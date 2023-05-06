@@ -12,6 +12,13 @@ static int to_msf(int frame)
 	return (m << 16) | (s << 8) | f;
 }
 
+void t10mmc::set_model(std::string model_name)
+{
+	m_model_name = model_name;
+	while(m_model_name.size() < 28)
+		m_model_name += ' ';
+}
+
 void t10mmc::t10_start(device_t &device)
 {
 	m_device = &device;
@@ -30,8 +37,7 @@ void t10mmc::t10_reset()
 {
 	t10spc::t10_reset();
 
-	SetDevice( m_image->get_cdrom_file() );
-	if( !m_cdrom )
+	if( !m_image->exists() )
 	{
 		m_device->logerror( "T10MMC %s: no CD found!\n", m_image->tag() );
 	}
@@ -72,7 +78,7 @@ t10mmc::toc_format_t t10mmc::toc_format()
 int t10mmc::toc_tracks()
 {
 	int start_track = command[6];
-	int end_track = m_cdrom->get_last_track();
+	int end_track = m_image->get_last_track();
 
 	if (start_track == 0)
 	{
@@ -156,8 +162,14 @@ void t10mmc::ExecCommand()
 		m_transfer_length = 8;
 		break;
 
+	case T10MMC_CMD_READ_DISC_STRUCTURE:
+		m_phase = SCSI_PHASE_DATAIN;
+		m_status_code = SCSI_STATUS_CODE_GOOD;
+		m_transfer_length = (command[8] << 8) | command[9];
+		break;
+
 	case T10SBC_CMD_READ_10:
-		if (m_cdrom == nullptr)
+		if (!m_image->exists())
 		{
 			m_phase = SCSI_PHASE_STATUS;
 			m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
@@ -188,7 +200,7 @@ void t10mmc::ExecCommand()
 		break;
 
 	case T10MMC_CMD_READ_SUB_CHANNEL:
-		if (m_cdrom == nullptr)
+		if (!m_image->exists())
 		{
 			m_phase = SCSI_PHASE_STATUS;
 			m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
@@ -204,7 +216,7 @@ void t10mmc::ExecCommand()
 
 	case T10MMC_CMD_READ_TOC_PMA_ATIP:
 	{
-		if (m_cdrom == nullptr)
+		if (!m_image->exists())
 		{
 			m_phase = SCSI_PHASE_STATUS;
 			m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
@@ -245,7 +257,7 @@ void t10mmc::ExecCommand()
 		break;
 	}
 	case T10MMC_CMD_PLAY_AUDIO_10:
-		if (m_cdrom == nullptr)
+		if (!m_image->exists())
 		{
 			m_phase = SCSI_PHASE_STATUS;
 			m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
@@ -261,8 +273,8 @@ void t10mmc::ExecCommand()
 			// A request for LBA 0 will return something different depending on the type of media being played.
 			// For data and mixed media, LBA 0 is assigned to MSF 00:02:00 (= LBA 150).
 			// For audio media, LBA 0 is assigned to the actual starting address of track 1.
-			if (m_cdrom->get_track_type(0) == cdrom_file::CD_TRACK_AUDIO)
-				m_lba = m_cdrom->get_track_start(0);
+			if (m_image->get_track_type(0) == cdrom_file::CD_TRACK_AUDIO)
+				m_lba = m_image->get_track_start(0);
 			else
 				m_lba = 150;
 		}
@@ -273,9 +285,9 @@ void t10mmc::ExecCommand()
 
 		//m_device->logerror("T10MMC: PLAY AUDIO(10) at LBA %x for %x blocks\n", m_lba, m_blocks);
 
-		trk = m_cdrom->get_track(m_lba);
+		trk = m_image->get_track(m_lba);
 
-		if (m_cdrom->get_track_type(trk) == cdrom_file::CD_TRACK_AUDIO)
+		if (m_image->get_track_type(trk) == cdrom_file::CD_TRACK_AUDIO)
 		{
 			m_cdda->start_audio(m_lba, m_blocks);
 			m_audio_sense = SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_IN_PROGRESS;
@@ -292,7 +304,7 @@ void t10mmc::ExecCommand()
 		break;
 
 	case T10MMC_CMD_PLAY_AUDIO_MSF:
-		if (m_cdrom == nullptr)
+		if (!m_image->exists())
 		{
 			m_phase = SCSI_PHASE_STATUS;
 			m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
@@ -305,8 +317,8 @@ void t10mmc::ExecCommand()
 
 		if (m_lba == 0)
 		{
-			if (m_cdrom->get_track_type(0) == cdrom_file::CD_TRACK_AUDIO)
-				m_lba = m_cdrom->get_track_start(0);
+			if (m_image->get_track_type(0) == cdrom_file::CD_TRACK_AUDIO)
+				m_lba = m_image->get_track_start(0);
 			else
 				m_lba = 150;
 		}
@@ -318,9 +330,9 @@ void t10mmc::ExecCommand()
 		//m_device->logerror("T10MMC: PLAY AUDIO MSF at LBA %x for %x blocks (MSF %i:%i:%i - %i:%i:%i)\n",
 			//m_lba, m_blocks, command[3], command[4], command[5], command[6], command[7], command[8]);
 
-		trk = m_cdrom->get_track(m_lba);
+		trk = m_image->get_track(m_lba);
 
-		if (m_cdrom->get_track_type(trk) == cdrom_file::CD_TRACK_AUDIO)
+		if (m_image->get_track_type(trk) == cdrom_file::CD_TRACK_AUDIO)
 		{
 			m_cdda->start_audio(m_lba, m_blocks);
 			m_audio_sense = SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_IN_PROGRESS;
@@ -337,7 +349,7 @@ void t10mmc::ExecCommand()
 		break;
 
 	case T10MMC_CMD_PLAY_AUDIO_TRACK_INDEX:
-		if (m_cdrom == nullptr)
+		if (!m_image->exists())
 		{
 			m_phase = SCSI_PHASE_STATUS;
 			m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
@@ -362,7 +374,7 @@ void t10mmc::ExecCommand()
 			// be careful: tracks here are zero-based, but the SCSI command
 			// uses the real CD track number which is 1-based!
 			//m_device->logerror("T10MMC: PLAY AUDIO T/I: strk %d idx %d etrk %d idx %d frames %d\n", command[4], command[5], command[7], command[8], m_blocks);
-			int end_track = m_cdrom->get_last_track();
+			int end_track = m_image->get_last_track();
 			if (end_track > command[7])
 				end_track = command[7];
 
@@ -377,11 +389,11 @@ void t10mmc::ExecCommand()
 					end_track = command[4];
 			}
 
-			m_lba = m_cdrom->get_track_start(command[4] - 1);
-			m_blocks = m_cdrom->get_track_start(end_track) - m_lba;
-			trk = m_cdrom->get_track(m_lba);
+			m_lba = m_image->get_track_start(command[4] - 1);
+			m_blocks = m_image->get_track_start(end_track) - m_lba;
+			trk = m_image->get_track(m_lba);
 
-			if (m_cdrom->get_track_type(trk) == cdrom_file::CD_TRACK_AUDIO)
+			if (m_image->get_track_type(trk) == cdrom_file::CD_TRACK_AUDIO)
 			{
 				m_cdda->start_audio(m_lba, m_blocks);
 				m_audio_sense = SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_IN_PROGRESS;
@@ -402,7 +414,7 @@ void t10mmc::ExecCommand()
 		break;
 
 	case T10MMC_CMD_PAUSE_RESUME:
-		if (m_cdrom)
+		if (m_image)
 		{
 			m_cdda->pause_audio((command[8] & 0x01) ^ 0x01);
 		}
@@ -436,7 +448,7 @@ void t10mmc::ExecCommand()
 		break;
 
 	case T10MMC_CMD_PLAY_AUDIO_12:
-		if (m_cdrom == nullptr)
+		if (!m_image->exists())
 		{
 			m_phase = SCSI_PHASE_STATUS;
 			m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
@@ -449,8 +461,8 @@ void t10mmc::ExecCommand()
 
 		if (m_lba == 0)
 		{
-			if (m_cdrom->get_track_type(0) == cdrom_file::CD_TRACK_AUDIO)
-				m_lba = m_cdrom->get_track_start(0);
+			if (m_image->get_track_type(0) == cdrom_file::CD_TRACK_AUDIO)
+				m_lba = m_image->get_track_start(0);
 			else
 				m_lba = 150;
 		}
@@ -461,9 +473,9 @@ void t10mmc::ExecCommand()
 
 		//m_device->logerror("T10MMC: PLAY AUDIO(12) at LBA %x for %x blocks\n", m_lba, m_blocks);
 
-		trk = m_cdrom->get_track(m_lba);
+		trk = m_image->get_track(m_lba);
 
-		if (m_cdrom->get_track_type(trk) == cdrom_file::CD_TRACK_AUDIO)
+		if (m_image->get_track_type(trk) == cdrom_file::CD_TRACK_AUDIO)
 		{
 			m_cdda->start_audio(m_lba, m_blocks);
 			m_audio_sense = SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_IN_PROGRESS;
@@ -480,7 +492,7 @@ void t10mmc::ExecCommand()
 		break;
 
 	case T10SBC_CMD_READ_12:
-		if (m_cdrom == nullptr)
+		if (!m_image->exists())
 		{
 			m_phase = SCSI_PHASE_STATUS;
 			m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
@@ -519,7 +531,7 @@ void t10mmc::ExecCommand()
 
 	case T10MMC_CMD_READ_CD:
 	{
-		if (m_cdrom == nullptr)
+		if (!m_image->exists())
 		{
 			m_phase = SCSI_PHASE_STATUS;
 			m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
@@ -534,8 +546,8 @@ void t10mmc::ExecCommand()
 		// m_device->logerror("T10MMC: READ CD start_lba[%08x] block_len[%06x] %02x %02x %02x %02x\n", m_lba, m_blocks, command[1], command[9], command[10], command[11]);
 
 		auto expected_sector_type = BIT(command[1], 2, 3);
-		auto trk = m_cdrom->get_track(m_lba);
-		auto track_type = m_cdrom->get_track_type(trk);
+		auto trk = m_image->get_track(m_lba);
+		auto track_type = m_image->get_track_type(trk);
 		if (expected_sector_type != 0)
 		{
 			m_device->logerror("T10MMC: READ CD requested a sector type of %d which is unhandled\n", expected_sector_type);
@@ -607,16 +619,13 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 		data[5] = 0;
 		data[6] = 0;
 		data[7] = 0;
-		memset(&data[8], ' ', 28);
-		memcpy(&data[8], "MAME", 4);
-		memcpy(&data[16], "Virtual CDROM", 13);
-		memcpy(&data[32], "1.0", 3);
+		memcpy(&data[8], m_model_name.data(), 28);
 		break;
 
 	case T10SBC_CMD_READ_CAPACITY:
 		m_device->logerror("T10MMC: READ CAPACITY\n");
 
-		temp = m_cdrom->get_track_start(0xaa);
+		temp = m_image->get_track_start(0xaa);
 		temp--; // return the last used block on the disc
 
 		data[0] = (temp>>24) & 0xff;
@@ -633,11 +642,11 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 	case T10SBC_CMD_READ_12:
 	case T10MMC_CMD_READ_CD: // TODO: Will need its own logic once more support is implemented
 		//m_device->logerror("T10MMC: read %x dataLength lba=%x\n", dataLength, m_lba);
-		if ((m_cdrom) && (m_blocks))
+		if ((m_image) && (m_blocks))
 		{
 			while (dataLength > 0)
 			{
-				if (!m_cdrom->read_data(m_lba, tmp_buffer, cdrom_file::CD_TRACK_MODE1))
+				if (!m_image->read_data(m_lba, tmp_buffer, cdrom_file::CD_TRACK_MODE1))
 				{
 					m_device->logerror("T10MMC: CD read error! (%08x)\n", m_lba);
 					return;
@@ -668,7 +677,7 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 		{
 			case 1: // return current position
 			{
-				if (!m_cdrom)
+				if (!m_image)
 				{
 					return;
 				}
@@ -713,7 +722,7 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 					data[3] = 12;       // data length
 					data[4] = 0x01; // sub-channel format code
 					data[5] = 0x10 | (audio_active ? 0 : 4);
-					data[6] = m_cdrom->get_track(m_last_lba) + 1; // track
+					data[6] = m_image->get_track(m_last_lba) + 1; // track
 					data[7] = 0;    // index
 
 					uint32_t frame = m_last_lba;
@@ -728,7 +737,7 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 					data[10] = (frame>>8)&0xff;
 					data[11] = frame&0xff;
 
-					frame = m_last_lba - m_cdrom->get_track_start(data[6] - 1);
+					frame = m_last_lba - m_image->get_track_start(data[6] - 1);
 
 					if (msf)
 					{
@@ -776,7 +785,7 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 					data[dptr++] = (len>>8) & 0xff;
 					data[dptr++] = (len & 0xff);
 					data[dptr++] = 1;
-					data[dptr++] = m_cdrom->get_last_track();
+					data[dptr++] = m_image->get_last_track();
 
 					int first_track = command[6];
 					if (first_track == 0)
@@ -800,11 +809,11 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 						}
 
 						data[dptr++] = 0;
-						data[dptr++] = m_cdrom->get_adr_control(cdrom_track);
+						data[dptr++] = m_image->get_adr_control(cdrom_track);
 						data[dptr++] = track;
 						data[dptr++] = 0;
 
-						uint32_t tstart = m_cdrom->get_track_start(cdrom_track);
+						uint32_t tstart = m_image->get_track_start(cdrom_track);
 
 						if (msf)
 						{
@@ -830,11 +839,11 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 					data[dptr++] = 1;
 
 					data[dptr++] = 0;
-					data[dptr++] = m_cdrom->get_adr_control(0);
+					data[dptr++] = m_image->get_adr_control(0);
 					data[dptr++] = 1;
 					data[dptr++] = 0;
 
-					uint32_t tstart = m_cdrom->get_track_start(0);
+					uint32_t tstart = m_image->get_track_start(0);
 
 					if (msf)
 					{
@@ -857,7 +866,7 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 
 	case T10SPC_CMD_MODE_SENSE_6:
 	case T10SPC_CMD_MODE_SENSE_10:
-		m_device->logerror("T10MMC: MODE SENSE page code = %x, PC = %x\n", command[2] & 0x3f, (command[2]&0xc0)>>6);
+		//		m_device->logerror("T10MMC: MODE SENSE page code = %x, PC = %x\n", command[2] & 0x3f, (command[2]&0xc0)>>6);
 
 		memset(data, 0, SCSILengthFromUINT16( &command[ 7 ] ));
 
@@ -917,6 +926,20 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 		}
 		break;
 
+	case T10MMC_CMD_READ_DISC_STRUCTURE:
+		m_device->machine().debug_break();
+		m_device->logerror("T10MMC: READ DISC STRUCTURE, data\n");
+		data[0] = data[1] = 0;
+		data[2] = data[3] = 0;
+
+		if((command[1] & 0x0f) == 0 && command[7] == 0x04) // DVD / DVD disc manufacturing information
+		{
+			data[1] = 0xe;
+			for(int i=4; i != 0xe; i++)
+				data[i] = 0;
+		}
+		break;
+
 	default:
 		t10spc::ReadData( data, dataLength );
 		break;
@@ -968,15 +991,4 @@ void t10mmc::WriteData( uint8_t *data, int dataLength )
 		t10spc::WriteData( data, dataLength );
 		break;
 }
-}
-
-void t10mmc::GetDevice( void **_cdrom )
-{
-	*(cdrom_file **)_cdrom = m_cdrom;
-}
-
-void t10mmc::SetDevice( void *_cdrom )
-{
-	m_cdrom = (cdrom_file *)_cdrom;
-	m_cdda->set_cdrom(m_cdrom);
 }

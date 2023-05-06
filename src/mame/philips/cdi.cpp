@@ -51,7 +51,7 @@ TODO:
 #include "cdi.h"
 
 #include "cpu/m6805/m6805.h"
-#include "imagedev/chd_cd.h"
+#include "imagedev/cdromimg.h"
 #include "machine/timekpr.h"
 #include "sound/cdda.h"
 
@@ -478,6 +478,8 @@ void cdi_state::cdimono1_base(machine_config &config)
 	CDI_SLAVE_HLE(config, m_slave_hle, 0);
 	m_slave_hle->int_callback().set(m_maincpu, FUNC(scc68070_device::in2_w));
 
+	CDROM(config, "cdrom").set_interface("cdi_cdrom");
+
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -589,7 +591,6 @@ void cdi_state::cdimono1(machine_config &config)
 	m_slave_hle->read_mousey().set_ioport("MOUSEY");
 	m_slave_hle->read_mousebtn().set_ioport("MOUSEBTN");
 
-	CDROM(config, "cdrom").set_interface("cdi_cdrom");
 	SOFTWARE_LIST(config, "cd_list").set_original("cdi").set_filter("!DVC");
 }
 

@@ -114,12 +114,13 @@ protected:
 	optional_device<speaker_sound_device> m_speaker;
 	optional_ioport_array<6> m_inputs; // max 6
 
-	// misc common
-	u8 m_a = 0;         // MCU port A write data
-	u8 m_b = 0;         // " B
-	u8 m_c = 0;         // " C
-	u8 m_d = 0;         // " D
 	u16 m_inp_mux = ~0; // multiplexed inputs mask
+
+	// MCU output pin state
+	u8 m_a = 0;         // port A
+	u8 m_b = 0;         // port B
+	u8 m_c = 0;         // port C
+	u8 m_d = 0;         // port D
 
 	u16 read_inputs(int columns, u16 colmask = ~0);
 	u8 read_rotated_inputs(int columns, u8 rowmask = ~0);
@@ -132,11 +133,11 @@ protected:
 void hh_pic16_state::machine_start()
 {
 	// register for savestates
+	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_a));
 	save_item(NAME(m_b));
 	save_item(NAME(m_c));
 	save_item(NAME(m_d));
-	save_item(NAME(m_inp_mux));
 }
 
 void hh_pic16_state::machine_reset()

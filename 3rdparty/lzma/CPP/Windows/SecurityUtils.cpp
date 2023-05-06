@@ -2,9 +2,10 @@
 
 #include "StdAfx.h"
 
-#include "../Common/MyString.h"
-
 #include "SecurityUtils.h"
+
+#define MY_CAST_FUNC  (void(*)())
+// #define MY_CAST_FUNC
 
 namespace NWindows {
 namespace NSecurity {
@@ -34,7 +35,7 @@ bool MyLookupAccountSid(LPCTSTR systemName, PSID sid,
   
 static void SetLsaString(LPWSTR src, PLSA_UNICODE_STRING dest)
 {
-  int len = (int)wcslen(src);
+  size_t len = (size_t)wcslen(src);
   dest->Length = (USHORT)(len * sizeof(WCHAR));
   dest->MaximumLength = (USHORT)((len + 1) * sizeof(WCHAR));
   dest->Buffer = src;
@@ -52,8 +53,10 @@ static void MyLookupSids(CPolicy &policy, PSID ps)
 }
 */
 
+extern "C" {
+
 #ifndef _UNICODE
-typedef BOOL (WINAPI * LookupAccountNameWP)(
+typedef BOOL (WINAPI * Func_LookupAccountNameW)(
     LPCWSTR lpSystemName,
     LPCWSTR lpAccountName,
     PSID Sid,
@@ -64,13 +67,17 @@ typedef BOOL (WINAPI * LookupAccountNameWP)(
     );
 #endif
 
+}
+
 static PSID GetSid(LPWSTR accountName)
 {
   #ifndef _UNICODE
   HMODULE hModule = GetModuleHandle(TEXT("Advapi32.dll"));
   if (hModule == NULL)
     return NULL;
-  LookupAccountNameWP lookupAccountNameW = (LookupAccountNameWP)GetProcAddress(hModule, "LookupAccountNameW");
+  Func_LookupAccountNameW lookupAccountNameW = (Func_LookupAccountNameW)
+      MY_CAST_FUNC
+      GetProcAddress(hModule, "LookupAccountNameW");
   if (lookupAccountNameW == NULL)
     return NULL;
   #endif

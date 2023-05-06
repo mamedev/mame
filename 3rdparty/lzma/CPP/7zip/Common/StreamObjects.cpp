@@ -37,9 +37,9 @@ STDMETHODIMP CBufferInStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newP
   }
   if (offset < 0)
     return HRESULT_WIN32_ERROR_NEGATIVE_SEEK;
-  _pos = offset;
+  _pos = (UInt64)offset;
   if (newPosition)
-    *newPosition = offset;
+    *newPosition = (UInt64)offset;
   return S_OK;
 }
 
@@ -72,9 +72,9 @@ STDMETHODIMP CBufInStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPosi
   }
   if (offset < 0)
     return HRESULT_WIN32_ERROR_NEGATIVE_SEEK;
-  _pos = offset;
+  _pos = (UInt64)offset;
   if (newPosition)
-    *newPosition = offset;
+    *newPosition = (UInt64)offset;
   return S_OK;
 }
 
@@ -108,14 +108,10 @@ bool CByteDynBuffer::EnsureCapacity(size_t cap) throw()
 {
   if (cap <= _capacity)
     return true;
-  size_t delta;
-  if (_capacity > 64)
-    delta = _capacity / 4;
-  else if (_capacity > 8)
-    delta = 16;
-  else
-    delta = 4;
-  cap = MyMax(_capacity + delta, cap);
+  size_t delta = _capacity / 4;
+  size_t cap2 = _capacity + delta;
+  if (cap < cap2)
+    cap = cap2;
   Byte *buf = (Byte *)realloc(_buf, cap);
   if (!buf)
     return false;
@@ -185,9 +181,9 @@ static const UInt64 kEmptyTag = (UInt64)(Int64)-1;
 void CCachedInStream::Free() throw()
 {
   MyFree(_tags);
-  _tags = 0;
+  _tags = NULL;
   MidFree(_data);
-  _data = 0;
+  _data = NULL;
 }
 
 bool CCachedInStream::Alloc(unsigned blockSizeLog, unsigned numBlocksLog) throw()
@@ -196,19 +192,19 @@ bool CCachedInStream::Alloc(unsigned blockSizeLog, unsigned numBlocksLog) throw(
   if (sizeLog >= sizeof(size_t) * 8)
     return false;
   size_t dataSize = (size_t)1 << sizeLog;
-  if (_data == 0 || dataSize != _dataSize)
+  if (!_data || dataSize != _dataSize)
   {
     MidFree(_data);
     _data = (Byte *)MidAlloc(dataSize);
-    if (_data == 0)
+    if (!_data)
       return false;
     _dataSize = dataSize;
   }
-  if (_tags == 0 || numBlocksLog != _numBlocksLog)
+  if (!_tags || numBlocksLog != _numBlocksLog)
   {
     MyFree(_tags);
     _tags = (UInt64 *)MyAlloc(sizeof(UInt64) << numBlocksLog);
-    if (_tags == 0)
+    if (!_tags)
       return false;
     _numBlocksLog = numBlocksLog;
   }
@@ -242,21 +238,32 @@ STDMETHODIMP CCachedInStream::Read(void *data, UInt32 size, UInt32 *processedSiz
 
   while (size != 0)
   {
-    UInt64 cacheTag = _pos >> _blockSizeLog;
-    size_t cacheIndex = (size_t)cacheTag & (((size_t)1 << _numBlocksLog) - 1);
+    const UInt64 cacheTag = _pos >> _blockSizeLog;
+    const size_t cacheIndex = (size_t)cacheTag & (((size_t)1 << _numBlocksLog) - 1);
     Byte *p = _data + (cacheIndex << _blockSizeLog);
+
     if (_tags[cacheIndex] != cacheTag)
     {
+      _tags[cacheIndex] = kEmptyTag;
       UInt64 remInBlock = _size - (cacheTag << _blockSizeLog);
       size_t blockSize = (size_t)1 << _blockSizeLog;
       if (blockSize > remInBlock)
         blockSize = (size_t)remInBlock;
+      
       RINOK(ReadBlock(cacheTag, p, blockSize));
+      
       _tags[cacheIndex] = cacheTag;
     }
-    size_t offset = (size_t)_pos & (((size_t)1 << _blockSizeLog) - 1);
-    UInt32 cur = (UInt32)MyMin(((size_t)1 << _blockSizeLog) - offset, (size_t)size);
+    
+    const size_t kBlockSize = (size_t)1 << _blockSizeLog;
+    const size_t offset = (size_t)_pos & (kBlockSize - 1);
+    UInt32 cur = size;
+    const size_t rem = kBlockSize - offset;
+    if (cur > rem)
+      cur = (UInt32)rem;
+    
     memcpy(data, p + offset, cur);
+    
     if (processedSize)
       *processedSize += cur;
     data = (void *)((const Byte *)data + cur);
@@ -266,6 +273,7 @@ STDMETHODIMP CCachedInStream::Read(void *data, UInt32 size, UInt32 *processedSiz
 
   return S_OK;
 }
+
  
 STDMETHODIMP CCachedInStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition)
 {
@@ -278,8 +286,8 @@ STDMETHODIMP CCachedInStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newP
   }
   if (offset < 0)
     return HRESULT_WIN32_ERROR_NEGATIVE_SEEK;
-  _pos = offset;
+  _pos = (UInt64)offset;
   if (newPosition)
-    *newPosition = offset;
+    *newPosition = (UInt64)offset;
   return S_OK;
 }

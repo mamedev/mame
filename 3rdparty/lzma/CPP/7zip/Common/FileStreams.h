@@ -7,42 +7,35 @@
 #define USE_WIN_FILE
 #endif
 
+#include "../../Common/MyCom.h"
 #include "../../Common/MyString.h"
 
-#ifdef USE_WIN_FILE
 #include "../../Windows/FileIO.h"
-#else
-#include "../../Common/C_FileIO.h"
-#endif
-
-#include "../../Common/MyCom.h"
 
 #include "../IStream.h"
 
-#ifdef _WIN32
-typedef UINT_PTR My_UINT_PTR;
-#else
-typedef UINT My_UINT_PTR;
-#endif
+#include "UniqBlocks.h"
 
+
+class CInFileStream;
 struct IInFileStream_Callback
 {
-  virtual HRESULT InFileStream_On_Error(My_UINT_PTR val, DWORD error) = 0;
-  virtual void InFileStream_On_Destroy(My_UINT_PTR val) = 0;
+  virtual HRESULT InFileStream_On_Error(UINT_PTR val, DWORD error) = 0;
+  virtual void InFileStream_On_Destroy(CInFileStream *stream, UINT_PTR val) = 0;
 };
 
 class CInFileStream:
   public IInStream,
   public IStreamGetSize,
-  #ifdef USE_WIN_FILE
   public IStreamGetProps,
   public IStreamGetProps2,
-  #endif
+  public IStreamGetProp,
   public CMyUnknownImp
 {
-public:
-  #ifdef USE_WIN_FILE
   NWindows::NFile::NIO::CInFile File;
+public:
+
+  #ifdef USE_WIN_FILE
   
   #ifdef SUPPORT_DEVICE_FILE
   UInt64 VirtPos;
@@ -52,35 +45,56 @@ public:
   UInt32 BufSize;
   #endif
 
-  #else
-  NC::NFile::NIO::CInFile File;
   #endif
 
-  bool SupportHardLinks;
+ #ifdef _WIN32
+  BY_HANDLE_FILE_INFORMATION _info;
+ #else
+  struct stat _info;
+  UInt32 _uid;
+  UInt32 _gid;
+  UString OwnerName;
+  UString OwnerGroup;
+  bool StoreOwnerId;
+  bool StoreOwnerName;
+ #endif
 
+  bool _info_WasLoaded;
+  bool SupportHardLinks;
   IInFileStream_Callback *Callback;
-  My_UINT_PTR CallbackRef;
+  UINT_PTR CallbackRef;
 
   virtual ~CInFileStream();
 
   CInFileStream();
+    
+  void Set_PreserveATime(bool v)
+  {
+    File.PreserveATime = v;
+  }
+
+  bool GetLength(UInt64 &length) const throw()
+  {
+    return File.GetLength(length);
+  }
   
   bool Open(CFSTR fileName)
   {
+    _info_WasLoaded = false;
     return File.Open(fileName);
   }
   
   bool OpenShared(CFSTR fileName, bool shareForWrite)
   {
+    _info_WasLoaded = false;
     return File.OpenShared(fileName, shareForWrite);
   }
 
   MY_QUERYINTERFACE_BEGIN2(IInStream)
   MY_QUERYINTERFACE_ENTRY(IStreamGetSize)
-  #ifdef USE_WIN_FILE
   MY_QUERYINTERFACE_ENTRY(IStreamGetProps)
   MY_QUERYINTERFACE_ENTRY(IStreamGetProps2)
-  #endif
+  MY_QUERYINTERFACE_ENTRY(IStreamGetProp)
   MY_QUERYINTERFACE_END
   MY_ADDREF_RELEASE
 
@@ -88,10 +102,10 @@ public:
   STDMETHOD(Seek)(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition);
 
   STDMETHOD(GetSize)(UInt64 *size);
-  #ifdef USE_WIN_FILE
   STDMETHOD(GetProps)(UInt64 *size, FILETIME *cTime, FILETIME *aTime, FILETIME *mTime, UInt32 *attrib);
   STDMETHOD(GetProps2)(CStreamFileProps *props);
-  #endif
+  STDMETHOD(GetProperty)(PROPID propID, PROPVARIANT *value);
+  STDMETHOD(ReloadProps)();
 };
 
 class CStdInFileStream:
@@ -110,11 +124,8 @@ class COutFileStream:
   public CMyUnknownImp
 {
 public:
-  #ifdef USE_WIN_FILE
   NWindows::NFile::NIO::COutFile File;
-  #else
-  NC::NFile::NIO::COutFile File;
-  #endif
+
   virtual ~COutFileStream() {}
   bool Create(CFSTR fileName, bool createAlways)
   {
@@ -131,20 +142,26 @@ public:
   
   UInt64 ProcessedSize;
 
-  #ifdef USE_WIN_FILE
-  bool SetTime(const FILETIME *cTime, const FILETIME *aTime, const FILETIME *mTime)
+  bool SetTime(const CFiTime *cTime, const CFiTime *aTime, const CFiTime *mTime)
   {
     return File.SetTime(cTime, aTime, mTime);
   }
-  bool SetMTime(const FILETIME *mTime) {  return File.SetMTime(mTime); }
-  #endif
-
+  bool SetMTime(const CFiTime *mTime) {  return File.SetMTime(mTime); }
 
   MY_UNKNOWN_IMP1(IOutStream)
 
   STDMETHOD(Write)(const void *data, UInt32 size, UInt32 *processedSize);
   STDMETHOD(Seek)(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition);
   STDMETHOD(SetSize)(UInt64 newSize);
+
+  bool SeekToBegin_bool()
+  {
+    #ifdef USE_WIN_FILE
+    return File.SeekToBegin();
+    #else
+    return File.seekToBegin() == 0;
+    #endif
+  }
 
   HRESULT GetSize(UInt64 *size);
 };

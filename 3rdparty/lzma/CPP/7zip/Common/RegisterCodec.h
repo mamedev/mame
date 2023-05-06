@@ -26,11 +26,11 @@ void RegisterCodec(const CCodecInfo *codecInfo) throw();
 #define REGISTER_CODEC_CREATE(name, cls) REGISTER_CODEC_CREATE_2(name, cls, ICompressCoder)
 
 #define REGISTER_CODEC_NAME(x) CRegisterCodec ## x
-#define REGISTER_CODEC_VAR static const CCodecInfo g_CodecInfo =
+#define REGISTER_CODEC_VAR(x) static const CCodecInfo g_CodecInfo_ ## x =
 
 #define REGISTER_CODEC(x) struct REGISTER_CODEC_NAME(x) { \
-    REGISTER_CODEC_NAME(x)() { RegisterCodec(&g_CodecInfo); }}; \
-    static REGISTER_CODEC_NAME(x) g_RegisterCodec;
+    REGISTER_CODEC_NAME(x)() { RegisterCodec(&g_CodecInfo_ ## x); }}; \
+    static REGISTER_CODEC_NAME(x) g_RegisterCodec_ ## x;
 
 
 #define REGISTER_CODECS_NAME(x) CRegisterCodecs ## x
@@ -43,7 +43,7 @@ void RegisterCodec(const CCodecInfo *codecInfo) throw();
 
 
 #define REGISTER_CODEC_2(x, crDec, crEnc, id, name) \
-    REGISTER_CODEC_VAR \
+    REGISTER_CODEC_VAR(x) \
     { crDec, crEnc, id, name, 1, false }; \
     REGISTER_CODEC(x)
 
@@ -67,19 +67,19 @@ void RegisterCodec(const CCodecInfo *codecInfo) throw();
     { crDec, crEnc, id, name, 1, true }
 
 #define REGISTER_FILTER(x, crDec, crEnc, id, name) \
-    REGISTER_CODEC_VAR \
+    REGISTER_CODEC_VAR(x) \
     REGISTER_FILTER_ITEM(crDec, crEnc, id, name); \
     REGISTER_CODEC(x)
 
 #ifdef EXTRACT_ONLY
   #define REGISTER_FILTER_E(x, clsDec, clsEnc, id, name) \
-    REGISTER_FILTER_CREATE(CreateDec, clsDec) \
-    REGISTER_FILTER(x, CreateDec, NULL, id, name)
+    REGISTER_FILTER_CREATE(x ## _CreateDec, clsDec) \
+    REGISTER_FILTER(x, x ## _CreateDec, NULL, id, name)
 #else
   #define REGISTER_FILTER_E(x, clsDec, clsEnc, id, name) \
-    REGISTER_FILTER_CREATE(CreateDec, clsDec) \
-    REGISTER_FILTER_CREATE(CreateEnc, clsEnc) \
-    REGISTER_FILTER(x, CreateDec, CreateEnc, id, name)
+    REGISTER_FILTER_CREATE(x ## _CreateDec, clsDec) \
+    REGISTER_FILTER_CREATE(x ## _CreateEnc, clsEnc) \
+    REGISTER_FILTER(x, x ## _CreateDec, x ## _CreateEnc, id, name)
 #endif
 
 

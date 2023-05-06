@@ -37,6 +37,17 @@ public:
     for (unsigned i = 0; i < sizeof(Salt); i++)
       Salt[i] = 0;
   }
+
+  void Wipe()
+  {
+    Password.Wipe();
+    NumCyclesPower = 0;
+    SaltSize = 0;
+    MY_memset_0_ARRAY(Salt);
+    MY_memset_0_ARRAY(Key);
+  }
+
+  ~CKeyInfo() { Wipe(); }
 };
 
 class CKeyInfoCache

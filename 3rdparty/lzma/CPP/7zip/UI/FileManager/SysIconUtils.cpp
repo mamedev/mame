@@ -12,6 +12,9 @@
 
 #include <ShlObj.h>
 
+#define MY_CAST_FUNC  (void(*)())
+// #define MY_CAST_FUNC
+
 #ifndef _UNICODE
 extern bool g_IsNT;
 #endif
@@ -23,7 +26,7 @@ int GetIconIndexForCSIDL(int csidl)
   if (pidl)
   {
     SHFILEINFO shellInfo;
-    SHGetFileInfo(LPCTSTR(pidl), FILE_ATTRIBUTE_NORMAL,
+    SHGetFileInfo((LPCTSTR)(const void *)(pidl), FILE_ATTRIBUTE_NORMAL,
       &shellInfo, sizeof(shellInfo),
       SHGFI_PIDL | SHGFI_SYSICONINDEX);
     IMalloc  *pMalloc;
@@ -39,15 +42,16 @@ int GetIconIndexForCSIDL(int csidl)
 }
 
 #ifndef _UNICODE
-typedef int (WINAPI * SHGetFileInfoWP)(LPCWSTR pszPath, DWORD attrib, SHFILEINFOW *psfi, UINT cbFileInfo, UINT uFlags);
+typedef int (WINAPI * Func_SHGetFileInfoW)(LPCWSTR pszPath, DWORD attrib, SHFILEINFOW *psfi, UINT cbFileInfo, UINT uFlags);
 
-struct CSHGetFileInfoInit
+static struct CSHGetFileInfoInit
 {
-  SHGetFileInfoWP shGetFileInfoW;
+  Func_SHGetFileInfoW shGetFileInfoW;
   CSHGetFileInfoInit()
   {
-    shGetFileInfoW = (SHGetFileInfoWP)
-    ::GetProcAddress(::GetModuleHandleW(L"shell32.dll"), "SHGetFileInfoW");
+    shGetFileInfoW = (Func_SHGetFileInfoW)
+        MY_CAST_FUNC
+        ::GetProcAddress(::GetModuleHandleW(L"shell32.dll"), "SHGetFileInfoW");
   }
 } g_SHGetFileInfoInit;
 #endif

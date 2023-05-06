@@ -11,7 +11,7 @@
 
 const char *const mn1400_disassembler::s_mnemonics[] =
 {
-	"?",
+	"?", "?",
 	"L", "LD", "LI", "LIC", "LDC", "ST", "STD", "STIC", "STDC",
 	"LX", "LY", "TAX", "TAY", "TYA", "TACU", "TACL", "TCAU", "TCAL",
 	"NOP", "AND", "ANDI", "OR", "XOR", "A", "AI", "CPL", "C", "CI", "CY",
@@ -27,7 +27,7 @@ const char *const mn1400_disassembler::s_mnemonics[] =
 // number of bits per opcode parameter
 const u8 mn1400_disassembler::s_bits[] =
 {
-	0,
+	0, 8,
 	0, 2, 4, 0, 0, 0, 2, 0, 0,
 	3, 4, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 4, 0, 0, 0, 4, 0, 0, 4, 4,
@@ -42,7 +42,7 @@ const u8 mn1400_disassembler::s_bits[] =
 
 const u32 mn1400_disassembler::s_flags[] =
 {
-	0,
+	0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -62,7 +62,7 @@ const u8 mn1400_disassembler::mn1400_mnemonic[0x100] =
 	mNOP,  mTAX,  mTYA,  mTAY,  mAND,  mOR,   mXOR,  mA,    mCPL,  mC,    mST,   mSTIC, mSTDC, mL,    mLIC,  mLDC,  // 0
 	mOTE,  mOTMD, mOTD,  mCCO,  mINA,  mINB,  mRCO,  mSCO,  mTACL, mTACU, mTCAL, mTCAU, mDC,   mEC,   mSL,   mRET,  // 1
 	mLD,   mLD,   mLD,   mLD,   mSTD,  mSTD,  mSTD,  mSTD,  mRC,   mRP,   mSC,   mSP,   mICY,  mDCY,  mICM,  mDCM,  // 2
-	mLX,   mLX,   mLX,   mLX,   mLX,   mLX,   mLX,   mLX,   0,     0,     mBSN0, mBS0,  mBSN1, mBS1,  mBSN01,mBS01, // 3
+	mLX,   mLX,   mLX,   mLX,   mLX,   mLX,   mLX,   mLX,   1,     1,     mBSN0, mBS0,  mBSN1, mBS1,  mBSN01,mBS01, // 3
 
 	mJMP,  mJMP,  mJMP,  mJMP,  mJMP,  mJMP,  mJMP,  mJMP,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  // 4
 	mLI,   mLI,   mLI,   mLI,   mLI,   mLI,   mLI,   mLI,   mLI,   mLI,   mLI,   mLI,   mLI,   mLI,   mLI,   mLI,   // 5
@@ -76,7 +76,7 @@ const u8 mn1400_disassembler::mn1400_mnemonic[0x100] =
 
 	mRM,   mRM,   mRM,   mRM,   mRM,   mRM,   mRM,   mRM,   mRM,   mRM,   mRM,   mRM,   mRM,   mRM,   mRM,   mRM,   // C
 	mTB,   mTB,   mTB,   mTB,   mTB,   mTB,   mTB,   mTB,   mTB,   mTB,   mTB,   mTB,   mTB,   mTB,   mTB,   mTB,   // D
-	0,     0,     mBNZ,  mBZ,   mBNC,  mBC,   mBNCZ, mBCZ,  mBNP,  mBP,   mBNPZ, mBPZ,  mBNPC, mBPC,  mBNPCZ,mBPCZ, // E
+	1,     1,     mBNZ,  mBZ,   mBNC,  mBC,   mBNCZ, mBCZ,  mBNP,  mBP,   mBNPZ, mBPZ,  mBNPC, mBPC,  mBNPCZ,mBPCZ, // E
 	mOTIE, mOTIE, mOTIE, mOTIE, mOTIE, mOTIE, mOTIE, mOTIE, mOTIE, mOTIE, mOTIE, mOTIE, mOTIE, mOTIE, mOTIE, mOTIE  // F
 };
 
@@ -100,7 +100,9 @@ offs_t mn1400_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 				param |= (op & ((1 << (bits - 8)) - 1)) << 8;
 			else
 				param |= pc & 0x700;
-			util::stream_format(stream, "$%03X", param);
+
+			if (instr > 1)
+				util::stream_format(stream, "$%03X", param);
 		}
 		else
 		{

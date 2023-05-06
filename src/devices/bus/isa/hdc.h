@@ -52,7 +52,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	hard_disk_file *pc_hdc_file(int id);
+	harddisk_image_device *pc_hdc_file(int id);
 	void pc_hdc_result(bool set_error_info);
 	bool no_dma();
 	int get_lbasector();

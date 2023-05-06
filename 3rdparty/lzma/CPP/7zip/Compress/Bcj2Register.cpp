@@ -16,7 +16,7 @@ REGISTER_CODEC_CREATE_2(CreateCodecOut, CEncoder(), ICompressCoder2)
 #define CreateCodecOut NULL
 #endif
 
-REGISTER_CODEC_VAR
+REGISTER_CODEC_VAR(BCJ2)
   { CreateCodec, CreateCodecOut, 0x303011B, "BCJ2", 4, false };
 
 REGISTER_CODEC(BCJ2)

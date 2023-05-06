@@ -8,6 +8,8 @@
     telephone cord, complete with modular plug on each end. The keyboard carries
     its own Intel 87C51 processor and is an intelligent device.
 
+    Non-Linear Systems changed its name to Kaypro Corporation in July 1983.
+
     Kaypro 5 notes:
     The Kaycomp Kay Pro V / Non-Linear Systems Kaypro 5: https://retrocmp.de/kaypro/kay-p1_vers.htm#kay-5,
     a version of the Kaypro II, but with a 5MB harddisk instead of one of the floppy drives, was announced
@@ -40,7 +42,7 @@
     - Hard Disk not emulated.
       The controller is a WD1002-HD0 (original version, for Winchester drives), HD is 10MB, e.g. Shugart 712
 
-    - RTC type MM58167A to be added. Modem chips TMS99531, TMS99532 to be developed.
+    - Modem chips TMS99531, TMS99532 to be developed.
 
     - Once everything works, sort out parent and compat relationships.
 
@@ -87,7 +89,7 @@ void kaypro_state::kayproii_io(address_map &map)
 	map(0x1c, 0x1f).rw(m_pio_s, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 }
 
-void kaypro_state::kaypro484_io(address_map &map)
+void kaypro_state::kaypro10_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
@@ -103,9 +105,7 @@ void kaypro_state::kaypro484_io(address_map &map)
 	map(0x1f, 0x1f).rw(FUNC(kaypro_state::kaypro484_videoram_r), FUNC(kaypro_state::kaypro484_videoram_w));
 
 	/* The below are not emulated */
-/*  map(0x20, 0x23).rw("z80pio", FUNC(z80pio_device::kaypro484_pio_r), FUNC(z80pio_device::kaypro484_pio_w)) - for RTC and Modem
-    map(0x24, 0x27) communicate with MM58167A RTC. Modem uses TMS99531 and TMS99532 chips.
-    map(0x80, 0x80) Hard drive controller card I/O port - 10MB hard drive only fitted to the Kaypro 10
+/*  map(0x80, 0x80) Hard drive controller card I/O port - 10MB hard drive only fitted to the Kaypro 10
     map(0x81, 0x81) Hard Drive READ error register, WRITE precomp
     map(0x82, 0x82) Hard Drive Sector register count I/O
     map(0x83, 0x83) Hard Drive Sector register number I/O
@@ -115,6 +115,13 @@ void kaypro_state::kaypro484_io(address_map &map)
     map(0x87, 0x87) Hard Drive READ status register, WRITE command register */
 	map(0x20, 0x86).noprw();
 	map(0x87, 0x87).r(FUNC(kaypro_state::kaypro484_87_r));
+}
+
+void kaypro_state::kaypro484_io(address_map &map)
+{
+	kaypro10_io(map);
+	map(0x20, 0x23).rw("z80pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+    map(0x24, 0x24).mirror(3).rw(FUNC(kaypro_state::rtc_r), FUNC(kaypro_state::rtc_w));
 }
 
 
@@ -176,8 +183,16 @@ static const z80_daisy_config kayproii_daisy_chain[] =
 	{ nullptr }
 };
 
+static const z80_daisy_config kaypro10_daisy_chain[] =
+{
+	{ "sio_1" },        /* sio for RS232C and keyboard */
+	{ "sio_2" },        /* sio for serial printer and inbuilt modem */
+	{ nullptr }
+};
+
 static const z80_daisy_config kaypro484_daisy_chain[] =
 {
+	{ "z80pio" },
 	{ "sio_1" },        /* sio for RS232C and keyboard */
 	{ "sio_2" },        /* sio for serial printer and inbuilt modem */
 	{ nullptr }
@@ -215,10 +230,7 @@ void kaypro_state::kayproii(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(80*7, 24*10);
-	m_screen->set_visarea(0, 80*7-1, 0, 24*10-1);
+	m_screen->set_raw(13.9776_MHz_XTAL, 128 * 7, 0, 80 * 7, 260, 0, 240);
 	m_screen->set_screen_update(FUNC(kaypro_state::screen_update_kayproii));
 	m_screen->set_palette(m_palette);
 
@@ -250,7 +262,7 @@ void kaypro_state::kayproii(machine_config &config)
 	serial.cts_handler().set("sio", FUNC(z80sio_device::ctsa_w));
 	serial.dcd_handler().set("sio", FUNC(z80sio_device::dcda_w));
 
-	com8116_device &brg(COM8116(config, "brg", XTAL(5'068'800))); // WD1943, SMC8116
+	com8116_device &brg(COM8116(config, "brg", 5.0688_MHz_XTAL)); // WD1943, SMC8116
 	brg.ft_handler().set("sio", FUNC(z80sio_device::rxca_w));
 	brg.ft_handler().append("sio", FUNC(z80sio_device::txca_w));
 	brg.fr_handler().set("sio", FUNC(z80sio_device::rxtxcb_w));
@@ -307,10 +319,7 @@ void kaypro_state::kaypro484(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(80*8, 25*16);
-	m_screen->set_visarea(0,80*8-1,0,25*16-1);
+	m_screen->set_raw(18_MHz_XTAL, 856, 0, 640, 426, 0, 400);
 	m_screen->set_screen_update(FUNC(kaypro_state::screen_update_kaypro484));
 
 	TIMER(config, m_floppy_timer).configure_generic(FUNC(kaypro_state::floppy_timer));
@@ -323,10 +332,10 @@ void kaypro_state::kaypro484(machine_config &config)
 	BEEP(config, m_beep, 950).add_route(ALL_OUTPUTS, "mono", 1.00); // piezo-device needs to be measured
 
 	/* devices */
-	MC6845(config, m_crtc, 2000000); // comes out of ULA - needs to be measured
+	MC6845(config, m_crtc, 18_MHz_XTAL / 8);
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(false);
-	m_crtc->set_char_width(7);
+	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(kaypro_state::kaypro484_update_row));
 
 	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(kaypro_state::quickload_cb));
@@ -335,7 +344,7 @@ void kaypro_state::kaypro484(machine_config &config)
 	kbd.rxd_cb().set("sio_1", FUNC(z80sio_device::rxb_w));
 	kbd.rxd_cb().append("sio_1", FUNC(z80sio_device::syncb_w));
 
-	CLOCK(config, "kbdtxrxc", 4800).signal_handler().set("sio_1", FUNC(z80sio_device::rxtxcb_w));
+	CLOCK(config, "kbdtxrxc", 16_MHz_XTAL / 16 / 13 / 16).signal_handler().set("sio_1", FUNC(z80sio_device::rxtxcb_w));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(kaypro_state::write_centronics_busy));
@@ -365,7 +374,7 @@ void kaypro_state::kaypro484(machine_config &config)
 	sio_2.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0); // FIXME: use a combiner
 	sio_2.out_txda_callback().set("serprn", FUNC(rs232_port_device::write_txd));
 
-	com8116_device &brg(COM8116(config, "brg", XTAL(5'068'800))); // WD1943, SMC8116
+	com8116_device &brg(COM8116(config, "brg", 5.0688_MHz_XTAL)); // WD1943, SMC8116
 	brg.fr_handler().set("sio_1", FUNC(z80sio_device::rxca_w));
 	brg.fr_handler().append("sio_1", FUNC(z80sio_device::txca_w));
 	brg.ft_handler().set("sio_2", FUNC(z80sio_device::rxca_w));
@@ -378,11 +387,20 @@ void kaypro_state::kaypro484(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:0", kaypro_floppies, "525dd", kaypro_state::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", kaypro_floppies, "525dd", kaypro_state::floppy_formats).enable_sound(true);
 	SOFTWARE_LIST(config, "flop_list").set_original("kaypro").set_filter("C");
+
+	z80pio_device &pio(Z80PIO(config, "z80pio", 16_MHz_XTAL / 4));
+	pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	pio.out_pa_callback().set(FUNC(kaypro_state::rtc_address_w));
+
+	MM58167(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->irq().set("z80pio", FUNC(z80pio_device::pa6_w));
 }
 
 void kaypro_state::kaypro4x(machine_config &config)
 {
 	kaypro484(config);
+	m_fdc->set_clock(16_MHz_XTAL / 8);
+	m_fdc->set_force_ready(false);
 	SOFTWARE_LIST(config.replace(), "flop_list").set_original("kaypro").set_filter("F");
 }
 
@@ -393,6 +411,18 @@ void kaypro_state::kaypro1(machine_config &config)
 }
 
 void kaypro_state::kaypro10(machine_config &config)
+{
+	kaypro484(config);
+	m_maincpu->set_addrmap(AS_IO, &kaypro_state::kaypro10_io);
+	m_maincpu->set_daisy_config(kaypro10_daisy_chain);
+	config.device_remove("z80pio");
+	config.device_remove("rtc");
+	config.device_remove("fdc:1");  // only has 1 floppy drive
+	// need to add hard drive & controller
+	SOFTWARE_LIST(config.replace(), "flop_list").set_original("kaypro").set_filter("E");
+}
+
+void kaypro_state::kaypro1084(machine_config &config)
 {
 	kaypro484(config);
 	config.device_remove("fdc:1");  // only has 1 floppy drive
@@ -677,18 +707,18 @@ ROM_END
 
 
 /*    YEAR  NAME          PARENT     COMPAT  MACHINE     INPUT   CLASS         INIT         COMPANY               FULLNAME */
-COMP( 1982, kayproii,     0,         0,      kayproii,   kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro II - 2/83", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, kayproiv,     kayproii,  0,      kayproiv,   kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro IV - 4/83", MACHINE_SUPPORTS_SAVE ) // model 81-004
-COMP( 1983, kaypro10,     0,         0,      kaypro10,   kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 10 - 1983", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, kayproiip88,  kayproii,  0,      kayproii,   kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 4 plus88 - 4/83" , MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // model 81-004 with an added 8088 daughterboard and rom
-COMP( 1984, kaypro484,    0,         0,      kaypro484,  kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 4/84", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // model 81-015
-COMP( 1984, kaypro284,    kaypro484, 0,      kaypro284,  kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 2/84", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // model 81-015
-COMP( 1984, kaypro484p88, kaypro484, 0,      kaypro484,  kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 4/84 plus88", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // model 81-015 with an added 8088 daughterboard and rom
-COMP( 1984, kaypro1084,   kaypro10,  0,      kaypro10,   kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 10", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // model 81-005
-COMP( 1984, robie,        0,         0,      kaypro4x,   kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro Robie", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1985, kaypro2x,     kaypro484, 0,      kaypro484,  kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 2x", MACHINE_SUPPORTS_SAVE ) // model 81-025
-COMP( 1985, kaypronew2,   0,         0,      kaypronew2, kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro New 2", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1985, kaypro4x,     robie,     0,      kaypro4x,   kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 4x", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1986, kaypro1,      kaypro484, 0,      kaypro1,    kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Kaypro 1", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 198?, omni2,        kayproii,  0,      omni2,      kaypro, kaypro_state, init_kaypro, "Non Linear Systems", "Omni II Logic Analyzer", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1982, kayproii,     0,         0,      kayproii,   kaypro, kaypro_state, init_kaypro, "Non-Linear Systems", "Kaypro II - 2/83", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, kayproiv,     kayproii,  0,      kayproiv,   kaypro, kaypro_state, init_kaypro, "Non-Linear Systems", "Kaypro IV - 4/83", MACHINE_SUPPORTS_SAVE ) // model 81-004
+COMP( 1983, kaypro10,     0,         0,      kaypro10,   kaypro, kaypro_state, init_kaypro, "Non-Linear Systems", "Kaypro 10 - 1983", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, kayproiip88,  kayproii,  0,      kayproii,   kaypro, kaypro_state, init_kaypro, "Kaypro Corporation", "Kaypro 4 plus88 - 4/83" , MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // model 81-004 with an added 8088 daughterboard and rom
+COMP( 1984, kaypro484,    0,         0,      kaypro484,  kaypro, kaypro_state, init_kaypro, "Kaypro Corporation", "Kaypro 4/84", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // model 81-015
+COMP( 1984, kaypro284,    kaypro484, 0,      kaypro284,  kaypro, kaypro_state, init_kaypro, "Kaypro Corporation", "Kaypro 2/84", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // model 81-015
+COMP( 1984, kaypro484p88, kaypro484, 0,      kaypro484,  kaypro, kaypro_state, init_kaypro, "Kaypro Corporation", "Kaypro 4/84 plus88", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // model 81-015 with an added 8088 daughterboard and rom
+COMP( 1984, kaypro1084,   kaypro10,  0,      kaypro1084, kaypro, kaypro_state, init_kaypro, "Kaypro Corporation", "Kaypro 10", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // model 81-005
+COMP( 1984, robie,        0,         0,      kaypro4x,   kaypro, kaypro_state, init_kaypro, "Kaypro Corporation", "Kaypro Robie", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, kaypro2x,     kaypro484, 0,      kaypro484,  kaypro, kaypro_state, init_kaypro, "Kaypro Corporation", "Kaypro 2x", MACHINE_SUPPORTS_SAVE ) // model 81-025
+COMP( 1985, kaypronew2,   0,         0,      kaypronew2, kaypro, kaypro_state, init_kaypro, "Kaypro Corporation", "Kaypro New 2", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, kaypro4x,     robie,     0,      kaypro4x,   kaypro, kaypro_state, init_kaypro, "Kaypro Corporation", "Kaypro 4x", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1986, kaypro1,      kaypro484, 0,      kaypro1,    kaypro, kaypro_state, init_kaypro, "Kaypro Corporation", "Kaypro 1", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 198?, omni2,        kayproii,  0,      omni2,      kaypro, kaypro_state, init_kaypro, "Kaypro Corporation", "Omni II Logic Analyzer", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 198?, omni4,        kaypro484, 0,      kaypro1,    kaypro, kaypro_state, init_kaypro, "Omni Logic Inc.",    "Omni 4 Logic Analyzer", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

@@ -80,13 +80,14 @@ protected:
 	optional_device<speaker_sound_device> m_speaker;
 	optional_ioport_array<6> m_inputs; // max 6
 
-	// misc common
-	u8 m_l = 0;         // MCU port L write data
-	u8 m_g = 0;         // MCU port G write data
-	u8 m_d = 0;         // MCU port D write data
-	int m_so = 0;       // MCU SO line state
-	int m_sk = 0;       // MCU SK line state
 	u16 m_inp_mux = ~0; // multiplexed inputs mask
+
+	// MCU output pin state
+	u8 m_l = 0;         // port L
+	u8 m_g = 0;         // port G
+	u8 m_d = 0;         // port D
+	int m_so = 0;       // SO line
+	int m_sk = 0;       // SK line
 
 	u16 read_inputs(int columns, u16 colmask = ~0);
 	void set_power(bool state);
@@ -98,12 +99,12 @@ protected:
 void hh_cop400_state::machine_start()
 {
 	// register for savestates
+	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_l));
 	save_item(NAME(m_g));
 	save_item(NAME(m_d));
 	save_item(NAME(m_so));
 	save_item(NAME(m_sk));
-	save_item(NAME(m_inp_mux));
 }
 
 void hh_cop400_state::machine_reset()

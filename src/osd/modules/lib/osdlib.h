@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <initializer_list>
 #include <string>
 #include <string_view>

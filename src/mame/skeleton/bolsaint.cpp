@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert
+// copyright-holders:
 /**************************************************************************************
 
 80188-based slot machines from Sleic/Petaco.

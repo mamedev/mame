@@ -343,7 +343,7 @@ Notes:
 #include "cpu/m68000/m68020.h"
 #include "cpu/mips/mips1.h"
 #include "cpu/jaguar/jaguar.h"
-#include "imagedev/chd_cd.h"
+#include "imagedev/cdromimg.h"
 #include "imagedev/snapquik.h"
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
@@ -479,7 +479,6 @@ void jaguarcd_state::machine_reset()
 
 	m_shared_ram[0x4/4] = 0x00802000; /* hack until I understand */
 
-	m_cd_file = m_cdrom->get_cdrom_file();
 	m_butch_cmd_index = 0;
 	m_butch_cmd_size = 1;
 }
@@ -1232,7 +1231,7 @@ void jaguarcd_state::butch_regs_w(offs_t offset, uint32_t data, uint32_t mem_mas
 			{
 				case 0x03: // Read TOC
 				{
-					if(!m_cd_file) // No disc
+					if(!m_cdrom->exists()) // No disc
 					{
 						m_butch_cmd_response[0] = 0x400;
 						m_butch_regs[0] |= 0x2000;
@@ -1249,12 +1248,12 @@ void jaguarcd_state::butch_regs_w(offs_t offset, uint32_t data, uint32_t mem_mas
 						return;
 					}
 
-					uint32_t msf = m_cd_file->get_track_start(0) + 150;
+					uint32_t msf = m_cdrom->get_track_start(0) + 150;
 
 					/* first track number */
 					m_butch_cmd_response[0] = 0x2000 | 1;
 					/* last track number */
-					m_butch_cmd_response[1] = 0x2100 | m_cd_file->get_last_track();
+					m_butch_cmd_response[1] = 0x2100 | m_cdrom->get_last_track();
 
 					/* start of first track minutes */
 					m_butch_cmd_response[2] = 0x2200 | ((msf / 60) / 60);
@@ -1270,7 +1269,7 @@ void jaguarcd_state::butch_regs_w(offs_t offset, uint32_t data, uint32_t mem_mas
 
 				case 0x14: // Read Long TOC
 				{
-					if(!m_cd_file) // No disc
+					if(!m_cdrom->exists()) // No disc
 					{
 						m_butch_cmd_response[0] = 0x400;
 						m_butch_regs[0] |= 0x2000;
@@ -1279,11 +1278,11 @@ void jaguarcd_state::butch_regs_w(offs_t offset, uint32_t data, uint32_t mem_mas
 						return;
 					}
 
-					int ntrks = m_cd_file->get_last_track();
+					int ntrks = m_cdrom->get_last_track();
 
 					for(int i=0;i<ntrks;i++)
 					{
-						uint32_t msf = m_cd_file->get_track_start(i) + 150;
+						uint32_t msf = m_cdrom->get_track_start(i) + 150;
 
 						/* track number */
 						m_butch_cmd_response[i*5+0] = 0x6000 | (i+1);

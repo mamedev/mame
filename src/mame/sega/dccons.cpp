@@ -55,7 +55,7 @@
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "cpu/sh/sh4.h"
-#include "imagedev/chd_cd.h"
+#include "imagedev/cdromimg.h"
 #include "machine/aicartc.h"
 
 //#include "emupal.h"
@@ -429,7 +429,7 @@ void dc_cons_state::dc_base(machine_config &config)
 	m_ata->irq_handler().set(FUNC(dc_cons_state::ata_interrupt));
 
 	ata_slot_device &ata_0(*subdevice<ata_slot_device>("ata:0"));
-	ata_0.option_add("gdrom", GDROM);
+	ata_0.option_add("gdrom", ATAPI_GDROM);
 	ata_0.set_option_machine_config("gdrom", gdrom_config);
 	ata_0.set_default_option("gdrom");
 }

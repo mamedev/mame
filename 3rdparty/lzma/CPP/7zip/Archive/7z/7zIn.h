@@ -115,6 +115,7 @@ struct CDatabase: public CFolders
   CUInt64DefVector ATime;
   CUInt64DefVector MTime;
   CUInt64DefVector StartPos;
+  CUInt32DefVector Attrib;
   CBoolVector IsAnti;
   /*
   CBoolVector IsAux;
@@ -146,6 +147,7 @@ struct CDatabase: public CFolders
     ATime.Clear();
     MTime.Clear();
     StartPos.Clear();
+    Attrib.Clear();
     IsAnti.Clear();
     // IsAux.Clear();
   }
@@ -172,13 +174,14 @@ struct CDatabase: public CFolders
   HRESULT GetPath_Prop(unsigned index, PROPVARIANT *path) const throw();
 };
 
+
 struct CInArchiveInfo
 {
   CArchiveVersion Version;
-  UInt64 StartPosition;
-  UInt64 StartPositionAfterHeader;
-  UInt64 DataStartPosition;
-  UInt64 DataStartPosition2;
+  UInt64 StartPosition;               // in stream
+  UInt64 StartPositionAfterHeader;    // in stream
+  UInt64 DataStartPosition;           // in stream
+  UInt64 DataStartPosition2;          // in stream. it's for headers
   CRecordVector<UInt64> FileInfoPopIDs;
   
   void Clear()
@@ -191,6 +194,7 @@ struct CInArchiveInfo
   }
 };
 
+
 struct CDbEx: public CDatabase
 {
   CInArchiveInfo ArcInfo;
@@ -200,6 +204,7 @@ struct CDbEx: public CDatabase
 
   UInt64 HeadersSize;
   UInt64 PhySize;
+  // UInt64 EndHeaderOffset; // relative to position after StartHeader (32 bytes)
 
   /*
   CRecordVector<size_t> SecureOffsets;
@@ -253,6 +258,17 @@ struct CDbEx: public CDatabase
 
     HeadersSize = 0;
     PhySize = 0;
+    // EndHeaderOffset = 0;
+  }
+
+  bool CanUpdate() const
+  {
+    if (ThereIsHeaderError
+        || UnexpectedEnd
+        || StartHeaderWasRecovered
+        || UnsupportedFeatureError)
+      return false;
+    return true;
   }
 
   void FillLinks();
@@ -337,6 +353,8 @@ class CInArchive
   UInt64 _arhiveBeginStreamPosition;
   UInt64 _fileEndPosition;
 
+  UInt64 _rangeLimit; // relative to position after StartHeader (32 bytes)
+
   Byte _header[kHeaderSize];
 
   UInt64 HeadersSize;
@@ -368,6 +386,8 @@ class CInArchive
   void SkipData(UInt64 size) { _inByteBack->SkipData(size); }
   void SkipData() { _inByteBack->SkipData(); }
   void WaitId(UInt64 id);
+
+  void Read_UInt32_Vector(CUInt32DefVector &v);
 
   void ReadArchiveProperties(CInArchiveInfo &archiveInfo);
   void ReadHashDigests(unsigned numItems, CUInt32DefVector &crcs);

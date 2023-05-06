@@ -67,7 +67,10 @@ device_image_interface::device_image_interface(const machine_config &mconfig, de
 	: device_interface(device, "image")
 	, m_file()
 	, m_mame_file()
+	, m_default_region(-1)
+	, m_current_region(-1)
 	, m_software_part_ptr(nullptr)
+	, m_sequence_counter(0)
 	, m_readonly(false)
 	, m_created(false)
 	, m_create_format(0)
@@ -88,6 +91,17 @@ device_image_interface::~device_image_interface()
 {
 }
 
+//-------------------------------------------------
+//  add_region - register a region that may
+//  have a chd image
+//-------------------------------------------------
+void device_image_interface::add_region(std::string name, bool is_default)
+{
+	if (is_default)
+		m_default_region = m_possible_preset_regions.size();
+	m_possible_preset_regions.push_back(name);
+}
+
 
 //-------------------------------------------------
 //  interface_config_complete - perform any
@@ -99,6 +113,128 @@ void device_image_interface::interface_config_complete()
 {
 	// set brief and instance name
 	update_names();
+}
+
+//-------------------------------------------------
+//  interface_pre_start - lookup the chds, if any
+//-------------------------------------------------
+
+void device_image_interface::interface_pre_start()
+{
+	if (!m_possible_preset_regions.empty())
+	{
+		for(const auto &r : m_possible_preset_regions)
+			m_preset_images.push_back(device().machine().rom_load().get_disk_handle(":" + r));
+		if (m_default_region != -1 && m_preset_images[m_default_region])
+			m_current_region = m_default_region;
+		else
+		{
+			for (m_current_region = 0; m_current_region != int(m_preset_images.size()) && !m_preset_images[m_current_region]; m_current_region++);
+			if (m_current_region == int(m_preset_images.size()))
+				fatalerror("%s: No configured region has an image\n", device().tag());
+		}
+	}
+	else
+	{
+		std::string tag = device().tag();
+		auto *chd = device().machine().rom_load().get_disk_handle(tag);
+		if (chd)
+		{
+			m_possible_preset_regions.push_back(tag);
+			m_preset_images.push_back(chd);
+			m_current_region = 0;
+		}
+	}			
+}
+
+//-------------------------------------------------
+//  has_preset_images - does the device have an
+//  image to retrieve through current_image_*
+//-------------------------------------------------
+
+bool device_image_interface::has_preset_images() const
+{
+	return !m_possible_preset_regions.empty();
+}
+
+//-------------------------------------------------
+//  has_preset_images - does the device have
+//  multiple preset images with user selection
+//-------------------------------------------------
+
+bool device_image_interface::has_preset_images_selection() const
+{
+	int icount = 0;
+	for (const auto *f : m_preset_images)
+		if (f)
+			icount ++;
+	return icount > 1;
+}
+
+
+//-------------------------------------------------
+//  preset_images_list -- generate the list of
+//  available image names
+//-------------------------------------------------
+
+std::vector<std::string> device_image_interface::preset_images_list() const
+{
+	std::vector<std::string> result;
+	for (unsigned int i = 0; i != m_preset_images.size(); i++)
+		if (m_preset_images[i])
+			result.push_back(m_possible_preset_regions[i]);
+	return result;
+}
+
+//-------------------------------------------------
+//  current_preset_image_id -- current image id,
+//  recomputed to ignore non-present images.
+//  returns -1 if not in preset mode
+//-------------------------------------------------
+
+int device_image_interface::current_preset_image_id() const
+{
+	if (m_current_region == -1)
+		return -1;
+	int id = 0;
+	for (int i = 0; i != m_current_region; i++)
+		if (m_preset_images[i])
+			id++;
+	return id;
+}
+
+//-------------------------------------------------
+//  current_preset_image_chd -- return the chd of
+//  the current active image, nullptr if non
+//-------------------------------------------------
+
+chd_file *device_image_interface::current_preset_image_chd() const
+{
+	if (m_current_region == -1)
+		return nullptr;
+	return m_preset_images[m_current_region];
+}
+
+//-------------------------------------------------
+//  switch_preset_image -- change of preset image
+//-------------------------------------------------
+
+void device_image_interface::switch_preset_image(int id)
+{
+	for (unsigned int i = 0; i != m_preset_images.size(); i++)
+		if (m_preset_images[i])
+		{
+			if(!id)
+			{
+				call_unload();
+				m_current_region = i;
+				call_load();
+				break;
+			}
+			id--;
+		}
+	
+	return;
 }
 
 
@@ -128,6 +264,20 @@ void device_image_interface::set_image_filename(std::string_view filename)
 		m_basename_noext = m_basename_noext.substr(0, loc);
 
 	m_filetype = core_filename_extract_extension(m_basename, true);
+}
+
+//-------------------------------------------------
+//  set_image_tag - specifies the filename of
+//  an image as the device tag
+//-------------------------------------------------
+
+void device_image_interface::set_image_tag()
+{
+	m_image_name = device().owner()->tag();
+	m_working_directory = "";
+	m_basename = "";
+	m_basename_noext = "";
+	m_filetype = "";
 }
 
 
@@ -665,6 +815,7 @@ std::pair<std::error_condition, std::string> device_image_interface::load_intern
 
 	// we are now loading
 	m_is_loading = true;
+	m_sequence_counter ++;
 
 	// record the filename
 	set_image_filename(path);
@@ -894,6 +1045,8 @@ void device_image_interface::clear() noexcept
 	m_software_list_name.clear();
 
 	m_hash.reset();
+
+	m_sequence_counter ++;
 }
 
 
@@ -905,6 +1058,7 @@ void device_image_interface::unload()
 {
 	if (is_loaded() || loaded_through_softlist())
 	{
+		m_sequence_counter ++;
 		call_unload();
 	}
 	clear();

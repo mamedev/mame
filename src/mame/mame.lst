@@ -18711,6 +18711,10 @@ zackman                         // Bandai
 cfrogger                        // Coleco
 gjungler                        // Gakken
 
+@source:handheld/hh_mn1400.cpp
+compperf                        // Lakeside
+scrablexa                       // Selchow & Righter
+
 @source:handheld/hh_pic16.cpp
 drdunk                          // Kmart
 flash                           // Ideal
@@ -33364,7 +33368,7 @@ cop01                           // (c) 1985
 cop01a                          // (c) 1985
 mightguy                        // (c) 1986
 
-@source:nichibutsu/csplayh5.cpp
+@source:nichibutsu/hrdvd.cpp
 aimode                          // (c) 1999
 bikiniko                        // (c) 1999
 csplayh1                        // (c) 1995

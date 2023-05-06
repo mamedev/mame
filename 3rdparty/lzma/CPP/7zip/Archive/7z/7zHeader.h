@@ -108,8 +108,9 @@ const UInt32 k_SWAP4 = 0x20304;
 const UInt32 k_LZMA  = 0x30101;
 const UInt32 k_PPMD  = 0x30401;
 
-const UInt32 k_Deflate = 0x40108;
-const UInt32 k_BZip2   = 0x40202;
+const UInt32 k_Deflate   = 0x40108;
+const UInt32 k_Deflate64 = 0x40109;
+const UInt32 k_BZip2     = 0x40202;
 
 const UInt32 k_BCJ   = 0x3030103;
 const UInt32 k_BCJ2  = 0x303011B;

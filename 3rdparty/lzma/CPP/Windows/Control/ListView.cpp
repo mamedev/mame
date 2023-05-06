@@ -35,7 +35,7 @@ int CListView::InsertColumn(int columnIndex, LPCTSTR text, int width)
 {
   LVCOLUMN ci;
   ci.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
-  ci.pszText = (LPTSTR)text;
+  ci.pszText = (LPTSTR)(void *)text;
   ci.iSubItem = columnIndex;
   ci.cx = width;
   return InsertColumn(columnIndex, &ci);
@@ -47,7 +47,7 @@ int CListView::InsertItem(int index, LPCTSTR text)
   item.mask = LVIF_TEXT | LVIF_PARAM;
   item.iItem = index;
   item.lParam = index;
-  item.pszText = (LPTSTR)text;
+  item.pszText = (LPTSTR)(void *)text;
   item.iSubItem = 0;
   return InsertItem(&item);
 }
@@ -57,7 +57,7 @@ int CListView::SetSubItem(int index, int subIndex, LPCTSTR text)
   LVITEM item;
   item.mask = LVIF_TEXT;
   item.iItem = index;
-  item.pszText = (LPTSTR)text;
+  item.pszText = (LPTSTR)(void *)text;
   item.iSubItem = subIndex;
   return SetItem(&item);
 }
@@ -68,7 +68,7 @@ int CListView::InsertColumn(int columnIndex, LPCWSTR text, int width)
 {
   LVCOLUMNW ci;
   ci.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
-  ci.pszText = (LPWSTR)text;
+  ci.pszText = (LPWSTR)(void *)text;
   ci.iSubItem = columnIndex;
   ci.cx = width;
   return InsertColumn(columnIndex, &ci);
@@ -80,7 +80,7 @@ int CListView::InsertItem(int index, LPCWSTR text)
   item.mask = LVIF_TEXT | LVIF_PARAM;
   item.iItem = index;
   item.lParam = index;
-  item.pszText = (LPWSTR)text;
+  item.pszText = (LPWSTR)(void *)text;
   item.iSubItem = 0;
   return InsertItem(&item);
 }
@@ -90,7 +90,7 @@ int CListView::SetSubItem(int index, int subIndex, LPCWSTR text)
   LVITEMW item;
   item.mask = LVIF_TEXT;
   item.iItem = index;
-  item.pszText = (LPWSTR)text;
+  item.pszText = (LPWSTR)(void *)text;
   item.iSubItem = subIndex;
   return SetItem(&item);
 }

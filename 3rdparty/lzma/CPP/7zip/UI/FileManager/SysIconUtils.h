@@ -5,7 +5,7 @@
 
 #include "../../../Common/MyWindows.h"
 
-#include <commctrl.h>
+#include <CommCtrl.h>
 
 #include "../../../Common/MyString.h"
 

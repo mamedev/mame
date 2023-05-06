@@ -1105,12 +1105,7 @@ end
 				}
 			end
 			if version >= 130000 then
-				buildoptions_c {
-					"-Wno-error=dangling-pointer",
-				}
 				buildoptions_cpp {
-					"-Wno-error=dangling-reference",
-					"-Wno-error=dangling-pointer",
 					"-Wno-xor-used-as-pow",
 				}
 			end

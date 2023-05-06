@@ -213,6 +213,22 @@ WRITE_LINE_MEMBER( kaypro_state::fdc_drq_w )
 }
 
 
+void kaypro_state::rtc_address_w(u8 data)
+{
+	m_rtc_address = data & 0x1f;
+}
+
+u8 kaypro_state::rtc_r()
+{
+	return m_rtc->read(m_rtc_address);
+}
+
+void kaypro_state::rtc_w(u8 data)
+{
+	m_rtc->write(m_rtc_address, data);
+}
+
+
 /***********************************************************
 
     Machine
@@ -236,6 +252,9 @@ void kaypro_state::machine_start()
 	save_item(NAME(m_fdc_rq));
 	save_item(NAME(m_system_port));
 	save_item(NAME(m_mc6845_video_address));
+
+	if (m_rtc.found())
+		save_item(NAME(m_rtc_address));
 
 	m_framecnt = 0;
 }

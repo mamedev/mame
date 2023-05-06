@@ -57,6 +57,7 @@
 #include "gblaster.h"
 #include "gus.h"
 #include "ibm_mfc.h"
+#include "ibm_speech.h"
 #include "mpu401.h"
 #include "pcmidi.h"
 #include "sblaster.h"
@@ -191,6 +192,7 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("acb2072", ACB2072);
 	device.option_add("3xtwin", ISA8_3XTWIN);
 	device.option_add("opus108pm", ISA8_OPUS108PM);
+	device.option_add("ibm_speech", ISA8_IBM_SPEECH);
 	// 16-bit
 	device.option_add("ide", ISA16_IDE);
 	device.option_add("ne2000", NE2000);

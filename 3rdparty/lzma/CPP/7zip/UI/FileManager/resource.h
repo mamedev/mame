@@ -47,6 +47,11 @@
 #define IDM_LINK                 558
 #define IDM_ALT_STREAMS          559
 
+#define IDM_VER_EDIT             580
+#define IDM_VER_COMMIT           581
+#define IDM_VER_REVERT           582
+#define IDM_VER_DIFF             583
+
 #define IDM_OPEN_INSIDE_ONE      590
 #define IDM_OPEN_INSIDE_PARSER   591
 
@@ -84,6 +89,8 @@
 #define IDM_VIEW_STANDARD_TOOLBAR           751
 #define IDM_VIEW_TOOLBARS_LARGE_BUTTONS     752
 #define IDM_VIEW_TOOLBARS_SHOW_BUTTONS_TEXT 753
+
+#define IDM_VIEW_TIME            761
 
 #define IDS_BOOKMARK             801
 

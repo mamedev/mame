@@ -227,6 +227,7 @@ const double XTAL::known_xtals[] = {
 	 13'516'800, /* 13.5168_MHz_XTAL       Kontron KDT6 */
 	 13'608'000, /* 13.608_MHz_XTAL        TeleVideo 910 & 925 */
 	 13'824'000, /* 13.824_MHz_XTAL        Robotron PC-1715 display circuit */
+	 13'977'600, /* 13.9776_MHz_XTAL       Kaypro II dot clock */
 	 14'000'000, /* 14_MHz_XTAL            - */
 	 14'112'000, /* 14.112_MHz_XTAL        Timex/Sinclair TS2068 */
 	 14'192'640, /* 14.19264_MHz_XTAL      Central Data 2650 */

@@ -2267,9 +2267,19 @@ if opt_tool(CPUS, "RSP") then
 end
 
 --------------------------------------------------
--- Matsushita (Panasonic) MN1400, disassembler only
---@src/devices/cpu/mn1400/mn1400d.h,CPUS["MN1400"] = true
+-- Matsushita (Panasonic) MN1400
+--@src/devices/cpu/mn1400/mn1400.h,CPUS["MN1400"] = true
 --------------------------------------------------
+
+if CPUS["MN1400"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/mn1400/mn1400base.cpp",
+		MAME_DIR .. "src/devices/cpu/mn1400/mn1400base.h",
+		MAME_DIR .. "src/devices/cpu/mn1400/mn1400.cpp",
+		MAME_DIR .. "src/devices/cpu/mn1400/mn1400.h",
+		MAME_DIR .. "src/devices/cpu/mn1400/mn1400op.cpp",
+	}
+end
 
 if opt_tool(CPUS, "MN1400") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mn1400/mn1400d.cpp")

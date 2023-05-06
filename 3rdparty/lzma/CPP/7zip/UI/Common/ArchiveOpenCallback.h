@@ -6,6 +6,7 @@
 #include "../../../Common/MyCom.h"
 
 #include "../../../Windows/FileFind.h"
+#include "../../../Windows/FileIO.h"
 
 #ifndef _NO_CRYPTO
 #include "../../IPassword.h"
@@ -88,24 +89,28 @@ public:
   CMyComPtr<IArchiveOpenCallback> ReOpenCallback;
   // UInt64 TotalSize;
 
-  COpenCallbackImp(): Callback(NULL), _subArchiveMode(false) {}
+  COpenCallbackImp(): _subArchiveMode(false), Callback(NULL)  {}
   
-  void Init(const FString &folderPrefix, const FString &fileName)
+  HRESULT Init2(const FString &folderPrefix, const FString &fileName)
   {
-    _folderPrefix = folderPrefix;
-    if (!_fileInfo.Find(_folderPrefix + fileName))
-      throw 20121118;
     FileNames.Clear();
     FileNames_WasUsed.Clear();
     FileSizes.Clear();
     _subArchiveMode = false;
     // TotalSize = 0;
     PasswordWasAsked = false;
+    _folderPrefix = folderPrefix;
+    if (!_fileInfo.Find_FollowLink(_folderPrefix + fileName))
+    {
+      // throw 20121118;
+      return GetLastError_noZero_HRESULT();
+    }
+    return S_OK;
   }
 
   bool SetSecondFileInfo(CFSTR newName)
   {
-    return _fileInfo.Find(newName) && !_fileInfo.IsDir();
+    return _fileInfo.Find_FollowLink(newName) && !_fileInfo.IsDir();
   }
 };
 

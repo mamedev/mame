@@ -305,7 +305,7 @@ void wd1010_device::end_command()
 
 int wd1010_device::get_lbasector()
 {
-	hard_disk_file *file = m_drives[drive()].drive->get_hard_disk_file();
+	harddisk_image_device *file = m_drives[drive()].drive;
 	const auto &info = file->get_info();
 	int lbasector;
 
@@ -537,7 +537,7 @@ void wd1010_device::cmd_read_sector()
 		}
 	}
 
-	hard_disk_file *file = m_drives[drive()].drive->get_hard_disk_file();
+	harddisk_image_device *file = m_drives[drive()].drive;
 	const auto &info = file->get_info();
 
 	// verify that we can read
@@ -605,7 +605,7 @@ void wd1010_device::cmd_write_sector()
 		return;
 	}
 
-	hard_disk_file *file = m_drives[drive()].drive->get_hard_disk_file();
+	harddisk_image_device *file = m_drives[drive()].drive;
 	uint8_t buffer[512];
 
 	set_bdrq(0);
