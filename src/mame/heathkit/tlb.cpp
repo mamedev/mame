@@ -791,13 +791,13 @@ void heath_ultra_tlb_device::device_add_mconfig(machine_config &config)
 
 void heath_ultra_tlb_device::mem_map(address_map &map)
 {
-	map.unmap_value_high();
+	heath_tlb_device::mem_map(map);
+
+	// update rom mirror setting to allow page 2 memory
 	map(0x0000, 0x0fff).mirror(0x2000).rom();
+
 	// Page 2 memory
 	map(0x1000, 0x1fff).mirror(0x2000).ram();
-	map(0x4000, 0x40ff).mirror(0x3f00).ram();
-	map(0xc000, 0xc7ff).mirror(0x3800).ram().share("videoram");
-
 }
 
 const tiny_rom_entry *heath_ultra_tlb_device::device_rom_region() const
