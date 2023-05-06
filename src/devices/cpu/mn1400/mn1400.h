@@ -59,6 +59,66 @@ protected:
 	void op_illegal();
 
 	// opcode handlers
+	void op_l();
+	void op_ld();
+	void op_li();
+	void op_lic();
+	void op_ldc();
+	void op_st();
+	void op_std();
+	void op_stic();
+	void op_stdc();
+	void op_lx();
+	void op_ly();
+	void op_tax();
+	void op_tay();
+	void op_tya();
+	void op_tacu();
+	void op_tacl();
+	void op_tcau();
+	void op_tcal();
+
+	void op_nop();
+	void op_and();
+	void op_andi();
+	void op_or();
+	void op_xor();
+	void op_a();
+	void op_ai();
+	void op_cpl();
+	void op_c();
+	void op_ci();
+	void op_cy();
+	void op_sl();
+	void op_icy();
+	void op_dcy();
+	void op_icm();
+	void op_dcm();
+	void op_sm();
+	void op_rm();
+	void op_tb();
+
+	void op_ina();
+	void op_inb();
+	void op_otd();
+	void op_otmd();
+	void op_ote();
+	void op_otie();
+	void op_rco();
+	void op_sco();
+	void op_cco();
+
+	void op_rc();
+	void op_rp();
+	void op_sc();
+	void op_sp();
+	void op_bs01();
+	void op_bpcz();
+	void op_jmp();
+	void op_cal();
+	void op_ret();
+	void op_ec();
+	void op_dc();
 };
 
 class mn1405_cpu_device : public mn1400_cpu_device

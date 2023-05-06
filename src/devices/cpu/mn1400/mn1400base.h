@@ -29,6 +29,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+
 	// device_execute_interface overrides
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 3 - 1) / 3; } // 3-phase clock
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 3); }
@@ -72,6 +74,15 @@ protected:
 	u8 m_a;
 	u8 m_x;
 	u8 m_y;
+	u8 m_status;
+	u8 m_counter;
+
+	enum
+	{
+		FLAG_Z = 1,
+		FLAG_C = 2,
+		FLAG_P = 4,
+	};
 
 	// i/o handlers
 };

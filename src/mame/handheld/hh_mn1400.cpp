@@ -110,7 +110,7 @@ u8 hh_mn1400_state::read_inputs(int columns)
 
   Lakeside Computer Perfection
   * PCB label: Lakeside, PANASONIC, TCI-A4H94HB
-  * MN1400ML MCU (28 pins, die label: 1400 ML-0)
+  * MN1400ML (28 pins, die label: 1400 ML-0)
   * 10 LEDs, 2-bit sound
 
 *******************************************************************************/
@@ -165,7 +165,7 @@ ROM_END
 
   Selchow & Righter Scrabble Lexor
   * PCB label: 2294HB
-  * MN1405MS MCU (die label: 1405 MS-0)
+  * MN1405MS (die label: 1405 MS-0)
   * 8-digit 14-seg LEDs, 2-bit sound
 
   This is the MN1405 version, see scrablex.cpp for the MB8841 version.

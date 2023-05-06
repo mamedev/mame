@@ -63,6 +63,8 @@ void mn1400_base_device::device_start()
 	m_a = 0;
 	m_x = 0;
 	m_y = 0;
+	m_status = 0;
+	m_counter = 0;
 
 	// register for savestates
 	save_item(NAME(m_pc));
@@ -74,16 +76,20 @@ void mn1400_base_device::device_start()
 	save_item(NAME(m_a));
 	save_item(NAME(m_x));
 	save_item(NAME(m_y));
+	save_item(NAME(m_status));
+	save_item(NAME(m_counter));
 
 	// register state for debugger
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%03X").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_prev_pc).formatstr("%03X").noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_status).formatstr("%3s").noshow();
 
 	m_state_count = 0;
 	state_add(++m_state_count, "PC", m_pc).formatstr("%03X"); // 1
 	state_add(++m_state_count, "A", m_a).formatstr("%01X"); // 2
 	state_add(++m_state_count, "X", m_x).formatstr("%01X"); // 3
 	state_add(++m_state_count, "Y", m_y).formatstr("%01X"); // 4
+	state_add(++m_state_count, "CNT", m_y).formatstr("%02X"); // 5
 
 	set_icountptr(m_icount);
 }
@@ -94,6 +100,20 @@ device_memory_interface::space_config_vector mn1400_base_device::memory_space_co
 		std::make_pair(AS_PROGRAM, &m_program_config),
 		std::make_pair(AS_DATA,    &m_data_config)
 	};
+}
+
+void mn1400_base_device::state_string_export(const device_state_entry &entry, std::string &str) const
+{
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			str = string_format("%c%c%c",
+				(m_status & FLAG_P) ? 'P' : 'p',
+				(m_status & FLAG_C) ? 'C' : 'c',
+				(m_status & FLAG_Z) ? 'Z' : 'z'
+			);
+			break;
+	}
 }
 
 
