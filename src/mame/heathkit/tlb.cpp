@@ -16,11 +16,8 @@
         is pressed/data is received.
 
         TODO:
-        - speed up emulation
-        - update SW401 baud rate options for Watz ROM
-        - update SW401 & SW402 definitions for Super-19 ROM
-        - update SW401 & SW402 definitions for ULTRA ROM
         - add option for ULTRA ROMs second page of screen RAM
+        - Fix Ultra ROM diag failure
 
 ****************************************************************************/
 /***************************************************************************
@@ -543,7 +540,7 @@ static INPUT_PORTS_START( ultra19 )
 	PORT_INCLUDE( tlb )
 
 	PORT_MODIFY("SW401")
-	PORT_DIPNAME( 0x07, 0x05, "Baud Rate")          PORT_DIPLOCATION("SW401:1,2,3")
+	PORT_DIPNAME( 0x07, 0x05, "Baud Rate")           PORT_DIPLOCATION("SW401:1,2,3")
 	PORT_DIPSETTING(    0x00, "110")
 	PORT_DIPSETTING(    0x01, "300")
 	PORT_DIPSETTING(    0x02, "1200")
@@ -552,11 +549,13 @@ static INPUT_PORTS_START( ultra19 )
 	PORT_DIPSETTING(    0x05, "9600")
 	PORT_DIPSETTING(    0x06, "19200")
 	PORT_DIPSETTING(    0x07, "38400")
-	PORT_DIPNAME( 0x18, 0x00, "Parity")              PORT_DIPLOCATION("SW401:4,5")
-	PORT_DIPSETTING(    0x00, DEF_STR(None))
-	PORT_DIPSETTING(    0x10, "Odd")
-	PORT_DIPSETTING(    0x20, "None")
-	PORT_DIPSETTING(    0x30, "Even")
+	PORT_DIPNAME( 0x08, 0x00, "Parity")              PORT_DIPLOCATION("SW401:4")
+	PORT_DIPSETTING(    0x00, "Disabled")
+	PORT_DIPSETTING(    0x08, "Enabled")
+
+	PORT_DIPNAME( 0x10, 0x00, "Parity Type")         PORT_DIPLOCATION("SW401:5")
+	PORT_DIPSETTING(    0x00, "Odd")
+	PORT_DIPSETTING(    0x10, "Even")
 	PORT_DIPNAME( 0x20, 0x00, "Data Size")           PORT_DIPLOCATION("SW401:6")
 	PORT_DIPSETTING(    0x00, "8-bit")
 	PORT_DIPSETTING(    0x20, "7-bit")
