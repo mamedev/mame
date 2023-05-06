@@ -17,6 +17,31 @@
 #include "softlist.h"
 #include "speaker.h"
 
+class n64_console_state : public n64_state
+{
+public:
+	n64_console_state(const machine_config &mconfig, device_type type, const char *tag)
+		: n64_state(mconfig, type, tag)
+		{ }
+
+	void n64(machine_config &config);
+	void n64dd(machine_config &config);
+
+private:
+	uint32_t dd_null_r();
+	void n64_map(address_map &map);
+	void n64dd_map(address_map &map);
+
+	DECLARE_MACHINE_START(n64dd);
+	INTERRUPT_GEN_MEMBER(n64_reset_poll);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+	void mempak_format(uint8_t* pak);
+	std::error_condition disk_load(device_image_interface &image);
+	void disk_unload(device_image_interface &image);
+	void rsp_imem_map(address_map &map);
+	void rsp_dmem_map(address_map &map);
+};
+
 uint32_t n64_console_state::dd_null_r()
 {
 	return 0xffffffff;
