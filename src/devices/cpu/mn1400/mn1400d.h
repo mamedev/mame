@@ -25,7 +25,7 @@ public:
 private:
 	enum e_mnemonics
 	{
-		mILL,
+		mILL, mILL2,
 		mL, mLD, mLI, mLIC, mLDC, mST, mSTD, mSTIC, mSTDC,
 		mLX, mLY, mTAX, mTAY, mTYA, mTACU, mTACL, mTCAU, mTCAL,
 		mNOP, mAND, mANDI, mOR, mXOR, mA, mAI, mCPL, mC, mCI, mCY,
