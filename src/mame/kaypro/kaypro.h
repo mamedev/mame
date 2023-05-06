@@ -13,6 +13,7 @@
 #include "imagedev/snapquik.h"
 #include "sound/beep.h"
 #include "video/mc6845.h"
+#include "machine/mm58167.h"
 #include "machine/wd_fdc.h"
 #include "machine/timer.h"
 #include "emupal.h"
@@ -35,6 +36,7 @@ public:
 		, m_floppy1(*this, "fdc:1")
 		, m_crtc(*this, "crtc")
 		, m_beep(*this, "beeper")
+		, m_rtc(*this, "rtc")
 		, m_bankr(*this, "bankr")
 		, m_bankw(*this, "bankw")
 		, m_bank3(*this, "bank3")
@@ -48,6 +50,7 @@ public:
 	void kaypronew2(machine_config &config);
 	void kaypro484(machine_config &config);
 	void kaypro10(machine_config &config);
+	void kaypro1084(machine_config &config);
 	void kaypro284(machine_config &config);
 	void kaypro4x(machine_config &config);
 	void kaypro1(machine_config &config);
@@ -59,6 +62,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
+	void kaypro10_io(address_map &map);
 	void kaypro484_io(address_map &map);
 	void kaypro_map(address_map &map);
 	void kayproii_io(address_map &map);
@@ -78,6 +82,9 @@ private:
 	void kayproiv_pio_system_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	void rtc_address_w(u8 data);
+	u8 rtc_r();
+	void rtc_w(u8 data);
 	u8 kaypro_videoram_r(offs_t offset);
 	void kaypro_videoram_w(offs_t offset, u8 data);
 	static void floppy_formats(format_registration &fr);
@@ -103,6 +110,7 @@ private:
 	u8 m_system_port = 0U;
 	u16 m_mc6845_video_address = 0U;
 	floppy_image_device *m_floppy = nullptr;
+	u8 m_rtc_address = 0U;
 
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
@@ -116,6 +124,7 @@ private:
 	optional_device<floppy_connector> m_floppy1;
 	optional_device<mc6845_device> m_crtc;
 	required_device<beep_device> m_beep;
+	optional_device<mm58167_device> m_rtc;
 	required_memory_bank m_bankr;
 	required_memory_bank m_bankw;
 	required_memory_bank m_bank3;
