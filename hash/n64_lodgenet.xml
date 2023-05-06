@@ -6,7 +6,7 @@ license:CC0-1.0
 
 <softwarelist name="n64_lodgenet" description="LodgeNet 64 software">
 
-	<software name="1080snow">
+	<software name="1080snow" supported="no">
 		<description>1080° Snowboarding</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
