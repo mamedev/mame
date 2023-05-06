@@ -33,8 +33,8 @@ TODO:
 #include "neogs.h"
 
 #include "cpu/z80/z80.h"
-#include "machine/spi_sdcard.h"
 #include "machine/ram.h"
+#include "machine/spi_sdcard.h"
 #include "sound/dac.h"
 #include "speaker.h"
 
@@ -109,18 +109,19 @@ protected:
 
 private:
 	TIMER_CALLBACK_MEMBER(spi_clock);
-	emu_timer *m_spi_clock;
-	int m_spi_clock_cycles;
-	bool m_spi_clock_state;
 
 	template <u8 Bank> u8 ram_bank_r(offs_t offset);
 	template <u8 Bank> void ram_bank_w(offs_t offset, u8 data);
 
-	u8 status_r() { LOGSTATUS(" read STAT & %02X\n", m_status); return m_status | 0x7e; }
-	void command_w(u8 data) { m_status |= 0x01; LOGSTATUS("write CMD & %02X, status: %02X\n", data, m_status); m_command_in = data; }
-	u8 data_r() { m_status &= ~0x80; LOGSTATUS(" read DATA & %02X, status: %02X\n", m_data_out, m_status); return m_data_out; }
-	void data_w(u8 data) { m_status |= 0x80; LOGSTATUS("write: DATA & %02X, status: %02X\n", data, m_status); m_data_in = data; }
-	void ctrl_w(u8 data);
+	u8 neogs_status_r();
+	void neogs_command_w(u8 data);
+	u8 neogs_data_r();
+	void neogs_data_w(u8 data);
+	void neogs_ctrl_w(u8 data);
+
+	void status_reset();
+	u8 data_r();
+	void data_w(u8 data);
 
 	void dac_flush();
 
@@ -136,6 +137,10 @@ private:
 	u8 m_spi_ctrl;
 	u8 m_spi_data_out;
 	u8 m_spi_data_in_latch;
+
+	emu_timer *m_spi_clock;
+	int m_spi_clock_cycles;
+	bool m_spi_clock_state;
 
 	u8 m_mpag;
 	u8 m_mpagx;
@@ -164,7 +169,37 @@ void neogs_device::update_config()
 	m_maincpu->set_clock_scale(cpu_scale);
 }
 
-void neogs_device::ctrl_w(u8 data)
+u8 neogs_device::neogs_status_r()
+{
+	if (!machine().side_effects_disabled())
+		LOGSTATUS(" read STAT & %02X\n", m_status);
+	return m_status | 0x7e;
+}
+
+void neogs_device::neogs_command_w(u8 data)
+{
+	m_status |= 0x01;
+	LOGSTATUS("write CMD & %02X, status: %02X\n", data, m_status);
+	m_command_in = data;
+}
+
+u8 neogs_device::neogs_data_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_status &= ~0x80;
+		LOGSTATUS(" read DATA & %02X, status: %02X\n", m_data_out, m_status);
+	}
+	return m_data_out;
+}
+
+void neogs_device::neogs_data_w(u8 data) {
+	m_status |= 0x80;
+	LOGSTATUS("write: DATA & %02X, status: %02X\n", data, m_status);
+	m_data_in = data;
+}
+
+void neogs_device::neogs_ctrl_w(u8 data)
 {
 	if (data & 0x80)
 	{
@@ -188,6 +223,32 @@ template <u8 Bank> u8 neogs_device::ram_bank_r(offs_t offset)
 template <u8 Bank> void neogs_device::ram_bank_w(offs_t offset, u8 data)
 {
 	m_ram->write((0xc000 * Bank) + offset, data);
+}
+
+void neogs_device::status_reset()
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_status &= ~0x01;
+		LOGSTATUS(" read: 05, status: %02X\n", m_status);
+	}
+}
+
+u8 neogs_device::data_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_status &= ~0x80;
+		LOGSTATUS(" read: 02 & %02X, status: %02X\n", m_data_in, m_status);
+	}
+	return m_data_in;
+}
+
+void neogs_device::data_w(u8 data)
+{
+	m_status |= 0x80;
+	LOGSTATUS("write: 03 & %02X, status: %02X\n", data, m_status);
+	m_data_out = data;
 }
 
 void neogs_device::spi_ctrl_w(u8 data)
@@ -228,7 +289,7 @@ void neogs_device::dac_flush()
 {
 	s16 left = 0;
 	s16 right = 0;
-	for(auto ch = 0; ch < 8; ch++)
+	for (auto ch = 0; ch < 8; ch++)
 	{
 		const bool leftright = BIT(~ch, 1);
 		const u8 sample = m_sample[ch] ^ (m_gscfg0 & 0x80); // INV7B
@@ -296,14 +357,12 @@ void neogs_device::map_io(address_map &map)
 		NAME([this](offs_t offset, u8 data) { m_mpag = data; update_config(); }));
 	map(0x0001, 0x0001).mirror(0xff00).lr8(
 		NAME([this](offs_t offset)          { return m_command_in; }));
-	map(0x0002, 0x0002).mirror(0xff00).lr8(
-		NAME([this](offs_t offset)          { m_status &= ~0x80; LOGSTATUS(" read: 02 & %02X, status: %02X\n", m_data_in, m_status); return m_data_in; }));
-	map(0x0003, 0x0003).mirror(0xff00).lw8(
-		NAME([this](offs_t offset, u8 data) { m_status |= 0x80; LOGSTATUS("write: 03 & %02X, status: %02X\n", data, m_status); m_data_out = data; }));
+	map(0x0002, 0x0002).mirror(0xff00).r(FUNC(neogs_device::data_r));
+	map(0x0003, 0x0003).mirror(0xff00).w(FUNC(neogs_device::data_w));
 	map(0x0004, 0x0004).mirror(0xff00).lr8(
 		NAME([this](offs_t offset)          { return m_status; }));
 	map(0x0005, 0x0005).mirror(0xff00).lrw8(
-		NAME([this](offs_t offset)          { m_status &= ~0x01; LOGSTATUS(" read: 05, status: %02X\n", m_status); return ~0; }),
+		NAME([this](offs_t offset)          { status_reset(); return ~0; }),
 		NAME([this](offs_t offset, u8 data) { m_status &= ~0x01; LOGSTATUS("write: 05, status: %02X\n", m_status); }));
 	map(0x0006, 0x0009).mirror(0xff00).lw8(
 		NAME([this](offs_t offset, u8 data) { m_vol[offset] = data & 0x3f; }));
@@ -312,10 +371,10 @@ void neogs_device::map_io(address_map &map)
 	map(0x0010, 0x0010).mirror(0xff00).lw8(
 		NAME([this](offs_t offset, u8 data) { m_mpagx = data; update_config(); }));
 	map(0x000a, 0x000a).mirror(0xff00).lrw8(
-		NAME([this](offs_t offset)          { m_status = (m_status & 0x7f) | (m_mpag << 7); return ~0; }),
+		NAME([this](offs_t offset)          { if (!machine().side_effects_disabled()) { m_status = (m_status & 0x7f) | (m_mpag << 7); } return ~0; }),
 		NAME([this](offs_t offset, u8 data) { m_status = (m_status & 0x7f) | (m_mpag << 7); }));
 	map(0x000b, 0x000b).mirror(0xff00).lrw8(
-		NAME([this](offs_t offset)          { m_status = (m_status & 0xfe) | (m_vol[0] >> 5); return ~0; }),
+		NAME([this](offs_t offset)          { if (!machine().side_effects_disabled()) { m_status = (m_status & 0xfe) | (m_vol[0] >> 5); } return ~0; }),
 		NAME([this](offs_t offset, u8 data) { m_status = (m_status & 0xfe) | ((m_vol[0] >> 5) & 1); }));
 
 	map(0x000f, 0x000f).mirror(0xff00).lrw8(
@@ -365,9 +424,9 @@ const tiny_rom_entry *neogs_device::device_rom_region() const
 
 void neogs_device::neogsmap(address_map &map)
 {
-	map(0x00bb, 0x00bb).mirror(0xff00).rw(FUNC(neogs_device::status_r), FUNC(neogs_device::command_w));
-	map(0x00b3, 0x00b3).mirror(0xff00).rw(FUNC(neogs_device::data_r), FUNC(neogs_device::data_w));
-	map(0x0033, 0x0033).mirror(0xff00).w(FUNC(neogs_device::ctrl_w));
+	map(0x00bb, 0x00bb).mirror(0xff00).rw(FUNC(neogs_device::neogs_status_r), FUNC(neogs_device::neogs_command_w));
+	map(0x00b3, 0x00b3).mirror(0xff00).rw(FUNC(neogs_device::neogs_data_r), FUNC(neogs_device::neogs_data_w));
+	map(0x0033, 0x0033).mirror(0xff00).w(FUNC(neogs_device::neogs_ctrl_w));
 }
 
 void neogs_device::device_start()
