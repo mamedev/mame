@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Berger
-/******************************************************************************
+/*******************************************************************************
 
 Novag Micro II (model 821)
 
@@ -38,7 +38,7 @@ TODO:
   6MHz: valid (single) button press registered between 307ms and 436ms,
   12MHz: between 154ms and 218ms.
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -115,9 +115,9 @@ void micro2_state::set_cpu_freq()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // MCU ports/generic
 
@@ -165,9 +165,9 @@ u8 micro2_state::input_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( micro2 )
 	PORT_START("IN.0")
@@ -188,13 +188,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void micro2_state::micro2(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	I8049(config, m_maincpu, 6_MHz_XTAL); // see set_cpu_freq
 	m_maincpu->p1_in_cb().set(FUNC(micro2_state::input_r));
 	m_maincpu->p2_out_cb().set(FUNC(micro2_state::control_w));
@@ -203,20 +203,20 @@ void micro2_state::micro2(machine_config &config)
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(3, 8);
 	config.set_default_layout(layout_novag_micro2);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( nmicro2 )
 	ROM_REGION( 0x0800, "maincpu", 0 )
@@ -227,9 +227,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1982, nmicro2, 0,       0,      micro2,  micro2, micro2_state, empty_init, "Novag", "Micro II (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1982, nmicro2, 0,       0,      micro2,  micro2, micro2_state, empty_init, "Novag", "Micro II (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

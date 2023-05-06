@@ -672,7 +672,7 @@ void geniusiq_state::machine_reset()
 
 DEVICE_IMAGE_LOAD_MEMBER(geniusiq_state::cart_load)
 {
-	uint32_t size = m_cart->common_get_size("rom");
+	uint32_t const size = m_cart->common_get_size("rom");
 
 	// we always a 0x100000 region, for easier mapping in the memory map
 	m_cart->rom_alloc(0x100000, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
@@ -692,7 +692,7 @@ DEVICE_IMAGE_LOAD_MEMBER(geniusiq_state::cart_load)
 		}
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 DEVICE_IMAGE_UNLOAD_MEMBER(geniusiq_state::cart_unload)

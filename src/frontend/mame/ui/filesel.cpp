@@ -420,7 +420,8 @@ void menu_file_selector::populate()
 	if (m_entrylist.size() > first)
 	{
 		// sort the menu entries
-		std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t> >(std::locale());
+		std::locale const lcl;
+		std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t> >(lcl);
 		std::sort(
 				m_entrylist.begin() + first,
 				m_entrylist.end(),

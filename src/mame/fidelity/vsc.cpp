@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Kevin Horton, Jonathan Gevaryahu, Sandro Ronco, hap
-/******************************************************************************
+/*******************************************************************************
 
 Fidelity Voice Sensory Chess Challenger (VSC)
 ---------------------------------------------
@@ -145,7 +145,7 @@ computers also have support for it. Two models were released:
 FP: Challenger Printer - thermal printer, MCU=D8048C243
 IFP: Impact Printer - also compatible with C64 apparently.
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -236,9 +236,9 @@ void vsc_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // misc handlers
 
@@ -336,9 +336,9 @@ void vsc_state::pio_portb_w(u8 data)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void vsc_state::main_map(address_map &map)
 {
@@ -376,9 +376,9 @@ void vsc_state::main_io(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( vsc )
 	PORT_START("IN.0")
@@ -403,13 +403,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void vsc_state::vsc(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, 3.9_MHz_XTAL); // 3.9MHz resonator
 	m_maincpu->set_addrmap(AS_PROGRAM, &vsc_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &vsc_state::main_io);
@@ -432,12 +432,12 @@ void vsc_state::vsc(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(250));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8, 16);
 	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_fidel_vsc);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	S14001A(config, m_speech, 25000); // R/C circuit, around 25khz
 	m_speech->ext_read().set(FUNC(vsc_state::speech_r));
@@ -446,9 +446,9 @@ void vsc_state::vsc(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( vsc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -481,9 +481,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME  PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1980, vsc,  0,      0, vsc,     vsc,   vsc_state, empty_init, "Fidelity Electronics", "Voice Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1980, vsc,  0,      0,      vsc,     vsc,   vsc_state, empty_init, "Fidelity Electronics", "Voice Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

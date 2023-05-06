@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco, hap
 // thanks-to:yoyo_chessboard
-/**************************************************************************************************
+/*******************************************************************************
 
 Mephisto Modena
 
@@ -14,7 +14,7 @@ Hardware notes:
 - 8KB RAM (battery-backed), 32KB ROM
 - 8*8 chessboard buttons, 16+6 leds, 7seg lcd, piezo
 
-**************************************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -80,9 +80,9 @@ void modena_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void modena_state::update_display()
 {
@@ -128,9 +128,9 @@ void modena_state::io_w(u8 data)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void modena_state::modena_mem(address_map &map)
 {
@@ -145,9 +145,9 @@ void modena_state::modena_mem(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( modena )
 	PORT_START("KEY")
@@ -166,13 +166,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void modena_state::modena(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M65C02(config, m_maincpu, 4.194304_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &modena_state::modena_mem);
 
@@ -186,21 +186,21 @@ void modena_state::modena(machine_config &config)
 	m_board->set_delay(attotime::from_msec(150));
 	m_board->set_nvram_enable(true);
 
-	/* video hardware */
+	// video hardware
 	MEPHISTO_DISPLAY_MODULE1(config, m_display); // internal
 	PWM_DISPLAY(config, m_led_pwm).set_size(3, 8);
 	config.set_default_layout(layout_mephisto_modena);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( modena )
 	ROM_REGION( 0x8000, "maincpu", 0 )
@@ -221,11 +221,11 @@ ROM_END
 
 
 
-/***************************************************************************
-    Game driver(s)
-***************************************************************************/
+/*******************************************************************************
+    Drivers
+*******************************************************************************/
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY             FULLNAME                   FLAGS */
-CONS( 1992, modena,   0,      0,      modena,  modena, modena_state, empty_init, "Hegener + Glaser", "Mephisto Modena (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1992, modenaa,  modena, 0,      modena,  modena, modena_state, empty_init, "Hegener + Glaser", "Mephisto Modena (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1992, modenab,  modena, 0,      modena,  modena, modena_state, empty_init, "Hegener + Glaser", "Mephisto Modena (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1992, modena,   0,      0,      modena,  modena, modena_state, empty_init, "Hegener + Glaser", "Mephisto Modena (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1992, modenaa,  modena, 0,      modena,  modena, modena_state, empty_init, "Hegener + Glaser", "Mephisto Modena (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1992, modenab,  modena, 0,      modena,  modena, modena_state, empty_init, "Hegener + Glaser", "Mephisto Modena (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

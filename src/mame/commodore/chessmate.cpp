@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Peter Trauner, hap
-/******************************************************************************
+/*******************************************************************************
 
 Commodore Chessmate / Novag Chess Champion MK II
 Initial driver version by PeT mess@utanet.at September 2000.
@@ -22,7 +22,7 @@ TODO:
 - is there an older version of chmate? chips on pcb photos are dated 1979, but
   the game is known to be released in 1978
 
-===============================================================================
+================================================================================
 
 Hardware notes:
 
@@ -41,7 +41,7 @@ MOS MPS 6332 005 2179
 4 single leds
 19 buttons (11 on brick model)
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6502/m6504.h"
@@ -120,9 +120,9 @@ INPUT_CHANGED_MEMBER(chmate_state::reset_button)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // 6530 ports
 
@@ -172,9 +172,9 @@ u8 chmate_state::input_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void chmate_state::main_map(address_map &map)
 {
@@ -188,9 +188,9 @@ void chmate_state::main_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( chmate )
 	PORT_START("IN.0")
@@ -258,13 +258,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void chmate_state::chmate(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M6504(config, m_maincpu, 8_MHz_XTAL/8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &chmate_state::main_map);
 
@@ -273,12 +273,12 @@ void chmate_state::chmate(machine_config &config)
 	m_miot->out_pa_callback().set(FUNC(chmate_state::digit_w));
 	m_miot->out_pb_callback().set(FUNC(chmate_state::control_w));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4+1, 8);
 	m_display->set_segmask(0xf, 0xff);
 	config.set_default_layout(layout_chessmate);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
@@ -297,9 +297,9 @@ void chmate_state::mk2a(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( chmate )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -323,12 +323,12 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME    PARENT CMP MACHINE  INPUT   STATE         INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1978, chmate, 0,      0, chmate,  chmate, chmate_state, empty_init, "Commodore", "Chessmate", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1978, chmate, 0,      0,      chmate,  chmate, chmate_state, empty_init, "Commodore", "Chessmate", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, ccmk2,  chmate, 0, mk2,     mk2,    chmate_state, empty_init, "Novag", "Chess Champion: MK II (ver. 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 1st version (jukebox model), aka version B
-CONS( 1979, ccmk2a, chmate, 0, mk2a,    mk2a,   chmate_state, empty_init, "Novag", "Chess Champion: MK II (ver. 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, ccmk2,  chmate, 0,      mk2,     mk2,    chmate_state, empty_init, "Novag", "Chess Champion: MK II (ver. 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 1st version (jukebox model), aka version B
+SYST( 1979, ccmk2a, chmate, 0,      mk2a,    mk2a,   chmate_state, empty_init, "Novag", "Chess Champion: MK II (ver. 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

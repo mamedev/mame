@@ -65,14 +65,14 @@ static DWORD GetDllVersion(LPCTSTR dllName)
 
 bool g_LVN_ITEMACTIVATE_Support = true;
 
-static const wchar_t *kUnknownExceptionMessage = L"ERROR: Unknown Error!";
+static const wchar_t * const kUnknownExceptionMessage = L"ERROR: Unknown Error!";
 
-void ErrorMessageForHRESULT(HRESULT res)
+static void ErrorMessageForHRESULT(HRESULT res)
 {
   ShowErrorMessage(HResultToMessage(res));
 }
 
-int APIENTRY WinMain2()
+static int APIENTRY WinMain2()
 {
   // OleInitialize is required for ProgressBar in TaskBar.
   #ifndef UNDER_CE
@@ -178,7 +178,7 @@ int APIENTRY WinMain2()
   v1.Add(fs2us(fullPath));
   v2.Add(fs2us(fullPath));
   NWildcard::CCensorNode wildcardCensor;
-  wildcardCensor.AddItem(true, L"*", true, true, true, true);
+  wildcardCensor.Add_Wildcard();
 
   bool messageWasDisplayed = false;
   result = ExtractGUI(codecs,
@@ -206,7 +206,9 @@ int APIENTRY WinMain2()
   return NExitCode::kFatalError;
 }
 
+#if defined(_WIN32) && defined(_UNICODE) && !defined(_WIN64) && !defined(UNDER_CE)
 #define NT_CHECK_FAIL_ACTION ShowErrorMessage(L"Unsupported Windows version"); return NExitCode::kFatalError;
+#endif
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
   #ifdef UNDER_CE

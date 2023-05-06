@@ -57,9 +57,9 @@ public:
 	void set_default_state(cassette_state default_state) { m_default_state = default_state; }
 	void set_interface(const char *interface) { m_interface = interface; }
 
-	// image-level overrides
-	virtual std::error_condition call_load() override;
-	virtual std::error_condition call_create(int format_type, util::option_resolution *format_options) override;
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 	virtual std::string call_display() override;
 
@@ -105,7 +105,7 @@ public:
 	device_sound_interface& set_stereo() { m_stereo = true; return *this; }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual bool use_software_list_file_extension_for_filetype() const noexcept override { return true; }

@@ -257,15 +257,12 @@ DEVICE_IMAGE_LOAD_MEMBER(gameking_state::cart_load)
 	uint32_t size = m_cart->common_get_size("rom");
 
 	if (size > 0x10'0000)
-	{
-		osd_printf_error("%s: Unsupported cartridge size\n", image.basename());
-		return image_error::INVALIDLENGTH;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be no larger than 1M)");
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void gameking_state::machine_start()

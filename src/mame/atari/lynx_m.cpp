@@ -2001,15 +2001,12 @@ void lynx_state::machine_start()
 
 ****************************************/
 
-std::error_condition lynx_state::verify_cart(const char *header, int kind)
+std::pair<std::error_condition, std::string> lynx_state::verify_cart(const char *header, int kind)
 {
 	if (kind)
 	{
 		if (strncmp("BS93", &header[6], 4))
-		{
-			logerror("This is not a valid Lynx image\n");
-			return image_error::INVALIDIMAGE;
-		}
+			return std::make_pair(image_error::INVALIDIMAGE, "This is not a valid Lynx image");
 	}
 	else
 	{
@@ -2017,16 +2014,18 @@ std::error_condition lynx_state::verify_cart(const char *header, int kind)
 		{
 			if (!strncmp("BS93", &header[6], 4))
 			{
-				logerror("This image is probably a Quickload image with .lnx extension\n");
-				logerror("Try to load it with -quickload\n");
+				// FIXME: multi-line message may not be displayed correctly
+				return std::make_pair(
+						image_error::INVALIDIMAGE,
+						"This image is probably a Quickload image with .lnx extension\n"
+						"Try to load it with -quickload");
 			}
 			else
-				logerror("This is not a valid Lynx image\n");
-			return image_error::INVALIDIMAGE;
+				return std::make_pair(image_error::INVALIDIMAGE, "This is not a valid Lynx image");
 		}
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(lynx_state::cart_load)
@@ -2052,8 +2051,8 @@ DEVICE_IMAGE_LOAD_MEMBER(lynx_state::cart_load)
 			image.fread(header, 0x40);
 
 			// Check the image
-			std::error_condition err = verify_cart((const char*)header, LYNX_CART);
-			if (err)
+			auto err = verify_cart((const char*)header, LYNX_CART);
+			if (err.first)
 				return err;
 
 			/* 2008-10 FP: According to Handy source these should be page_size_bank0. Are we using
@@ -2119,5 +2118,5 @@ DEVICE_IMAGE_LOAD_MEMBER(lynx_state::cart_load)
 
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }

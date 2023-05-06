@@ -216,9 +216,10 @@ void gdrom_device::ExecCommand()
 					throw emu_fatalerror("GDROM: Unhandled data_select %d", data_select);
 				}
 
+				// LBA 45000 is start of double density GD-ROM
 				LOGCMD("CD_READ %02x %02x\n", command[2], command[4]);
-				LOGCMD("   LBA %x for %d blocks (%d bytes, read type %d, data select %d)\n",
-					m_lba, m_blocks,
+				LOGCMD("   LBA %d (%x) for %d blocks (%d bytes, read type %d, data select %d)\n",
+					m_lba + 150, m_lba, m_blocks,
 					m_blocks * m_sector_bytes, read_type, data_select
 				);
 
@@ -246,7 +247,7 @@ void gdrom_device::ExecCommand()
 		// READ TOC (GD-ROM ver.)
 		case 0x14:
 		{
-			if (m_cdrom == nullptr)
+			if (!m_image->exists())
 			{
 				m_phase = SCSI_PHASE_STATUS;
 				m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
@@ -256,7 +257,7 @@ void gdrom_device::ExecCommand()
 
 			// TODO: is this correct?
 			int start_trk = command[2];
-			int end_trk = m_cdrom->get_last_track();
+			int end_trk = m_image->get_last_track();
 			int length;
 			int allocation_length = SCSILengthFromUINT16( &command[ 3 ] );
 
@@ -339,13 +340,14 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 
 		case 0x30: // CD_READ
 			LOGCMD("CD_READ read %x dataLength,\n", dataLength);
-			if ((m_cdrom) && (m_blocks))
+			if (m_image->exists() && m_blocks)
 			{
 				while (dataLength > 0)
 				{
-					if (!m_cdrom->read_data(m_lba, tmp_buffer, cdrom_file::CD_TRACK_MODE1))
+					if (!m_image->read_data(m_lba, tmp_buffer, cdrom_file::CD_TRACK_MODE1))
 					{
 						LOGWARN("CD read error!\n");
+						return;
 					}
 
 					LOGXFER("True LBA: %d, buffer half: %d\n", m_lba, m_cur_subblock * m_sector_bytes);
@@ -395,7 +397,7 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 						start_trk = 1;
 					}
 
-					end_trk = m_cdrom->get_last_track();
+					end_trk = m_image->get_last_track();
 					len = (end_trk * 8) + 2;
 
 					// the returned TOC DATA LENGTH must be the full amount,
@@ -427,11 +429,11 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 						}
 
 						data[dptr++] = 0;
-						data[dptr++] = m_cdrom->get_adr_control(cdrom_track);
+						data[dptr++] = m_image->get_adr_control(cdrom_track);
 						data[dptr++] = i;
 						data[dptr++] = 0;
 
-						tstart = m_cdrom->get_track_start(cdrom_track);
+						tstart = m_image->get_track_start(cdrom_track);
 						if ((command[1]&2)>>1)
 							tstart = cdrom_file::lba_to_msf(tstart);
 						data[dptr++] = (tstart>>24) & 0xff;
@@ -451,7 +453,7 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 		case 0x71:
 			LOGCMD("SYS_REQ_SECU\n");
 			memcpy(data, &GDROM_Cmd71_Reply[0], sizeof(GDROM_Cmd71_Reply));
-			if (is_real_gdrom_disc)
+			if (m_image->is_gd())
 				data[10] = 0x1f; // needed by dimm board firmware
 			break;
 
@@ -496,22 +498,11 @@ void gdrom_device::WriteData( uint8_t *data, int dataLength )
 	}
 }
 
-void gdrom_device::SetDevice(void *device)
-{
-	t10mmc::SetDevice(device);
-
-	// try to find if the mounted chd is from an actual gd-rom disc
-	if (m_cdrom)
-		if (m_cdrom->get_toc().flags & cdrom_file::CD_FLAG_GDROM)
-			is_real_gdrom_disc = true;
-}
-
 // device type definition
-DEFINE_DEVICE_TYPE(GDROM, gdrom_device, "gdrom", "GD-ROM")
+DEFINE_DEVICE_TYPE(ATAPI_GDROM, gdrom_device, "gdrom", "GD-ROM")
 
 gdrom_device::gdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	atapi_cdrom_device(mconfig, GDROM, tag, owner, clock),
-	is_real_gdrom_disc(false)
+	atapi_cdrom_device(mconfig, ATAPI_GDROM, tag, owner, clock)
 {
 }
 
@@ -572,6 +563,6 @@ void gdrom_device::signature()
 	atapi_hle_device::signature();
 
 	// naomi dimm board firmware needs the upper nibble to be 8 at the beginning
-	if (is_real_gdrom_disc)
+	if (m_image->is_gd())
 		m_sector_number = 0x81;
 }

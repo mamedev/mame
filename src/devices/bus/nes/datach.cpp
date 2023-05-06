@@ -92,20 +92,19 @@ uint8_t nes_datach_slot_device::read(offs_t offset)
 		return 0xff;
 }
 
-std::error_condition nes_datach_slot_device::call_load()
+std::pair<std::error_condition, std::string> nes_datach_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint8_t *ROM = m_cart->get_cart_base();
-
+		uint8_t *const ROM = m_cart->get_cart_base();
 		if (!ROM)
-			return image_error::INTERNAL;
+			return std::make_pair(image_error::INTERNAL, std::string());
 
 		// Existing Datach carts are all 256K, so we only load files of this size
 		if (!loaded_through_softlist())
 		{
 			if (length() != 0x40000 && length() != 0x40010)
-				return image_error::INVALIDLENGTH;
+				return std::make_pair(image_error::INVALIDLENGTH, std::string());
 
 			int shift = length() - 0x40000;
 			uint8_t temp[0x40010];
@@ -120,20 +119,22 @@ std::error_condition nes_datach_slot_device::call_load()
 				mapper |= temp[7] & 0xf0;
 				if (mapper != 157 && mapper != 16)
 				{
-					return image_error::INVALIDIMAGE;
+					return std::make_pair(
+							image_error::INVALIDIMAGE,
+							util::string_format("Unsupported iNES mapper %u (must be 16 or 157)", mapper));
 				}
 			}
 		}
 		else
 		{
 			if (get_software_region_length("rom") != 0x40000)
-				return image_error::BADSOFTWARE;
+				return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be 256K)");
 
 			memcpy(ROM, get_software_region("rom"), 0x40000);
 		}
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

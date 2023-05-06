@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Kevin Horton, Sean Riddle
-/***************************************************************************
+/*******************************************************************************
 
-NEC uCOM4 MCU tabletops/handhelds or other simple devices,
-most of them (emulated ones) are VFD electronic games/toys.
+NEC uCOM4 MCU tabletops/handhelds or other simple devices, most of them
+(emulated ones) are VFD electronic games/toys.
 
 known chips:
 
@@ -52,7 +52,7 @@ known chips:
 
   (* means undumped unless noted, @ denotes it's in this driver)
 
-============================================================================
+================================================================================
 
 Commonly used VFD(vacuum fluorescent display) are by NEC or Futaba.
 
@@ -81,21 +81,21 @@ Color overlays are mostly handled in the SVG, since it's often not possible
 getting the right color when doing it in a .lay file (eg. changing cpacman
 cyan to yellow)
 
-============================================================================
+================================================================================
 
 ROM source notes when dumped from another title, but confident it's the same:
 - astrocmd: Tandy Astro Command
 - caveman: Tandy Caveman
 - grobot9: Mego Fabulous Fred
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
 #include "cpu/ucom4/ucom4.h"
-#include "video/pwm.h"
-#include "video/hlcd0515.h"
 #include "sound/spkrdev.h"
+#include "video/hlcd0515.h"
+#include "video/pwm.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -143,12 +143,12 @@ protected:
 	optional_ioport_array<6> m_inputs; // max 6
 
 	// misc common
-	u8 m_port[9] = { };             // MCU port A-I write data (optional)
-	u8 m_int = 0;                   // MCU INT pin state
-	u16 m_inp_mux = 0;              // multiplexed inputs mask
+	u8 m_port[9] = { }; // MCU port A-I write data (optional)
+	u8 m_int = 0;       // MCU INT pin state
+	u16 m_inp_mux = 0;  // multiplexed inputs mask
 
-	u32 m_grid = 0;                 // VFD current row data
-	u32 m_plate = 0;                // VFD current column data
+	u32 m_grid = 0;     // VFD current row data
+	u32 m_plate = 0;    // VFD current column data
 
 	u8 read_inputs(int columns);
 	void refresh_interrupts(void);
@@ -188,11 +188,11 @@ void hh_ucom4_state::machine_reset()
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Helper Functions
 
-***************************************************************************/
+*******************************************************************************/
 
 // generic input handlers
 
@@ -235,13 +235,13 @@ INPUT_CHANGED_MEMBER(hh_ucom4_state::single_interrupt_line)
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
 
-***************************************************************************/
+*******************************************************************************/
 
-/***************************************************************************
+/*******************************************************************************
 
   Bambino UFO Master-Blaster Station (manufactured in Japan)
   * PCB label: Emix Corp. ET-02
@@ -258,7 +258,7 @@ INPUT_CHANGED_MEMBER(hh_ucom4_state::single_interrupt_line)
   - Japan: "Missile Guerilla Warfare Maneuvers", published by Tomy
   - World: UFO Master-Blaster Station, published by Bambino
 
-***************************************************************************/
+*******************************************************************************/
 
 class ufombs_state : public hh_ucom4_state
 {
@@ -369,7 +369,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bambino Super Star Football (manufactured in Japan)
   * PCB label: Emix Corp. ET-03
@@ -383,7 +383,7 @@ ROM_END
   Then choose a formation(A,B,C) and either pass the ball, and/or start
   running. For more information, refer to the official manual.
 
-***************************************************************************/
+*******************************************************************************/
 
 class ssfball_state : public hh_ucom4_state
 {
@@ -532,7 +532,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bambino Kick The Goal Soccer
   * PCB label: Emix Corp. ET-10/08 (PCB is for 2 possible games)
@@ -543,7 +543,7 @@ ROM_END
   player 1 presses one of the directional keys. In 2-player mode, player 2
   controls the goalkeeper, defensive players are still controlled by the CPU.
 
-***************************************************************************/
+*******************************************************************************/
 
 class bmsoccer_state : public hh_ucom4_state
 {
@@ -672,7 +672,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bambino Safari (manufactured in Japan)
   * PCB label: Emix Corp. ET-11
@@ -680,7 +680,7 @@ ROM_END
   * cyan VFD Emix-108
   * color overlay: green (optional)
 
-***************************************************************************/
+*******************************************************************************/
 
 class bmsafari_state : public hh_ucom4_state
 {
@@ -793,7 +793,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bambino Space Laser Fight (manufactured in Japan)
   * PCB label: Emix Corp. ET-12
@@ -803,7 +803,7 @@ ROM_END
   This is basically a revamp of their earlier Boxing game (ET-06), case and
   buttons are exactly the same.
 
-***************************************************************************/
+*******************************************************************************/
 
 class splasfgt_state : public hh_ucom4_state
 {
@@ -958,7 +958,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bandai Gunfighter
   * PCB label: KAKEN CORP., PT-256, PT-256B/PT-258 for the button PCBs
@@ -976,7 +976,7 @@ ROM_END
   - World: Gunfighter (model 8006), published by Bandai
   - Canada: Duel, published by Bandai ("FL Gun Professional" on handheld itself)
 
-***************************************************************************/
+*******************************************************************************/
 
 class bgunf_state : public hh_ucom4_state
 {
@@ -1098,7 +1098,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bandai Galaxian
   * PCB label: SM-008
@@ -1113,7 +1113,7 @@ ROM_END
   There's also a 2nd version on a NEC D7502G MCU, this one doesn't have
   the Star Wars jingle.
 
-***************************************************************************/
+*******************************************************************************/
 
 class bgalaxn_state : public hh_ucom4_state
 {
@@ -1219,7 +1219,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bandai Crazy Climber (manufactured in Japan)
   * PCB labels: SM-020/SM-021
@@ -1231,7 +1231,7 @@ ROM_END
   - Japan: FL Crazy Climbing, published by Bandai
   - USA: Crazy Climber, published by Bandai
 
-***************************************************************************/
+*******************************************************************************/
 
 class bcclimbr_state : public hh_ucom4_state
 {
@@ -1337,7 +1337,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Castle Toy Tactix
   * NEC uCOM-43 MCU, label D557LC 512
@@ -1350,7 +1350,7 @@ ROM_END
   3: Triple Play (3 in a row)
   4: Concentration (memory)
 
-***************************************************************************/
+*******************************************************************************/
 
 class tactix_state : public hh_ucom4_state
 {
@@ -1464,7 +1464,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Castle Toy Name That Tune
   * NEC uCOM-43 MCU, label D557LC 513
@@ -1473,7 +1473,7 @@ ROM_END
   This is a tabletop multiplayer game. Players are meant to place a bid,
   and guess the song (by announcing it to everyone).
 
-***************************************************************************/
+*******************************************************************************/
 
 class ctntune_state : public hh_ucom4_state
 {
@@ -1609,7 +1609,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Epoch Invader From Space (manufactured in Japan)
   * PCB labels: 36010(A/B)
@@ -1621,7 +1621,7 @@ ROM_END
   - USA: Invader From Space, published by Epoch
   - UK: Invader From Space, published by Grandstand
 
-***************************************************************************/
+*******************************************************************************/
 
 class invspace_state : public hh_ucom4_state
 {
@@ -1724,7 +1724,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Epoch Electronic Football (manufactured in Japan)
   * PCB labels: 36020(A/B/C)
@@ -1735,7 +1735,7 @@ ROM_END
   - USA: Electronic Football (aka Pro-Bowl Football), published by Epoch
   - Japan: American Football, published by Epoch
 
-***************************************************************************/
+*******************************************************************************/
 
 class efball_state : public hh_ucom4_state
 {
@@ -1842,7 +1842,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Epoch Galaxy II (manufactured in Japan)
   * PCB labels: 19096/96062
@@ -1856,7 +1856,7 @@ ROM_END
   - Japan: Astro Wars, published by Epoch
   - UK: Astro Wars, published by Grandstand
 
-***************************************************************************/
+*******************************************************************************/
 
 class galaxy2_state : public hh_ucom4_state
 {
@@ -1978,7 +1978,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Epoch Astro Command (manufactured in Japan)
   * PCB labels: 96111/96112
@@ -1991,7 +1991,7 @@ ROM_END
   - USA: Astro Command, published by Tandy
   - UK: Scramble, published by Grandstand
 
-***************************************************************************/
+*******************************************************************************/
 
 class astrocmd_state : public hh_ucom4_state
 {
@@ -2101,7 +2101,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Epoch Dracula (manufactured in Japan)
   * PCB label: 96121
@@ -2113,7 +2113,7 @@ ROM_END
   - USA: Dracula, red case, published by Epoch
   - Other: Dracula, yellow case, published by Hales
 
-***************************************************************************/
+*******************************************************************************/
 
 class edracula_state : public hh_ucom4_state
 {
@@ -2217,13 +2217,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Mattel Computer Gin
   * NEC uCOM-43 MCU, label D650C 060 (die label same)
   * Hughes HLCD0530 LCD driver, 5 by 14 segments LCD panel, no sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class mcompgin_state : public hh_ucom4_state
 {
@@ -2307,14 +2307,14 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Mego Mini-Vid: Break Free (manufactured in Japan)
   * PCB label: Mego 79 rev F
   * NEC uCOM-43 MCU, label D553C 049
   * cyan VFD Futaba DM-4.5 91
 
-***************************************************************************/
+*******************************************************************************/
 
 class mvbfree_state : public hh_ucom4_state
 {
@@ -2420,7 +2420,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Takatoku Toys(T.T) Game Robot 9 「ゲームロボット九」
   * PCB label: GAME ROBOT 7520
@@ -2435,7 +2435,7 @@ ROM_END
 
   Accessories were included for some of the minigames.
 
-***************************************************************************/
+*******************************************************************************/
 
 class grobot9_state : public hh_ucom4_state
 {
@@ -2547,7 +2547,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Tomy(tronic) Cosmic Combat (manufactured in Japan)
   * PCB label: 2E1019-E01
@@ -2562,7 +2562,7 @@ ROM_END
   - USA: UFO Attack, published by Tomy
   - Japan: Space Attack, published by Tomy
 
-***************************************************************************/
+*******************************************************************************/
 
 class tccombat_state : public hh_ucom4_state
 {
@@ -2662,7 +2662,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Tomy(tronic) Tennis (manufactured in Japan)
   * PCB label: TOMY TN-04 TENNIS
@@ -2675,7 +2675,7 @@ ROM_END
   Press the Serve button to start, then hit the ball by pressing one of the
   positional buttons when the ball flies over it.
 
-***************************************************************************/
+*******************************************************************************/
 
 class tmtennis_state : public hh_ucom4_state
 {
@@ -2836,7 +2836,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Tomy(tronic) Pac-Man (manufactured in Japan)
   * PCB label: TN-08 2E108E01
@@ -2853,7 +2853,7 @@ ROM_END
   The game will start automatically after turning it on. This Pac Man refuses
   to eat dots with his butt, you can only eat them going right-to-left.
 
-***************************************************************************/
+*******************************************************************************/
 
 class tmpacman_state : public hh_ucom4_state
 {
@@ -2957,7 +2957,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Tomy(tronic) Scramble (manufactured in Japan)
   * PCB label: TN-10 2E114E01
@@ -2970,7 +2970,7 @@ ROM_END
   - UK: Astro Blaster, published by Hales (Epoch Astro Command was named Scramble)
   - Germany: Rambler, published by Tomy
 
-***************************************************************************/
+*******************************************************************************/
 
 class tmscramb_state : public hh_ucom4_state
 {
@@ -3073,7 +3073,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Tomy(tronic) Caveman (manufactured in Japan)
   * PCB label: TN-12 2E114E03
@@ -3085,7 +3085,7 @@ ROM_END
   - USA: Caveman, published by Tandy
   - UK: Cave Man - Jr. Caveman vs Dinosaur, published by Grandstand
 
-***************************************************************************/
+*******************************************************************************/
 
 class tcaveman_state : public hh_ucom4_state
 {
@@ -3184,7 +3184,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Tomy Alien Chase (manufactured in Japan)
   * PCB label: TN-16 2E121B01
@@ -3198,7 +3198,7 @@ ROM_END
 
   To start the game, simply press [UP]. Hold a joystick direction to move around.
 
-***************************************************************************/
+*******************************************************************************/
 
 class alnchase_state : public hh_ucom4_state
 {
@@ -3333,46 +3333,46 @@ ROM_END
 
 } // anonymous namespace
 
-/***************************************************************************
+/*******************************************************************************
 
   Game driver(s)
 
-***************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME      PARENT   CMP MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1979, ufombs,   0,        0, ufombs,   ufombs,   ufombs_state,   empty_init, "Bambino", "UFO Master-Blaster Station", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, ssfball,  0,        0, ssfball,  ssfball,  ssfball_state,  empty_init, "Bambino", "Super Star Football (Bambino)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, bmcfball, ssfball,  0, ssfball,  ssfball,  ssfball_state,  empty_init, "Bambino", "Football Classic (Bambino)", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, bmsoccer, 0,        0, bmsoccer, bmsoccer, bmsoccer_state, empty_init, "Bambino", "Kick The Goal Soccer", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, bmsafari, 0,        0, bmsafari, bmsafari, bmsafari_state, empty_init, "Bambino", "Safari (Bambino)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, splasfgt, 0,        0, splasfgt, splasfgt, splasfgt_state, empty_init, "Bambino", "Space Laser Fight", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1979, ufombs,   0,        0,      ufombs,   ufombs,   ufombs_state,   empty_init, "Bambino", "UFO Master-Blaster Station", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, ssfball,  0,        0,      ssfball,  ssfball,  ssfball_state,  empty_init, "Bambino", "Super Star Football (Bambino)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, bmcfball, ssfball,  0,      ssfball,  ssfball,  ssfball_state,  empty_init, "Bambino", "Football Classic (Bambino)", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, bmsoccer, 0,        0,      bmsoccer, bmsoccer, bmsoccer_state, empty_init, "Bambino", "Kick The Goal Soccer", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, bmsafari, 0,        0,      bmsafari, bmsafari, bmsafari_state, empty_init, "Bambino", "Safari (Bambino)", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, splasfgt, 0,        0,      splasfgt, splasfgt, splasfgt_state, empty_init, "Bambino", "Space Laser Fight", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, bgunf,    0,        0, bgunf,    bgunf,    bgunf_state,    empty_init, "Bandai", "Gunfighter", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, bgalaxn,  0,        0, bgalaxn,  bgalaxn,  bgalaxn_state,  empty_init, "Bandai", "Galaxian (Bandai)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, bcclimbr, 0,        0, bcclimbr, bcclimbr, bcclimbr_state, empty_init, "Bandai", "Crazy Climber (Bandai)", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, bgunf,    0,        0,      bgunf,    bgunf,    bgunf_state,    empty_init, "Bandai", "Gunfighter", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, bgalaxn,  0,        0,      bgalaxn,  bgalaxn,  bgalaxn_state,  empty_init, "Bandai", "Galaxian (Bandai)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, bcclimbr, 0,        0,      bcclimbr, bcclimbr, bcclimbr_state, empty_init, "Bandai", "Crazy Climber (Bandai)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, tactix,   0,        0, tactix,   tactix,   tactix_state,   empty_init, "Castle Toy", "Tactix (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1980, ctntune,  0,        0, ctntune,  ctntune,  ctntune_state,  empty_init, "Castle Toy", "Name That Tune (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
+SYST( 1980, tactix,   0,        0,      tactix,   tactix,   tactix_state,   empty_init, "Castle Toy", "Tactix (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, ctntune,  0,        0,      ctntune,  ctntune,  ctntune_state,  empty_init, "Castle Toy", "Name That Tune (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 
-CONS( 1980, invspace, 0,        0, invspace, invspace, invspace_state, empty_init, "Epoch", "Invader From Space", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, efball,   0,        0, efball,   efball,   efball_state,   empty_init, "Epoch", "Electronic Football (Epoch)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, galaxy2,  0,        0, galaxy2,  galaxy2,  galaxy2_state,  empty_init, "Epoch", "Galaxy II (VFD Rev. D)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, galaxy2b, galaxy2,  0, galaxy2b, galaxy2,  galaxy2_state,  empty_init, "Epoch", "Galaxy II (VFD Rev. B)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, astrocmd, 0,        0, astrocmd, astrocmd, astrocmd_state, empty_init, "Epoch", "Astro Command", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, edracula, 0,        0, edracula, edracula, edracula_state, empty_init, "Epoch", "Dracula (Epoch)", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, invspace, 0,        0,      invspace, invspace, invspace_state, empty_init, "Epoch", "Invader From Space", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, efball,   0,        0,      efball,   efball,   efball_state,   empty_init, "Epoch", "Electronic Football (Epoch)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, galaxy2,  0,        0,      galaxy2,  galaxy2,  galaxy2_state,  empty_init, "Epoch", "Galaxy II (VFD Rev. D)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, galaxy2b, galaxy2,  0,      galaxy2b, galaxy2,  galaxy2_state,  empty_init, "Epoch", "Galaxy II (VFD Rev. B)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, astrocmd, 0,        0,      astrocmd, astrocmd, astrocmd_state, empty_init, "Epoch", "Astro Command", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, edracula, 0,        0,      edracula, edracula, edracula_state, empty_init, "Epoch", "Dracula (Epoch)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1979, mcompgin, 0,        0, mcompgin, mcompgin, mcompgin_state, empty_init, "Mattel Electronics", "Computer Gin", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1979, mcompgin, 0,        0,      mcompgin, mcompgin, mcompgin_state, empty_init, "Mattel Electronics", "Computer Gin", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-CONS( 1979, mvbfree,  0,        0, mvbfree,  mvbfree,  mvbfree_state,  empty_init, "Mego", "Mini-Vid: Break Free", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, mvbfree,  0,        0,      mvbfree,  mvbfree,  mvbfree_state,  empty_init, "Mego", "Mini-Vid: Break Free", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, grobot9,  0,        0, grobot9,  grobot9,  grobot9_state,  empty_init, "Takatoku Toys", "Game Robot 9", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
+SYST( 1980, grobot9,  0,        0,      grobot9,  grobot9,  grobot9_state,  empty_init, "Takatoku Toys", "Game Robot 9", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
 
-CONS( 1980, tccombat, 0,        0, tccombat, tccombat, tccombat_state, empty_init, "Tomy", "Cosmic Combat", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, tmtennis, 0,        0, tmtennis, tmtennis, tmtennis_state, empty_init, "Tomy", "Tennis (Tomy)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, tmpacman, 0,        0, tmpacman, tmpacman, tmpacman_state, empty_init, "Tomy", "Pac Man (Tomy)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, tmscramb, 0,        0, tmscramb, tmscramb, tmscramb_state, empty_init, "Tomy", "Scramble (Tomy)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, tcaveman, 0,        0, tcaveman, tcaveman, tcaveman_state, empty_init, "Tomy", "Caveman (Tomy)", MACHINE_SUPPORTS_SAVE )
-CONS( 1984, alnchase, 0,        0, alnchase, alnchase, alnchase_state, empty_init, "Tomy", "Alien Chase", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, tccombat, 0,        0,      tccombat, tccombat, tccombat_state, empty_init, "Tomy", "Cosmic Combat", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, tmtennis, 0,        0,      tmtennis, tmtennis, tmtennis_state, empty_init, "Tomy", "Tennis (Tomy)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, tmpacman, 0,        0,      tmpacman, tmpacman, tmpacman_state, empty_init, "Tomy", "Pac Man (Tomy)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, tmscramb, 0,        0,      tmscramb, tmscramb, tmscramb_state, empty_init, "Tomy", "Scramble (Tomy)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, tcaveman, 0,        0,      tcaveman, tcaveman, tcaveman_state, empty_init, "Tomy", "Caveman (Tomy)", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, alnchase, 0,        0,      alnchase, alnchase, alnchase_state, empty_init, "Tomy", "Alien Chase", MACHINE_SUPPORTS_SAVE )
 
 // ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
 // with other, unemulatable, things eg. game board/pieces, book, playing cards, pen & paper, etc.

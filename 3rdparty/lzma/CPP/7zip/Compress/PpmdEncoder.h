@@ -37,7 +37,6 @@ class CEncoder :
 {
   Byte *_inBuf;
   CByteOutBufWrap _outStream;
-  CPpmd7z_RangeEnc _rangeEnc;
   CPpmd7 _ppmd;
   CEncProps _props;
 public:

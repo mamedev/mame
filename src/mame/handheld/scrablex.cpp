@@ -16,9 +16,11 @@ There's also a version of this game on a Panasonic MN1405 MCU.
 *******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/mb88xx/mb88xx.h"
 #include "sound/spkrdev.h"
 #include "video/pwm.h"
+
 #include "speaker.h"
 
 #include "scrablex.lh"
@@ -225,5 +227,5 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME      PARENT CMP MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1980, scrablex, 0,      0, scrablex, scrablex, scrablex_state, empty_init, "Selchow & Righter", "Scrabble Lexor - Computer Word Game", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1980, scrablex, 0,      0,      scrablex, scrablex, scrablex_state, empty_init, "Selchow & Righter", "Scrabble Lexor: Computer Word Game", MACHINE_SUPPORTS_SAVE )

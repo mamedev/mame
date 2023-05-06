@@ -24,8 +24,8 @@ public:
 	hp_dc100_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_image_interface implementation
-	virtual std::error_condition call_load() override;
-	virtual std::error_condition call_create(int format_type, util::option_resolution *format_options) override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 	virtual std::string call_display() override;
 	virtual const char *file_extensions() const noexcept override;
@@ -157,7 +157,7 @@ private:
 	bool m_image_dirty;
 
 	void clear_state();
-	std::error_condition internal_load(bool is_create);
+	std::pair<std::error_condition, std::string> internal_load(bool is_create);
 	void set_tape_present(bool present);
 	double compute_set_point(tape_speed_t speed , bool fwd) const;
 	void start_tape();

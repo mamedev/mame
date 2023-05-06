@@ -76,14 +76,18 @@ private:
 };
 
 template<int Slot>
-void  msx_cart_slotexpander_device::add_cartslot(machine_config &mconfig)
+void msx_cart_slotexpander_device::add_cartslot(machine_config &mconfig)
 {
-	MSX_SLOT_CARTRIDGE(mconfig, m_cartslot[Slot], 0);
+	MSX_SLOT_CARTRIDGE(mconfig, m_cartslot[Slot], DERIVED_CLOCK(1, 1));
 	m_cartslot[Slot]->option_reset();
 	msx_cart(*m_cartslot[Slot], true);
 	m_cartslot[Slot]->set_default_option(nullptr);
 	m_cartslot[Slot]->set_fixed(false);
 	m_cartslot[Slot]->irq_handler().set(m_irq_out, FUNC(input_merger_device::in_w<Slot>));
+	if (parent_slot())
+	{
+		m_cartslot[Slot]->add_route(ALL_OUTPUTS, soundin(), 1.0);
+	}
 }
 
 void msx_cart_slotexpander_device::device_add_mconfig(machine_config &mconfig)
@@ -114,7 +118,7 @@ void msx_cart_slotexpander_device::device_resolve_objects()
 	page(1)->install_view(0x4000, 0x7fff, m_view1);
 	page(2)->install_view(0x8000, 0xbfff, m_view2);
 	page(3)->install_view(0xc000, 0xffff, m_view3);
-	page(3)->install_readwrite_handler(0xffff, 0xffff, read8smo_delegate(*this, FUNC(msx_cart_slotexpander_device::secondary_slot_r)), write8smo_delegate(*this, FUNC(msx_cart_slotexpander_device::secondary_slot_w)));
+	page(3)->install_readwrite_handler(0xffff, 0xffff, emu::rw_delegate(*this, FUNC(msx_cart_slotexpander_device::secondary_slot_r)), emu::rw_delegate(*this, FUNC(msx_cart_slotexpander_device::secondary_slot_w)));
 
 	for (int page = 0; page < 4; page++)
 	{

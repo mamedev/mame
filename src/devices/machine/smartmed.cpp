@@ -216,12 +216,11 @@ std::error_condition smartmedia_image_device::smartmedia_format_2()
 	return std::error_condition();
 }
 
-std::error_condition smartmedia_image_device::call_load()
+std::pair<std::error_condition, std::string> smartmedia_image_device::call_load()
 {
 	std::error_condition result;
-	uint64_t position;
 	// try format 1
-	position = ftell();
+	uint64_t const position = ftell();
 	result = smartmedia_format_1();
 	if (result)
 	{
@@ -229,7 +228,7 @@ std::error_condition smartmedia_image_device::call_load()
 		fseek(position, SEEK_SET);
 		result = smartmedia_format_2();
 	}
-	return result;
+	return std::make_pair(result, std::string());
 }
 
 /*

@@ -87,10 +87,10 @@ public:
 
 	void init_fs(const fs_info *fs, const fs::meta_data &meta);
 
-	// image-level overrides
-	virtual std::error_condition call_load() override;
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
-	virtual std::error_condition call_create(int format_type, util::option_resolution *format_options) override;
+	virtual std::pair<std::error_condition, std::string> call_create(int format_type, util::option_resolution *format_options) override;
 	virtual const char *image_interface() const noexcept override = 0;
 
 	virtual bool is_readable()  const noexcept override { return true; }
@@ -166,7 +166,7 @@ protected:
 
 	floppy_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_config_complete() override;

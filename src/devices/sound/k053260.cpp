@@ -256,28 +256,24 @@ void k053260_device::write(offs_t offset, u8 data)
 
 			for (int i = 0; i < 4; i++)
 			{
+				m_voice[i].set_reverse(BIT(data, i | 4));
+
 				if (BIT(rising_edge, i))
 					m_voice[i].key_on();
 				else if (!BIT(data, i))
 					m_voice[i].key_off();
 			}
 			m_keyon = data;
-
-			for (auto & voice : m_voice)
-			{
-				voice.set_reverse(data >> 4);
-				data >>= 1;
-			}
 			break;
 		}
 
 		// 0x29 is a read register
 
 		case 0x2a: // loop and pcm/adpcm select
-			for (auto & voice : m_voice)
+			for (int i = 0; i < 4; i++)
 			{
-				voice.set_loop_kadpcm(data);
-				data >>= 1;
+				m_voice[i].set_loop(BIT(data, i));
+				m_voice[i].set_kadpcm(BIT(data, i | 4));
 			}
 			break;
 
@@ -320,7 +316,7 @@ void k053260_device::sound_stream_update(sound_stream &stream, std::vector<read_
 {
 	if (m_mode & 2)
 	{
-		for ( int j = 0; j < outputs[0].samples(); j++ )
+		for (int j = 0; j < outputs[0].samples(); j++)
 		{
 			s32 buffer[2] = {0, 0};
 
@@ -413,15 +409,19 @@ void k053260_device::KDSC_Voice::set_register(offs_t offset, u8 data)
 	}
 }
 
-void k053260_device::KDSC_Voice::set_loop_kadpcm(u8 data)
+void k053260_device::KDSC_Voice::set_loop(int state)
 {
-	m_loop = bool(BIT(data, 0));
-	m_kadpcm = bool(BIT(data, 4));
+	m_loop = bool(state);
 }
 
-void k053260_device::KDSC_Voice::set_reverse(u8 data)
+void k053260_device::KDSC_Voice::set_kadpcm(int state)
 {
-	m_reverse = bool(BIT(data, 0));
+	m_kadpcm = bool(state);
+}
+
+void k053260_device::KDSC_Voice::set_reverse(int state)
+{
+	m_reverse = bool(state);
 }
 
 void k053260_device::KDSC_Voice::set_pan(u8 data)
@@ -449,7 +449,7 @@ void k053260_device::KDSC_Voice::key_on()
 				m_start, m_length, m_pitch, m_volume, m_pan,
 				m_loop ? "yes" : "no",
 				m_reverse ? "yes" : "no",
-				m_kadpcm ? "KADPCM" : "PCM" );
+				m_kadpcm ? "KADPCM" : "PCM");
 	}
 }
 

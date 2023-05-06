@@ -67,7 +67,7 @@ STDMETHODIMP CLimitedInStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *new
   }
   if (offset < 0)
     return HRESULT_WIN32_ERROR_NEGATIVE_SEEK;
-  _virtPos = offset;
+  _virtPos = (UInt64)offset;
   if (newPosition)
     *newPosition = _virtPos;
   return S_OK;
@@ -115,7 +115,7 @@ STDMETHODIMP CClusterInStream::Read(void *data, UInt32 size, UInt32 *processedSi
 
     _curRem = blockSize - offsetInBlock;
     
-    for (int i = 1; i < 64 && (virtBlock + i) < (UInt32)Vector.Size() && phyBlock + i == Vector[virtBlock + i]; i++)
+    for (unsigned i = 1; i < 64 && (virtBlock + i) < (UInt32)Vector.Size() && phyBlock + i == Vector[virtBlock + i]; i++)
       _curRem += (UInt32)1 << BlockSizeLog;
   }
   
@@ -143,9 +143,9 @@ STDMETHODIMP CClusterInStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *new
     return HRESULT_WIN32_ERROR_NEGATIVE_SEEK;
   if (_virtPos != (UInt64)offset)
     _curRem = 0;
-  _virtPos = offset;
+  _virtPos = (UInt64)offset;
   if (newPosition)
-    *newPosition = offset;
+    *newPosition = (UInt64)offset;
   return S_OK;
 }
 
@@ -154,43 +154,69 @@ STDMETHODIMP CExtentsStream::Read(void *data, UInt32 size, UInt32 *processedSize
 {
   if (processedSize)
     *processedSize = 0;
-  if (_virtPos >= Extents.Back().Virt)
+  const UInt64 virt = _virtPos;
+  if (virt >= Extents.Back().Virt)
     return S_OK;
   if (size == 0)
     return S_OK;
   
-  unsigned left = 0, right = Extents.Size() - 1;
-  for (;;)
+  unsigned left = _prevExtentIndex;
+  if (virt <  Extents[left].Virt ||
+      virt >= Extents[left + 1].Virt)
   {
-    unsigned mid = (left + right) / 2;
-    if (mid == left)
-      break;
-    if (_virtPos < Extents[mid].Virt)
-      right = mid;
-    else
-      left = mid;
+    left = 0;
+    unsigned right = Extents.Size() - 1;
+    for (;;)
+    {
+      const unsigned mid = (unsigned)(((size_t)left + (size_t)right) / 2);
+      if (mid == left)
+        break;
+      if (virt < Extents[mid].Virt)
+        right = mid;
+      else
+        left = mid;
+    }
+    _prevExtentIndex = left;
+  }
+  
+  {
+    const UInt64 rem = Extents[left + 1].Virt - virt;
+    if (size > rem)
+      size = (UInt32)rem;
   }
   
   const CSeekExtent &extent = Extents[left];
-  UInt64 phyPos = extent.Phy + (_virtPos - extent.Virt);
-  if (_needStartSeek || _phyPos != phyPos)
+  
+  if (extent.Is_ZeroFill())
   {
-    _needStartSeek = false;
-    _phyPos = phyPos;
-    RINOK(SeekToPhys());
+    memset(data, 0, size);
+    _virtPos += size;
+    if (processedSize)
+      *processedSize = size;
+    return S_OK;
+  }
+
+  {
+    const UInt64 phy = extent.Phy + (virt - extent.Virt);
+    if (_phyPos != phy)
+    {
+      _phyPos = (UInt64)0 - 1;  // we don't trust seek_pos in case of error
+      RINOK(Stream->Seek((Int64)phy, STREAM_SEEK_SET, NULL));
+      _phyPos = phy;
+    }
   }
   
-  UInt64 rem = Extents[left + 1].Virt - _virtPos;
-  if (size > rem)
-    size = (UInt32)rem;
-  
-  HRESULT res = Stream->Read(data, size, &size);
-  _phyPos += size;
+  const HRESULT res = Stream->Read(data, size, &size);
   _virtPos += size;
+  if (res == S_OK)
+    _phyPos += size;
+  else
+    _phyPos = (UInt64)0 - 1;  // we don't trust seek_pos in case of error
   if (processedSize)
     *processedSize = size;
   return res;
 }
+
 
 STDMETHODIMP CExtentsStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition)
 {
@@ -203,7 +229,7 @@ STDMETHODIMP CExtentsStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPo
   }
   if (offset < 0)
     return HRESULT_WIN32_ERROR_NEGATIVE_SEEK;
-  _virtPos = offset;
+  _virtPos = (UInt64)offset;
   if (newPosition)
     *newPosition = _virtPos;
   return S_OK;
@@ -268,10 +294,10 @@ STDMETHODIMP CTailInStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPos
   }
   if (offset < 0)
     return HRESULT_WIN32_ERROR_NEGATIVE_SEEK;
-  _virtPos = offset;
+  _virtPos = (UInt64)offset;
   if (newPosition)
     *newPosition = _virtPos;
-  return Stream->Seek(Offset + _virtPos, STREAM_SEEK_SET, NULL);
+  return Stream->Seek((Int64)(Offset + _virtPos), STREAM_SEEK_SET, NULL);
 }
 
 STDMETHODIMP CLimitedCachedInStream::Read(void *data, UInt32 size, UInt32 *processedSize)
@@ -325,7 +351,7 @@ STDMETHODIMP CLimitedCachedInStream::Seek(Int64 offset, UInt32 seekOrigin, UInt6
   }
   if (offset < 0)
     return HRESULT_WIN32_ERROR_NEGATIVE_SEEK;
-  _virtPos = offset;
+  _virtPos = (UInt64)offset;
   if (newPosition)
     *newPosition = _virtPos;
   return S_OK;
@@ -354,10 +380,10 @@ STDMETHODIMP CTailOutStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPo
   }
   if (offset < 0)
     return HRESULT_WIN32_ERROR_NEGATIVE_SEEK;
-  _virtPos = offset;
+  _virtPos = (UInt64)offset;
   if (newPosition)
     *newPosition = _virtPos;
-  return Stream->Seek(Offset + _virtPos, STREAM_SEEK_SET, NULL);
+  return Stream->Seek((Int64)(Offset + _virtPos), STREAM_SEEK_SET, NULL);
 }
 
 STDMETHODIMP CTailOutStream::SetSize(UInt64 newSize)

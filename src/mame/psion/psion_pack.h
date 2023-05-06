@@ -26,10 +26,10 @@ public:
 	datapack_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~datapack_device();
 
-	// image-level overrides
-	virtual std::error_condition call_load() override;
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
-	virtual std::error_condition call_create(int format_type, util::option_resolution *create_args) override;
+	virtual std::pair<std::error_condition, std::string> call_create(int format_type, util::option_resolution *create_args) override;
 
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *image_interface() const noexcept override { return "psion_pack"; }
@@ -48,7 +48,7 @@ protected:
 	// internal helper
 	void update();
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
 

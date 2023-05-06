@@ -116,7 +116,7 @@ std::string megaduck_cart_slot_device::get_default_card_software(get_default_car
 }
 
 
-std::error_condition megaduck_cart_slot_device::load_image_file(util::random_read &file)
+std::pair<std::error_condition, std::string> megaduck_cart_slot_device::load_image_file(util::random_read &file)
 {
 	auto const len = length();
 	size_t actual;
@@ -127,16 +127,10 @@ std::error_condition megaduck_cart_slot_device::load_image_file(util::random_rea
 		memory_region *const romregion = machine().memory().region_alloc(subtag("rom"), len, 1, ENDIANNESS_LITTLE);
 		std::error_condition const err = file.read_at(0, romregion->base(), len, actual);
 		if (err || (len != actual))
-		{
-			osd_printf_error("%s: Error reading cartridge file\n", basename());
-			if (err)
-				return err;
-			else
-				return std::errc::io_error;
-		}
+			std::make_pair(err ? err : std::errc::io_error, "Error reading cartridge file");
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

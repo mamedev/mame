@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco, hap
 // thanks-to:Berger
-/******************************************************************************
+/*******************************************************************************
 
 Mephisto Milano
 
@@ -13,7 +13,7 @@ Hardware notes:
 
 Nigel Short is basically a Milano 2.00
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -74,9 +74,9 @@ void milano_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void milano_state::update_leds()
 {
@@ -118,9 +118,9 @@ u8 milano_state::keys_r(offs_t offset)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void milano_state::milano_mem(address_map &map)
 {
@@ -137,9 +137,9 @@ void milano_state::milano_mem(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( milano )
 	PORT_START("KEY")
@@ -158,13 +158,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void milano_state::milano(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	R65C02(config, m_maincpu, 4.9152_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &milano_state::milano_mem);
 
@@ -185,7 +185,7 @@ void milano_state::milano(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_led_pwm).set_size(8, 2);
 
 	MEPHISTO_DISPLAY_MODULE2(config, m_display); // internal
@@ -194,9 +194,9 @@ void milano_state::milano(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( milano ) // 1.02
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -217,12 +217,12 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
     Drivers
-***************************************************************************/
+*******************************************************************************/
 
-/*    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT   CLASS          INIT       COMPANY             FULLNAME                   FLAGS */
-CONS( 1991, milano,    0,       0,      milano,   milano, milano_state, empty_init, "Hegener + Glaser", "Mephisto Milano (v1.02)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1991, milanoa,   milano,  0,      milano,   milano, milano_state, empty_init, "Hegener + Glaser", "Mephisto Milano (v1.01)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT   CLASS          INIT       COMPANY, FULLNAME, FLAGS
+SYST( 1991, milano,    0,       0,      milano,   milano, milano_state, empty_init, "Hegener + Glaser", "Mephisto Milano (v1.02)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1991, milanoa,   milano,  0,      milano,   milano, milano_state, empty_init, "Hegener + Glaser", "Mephisto Milano (v1.01)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1993, nshort,    0,       0,      milano,   milano, milano_state, empty_init, "Hegener + Glaser", "Mephisto Nigel Short", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1993, nshort,    0,       0,      milano,   milano, milano_state, empty_init, "Hegener + Glaser", "Mephisto Nigel Short", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

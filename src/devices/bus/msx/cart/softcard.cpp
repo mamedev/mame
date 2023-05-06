@@ -40,46 +40,34 @@ void msx_cart_softcard_device::device_add_mconfig(machine_config &config)
 	SOFTWARE_LIST(config, "softcard_list").set_original("msx_softcard");
 }
 
-std::error_condition msx_cart_softcard_device::call_load()
+std::pair<std::error_condition, std::string> msx_cart_softcard_device::call_load()
 {
 	if (m_softcard)
 	{
 		if (loaded_through_softlist())
 		{
-			u32 length = get_software_region_length("rom");
+			u32 const length = get_software_region_length("rom");
 			// Only 32KB images are supported
 			if (length != 0x8000)
-			{
-				osd_printf_error("%s: Invalid file size for a softcard\n", basename());
-				return image_error::BADSOFTWARE;
-			}
+				return std::pair(image_error::BADSOFTWARE, "Invalid file size for a softcard (must be 32K)");
 		}
 		else
 		{
-			u32 length = this->length();
+			u32 const length = this->length();
 			// Only 32KB images are supported
 			if (length != 0x8000)
-			{
-				osd_printf_error("%s: Invalid file size for a softcard\n", basename());
-				return image_error::INVALIDLENGTH;
-			}
+				return std::pair(image_error::BADSOFTWARE, "Invalid file size for a softcard (must be 32K)");
 
 			memory_region *const romregion = machine().memory().region_alloc(subtag("rom"), length, 1, ENDIANNESS_LITTLE);
 			if (fread(romregion->base(), length) != length)
-			{
-				osd_printf_error("%s: Unable to fully read file\n", basename());
-				return image_error::UNSPECIFIED;
-			}
+				return std::make_pair(image_error::UNSPECIFIED, "Unable to fully read file");
 		}
 
 		std::string message;
 		std::error_condition result = m_softcard->initialize_cartridge(message);
-		if (result)
-			osd_printf_error("%s: %s\n", basename(), message);
-
-		return result;
+		return std::make_pair(result, message);
 	}
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 std::string msx_cart_softcard_device::get_default_card_software(get_default_card_software_hook &hook) const

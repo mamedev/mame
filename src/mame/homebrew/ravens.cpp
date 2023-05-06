@@ -312,69 +312,40 @@ void ravens2_state::kbd_put(u8 data)
 
 QUICKLOAD_LOAD_MEMBER(ravens_base::quickload_cb)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	int i;
-	int quick_addr = 0x900;
-	int exec_addr;
-	std::vector<u8> quick_data;
-	int read_;
-	std::error_condition result = image_error::UNSPECIFIED;
-
 	int const quick_length = image.length();
 	if (quick_length < 0x0900)
-	{
-		result = image_error::INVALIDLENGTH;
-		osd_printf_error("%s: File too short\n", image.basename());
-		image.message(" File too short");
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "File too short");
 	else if (quick_length > 0x8000)
+		return std::make_pair(image_error::INVALIDLENGTH, "File too long (must be no more than 32K)");
+
+	std::vector<u8> quick_data;
+	quick_data.resize(quick_length);
+	int const read_ = image.fread( &quick_data[0], quick_length);
+	if (read_ != quick_length)
+		return std::make_pair(image_error::UNSPECIFIED, "Cannot read the file");
+	else if (quick_data[0] != 0xc6)
+		return std::make_pair(image_error::INVALIDIMAGE, "Invalid header");
+
+	int const exec_addr = quick_data[2] * 256 + quick_data[3];
+	if (exec_addr >= quick_length)
 	{
-		result = image_error::INVALIDLENGTH;
-		osd_printf_error("%s: File too long\n", image.basename());
-		image.message(" File too long");
-	}
-	else
-	{
-		quick_data.resize(quick_length);
-		read_ = image.fread( &quick_data[0], quick_length);
-		if (read_ != quick_length)
-		{
-			osd_printf_error("%s: Cannot read the file\n", image.basename());
-			image.message(" Cannot read the file");
-		}
-		else if (quick_data[0] != 0xc6)
-		{
-			result = image_error::INVALIDIMAGE;
-			osd_printf_error("%s: Invalid header\n", image.basename());
-			image.message(" Invalid header");
-		}
-		else
-		{
-			exec_addr = quick_data[2] * 256 + quick_data[3];
-
-			if (exec_addr >= quick_length)
-			{
-				result = image_error::INVALIDIMAGE;
-				osd_printf_error("%s: Exec address beyond end of file\n", image.basename());
-				image.message(" Exec address beyond end of file");
-			}
-			else
-			{
-				for (i = quick_addr; i < read_; i++)
-					space.write_byte(i, quick_data[i]);
-
-				/* display a message about the loaded quickload */
-				image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
-
-				// Start the quickload
-				m_maincpu->set_state_int(S2650_PC, exec_addr);
-
-				result = std::error_condition();
-			}
-		}
+		return std::make_pair(
+				image_error::INVALIDIMAGE,
+				util::string_format("Exec address %04X beyond end of file %04X", exec_addr, quick_length));
 	}
 
-	return result;
+	constexpr int QUICK_ADDR = 0x900;
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	for (int i = QUICK_ADDR; i < read_; i++)
+		space.write_byte(i, quick_data[i]);
+
+	// display a message about the loaded quickload
+	image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
+
+	// Start the quickload
+	m_maincpu->set_state_int(S2650_PC, exec_addr);
+
+	return std::pair(std::error_condition(), std::string());
 }
 
 void ravens_state::ravens(machine_config &config)

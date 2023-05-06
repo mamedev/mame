@@ -136,7 +136,7 @@ void pc11_device::z80daisy_irq_reti()
 }
 
 
-std::error_condition pc11_device::call_load()
+std::pair<std::error_condition, std::string> pc11_device::call_load()
 {
 	/* reader unit */
 	m_fd = this;
@@ -144,7 +144,7 @@ std::error_condition pc11_device::call_load()
 
 	LOG("call_load filename %s is_open %d\n", m_fd->filename(), m_fd->is_open());
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void pc11_device::call_unload()

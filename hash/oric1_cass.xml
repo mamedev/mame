@@ -3,23 +3,13 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="oric1_cass" description="Oric 1 cassettes">
-
-	<software name="007danger">
-		<description>007 - Dangereusement Votre</description>
-		<year>1985</year>
-		<publisher>Domark, ERE Informatique</publisher>
-		<part name="cass" interface="oric1_cass">
-			<dataarea name="cass" size="28630">
-				<rom name="007 - Dangereusement Votre (1985)(Domark - Ere Informatique)(FR).tap" size="28630" crc="693b1888" sha1="e2b86ae997cbf944b5cd2c0d715d78875efa3f19"/>
-			</dataarea>
-		</part>
-	</software>
+<softwarelist name="oric1_cass" description="Tangerine Oric 1 cassettes">
 
 	<software name="3dfongus">
 		<description>3D Fongus</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
+		<info name="region" value="France" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="48016">
 				<rom name="3D Fongus (1985-01)(Loriciels)(FR).tap" size="48016" crc="e53a85d5" sha1="2ae70d5051613971ebe4146a454a825a36eaf8bb"/>
@@ -31,6 +21,7 @@ license:CC0-1.0
 		<description>3D Fongus (alt)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
+		<info name="region" value="France" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="48016">
 				<rom name="3D Fongus (1985-01)(Loriciels)(FR)[a].tap" size="48016" crc="a132e45c" sha1="88408d8e0dd839c6dae27055ec668cef60ef5b40"/>
@@ -42,6 +33,7 @@ license:CC0-1.0
 		<description>3D Luffar-Schack v1.2</description>
 		<year>1983</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="region" value="Sweden" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="4410">
 				<rom name="3D Luffar-Schack v1.2 (1983)(-)(en-sv).tap" size="4410" crc="ec6b3af1" sha1="4b588eca0d9b3e89ef26ab168d7c859850b7176a"/>
@@ -64,6 +56,7 @@ license:CC0-1.0
 		<description>3D Munch</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
+		<info name="region" value="France" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="29542">
 				<rom name="3D Munch (1985)(Loriciels)(FR).tap" size="29542" crc="cddfc7fa" sha1="312f7d4f5900506c3c3f0e6bf3b3ceca4e460ac9"/>
@@ -93,10 +86,39 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="viewkill">
+		<description>A View to a Kill - The Computer Game</description>
+		<year>1985</year>
+		<publisher>Domark</publisher>
+		<info name="alt_title" value="007 'A View to a Kill' - The computer game"/>
+		<info name="language" value="English" />
+		<info name="region" value="UK" />
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="73589">
+				<rom name="A View to a Kill - The Computer Game (1985)(Domark).tap" size="73589" crc="4591b321" sha1="f7550d10497e89df8d2410bab06f75b1352d5189"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="007danger" cloneof="viewkill">
+		<description>Dangereusement Votre! - Le Jeu sur Micro-Ordinateur</description>
+		<year>1985</year>
+		<publisher>Domark, ERE Informatique</publisher>
+		<info name="alt_title" value="007 'Dangereusement Votre' - Le jeu sur ordinateur"/>
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="28630">
+				<rom name="007 - Dangereusement Votre (1985)(Domark - Ere Informatique)(FR).tap" size="28630" crc="693b1888" sha1="e2b86ae997cbf944b5cd2c0d715d78875efa3f19"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="atm">
 		<description>A.T.M.</description>
 		<year>1985</year>
 		<publisher>Cobra Soft</publisher>
+		<info name="region" value="France" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="35869">
 				<rom name="A.T.M. (1985)(Cobra Soft)(FR).tap" size="35869" crc="4edda739" sha1="9b40c851720f88309084910d2d21d8590abda58c"/>
@@ -130,6 +152,7 @@ license:CC0-1.0
 		<description>Une Affaire En Or</description>
 		<year>1984</year>
 		<publisher>Free Game Blot</publisher>
+		<info name="region" value="France" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="36442">
 				<rom name="Affaire En Or, Une (1984)(Free Game Blot)(FR).tap" size="36442" crc="721e0461" sha1="a497f0f3bffda8273336c841a925c83aca55cced"/>
@@ -141,6 +164,7 @@ license:CC0-1.0
 		<description>Agent 0013</description>
 		<year>1983</year>
 		<publisher>Hebdogiciel</publisher>
+		<info name="region" value="France" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="25494">
 				<rom name="Agent 0013 (1983)(Hebdogiciel)(FR)[Oric #4, Program 5].tap" size="25494" crc="24e779e1" sha1="d17f91ddc4fdd1dce2325a8121609ab8da1f7e53"/>
@@ -152,6 +176,7 @@ license:CC0-1.0
 		<description>Agent 0013 (alt)</description>
 		<year>1983</year>
 		<publisher>Hebdogiciel</publisher>
+		<info name="region" value="France" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="25552">
 				<rom name="Agent 0013 (1983)(Hebdogiciel)(FR)[a][Oric #4, Program 5].tap" size="25552" crc="ee6938af" sha1="8e7a56bd7baa073f34fd722474cd18a67586f521"/>
@@ -163,6 +188,7 @@ license:CC0-1.0
 		<description>L'Aigle D'Or</description>
 		<year>1984</year>
 		<publisher>Loriciels</publisher>
+		<info name="region" value="France" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="54630">
 				<rom name="Aigle D'Or, L' (1984)(Loriciels)(FR).tap" size="54630" crc="76de857c" sha1="e8b5d417d482809a5145e1d160d01064721fe4e7"/>
@@ -426,7 +452,10 @@ license:CC0-1.0
 	<software name="bunker">
 		<description>Bunker</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Hebdogiciel</publisher>
+		<notes><![CDATA[
+Type-in from magazine
+]]></notes>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="13561">
 				<rom name="Bunker (19xx)(-)(fr).tap" size="13561" crc="4aa32409" sha1="0e3808f50613ca3dbe444b535c1b865d7f8c797e"/>
@@ -814,16 +843,24 @@ license:CC0-1.0
 		<publisher>Fabrizio Caruso</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="6684">
-				<!-- originally released version seems to have disappeared off the Internet
-				<rom name="Cross Bomber (2021-05-13)(Caruso, Fabrizio)[48K].tap" size="6412" crc="5915840a" sha1="ab594aa3f6913c836956854374eafe243e4b457c"/>
-				-->
 				<rom name="Cross Bomber (2022-07-20)(Caruso, Fabrizio)[48K].tap" size="6684" crc="952b37c8" sha1="8298e07d262181611ab7286719830f5d66d670b6"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="crossbomber1" cloneof="crossbomber">
-		<description>Cross Bomber (alt)</description>
+		<description>Cross Bomber (2021-05-13)</description>
+		<year>2022</year>
+		<publisher>Fabrizio Caruso</publisher>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="6684">
+				<rom name="Cross Bomber (2021-05-13)(Caruso, Fabrizio)[48K].tap" size="6412" crc="5915840a" sha1="ab594aa3f6913c836956854374eafe243e4b457c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crossbomber2" cloneof="crossbomber">
+		<description>Cross Bomber (2020-08-26)</description>
 		<year>2020</year>
 		<publisher>Fabrizio Caruso</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -991,6 +1028,8 @@ license:CC0-1.0
 		<description>Le Diamant de Kheops</description>
 		<year>1984</year>
 		<publisher>Sprites</publisher>
+		<info name="language" value="French" />
+		<info name="region" value="France" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="47322">
 				<rom name="Diamant de Kheops, Le (1984)(Sprites)(FR).tap" size="47322" crc="8ad535ea" sha1="ae71295b96de16552d1325aa5ba45bac6cfa16c2"/>
@@ -1015,6 +1054,17 @@ license:CC0-1.0
 		<part name="cass3" interface="oric1_cass">
 			<dataarea name="cass" size="7816">
 				<rom name="Diamant de l'ile Maudite, Le (1984-07)(Loriciels)(FR)[3e partie].tap" size="7816" crc="e3ef79e2" sha1="a720ffbc378b44ccc6f26c96ba910f7c9f79597a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diamantm_d" cloneof="diamantm" supported="no">
+		<description>Le Diamant de l'île Maudite (demo)</description>
+		<year>1984</year>
+		<publisher>Loriciels</publisher>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="38261">
+				<rom name="Le Diamant de l'ile Maudite (demo)(Loriciels).tap" size="38261" crc="03015f42" sha1="558107ecc8f1e34348bc09ed509f9616b37be25d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1103,6 +1153,19 @@ license:CC0-1.0
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="31489">
 				<rom name="Don Juan (1984)(No Man's Land)(Atmos)(FR)[a2].tap" size="31489" crc="cffe5f78" sha1="4178dc51507d0de3415cdf7b407961abf3dd2170"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="juandrag">
+		<description>Don Juans et Dragueurs</description>
+		<year>1984</year>
+		<publisher>Ere Informatique</publisher>
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="49032">
+				<rom name="Don Juans et Dragueurs (1984)(Ere).tap" size="49032" crc="36f7ef6c" sha1="4c42f0530b3375043c06744ebd634a0350060324"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1232,6 +1295,8 @@ license:CC0-1.0
 		<description>Fantasy Quest (UK)</description>
 		<year>1983</year>
 		<publisher>IJK Software</publisher>
+		<info name="language" value="English" />
+		<info name="region" value="UK" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="28272">
 				<rom name="Fantasy Quest (1983)(IJK Software)(GB).tap" size="28272" crc="8c436186" sha1="ba9fe856c778dea4ab05a882ff0e6f0baf8b93ff"/>
@@ -1243,6 +1308,8 @@ license:CC0-1.0
 		<description>Fantasy Quest (France)</description>
 		<year>1983</year>
 		<publisher>IJK Software</publisher>
+		<info name="language" value="French" />
+		<info name="region" value="France" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="29948">
 				<rom name="Fantasy Quest (1983)(IJK Software)(GB)(fr).tap" size="29948" crc="4a5e1a8f" sha1="379d9463775a67f3112507ce869590b6930feb72"/>
@@ -3824,6 +3891,7 @@ license:CC0-1.0
 		<description>Tri-Olymporic</description>
 		<year>1984</year>
 		<publisher>Besdugiciel</publisher>
+		<info name="region" value="France" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="21387">
 				<rom name="Tri-Olymporic (1984)(Besdugiciel)(FR).tap" size="21387" crc="e0917764" sha1="97c1f133562de67092d831d041d926fb4b6e89a8"/>
@@ -3835,6 +3903,7 @@ license:CC0-1.0
 		<description>Tri-Olymporic (alt)</description>
 		<year>1984</year>
 		<publisher>Besdugiciel</publisher>
+		<info name="region" value="France" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="19928">
 				<rom name="Tri-Olymporic (1984)(Besdugiciel)(FR)[a].tap" size="19928" crc="f4070e34" sha1="62a1b1e973e7af3699f4e3b3439d4c7d6b9f8feb"/>
@@ -3846,6 +3915,7 @@ license:CC0-1.0
 		<description>Triathlon</description>
 		<year>1985</year>
 		<publisher>ERE Informatique</publisher>
+		<info name="region" value="France" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="43728">
 				<rom name="Triathlon (1985)(ERE Informatique)(FR).tap" size="43728" crc="3df7c515" sha1="35f65519ff49251270c89fe3d176a8086881d6bc"/>
@@ -4245,6 +4315,17 @@ license:CC0-1.0
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="37397">
 				<rom name="Zorgon's Revenge (1983)(IJK Software)(GB)[a2].tap" size="37397" crc="110ff38c" sha1="6a50dd8021e89f0fdb2b68242a5ddf4d7b23c61d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zorgons_d" cloneof="zorgons">
+		<description>Zorgon's Revenge (demonstration only)</description>
+		<year>1984</year>
+		<publisher>IJK Software</publisher>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="37401">
+				<rom name="Zorgon's Revenge (demo) (1984)(IJK Software)(GB).tap" size="37401" crc="650e3b72" sha1="4aef2008cc0d31c9f16eebebb9d347e1f82c686b"/>
 			</dataarea>
 		</part>
 	</software>

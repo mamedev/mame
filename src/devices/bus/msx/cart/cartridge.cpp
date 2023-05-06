@@ -3,6 +3,7 @@
 
 #include "emu.h"
 #include "cartridge.h"
+
 #include "arc.h"
 #include "ascii.h"
 #include "beepack.h"
@@ -14,6 +15,7 @@
 #include "fmpac.h"
 #include "fs_sr022.h"
 #include "halnote.h"
+#include "hbi55.h"
 #include "hfox.h"
 #include "holy_quran.h"
 #include "ink.h"
@@ -30,8 +32,8 @@
 #include "slotexpander.h"
 #include "slotoptions.h"
 #include "softcard.h"
-#include "superloderunner.h"
 #include "super_swangi.h"
+#include "superloderunner.h"
 #include "yamaha_ucn01.h"
 
 #include "bus/msx/slot/cartridge.h"
@@ -84,9 +86,10 @@ void msx_cart(device_slot_interface &device, bool is_in_subslot)
 	device.option_add_internal(slotoptions::EC701,           MSX_CART_EC701);
 	device.option_add(slotoptions::BEEPACK,   MSX_CART_BEEPACK);
 	device.option_add(slotoptions::BM_012,    MSX_CART_BM_012);
+	device.option_add(slotoptions::HBI55,     MSX_CART_HBI55);
 	device.option_add(slotoptions::MOONSOUND, MSX_CART_MOONSOUND);
-	device.option_add(slotoptions::UCN01,     MSX_CART_UCN01);
 	device.option_add(slotoptions::SOFTCARD,  MSX_CART_SOFTCARD);
+	device.option_add(slotoptions::UCN01,     MSX_CART_UCN01);
 	if (!is_in_subslot)
 	{
 		device.option_add(slotoptions::SLOTEXP, MSX_CART_SLOTEXPANDER);

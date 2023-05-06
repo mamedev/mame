@@ -23,7 +23,7 @@
 #include "machine/8530scc.h"
 #include "machine/hd63450.h"
 #include "machine/i8255.h"
-#include "machine/mb89352.h"
+#include "machine/mb87030.h"
 #include "machine/mc68901.h"
 #include "machine/ram.h"
 #include "machine/rp5c15.h"
@@ -309,7 +309,7 @@ class x68ksupr_state : public x68k_state
 public:
 	x68ksupr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: x68k_state(mconfig, type, tag)
-		, m_scsictrl(*this, "mb89352")
+		, m_scsictrl(*this, "scsi:7:spc")
 	{
 	}
 

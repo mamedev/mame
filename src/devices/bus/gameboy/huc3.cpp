@@ -314,33 +314,33 @@ std::error_condition huc3_device::load(std::string &message)
 	// install memory controller handlers
 	cart_space()->install_write_handler(
 			0x0000, 0x1fff,
-			write8smo_delegate(*this, FUNC(huc3_device::io_select)));
+			emu::rw_delegate(*this, FUNC(huc3_device::io_select)));
 	cart_space()->install_write_handler(
 			0x2000, 0x3fff,
-			write8smo_delegate(*this, FUNC(huc3_device::bank_switch_fine)));
+			emu::rw_delegate(*this, FUNC(huc3_device::bank_switch_fine)));
 	cart_space()->install_write_handler(
 			0x4000, 0x5fff,
-			write8smo_delegate(*this, FUNC(huc3_device::bank_switch_coarse)));
+			emu::rw_delegate(*this, FUNC(huc3_device::bank_switch_coarse)));
 
 	// install I/O handlers
 	m_view_io[2].install_write_handler(
 			0xa000, 0xbfff,
-			write8smo_delegate(*this, FUNC(huc3_device::write_command)));
+			emu::rw_delegate(*this, FUNC(huc3_device::write_command)));
 	m_view_io[3].install_read_handler(
 			0xa000, 0xbfff,
-			read8mo_delegate(*this, FUNC(huc3_device::read_command)));
+			emu::rw_delegate(*this, FUNC(huc3_device::read_command)));
 	m_view_io[4].install_read_handler(
 			0xa000, 0xbfff,
-			read8mo_delegate(*this, FUNC(huc3_device::read_status)));
+			emu::rw_delegate(*this, FUNC(huc3_device::read_status)));
 	m_view_io[4].install_write_handler(
 			0xa000, 0xbfff,
-			write8smo_delegate(*this, FUNC(huc3_device::write_control)));
+			emu::rw_delegate(*this, FUNC(huc3_device::write_control)));
 	m_view_io[5].install_read_handler(
 			0xa000, 0xbfff,
-			read8mo_delegate(*this, FUNC(huc3_device::read_ir)));
+			emu::rw_delegate(*this, FUNC(huc3_device::read_ir)));
 	m_view_io[5].install_write_handler(
 			0xa000, 0xbfff,
-			write8smo_delegate(*this, FUNC(huc3_device::write_ir)));
+			emu::rw_delegate(*this, FUNC(huc3_device::write_ir)));
 
 	// all good
 	return std::error_condition();

@@ -479,7 +479,8 @@ void menu_crosshair::populate()
 			if ((length > 4) && core_filename_ends_with(dir->name, ".png"))
 				m_pics.emplace_back(dir->name, length - 4);
 		}
-		std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t>>(std::locale());
+		std::locale const lcl;
+		std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t> >(lcl);
 		std::stable_sort(
 				m_pics.begin(),
 				m_pics.end(),

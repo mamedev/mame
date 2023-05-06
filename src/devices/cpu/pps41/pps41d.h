@@ -29,20 +29,20 @@ protected:
 	enum e_mnemonics
 	{
 		// MM76/shared
-		em_ILL /* 0! */,
-		em_XAB, em_LBA, em_LB, em_EOB2,
-		em_SB, em_RB, em_SKBF,
-		em_XAS, em_LSA,
-		em_L, em_X, em_XDSK, em_XNSK,
-		em_A, em_AC, em_ACSK, em_ASK, em_COM, em_RC, em_SC, em_SKNC, em_LAI, em_AISK,
-		em_RT, em_RTSK, em_T, em_NOP, em_TL, em_TM, em_TML, em_TR,
-		em_SKMEA, em_SKBEI, em_SKAEI,
-		em_SOS, em_ROS, em_SKISL, em_IBM, em_OB, em_IAM, em_OA, em_IOS, em_I1, em_I2C, em_INT1H, em_DIN1, em_INT0L, em_DIN0, em_SEG1, em_SEG2,
+		mILL /* 0! */,
+		mXAB, mLBA, mLB, mEOB2,
+		mSB, mRB, mSKBF,
+		mXAS, mLSA,
+		mL, mX, mXDSK, mXNSK,
+		mA, mAC, mACSK, mASK, mCOM, mRC, mSC, mSKNC, mLAI, mAISK,
+		mRT, mRTSK, mT, mNOP, mTL, mTM, mTML, mTR,
+		mSKMEA, mSKBEI, mSKAEI,
+		mSOS, mROS, mSKISL, mIBM, mOB, mIAM, mOA, mIOS, mI1, mI2C, mINT1H, mDIN1, mINT0L, mDIN0, mSEG1, mSEG2,
 
 		// MM78 differences
-		em_INT0H, em_INT1L, em_SAG, em_EOB3, em_TAB,
-		em_I1SK, em_IX, em_OX, em_LXA, em_XAX, em_IOA,
-		em_TLB, em_TMLB
+		mINT0H, mINT1L, mSAG, mEOB3, mTAB,
+		mI1SK, mIX, mOX, mLXA, mXAX, mIOA,
+		mTLB, mTMLB
 	};
 
 	static const char *const s_name[];

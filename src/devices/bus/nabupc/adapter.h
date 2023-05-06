@@ -34,7 +34,7 @@ public:
 	// constructor/destructor
 	network_adapter(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return false; }
 	virtual bool is_creatable() const noexcept override { return false; }
@@ -43,17 +43,17 @@ public:
 	virtual const char *file_extensions() const noexcept override { return "pak"; }
 	virtual const char *image_type_name() const noexcept override { return "Segment Pak"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "hcca"; }
-	virtual std::error_condition call_load() override;
-
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 
 	virtual DECLARE_WRITE_LINE_MEMBER(input_txd) override;
+
 protected:
-	// device overrides
+	// device_t implementation
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_buffered_serial_interface overrides
+	// device_buffered_serial_interface implementation
 	virtual void tra_callback() override;
 
 private:

@@ -146,7 +146,7 @@ public:
 
 protected:
 	void device_start() override { }
-	std::error_condition    call_load() override;
+	std::pair<std::error_condition, std::string>    call_load() override;
 	void    call_unload() override;
 
 private:
@@ -174,7 +174,7 @@ public:
 
 protected:
 	void    device_start() override { }
-	std::error_condition    call_load() override;
+	std::pair<std::error_condition, std::string>    call_load() override;
 	void    call_unload() override;
 };
 

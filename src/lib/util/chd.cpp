@@ -133,7 +133,7 @@ struct chd_file::metadata_hash
 //  a byte buffer
 //-------------------------------------------------
 
-inline uint64_t chd_file::be_read(const uint8_t *base, int numbytes)
+inline uint64_t chd_file::be_read(const uint8_t *base, int numbytes) const
 {
 	uint64_t result = 0;
 	while (numbytes--)
@@ -163,7 +163,7 @@ inline void chd_file::be_write(uint8_t *base, uint64_t value, int numbytes)
 //  stream in bigendian order
 //-------------------------------------------------
 
-inline util::sha1_t chd_file::be_read_sha1(const uint8_t *base)
+inline util::sha1_t chd_file::be_read_sha1(const uint8_t *base)const
 {
 	util::sha1_t result;
 	memcpy(&result.m_raw[0], base, sizeof(result.m_raw));
@@ -187,7 +187,7 @@ inline void chd_file::be_write_sha1(uint8_t *base, util::sha1_t value)
 //  offset; on failure throw an error
 //-------------------------------------------------
 
-inline void chd_file::file_read(uint64_t offset, void *dest, uint32_t length)
+inline void chd_file::file_read(uint64_t offset, void *dest, uint32_t length) const
 {
 	// no file = failure
 	if (!m_file)
@@ -2637,7 +2637,7 @@ void chd_file::hunk_copy_from_parent(uint32_t hunknum, uint64_t parentunit)
  * @return  true if it succeeds, false if it fails.
  */
 
-bool chd_file::metadata_find(chd_metadata_tag metatag, int32_t metaindex, metadata_entry &metaentry, bool resume)
+bool chd_file::metadata_find(chd_metadata_tag metatag, int32_t metaindex, metadata_entry &metaentry, bool resume) const
 {
 	// start at the beginning unless we're resuming a previous search
 	if (!resume)
@@ -3302,3 +3302,37 @@ void chd_file_compressor::hashmap::add(uint64_t itemnum, util::crc16_t crc16, ut
 	entry->m_next = m_map[crc16];
 	m_map[crc16] = entry;
 }
+
+bool chd_file::is_hd() const
+{
+	metadata_entry metaentry;
+	return metadata_find(HARD_DISK_METADATA_TAG, 0, metaentry);
+}
+
+bool chd_file::is_cd() const
+{
+	metadata_entry metaentry;
+	return metadata_find(CDROM_OLD_METADATA_TAG, 0, metaentry)
+		|| metadata_find(CDROM_TRACK_METADATA_TAG, 0, metaentry)
+		|| metadata_find(CDROM_TRACK_METADATA2_TAG, 0, metaentry);
+}
+
+bool chd_file::is_gd() const
+{
+	metadata_entry metaentry;
+	return metadata_find(GDROM_OLD_METADATA_TAG, 0, metaentry)
+		|| metadata_find(GDROM_TRACK_METADATA_TAG, 0, metaentry);
+}
+
+bool chd_file::is_dvd() const
+{
+	metadata_entry metaentry;
+	return metadata_find(DVD_METADATA_TAG, 0, metaentry);
+}
+
+bool chd_file::is_av() const
+{
+	metadata_entry metaentry;
+	return metadata_find(AV_METADATA_TAG, 0, metaentry);
+}
+

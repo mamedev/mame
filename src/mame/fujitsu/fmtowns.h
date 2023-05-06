@@ -8,7 +8,7 @@
 #include "fmt_icmem.h"
 
 #include "cpu/i386/i386.h"
-#include "imagedev/chd_cd.h"
+#include "imagedev/cdromimg.h"
 #include "imagedev/floppy.h"
 #include "machine/fm_scsi.h"
 #include "machine/i8251.h"

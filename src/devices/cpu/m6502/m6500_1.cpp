@@ -73,6 +73,8 @@
 #include "emu.h"
 #include "m6500_1.h"
 
+#include "m6502mcu.ipp"
+
 
 namespace {
 
@@ -92,7 +94,7 @@ DEFINE_DEVICE_TYPE(M6500_1, m6500_1_device, "m6500_1", "MOS Technology 6500/1");
 
 
 m6500_1_device::m6500_1_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: m6502_mcu_device(mconfig, M6500_1, tag, owner, clock)
+	: m6502_mcu_device_base<m6502_device>(mconfig, M6500_1, tag, owner, clock)
 	, m_port_in_cb{ *this }
 	, m_port_out_cb{ *this }
 	, m_cntr_out_cb{ *this }
@@ -142,7 +144,7 @@ WRITE_LINE_MEMBER(m6500_1_device::cntr_w)
 
 void m6500_1_device::device_resolve_objects()
 {
-	m6502_mcu_device::device_resolve_objects();
+	m6502_mcu_device_base<m6502_device>::device_resolve_objects();
 
 	m_port_in_cb.resolve_all();
 	m_port_out_cb.resolve_all_safe();
@@ -151,7 +153,7 @@ void m6500_1_device::device_resolve_objects()
 
 void m6500_1_device::device_start()
 {
-	m6502_mcu_device::device_start();
+	m6502_mcu_device_base<m6502_device>::device_start();
 
 	m_counter_base = 0U;
 
@@ -173,7 +175,7 @@ void m6500_1_device::device_start()
 
 void m6500_1_device::device_reset()
 {
-	m6502_mcu_device::device_reset();
+	m6502_mcu_device_base<m6502_device>::device_reset();
 
 	SP = 0x003fU;
 
@@ -238,7 +240,7 @@ void m6500_1_device::state_import(device_state_entry const &entry)
 		break;
 
 	default:
-		m6502_mcu_device::state_import(entry);
+		m6502_mcu_device_base<m6502_device>::state_import(entry);
 	}
 }
 
@@ -269,7 +271,7 @@ void m6500_1_device::state_export(device_state_entry const &entry)
 		break;
 
 	default:
-		m6502_mcu_device::state_export(entry);
+		m6502_mcu_device_base<m6502_device>::state_export(entry);
 	}
 }
 

@@ -592,94 +592,58 @@ INPUT_PORTS_END
 QUICKLOAD_LOAD_MEMBER(jtc_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	u16 i, quick_addr, quick_length;
+	u16 quick_addr;
 	std::vector<u8> quick_data;
-	std::error_condition result = image_error::UNSUPPORTED;
 
-	quick_length = image.length();
+	int quick_length = image.length();
 	if (image.is_filetype("jtc"))
 	{
 		if (quick_length < 0x0088)
-		{
-			result = image_error::INVALIDLENGTH;
-			osd_printf_error("%s: File too short\n", image.basename());
-			image.message(" File too short");
-		}
-		else
-		if (quick_length > 0x8000)
-		{
-			result = image_error::INVALIDLENGTH;
-			osd_printf_error("%s: File too long\n", image.basename());
-			image.message(" File too long");
-		}
-		else
-		{
-			quick_data.resize(quick_length+1);
-			u16 read_ = image.fread(&quick_data[0], quick_length);
-			if (read_ != quick_length)
-			{
-				result = image_error::UNSPECIFIED;
-				osd_printf_error("%s: Cannot read the file\n", image.basename());
-				image.message(" Cannot read the file");
-			}
-			else
-			{
-				quick_addr = quick_data[0x12] * 256 + quick_data[0x11];
-				quick_length = quick_data[0x14] * 256 + quick_data[0x13] - quick_addr + 0x81;
-				if (image.length() != quick_length)
-				{
-					result = image_error::INVALIDIMAGE;
-					osd_printf_error("%s: Invalid file header\n", image.basename());
-					image.message(" Invalid file header");
-				}
-				else
-				{
-					for (i = 0x80; i < image.length(); i++)
-						space.write_byte(quick_addr+i-0x80, quick_data[i]);
+			return std::make_pair(image_error::INVALIDLENGTH, "File too short");
+		else if (quick_length > 0x8000)
+			return std::make_pair(image_error::INVALIDLENGTH, "File too long");
 
-					/* display a message about the loaded quickload */
-					image.message(" Quickload: size=%04X : loaded at %04X",quick_length,quick_addr);
+		quick_data.resize(quick_length+1);
+		int const read_ = image.fread(&quick_data[0], quick_length);
+		if (read_ != quick_length)
+			return std::make_pair(image_error::UNSPECIFIED, "Cannot read the file");
 
-					result = std::error_condition();
-				}
-			}
-		}
+		quick_addr = quick_data[0x12] * 256 + quick_data[0x11];
+		quick_length = quick_data[0x14] * 256 + quick_data[0x13] - quick_addr + 0x81;
+		if (image.length() != quick_length)
+			return std::make_pair(image_error::INVALIDIMAGE, "Invalid file header");
+
+		for (int i = 0x80; i < image.length(); i++)
+			space.write_byte(quick_addr+i-0x80, quick_data[i]);
+
+		// display a message about the loaded quickload
+		image.message(" Quickload: size=%04X : loaded at %04X",quick_length,quick_addr);
+
+		return std::make_pair(std::error_condition(), std::string());
 	}
-	else
-	if (image.is_filetype("bin"))
+	else if (image.is_filetype("bin"))
 	{
 		quick_addr = 0xe000;
 		if (quick_length > 0x8000)
-		{
-			result = image_error::INVALIDLENGTH;
-			osd_printf_error("%s: File too long\n", image.basename());
-			image.message(" File too long");
-		}
-		else
-		{
-			quick_data.resize(quick_length+1);
-			u16 read_ = image.fread( &quick_data[0], quick_length);
-			if (read_ != quick_length)
-			{
-				result = image_error::UNSPECIFIED;
-				osd_printf_error("%s: Cannot read the file\n", image.basename());
-				image.message(" Cannot read the file");
-			}
-			else
-			{
-				for (i = 0; i < image.length(); i++)
-					space.write_byte(quick_addr+i, quick_data[i]);
+			return std::make_pair(image_error::INVALIDLENGTH, "File too long");
 
-				/* display a message about the loaded quickload */
-				image.message(" Quickload: size=%04X : loaded at %04X",quick_length,quick_addr);
+		quick_data.resize(quick_length+1);
+		u16 read_ = image.fread( &quick_data[0], quick_length);
+		if (read_ != quick_length)
+			return std::make_pair(image_error::UNSPECIFIED, "Cannot read the file");
 
-				result = std::error_condition();
-				m_maincpu->set_pc(quick_addr);
-			}
-		}
+		for (int i = 0; i < image.length(); i++)
+			space.write_byte(quick_addr+i, quick_data[i]);
+
+		// display a message about the loaded quickload
+		image.message(" Quickload: size=%04X : loaded at %04X",quick_length,quick_addr);
+
+		m_maincpu->set_pc(quick_addr);
+
+		return std::make_pair(std::error_condition(), std::string());
 	}
 
-	return result;
+	return std::make_pair(image_error::UNSUPPORTED, std::string());
 }
 
 

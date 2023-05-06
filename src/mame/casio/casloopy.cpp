@@ -506,7 +506,7 @@ DEVICE_IMAGE_LOAD_MEMBER( casloopy_state::cart_load )
 		DST[i + 3] = tempb;
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void casloopy_state::casloopy(machine_config &config)

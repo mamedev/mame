@@ -318,6 +318,7 @@ public:
 		, m_m50458(*this, "m50458")
 		, m_s3520cf(*this, "s3520cf")
 		, m_rp5h01(*this, "rp5h01")
+		, m_wram_wp(*this, "wram_wp")
 		, m_eepromout(*this, "EEPROMOUT")
 		, m_serial1_data1(*this, "SERIAL1_DATA1")
 		, m_rtc_osd(*this, "RTC_OSD")
@@ -338,17 +339,16 @@ private:
 	required_device<m50458_device> m_m50458;
 	required_device<s3520cf_device> m_s3520cf;
 	required_device<rp5h01_device> m_rp5h01;
+	required_shared_ptr<uint8_t> m_wram_wp;
 	required_ioport m_eepromout;
 	required_ioport m_serial1_data1;
 	required_ioport m_rtc_osd;
 
-	uint8_t m_wram_wp_flag;
-	std::unique_ptr<uint8_t[]> m_wram;
-	bool m_nmi_enable;
-	uint8_t m_cart_sel;
+	uint8_t m_wram_wp_flag = 0;
+	bool m_nmi_enable = false;
+	uint8_t m_cart_sel = 0;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	uint8_t ram_wp_r(offs_t offset);
 	void ram_wp_w(offs_t offset, uint8_t data);
 	uint8_t nss_prot_r();
 	void nss_prot_w(uint8_t data);
@@ -389,6 +389,7 @@ void nss_state::spc_map(address_map &map)
 {
 	map(0x0000, 0xffff).ram().share("aram");
 }
+
 
 /* NSS specific */
 /*
@@ -465,21 +466,13 @@ SNES part:
 0x4016 bit 0 Joypad Strobe?
 0x4016 bit 2 Game Over Flag
 
-
-
 */
-
-uint8_t nss_state::ram_wp_r(offs_t offset)
-{
-	return m_wram[offset];
-}
 
 void nss_state::ram_wp_w(offs_t offset, uint8_t data)
 {
-	if(m_wram_wp_flag)
-		m_wram[offset] = data;
+	if (m_wram_wp_flag)
+		m_wram_wp[offset] = data;
 }
-
 
 uint8_t nss_state::nss_prot_r()
 {
@@ -511,7 +504,7 @@ void nss_state::bios_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).ram();
-	map(0x9000, 0x9fff).rw(FUNC(nss_state::ram_wp_r), FUNC(nss_state::ram_wp_w));
+	map(0x9000, 0x9fff).ram().w(FUNC(nss_state::ram_wp_w)).share("wram_wp");
 	map(0xa000, 0xa000).portr("EEPROMIN");
 	map(0xc000, 0xdfff).rom().region("ibios_rom", 0x6000);
 	map(0xe000, 0xffff).rw(FUNC(nss_state::nss_prot_r), FUNC(nss_state::nss_prot_w));
@@ -643,10 +636,8 @@ void nss_state::machine_start()
 	snes_state::machine_start();
 
 	m_is_nss = 1;
-	m_wram = make_unique_clear<uint8_t[]>(0x1000);
 
 	save_item(NAME(m_wram_wp_flag));
-	save_pointer(NAME(m_wram), 0x1000);
 	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_cart_sel));
 }

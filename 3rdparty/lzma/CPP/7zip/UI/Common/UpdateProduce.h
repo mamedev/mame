@@ -17,13 +17,14 @@ struct CUpdatePair2
   int NewNameIndex;
 
   bool IsMainRenameItem;
+  bool IsSameTime;
 
-  void SetAs_NoChangeArcItem(int arcIndex)
+  void SetAs_NoChangeArcItem(unsigned arcIndex) // int
   {
     NewData = NewProps = false;
     UseArcProps = true;
     IsAnti = false;
-    ArcIndex = arcIndex;
+    ArcIndex = (int)arcIndex;
   }
 
   bool ExistOnDisk() const { return DirIndex != -1; }
@@ -37,7 +38,8 @@ struct CUpdatePair2
       DirIndex(-1),
       ArcIndex(-1),
       NewNameIndex(-1),
-      IsMainRenameItem(false)
+      IsMainRenameItem(false),
+      IsSameTime(false)
       {}
 };
 

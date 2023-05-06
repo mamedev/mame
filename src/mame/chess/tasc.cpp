@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap, Sandro Ronco
-/******************************************************************************
+/*******************************************************************************
 
 Tasc ChessSystem
 
@@ -51,7 +51,7 @@ BTANB:
 - R40 calls itself "R30" on the system information screen (there is a photo of
   an R40 that does say "R40", but it appears to be a modified ROM)
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -157,9 +157,9 @@ void tasc_state::set_cpu_freq()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void tasc_state::install_bootrom(bool enable)
 {
@@ -249,9 +249,9 @@ u32 tasc_state::rom_r(offs_t offset)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void tasc_state::main_map(address_map &map)
 {
@@ -262,9 +262,9 @@ void tasc_state::main_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( tasc )
 	PORT_START("IN.0")
@@ -295,13 +295,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void tasc_state::tasc(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	ARM(config, m_maincpu, 30_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tasc_state::main_map);
 	m_maincpu->set_copro_type(arm_cpu_device::copro_type::VL86C020);
@@ -320,13 +320,13 @@ void tasc_state::tasc(machine_config &config)
 	TASC_SB30(config, m_smartboard);
 	subdevice<sensorboard_device>("smartboard:board")->set_nvram_enable(true);
 
-	/* video hardware */
+	// video hardware
 	LM24014H(config, m_lcd, 0);
 	m_lcd->set_fs(1); // font size 6x8
 
 	config.set_default_layout(layout_tascr30);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -335,9 +335,9 @@ void tasc_state::tasc(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( tascr30 ) // system version V1.01 (17-Mar-95), program version 2.50 (26-Feb-95)
 	ROM_REGION32_LE( 0x40000, "maincpu", 0 )
@@ -367,12 +367,12 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME      PARENT  CMP MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1995, tascr30,  0,       0, tasc,    tasc,  tasc_state, empty_init, "Tasc", "ChessSystem R30 (The King 2.50)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1993, tascr30a, tascr30, 0, tasc,    tasc,  tasc_state, empty_init, "Tasc", "ChessSystem R30 (The King 2.20)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1993, tascr30b, tascr30, 0, tasc,    tasc,  tasc_state, empty_init, "Tasc", "ChessSystem R30 (The King 2.23, TM version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK ) // competed in several chesscomputer tournaments
-CONS( 1993, tascr30g, tascr30, 0, tasc,    tasc,  tasc_state, empty_init, "Tasc", "ChessSystem R30 (Gideon 3.1, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK ) // made in 1993, later released in 2012
+//    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1995, tascr30,  0,       0,      tasc,    tasc,  tasc_state, empty_init, "Tasc", "ChessSystem R30 (The King 2.50)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1993, tascr30a, tascr30, 0,      tasc,    tasc,  tasc_state, empty_init, "Tasc", "ChessSystem R30 (The King 2.20)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1993, tascr30b, tascr30, 0,      tasc,    tasc,  tasc_state, empty_init, "Tasc", "ChessSystem R30 (The King 2.23, TM version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK ) // competed in several chesscomputer tournaments
+SYST( 1993, tascr30g, tascr30, 0,      tasc,    tasc,  tasc_state, empty_init, "Tasc", "ChessSystem R30 (Gideon 3.1, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK ) // made in 1993, later released in 2012

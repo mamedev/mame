@@ -52,8 +52,26 @@ TIMER_CALLBACK_MEMBER(snapshot_image_device::process_snapshot_or_quickload)
 {
 	check_for_file();
 
-	// invoke the load (FIXME: don't swallow errors)
-	m_load(*this);
+	// invoke the load (FIXME: better way to report errors?)
+	auto [err, message] = m_load(*this);
+	if (err)
+	{
+		osd_printf_error(
+				!message.empty()
+					? "%1$s: Error loading '%2$s': %3$s (%4$s:%5$d %6$s)\n"
+					: "%1$s: Error loading '%2$s': %6$s (%4$s:%5$d)\n",
+				tag(),
+				basename(),
+				message,
+				err.category().name(),
+				err.value(),
+				err.message());
+		popmessage(
+				!message.empty() ? "Error loading '%1$s': %3$s" : "Error loading '%1$s': %4$s",
+				basename(),
+				message,
+				err.message());
+	}
 }
 
 //-------------------------------------------------
@@ -64,18 +82,18 @@ void snapshot_image_device::device_start()
 {
 	m_load.resolve();
 
-	/* allocate a timer */
+	// allocate a timer
 	m_timer = timer_alloc(FUNC(snapshot_image_device::process_snapshot_or_quickload), this);
 }
 
 /*-------------------------------------------------
     call_load
 -------------------------------------------------*/
-std::error_condition snapshot_image_device::call_load()
+std::pair<std::error_condition, std::string> snapshot_image_device::call_load()
 {
-	/* adjust the timer */
+	// adjust the timer
 	m_timer->adjust(m_delay, 0);
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 const software_list_loader &snapshot_image_device::get_software_list_loader() const

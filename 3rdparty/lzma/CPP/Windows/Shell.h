@@ -3,8 +3,8 @@
 #ifndef __WINDOWS_SHELL_H
 #define __WINDOWS_SHELL_H
 
-#include <windows.h>
-#include <shlobj.h>
+#include "../Common/MyWindows.h"
+#include <ShlObj.h>
 
 #include "../Common/MyString.h"
 

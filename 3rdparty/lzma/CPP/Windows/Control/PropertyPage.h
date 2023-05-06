@@ -5,7 +5,7 @@
 
 #include "../../Common/MyWindows.h"
 
-#include <prsht.h>
+#include <PrSht.h>
 
 #include "Dialog.h"
 

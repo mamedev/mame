@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Berger
-/******************************************************************************
+/*******************************************************************************
 
 Novag Super Sensor IV (model 812)
 Novag Constellation (model 831)
@@ -63,7 +63,7 @@ than writing 0x08 to control_w.
 TODO:
 - is Dynamic S a program update of ssensor4 or identical?
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -169,9 +169,9 @@ void const_state::init_const()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void const_state::update_display()
 {
@@ -226,9 +226,9 @@ u8 const_state::input2_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void const_state::ssensor4_map(address_map &map)
 {
@@ -261,9 +261,9 @@ void const_state::sconst_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( nconst )
 	PORT_START("IN.0")
@@ -350,9 +350,9 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void const_state::nconst(machine_config &config)
 {
@@ -464,9 +464,9 @@ void const_state::sconst(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( ssensor4 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -506,16 +506,16 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME      PARENT CMP MACHINE    INPUT     STATE        INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1981, ssensor4, 0,      0, ssensor4,  ssensor4, const_state, empty_init, "Novag", "Super Sensor IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     CLASS        INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1981, ssensor4, 0,       0,      ssensor4,  ssensor4, const_state, empty_init, "Novag", "Super Sensor IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1983, const,    0,      0, nconst,    nconst,   const_state, init_const, "Novag", "Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1984, const36,  const,  0, nconst36,  nconst,   const_state, init_const, "Novag", "Constellation 3.6MHz (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, const36a, const,  0, nconst36a, nconst,   const_state, init_const, "Novag", "Constellation 3.6MHz (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, constq,   const,  0, nconstq,   nconstq,  const_state, init_const, "Novag", "Constellation Quattro", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1983, const,    0,       0,      nconst,    nconst,   const_state, init_const, "Novag", "Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1984, const36,  const,   0,      nconst36,  nconst,   const_state, init_const, "Novag", "Constellation 3.6MHz (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, const36a, const,   0,      nconst36a, nconst,   const_state, init_const, "Novag", "Constellation 3.6MHz (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, constq,   const,   0,      nconstq,   nconstq,  const_state, init_const, "Novag", "Constellation Quattro", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1984, supercon, 0,      0, sconst,    sconst,   const_state, empty_init, "Novag", "Super Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1984, supercon, 0,       0,      sconst,    sconst,   const_state, empty_init, "Novag", "Super Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

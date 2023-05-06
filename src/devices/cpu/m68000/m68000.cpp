@@ -28,6 +28,7 @@ m68000_device::m68000_device(const machine_config &mconfig, device_type type, co
 	  m_cpu_space_config("cpu_space", ENDIANNESS_BIG, 16, 24, 0, address_map_constructor(FUNC(m68000_device::default_autovectors_map), this))
 {
 	m_mmu = nullptr;
+	m_disable_interrupt_callback = false;
 }
 
 void m68000_device::abort_access(u32 reason)
@@ -195,9 +196,13 @@ void m68000_device::device_start()
 	save_item(NAME(m_au));
 	save_item(NAME(m_at));
 	save_item(NAME(m_aob));
-	save_item(NAME(m_sp));
 	save_item(NAME(m_dt));
 	save_item(NAME(m_int_vector));
+	save_item(NAME(m_sp));
+	save_item(NAME(m_bcount));
+	save_item(NAME(m_count_before_instruction_step));
+	save_item(NAME(m_t));
+	save_item(NAME(m_movems));
 	save_item(NAME(m_isr));
 	save_item(NAME(m_sr));
 	save_item(NAME(m_dbin));
@@ -206,27 +211,28 @@ void m68000_device::device_start()
 	save_item(NAME(m_irc));
 	save_item(NAME(m_ir));
 	save_item(NAME(m_ird));
-	save_item(NAME(m_irdi));
 	save_item(NAME(m_ftu));
 	save_item(NAME(m_aluo));
 	save_item(NAME(m_alue));
-	save_item(NAME(m_dcr));
-	save_item(NAME(m_movems));
+	save_item(NAME(m_alub));
 	save_item(NAME(m_movemr));
+	save_item(NAME(m_irdi));
+	save_item(NAME(m_base_ssw));
+	save_item(NAME(m_ssw));
+	save_item(NAME(m_dcr));
+
 	save_item(NAME(m_virq_state));
 	save_item(NAME(m_nmi_pending));
 	save_item(NAME(m_int_level));
 	save_item(NAME(m_int_next_state));
-	save_item(NAME(m_next_state));
-	save_item(NAME(m_inst_state));
-	save_item(NAME(m_inst_substate));
-	save_item(NAME(m_count_before_instruction_step));
-	save_item(NAME(m_bcount));
-	save_item(NAME(m_t));
-	save_item(NAME(m_post_run));
-	save_item(NAME(m_post_run_cycles));
 	save_item(NAME(m_nmi_uses_generic));
 	save_item(NAME(m_last_vpa_time));
+
+	save_item(NAME(m_inst_state));
+	save_item(NAME(m_inst_substate));
+	save_item(NAME(m_next_state));
+	save_item(NAME(m_post_run));
+	save_item(NAME(m_post_run_cycles));
 
 	memset(m_da, 0, sizeof(m_da));
 	m_ipc = 0;
@@ -234,8 +240,13 @@ void m68000_device::device_start()
 	m_au = 0;
 	m_at = 0;
 	m_aob = 0;
-	m_sp = 0;
 	m_dt = 0;
+	m_int_vector = 0;
+	m_sp = 0;
+	m_bcount = 0;
+	m_count_before_instruction_step = 0;
+	m_t = 0;
+	m_movems = 0;
 	m_isr = 0;
 	m_sr = 0;
 	m_dbin = 0;
@@ -244,25 +255,28 @@ void m68000_device::device_start()
 	m_irc = 0;
 	m_ir = 0;
 	m_ird = 0;
-	m_irdi = 0;
 	m_ftu = 0;
 	m_aluo = 0;
 	m_alue = 0;
-	m_dcr = 0;
+	m_alub = 0;
 	m_movemr = 0;
-	m_movems = 0;
+	m_irdi = 0;
+	m_base_ssw = 0;
+	m_ssw = 0;
+	m_dcr = 0;
+
 	m_virq_state = 0;
 	m_nmi_pending = 0;
 	m_int_level = 0;
 	m_int_next_state = 0;
-	m_next_state = 0;
-	m_inst_state = 0;
-	m_inst_substate = 0;
-	m_count_before_instruction_step = 0;
-	m_bcount = 0;
-	m_t = 0;
 	m_nmi_uses_generic = false;
 	m_last_vpa_time = 0;
+
+	m_inst_state = 0;
+	m_inst_substate = 0;
+	m_next_state = 0;
+	m_post_run = 0;
+	m_post_run_cycles = 0;
 
 	state_add(STATE_GENPCBASE, "PC",  m_ipc).callimport();
 	state_add(STATE_GENPC,     "rPC", m_pc);
@@ -431,12 +445,14 @@ void m68000_device::start_interrupt_vector_lookup()
 	// flag for berr -> spurious
 
 	int level = m_next_state >> 24;
-	if(m_interrupt_mixer)
-		standard_irq_callback(level == 7 && m_nmi_uses_generic ? INPUT_LINE_NMI : level, m_pc);
-	else {
-		for(int i=0; i<3; i++)
-			if(level & (1<<i))
-				standard_irq_callback(i, m_pc);
+	if(!m_disable_interrupt_callback) {
+		if(m_interrupt_mixer)
+			standard_irq_callback(level == 7 && m_nmi_uses_generic ? INPUT_LINE_NMI : level, m_pc);
+		else {
+			for(int i=0; i<3; i++)
+				if(level & (1<<i))
+					standard_irq_callback(i, m_pc);
+		}
 	}
 
 	// Clear the nmi flag
@@ -450,4 +466,106 @@ void m68000_device::end_interrupt_vector_lookup()
 {
 	m_int_vector = (m_edb & 0xff) << 2;
 	m_int_next_state = 0;
+}
+
+m68000_mcu_device::m68000_mcu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+	m68000_device(mconfig, type, tag, owner, clock)
+{
+	m_disable_interrupt_callback = true;
+}
+
+void m68000_mcu_device::execute_run()
+{
+	internal_update(total_cycles());
+
+	m_icount -= m_count_before_instruction_step;
+	if(m_icount < 0) {
+		m_count_before_instruction_step = -m_icount;
+		m_icount = 0;
+	} else
+		m_count_before_instruction_step = 0;
+
+	while(m_bcount && m_icount <= m_bcount)
+		internal_update(total_cycles() + m_icount - m_bcount);
+
+	while(m_icount > 0) {
+		for(;;) {
+			if(m_icount > m_bcount && m_inst_substate)
+				(this->*(m_handlers_p[m_inst_state]))();
+
+			while(m_icount > m_bcount) {
+				if(m_inst_state >= S_first_instruction) {
+					m_ipc = m_pc - 2;
+					m_irdi = m_ird;
+
+					if(machine().debug_flags & DEBUG_FLAG_ENABLED)
+						debugger_instruction_hook(m_ipc);
+				}
+				(this->*(m_handlers_f[m_inst_state]))();
+			}
+
+			if(m_post_run)
+				do_post_run();
+			else
+				break;
+		}
+		if(m_icount > 0)
+			while(m_bcount && m_icount <= m_bcount)
+				internal_update(total_cycles() + m_icount - m_bcount);
+		if(m_icount > 0 && m_inst_substate) {
+			(this->*(m_handlers_p[m_inst_state]))();
+			if(m_post_run)
+				do_post_run();
+		}
+	}
+
+	if(m_icount < 0) {
+		m_count_before_instruction_step = -m_icount;
+		m_icount = 0;
+	}
+}
+
+void m68000_mcu_device::recompute_bcount(uint64_t event_time)
+{
+	if(!event_time || event_time >= total_cycles() + m_icount) {
+		m_bcount = 0;
+		return;
+	}
+	m_bcount = total_cycles() + m_icount - event_time;
+}
+
+void m68000_mcu_device::add_event(uint64_t &event_time, uint64_t new_event)
+{
+	if(!new_event)
+		return;
+	if(!event_time || event_time > new_event)
+		event_time = new_event;
+}
+
+void m68000_mcu_device::device_start()
+{
+	m68000_device::device_start();
+
+	if(m_mmu) {
+		m_handlers_f = s_handlers_ifm;
+		m_handlers_p = s_handlers_ipm;
+	} else {
+		m_handlers_f = s_handlers_dfm;
+		m_handlers_p = s_handlers_dpm;
+	}
+}
+
+void m68000_mcu_device::set_current_interrupt_level(u32 level)
+{
+	if(level == m_int_level)
+		return;
+
+	m_int_level = level;
+
+	/* A transition from < 7 to 7 always interrupts (NMI) */
+	/* Note: Level 7 can also level trigger like a normal IRQ */
+	if(m_int_level == 7)
+		m_nmi_pending = true;
+
+	update_interrupt();
 }

@@ -54,7 +54,7 @@ public:
     memcpy(GetCurPtrAndGrow(size), data, size * sizeof(T));
   }
 
-  const size_t GetPos() const { return _pos; }
+  size_t GetPos() const { return _pos; }
 
   // void Empty() { _pos = 0; }
 };

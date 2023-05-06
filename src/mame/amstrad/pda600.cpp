@@ -486,7 +486,7 @@ DEVICE_IMAGE_LOAD_MEMBER(pda600_state::card_load)
 		m_card->ram_alloc(size);
 
 		if (size != image.fread(m_card->get_ram_base(), size))
-			return image_error::UNSPECIFIED;
+			return std::make_pair(image_error::UNSPECIFIED, std::string());
 
 		m_card_size = size;
 	}
@@ -495,14 +495,14 @@ DEVICE_IMAGE_LOAD_MEMBER(pda600_state::card_load)
 		m_card_size = image.get_software_region_length("rom");
 
 		if (m_card_size == 0)
-			return image_error::BADSOFTWARE;
+			return std::make_pair(image_error::BADSOFTWARE, "rom data area is missing or empty");
 
 		m_card->ram_alloc(m_card_size);
 		memcpy(m_card->get_ram_base(), image.get_software_region("rom"), m_card_size);
 	}
 
 	m_card->battery_load(m_card->get_ram_base(), m_card_size, nullptr);
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

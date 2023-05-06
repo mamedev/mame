@@ -1706,6 +1706,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/roland_dsk.h,FORMATS["ROLAND_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "ROLAND_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/roland_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/roland_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/rx50_dsk.h,FORMATS["RX50_DSK"] = true
 --------------------------------------------------
 

@@ -184,29 +184,17 @@ SNAPSHOT_LOAD_MEMBER(apple1_state::snapshot_cb)
 	uint64_t snapsize = image.length();
 
 	if (snapsize < 12)
-	{
-		logerror("Snapshot is too short\n");
-		return image_error::INVALIDLENGTH;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Snapshot is too short");
 
 	if ((snapsize - 12) > 65535)
-	{
-		logerror("Snapshot is too long\n");
-		return image_error::INVALIDLENGTH;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Snapshot is too long");
 
 	auto data = std::make_unique<uint8_t []>(snapsize);
 	if (image.fread(data.get(), snapsize) != snapsize)
-	{
-		logerror("Internal error loading snapshot\n");
-		return image_error::UNSPECIFIED;
-	}
+		return std::make_pair(image_error::UNSPECIFIED, "Internal error loading snapshot");
 
 	if ((memcmp(hd1, &data[0], 5)) || (memcmp(hd2, &data[7], 5)))
-	{
-		logerror("Snapshot is invalid\n");
-		return image_error::INVALIDIMAGE;
-	}
+		return std::make_pair(image_error::INVALIDIMAGE, "Snapshot is invalid");
 
 	uint16_t start = (data[5]<<8) | data[6];
 	uint16_t end = (snapsize - 12) + start;
@@ -214,10 +202,7 @@ SNAPSHOT_LOAD_MEMBER(apple1_state::snapshot_cb)
 	// check if this fits in RAM; load below 0xe000 must fit in RAMSIZE,
 	// load at 0xe000 must fit in 4K
 	if (((start < 0xe000) && (end > (m_ram_size - 1))) || (end > 0xefff))
-	{
-		logerror("Snapshot can't fit in RAM\n");
-		return image_error::UNSUPPORTED;
-	}
+		return std::make_pair(image_error::UNSUPPORTED, "Snapshot can't fit in RAM");
 
 	if (start < 0xe000)
 	{
@@ -229,11 +214,12 @@ SNAPSHOT_LOAD_MEMBER(apple1_state::snapshot_cb)
 	}
 	else
 	{
-		logerror("Snapshot has invalid load address %04x\n", start);
-		return image_error::INVALIDIMAGE;
+		return std::make_pair(
+				image_error::INVALIDIMAGE,
+				util::string_format("Snapshot has invalid load address %04x", start));
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void apple1_state::poll_keyboard()

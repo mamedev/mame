@@ -14,7 +14,7 @@
 //  MACROS
 //**************************************************************************
 
-#define DEVICE_IMAGE_LOAD_MEMBER(_name)             std::error_condition _name(device_image_interface &image)
+#define DEVICE_IMAGE_LOAD_MEMBER(_name)             std::pair<std::error_condition, std::string> _name(device_image_interface &image)
 #define DECLARE_DEVICE_IMAGE_LOAD_MEMBER(_name)     DEVICE_IMAGE_LOAD_MEMBER(_name)
 
 #define DEVICE_IMAGE_UNLOAD_MEMBER(_name)           void _name(device_image_interface &image)
@@ -64,6 +64,33 @@ public:
 	}
 
 	// TODO: find a better home for this helper
+	template <unsigned Shift, typename T>
+	static void install_non_power_of_two(
+			offs_t length,
+			offs_t decode_limit,
+			offs_t decode_offset,
+			offs_t base,
+			T &&install)
+	{
+		offs_t decode_mask(length - 1);
+		for (unsigned i = 31 - count_leading_zeros_32(decode_mask); 0U < i; --i)
+		{
+			if (!BIT(decode_mask, i - 1))
+			{
+				decode_mask &= ~((offs_t(1) << i) - 1);
+				break;
+			}
+		}
+		install_non_power_of_two<Shift, T>(
+				length,
+				decode_limit,
+				decode_mask,
+				decode_offset,
+				base,
+				std::forward<T>(install));
+	}
+
+	// TODO: find a better home for this helper
 	template <typename T, typename U>
 	static T map_non_power_of_two(T count, U &&map)
 	{
@@ -72,7 +99,7 @@ public:
 
 		T const max(count - 1);
 		T mask(max);
-		for (unsigned i = 1; (sizeof(T) * 8) > i; i <<= 1)
+		for (unsigned i = 1U; (sizeof(T) * 8) > i; i <<= 1)
 			mask = T(std::make_unsigned_t<T>(mask) | (std::make_unsigned_t<T>(mask) >> i));
 		int bits(0);
 		while (BIT(mask, bits))
@@ -149,7 +176,7 @@ class generic_slot_device : public device_t,
 								public device_single_card_slot_interface<device_generic_cart_interface>
 {
 public:
-	typedef device_delegate<std::error_condition (device_image_interface &)> load_delegate;
+	typedef device_delegate<std::pair<std::error_condition, std::string> (device_image_interface &)> load_delegate;
 	typedef device_delegate<void (device_image_interface &)> unload_delegate;
 
 	virtual ~generic_slot_device();
@@ -164,7 +191,7 @@ public:
 	void set_endian(endianness_t end) { m_endianness = end; }
 
 	// device_image_interface implementation
-	virtual std::error_condition call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual char const *image_interface() const noexcept override { return m_interface; }

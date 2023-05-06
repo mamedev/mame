@@ -325,7 +325,7 @@ static INPUT_PORTS_START( spellb )
 	PORT_START("IN.5") // R5
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_NAME("Memory")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_NAME("Clue")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8) PORT_NAME("Erase")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(127) PORT_NAME("Erase")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13) PORT_NAME("Enter")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
 
@@ -350,7 +350,7 @@ static INPUT_PORTS_START( spellabc )
 	PORT_MODIFY("IN.5")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_NAME("Speicher")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_NAME("Rat")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8) PORT_NAME("Tilgen")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(127) PORT_NAME("Tilgen")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13) PORT_NAME("Eingabe")
 
 	PORT_MODIFY("IN.6")
@@ -386,7 +386,7 @@ static INPUT_PORTS_START( letterlf )
 	PORT_MODIFY("IN.5")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_NAME("Joueur 2")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_NAME("Aide")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8) PORT_NAME("Effacez")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(127) PORT_NAME("Effacez")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13) PORT_NAME("Marque")
 
 	PORT_MODIFY("IN.6")
@@ -406,7 +406,7 @@ static INPUT_PORTS_START( letterlg )
 	PORT_MODIFY("IN.5")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_NAME("Spieler 2")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_NAME("Rat")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8) PORT_NAME("Tilgen")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(127) PORT_NAME("Tilgen")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13) PORT_NAME("Punkte")
 
 	PORT_MODIFY("IN.6")
@@ -492,7 +492,7 @@ ROM_START( spellb )
 	ROM_LOAD( "tms0270_spellb_output.pla", 0, 1246, CRC(b95e35e6) SHA1(430917486856c9e6c28af10ff3758242048096c4) )
 
 	ROM_REGION( 0x1000, "tms6100", 0 )
-	ROM_LOAD( "cd2602.vsm", 0x0000, 0x1000, CRC(dd1fff8c) SHA1(f1760b29aa50fc96a1538db814cc73289654ac25) )
+	ROM_LOAD( "cd2602", 0x0000, 0x1000, CRC(dd1fff8c) SHA1(f1760b29aa50fc96a1538db814cc73289654ac25) )
 ROM_END
 
 ROM_START( spellabc )
@@ -507,7 +507,7 @@ ROM_START( spellabc )
 	ROM_LOAD( "tms0270_spellb_output.pla", 0, 1246, CRC(b95e35e6) SHA1(430917486856c9e6c28af10ff3758242048096c4) )
 
 	ROM_REGION( 0x1000, "tms6100", 0 )
-	ROM_LOAD( "cd2607.vsm", 0x0000, 0x1000, CRC(875090c0) SHA1(73b87fff64054f6ab3b7e69d89585582145dbaa7) )
+	ROM_LOAD( "cd2607", 0x0000, 0x1000, CRC(875090c0) SHA1(73b87fff64054f6ab3b7e69d89585582145dbaa7) )
 ROM_END
 
 ROM_START( spellba )
@@ -545,7 +545,7 @@ ROM_START( mrchalgr )
 	ROM_LOAD( "tms0270_mrchalgr_output.pla", 0, 1246, CRC(4785289c) SHA1(60567af0ea120872a4ccf3128e1365fe84722aa8) )
 
 	ROM_REGION( 0x1000, "tms6100", 0 )
-	ROM_LOAD( "cd2601.vsm", 0x0000, 0x1000, CRC(a9fbe7e9) SHA1(9d480cb30313b8cbce2d048140c1e5e6c5b92452) )
+	ROM_LOAD( "cd2601", 0x0000, 0x1000, CRC(a9fbe7e9) SHA1(9d480cb30313b8cbce2d048140c1e5e6c5b92452) )
 ROM_END
 
 ROM_START( letterlf )
@@ -560,7 +560,7 @@ ROM_START( letterlf )
 	ROM_LOAD( "tms0270_mrchalgr_output.pla", 0, 1246, CRC(4785289c) SHA1(60567af0ea120872a4ccf3128e1365fe84722aa8) )
 
 	ROM_REGION( 0x1000, "tms6100", 0 )
-	ROM_LOAD( "cd2603.vsm", 0x0000, 0x1000, CRC(70ac954b) SHA1(5593a5844063acdf399600e3e842f0fbe712ba69) )
+	ROM_LOAD( "cd2603", 0x0000, 0x1000, CRC(70ac954b) SHA1(5593a5844063acdf399600e3e842f0fbe712ba69) )
 ROM_END
 
 ROM_START( letterlg )
@@ -575,7 +575,7 @@ ROM_START( letterlg )
 	ROM_LOAD( "tms0270_mrchalgr_output.pla", 0, 1246, CRC(4785289c) SHA1(60567af0ea120872a4ccf3128e1365fe84722aa8) )
 
 	ROM_REGION( 0x1000, "tms6100", 0 )
-	ROM_LOAD( "cd2604.vsm", 0x0000, 0x1000, CRC(cdb6f039) SHA1(56f512720c5e80cd74b65e31d5a19bf1260017fb) )
+	ROM_LOAD( "cd2604", 0x0000, 0x1000, CRC(cdb6f039) SHA1(56f512720c5e80cd74b65e31d5a19bf1260017fb) )
 ROM_END
 
 } // anonymous namespace
@@ -586,11 +586,11 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME      PARENT   CMP MACHINE  INPUT     CLASS         INIT        COMPANY, FULLNAME, FLAGS
-COMP( 1980, spellb,   0,        0, rev2,    spellb,   spellb_state, empty_init, "Texas Instruments", "Spelling B (US, 1980 version)", MACHINE_SUPPORTS_SAVE )
-COMP( 1978, spellba,  spellb,   0, rev1,    spellb,   spellb_state, empty_init, "Texas Instruments", "Spelling B (US, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1980, spellabc, spellb,   0, rev2,    spellabc, spellb_state, empty_init, "Texas Instruments", "Spelling ABC (Germany)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT     CLASS         INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1980, spellb,   0,        0,      rev2,    spellb,   spellb_state, empty_init, "Texas Instruments", "Spelling B (US, 1980 version)", MACHINE_SUPPORTS_SAVE )
+SYST( 1978, spellba,  spellb,   0,      rev1,    spellb,   spellb_state, empty_init, "Texas Instruments", "Spelling B (US, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1980, spellabc, spellb,   0,      rev2,    spellabc, spellb_state, empty_init, "Texas Instruments", "Spelling ABC (Germany)", MACHINE_SUPPORTS_SAVE )
 
-COMP( 1979, mrchalgr, 0,        0, rev2,    mrchalgr, spellb_state, empty_init, "Texas Instruments", "Mr. Challenger (US)", MACHINE_SUPPORTS_SAVE )
-COMP( 1980, letterlf, mrchalgr, 0, rev2,    letterlf, spellb_state, empty_init, "Texas Instruments", "Letterlogic (France)", MACHINE_SUPPORTS_SAVE )
-COMP( 1980, letterlg, mrchalgr, 0, rev2,    letterlg, spellb_state, empty_init, "Texas Instruments", "Letterlogic (Germany)", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, mrchalgr, 0,        0,      rev2,    mrchalgr, spellb_state, empty_init, "Texas Instruments", "Mr. Challenger (US)", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, letterlf, mrchalgr, 0,      rev2,    letterlf, spellb_state, empty_init, "Texas Instruments", "Letterlogic (France)", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, letterlg, mrchalgr, 0,      rev2,    letterlg, spellb_state, empty_init, "Texas Instruments", "Letterlogic (Germany)", MACHINE_SUPPORTS_SAVE )

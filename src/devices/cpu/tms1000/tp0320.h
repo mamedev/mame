@@ -23,8 +23,8 @@ protected:
 	void ram_192x4(address_map &map);
 
 	// overrides
-	virtual u32 decode_fixed(u16 op) override { return 0; } // not yet
-	virtual u32 decode_micro(u8 sel) override;
+	virtual u32 decode_fixed(offs_t offset) override { return 0; } // not yet
+	virtual u32 decode_micro(offs_t offset) override;
 	virtual void device_reset() override;
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 

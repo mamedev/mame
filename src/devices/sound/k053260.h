@@ -75,8 +75,9 @@ private:
 		inline void voice_start(int index);
 		inline void voice_reset();
 		inline void set_register(offs_t offset, u8 data);
-		inline void set_loop_kadpcm(u8 data);
-		inline void set_reverse(u8 data);
+		inline void set_loop(int state);
+		inline void set_kadpcm(int state);
+		inline void set_reverse(int state);
 		inline void set_pan(u8 data);
 		inline void update_pan_volume();
 		inline void key_on();

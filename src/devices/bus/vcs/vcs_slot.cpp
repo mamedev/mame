@@ -199,7 +199,7 @@ static const char *vcs_get_slot(int type)
 	return "a26_2k_4k";
 }
 
-std::error_condition vcs_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> vcs_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -221,12 +221,11 @@ std::error_condition vcs_cart_slot_device::call_load()
 				break;
 
 			default:
-				osd_printf_error("%s: Invalid ROM file size\n", basename());
-				return image_error::INVALIDLENGTH;
+				return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge ROM file size");
 		}
 
 		m_cart->rom_alloc(len, tag());
-		uint8_t *ROM = m_cart->get_rom_base();
+		uint8_t *const ROM = m_cart->get_rom_base();
 
 		if (loaded_through_softlist())
 		{
@@ -310,11 +309,9 @@ std::error_condition vcs_cart_slot_device::call_load()
 			m_cart->setup_addon_ptr((uint8_t *)m_cart->get_rom_base() + 0x2000);
 
 		m_cart->install_memory_handlers(m_address_space.target());
-
-		return std::error_condition();
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

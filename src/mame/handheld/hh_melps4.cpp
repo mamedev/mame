@@ -1,21 +1,21 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Kevin Horton
-/***************************************************************************
+/*******************************************************************************
 
-Mitsubishi MELPS 4 MCU tabletops/handhelds or other simple devices,
-most of them are VFD electronic games/toys.
+Mitsubishi MELPS 4 MCU tabletops/handhelds or other simple devices, most of them
+are VFD electronic games/toys.
 
 TODO:
 - dump/add Gakken version of Frogger
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
 #include "cpu/melps4/m58846.h"
-#include "video/pwm.h"
 #include "sound/spkrdev.h"
+#include "video/pwm.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -49,10 +49,10 @@ protected:
 	optional_ioport_array<4> m_inputs; // max 4
 
 	// misc common
-	u16 m_inp_mux = 0;              // multiplexed inputs mask
+	u16 m_inp_mux = 0; // multiplexed inputs mask
 
-	u32 m_grid = 0;                 // VFD current row data
-	u32 m_plate = 0;                // VFD current column data
+	u32 m_grid = 0;    // VFD current row data
+	u32 m_plate = 0;   // VFD current column data
 
 	u8 read_inputs(int columns);
 };
@@ -74,11 +74,11 @@ void hh_melps4_state::machine_reset()
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Helper Functions
 
-***************************************************************************/
+*******************************************************************************/
 
 // generic input handlers
 
@@ -102,13 +102,13 @@ INPUT_CHANGED_MEMBER(hh_melps4_state::reset_button)
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
 
-***************************************************************************/
+*******************************************************************************/
 
-/***************************************************************************
+/*******************************************************************************
 
   Coleco Frogger (manufactured in Japan, licensed from Sega)
   * PCB label: Coleco Frogger Code No. 01-81543, KS-003282 Japan
@@ -122,7 +122,7 @@ INPUT_CHANGED_MEMBER(hh_melps4_state::reset_button)
   * cyan/red/green VFD
   * color overlay: row 2(goal): blue, row 3-6: yellow, row 8-10(cars): red
 
-***************************************************************************/
+*******************************************************************************/
 
 class cfrogger_state : public hh_melps4_state
 {
@@ -242,7 +242,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Gakken / Konami Jungler (manufactured in Japan)
   * PCB label: Konami Gakken GR503
@@ -250,7 +250,7 @@ ROM_END
   * cyan/red/green VFD Itron CP5143GLR SGA
   * color overlay: all yellow
 
-***************************************************************************/
+*******************************************************************************/
 
 class gjungler_state : public hh_melps4_state
 {
@@ -371,13 +371,13 @@ ROM_END
 
 } // anonymous namespace
 
-/***************************************************************************
+/*******************************************************************************
 
   Game driver(s)
 
-***************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME      PARENT CMP MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1982, cfrogger, 0,      0, cfrogger, cfrogger, cfrogger_state, empty_init, "Coleco / Konami", "Frogger (Coleco)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1982, cfrogger, 0,      0,      cfrogger, cfrogger, cfrogger_state, empty_init, "Coleco / Konami", "Frogger (Coleco)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1982, gjungler, 0,      0, gjungler, gjungler, gjungler_state, empty_init, "Gakken / Konami", "Jungler (Gakken)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, gjungler, 0,      0,      gjungler, gjungler, gjungler_state, empty_init, "Gakken / Konami", "Jungler (Gakken)", MACHINE_SUPPORTS_SAVE )

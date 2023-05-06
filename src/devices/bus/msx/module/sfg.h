@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#ifndef MAME_BUS_MSX_CART_YAMAHA_H
-#define MAME_BUS_MSX_CART_YAMAHA_H
+#ifndef MAME_BUS_MSX_MODULE_SFG_H
+#define MAME_BUS_MSX_MODULE_SFG_H
 
 #pragma once
 
@@ -60,4 +60,4 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
-#endif // MAME_BUS_MSX_CART_YAMAHA_H
+#endif // MAME_BUS_MSX_MODULE_SFG_H

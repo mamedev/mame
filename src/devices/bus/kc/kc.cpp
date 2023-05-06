@@ -316,15 +316,14 @@ kccart_slot_device::~kccart_slot_device()
     call load
 -------------------------------------------------*/
 
-std::error_condition kccart_slot_device::call_load()
+std::pair<std::error_condition, std::string> kccart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		offs_t read_length;
-		uint8_t *cart_base = m_cart->get_cart_base();
-
-		if (cart_base != nullptr)
+		uint8_t *const cart_base = m_cart->get_cart_base();
+		if (cart_base)
 		{
+			offs_t read_length;
 			if (!loaded_through_softlist())
 			{
 				read_length = length();
@@ -337,10 +336,10 @@ std::error_condition kccart_slot_device::call_load()
 			}
 		}
 		else
-			return image_error::INTERNAL;
+			return std::make_pair(image_error::INTERNAL, std::string());
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /*-------------------------------------------------

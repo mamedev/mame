@@ -15,6 +15,11 @@
 
 #include "diserial.h"
 
+#include <memory>
+#include <string>
+#include <system_error>
+#include <utility>
+
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -31,8 +36,8 @@ public:
 
 	auto input_callback() { return m_input_cb.bind(); }
 
-	// image-level overrides
-	virtual std::error_condition call_load() override;
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 	// image device
@@ -46,12 +51,12 @@ public:
 	virtual const char *image_brief_type_name() const noexcept override { return "min"; }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// serial overrides
+	// device_serial_interface implementation
 	virtual void tra_complete() override;    // Tx completed sending byte
 	virtual void tra_callback() override;    // Tx send bit
 

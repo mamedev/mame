@@ -146,11 +146,11 @@ static const char *chanf_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-std::error_condition channelf_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> channelf_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint32_t len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
+		uint32_t const len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 		m_cart->rom_alloc(len);
 
 		if (!loaded_through_softlist())
@@ -180,11 +180,9 @@ std::error_condition channelf_cart_slot_device::call_load()
 		}
 
 		//printf("Type: %s\n", chanf_get_slot(m_type));
-
-		return std::error_condition();
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

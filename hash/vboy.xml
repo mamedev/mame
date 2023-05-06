@@ -12,12 +12,19 @@ According to Planet Virtual Boy, the following undumped protos exist
   - Virtual Fishing (USA),
   - Zero Racers
 
+- Entries with a supported="partial" with no notes field attached are
+  to be intended as working with generic system issues
+  (namely sprite wraparound not working on screen edges and imperfect sound)
+
 -->
 <softwarelist name="vboy" description="Nintendo Virtual Boy cartridges">
 	<software name="3dtetris" supported="no">
 		<description>3-D Tetris (USA)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Missing intro and gameplay graphics, uses [VIP] framebuffer
+]]></notes>
 		<info name="developer" value="T&amp;E Soft"/>
 		<info name="serial" value="VUE-VPBE-USA"/>
 		<info name="release" value="19960322"/>
@@ -40,6 +47,9 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<description>Bound High! (Japan, USA, prototype)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Runs way too fast
+]]></notes>
 		<info name="developer" value="Japan System Supply"/>
 		<info name="serial" value="VUE-VBHE-JPN, VUE-VBHE-USA"/>
 		<part name="cart" interface="vboy_cart">
@@ -49,10 +59,13 @@ According to Planet Virtual Boy, the following undumped protos exist
 		</part>
 	</software>
 
-	<software name="galactic" supported="no">
+	<software name="galactic" supported="partial">
 		<description>Galactic Pinball (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Ball goes out of bounds sometimes on gameplay (verify)
+]]></notes>
 		<info name="developer" value="Intelligent Systems"/>
 		<info name="serial" value="VUE-VGPJ-JPN, VUE-VGPJ-USA"/>
 		<info name="release" value="19950701 (JPN), 19950814 (USA)"/>
@@ -69,6 +82,10 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<description>Golf (USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Missing attract and gameplay graphics, uses [VIP] framebuffer
+Missing [cart] SRAM
+]]></notes>
 		<info name="developer" value="T&amp;E Soft"/>
 		<info name="serial" value="VUE-VVGE-USA"/>
 		<info name="release" value="199511xx"/>
@@ -79,10 +96,15 @@ According to Planet Virtual Boy, the following undumped protos exist
 		</part>
 	</software>
 
-	<software name="hyperfgt" supported="no">
+	<software name="hyperfgt" supported="partial">
 		<description>Hyper Fighting (pirate)</description>
 		<year>2013?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Glitchy [VIP] backgrounds during gameplay (fixed)
+[VIP] palette ramps are pretty dim even on max brightness
+bp 7020fea,1,{R10=1;g} in Versus Mode to force serial to master mode (and be able to select stage)
+]]></notes>
 		<info name="developer" value="Mr. Anon"/>
 		<info name="serial" value="VUE ANON"/>
 		<part name="cart" interface="vboy_cart">
@@ -93,7 +115,8 @@ According to Planet Virtual Boy, the following undumped protos exist
 		</part>
 	</software>
 
-	<software name="insmouse" supported="no">
+	<software name="insmouse" supported="partial">
+		<!-- Alt name "Innsmouth no Yakata" -->
 		<description>Insmouse no Yakata (Japan)</description>
 		<year>1995</year>
 		<publisher>I'Max</publisher>
@@ -108,7 +131,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		</part>
 	</software>
 
-	<software name="jackbros" supported="no">
+	<software name="jackbros" supported="partial">
 		<description>Jack Bros. (USA)</description>
 		<year>1995</year>
 		<publisher>Atlus</publisher>
@@ -124,7 +147,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		</part>
 	</software>
 
-	<software name="jackbrosj" cloneof="jackbros" supported="no">
+	<software name="jackbrosj" cloneof="jackbros" supported="partial">
 		<description>Jack Bros. no Meiro de Hiihoo! (Japan)</description>
 		<year>1995</year>
 		<publisher>Atlus</publisher>
@@ -139,7 +162,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		</part>
 	</software>
 
-	<software name="mariocla" supported="no">
+	<software name="mariocla" supported="partial">
 		<description>Mario Clash (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
@@ -156,10 +179,15 @@ According to Planet Virtual Boy, the following undumped protos exist
 		</part>
 	</software>
 
-	<software name="marioten" supported="no">
+	<software name="marioten" supported="partial">
 		<description>Mario's Tennis (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Title screen logo is misplaced if intro isn't skipped, uses [V810] CMPF, CVTS, ADDF, SUBF.
+Mario also shots in fault, which definitely indicates bad maths
+[VIP] palette ramps are particularly bad, cfr. ROZ layer
+]]></notes>
 		<info name="developer" value="Nintendo R&amp;D1, Tose Software"/>
 		<info name="serial" value="VUE-VMTJ-JPN, VUE-VMTJ-USA"/>
 		<info name="release" value="19950721 (JPN), 19950814 (USA)"/>
@@ -171,10 +199,13 @@ According to Planet Virtual Boy, the following undumped protos exist
 		</part>
 	</software>
 
-	<software name="nesterfb" supported="no">
+	<software name="nesterfb" supported="partial">
 		<description>Nester's Funky Bowling (USA)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Once that you hit the pins, animation phase takes a while to start (can't repro, assume fixed)
+]]></notes>
 		<info name="developer" value="Nintendo IRD"/>
 		<info name="serial" value="VUE-VNFE-USA"/>
 		<info name="release" value="19960226"/>
@@ -187,10 +218,13 @@ According to Planet Virtual Boy, the following undumped protos exist
 		</part>
 	</software>
 
-	<software name="nikochan">
+	<software name="nikochan" supported="no">
 		<description>Niko-chan Battle (Japan, prototype)</description>
 		<year>1996</year>
 		<publisher>Bullet-Proof Software</publisher>
+		<notes><![CDATA[
+Gameplay [VIP] flickers too much, framebuffer?
+]]></notes>
 		<info name="alt_title" value="ニコちゃんバトル"/>
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="0x100000" width="32">
@@ -199,7 +233,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		</part>
 	</software>
 
-	<software name="panicbom" supported="no">
+	<software name="panicbom" supported="partial">
 		<description>Panic Bomber (USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
@@ -219,6 +253,9 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<description>Red Alarm (USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Missing graphics, uses [VIP] framebuffer
+]]></notes>
 		<info name="developer" value="T&amp;E Soft"/>
 		<info name="serial" value="VUE-VREE-USA"/>
 		<info name="release" value="19950814"/>
@@ -233,6 +270,9 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<description>Red Alarm (Japan)</description>
 		<year>1995</year>
 		<publisher>T&amp;E Soft</publisher>
+		<notes><![CDATA[
+Missing graphics, uses [VIP] framebuffer
+]]></notes>
 		<info name="developer" value="T&amp;E Soft"/>
 		<info name="serial" value="VUE-VREJ-JPN"/>
 		<info name="release" value="19950721"/>
@@ -244,10 +284,13 @@ According to Planet Virtual Boy, the following undumped protos exist
 		</part>
 	</software>
 
-	<software name="sdgundam" supported="no">
+	<software name="sdgundam" supported="partial">
 		<description>SD Gundam - Dimension War (Japan)</description>
 		<year>1995</year>
 		<publisher>Bandai</publisher>
+		<notes><![CDATA[
+Overdriven [sound] samples when moving outside the allocated space
+]]></notes>
 		<info name="developer" value="Locomotive"/>
 		<info name="serial" value="VUE-VSDJ-JPN"/>
 		<info name="release" value="19951222"/>
@@ -264,6 +307,11 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<description>Space Invaders - Virtual Collection (Japan)</description>
 		<year>1995</year>
 		<publisher>Taito</publisher>
+		<notes><![CDATA[
+No FMV during attract mode (two of them), [VIP] framebuffer
+No shots during gameplay, [VIP] affine GP out of bounds (fixed)
+Spams lots of "error reading INTCLR" in error.log
+]]></notes>
 		<info name="developer" value="Taito"/>
 		<info name="serial" value="VUE-VSPJ-JPN"/>
 		<info name="release" value="19951201"/>
@@ -279,6 +327,9 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<description>Space Pinball (Japan, prototype)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+I/O access (regression)
+]]></notes>
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="0x200000" width="32">
 				<rom name="space pinball prototype (j).bin" size="0x200000" crc="44c2b723" sha1="dc182360c7c8d26323db8921f09db76638e81ced" />
@@ -286,7 +337,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		</part>
 	</software>
 
-	<software name="ssquash" supported="no">
+	<software name="ssquash" supported="partial">
 		<description>Space Squash (Japan)</description>
 		<year>1995</year>
 		<publisher>Coconuts Japan Entertainment</publisher>
@@ -301,10 +352,13 @@ According to Planet Virtual Boy, the following undumped protos exist
 		</part>
 	</software>
 
-	<software name="telerobo" supported="no">
+	<software name="telerobo" supported="partial">
 		<description>Teleroboxer (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Verify player KO [VIP] graphics
+]]></notes>
 		<info name="developer" value="Nintendo R&amp;D1"/>
 		<info name="serial" value="VUE-VTBJ-JPN, VUE-VTBJ-USA"/>
 		<info name="release" value="19950721 (JPN), 19950814 (USA)"/>
@@ -317,7 +371,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		</part>
 	</software>
 
-	<software name="tobidase" supported="no">
+	<software name="tobidase" cloneof="panicbom" supported="partial">
 		<description>Tobidase! Panibon (Japan)</description>
 		<year>1995</year>
 		<publisher>Hudson</publisher>
@@ -332,7 +386,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		</part>
 	</software>
 
-	<software name="vbowling" supported="no">
+	<software name="vbowling" supported="partial">
 		<description>Virtual Bowling (Japan)</description>
 		<year>1995</year>
 		<publisher>Athena</publisher>
@@ -347,10 +401,13 @@ According to Planet Virtual Boy, the following undumped protos exist
 		</part>
 	</software>
 
-	<software name="vfishing" supported="no">
+	<software name="vfishing" supported="partial">
 		<description>Virtual Fishing (Japan)</description>
 		<year>1995</year>
 		<publisher>Pack-In-Video</publisher>
+		<notes><![CDATA[
+Missing GFXs for gender select in name entry, [VIP] palette ramps
+]]></notes>
 		<info name="developer" value="Pack-In-Video"/>
 		<info name="serial" value="VUE-VVFJ-JPN"/>
 		<info name="release" value="19951016"/>
@@ -368,7 +425,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		</part>
 	</software>
 
-	<software name="vforce" supported="no">
+	<software name="vforce" supported="partial">
 		<description>Vertical Force (USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
@@ -382,7 +439,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		</part>
 	</software>
 
-	<software name="vforcej" cloneof="vforce" supported="no">
+	<software name="vforcej" cloneof="vforce" supported="partial">
 		<description>Vertical Force (Japan)</description>
 		<year>1995</year>
 		<publisher>Hudson</publisher>
@@ -401,6 +458,10 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<description>T&amp;E Virtual Golf (Japan)</description>
 		<year>1995</year>
 		<publisher>T&amp;E Soft</publisher>
+		<notes><![CDATA[
+Missing attract and gameplay graphics, uses [VIP] framebuffer
+Missing [cart] SRAM
+]]></notes>
 		<info name="developer" value="T&amp;E Soft"/>
 		<info name="serial" value="VUE-VVGJ-JPN"/>
 		<info name="release" value="19950811"/>
@@ -416,6 +477,10 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<description>Virtual Lab (Japan)</description>
 		<year>1995</year>
 		<publisher>J-Wing</publisher>
+		<notes><![CDATA[
+Crashes on boot, [V810] stack gets corrupted on spurious irqs, boots on overclock
+Unresponsive [pad] inputs on gameplay
+]]></notes>
 		<info name="developer" value="J-Wing"/>
 		<info name="serial" value="VUE-VJVJ-JPN"/>
 		<info name="release" value="19951208"/>
@@ -429,10 +494,13 @@ According to Planet Virtual Boy, the following undumped protos exist
 		</part>
 	</software>
 
-	<software name="vleague" supported="no">
+	<software name="vleague" supported="partial">
 		<description>Virtual League Baseball (USA)</description>
 		<year>1995</year>
 		<publisher>Kemco</publisher>
+		<notes><![CDATA[
+[sound] is too much uptempo during gameplay
+]]></notes>
 		<info name="developer" value="Kemco"/>
 		<info name="serial" value="VUE-VVPE-USA"/>
 		<info name="release" value="19950911"/>
@@ -443,7 +511,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		</part>
 	</software>
 
-	<software name="vproyak" cloneof="vleague" supported="no">
+	<software name="vproyak" cloneof="vleague" supported="partial">
 		<description>Virtual Pro Yakyuu '95 (Japan)</description>
 		<year>1995</year>
 		<publisher>Kemco</publisher>
@@ -458,10 +526,13 @@ According to Planet Virtual Boy, the following undumped protos exist
 		</part>
 	</software>
 
-	<software name="vtetris" supported="no">
+	<software name="vtetris" supported="partial">
 		<description>V-Tetris (Japan)</description>
 		<year>1995</year>
 		<publisher>Bullet-Proof Software</publisher>
+		<notes><![CDATA[
+Slightly overdriven [sound] samples during gameplay
+]]></notes>
 		<info name="developer" value="Locomotive"/>
 		<info name="serial" value="VUE-VTRJ-JPN"/>
 		<info name="release" value="19950825"/>
@@ -473,10 +544,15 @@ According to Planet Virtual Boy, the following undumped protos exist
 		</part>
 	</software>
 
-	<software name="wariolnd">
+	<software name="wariolnd" supported="partial">
 		<description>Virtual Boy Wario Land (USA) ~ Virtual Boy Wario Land - Awazon no Hihou (Japan)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+[VIP] brightness dips during intro, [V810] core bug?
+Dash doesn't produce any [sound]
+[VIP] palette ramps are ugly on default brightness
+]]></notes>
 		<info name="developer" value="Nintendo R&amp;D1"/>
 		<info name="serial" value="VUE-VWCJ-JPN, VUE-VWCJ-USA"/>
 		<info name="release" value="19951201 (JPN), 199511xx (USA)"/>
@@ -493,6 +569,9 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<description>Waterworld (USA)</description>
 		<year>1995</year>
 		<publisher>Ocean</publisher>
+		<notes><![CDATA[
+Erratic [VIP] graphics including ghost enemy sprites, move camera left or right at start to reproduce
+]]></notes>
 		<info name="developer" value="Ocean"/>
 		<info name="serial" value="VUE-VWEE-USA"/>
 		<info name="release" value="19951221"/>

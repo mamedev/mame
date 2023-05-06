@@ -22,8 +22,8 @@ class msx_cart_softcard_device : public device_t
 public:
 	msx_cart_softcard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	// image-level overrides
-	virtual std::error_condition call_load() override;
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "softcard"; }
 	virtual const char *file_extensions() const noexcept override { return "bin,rom"; }

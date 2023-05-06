@@ -370,29 +370,25 @@ void mk14vdu_state::draw_page_graphics(int page, uint16_t addr, int invert, bitm
 QUICKLOAD_LOAD_MEMBER(mk14_state::quickload_cb)
 {
 	if (image.software_entry() == nullptr)
+		return std::make_pair(image_error::UNSUPPORTED, "Unsupported quickload format");
+
+	uint16_t const size = image.length();
+	int load_addr, exec_addr;
+	sscanf(image.get_feature("load"), "%x", &load_addr);
+	sscanf(image.get_feature("exec"), "%x", &exec_addr);
+
+	for (uint16_t i = 0; i < size; i++)
 	{
-		osd_printf_error("%s: Unsupported quickload format", image.basename());
-		return image_error::UNSUPPORTED;
+		uint8_t data;
+
+		if (image.fread(&data, 1) != 1)
+			return std::make_pair(image_error::UNSPECIFIED, std::string());
+		m_maincpu->space(AS_PROGRAM).write_byte(load_addr + i, data);
 	}
-	else
-	{
-		uint16_t size = image.length();
-		int load_addr, exec_addr;
-		sscanf(image.get_feature("load"), "%x", &load_addr);
-		sscanf(image.get_feature("exec"), "%x", &exec_addr);
 
-		for (uint16_t i = 0; i < size; i++)
-		{
-			uint8_t data;
+	m_maincpu->set_pc(exec_addr);
 
-			if (image.fread(&data, 1) != 1)
-				return image_error::UNSPECIFIED;
-			m_maincpu->space(AS_PROGRAM).write_byte(load_addr + i, data);
-		}
-
-		m_maincpu->set_pc(exec_addr);
-	}
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void mk14_state::mk14(machine_config &config)

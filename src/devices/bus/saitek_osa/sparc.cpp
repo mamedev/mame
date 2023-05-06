@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Berger
-/***************************************************************************
+/*******************************************************************************
 
 Saitek OSA Module: Kasparov Sparc (1993)
 
@@ -30,7 +30,7 @@ TODO:
   maybe cpu cache related?
 - opening book moves take 3 around seconds per ply, should be almost immediate
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 #include "sparc.h"

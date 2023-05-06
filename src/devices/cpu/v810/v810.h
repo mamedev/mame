@@ -113,9 +113,8 @@ private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
-	uint32_t m_reg[65];
-	uint8_t m_irq_line;
-	uint8_t m_irq_state;
+	uint32_t m_reg[65]{};
+	uint16_t m_irq_state;
 	uint8_t m_nmi_line;
 	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache m_cache;
 	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::specific m_program;
@@ -178,20 +177,20 @@ private:
 	uint32_t opMULUr(uint32_t op);
 	uint32_t opDIVr(uint32_t op);
 	uint32_t opDIVUr(uint32_t op);
-	void opADDF(uint32_t op);
-	void opSUBF(uint32_t op);
-	void opMULF(uint32_t op);
-	void opDIVF(uint32_t op);
-	void opTRNC(uint32_t op);
-	void opCMPF(uint32_t op);
-	void opCVTS(uint32_t op);
-	void opCVTW(uint32_t op);
-	void opMPYHW(uint32_t op);
-	void opXB(uint32_t op);
-	void opXH(uint32_t op);
+	uint32_t opADDF(uint32_t op);
+	uint32_t opSUBF(uint32_t op);
+	uint32_t opMULF(uint32_t op);
+	uint32_t opDIVF(uint32_t op);
+	uint32_t opTRNC(uint32_t op);
+	uint32_t opCMPF(uint32_t op);
+	uint32_t opCVTS(uint32_t op);
+	uint32_t opCVTW(uint32_t op);
+	uint32_t opMPYHW(uint32_t op);
+	uint32_t opXB(uint32_t op);
+	uint32_t opXH(uint32_t op);
 	uint32_t opFpoint(uint32_t op);
 	uint32_t opBSU(uint32_t op);
-	void take_interrupt();
+	void check_interrupts();
 };
 
 

@@ -71,12 +71,12 @@ void magiceyes_vr3520f_game_state::machine_reset()
 
 DEVICE_IMAGE_LOAD_MEMBER(magiceyes_vr3520f_game_state::cart_load)
 {
-	uint32_t size = m_cart->common_get_size("rom");
+	uint32_t const size = m_cart->common_get_size("rom");
 
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 static INPUT_PORTS_START( leapfrog_didj )

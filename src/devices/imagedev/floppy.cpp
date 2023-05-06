@@ -576,13 +576,12 @@ void floppy_image_device::init_floppy_load(bool write_supported)
 		dskchg = 1;
 }
 
-std::error_condition floppy_image_device::call_load()
+std::pair<std::error_condition, std::string> floppy_image_device::call_load()
 {
 	check_for_file();
 	auto io = util::random_read_fill(image_core_file(), 0xff);
-	if(!io) {
-		return std::errc::not_enough_memory;
-	}
+	if(!io)
+		return std::make_pair(std::errc::not_enough_memory, std::string());
 
 	int best = 0;
 	const floppy_image_format_t *best_format = nullptr;
@@ -596,16 +595,13 @@ std::error_condition floppy_image_device::call_load()
 		}
 	}
 
-	if (!best_format) {
-		osd_printf_error("%s: Unable to identify the image format\n", filename());
-		return image_error::INVALIDIMAGE;
-	}
+	if (!best_format)
+		return std::make_pair(image_error::INVALIDIMAGE, "Unable to identify image file format");
 
 	image = std::make_unique<floppy_image>(tracks, sides, form_factor);
 	if (!best_format->load(*io, form_factor, variants, image.get())) {
-		osd_printf_error("%s: Incompatible image format or corrupted data\n", filename());
 		image.reset();
-		return image_error::INVALIDIMAGE;
+		return std::make_pair(image_error::INVALIDIMAGE, "Incompatible image file format or corrupted data");
 	}
 	output_format = is_readonly() ? nullptr : best_format;
 
@@ -618,7 +614,7 @@ std::error_condition floppy_image_device::call_load()
 
 	flux_image_prepare();
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void floppy_image_device::flux_image_prepare()
@@ -787,7 +783,7 @@ void floppy_image_device::call_unload()
 	set_ready(true);
 }
 
-std::error_condition floppy_image_device::call_create(int format_type, util::option_resolution *format_options)
+std::pair<std::error_condition, std::string> floppy_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	image = std::make_unique<floppy_image>(tracks, sides, form_factor);
 	output_format = nullptr;
@@ -814,7 +810,7 @@ std::error_condition floppy_image_device::call_create(int format_type, util::opt
 
 	flux_image_prepare();
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void floppy_image_device::init_fs(const fs_info *fs, const fs::meta_data &meta)

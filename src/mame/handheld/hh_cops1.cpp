@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Sean Riddle
-/***************************************************************************
+/*******************************************************************************
 
 National Semiconductor COPS(MM57 MCU series) handhelds
 
@@ -14,14 +14,14 @@ TODO:
 - qkracerm link cable (already tested locally and it works, so driver notes
   and MCU serial emulation are good enough)
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
 #include "cpu/cops1/mm5799.h"
 #include "machine/ds8874.h"
-#include "video/pwm.h"
 #include "sound/spkrdev.h"
+#include "video/pwm.h"
 
 #include "speaker.h"
 
@@ -92,11 +92,11 @@ void hh_cops1_state::machine_reset()
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Helper Functions
 
-***************************************************************************/
+*******************************************************************************/
 
 // generic input handlers
 
@@ -114,13 +114,13 @@ u8 hh_cops1_state::read_inputs(int columns)
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
 
-***************************************************************************/
+*******************************************************************************/
 
-/***************************************************************************
+/*******************************************************************************
 
   Mattel Basketball (model 2437)
   * PCB label: MA 6017/18/19
@@ -143,7 +143,7 @@ u8 hh_cops1_state::read_inputs(int columns)
   This version wasn't sold in the USA. It is commonly known as the Canadian
   version, though it was also released in Europe and Japan.
 
-***************************************************************************/
+*******************************************************************************/
 
 class mbaskb_state : public hh_cops1_state
 {
@@ -333,7 +333,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   National Semiconductor QuizKid Racer (MM5799 version)
   * MM5799 MCU die bonded directly to PCB (die label MM4799 C DUZ)
@@ -344,7 +344,7 @@ ROM_END
   This is the first version of QuizKid Racer, the 2nd release is on a
   COP420 MCU, see hh_cop400.cpp.
 
-***************************************************************************/
+*******************************************************************************/
 
 class qkracerm_state : public hh_cops1_state
 {
@@ -492,7 +492,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   National Semiconductor QuizKid Speller
   * MM5799 MCU die bonded directly to PCB (die label MM4799 C NDF)
@@ -506,7 +506,7 @@ ROM_END
   - Learn: same as Spell, but only the 1st letter
   - Game: player 1 enters word, player 2 needs to guess it
 
-***************************************************************************/
+*******************************************************************************/
 
 class qkspeller_state : public hh_cops1_state
 {
@@ -674,7 +674,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Sinclair Radionics Cambridge Programmable
   * MM5799 MCU (label MM5799NBP/N, die label MM4799 C NBP)
@@ -696,7 +696,7 @@ ROM_END
   - World: Cambridge Programmable, published by Sinclair Radionics
   - USA: EC-4001 Programmable, published by Tandy Corporation, Radio Shack brand
 
-***************************************************************************/
+*******************************************************************************/
 
 class cambrp_state : public hh_cops1_state
 {
@@ -837,22 +837,22 @@ ROM_END
 
 } // anonymous namespace
 
-/***************************************************************************
+/*******************************************************************************
 
   Game driver(s)
 
-***************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME       PARENT  CMP MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1978, mbaskb,    0,       0, mbaskb,    mbaskb,    mbaskb_state,    empty_init, "Mattel Electronics", "Basketball (Mattel)", MACHINE_SUPPORTS_SAVE )
-CONS( 1978, msoccer,   0,       0, msoccer,   mbaskb,    mbaskb_state,    empty_init, "Mattel Electronics", "Soccer (Mattel)", MACHINE_SUPPORTS_SAVE )
-CONS( 1978, mhockey,   0,       0, mhockey,   mbaskb,    mbaskb_state,    empty_init, "Mattel Electronics", "Hockey (Mattel, US version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1978, mhockeya,  mhockey, 0, mhockeya,  mhockeya,  mbaskb_state,    empty_init, "Mattel Electronics", "Hockey (Mattel, export version)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1978, mbaskb,    0,       0,      mbaskb,    mbaskb,    mbaskb_state,    empty_init, "Mattel Electronics", "Basketball (Mattel)", MACHINE_SUPPORTS_SAVE )
+SYST( 1978, msoccer,   0,       0,      msoccer,   mbaskb,    mbaskb_state,    empty_init, "Mattel Electronics", "Soccer (Mattel)", MACHINE_SUPPORTS_SAVE )
+SYST( 1978, mhockey,   0,       0,      mhockey,   mbaskb,    mbaskb_state,    empty_init, "Mattel Electronics", "Hockey (Mattel, US version)", MACHINE_SUPPORTS_SAVE )
+SYST( 1978, mhockeya,  mhockey, 0,      mhockeya,  mhockeya,  mbaskb_state,    empty_init, "Mattel Electronics", "Hockey (Mattel, export version)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1977, qkracerm,  qkracer, 0, qkracerm,  qkracerm,  qkracerm_state,  empty_init, "National Semiconductor", "QuizKid Racer (MM5799 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NODEVICE_LAN )
-CONS( 1978, qkspeller, 0,       0, qkspeller, qkspeller, qkspeller_state, empty_init, "National Semiconductor", "QuizKid Speller", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // ***
+SYST( 1977, qkracerm,  qkracer, 0,      qkracerm,  qkracerm,  qkracerm_state,  empty_init, "National Semiconductor", "QuizKid Racer (MM5799 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NODEVICE_LAN )
+SYST( 1978, qkspeller, 0,       0,      qkspeller, qkspeller, qkspeller_state, empty_init, "National Semiconductor", "QuizKid Speller", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // ***
 
-COMP( 1977, cambrp,    0,       0, cambrp,    cambrp,    cambrp_state,    empty_init, "Sinclair Radionics", "Cambridge Programmable", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1977, cambrp,    0,       0,      cambrp,    cambrp,    cambrp_state,    empty_init, "Sinclair Radionics", "Cambridge Programmable", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 // ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
 // with other, unemulatable, things eg. game board/pieces, book, playing cards, pen & paper, etc.

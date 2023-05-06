@@ -83,6 +83,8 @@ public:
 	void pd_w(uint8_t data, uint8_t mem_mask = ~0);
 	void pf_w(uint8_t data, uint8_t mem_mask = ~0);
 
+	DECLARE_WRITE_LINE_MEMBER(sck_w);
+
 protected:
 	void upd_internal_128_ram_map(address_map &map);
 	void upd_internal_256_ram_map(address_map &map);
@@ -156,6 +158,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
+	void update_sio(int cycles);
 	virtual void handle_timers(int cycles);
 	virtual void upd7810_take_irq();
 

@@ -39,6 +39,7 @@ extern char const *const FMPAC;
 extern char const *const FS_SR022;
 extern char const *const GAMEMASTER2;
 extern char const *const HALNOTE;
+extern char const *const HBI55;
 extern char const *const HFOX;
 extern char const *const HOLY_QURAN;
 extern char const *const INK;

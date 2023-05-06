@@ -5,28 +5,34 @@
 
 namespace NConsoleClose {
 
+class CCtrlBreakException {};
+
+#ifdef UNDER_CE
+
+inline bool TestBreakSignal() { return false; }
+struct CCtrlHandlerSetter {};
+
+#else
+
 extern unsigned g_BreakCounter;
 
 inline bool TestBreakSignal()
 {
-  #ifdef UNDER_CE
-  return false;
-  #else
   return (g_BreakCounter != 0);
-  #endif
 }
 
 class CCtrlHandlerSetter
 {
+  #ifndef _WIN32
+  void (*memo_sig_int)(int);
+  void (*memo_sig_term)(int);
+  #endif
 public:
   CCtrlHandlerSetter();
   virtual ~CCtrlHandlerSetter();
 };
 
-class CCtrlBreakException
-{};
-
-// void CheckCtrlBreak();
+#endif
 
 }
 

@@ -7,10 +7,10 @@ import re
 import sys
 
 # Initial state
-state = 1
 text = ""
-dispatch_to_states = { "MAIN" : 0 }
-states_to_dispatch = { 0 : "MAIN" }
+dispatch_to_states = { "MAIN" : 0, "INTERRUPT_VECTOR" : 1 }
+states_to_dispatch = { 0 : "MAIN", 1 : "INTERRUPT_VECTOR" }
+state = len(states_to_dispatch)
 
 def load_file(fname, lines):
 	path = fname.rpartition('/')[0]

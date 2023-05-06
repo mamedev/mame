@@ -316,37 +316,28 @@ void eti660_state::machine_start()
 
 QUICKLOAD_LOAD_MEMBER(eti660_state::quickload_cb)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	int i;
-	int quick_addr = 0x600;
-	int quick_length;
+	int const quick_length = image.length();
 	std::vector<u8> quick_data;
-	std::error_condition result = image_error::UNSPECIFIED;
-
-	quick_length = image.length();
 	quick_data.resize(quick_length);
 	int const read_ = image.fread( &quick_data[0], quick_length);
 	if (read_ != quick_length)
+		return std::make_pair(image_error::INVALIDIMAGE, "Cannot read the file");
+
+	constexpr int QUICK_ADDR = 0x600;
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	for (int i = 0; i < quick_length; i++)
 	{
-		result = image_error::INVALIDIMAGE;
-		image.message(" Cannot read the file");
+		if ((QUICK_ADDR + i) < 0x1000)
+			space.write_byte(i + QUICK_ADDR, quick_data[i]);
 	}
+
+	// display a message about the loaded quickload
+	if (image.is_filetype("bin"))
+		image.message(" Quickload: size=%04X : start=%04X : end=%04X : Press 6 to start", quick_length, QUICK_ADDR, QUICK_ADDR+quick_length);
 	else
-	{
-		for (i = 0; i < quick_length; i++)
-			if ((quick_addr + i) < 0x1000)
-				space.write_byte(i + quick_addr, quick_data[i]);
+		image.message(" Quickload: size=%04X : start=%04X : end=%04X : Press 8 to start", quick_length, QUICK_ADDR, QUICK_ADDR+quick_length);
 
-		/* display a message about the loaded quickload */
-		if (image.is_filetype("bin"))
-			image.message(" Quickload: size=%04X : start=%04X : end=%04X : Press 6 to start",quick_length,quick_addr,quick_addr+quick_length);
-		else
-			image.message(" Quickload: size=%04X : start=%04X : end=%04X : Press 8 to start",quick_length,quick_addr,quick_addr+quick_length);
-
-		result = std::error_condition();
-	}
-
-	return result;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /* Machine Drivers */

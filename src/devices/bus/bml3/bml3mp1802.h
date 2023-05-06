@@ -43,6 +43,9 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	virtual void map_exrom(address_space_installer &space) override;
+	virtual void map_io(address_space_installer &space) override;
+
 private:
 	DECLARE_WRITE_LINE_MEMBER(nmi_w);
 
@@ -50,7 +53,7 @@ private:
 	required_device_array<floppy_connector, 4> m_floppy;
 	required_device<input_merger_device> m_nmigate;
 
-	uint8_t *m_rom;
+	required_region_ptr<uint8_t> m_rom;
 };
 
 // device type definition

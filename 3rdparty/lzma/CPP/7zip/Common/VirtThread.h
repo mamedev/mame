@@ -16,9 +16,9 @@ struct CVirtThread
   ~CVirtThread() { WaitThreadFinish(); }
   void WaitThreadFinish(); // call it in destructor of child class !
   WRes Create();
-  void Start();
+  WRes Start();
   virtual void Execute() = 0;
-  void WaitExecuteFinish() { FinishedEvent.Lock(); }
+  WRes WaitExecuteFinish() { return FinishedEvent.Lock(); }
 };
 
 #endif

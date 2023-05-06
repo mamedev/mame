@@ -11,6 +11,9 @@
 #ifndef MAME_CPU_M6502_M6502_H
 #define MAME_CPU_M6502_M6502_H
 
+#pragma once
+
+
 class m6502_device : public cpu_device {
 public:
 	enum {
@@ -274,18 +277,6 @@ protected:
 	O(kil_non);
 
 #undef O
-};
-
-class m6502_mcu_device : public m6502_device {
-protected:
-	m6502_mcu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-
-	void internal_update() { internal_update(total_cycles()); }
-	virtual void internal_update(uint64_t current_time) = 0;
-	void recompute_bcount(uint64_t event_time);
-	static void add_event(uint64_t &event_time, uint64_t new_event);
-
-	virtual void execute_run() override;
 };
 
 class m6512_device : public m6502_device {

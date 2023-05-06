@@ -15,6 +15,7 @@
 
 #include "emu.h"
 #include "flopdrv.h"
+
 #include "softlist_dev.h"
 
 #include "formats/imageutl.h"
@@ -22,9 +23,9 @@
 #include "util/ioprocs.h"
 #include "util/ioprocsfilter.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
 
-#define VERBOSE     0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 /***************************************************************************
     CONSTANTS
@@ -255,7 +256,7 @@ int legacy_floppy_image_device::floppy_drive_get_flag_state(int flag)
 
 void legacy_floppy_image_device::floppy_drive_seek(signed int signed_tracks)
 {
-	LOG(("seek from: %d delta: %d\n",m_current_track, signed_tracks));
+	LOG("seek from: %d delta: %d\n", m_current_track, signed_tracks);
 
 	/* update position */
 	m_current_track+=signed_tracks;
@@ -727,12 +728,12 @@ const software_list_loader &legacy_floppy_image_device::get_software_list_loader
 	return image_software_list_loader::instance();
 }
 
-std::error_condition legacy_floppy_image_device::call_create(int format_type, util::option_resolution *format_options)
+std::pair<std::error_condition, std::string> legacy_floppy_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
-	return internal_floppy_device_load(true, format_type, format_options);
+	return std::make_pair(internal_floppy_device_load(true, format_type, format_options), std::string());
 }
 
-std::error_condition legacy_floppy_image_device::call_load()
+std::pair<std::error_condition, std::string> legacy_floppy_image_device::call_load()
 {
 	std::error_condition retVal = internal_floppy_device_load(false, -1, nullptr);
 
@@ -750,7 +751,7 @@ std::error_condition legacy_floppy_image_device::call_load()
 
 	m_wpt_timer->adjust(attotime::from_msec(250), next_wpt);
 
-	return retVal;
+	return std::make_pair(retVal, std::string());
 }
 
 void legacy_floppy_image_device::call_unload()

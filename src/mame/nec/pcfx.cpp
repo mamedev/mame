@@ -186,7 +186,7 @@ void pcfx_state::pcfx_io(address_map &map)
 	map(0x00000300, 0x000003FF).rw(m_huc6261, FUNC(huc6261_device::read), FUNC(huc6261_device::write)).umask32(0x0000ffff);  /* HuC6261 */
 	map(0x00000400, 0x000004FF).rw("huc6270_a", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).umask32(0x0000ffff); /* HuC6270-A */
 	map(0x00000500, 0x000005FF).rw("huc6270_b", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).umask32(0x0000ffff); /* HuC6270-B */
-	map(0x00000600, 0x000006FF).rw("huc6272", FUNC(huc6272_device::read), FUNC(huc6272_device::write));    /* HuC6272 */
+	map(0x00000600, 0x00000607).mirror(0xf8).m("huc6272", FUNC(huc6272_device::amap)); // King
 //  map(0x00000C80, 0x00000C83).noprw(); // backup RAM control
 	map(0x00000E00, 0x00000EFF).rw(FUNC(pcfx_state::irq_read), FUNC(pcfx_state::irq_write)).umask32(0x0000ffff);    /* Interrupt controller */
 //  map(0x00000F00, 0x00000FFF).noprw(); // Timer

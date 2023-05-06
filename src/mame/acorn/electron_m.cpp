@@ -627,16 +627,13 @@ void electronsp_state::machine_start()
 }
 
 
-std::error_condition electronsp_state::load_rom(device_image_interface &image, generic_slot_device *slot)
+std::pair<std::error_condition, std::string> electronsp_state::load_rom(device_image_interface &image, generic_slot_device *slot)
 {
 	uint32_t size = slot->common_get_size("rom");
 
 	// socket accepts 8K and 16K ROM only
 	if (size != 0x2000 && size != 0x4000)
-	{
-		osd_printf_error("%s: Invalid size: Only 8K/16K is supported\n", image.basename());
-		return image_error::INVALIDLENGTH;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Invalid size: Only 8K/16K is supported");
 
 	slot->rom_alloc(0x4000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	slot->common_load_rom(slot->get_rom_base(), size, "rom");
@@ -645,5 +642,5 @@ std::error_condition electronsp_state::load_rom(device_image_interface &image, g
 	uint8_t *crt = slot->get_rom_base();
 	if (size <= 0x2000) memcpy(crt + 0x2000, crt, 0x2000);
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }

@@ -327,7 +327,7 @@ QUICKLOAD_LOAD_MEMBER(svmu_state::quickload_cb)
 		vmufat_write_word(flash, 253, 0x1a, 0x0001);        // offset of header (in blocks) from file start
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

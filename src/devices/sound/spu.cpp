@@ -950,6 +950,7 @@ spu_device::spu_device(const machine_config &mconfig, const char *tag, device_t 
 spu_device::spu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SPU, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
+	m_stream_flags(STREAM_DEFAULT_FLAGS),
 	m_irq_handler(*this),
 	dirty_flags(-1),
 	status_enabled(false),
@@ -1098,7 +1099,8 @@ void spu_device::init_stream()
 {
 	const unsigned int hz=44100;
 
-	m_stream = stream_alloc(0, 2, hz);
+	// TODO: Rewrite SPU stream update code to work such that Taiko no Tatsujin no longer needs synchronous streams
+	m_stream = stream_alloc(0, 2, hz, m_stream_flags);
 
 	rev=new reverb(hz);
 

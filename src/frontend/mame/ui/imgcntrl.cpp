@@ -159,7 +159,9 @@ void menu_control_device_image::load_software_part()
 	// if everything looks good, load software
 	if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 	{
-		m_image.load_software(temp_name);
+		auto [err, msg] = m_image.load_software(temp_name);
+		if (err)
+			machine().popmessage(_("Error loading software item: %1$s"), !msg.empty() ? msg : err.message());
 		stack_pop();
 	}
 	else
@@ -177,7 +179,9 @@ void menu_control_device_image::load_software_part()
 
 void menu_control_device_image::hook_load(const std::string &name)
 {
-	m_image.load(name);
+	auto [err, msg] = m_image.load(name);
+	if (err)
+		machine().popmessage(_("Error loading media image: %1$s"), !msg.empty() ? msg : err.message());
 	stack_pop();
 }
 
@@ -212,7 +216,15 @@ void menu_control_device_image::menu_activated()
 	{
 	case START_FILE:
 		m_submenu_result.filesel = menu_file_selector::result::INVALID;
-		menu::stack_push<menu_file_selector>(ui(), container(), &m_image, m_current_directory, m_current_file, true, m_image.image_interface()!=nullptr, m_image.is_creatable(), m_submenu_result.filesel);
+		menu::stack_push<menu_file_selector>(
+				ui(), container(),
+				&m_image,
+				m_current_directory,
+				m_current_file,
+				true,
+				m_image.image_interface() != nullptr,
+				m_image.is_creatable(),
+				m_submenu_result.filesel);
 		m_state = SELECT_FILE;
 		break;
 
@@ -370,9 +382,9 @@ void menu_control_device_image::menu_activated()
 	case DO_CREATE:
 		{
 			auto path = util::zippath_combine(m_current_directory, m_current_file);
-			std::error_condition err = m_image.create(path, nullptr, nullptr);
+			auto [err, msg] = m_image.create(path, nullptr, nullptr);
 			if (err)
-				machine().popmessage("Error: %s", err.message());
+				machine().popmessage(_("Error creating media image: %1$s"), !msg.empty() ? msg : err.message());
 			stack_pop();
 		}
 		break;

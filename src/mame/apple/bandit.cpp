@@ -66,31 +66,31 @@ void bandit_host_device::device_start()
 	status = 0x0080;
 	revision = 0;
 
-	m_cpu_space->install_read_handler(0x80000000, 0xefffffff, read32s_delegate(*this, FUNC(bandit_host_device::pci_memory_r<0x80000000>)));
-	m_cpu_space->install_write_handler(0x80000000, 0xefffffff, write32s_delegate(*this, FUNC(bandit_host_device::pci_memory_w<0x80000000>)));
+	m_cpu_space->install_read_handler(0x80000000, 0xefffffff, emu::rw_delegate(*this, FUNC(bandit_host_device::pci_memory_r<0x80000000>)));
+	m_cpu_space->install_write_handler(0x80000000, 0xefffffff, emu::rw_delegate(*this, FUNC(bandit_host_device::pci_memory_w<0x80000000>)));
 
 	// TODO: PCI I/O space is at Fn000000-Fn7FFFFF, but it's unclear where in the PCI space that maps to
 
 	switch (m_dev_offset)
 	{
 		case 0:
-			m_cpu_space->install_read_handler(0xf1000000, 0xf1ffffff, read32s_delegate(*this, FUNC(bandit_host_device::pci_memory_r<0xf1000000>)));
-			m_cpu_space->install_write_handler(0xf1000000, 0xf1ffffff, write32s_delegate(*this, FUNC(bandit_host_device::pci_memory_w<0xf1000000>)));
+			m_cpu_space->install_read_handler(0xf1000000, 0xf1ffffff, emu::rw_delegate(*this, FUNC(bandit_host_device::pci_memory_r<0xf1000000>)));
+			m_cpu_space->install_write_handler(0xf1000000, 0xf1ffffff, emu::rw_delegate(*this, FUNC(bandit_host_device::pci_memory_w<0xf1000000>)));
 			break;
 
 		case 1:
-			m_cpu_space->install_read_handler(0xf3000000, 0xf3ffffff, read32s_delegate(*this, FUNC(bandit_host_device::pci_memory_r<0xf3000000>)));
-			m_cpu_space->install_write_handler(0xf3000000, 0xf3ffffff, write32s_delegate(*this, FUNC(bandit_host_device::pci_memory_w<0xf3000000>)));
+			m_cpu_space->install_read_handler(0xf3000000, 0xf3ffffff, emu::rw_delegate(*this, FUNC(bandit_host_device::pci_memory_r<0xf3000000>)));
+			m_cpu_space->install_write_handler(0xf3000000, 0xf3ffffff, emu::rw_delegate(*this, FUNC(bandit_host_device::pci_memory_w<0xf3000000>)));
 			break;
 
 		case 2:
-			m_cpu_space->install_read_handler(0xf5000000, 0xf5ffffff, read32s_delegate(*this, FUNC(bandit_host_device::pci_memory_r<0xf5000000>)));
-			m_cpu_space->install_write_handler(0xf5000000, 0xf5ffffff, write32s_delegate(*this, FUNC(bandit_host_device::pci_memory_w<0xf5000000>)));
+			m_cpu_space->install_read_handler(0xf5000000, 0xf5ffffff, emu::rw_delegate(*this, FUNC(bandit_host_device::pci_memory_r<0xf5000000>)));
+			m_cpu_space->install_write_handler(0xf5000000, 0xf5ffffff, emu::rw_delegate(*this, FUNC(bandit_host_device::pci_memory_w<0xf5000000>)));
 			break;
 
 		case 3:
-			m_cpu_space->install_read_handler(0xf7000000, 0xf7ffffff, read32s_delegate(*this, FUNC(bandit_host_device::pci_memory_r<0xf7000000>)));
-			m_cpu_space->install_write_handler(0xf7000000, 0xf7ffffff, write32s_delegate(*this, FUNC(bandit_host_device::pci_memory_w<0xf7000000>)));
+			m_cpu_space->install_read_handler(0xf7000000, 0xf7ffffff, emu::rw_delegate(*this, FUNC(bandit_host_device::pci_memory_r<0xf7000000>)));
+			m_cpu_space->install_write_handler(0xf7000000, 0xf7ffffff, emu::rw_delegate(*this, FUNC(bandit_host_device::pci_memory_w<0xf7000000>)));
 			break;
 	}
 
@@ -156,14 +156,13 @@ void bandit_host_device::be_config_data_w(offs_t offset, u32 data, u32 mem_mask)
 template <u32 Base>
 u32 bandit_host_device::pci_memory_r(offs_t offset, u32 mem_mask)
 {
-	u32 result = this->space(AS_PCI_MEM).read_dword(Base + (offset * 4), mem_mask);
-	return result;
+	return swapendian_int32(this->space(AS_PCI_MEM).read_dword(Base + (offset * 4), swapendian_int32(mem_mask)));
 }
 
 template <u32 Base>
 void bandit_host_device::pci_memory_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	this->space(AS_PCI_MEM).write_dword(Base + (offset * 4), data, mem_mask);
+	this->space(AS_PCI_MEM).write_dword(Base + (offset * 4), swapendian_int32(data), swapendian_int32((mem_mask)));
 }
 
 template u32 bandit_host_device::pci_memory_r<0x80000000>(offs_t offset, u32 mem_mask);
@@ -180,14 +179,13 @@ template void bandit_host_device::pci_memory_w<0xf7000000>(offs_t offset, u32 da
 template <u32 Base>
 u32 bandit_host_device::pci_io_r(offs_t offset, u32 mem_mask)
 {
-	u32 result = this->space(AS_PCI_IO).read_dword(Base + (offset * 4), mem_mask);
-	return result;
+	return swapendian_int32(this->space(AS_PCI_IO).read_dword(Base + (offset * 4), swapendian_int32(mem_mask)));
 }
 
 template <u32 Base>
 void bandit_host_device::pci_io_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	this->space(AS_PCI_IO).write_dword(Base + (offset * 4), data, mem_mask);
+	this->space(AS_PCI_IO).write_dword(Base + (offset * 4), swapendian_int32(data), swapendian_int32((mem_mask)));
 }
 
 // map PCI memory and I/O space stuff here

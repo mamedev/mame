@@ -37,6 +37,7 @@
 #include <windows.h>
 #include <commctrl.h>
 #include <mmsystem.h>
+#include <objbase.h>
 #include <tchar.h>
 #include <io.h>
 
@@ -269,6 +270,7 @@ void windows_osd_interface::output_oslog(const char *buffer)
 windows_osd_interface::windows_osd_interface(windows_options &options)
 	: osd_common_t(options)
 	, m_options(options)
+	, m_com_status(SUCCEEDED(CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED)))
 	, m_last_event_check(std::chrono::steady_clock::time_point::min())
 {
 }
@@ -280,6 +282,8 @@ windows_osd_interface::windows_osd_interface(windows_options &options)
 
 windows_osd_interface::~windows_osd_interface()
 {
+	if (m_com_status)
+		CoUninitialize();
 }
 
 

@@ -392,7 +392,7 @@ void wangpc_keyboard_device::device_start()
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_2);
 
 	set_rcv_rate(62500);
-	//set_tra_rate(62500);
+	set_tra_rate(62500);
 
 	save_item(NAME(m_keylatch));
 	save_item(NAME(m_rxd));
@@ -422,7 +422,7 @@ void wangpc_keyboard_device::tra_callback()
 
 	if (LOG) logerror("KB '%s' Transmit Bit %u\n", tag(), bit);
 
-	m_txd_handler(transmit_register_get_data_bit());
+	m_txd_handler(bit);
 }
 
 
@@ -495,12 +495,6 @@ void wangpc_keyboard_device::mcs51_tx_callback(uint8_t data)
 	if (LOG) logerror("KB '%s' CPU Transmit Data %02x\n", tag(), data);
 
 	transmit_register_setup(data);
-
-	// HACK bang the bits out immediately
-	while (!is_transmit_register_empty())
-	{
-		m_txd_handler(transmit_register_get_data_bit());
-	}
 }
 
 

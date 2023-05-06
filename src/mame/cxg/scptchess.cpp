@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Sean Riddle
-/******************************************************************************
+/*******************************************************************************
 
 CXG Sensor Computachess (CXG-001 or WA-001)
 CXG Portachess, Portachess II, Computachess IV, Sphinx Chess Voyager
@@ -47,7 +47,7 @@ HD44801C89 used in:
 - Schneider Sensor Chessmaster MK 6
 - Schneider Sensor Chesspartner MK 4
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 #include "cpu/hmcs40/hmcs40.h"
@@ -109,9 +109,9 @@ void scptchess_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void scptchess_state::update_display()
 {
@@ -154,9 +154,9 @@ u16 scptchess_state::input_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( scptchess_v1 )
 	PORT_START("IN.0")
@@ -177,13 +177,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void scptchess_state::scptchess_v1(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD44801(config, m_maincpu, 400000);
 	m_maincpu->write_r<2>().set(FUNC(scptchess_state::mux_w<0>));
 	m_maincpu->write_r<3>().set(FUNC(scptchess_state::mux_w<1>));
@@ -194,11 +194,11 @@ void scptchess_state::scptchess_v1(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8, 2);
 	config.set_default_layout(layout_cxg_scptchess_v1);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
@@ -211,9 +211,9 @@ void scptchess_state::scptchess_v2(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( scptchess )
 	ROM_REGION( 0x2000, "maincpu", 0 )
@@ -229,10 +229,10 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME        PARENT    CMP MACHINE       INPUT         STATE            INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1981, scptchess,  0,         0, scptchess_v1, scptchess_v1, scptchess_state, empty_init, "CXG Systems / White & Allcock", "Sensor Computachess (1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1985, scptchessa, scptchess, 0, scptchess_v2, scptchess_v2, scptchess_state, empty_init, "CXG Systems / Newcrest Technology", "Sensor Computachess (1985 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME        PARENT     COMPAT  MACHINE       INPUT         CLASS            INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1981, scptchess,  0,         0,      scptchess_v1, scptchess_v1, scptchess_state, empty_init, "CXG Systems / White & Allcock", "Sensor Computachess (1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, scptchessa, scptchess, 0,      scptchess_v2, scptchess_v2, scptchess_state, empty_init, "CXG Systems / Newcrest Technology", "Sensor Computachess (1985 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

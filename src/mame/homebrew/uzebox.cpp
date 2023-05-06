@@ -270,7 +270,7 @@ DEVICE_IMAGE_LOAD_MEMBER(uzebox_state::cart_load)
 	else
 		memcpy(m_cart->get_rom_base(), image.get_software_region("rom"), size);
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

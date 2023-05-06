@@ -1,5 +1,5 @@
 ; 7zCrcOpt.asm -- CRC32 calculation : optimized version
-; 2009-12-12 : Igor Pavlov : Public domain
+; 2021-02-07 : Igor Pavlov : Public domain
 
 include 7zAsm.asm
 
@@ -7,21 +7,28 @@ MY_ASM_START
 
 rD   equ  r2
 rN   equ  r7
+rT   equ  r5
 
 ifdef x64
     num_VAR     equ r8
     table_VAR   equ r9
 else
-    data_size   equ (REG_SIZE * 5)
-    crc_table   equ (REG_SIZE + data_size)
-    num_VAR     equ [r4 + data_size]
-    table_VAR   equ [r4 + crc_table]
+  if (IS_CDECL gt 0)
+    crc_OFFS    equ (REG_SIZE * 5)
+    data_OFFS   equ (REG_SIZE + crc_OFFS)
+    size_OFFS   equ (REG_SIZE + data_OFFS)
+  else
+    size_OFFS   equ (REG_SIZE * 5)
+  endif
+    table_OFFS  equ (REG_SIZE + size_OFFS)
+    num_VAR     equ [r4 + size_OFFS]
+    table_VAR   equ [r4 + table_OFFS]
 endif
 
-SRCDAT  equ  rN + rD + 4 *
+SRCDAT  equ  rD + rN * 1 + 4 *
 
 CRC macro op:req, dest:req, src:req, t:req
-    op      dest, DWORD PTR [r5 + src * 4 + 0400h * t]
+    op      dest, DWORD PTR [rT + src * 4 + 0400h * t]
 endm
 
 CRC_XOR macro dest:req, src:req, t:req
@@ -43,11 +50,33 @@ CRC1b macro
 endm
 
 MY_PROLOG macro crc_end:req
-    MY_PUSH_4_REGS
+
+    ifdef x64
+      if  (IS_LINUX gt 0)
+        MY_PUSH_2_REGS
+        mov     x0, REG_ABI_PARAM_0_x   ; x0 = x7
+        mov     rT, REG_ABI_PARAM_3     ; r5 = r1
+        mov     rN, REG_ABI_PARAM_2     ; r7 = r2
+        mov     rD, REG_ABI_PARAM_1     ; r2 = r6
+      else
+        MY_PUSH_4_REGS
+        mov     x0, REG_ABI_PARAM_0_x   ; x0 = x1
+        mov     rT, REG_ABI_PARAM_3     ; r5 = r9
+        mov     rN, REG_ABI_PARAM_2     ; r7 = r8
+        ; mov     rD, REG_ABI_PARAM_1     ; r2 = r2
+      endif
+    else
+        MY_PUSH_4_REGS
+      if  (IS_CDECL gt 0)
+        mov     x0, [r4 + crc_OFFS]
+        mov     rD, [r4 + data_OFFS]
+      else
+        mov     x0, REG_ABI_PARAM_0_x
+      endif
+        mov     rN, num_VAR
+        mov     rT, table_VAR
+    endif
     
-    mov     x0, x1
-    mov     rN, num_VAR
-    mov     r5, table_VAR
     test    rN, rN
     jz      crc_end
   @@:
@@ -77,7 +106,11 @@ MY_EPILOG macro crc_end:req
     CRC1b
     jmp     crc_end
   @@:
-    MY_POP_4_REGS
+      if (IS_X64 gt 0) and (IS_LINUX gt 0)
+        MY_POP_2_REGS
+      else
+        MY_POP_4_REGS
+      endif
 endm
 
 MY_PROC CrcUpdateT8, 4

@@ -1,73 +1,73 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-/***************************************************************************
+/*******************************************************************************
 
-  Texas Instruments TI-74 BASICALC
-  Texas Instruments TI-95 PROCALC
-  hardware family: CC-40 -> TI-74 BASICALC -> TI-95 PROCALC
+Texas Instruments TI-74 BASICALC
+Texas Instruments TI-95 PROCALC
+hardware family: CC-40 -> TI-74 BASICALC -> TI-95 PROCALC
 
-  TI-74 PCB layout:
-  note: TI-95 PCB is nearly the same, just with a different size LCD screen,
-  its CPU is labeled C70011, and the system ROM is labeled HN61256PC95.
+TI-74 PCB layout:
+note: TI-95 PCB is nearly the same, just with a different size LCD screen,
+its CPU is labeled C70011, and the system ROM is labeled HN61256PC95.
 
-          DOCK-BUS
-        --||||||||---
-    C  ==           |
-    a  ==           |
-    r  ==  HN61256  |
-    t  ==           ----------------------------
-        |                                      |
-  -------            C70009          4MHz      |
-  |        HM6264                    RC4193N   |
-  |                                            |
-  |                                            |
-  |                                            |
-  |                                            |
-  ---------------||||||||||||||||||||||||-------
-                 ||||||||||||||||||||||||
-  ---------------||||||||||||||||||||||||-------
-  |              *HD44100H   *HD44780A00       |
-  |                                            |
-  |                                            |
-  |                                            |
-  |                                            |
-  ----------                                   |
-           | ----------------------------------|
-           | |                                ||
-           | |          LCD screen            ||
-           | |                                ||
-           | ----------------------------------|
-           -------------------------------------
+        DOCK-BUS
+      --||||||||---
+  C  ==           |
+  a  ==           |
+  r  ==  HN61256  |
+  t  ==           ----------------------------
+      |                                      |
+-------            C70009          4MHz      |
+|        HM6264                    RC4193N   |
+|                                            |
+|                                            |
+|                                            |
+|                                            |
+---------------||||||||||||||||||||||||-------
+               ||||||||||||||||||||||||
+---------------||||||||||||||||||||||||-------
+|              *HD44100H   *HD44780A00       |
+|                                            |
+|                                            |
+|                                            |
+|                                            |
+----------                                   |
+         | ----------------------------------|
+         | |                                ||
+         | |          LCD screen            ||
+         | |                                ||
+         | ----------------------------------|
+         -------------------------------------
 
-  IC1 HN61256PC93 - Hitachi DIP-28 32KB CMOS Mask PROM
-  IC2 C70009      - Texas Instruments TMS70C46, 54 pins. Basically a TMS70C40 with some TI custom I/O mods.
-                    128 bytes internal RAM, 4KB internal ROM, running at max 4MHz.
-  IC3 HM6264LP-15 - Hitachi 8KB SRAM (battery backed)
-  RC4193N         - Micropower Switching Regulator
-  HD44100H        - 60-pin QFP Hitachi HD44100 LCD Driver
-  HD44780A00      - 80-pin TFP Hitachi HD44780 LCD Controller
+IC1 HN61256PC93 - Hitachi DIP-28 32KB CMOS Mask PROM
+IC2 C70009      - Texas Instruments TMS70C46, 54 pins. Basically a TMS70C40 with some TI custom I/O mods.
+                  128 bytes internal RAM, 4KB internal ROM, running at max 4MHz.
+IC3 HM6264LP-15 - Hitachi 8KB SRAM (battery backed)
+RC4193N         - Micropower Switching Regulator
+HD44100H        - 60-pin QFP Hitachi HD44100 LCD Driver
+HD44780A00      - 80-pin TFP Hitachi HD44780 LCD Controller
 
-  *               - indicates that it's on the other side of the PCB
-
-
-  Overall, the hardware is very similar to TI CC-40. A lot has been shuffled around
-  to cut down on complexity. To reduce power usage even more, the OS often idles while
-  waiting for any keypress that triggers an interrupt and wakes the processor up.
-
-  The machine is powered by 4 AAA batteries. These will also save internal RAM,
-  provided that the machine is turned off properly.
+*               - indicates that it's on the other side of the PCB
 
 
-  TODO:
-  - it runs too fast due to missing clock divider emulation in TMS70C46
-  - external ram cartridge (HM6264LFP-15 + coin battery)
-  - DOCK-BUS interface and peripherals, compatible with both TI-74 and TI-95
-    * CI-7 cassette interface
-    * PC-324 thermal printer
-    (+ old Hexbus devices can be connected via a converter cable)
-  - verify ti74(d12) rom label
+Overall, the hardware is very similar to TI CC-40. A lot has been shuffled around
+to cut down on complexity. To reduce power usage even more, the OS often idles while
+waiting for any keypress that triggers an interrupt and wakes the processor up.
 
-***************************************************************************/
+The machine is powered by 4 AAA batteries. These will also save internal RAM,
+provided that the machine is turned off properly.
+
+
+TODO:
+- it runs too fast due to missing clock divider emulation in TMS70C46
+- external ram cartridge (HM6264LFP-15 + coin battery)
+- DOCK-BUS interface and peripherals, compatible with both TI-74 and TI-95
+  * CI-7 cassette interface
+  * PC-324 thermal printer
+  (+ old Hexbus devices can be connected via a converter cable)
+- verify ti74(d12) rom label
+
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -136,36 +136,63 @@ private:
 
 
 
-/***************************************************************************
+/*******************************************************************************
+    Initialisation
+*******************************************************************************/
 
-  File Handling
-
-***************************************************************************/
-
-DEVICE_IMAGE_LOAD_MEMBER(ti74_state::cart_load)
+void ti74_state::machine_start()
 {
-	u32 size = m_cart->common_get_size("rom");
+	m_segs.resolve();
 
-	// max size is 32KB
-	if (size > 0x8000)
-	{
-		osd_printf_error("%s: Invalid file size\n", image.basename());
-		return image_error::INVALIDLENGTH;
-	}
+	if (m_cart->exists())
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0xbfff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 
-	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+	m_sysbank->configure_entries(0, 4, memregion("system")->base(), 0x2000);
 
-	return std::error_condition();
+	// register for savestates
+	save_item(NAME(m_key_select));
+	save_item(NAME(m_power));
+}
+
+void ti74_state::machine_reset()
+{
+	m_power = 1;
+
+	m_sysbank->set_entry(0);
+	update_battery_status(m_battery_inp->read());
+}
+
+void ti74_state::update_battery_status(int state)
+{
+	// battery ok/low status is on int1 line!
+	m_maincpu->set_input_line(TMS7000_INT1_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 
-/***************************************************************************
+/*******************************************************************************
+    Cartridge
+*******************************************************************************/
 
-  Video
+DEVICE_IMAGE_LOAD_MEMBER(ti74_state::cart_load)
+{
+	u32 const size = m_cart->common_get_size("rom");
 
-***************************************************************************/
+	// max size is 32KB
+	if (size > 0x8000)
+		return std::make_pair(image_error::INVALIDLENGTH, "Invalid file size (must be no more than 32K)");
+
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	return std::make_pair(std::error_condition(), std::string());
+}
+
+
+
+/*******************************************************************************
+    Video
+*******************************************************************************/
 
 void ti74_state::ti74_palette(palette_device &palette) const
 {
@@ -239,11 +266,9 @@ HD44780_PIXEL_UPDATE(ti74_state::ti95_pixel_update)
 
 
 
-/***************************************************************************
-
-  I/O, Memory Maps
-
-***************************************************************************/
+/*******************************************************************************
+    I/O
+*******************************************************************************/
 
 u8 ti74_state::keyboard_r()
 {
@@ -291,11 +316,9 @@ void ti74_state::main_map(address_map &map)
 
 
 
-/***************************************************************************
-
-  Inputs
-
-***************************************************************************/
+/*******************************************************************************
+    Inputs
+*******************************************************************************/
 
 INPUT_CHANGED_MEMBER(ti74_state::battery_status_changed)
 {
@@ -485,39 +508,9 @@ INPUT_PORTS_END
 
 
 
-/***************************************************************************
-
-  Machine Config
-
-***************************************************************************/
-
-void ti74_state::update_battery_status(int state)
-{
-	// battery ok/low status is on int1 line!
-	m_maincpu->set_input_line(TMS7000_INT1_LINE, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-void ti74_state::machine_reset()
-{
-	m_power = 1;
-
-	m_sysbank->set_entry(0);
-	update_battery_status(m_battery_inp->read());
-}
-
-void ti74_state::machine_start()
-{
-	m_segs.resolve();
-
-	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0xbfff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
-
-	m_sysbank->configure_entries(0, 4, memregion("system")->base(), 0x2000);
-
-	// register for savestates
-	save_item(NAME(m_key_select));
-	save_item(NAME(m_power));
-}
+/*******************************************************************************
+    Machine Configs
+*******************************************************************************/
 
 void ti74_state::ti74(machine_config &config)
 {
@@ -587,11 +580,9 @@ void ti74_state::ti95(machine_config &config)
 
 
 
-/***************************************************************************
-
-  ROM Definitions
-
-***************************************************************************/
+/*******************************************************************************
+    ROM Definitions
+*******************************************************************************/
 
 ROM_START( ti74 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
@@ -621,7 +612,12 @@ ROM_END
 } // anonymous namespace
 
 
+
+/*******************************************************************************
+    Drivers
+*******************************************************************************/
+
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
-COMP( 1985, ti74,  0,      0,      ti74,    ti74,  ti74_state, empty_init, "Texas Instruments", "TI-74 Basicalc (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1985, ti74a, ti74,   0,      ti74,    ti74,  ti74_state, empty_init, "Texas Instruments", "TI-74 Basicalc (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1986, ti95,  0,      0,      ti95,    ti95,  ti74_state, empty_init, "Texas Instruments", "TI-95 Procalc", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1985, ti74,  0,      0,      ti74,    ti74,  ti74_state, empty_init, "Texas Instruments", "TI-74 Basicalc (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1985, ti74a, ti74,   0,      ti74,    ti74,  ti74_state, empty_init, "Texas Instruments", "TI-74 Basicalc (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1986, ti95,  0,      0,      ti95,    ti95,  ti74_state, empty_init, "Texas Instruments", "TI-95 Procalc", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

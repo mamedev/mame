@@ -177,6 +177,7 @@ public:
 	ddenlovr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: dynax_state(mconfig, type, tag)
 		, m_blitter_irq_handler(*this)
+		, m_oki(*this, "oki")
 		, m_protection1(*this, "protection1")
 		, m_protection2(*this, "protection2")
 	{ }
@@ -409,6 +410,7 @@ private:
 
 protected:
 	devcb_write_line m_blitter_irq_handler;
+	optional_device<okim6295_device> m_oki;
 
 private:
 	optional_shared_ptr<uint16_t> m_protection1;
@@ -416,7 +418,11 @@ private:
 protected:
 	std::unique_ptr<uint8_t[]>  m_ddenlovr_pixmap[8];
 
-	/* blitter (TODO: merge with the dynax.h, where possible) */
+	// input/output
+	uint8_t m_coins = 0U;
+	uint8_t m_hopper = 0U;
+
+	// blitter (TODO: merge with the dynax.h, where possible)
 	int m_extra_layers;
 	int m_ddenlovr_dest_layer;
 	int m_ddenlovr_blit_flip;
@@ -453,7 +459,7 @@ protected:
 	int m_ddenlovr_blit_regs[2];
 
 private:
-	/* ddenlovr misc (TODO: merge with dynax.h, where possible) */
+	// ddenlovr misc (TODO: merge with dynax.h, where possible)
 	uint8_t m_palram[0x200];
 	int m_okibank;
 protected:
@@ -471,9 +477,15 @@ class htengoku_state : public ddenlovr_state
 public:
 	htengoku_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ddenlovr_state(mconfig, type, tag)
+		, m_highview(*this, "highmem")
+		, m_rombank(*this, "bank1")
+		, m_dsw(*this, "DSW%u", 0U)
 	{ }
 
-	void htengoku(machine_config &config);
+	void htengoku(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	uint32_t screen_update_htengoku(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -488,10 +500,12 @@ private:
 	void htengoku_dsw_w(uint8_t data);
 	uint8_t htengoku_dsw_r();
 
-	void htengoku_io_map(address_map &map);
-	void htengoku_mem_map(address_map &map);
-	void htengoku_banked_map(address_map &map);
+	void htengoku_io_map(address_map &map) ATTR_COLD;
+	void htengoku_mem_map(address_map &map) ATTR_COLD;
 
+	memory_view m_highview;
+	required_memory_bank m_rombank;
+	required_ioport_array<5> m_dsw;
 	bitmap_ind16 m_htengoku_layer;
 };
 
@@ -500,6 +514,7 @@ class mmpanic_state : public ddenlovr_state
 public:
 	mmpanic_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ddenlovr_state(mconfig, type, tag)
+		, m_soundcpu(*this, "soundcpu")
 		, m_soundlatch(*this, "soundlatch")
 		, m_leds(*this, "led%u", 0U)
 	{ }
@@ -544,10 +559,11 @@ private:
 	void mmpanic_sound_map(address_map &map);
 	void mmpanic_sound_portmap(address_map &map);
 
+	required_device<cpu_device> m_soundcpu;
 	required_device<generic_latch_8_device> m_soundlatch;
 	output_finder<2> m_leds;
 
-	uint16_t m_mmpanic_leds = 0;  /* A led for each of the 9 buttons */
+	uint16_t m_mmpanic_leds = 0;  // A led for each of the 9 buttons
 	uint8_t m_funkyfig_lockout = 0;
 };
 
@@ -4269,6 +4285,15 @@ void ddenlovr_state::seljan2_portmap(address_map &map)
 ***************************************************************************/
 // htengoku uses the mixer chip from ddenlovr
 
+void htengoku_state::machine_start()
+{
+	ddenlovr_state::machine_start();
+
+	m_rombank->configure_entries(0, 8, memregion("maincpu")->base(), 0x8000);
+	m_rombank->set_entry(0);
+	m_highview.select(0);
+}
+
 VIDEO_START_MEMBER(htengoku_state,htengoku)
 {
 	VIDEO_START_CALL_MEMBER(ddenlovr);
@@ -4307,14 +4332,13 @@ void htengoku_state::htengoku_dsw_w(uint8_t data)
 
 uint8_t htengoku_state::htengoku_dsw_r()
 {
-	if (!BIT(m_dsw_sel, 0)) return ioport("DSW0")->read();
-	if (!BIT(m_dsw_sel, 1)) return ioport("DSW1")->read();
-	if (!BIT(m_dsw_sel, 2)) return ioport("DSW2")->read();
-	if (!BIT(m_dsw_sel, 3)) return ioport("DSW3")->read();
-	if (!BIT(m_dsw_sel, 4)) return ioport("DSW4")->read();
-	logerror("%s: warning, unknown bits read, dsw_sel = %02x\n", machine().describe_context(), m_dsw_sel);
-
-	return 0xff;
+	uint8_t result = 0xff;
+	if (!BIT(m_dsw_sel, 0)) result &= m_dsw[0]->read();
+	if (!BIT(m_dsw_sel, 1)) result &= m_dsw[1]->read();
+	if (!BIT(m_dsw_sel, 2)) result &= m_dsw[2]->read();
+	if (!BIT(m_dsw_sel, 3)) result &= m_dsw[3]->read();
+	if (!BIT(m_dsw_sel, 4)) result &= m_dsw[4]->read();
+	return result;
 }
 
 void htengoku_state::htengoku_coin_w(uint8_t data)
@@ -4371,7 +4395,8 @@ uint8_t htengoku_state::htengoku_coin_r()
 
 void htengoku_state::htengoku_rombank_w(uint8_t data)
 {
-	m_bankdev->set_bank(data & 0x1f);
+	m_highview.select(BIT(data, 4));
+	m_rombank->set_entry(BIT(data, 0, 3));
 }
 
 void htengoku_state::htengoku_blit_romregion_w(uint8_t data)
@@ -4423,16 +4448,12 @@ void htengoku_state::htengoku_io_map(address_map &map)
 
 void htengoku_state::htengoku_mem_map(address_map &map)
 {
-	map(0x0000, 0x5fff).rom();
+	map(0x0000, 0x5fff).rom().region("maincpu", 0);
 	map(0x6000, 0x6fff).ram().share("nvram");
 	map(0x7000, 0x7fff).ram();
-	map(0x8000, 0xffff).m(m_bankdev, FUNC(address_map_bank_device::amap8));
-}
-
-void htengoku_state::htengoku_banked_map(address_map &map)
-{
-	map(0x00000, 0x3ffff).rom().region("maincpu", 0x10000);
-	map(0x80000, 0x801ff).w(FUNC(htengoku_state::tenkai_palette_w));
+	map(0x8000, 0xffff).view(m_highview);
+	m_highview[0](0x8000, 0xffff).bankr(m_rombank);
+	m_highview[1](0x0000, 0x01ff).w(FUNC(htengoku_state::tenkai_palette_w));
 }
 
 void htengoku_state::htengoku(machine_config &config)
@@ -4442,15 +4463,6 @@ void htengoku_state::htengoku(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &htengoku_state::htengoku_mem_map);
 	m_maincpu->set_addrmap(AS_IO, &htengoku_state::htengoku_io_map);
 	m_maincpu->set_irq_acknowledge_callback("mainirq", FUNC(rst_pos_buffer_device::inta_cb)); // IM 0 needs an opcode on the data bus
-
-	ADDRESS_MAP_BANK(config, m_bankdev, 0);
-	m_bankdev->set_addrmap(0, &htengoku_state::htengoku_banked_map);
-	m_bankdev->set_data_width(8);
-	m_bankdev->set_addr_width(20);
-	m_bankdev->set_stride(0x8000);
-
-	MCFG_MACHINE_START_OVERRIDE(htengoku_state,dynax)
-	MCFG_MACHINE_RESET_OVERRIDE(htengoku_state,dynax)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -13106,9 +13118,8 @@ DSWs - 4x 10-position, 1x 4-position
 ***************************************************************************/
 
 ROM_START( htengoku )
-	ROM_REGION( 0x50000, "maincpu", 0 ) // Z80 Code
+	ROM_REGION( 0x40000, "maincpu", 0 ) // Z80 Code
 	ROM_LOAD( "6501.4b", 0x00000, 0x40000, CRC(29a7fc83) SHA1(5d3cf0a72918e58b5b60f7c978e559c7c1306bce) )
-	ROM_RELOAD(          0x10000, 0x40000 )
 
 	ROM_REGION( 0x300000, "blitter", 0 )    // blitter data
 	ROM_LOAD( "6506.4c",  0x000000, 0x80000, CRC(7de17b26) SHA1(326667063ab045ac50e850f2f7821a65317879ad) )

@@ -9,6 +9,7 @@ msx_slot_cartridge_base_device::msx_slot_cartridge_base_device(const machine_con
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_cartrom_image_interface(mconfig, *this)
 	, device_slot_interface(mconfig, *this)
+	, device_mixer_interface(mconfig, *this)
 	, msx_internal_slot_interface(mconfig, *this)
 	, m_irq_handler(*this)
 	, m_cartridge(nullptr)
@@ -32,13 +33,13 @@ void msx_slot_cartridge_base_device::device_start()
 }
 
 
-std::error_condition msx_slot_cartridge_base_device::call_load()
+std::pair<std::error_condition, std::string> msx_slot_cartridge_base_device::call_load()
 {
 	if (m_cartridge)
 	{
 		if (!loaded_through_softlist())
 		{
-			u32 length = this->length();
+			u32 const length = this->length();
 
 			// determine how much space to allocate
 			u32 length_aligned = 0x10000;
@@ -59,26 +60,18 @@ std::error_condition msx_slot_cartridge_base_device::call_load()
 
 			memory_region *const romregion = machine().memory().region_alloc(subtag("rom"), length_aligned, 1, ENDIANNESS_LITTLE);
 			if (fread(romregion->base(), length) != length)
-			{
-				osd_printf_error("%s: Unable to fully read file\n", basename());
-				return image_error::UNSPECIFIED;
-			}
+				return std::make_pair(image_error::UNSPECIFIED, "Unable to fully read file");
 		}
 
 		std::string message;
 		std::error_condition result = m_cartridge->initialize_cartridge(message);
 		if (result)
-		{
-			osd_printf_error("%s: %s\n", basename(), message);
-			return result;
-		}
+			return std::make_pair(result, message);
 
 		if (m_cartridge->cart_sram_region())
-		{
 			battery_load(m_cartridge->cart_sram_region()->base(), m_cartridge->cart_sram_region()->bytes(), 0x00);
-		}
 	}
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -122,6 +115,11 @@ address_space &msx_cart_interface::io_space() const
 cpu_device &msx_cart_interface::maincpu() const
 {
 	return m_exp->maincpu();
+}
+
+device_mixer_interface &msx_cart_interface::soundin() const
+{
+	return *m_exp;
 }
 
 void msx_cart_interface::set_views(memory_view::memory_view_entry *page0, memory_view::memory_view_entry *page1, memory_view::memory_view_entry *page2, memory_view::memory_view_entry *page3)

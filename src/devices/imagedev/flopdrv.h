@@ -102,8 +102,8 @@ public:
 	void set_floppy_config(const floppy_interface *config) { m_config = config; }
 	auto out_idx_cb() { return m_out_idx_func.bind(); }
 
-	virtual std::error_condition call_load() override;
-	virtual std::error_condition call_create(int format_type, util::option_resolution *format_options) override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 
 	virtual bool is_readable()  const noexcept override { return true; }
@@ -165,7 +165,7 @@ private:
 protected:
 	legacy_floppy_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device overrides
+	// device_t implementation
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
 

@@ -659,6 +659,9 @@ bool menu_image_info::handle(event const *ev)
 
 void menu_image_info::image_info(device_image_interface *image)
 {
+	if (!image->user_loadable())
+		return;
+
 	if (image->exists())
 	{
 		// display device type and filename

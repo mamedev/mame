@@ -995,18 +995,18 @@ void debug_imgui::mount_image()
 
 void debug_imgui::create_image()
 {
-	std::error_condition res;
+	std::pair<std::error_condition, std::string> res;
 
 	auto *fd = dynamic_cast<floppy_image_device *>(m_dialog_image);
 	if(fd != nullptr)
 	{
 		res = fd->create(m_path,nullptr,nullptr);
-		if(!res)
+		if(!res.first)
 			fd->setup_write(m_typelist.at(m_format_sel).format);
 	}
 	else
 		res = m_dialog_image->create(m_path,nullptr,nullptr);
-	if(!res)
+	if(!res.first)
 		ImGui::CloseCurrentPopup();
 	// TODO: add a messagebox to display on an error
 }

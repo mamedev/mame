@@ -142,8 +142,6 @@ void pce_cd_device::device_start()
 	m_ack_clear_timer = timer_alloc(FUNC(pce_cd_device::clear_ack), this);
 	m_ack_clear_timer->adjust(attotime::never);
 
-	// m_cd_file pointer is setup at a later stage because it is still empty when this function is called
-
 	// TODO: add proper restore for the cd data...
 	save_pointer(NAME(m_bram), PCE_BRAM_SIZE * 2);
 	save_pointer(NAME(m_adpcm_ram), PCE_ADPCM_RAM_SIZE);
@@ -240,13 +238,12 @@ void pce_cd_device::device_reset()
 void pce_cd_device::late_setup()
 {
 	// at device start, the cdrom is not 'ready' yet, so we postpone this part of the initialization at machine_start in the driver
-	m_cd_file = m_cdrom->get_cdrom_file();
-	if (m_cd_file)
+	if (m_cdrom->exists())
 	{
-		m_toc = &m_cd_file->get_toc();
-		m_cdda->set_cdrom(m_cd_file);
-		m_last_frame = m_cd_file->get_track_start(m_cd_file->get_last_track() - 1);
-		m_last_frame += m_toc->tracks[m_cd_file->get_last_track() - 1].frames;
+		m_toc = &m_cdrom->get_toc();
+		m_cdda->set_cdrom(m_cdrom);
+		m_last_frame = m_cdrom->get_track_start(m_cdrom->get_last_track() - 1);
+		m_last_frame += m_toc->tracks[m_cdrom->get_last_track() - 1].frames;
 		m_end_frame = m_last_frame;
 	}
 
@@ -381,7 +378,7 @@ void pce_cd_device::reply_status_byte(uint8_t status)
 void pce_cd_device::test_unit_ready()
 {
 	LOGCMD("0x00 TEST UNIT READY: status send ");
-	if (m_cd_file)
+	if (m_cdrom)
 	{
 		LOGCMD("STATUS_OK\n");
 		reply_status_byte(SCSI_STATUS_OK);
@@ -401,7 +398,7 @@ void pce_cd_device::read_6()
 	LOGCMD("0x08 READ(6): frame: %08x size: %08x\n", frame, frame_count);
 
 	/* Check for presence of a CD */
-	if (!m_cd_file)
+	if (!m_cdrom)
 	{
 		reply_status_byte(SCSI_CHECK_CONDITION);
 		return;
@@ -440,7 +437,7 @@ void pce_cd_device::nec_set_audio_start_position()
 	const uint8_t mode = m_command_buffer[9] & 0xc0;
 	LOGCMD("0xd8 SET AUDIO PLAYBACK START POSITION (NEC): mode %02x\n", mode);
 
-	if (!m_cd_file)
+	if (!m_cdrom)
 	{
 		/* Throw some error here */
 		reply_status_byte(SCSI_CHECK_CONDITION);
@@ -460,7 +457,7 @@ void pce_cd_device::nec_set_audio_start_position()
 			const u8 f = bcd_2_dec(m_command_buffer[4]);
 			frame = f + 75 * (s + m * 60);
 
-			const u32 pregap = m_toc->tracks[m_cd_file->get_track(frame)].pregap;
+			const u32 pregap = m_toc->tracks[m_cdrom->get_track(frame)].pregap;
 
 			LOGCMD("MSF=%d %02d:%02d:%02d (pregap = %d)\n", frame, m, s, f, pregap);
 			// PCE tries to be clever here and set (start of track + track pregap size) to skip the pregap
@@ -473,7 +470,7 @@ void pce_cd_device::nec_set_audio_start_position()
 		case 0x80:
 		{
 			const u8 track_number = bcd_2_dec(m_command_buffer[2]);
-			const u32 pregap = m_toc->tracks[m_cd_file->get_track(track_number - 1)].pregap;
+			const u32 pregap = m_toc->tracks[m_cdrom->get_track(track_number - 1)].pregap;
 			LOGCMD("TRACK=%d (pregap = %d)\n", track_number, pregap);
 			frame = m_toc->tracks[ track_number - 1 ].logframeofs;
 			// Not right for emeraldd, breaks intro lip sync
@@ -518,8 +515,8 @@ void pce_cd_device::nec_set_audio_start_position()
 		else
 		{
 			//m_cdda_status = PCE_CD_CDDA_PLAYING;
-			m_end_frame = m_toc->tracks[ m_cd_file->get_track(m_current_frame) ].logframeofs
-						+ m_toc->tracks[ m_cd_file->get_track(m_current_frame) ].logframes;
+			m_end_frame = m_toc->tracks[ m_cdrom->get_track(m_current_frame) ].logframeofs
+						+ m_toc->tracks[ m_cdrom->get_track(m_current_frame) ].logframes;
 
 			LOGCDDA("Audio start (end of track) current %d end %d\n", m_current_frame, m_end_frame);
 			// Several places definitely don't want this to start redbook,
@@ -558,7 +555,7 @@ void pce_cd_device::nec_set_audio_stop_position()
 	const uint8_t mode = m_command_buffer[9] & 0xc0;
 	LOGCMD("0xd9 SET AUDIO PLAYBACK END POSITION (NEC): mode %02x\n", mode);
 
-	if (!m_cd_file)
+	if (!m_cdrom)
 	{
 		/* Throw some error here */
 		reply_status_byte(SCSI_CHECK_CONDITION);
@@ -578,7 +575,7 @@ void pce_cd_device::nec_set_audio_stop_position()
 			const u8 m = bcd_2_dec(m_command_buffer[2]);
 			const u8 s = bcd_2_dec(m_command_buffer[3]);
 			const u8 f = bcd_2_dec(m_command_buffer[4]);
-			const u32 pregap = m_toc->tracks[m_cd_file->get_track(frame)].pregap;
+			const u32 pregap = m_toc->tracks[m_cdrom->get_track(frame)].pregap;
 
 			frame = f + 75 * (s + m * 60);
 			LOGCMD("MSF=%d %02d:%02d:%02d (pregap = %d)\n", frame, m, s, f, pregap);
@@ -588,7 +585,7 @@ void pce_cd_device::nec_set_audio_stop_position()
 		case 0x80:
 		{
 			const u8 track_number = bcd_2_dec(m_command_buffer[2]);
-			const u32 pregap = m_toc->tracks[m_cd_file->get_track(track_number - 1)].pregap;
+			const u32 pregap = m_toc->tracks[m_cdrom->get_track(track_number - 1)].pregap;
 			// NB: crazyhos uses this command with track = 1 on pre-title screen intro.
 			// It's not supposed to playback anything according to real HW refs.
 			frame = m_toc->tracks[ track_number - 1 ].logframeofs;
@@ -645,7 +642,7 @@ void pce_cd_device::nec_set_audio_stop_position()
 void pce_cd_device::nec_pause()
 {
 	/* If no cd mounted throw an error */
-	if (!m_cd_file)
+	if (!m_cdrom)
 	{
 		reply_status_byte(SCSI_CHECK_CONDITION);
 		return;
@@ -675,7 +672,7 @@ void pce_cd_device::nec_get_subq()
 	uint32_t msf_abs, msf_rel, track, frame;
 	//LOGCMD("0xdd READ SUBCHANNEL Q (NEC) %d\n", m_cdda_status);
 
-	if (!m_cd_file)
+	if (!m_cdrom)
 	{
 		/* Throw some error here */
 		reply_status_byte(SCSI_CHECK_CONDITION);
@@ -700,10 +697,10 @@ void pce_cd_device::nec_get_subq()
 	}
 
 	msf_abs = cdrom_file::lba_to_msf_alt(frame);
-	track = m_cd_file->get_track(frame);
-	msf_rel = cdrom_file::lba_to_msf_alt(frame - m_cd_file->get_track_start(track));
+	track = m_cdrom->get_track(frame);
+	msf_rel = cdrom_file::lba_to_msf_alt(frame - m_cdrom->get_track_start(track));
 
-	m_data_buffer[1] = 0x01 | ((m_cd_file->get_track_type(m_cd_file->get_track(track+1)) == cdrom_file::CD_TRACK_AUDIO) ? 0x00 : 0x40);
+	m_data_buffer[1] = 0x01 | ((m_cdrom->get_track_type(m_cdrom->get_track(track+1)) == cdrom_file::CD_TRACK_AUDIO) ? 0x00 : 0x40);
 	// track
 	m_data_buffer[2] = dec_2_bcd(track+1);
 	// index
@@ -742,13 +739,13 @@ void pce_cd_device::nec_get_dir_info()
 	uint32_t frame, msf, track = 0;
 	LOGCMD("0xde GET DIR INFO (NEC)\n");
 
-	if (!m_cd_file)
+	if (!m_cdrom)
 	{
 		/* Throw some error here */
 		reply_status_byte(SCSI_CHECK_CONDITION);
 	}
 
-	const cdrom_file::toc &toc = m_cd_file->get_toc();
+	const cdrom_file::toc &toc = m_cdrom->get_toc();
 
 	switch (m_command_buffer[1])
 	{
@@ -1097,7 +1094,7 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::data_timer_callback)
 	{
 		/* Read next data sector */
 		LOGSCSI("read sector %d\n", m_current_frame);
-		if (! m_cd_file->read_data(m_current_frame, m_data_buffer.get(), cdrom_file::CD_TRACK_MODE1))
+		if (! m_cdrom->read_data(m_current_frame, m_data_buffer.get(), cdrom_file::CD_TRACK_MODE1))
 		{
 			LOGSCSI("Mode1 CD read failed for frame #%d\n", m_current_frame);
 		}

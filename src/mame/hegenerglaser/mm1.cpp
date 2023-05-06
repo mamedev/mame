@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Berger
-/******************************************************************************
+/*******************************************************************************
 
 Mephisto MM I, the first H+G slide-in chesscomputer module
 
@@ -35,7 +35,7 @@ TODO:
 - mm1 unknown expansion rom at $c000?
 - add mm1 STP/ON buttons? (they're off/on, game continues when ON again)
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -115,9 +115,9 @@ void mm1_state::machine_reset()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 READ_LINE_MEMBER(mm1_state::clear_r)
 {
@@ -153,9 +153,9 @@ READ_LINE_MEMBER(mm1_state::keypad_r)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void mm1_state::mirage_map(address_map &map)
 {
@@ -183,9 +183,9 @@ void mm1_state::mm1_io(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( mm1 )
 	PORT_START("IN.0")
@@ -243,13 +243,13 @@ INPUT_CHANGED_MEMBER(mm1_state::mirage_switch_sensor_type)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void mm1_state::mirage(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	CDP1806(config, m_maincpu, 8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mm1_state::mirage_map);
 	m_maincpu->set_addrmap(AS_IO, &mm1_state::mm1_io);
@@ -261,11 +261,11 @@ void mm1_state::mirage(machine_config &config)
 	MEPHISTO_BUTTONS_BOARD(config, m_board); // see mirage_switch_sensor_type
 	m_board->set_delay(attotime::from_msec(200));
 
-	/* video hardware */
+	// video hardware
 	MEPHISTO_DISPLAY_MODULE1(config, "display");
 	config.set_default_layout(layout_mephisto_mirage);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
@@ -274,7 +274,7 @@ void mm1_state::mm1(machine_config &config)
 {
 	mirage(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &mm1_state::mm1_map);
 	m_maincpu->q_cb().set("display", FUNC(mephisto_display1_device::strobe_w));
 
@@ -289,9 +289,9 @@ void mm1_state::mm1(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( mm1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -314,12 +314,12 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME     PARENT CMP MACHINE INPUT   STATE      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1983, mm1,     0,      0, mm1,    mm1,    mm1_state, empty_init, "Hegener + Glaser", "Mephisto MM I (ver. A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1983, mm1b,    mm1,    0, mm1,    mm1,    mm1_state, empty_init, "Hegener + Glaser", "Mephisto MM I (ver. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE INPUT   CLASS      INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1983, mm1,     0,      0,      mm1,    mm1,    mm1_state, empty_init, "Hegener + Glaser", "Mephisto MM I (ver. A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1983, mm1b,    mm1,    0,      mm1,    mm1,    mm1_state, empty_init, "Hegener + Glaser", "Mephisto MM I (ver. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1984, mmirage, 0,      0, mirage, mirage, mm1_state, empty_init, "Hegener + Glaser", "Mephisto Mirage", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1984, mmirage, 0,      0,      mirage, mirage, mm1_state, empty_init, "Hegener + Glaser", "Mephisto Mirage", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

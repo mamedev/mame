@@ -51,49 +51,116 @@ struct CItem
   bool CheckPath(const UStringVector &pathParts, bool isFile) const;
 };
 
-class CCensorNode
+
+
+const Byte kMark_FileOrDir = 0;
+const Byte kMark_StrictFile = 1;
+const Byte kMark_StrictFile_IfWildcard = 2;
+
+struct CCensorPathProps
+{
+  bool Recursive;
+  bool WildcardMatching;
+  Byte MarkMode;
+  
+  CCensorPathProps():
+      Recursive(false),
+      WildcardMatching(true),
+      MarkMode(kMark_FileOrDir)
+      {}
+};
+
+
+class CCensorNode  MY_UNCOPYABLE
 {
   CCensorNode *Parent;
   
   bool CheckPathCurrent(bool include, const UStringVector &pathParts, bool isFile) const;
   void AddItemSimple(bool include, CItem &item);
 public:
-  bool CheckPathVect(const UStringVector &pathParts, bool isFile, bool &include) const;
+  // bool ExcludeDirItems;
 
-  CCensorNode(): Parent(0) { };
-  CCensorNode(const UString &name, CCensorNode *parent): Name(name), Parent(parent) { };
+  CCensorNode():
+      Parent(NULL)
+      // , ExcludeDirItems(false)
+      {};
+
+  CCensorNode(const UString &name, CCensorNode *parent):
+      Parent(parent)
+      // , ExcludeDirItems(false)
+      , Name(name)
+      {}
 
   UString Name; // WIN32 doesn't support wildcards in file names
   CObjectVector<CCensorNode> SubNodes;
   CObjectVector<CItem> IncludeItems;
   CObjectVector<CItem> ExcludeItems;
 
+  CCensorNode &Find_SubNode_Or_Add_New(const UString &name)
+  {
+    int i = FindSubNode(name);
+    if (i >= 0)
+      return SubNodes[(unsigned)i];
+    // return SubNodes.Add(CCensorNode(name, this));
+    CCensorNode &node = SubNodes.AddNew();
+    node.Parent = this;
+    node.Name = name;
+    return node;
+  }
+
   bool AreAllAllowed() const;
 
   int FindSubNode(const UString &path) const;
 
   void AddItem(bool include, CItem &item, int ignoreWildcardIndex = -1);
-  void AddItem(bool include, const UString &path, bool recursive, bool forFile, bool forDir, bool wildcardMatching);
-  void AddItem2(bool include, const UString &path, bool recursive, bool wildcardMatching);
+  // void AddItem(bool include, const UString &path, const CCensorPathProps &props);
+  void Add_Wildcard()
+  {
+    CItem item;
+    item.PathParts.Add(L"*");
+    item.Recursive = false;
+    item.ForFile = true;
+    item.ForDir = true;
+    item.WildcardMatching = true;
+    AddItem(
+        true // include
+        , item);
+  }
 
+  // NeedCheckSubDirs() returns true, if there are IncludeItems rules that affect items in subdirs
   bool NeedCheckSubDirs() const;
   bool AreThereIncludeItems() const;
+
+  /*
+  CheckPathVect() doesn't check path in Parent CCensorNode
+  so use CheckPathVect() for root CCensorNode
+  OUT:
+    returns (true) && (include = false) - file in exlude list
+    returns (true) && (include = true)  - file in include list and is not in exlude list
+    returns (false)  - file is not in (include/exlude) list
+  */
+  bool CheckPathVect(const UStringVector &pathParts, bool isFile, bool &include) const;
 
   // bool CheckPath2(bool isAltStream, const UString &path, bool isFile, bool &include) const;
   // bool CheckPath(bool isAltStream, const UString &path, bool isFile) const;
 
-  bool CheckPathToRoot(bool include, UStringVector &pathParts, bool isFile) const;
+  // CheckPathToRoot_Change() changes pathParts !!!
+  bool CheckPathToRoot_Change(bool include, UStringVector &pathParts, bool isFile) const;
+  bool CheckPathToRoot(bool include, const UStringVector &pathParts, bool isFile) const;
+
   // bool CheckPathToRoot(const UString &path, bool isFile, bool include) const;
   void ExtendExclude(const CCensorNode &fromNodes);
 };
 
-struct CPair
+
+struct CPair  MY_UNCOPYABLE
 {
   UString Prefix;
   CCensorNode Head;
   
-  CPair(const UString &prefix): Prefix(prefix) { };
+  // CPair(const UString &prefix): Prefix(prefix) { };
 };
+
 
 enum ECensorPathMode
 {
@@ -102,47 +169,62 @@ enum ECensorPathMode
   k_AbsPath     // full path in Tree
 };
 
+
 struct CCensorPath
 {
   UString Path;
   bool Include;
-  bool Recursive;
-  bool WildcardMatching;
+  CCensorPathProps Props;
 
   CCensorPath():
-    Include(true),
-    Recursive(false),
-    WildcardMatching(true)
-    {}
+      Include(true)
+      {}
 };
 
-class CCensor
+
+class CCensor  MY_UNCOPYABLE
 {
-  int FindPrefix(const UString &prefix) const;
+  int FindPairForPrefix(const UString &prefix) const;
 public:
   CObjectVector<CPair> Pairs;
+
+  bool ExcludeDirItems;
+  bool ExcludeFileItems;
+
+  CCensor():
+      ExcludeDirItems(false),
+      ExcludeFileItems(false)
+      {}
 
   CObjectVector<NWildcard::CCensorPath> CensorPaths;
   
   bool AllAreRelative() const
     { return (Pairs.Size() == 1 && Pairs.Front().Prefix.IsEmpty()); }
   
-  void AddItem(ECensorPathMode pathMode, bool include, const UString &path, bool recursive, bool wildcardMatching);
+  void AddItem(ECensorPathMode pathMode, bool include, const UString &path, const CCensorPathProps &props);
   // bool CheckPath(bool isAltStream, const UString &path, bool isFile) const;
   void ExtendExclude();
 
   void AddPathsToCensor(NWildcard::ECensorPathMode censorPathMode);
-  void AddPreItem(bool include, const UString &path, bool recursive, bool wildcardMatching);
-  void AddPreItem(const UString &path)
+  void AddPreItem(bool include, const UString &path, const CCensorPathProps &props);
+
+  void AddPreItem_NoWildcard(const UString &path)
   {
-    AddPreItem(true, path, false, false);
+    CCensorPathProps props;
+    props.WildcardMatching = false;
+    AddPreItem(
+        true,  // include
+        path, props);
   }
   void AddPreItem_Wildcard()
   {
-    AddPreItem(true, L"*", false, true);
+    CCensorPathProps props;
+    // props.WildcardMatching = true;
+    AddPreItem(
+        true,  // include
+        UString("*"), props);
   }
 };
-
 
 }
 

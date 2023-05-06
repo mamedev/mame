@@ -56,8 +56,8 @@ Notes:
     CN5     - cassette connector
     CN6     - keyboard connector
     SW1     - reset switch
-    SB1   	- solder bridge for A11/CS1 to ROM1/ROM3
-    SB2   	- solder bridge for A11/CS1 to ROM0/ROM2
+    SB1     - solder bridge for A11/CS1 to ROM1/ROM3
+    SB2     - solder bridge for A11/CS1 to ROM0/ROM2
 
 
 Calculate ROM checksum:
@@ -111,8 +111,8 @@ PCB Layout
 Notes:
     All IC's shown.
 
-	PROM0   - MMI 63S141N 512x4 TTL Bipolar PROM
-	ROM4    - 4Kx8 EPROM "TKN80-III"
+    PROM0   - MMI 63S141N 512x4 TTL Bipolar PROM
+    ROM4    - 4Kx8 EPROM "TKN80-III"
     6116    - Hitachi HM6116P-4 2Kx8 Static RAM
 
 
@@ -133,9 +133,9 @@ Switch to 80 column mode:
     - PWM sound in ABC-klubben/abc80/grafik/flagga.bac
     - proper keyboard controller emulation
     - GeJo 80-column card
-	- 64K RAM expansions
-    	- Mikrodatorn
-		- MYAB UNI-80
+    - 64K RAM expansions
+        - Mikrodatorn
+        - MYAB UNI-80
     - Metric ABC CAD 1000
 
 */
@@ -192,10 +192,10 @@ u8 tkn80_state::read(offs_t offset)
 {
 	/*
 
-		TKN 000-3ff -> ZA3506 000-3ff (9913/10042)
-		TKN 400-7ff -> ZA3507 000-3ff (9913/10042)
-		TKN 800-cff -> ZA3506 000-3ff (11273)
-		TKN c00-FFF -> ZA3507 000-3ff (11273)
+	    TKN 000-3ff -> ZA3506 000-3ff (9913/10042)
+	    TKN 400-7ff -> ZA3507 000-3ff (9913/10042)
+	    TKN 800-cff -> ZA3506 000-3ff (11273)
+	    TKN c00-FFF -> ZA3507 000-3ff (11273)
 
 	*/
 
@@ -683,7 +683,7 @@ QUICKLOAD_LOAD_MEMBER(abc80_state::quickload_cb)
 	space.write_byte(HEAD + 1, head >> 8);
 	if (LOG) logerror("HEAD %04x\n",address);
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -766,7 +766,7 @@ void abc80_state::abc80(machine_config &config)
 void tkn80_state::tkn80(machine_config &config)
 {
 	abc80_state::abc80_common(config);
-	
+
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_IO, &tkn80_state::tkn80_io);
 

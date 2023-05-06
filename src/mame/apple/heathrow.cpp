@@ -6,7 +6,7 @@
 
     These ASICs sit on the PCI bus and provide what came to be known as "Mac I/O",
     including:
-    - A VIA to interface with Cuda
+    - A VIA to interface with Cuda / an enhanced VIA that can speak SPI to interface with PG&E (O'Hare and later)
     - Serial
     - SWIM3 floppy
     - MESH SCSI ("Macintosh Enhanced SCSI Handler"), a 5394/96 clone with some features Apple didn't use removed)
@@ -21,6 +21,12 @@
 
 #include "bus/rs232/rs232.h"
 #include "formats/ap_dsk35.h"
+
+#define LOG_GENERAL (1U << 0)
+#define LOG_IRQ     (1U << 1)
+
+#define VERBOSE (0)
+#include "logmacro.h"
 
 static constexpr u32 C7M  = 7833600;
 static constexpr u32 C15M = (C7M * 2);
@@ -37,27 +43,51 @@ DEFINE_DEVICE_TYPE(GRAND_CENTRAL, grandcentral_device, "grndctrl", "Apple Grand 
 //-------------------------------------------------
 //  ADDRESS_MAP
 //-------------------------------------------------
-/*
-    A "Kanga" G3 PowerBook says:
-    16000 : VIA
-    12000 : SCC Rd
-    12000 : SCC Wr
-    15000 : IWM/SWIM
-    10000 : SCSI
-
-    DMA is at 8xxx (audio DMA at 88xx)
-    ATA is at 20000
+/*          Grand Central           O'Hare                  Heathrow/Paddington
+0x10000     SCSI0                   SCSI0                   SCSI
+0x11000     MACE Ethernet           (unused)                "BigMac" Ethernet
+0x12000     SCC "compatibility"     SCC compat              SCC compat
+0x13000     SCC "MacRisc"           SCC MacRisc             SCC MacRisc
+0x14000     Audio                   Audio                   Audio
+0x15000     SWIM3                   SWIM3                   SWIM3
+0x16000     VIA                     VIA                     VIA
+0x17000     VIA                     VIA                     VIA
+0x18000     SCSI1                   (unused)                (unused)
+0x19000     Ethernet MAC PROM       (unused)                ADB Master Cell
+0x1a000     (external IOBus)        (external IOBus)        (external IOBus)
+0x1b000     (external IOBus)        (external IOBus)        (external IOBus)
+0x1c000     (external IOBus)        (external IOBus)        (external IOBus)
+0x1d000     (external IOBus)        (external IOBus)        (external IOBus)
+0x1e000     (external IOBus)        (unused)
+0x1f000     (external IOBus)        (unused)
+0x20000     (external IOBus)        ATA bus 0               ATA bus 0
+0x21000     (external IOBus)        ATA bus 1               ATA bus 1
+0x60000     (128K BAR, no)          PRAM                    PRAM
+0x70000     (128K BAR, no)          PRAM                    PRAM
 */
+void grandcentral_device::map(address_map &map)
+{
+	map(0x00000, 0x00fff).rw(FUNC(grandcentral_device::macio_r), FUNC(grandcentral_device::macio_w));
+	map(0x08800, 0x0881f).m(m_dma_audio_out, FUNC(dbdma_device::map));
+	map(0x08900, 0x0891f).m(m_dma_audio_in, FUNC(dbdma_device::map));
+	map(0x12000, 0x12fff).rw(FUNC(grandcentral_device::scc_r), FUNC(grandcentral_device::scc_w));
+	map(0x13000, 0x13fff).rw(FUNC(grandcentral_device::scc_macrisc_r), FUNC(grandcentral_device::scc_macrisc_w));
+	map(0x14000, 0x140ff).rw(FUNC(heathrow_device::codec_r), FUNC(heathrow_device::codec_w));
+	map(0x15000, 0x15fff).rw(FUNC(grandcentral_device::fdc_r), FUNC(grandcentral_device::fdc_w));
+	map(0x16000, 0x17fff).rw(FUNC(grandcentral_device::mac_via_r), FUNC(grandcentral_device::mac_via_w));
+}
+
 void heathrow_device::map(address_map &map)
 {
 	map(0x00000, 0x00fff).rw(FUNC(heathrow_device::macio_r), FUNC(heathrow_device::macio_w));
+	map(0x08800, 0x0881f).m(m_dma_audio_out, FUNC(dbdma_device::map));
+	map(0x08900, 0x0891f).m(m_dma_audio_in, FUNC(dbdma_device::map));
 	map(0x12000, 0x12fff).rw(FUNC(heathrow_device::scc_r), FUNC(heathrow_device::scc_w));
 	map(0x13000, 0x13fff).rw(FUNC(heathrow_device::scc_macrisc_r), FUNC(heathrow_device::scc_macrisc_w));
-	map(0x14000, 0x1401f).rw(m_awacs, FUNC(awacs_device::read), FUNC(awacs_device::write));
-	map(0x14020, 0x14023).r(FUNC(heathrow_device::unk_r));
+	map(0x14000, 0x140ff).rw(FUNC(heathrow_device::codec_r), FUNC(heathrow_device::codec_w));
 	map(0x15000, 0x15fff).rw(FUNC(heathrow_device::fdc_r), FUNC(heathrow_device::fdc_w));
 	map(0x16000, 0x17fff).rw(FUNC(heathrow_device::mac_via_r), FUNC(heathrow_device::mac_via_w));
-	map(0x60000, 0x7ffff).rw(FUNC(heathrow_device::nvram_r), FUNC(heathrow_device::nvram_w));
+	map(0x60000, 0x7ffff).rw(FUNC(heathrow_device::nvram_r), FUNC(heathrow_device::nvram_w)).umask32(0x000000ff);
 }
 
 //-------------------------------------------------
@@ -71,16 +101,13 @@ void heathrow_device::device_add_mconfig(machine_config &config)
 	m_via1->writepa_handler().set(FUNC(heathrow_device::via_out_a));
 	m_via1->writepb_handler().set(FUNC(heathrow_device::via_out_b));
 	m_via1->cb2_handler().set(FUNC(heathrow_device::via_out_cb2));
-	m_via1->irq_handler().set(FUNC(heathrow_device::via1_irq));
+	m_via1->irq_handler().set(FUNC(heathrow_device::set_irq_line<18>));
 
-	AWACS(config, m_awacs, 45.1584_MHz_XTAL / 2);
-	m_awacs->dma_output().set(FUNC(heathrow_device::sound_dma_output));
-	m_awacs->dma_input().set(FUNC(heathrow_device::sound_dma_input));
+	DBDMA_CHANNEL(config, m_dma_audio_out, 0);
+	m_dma_audio_out->irq_callback().set(FUNC(heathrow_device::set_irq_line<8>));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	m_awacs->add_route(0, "lspeaker", 1.0);
-	m_awacs->add_route(1, "rspeaker", 1.0);
+	DBDMA_CHANNEL(config, m_dma_audio_in, 0);
+	m_dma_audio_in->irq_callback().set(FUNC(heathrow_device::set_irq_line<9>));
 
 	SWIM3(config, m_fdc, C15M);
 	m_fdc->devsel_cb().set(FUNC(heathrow_device::devsel_w));
@@ -116,16 +143,21 @@ void heathrow_device::config_map(address_map &map)
 
 heathrow_device::heathrow_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: pci_device(mconfig, type, tag, owner, clock),
+	  write_irq(*this),
 	  write_pb4(*this),
 	  write_pb5(*this),
 	  write_cb2(*this),
 	  read_pb3(*this),
+	  read_codec(*this),
+	  write_codec(*this),
 	  m_maincpu(*this, finder_base::DUMMY_TAG),
 	  m_via1(*this, "via1"),
 	  m_fdc(*this, "fdc"),
 	  m_floppy(*this, "fdc:%d", 0U),
-	  m_awacs(*this, "awacs"),
 	  m_scc(*this, "scc"),
+	  m_dma_audio_in(*this, "dma_audin"),
+	  m_dma_audio_out(*this, "dma_audout"),
+	  m_pci_memory(*this, ":pci:00.0", AS_DATA),
 	  m_cur_floppy(nullptr),
 	  m_hdsel(0)
 {
@@ -158,41 +190,58 @@ ohare_device::ohare_device(const machine_config &mconfig, const char *tag, devic
 
 void heathrow_device::common_init()
 {
+	write_irq.resolve_safe();
 	write_pb4.resolve_safe();
 	write_pb5.resolve_safe();
 	write_cb2.resolve_safe();
 	read_pb3.resolve_safe(0);
+	read_codec.resolve_safe(0);
+	write_codec.resolve_safe();
 
-	m_6015_timer = timer_alloc(FUNC(heathrow_device::mac_6015_tick), this);
-	m_6015_timer->adjust(attotime::never);
-	save_item(NAME(m_hdsel));
+	m_dma_audio_out->set_address_space(m_pci_memory);
 
-	add_map(0x80000, M_MEM, FUNC(heathrow_device::map));
 	command = 2; // enable our memory range
 	revision = 1;
+
+	m_InterruptEvents = m_InterruptMask = m_InterruptLevels = 0;
+	m_InterruptEvents2 = m_InterruptMask2 = m_InterruptLevels2 = 0;
+	recalc_irqs();
+
+	save_item(NAME(m_hdsel));
+	save_item(NAME(m_InterruptEvents));
+	save_item(NAME(m_InterruptMask));
+	save_item(NAME(m_InterruptLevels));
+	save_item(NAME(m_InterruptEvents2));
+	save_item(NAME(m_InterruptMask2));
+	save_item(NAME(m_InterruptLevels2));
+	save_item(NAME(m_nvram));
 }
 
 void heathrow_device::device_start()
 {
 	common_init();
+	add_map(0x80000, M_MEM, FUNC(heathrow_device::map));
 	set_ids(0x106b0010, 0x01, 0xff000001, 0x000000);
 }
 
 void paddington_device::device_start()
 {
 	common_init();
+	add_map(0x80000, M_MEM, FUNC(heathrow_device::map));
 	set_ids(0x106b0017, 0x01, 0xff000001, 0x000000);
 }
 
 void grandcentral_device::device_start()
 {
 	common_init();
+	add_map(0x20000, M_MEM, FUNC(heathrow_device::map));    // Grand Central only has 128K of BAR space, the others have 512K
 	set_ids(0x106b0002, 0x01, 0xff000001, 0x000000);
 }
 
 void ohare_device::device_start()
 {
 	common_init();
+	add_map(0x80000, M_MEM, FUNC(heathrow_device::map));
 	set_ids(0x106b0007, 0x01, 0xff000001, 0x000000);
 }
 
@@ -202,16 +251,7 @@ void ohare_device::device_start()
 
 void heathrow_device::device_reset()
 {
-	// start 60.15 Hz timer
-	m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
-
 	m_hdsel = 0;
-}
-
-TIMER_CALLBACK_MEMBER(heathrow_device::mac_6015_tick)
-{
-	m_via1->write_ca1(CLEAR_LINE);
-	m_via1->write_ca1(ASSERT_LINE);
 }
 
 u8 heathrow_device::via_in_a()
@@ -246,10 +286,6 @@ void heathrow_device::via_out_b(u8 data)
 {
 	write_pb4(BIT(data, 4));
 	write_pb5(BIT(data, 5));
-}
-
-WRITE_LINE_MEMBER(heathrow_device::via1_irq)
-{
 }
 
 WRITE_LINE_MEMBER(heathrow_device::cb1_w)
@@ -353,13 +389,126 @@ void heathrow_device::devsel_w(u8 devsel)
 
 u32 heathrow_device::macio_r(offs_t offset)
 {
+	// InterruptLevels = live status of all interrupt lines
+	// InterruptMask = mask to determine which bits of InterruptLevels matter
+	// InterruptEvents = interrupts allowed to fire by InterruptMask
 //  printf("macio_r: offset %x (%x)\n", offset, offset*4);
+	switch (offset << 2)
+	{
+		case 0x10:
+			return swapendian_int32(m_InterruptEvents2 & m_InterruptMask2);
+		case 0x14:
+			return swapendian_int32(m_InterruptMask2);
+		case 0x1c:
+			return swapendian_int32(m_InterruptLevels2);
+		case 0x20:
+			return swapendian_int32(m_InterruptEvents & m_InterruptMask);
+		case 0x24:
+			return swapendian_int32(m_InterruptMask);
+		case 0x2c:
+			return swapendian_int32(m_InterruptLevels);
+	}
 	return 0;
 }
 
 void heathrow_device::macio_w(offs_t offset, u32 data, u32 mem_mask)
 {
+	data = swapendian_int32(data);
+	mem_mask = swapendian_int32(mem_mask);
 //  printf("macio_w: offset %x (%x) data %08x mask %08x\n", offset, offset*4, data, mem_mask);
+	switch (offset << 2)
+	{
+		case 0x14:
+			m_InterruptMask2 = data;
+			recalc_irqs();
+			break;
+		case 0x18:  // InterruptClear
+			// which interrupt mode?
+			if (BIT(m_InterruptMask2, 31))
+			{
+				// in Mode 1, "1" to bit 31 clears all active interrupts
+				if (BIT(data, 31))
+				{
+					m_InterruptEvents2 = 0;
+				}
+				else
+				{
+					m_InterruptEvents2 &= (data ^ 0xffffffff);
+				}
+			}
+			else
+			{
+				m_InterruptEvents2 &= (data ^ 0xffffffff);
+			}
+			recalc_irqs();
+			break;
+		case 0x24:
+			m_InterruptMask = data;
+			recalc_irqs();
+			break;
+		case 0x28:  // InterruptClear
+			// which interrupt mode?
+			if (BIT(m_InterruptMask, 31))
+			{
+				// in Mode 1, "1" to bit 31 clears all active interrupts
+				if (BIT(data, 31))
+				{
+					m_InterruptEvents = 0;
+				}
+				else
+				{
+					m_InterruptEvents &= (data ^ 0xffffffff);
+				}
+			}
+			else
+			{
+				m_InterruptEvents &= (data ^ 0xffffffff);
+			}
+			recalc_irqs();
+			break;
+	}
+}
+
+void heathrow_device::recalc_irqs()
+{
+	LOGMASKED(LOG_IRQ, "%s recalc_irqs: events %08x levels %08x mask %08x\n", tag(), m_InterruptEvents, m_InterruptLevels, m_InterruptMask);
+	m_InterruptEvents = m_InterruptLevels & m_InterruptMask;
+	m_InterruptEvents2 = m_InterruptLevels2 & m_InterruptMask2;
+	if (m_InterruptEvents || m_InterruptEvents2)
+	{
+		write_irq(ASSERT_LINE);
+	}
+	else
+	{
+		write_irq(CLEAR_LINE);
+	}
+}
+
+template<int bit> WRITE_LINE_MEMBER(heathrow_device::set_irq_line)
+{
+	if (bit < 32)
+	{
+		if (state == ASSERT_LINE)
+		{
+			m_InterruptLevels |= (1 << bit);
+		}
+		else
+		{
+			m_InterruptLevels &= ((1 << bit) ^ 0xffffffff);
+		}
+	}
+	else
+	{
+		if (state == ASSERT_LINE)
+		{
+			m_InterruptLevels2 |= (1 << (bit-32));
+		}
+		else
+		{
+			m_InterruptLevels2 &= ((1 << (bit-32)) ^ 0xffffffff);
+		}
+	}
+	recalc_irqs();
 }
 
 u8 heathrow_device::fdc_r(offs_t offset)
@@ -374,12 +523,12 @@ void heathrow_device::fdc_w(offs_t offset, u8 data)
 
 u8 heathrow_device::nvram_r(offs_t offset)
 {
-	return m_nvram[offset >> 2];
+	return m_nvram[offset>>2];
 }
 
 void heathrow_device::nvram_w(offs_t offset, u8 data)
 {
-	m_nvram[offset >> 2] = data;
+	m_nvram[offset>>2] = data;
 }
 
 u16 heathrow_device::scc_r(offs_t offset)
@@ -430,21 +579,23 @@ void heathrow_device::scc_macrisc_w(offs_t offset, u8 data)
 	}
 }
 
-u32 heathrow_device::unk_r(offs_t offset)
+// Audio support
+uint32_t heathrow_device::codec_r(offs_t offset)
 {
-	m_toggle ^= 0xffffffff;
-	return m_toggle;
+	return read_codec(offset);
 }
 
-// *****************************************************
-// DMA
-// *****************************************************
-
-u32 heathrow_device::sound_dma_output(offs_t offset)
+void heathrow_device::codec_w(offs_t offset, uint32_t data)
 {
-	return 0;
+	write_codec(offset, data);
 }
 
-void heathrow_device::sound_dma_input(offs_t offset, u32 value)
+u32 heathrow_device::codec_dma_read(u32 offset)
 {
+	return m_dma_audio_out->dma_read(offset);
+}
+
+void heathrow_device::codec_dma_write(u32 offset, u32 data)
+{
+	m_dma_audio_in->dma_write(offset, data);
 }

@@ -55,6 +55,82 @@ c:index_of(v)
     value.
 
 
+.. _luareference-globals:
+
+Global objects
+--------------
+
+.. _luareference-globals-emu:
+
+Emulator interface
+~~~~~~~~~~~~~~~~~~
+
+The emulator interface ``emu`` provides access to core functionality.  Many
+classes are also available as properties of the emulator interface.
+
+Methods
+^^^^^^^
+
+emu.wait(duration, …)
+    Yields for the specified duration in terms of emulated time.  The duration
+    may be specified as an :ref:`attotime <luareference-core-attotime>` or a
+    number in seconds.  Any additional arguments are returned to the caller.
+    Returns a Boolean indicating whether the duration expired normally.
+
+    All outstanding calls to ``emu.wait`` will return ``false`` immediately if a
+    saved state is loaded or the emulation session ends.  Calling this function
+    from callbacks that are not run as coroutines will raise an error.
+emu.wait_next_update(…)
+    Yields until the next video/UI update.  Any arguments are returned to the
+    caller.  Calling this function from callbacks that are not run as coroutines
+    will raise an error.
+emu.wait_next_frame(…)
+    Yields until the next emulated frame completes.  Any arguments are returned
+    to the caller.  Calling this function from callbacks that are not run as
+    coroutines will raise an error.
+emu.add_machine_reset_notifier(callback)
+    Add a callback to receive notifications when the emulated system is reset.
+    Returns a :ref:`notifier subscription <luareference-core-notifiersub>`.
+emu.add_machine_stop_notifier(callback)
+    Add a callback to receive notifications when the emulated system is stopped.
+    Returns a :ref:`notifier subscription <luareference-core-notifiersub>`.
+emu.add_machine_pause_notifier(callback)
+    Add a callback to receive notifications when the emulated system is paused.
+    Returns a :ref:`notifier subscription <luareference-core-notifiersub>`.
+emu.add_machine_resume_notifier(callback)
+    Add a callback to receive notifications when the emulated system is resumed
+    after being paused.  Returns a
+    :ref:`notifier subscription <luareference-core-notifiersub>`.
+emu.add_machine_frame_notifier(callback)
+    Add a callback to receive notifications when an emulated frame completes.
+    Returns a :ref:`notifier subscription <luareference-core-notifiersub>`.
+emu.add_machine_pre_save_notifier(callback)
+    Add a callback to receive notification before the emulated system state is
+    saved.  Returns a
+    :ref:`notifier subscription <luareference-core-notifiersub>`.
+emu.add_machine_post_load_notifier(callback)
+    Add a callback to receive notification after the emulated system is restored
+    to a previously saved state.  Returns a
+    :ref:`notifier subscription <luareference-core-notifiersub>`.
+emu.print_error(message)
+    Print an error message.
+emu.print_warning(message)
+    Print a warning message.
+emu.print_info(message)
+    Print an informational message.
+emu.print_verbose(message)
+    Print a verbose diagnostic message (disabled by default).
+emu.print_debug(message)
+    Print a debug message (only enabled for debug builds by default).
+emu.lang_translate([context], message)
+    Look up a message with optional context in the current localised message
+    catalog.  Returns the message unchanged if no corresponding localised
+    message is found.
+emu.subst_env(string)
+    Substitute environment variables in a string.  The syntax is dependent on
+    the host operating system.
+
+
 .. _luareference-core:
 
 Core classes
@@ -1598,7 +1674,8 @@ Pass-through handler
 Tracks a pass-through handler installed in an
 :ref:`address space <luareference-mem-space>`.  A memory pass-through handler
 receives notifications on accesses to a specified range of addresses, and can
-modify the data that is read or written if desired.
+modify the data that is read or written if desired.  Note that pass-through handler
+callbacks are not run as coroutines.
 
 Instantiation
 ^^^^^^^^^^^^^
@@ -3132,6 +3209,10 @@ emu.bitmap_argb32(source, [x0, y0, x1, y1])
     The source bitmap must be owned by the Lua script and must use the ARGB
     format.  Raises an error if coordinates are specified representing a
     rectangle not fully contained within the source bitmap’s clipping rectangle.
+emu.bitmap_argb32.load(data)
+    Creates an ARGB format bitmap from data in PNG, JPEG (JFIF/EXIF) or
+    Microsoft DIB (BMP) format.  Raises an error if the data invalid or not a
+    supported format.
 
 Methods
 ^^^^^^^
@@ -3572,7 +3653,8 @@ Layout file
 ~~~~~~~~~~~
 
 Wraps MAME’s ``layout_file`` class, representing the views loaded from a layout
-file for use by a render target.
+file for use by a render target.  Note that layout file callbacks are not run as
+coroutines.
 
 Instantiation
 ^^^^^^^^^^^^^
@@ -3616,7 +3698,8 @@ Layout view
 Wraps MAME’s ``layout_view`` class, representing a view that can be displayed in
 a render target.  Views are created from XML layout files, which may be loaded
 from external artwork, internal to MAME, or automatically generated based on the
-screens in the emulated system.
+screens in the emulated system.  Note that layout view callbacks are not run as
+coroutines.
 
 Instantiation
 ^^^^^^^^^^^^^
@@ -3695,7 +3778,8 @@ Layout view item
 
 Wraps MAME’s ``layout_view_item`` class, representing an item in a view.  An
 item is drawn as a rectangular textured surface.  The texture is supplied by an
-emulated screen or a layout element.
+emulated screen or a layout element.  Note that layout view item callbacks are
+not run as coroutines.
 
 Instantiation
 ^^^^^^^^^^^^^

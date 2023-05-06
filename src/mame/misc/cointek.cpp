@@ -5,7 +5,7 @@
 Unknown game running on a PCB with the following components:
 Z80 (a second one is probably inside the box on the daughter board)
 3 x D8255AC-2
-HD63310P20
+HD63310P20 S-DPRAM
 12.00 crystal
 3.579545 crystal (near YM2413)
 10 x 6116
@@ -229,7 +229,7 @@ void cointek_state::init_unkct()
 			rom[i] = bitswap<8>(rom[i], 7, 6, 3, 4, 5, 2, 1, 0);
 }
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
 GAME( 1989, unkct, 0, cointek, unkct, cointek_state, init_unkct, ROT0, "Cointek Enterprise Corp", "unknown Cointek game", MACHINE_IS_SKELETON ) // string in ROM at 0x7839: Ver 4.00 1989-08-01

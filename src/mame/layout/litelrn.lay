@@ -44,7 +44,7 @@ license:CC0-1.0
 			<bounds x="0" y="0.35" width="1" height="3" />
 			<color red="0.05" green="0.05" blue="0.05" />
 		</text>
-		<text state="0x03" string="BANJO">
+		<text state="0x02" string="BANJO">
 			<bounds x="0" y="0.35" width="1" height="3" />
 			<color red="0.05" green="0.05" blue="0.05" />
 		</text>

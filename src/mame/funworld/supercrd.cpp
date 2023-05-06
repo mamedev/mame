@@ -8,6 +8,8 @@
   Encrypted CPU (based on a Z80)
   plus 2x 8255 + YM3014 + YM3812 hardware.
 
+  Close to Amatic 8000-1 hardware.
+
 
   Driver by Roberto Fresca.
 
@@ -18,6 +20,16 @@
 
   * Super Card (encrypted),    Fun World, 1992.
   * Fruit Star (encrypted),    Fun World, 1992.
+
+
+***********************************************************************************
+
+  To boot into the game...
+
+  1) Let the initial test ends.
+  2) Turn ON Service Key (key 9). The screen will show "Elektronik Defekt 5".
+  3) Turn ON Personal A key (key 0).
+  4) Turn OFF Personal A key.
 
 
 ***********************************************************************************
@@ -169,6 +181,7 @@
 
 ***********************************************************************************/
 
+
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
@@ -265,13 +278,13 @@ void supercrd_state::palette(palette_device &palette) const
 		bit2 = BIT(color_prom[i], 2);
 		int const r = combine_weights(weights_r, bit0, bit1, bit2);
 
-		// blue component */
+		// blue component
 		bit0 = BIT(color_prom[i], 3);
 		bit1 = BIT(color_prom[i], 4);
 		bit2 = BIT(color_prom[i], 5);
 		int const b = combine_weights(weights_b, bit0, bit1, bit2);
 
-		// green component */
+		// green component
 		bit0 = BIT(color_prom[i], 6);
 		bit1 = BIT(color_prom[i], 7);
 		int const g = combine_weights(weights_g, bit0, bit1);
@@ -312,7 +325,7 @@ TILE_GET_INFO_MEMBER(supercrd_state::get_bg_tile_info)
 
 void supercrd_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supercrd_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 4, 8, 96, 29);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supercrd_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 4, 8, 96, 31);
 }
 
 
@@ -334,10 +347,12 @@ uint8_t supercrd_state::decrypted_opcodes_r(offs_t offset)
 	return data ^ m_decode_table[offset & 0x03][row][xor_v];
 }
 
+
 void supercrd_state::machine_start()
 {
 	m_rombank->configure_entries(0, 2, memregion("maincpu")->base() + 0x8000, 0x4000); // TODO: should be more than just 2, at least for supercrd, but for now games don't run enough to reach them
 }
+
 
 /*****************************
 *   Memory map information   *
@@ -375,70 +390,68 @@ void supercrd_state::decrypted_opcodes_map(address_map &map)
 
 static INPUT_PORTS_START( supercrd )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("IN0-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2) PORT_NAME("IN0-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("IN0-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("IN0-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5) PORT_NAME("IN0-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6) PORT_NAME("IN0-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7) PORT_NAME("IN0-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8) PORT_NAME("IN0-8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_1) PORT_NAME("IN0-1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_2) PORT_NAME("IN0-2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_3) PORT_NAME("IN0-3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_4) PORT_NAME("IN0-4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_F) PORT_NAME("IN0-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_U) PORT_NAME("IN0-6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_7) PORT_NAME("IN0-7")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q) PORT_NAME("IN1-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("IN1-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E) PORT_NAME("IN1-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R) PORT_NAME("IN1-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("IN1-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y) PORT_NAME("IN1-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U) PORT_NAME("IN1-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("IN1-8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_O) PORT_NAME("IN1-2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_R) PORT_NAME("IN1-4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_T) PORT_NAME("IN1-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_Y) PORT_NAME("IN1-6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_0) PORT_NAME("Service A (Personal A)") PORT_TOGGLE  // Service/Personal A key - Bookkeeping
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_I) PORT_NAME("IN1-8")
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("IN2-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("IN2-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("IN2-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F) PORT_NAME("IN2-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G) PORT_NAME("IN2-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("IN2-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J) PORT_NAME("IN2-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K) PORT_NAME("IN2-8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_A) PORT_NAME("IN2-1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_S) PORT_NAME("IN2-2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )                 PORT_NAME("Remote Credits")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9) PORT_NAME("Service Key") PORT_TOGGLE  // Sw Elektronik Defekt 5
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_G) PORT_NAME("IN2-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_H) PORT_NAME("IN2-6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_J) PORT_NAME("IN2-7")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_K) PORT_NAME("IN2-8")
 
 	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z) PORT_NAME("IN3-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("IN3-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C) PORT_NAME("IN3-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V) PORT_NAME("IN3-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B) PORT_NAME("IN3-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N) PORT_NAME("IN3-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M) PORT_NAME("IN3-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L) PORT_NAME("IN3-8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_Z) PORT_NAME("IN3-1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_X) PORT_NAME("IN3-2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_C) PORT_NAME("IN3-3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_V) PORT_NAME("IN3-4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_B) PORT_NAME("IN3-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_N) PORT_NAME("IN3-6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_M) PORT_NAME("IN3-7")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_L) PORT_NAME("IN3-8")
 
 	PORT_START("SW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, "Personal A Settings" )
+	PORT_DIPSETTING(    0x01, "Brief" )                 // Remote A, Abgeschrieben A.
+	PORT_DIPSETTING(    0x00, "Complete" )              // Remote A, Gewechselt A, Abgeschrieben A, Nachgefuellt A.
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x04, "10 credits" )
+	PORT_DIPSETTING(    0x00, "5 credits" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x08, "10 credits" )
+	PORT_DIPSETTING(    0x00, "5 credits" )
+	PORT_DIPNAME( 0x10, 0x10, "Remote Value" )
+	PORT_DIPSETTING(    0x10, "100 Credits / Pulse" )
+	PORT_DIPSETTING(    0x00, "50 Credits / Pulse" )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE )  PORT_CODE(KEYCODE_8) PORT_NAME("Remote Credits (Service)")
 INPUT_PORTS_END
 
 
@@ -503,7 +516,7 @@ void supercrd_state::supercrd(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size((124+1)*4, (30+1)*8);               // Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1)
+	screen.set_size((124+1)*4, (30+1)*8);          // Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1)
 	screen.set_visarea(0*4, 96*4-1, 0*8, 29*8-1);  // Taken from MC6845 init, registers 01 & 06
 	screen.set_screen_update(FUNC(supercrd_state::screen_update));
 
@@ -514,12 +527,12 @@ void supercrd_state::supercrd(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(4);
-	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI); // no NMI mask?
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);  // no NMI mask?
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	YM3812(config, "ymsnd", MASTER_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 0.5); // Y3014B DAC
+	YM3812(config, "ymsnd", MASTER_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 0.5);  // Y3014B DAC
 }
 
 
@@ -531,7 +544,7 @@ ROM_START( supercrd )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "supca_417_ce1.ic37", 0x00000, 0x08000, CRC(b67f7d38) SHA1(eaf8f24d476185d4744858afcbf0005362f49cab) )
 	ROM_CONTINUE(                   0x00000, 0x08000 )
-	ROM_LOAD( "supca_417_ce2.ic51", 0x08000, 0x08000, CRC(36415f73) SHA1(9881b88991f034d79260502289432a7318aa1647) )    // wrong
+	ROM_LOAD( "supca_417_ce2.ic51", 0x08000, 0x08000, CRC(36415f73) SHA1(9881b88991f034d79260502289432a7318aa1647) )
 	ROM_IGNORE(                     0x8000)
 
 	ROM_REGION( 0x20000, "gfxtemp", 0 )
@@ -566,9 +579,9 @@ ROM_END
 */
 ROM_START( fruitstr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "fruitstar_t10s-i-1.ic37", 0x0000, 0x8000, CRC(cd458e9f) SHA1(3fdf59360704ae1550c108c59907067fc7c8424c) ) // 1st half: empty; 2nd half: program (1st half)
+	ROM_LOAD( "fruitstar_t10s-i-1.ic37", 0x0000, 0x8000, CRC(cd458e9f) SHA1(3fdf59360704ae1550c108c59907067fc7c8424c) )  // 1st half: empty; 2nd half: program (1st half)
 	ROM_CONTINUE(                        0x0000, 0x8000)
-	ROM_LOAD( "fruitstar_t10s-i-2.ic51", 0x8000, 0x8000, CRC(4536976b) SHA1(9a0ef6245e5aedfdb690df4c6d7a32ebf1b22590) ) // 1st half: program (2nd half); 2nd half: empty
+	ROM_LOAD( "fruitstar_t10s-i-2.ic51", 0x8000, 0x8000, CRC(4536976b) SHA1(9a0ef6245e5aedfdb690df4c6d7a32ebf1b22590) )  // 1st half: program (2nd half); 2nd half: empty
 	ROM_IGNORE(                                  0x8000)
 
 	ROM_REGION( 0x20000, "gfxtemp", 0 )
@@ -586,15 +599,17 @@ ROM_END
 
 
 /*
-Encryption observations:
-- only opcodes are encrypted;
-- there are 4 XOR tables selected by bits 0 and 1 of the address;
-- within a table the XOR is chosen depending on bits 0, 1, 2, 4, 6, 7 of the data. Only bit 3 and 5 aren't considered;
-- XOR values only affect bits 0, 1, 4 and 6;
-- the games use different XOR tables;
-- code is mostly the same for both games up to 0x96e, then they start differing significantly;
-- the encryption concept is the same as ladylinrb,c,d,e in igs/goldstar.cpp;
-- compare to suprstar in misc/amaticmg.cpp for confirmed correctly decrypted code.
+  Encryption observations:
+
+  - only opcodes are encrypted;
+  - there are 4 XOR tables selected by bits 0 and 1 of the address;
+  - within a table the XOR is chosen depending on bits 0, 1, 2, 4, 6, 7 of the data. Only bit 3 and 5 aren't considered;
+  - XOR values only affect bits 0, 1, 4 and 6;
+  - the games use different XOR tables;
+  - code is mostly the same for both games up to 0x96e, then they start differing significantly;
+  - the encryption concept is the same as ladylinrb,c,d,e in igs/goldstar.cpp;
+  - compare to suprstar in misc/amaticmg.cpp for confirmed correctly decrypted code.
+
 */
 
 void supercrd_state::init_supercrd() // TODO: check unknown opcodes
@@ -608,7 +623,7 @@ void supercrd_state::init_supercrd() // TODO: check unknown opcodes
 			{ 0x11, 0x52, 0x50, 0x43, 0x10, 0x43, unkn, 0x02 }, // 0x1x and 0x3x
 			{ 0x51, 0x13, 0x02, 0x12, 0x43, 0x00, unkn, 0x51 }, // 0x4x and 0x6x
 			{ 0x50, 0x53, 0x13, 0x00, 0x51, 0x12, 0x02, 0x11 }, // 0x5x and 0x7x
-			{ 0x12, unkn, 0x40, 0x51, 0x03, 0x50, unkn, 0x12 }, // 0x8x and 0xax
+			{ 0x12, 0x02, 0x40, 0x51, 0x03, 0x50, unkn, 0x12 }, // 0x8x and 0xax
 			{ 0x50, 0x01, 0x53, 0x50, 0x43, 0x43, unkn, 0x00 }, // 0x9x and 0xbx
 			{ unkn, 0x41, 0x43, 0x52, 0x42, 0x00, unkn, unkn }, // 0xcx and 0xex
 			{ 0x43, 0x02, unkn, 0x02, unkn, 0x43, 0x10, 0x43 }  // 0xdx and 0xfx
@@ -676,10 +691,10 @@ void supercrd_state::init_fruitstr() // TODO: check unknown opcodes
 			{ 0x50, 0x50, 0x12, unkn, unkn, 0x41, 0x43, 0x40 }  // 0xdx and 0xfx
 		},
 		{
-			{ 0x42, 0x11, 0x51, 0x51, 0x51, 0x12, 0x10, 0x03 }, // 0x0x and 0x2x
+			{ 0x42, 0x11, 0x41, 0x51, 0x51, 0x12, 0x10, 0x03 }, // 0x0x and 0x2x
 			{ 0x40, 0x12, 0x13, 0x01, 0x42, 0x10, 0x51, 0x03 }, // 0x1x and 0x3x
 			{ 0x01, 0x41, 0x11, 0x41, 0x42, 0x00, 0x41, 0x01 }, // 0x4x and 0x6x
-			{ unkn, 0x40, 0x41, 0x02, 0x41, 0x11, 0x02, 0x00 }, // 0x5x and 0x7x
+			{ 0x10, 0x40, 0x41, 0x02, 0x41, 0x11, 0x02, 0x00 }, // 0x5x and 0x7x
 			{ 0x12, 0x41, 0x50, 0x42, 0x00, unkn, unkn, 0x03 }, // 0x8x and 0xax
 			{ 0x11, 0x40, 0x02, unkn, 0x52, 0x43, 0x00, 0x40 }, // 0x9x and 0xbx
 			{ 0x51, 0x52, unkn, unkn, 0x51, 0x00, 0x40, 0x50 }, // 0xcx and 0xex
@@ -691,7 +706,7 @@ void supercrd_state::init_fruitstr() // TODO: check unknown opcodes
 			{ 0x00, 0x51, unkn, 0x40, 0x03, 0x00, 0x02, 0x50 }, // 0x4x and 0x6x
 			{ 0x03, 0x51, 0x43, 0x03, 0x01, 0x53, 0x10, 0x50 }, // 0x5x and 0x7x
 			{ 0x51, 0x40, 0x51, 0x02, 0x02, 0x52, 0x40, 0x13 }, // 0x8x and 0xax
-			{ 0xff, unkn, 0x02, 0x41, 0x42, 0x51, unkn, 0x13 }, // 0x9x and 0xbx
+			{ unkn, unkn, 0x02, 0x41, 0x42, 0x51, unkn, 0x13 }, // 0x9x and 0xbx
 			{ 0x51, 0x52, 0x02, 0x00, unkn, 0x00, 0x53, 0x13 }, // 0xcx and 0xex
 			{ 0x53, 0x13, 0x50, 0x41, 0x53, 0x42, 0x40, 0x02 }  // 0xdx and 0xfx
 		},
@@ -725,5 +740,5 @@ void supercrd_state::init_fruitstr() // TODO: check unknown opcodes
 
 
 //    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT           ROT   COMPANY      FULLNAME                  FLAGS
-GAME( 1992, supercrd, 0,      supercrd, supercrd, supercrd_state, init_supercrd, ROT0, "Fun World", "Super Card (encrypted)", MACHINE_IS_SKELETON )
-GAME( 1992, fruitstr, 0,      supercrd, supercrd, supercrd_state, init_fruitstr, ROT0, "Fun World", "Fruit Star (encrypted)", MACHINE_IS_SKELETON )
+GAME( 1992, supercrd, 0,      supercrd, supercrd, supercrd_state, init_supercrd, ROT0, "Fun World", "Super Card (encrypted)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
+GAME( 1992, fruitstr, 0,      supercrd, supercrd, supercrd_state, init_fruitstr, ROT0, "Fun World", "Fruit Star (encrypted)", MACHINE_NOT_WORKING )

@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco, hap
-/******************************************************************************
+/*******************************************************************************
 
 Mephisto Polgar
 
@@ -12,7 +12,7 @@ Hardware notes:
 
 The 10MHz version has a W65C02P-8 @ 9.83MHz.
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -52,9 +52,9 @@ private:
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 u8 polgar_state::keys_r(offs_t offset)
 {
@@ -63,9 +63,9 @@ u8 polgar_state::keys_r(offs_t offset)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void polgar_state::polgar_mem(address_map &map)
 {
@@ -82,9 +82,9 @@ void polgar_state::polgar_mem(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( polgar )
 	PORT_START("KEY")
@@ -103,12 +103,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void polgar_state::polgar(machine_config &config)
 {
+	// basic machine hardware
 	R65C02(config, m_maincpu, 4.9152_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &polgar_state::polgar_mem);
 
@@ -134,6 +135,7 @@ void polgar_state::polgar10(machine_config &config)
 {
 	polgar(config);
 
+	// basic machine hardware
 	M65C02(config.replace(), m_maincpu, 9.8304_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &polgar_state::polgar_mem);
 
@@ -143,9 +145,9 @@ void polgar_state::polgar10(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( polgar )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -171,12 +173,12 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
     Drivers
-***************************************************************************/
+*******************************************************************************/
 
-/*    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT   CLASS         INIT        COMPANY             FULLNAME                   FLAGS */
-CONS( 1990, polgar,    0,       0,      polgar,   polgar, polgar_state, empty_init, "Hegener + Glaser", "Mephisto Polgar (v1.50)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, polgara,   polgar,  0,      polgar,   polgar, polgar_state, empty_init, "Hegener + Glaser", "Mephisto Polgar (v1.10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, polgar101, polgar,  0,      polgar10, polgar, polgar_state, empty_init, "Hegener + Glaser", "Mephisto Polgar 10 MHz (v10.1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, polgar10,  polgar,  0,      polgar10, polgar, polgar_state, empty_init, "Hegener + Glaser", "Mephisto Polgar 10 MHz (v10.0)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1990, polgar,    0,       0,      polgar,   polgar, polgar_state, empty_init, "Hegener + Glaser", "Mephisto Polgar (v1.50)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, polgara,   polgar,  0,      polgar,   polgar, polgar_state, empty_init, "Hegener + Glaser", "Mephisto Polgar (v1.10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, polgar101, polgar,  0,      polgar10, polgar, polgar_state, empty_init, "Hegener + Glaser", "Mephisto Polgar 10 MHz (v10.1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, polgar10,  polgar,  0,      polgar10, polgar, polgar_state, empty_init, "Hegener + Glaser", "Mephisto Polgar 10 MHz (v10.0)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

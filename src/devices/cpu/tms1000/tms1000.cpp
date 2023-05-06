@@ -2,10 +2,9 @@
 // copyright-holders:hap
 /*
 
-  TMS1000 family - TMS1000, TMS1070, TMS1040, TMS1200, TMS1700, TMS1730,
-  and second source Motorola MC141000, MC141200.
+  TMS1000 family - TMS1000, TMS1070, TMS1040, TMS1200, TMS1270, TMS1700, TMS1730
 
-TMS1000
+TMS1000 die notes:
 - 64x4bit RAM array at the bottom-left
 - 1024x8bit ROM array at the bottom-right
   * FYI, the row-selector to the left of it is laid out as:
@@ -14,6 +13,10 @@ TMS1000
 - 30-term microinstructions PLA(mpla) at the top half, to the right of the midline, supporting 16 microinstructions
 - 20-term output PLA(opla) at the top-left
 - the ALU is between the opla and mpla
+
+TODO:
+- add Motorola MC141000/MC141200 when needed, they are CMOS MCUs based on
+  TMS1000/TMS1200 but not 100% the same
 
 */
 
@@ -31,16 +34,13 @@ DEFINE_DEVICE_TYPE(TMS1270,  tms1270_cpu_device,  "tms1270",  "Texas Instruments
 DEFINE_DEVICE_TYPE(TMS1700,  tms1700_cpu_device,  "tms1700",  "Texas Instruments TMS1700") // 28-pin DIP, RAM/ROM size halved, 9 R pins
 DEFINE_DEVICE_TYPE(TMS1730,  tms1730_cpu_device,  "tms1730",  "Texas Instruments TMS1730") // 20-pin DIP, same die as TMS1700, package has less pins: 6 R pins, 5 O pins (output PLA is still 8-bit, O1,O3,O5 unused)
 
-DEFINE_DEVICE_TYPE(MC141000, mc141000_cpu_device, "mc141000", "Motorola MC141000") // CMOS, pin-compatible with TMS1000(reverse polarity)
-DEFINE_DEVICE_TYPE(MC141200, mc141200_cpu_device, "mc141200", "Motorola MC141200") // CMOS, 40-pin DIP, 16 R pins
-
-
-tms1000_cpu_device::tms1000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	tms1000_cpu_device(mconfig, TMS1000, tag, owner, clock, 8 /* o pins */, 11 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 2 /* x width */, 1 /* stack levels */, 10 /* rom width */, address_map_constructor(FUNC(tms1000_cpu_device::rom_10bit), this), 6 /* ram width */, address_map_constructor(FUNC(tms1000_cpu_device::ram_6bit), this))
-{ }
 
 tms1000_cpu_device::tms1000_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map) :
 	tms1k_base_device(mconfig, type, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, stack_levels, rom_width, rom_map, ram_width, ram_map)
+{ }
+
+tms1000_cpu_device::tms1000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	tms1000_cpu_device(mconfig, TMS1000, tag, owner, clock, 8 /* o pins */, 11 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 2 /* x width */, 1 /* stack levels */, 10 /* rom width */, address_map_constructor(FUNC(tms1000_cpu_device::rom_10bit), this), 6 /* ram width */, address_map_constructor(FUNC(tms1000_cpu_device::ram_6bit), this))
 { }
 
 tms1040_cpu_device::tms1040_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
@@ -51,17 +51,19 @@ tms1200_cpu_device::tms1200_cpu_device(const machine_config &mconfig, const char
 	tms1000_cpu_device(mconfig, TMS1200, tag, owner, clock, 8, 13, 6, 8, 2, 1, 10, address_map_constructor(FUNC(tms1200_cpu_device::rom_10bit), this), 6, address_map_constructor(FUNC(tms1200_cpu_device::ram_6bit), this))
 { }
 
-tms1070_cpu_device::tms1070_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	tms1070_cpu_device(mconfig, TMS1070, tag, owner, clock, 8, 11, 6, 8, 2, 1, 10, address_map_constructor(FUNC(tms1070_cpu_device::rom_10bit), this), 6, address_map_constructor(FUNC(tms1070_cpu_device::ram_6bit), this))
-{ }
 
 tms1070_cpu_device::tms1070_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map) :
 	tms1000_cpu_device(mconfig, type, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, stack_levels, rom_width, rom_map, ram_width, ram_map)
 { }
 
+tms1070_cpu_device::tms1070_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	tms1070_cpu_device(mconfig, TMS1070, tag, owner, clock, 8, 11, 6, 8, 2, 1, 10, address_map_constructor(FUNC(tms1070_cpu_device::rom_10bit), this), 6, address_map_constructor(FUNC(tms1070_cpu_device::ram_6bit), this))
+{ }
+
 tms1270_cpu_device::tms1270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	tms1070_cpu_device(mconfig, TMS1270, tag, owner, clock, 10, 13, 6, 8, 2, 1, 10, address_map_constructor(FUNC(tms1270_cpu_device::rom_10bit), this), 6, address_map_constructor(FUNC(tms1270_cpu_device::ram_6bit), this))
 { }
+
 
 tms1700_cpu_device::tms1700_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	tms1000_cpu_device(mconfig, TMS1700, tag, owner, clock, 8, 9, 6, 8, 2, 1, 10, address_map_constructor(FUNC(tms1700_cpu_device::rom_9bitm), this), 6, address_map_constructor(FUNC(tms1700_cpu_device::ram_32x4), this))
@@ -69,14 +71,6 @@ tms1700_cpu_device::tms1700_cpu_device(const machine_config &mconfig, const char
 
 tms1730_cpu_device::tms1730_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	tms1000_cpu_device(mconfig, TMS1730, tag, owner, clock, 8, 9, 6, 8, 2, 1, 10, address_map_constructor(FUNC(tms1730_cpu_device::rom_9bitm), this), 6, address_map_constructor(FUNC(tms1730_cpu_device::ram_32x4), this))
-{ }
-
-mc141000_cpu_device::mc141000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	tms1000_cpu_device(mconfig, MC141000, tag, owner, clock, 8, 11, 6, 8, 2, 1, 10, address_map_constructor(FUNC(mc141000_cpu_device::rom_10bit), this), 6, address_map_constructor(FUNC(mc141000_cpu_device::ram_6bit), this))
-{ }
-
-mc141200_cpu_device::mc141200_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	tms1000_cpu_device(mconfig, MC141200, tag, owner, clock, 8, 16, 6, 8, 2, 1, 10, address_map_constructor(FUNC(mc141200_cpu_device::rom_10bit), this), 6, address_map_constructor(FUNC(mc141200_cpu_device::ram_6bit), this))
 { }
 
 
@@ -116,21 +110,6 @@ std::unique_ptr<util::disasm_interface> tms1000_cpu_device::create_disassembler(
 
 
 // device_reset
-u32 tms1000_cpu_device::decode_micro(u8 sel)
-{
-	//                                           _____              _____  ______  _____  ______  _____  _____  _____  _____
-	const u32 md[16] = { M_STSL, M_AUTY, M_AUTA, M_CIN, M_C8, M_NE, M_CKN, M_15TN, M_MTN, M_NATN, M_ATN, M_MTP, M_YTP, M_CKP, M_CKM, M_STO };
-	u16 mask = m_mpla->read(sel);
-	mask ^= 0x3fc8; // invert active-negative
-	u32 decode = 0;
-
-	for (int bit = 0; bit < 16; bit++)
-		if (mask & (1 << bit))
-			decode |= md[bit];
-
-	return decode;
-}
-
 void tms1000_cpu_device::device_reset()
 {
 	// common reset
@@ -138,7 +117,7 @@ void tms1000_cpu_device::device_reset()
 
 	// pre-decode instructionset
 	m_fixed_decode.resize(0x100);
-	memset(&m_fixed_decode[0], 0, 0x100*sizeof(u32));
+	memset(&m_fixed_decode[0], 0, 0x100*sizeof(u64));
 	m_micro_decode.resize(0x100);
 	memset(&m_micro_decode[0], 0, 0x100*sizeof(u32));
 
@@ -161,4 +140,19 @@ void tms1000_cpu_device::device_reset()
 
 	for (int i = 0x80; i < 0xc0; i++) m_fixed_decode[i] = F_BR;
 	for (int i = 0xc0; i < 0x100; i++) m_fixed_decode[i] = F_CALL;
+}
+
+u32 tms1000_cpu_device::decode_micro(offs_t offset)
+{
+	//                                           _____              _____  ______  _____  ______  _____  _____  _____  _____
+	const u32 md[16] = { M_STSL, M_AUTY, M_AUTA, M_CIN, M_C8, M_NE, M_CKN, M_15TN, M_MTN, M_NATN, M_ATN, M_MTP, M_YTP, M_CKP, M_CKM, M_STO };
+	u16 mask = m_mpla->read(offset);
+	mask ^= 0x3fc8; // invert active-negative
+	u32 decode = 0;
+
+	for (int bit = 0; bit < 16; bit++)
+		if (mask & (1 << bit))
+			decode |= md[bit];
+
+	return decode;
 }

@@ -331,24 +331,24 @@ std::error_condition mbc3_device_base::install_memory(
 	// install bank switching handlers
 	cart_space()->install_write_handler(
 			0x0000, 0x1fff,
-			write8smo_delegate(*this, FUNC(mbc3_device_base::enable_ram_rtc)));
+			emu::rw_delegate(*this, FUNC(mbc3_device_base::enable_ram_rtc)));
 	cart_space()->install_write_handler(
 			0x2000, 0x3fff,
-			write8smo_delegate(*this, FUNC(mbc3_device_base::bank_switch_fine)));
+			emu::rw_delegate(*this, FUNC(mbc3_device_base::bank_switch_fine)));
 	cart_space()->install_write_handler(
 			0x4000, 0x5fff,
-			write8smo_delegate(*this, FUNC(mbc3_device_base::select_ram_rtc)));
+			emu::rw_delegate(*this, FUNC(mbc3_device_base::select_ram_rtc)));
 	cart_space()->install_write_handler(
 			0x6000, 0x7fff,
-			write8smo_delegate(*this, FUNC(mbc3_device_base::latch_rtc)));
+			emu::rw_delegate(*this, FUNC(mbc3_device_base::latch_rtc)));
 
 	// install real-time clock handlers
 	m_view_ram[1].install_read_handler(
 			0xa000, 0xbfff,
-			read8mo_delegate(*this, FUNC(mbc3_device_base::read_rtc)));
+			emu::rw_delegate(*this, FUNC(mbc3_device_base::read_rtc)));
 	m_view_ram[1].install_write_handler(
 			0xa000, 0xbfff,
-			write8smo_delegate(*this, FUNC(mbc3_device_base::write_rtc)));
+			emu::rw_delegate(*this, FUNC(mbc3_device_base::write_rtc)));
 
 	// if real-time clock crystal is present, start it ticking
 	if (m_has_rtc_xtal)

@@ -77,32 +77,31 @@ uint8_t nes_ntb_slot_device::read(offs_t offset)
 }
 
 
-std::error_condition nes_ntb_slot_device::call_load()
+std::pair<std::error_condition, std::string> nes_ntb_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint8_t *ROM = m_cart->get_cart_base();
-
+		uint8_t *const ROM = m_cart->get_cart_base();
 		if (!ROM)
-			return image_error::INTERNAL;
+			return std::make_pair(image_error::INTERNAL, std::string());
 
 		if (!loaded_through_softlist())
 		{
 			if (length() != 0x4000)
-				return image_error::INVALIDLENGTH;
+				return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be 16K)");
 
-			fread(&ROM, 0x4000);
+			fread(ROM, 0x4000);
 		}
 		else
 		{
 			if (get_software_region_length("rom") != 0x4000)
-				return image_error::BADSOFTWARE;
+				return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be 16K)");
 
 			memcpy(ROM, get_software_region("rom"), 0x4000);
 		}
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

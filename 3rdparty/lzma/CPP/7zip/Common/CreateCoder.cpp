@@ -11,19 +11,23 @@
 #include "RegisterCodec.h"
 
 static const unsigned kNumCodecsMax = 64;
+extern
+unsigned g_NumCodecs;
 unsigned g_NumCodecs = 0;
+extern
+const CCodecInfo *g_Codecs[];
 const CCodecInfo *g_Codecs[kNumCodecsMax];
 
 // We use g_ExternalCodecs in other stages.
-/*
 #ifdef EXTERNAL_CODECS
+/*
 extern CExternalCodecs g_ExternalCodecs;
 #define CHECK_GLOBAL_CODECS \
     if (!__externalCodecs || !__externalCodecs->IsSet()) __externalCodecs = &g_ExternalCodecs;
-#endif
 */
-
 #define CHECK_GLOBAL_CODECS
+#endif
+
 
 void RegisterCodec(const CCodecInfo *codecInfo) throw()
 {
@@ -32,7 +36,11 @@ void RegisterCodec(const CCodecInfo *codecInfo) throw()
 }
 
 static const unsigned kNumHashersMax = 16;
+extern
+unsigned g_NumHashers;
 unsigned g_NumHashers = 0;
+extern
+const CHasherInfo *g_Hashers[];
 const CHasherInfo *g_Hashers[kNumHashersMax];
 
 void RegisterHasher(const CHasherInfo *hashInfo) throw()
@@ -110,6 +118,7 @@ HRESULT CExternalCodecs::Load()
       }
       RINOK(ReadIsAssignedProp(GetCodecs, i, NMethodPropID::kEncoderIsAssigned, info.EncoderIsAssigned));
       RINOK(ReadIsAssignedProp(GetCodecs, i, NMethodPropID::kDecoderIsAssigned, info.DecoderIsAssigned));
+      RINOK(ReadIsAssignedProp(GetCodecs, i, NMethodPropID::kIsFilter, info.IsFilter));
       
       Codecs.Add(info);
     }
@@ -148,20 +157,23 @@ HRESULT CExternalCodecs::Load()
 #endif
 
 
-bool FindMethod(
+int FindMethod_Index(
     DECL_EXTERNAL_CODECS_LOC_VARS
     const AString &name,
-    CMethodId &methodId, UInt32 &numStreams)
+    bool encode,
+    CMethodId &methodId,
+    UInt32 &numStreams)
 {
   unsigned i;
   for (i = 0; i < g_NumCodecs; i++)
   {
     const CCodecInfo &codec = *g_Codecs[i];
-    if (StringsAreEqualNoCase_Ascii(name, codec.Name))
+    if ((encode ? codec.CreateEncoder : codec.CreateDecoder)
+        && StringsAreEqualNoCase_Ascii(name, codec.Name))
     {
       methodId = codec.Id;
       numStreams = codec.NumStreams;
-      return true;
+      return (int)i;
     }
   }
   
@@ -173,18 +185,50 @@ bool FindMethod(
     for (i = 0; i < __externalCodecs->Codecs.Size(); i++)
     {
       const CCodecInfoEx &codec = __externalCodecs->Codecs[i];
-      if (StringsAreEqualNoCase_Ascii(name, codec.Name))
+      if ((encode ? codec.EncoderIsAssigned : codec.DecoderIsAssigned)
+          && StringsAreEqualNoCase_Ascii(name, codec.Name))
       {
         methodId = codec.Id;
         numStreams = codec.NumStreams;
-        return true;
+        return (int)(g_NumCodecs + i);
       }
     }
   
   #endif
   
-  return false;
+  return -1;
 }
+
+
+static int FindMethod_Index(
+    DECL_EXTERNAL_CODECS_LOC_VARS
+    CMethodId methodId, bool encode)
+{
+  unsigned i;
+  for (i = 0; i < g_NumCodecs; i++)
+  {
+    const CCodecInfo &codec = *g_Codecs[i];
+    if (codec.Id == methodId && (encode ? codec.CreateEncoder : codec.CreateDecoder))
+      return (int)i;
+  }
+  
+  #ifdef EXTERNAL_CODECS
+  
+  CHECK_GLOBAL_CODECS
+
+  if (__externalCodecs)
+    for (i = 0; i < __externalCodecs->Codecs.Size(); i++)
+    {
+      const CCodecInfoEx &codec = __externalCodecs->Codecs[i];
+      if (codec.Id == methodId && (encode ? codec.EncoderIsAssigned : codec.DecoderIsAssigned))
+        return (int)(g_NumCodecs + i);
+    }
+  
+  #endif
+  
+  return -1;
+}
+
 
 bool FindMethod(
     DECL_EXTERNAL_CODECS_LOC_VARS
@@ -280,9 +324,11 @@ void GetHashMethods(
   #endif
 }
 
-HRESULT CreateCoder(
+
+
+HRESULT CreateCoder_Index(
     DECL_EXTERNAL_CODECS_LOC_VARS
-    CMethodId methodId, bool encode,
+    unsigned i, bool encode,
     CMyComPtr<ICompressFilter> &filter,
     CCreatedCoder &cod)
 {
@@ -290,11 +336,10 @@ HRESULT CreateCoder(
   cod.IsFilter = false;
   cod.NumStreams = 1;
 
-  unsigned i;
-  for (i = 0; i < g_NumCodecs; i++)
+  if (i < g_NumCodecs)
   {
     const CCodecInfo &codec = *g_Codecs[i];
-    if (codec.Id == methodId)
+    // if (codec.Id == methodId)
     {
       if (encode)
       {
@@ -325,11 +370,12 @@ HRESULT CreateCoder(
   
   if (__externalCodecs)
   {
+    i -= g_NumCodecs;
     cod.IsExternal = true;
-    for (i = 0; i < __externalCodecs->Codecs.Size(); i++)
+    if (i < __externalCodecs->Codecs.Size())
     {
       const CCodecInfoEx &codec = __externalCodecs->Codecs[i];
-      if (codec.Id == methodId)
+      // if (codec.Id == methodId)
       {
         if (encode)
         {
@@ -371,13 +417,50 @@ HRESULT CreateCoder(
   return S_OK;
 }
 
-HRESULT CreateCoder(
+
+HRESULT CreateCoder_Index(
+    DECL_EXTERNAL_CODECS_LOC_VARS
+    unsigned index, bool encode,
+    CCreatedCoder &cod)
+{
+  CMyComPtr<ICompressFilter> filter;
+  HRESULT res = CreateCoder_Index(
+      EXTERNAL_CODECS_LOC_VARS
+      index, encode,
+      filter, cod);
+  
+  if (filter)
+  {
+    cod.IsFilter = true;
+    CFilterCoder *coderSpec = new CFilterCoder(encode);
+    cod.Coder = coderSpec;
+    coderSpec->Filter = filter;
+  }
+  
+  return res;
+}
+
+
+HRESULT CreateCoder_Id(
+    DECL_EXTERNAL_CODECS_LOC_VARS
+    CMethodId methodId, bool encode,
+    CMyComPtr<ICompressFilter> &filter,
+    CCreatedCoder &cod)
+{
+  int index = FindMethod_Index(EXTERNAL_CODECS_LOC_VARS methodId, encode);
+  if (index < 0)
+    return S_OK;
+  return CreateCoder_Index(EXTERNAL_CODECS_LOC_VARS (unsigned)index, encode, filter, cod);
+}
+
+
+HRESULT CreateCoder_Id(
     DECL_EXTERNAL_CODECS_LOC_VARS
     CMethodId methodId, bool encode,
     CCreatedCoder &cod)
 {
   CMyComPtr<ICompressFilter> filter;
-  HRESULT res = CreateCoder(
+  HRESULT res = CreateCoder_Id(
       EXTERNAL_CODECS_LOC_VARS
       methodId, encode,
       filter, cod);
@@ -393,13 +476,14 @@ HRESULT CreateCoder(
   return res;
 }
 
-HRESULT CreateCoder(
+
+HRESULT CreateCoder_Id(
     DECL_EXTERNAL_CODECS_LOC_VARS
     CMethodId methodId, bool encode,
     CMyComPtr<ICompressCoder> &coder)
 {
   CCreatedCoder cod;
-  HRESULT res = CreateCoder(
+  HRESULT res = CreateCoder_Id(
       EXTERNAL_CODECS_LOC_VARS
       methodId, encode,
       cod);
@@ -413,7 +497,7 @@ HRESULT CreateFilter(
     CMyComPtr<ICompressFilter> &filter)
 {
   CCreatedCoder cod;
-  return CreateCoder(
+  return CreateCoder_Id(
       EXTERNAL_CODECS_LOC_VARS
       methodId, encode,
       filter, cod);

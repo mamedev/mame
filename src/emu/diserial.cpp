@@ -261,7 +261,7 @@ void device_serial_interface::receive_register_update_bit(int bit)
 			/* yes */
 			if (bit==0)
 			{
-				LOGMASKED(LOG_RX, "Receiver saw start bit\n");
+				LOGMASKED(LOG_RX, "Receiver saw start bit (%s)\n", device().machine().time().to_string());
 
 				/* seen start bit! */
 				/* not waiting for start bit now! */
@@ -276,7 +276,7 @@ void device_serial_interface::receive_register_update_bit(int bit)
 	}
 	else if (m_rcv_flags & RECEIVE_REGISTER_SYNCHRONISED)
 	{
-		LOGMASKED(LOG_RX, "Received bit %d as %d\n", m_rcv_bit_count_received, bit);
+		LOGMASKED(LOG_RX, "Received bit %d as %d (%s)\n", m_rcv_bit_count_received, bit, device().machine().time().to_string());
 		m_rcv_bit_count_received++;
 
 		if (!bit && (m_rcv_bit_count_received > (m_rcv_bit_count - m_df_stop_bit_count)))
@@ -436,9 +436,9 @@ u8 device_serial_interface::transmit_register_get_data_bit()
 	bit = (m_tra_register_data>>(m_tra_bit_count-1-m_tra_bit_count_transmitted))&1;
 
 	if (m_tra_bit_count_transmitted < m_df_start_bit_count)
-		LOGMASKED(LOG_TX, "Transmitting start bit as %d\n", m_tra_bit_count_transmitted, bit);
+		LOGMASKED(LOG_TX, "Transmitting start bit as %d (%s)\n", m_tra_bit_count_transmitted, bit, device().machine().time().to_string());
 	else
-		LOGMASKED(LOG_TX, "Transmitting bit %d as %d\n", m_tra_bit_count_transmitted - m_df_start_bit_count, bit);
+		LOGMASKED(LOG_TX, "Transmitting bit %d as %d (%s)\n", m_tra_bit_count_transmitted - m_df_start_bit_count, bit, device().machine().time().to_string());
 	m_tra_bit_count_transmitted++;
 
 	/* have all bits of this stream formatted byte been sent? */

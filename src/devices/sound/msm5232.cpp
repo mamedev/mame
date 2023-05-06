@@ -110,7 +110,7 @@ void msm5232_device::device_reset()
 
 void msm5232_device::device_stop()
 {
-	#ifdef SAVE_SAMPLE
+#ifdef SAVE_SAMPLE
 	fclose(sample[8]);
 #endif
 #ifdef SAVE_SEPARATE_CHANNELS
@@ -127,22 +127,22 @@ void msm5232_device::device_stop()
 
 void msm5232_device::set_capacitors(double cap1, double cap2, double cap3, double cap4, double cap5, double cap6, double cap7, double cap8)
 {
-	m_external_capacity[0] = cap1;
-	m_external_capacity[1] = cap2;
-	m_external_capacity[2] = cap3;
-	m_external_capacity[3] = cap4;
-	m_external_capacity[4] = cap5;
-	m_external_capacity[5] = cap6;
-	m_external_capacity[6] = cap7;
-	m_external_capacity[7] = cap8;
+	m_external_capacitance[0] = cap1;
+	m_external_capacitance[1] = cap2;
+	m_external_capacitance[2] = cap3;
+	m_external_capacitance[3] = cap4;
+	m_external_capacitance[4] = cap5;
+	m_external_capacitance[5] = cap6;
+	m_external_capacitance[6] = cap7;
+	m_external_capacitance[7] = cap8;
 }
 
-/* Default chip clock is 2119040 Hz */
-/* At this clock chip generates exactly 440.0 Hz signal on 8' output when pitch data=0x21 */
+// Default chip clock is 2119040 Hz
+// At this clock chip generates exactly 440.0 Hz signal on 8' output when pitch data=0x21
 
 
-/* ROM table to convert from pitch data into data for programmable counter and binary counter */
-/* Chip has 88x12bits ROM   (addressing (in hex) from 0x00 to 0x57) */
+// ROM table to convert from pitch data into data for programmable counter and binary counter
+// Chip has 88x12bits ROM   (addressing (in hex) from 0x00 to 0x57)
 #define ROM(counter,bindiv) (counter|(bindiv<<9))
 
 static const uint16_t MSM5232_ROM[88]={
@@ -199,31 +199,35 @@ static FILE *sample[9];
 
 
 /*
- * resistance values are guesswork, default capacity is mentioned in the datasheets
+ * Resistance values are guesswork, default capacitance is mentioned in the datasheets
  *
- * charges external capacitor (default is 0.39uF) via R51
- * in approx. 5*1400 * 0.39e-6
+ * Two errors in the datasheet, one probable, one certain
+ * - it mentions 0.39uF caps, but most boards have 1uF caps and expect datasheet timings
  *
- * external capacitor is discharged through R52
- * in approx. 5*28750 * 0.39e-6
+ * - the 330ms timing of decay2 has been measured to be 250ms (which
+ *   also matches the duty cycle information for the rest of the table)
+ *
+ * In both cases it ends up with smaller resistor values, which are
+ * easier to do on-die.
+ *
+ * The timings are for a 90% charge/discharge of the external
+ * capacitor through three possible resistors, one for attack, two for
+ * decay.
+ *
+ * Expected timings are 2ms, 40ms and 250ms respectively with a 1uF
+ * capacitor.
+ *
+ * exp(-t/(r*c)) = (100% - 90%) => r = -r/(log(0.1)*c)
+ *
+ *   2ms ->    870 ohms
+ *  40ms ->  17400 ohms
+ * 250ms -> 101000 ohms
  */
 
 
-#define R51 1400    /* charge resistance */
-#define R52 28750   /* discharge resistance */
-
-#if 0
-/*
-    C24 = external capacity
-
-    osd_printf_debug("Time constant T=R*C =%f sec.\n",R51*C24);
-    osd_printf_debug("Cap fully charged after 5T=%f sec (sample=%f). Level=%f\n",(R51*C24)*5,(R51*C24)*5*sample_rate , VMAX*0.99326 );
-    osd_printf_debug("Cap charged after 5T=%f sec (sample=%f). Level=%20.16f\n",(R51*C24)*5,(R51*C24)*5*sample_rate ,
-           VMAX*(1.0-pow(2.718,-0.0748/(R51*C24))) );
-*/
-#endif
-
-
+static constexpr double R51 =    870;    /* attack resistance */
+static constexpr double R52 =  17400;    /* decay 1 resistance */
+static constexpr double R53 = 101000;    /* decay 2 resistance */
 
 
 void msm5232_device::init_tables()
@@ -244,42 +248,19 @@ void msm5232_device::init_tables()
 	m_noise_step = ((1<<STEP_SH)/128.0) * scale; /* step of the rng reg in 16.16 format */
 	/* logerror("noise step=%8x\n", m_noise_step); */
 
-#if 0
-{
-	/* rate tables (in milliseconds) */
-	static const int ATBL[8] = { 2,4,8,16, 32,64, 32,64};
-	static const int DTBL[16]= { 40,80,160,320, 640,1280, 640,1280,
-							333,500,1000,2000, 4000,8000, 4000,8000};
 	for (i=0; i<8; i++)
 	{
 		double clockscale = (double)m_chip_clock / 2119040.0;
-		double time = (ATBL[i] / 1000.0) / clockscale;  /* attack time in seconds */
-		m_ar_tbl[i] = 0.50 * ( (1.0/time) / (double)m_rate );
-		/* logerror("ATBL[%i] = %20.16f time = %f s\n",i, m_ar_tbl[i], time); */
-	}
-
-	for (i=0; i<16; i++)
-	{
-		double clockscale = (double)m_chip_clock / 2119040.0;
-		double time = (DTBL[i] / 1000.0) / clockscale;  /* decay time in seconds */
-		m_dr_tbl[i] = 0.50 * ( (1.0/time) / (double)m_rate );
-		/* logerror("DTBL[%i] = %20.16f time = %f s\n",i, m_dr_tbl[i], time); */
-	}
-}
-#endif
-
-
-	for (i=0; i<8; i++)
-	{
-		double clockscale = (double)m_chip_clock / 2119040.0;
-		m_ar_tbl[i]   = ((1<<i) / clockscale) * (double)R51;
+		int rcp_duty_cycle = 1 << ( i<6 ? i : i-2 );
+		m_ar_tbl[i]   = (rcp_duty_cycle / clockscale) * (double)R51;
 	}
 
 	for (i=0; i<8; i++)
 	{
 		double clockscale = (double)m_chip_clock / 2119040.0;
-		m_dr_tbl[i]   = (     (1<<i) / clockscale) * (double)R52;
-		m_dr_tbl[i+8] = (6.25*(1<<i) / clockscale) * (double)R52;
+		int rcp_duty_cycle = 1 << ( i<6 ? i : i-2 );
+		m_dr_tbl[i]   = (rcp_duty_cycle / clockscale) * (double)R52;
+		m_dr_tbl[i+8] = (rcp_duty_cycle / clockscale) * (double)R53;
 	}
 
 
@@ -301,9 +282,9 @@ void msm5232_device::init_tables()
 
 void msm5232_device::init_voice(int i)
 {
-	m_voi[i].ar_rate= m_ar_tbl[0] * m_external_capacity[i];
-	m_voi[i].dr_rate= m_dr_tbl[0] * m_external_capacity[i];
-	m_voi[i].rr_rate= m_dr_tbl[0] * m_external_capacity[i]; /* this is constant value */
+	m_voi[i].ar_rate= m_ar_tbl[0] * m_external_capacitance[i];
+	m_voi[i].dr_rate= m_dr_tbl[0] * m_external_capacitance[i];
+	m_voi[i].rr_rate= m_dr_tbl[0] * m_external_capacitance[i]; /* this is constant value */
 	m_voi[i].eg_sect= -1;
 	m_voi[i].eg     = 0.0;
 	m_voi[i].eg_arm = 0;
@@ -408,22 +389,22 @@ void msm5232_device::write(offs_t offset, uint8_t data)
 		{
 		case 0x08:  /* group1 attack */
 			for (i=0; i<4; i++)
-				m_voi[i].ar_rate   = m_ar_tbl[data&0x7] * m_external_capacity[i];
+				m_voi[i].ar_rate   = m_ar_tbl[data&0x7] * m_external_capacitance[i];
 			break;
 
 		case 0x09:  /* group2 attack */
 			for (i=0; i<4; i++)
-				m_voi[i+4].ar_rate = m_ar_tbl[data&0x7] * m_external_capacity[i+4];
+				m_voi[i+4].ar_rate = m_ar_tbl[data&0x7] * m_external_capacitance[i+4];
 			break;
 
 		case 0x0a:  /* group1 decay */
 			for (i=0; i<4; i++)
-				m_voi[i].dr_rate   = m_dr_tbl[data&0xf] * m_external_capacity[i];
+				m_voi[i].dr_rate   = m_dr_tbl[data&0xf] * m_external_capacitance[i];
 			break;
 
 		case 0x0b:  /* group2 decay */
 			for (i=0; i<4; i++)
-				m_voi[i+4].dr_rate = m_dr_tbl[data&0xf] * m_external_capacity[i+4];
+				m_voi[i+4].dr_rate = m_dr_tbl[data&0xf] * m_external_capacitance[i+4];
 			break;
 
 		case 0x0c:  /* group1 control */
