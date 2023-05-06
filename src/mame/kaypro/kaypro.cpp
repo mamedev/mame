@@ -215,10 +215,7 @@ void kaypro_state::kayproii(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(80*7, 24*10);
-	m_screen->set_visarea(0, 80*7-1, 0, 24*10-1);
+	m_screen->set_raw(13.9776_MHz_XTAL, 128 * 7, 0, 80 * 7, 260, 0, 240);
 	m_screen->set_screen_update(FUNC(kaypro_state::screen_update_kayproii));
 	m_screen->set_palette(m_palette);
 
@@ -307,10 +304,7 @@ void kaypro_state::kaypro484(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(80*8, 25*16);
-	m_screen->set_visarea(0,80*8-1,0,25*16-1);
+	m_screen->set_raw(18_MHz_XTAL, 856, 0, 640, 426, 0, 400);
 	m_screen->set_screen_update(FUNC(kaypro_state::screen_update_kaypro484));
 
 	TIMER(config, m_floppy_timer).configure_generic(FUNC(kaypro_state::floppy_timer));
@@ -323,10 +317,10 @@ void kaypro_state::kaypro484(machine_config &config)
 	BEEP(config, m_beep, 950).add_route(ALL_OUTPUTS, "mono", 1.00); // piezo-device needs to be measured
 
 	/* devices */
-	MC6845(config, m_crtc, 2000000); // comes out of ULA - needs to be measured
+	MC6845(config, m_crtc, 18_MHz_XTAL / 8);
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(false);
-	m_crtc->set_char_width(7);
+	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(kaypro_state::kaypro484_update_row));
 
 	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(kaypro_state::quickload_cb));
@@ -335,7 +329,7 @@ void kaypro_state::kaypro484(machine_config &config)
 	kbd.rxd_cb().set("sio_1", FUNC(z80sio_device::rxb_w));
 	kbd.rxd_cb().append("sio_1", FUNC(z80sio_device::syncb_w));
 
-	CLOCK(config, "kbdtxrxc", 4800).signal_handler().set("sio_1", FUNC(z80sio_device::rxtxcb_w));
+	CLOCK(config, "kbdtxrxc", 16_MHz_XTAL / 16 / 13 / 16).signal_handler().set("sio_1", FUNC(z80sio_device::rxtxcb_w));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(kaypro_state::write_centronics_busy));
