@@ -2621,7 +2621,7 @@ license:CC0-1.0
 
 	<software name="bokujomnp" cloneof="harvmoon">
 		<!-- Planned for physical release? -->
-		<description>Bokujou Monogatari GB (Japan, NP)</description>
+		<description>Bokujou Monogatari GB (Japan, Nintendo Power service)</description>
 		<year>1997</year>
 		<publisher>Victor Interactive Software</publisher>
 		<info name="serial" value="DMG-BYWJ-JPN?" />
@@ -18557,7 +18557,7 @@ license:CC0-1.0
 	<software name="poktpuyo">
 		<!-- NP only -->
 		<!-- Planned for physical release? -->
-		<description>Pocket Puyo Puyo Tsuu (Japan, rev 1, NP)</description>
+		<description>Pocket Puyo Puyo Tsuu (Japan, rev 1, Nintendo Power service)</description>
 		<year>1996</year>
 		<publisher>Compile</publisher>
 		<info name="serial" value="DMG-APYJ-JPN?" />
@@ -19534,7 +19534,7 @@ license:CC0-1.0
 	<software name="purikura">
 		<!-- NP only -->
 		<!-- Planned for physical release? -->
-		<description>Purikura Pocket - Fukanzen Joshikousei Manual (Japan, rev 1, NP)</description>
+		<description>Purikura Pocket - Fukanzen Joshikousei Manual (Japan, rev 1, Nintendo Power service)</description>
 		<year>1997</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="DMG-APPJ-JPN?" />
