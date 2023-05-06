@@ -318,6 +318,7 @@ void hcastle_state::workram_w(offs_t offset, uint8_t data)
 	if (BIT(m_control, 5))
 	{
 		m_workram[(offset & 0x7ff) | 0x800] = data;
+		return;
 	}
 
 	m_workram[offset & 0x7ff] = data;
