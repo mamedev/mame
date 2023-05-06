@@ -20,6 +20,9 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
+// internal artwork
+#include "scrablexa.lh"
+
 #include "hh_mn1400_test.lh" // common test-layout - use external artwork
 
 
@@ -155,6 +158,63 @@ ROM_END
 
 
 
+
+
+/*******************************************************************************
+
+  Selchow & Righter Scrabble Lexor
+  * PCB label: 2294HB
+  * MN1405MS MCU (die label: 1405 MS-0)
+  * 8-digit 14-seg LEDs, 2-bit sound
+
+  This is the MN1405 version, see scrablex.cpp for the MB8841 version.
+
+*******************************************************************************/
+
+class scrablexa_state : public hh_mn1400_state
+{
+public:
+	scrablexa_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_mn1400_state(mconfig, type, tag)
+	{ }
+
+	void scrablexa(machine_config &config);
+
+private:
+};
+
+// handlers
+
+// inputs
+
+static INPUT_PORTS_START( scrablexa )
+INPUT_PORTS_END
+
+// config
+
+void scrablexa_state::scrablexa(machine_config &config)
+{
+	// basic machine hardware
+	MN1405(config, m_maincpu, 300000);
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(1, 1);
+	config.set_default_layout(layout_scrablexa);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( scrablexa )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mn1405ms", 0x0000, 0x0800, NO_DUMP )
+ROM_END
+
+
+
 } // anonymous namespace
 
 /*******************************************************************************
@@ -163,5 +223,7 @@ ROM_END
 
 *******************************************************************************/
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1979, compperf, 0,      0,      compperf, compperf, compperf_state, empty_init, "Lakeside", "Computer Perfection", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1979, compperf,  0,        0,      compperf,  compperf,  compperf_state,  empty_init, "Lakeside", "Computer Perfection", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+
+SYST( 1980, scrablexa, scrablex, 0,      scrablexa, scrablexa, scrablexa_state, empty_init, "Selchow & Righter", "Scrabble Lexor: Computer Word Game (MN1405 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

@@ -18713,6 +18713,7 @@ gjungler                        // Gakken
 
 @source:handheld/hh_mn1400.cpp
 compperf                        // Lakeside
+scrablexa                       // Selchow & Righter
 
 @source:handheld/hh_pic16.cpp
 drdunk                          // Kmart

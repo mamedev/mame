@@ -23,7 +23,7 @@ public:
 
 protected:
 	// construction/destruction
-	mn1400_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+	mn1400_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -45,9 +45,15 @@ protected:
 	address_space *m_program;
 	address_space *m_data;
 
+	void program_1kx8(address_map &map);
+	void program_2kx8(address_map &map);
+	void data_64x4(address_map &map);
+	void data_128x4(address_map &map);
+
 	int m_icount;
 	int m_state_count;
 
+	int m_stack_levels;
 	int m_prgwidth; // ROM/RAM address size
 	int m_datawidth; // "
 	u16 m_prgmask; // "

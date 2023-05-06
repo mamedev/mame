@@ -12,10 +12,11 @@ x
 #include "mn1400base.h"
 
 
-mn1400_base_device::mn1400_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
+mn1400_base_device::mn1400_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, prgwidth, 0, program),
 	m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data),
+	m_stack_levels(stack_levels),
 	m_prgwidth(prgwidth),
 	m_datawidth(datawidth)
 { }
@@ -87,6 +88,31 @@ void mn1400_base_device::device_reset()
 	m_pc = m_prev_pc = 0;
 	m_op = m_prev_op = 0;
 	m_param = 0;
+}
+
+
+//-------------------------------------------------
+//  common internal memory maps
+//-------------------------------------------------
+
+void mn1400_base_device::program_1kx8(address_map &map)
+{
+	map(0x000, 0x3ff).rom();
+}
+
+void mn1400_base_device::program_2kx8(address_map &map)
+{
+	map(0x000, 0x7ff).rom();
+}
+
+void mn1400_base_device::data_64x4(address_map &map)
+{
+	map(0x00, 0x3f).ram();
+}
+
+void mn1400_base_device::data_128x4(address_map &map)
+{
+	map(0x00, 0x7f).ram();
 }
 
 

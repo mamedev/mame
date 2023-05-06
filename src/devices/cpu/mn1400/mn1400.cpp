@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /*
 
-  Matsushita MN1400 MCU
+  Matsushita MN1400, MN1405
 
 TODO:
 - stuff
@@ -15,29 +15,23 @@ TODO:
 #include "mn1400d.h"
 
 
+// device definitions
 DEFINE_DEVICE_TYPE(MN1400, mn1400_cpu_device, "mn1400", "Matsushita MN1400")
+DEFINE_DEVICE_TYPE(MN1405, mn1405_cpu_device, "mn1405", "Matsushita MN1405")
 
 
 // constructor
-mn1400_cpu_device::mn1400_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
-	mn1400_base_device(mconfig, type, tag, owner, clock, prgwidth, program, datawidth, data)
+mn1400_cpu_device::mn1400_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
+	mn1400_base_device(mconfig, type, tag, owner, clock, stack_levels, prgwidth, program, datawidth, data)
 { }
 
 mn1400_cpu_device::mn1400_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	mn1400_cpu_device(mconfig, MN1400, tag, owner, clock, 10, address_map_constructor(FUNC(mn1400_cpu_device::program_1024x8), this), 6, address_map_constructor(FUNC(mn1400_cpu_device::data_64x4), this))
+	mn1400_cpu_device(mconfig, MN1400, tag, owner, clock, 2 /* stack levels */, 10 /* rom bits */, address_map_constructor(FUNC(mn1400_cpu_device::program_1kx8), this), 6 /* ram bits */, address_map_constructor(FUNC(mn1400_cpu_device::data_64x4), this))
 { }
 
-
-// internal memory maps
-void mn1400_cpu_device::program_1024x8(address_map &map)
-{
-	map(0x000, 0x3ff).rom();
-}
-
-void mn1400_cpu_device::data_64x4(address_map &map)
-{
-	map(0x00, 0x3f).ram();
-}
+mn1405_cpu_device::mn1405_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	mn1400_cpu_device(mconfig, MN1405, tag, owner, clock, 2, 11, address_map_constructor(FUNC(mn1405_cpu_device::program_2kx8), this), 7, address_map_constructor(FUNC(mn1405_cpu_device::data_128x4), this))
+{ }
 
 
 // disasm
