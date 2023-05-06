@@ -20,7 +20,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="dk64">
+	<software name="dk64" supported="no">
 		<description>Donkey Kong 64</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
@@ -35,7 +35,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="drmar64">
+	<software name="drmar64" supported="no">
 		<description>Dr. Mario 64</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
@@ -48,7 +48,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="excitb64">
+	<software name="excitb64" supported="no">
 		<description>Excitebike 64 (USA)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
@@ -62,7 +62,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="fzerox">
+	<software name="fzerox" supported="no">
 		<description>F-Zero X</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
@@ -75,7 +75,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="gauntleg">
+	<software name="gauntleg" supported="no">
 		<description>Gauntlet Legends</description>
 		<year>1999</year>
 		<publisher>Midway</publisher>
@@ -88,7 +88,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="hydroth">
+	<software name="hydroth" supported="no">
 		<description>Hydro Thunder</description>
 		<year>2000</year>
 		<publisher>Midway</publisher>
@@ -101,7 +101,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="kirby64">
+	<software name="kirby64" supported="no">
 		<description>Kirby 64 - The Crystal Shards</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
@@ -114,7 +114,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="zeldamaj">
+	<software name="zeldamaj" supported="no">
 		<description>The Legend of Zelda - Majora's Mask</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
@@ -128,7 +128,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="zeldaoot">
+	<software name="zeldaoot" supported="no">
 		<description>The Legend of Zelda - Ocarina of Time</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
@@ -141,7 +141,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="marioglf">
+	<software name="marioglf" supported="no">
 		<description>Mario Golf</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
@@ -154,7 +154,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mariokrt">
+	<software name="mariokrt" supported="no">
 		<description>Mario Kart 64</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
@@ -167,7 +167,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mariopr3">
+	<software name="mariopr3" supported="no">
 		<description>Mario Party 3</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
@@ -181,7 +181,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="marioten">
+	<software name="marioten" supported="no">
 		<description>Mario Tennis</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
@@ -194,7 +194,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="midwaygh">
+	<software name="midwaygh" supported="no">
 		<description>Midway's Greatest Arcade Hits Vol. 1</description>
 		<year>2000</year>
 		<publisher>Midway</publisher>
@@ -208,7 +208,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mk4">
+	<software name="mk4" supported="no">
 		<description>Mortal Kombat 4</description>
 		<year>1998</year>
 		<publisher>Midway</publisher>
@@ -222,7 +222,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ntetris">
+	<software name="ntetris" supported="no">
 		<description>The New Tetris</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
@@ -235,7 +235,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="papermar">
+	<software name="papermar" supported="no">
 		<description>Paper Mario</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
@@ -248,7 +248,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pilotwin">
+	<software name="pilotwin" supported="no">
 		<description>Pilotwings 64</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
@@ -261,7 +261,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pokesnap">
+	<software name="pokesnap" supported="no">
 		<description>Pokémon Snap</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
@@ -274,7 +274,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="rampage2">
+	<software name="rampage2" supported="no">
 		<description>Rampage 2 - Universal Tour</description>
 		<year>1998</year>
 		<publisher>Midway</publisher>
@@ -287,7 +287,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="r2rumble">
+	<software name="r2rumble" supported="no">
 		<description>Ready 2 Rumble Boxing</description>
 		<year>1999</year>
 		<publisher>Midway</publisher>
@@ -301,7 +301,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="rush2">
+	<software name="rush2" supported="no">
 		<description>Rush 2 - Extreme Racing USA</description>
 		<year>1998</year>
 		<publisher>Midway</publisher>
@@ -314,7 +314,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="starfox">
+	<software name="starfox" supported="no">
 		<description>Star Fox 64</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
@@ -327,7 +327,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="swrogue">
+	<software name="swrogue" supported="no">
 		<description>Star Wars - Rogue Squadron</description>
 		<year>1998</year>
 		<publisher>LucasArts</publisher>
@@ -340,7 +340,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="sm64u">
+	<software name="sm64u" supported="no">
 		<description>Super Mario 64</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
@@ -353,7 +353,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="smashbro">
+	<software name="smashbro" supported="no">
 		<description>Super Smash Bros.</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
@@ -366,7 +366,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="vchess">
+	<software name="vchess" supported="no">
 		<description>Virtual Chess 64</description>
 		<year>1998</year>
 		<publisher>Titus</publisher>
@@ -379,7 +379,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="vpool">
+	<software name="vpool" supported="no">
 		<description>Virtual Pool 64</description>
 		<year>1998</year>
 		<publisher>Crave Entertainment</publisher>
@@ -392,7 +392,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="waverace">
+	<software name="waverace" supported="no">
 		<description>Wave Race 64</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
@@ -405,7 +405,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="yoshisto">
+	<software name="yoshisto" supported="no">
 		<description>Yoshi's Story</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
@@ -421,7 +421,7 @@ license:CC0-1.0
 
 <!-- System utilities -->
 
-	<software name="eeerase">
+	<software name="eeerase" supported="no">
 		<description>eeerase</description>
 		<year>19??</year>
 		<publisher>LodgeNet</publisher>
