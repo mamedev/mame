@@ -47,7 +47,8 @@ std::unique_ptr<util::disasm_interface> mn1400_cpu_device::create_disassembler()
 
 bool mn1400_cpu_device::op_has_param(u8 op)
 {
-	return false;
+	// branch opcodes are 2 bytes
+	return ((op & 0xf8) == 0x38 || (op & 0xf0) == 0x40 || (op & 0xf0) == 0xe0);
 }
 
 void mn1400_cpu_device::execute_one()

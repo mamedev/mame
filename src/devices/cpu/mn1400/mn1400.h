@@ -16,6 +16,27 @@
 // pinout reference
 
 /*
+            ____   ____                      ____   ____
+    Vss  1 |    \_/    | 40 OSC      Vss  1 |    \_/    | 28 OSC
+   CO11  2 |           | 39 Vdd      CO9  2 |           | 27 Vdd
+   CO10  3 |           | 38 DO7      CO8  3 |           | 26 SNS1
+    CO9  4 |           | 37 DO6      CO7  4 |           | 25 SNS0
+    CO8  5 |           | 36 DO5      CO6  5 |           | 24 DO0
+    CO7  6 |           | 35 DO4      CO5  6 |  MN1400   | 23 DO1
+    CO6  7 |           | 34 DO3      AI3  7 |  MN1402   | 22 DO2
+    CO5  8 |  MN1400   | 33 DO2      AI2  8 |  MN1432   | 21 DO3
+    CO4  9 |  MN1405   | 32 DO1      AI1  9 |           | 20 TST
+    CO3 10 |  MN1430   | 31 DO0      AI0 10 |           | 19 RST
+    CO2 11 |  MN1435   | 30 SNS1     BI3 11 |           | 18 EO3
+    CO1 12 |  MN1450   | 29 SNS0     BI2 12 |           | 17 EO2
+    CO0 13 |  MN1455   | 28 CSLCT    BI1 13 |           | 16 EO1
+    AI3 14 |           | 27 RST      BI0 14 |___________| 15 EO0
+    AI2 15 |           | 26 TST
+    AI1 16 |           | 25 EO3
+    AI0 17 |           | 24 EO2
+    BI3 18 |           | 23 EO1
+    BI2 19 |           | 22 EO0
+    BI1 20 |___________| 21 BI0
 
 */
 

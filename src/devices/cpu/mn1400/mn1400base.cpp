@@ -4,7 +4,25 @@
 
   Matsushita (Panasonic) MN1400 family MCU cores
 
-x
+4-bit microcontroller introduced in 1977, possibly Matsushita's first MCU.
+
+Basic models:
+
+MN1400: 1KB ROM, 64 nibbles RAM
+MN1402: 768 bytes ROM, 32 nibbles RAM
+MN1403: 0.5KB ROM, 16 nibbles RAM, 18 pins
+MN1404: 0.5KB ROM, 16 nibbles RAM, 16 pins
+MN1405: 2KB ROM, 128 nibbles RAM
+
+MN1420: MN1400 with LED driver
+MN1421: 28-pin version of MN1420
+MN1425: MN1405 with LED driver
+
+MN1430: high-voltage version of MN1400
+MN1435: high-voltage version of MN1405
+
+MN1450/MN1460: CMOS version of MN1400
+MN1455/MN1465: CMOS version of MN1405
 
 */
 

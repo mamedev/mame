@@ -109,7 +109,8 @@ u8 hh_mn1400_state::read_inputs(int columns)
 /*******************************************************************************
 
   Lakeside Computer Perfection
-  * MN1400ML MCU (die label: 1400 ML-0)
+  * PCB label: Lakeside, PANASONIC, TCI-A4H94HB
+  * MN1400ML MCU (28 pins, die label: 1400 ML-0)
   * 10 LEDs, 2-bit sound
 
 *******************************************************************************/
@@ -138,7 +139,7 @@ INPUT_PORTS_END
 void compperf_state::compperf(machine_config &config)
 {
 	// basic machine hardware
-	MN1400(config, m_maincpu, 300000);
+	MN1400(config, m_maincpu, 300000); // approximation - RC osc. R=18K, C=100pF
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 10);
@@ -195,7 +196,7 @@ INPUT_PORTS_END
 void scrablexa_state::scrablexa(machine_config &config)
 {
 	// basic machine hardware
-	MN1405(config, m_maincpu, 300000);
+	MN1405(config, m_maincpu, 300000); // approximation - RC osc. R=15K, C=100pF
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 1);
