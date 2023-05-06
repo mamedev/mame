@@ -18711,6 +18711,9 @@ zackman                         // Bandai
 cfrogger                        // Coleco
 gjungler                        // Gakken
 
+@source:handheld/hh_mn1400.cpp
+compperf                        // Lakeside
+
 @source:handheld/hh_pic16.cpp
 drdunk                          // Kmart
 flash                           // Ideal

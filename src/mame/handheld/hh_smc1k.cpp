@@ -52,10 +52,10 @@ protected:
 	optional_ioport_array<4> m_inputs; // max 4
 	output_finder<4, 32> m_out_x;
 
+	u8 m_inp_mux = 0;
+
 	virtual void write_segs(offs_t offset, u32 data);
 	u8 read_inputs(int columns);
-
-	u8 m_inp_mux = 0;
 };
 
 
