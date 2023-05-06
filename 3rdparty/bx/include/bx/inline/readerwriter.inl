@@ -297,16 +297,6 @@ namespace bx
 		return _writer->write(_data, _size, _err);
 	}
 
-	inline int32_t write(WriterI* _writer, const char* _str, Error* _err)
-	{
-		return write(_writer, _str, strLen(_str), _err);
-	}
-
-	inline int32_t write(WriterI* _writer, const StringView& _str, Error* _err)
-	{
-		return write(_writer, _str.getPtr(), _str.getLength(), _err);
-	}
-
 	inline int32_t writeRep(WriterI* _writer, uint8_t _byte, int32_t _size, Error* _err)
 	{
 		BX_ERROR_SCOPE(_err);
@@ -334,6 +324,23 @@ namespace bx
 		BX_ERROR_SCOPE(_err);
 		BX_STATIC_ASSERT(isTriviallyCopyable<Ty>() );
 		return _writer->write(&_value, sizeof(Ty), _err);
+	}
+
+	template<>
+	inline int32_t write(WriterI* _writer, const StringView& _str, Error* _err)
+	{
+		return write(_writer, _str.getPtr(), _str.getLength(), _err);
+	}
+
+	template<>
+	inline int32_t write(WriterI* _writer, const StringLiteral& _str, Error* _err)
+	{
+		return write<StringView>(_writer, _str, _err);
+	}
+
+	inline int32_t write(WriterI* _writer, const char* _str, Error* _err)
+	{
+		return write<StringView>(_writer, _str, _err);
 	}
 
 	template<typename Ty>
