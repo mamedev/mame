@@ -1203,7 +1203,7 @@ std::vector<u8> hp98x5_impl::convert_data_2_txt(const std::vector<u8>& in, unsig
 			// Sanitize and copy string
 			for (unsigned i = 0; i < rec_len; i++) {
 				u8 c = *it++;
-				if (!isascii(c) || !isprint(c)) {
+				if (c < 0x20 || c >= 0x7f) {
 					c = ' ';
 				}
 				accum.push_back(c);
@@ -1284,7 +1284,7 @@ std::vector<u8> hp98x5_impl::convert_txt_2_data(const std::vector<u8>& in, unsig
 			}
 			accum.clear();
 			trailer.clear();
-		} else if (isascii(c) && isspace(c)) {
+		} else if (c == ' ' || c == '\n' || c == '\r' || c == '\t' || c == '\f' || c == '\v') {
 			trailer.push_back(c);
 		} else {
 			if (!trailer.empty()) {
