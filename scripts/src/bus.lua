@@ -1840,6 +1840,8 @@ if (BUSES["MSX_CTRL"]~=null) then
 		MAME_DIR .. "src/devices/bus/msx/ctrl/towns6b.h",
 		MAME_DIR .. "src/devices/bus/msx/ctrl/townspad.cpp",
 		MAME_DIR .. "src/devices/bus/msx/ctrl/townspad.h",
+		MAME_DIR .. "src/devices/bus/msx/ctrl/vaus.cpp",
+		MAME_DIR .. "src/devices/bus/msx/ctrl/vaus.h",
 		MAME_DIR .. "src/devices/bus/msx/ctrl/xe1ap.cpp",
 		MAME_DIR .. "src/devices/bus/msx/ctrl/xe1ap.h",
 	}
