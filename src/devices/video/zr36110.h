@@ -26,8 +26,8 @@ public:
 	u8   user_r (); // a = 3
 
 protected:
-	void device_start();
-	void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	enum {
