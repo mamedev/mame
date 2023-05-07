@@ -125,9 +125,16 @@ public:
 	void compperf(machine_config &config);
 
 private:
+	void write_e(u8 data);
 };
 
 // handlers
+
+void compperf_state::write_e(u8 data)
+{
+	// E2,E3: speaker out
+	m_speaker->level_w(data >> 2 & 3);
+}
 
 // inputs
 
@@ -140,6 +147,7 @@ void compperf_state::compperf(machine_config &config)
 {
 	// basic machine hardware
 	MN1400(config, m_maincpu, 300000); // approximation - RC osc. R=18K, C=100pF
+	m_maincpu->write_e().set(FUNC(compperf_state::write_e));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 10);
@@ -147,7 +155,10 @@ void compperf_state::compperf(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, m_speaker);
+	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
+	m_speaker->set_levels(4, speaker_levels);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.125);
 }
 
 // roms
@@ -155,6 +166,9 @@ void compperf_state::compperf(machine_config &config)
 ROM_START( compperf )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "mn1400ml", 0x0000, 0x0400, NO_DUMP )
+
+	ROM_REGION( 200, "maincpu:opla", 0 )
+	ROM_LOAD( "mn1400_compperf_output.pla", 0, 200, NO_DUMP )
 ROM_END
 
 
@@ -182,9 +196,16 @@ public:
 	void scrablexa(machine_config &config);
 
 private:
+	void write_e(u8 data);
 };
 
 // handlers
+
+void scrablexa_state::write_e(u8 data)
+{
+	// E2,E3: speaker out
+	m_speaker->level_w(data >> 2 & 3);
+}
 
 // inputs
 
@@ -197,6 +218,7 @@ void scrablexa_state::scrablexa(machine_config &config)
 {
 	// basic machine hardware
 	MN1405(config, m_maincpu, 300000); // approximation - RC osc. R=15K, C=100pF
+	m_maincpu->write_e().set(FUNC(scrablexa_state::write_e));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 1);
@@ -204,7 +226,10 @@ void scrablexa_state::scrablexa(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, m_speaker);
+	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
+	m_speaker->set_levels(4, speaker_levels);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.125);
 }
 
 // roms
@@ -212,6 +237,9 @@ void scrablexa_state::scrablexa(machine_config &config)
 ROM_START( scrablexa )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "mn1405ms", 0x0000, 0x0800, NO_DUMP )
+
+	ROM_REGION( 200, "maincpu:opla", 0 )
+	ROM_LOAD( "mn1400_scrablexa_output.pla", 0, 200, NO_DUMP )
 ROM_END
 
 

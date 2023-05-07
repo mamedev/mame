@@ -208,9 +208,9 @@ void mn1400_cpu_device::op_xor()
 
 void mn1400_cpu_device::op_a()
 {
-	// A: add memory + carry to A
-	u8 c = (m_status & FLAG_C) ? 1 : 0;
-	m_a += ram_r() + c;
+	// A: add memory + CF to A
+	u8 cf = (m_status & FLAG_C) ? 1 : 0;
+	m_a += ram_r() + cf;
 	set_cz(m_a);
 	m_a &= 0xf;
 }
@@ -314,46 +314,61 @@ void mn1400_cpu_device::op_tb()
 void mn1400_cpu_device::op_ina()
 {
 	// INA: input from port A
+	m_a = m_read_a() & 0xf;
+	set_z(m_a);
 }
 
 void mn1400_cpu_device::op_inb()
 {
 	// INB: input from port B
+	m_a = m_read_b() & 0xf;
+	set_z(m_a);
 }
 
 void mn1400_cpu_device::op_otd()
 {
 	// OTD: output A + PS to port D
+	u8 ps = (m_status & FLAG_P) ? 1 : 0;
+	write_d(ps << 4 | m_a);
 }
 
 void mn1400_cpu_device::op_otmd()
 {
 	// OTMD: output memory + PS to port D
+	u8 ps = (m_status & FLAG_P) ? 1 : 0;
+	write_d(ps << 4 | ram_r());
 }
 
 void mn1400_cpu_device::op_ote()
 {
 	// OTE: output A to port E
+	m_write_e(m_a);
 }
 
 void mn1400_cpu_device::op_otie()
 {
 	// OTIE: output immediate to port E
+	m_write_e(m_op & 0xf);
 }
 
 void mn1400_cpu_device::op_rco()
 {
 	// RCO: reset C pin
+	m_c &= ~(1 << m_y);
+	m_write_c(m_c);
 }
 
 void mn1400_cpu_device::op_sco()
 {
 	// SCO: set C pin
+	m_c |= 1 << m_y;
+	m_write_c(m_c);
 }
 
 void mn1400_cpu_device::op_cco()
 {
 	// CCO: clear C port
+	m_write_c(m_c = 0);
 }
 
 
@@ -386,6 +401,9 @@ void mn1400_cpu_device::op_sp()
 void mn1400_cpu_device::op_bs01()
 {
 	// BS(N)0/1: branch on S pins
+	u8 mask = m_read_sns() & (m_op >> 1 & 3);
+	if (bool(m_op & 1) == bool(mask))
+		m_pc = (m_prev_pc & ~0xff) | m_param;
 }
 
 void mn1400_cpu_device::op_bpcz()

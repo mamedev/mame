@@ -5,7 +5,11 @@
   Matsushita MN1400, MN1405
 
 TODO:
-- stuff
+- counter input pin (CSLCT and SNS1)
+- are illegal opcodes 0x38/0xe0 and 0x39/0xe1 branch-always and branch-never?
+  right now they're implemented as such
+- is branch emulation correct when near the end of a page?
+- add other MCUs when needed
 
 */
 

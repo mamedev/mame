@@ -6,7 +6,7 @@
 
 4-bit microcontroller introduced in 1977, possibly Matsushita's first MCU.
 
-Basic models:
+Basic MN1400 series:
 
 MN1400: 1KB ROM, 64 nibbles RAM
 MN1402: 768 bytes ROM, 32 nibbles RAM
@@ -24,6 +24,13 @@ MN1435: high-voltage version of MN1405
 MN1450/MN1460: CMOS version of MN1400
 MN1455/MN1465: CMOS version of MN1405
 
+Other models:
+
+MN1450B: internal FLT driver
+MN1456A: MN1455 with double amount ROM/RAM
+MN148x: DAC for TV/VTR tuner
+MN1427: support for FM audio tuner
+
 */
 
 #include "emu.h"
@@ -34,10 +41,36 @@ mn1400_base_device::mn1400_base_device(const machine_config &mconfig, device_typ
 	cpu_device(mconfig, type, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, prgwidth, 0, program),
 	m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data),
+	m_opla(*this, "opla"),
 	m_stack_levels(stack_levels),
 	m_prgwidth(prgwidth),
-	m_datawidth(datawidth)
+	m_datawidth(datawidth),
+	m_read_a(*this),
+	m_read_b(*this),
+	m_read_sns(*this),
+	m_write_c(*this),
+	m_write_d(*this),
+	m_write_e(*this)
 { }
+
+
+//-------------------------------------------------
+//  disasm
+//-------------------------------------------------
+
+void mn1400_base_device::state_string_export(const device_state_entry &entry, std::string &str) const
+{
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			str = string_format("%c%c%c",
+				(m_status & FLAG_P) ? 'P' : 'p',
+				(m_status & FLAG_C) ? 'C' : 'c',
+				(m_status & FLAG_Z) ? 'Z' : 'z'
+			);
+			break;
+	}
+}
 
 
 //-------------------------------------------------
@@ -52,6 +85,12 @@ void mn1400_base_device::device_start()
 	m_datamask = (1 << m_datawidth) - 1;
 
 	// resolve callbacks
+	m_read_a.resolve_safe(0xf);
+	m_read_b.resolve_safe(0xf);
+	m_read_sns.resolve_safe(3);
+	m_write_c.resolve_safe();
+	m_write_d.resolve_safe();
+	m_write_e.resolve_safe();
 
 	// zerofill
 	m_pc = 0;
@@ -104,28 +143,6 @@ void mn1400_base_device::device_start()
 	set_icountptr(m_icount);
 }
 
-device_memory_interface::space_config_vector mn1400_base_device::memory_space_config() const
-{
-	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_DATA,    &m_data_config)
-	};
-}
-
-void mn1400_base_device::state_string_export(const device_state_entry &entry, std::string &str) const
-{
-	switch (entry.index())
-	{
-		case STATE_GENFLAGS:
-			str = string_format("%c%c%c",
-				(m_status & FLAG_P) ? 'P' : 'p',
-				(m_status & FLAG_C) ? 'C' : 'c',
-				(m_status & FLAG_Z) ? 'Z' : 'z'
-			);
-			break;
-	}
-}
-
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -136,15 +153,41 @@ void mn1400_base_device::device_reset()
 	m_pc = m_prev_pc = 0;
 	m_op = m_prev_op = 0;
 	m_status = 0;
+	m_ec = false;
 
 	// clear output ports
-	m_c = 0;
+	m_write_c(m_c = 0);
+	write_d(0);
+	m_write_e(0);
+}
+
+
+//-------------------------------------------------
+//  D output port
+//-------------------------------------------------
+
+void mn1400_base_device::device_add_mconfig(machine_config &config)
+{
+	PLA(config, m_opla, 5, 8, 24).set_format(pla_device::FMT::BERKELEY);
+}
+
+void mn1400_base_device::write_d(u8 data)
+{
+	m_write_d(m_opla->read(data));
 }
 
 
 //-------------------------------------------------
 //  common internal memory maps
 //-------------------------------------------------
+
+device_memory_interface::space_config_vector mn1400_base_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config)
+	};
+}
 
 void mn1400_base_device::program_1kx8(address_map &map)
 {

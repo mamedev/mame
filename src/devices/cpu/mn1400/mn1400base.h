@@ -14,12 +14,31 @@
 
 #pragma once
 
+#include "machine/pla.h"
+
 
 class mn1400_base_device : public cpu_device
 {
 public:
 	// configuration helpers
 	// I/O ports:
+
+	// 4-bit A/B input ports
+	auto read_a() { return m_read_a.bind(); }
+	auto read_b() { return m_read_b.bind(); }
+
+	// SNS0/SNS1 input pins
+	auto read_sns() { return m_read_sns.bind(); }
+
+	// up to 12-bit C output port
+	auto write_c() { return m_write_c.bind(); }
+
+	// up to 8-bit D output port
+	// for 4-bit, it uses D1-D4 or D1-D3,D5
+	auto write_d() { return m_write_d.bind(); }
+
+	// 4-bit E output port
+	auto write_e() { return m_write_e.bind(); }
 
 protected:
 	// construction/destruction
@@ -28,6 +47,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
@@ -42,15 +62,17 @@ protected:
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
+	void program_1kx8(address_map &map);
+	void program_2kx8(address_map &map);
+	void data_64x4(address_map &map);
+	void data_128x4(address_map &map);
+
 	address_space_config m_program_config;
 	address_space_config m_data_config;
 	address_space *m_program;
 	address_space *m_data;
 
-	void program_1kx8(address_map &map);
-	void program_2kx8(address_map &map);
-	void data_64x4(address_map &map);
-	void data_128x4(address_map &map);
+	optional_device<pla_device> m_opla; // D port output PLA
 
 	int m_icount;
 	int m_state_count;
@@ -61,6 +83,7 @@ protected:
 	u16 m_prgmask; // "
 	u16 m_datamask; // "
 
+	virtual void write_d(u8 data);
 	virtual void cycle();
 	virtual void increment_pc();
 	virtual bool op_has_param(u8 op) = 0;
@@ -71,7 +94,7 @@ protected:
 	u8 m_prev_op;
 	u8 m_param;
 	u8 m_ram_address;
-	u16 m_stack[2];
+	u16 m_stack[2]; // max 2
 	u8 m_sp;
 
 	u8 m_a;
@@ -90,6 +113,12 @@ protected:
 	};
 
 	// i/o handlers
+	devcb_read8 m_read_a;
+	devcb_read8 m_read_b;
+	devcb_read8 m_read_sns;
+	devcb_write16 m_write_c;
+	devcb_write8 m_write_d;
+	devcb_write8 m_write_e;
 };
 
 
