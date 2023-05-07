@@ -37,6 +37,7 @@
 #define GDROM_RETRY_STATE   0x08
 #define GDROM_ERROR_STATE   0x09
 
+#define LIVE_REQ_STAT 0
 
 /*
  Officially not documented security-related packet commands:
@@ -179,7 +180,30 @@ void gdrom_device::ExecCommand()
 	LOGCMDRAW("%02x\n", command[0]);
 	switch ( command[0] )
 	{
-		case 0x11: // REQ_MODE
+		case 0x00:
+			// TEST_UNIT
+			// TODO: verify if t10mmc use is enough
+			// loopchk returns OK in Packet cmnd (0201)
+			t10mmc::ExecCommand();
+			break;
+
+		case 0x10:
+		{
+			transferOffset = command[2];
+			u8 allocation_length = SCSILengthFromUINT8( &command[ 4 ] );
+			// any game that enables [redbook]
+			LOGCMD("REQ_STAT 10h offset %02x length %02x\n", transferOffset, allocation_length);
+
+			if (transferOffset || allocation_length != 0xa)
+				throw emu_fatalerror("GDROM: REQ_STAT with unsupported offset %02x length %02x", transferOffset, allocation_length);
+
+			m_phase = SCSI_PHASE_DATAIN;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
+			m_transfer_length = allocation_length;
+			break;
+		}
+
+		case 0x11:
 			LOGCMD("REQ_MODE 11h %02x %02x\n", command[2], command[4]);
 			m_phase = SCSI_PHASE_DATAIN;
 			m_status_code = SCSI_STATUS_CODE_GOOD;
@@ -205,62 +229,6 @@ void gdrom_device::ExecCommand()
 			{
 				LOGWARN("SET_MODE attempt to write on read only regs %02x\n", command[4]);
 				m_transfer_length = 0xa;
-			}
-			break;
-
-		case 0x30: // CD_READ
-			if (command[1] & 1)
-			{
-				m_transfer_length = 0;
-				throw emu_fatalerror("GDROM: MSF mode used for CD_READ, unsupported");
-			}
-			else
-			{
-				m_lba = (command[2]<<16 | command[3]<<8 | command[4]) - 150;
-				m_blocks = command[8]<<16 | command[9]<<8 | command[10];
-
-				read_type = (command[1] >> 1) & 7;
-				data_select = (command[1] >> 4) & 0xf;
-				//m_status |= IDE_STATUS_DSC;
-
-				// TODO: any other value is a non-Mode 1 attempt basically
-				if (read_type != 0 && read_type != 2)
-				{
-					throw emu_fatalerror("GDROM: Unhandled read_type %d", read_type);
-				}
-
-				if (data_select != 2)   // just sector data
-				{
-					throw emu_fatalerror("GDROM: Unhandled data_select %d", data_select);
-				}
-
-				// LBA 45000 is start of double density GD-ROM
-				LOGCMD("CD_READ 30h %02x %02x\n", command[2], command[4]);
-				LOGCMD("   LBA %d (%x) for %d blocks (%d bytes, read type %d, data select %d)\n",
-					m_lba + 150, m_lba, m_blocks,
-					m_blocks * m_sector_bytes, read_type, data_select
-				);
-
-				if (m_num_subblocks > 1)
-				{
-					m_cur_subblock = m_lba % m_num_subblocks;
-					m_lba /= m_num_subblocks;
-				}
-				else
-				{
-					m_cur_subblock = 0;
-				}
-
-				if (m_cdda != nullptr)
-				{
-					m_cdda->stop_audio();
-					m_audio_sense = SCSI_SENSE_ASC_ASCQ_NO_SENSE;
-					m_sector_number = (m_sector_number & 0xf0) | GDROM_STANDBY_STATE;
-				}
-
-				m_phase = SCSI_PHASE_DATAIN;
-				m_status_code = SCSI_STATUS_CODE_GOOD;
-				m_transfer_length = m_blocks * m_sector_bytes;
 			}
 			break;
 
@@ -307,18 +275,6 @@ void gdrom_device::ExecCommand()
 			LOGCMD("REQ_SES 15h %02x %02x\n", command[2], m_transfer_length);
 			break;
 		}
-
-		case 0x70:  // security check, return no data, always followed by cmd 0x71, command[1] parameter can be 0x1f or 0x9f
-			m_phase = SCSI_PHASE_STATUS;
-			m_status_code = SCSI_STATUS_CODE_GOOD;
-			m_transfer_length = 0;
-			break;
-
-		case 0x71:
-			m_phase = SCSI_PHASE_DATAIN;
-			m_status_code = SCSI_STATUS_CODE_GOOD;
-			m_transfer_length = sizeof(GDROM_Cmd71_Reply);
-			break;
 
 		case 0x20: // CD_PLAY
 		{
@@ -410,12 +366,67 @@ void gdrom_device::ExecCommand()
 					break;
 			}
 
-
 			m_phase = SCSI_PHASE_STATUS;
 			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = 0;
 			break;
 		}
+
+		case 0x30: // CD_READ
+			if (command[1] & 1)
+			{
+				m_transfer_length = 0;
+				throw emu_fatalerror("GDROM: MSF mode used for CD_READ, unsupported");
+			}
+			else
+			{
+				m_lba = (command[2]<<16 | command[3]<<8 | command[4]) - 150;
+				m_blocks = command[8]<<16 | command[9]<<8 | command[10];
+
+				read_type = (command[1] >> 1) & 7;
+				data_select = (command[1] >> 4) & 0xf;
+				//m_status |= IDE_STATUS_DSC;
+
+				// TODO: any other value is a non-Mode 1 attempt basically
+				if (read_type != 0 && read_type != 2)
+				{
+					throw emu_fatalerror("GDROM: Unhandled read_type %d", read_type);
+				}
+
+				if (data_select != 2)   // just sector data
+				{
+					throw emu_fatalerror("GDROM: Unhandled data_select %d", data_select);
+				}
+
+				// LBA 45000 is start of double density GD-ROM
+				LOGCMD("CD_READ 30h %02x %02x\n", command[2], command[4]);
+				LOGCMD("   LBA %d (%x) for %d blocks (%d bytes, read type %d, data select %d)\n",
+					m_lba + 150, m_lba, m_blocks,
+					m_blocks * m_sector_bytes, read_type, data_select
+				);
+
+				if (m_num_subblocks > 1)
+				{
+					m_cur_subblock = m_lba % m_num_subblocks;
+					m_lba /= m_num_subblocks;
+				}
+				else
+				{
+					m_cur_subblock = 0;
+				}
+
+				if (m_cdda != nullptr)
+				{
+					m_cdda->stop_audio();
+					m_audio_sense = SCSI_SENSE_ASC_ASCQ_NO_SENSE;
+					m_sector_number = (m_sector_number & 0xf0) | GDROM_STANDBY_STATE;
+				}
+
+				m_phase = SCSI_PHASE_DATAIN;
+				m_status_code = SCSI_STATUS_CODE_GOOD;
+				m_transfer_length = m_blocks * m_sector_bytes;
+			}
+			break;
 
 		case 0x40:
 		{
@@ -441,24 +452,26 @@ void gdrom_device::ExecCommand()
 			break;
 		}
 
-		case 0x10:
-			LOGCMD("REQ_STAT 10h offset %02x length %02x\n", command[2], command[4]);
-			// any game that enables redbook
-			//t10mmc::ExecCommand();
+		// security check, return no data, always followed by cmd 0x71, command[1] parameter can be 0x1f or 0x9f
+		case 0x70:
+			m_phase = SCSI_PHASE_STATUS;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
+			m_transfer_length = 0;
+			break;
 
+		case 0x71:
+			m_phase = SCSI_PHASE_DATAIN;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
+			m_transfer_length = sizeof(GDROM_Cmd71_Reply);
 			break;
 
 		// case 0x22: CD_SCAN
 		// case 0x31: CD_READ2
 		// case 0x13: REQ_ERROR
 		// case 0x16: CD_OPEN [Tray]
-		case 0x00:
-			// TEST_UNIT
-			// TODO: verify if t10mmc use is enough
-			// loopchk returns OK in Packet cmnd (0201)
-			t10mmc::ExecCommand();
-			break;
+
 		// case 0x08: ??? loopchk uses it in one of the Packet cmnd tests
+		//            (check for unsupported command?)
 
 		default:
 			throw emu_fatalerror("GDROM: unhandled command %02x", command[0]);
@@ -476,6 +489,37 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 
 	switch ( command[0] )
 	{
+		case 0x10: // REQ_STAT
+		{
+			data[0] = m_sector_number & 0xf; // CD status
+			data[1] = (m_sector_number & 0xf0) | (m_cd_status.repeat_current & 0xf);
+			auto fad = m_cdda->get_audio_lba() - 150;
+			auto trk = m_image->get_track(fad);
+			data[2] = m_image->get_adr_control(trk - 1);
+			data[3] = trk;
+			// TODO: index
+			data[4] = 1;
+			// FAD, in binary format
+			data[5] = (fad >> 16) & 0xff;
+			data[6] = (fad >> 8) & 0xff;
+			data[7] = fad & 0xff;
+			// Max Read Error Retry Times
+			data[8] = 0;
+			// <reserved>
+			data[9] = 0;
+			if (LIVE_REQ_STAT)
+			{
+				popmessage("STATUS %02x track %d index %d adr %02x fad %06d"
+					, m_sector_number
+					, data[3]
+					, data[4]
+					, data[2]
+					, fad
+				);
+			}
+			break;
+		}
+
 		case 0x11: // REQ_MODE
 			//LOGCMD("REQ_MODE dataLength %d\n", dataLength);
 			memcpy(data, &GDROM_Cmd11_Reply[transferOffset], (dataLength >= 32-transferOffset) ? 32-transferOffset : dataLength);
@@ -483,36 +527,19 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 			//data[1] = 0x01;
 			break;
 
-		case 0x30: // CD_READ
-			LOGXFER("CD_READ read %x dataLength,\n", dataLength);
-			if ((m_image->exists()) && (m_blocks))
-			{
-				while (dataLength > 0)
-				{
-					if (!m_image->read_data(m_lba, tmp_buffer, cdrom_file::CD_TRACK_MODE1))
-					{
-						LOGWARN("CD read error!\n");
-						return;
-					}
-
-					LOGXFER("True LBA: %d, buffer half: %d\n", m_lba, m_cur_subblock * m_sector_bytes);
-
-					memcpy(data, &tmp_buffer[m_cur_subblock * m_sector_bytes], m_sector_bytes);
-
-					m_cur_subblock++;
-					if (m_cur_subblock >= m_num_subblocks)
-					{
-						m_cur_subblock = 0;
-
-						m_lba++;
-						m_blocks--;
-					}
-
-					m_last_lba = m_lba;
-					dataLength -= m_sector_bytes;
-					data += m_sector_bytes;
-				}
-			}
+		case 0x13: // REQ_ERROR
+			// cfr. Appendix I for possible error types
+			data[0] = 0xf0; // fixed?
+			data[1] = 0;
+			data[2] = 6; // Sense Key
+			data[3] = 0;
+			// 4-7 "specific command details" (?) or FAD
+			data[4] = 0;
+			data[5] = 0;
+			data[6] = 0;
+			data[7] = 0;
+			data[8] = 0x29; // ASC
+			data[9] = 0; // ASCQ
 			break;
 
 		case 0x14: // READ TOC (GD-ROM ver.)
@@ -587,6 +614,7 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 
 		case 0x15:
 		{
+			// REQ_SES
 			//const u8 session_num = command[2] & 0xff;
 			data[0] = 1; // CD status, stripped by type?
 			data[1] = 0;
@@ -599,11 +627,36 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 			break;
 		}
 
-		case 0x71:
-			LOGCMD("SYS_REQ_SECU\n");
-			memcpy(data, &GDROM_Cmd71_Reply[0], sizeof(GDROM_Cmd71_Reply));
-			if (m_image->is_gd())
-				data[10] = 0x1f; // needed by dimm board firmware
+		case 0x30: // CD_READ
+			LOGXFER("CD_READ read %x dataLength,\n", dataLength);
+			if ((m_image->exists()) && (m_blocks))
+			{
+				while (dataLength > 0)
+				{
+					if (!m_image->read_data(m_lba, tmp_buffer, cdrom_file::CD_TRACK_MODE1))
+					{
+						LOGWARN("CD read error!\n");
+						return;
+					}
+
+					LOGXFER("True LBA: %d, buffer half: %d\n", m_lba, m_cur_subblock * m_sector_bytes);
+
+					memcpy(data, &tmp_buffer[m_cur_subblock * m_sector_bytes], m_sector_bytes);
+
+					m_cur_subblock++;
+					if (m_cur_subblock >= m_num_subblocks)
+					{
+						m_cur_subblock = 0;
+
+						m_lba++;
+						m_blocks--;
+					}
+
+					m_last_lba = m_lba;
+					dataLength -= m_sector_bytes;
+					data += m_sector_bytes;
+				}
+			}
 			break;
 
 		case 0x40: // Get Subchannel status
@@ -651,19 +704,11 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 			}
 			break;
 
-		case 0x13: // REQ_ERROR
-			// cfr. Appendix I for possible error types
-			data[0] = 0xf0; // fixed?
-			data[1] = 0;
-			data[2] = 6; // Sense Key
-			data[3] = 0;
-			// 4-7 "specific command details" (?) or FAD
-			data[4] = 0;
-			data[5] = 0;
-			data[6] = 0;
-			data[7] = 0;
-			data[8] = 0x29; // ASC
-			data[9] = 0; // ASCQ
+		case 0x71:
+			LOGCMD("SYS_REQ_SECU\n");
+			memcpy(data, &GDROM_Cmd71_Reply[0], sizeof(GDROM_Cmd71_Reply));
+			if (m_image->is_gd())
+				data[10] = 0x1f; // needed by dimm board firmware
 			break;
 
 		default:
