@@ -717,8 +717,9 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 				}
 				case 1: // Subcode Q
 					// TODO: unread by audio CD player (?)
+					LOGWARN("CD_SCD: unhandled Subcode Q path\n");
 					data[0] = 0; // Reserved
-					data[1] = m_audio_sense; // Audio Playback status (todo)
+					data[1] = m_audio_sense;
 					data[2] = 0;
 					data[3] = m_transfer_length; // header size
 					data[4] = 0; // ADR
