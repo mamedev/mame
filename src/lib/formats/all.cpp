@@ -889,11 +889,6 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #ifdef HAS_FORMATS_APD_DSK
 	en.add(FLOPPY_APD_FORMAT); // apd_dsk.h
 #endif
-#ifdef HAS_FORMATS_FS_HP98X5
-	en.add(fs::HP9825);
-	en.add(fs::HP9831);
-	en.add(fs::HP9845);
-#endif
 
 	en.category("HP");
 #ifdef HAS_FORMATS_APOLLO_DSK
@@ -910,6 +905,11 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #endif
 #ifdef HAS_FORMATS_FS_HPLIF
 	en.add(fs::HPLIF); // fs_lif.h
+#endif
+#ifdef HAS_FORMATS_FS_HP98X5
+	en.add(fs::HP9825);
+	en.add(fs::HP9831);
+	en.add(fs::HP9845);
 #endif
 
 	en.category("Applix");
