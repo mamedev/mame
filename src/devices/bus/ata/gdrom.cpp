@@ -493,7 +493,7 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 		{
 			data[0] = m_sector_number & 0xf; // CD status
 			data[1] = (m_sector_number & 0xf0) | (m_cd_status.repeat_current & 0xf);
-			auto fad = m_cdda->get_audio_lba() - 150;
+			auto fad = m_cdda->get_audio_lba();
 			auto trk = m_image->get_track(fad);
 			data[2] = m_image->get_adr_control(trk - 1);
 			data[3] = trk;
@@ -615,15 +615,20 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 		case 0x15:
 		{
 			// REQ_SES
-			//const u8 session_num = command[2] & 0xff;
-			data[0] = 1; // CD status, stripped by type?
-			data[1] = 0;
+			data[0] = m_sector_number & 0xf; // CD status, stripped by type?
+			data[1] = 0; // <reserved>, zeroed
 			data[2] = 1; // number of sessions
-			// FAD
-			// TODO: should be CD size
-			data[3] = 0;
-			data[4] = 0;
-			data[5] = 0x96;
+
+			const u8 session_num = command[2] & 0xff;
+			u32 fad;
+			if (session_num == 0)
+				fad = m_image->get_track_start(0xaa) + 150;
+			else
+				fad = m_image->get_track_start(0) + 150;
+			LOGTOC("SESSION %d: %06d\n", session_num, fad);
+			data[3] = (fad >> 16) & 0xff;
+			data[4] = (fad >> 8) & 0xff;
+			data[5] = fad & 0xff;
 			break;
 		}
 
@@ -660,43 +665,36 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 			break;
 
 		case 0x40: // Get Subchannel status
-			// TODO: stub, needs to derive most data coming from CD status
 			switch (command[2] & 0x0f)
 			{
 				case 0: // Subcode P-W
 				{
 					data[0] = 0; // Reserved
-					data[1] = 0x12; // Audio Playback status (todo)
+					data[1] = m_audio_sense;
 					data[2] = 0;
 					data[3] = m_transfer_length; // header size
-					auto trk = m_image->get_track(m_lba+150);
-					//printf("%d %d\n", trk, m_lba);
-					data[4] = m_image->get_adr_control(trk - 1) | 1;
-					data[5] = 1; // Track Number
-					data[6] = 1; // index #1
-					data[7] = 0;
-					data[8] = 0;
-					data[9] = 0; // Elapsed time
-					data[10] = 0;
-					data[11] = 0;
-					data[12] = 0x96; // FAD
-					for (int i = 0xe; i < m_transfer_length; i++)
-						data[i] = 0xff;
+					auto fad = m_cdda->get_audio_lba();
+					if (!m_image->read_subcode( fad, &data[4 + m_transfer_length]))
+					{
+						for (int i = 4; i < m_transfer_length; i++)
+							data[i] = 0;
+					}
+
 					break;
 				}
 				case 1: // Subcode Q
 					// TODO: unread by audio CD player (?)
 					data[0] = 0; // Reserved
-					data[1] = 0x12; // Audio Playback status (todo)
+					data[1] = m_audio_sense; // Audio Playback status (todo)
 					data[2] = 0;
-					data[3] = 0x0e; // header size
-					data[4] = 0; // ?
+					data[3] = m_transfer_length; // header size
+					data[4] = 0; // ADR
 					data[5] = 1; // Track Number
-					data[6] = 1; // gap #1
+					data[6] = 1; // index #1
 					data[7] = 0; // ?
 					data[8] = 0; // ?
-					data[9] = 0; // ?
-					data[0xa] = 0; // ?
+					data[9] = 0; // elapsed FAD
+					data[0xa] = 0; // <reserved>, zeroed
 					data[0xb] = 0; // FAD >> 16
 					data[0xc] = 0; // FAD >> 8
 					data[0xd] = 0x96; // FAD >> 0
