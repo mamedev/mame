@@ -14,15 +14,11 @@
 
 
     DVD Notes:
-    - TMP68301 communicates with h8 via their respective internal serial comms
-
-    - TMP sends "?P", h8 answers "P01", TMP tends "?S", h8 answers "NG", games says the dvd drive has a problem
-
     - h8 board components:
       H8/3002
       MN7100 8-bit channel data acquisition system
       Fujitsu MD0208
-      Heatsinked chip (TBD)
+      Zoran ZR36110PQC
       IDE and RS232c ports
       xtal 27 MHz, 12.288MHz
 
@@ -43,6 +39,7 @@
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "video/v9938.h"
+#include "video/zr36110.h"
 #include "nichisnd.h"
 
 class hrdvd_ata_controller_device : public abstract_ata_interface_device
@@ -67,6 +64,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
 		m_ata(*this, "ata"),
+		m_mpeg(*this, "mpeg"),
 		m_nichisnd(*this, "nichisnd"),
 		m_key(*this, "KEY.%u", 0),
 		m_region_maincpu(*this, "maincpu")
@@ -75,6 +73,7 @@ public:
 	required_device<tmp68301_device> m_maincpu;
 	required_device<h83002_device> m_subcpu;
 	required_device<hrdvd_ata_controller_device> m_ata;
+	required_device<zr36110_device> m_mpeg;
 	required_device<nichisnd_device> m_nichisnd;
 	required_ioport_array<5> m_key;
 	required_memory_region m_region_maincpu;
@@ -89,11 +88,6 @@ public:
 
 	uint8_t cs0_r(offs_t offset);
 	void cs0_w(offs_t offset, uint8_t data);
-
-	uint8_t sec_r();
-	void sec_w(uint8_t data);
-	void sec2_w(uint8_t data);
-	void sec3_w(uint8_t data);
 
 	uint16_t hrdvd_mux_r();
 	void hrdvd_mux_w(uint16_t data);
@@ -112,28 +106,6 @@ public:
 
 	static void dvdrom_config(device_t *device);
 };
-
-// Some kind of device a table is sent to
-uint8_t hrdvd_state::sec_r()
-{
-	// Bit 3 means ready for upload
-	return 0x08;
-}
-
-void hrdvd_state::sec_w(uint8_t data)
-{
-	// Table is 0xe00 bytes at offset 0x1000 of the h8 rom
-}
-
-void hrdvd_state::sec2_w(uint8_t data)
-{
-	// Table is 0x1000 bytes at offset 0x1e00 of the h8 rom
-}
-
-void hrdvd_state::sec3_w(uint8_t data)
-{
-	// Another table, partially hardcoded, partially generated
-}
 
 uint16_t hrdvd_state::pb_r()
 {
@@ -218,6 +190,7 @@ void hrdvd_ata_controller_device::write(offs_t offset, uint16_t data, uint16_t m
 		internal_write_cs0(offset * 2, data >> 8, 0xff);
 }
 
+
 void hrdvd_state::hrdvd_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
@@ -231,6 +204,8 @@ void hrdvd_state::hrdvd_map(address_map &map)
 
 	map(0x800000, 0xbfffff).rom().region("blit_gfx", 0); // GFX ROM routes here
 
+	map(0xc80000, 0xcbffff).ram(); // work RAM
+
 	map(0xe80000, 0xefffff).ram(); // work RAM
 }
 
@@ -238,11 +213,15 @@ void hrdvd_state::hrdvd_sub_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 
-	map(0x020008, 0x020008).w (FUNC(hrdvd_state::sec3_w));
-	map(0x02000a, 0x02000a).rw(FUNC(hrdvd_state::sec_r), FUNC(hrdvd_state::sec_w));
-	map(0x02000e, 0x02000e).w (FUNC(hrdvd_state::sec2_w));
+	map(0x020008, 0x020008).rw(m_mpeg, FUNC(zr36110_device::stat0_r), FUNC(zr36110_device::setup8_w));
+	map(0x02000a, 0x02000a).rw(m_mpeg, FUNC(zr36110_device::stat1_r), FUNC(zr36110_device::mc18_w));
+	map(0x02000c, 0x02000c).rw(m_mpeg, FUNC(zr36110_device::stat2_r), FUNC(zr36110_device::cmd8_w));
+	map(0x02000e, 0x02000e). w(m_mpeg,                                FUNC(zr36110_device::mc238_w));
+
 	map(0x040018, 0x040019).rw(m_ata, FUNC(hrdvd_ata_controller_device::dma_read), FUNC(hrdvd_ata_controller_device::dma_write));
 	map(0x040028, 0x04002f).rw(m_ata, FUNC(hrdvd_ata_controller_device::read), FUNC(hrdvd_ata_controller_device::write));
+
+	map(0x060000, 0x06bfff).ram();
 
 	map(0x078000, 0x07ffff).mirror(0xf80000).ram(); //.share("nvram");
 }
@@ -253,7 +232,6 @@ void hrdvd_state::hrdvd_sub_io_map(address_map &map)
 	map(h8_device::PORT_A, h8_device::PORT_A).w (FUNC(hrdvd_state::pa_w));
 	map(h8_device::PORT_B, h8_device::PORT_B).rw(FUNC(hrdvd_state::pb_r), FUNC(hrdvd_state::pb_w));
 //  map(h8_device::PORT_6, h8_device::PORT_6).noprw();
-//  map(h8_device::PORT_A, h8_device::PORT_A).nopw();
 }
 
 
@@ -420,6 +398,7 @@ WRITE_LINE_MEMBER(hrdvd_state::ata_drq)
 {
 	//  logerror("ata drq %d\n", state);
 	m_pb = (m_pb & 0x7f) | (state ? 0x00 : 0x80);
+	m_subcpu->set_input_line(H8_INPUT_LINE_DREQ1, state);
 }
 
 void hrdvd_state::tmp68301_parallel_port_w(uint16_t data)
@@ -470,6 +449,9 @@ void hrdvd_state::hrdvd(machine_config &config)
 	v9958.set_vram_size(0x20000);
 	v9958.int_cb().set_inputline(m_maincpu, 0);
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+
+	ZR36110(config, m_mpeg, 27_MHz_XTAL/2);
+	m_mpeg->drq_handler().set_inputline(m_maincpu, H8_INPUT_LINE_DREQ0);
 
 	/* sound hardware */
 	NICHISND(config, m_nichisnd, 0);

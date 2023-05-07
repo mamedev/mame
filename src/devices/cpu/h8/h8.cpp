@@ -160,11 +160,11 @@ void h8_device::set_current_dma(h8_dma_state *state)
 	current_dma = state;
 	if(!state)
 		logerror("DMA done\n");
-	else
+	else {
 		logerror("New current dma s=%x d=%x is=%d id=%d count=%x m=%d autoreq=%d\n",
 					state->source, state->dest, state->incs, state->incd,
 					state->count, state->mode_16 ? 16 : 8, state->autoreq);
-
+	}
 }
 
 void h8_device::set_current_dtc(h8_dtc_state *state)

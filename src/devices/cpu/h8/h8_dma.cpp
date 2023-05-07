@@ -430,9 +430,10 @@ bool h8_dma_channel_device::start_test(int vector)
 		if(dte != 3)
 			return false;
 
-		if(dmacr & 0x0800)
+		if(dmacr & 0x0800) {
 			throw emu_fatalerror("%s: DMA startup test in full address/block mode unimplemented.\n", tag());
-		else {
+
+		} else {
 			// Normal Mode
 			if(vector == -1) {
 				start(0);
@@ -478,8 +479,8 @@ void h8_dma_channel_device::start(int submodule)
 			state[submodule].dest = mar[1];
 			state[submodule].count = etcr[0] ? etcr[0] : 0x10000;
 			state[submodule].mode_16 = dmacr & 0x8000;
-			state[submodule].autoreq = (dmacr & 6) == 6;
-			state[submodule].suspended = !state[submodule].autoreq; // non-auto-request transfers start suspended
+			state[submodule].autoreq = (dmacr & 6) == 6 || (dmacr & 7) == 3; // autoreq or dreq level
+			state[submodule].suspended = (dmacr & 6) != 6; // non-auto-request transfers start suspended
 			int32_t step = state[submodule].mode_16 ? 2 : 1;
 			state[submodule].incs = dmacr & 0x2000 ? dmacr & 0x4000 ? -step : step : 0;
 			state[submodule].incd = dmacr & 0x0020 ? dmacr & 0x0040 ? -step : step : 0;
@@ -527,7 +528,6 @@ void h8_dma_channel_device::count_last(int submodule)
 
 void h8_dma_channel_device::count_done(int submodule)
 {
-	logerror("count done on %d\n", submodule);
 	if(!state[submodule].autoreq)
 		cpu->set_input_line(H8_INPUT_LINE_TEND0 + (state[submodule].id >> 1), CLEAR_LINE);
 	if(fae) {
