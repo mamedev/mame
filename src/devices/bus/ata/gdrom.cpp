@@ -19,7 +19,7 @@
 #define LOG_TOC     (1U << 5) // TOC frame offsets
 
 #define VERBOSE (LOG_GENERAL | LOG_WARN | LOG_CMD | LOG_TOC)
-#define LOG_OUTPUT_STREAM std::cout
+//#define LOG_OUTPUT_STREAM std::cout
 #include "logmacro.h"
 
 #define LOGWARN(...)      LOGMASKED(LOG_WARN, __VA_ARGS__)

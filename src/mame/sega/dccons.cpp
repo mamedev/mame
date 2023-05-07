@@ -666,9 +666,9 @@ ROM_START( dcfish )
 	ROM_REGION64_LE(0x040000, "dcflash", ROMREGION_ERASEFF)
 	ROM_LOAD( "fish_flash.bin", 0x020000, 0x020000, CRC(f7f36b7b) SHA1(f49d18de85c519c16d5447ca8ae39b62d1b8e483) ) // VA1 NTSC-JP
 
-	DISK_REGION( "ata:0:gdrom" )
+	DISK_REGION( "ata:0:gdrom:image" )
 	DISK_IMAGE_READONLY( "fish_life_amazon", 0, SHA1(2cbba727b219bbbeddf551d0f3e80c5f8ecbe21f) ) // HDR-0094
 ROM_END
 
 /*    YEAR  NAME     PARENT  MACHINE  INPUT  CLASS          INIT       ROT   COMPANY FULLNAME */
-GAME( 2000, dcfish,  0,      dc_fish, dcfish,dc_cons_state, init_dc, ROT0, "Sega", "Fish Life Amazon Playful Edition (Japan)", MACHINE_NOT_WORKING )
+GAME( 2000, dcfish,  0,      dc_fish, dcfish,dc_cons_state, init_dc, ROT0, "Sega", "Fish Life Amazon Playful Edition (Japan)", MACHINE_NOT_WORKING ) // requires SH-4 touch screen, crashes on attract mode with DRC
