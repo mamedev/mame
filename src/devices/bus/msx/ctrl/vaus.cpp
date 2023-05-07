@@ -97,7 +97,7 @@ void msx_vaus_device::pin_8_w(int state)
 	}
 	else if (!m_old_pin8)
 	{
-		// start counting
+		// start counting; the counter is incremented on a ~96k2 clock
 		m_counter = m_pot->read();
 		m_timer->adjust(attotime::from_ticks(m_counter, 96200));
 	}
