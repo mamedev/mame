@@ -70,14 +70,19 @@ protected:
 	u8 m_op;
 	u8 m_prev_op;
 	u8 m_param;
+	u8 m_ram_address;
+	u16 m_stack[2];
+	u8 m_sp;
 
 	u8 m_a;
 	u8 m_x;
 	u8 m_y;
 	u8 m_status;
+	u16 m_c;
 	u8 m_counter;
+	bool m_ec;
 
-	enum
+	enum : u8
 	{
 		FLAG_Z = 1,
 		FLAG_C = 2,

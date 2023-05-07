@@ -56,6 +56,10 @@ protected:
 	virtual bool op_has_param(u8 op) override;
 
 	// opcode helpers
+	u8 ram_r();
+	void ram_w(u8 data);
+	void set_z(u8 data);
+	void set_cz(u8 data);
 	void op_illegal();
 
 	// opcode handlers

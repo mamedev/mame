@@ -59,12 +59,17 @@ void mn1400_base_device::device_start()
 	m_op = 0;
 	m_prev_op = 0;
 	m_param = 0;
+	m_ram_address = 0;
+	memset(m_stack, 0, sizeof(m_stack));
+	m_sp = 0;
 
 	m_a = 0;
 	m_x = 0;
 	m_y = 0;
 	m_status = 0;
+	m_c = 0;
 	m_counter = 0;
+	m_ec = false;
 
 	// register for savestates
 	save_item(NAME(m_pc));
@@ -72,12 +77,17 @@ void mn1400_base_device::device_start()
 	save_item(NAME(m_op));
 	save_item(NAME(m_prev_op));
 	save_item(NAME(m_param));
+	save_item(NAME(m_ram_address));
+	save_item(NAME(m_stack));
+	save_item(NAME(m_sp));
 
 	save_item(NAME(m_a));
 	save_item(NAME(m_x));
 	save_item(NAME(m_y));
 	save_item(NAME(m_status));
+	save_item(NAME(m_c));
 	save_item(NAME(m_counter));
+	save_item(NAME(m_ec));
 
 	// register state for debugger
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%03X").noshow();
@@ -89,7 +99,7 @@ void mn1400_base_device::device_start()
 	state_add(++m_state_count, "A", m_a).formatstr("%01X"); // 2
 	state_add(++m_state_count, "X", m_x).formatstr("%01X"); // 3
 	state_add(++m_state_count, "Y", m_y).formatstr("%01X"); // 4
-	state_add(++m_state_count, "CNT", m_y).formatstr("%02X"); // 5
+	state_add(++m_state_count, "CNT", m_counter).formatstr("%02X"); // 5
 
 	set_icountptr(m_icount);
 }
@@ -125,7 +135,10 @@ void mn1400_base_device::device_reset()
 {
 	m_pc = m_prev_pc = 0;
 	m_op = m_prev_op = 0;
-	m_param = 0;
+	m_status = 0;
+
+	// clear output ports
+	m_c = 0;
 }
 
 
@@ -190,6 +203,7 @@ void mn1400_base_device::execute_run()
 			cycle();
 		}
 
+		m_ram_address = (m_x << 4 | m_y) & m_datamask;
 		execute_one();
 	}
 }
