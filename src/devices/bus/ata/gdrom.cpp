@@ -8,6 +8,8 @@
 
 #include "emu.h"
 #include "gdrom.h"
+#include "coreutil.h"
+
 #include <iostream>
 
 #define LOG_WARN    (1U << 1)
@@ -37,6 +39,7 @@
 #define GDROM_RETRY_STATE   0x08
 #define GDROM_ERROR_STATE   0x09
 
+// CD status readback/subchannel Q
 #define LIVE_REQ_STAT 0
 
 /*
@@ -509,7 +512,7 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 			data[9] = 0;
 			if (LIVE_REQ_STAT)
 			{
-				popmessage("STATUS %02x track %d index %d adr %02x fad %06d"
+				popmessage("REQ_STAT STATUS %02x track %d index %d adr %02x fad %06d"
 					, m_sector_number
 					, data[3]
 					, data[4]
@@ -676,8 +679,38 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 					auto fad = m_cdda->get_audio_lba();
 					if (!m_image->read_subcode( fad, &data[4 + m_transfer_length]))
 					{
-						for (int i = 4; i < m_transfer_length; i++)
-							data[i] = 0;
+						// attempt to provide Q channel
+						// TODO: audio CD player definitely reads here but never updates GFXs?
+						u8 subqbuf[12]{};
+						const u32 msf_abs = cdrom_file::lba_to_msf_alt( fad );
+						const auto trk = m_image->get_track( fad );
+						const u32 msf_rel = cdrom_file::lba_to_msf_alt( fad - m_image->get_track_start( trk ) );
+
+						subqbuf[0] = 0x01 | ((m_image->get_track_type(m_image->get_track(trk + 1)) == cdrom_file::CD_TRACK_AUDIO) ? 0x00 : 0x40);
+						subqbuf[1] = dec_2_bcd(trk + 1);
+						subqbuf[2] = 1;
+						subqbuf[3] = dec_2_bcd((msf_rel >> 16) & 0xff);
+						subqbuf[4] = dec_2_bcd((msf_rel >> 8) & 0xff);
+						subqbuf[5] = dec_2_bcd((msf_rel >> 0) & 0xff);
+						subqbuf[6] = 0;
+						subqbuf[7] = dec_2_bcd((msf_abs >> 16) & 0xff);
+						subqbuf[8] = dec_2_bcd((msf_abs >> 8) & 0xff);
+						subqbuf[9] = dec_2_bcd((msf_abs >> 0) & 0xff);
+						subqbuf[10] = 0xff; //machine().rand(); // CRC
+						subqbuf[11] = 0xff; //machine().rand();
+
+						if (LIVE_REQ_STAT)
+						{
+							popmessage("Qchan STATUS %02x TRACK %d ABS %02x:%02x:%02x REL %02x:%02x:%02x"
+								, subqbuf[0]
+								, subqbuf[1]
+								, subqbuf[7], subqbuf[8], subqbuf[9]
+								, subqbuf[3], subqbuf[4], subqbuf[5]
+							);
+						}
+
+						for (int i = 0; i < m_transfer_length - 4; i++)
+							data[i + 4] = BIT(subqbuf[i >> 3], 7 - (i & 7)) ? 0x40 : 0x00;
 					}
 
 					break;
