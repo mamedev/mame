@@ -97,7 +97,6 @@ void cdrom_image_device::device_stop()
 
 std::pair<std::error_condition, std::string> cdrom_image_device::call_load()
 {
-	fprintf(stderr, "HERE B\n");
 	if (has_preset_images())
 	{
 		setup_current_preset_image();
