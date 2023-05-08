@@ -40,6 +40,9 @@ image_manager::image_manager(running_machine &machine)
 	// make sure that any required devices have been allocated
 	for (device_image_interface &image : image_interface_enumerator(machine.root_device()))
 	{
+		// see if region-based chds are available
+		image.check_preset_images();
+
 		// ignore things not user loadable
 		if (!image.user_loadable())
 			continue;
