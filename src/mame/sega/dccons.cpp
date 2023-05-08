@@ -19,7 +19,6 @@
             25925600 (PAL 480 @ 50.00), 13462800 (PAL 240 @ 50.00)
 
     TODO:
-    - RTC error always pops up at start-up, no flash plus bug with ticks (needs rewrite)
     - cfr. naomi.cpp header for general DC notes;
     - https://github.com/flyinghead/flycast/blob/master/docs/Notable%20game%20bugs.md
       For a comprehensive list of issues to be verified;
@@ -27,15 +26,22 @@
     - G1 i/f for GD-ROM needs to be converted in device class and hunted for unsupported features;
     - VMU;
     - Modem;
+    - regtest dc.xml against region setting, find the bad chance that a SW item
+      managed to brick a dcjp and turning into PAL. Notable symptoms:
+      - crzytaxi2j will start with 50Hz/60Hz screen selector;
+      - jojobaj will run in PAL mode;
+
+    Notes:
+    - RTC error pops up at start-up. (btanb)
+      System saves to flash the AICA RTC timestamp and prompt user to change the clock in
+      case that drifts out significantly during boot.
+      Solution is to insert the actual host PC timestamp and have MAME nvram_save on,
+      that will lift the RTC prompt at next boot.
 
     Old TODO (to be rechecked and moved in XML notes):
     - Inputs doesn't work most of the time;
     - Candy Stripe: fills the log with "ATAPI_FEATURES_FLAG_OVL not supported", black screen
-    - Carrier: Jaleco logo uses YUV, but y size is halved?
     - Close To: Hangs at FMV
-    - F355 Challenge: black screen after Sega logo;
-    - Gundam - Side Story 0079: currently hangs at Bandai logo (regression)
-    - Idol Janshi wo Tsukucchaou: pixel aspect is way wrong (stretched and offsetted horizontally)
     - Power Stone: hangs at Capcom logo;
     - Sega GT: no cursor on main menu;
     - Tetris 4D: hangs at BPS FMV (bp 0C0B0C4E)
@@ -368,8 +374,9 @@ INPUT_PORTS_END
 void dc_cons_state::gdrom_config(device_t *device)
 {
 	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
-	cdda->add_route(0, "^^aica", 0.4);
-	cdda->add_route(1, "^^aica", 0.4);
+	cdda->audio_end_cb().set(*device, FUNC(gdrom_device::cdda_end_mark_cb));
+	cdda->add_route(0, "^^aica", 1.0);
+	cdda->add_route(1, "^^aica", 1.0);
 }
 
 void dc_cons_state::dc_base(machine_config &config)
@@ -659,9 +666,9 @@ ROM_START( dcfish )
 	ROM_REGION64_LE(0x040000, "dcflash", ROMREGION_ERASEFF)
 	ROM_LOAD( "fish_flash.bin", 0x020000, 0x020000, CRC(f7f36b7b) SHA1(f49d18de85c519c16d5447ca8ae39b62d1b8e483) ) // VA1 NTSC-JP
 
-	DISK_REGION( "ata:0:gdrom" )
+	DISK_REGION( "ata:0:gdrom:image" )
 	DISK_IMAGE_READONLY( "fish_life_amazon", 0, SHA1(2cbba727b219bbbeddf551d0f3e80c5f8ecbe21f) ) // HDR-0094
 ROM_END
 
 /*    YEAR  NAME     PARENT  MACHINE  INPUT  CLASS          INIT       ROT   COMPANY FULLNAME */
-GAME( 2000, dcfish,  0,      dc_fish, dcfish,dc_cons_state, init_dc, ROT0, "Sega", "Fish Life Amazon Playful Edition (Japan)", MACHINE_NOT_WORKING )
+GAME( 2000, dcfish,  0,      dc_fish, dcfish,dc_cons_state, init_dc, ROT0, "Sega", "Fish Life Amazon Playful Edition (Japan)", MACHINE_NOT_WORKING ) // requires SH-4 touch screen, crashes on attract mode with DRC
