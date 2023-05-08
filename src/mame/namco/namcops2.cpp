@@ -1142,6 +1142,9 @@ ROM_START( taiko7 )
 
 	DISK_REGION("dvd")
 	DISK_IMAGE_READONLY( "tk71dvd0", 0, SHA1(622ffc8f71f50e93069a8e91b56a7e63cf98b5ae) )
+
+	DISK_REGION("cd")
+	DISK_IMAGE_READONLY( "tk71_cd01", 0, SHA1(f2a88cfcc3cf8691987bed27c3e20a7fc828a7db) ) // firmware updater
 ROM_END
 
 ROM_START( taiko8 )
