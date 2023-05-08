@@ -31,8 +31,9 @@ TODO:
 
 #include "emu.h"
 #include "atm.h"
-
 #include "glukrs.h"
+
+#include "bus/spectrum/zxbus.h"
 #include "machine/pckeybrd.h"
 #include "machine/spi_sdcard.h"
 #include "machine/timer.h"
@@ -743,6 +744,10 @@ void pentevo_state::pentevo(machine_config &config)
 	m_sdcard->spi_miso_callback().set(FUNC(pentevo_state::spi_miso_w));
 
 	AT_KEYB(config, m_keyboard, pc_keyboard_device::KEYBOARD_TYPE::AT, 3);
+
+	zxbus_device &zxbus(ZXBUS(config, "zxbus", 0));
+	zxbus.set_iospace("maincpu", AS_IO);
+	ZXBUS_SLOT(config, "zxbus1", 0, "zxbus", zxbus_cards, nullptr);
 }
 
 

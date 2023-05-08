@@ -49,6 +49,7 @@ TODO:
 #include "emu.h"
 #include "tsconf.h"
 
+#include "bus/spectrum/zxbus.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "speaker.h"
@@ -276,7 +277,7 @@ void tsconf_state::tsconf(machine_config &config)
 
 	zxbus_device &zxbus(ZXBUS(config, "zxbus", 0));
 	zxbus.set_iospace("maincpu", AS_IO);
-	ZXBUS_SLOT(config, "zxbus1", 0, "zxbus", zxbus_cards, "neogs");
+	ZXBUS_SLOT(config, "zxbus1", 0, "zxbus", zxbus_cards, nullptr);
 	//ZXBUS_SLOT(config, "zxbus2", 0, "zxbus", zxbus_cards, nullptr);
 
 	m_ram->set_default_size("4096K");
