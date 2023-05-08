@@ -11,7 +11,8 @@ Hardware notes:
 - Fujitsu MB8841 MCU
 - 8-digit 14-seg LEDs, 2-bit sound
 
-There's also a version of this game on a Matsushita MN1405 MCU (see hh_mn1400.cpp).
+There's also a version of this game on a Matsushita MN1405 MCU (see hh_mn1400.cpp),
+even though it's a different MCU, the I/O is very similar.
 
 *******************************************************************************/
 

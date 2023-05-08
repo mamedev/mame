@@ -244,7 +244,7 @@ void mn1400_cpu_device::op_ci()
 
 void mn1400_cpu_device::op_cy()
 {
-	// CY: compare A with Y
+	// CY: compare Y with immediate
 	set_z(m_y ^ (m_op & 0xf));
 }
 
@@ -283,7 +283,7 @@ void mn1400_cpu_device::op_dcm()
 {
 	// DCM: decrement memory
 	cycle();
-	u8 temp = ram_r() - 1;
+	u8 temp = ram_r() + 0xf;
 	ram_w(temp);
 	set_cz(temp);
 }
@@ -354,21 +354,19 @@ void mn1400_cpu_device::op_otie()
 void mn1400_cpu_device::op_rco()
 {
 	// RCO: reset C pin
-	m_c &= ~(1 << m_y);
-	m_write_c(m_c);
+	write_c(m_c & ~(1 << m_y));
 }
 
 void mn1400_cpu_device::op_sco()
 {
 	// SCO: set C pin
-	m_c |= 1 << m_y;
-	m_write_c(m_c);
+	write_c(m_c | (1 << m_y));
 }
 
 void mn1400_cpu_device::op_cco()
 {
 	// CCO: clear C port
-	m_write_c(m_c = 0);
+	write_c(0);
 }
 
 
@@ -417,7 +415,7 @@ void mn1400_cpu_device::op_bpcz()
 void mn1400_cpu_device::op_jmp()
 {
 	// JMP: jump
-	m_pc = ((m_op & 0xf) << 8 | m_param) & m_prgmask;
+	m_pc = ((m_op & 7) << 8 | m_param) & m_prgmask;
 }
 
 void mn1400_cpu_device::op_cal()

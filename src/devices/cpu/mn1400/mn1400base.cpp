@@ -50,7 +50,10 @@ mn1400_base_device::mn1400_base_device(const machine_config &mconfig, device_typ
 	m_read_sns(*this),
 	m_write_c(*this),
 	m_write_d(*this),
-	m_write_e(*this)
+	m_write_e(*this),
+	m_c_mask(0xfff),
+	m_d_mask(0xff),
+	m_d_bits(0)
 { }
 
 
@@ -85,9 +88,9 @@ void mn1400_base_device::device_start()
 	m_datamask = (1 << m_datawidth) - 1;
 
 	// resolve callbacks
-	m_read_a.resolve_safe(0xf);
-	m_read_b.resolve_safe(0xf);
-	m_read_sns.resolve_safe(3);
+	m_read_a.resolve_safe(0);
+	m_read_b.resolve_safe(0);
+	m_read_sns.resolve_safe(0);
 	m_write_c.resolve_safe();
 	m_write_d.resolve_safe();
 	m_write_e.resolve_safe();
@@ -156,14 +159,14 @@ void mn1400_base_device::device_reset()
 	m_ec = false;
 
 	// clear output ports
-	m_write_c(m_c = 0);
+	write_c(0);
 	write_d(0);
 	m_write_e(0);
 }
 
 
 //-------------------------------------------------
-//  D output port
+//  I/O
 //-------------------------------------------------
 
 void mn1400_base_device::device_add_mconfig(machine_config &config)
@@ -173,7 +176,20 @@ void mn1400_base_device::device_add_mconfig(machine_config &config)
 
 void mn1400_base_device::write_d(u8 data)
 {
-	m_write_d(m_opla->read(data));
+	u8 output = m_opla->read(data);
+	output = bitswap<8>(output,7,6,5,3,1,2,0,4);
+
+	// DO outputs may be bonded to different DO pins
+	if (u32 b = m_d_bits)
+		output = bitswap<8>(output, b >> 28 & 7, b >> 24 & 7, b >> 20 & 7, b >> 16 & 7, b >> 12 & 7, b >> 8 & 7, b >> 4 & 7, b >> 0 & 7);
+
+	m_write_d(~output & m_d_mask);
+}
+
+void mn1400_base_device::write_c(u16 data)
+{
+	m_c = data & m_c_mask;
+	m_write_c(m_c);
 }
 
 
