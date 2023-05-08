@@ -234,8 +234,6 @@ private:
 	void write_odd(uint16_t data);
 	uint16_t read_odd();
 	void vsync_int_ctrl(uint16_t data);
-	uint8_t mcu_r(offs_t offset);
-	void mcu_w(offs_t offset, uint8_t data);
 	uint8_t b_read();
 	void b_writ(uint8_t data);
 	void strobe_w(uint8_t data);
@@ -243,14 +241,13 @@ private:
 	uint8_t kbd_r();
 	uint32_t screen_update_maygayv1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_maygayv1);
-	void data_from_i8031(uint8_t data);
-	uint8_t data_to_i8031();
+	uint8_t sound_p1_r();
+	void sound_p1_w(uint8_t data);
+	uint8_t sound_p3_r();
+	void sound_p3_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_txa);
 	void main_map(address_map &map);
-	void sound_data(address_map &map);
-	void sound_io(address_map &map);
-	void sound_prg(address_map &map);
 	void cpu_space_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
@@ -273,7 +270,6 @@ private:
 	int m_vsync_latch_preset = 0;
 	uint8_t m_p1 = 0;
 	uint8_t m_p3 = 0;
-	int m_d68681_val = 0;
 	i82716_t m_i82716;
 	output_finder<8 * 256> m_lamp;
 };
@@ -616,59 +612,34 @@ void maygayv1_state::main_map(address_map &map)
 
 */
 
-uint8_t maygayv1_state::mcu_r(offs_t offset)
+uint8_t maygayv1_state::sound_p1_r()
 {
-	switch (offset)
-	{
-		case 1:
-		{
-			if ( !BIT(m_p3, 4) )
-				return (ioport("REEL")->read());    // Reels???
-			else
-				return 0;
-		}
-
-		case 3: return m_upd7759->busy_r() ? 0 : 0x08;
-	}
-	return 0;
+	if (!BIT(m_p3, 4))
+		return (ioport("REEL")->read());    // Reels???
+	else
+		return m_p1;
 }
 
-void maygayv1_state::mcu_w(offs_t offset, uint8_t data)
+void maygayv1_state::sound_p1_w(uint8_t data)
 {
-			logerror("O %x D %x",offset,data);
+	m_p1 = data;
 
-	switch (offset)
-	{
-		// Bottom nibble = UPD
-		case 1:
-			m_p1 = data;
-//          m_upd7759->msg_w(data);//?
-			break;
-		case 3:
-			m_upd7759->reset_w (BIT(data, 2));
-			m_upd7759->start_w(BIT(data, 6));
-
-//          if ( !BIT(m_p3, 7) && BIT(data, 7) )
-				// P1 propagates to outputs
-
-			m_p3 = data;
-			break;
-	}
+	m_upd7759->port_w(data);//?
 }
 
-
-void maygayv1_state::sound_prg(address_map &map)
+uint8_t maygayv1_state::sound_p3_r()
 {
-	map(0x0000, 0xffff).rom();
+	return m_upd7759->busy_r() ? m_p3 : (m_p3 | 0x08);
 }
 
-void maygayv1_state::sound_data(address_map &map)
+void maygayv1_state::sound_p3_w(uint8_t data)
 {
-}
+	// preserve RXD
+	m_p3 = (m_p3 & 1) | (m_p3 & ~1);
 
-void maygayv1_state::sound_io(address_map &map)
-{
-	map(0x00, 0xff).rw(FUNC(maygayv1_state::mcu_r), FUNC(maygayv1_state::mcu_w));
+	m_duart68681->rx_a_w(BIT(data, 1));
+	m_upd7759->reset_w(BIT(data, 2));
+	m_upd7759->start_w(BIT(data, 6));
 }
 
 
@@ -835,18 +806,10 @@ WRITE_LINE_MEMBER(maygayv1_state::duart_irq_handler)
 
 WRITE_LINE_MEMBER(maygayv1_state::duart_txa)
 {
-	m_d68681_val = state;
-	m_soundcpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);  // ?
-}
-
-uint8_t maygayv1_state::data_to_i8031()
-{
-	return m_d68681_val;
-}
-
-void maygayv1_state::data_from_i8031(uint8_t data)
-{
-	m_duart68681->rx_a_w(data);
+	if (state)
+		m_p3 |= 1;
+	else
+		m_p3 &= ~1;
 }
 
 uint8_t maygayv1_state::b_read()
@@ -886,11 +849,10 @@ void maygayv1_state::maygayv1(machine_config &config)
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &maygayv1_state::cpu_space_map);
 
 	I8052(config, m_soundcpu, SOUND_CLOCK);
-	m_soundcpu->set_addrmap(AS_PROGRAM, &maygayv1_state::sound_prg);
-	m_soundcpu->set_addrmap(AS_DATA, &maygayv1_state::sound_data);
-	m_soundcpu->set_addrmap(AS_IO, &maygayv1_state::sound_io);
-	m_soundcpu->serial_tx_cb().set(FUNC(maygayv1_state::data_from_i8031));
-	m_soundcpu->serial_rx_cb().set(FUNC(maygayv1_state::data_to_i8031));
+	m_soundcpu->port_in_cb<1>().set(FUNC(maygayv1_state::sound_p1_r));
+	m_soundcpu->port_out_cb<1>().set(FUNC(maygayv1_state::sound_p1_w));
+	m_soundcpu->port_in_cb<3>().set(FUNC(maygayv1_state::sound_p3_r));
+	m_soundcpu->port_out_cb<3>().set(FUNC(maygayv1_state::sound_p3_w));
 
 	/* U25 ST 2 9148 EF68B21P */
 	pia6821_device &pia(PIA6821(config, "pia", 0));
