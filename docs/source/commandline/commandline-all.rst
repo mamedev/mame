@@ -2977,11 +2977,14 @@ Core Sound Options
 
 **-volume** / **-vol** *<value>*
 
-    Sets the startup volume. It can later be changed with the user interface
-    (see Keys section).  The volume is an attenuation in dB: e.g.,
-    "**-volume -12**" will start with -12dB attenuation.
+    Sets the initial sound volume.  It can be changed later with the user
+    interface (see Keys section).  The volume is an attenuation in decibels:
+    e.g. "**-volume -12**" will start with -12 dB attenuation.  Note that if the
+    volume is changed in the user interface it will be saved to the
+    configuration file for the system.  The value from the configuration file
+    for the system has priority over ``volume`` settings in general INI files.
 
-    The default is ``0``.
+    The default is ``0`` (no attenuation, or full volume).
 
     Example:
         .. code-block:: bash
@@ -3053,11 +3056,11 @@ Core Sound Options
 
     The default is ``1``.
 
-    | For PortAudio, see the section on :ref:`-pa_latency <mame-commandline-palatency>`.
-    | XAudio2 calculates audio_latency as 10ms steps.
-    | DSound calculates audio_latency as 10ms steps.
-    | CoreAudio calculates audio_latency as 25ms steps.
-    | SDL calculates audio_latency as Xms steps.
+    * For PortAudio, see the section on :ref:`-pa_latency <mame-commandline-palatency>`.
+    * XAudio2 calculates audio_latency as 10ms steps.
+    * DSound calculates audio_latency as 10ms steps.
+    * CoreAudio calculates audio_latency as 25ms steps.
+    * SDL calculates audio_latency as Xms steps.
 
     Example:
         .. code-block:: bash
@@ -3559,11 +3562,13 @@ Core Input Automatic Enable Options
     :ref:`-mouse <mame-commandline-nomouse>`, :ref:`-joystick
     <mame-commandline-nojoystick>` and/or :ref:`-lightgun
     <mame-commandline-nolightgun>` depending on the type of inputs present on
-    the emulated system.
+    the emulated system.  Note that these options *will not* override explicit
+    **-nomouse**, **-nojoystick** and/or **-nolightgun** settings at a higher
+    priority level (e.g. in a more specific INI file or on the command line).
 
     For example, if you specify the option **-paddle_device mouse**, then mouse
     controls will automatically be enabled when you run a game that has paddle
-    controls (e.g. Super Breakout), even if you specified **-nomouse**.
+    controls (e.g. Super Breakout), even if you specified **-nomouse** .
 
     The default is to automatically enable mouse controls when running emulated
     systems with mouse inputs (**-mouse_device mouse**).
