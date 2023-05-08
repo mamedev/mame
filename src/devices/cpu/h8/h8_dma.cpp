@@ -121,13 +121,13 @@ void h8_dma_device::dmabcr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 h8_dma_channel_device::h8_dma_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, H8_DMA_CHANNEL, tag, owner, clock),
 	dmac(*this, "^"),
-	cpu(*this, "^^")
+	cpu(*this, "^^"),
+	intc(*this, finder_base::DUMMY_TAG)
 {
 }
 
-void h8_dma_channel_device::set_info(const char *_intc, int _irq_base, int v0, int v1, int v2, int v3, int v4, int v5, int v6, int v7, int v8, int v9, int va, int vb, int vc, int vd, int ve, int vf)
+void h8_dma_channel_device::set_info(int _irq_base, int v0, int v1, int v2, int v3, int v4, int v5, int v6, int v7, int v8, int v9, int va, int vb, int vc, int vd, int ve, int vf)
 {
-	intc_tag = _intc;
 	irq_base = _irq_base;
 	activation_vectors[ 0] = v0;
 	activation_vectors[ 1] = v1;
@@ -430,9 +430,10 @@ bool h8_dma_channel_device::start_test(int vector)
 		if(dte != 3)
 			return false;
 
-		if(dmacr & 0x0800)
+		if(dmacr & 0x0800) {
 			throw emu_fatalerror("%s: DMA startup test in full address/block mode unimplemented.\n", tag());
-		else {
+
+		} else {
 			// Normal Mode
 			if(vector == -1) {
 				start(0);
@@ -478,8 +479,8 @@ void h8_dma_channel_device::start(int submodule)
 			state[submodule].dest = mar[1];
 			state[submodule].count = etcr[0] ? etcr[0] : 0x10000;
 			state[submodule].mode_16 = dmacr & 0x8000;
-			state[submodule].autoreq = (dmacr & 6) == 6;
-			state[submodule].suspended = !state[submodule].autoreq; // non-auto-request transfers start suspended
+			state[submodule].autoreq = (dmacr & 6) == 6 || (dmacr & 7) == 3; // autoreq or dreq level
+			state[submodule].suspended = (dmacr & 6) != 6; // non-auto-request transfers start suspended
 			int32_t step = state[submodule].mode_16 ? 2 : 1;
 			state[submodule].incs = dmacr & 0x2000 ? dmacr & 0x4000 ? -step : step : 0;
 			state[submodule].incd = dmacr & 0x0020 ? dmacr & 0x0040 ? -step : step : 0;
@@ -527,7 +528,6 @@ void h8_dma_channel_device::count_last(int submodule)
 
 void h8_dma_channel_device::count_done(int submodule)
 {
-	logerror("count done on %d\n", submodule);
 	if(!state[submodule].autoreq)
 		cpu->set_input_line(H8_INPUT_LINE_TEND0 + (state[submodule].id >> 1), CLEAR_LINE);
 	if(fae) {
@@ -538,7 +538,7 @@ void h8_dma_channel_device::count_done(int submodule)
 			dmac->clear_dte(state[0].id);
 			dtcr[0] &= ~0x80; // clear DTE (for H8H)
 			if(dtie & 1)
-				throw emu_fatalerror("%s: DMA end-of-transfer interrupt in full address/normal mode unimplemented.\n", tag());
+				intc->internal_interrupt(irq_base + submodule);
 		}
 	} else {
 		uint8_t cr = submodule ? dmacr & 0x00ff : dmacr >> 8;
@@ -554,7 +554,7 @@ void h8_dma_channel_device::count_done(int submodule)
 			dmac->clear_dte(state[0].id + submodule);
 			dtcr[submodule] &= ~0x80; // clear DTE (for H8H)
 			if(dtie & (1 << submodule))
-				throw emu_fatalerror("%s: DMA end-of-transfer interrupt in short address mode unimplemented.\n", tag());
+				intc->internal_interrupt(irq_base + submodule);
 		}
 	}
 }

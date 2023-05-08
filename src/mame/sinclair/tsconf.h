@@ -12,13 +12,13 @@
 
 #include "spec128.h"
 
-#include "beta_m.h"
-
 #include "glukrs.h"
+#include "tsconfdma.h"
+
+#include "beta_m.h"
+#include "bus/spectrum/zxbus.h"
 #include "machine/pckeybrd.h"
 #include "machine/spi_sdcard.h"
-#include "neogs.h"
-#include "tsconfdma.h"
 
 #include "tilemap.h"
 
@@ -38,8 +38,7 @@ public:
 		  m_palette(*this, "palette"),
 		  m_gfxdecode(*this, "gfxdecode"),
 		  m_cram(*this, "cram"),
-		  m_sfile(*this, "sfile"),
-		  m_gs(*this, "gs")
+		  m_sfile(*this, "sfile")
 	{
 	}
 
@@ -215,7 +214,6 @@ private:
 	tilemap_t *m_ts_tilemap[3]{};
 	required_device<ram_device> m_cram;
 	required_device<ram_device> m_sfile;
-	required_device<neogs_device> m_gs;
 };
 
 /*----------- defined in drivers/tsconf.c -----------*/

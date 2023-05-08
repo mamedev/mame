@@ -697,7 +697,7 @@ QUICKLOAD_LOAD_MEMBER(avigo_state::quickload_cb)
 	int app_page;
 
 	// german and spanish language are 4 pages bigger than other
-	if ( strcmp( systemname, "avigo_de" ) == 0 || strcmp( systemname, "avigo_es" ) == 0 )
+	if (strcmp( systemname, "avigo_de" ) == 0 || strcmp( systemname, "avigo_es" ) == 0)
 		first_app_page += 4;
 
 	// search the first empty page
@@ -732,11 +732,10 @@ QUICKLOAD_LOAD_MEMBER(avigo_state::quickload_cb)
 		// reset the CPU for allow at the Avigo OS to recognize the installed app
 		m_warm_start = 1;
 		m_maincpu->reset();
-
-		return image_init_result::PASS;
+		return std::make_pair(std::error_condition(), std::string());
 	}
 
-	return image_init_result::FAIL;
+	return std::make_pair(image_error::INVALIDLENGTH, std::string());
 }
 
 void avigo_state::nvram_init(nvram_device &nvram, void *base, size_t size)

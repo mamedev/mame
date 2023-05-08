@@ -293,16 +293,21 @@ static std::vector<std::wstring> get_tap_adapters()
 
 				// check if the ComponentId value indicates a TAP-Windows adapter
 				if (RegQueryValueExW(unit_key, L"ComponentId", NULL, &data_type, LPBYTE(component_id), &component_id_len) == ERROR_SUCCESS
-					&& data_type == REG_SZ
-					&& safe_string(component_id, component_id_len) == L"" PRODUCT_TAP_WIN_COMPONENT_ID)
+					&& data_type == REG_SZ)
 				{
-					WCHAR net_cfg_instance_id[MAX_PATH];
-					DWORD net_cfg_instance_id_len = sizeof(net_cfg_instance_id);
+					std::wstring const value(safe_string(component_id, component_id_len));
 
-					// add the adapter to the result
-					if (RegQueryValueExW(unit_key, L"NetCfgInstanceId", NULL, &data_type, LPBYTE(net_cfg_instance_id), &net_cfg_instance_id_len) == ERROR_SUCCESS
-						&& data_type == REG_SZ)
-						result.push_back(safe_string(net_cfg_instance_id, net_cfg_instance_id_len));
+					// some older versions may not set the "root\" prefix
+					if (value == L"root\\" PRODUCT_TAP_WIN_COMPONENT_ID || value == L"" PRODUCT_TAP_WIN_COMPONENT_ID)
+					{
+						WCHAR net_cfg_instance_id[MAX_PATH];
+						DWORD net_cfg_instance_id_len = sizeof(net_cfg_instance_id);
+
+						// add the adapter to the result
+						if (RegQueryValueExW(unit_key, L"NetCfgInstanceId", NULL, &data_type, LPBYTE(net_cfg_instance_id), &net_cfg_instance_id_len) == ERROR_SUCCESS
+							&& data_type == REG_SZ)
+							result.push_back(safe_string(net_cfg_instance_id, net_cfg_instance_id_len));
+					}
 				}
 
 				RegCloseKey(unit_key);

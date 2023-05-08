@@ -119,6 +119,8 @@ void rbv_device::device_reset()
 	m_pseudovia_regs[3] = 0;
 	m_pseudovia_ier = 0;
 	m_pseudovia_ifr = 0;
+
+	m_pseudovia_regs[0x10] = 0x40;  // video off
 }
 
 void rbv_device::set_ram_info(u32 *ram, u32 size)
@@ -282,7 +284,6 @@ void rbv_device::pseudovia_w(offs_t offset, uint8_t data)
 		switch (offset)
 		{
 		case 0x02:
-			printf("PV: %02x to offset 2\n", data);
 			m_pseudovia_regs[offset] |= (data & 0x40);
 			pseudovia_recalc_irqs();
 			break;
@@ -435,6 +436,13 @@ u32 rbv_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 		hres = 640;
 		vres = 480;
 		break;
+	}
+
+	// video disabled?
+	if (m_pseudovia_regs[0x10] & 0x40)
+	{
+		bitmap.fill(0, cliprect);
+		return 0;
 	}
 
 	const pen_t *pens = m_palette->pens();

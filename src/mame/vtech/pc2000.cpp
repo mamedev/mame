@@ -901,14 +901,14 @@ GFXDECODE_END
 
 DEVICE_IMAGE_LOAD_MEMBER( pc2000_state::cart_load )
 {
-	uint32_t size = m_cart->common_get_size("rom");
+	uint32_t const size = m_cart->common_get_size("rom");
 
 	// we always allocate a 0x40000 region, even if most carts span only 0x20000,
 	// because the bankswitch code accesses up to 16 x 16K banks...
 	m_cart->rom_alloc(0x40000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void pc2000_state::pc2000gen(machine_config &config)

@@ -51,8 +51,8 @@
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
+#include "machine/nandflash.h"
 #include "machine/s3c2440.h"
-#include "machine/smartmed.h"
 #include "sound/dac.h"
 #include "screen.h"
 #include "speaker.h"
@@ -89,7 +89,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<s3c2440_device> m_s3c2440;
-	required_device<nand_device> m_nand, m_nand2;
+	required_device<samsung_k9lag08u0m_device> m_nand, m_nand2;
 	required_device<dac_word_interface> m_ldac;
 	required_device<dac_word_interface> m_rdac;
 	required_ioport_array<6> m_inputs;
@@ -470,8 +470,6 @@ uint32_t hapyfish_state::s3c2440_adc_data_r()
 
 void hapyfish_state::machine_start()
 {
-	m_nand->set_data_ptr(memregion("nand")->base());
-	m_nand2->set_data_ptr(memregion("nand2")->base());
 	m_nand_select = true; // select NAND #1 (S3C2440 bootloader will happen before machine_reset())
 	m_input_select = 7;
 }
@@ -539,12 +537,10 @@ void hapyfish_state::hapyfish(machine_config &config)
 	m_s3c2440->nand_data_r_callback().set(FUNC(hapyfish_state::s3c2440_nand_data_r));
 	m_s3c2440->nand_data_w_callback().set(FUNC(hapyfish_state::s3c2440_nand_data_w));
 
-	NAND(config, m_nand, 0);
-	m_nand->set_nand_type(nand_device::chip::K9LAG08U0M);
+	SAMSUNG_K9LAG08U0M(config, m_nand, 0);
 	m_nand->rnb_wr_callback().set(m_s3c2440, FUNC(s3c2440_device::frnb_w));
 
-	NAND(config, m_nand2, 0);
-	m_nand2->set_nand_type(nand_device::chip::K9LAG08U0M);
+	SAMSUNG_K9LAG08U0M(config, m_nand2, 0);
 	m_nand2->rnb_wr_callback().set(m_s3c2440, FUNC(s3c2440_device::frnb_w));
 }
 

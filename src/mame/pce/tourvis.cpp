@@ -223,22 +223,21 @@ private:
 	uint32_t  m_rom_size = 0;
 };
 
-DEVICE_IMAGE_LOAD_MEMBER( tourvision_state::cart_load )
+DEVICE_IMAGE_LOAD_MEMBER(tourvision_state::cart_load)
 {
 	m_rom_size = m_cart->common_get_size("rom");
 	m_cart->rom_alloc(m_rom_size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), m_rom_size, "rom");
 
-	uint8_t* rgn = memregion("maincpu")->base();
-	uint8_t* base = m_cart->get_rom_base();
+	uint8_t *rgn = memregion("maincpu")->base();
+	uint8_t *base = m_cart->get_rom_base();
 
 	if (m_rom_size == 0x0c0000)
 	{
 		memcpy(rgn+0x000000, base+0x000000, 0x0c0000 );
 		memcpy(rgn+0x0c0000, base+0x080000, 0x040000 );
 	}
-	else
-	if (m_rom_size == 0x060000)
+	else if (m_rom_size == 0x060000)
 	{
 		memcpy(rgn+0x000000, base+0x000000, 0x040000 );
 		memcpy(rgn+0x040000, base+0x000000, 0x040000 );
@@ -249,8 +248,8 @@ DEVICE_IMAGE_LOAD_MEMBER( tourvision_state::cart_load )
 	}
 	else
 	{
-		for (int i=0;i<0x100000;i+=m_rom_size)
-			memcpy(rgn+i, base+0x000000, m_rom_size );
+		for (int i=0; i<0x100000; i+=m_rom_size)
+			memcpy(rgn+i, base+0x000000, m_rom_size);
 	}
 
 #if 0
@@ -265,7 +264,7 @@ DEVICE_IMAGE_LOAD_MEMBER( tourvision_state::cart_load )
 	}
 #endif
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 // Note from system11: This system actually supports 2 players

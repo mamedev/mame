@@ -17,6 +17,7 @@
 #include "ui/filesel.h"
 #include "ui/floppycntrl.h"
 #include "ui/imgcntrl.h"
+#include "ui/prscntrl.h"
 #include "ui/miscmenu.h"
 #include "ui/ui.h"
 
@@ -136,6 +137,16 @@ void menu_file_manager::populate()
 			// if so, cycle through all its image interfaces
 			for (device_image_interface &scan : subiter)
 			{
+				if (scan.has_preset_images_selection())
+				{
+					if (devtags.insert(scan.device().tag()).second)
+					{
+						item_append(string_format(_("[root%1$s]"), scan.device().owner()->tag()), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
+						item_append(scan.image_type_name(), scan.preset_images_list()[scan.current_preset_image_id()], 0, (void *)&scan);
+					}
+					continue;
+				}
+
 				if (!scan.user_loadable())
 					continue;
 
@@ -173,30 +184,50 @@ void menu_file_manager::populate()
 
 bool menu_file_manager::handle(event const *ev)
 {
-	if (!ev || !ev->itemref || (ev->iptkey != IPT_UI_SELECT))
-		return false;
+	bool result = false;
 
-	if ((uintptr_t)ev->itemref == 1)
+	if (ev)
 	{
-		machine().schedule_hard_reset();
-	}
-	else
-	{
-		selected_device = (device_image_interface *) ev->itemref;
-		if (selected_device)
+		if ((uintptr_t)ev->itemref == 1)
 		{
-			floppy_image_device *floppy_device = dynamic_cast<floppy_image_device *>(selected_device);
-			if (floppy_device)
-				menu::stack_push<menu_control_floppy_image>(ui(), container(), *floppy_device);
-			else
-				menu::stack_push<menu_control_device_image>(ui(), container(), *selected_device);
+			if (selected_device)
+			{
+				selected_device = nullptr;
+				result = true;
+			}
 
-			// reset the existing menu
-			reset(reset_options::REMEMBER_POSITION);
+			if (IPT_UI_SELECT == ev->iptkey)
+				machine().schedule_hard_reset();
+		}
+		else
+		{
+			if (ev->itemref != selected_device)
+			{
+				selected_device = (device_image_interface *)ev->itemref;
+				result = true;
+			}
+
+			if (selected_device && (IPT_UI_SELECT == ev->iptkey))
+			{
+				if (selected_device->has_preset_images_selection())
+					menu::stack_push<menu_control_device_preset>(ui(), container(), *selected_device);
+
+				else
+				{
+					floppy_image_device *floppy_device = dynamic_cast<floppy_image_device *>(selected_device);
+					if (floppy_device)
+						menu::stack_push<menu_control_floppy_image>(ui(), container(), *floppy_device);
+					else
+						menu::stack_push<menu_control_device_image>(ui(), container(), *selected_device);
+				}
+
+				// reset the existing menu
+				reset(reset_options::REMEMBER_POSITION);
+			}
 		}
 	}
 
-	return false;
+	return result;
 }
 
 // force file manager menu

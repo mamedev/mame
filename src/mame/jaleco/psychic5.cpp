@@ -1055,47 +1055,38 @@ INPUT_PORTS_START( psychic5 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )          PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) )               PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )               PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Cabinet ) )              PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )          PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )                PORT_DIPLOCATION("SW1:2,1")
 	PORT_DIPSETTING(    0x80, "2" )
 	PORT_DIPSETTING(    0xc0, "3" )
 	PORT_DIPSETTING(    0x40, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "Invulnerability (Cheat)" )
+	PORT_DIPNAME( 0x01, 0x01, "Invulnerability (Cheat)" )       PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) )               PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x60, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW2:6,5,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
@@ -1104,6 +1095,15 @@ INPUT_PORTS_START( psychic5 )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x14, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_4C ) )
+	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW2:3,2,1")
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( bombsa )
@@ -1127,10 +1127,10 @@ INPUT_PORTS_START( bombsa )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:5" )           // Coin_B
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:3" )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SW1:1,2")
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x40, "2 Coins 1 Credit/4 Coins 3 Credits" )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SW1:2,1")
 	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x40, "2 Coins 1 Credit/4 Coins 3 Credits" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
 
 	PORT_START("DSW2")
@@ -1196,7 +1196,7 @@ void psychic5_state::psychic5(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(12'000'000)/2,394, 0, 256, 282, 16, 240); // was 53.8 Hz before, assume same as Bombs Away
+	screen.set_raw(XTAL(12'000'000)/2, 394, 0, 256, 282, 16, 240); // was 53.8 Hz before, assume same as Bombs Away
 	screen.set_screen_update(FUNC(psychic5_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_psychic5);
@@ -1238,7 +1238,7 @@ void bombsa_state::bombsa(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(12'000'000)/2,394, 0, 256, 282, 16, 240); // Measured as: VSync 54Hz, HSync 15.25kHz
+	screen.set_raw(XTAL(12'000'000)/2, 394, 0, 256, 282, 16, 240); // Measured as: VSync 54Hz, HSync 15.25kHz
 	screen.set_screen_update(FUNC(bombsa_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bombsa);

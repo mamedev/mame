@@ -412,14 +412,65 @@ void mc88200_device::cssp_w(u32 data)
 	m_cache[BIT(m_sar, 4, 8)].status = data & CSSP_WM;
 }
 
-std::optional<mc88200_device::translate_result> mc88200_device::translate(u32 virtual_address, bool supervisor, bool write, bool debug)
+// abbreviated, side-effect free address translation for debugger
+bool mc88200_device::translate(int intention, u32 &address, bool supervisor)
 {
 	// select area descriptor
 	u32 const apr = supervisor ? m_sapr : m_uapr;
 	if (apr & APR_TE)
 	{
-		// check block address translation cache
-		for (u32 const batc : m_batc)
+		// search block address translation cache
+		for (u32 const &batc : m_batc)
+		{
+			if ((batc & BATC_V) && bool(batc & BATC_S) == supervisor && BIT(address, 19, 13) == BIT(batc, 19, 13))
+			{
+				address = ((batc & BATC_PBA) << 13) | (address & ~BATC_LBA);
+				return true;
+			}
+		}
+
+		// search page address translation cache
+		for (u64 const &patc : m_patc)
+		{
+			if ((patc & PATC_V) && (bool(patc & PATC_S) == supervisor && BIT(address, 12, 20) == BIT(patc, 26, 20)))
+			{
+				address = ((patc & PATC_PFA) << 6) | (address & LA_OFS);
+				return true;
+			}
+		}
+
+		// load and check segment descriptor
+		std::optional<u32> const sgd = mbus_read<u32>((apr & APR_STBA) | ((address & LA_SEG) >> 20));
+		if (!sgd.has_value() || !(sgd.value() & SGD_V) || ((sgd.value() & SGD_SP) && !supervisor))
+			return false;
+
+		// load and check page descriptor
+		std::optional<u32> pgd = mbus_read<u32>((sgd.value() & SGD_PTBA) | ((address & LA_PAG) >> 10));
+		if (!pgd.has_value() || !(pgd.value() & PGD_V) || ((pgd.value() & PGD_SP) && !supervisor))
+			return false;
+
+		address = (pgd.value() & PGD_PFA) | (address & LA_OFS);
+	}
+	else
+	{
+		// apply hard-wired batc entries
+		if (BIT(address, 19, 13) == BIT(m_batc[8], 19, 13))
+			address = ((m_batc[8] & BATC_PBA) << 13) | (address & ~BATC_LBA);
+		else if (BIT(address, 19, 13) == BIT(m_batc[9], 19, 13))
+			address = ((m_batc[9] & BATC_PBA) << 13) | (address & ~BATC_LBA);
+	}
+
+	return true;
+}
+
+std::optional<mc88200_device::translate_result> mc88200_device::translate(u32 virtual_address, bool supervisor, bool write)
+{
+	// select area descriptor
+	u32 const apr = supervisor ? m_sapr : m_uapr;
+	if (apr & APR_TE)
+	{
+		// search block address translation cache
+		for (u32 const &batc : m_batc)
 		{
 			if ((batc & BATC_V) && bool(batc & BATC_S) == supervisor && BIT(virtual_address, 19, 13) == BIT(batc, 19, 13))
 			{
@@ -435,7 +486,7 @@ std::optional<mc88200_device::translate_result> mc88200_device::translate(u32 vi
 			}
 		}
 
-		// check page address translation cache
+		// search page address translation cache
 		bool patc_hit = false;
 		for (u64 &patc : m_patc)
 		{
@@ -505,24 +556,21 @@ std::optional<mc88200_device::translate_result> mc88200_device::translate(u32 vi
 			return std::nullopt;
 		}
 
-		if (!debug)
+		// update page descriptor used and modified bits
+		if (!(pgd.value() & PGD_U) || (write && !(pgd.value() & PGD_M)))
 		{
-			// set page descriptor used and modified bits
-			if (!(pgd.value() & PGD_U) || (write && !(pgd.value() & PGD_M)))
-			{
-				pgd.value() |= (write ? PGD_M : 0) | PGD_U;
+			pgd.value() |= (write ? PGD_M : 0) | PGD_U;
 
-				if (!mbus_write((sgd.value() & SGD_PTBA) | ((virtual_address & LA_PAG) >> 10), pgd.value()))
-					return std::nullopt;
-			}
+			if (!mbus_write((sgd.value() & SGD_PTBA) | ((virtual_address & LA_PAG) >> 10), pgd.value()))
+				return std::nullopt;
+		}
 
-			if (!patc_hit)
-			{
-				// create patc entry (lpa,pfa,s,wt,g,ci,m,wp)
-				m_patc[m_patc_ptr++] = PATC_V | (u64(virtual_address & ~LA_OFS) << 14) | ((pgd.value() & PGD_PFA) >> 6) | (supervisor ? PATC_S : 0) | bitswap<u64>(apr | sgd.value() | pgd.value(), 9, 7, 6, 4, 2);
-				if (m_patc_ptr == std::size(m_patc))
-					m_patc_ptr = 0;
-			}
+		if (!patc_hit)
+		{
+			// create patc entry (lpa,pfa,s,wt,g,ci,m,wp)
+			m_patc[m_patc_ptr++] = PATC_V | (u64(virtual_address & ~LA_OFS) << 14) | ((pgd.value() & PGD_PFA) >> 6) | (supervisor ? PATC_S : 0) | bitswap<u64>(apr | sgd.value() | pgd.value(), 9, 7, 6, 4, 2);
+			if (m_patc_ptr == std::size(m_patc))
+				m_patc_ptr = 0;
 		}
 
 		return translate_result((pgd.value() & PGD_PFA) | (virtual_address & LA_OFS),
@@ -689,159 +737,6 @@ std::optional<unsigned> mc88200_device::cache_replace(cache_set const &cs)
 	return std::nullopt;
 }
 
-template <typename T> std::optional<T> mc88200_device::cache_read(u32 physical_address)
-{
-	unsigned const s = BIT(physical_address, 4, 8);
-	cache_set &cs = m_cache[s];
-
-	for (unsigned l = 0; l < std::size(cs.line); l++)
-	{
-		// cache line hit: tag match, ensabled, not invalid
-		if (cs.line[l].match_page(physical_address) && cs.enabled(l) && !cs.invalid(l))
-		{
-			// set most recently used
-			cs.set_mru(l);
-
-			// return data
-			u32 const data = cs.line[l].data[BIT(physical_address, 2, 2)];
-
-			switch (sizeof(T))
-			{
-			case 1: return T(data >> ((physical_address & 3) * 8));
-			case 2: return T(data >> ((physical_address & 3) * 8));
-			case 4: return T(data);
-			}
-		}
-	}
-
-	// select cache line for replacement
-	std::optional<unsigned> const l = cache_replace(cs);
-
-	if (l.has_value())
-	{
-		// copy back modified line
-		if (cs.modified(l.value()))
-			if (!cs.line[l.value()].copy_back(*this, cs.line[l.value()].tag | (s << 4)))
-				return false;
-
-		// mark line invalid
-		cs.set_invalid(l.value());
-
-		// update tag
-		cs.line[l.value()].tag = physical_address & ~LA_OFS;
-
-		// load line from memory
-		if (!cs.line[l.value()].load_line(*this, physical_address & 0xfffffff0U))
-			return false;
-
-		// mark line shared unmodified
-		cs.set_shared(l.value());
-
-		// set most recently used
-		cs.set_mru(l.value());
-
-		// return data
-		u32 const data = cs.line[l.value()].data[BIT(physical_address, 2, 2)];
-
-		switch (sizeof(T))
-		{
-		case 1: return T(data >> ((physical_address & 3) * 8));
-		case 2: return T(data >> ((physical_address & 3) * 8));
-		case 4: return T(data);
-		}
-	}
-
-	return mbus_read<T>(physical_address);
-}
-
-template <typename T> bool mc88200_device::cache_write(u32 physical_address, T data, bool writethrough, bool global)
-{
-	unsigned const s = BIT(physical_address, 4, 8);
-	cache_set &cs = m_cache[s];
-
-	for (unsigned l = 0; l < std::size(cs.line); l++)
-	{
-		// cache line hit: tag match, enabled, not invalid
-		if (cs.line[l].match_page(physical_address) && cs.enabled(l) && !cs.invalid(l))
-		{
-			// write data to cache
-			u32 &cache_data = cs.line[l].data[BIT(physical_address, 2, 2)];
-			switch (sizeof(T))
-			{
-			case 1: cache_data = (cache_data & ~(0x000000ffU << ((physical_address & 3) * 8))) | (u32(data) << ((physical_address & 3) * 8)); break;
-			case 2: cache_data = (cache_data & ~(0x0000ffffU << ((physical_address & 3) * 8))) | (u32(data) << ((physical_address & 3) * 8)); break;
-			case 4: cache_data = data; break;
-			}
-
-			// set most recently used
-			cs.set_mru(l);
-
-			// write data to memory
-			if (writethrough || global)
-				if (!mbus_write(physical_address, data))
-					return false;
-
-			// update line status
-			if (cs.shared(l))
-			{
-				if (global)
-					cs.set_unmodified(l);
-				else if (!writethrough)
-					cs.set_modified(l);
-			}
-			else
-				cs.set_modified(l);
-
-			return true;
-		}
-	}
-
-	// select cache line for replacement
-	std::optional<unsigned> const l = cache_replace(cs);
-
-	if (l.has_value())
-	{
-		// copy back modified line
-		if (cs.modified(l.value()))
-			if (!cs.line[l.value()].copy_back(*this, cs.line[l.value()].tag | (s << 4)))
-				return false;
-
-		// mark line invalid
-		cs.set_invalid(l.value());
-
-		// load line from memory
-		if (!cs.line[l.value()].load_line(*this, physical_address & 0xfffffff0U))
-			return false;
-	}
-
-	// write data to memory
-	if (!mbus_write(physical_address, data))
-		return false;
-
-	if (l.has_value())
-	{
-		// update tag
-		cs.line[l.value()].tag = physical_address & ~LA_OFS;
-
-		// write data into cache
-		u32 &cache_data = cs.line[l.value()].data[BIT(physical_address, 2, 2)];
-		switch (sizeof(T))
-		{
-		case 1: cache_data = (cache_data & ~(0x000000ffU << ((physical_address & 3) * 8))) | (u32(data) << ((physical_address & 3) * 8)); break;
-		case 2: cache_data = (cache_data & ~(0x0000ffffU << ((physical_address & 3) * 8))) | (u32(data) << ((physical_address & 3) * 8)); break;
-		case 4: cache_data = data; break;
-		}
-
-		// mark line exclusive unmodified
-		cs.set_unmodified(l.value());
-
-		// set most recently used
-		cs.set_mru(l.value());
-	}
-
-	return true;
-}
-
 void mc88200_device::cache_flush(unsigned const start, unsigned const limit, match_function match, bool const copyback, bool const invalidate)
 {
 	for (unsigned s = start; s < limit; s++)
@@ -865,37 +760,184 @@ void mc88200_device::cache_flush(unsigned const start, unsigned const limit, mat
 	}
 }
 
-template <typename T> std::optional<T> mc88200_device::read(u32 virtual_address, bool supervisor, bool debug)
+template <typename T> std::optional<T> mc88200_device::read(u32 virtual_address, bool supervisor)
 {
-	std::optional<mc88200_device::translate_result> result = translate(virtual_address, supervisor, false, debug);
+	std::optional<mc88200_device::translate_result> result = translate(virtual_address, supervisor, false);
 	if (!result.has_value())
 		return std::nullopt;
 
-	if (result.value().ci)
-		return mbus_read<T>(result.value().address);
-	else
-		return cache_read<T>(result.value().address);
+	u32 const physical_address = result.value().address;
+	if (!result.value().ci)
+	{
+		unsigned const s = BIT(physical_address, 4, 8);
+		cache_set &cs = m_cache[s];
+
+		for (unsigned l = 0; l < std::size(cs.line); l++)
+		{
+			// cache line hit: tag match, enabled, not invalid
+			if (cs.line[l].match_page(physical_address) && cs.enabled(l) && !cs.invalid(l))
+			{
+				// set most recently used
+				cs.set_mru(l);
+
+				// return data
+				u32 const data = cs.line[l].data[BIT(physical_address, 2, 2)];
+
+				switch (sizeof(T))
+				{
+				case 1: return T(data >> (24 - (physical_address & 3) * 8));
+				case 2: return T(data >> (16 - (physical_address & 3) * 8));
+				case 4: return T(data);
+				}
+			}
+		}
+
+		// select cache line for replacement
+		std::optional<unsigned> const l = cache_replace(cs);
+
+		if (l.has_value())
+		{
+			// copy back modified line
+			if (cs.modified(l.value()))
+				if (!cs.line[l.value()].copy_back(*this, cs.line[l.value()].tag | (s << 4)))
+					return false;
+
+			// mark line invalid
+			cs.set_invalid(l.value());
+
+			// update tag
+			cs.line[l.value()].tag = physical_address & ~LA_OFS;
+
+			// load line from memory
+			if (!cs.line[l.value()].load_line(*this, physical_address & 0xfffffff0U))
+				return false;
+
+			// mark line shared unmodified
+			cs.set_shared(l.value());
+
+			// set most recently used
+			cs.set_mru(l.value());
+
+			// return data
+			u32 const data = cs.line[l.value()].data[BIT(physical_address, 2, 2)];
+
+			switch (sizeof(T))
+			{
+			case 1: return T(data >> (24 - (physical_address & 3) * 8));
+			case 2: return T(data >> (16 - (physical_address & 3) * 8));
+			case 4: return T(data);
+			}
+		}
+	}
+
+	return mbus_read<T>(physical_address);
 }
 
-template <typename T> bool mc88200_device::write(u32 virtual_address, T data, bool supervisor, bool debug)
+template <typename T> bool mc88200_device::write(u32 virtual_address, T data, bool supervisor)
 {
-	std::optional<mc88200_device::translate_result> result = translate(virtual_address, supervisor, true, debug);
+	std::optional<mc88200_device::translate_result> result = translate(virtual_address, supervisor, true);
 	if (!result.has_value())
 		return false;
 
-	if (result.value().ci)
-		return mbus_write(result.value().address, data);
-	else
-		return cache_write<T>(result.value().address, data, result.value().wt, result.value().g);
+	u32 const physical_address = result.value().address;
+	if (!result.value().ci)
+	{
+		unsigned const s = BIT(physical_address, 4, 8);
+		cache_set &cs = m_cache[s];
+
+		for (unsigned l = 0; l < std::size(cs.line); l++)
+		{
+			// cache line hit: tag match, enabled, not invalid
+			if (cs.line[l].match_page(physical_address) && cs.enabled(l) && !cs.invalid(l))
+			{
+				// write data to cache
+				u32 &cache_data = cs.line[l].data[BIT(physical_address, 2, 2)];
+				switch (sizeof(T))
+				{
+				case 1: cache_data = (cache_data & ~(0x000000ffU << (24 - (physical_address & 3) * 8))) | (u32(data) << (24 - (physical_address & 3) * 8)); break;
+				case 2: cache_data = (cache_data & ~(0x0000ffffU << (16 - (physical_address & 3) * 8))) | (u32(data) << (16 - (physical_address & 3) * 8)); break;
+				case 4: cache_data = data; break;
+				}
+
+				// set most recently used
+				cs.set_mru(l);
+
+				// write data to memory
+				if (result.value().wt || result.value().g)
+					if (!mbus_write(physical_address, data))
+						return false;
+
+				// update line status
+				if (cs.shared(l))
+				{
+					if (result.value().g)
+						cs.set_unmodified(l);
+					else if (!result.value().wt)
+						cs.set_modified(l);
+				}
+				else
+					cs.set_modified(l);
+
+				return true;
+			}
+		}
+
+		// select cache line for replacement
+		std::optional<unsigned> const l = cache_replace(cs);
+
+		if (l.has_value())
+		{
+			// copy back modified line
+			if (cs.modified(l.value()))
+				if (!cs.line[l.value()].copy_back(*this, cs.line[l.value()].tag | (s << 4)))
+					return false;
+
+			// mark line invalid
+			cs.set_invalid(l.value());
+
+			// load line from memory
+			if (!cs.line[l.value()].load_line(*this, physical_address & 0xfffffff0U))
+				return false;
+		}
+
+		// write data to memory
+		if (!mbus_write(physical_address, data))
+			return false;
+
+		if (l.has_value())
+		{
+			// update tag
+			cs.line[l.value()].tag = physical_address & ~LA_OFS;
+
+			// write data into cache
+			u32 &cache_data = cs.line[l.value()].data[BIT(physical_address, 2, 2)];
+			switch (sizeof(T))
+			{
+			case 1: cache_data = (cache_data & ~(0x000000ffU << (24 - (physical_address & 3) * 8))) | (u32(data) << (24 - (physical_address & 3) * 8)); break;
+			case 2: cache_data = (cache_data & ~(0x0000ffffU << (16 - (physical_address & 3) * 8))) | (u32(data) << (16 - (physical_address & 3) * 8)); break;
+			case 4: cache_data = data; break;
+			}
+
+			// mark line exclusive unmodified
+			cs.set_unmodified(l.value());
+
+			// set most recently used
+			cs.set_mru(l.value());
+		}
+
+		return true;
+	}
+
+	return mbus_write(result.value().address, data);
 }
 
-template std::optional<u8> mc88200_device::read(u32 virtual_address, bool supervisor, bool debug);
-template std::optional<u16> mc88200_device::read(u32 virtual_address, bool supervisor, bool debug);
-template std::optional<u32> mc88200_device::read(u32 virtual_address, bool supervisor, bool debug);
+template std::optional<u8> mc88200_device::read(u32 virtual_address, bool supervisor);
+template std::optional<u16> mc88200_device::read(u32 virtual_address, bool supervisor);
+template std::optional<u32> mc88200_device::read(u32 virtual_address, bool supervisor);
 
-template bool mc88200_device::write(u32 virtual_address, u8 data, bool supervisor, bool debug);
-template bool mc88200_device::write(u32 virtual_address, u16 data, bool supervisor, bool debug);
-template bool mc88200_device::write(u32 virtual_address, u32 data, bool supervisor, bool debug);
+template bool mc88200_device::write(u32 virtual_address, u8 data, bool supervisor);
+template bool mc88200_device::write(u32 virtual_address, u16 data, bool supervisor);
+template bool mc88200_device::write(u32 virtual_address, u32 data, bool supervisor);
 
 template <typename T> std::optional<T> mc88200_device::mbus_read(u32 address)
 {
@@ -910,9 +952,13 @@ template <typename T> std::optional<T> mc88200_device::mbus_read(u32 address)
 
 	if (m_bus_error)
 	{
-		m_bus_error = false;
-		m_pfar = address;
-		m_pfsr = PFSR_BE;
+		if (!machine().side_effects_disabled())
+		{
+			m_bus_error = false;
+			m_pfar = address;
+			m_pfsr = PFSR_BE;
+		}
+		data = std::nullopt;
 	}
 
 	return data;

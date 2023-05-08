@@ -232,13 +232,13 @@ public:
 	emu_fatalerror(int _exitcode, util::format_argument_pack<char> const &args);
 
 	template <typename Format, typename... Params>
-	emu_fatalerror(Format const &fmt, Params &&... args)
-		: emu_fatalerror(static_cast<util::format_argument_pack<char> const &>(util::make_format_argument_pack(fmt, std::forward<Params>(args)...)))
+	emu_fatalerror(Format &&fmt, Params &&... args)
+		: emu_fatalerror(static_cast<util::format_argument_pack<char> const &>(util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...)))
 	{
 	}
 	template <typename Format, typename... Params>
-	emu_fatalerror(int _exitcode, Format const &fmt, Params &&... args)
-		: emu_fatalerror(_exitcode, static_cast<util::format_argument_pack<char> const &>(util::make_format_argument_pack(fmt, std::forward<Params>(args)...)))
+	emu_fatalerror(int _exitcode, Format &&fmt, Params &&... args)
+		: emu_fatalerror(_exitcode, static_cast<util::format_argument_pack<char> const &>(util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...)))
 	{
 	}
 

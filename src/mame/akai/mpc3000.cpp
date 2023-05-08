@@ -67,13 +67,14 @@ MPCs on other hardware:
 #include "sound/l7a1045_l6028_dsp_a.h"
 #include "video/hd61830.h"
 #include "bus/midi/midi.h"
+#include "bus/nscsi/devices.h"
 #include "speaker.h"
 #include "screen.h"
 #include "emupal.h"
 #include "machine/74259.h"
 #include "machine/i8255.h"
 #include "machine/input_merger.h"
-#include "machine/mb89352.h"
+#include "machine/mb87030.h"
 #include "machine/pit8253.h"
 #include "machine/upd765.h"
 
@@ -157,7 +158,7 @@ void mpc3000_state::mpc3000_io_map(address_map &map)
 	map(0x0060, 0x0067).rw(m_dsp, FUNC(l7a1045_sound_device::l7a1045_sound_r), FUNC(l7a1045_sound_device::l7a1045_sound_w));
 	map(0x0068, 0x0069).rw(FUNC(mpc3000_state::dsp_0008_hack_r), FUNC(mpc3000_state::dsp_0008_hack_w));
 	map(0x0080, 0x0087).rw("dioexp", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
-	map(0x00a0, 0x00bf).rw("spc", FUNC(mb89352_device::mb89352_r), FUNC(mb89352_device::mb89352_w)).umask16(0x00ff);
+	map(0x00a0, 0x00bf).m("scsi:7:spc", FUNC(mb89352_device::map)).umask16(0x00ff);
 	//map(0x00c0, 0x00c7).rw("sio", FUNC(te7774_device::read0), FUNC(te7774_device::write0)).umask16(0x00ff);
 	//map(0x00c8, 0x00cf).rw("sio", FUNC(te7774_device::read1), FUNC(te7774_device::write1)).umask16(0x00ff);
 	//map(0x00d0, 0x00d7).rw("sio", FUNC(te7774_device::read2), FUNC(te7774_device::write2)).umask16(0x00ff);
@@ -204,6 +205,8 @@ void mpc3000_state::mpc3000(machine_config &config)
 	m_maincpu->in_mem16r_cb().set(FUNC(mpc3000_state::dma_memr_cb));
 	m_maincpu->out_mem16w_cb().set(FUNC(mpc3000_state::dma_memw_cb));
 	m_maincpu->out_eop_cb().set("tc", FUNC(input_merger_device::in_w<0>));
+	m_maincpu->in_ior_cb<0>().set("scsi:7:spc", FUNC(mb89352_device::dma_r));
+	m_maincpu->out_iow_cb<0>().set("scsi:7:spc", FUNC(mb89352_device::dma_w));
 	m_maincpu->out_dack_cb<1>().set("tc", FUNC(input_merger_device::in_w<1>));
 	m_maincpu->in_ior_cb<1>().set(m_fdc, FUNC(upd72069_device::dma_r));
 	m_maincpu->out_iow_cb<1>().set(m_fdc, FUNC(upd72069_device::dma_w));
@@ -274,12 +277,23 @@ void mpc3000_state::mpc3000(machine_config &config)
 
 	midiout_slot(MIDI_PORT(config, "mdout"));
 
-	mb89352_device &spc(MB89352A(config, "spc", 16_MHz_XTAL / 2));
-	spc.set_scsi_port("scsi");
-	spc.irq_cb().set("intp3", FUNC(input_merger_device::in_w<1>));
-	spc.drq_cb().set(m_maincpu, FUNC(v53a_device::dreq_w<0>));
+	NSCSI_BUS(config, "scsi");
+	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("spc", MB89352).machine_config(
+		[this](device_t *device)
+		{
+			mb89352_device &spc = downcast<mb89352_device &>(*device);
 
-	SCSI_PORT(config, "scsi");
+			spc.set_clock(16_MHz_XTAL / 2);
+			spc.out_irq_callback().set(":intp3", FUNC(input_merger_device::in_w<1>));
+			spc.out_dreq_callback().set(m_maincpu, FUNC(v53a_device::dreq_w<0>));
+		});
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

@@ -34,7 +34,6 @@ pcd_video_device::pcd_video_device(const machine_config &mconfig, const char *ta
 
 pcx_video_device::pcx_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	pcdx_video_device(mconfig, PCX_VIDEO, tag, owner, clock),
-	device_serial_interface(mconfig, *this),
 	m_crtc(*this, "crtc"),
 	m_charrom(*this, "char"),
 	m_txd_handler(*this)
@@ -152,8 +151,8 @@ void pcx_video_device::device_add_mconfig(machine_config &config)
 	gfx.set_addrmap(AS_PROGRAM, &pcx_video_device::pcx_vid_map);
 	gfx.set_addrmap(AS_IO, &pcx_video_device::pcx_vid_io);
 	gfx.port_out_cb<1>().set(FUNC(pcx_video_device::p1_w));
-	gfx.serial_tx_cb().set(FUNC(pcx_video_device::tx_callback));
-	gfx.serial_rx_cb().set(FUNC(pcx_video_device::rx_callback));
+	gfx.port_in_cb<3>().set(FUNC(pcx_video_device::p3_r));
+	gfx.port_out_cb<3>().set(FUNC(pcx_video_device::p3_w));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -422,9 +421,6 @@ void pcx_video_device::device_start()
 	m_maincpu->space(AS_IO).install_readwrite_handler(0xfb00, 0xfb01, read8smo_delegate(*this, FUNC(pcdx_video_device::detect_r)), write8smo_delegate(*this, FUNC(pcdx_video_device::detect_w)), 0x00ff);
 	m_txd_handler.resolve_safe();
 
-	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
-	set_rate(600);
-
 	decode_gfx(gfx_pcx);
 }
 
@@ -432,8 +428,6 @@ void pcx_video_device::device_reset()
 {
 	m_term_key = 0;
 	m_term_stat = 0;
-	transmit_register_reset();
-	receive_register_reset();
 
 	m_txd_handler(1);
 }
@@ -443,24 +437,23 @@ void pcx_video_device::map(address_map &map)
 	map(0x0, 0xf).rw(FUNC(pcx_video_device::term_r), FUNC(pcx_video_device::term_w));
 }
 
-uint8_t pcx_video_device::rx_callback()
+void pcx_video_device::rx_w(int state)
 {
-	return get_received_char();
+	if (state)
+		m_p3 |= 1;
+	else
+		m_p3 &= ~1;
 }
 
-void pcx_video_device::tx_callback(uint8_t data)
+uint8_t pcx_video_device::p3_r()
 {
-	transmit_register_setup(data);
+	return m_p3;
 }
 
-void pcx_video_device::tra_callback()
+void pcx_video_device::p3_w(uint8_t data)
 {
-	m_txd_handler(transmit_register_get_data_bit());
-}
+	// preserve RXD
+	m_p3 = (m_p3 & 1) | (data & ~1);
 
-void pcx_video_device::rcv_complete()
-{
-	receive_register_extract();
-	m_mcu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);
-	m_mcu->set_input_line(MCS51_RX_LINE, CLEAR_LINE);
+	m_txd_handler(BIT(data, 1));
 }

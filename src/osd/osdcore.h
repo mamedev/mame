@@ -35,7 +35,7 @@ const char *osd_getenv(const char *name);
 /// \brief Get current process ID
 ///
 /// \return The process ID of the current process.
-int osd_getpid();
+int osd_getpid() noexcept;
 
 
 /*-----------------------------------------------------------------------------

@@ -1,3 +1,9 @@
+MY_CONSOLE = 1
+
+!IFNDEF UNDER_CE
+CFLAGS = $(CFLAGS) -DWIN_LONG_PATH -D_7ZIP_LARGE_PAGES -DSUPPORT_DEVICE_FILE
+!ENDIF
+
 CONSOLE_OBJS = \
   $O\BenchCon.obj \
   $O\ConsoleClose.obj \
@@ -33,4 +39,5 @@ UI_COMMON_OBJS = \
   $O\UpdatePair.obj \
   $O\UpdateProduce.obj \
 
-#
+C_OBJS = $(C_OBJS) \
+  $O\DllSecur.obj \

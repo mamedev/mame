@@ -38,8 +38,16 @@ public:
 
   CInBufferBase() throw();
 
-  UInt64 GetStreamSize() const { return _processedSize + (_buf - _bufBase); }
-  UInt64 GetProcessedSize() const { return _processedSize + NumExtraBytes + (_buf - _bufBase); }
+  // the size of portion of data in real stream that was already read from this object
+  // it doesn't include unused data in buffer
+  // it doesn't include virtual Extra bytes after the end of real stream data
+  UInt64 GetStreamSize() const { return _processedSize + (size_t)(_buf - _bufBase); }
+  
+  // the size of virtual data that was read from this object
+  // it doesn't include unused data in buffers
+  // it includes any virtual Extra bytes after the end of real data
+  UInt64 GetProcessedSize() const { return _processedSize + NumExtraBytes + (size_t)(_buf - _bufBase); }
+
   bool WasFinished() const { return _wasFinished; }
 
   void SetStream(ISequentialInStream *stream) { _stream = stream; }
@@ -59,7 +67,8 @@ public:
   }
 
   void Init() throw();
-
+  
+  MY_FORCE_INLINE
   bool ReadByte(Byte &b)
   {
     if (_buf >= _bufLim)
@@ -67,7 +76,17 @@ public:
     b = *_buf++;
     return true;
   }
+
+  MY_FORCE_INLINE
+  bool ReadByte_FromBuf(Byte &b)
+  {
+    if (_buf >= _bufLim)
+      return false;
+    b = *_buf++;
+    return true;
+  }
   
+  MY_FORCE_INLINE
   Byte ReadByte()
   {
     if (_buf >= _bufLim)

@@ -1330,16 +1330,15 @@ void stv_state::machine_reset()
 	m_vdp2.old_tvmd = -1;
 }
 
-image_init_result stv_state::load_cart(device_image_interface &image, generic_slot_device *slot)
+std::pair<std::error_condition, std::string> stv_state::load_cart(device_image_interface &image, generic_slot_device *slot)
 {
-	uint8_t *ROM;
-	uint32_t size = slot->common_get_size("rom");
+	uint32_t const size = slot->common_get_size("rom");
 
 	if (!image.loaded_through_softlist())
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::UNSUPPORTED, "Cartridges must be loaded from the software list");
 
 	slot->rom_alloc(size, GENERIC_ROM32_WIDTH, ENDIANNESS_BIG);
-	ROM = slot->get_rom_base();
+	uint8_t *const ROM = slot->get_rom_base();
 	memcpy(ROM, image.get_software_region("rom"), size);
 
 	/* fix endianess */
@@ -1359,7 +1358,7 @@ image_init_result stv_state::load_cart(device_image_interface &image, generic_sl
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

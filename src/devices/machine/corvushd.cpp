@@ -419,7 +419,7 @@ bool corvus_hdc_device::parse_hdc_command(uint8_t data) {
 //      status: Command status
 //
 uint8_t corvus_hdc_device::corvus_write_sector(uint8_t drv, uint32_t sector, uint8_t *buffer, int len) {
-	hard_disk_file
+	harddisk_image_device
 			*disk;              // Structures for interface to CHD routines
 	uint8_t   tbuffer[512];       // Buffer to hold an entire sector
 	uint16_t  cylinder;           // Cylinder this sector resides on
@@ -527,7 +527,7 @@ uint8_t corvus_hdc_device::corvus_write_logical_sector(dadr_t *dadr, uint8_t *bu
 //      status: Corvus status
 //
 uint8_t corvus_hdc_device::corvus_read_sector(uint8_t drv, uint32_t sector, uint8_t *buffer, int len) {
-	hard_disk_file
+	harddisk_image_device
 			*disk;              // Structures for interface to CHD routines
 	uint8_t   tbuffer[512];       // Buffer to store full sector results in
 	uint16_t  cylinder;
@@ -1090,15 +1090,15 @@ uint8_t corvus_hdc_device::corvus_format_drive(uint8_t *pattern, uint16_t len) {
 //
 // Corvus_HDC_File
 //
-// Returns a hard_disk_file object for a given virtual hard drive device in the concept
+// Returns a harddisk_image_device object for a given virtual hard drive device in the concept
 //
 // Pass:
 //      drv:    Corvus drive id (1..15)
 //
 // Returns:
-//      hard_disk_file object
+//      harddisk_image_device object
 //
-hard_disk_file *corvus_hdc_device::corvus_hdc_file(int drv) {
+harddisk_image_device *corvus_hdc_device::corvus_hdc_file(int drv) {
 	static const char *const tags[] = {
 		"harddisk1", "harddisk2", "harddisk3", "harddisk4"
 	};
@@ -1119,15 +1119,14 @@ hard_disk_file *corvus_hdc_device::corvus_hdc_file(int drv) {
 		return nullptr;
 
 	// Pick up the Head/Cylinder/Sector info
-	hard_disk_file *file = img->get_hard_disk_file();
-	const auto &info = file->get_info();
+	const auto &info = img->get_info();
 	m_sectors_per_track = info.sectors;
 	m_tracks_per_cylinder = info.heads;
 	m_cylinders_per_drive = info.cylinders;
 
 	LOG("corvus_hdc_file: Attached to drive %u image: H:%d, C:%d, S:%d\n", drv, info.heads, info.cylinders, info.sectors);
 
-	return file;
+	return img;
 }
 
 

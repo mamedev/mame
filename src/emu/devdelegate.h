@@ -115,6 +115,16 @@ public:
 	void reset() noexcept { basetype::reset(); m_name = nullptr; }
 };
 
+template <class FunctionClass, typename ReturnType, typename... Params>
+named_delegate(ReturnType (FunctionClass::*)(Params...), char const *, FunctionClass *) -> named_delegate<ReturnType (Params...)>;
+
+template <class FunctionClass, typename ReturnType, typename... Params>
+named_delegate(ReturnType (FunctionClass::*)(Params...) const, char const *, FunctionClass *) -> named_delegate<ReturnType (Params...)>;
+
+template <class FunctionClass, typename ReturnType, typename... Params>
+named_delegate(ReturnType (*)(FunctionClass &, Params...), char const *, FunctionClass *) -> named_delegate<ReturnType (Params...)>;
+
+
 // ======================> device_delegate
 
 // device_delegate is a delegate that wraps with a device tag and can be easily
@@ -289,6 +299,33 @@ public:
 			elem.resolve();
 	}
 };
+
+template <class D, typename ReturnType, typename... Params>
+device_delegate(device_t &, char const *, ReturnType (D::*)(Params...), char const *) -> device_delegate<ReturnType (Params...)>;
+
+template <class D, typename ReturnType, typename... Params>
+device_delegate(device_t &, char const *, ReturnType (D::*)(Params...) const, char const *) -> device_delegate<ReturnType (Params...)>;
+
+template <class D, typename ReturnType, typename... Params>
+device_delegate(device_t &, char const *, ReturnType (*)(D &, Params...), char const *) -> device_delegate<ReturnType (Params...)>;
+
+template <class D, bool R, class E, typename ReturnType, typename... Params>
+device_delegate(device_finder<D, R> const &, ReturnType (E::*)(Params...), char const *) -> device_delegate<ReturnType (Params...)>;
+
+template <class D, bool R, class E, typename ReturnType, typename... Params>
+device_delegate(device_finder<D, R> const &, ReturnType (E::*)(Params...) const, char const *) -> device_delegate<ReturnType (Params...)>;
+
+template <class D, bool R, class E, typename ReturnType, typename... Params>
+device_delegate(device_finder<D, R> const &, ReturnType (*)(E &, Params...), char const *) -> device_delegate<ReturnType (Params...)>;
+
+template <class T, class D, typename ReturnType, typename... Params>
+device_delegate(T &, ReturnType (D::*)(Params...), char const *) -> device_delegate<ReturnType (Params...)>;
+
+template <class T, class D, typename ReturnType, typename... Params>
+device_delegate(T &, ReturnType (D::*)(Params...) const, char const *) -> device_delegate<ReturnType (Params...)>;
+
+template <class T, class D, typename ReturnType, typename... Params>
+device_delegate(T &, ReturnType (*)(D &, Params...), char const *) -> device_delegate<ReturnType (Params...)>;
 
 } // namespace emu
 

@@ -49,24 +49,18 @@ vboy_cart_slot_device::vboy_cart_slot_device(machine_config const &mconfig, char
 }
 
 
-image_init_result vboy_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> vboy_cart_slot_device::call_load()
 {
 	if (!m_cart)
-		return image_init_result::PASS;
+		return std::make_pair(std::error_condition(), std::string());
 
 	memory_region *romregion(loaded_through_softlist() ? memregion("rom") : nullptr);
 	if (loaded_through_softlist() && !romregion)
-	{
-		seterror(image_error::INVALIDIMAGE, "Software list item has no 'rom' data area");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::BADSOFTWARE, "Software list item has no 'rom' data area");
 
 	u32 const len(loaded_through_softlist() ? romregion->bytes() : length());
 	if ((0x0000'0003 & len) || (0x0100'0000 < len))
-	{
-		seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size (must be a multiple of 4 bytes no larger than 16 MiB)");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be a multiple of 4 bytes no larger than 16 MiB)");
 
 	if (!loaded_through_softlist())
 	{
@@ -74,13 +68,10 @@ image_init_result vboy_cart_slot_device::call_load()
 		romregion = machine().memory().region_alloc(subtag("rom"), len, 4, ENDIANNESS_LITTLE);
 		u32 const cnt(fread(romregion->base(), len));
 		if (cnt != len)
-		{
-			seterror(image_error::UNSPECIFIED, "Error reading cartridge file");
-			return image_init_result::FAIL;
-		}
+			return std::make_pair(image_error::UNSPECIFIED, "Error reading cartridge file");
 	}
 
-	return m_cart->load();
+	return std::make_pair(m_cart->load(), std::string());
 }
 
 

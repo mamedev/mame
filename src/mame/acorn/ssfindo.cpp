@@ -133,6 +133,7 @@ Notes:
 #include "machine/arm_iomd.h"
 #include "machine/i2cmem.h"
 #include "sound/qs1000.h"
+#include "diserial.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -140,11 +141,12 @@ Notes:
 
 namespace {
 
-class ssfindo_state : public driver_device
+class ssfindo_state : public driver_device, public device_serial_interface
 {
 public:
 	ssfindo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, device_serial_interface(mconfig, *this)
 		, m_maincpu(*this, "maincpu")
 		, m_vidc(*this, "vidc")
 		, m_iomd(*this, "iomd")
@@ -178,6 +180,7 @@ protected:
 
 	bool m_i2cmem_clock = false;
 
+	virtual void tra_callback() override;
 	void sound_w(uint8_t data);
 
 private:
@@ -209,6 +212,8 @@ private:
 	uint8_t iolines_r();
 	void iolines_w(uint8_t data);
 	bool m_flash_bank_select = false;
+
+	bool m_txd = true;
 };
 
 class tetfight_state : public ssfindo_state
@@ -371,7 +376,7 @@ uint32_t ssfindo_state::randomized_r()
 
 void ssfindo_state::sound_w(uint8_t data)
 {
-	m_qs1000->serial_in(data);
+	transmit_register_setup(data);
 	m_maincpu->spin_until_time(attotime::from_usec(2000)); // give time to the QS1000 CPU to react. TODO: sync things correctly
 }
 
@@ -441,11 +446,23 @@ void ssfindo_state::machine_start()
 	save_item(NAME(m_flashN));
 	save_item(NAME(m_i2cmem_clock));
 	save_item(NAME(m_flash_bank_select));
+
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
+	set_rate(31250);
 }
 
 void ssfindo_state::machine_reset()
 {
 	// ...
+	receive_register_reset();
+	transmit_register_reset();
+
+	m_txd = true;
+}
+
+void ssfindo_state::tra_callback()
+{
+	m_txd = transmit_register_get_data_bit();
 }
 
 static INPUT_PORTS_START( ssfindo )
@@ -616,6 +633,7 @@ void ssfindo_state::ssfindo(machine_config &config)
 	qs1000_device &qs1000(QS1000(config, "qs1000", 24_MHz_XTAL));
 	qs1000.set_external_rom(true);
 	// qs1000.p1_out().set(FUNC()); // TODO: writes something here
+	qs1000.p3_in().set([this]() { return u8(0xfeU | m_txd); });
 	qs1000.add_route(0, "lspeaker", 0.25);
 	qs1000.add_route(1, "rspeaker", 0.25);
 }

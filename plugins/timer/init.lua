@@ -1,5 +1,6 @@
 -- license:BSD-3-Clause
 -- copyright-holders:Vas Crabb
+-- TODO: track time properly across soft reset and state load
 local exports = {
 	name = 'timer',
 	version = '0.0.3',
@@ -8,6 +9,8 @@ local exports = {
 	author = { name = 'Vas Crabb' } }
 
 local timer = exports
+
+local reset_subscription, stop_subscription
 
 function timer.startplugin()
 	local total_time = 0
@@ -53,8 +56,8 @@ function timer.startplugin()
 	end
 
 
-	emu.register_start(
-		function()
+	reset_subscription = emu.add_machine_reset_notifier(
+		function ()
 			if emu.romname() ~= '___empty' then
 				start_time = os.time()
 				local persister = require('timer/timer_persist')
@@ -62,8 +65,8 @@ function timer.startplugin()
 			end
 		end)
 
-	emu.register_stop(
-		function()
+	stop_subscription = emu.add_machine_stop_notifier(
+		function ()
 			if emu.romname() ~= '___empty' then
 				local persister = require('timer/timer_persist')
 				persister:update_totals(start_time)

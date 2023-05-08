@@ -49,7 +49,7 @@
  *
  *****************************************************************************/
 
-#define VERBOSE                 1
+#define VERBOSE                 0
 
 /* if 1, create a .wav file of the sound produced */
 #define LOG_WAV                 0

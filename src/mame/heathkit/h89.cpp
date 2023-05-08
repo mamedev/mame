@@ -2,40 +2,43 @@
 // copyright-holders:Sandro Ronco, Mark Garlanger
 /***************************************************************************
 
-        Heathkit H89
+  Heathkit H89
 
-        12/05/2009 Skeleton driver.
-
-    Monitor Commands:
-    B Boot
-    C Convert (number)
-    G Go (address)
-    I In (address)
-    O Out (address,data)
-    R Radix (H/O)
-    S Substitute (address)
-    T Test Memory
-    V View
+    Monitor Commands (for MTR-90):
+      B Boot
+      C Convert (number)
+      G Go (address)
+      I In (address)
+      O Out (address,data)
+      R Radix (H/O)
+      S Substitute (address)
+      T Test Memory
+      V View
 
 ****************************************************************************/
 
 #include "emu.h"
-#include "bus/rs232/rs232.h"
+
+#include "tlb.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/ins8250.h"
 #include "machine/timer.h"
 
-
 namespace {
 
-#define RS232_TAG "rs232"
+
+#define H89_CLOCK (XTAL(12'288'000) / 6)
+#define INS8250_CLOCK (XTAL(1'843'200))
 
 class h89_state : public driver_device
 {
 public:
-	h89_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
+	h89_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_tlb(*this, "tlb"),
+		m_console(*this, "console")
 	{
 	}
 
@@ -43,6 +46,8 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<heath_tlb_device> m_tlb;
+	required_device<ins8250_device> m_console;
 
 	void port_f2_w(uint8_t data);
 
@@ -83,11 +88,9 @@ void h89_state::h89_io(address_map &map)
 //  map(0xd0, 0xd7)    8250 UART DCE
 //  map(0xd8, 0xdf)    8250 UART DTE - MODEM
 //  map(0xe0, 0xe7)    8250 UART DCE - LP
-	map(0xe8, 0xef).rw("ins8250", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w)); // 8250 UART console - this
+	map(0xe8, 0xef).rw(m_console, FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w)); // 8250 UART console - this
 																								 // connects internally to a Terminal board
-																								 // that is also used in the H19. Ideally,
-																								 // the H19 code could be connected and ran
-																								 // as a separate thread.
+																								 // that is also used in the H19.
 //  map(0xf0, 0xf1)        // ports defined on the H8 - on the H89, access to these addresses causes a NMI
 	map(0xf2, 0xf2).w(FUNC(h89_state::port_f2_w)).portr("SW501");
 //  map(0xf3, 0xf3)        // ports defined on the H8 - on the H89, access to these addresses causes a NMI
@@ -133,7 +136,7 @@ static INPUT_PORTS_START( h89 )
 //  PORT_DIPSETTING( 0x00, DEF_STR( Normal ) )
 //  PORT_DIPSETTING( 0x80, "Auto" )
 
-		// Settings with the MTR-90 ROM (#444-84 or 444-142)
+	// Settings with the MTR-90 ROM (#444-84 or 444-142)
 	PORT_START("SW501")
 	PORT_DIPNAME( 0x03, 0x00, "Expansion 1" )  PORT_DIPLOCATION("S1:1,S1:2")
 	PORT_DIPSETTING( 0x00, "H-88-1" )
@@ -167,7 +170,9 @@ void h89_state::machine_reset()
 TIMER_DEVICE_CALLBACK_MEMBER(h89_state::h89_irq_timer)
 {
 	if (m_port_f2 & 0x02)
+	{
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); // Z80
+	}
 }
 
 void h89_state::port_f2_w(uint8_t data)
@@ -177,31 +182,22 @@ void h89_state::port_f2_w(uint8_t data)
 	m_port_f2 = data;
 }
 
-static DEVICE_INPUT_DEFAULTS_START( terminal )
-	// TODO - baud rate should be controlled by SW501 setting
-	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
-	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
-	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
-DEVICE_INPUT_DEFAULTS_END
-
-
 void h89_state::h89(machine_config & config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(12'288'000) / 6);
+	// basic machine hardware
+	Z80(config, m_maincpu, H89_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &h89_state::h89_mem);
 	m_maincpu->set_addrmap(AS_IO, &h89_state::h89_io);
 
-	ins8250_device &uart(INS8250(config, "ins8250", XTAL(1'843'200)));
-	uart.out_tx_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	INS8250(config, m_console, INS8250_CLOCK);
+	HEATH_TLB(config, m_tlb);
 
-	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, "terminal"));
-	rs232.rxd_handler().set("ins8250", FUNC(ins8250_uart_device::rx_w));
-	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
+	// Connect the console port on CPU board to serial port on TLB
+	m_console->out_tx_callback().set(m_tlb, FUNC(heath_tlb_device::cb1_w));
+	m_tlb->serial_data_callback().set(m_console, FUNC(ins8250_uart_device::rx_w));
 
-	TIMER(config, "irq_timer", 0).configure_periodic(FUNC(h89_state::h89_irq_timer), attotime::from_hz(100));
+	// H89 interrupt interval is 2mSec
+	TIMER(config, "irq_timer", 0).configure_periodic(FUNC(h89_state::h89_irq_timer), attotime::from_msec(2));
 }
 
 /* ROM definition */
@@ -221,4 +217,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY      FULLNAME        FLAGS */
-COMP( 1979, h89,  0,      0,      h89,     h89,   h89_state, empty_init, "Heath Company", "Heathkit H89", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1979, h89,  0,      0,      h89,     h89,   h89_state, empty_init, "Heath Company", "Heathkit H89", MACHINE_NOT_WORKING)

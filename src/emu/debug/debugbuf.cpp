@@ -82,6 +82,8 @@ void debug_disasm_buffer::debug_data_buffer::fill(offs_t lstart, offs_t size) co
 		}
 	}
 
+	// FIXME: This buffer tends to hog more memory than necessary for typical disassembly tasks.
+	// If the PC values supplied are far enough apart, the buffer may suddenly increase in size to a gigabyte or more.
 	if(m_buffer.empty()) {
 		m_lstart = lstart;
 		m_lend = lend;

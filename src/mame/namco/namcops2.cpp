@@ -1656,6 +1656,17 @@ ROM_START( motogp )
 	DISK_IMAGE_READONLY( "mgp1004-na-hdd0-a", 0, SHA1(599940b9fe7fc8e46fd80a32c7e795ae143ee645) )
 ROM_END
 
+ROM_START( acedriv3 )
+	ROM_REGION32_LE(0x200000, "bios", 0)
+	SYSTEM246_BIOS
+
+	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+	ROM_LOAD( "adt1005-na-a.ic002", 0x000000, 0x840000, CRC(5f4d48bf) SHA1(19fa62e97c6bf2b8ae62cb99e31a06ec87a5e203) )
+
+	DISK_REGION("dvd")  // actually HDD for this game
+	DISK_IMAGE_READONLY( "adt1005-na-hdd0a", 0, SHA1(9df73a5ada38e6346fbfcc2890faf399110bdc4a) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -1698,6 +1709,7 @@ GAME(2005, taiko7,     sys246, system246, system246, namcops2_state, empty_init,
 GAME(2006, taiko8,     sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Taiko no Tatsujin 8 (TK8100-1-NA-A)", MACHINE_IS_SKELETON)
 GAME(2006, qgundam,    sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Quiz Mobile Suit Gundam: Monsenshi (QG1 Ver. A)", MACHINE_IS_SKELETON)
 GAME(2007, minnadk,    sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Minna de Kitaeru Zenno Training (Ver. 1.50)", MACHINE_IS_SKELETON)
+GAME(2008, acedriv3,   sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Ace Driver 3: Final Turn", MACHINE_IS_SKELETON)
 GAME(2008, fateulc,    sys246, system246, system246, namcops2_state, empty_init, ROT0, "Capcom / Namco", "Fate: Unlimited Codes (FUD1 ver. A)", MACHINE_IS_SKELETON)
 GAME(2008, fateulcb,  fateulc, system246, system246, namcops2_state, empty_init, ROT0, "bootleg", "Fate: Unlimited Codes (bootleg)", MACHINE_IS_SKELETON)
 GAME(2008, sbxc,       sys246, system246, system246, namcops2_state, empty_init, ROT0, "Capcom / Arc System Works", "Sengoku Basara X Cross", MACHINE_IS_SKELETON)

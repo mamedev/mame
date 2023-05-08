@@ -1377,7 +1377,12 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 
 	// master volume attenuation
 	if (util::xml::data_node const *node = parentnode->get_child("attenuation"))
-		set_attenuation(std::clamp(int(node->get_attribute_int("value", 0)), -32, 0));
+	{
+		// treat source INI files or more specific as higher priority than CFG
+		// FIXME: leaky abstraction - this depends on a front-end implementation detail
+		if ((OPTION_PRIORITY_NORMAL + 5) > machine().options().get_entry(OPTION_VOLUME)->priority())
+			set_attenuation(std::clamp(int(node->get_attribute_int("value", 0)), -32, 0));
+	}
 
 	// iterate over channel nodes
 	for (util::xml::data_node const *channelnode = parentnode->get_child("channel"); channelnode != nullptr; channelnode = channelnode->get_next_sibling("channel"))

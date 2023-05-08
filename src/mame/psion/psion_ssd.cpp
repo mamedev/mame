@@ -169,7 +169,7 @@ TIMER_CALLBACK_MEMBER(psion_ssd_device::close_door)
 }
 
 
-image_init_result psion_ssd_device::call_load()
+std::pair<std::error_condition, std::string> psion_ssd_device::call_load()
 {
 	device_image_interface *image = nullptr;
 	interface(image);
@@ -177,10 +177,7 @@ image_init_result psion_ssd_device::call_load()
 	uint32_t size = image->length();
 
 	if (size < 0x10000 || size > 0x800000 || (size & (size - 1)) != 0)
-	{
-		image->seterror(image_error::INVALIDIMAGE, "Invalid size, must be 64K, 128K, 256K, 512K, 1M, 2M, 4M, 8M");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Invalid size, must be 64K, 128K, 256K, 512K, 1M, 2M, 4M, 8M");
 
 	image->fread(m_ssd_data.get(), size);
 
@@ -196,7 +193,7 @@ image_init_result psion_ssd_device::call_load()
 	// setup the timer to close the door
 	m_door_timer->adjust(attotime::from_msec(200));
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

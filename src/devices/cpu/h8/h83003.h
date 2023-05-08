@@ -29,8 +29,10 @@ class h83003_device : public h8h_device {
 public:
 	h83003_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto tend0() { return tend0_cb.bind(); }
-	auto tend1() { return tend1_cb.bind(); }
+	auto tend0() { return tend_cb[0].bind(); }
+	auto tend1() { return tend_cb[1].bind(); }
+	auto tend2() { return tend_cb[2].bind(); }
+	auto tend3() { return tend_cb[3].bind(); }
 
 	void set_mode_a20() { mode_a20 = true; }
 	void set_mode_a24() { mode_a20 = false; }
@@ -68,7 +70,7 @@ protected:
 	uint8_t syscr;
 	uint8_t rtmcsr;
 
-	devcb_write_line tend0_cb, tend1_cb;
+	devcb_write_line::array<4> tend_cb;
 
 	virtual void update_irq_filter() override;
 	virtual void interrupt_taken() override;

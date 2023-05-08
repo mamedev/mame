@@ -585,6 +585,13 @@ void upd7810_device::pf_w(uint8_t data, uint8_t mem_mask)
 	COMBINE_DATA(&m_pf_in);
 }
 
+WRITE_LINE_MEMBER(upd7810_device::sck_w)
+{
+	if ((SMH & 0x03) == 0x03 && state != SCK)
+		update_sio(1);
+	SCK = state;
+}
+
 uint8_t upd7810_device::RP(offs_t port)
 {
 	uint8_t data = 0xff;
@@ -911,7 +918,9 @@ void upd7801_device::upd7810_take_irq()
 
 void upd7810_device::upd7810_to_output_change(int state)
 {
-	TO = state & 1;
+	if ((SMH & 0x03) == 0x00 && state != TO)
+		update_sio(1);
+	TO = state;
 	m_to_func(TO);
 
 	if (m_mcc & 0x10)
@@ -1350,6 +1359,25 @@ void upd7810_device::upd7810_handle_timer1(int cycles, int clkdiv)
 	}
 }
 
+void upd7810_device::update_sio(int cycles)
+{
+	const int divider[] = { 2, 384 / 3, 24 / 3, 2 };
+	const int prescale[] = { 1, 1, 16, 64 };
+	const int interval = divider[SMH & 0x03] * prescale[SML & 0x03];
+
+	OVCS += cycles;
+
+	while (OVCS >= interval / 2)
+	{
+		OVCS -= (interval / 2);
+
+		if (0 == (EDGES ^= 1))
+			upd7810_sio_input(); // rising edge
+		else
+			upd7810_sio_output(); // falling edge
+	}
+}
+
 void upd7810_device::handle_timers(int cycles)
 {
 	/**** TIMER 0 ****/
@@ -1461,21 +1489,7 @@ void upd7810_device::handle_timers(int cycles)
 	// we only handle "internal clock" serial mode here
 	if (((SMH & 0x03) == 0x01) || ((SMH & 0x03) == 0x02))
 	{
-		const int divider[] = { 0, 384, 24, 0 };
-		const int prescale[] = { 1, 1, 16, 64 };
-		const int interval = divider[SMH & 0x03] / 3 * prescale[SML & 0x03];
-
-		OVCS += cycles;
-
-		while (OVCS >= interval / 2)
-		{
-			OVCS -= (interval / 2);
-
-			if (0 == (EDGES ^= 1))
-				upd7810_sio_input(); // rising edge
-			else
-				upd7810_sio_output(); // falling edge
-		}
+		update_sio(cycles);
 	}
 
 	/**** ADC ****/

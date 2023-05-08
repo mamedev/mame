@@ -13,13 +13,6 @@
 
 
 //**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define ABC80_KEYBOARD_TAG  "abc80kb"
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -35,7 +28,9 @@ public:
 
 	uint8_t data_r();
 
-	void abc80_keyboard_io(address_map &map);
+	void keyboard_mem(address_map &map);
+	void keyboard_io(address_map &map);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;

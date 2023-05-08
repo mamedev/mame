@@ -41,9 +41,11 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/mc146818.h"
@@ -55,11 +57,12 @@
 #include "machine/timer.h"
 #include "machine/upd765.h"
 #include "sound/beep.h"
-#include "imagedev/floppy.h"
-#include "formats/pc_dsk.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "formats/pc_dsk.h"
 
 #define LOG_GENERAL (1U << 0)
 #define LOG_DEBUG   (1U << 1)
@@ -93,7 +96,10 @@ public:
 		m_uart_clock(*this, "uart_clock"),
 		m_nvram(*this, "nvram"),
 		m_pcmcia(*this, "pcmcia"),
-		m_mem_view{ {*this, "block0"}, {*this, "block1"}, {*this, "block2"}, {*this, "block3"} },
+		m_mem_view0(*this, "block0"),
+		m_mem_view1(*this, "block1"),
+		m_mem_view2(*this, "block2"),
+		m_mem_view3(*this, "block3"),
 		m_keyboard(*this, "line%d", 0U),
 		m_battery(*this, "battery")
 	{
@@ -137,7 +143,10 @@ protected:
 	required_device<clock_device> m_uart_clock;
 	required_device<nvram_device> m_nvram;
 	required_device<pccard_slot_device> m_pcmcia;
-	memory_view m_mem_view[4];
+	memory_view m_mem_view0;
+	memory_view m_mem_view1;
+	memory_view m_mem_view2;
+	memory_view m_mem_view3;
 	required_ioport_array<10> m_keyboard;
 	required_ioport m_battery;
 
@@ -263,26 +272,26 @@ private:
 
 void nc_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x3fff).view(m_mem_view[0]);
-	m_mem_view[0][0](0x0000, 0x3fff).bankr(m_rombank[0]);
-	m_mem_view[0][1](0x0000, 0x3fff).bankrw(m_rambank[0]);
-	m_mem_view[0][2](0x0000, 0x3fff).rw(FUNC(nc_state::pcmcia_r<0>), FUNC(nc_state::pcmcia_w<0>));
-	m_mem_view[0][3](0x0000, 0x3fff).bankr(m_rombank[0]);
-	map(0x4000, 0x7fff).view(m_mem_view[1]);
-	m_mem_view[1][0](0x4000, 0x7fff).bankr(m_rombank[1]);
-	m_mem_view[1][1](0x4000, 0x7fff).bankrw(m_rambank[1]);
-	m_mem_view[1][2](0x4000, 0x7fff).rw(FUNC(nc_state::pcmcia_r<1>), FUNC(nc_state::pcmcia_w<1>));
-	m_mem_view[1][3](0x4000, 0x7fff).bankr(m_rombank[1]);
-	map(0x8000, 0xbfff).view(m_mem_view[2]);
-	m_mem_view[2][0](0x8000, 0xbfff).bankr(m_rombank[2]);
-	m_mem_view[2][1](0x8000, 0xbfff).bankrw(m_rambank[2]);
-	m_mem_view[2][2](0x8000, 0xbfff).rw(FUNC(nc_state::pcmcia_r<2>), FUNC(nc_state::pcmcia_w<2>));
-	m_mem_view[2][3](0x8000, 0xbfff).bankr(m_rombank[2]);
-	map(0xc000, 0xffff).view(m_mem_view[3]);
-	m_mem_view[3][0](0xc000, 0xffff).bankr(m_rombank[3]);
-	m_mem_view[3][1](0xc000, 0xffff).bankrw(m_rambank[3]);
-	m_mem_view[3][2](0xc000, 0xffff).rw(FUNC(nc_state::pcmcia_r<3>), FUNC(nc_state::pcmcia_w<3>));
-	m_mem_view[3][3](0xc000, 0xffff).bankr(m_rombank[3]);
+	map(0x0000, 0x3fff).view(m_mem_view0);
+	m_mem_view0[0](0x0000, 0x3fff).bankr(m_rombank[0]);
+	m_mem_view0[1](0x0000, 0x3fff).bankrw(m_rambank[0]);
+	m_mem_view0[2](0x0000, 0x3fff).rw(FUNC(nc_state::pcmcia_r<0>), FUNC(nc_state::pcmcia_w<0>));
+	m_mem_view0[3](0x0000, 0x3fff).bankr(m_rombank[0]);
+	map(0x4000, 0x7fff).view(m_mem_view1);
+	m_mem_view1[0](0x4000, 0x7fff).bankr(m_rombank[1]);
+	m_mem_view1[1](0x4000, 0x7fff).bankrw(m_rambank[1]);
+	m_mem_view1[2](0x4000, 0x7fff).rw(FUNC(nc_state::pcmcia_r<1>), FUNC(nc_state::pcmcia_w<1>));
+	m_mem_view1[3](0x4000, 0x7fff).bankr(m_rombank[1]);
+	map(0x8000, 0xbfff).view(m_mem_view2);
+	m_mem_view2[0](0x8000, 0xbfff).bankr(m_rombank[2]);
+	m_mem_view2[1](0x8000, 0xbfff).bankrw(m_rambank[2]);
+	m_mem_view2[2](0x8000, 0xbfff).rw(FUNC(nc_state::pcmcia_r<2>), FUNC(nc_state::pcmcia_w<2>));
+	m_mem_view2[3](0x8000, 0xbfff).bankr(m_rombank[2]);
+	map(0xc000, 0xffff).view(m_mem_view3);
+	m_mem_view3[0](0xc000, 0xffff).bankr(m_rombank[3]);
+	m_mem_view3[1](0xc000, 0xffff).bankrw(m_rambank[3]);
+	m_mem_view3[2](0xc000, 0xffff).rw(FUNC(nc_state::pcmcia_r<3>), FUNC(nc_state::pcmcia_w<3>));
+	m_mem_view3[3](0xc000, 0xffff).bankr(m_rombank[3]);
 }
 
 void nc100_state::io_map(address_map &map)
@@ -1193,7 +1202,8 @@ void nc_state::memory_management_w(offs_t offset, uint8_t data)
 
 	m_mmc[offset] = data;
 
-	m_mem_view[offset].select(BIT(m_mmc[offset], 6, 2));
+	memory_view *const mem_view[4] = { &m_mem_view0, &m_mem_view1, &m_mem_view2, &m_mem_view3 };
+	mem_view[offset]->select(BIT(m_mmc[offset], 6, 2));
 	m_rombank[offset]->set_entry(m_mmc[offset] & 0x3f & (m_rom_banks - 1));
 	m_rambank[offset]->set_entry(m_mmc[offset] & 0x3f & (m_ram_banks - 1));
 }

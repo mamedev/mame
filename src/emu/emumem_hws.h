@@ -14,7 +14,7 @@
 template<int Width, int AddrShift> class handler_entry_read_before_time : public handler_entry_read_passthrough<Width, AddrShift>
 {
 public:
-	using uX = typename emu::detail::handler_entry_size<Width>::uX;
+	using uX = emu::detail::handler_entry_size_t<Width>;
 
 	handler_entry_read_before_time(address_space *space, emu::detail::memory_passthrough_handler_impl &mph, const ws_time_delegate &ws) : handler_entry_read_passthrough<Width, AddrShift>(space, mph, 13), m_ws(ws), m_cpu(downcast<cpu_device &>(space->device())) {}
 	~handler_entry_read_before_time() = default;
@@ -38,7 +38,7 @@ protected:
 template<int Width, int AddrShift> class handler_entry_write_before_time : public handler_entry_write_passthrough<Width, AddrShift>
 {
 public:
-	using uX = typename emu::detail::handler_entry_size<Width>::uX;
+	using uX = emu::detail::handler_entry_size_t<Width>;
 
 	handler_entry_write_before_time(address_space *space, emu::detail::memory_passthrough_handler_impl &mph, const ws_time_delegate &ws) : handler_entry_write_passthrough<Width, AddrShift>(space, mph, 13), m_ws(ws), m_cpu(downcast<cpu_device &>(space->device())) {}
 	~handler_entry_write_before_time() = default;
@@ -64,7 +64,7 @@ protected:
 template<int Width, int AddrShift> class handler_entry_read_before_delay : public handler_entry_read_passthrough<Width, AddrShift>
 {
 public:
-	using uX = typename emu::detail::handler_entry_size<Width>::uX;
+	using uX = emu::detail::handler_entry_size_t<Width>;
 
 	handler_entry_read_before_delay(address_space *space, emu::detail::memory_passthrough_handler_impl &mph, const ws_delay_delegate &ws) : handler_entry_read_passthrough<Width, AddrShift>(space, mph, 13), m_ws(ws), m_cpu(downcast<cpu_device &>(space->device())) {}
 	~handler_entry_read_before_delay() = default;
@@ -88,7 +88,7 @@ protected:
 template<int Width, int AddrShift> class handler_entry_write_before_delay : public handler_entry_write_passthrough<Width, AddrShift>
 {
 public:
-	using uX = typename emu::detail::handler_entry_size<Width>::uX;
+	using uX = emu::detail::handler_entry_size_t<Width>;
 
 	handler_entry_write_before_delay(address_space *space, emu::detail::memory_passthrough_handler_impl &mph, const ws_delay_delegate &ws) : handler_entry_write_passthrough<Width, AddrShift>(space, mph, 11), m_ws(ws), m_cpu(downcast<cpu_device &>(space->device())) {}
 	~handler_entry_write_before_delay() = default;
@@ -114,7 +114,7 @@ protected:
 template<int Width, int AddrShift> class handler_entry_read_after_delay : public handler_entry_read_passthrough<Width, AddrShift>
 {
 public:
-	using uX = typename emu::detail::handler_entry_size<Width>::uX;
+	using uX = emu::detail::handler_entry_size_t<Width>;
 
 	handler_entry_read_after_delay(address_space *space, emu::detail::memory_passthrough_handler_impl &mph, const ws_delay_delegate &ws) : handler_entry_read_passthrough<Width, AddrShift>(space, mph, 9), m_ws(ws), m_cpu(downcast<cpu_device &>(space->device())) {}
 	~handler_entry_read_after_delay() = default;
@@ -138,7 +138,7 @@ protected:
 template<int Width, int AddrShift> class handler_entry_write_after_delay : public handler_entry_write_passthrough<Width, AddrShift>
 {
 public:
-	using uX = typename emu::detail::handler_entry_size<Width>::uX;
+	using uX = emu::detail::handler_entry_size_t<Width>;
 
 	handler_entry_write_after_delay(address_space *space, emu::detail::memory_passthrough_handler_impl &mph, const ws_delay_delegate &ws) : handler_entry_write_passthrough<Width, AddrShift>(space, mph, 9), m_ws(ws), m_cpu(downcast<cpu_device &>(space->device())) {}
 	~handler_entry_write_after_delay() = default;

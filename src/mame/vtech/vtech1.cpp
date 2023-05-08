@@ -163,8 +163,7 @@ SNAPSHOT_LOAD_MEMBER(vtech1_base_state::snapshot_cb)
 	uint8_t header[24];
 	if (image.fread(&header, sizeof(header)) != sizeof(header))
 	{
-		//image.seterror(image_error::UNSPECIFIED);
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::UNSPECIFIED, std::string());
 	}
 
 	// get image name
@@ -174,18 +173,28 @@ SNAPSHOT_LOAD_MEMBER(vtech1_base_state::snapshot_cb)
 	pgmname[16] = '\0';
 
 	// get start and end addresses
-	uint16_t start = pick_integer_le(header, 22, 2);
-	uint16_t end = start + image.length() - sizeof(header);
-	uint16_t size = end - start;
+	uint16_t const start = pick_integer_le(header, 22, 2);
+	uint16_t const end = start + image.length() - sizeof(header);
+	uint16_t const size = end - start;
 
-	// write it to ram
+	// write it to RAM
 	auto buf = std::make_unique<uint8_t []>(size);
 	if (image.fread(buf.get(), size) != size)
 	{
-		//image.seterror(image_error::UNSPECIFIED);
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::UNSPECIFIED, std::string());
 	}
 	uint8_t *ptr = &buf[0];
+
+	// check for supported format before overwriting memory
+	switch (header[21])
+	{
+	case VZ_BASIC:
+	case VZ_MCODE:
+		break;
+
+	default:
+		return std::make_pair(image_error::UNSUPPORTED, "Snapshot format not supported");
+	}
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	for (uint16_t addr = start; addr < end; addr++, ptr++)
@@ -196,10 +205,9 @@ SNAPSHOT_LOAD_MEMBER(vtech1_base_state::snapshot_cb)
 		// verify
 		if (space.read_byte(addr) != to_write)
 		{
-			image.seterror(image_error::INVALIDIMAGE, "Insufficient RAM to load snapshot");
-			image.message("Insufficient RAM to load snapshot (%d bytes needed) [%s]", size, pgmname);
-
-			return image_init_result::FAIL;
+			return std::make_pair(
+					image_error::INVALIDIMAGE,
+					util::string_format("Insufficient RAM to load snapshot program '%s' (%d bytes needed)", pgmname, size));
 		}
 	}
 
@@ -224,14 +232,9 @@ SNAPSHOT_LOAD_MEMBER(vtech1_base_state::snapshot_cb)
 		image.message(" %s (M)\nsize=%04X : start=%04X : end=%04X", pgmname, size, start, end);
 		m_maincpu->set_pc(start);              /* start program */
 		break;
-
-	default:
-		image.seterror(image_error::INVALIDIMAGE, "Snapshot format not supported.");
-		image.message("Snapshot format not supported.");
-		return image_init_result::FAIL;
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

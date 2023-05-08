@@ -38,7 +38,7 @@ private:
 
 void msx_cart_ucn01_device::device_add_mconfig(machine_config &mconfig)
 {
-	MSX_SLOT_YAMAHA_EXPANSION(mconfig, m_module, 0);
+	MSX_SLOT_YAMAHA_EXPANSION(mconfig, m_module, DERIVED_CLOCK(1, 1));
 	m_module->option_reset();
 	msx_yamaha_60pin(*m_module, false);
 	m_module->set_default_option(nullptr);

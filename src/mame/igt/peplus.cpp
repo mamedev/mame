@@ -206,16 +206,18 @@ A Note about Best Bet Products.
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
 
 #include "peplus.lh"
-#include "pe_schip.lh"
-#include "pe_poker.lh"
 #include "pe_bjack.lh"
+#include "pe_fantasy.lh"
 #include "pe_keno.lh"
+#include "pe_poker.lh"
+#include "pe_schip.lh"
 #include "pe_slots.lh"
 
 
@@ -1331,6 +1333,45 @@ static INPUT_PORTS_START( peplus_slots )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(peplus_state, input_r<1>)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Card Cage") PORT_CODE(KEYCODE_M) PORT_TOGGLE
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( peplus_fantasy )
+	PORT_INCLUDE(peplus)
+
+	PORT_START("IN_BANK1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Jackpot Reset") PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Self Test") PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("1-5 Lines Select") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Play 1 Credit") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Play 2 Credits") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Play 3 Credits") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Play 4 Credits") PORT_CODE(KEYCODE_B)
+
+	PORT_START("IN_BANK2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("Play 5 Credits") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_NAME("Reserve-Cursor") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_NAME("Collect") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED ) // Bill Acceptor
+
+	PORT_START("IN0")
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(peplus_state, input_r<0>)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(peplus_state, input_r<1>)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Diverter Input") PORT_CODE(KEYCODE_M)
+
+	PORT_MODIFY("SW1")
+	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW1:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW1:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW1:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "SW1:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW1:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW1:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW1:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW1:8" )
 INPUT_PORTS_END
 
 
@@ -9202,7 +9243,29 @@ ROM_START( peps0722 ) // Normal board River Gambler Slots (PS0722) - Payout 90.0
 	ROM_LOAD( "cap2266.u50", 0x0000, 0x0100, CRC(5aaff103) SHA1(9cfda9c095cb77a8bb761c131a0f358e79b97abc) )
 ROM_END
 
+// Sovereign boards (Australia)
+// Different PCB layout and IC locations compared to regular PE+
+// PCB markings:
+// I.G.T. AUSTRALIA
+// ASSY NO. A33.001.19
+
+ROM_START( sv1pf434 ) // Sovereign Fantasy - Payout 89.82%
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1pf434a3.u65",   0x00000, 0x10000, CRC(77333cc3) SHA1(728bb4cccd3a7236d38feb0b95e87938ec371e03) ) // 1PF434A3 FANTASY 89.82% DA
+
+	ROM_REGION( 0x020000, "tiles", 0 )
+	ROM_LOAD( "rcf127.u69",  0x00000, 0x8000, CRC(674de002) SHA1(43e3250f28b6dc94c58197107d9ebf823125ecda) ) // RCF127 FANTASY % IGT
+	ROM_LOAD( "gcf127.u70",  0x08000, 0x8000, CRC(5d5ff4dd) SHA1(084358d113b1cb381d98fc73307debe7973e3b6a) ) // GCF127 FANTASY % IGT
+	ROM_LOAD( "bcf127.u71",  0x10000, 0x8000, CRC(9c719eab) SHA1(91365cc2ec2b34e15f995e6b64c414e2d6b8c2ea) ) // BCF127 FANTASY % IGT
+	ROM_LOAD( "xcf127.u72",  0x18000, 0x8000, CRC(bd755c16) SHA1(73c913c21bbaca0a06e8bca0dc74e5a01f4fc662) ) // XCF127 FANTASY % IGT
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap127.u47", 0x0000, 0x0100, CRC(a914b11c) SHA1(f2384ea18dd18fb561ee1bedf6ed7142719b69d6) ) // CAP127 FANTASY
+ROM_END
+
+
 // Imperial boards (New Zealand)
+// Same PCB as Sovereign?
 
 ROM_START( im1p1952 ) // Imperial Blue Moon - Payout 90.30%
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -15341,6 +15404,9 @@ GAMEL( 1996, peps0631,  peps0358, peplus, peplus_slots,  peplus_state, init_pepl
 GAMEL( 1996, peps0708,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0708) Double Cherry Bar Slots",          MACHINE_SUPPORTS_SAVE, layout_pe_slots )
 GAMEL( 1996, peps0716,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0716) River Gambler Slots",              MACHINE_SUPPORTS_SAVE, layout_pe_slots )
 GAMEL( 1996, peps0722,  peps0716, peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0722) River Gambler Slots",              MACHINE_SUPPORTS_SAVE, layout_pe_slots )
+
+// IGT Sovereign slots (Australia)
+GAMEL( 1992, sv1pf434,  0,        peplus, peplus_fantasy, peplus_state, init_peplus,  ROT0, "IGT - International Game Technology", "Sovereign (1PF434A3) Fantasy",                                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_fantasy ) // occasionally makes an alarm sound most likely related to the door
 
 // IGT Imperial slots (New Zealand)
 GAMEL( 1995, im1p1952,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Imperial (1P1952IZ) Blue Moon",                                MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_slots ) // stuck during initialization, CAP not dumped

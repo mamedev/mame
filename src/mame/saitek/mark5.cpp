@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Berger
-/******************************************************************************
+/*******************************************************************************
 
 Chess Champion: Mark V / Mark VI (aka MK V / MK VI)
 
@@ -43,7 +43,7 @@ TODO:
 - what are the 1M/3M/4M diodes for? CPU speed? the only noticeable difference
   is beeper pitch
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
@@ -150,9 +150,9 @@ void mark5_state::machine_reset()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void mark5_state::nvram_w(offs_t offset, u8 data)
 {
@@ -285,9 +285,9 @@ u8 mark5_state::cb_rom_r(offs_t offset)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void mark5_state::mark5_map(address_map &map)
 {
@@ -311,9 +311,9 @@ void mark5_state::mark6_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( mark5 )
 	PORT_START("IN.0")
@@ -404,19 +404,19 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void mark5_state::mark5(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M6502(config, m_maincpu, 19.6608_MHz_XTAL / 10);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mark5_state::mark5_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	// video hardware
 	HLCD0538(config, m_lcd[0]).write_cols().set(FUNC(mark5_state::lcd_output_w<0>));
 	PWM_DISPLAY(config, m_display[0]).set_size(8, 26);
 	m_display[0]->output_x().set(FUNC(mark5_state::pwm_output_w<0>));
@@ -439,7 +439,7 @@ void mark5_state::mark5(machine_config &config)
 
 	config.set_default_layout(layout_saitek_mark5);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
@@ -448,7 +448,7 @@ void mark5_state::mark6(machine_config &config)
 {
 	mark5(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &mark5_state::mark6_map);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
@@ -463,9 +463,9 @@ void mark5_state::mark6(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( ccmk5 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -496,10 +496,10 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME   PARENT CMP MACHINE INPUT  STATE        INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1981, ccmk5, 0,      0, mark5,  mark5, mark5_state, empty_init, "SciSys / Philidor Software", "Chess Champion: Mark V", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1982, ccmk6, ccmk5,  0, mark6,  mark6, mark5_state, empty_init, "SciSys / Philidor Software", "Chess Champion: Mark VI/Philidor", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1981, ccmk5, 0,      0,      mark5,   mark5, mark5_state, empty_init, "SciSys / Philidor Software", "Chess Champion: Mark V", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1982, ccmk6, ccmk5,  0,      mark6,   mark6, mark5_state, empty_init, "SciSys / Philidor Software", "Chess Champion: Mark VI/Philidor", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

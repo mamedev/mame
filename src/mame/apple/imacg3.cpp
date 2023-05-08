@@ -25,6 +25,7 @@
 #include "machine/pci.h"
 #include "machine/pci-ide.h"
 #include "machine/ram.h"
+#include "burgundy.h"
 #include "cuda.h"
 #include "heathrow.h"
 #include "macadb.h"
@@ -36,7 +37,7 @@ public:
 
 	imac_state(const machine_config &mconfig, device_type type, const char *tag);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<ppc_device> m_maincpu;
 	required_device<mpc106_host_device> m_mpc106;
 	required_device<cuda_device> m_cuda;
 	required_device<macadb_device> m_macadb;
@@ -53,6 +54,11 @@ private:
 	{
 		m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 		m_maincpu->set_input_line(INPUT_LINE_RESET, state);
+	}
+
+	WRITE_LINE_MEMBER(irq_w)
+	{
+		m_maincpu->set_input_line(PPC_IRQ, state);
 	}
 };
 
@@ -108,7 +114,8 @@ void imac_state::imac_map(address_map &map)
 
 void imac_state::imac(machine_config &config)
 {
-	PPC604(config, m_maincpu, 66000000);    // actually PPC750
+	PPC740(config, m_maincpu, 66000000);    // actually 233 MHz
+	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 	m_maincpu->set_addrmap(AS_PROGRAM, &imac_state::imac_map);
 
 	PCI_ROOT(config, "pci", 0);
@@ -116,6 +123,8 @@ void imac_state::imac(machine_config &config)
 
 	paddington_device &paddington(PADDINGTON(config, "pci:10.0", 0));
 	paddington.set_maincpu_tag("maincpu");
+	paddington.set_pci_root_tag(":pci:00.0", AS_DATA);
+	paddington.irq_callback().set(FUNC(imac_state::irq_w));
 
 	MACADB(config, m_macadb, 15.6672_MHz_XTAL);
 
@@ -151,6 +160,17 @@ void imac_state::imac(machine_config &config)
 	RAM(config, m_ram);
 	m_ram->set_default_size("32M");
 	m_ram->set_extra_options("32M,64M,128M");
+
+	burgundy_device &burgundy(BURGUNDY(config, "codec", 45.1584_MHz_XTAL / 2));
+	burgundy.dma_output().set(paddington, FUNC(heathrow_device::codec_dma_read));
+
+	paddington.codec_r_callback().set(burgundy, FUNC(burgundy_device::read_macrisc));
+	paddington.codec_w_callback().set(burgundy, FUNC(burgundy_device::write_macrisc));
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	burgundy.add_route(0, "lspeaker", 1.0);
+	burgundy.add_route(1, "rspeaker", 1.0);
 }
 
 ROM_START(imac)

@@ -9,8 +9,6 @@ NOTE:  Eventually to be merged into galaxian.cpp
 TODO:
 ----
 
-- Need correct color PROMs for Super Bond
-
 - Dark Planet background graphics
 
 - Explosion sound in Scramble/Super Cobra repeats

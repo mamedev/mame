@@ -145,14 +145,23 @@ void vastar_video_device::draw_sprites(bitmap_rgb32& bitmap, const rectangle& cl
 		const int sx = spriteram[m_spr_code_x + offs + 1];
 		int sy = spriteram[m_spr_y_col + offs];
 		const int color = spriteram[m_spr_y_col + offs + 1] & 0x3f;
-		int flipx = spriteram[m_spr_code_x + offs] & 0x02;
-		int flipy = spriteram[m_spr_code_x + offs] & 0x01;
+		bool flipy, flipx;
+
+		if (m_alt_spriteflip)
+		{
+			flipy = (spriteram[m_spr_code_x + offs] & 0x02) ? true : false;
+			flipx = (spriteram[m_spr_code_x + offs] & 0x01) ? true : false;
+		}
+		else
+		{
+			flipy = (spriteram[m_spr_code_x + offs] & 0x01) ? true : false;
+			flipx = (spriteram[m_spr_code_x + offs] & 0x02) ? true : false;
+		}
 
 		if (m_flip_screen)
 		{
-			int temp = flipx;
-			flipx = !flipy;
-			flipy = !temp;
+			flipx = !flipx;
+			flipy = !flipy;
 		}
 
 		if (spriteram[m_spr_attr + offs] & 0x08)   // double width

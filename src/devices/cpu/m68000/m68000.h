@@ -166,6 +166,7 @@ protected:
 	u32 m_int_level;
 	u32 m_int_next_state;
 	bool m_nmi_uses_generic;
+	bool m_disable_interrupt_callback;
 	u64 m_last_vpa_time;
 
 	// Current instruction state and substate
@@ -925,6 +926,22 @@ protected:
 	inline void sr_xnzvc_u() {
 		m_sr = (m_sr & ~(SR_X|SR_N|SR_V|SR_C) & (m_isr | ~SR_Z)) | (m_isr & (SR_X|SR_N|SR_V|SR_C));
 	}
+};
+
+class m68000_mcu_device : public m68000_device
+{
+protected:
+	m68000_mcu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
+	virtual void execute_run() override;
+	void recompute_bcount(uint64_t event_time);
+	static void add_event(uint64_t &event_time, uint64_t new_event);
+	void internal_update();
+
+	virtual void internal_update(uint64_t current_time) = 0;
+	virtual void device_start() override;
+
+	void set_current_interrupt_level(u32 level);
 };
 
 DECLARE_DEVICE_TYPE(M68000, m68000_device)

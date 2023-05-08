@@ -31,10 +31,7 @@ beta_disk_device::beta_disk_device(const machine_config &mconfig, const char *ta
 	: device_t(mconfig, BETA_DISK, tag, owner, clock)
 	, m_betadisk_active(0)
 	, m_wd179x(*this, "wd179x")
-	, m_floppy0(*this, "wd179x:0")
-	, m_floppy1(*this, "wd179x:1")
-	, m_floppy2(*this, "wd179x:2")
-	, m_floppy3(*this, "wd179x:3")
+	, m_floppy(*this, "wd179x:%u", 0U)
 	, m_control(0)
 	, m_motor_active(false)
 {
@@ -127,8 +124,7 @@ void beta_disk_device::param_w(uint8_t data)
 {
 	if (m_betadisk_active == 1)
 	{
-		floppy_connector* connectors[] = { m_floppy0, m_floppy1, m_floppy2, m_floppy3 };
-		floppy_image_device* floppy = connectors[data & 3]->get_device();
+		floppy_image_device* floppy = m_floppy[data & 3]->get_device();
 
 		m_control = data;
 		m_wd179x->set_floppy(floppy);
@@ -181,13 +177,12 @@ void beta_disk_device::fdc_hld_w(int state)
 
 void beta_disk_device::motors_control()
 {
-	floppy_connector* connectors[] = { m_floppy0, m_floppy1, m_floppy2, m_floppy3 };
 	for (int i = 0; i < 4; i++)
 	{
 		if (m_motor_active && (m_control & 3) == i)
-			connectors[i]->get_device()->mon_w(CLEAR_LINE);
+			m_floppy[i]->get_device()->mon_w(CLEAR_LINE);
 		else
-			connectors[i]->get_device()->mon_w(ASSERT_LINE);
+			m_floppy[i]->get_device()->mon_w(ASSERT_LINE);
 	}
 }
 
@@ -293,10 +288,8 @@ void beta_disk_device::device_add_mconfig(machine_config &config)
 {
 	KR1818VG93(config, m_wd179x, 8_MHz_XTAL / 8);
 	m_wd179x->hld_wr_callback().set(FUNC(beta_disk_device::fdc_hld_w));
-	FLOPPY_CONNECTOR(config, m_floppy0, beta_disk_floppies, "525qd", beta_disk_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, beta_disk_floppies, "525qd", beta_disk_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy2, beta_disk_floppies, "525qd", beta_disk_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy3, beta_disk_floppies, "525qd", beta_disk_device::floppy_formats).enable_sound(true);
+	for (auto &floppy : m_floppy)
+		FLOPPY_CONNECTOR(config, floppy, beta_disk_floppies, "525qd", beta_disk_device::floppy_formats).enable_sound(true);
 }
 
 //-------------------------------------------------

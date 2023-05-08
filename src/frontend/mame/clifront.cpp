@@ -112,13 +112,13 @@ const options_entry cli_option_entries[] =
 	{ CLICOMMAND_LISTBROTHERS   ";lb",      "0",       core_options::option_type::COMMAND,    "show \"brothers\", or other drivers from same sourcefile" },
 	{ CLICOMMAND_LISTCRC,                   "0",       core_options::option_type::COMMAND,    "CRC-32s" },
 	{ CLICOMMAND_LISTROMS       ";lr",      "0",       core_options::option_type::COMMAND,    "list required ROMs for a driver" },
-	{ CLICOMMAND_LISTBIOS,                  "0",       core_options::option_type::COMMAND,    "list alternate BIOSes for a driver" },
 	{ CLICOMMAND_LISTSAMPLES,               "0",       core_options::option_type::COMMAND,    "list optional samples for a driver" },
 	{ CLICOMMAND_VERIFYROMS,                "0",       core_options::option_type::COMMAND,    "report romsets that have problems" },
 	{ CLICOMMAND_VERIFYSAMPLES,             "0",       core_options::option_type::COMMAND,    "report samplesets that have problems" },
 	{ CLICOMMAND_ROMIDENT,                  "0",       core_options::option_type::COMMAND,    "compare files with known MAME ROMs" },
-	{ CLICOMMAND_LISTDEVICES    ";ld",      "0",       core_options::option_type::COMMAND,    "list available devices" },
+	{ CLICOMMAND_LISTDEVICES    ";ld",      "0",       core_options::option_type::COMMAND,    "list devices in a system" },
 	{ CLICOMMAND_LISTSLOTS      ";lslot",   "0",       core_options::option_type::COMMAND,    "list available slots and slot devices" },
+	{ CLICOMMAND_LISTBIOS,                  "0",       core_options::option_type::COMMAND,    "list BIOS options for a system" },
 	{ CLICOMMAND_LISTMEDIA      ";lm",      "0",       core_options::option_type::COMMAND,    "list available media for the system" },
 	{ CLICOMMAND_LISTSOFTWARE   ";lsoft",   "0",       core_options::option_type::COMMAND,    "list known software for the system" },
 	{ CLICOMMAND_VERIFYSOFTWARE ";vsoft",   "0",       core_options::option_type::COMMAND,    "verify known software for the system" },
@@ -660,44 +660,65 @@ void cli_frontend::listroms(const std::vector<std::string> &args)
 
 
 //-------------------------------------------------
-//  listbios - output the list of BIOSes referenced
+//  listbios - output the BIOS options for a system
 //  by matching systems/devices
 //-------------------------------------------------
 
 void cli_frontend::listbios(const std::vector<std::string> &args)
 {
-	apply_device_action(
-			args,
-			[] (device_t &root, char const *type, bool first)
+	const char *gamename = args.empty() ? nullptr : args[0].c_str();
+
+	// determine which drivers to output; return an error if none found
+	driver_enumerator drivlist(m_options, gamename);
+	if (drivlist.count() == 0)
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", gamename);
+
+	// iterate over drivers
+	bool firstsystem = true;
+	std::vector<std::pair<std::string, std::string> > bioses;
+	while (drivlist.next())
+	{
+		device_t &root = drivlist.config()->root_device();
+		if (firstsystem)
+			firstsystem = false;
+		else
+			printf("\n");
+
+		// print system BIOS options if there are any
+		bool firstbios = true;
+		for (const romload::system_bios &bios : romload::system_bioses(root.rom_region()))
+		{
+			if (firstbios)
 			{
-				// space between items
-				if (!first)
-					osd_printf_info("\n");
+				printf("BIOS options for system %s (%s):\n", root.name(), root.shortname());
+				firstbios = false;
+			}
+			printf("    %-16s %s\n", bios.get_name(), bios.get_description());
+		}
+		if (firstbios)
+			printf("No BIOS options for system %s (%s)\n", root.name(), root.shortname());
 
-				// gather BIOS names and descriptions for one device only
-				std::vector<std::pair<std::string, std::string>> bioses;
-				for (const romload::system_bios &bios : romload::system_bioses(root.rom_region()))
-				{
-					int bios_index = bios.get_value() - 1;
-					if (bios_index >= 0)
-					{
-						if (bioses.size() < bios_index)
-							bioses.resize(bios_index);
-						bioses.emplace(bioses.begin() + bios_index, bios.get_name(), bios.get_description());
-					}
-				}
+		// iterate over slots
+		for (const device_slot_interface &slot : slot_interface_enumerator(root))
+		{
+			// ignore fixed or empty slots
+			device_t *const card = slot.get_card_device();
+			if (slot.fixed() || !card || !card->rom_region())
+				continue;
 
-				// print results
-				if (bioses.empty())
-					osd_printf_info("No BIOSes available for %s \"%s\".\n", type, root.shortname());
-				else
+			// print card BIOS options if there are any
+			bool firstcard = true;
+			for (const romload::system_bios &bios : romload::system_bioses(card->rom_region()))
+			{
+				if (firstcard)
 				{
-					osd_printf_info("%d BIOS%s available for %s \"%s\".\n", bioses.size(), bioses.size() != 1 ? "es" : "", type, root.shortname());
-					osd_printf_info("Name:             Description:\n");
-					for (const auto &desc : bioses)
-						osd_printf_info("%-17s \"%s\"\n", desc.first, desc.second);
+					printf("\n  BIOS options for device %s (-%s %s):\n", card->name(), slot.device().tag() + 1, card->basetag());
+					firstcard = false;
 				}
-			});
+				printf("      %-16s %s\n", bios.get_name(), bios.get_description());
+			}
+		}
+	}
 }
 
 
@@ -828,7 +849,7 @@ void cli_frontend::listdevices(const std::vector<std::string> &args)
 
 //-------------------------------------------------
 //  listslots - output the list of slot devices
-//  referenced by a given game or set of games
+//  present in a system or set of systems
 //-------------------------------------------------
 
 void cli_frontend::listslots(const std::vector<std::string> &args)
@@ -847,11 +868,12 @@ void cli_frontend::listslots(const std::vector<std::string> &args)
 	// iterate over drivers
 	while (drivlist.next())
 	{
-		// iterate
+		// iterate over slots
 		bool first = true;
 		for (const device_slot_interface &slot : slot_interface_enumerator(drivlist.config()->root_device()))
 		{
-			if (slot.fixed()) continue;
+			if (slot.fixed())
+				continue;
 
 			// build a list of user-selectable options
 			std::vector<device_slot_interface::slot_option const *> option_list;
@@ -860,9 +882,13 @@ void cli_frontend::listslots(const std::vector<std::string> &args)
 					option_list.push_back(option.second.get());
 
 			// sort them by name
-			std::sort(option_list.begin(), option_list.end(), [](device_slot_interface::slot_option const *opt1, device_slot_interface::slot_option const *opt2) {
-				return strcmp(opt1->name(), opt2->name()) < 0;
-			});
+			std::sort(
+					option_list.begin(),
+					option_list.end(),
+					[] (device_slot_interface::slot_option const *opt1, device_slot_interface::slot_option const *opt2)
+					{
+						return strcmp(opt1->name(), opt2->name()) < 0;
+					});
 
 
 			// output the line, up to the list of extensions
@@ -1689,8 +1715,8 @@ const cli_frontend::info_command_struct *cli_frontend::find_command(const std::s
 		{ CLICOMMAND_LISTCRC,           0, -1, &cli_frontend::listcrc,          "[system name]" },
 		{ CLICOMMAND_LISTDEVICES,       0,  1, &cli_frontend::listdevices,      "[system name]" },
 		{ CLICOMMAND_LISTSLOTS,         0,  1, &cli_frontend::listslots,        "[system name]" },
+		{ CLICOMMAND_LISTBIOS,          0,  1, &cli_frontend::listbios,         "[system name]" },
 		{ CLICOMMAND_LISTROMS,          0, -1, &cli_frontend::listroms,         "[pattern] ..." },
-		{ CLICOMMAND_LISTBIOS,          0, -1, &cli_frontend::listbios,         "[pattern] ..." },
 		{ CLICOMMAND_LISTSAMPLES,       0,  1, &cli_frontend::listsamples,      "[system name]" },
 		{ CLICOMMAND_VERIFYROMS,        0, -1, &cli_frontend::verifyroms,       "[pattern] ..." },
 		{ CLICOMMAND_VERIFYSAMPLES,     0,  1, &cli_frontend::verifysamples,    "[system name|*]" },

@@ -22,10 +22,8 @@
 
 DEFINE_DEVICE_TYPE(BML3BUS_KANJI, bml3bus_kanji_device, "bml3kanji", "Hitachi MP-9740 Kanji Character ROM Card")
 
-#define KANJI_ROM_REGION  "kanji_rom"
-
 ROM_START( kanji )
-	ROM_REGION( 0x20000, KANJI_ROM_REGION, ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, "kanji_rom", ROMREGION_ERASEFF )
 	ROM_LOAD("kanji.rom", 0x00000, 0x20000, BAD_DUMP CRC(de99a726) SHA1(65fead5d0d779b242f6e0ac25fcc9899dc343101))
 ROM_END
 
@@ -61,7 +59,8 @@ void bml3bus_kanji_device::bml3_kanji_w(offs_t offset, uint8_t data)
 
 bml3bus_kanji_device::bml3bus_kanji_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, BML3BUS_KANJI, tag, owner, clock),
-	device_bml3bus_card_interface(mconfig, *this), m_kanji_addr(0), m_rom(nullptr)
+	device_bml3bus_card_interface(mconfig, *this), m_kanji_addr(0),
+	m_rom(*this, "kanji_rom")
 {
 }
 
@@ -72,11 +71,13 @@ bml3bus_kanji_device::bml3bus_kanji_device(const machine_config &mconfig, const 
 
 void bml3bus_kanji_device::device_start()
 {
-	m_rom = memregion(KANJI_ROM_REGION)->base();
+	save_item(NAME(m_kanji_addr));
+}
 
+void bml3bus_kanji_device::map_io(address_space_installer &space)
+{
 	// install into memory
-	address_space &space_prg = space();
-	space_prg.install_readwrite_handler(0xff75, 0xff76, read8sm_delegate(*this, FUNC(bml3bus_kanji_device::bml3_kanji_r)), write8sm_delegate(*this, FUNC(bml3bus_kanji_device::bml3_kanji_w)));
+	space.install_readwrite_handler(0xff75, 0xff76, read8sm_delegate(*this, FUNC(bml3bus_kanji_device::bml3_kanji_r)), write8sm_delegate(*this, FUNC(bml3bus_kanji_device::bml3_kanji_w)));
 }
 
 void bml3bus_kanji_device::device_reset()

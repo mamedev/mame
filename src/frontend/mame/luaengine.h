@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include "notifier.h"
+
 #include <functional>
 #include <map>
 #include <memory>
@@ -131,7 +133,25 @@ public:
 		return cr(std::forward<Params>(args)...);
 	}
 
+	template <typename Func, typename... Params>
+	static auto invoke_direct(Func &&func, Params&&... args)
+	{
+		auto profile = g_profiler.start(PROFILER_LUA);
+		return func(std::forward<Params>(args)...);
+	}
+
 private:
+	struct notifiers
+	{
+		util::notifier<> on_reset;
+		util::notifier<> on_stop;
+		util::notifier<> on_pause;
+		util::notifier<> on_resume;
+		util::notifier<> on_frame;
+		util::notifier<> on_presave;
+		util::notifier<> on_postload;
+	};
+
 	template <typename T, size_t Size> class enum_parser;
 
 	class buffer_helper;
@@ -143,15 +163,6 @@ private:
 	class symbol_table_wrapper;
 	class expression_wrapper;
 
-	struct save_item {
-		void *base;
-		unsigned int size;
-		unsigned int count;
-		unsigned int valcount;
-		unsigned int blockcount;
-		unsigned int stride;
-	};
-
 	// internal state
 	lua_State *m_lua_state;
 	std::unique_ptr<sol::state_view> m_sol_state;
@@ -159,22 +170,33 @@ private:
 
 	std::vector<std::string> m_menu;
 
+	emu_timer *m_timer;
+
+	// machine event notifiers
+	std::optional<notifiers> m_notifiers;
+
+	// deferred coroutines
+	std::vector<std::pair<attotime, int> > m_waiting_tasks;
 	std::vector<int> m_update_tasks;
 	std::vector<int> m_frame_tasks;
 
+	template <typename... T>
+	auto make_notifier_adder(util::notifier<T...> &notifier, const char *desc);
 	template <typename R, typename T, typename D>
 	auto make_simple_callback_setter(void (T::*setter)(delegate<R ()> &&), D &&dflt, const char *name, const char *desc);
 
 	running_machine &machine() const { return *m_machine; }
 
 	void on_machine_prestart();
-	void on_machine_start();
+	void on_machine_reset();
 	void on_machine_stop();
 	void on_machine_pause();
 	void on_machine_resume();
 	void on_machine_frame();
+	void on_machine_presave();
+	void on_machine_postload();
 
-	void resume(int nparam);
+	void resume(s32 param);
 	void register_function(sol::function func, const char *id);
 	template <typename T> size_t enumerate_functions(const char *id, T &&callback);
 	bool execute_function(const char *id);

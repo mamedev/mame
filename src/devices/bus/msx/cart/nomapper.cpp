@@ -39,12 +39,12 @@ void msx_cart_nomapper_device::install_memory()
 	}
 }
 
-image_init_result msx_cart_nomapper_device::initialize_cartridge(std::string &message)
+std::error_condition msx_cart_nomapper_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
 	{
 		message = "msx_cart_nomapper_device: Required region 'rom' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	const u32 size = cart_rom_region()->bytes();
@@ -61,13 +61,13 @@ image_init_result msx_cart_nomapper_device::initialize_cartridge(std::string &me
 		if (!start_page_str)
 		{
 			message = "msx_cart_nomapper_device: Feature 'start_page' was not found.";
-			return image_init_result::FAIL;
+			return image_error::BADSOFTWARE;
 		}
 		u32 start_page = strtol(start_page_str, nullptr, 0);
 		if (start_page > 2)
 		{
 			message = "msx_cart_nomapper_device: Invalid value for 'start_page', allowed values are 0, 1, and 2";
-			return image_init_result::FAIL;
+			return image_error::BADSOFTWARE;
 		}
 
 		m_start_address = start_page * 0x4000;
@@ -131,5 +131,5 @@ image_init_result msx_cart_nomapper_device::initialize_cartridge(std::string &me
 
 	install_memory();
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }

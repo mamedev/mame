@@ -22,12 +22,12 @@ void msx_cart_korean_80in1_device::device_reset()
 		m_rombank[i]->set_entry(i);
 }
 
-image_init_result msx_cart_korean_80in1_device::initialize_cartridge(std::string &message)
+std::error_condition msx_cart_korean_80in1_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
 	{
 		message = "msx_cart_korean_80in1_device: Required region 'rom' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	const u32 size = cart_rom_region()->bytes();
@@ -36,7 +36,7 @@ image_init_result msx_cart_korean_80in1_device::initialize_cartridge(std::string
 	if (size > 256 * 0x2000 || size < 0x8000 || size != banks * 0x2000 || (~(banks - 1) % banks))
 	{
 		message = "msx_cart_korean_80in1_device: Region 'rom' has unsupported size.";
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 	}
 
 	m_bank_mask = banks - 1;
@@ -45,12 +45,12 @@ image_init_result msx_cart_korean_80in1_device::initialize_cartridge(std::string
 		m_rombank[i]->configure_entries(0, banks, cart_rom_region()->base(), 0x2000);
 
 	page(1)->install_read_bank(0x4000, 0x5fff, m_rombank[0]);
-	page(1)->install_write_handler(0x4000, 0x4003, write8sm_delegate(*this, FUNC(msx_cart_korean_80in1_device::bank_w)));
+	page(1)->install_write_handler(0x4000, 0x4003, emu::rw_delegate(*this, FUNC(msx_cart_korean_80in1_device::bank_w)));
 	page(1)->install_read_bank(0x6000, 0x7fff, m_rombank[1]);
 	page(2)->install_read_bank(0x8000, 0x9fff, m_rombank[2]);
 	page(2)->install_read_bank(0xa000, 0xbfff, m_rombank[3]);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void msx_cart_korean_80in1_device::bank_w(offs_t offset, u8 data)
@@ -74,7 +74,7 @@ msx_cart_korean_90in1_device::msx_cart_korean_90in1_device(const machine_config 
 void msx_cart_korean_90in1_device::device_start()
 {
 	// Install IO read/write handlers
-	io_space().install_write_handler(0x77, 0x77, write8smo_delegate(*this, FUNC(msx_cart_korean_90in1_device::banking)));
+	io_space().install_write_handler(0x77, 0x77, emu::rw_delegate(*this, FUNC(msx_cart_korean_90in1_device::banking)));
 }
 
 void msx_cart_korean_90in1_device::device_reset()
@@ -85,12 +85,12 @@ void msx_cart_korean_90in1_device::device_reset()
 	m_rombank[2]->set_entry(0);
 }
 
-image_init_result msx_cart_korean_90in1_device::initialize_cartridge(std::string &message)
+std::error_condition msx_cart_korean_90in1_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
 	{
 		message = "msx_cart_korean_90in1_device: Required region 'rom' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	const u32 size = cart_rom_region()->bytes();
@@ -99,7 +99,7 @@ image_init_result msx_cart_korean_90in1_device::initialize_cartridge(std::string
 	if (size > 64 * 0x4000 || size < 0x8000 || size != banks * 0x4000 || (~(banks - 1) % banks))
 	{
 		message = "msx_cart_korean_90in1_device: Region 'rom' has unsupported size.";
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 	}
 
 	m_bank_mask = banks - 1;
@@ -116,7 +116,7 @@ image_init_result msx_cart_korean_90in1_device::initialize_cartridge(std::string
 	m_view[1].install_read_bank(0x8000, 0x9fff, m_rombank[2]);
 	m_view[1].install_read_bank(0xa000, 0xbfff, m_rombank[1]);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void msx_cart_korean_90in1_device::banking(u8 data)
@@ -149,12 +149,12 @@ void msx_cart_korean_126in1_device::device_reset()
 	m_rombank[1]->set_entry(1);
 }
 
-image_init_result msx_cart_korean_126in1_device::initialize_cartridge(std::string &message)
+std::error_condition msx_cart_korean_126in1_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
 	{
 		message = "msx_cart_korean_126in1_device: Required region 'rom' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	const u32 size = cart_rom_region()->bytes();
@@ -163,7 +163,7 @@ image_init_result msx_cart_korean_126in1_device::initialize_cartridge(std::strin
 	if (size > 256 * 0x4000 || size < 0x8000 || size != banks * 0x4000 || (~(banks - 1) % banks))
 	{
 		message = "msx_cart_korean_126in1_device: Region 'rom' has unsupported size.";
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 	}
 
 	m_bank_mask = banks - 1;
@@ -172,10 +172,10 @@ image_init_result msx_cart_korean_126in1_device::initialize_cartridge(std::strin
 	m_rombank[1]->configure_entries(0, banks, cart_rom_region()->base(), 0x4000);
 
 	page(1)->install_read_bank(0x4000, 0x7fff, m_rombank[0]);
-	page(1)->install_write_handler(0x4000, 0x4001, write8sm_delegate(*this, FUNC(msx_cart_korean_126in1_device::bank_w)));
+	page(1)->install_write_handler(0x4000, 0x4001, emu::rw_delegate(*this, FUNC(msx_cart_korean_126in1_device::bank_w)));
 	page(2)->install_read_bank(0x8000, 0xbfff, m_rombank[1]);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void msx_cart_korean_126in1_device::bank_w(offs_t offset, uint8_t data)

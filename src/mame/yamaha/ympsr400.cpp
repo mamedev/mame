@@ -28,14 +28,30 @@ public:
 
 protected:
 	virtual void driver_start() override;
+	virtual void machine_start() override;
 
 private:
+	TIMER_CALLBACK_MEMBER(interrupt_hack);
+
 	void program_map(address_map &map);
 	void data_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mpscpu;
+
+	emu_timer *m_hack_timer;
 };
+
+void psr400_state::machine_start()
+{
+	m_hack_timer = timer_alloc(FUNC(psr400_state::interrupt_hack), this);
+	m_hack_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
+}
+
+TIMER_CALLBACK_MEMBER(psr400_state::interrupt_hack)
+{
+	m_maincpu->set_state_int(mn1880_device::MN1880_IF, m_maincpu->state_int(mn1880_device::MN1880_IF) | (1 << 3));
+}
 
 void psr400_state::program_map(address_map &map)
 {
@@ -46,7 +62,27 @@ void psr400_state::program_map(address_map &map)
 void psr400_state::data_map(address_map &map)
 {
 	// 2 MB external data memory space using MMU
+	map(0x000000, 0x000000).nopw(); // ?
+	map(0x000001, 0x000001).nopr(); // ?
+	map(0x000011, 0x000011).noprw(); // ?
+	map(0x000014, 0x000014).noprw(); // ?
+	map(0x000018, 0x000018).lr8(NAME([]() { return 0; })); // serial status?
+	map(0x00001a, 0x00001a).nopw(); // serial transmit buffer?
+	map(0x000030, 0x000031).ram(); // ?
+	map(0x000034, 0x000036).noprw(); // ?
+	map(0x00003a, 0x00003b).noprw(); // ?
+	map(0x00003e, 0x00003f).noprw(); // ?
+	map(0x000050, 0x000053).ram(); // ?
+	map(0x000055, 0x000055).noprw(); // ?
+	map(0x00005d, 0x00005e).noprw(); // ?
 	map(0x000080, 0x03ffff).mirror(0xc0000).ram(); // 2x 1M-bit PSRAM (only one on PSR-400)
+	map(0x003fe0, 0x003fff).unmaprw(); // window for more internal SFRs?
+	map(0x003fe3, 0x003fe3).noprw(); // ?
+	map(0x003fe6, 0x003fe6).nopw(); // ?
+	map(0x003fe7, 0x003fe7).noprw(); // ?
+	map(0x003fe9, 0x003fe9).nopr(); // ?
+	map(0x003fee, 0x003fee).lr8(NAME([]() { return 0x05; })).nopw(); // ?
+	map(0x003ff3, 0x003ff3).noprw(); // ?
 	map(0x100000, 0x10000f).mirror(0xffff0).rw("gew8", FUNC(multipcm_device::read), FUNC(multipcm_device::write));
 }
 
@@ -55,7 +91,7 @@ INPUT_PORTS_END
 
 void psr400_state::psr500(machine_config &config)
 {
-	MN18801A(config, m_maincpu, 10_MHz_XTAL); // MN18801A (also has 500 kHz secondary resonator)
+	MN18801A(config, m_maincpu, 10_MHz_XTAL); // MN18801A (also has 500 kHz secondary resonator connected to XI)
 	m_maincpu->set_addrmap(AS_PROGRAM, &psr400_state::program_map);
 	m_maincpu->set_addrmap(AS_DATA, &psr400_state::data_map);
 

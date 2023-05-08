@@ -26,18 +26,18 @@ public:
 	electron_romp144_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	// electron_cart_interface overrides
+	// electron_cart_interface implementation
 	virtual uint8_t read(offs_t offset, int infc, int infd, int romqa, int oe, int oe2) override;
 	virtual void write(offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2) override;
 
 private:
-	image_init_result load_rom(device_image_interface &image, generic_slot_device *slot);
+	std::pair<std::error_condition, std::string> load_rom(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom0) { return load_rom(image, m_romslot[0]); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom1) { return load_rom(image, m_romslot[1]); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom2) { return load_rom(image, m_romslot[2]); }

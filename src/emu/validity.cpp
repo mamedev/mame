@@ -51,12 +51,10 @@ using test_delegate = delegate<char (void const *&)>;
 //  type
 //-------------------------------------------------
 
-#if !defined(_LIBCPP_VERSION) || (_LIBCPP_VERSION >= 7000)
 test_delegate make_diamond_class_delegate(char (diamond_inheritance::*func)(void const *&), diamond_inheritance *obj)
 {
 	return test_delegate(func, obj);
 }
-#endif // !defined(_LIBCPP_VERSION) || (_LIBCPP_VERSION >= 7000)
 
 
 //-------------------------------------------------
@@ -1488,7 +1486,6 @@ void validate_delegates_mfp()
 	if (&o != addr)
 		osd_printf_error("Error testing delegate this pointer adjustment for virtual member function through base class pointer %p -> %p (expected %p)\n", static_cast<void const *>(static_cast<base_b *>(&o)), addr, static_cast<void const *>(&o));
 
-#if !defined(_LIBCPP_VERSION) || (_LIBCPP_VERSION >= 7000)
 	// test creating delegates for a forward-declared class
 	cb1 = make_diamond_class_delegate(&diamond_inheritance::get_derived_a, &d);
 	cb2 = make_diamond_class_delegate(&diamond_inheritance::get_derived_b, &d);
@@ -1518,7 +1515,6 @@ void validate_delegates_mfp()
 	if (static_cast<virtual_base *>(&d) != addr)
 		osd_printf_error("Error testing delegate this pointer adjustment for incomplete class %p -> %p (expected %p)\n", static_cast<void const *>(&d), addr, static_cast<void const *>(static_cast<virtual_base *>(&d)));
 #endif // defined(_MSC_VER) && !defined(__clang__)
-#endif // !defined(_LIBCPP_VERSION) || (_LIBCPP_VERSION >= 7000)
 }
 
 

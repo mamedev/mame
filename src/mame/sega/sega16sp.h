@@ -67,8 +67,8 @@ protected:
 	virtual void device_start() override;
 
 	// internal state
-	bool                        m_flip;                 // screen flip?
-	uint8_t                       m_bank[16];             // banking redirection
+	bool m_flip;                 // screen flip?
+	uint8_t m_bank[16];          // banking redirection
 	int m_xoffs = 0;
 	int m_yoffs = 0;
 	int m_xoffs_flipped = 0;

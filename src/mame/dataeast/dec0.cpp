@@ -5,35 +5,12 @@
 
   Data East 16 bit games - Bryan McPhail, mish@tendril.co.uk
 
-  This file contains drivers for:
-
-    * Heavy Barrel                            (USA set)
-    * Heavy Barrel                            (World set)
-    * Bad Dudes vs. Dragonninja               (USA set)
-    * Dragonninja                             (Japanese version of above)
-    * Birdie Try                              (Japanese set)
-    * Robocop                                 (World bootleg rom set)
-    * Robocop                                 (World rev 3)
-    * Robocop                                 (USA rev 1)
-    * Robocop                                 (USA rev 0)
-    * Hippodrome                              (USA set)
-    * Fighting Fantasy                        (Japanese version of above)
-    * Secret Agent                            (World rev 3)
-    * Secret Agent                            (Japan rev 2)
-    * Sly Spy                                 (USA rev 3)
-    * Sly Spy                                 (USA rev 2)
-    * Midnight Resistance                     (World set)
-    * Midnight Resistance                     (USA set)
-    * Midnight Resistance                     (Japanese set)
-    * Boulder Dash                            (World set)
-    * Bandit                                  (USA set)
-
     Heavy Barrel, Bad Dudes, Robocop, Birdie Try & Hippodrome use the 'MEC-M1'
 motherboard and varying game boards.  Sly Spy, Midnight Resistance and
 Boulder Dash use the same graphics chips but are different pcbs.
 
     Bandit (USA) is almost certainly a field test prototype, the software runs
-    on a Heavy Barrel board including the original Heavy Barrel MCU (which is effectively
+    on a Heavy Barrel board with the original Heavy Barrel MCU (which is effectively
     not used).  There is also Japanese version known to run on a DE-0321-1 top board.
 
     There are Secret Agent (bootleg) and Robocop (bootleg) sets to add.
@@ -1856,7 +1833,7 @@ void dec0_state::dec0(machine_config &config)
 	ym1.add_route(1, "mono", 0.81);
 	ym1.add_route(2, "mono", 0.81);
 	ym1.add_route(3, "mono", 0.32);
-	ym1.irq_handler().set_inputline(m_audiocpu, 0); // Schematics show both ym2203 and ym3812 can trigger IRQ, but Bandit is only game to program 2203 to do so
+	ym1.irq_handler().set_inputline(m_audiocpu, 0); // Schematics show both ym2203 and ym3812 can trigger IRQ, but Bandit is the only game to program 2203 to do so
 
 	ym3812_device &ym2(YM3812(config, "ym2", XTAL(12'000'000) / 4));
 	ym2.irq_handler().set_inputline(m_audiocpu, 0);

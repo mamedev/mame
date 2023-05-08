@@ -17,7 +17,7 @@ license:CC0-1.0
 
 <softwarelist name="svision" description="Watara Supervision cartridges">
 	<software name="2in1">
-		<description>2 in 1 - Block Buster + Cross High (Euro, USA)</description>
+		<description>2 in 1 - Block Buster + Cross High (Europe, USA)</description>
 		<year>199?</year>
 		<publisher>Supervision</publisher>
 		<info name="serial" value="SV10033" />
@@ -30,7 +30,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="2in1a">
-		<description>2 in 1 - Hash Blocks + Eagle Plan (Euro, USA)</description>
+		<description>2 in 1 - Hash Blocks + Eagle Plan (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>GTC Inc</publisher>
 		<info name="serial" value="SV10024" />
@@ -43,7 +43,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="alien">
-		<description>Alien (Euro, USA)</description>
+		<description>Alien (Europe, USA)</description>
 		<year>199?</year>
 		<publisher>Supervision</publisher>
 		<info name="serial" value="SV10010" />
@@ -56,7 +56,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="balonfgt">
-		<description>Balloon Fight (Euro, USA)</description>
+		<description>Balloon Fight (Europe, USA)</description>
 		<year>199?</year>
 		<publisher>Watara</publisher>
 		<part name="cart" interface="svision_cart">
@@ -67,7 +67,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="blockbus">
-		<description>Block Buster (Euro, USA)</description>
+		<description>Block Buster (Europe, USA)</description>
 		<year>199?</year>
 		<publisher>Supervision</publisher>
 		<info name="serial" value="SV10001" />
@@ -80,7 +80,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="brainpow">
-		<description>Brain Power (Euro, USA)</description>
+		<description>Brain Power (Europe, USA)</description>
 		<year>199?</year>
 		<publisher>Supervision</publisher>
 		<info name="serial" value="SV10023" />
@@ -104,7 +104,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="carrier">
-		<description>Carrier (Euro, USA)</description>
+		<description>Carrier (Europe, USA)</description>
 		<year>199?</year>
 		<publisher>Travellmate</publisher>
 		<info name="serial" value="SV10004" />
@@ -117,7 +117,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cavewond">
-		<description>Cave Wonders (Euro, USA)</description>
+		<description>Cave Wonders (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Bon Treasure</publisher>
 		<part name="cart" interface="svision_cart">
@@ -128,7 +128,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="challtnk">
-		<description>Challenger Tank (Euro, USA)</description>
+		<description>Challenger Tank (Europe, USA)</description>
 		<year>199?</year>
 		<publisher>Watara</publisher>
 		<info name="serial" value="SV10017" />
@@ -141,7 +141,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="chimera">
-		<description>Chimera (Euro, USA)</description>
+		<description>Chimera (Europe, USA)</description>
 		<year>199?</year>
 		<publisher>Supervision</publisher>
 		<info name="serial" value="SV10016" />
@@ -189,7 +189,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="crsshigh">
-		<description>Cross High (Euro, USA)</description>
+		<description>Cross High (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>GTC Inc</publisher>
 		<part name="cart" interface="svision_cart">
@@ -200,7 +200,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="crystbal">
-		<description>Crystball (Euro, USA)</description>
+		<description>Crystball (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Travellmate</publisher>
 		<part name="cart" interface="svision_cart">
@@ -211,7 +211,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="crystbala" cloneof="crystbal">
-		<description>Crystball (Euro, USA, earlier)</description>
+		<description>Crystball (Europe, USA, earlier)</description>
 		<year>1991</year>
 		<publisher>Travellmate</publisher>
 		<part name="cart" interface="svision_cart">
@@ -235,7 +235,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="dhero">
-		<description>Delta Hero (Euro, USA)</description>
+		<description>Delta Hero (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Bon Treasure</publisher>
 		<info name="serial" value="SV10040" />
@@ -259,7 +259,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="eaglplan">
-		<description>Eagle Plan (Euro, USA)</description>
+		<description>Eagle Plan (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>GTC Inc</publisher>
 		<info name="serial" value="SV10005" />
@@ -272,7 +272,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="earthdef">
-		<description>Earth Defender (Euro, USA)</description>
+		<description>Earth Defender (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Bon Treasure</publisher>
 		<part name="cart" interface="svision_cart">
@@ -283,7 +283,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="fatcraft">
-		<description>Fatal Craft (Euro, USA)</description>
+		<description>Fatal Craft (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Bon Treasure</publisher>
 		<part name="cart" interface="svision_cart">
@@ -294,7 +294,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="fcombat"> <!-- this might be bad dump, there are two bad tiles in the data -->
-		<description>Final Combat (Euro, USA)</description>
+		<description>Final Combat (Europe, USA)</description>
 		<year>199?</year>
 		<publisher>Watara</publisher>
 		<part name="cart" interface="svision_cart">
@@ -305,7 +305,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="fcombata" cloneof="fcombat">
-		<description>Final Combat (Alt)</description>
+		<description>Final Combat (alt)</description>
 		<year>1992</year>
 		<publisher>Thin Chen Enterprise</publisher>
 		<info name="serial" value="SV10031" />
@@ -318,7 +318,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="galcrus">
-		<description>Galactic Crusader (Euro, USA)</description>
+		<description>Galactic Crusader (Europe, USA)</description>
 		<year>199?</year>
 		<publisher>Watara</publisher>
 		<info name="serial" value="SV10029" />
@@ -331,7 +331,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="galaxy">
-		<description>Galaxy Fighter (Euro, USA)</description>
+		<description>Galaxy Fighter (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Thin Chen Enterprise</publisher>
 		<part name="cart" interface="svision_cart">
@@ -342,7 +342,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="gp">
-		<description>Grand Prix (Euro, USA)</description>
+		<description>Grand Prix (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Bon Treasure</publisher>
 		<info name="serial" value="SV10021" />
@@ -355,7 +355,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="happyp">
-		<description>Happy Pairs (Euro, USA)</description>
+		<description>Happy Pairs (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="SV10035" />
@@ -381,7 +381,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="hashbloc">
-		<description>Hash Blocks (Euro, USA)</description>
+		<description>Hash Blocks (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>GTC Inc</publisher>
 		<info name="serial" value="SV10002" />
@@ -405,7 +405,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="herokid">
-		<description>Hero Kid (Euro, USA)</description>
+		<description>Hero Kid (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Hartung</publisher>
 		<info name="serial" value="SV10011" />
@@ -418,7 +418,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="honeybee">
-		<description>Honey Bee (Euro, USA)</description>
+		<description>Honey Bee (Europe, USA)</description>
 		<year>199?</year>
 		<publisher>Watara</publisher>
 		<info name="serial" value="SV10018" />
@@ -431,7 +431,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="jackyluc">
-		<description>Jacky Lucky (Euro, USA)</description>
+		<description>Jacky Lucky (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Bon Treasure</publisher>
 		<part name="cart" interface="svision_cart">
@@ -442,7 +442,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="jagbombr">
-		<description>Jaguar Bomber (Euro, USA)</description>
+		<description>Jaguar Bomber (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Bon Treasure</publisher>
 		<info name="serial" value="SV10025" />
@@ -455,7 +455,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="johnadv">
-		<description>John Adventure (Euro, USA)</description>
+		<description>John Adventure (Europe, USA)</description>
 		<year>199?</year>
 		<publisher>Watara</publisher>
 		<info name="serial" value="SV10036" />
@@ -468,7 +468,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="juggler">
-		<description>Juggler (Euro, USA)</description>
+		<description>Juggler (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Bon Treasure</publisher>
 		<info name="serial" value="SV10043" />
@@ -481,7 +481,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="kabiisl">
-		<description>Kabi Island - Gold in Island (Euro, USA)</description>
+		<description>Kabi Island - Gold in Island (Europe, USA)</description>
 		<year>199?</year>
 		<publisher>Watara</publisher>
 		<part name="cart" interface="svision_cart">
@@ -514,7 +514,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="linear">
-		<description>Linear Racing (Euro, USA)</description>
+		<description>Linear Racing (Europe, USA)</description>
 		<year>199?</year>
 		<publisher>Watara</publisher>
 		<info name="serial" value="SV10007" />
@@ -527,7 +527,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="maginx">
-		<description>Magincross (Euro, USA)</description>
+		<description>Magincross (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Thin Chen Enterprise</publisher>
 		<info name="serial" value="SV10039" />
@@ -554,7 +554,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mattablt">
-		<description>Matta Blatta (Euro, USA)</description>
+		<description>Matta Blatta (Europe, USA)</description>
 		<year>199?</year>
 		<publisher>Watara</publisher>
 		<info name="serial" value="SV10020" />
@@ -567,7 +567,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="olympict">
-		<description>Olympic Trials (Euro, USA)</description>
+		<description>Olympic Trials (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Watara</publisher>
 		<info name="serial" value="SV10019" />
@@ -580,7 +580,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="p52sea">
-		<description>P-52 Sea Battle (Euro, USA)</description>
+		<description>P-52 Sea Battle (Europe, USA)</description>
 		<year>199?</year>
 		<publisher>Watara</publisher>
 		<info name="serial" value="SV10006" />
@@ -593,7 +593,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="pacboy">
-		<description>PacBoy &amp; Mouse (Euro, USA)</description>
+		<description>PacBoy &amp; Mouse (Europe, USA)</description>
 		<year>199?</year>
 		<publisher>Watara</publisher>
 		<info name="serial" value="SV10008" />
@@ -617,7 +617,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="penguinh">
-		<description>Penguin Hideout (Euro, USA)</description>
+		<description>Penguin Hideout (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Thin Chen Enterprise</publisher>
 		<info name="serial" value="SV10032" />
@@ -630,7 +630,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="policebu">
-		<description>Police Bust (Euro, USA)</description>
+		<description>Police Bust (Europe, USA)</description>
 		<year>199?</year>
 		<publisher>Bon Treasure</publisher>
 		<info name="serial" value="SV10014" />
@@ -656,7 +656,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="pyramid">
-		<description>Pyramid (Euro, USA)</description>
+		<description>Pyramid (Europe, USA)</description>
 		<year>199?</year>
 		<publisher>Watara</publisher>
 		<part name="cart" interface="svision_cart">
@@ -691,7 +691,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="soccerch">
-		<description>Soccer Champion (Euro, USA)</description>
+		<description>Soccer Champion (Europe, USA)</description>
 		<year>199?</year>
 		<publisher>Hartung</publisher>
 		<info name="serial" value="SV10034" />
@@ -728,7 +728,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="sssnake">
-		<description>SSSnake (Euro, USA)</description>
+		<description>SSSnake (Europe, USA)</description>
 		<year>199?</year>
 		<publisher>Watara</publisher>
 		<info name="serial" value="SV10009" />
@@ -741,7 +741,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="sblock">
-		<description>Super Block (Euro, USA)</description>
+		<description>Super Block (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Bon Treasure</publisher>
 		<info name="serial" value="SV10022" />
@@ -754,7 +754,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="skong">
-		<description>Super Kong (Euro, USA)</description>
+		<description>Super Kong (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Thin Chen Enterprise</publisher>
 		<info name="serial" value="SV10042" />
@@ -780,7 +780,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tasac">
-		<description>Tasac 2010 (Euro, USA)</description>
+		<description>Tasac 2010 (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Thin Chen Enterprise</publisher>
 		<info name="serial" value="SV10026" />
@@ -793,7 +793,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tennis92">
-		<description>Tennis Pro '92 (Euro, USA)</description>
+		<description>Tennis Pro '92 (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>B.I.T.S.</publisher>
 		<info name="serial" value="SV10015" />
@@ -817,7 +817,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="thunter">
-		<description>Treasure Hunter (Euro, USA, 1993)</description>
+		<description>Treasure Hunter (Europe, USA, 1993)</description>
 		<year>1993</year>
 		<publisher>Watara</publisher>
 		<part name="cart" interface="svision_cart">
@@ -828,7 +828,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="thuntera" cloneof="thunter">
-		<description>Treasure Hunter (Euro, USA, 1992)</description>
+		<description>Treasure Hunter (Europe, USA, 1992)</description>
 		<year>1992</year>
 		<publisher>Watara</publisher>
 		<part name="cart" interface="svision_cart">

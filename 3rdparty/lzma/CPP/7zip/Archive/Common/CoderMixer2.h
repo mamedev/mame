@@ -107,7 +107,7 @@ struct CBindInfo
   {
     FOR_VECTOR (i, Bonds)
       if (Bonds[i].PackIndex == packStream)
-        return i;
+        return (int)i;
     return -1;
   }
 
@@ -115,7 +115,7 @@ struct CBindInfo
   {
     FOR_VECTOR (i, Bonds)
       if (Bonds[i].UnpackIndex == unpackStream)
-        return i;
+        return (int)i;
     return -1;
   }
 
@@ -144,7 +144,7 @@ struct CBindInfo
   {
     FOR_VECTOR(i, PackStreams)
       if (PackStreams[i] == streamIndex)
-        return i;
+        return (int)i;
     return -1;
   }
 
@@ -201,9 +201,13 @@ public:
   CRecordVector<UInt64> PackSizes;
   CRecordVector<const UInt64 *> PackSizePointers;
 
-  CCoder() {}
+  bool Finish;
 
-  void SetCoderInfo(const UInt64 *unpackSize, const UInt64 * const *packSizes);
+  CCoder(): Finish(false) {}
+
+  void SetCoderInfo(const UInt64 *unpackSize, const UInt64 * const *packSizes, bool finish);
+
+  HRESULT CheckDataAfterEnd(bool &dataAfterEnd_Error /* , bool &InternalPackSizeError */) const;
 
   IUnknown *GetUnknown() const
   {
@@ -239,11 +243,15 @@ protected:
 public:
   unsigned MainCoderIndex;
 
+  // bool InternalPackSizeError;
+
   CMixer(bool encodeMode):
       EncodeMode(encodeMode),
       MainCoderIndex(0)
+      // , InternalPackSizeError(false)
       {}
 
+  virtual ~CMixer() {};
   /*
   Sequence of calling:
 
@@ -272,12 +280,13 @@ public:
   virtual void AddCoder(const CCreatedCoder &cod) = 0;
   virtual CCoder &GetCoder(unsigned index) = 0;
   virtual void SelectMainCoder(bool useFirst) = 0;
-  virtual void ReInit() = 0;
-  virtual void SetCoderInfo(unsigned coderIndex, const UInt64 *unpackSize, const UInt64 * const *packSizes) = 0;
+  virtual HRESULT ReInit2() = 0;
+  virtual void SetCoderInfo(unsigned coderIndex, const UInt64 *unpackSize, const UInt64 * const *packSizes, bool finish) = 0;
   virtual HRESULT Code(
       ISequentialInStream * const *inStreams,
       ISequentialOutStream * const *outStreams,
-      ICompressProgressInfo *progress) = 0;
+      ICompressProgressInfo *progress,
+      bool &dataAfterEnd_Error) = 0;
   virtual UInt64 GetBondStreamSize(unsigned bondIndex) const = 0;
 
   bool Is_UnpackSize_Correct_for_Coder(UInt32 coderIndex);
@@ -314,6 +323,8 @@ class CMixerST:
   public CMixer,
   public CMyUnknownImp
 {
+  CLASS_NO_COPY(CMixerST)
+
   HRESULT GetInStream2(ISequentialInStream * const *inStreams, /* const UInt64 * const *inSizes, */
       UInt32 outStreamIndex, ISequentialInStream **inStreamRes);
   HRESULT GetInStream(ISequentialInStream * const *inStreams, /* const UInt64 * const *inSizes, */
@@ -337,13 +348,14 @@ public:
   virtual void AddCoder(const CCreatedCoder &cod);
   virtual CCoder &GetCoder(unsigned index);
   virtual void SelectMainCoder(bool useFirst);
-  virtual void ReInit();
-  virtual void SetCoderInfo(unsigned coderIndex, const UInt64 *unpackSize, const UInt64 * const *packSizes)
-    { _coders[coderIndex].SetCoderInfo(unpackSize, packSizes); }
+  virtual HRESULT ReInit2();
+  virtual void SetCoderInfo(unsigned coderIndex, const UInt64 *unpackSize, const UInt64 * const *packSizes, bool finish)
+    { _coders[coderIndex].SetCoderInfo(unpackSize, packSizes, finish); }
   virtual HRESULT Code(
       ISequentialInStream * const *inStreams,
       ISequentialOutStream * const *outStreams,
-      ICompressProgressInfo *progress);
+      ICompressProgressInfo *progress,
+      bool &dataAfterEnd_Error);
   virtual UInt64 GetBondStreamSize(unsigned bondIndex) const;
 
   HRESULT GetMainUnpackStream(
@@ -393,7 +405,7 @@ public:
   };
 
   CCoderMT(): EncodeMode(false) {}
-  ~CCoderMT() { CVirtThread::WaitThreadFinish(); }
+  virtual ~CCoderMT() { CVirtThread::WaitThreadFinish(); }
   
   void Code(ICompressProgressInfo *progress);
 };
@@ -404,11 +416,14 @@ class CMixerMT:
   public CMixer,
   public CMyUnknownImp
 {
+  CLASS_NO_COPY(CMixerMT)
+
   CObjectVector<CStreamBinder> _streamBinders;
 
   HRESULT Init(ISequentialInStream * const *inStreams, ISequentialOutStream * const *outStreams);
   HRESULT ReturnIfError(HRESULT code);
 
+  // virtual ~CMixerMT() {};
 public:
   CObjectVector<CCoderMT> _coders;
 
@@ -418,13 +433,14 @@ public:
   virtual void AddCoder(const CCreatedCoder &cod);
   virtual CCoder &GetCoder(unsigned index);
   virtual void SelectMainCoder(bool useFirst);
-  virtual void ReInit();
-  virtual void SetCoderInfo(unsigned coderIndex, const UInt64 *unpackSize, const UInt64 * const *packSizes)
-    { _coders[coderIndex].SetCoderInfo(unpackSize, packSizes); }
+  virtual HRESULT ReInit2();
+  virtual void SetCoderInfo(unsigned coderIndex, const UInt64 *unpackSize, const UInt64 * const *packSizes, bool finish)
+    { _coders[coderIndex].SetCoderInfo(unpackSize, packSizes, finish); }
   virtual HRESULT Code(
       ISequentialInStream * const *inStreams,
       ISequentialOutStream * const *outStreams,
-      ICompressProgressInfo *progress);
+      ICompressProgressInfo *progress,
+      bool &dataAfterEnd_Error);
   virtual UInt64 GetBondStreamSize(unsigned bondIndex) const;
 
   CMixerMT(bool encodeMode): CMixer(encodeMode) {}

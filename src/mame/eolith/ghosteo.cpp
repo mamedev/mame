@@ -61,9 +61,9 @@ ToDo: verify QS1000 hook-up
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "machine/gen_latch.h"
-#include "machine/s3c2410.h"
-//#include "machine/smartmed.h"
 #include "machine/i2cmem.h"
+//#include "machine/nandflash.h"
+#include "machine/s3c2410.h"
 #include "sound/qs1000.h"
 
 #include "emupal.h"
@@ -642,8 +642,7 @@ void ghosteo_state::ghosteo(machine_config &config)
 	m_s3c2410->nand_data_r_callback().set(FUNC(ghosteo_state::s3c2410_nand_data_r));
 	m_s3c2410->nand_data_w_callback().set(FUNC(ghosteo_state::s3c2410_nand_data_w));
 
-//  nand_device &nand(NAND(config, "nand", 0));
-//  nand.set_nand_type(nand_device::chip::K9F5608U0D);    // or another variant with ID 0xEC 0x75 ?
+//  samsung_k9f5608u0d_device &nand(SAMSUNG_K9F5608U0D(config, "nand", 0));  // or another variant with ID 0xEC 0x75 ?
 //  nand.rnb_wr_callback().set(m_s3c2410, FUNC(s3c2410_device::s3c24xx_pin_frnb_w));
 
 	I2C_24C16(config, "i2cmem", 0); // M24CL16-S

@@ -16104,11 +16104,14 @@ HOMEBREW
 		</part>
 	</software>
 
-	<software name="battlebo">
+	<!-- The readme mentions that the game should autoboot but this dump is missing an AUTOEXEC.BAT file. -->
+	<!-- GFX9000 is not supported yet. -->
+	<software name="battlebo" supported="no">
 		<description>Battle Bomber (UK?)</description>
 		<year>1996</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="BitBoyz" />
+		<info name="usage" value="Requires a system with at least 128KB memory mapper, MSX-DOS2, Moonsound, and a GFX9000 graphics card. Once in MSX-DOS2 type 'batlbomb' to start the software."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="battle bomber.dsk" size="737280" crc="a318cfcd" sha1="75e6a558ac1f0346f951d9c6667e0b9ecb8557e8"/>
@@ -17419,18 +17422,6 @@ HOMEBREW
 		</part>
 	</software>
 
-	<software name="mobiusd">
-		<description>Mobius Debugger 2 - Eternal Striker (Japan, demo)</description>
-		<year>1995</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="Sequence" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="eternaldemo.dsk" size="737280" crc="19a45f75" sha1="20cbe1beaa164f2fc80a49caeadf320848881a74"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="moonland">
 		<description>Moon Landing (Japan)</description>
 		<year>1998</year>
@@ -18354,18 +18345,6 @@ HOMEBREW
 		</part>
 	</software>
 
-	<software name="shlblade">
-		<description>Shoulder Blade (Japan, bad dump?)</description>
-		<year>1997</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="GW's Workshop" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="blade (1997)(gw's workshop)[b].dsk" size="737280" crc="3dab74d6" sha1="8c0b7b32ec22840ce1dabd38863e1876232d3b9d"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="enigma">
 		<description>Shrines of Enigma (Netherlands)</description>
 		<year>1994</year>
@@ -18740,17 +18719,6 @@ HOMEBREW
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="wingmain.dsk" size="737280" crc="0e689ae8" sha1="bc1ddd03931f9834f5ddc76917e6b45b9cbdc81f"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="witchiz">
-		<description>The Witch 'Iz' (Japan)</description>
-		<year>1994</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="the witch iz.dsk" size="737280" crc="9eef4495" sha1="d096b1ef10c9d7b3ddffda0ec14b841c2c14cada"/>
 			</dataarea>
 		</part>
 	</software>

@@ -19,6 +19,9 @@
     f1gp:
     - gfxctrl register not understood - handling of fg/sprite priority to fix
       "continue" screen is just a kludge.
+     f1gpb:
+    - supposedly supports only steering wheel, but the emulation doesn't seem
+      to work.
     f1gp2:
     - sprite lag noticeable in the animation at the end of a race (the wheels
       of the car are sprites while the car is the fg tilemap)
@@ -85,7 +88,7 @@ public:
 		m_spr_old(*this, "vsystem_spr_old%u", 1U)
 	{ }
 
-	void f1gpb(machine_config &config);
+	void f1gpbl(machine_config &config);
 	void f1gp(machine_config &config);
 
 protected:
@@ -115,7 +118,7 @@ protected:
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<k053936_device> m_k053936;
 	required_device<palette_device> m_palette;
-	optional_device<generic_latch_8_device> m_soundlatch; // not f1gpb
+	optional_device<generic_latch_8_device> m_soundlatch; // not f1gpbl
 	required_device<acia6850_device> m_acia;
 
 	void sh_bankswitch_w(uint8_t data);
@@ -141,16 +144,16 @@ private:
 	// devices
 	optional_device_array<vsystem_spr2_device, 2> m_spr_old; // f1gp
 
-	void f1gpb_misc_w(uint16_t data);
+	void f1gpbl_misc_w(uint16_t data);
 	void rozgfxram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_roz_tile_info);
 
 	uint32_t screen_update_f1gp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_f1gpb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void f1gpb_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
+	uint32_t screen_update_f1gpbl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void f1gpbl_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void f1gp_cpu1_map(address_map &map);
-	void f1gpb_cpu1_map(address_map &map);
-	void f1gpb_cpu2_map(address_map &map);
+	void f1gpbl_cpu1_map(address_map &map);
+	void f1gpbl_cpu2_map(address_map &map);
 };
 
 class f1gp2_state : public f1gp_state
@@ -366,7 +369,7 @@ uint32_t f1gp2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 ***************************************************************************/
 
 // BOOTLEG
-void f1gp_state::f1gpb_draw_sprites(screen_device &screen,bitmap_ind16 &bitmap,const rectangle &cliprect)
+void f1gp_state::f1gpbl_draw_sprites(screen_device &screen,bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	int start_offset = m_spriteram.bytes() / 2 - 4;
 
@@ -431,7 +434,7 @@ void f1gp_state::f1gpb_draw_sprites(screen_device &screen,bitmap_ind16 &bitmap,c
 }
 
 // BOOTLEG
-uint32_t f1gp_state::screen_update_f1gpb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t f1gp_state::screen_update_f1gpbl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int const incxy = (int16_t)m_rozregs[1];
 	int const incyx = -incxy;
@@ -451,7 +454,7 @@ uint32_t f1gp_state::screen_update_f1gpb(screen_device &screen, bitmap_ind16 &bi
 
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
 
-	f1gpb_draw_sprites(screen, bitmap, cliprect);
+	f1gpbl_draw_sprites(screen, bitmap, cliprect);
 
 	return 0;
 }
@@ -545,7 +548,7 @@ void f1gp_state::sound_io_map(address_map &map)
 	map(0x18, 0x1b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 }
 
-void f1gp_state::f1gpb_misc_w(uint16_t data)
+void f1gp_state::f1gpbl_misc_w(uint16_t data)
 {
 	/*
 	static int old=-1;
@@ -570,7 +573,7 @@ void f1gp_state::f1gpb_misc_w(uint16_t data)
 	*/
 }
 
-void f1gp_state::f1gpb_cpu1_map(address_map &map)
+void f1gp_state::f1gpbl_cpu1_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x2fffff).rom().region("user1", 0);
@@ -594,14 +597,14 @@ void f1gp_state::f1gpb_cpu1_map(address_map &map)
 	map(0xfff006, 0xfff007).nopw();
 	map(0xfff00a, 0xfff00b).ram().share(m_fgregs);
 	map(0xfff00f, 0xfff00f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xfff00c, 0xfff00d).w(FUNC(f1gp_state::f1gpb_misc_w));
+	map(0xfff00c, 0xfff00d).w(FUNC(f1gp_state::f1gpbl_misc_w));
 	map(0xfff010, 0xfff011).nopw();
 	map(0xfff020, 0xfff023).nopw(); // GGA access
 	map(0xfff050, 0xfff051).portr("DSW3");
 	map(0xfff800, 0xfff809).ram().share(m_rozregs);
 }
 
-void f1gp_state::f1gpb_cpu2_map(address_map &map)
+void f1gp_state::f1gpbl_cpu2_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0xff8000, 0xffbfff).ram();
@@ -852,15 +855,15 @@ void f1gp_state::f1gp(machine_config &config)
 	ymsnd.add_route(2, "rspeaker", 1.0);
 }
 
-void f1gp_state::f1gpb(machine_config &config)
+void f1gp_state::f1gpbl(machine_config &config)
 {
 	// basic machine hardware
 	M68000(config, m_maincpu, 10'000'000); // 10 MHz ???
-	m_maincpu->set_addrmap(AS_PROGRAM, &f1gp_state::f1gpb_cpu1_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &f1gp_state::f1gpbl_cpu1_map);
 	m_maincpu->set_vblank_int("screen", FUNC(f1gp_state::irq1_line_hold));
 
 	m68000_device &sub(M68000(config, "sub", 10'000'000));    // 10 MHz ???
-	sub.set_addrmap(AS_PROGRAM, &f1gp_state::f1gpb_cpu2_map);
+	sub.set_addrmap(AS_PROGRAM, &f1gp_state::f1gpbl_cpu2_map);
 	sub.set_vblank_int("screen", FUNC(f1gp_state::irq1_line_hold));
 
 	// NO sound CPU
@@ -879,7 +882,7 @@ void f1gp_state::f1gpb(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(f1gp_state::screen_update_f1gpb));
+	screen.set_screen_update(FUNC(f1gp_state::screen_update_f1gpbl));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_f1gp);
@@ -1006,11 +1009,54 @@ ROM_START( f1gpa )
 	ROM_LOAD( "rom17-a.08", 0x000000, 0x100000, CRC(ea70303d) SHA1(8de1a0e6d47cd80a622663c1745a1da54cd0ea05) )
 ROM_END
 
+ROM_START( f1gpb ) // 0F17-A-04 PCB
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_WORD_SWAP( "rom1.3", 0x00000, 0x40000, CRC(5d945bcd) SHA1(8dc1cce2d0eac21ec4dd716b35944ae67d35ced0) )
+
+	ROM_REGION16_BE( 0x200000, "user1", 0 )  // extra ROMs mapped at 100000
+	ROM_LOAD16_BYTE( "rom10-a.1", 0x000000, 0x40000, CRC(46a289fb) SHA1(6a8c19e08b6d836fe83378fd77fead82a0b2db7c) )
+	ROM_LOAD16_BYTE( "rom11-a.2", 0x000001, 0x40000, CRC(53df8ea1) SHA1(25d50bb787f3bd35c9a8ae2b0ab9a21e000debb0) )
+	ROM_LOAD16_BYTE( "rom12-a.3", 0x080000, 0x40000, CRC(d8c1bcf4) SHA1(d6d77354eb1ab413ba8cfa5d973cf5b0c851c23b) )
+	ROM_LOAD16_BYTE( "rom13-a.4", 0x080001, 0x40000, CRC(7d92e1fa) SHA1(c23f5beea85b0804c61ef9e7f131b186d076221f) )
+	ROM_LOAD16_BYTE( "rom7-a.5",  0x100000, 0x40000, CRC(7a014ba6) SHA1(8f0abbb68100e396e5a41337254cb6bf1a2ed00b) )
+	ROM_LOAD16_BYTE( "rom6-a.6",  0x100001, 0x40000, CRC(6d947a3f) SHA1(2cd01ee2a73ab105a45a5464a29fd75aa43ba2db) )
+	ROM_LOAD16_BYTE( "rom8-a.7",  0x180000, 0x40000, CRC(0ed783c7) SHA1(c0c467ede51c08d84999897c6d5cc8b584b23b67) )
+	ROM_LOAD16_BYTE( "rom9-a.8",  0x180001, 0x40000, CRC(49286572) SHA1(c5e16bd1ccd43452337a4cd76db70db079ca0706) )
+
+	ROM_REGION16_BE( 0x200000, "user2", 0 )  // extra ROMs mapped at a00000 containing gfx data for the 053936
+	ROM_LOAD16_WORD_SWAP( "rom2-a.06", 0x000000, 0x100000, CRC(747dd112) SHA1(b9264bec61467ab256cf6cb698b6e0ea8f8006e0) )
+	ROM_LOAD16_WORD_SWAP( "rom3-a.05", 0x100000, 0x100000, CRC(264aed13) SHA1(6f0de860d4299befffc530b7a8f19656982a51c4) )
+
+	ROM_REGION( 0x20000, "sub", 0 ) // 68000 code
+	ROM_LOAD16_WORD_SWAP( "rom4.4", 0x00000, 0x20000, CRC(8e811d36) SHA1(2b806b50a3a307a21894687f16485ace287a7c4c) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
+	ROM_LOAD( "rom5.8", 0x00000, 0x20000, CRC(9ea36e35) SHA1(9254dea8362318d8cfbd5e36e476e0e235e6326a) )
+
+	ROM_REGION( 0x200000, "fgtiles", 0 )
+	ROM_LOAD( "rom3-b.07", 0x000000, 0x100000, CRC(ffb1d489) SHA1(9330b67e0eaaf67d6c38f40a02c72419bd38fb81) )
+	ROM_LOAD( "rom2-b.04", 0x100000, 0x100000, CRC(d1b3471f) SHA1(d1a95fbaad1c3d9ec2121bf65abbcdb5441bd0ac) )
+
+	ROM_REGION( 0x100000, "sprites1", 0 )
+	ROM_LOAD32_WORD( "rom5-b.2", 0x00000, 0x80000, CRC(17572b36) SHA1(c58327c2f708783a3e8470e290cae0d71454f1da) )
+	ROM_LOAD32_WORD( "rom4-b.3", 0x00002, 0x80000, CRC(72d12129) SHA1(11da6990a54ae1b6f6d0bed5d0431552f83a0dda) )
+
+	ROM_REGION( 0x080000, "sprites2", 0 )
+	ROM_LOAD32_WORD( "rom7-b.17", 0x00000, 0x40000, CRC(2aed9003) SHA1(45ff9953ad98063573e7fd7b930ae8b0183cdd04) )
+	ROM_LOAD32_WORD( "rom6-b.16", 0x00002, 0x40000, CRC(6789ef12) SHA1(9b0d1cc6e9c6398ccb7f635c4c148fddd224a21f) )
+
+	ROM_REGION( 0x100000, "ymsnd:adpcmb", 0 )
+	ROM_LOAD( "rom14-a.09", 0x000000, 0x100000, CRC(b4c1ac31) SHA1(acab2e1b5ce4ca3a5c4734562481b54db4b46995) )
+
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )
+	ROM_LOAD( "rom17-a.08", 0x000000, 0x100000, CRC(ea70303d) SHA1(8de1a0e6d47cd80a622663c1745a1da54cd0ea05) )
+ROM_END
+
 /* This is a bootleg of f1gp, produced by Playmark in Italy
    the video hardware is different, it lacks the sound z80, and has less samples
  */
 
-ROM_START( f1gpb )
+ROM_START( f1gpbl )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	// these have extra data at 0x30000 which isn't preset in the f1gp set, is it related to the changed sound hardware?
 	ROM_LOAD16_BYTE( "1.ic38", 0x00001, 0x20000, CRC(046dd83a) SHA1(ea65fa88f9d9a79664de666e63594a7a7de86650) )
@@ -1101,8 +1147,9 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1991, f1gp,  0,    f1gp,  f1gp,  f1gp_state,  empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix (set 1)",            MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // censored banners, US McO'River release?
-GAME( 1991, f1gpa, f1gp, f1gp,  f1gp,  f1gp_state,  empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix (set 2)",            MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, f1gpb, f1gp, f1gpb, f1gp,  f1gp_state,  empty_init, ROT90, "bootleg (Playmark)", "F-1 Grand Prix (Playmark bootleg)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // PCB marked 'Super Formula II', manufactured by Playmark.
+GAME( 1991, f1gp,   0,    f1gp,   f1gp,  f1gp_state,  empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix (set 1)",            MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // censored banners, US McO'River release?
+GAME( 1991, f1gpa,  f1gp, f1gp,   f1gp,  f1gp_state,  empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix (set 2)",            MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, f1gpb,  f1gp, f1gp,   f1gp,  f1gp_state,  empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix (set 3)",            MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // supposed to be the earliest version dumped and only work with steering wheel
+GAME( 1991, f1gpbl, f1gp, f1gpbl, f1gp,  f1gp_state,  empty_init, ROT90, "bootleg (Playmark)", "F-1 Grand Prix (Playmark bootleg)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // PCB marked 'Super Formula II', manufactured by Playmark.
 
-GAME( 1992, f1gp2, 0,    f1gp2, f1gp2, f1gp2_state, empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix Part II",            MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, f1gp2,  0,    f1gp2,  f1gp2, f1gp2_state, empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix Part II",            MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )

@@ -283,25 +283,25 @@ void i7000_state::i7000_io(address_map &map)
 
 DEVICE_IMAGE_LOAD_MEMBER(i7000_state::card_load)
 {
-	uint32_t size = m_card->common_get_size("rom");
+	uint32_t const size = m_card->common_get_size("rom");
 
 	m_card->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_BIG);
 	m_card->common_load_rom(m_card->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 static const gfx_layout i7000_charlayout =
 {
-	8, 8,                   /* 8 x 8 characters */
-	256,                 /* 256 characters */
-	1,                  /* 1 bits per pixel */
-	{ 0 },                  /* no bitplanes */
-	/* x offsets */
+	8, 8,                   // 8 x 8 characters
+	256,                    // 256 characters
+	1,                      // 1 bits per pixel
+	{ 0 },                  // no bitplanes
+	// x offsets
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
+	// y offsets
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8                 /* every char takes 8 bytes */
+	8*8                     // every char takes 8 bytes
 };
 
 static GFXDECODE_START( gfx_i7000 )

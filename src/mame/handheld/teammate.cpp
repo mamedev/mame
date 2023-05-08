@@ -256,5 +256,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT CMP MACHINE   INPUT     STATE           INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1978, teammate, 0,      0, teammate, teammate, teammate_state, empty_init, "Logix", "Teammate Game Computer", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1978, teammate, 0,      0,      teammate, teammate, teammate_state, empty_init, "Logix", "Teammate Game Computer", MACHINE_SUPPORTS_SAVE )

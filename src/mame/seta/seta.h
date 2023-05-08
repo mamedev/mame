@@ -13,6 +13,7 @@
 
 #include "machine/74157.h"
 #include "machine/adc083x.h"
+#include "machine/ds2430a.h"
 #include "machine/gen_latch.h"
 #include "machine/ticket.h"
 #include "machine/timer.h"
@@ -79,7 +80,6 @@ public:
 	void blockcarb(machine_config &config);
 	void wrofaero(machine_config &config);
 	void blockcar(machine_config &config);
-	void crazyfgt(machine_config &config);
 	void drgnunit(machine_config &config);
 	void stg(machine_config &config);
 	void qzkklogy(machine_config &config);
@@ -95,7 +95,6 @@ public:
 	void rezon(machine_config &config);
 
 	void init_rezon();
-	void init_crazyfgt();
 	void init_wiggie();
 	void init_bankx1();
 	void init_eightfrc();
@@ -185,7 +184,6 @@ protected:
 	void blockcarb_map(address_map &map);
 	void blockcarb_sound_map(address_map &map);
 	void blockcarb_sound_portmap(address_map &map);
-	void crazyfgt_map(address_map &map);
 	void daioh_map(address_map &map);
 	void daiohp_map(address_map &map);
 	void drgnunit_map(address_map &map);
@@ -534,6 +532,26 @@ protected:
 
 	std::unique_ptr<u16 []> m_protram;
 	std::unique_ptr<u16 []> m_protram_old;
+};
+
+class crazyfgt_state : public seta_state
+{
+public:
+	crazyfgt_state(const machine_config &mconfig, device_type type, const char *tag)
+		: seta_state(mconfig, type, tag)
+		, m_eeprom(*this, "eeprom")
+	{
+	}
+
+	void crazyfgt(machine_config &config);
+
+private:
+	void coin_counter_w(u8 data);
+	void outputs_w(u8 data);
+
+	void crazyfgt_map(address_map &map);
+
+	required_device<ds2430a_device> m_eeprom;
 };
 
 class jockeyc_state : public seta_state

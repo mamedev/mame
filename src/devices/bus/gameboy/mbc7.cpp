@@ -73,7 +73,7 @@ namespace {
 class mbc7_device_base : public mbc_device_base
 {
 public:
-	virtual image_init_result load(std::string &message) override ATTR_COLD;
+	virtual std::error_condition load(std::string &message) override ATTR_COLD;
 
 protected:
 	mbc7_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
@@ -157,49 +157,49 @@ INPUT_PORTS_END
 //  mbc7_device_base
 //**************************************************************************
 
-image_init_result mbc7_device_base::load(std::string &message)
+std::error_condition mbc7_device_base::load(std::string &message)
 {
 	// first check ROM
 	set_bank_bits_rom(7);
 	if (!check_rom(message))
-		return image_init_result::FAIL;
+		return image_error::BADSOFTWARE;
 
 	// install ROM and handlers
 	install_rom();
 	cart_space()->install_write_handler(
 			0x0000, 0x1fff,
-			write8smo_delegate(*this, NAME((&mbc7_device_base::enable_io<0, 0x0a, 0x0f>))));
+			emu::rw_delegate(*this, NAME((&mbc7_device_base::enable_io<0, 0x0a, 0x0f>))));
 	cart_space()->install_write_handler(
 			0x2000, 0x3fff,
-			write8smo_delegate(*this, FUNC(mbc7_device_base::bank_rom_switch)));
+			emu::rw_delegate(*this, FUNC(mbc7_device_base::bank_rom_switch)));
 	cart_space()->install_write_handler(
 			0x4000, 0x5fff,
-			write8smo_delegate(*this, NAME((&mbc7_device_base::enable_io<1, 0x40, 0xff>))));
+			emu::rw_delegate(*this, NAME((&mbc7_device_base::enable_io<1, 0x40, 0xff>))));
 	cart_space()->install_view(
 			0xa000, 0xafff,
 			m_view_io);
 	m_view_io[0].install_write_handler(
 			0xa000, 0xa00f, 0x0000, 0x0f00, 0x0000,
-			write8smo_delegate(*this, FUNC(mbc7_device_base::clear_accel)));
+			emu::rw_delegate(*this, FUNC(mbc7_device_base::clear_accel)));
 	m_view_io[0].install_write_handler(
 			0xa010, 0xa01f, 0x0000, 0x0f00, 0x0000,
-			write8smo_delegate(*this, FUNC(mbc7_device_base::acquire_accel)));
+			emu::rw_delegate(*this, FUNC(mbc7_device_base::acquire_accel)));
 	m_view_io[0].install_read_handler(
 			0xa020, 0xa03f, 0x0000, 0x0f00, 0x0000,
-			read8sm_delegate(*this, FUNC(mbc7_device_base::read_accel<0>)));
+			emu::rw_delegate(*this, FUNC(mbc7_device_base::read_accel<0>)));
 	m_view_io[0].install_read_handler(
 			0xa040, 0xa05f, 0x0000, 0x0f00, 0x0000,
-			read8sm_delegate(*this, FUNC(mbc7_device_base::read_accel<1>)));
+			emu::rw_delegate(*this, FUNC(mbc7_device_base::read_accel<1>)));
 	m_view_io[0].install_read_handler(
 			0xa060, 0xa07f, 0x0000, 0x0f00, 0x0000,
-			read8sm_delegate(*this, FUNC(mbc7_device_base::read_unknown)));
+			emu::rw_delegate(*this, FUNC(mbc7_device_base::read_unknown)));
 	m_view_io[0].install_readwrite_handler(
 			0xa080, 0xa08f, 0x0000, 0x0f00, 0x0000,
-			read8smo_delegate(*this, FUNC(mbc7_device_base::read_eeprom)),
-			write8smo_delegate(*this, FUNC(mbc7_device_base::write_eeprom)));
+			emu::rw_delegate(*this, FUNC(mbc7_device_base::read_eeprom)),
+			emu::rw_delegate(*this, FUNC(mbc7_device_base::write_eeprom)));
 
 	// all good
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

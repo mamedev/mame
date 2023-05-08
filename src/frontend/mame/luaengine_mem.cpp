@@ -202,8 +202,7 @@ public:
 			offs_t end,
 			std::string &&name,
 			sol::protected_function &&callback)
-		: m_host(host)
-		, m_callback(std::move(callback))
+		: m_callback(host.m_lua_state, std::move(callback))
 		, m_space(space)
 		, m_handler()
 		, m_name(std::move(name))
@@ -270,7 +269,7 @@ private:
 						m_name,
 						[this] (offs_t offset, T &data, T mem_mask)
 						{
-							auto result = m_host.invoke(m_callback, offset, data, mem_mask).template get<std::optional<T> >();
+							auto result = invoke_direct(m_callback, offset, data, mem_mask).template get<std::optional<T> >();
 							if (result)
 								data = *result;
 						},
@@ -283,7 +282,7 @@ private:
 						m_name,
 						[this] (offs_t offset, T &data, T mem_mask)
 						{
-							auto result = m_host.invoke(m_callback, offset, data, mem_mask).template get<std::optional<T> >();
+							auto result = invoke_direct(m_callback, offset, data, mem_mask).template get<std::optional<T> >();
 							if (result)
 								data = *result;
 						},
@@ -302,7 +301,6 @@ private:
 		--m_installing;
 	};
 
-	lua_engine &m_host;
 	sol::protected_function m_callback;
 	address_space &m_space;
 	memory_passthrough_handler m_handler;
@@ -660,7 +658,12 @@ void lua_engine::initialize_memory(sol::table &emu)
 							case read_or_write::WRITE:     modestr = "w";  break;
 							case read_or_write::READWRITE: modestr = "rw"; break;
 							}
-							invoke(callback, modestr);
+							auto status = invoke(callback, modestr);
+							if (!status.valid())
+							{
+								sol::error err = status;
+								osd_printf_error("[LUA ERROR] in address space change notifier: %s\n", err.what());
+							}
 						});
 			});
 	addr_space_type.set_function("install_read_tap",

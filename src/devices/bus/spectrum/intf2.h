@@ -39,7 +39,7 @@ protected:
 	virtual uint8_t iorq_r(offs_t offset) override;
 
 private:
-	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
+	std::error_condition load_cart(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	required_device<generic_slot_device> m_cart;

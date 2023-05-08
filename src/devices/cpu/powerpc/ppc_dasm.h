@@ -102,7 +102,8 @@ private:
 		F_FRT_FRA_FRC,  // frT, frA, frC
 		F_RA_RT_SH_MB_ME,   // rA, rT, SH, MB, ME
 		F_RA_RT_RB_MB_ME,   // rA, rT, rB, MB, ME
-		F_RT_RB         // rT, rB
+		F_RT_RB,        // rT, rB
+		F_SC            // LEV, FL1, FL2 or SV  only used by SVC (POWER)
 	};
 
 	/*

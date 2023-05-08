@@ -579,7 +579,13 @@ void abc1600_mac_device::page_hi_w(offs_t offset, uint8_t data)
 
 offs_t abc1600_mac_device::get_dma_address(int index, offs_t offset, bool &rw)
 {
-	// A0 = DMA15, A1 = BA1, A2 = BA2
+	/*
+	            BA2 BA1 A15
+	    DMA0     1   1   x
+	    DMA1     1   0   x
+	    DMA2     0   0   x
+	*/
+
 	uint8_t dmamap_addr = index | BIT(offset, 15);
 	uint8_t dmamap = m_dmamap[dmamap_addr];
 

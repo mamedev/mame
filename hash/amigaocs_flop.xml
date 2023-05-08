@@ -50661,6 +50661,7 @@ ATK test: OK
 		<year>1991</year>
 		<publisher>Image Works</publisher>
 		<notes><![CDATA[
+Mouse input doesn't work when selecting any cabinet
 ATK test: C:0 H:U 1 Sector Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">

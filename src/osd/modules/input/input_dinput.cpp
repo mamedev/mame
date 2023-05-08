@@ -51,13 +51,13 @@ might expect from the HID mapping.
 
 Gamepads:
 
-Axis        Logitech        Xinput          Switch
-X           Left X          Left X          Left X
-Y           Left Y          Left Y          Left Y
-Z           Right X         Triggers
-Rx                          Right X         Right X
-Ry                          Right Y         Right Y
-Rz          Right Y
+Axis        Logitech        DS4             Xinput          Switch
+X           Left X          Left X          Left X          Left X
+Y           Left Y          Left Y          Left Y          Left Y
+Z           Right X         Right X         Triggers
+Rx                          Left trigger    Right X         Right X
+Ry                          Right trigger   Right Y         Right Y
+Rz          Right Y         Right Y
 
 Thrustmaster controllers:
 
@@ -1041,12 +1041,11 @@ void dinput_joystick_device::configure(input_device &device)
 				{ axisitems[0], axisitems[1] },
 				{ ITEM_ID_INVALID, ITEM_ID_INVALID } };
 		input_item_id pedalaxis = ITEM_ID_INVALID;
-		if ((ITEM_ID_INVALID != axisitems[3]) && (ITEM_ID_INVALID != axisitems[4]))
+		if ((ITEM_ID_INVALID != axisitems[2]) && (ITEM_ID_INVALID != axisitems[5]))
 		{
-			// assume Rx/Ry are right stick and Z is triggers if present
-			stickaxes[1][0] = axisitems[3];
-			stickaxes[1][1] = axisitems[4];
-			pedalaxis = axisitems[2];
+			// assume Z/Rz are right stick
+			stickaxes[1][0] = axisitems[2];
+			stickaxes[1][1] = axisitems[5];
 			add_twin_stick_assignments(
 					assignments,
 					stickaxes[0][0],
@@ -1062,11 +1061,12 @@ void dinput_joystick_device::configure(input_device &device)
 					ITEM_ID_INVALID,
 					ITEM_ID_INVALID);
 		}
-		else if ((ITEM_ID_INVALID != axisitems[2]) && (ITEM_ID_INVALID != axisitems[5]))
+		else if ((ITEM_ID_INVALID != axisitems[3]) && (ITEM_ID_INVALID != axisitems[4]))
 		{
-			// assume Z/Rz are right stick
-			stickaxes[1][0] = axisitems[2];
-			stickaxes[1][1] = axisitems[5];
+			// assume Rx/Ry are right stick and Z is triggers if present
+			stickaxes[1][0] = axisitems[3];
+			stickaxes[1][1] = axisitems[4];
+			pedalaxis = axisitems[2];
 			add_twin_stick_assignments(
 					assignments,
 					stickaxes[0][0],

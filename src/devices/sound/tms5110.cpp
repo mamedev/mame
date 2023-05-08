@@ -1108,6 +1108,10 @@ void tms5110_device::device_reset()
 	m_next_is_address = false;
 	m_address = 0;
 	m_addr_bit = 0;
+
+	m_romclk_hack_timer->adjust(attotime::never);
+	m_romclk_hack_timer_started = false;
+	m_romclk_hack_state = false;
 }
 
 

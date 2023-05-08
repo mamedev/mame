@@ -41,7 +41,7 @@ public:
 		m_videoram(*this,"videoram")
 	{ }
 
-	void concept(machine_config &config);
+	void corvus_concept(machine_config &config);
 
 private:
 	required_device<cpu_device> m_maincpu;

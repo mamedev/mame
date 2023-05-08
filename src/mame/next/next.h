@@ -16,7 +16,7 @@
 #include "machine/ncr53c90.h"
 #include "machine/mb8795.h"
 #include "nextmo.h"
-#include "imagedev/chd_cd.h"
+#include "imagedev/cdromimg.h"
 #include "imagedev/harddriv.h"
 
 class next_state : public driver_device

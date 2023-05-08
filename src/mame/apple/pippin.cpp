@@ -48,10 +48,11 @@
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/mn1880/mn1880.h"
-#include "imagedev/chd_cd.h"
+#include "imagedev/cdromimg.h"
 #include "machine/ram.h"
 #include "sound/cdda.h"
 
+#include "awacs_macrisc.h"
 #include "bandit.h"
 #include "cuda.h"
 #include "heathrow.h"
@@ -59,15 +60,15 @@
 #include "softlist.h"
 #include "speaker.h"
 
-class macpci_state : public driver_device
+class pippin_state : public driver_device
 {
 public:
 	void pippin(machine_config &config);
 
-	macpci_state(const machine_config &mconfig, device_type type, const char *tag);
+	pippin_state(const machine_config &mconfig, device_type type, const char *tag);
 
-	required_device<cpu_device> m_maincpu;
-	required_device<aspen_host_device> m_bandit;
+	required_device<ppc_device> m_maincpu;
+	required_device<aspen_host_device> m_aspen;
 	required_device<cuda_device> m_cuda;
 	required_device<macadb_device> m_macadb;
 	required_device<ram_device> m_ram;
@@ -85,29 +86,34 @@ private:
 		m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 		m_maincpu->set_input_line(INPUT_LINE_RESET, state);
 	}
+
+	WRITE_LINE_MEMBER(irq_w)
+	{
+		m_maincpu->set_input_line(PPC_IRQ, state);
+	}
 };
 
-macpci_state::macpci_state(const machine_config &mconfig, device_type type, const char *tag) :
+pippin_state::pippin_state(const machine_config &mconfig, device_type type, const char *tag) :
 	driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_bandit(*this, "pci:00.0"),
+	m_aspen(*this, "pci:00.0"),
 	m_cuda(*this, "cuda"),
 	m_macadb(*this, "macadb"),
 	m_ram(*this, RAM_TAG)
 {
 }
 
-void macpci_state::machine_start()
+void pippin_state::machine_start()
 {
 }
 
-void macpci_state::machine_reset()
+void pippin_state::machine_reset()
 {
 	// the PPC can't run until Cuda's ready
 	m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
-void macpci_state::pippin_map(address_map &map)
+void pippin_state::pippin_map(address_map &map)
 {
 	map(0x00000000, 0x005fffff).ram();
 
@@ -118,19 +124,20 @@ void macpci_state::pippin_map(address_map &map)
 	map(0x03c00000, 0x03c01007).ram();
 
 	map(0x40000000, 0x403fffff).rom().region("bootrom", 0).mirror(0x0fc00000);   // mirror of ROM for 680x0 emulation
+	map(0x40000000, 0x40000000).lr8(NAME([]() { return 0x80; }));   // hack to make flash ROM status check pass (causes 0xe1 to be written to VRAM, which is important later)
 	map(0x5ffffffc, 0x5fffffff).lr32(NAME([](offs_t offset) { return 0xa55a7001; }));
 
-	map(0xf00dfff8, 0xf00dffff).lr64(NAME([](offs_t offset) { return (uint64_t)0xe1 << 32; })); // PC=0xfff04810
+	map(0xf0000000, 0xf00fffff).ram();  // VRAM
 
 	map(0xffc00000, 0xffffffff).rom().region("bootrom", 0);
 }
 
-void macpci_state::cdmcu_mem(address_map &map)
+void pippin_state::cdmcu_mem(address_map &map)
 {
 	map(0x0000, 0xffff).rom().region("cdrom", 0);
 }
 
-void macpci_state::cdmcu_data(address_map &map)
+void pippin_state::cdmcu_data(address_map &map)
 {
 	map(0x0000, 0x0001).noprw();
 	map(0x0003, 0x0003).noprw();
@@ -155,14 +162,15 @@ void macpci_state::cdmcu_data(address_map &map)
 static INPUT_PORTS_START( pippin )
 INPUT_PORTS_END
 
-void macpci_state::pippin(machine_config &config)
+void pippin_state::pippin(machine_config &config)
 {
 	/* basic machine hardware */
 	PPC603(config, m_maincpu, 66000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &macpci_state::pippin_map);
+	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pippin_state::pippin_map);
 
 	PCI_ROOT(config, "pci", 0);
-	ASPEN(config, m_bandit, 66000000, "maincpu").set_dev_offset(1);
+	ASPEN(config, m_aspen, 66000000, "maincpu").set_dev_offset(1);
 
 	cdrom_image_device &cdrom(CDROM(config, "cdrom", 0));
 	cdrom.set_interface("pippin_cdrom");
@@ -173,11 +181,24 @@ void macpci_state::pippin(machine_config &config)
 
 	grandcentral_device &grandcentral(GRAND_CENTRAL(config, "pci:0d.0", 0));
 	grandcentral.set_maincpu_tag("maincpu");
+	grandcentral.set_pci_root_tag(":pci:00.0", AS_DATA);
+	grandcentral.irq_callback().set(FUNC(pippin_state::irq_w));
+
+	awacs_macrisc_device &awacs(AWACS_MACRISC(config, "codec", 45.1584_MHz_XTAL / 2));
+	awacs.dma_output().set(grandcentral, FUNC(heathrow_device::codec_dma_read));
+
+	grandcentral.codec_r_callback().set(awacs, FUNC(awacs_macrisc_device::read_macrisc));
+	grandcentral.codec_w_callback().set(awacs, FUNC(awacs_macrisc_device::write_macrisc));
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	awacs.add_route(0, "lspeaker", 1.0);
+	awacs.add_route(1, "rspeaker", 1.0);
 
 	MACADB(config, m_macadb, 15.6672_MHz_XTAL);
 
 	CUDA(config, m_cuda, CUDA_341S0060);
-	m_cuda->reset_callback().set(FUNC(macpci_state::cuda_reset_w));
+	m_cuda->reset_callback().set(FUNC(pippin_state::cuda_reset_w));
 	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_cuda->via_clock_callback().set(grandcentral, FUNC(heathrow_device::cb1_w));
 	m_cuda->via_data_callback().set(grandcentral, FUNC(heathrow_device::cb2_w));
@@ -190,8 +211,8 @@ void macpci_state::pippin(machine_config &config)
 	grandcentral.cb2_callback().set(m_cuda, FUNC(cuda_device::set_via_data));
 
 	mn1880_device &cdmcu(MN1880(config, "cdmcu", 8388608)); // type and clock unknown
-	cdmcu.set_addrmap(AS_PROGRAM, &macpci_state::cdmcu_mem);
-	cdmcu.set_addrmap(AS_DATA, &macpci_state::cdmcu_data);
+	cdmcu.set_addrmap(AS_PROGRAM, &pippin_state::cdmcu_mem);
+	cdmcu.set_addrmap(AS_DATA, &pippin_state::cdmcu_data);
 	cdmcu.set_disable();
 }
 
@@ -235,4 +256,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY           FULLNAME        FLAGS */
-COMP( 1996, pippin, 0,      0,      pippin,  pippin, macpci_state, empty_init, "Apple / Bandai", "Pippin @mark", MACHINE_NOT_WORKING)
+COMP( 1996, pippin, 0,      0,      pippin,  pippin, pippin_state, empty_init, "Apple / Bandai", "Pippin @mark", MACHINE_NOT_WORKING)

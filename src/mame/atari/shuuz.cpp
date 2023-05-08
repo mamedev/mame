@@ -232,7 +232,7 @@ uint16_t shuuz_state::leta_r(offs_t offset)
 	if (which == 0)
 	{
 		int const dx = (int8_t)m_track[0]->read();
-		int const dy = (int8_t)m_track[0]->read();
+		int const dy = (int8_t)m_track[1]->read();
 
 		m_cur[0] = dx + dy;
 		m_cur[1] = dx - dy;

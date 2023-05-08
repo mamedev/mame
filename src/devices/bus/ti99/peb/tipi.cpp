@@ -675,9 +675,9 @@ tipi_attached_device::tipi_attached_device(const machine_config &mconfig, const 
 /*
     Initialize connection
 */
-image_init_result tipi_attached_device::call_load()
+std::pair<std::error_condition, std::string> tipi_attached_device::call_load()
 {
-	return image_init_result::PASS;  // OK
+	return std::make_pair(std::error_condition(), std::string());  // OK
 }
 
 void tipi_attached_device::call_unload()

@@ -174,6 +174,7 @@ public:
 		m_fbscroll(*this, "fbscroll"),
 		m_fbunk(*this, "fbunk"),
 		m_idt7133_dpram(*this, "com_ram"),
+		m_com_bank(*this, "com_bank"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_in(*this, "IN%u", 0U),
 		m_samsho64_3d_hack(0),
@@ -246,6 +247,7 @@ private:
 
 	required_shared_ptr<uint32_t> m_idt7133_dpram;
 	//required_shared_ptr<uint8_t> m_com_mmu_mem;
+	required_memory_bank m_com_bank;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 
@@ -330,6 +332,7 @@ private:
 	void hng64_com_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void hng64_com_share_w(offs_t offset, uint8_t data);
 	uint8_t hng64_com_share_r(offs_t offset);
+	void hng64_com_bank_w(uint8_t data);
 	void hng64_com_share_mips_w(offs_t offset, uint8_t data);
 	uint8_t hng64_com_share_mips_r(offs_t offset);
 	uint32_t hng64_sysregs_r(offs_t offset, uint32_t mem_mask = ~0);

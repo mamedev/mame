@@ -43,7 +43,9 @@ public:
 		m_k007232(*this, "k007232"),
 		m_spriteram(*this, "spriteram%u", 1U),
 		m_pf_videoram(*this, "pf_videoram%u", 1U),
-		m_mainbank(*this, "mainbank")
+		m_bankedram(*this, "bankedram", 0x1000, ENDIANNESS_BIG),
+		m_mainbank(*this, "mainbank"),
+		m_rambank(*this, "rambank")
 	{ }
 
 	void hcastle(machine_config &config);
@@ -65,7 +67,9 @@ private:
 
 	// memory pointers
 	required_shared_ptr_array<uint8_t, 2> m_pf_videoram;
+	memory_share_creator<u8> m_bankedram;
 	required_memory_bank m_mainbank;
+	required_memory_bank m_rambank;
 
 	// video-related
 	tilemap_t *m_tilemap[2]{};
@@ -75,7 +79,6 @@ private:
 
 	void bankswitch_w(uint8_t data);
 	void soundirq_w(uint8_t data);
-	void coin_w(uint8_t data);
 	void gfxbank_w(uint8_t data);
 	uint8_t gfxbank_r();
 	void sound_bank_w(uint8_t data);
@@ -287,20 +290,20 @@ uint32_t hcastle_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 void hcastle_state::bankswitch_w(uint8_t data)
 {
 	m_mainbank->set_entry(data & 0x1f);
+
+	// Work RAM is an 8KiB 6264 RAM (H11) mapped to a 6 KiB region.
+	// The first 2KiB is bankswitched by bit 5 of the LS273 control
+	// latch (J11), while the upper 4KiB is directly mapped.
+	m_rambank->set_entry(BIT(data, 5));
+
+	machine().bookkeeping().coin_counter_w(0, data & 0x40);
+	machine().bookkeeping().coin_counter_w(1, data & 0x80);
 }
 
 void hcastle_state::soundirq_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
-
-void hcastle_state::coin_w(uint8_t data)
-{
-	machine().bookkeeping().coin_counter_w(0, data & 0x40);
-	machine().bookkeeping().coin_counter_w(1, data & 0x80);
-}
-
-
 
 void hcastle_state::main_map(address_map &map)
 {
@@ -312,7 +315,7 @@ void hcastle_state::main_map(address_map &map)
 	map(0x0404, 0x0404).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x0408, 0x0408).w(FUNC(hcastle_state::soundirq_w));
 	map(0x040c, 0x040c).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x0410, 0x0410).portr("SYSTEM").w(FUNC(hcastle_state::coin_w));
+	map(0x0410, 0x0410).portr("SYSTEM");
 	map(0x0411, 0x0411).portr("P1");
 	map(0x0412, 0x0412).portr("P2");
 	map(0x0413, 0x0413).portr("DSW3");
@@ -320,7 +323,10 @@ void hcastle_state::main_map(address_map &map)
 	map(0x0415, 0x0415).portr("DSW2");
 	map(0x0418, 0x0418).rw(FUNC(hcastle_state::gfxbank_r), FUNC(hcastle_state::gfxbank_w));
 	map(0x0600, 0x06ff).ram().w(m_palette, FUNC(palette_device::write_indirect)).share("palette");
-	map(0x0700, 0x1fff).ram();
+	// Version E accesses 0x700-0x7ff, but nothing maps there on the PCB.  This is fixed in
+	// version K and all later versions, so it seems to be a bug that was fixed.
+	map(0x0800, 0x0fff).bankrw(m_rambank);
+	map(0x1000, 0x1fff).ram();
 	map(0x2000, 0x2fff).ram().w(FUNC(hcastle_state::pf_video_w<0>)).share(m_pf_videoram[0]);
 	map(0x3000, 0x3fff).ram().share("spriteram1");
 	map(0x4000, 0x4fff).ram().w(FUNC(hcastle_state::pf_video_w<1>)).share(m_pf_videoram[1]);
@@ -430,6 +436,7 @@ void hcastle_state::machine_start()
 	uint8_t *rom = memregion("maincpu")->base();
 
 	m_mainbank->configure_entries(0, 16, &rom[0x10000], 0x2000);
+	m_rambank->configure_entries(0, 2, m_bankedram, 0x800);
 
 	save_item(NAME(m_pf_bankbase));
 	save_item(NAME(m_gfx_bank));

@@ -36,12 +36,12 @@ void msx_cart_ink_device::device_add_mconfig(machine_config &config)
 	AMD_29F040(config, m_flash);
 }
 
-image_init_result msx_cart_ink_device::initialize_cartridge(std::string &message)
+std::error_condition msx_cart_ink_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
 	{
 		message = "msx_cart_ink_device: Required region 'rom' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	const size_t size = std::min<size_t>(0x80000, cart_rom_region()->bytes());
@@ -53,12 +53,12 @@ image_init_result msx_cart_ink_device::initialize_cartridge(std::string &message
 	page(1)->install_rom(0x4000, 0x7fff, flash + 0x4000);
 	page(2)->install_rom(0x8000, 0xbfff, flash + 0x8000);
 	page(3)->install_rom(0xc000, 0xffff, flash + 0xc000);
-	page(0)->install_write_handler(0x0000, 0x3fff, write8sm_delegate(*this, FUNC(msx_cart_ink_device::write_page<0>)));
-	page(1)->install_write_handler(0x4000, 0x7fff, write8sm_delegate(*this, FUNC(msx_cart_ink_device::write_page<1>)));
-	page(2)->install_write_handler(0x8000, 0xbfff, write8sm_delegate(*this, FUNC(msx_cart_ink_device::write_page<2>)));
-	page(3)->install_write_handler(0xc000, 0xffff, write8sm_delegate(*this, FUNC(msx_cart_ink_device::write_page<3>)));
+	page(0)->install_write_handler(0x0000, 0x3fff, emu::rw_delegate(*this, FUNC(msx_cart_ink_device::write_page<0>)));
+	page(1)->install_write_handler(0x4000, 0x7fff, emu::rw_delegate(*this, FUNC(msx_cart_ink_device::write_page<1>)));
+	page(2)->install_write_handler(0x8000, 0xbfff, emu::rw_delegate(*this, FUNC(msx_cart_ink_device::write_page<2>)));
+	page(3)->install_write_handler(0xc000, 0xffff, emu::rw_delegate(*this, FUNC(msx_cart_ink_device::write_page<3>)));
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 template <int Page>

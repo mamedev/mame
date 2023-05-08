@@ -153,9 +153,10 @@ private:
 	void eolith_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t eolith_vram_r(offs_t offset);
 	void sound_p1_w(uint8_t data);
+	void sound_p3_w(uint8_t data);
 	uint8_t qs1000_p1_r();
 	void qs1000_p1_w(uint8_t data);
-	void soundcpu_to_qs1000(uint8_t data);
+	uint8_t qs1000_p3_r();
 
 	uint32_t screen_update_eolith(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -176,6 +177,7 @@ private:
 	int m_coin_counter_bit = 0;
 	std::unique_ptr<uint16_t[]> m_vram;
 	int m_buffer = 0;
+	uint8_t m_sound_txd = 0;
 };
 
 
@@ -315,6 +317,11 @@ void eolith_state::sound_p1_w(uint8_t data)
 	m_sndbank->set_entry(data & 0x0f);
 }
 
+void eolith_state::sound_p3_w(uint8_t data)
+{
+	// Sound CPU -> QS1000 CPU serial link
+	m_sound_txd = BIT(data, 1);
+}
 
 /*************************************
  *
@@ -352,10 +359,9 @@ void eolith_state::qs1000_p1_w(uint8_t data)
  *
  *************************************/
 
-void eolith_state::soundcpu_to_qs1000(uint8_t data)
+uint8_t eolith_state::qs1000_p3_r()
 {
-	m_qs1000->serial_in(data);
-	machine().scheduler().perfect_quantum(attotime::from_usec(250));
+	return m_sound_txd;
 }
 
 
@@ -693,7 +699,8 @@ void eolith_state::eolith45(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &eolith_state::sound_prg_map);
 	m_soundcpu->set_addrmap(AS_IO, &eolith_state::sound_io_map);
 	m_soundcpu->port_out_cb<1>().set(FUNC(eolith_state::sound_p1_w));
-	m_soundcpu->serial_tx_cb().set(FUNC(eolith_state::soundcpu_to_qs1000)); // Sound CPU -> QS1000 CPU serial link
+	m_soundcpu->port_out_cb<3>().set(FUNC(eolith_state::sound_p3_w));
+	config.set_perfect_quantum(m_soundcpu); // HACK: ensure serial sync between Sound CPU and QS1000
 
 	EEPROM_93C66_8BIT(config, "eeprom")
 			.erase_time(attotime::from_usec(250))
@@ -724,6 +731,7 @@ void eolith_state::eolith45(machine_config &config)
 	m_qs1000->set_external_rom(true);
 	m_qs1000->p1_in().set(FUNC(eolith_state::qs1000_p1_r));
 	m_qs1000->p1_out().set(FUNC(eolith_state::qs1000_p1_w));
+	m_qs1000->p3_in().set(FUNC(eolith_state::qs1000_p3_r));
 	m_qs1000->add_route(0, "lspeaker", 1.0);
 	m_qs1000->add_route(1, "rspeaker", 1.0);
 }

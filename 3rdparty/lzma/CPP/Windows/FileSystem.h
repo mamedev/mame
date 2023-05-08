@@ -10,6 +10,8 @@ namespace NWindows {
 namespace NFile {
 namespace NSystem {
 
+#ifdef _WIN32
+
 bool MyGetVolumeInformation(
     CFSTR rootPath  ,
     UString &volumeName,
@@ -21,6 +23,8 @@ bool MyGetVolumeInformation(
 UINT MyGetDriveType(CFSTR pathName);
 
 bool MyGetDiskFreeSpace(CFSTR rootPath, UInt64 &clusterSize, UInt64 &totalSize, UInt64 &freeSize);
+
+#endif
 
 }}}
 

@@ -91,7 +91,8 @@ real_profiler_state::real_profiler_state()
 
 void real_profiler_state::reset(bool enabled) noexcept
 {
-	assert(!m_filoptr || (m_filoptr == m_filo));
+	// disabling the profiler from the UI happens while PROFILER_EXTRA is active
+	//assert(!m_filoptr || (m_filoptr == m_filo));
 
 	m_text_time = attotime::never;
 

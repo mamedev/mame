@@ -37,19 +37,19 @@ void ds6417_device::device_reset()
 	m_command = 0;
 }
 
-image_init_result ds6417_device::call_load()
+std::pair<std::error_condition, std::string> ds6417_device::call_load()
 {
 	if(length() != 32768)
-		return image_init_result::FAIL;
-	return image_init_result::PASS;
+		return std::make_pair(image_error::INVALIDLENGTH, "Incorrect image file size (must be 32K)");
+	return std::make_pair(std::error_condition(), std::string());
 }
 
-image_init_result ds6417_device::call_create(int format_type, util::option_resolution *format_options)
+std::pair<std::error_condition, std::string> ds6417_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	u8 buffer[32768] = {0};
 	if(fwrite(buffer, 32768) != 32768)
-		return image_init_result::FAIL;
-	return image_init_result::PASS;
+		return std::make_pair(std::errc::io_error, std::string());
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 uint8_t ds6417_device::calccrc(uint8_t bit, uint8_t crc) const

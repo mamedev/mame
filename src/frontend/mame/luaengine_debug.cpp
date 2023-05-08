@@ -106,21 +106,37 @@ public:
 	{
 		symbol_table::setter_func setfun;
 		if (setter)
-			setfun = [this, cbfunc = std::move(*setter)] (u64 value) { m_host.invoke(cbfunc, value); };
+		{
+			setfun =
+					[this, cbfunc = sol::protected_function(m_host.m_lua_state, *setter)] (u64 value)
+					{
+						auto status = m_host.invoke(cbfunc, value);
+						if (!status.valid())
+						{
+							sol::error err = status;
+							osd_printf_error("[LUA EROR] in symbol value setter callback: %s\n", err.what());
+						}
+					};
+		}
 		return m_table.add(
 				name,
-				[this, cbfunc = std::move(getter)] () -> u64
+				[this, cbfunc = sol::protected_function(m_host.m_lua_state, getter)] () -> u64
 				{
-					auto result = m_host.invoke(cbfunc).get<std::optional<u64> >();
-					if (result)
+					auto status = m_host.invoke(cbfunc);
+					if (status.valid())
 					{
-						return *result;
+						auto result = status.get<std::optional<u64> >();
+						if (result)
+							return *result;
+
+						osd_printf_error("[LUA EROR] invalid return from symbol value getter callback\n");
 					}
 					else
 					{
-						osd_printf_error("[LUA EROR] invalid return from symbol value getter callback\n");
-						return 0;
+						sol::error err = status;
+						osd_printf_error("[LUA EROR] in symbol value getter callback: %s\n", err.what());
 					}
+					return 0;
 				},
 				std::move(setfun),
 				(format && *format) ? *format : "");
@@ -245,7 +261,7 @@ void lua_engine::initialize_debug(sol::table &emu)
 				if (cb == sol::lua_nil)
 					st.table().set_memory_modified_func(nullptr);
 				else if (cb.is<sol::protected_function>())
-					st.table().set_memory_modified_func([this, cbfunc = cb.as<sol::protected_function>()] () { invoke(cbfunc); });
+					st.table().set_memory_modified_func([this, cbfunc = sol::protected_function(m_lua_state, cb)] () { invoke(cbfunc); });
 				else
 					osd_printf_error("[LUA ERROR] must call set_memory_modified_func with function or nil\n");
 			});
@@ -269,22 +285,40 @@ void lua_engine::initialize_debug(sol::table &emu)
 			{
 				return st.add(name, getter, std::nullopt, nullptr);
 			},
-			[] (symbol_table_wrapper &st, sol::this_state s, char const *name, int minparams, int maxparams, sol::protected_function execute) -> symbol_entry &
+			[this] (symbol_table_wrapper &st, char const *name, int minparams, int maxparams, sol::protected_function execute) -> symbol_entry &
 			{
 				return st.table().add(
 						name,
 						minparams,
 						maxparams,
-						[L = s.L, cbref = sol::reference(execute)] (int numparams, u64 const *paramlist) -> u64
+						[this, cb = sol::protected_function(m_lua_state, execute)] (int numparams, u64 const *paramlist) -> u64
 						{
-							sol::stack_reference traceback(L, -sol::stack::push(L, sol::default_traceback_error_handler));
-							cbref.push();
-							sol::stack_aligned_stack_handler_function func(L, -1, traceback);
-							for (int i = 0; numparams > i; ++i)
-								lua_pushinteger(L, paramlist[i]);
-							auto result = func(sol::stack_count(numparams)).get<std::optional<u64> >();
-							traceback.pop();
-							return result ? *result : 0;
+							// TODO: C++20 will make this obsolete
+							class helper
+							{
+							private:
+								u64 const *b, *e;
+							public:
+								helper(int n, u64 const *p) : b(p), e(p + n) { }
+								auto begin() const { return b; }
+								auto end() const { return e; }
+							};
+
+							auto status(invoke(cb, sol::as_args(helper(numparams, paramlist))));
+							if (status.valid())
+							{
+								auto result = status.get<std::optional<u64> >();
+								if (result)
+									return *result;
+
+								osd_printf_error("[LUA EROR] invalid return from symbol execute callback\n");
+							}
+							else
+							{
+								sol::error err = status;
+								osd_printf_error("[LUA EROR] in symbol execute callback: %s\n", err.what());
+							}
+							return 0;
 						});
 			});
 	symbol_table_type.set_function("find", &symbol_table_wrapper::find);

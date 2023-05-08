@@ -5,7 +5,7 @@
 #include "emumem_hea.h"
 #include "emumem_heun.h"
 
-template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_unmapped<Width, AddrShift>::read(offs_t offset, uX mem_mask) const
+template<int Width, int AddrShift> emu::detail::handler_entry_size_t<Width> handler_entry_read_unmapped<Width, AddrShift>::read(offs_t offset, uX mem_mask) const
 {
 	if (this->m_space->log_unmap() && !this->m_space->m_manager.machine().side_effects_disabled())
 		this->m_space->device().logerror(this->m_space->is_octal()
@@ -17,7 +17,7 @@ template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Widt
 	return this->m_space->unmap();
 }
 
-template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_unmapped<Width, AddrShift>::read_interruptible(offs_t offset, uX mem_mask) const
+template<int Width, int AddrShift> emu::detail::handler_entry_size_t<Width> handler_entry_read_unmapped<Width, AddrShift>::read_interruptible(offs_t offset, uX mem_mask) const
 {
 	if (this->m_space->log_unmap() && !this->m_space->m_manager.machine().side_effects_disabled())
 		this->m_space->device().logerror(this->m_space->is_octal()
@@ -29,7 +29,7 @@ template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Widt
 	return this->m_space->unmap();
 }
 
-template<int Width, int AddrShift> std::pair<typename emu::detail::handler_entry_size<Width>::uX, u16> handler_entry_read_unmapped<Width, AddrShift>::read_flags(offs_t offset, uX mem_mask) const
+template<int Width, int AddrShift> std::pair<emu::detail::handler_entry_size_t<Width>, u16> handler_entry_read_unmapped<Width, AddrShift>::read_flags(offs_t offset, uX mem_mask) const
 {
 	if (this->m_space->log_unmap() && !this->m_space->m_manager.machine().side_effects_disabled())
 		this->m_space->device().logerror(this->m_space->is_octal()
@@ -116,17 +116,17 @@ template<int Width, int AddrShift> std::string handler_entry_write_unmapped<Widt
 
 
 
-template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_nop<Width, AddrShift>::read(offs_t offset, uX mem_mask) const
+template<int Width, int AddrShift> emu::detail::handler_entry_size_t<Width> handler_entry_read_nop<Width, AddrShift>::read(offs_t offset, uX mem_mask) const
 {
 	return this->m_space->unmap();
 }
 
-template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_nop<Width, AddrShift>::read_interruptible(offs_t offset, uX mem_mask) const
+template<int Width, int AddrShift> emu::detail::handler_entry_size_t<Width> handler_entry_read_nop<Width, AddrShift>::read_interruptible(offs_t offset, uX mem_mask) const
 {
 	return this->m_space->unmap();
 }
 
-template<int Width, int AddrShift> std::pair<typename emu::detail::handler_entry_size<Width>::uX, u16> handler_entry_read_nop<Width, AddrShift>::read_flags(offs_t offset, uX mem_mask) const
+template<int Width, int AddrShift> std::pair<emu::detail::handler_entry_size_t<Width>, u16> handler_entry_read_nop<Width, AddrShift>::read_flags(offs_t offset, uX mem_mask) const
 {
 	return std::pair<uX, u16>(this->m_space->unmap(), this->m_flags);
 }

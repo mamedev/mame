@@ -340,7 +340,7 @@ static const uint8_t cc_ex[0x100] = {
 } while (0)
 
 // T Memory Address
-#define MTM ((m_cc_op == nullptr ? 4 : m_cc_op[0])-1)
+#define MTM (m_mtm_cycles)
 
 #define EXEC(prefix,opcode) do { \
 	unsigned op = opcode; \
@@ -3814,6 +3814,12 @@ void z80_device::z80_set_cycle_tables(const uint8_t *op, const uint8_t *cb, cons
 }
 
 
+void z80_device::set_mtm_cycles(uint8_t mtm_cycles)
+{
+	m_mtm_cycles = mtm_cycles;
+}
+
+
 z80_device::z80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	z80_device(mconfig, Z80, tag, owner, clock)
 {
@@ -3828,7 +3834,8 @@ z80_device::z80_device(const machine_config &mconfig, device_type type, const ch
 	m_irqack_cb(*this),
 	m_refresh_cb(*this),
 	m_nomreq_cb(*this),
-	m_halt_cb(*this)
+	m_halt_cb(*this),
+	m_mtm_cycles(3)
 {
 }
 

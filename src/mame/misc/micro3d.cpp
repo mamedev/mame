@@ -334,8 +334,6 @@ void micro3d_state::micro3d(machine_config &config)
 	m_audiocpu->port_out_cb<1>().set(FUNC(micro3d_state::micro3d_sound_p1_w));
 	m_audiocpu->port_in_cb<3>().set(FUNC(micro3d_state::micro3d_sound_p3_r));
 	m_audiocpu->port_out_cb<3>().set(FUNC(micro3d_state::micro3d_sound_p3_w));
-	m_audiocpu->serial_tx_cb().set(FUNC(micro3d_state::data_from_i8031));
-	m_audiocpu->serial_rx_cb().set(FUNC(micro3d_state::data_to_i8031));
 
 	MC68681(config, m_duart, 3.6864_MHz_XTAL);
 	m_duart->irq_cb().set(FUNC(micro3d_state::duart_irq_handler));

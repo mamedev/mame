@@ -258,7 +258,8 @@ void menu_software_list::populate()
 	}
 	else
 	{
-		std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t>>(std::locale());
+		std::locale const lcl;
+		std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t> >(lcl);
 		m_entrylist.sort(
 				[&coll] (entry_info const &e1, entry_info const &e2) -> bool
 				{

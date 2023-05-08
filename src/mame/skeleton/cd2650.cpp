@@ -256,71 +256,44 @@ void cd2650_state::kbd_put(u8 data)
 
 QUICKLOAD_LOAD_MEMBER(cd2650_state::quickload_cb)
 {
-	int i;
-	image_init_result result = image_init_result::FAIL;
-
-	int quick_length = image.length();
+	int const quick_length = image.length();
 	if (quick_length < 0x1500)
+		return std::make_pair(image_error::INVALIDLENGTH, "Image file too short (must be at least 5376 bytes)");
+	else if (quick_length > 0x8000)
+		return std::make_pair(image_error::INVALIDLENGTH, "Image file too long (must be no more than 32K)");
+
+	std::vector<u8> quick_data(quick_length);
+	int read_ = image.fread( &quick_data[0], quick_length);
+	if (read_ != quick_length)
+		return std::make_pair(image_error::UNSPECIFIED, "Cannot read the file");
+	else if (quick_data[0] != 0x40)
+		return std::make_pair(image_error::INVALIDIMAGE, "Invalid file header");
+
+	int const exec_addr = quick_data[1] * 256 + quick_data[2];
+	if (exec_addr >= quick_length)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "File too short");
-		image.message(" File too short");
-	}
-	else
-	if (quick_length > 0x8000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "File too long");
-		image.message(" File too long");
-	}
-	else
-	{
-		std::vector<u8> quick_data(quick_length);
-		int read_ = image.fread( &quick_data[0], quick_length);
-		if (read_ != quick_length)
-		{
-			image.seterror(image_error::INVALIDIMAGE, "Cannot read the file");
-			image.message(" Cannot read the file");
-		}
-		else
-		if (quick_data[0] != 0x40)
-		{
-			image.seterror(image_error::INVALIDIMAGE, "Invalid header");
-			image.message(" Invalid header");
-		}
-		else
-		{
-			int exec_addr = quick_data[1] * 256 + quick_data[2];
-
-			if (exec_addr >= quick_length)
-			{
-				image.seterror(image_error::INVALIDIMAGE, "Exec address beyond end of file");
-				image.message(" Exec address beyond end of file");
-			}
-			else
-			{
-				// do not overwite system area (17E0-17FF) otherwise chess3 has problems
-				read_ = 0x17e0;
-				if (quick_length < 0x17e0)
-					read_ = quick_length;
-
-				for (i = 0x1500; i < read_; i++)
-					m_p_videoram[i-0x1000] = quick_data[i];
-
-				if (quick_length > 0x17ff)
-					for (i = 0x1800; i < quick_length; i++)
-						m_p_videoram[i-0x1000] = quick_data[i];
-
-				/* display a message about the loaded quickload */
-				image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
-
-				// Start the quickload
-				m_maincpu->set_state_int(S2650_PC, exec_addr);
-
-				result = image_init_result::PASS;
-			}
-		}
+		return std::make_pair(
+				image_error::INVALIDIMAGE,
+				util::string_format("Exec address %04X beyond end of file %04X", exec_addr, quick_length));
 	}
 
-	return result;
+	// do not overwite system area (17E0-17FF) otherwise chess3 has problems
+	read_ = std::min<int>(0x17e0, quick_length);
+
+	for (int i = 0x1500; i < read_; i++)
+		m_p_videoram[i-0x1000] = quick_data[i];
+
+	if (quick_length > 0x17ff)
+		for (int i = 0x1800; i < quick_length; i++)
+			m_p_videoram[i-0x1000] = quick_data[i];
+
+	// display a message about the loaded quickload
+	image.message(" Quickload: size=%04X : exec=%04X", quick_length, exec_addr);
+
+	// Start the quickload
+	m_maincpu->set_state_int(S2650_PC, exec_addr);
+
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void cd2650_state::cd2650(machine_config &config)

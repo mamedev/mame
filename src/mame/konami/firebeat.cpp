@@ -375,6 +375,7 @@ struct IBUTTON
 static void firebeat_ata_devices(device_slot_interface &device)
 {
 	device.option_add("cdrom", ATAPI_FIXED_CDROM);
+	device.option_add("dvdrom", ATAPI_FIXED_DVDROM);
 	device.option_add("hdd", IDE_HARDDISK);
 }
 
@@ -1540,10 +1541,10 @@ void firebeat_popn_state::firebeat_popn(machine_config &config)
 {
 	firebeat_spu_base(config);
 
-	ATA_INTERFACE(config, m_spuata).options(firebeat_ata_devices, "cdrom", nullptr, true);
+	ATA_INTERFACE(config, m_spuata).options(firebeat_ata_devices, "dvdrom", nullptr, true);
 	m_spuata->irq_handler().set(FUNC(firebeat_popn_state::spu_ata_interrupt));
 	m_spuata->dmarq_handler().set(FUNC(firebeat_popn_state::spu_ata_dmarq));
-	m_spuata->slot(0).set_option_machine_config("cdrom", dvdrom_config);
+	m_spuata->slot(0).set_option_machine_config("dvdrom", dvdrom_config);
 	m_spuata->slot(0).set_fixed(true);
 
 	// 500 hz works best for pop'n music.
@@ -2256,10 +2257,10 @@ ROM_START( ppp )
 	ROM_REGION(0xc8, "user2", 0)    // Security dongle
 	ROM_LOAD("gq977", 0x00, 0xc8, CRC(1cf40267) SHA1(28269e30a05c7334955c02aaa8e233d7e53842d9))
 
-	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom:image" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "977jaa01", 0, BAD_DUMP SHA1(59c03d8eb366167feef741d42d9d8b54bfeb3c1e) )
 
-	DISK_REGION( "ata:1:cdrom" ) // audio CD-ROM
+	DISK_REGION( "ata:1:cdrom:image" ) // audio CD-ROM
 	DISK_IMAGE_READONLY( "977jaa02", 0, SHA1(bd07c25ee3e1edc962997f6a5bb1700897231fb2) )
 ROM_END
 
@@ -2270,10 +2271,10 @@ ROM_START( ppp1mp )
 	ROM_REGION(0xc0, "user2", 0)    // Security dongle
 	ROM_LOAD("gqa11-ja", 0x00, 0xc0, BAD_DUMP CRC(207a99b2) SHA1(d19788e1c377771141527660311ff84653039c32))
 
-	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom:image" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "a11jaa01", 0, SHA1(539ec6f1c1d198b0d6ce5543eadcbb4d9917fa42) )
 
-	DISK_REGION( "ata:1:cdrom" ) // audio CD-ROM
+	DISK_REGION( "ata:1:cdrom:image" ) // audio CD-ROM
 	DISK_IMAGE_READONLY( "a11jaa02", 0, SHA1(575069570cb4a2b58b199a1329d45b189a20fcc9) )
 ROM_END
 
@@ -2284,10 +2285,10 @@ ROM_START( ppd )
 	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)    // Security dongle
 	ROM_LOAD("gq977-ko", 0x00, 0xc0, BAD_DUMP CRC(b275de3c) SHA1(d23fcf0e87da2e561bc112851d26b3e78079f40a))
 
-	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom:image" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "977kaa01", 0, BAD_DUMP SHA1(7af9f4949ffa10ea5fc18b6c88c2abc710df3cf9) )
 
-	DISK_REGION( "ata:1:cdrom" ) // audio CD-ROM
+	DISK_REGION( "ata:1:cdrom:image" ) // audio CD-ROM
 	DISK_IMAGE_READONLY( "977kaa02", 1, SHA1(0feb5ac56269ad4a8401fcfe3bb98b01a0169177) )
 ROM_END
 
@@ -2298,10 +2299,10 @@ ROM_START( ppp11 )
 	ROM_REGION(0xc8, "user2", ROMREGION_ERASE00)    // Security dongle
 	ROM_LOAD("gq977", 0x00, 0xc8, CRC(1cf40267) SHA1(28269e30a05c7334955c02aaa8e233d7e53842d9))
 
-	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom:image" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "gc977jaa01", 0, SHA1(7ed1f4b55105c93fec74468436bfb1d540bce944) )
 
-	DISK_REGION( "ata:1:cdrom" ) // audio CD-ROM
+	DISK_REGION( "ata:1:cdrom:image" ) // audio CD-ROM
 	DISK_IMAGE_READONLY( "gc977jaa02", 1, SHA1(74ce8c90575fd562807def7d561392d0f91f2bc6) )
 ROM_END
 
@@ -2312,10 +2313,10 @@ ROM_START( kbm )
 	ROM_REGION(0xc8, "user2", ROMREGION_ERASE00)    // Security dongle
 	ROM_LOAD("gq974", 0x00, 0xc8, CRC(65e4886a) SHA1(afba0315f2532599c51e232f734c538c4d108d73))
 
-	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom:image" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "gq974-ja c01", 0, SHA1(975a4a59f842b8a7edad79b307e489cc88bef24d) )
 
-	DISK_REGION( "ata:1:cdrom" ) // audio CD-ROM
+	DISK_REGION( "ata:1:cdrom:image" ) // audio CD-ROM
 	DISK_IMAGE_READONLY( "gq974-ja a02", 1, SHA1(80086676c00c9ca06ec14e305ea4523b6576e47f) )
 ROM_END
 
@@ -2326,10 +2327,10 @@ ROM_START( kbh )
 	ROM_REGION(0xc8, "user2", ROMREGION_ERASE00)    // Security dongle
 	ROM_LOAD("gu974", 0x00, 0xc8, CRC(748b8476) SHA1(5d507fd46235c4315ad32599ce87aa4e06642eb5))
 
-	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom:image" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "gu974-ka a01", 0, SHA1(07d3d6abcb13b2c2a556f2eed7e89e3d11febf1b) )
 
-	DISK_REGION( "ata:1:cdrom" ) // audio CD-ROM
+	DISK_REGION( "ata:1:cdrom:image" ) // audio CD-ROM
 	DISK_IMAGE_READONLY( "gu974-ka a02", 1, SHA1(9e358b0551b650a432e685ec82d3df2433e2aac3) )
 ROM_END
 
@@ -2340,10 +2341,10 @@ ROM_START( kbm2nd )
 	ROM_REGION(0xc8, "user2", ROMREGION_ERASE00)    // Security dongle
 	ROM_LOAD("gca01ja_gca01aa", 0x00, 0xc8, CRC(27f977cf) SHA1(14739cb4edfc3c4453673d59f2bd0442eab71d6a))
 
-	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom:image" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "a01 ja a01", 0, SHA1(6a661dd737c83130febe771402a159859afeffba) )
 
-	DISK_REGION( "ata:1:cdrom" ) // audio CD-ROM
+	DISK_REGION( "ata:1:cdrom:image" ) // audio CD-ROM
 	DISK_IMAGE_READONLY( "a01 ja a02", 1, SHA1(e1ffc0bd4ea169951ed9ceaf090dbb1511a46601) )
 ROM_END
 
@@ -2354,10 +2355,10 @@ ROM_START( kbm3rd )
 	ROM_REGION(0xc8, "user2", 0)    // Security dongle
 	ROM_LOAD("gca12-ja_gca12-aa.bin", 0x00, 0xc8, CRC(96b12482) SHA1(199f20d9fa53108b3fe02d91d6793af1554b0f6f))
 
-	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom:image" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "a12jaa01", 0, SHA1(ea30bf1273bce772f09063bfc8a74df360c743a7) )
 
-	DISK_REGION( "ata:1:cdrom" ) // audio CD-ROM
+	DISK_REGION( "ata:1:cdrom:image" ) // audio CD-ROM
 	DISK_IMAGE_READONLY( "a12jaa02", 0, SHA1(6bf7adbd637a0ce0c19b57187d3e46fabea99363) )
 ROM_END
 
@@ -2371,11 +2372,11 @@ ROM_START( popn4 )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
-	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom:image" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "gq986jaa01", 0, SHA1(e5368ac029b0bdf29943ae66677b5521ae1176e1) )
 
-	DISK_REGION( "spu_ata:0:cdrom" ) // data DVD-ROM
-	DISK_IMAGE( "gq986jaa02", 0, SHA1(53367d3d5f91422fe386c42716492a0ae4332390) )
+	DISK_REGION( "spu_ata:0:dvdrom:image" ) // data DVD-ROM
+	DISK_IMAGE( "gq986jaa02", 0, SHA1(c34ac216b3e0bef1d1813119469364c6403feaa4) )
 
 	ROM_REGION(0x1038, "rtc", ROMREGION_ERASE00)    // Default unlocked RTC
 	ROM_LOAD("rtc", 0x0000, 0x1038, CRC(4a5c946c) SHA1(9de6085d45c39ba91934cea3abaa37e1203888c7))
@@ -2391,11 +2392,11 @@ ROM_START( popn5 )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP( "a02jaa04.3q",  0x000000, 0x080000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683) )
 
-	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom:image" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "a04jaa01", 0, SHA1(87136ddad1d786b4d5f04381fcbf679ab666e6c9) )
 
-	DISK_REGION( "spu_ata:0:cdrom" ) // data DVD-ROM
-	DISK_IMAGE_READONLY( "a04jaa02", 0, SHA1(49a017dde76f84829f6e99a678524c40665c3bfd) )
+	DISK_REGION( "spu_ata:0:dvdrom:image" ) // data DVD-ROM
+	DISK_IMAGE_READONLY( "a04jaa02", 0, SHA1(058167a6ac910183a701920021cfbc0933428e97) )
 
 	ROM_REGION(0x1038, "rtc", ROMREGION_ERASE00)    // Default unlocked RTC
 	ROM_LOAD("rtc", 0x0000, 0x1038, CRC(adeba6fc) SHA1(a2266696bb0a68e2b70a07d580a3b471e72fa587))
@@ -2411,11 +2412,11 @@ ROM_START( popn6 )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
-	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom:image" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "gqa16jaa01", 0, SHA1(7a7e475d06c74a273f821fdfde0743b33d566e4c) )
 
-	DISK_REGION( "spu_ata:0:cdrom" ) // data DVD-ROM
-	DISK_IMAGE( "gqa16jaa02", 0, SHA1(e39067300e9440ff19cb98c1abc234fa3d5b26d1) )
+	DISK_REGION( "spu_ata:0:dvdrom:image" ) // data DVD-ROM
+	DISK_IMAGE( "gqa16jaa02", 0, SHA1(18abf1a9dbf61faebd44c8dc1d6decbaaca826a2) )
 
 	ROM_REGION(0x1038, "rtc", ROMREGION_ERASE00)    // Default unlocked RTC
 	ROM_LOAD("rtc", 0x0000, 0x1038, CRC(9935427c) SHA1(f7095ea6360ca61d1e2914cf184e50e50777a168))
@@ -2431,11 +2432,11 @@ ROM_START( popn7 )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
-	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom:image" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "b00jab01", 0, SHA1(259c733ca4d30281205b46b7bf8d60c9d01aa818) )
 
-	DISK_REGION( "spu_ata:0:cdrom" ) // data DVD-ROM
-	DISK_IMAGE_READONLY( "b00jaa02", 0, SHA1(c8ce2f8ee6aeeedef9c110a59e68fcec7b669ad6) )
+	DISK_REGION( "spu_ata:0:dvdrom:image" ) // data DVD-ROM
+	DISK_IMAGE_READONLY( "b00jaa02", 0, SHA1(43201334acb20f529baa50c24494b7f0a4bf3d0d) )
 
 	ROM_REGION(0x1038, "rtc", ROMREGION_ERASE00)    // Default unlocked RTC
 	ROM_LOAD("rtc", 0x0000, 0x1038, CRC(fce30919) SHA1(9f875f5fe6ab6591ec024afc0a91966befa73ede))
@@ -2451,11 +2452,11 @@ ROM_START( popn8 )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
-	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom:image" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "gqb30jaa01", 0, SHA1(0ff3e40e3717ce23337b3a2438bdaca01cba9e30) )
 
-	DISK_REGION( "spu_ata:0:cdrom" ) // data DVD-ROM
-	DISK_IMAGE_READONLY( "gqb30jaa02", 0, SHA1(f067d502c23efe0267aada5706f5bc7a54605942) )
+	DISK_REGION( "spu_ata:0:dvdrom:image" ) // data DVD-ROM
+	DISK_IMAGE_READONLY( "gqb30jaa02", 0, SHA1(69d26af2bd85a5a510049fd2f6e36bcabee81fd1) )
 
 	ROM_REGION(0x1038, "rtc", ROMREGION_ERASE00)    // Default unlocked RTC
 	ROM_LOAD("rtc", 0x0000, 0x1038, CRC(1a91f33a) SHA1(510b5cbacb218e5588f3b725733e095b7914dcdb))
@@ -2466,16 +2467,36 @@ ROM_START( popnanm )
 	ROM_LOAD16_WORD_SWAP("a02jaa03.21e", 0x00000, 0x80000, CRC(43ecc093) SHA1(637df5b546cf7409dd4752dc471674fe2a046599))
 
 	ROM_REGION(0xc8, "user2", ROMREGION_ERASE00)    // Security dongle
+	ROM_LOAD("gq987_gc987_forever", 0x00, 0xc8, CRC(ddd976b6) SHA1(91b49585886b8b1618401ca43ec3bde09896b782)) // Modified to set the period to 00/00 for forever license mode
+
+	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
+	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
+
+	DISK_REGION( "ata:0:cdrom:image" ) // program CD-ROM
+	DISK_IMAGE_READONLY( "gq987jaa01", 0, SHA1(ee1f9cf480c01ef356451cec30e5303d6c433758) )
+
+	DISK_REGION( "spu_ata:0:dvdrom:image" ) // data DVD-ROM
+	DISK_IMAGE_READONLY( "gq987jaa02", 0, SHA1(47f90cc940af50c8d91751ec27b45070a95d4d58) )
+
+	ROM_REGION(0x1038, "rtc", ROMREGION_ERASE00)    // Default unlocked RTC
+	ROM_LOAD("rtc", 0x0000, 0x1038, CRC(b08b454d) SHA1(33fc12ab148a379925b7b77016efba747f3b13cc))
+ROM_END
+
+ROM_START( popnanma )
+	ROM_REGION32_BE(0x80000, "user1", 0)
+	ROM_LOAD16_WORD_SWAP("a02jaa03.21e", 0x00000, 0x80000, CRC(43ecc093) SHA1(637df5b546cf7409dd4752dc471674fe2a046599))
+
+	ROM_REGION(0xc8, "user2", ROMREGION_ERASE00)    // Security dongle
 	ROM_LOAD("gq987_gc987", 0x00, 0xc8, CRC(c77bb0fc) SHA1(7228f334d6662f764c2b0417bfd415f30ac919d7))
 
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
-	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom:image" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "gq987jaa01", 0, SHA1(ee1f9cf480c01ef356451cec30e5303d6c433758) )
 
-	DISK_REGION( "spu_ata:0:cdrom" ) // data DVD-ROM
-	DISK_IMAGE_READONLY( "gq987jaa02", 0, SHA1(d72515bac3fcd9f28c39fa1402292009734df678) )
+	DISK_REGION( "spu_ata:0:dvdrom:image" ) // data DVD-ROM
+	DISK_IMAGE_READONLY( "gq987jaa02", 0, SHA1(47f90cc940af50c8d91751ec27b45070a95d4d58) )
 
 	ROM_REGION(0x1038, "rtc", ROMREGION_ERASE00)    // Default unlocked RTC
 	ROM_LOAD("rtc", 0x0000, 0x1038, CRC(b08b454d) SHA1(33fc12ab148a379925b7b77016efba747f3b13cc))
@@ -2486,16 +2507,36 @@ ROM_START( popnanm2 )
 	ROM_LOAD16_WORD_SWAP("a02jaa03.21e", 0x00000, 0x80000, CRC(43ecc093) SHA1(637df5b546cf7409dd4752dc471674fe2a046599))
 
 	ROM_REGION(0xc8, "user2", ROMREGION_ERASE00)    // Security dongle
+	ROM_LOAD("gca02ja_gca02jb_gea02ja_forever", 0x00, 0xc8, CRC(63b22ee0) SHA1(60f384140ea80e886e45a56a37811d86133674a4)) // Modified to set the period to 00/00 for forever license mode
+
+	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
+	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
+
+	DISK_REGION( "ata:0:cdrom:image" ) // program CD-ROM
+	DISK_IMAGE_READONLY( "gea02jaa01", 0, SHA1(e81203b6812336c4d00476377193340031ef11b1) )
+
+	DISK_REGION( "spu_ata:0:dvdrom:image" ) // data DVD-ROM
+	DISK_IMAGE_READONLY( "gea02jaa02", 0, SHA1(b482d0898cafeafcb020d81d40bd8915c0440f1e) )
+
+	ROM_REGION(0x1038, "rtc", ROMREGION_ERASE00)    // Default unlocked RTC
+	ROM_LOAD("rtc", 0x0000, 0x1038, CRC(90fcfeab) SHA1(f96e27e661259dc9e7f25a99bee9ffd6584fc1b8))
+ROM_END
+
+ROM_START( popnanm2a )
+	ROM_REGION32_BE(0x80000, "user1", 0)
+	ROM_LOAD16_WORD_SWAP("a02jaa03.21e", 0x00000, 0x80000, CRC(43ecc093) SHA1(637df5b546cf7409dd4752dc471674fe2a046599))
+
+	ROM_REGION(0xc8, "user2", ROMREGION_ERASE00)    // Security dongle
 	ROM_LOAD("gca02ja_gca02jb_gea02ja", 0x00, 0xc8, CRC(7910e8aa) SHA1(e296a50e846ad13a98953b6804e9e4c22cf3a389))
 
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
-	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom:image" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "gea02jaa01", 0, SHA1(e81203b6812336c4d00476377193340031ef11b1) )
 
-	DISK_REGION( "spu_ata:0:cdrom" ) // data DVD-ROM
-	DISK_IMAGE_READONLY( "gea02jaa02", 0, SHA1(7212e399779f37a5dcb8317a8f635a3b3f620aa9) )
+	DISK_REGION( "spu_ata:0:dvdrom:image" ) // data DVD-ROM
+	DISK_IMAGE_READONLY( "gea02jaa02", 0, SHA1(b482d0898cafeafcb020d81d40bd8915c0440f1e) )
 
 	ROM_REGION(0x1038, "rtc", ROMREGION_ERASE00)    // Default unlocked RTC
 	ROM_LOAD("rtc", 0x0000, 0x1038, CRC(90fcfeab) SHA1(f96e27e661259dc9e7f25a99bee9ffd6584fc1b8))
@@ -2511,11 +2552,11 @@ ROM_START( popnmt )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP( "a02jaa04.3q",  0x000000, 0x080000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683) )
 
-	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom:image" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "976jaa01", 0, SHA1(622a9350107e9fb17609ea1a234ca35489915da7) )
 
-	DISK_REGION( "spu_ata:0:cdrom" ) // data DVD-ROM
-	DISK_IMAGE_READONLY( "976jaa02", 0, SHA1(3881bb1e4deb829ba272c541cb7d203924571f3b) )
+	DISK_REGION( "spu_ata:0:dvdrom:image" ) // data DVD-ROM
+	DISK_IMAGE_READONLY( "976jaa02", 0, SHA1(8a5fda9d98fbf7c9d702bf650fb131a89925eb2b) )
 
 	ROM_REGION(0x1038, "rtc", ROMREGION_ERASE00)    // Default unlocked RTC
 	ROM_LOAD("rtc", 0x0000, 0x1038, CRC(a51bdc10) SHA1(99b759d9a575129abec556d381f3a041453d7136))
@@ -2532,11 +2573,11 @@ ROM_START( popnmt2 )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP( "a02jaa04.3q",  0x000000, 0x080000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683) )
 
-	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom:image" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "976jba01", 0, SHA1(f8a70ca0718dc222cebbef238b5954494503d315) )
 
-	DISK_REGION( "spu_ata:0:cdrom" ) // data DVD-ROM
-	DISK_IMAGE_READONLY( "976jaa02", 0, SHA1(3881bb1e4deb829ba272c541cb7d203924571f3b) )
+	DISK_REGION( "spu_ata:0:dvdrom:image" ) // data DVD-ROM
+	DISK_IMAGE_READONLY( "976jaa02", 0, SHA1(8a5fda9d98fbf7c9d702bf650fb131a89925eb2b) )
 
 	ROM_REGION(0x1038, "rtc", ROMREGION_ERASE00)    // Default unlocked RTC
 	ROM_LOAD("rtc", 0x0000, 0x1038, CRC(a51bdc10) SHA1(99b759d9a575129abec556d381f3a041453d7136))
@@ -2552,7 +2593,7 @@ ROM_START( bm3 )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("972spua01.3q", 0x00000, 0x80000, CRC(308dbcff) SHA1(87d11eb3e28cb4f3a8f88e3c57a28809dc429ccd))
 
-	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom:image" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "gc97201", 0, SHA1(216ced68f2082bf891dc3e89fb0663f559cc4915) )
 
 	DISK_REGION( "spu_ata:0:hdd:image" ) // HDD
@@ -2572,7 +2613,7 @@ ROM_START( bm3core )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("972spua01.3q", 0x00000, 0x80000, CRC(308dbcff) SHA1(87d11eb3e28cb4f3a8f88e3c57a28809dc429ccd))
 
-	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom:image" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "a05jca01", 0, SHA1(b89eced8a1325b087e3f875d1a643bebe9bad5c0) )
 
 	DISK_REGION( "spu_ata:0:hdd:image" ) // HDD
@@ -2592,7 +2633,7 @@ ROM_START( bm36th )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a21jca03.3q", 0x00000, 0x80000, CRC(98ea367a) SHA1(f0b72bdfbba4d265e7b08d606cd82424947d97b9))
 
-	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom:image" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "a21jca01", 0, SHA1(d1b888379cc0b2c2ab58fa2c5be49258043c3ea1) )
 
 	DISK_REGION( "spu_ata:0:hdd:image" ) // HDD
@@ -2612,7 +2653,7 @@ ROM_START( bm37th )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a21jca03.3q", 0x00000, 0x80000, CRC(98ea367a) SHA1(f0b72bdfbba4d265e7b08d606cd82424947d97b9))
 
-	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom:image" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "gcb07jca01", 0, SHA1(f906379bdebee314e2ca97c7756259c8c25897fd) )
 
 	DISK_REGION( "spu_ata:0:hdd:image" ) // HDD
@@ -2632,7 +2673,7 @@ ROM_START( bm3final )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a21jca03.3q", 0x00000, 0x80000, CRC(98ea367a) SHA1(f0b72bdfbba4d265e7b08d606cd82424947d97b9))
 
-	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom:image" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "gcc01jca01", 0, SHA1(3e7af83670d791591ad838823422959987f7aab9) )
 
 	DISK_REGION( "spu_ata:0:hdd:image" ) // HDD
@@ -2658,16 +2699,17 @@ GAMEL( 2000, kbh,    kbm, firebeat_kbm, kbm, firebeat_kbm_state, init_kbm_overse
 GAMEL( 2000, kbm2nd, 0,   firebeat_kbm, kbm, firebeat_kbm_state, init_kbm_jp, ROT270, "Konami", "Keyboardmania 2nd Mix", MACHINE_IMPERFECT_SOUND, layout_firebeat )
 GAMEL( 2001, kbm3rd, 0,   firebeat_kbm, kbm, firebeat_kbm_state, init_kbm_jp, ROT270, "Konami", "Keyboardmania 3rd Mix", MACHINE_IMPERFECT_SOUND, layout_firebeat )
 
-// Requires DVD CHD support. Once DVD CHD support is implemented then MACHINE_NOT_WORKING can be removed
-GAME( 2000, popn4,    0,      firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music 4", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2000, popn5,    0,      firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music 5", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2001, popn6,    0,      firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music 6", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2001, popn7,    0,      firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music 7", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2002, popn8,    0,      firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music 8", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2000, popnmt,   0,      firebeat_popn, popn, firebeat_popn_state, init_popn_rental, ROT0, "Konami", "Pop'n Music Mickey Tunes", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2000, popnmt2,  popnmt, firebeat_popn, popn, firebeat_popn_state, init_popn_rental, ROT0, "Konami", "Pop'n Music Mickey Tunes!", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2000, popnanm,  0,      firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music Animelo", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2001, popnanm2, 0,      firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music Animelo 2", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2000, popn4,     0,        firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music 4", MACHINE_IMPERFECT_SOUND )
+GAME( 2000, popn5,     0,        firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music 5", MACHINE_IMPERFECT_SOUND )
+GAME( 2001, popn6,     0,        firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music 6", MACHINE_IMPERFECT_SOUND )
+GAME( 2001, popn7,     0,        firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music 7", MACHINE_IMPERFECT_SOUND )
+GAME( 2002, popn8,     0,        firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music 8", MACHINE_IMPERFECT_SOUND )
+GAME( 2000, popnmt,    0,        firebeat_popn, popn, firebeat_popn_state, init_popn_rental, ROT0, "Konami", "Pop'n Music Mickey Tunes", MACHINE_IMPERFECT_SOUND )
+GAME( 2000, popnmt2,   popnmt,   firebeat_popn, popn, firebeat_popn_state, init_popn_rental, ROT0, "Konami", "Pop'n Music Mickey Tunes!", MACHINE_IMPERFECT_SOUND )
+GAME( 2000, popnanm,   0,        firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music Animelo", MACHINE_IMPERFECT_SOUND )
+GAME( 2000, popnanma,  popnanm,  firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music Animelo (license expired)", MACHINE_IMPERFECT_SOUND )
+GAME( 2001, popnanm2,  0,        firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music Animelo 2", MACHINE_IMPERFECT_SOUND )
+GAME( 2001, popnanm2a, popnanm2, firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music Animelo 2 (license expired)", MACHINE_IMPERFECT_SOUND )
 
 // Requires ST-224 emulation for optional toggleable external effects, but otherwise is fully playable
 GAME( 2000, bm3,      0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III", MACHINE_IMPERFECT_SOUND )

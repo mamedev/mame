@@ -28,13 +28,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -54,7 +54,7 @@
  example.
 
  A PA_VALIDATE_ENDIANNESS macro is provided to compare the compile time
- and runtime endiannes and raise an assertion if they don't match.
+ and runtime endianness and raise an assertion if they don't match.
 */
 
 
@@ -65,25 +65,25 @@ extern "C"
 
 /* If this is an apple, we need to do detect endianness this way */
 #if defined(__APPLE__)
-    /* we need to do some endian detection that is sensitive to harware arch */
+    /* we need to do some endian detection that is sensitive to hardware arch */
     #if defined(__LITTLE_ENDIAN__)
-       #if !defined( PA_LITTLE_ENDIAN )
-          #define PA_LITTLE_ENDIAN
-       #endif
-       #if defined( PA_BIG_ENDIAN )
-          #undef PA_BIG_ENDIAN
-       #endif
+        #if !defined( PA_LITTLE_ENDIAN )
+            #define PA_LITTLE_ENDIAN
+        #endif
+        #if defined( PA_BIG_ENDIAN )
+            #undef PA_BIG_ENDIAN
+        #endif
     #else
-       #if !defined( PA_BIG_ENDIAN )
-          #define PA_BIG_ENDIAN
-       #endif
-       #if defined( PA_LITTLE_ENDIAN )
-          #undef PA_LITTLE_ENDIAN
-       #endif
+        #if !defined( PA_BIG_ENDIAN )
+            #define PA_BIG_ENDIAN
+        #endif
+        #if defined( PA_LITTLE_ENDIAN )
+            #undef PA_LITTLE_ENDIAN
+        #endif
     #endif
 #else
     /* this is not an apple, so first check the existing defines, and, failing that,
-       detect well-known architechtures. */
+       detect well-known architectures. */
 
     #if defined(PA_LITTLE_ENDIAN) || defined(PA_BIG_ENDIAN)
         /* endianness define has been set externally, such as by autoconf */

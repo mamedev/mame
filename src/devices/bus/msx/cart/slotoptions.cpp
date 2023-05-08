@@ -36,6 +36,7 @@ char const *const FMPAC           = "fmpac";
 char const *const FS_SR022        = "fs_sr022";
 char const *const GAMEMASTER2     = "gamemaster2";
 char const *const HALNOTE         = "halnote";
+char const *const HBI55           = "hbi55";
 char const *const HFOX            = "hfox";
 char const *const HOLY_QURAN      = "holy_quran";
 char const *const INK             = "ink";

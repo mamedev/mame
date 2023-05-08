@@ -173,7 +173,7 @@ public:
 		, m_earom_control(0)
 	{ }
 
-	void liberat2(machine_config &config);
+	void liberatp(machine_config &config);
 	void liberatr(machine_config &config);
 
 protected:
@@ -262,7 +262,7 @@ private:
 	void earom_w(offs_t offset, uint8_t data);
 	void earom_control_w(uint8_t data);
 
-	void liberat2_map(address_map &map);
+	void liberatp_map(address_map &map);
 	void liberatr_map(address_map &map);
 
 	void init_planet(planet &liberatr_planet, uint8_t *planet_rom);
@@ -704,7 +704,7 @@ void liberatr_state::liberatr_map(address_map &map)
  *
  *************************************/
 
-void liberatr_state::liberat2_map(address_map &map)
+void liberatr_state::liberatp_map(address_map &map)
 {
 	map(0x0000, 0x0000).ram().share(m_xcoord);
 	map(0x0001, 0x0001).ram().share(m_ycoord);
@@ -865,12 +865,12 @@ void liberatr_state::liberatr(machine_config &config)
 	pokey2.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
-void liberatr_state::liberat2(machine_config &config)
+void liberatr_state::liberatp(machine_config &config)
 {
 	liberatr(config);
 
 	// basic machine hardware
-	subdevice<m6502_device>("maincpu")->set_addrmap(AS_PROGRAM, &liberatr_state::liberat2_map);
+	subdevice<m6502_device>("maincpu")->set_addrmap(AS_PROGRAM, &liberatr_state::liberatp_map);
 }
 
 
@@ -883,36 +883,36 @@ void liberatr_state::liberat2(machine_config &config)
 
 ROM_START( liberatr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "136012.206",   0x8000, 0x1000, CRC(1a0cb4a0) SHA1(595828a07af729a84aab4e0b51e873046b56b419) )
-	ROM_LOAD( "136012.205",   0x9000, 0x1000, CRC(2f071920) SHA1(8764f3e78451c4968bffb7c7f72d1ed862f4b185) )
-	ROM_LOAD( "136012.204",   0xa000, 0x1000, CRC(bcc91827) SHA1(3bfbe1f1db58437ccd204a857e58695f56819649) )
-	ROM_LOAD( "136012.203",   0xb000, 0x1000, CRC(b558c3d4) SHA1(0b09786d696e91b12435a9e76b127c004c32e59a) )
-	ROM_LOAD( "136012.202",   0xc000, 0x1000, CRC(569ba7ea) SHA1(4812b255886204192ab999d1370550d48438ea81) )
-	ROM_LOAD( "136012.201",   0xd000, 0x1000, CRC(d12cd6d0) SHA1(94474429cbcdbb406eb045152fb158e2a23cd26d) )
-	ROM_LOAD( "136012.200",   0xe000, 0x1000, CRC(1e98d21a) SHA1(92c7cc033c78ae0ce8127d49debe62263404feb1) )
-	ROM_RELOAD(               0xf000, 0x1000 )      // for interrupt/reset vectors
+	ROM_LOAD( "136012-206.j1",   0x8000, 0x1000, CRC(1a0cb4a0) SHA1(595828a07af729a84aab4e0b51e873046b56b419) )
+	ROM_LOAD( "136012-205.kl1",  0x9000, 0x1000, CRC(2f071920) SHA1(8764f3e78451c4968bffb7c7f72d1ed862f4b185) )
+	ROM_LOAD( "136012-204.lm1",  0xa000, 0x1000, CRC(bcc91827) SHA1(3bfbe1f1db58437ccd204a857e58695f56819649) )
+	ROM_LOAD( "136012-203.n1",   0xb000, 0x1000, CRC(b558c3d4) SHA1(0b09786d696e91b12435a9e76b127c004c32e59a) )
+	ROM_LOAD( "136012-202.pr1",  0xc000, 0x1000, CRC(569ba7ea) SHA1(4812b255886204192ab999d1370550d48438ea81) )
+	ROM_LOAD( "136012-201.rs1",  0xd000, 0x1000, CRC(d12cd6d0) SHA1(94474429cbcdbb406eb045152fb158e2a23cd26d) )
+	ROM_LOAD( "136012-200.t1",   0xe000, 0x1000, CRC(1e98d21a) SHA1(92c7cc033c78ae0ce8127d49debe62263404feb1) )
+	ROM_RELOAD(                  0xf000, 0x1000 ) // for interrupt/reset vectors
 
 	ROM_REGION( 0x4000, "planet", 0 ) // used at runtime
-	ROM_LOAD( "136012.110",   0x0000, 0x1000, CRC(6eb11221) SHA1(355b71812a18cbb2ee4dc20b3622fca1c96e4570) )
-	ROM_LOAD( "136012.107",   0x1000, 0x1000, CRC(8a616a63) SHA1(76794cc4e11048bb6f2628bd8b84c9a7e2e82551) )
-	ROM_LOAD( "136012.108",   0x2000, 0x1000, CRC(3f8e4cf6) SHA1(a9d0feb0892f343687e00b96f05adb423ee4d659) )
-	ROM_LOAD( "136012.109",   0x3000, 0x1000, CRC(dda0c0ef) SHA1(6e547c07c1abd17383a4389b0b4ced442ed65ce7) )
+	ROM_LOAD( "136012-110.p8",   0x0000, 0x1000, CRC(6eb11221) SHA1(355b71812a18cbb2ee4dc20b3622fca1c96e4570) )
+	ROM_LOAD( "136012-107.rs8",  0x1000, 0x1000, CRC(8a616a63) SHA1(76794cc4e11048bb6f2628bd8b84c9a7e2e82551) )
+	ROM_LOAD( "136012-108.mn8",  0x2000, 0x1000, CRC(3f8e4cf6) SHA1(a9d0feb0892f343687e00b96f05adb423ee4d659) )
+	ROM_LOAD( "136012-109.t8",   0x3000, 0x1000, CRC(dda0c0ef) SHA1(6e547c07c1abd17383a4389b0b4ced442ed65ce7) )
 
-	ROM_REGION( 0x100, "latitude_scaler", 0 ) /* latitude scaler */
-	ROM_LOAD_NIB_LOW ( "136012.123",   0x0000, 0x0100, CRC(b8c806e0) SHA1(19b1b9796e1e9a42899a92ec53288d17d5d15fb3) )
-	ROM_LOAD_NIB_HIGH( "136012.124",   0x0000, 0x0100, CRC(e51ec78f) SHA1(224237370c418361a00d62a77d39fa494e7d8831) )
+	ROM_REGION( 0x100, "latitude_scaler", 0 ) // latitude scaler
+	ROM_LOAD_NIB_LOW ( "136012-123.n6",   0x0000, 0x0100, CRC(b8c806e0) SHA1(19b1b9796e1e9a42899a92ec53288d17d5d15fb3) )
+	ROM_LOAD_NIB_HIGH( "136012-124.p6",   0x0000, 0x0100, CRC(e51ec78f) SHA1(224237370c418361a00d62a77d39fa494e7d8831) )
 
-	ROM_REGION( 0x100, "longitude_scaler", 0 ) /* longitude scaler */
-	ROM_LOAD_NIB_LOW ( "136012.125",   0x0000, 0x0100, CRC(52ac8dd9) SHA1(125d54b562d079b974f2562e71ab7c7a0b97e709) )
-	ROM_LOAD_NIB_HIGH( "136012.126",   0x0000, 0x0100, CRC(2e670aa6) SHA1(a6bcc49d0948d2dfe497c5e3ad4a834fa78f779a) )
+	ROM_REGION( 0x100, "longitude_scaler", 0 ) // longitude scaler
+	ROM_LOAD_NIB_LOW ( "136012-125.t7",   0x0000, 0x0100, CRC(52ac8dd9) SHA1(125d54b562d079b974f2562e71ab7c7a0b97e709) )
+	ROM_LOAD_NIB_HIGH( "136012-126.s7",   0x0000, 0x0100, CRC(2e670aa6) SHA1(a6bcc49d0948d2dfe497c5e3ad4a834fa78f779a) )
 
 	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "136012.021",   0x0000, 0x0100, CRC(ffdcd7bc) SHA1(2ce733203d628e299ec4fb93db8be1598b49142c) )    // write protect PROM
-	ROM_LOAD( "136012.022",   0x0100, 0x0100, CRC(3353edce) SHA1(915308b11096fc1d02acf9b4af806a2a935dd748) )    // sync PROM
+	ROM_LOAD( "136012-021.c5",   0x0000, 0x0100, CRC(ffdcd7bc) SHA1(2ce733203d628e299ec4fb93db8be1598b49142c) ) // write protect PROM
+	ROM_LOAD( "136012-022.k8",   0x0100, 0x0100, CRC(3353edce) SHA1(915308b11096fc1d02acf9b4af806a2a935dd748) ) // sync PROM
 ROM_END
 
 
-ROM_START( liberatr2 )
+ROM_START( liberatrp ) // no backstory text or fancy "ring of Saturn" title screen
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "l6.bin",       0x6000, 0x1000, CRC(78093d06) SHA1(0f6ca01e27b32aae384a6ab67a6f14eedd3f1d9c) )
 	ROM_LOAD( "l5.bin",       0x7000, 0x1000, CRC(988db636) SHA1(8fdd07b397d4bef108aafb10c06c2fd53fc1f99a) )
@@ -920,25 +920,25 @@ ROM_START( liberatr2 )
 	ROM_LOAD( "l3.bin",       0x9000, 0x1000, CRC(184c751f) SHA1(e020d2943be89f244c1aeeb34a28b7aa7dbc1454) )
 	ROM_LOAD( "l2.bin",       0xa000, 0x1000, CRC(c3f61f88) SHA1(a56ce094fe7374d3ac341d5eb9e06df083e16b1f) )
 	ROM_LOAD( "l1.bin",       0xb000, 0x1000, CRC(ef6e9f9e) SHA1(b1f7cc9e0a2ea08ec89428ad31161ac81e7faaaf) )
-	ROM_RELOAD(               0xf000, 0x1000 )      // for interrupt/reset vectors
+	ROM_RELOAD(               0xf000, 0x1000 ) // for interrupt/reset vectors
 
 	ROM_REGION( 0x4000, "planet", 0 ) // used at runtime
-	ROM_LOAD( "136012.110",   0x0000, 0x1000, CRC(6eb11221) SHA1(355b71812a18cbb2ee4dc20b3622fca1c96e4570) )
-	ROM_LOAD( "136012.107",   0x1000, 0x1000, CRC(8a616a63) SHA1(76794cc4e11048bb6f2628bd8b84c9a7e2e82551) )
-	ROM_LOAD( "136012.108",   0x2000, 0x1000, CRC(3f8e4cf6) SHA1(a9d0feb0892f343687e00b96f05adb423ee4d659) )
-	ROM_LOAD( "136012.109",   0x3000, 0x1000, CRC(dda0c0ef) SHA1(6e547c07c1abd17383a4389b0b4ced442ed65ce7) )
+	ROM_LOAD( "136012-110.p8",   0x0000, 0x1000, CRC(6eb11221) SHA1(355b71812a18cbb2ee4dc20b3622fca1c96e4570) )
+	ROM_LOAD( "136012-107.rs8",  0x1000, 0x1000, CRC(8a616a63) SHA1(76794cc4e11048bb6f2628bd8b84c9a7e2e82551) )
+	ROM_LOAD( "136012-108.mn8",  0x2000, 0x1000, CRC(3f8e4cf6) SHA1(a9d0feb0892f343687e00b96f05adb423ee4d659) )
+	ROM_LOAD( "136012-109.t8",   0x3000, 0x1000, CRC(dda0c0ef) SHA1(6e547c07c1abd17383a4389b0b4ced442ed65ce7) )
 
-	ROM_REGION( 0x100, "latitude_scaler", 0 )
-	ROM_LOAD_NIB_LOW ( "136012.123",   0x0000, 0x0100, CRC(b8c806e0) SHA1(19b1b9796e1e9a42899a92ec53288d17d5d15fb3) )
-	ROM_LOAD_NIB_HIGH( "136012.124",   0x0000, 0x0100, CRC(e51ec78f) SHA1(224237370c418361a00d62a77d39fa494e7d8831) )
+	ROM_REGION( 0x100, "latitude_scaler", 0 ) // latitude scaler
+	ROM_LOAD_NIB_LOW ( "136012-123.n6",   0x0000, 0x0100, CRC(b8c806e0) SHA1(19b1b9796e1e9a42899a92ec53288d17d5d15fb3) )
+	ROM_LOAD_NIB_HIGH( "136012-124.p6",   0x0000, 0x0100, CRC(e51ec78f) SHA1(224237370c418361a00d62a77d39fa494e7d8831) )
 
-	ROM_REGION( 0x100, "longitude_scaler", 0 )
-	ROM_LOAD_NIB_LOW ( "136012.125",   0x0000, 0x0100, CRC(52ac8dd9) SHA1(125d54b562d079b974f2562e71ab7c7a0b97e709) )
-	ROM_LOAD_NIB_HIGH( "136012.126",   0x0000, 0x0100, CRC(2e670aa6) SHA1(a6bcc49d0948d2dfe497c5e3ad4a834fa78f779a) )
+	ROM_REGION( 0x100, "longitude_scaler", 0 ) // longitude scaler
+	ROM_LOAD_NIB_LOW ( "136012-125.t7",   0x0000, 0x0100, CRC(52ac8dd9) SHA1(125d54b562d079b974f2562e71ab7c7a0b97e709) )
+	ROM_LOAD_NIB_HIGH( "136012-126.s7",   0x0000, 0x0100, CRC(2e670aa6) SHA1(a6bcc49d0948d2dfe497c5e3ad4a834fa78f779a) )
 
 	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "136012.021",   0x0000, 0x0100, CRC(ffdcd7bc) SHA1(2ce733203d628e299ec4fb93db8be1598b49142c) )    // write protect PROM
-	ROM_LOAD( "136012.022",   0x0100, 0x0100, CRC(3353edce) SHA1(915308b11096fc1d02acf9b4af806a2a935dd748) )    // sync PROM
+	ROM_LOAD( "136012-021.c5",   0x0000, 0x0100, CRC(ffdcd7bc) SHA1(2ce733203d628e299ec4fb93db8be1598b49142c) ) // write protect PROM
+	ROM_LOAD( "136012-022.k8",   0x0100, 0x0100, CRC(3353edce) SHA1(915308b11096fc1d02acf9b4af806a2a935dd748) ) // sync PROM
 ROM_END
 
 } // anonymous namespace
@@ -950,5 +950,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, liberatr,  0,        liberatr, liberatr, liberatr_state, empty_init, ROT0, "Atari", "Liberator (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, liberatr2, liberatr, liberat2, liberatr, liberatr_state, empty_init, ROT0, "Atari", "Liberator (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, liberatr,  0,        liberatr, liberatr, liberatr_state, empty_init, ROT0, "Atari", "Liberator (version 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, liberatrp, liberatr, liberatp, liberatr, liberatr_state, empty_init, ROT0, "Atari", "Liberator (prototype)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

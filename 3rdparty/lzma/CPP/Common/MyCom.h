@@ -4,7 +4,7 @@
 #define __MY_COM_H
 
 #include "MyWindows.h"
-#include "NewHandler.h"
+#include "MyTypes.h"
 
 #ifndef RINOK
 #define RINOK(x) { HRESULT __result_ = (x); if (__result_ != S_OK) return __result_; }
@@ -67,6 +67,7 @@ public:
   template <class Q>
   HRESULT QueryInterface(REFGUID iid, Q** pp) const throw()
   {
+    // if (*pp) throw 20220216; // for debug
     return _p->QueryInterface(iid, (void**)pp);
   }
 };
@@ -82,7 +83,7 @@ inline HRESULT StringToBstr(LPCOLESTR src, BSTR *bstr)
 class CMyComBSTR
 {
   BSTR m_str;
-
+  CLASS_NO_COPY(CMyComBSTR)
 public:
   CMyComBSTR(): m_str(NULL) {}
   ~CMyComBSTR() { ::SysFreeString(m_str); }
@@ -90,13 +91,23 @@ public:
   operator LPCOLESTR() const { return m_str; }
   // operator bool() const { return m_str != NULL; }
   // bool operator!() const { return m_str == NULL; }
+
+  void Wipe_and_Free()
+  {
+    if (m_str)
+    {
+      memset(m_str, 0, ::SysStringLen(m_str) * sizeof(*m_str));
+      Empty();
+    }
+  }
+
 private:
   // operator BSTR() const { return m_str; }
 
   CMyComBSTR(LPCOLESTR src) { m_str = ::SysAllocString(src); }
   // CMyComBSTR(int nSize) { m_str = ::SysAllocStringLen(NULL, nSize); }
   // CMyComBSTR(int nSize, LPCOLESTR sz) { m_str = ::SysAllocStringLen(sz, nSize);  }
-  CMyComBSTR(const CMyComBSTR& src) { m_str = src.MyCopy(); }
+  // CMyComBSTR(const CMyComBSTR& src) { m_str = src.MyCopy(); }
   
   /*
   CMyComBSTR(REFGUID src)
@@ -108,6 +119,7 @@ private:
   }
   */
   
+  /*
   CMyComBSTR& operator=(const CMyComBSTR& src)
   {
     if (m_str != src.m_str)
@@ -118,6 +130,7 @@ private:
     }
     return *this;
   }
+  */
   
   CMyComBSTR& operator=(LPCOLESTR src)
   {
@@ -158,16 +171,48 @@ private:
   }
 };
 
-//////////////////////////////////////////////////////////
+
+class CMyComBSTR_Wipe: public CMyComBSTR
+{
+  CLASS_NO_COPY(CMyComBSTR_Wipe)
+public:
+  CMyComBSTR_Wipe(): CMyComBSTR() {}
+  ~CMyComBSTR_Wipe() { Wipe_and_Free(); }
+};
+
+
+
+/*
+  If CMyUnknownImp doesn't use virtual destructor, the code size is smaller.
+  But if some class_1 derived from CMyUnknownImp
+    uses MY_ADDREF_RELEASE and IUnknown::Release()
+    and some another class_2 is derived from class_1,
+    then class_1 must use virtual destructor:
+      virtual ~class_1();
+    In that case, class_1::Release() calls correct destructor of class_2.
+
+  We use virtual ~CMyUnknownImp() to disable warning
+    "class has virtual functions, but destructor is not virtual".
+
+  also we can use virtual ~IUnknown() {} in MyWindows.h
+*/
 
 class CMyUnknownImp
 {
+  CLASS_NO_COPY(CMyUnknownImp)
 public:
   ULONG __m_RefCount;
   CMyUnknownImp(): __m_RefCount(0) {}
 
-  // virtual ~CMyUnknownImp() {};
+  #ifdef _WIN32
+  #if defined(__GNUC__) || defined(__clang__)
+  virtual // to disable GCC/CLANG varnings
+  #endif
+  #endif
+  ~CMyUnknownImp() {}
 };
+
+
 
 #define MY_QUERYINTERFACE_BEGIN STDMETHOD(QueryInterface) \
 (REFGUID iid, void **outObject) throw() { *outObject = NULL;
@@ -186,8 +231,8 @@ public:
 
 #define MY_ADDREF_RELEASE \
 STDMETHOD_(ULONG, AddRef)() throw() { return ++__m_RefCount; } \
-STDMETHOD_(ULONG, Release)() { if (--__m_RefCount != 0)  \
-  return __m_RefCount; delete this; return 0; }
+STDMETHOD_(ULONG, Release)() { if (--__m_RefCount != 0) return __m_RefCount; \
+    delete this; return 0; }
 
 #define MY_UNKNOWN_IMP_SPEC(i) \
   MY_QUERYINTERFACE_BEGIN \

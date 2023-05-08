@@ -1,8 +1,8 @@
 /** @file patest_maxsines.c
-	@ingroup test_src
-	@brief How many sine waves can we calculate and play in less than 80% CPU Load.
-	@author Ross Bencina <rossb@audiomulch.com>
-	@author Phil Burk <philburk@softsynth.com>
+    @ingroup test_src
+    @brief How many sine waves can we calculate and play in less than 80% CPU Load.
+    @author Ross Bencina <rossb@audiomulch.com>
+    @author Phil Burk <philburk@softsynth.com>
 */
 /*
  * $Id$
@@ -32,13 +32,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -110,7 +110,7 @@ static int patestCallback(const void*                     inputBuffer,
     numForScale = data->numSines;
     if( numForScale < 8 ) numForScale = 8;  /* prevent pops at beginning */
     scaler = 1.0f / numForScale;
-    
+
     for( i=0; i<framesPerBuffer; i++ )
     {
         float output = 0.0;
@@ -123,9 +123,9 @@ static int patestCallback(const void*                     inputBuffer,
             phase += phaseInc;
             if( phase >= 1.0 ) phase -= 1.0;
 
-            output += LookupSine(data, phase); 
+            output += LookupSine(data, phase);
             data->phases[j] = phase;
-            
+
             phaseInc *= 1.02f;
             if( phaseInc > MAX_PHASE_INC ) phaseInc = MIN_PHASE_INC;
         }
@@ -141,7 +141,7 @@ static int patestCallback(const void*                     inputBuffer,
 int main(void);
 int main(void)
 {
-	int                 i;
+    int                 i;
     PaStream*           stream;
     PaStreamParameters  outputParameters;
     PaError             err;
@@ -162,8 +162,8 @@ int main(void)
         goto error;
     outputParameters.device                    = Pa_GetDefaultOutputDevice(); /* Default output device. */
     if (outputParameters.device == paNoDevice) {
-      fprintf(stderr,"Error: No default output device.\n");
-      goto error;
+        fprintf(stderr,"Error: No default output device.\n");
+        goto error;
     }
     outputParameters.channelCount              = 2;                           /* Stereo output. */
     outputParameters.sampleFormat              = paFloat32;                   /* 32 bit floating point output. */
@@ -209,7 +209,7 @@ int main(void)
     return err;
 error:
     Pa_Terminate();
-    fprintf( stderr, "An error occured while using the portaudio stream\n" );
+    fprintf( stderr, "An error occurred while using the portaudio stream\n" );
     fprintf( stderr, "Error number: %d\n", err );
     fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
     return err;

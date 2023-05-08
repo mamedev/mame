@@ -227,6 +227,7 @@ const double XTAL::known_xtals[] = {
 	 13'516'800, /* 13.5168_MHz_XTAL       Kontron KDT6 */
 	 13'608'000, /* 13.608_MHz_XTAL        TeleVideo 910 & 925 */
 	 13'824'000, /* 13.824_MHz_XTAL        Robotron PC-1715 display circuit */
+	 13'977'600, /* 13.9776_MHz_XTAL       Kaypro II dot clock */
 	 14'000'000, /* 14_MHz_XTAL            - */
 	 14'112'000, /* 14.112_MHz_XTAL        Timex/Sinclair TS2068 */
 	 14'192'640, /* 14.19264_MHz_XTAL      Central Data 2650 */
@@ -241,6 +242,7 @@ const double XTAL::known_xtals[] = {
 	 14'742'800, /* 14.7428_MHz_XTAL       ADM 23 */
 	 14'745'000, /* 14.745_MHz_XTAL        Synertek KTM-3 */
 	 14'745'600, /* 14.7456_MHz_XTAL       Namco System 12 & System Super 22/23 for JVS */
+	 14'746'000, /* 14.746_MHz_XTAL        Namco System 10 MGEXIO */
 	 14'784'000, /* 14.784_MHz_XTAL        Zenith Z-29 */
 	 14'916'000, /* 14.916_MHz_XTAL        ADDS Viewpoint 122 */
 	 14'976'000, /* 14.976_MHz_XTAL        CIT-101 80-column display clock */

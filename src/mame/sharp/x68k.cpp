@@ -125,9 +125,8 @@
 #include "bus/x68k/x68k_neptunex.h"
 #include "bus/x68k/x68k_scsiext.h"
 #include "bus/x68k/x68k_midi.h"
-#include "bus/scsi/scsi.h"
-#include "bus/scsi/scsihd.h"
-#include "bus/scsi/scsicd.h"
+#include "bus/nscsi/hd.h"
+#include "bus/nscsi/cd.h"
 
 #include "softlist.h"
 #include "speaker.h"
@@ -1036,7 +1035,7 @@ void x68ksupr_state::x68kxvi_map(address_map &map)
 	map(0xe82200, 0xe823ff).rw(m_pcgpalette, FUNC(palette_device::read16), FUNC(palette_device::write16)).share("pcgpalette");
 	map(0xe92001, 0xe92001).rw(m_okim6258, FUNC(okim6258_device::status_r), FUNC(okim6258_device::ctrl_w));
 	map(0xe92003, 0xe92003).rw(m_okim6258, FUNC(okim6258_device::status_r), FUNC(okim6258_device::data_w));
-	map(0xe96020, 0xe9603f).rw(m_scsictrl, FUNC(mb89352_device::mb89352_r), FUNC(mb89352_device::mb89352_w)).umask16(0x00ff);
+	map(0xe96020, 0xe9603f).m(m_scsictrl, FUNC(mb89352_device::map)).umask16(0x00ff);
 	map(0xea0000, 0xea1fff).rw(FUNC(x68ksupr_state::exp_r), FUNC(x68ksupr_state::exp_w));  // external SCSI ROM and controller
 	map(0xeafa80, 0xeafa89).rw(FUNC(x68ksupr_state::areaset_r), FUNC(x68ksupr_state::enh_areaset_w));
 	map(0xfc0000, 0xfdffff).rom();  // internal SCSI ROM
@@ -1051,7 +1050,7 @@ void x68030_state::x68030_map(address_map &map)
 //  map(0xe8c000, 0xe8dfff).rw(FUNC(x68k_state::x68k_printer_r), FUNC(x68k_state::x68k_printer_w));
 	map(0xe92000, 0xe92003).r(m_okim6258, FUNC(okim6258_device::status_r)).umask32(0x00ff00ff).w(FUNC(x68030_state::adpcm_w)).umask32(0x00ff00ff);
 
-	map(0xe96020, 0xe9603f).rw(m_scsictrl, FUNC(mb89352_device::mb89352_r), FUNC(mb89352_device::mb89352_w)).umask32(0x00ff00ff);
+	map(0xe96020, 0xe9603f).m(m_scsictrl, FUNC(mb89352_device::map)).umask32(0x00ff00ff);
 	map(0xea0000, 0xea1fff).noprw();//.rw(FUNC(x68030_state::exp_r), FUNC(x68030_state::exp_w));  // external SCSI ROM and controller
 	map(0xeafa80, 0xeafa8b).rw(FUNC(x68030_state::areaset_r), FUNC(x68030_state::enh_areaset_w));
 	map(0xfc0000, 0xfdffff).rom();  // internal SCSI ROM
@@ -1361,23 +1360,33 @@ void x68k_state::x68000(machine_config &config)
 	X68KHDC(config, "x68k_hdc", 0);
 }
 
+static void scsi_devices(device_slot_interface &device)
+{
+	device.option_add("harddisk", NSCSI_HARDDISK);
+	device.option_add("cdrom", NSCSI_CDROM);
+}
+
 void x68ksupr_state::x68ksupr_base(machine_config &config)
 {
 	x68000_base(config);
 
-	scsi_port_device &scsi(SCSI_PORT(config, "scsi"));
-	scsi.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
-	scsi.set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));
-	scsi.set_slot_device(3, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_2));
-	scsi.set_slot_device(4, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_3));
-	scsi.set_slot_device(5, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_4));
-	scsi.set_slot_device(6, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_5));
-	scsi.set_slot_device(7, "cdrom", SCSICD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_6));
+	NSCSI_BUS(config, "scsi");
+	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("spc", MB89352).machine_config(
+		[this](device_t *device)
+		{
+			mb89352_device &spc = downcast<mb89352_device &>(*device);
 
-	MB89352A(config, m_scsictrl, 40_MHz_XTAL / 8);
-	m_scsictrl->set_scsi_port("scsi");
-	m_scsictrl->irq_cb().set(FUNC(x68ksupr_state::scsi_irq));
-	m_scsictrl->drq_cb().set(FUNC(x68ksupr_state::scsi_drq));
+			spc.set_clock(40_MHz_XTAL / 8);
+			spc.out_irq_callback().set(*this, FUNC(x68ksupr_state::scsi_irq));
+			spc.out_dreq_callback().set(*this, FUNC(x68ksupr_state::scsi_drq));
+		});
 
 	VICON(config, m_crtc, 38.86363_MHz_XTAL);
 	m_crtc->set_clock_69m(69.55199_MHz_XTAL);
@@ -1411,7 +1420,7 @@ void x68030_state::x68030(machine_config &config)
 
 	m_hd63450->set_clock(50_MHz_XTAL / 4);
 	m_scc->set_clock(20_MHz_XTAL / 4);
-	m_scsictrl->set_clock(20_MHz_XTAL / 4);
+	//m_scsictrl->set_clock(20_MHz_XTAL / 4);
 
 	m_crtc->set_clock_50m(50.35_MHz_XTAL);
 }

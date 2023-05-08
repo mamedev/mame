@@ -62,7 +62,7 @@ class msx2_state : public msx2_base_state
 {
 public:
 	msx2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: msx2_base_state(mconfig, type, tag)
+		: msx2_base_state(mconfig, type, tag, 21.477272_MHz_XTAL, 6)
 	{
 	}
 
@@ -3746,7 +3746,7 @@ void msx2_state::cx7128(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom");
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_MINICART, "minicart", 3, 1, msx_yamaha_minicart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000).set_unused_bits(0x80);   // 64KB Mapper RAM
-	add_cartridge_slot<4>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, 3, msx_yamaha_60pin, nullptr);
+	add_cartridge_slot<4>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, nullptr);
 
 	msx2(SND_YM2149, config, REGION_JAPAN);
 	SOFTWARE_LIST(config, "minicart_list").set_original("msx_yamaha_minicart");
@@ -3775,7 +3775,7 @@ void msx2_state::cx7m128(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom");
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_MINICART, "minicart", 3, 1, msx_yamaha_minicart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000).set_unused_bits(0x80);   // 64KB Mapper RAM
-	add_cartridge_slot<4>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, 3, msx_yamaha_60pin, "sfg05");
+	add_cartridge_slot<4>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, "sfg05");
 
 	msx2(SND_YM2149, config, REGION_JAPAN);
 	SOFTWARE_LIST(config, "minicart_list").set_original("msx_yamaha_minicart");
@@ -3858,7 +3858,7 @@ void msx2_state::yis604(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_MINICART, "minicart", 3, 1, msx_yamaha_minicart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000); // 128KB Mapper RAM
-	add_cartridge_slot<4>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, 3, msx_yamaha_60pin, nullptr);
+	add_cartridge_slot<4>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, nullptr);
 
 	msx2(SND_YM2149, config, REGION_JAPAN);
 	SOFTWARE_LIST(config, "minicart_list").set_original("msx_yamaha_minicart");
@@ -3896,7 +3896,7 @@ void msx2_state::y805128(machine_config &config)
 	add_internal_disk_mirrored(config, MSX_SLOT_DISK11_WD2793, "disk", 3, 0, 1, 2, "diskrom");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000); // 128KB Mapper RAM
 	// Default: SKW-05
-	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, 3, msx_yamaha_60pin, nullptr);
+	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, nullptr);
 
 	MSX_S1985(config, "s1985", 0);
 	msx2(SND_YM2149, config, REGION_JAPAN);
@@ -3935,7 +3935,7 @@ void msx2_state::y805256(machine_config &config)
 	add_internal_disk_mirrored(config, MSX_SLOT_DISK1_WD2793_2_DRIVES, "disk", 3, 0, 1, 2, "diskrom");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x40000); // 256KB Mapper RAM
 	// Default: SKW-05
-	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, 3, msx_yamaha_60pin, nullptr);
+	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, nullptr);
 
 	MSX_S1985(config, "s1985", 0);
 	msx2(SND_YM2149, config, REGION_JAPAN);

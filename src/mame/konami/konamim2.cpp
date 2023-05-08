@@ -286,9 +286,6 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	void update_disc();
 
 public:
 	DECLARE_WRITE_LINE_MEMBER(ppc1_int);
@@ -322,9 +319,6 @@ public:
 		if (!(data & 0x8000))
 		{
 			logerror("ATAPI RESET!\n");
-
-			// TODO: Do we need any of this?
-			update_disc();
 		}
 	}
 
@@ -696,34 +690,6 @@ void konamim2_state::machine_start()
 	{
 		using namespace std::placeholders;
 		machine().debugger().console().register_command("m2", CMDFLAG_NONE, 1, 4, std::bind(&konamim2_state::debug_commands, this, _1));
-	}
-}
-
-void konamim2_state::machine_reset()
-{
-	update_disc();
-}
-
-void konamim2_state::update_disc()
-{
-	cdrom_file *new_cdrom = m_available_cdroms;
-
-	atapi_hle_device *image = subdevice<atapi_hle_device>("ata:0:cr589");
-	if (image != nullptr)
-	{
-		void *current_cdrom = nullptr;
-		image->GetDevice(&current_cdrom);
-
-		if (current_cdrom != new_cdrom)
-		{
-			current_cdrom = new_cdrom;
-
-			image->SetDevice(new_cdrom);
-		}
-	}
-	else
-	{
-		abort();
 	}
 }
 

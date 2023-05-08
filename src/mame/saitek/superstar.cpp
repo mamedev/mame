@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Berger
-/******************************************************************************
+/*******************************************************************************
 
 SciSys Superstar / Turbostar
 Starting from Turbostar 432, SciSys started adding the "Kasparov" prefix.
@@ -36,7 +36,7 @@ so the internal chess clock would run too fast.
 TODO:
 - verify sstar28k CPU speed
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -104,9 +104,9 @@ void star_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void star_state::control_w(u8 data)
 {
@@ -138,9 +138,9 @@ u8 star_state::input_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void star_state::sstar28k_map(address_map &map)
 {
@@ -161,9 +161,9 @@ void star_state::tstar432_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( sstar28k )
 	PORT_START("IN.0")
@@ -189,13 +189,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void star_state::sstar28k(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M6502(config, m_maincpu, 2000000); // no XTAL
 	m_maincpu->set_addrmap(AS_PROGRAM, &star_state::sstar28k_map);
 
@@ -206,11 +206,11 @@ void star_state::sstar28k(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 3);
 	config.set_default_layout(layout_saitek_sstar28k);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
@@ -219,7 +219,7 @@ void star_state::tstar432(machine_config &config)
 {
 	sstar28k(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	R65C02(config.replace(), m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &star_state::tstar432_map);
 
@@ -228,7 +228,7 @@ void star_state::tstar432(machine_config &config)
 
 	config.set_default_layout(layout_saitek_tstar432);
 
-	/* extension rom */
+	// extension rom
 	GENERIC_SOCKET(config, "extrom", generic_plain_slot, "saitek_kso");
 	SOFTWARE_LIST(config, "cart_list").set_original("saitek_kso");
 }
@@ -237,7 +237,7 @@ void star_state::sstar36k(machine_config &config)
 {
 	tstar432(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	M6502(config.replace(), m_maincpu, 2_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &star_state::tstar432_map);
 
@@ -247,9 +247,9 @@ void star_state::sstar36k(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( sstar28k )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -279,13 +279,13 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME       PARENT  COMP MACHINE   INPUT     STATE       INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1983, sstar28k,  0,        0, sstar28k, sstar28k, star_state, empty_init, "SciSys", "Superstar 28K", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     CLASS       INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1983, sstar28k,  0,        0,      sstar28k, sstar28k, star_state, empty_init, "SciSys", "Superstar 28K", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1985, tstar432,  0,        0, tstar432, sstar28k, star_state, empty_init, "SciSys", "Kasparov Turbostar 432 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1985, tstar432a, tstar432, 0, tstar432, sstar28k, star_state, empty_init, "SciSys", "Kasparov Turbostar 432 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1985, sstar36k,  tstar432, 0, sstar36k, sstar28k, star_state, empty_init, "SciSys", "Superstar 36K", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, tstar432,  0,        0,      tstar432, sstar28k, star_state, empty_init, "SciSys", "Kasparov Turbostar 432 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, tstar432a, tstar432, 0,      tstar432, sstar28k, star_state, empty_init, "SciSys", "Kasparov Turbostar 432 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, sstar36k,  tstar432, 0,      sstar36k, sstar28k, star_state, empty_init, "SciSys", "Superstar 36K", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

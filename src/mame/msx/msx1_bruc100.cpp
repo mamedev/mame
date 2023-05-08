@@ -35,7 +35,7 @@ private:
 
 
 bruc100_state::bruc100_state(const machine_config &mconfig, device_type type, const char *tag)
-	: msx_state(mconfig, type, tag)
+	: msx_state(mconfig, type, tag, 10.738635_MHz_XTAL, 3)
 	, m_bruc100_firm(*this, "firm")
 {
 }

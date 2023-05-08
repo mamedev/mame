@@ -24,6 +24,7 @@
 #include "machine/pci.h"
 #include "machine/pci-ide.h"
 #include "machine/ram.h"
+#include "awacs_macrisc.h"
 #include "cuda.h"
 #include "heathrow.h"
 #include "macadb.h"
@@ -35,7 +36,7 @@ public:
 
 	pwrmacg3_state(const machine_config &mconfig, device_type type, const char *tag);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<ppc_device> m_maincpu;
 	required_device<mpc106_host_device> m_mpc106;
 	required_device<cuda_device> m_cuda;
 	required_device<macadb_device> m_macadb;
@@ -52,6 +53,11 @@ private:
 	{
 		m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 		m_maincpu->set_input_line(INPUT_LINE_RESET, state);
+	}
+
+	WRITE_LINE_MEMBER(irq_w)
+	{
+		m_maincpu->set_input_line(PPC_IRQ, state);
 	}
 };
 
@@ -115,7 +121,8 @@ void pwrmacg3_state::pwrmacg3_map(address_map &map)
 
 void pwrmacg3_state::pwrmacg3(machine_config &config)
 {
-	PPC604(config, m_maincpu, 66000000);    // actually PPC750
+	PPC740(config, m_maincpu, 66000000);    // actually 233 MHz
+	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pwrmacg3_state::pwrmacg3_map);
 
 	PCI_ROOT(config, "pci", 0);
@@ -123,6 +130,7 @@ void pwrmacg3_state::pwrmacg3(machine_config &config)
 
 	heathrow_device &heathrow(HEATHROW(config, "pci:10.0", 0));
 	heathrow.set_maincpu_tag("maincpu");
+	heathrow.set_pci_root_tag(":pci:00.0", AS_DATA);
 
 	MACADB(config, m_macadb, 15.6672_MHz_XTAL);
 
@@ -134,6 +142,7 @@ void pwrmacg3_state::pwrmacg3(machine_config &config)
 	m_macadb->adb_data_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
 	config.set_perfect_quantum(m_maincpu);
 
+	heathrow.irq_callback().set(FUNC(pwrmacg3_state::irq_w));
 	heathrow.pb3_callback().set(m_cuda, FUNC(cuda_device::get_treq));
 	heathrow.pb4_callback().set(m_cuda, FUNC(cuda_device::set_byteack));
 	heathrow.pb5_callback().set(m_cuda, FUNC(cuda_device::set_tip));
@@ -163,6 +172,17 @@ void pwrmacg3_state::pwrmacg3(machine_config &config)
 	RAM(config, m_ram);
 	m_ram->set_default_size("32M");
 	m_ram->set_extra_options("32M,64M,96M,128M,256M");
+
+	screamer_device &screamer(SCREAMER(config, "codec", 45.1584_MHz_XTAL / 2));
+	screamer.dma_output().set(heathrow, FUNC(heathrow_device::codec_dma_read));
+
+	heathrow.codec_r_callback().set(screamer, FUNC(screamer_device::read_macrisc));
+	heathrow.codec_w_callback().set(screamer, FUNC(screamer_device::write_macrisc));
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	screamer.add_route(0, "lspeaker", 1.0);
+	screamer.add_route(1, "rspeaker", 1.0);
 }
 
 /*

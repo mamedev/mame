@@ -62,13 +62,9 @@ private:
 };
 
 // device type definitions - CoCo FDC
-DECLARE_DEVICE_TYPE(COCO_FDC,       coco_family_fdc_device_base)
-DECLARE_DEVICE_TYPE(COCO_FDC_V11,   coco_family_fdc_device_base)
-DECLARE_DEVICE_TYPE(COCO_SCII_CC1,  coco_family_fdc_device_base)
-DECLARE_DEVICE_TYPE(COCO_SCII_CC3,  coco_family_fdc_device_base)
-DECLARE_DEVICE_TYPE(COCO3_HDB1,     coco_family_fdc_device_base)
-DECLARE_DEVICE_TYPE(COCO2_HDB1,     coco_family_fdc_device_base)
-DECLARE_DEVICE_TYPE(CP450_FDC,      coco_family_fdc_device_base)
-DECLARE_DEVICE_TYPE(CD6809_FDC,     coco_family_fdc_device_base)
+DECLARE_DEVICE_TYPE(COCO_FDC,   coco_family_fdc_device_base)
+DECLARE_DEVICE_TYPE(COCO_SCII,  coco_family_fdc_device_base)
+DECLARE_DEVICE_TYPE(CP450_FDC,  coco_family_fdc_device_base)
+DECLARE_DEVICE_TYPE(CD6809_FDC, coco_family_fdc_device_base)
 
 #endif // MAME_BUS_COCO_COCO_FDC_H

@@ -12,6 +12,8 @@
 
 #include "emu.h"
 
+#include "cbm_snqk.h"
+
 #include "bus/cbm2/exp.h"
 #include "bus/cbm2/user.h"
 #include "bus/ieee488/ieee488.h"
@@ -20,7 +22,7 @@
 #include "bus/vcs_ctrl/ctrl.h"
 #include "cpu/m6502/m6509.h"
 #include "cpu/i86/i86.h"
-#include "cbm_snqk.h"
+#include "imagedev/snapquik.h"
 #include "machine/6525tpi.h"
 #include "machine/ds75160a.h"
 #include "machine/ds75161a.h"

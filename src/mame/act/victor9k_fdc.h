@@ -58,8 +58,6 @@ protected:
 private:
 	static const int rpm[0x100];
 
-	void add_floppy_drive(machine_config &config, const char *_tag);
-
 	enum
 	{
 		LED_A = 0,
@@ -112,8 +110,7 @@ private:
 	required_device<via6522_device> m_via4;
 	required_device<via6522_device> m_via5;
 	required_device<via6522_device> m_via6;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_memory_region m_gcr_rom;
 	output_finder<2> m_leds;
 
@@ -131,19 +128,13 @@ private:
 	uint8_t m_p2;
 
 	/* floppy state */
-	uint8_t m_da;
-	uint8_t m_da0;
-	uint8_t m_da1;
-	int m_start0;
-	int m_stop0;
-	int m_start1;
-	int m_stop1;
-	int m_sel0;
-	int m_sel1;
-	int m_tach0;
-	int m_tach1;
-	int m_rdy0;
-	int m_rdy1;
+	uint8_t m_data;
+	uint8_t m_da[2];
+	int m_start[2];
+	int m_stop[2];
+	int m_sel[2];
+	int m_tach[2];
+	int m_rdy[2];
 	int m_scp_rdy0;
 	int m_scp_rdy1;
 	int m_via_rdy0;
@@ -152,10 +143,8 @@ private:
 	uint8_t m_scp_l1ms;
 	uint8_t m_via_l0ms;
 	uint8_t m_via_l1ms;
-	int m_st0;
-	int m_st1;
-	int m_stp0;
-	int m_stp1;
+	int m_st[2];
+	int m_stp[2];
 	int m_drive;
 	int m_side;
 	int m_drw;
@@ -171,7 +160,7 @@ private:
 
 	live_info cur_live, checkpoint_live;
 	fdc_pll_t cur_pll, checkpoint_pll;
-	emu_timer *t_gen, *t_tach0, *t_tach1;
+	emu_timer *t_gen, *t_tach[2];
 
 	floppy_image_device* get_floppy();
 	void live_start();

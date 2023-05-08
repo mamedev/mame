@@ -111,7 +111,6 @@ public:
 		, m_floppy0(*this, "0")
 		, m_hdd(*this, "hdd")
 		, m_floppy(nullptr)
-		, m_hdd_file(nullptr)
 		, m_output_cursor(*this, "output_timing_cursor")
 		, m_output_hlines(*this, "output_timing_hlines")
 		, m_output_hflags(*this, "output_timing_hflags")
@@ -240,9 +239,6 @@ private:
 	uint8_t m_fdd_track;
 	uint8_t m_fdd_side;
 	fdc_pll_t m_fdd_pll;
-
-	// Hard Disk
-	hard_disk_file *m_hdd_file;
 
 	// Timers
 	emu_timer *m_diskseq_complete_clk;
@@ -998,9 +994,6 @@ void dpb7000_state::machine_reset()
 	m_fdd_pll.set_clock(attotime::from_hz(1000000));
 	m_fdd_pll.reset(machine().time());
 	m_floppy = nullptr;
-
-	// Hard Disc Handling
-	m_hdd_file = m_hdd->get_hard_disk_file();
 
 	// Disc Data Buffer Card
 	m_diskbuf_ram_addr = 0;
@@ -2409,7 +2402,7 @@ TIMER_CALLBACK_MEMBER(dpb7000_state::execute_hdd_command)
 	int head_index = m_diskseq_cmd_word_from_cpu & 0xf;
 	int image_lba = SECTORS_PER_TRACK * head_count * (int)m_diskseq_cyl_from_cpu + SECTORS_PER_TRACK * head_index;
 
-	if (m_hdd_file != nullptr)
+	if (m_hdd->exists())
 	{
 		if (m_diskseq_cyl_write_pending)
 		{
@@ -2420,14 +2413,14 @@ TIMER_CALLBACK_MEMBER(dpb7000_state::execute_hdd_command)
 			{
 				for (int sector = start_sector; sector < 19200 / 256; sector++, image_lba++)
 				{
-					m_hdd_file->read(image_lba, sector_buffer);
+					m_hdd->read(image_lba, sector_buffer);
 					for (int stride_idx = 0; stride_idx < 256; stride_idx += 2)
 					{
 						sector_buffer[stride_idx] = m_diskbuf_ram[ram_addr];
 						ram_addr += 2;
 					}
 					LOGMASKED(LOG_HDD, "Performing write to LBA %d: Cylinder %03x, head %x, command word %03x, Stride 2 (RAM address %04x, offset %04x)\n", image_lba, m_diskseq_cyl_from_cpu, head_index, m_diskseq_cmd_word_from_cpu, m_diskbuf_ram_addr, sector * 256);
-					m_hdd_file->write(image_lba, sector_buffer);
+					m_hdd->write(image_lba, sector_buffer);
 				}
 			}
 			else
@@ -2442,7 +2435,7 @@ TIMER_CALLBACK_MEMBER(dpb7000_state::execute_hdd_command)
 							sector_buffer[i + 0] = process_byte_to_disc();
 							sector_buffer[i + 1] = process_byte_to_disc();
 						}
-						m_hdd_file->write(image_lba, sector_buffer);
+						m_hdd->write(image_lba, sector_buffer);
 					}
 				}
 				else
@@ -2450,7 +2443,7 @@ TIMER_CALLBACK_MEMBER(dpb7000_state::execute_hdd_command)
 					for (int sector = start_sector; sector < 19200 / 256; sector++, image_lba++)
 					{
 						LOGMASKED(LOG_HDD, "Performing write to LBA %d: Cylinder %03x, head %x, command word %03x (RAM address %04x, offset %04x)\n", image_lba, m_diskseq_cyl_from_cpu, head_index, m_diskseq_cmd_word_from_cpu, m_diskbuf_ram_addr, sector * 256);
-						m_hdd_file->write(image_lba, m_diskbuf_ram + sector * 256);
+						m_hdd->write(image_lba, m_diskbuf_ram + sector * 256);
 					}
 				}
 			}
@@ -2464,7 +2457,7 @@ TIMER_CALLBACK_MEMBER(dpb7000_state::execute_hdd_command)
 				for (int sector = 0; sector < 19200 / 256; sector++, image_lba++)
 				{
 					LOGMASKED(LOG_HDD, "Performing read of LBA %d: Cylinder %03x, head %x, command word %03x\n", image_lba, m_diskseq_cyl_from_cpu, head_index, m_diskseq_cmd_word_from_cpu);
-					m_hdd_file->read(image_lba, sector_buffer);
+					m_hdd->read(image_lba, sector_buffer);
 					for (int clear_idx = 0; clear_idx < 256; clear_idx += 2)
 					{
 						sector_buffer[clear_idx] = 0;
@@ -2489,7 +2482,7 @@ TIMER_CALLBACK_MEMBER(dpb7000_state::execute_hdd_command)
 				if (partial_bytes && !BIT(m_diskseq_cmd, 2))
 				{
 					LOGMASKED(LOG_HDD, "Performing partial read of sector into disk buffer address %04x\n", m_diskbuf_ram_addr);
-					m_hdd_file->read(image_lba, sector_buffer);
+					m_hdd->read(image_lba, sector_buffer);
 					memcpy(m_diskbuf_ram + m_diskbuf_ram_addr, sector_buffer + partial_bytes, 0x100 - partial_bytes);
 					m_diskbuf_ram_addr += 0x100;
 					m_diskbuf_ram_addr &= 0xff00;
@@ -2501,7 +2494,7 @@ TIMER_CALLBACK_MEMBER(dpb7000_state::execute_hdd_command)
 					LOGMASKED(LOG_HDD, "Performing read of LBA %d: Cylinder %03x, head %x, command word %03x\n", image_lba, m_diskseq_cyl_from_cpu, head_index, m_diskseq_cmd_word_from_cpu);
 					if (BIT(m_diskseq_cmd, 2))
 					{
-						m_hdd_file->read(image_lba, sector_buffer);
+						m_hdd->read(image_lba, sector_buffer);
 						for (int i = 0; i < 256; i++)
 						{
 							process_byte_from_disc(sector_buffer[i]);
@@ -2509,7 +2502,7 @@ TIMER_CALLBACK_MEMBER(dpb7000_state::execute_hdd_command)
 					}
 					else
 					{
-						m_hdd_file->read(image_lba, m_diskbuf_ram + sector * 256);
+						m_hdd->read(image_lba, m_diskbuf_ram + sector * 256);
 					}
 				}
 			}

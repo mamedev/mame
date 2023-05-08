@@ -1,8 +1,8 @@
 /** @file pa_minlat.c
-	@ingroup test_src
+    @ingroup test_src
     @brief Experiment with different numbers of buffers to determine the
-	minimum latency for a computer.
-	@author Phil Burk  http://www.softsynth.com
+    minimum latency for a computer.
+    @author Phil Burk  http://www.softsynth.com
 */
 /*
  * $Id$
@@ -32,13 +32,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -107,7 +107,7 @@ int main( int argc, char **argv )
     int    framesPerBuffer;
     double sampleRate = 44100.0;
     char   str[256];
-	char  *line;
+    char  *line;
 
     printf("pa_minlat - Determine minimum latency for your computer.\n");
     printf("  usage:         pa_minlat {userBufferSize}\n");
@@ -136,7 +136,7 @@ int main( int argc, char **argv )
         outputParameters.sampleFormat              = paFloat32;                   /* 32 bit floating point output. */
         outputParameters.suggestedLatency          = (double)outLatency / sampleRate; /* In seconds. */
         outputParameters.hostApiSpecificStreamInfo = NULL;
-        
+
         printf("Latency = %d frames = %6.1f msec.\n", outLatency, outputParameters.suggestedLatency * 1000.0 );
 
         err = Pa_OpenStream(
@@ -159,33 +159,33 @@ int main( int argc, char **argv )
         printf("\nMove windows around to see if the sound glitches.\n");
         printf("Latency now %d, enter new number of frames, or 'q' to quit: ", outLatency );
         line = fgets( str, 256, stdin );
-		if( line == NULL )
-		{
-			go = 0;
-		}
-		else
-		{
-			{
-				/* Get rid of newline */
-				size_t l = strlen( str ) - 1;
-				if( str[ l ] == '\n')
-					str[ l ] = '\0';
-			}
-			
-			
-			if( str[0] == 'q' ) go = 0;
-			else
-			{
-				outLatency = atol( str );
-				if( outLatency < minLatency )
-				{
-					printf( "Latency below minimum of %d! Set to minimum!!!\n", minLatency );
-					outLatency = minLatency;
-				}
-			}
-			
-		}
-		/* Stop sound until ENTER hit. */
+        if( line == NULL )
+        {
+            go = 0;
+        }
+        else
+        {
+            {
+                /* Get rid of newline */
+                size_t l = strlen( str ) - 1;
+                if( str[ l ] == '\n')
+                    str[ l ] = '\0';
+            }
+
+
+            if( str[0] == 'q' ) go = 0;
+            else
+            {
+                outLatency = atol( str );
+                if( outLatency < minLatency )
+                {
+                    printf( "Latency below minimum of %d! Set to minimum!!!\n", minLatency );
+                    outLatency = minLatency;
+                }
+            }
+
+        }
+        /* Stop sound until ENTER hit. */
         err = Pa_StopStream( stream );
         if( err != paNoError ) goto error;
         err = Pa_CloseStream( stream );
@@ -198,7 +198,7 @@ int main( int argc, char **argv )
     return 0;
 error:
     Pa_Terminate();
-    fprintf( stderr, "An error occured while using the portaudio stream\n" );
+    fprintf( stderr, "An error occurred while using the portaudio stream\n" );
     fprintf( stderr, "Error number: %d\n", err );
     fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
     return 1;

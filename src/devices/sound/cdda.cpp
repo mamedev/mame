@@ -58,9 +58,9 @@ void cdda_device::device_start()
     given CDDA stream
 -------------------------------------------------*/
 
-void cdda_device::set_cdrom(void *file)
+void cdda_device::set_cdrom(cdrom_image_device *file)
 {
-	m_disc = (cdrom_file *)file;
+	m_disc = file;
 }
 
 

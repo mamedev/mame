@@ -10,19 +10,23 @@
 */
 
 #include "emu.h"
-#include "screen.h"
-#include "softlist_dev.h"
-#include "speaker.h"
+
+#include "cbm_snqk.h"
+
 #include "bus/cbmiec/cbmiec.h"
 #include "bus/pet/cass.h"
 #include "bus/vcs_ctrl/ctrl.h"
 #include "bus/vic20/exp.h"
 #include "bus/vic20/user.h"
 #include "cpu/m6502/m6510.h"
+#include "imagedev/snapquik.h"
 #include "machine/6522via.h"
-#include "cbm_snqk.h"
 #include "machine/ram.h"
 #include "sound/mos6560.h"
+
+#include "screen.h"
+#include "softlist_dev.h"
+#include "speaker.h"
 
 
 namespace {

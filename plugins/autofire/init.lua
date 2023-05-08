@@ -9,6 +9,8 @@ local exports = {
 
 local autofire = exports
 
+local frame_subscription, stop_subscription
+
 function autofire.startplugin()
 
 	-- List of autofire buttons, each being a table with keys:
@@ -104,9 +106,9 @@ function autofire.startplugin()
 		end
 	end
 
-	emu.register_frame(process_frame)
+	frame_subscription = emu.add_machine_frame_notifier(process_frame)
 	emu.register_prestart(load_settings)
-	emu.register_stop(save_settings)
+	stop_subscription = emu.add_machine_stop_notifier(save_settings)
 	emu.register_menu(menu_callback, menu_populate, _p('plugin-autofire', 'Autofire'))
 end
 

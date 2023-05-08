@@ -10,6 +10,9 @@
 #include "cpu/rsp/rsp.h"
 #include "cpu/mips/mips3.h"
 #include "sound/dmadac.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+#include "imagedev/harddriv.h"
 
 /*----------- driver state -----------*/
 

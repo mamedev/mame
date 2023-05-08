@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
+	</element>
+
+	<element name="led" defstate="0">
+		<disk state="0"><color red="0.1" green="0.01" blue="0.015" /></disk>
+		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
+	</element>
+
+	<element name="nothing" defstate="0"><rect><color alpha="0" /></rect></element>
+
+	<element name="text_pm"><text string="PM"><color red="0.75" green="0.75" blue="0.75" /></text></element>
+	<element name="text_b1"><text string="BATTERY" align="1"><color red="0.75" green="0.75" blue="0.75" /></text></element>
+	<element name="text_b2"><text string="SENTINEL" align="1"><color red="0.75" green="0.75" blue="0.75" /></text></element>
+	<element name="text_al1"><text string="AL 1"><color red="0.75" green="0.75" blue="0.75" /></text></element>
+	<element name="text_al2"><text string="AL 2"><color red="0.75" green="0.75" blue="0.75" /></text></element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="-3.5" right="56" top="-3" bottom="18" />
+
+		<element name="digit0" ref="digit"><bounds x="0" y="0" width="10" height="15" /></element>
+		<element name="digit1" ref="digit"><bounds x="12.5" y="0" width="10" height="15" /></element>
+		<element name="digit2" ref="digit"><bounds x="30" y="0" width="10" height="15" /></element>
+		<element name="digit3" ref="digit"><bounds x="42.5" y="0" width="10" height="15" /></element>
+
+		<element name="2.8" ref="led"><bounds x="25.9" y="2.75" width="1.5" height="1.5" /></element>
+		<element name="1.8" ref="led"><bounds x="25.1" y="10.75" width="1.5" height="1.5" /></element>
+
+		<element name="0.8" ref="led"><bounds x="-2" y="0" width="1.5" height="1.5" /></element>
+		<element ref="text_pm"><bounds x="-4" y="2" width="5.5" height="1.5" /></element>
+
+		<element ref="nothing" inputtag="IN.6" inputmask="0x00" inputraw="yes"><bounds x="-2" y="9" width="1.5" height="1.5" /></element> <!-- block clickable input -->
+		<element ref="led" inputtag="IN.6" inputmask="0x02"><bounds x="-2" y="9" width="1.5" height="1.5" /></element>
+		<element ref="text_b1"><bounds x="-3" y="11" width="7.5" height="1.5" /></element>
+		<element ref="text_b2"><bounds x="-3" y="12.5" width="7.5" height="1.5" /></element>
+
+		<element name="3.8" ref="led"><bounds x="53" y="4.5" width="1.5" height="1.5" /></element>
+		<element name="3.7" ref="led"><bounds x="53" y="13.5" width="1.5" height="1.5" /></element>
+		<element ref="text_al1"><bounds x="51" y="6.5" width="5.5" height="1.5" /></element>
+		<element ref="text_al2"><bounds x="51" y="15.5" width="5.5" height="1.5" /></element>
+
+	</view>
+</mamelayout>

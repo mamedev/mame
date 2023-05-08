@@ -497,13 +497,21 @@ void cosmicos_state::machine_reset()
 
 QUICKLOAD_LOAD_MEMBER(cosmicos_state::quickload_cb)
 {
-	uint8_t *ptr = m_rom->base();
-	int size = image.length();
+	// FIXME: comment says "RAM" but data is loaded to ROM region - which should it be?
+	int const size = image.length();
+	if (size > m_rom->bytes())
+	{
+		return std::make_pair(
+				image_error::INVALIDLENGTH,
+				util::string_format("%u-byte image file is too large for %u-byte ROM", size, m_rom->bytes()));
+	}
 
-	/* load image to RAM */
+	uint8_t *const ptr = m_rom->base();
+
+	// load image to RAM
 	image.fread(ptr, size);
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /* Machine Driver */
