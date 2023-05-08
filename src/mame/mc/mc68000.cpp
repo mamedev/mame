@@ -162,29 +162,27 @@ uint16_t mc68000_state::memory_r(offs_t offset, uint16_t mem_mask)
 
 		LOGMASKED(LOG_IO_READ, "Read from IO: %06x = %04x & %04x\n", offset << 1, data, mem_mask);
 
-		offset = (offset << 1) & 0x3fff;
-
 		// ic45, 74ls139
-		switch (offset >> 12)
+		switch ((offset >> 11) & 0x03)
 		{
 		case 0:
-			if (ACCESSING_BITS_8_15 && (BIT(offset, 1) == 1))
+			if (ACCESSING_BITS_8_15 && (BIT(offset, 0) == 1))
 				data = m_crtc->register_r() << 8;
 			break;
 
 		case 1:
 			if (ACCESSING_BITS_0_7)
-				data |= m_via[0]->read(offset >> 1) << 0;
+				data |= m_via[0]->read(offset) << 0;
 			if (ACCESSING_BITS_8_15)
-				data |= m_via[1]->read(offset >> 1) << 8;
+				data |= m_via[1]->read(offset) << 8;
 			break;
 
 		case 2:
-			data = m_sysbus->floppy_r(offset >> 1, mem_mask);
+			data = m_sysbus->floppy_r(offset, mem_mask);
 			break;
 
 		case 3:
-			if (ACCESSING_BITS_8_15 && (BIT(offset, 1) == 0))
+			if (ACCESSING_BITS_8_15 && (BIT(offset, 0) == 0))
 			{
 				data = m_key << 8;
 
@@ -192,7 +190,7 @@ uint16_t mc68000_state::memory_r(offs_t offset, uint16_t mem_mask)
 				m_via[1]->write_cb1(1);
 				m_via[1]->write_cb1(BIT(m_switches->read(), 1));
 			}
-			if (ACCESSING_BITS_8_15 && (BIT(offset, 1) == 1))
+			if (ACCESSING_BITS_8_15 && (BIT(offset, 0) == 1))
 				m_apm_view.select(0);
 			break;
 		}
@@ -251,31 +249,29 @@ void mc68000_state::memory_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	case 0x1:
 		LOGMASKED(LOG_IO_WRITE, "Write to IO: %06x = %04x & %04x\n", offset << 1, data, mem_mask);
 
-		offset = (offset << 1) & 0x3fff;
-
 		// ic45, 74ls139
-		switch (offset >> 12)
+		switch ((offset >> 11) & 0x03)
 		{
 		case 0:
-			if (ACCESSING_BITS_8_15 && (BIT(offset, 1) == 0))
+			if (ACCESSING_BITS_8_15 && (BIT(offset, 0) == 0))
 				m_crtc->address_w(data >> 8);
-			if (ACCESSING_BITS_8_15 && (BIT(offset, 1) == 1))
+			if (ACCESSING_BITS_8_15 && (BIT(offset, 0) == 1))
 				m_crtc->register_w(data >> 8);
 			break;
 
 		case 1:
 			if (ACCESSING_BITS_0_7)
-				m_via[0]->write(offset >> 1, data >> 0);
+				m_via[0]->write(offset, data >> 0);
 			if (ACCESSING_BITS_8_15)
-				m_via[1]->write(offset >> 1, data >> 8);
+				m_via[1]->write(offset, data >> 8);
 			break;
 
 		case 2:
-			m_sysbus->floppy_w(offset >> 1, data, mem_mask);
+			m_sysbus->floppy_w(offset, data, mem_mask);
 			break;
 
 		case 3:
-			if (ACCESSING_BITS_8_15 && (BIT(offset, 1) == 0))
+			if (ACCESSING_BITS_8_15 && (BIT(offset, 0) == 0))
 			{
 				m_centronics_latch->write(data >> 8);
 
@@ -283,7 +279,7 @@ void mc68000_state::memory_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 				m_via[1]->write_cb1(1);
 				m_via[1]->write_cb1(BIT(m_switches->read(), 0));
 			}
-			if (ACCESSING_BITS_8_15 && (BIT(offset, 1) == 1))
+			if (ACCESSING_BITS_8_15 && (BIT(offset, 0) == 1))
 				LOGMASKED(LOG_IO_WRITE, "Unhandled volume latch write\n");
 			break;
 		}
