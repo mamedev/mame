@@ -249,7 +249,7 @@ static void isa_internal_devices(device_slot_interface &device)
 void comebaby_state::superio_config(device_t *device)
 {
 	// TODO: wrong super I/O type
-	// Most likely FDC37M707, check MB manual
+	// It's an ITE 8671 "Giga I/O", unemulated
 	fdc37c93x_device &fdc = *downcast<fdc37c93x_device *>(device);
 	fdc.set_sysopt_pin(0);
 	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);

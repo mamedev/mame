@@ -349,13 +349,12 @@ void midway_quicksilver2_state::midqslvr_map(address_map &map)
 
 static void isa_internal_devices(device_slot_interface &device)
 {
-	device.option_add("fdc37c93x", FDC37C93X);
+	device.option_add("fdc37m707", FDC37M707);
 }
 
 void midway_quicksilver2_state::superio_config(device_t *device)
 {
-	// TODO: FDC37M707
-	fdc37c93x_device &fdc = *downcast<fdc37c93x_device *>(device);
+	fdc37m707_device &fdc = *downcast<fdc37m707_device *>(device);
 	fdc.set_sysopt_pin(0);
 	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
 	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
@@ -397,7 +396,7 @@ void midway_quicksilver2_state::midqslvr(machine_config &config)
 	LPC_ACPI     (config, "pci:07.3:acpi", 0);
 	SMBUS        (config, "pci:07.3:smbus", 0);
 
-	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", superio_config);
+	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37m707", true).set_option_machine_config("fdc37m707", superio_config);
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
