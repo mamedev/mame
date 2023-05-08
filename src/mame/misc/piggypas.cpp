@@ -71,6 +71,8 @@ void piggypas_state::output_digits()
 	m_digits[1] = bitswap<8>((m_digit_latch >> 8) & 0xff, 7,6,4,3,2,1,0,5) & 0x7f;
 	m_digits[2] = bitswap<8>((m_digit_latch >> 16) & 0xff, 7,6,4,3,2,1,0,5) & 0x7f;
 	m_digits[3] = bitswap<8>((m_digit_latch >> 24) & 0xff, 7,6,4,3,2,1,0,5) & 0x7f;
+
+	m_digit_latch = 0;
 }
 
 void piggypas_state::ctrl_w(uint8_t data)
@@ -85,8 +87,13 @@ void piggypas_state::ctrl_w(uint8_t data)
 
 void piggypas_state::port3_w(uint8_t data)
 {
-	// FIXME: what handles the serial timing and framing for the UCN5833A?
-	//m_digit_latch = (m_digit_latch >> 8) | (u32(data) << 24);
+	if (!BIT(data, 1))
+	{
+		m_digit_latch >>= 1;
+
+		if (BIT(data, 0))
+			m_digit_latch |= (1U << 31);
+	}
 }
 
 void piggypas_state::led_strobe_w(uint8_t data)

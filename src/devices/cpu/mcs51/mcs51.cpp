@@ -1036,11 +1036,44 @@ void mcs51_cpu_device::transmit_receive(int source)
 		m_uart.smod_div = (m_uart.smod_div + 1) & (1-GET_SMOD);
 
 	switch(mode) {
-		//8 bit shifter ( + start,stop bit ) - baud set by clock freq / 12
+		// 8 bit shifter - rate set by clock freq / 12
 		case 0:
-			m_uart.rx_clk += (source == 0) ? 16 : 0; /* clock / 12 */
-			m_uart.tx_clk += (source == 0) ? 16 : 0; /* clock / 12 */
-			break;
+			if (source == 0)
+			{
+				// TODO: mode 0 serial input is unemulated
+				// FIXME: output timing is highly simplified and incorrect
+				switch (m_uart.txbit)
+				{
+				case SIO_IDLE:
+					break;
+				case SIO_START:
+					SFR_A(ADDR_P3) |= 0x03;
+					m_port_out_cb[3](SFR_A(ADDR_P3));
+					m_uart.txbit = SIO_DATA0;
+					break;
+				case SIO_DATA0: case SIO_DATA1: case SIO_DATA2: case SIO_DATA3:
+				case SIO_DATA4: case SIO_DATA5: case SIO_DATA6: case SIO_DATA7:
+					SFR_A(ADDR_P3) &= ~0x03;
+					if (BIT(m_uart.data_out, m_uart.txbit - SIO_DATA0))
+						SFR_A(ADDR_P3) |= 1U << 0;
+					m_port_out_cb[3](SFR_A(ADDR_P3));
+
+					if (m_uart.txbit == SIO_DATA7)
+					{
+						SET_TI(1);
+						m_uart.txbit = SIO_STOP;
+					}
+					else
+						m_uart.txbit++;
+					break;
+				case SIO_STOP:
+					SFR_A(ADDR_P3) |= 0x03;
+					m_port_out_cb[3](SFR_A(ADDR_P3));
+					m_uart.txbit = SIO_IDLE;
+					break;
+				}
+			}
+			return;
 		//8 bit uart ( + start,stop bit ) - baud set by timer1 or timer2
 		case 1:
 		case 3:
@@ -2197,6 +2230,8 @@ void mcs51_cpu_device::sfr_write(size_t offset, uint8_t data)
 			if (!GET_REN && BIT(data, 4))
 			{
 				LOGMASKED(LOG_RX, "rx enabled SCON 0x%02x\n", data);
+				if (!BIT(data, 6, 2))
+					logerror("mode 0 serial input is not emulated\n");
 				m_uart.rxbit = SIO_IDLE;
 			}
 			break;
