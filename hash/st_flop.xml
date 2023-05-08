@@ -221,7 +221,7 @@ White screen, [68k] stalls on bootstrap
 
 	<software name="altreal" supported="no">
 		<!-- SPS (CAPS) release 3313 -->
-		<description>Alternate Reality (Euro, v3.0)</description>
+		<description>Alternate Reality (Europe, v3.0)</description>
 		<year>1986</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="alt_title" value="Alternate Reality - The City" />
@@ -372,7 +372,7 @@ Black screen after Thalion logo, attempts to r/w [FPU] $fffa40
 
 	<software name="backgamm" supported="no">
 		<!-- SPS (CAPS) release 3254 -->
-		<description>Backgammon Royale (Euro, v2.50 19910104)</description>
+		<description>Backgammon Royale (Europe, v2.50 19910104)</description>
 		<year>1991</year>
 		<publisher>CP Software</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -415,7 +415,7 @@ Black screen after Thalion logo, attempts to r/w [FPU] $fffa40
 
 	<software name="barbpal" supported="no">
 		<!-- SPS (CAPS) release 3255 -->
-		<description>Barbarian (Euro, Palace)</description>
+		<description>Barbarian (Europe, Palace)</description>
 		<year>1987</year>
 		<publisher>Palace</publisher>
 		<info name="alt_title" value="Barbarian - The Ultimate Warrior" />
@@ -466,7 +466,7 @@ Black screen after Thalion logo, attempts to r/w [FPU] $fffa40
 
 	<software name="bhawk42" supported="no">
 		<!-- SPS (CAPS) release 3120 -->
-		<description>Battlehawks 1942 (Euro, v1.0 19890301)</description>
+		<description>Battlehawks 1942 (Europe, v1.0 19890301)</description>
 		<year>1989</year>
 		<publisher>Lucasfilm</publisher>
 		<notes><![CDATA[
@@ -549,7 +549,7 @@ Fussy on [disk swap], will return to TOS when trying to begin a flight
 
 	<software name="blktiger" supported="no">
 		<!-- SPS (CAPS) release 3192 -->
-		<description>Black Tiger (Euro, Les Chevaliers)</description>
+		<description>Black Tiger (Europe, Les Chevaliers)</description>
 		<year>1990</year>
 		<publisher>U.S. Gold</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -614,7 +614,7 @@ Fussy on [disk swap], will return to TOS when trying to begin a flight
 
 	<software name="bloodmon" supported="no">
 		<!-- SPS (CAPS) release 3258 -->
-		<description>Blood Money (Euro, Budget)</description>
+		<description>Blood Money (Europe, Budget)</description>
 		<year>1989</year>
 		<publisher>Sizzlers</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -684,7 +684,7 @@ Fussy on [disk swap], will return to TOS when trying to begin a flight
 
 	<software name="bombjack" supported="no">
 		<!-- SPS (CAPS) release 3262 -->
-		<description>Bomb Jack (Euro, Budget)</description>
+		<description>Bomb Jack (Europe, Budget)</description>
 		<year>1988</year>
 		<publisher>Encore</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -936,7 +936,7 @@ Keeps returning to TOS on loading
 
 	<software name="chsp2150a" cloneof="chsp2150" supported="no">
 		<!-- SPS (CAPS) release 3124 -->
-		<description>Chess Player 2150 (Euro, TenStar Pack)</description>
+		<description>Chess Player 2150 (Europe, TenStar Pack)</description>
 		<year>1989</year>
 		<publisher>Oxford Softworks</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1087,7 +1087,7 @@ Keeps returning to TOS on loading
 
 	<software name="camelot" supported="no">
 		<!-- SPS (CAPS) release 3152 -->
-		<description>Conquests of Camelot (Euro, v1.019)</description>
+		<description>Conquests of Camelot (Europe, v1.019)</description>
 		<year>1990</year>
 		<publisher>Sierra</publisher>
 		<notes><![CDATA[
@@ -1150,7 +1150,7 @@ Has [MIDI] options
 
 	<software name="corruptn" supported="no">
 		<!-- SPS (CAPS) release 3291 -->
-		<description>Corruption (Euro, v1.9)</description>
+		<description>Corruption (Europe, v1.9)</description>
 		<year>1988</year>
 		<publisher>Rainbird</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1164,7 +1164,7 @@ Has [MIDI] options
 
 	<software name="crkdown" supported="no">
 		<!-- SPS (CAPS) release 3292 -->
-		<description>Crack Down (Euro, Budget)</description>
+		<description>Crack Down (Europe, Budget)</description>
 		<year>1990</year>
 		<publisher>KIXX</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1178,7 +1178,7 @@ Has [MIDI] options
 
 	<software name="cricketc" supported="no">
 		<!-- SPS (CAPS) release 3125 -->
-		<description>Cricket Captain (Euro, v1.5 1991)</description>
+		<description>Cricket Captain (Europe, v1.5 1991)</description>
 		<year>1991?</year>
 		<publisher>D &amp; H Games</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1231,7 +1231,7 @@ Black screen, expects an irq reading work RAM $ac02
 
 	<software name="cybercn3" supported="no">
 		<!-- SPS (CAPS) release 3126 -->
-		<description>Cybercon III (Euro, 19910406)</description>
+		<description>Cybercon III (Europe, 19910406)</description>
 		<year>1991</year>
 		<publisher>U.S. Gold</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1390,7 +1390,7 @@ Black screen
 
 	<software name="demoniak" supported="no">
 		<!-- SPS (CAPS) release 3318 -->
-		<description>Demoniak (Euro, v1.0)</description>
+		<description>Demoniak (Europe, v1.0)</description>
 		<year>1991</year>
 		<publisher>Palace</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1429,7 +1429,7 @@ Black screen
 
 	<software name="disc" supported="no">
 		<!-- SPS (CAPS) release 3153 -->
-		<description>Disc (Euro, Budget)</description>
+		<description>Disc (Europe, Budget)</description>
 		<year>1991</year>
 		<publisher>Action Sixteen</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1443,7 +1443,7 @@ Black screen
 
 	<software name="dizzydic" supported="no">
 		<!-- SPS (CAPS) release 3319 -->
-		<description>Dizzy Dice (Euro, Budget)</description>
+		<description>Dizzy Dice (Europe, Budget)</description>
 		<year>1990</year>
 		<publisher>Smash 16</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1457,7 +1457,7 @@ Black screen
 
 	<software name="ddragon" supported="no">
 		<!-- SPS (CAPS) release 3204 -->
-		<description>Double Dragon (Euro, Magnum 4)</description>
+		<description>Double Dragon (Europe, Magnum 4)</description>
 		<year>1989</year>
 		<publisher>Melbourne House</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1479,7 +1479,7 @@ Black screen
 
 	<software name="ddragon2" supported="no">
 		<!-- SPS (CAPS) release 3154 -->
-		<description>Double Dragon II - The Revenge (Euro, v1.2, Budget)</description>
+		<description>Double Dragon II - The Revenge (Europe, v1.2, Budget)</description>
 		<year>1989</year>
 		<publisher>16 Blitz</publisher>
 		<notes><![CDATA[
@@ -1529,7 +1529,7 @@ White screen, fails to bootstrap
 
 	<software name="drakkhen" supported="no">
 		<!-- SPS (CAPS) release 3321 -->
-		<description>Drakkhen (Euro, v1.1)</description>
+		<description>Drakkhen (Europe, v1.1)</description>
 		<year>1989</year>
 		<publisher>Infogrames</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1573,7 +1573,7 @@ White screen, fails to bootstrap
 
 	<software name="dynawars" supported="no">
 		<!-- SPS (CAPS) release 3194 -->
-		<description>Dynasty Wars (Euro, Les Chevaliers)</description>
+		<description>Dynasty Wars (Europe, Les Chevaliers)</description>
 		<year>1990</year>
 		<publisher>U.S. Gold</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1630,7 +1630,7 @@ Main menu is unresponsive, likely [GPIO4] irq
 
 	<software name="elfmv" supported="no">
 		<!-- SPS (CAPS) release 3129 -->
-		<description>Elf (Euro, MicroValue)</description>
+		<description>Elf (Europe, MicroValue)</description>
 		<year>1988</year>
 		<publisher>MicroValue</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1723,7 +1723,7 @@ Manually trying to execute auto/exolon.prg will crash TOS
 
 	<software name="f19sf" supported="no">
 		<!-- SPS (CAPS) release 3191 -->
-		<description>F-19 Stealth Fighter (Euro, v1.02)</description>
+		<description>F-19 Stealth Fighter (Europe, v1.02)</description>
 		<year>1990</year>
 		<publisher>Microprose</publisher>
 		<info name="usage" value="Sports manual copy protection (Aircraft Identification Exam)" />
@@ -1864,7 +1864,7 @@ Red screen
 	</software>
 
 	<software name="foundwst">
-		<description>Foundation's Waste (Euro, Budget)</description>
+		<description>Foundation's Waste (Europe, Budget)</description>
 		<year>1988</year>
 		<publisher>Klassix</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1879,7 +1879,7 @@ Red screen
 <!-- This is a dual disk Amiga + ST -->
 	<software name="foundwstc" cloneof="foundwst" supported="no">
 		<!-- SPS (CAPS) release 3155? -->
-		<description>Foundation's Waste (Euro, Coverdisk)</description>
+		<description>Foundation's Waste (Europe, The One issue 22 coverdisk)</description>
 		<year>1990</year>
 		<publisher>&lt;coverdisk&gt;</publisher>
 		<info name="magazine" value="The One 22" />
@@ -2069,7 +2069,7 @@ White screen
 
 	<software name="gng" supported="no">
 		<!-- SPS (CAPS) release 3389 -->
-		<description>Ghosts 'n' Goblins (Euro, Finale)</description>
+		<description>Ghosts 'n' Goblins (Europe, Finale)</description>
 		<year>1990</year>
 		<publisher>Elite</publisher>
 		<notes><![CDATA[
@@ -2086,7 +2086,7 @@ White screen
 
 	<software name="ghouls" supported="no">
 		<!-- SPS (CAPS) release 3195 -->
-		<description>Ghouls 'n' Ghosts (Euro, Les Chevaliers)</description>
+		<description>Ghouls 'n' Ghosts (Europe, Les Chevaliers)</description>
 		<year>1989</year>
 		<publisher>U.S. Gold</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2198,7 +2198,7 @@ White screen, [68k] stalls with illegal A0 and A1 stacks
 
 	<software name="guildthv" supported="no">
 		<!-- SPS (CAPS) release 3207 -->
-		<description>The Guild of Thieves (Euro, v1.0)</description>
+		<description>The Guild of Thieves (Europe, v1.0)</description>
 		<year>1987</year>
 		<publisher>Firebird</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2268,7 +2268,7 @@ Mouse doesn't respond after setting up MFSM system
 
 	<software name="hardball" supported="no">
 		<!-- SPS (CAPS) release 3360 -->
-		<description>HardBall! (Euro, Accolade All Time Favourites)</description>
+		<description>HardBall! (Europe, Accolade All Time Favourites)</description>
 		<year>1987</year>
 		<publisher>Accolade</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2350,7 +2350,7 @@ Keeps attempting to bootstrap with no success (cycles between white and black sc
 
 	<software name="hillstrt" supported="no">
 		<!-- SPS (CAPS) release 3134 -->
-		<description>Hill Street Blues (Euro, v1.11 19910326, Budget)</description>
+		<description>Hill Street Blues (Europe, v1.11 19910326, Budget)</description>
 		<year>1991</year>
 		<publisher>Buzz</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2443,7 +2443,7 @@ Keeps attempting to bootstrap with no success (cycles between white and black sc
 
 	<software name="huntrklr" supported="no">
 		<!-- SPS (CAPS) release 3135 -->
-		<description>Hunter Killer (Euro, v1.01, Budget)</description>
+		<description>Hunter Killer (Europe, v1.01, Budget)</description>
 		<year>1990</year>
 		<publisher>16 Blitz</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2569,7 +2569,7 @@ Fails autobooting, wants a disk B that is missing from the set.
 
 	<software name="italy90" supported="no">
 		<!-- SPS (CAPS) release 3136 -->
-		<description>Italy 1990 (Euro, The Lineker Collection)</description>
+		<description>Italy 1990 (Europe, The Lineker Collection)</description>
 		<year>1990</year>
 		<publisher>U.S. Gold</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2647,7 +2647,7 @@ Fails autobooting, wants a disk B that is missing from the set.
 
 	<software name="kickoff2" supported="no">
 		<!-- SPS (CAPS) release 3158 -->
-		<description>Kick Off 2 (Euro, v1.4e)</description>
+		<description>Kick Off 2 (Europe, v1.4e)</description>
 		<year>1990</year>
 		<publisher>Anco</publisher>
 		<notes><![CDATA[
@@ -2664,7 +2664,7 @@ Fails autobooting, wants a disk B that is missing from the set.
 
 	<software name="kickoff2re" cloneof="kickoff2" supported="no">
 		<!-- SPS (CAPS) release 3215 -->
-		<description>Kick Off 2 - Return to Europe (Euro, v2.1e)</description>
+		<description>Kick Off 2 - Return to Europe (Europe, v2.1e)</description>
 		<year>1991</year>
 		<publisher>Anco</publisher>
 		<notes><![CDATA[
@@ -2682,7 +2682,7 @@ Fails autobooting, wants a disk B that is missing from the set.
 
 	<software name="kickoff2fw" cloneof="kickoff2" supported="no">
 		<!-- SPS (CAPS) release 3159 -->
-		<description>Kick Off 2 - The Final Whistle (Euro, v2.1e)</description>
+		<description>Kick Off 2 - The Final Whistle (Europe, v2.1e)</description>
 		<year>1991</year>
 		<publisher>Anco</publisher>
 		<notes><![CDATA[
@@ -2738,7 +2738,7 @@ Fails autobooting, wants a disk B that is missing from the set.
 
 	<software name="kingqst3" supported="no">
 		<!-- SPS (CAPS) release 3208 -->
-		<description>King's Quest III - To Heir is Human (Euro, v1.02 19861118)</description>
+		<description>King's Quest III - To Heir is Human (Europe, v1.02 19861118)</description>
 		<year>1989</year>
 		<publisher>Sierra</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2798,7 +2798,7 @@ Tight loops at PC=71b26, cmp.l #$a2b2c837 (D0 is 0), boots if bypassed
 
 	<software name="lastnin3" supported="no">
 		<!-- SPS (CAPS) release 3219 -->
-		<description>Last Ninja 3 (Euro, Budget)</description>
+		<description>Last Ninja 3 (Europe, Budget)</description>
 		<year>1991</year>
 		<publisher>KIXX</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2835,7 +2835,7 @@ Tight loops at PC=71b26, cmp.l #$a2b2c837 (D0 is 0), boots if bypassed
 
 	<software name="leadbgt1" cloneof="leadbg" supported="no">
 		<!-- SPS (CAPS) release 3161 -->
-		<description>Leader Board Pro Golf Simulator - Tournament Disk #1 (Euro, Leader Board Birdie)</description>
+		<description>Leader Board Pro Golf Simulator - Tournament Disk #1 (Europe, Leader Board Birdie)</description>
 		<year>1986</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="usage" value="Requires &quot;Leader Board Golf Simulation&quot; to work" />
@@ -2850,7 +2850,7 @@ Tight loops at PC=71b26, cmp.l #$a2b2c837 (D0 is 0), boots if bypassed
 
 	<software name="lslarry" supported="no">
 		<!-- SPS (CAPS) release 3214 -->
-		<description>Leisure Suit Larry in The Land of the Lounge Lizards (Euro, v1.04 19870618)</description>
+		<description>Leisure Suit Larry in The Land of the Lounge Lizards (Europe, v1.04 19870618)</description>
 		<year>1987</year>
 		<publisher>Sierra</publisher>
 		<info name="usage" value="Sports manual copy protection (parental control quiz)" />
@@ -2994,7 +2994,7 @@ Unresponsive [mouse] on TOS (random)
 
 	<software name="lurkinh" supported="no">
 		<!-- SPS (CAPS) release 3109 -->
-		<description>The Lurking Horror (Euro, r203)</description>
+		<description>The Lurking Horror (Europe, r203)</description>
 		<year>1987</year>
 		<publisher>Infocom</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3128,7 +3128,7 @@ Hangs on title screen
 
 	<software name="mean18" supported="no">
 		<!-- SPS (CAPS) release 3362 -->
-		<description>Mean 18 + Famous Courses Disk Volume I &amp; Volume II (Euro, Accolade All Time Favourites)</description>
+		<description>Mean 18 + Famous Courses Disk Volume I &amp; Volume II (Europe, Accolade All Time Favourites)</description>
 		<year>1986</year>
 		<publisher>Accolade</publisher>
 		<notes><![CDATA[
@@ -3182,7 +3182,7 @@ Fails [disk swap], requests disk A again, never leaves TOS
 
 	<software name="mercenry" supported="no">
 		<!-- SPS (CAPS) release 3383 -->
-		<description>Mercenary - Escape from Targ &amp; The Second City (Euro, Premier Collection II)</description>
+		<description>Mercenary - Escape from Targ &amp; The Second City (Europe, Premier Collection II)</description>
 		<year>1988</year>
 		<publisher>Novagen</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3616,7 +3616,7 @@ Black screen, enables [68k] trace mode
 
 	<software name="overlanda" cloneof="overland" supported="no">
 		<!-- SPS (CAPS) release 3387 -->
-		<description>Overlander (Euro, Finale)</description>
+		<description>Overlander (Europe, Finale)</description>
 		<year>1988</year>
 		<publisher>Elite</publisher>
 		<notes><![CDATA[
@@ -3678,7 +3678,7 @@ Doesn't recognize fire button or space key on title screen
 
 	<software name="paperboy" supported="no">
 		<!-- SPS (CAPS) release 3386 -->
-		<description>Paperboy (Euro, Finale)</description>
+		<description>Paperboy (Europe, Finale)</description>
 		<year>1989</year>
 		<publisher>Elite</publisher>
 		<notes><![CDATA[
@@ -3709,7 +3709,7 @@ Executes illegal opcode at PC=af06, [68k] hangs
 
 	<software name="pawn" supported="no">
 		<!-- SPS (CAPS) release 3209 -->
-		<description>The Pawn (Euro, v2.1)</description>
+		<description>The Pawn (Europe, v2.1)</description>
 		<year>1986</year>
 		<publisher>Rainbird</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3768,7 +3768,7 @@ F3 doesn't show key configure screen, doesn't seem joystick controllable?
 
 	<software name="pmanger" supported="no">
 		<!-- SPS (CAPS) release 3188 -->
-		<description>Player Manager (Euro, Football Crazy Challenge)</description>
+		<description>Player Manager (Europe, Football Crazy Challenge)</description>
 		<year>1990</year>
 		<publisher>Anco</publisher>
 		<notes><![CDATA[
@@ -3785,7 +3785,7 @@ Hangs after title screen with a broken icon in the middle.
 
 	<software name="pquest" supported="no">
 		<!-- SPS (CAPS) release 3149 -->
-		<description>Police Quest - In Pursuit of the Death Angel (Euro, v2.0G 19870312)</description>
+		<description>Police Quest - In Pursuit of the Death Angel (Europe, v2.0G 19870312)</description>
 		<year>1987</year>
 		<publisher>Sierra</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3985,7 +3985,7 @@ White screen, enables [68k] trace mode
 
 	<software name="redstorm" supported="no">
 		<!-- SPS (CAPS) release 3165 -->
-		<description>Red Storm Rising (Euro, v743.01)</description>
+		<description>Red Storm Rising (Europe, v743.01)</description>
 		<year>1990</year>
 		<publisher>MicroProse</publisher>
 		<notes><![CDATA[
@@ -4297,7 +4297,7 @@ Randomly hangs, stalls waiting for a $bcbe that never becomes 1, supposed to be 
 
 	<software name="sharriera" cloneof="sharrier" supported="no">
 		<!-- SPS (CAPS) release 3388 -->
-		<description>Space Harrier (Euro, Finale)</description>
+		<description>Space Harrier (Europe, Finale)</description>
 		<year>1988</year>
 		<publisher>Elite</publisher>
 		<notes><![CDATA[
@@ -4372,7 +4372,7 @@ Random hangs, cfr. sharrier
 	</software>
 
 	<software name="spidertr1" cloneof="spidertr" supported="no">
-		<description>Spidertronic (Euro, Smash 16)</description>
+		<description>Spidertronic (Europe, Smash 16)</description>
 		<year>1990</year>
 		<publisher>Smash 16</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4413,7 +4413,7 @@ Random hangs, cfr. sharrier
 
 	<software name="jedi" supported="no">
 		<!-- SPS (CAPS) release 3374 -->
-		<description>Return of the Jedi (Euro, The Star Wars Trilogy)</description>
+		<description>Return of the Jedi (Europe, The Star Wars Trilogy)</description>
 		<year>1989</year>
 		<publisher>Domark</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4427,7 +4427,7 @@ Random hangs, cfr. sharrier
 
 	<software name="esb" supported="no">
 		<!-- SPS (CAPS) release 3171 -->
-		<description>Star Wars - The Empire Strikes Back (Euro, The Star Wars Trilogy)</description>
+		<description>Star Wars - The Empire Strikes Back (Europe, The Star Wars Trilogy)</description>
 		<year>1989</year>
 		<publisher>Domark</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4604,7 +4604,7 @@ Hangs on title screen
 
 	<software name="strider" supported="no">
 		<!-- SPS (CAPS) release 3193 -->
-		<description>Strider (Euro, Les Chevaliers)</description>
+		<description>Strider (Europe, Les Chevaliers)</description>
 		<year>1989</year>
 		<publisher>U.S. Gold</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4685,7 +4685,7 @@ Player cursor oddly appears a bit lower compared to the shadow (verify)
 
 	<software name="swap" supported="no">
 		<!-- SPS (CAPS) release 3301 -->
-		<description>Swap (Euro, Budget)</description>
+		<description>Swap (Europe, Budget)</description>
 		<year>1991</year>
 		<publisher>Fox Hits</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4755,7 +4755,7 @@ Hangs after selecting input device on title screen, looping on [MFP] and [MMU] i
 
 	<software name="tenniscp" supported="no">
 		<!-- SPS (CAPS) release 3173 -->
-		<description>Tennis Cup (Euro, Budget)</description>
+		<description>Tennis Cup (Europe, Budget)</description>
 		<year>1990</year>
 		<publisher>Action Sixteen</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4794,7 +4794,7 @@ Hangs after selecting input device on title screen, looping on [MFP] and [MMU] i
 
 	<software name="tdriv" supported="no">
 		<!-- SPS (CAPS) release 3361 -->
-		<description>Test Drive (Euro, Accolade All Time Favourites)</description>
+		<description>Test Drive (Europe, Accolade All Time Favourites)</description>
 		<year>1987</year>
 		<publisher>Accolade</publisher>
 		<notes><![CDATA[
@@ -4864,7 +4864,7 @@ Mouse pointer becomes invisible when selecting fortune teller cabinet in gamepla
 
 	<software name="thdrcats" supported="no">
 		<!-- SPS (CAPS) release 3302 -->
-		<description>ThunderCats (Euro, Budget)</description>
+		<description>ThunderCats (Europe, Budget)</description>
 		<year>1988</year>
 		<publisher>Encore</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -5070,7 +5070,7 @@ Fails [disk swap] after title screen
 
 	<software name="treblech" supported="no">
 		<!-- SPS (CAPS) release 3280 -->
-		<description>Treble Champions (Euro, v1.0)</description>
+		<description>Treble Champions (Europe, v1.0)</description>
 		<year>1990</year>
 		<publisher>Challenge Software</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -5084,7 +5084,7 @@ Fails [disk swap] after title screen
 
 	<software name="trinity" supported="no">
 		<!-- SPS (CAPS) release 3212 -->
-		<description>Trinity (Euro, r11)</description>
+		<description>Trinity (Europe, r11)</description>
 		<year>1986</year>
 		<publisher>Infocom</publisher>
 		<info name="usage" value="Requires Medium or High res screen setup in TOS (disk defaults to Low)" />
@@ -5127,7 +5127,7 @@ Fails [disk swap] after title screen
 
 	<software name="toutrun" supported="no">
 		<!-- SPS (CAPS) release 3221 -->
-		<description>Turbo Out Run (Euro, Budget)</description>
+		<description>Turbo Out Run (Europe, Budget)</description>
 		<year>1989</year>
 		<publisher>KIXX</publisher>
 		<notes><![CDATA[
@@ -5144,7 +5144,7 @@ Prompts user on inserting disk 2, but there's only one disk in the set.
 
 	<software name="turricn2" supported="no">
 		<!-- SPS (CAPS) release 3349 -->
-		<description>Turrican II (Euro, Budget)</description>
+		<description>Turrican II (Europe, Budget)</description>
 		<year>1991</year>
 		<publisher>KIXX</publisher>
 		<info name="alt_title" value="Turrican II - The Final Fight (Box)" />
@@ -5205,7 +5205,7 @@ White screen, [68k] stalls on bootstrap with invalid opcode PC=13eba
 
 	<software name="univers3" supported="no">
 		<!-- SPS (CAPS) release 3350 -->
-		<description>Universe 3 (Euro, v1.0)</description>
+		<description>Universe 3 (Europe, v1.0)</description>
 		<year>1990</year>
 		<publisher>Impressions</publisher>
 		<notes><![CDATA[
@@ -5313,7 +5313,7 @@ Fails [disk swap] when launching univers3.prg
 
 	<software name="wander3d" supported="no">
 		<!-- SPS (CAPS) release 3303 -->
-		<description>Wanderer 3D (Euro, Budget)</description>
+		<description>Wanderer 3D (Europe, Budget)</description>
 		<year>1988</year>
 		<publisher>Encore</publisher>
 		<notes><![CDATA[
@@ -5398,7 +5398,7 @@ Fails to recognize [disk swap] after title screen
 
 	<software name="warlock" supported="no">
 		<!-- SPS (CAPS) release 3181 -->
-		<description>Warlock's Quest (Euro, Budget)</description>
+		<description>Warlock's Quest (Europe, Budget)</description>
 		<year>1988</year>
 		<publisher>Pocket Soft</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -5412,7 +5412,7 @@ Fails to recognize [disk swap] after title screen
 
 	<software name="warlocke" supported="no">
 		<!-- SPS (CAPS) release 3247 -->
-		<description>Warlock (Euro, The Edge)</description>
+		<description>Warlock (Europe, The Edge)</description>
 		<year>19??</year>
 		<publisher>The Edge</publisher>
 		<info name="usage" value="Keyboard only, where pause is space key and S to resume" />
@@ -5459,7 +5459,7 @@ Randomly hangs after few seconds in gameplay or doesn't recognize fire button on
 
 	<software name="wildstrt" supported="no">
 		<!-- SPS (CAPS) release 3182 -->
-		<description>Wild Streets (Euro, Budget)</description>
+		<description>Wild Streets (Europe, Budget)</description>
 		<year>1990</year>
 		<publisher>Fox Hits</publisher>
 		<notes><![CDATA[
@@ -5501,7 +5501,7 @@ Prompts user to insert the "other" disk, fails [disk swap]
 
 	<software name="wclead" supported="no">
 		<!-- SPS (CAPS) release 3185 -->
-		<description>World Class Leader Board (Euro, Budget)</description>
+		<description>World Class Leader Board (Europe, Budget)</description>
 		<year>1990</year>
 		<publisher>Klassix</publisher>
 		<notes><![CDATA[
@@ -5557,7 +5557,7 @@ Static sound during intro and gameplay
 
 	<software name="xenon" supported="no">
 		<!-- SPS (CAPS) release 3251 -->
-		<description>Xenon (Euro, Budget)</description>
+		<description>Xenon (Europe, Budget)</description>
 		<year>1988</year>
 		<publisher>16 Blitz</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -5571,7 +5571,7 @@ Static sound during intro and gameplay
 
 	<!-- S/N: CA400607-012 Rev. B -->
 	<software name="stelang">
-		<description>STE Language Disk (Swe, Rev. B)</description>
+		<description>STE Language Disk (Sweden, rev. B)</description>
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<info name="usage" value="Requires a STE machine"/>
