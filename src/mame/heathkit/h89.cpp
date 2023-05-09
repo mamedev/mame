@@ -315,14 +315,11 @@ void h89_state::machine_start()
 	if (ram_size == 0x10000)
 	{
 		// system has a full 64k
-		// All views will have RAM from 8k -> 64k.
-		m_mem_view[0].install_ram(0x2000, 0xffff, m_ram_ptr);
-		m_mem_view[1].install_ram(0x2000, 0xffff, m_ram_ptr);
-		m_mem_view[2].install_ram(0x2000, 0xffff, m_ram_ptr);
+		m_maincpu->space(AS_PROGRAM).install_ram(0x2000, 0xffff, m_ram_ptr);
 
 		// TODO: install shadow writing to RAM when in ROM mode
 
-		// Only the CP/M - Org 0 view will have it at the lower 8k
+		// Only the CP/M - Org 0 view will have RAM at the lower 8k
 		m_mem_view[2].install_ram(0x0000, 0x1fff, m_ram_ptr + 0xe000);
 	}
 	else
