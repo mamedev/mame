@@ -748,10 +748,10 @@ static INPUT_PORTS_START( tmek )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( primrage )
+static INPUT_PORTS_START( primrageo )
 	PORT_INCLUDE( common )
 
-	/* primrage uses one of the 4 action buttons as start */
+	/* primrage20 & primrageo use one of the 4 action buttons as start */
 	PORT_MODIFY( "P1_P2" )
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
@@ -763,6 +763,21 @@ static INPUT_PORTS_START( primrage )
 	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( primrage )
+	PORT_INCLUDE( common )
+
+	/* primrage has a dedicated start button */
+	PORT_MODIFY( "P1_P2" )
+	PORT_BIT( 0x000000F5, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+INPUT_PORTS_END
 
 
 /*************************************
@@ -1487,11 +1502,11 @@ void atarigt_state::init_primrage()
  *
  *************************************/
 
-GAME( 1994, tmek,       0,        tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v5.1, The Warlords)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
-GAME( 1994, tmek51p,    tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v5.1, prototype)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
-GAME( 1994, tmek45,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v4.5)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
-GAME( 1994, tmek44,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v4.4)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
-GAME( 1994, tmek20,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v2.0, prototype)", MACHINE_NODEVICE_LAN )
-GAME( 1994, primrage,   0,        primrage,   primrage, atarigt_state, init_primrage, ROT0, "Atari Games", "Primal Rage (version 2.3, newer build)", MACHINE_UNEMULATED_PROTECTION ) // OS: Jan 4 1995 18:25:40 Main: Jan 4 1995 18:28:24
-GAME( 1994, primrageo,  primrage, primrage,   primrage, atarigt_state, init_primrage, ROT0, "Atari Games", "Primal Rage (version 2.3, older build)", MACHINE_UNEMULATED_PROTECTION ) // OS: Dec 6 1994 16:04:09 Main: Dec 7 1994 17:24:05
-GAME( 1994, primrage20, primrage, primrage20, primrage, atarigt_state, init_primrage, ROT0, "Atari Games", "Primal Rage (version 2.0)", MACHINE_UNEMULATED_PROTECTION ) // OS: Aug 9 1994 17:05:40 Main: Aug 9 1994 17:05:02
+GAME( 1994, tmek,       0,        tmek,       tmek,      atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v5.1, The Warlords)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
+GAME( 1994, tmek51p,    tmek,     tmek,       tmek,      atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v5.1, prototype)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
+GAME( 1994, tmek45,     tmek,     tmek,       tmek,      atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v4.5)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
+GAME( 1994, tmek44,     tmek,     tmek,       tmek,      atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v4.4)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
+GAME( 1994, tmek20,     tmek,     tmek,       tmek,      atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v2.0, prototype)", MACHINE_NODEVICE_LAN )
+GAME( 1994, primrage,   0,        primrage,   primrage,  atarigt_state, init_primrage, ROT0, "Atari Games", "Primal Rage (version 2.3, newer build)", MACHINE_UNEMULATED_PROTECTION ) // OS: Jan 4 1995 18:25:40 Main: Jan 4 1995 18:28:24
+GAME( 1994, primrageo,  primrage, primrage,   primrageo, atarigt_state, init_primrage, ROT0, "Atari Games", "Primal Rage (version 2.3, older build)", MACHINE_UNEMULATED_PROTECTION ) // OS: Dec 6 1994 16:04:09 Main: Dec 7 1994 17:24:05
+GAME( 1994, primrage20, primrage, primrage20, primrageo, atarigt_state, init_primrage, ROT0, "Atari Games", "Primal Rage (version 2.0)", MACHINE_UNEMULATED_PROTECTION ) // OS: Aug 9 1994 17:05:40 Main: Aug 9 1994 17:05:02
