@@ -549,7 +549,6 @@ public:
 		m_in2(*this, "IN2"),
 		m_out1(*this, "OUT1"),
 		m_out2(*this, "OUT2"),
-		m_cd(*this, "CD"),
 		m_upd4701(*this, "upd4701"),
 		m_gunx(*this, "GUNX"),
 		m_sensor(*this, "SENSOR"),
@@ -565,7 +564,6 @@ public:
 	void drmn10m(machine_config &config);
 	void gtfrk10m(machine_config &config);
 	void gtfrk11m(machine_config &config);
-	void gtfrk10mb(machine_config &config);
 	void gtrfrk7m(machine_config &config);
 	void hyperbbc(machine_config &config);
 	[[maybe_unused]] void ddrsolo(machine_config &config);
@@ -778,7 +776,6 @@ private:
 	required_ioport m_in2;
 	required_ioport m_out1;
 	required_ioport m_out2;
-	required_ioport m_cd;
 	optional_device<upd4701_device> m_upd4701;
 	optional_ioport m_gunx;
 	optional_ioport m_sensor;
@@ -2836,6 +2833,8 @@ void ksys573_state::drmn9m(machine_config &config)
 	casszi(config);
 
 	KONAMI_573_MULTI_SESSION_UNIT(config, "k573msu", 0);
+
+	// KONAMI_573_NETWORK_PCB_UNIT(config, "k573npu", 0);
 }
 
 void ksys573_state::drmn10m(machine_config &config)
@@ -2846,6 +2845,8 @@ void ksys573_state::drmn10m(machine_config &config)
 	casszi(config);
 
 	KONAMI_573_MULTI_SESSION_UNIT(config, "k573msu", 0);
+
+	// KONAMI_573_NETWORK_PCB_UNIT(config, "k573npu", 0);
 }
 
 // Guitar Freaks
@@ -2901,13 +2902,8 @@ void ksys573_state::gtfrk10m(machine_config &config)
 	k573d(config);
 	casszi(config);
 	pccard1_32mb(config);
-}
 
-void ksys573_state::gtfrk10mb(machine_config &config)
-{
-	gtrfrk7m(config);
-
-	KONAMI_573_NETWORK_PCB_UNIT(config, "k573npu", 0);
+	// KONAMI_573_NETWORK_PCB_UNIT(config, "k573npu", 0);
 }
 
 void ksys573_state::gtfrk11m(machine_config &config)
@@ -2915,6 +2911,8 @@ void ksys573_state::gtfrk11m(machine_config &config)
 	k573d(config);
 	casszi(config);
 	pccard1_32mb(config);
+
+	// KONAMI_573_NETWORK_PCB_UNIT(config, "k573npu", 0);
 }
 
 // Miscellaneous
@@ -3039,7 +3037,8 @@ void ksys573_state::mamboagg(machine_config &config)
 void ksys573_state::mamboagga(machine_config &config)
 {
 	mamboagg(config);
-	KONAMI_573_NETWORK_PCB_UNIT(config, "k573npu", 0);
+
+	// TODO: Rental serial device needs to be attached here
 }
 
 void ksys573_state::kicknkick(machine_config &config)
@@ -3159,11 +3158,6 @@ static INPUT_PORTS_START( konami573 )
 
 	PORT_START( "analog3" )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START( "CD" )
-	PORT_CONFNAME( 1, 0, "CD" )
-	PORT_CONFSETTING( 0, "1" )
-	PORT_CONFSETTING( 1, "2" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( fbaitbc )
@@ -3193,6 +3187,8 @@ static INPUT_PORTS_START( ddr )
 
 	PORT_MODIFY( "IN2" )
 	PORT_BIT( 0x00000f0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER( ddr_state, gn845pwbb_read )
+
+	/* IN3 bit 0x02000000 is used by ddr4mp and ddr4mps to specify that it's a rental cabinet type which requires a rental security cartridge to boot, unused by other DDR games */
 
 	PORT_START( "STAGE" )
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_PLAYER( 1 )
@@ -3308,7 +3304,7 @@ static INPUT_PORTS_START( dmx )
 	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_PLAYER( 1 ) PORT_NAME( "P1 Select R" ) /* P1 DOWN */
 	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER( 1 ) PORT_NAME( "D-Sensor U L" ) /* P1 BUTTON1 */
 	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER( 1 ) PORT_NAME( "D-Sensor U R" ) /* P1 BUTTON2 */
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNUSED ) /* P1 BUTTON3 */
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNUSED ) /* Used by dmx2 and dmx2majp to specify it's a rental cabinet type which requires a rental security cartridge to boot, unused by other DMX games */
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER( 2 ) PORT_NAME( "D-Sensor D1 L" ) /* P2 LEFT */
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER( 2 ) PORT_NAME( "D-Sensor D1 R" ) /* P2 RIGHT */
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_PLAYER( 2 ) PORT_NAME( "P2 Select L" ) /* P2 UP */
@@ -3897,7 +3893,7 @@ ROM_START( ddr2mc )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 )
-	ROM_LOAD( "gn896ja.u1",  0x000000, 0x000224, BAD_DUMP CRC(5d906be5) SHA1(4ea9c5506aaaf1726f2a39d0a37a8df35a6aad47) )
+	ROM_LOAD( "ge984ja.u1",  0x000000, 0x000224, BAD_DUMP CRC(a066ad5e) SHA1(1783c62d7396e4e7f8d723b7bc07e45285dc122d) )
 
 	DISK_REGION( "install" )
 	DISK_IMAGE_READONLY( "896jaa01", 0, BAD_DUMP SHA1(f802a0e2ba0147eb71c54d92af409c3010a5715f) )
@@ -3925,7 +3921,7 @@ ROM_START( ddr2ml )
 	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 )
 	ROM_LOAD( "ge885jaa.u1",  0x000000, 0x000224, BAD_DUMP CRC(a066ad5e) SHA1(1783c62d7396e4e7f8d723b7bc07e45285dc122d) )
 
-	DISK_REGION( "install" )
+	DISK_REGION( "runtime" )
 	DISK_IMAGE_READONLY( "885jac01", 0, SHA1(ed864096ee99aa813f40642b9467fe2cbb07d669) )
 ROM_END
 
@@ -4356,10 +4352,15 @@ ROM_START( drmn2mpu )
 	ROM_REGION( 0x000008, "cassette:game:id", 0 )
 	ROM_LOAD( "gn912ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "install" )
+	DISK_REGION( "runtime" )
 	DISK_IMAGE_READONLY( "912jab02", 0, BAD_DUMP SHA1(19dfae94b63468d3e16d3cc4a3eeae60d5dff1d7) )
 
-	DISK_REGION( "runtime" )
+	// How to install:
+	// 1. Set dipswitch 4 to CD-ROM mode, switch to install security cart, and restart machine to install using the runtime CD
+	// 2. Switch to game security cart, switch to install CD, and restart machine to install power up version (will have a graphical installer)
+	// 3. Set dipswitch 4 to Flash ROM mode, switch to runtime CD again, and restart machine
+	// You should see "SESSION POWERUP KIT INSTALLED" in top left corner after initial boot (will always show up if you go into operator menu and select game mode as an easy test)
+	DISK_REGION( "install" )
 	DISK_IMAGE_READONLY( "912za01",  0, BAD_DUMP SHA1(033a310006efe164cc6a8276de42a5d555f9fea9) )
 ROM_END
 
@@ -4396,10 +4397,10 @@ ROM_START( drmn4m )
 	ROM_REGION( 0x000008, "cassette:game:id", 0 )
 	ROM_LOAD( "gea25jaa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "install" )
+	DISK_REGION( "runtime" )
 	DISK_IMAGE_READONLY( "a25jaa02", 0, BAD_DUMP SHA1(8a0b761d1c282d927e2daf92519654a1c91ee1ab) )
 
-	DISK_REGION( "runtime" )
+	DISK_REGION( "multisession" )
 	DISK_IMAGE_READONLY( "a25jba02", 0, BAD_DUMP SHA1(5f4aae359da610352c1004cfa1a32064d8f55d0e) )
 ROM_END
 
@@ -4412,10 +4413,10 @@ ROM_START( drmn5m )
 	ROM_REGION( 0x000008, "cassette:game:id", 0 )
 	ROM_LOAD( "gcb05jaa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "install" )
+	DISK_REGION( "runtime" )
 	DISK_IMAGE_READONLY( "b05jaa02", 0, BAD_DUMP SHA1(7a6e7940d1441cff1d9be1bc3affc029fe6dc9e4) )
 
-	DISK_REGION( "runtime" )
+	DISK_REGION( "multisession" )
 	DISK_IMAGE_READONLY( "b05jba02", 0, BAD_DUMP SHA1(822149db553ca78ad8174719a657dbbd2776b922) )
 ROM_END
 
@@ -4433,10 +4434,10 @@ ROM_START( drmn6m )
 	ROM_REGION( 0x000008, "cassette:game:id", 0 )
 	ROM_LOAD( "gcb16jaa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "install" )
+	DISK_REGION( "runtime" )
 	DISK_IMAGE_READONLY( "b16jaa02", 0, BAD_DUMP SHA1(fa0862a9bd3a48d4f6e7b44b11ad387acc05037e) )
 
-	DISK_REGION( "runtime" )
+	DISK_REGION( "multisession" )
 	DISK_IMAGE_READONLY( "b16jba02", 0, BAD_DUMP SHA1(07de74a3ca384407d99c433110085208a458653e) )
 ROM_END
 
@@ -4454,10 +4455,10 @@ ROM_START( drmn7m )
 	ROM_REGION( 0x000008, "cassette:game:id", 0 )
 	ROM_LOAD( "gcc07jba.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "install" )
+	DISK_REGION( "runtime" )
 	DISK_IMAGE_READONLY( "c07jca02", 0, SHA1(a81a35360933ab8a7630cf5e8a8c6988714cfa0d) )
 
-	DISK_REGION( "runtime" )
+	DISK_REGION( "multisession" )
 	DISK_IMAGE_READONLY( "c07jda02", 0, BAD_DUMP SHA1(7c22ebbda11bdaf85c3441d7a6f3497994cd957f) )
 ROM_END
 
@@ -4475,10 +4476,10 @@ ROM_START( drmn7ma )
 	ROM_REGION( 0x000008, "cassette:game:id", 0 )
 	ROM_LOAD( "gcc07jaa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "install" )
+	DISK_REGION( "runtime" )
 	DISK_IMAGE_READONLY( "c07jaa02", 0, BAD_DUMP SHA1(96c410745d1fd14059bf11987655ed998a9b79dd) )
 
-	DISK_REGION( "runtime" )
+	DISK_REGION( "multisession" )
 	DISK_IMAGE_READONLY( "c07jba02", 0, BAD_DUMP SHA1(25e1a3ff7886c409d16e40ca1798b01b11546755) )
 ROM_END
 
@@ -4491,10 +4492,10 @@ ROM_START( drmn8m )
 	ROM_REGION( 0x000008, "cassette:game:id", 0 )
 	ROM_LOAD( "gcc38jaa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "install" )
+	DISK_REGION( "runtime" )
 	DISK_IMAGE_READONLY( "c38jaa02", 0, SHA1(9115252e6cc13ff90e73cd1a864e0d99e3c8b5ea) )
 
-	DISK_REGION( "runtime" )
+	DISK_REGION( "multisession" )
 	DISK_IMAGE_READONLY( "c38jba02", 0, SHA1(2a31335277929b2231b12ad950ab69e35b37d973) )
 ROM_END
 
@@ -4511,9 +4512,12 @@ ROM_START( drmn9m )
 	DISK_IMAGE_READONLY( "d09jab01", 0, SHA1(f3962f77b96a48bf0195700f4b72bf02d75a7e03) )
 
 	DISK_REGION( "install2" )
-	DISK_IMAGE_READONLY( "d09jaa02", 0, BAD_DUMP SHA1(33f3e48ed5a8becd8c4714413e454328d8d5baae) )
+	DISK_IMAGE_READONLY( "d09jca02", 0, SHA1(4583ce07fca67660f9f1928589f39d3f551206ff) ) // e-Amusement song data installer for HDD, requires NPU
 
 	DISK_REGION( "runtime" )
+	DISK_IMAGE_READONLY( "d09jaa02", 0, BAD_DUMP SHA1(33f3e48ed5a8becd8c4714413e454328d8d5baae) )
+
+	DISK_REGION( "multisession" )
 	DISK_IMAGE_READONLY( "d09jba02", 0, BAD_DUMP SHA1(68324d474d89a9ddf5cadc9ab4a8d615b3739879) )
 ROM_END
 
@@ -4527,23 +4531,13 @@ ROM_START( drmn9ma )
 	ROM_LOAD( "gcd09jaa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "install" )
+	DISK_IMAGE_READONLY( "d09jca02", 0, SHA1(4583ce07fca67660f9f1928589f39d3f551206ff) ) // e-Amusement song data installer for HDD, requires NPU
+
+	DISK_REGION( "runtime" )
 	DISK_IMAGE_READONLY( "d09jaa02", 0, BAD_DUMP SHA1(33f3e48ed5a8becd8c4714413e454328d8d5baae) )
 
-	DISK_REGION( "runtime" )
+	DISK_REGION( "multisession" )
 	DISK_IMAGE_READONLY( "d09jba02", 0, BAD_DUMP SHA1(68324d474d89a9ddf5cadc9ab4a8d615b3739879) )
-ROM_END
-
-ROM_START( drmn9mb )
-	SYS573_BIOS_A
-
-	ROM_REGION( 0x000008c, "cassette:game:eeprom", 0 )
-	ROM_LOAD( "gcd09jaa.u1",   0x000000, 0x00008c, BAD_DUMP CRC(f73f2f6b) SHA1(30abe964fcef3901b2098e32946568f4a7c617d7) )
-
-	ROM_REGION( 0x000008, "cassette:game:id", 0 )
-	ROM_LOAD( "gcd09jaa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
-
-	DISK_REGION( "runtime" )
-	DISK_IMAGE_READONLY( "d09jca02", 0, SHA1(4583ce07fca67660f9f1928589f39d3f551206ff) )
 ROM_END
 
 ROM_START( drmn10m )
@@ -4556,23 +4550,13 @@ ROM_START( drmn10m )
 	ROM_LOAD( "gcd40jaa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "install" )
+	DISK_IMAGE_READONLY( "d40jca02", 0, SHA1(f0208a62e2d15773961e89383ae8d4bd2e8f6b47) ) // e-Amusement song data installer for HDD, requires NPU
+
+	DISK_REGION( "runtime" )
 	DISK_IMAGE_READONLY( "d40jaa02", 0, BAD_DUMP SHA1(68b2038f0cd2d461f608945d1e243f2b6979efaa) )
 
-	DISK_REGION( "runtime" )
+	DISK_REGION( "multisession" )
 	DISK_IMAGE_READONLY( "d40jba02", 0, BAD_DUMP SHA1(0ded9e0a6c77b181e7b6beb1dbdfa17dee4acd90) )
-ROM_END
-
-ROM_START( drmn10ma )
-	SYS573_BIOS_A
-
-	ROM_REGION( 0x000008c, "cassette:game:eeprom", 0 )
-	ROM_LOAD( "gcd40jaa.u1",   0x000000, 0x00008c, BAD_DUMP CRC(d98d4aa5) SHA1(7142c1e6291fdaac726477662487c7600c048e0a) )
-
-	ROM_REGION( 0x000008, "cassette:game:id", 0 )
-	ROM_LOAD( "gcd40jaa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
-
-	DISK_REGION( "runtime" )
-	DISK_IMAGE_READONLY( "d40jca02", 0, SHA1(f0208a62e2d15773961e89383ae8d4bd2e8f6b47) )
 ROM_END
 
 ROM_START( dmx )
@@ -5453,6 +5437,9 @@ ROM_START( gtfrk10m )
 	DISK_REGION( "install" )
 	DISK_IMAGE_READONLY( "d10jab01", 0, BAD_DUMP SHA1(c84858b412f0798a65cf3059c743501f32ad7280) )
 
+	DISK_REGION( "install2" )
+	DISK_IMAGE_READONLY( "d10jba02", 0, BAD_DUMP SHA1(80893da422268cc1f89688289cdec981c4f9feb2) ) // e-Amusement song data installer for HDD, requires NPU
+
 	DISK_REGION( "runtime" )
 	DISK_IMAGE_READONLY( "d10jaa02", 0, BAD_DUMP SHA1(d4e4460ca3edc1b365af593757557c6cf5b7b3ec) )
 ROM_END
@@ -5466,21 +5453,11 @@ ROM_START( gtfrk10ma )
 	ROM_REGION( 0x000008, "cassette:game:id", 0 )
 	ROM_LOAD( "gcd10jaa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
+	DISK_REGION( "install" )
+	DISK_IMAGE_READONLY( "d10jba02", 0, BAD_DUMP SHA1(80893da422268cc1f89688289cdec981c4f9feb2) ) // e-Amusement song data installer for HDD, requires NPU
+
 	DISK_REGION( "runtime" )
 	DISK_IMAGE_READONLY( "d10jaa02", 0, BAD_DUMP SHA1(d4e4460ca3edc1b365af593757557c6cf5b7b3ec) )
-ROM_END
-
-ROM_START( gtfrk10mb )
-	SYS573_BIOS_A
-
-	ROM_REGION( 0x000008c, "cassette:game:eeprom", 0 )
-	ROM_LOAD( "gcd10jab.u1",   0x000000, 0x00008c, BAD_DUMP CRC(4147d6fb) SHA1(35877a6c295369f3c6857f6e33fad80abf111156) )
-
-	ROM_REGION( 0x000008, "cassette:game:id", 0 )
-	ROM_LOAD( "gcd10jab.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
-
-	DISK_REGION( "runtime" )
-	DISK_IMAGE_READONLY( "d10jba02", 0, BAD_DUMP SHA1(80893da422268cc1f89688289cdec981c4f9feb2) )
 ROM_END
 
 ROM_START( gtfrk11m )
@@ -5492,21 +5469,11 @@ ROM_START( gtfrk11m )
 	ROM_REGION( 0x000008, "cassette:game:id", 0 )
 	ROM_LOAD( "gcd39ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
+	DISK_REGION( "install" )
+	DISK_IMAGE_READONLY( "d39jba02", 0, SHA1(a10225d1dd6cfd22382970099927aeba5e0c03e7) ) // e-Amusement song data installer for HDD, requires NPU
+
 	DISK_REGION( "runtime" )
 	DISK_IMAGE_READONLY( "d39jaa02", 0, BAD_DUMP SHA1(7a87ee331ba0301bb8724c398e6c77cfb9c172a7) )
-ROM_END
-
-ROM_START( gtfrk11ma )
-	SYS573_BIOS_A
-
-	ROM_REGION( 0x000008c, "cassette:game:eeprom", 0 )
-	ROM_LOAD( "gcd39ja.u1",   0x000000, 0x00008c, BAD_DUMP CRC(809301a6) SHA1(718e646bc6e72d89e78b771fb64374f77c5662a0) )
-
-	ROM_REGION( 0x000008, "cassette:game:id", 0 )
-	ROM_LOAD( "gcd39ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
-
-	DISK_REGION( "runtime" )
-	DISK_IMAGE_READONLY( "d39jba02", 0, SHA1(a10225d1dd6cfd22382970099927aeba5e0c03e7) )
 ROM_END
 
 ROM_START( gunmania )
@@ -6011,10 +5978,10 @@ ROM_START( pcnfrk4m )
 	ROM_REGION( 0x000008, "cassette:game:id", 0 )
 	ROM_LOAD( "gea25aaa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "install" )
+	DISK_REGION( "runtime" )
 	DISK_IMAGE_READONLY( "a25aaa02", 0, BAD_DUMP SHA1(cea168d38a4052ef5f30dc00a80529bbd8a31097) )
 
-	DISK_REGION( "runtime" )
+	DISK_REGION( "multisession" )
 	DISK_IMAGE_READONLY( "a25aba02", 0, BAD_DUMP SHA1(eb8eed41c715f39a426433224671adc36d4b0262) )
 ROM_END
 
@@ -6115,21 +6082,11 @@ ROM_START( pcnfrk9m )
 	ROM_REGION( 0x000008, "cassette:game:id", 0 )
 	ROM_LOAD( "gcd09aba.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
+	DISK_REGION( "install" )
+	DISK_IMAGE_READONLY( "d09aba02", 0, BAD_DUMP SHA1(a817d1c7fdb354b7d2d5c08f92a352c76a2b1a72) ) // e-Amusement song data installer for HDD, requires NPU
+
 	DISK_REGION( "runtime" )
 	DISK_IMAGE_READONLY( "d09aaa02", 0, SHA1(593706872e3a541acfe4d9527c3a5e89cc193e98) )
-ROM_END
-
-ROM_START( pcnfrk9ma )
-	SYS573_BIOS_A
-
-	ROM_REGION( 0x000008c, "cassette:game:eeprom", 0 )
-	ROM_LOAD( "gcd09aba.u1",   0x000000, 0x00008c, BAD_DUMP CRC(1fe73b91) SHA1(b3c49b84295b9dfc946b12a53bdec5cd24541c98) )
-
-	ROM_REGION( 0x000008, "cassette:game:id", 0 )
-	ROM_LOAD( "gcd09aba.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
-
-	DISK_REGION( "runtime" )
-	DISK_IMAGE_READONLY( "d09aba02", 0, BAD_DUMP SHA1(a817d1c7fdb354b7d2d5c08f92a352c76a2b1a72) )
 ROM_END
 
 ROM_START( pcnfrk10m )
@@ -6141,24 +6098,14 @@ ROM_START( pcnfrk10m )
 	ROM_REGION( 0x000008, "cassette:game:id", 0 )
 	ROM_LOAD( "gcd40aca.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
+	DISK_REGION( "install" )
+	DISK_IMAGE_READONLY( "d40aca02", 0, BAD_DUMP SHA1(3a23808e13b689f3ed2a1fa1ce541a4b82765d97) ) // e-Amusement song data installer for HDD, requires NPU
+
 	DISK_REGION( "runtime" )
 	DISK_IMAGE_READONLY( "d40aaa02", 0, SHA1(638c19588c5f9967eb5623a3a979ac68e7c96dae) )
 
-	DISK_REGION( "install" )
+	DISK_REGION( "multisession" )
 	DISK_IMAGE_READONLY( "d40aba02", 0, NO_DUMP )
-ROM_END
-
-ROM_START( pcnfrk10ma )
-	SYS573_BIOS_A
-
-	ROM_REGION( 0x000008c, "cassette:game:eeprom", 0 )
-	ROM_LOAD( "gcd40aca.u1",   0x000000, 0x00008c, BAD_DUMP CRC(cbeaaaae) SHA1(ccc6c47b20ab847859ec37c9c45dc90b24a232b5) )
-
-	ROM_REGION( 0x000008, "cassette:game:id", 0 )
-	ROM_LOAD( "gcd40aca.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
-
-	DISK_REGION( "runtime" )
-	DISK_IMAGE_READONLY( "d40aca02", 0, BAD_DUMP SHA1(3a23808e13b689f3ed2a1fa1ce541a4b82765d97) )
 ROM_END
 
 ROM_START( pnchmn )
@@ -6490,7 +6437,7 @@ GAME( 2001, ddr5m,     sys573,   ddr5m,      ddr,       ddr_state,     empty_ini
 GAME( 2001, kicknkick, sys573,   kicknkick,  kicknkick, ksys573_state, empty_init,    ROT0,  "Konami", "Kick & Kick (GNA36 VER. EAA)", MACHINE_IMPERFECT_SOUND )
 GAME( 2001, dmx2majp,  sys573,   dmx,        dmx,       ksys573_state, empty_init,    ROT0,  "Konami", "Dance Maniax 2nd Mix Append J-Paradise (G*A38 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, mamboagg,  sys573,   mamboagg,   mamboagg,  ksys573_state, empty_init,    ROT0,  "Konami", "Mambo A Go-Go (GQA40 VER. JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
-GAME( 2001, mamboagga, mamboagg, mamboagga,  mamboagg,  ksys573_state, empty_init,    ROT0,  "Konami", "Mambo A Go-Go e-Amusement (GQA40 VER. JRB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
+GAME( 2001, mamboagga, mamboagg, mamboagga,  mamboagg,  ksys573_state, empty_init,    ROT0,  "Konami", "Mambo A Go-Go (GQA40 VER. JRB, Rental)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2001, pcnfrk5m,  sys573,   drmn4m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "Percussion Freaks 5th Mix (G*B05 VER. AAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, pcnfrk5mk, pcnfrk5m, drmn4m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "Percussion Freaks 5th Mix (G*B05 VER. KAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, drmn5m,    pcnfrk5m, drmn4m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "DrumMania 5th Mix (G*B05 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.9 */
@@ -6513,16 +6460,10 @@ GAME( 2003, pcnfrk8m,  sys573,   drmn4m,     drmn,      ksys573_state, empty_ini
 GAME( 2003, drmn8m,    pcnfrk8m, drmn4m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "DrumMania 8th Mix (G*C38 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2003, gtrfrk9m,  sys573,   gtrfrk7m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 9th Mix (G*C39 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2003, pcnfrk9m,  sys573,   drmn9m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "Percussion Freaks 9th Mix (G*D09 VER. AAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
-GAME( 2003, pcnfrk9ma, pcnfrk9m, drmn9m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "Percussion Freaks 9th Mix eAmusement (G*D09 VER. ABA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2003, drmn9m,    pcnfrk9m, drmn9m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "DrumMania 9th Mix (G*D09 VER. JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2003, drmn9ma,   pcnfrk9m, drmn9m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "DrumMania 9th Mix (G*D09 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
-GAME( 2003, drmn9mb,   pcnfrk9m, drmn9m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "DrumMania 9th Mix eAmusement (G*D09 VER. JCA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2003, gtfrk10m,  sys573,   gtfrk10m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 10th Mix (G*D10 VER. JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2003, gtfrk10ma, gtfrk10m, gtfrk10m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 10th Mix (G*D10 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
-GAME( 2003, gtfrk10mb, gtfrk10m, gtfrk10mb,  gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 10th Mix eAmusement (G*D10 VER. JBA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2004, gtfrk11m,  sys573,   gtfrk11m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 11th Mix (G*D39 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
-GAME( 2004, gtfrk11ma, gtfrk11m, gtfrk11m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 11th Mix eAmusement (G*D39 VER. JBA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2004, pcnfrk10m, sys573,   drmn10m,    drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "Percussion Freaks 10th Mix (G*D40 VER. AAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
-GAME( 2004, pcnfrk10ma,pcnfrk10m,drmn10m,    drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "Percussion Freaks 10th Mix eAmusement (G*D40 VER. ACA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2004, drmn10m,   pcnfrk10m,drmn10m,    drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "DrumMania 10th Mix (G*D40 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
-GAME( 2004, drmn10ma,  pcnfrk10m,drmn10m,    drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "DrumMania 10th Mix eAmusement (G*D40 VER. JCA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.95 */
