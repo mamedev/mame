@@ -3290,6 +3290,9 @@ Has [redbook] audio
 		<description>Bomber Hehhe! (Japan)</description>
 		<year>2002</year>
 		<publisher>Fujicom</publisher>
+		<notes><![CDATA[
+[PVR] ignores alpha for TV-like scanline effects on main menu
+]]></notes>
 		<info name="serial" value="T-42903M"/>
 		<info name="release" value="20020110"/>
 		<info name="alt_title" value="ボンバーヘッヘ"/>
@@ -3311,6 +3314,9 @@ Has [redbook] audio
 		<description>Bomberman Online (USA)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+[PVR] bomb explosions draws empty at center
+]]></notes>
 		<info name="serial" value="51065"/>
 		<info name="release" value="20011030"/>
 		<part interface="cdrom" name="cdrom">
@@ -6076,7 +6082,7 @@ Hangs at "Produced by Sega", [GDROM READY] keeps reading LBA=$afbe with REQ_ERRO
 		<publisher>Princess Soft</publisher>
 		<notes><![CDATA[
 Black screen [GDROM READY] (fixed)
-No [PVR] renders/black screen on FMV and title screen (sound plays)
+No [PVR] renders/black screen on FMV and title screen (sound plays, setup [fb_r_ctrl] [fb_w_ctrl] [fb_w_linestride] to 0)
 ]]></notes>
 		<info name="serial" value="T-46502M, T-46552M (Alt. Audio CD)"/>
 		<info name="release" value="20011025"/>
@@ -13624,8 +13630,10 @@ Too fast ADX logo transition
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
 [PVR] safety cars in attract mode have ugly renders
-Black screen on title, [PVR] wrong ROP?
-[PVR] Checkered flag is blackened on main menu
+[PVR] Black screen on title
+[PVR] Checkered flag is blackened on main menu with [drc]
+Hangs after selecting car with [drc]
+[PVR] Gameplay rear mirrors draws garbage
 ]]></notes>
 		<info name="serial" value="HDR-0013"/>
 		<info name="release" value="19990325"/>
