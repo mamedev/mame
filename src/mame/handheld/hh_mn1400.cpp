@@ -417,7 +417,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tomy Basketball
+  Tomy Basketball (model 7600)
   * PCB label: TOMY, BASKET, 2E018E01
   * MN9008 (28-pin MN1400, AI0-AI3 replaced with CO0-CO3, die label: 1400 BM-0)
   * 2 7seg LEDs, 29 other LEDs, 1-bit sound

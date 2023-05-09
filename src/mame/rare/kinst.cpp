@@ -21,12 +21,6 @@ TODO:
 - Bootup sequence (the blue color fill) is too fast, which in turn causes
   attract mode music not to play. Maybe the main CPU is running at a lower
   clockspeed at boot (50MHz/4 seems plausible), but then, what toggles it?
-- Screen timing (not just H and V freq). 261 lines should be good, but pixel
-  clock is unknown. The only one that comes close to sensible values is 6MHz,
-  yet there is no (multiple of) 6MHz XTAL.
-  15384.6 / 58.9634 = 260.9178 (261 lines? howcome it's off by 0.1?)
-  15384.6 * 325 = 4999995 (nope, 5 clocks hblank/hsync is too short)
-  15384.6 * 390 = 5999994
 
 ****************************************************************************
 
@@ -146,8 +140,8 @@ Notes:
                  It is used only with the KI2 conversion kit. This is mainly a protection device to stop game swaps on a KI 1 PCB. However if the
                  sub board is removed and all the EPROMs and HDD are changed, the main board will run Killer Instinct, providing U96 is the correct
                  chip for KI. If U96 is the type for KI2, then the main board will only run KI2 and can't be converted to KI.
-      HSync    - 15.3846kHz
-      VSync    - 58.9634Hz
+      HSync    - 15.3846kHz (another measurement: 15.39090kHz)
+      VSync    - 58.9634Hz (another measurement: 58.96258Hz)
 
       ROMs
       ----
@@ -703,7 +697,7 @@ void kinst_state::kinst(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(6000000, 390, 0, 320, 261, 0, 240); // preliminary
+	screen.set_raw(50_MHz_XTAL/8, 406, 0, 320, 261, 0, 240);
 	screen.screen_vblank().set_inputline(m_maincpu, 0);
 	screen.set_screen_update(FUNC(kinst_state::screen_update));
 
