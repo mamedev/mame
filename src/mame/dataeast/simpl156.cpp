@@ -322,7 +322,7 @@ void simpl156_state::mitchell156_map(address_map &map)
 	map(0x1e4000, 0x1e5fff).rw(FUNC(simpl156_state::rowscroll_r<1>), FUNC(simpl156_state::rowscroll_w<1>));
 	map(0x1f0000, 0x1f0003).readonly().nopw(); // ?
 	map(0x200000, 0x200003).portr("IN0");
-	map(0x201000, 0x201fff).ram().share("systemram"); // work ram (32-bit)
+	map(0x201000, 0x201fff).ram().share("systemram").mirror(0x002000); // work ram (32-bit)
 }
 
 
