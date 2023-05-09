@@ -4336,20 +4336,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/sgikbd/sgikbd.h,BUSES["SGIKBD"] = true
----------------------------------------------------
-
-if (BUSES["SGIKBD"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/bus/sgikbd/hlekbd.cpp",
-		MAME_DIR .. "src/devices/bus/sgikbd/hlekbd.h",
-		MAME_DIR .. "src/devices/bus/sgikbd/sgikbd.cpp",
-		MAME_DIR .. "src/devices/bus/sgikbd/sgikbd.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/bus/sunkbd/sunkbd.h,BUSES["SUNKBD"] = true
 ---------------------------------------------------
 
