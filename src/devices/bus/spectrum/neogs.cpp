@@ -193,7 +193,8 @@ u8 neogs_device::neogs_data_r()
 	return m_data_out;
 }
 
-void neogs_device::neogs_data_w(u8 data) {
+void neogs_device::neogs_data_w(u8 data)
+{
 	m_status |= 0x80;
 	LOGSTATUS("write: DATA & %02X, status: %02X\n", data, m_status);
 	m_data_in = data;
