@@ -139,7 +139,7 @@ void device_image_interface::check_preset_images()
 	}
 	else
 	{
-		std::string tag = device().tag();
+		std::string tag = device().owner()->tag();
 		auto *chd = device().machine().rom_load().get_disk_handle(tag);
 		if (chd)
 		{

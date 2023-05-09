@@ -2268,7 +2268,7 @@ ROM_START( gauntleg )
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_NILE":update", ROMREGION_ERASEFF )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // GUTS 1.5 1/14/1999 Game 1/14/1999
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // GUTS 1.5 1/14/1999 Game 1/14/1999
 	DISK_IMAGE( "gauntleg", 0, SHA1(66eb70e2fba574a7abe54be8bd45310654b24b08) )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // Vegas SIO boot ROM
@@ -2295,7 +2295,7 @@ ROM_START( gauntleg12 )
 	ROMX_LOAD("12to16.3.bin", 0x000000, 0x100000, CRC(1027e54f) SHA1(a841f5cc5b022ddfaf70c97a64d1582f0a2ca70e), ROM_BIOS(3))
 
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // GUTS 1.4 10/22/1998 Main 10/23/1998
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // GUTS 1.4 10/22/1998 Main 10/23/1998
 	DISK_IMAGE( "gauntl12", 0, SHA1(62917fbd692d004bc391287349041ebe669385cf) ) // compressed with -chs 4969,16,63 (which is apparently correct for a Quantum FIREBALL 2.5 GB and allows the update program to work)
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // Vegas SIO boot ROM
@@ -2313,7 +2313,7 @@ ROM_START( gauntdl )
 	ROM_REGION32_LE( 0x100000, PCI_ID_NILE":update", ROMREGION_ERASEFF )
 
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // GUTS: 1.9 3/17/2000 Game 5/9/2000
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // GUTS: 1.9 3/17/2000 Game 5/9/2000
 	DISK_IMAGE( "gauntdl", 0, SHA1(ba3af48171e727c2f7232c06dcf8411cbcf14de8) )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // Vegas SIO boot ROM
@@ -2331,7 +2331,7 @@ ROM_START( gauntdl24 )
 	ROM_REGION32_LE( 0x100000, PCI_ID_NILE":update", ROMREGION_ERASEFF )
 
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // GUTS: 1.9 3/17/2000 Game 3/19/2000
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // GUTS: 1.9 3/17/2000 Game 3/19/2000
 	DISK_IMAGE( "gauntd24", 0, SHA1(3e055794d23d62680732e906cfaf9154765de698) )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // Vegas SIO boot ROM
@@ -2349,7 +2349,7 @@ ROM_START( warfa )
 	ROM_REGION32_LE( 0x100000, PCI_ID_NILE":update", ROMREGION_ERASEFF )
 
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // GUTS 1.3 4/20/1999 Game 4/20/1999
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // GUTS 1.3 4/20/1999 Game 4/20/1999
 	DISK_IMAGE( "warfa", 0, SHA1(87f8a8878cd6be716dbd6c68fb1bc7f564ede484) )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // Vegas SIO boot ROM
@@ -2363,7 +2363,7 @@ ROM_START( warfaa )
 	ROM_REGION32_LE( 0x100000, PCI_ID_NILE":update", ROMREGION_ERASEFF )
 
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // GUTS 1.1 Mar 16 1999, GAME Mar 16 1999
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // GUTS 1.1 Mar 16 1999, GAME Mar 16 1999
 	DISK_IMAGE( "warfaa", 0, SHA1(b443ba68003f8492e5c20156e0d3091fe51e9224) )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // Vegas SIO boot ROM
@@ -2377,7 +2377,7 @@ ROM_START( warfab )
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_NILE":update", ROMREGION_ERASEFF )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // GUTS 1.3 Apr 7 1999 GAME 1.3 Apr 7 1999
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // GUTS 1.3 Apr 7 1999 GAME 1.3 Apr 7 1999
 	// V1.5
 	DISK_IMAGE( "warfa15", 0, SHA1(bd538bf2f6a245545dae4ea97c433bb3f7d4394e) )
 
@@ -2392,7 +2392,7 @@ ROM_START( warfac )
 	ROM_REGION32_LE( 0x100000, PCI_ID_NILE":update", ROMREGION_ERASEFF )
 
 	// required HDD image version is guess
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // GUTS 1.3 4/20/1999 GAME 4/20/1999
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // GUTS 1.3 4/20/1999 GAME 4/20/1999
 	DISK_IMAGE( "warfa", 0, SHA1(87f8a8878cd6be716dbd6c68fb1bc7f564ede484) )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // Vegas SIO boot ROM
@@ -2406,7 +2406,7 @@ ROM_START( tenthdeg )
 	ROM_REGION32_LE( 0x100000, PCI_ID_NILE":update", ROMREGION_ERASEFF )
 
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // GUTS 5/26/1998 MAIN 8/25/1998
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // GUTS 5/26/1998 MAIN 8/25/1998
 	DISK_IMAGE( "tenthdeg", 0, SHA1(41a1a045a2d118cf6235be2cc40bf16dbb8be5d1) )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // Vegas SIO boot ROM
@@ -2421,7 +2421,7 @@ ROM_START( roadburn ) // version 1.04 - verified on hardware
 	ROM_REGION32_LE( 0x100000, PCI_ID_NILE":update", ROMREGION_ERASEFF )
 
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // GUTS 5/19/1999 GAME 5/19/1999
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // GUTS 5/19/1999 GAME 5/19/1999
 	DISK_IMAGE( "road burners v1.04", 0, SHA1(30567241c000ee572a9cfb1b080c02a51a2b12d2) )
 ROM_END
 
@@ -2432,7 +2432,7 @@ ROM_START( roadburn1 ) // version 1.0 - verified on hardware
 	ROM_REGION32_LE( 0x100000, PCI_ID_NILE":update", ROMREGION_ERASEFF )
 
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // GUTS 4/22/1999 GAME 4/22/1999
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // GUTS 4/22/1999 GAME 4/22/1999
 	DISK_IMAGE( "roadburn", 0, SHA1(a62870cceafa6357d7d3505aca250c3f16087566) )
 ROM_END
 
@@ -2444,7 +2444,7 @@ ROM_START( nbashowt )
 	ROM_REGION32_LE( 0x100000, PCI_ID_NILE":update", ROMREGION_ERASEFF )
 
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" )
 	// various strings from this image
 	// SHOWTIME REV 2.0
 	// BUILD DATE: Apr 25 1999 (diag.exe?)
@@ -2466,7 +2466,7 @@ ROM_START( nbanfl )
 	ROM_REGION32_LE( 0x100000, PCI_ID_NILE":update", ROMREGION_ERASEFF )
 
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" )
 	// various strings from this image
 	//NBA SHOWTIME 2.1
 	//BUILD DATE: Sep 22 1999 (diag.exe?)
@@ -2486,7 +2486,7 @@ ROM_START( nbagold ) //Also known as "Sportstation"
 	ROM_REGION32_LE( 0x100000, PCI_ID_NILE":update", ROMREGION_ERASEFF )
 
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" )
 	// various strings from this image
 	//NBA SHOWTIME GOLD 3.00
 	//BUILD DATE Feb 18 2000 (diag.exe)
@@ -2508,7 +2508,7 @@ ROM_START( cartfury )
 	ROM_REGION32_LE( 0x100000, PCI_ID_NILE":update", ROMREGION_ERASEFF )
 
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" )
 	DISK_IMAGE( "cartfury", 0, SHA1(4c5bc2803297ea9a191bbd8b002d0e46b4ae1563) )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2105 data
@@ -2523,7 +2523,7 @@ ROM_START( sf2049 )
 	ROM_REGION32_LE( 0x100000, PCI_ID_NILE":update", ROMREGION_ERASEFF )
 
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Guts 1.03 9/3/1999 Game 9/8/1999
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // Guts 1.03 9/3/1999 Game 9/8/1999
 	DISK_IMAGE( "sf2049", 0, SHA1(9e0661b8566a6c78d18c59c11cd3a6628d025405) )
 
 	ROM_REGION( 0x2000, "serial_security_pic", ROMREGION_ERASEFF ) // security PIC (provides game ID code and serial number)
@@ -2539,7 +2539,7 @@ ROM_START( sf2049se )
 	ROM_REGION32_LE( 0x100000, PCI_ID_NILE":update", ROMREGION_ERASEFF )
 
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" )
 	DISK_IMAGE( "sf2049se", 0, SHA1(7b27a8ce2a953050ce267548bb7160b41f3e8054) )
 
 	ROM_REGION( 0x2000, "serial_security_pic", ROMREGION_ERASEFF ) // security PIC (provides game ID code and serial number)
@@ -2554,7 +2554,7 @@ ROM_START( sf2049te )
 	ROM_REGION32_LE( 0x100000, PCI_ID_NILE":update", ROMREGION_ERASEFF )
 
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" )
 	DISK_IMAGE( "sf2049te", 0, SHA1(625aa36436587b7bec3e7db1d19793b760e2ea51) ) // GUTS 1.61 Game Apr 2, 2001 13:07:21
 
 	ROM_REGION( 0x2000, "serial_security_pic", ROMREGION_ERASEFF ) // security PIC (provides game ID code and serial number)
@@ -2568,7 +2568,7 @@ ROM_START( sf2049tea )
 	ROM_REGION32_LE( 0x100000, PCI_ID_NILE":update", ROMREGION_ERASEFF )
 
 	// All 7 courses are unlocked
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" )
 	DISK_IMAGE( "sf2049tea", 0, SHA1(8d6badf1159903bf44d9a9c7570d4f2417398a93) )
 
 	ROM_REGION( 0x2000, "serial_security_pic", ROMREGION_ERASEFF ) // security PIC (provides game ID code and serial number)

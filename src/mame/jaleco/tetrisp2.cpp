@@ -3111,7 +3111,7 @@ ROM_START( vjslap )
 	ROM_REGION( 0x010000, "xilinx", ROMREGION_ERASE )  // XILINX CPLD
 	ROM_LOAD( "15c.ic49", 0x000000, 38807, CRC(60d50907) SHA1(c5a837b3105ba15fcec103154c8c4d00924974e1) )
 
-	DISK_REGION( "jaleco_vj_pc:pci:07.1:ide1:0:hdd:image" )
+	DISK_REGION( "jaleco_vj_pc:pci:07.1:ide1:0:hdd" )
 	DISK_IMAGE( "vj_ver1", 0, BAD_DUMP SHA1(bf5c70fba13186854ff0b7eafab07dd527aac663) ) // macOS infected the HDD with a ".Spotlight-V100" folder before it could be copied
 ROM_END
 
@@ -3173,7 +3173,7 @@ ROM_START( vjdash )
 	ROM_REGION( 0x010000, "xilinx", 0 )  // XILINX CPLD
 	ROM_LOAD( "15c.ic49", 0x000000, 38807, CRC(60d50907) SHA1(c5a837b3105ba15fcec103154c8c4d00924974e1) )
 
-	DISK_REGION( "jaleco_vj_pc:pci:07.1:ide1:0:hdd:image" )
+	DISK_REGION( "jaleco_vj_pc:pci:07.1:ide1:0:hdd" )
 	DISK_IMAGE( "vj_ver1", 0, BAD_DUMP SHA1(bf5c70fba13186854ff0b7eafab07dd527aac663) )
 ROM_END
 
@@ -3237,7 +3237,7 @@ ROM_START( vjdasha )
 	ROM_REGION( 0x010000, "xilinx", 0 )  // XILINX CPLD
 	ROM_LOAD( "15c.ic49", 0x000000, 38807, CRC(60d50907) SHA1(c5a837b3105ba15fcec103154c8c4d00924974e1) )
 
-	DISK_REGION( "jaleco_vj_pc:pci:07.1:ide1:0:hdd:image" )
+	DISK_REGION( "jaleco_vj_pc:pci:07.1:ide1:0:hdd" )
 	DISK_IMAGE( "vj_ver1", 0, SHA1(bf5c70fba13186854ff0b7eafab07dd527aac663) BAD_DUMP )
 ROM_END
 
@@ -3287,7 +3287,7 @@ ROM_START( stepstag )
 	ROM_REGION( 0x400000, "gfx3", ROMREGION_ERASE )   /* 16x16x8 (Rotation) */
 	ROM_LOAD( "stepstag_rott", 0x000000, 0x400000, NO_DUMP )
 
-	DISK_REGION( "jaleco_vj_pc:pci:07.1:ide1:0:hdd:image" )
+	DISK_REGION( "jaleco_vj_pc:pci:07.1:ide1:0:hdd" )
 	DISK_IMAGE( "stepstag", 0, NO_DUMP )
 ROM_END
 
@@ -3337,7 +3337,7 @@ ROM_START( step3 )
 
 	ROM_REGION( 0x400000, "gfx3", ROMREGION_ERASE )   /* 16x16x8 (Rotation) */
 
-	DISK_REGION( "jaleco_vj_pc:pci:07.1:ide1:0:hdd:image" )
+	DISK_REGION( "jaleco_vj_pc:pci:07.1:ide1:0:hdd" )
 	DISK_IMAGE( "step3", 0, SHA1(926a32998c837f7ba45d07db243c43c1f9d46d6a) )
 ROM_END
 

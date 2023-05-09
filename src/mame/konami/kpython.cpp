@@ -281,7 +281,7 @@ ROM_START( kpython )
 	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
 	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 ROM_END
 
 ROM_START( dogstdx )
@@ -296,7 +296,7 @@ ROM_START( dogstdx )
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)
 	// Not dumped
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE_READONLY( "dogstdx", 0, SHA1(e44a5f535d2a925cd907bdfd5b8e98e61899b4fc) ) // No picture of media available; used romset name
 ROM_END
 
@@ -313,7 +313,7 @@ ROM_START( wswe )
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)
 	ROM_LOAD( "m48t58y.u48",       0x000000, 0x002000, CRC(d4181cb5) SHA1(c5560d1ac043bfe2527fac3fb1989fa8fc53cf8a) )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE_READONLY( "c18jaa03", 0, SHA1(b47190aa38f1f3a499b817758e3f29fac54391bd) )
 ROM_END
 
@@ -330,7 +330,7 @@ ROM_START( wswe2k3 )
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)
 	ROM_LOAD( "m48t58y.u48",       0x000000, 0x002000, CRC(76068de0) SHA1(5f75b88ad04871fb3799fe904658c87524bad94f) )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE_READONLY( "c27jaa03", 0, SHA1(9b2aa900711d88cf5effb3ba6be18726ea006ac4) )
 ROM_END
 
@@ -349,7 +349,7 @@ ROM_START( pesta )
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     // M48T58 Timekeeper NVRAM
 	ROM_LOAD( "m48t58y.u48", 0x0000, 0x2000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	// Konami 128MB Compact Flash PN.0000124371
 	DISK_IMAGE_READONLY( "pes_c18_ea_a03", 0, SHA1(4fe2f0f8e11ac709881e754755d44de5dd8d9fa8) )
 ROM_END
@@ -366,7 +366,7 @@ ROM_START( popn9 )
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     // M48T58 Timekeeper NVRAM
 	ROM_LOAD( "m48t58y.u48",       0x000000, 0x2000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE_READONLY( "c00jab", 0, BAD_DUMP SHA1(3763aaded9b45388a664edd84a3f7f8ff4101be4) )
 ROM_END
 

@@ -103,7 +103,7 @@ ROM_START( ez2d2m )
 	// TODO: move to PCI device once we have one
 	ROM_LOAD( "62090211.rom", 0x000000, 0x00b000, CRC(5669135b) SHA1(b704ce0d20b71e40563d12bcc45bd1240227be74) )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE( "ez2d2m", 0, SHA1(431f0bef3b81f83dad3818bca8994faa8ce9d5b7) )
 ROM_END
 

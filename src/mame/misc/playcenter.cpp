@@ -98,7 +98,7 @@ ROM_START(plycntrchtr)
 	ROM_REGION32_LE(0x40000, "bios", 0) // Bios date: 03/13/2001
 	ROM_LOAD("vp4f1313.bin", 0x00000, 0x40000, CRC(bd4b155f) SHA1(3eafe71e89bf84b72a42e933187676fe08db0492))
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE("playcenter_epox_9.3_tournament", 0, SHA1(93a73d32c5b12e1e34e691c6a96717b0da709eee)) // Dump contains a raw image for a (c) 1998 Trident video card (C:\videorom.bin)
 
 ROM_END
@@ -109,7 +109,7 @@ ROM_START(plycntrchtrk)
 	ROM_REGION32_LE(0x40000, "bios", 0)
 	ROM_LOAD("bios.bin", 0x00000, 0x40000, NO_DUMP)
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE("playcenter_k6_9.3_tournament", 0, SHA1(7e8935c45c52eb1e28cd3ea18f9f58f8262ffeb3))
 ROM_END
 
@@ -119,7 +119,7 @@ ROM_START(plycntrchtrc)
 	ROM_REGION32_LE(0x40000, "bios", 0)
 	ROM_LOAD("bios.bin", 0x00000, 0x40000, NO_DUMP)
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE("playcenter_celeron_9.3_tournament", 0, SHA1(eb98f6af20a98d4bf6dc7311035431467ad56605))
 ROM_END
 

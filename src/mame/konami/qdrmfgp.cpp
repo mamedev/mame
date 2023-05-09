@@ -771,7 +771,7 @@ ROM_START( qdrmfgp )
 	ROM_LOAD( "gq_460_a07.14h", 0x000000, 0x80000, CRC(67d8ea6b) SHA1(11af1b5a33de2a6e24823964d210bef193ecefe4) )
 	ROM_LOAD( "gq_460_a06.12h", 0x080000, 0x80000, CRC(97ed5a77) SHA1(68600fd8d914451284cf181fb4bd5872860fb9ad) )
 
-	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "gq460a08", 0, SHA1(2f142f986fa3c79d5c4102e800980d1706c35f75) )
 ROM_END
 
@@ -788,7 +788,7 @@ ROM_START( qdrmfgp2 )
 	ROM_LOAD( "ge_557_a07.19h", 0x000000, 0x80000, CRC(7491e0c8) SHA1(6459ab5e7af052ef7a1c4ce01cd844c0f4319f2e) )
 	ROM_LOAD( "ge_557_a08.19k", 0x080000, 0x80000, CRC(3da2b20c) SHA1(fdc2cdc27f3299f541944a78ce36ed33a7926056) )
 
-	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "ge557a09", 0, SHA1(1ef8093b542fe0bf8240a5fd64e5af3839b6a04c) )
 ROM_END
 

@@ -73,7 +73,7 @@ ROM_START( drgdance )
 	ROM_REGION(0x20000, "bios", 0) \
 	ROM_LOAD("mbbios", 0x10000, 0x10000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE( "dragon_dance", 0, SHA1(73868dd9354d936100ba56f460e872087ede012c) )
 ROM_END
 

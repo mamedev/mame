@@ -5118,7 +5118,7 @@ ROM_START( bam2 )
 	ROM_REGION( 0x8000, "h83644", 0)
 	ROM_LOAD( "hd64f3644.u2", 0x00000, 0x8000, NO_DUMP )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE("bam2", 0, SHA1(634d9a745a82c567fc4d7ce48e3570d88326c5f9) )
 
 	ROM_REGION( 0x8, "cat702_2", 0 )
@@ -5151,7 +5151,7 @@ ROM_START( primrag2 )
 	ROM_LOAD16_BYTE( "pr2_036.u17",  0x100001, 0x080000, CRC(3681516c) SHA1(714f73ea4ac190c36a6eb2308616a4aecabc4e69) )
 	ROM_LOAD16_BYTE( "pr2_036.u15",  0x100000, 0x080000, CRC(4b24bd54) SHA1(7f27cd524d10e5869aab6d4dc6a4217d049c475d) )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE( "primrag2", 0, SHA1(bc615068ddf4fd967f770ee01c02f285c052c4c5) )
 
 	ROM_REGION( 0x8, "cat702_2", 0 )
@@ -5242,7 +5242,7 @@ ROM_START( jdredd )
 	ROM_LOAD16_BYTE( "9e54_01-16-98_1566_u_36.u36",  0x000001, 0x020000, CRC(37addbf9) SHA1(a4061a1ba9e230f080f0bfea69bf77efe9264a92) ) // ROMs for Rev.C hard drive are dated 01-16-98 - still same checksum of 9E54
 	ROM_LOAD16_BYTE( "79d3_01-16-98_1565_u_35.u35",  0x000000, 0x020000, CRC(c1e17191) SHA1(82901439b1a51b9aadb4df4b9d944f26697a1460) ) // ROMs for Rev.C hard drive are dated 01-16-98 - still same checksum of 79D3
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE( "jdreddc", 0, SHA1(eee205f83e5f590f8baf36452c873d7063156bd0) ) // label on drive reads:  1576 Rev.C
 
 	ROM_REGION( 0x8, "cat702_2", 0 )
@@ -5256,7 +5256,7 @@ ROM_START( jdreddb )
 	ROM_LOAD16_BYTE( "9e54_11-21-97_1566_u_36.u36",  0x000001, 0x020000, CRC(37addbf9) SHA1(a4061a1ba9e230f080f0bfea69bf77efe9264a92) ) // ROMs for Rev.B hard drive are dated 11-21-97 - still same checksum of 9E54
 	ROM_LOAD16_BYTE( "79d3_11-21-97_1565_u_35.u35",  0x000000, 0x020000, CRC(c1e17191) SHA1(82901439b1a51b9aadb4df4b9d944f26697a1460) ) // ROMs for Rev.B hard drive are dated 11-21-97 - still same checksum of 79D3
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE( "jdreddb", 0, SHA1(20f696fa6e1fbf97793bac2a794631c5dd4fb39a) ) // label on drive reads:  1576 Rev.B
 
 	ROM_REGION( 0x8, "cat702_2", 0 )

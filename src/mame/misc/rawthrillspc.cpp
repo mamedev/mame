@@ -82,7 +82,7 @@ void rawthrillspc_state::rawthrillspc(machine_config &config)
 ROM_START( guitarheroac )
 	OPTIPLEX740_BIOS
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE( "slax105", 0, NO_DUMP )
 
 	// Recovery DVD
@@ -100,7 +100,7 @@ ROM_END
 ROM_START( fnf )
 	OPTIPLEX740_BIOS
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	/* Clean image created from the recovery CDs on the original machine.
 	   After installing the software from the discs, the PC reboots several times for configurating
 	   the hardware devices and peripherals, and then asks for controllers calibration.
@@ -133,7 +133,7 @@ ROM_START( doodlejmp )
 	ROM_SYSTEM_BIOS( 0, "1001", "ASUS 1001 (11/17/2010)" )
 	ROMX_LOAD( "m2n68-asus-1001.rom", 0x000000, 0x100000, CRC(6f4ff699) SHA1(d43baae25fcfb442ccf2cc716e6051b3795296cd), ROM_BIOS(0) )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE( "doodlejmp", 0, NO_DUMP )
 
 	/* Recovery DVD:

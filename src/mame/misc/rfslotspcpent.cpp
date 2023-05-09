@@ -246,7 +246,7 @@ ROM_START( rfsantafeg )
 	ROM_REGION32_LE(0x200000, "bios", 0) // Advantech AIMB-256
 	ROM_LOAD("bios_a256v103.bin", 0x000000, 0x200000, CRC(06df0d8d) SHA1(5d740071500729af8c045b562adc5f8da058b59f) )
 
-	DISK_REGION( "ide:0:hdd:image" ) // Compact Flash Transcend 512MB
+	DISK_REGION( "ide:0:hdd" ) // Compact Flash Transcend 512MB
 	DISK_IMAGE( "santa_fe_golden_g12v5_11482e_advantech", 0, SHA1(7ad57f0c80e89ab8086fc5c9c7ba9be4b2c90451) )
 
 	ROM_REGION(0x4000, "pics", 0)

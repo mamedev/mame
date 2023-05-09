@@ -127,7 +127,7 @@ ROM_START(slvrball806)
 	SILVERBALL_BIOS
 	ROM_DEFAULT_BIOS("bios29") // The one dumped from the actual machine
 
-	DISK_REGION( "ide:0:hdd:image" ) // 16383 cylinders, 16 heads, 63 sectors
+	DISK_REGION( "ide:0:hdd" ) // 16383 cylinders, 16 heads, 63 sectors
 	DISK_IMAGE("silverball_8.06", 0, BAD_DUMP SHA1(4bd03240229a2f59d457e95e04837422c423111b)) // May contain operator data
 ROM_END
 
@@ -135,7 +135,7 @@ ROM_START(slvrball720)
 	SILVERBALL_BIOS
 	ROM_DEFAULT_BIOS("bios29") // Not sure what PCB this HD was dumped from
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE("silverball_7.20", 0, BAD_DUMP SHA1(008d0146b579793f9ba2aa2e43ffa7ec1401f752)) // May contain operator data
 ROM_END
 
@@ -143,7 +143,7 @@ ROM_START(slvrball632)
 	SILVERBALL_BIOS
 	ROM_DEFAULT_BIOS("bios29") // Not sure what PCB this HD was dumped from
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE("silverball_6.32", 0, BAD_DUMP SHA1(0193fbc3b27e0b3ad6139830dfec04172eb3089a)) // May contain operator data
 ROM_END
 
@@ -152,7 +152,7 @@ ROM_START(slvrballbu409)
 	SILVERBALL_BIOS
 	ROM_DEFAULT_BIOS("bios29") // Not sure what PCB this HD was dumped from
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE("silverball_bulova_4.09_1", 0, BAD_DUMP SHA1(da838ddccf285fb4e06d7f752949e745e6b4e2e7)) // May contain operator data
 ROM_END
 
@@ -162,7 +162,7 @@ ROM_START(slvrballbu409b)
 	SILVERBALL_BIOS
 	ROM_DEFAULT_BIOS("bios29") // Not sure what PCB this HD was dumped from
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE("silverball_bulova_4.09_2", 0, BAD_DUMP SHA1(86bf947b39cabcd207f79b7d6132199819e1fed7)) // May contain operator data
 ROM_END
 
