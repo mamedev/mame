@@ -35244,7 +35244,7 @@ List of unclassified roms
 	</software>
 
 	<software name="ajmajonmnp" cloneof="ajmajonm">
-		<description>Akagawa Jirou Majo-tachi no Nemuri (Japan, rev. A, NP)</description>
+		<description>Akagawa Jirou Majo-tachi no Nemuri (Japan, rev. A, Nintendo Power service)</description>
 		<year>1995</year>
 		<publisher>Pack-In-Video</publisher>
 		<info name="serial" value="SHVC-AAMJ" />
@@ -37077,7 +37077,7 @@ List of unclassified roms
 	</software>
 
 	<software name="bof2jnp" cloneof="bof2">
-		<description>Breath of Fire II (Japan, rev. A, NP)</description>
+		<description>Breath of Fire II (Japan, rev. A, Nintendo Power service)</description>
 		<year>1994</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="SHVC-AF2J-JPN" />
@@ -37964,7 +37964,7 @@ List of unclassified roms
 	</software>
 
 	<software name="columns">
-		<description>Columns (Japan, NP)</description>
+		<description>Columns (Japan, Nintendo Power service)</description>
 		<year>1999</year>
 		<publisher>Media Factory</publisher>
 		<info name="serial" value="SHVC-BCLJ-JPN" />
@@ -38332,7 +38332,7 @@ List of unclassified roms
 	</software>
 
 	<software name="daibakjznp" cloneof="daibakjz">
-		<description>Daibakushou Jinsei Gekijou - Zukkoke Salaryman Hen (Japan, rev. A, NP)</description>
+		<description>Daibakushou Jinsei Gekijou - Zukkoke Salaryman Hen (Japan, rev. A, Nintendo Power service)</description>
 		<year>1995</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="SHVC-AZSJ-JPN" />
@@ -38647,7 +38647,7 @@ List of unclassified roms
 	</software>
 
 	<software name="ogrebatlnp" cloneof="ogrebatl">
-		<description>Densetsu no Ogre Battle - The March of the Black Queen (Japan, NP)</description>
+		<description>Densetsu no Ogre Battle - The March of the Black Queen (Japan, Nintendo Power service)</description>
 		<year>1993</year>
 		<publisher>Quest</publisher>
 		<part name="cart" interface="snes_cart">
@@ -38713,7 +38713,7 @@ List of unclassified roms
 	</software>
 
 	<software name="dstall98">
-		<description>Derby Stallion 98 (Japan, NP)</description>
+		<description>Derby Stallion 98 (Japan, Nintendo Power service)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BDBJ-JPN" />
@@ -39228,7 +39228,7 @@ List of unclassified roms
 	</software>
 
 	<software name="dokyuse2">
-		<description>Doukyuusei 2 (Japan, NP)</description>
+		<description>Doukyuusei 2 (Japan, Nintendo Power service)</description>
 		<year>1997</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="SHVC-A88J-JPN" />
@@ -39306,7 +39306,7 @@ List of unclassified roms
 	</software>
 
 	<software name="drmario">
-		<description>Dr. Mario (Japan, NP)</description>
+		<description>Dr. Mario (Japan, Nintendo Power service)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BDMJ-JPN" />
@@ -39491,7 +39491,7 @@ List of unclassified roms
 	</software>
 
 	<software name="dslayednp" cloneof="dslayed">
-		<description>Dragon Slayer - Eiyuu Densetsu (Japan, rev. A, NP)</description>
+		<description>Dragon Slayer - Eiyuu Densetsu (Japan, rev. A, Nintendo Power service)</description>
 		<year>1992?</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="snes_cart">
@@ -40517,7 +40517,7 @@ List of unclassified roms
 	</software>
 
 	<software name="famibunk">
-		<description>Famicom Bunko - Hajimari no Mori (Japan, NP)</description>
+		<description>Famicom Bunko - Hajimari no Mori (Japan, Nintendo Power service)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BTAJ-JPN" />
@@ -40534,7 +40534,7 @@ List of unclassified roms
 	</software>
 
 	<software name="famitc2a" cloneof="famitc2">
-		<description>Famicom Tantei Club Part II - Ushiro ni Tatsu Shoujo (Japan, NP)</description>
+		<description>Famicom Tantei Club Part II - Ushiro ni Tatsu Shoujo (Japan, Nintendo Power service)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BTCJ-JPN" />
@@ -40551,7 +40551,7 @@ List of unclassified roms
 	</software>
 
 	<software name="famitc2">
-		<description>Famicom Tantei Club Part II - Ushiro ni Tatsu Shoujo (Japan, rev. A, NP)</description>
+		<description>Famicom Tantei Club Part II - Ushiro ni Tatsu Shoujo (Japan, rev. A, Nintendo Power service)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BTCJ-JPN" />
@@ -41023,7 +41023,7 @@ List of unclassified roms
 	</software>
 
 	<software name="firembthnp" cloneof="firembth">
-		<description>Fire Emblem - Thracia 776 (Japan, NP)</description>
+		<description>Fire Emblem - Thracia 776 (Japan, Nintendo Power service)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BFRJ-JPN" />
@@ -41040,7 +41040,7 @@ List of unclassified roms
 	</software>
 
 	<software name="firembth">
-		<description>Fire Emblem - Thracia 776 (Japan, rev. A, NP)</description>
+		<description>Fire Emblem - Thracia 776 (Japan, rev. A, Nintendo Power service)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BFRJ-JPN" />
@@ -41636,7 +41636,7 @@ List of unclassified roms
 	</software>
 
 	<software name="fushidn2">
-		<description>Fushigi no Dungeon 2 - Fuurai no Shiren (Japan, rev. A, NP)</description>
+		<description>Fushigi no Dungeon 2 - Fuurai no Shiren (Japan, rev. A, Nintendo Power service)</description>
 		<year>1995?</year>
 		<publisher>Chunsoft?</publisher>
 		<part name="cart" interface="snes_cart">
@@ -41824,7 +41824,7 @@ List of unclassified roms
 	</software>
 
 	<software name="ggoemkir">
-		<description>Ganbare Goemon Kirakira Douchuu - Boku ga Dancer ni Natta Wake (Japan, rev. B, NP)</description>
+		<description>Ganbare Goemon Kirakira Douchuu - Boku ga Dancer ni Natta Wake (Japan, rev. B, Nintendo Power service)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="SHVC-A4GJ-JPN" />
@@ -42031,7 +42031,7 @@ List of unclassified roms
 	</software>
 
 	<software name="genjryod">
-		<description>Genjuu Ryodan (Japan, NP)</description>
+		<description>Genjuu Ryodan (Japan, Nintendo Power service)</description>
 		<year>1998</year>
 		<publisher>Axela</publisher>
 		<info name="serial" value="SHVC-BGJJ-JPN" />
@@ -45047,7 +45047,7 @@ List of unclassified roms
 	</software>
 
 	<software name="jikkscr2">
-		<description>Jikkyou World Soccer 2 - Fighting Eleven (Japan, rev. A, NP)</description>
+		<description>Jikkyou World Soccer 2 - Fighting Eleven (Japan, rev. A, Nintendo Power service)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="SHVC-AWJJ-JPN" />
@@ -47847,7 +47847,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="lordmona">
-		<description>Lord Monarch (Japan, rev. A, NP)</description>
+		<description>Lord Monarch (Japan, rev. A, Nintendo Power service)</description>
 		<year>1992</year>
 		<publisher>Epoch</publisher>
 		<info name="serial" value="SHVC-LM" />
@@ -49354,7 +49354,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="msladerg">
-		<description>Metal Slader Glory - Director's Cut (Japan, NP)</description>
+		<description>Metal Slader Glory - Director's Cut (Japan, Nintendo Power service)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BMSJ-JPN" />
@@ -51619,7 +51619,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="oekakil">
-		<description>Oekaki Logic (Japan, NP)</description>
+		<description>Oekaki Logic (Japan, Nintendo Power service)</description>
 		<year>1999</year>
 		<publisher>Bunkasha Games</publisher>
 		<info name="serial" value="SHVC-BORJ-JPN" />
@@ -51636,7 +51636,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="oekakil2">
-		<description>Oekaki Logic 2 (Japan, NP)</description>
+		<description>Oekaki Logic 2 (Japan, Nintendo Power service)</description>
 		<year>1999</year>
 		<publisher>Bunkasha Games</publisher>
 		<info name="serial" value="SHVC-BOSJ-JPN" />
@@ -52783,7 +52783,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="picrosv1">
-		<description>Picross NP Vol. 1 (Japan, rev. A, NP)</description>
+		<description>Picross NP Vol. 1 (Japan, rev. A, Nintendo Power service)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BPIJ-JPN" />
@@ -52800,7 +52800,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="picrosv1a" cloneof="picrosv1">
-		<description>Picross NP Vol. 1 (Japan, NP)</description>
+		<description>Picross NP Vol. 1 (Japan, Nintendo Power service)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BPIJ-JPN" />
@@ -52817,7 +52817,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="picrosv2a" cloneof="picrosv2">
-		<description>Picross NP Vol. 2 (Japan, NP)</description>
+		<description>Picross NP Vol. 2 (Japan, Nintendo Power service)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BP2J-JPN" />
@@ -52834,7 +52834,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="picrosv2">
-		<description>Picross NP Vol. 2 (Japan, rev. A, NP)</description>
+		<description>Picross NP Vol. 2 (Japan, rev. A, Nintendo Power service)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BP2J-JPN" />
@@ -52851,7 +52851,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="picrosv3">
-		<description>Picross NP Vol. 3 (Japan, NP)</description>
+		<description>Picross NP Vol. 3 (Japan, Nintendo Power service)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BP3J-JPN" />
@@ -52868,7 +52868,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="picrosv4">
-		<description>Picross NP Vol. 4 (Japan, rev. A, NP)</description>
+		<description>Picross NP Vol. 4 (Japan, rev. A, Nintendo Power service)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BP4J-JPN" />
@@ -52885,7 +52885,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="picrosv4a" cloneof="picrosv4">
-		<description>Picross NP Vol. 4 (Japan, NP)</description>
+		<description>Picross NP Vol. 4 (Japan, Nintendo Power service)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BP4J-JPN" />
@@ -52902,7 +52902,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="picrosv5">
-		<description>Picross NP Vol. 5 (Japan, NP)</description>
+		<description>Picross NP Vol. 5 (Japan, Nintendo Power service)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BP5J-JPN" />
@@ -52919,7 +52919,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="picrosv6">
-		<description>Picross NP Vol. 6 (Japan, NP)</description>
+		<description>Picross NP Vol. 6 (Japan, Nintendo Power service)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BP6J-JPN" />
@@ -52936,7 +52936,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="picrosv7">
-		<description>Picross NP Vol. 7 (Japan, NP)</description>
+		<description>Picross NP Vol. 7 (Japan, Nintendo Power service)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BP7J-JPN" />
@@ -52953,7 +52953,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="picrosv8">
-		<description>Picross NP Vol. 8 (Japan, NP)</description>
+		<description>Picross NP Vol. 8 (Japan, Nintendo Power service)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BP8J-JPN" />
@@ -53621,7 +53621,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="powerlod">
-		<description>Power Lode Runner (Japan, NP)</description>
+		<description>Power Lode Runner (Japan, Nintendo Power service)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BPLJ-JPN" />
@@ -54790,7 +54790,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="ringkake">
-		<description>Ring ni Kakero (Japan, NP)</description>
+		<description>Ring ni Kakero (Japan, Nintendo Power service)</description>
 		<year>1998</year>
 		<publisher>NCS</publisher>
 		<info name="serial" value="SHVC-ARKJ-JPN" />
@@ -59161,7 +59161,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="daikokai" cloneof="unchartd">
-		<description>Super Daikoukai Jidai (Japan, rev. A, NP)</description>
+		<description>Super Daikoukai Jidai (Japan, rev. A, Nintendo Power service)</description>
 		<year>1992</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="SHVC-QK" />
@@ -59392,7 +59392,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="famiwars">
-		<description>Super Famicom Wars (Japan, NP)</description>
+		<description>Super Famicom Wars (Japan, Nintendo Power service)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BFWJ-JPN" />
@@ -59409,7 +59409,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="famigela">
-		<description>Super Family Gelaende (Japan, NP)</description>
+		<description>Super Family Gelaende (Japan, Nintendo Power service)</description>
 		<year>1998</year>
 		<publisher>Namco</publisher>
 		<info name="serial" value="SHVC-A25J-JPN" />
@@ -60740,7 +60740,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="suppunchj" cloneof="suppunch">
-		<description>Super Punch-Out!! (Japan, NP)</description>
+		<description>Super Punch-Out!! (Japan, Nintendo Power service)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-4Q" />
@@ -62053,7 +62053,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="tamatown">
-		<description>Tamagotchi Town (Japan, NP)</description>
+		<description>Tamagotchi Town (Japan, Nintendo Power service)</description>
 		<year>1999</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SHVC-BTTJ-JPN" />
@@ -65285,7 +65285,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="wizardry">
-		<description>Wizardry I-II-III - Story of Llylgamyn (Japan, NP)</description>
+		<description>Wizardry I-II-III - Story of Llylgamyn (Japan, Nintendo Power service)</description>
 		<year>1999</year>
 		<publisher>Media Factory</publisher>
 		<info name="serial" value="SHVC-BWZJ-JPN" />
@@ -66625,7 +66625,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="zottomj">
-		<description>Zootto Mahjong! (Japan, NP)</description>
+		<description>Zootto Mahjong! (Japan, Nintendo Power service)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BZMJ-JPN" />
@@ -66833,7 +66833,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="npmenua" cloneof="npmenu">
-		<description>Nintendo Power Menu Program (Japan, NP)</description>
+		<description>Nintendo Power Menu Program (Japan, Nintendo Power service)</description>
 		<year>199?</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -66845,7 +66845,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="npmenu">
-		<description>Nintendo Power Menu Program (Japan, rev. A, NP)</description>
+		<description>Nintendo Power Menu Program (Japan, rev. A, Nintendo Power service)</description>
 		<year>199?</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
