@@ -54,8 +54,8 @@ static bool is_valid_softlist_part_char(char32_t ch)
 //-------------------------------------------------
 
 menu_software_parts::menu_software_parts(mame_ui_manager &mui, render_container &container, const software_info *info, const char *interface, const software_part **part, bool other_opt, result &result)
-	: menu(mui, container),
-		m_result(result)
+	: menu(mui, container)
+	, m_result(result)
 {
 	m_info = info;
 	m_interface = interface;

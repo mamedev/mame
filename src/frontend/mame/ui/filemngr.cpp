@@ -210,8 +210,9 @@ bool menu_file_manager::handle(event const *ev)
 			if (selected_device && (IPT_UI_SELECT == ev->iptkey))
 			{
 				if (selected_device->has_preset_images_selection())
+				{
 					menu::stack_push<menu_control_device_preset>(ui(), container(), *selected_device);
-
+				}
 				else
 				{
 					floppy_image_device *floppy_device = dynamic_cast<floppy_image_device *>(selected_device);

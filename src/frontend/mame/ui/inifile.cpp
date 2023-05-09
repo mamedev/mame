@@ -345,7 +345,7 @@ void favorite_manager::add_favorite(running_machine &machine)
 							driver,
 							imagedev->software_list_name(),
 							imagedev->instance_name(),
-							strensure(imagedev->image_type_name()));
+							imagedev->image_type_name() ? imagedev->image_type_name() : "");
 
 					// assume it's available if it's mounted
 					info.available = true;
