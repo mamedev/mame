@@ -2599,7 +2599,7 @@ ROM_START( redearth )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "redearth_euro.29f400.u2", 0x000000, 0x080000, CRC(02e0f336) SHA1(acc37e830dfeb9674f5a0fb24f4cc23217ae4ff5) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-wzd-5", 0, SHA1(034c375c3f2f68723eef530b40da909a7be7b556) )
 ROM_END
 
@@ -2607,7 +2607,7 @@ ROM_START( redearthr1 )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "redearth_euro.29f400.u2", 0x000000, 0x080000, CRC(02e0f336) SHA1(acc37e830dfeb9674f5a0fb24f4cc23217ae4ff5) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-wzd-3", 0, SHA1(a6ff67093db6bc80ee5fc46e4300e0177b213a52) )
 ROM_END
 
@@ -2615,7 +2615,7 @@ ROM_START( warzard )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "warzard_japan.29f400.u2", 0x000000, 0x080000, CRC(f8e2f0c6) SHA1(93d6a986f44c211fff014e55681eca4d2a2774d6) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-wzd-5", 0, SHA1(034c375c3f2f68723eef530b40da909a7be7b556) )
 ROM_END
 
@@ -2623,7 +2623,7 @@ ROM_START( warzardr1 )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "warzard_japan.29f400.u2", 0x000000, 0x080000, CRC(f8e2f0c6) SHA1(93d6a986f44c211fff014e55681eca4d2a2774d6) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-wzd-3", 0, SHA1(a6ff67093db6bc80ee5fc46e4300e0177b213a52) )
 ROM_END
 
@@ -2632,7 +2632,7 @@ ROM_START( sfiii )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii_euro.29f400.u2", 0x000000, 0x080000, CRC(27699ddc) SHA1(d8b525cd27e584560b129598df31fd2c5b2a682a) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-sf3-3", 0, SHA1(20aa46f8ffeb235205dc95cfd8fba42c7d102355) )
 ROM_END
 
@@ -2640,7 +2640,7 @@ ROM_START( sfiiiu )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii_usa_region_b1.29f400.u2", 0x000000, 0x080000, CRC(fb172a8e) SHA1(48ebf59910f246835f7dc0c588da30f7a908072f) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-sf3-3", 0, SHA1(20aa46f8ffeb235205dc95cfd8fba42c7d102355) )
 ROM_END
 
@@ -2648,7 +2648,7 @@ ROM_START( sfiiia )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii_asia_region_bd.29f400.u2", 0x000000, 0x080000,  CRC(cbd28de7) SHA1(9c15ecb73b9587d20850e62e8683930a45caa01b) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-sf3-3", 0, SHA1(20aa46f8ffeb235205dc95cfd8fba42c7d102355) )
 ROM_END
 
@@ -2656,7 +2656,7 @@ ROM_START( sfiiij )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii_japan.29f400.u2", 0x000000, 0x080000, CRC(74205250) SHA1(c3e83ace7121d32da729162662ec6b5285a31211) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-sf3-3", 0, SHA1(20aa46f8ffeb235205dc95cfd8fba42c7d102355) )
 ROM_END
 
@@ -2664,7 +2664,7 @@ ROM_START( sfiiih )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii_hispanic.29f400.u2", 0x000000, 0x080000, CRC(d2b3cd48) SHA1(00ebb270c24a66515c97e35331de54ff5358000e) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-sf3-3", 0, SHA1(20aa46f8ffeb235205dc95cfd8fba42c7d102355) )
 ROM_END
 
@@ -2673,7 +2673,7 @@ ROM_START( sfiii2 )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii2_usa.29f400.u2", 0x000000, 0x080000, CRC(75dd72e0) SHA1(5a12d6ea6734df5de00ecee6f9ef470749d2f242) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-3ga000", 0, SHA1(a0c11a5c3057dc1ad3962aa38adf95acb3430bec) )
 ROM_END
 
@@ -2681,7 +2681,7 @@ ROM_START( sfiii2j )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii2_japan.29f400.u2", 0x000000, 0x080000, CRC(faea0a3e) SHA1(a03cd63bcf52e4d57f7a598c8bc8e243694624ec) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-3ga000", 0, SHA1(a0c11a5c3057dc1ad3962aa38adf95acb3430bec) )
 ROM_END
 
@@ -2689,7 +2689,7 @@ ROM_START( sfiii2h )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii2_hispanic.29f400.u2", 0x000000, 0x080000, CRC(5c799526) SHA1(5a56345b500cd7e20d5fb6cabc791655c6ff4ed2) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-3ga000", 0, SHA1(a0c11a5c3057dc1ad3962aa38adf95acb3430bec) )
 ROM_END
 
@@ -2697,7 +2697,7 @@ ROM_START( jojo )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojo_euro.29f400.u2", 0x000000, 0x080000, CRC(513e40ec) SHA1(03b91f0fbd5be56d24feed4698c7543d4df07837) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-jjk-3", 0, SHA1(dc6e74b5e02e13f62cb8c4e234dd6061501e49c1) )
 ROM_END
 
@@ -2705,7 +2705,7 @@ ROM_START( jojor1 )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojo_euro.29f400.u2", 0x000000, 0x080000, CRC(513e40ec) SHA1(03b91f0fbd5be56d24feed4698c7543d4df07837) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-jjk-2", 0, SHA1(ce22d10f2b35a0e00f8d83642b97842c9b2327fa) )
 ROM_END
 
@@ -2713,7 +2713,7 @@ ROM_START( jojor2 )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojo_euro.29f400.u2", 0x000000, 0x080000, CRC(513e40ec) SHA1(03b91f0fbd5be56d24feed4698c7543d4df07837) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-jjk000", 0, SHA1(a24e174aaaf47f98312a38129645026a613cd344) )
 ROM_END
 
@@ -2721,7 +2721,7 @@ ROM_START( jojou )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojo_usa.29f400.u2", 0x000000, 0x080000, CRC(8d40f7be) SHA1(2a4bd83db2f959c33b071e517941aa55a0f919c0) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-jjk-3", 0, SHA1(dc6e74b5e02e13f62cb8c4e234dd6061501e49c1) )
 ROM_END
 
@@ -2729,7 +2729,7 @@ ROM_START( jojour1 )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojo_usa.29f400.u2", 0x000000, 0x080000, CRC(8d40f7be) SHA1(2a4bd83db2f959c33b071e517941aa55a0f919c0) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-jjk-2", 0, SHA1(ce22d10f2b35a0e00f8d83642b97842c9b2327fa) )
 ROM_END
 
@@ -2737,7 +2737,7 @@ ROM_START( jojour2 )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojo_usa.29f400.u2", 0x000000, 0x080000, CRC(8d40f7be) SHA1(2a4bd83db2f959c33b071e517941aa55a0f919c0) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-jjk000", 0, SHA1(a24e174aaaf47f98312a38129645026a613cd344) )
 ROM_END
 
@@ -2745,7 +2745,7 @@ ROM_START( jojoj )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojo_japan.29f400.u2", 0x000000, 0x080000, CRC(02778f60) SHA1(a167f9ebe030592a0cdb0c6a3c75835c6a43be4c) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-jjk-3", 0, SHA1(dc6e74b5e02e13f62cb8c4e234dd6061501e49c1) )
 ROM_END
 
@@ -2753,7 +2753,7 @@ ROM_START( jojojr1 )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojo_japan.29f400.u2", 0x000000, 0x080000, CRC(02778f60) SHA1(a167f9ebe030592a0cdb0c6a3c75835c6a43be4c) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-jjk-2", 0, SHA1(ce22d10f2b35a0e00f8d83642b97842c9b2327fa) )
 ROM_END
 
@@ -2761,7 +2761,7 @@ ROM_START( jojojr2 )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojo_japan.29f400.u2", 0x000000, 0x080000, CRC(02778f60) SHA1(a167f9ebe030592a0cdb0c6a3c75835c6a43be4c) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-jjk000", 0, SHA1(a24e174aaaf47f98312a38129645026a613cd344) )
 ROM_END
 
@@ -2769,7 +2769,7 @@ ROM_START( jojoa )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojo_asia.29f400.u2", 0x000000, 0x080000, CRC(789aa72a) SHA1(afcefb963d7c103514585f4a6738b2deb5b7d27a) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-jjk-3", 0, SHA1(dc6e74b5e02e13f62cb8c4e234dd6061501e49c1) )
 ROM_END
 
@@ -2777,7 +2777,7 @@ ROM_START( jojoar1 )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojo_asia.29f400.u2", 0x000000, 0x080000, CRC(789aa72a) SHA1(afcefb963d7c103514585f4a6738b2deb5b7d27a) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-jjk-2", 0, SHA1(ce22d10f2b35a0e00f8d83642b97842c9b2327fa) )
 ROM_END
 
@@ -2785,7 +2785,7 @@ ROM_START( jojoar2 )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojo_asia.29f400.u2", 0x000000, 0x080000, CRC(789aa72a) SHA1(afcefb963d7c103514585f4a6738b2deb5b7d27a) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-jjk000", 0, SHA1(a24e174aaaf47f98312a38129645026a613cd344) )
 ROM_END
 
@@ -2794,7 +2794,7 @@ ROM_START( sfiii3 )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii3_euro.29f400.u2", 0x000000, 0x080000, CRC(30bbf293) SHA1(f094c2eeaf4f6709060197aca371a4532346bf78) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-33s-2", 0, SHA1(5a090956fc6d68e496ac42854199059898f2fe16) )
 ROM_END
 
@@ -2802,7 +2802,7 @@ ROM_START( sfiii3r1 )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii3_euro.29f400.u2", 0x000000, 0x080000, CRC(30bbf293) SHA1(f094c2eeaf4f6709060197aca371a4532346bf78) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-33s-1", 0, SHA1(92e146fea751404077919da91f4c5112742627ed) )
 ROM_END
 
@@ -2810,7 +2810,7 @@ ROM_START( sfiii3u )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii3_usa.29f400.u2", 0x000000, 0x080000, CRC(ecc545c1) SHA1(e39083820aae914fd8b80c9765129bedb745ceba) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-33s-2", 0, SHA1(5a090956fc6d68e496ac42854199059898f2fe16) )
 ROM_END
 
@@ -2818,7 +2818,7 @@ ROM_START( sfiii3ur1 )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii3_usa.29f400.u2", 0x000000, 0x080000, CRC(ecc545c1) SHA1(e39083820aae914fd8b80c9765129bedb745ceba) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-33s-1", 0, SHA1(92e146fea751404077919da91f4c5112742627ed) )
 ROM_END
 
@@ -2826,7 +2826,7 @@ ROM_START( sfiii3j )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii3_japan.29f400.u2", 0x000000, 0x080000, CRC(63f23d1f) SHA1(58559403c325454f8c8d3eb0f569a531aa22db26) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-33s-2", 0, SHA1(5a090956fc6d68e496ac42854199059898f2fe16) )
 ROM_END
 
@@ -2834,7 +2834,7 @@ ROM_START( sfiii3jr1 )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii3_japan.29f400.u2", 0x000000, 0x080000, CRC(63f23d1f) SHA1(58559403c325454f8c8d3eb0f569a531aa22db26) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-33s-1", 0, SHA1(92e146fea751404077919da91f4c5112742627ed) )
 ROM_END
 
@@ -2843,7 +2843,7 @@ ROM_START( jojoba )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojoba_euro.29f400.u2", 0x000000, 0x080000, CRC(63cc8800) SHA1(f0c7e6abb205a16dab7a114e017b193521071a4b) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-jjm-1", 0, SHA1(8628d3fa555fbd5f4121082e925c1834b76c5e65) )
 ROM_END
 
@@ -2851,7 +2851,7 @@ ROM_START( jojobaj )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojoba_japan.29f400.u2", 0x000000, 0x080000, CRC(3085478c) SHA1(055eab1fc42816f370a44b17fd7e87ffcb10e8b7) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-jjm-1", 0, SHA1(8628d3fa555fbd5f4121082e925c1834b76c5e65) )
 ROM_END
 
@@ -2859,7 +2859,7 @@ ROM_START( jojobar1 )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojoba_euro.29f400.u2", 0x000000, 0x080000, CRC(63cc8800) SHA1(f0c7e6abb205a16dab7a114e017b193521071a4b) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-jjm-0", 0, SHA1(1651896d127dbf32af99175ae91227cd90675aaa) )
 ROM_END
 
@@ -2867,7 +2867,7 @@ ROM_START( jojobajr1 )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojoba_japan.29f400.u2", 0x000000, 0x080000, CRC(3085478c) SHA1(055eab1fc42816f370a44b17fd7e87ffcb10e8b7) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "cap-jjm-0", 0, SHA1(1651896d127dbf32af99175ae91227cd90675aaa) )
 ROM_END
 
@@ -3835,7 +3835,7 @@ ROM_START( cps3boot ) // for cart with standard SH2
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "no-battery_bios_29f400_for_hd6417095_sh2.u2", 0x000000, 0x080000, CRC(cb9bd5b0) SHA1(ea7ecb3deb69f5307a62d8f0d7d8e68d49013d07))
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "unicd-cps3_for_standard_sh2_v4", 0, SHA1(099c52bd38753f0f4876243e7aa87ca482a2dcb7) )
 ROM_END
 
@@ -3843,7 +3843,7 @@ ROM_START( cps3booto ) // for cart with standard SH2
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "no-battery_bios_29f400_for_hd6417095_sh2.u2", 0x000000, 0x080000, CRC(cb9bd5b0) SHA1(ea7ecb3deb69f5307a62d8f0d7d8e68d49013d07))
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "no-battery_multi-game_bootleg_cd_for_hd6417095_sh2", 0, SHA1(6057cc3ec7991c0c00a7ab9da6ac2f92c9fb1aed) )
 ROM_END
 
@@ -3851,7 +3851,7 @@ ROM_START( cps3booto2 ) // for cart with standard SH2
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "no-battery_bios_29f400_for_hd6417095_sh2.u2", 0x000000, 0x080000, CRC(cb9bd5b0) SHA1(ea7ecb3deb69f5307a62d8f0d7d8e68d49013d07))
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "no-battery_multi-game_bootleg_cd_for_hd6417095_sh2_older", 0, SHA1(123f2fcb0f3dd3d6b859e82a51d0127e46763776) )
 ROM_END
 
@@ -3859,7 +3859,7 @@ ROM_START( cps3bs32 ) // for cart with standard SH2
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "no-battery_bios_29f400_for_hd6417095_sh2.u2", 0x000000, 0x080000, CRC(cb9bd5b0) SHA1(ea7ecb3deb69f5307a62d8f0d7d8e68d49013d07))
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "sfiii_2nd_impact_converted_for_standard_sh2_v3", 0, SHA1(8f180d159e88042a1e819cefd39eef67f5e86e3d) )
 ROM_END
 
@@ -3867,7 +3867,7 @@ ROM_START( cps3bs32a ) // for cart with standard SH2
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "no-battery_bios_29f400_for_hd6417095_sh2.u2", 0x000000, 0x080000, CRC(cb9bd5b0) SHA1(ea7ecb3deb69f5307a62d8f0d7d8e68d49013d07))
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "sfiii_2nd_impact_converted_for_standard_sh2_older", 0, SHA1(8a8e4138c3bf12435933ab9d9ace510513200843) ) // v1 or v2?
 ROM_END
 
@@ -3875,7 +3875,7 @@ ROM_START( cps3boota ) // for cart with dead custom SH2 (or 2nd Impact CPU which
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "no-battery_bios_29f400_for_dead_security_cart.u2", 0x000000, 0x080000, CRC(0fd56fb3) SHA1(5a8bffc07eb7da73cf4bca6718df72e471296bfd) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "unicd-cps3_for_custom_sh2_v5", 0, SHA1(50a5b2845d3dd3de3bce15c4f1b58500db80cabe) )
 ROM_END
 
@@ -3883,7 +3883,7 @@ ROM_START( cps3bootao ) // for cart with dead custom SH2 (or 2nd Impact CPU whic
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "no-battery_bios_29f400_for_dead_security_cart.u2", 0x000000, 0x080000, CRC(0fd56fb3) SHA1(5a8bffc07eb7da73cf4bca6718df72e471296bfd) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "no-battery_multi-game_bootleg_cd_for_dead_security_cart", 0, SHA1(1ede2f1ba197ee787208358a13eae7185a5ae3b2) )
 ROM_END
 
@@ -3892,7 +3892,7 @@ ROM_START( cps3bootao2 ) // for cart with dead custom SH2 (or 2nd Impact CPU whi
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "no-battery_bios_29f400_for_dead_security_cart.u2", 0x000000, 0x080000, CRC(0fd56fb3) SHA1(5a8bffc07eb7da73cf4bca6718df72e471296bfd) )
 
-	DISK_REGION( "scsi:1:cdrom" )
+	DISK_REGION( "scsi:1:cdrom:image" )
 	DISK_IMAGE_READONLY( "no-battery_multi-game_bootleg_cd_for_dead_security_cart_older", 0, SHA1(4b0b673b45dac94da018576c0a7f8644653fc564) )
 ROM_END
 
