@@ -74,7 +74,7 @@ Taiko no Tatsujin 7............................. ------X  TK71 DVD0            D
 Taiko no Tatsujin 8............................. ------X  TK8100-1-NA-DVD0-A   DVD          NM00033   TK81001-NA-A           Namco 2006
 Taiko no Tatsujin 9............................. XXXX56X  TK9100-1-NA-DVD0-A   DVD          NM00038   TK91001-NA-A           Namco 2006
 Taiko no Tatsujin 10............................ XXXX56X  TK10100-1-NA-DVD0-A  DVD          NM00041   TK101001-NA-A          Namco 2007
-Taiko no Tatsujin 11............................ ------X *TK11100-1-NA-DVD0-A *DVD         *NM00044  *TK111001-NA-A          Namco 2008
+Taiko no Tatsujin 11............................ ------X  TK11100-1-NA-DVD0-A  DVD         *NM00044  *TK111001-NA-A          Namco 2008
 Taiko no Tatsujin 12............................ ------X *TK12-HA             *HDD         *NM00051  *TK121001-NA-A          Namco 2008
 Taiko no Tatsujin 12 More....................... ------X *TK12200-1-NA-HDD-A  *HDD         *NM00051  *TK121001-NA-A          Namco 2008
 Taiko no Tatsujin 13............................ ------X *TK1301-NA-HDD0-A1   *HDD         *NM00056  *TK1301-NA-A            Namco 2009
@@ -870,14 +870,14 @@ Notes:
           CN7 - 6 pin connector (unused)
 
 
-TODO: all DVD dumps but taiko8 should be updated with chdman's createdvd option
+TODO: all DVD dumps but taiko8 and taiko11 should be updated with chdman's createdvd option
 
 ***************************************************************************/
 
 
 #include "emu.h"
-#include "cpu/mips/mips3.h"
 #include "cpu/mips/mips1.h"
+#include "cpu/mips/mips3.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -928,7 +928,7 @@ INPUT_PORTS_END
 
 void namcops2_state::system246(machine_config &config)
 {
-	R5000LE(config, m_maincpu, 294000000); // actually R5900 @ 294 MHz
+	R5000LE(config, m_maincpu, 294'000'000); // actually R5900 @ 294 MHz
 	m_maincpu->set_icache_size(16384);
 	m_maincpu->set_dcache_size(16384);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcops2_state::ps2_map);
@@ -1233,6 +1233,18 @@ ROM_START( taiko10 )
 
 	DISK_REGION("dvd")
 	DISK_IMAGE_READONLY( "tk10100-1-na-dvd0-a", 0, SHA1(9aef4a6b64295a6684d56334904b4c92a20abe15) )
+ROM_END
+
+ROM_START( taiko11 )
+	ROM_REGION32_LE(0x200000, "bios", 0)
+	SYSTEM256_BIOS
+
+	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+	ROM_LOAD( "t111001-na-a.ic002",     0x000000, 0x800000, NO_DUMP )
+	ROM_LOAD( "t111001-na-a_spr.ic002", 0x800000, 0x040000, NO_DUMP )
+
+	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "t11100-1-na-dvd0-a", 0, SHA1(5d06c17582db871a6430397e465914afbf1840a5) )
 ROM_END
 
 ROM_START( tekken4 )
@@ -1734,6 +1746,7 @@ GAME(2006, zoidiexp,   sys246, system246, system246, namcops2_state, empty_init,
 GAME(2007, kinniku2,   sys256, system256, system246, namcops2_state, empty_init, ROT0, "Namco", "Kinnikuman Muscle Grand Prix 2 (KN2 Ver. A)", MACHINE_IS_SKELETON)
 GAME(2007, motogp,     sys256, system256, system246, namcops2_state, empty_init, ROT0, "Namco", "Moto GP (MGP1004-NA-B)", MACHINE_IS_SKELETON)
 GAME(2007, taiko10,    sys256, system256, system246, namcops2_state, empty_init, ROT0, "Namco", "Taiko no Tatsujin 10 (T101001-NA-A)", MACHINE_IS_SKELETON)
+GAME(2008, taiko11,    sys256, system256, system246, namcops2_state, empty_init, ROT0, "Namco", "Taiko no Tatsujin 11 (T111001-NA-A)", MACHINE_IS_SKELETON)
 GAME(2008, gdvsgd,     sys256, system256, system246, namcops2_state, empty_init, ROT0, "Capcom / Bandai", "Gundam vs. Gundam (GVS1 Ver. A)", MACHINE_IS_SKELETON)
 GAME(2009, gdvsgdnx,   sys256, system256, system246, namcops2_state, empty_init, ROT0, "Capcom / Bandai", "Gundam vs. Gundam Next", MACHINE_IS_SKELETON)
 
