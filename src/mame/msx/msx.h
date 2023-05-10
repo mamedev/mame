@@ -34,19 +34,16 @@ public:
 	bool has_printer_port() const { return m_has_printer_port; }
 	bool has_cartslot() const { return m_has_cartslot; }
 	bool has_fdc() const { return m_has_fdc; }
-	bool has_caps_led() const { return m_has_caps_led; }
 	msx_hw_def &has_cassette(bool has_cassette) { m_has_cassette = has_cassette; return *this;}
 	msx_hw_def &has_printer_port(bool has_printer_port) { m_has_printer_port = has_printer_port; return *this; }
 	msx_hw_def &has_cartslot(bool has_cartslot) { m_has_cartslot = has_cartslot; return *this; }
 	msx_hw_def &has_fdc(bool has_fdc) { m_has_fdc = has_fdc; return *this; }
-	msx_hw_def &no_caps_led() { m_has_caps_led = false; return *this; }
 
 private:
 	bool m_has_cassette = true;
 	bool m_has_printer_port = true;
 	bool m_has_cartslot = false;
 	bool m_has_fdc = false;
-	bool m_has_caps_led = true;
 };
 
 class msx_state : public driver_device
@@ -245,7 +242,6 @@ protected:
 	u8 m_port_c_old;
 	u8 m_keylatch;
 	output_finder<> m_caps_led;
-	output_finder<> m_caps_led_name;
 	output_finder<> m_code_led;
 	const XTAL m_main_xtal;
 	const int m_cpu_xtal_divider;

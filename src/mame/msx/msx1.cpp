@@ -13,9 +13,11 @@
 
 #include "msx_ar.lh"
 #include "msx_en.lh"
+#include "msx_en_nocaps.lh"
 #include "msx_jp.lh"
 #include "msx_kr.lh"
 #include "msx_nocode.lh"
+#include "msx_nocode_nocaps.lh"
 
 using namespace msx_keyboard;
 
@@ -410,8 +412,8 @@ void msx1_state::mx10(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 3, 1); // 16KB RAM
 	add_cartridge_slot<1>(config, 1);
 
-	m_hw_def.has_cassette(false).has_printer_port(false).no_caps_led();
-	msx1(VDP_TMS9118, SND_AY8910, config, layout_msx_nocode);
+	m_hw_def.has_cassette(false).has_printer_port(false);
+	msx1(VDP_TMS9118, SND_AY8910, config, layout_msx_nocode_nocaps);
 }
 
 /* MSX - Casio MX-15 */
@@ -433,8 +435,8 @@ void msx1_state::mx15(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 3, 1); // 16KB RAM
 	add_cartridge_slot<1>(config, 1);
 
-	m_hw_def.has_printer_port(false).no_caps_led();
-	msx1(VDP_TMS9928A, SND_AY8910, config, layout_msx_en);
+	m_hw_def.has_printer_port(false);
+	msx1(VDP_TMS9928A, SND_AY8910, config, layout_msx_en_nocaps);
 }
 
 /* MSX - Casio MX-101 */
@@ -456,8 +458,8 @@ void msx1_state::mx101(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 3, 1); // 16KB RAM
 	add_cartridge_slot<1>(config, 1);
 
-	m_hw_def.has_cassette(false).has_printer_port(false).no_caps_led();
-	msx1(VDP_TMS9118, SND_AY8910, config, layout_msx_nocode);
+	m_hw_def.has_cassette(false).has_printer_port(false);
+	msx1(VDP_TMS9118, SND_AY8910, config, layout_msx_nocode_nocaps);
 }
 
 /* MSX - Casio PV-7 */
@@ -481,8 +483,8 @@ void msx1_state::pv7(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 3, 1).force_start_address(0xe000);   // 8KB RAM
 	add_cartridge_slot<1>(config, 1);
 
-	m_hw_def.has_printer_port(false).no_caps_led();
-	msx1(VDP_TMS9118, SND_AY8910, config, layout_msx_nocode);
+	m_hw_def.has_printer_port(false);
+	msx1(VDP_TMS9118, SND_AY8910, config, layout_msx_nocode_nocaps);
 }
 
 /* MSX - Casio PV-16 */
@@ -505,8 +507,8 @@ void msx1_state::pv16(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 3, 1);   // 16KB RAM
 	add_cartridge_slot<1>(config, 1);
 
-	m_hw_def.has_printer_port(false).no_caps_led();
-	msx1(VDP_TMS9118, SND_AY8910, config, layout_msx_nocode);
+	m_hw_def.has_printer_port(false);
+	msx1(VDP_TMS9118, SND_AY8910, config, layout_msx_nocode_nocaps);
 }
 
 /* MSX - CE-TEC MPC-80, German version of Daewoo DPC-200, dump needed to verify */
@@ -671,9 +673,9 @@ void msx1_state::cpc50a(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 3, 1).force_start_address(0xe000);  // 8KB RAM
 
-	m_hw_def.has_cassette(false).has_printer_port(false).no_caps_led();
+	m_hw_def.has_cassette(false).has_printer_port(false);
 	// It was released in Korea but there are no Korean specific things about the hardware
-	msx1(VDP_TMS9118, SND_AY8910, config, layout_msx_nocode);
+	msx1(VDP_TMS9118, SND_AY8910, config, layout_msx_nocode_nocaps);
 }
 
 /* MSX - Daewoo Zemmix CPC-50B */
@@ -697,9 +699,9 @@ void msx1_state::cpc50b(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 3, 1);  // 16KB RAM
 
-	m_hw_def.has_cassette(false).has_printer_port(false).no_caps_led();
+	m_hw_def.has_cassette(false).has_printer_port(false);
 	// It was released in Korea but there are no Korean specific things about the hardware
-	msx1(VDP_TMS9118, SND_AY8910, config, layout_msx_nocode);
+	msx1(VDP_TMS9118, SND_AY8910, config, layout_msx_nocode_nocaps);
 }
 
 /* MSX - Daewoo Zemmix CPC-51 */
@@ -725,9 +727,9 @@ void msx1_state::cpc51(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 4);  // 64KB RAM
 
-	m_hw_def.has_cassette(false).has_printer_port(false).no_caps_led();
+	m_hw_def.has_cassette(false).has_printer_port(false);
 	// It was released in Korea but there are no Korean specific things about the hardware
-	msx1(VDP_TMS9118, SND_AY8910, config, layout_msx_nocode);
+	msx1(VDP_TMS9118, SND_AY8910, config, layout_msx_nocode_nocaps);
 }
 
 /* MSX - Daewoo Zemmix DTX-1493FW */
@@ -1723,8 +1725,8 @@ void msx1_state::nms801(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 2, "mainrom");
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 4);  // 64KB RAM
 
-	m_hw_def.has_printer_port(false).no_caps_led();
-	msx1(VDP_TMS9129, SND_AY8910, config, layout_msx_nocode);
+	m_hw_def.has_printer_port(false);
+	msx1(VDP_TMS9129, SND_AY8910, config, layout_msx_nocode_nocaps);
 }
 
 /* MSX - Philips VG-8000 */
@@ -2216,8 +2218,7 @@ void msx1_state::mpc100(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 4);  // 64KB RAM
 
-	m_hw_def.no_caps_led();
-	msx1(VDP_TMS9929A, SND_AY8910, config, layout_msx_nocode);
+	msx1(VDP_TMS9929A, SND_AY8910, config, layout_msx_nocode_nocaps);
 }
 
 /* MSX - Sanyo MPC-200 */
@@ -3646,8 +3647,7 @@ void msx1_state::yc64(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 4);  // 64KB RAM
 
-	m_hw_def.no_caps_led();
-	msx1(VDP_TMS9929A, SND_YM2149, config, layout_msx_nocode);
+	msx1(VDP_TMS9929A, SND_YM2149, config, layout_msx_nocode_nocaps);
 }
 
 /* MSX - Yeno DPC-64 */

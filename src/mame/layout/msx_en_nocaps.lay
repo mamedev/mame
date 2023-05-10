@@ -24,8 +24,8 @@ Basic display of LEDs for an MSX
 	</element>
 	<element name="no_led">
 	</element>
-	<element name="caps_name">
-		<text string="Caps" align="1">
+	<element name="code_name">
+		<text string="Code" align="1">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</text>
 	</element>
@@ -46,16 +46,16 @@ Basic display of LEDs for an MSX
 		<screen index="0">
 			<bounds x="75" y="0" width="1024" height="768" />
 		</screen>
-		<element name="caps_led_name" ref="caps_name">
+		<element name="caps_led_name" ref="no_name">
 			<bounds left="0" right="74" top="0" bottom="30" />
 		</element>
-		<element name="caps_led" ref="green_led">
+		<element name="caps_led" ref="no_led">
 			<bounds left="0" right="20" top="31" bottom="39" />
 		</element>
-		<element name="code_led_name" ref="no_name">
+		<element name="code_led_name" ref="code_name">
 			<bounds left="0" right="74" top="40" bottom="70" />
 		</element>
-		<element name="code_led" ref="no_led">
+		<element name="code_led" ref="green_led">
 			<bounds left="0" right="20" top="71" bottom="79" />
 		</element>
 		<element name="internal_drive0_name" ref="drv0">

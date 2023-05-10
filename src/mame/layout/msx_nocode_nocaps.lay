@@ -6,14 +6,6 @@ Basic display of LEDs for an MSX
 -->
 
 <mamelayout version="2">
-	<element name="green_led">
-		<rect state="0">
-			<color red="0.2" green="0.2" blue="0.2" />
-		</rect>
-		<rect state="1">
-			<color red="0.0" green="1.0" blue="0.0" />
-		</rect>
-	</element>
 	<element name="optional_orange_led">
 		<rect state="1">
 			<color red="0.2" green="0.2" blue="0.2" />
@@ -23,11 +15,6 @@ Basic display of LEDs for an MSX
 		</rect>
 	</element>
 	<element name="no_led">
-	</element>
-	<element name="caps_name">
-		<text string="Caps" align="1">
-			<color red="1.0" green="1.0" blue="1.0" />
-		</text>
 	</element>
 	<element name="no_name">
 	</element>
@@ -46,10 +33,10 @@ Basic display of LEDs for an MSX
 		<screen index="0">
 			<bounds x="75" y="0" width="1024" height="768" />
 		</screen>
-		<element name="caps_led_name" ref="caps_name">
+		<element name="caps_led_name" ref="no_name">
 			<bounds left="0" right="74" top="0" bottom="30" />
 		</element>
-		<element name="caps_led" ref="green_led">
+		<element name="caps_led" ref="no_led">
 			<bounds left="0" right="20" top="31" bottom="39" />
 		</element>
 		<element name="code_led_name" ref="no_name">

@@ -158,7 +158,6 @@ msx_state::msx_state(const machine_config &mconfig, device_type type, const char
 	, m_port_c_old(0)
 	, m_keylatch(0)
 	, m_caps_led(*this, "caps_led")
-	, m_caps_led_name(*this, "caps_led_name")
 	, m_code_led(*this, "code_led")
 	, m_main_xtal(main_xtal)
 	, m_cpu_xtal_divider(cpu_xtal_divider)
@@ -304,15 +303,13 @@ void msx_state::machine_reset()
 		m_view_slot0_page2.select(0);
 		m_view_slot0_page3.select(0);
 	}
-	m_caps_led_name = m_hw_def.has_caps_led() ? 1 : 0;
-	m_caps_led = m_hw_def.has_caps_led() ? 1 : 0;
+	m_caps_led = 0;
 	m_code_led = 0;
 }
 
 void msx_state::machine_start()
 {
 	m_caps_led.resolve();
-	m_caps_led_name.resolve();
 	m_code_led.resolve();
 	m_port_c_old = 0xff;
 }
@@ -484,8 +481,7 @@ void msx_state::ppi_port_c_w(u8 data)
 	m_keylatch = data & 0x0f;
 
 	// caps lock
-	if (m_hw_def.has_caps_led())
-		m_caps_led = 1 + BIT(~data, 6);
+	m_caps_led = BIT(~data, 6);
 
 	// key click
 	if (BIT(m_port_c_old ^ data, 7))

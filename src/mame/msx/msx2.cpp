@@ -28,6 +28,7 @@
 #include "msx_kr.lh"
 #include "msx_ru.lh"
 #include "msx_nocode.lh"
+#include "msx_nocode_nocaps.lh"
 
 using namespace msx_keyboard;
 
@@ -446,8 +447,8 @@ void msx2_state::cpc61(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 0, 3, 0, 1, "mainrom", 0x8000);
 	add_cartridge_slot<1>(config, 1);
 
-	m_hw_def.has_cassette(false).has_printer_port(false).no_caps_led();
-	msx2(SND_AY8910, config, layout_msx_nocode);
+	m_hw_def.has_cassette(false).has_printer_port(false);
+	msx2(SND_AY8910, config, layout_msx_nocode_nocaps);
 }
 
 /* MSX2 - Daewoo Zemmix CPG-120 Normal */
@@ -486,8 +487,8 @@ void msx2_state::cpg120(machine_config &config)
 	MSX_S1985(config, "s1985", 0);
 
 	msx_ym2413(config);
-	m_hw_def.has_printer_port(false).no_caps_led();
-	msx2plus(SND_AY8910, config, layout_msx_nocode);
+	m_hw_def.has_printer_port(false);
+	msx2plus(SND_AY8910, config, layout_msx_nocode_nocaps);
 }
 
 /* MSX2 - Daisen Sangyo MX-2021 */
@@ -1272,8 +1273,7 @@ void msx2_state::fsa1(machine_config &config)
 
 	MSX_S1985(config, "s1985", 0);
 
-	m_hw_def.no_caps_led();
-	msx2(SND_YM2149, config, layout_msx_nocode);
+	msx2(SND_YM2149, config, layout_msx_nocode_nocaps);
 }
 
 /* MSX2 - Panasonic FS-A1 (a) */
@@ -1303,8 +1303,7 @@ void msx2_state::fsa1a(machine_config &config)
 
 	MSX_S1985(config, "s1985", 0);
 
-	m_hw_def.no_caps_led();
-	msx2(SND_YM2149, config, layout_msx_nocode);
+	msx2(SND_YM2149, config, layout_msx_nocode_nocaps);
 }
 
 /* MSX2 - Panasonic FS-A1F */
@@ -2572,8 +2571,7 @@ void msx2_state::hbf1(machine_config &config)
 
 	MSX_S1985(config, "s1985", 0);
 
-	m_hw_def.no_caps_led();
-	msx2(SND_YM2149, config, layout_msx_nocode);
+	msx2(SND_YM2149, config, layout_msx_nocode_nocaps);
 }
 
 /* MSX2 - Sony HB-F1II */
