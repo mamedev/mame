@@ -1041,7 +1041,7 @@ void aleck64_state::aleck64(machine_config &config)
 	m_vr4300->set_dcache_size(8192);
 	m_vr4300->set_system_clock(62500000);
 	m_vr4300->set_addrmap(AS_PROGRAM, &aleck64_state::n64_map);
-	m_vr4300->set_force_no_drc(true);
+	m_vr4300->set_force_no_drc(false);
 
 	RSP(config, m_rsp, 62500000);
 	m_rsp->dp_reg_r().set(m_rcp_periphs, FUNC(n64_periphs::dp_reg_r));
@@ -1051,6 +1051,7 @@ void aleck64_state::aleck64(machine_config &config)
 	m_rsp->status_set().set(m_rcp_periphs, FUNC(n64_periphs::sp_set_status));
 	m_rsp->set_addrmap(AS_PROGRAM, &aleck64_state::rsp_imem_map);
 	m_rsp->set_addrmap(AS_DATA, &aleck64_state::rsp_dmem_map);
+	m_rsp->set_force_no_drc(false);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);

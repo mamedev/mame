@@ -390,7 +390,7 @@ void n64_console_state::n64(machine_config &config)
 {
 	/* basic machine hardware */
 	VR4300BE(config, m_vr4300, 93750000);
-	m_vr4300->set_force_no_drc(true);
+	m_vr4300->set_force_no_drc(false);
 	//m_vr4300->set_icache_size(16384);
 	//m_vr4300->set_dcache_size(8192);
 	//m_vr4300->set_system_clock(62500000);
@@ -398,7 +398,7 @@ void n64_console_state::n64(machine_config &config)
 	m_vr4300->set_vblank_int("screen", FUNC(n64_console_state::n64_reset_poll));
 
 	RSP(config, m_rsp, 62500000);
-	m_rsp->set_force_no_drc(true);
+	m_rsp->set_force_no_drc(false);
 	m_rsp->dp_reg_r().set(m_rcp_periphs, FUNC(n64_periphs::dp_reg_r));
 	m_rsp->dp_reg_w().set(m_rcp_periphs, FUNC(n64_periphs::dp_reg_w));
 	m_rsp->sp_reg_r().set(m_rcp_periphs, FUNC(n64_periphs::sp_reg_r));
