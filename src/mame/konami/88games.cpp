@@ -217,7 +217,7 @@ void _88games_state::speech_control_w(uint8_t data)
 	m_speech_chip = BIT(data, 2);
 
 	m_upd7759[m_speech_chip]->reset_w(BIT(data, 1));
-	m_upd7759[m_speech_chip]->start_w(BIT(data, 0));
+	m_upd7759[m_speech_chip]->start_w(!BIT(data, 0));
 }
 
 void _88games_state::speech_msg_w(uint8_t data)
