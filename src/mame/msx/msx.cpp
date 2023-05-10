@@ -160,7 +160,6 @@ msx_state::msx_state(const machine_config &mconfig, device_type type, const char
 	, m_caps_led(*this, "caps_led")
 	, m_caps_led_name(*this, "caps_led_name")
 	, m_code_led(*this, "code_led")
-	, m_region(REGION_UNKNOWN)
 	, m_main_xtal(main_xtal)
 	, m_cpu_xtal_divider(cpu_xtal_divider)
 {
@@ -556,9 +555,8 @@ void msx_state::kanji_w(offs_t offset, u8 data)
 		m_kanji_latch = (m_kanji_latch & 0x1f800) | ((data & 0x3f) << 5);
 }
 
-void msx_state::msx_base(ay8910_type ay8910_type, machine_config &config, region_type region, const internal_layout &layout)
+void msx_state::msx_base(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout)
 {
-	m_region = region;
 	// basic machine hardware
 	Z80(config, m_maincpu, m_main_xtal / m_cpu_xtal_divider);         // 3.579545 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &msx_state::memory_map);
@@ -632,9 +630,9 @@ void msx_state::msx1_add_softlists(machine_config &config)
 		SOFTWARE_LIST(config, "flop_list").set_original("msx1_flop");
 }
 
-void msx_state::msx1(vdp_type vdp_type, ay8910_type ay8910_type, machine_config &config, region_type region, const internal_layout &layout)
+void msx_state::msx1(vdp_type vdp_type, ay8910_type ay8910_type, machine_config &config, const internal_layout &layout)
 {
-	msx_base(ay8910_type, config, region, layout);
+	msx_base(ay8910_type, config, layout);
 
 	m_maincpu->set_addrmap(AS_IO, &msx_state::msx1_io_map);
 
@@ -815,17 +813,17 @@ void msx2_base_state::turbor_add_softlists(machine_config &config)
 	}
 }
 
-void msx2_base_state::msx2_base(ay8910_type ay8910_type, machine_config &config, region_type region, const internal_layout &layout)
+void msx2_base_state::msx2_base(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout)
 {
-	msx_base(ay8910_type, config, region, layout);
+	msx_base(ay8910_type, config, layout);
 
 	// real time clock
 	RP5C01(config, m_rtc, 32.768_kHz_XTAL);
 }
 
-void msx2_base_state::msx2(ay8910_type ay8910_type, machine_config &config, region_type region, const internal_layout &layout)
+void msx2_base_state::msx2(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout)
 {
-	msx2_base(ay8910_type, config, region, layout);
+	msx2_base(ay8910_type, config, layout);
 
 	m_maincpu->set_addrmap(AS_IO, &msx2_base_state::msx2_io_map);
 
@@ -839,15 +837,15 @@ void msx2_base_state::msx2(ay8910_type ay8910_type, machine_config &config, regi
 	msx2_add_softlists(config);
 }
 
-void msx2_base_state::msx2_pal(ay8910_type ay8910_type, machine_config &config, region_type region, const internal_layout &layout)
+void msx2_base_state::msx2_pal(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout)
 {
-	msx2(ay8910_type, config, region, layout);
+	msx2(ay8910_type, config, layout);
 	m_v9938->set_screen_pal(m_screen);
 }
 
-void msx2_base_state::msx2plus_base(ay8910_type ay8910_type, machine_config &config, region_type region, const internal_layout &layout)
+void msx2_base_state::msx2plus_base(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout)
 {
-	msx2_base(ay8910_type, config, region, layout);
+	msx2_base(ay8910_type, config, layout);
 
 	m_maincpu->set_addrmap(AS_IO, &msx2_base_state::msx2plus_io_map);
 
@@ -858,23 +856,23 @@ void msx2_base_state::msx2plus_base(ay8910_type ay8910_type, machine_config &con
 	m_v9958->int_cb().set(m_mainirq, FUNC(input_merger_device::in_w<0>));
 }
 
-void msx2_base_state::msx2plus(ay8910_type ay8910_type, machine_config &config, region_type region, const internal_layout &layout)
+void msx2_base_state::msx2plus(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout)
 {
-	msx2plus_base(ay8910_type, config, region, layout);
+	msx2plus_base(ay8910_type, config, layout);
 
 	// Software lists
 	msx2plus_add_softlists(config);
 }
 
-void msx2_base_state::msx2plus_pal(ay8910_type ay8910_type, machine_config &config, region_type region, const internal_layout &layout)
+void msx2_base_state::msx2plus_pal(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout)
 {
-	msx2plus(ay8910_type, config, region, layout);
+	msx2plus(ay8910_type, config, layout);
 	m_v9958->set_screen_pal(m_screen);
 }
 
-void msx2_base_state::turbor(ay8910_type ay8910_type, machine_config &config, region_type region, const internal_layout &layout)
+void msx2_base_state::turbor(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout)
 {
-	msx2plus_base(ay8910_type, config, region, layout);
+	msx2plus_base(ay8910_type, config, layout);
 
 	R800(config.replace(), m_maincpu, 28.636363_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &msx2_base_state::memory_map);

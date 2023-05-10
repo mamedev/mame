@@ -71,18 +71,8 @@ protected:
 		VDP_TMS9929A
 	};
 
-	enum region_type
-	{
-		REGION_UNKNOWN = 0,
-		REGION_INTERNATIONAL = 1,
-		REGION_JAPAN = 2,
-		REGION_KOREA = 3,
-		REGION_ARAB = 4,
-		REGION_RUSSIA = 5
-	};
-
-	void msx_base(ay8910_type ay8910_type, machine_config &config, region_type region, const internal_layout &layout);
-	void msx1(vdp_type vdp_type, ay8910_type ay8910_type, machine_config &config, region_type region, const internal_layout &layout);
+	void msx_base(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
+	void msx1(vdp_type vdp_type, ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
 	void msx1_add_softlists(machine_config &config);
 
 	// configuration helpers
@@ -257,7 +247,6 @@ protected:
 	output_finder<> m_caps_led;
 	output_finder<> m_caps_led_name;
 	output_finder<> m_code_led;
-	region_type m_region;
 	const XTAL m_main_xtal;
 	const int m_cpu_xtal_divider;
 
@@ -354,13 +343,13 @@ protected:
 
 	virtual void machine_start() override;
 
-	void msx2_base(ay8910_type ay8910_type, machine_config &config, region_type region, const internal_layout &layout);
-	void msx2(ay8910_type ay8910_type, machine_config &config, region_type region, const internal_layout &layout);
-	void msx2_pal(ay8910_type ay8910_type, machine_config &config, region_type region, const internal_layout &layout);
-	void msx2plus_base(ay8910_type ay8910_type, machine_config &config, region_type region, const internal_layout &layout);
-	void msx2plus(ay8910_type ay8910_type, machine_config &config, region_type region, const internal_layout &layout);
-	void msx2plus_pal(ay8910_type ay8910_type, machine_config &config, region_type region, const internal_layout &layout);
-	void turbor(ay8910_type ay8910_type, machine_config &config, region_type region, const internal_layout &layout);
+	void msx2_base(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
+	void msx2(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
+	void msx2_pal(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
+	void msx2plus_base(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
+	void msx2plus(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
+	void msx2plus_pal(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
+	void turbor(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
 	void msx2_add_softlists(machine_config &config);
 	void msx2plus_add_softlists(machine_config &config);
 	void turbor_add_softlists(machine_config &config);
