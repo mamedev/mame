@@ -1442,6 +1442,18 @@ if (SOUNDS["LC7535"]~=null) then
 end
 
 ---------------------------------------------------
+-- Sanyo LC82310
+--@src/devices/sound/lc82310.h,SOUNDS["LC82310"] = true
+---------------------------------------------------
+
+if (SOUNDS["LC82310"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/lc82310.cpp",
+		MAME_DIR .. "src/devices/sound/lc82310.h",
+	}
+end
+
+---------------------------------------------------
 -- NEC uPD934G
 --@src/devices/sound/upd934g.h,SOUNDS["UPD934G"] = true
 ---------------------------------------------------

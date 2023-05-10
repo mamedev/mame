@@ -660,6 +660,7 @@ User data note:
 #include "machine/ram.h"
 #include "machine/ticket.h"
 #include "machine/timer.h"
+#include "sound/lc82310.h"
 #include "sound/spu.h"
 #include "video/psx.h"
 
@@ -907,6 +908,7 @@ public:
 		: namcos10_memn_state(mconfig, type, tag)
 		, m_ram(*this, "maincpu:ram")
 		, m_memp3_mcu(*this, "memp3_mcu")
+		, m_lc82310(*this, "mp3_decoder")
 		, m_mcu_ram(*this, "mcu_ram")
 		, m_p3_analog(*this, "P3_ANALOG%u", 1U)
 	{ }
@@ -926,26 +928,55 @@ private:
 	void namcos10_memp3_map(address_map &map);
 	void mcu_map(address_map &map);
 
+	template <int Port> uint8_t port_read(offs_t offset);
+	template <int Port> void port_write(offs_t offset, uint8_t data);
+
 	void firmware_write_w(uint16_t data);
 
 	void ram_bank_w(uint16_t data);
 
 	uint16_t unk_status1_r();
 
-	uint16_t unk_status2_r();
-	void mcu_int5_w(uint16_t data);
+	uint16_t subcomm_busy_r();
+	void subcomm_int_w(uint16_t data);
 
 	uint16_t ram_r(offs_t offset);
 	void ram_w(offs_t offset, uint16_t data);
 
-	uint16_t io_analog_r(offs_t offset);
+	void subcomm_ack_w(uint16_t data);
+
+	uint16_t mp3_unk_r();
+	void mp3_unk_w(uint16_t data);
+
+	uint16_t mp3_unk2_r();
+	void mp3_unk2_w(uint16_t data);
+
+	uint16_t mp3_unk3_r();
+	void mp3_unk3_w(uint16_t data);
+
+	uint16_t decode_pld_ver_r();
+	uint16_t dram_pld_ver_r();
+	uint16_t nand_pld_ver_r();
+
+	uint16_t mp3_stream_status_r();
+	void mp3_stream_status_w(uint16_t data);
+
+	void mp3_data_w(uint16_t data);
 
 	required_device<ram_device> m_ram;
 	required_device<tmp95c061_device> m_memp3_mcu;
+	required_device<lc82310_device> m_lc82310;
 	required_shared_ptr<uint16_t> m_mcu_ram;
 	optional_ioport_array<4> m_p3_analog;
 
 	uint16_t m_mcu_ram_bank;
+	bool m_subcomm_busy;
+
+	uint16_t m_mp3_unk_val, m_mp3_unk2_val, m_mp3_unk3_val;
+	uint8_t m_mp3_port7_data;
+	uint8_t m_mp3_porta_data;
+	bool m_mp3_stream_available;
+	bool m_mp3_received_byte;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -1258,8 +1289,6 @@ void namcos10_state::namcos10_exio(machine_config &config)
 
 void namcos10_state::namcos10_map_exio_inner(address_map &map)
 {
-	// TODO: Base registers are probably similar between EXIO and MGEXIO, fill in registers and rename if possible
-	// TODO: Figure out what the commented out registers are actually used for
 	map(0x06000, 0x0ffff).rw(m_exio, FUNC(namcos10_exio_device::ram_r), FUNC(namcos10_exio_device::ram_w));
 	map(0x10000, 0x10003).rw(m_exio, FUNC(namcos10_exio_device::ctrl_r), FUNC(namcos10_exio_device::ctrl_w));
 	map(0x18000, 0x18003).rw(m_exio, FUNC(namcos10_exio_device::bus_req_r), FUNC(namcos10_exio_device::bus_req_w));
@@ -1758,6 +1787,9 @@ void namcos10_memn_state::namcos10_memn_map_inner(address_map &map)
 	map(0xf460000, 0xf460001).w(FUNC(namcos10_memn_state::nand_bank_w));
 	map(0xf470000, 0xf470001).rw(FUNC(namcos10_memn_state::ctrl_reg_r), FUNC(namcos10_memn_state::ctrl_reg_w));
 	//map(0xf480000, 0xf480001).w(); // 0xffff is written here after a nand write/erase?
+
+	map(0xfe40000, 0xfe40003).noprw();
+	map(0xfe48000, 0xfe48003).noprw();
 }
 
 void namcos10_memn_state::namcos10_memn_map(address_map &map)
@@ -2551,37 +2583,28 @@ void namcos10_memp3_state::ram_w(offs_t offset, uint16_t data)
 	m_mcu_ram[m_mcu_ram_bank * 0x10000 + offset] = data;
 }
 
-uint16_t namcos10_memp3_state::unk_status2_r()
+uint16_t namcos10_memp3_state::subcomm_busy_r()
 {
-	// Some kind of status flag.
-	// Game code loops until this is non-zero before writing to data to f30000c/320000.
-	// Possibly related to MP3 decoder?
-	return 1;
+	// Before writing a new command this register is checked to make sure the
+	// previous command has already been finished processing
+	return !m_subcomm_busy;
 }
 
-void namcos10_memp3_state::mcu_int5_w(uint16_t data)
+void namcos10_memp3_state::subcomm_int_w(uint16_t data)
 {
-	// MP3 decoder commands will only be processed when INT5 is triggered.
-	// 0 gets written to this register (only?) after the MP3 decoder commands are
-	// written into the MCU's memory so I believe it's responsible for making the
-	// INT5 get triggered.
+	// MP3 decoder commands will only be processed when INT5 is triggered
 	m_memp3_mcu->set_input_line(TLCS900_INT5, ASSERT_LINE);
-}
-
-uint16_t namcos10_memp3_state::io_analog_r(offs_t offset)
-{
-	return m_p3_analog[offset].read_safe(0);
+	m_subcomm_busy = true;
 }
 
 void namcos10_memp3_state::namcos10_memp3_map_inner(address_map &map)
 {
 	map(0xf300000, 0xf300001).w(FUNC(namcos10_memp3_state::firmware_write_w));
 	// 1f300004 unk
-	map(0xf300006, 0xf300007).rw(FUNC(namcos10_memp3_state::unk_status2_r), FUNC(namcos10_memp3_state::mcu_int5_w));
+	map(0xf300006, 0xf300007).rw(FUNC(namcos10_memp3_state::subcomm_busy_r), FUNC(namcos10_memp3_state::subcomm_int_w));
 	map(0xf30000c, 0xf30000d).w(FUNC(namcos10_memp3_state::ram_bank_w));
-	map(0xf30000e, 0xf30000f).r(FUNC(namcos10_memp3_state::unk_status1_r));
+	map(0xf30000e, 0xf30000f).r(FUNC(namcos10_memp3_state::unk_status1_r)); // similar to 0xf300006, only used when writing firmware?
 	map(0xf320000, 0xf33ffff).rw(FUNC(namcos10_memp3_state::ram_r), FUNC(namcos10_memp3_state::ram_w));
-	map(0xf33fff0, 0xf33fff7).r(FUNC(namcos10_memp3_state::io_analog_r));
 }
 
 void namcos10_memp3_state::namcos10_memp3_map(address_map &map)
@@ -2595,9 +2618,143 @@ void namcos10_memp3_state::namcos10_memp3_map(address_map &map)
 
 void namcos10_memp3_state::mcu_map(address_map &map)
 {
-	map(0x000000, 0x7fffff).ram().mirror(0x800000).share(m_mcu_ram);
+	map(0x100000, 0x100001).rw(FUNC(namcos10_memp3_state::mp3_unk_r), FUNC(namcos10_memp3_state::mp3_unk_w));
+	map(0x100002, 0x100003).portr("MEMP3_DIPSW");
+	map(0x100004, 0x100005).rw(FUNC(namcos10_memp3_state::mp3_unk2_r), FUNC(namcos10_memp3_state::mp3_unk2_w));
+	map(0x100008, 0x100009).w(FUNC(namcos10_memp3_state::subcomm_ack_w));
+	map(0x10000e, 0x10000f).r(FUNC(namcos10_memp3_state::decode_pld_ver_r));
+	map(0x100010, 0x100011).rw(FUNC(namcos10_memp3_state::mp3_unk3_r), FUNC(namcos10_memp3_state::mp3_unk3_w));
+	map(0x10001e, 0x10002f).r(FUNC(namcos10_memp3_state::dram_pld_ver_r));
+	map(0x10002e, 0x10002f).r(FUNC(namcos10_memp3_state::nand_pld_ver_r));
+	map(0x100030, 0x100031).w(FUNC(namcos10_memp3_state::mp3_data_w));
+	map(0x100032, 0x100033).rw(FUNC(namcos10_memp3_state::mp3_stream_status_r), FUNC(namcos10_memp3_state::mp3_stream_status_w));
+	map(0x800000, 0xffffff).ram().share(m_mcu_ram);
 }
 
+uint16_t namcos10_memp3_state::decode_pld_ver_r()
+{
+	// DECODE PLD version, only seems to be read when sub CPU is in debug mode
+	return 1;
+}
+
+uint16_t namcos10_memp3_state::dram_pld_ver_r()
+{
+	// DRAM-C PLD version, only seems to be read when sub CPU is in debug mode
+	return 1;
+}
+
+uint16_t namcos10_memp3_state::nand_pld_ver_r()
+{
+	// NAND-C PLD version, only seems to be read when sub CPU is in debug mode
+	return 1;
+}
+
+uint16_t namcos10_memp3_state::mp3_stream_status_r()
+{
+	// The debug messages when debug mode are enabled checks this register
+	// and if it's 0 then it prints "MUTE:ON" and if it's 1 it prints "MUTE:OFF"
+	return m_mp3_stream_available;
+}
+
+void namcos10_memp3_state::mp3_stream_status_w(uint16_t data)
+{
+	// This gets set to 0 and then 1 every time a new MP3 stream is started
+	bool is_available = BIT(data, 0);
+
+	if (m_mp3_stream_available && !is_available)
+		m_lc82310->reset_playback();
+
+	m_mp3_stream_available = is_available;
+}
+
+void namcos10_memp3_state::mp3_data_w(uint16_t data)
+{
+	m_lc82310->dimpg_w(data & 0xff);
+	m_mp3_received_byte = true;
+}
+
+void namcos10_memp3_state::subcomm_ack_w(uint16_t data)
+{
+	m_subcomm_busy = false;
+	m_memp3_mcu->set_input_line(TLCS900_INT5, CLEAR_LINE);
+}
+
+uint16_t namcos10_memp3_state::mp3_unk_r()
+{
+	// Seems to be related to timer 3, something to do with the "L" LEDs maybe?
+	// When the timer 3 value has ticked 10 times, set to 1 if value is 0 else shift value by 1
+	// mp3_unk_w(mp3_unk_r() ? mp3_unk_r() << 1 : 1)
+	return m_mp3_unk_val;
+}
+
+void namcos10_memp3_state::mp3_unk_w(uint16_t data)
+{
+	m_mp3_unk_val = data;
+}
+
+uint16_t namcos10_memp3_state::mp3_unk2_r()
+{
+	// The following are how the sub CPU program handles the bits.
+	// It's unclear what writing to these registers actually does outside of the sub CPU.
+	// Only available in g13jnr and nicetsuk, maybe some kind of debug controls?
+	// bit 0 = Start playback
+	// bit 1 = Stop playback
+	// bit 2 = Fade out
+	// bit 3 = Fade in
+	// bit 4 = Decrease volume by 1
+	// bit 5 = Increase volume by 1
+	// bit 6 = Mute/Unmute (uses 0x100032)
+	// bit 7 = Print state from MP3 decoder + state byte from sub CPU to the sub CPU's serial output
+	return m_mp3_unk2_val;
+}
+
+void namcos10_memp3_state::mp3_unk2_w(uint16_t data)
+{
+	m_mp3_unk2_val = data;
+}
+
+uint16_t namcos10_memp3_state::mp3_unk3_r()
+{
+	// When the timer 3 value has ticked 10 times: mp3_unk3_w(3 - mp3_unk3_r())
+	return m_mp3_unk3_val;
+}
+
+void namcos10_memp3_state::mp3_unk3_w(uint16_t data)
+{
+	m_mp3_unk3_val = data;
+}
+
+template <int Port>
+void namcos10_memp3_state::port_write(offs_t offset, uint8_t data)
+{
+	if (Port == 7) {
+		m_lc82310->zcsctl_w(BIT(data, 3));
+		m_lc82310->dictl_w(BIT(data, 1));
+		m_lc82310->ckctl_w(BIT(data, 2));
+		m_mp3_port7_data = data;
+	} else if (Port == 10) {
+		// bit 2 is toggled off/on after MP3 byte is written
+		// bit 3 is set to 0 before writing data and then set to 1 after writing data
+		m_mp3_porta_data = data;
+	}
+}
+
+template <int Port>
+uint8_t namcos10_memp3_state::port_read(offs_t offset)
+{
+	auto r = 0;
+
+	if (Port == 7) {
+		r = (m_mp3_port7_data & ~1) | m_lc82310->doctl_r();
+	} else if (Port == 10) { // Port A
+		r = m_mp3_porta_data;
+	} else if (Port == 11) { // Port B
+		r = !m_mp3_received_byte && m_lc82310->demand_r();
+		m_mp3_received_byte = false;
+	}
+
+	return r;
+}
 
 void namcos10_memp3_state::namcos10_memp3_base(machine_config &config)
 {
@@ -2607,11 +2764,44 @@ void namcos10_memp3_state::namcos10_memp3_base(machine_config &config)
 	m_maincpu->subdevice<psxdma_device>("dma")->install_write_handler(5, psxdma_device::write_delegate(&namcos10_memp3_state::pio_dma_read, this));
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos10_memp3_state::namcos10_memp3_map);
 
-	TMP95C061(config, m_memp3_mcu, XTAL(16'934'400));
+	TMP95C061(config, m_memp3_mcu, XTAL(101'491'200) / 2); // Measured
 	m_memp3_mcu->set_addrmap(AS_PROGRAM, &namcos10_memp3_state::mcu_map);
-	// Port 7 is used for communicating with the MP3 decoder chip
 
-	// LC82310 16.9344MHz
+	m_memp3_mcu->port1_read().set(FUNC(namcos10_memp3_state::port_read<1>));
+	m_memp3_mcu->port5_read().set(FUNC(namcos10_memp3_state::port_read<5>));
+	m_memp3_mcu->port7_read().set(FUNC(namcos10_memp3_state::port_read<7>));
+	m_memp3_mcu->port8_read().set(FUNC(namcos10_memp3_state::port_read<8>));
+	m_memp3_mcu->port9_read().set(FUNC(namcos10_memp3_state::port_read<9>));
+	m_memp3_mcu->porta_read().set(FUNC(namcos10_memp3_state::port_read<10>));
+	m_memp3_mcu->portb_read().set(FUNC(namcos10_memp3_state::port_read<11>));
+	m_memp3_mcu->port1_write().set(FUNC(namcos10_memp3_state::port_write<1>));
+	m_memp3_mcu->port2_write().set(FUNC(namcos10_memp3_state::port_write<2>));
+	m_memp3_mcu->port5_write().set(FUNC(namcos10_memp3_state::port_write<5>));
+	m_memp3_mcu->port6_write().set(FUNC(namcos10_memp3_state::port_write<6>));
+	m_memp3_mcu->port7_write().set(FUNC(namcos10_memp3_state::port_write<7>));
+	m_memp3_mcu->port8_write().set(FUNC(namcos10_memp3_state::port_write<8>));
+	m_memp3_mcu->porta_write().set(FUNC(namcos10_memp3_state::port_write<10>));
+	m_memp3_mcu->portb_write().set(FUNC(namcos10_memp3_state::port_write<11>));
+
+	m_memp3_mcu->an_read<0>().set([this] () {
+		return m_p3_analog[0].read_safe(0);
+	});
+
+	m_memp3_mcu->an_read<1>().set([this] () {
+		return m_p3_analog[1].read_safe(0);
+	});
+
+	m_memp3_mcu->an_read<2>().set([this] () {
+		return m_p3_analog[2].read_safe(0);
+	});
+
+	m_memp3_mcu->an_read<3>().set([this] () {
+		return m_p3_analog[3].read_safe(0);
+	});
+
+	LC82310(config, m_lc82310, XTAL(16'934'400));
+	m_lc82310->add_route(0, ":lspeaker", 1.0);
+	m_lc82310->add_route(1, ":rspeaker", 1.0);
 }
 
 void namcos10_memp3_state::machine_start()
@@ -2619,13 +2809,31 @@ void namcos10_memp3_state::machine_start()
 	namcos10_memn_state::machine_start();
 
 	save_item(NAME(m_mcu_ram_bank));
+	save_item(NAME(m_mp3_unk_val));
+	save_item(NAME(m_mp3_unk2_val));
+	save_item(NAME(m_mp3_unk3_val));
+	save_item(NAME(m_mp3_port7_data));
+	save_item(NAME(m_mp3_porta_data));
+	save_item(NAME(m_mp3_stream_available));
+	save_item(NAME(m_mp3_received_byte));
+	save_item(NAME(m_subcomm_busy));
 }
 
 void namcos10_memp3_state::machine_reset()
 {
 	namcos10_memn_state::machine_reset();
 
+	std::fill(m_mcu_ram.begin(), m_mcu_ram.end(), 0);
+
 	m_mcu_ram_bank = 0;
+	m_mp3_unk_val = m_mp3_unk3_val = 0;
+	m_mp3_unk2_val = 0xffff;
+	m_mp3_port7_data = 0;
+	m_mp3_porta_data = 0;
+	m_mp3_stream_available = false;
+	m_mp3_received_byte = false;
+
+	m_subcomm_busy = false;
 
 	m_memp3_mcu->suspend(SUSPEND_REASON_HALT, 1);
 }
@@ -2771,6 +2979,18 @@ static INPUT_PORTS_START( namcos10 )
 
 	PORT_START("EXIO_IN2")
 	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( memp3 )
+	PORT_START("MEMP3_DIPSW")
+	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0001, IP_ACTIVE_LOW, "MEMP3_SW1:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0002, IP_ACTIVE_LOW, "MEMP3_SW1:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0004, IP_ACTIVE_LOW, "MEMP3_SW1:3" )
+	PORT_DIPNAME( 0x0008, 0x0008, "Debug Mode" ) PORT_DIPLOCATION("MEMP3_SW1:4")
+	PORT_DIPSETTING( 0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x0000, DEF_STR( On ) )
 
 INPUT_PORTS_END
 
@@ -2925,6 +3145,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( g13jnr )
 	PORT_INCLUDE(namcos10)
+	PORT_INCLUDE(memp3)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x071f0043, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2947,10 +3168,10 @@ static INPUT_PORTS_START( g13jnr )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
 	PORT_START("P3_ANALOG1")
-	PORT_BIT( 0xffff, 0x7fff, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, -1.0, 0.0, 0) PORT_MINMAX(0x0000,0xffff) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_PLAYER(1) PORT_REVERSE
+	PORT_BIT( 0x3ff, 0, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, -1.0, 0.0, 0) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(50) PORT_PLAYER(1) PORT_REVERSE
 
 	PORT_START("P3_ANALOG2")
-	PORT_BIT( 0xffff, 0x7fff, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0x0000,0xffff) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_PLAYER(1)
+	PORT_BIT( 0x3ff, 0, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(50) PORT_PLAYER(1)
 
 INPUT_PORTS_END
 
@@ -3022,6 +3243,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( nicetsuk )
 	PORT_INCLUDE(namcos10)
+	PORT_INCLUDE(memp3)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0ff9ef40, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -3041,6 +3263,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( squizchs )
 	PORT_INCLUDE(namcos10)
+	PORT_INCLUDE(memp3)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0fff7070, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -3675,6 +3898,6 @@ GAME( 2003, taiko5,    0,        ns10_taiko5,    taiko,        namcos10_memn_sta
 GAME( 2004, taiko6,    0,        ns10_taiko6,    taiko,        namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Taiko no Tatsujin 6 (Japan, TK61 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // MEM(P3)
-GAME( 2001, g13jnr,    0,        ns10_g13jnr,    g13jnr,       namcos10_memp3_state, memn_driver_init, ROT0, "Eighting / Raizing / Namco", "Golgo 13: Juusei no Requiem (Japan, GLT1 VER.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2002, nicetsuk,  0,        ns10_nicetsuk,  nicetsuk,     namcos10_memp3_state, memn_driver_init, ROT0, "Namco / Metro", "Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2003, squizchs,  0,        ns10_squizchs,  squizchs,     namcos10_memp3_state, memn_driver_init, ROT0, "Namco", "Seishun-Quiz Colorful High School (CHS1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2001, g13jnr,    0,        ns10_g13jnr,    g13jnr,       namcos10_memp3_state, memn_driver_init, ROT0, "Eighting / Raizing / Namco", "Golgo 13: Juusei no Requiem (Japan, GLT1 VER.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2002, nicetsuk,  0,        ns10_nicetsuk,  nicetsuk,     namcos10_memp3_state, memn_driver_init, ROT0, "Namco / Metro", "Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2003, squizchs,  0,        ns10_squizchs,  squizchs,     namcos10_memp3_state, memn_driver_init, ROT0, "Namco", "Seishun-Quiz Colorful High School (CHS1 Ver.A)", MACHINE_IMPERFECT_SOUND )
