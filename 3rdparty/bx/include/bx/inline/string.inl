@@ -73,6 +73,11 @@ namespace bx
 	{
 	}
 
+	inline StringView::StringView(const StringView& _rhs)
+	{
+		set(_rhs);
+	}
+
 	inline StringView::StringView(const StringView& _rhs, int32_t _start, int32_t _len)
 	{
 		set(_rhs, _start, _len);
@@ -125,6 +130,11 @@ namespace bx
 	inline void StringView::set(const char* _ptr, const char* _term)
 	{
 		set(_ptr, int32_t(_term-_ptr) );
+	}
+
+	inline void StringView::set(const StringView& _str)
+	{
+		set(_str, 0, INT32_MAX);
 	}
 
 	inline void StringView::set(const StringView& _str, int32_t _start, int32_t _len)

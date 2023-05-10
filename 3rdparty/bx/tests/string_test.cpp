@@ -584,7 +584,7 @@ TEST_CASE("strWord", "")
 TEST_CASE("strFindBlock", "")
 {
 	const bx::StringView test0("{ { {} {} abvgd; {} } }");
-	const bx::StringView test1(test0, 1);
+	const bx::StringView test1(test0, 1, INT32_MAX);
 
 	bx::StringView result = bx::strFindBlock(test1, '{', '}');
 	REQUIRE(19 == result.getLength() );
