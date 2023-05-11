@@ -44,13 +44,13 @@ device_memory_interface::space_config_vector z84c015_device::memory_space_config
 bool z84c015_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
 	if (spacenum == AS_PROGRAM || spacenum == AS_OPCODES)
-		address = tranlsate_memory_address(address);
+		address = translate_memory_address(address);
 
 	target_space = &space(spacenum);
 	return true;
 }
 
-u32 z84c015_device::tranlsate_memory_address(u16 addr)
+u32 z84c015_device::translate_memory_address(u16 addr)
 {
 	const u8 csbr = csbr_r();
 	const u8 at = BIT(addr, 12, 4);

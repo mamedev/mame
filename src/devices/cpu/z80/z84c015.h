@@ -40,7 +40,7 @@ protected:
 	void internal_io_map(address_map &map) const;
 	virtual space_config_vector memory_space_config() const override;
 	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
-	virtual u32 tranlsate_memory_address(u16 address) override;
+	virtual u32 translate_memory_address(u16 address) override;
 
 private:
 	// system control registers
