@@ -10120,7 +10120,7 @@ more investigation needed...
 		</part>
 	</software>
 
-	<software name="chavez"> <!-- todo : cloneof Riddick Bowe Boxing? -->
+	<software name="chavez" cloneof="riddick">
 		<description>Chavez (USA)</description>
 		<year>1994</year>
 		<publisher>ASC Games</publisher>
@@ -10144,7 +10144,7 @@ more investigation needed...
 		</part>
 	</software>
 
-	<software name="chavez2"> <!-- todo : cloneof Boxing Legends of the Ring? -->
+	<software name="chavez2" cloneof="boxinglg">
 		<description>Chavez II (USA)</description>
 		<year>1994</year>
 		<publisher>American Softworks</publisher>
@@ -37533,7 +37533,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="chavezp" cloneof="chavez">
+	<software name="chavezp" cloneof="riddick">
 		<description>Chavez (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>ASC Games</publisher>
@@ -59149,7 +59149,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="suprcopa" cloneof="tonymeol">
-		<description>Super Copa (Brazil)</description>
+		<description>Super Copa (Brazil, Mexico)</description>
 		<year>1994</year>
 		<publisher>American Softworks Company</publisher>
 		<part name="cart" interface="snes_cart">
