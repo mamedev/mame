@@ -1920,7 +1920,7 @@ void taito_f3_state::get_vram_info(tilemap_t *vram_tilemap, tilemap_t *pixel_til
 
 	u16 pri = 0;
 
-	const int vram_width_mask = 0x3ff;
+	const int vram_width_mask = 0x1ff;
 
 	if (m_flipscreen)
 	{
