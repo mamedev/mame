@@ -12,9 +12,11 @@
 #include "softlist_dev.h"
 
 #include "msx_ar.lh"
+#include "msx_ar_1fdd.lh"
 #include "msx_en.lh"
 #include "msx_ru.lh"
 #include "msx_nocode.lh"
+#include "msx_nocode_1fdd.lh"
 
 using namespace msx_keyboard;
 
@@ -198,7 +200,7 @@ void msx1_v9938_state::svi738(machine_config &config)
 	// builtin 80 columns card (V9938)
 	// RS-232C interface
 
-	svi738_base(config, layout_msx_nocode);
+	svi738_base(config, layout_msx_nocode_1fdd);
 }
 
 /* MSX - Spectravideo SVI-738 Arabic */
@@ -219,7 +221,7 @@ ROM_END
 
 void msx1_v9938_state::svi738ar(machine_config &config)
 {
-	svi738_base(config, layout_msx_ar);
+	svi738_base(config, layout_msx_ar_1fdd);
 	add_internal_slot(config, MSX_SLOT_ROM, "arab", 3, 3, 1, 2, "arab");
 }
 
