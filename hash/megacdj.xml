@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -89,7 +89,7 @@ license:CC0-1.0
 		<info name="alt_title" value="バリ・アーム"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="bari-arm (japan)" sha1="a14d376efd556bf05f37e696c01664b7dfa13dbe"/>
+				<disk name="bari-arm (japan)" sha1="f90d9dfc264ce4090b348713c235672bce43dd2a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -149,7 +149,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ブライ 八玉の勇士伝説"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="burai - hachigyoku no yuushi densetsu (japan)" sha1="fb036bacef4520c93cd3b9d3d2aaa64975e4a113"/>
+				<disk name="burai - hachigyoku no yuushi densetsu (japan)" sha1="d410d2636e81a163b6d30ed14a822276161c7e2d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -225,7 +225,7 @@ license:CC0-1.0
 		<info name="alt_title" value="コズミックファンタジー Stories"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="cosmic fantasy stories (japan)" sha1="62bed0d8e461b8b118ce9d7dfc49d7944edf1c23"/>
+				<disk name="cosmic fantasy stories (japan)" sha1="d12bdaa19acc423de73a62acf8691282b5d625ad"/>
 			</diskarea>
 		</part>
 	</software>
@@ -276,7 +276,7 @@ license:CC0-1.0
 		<info name="alt_title" value="サイボーグ009"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="cyborg 009 (japan)" sha1="19cdb90db8c92f6baafc188b83e8ea7a67adb6f1"/>
+				<disk name="cyborg 009 (japan)" sha1="78543b133aab93a87573ffec5692b92d44744083"/>
 			</diskarea>
 		</part>
 	</software>
@@ -348,7 +348,7 @@ license:CC0-1.0
 		<info name="alt_title" value="デトネイター・オーガン"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="detonator orgun (japan)" sha1="80a99c378610c903453fbb8efac9325f04db7700"/>
+				<disk name="detonator orgun (japan)" sha1="81d9c8783fce371a6887d87c8ac9781232d75418"/>
 			</diskarea>
 		</part>
 	</software>
@@ -377,7 +377,7 @@ license:CC0-1.0
 		<info name="alt_title" value="デバステイター"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="devastator (japan)" sha1="3859b4eed02a3b9ccbddfe750285f755d85316cb"/>
+				<disk name="devastator (japan)" sha1="6a515db113271804bb63c27a7393c4f1a28393da"/>
 			</diskarea>
 		</part>
 	</software>
@@ -428,7 +428,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ダイナミックカントリークラブ"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="dynamic country club (japan)" sha1="04e213ea91c03b9aa8a354a2b5f9d42003ca5dbf"/>
+				<disk name="dynamic country club (japan)" sha1="ece262909b3b242e20b8ad29d2559dec3b5edf03"/>
 			</diskarea>
 		</part>
 	</software>
@@ -471,7 +471,7 @@ license:CC0-1.0
 		<info name="alt_title" value="アーネストエバンス"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="earnest evans (japan)" sha1="9f0e70f629e32134a529b2784786cdac07e55780"/>
+				<disk name="earnest evans (japan)" sha1="7b3dd8e564d7a6f2f659b535c67d8a3d25553f08"/>
 			</diskarea>
 		</part>
 	</software>
@@ -524,7 +524,7 @@ license:CC0-1.0
 		<info name="alt_title" value="江川卓のスーパーリーグCD"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="egawa suguru no super league cd (japan)" sha1="4062f8fbc43963cc9305e14530379989f9543a30"/>
+				<disk name="egawa suguru no super league cd (japan)" sha1="4e8adf6b142de98089af20316be9b644e12ed565"/>
 			</diskarea>
 		</part>
 	</software>
@@ -571,7 +571,7 @@ license:CC0-1.0
 		<info name="alt_title" value="F1サーカスCD"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="f1 circus cd (japan)" sha1="e13e963d3386cd38143334011b6a4c239a871bfa"/>
+				<disk name="f1 circus cd (japan)" sha1="6f9a6324527d277ee36357f52f850f106016b6d8"/>
 			</diskarea>
 		</part>
 	</software>
@@ -686,7 +686,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ぎゅわんぶらあ自己中心派2 激闘! 東京マージャンランド編"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gambler jiko chuushinha 2 - gekitou tokyo mahjongland hen (japan)" sha1="12cb45fafb9f63b41551150dc313eba51fa639c9"/>
+				<disk name="gambler jiko chuushinha 2 - gekitou tokyo mahjongland hen (japan)" sha1="b1d7b2c9f65f5976a4f2025a7464cd9480df0433"/>
 			</diskarea>
 		</part>
 	</software>
@@ -735,7 +735,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ゲームのかんづめ VOL.1"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="game no kandume vol.1 (japan)" sha1="88a441b47cc53a088de1b95cc624176895882478"/>
+				<disk name="game no kandume vol.1 (japan)" sha1="4496b319dea8fde1a58411dbeff5f9d9887c8794"/>
 			</diskarea>
 		</part>
 	</software>
@@ -777,7 +777,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ゲームのかんづめ VOL.2"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="game no kandume vol.2 (japan)" sha1="093b5a17ea088fe6714e4a095f5240cb6d918fcd"/>
+				<disk name="game no kandume vol.2 (japan)" sha1="a2837628ba846b4108cfbab702df451af2bef294"/>
 			</diskarea>
 		</part>
 	</software>
@@ -922,7 +922,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ヘビーノバ"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="heavy nova (japan)" sha1="aa7a040fc2b8c8d8264f82573dc5e16d31e2ed57"/>
+				<disk name="heavy nova (japan)" sha1="f476ecc8c9bc76daa3fd4274c1d052abbf7b07d5"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1030,7 +1030,7 @@ license:CC0-1.0
 		<info name="alt_title" value="雀豪ワールドカップ"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="jangou world cup (japan)" sha1="5ce7ade2f0d4ca8b2919db189f5f9e8bfb7aebe4"/>
+				<disk name="jangou world cup (japan)" sha1="a61a656bee8aaedec046259f2f52b97d1f32db8d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1096,7 +1096,7 @@ license:CC0-1.0
 		<info name="alt_title" value="慶応遊撃隊"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="keiou yuugekitai (japan)" sha1="ef5af443f78c67caba7ec02590a3f3f0af93d387"/>
+				<disk name="keiou yuugekitai (japan)" sha1="9ff5dd2775ae157cd0d3fed8b5c877a12541ab5a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1128,7 +1128,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ロードス島戦記 英雄戦争"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="lodoss tou senki - eiyuu sensou (japan)" sha1="15ed554b0a63e78648cf496c8b249be35c18420c"/>
+				<disk name="lodoss tou senki - eiyuu sensou (japan)" sha1="441685a5c2a392cf0804d95745600fea553351ca"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1304,7 +1304,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ナイトストライカー"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="night striker (japan, korea)" sha1="0c8ba1a5ca12ec52de6b2febac14abd5d1126c84"/>
+				<disk name="night striker (japan, korea)" sha1="8a13f784fa7baf8b7f892429f221ac7c149215dd"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1358,7 +1358,7 @@ Requires [disc swap]
 		<info name="alt_title" value="ノスタルジア1907"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nostalgia 1907 (japan)" sha1="c6718f18b5720b3c48abf9c8accdf6d7572e4a63"/>
+				<disk name="nostalgia 1907 (japan)" sha1="668a78fa1eb3c4aeca479f31513eb2d37c22b1ed"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1463,7 +1463,7 @@ Requires [disc swap]
 		<info name="alt_title" value="プロ野球スーパーリーグCD"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="pro yakyuu super league cd (japan)" sha1="87cf208ad060b8ef6ace3db18824152f45dc91b5"/>
+				<disk name="pro yakyuu super league cd (japan)" sha1="d0fd6311030ea46dfc74f7d03b0ca02618623849"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1522,7 +1522,7 @@ Requires [disc swap]
 		<info name="alt_title" value="クイズスクランブルスペシャル"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="quiz scramble special (japan) (rev b)" sha1="cc636ce3a99a01cdf3d34d93df74b143b6d239b7"/>
+				<disk name="quiz scramble special (japan) (rev b)" sha1="f357feb98bb355e1b8ceea346fbedd90332be49c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1542,7 +1542,7 @@ Requires [disc swap]
 		<info name="alt_title" value="クイズ殿様の野望"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="capcom no quiz - tonosama no yabou (japan)" sha1="9f09efae7369a1439cd85616c89f5d42a2eb741a"/>
+				<disk name="capcom no quiz - tonosama no yabou (japan)" sha1="82fbbe604709866420f64705beb902a4addb1f5c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1585,7 +1585,7 @@ Requires [disc swap]
 		<info name="alt_title" value="らんま½ 白蘭愛歌"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ranma 1-2 - byakuranaika (japan)" sha1="89f733676137b26b304d21eab6c5e50c4ee48389"/>
+				<disk name="ranma 1-2 - byakuranaika (japan)" sha1="ebbc76619d2a5353175083563326165ee89499b4"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1676,7 +1676,7 @@ Requires [disc swap]
 		<info name="alt_title" value="三國志III"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="sangokushi iii (japan)" sha1="4745bf0906999474645e1b4d515bc1b1902ca422"/>
+				<disk name="sangokushi iii (japan)" sha1="5e59329e50c979a0dbc5fd665a040fdd8af30e54"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1771,7 +1771,7 @@ Requires [disc swap]
 		<info name="alt_title" value="聖魔伝説 3×3EYES"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="seima densetsu 3x3 eyes (japan)" sha1="8a850d7cf8db54c48adb8ae8f485143cd27df8c6"/>
+				<disk name="seima densetsu 3x3 eyes (japan)" sha1="30be1bd4a12635c5aa4317974ffdf97c096003d8"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1874,7 +1874,7 @@ Requires [disc swap]
 		<info name="alt_title" value="精霊神世紀フェイエリア"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="seirei shinseiki - fhey area (japan)" sha1="0eb59654214bf37e8493ec48f6d4f6cd5077fbb2"/>
+				<disk name="seirei shinseiki - fhey area (japan)" sha1="3842a33ed9fd130801a2c54c072b7d930f0aa38e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1953,7 +1953,7 @@ Requires [disc swap]
 		<info name="alt_title" value="真・女神転生"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="shin megami tensei (japan)" sha1="4ef3c263e909471ac27757c16423e66009726544"/>
+				<disk name="shin megami tensei (japan)" sha1="bbb6f22e314459a35bf118d17edbebb7c27af226"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2256,7 +2256,7 @@ Requires [disc swap]
 		<info name="alt_title" value="天舞メガCDスペシャル"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tenbu mega cd special (japan)" sha1="e973a5a3d51455b394eecccd99c7b62d407c1a82"/>
+				<disk name="tenbu mega cd special (japan)" sha1="d85c060847c769112f392c22795a4afa39e9fd46"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2293,7 +2293,7 @@ Requires [disc swap]
 		<info name="alt_title" value="天下布武 英雄たちの咆哮"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tenkafubu - eiyuutachi no houkou (japan)" sha1="9a97b0c278d0a5ba7c2df8e7343811f9a0ccd3f2"/>
+				<disk name="tenkafubu - eiyuutachi no houkou (japan)" sha1="d8375089c8979bee48210a46548aae3a82e48384"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2342,7 +2342,7 @@ Requires [disc swap]
 		<info name="alt_title" value="サンダーホーク"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="thunderhawk (japan)" sha1="0e729497bb3ab8c0614c32d1a3f4668584518356"/>
+				<disk name="thunderhawk (japan)" sha1="5571e029303d0b4f1bb2dcbf71f2af23127cb5af"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2365,7 +2365,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<info name="alt_title" value="タイムギャル"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="time gal (japan)" sha1="32fffda2ccc83602a0e6d96a18bb3355a4c3d3d5"/>
+				<disk name="time gal (japan)" sha1="891f864be9ccb762ccb0420d246171a5a2e38fe1"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2386,7 +2386,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<info name="alt_title" value="うる星やつら ディア マイ フレンズ"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="urusei yatsura - dear my friends (japan)" sha1="3d3e05daf5f3c4fe36c1d08eec1017daaac06c9e"/>
+				<disk name="urusei yatsura - dear my friends (japan)" sha1="f016d91cf16f8231979b863b43b9a1f4cdd10e66"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2444,7 +2444,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<info name="alt_title" value="惑星ウッドストック ファンキーホラーバンド"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="wakusei woodstock - funky horror band (japan)" sha1="1bc0d49763960db4e7cd53661f07e9a4cd9f2f7b"/>
+				<disk name="wakusei woodstock - funky horror band (japan)" sha1="b8e62fcd47660354ebad5a26351872837efd9c5a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2505,7 +2505,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<info name="alt_title" value="ウイニングポスト"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="winning post (japan)" sha1="85f6dfa7125b37f9471206898d3b51e0ea2857f7"/>
+				<disk name="winning post (japan)" sha1="88e37f4ce5e4bb9ee9ffdbea0e1cfbd5c65e3287"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2615,7 +2615,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<info name="alt_title" value="ゆみみみっくす"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="yumimi mix (japan)" sha1="4adc66b222b7a26a3f00be9692a81ad343b07b41"/>
+				<disk name="yumimi mix (japan)" sha1="68812a953d4c88485427d415576b77382985f746"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2746,7 +2746,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<info name="alt_title" value="アフターハルマゲドン外伝 魔獣闘将伝エクリプス"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="after armageddon gaiden - majuu toushouden eclipse (1994)(sega)(ntsc)(jp)" sha1="1e86a6fbb394519c6248eaeff2421af8b50b61e2"/>
+				<disk name="after armageddon gaiden - majuu toushouden eclipse (1994)(sega)(ntsc)(jp)" sha1="fdccf03dd1052039b978f5547bb0e64f6dc565b8"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2884,7 +2884,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<info name="alt_title" value="アネット再び"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="anett futatabi (1993)(wolf team)(ntsc)(jp)(en)" sha1="3b86f9d737a36266a72b46f148dbdb369356ff9b"/>
+				<disk name="anett futatabi (1993)(wolf team)(ntsc)(jp)(en)" sha1="c552b5375490890883a8ec70f6fd6ddea5b27ef3"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3221,7 +3221,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<info name="alt_title" value="バトルファンタジー"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="battle fantasy (1994)(micronet)(ntsc)(jp)" sha1="763d75175e1a1fac6368c42b95c6260fbf14e865"/>
+				<disk name="battle fantasy (1994)(micronet)(ntsc)(jp)" sha1="4343c46832992952d9f2fdce0c118c105181c5f8"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3348,7 +3348,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<info name="alt_title" value="キャプテン翼"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="captain tsubasa (1994)(tecmo)(ntsc)(jp)" sha1="60bf853778b6beedf2b715978b35b1aeed6181c0"/>
+				<disk name="captain tsubasa (1994)(tecmo)(ntsc)(jp)" sha1="9c4b2276304985460e4a666a0115a637bb1b2cff"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4363,7 +4363,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<info name="alt_title" value="ニンジャウォーリアーズ"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ninjawarriors, the (1993)(taito)(ntsc)(jp)(en)" sha1="54139589ce904ddba72f9379949f3b6d0bfef2f6"/>
+				<disk name="ninjawarriors, the (1993)(taito)(ntsc)(jp)(en)" sha1="471a824e6729c65321fa8219fc40b23821a08b40"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4976,7 +4976,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<info name="alt_title" value="戦国伝承"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="sengoku denshou (1993)(sammy)(ntsc)(jp)" sha1="a7068e9594b65c665796689bfe16c7ee0ecba041"/>
+				<disk name="sengoku denshou (1993)(sammy)(ntsc)(jp)" sha1="03699195ec6906653309f0ed76ec2151937fce6e"/>
 			</diskarea>
 		</part>
 	</software>
