@@ -37,8 +37,6 @@ TODO:
 
 #include "beta_m.h"
 #include "spec128.h"
-#include "speaker.h"
-#include "tilemap.h"
 
 #include "bus/ata/atapicdr.h"
 #include "bus/ata/ataintf.h"
@@ -54,6 +52,9 @@ TODO:
 #include "machine/ds128x.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+
+#include "speaker.h"
+#include "tilemap.h"
 
 #include <algorithm>
 
