@@ -321,7 +321,7 @@ public:
 
 protected:
 	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
-	DECLARE_WRITE_LINE_MEMBER(scsi_drq);
+	void scsi_unknown_w(uint8_t data);
 
 	required_device<mb89352_device> m_scsictrl;
 
