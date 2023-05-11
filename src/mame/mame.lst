@@ -40773,6 +40773,9 @@ tk90x                           // 1985 TK90x Color Computer
 tk95                            // 1986 TK95 Color Computer
 zvezda                          // 1990 Zvezda
 
+@source:sinclair/sprinter.cpp
+sprinter                        // 2000 Sprinter
+
 @source:sinclair/timex.cpp
 tc2048                          // 198? TC2048
 ts2068                          // 1983 TS2068
