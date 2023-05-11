@@ -502,23 +502,37 @@ static INPUT_PORTS_START( super19 )
 
   PORT_MODIFY("SW401")
 	PORT_DIPNAME( 0x0f, 0x0c, "Baud Rate")           PORT_DIPLOCATION("SW401:1,2,3,4")
+	PORT_DIPSETTING(    0x01, "110")
+	PORT_DIPSETTING(    0x02, "150")
+	PORT_DIPSETTING(    0x03, "300")
+	PORT_DIPSETTING(    0x04, "600")
+	PORT_DIPSETTING(    0x05, "1200")
+	PORT_DIPSETTING(    0x06, "1800")
+	PORT_DIPSETTING(    0x07, "2000")
+	PORT_DIPSETTING(    0x08, "2400")
+	PORT_DIPSETTING(    0x09, "3600")
+	PORT_DIPSETTING(    0x0a, "4800")
+	PORT_DIPSETTING(    0x0b, "7200")
+	PORT_DIPSETTING(    0x0c, "9600")
+	PORT_DIPSETTING(    0x0d, "19200")
 	PORT_DIPSETTING(    0x0e, "38400")
-	PORT_DIPNAME( 0x30, 0x00, "Parity")              PORT_DIPLOCATION("SW401:5,6")
-	PORT_DIPSETTING(    0x00, DEF_STR(None))
-	PORT_DIPSETTING(    0x10, "Odd")
-	PORT_DIPSETTING(    0x20, "None")
-	PORT_DIPSETTING(    0x30, "Even")
-	PORT_DIPNAME( 0x40, 0x00, "Parity Type")         PORT_DIPLOCATION("SW401:7")
-	PORT_DIPSETTING(    0x00, DEF_STR(Normal))
-	PORT_DIPSETTING(    0x40, "Stick")
+	PORT_DIPNAME( 0x70, 0x00, "8 bit mode")          PORT_DIPLOCATION("SW401:5,6,7")
+	PORT_DIPSETTING(    0x00, "Mode A/0 - 8th bit ignored, sent as 0")
+	PORT_DIPSETTING(    0x10, "Mode B/1 - 8th bit ignored, sent as 1")
+	PORT_DIPSETTING(    0x20, "Mode C/2 - 8 bit escape mode")
+	PORT_DIPSETTING(    0x30, "Mode D/3 - 8 bit escape mode, invert 8th bit")
+	PORT_DIPSETTING(    0x40, "Mode E/4 - 8 bit data mode")
+	PORT_DIPSETTING(    0x50, "Mode F/5 - 8 bit data mode, invert 8th bit")
+	PORT_DIPSETTING(    0x60, "7 bit data with odd parity, 8th bit ignored on input")
+	PORT_DIPSETTING(    0x70, "7 bit data with even parity, 8th bit ignored on input")
 	PORT_DIPNAME( 0x80, 0x80, "Duplex")              PORT_DIPLOCATION("SW401:8")
 	PORT_DIPSETTING(    0x00, "Half")
 	PORT_DIPSETTING(    0x80, "Full")
 
 	PORT_MODIFY("SW402")
-	PORT_DIPNAME( 0x02, 0x00, "Keyclick")            PORT_DIPLOCATION("SW402:2")
-	PORT_DIPSETTING(    0x02, DEF_STR(No))
-	PORT_DIPSETTING(    0x00, DEF_STR(Yes))
+	PORT_DIPNAME( 0x02, 0x00, "Transmit mode")       PORT_DIPLOCATION("SW402:2")
+	PORT_DIPSETTING(    0x00, DEF_STR(Normal))
+	PORT_DIPSETTING(    0x02, "Slow")
 	PORT_DIPNAME( 0x80, 0x00, "DEC Keypad Codes")    PORT_DIPLOCATION("SW402:8")
 	PORT_DIPSETTING(    0x00, "Off")
 	PORT_DIPSETTING(    0x80, "On")
@@ -529,7 +543,7 @@ static INPUT_PORTS_START( ultra19 )
 	PORT_INCLUDE( tlb )
 
 	PORT_MODIFY("SW401")
-	PORT_DIPNAME( 0x07, 0x05, "Baud Rate")          PORT_DIPLOCATION("SW401:1,2,3")
+	PORT_DIPNAME( 0x07, 0x05, "Baud Rate")           PORT_DIPLOCATION("SW401:1,2,3")
 	PORT_DIPSETTING(    0x00, "110")
 	PORT_DIPSETTING(    0x01, "300")
 	PORT_DIPSETTING(    0x02, "1200")
@@ -538,11 +552,13 @@ static INPUT_PORTS_START( ultra19 )
 	PORT_DIPSETTING(    0x05, "9600")
 	PORT_DIPSETTING(    0x06, "19200")
 	PORT_DIPSETTING(    0x07, "38400")
-	PORT_DIPNAME( 0x18, 0x00, "Parity")              PORT_DIPLOCATION("SW401:4,5")
-	PORT_DIPSETTING(    0x00, DEF_STR(None))
-	PORT_DIPSETTING(    0x10, "Odd")
-	PORT_DIPSETTING(    0x20, "None")
-	PORT_DIPSETTING(    0x30, "Even")
+	PORT_DIPNAME( 0x08, 0x00, "Parity")              PORT_DIPLOCATION("SW401:4")
+	PORT_DIPSETTING(    0x00, "Disabled")
+	PORT_DIPSETTING(    0x08, "Enabled")
+
+	PORT_DIPNAME( 0x10, 0x00, "Parity Type")         PORT_DIPLOCATION("SW401:5")
+	PORT_DIPSETTING(    0x00, "Odd")
+	PORT_DIPSETTING(    0x10, "Even")
 	PORT_DIPNAME( 0x20, 0x00, "Data Size")           PORT_DIPLOCATION("SW401:6")
 	PORT_DIPSETTING(    0x00, "8-bit")
 	PORT_DIPSETTING(    0x20, "7-bit")
@@ -574,10 +590,30 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( watz19 )
 	PORT_INCLUDE( tlb )
 
-	PORT_MODIFY("SW402")
-	PORT_DIPNAME( 0x40, 0x00, "Word Size")    PORT_DIPLOCATION("SW402:7")
-	PORT_DIPSETTING(    0x00, "8-bit")
-	PORT_DIPSETTING(    0x40, "7-bit")
+	PORT_MODIFY("SW401")
+	PORT_DIPNAME( 0x0f, 0x0c, "Baud Rate")          PORT_DIPLOCATION("SW401:1,2,3,4")
+	PORT_DIPSETTING(    0x00, "75")
+	PORT_DIPSETTING(    0x01, "110")
+	PORT_DIPSETTING(    0x02, "150")
+	PORT_DIPSETTING(    0x03, "300")
+	PORT_DIPSETTING(    0x04, "600")
+	PORT_DIPSETTING(    0x05, "1200")
+	PORT_DIPSETTING(    0x06, "1800")
+	PORT_DIPSETTING(    0x07, "2000")
+	PORT_DIPSETTING(    0x08, "2400")
+	PORT_DIPSETTING(    0x09, "3600")
+	PORT_DIPSETTING(    0x0a, "4800")
+	PORT_DIPSETTING(    0x0b, "7200")
+	PORT_DIPSETTING(    0x0c, "9600")
+	PORT_DIPSETTING(    0x0d, "19200")
+	PORT_DIPSETTING(    0x0e, "38400")
+	PORT_DIPSETTING(    0x0f, "134.5")
+	PORT_DIPNAME( 0x40, 0x00, "Word Size")         PORT_DIPLOCATION("SW401:7")
+	PORT_DIPSETTING(    0x00, "8-bit Word")
+	PORT_DIPSETTING(    0x40, "7-bit Word")
+	PORT_DIPNAME( 0x80, 0x80, "Duplex")              PORT_DIPLOCATION("SW401:8")
+	PORT_DIPSETTING(    0x00, "Half")
+	PORT_DIPSETTING(    0x80, "Full")
 
 INPUT_PORTS_END
 
@@ -611,9 +647,15 @@ ROM_START( super19 )
 ROM_END
 
 ROM_START( watz19 )
-	// Watzman ROM
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "watzman.bin", 0x0000, 0x1000, CRC(8168b6dc) SHA1(bfaebb9d766edbe545d24bc2b6630be4f3aa0ce9))
+	ROM_DEFAULT_BIOS("watzman-a")
+
+	// Watzman ROM
+	ROM_SYSTEM_BIOS(0, "watzman", "Watzman")
+	ROMX_LOAD("watzman.bin", 0x0000, 0x1000, CRC(8168b6dc) SHA1(bfaebb9d766edbe545d24bc2b6630be4f3aa0ce9), ROM_BIOS(0))
+
+	ROM_SYSTEM_BIOS(1, "watzman-a", "Watzman w/clock persists after reset")
+	ROMX_LOAD("watzman-a.bin", 0x0000, 0x1000, CRC(1f7553e9) SHA1(ac6ddb12b4fb46c1a0ad08ee43978ad3153b51aa), ROM_BIOS(1))
 
 	ROM_REGION( 0x0800, "chargen", 0 )
 	// Original font dump
@@ -749,13 +791,13 @@ void heath_ultra_tlb_device::device_add_mconfig(machine_config &config)
 
 void heath_ultra_tlb_device::mem_map(address_map &map)
 {
-	map.unmap_value_high();
+	heath_tlb_device::mem_map(map);
+
+	// update rom mirror setting to allow page 2 memory
 	map(0x0000, 0x0fff).mirror(0x2000).rom();
+
 	// Page 2 memory
 	map(0x1000, 0x1fff).mirror(0x2000).ram();
-	map(0x4000, 0x40ff).mirror(0x3f00).ram();
-	map(0xc000, 0xc7ff).mirror(0x3800).ram().share("videoram");
-
 }
 
 const tiny_rom_entry *heath_ultra_tlb_device::device_rom_region() const
