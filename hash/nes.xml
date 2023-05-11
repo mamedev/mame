@@ -78749,7 +78749,7 @@ We include them here as reference if they should coincide with later revisions o
 	</software>
 
 	<software name="zeldagc" cloneof="zelda">
-		<description>The Legend of Zelda (ripped from GameCube "Zelda")</description>
+		<description>The Legend of Zelda (ripped from GameCube "The Legend of Zelda: Collector's Edition")</description>
 		<year>2002</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
