@@ -25,6 +25,9 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 // overclocked to 8 * NTSC burst frequency
 #define MASTER_CLOCK 28618180
 
@@ -267,7 +270,7 @@ DEVICE_IMAGE_LOAD_MEMBER(uzebox_state::cart_load)
 	else
 		memcpy(m_cart->get_rom_base(), image.get_software_region("rom"), size);
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -317,6 +320,9 @@ ROM_START( uzebox )
 
 	ROM_REGION( 0x800, "eeprom", ROMREGION_ERASE00 )  /* on-die eeprom */
 ROM_END
+
+} // anonymous namespace
+
 
 /*   YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY    FULLNAME */
 CONS(2010, uzebox, 0,      0,      uzebox,  uzebox, uzebox_state, empty_init, "Belogic", "Uzebox", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING)

@@ -133,6 +133,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/abc800i_dsk.h,FORMATS["ABC800I_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "ABC800I_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/abc800i_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/abc800i_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/abc1600_dsk.h,FORMATS["ABC1600_DSK"] = true
 --------------------------------------------------
 
@@ -536,18 +548,6 @@ if opt_tool(FORMATS, "CCVF_DSK") then
 	files {
 		MAME_DIR.. "src/lib/formats/ccvf_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/ccvf_dsk.h",
-	}
-end
-
---------------------------------------------------
---
---@src/lib/formats/cd90_640_dsk.h,FORMATS["CD90_640_DSK"] = true
---------------------------------------------------
-
-if opt_tool(FORMATS, "CD90_640_DSK") then
-	files {
-		MAME_DIR.. "src/lib/formats/cd90_640_dsk.cpp",
-		MAME_DIR.. "src/lib/formats/cd90_640_dsk.h",
 	}
 end
 
@@ -1093,6 +1093,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/hp_ipc_dsk.h,FORMATS["HP300_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "HP300_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/hp300_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/hp300_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/hpi_dsk.h,FORMATS["HPI_DSK"] = true
 --------------------------------------------------
 
@@ -1172,6 +1184,18 @@ if opt_tool(FORMATS, "JVC_DSK") then
 	files {
 		MAME_DIR.. "src/lib/formats/jvc_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/jvc_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/lw30_dsk.h,FORMATS["LW30_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "LW30_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/lw30_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/lw30_dsk.h",
 	}
 end
 
@@ -1682,6 +1706,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/roland_dsk.h,FORMATS["ROLAND_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "ROLAND_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/roland_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/roland_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/rx50_dsk.h,FORMATS["RX50_DSK"] = true
 --------------------------------------------------
 
@@ -2042,6 +2078,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/vgi_dsk.h,FORMATS["VGI_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "VGI_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/vgi_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/vgi_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/victor9k_dsk.h,FORMATS["VICTOR9K_DSK"] = true
 --------------------------------------------------
 
@@ -2174,6 +2222,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/fs_hplif.h,FORMATS["FS_HPLIF"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "FS_HPLIF") then
+	files {
+		MAME_DIR.. "src/lib/formats/fs_hplif.cpp",
+		MAME_DIR.. "src/lib/formats/fs_hplif.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/fs_oric_jasmin.h,FORMATS["FS_ORIC_JASMIN"] = true
 --------------------------------------------------
 
@@ -2217,6 +2277,18 @@ if opt_tool(FORMATS, "FS_COCO_OS9") then
 	files {
 		MAME_DIR.. "src/lib/formats/fs_coco_os9.cpp",
 		MAME_DIR.. "src/lib/formats/fs_coco_os9.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/fs_isis.h,FORMATS["FS_ISIS"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "FS_ISIS") then
+	files {
+		MAME_DIR.. "src/lib/formats/fs_isis.cpp",
+		MAME_DIR.. "src/lib/formats/fs_isis.h",
 	}
 end
 

@@ -24,6 +24,7 @@ DEFINE_DEVICE_TYPE(K033906, k033906_device, "k033906", "K033906 PCI bridge")
 k033906_device::k033906_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K033906, tag, owner, clock)
 	, m_reg_set(0)
+	, m_voodoo_pciid(0x0001121a) // PCI Vendor ID (0x121a = 3dfx), Device ID (0x0001 = Voodoo 1)
 	, m_voodoo(*this, finder_base::DUMMY_TAG)
 	, m_reg(nullptr)
 	, m_ram(nullptr)
@@ -55,10 +56,11 @@ uint32_t k033906_device::reg_r(int reg)
 {
 	switch (reg)
 	{
-		case 0x00:      return 0x0001121a;          // PCI Vendor ID (0x121a = 3dfx), Device ID (0x0001 = Voodoo)
+		case 0x00:      return m_voodoo_pciid;
 		case 0x02:      return 0x04000000;          // Revision ID
 		case 0x04:      return m_reg[0x04];         // memBaseAddr
 		case 0x0f:      return m_reg[0x0f];         // interrupt_line, interrupt_pin, min_gnt, max_lat
+		case 0x14:      return m_reg[0x14];         // ??? must be able to read the same value (0xf47c6451) that was written, used by Silent Scope when using Voodoo 2
 
 		default:
 			fatalerror("%s: k033906_reg_r: %08X\n", machine().describe_context().c_str(), reg);
@@ -104,6 +106,10 @@ void k033906_device::reg_w(int reg, uint32_t data)
 
 		case 0x11:      // busSnoop0
 		case 0x12:      // busSnoop1
+			break;
+
+		case 0x14:      // ???
+			m_reg[reg] = data;
 			break;
 
 		case 0x38:      // ???

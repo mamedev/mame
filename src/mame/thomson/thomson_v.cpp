@@ -27,6 +27,12 @@
 
 #define THOM_GPL_PER_LINE 40
 
+/* maximum number of video pages:
+   1 for TO7 generation (including MO5)
+   4 for TO8 generation (including TO9, MO6)
+ */
+#define THOM_NB_PAGES 4
+
 
 /****************** dynamic screen size *****************/
 

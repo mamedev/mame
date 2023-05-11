@@ -26,6 +26,9 @@ NOTE: The default Sgi O2 Keyboard (Model No. RT6856T, Part No. 121472-101-B,
 #include "mace.h"
 #include "crime.h"
 
+
+namespace {
+
 class o2_state : public driver_device
 {
 public:
@@ -96,6 +99,9 @@ ROM_START( o2 )
 	ROM_SYSTEM_BIOS( 1, "ip32prom_4_18", "IP32 PROM V4.18" )
 	ROMX_LOAD( "ip32prom.rev4.18.bin", 0x000000, 0x080000, CRC(02b3c53d) SHA1(f2cfa7246d67f88fe5490e40dac6c04b1deb4d28), ROM_GROUPDWORD | ROM_BIOS(1))
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS     INIT        COMPANY                  FULLNAME  FLAGS
 COMP( 1996, o2,   0,      0,      o2,      o2,    o2_state, empty_init, "Silicon Graphics Inc.", "O2",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

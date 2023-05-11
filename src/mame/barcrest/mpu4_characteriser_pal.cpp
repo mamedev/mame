@@ -201,7 +201,7 @@ uint8_t mpu4_characteriser_pal::protection_r()
 		}
 		else if (m_allow_68k_cheat)
 		{
-			// MPU4 Video (question decrambling where used not handled)
+			// MPU4 Video (question descrambling where used not handled)
 			ret = m_cpu->state_int(M68K_D0) & 0xff;
 			logerror("%s: Characteriser protection_r WITH 68000 CHEAT (col is %02x returning %02x)\n", machine().describe_context(), m_prot_col, ret);
 		}

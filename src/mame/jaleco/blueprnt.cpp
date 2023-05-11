@@ -146,13 +146,17 @@ void blueprnt_state::palette(palette_device &palette) const
 		uint8_t pen;
 
 		if (i < 0x200)
+		{
 			// characters
 			pen = ((i & 0x100) >> 5) |
 					((i & 0x002) ? ((i & 0x0e0) >> 5) : 0) |
 					((i & 0x001) ? ((i & 0x01c) >> 2) : 0);
+		}
 		else
+		{
 			// sprites
 			pen = i - 0x200;
+		}
 
 		int const r = ((pen >> 0) & 1) * ((pen & 0x08) ? 0xbf : 0xff);
 		int const g = ((pen >> 2) & 1) * ((pen & 0x08) ? 0xbf : 0xff);
@@ -180,17 +184,16 @@ void blueprnt_state::colorram_w(offs_t offset, uint8_t data)
 	offset += 64;
 	offset &= 0x3ff;
 	m_bg_tilemap->mark_tile_dirty(offset);
-
-
 }
 
 void blueprnt_state::flipscreen_w(uint8_t data)
 {
 	flip_screen_set(~data & 0x02);
 
-	if (m_gfx_bank != ((data & 0x04) >> 2))
+	uint8_t gfx_bank = (data & 0x04) >> 2;
+	if (m_gfx_bank != gfx_bank)
 	{
-		m_gfx_bank = ((data & 0x04) >> 2);
+		m_gfx_bank = gfx_bank;
 		machine().tilemap().mark_all_dirty();
 	}
 }
@@ -242,13 +245,14 @@ void blueprnt_state::video_start()
 
 void blueprnt_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	int flipy = 0;
+
 	for (int offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
 		int code = m_spriteram[offs + 1];
 		int sx = m_spriteram[offs + 3];
 		int sy = 240 - m_spriteram[offs];
 		int flipx = m_spriteram[offs + 2] & 0x40;
-		int flipy = m_spriteram[offs + 2 - 4] & 0x80;    // -4? Awkward, isn't it?
 
 		if (flip_screen())
 		{
@@ -260,22 +264,30 @@ void blueprnt_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 		// sprites are slightly misplaced, regardless of the screen flip
 		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, code, 0, flipx, flipy, 2 + sx, sy - 1, 0);
+
+		// flipy applies to next sprite, isn't it awkward?
+		flipy = m_spriteram[offs + 2] & 0x80;
 	}
 }
 
 uint32_t blueprnt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (flip_screen())
+	{
 		for (int i = 0; i < 32; i++)
-			m_bg_tilemap->set_scrolly(i, m_scrollram[32 - i]);
+			m_bg_tilemap->set_scrolly(i, m_scrollram[(32 - i) & 0xff]);
+	}
 	else
+	{
 		for (int i = 0; i < 32; i++)
-			m_bg_tilemap->set_scrolly(i, m_scrollram[30 - i]);
+			m_bg_tilemap->set_scrolly(i, m_scrollram[(30 - i) & 0xff]);
+	}
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 1, 0);
+
 	return 0;
 }
 
@@ -317,6 +329,7 @@ void blueprnt_state::coin_counter_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 }
+
 
 /*************************************
  *
@@ -526,6 +539,7 @@ static INPUT_PORTS_START( grasspin )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "DILSW2:1" )
 INPUT_PORTS_END
 
+
 /*************************************
  *
  *  Graphics definitions
@@ -580,7 +594,6 @@ void blueprnt_state::blueprnt(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &blueprnt_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &blueprnt_state::sound_io);
 	m_audiocpu->set_periodic_int(FUNC(blueprnt_state::irq0_line_hold), attotime::from_hz(4*60)); // IRQs connected to 32V
-									// NMIs are caused by the main CPU
 
 	config.set_perfect_quantum(m_maincpu);
 
@@ -621,6 +634,7 @@ void blueprnt_state::grasspin(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &blueprnt_state::grasspin_main_map);
 }
+
 
 /*************************************
  *

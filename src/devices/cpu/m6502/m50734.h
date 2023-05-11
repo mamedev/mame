@@ -96,6 +96,9 @@ protected:
 	virtual void write_data(u16 adr, u8 val) override;
 
 private:
+	u8 interrupt_control_r(offs_t offset);
+	void interrupt_control_w(offs_t offset, u8 data);
+
 	template <int N> u8 port_r(offs_t offset);
 	template <int N> void port_w(offs_t offset, u8 data);
 	u8 p4_r();
@@ -103,11 +106,27 @@ private:
 	void p0_function_w(u8 data);
 	u8 p2_p3_function_r();
 	void p2_p3_function_w(u8 data);
+
 	u8 ad_control_r();
 	void ad_control_w(u8 data);
 	u8 ad_r();
-
 	TIMER_CALLBACK_MEMBER(ad_complete);
+
+	u8 timer_r(offs_t offset);
+	void timer_w(offs_t offset, u8 data);
+	void step_motor(int which);
+	template <int N> TIMER_CALLBACK_MEMBER(timer_interrupt);
+	u8 step_counter_r(offs_t offset);
+	void step_counter_w(offs_t offset, u8 data);
+	u8 phase_counter_r();
+	void phase_counter_w(u8 data);
+	u8 smcon_r(offs_t offset);
+	void smcon_w(offs_t offset, u8 data);
+	TIMER_CALLBACK_MEMBER(timer_x_interrupt);
+	u16 get_timer_x() const;
+	void set_timer_x(u16 count);
+	u8 timer_x_r(offs_t offset);
+	void timer_x_w(offs_t offset, u8 data);
 
 	void internal_map(address_map &map);
 
@@ -119,6 +138,8 @@ private:
 	devcb_read8::array<4> m_analog_in_cb;
 
 	emu_timer *m_ad_timer;
+	emu_timer *m_timer[3];
+	emu_timer *m_timer_x;
 
 	u8 m_port_latch[4];
 	u8 m_port_direction[4];
@@ -127,6 +148,14 @@ private:
 	u8 m_p2_p3_function;
 	u8 m_ad_control;
 	u8 m_ad_register;
+	u8 m_prescaler_reload[3];
+	u8 m_timer_reload[3];
+	u8 m_step_counter[2];
+	u8 m_phase_counter;
+	u8 m_smcon[2];
+	u16 m_tx_count;
+	u16 m_tx_reload;
+	u8 m_interrupt_control[3];
 };
 
 DECLARE_DEVICE_TYPE(M50734, m50734_device)

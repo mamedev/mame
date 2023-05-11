@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-#ifndef MAME_MACHINE_INTERPRO_SGA_H
-#define MAME_MACHINE_INTERPRO_SGA_H
+#ifndef MAME_INTERGRAPH_INTERPRO_SGA_H
+#define MAME_INTERGRAPH_INTERPRO_SGA_H
 
 #pragma once
 
@@ -188,4 +188,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(INTERPRO_SGA, interpro_sga_device)
 
-#endif // MAME_MACHINE_INTERPRO_SGA_H
+#endif // MAME_INTERGRAPH_INTERPRO_SGA_H

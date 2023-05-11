@@ -113,9 +113,9 @@ int DevicesWindowModel::columnCount(const QModelIndex &parent) const
 
 
 
-DevicesWindow::DevicesWindow(running_machine &machine, QWidget *parent) :
-	WindowQt(machine, nullptr),
-	m_devices_model(machine)
+DevicesWindow::DevicesWindow(DebuggerQt &debugger, QWidget *parent) :
+	WindowQt(debugger, nullptr),
+	m_devices_model(debugger.machine())
 {
 	m_selected_device = nullptr;
 
@@ -154,7 +154,7 @@ void DevicesWindow::currentRowChanged(const QModelIndex &current, const QModelIn
 void DevicesWindow::activated(const QModelIndex &index)
 {
 	device_t *dev = static_cast<device_t *>(index.internalPointer());
-	(new DeviceInformationWindow(m_machine, dev, this))->show();
+	(new DeviceInformationWindow(m_debugger, dev, this))->show();
 }
 
 
@@ -163,24 +163,6 @@ void DevicesWindow::saveConfigurationToNode(util::xml::data_node &node)
 	WindowQt::saveConfigurationToNode(node);
 
 	node.set_attribute_int(ATTR_WINDOW_TYPE, WINDOW_TYPE_DEVICES_VIEWER);
-}
-
-
-
-//=========================================================================
-//  DevicesWindowQtConfig
-//=========================================================================
-
-void DevicesWindowQtConfig::applyToQWidget(QWidget *widget)
-{
-	WindowQtConfig::applyToQWidget(widget);
-	//  DevicesWindow *window = dynamic_cast<DevicesWindow *>(widget);
-}
-
-
-void DevicesWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
-{
-	WindowQtConfig::recoverFromXmlNode(node);
 }
 
 } // namespace osd::debugger::qt

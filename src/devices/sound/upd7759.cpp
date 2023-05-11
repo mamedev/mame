@@ -281,7 +281,6 @@ void upd7759_device::device_start()
 void upd775x_device::device_reset()
 {
 	m_pos                = 0;
-	//m_fifo_in            = 0; // this seems to keep state when /RESET line asserted (test case: konmedal.cpp games)
 	m_state              = STATE_IDLE;
 	m_clocks_left        = 0;
 	m_nibbles_left       = 0;
@@ -565,17 +564,12 @@ void upd775x_device::advance_state()
 	}
 }
 
-TIMER_CALLBACK_MEMBER(upd775x_device::sync_port_write)
-{
-	m_fifo_in = param;
-}
-
 TIMER_CALLBACK_MEMBER(upd7759_device::drq_update)
 {
+	m_channel->update();
+
 	uint8_t olddrq = m_drq;
 	int old_state = m_state;
-
-	m_channel->update();
 
 	advance_state();
 
@@ -590,6 +584,8 @@ TIMER_CALLBACK_MEMBER(upd7759_device::drq_update)
 		m_timer->adjust(m_clock_period * m_clocks_left);
 }
 
+
+
 /************************************************************
 
     I/O handlers
@@ -603,90 +599,63 @@ WRITE_LINE_MEMBER( upd775x_device::reset_w )
 
 TIMER_CALLBACK_MEMBER(upd775x_device::internal_reset_w)
 {
+	m_channel->update();
+
 	uint8_t oldreset = m_reset;
 	m_reset = (param != 0);
-
-	m_channel->update();
 
 	if (oldreset && !m_reset)
 		device_reset();
 }
 
-TIMER_CALLBACK_MEMBER(upd7759_device::internal_reset_w)
-{
-	uint8_t oldreset = m_reset;
-	upd775x_device::internal_reset_w(param);
-
-	if (!oldreset && m_reset)
-	{
-		if (!m_md)
-		{
-			m_mode = MODE_SLAVE;
-			m_state = STATE_START;
-			m_timer->adjust(attotime::zero);
-		}
-	}
-}
 
 WRITE_LINE_MEMBER( upd775x_device::start_w )
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(upd775x_device::internal_start_w), this), state);
 }
 
-void upd7759_device::internal_start_w(int state)
+void upd775x_device::internal_start_w(int state)
 {
+	m_channel->update();
+
 	uint8_t oldstart = m_start;
 	m_start = (state != 0);
 
 	LOG_STATE("upd7759_start_w: %d->%d\n", oldstart, m_start);
-
-	m_channel->update();
 
 	if (m_state == STATE_IDLE && m_mode == MODE_STAND_ALONE && oldstart && !m_start && m_reset)
 	{
 		m_state = STATE_START;
-
-		if (m_mode == MODE_SLAVE)
-			m_timer->adjust(attotime::zero);
 	}
 }
 
-void upd7756_device::internal_start_w(int state)
+
+void upd775x_device::port_w(u8 data)
 {
-	uint8_t oldstart = m_start;
-	m_start = (state != 0);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(upd775x_device::internal_port_w), this), data);
+}
 
-	LOG_STATE("upd7759_start_w: %d->%d\n", oldstart, m_start);
-
+TIMER_CALLBACK_MEMBER(upd775x_device::internal_port_w)
+{
 	m_channel->update();
 
-	if (m_state == STATE_IDLE && oldstart && !m_start && m_reset)
-	{
-		m_state = STATE_START;
-	}
+	m_fifo_in = param;
 }
 
 
 WRITE_LINE_MEMBER(upd7759_device::md_w)
 {
-	// When called from machine configs/during start up set the mode pin directly.
-	if (m_timer == nullptr)
-	{
-		m_md = state;
-		return;
-	}
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(upd7759_device::internal_md_w), this), state);
 }
 
-
 TIMER_CALLBACK_MEMBER(upd7759_device::internal_md_w)
 {
+	m_channel->update();
+
 	uint8_t old_md = m_md;
 	m_md = (param != 0);
 
 	LOG_STATE("upd7759_md_w: %d->%d\n", old_md, m_md);
-
-	m_channel->update();
 
 	if (m_state == STATE_IDLE && m_reset)
 	{
@@ -701,12 +670,6 @@ TIMER_CALLBACK_MEMBER(upd7759_device::internal_md_w)
 			m_mode = MODE_STAND_ALONE;
 		}
 	}
-}
-
-
-void upd775x_device::port_w(u8 data)
-{
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(upd775x_device::sync_port_write), this), data);
 }
 
 

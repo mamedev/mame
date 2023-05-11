@@ -1,95 +1,219 @@
 <?xml version="1.0"?>
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <mamelayout version="2">
-	<element name="digit" defstate="10">
+
+<!-- define elements -->
+
+	<element name="black"><rect><color red="0" green="0" blue="0" /></rect></element>
+	<element name="blue"><rect><color red="0.1" green="0.5" blue="0.9" /></rect></element>
+	<element name="gray"><rect><color red="0.3" green="0.3" blue="0.33" /></rect></element>
+
+	<element name="text_score">
+		<rect><color red="0.3" green="0.3" blue="0.33" /></rect>
+		<text string="SCORE"><color red="0.9" green="0.9" blue="0.9" /></text>
+	</element>
+	<element name="text_best">
+		<rect><color red="0.3" green="0.3" blue="0.33" /></rect>
+		<text string="BEST 3"><color red="0.9" green="0.9" blue="0.9" /></text>
+	</element>
+	<element name="text_1">
+		<rect><color red="0.3" green="0.3" blue="0.33" /></rect>
+		<text string="1st"><color red="0.9" green="0.9" blue="0.9" /></text>
+	</element>
+	<element name="text_2">
+		<rect><color red="0.3" green="0.3" blue="0.33" /></rect>
+		<text string="2nd"><color red="0.9" green="0.9" blue="0.9" /></text>
+	</element>
+	<element name="text_3">
+		<rect><color red="0.3" green="0.3" blue="0.33" /></rect>
+		<text string="3rd"><color red="0.9" green="0.9" blue="0.9" /></text>
+	</element>
+
+	<element name="digit" defstate="0">
 		<led7seg>
-			<color red="1.0" green="0.3" blue="0.0" />
+			<color red="1.0" green="0.1" blue="0.15" />
 		</led7seg>
 	</element>
 
-	<view name="Simple LEDs">
-		<bounds left="0" top="-0.472" right="4" bottom="3" />
+	<element name="shutter1" defstate="0">
+		<rect state="0"><color red="0" green="0" blue="0" /></rect>
+	</element>
+	<element name="shutter2" defstate="0">
+		<rect state="1"><color red="0" green="0" blue="0" /></rect>
+	</element>
 
-		<screen index="0">
-			<bounds left="0" top="0" right="4" bottom="3" />
-		</screen>
 
-		<element name="digit4" ref="digit">
-			<bounds left="0.166" top="-0.336" right="0.300" bottom="-0.136" />
-		</element>
-		<element name="digit5" ref="digit">
-			<bounds left="0.350" top="-0.336" right="0.484" bottom="-0.136" />
-		</element>
-		<element name="digit2" ref="digit">
-			<bounds left="0.534" top="-0.336" right="0.668" bottom="-0.136" />
-		</element>
-		<element name="digit3" ref="digit">
-			<bounds left="0.718" top="-0.336" right="0.852" bottom="-0.136" />
-		</element>
-		<element name="digit0" ref="digit">
-			<bounds left="0.902" top="-0.336" right="1.036" bottom="-0.136" />
-		</element>
-		<element name="digit1" ref="digit">
-			<bounds left="1.0860" top="-0.336" right="1.220" bottom="-0.136" />
-		</element>
+<!-- viewfinder (it's inside the cabinet, not in the scope) -->
 
-		<element name="digit10" ref="digit">
-			<bounds left="1.454" top="-0.306" right="1.554" bottom="-0.136" />
-		</element>
-		<element name="digit11" ref="digit">
-			<bounds left="1.565" top="-0.306" right="1.666" bottom="-0.136" />
-		</element>
-		<element name="digit8" ref="digit">
-			<bounds left="1.677" top="-0.306" right="1.778" bottom="-0.136" />
-		</element>
-		<element name="digit9" ref="digit">
-			<bounds left="1.790" top="-0.306" right="1.890" bottom="-0.136" />
-		</element>
-		<element name="digit6" ref="digit">
-			<bounds left="1.902" top="-0.306" right="2.002" bottom="-0.136" />
-		</element>
-		<element name="digit7" ref="digit">
-			<bounds left="2.014" top="-0.306" right="2.114" bottom="-0.136" />
-		</element>
+	<element name="view">
+		<disk>
+			<bounds x="0" y="0" width="100" height="100" />
+			<color red="0.3" green="0.3" blue="0.0" />
+		</disk>
+		<disk>
+			<bounds x="1" y="1" width="98" height="98" />
+			<color red="0" green="0" blue="0" />
+		</disk>
+		<disk>
+			<bounds x="25" y="25" width="50" height="50" />
+			<color red="0.3" green="0.3" blue="0.0" />
+		</disk>
+		<disk>
+			<bounds x="26" y="26" width="48" height="48" />
+			<color red="0" green="0" blue="0" />
+		</disk>
+		<rect>
+			<bounds x="49.5" y="0" width="1" height="100" />
+			<color red="0.3" green="0.3" blue="0.0" />
+		</rect>
+		<rect>
+			<bounds x="0" y="49.5" width="100" height="1" />
+			<color red="0.3" green="0.3" blue="0.0" />
+		</rect>
+	</element>
 
-		<element name="digit16" ref="digit">
-			<bounds left="2.333" top="-0.306" right="2.433" bottom="-0.136" />
-		</element>
-		<element name="digit17" ref="digit">
-			<bounds left="2.445" top="-0.306" right="2.545" bottom="-0.136" />
-		</element>
-		<element name="digit14" ref="digit">
-			<bounds left="2.557" top="-0.306" right="2.657" bottom="-0.136" />
-		</element>
-		<element name="digit15" ref="digit">
-			<bounds left="2.669" top="-0.306" right="2.769" bottom="-0.136" />
-		</element>
-		<element name="digit12" ref="digit">
-			<bounds left="2.781" top="-0.306" right="2.881" bottom="-0.136" />
-		</element>
-		<element name="digit13" ref="digit">
-			<bounds left="2.893" top="-0.306" right="2.993" bottom="-0.136" />
-		</element>
 
-		<element name="digit22" ref="digit">
-			<bounds left="3.211" top="-0.306" right="3.311" bottom="-0.136" />
-		</element>
-		<element name="digit23" ref="digit">
-			<bounds left="3.323" top="-0.306" right="3.423" bottom="-0.136" />
-		</element>
-		<element name="digit20" ref="digit">
-			<bounds left="3.435" top="-0.306" right="3.535" bottom="-0.136" />
-		</element>
-		<element name="digit21" ref="digit">
-			<bounds left="3.547" top="-0.306" right="3.647" bottom="-0.136" />
-		</element>
-		<element name="digit18" ref="digit">
-			<bounds left="3.658" top="-0.306" right="3.758" bottom="-0.136" />
-		</element>
-		<element name="digit19" ref="digit">
-			<bounds left="3.770" top="-0.306" right="3.870" bottom="-0.136" />
-		</element>
+<!-- score panel -->
+
+	<group name="score1">
+		<element ref="black"><bounds x="0" y="0" width="111" height="26" /></element>
+		<element name="digit4" ref="digit"><bounds x="6"  y="3" width="13.33" height="20" /></element>
+		<element name="digit5" ref="digit"><bounds x="23" y="3" width="13.33" height="20" /></element>
+		<element name="digit2" ref="digit"><bounds x="40" y="3" width="13.33" height="20" /></element>
+		<element name="digit3" ref="digit"><bounds x="57" y="3" width="13.33" height="20" /></element>
+		<element name="digit0" ref="digit"><bounds x="74" y="3" width="13.33" height="20" /></element>
+		<element name="digit1" ref="digit"><bounds x="91" y="3" width="13.33" height="20" /></element>
+	</group>
+
+	<group name="score2">
+		<element ref="black"><bounds x="0" y="0" width="111" height="26" /></element>
+		<element name="digit10" ref="digit"><bounds x="6"  y="3" width="13.33" height="20" /></element>
+		<element name="digit11" ref="digit"><bounds x="23" y="3" width="13.33" height="20" /></element>
+		<element name="digit8"  ref="digit"><bounds x="40" y="3" width="13.33" height="20" /></element>
+		<element name="digit9"  ref="digit"><bounds x="57" y="3" width="13.33" height="20" /></element>
+		<element name="digit6"  ref="digit"><bounds x="74" y="3" width="13.33" height="20" /></element>
+		<element name="digit7"  ref="digit"><bounds x="91" y="3" width="13.33" height="20" /></element>
+	</group>
+
+	<group name="score3">
+		<element ref="black"><bounds x="0" y="0" width="111" height="26" /></element>
+		<element name="digit16" ref="digit"><bounds x="6"  y="3" width="13.33" height="20" /></element>
+		<element name="digit17" ref="digit"><bounds x="23" y="3" width="13.33" height="20" /></element>
+		<element name="digit14" ref="digit"><bounds x="40" y="3" width="13.33" height="20" /></element>
+		<element name="digit15" ref="digit"><bounds x="57" y="3" width="13.33" height="20" /></element>
+		<element name="digit12" ref="digit"><bounds x="74" y="3" width="13.33" height="20" /></element>
+		<element name="digit13" ref="digit"><bounds x="91" y="3" width="13.33" height="20" /></element>
+	</group>
+
+	<group name="score4">
+		<element ref="black"><bounds x="0" y="0" width="111" height="26" /></element>
+		<element name="digit22" ref="digit"><bounds x="6"  y="3" width="13.33" height="20" /></element>
+		<element name="digit23" ref="digit"><bounds x="23" y="3" width="13.33" height="20" /></element>
+		<element name="digit20" ref="digit"><bounds x="40" y="3" width="13.33" height="20" /></element>
+		<element name="digit21" ref="digit"><bounds x="57" y="3" width="13.33" height="20" /></element>
+		<element name="digit18" ref="digit"><bounds x="74" y="3" width="13.33" height="20" /></element>
+		<element name="digit19" ref="digit"><bounds x="91" y="3" width="13.33" height="20" /></element>
+	</group>
+
+	<group name="panel">
+		<element ref="gray"><bounds x="0" y="0" width="639" height="77" /></element>
+
+		<element ref="text_score"><bounds x="28" y="0" width="166" height="26" /></element>
+
+		<element ref="blue"><bounds x="25" y="27" width="172" height="45" /></element>
+		<group ref="score1"><bounds x="28" y="30" width="166" height="39" /></group>
+
+		<element ref="text_best"><bounds x="222" y="0" width="389" height="26" /></element>
+
+		<element ref="text_1"><bounds x="222" y="26" width="111" height="14" /></element>
+		<element ref="blue"><bounds x="219" y="40" width="117" height="32" /></element>
+		<group ref="score2"><bounds x="222" y="43" width="111" height="26" /></group>
+
+		<element ref="text_2"><bounds x="361" y="26" width="111" height="14" /></element>
+		<element ref="blue"><bounds x="358" y="40" width="117" height="32" /></element>
+		<group ref="score3"><bounds x="361" y="43" width="111" height="26" /></group>
+
+		<element ref="text_3"><bounds x="500" y="26" width="111" height="14" /></element>
+		<element ref="blue"><bounds x="497" y="40" width="117" height="32" /></element>
+		<group ref="score4"><bounds x="500" y="43" width="111" height="26" /></group>
+	</group>
+
+
+<!-- build screen -->
+
+	<view name="3D Scope Off">
+		<screen index="0"><bounds left="0" top="0" right="4" bottom="3" /></screen>
+
+		<collection name="Score Panel">
+			<group ref="panel"><bounds x="0" y="-0.52" width="4" height="0.482" /></group>
+		</collection>
+		<collection name="Viewfinder">
+			<element ref="view" blend="add"><bounds x="1.4" y="0.9" width="1.2" height="1.2" /></element>
+		</collection>
 	</view>
+
+	<!-- for the 3D Scope views, enable stereoscopic 3D DIP switch first -->
+
+	<view name="3D Scope Straight View">
+		<collection name="Score Panel">
+			<group ref="panel"><bounds x="0" y="-0.52" width="4" height="0.482" /></group>
+			<group ref="panel"><bounds x="4.03" y="-0.52" width="4" height="0.482" /></group>
+		</collection>
+		<collection name="Viewfinder">
+			<element ref="view"><bounds x="1.4" y="0.9" width="1.2" height="1.2" /></element>
+			<element ref="view"><bounds x="5.43" y="0.9" width="1.2" height="1.2" /></element>
+		</collection>
+
+		<!-- parallel-eyed -->
+		<screen index="0" blend="add"><bounds left="0" top="0" right="4" bottom="3" /></screen>
+		<element name="shutter" ref="shutter1"><bounds left="0" top="0" right="4" bottom="3" /></element>
+
+		<screen index="0" blend="add"><bounds left="4.03" top="0" right="8.03" bottom="3" /></screen>
+		<element name="shutter" ref="shutter2"><bounds left="4.03" top="0" right="8.03" bottom="3" /></element>
+	</view>
+
+	<view name="3D Scope Cross View">
+		<collection name="Score Panel">
+			<group ref="panel"><bounds x="0" y="-0.52" width="4" height="0.482" /></group>
+			<group ref="panel"><bounds x="4.03" y="-0.52" width="4" height="0.482" /></group>
+		</collection>
+		<collection name="Viewfinder">
+			<element ref="view"><bounds x="1.4" y="0.9" width="1.2" height="1.2" /></element>
+			<element ref="view"><bounds x="5.43" y="0.9" width="1.2" height="1.2" /></element>
+		</collection>
+
+		<!-- cross-eyed -->
+		<screen index="0" blend="add"><bounds left="0" top="0" right="4" bottom="3" /></screen>
+		<element name="shutter" ref="shutter2"><bounds left="0" top="0" right="4" bottom="3" /></element>
+
+		<screen index="0" blend="add"><bounds left="4.03" top="0" right="8.03" bottom="3" /></screen>
+		<element name="shutter" ref="shutter1"><bounds left="4.03" top="0" right="8.03" bottom="3" /></element>
+	</view>
+
+	<view name="3D Scope Left">
+		<collection name="Score Panel">
+			<group ref="panel"><bounds x="0" y="-0.52" width="4" height="0.482" /></group>
+		</collection>
+		<collection name="Viewfinder">
+			<element ref="view"><bounds x="1.4" y="0.9" width="1.2" height="1.2" /></element>
+		</collection>
+
+		<screen index="0" blend="add"><bounds left="0" top="0" right="4" bottom="3" /></screen>
+		<element name="shutter" ref="shutter1"><bounds left="0" top="0" right="4" bottom="3" /></element>
+	</view>
+
+	<view name="3D Scope Right">
+		<collection name="Score Panel">
+			<group ref="panel"><bounds x="0" y="-0.52" width="4" height="0.482" /></group>
+		</collection>
+		<collection name="Viewfinder">
+			<element ref="view"><bounds x="1.4" y="0.9" width="1.2" height="1.2" /></element>
+		</collection>
+
+		<screen index="0" blend="add"><bounds left="0" top="0" right="4" bottom="3" /></screen>
+		<element name="shutter" ref="shutter2"><bounds left="0" top="0" right="4" bottom="3" /></element>
+	</view>
+
 </mamelayout>

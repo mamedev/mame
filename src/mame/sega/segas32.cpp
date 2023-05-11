@@ -527,8 +527,7 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 #include "emu.h"
 #include "segas32.h"
 
-#include "bus/scsi/scsi.h"
-#include "bus/scsi/scsicd.h"
+#include "bus/nscsi/cd.h"
 #include "cpu/z80/z80.h"
 #include "cpu/v60/v60.h"
 #include "cpu/nec/v25.h"
@@ -537,22 +536,17 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 #include "machine/eepromser.h"
 #include "machine/i8255.h"
 #include "machine/mb8421.h"
-#include "machine/mb89352.h"
+#include "machine/mb87030.h"
 #include "machine/msm6253.h"
 #include "machine/upd4701.h"
 #include "315_5296.h"
+#include "sound/cdda.h"
 #include "sound/rf5c68.h"
 #include "sound/ymopn.h"
 #include "speaker.h"
 
 #include "layout/generic.h"
 #include "radr.lh"
-
-/*
- * TODO: Kokoroji hangs if CD comms are handled with current mb89352 core.
- * We currently hide this behind a compile switch to aid development
- */
-#define S32_KOKOROJI_TEST_CD 0
 
 DEFINE_DEVICE_TYPE(SEGA_S32_PCB, segas32_state, "segas32_pcb", "Sega System 32 PCB")
 
@@ -2505,32 +2499,26 @@ void segas32_cd_state::lamps2_w(uint8_t data)
 
 WRITE_LINE_MEMBER(segas32_cd_state::scsi_irq_w)
 {
-	printf("%02x IRQ\n",state);
+	//printf("%02x IRQ\n",state);
 	// TODO: sent!
 }
 
 WRITE_LINE_MEMBER(segas32_cd_state::scsi_drq_w)
 {
-	printf("%02x DRQ\n",state);
+	//printf("%02x DRQ\n",state);
 }
 
 void segas32_state::system32_cd_map(address_map &map)
 {
 	map.unmap_value_high();
 	system32_map(map);
-	#if S32_KOKOROJI_TEST_CD
-	map(0xc00040, 0xc0005f).mirror(0x0fff80).rw("mb89352", FUNC(mb89352_device::mb89352_r), FUNC(mb89352_device::mb89352_w)).umask16(0x00ff);
-	#else
-	map(0xc00040, 0xc0005f).mirror(0x0fff80).noprw();
-	#endif
+	map(0xc00040, 0xc0005f).mirror(0x0fff80).m("scsi:7:spc", FUNC(mb89352_device::map)).umask16(0x00ff);
 	map(0xc00060, 0xc0006f).mirror(0x0fff80).rw("cxdio", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write)).umask16(0x00ff);
 }
 
-void segas32_cd_state::cdrom_config(device_t *device)
+static void scsi_devices(device_slot_interface &device)
 {
-	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
-	cdda->add_route(0, "^^lspeaker", 1.0);
-	cdda->add_route(1, "^^rspeaker", 1.0);
+	device.option_add("cdrom", NSCSI_CDROM);
 }
 
 void segas32_cd_state::device_add_mconfig(machine_config &config)
@@ -2539,14 +2527,28 @@ void segas32_cd_state::device_add_mconfig(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas32_cd_state::system32_cd_map);
 
-	mb89352_device &scsictrl(MB89352A(config, "mb89352", 8000000));
-	scsictrl.set_scsi_port("scsi");
-	scsictrl.irq_cb().set(FUNC(segas32_cd_state::scsi_irq_w));
-	scsictrl.drq_cb().set(FUNC(segas32_cd_state::scsi_drq_w));
+	NSCSI_BUS(config, "scsi");
+	NSCSI_CONNECTOR(config, "scsi:0").option_set("cdrom", NSCSI_CDROM).machine_config(
+		[](device_t *device)
+		{
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0);
+		});
+	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("spc", MB89352).machine_config(
+		[this](device_t *device)
+		{
+			mb89352_device &spc = downcast<mb89352_device &>(*device);
 
-	scsi_port_device &scsi(SCSI_PORT(config, "scsi"));
-	scsi.set_slot_device(1, "cdrom", SCSICD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
-	scsi.slot(1).set_option_machine_config("cdrom", cdrom_config);
+			spc.set_clock(8_MHz_XTAL);
+			spc.out_irq_callback().set(*this, FUNC(segas32_cd_state::scsi_irq_w));
+			spc.out_dreq_callback().set(*this, FUNC(segas32_cd_state::scsi_drq_w));
+		});
 
 	cxd1095_device &cxdio(CXD1095(config, "cxdio"));
 	cxdio.out_porta_cb().set(FUNC(segas32_cd_state::lamps1_w));
@@ -4301,7 +4303,7 @@ ROM_START( kokoroj )
 	ROM_LOAD16_BYTE( "epr-15520a.ic9",  0x100001, 0x80000, CRC(bfbae875) SHA1(340c1e07eeb8e15448f82b87cc749d66086130ab) )
 
 	ROM_REGION( 0x400000, "mainpcb:soundcpu", 0 )
-	ROM_LOAD_x8( "epr-15523.ic36", 0x000000, 0x020000, CRC(b3b9d29c) SHA1(22acd747540e8c4558ec5eaeda1aaab68f84a6e2) )
+	ROM_LOAD_x8( "epr-15523.ic36", 0x000000, 0x020000, CRC(b3b9d29c) SHA1(22acd747540e8c4558ec5eaeda1aaab68f84a6e2) ) // same label as below and identical first half, second half is 0x00 filled here
 	ROM_LOAD_x2( "mpr-15522.ic35", 0x100000, 0x080000, CRC(fb68a351) SHA1(f307c0e4f33786630e8baddbb8c0a5e0f956de76) )
 	// IC24 & IC34 are not populated
 
@@ -4320,7 +4322,37 @@ ROM_START( kokoroj )
 	ROM_LOAD64_WORD( "mpr-15534.ic25", 0x800006, 0x200000, CRC(4fa5c56d) SHA1(52926bef0f21ef17dc9d49e3137712bf6d8c29af) )
 
 	// Audio CD
-	DISK_REGION( "mainpcb:scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
+	DISK_REGION( "mainpcb:scsi:0:cdrom" )
+	DISK_IMAGE_READONLY( "kokoroj", 0, NO_DUMP )
+ROM_END
+
+ROM_START( kokoroja )
+	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code + data */
+	ROM_LOAD_x8(     "epr-15524.ic8",  0x000000, 0x20000, CRC(135640f6) SHA1(1cd4f0e3c56b645d6734de9c7d85f21baead1e07) )
+	ROM_LOAD16_BYTE( "epr-15521.ic18", 0x100000, 0x80000, CRC(b0a80786) SHA1(06dee49c6f554a72c24e7894ce838718963a54a2) )
+	ROM_LOAD16_BYTE( "epr-15520.ic9",  0x100001, 0x80000, CRC(f2a87e48) SHA1(fb28f36a04af5c8980e7f081d5dc1b05339b0b53) )
+
+	ROM_REGION( 0x400000, "mainpcb:soundcpu", 0 )
+	ROM_LOAD_x8( "epr-15523.ic36", 0x000000, 0x020000, CRC(ba852239) SHA1(ac4ec104d1603eb418c8f93befbdf53251a36579) ) // same label as above and identical first half, second half is 0xff filled here
+	ROM_LOAD_x2( "mpr-15522.ic35", 0x100000, 0x080000, CRC(fb68a351) SHA1(f307c0e4f33786630e8baddbb8c0a5e0f956de76) )
+	// IC24 & IC34 are not populated
+
+	ROM_REGION( 0x200000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_LOAD16_BYTE( "mpr-15526.ic14", 0x000000, 0x100000, CRC(f6907c13) SHA1(d3f65dd02d7cee0fd2f422ba6a54164b2a2b8303) )
+	ROM_LOAD16_BYTE( "mpr-15525.ic5",  0x000001, 0x100000, CRC(8c0c876f) SHA1(e5335fa7a3e4a0e1d79fc7612bf4aaa50224f4ca) )
+
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 )
+	ROM_LOAD64_WORD( "mpr-15527.ic32", 0x000000, 0x200000, CRC(132f91c6) SHA1(0f854b173bdebfb642dba3b58a307d0e3a157c85) )
+	ROM_LOAD64_WORD( "mpr-15529.ic30", 0x000002, 0x200000, CRC(c1b826f7) SHA1(00051762074cdcf62b07cea6c744244b11ebf1b1) )
+	ROM_LOAD64_WORD( "mpr-15531.ic28", 0x000004, 0x200000, CRC(d624e05f) SHA1(f19f173aaeb04a59ab7fe89a3490d1d7c13c77a0) )
+	ROM_LOAD64_WORD( "mpr-15533.ic26", 0x000006, 0x200000, CRC(aff0e9a8) SHA1(5ced176cfef65426e2b4a3b990a319fdceaa9162) )
+	ROM_LOAD64_WORD( "mpr-15528.ic31", 0x800000, 0x200000, CRC(2e4bc090) SHA1(67d464ea078a19ae303b2b60f4ab0abd71aea85c) )
+	ROM_LOAD64_WORD( "mpr-15530.ic29", 0x800002, 0x200000, CRC(307877a8) SHA1(0104a51349f745a9fb7cc238a832ef6abeec2025) )
+	ROM_LOAD64_WORD( "mpr-15532.ic27", 0x800004, 0x200000, CRC(923ba3e5) SHA1(d26c55e7021c81b5fdaa9fadee20db30f6677981) )
+	ROM_LOAD64_WORD( "mpr-15534.ic25", 0x800006, 0x200000, CRC(4fa5c56d) SHA1(52926bef0f21ef17dc9d49e3137712bf6d8c29af) )
+
+	// Audio CD
+	DISK_REGION( "mainpcb:scsi:0:cdrom" )
 	DISK_IMAGE_READONLY( "kokoroj", 0, NO_DUMP )
 ROM_END
 
@@ -4361,7 +4393,7 @@ ROM_START( kokoroj2 )
 	ROM_LOAD64_WORD( "mpr-16196.ic25", 0x800006, 0x200000, CRC(b8e22e05) SHA1(dd667e2c5d421cba356421825e6aca9b5ca0af45) )
 
 	/* AUDIO CD */
-	DISK_REGION( "mainpcb:scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
+	DISK_REGION( "mainpcb:scsi:0:cdrom" )
 	DISK_IMAGE_READONLY( "cdp-00146", 0, SHA1(0b37e0ea2380ecd9abef2ccd6a8096d76d2ba344) )
 ROM_END
 
@@ -5942,7 +5974,7 @@ GAME( 1992, brivalj,   brival,   sega_system32_4p,          brival,   segas32_ne
 GAME( 1992, darkedge,  0,        sega_system32_4p,          darkedge, segas32_new_state, init_darkedge, ROT0, "Sega",   "Dark Edge (World)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1992, darkedgej, darkedge, sega_system32_4p,          darkedge, segas32_new_state, init_darkedge, ROT0, "Sega",   "Dark Edge (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1994, dbzvrvs,   0,        sega_system32_analog,      dbzvrvs,  segas32_new_state, init_dbzvrvs,  ROT0, "Sega / Banpresto", "Dragon Ball Z V.R.V.S. (Japan, Rev A)", MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1994, dbzvrvs,   0,        sega_system32_analog,      dbzvrvs,  segas32_new_state, init_dbzvrvs,  ROT0, "Sega / Banpresto", "Dragon Ball Z: V.R. V.S. (Japan, Rev A)", MACHINE_IMPERFECT_GRAPHICS)
 
 GAME( 1991, f1en,      0,        sega_system32_dual_direct, f1en,     segas32_new_state, init_f1en,     ROT0, "Sega",   "F1 Exhaust Note (World, Rev A)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1991, f1enu,     f1en,     sega_system32_dual_direct, f1en,     segas32_new_state, init_f1en,     ROT0, "Sega",   "F1 Exhaust Note (US, Rev A)", MACHINE_IMPERFECT_GRAPHICS )
@@ -5964,6 +5996,7 @@ GAME( 1993, jparkja,   jpark,    sega_system32_analog,      jpark,    segas32_ne
 GAME( 1993, jparkjc,   jpark,    sega_system32_analog,      jpark,    segas32_new_state, init_jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Rev A, Conversion)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1992, kokoroj,   0,        sega_system32_cd,          kokoroj2, segas32_new_state, init_radr,     ROT0, "Sega",   "Soreike Kokology (Rev A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_PRINTER) /* uses an Audio CD */
+GAME( 1992, kokoroja,  kokoroj,  sega_system32_cd,          kokoroj2, segas32_new_state, init_radr,     ROT0, "Sega",   "Soreike Kokology", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_PRINTER) /* uses an Audio CD */
 GAME( 1993, kokoroj2,  0,        sega_system32_cd,          kokoroj2, segas32_new_state, init_radr,     ROT0, "Sega",   "Soreike Kokology Vol. 2 - Kokoro no Tanteikyoku", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_PRINTER) /* uses an Audio CD */
 
 GAME( 1990, radm,      0,        sega_system32_analog,      radm,     segas32_new_state, init_radm,     ROT0, "Sega",   "Rad Mobile (World)", MACHINE_IMPERFECT_GRAPHICS )  /* Released in 02.1991 */

@@ -227,7 +227,6 @@ Notes:
 #include "sound/ymz280b.h"
 
 #include "debug/debugcon.h"
-#include "debug/debugcmd.h"
 #include "debugger.h"
 #include "romload.h"
 #include "screen.h"
@@ -287,9 +286,6 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	void update_disc();
 
 public:
 	DECLARE_WRITE_LINE_MEMBER(ppc1_int);
@@ -323,20 +319,7 @@ public:
 		if (!(data & 0x8000))
 		{
 			logerror("ATAPI RESET!\n");
-
-			// TODO: Do we need any of this?
-			update_disc();
 		}
-	}
-
-	uint16_t konami_ide_r(offs_t offset, uint16_t mem_mask = ~0)
-	{
-		return swapendian_int16(m_ata->cs0_r(offset, mem_mask));
-	}
-
-	void konami_ide_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0)
-	{
-		m_ata->cs0_w(offset, swapendian_int16(data), mem_mask);
 	}
 
 private:
@@ -501,7 +484,7 @@ uint16_t konamim2_state::konami_io0_r(offs_t offset)
 		case 8: return ioport("P5")->read();
 	}
 
-	//return rand();
+	//return machine().rand();
 	return 0;
 }
 
@@ -710,34 +693,6 @@ void konamim2_state::machine_start()
 	}
 }
 
-void konamim2_state::machine_reset()
-{
-	update_disc();
-}
-
-void konamim2_state::update_disc()
-{
-	cdrom_file *new_cdrom = m_available_cdroms;
-
-	atapi_hle_device *image = subdevice<atapi_hle_device>("ata:0:cr589");
-	if (image != nullptr)
-	{
-		void *current_cdrom = nullptr;
-		image->GetDevice(&current_cdrom);
-
-		if (current_cdrom != new_cdrom)
-		{
-			current_cdrom = new_cdrom;
-
-			image->SetDevice(new_cdrom);
-		}
-	}
-	else
-	{
-		abort();
-	}
-}
-
 /*************************************
  *
  *  Address map
@@ -753,7 +708,7 @@ void konamim2_state::m2_map(address_map &map)
 	map(0x37a00020, 0x37a0003f).rw(FUNC(konamim2_state::konami_io0_r), FUNC(konamim2_state::konami_io0_w));
 	map(0x37c00010, 0x37c0001f).rw(FUNC(konamim2_state::konami_sio_r), FUNC(konamim2_state::konami_sio_w));
 	map(0x37e00000, 0x37e0000f).rw(FUNC(konamim2_state::konami_io1_r), FUNC(konamim2_state::konami_io1_w));
-	map(0x3f000000, 0x3fffffff).rw(FUNC(konamim2_state::konami_ide_r), FUNC(konamim2_state::konami_ide_w));
+	map(0x3f000000, 0x3fffffff).rw(m_ata, FUNC(ata_interface_device::cs0_swap_r), FUNC(ata_interface_device::cs0_swap_w));
 }
 
 
@@ -1556,19 +1511,19 @@ void konamim2_state::dump_task_command(const std::vector<std::string_view> &para
 	};
 
 	debugger_console &con = machine().debugger().console();
-	address_space &space = m_ppc1->space();
 	uint64_t addr;
 	offs_t address;
 
 	if (params.size() < 1)
 		return;
 
-	if (!machine().debugger().commands().validate_number_parameter(params[1], addr))
+	if (!con.validate_number_parameter(params[1], addr))
 		return;
 
 	address = (offs_t)addr;
 	address = 0x40FB54E8;
-	if (!m_ppc1->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, address))
+	address_space *tspace;
+	if (!m_ppc1->translate(AS_PROGRAM, device_memory_interface::TR_READ, address, tspace))
 	{
 		con.printf("Address is unmapped.\n");
 		return;
@@ -1576,14 +1531,14 @@ void konamim2_state::dump_task_command(const std::vector<std::string_view> &para
 
 	Task task;
 
-	task.t.pn_Next = space.read_dword(address + offsetof(ItemNode, pn_Next));
-	task.t.pn_Prev = space.read_dword(address + offsetof(ItemNode, pn_Prev));
-	task.t.n_SubsysType = space.read_byte(address + offsetof(ItemNode, n_SubsysType));
-	task.t.n_Type = space.read_byte(address + offsetof(ItemNode, n_Type));
-	task.t.n_Priority = space.read_byte(address + offsetof(ItemNode, n_Priority));
-	task.t.n_Flags = space.read_byte(address + offsetof(ItemNode, n_Flags));
-	task.t.n_Size = space.read_dword(address + offsetof(ItemNode, n_Size));
-	task.t.pn_Name = space.read_dword(address + offsetof(ItemNode, pn_Name));
+	task.t.pn_Next = tspace->read_dword(address + offsetof(ItemNode, pn_Next));
+	task.t.pn_Prev = tspace->read_dword(address + offsetof(ItemNode, pn_Prev));
+	task.t.n_SubsysType = tspace->read_byte(address + offsetof(ItemNode, n_SubsysType));
+	task.t.n_Type = tspace->read_byte(address + offsetof(ItemNode, n_Type));
+	task.t.n_Priority = tspace->read_byte(address + offsetof(ItemNode, n_Priority));
+	task.t.n_Flags = tspace->read_byte(address + offsetof(ItemNode, n_Flags));
+	task.t.n_Size = tspace->read_dword(address + offsetof(ItemNode, n_Size));
+	task.t.pn_Name = tspace->read_dword(address + offsetof(ItemNode, pn_Name));
 
 	char name[128];
 	char *ptr = name;
@@ -1591,31 +1546,31 @@ void konamim2_state::dump_task_command(const std::vector<std::string_view> &para
 
 	do
 	{
-		*ptr = space.read_byte(nameptr++);
+		*ptr = tspace->read_byte(nameptr++);
 	} while (*ptr++ != 0);
 
-	task.t.n_Version = space.read_byte(address + offsetof(ItemNode, n_Version));
-	task.t.n_Revision = space.read_byte(address + offsetof(ItemNode, n_Revision));
-	task.t.n_Reserved0 = space.read_byte(address + offsetof(ItemNode, n_Reserved0));
-	task.t.n_ItemFlags = space.read_byte(address + offsetof(ItemNode, n_ItemFlags));
-	task.t.n_Item = space.read_dword(address + offsetof(ItemNode, n_Item));
-	task.t.n_Owner = space.read_dword(address + offsetof(ItemNode, n_Owner));
-	task.t.pn_Reserved1 = space.read_dword(address + offsetof(ItemNode, pn_Reserved1));
+	task.t.n_Version = tspace->read_byte(address + offsetof(ItemNode, n_Version));
+	task.t.n_Revision = tspace->read_byte(address + offsetof(ItemNode, n_Revision));
+	task.t.n_Reserved0 = tspace->read_byte(address + offsetof(ItemNode, n_Reserved0));
+	task.t.n_ItemFlags = tspace->read_byte(address + offsetof(ItemNode, n_ItemFlags));
+	task.t.n_Item = tspace->read_dword(address + offsetof(ItemNode, n_Item));
+	task.t.n_Owner = tspace->read_dword(address + offsetof(ItemNode, n_Owner));
+	task.t.pn_Reserved1 = tspace->read_dword(address + offsetof(ItemNode, pn_Reserved1));
 
-	task.pt_ThreadTask = space.read_dword(address + offsetof(Task, pt_ThreadTask));
-	task.t_WaitBits = space.read_dword(address + offsetof(Task, t_WaitBits));
-	task.t_SigBits = space.read_dword(address + offsetof(Task, t_SigBits));
-	task.t_AllocatedSigs = space.read_dword(address + offsetof(Task, t_AllocatedSigs));
-	task.pt_StackBase = space.read_dword(address + offsetof(Task, pt_StackBase));
-	task.t_StackSize = space.read_dword(address + offsetof(Task, t_StackSize));
-	task.t_MaxUSecs = space.read_dword(address + offsetof(Task, t_MaxUSecs));
-	task.t_ElapsedTime.tt_Hi = space.read_dword(address + offsetof(Task, t_ElapsedTime)+0);
-	task.t_ElapsedTime.tt_Lo = space.read_dword(address + offsetof(Task, t_ElapsedTime)+4);
-	task.t_NumTaskLaunch = space.read_dword(address + offsetof(Task, t_NumTaskLaunch));
-	task.t_Flags = space.read_dword(address + offsetof(Task, t_Flags));
-	task.t_Module = space.read_dword(address + offsetof(Task, t_Module));
-	task.t_DefaultMsgPort = space.read_dword(address + offsetof(Task, t_DefaultMsgPort));
-	task.pt_UserData = space.read_dword(address + offsetof(Task, pt_UserData));
+	task.pt_ThreadTask = tspace->read_dword(address + offsetof(Task, pt_ThreadTask));
+	task.t_WaitBits = tspace->read_dword(address + offsetof(Task, t_WaitBits));
+	task.t_SigBits = tspace->read_dword(address + offsetof(Task, t_SigBits));
+	task.t_AllocatedSigs = tspace->read_dword(address + offsetof(Task, t_AllocatedSigs));
+	task.pt_StackBase = tspace->read_dword(address + offsetof(Task, pt_StackBase));
+	task.t_StackSize = tspace->read_dword(address + offsetof(Task, t_StackSize));
+	task.t_MaxUSecs = tspace->read_dword(address + offsetof(Task, t_MaxUSecs));
+	task.t_ElapsedTime.tt_Hi = tspace->read_dword(address + offsetof(Task, t_ElapsedTime)+0);
+	task.t_ElapsedTime.tt_Lo = tspace->read_dword(address + offsetof(Task, t_ElapsedTime)+4);
+	task.t_NumTaskLaunch = tspace->read_dword(address + offsetof(Task, t_NumTaskLaunch));
+	task.t_Flags = tspace->read_dword(address + offsetof(Task, t_Flags));
+	task.t_Module = tspace->read_dword(address + offsetof(Task, t_Module));
+	task.t_DefaultMsgPort = tspace->read_dword(address + offsetof(Task, t_DefaultMsgPort));
+	task.pt_UserData = tspace->read_dword(address + offsetof(Task, pt_UserData));
 
 //  m2ptr       pt_ThreadTask;      /* I am a thread of what task?  */
 //  uint32_t     t_WaitBits;        /* signals being waited for     */

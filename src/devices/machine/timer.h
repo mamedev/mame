@@ -97,10 +97,10 @@ public:
 	}
 
 	// timing information
-	attotime time_elapsed() const { return m_timer->elapsed(); }
-	attotime time_left() const { return m_timer->remaining(); }
-	attotime start_time() const { return m_timer->start(); }
-	attotime fire_time() const { return m_timer->expire(); }
+	attotime elapsed() const { return m_timer->elapsed(); }
+	attotime remaining() const { return m_timer->remaining(); }
+	attotime start() const { return m_timer->start(); }
+	attotime expire() const { return m_timer->expire(); }
 	attotime period() const { return m_timer ? m_timer->period() : m_period; }
 
 private:

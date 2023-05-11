@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Mike Balfour
+
 /***************************************************************************
 
     Atari Sprint 2 hardware
@@ -20,16 +21,274 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "sprint2.h"
+
+#include "sprint2_a.h"
 
 #include "cpu/m6502/m6502.h"
+#include "machine/74259.h"
+#include "machine/watchdog.h"
 #include "sound/discrete.h"
+
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
+
+
+namespace {
 
 #define MACHINE_IS_SPRINT1   (m_game == 1)
 #define MACHINE_IS_SPRINT2   (m_game == 2)
 #define MACHINE_IS_DOMINOS   (m_game == 3)
 
+
+class sprint2_state : public driver_device
+{
+public:
+	sprint2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_video_ram(*this, "video_ram"),
+		m_maincpu(*this, "maincpu"),
+		m_watchdog(*this, "watchdog"),
+		m_outlatch(*this, "outlatch"),
+		m_discrete(*this, "discrete"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_in(*this, { "INA", "INB" }),
+		m_dials(*this, "DIAL_P%u", 1U),
+		m_gears(*this, "GEAR_P%u", 1U),
+		m_dsw(*this, "DSW"),
+		m_gear_sel(*this, "P%ugear", 1U)
+	{ }
+
+	void sprint1(machine_config &config);
+	void sprint2(machine_config &config);
+	void dominos4(machine_config &config);
+	void dominos(machine_config &config);
+
+	void init_sprint1();
+	void init_sprint2();
+	void init_dominos();
+	void init_dominos4();
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
+	required_shared_ptr<uint8_t> m_video_ram;
+	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
+	required_device<f9334_device> m_outlatch;
+	required_device<discrete_sound_device> m_discrete;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_ioport_array<2> m_in;
+	optional_ioport_array<2> m_dials, m_gears;
+	required_ioport m_dsw;
+	output_finder<2> m_gear_sel;
+
+	uint8_t m_steering[2]{};
+	uint8_t m_gear[2]{};
+	uint8_t m_game = 0;
+	uint8_t m_dial[2]{};
+	tilemap_t* m_bg_tilemap = nullptr;
+	bitmap_ind16 m_helper;
+	uint8_t m_collision[2]{};
+
+	uint8_t wram_r(offs_t offset);
+	uint8_t dip_r(offs_t offset);
+	uint8_t input_a_r(offs_t offset);
+	uint8_t input_b_r(offs_t offset);
+	uint8_t sync_r();
+	template <uint8_t Which> uint8_t steering_r();
+	template <uint8_t Which> void steering_reset_w(uint8_t data);
+	void wram_w(offs_t offset, uint8_t data);
+	void output_latch_w(offs_t offset, uint8_t data);
+	void video_ram_w(offs_t offset, uint8_t data);
+	void noise_reset_w(uint8_t data);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	INTERRUPT_GEN_MEMBER(irq);
+	uint8_t collision_check(rectangle& rect);
+	inline int get_sprite_code(int n);
+	inline int get_sprite_x(int n);
+	inline int get_sprite_y(int n);
+	uint8_t service_mode();
+
+	void main_map(address_map &map);
+};
+
+
+// video
+
+void sprint2_state::palette(palette_device &palette) const
+{
+	palette.set_indirect_color(0, rgb_t(0x00, 0x00, 0x00));
+	palette.set_indirect_color(1, rgb_t(0x5b, 0x5b, 0x5b));
+	palette.set_indirect_color(2, rgb_t(0xa4, 0xa4, 0xa4));
+	palette.set_indirect_color(3, rgb_t(0xff, 0xff, 0xff));
+
+	palette.set_pen_indirect(0x0, 1);   // black playfield
+	palette.set_pen_indirect(0x1, 0);
+	palette.set_pen_indirect(0x2, 1);   // white playfield
+	palette.set_pen_indirect(0x3, 3);
+
+	palette.set_pen_indirect(0x4, 1);   // car #1
+	palette.set_pen_indirect(0x5, 3);
+	palette.set_pen_indirect(0x6, 1);   // car #2
+	palette.set_pen_indirect(0x7, 0);
+	palette.set_pen_indirect(0x8, 1);   // car #3
+	palette.set_pen_indirect(0x9, 2);
+	palette.set_pen_indirect(0xa, 1);   // car #4
+	palette.set_pen_indirect(0xb, 2);
+}
+
+
+TILE_GET_INFO_MEMBER(sprint2_state::get_tile_info)
+{
+	uint8_t const code = m_video_ram[tile_index];
+
+	tileinfo.set(0, code & 0x3f, code >> 7, 0);
+}
+
+
+void sprint2_state::video_start()
+{
+	m_screen->register_screen_bitmap(m_helper);
+
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sprint2_state::get_tile_info)), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
+}
+
+
+void sprint2_state::video_ram_w(offs_t offset, uint8_t data)
+{
+	m_video_ram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+
+uint8_t sprint2_state::collision_check(rectangle& rect)
+{
+	uint8_t data = 0;
+
+	for (int y = rect.top(); y <= rect.bottom(); y++)
+		for (int x = rect.left(); x <= rect.right(); x++)
+		{
+			uint16_t const a = m_palette->pen_indirect(m_helper.pix(y, x));
+
+			if (a == 0)
+				data |= 0x40;
+
+			if (a == 3)
+				data |= 0x80;
+		}
+
+	return data;
+}
+
+
+inline int sprint2_state::get_sprite_code(int n)
+{
+	return m_video_ram[0x398 + 2 * n + 1] >> 3;
+}
+inline int sprint2_state::get_sprite_x(int n)
+{
+	return 2 * (248 - m_video_ram[0x390 + 1 * n]);
+}
+inline int sprint2_state::get_sprite_y(int n)
+{
+	return 1 * (248 - m_video_ram[0x398 + 2 * n]);
+}
+
+
+uint32_t sprint2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(*m_screen, bitmap, cliprect, 0, 0);
+
+	// draw the sprites
+
+	for (int i = 0; i < 4; i++)
+	{
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+			get_sprite_code(i),
+			i,
+			0, 0,
+			get_sprite_x(i),
+			get_sprite_y(i), 0);
+	}
+	return 0;
+}
+
+
+WRITE_LINE_MEMBER(sprint2_state::screen_vblank)
+{
+	// rising edge
+	if (state)
+	{
+		const rectangle &visarea = m_screen->visible_area();
+
+		/*
+		 * Collisions are detected for both player cars:
+		 *
+		 * D7 => m_collision w/ white playfield
+		 * D6 => m_collision w/ black playfield or another car
+		 *
+		 */
+
+		for (int i = 0; i < 2; i++)
+		{
+			rectangle rect(
+					get_sprite_x(i),
+					get_sprite_x(i) + m_gfxdecode->gfx(1)->width() - 1,
+					get_sprite_y(i),
+					get_sprite_y(i) + m_gfxdecode->gfx(1)->height() - 1);
+			rect &= visarea;
+
+			// check for sprite-tilemap collisions
+
+			m_bg_tilemap->draw(*m_screen, m_helper, rect, 0, 0);
+
+			m_gfxdecode->gfx(1)->transpen(m_helper, rect,
+				get_sprite_code(i),
+				0,
+				0, 0,
+				get_sprite_x(i),
+				get_sprite_y(i), 1);
+
+			m_collision[i] |= collision_check(rect);
+
+			// check for sprite-sprite collisions
+
+			for (int j = 0; j < 4; j++)
+				if (j != i)
+				{
+					m_gfxdecode->gfx(1)->transpen(m_helper, rect,
+						get_sprite_code(j),
+						1,
+						0, 0,
+						get_sprite_x(j),
+						get_sprite_y(j), 0);
+				}
+
+			m_gfxdecode->gfx(1)->transpen(m_helper, rect,
+				get_sprite_code(i),
+				0,
+				0, 0,
+				get_sprite_x(i),
+				get_sprite_y(i), 1);
+
+			m_collision[i] |= collision_check(rect);
+		}
+	}
+}
+
+
+// machine
 
 void sprint2_state::machine_start()
 {
@@ -63,7 +322,7 @@ void sprint2_state::init_dominos4()
 
 uint8_t sprint2_state::service_mode()
 {
-	uint8_t v = m_in[1]->read();
+	uint8_t const v = m_in[1]->read();
 
 	if (MACHINE_IS_SPRINT1)
 	{
@@ -90,7 +349,7 @@ INTERRUPT_GEN_MEMBER(sprint2_state::irq)
 	{
 		for (int i = 0; i < 2; i++)
 		{
-			signed char delta = m_dials[i]->read() - m_dial[i];
+			signed char const delta = m_dials[i]->read() - m_dial[i];
 
 			if (delta < 0)
 			{
@@ -140,7 +399,7 @@ uint8_t sprint2_state::dip_r(offs_t offset)
 }
 
 
-uint8_t sprint2_state::input_A_r(offs_t offset)
+uint8_t sprint2_state::input_a_r(offs_t offset)
 {
 	uint8_t val = m_in[0]->read();
 
@@ -158,7 +417,7 @@ uint8_t sprint2_state::input_A_r(offs_t offset)
 }
 
 
-uint8_t sprint2_state::input_B_r(offs_t offset)
+uint8_t sprint2_state::input_b_r(offs_t offset)
 {
 	uint8_t val = m_in[1]->read();
 
@@ -230,8 +489,8 @@ void sprint2_state::main_map(address_map &map)
 	map.global_mask(0x3fff);
 	map(0x0000, 0x03ff).rw(FUNC(sprint2_state::wram_r), FUNC(sprint2_state::wram_w));
 	map(0x0400, 0x07ff).ram().w(FUNC(sprint2_state::video_ram_w)).share(m_video_ram);
-	map(0x0818, 0x081f).r(FUNC(sprint2_state::input_A_r));
-	map(0x0828, 0x082f).r(FUNC(sprint2_state::input_B_r));
+	map(0x0818, 0x081f).r(FUNC(sprint2_state::input_a_r));
+	map(0x0828, 0x082f).r(FUNC(sprint2_state::input_b_r));
 	map(0x0830, 0x0837).r(FUNC(sprint2_state::dip_r));
 	map(0x0840, 0x087f).portr("COIN");
 	map(0x0880, 0x08bf).r(FUNC(sprint2_state::steering_r<0>));
@@ -323,7 +582,7 @@ static INPUT_PORTS_START( sprint2 )
 INPUT_PORTS_END
 
 
-	static INPUT_PORTS_START( sprint1 )
+static INPUT_PORTS_START( sprint1 )
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x00, "Change Track" )          PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, "Every Lap" )
@@ -680,9 +939,12 @@ ROM_START( dominos4 ) // built from original Atari source code
 	ROM_LOAD( "6401-01.e2", 0x0100, 0x0020, CRC(857df8db) SHA1(06313d5bde03220b2bc313d18e50e4bb1d0cfbbb) )  // address
 ROM_END
 
-GAME( 1978, sprint1,  0,       sprint1, sprint1, sprint2_state, init_sprint1, ROT0, "Atari (Kee Games)", "Sprint 1", MACHINE_SUPPORTS_SAVE )
-GAME( 1976, sprint2,  sprint1, sprint2, sprint2, sprint2_state, init_sprint2, ROT0, "Atari (Kee Games)", "Sprint 2 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1976, sprint2a, sprint1, sprint2, sprint2, sprint2_state, init_sprint2, ROT0, "Atari (Kee Games)", "Sprint 2 (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1976, sprint2h, sprint1, sprint2, sprint2, sprint2_state, init_sprint2, ROT0, "hack", "Sprint 2 (color kit, Italy)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // Italian hack, supposedly is color instead of b/w? how?
-GAME( 1977, dominos,  0,       dominos, dominos, sprint2_state, init_dominos, ROT0, "Atari", "Dominos", MACHINE_SUPPORTS_SAVE )
-GAME( 1977, dominos4, dominos, dominos4,dominos4,sprint2_state, init_dominos4,ROT0, "Atari", "Dominos 4 (Cocktail)", MACHINE_SUPPORTS_SAVE )
+} // anonymous namespace
+
+
+GAME( 1978, sprint1,  0,       sprint1, sprint1, sprint2_state, init_sprint1, ROT0, "Atari (Kee Games)", "Sprint 1",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1976, sprint2,  sprint1, sprint2, sprint2, sprint2_state, init_sprint2, ROT0, "Atari (Kee Games)", "Sprint 2 (set 1)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1976, sprint2a, sprint1, sprint2, sprint2, sprint2_state, init_sprint2, ROT0, "Atari (Kee Games)", "Sprint 2 (set 2)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1976, sprint2h, sprint1, sprint2, sprint2, sprint2_state, init_sprint2, ROT0, "hack",              "Sprint 2 (color kit, Italy)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // Italian hack, supposedly is color instead of b/w? how?
+GAME( 1977, dominos,  0,       dominos, dominos, sprint2_state, init_dominos, ROT0, "Atari",             "Dominos",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1977, dominos4, dominos, dominos4,dominos4,sprint2_state, init_dominos4,ROT0, "Atari",             "Dominos 4 (Cocktail)",        MACHINE_SUPPORTS_SAVE )

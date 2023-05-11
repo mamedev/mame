@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<softwarelist name="bungo_flop" description="NEC Bungo disk images">
+
+	<software name="pwp50sx" supported="no">
+		<description>Bungo Utilities (pwp50sx)</description>
+		<year>1991</year>
+		<publisher>NEC</publisher>
+		<notes><![CDATA[
+Font disk: has an extra track with kinky format
+Sample disk: has two sectors broken hence baddump
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Auxiliary Disk" />
+			<dataarea name="flop" size="613572">
+				<rom name="pwp50sx-auxiliary-disk.imd" size="613572" crc="f83c3e57" sha1="c57aa9bb02fbc4be2e4e28de809d1eabe386ac6b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Font Disk" />
+			<dataarea name="flop" size="615616">
+				<rom name="pwp50sx-font-disk.imd" size="615616" crc="11a42466" sha1="16ef33e0d708245a69c6f8fa7b8c6f13b27461dd" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Sample Disk" />
+			<dataarea name="flop" size="707085">
+				<rom name="pwp50sx-sample-disk.imd" size="707085" crc="12f681f4" sha1="8b1a8ad7fd1c4ed08067296ab7d389cf51d94d1b" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Spreadsheet Disk" />
+			<dataarea name="flop" size="185865">
+				<rom name="pwp50sx-spreadsheet-disk.imd" size="185865" crc="3ed7c387" sha1="89972768f57d798597aebaefc938d3ca9ba99351" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="tetris" supported="no">
+		<description>Tetris (Mini5)</description>
+		<!-- Sublicensed by BPS to Tokyo System House, floppy printout reports '90 but internal TETRIS.COM file has August 1991 -->
+		<year>1991</year>
+		<publisher>Tokyo System House</publisher>
+		<notes><![CDATA[
+Has copy protection (non-standard sector sizes)
+https://www.leadedsolder.com/2022/10/20/mini5-tetris-dump.html
+]]></notes>
+		<!-- supported archs according to manual: Mini5R/5RD/5RG/5RX/5RS/5RC/5SX -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="355203">
+				<rom name="mini5-tetris.imd" size="355203" crc="d369f80b" sha1="156a339746057b483e0f104dc69a3bf70cd18a26" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

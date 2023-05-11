@@ -5,8 +5,8 @@
     Meadows S2650 hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_MEADOWS_H
-#define MAME_INCLUDES_MEADOWS_H
+#ifndef MAME_MEADOWS_MEADOWS_H
+#define MAME_MEADOWS_MEADOWS_H
 
 #pragma once
 
@@ -95,4 +95,4 @@ private:
 	void minferno_main_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_MEADOWS_H
+#endif // MAME_MEADOWS_MEADOWS_H

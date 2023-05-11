@@ -13,8 +13,7 @@
 uint32_t copsnrob_state::screen_update_copsnrob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* redrawing the entire display is faster in this case */
-
-	for (int offs = m_videoram.bytes(); offs >= 0; offs--)
+	for (int offs = 0; offs < m_videoram.bytes(); offs++)
 	{
 		int const sx = 31 - (offs % 32);
 		int const sy = offs / 32;

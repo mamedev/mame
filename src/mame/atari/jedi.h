@@ -5,8 +5,8 @@
     Atari Return of the Jedi hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_JEDI_H
-#define MAME_INCLUDES_JEDI_H
+#ifndef MAME_ATARI_JEDI_H
+#define MAME_ATARI_JEDI_H
 
 #pragma once
 
@@ -124,4 +124,4 @@ private:
 	required_memory_bank m_mainbank;
 };
 
-#endif // MAME_INCLUDES_JEDI_H
+#endif // MAME_ATARI_JEDI_H

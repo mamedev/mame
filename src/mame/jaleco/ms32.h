@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood,Paul Priest
-#ifndef MAME_INCLUDES_MS32_H
-#define MAME_INCLUDES_MS32_H
+#ifndef MAME_JALECO_MS32_H
+#define MAME_JALECO_MS32_H
 
 #pragma once
 
@@ -204,4 +204,4 @@ private:
 	tilemap_t* m_extra_tilemap;
 };
 
-#endif // MAME_INCLUDES_MS32_H
+#endif // MAME_JALECO_MS32_H

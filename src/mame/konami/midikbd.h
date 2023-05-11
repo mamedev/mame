@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-#ifndef MAME_MACHINE_MIDIKBD_H
-#define MAME_MACHINE_MIDIKBD_H
+#ifndef MAME_KONAMI_MIDIKBD_H
+#define MAME_KONAMI_MIDIKBD_H
 
 #pragma once
 
@@ -36,4 +36,4 @@ private:
 
 DECLARE_DEVICE_TYPE(MIDI_KBD, midi_keyboard_device)
 
-#endif // MAME_MACHINE_MIDIKBD_H
+#endif // MAME_KONAMI_MIDIKBD_H

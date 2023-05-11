@@ -170,7 +170,7 @@ ROM_START( fruitpc )
 	ROM_REGION32_LE( 0x20000, "bios", 0 )
 	ROM_LOAD( "at-gs001.bin", 0x000000, 0x020000, CRC(7dec34d0) SHA1(81d194d67fef9f6531bd3cd1ee0baacb5c2558bf) )
 
-	DISK_REGION( "ide:0:hdd:image" )    // 8 MB Compact Flash card
+	DISK_REGION( "ide:0:hdd" )    // 8 MB Compact Flash card
 	DISK_IMAGE( "fruit", 0,SHA1(df250ff06a97fa141a4144034f7035ac2947c53c) )
 ROM_END
 

@@ -113,6 +113,8 @@ private:
 
 	uint16_t unk_r(offs_t offset, uint16_t mem_mask = ~0);
 
+	static inline constexpr uint8_t reel_interface_table[4] = {0x0a, 0x09, 0x06, 0x05};//An interface maps the 2-bit values to meaningful Starpoint patterns (Proconn do this too, put in steppers?)
+
 	uint16_t reellamps_0123_r(offs_t offset, uint16_t mem_mask = ~0);
 	void reellamps_0123_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t reellamps_4567_r(offs_t offset, uint16_t mem_mask = ~0);

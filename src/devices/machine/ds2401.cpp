@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "machine/ds2401.h"
 
+#include <cstdarg>
+
 #define VERBOSE_LEVEL 0
 
 inline void ds2401_device::verboselog(int n_level, const char *s_fmt, ...)

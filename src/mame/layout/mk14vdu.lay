@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="0.75" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+	<element name="background">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<group name="lcd">
+		<bounds left="90" top="95" right="494" bottom="195" />
+		<element name="digit7" ref="digit">
+			<bounds left="100" top="105" right="148" bottom="185" />
+		</element>
+		<element name="digit6" ref="digit">
+			<bounds left="148" top="105" right="196" bottom="185" />
+		</element>
+		<element name="digit5" ref="digit">
+			<bounds left="196" top="105" right="244" bottom="185" />
+		</element>
+		<element name="digit4" ref="digit">
+			<bounds left="244" top="105" right="292" bottom="185" />
+		</element>
+		<element name="digit3" ref="digit">
+			<bounds left="292" top="105" right="340" bottom="185" />
+		</element>
+		<element name="digit2" ref="digit">
+			<bounds left="340" top="105" right="388" bottom="185" />
+		</element>
+		<element name="digit1" ref="digit">
+			<bounds left="388" top="105" right="436" bottom="185" />
+		</element>
+		<element name="digit0" ref="digit">
+			<bounds left="436" top="105" right="484" bottom="185" />
+		</element>
+	</group>
+
+	<view name="Default Layout">
+		<!-- Black background -->
+		<element ref="background">
+			<bounds left="0" top="0" right="256" bottom="320" />
+		</element>
+		<screen tag="screen">
+			<bounds left="0" top="0" right="256" bottom="256" />
+		</screen>
+		<group ref="lcd">
+			<bounds left="0" top="256" right="256" bottom="320" />
+		</group>
+	</view>
+</mamelayout>

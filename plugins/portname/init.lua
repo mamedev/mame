@@ -28,7 +28,7 @@ local portname = exports
 
 function portname.startplugin()
 	local json = require("json")
-	local ctrlrpath = emu.subst_env(manager.options.entries.ctrlrpath:value():match("([^;]+)"))
+	local ctrlrpath = manager.options.entries.ctrlrpath:value():match("([^;]+)")
 	local function get_filename(nosoft)
 		local filename
 		if emu.softname() ~= "" and not nosoft then

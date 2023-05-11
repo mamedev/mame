@@ -17,7 +17,7 @@ Sega 2005-2009
 This is a "PC-based" arcade system. Different configurations have different colored boxes.
 The version documented here is the red box. The PC part of it is mostly just the CPU,
 Intel North/South-bridge chipset and AGP/PCI card slots etc. The main board is still
-a typically custom-made Sega arcade PCB using a custom nVIDIA GeForce video card.
+a typically custom-made Sega arcade PCB using a custom nVidia GeForce video card.
 The main board also has a slot for a compact flash card. Primary storage media is HDD.
 Games are installed from a DVD. Both the CF and HDD are locked and unreadable on a regular PC.
 
@@ -369,6 +369,9 @@ Sega 2005
 #include "sound/sb0400.h"
 #include "video/gf7600gs.h"
 
+
+namespace {
+
 class lindbergh_state : public driver_device
 {
 public:
@@ -613,6 +616,9 @@ ROM_START(lbvbiosu)
 	DISK_REGION("dvd")
 	DISK_IMAGE_READONLY("dvp-0021b", 0, SHA1(362ac028ba19ba4762678953a033034a5ee8ad53))
 ROM_END
+
+} // anonymous namespace
+
 
 GAME(1999, lindbios,  0,        lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "Sega Lindbergh Bios",                      MACHINE_IS_BIOS_ROOT)
 GAME(2005, hotd4,     lindbios, lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "The House of the Dead 4 (Export) (Rev B)", MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)

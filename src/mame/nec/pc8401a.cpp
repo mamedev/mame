@@ -21,6 +21,9 @@
     - MC6845 palette
     - MC6845 chargen ROM
     - MC6845 screen update
+    - Merge keyboard with pc8001 / pc8801 / pc88va (same keys, running on a MCU like VA)
+    - PC-8431A FDC is same family as PC-80S31K, basically the 3.5" version of it.
+      Likely none of the available BIOSes fits here.
 
     - peripherals
         * PC-8431A Dual Floppy Drive

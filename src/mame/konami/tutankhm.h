@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Mirko Buffoni
-#ifndef MAME_INCLUDES_TUTANKHM_H
-#define MAME_INCLUDES_TUTANKHM_H
+#ifndef MAME_KONAMI_TUTANKHM_H
+#define MAME_KONAMI_TUTANKHM_H
 
 #pragma once
 
@@ -98,4 +98,4 @@ protected:
 	uint8_t m_stars_blink_state = 0;
 };
 
-#endif // MAME_INCLUDES_TUTANKHM_H
+#endif // MAME_KONAMI_TUTANKHM_H

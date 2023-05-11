@@ -6,8 +6,8 @@
     Williams/Midway Y/Z-unit system
 
 **************************************************************************/
-#ifndef MAME_INCLUDES_MIDYUNIT_H
-#define MAME_INCLUDES_MIDYUNIT_H
+#ifndef MAME_MIDWAY_MIDYUNIT_H
+#define MAME_MIDWAY_MIDYUNIT_H
 
 #pragma once
 
@@ -171,7 +171,8 @@ private:
 
 	void dma_draw(uint16_t command);
 	void init_generic(int bpp, int sound, int prot_start, int prot_end);
+	void install_hidden_ram(mc6809e_device &cpu, int prot_start, int prot_end);
 	void term2_init_common(write16s_delegate hack_w);
 };
 
-#endif // MAME_INCLUDES_MIDYUNIT_H
+#endif // MAME_MIDWAY_MIDYUNIT_H

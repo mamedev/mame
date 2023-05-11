@@ -364,7 +364,7 @@ private:
 	uint8_t corvus_read_firmware_block(uint8_t head, uint8_t sector);
 	uint8_t corvus_write_firmware_block(uint8_t head, uint8_t sector, uint8_t *buffer);
 	uint8_t corvus_format_drive(uint8_t *pattern, uint16_t len);
-	hard_disk_file *corvus_hdc_file(int id);
+	harddisk_image_device *corvus_hdc_file(int id);
 	void corvus_process_command_packet(bool local_invalid_command_flag);
 
 	corvus_cmd_t corvus_cmd[0xf5][0xc1];     // Command sizes and their return sizes

@@ -143,7 +143,7 @@ static const uint16_t overdriv_default_eeprom[64] =
 
 void overdriv_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-//logerror("%s: write %04x to eeprom_w\n",machine().describe_context(),data);
+	//logerror("%s: write %04x to eeprom_w\n",machine().describe_context(),data);
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 is data */
@@ -264,14 +264,12 @@ K053246_CB_MEMBER(overdriv_state::sprite_callback)
 
 K051316_CB_MEMBER(overdriv_state::zoom_callback_1)
 {
-	*flags = (*color & 0x40) ? TILE_FLIPX : 0;
 	*code |= ((*color & 0x03) << 8);
 	*color = m_zoom_colorbase[0] + ((*color & 0x3c) >> 2);
 }
 
 K051316_CB_MEMBER(overdriv_state::zoom_callback_2)
 {
-	*flags = (*color & 0x40) ? TILE_FLIPX : 0;
 	*code |= ((*color & 0x03) << 8);
 	*color = m_zoom_colorbase[1] + ((*color & 0x3c) >> 2);
 }

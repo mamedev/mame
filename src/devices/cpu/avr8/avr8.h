@@ -15,8 +15,6 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class avr8_device;
-
 // ======================> avr8_device
 
 // Used by core CPU interface
@@ -43,6 +41,9 @@ public:
 	// GPIO
 	template<uint8_t Port> auto gpio_out() { return m_gpio_out_cb[Port].bind(); }
 	template<uint8_t Port> auto gpio_in() { return m_gpio_in_cb[Port].bind(); }
+
+	// ADC
+	template<uint8_t Pin> auto adc_in() { return m_adc_in_cb[Pin].bind(); }
 
 protected:
 	avr8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, uint32_t address_mask, address_map_constructor internal_map, int32_t num_timers);
@@ -114,6 +115,19 @@ protected:
 	uint8_t read_gpio(const uint8_t port);
 	devcb_write8::array<11> m_gpio_out_cb;
 	devcb_read8::array<11> m_gpio_in_cb;
+
+	// ADC
+	devcb_read16::array<8> m_adc_in_cb;
+	emu_timer *m_adc_timer;
+	uint16_t m_adc_sample;
+	uint16_t m_adc_result;
+	uint16_t m_adc_data;
+	bool m_adc_first;
+	bool m_adc_hold;
+	void adc_start_conversion();
+	TIMER_CALLBACK_MEMBER(adc_conversion_complete);
+	void change_adcsra(uint8_t data);
+	void change_adcsrb(uint8_t data);
 
 	// SPI
 	bool m_spi_active;
@@ -822,7 +836,8 @@ enum : uint16_t
 	//0x1FF: Reserved
 };
 
-enum : uint8_t {
+enum : uint8_t
+{
 	AVR8_IO_PORTA = 0,
 	AVR8_IO_PORTB,
 	AVR8_IO_PORTC,
@@ -834,6 +849,18 @@ enum : uint8_t {
 	AVR8_IO_PORTJ,
 	AVR8_IO_PORTK,
 	AVR8_IO_PORTL
+};
+
+enum : uint8_t
+{
+	AVR8_ADC_ADC0 = 0,
+	AVR8_ADC_ADC1,
+	AVR8_ADC_ADC2,
+	AVR8_ADC_ADC3,
+	AVR8_ADC_ADC4,
+	AVR8_ADC_ADC5,
+	AVR8_ADC_ADC6,
+	AVR8_ADC_ADC7
 };
 
 enum : uint8_t

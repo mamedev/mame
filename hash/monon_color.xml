@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="monon_color" description="M&amp;D Monon Color cartridges">
   <!-- Cartridges contain a serial flash ROM, and an epoxy blob.

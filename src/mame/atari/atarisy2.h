@@ -8,7 +8,6 @@
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/t11/t11.h"
-#include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "slapstic.h"
 #include "machine/timer.h"

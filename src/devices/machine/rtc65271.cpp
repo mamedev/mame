@@ -219,50 +219,50 @@ bool rtc65271_device::nvram_read(util::read_stream &file)
 	m_regs[reg_D] |= reg_D_VRT; /* the data was backed up successfully */
 	/*m_dirty = false;*/
 
-	{
-		system_time systime;
-
-		/* get the current date/time from the core */
-		machine().current_datetime(systime);
-
-		/* set clock registers */
-		m_regs[reg_second] = systime.local_time.second;
-		m_regs[reg_minute] = systime.local_time.minute;
-		if (m_regs[reg_B] & reg_B_24h)
-			/* 24-hour mode */
-			m_regs[reg_hour] = systime.local_time.hour;
-		else
-		{   /* 12-hour mode */
-			if (systime.local_time.hour >= 12)
-			{
-				m_regs[reg_hour] = 0x80;
-				systime.local_time.hour -= 12;
-			}
-			else
-			{
-				m_regs[reg_hour] = 0;
-			}
-
-			// Firebeat indicates non-BCD 12-hour mode has 0-based hour, so 12 AM is 0x00 and 12 PM is 0x80
-			m_regs[reg_hour] |= systime.local_time.hour; // ? systime.local_time.hour : 12;
-		}
-		m_regs[reg_weekday] = systime.local_time.weekday + 1;
-		m_regs[reg_monthday] = systime.local_time.mday;
-		m_regs[reg_month] = systime.local_time.month + 1;
-		m_regs[reg_year] = systime.local_time.year % 100;
-		if (! (m_regs[reg_B] & reg_B_DM))
-		{   /* BCD mode */
-			m_regs[reg_second] = binary_to_BCD(m_regs[reg_second]);
-			m_regs[reg_minute] = binary_to_BCD(m_regs[reg_minute]);
-			m_regs[reg_hour] = (m_regs[reg_hour] & 0x80) | binary_to_BCD(m_regs[reg_hour] & 0x7f);
-			/*m_regs[reg_weekday] = binary_to_BCD(m_regs[reg_weekday]);*/
-			m_regs[reg_monthday] = binary_to_BCD(m_regs[reg_monthday]);
-			m_regs[reg_month] = binary_to_BCD(m_regs[reg_month]);
-			m_regs[reg_year] = binary_to_BCD(m_regs[reg_year]);
-		}
-	}
-
 	return true;
+}
+
+//-------------------------------------------------
+//  rtc_clock_updated - update clock with real time
+//-------------------------------------------------
+
+void rtc65271_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
+{
+	/* set clock registers */
+	m_regs[reg_second] = second;
+	m_regs[reg_minute] = minute;
+	if (m_regs[reg_B] & reg_B_24h)
+		/* 24-hour mode */
+		m_regs[reg_hour] = hour;
+	else
+	{   /* 12-hour mode */
+		if (hour >= 12)
+		{
+			m_regs[reg_hour] = 0x80;
+			hour -= 12;
+		}
+		else
+		{
+			m_regs[reg_hour] = 0;
+		}
+
+		// Firebeat indicates non-BCD 12-hour mode has 0-based hour, so 12 AM is 0x00 and 12 PM is 0x80
+		m_regs[reg_hour] |= hour; // ? hour : 12;
+	}
+	m_regs[reg_weekday] = day_of_week;
+	m_regs[reg_monthday] = day;
+	m_regs[reg_month] = month;
+	m_regs[reg_year] = year % 100;
+	if (! (m_regs[reg_B] & reg_B_DM))
+	{   /* BCD mode */
+		m_regs[reg_second] = binary_to_BCD(m_regs[reg_second]);
+		m_regs[reg_minute] = binary_to_BCD(m_regs[reg_minute]);
+		m_regs[reg_hour] = (m_regs[reg_hour] & 0x80) | binary_to_BCD(m_regs[reg_hour] & 0x7f);
+		/*m_regs[reg_weekday] = binary_to_BCD(m_regs[reg_weekday]);*/
+		m_regs[reg_monthday] = binary_to_BCD(m_regs[reg_monthday]);
+		m_regs[reg_month] = binary_to_BCD(m_regs[reg_month]);
+		m_regs[reg_year] = binary_to_BCD(m_regs[reg_year]);
+	}
 }
 
 //-------------------------------------------------
@@ -672,6 +672,7 @@ DEFINE_DEVICE_TYPE(RTC65271, rtc65271_device, "rtc65271", "Epson RTC-65271 RTC")
 rtc65271_device::rtc65271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, RTC65271, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
+	, device_rtc_interface(mconfig, *this)
 	, m_interrupt_cb(*this)
 	, m_default_data(*this, DEVICE_SELF)
 {

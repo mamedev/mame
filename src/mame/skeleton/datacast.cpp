@@ -54,6 +54,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class datacast_state : public driver_device
 {
 public:
@@ -250,6 +252,8 @@ ROM_START(datacast)
 	ROM_LOAD16_BYTE("v29.ic9",  0x0000, 0x8000, CRC(650e6d34) SHA1(0c8709ce8220bda5da8fd41b81e531fc6f7b8ee4))
 	ROM_LOAD16_BYTE("v29.ic10", 0x0001, 0x8000, CRC(bd39d683) SHA1(9d6cc2d3d6a26ca35e4e38beac64d31e345d6808))
 ROM_END
+
+} // anonymous namespace
 
 
 //   YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT     CLASS           INIT        COMPANY             FULLNAME                                    FLAGS

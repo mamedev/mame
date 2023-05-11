@@ -10,6 +10,8 @@ local exports = {
 
 local inputmacro = exports
 
+local frame_subscription, stop_subscription
+
 function inputmacro.startplugin()
 	--[[
 	  Configuration data:
@@ -97,7 +99,7 @@ function inputmacro.startplugin()
 		end
 		for key, field in pairs(previous_inputs) do
 			if not active_inputs[key] then
-				field:set_value(0)
+				field:clear_value()
 			end
 		end
 	end
@@ -129,9 +131,9 @@ function inputmacro.startplugin()
 		return menu:populate()
 	end
 
-	emu.register_frame(process_frame)
+	frame_subscription = emu.add_machine_frame_notifier(process_frame)
 	emu.register_prestart(start)
-	emu.register_stop(stop)
+	stop_subscription = emu.add_machine_stop_notifier(stop)
 	emu.register_menu(menu_callback, menu_populate, _p('plugin-inputmacro', 'Input Macros'))
 end
 

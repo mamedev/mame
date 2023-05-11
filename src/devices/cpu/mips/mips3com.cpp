@@ -336,8 +336,10 @@ uint32_t mips3_device::compute_prid_register()
 			return 0x5500;
 
 		case MIPS3_TYPE_R4600:
+			return 0x2020;
+
 		case MIPS3_TYPE_R4650:
-			return 0x2000;
+			return 0x2200;
 
 		case MIPS3_TYPE_R4700:
 			return 0x2100;
@@ -362,6 +364,12 @@ uint32_t mips3_device::compute_prid_register()
 	}
 	// never executed
 	//return 0x2000;
+}
+
+uint32_t mips3_device::compute_fpu_prid_register()
+{
+	/* For most CPUs they are same */
+	return compute_prid_register();
 }
 
 /*-------------------------------------------------
@@ -414,15 +422,15 @@ void mips3_device::tlb_map_entry(int tlbindex)
 		/* valid? */
 		if ((lo & 2) != 0)
 		{
-			flags |= VTLB_FLAG_VALID | VTLB_READ_ALLOWED | VTLB_FETCH_ALLOWED;
+			flags |= FLAG_VALID | READ_ALLOWED | FETCH_ALLOWED;
 
 			/* writable? */
 			if ((lo & 4) != 0)
-				flags |= VTLB_WRITE_ALLOWED;
+				flags |= WRITE_ALLOWED;
 
 			/* mirror the flags for user mode if the VPN is in user space */
 			if (effvpn < (0x80000000 >> MIPS3_MIN_PAGE_SHIFT))
-				flags |= (flags << 4) & (VTLB_USER_READ_ALLOWED | VTLB_USER_WRITE_ALLOWED | VTLB_USER_FETCH_ALLOWED);
+				flags |= (flags << 4) & (USER_READ_ALLOWED | USER_WRITE_ALLOWED | USER_FETCH_ALLOWED);
 		}
 
 		/* load the virtual TLB with the corresponding entries */

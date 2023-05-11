@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <mamelayout version="2">
 
@@ -226,7 +226,7 @@ license:CC0
 		<element ref="static_gray"><bounds x="93" y="-1" width="6" height="143" /></element>
 		<element ref="static_red"><bounds x="98" y="-1" width="132" height="143" /></element>
 
-		<element ref="text_rcom"><bounds x="99" y="11.5" width="128" height="11" /></element>
+		<element ref="text_rcom"><bounds x="99" y="11.75" width="128" height="10.5" /></element>
 
 		<element ref="static_gray2"><bounds x="102" y="28" width="50" height="18" /></element>
 		<element ref="static_red"><bounds x="103" y="29" width="48" height="16" /></element>

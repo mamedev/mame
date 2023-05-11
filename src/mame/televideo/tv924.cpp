@@ -16,6 +16,9 @@
 #include "video/scn2674.h"
 #include "screen.h"
 
+
+namespace {
+
 class tv924_state : public driver_device
 {
 public:
@@ -94,5 +97,8 @@ ROM_START(tv924)
 	ROM_REGION(0x800, "kbdc", 0)
 	ROM_LOAD("d8049hc.bin", 0x000, 0x800, NO_DUMP)
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1984, tv924, 0, 0, tv924, tv924, tv924_state, empty_init, "TeleVideo Systems", "TeleVideo 924 Video Display Terminal", MACHINE_IS_SKELETON)

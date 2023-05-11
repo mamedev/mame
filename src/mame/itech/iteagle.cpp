@@ -112,6 +112,8 @@ www.multitech.com
 #include "screen.h"
 
 
+namespace {
+
 //*************************************
 // Main iteagle driver
 //*************************************
@@ -495,7 +497,7 @@ INPUT_PORTS_END
 ROM_START( iteagle )
 	EAGLE_BIOS
 
-	//DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	//DISK_REGION( PCI_ID_IDE":ide:0:hdd" )
 	//DISK_REGION( PCI_ID_IDE":ide2:1:cdrom" ) // program CD-ROM
 ROM_END
 
@@ -507,7 +509,7 @@ ROM_START( virtpool ) /* On earlier Eagle 1 PCB, possibly a prototype version - 
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "itvp-1.u53", 0x0000, 0x0880, NO_DUMP )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" )
 	DISK_IMAGE( "virtualpool", 0, SHA1(be8f890c33701ca17fab8112ee6cd7b5e435d8cf) ) /* HD hand labeled 3-1-99 V.P. */
 ROM_END
 
@@ -517,7 +519,7 @@ ROM_START( carnking ) /* REQUIRES a "RED" board, will NOT work with earlier gree
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "ck1-us.u53", 0x0000, 0x0880, NO_DUMP )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" )
 	DISK_IMAGE( "carnival_king_v_1.00.11", 0, SHA1(c819af66d36df173ab17bf42f4045c7cca3203d8) ) /* Labeled Carnival King V 1.00.11 */
 ROM_END
 
@@ -527,7 +529,7 @@ ROM_START( gtfore01 )
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "e2-led0.u53", 0x0000, 0x0880, CRC(6ec86dc6) SHA1(01665ad6d92d2b8e917e33ca705fab9258766513) )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" )
 	DISK_IMAGE( "golf_fore_v1.00.25", 0, SHA1(6dc445b982aee3bab93ade5c4f5d148471939ecc) ) /* Build 19:19:59, Sep 11 2000 */
 ROM_END
 
@@ -537,7 +539,7 @@ ROM_START( gtfore02 )
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "g42-us-u.u53", 0x0000, 0x0880, CRC(06e0b452) SHA1(f6b865799cb94941e0e77453b9d556d5988b0194) )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" )
 	DISK_IMAGE( "golf_fore_2002_v2.01.06", 0, SHA1(d1363bc17337c91684148b76fa1e73ac9dd80d8f) ) /* Build 11:27:20, Nov  5 2001 */
 ROM_END
 
@@ -547,7 +549,7 @@ ROM_START( gtfore03 )
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "g43-us-u.u53", 0x0000, 0x0880, CRC(51c6f726) SHA1(9930337315128f89f7202893fb123ee3f0d33649) )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" )
 	DISK_IMAGE( "golf_fore_2003_v3.00.10", 0, SHA1(d789ef86837a5012beb224c487537dd563d93886) ) /* Build 09:36:45, Nov  7 2002 */
 ROM_END
 
@@ -557,7 +559,7 @@ ROM_START( gtfore03a )
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "g43-us-u.u53", 0x0000, 0x0880, CRC(51c6f726) SHA1(9930337315128f89f7202893fb123ee3f0d33649) )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" )
 	DISK_IMAGE( "golf_fore_2003_v3.00.09", 0, SHA1(3c9cf82c3ad87b0d6b5a21089795abd8a08f8dd2) ) /* Build 09:36:45, Oct 17 2002 */
 ROM_END
 
@@ -567,7 +569,7 @@ ROM_START( gtfore04 )
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "g44-us-u.u53", 0x0000, 0x0880, NO_DUMP )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" )
 	DISK_IMAGE( "golf_fore_2004_v4.00.08", 0, SHA1(739a52d6ce13bb6ac7a543ee0e8086fb66be19b9) ) /* Build 14:15:44, Aug 27 2003 - Has been upgraded to Extra */
 ROM_END
 
@@ -577,7 +579,7 @@ ROM_START( gtfore04a )
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "g44-us-u.u53", 0x0000, 0x0880, NO_DUMP )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" )
 	DISK_IMAGE( "golf_fore_2004_v4.00.00", 0, SHA1(fe7525de89d67e0e3d10c48572fd04382543c19f) ) /* Build 16:40:59, Feb 28 2003 */
 ROM_END
 
@@ -587,7 +589,7 @@ ROM_START( gtfore05 )
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "g45-us-u.u53", 0x0000, 0x0880, NO_DUMP )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" )
 	DISK_IMAGE( "golf_fore_2005_v5.01.06", 0, SHA1(fa465263218d8e39102ec81d116c11447ef07e19) ) /* Build 10:55:49, Oct 27 2005 - Has been upgraded to Extra */
 ROM_END
 
@@ -597,7 +599,7 @@ ROM_START( gtfore05a )
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "g45-us-u.u53", 0x0000, 0x0880, NO_DUMP )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" )
 	DISK_IMAGE( "golf_fore_2005_v5.01.02", 0, SHA1(6e20d60fb7e9ab6bf0086267fa5b4329d8a9f468) ) /* Build 15:02:32, Feb 27 2004 - Has been upgraded to Extra */
 ROM_END
 
@@ -607,7 +609,7 @@ ROM_START( gtfore05b )
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "g45-us-u.u53", 0x0000, 0x0880, NO_DUMP )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" )
 	DISK_IMAGE( "golf_fore_2005_v5.01.00", 0, SHA1(d8de569d8cf97b5aaada10ce896eb3c75f1b37f1) ) /* Build 12:30:35, Feb 16 2004 - Has been upgraded to Extra */
 ROM_END
 
@@ -617,7 +619,7 @@ ROM_START( gtfore05c )
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "g45-us-u.u53", 0x0000, 0x0880, NO_DUMP )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" )
 	DISK_IMAGE( "golf_fore_2005_v5.00.00", 0, SHA1(4236f57e639cae2e5a3eaa97fb24f5ff80557e84) ) /* Build 23:15:38, Jan 31 2004 - Has been upgraded to Extra */
 ROM_END
 
@@ -627,7 +629,7 @@ ROM_START( gtfore06 )
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "g4c-us-u.u53", 0x0000, 0x0880, NO_DUMP )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" )
 	DISK_IMAGE( "golf_fore_complete_v6.00.01", 0, SHA1(e902b91bd739daee0b95b10e5cf33700dd63a76b) ) /* Build 09:51:13, Jan 20 2006 */
 ROM_END
 
@@ -637,7 +639,7 @@ ROM_START( bbh )
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "e2-bbh0.u53", 0x0000, 0x0880, NO_DUMP )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" )
 	DISK_IMAGE("bbh_v1.00.14", 0, SHA1(dd56f758c3e421005e06ac24c21d12f0f29b0f44)) /* Build 10:59:51, Feb 25 2003 */
 ROM_END
 
@@ -647,7 +649,7 @@ ROM_START( bbhsc )
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "bb15-us.u53", 0x0000, 0x0880, NO_DUMP )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" )
 	DISK_IMAGE("bbhsc_v1.60.01", 0, SHA1(8554fdd7193ee27c0fe8ca921aa8db9c0378b313)) /* Build 09:50:13, May 29 2002 */
 ROM_END
 
@@ -657,7 +659,7 @@ ROM_START( bbhsca )
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "bb15-us.u53", 0x0000, 0x0880, NO_DUMP )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" )
 	DISK_IMAGE( "bbhsc_v1.50.07_cf", 0, SHA1(21dcf1f7e5ab901ac64e6afb099c35e273b3bf1f) ) /* Build 16:35:34, Feb 26 2002 - 4gb Compact Flash conversion */
 ROM_END
 
@@ -667,7 +669,7 @@ ROM_START( bbh2sp )
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "bbh2-us.u53", 0x0000, 0x0880, NO_DUMP )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" )
 	DISK_IMAGE( "bbh2sp_v2.02.11", 0, SHA1(63e41cca534f4774bfba4b4dda9620fe805029b4) ) /* Build 10:52:30, March 26, 2004 */
 ROM_END
 
@@ -677,7 +679,7 @@ ROM_START( bbh2spa )
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "bbh2-us.u53", 0x0000, 0x0880, NO_DUMP ) /* Build 18:07:45, Sept 15, 2003 */
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" )
 	DISK_IMAGE( "bbh2sp_v2.02.09", 0, SHA1(fac3963b6da35a8c8b00f6826bc10e9c7230b1d6) ) /* Build 18:07:45, Sept 15, 2003 */
 ROM_END
 
@@ -687,7 +689,7 @@ ROM_START( bbh2spb )
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "bbh2-us.u53", 0x0000, 0x0880, NO_DUMP )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" )
 	DISK_IMAGE( "bbh2sp_v2.02.08", 0, SHA1(13b9b4ea0465f55dd1c7bc6e2f962c3c9b9566bd) ) /* Build 09:09:03, July 23, 2003 */
 ROM_END
 
@@ -697,9 +699,12 @@ ROM_START( bbhcotw ) /* This version is meant for 8meg GREEN board PCBs */
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "cw-us-8.u53", 0x0000, 0x0880, CRC(c5234b58) SHA1(fb47b2233147a3f633f01edebef9994c358bd162) )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" )
 	DISK_IMAGE( "bbhcotw_v3.02.05_cf", 0, SHA1(b1fcaab3a5aa51821673a914333c8868d36f77ae) ) /* Build 21:00:39, Sep 10 2006 - 4gb Compact Flash conversion  */
 ROM_END
+
+} // anonymous namespace
+
 
 /*************************************
  *

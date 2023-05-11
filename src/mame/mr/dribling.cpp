@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders: Aaron Giles
+
 /***************************************************************************
 
     Model Racing Dribbling hardware
@@ -34,13 +35,165 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "dribling.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "machine/watchdog.h"
+
+#include "emupal.h"
 #include "screen.h"
 
 
+// configurable logging
+#define LOG_MISC     (1U <<  1)
+#define LOG_SOUND    (1U <<  2)
+#define LOG_PB       (1U <<  3)
+
+//#define VERBOSE (LOG_GENERAL | LOG_MISC | LOG_SOUND | LOG_PB)
+
+#include "logmacro.h"
+
+#define LOGMISC(...)     LOGMASKED(LOG_MISC,     __VA_ARGS__)
+#define LOGSOUND(...)    LOGMASKED(LOG_SOUND,    __VA_ARGS__)
+#define LOGPB(...)       LOGMASKED(LOG_PB,       __VA_ARGS__)
+
+
+namespace {
+
+class dribling_state : public driver_device
+{
+public:
+	dribling_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_watchdog(*this, "watchdog"),
+		m_ppi8255(*this, "ppi8255%d", 0),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_mux(*this, "MUX%u", 0),
+		m_proms(*this, "proms"),
+		m_gfxroms(*this, "gfx")
+	{ }
+
+	void dribling(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
+	required_device_array<i8255_device, 2>  m_ppi8255;
+
+	// memory pointers
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_ioport_array<3> m_mux;
+	required_region_ptr<uint8_t> m_proms;
+	required_region_ptr<uint8_t> m_gfxroms;
+
+	// misc
+	uint8_t m_abca = 0U;
+	uint8_t m_dr = 0U;
+	uint8_t m_ds = 0U;
+	uint8_t m_sh = 0U;
+	uint8_t m_input_mux = 0U;
+	uint8_t m_di = 0U;
+
+	uint8_t ioread(offs_t offset);
+	void iowrite(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	uint8_t dsr_r();
+	uint8_t input_mux0_r();
+	void misc_w(uint8_t data);
+	void sound_w(uint8_t data);
+	void pb_w(uint8_t data);
+	void shr_w(uint8_t data);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(irq_gen);
+	void prg_map(address_map &map);
+	void io_map(address_map &map);
+};
+
+
+// video
+
+/*************************************
+ *
+ *  Convert the palette PROM into
+ *  a real palette
+ *
+ *************************************/
+
+void dribling_state::palette(palette_device &palette) const
+{
+	uint8_t const *const prom = memregion("proms")->base() + 0x400;
+
+	for (int i = 0; i < 256; i++)
+	{
+		int r = (~prom[i] >> 0) & 1;    // 220
+		int g = (~prom[i] >> 1) & 3;    // 820 + 560 (332 max)
+		int b = (~prom[i] >> 3) & 1;    // 220
+
+		r *= 0xff;
+		g *= 0x55;
+		b *= 0xff;
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
+}
+
+
+
+/*************************************
+ *
+ *  Color control writes
+ *
+ *************************************/
+
+void dribling_state::colorram_w(offs_t offset, uint8_t data)
+{
+	// it is very important that we mask off the two bits here
+	m_colorram[offset & 0x1f9f] = data;
+}
+
+
+
+/*************************************
+ *
+ *  Video update routine
+ *
+ *************************************/
+
+uint32_t dribling_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// loop over rows
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		uint16_t *const dst = &bitmap.pix(y);
+
+		// loop over columns
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			int const b7 = m_proms[(x >> 3) | ((y >> 3) << 5)] & 1;
+			int const b6 = m_abca;
+			int const b5 = (x >> 3) & 1;
+			int const b4 = (m_gfxroms[(x >> 3) | (y << 5)] >> (x & 7)) & 1;
+			int const b3 = (m_videoram[(x >> 3) | (y << 5)] >> (x & 7)) & 1;
+			int const b2_0 = m_colorram[(x >> 3) | ((y >> 2) << 7)] & 7;
+
+			// assemble the various bits into a palette PROM index
+			dst[x] = (b7 << 7) | (b6 << 6) | (b5 << 5) | (b4 << 4) | (b3 << 3) | b2_0;
+		}
+	}
+	return 0;
+}
+
+
+// machine
 
 /*************************************
  *
@@ -108,7 +261,7 @@ void dribling_state::misc_w(uint8_t data)
 	// bit 1 = (10) = PC1
 	// bit 0 = (32) = PC0
 	m_input_mux = data & 7;
-	logerror("%s:misc_w(%02X)\n", machine().describe_context(), data);
+	LOGMISC("%s:misc_w(%02X)\n", machine().describe_context(), data);
 }
 
 
@@ -122,14 +275,14 @@ void dribling_state::sound_w(uint8_t data)
 	// bit 2 = folla a (crowd a)
 	// bit 1 = folla m (crowd m)
 	// bit 0 = folla b (crowd b)
-	logerror("%s:sound_w(%02X)\n", machine().describe_context(), data);
+	LOGSOUND("%s:sound_w(%02X)\n", machine().describe_context(), data);
 }
 
 
 void dribling_state::pb_w(uint8_t data)
 {
 	// write PB0-7
-	logerror("%s:pb_w(%02X)\n", machine().describe_context(), data);
+	LOGPB("%s:pb_w(%02X)\n", machine().describe_context(), data);
 }
 
 
@@ -318,10 +471,10 @@ void dribling_state::dribling(machine_config &config)
 ROM_START( dribling )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "5p.bin",  0x0000, 0x1000, CRC(0e791947) SHA1(57bc4f4e9e1fe3fbac1017601c9c75029b2601a4) )
-	ROM_LOAD( "5n.bin",  0x1000, 0x1000, CRC(bd0f223a) SHA1(f9fbc5670a8723c091d61012e545774d315eb18f) ) //
+	ROM_LOAD( "5n.bin",  0x1000, 0x1000, CRC(bd0f223a) SHA1(f9fbc5670a8723c091d61012e545774d315eb18f) )
 	ROM_LOAD( "5l.bin",  0x4000, 0x1000, CRC(1fccfc85) SHA1(c0365ad54144414218f52209173b858b927c9626) )
-	ROM_LOAD( "5k.bin",  0x5000, 0x1000, CRC(737628c4) SHA1(301fda413388c26da5b5150aec2cefc971801749) ) //
-	ROM_LOAD( "5h.bin",  0x6000, 0x1000, CRC(30d0957f) SHA1(52135e12094ee1c8828a48c355bdd565aa5895de) ) //
+	ROM_LOAD( "5k.bin",  0x5000, 0x1000, CRC(737628c4) SHA1(301fda413388c26da5b5150aec2cefc971801749) )
+	ROM_LOAD( "5h.bin",  0x6000, 0x1000, CRC(30d0957f) SHA1(52135e12094ee1c8828a48c355bdd565aa5895de) )
 
 	ROM_REGION( 0x2000, "gfx", 0 )
 	ROM_LOAD( "3p.bin",  0x0000, 0x1000, CRC(208971b8) SHA1(f91f3ea04d75beb58a61c844472b4dba53d84c0f) )
@@ -393,6 +546,8 @@ ROM_START( driblingbr )
 	ROM_LOAD( "63s140-d8.3e", 0x0400, 0x0100, CRC(8f1a9908) SHA1(12c513c589757f1282e9979d3589f9b49d30ec0f) )
 	ROM_LOAD( "tbp24s10.2d",  0x0500, 0x0100, CRC(a17d6956) SHA1(81724daf2e2d319f55cc34cc881b6a9a4e64e7ac) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************************

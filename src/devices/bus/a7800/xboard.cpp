@@ -108,24 +108,24 @@ void a78_xm_device::device_reset()
 
 void a78_xboard_device::device_add_mconfig(machine_config &config)
 {
-	A78_CART_SLOT(config, m_xbslot, a7800_cart, nullptr);
+	A78_CART_SLOT(config, m_xbslot, DERIVED_CLOCK(1, 1), a7800_cart, nullptr);
 
 	SPEAKER(config, "xb_speaker").front_center();
 
-	POKEY(config, m_pokey, XTAL(14'318'181)/8);
+	POKEY(config, m_pokey, DERIVED_CLOCK(1, 1));
 	m_pokey->add_route(ALL_OUTPUTS, "xb_speaker", 1.00);
 }
 
 void a78_xm_device::device_add_mconfig(machine_config &config)
 {
-	A78_CART_SLOT(config, m_xbslot, a7800_cart, nullptr);
+	A78_CART_SLOT(config, m_xbslot, DERIVED_CLOCK(1, 1), a7800_cart, nullptr);
 
 	SPEAKER(config, "xb_speaker").front_center();
 
-	POKEY(config, m_pokey, XTAL(14'318'181)/8);
+	POKEY(config, m_pokey, DERIVED_CLOCK(1, 1));
 	m_pokey->add_route(ALL_OUTPUTS, "xb_speaker", 1.00);
 
-	YM2151(config, m_ym, XTAL(14'318'181)/4).add_route(ALL_OUTPUTS, "xb_speaker", 1.00);
+	YM2151(config, m_ym, DERIVED_CLOCK(2, 1)).add_route(ALL_OUTPUTS, "xb_speaker", 1.00);
 }
 
 

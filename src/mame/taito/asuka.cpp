@@ -1528,6 +1528,62 @@ ROM_START( bonzeadvp ) // Labels consists of hand written checksum values of the
 	ROM_LOAD( "49d7.ic7",   0x60000, 0x20000, CRC(5584c02c) SHA1(00402df66debb257c97a609a37de0f8eeeb6e9f0) ) // ^
 ROM_END
 
+// this prototype seems earlier: Test mode doesn't work properly and main CPU ROMs have strings about 'Rainbow' and 'Jump' instead of 'Fire' and 'Warp'. Remnants from Rainbow Island? Did Taito use it as a start for coding Bonze Adventure?
+ROM_START( bonzeadvp2 ) // only main CPU first 4 ROMs and audio CPU ROM differ from bonzeadvp. Rest is the same but split in smaller chips. All labels handwritten.
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )     // on BV903001B MAIN PCB, 68000 code
+	ROM_LOAD16_BYTE( "prg 0h.ic17",        0x00000, 0x10000, CRC(ce530615) SHA1(23263f5cb5aa28bb8dfae90351c93056f6560fe6) )
+	ROM_LOAD16_BYTE( "prg 0l.ic26",        0x00001, 0x10000, CRC(048a0dcb) SHA1(2b74e8fd1aa9119b528660dc82d5ea3d779f3e7d) )
+	ROM_LOAD16_BYTE( "prg 1h.ic16",        0x20000, 0x10000, CRC(e5d63e9b) SHA1(e9cb0052811098c0f1f97575fd297cf5fde5d480) )
+	ROM_LOAD16_BYTE( "prg 1l europe.ic25", 0x20001, 0x10000, CRC(d04b8e2b) SHA1(0f9f44a76e90c08745481117d2610eb02ea25d99) )
+	// 0x040000 - 0x7ffff is intentionally empty
+	// these ROMs below are on a ROM P.C.BOARD BT203007B
+	ROM_LOAD16_BYTE( "map 0h ad2e.ic7", 0x80000, 0x10000, CRC(ca894028) SHA1(8d650763d7451f3c4e0c84fecee73a6e2b7ce653) )
+	ROM_LOAD16_BYTE( "map 0l 676f.ic2", 0x80001, 0x10000, CRC(956bc558) SHA1(65ef807ce203e542c38da689fd519f97192e1062) )
+	ROM_LOAD16_BYTE( "map 1h 9cbd.ic8", 0xa0000, 0x10000, CRC(08a5320f) SHA1(8ac6b55fb55c5117bb8f980ea7cfa664025d7aa4) )
+	ROM_LOAD16_BYTE( "map 1l 95f6.ic3", 0xa0001, 0x10000, CRC(f65988c0) SHA1(e05764217aa7a8b92a3d03227538d67bb4a994c6) )
+	ROM_LOAD16_BYTE( "map 2h 0e7e.ic9", 0xc0000, 0x10000, CRC(4513dcf7) SHA1(637dc4bc28b054f27e323febc8ac47d9863e5c13) )
+	ROM_LOAD16_BYTE( "map 2l a418.ic4", 0xc0001, 0x10000, CRC(106475e3) SHA1(5a737e933f39a7820300adc8db7f531fd4449b96) )
+	// ic10 and ic5 not populated
+
+	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )  // on BV903001B MAIN PCB, not dumped
+	ROM_LOAD( "generic 10-9 f3eb.ic43", 0x0000, 0x2000, BAD_DUMP CRC(75c52553) SHA1(87bbaefab90e7d43f63556fbae3e937baf9d397b) ) // actually 汎用 on label (translated as 'generic').
+	// Is the C-Chip the same as the final? Probably not as SUM doesn't match
+
+	ROM_REGION( 0x80000, "tc0100scn", ROMREGION_ERASEFF ) // on a second ROM P.C.BOARD BT203007B
+	ROM_LOAD16_BYTE( "scn 0h 8711.ic7", 0x00000, 0x10000, CRC(17466da0) SHA1(1de9cc4bcbfa50d6c40d1acd4ac0a47c705e2f09) )
+	ROM_LOAD16_BYTE( "scn 0l 7fe0.ic2", 0x00001, 0x10000, CRC(c6413f92) SHA1(ac8b1cfc3ba140a68192df1de6750998f5e357a0) )
+	ROM_LOAD16_BYTE( "scn 1h 83b7.ic8", 0x20000, 0x10000, CRC(35fde3c7) SHA1(b6caddff84e607b5ca2dd021151def80ff051f41) )
+	ROM_LOAD16_BYTE( "scn 1l 2bde.ic3", 0x20001, 0x10000, CRC(ca459623) SHA1(b071e672df6872fa777d1baae663ec85f92ec728) )
+	ROM_LOAD16_BYTE( "scn 2h f411.ic9", 0x40000, 0x10000, CRC(229debcf) SHA1(ea99d0ea0169b72109b830cd335a43eb122c0e34) )
+	ROM_LOAD16_BYTE( "scn 2l db08.ic4", 0x40001, 0x10000, CRC(2431e8db) SHA1(1773f0dfe59c4cb9b114a784f345b7fc05bb8934) )
+	// ic10 and ic5 not populated
+
+	ROM_REGION( 0x80000, "pc090oj", 0 ) // on a third ROM P.C.BOARD BT203007B
+	ROM_LOAD16_BYTE( "obj 0h 6ce2.ic7",  0x00000, 0x10000, CRC(d5bff0fd) SHA1(c4998a788c48371d0f83ebec8987b584c5e94d1a) )
+	ROM_LOAD16_BYTE( "obj 0l c67e.ic2",  0x00001, 0x10000, CRC(2f9615a8) SHA1(d89f122ce4af193f56560f5183993e242b22551c) ) // actual SUM of the dump is c672, but given data matches the other existing dumps the one on the label is probably a typo
+	ROM_LOAD16_BYTE( "obj 1h 7708.ic8",  0x20000, 0x10000, CRC(81357279) SHA1(241954743238815a18598d76d96a8a312e087351) ) // actual SUM of the dump is 770b, but given data matches the other existing dumps the one on the label is probably a typo
+	ROM_LOAD16_BYTE( "obj 1l ccf7.ic3",  0x20001, 0x10000, CRC(c7a654d9) SHA1(58b7e5e2e05f7980ad199083b31b5c406b99298e) )
+	ROM_LOAD16_BYTE( "obj 2h 818b.ic9",  0x40000, 0x10000, CRC(d614732b) SHA1(0bfa5dd2876a3480d4f5f3e2baeb94e9601a691a) )
+	ROM_LOAD16_BYTE( "obj 2l 6096.ic4",  0x40001, 0x10000, CRC(6dd67af8) SHA1(7d9d836d0aee2d3d636f28af84bf5f04fc54db74) )
+	ROM_LOAD16_BYTE( "obj 3h 3756.ic10", 0x60000, 0x10000, CRC(981e66a9) SHA1(98db800e99a2508fbe05a8bf12617abd18721f4b) )
+	ROM_LOAD16_BYTE( "obj 3l a355.ic5",  0x60001, 0x10000, CRC(173ddd11) SHA1(c28fd4f728066f7926752f9af1115bc90ce838fc) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // on BV903001B MAIN PCB
+	ROM_LOAD( "sound main 3-9.ic20", 0x00000, 0x10000, CRC(2b4fc69a) SHA1(030ba4eb81c59174527edcda65f2ed94bd768140) ) // actual label is 3/9 instead of 3-9, possibly a date?
+
+	// no ADPCM-A samples
+
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 ) // on KE7X0003B 4M 8BIT ROM BOARD, // actual label is 3/8 instead of 3-8, possibly a date?
+	ROM_LOAD( "sound 0h 3-8.ic2",  0x00000, 0x10000, CRC(2996e756) SHA1(b6fa6f20bdecb1e6ed7166083c9581f8f97f9836) )
+	ROM_LOAD( "sound 1h 3-8.ic3",  0x10000, 0x10000, CRC(780368ac) SHA1(bc5592fbefa310b1c496b4a9f60e29cb1efa9070) )
+	ROM_LOAD( "sound 2h 3-8.ic4",  0x20000, 0x10000, CRC(8f3b9fa5) SHA1(c4d536af730336b70813653e3b216f7ca9518909) )
+	ROM_LOAD( "sound 3h 3-8.ic5",  0x30000, 0x10000, CRC(1a8be621) SHA1(410a4f93e95f1824643ee918a06fb8c3ac93765d) )
+	ROM_LOAD( "sound 0l 3-8.ic7",  0x40000, 0x10000, CRC(3711abfa) SHA1(35237b13b201f2883bc969ebbb51f7e112f0eb35) )
+	ROM_LOAD( "sound 1l 3-8.ic8",  0x50000, 0x10000, CRC(f24a3d1a) SHA1(c2d8a8e4835429b7830dad5a8d3cdf1afe21b7d6) )
+	ROM_LOAD( "sound 2l 3-8.ic9",  0x60000, 0x10000, CRC(5987900c) SHA1(1109e48d196b3ed5788326df235f1ad950492d17) )
+	ROM_LOAD( "sound 3l 3-8.ic10", 0x70000, 0x10000, CRC(e8a6a9e6) SHA1(435a599d188f6c4650bd3dd72d8080541824148d) )
+ROM_END
+
 ROM_START( asuka ) // Taito PCB: ASKA&ASKA - K1100388A / J1100169A
 	ROM_REGION( 0x100000, "maincpu", 0 )     // 1024k for 68000 code
 	ROM_LOAD16_BYTE( "b68-13.ic23", 0x00000, 0x20000, CRC(855efb3e) SHA1(644e02e207adeaec7839c824688d88ab8d046418) )
@@ -2105,11 +2161,12 @@ void base_state::init_earthjkr()
 } // Anonymous namespace
 
 
-GAME( 1988, bonzeadv,  0,        bonzeadv, bonzeadv,  bonzeadv_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, Newer)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, bonzeadvo, bonzeadv, bonzeadv, bonzeadv,  bonzeadv_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, Older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bonzeadv,  0,        bonzeadv, bonzeadv,  bonzeadv_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, newer)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bonzeadvo, bonzeadv, bonzeadv, bonzeadv,  bonzeadv_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, older)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, bonzeadvu, bonzeadv, bonzeadv, jigkmgri,  bonzeadv_state, empty_init,    ROT0,   "Taito America Corporation", "Bonze Adventure (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, jigkmgri,  bonzeadv, bonzeadv, jigkmgri,  bonzeadv_state, empty_init,    ROT0,   "Taito Corporation",         "Jigoku Meguri (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, bonzeadvp, bonzeadv, bonzeadv, jigkmgri,  bonzeadv_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bonzeadvp, bonzeadv, bonzeadv, jigkmgri,  bonzeadv_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, prototype, newer)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bonzeadvp2,bonzeadv, bonzeadv, jigkmgri,  bonzeadv_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, prototype, older)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1988, asuka,     0,        asuka,    asuka,     msm_state,      empty_init,    ROT270, "Taito Corporation",         "Asuka & Asuka (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, asukaj,    asuka,    asuka,    asuka,     msm_state,      empty_init,    ROT270, "Taito Corporation",         "Asuka & Asuka (Japan, version 1)", MACHINE_SUPPORTS_SAVE )

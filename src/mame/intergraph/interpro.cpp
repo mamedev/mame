@@ -243,7 +243,7 @@
 #include "machine/upd765.h"
 #include "machine/i82586.h"
 
-#include "machine/ncr5390.h"
+#include "machine/ncr53c90.h"
 #include "machine/nscsi_bus.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
@@ -1126,7 +1126,7 @@ static void interpro_scsi_devices(device_slot_interface &device)
 
 void interpro_state::interpro_scsi_adapter(device_t *device)
 {
-	ncr5390_device &adapter = downcast<ncr5390_device &>(*device);
+	ncr53c90_device &adapter = downcast<ncr53c90_device &>(*device);
 
 	adapter.set_clock(24_MHz_XTAL);
 

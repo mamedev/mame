@@ -1,0 +1,590 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="background">
+		<rect>
+			<color red="0.12" green="0.10" blue="0.05" />
+		</rect>
+	</element>
+
+	<element name="inset-background">
+		<rect><color red="0.05" green="0.05" blue="0.05" /></rect>
+	</element>
+
+	<element name="led" defstate="0">
+		<led7seg><color red="1.0" green="0.0" blue="0.0" /></led7seg>
+	</element>
+
+	<element name="button-text-separator-blue">
+		<rect><color red="0.13" green="0.65" blue="0.9" /></rect>
+	</element>
+
+	<element name="button-text-separator-brown">
+		<rect><color red="0.72" green="0.48" blue="0.33" /></rect>
+	</element>
+
+	<element name="button-membrane-green" defstate="0">
+		<rect state="0"><color red="0" green="0.8" blue="0.75" /></rect>
+		<rect state="1"><color red="0" green="0.7" blue="0.6" /></rect>
+	</element>
+
+	<element name="button-membrane-red" defstate="0">
+		<rect><color red="1.0" green="0" blue="0" /></rect>
+	</element>
+
+	<element name="button-membrane-blue" defstate="0">
+		<rect><color red="0.13" green="0.65" blue="0.9" /></rect>
+	</element>
+
+	<element name="button-membrane-brown" defstate="0">
+		<rect><color red="0.72" green="0.48" blue="0.33" /></rect>
+	</element>
+
+	<!-- Main Button Labels -->
+	<element name="button-text-store"><text align="1" string="STORE" /></element>
+	<element name="button-text-function"><text align="1" string="FUNCTION" /></element>
+	<element name="button-text-edit"><text align="1" string="EDIT / COMPARE" /></element>
+	<element name="button-text-memory"><text align="1" string="MEMORY SELECT" /></element>
+
+	<!-- Up/Down Yes/No Button Labels -->
+	<element name="button-text-no"><text align="1" string="NO" /></element>
+	<element name="button-text-off"><text align="1" string="OFF" /></element>
+	<element name="button-text-yes"><text align="1" string="YES" /></element>
+	<element name="button-text-on"><text align="1" string="ON" /></element>
+	<element name="button-text-plus"><text align="1" string="+1" /></element>
+	<element name="button-text-minus"><text align="1" string="-1" /></element>
+
+	<!-- Numeric Button Label Numbers -->
+	<element name="button-number-1"><text align="1" string="1" /></element>
+	<element name="button-number-2"><text align="1" string="2" /></element>
+	<element name="button-number-3"><text align="1" string="3" /></element>
+	<element name="button-number-4"><text align="1" string="4" /></element>
+	<element name="button-number-5"><text align="1" string="5" /></element>
+	<element name="button-number-6"><text align="1" string="6" /></element>
+	<element name="button-number-7"><text align="1" string="7" /></element>
+	<element name="button-number-8"><text align="1" string="8" /></element>
+	<element name="button-number-9"><text align="1" string="9" /></element>
+	<element name="button-number-10"><text align="1" string="10" /></element>
+	<element name="button-number-11"><text align="1" string="11" /></element>
+	<element name="button-number-12"><text align="1" string="12" /></element>
+	<element name="button-number-13"><text align="1" string="13" /></element>
+	<element name="button-number-14"><text align="1" string="14" /></element>
+	<element name="button-number-15"><text align="1" string="15" /></element>
+	<element name="button-number-16"><text align="1" string="16" /></element>
+	<element name="button-number-17"><text align="1" string="17" /></element>
+	<element name="button-number-18"><text align="1" string="18" /></element>
+	<element name="button-number-19"><text align="1" string="19" /></element>
+	<element name="button-number-20"><text align="1" string="20" /></element>
+
+	<!-- Button Labels Row 1 Top -->
+	<element name="button-text-operator-copy">
+		<text align="1" string="OPERATOR ON-OFF/EG COPY">
+			<color red="0.13" green="0.65" blue="0.9" />
+		</text>
+	</element>
+
+	<element name="button-text-operator-1">
+		<text align="1" string="1"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-operator-2">
+		<text align="1" string="2"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-operator-3">
+		<text align="1" string="3"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-operator-4">
+		<text align="1" string="4"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-algorithm">
+		<text align="1" string="ALGORITHM"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-feedback">
+		<text align="1" string="/FEEDBACK"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-lfo">
+		<text align="1" string="LFO"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-lfo-wave">
+		<text align="1" string="WAVE"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-lfo-speed">
+		<text align="1" string="SPEED"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-lfo-delay">
+		<text align="1" string="DELAY"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-lfo-pmd">
+		<text align="1" string="PMD/AMD"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-mod-sens">
+		<text align="1" string="MOD SENS"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-pitch-amp">
+		<text align="1" string="PITCH/AMP"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<!-- Button Labels Row 1 Bottom -->
+	<element name="button-text-master">
+		<text align="1" string="MASTER"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-tune-adj">
+		<text align="1" string="TUNE ADJ"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-poly">
+		<text align="1" string="POLY/MONO"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-pitch-bend">
+		<text align="1" string="PITCH BEND"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-pitch-bend-range">
+		<text align="1" string="RANGE"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-portamento">
+		<text align="1" string="PORTAMENTO"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-portamento-mode">
+		<text align="1" string="MODE"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-portamento-time">
+		<text align="1" string="TIME"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-cassette">
+		<text align="1" string="CASSETTE"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-cassette-save">
+		<text align="1" string="SAVE/VERIFY"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-cassette-load">
+		<text align="1" string="LOAD"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-cassette-load-single">
+		<text align="1" string="LOAD SINGLE"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-cassette-remote">
+		<text align="1" string="REMOTE"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<!-- Labels Row 2 Top -->
+	<element name="button-text-operator">
+		<text align="1" string="OPERATOR"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+	<element name="button-text-select">
+		<text align="1" string="SELECT"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-oscillator">
+		<text align="1" string="OSCILLATOR"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-oscillator-frequency">
+		<text align="1" string="FREQUENCY"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-oscillator-coarse">
+		<text align="1" string="COARSE"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-oscillator-fine">
+		<text align="1" string="FINE"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-oscillator-detune">
+		<text align="1" string="DETUNE"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-oscillator-sync">
+		<text align="1" string="SYNC"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-eg">
+		<text align="1" string="EG"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-rate">
+		<text align="1" string="RATE"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-level">
+		<text align="1" string="LEVEL"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-scaling">
+		<text align="1" string="KEYBOARD SCALING"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-output">
+		<text align="1" string="OUTPUT"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-key">
+		<text align="1" string="KEY"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-transpose">
+		<text align="1" string="TRANSPOSE"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<!-- Button Labels Row 2 Bottom -->
+	<element name="button-text-modulation-wheel">
+		<text align="1" string="MODULATION WHEEL"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-modulation-range">
+		<text align="1" string="RANGE"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-modulation-pitch">
+		<text align="1" string="PITCH"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-modulation-amplitude">
+		<text align="1" string="AMPLITUDE"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-modulation-bias">
+		<text align="1" string="EG BIAS"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-breath-control">
+		<text align="1" string="BREATH CONTROL"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-edit-recall">
+		<text align="1" string="EDIT RECALL"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-voice-init">
+		<text align="1" string="/ VOICE INIT"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-memory-protect">
+		<text align="1" string="MEMORY"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-protect">
+		<text align="1" string="PROTECT"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<group name="group-screen-inset">
+		<element ref="inset-background">
+			<bounds x="0" y="0" width="400" height="80" />
+		</element>
+		<screen index="0">
+			<bounds x="172" y="20" width="160" height="40" />
+		</screen>
+		<element ref="led" name="led_0">
+			<bounds x="48" y="20" width="32" height="40" />
+		</element>
+		<element ref="led" name="led_1">
+			<bounds x="80" y="20" width="32" height="40" />
+		</element>
+	</group>
+
+	<group name="front-panel-buttons-main">
+		<!-- Main buttons -->
+		<element ref="button-text-store"><bounds x="0" y="0" width="72" height="16" /></element>
+		<element ref="button-membrane-red" inputtag="KEY_SWITCH_INPUT.0" inputmask="0x04">
+			<bounds x="0" y="16" width="72" height="32" />
+		</element>
+
+		<element ref="button-text-function"><bounds x="80" y="0" width="72" height="16" /></element>
+		<element ref="button-membrane-brown" inputtag="KEY_SWITCH_INPUT.0" inputmask="0x10">
+			<bounds x="80" y="16" width="72" height="32" />
+		</element>
+
+		<element ref="button-text-edit"><bounds x="0" y="64" width="72" height="16" /></element>
+		<element ref="button-membrane-blue" inputtag="KEY_SWITCH_INPUT.0" inputmask="0x20">
+			<bounds x="0" y="80" width="72" height="32" />
+		</element>
+
+		<element ref="button-text-memory"><bounds x="80" y="64" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.0" inputmask="0x40">
+			<bounds x="80" y="80" width="72" height="32" />
+		</element>
+	</group>
+
+	<group name="front-panel-buttons-up-down">
+		<element ref="button-text-no"><bounds x="0" y="0" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.0" inputmask="0x2">
+			<bounds x="0" y="16" width="72" height="32" />
+		</element>
+		<element ref="button-text-minus"><bounds x="4" y="22" width="18" height="18" /></element>
+		<element ref="button-text-off"><bounds x="0" y="48" width="72" height="16" /></element>
+
+		<element ref="button-text-yes"><bounds x="80" y="0" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.0" inputmask="0x1">
+			<bounds x="80" y="16" width="72" height="32" />
+		</element>
+		<element ref="button-text-plus"><bounds x="84" y="22" width="18" height="18" /></element>
+		<element ref="button-text-on"><bounds x="80" y="48" width="72" height="16" /></element>
+	</group>
+
+	<!-- Numeric Buttons Row 1 -->
+	<group name="front-panel-buttons-numeric-row-1">
+		<!-- Button 1 -->
+		<element ref="button-text-operator-copy"><bounds x="0" y="0" width="128" height="16" /></element>
+		<element ref="button-text-separator-blue"><bounds x="0" y="16" width="312" height="1" /></element>
+		<element ref="button-text-operator-1"><bounds x="0" y="16" width="10" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.1" inputmask="0x01">
+			<bounds x="0" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-1"><bounds x="4" y="38" width="10" height="18" /></element>
+		<element ref="button-text-master"><bounds x="0" y="64" width="72" height="16" /></element>
+		<element ref="button-text-tune-adj"><bounds x="0" y="76" width="72" height="16" /></element>
+
+		<!-- Button 2 -->
+		<element ref="button-text-operator-2"><bounds x="80" y="16" width="10" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.1" inputmask="0x02">
+			<bounds x="80" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-2"><bounds x="84" y="38" width="10" height="18" /></element>
+		<element ref="button-text-poly"><bounds x="80" y="64" width="72" height="16" /></element>
+
+		<!-- Button 3 -->
+		<element ref="button-text-operator-3"><bounds x="160" y="16" width="10" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.1" inputmask="0x04">
+			<bounds x="160" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-3"><bounds x="164" y="38" width="10" height="18" /></element>
+		<element ref="button-text-pitch-bend"><bounds x="160" y="64" width="72" height="16" /></element>
+		<element ref="button-text-pitch-bend-range"><bounds x="160" y="76" width="72" height="16" /></element>
+
+		<!-- Button 4 -->
+		<element ref="button-text-operator-4"><bounds x="240" y="16" width="10" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.1" inputmask="0x08">
+			<bounds x="240" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-4"><bounds x="244" y="38" width="10" height="18" /></element>
+		<element ref="button-text-portamento-mode"><bounds x="240" y="64" width="72" height="16" /></element>
+		<element ref="button-text-separator-brown"><bounds x="240" y="80" width="152" height="1" /></element>
+		<element ref="button-text-portamento"><bounds x="240" y="80" width="72" height="16" /></element>
+
+		<!-- Button 5 -->
+		<element ref="button-text-algorithm"><bounds x="320" y="4" width="72" height="16" /></element>
+		<element ref="button-text-feedback"><bounds x="320" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.1" inputmask="0x10">
+			<bounds x="320" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-5"><bounds x="324" y="38" width="10" height="18" /></element>
+		<element ref="button-text-portamento-time"><bounds x="320" y="64" width="72" height="16" /></element>
+
+		<!-- Button 6 -->
+		<element ref="button-text-lfo"><bounds x="400" y="0" width="72" height="16" /></element>
+		<element ref="button-text-separator-blue"><bounds x="400" y="16" width="312" height="1" /></element>
+		<element ref="button-text-lfo-wave"><bounds x="400" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.1" inputmask="0x20">
+			<bounds x="400" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-6"><bounds x="404" y="38" width="10" height="18" /></element>
+
+		<!-- Button 7 -->
+		<element ref="button-text-lfo-speed"><bounds x="480" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.1" inputmask="0x40">
+			<bounds x="480" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-7"><bounds x="484" y="38" width="10" height="18" /></element>
+		<element ref="button-text-cassette-save"><bounds x="480" y="64" width="72" height="16" /></element>
+		<element ref="button-text-separator-brown"><bounds x="480" y="80" width="312" height="1" /></element>
+		<element ref="button-text-cassette"><bounds x="480" y="80" width="72" height="16" /></element>
+
+		<!-- Button 8 -->
+		<element ref="button-text-lfo-delay"><bounds x="560" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.1" inputmask="0x80">
+			<bounds x="560" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-8"><bounds x="564" y="38" width="10" height="18" /></element>
+		<element ref="button-text-cassette-load"><bounds x="560" y="64" width="72" height="16" /></element>
+
+		<!-- Button 9 -->
+		<element ref="button-text-lfo-pmd"><bounds x="640" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.2" inputmask="0x1">
+			<bounds x="640" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-9"><bounds x="644" y="38" width="10" height="18" /></element>
+		<element ref="button-text-cassette-load-single"><bounds x="640" y="64" width="72" height="16" /></element>
+
+		<!-- Button 10 -->
+		<element ref="button-text-mod-sens"><bounds x="720" y="0" width="72" height="16" /></element>
+		<element ref="button-text-separator-blue"><bounds x="720" y="16" width="72" height="1" /></element>
+		<element ref="button-text-pitch-amp"><bounds x="720" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.2" inputmask="0x2">
+			<bounds x="720" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-10"><bounds x="724" y="38" width="18" height="18" /></element>
+		<element ref="button-text-cassette-remote"><bounds x="720" y="64" width="72" height="16" /></element>
+	</group>
+
+	<!-- Numeric Buttons Row 2 -->
+	<group name="front-panel-buttons-numeric-row-2">
+		<!-- Button 11 -->
+		<element ref="button-text-operator"><bounds x="0" y="0" width="72" height="16" /></element>
+		<element ref="button-text-select"><bounds x="0" y="12" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.2" inputmask="0x04">
+			<bounds x="0" y="48" width="72" height="32" />
+		</element>
+		<element ref="button-number-11"><bounds x="4" y="52" width="18" height="18" /></element>
+		<element ref="button-text-modulation-range"><bounds x="0" y="80" width="72" height="16" /></element>
+		<element ref="button-text-separator-brown"><bounds x="0" y="96" width="312" height="1" /></element>
+		<element ref="button-text-modulation-wheel"><bounds x="0" y="96" width="150" height="16" /></element>
+
+		<!-- Button 12 -->
+		<element ref="button-text-oscillator"><bounds x="80" y="0" width="72" height="16" /></element>
+		<element ref="button-text-separator-blue"><bounds x="80" y="16" width="230" height="1" /></element>
+		<element ref="button-text-oscillator-frequency"><bounds x="80" y="16" width="72" height="16" /></element>
+		<element ref="button-text-oscillator-coarse"><bounds x="80" y="28" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.2" inputmask="0x08">
+			<bounds x="80" y="48" width="72" height="32" />
+		</element>
+		<element ref="button-number-12"><bounds x="84" y="52" width="18" height="18" /></element>
+		<element ref="button-text-modulation-pitch"><bounds x="80" y="80" width="72" height="16" /></element>
+
+		<!-- Button 13 -->
+		<element ref="button-text-oscillator-frequency"><bounds x="160" y="16" width="72" height="16" /></element>
+		<element ref="button-text-oscillator-fine"><bounds x="160" y="28" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.2" inputmask="0x10">
+			<bounds x="160" y="48" width="72" height="32" />
+		</element>
+		<element ref="button-number-13"><bounds x="164" y="52" width="18" height="18" /></element>
+		<element ref="button-text-modulation-amplitude"><bounds x="160" y="80" width="72" height="16" /></element>
+
+		<!-- Button 14 -->
+		<element ref="button-text-oscillator-detune"><bounds x="240" y="16" width="72" height="16" /></element>
+		<element ref="button-text-oscillator-sync"><bounds x="240" y="28" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.2" inputmask="0x20">
+			<bounds x="240" y="48" width="72" height="32" />
+		</element>
+		<element ref="button-number-14"><bounds x="244" y="52" width="18" height="18" /></element>
+		<element ref="button-text-modulation-bias"><bounds x="240" y="80" width="72" height="16" /></element>
+
+		<!-- Button 15 -->
+		<element ref="button-text-eg"><bounds x="320" y="0" width="72" height="16" /></element>
+		<element ref="button-text-separator-blue"><bounds x="320" y="16" width="152" height="1" /></element>
+		<element ref="button-text-rate"><bounds x="320" y="28" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.2" inputmask="0x40">
+			<bounds x="320" y="48" width="72" height="32" />
+		</element>
+		<element ref="button-number-15"><bounds x="324" y="52" width="18" height="18" /></element>
+		<element ref="button-text-modulation-range"><bounds x="320" y="80" width="72" height="16" /></element>
+		<element ref="button-text-separator-brown"><bounds x="320" y="96" width="312" height="1" /></element>
+		<element ref="button-text-breath-control"><bounds x="320" y="96" width="150" height="16" /></element>
+
+		<!-- Button 16 -->
+		<element ref="button-text-level"><bounds x="400" y="28" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.2" inputmask="0x80">
+			<bounds x="400" y="48" width="72" height="32" />
+		</element>
+		<element ref="button-number-16"><bounds x="404" y="52" width="18" height="18" /></element>
+		<element ref="button-text-modulation-pitch"><bounds x="400" y="80" width="72" height="16" /></element>
+
+		<!-- Button 17 -->
+		<element ref="button-text-scaling"><bounds x="480" y="0" width="150" height="16" /></element>
+		<element ref="button-text-separator-blue"><bounds x="480" y="16" width="152" height="1" /></element>
+		<element ref="button-text-rate"><bounds x="480" y="28" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.3" inputmask="0x02">
+			<bounds x="480" y="48" width="72" height="32" />
+		</element>
+		<element ref="button-number-17"><bounds x="484" y="52" width="18" height="18" /></element>
+		<element ref="button-text-modulation-amplitude"><bounds x="480" y="80" width="72" height="16" /></element>
+
+		<!-- Button 18 -->
+		<element ref="button-text-level"><bounds x="560" y="28" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.3" inputmask="0x04">
+			<bounds x="560" y="48" width="72" height="32" />
+		</element>
+		<element ref="button-number-18"><bounds x="564" y="52" width="18" height="18" /></element>
+		<element ref="button-text-modulation-bias"><bounds x="560" y="80" width="72" height="16" /></element>
+
+		<!-- Button 19 -->
+		<element ref="button-text-operator"><bounds x="640" y="0" width="72" height="16" /></element>
+		<element ref="button-text-separator-blue"><bounds x="640" y="16" width="72" height="1" /></element>
+		<element ref="button-text-output"><bounds x="640" y="16" width="72" height="16" /></element>
+		<element ref="button-text-level"><bounds x="640" y="28" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.3" inputmask="0x08">
+			<bounds x="640" y="48" width="72" height="32" />
+		</element>
+		<element ref="button-number-19"><bounds x="644" y="52" width="18" height="18" /></element>
+		<element ref="button-text-edit-recall"><bounds x="640" y="80" width="72" height="16" /></element>
+		<element ref="button-text-voice-init"><bounds x="640" y="92" width="72" height="16" /></element>
+
+		<!-- Button 20 -->
+		<element ref="button-text-key"><bounds x="720" y="16" width="72" height="16" /></element>
+		<element ref="button-text-transpose"><bounds x="720" y="28" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="KEY_SWITCH_INPUT.3" inputmask="0x10">
+			<bounds x="720" y="48" width="72" height="32" />
+		</element>
+		<element ref="button-number-20"><bounds x="724" y="52" width="18" height="18" /></element>
+		<element ref="button-text-memory-protect"><bounds x="720" y="80" width="72" height="16" /></element>
+		<element ref="button-text-protect"><bounds x="720" y="92" width="72" height="16" /></element>
+	</group>
+
+	<element name="logo-yamaha">
+		<text align="1" string="YAMAHA DX9" />
+	</element>
+	<element name="logo-digital">
+		<text align="1" string="DIGITAL PROGRAMMABLE ALGORITHM SYNTHESIZER" />
+	</element>
+
+	<group name="group-interface">
+		<group ref="group-screen-inset">
+			<bounds x="368" y="24" width="400" height="80" />
+		</group>
+
+		<group ref="front-panel-buttons-main">
+			<bounds x="168" y="0" width="152" height="112" />
+		</group>
+
+		<group ref="front-panel-buttons-up-down">
+			<bounds x="0" y="64" width="152" height="64" />
+		</group>
+
+		<group ref="front-panel-buttons-numeric-row-1">
+			<bounds x="0" y="192" width="792" height="96" />
+		</group>
+
+		<group ref="front-panel-buttons-numeric-row-2">
+			<bounds x="0" y="320" width="792" height="112" />
+		</group>
+	</group>
+
+	<view name="Standard">
+		<element ref="background">
+			<bounds x="0" y="0" width="824" height="520" />
+		</element>
+		<element ref="logo-yamaha">
+			<bounds x="16" y="16" width="128" height="32" />
+		</element>
+		<element ref="logo-digital">
+			<bounds x="16" y="48" width="256" height="16"/>
+		</element>
+
+		<group ref="group-interface">
+			<bounds x="16" y="72" width="792" height="432"/>
+		</group>
+	</view>
+</mamelayout>

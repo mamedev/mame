@@ -120,7 +120,7 @@ void cyberbal_state::p2_reset_w(uint16_t data)
 void cyberbal_state::main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0xfc0000, 0xfc0fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
+	map(0xfc0000, 0xfc03ff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0xfc8000, 0xfcffff).r(m_sac, FUNC(atari_sac_device::main_response_r)).umask16(0xff00);
 	map(0xfd0000, 0xfd1fff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0xfd2000, 0xfd3fff).w(m_sac, FUNC(atari_sac_device::sound_reset_w));
@@ -147,6 +147,7 @@ void cyberbal_state::tournament_map(address_map &map)
 {
 	main_map(map);
 	map(0x018000, 0x019fff).mirror(0x6000).bankr(m_slapstic_bank);
+	map(0xfc0000, 0xfc0fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 }
 
 
@@ -343,7 +344,7 @@ GFXDECODE_END
  *
  *************************************/
 
-void cyberbal_state::cyberbal_base(machine_config &config)
+void cyberbal_state::cyberbal(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 14.318181_MHz_XTAL/2);
@@ -353,6 +354,8 @@ void cyberbal_state::cyberbal_base(machine_config &config)
 	m_extracpu->set_addrmap(AS_PROGRAM, &cyberbal_state::extra_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
+
+	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(cyberbal_state::scanline_update), m_lscreen, 0, 8);
 
@@ -408,17 +411,10 @@ void cyberbal_state::cyberbal_base(machine_config &config)
 	m_sac->add_route(1, "rspeaker", 1.0);
 }
 
-void cyberbal_state::cyberbal(machine_config &config)
-{
-	cyberbal_base(config);
-
-	EEPROM_2804(config, "eeprom").lock_after_write(true);
-}
-
 void cyberbal_state::cyberbalt(machine_config &config)
 {
-	cyberbal_base(config);
-	EEPROM_2816(config, "eeprom").lock_after_write(true);
+	cyberbal(config);
+	EEPROM_2816(config.replace(), "eeprom").lock_after_write(true);
 
 	SLAPSTIC(config, m_slapstic, 116);
 	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x18000, 0x1ffff, 0);

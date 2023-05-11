@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_B2M_H
-#define MAME_INCLUDES_B2M_H
+#ifndef MAME_USSR_B2M_H
+#define MAME_USSR_B2M_H
 
 #pragma once
 
@@ -93,4 +93,4 @@ private:
 	optional_device<pic8259_device> m_pic;
 };
 
-#endif // MAME_INCLUDES_B2M_H
+#endif // MAME_USSR_B2M_H

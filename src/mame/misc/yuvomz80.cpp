@@ -40,6 +40,9 @@ Yuvo PCI117B - I/O board
 - connectors and ttl chips
 */
 
+
+namespace {
+
 class yuvomz80_state : public driver_device
 {
 public:
@@ -162,6 +165,9 @@ ROM_START( hexaprsz )
 	ROM_LOAD( "ghp_pcm-a_ver.1.01.ic12",  0x00000, 0x80000, CRC(08de888b) SHA1(a6b68accb136481f45b65eab33e0bab5212a1daf) )
 	ROM_LOAD( "ghp_pcm-b_ver.1.01.ic13",  0x80000, 0x80000, CRC(161838c9) SHA1(52b9c324b01702c1164a462af371d82e8c2eea43) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1995, hexaprs,  0,       hexaprs,  hexaprs, yuvomz80_state, empty_init, ROT0, "Yuvo / Yubis", "Hexa President (YM2610 set)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1995, hexaprsz, hexaprs, hexaprsz, hexaprs, yuvomz80_state, empty_init, ROT0, "Yuvo / Yubis", "Hexa President (YMZ280B set)", MACHINE_IS_SKELETON_MECHANICAL )

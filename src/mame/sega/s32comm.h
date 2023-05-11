@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ariane Fugmann
-#ifndef MAME_MACHINE_S32COMM_H
-#define MAME_MACHINE_S32COMM_H
+#ifndef MAME_SEGA_S32COMM_H
+#define MAME_SEGA_S32COMM_H
 
 #pragma once
 
@@ -89,4 +89,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(S32COMM, s32comm_device)
 
-#endif // MAME_MACHINE_S32COMM_H
+#endif // MAME_SEGA_S32COMM_H

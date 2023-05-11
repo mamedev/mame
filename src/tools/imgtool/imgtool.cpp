@@ -19,6 +19,7 @@
 #include "corestr.h"
 #include "opresolv.h"
 #include "path.h"
+#include "strformat.h"
 
 #include <cstdarg>
 #include <cstdio>

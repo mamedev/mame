@@ -11,6 +11,8 @@
 #include "bus/neogeo/prot_pvc.h"
 
 
+namespace {
+
 class neopcb_state : public ngarcade_base_state
 {
 public:
@@ -555,6 +557,8 @@ void neopcb_state::init_kf2k3pcb()
 
 	m_maincpu->space(AS_PROGRAM).install_rom(0xc00000, 0xc7ffff, 0x080000, memregion("mainbios")->base());  // 512k bios
 }
+
+} // anonymous namespace
 
 
 GAME( 2003, ms5pcb,     0,        neopcb,   dualbios, neopcb_state, init_ms5pcb,   ROT0, "SNK Playmore", "Metal Slug 5 (JAMMA PCB)", MACHINE_SUPPORTS_SAVE )

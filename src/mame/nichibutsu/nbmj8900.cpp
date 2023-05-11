@@ -4,7 +4,7 @@
 
     nbmj8900 - Nichibutsu Mahjong games for years 1989
 
-    Driver by Takahiro Nogi <nogi@kt.rim.or.jp> 2007/05/13 -
+    Driver by Takahiro Nogi 2007/05/13 -
 
 ******************************************************************************/
 /******************************************************************************
@@ -311,7 +311,8 @@ void nbmj8900_state::ohpaipee(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &nbmj8900_state::ohpaipee_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(nbmj8900_state::irq0_line_hold));
 
-	NB1413M3(config, m_nb1413m3, 0, NB1413M3_OHPAIPEE);
+	NB1413M3(config, m_nb1413m3, 0, nb1413m3_device::NB1413M3_OHPAIPEE);
+	m_nb1413m3->set_blitter_rom_tag("gfx");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -340,7 +341,7 @@ void nbmj8900_state::togenkyo(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8900_state::togenkyo_map);
 
-	m_nb1413m3->set_type(NB1413M3_TOGENKYO);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_TOGENKYO);
 }
 
 

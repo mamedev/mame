@@ -28,12 +28,14 @@
 
 #include "megacdcd.h"
 
-#include "imagedev/chd_cd.h"
+#include "imagedev/cdromimg.h"
 #include "machine/74259.h"
 #include "machine/nvram.h"
 
 #include "softlist.h"
 
+
+namespace {
 
 // was it actually released in eu / asia?
 #define NEOCD_REGION_ASIA 3 // IronClad runs with a darkened screen (MVS has the same issue)
@@ -1117,6 +1119,8 @@ void ngcd_state::init_neocdzj()
 {
 	m_system_region = NEOCD_REGION_JAPAN;
 }
+
+} // anonymous namespace
 
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT   CLASS        INIT          COMPANY FULLNAME               FLAGS */

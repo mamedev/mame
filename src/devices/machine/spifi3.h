@@ -15,12 +15,12 @@
  * In its current state, this driver is unlikely to work out of the box with any other machines.
  *
  * Register definitions were derived from the NetBSD source code, copyright (c) 2000 Tsubai Masanari.
- * SCSI state machine code was derived from the MAME NCR5390 driver, copyright (c) Olivier Galibert
+ * SCSI state machine code was derived from the MAME NCR53C90 driver, copyright (c) Olivier Galibert
  *
  * References:
  * - https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/apbus/spifireg.h
  * - https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/apbus/spifi.c
- * - https://github.com/mamedev/mame/blob/master/src/devices/machine/ncr5390.cpp
+ * - https://github.com/mamedev/mame/blob/master/src/devices/machine/ncr53c90.cpp
  */
 
 #ifndef MAME_MACHINE_SPIFI3_H

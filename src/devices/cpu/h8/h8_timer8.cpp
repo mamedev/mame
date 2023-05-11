@@ -65,73 +65,73 @@ void h8_timer8_channel_device::set_extra_clock_bit(bool bit)
 
 void h8_timer8_channel_device::update_tcr()
 {
-	char buf[4096];
-	char *p = buf;
+	std::ostringstream message;
 	switch(tcr & TCR_CKS) {
 	case 0:
 		clock_type = STOPPED;
 		clock_divider = 0;
-		if(V>=1) p += sprintf(p, "clock stopped");
+		if(V>=1) message << "clock stopped";
 		break;
 
 	case 1: case 2: case 3:
 		clock_type = DIV;
 		clock_divider = div_tab[((tcr & TCR_CKS)-1)*2 + extra_clock_bit];
-		if(V>=1) p += sprintf(p, "clock %dHz", cpu->clock()/clock_divider);
+		if(V>=1) util::stream_format(message, "clock %dHz", cpu->clock()/clock_divider);
 		break;
 
 	case 4:
 		clock_type = chain_type;
 		clock_divider = 0;
-		if(V>=1) p += sprintf(p, "clock chained %s", clock_type == CHAIN_A ? "tcora" : "overflow");
+		if(V>=1) util::stream_format(message, "clock chained %s", clock_type == CHAIN_A ? "tcora" : "overflow");
 		break;
 
 	case 5:
 		clock_type = INPUT_UP;
 		clock_divider = 0;
-		if(V>=1) p += sprintf(p, "clock external raising edge");
+		if(V>=1) message << "clock external raising edge";
 		break;
 
 	case 6:
 		clock_type = INPUT_DOWN;
 		clock_divider = 0;
-		if(V>=1) p += sprintf(p, "clock external falling edge");
+		if(V>=1) message << "clock external falling edge";
 		break;
 
 	case 7:
 		clock_type = INPUT_UPDOWN;
 		clock_divider = 0;
-		if(V>=1) p += sprintf(p, "clock external both edges");
+		if(V>=1) message << "clock external both edges";
 		break;
 	}
 
 	switch(tcr & TCR_CCLR) {
 	case 0x00:
 		clear_type = CLEAR_NONE;
-		if(V>=1) p += sprintf(p, ", no clear");
+		if(V>=1) message << ", no clear";
 		break;
 
 	case 0x08:
 		clear_type = CLEAR_A;
-		if(V>=1) p += sprintf(p, ", clear on tcora");
+		if(V>=1) message << ", clear on tcora";
 		break;
 
 	case 0x10:
 		clear_type = CLEAR_B;
-		if(V>=1) p += sprintf(p, ", clear on tcorb");
+		if(V>=1) message << ", clear on tcorb";
 		break;
 
 	case 0x18:
 		clear_type = CLEAR_EXTERNAL;
-		if(V>=1) p += sprintf(p, ", clear on external");
+		if(V>=1) message << ", clear on external";
 		break;
 	}
 
-	if(V>=1) p += sprintf(p, ", irq=%c%c%c\n",
+	if(V>=1) util::stream_format(message, ", irq=%c%c%c\n",
 						tcr & TCR_CMIEB ? 'b' : '-',
 						tcr & TCR_CMIEA ? 'a' : '-',
 						tcr & TCR_OVIE  ? 'o' : '-');
-	logerror(buf);
+
+	logerror(std::move(message).str());
 }
 
 uint8_t h8_timer8_channel_device::tcsr_r()

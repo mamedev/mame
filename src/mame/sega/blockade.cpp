@@ -24,6 +24,8 @@
 #include "blockade.lh"
 
 
+namespace {
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -579,6 +581,8 @@ ROM_START( mineswpr4 )
 	ROM_LOAD_NIB_HIGH("mineswee.cms", 0x000, 0x200, CRC(aad3ce0c) SHA1(92257706ae0c9c1a258eed3311116063e647e1ae))
 	ROM_LOAD_NIB_LOW( "mineswee.cls", 0x000, 0x200, CRC(70959755) SHA1(f62d448742da3fae8bbd96eb3a2714db500cecce))
 ROM_END
+
+} // anonymous namespace
 
 
 //**************************************************************************

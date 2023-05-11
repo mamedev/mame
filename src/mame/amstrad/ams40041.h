@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
 
-#ifndef MAME_VIDEO_AMS40041_H
-#define MAME_VIDEO_AMS40041_H
+#ifndef MAME_AMSTRAD_AMS40041_H
+#define MAME_AMSTRAD_AMS40041_H
 
 #pragma once
 
@@ -67,4 +67,4 @@ private:
 // device type declaration
 DECLARE_DEVICE_TYPE(AMS40041, ams40041_device)
 
-#endif // MAME_VIDEO_AMS40041_H
+#endif // MAME_AMSTRAD_AMS40041_H

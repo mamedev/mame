@@ -54,6 +54,8 @@ ICS8080
 #include "tk80.lh"
 
 
+namespace {
+
 class tk80_state : public driver_device
 {
 public:
@@ -416,6 +418,8 @@ ROM_START( nd80z )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "ndf.bin",  0x0000, 0x0800, CRC(fe829f1d) SHA1(6fff31884b8d984076d4450ca3a3e48efadeb648))
 ROM_END
+
+} // anonymous namespace
 
 
 /* Driver */

@@ -55,6 +55,8 @@
 #include "vt100.lh"
 
 
+namespace {
+
 class vt100_state : public driver_device
 {
 public:
@@ -69,7 +71,8 @@ public:
 		m_rstbuf(*this, "rstbuf"),
 		m_rs232(*this, "rs232"),
 		m_printer_uart(*this, "printuart"),
-		m_p_ram(*this, "p_ram")
+		m_p_ram(*this, "p_ram"),
+		m_phosphor(*this, "phosphor")
 	{
 	}
 
@@ -90,6 +93,8 @@ private:
 	required_device<rs232_port_device> m_rs232;
 	optional_device<ins8250_device> m_printer_uart;
 	required_shared_ptr<u8> m_p_ram;
+
+	required_ioport m_phosphor;
 
 	u8 flags_r();
 	u8 modem_r();
@@ -230,10 +235,27 @@ void vt100_state::vt102_io(address_map &map)
 
 /* Input ports */
 static INPUT_PORTS_START( vt100 )
+	PORT_START("phosphor")
+	PORT_CONFNAME(0x03, 0x00, "Phosphor Color")
+	PORT_CONFSETTING(0x00, "Green")
+	PORT_CONFSETTING(0x01, "Amber")
+	PORT_CONFSETTING(0x02, "White")
 INPUT_PORTS_END
 
 u32 vt100_state::screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	switch (m_phosphor->read())
+	{
+		case 0x00:
+			screen.set_color(rgb_t::green());
+			break;
+		case 0x01:
+			screen.set_color(rgb_t::amber());
+			break;
+		case 0x02:
+			screen.set_color(rgb_t::white());
+			break;
+	}
 	m_crtc->video_update(bitmap, cliprect);
 	return 0;
 }
@@ -863,6 +885,9 @@ ROM_START( vt180 )
 	ROM_LOAD( "23-021e3-00.bin", 0x0000, 0x1000, CRC(a2a575d2) SHA1(47a2c40aaec89e8476240f25515d75ab157f2911))
 	ROM_LOAD( "23-017e3-00.bin", 0x1000, 0x1000, CRC(4bdd2398) SHA1(84f288def6c143a2d2ed9dedf947c862c66bb18e))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

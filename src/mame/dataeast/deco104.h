@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_MACHINE_DECO104_H
-#define MAME_MACHINE_DECO104_H
+#ifndef MAME_DATAEAST_DECO104_H
+#define MAME_DATAEAST_DECO104_H
 
 #pragma once
 
@@ -22,4 +22,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(DECO104PROT, deco104_device)
 
-#endif // MAME_MACHINE_DECO104_H
+#endif // MAME_DATAEAST_DECO104_H

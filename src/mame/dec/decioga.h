@@ -6,8 +6,8 @@
 *
 *
 */
-#ifndef MAME_MACHINE_DECIOGA_H
-#define MAME_MACHINE_DECIOGA_H
+#ifndef MAME_DEC_DECIOGA_H
+#define MAME_DEC_DECIOGA_H
 
 #pragma once
 
@@ -59,4 +59,4 @@ private:
 
 DECLARE_DEVICE_TYPE(DECSTATION_IOGA, dec_ioga_device)
 
-#endif // MAME_MACHINE_DECIOGA_H
+#endif // MAME_DEC_DECIOGA_H

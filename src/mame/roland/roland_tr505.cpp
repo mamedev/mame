@@ -16,6 +16,9 @@
 //#include "machine/nvram.h"
 //#include "video/upd7227.h"
 
+
+namespace {
+
 class roland_tr505_state : public driver_device
 {
 public:
@@ -68,5 +71,8 @@ ROM_START(tr505)
 	ROM_REGION(0x20000, "mac", 0)
 	ROM_LOAD("tr-505_rawromdump.bin", 0x00000, 0x20000, CRC(2234c834) SHA1(6441d3e7b53aff4511b23021dc854b7a5cc57689)) // TC531000P
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1986, tr505, 0, 0, tr505, tr505, roland_tr505_state, empty_init, "Roland", "TR-505 Rhythm Composer", MACHINE_IS_SKELETON)

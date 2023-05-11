@@ -81,6 +81,8 @@ JMON ToDo:
 #include "tec1.lh"
 
 
+namespace {
+
 class tec1_state : public driver_device
 {
 public:
@@ -404,6 +406,9 @@ ROM_START(tecjmon)
 	ROM_LOAD("jmon.rom",    0x0000, 0x0800, CRC(202c47a2) SHA1(701588ec5640d633d90d94b2ccd6f65422e19a70) )
 	ROM_LOAD("util.rom",    0x0800, 0x0800, CRC(7c19700d) SHA1(dc5b3ade66bb11c54430056966ed99cdd299d82b) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                         FULLNAME            FLAGS
 COMP( 1984, tec1,     0,      0,      tec1,    tec1,  tec1_state, empty_init, "Talking Electronics magazine", "TEC-1",            MACHINE_SUPPORTS_SAVE )

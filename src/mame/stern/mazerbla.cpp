@@ -116,6 +116,9 @@ video z80
 #include "speaker.h"
 
 
+
+namespace {
+
 #define MASTER_CLOCK XTAL(4'000'000)
 #define SOUND_CLOCK XTAL(14'318'181)
 
@@ -1202,6 +1205,9 @@ void mazerbla_state::init_greatgun()
 	rom[0x037f] = 0;
 	rom[0x0380] = 0;
 }
+
+} // anonymous namespace
+
 
 GAME( 1983, mazerbla,  0,        mazerbla,  mazerbla, mazerbla_state, init_mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, mazerblaa, mazerbla, mazerbla,  mazerblaa,mazerbla_state, init_mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // newer?

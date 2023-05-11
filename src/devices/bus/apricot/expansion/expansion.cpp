@@ -78,7 +78,6 @@ apricot_expansion_bus_device::apricot_expansion_bus_device(const machine_config 
 
 apricot_expansion_bus_device::~apricot_expansion_bus_device()
 {
-	m_dev.detach_all();
 }
 
 //-------------------------------------------------
@@ -103,7 +102,7 @@ void apricot_expansion_bus_device::device_start()
 void apricot_expansion_bus_device::add_card(device_apricot_expansion_card_interface *card)
 {
 	card->set_bus_device(this);
-	m_dev.append(*card);
+	m_dev.emplace_back(*card);
 }
 
 // callbacks from slot device to the host
@@ -137,8 +136,7 @@ void apricot_expansion_bus_device::install_ram(offs_t addrstart, offs_t addrend,
 
 device_apricot_expansion_card_interface::device_apricot_expansion_card_interface(const machine_config &mconfig, device_t &device) :
 	device_interface(device, "apricotexp"),
-	m_bus(nullptr),
-	m_next(nullptr)
+	m_bus(nullptr)
 {
 }
 

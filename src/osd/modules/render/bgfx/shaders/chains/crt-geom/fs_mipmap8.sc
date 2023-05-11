@@ -22,7 +22,7 @@ uniform vec4 u_smooth;
 const vec2 v05 = vec2(0.5,0.5);
 
 // pix has integer coordinates -> average four pixels using bilinear filtering
-vec3 sample_screen(vec2 pix)
+vec4 sample_screen(vec2 pix)
 {
   vec2 border = step(-0.5, u_tex_size0.xy - pix);
   float weight = border.x * border.y;
@@ -34,12 +34,12 @@ vec3 sample_screen(vec2 pix)
   border = clamp(u_tex_size0.xy-x,0.0,1.0);
   weight *= border.x * border.y;
 
-  vec3 tex = texture2D(s_screen, x / u_tex_size0.xy).rgb;
+  vec4 tex = texture2D(s_screen, x / u_tex_size0.xy);
 
-  return tex * vec3_splat(weight);
+  return tex * vec4_splat(weight);
 }
 
-vec3 sample_mipmap(vec2 pix, vec2 offset, vec2 size)
+vec4 sample_mipmap(vec2 pix, vec2 offset, vec2 size)
 {
   vec2 border = step(-0.5, size - pix) * step(-0.5, pix);
   float weight = border.x * border.y;
@@ -51,9 +51,9 @@ vec3 sample_mipmap(vec2 pix, vec2 offset, vec2 size)
   border = clamp(size-x,0.0,1.0);
   weight *= border.x * border.y;
 
-  vec3 tex = texture2D(s_mipmap, (x + offset) / u_tex_size0.xy).rgb;
+  vec4 tex = texture2D(s_mipmap, (x + offset) / u_tex_size0.xy);
 
-  return tex * vec3_splat(weight);
+  return tex * vec4_splat(weight);
 }
 
 void main()
@@ -66,7 +66,7 @@ void main()
     // sample 4x4 grid
     // each sample uses bilinear filtering to average a 2x2 region
     // overall reduction by 8x8
-    vec3 tex = ( sample_screen(x + vec2(-3.0,-3.0))
+    vec4 tex = ( sample_screen(x + vec2(-3.0,-3.0))
                + sample_screen(x + vec2(-3.0,-1.0))
                + sample_screen(x + vec2(-3.0, 1.0))
                + sample_screen(x + vec2(-3.0, 3.0))
@@ -113,7 +113,7 @@ void main()
     if (fc)
       x = vec2(4.0,4.0);
 
-    vec3 tex = ( sample_mipmap(x + vec2(-3.0,-3.0),offset0,newsize)
+    vec4 tex = ( sample_mipmap(x + vec2(-3.0,-3.0),offset0,newsize)
                + sample_mipmap(x + vec2(-3.0,-1.0),offset0,newsize)
                + sample_mipmap(x + vec2(-3.0, 1.0),offset0,newsize)
                + sample_mipmap(x + vec2(-3.0, 3.0),offset0,newsize)
@@ -133,16 +133,16 @@ void main()
     if (fc) { // this sample yields average over the whole screen
       // apply a compensation for the zeros included in the 8^n average
       float f = fac*fac / (u_tex_size0.x * u_tex_size0.y);
-      vec3 col = tex * vec3_splat(f);
+      vec4 col = tex * vec4_splat(f);
       if (v_texCoord.y * u_tex_size1.y < ( offset0.y + u_tex_size1.y ) * 0.5) {
-        gl_FragColor = vec4(col,1.0);
+        gl_FragColor = col;
       } else {
         // we are near (1,1): in this region include the temporal filter
         vec4 old = texture2D(s_mipmap, v_texCoord.xy);
-        gl_FragColor = vec4(mix(col,old.rgb,u_smooth.x),1.0);
+        gl_FragColor = mix(col,old,u_smooth.x);
       }
     } else {
-      gl_FragColor = vec4(tex.rgb,1.0);
+      gl_FragColor = tex;
     }
   }
 }

@@ -46,6 +46,9 @@ A1                   2101            2101
 
 #include "ace.lh"
 
+
+namespace {
+
 static constexpr XTAL MASTER_CLOCK = 18_MHz_XTAL;
 
 
@@ -362,6 +365,8 @@ ROM_START( ace )
 	ROM_REGION( 0x0200, "gfx1", 0 )
 	ROM_LOAD( "ace.k4",     0x0000, 0x0200, CRC(daa05ec6) SHA1(8b71ffb802293dc93f6b492ff128a704e676a5fd) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAMEL(1976, ace, 0, ace, ace, aceal_state, empty_init, ROT0, "Allied Leisure", "Ace", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND, layout_ace )

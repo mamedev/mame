@@ -2,8 +2,6 @@
 // copyright-holders:Nathan Woods
 /*********************************************************************
 
-    m6809inl.h
-
     Portable 6809 emulator - Inline functions for the purposes of
     optimization
 

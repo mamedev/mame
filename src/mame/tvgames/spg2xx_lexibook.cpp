@@ -9,6 +9,8 @@
 #include "spg2xx.h"
 
 
+namespace {
+
 class spg2xx_lexizeus_game_state : public spg2xx_game_state
 {
 public:
@@ -413,6 +415,8 @@ ROM_START( vgcap35 )
 	ROM_LOAD16_WORD_SWAP( "vgpocket.bin", 0x0000000, 0x1000000, CRC(b4dd781b) SHA1(b060c83c2f96a2b78f075d1c8143f654016ff0ec) )
 	ROM_RELOAD(0x1000000,0x1000000)
 ROM_END
+
+} // anonymous namespace
 
 
 // these all have the same ROM scrambling

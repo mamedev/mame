@@ -1,8 +1,8 @@
 // license:LGPL-2.1+
 // copyright-holders:Angelo Salese, Olivier Galibert, David Haywood, Samuele Zannoli, R. Belmont, ElSemi
 
-#ifndef MAME_INCLUDES_DC_H
-#define MAME_INCLUDES_DC_H
+#ifndef MAME_SEGA_DC_H
+#define MAME_SEGA_DC_H
 
 #pragma once
 
@@ -284,4 +284,4 @@ protected:
 #define IST_ERR_ISP_LIMIT        0x00000004
 #define IST_ERR_PVRIF_ILL_ADDR   0x00000040
 
-#endif // MAME_INCLUDES_DC_H
+#endif // MAME_SEGA_DC_H

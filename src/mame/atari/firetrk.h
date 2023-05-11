@@ -5,8 +5,8 @@
 Atari Fire Truck + Super Bug + Monte Carlo driver
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_FIRETRK_H
-#define MAME_INCLUDES_FIRETRK_H
+#ifndef MAME_ATARI_FIRETRK_H
+#define MAME_ATARI_FIRETRK_H
 
 #pragma once
 
@@ -179,4 +179,4 @@ DISCRETE_SOUND_EXTERN( firetrk_discrete );
 DISCRETE_SOUND_EXTERN( superbug_discrete );
 DISCRETE_SOUND_EXTERN( montecar_discrete );
 
-#endif // MAME_INCLUDES_FIRETRK_H
+#endif // MAME_ATARI_FIRETRK_H

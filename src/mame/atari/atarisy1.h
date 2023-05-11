@@ -5,8 +5,8 @@
     Atari System 1 hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_ATARISY1_H
-#define MAME_INCLUDES_ATARISY1_H
+#ifndef MAME_ATARI_ATARISY1_H
+#define MAME_ATARI_ATARISY1_H
 
 #pragma once
 
@@ -164,4 +164,4 @@ public:
 	virtual void update_timers(int scanline) override;
 };
 
-#endif // MAME_INCLUDES_ATARISY1_H
+#endif // MAME_ATARI_ATARISY1_H

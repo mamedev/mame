@@ -6,7 +6,7 @@
     originally written for AGEMAME by J.Wallace, enhanced by D.Haywood
 
     This is a primitive handler for generating reels with multiple symbols visible
-    hanging off steppers.c .
+    hanging off steppers.cpp .
 
     TODO: Add any lamping persistance simulations we need.
 

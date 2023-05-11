@@ -527,8 +527,37 @@ ROM_START( discoboyp ) // all ROMs had PROMAT stickers but copyright in the game
 	ROM_LOAD( "discob.u49",   0x0c0000, 0x40000, CRC(9f884db4) SHA1(fd916b0ac54961bbd9b3f23d3ee5d35d747cbf17) )
 ROM_END
 
+ROM_START( djgirl ) // all ROMs had PROMAT stickers but the game displays no copyright string. DJ Girl only used on title screen, still Disco Boy after coin-up and in-game.
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "djgirl.u2",  0x00000, 0x10000, CRC(95912ee3) SHA1(0e3dba93de550f2af7978af324b0ab514e44ebd1) )
+	ROM_LOAD( "djgirl.u18", 0x10000, 0x20000, CRC(05f0daaf) SHA1(8691e0afff069a589a4601fe08f96f93c3773c7d) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )
+	ROM_LOAD( "djgirl.u28",  0x00000, 0x10000, CRC(7c2ed174) SHA1(ace209dc4cc7a4ffca062842defd84cefc5b10d2) )
+	ROM_LOAD( "djgirl.u45",  0x10000, 0x10000, CRC(c266c6df) SHA1(f76e38ded43f56a486cf6569c679ddb57a4165fb) )
+
+	ROM_REGION( 0x100000, "sprites", ROMREGION_INVERT )
+	ROM_LOAD( "djgirl.u94",   0x00000, 0x10000, CRC(c436f1e5) SHA1(511e23b85f1b4fc732bd9648c0582848c20e6378) )
+	ROM_LOAD( "djgirl.u124",  0x10000, 0x40000, CRC(0b0bf653) SHA1(ce609e9ee270eda6e74612ed5334fd6c3c81ef18) )
+	ROM_LOAD( "djgirl.u95",   0x80000, 0x10000, CRC(ddea540e) SHA1(b69b94409bb15174f7780c637b183a2563c3d6c3) )
+	ROM_LOAD( "djgirl.u125",  0x90000, 0x40000, CRC(fcac2cb8) SHA1(cb629b28acbb3ab42572b52ee85bf18a556b8e24) )
+
+	ROM_REGION( 0x40000, "bgtiles", ROMREGION_INVERT )
+	ROM_LOAD( "djgirl.u80",   0x000000, 0x10000, CRC(74f18c8b) SHA1(af6fb8927a8b8b85b65259bcd0d6f29e3c72b66b) )
+	ROM_LOAD( "djgirl.u81",   0x010000, 0x10000, CRC(077ccd1c) SHA1(43fc03bf88f35804069be843f6df9be74ea905c7) )
+	ROM_LOAD( "djgirl.u78",   0x020000, 0x10000, CRC(746bcf74) SHA1(597a8ce18c2a9dd04d9d3999fe0721d491726c38) )
+	ROM_LOAD( "djgirl.u79",   0x030000, 0x10000, CRC(a17e04f8) SHA1(94bb0f958c83f8287b9a83858c153f009db109ef) )
+
+	ROM_REGION( 0x100000, "bgtiles_bank", ROMREGION_INVERT )
+	ROM_LOAD( "djgirl.u50",   0x000000, 0x40000, CRC(02a52a90) SHA1(b1c6f9b4f02f498109ea57f5bc37277f6cc4c11e) )
+	ROM_LOAD( "djgirl.u5",    0x040000, 0x40000, CRC(39abacac) SHA1(3558334abb2b0d6cbccc2a07125c13e978ef9d26) )
+	ROM_LOAD( "djgirl.u46",   0x080000, 0x40000, CRC(3853d794) SHA1(4746c660c57d44dc4fb2793c2660c30d3185efc4) )
+	ROM_LOAD( "djgirl.u49",   0x0c0000, 0x40000, CRC(b3f580c5) SHA1(807380bed3773495de4b7c4b26a8aa97d4e83d64) )
+ROM_END
+
 } // anonymous namespace
 
 
-GAME( 1993, discoboy,  0,        discoboy, discoboy, discoboy_state, empty_init, ROT270, "Soft Art Co.", "Disco Boy",                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, discoboyp, discoboy, discoboy, discoboy, discoboy_state, empty_init, ROT270, "Soft Art Co.", "Disco Boy (Promat license?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, discoboy,  0,        discoboy, discoboy, discoboy_state, empty_init, ROT270, "Soft Art Co.",          "Disco Boy",                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, discoboyp, discoboy, discoboy, discoboy, discoboy_state, empty_init, ROT270, "Soft Art Co. / Promat", "Disco Boy (Promat license)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, djgirl,    discoboy, discoboy, discoboy, discoboy_state, empty_init, ROT270, "Soft Art Co. / Promat", "DJ Girl (Promat license)",    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

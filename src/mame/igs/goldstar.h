@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Roberto Fresca, Vas Crabb
-#ifndef MAME_INCLUDES_GOLDSTAR_H
-#define MAME_INCLUDES_GOLDSTAR_H
+#ifndef MAME_IGS_GOLDSTAR_H
+#define MAME_IGS_GOLDSTAR_H
 
 #pragma once
 
@@ -195,10 +195,12 @@ public:
 	void init_cmtetrisc();
 	void init_cmtetrisd();
 	void init_ll3();
+	void init_cmfb55();
 
 	uint32_t screen_update_amcoe1a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void cm(machine_config &config);
+	void cmfb55(machine_config &config);
 	void cm97(machine_config &config);
 	void cmasterc(machine_config &config);
 	void amcoe1a(machine_config &config);
@@ -425,4 +427,4 @@ private:
 	optional_device<ticket_dispenser_device> m_ticket_dispenser;
 };
 
-#endif // MAME_INCLUDES_GOLDSTAR_H
+#endif // MAME_IGS_GOLDSTAR_H

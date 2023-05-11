@@ -2062,6 +2062,16 @@ ROM_START( wwmarine ) /* Waku Waku Marine  (c)1992 Sega - 834-9082 WAKUWAKU MARI
 ROM_END
 
 
+ROM_START( wwanpanm ) /* Waku Waku Anpanman - 834-8191 sticker */
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "epr-14123a.ic32", 0x000000, 0x040000, CRC(0e4f38c6) SHA1(2913fbde9a7e6428bab05c6e550c3e2d79c9f211) )
+	ROM_LOAD16_BYTE( "epr-14122a.ic31", 0x000001, 0x040000, CRC(01b8fe20) SHA1(8d21c346b141a298074d199ce2bc4094217e8c25) )
+
+	ROM_REGION( 0x040000, "upd", 0 )
+	ROM_LOAD( "epr-14121.ic4", 0x000000, 0x040000, CRC(69adf3a1) SHA1(63233e723ab9be8d5663651cb2e6e54b64a7bb8e) )
+ROM_END
+
+
 ROM_START( ssonicbr ) // hack: supposedly the data ROM mapping was modified
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ssonicbr.ic32", 0x000000, 0x040000, CRC(cf254ecd) SHA1(4bb295ec80f8ddfeab4e360eebf12c5e2dfb9800) )
@@ -2076,8 +2086,19 @@ ROM_START( anpanman ) /* Sega Soreike! Anpanman Popcorn Koujou (Rev.B) (c)1993 S
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-14804b.ic32", 0x000000, 0x040000, CRC(7ce88c49) SHA1(959ee459a5b4a6324488a935fa6a48e38ce93464) ) // 27C020
 	ROM_LOAD16_BYTE( "epr-14803b.ic31", 0x000001, 0x040000, CRC(eb3ca1b9) SHA1(e4dd9d2bd2301f47f167d6516457386ba4e57df0) ) // 27C020
-	ROM_LOAD16_BYTE( "epr-14806.ic34", 0x100000, 0x040000, CRC(40f398db) SHA1(abaaf4404342232b58f02c7ea0571926b2417b45) ) // 27C020
-	ROM_LOAD16_BYTE( "epr-14805.ic33", 0x100001, 0x040000, CRC(f27229ed) SHA1(307182cdcd8954bbc56d4b412df452b406466d53) ) // 27C020
+	ROM_LOAD16_BYTE( "epr-14806.ic34",  0x100000, 0x040000, CRC(40f398db) SHA1(abaaf4404342232b58f02c7ea0571926b2417b45) ) // 27C020
+	ROM_LOAD16_BYTE( "epr-14805.ic33",  0x100001, 0x040000, CRC(f27229ed) SHA1(307182cdcd8954bbc56d4b412df452b406466d53) ) // 27C020
+
+	ROM_REGION( 0x040000, "upd", 0 )
+	ROM_LOAD( "epr-14807.ic4", 0x000000, 0x040000, CRC(9827549f) SHA1(66d195299085ec690498fc795a3088c05e6db820) ) // 27C020
+ROM_END
+
+ROM_START( anpanmana ) /* Sega Soreike! Anpanman Popcorn Koujou (Rev.A) (c)1993 Sega - 834-8795-01 (EMP5032 labeled 317-0140) */
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "epr-14804a.ic32", 0x000000, 0x040000, CRC(a80bd024) SHA1(bfd3cc45214cd89d5cbed99f88ba2d3e8cc61538) ) // 27C020
+	ROM_LOAD16_BYTE( "epr-14803a.ic31", 0x000001, 0x040000, CRC(32e1f248) SHA1(151c59d0be5bb2e77c777da2b99627c887d49f55) ) // 27C020
+	ROM_LOAD16_BYTE( "epr-14806.ic34",  0x100000, 0x040000, CRC(40f398db) SHA1(abaaf4404342232b58f02c7ea0571926b2417b45) ) // 27C020
+	ROM_LOAD16_BYTE( "epr-14805.ic33",  0x100001, 0x040000, CRC(f27229ed) SHA1(307182cdcd8954bbc56d4b412df452b406466d53) ) // 27C020
 
 	ROM_REGION( 0x040000, "upd", 0 )
 	ROM_LOAD( "epr-14807.ic4", 0x000000, 0x040000, CRC(9827549f) SHA1(66d195299085ec690498fc795a3088c05e6db820) ) // 27C020
@@ -2088,15 +2109,26 @@ ROM_START( sonicpop ) /* SegaSonic Popcorn Shop (Rev.B) (c)1993 Sega - 834-9555-
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-14592b.ic32", 0x000000, 0x040000, CRC(bac586a1) SHA1(0208213bfa1a5093e76edb1a7e0ba5ebc862801d) )
 	ROM_LOAD16_BYTE( "epr-15491b.ic31", 0x000001, 0x040000, CRC(527106c3) SHA1(97f08006bba4b87c304c7ad3b1480b77e99dff10) )
-	ROM_LOAD16_BYTE( "epr-15494.ic34", 0x100000, 0x040000, CRC(0520df5e) SHA1(5a795a1630d841406a106a566228223583deef44) )
-	ROM_LOAD16_BYTE( "epr-15493.ic33", 0x100001, 0x040000, CRC(d51b3b85) SHA1(66f6b4656841ab70ffde0141a613eaf91c06f86b) )
+	ROM_LOAD16_BYTE( "epr-15494.ic34",  0x100000, 0x040000, CRC(0520df5e) SHA1(5a795a1630d841406a106a566228223583deef44) )
+	ROM_LOAD16_BYTE( "epr-15493.ic33",  0x100001, 0x040000, CRC(d51b3b85) SHA1(66f6b4656841ab70ffde0141a613eaf91c06f86b) )
 
 	ROM_REGION( 0x040000, "upd", 0 )
 	ROM_LOAD( "epr-15495.ic4", 0x000000, 0x040000, CRC(d3ee4c68) SHA1(557c57b22521339d94d9a3e6fd2af68a67a153b6) )
 ROM_END
 
 
-ROM_START( sonicfgt ) /* SegaSonic Cosmo Fighter (c)1993 Sega - 834-10082 930719-1755T (EMP5032 labeled 317-0140) */
+ROM_START( sonicfgt ) /* SegaSonic Cosmo Fighter (c)1993 Sega - 834-10082 940725-3598T (EMP5032 labeled 317-0140) */
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "epr-17178.ic32", 0x000000, 0x040000, CRC(e05b7388) SHA1(38fd175c265986a14d1365e3a403e12fbc6c73c3) )
+	ROM_LOAD16_BYTE( "epr-17177.ic31", 0x000001, 0x040000, CRC(7c2ec4eb) SHA1(f74f21f5dcfbf6ee902c2a44fed908a628d60363) )
+	ROM_LOAD16_BYTE( "epr-17180.ic34", 0x100000, 0x040000, CRC(8933e91c) SHA1(5dc7451874f97e0e5d0c666800c26907b9abf5f5) )
+	ROM_LOAD16_BYTE( "epr-17179.ic33", 0x100001, 0x040000, CRC(0ae979cd) SHA1(a4d4f096e976d4993123de0c2505382f878ea42a) )
+
+	ROM_REGION( 0x040000, "upd", 0 )
+	ROM_LOAD( "epr-17176.ic4", 0x000000, 0x040000, CRC(4211745d) SHA1(710f7dab436bf0551b95786efc5ea4303c0fd5ec) )
+ROM_END
+
+ROM_START( sonicfgtj ) /* SegaSonic Cosmo Fighter (c)1993 Sega - 834-10082 930719-1755T (EMP5032 labeled 317-0140) */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-16001.ic32", 0x000000, 0x040000, CRC(8ed1dc11) SHA1(cd1cb6066c2ff159bec88802bc4b7ca7fff2ed71) )
 	ROM_LOAD16_BYTE( "epr-16000.ic31", 0x000001, 0x040000, CRC(1440caec) SHA1(9e50c28544d6c42cdc7d3ae0f321670fed68fedb) )
@@ -2895,13 +2927,16 @@ GAME( 1992, tantrbl4,   tantr,    segac2,     ichir,    segac2_state,    init_no
 GAME( 1994, tantrbl2,   tantr,    segac,      ichir,    segac2_state,    init_tantr,    ROT0,   "bootleg", "Puzzle & Action: Tant-R (Japan) (bootleg set 2)", 0 ) // Common bootleg in Europe, C board, no samples
 GAME( 1994, tantrbl3,   tantr,    segac,      ichir,    segac2_state,    init_tantr,    ROT0,   "bootleg", "Puzzle & Action: Tant-R (Japan) (bootleg set 3)", 0 ) // Common bootleg in Europe, C board, no samples
 
+GAME( 1992, wwanpanm,   0,        segac2,     wwmarine, wwmarine_state,  init_noprot,   ROT0,   "Sega", "Waku Waku Anpanman (Rev A)", 0 )
 GAME( 1992, wwmarine,   0,        segac2,     wwmarine, wwmarine_state,  init_noprot,   ROT0,   "Sega", "Waku Waku Marine", 0 )
 
 // not really sure how this should hook up, things like the 'sold out' flags could be mechanical sensors, or from another MCU / CPU board in the actual popcorn part of the machine?
 GAME( 1992, anpanman,   0,        segac2,     anpanman, segac2_state,    init_noprot,   ROT0,   "Sega", "Soreike! Anpanman Popcorn Koujou (Rev B)", MACHINE_MECHANICAL ) // 'Mechanical' part isn't emulated
-GAME( 1993, sonicpop,   0,        segac2,     sonicpop, segac2_state,    init_noprot,   ROT0,   "Sega", "SegaSonic Popcorn Shop (Rev B)", MACHINE_MECHANICAL ) // region DSW for USA / Export / Japan, still speaks Japanese tho.  'Mechanical' part isn't emulated
+GAME( 1992, anpanmana,  anpanman, segac2,     anpanman, segac2_state,    init_noprot,   ROT0,   "Sega", "Soreike! Anpanman Popcorn Koujou (Rev A)", MACHINE_MECHANICAL ) // 'Mechanical' part isn't emulated
+GAME( 1993, sonicpop,   0,        segac2,     sonicpop, segac2_state,    init_noprot,   ROT0,   "Sega", "SegaSonic Popcorn Shop (Rev B)", MACHINE_MECHANICAL ) // region DSW for USA / Export / Japan, still speaks Japanese tho. 'Mechanical' part isn't emulated
 
-GAME( 1993, sonicfgt,   0,        segac2,     sonicfgt, segac2_state,    init_noprot,   ROT0,   "Sega", "SegaSonic Cosmo Fighter", 0 )
+GAME( 1993, sonicfgt,   0,        segac2,     sonicfgt, segac2_state,    init_noprot,   ROT0,   "Sega", "SegaSonic Cosmo Fighter (World)", 0 )
+GAME( 1993, sonicfgtj,  sonicfgt, segac2,     sonicfgt, segac2_state,    init_noprot,   ROT0,   "Sega", "SegaSonic Cosmo Fighter (Japan)", 0 )
 
 GAME( 1994, potopoto,   0,        segac2,     potopoto, segac2_state,    init_potopoto, ROT0,   "Sega", "Poto Poto (Japan, Rev A)", 0 )
 

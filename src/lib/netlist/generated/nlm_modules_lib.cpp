@@ -1,4 +1,4 @@
-// license:CC0
+// license:CC0-1.0
 // copyright-holders:Couriersud
 
 // File programmatically created Sat Jul  2 23:43:48 2022

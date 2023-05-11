@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<softwarelist name="mpf1_rom" description="Micro-Professor 1 ROMs">
+
+	<!-- Micro-Professor 1/88 -->
+
+	<software name="forth_i88">
+		<description>FORTH-I/88</description>
+		<year>1985</year>
+		<publisher>Multitech</publisher>
+		<info name="usage" value="H"/>
+		<sharedfeat name="compatibility" value="I88"/>
+		<part name="rom" interface="mpf1_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="forth_i88.bin" size="8192" crc="a04caba9" sha1="1e94f1355722228cd4de0e9a773e7a923cbad745"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vip_i88">
+		<description>VIP-I/88</description>
+		<year>1985</year>
+		<publisher>Multitech</publisher>
+		<info name="usage" value="Z"/>
+		<sharedfeat name="compatibility" value="I88"/>
+		<part name="rom" interface="mpf1_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="vip_i88.bin" size="16384" crc="c5aceba3" sha1="735af166ff0dbe9c3e48eec61ab2365be74120cb"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

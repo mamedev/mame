@@ -92,6 +92,8 @@ Bprom dump by f205v
 #include "tilemap.h"
 
 
+namespace {
+
 class stuntair_state : public driver_device
 {
 public:
@@ -594,6 +596,8 @@ ROM_START( stuntair )
 	ROM_LOAD_NIB_HIGH( "dm74s287n.11l", 0x000, 0x100, CRC(6c98f964) SHA1(abf7bdeccd33e62fa106d2056d1949cf278483a7) ) // "
 	ROM_LOAD_NIB_LOW ( "dm74s288n.7a",  0x100, 0x020, CRC(5779e751) SHA1(89c955ef8635ad3e9d699f33ec0e4d6c9205d01c) ) // ?
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1983, stuntair,  0,    stuntair, stuntair, stuntair_state, empty_init, ROT90, "Nuova Videotron", "Stunt Air",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

@@ -53,6 +53,8 @@ The BASIC
 #include "utf8.h"
 
 
+namespace {
+
 class pyl601_state : public driver_device
 {
 public:
@@ -641,6 +643,10 @@ ROM_START( pyl601a )
 	ROM_REGION(0x0800, "keyboard", 0)
 	ROM_LOAD( "keyboard.rom", 0x0000, 0x0800, CRC(41fbe5ca) SHA1(875adaef53bc37e92ad0b6b6ee3d8fd28344d358))
 ROM_END
+
+} // anonymous namespace
+
+
 /* Driver */
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY             FULLNAME       FLAGS */

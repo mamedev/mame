@@ -3,7 +3,7 @@
 
 // A "virtual" driver to turn waveblaster cards into a screen-less expander
 
-// Currently KS0164 only, and built-in.  Evetually should be slot-based with
+// Currently KS0164 only, and built-in.  Eventually should be slot-based with
 // multiple possible cards
 
 #include "emu.h"
@@ -12,6 +12,9 @@
 #include "bus/midi/midioutport.h"
 
 #include "sound/ks0164.h"
+
+
+namespace {
 
 class wavesynth_state : public driver_device
 {
@@ -64,5 +67,8 @@ ROM_START( wavesynth )
 	ROM_REGION( 0x100000, "waveblaster", 0)
 	ROM_LOAD16_WORD_SWAP("ks0174-1m04.bin", 0, 0x100000, CRC(3cabaa2f) SHA1(1e894c0345eaf0ea713f36a75b065f7ee419c63c))
 ROM_END
+
+} // anonymous namespace
+
 
 CONS( 2020, wavesynth, 0, 0, wavesynth, wavesynth, wavesynth_state, empty_init, "MAME", "Waveblaster-based expander", MACHINE_SUPPORTS_SAVE )

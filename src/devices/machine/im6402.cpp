@@ -180,15 +180,6 @@ void im6402_device::tra_complete()
 
 
 //-------------------------------------------------
-//  rcv_callback -
-//-------------------------------------------------
-
-void im6402_device::rcv_callback()
-{
-}
-
-
-//-------------------------------------------------
 //  rcv_complete -
 //-------------------------------------------------
 
@@ -391,10 +382,12 @@ void im6402_device::epe_w(int state)
 	m_epe = state;
 }
 
-void im6402_device::write_rri(int state)
+
+//-------------------------------------------------
+//  rri_w - receiver register input
+//-------------------------------------------------
+
+void im6402_device::rri_w(int state)
 {
-	// HACK derive clock from data line as wangpckb sends bytes instantly to make up for mcs51 serial implementation
-	receive_register_update_bit(state);
-	rx_clock_w(1);
-	rx_clock_w(0);
+	rx_w(state);
 }

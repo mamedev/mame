@@ -366,7 +366,7 @@ void contra_state::cram_w(offs_t offset, uint8_t data)
 template <uint8_t Which>
 void contra_state::K007121_ctrl_w(offs_t offset, uint8_t data)
 {
-	uint8_t ctrl_6 = m_k007121[Which]->ctrlram_r(6);
+	uint8_t prev = m_k007121[Which]->ctrlram_r(offset);
 
 	if (offset == 3)
 	{
@@ -378,7 +378,7 @@ void contra_state::K007121_ctrl_w(offs_t offset, uint8_t data)
 
 	if (offset == 6)
 	{
-		if (ctrl_6 != data)
+		if (prev != data)
 			m_tilemap[Which]->mark_all_dirty();
 	}
 

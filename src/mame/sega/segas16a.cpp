@@ -152,9 +152,11 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 
 #include "fd1089.h"
 #include "fd1094.h"
+
 #include "machine/nvram.h"
 #include "machine/segacrp2_device.h"
 #include "sound/dac.h"
+
 #include "speaker.h"
 
 
@@ -3927,7 +3929,7 @@ void segas16a_state::init_aceattaca()
 void segas16a_state::init_dumpmtmt()
 {
 	init_generic();
-	m_i8751_vblank_hook = i8751_sim_delegate(&segas16a_state::dumpmtmt_i8751_sim, this);
+	m_i8751_vblank_hook = delegate(&segas16a_state::dumpmtmt_i8751_sim, this);
 }
 
 void segas16a_state::init_mjleague()
@@ -3952,7 +3954,7 @@ void segas16a_state::init_sjryukoa()
 {
 	init_generic();
 	m_custom_io_r = read16sm_delegate(*this, FUNC(segas16a_state::sjryuko_custom_io_r));
-	m_lamp_changed_w = lamp_changed_delegate(&segas16a_state::sjryuko_lamp_changed_w, this);
+	m_lamp_changed_w = delegate(&segas16a_state::sjryuko_lamp_changed_w, this);
 }
 
 

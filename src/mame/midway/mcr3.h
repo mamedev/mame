@@ -5,8 +5,8 @@
     Midway MCR-3 system
 
 **************************************************************************/
-#ifndef MAME_INCLUDES_MCR3_H
-#define MAME_INCLUDES_MCR3_H
+#ifndef MAME_MIDWAY_MCR3_H
+#define MAME_MIDWAY_MCR3_H
 
 #pragma once
 
@@ -149,4 +149,4 @@ private:
 	required_ioport_array<2> m_analog_inputs;
 };
 
-#endif // MAME_INCLUDES_MCR3_H
+#endif // MAME_MIDWAY_MCR3_H

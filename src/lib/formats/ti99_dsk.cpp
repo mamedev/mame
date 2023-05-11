@@ -17,7 +17,7 @@
   bytes long. The most common formats are 9 sectors per track, single-sided,
   40 tracks, which yields 90 KiB of sector data (known as SSSD), and 18
   sectors per track, double-sided, and 40 tracks, which is 360 KiB (known as
-  DSDD). There are rare occurances of 16 sectors/track
+  DSDD). There are rare occurrences of 16 sectors/track
   (prototypical TI double-density controller) and 35 track media. Newer
   controllers and ROMs allow for up to 36 sectors per track and 80 tracks on
   both sides, which is 1,44 MiB (DSHD80).

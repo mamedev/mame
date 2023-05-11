@@ -40,6 +40,8 @@
 #include "votrtnt.lh"
 
 
+namespace {
+
 class votrtnt_state : public driver_device
 {
 public:
@@ -176,6 +178,8 @@ ROM_START(votrtnt)
 	ROM_REGION(0x1000, "maincpu", 0)
 	ROM_LOAD("cn49752n.bin", 0x0000, 0x1000, CRC(a44e1af3) SHA1(af83b9e84f44c126b24ee754a22e34ca992a8d3d)) /* 2332 mask rom inside potted brick */
 ROM_END
+
+} // anonymous namespace
 
 
 /******************************************************************************

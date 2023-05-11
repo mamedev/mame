@@ -104,11 +104,15 @@ bml3bus_device::bml3bus_device(const machine_config &mconfig, const char *tag, d
 
 bml3bus_device::bml3bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	m_space(*this, finder_base::DUMMY_TAG, -1, 8),
 	m_out_nmi_cb(*this),
 	m_out_irq_cb(*this),
 	m_out_firq_cb(*this)
 {
+	// clear slots
+	for (auto & elem : m_device_list)
+	{
+		elem = nullptr;
+	}
 }
 
 //-------------------------------------------------
@@ -121,12 +125,6 @@ void bml3bus_device::device_start()
 	m_out_nmi_cb.resolve_safe();
 	m_out_irq_cb.resolve_safe();
 	m_out_firq_cb.resolve_safe();
-
-	// clear slots
-	for (auto & elem : m_device_list)
-	{
-		elem = nullptr;
-	}
 }
 
 //-------------------------------------------------
@@ -150,6 +148,24 @@ device_bml3bus_card_interface *bml3bus_device::get_bml3bus_card(int slot)
 void bml3bus_device::add_bml3bus_card(int slot, device_bml3bus_card_interface &card)
 {
 	m_device_list[slot] = &card;
+}
+
+void bml3bus_device::map_exrom(address_space_installer &space)
+{
+	for (auto & elem : m_device_list)
+	{
+		if (elem != nullptr)
+			elem->map_exrom(space);
+	}
+}
+
+void bml3bus_device::map_io(address_space_installer &space)
+{
+	for (auto & elem : m_device_list)
+	{
+		if (elem != nullptr)
+			elem->map_io(space);
+	}
 }
 
 void bml3bus_device::set_nmi_line(int state)

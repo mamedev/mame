@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 
-<softwarelist name="mephisto_mm5" description="Mephisto MM V Modules">
+<softwarelist name="mephisto_mm5" description="Mephisto MM V modules">
 
 <!-- HG 550 module is exclusively used with MM V -->
 

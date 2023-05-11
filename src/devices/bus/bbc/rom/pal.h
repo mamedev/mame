@@ -151,6 +151,19 @@ protected:
 	virtual uint8_t read(offs_t offset) override;
 };
 
+// ======================> bbc_trilogy_device
+
+class bbc_trilogy_device : public bbc_pal_device
+{
+public:
+	// construction/destruction
+	bbc_trilogy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device_bbc_rom_interface overrides
+	virtual uint8_t read(offs_t offset) override;
+};
+
 
 // device type definition
 DECLARE_DEVICE_TYPE(BBC_CCIWORD, bbc_cciword_device)
@@ -162,6 +175,7 @@ DECLARE_DEVICE_TYPE(BBC_PALTED, bbc_palted_device)
 DECLARE_DEVICE_TYPE(BBC_PALABEP, bbc_palabep_device)
 DECLARE_DEVICE_TYPE(BBC_PALABE, bbc_palabe_device)
 DECLARE_DEVICE_TYPE(BBC_PALMO2, bbc_palmo2_device)
+DECLARE_DEVICE_TYPE(BBC_TRILOGY, bbc_trilogy_device)
 
 
 #endif // MAME_BUS_BBC_ROM_PAL_H

@@ -186,6 +186,9 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
+
+namespace {
+
 #define BAUDGEN_CLOCK 19.6608_MHz_XTAL /* Raltron */
 #define SCC_CLOCK (BAUDGEN_CLOCK / 4) /* through a 74LS393 counter */
 
@@ -396,6 +399,9 @@ ROM_START (hk68v10)
 	 *  Repeated for :scc A
 	 */
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY                 FULLNAME    FLAGS */

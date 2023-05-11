@@ -30,6 +30,7 @@ static const int DAYS_PER_MONTH[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 
 
 device_rtc_interface::device_rtc_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "rtc")
+	, m_use_utc(false)
 {
 }
 
@@ -78,8 +79,9 @@ void device_rtc_interface::set_time(bool update, int year, int month, int day, i
 
 void device_rtc_interface::set_current_time(const system_time &systime)
 {
-	set_time(true, systime.local_time.year, systime.local_time.month + 1, systime.local_time.mday, systime.local_time.weekday + 1,
-		systime.local_time.hour, systime.local_time.minute, systime.local_time.second);
+	const system_time::full_time &time = m_use_utc ? systime.utc_time : systime.local_time;
+	set_time(true, time.year, time.month + 1, time.mday, time.weekday + 1,
+		time.hour, time.minute, time.second);
 }
 
 

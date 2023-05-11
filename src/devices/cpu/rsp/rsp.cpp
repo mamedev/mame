@@ -2244,8 +2244,7 @@ void rsp_device::handle_lwc2(uint32_t op)
 	int base = (op >> 21) & 0x1f;
 	int dest = (op >> 16) & 0x1f;
 	int index = (op >> 7) & 0xf;
-	int offset = (op & 0x7f);
-	offset = (offset << 25) >> 25;
+	int offset = util::sext(op & 0x7f, 7);
 
 	switch ((op >> 11) & 0x1f)
 	{
@@ -2518,8 +2517,7 @@ void rsp_device::handle_swc2(uint32_t op)
 	int base = (op >> 21) & 0x1f;
 	int dest = (op >> 16) & 0x1f;
 	int index = (op >> 7) & 0xf;
-	int offset = (op & 0x7f);
-	offset = (offset << 25) >> 25;
+	int offset = util::sext(op & 0x7f, 7);
 
 	switch ((op >> 11) & 0x1f)
 	{

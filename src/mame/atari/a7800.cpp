@@ -97,21 +97,22 @@
 ***************************************************************************/
 
 #include "emu.h"
+
+#include "maria.h"
+
+#include "bus/a7800/a78_carts.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/timer.h"
-#include "sound/tiaintf.h"
-#include "sound/tiasound.h"
 #include "machine/mos6530n.h"
-#include "maria.h"
-#include "bus/a7800/a78_carts.h"
+#include "sound/tiaintf.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 
-#define A7800_NTSC_Y1   XTAL(14'318'181)
-#define CLK_PAL 1773447
 
+namespace {
 
 class a7800_state : public driver_device
 {
@@ -121,6 +122,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_tia(*this, "tia"),
 		m_maria(*this, "maria"),
+		m_riot(*this, "riot"),
 		m_io_joysticks(*this, "joysticks"),
 		m_io_buttons(*this, "buttons"),
 		m_io_console_buttons(*this, "console_buttons"),
@@ -130,13 +132,13 @@ public:
 	{
 	}
 
-	void a7800_ntsc(machine_config &config);
-
 protected:
+	void a7800_common(machine_config &config, uint32_t clock);
+
 	uint8_t bios_or_cart_r(offs_t offset);
 	uint8_t tia_r(offs_t offset);
 	void tia_w(offs_t offset, uint8_t data);
-	void a7800_palette(palette_device &palette) const;
+	virtual void a7800_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(maria_startdma);
 	uint8_t riot_joystick_r();
@@ -162,6 +164,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<tia_device> m_tia;
 	required_device<atari_maria_device> m_maria;
+	required_device<mos6532_new_device> m_riot;
 	required_ioport m_io_joysticks;
 	required_ioport m_io_buttons;
 	required_ioport m_io_console_buttons;
@@ -175,6 +178,7 @@ class a7800_ntsc_state : public a7800_state
 public:
 	using a7800_state::a7800_state;
 	void init_a7800_ntsc();
+	void a7800_ntsc(machine_config &config);
 };
 
 class a7800_pal_state : public a7800_state
@@ -185,7 +189,7 @@ public:
 	void a7800_pal(machine_config &config);
 
 protected:
-	void a7800p_palette(palette_device &palette) const;
+	virtual void a7800_palette(palette_device &palette) const override;
 };
 
 
@@ -304,14 +308,13 @@ uint8_t a7800_state::bios_or_cart_r(offs_t offset)
 
 void a7800_state::a7800_mem(address_map &map)
 {
+	map(0x0000, 0x01ff).mirror(0x2000).ram(); // 0x40-0xff, 0x140-0x1ff are mirrors of second 6116 chip
 	map(0x0000, 0x001f).mirror(0x300).rw(FUNC(a7800_state::tia_r), FUNC(a7800_state::tia_w));
 	map(0x0020, 0x003f).mirror(0x300).rw(m_maria, FUNC(atari_maria_device::read), FUNC(atari_maria_device::write));
-	map(0x0040, 0x00ff).bankrw("zpmirror"); // mirror of 0x2040-0x20ff, for zero page
-	map(0x0140, 0x01ff).bankrw("spmirror"); // mirror of 0x2140-0x21ff, for stack page
-	map(0x0280, 0x029f).mirror(0x160).m("riot", FUNC(mos6532_new_device::io_map));
-	map(0x0480, 0x04ff).mirror(0x100).m("riot", FUNC(mos6532_new_device::ram_map));
-	map(0x1800, 0x1fff).ram().share("6116_1");
-	map(0x2000, 0x27ff).ram().share("6116_2");
+	map(0x0280, 0x029f).mirror(0x160).m(m_riot, FUNC(mos6532_new_device::io_map));
+	map(0x0480, 0x04ff).mirror(0x100).m(m_riot, FUNC(mos6532_new_device::ram_map));
+	map(0x1800, 0x1fff).ram();
+	map(0x2200, 0x27ff).ram();  // 0x2000-0x21ff, installed in mirror above
 								// According to the official Software Guide, the RAM at 0x2000 is
 								// repeatedly mirrored up to 0x3fff, but this is evidently incorrect
 								// because the High Score Cartridge maps ROM at 0x3000-0x3fff
@@ -1314,7 +1317,7 @@ void a7800_state::a7800_palette(palette_device &palette) const
 }
 
 
-void a7800_pal_state::a7800p_palette(palette_device &palette) const
+void a7800_pal_state::a7800_palette(palette_device &palette) const
 {
 	palette.set_pen_colors(0, a7800p_colors);
 }
@@ -1332,11 +1335,6 @@ void a7800_state::machine_start()
 	save_item(NAME(m_ctrl_lock));
 	save_item(NAME(m_ctrl_reg));
 	save_item(NAME(m_maria_flag));
-
-	// set up RAM mirrors
-	uint8_t *ram = reinterpret_cast<uint8_t *>(memshare("6116_2")->ptr());
-	membank("zpmirror")->set_base(ram + 0x0040);
-	membank("spmirror")->set_base(ram + 0x0140);
 
 	// install additional handlers, if needed
 	if (m_cart->exists())
@@ -1378,17 +1376,16 @@ void a7800_state::machine_reset()
 	m_bios_enabled = 0;
 }
 
-void a7800_state::a7800_ntsc(machine_config &config)
+void a7800_state::a7800_common(machine_config &config, uint32_t clock)
 {
-	/* basic machine hardware */
-	M6502(config, m_maincpu, A7800_NTSC_Y1/8); /* 1.79 MHz (switches to 1.19 MHz on TIA or RIOT access) */
+	// basic machine hardware
+	M6502(config, m_maincpu, clock/8); // NTSC 1.79 MHz, PAL 1.77 MHz (switches to 1.19 MHz on TIA or RIOT access)
 	m_maincpu->set_addrmap(AS_PROGRAM, &a7800_state::a7800_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(a7800_state::interrupt), "screen", 0, 1);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(7159090, 454, 0, 320, 263, 27, 27 + 192 + 32);
-	m_screen->set_screen_update("maria", FUNC(atari_maria_device::screen_update));
+	m_screen->set_screen_update(m_maria, FUNC(atari_maria_device::screen_update));
 	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(a7800_state::a7800_palette), std::size(a7800_colors));
@@ -1397,38 +1394,39 @@ void a7800_state::a7800_ntsc(machine_config &config)
 	m_maria->set_dmacpu_tag(m_maincpu);
 	m_maria->set_screen_tag(m_screen);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	TIA(config, "tia", 31400).add_route(ALL_OUTPUTS, "mono", 1.00);
+	TIA(config, m_tia, clock/4/114).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	/* devices */
-	mos6532_new_device &riot(MOS6532_NEW(config, "riot", A7800_NTSC_Y1/8));
-	riot.pa_rd_callback().set(FUNC(a7800_state::riot_joystick_r));
-	riot.pb_rd_callback().set(FUNC(a7800_state::riot_console_button_r));
-	riot.pb_wr_callback().set(FUNC(a7800_state::riot_button_pullup_w));
+	// devices
+	MOS6532_NEW(config, m_riot, clock/8);
+	m_riot->pa_rd_callback().set(FUNC(a7800_state::riot_joystick_r));
+	m_riot->pb_rd_callback().set(FUNC(a7800_state::riot_console_button_r));
+	m_riot->pb_wr_callback().set(FUNC(a7800_state::riot_button_pullup_w));
 
-	A78_CART_SLOT(config, "cartslot", a7800_cart, nullptr);
+	A78_CART_SLOT(config, m_cart, clock/8, a7800_cart, nullptr);
+}
 
-	/* software lists */
+void a7800_ntsc_state::a7800_ntsc(machine_config &config)
+{
+	a7800_common(config, 14'318'180); // from schematics
+
+	// basic machine hardware
+	m_screen->set_raw(14'318'180/2, 454, 0, 320, 263, 27, 27 + 192 + 32);
+
+	// software lists
 	SOFTWARE_LIST(config, "cart_list").set_original("a7800").set_filter("NTSC");
 }
 
 void a7800_pal_state::a7800_pal(machine_config &config)
 {
-	a7800_ntsc(config);
+	a7800_common(config, 14'187'576); // from hardware tests (and label?)
 
-	/* basic machine hardware */
-	m_maincpu->set_clock(CLK_PAL);
+	// basic machine hardware
+	m_screen->set_raw(14'187'576/2, 454, 0, 320, 313, 35, 35 + 228 + 32);
 
-	m_screen->set_raw(7093788, 454, 0, 320, 313, 35, 35 + 228 + 32);
-
-	subdevice<palette_device>("palette")->set_init(FUNC(a7800_pal_state::a7800p_palette));
-
-	/* devices */
-	subdevice<mos6532_new_device>("riot")->set_clock(CLK_PAL);
-
-	/* software lists */
-	subdevice<software_list_device>("cart_list")->set_filter("PAL");
+	// software lists
+	SOFTWARE_LIST(config, "cart_list").set_original("a7800").set_filter("PAL");
 }
 
 
@@ -1470,6 +1468,8 @@ void a7800_pal_state::init_a7800_pal()
 	m_p1_one_button = 1;
 	m_p2_one_button = 1;
 }
+
+} // anonymous namespace
 
 
 /***************************************************************************

@@ -1,145 +1,129 @@
 <?xml version="1.0"?>
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <mamelayout version="2">
-	<element name="digit" defstate="10">
+
+<!-- define elements -->
+
+	<element name="black"><rect><color red="0" green="0" blue="0" /></rect></element>
+	<element name="yellow"><rect><color red="0.9" green="0.9" blue="0.15" /></rect></element>
+	<element name="blue"><rect><color red="0.1" green="0.5" blue="0.9" /></rect></element>
+	<element name="red"><rect><color red="0.9" green="0.2" blue="0.15" /></rect></element>
+
+	<element name="text_b1"><text string="1ST." align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_b2"><text string="2ND." align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_b3"><text string="3RD." align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_b4"><text string="4TH." align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_b5"><text string="5TH." align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+
+	<element name="text_best">
+		<rect><color red="0.9" green="0.2" blue="0.15" /></rect>
+		<text string="BEST 5"><color red="0.9" green="0.9" blue="0.9" /></text>
+	</element>
+	<element name="text_score">
+		<rect><color red="0.9" green="0.2" blue="0.15" /></rect>
+		<text string="YOUR SCORE"><color red="0.9" green="0.9" blue="0.9" /></text>
+	</element>
+
+	<element name="digit" defstate="0">
 		<led7seg>
-			<color red="1.0" green="0.3" blue="0.0" />
+			<color red="1.0" green="0.1" blue="0.15" />
 		</led7seg>
 	</element>
 
-	<view name="Simple LEDs">
-		<bounds left="-59" top="0" right="330" bottom="248" />
+
+<!-- best 5 score digits -->
+
+	<group name="best">
+		<element ref="yellow"><bounds x="0" y="0" width="96" height="23" /></element>
+		<element ref="black"><bounds x="1" y="1" width="94" height="21" /></element>
+		<element ref="text_b1"><bounds x="3" y="4" width="50" height="15" /></element>
+		<element name="digit9" ref="digit"><bounds x="32" y="4" width="10" height="15" /></element>
+		<element name="digit8" ref="digit"><bounds x="44" y="4" width="10" height="15" /></element>
+		<element name="digit7" ref="digit"><bounds x="56" y="4" width="10" height="15" /></element>
+		<element name="digit6" ref="digit"><bounds x="68" y="4" width="10" height="15" /></element>
+		<element name="digit5" ref="digit"><bounds x="80" y="4" width="10" height="15" /></element>
+
+		<element ref="yellow"><bounds x="0" y="27" width="96" height="23" /></element>
+		<element ref="black"><bounds x="1" y="28" width="94" height="21" /></element>
+		<element ref="text_b2"><bounds x="3" y="31" width="50" height="15" /></element>
+		<element name="digit14" ref="digit"><bounds x="32" y="31" width="10" height="15" /></element>
+		<element name="digit13" ref="digit"><bounds x="44" y="31" width="10" height="15" /></element>
+		<element name="digit12" ref="digit"><bounds x="56" y="31" width="10" height="15" /></element>
+		<element name="digit11" ref="digit"><bounds x="68" y="31" width="10" height="15" /></element>
+		<element name="digit10" ref="digit"><bounds x="80" y="31" width="10" height="15" /></element>
+
+		<element ref="yellow"><bounds x="0" y="54" width="96" height="23" /></element>
+		<element ref="black"><bounds x="1" y="55" width="94" height="21" /></element>
+		<element ref="text_b3"><bounds x="3" y="58" width="50" height="15" /></element>
+		<element name="digit19" ref="digit"><bounds x="32" y="58" width="10" height="15" /></element>
+		<element name="digit18" ref="digit"><bounds x="44" y="58" width="10" height="15" /></element>
+		<element name="digit17" ref="digit"><bounds x="56" y="58" width="10" height="15" /></element>
+		<element name="digit16" ref="digit"><bounds x="68" y="58" width="10" height="15" /></element>
+		<element name="digit15" ref="digit"><bounds x="80" y="58" width="10" height="15" /></element>
+
+		<element ref="yellow"><bounds x="0" y="81" width="96" height="23" /></element>
+		<element ref="black"><bounds x="1" y="82" width="94" height="21" /></element>
+		<element ref="text_b4"><bounds x="3" y="85" width="50" height="15" /></element>
+		<element name="digit24" ref="digit"><bounds x="32" y="85" width="10" height="15" /></element>
+		<element name="digit23" ref="digit"><bounds x="44" y="85" width="10" height="15" /></element>
+		<element name="digit22" ref="digit"><bounds x="56" y="85" width="10" height="15" /></element>
+		<element name="digit21" ref="digit"><bounds x="68" y="85" width="10" height="15" /></element>
+		<element name="digit20" ref="digit"><bounds x="80" y="85" width="10" height="15" /></element>
+
+		<element ref="yellow"><bounds x="0" y="108" width="96" height="23" /></element>
+		<element ref="black"><bounds x="1" y="109" width="94" height="21" /></element>
+		<element ref="text_b5"><bounds x="3" y="112" width="50" height="15" /></element>
+		<element name="digit29" ref="digit"><bounds x="32" y="112" width="10" height="15" /></element>
+		<element name="digit28" ref="digit"><bounds x="44" y="112" width="10" height="15" /></element>
+		<element name="digit27" ref="digit"><bounds x="56" y="112" width="10" height="15" /></element>
+		<element name="digit26" ref="digit"><bounds x="68" y="112" width="10" height="15" /></element>
+		<element name="digit25" ref="digit"><bounds x="80" y="112" width="10" height="15" /></element>
+	</group>
+
+	<group name="panel1">
+		<element ref="blue"><bounds x="0" y="0" width="152" height="238" /></element>
+		<element ref="black"><bounds x="8" y="8" width="136" height="222" /></element>
+		<element ref="red"><bounds x="10" y="10" width="132" height="31.5" /></element>
+		<element ref="text_best"><bounds x="10" y="14.25" width="132" height="23" /></element>
+		<group ref="best"><bounds x="10" y="48" width="132" height="180" /></group>
+	</group>
+
+
+<!-- player score digits -->
+
+	<group name="score">
+		<element ref="yellow"><bounds x="0" y="0" width="96" height="28" /></element>
+		<element ref="black"><bounds x="1" y="1" width="94" height="26" /></element>
+
+		<element name="digit4" ref="digit"><bounds x="7"  y="4" width="13.33" height="20" /></element>
+		<element name="digit3" ref="digit"><bounds x="24" y="4" width="13.33" height="20" /></element>
+		<element name="digit2" ref="digit"><bounds x="41" y="4" width="13.33" height="20" /></element>
+		<element name="digit1" ref="digit"><bounds x="58" y="4" width="13.33" height="20" /></element>
+		<element name="digit0" ref="digit"><bounds x="75" y="4" width="13.33" height="20" /></element>
+	</group>
+
+	<group name="panel2">
+		<element ref="blue"><bounds x="0" y="0" width="152" height="96.5" /></element>
+		<element ref="black"><bounds x="8" y="8" width="136" height="80.5" /></element>
+		<element ref="red"><bounds x="10" y="10" width="132" height="31.5" /></element>
+		<element ref="text_score"><bounds x="10" y="14.25" width="132" height="23" /></element>
+		<group ref="score"><bounds x="10" y="48" width="132" height="38.5" /></group>
+	</group>
+
+
+<!-- build screen -->
+
+	<view name="Score Panel">
+		<bounds left="-168" top="0" right="640" bottom="480" />
+
+		<group ref="panel1"><bounds x="-160" y="45" width="152" height="238" /></group>
+		<group ref="panel2"><bounds x="-160" y="330" width="152" height="96.5" /></group>
 
 		<screen index="0">
-			<bounds left="0" top="0" right="330" bottom="248" />
+			<bounds left="0" top="0" right="640" bottom="480" />
 		</screen>
-
-
-		<element name="digit0" ref="digit">
-			<bounds left="-15" top="18" right="-8" bottom="31" />
-		</element>
-
-		<element name="digit1" ref="digit">
-			<bounds left="-24" top="18" right="-17" bottom="31" />
-		</element>
-
-		<element name="digit2" ref="digit">
-			<bounds left="-33" top="18" right="-26" bottom="31" />
-		</element>
-
-		<element name="digit3" ref="digit">
-			<bounds left="-42" top="18" right="-35" bottom="31" />
-		</element>
-
-		<element name="digit4" ref="digit">
-			<bounds left="-51" top="18" right="-44" bottom="31" />
-		</element>
-
-
-		<element name="digit25" ref="digit">
-			<bounds left="-20" top="110" right="-15" bottom="120" />
-		</element>
-
-		<element name="digit26" ref="digit">
-			<bounds left="-26" top="110" right="-21" bottom="120" />
-		</element>
-
-		<element name="digit27" ref="digit">
-			<bounds left="-32" top="110" right="-27" bottom="120" />
-		</element>
-
-		<element name="digit28" ref="digit">
-			<bounds left="-38" top="110" right="-33" bottom="120" />
-		</element>
-
-		<element name="digit29" ref="digit">
-			<bounds left="-44" top="110" right="-39" bottom="120" />
-		</element>
-
-
-		<element name="digit20" ref="digit">
-			<bounds left="-20" top="95" right="-15" bottom="105" />
-		</element>
-
-		<element name="digit21" ref="digit">
-			<bounds left="-26" top="95" right="-21" bottom="105" />
-		</element>
-
-		<element name="digit22" ref="digit">
-			<bounds left="-32" top="95" right="-27" bottom="105" />
-		</element>
-
-		<element name="digit23" ref="digit">
-			<bounds left="-38" top="95" right="-33" bottom="105" />
-		</element>
-
-		<element name="digit24" ref="digit">
-			<bounds left="-44" top="95" right="-39" bottom="105" />
-		</element>
-
-
-		<element name="digit15" ref="digit">
-			<bounds left="-20" top="80" right="-15" bottom="90" />
-		</element>
-
-		<element name="digit16" ref="digit">
-			<bounds left="-26" top="80" right="-21" bottom="90" />
-		</element>
-
-		<element name="digit17" ref="digit">
-			<bounds left="-32" top="80" right="-27" bottom="90" />
-		</element>
-
-		<element name="digit18" ref="digit">
-			<bounds left="-38" top="80" right="-33" bottom="90" />
-		</element>
-
-		<element name="digit19" ref="digit">
-			<bounds left="-44" top="80" right="-39" bottom="90" />
-		</element>
-
-
-		<element name="digit10" ref="digit">
-			<bounds left="-20" top="65" right="-15" bottom="75" />
-		</element>
-
-		<element name="digit11" ref="digit">
-			<bounds left="-26" top="65" right="-21" bottom="75" />
-		</element>
-
-		<element name="digit12" ref="digit">
-			<bounds left="-32" top="65" right="-27" bottom="75" />
-		</element>
-
-		<element name="digit13" ref="digit">
-			<bounds left="-38" top="65" right="-33" bottom="75" />
-		</element>
-
-		<element name="digit14" ref="digit">
-			<bounds left="-44" top="65" right="-39" bottom="75" />
-		</element>
-
-
-		<element name="digit5" ref="digit">
-			<bounds left="-20" top="50" right="-15" bottom="60" />
-		</element>
-
-		<element name="digit6" ref="digit">
-			<bounds left="-26" top="50" right="-21" bottom="60" />
-		</element>
-
-		<element name="digit7" ref="digit">
-			<bounds left="-32" top="50" right="-27" bottom="60" />
-		</element>
-
-		<element name="digit8" ref="digit">
-			<bounds left="-38" top="50" right="-33" bottom="60" />
-		</element>
-
-		<element name="digit9" ref="digit">
-			<bounds left="-44" top="50" right="-39" bottom="60" />
-		</element>
 	</view>
+
 </mamelayout>

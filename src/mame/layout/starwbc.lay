@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <mamelayout version="2">
 
@@ -25,24 +25,24 @@ license:CC0
 	</element>
 
 	<element name="digit" defstate="0">
-		<led7seg><color red="1.0" green="0.25" blue="0.23" /></led7seg>
+		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
 	</element>
 
 	<element name="lamp" defstate="0">
 		<rect><color red="0.0" green="0.0" blue="0.0" /></rect>
 		<disk state="1">
-			<color red="1.0" green="0.25" blue="0.23" />
+			<color red="1.0" green="0.1" blue="0.15" />
 			<bounds x="0.4" y="0.4" width="0.2" height="0.2" />
 		</disk>
 		<disk state="0">
-			<color red="0.2" green="0.05" blue="0.04" />
+			<color red="0.15" green="0.015" blue="0.0225" />
 			<bounds x="0.4" y="0.4" width="0.2" height="0.2" />
 		</disk>
 	</element>
 
 	<element name="nlamp" defstate="0">
-		<disk state="1"><color red="1.0" green="0.25" blue="0.23" /></disk>
-		<disk state="0"><color red="0.2" green="0.05" blue="0.04" /></disk>
+		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
+		<disk state="0"><color red="0.15" green="0.015" blue="0.0225" /></disk>
 	</element>
 
 	<element name="text_a"><text string="A"><color red="0.7" green="0.7" blue="0.7" /></text></element>
@@ -107,13 +107,13 @@ license:CC0
 		<element ref="static_red"><bounds x="17" y="3" width="83" height="10" /></element>
 		<element ref="static_black"><bounds x="18" y="4" width="81" height="8" /></element>
 
-		<element ref="static_yellow"><bounds x="3.5" y="38" width="9" height="1" /></element>
+		<element ref="static_yellow"><bounds x="3.5" y="37.75" width="9" height="1" /></element>
 		<element ref="static_yellow"><bounds x="3.5" y="58" width="9" height="1" /></element>
-		<element ref="static_yellow"><bounds x="3.5" y="78" width="9" height="1" /></element>
+		<element ref="static_yellow"><bounds x="3.5" y="78.25" width="9" height="1" /></element>
 
-		<element ref="static_red"><bounds x="38" y="3.5" width="1" height="9" /></element>
+		<element ref="static_red"><bounds x="37.75" y="3.5" width="1" height="9" /></element>
 		<element ref="static_red"><bounds x="58" y="3.5" width="1" height="9" /></element>
-		<element ref="static_red"><bounds x="78" y="3.5" width="1" height="9" /></element>
+		<element ref="static_red"><bounds x="78.25" y="3.5" width="1" height="9" /></element>
 
 		<element ref="text_a"><bounds x="4" y="25" width="8" height="7" /></element>
 		<element ref="text_b"><bounds x="4" y="45" width="8" height="7" /></element>
@@ -125,8 +125,7 @@ license:CC0
 		<element ref="text_3"><bounds x="64.5" y="4.5" width="8" height="7" /></element>
 		<element ref="text_4"><bounds x="84.5" y="4.5" width="8" height="7" /></element>
 
-	<!-- lamp matrix -->
-
+		<!-- lamp matrix -->
 		<element ref="static_white"><bounds x="17" y="17" width="83" height="83" /></element>
 
 		<element name="2.0" ref="lamp"><bounds x="20" y="20" width="17" height="17" /></element>
@@ -149,8 +148,7 @@ license:CC0
 		<element name="4.6" ref="lamp"><bounds x="60" y="80" width="17" height="17" /></element>
 		<element name="4.7" ref="lamp"><bounds x="80" y="80" width="17" height="17" /></element>
 
-	<!-- right side -->
-
+		<!-- right side -->
 		<element ref="static_white"><bounds x="105" y="17" width="55" height="23" /></element>
 		<element ref="static_black"><bounds x="106" y="18" width="53" height="21" /></element>
 		<element ref="text_alert"><bounds x="106" y="18.5" width="53" height="8" /></element>
@@ -171,12 +169,11 @@ license:CC0
 		<element name="digit6" ref="digit"><bounds x="126" y="79.7" width="6" height="9" /></element>
 		<element name="digit8" ref="digit"><bounds x="132" y="79.7" width="6" height="9" /></element>
 
-	<!-- button panel -->
-
+		<!-- button panel -->
 		<element ref="static_white"><bounds x="-1" y="105" width="167" height="1" /></element>
 
 		<element ref="static_white"><bounds x="3" y="112" width="50" height="1" /></element>
-		<element ref="text_byl"><bounds x="9.5" y="110" width="37" height="5" /></element>
+		<element ref="text_byl"><bounds x="9.0" y="110" width="38" height="5" /></element>
 		<element ref="static_yellow"><bounds x="3" y="116" width="24" height="21" /></element>
 		<element ref="static_yellow"><bounds x="29" y="116" width="24" height="21" /></element>
 

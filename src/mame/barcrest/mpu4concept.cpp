@@ -24,7 +24,7 @@ using namespace mpu4_traits;
 #define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
 
 #define M4RHFEVC_EXTRA_ROMS \
-	ROM_REGION( 0x080000, "msm6376", 0 ) \
+	ROM_REGION( 0x080000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "rhfs1.bin", 0x0000, 0x03de5e, CRC(0dddd05f) SHA1(908a58752fb1cf76667695a40bcaa7778201c3a2) )
 
 #undef GAME_CUSTOM
@@ -67,7 +67,7 @@ GAME_CUSTOM( 199?, m4rhfevc__y,    m4rhfevc,   "lxled1.bin",   0x0000, 0x010000,
 
 
 #define M4PULWNC_EXTRA_ROMS \
-	ROM_REGION( 0x080000, "msm6376", 0 ) \
+	ROM_REGION( 0x080000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "paws1.bin", 0x0000, 0x03e72f, CRC(124b14ba) SHA1(b6b84c306c83b3159d88992ad88a10aff161fce8) )
 
 #undef GAME_CUSTOM
@@ -117,7 +117,7 @@ GAME_CUSTOM( 199?, m4pulwnc__4,    m4pulwnc,   "tchm02.bin",   0x0000, 0x010000,
 
 
 #define M4SPNWNC_EXTRA_ROMS \
-	ROM_REGION( 0x080000, "msm6376", 0 ) \
+	ROM_REGION( 0x080000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "sawsnd1", 0x0000, 0x080000, CRC(7957381f) SHA1(8fd45e5bf67248607f7d98032e08516ded493d74) )
 
 #undef GAME_CUSTOM
@@ -134,7 +134,7 @@ GAME_CUSTOM( 199?, m4spnwnc__a,    m4spnwnc,   "saw02.bin", 0x0000, 0x010000, CR
 GAME_CUSTOM( 199?, m4spnwnc__b,    m4spnwnc,   "saw03.bin", 0x0000, 0x010000, CRC(a891451d) SHA1(2c0a4b6b5c50e234715e103e72986a2bda1d4588), "Concept Games Ltd","Spin-A-Win (Concept Games Ltd) (MPU4) (set 3)" )
 
 #define M4NUDGWC_EXTRA_ROMS \
-	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x180000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "naws1.bin", 0x0000, 0x02373f, CRC(b2ea8c50) SHA1(a02181f8f4636e69287073f4ffb8604ff2f14b9c) )
 
 #undef GAME_CUSTOM

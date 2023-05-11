@@ -147,7 +147,7 @@ override the default control assignments for emulated inputs by type:
 .. code-block:: XML
 
     <input>
-        <port type="UI_CONFIGURE">
+        <port type="UI_MENU">
             <newseq type="standard">KEYCODE_TAB OR KEYCODE_1 KEYCODE_5</newseq>
         </port>
         <port type="UI_CANCEL">
@@ -170,7 +170,7 @@ override the default control assignments for emulated inputs by type:
 
 This sets the following default input assignments:
 
-Config Menu (User Interface)
+Show/Hide Menu (User Interface)
     Tab key, or 1 and 2 keys pressed simultaneously
 UI Cancel (User Interface)
     Escape key, or 2 and 6 keys pressed simultaneously
@@ -257,5 +257,7 @@ Here’s an example numbering two light guns and two XInput game controllers:
         </input>
     </system>
 
-MAME applies ``mapdevice`` elements found inside any applicable ``system``
-element.
+MAME applies ``mapdevice`` elements found inside the first applicable ``system``
+element only.  To avoid confusion, it’s simplest place the ``system`` element
+element applying to all systems (``name`` attribute set to ``default``) first
+in the file, and use it to assign input device numbers.

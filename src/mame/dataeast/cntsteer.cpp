@@ -46,6 +46,8 @@
 #include "tilemap.h"
 
 
+namespace {
+
 class cntsteer_state : public driver_device
 {
 public:
@@ -1280,6 +1282,8 @@ void cntsteer_state::init_zerotrgt()
 {
 	zerotrgt_rearrange_gfx(0x02000, 0x10000);
 }
+
+} // anonymous namespace
 
 
 /***************************************************************************/

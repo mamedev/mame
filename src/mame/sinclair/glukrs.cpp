@@ -3,6 +3,7 @@
 /***************************************************************************
 
   Mr Gluk Reset Service
+  TODO implementation must be based on KR512VI1 clone MC146818
 
   Refs:
   https://zxart.ee/spa/software/prikladnoe-po/electronics/pzu/mr-gluk-reset-service-663/mr-gluk-reset-service-663/action:viewFile/id:250389/fileId:814961/

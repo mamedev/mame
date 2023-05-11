@@ -32,6 +32,9 @@ lamps?
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class dreambal_state : public driver_device
 {
 public:
@@ -372,6 +375,9 @@ void dreambal_state::init_dreambal()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 }
+
+} // anonymous namespace
+
 
 // Ver 2.4 JPN 93.12.02
 GAME( 1993, dreambal, 0, dreambal, dreambal, dreambal_state, init_dreambal, ROT0, "NDK / Data East", "Dream Ball (Japan V2.4)", MACHINE_SUPPORTS_SAVE ) // copyright shows NDK, board is Data East, code seems Data East-like too

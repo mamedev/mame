@@ -20,6 +20,9 @@
 #include "bus/rs232/rs232.h"
 #include "softlist.h"
 
+
+namespace {
+
 #define MAINCPU_TAG "maincpu"
 #define DUART_A_TAG "duarta"
 #define DUART_B_TAG "duartb"
@@ -83,8 +86,6 @@ void micro20_state::machine_reset()
 	pRAM[0] = pROM[2];
 	pRAM[1] = pROM[3];
 	m_maincpu->reset();
-
-	m_maincpu->set_reset_callback(*this, FUNC(micro20_state::m68k_reset_callback));
 
 	m_tin = 0;
 }
@@ -168,6 +169,7 @@ void micro20_state::micro20(machine_config &config)
 	/* basic machine hardware */
 	M68020(config, m_maincpu, 16.67_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &micro20_state::micro20_map);
+	m_maincpu->reset_cb().set(FUNC(micro20_state::m68k_reset_callback));
 
 	mc68681_device &duart_a(MC68681(config, DUART_A_TAG, 3.6864_MHz_XTAL));
 	duart_a.a_tx_cb().set("rs232", FUNC(rs232_port_device::write_txd));
@@ -214,5 +216,8 @@ ROM_START( micro20 )
 	ROM_LOAD32_BYTE( "d16-23_u10_e5b0.bin", 0x000001, 0x010000, CRC(cd7acf86) SHA1(db994ed714a1079fbb66616355e8f18d2d1a2005) )
 	ROM_LOAD32_BYTE( "d24-31_u13_d115.bin", 0x000000, 0x010000, CRC(3646d943) SHA1(97ee54063e2fe49fef2ff68d0f2e39345a75eac5) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1984, micro20, 0, 0, micro20, micro20, micro20_state, empty_init, "GMX", "Micro 20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

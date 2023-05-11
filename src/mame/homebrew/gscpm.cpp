@@ -22,6 +22,9 @@
 #include "machine/clock.h"
 #include "bus/rs232/rs232.h"
 
+
+namespace {
+
 class gscpm_state : public driver_device
 {
 public:
@@ -124,7 +127,6 @@ void gscpm_state::switch_to_ram_w(uint8_t data)
 
 void gscpm_state::machine_reset()
 {
-	driver_device::machine_reset();
 	// Install the ROM handler here
 	m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x0000, 0x3fff);  // Unmap RAM handler if being rebooted
 	m_maincpu->space(AS_PROGRAM).install_rom(0x0000, 0x3fff, memregion("maincpu")->base());
@@ -179,6 +181,9 @@ ROM_START(gscpm)
 	ROM_REGION(0x4000, "maincpu",0)
 	ROM_LOAD("gscpm.bin",   0x0000, 0x4000, CRC(35ae0d43) SHA1(7fae4df419d38a1787a4a97cbef558f402109959))
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME         PARENT    COMPAT  MACHINE   INPUT    CLASS        INIT           COMPANY           FULLNAME                FLAGS
 COMP( 201?, gscpm,       0,        0,      gscpm,    0,       gscpm_state, empty_init,    "Grant Searle",   "Simple CP/M Machine",  MACHINE_NO_SOUND_HW )

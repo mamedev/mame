@@ -10,6 +10,7 @@
 
 #include "util/xmlfile.h"
 
+#include <QtGui/QKeyEvent>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QAction>
@@ -19,8 +20,9 @@
 
 namespace osd::debugger::qt {
 
-DasmWindow::DasmWindow(running_machine &machine, QWidget *parent) :
-	WindowQt(machine, nullptr)
+DasmWindow::DasmWindow(DebuggerQt &debugger, QWidget *parent) :
+	WindowQt(debugger, nullptr),
+	m_inputHistory()
 {
 	setWindowTitle("Debug: Disassembly View");
 
@@ -41,6 +43,8 @@ DasmWindow::DasmWindow(running_machine &machine, QWidget *parent) :
 	// The input edit
 	m_inputEdit = new QLineEdit(topSubFrame);
 	connect(m_inputEdit, &QLineEdit::returnPressed, this, &DasmWindow::expressionSubmitted);
+	connect(m_inputEdit, &QLineEdit::textEdited, this, &DasmWindow::expressionEdited);
+	m_inputEdit->installEventFilter(this);
 
 	// The cpu combo box
 	m_cpuComboBox = new QComboBox(topSubFrame);
@@ -124,6 +128,39 @@ DasmWindow::~DasmWindow()
 }
 
 
+void DasmWindow::restoreConfiguration(util::xml::data_node const &node)
+{
+	WindowQt::restoreConfiguration(node);
+
+	debug_view_disasm &dasmview = *m_dasmView->view<debug_view_disasm>();
+
+	auto const cpu = node.get_attribute_int(ATTR_WINDOW_DISASSEMBLY_CPU, m_dasmView->sourceIndex());
+	if ((0 <= cpu) && (m_cpuComboBox->count() > cpu))
+		m_cpuComboBox->setCurrentIndex(cpu);
+
+	auto const rightbar = node.get_attribute_int(ATTR_WINDOW_DISASSEMBLY_RIGHT_COLUMN, dasmview.right_column());
+	QActionGroup *const rightBarGroup = findChild<QActionGroup *>("rightbargroup");
+	for (QAction *action : rightBarGroup->actions())
+	{
+		if (action->data().toInt() == rightbar)
+		{
+			action->trigger();
+			break;
+		}
+	}
+
+	util::xml::data_node const *const expression = node.get_child(NODE_WINDOW_EXPRESSION);
+	if (expression && expression->get_value())
+	{
+		m_inputEdit->setText(QString::fromUtf8(expression->get_value()));
+		expressionSubmitted();
+	}
+
+	m_dasmView->restoreConfigurationFromNode(node);
+	m_inputHistory.restoreConfigurationFromNode(node);
+}
+
+
 void DasmWindow::saveConfigurationToNode(util::xml::data_node &node)
 {
 	WindowQt::saveConfigurationToNode(node);
@@ -134,6 +171,53 @@ void DasmWindow::saveConfigurationToNode(util::xml::data_node &node)
 	node.set_attribute_int(ATTR_WINDOW_DISASSEMBLY_CPU, m_dasmView->sourceIndex());
 	node.set_attribute_int(ATTR_WINDOW_DISASSEMBLY_RIGHT_COLUMN, dasmview.right_column());
 	node.add_child(NODE_WINDOW_EXPRESSION, dasmview.expression());
+
+	m_dasmView->saveConfigurationToNode(node);
+	m_inputHistory.saveConfigurationToNode(node);
+}
+
+
+// Used to intercept the user hitting the up arrow in the input widget
+bool DasmWindow::eventFilter(QObject *obj, QEvent *event)
+{
+	// Only filter keypresses
+	if (event->type() != QEvent::KeyPress)
+		return QObject::eventFilter(obj, event);
+
+	QKeyEvent const &keyEvent = *static_cast<QKeyEvent *>(event);
+
+	// Catch up & down keys
+	if (keyEvent.key() == Qt::Key_Escape)
+	{
+		m_inputEdit->setText(QString::fromUtf8(m_dasmView->view<debug_view_disasm>()->expression()));
+		m_inputEdit->selectAll();
+		m_inputHistory.reset();
+		return true;
+	}
+	else if (keyEvent.key() == Qt::Key_Up)
+	{
+		QString const *const hist = m_inputHistory.previous(m_inputEdit->text());
+		if (hist)
+		{
+			m_inputEdit->setText(*hist);
+			m_inputEdit->setSelection(hist->size(), 0);
+		}
+		return true;
+	}
+	else if (keyEvent.key() == Qt::Key_Down)
+	{
+		QString const *const hist = m_inputHistory.next(m_inputEdit->text());
+		if (hist)
+		{
+			m_inputEdit->setText(*hist);
+			m_inputEdit->setSelection(hist->size(), 0);
+		}
+		return true;
+	}
+	else
+	{
+		return QObject::eventFilter(obj, event);
+	}
 }
 
 
@@ -150,8 +234,18 @@ void DasmWindow::cpuChanged(int index)
 void DasmWindow::expressionSubmitted()
 {
 	const QString expression = m_inputEdit->text();
-	m_dasmView->view<debug_view_disasm>()->set_expression(expression.toLocal8Bit().data());
-	m_dasmView->viewport()->update();
+	m_dasmView->view<debug_view_disasm>()->set_expression(expression.toUtf8().data());
+	m_inputEdit->selectAll();
+
+	// Add history
+	if (!expression.isEmpty())
+		m_inputHistory.add(expression);
+}
+
+
+void DasmWindow::expressionEdited(QString const &text)
+{
+	m_inputHistory.edit();
 }
 
 
@@ -181,8 +275,6 @@ void DasmWindow::toggleBreakpointAtCursor(bool changedTo)
 		m_machine.debug_view().update_all();
 		m_machine.debugger().refresh_display();
 	}
-
-	refreshAll();
 }
 
 
@@ -205,8 +297,6 @@ void DasmWindow::enableBreakpointAtCursor(bool changedTo)
 			m_machine.debugger().refresh_display();
 		}
 	}
-
-	refreshAll();
 }
 
 
@@ -282,36 +372,6 @@ void DasmWindow::setToCurrentCpu()
 			m_cpuComboBox->setCurrentIndex(listIndex);
 		}
 	}
-}
-
-
-//=========================================================================
-//  DasmWindowQtConfig
-//=========================================================================
-
-void DasmWindowQtConfig::applyToQWidget(QWidget *widget)
-{
-	WindowQtConfig::applyToQWidget(widget);
-	DasmWindow *window = dynamic_cast<DasmWindow *>(widget);
-	QComboBox *cpu = window->findChild<QComboBox *>("cpu");
-	cpu->setCurrentIndex(m_cpu);
-
-	QActionGroup *const rightBarGroup = window->findChild<QActionGroup *>("rightbargroup");
-	for (QAction *action : rightBarGroup->actions())
-	{
-		if (action->data().toInt() == m_rightBar)
-		{
-			action->trigger();
-			break;
-		}
-	}
-}
-
-void DasmWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
-{
-	WindowQtConfig::recoverFromXmlNode(node);
-	m_cpu = node.get_attribute_int(ATTR_WINDOW_DISASSEMBLY_CPU, m_cpu);
-	m_rightBar = node.get_attribute_int(ATTR_WINDOW_DISASSEMBLY_RIGHT_COLUMN, m_rightBar);
 }
 
 } // namespace osd::debugger::qt

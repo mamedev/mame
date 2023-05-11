@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_CMI_MKBD_H
-#define MAME_MACHINE_CMI_MKBD_H
+#ifndef MAME_FAIRLIGHT_CMI_MKBD_H
+#define MAME_FAIRLIGHT_CMI_MKBD_H
 
 #pragma once
 
@@ -180,4 +180,4 @@ private:
 
 DECLARE_DEVICE_TYPE(CMI_MUSIC_KEYBOARD, cmi_music_keyboard_device)
 
-#endif // MAME_MACHINE_CMI_MKBD_H
+#endif // MAME_FAIRLIGHT_CMI_MKBD_H

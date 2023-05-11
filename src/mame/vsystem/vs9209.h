@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_VS9209_H
-#define MAME_MACHINE_VS9209_H
+#ifndef MAME_VSYSTEM_VS9209_H
+#define MAME_VSYSTEM_VS9209_H
 
 #pragma once
 
@@ -65,4 +65,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(VS9209, vs9209_device)
 
-#endif // MAME_MACHINE_VS9209_H
+#endif // MAME_VSYSTEM_VS9209_H

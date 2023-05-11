@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_SPECTRUM_H
-#define MAME_INCLUDES_SPECTRUM_H
+#ifndef MAME_SINCLAIR_SPECTRUM_H
+#define MAME_SINCLAIR_SPECTRUM_H
 
 #pragma once
 
@@ -94,8 +94,8 @@ protected:
 	virtual void spectrum_128_update_memory() { }
 	virtual void ts2068_update_memory() { }
 
-	TIMER_CALLBACK_MEMBER(irq_on);
-	TIMER_CALLBACK_MEMBER(irq_off);
+	virtual TIMER_CALLBACK_MEMBER(irq_on);
+	virtual TIMER_CALLBACK_MEMBER(irq_off);
 	TIMER_CALLBACK_MEMBER(finish_screen_update);
 
 	emu_timer *m_irq_on_timer;
@@ -220,4 +220,4 @@ INPUT_PORTS_EXTERN( spectrum );
 INPUT_PORTS_EXTERN( spec128 );
 INPUT_PORTS_EXTERN( spec_plus );
 
-#endif // MAME_INCLUDES_SPECTRUM_H
+#endif // MAME_SINCLAIR_SPECTRUM_H

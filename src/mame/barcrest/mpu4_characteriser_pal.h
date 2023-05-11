@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, James Wallace
 
-#ifndef MAME_MACHINE_MPU4_CHARACTERISER_PAL_H
-#define MAME_MACHINE_MPU4_CHARACTERISER_PAL_H
+#ifndef MAME_BARCREST_MPU4_CHARACTERISER_PAL_H
+#define MAME_BARCREST_MPU4_CHARACTERISER_PAL_H
 
 #pragma once
 
@@ -56,7 +56,7 @@ public:
 	virtual uint8_t read(offs_t offset);
 	virtual void write(offs_t offset, uint8_t data);
 
-	/* While some games use unique keys and lamp scrambles, several do write the same sequencesand expect the
+	/* While some games use unique keys and lamp scrambles, several do write the same sequences and expect the
 	   same responses.  It is possible PALs were reused.  Sometimes the lamp tables are masked subsets, as
 	   they were handcrafted when the layouts were made, they could also be incorrect in places.
 
@@ -1435,4 +1435,4 @@ private:
 	uint8_t m_temp_debug_table[64];
 };
 
-#endif // MAME_MACHINE_MPU4_CHARACTERISER_PAL_H
+#endif // MAME_BARCREST_MPU4_CHARACTERISER_PAL_H

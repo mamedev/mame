@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 The Epoch Super Cassette Vision was also released in Europe under the Yeno
 brand. About half of the games released in Japan were also released in Europe.
@@ -248,10 +248,10 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 	</software>
 
 	<software name="y2mnstld">
-	<!-- Alt. Title: Wai Wai Monster Land -->
 		<description>Y² Monster Land</description>
 		<year>1986</year>
 		<publisher>Epoch</publisher>
+		<info name="alt_title" value="Wai Wai Monster Land" />
 		<part name="cart" interface="scv_cart">
 			<feature name="slot" value="rom128k" />
 			<dataarea name="rom" size="131072">
@@ -273,7 +273,7 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 	</software>
 
 	<software name="nebulaa" cloneof="nebula">
-		<description>Nebula (Alt)</description>
+		<description>Nebula (alt)</description>
 		<year>1984</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
@@ -417,7 +417,7 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 
 	<!-- maybe pal, name taken from boxart -->
 	<software name="soccera" cloneof="soccer">
-		<description>Super Soccer (Alt)</description>
+		<description>Super Soccer (alt)</description>
 		<year>1985</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">

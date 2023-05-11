@@ -1,205 +1,449 @@
 <?xml version="1.0"?>
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <mamelayout version="2">
-	<element name="digit" defstate="10">
+
+<!-- define elements -->
+
+	<element name="black"><rect><color red="0" green="0" blue="0" /></rect></element>
+	<element name="yellow"><rect><color red="0.9" green="0.9" blue="0.15" /></rect></element>
+	<element name="blue"><rect><color red="0.1" green="0.5" blue="0.9" /></rect></element>
+	<element name="red"><rect><color red="0.9" green="0.2" blue="0.15" /></rect></element>
+
+	<element name="text_b1"><text string="1ST." align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_b2"><text string="2ND." align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_b3"><text string="3RD." align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_b4"><text string="4TH." align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_b5"><text string="5TH." align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+
+	<element name="text_best">
+		<rect><color red="0.9" green="0.2" blue="0.15" /></rect>
+		<text string="BEST 5"><color red="0.9" green="0.9" blue="0.9" /></text>
+	</element>
+	<element name="text_score">
+		<rect><color red="0.9" green="0.2" blue="0.15" /></rect>
+		<text string="YOUR SCORE"><color red="0.9" green="0.9" blue="0.9" /></text>
+	</element>
+
+	<element name="text_rpm"><text string="RPM" align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_speed"><text string="SPEED" align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+
+	<element name="nothing"><rect><color alpha="0" /></rect></element>
+
+	<element name="digit" defstate="0">
 		<led7seg>
-			<color red="1.0" green="0.3" blue="0.0" />
+			<color red="1.0" green="0.1" blue="0.15" />
 		</led7seg>
 	</element>
 
+	<element name="shifter" defstate="0">
+		<rect>
+			<bounds left="0" right="32" top="0" bottom="64" />
+			<color red="0.85" green="0.4" blue="0.3" />
+		</rect>
+		<rect>
+			<bounds left="2" right="30" top="2" bottom="62" />
+			<color red="0.14" green="0.17" blue="0.2" />
+		</rect>
+		<rect>
+			<bounds left="14" right="18" top="15" bottom="49" />
+			<color red="0.44" green="0.47" blue="0.5" />
+		</rect>
+		<disk>
+			<bounds left="14" right="18" top="13" bottom="17" />
+			<color red="0.44" green="0.47" blue="0.5" />
+		</disk>
+		<disk>
+			<bounds left="14" right="18" top="47" bottom="51" />
+			<color red="0.44" green="0.47" blue="0.5" />
+		</disk>
+		<text string="LOW" state="0">
+			<bounds left="3" right="29" top="2" bottom="12" />
+			<color red="1.0" green="1.0" blue="0.4" />
+		</text>
+		<text string="LOW" state="1">
+			<bounds left="3" right="29" top="2" bottom="12" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+
+		<text string="HIGH" state="0">
+			<bounds left="3" right="29" top="52" bottom="62" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+		<text string="HIGH" state="1">
+			<bounds left="3" right="29" top="52" bottom="62" />
+			<color red="1.0" green="1.0" blue="0.4" />
+		</text>
+		<disk state="0">
+			<bounds left="9" right="23" top="14" bottom="28" />
+			<color red="0.85" green="0.4" blue="0.3" />
+		</disk>
+		<disk state="1">
+			<bounds left="9" right="23" top="36" bottom="50" />
+			<color red="0.85" green="0.4" blue="0.3" />
+		</disk>
+	</element>
+
+
+<!-- speedometer -->
+
 	<element name="speed" defstate="0">
 		<rect>
-			<bounds x="0" y="0" width="86" height="26" />
-			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0" width="22" height="1" />
+			<color alpha="0" />
 		</rect>
 		<rect>
-			<bounds x="4" y="2" width="78" height="22" />
-			<color red="0.0" green="0.1" blue="0.0" />
+			<bounds x="1" y="0" width="20" height="1" />
+			<color red="0.1" green="0.01" blue="0.015" />
 		</rect>
-		<rect state="1">
-			<bounds x="4" y="2" width="6" height="22" />
-			<color red="0.0" green="1.0" blue="0.0" />
+
+		<!-- leds -->
+		<rect state="1"> <bounds x="1" y="0" width="2"  height="1" /><color red="1.0" green="0.1" blue="0.15" /></rect>
+		<rect state="2"> <bounds x="1" y="0" width="4"  height="1" /><color red="1.0" green="0.1" blue="0.15" /></rect>
+		<rect state="3"> <bounds x="1" y="0" width="6"  height="1" /><color red="1.0" green="0.1" blue="0.15" /></rect>
+		<rect state="4"> <bounds x="1" y="0" width="8"  height="1" /><color red="1.0" green="0.1" blue="0.15" /></rect>
+		<rect state="5"> <bounds x="1" y="0" width="10" height="1" /><color red="1.0" green="0.1" blue="0.15" /></rect>
+		<rect state="6"> <bounds x="1" y="0" width="12" height="1" /><color red="1.0" green="0.1" blue="0.15" /></rect>
+		<rect state="7"> <bounds x="1" y="0" width="14" height="1" /><color red="1.0" green="0.1" blue="0.15" /></rect>
+		<rect state="8"> <bounds x="1" y="0" width="16" height="1" /><color red="1.0" green="0.1" blue="0.15" /></rect>
+		<rect state="9"> <bounds x="1" y="0" width="18" height="1" /><color red="1.0" green="0.1" blue="0.15" /></rect>
+		<rect state="10"><bounds x="1" y="0" width="20" height="1" /><color red="1.0" green="0.1" blue="0.15" /></rect>
+
+		<!-- voltage higher than threshold -->
+		<rect state="11"><bounds x="1" y="0" width="20" height="1" /><color red="1.0" green="0.1" blue="0.15" /></rect>
+		<rect state="12"><bounds x="1" y="0" width="20" height="1" /><color red="1.0" green="0.1" blue="0.15" /></rect>
+		<rect state="13"><bounds x="1" y="0" width="20" height="1" /><color red="1.0" green="0.1" blue="0.15" /></rect>
+		<rect state="14"><bounds x="1" y="0" width="20" height="1" /><color red="1.0" green="0.1" blue="0.15" /></rect>
+		<rect state="15"><bounds x="1" y="0" width="20" height="1" /><color red="1.0" green="0.1" blue="0.15" /></rect>
+
+		<!-- gaps -->
+		<rect><bounds x="-0.1" y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="0.9"  y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="1.9"  y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="2.9"  y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="3.9"  y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="4.9"  y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="5.9"  y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="6.9"  y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="7.9"  y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="8.9"  y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="9.9"  y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="10.9" y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="11.9" y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="12.9" y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="13.9" y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="14.9" y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="15.9" y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="16.9" y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="17.9" y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="18.9" y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="19.9" y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+	</element>
+
+
+<!-- tachometer -->
+
+	<element name="tacho" defstate="0">
+		<rect>
+			<bounds x="0" y="0" width="22" height="1" />
+			<color alpha="0" />
 		</rect>
-		<rect state="2">
-			<bounds x="4" y="2" width="14" height="22" />
-			<color red="0.0" green="1.0" blue="0.0" />
+		<rect>
+			<bounds x="1" y="0" width="20" height="1" />
+			<color red="0.1" green="0.01" blue="0.015" />
 		</rect>
-		<rect state="3">
-			<bounds x="4" y="2" width="22" height="22" />
-			<color red="0.0" green="1.0" blue="0.0" />
+
+		<!-- leds -->
+		<rect state="1"> <bounds x="1" y="0" width="1"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="2"> <bounds x="1" y="0" width="1"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="3"> <bounds x="1" y="0" width="1"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="4"> <bounds x="1" y="0" width="2"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="5"> <bounds x="1" y="0" width="2"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="6"> <bounds x="1" y="0" width="2"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="7"> <bounds x="1" y="0" width="3"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="8"> <bounds x="1" y="0" width="3"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="9"> <bounds x="1" y="0" width="3"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="10"><bounds x="1" y="0" width="4"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="11"><bounds x="1" y="0" width="4"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="12"><bounds x="1" y="0" width="4"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="13"><bounds x="1" y="0" width="5"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="14"><bounds x="1" y="0" width="5"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="15"><bounds x="1" y="0" width="5"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="16"><bounds x="1" y="0" width="6"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="17"><bounds x="1" y="0" width="6"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="18"><bounds x="1" y="0" width="6"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="19"><bounds x="1" y="0" width="7"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="20"><bounds x="1" y="0" width="7"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="21"><bounds x="1" y="0" width="7"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="22"><bounds x="1" y="0" width="8"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="23"><bounds x="1" y="0" width="8"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="24"><bounds x="1" y="0" width="8"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="25"><bounds x="1" y="0" width="9"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="26"><bounds x="1" y="0" width="9"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="27"><bounds x="1" y="0" width="9"  height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="28"><bounds x="1" y="0" width="10" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="29"><bounds x="1" y="0" width="10" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="30"><bounds x="1" y="0" width="10" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="31"><bounds x="1" y="0" width="11" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="32"><bounds x="1" y="0" width="11" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="33"><bounds x="1" y="0" width="11" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="34"><bounds x="1" y="0" width="12" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="35"><bounds x="1" y="0" width="12" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="36"><bounds x="1" y="0" width="12" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="37"><bounds x="1" y="0" width="13" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="38"><bounds x="1" y="0" width="13" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="39"><bounds x="1" y="0" width="13" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="40"><bounds x="1" y="0" width="14" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="41"><bounds x="1" y="0" width="14" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="42"><bounds x="1" y="0" width="14" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="43"><bounds x="1" y="0" width="15" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="44"><bounds x="1" y="0" width="15" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="45"><bounds x="1" y="0" width="15" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="46"><bounds x="1" y="0" width="16" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="47"><bounds x="1" y="0" width="16" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="48"><bounds x="1" y="0" width="16" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="49"><bounds x="1" y="0" width="17" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="50"><bounds x="1" y="0" width="17" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="51"><bounds x="1" y="0" width="17" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="52"><bounds x="1" y="0" width="18" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="53"><bounds x="1" y="0" width="18" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="54"><bounds x="1" y="0" width="18" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="55"><bounds x="1" y="0" width="19" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="56"><bounds x="1" y="0" width="19" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="57"><bounds x="1" y="0" width="19" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="58"><bounds x="1" y="0" width="20" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="59"><bounds x="1" y="0" width="20" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="60"><bounds x="1" y="0" width="20" height="1" /><color red="1" green="1" blue="1" /></rect>
+
+		<!-- voltage higher than threshold -->
+		<rect state="61"><bounds x="1" y="0" width="20" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="62"><bounds x="1" y="0" width="20" height="1" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="63"><bounds x="1" y="0" width="20" height="1" /><color red="1" green="1" blue="1" /></rect>
+
+		<!-- gaps -->
+		<rect><bounds x="-0.1" y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="0.9"  y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="1.9"  y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="2.9"  y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="3.9"  y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="4.9"  y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="5.9"  y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="6.9"  y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="7.9"  y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="8.9"  y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="9.9"  y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="10.9" y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="11.9" y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="12.9" y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="13.9" y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="14.9" y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="15.9" y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="16.9" y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="17.9" y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="18.9" y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+		<rect><bounds x="19.9" y="0" width="0.2" height="1" /><color red="0" green="0" blue="0" /></rect>
+	</element>
+
+	<element name="tachom">
+		<rect>
+			<bounds x="0" y="0" width="22" height="1" />
+			<color red="0" green="0" blue="0" />
 		</rect>
-		<rect state="4">
-			<bounds x="4" y="2" width="30" height="22" />
-			<color red="0.0" green="1.0" blue="0.0" />
+
+		<!-- green/yellow/red mask -->
+		<rect>
+			<bounds x="1" y="0" width="15" height="1" />
+			<color red="0.15" green="1.0" blue="0.1" />
 		</rect>
-		<rect state="5">
-			<bounds x="4" y="2" width="38" height="22" />
-			<color red="0.0" green="1.0" blue="0.0" />
+		<rect>
+			<bounds x="15" y="0" width="4" height="1" />
+			<color red="1.0" green="1.0" blue="0.15" />
 		</rect>
-		<rect state="6">
-			<bounds x="4" y="2" width="46" height="22" />
-			<color red="0.0" green="1.0" blue="0.0" />
-		</rect>
-		<rect state="7">
-			<bounds x="4" y="2" width="54" height="22" />
-			<color red="0.0" green="1.0" blue="0.0" />
-		</rect>
-		<rect state="8">
-			<bounds x="4" y="2" width="62" height="22" />
-			<color red="0.0" green="1.0" blue="0.0" />
-		</rect>
-		<rect state="9">
-			<bounds x="4" y="2" width="70" height="22" />
-			<color red="0.0" green="1.0" blue="0.0" />
-		</rect>
-		<rect state="10">
-			<bounds x="4" y="2" width="78" height="22" />
-			<color red="0.0" green="1.0" blue="0.0" />
+		<rect>
+			<bounds x="19" y="0" width="2" height="1" />
+			<color red="1.0" green="0.1" blue="0.15" />
 		</rect>
 	</element>
 
-	<view name="Simple LEDs">
-		<bounds left="-59" right="186" top="0" bottom="248" />
+
+<!-- best 5 score digits -->
+
+	<group name="best">
+		<element ref="yellow"><bounds x="0" y="0" width="96" height="23" /></element>
+		<element ref="black"><bounds x="1" y="1" width="94" height="21" /></element>
+		<element ref="text_b1"><bounds x="3" y="4" width="50" height="15" /></element>
+		<element name="digit26" ref="digit"><bounds x="32" y="4" width="10" height="15" /></element>
+		<element name="digit25" ref="digit"><bounds x="44" y="4" width="10" height="15" /></element>
+		<element name="digit24" ref="digit"><bounds x="56" y="4" width="10" height="15" /></element>
+		<element name="digit23" ref="digit"><bounds x="68" y="4" width="10" height="15" /></element>
+		<element name="digit22" ref="digit"><bounds x="80" y="4" width="10" height="15" /></element>
+
+		<element ref="yellow"><bounds x="0" y="27" width="96" height="23" /></element>
+		<element ref="black"><bounds x="1" y="28" width="94" height="21" /></element>
+		<element ref="text_b2"><bounds x="3" y="31" width="50" height="15" /></element>
+		<element name="digit21" ref="digit"><bounds x="32" y="31" width="10" height="15" /></element>
+		<element name="digit20" ref="digit"><bounds x="44" y="31" width="10" height="15" /></element>
+		<element name="digit19" ref="digit"><bounds x="56" y="31" width="10" height="15" /></element>
+		<element name="digit18" ref="digit"><bounds x="68" y="31" width="10" height="15" /></element>
+		<element name="digit17" ref="digit"><bounds x="80" y="31" width="10" height="15" /></element>
+
+		<element ref="yellow"><bounds x="0" y="54" width="96" height="23" /></element>
+		<element ref="black"><bounds x="1" y="55" width="94" height="21" /></element>
+		<element ref="text_b3"><bounds x="3" y="58" width="50" height="15" /></element>
+		<element name="digit16" ref="digit"><bounds x="32" y="58" width="10" height="15" /></element>
+		<element name="digit15" ref="digit"><bounds x="44" y="58" width="10" height="15" /></element>
+		<element name="digit14" ref="digit"><bounds x="56" y="58" width="10" height="15" /></element>
+		<element name="digit13" ref="digit"><bounds x="68" y="58" width="10" height="15" /></element>
+		<element name="digit12" ref="digit"><bounds x="80" y="58" width="10" height="15" /></element>
+
+		<element ref="yellow"><bounds x="0" y="81" width="96" height="23" /></element>
+		<element ref="black"><bounds x="1" y="82" width="94" height="21" /></element>
+		<element ref="text_b4"><bounds x="3" y="85" width="50" height="15" /></element>
+		<element name="digit11" ref="digit"><bounds x="32" y="85" width="10" height="15" /></element>
+		<element name="digit10" ref="digit"><bounds x="44" y="85" width="10" height="15" /></element>
+		<element name="digit9" ref="digit"><bounds x="56" y="85" width="10" height="15" /></element>
+		<element name="digit8" ref="digit"><bounds x="68" y="85" width="10" height="15" /></element>
+		<element name="digit7" ref="digit"><bounds x="80" y="85" width="10" height="15" /></element>
+
+		<element ref="yellow"><bounds x="0" y="108" width="96" height="23" /></element>
+		<element ref="black"><bounds x="1" y="109" width="94" height="21" /></element>
+		<element ref="text_b5"><bounds x="3" y="112" width="50" height="15" /></element>
+		<element name="digit6" ref="digit"><bounds x="32" y="112" width="10" height="15" /></element>
+		<element name="digit5" ref="digit"><bounds x="44" y="112" width="10" height="15" /></element>
+		<element name="digit4" ref="digit"><bounds x="56" y="112" width="10" height="15" /></element>
+		<element name="digit3" ref="digit"><bounds x="68" y="112" width="10" height="15" /></element>
+		<element name="digit2" ref="digit"><bounds x="80" y="112" width="10" height="15" /></element>
+	</group>
+
+	<group name="panel1">
+		<element ref="blue"><bounds x="0" y="0" width="152" height="238" /></element>
+		<element ref="black"><bounds x="8" y="8" width="136" height="222" /></element>
+		<element ref="red"><bounds x="10" y="10" width="132" height="31.5" /></element>
+		<element ref="text_best"><bounds x="10" y="14.25" width="132" height="23" /></element>
+		<group ref="best"><bounds x="10" y="48" width="132" height="180" /></group>
+	</group>
+
+
+<!-- player score digits -->
+
+	<group name="score">
+		<element ref="yellow"><bounds x="0" y="0" width="96" height="28" /></element>
+		<element ref="black"><bounds x="1" y="1" width="94" height="26" /></element>
+
+		<element name="digit31" ref="digit"><bounds x="7"  y="4" width="13.33" height="20" /></element>
+		<element name="digit30" ref="digit"><bounds x="24" y="4" width="13.33" height="20" /></element>
+		<element name="digit29" ref="digit"><bounds x="41" y="4" width="13.33" height="20" /></element>
+		<element name="digit28" ref="digit"><bounds x="58" y="4" width="13.33" height="20" /></element>
+		<element name="digit27" ref="digit"><bounds x="75" y="4" width="13.33" height="20" /></element>
+	</group>
+
+	<group name="panel2">
+		<element ref="blue"><bounds x="0" y="0" width="152" height="96.5" /></element>
+		<element ref="black"><bounds x="8" y="8" width="136" height="80.5" /></element>
+		<element ref="red"><bounds x="10" y="10" width="132" height="31.5" /></element>
+		<element ref="text_score"><bounds x="10" y="14.25" width="132" height="23" /></element>
+		<group ref="score"><bounds x="10" y="48" width="132" height="38.5" /></group>
+	</group>
+
+
+<!-- side panel -->
+
+	<group name="panel">
+		<element ref="nothing"><bounds x="0" y="0" width="168" height="640" /></element>
+
+		<group ref="panel1"><bounds x="8" y="35" width="152" height="238" /></group>
+		<group ref="panel2"><bounds x="8" y="310" width="152" height="96.5" /></group>
+
+		<element ref="text_rpm"><bounds x="8" y="445" width="80" height="12" /></element>
+		<element name="tachometer" ref="tacho"><bounds x="0" y="460" width="168" height="4" /></element>
+		<element ref="tachom" blend="multiply"><bounds x="0" y="460" width="168" height="4" /></element>
+
+		<element ref="text_speed"><bounds x="8" y="480" width="80" height="12" /></element>
+		<element name="speed" ref="speed"><bounds x="0" y="495" width="168" height="4" /></element>
+	</group>
+
+
+<!-- build screen -->
+
+	<view name="Shifter-R">
+		<collection name="Side Panel">
+			<group ref="panel"><bounds x="-168" y="0" width="168" height="640" /></group>
+		</collection>
 
 		<screen index="0">
-			<bounds left="0" top="0" right="186" bottom="248" />
+			<bounds x="0" y="0" width="480" height="640" />
 		</screen>
-
-<!--
-        <element ref="panel">
-            <bounds left="-59" top="0" right="0" bottom="248" />
-        </element>
--->
-		<element name="speed" ref="speed">
-			<bounds left="-51" top="218" right="-8" bottom="231" />
-		</element>
-
-
-		<element name="digit27" ref="digit">
-			<bounds left="-15" top="18" right="-8" bottom="31" />
-		</element>
-
-		<element name="digit28" ref="digit">
-			<bounds left="-24" top="18" right="-17" bottom="31" />
-		</element>
-
-		<element name="digit29" ref="digit">
-			<bounds left="-33" top="18" right="-26" bottom="31" />
-		</element>
-
-		<element name="digit30" ref="digit">
-			<bounds left="-42" top="18" right="-35" bottom="31" />
-		</element>
-
-		<element name="digit31" ref="digit">
-			<bounds left="-51" top="18" right="-44" bottom="31" />
-		</element>
-
-
-		<element name="digit2" ref="digit">
-			<bounds left="-20" top="110" right="-15" bottom="120" />
-		</element>
-
-		<element name="digit3" ref="digit">
-			<bounds left="-26" top="110" right="-21" bottom="120" />
-		</element>
-
-		<element name="digit4" ref="digit">
-			<bounds left="-32" top="110" right="-27" bottom="120" />
-		</element>
-
-		<element name="digit5" ref="digit">
-			<bounds left="-38" top="110" right="-33" bottom="120" />
-		</element>
-
-		<element name="digit6" ref="digit">
-			<bounds left="-44" top="110" right="-39" bottom="120" />
-		</element>
-
-
-		<element name="digit7" ref="digit">
-			<bounds left="-20" top="95" right="-15" bottom="105" />
-		</element>
-
-		<element name="digit8" ref="digit">
-			<bounds left="-26" top="95" right="-21" bottom="105" />
-		</element>
-
-		<element name="digit9" ref="digit">
-			<bounds left="-32" top="95" right="-27" bottom="105" />
-		</element>
-
-		<element name="digit10" ref="digit">
-			<bounds left="-38" top="95" right="-33" bottom="105" />
-		</element>
-
-		<element name="digit11" ref="digit">
-			<bounds left="-44" top="95" right="-39" bottom="105" />
-		</element>
-
-
-		<element name="digit12" ref="digit">
-			<bounds left="-20" top="80" right="-15" bottom="90" />
-		</element>
-
-		<element name="digit13" ref="digit">
-			<bounds left="-26" top="80" right="-21" bottom="90" />
-		</element>
-
-		<element name="digit14" ref="digit">
-			<bounds left="-32" top="80" right="-27" bottom="90" />
-		</element>
-
-		<element name="digit15" ref="digit">
-			<bounds left="-38" top="80" right="-33" bottom="90" />
-		</element>
-
-		<element name="digit16" ref="digit">
-			<bounds left="-44" top="80" right="-39" bottom="90" />
-		</element>
-
-
-		<element name="digit17" ref="digit">
-			<bounds left="-20" top="65" right="-15" bottom="75" />
-		</element>
-
-		<element name="digit18" ref="digit">
-			<bounds left="-26" top="65" right="-21" bottom="75" />
-		</element>
-
-		<element name="digit19" ref="digit">
-			<bounds left="-32" top="65" right="-27" bottom="75" />
-		</element>
-
-		<element name="digit20" ref="digit">
-			<bounds left="-38" top="65" right="-33" bottom="75" />
-		</element>
-
-		<element name="digit21" ref="digit">
-			<bounds left="-44" top="65" right="-39" bottom="75" />
-		</element>
-
-
-		<element name="digit22" ref="digit">
-			<bounds left="-20" top="50" right="-15" bottom="60" />
-		</element>
-
-		<element name="digit23" ref="digit">
-			<bounds left="-26" top="50" right="-21" bottom="60" />
-		</element>
-
-		<element name="digit24" ref="digit">
-			<bounds left="-32" top="50" right="-27" bottom="60" />
-		</element>
-
-		<element name="digit25" ref="digit">
-			<bounds left="-38" top="50" right="-33" bottom="60" />
-		</element>
-
-		<element name="digit26" ref="digit">
-			<bounds left="-44" top="50" right="-39" bottom="60" />
+		<element ref="shifter" inputtag="IN0" inputmask="0x04">
+			<bounds x="446" y="574" width="32" height="64" />
+			<color alpha="0.6" />
 		</element>
 	</view>
+
+	<view name="Shifter-L">
+		<collection name="Side Panel">
+			<group ref="panel"><bounds x="-168" y="0" width="168" height="640" /></group>
+		</collection>
+
+		<screen index="0">
+			<bounds x="0" y="0" width="480" height="640" />
+		</screen>
+		<element ref="shifter" inputtag="IN0" inputmask="0x04">
+			<bounds x="2" y="574" width="32" height="64" />
+			<color alpha="0.6" />
+		</element>
+	</view>
+
+	<view name="Widescreen Shifter-R">
+		<collection name="Side Panel">
+			<group ref="panel"><bounds x="-168" y="0" width="168" height="640" /></group>
+		</collection>
+
+		<screen index="0">
+			<bounds x="0" y="0" width="480" height="640" />
+		</screen>
+		<element ref="shifter" inputtag="IN0" inputmask="0x04">
+			<bounds x="496" y="574" width="32" height="64" />
+		</element>
+	</view>
+
+	<view name="Widescreen Shifter-L">
+		<collection name="Side Panel">
+			<group ref="panel"><bounds x="-168" y="0" width="168" height="640" /></group>
+		</collection>
+
+		<screen index="0">
+			<bounds x="0" y="0" width="480" height="640" />
+		</screen>
+		<element ref="shifter" inputtag="IN0" inputmask="0x04">
+			<bounds x="-48" y="574" width="32" height="64" />
+		</element>
+	</view>
+
+	<view name="Vertical Widescreen Shifter-R">
+		<collection name="Side Panel">
+			<group ref="panel"><bounds x="-168" y="0" width="168" height="640" /></group>
+		</collection>
+
+		<screen index="0">
+			<bounds x="0" y="0" width="480" height="640" />
+		</screen>
+		<element ref="shifter" inputtag="IN0" inputmask="0x04">
+			<bounds x="446" y="648" width="32" height="64" />
+		</element>
+	</view>
+
+	<view name="Vertical Widescreen Shifter-L">
+		<collection name="Side Panel">
+			<group ref="panel"><bounds x="-168" y="0" width="168" height="640" /></group>
+		</collection>
+
+		<screen index="0">
+			<bounds x="0" y="0" width="480" height="640" />
+		</screen>
+		<element ref="shifter" inputtag="IN0" inputmask="0x04">
+			<bounds x="2" y="648" width="32" height="64" />
+		</element>
+	</view>
+
 </mamelayout>

@@ -14,6 +14,7 @@
 #include "screen.h"
 #include "bus/sat_ctrl/ctrl.h"
 #include "machine/nvram.h"
+#include "dirtc.h"
 
 
 //**************************************************************************
@@ -23,7 +24,8 @@
 // ======================> smpc_hle_device
 
 class smpc_hle_device : public device_t,
-						public device_memory_interface
+						public device_memory_interface,
+						public device_rtc_interface
 {
 public:
 	// construction/destruction
@@ -87,6 +89,11 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual space_config_vector memory_space_config() const override;
+
+	// device_rtc_interface overrides
+	virtual bool rtc_feature_y2k() const override { return true; }
+	virtual bool rtc_feature_leap_year() const override { return true; }
+	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
 
 private:
 

@@ -36,7 +36,7 @@ protected:
 	TIMER_CALLBACK_MEMBER(bus_error_off);
 
 private:
-	required_device<m68000_base_device> m_maincpu;
+	required_device<m68000_musashi_device> m_maincpu;
 	required_device<bim68153_device> m_bim;
 	required_device<mpcc68561_device> m_mpcc;
 	required_device<rtc62421_device> m_rtc;

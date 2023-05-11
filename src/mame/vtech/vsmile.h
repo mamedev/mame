@@ -17,8 +17,8 @@
 
 *******************************************************************************/
 
-#ifndef MAME_INCLUDES_VSMILE_H
-#define MAME_INCLUDES_VSMILE_H
+#ifndef MAME_VTECH_VSMILE_H
+#define MAME_VTECH_VSMILE_H
 
 #include "bus/vsmile/vsmile_ctrl.h"
 #include "bus/vsmile/vsmile_slot.h"
@@ -68,6 +68,7 @@ public:
 		: vsmile_base_state(mconfig, type, tag)
 		, m_ctrl(*this, "ctrl%u", 1U)
 		, m_dsw_region(*this, "REGION")
+		, m_dsw_system(*this, "SYSTEM")
 		, m_redled(*this, "redled%u", 1U)
 		, m_yellowled(*this, "yellowled%u", 1U)
 		, m_blueled(*this, "blueled%u", 1U)
@@ -113,6 +114,7 @@ private:
 
 	required_device_array<vsmile_ctrl_port_device, 2> m_ctrl;
 	required_ioport m_dsw_region;
+	required_ioport m_dsw_system;
 
 	output_finder<2> m_redled;
 	output_finder<2> m_yellowled;
@@ -179,4 +181,4 @@ private:
 	uint16_t m_mode = 0;
 };
 
-#endif // MAME_INCLUDES_VSMILE_H
+#endif // MAME_VTECH_VSMILE_H

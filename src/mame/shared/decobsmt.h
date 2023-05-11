@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
-#ifndef MAME_AUDIO_DECOBSMT_H
-#define MAME_AUDIO_DECOBSMT_H
+#ifndef MAME_SHARED_DECOBSMT_H
+#define MAME_SHARED_DECOBSMT_H
 
 #pragma once
 
@@ -55,4 +55,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(DECOBSMT, decobsmt_device)
 
-#endif  // MAME_AUDIO_DECOBSMT_H
+#endif  // MAME_SHARED_DECOBSMT_H

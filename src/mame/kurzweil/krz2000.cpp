@@ -31,11 +31,10 @@
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
 #include "cpu/m6502/m3745x.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/tmp68301.h"
 #include "imagedev/floppy.h"
 #include "machine/bankdev.h"
 #include "machine/ncr5380.h"
-#include "machine/tmp68301.h"
 #include "machine/upd765.h"
 #include "video/t6963c.h"
 
@@ -277,7 +276,7 @@ void k2000_state::k2000_map(address_map &map)
 	map(0x680300, 0x6805FF).rw(FUNC(k2000_state::hobbes1_read), FUNC(k2000_state::hobbes1_write));
 
 	// SROM - Setup ROM?
-	uint32 srom_base = 0x280000;
+	uint32_t srom_base = 0x280000;
 	map(srom_base, srom_base + 0x40000 - 1).rom().region("maincpu", 0x100000);
 
 	// Calvin chip has a 20-bit address bus with A0 tied low and A12-15 tied high, giving it access to 0x?0??[0-E]

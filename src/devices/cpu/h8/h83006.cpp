@@ -207,7 +207,7 @@ void h83006_device::update_irq_filter()
 
 void h83006_device::interrupt_taken()
 {
-	standard_irq_callback(intc->interrupt_taken(taken_irq_vector));
+	standard_irq_callback(intc->interrupt_taken(taken_irq_vector), NPC);
 }
 
 void h83006_device::internal_update(uint64_t current_time)

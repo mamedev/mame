@@ -6,8 +6,8 @@
  * Copyright Eric Smith
  *
  */
-#ifndef MAME_MACHINE_MATHBOX_H
-#define MAME_MACHINE_MATHBOX_H
+#ifndef MAME_ATARI_MATHBOX_H
+#define MAME_ATARI_MATHBOX_H
 
 #pragma once
 
@@ -40,4 +40,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(MATHBOX, mathbox_device)
 
-#endif // MAME_MACHINE_MATHBOX_H
+#endif // MAME_ATARI_MATHBOX_H

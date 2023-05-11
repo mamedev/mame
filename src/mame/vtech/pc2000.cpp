@@ -47,6 +47,8 @@ Other known international versions:
 #include "gl3000s.lh"
 
 
+namespace {
+
 class pc2000_state : public driver_device
 {
 public:
@@ -899,14 +901,14 @@ GFXDECODE_END
 
 DEVICE_IMAGE_LOAD_MEMBER( pc2000_state::cart_load )
 {
-	uint32_t size = m_cart->common_get_size("rom");
+	uint32_t const size = m_cart->common_get_size("rom");
 
 	// we always allocate a 0x40000 region, even if most carts span only 0x20000,
 	// because the bankswitch code accesses up to 16 x 16K banks...
 	m_cart->rom_alloc(0x40000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void pc2000_state::pc2000gen(machine_config &config)
@@ -1128,12 +1130,20 @@ ROM_START( lexipcm )
 	ROM_LOAD( "epoxy.u3", 0x00000, 0x100000, CRC(0a410790) SHA1(be04d5f74208a2f3b200daed75e04e966f64b545) )
 ROM_END
 
+ROM_START( primusex ) // Z84C0006PEC + 2x CP82C55A + V05040INS (?) with 80x48 pixel LCD
+	ROM_REGION( 0x80000, "bios", 0 )
+	ROM_LOAD( "mtrom.u11", 0x000000, 0x080000, CRC(b35f8e80) SHA1(aa79175f0e590201b62ba1c19492833064e69f71))
+ROM_END
+
+} // anonymous expert
+
 
 /* Driver */
 
 //    YEAR  NAME      PARENT  COMPAT MACHINE    INPUT    CLASS         INIT        COMPANY                    FULLNAME                                  FLAGS
 COMP( 1988, pc1000,   0,      0,     pc1000,    pc1000,  pc1000_state, empty_init, "Video Technology",        "PreComputer 1000",                       MACHINE_NOT_WORKING )
 COMP( 1988, misterx,  0,      0,     misterx,   pc1000,  pc1000_state, empty_init, "Video Technology / Yeno", "MisterX",                                MACHINE_NOT_WORKING )
+COMP( 198?, primusex, 0,      0,     misterx,   pc1000,  pc1000_state, empty_init, "Yeno",                    "Primus Expert mit Stimme",               MACHINE_IS_SKELETON )
 COMP( 1988, ordisava, 0,      0,     pc1000,    pc1000,  pc1000_state, empty_init, "Video Technology",        "Ordisavant (France)",                    MACHINE_NOT_WORKING )
 COMP( 1993, pc2000,   0,      0,     pc2000,    pc2000,  pc2000_state, empty_init, "Video Technology",        "PreComputer 2000",                       MACHINE_NOT_WORKING )
 COMP( 1993, pc2000s,  pc2000, 0,     pc2000eur, pc2000,  pc2000_state, empty_init, "Video Technology",        "PreComputer 2000 (Spain)",               MACHINE_NOT_WORKING )

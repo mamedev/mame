@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef MAME_INCLUDES_VIDBRAIN_H
-#define MAME_INCLUDES_VIDBRAIN_H
+#ifndef MAME_VIDBRAIN_VIDBRAIN_H
+#define MAME_VIDBRAIN_VIDBRAIN_H
 
 #include "bus/vidbrain/exp.h"
 #include "cpu/f8/f8.h"
@@ -91,4 +91,4 @@ private:
 	emu_timer *m_timer_ne555 = nullptr;
 };
 
-#endif
+#endif // MAME_VIDBRAIN_VIDBRAIN_H

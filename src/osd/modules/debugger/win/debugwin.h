@@ -52,6 +52,8 @@ public:
 
 	virtual void show_all() = 0;
 	virtual void hide_all() = 0;
+
+	virtual void stagger_window(HWND window, int width, int height) = 0;
 };
 
 } // namespace osd::debugger::win

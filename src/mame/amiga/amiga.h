@@ -9,8 +9,8 @@ Ernesto Corvi & Mariusz Wojcieszek
 
 ***************************************************************************/
 
-#ifndef MAME_INCLUDES_AMIGA_H
-#define MAME_INCLUDES_AMIGA_H
+#ifndef MAME_AMIGA_AMIGA_H
+#define MAME_AMIGA_AMIGA_H
 
 #pragma once
 
@@ -729,4 +729,4 @@ private:
 	uint32_t amiga_gethvpos();
 };
 
-#endif // MAME_INCLUDES_AMIGA_H
+#endif // MAME_AMIGA_AMIGA_H

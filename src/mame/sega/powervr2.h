@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MAME_VIDEO_POWERVR2_H
-#define MAME_VIDEO_POWERVR2_H
+#ifndef MAME_SEGA_POWERVR2_H
+#define MAME_SEGA_POWERVR2_H
 
 #pragma once
 
@@ -578,4 +578,4 @@ private:
 
 DECLARE_DEVICE_TYPE(POWERVR2, powervr2_device)
 
-#endif // MAME_VIDEO_POWERVR2_H
+#endif // MAME_SEGA_POWERVR2_H

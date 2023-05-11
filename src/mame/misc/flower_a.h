@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_AUDIO_FLOWER_H
-#define MAME_AUDIO_FLOWER_H
+#ifndef MAME_MISC_FLOWER_A_H
+#define MAME_MISC_FLOWER_A_H
 
 #pragma once
 
@@ -91,4 +91,4 @@ private:
 DECLARE_DEVICE_TYPE(FLOWER_CUSTOM, flower_sound_device)
 
 
-#endif // MAME_AUDIO_FLOWER_H
+#endif // MAME_MISC_FLOWER_A_H

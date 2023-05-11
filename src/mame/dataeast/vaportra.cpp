@@ -34,6 +34,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class vaportra_state : public driver_device
 {
 public:
@@ -607,6 +609,9 @@ void vaportra_state::driver_init()
 }
 
 /******************************************************************************/
+
+} // anonymous namespace
+
 
 GAME( 1989, vaportra,  0,        vaportra, vaportra, vaportra_state, driver_init, ROT270, "Data East Corporation", "Vapor Trail - Hyper Offence Formation (World revision 1)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1989, vaportra3, vaportra, vaportra, vaportra, vaportra_state, driver_init, ROT270, "Data East Corporation", "Vapor Trail - Hyper Offence Formation (World revision 3?)", MACHINE_SUPPORTS_SAVE )

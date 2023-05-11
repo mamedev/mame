@@ -1,0 +1,999 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="background">
+		<rect>
+			<color red="0.15" green="0.15" blue="0.15" />
+		</rect>
+	</element>
+
+	<element name="inset-background">
+		<rect><color red="0.05" green="0.05" blue="0.05" /></rect>
+	</element>
+
+	<element name="button-text-separator-blue">
+		<rect><color red="0.13" green="0.65" blue="0.9" /></rect>
+	</element>
+
+	<element name="button-text-separator-brown">
+		<rect><color red="0.72" green="0.48" blue="0.33" /></rect>
+	</element>
+
+	<element name="button-membrane-green" defstate="0">
+		<rect state="0"><color red="0" green="0.8" blue="0.75" /></rect>
+		<rect state="1"><color red="0" green="0.7" blue="0.6" /></rect>
+	</element>
+
+	<element name="button-membrane-red" defstate="0">
+		<rect><color red="1.0" green="0" blue="0" /></rect>
+	</element>
+
+	<element name="button-membrane-blue" defstate="0">
+		<rect><color red="0.13" green="0.65" blue="0.9" /></rect>
+	</element>
+
+	<element name="button-membrane-brown" defstate="0">
+		<rect><color red="0.72" green="0.48" blue="0.33" /></rect>
+	</element>
+
+	<!-- Button labels -->
+	<element name="button-text-white-store"><text align="1" string="STORE" /></element>
+	<element name="button-text-white-function"><text align="1" string="FUNCTION/" /></element>
+	<element name="button-text-white-edit"><text align="1" string="EDIT/" /></element>
+	<element name="button-text-white-compare"><text align="1" string="COMPARE" /></element>
+	<element name="button-text-white-internal"><text align="1" string="INTERNAL" /></element>
+
+	<element name="button-text-play">
+		<rect></rect>
+		<text align="0" valign="0" string="PLAY">
+			<color red="0.15" green="0.15" blue="0.15" />
+		</text>
+	</element>
+
+	<element name="button-text-white-pitch-b"><text align="1" string="PITCH B" /></element>
+	<element name="button-text-white-mode"><text align="1" string="MODE" /></element>
+	<element name="button-text-white-key"><text align="1" string="KEY" /></element>
+	<element name="button-text-white-shift"><text align="1" string="SHIFT" /></element>
+	<element name="button-text-white-no"><text align="1" string="NO" /></element>
+	<element name="button-text-white-off"><text align="1" string="OFF" /></element>
+	<element name="button-text-white-yes"><text align="1" string="YES" /></element>
+	<element name="button-text-white-on"><text align="1" string="ON" /></element>
+	<element name="button-text-white-plus-one"><text align="1" string="+1" /></element>
+	<element name="button-text-white-minus-one"><text align="1" string="-1" /></element>
+	<element name="button-text-white-bank"><text align="1" string="BANK" /></element>
+	<element name="button-text-white-right-a"><text align="2" string="A" /></element>
+	<element name="button-text-white-right-b"><text align="2" string="B" /></element>
+	<element name="button-text-white-right-c"><text align="2" string="C" /></element>
+	<element name="button-text-white-right-d"><text align="2" string="D" /></element>
+
+	<!-- Numeric Button Label Numbers -->
+	<element name="button-number-1"><text align="1" string="1" /></element>
+	<element name="button-number-2"><text align="1" string="2" /></element>
+	<element name="button-number-3"><text align="1" string="3" /></element>
+	<element name="button-number-4"><text align="1" string="4" /></element>
+	<element name="button-number-5"><text align="1" string="5" /></element>
+	<element name="button-number-6"><text align="1" string="6" /></element>
+	<element name="button-number-7"><text align="1" string="7" /></element>
+	<element name="button-number-8"><text align="1" string="8" /></element>
+	<element name="button-number-9"><text align="1" string="9" /></element>
+	<element name="button-number-10"><text align="1" string="10" /></element>
+	<element name="button-number-11"><text align="1" string="11" /></element>
+	<element name="button-number-12"><text align="1" string="12" /></element>
+	<element name="button-number-13"><text align="1" string="13" /></element>
+	<element name="button-number-14"><text align="1" string="14" /></element>
+	<element name="button-number-15"><text align="1" string="15" /></element>
+	<element name="button-number-16"><text align="1" string="16" /></element>
+	<element name="button-number-17"><text align="1" string="17" /></element>
+	<element name="button-number-18"><text align="1" string="18" /></element>
+	<element name="button-number-19"><text align="1" string="19" /></element>
+	<element name="button-number-20"><text align="1" string="20" /></element>
+	<element name="button-number-21"><text align="1" string="21" /></element>
+	<element name="button-number-22"><text align="1" string="22" /></element>
+	<element name="button-number-23"><text align="1" string="23" /></element>
+	<element name="button-number-24"><text align="1" string="24" /></element>
+
+	<element name="button-text-blue-eg-copy">
+		<text align="1" string="EG COPY">
+			<color red="0.13" green="0.65" blue="0.9" />
+		</text>
+	</element>
+
+	<element name="button-text-blue-1">
+		<text align="1" string="1"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-blue-2">
+		<text align="1" string="2"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-blue-3">
+		<text align="1" string="3"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-blue-4">
+		<text align="1" string="4"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-blue-operator-ams-on-off">
+		<text align="1" string="OPERATOR/AMS ON-OFF"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-blue-algorithm">
+		<text align="1" string="ALGORITHM"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-blue-feedback">
+		<text align="1" string="FEEDBACK"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-blue-lfo">
+		<text align="1" string="LFO"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-blue-wave">
+		<text align="1" string="WAVE"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-blue-speed">
+		<text align="1" string="SPEED"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-blue-delay">
+		<text align="1" string="DELAY"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-blue-pmd">
+		<text align="1" string="PMD"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-blue-amd">
+		<text align="1" string="AMD"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-blue-sync">
+		<text align="1" string="SYNC"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-blue-modulation-sensitivity">
+		<text align="1" string="MODULATION SENSITIVITY"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-blue-pitch">
+		<text align="1" string="PITCH"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-blue-amplitude">
+		<text align="1" string="AMPLITUDE"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-blue-eg-bias">
+		<text align="1" string="EG BIAS"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-blue-key-velocity">
+		<text align="1" string="KEY VELOCITY"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-brown-master">
+		<text align="1" string="MASTER"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-tune-adj">
+		<text align="1" string="TUNE ADJ"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-preset-search">
+		<text align="1" string="PRESET SEARCH"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-101-124">
+		<text align="1" string="101~124"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-201-224">
+		<text align="1" string="201~224"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-301-324">
+		<text align="1" string="301~324"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-401-424">
+		<text align="1" string="401~424"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-midi">
+		<text align="1" string="MIDI"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-on-off">
+		<text align="1" string="ON-OFF"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-channel">
+		<text align="1" string="CHANNEL"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-ch-info">
+		<text align="1" string="CH INFO"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-sys-info">
+		<text align="1" string="SYS INFO"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-recall">
+		<text align="1" string="RECALL"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-edit">
+		<text align="1" string="EDIT"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-init">
+		<text align="1" string="INIT"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-voice">
+		<text align="1" string="VOICE"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-bank">
+		<text align="1" string="BANK"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-poly-mono">
+		<text align="1" string="POLY/MONO"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-pitch-bend">
+		<text align="1" string="PITCH BEND"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-range">
+		<text align="1" string="RANGE"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-portamento">
+		<text align="1" string="PORTAMENTO"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-mode">
+		<text align="1" string="MODE"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-time">
+		<text align="1" string="TIME"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-foot-sw">
+		<text align="1" string="FOOT SW"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-assign">
+		<text align="1" string="ASSIGN"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-voice-name">
+		<text align="1" string="VOICE NAME"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-cursor-right">
+		<text align="1" string="CURSOR >"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-wheel-range">
+		<text align="1" string="WHEEL RANGE"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-cassette">
+		<text align="1" string="CASSETTE"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-save-verify">
+		<text align="1" string="SAVE/VERIFY"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-load">
+		<text align="1" string="LOAD"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-load-single">
+		<text align="1" string="LOAD SINGLE"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-blue-operator">
+		<text align="1" string="OPERATOR"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-blue-select">
+		<text align="1" string="SELECT"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-blue-oscillator">
+		<text align="1" string="OSCILLATOR"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-blue-freq-ratio">
+		<text align="1" string="FREQ RATIO"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-blue-detune">
+		<text align="1" string="DETUNE"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-blue-envelope-generator">
+		<text align="1" string="ENVELOPE GENERATOR"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-blue-ar">
+		<text align="1" string="AR"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-blue-d1r">
+		<text align="1" string="D1R"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-blue-d1l">
+		<text align="1" string="D1L"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-blue-d2r">
+		<text align="1" string="D2R"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-blue-rr">
+		<text align="1" string="RR"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-blue-rate">
+		<text align="1" string="RATE"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-blue-level">
+		<text align="1" string="LEVEL"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-blue-keyboard-scaling">
+		<text align="1" string="KEYBOARD SCALING"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-blue-out-level">
+		<text align="1" string="OUT LEVEL"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-blue-transpose">
+		<text align="1" string="TRANSPOSE"><color red="0.13" green="0.65" blue="0.9" /></text>
+	</element>
+
+	<element name="button-text-brown-pitch">
+		<text align="1" string="PITCH"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-amplitude">
+		<text align="1" string="AMPLITUDE"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-pitch-bias">
+		<text align="1" string="PITCH BIAS"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-eg-bias">
+		<text align="1" string="EG BIAS"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-breath-range">
+		<text align="1" string="BREATH RANGE"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-memory">
+		<text align="1" string="MEMORY"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-protect">
+		<text align="1" string="PROTECT"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-mode-set">
+		<text align="1" string="MODE SET"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="button-text-brown-key-set">
+		<text align="1" string="KEY SET"><color red="0.72" green="0.48" blue="0.33" /></text>
+	</element>
+
+	<element name="led">
+		<rect>
+			<bounds x="0" y="0" width="24" height="4" />
+		</rect>
+	</element>
+
+	<group name="group-screen-inset">
+		<element ref="inset-background">
+			<bounds x="0" y="0" width="500" height="96" />
+		</element>
+		<screen index="0">
+			<bounds x="56" y="26" width="388" height="44" />
+		</screen>
+		<element ref="led">
+			<bounds x="460" y="46" width="24" height="4" />
+			<animate name="LED" />
+			<color state="0" red="0.9" green="0.2" blue="0.2" />
+			<color state="1" red="0.4" green="0.0" blue="0.0" />
+		</element>
+	</group>
+
+	<!-- Numeric Buttons Row 1 -->
+	<group name="front-panel-buttons-row-1">
+		<!-- Pitch Bend Mode -->
+		<element ref="button-text-blue-operator"><bounds x="0" y="4" width="72" height="16" /></element>
+		<element ref="button-text-blue-select"><bounds x="0" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="P6_0" inputmask="0x40">
+			<bounds x="0" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-text-white-pitch-b"><bounds x="4" y="34" width="64" height="15" /></element>
+		<element ref="button-text-white-mode"><bounds x="4" y="49" width="64" height="15" /></element>
+		<element ref="button-text-brown-mode-set"><bounds x="0" y="64" width="72" height="16" /></element>
+
+		<!-- Key Shift -->
+		<element ref="button-membrane-green" inputtag="P6_0" inputmask="0x80">
+			<bounds x="80" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-text-white-key"><bounds x="84" y="34" width="64" height="15" /></element>
+		<element ref="button-text-white-shift"><bounds x="84" y="49" width="64" height="15" /></element>
+		<element ref="button-text-brown-key-set"><bounds x="80" y="64" width="72" height="16" /></element>
+
+		<!-- Store -->
+		<element ref="button-text-blue-eg-copy"><bounds x="168" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-red" inputtag="P6_0" inputmask="0x04">
+			<bounds x="168" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-text-white-store"><bounds x="172" y="34" width="64" height="15" /></element>
+
+		<!-- Function/Compare -->
+		<element ref="button-membrane-brown" inputtag="P6_0" inputmask="0x08">
+			<bounds x="248" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-text-white-function"><bounds x="252" y="34" width="64" height="15" /></element>
+		<element ref="button-text-white-compare"><bounds x="252" y="49" width="64" height="15" /></element>
+
+		<!-- Bank A -->
+		<element ref="button-text-blue-operator-ams-on-off"><bounds x="336" y="0" width="152" height="16" /></element>
+		<element ref="button-text-separator-blue"><bounds x="336" y="16" width="152" height="1" /></element>
+		<element ref="button-text-blue-1"><bounds x="336" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="P6_5" inputmask="0x80">
+			<bounds x="336" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-text-white-bank"><bounds x="340" y="34" width="64" height="15" /></element>
+		<element ref="button-text-white-right-a"><bounds x="340" y="34" width="64" height="28" /></element>
+		<element ref="button-text-brown-101-124"><bounds x="336" y="64" width="72" height="16" /></element>
+		<element ref="button-text-separator-brown"><bounds x="336" y="80" width="152" height="1" /></element>
+		<element ref="button-text-brown-preset-search"><bounds x="336" y="80" width="152" height="16" /></element>
+
+		<!-- Bank B -->
+		<element ref="button-text-blue-2"><bounds x="416" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="P6_5" inputmask="0x40">
+			<bounds x="416" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-text-white-bank"><bounds x="420" y="34" width="64" height="15" /></element>
+		<element ref="button-text-white-right-b"><bounds x="420" y="34" width="64" height="28" /></element>
+		<element ref="button-text-brown-201-224"><bounds x="416" y="64" width="72" height="16" /></element>
+
+		<!-- Button 1 -->
+		<element ref="button-text-blue-algorithm"><bounds x="504" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="P6_1" inputmask="0x01">
+			<bounds x="504" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-1"><bounds x="508" y="34" width="64" height="28" /></element>
+		<element ref="button-text-brown-master"><bounds x="504" y="64" width="72" height="16" /></element>
+		<element ref="button-text-brown-tune-adj"><bounds x="504" y="76" width="72" height="16" /></element>
+
+		<!-- Button 2 -->
+		<element ref="button-text-blue-feedback"><bounds x="584" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="P6_1" inputmask="0x02">
+			<bounds x="584" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-2"><bounds x="588" y="34" width="64" height="28" /></element>
+		<element ref="button-text-brown-on-off"><bounds x="584" y="64" width="72" height="16" /></element>
+		<element ref="button-text-separator-brown"><bounds x="584" y="80" width="316" height="1" /></element>
+		<element ref="button-text-brown-midi"><bounds x="584" y="80" width="316" height="16" /></element>
+
+		<!-- Button 3 -->
+		<element ref="button-text-blue-lfo"><bounds x="664" y="0" width="472" height="16" /></element>
+		<element ref="button-text-separator-blue"><bounds x="664" y="16" width="472" height="1" /></element>
+		<element ref="button-text-blue-wave"><bounds x="664" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="P6_1" inputmask="0x04">
+			<bounds x="664" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-3"><bounds x="668" y="34" width="64" height="28" /></element>
+		<element ref="button-text-brown-channel"><bounds x="664" y="64" width="72" height="16" /></element>
+
+		<!-- Button 4 -->
+		<element ref="button-text-blue-speed"><bounds x="744" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="P6_1" inputmask="0x08">
+			<bounds x="744" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-4"><bounds x="748" y="34" width="64" height="28" /></element>
+		<element ref="button-text-brown-ch-info"><bounds x="744" y="64" width="72" height="16" /></element>
+
+		<!-- Button 5 -->
+		<element ref="button-text-blue-delay"><bounds x="824" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="P6_1" inputmask="0x10">
+			<bounds x="824" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-5"><bounds x="828" y="34" width="64" height="28" /></element>
+		<element ref="button-text-brown-sys-info"><bounds x="824" y="64" width="72" height="16" /></element>
+
+		<!-- Button 6 -->
+		<element ref="button-text-blue-pmd"><bounds x="904" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="P6_1" inputmask="0x20">
+			<bounds x="904" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-6"><bounds x="908" y="34" width="64" height="28" /></element>
+		<element ref="button-text-brown-recall"><bounds x="904" y="64" width="72" height="16" /></element>
+		<element ref="button-text-brown-edit"><bounds x="904" y="76" width="72" height="16" /></element>
+
+		<!-- Button 7 -->
+		<element ref="button-text-blue-amd"><bounds x="984" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="P6_1" inputmask="0x40">
+			<bounds x="984" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-7"><bounds x="988" y="34" width="64" height="28" /></element>
+		<element ref="button-text-brown-init"><bounds x="984" y="64" width="72" height="16" /></element>
+		<element ref="button-text-brown-voice"><bounds x="984" y="76" width="72" height="16" /></element>
+
+		<!-- Button 8 -->
+		<element ref="button-text-blue-sync"><bounds x="1064" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="P6_1" inputmask="0x80">
+			<bounds x="1064" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-8"><bounds x="1068" y="34" width="64" height="28" /></element>
+		<element ref="button-text-brown-load"><bounds x="1064" y="64" width="72" height="16" /></element>
+		<element ref="button-text-brown-bank"><bounds x="1064" y="76" width="72" height="16" /></element>
+
+		<!-- Button 9 -->
+		<element ref="button-text-blue-modulation-sensitivity"><bounds x="1144" y="0" width="232" height="16" /></element>
+		<element ref="button-text-separator-blue"><bounds x="1144" y="16" width="232" height="1" /></element>
+		<element ref="button-text-blue-pitch"><bounds x="1144" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="P6_2" inputmask="0x01">
+			<bounds x="1144" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-9"><bounds x="1148" y="34" width="64" height="28" /></element>
+		<element ref="button-text-brown-save-verify"><bounds x="1144" y="64" width="72" height="16" /></element>
+		<element ref="button-text-separator-brown"><bounds x="1144" y="80" width="232" height="1" /></element>
+		<element ref="button-text-brown-cassette"><bounds x="1144" y="80" width="232" height="16" /></element>
+
+		<!-- Button 10 -->
+		<element ref="button-text-blue-amplitude"><bounds x="1224" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="P6_2" inputmask="0x02">
+			<bounds x="1224" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-10"><bounds x="1228" y="34" width="64" height="28" /></element>
+		<element ref="button-text-brown-load"><bounds x="1224" y="64" width="72" height="16" /></element>
+
+		<!-- Button 11 -->
+		<element ref="button-text-blue-eg-bias"><bounds x="1304" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="P6_2" inputmask="0x04">
+			<bounds x="1304" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-11"><bounds x="1308" y="34" width="64" height="28" /></element>
+		<element ref="button-text-brown-load-single"><bounds x="1304" y="64" width="72" height="16" /></element>
+
+		<!-- Button 12 -->
+		<element ref="button-text-blue-key-velocity"><bounds x="1384" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="P6_2" inputmask="0x08">
+			<bounds x="1384" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-12"><bounds x="1388" y="34" width="64" height="28" /></element>
+		<element ref="button-text-brown-memory"><bounds x="1384" y="64" width="72" height="16" /></element>
+		<element ref="button-text-brown-protect"><bounds x="1384" y="76" width="72" height="16" /></element>
+	</group>
+
+	<!-- Numeric Buttons Row 2 -->
+	<group name="front-panel-buttons-row-2">
+		<!-- Data Entry -1 -->
+		<element ref="button-text-white-no"><bounds x="0" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="P6_0" inputmask="0x02">
+			<bounds x="0" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-text-white-minus-one"><bounds x="4" y="34" width="64" height="28" /></element>
+		<element ref="button-text-white-off"><bounds x="0" y="64" width="72" height="16" /></element>
+
+		<!-- Data Entry +1 -->
+		<element ref="button-text-white-yes"><bounds x="80" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="P6_0" inputmask="0x01">
+			<bounds x="80" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-text-white-plus-one"><bounds x="84" y="34" width="64" height="28" /></element>
+		<element ref="button-text-white-on"><bounds x="80" y="64" width="72" height="16" /></element>
+
+		<!-- Edit/Compare -->
+		<element ref="button-membrane-blue" inputtag="P6_0" inputmask="0x10">
+			<bounds x="168" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-text-white-edit"><bounds x="172" y="34" width="64" height="15" /></element>
+		<element ref="button-text-white-compare"><bounds x="172" y="49" width="64" height="15" /></element>
+
+		<!-- Internal -->
+		<element ref="button-membrane-green" inputtag="P6_0" inputmask="0x20">
+			<bounds x="248" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-text-white-internal"><bounds x="252" y="34" width="64" height="15" /></element>
+		<element ref="button-text-play"><bounds x="248" y="64" width="72" height="16" /></element>
+
+		<!-- Bank C -->
+		<element ref="button-text-blue-operator-ams-on-off"><bounds x="336" y="0" width="152" height="16" /></element>
+		<element ref="button-text-separator-blue"><bounds x="336" y="16" width="152" height="1" /></element>
+		<element ref="button-text-blue-3"><bounds x="336" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="P6_4" inputmask="0x80">
+			<bounds x="336" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-text-white-bank"><bounds x="340" y="34" width="64" height="15" /></element>
+		<element ref="button-text-white-right-c"><bounds x="340" y="34" width="64" height="28" /></element>
+		<element ref="button-text-brown-301-324"><bounds x="336" y="64" width="72" height="16" /></element>
+		<element ref="button-text-separator-brown"><bounds x="336" y="80" width="152" height="1" /></element>
+		<element ref="button-text-brown-preset-search"><bounds x="336" y="80" width="152" height="16" /></element>
+
+		<!-- Bank D -->
+		<element ref="button-text-blue-4"><bounds x="416" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="P6_4" inputmask="0x40">
+			<bounds x="416" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-text-white-bank"><bounds x="420" y="34" width="64" height="15" /></element>
+		<element ref="button-text-white-right-d"><bounds x="420" y="34" width="64" height="28" /></element>
+		<element ref="button-text-brown-401-424"><bounds x="416" y="64" width="72" height="16" /></element>
+
+		<!-- Button 13 -->
+		<element ref="button-text-blue-oscillator"><bounds x="504" y="0" width="152" height="16" /></element>
+		<element ref="button-text-separator-blue"><bounds x="504" y="16" width="152" height="1" /></element>
+		<element ref="button-text-blue-freq-ratio"><bounds x="504" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="P6_2" inputmask="0x10">
+			<bounds x="504" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-13"><bounds x="508" y="34" width="64" height="28" /></element>
+		<element ref="button-text-brown-poly-mono"><bounds x="504" y="64" width="72" height="16" /></element>
+
+		<!-- Button 14 -->
+		<element ref="button-text-blue-detune"><bounds x="584" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="P6_2" inputmask="0x20">
+			<bounds x="584" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-14"><bounds x="588" y="34" width="64" height="28" /></element>
+		<element ref="button-text-brown-pitch-bend"><bounds x="584" y="64" width="72" height="16" /></element>
+		<element ref="button-text-brown-range"><bounds x="584" y="76" width="72" height="16" /></element>
+
+		<!-- Button 15 -->
+		<element ref="button-text-blue-envelope-generator"><bounds x="664" y="0" width="394" height="16" /></element>
+		<element ref="button-text-separator-blue"><bounds x="664" y="16" width="394" height="1" /></element>
+		<element ref="button-text-blue-ar"><bounds x="664" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="P6_2" inputmask="0x40">
+			<bounds x="664" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-15"><bounds x="668" y="34" width="64" height="28" /></element>
+		<element ref="button-text-brown-mode"><bounds x="664" y="64" width="72" height="16" /></element>
+		<element ref="button-text-separator-brown"><bounds x="664" y="80" width="152" height="1" /></element>
+		<element ref="button-text-brown-portamento"><bounds x="664" y="80" width="152" height="16" /></element>
+
+		<!-- Button 16 -->
+		<element ref="button-text-blue-d1r"><bounds x="744" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="P6_2" inputmask="0x80">
+			<bounds x="744" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-16"><bounds x="748" y="34" width="64" height="28" /></element>
+		<element ref="button-text-brown-time"><bounds x="744" y="64" width="72" height="16" /></element>
+
+		<!-- Button 17 -->
+		<element ref="button-text-blue-d1l"><bounds x="824" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="P6_3" inputmask="0x01">
+			<bounds x="824" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-17"><bounds x="828" y="34" width="64" height="28" /></element>
+		<element ref="button-text-brown-foot-sw"><bounds x="824" y="64" width="72" height="16" /></element>
+		<element ref="button-text-brown-assign"><bounds x="824" y="76" width="72" height="16" /></element>
+
+		<!-- Button 18 -->
+		<element ref="button-text-blue-d2r"><bounds x="904" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="P6_3" inputmask="0x02">
+			<bounds x="904" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-18"><bounds x="908" y="34" width="64" height="28" /></element>
+		<element ref="button-text-brown-pitch"><bounds x="904" y="64" width="72" height="16" /></element>
+		<element ref="button-text-separator-brown"><bounds x="904" y="80" width="152" height="1" /></element>
+		<element ref="button-text-brown-wheel-range"><bounds x="904" y="80" width="152" height="16" /></element>
+
+		<!-- Button 19 -->
+		<element ref="button-text-blue-rr"><bounds x="984" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="P6_3" inputmask="0x04">
+			<bounds x="984" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-19"><bounds x="988" y="34" width="64" height="28" /></element>
+		<element ref="button-text-brown-amplitude"><bounds x="984" y="64" width="72" height="16" /></element>
+
+		<!-- Button 20 -->
+		<element ref="button-text-blue-operator"><bounds x="1064" y="0" width="72" height="16" /></element>
+		<element ref="button-text-separator-blue"><bounds x="1064" y="16" width="72" height="1" /></element>
+		<element ref="button-text-blue-out-level"><bounds x="1064" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="P6_3" inputmask="0x08">
+			<bounds x="1064" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-20"><bounds x="1068" y="34" width="64" height="28" /></element>
+		<element ref="button-text-brown-pitch"><bounds x="1064" y="64" width="72" height="16" /></element>
+		<element ref="button-text-separator-brown"><bounds x="1064" y="80" width="312" height="1" /></element>
+		<element ref="button-text-brown-breath-range"><bounds x="1064" y="80" width="150" height="16" /></element>
+
+		<!-- Button 21 -->
+		<element ref="button-text-blue-keyboard-scaling"><bounds x="1144" y="0" width="152" height="16" /></element>
+		<element ref="button-text-separator-blue"><bounds x="1144" y="16" width="152" height="1" /></element>
+		<element ref="button-text-blue-rate"><bounds x="1144" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="P6_3" inputmask="0x10">
+			<bounds x="1144" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-21"><bounds x="1148" y="34" width="64" height="28" /></element>
+		<element ref="button-text-brown-amplitude"><bounds x="1144" y="64" width="72" height="16" /></element>
+
+		<!-- Button 22 -->
+		<element ref="button-text-blue-level"><bounds x="1224" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="P6_3" inputmask="0x20">
+			<bounds x="1224" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-22"><bounds x="1228" y="34" width="64" height="28" /></element>
+		<element ref="button-text-brown-pitch-bias"><bounds x="1224" y="64" width="72" height="16" /></element>
+
+		<!-- Button 23 -->
+		<element ref="button-text-blue-transpose"><bounds x="1304" y="16" width="72" height="16" /></element>
+		<element ref="button-membrane-green" inputtag="P6_3" inputmask="0x40">
+			<bounds x="1304" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-23"><bounds x="1308" y="34" width="64" height="28" /></element>
+		<element ref="button-text-brown-eg-bias"><bounds x="1304" y="64" width="72" height="16" /></element>
+
+		<!-- Button 24 -->
+		<element ref="button-membrane-green" inputtag="P6_3" inputmask="0x80">
+			<bounds x="1384" y="32" width="72" height="32" />
+		</element>
+		<element ref="button-number-24"><bounds x="1388" y="34" width="64" height="28" /></element>
+		<element ref="button-text-brown-voice-name"><bounds x="1384" y="64" width="72" height="16" /></element>
+		<element ref="button-text-brown-cursor-right"><bounds x="1384" y="76" width="72" height="16" /></element>
+	</group>
+
+	<element name="logo-yamaha">
+		<text align="1" string="YAMAHA" />
+	</element>
+	<element name="logo-dx100">
+		<text align="1" string="DX100" />
+	</element>
+	<element name="logo-digital">
+		<text align="1" string="DIGITAL PROGRAMMABLE ALGORITHM SYNTHESIZER" />
+	</element>
+
+	<group name="group-logo">
+		<element ref="logo-yamaha">
+			<bounds x="0" y="0" width="450" height="32" />
+		</element>
+		<element ref="logo-dx100">
+			<bounds x="0" y="32" width="450" height="48" />
+		</element>
+		<element ref="logo-digital">
+			<bounds x="0" y="80" width="450" height="16"/>
+		</element>
+	</group>
+
+	<element name="keyfill"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
+	<element name="whitekey" defstate="0">
+		<rect state="0"><bounds x="0" y="0" width="45" height="504" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="0" y="0" width="45" height="504" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="whitekey-l" defstate="0">
+		<rect state="0"><bounds x="0" y="0" width="45" height="280" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><bounds x="0" y="280" width="79" height="224" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="0" y="0" width="45" height="280" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<rect state="1"><bounds x="0" y="280" width="79" height="224" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="whitekey-m" defstate="0">
+		<rect state="0"><bounds x="13" y="0" width="53" height="280" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><bounds x="0" y="280" width="79" height="224" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="13" y="0" width="53" height="280" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<rect state="1"><bounds x="0" y="280" width="79" height="224" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="whitekey-lm" defstate="0">
+		<rect state="0"><bounds x="10" y="0" width="44" height="280" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><bounds x="0" y="280" width="79" height="224" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="10" y="0" width="44" height="280" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<rect state="1"><bounds x="0" y="280" width="79" height="224" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="whitekey-rm" defstate="0">
+		<rect state="0"><bounds x="22" y="0" width="44" height="280" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><bounds x="0" y="280" width="79" height="224" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="22" y="0" width="44" height="280" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<rect state="1"><bounds x="0" y="280" width="79" height="224" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="whitekey-r" defstate="0">
+		<rect state="0"><bounds x="34" y="0" width="45" height="280" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><bounds x="0" y="280" width="79" height="224" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="34" y="0" width="45" height="280" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<rect state="1"><bounds x="0" y="280" width="79" height="224" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="blackkey" defstate="0">
+		<rect state="0"><bounds x="0" y="0" width="44" height="272" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><bounds x="4" y="0" width="36" height="268" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<rect state="1"><bounds x="0" y="0" width="44" height="272" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<rect state="1"><bounds x="4" y="0" width="36" height="268" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+	</element>
+
+	<group name="keyboard">
+		<element ref="keyfill"><bounds x="564" y="494" width="2395" height="524" /></element>
+
+		<!-- key layout:
+		    wwwww bbbbbb wwwwwww bbbbbbbb wwwwwwww   wwwwwwww bbbbbbbb wwwwwwww bbbbbbbb wwwwwwww bbbbbbbb wwwwwwww
+		      45    44      53      44       45         45       44       44       44       44       44      45
+		    0->45 48->92 95->148 151->195 198->243   243->288 291->335 338->382 385->429 432->476 479->523 526->571
+		    0->79        82->161          164->243   246->325          328->407          410->489          492->571
+		-->
+
+		<!-- octave 0 -->
+		<element ref="blackkey" inputtag="P6_4" inputmask="0x02"><bounds x="622" y="504" width="44" height="272" /></element>
+		<element ref="blackkey" inputtag="P6_6" inputmask="0x02"><bounds x="725" y="504" width="44" height="272" /></element>
+		<element ref="blackkey" inputtag="P6_9" inputmask="0x02"><bounds x="865" y="504" width="44" height="272" /></element>
+		<element ref="blackkey" inputtag="P6_11" inputmask="0x02"><bounds x="959" y="504" width="44" height="272" /></element>
+		<element ref="blackkey" inputtag="P6_13" inputmask="0x02"><bounds x="1053" y="504" width="44" height="272" /></element>
+		<element ref="whitekey-l" inputtag="P6_15" inputmask="0x01"><bounds x="574" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-m" inputtag="P6_5" inputmask="0x02"><bounds x="656" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-r" inputtag="P6_7" inputmask="0x02"><bounds x="738" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-l" inputtag="P6_8" inputmask="0x02"><bounds x="820" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-lm" inputtag="P6_10" inputmask="0x02"><bounds x="902" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-rm" inputtag="P6_12" inputmask="0x02"><bounds x="984" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-r" inputtag="P6_14" inputmask="0x02"><bounds x="1066" y="504" width="79" height="504" /></element>
+
+		<!-- octave 1 -->
+		<element ref="blackkey" inputtag="P6_4" inputmask="0x04"><bounds x="1196" y="504" width="44" height="272" /></element>
+		<element ref="blackkey" inputtag="P6_6" inputmask="0x04"><bounds x="1299" y="504" width="44" height="272" /></element>
+		<element ref="blackkey" inputtag="P6_9" inputmask="0x04"><bounds x="1439" y="504" width="44" height="272" /></element>
+		<element ref="blackkey" inputtag="P6_11" inputmask="0x04"><bounds x="1533" y="504" width="44" height="272" /></element>
+		<element ref="blackkey" inputtag="P6_13" inputmask="0x04"><bounds x="1627" y="504" width="44" height="272" /></element>
+		<element ref="whitekey-l" inputtag="P6_15" inputmask="0x02"><bounds x="1148" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-m" inputtag="P6_5" inputmask="0x04"><bounds x="1230" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-r" inputtag="P6_7" inputmask="0x04"><bounds x="1312" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-l" inputtag="P6_8" inputmask="0x04"><bounds x="1394" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-lm" inputtag="P6_10" inputmask="0x04"><bounds x="1476" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-rm" inputtag="P6_12" inputmask="0x04"><bounds x="1558" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-r" inputtag="P6_14" inputmask="0x04"><bounds x="1640" y="504" width="79" height="504" /></element>
+
+		<!-- octave 2 -->
+		<element ref="blackkey" inputtag="P6_4" inputmask="0x08"><bounds x="1770" y="504" width="44" height="272" /></element>
+		<element ref="blackkey" inputtag="P6_6" inputmask="0x08"><bounds x="1873" y="504" width="44" height="272" /></element>
+		<element ref="blackkey" inputtag="P6_9" inputmask="0x08"><bounds x="2013" y="504" width="44" height="272" /></element>
+		<element ref="blackkey" inputtag="P6_11" inputmask="0x08"><bounds x="2107" y="504" width="44" height="272" /></element>
+		<element ref="blackkey" inputtag="P6_13" inputmask="0x08"><bounds x="2201" y="504" width="44" height="272" /></element>
+		<element ref="whitekey-l" inputtag="P6_15" inputmask="0x04"><bounds x="1722" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-m" inputtag="P6_5" inputmask="0x08"><bounds x="1804" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-r" inputtag="P6_7" inputmask="0x08"><bounds x="1886" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-l" inputtag="P6_8" inputmask="0x08"><bounds x="1968" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-lm" inputtag="P6_10" inputmask="0x08"><bounds x="2050" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-rm" inputtag="P6_12" inputmask="0x08"><bounds x="2132" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-r" inputtag="P6_14" inputmask="0x08"><bounds x="2214" y="504" width="79" height="504" /></element>
+
+		<!-- octave 3 -->
+		<element ref="blackkey" inputtag="P6_4" inputmask="0x10"><bounds x="2344" y="504" width="44" height="272" /></element>
+		<element ref="blackkey" inputtag="P6_6" inputmask="0x10"><bounds x="2447" y="504" width="44" height="272" /></element>
+		<element ref="blackkey" inputtag="P6_9" inputmask="0x10"><bounds x="2587" y="504" width="44" height="272" /></element>
+		<element ref="blackkey" inputtag="P6_11" inputmask="0x10"><bounds x="2681" y="504" width="44" height="272" /></element>
+		<element ref="blackkey" inputtag="P6_13" inputmask="0x10"><bounds x="2775" y="504" width="44" height="272" /></element>
+		<element ref="whitekey-l" inputtag="P6_15" inputmask="0x08"><bounds x="2296" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-m" inputtag="P6_5" inputmask="0x10"><bounds x="2378" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-r" inputtag="P6_7" inputmask="0x10"><bounds x="2460" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-l" inputtag="P6_8" inputmask="0x10"><bounds x="2542" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-lm" inputtag="P6_10" inputmask="0x10"><bounds x="2624" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-rm" inputtag="P6_12" inputmask="0x10"><bounds x="2706" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-r" inputtag="P6_14" inputmask="0x10"><bounds x="2788" y="504" width="79" height="504" /></element>
+
+		<!-- final key -->
+		<element ref="whitekey" inputtag="P6_15" inputmask="0x10"><bounds x="2870" y="504" width="79" height="504" /></element>
+	</group>
+
+	<element name="slider-well">
+		<rect>
+			<bounds x="0" y="0" width="72" height="208" />
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+		<rect>
+			<bounds x="34" y="48" width="4" height="112" />
+			<color red="0" green="0" blue="0" />
+		</rect>
+	</element>
+
+	<element name="slider-nub">
+		<rect>
+			<bounds x="0" y="0" width="68" height="10" />
+			<color red="0" green="0" blue="0" />
+		</rect>
+		<rect>
+			<bounds x="0" y="4" width="68" height="2" />
+		</rect>
+	</element>
+
+	<element name="slider-tick">
+		<rect>
+			<bounds x="0" y="0" width="14" height="1" />
+		</rect>
+	</element>
+
+	<element name="text-volume"><text align="1" string="VOLUME" /></element>
+	<element name="text-data-entry"><text align="1" string="DATA ENTRY" /></element>
+	<element name="text-min"><text align="1" string="MIN" /></element>
+	<element name="text-max"><text align="1" string="MAX" /></element>
+
+	<group name="sliders">
+		<!-- Volume, which is not emulated in MAME (MAME provides its own volume control) and is therefore pegged to MAX here -->
+		<element ref="slider-well">
+			<bounds x="0" y="0" width="72" height="208" />
+		</element>
+		<element ref="slider-nub">
+			<bounds x="2" y="44" width="68" height="6" />
+		</element>
+		<element ref="text-volume">
+			<bounds x="0" y="208" width="72" height="16" />
+		</element>
+		<repeat count="13">
+			<param name="y" start="56" increment="8" />
+			<element ref="slider-tick">
+				<bounds x="73" y="~y~" width="14" height="1" />
+			</element>
+		</repeat>
+		<element ref="text-min">
+			<bounds x="73" y="152" width="14" height="16" />
+		</element>
+		<element ref="text-max">
+			<bounds x="73" y="40" width="14" height="16" />
+		</element>
+
+		<!-- Data Entry -->
+		<element ref="slider-well">
+			<bounds x="88" y="0" width="72" height="208" />
+		</element>
+		<element ref="slider-nub">
+			<animate inputtag="AN3" inputmask="0xFF" />
+			<bounds state="0" x="90" y="156" width="68" height="6" />
+			<bounds state="255" x="90" y="44" width="68" height="6" />
+		</element>
+		<element ref="text-data-entry">
+			<bounds x="88" y="208" width="72" height="16" />
+		</element>
+		<repeat count="13">
+			<param name="y" start="56" increment="8" />
+			<element ref="slider-tick">
+				<bounds x="161" y="~y~" width="14" height="1" />
+			</element>
+		</repeat>
+	</group>
+
+	<view name="Standard">
+		<element ref="background">
+			<bounds x="0" y="0" width="2228" height="566" />
+		</element>
+
+		<group ref="sliders">
+			<bounds x="24" y="24" width="175" height="224" />
+		</group>
+
+		<group ref="group-screen-inset">
+			<bounds x="224" y="24" width="500" height="96" />
+		</group>
+
+		<group ref="front-panel-buttons-row-1">
+			<bounds x="748" y="24" width="1456" height="96" />
+		</group>
+
+		<group ref="group-logo">
+			<bounds x="224" y="152" width="500" height="96" />
+		</group>
+
+		<group ref="front-panel-buttons-row-2">
+			<bounds x="748" y="152" width="1456" height="96" />
+		</group>
+
+		<group ref="keyboard"><bounds x="24" y="280" width="2180" height="262" /></group>
+	</view>
+</mamelayout>
+

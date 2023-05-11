@@ -189,7 +189,7 @@ func_basename ()
 #             to NONDIR_REPLACEMENT.
 #             value returned in "$func_dirname_result"
 #   basename: Compute filename of FILE.
-#             value retuned in "$func_basename_result"
+#             value returned in "$func_basename_result"
 # Implementation must be kept synchronized with func_dirname
 # and func_basename. For efficiency, we do not delegate to
 # those functions but instead duplicate the functionality here.
@@ -602,7 +602,7 @@ func_quote_for_eval ()
 
     case $func_quote_for_eval_unquoted_result in
       # Double-quote args containing shell metacharacters to delay
-      # word splitting, command substitution and and variable
+      # word splitting, command substitution and variable
       # expansion for a subsequent eval.
       # Many Bourne shells cannot handle close brackets correctly
       # in scan sets, so we specify it separately.
@@ -4394,7 +4394,7 @@ EOF
         {
           /* however, if there is an option in the LTWRAPPER_OPTION_PREFIX
              namespace, but it is not one of the ones we know about and
-             have already dealt with, above (inluding dump-script), then
+             have already dealt with, above (including dump-script), then
              report an error. Otherwise, targets might begin to believe
              they are allowed to use options in the LTWRAPPER_OPTION_PREFIX
              namespace. The first time any user complains about this, we'll

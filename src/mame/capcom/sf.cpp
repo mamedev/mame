@@ -22,6 +22,8 @@
 #include "tilemap.h"
 
 
+namespace {
+
 class sf_state : public driver_device
 {
 public:
@@ -1413,6 +1415,7 @@ ROM_START( sfp )
 	ROM_LOAD( "mmi-7603.13h", 0x0300, 0x0020, CRC(06bcda53) SHA1(fa69b77697bb12aa6012d82ef5b504d3a1d20232) ) /* unknown */
 ROM_END
 
+} // anonymous namespace
 
 
 GAME( 1987, sf,     0, sfus, sfus, sf_state, empty_init, ROT0, "Capcom",  "Street Fighter (US, set 1)", MACHINE_SUPPORTS_SAVE ) // Shows Capcom copyright

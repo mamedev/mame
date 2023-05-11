@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include "m68kcommon.h"
+#include "m68kmusashi.h"
 
-class scc68070_base_device : public m68000_base_device
+class scc68070_base_device : public m68000_musashi_device
 {
 protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;

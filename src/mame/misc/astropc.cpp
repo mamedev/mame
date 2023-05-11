@@ -31,6 +31,9 @@ Note: It's "Hawaii" the same game as "Treasure Hunting"?
 #include "emu.h"
 #include "cpu/i386/i386.h"
 
+
+namespace {
+
 class astropc_state : public driver_device
 {
 public:
@@ -184,6 +187,9 @@ ROM_END
 void astropc_state::init_astropc()
 {
 }
+
+} // anonymous namespace
+
 
 GAME( 2002, blackbd,  0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Black Beard (Russia, set 1)", MACHINE_IS_SKELETON )
 GAME( 2002, blackbda, blackbd, astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Black Beard (Russia, set 2)", MACHINE_IS_SKELETON )

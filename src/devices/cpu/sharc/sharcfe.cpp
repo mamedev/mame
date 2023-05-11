@@ -326,7 +326,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 					describe_if_condition(desc, cond);
 
-					desc.targetpc = desc.pc + SIGN_EXTEND24(address);
+					desc.targetpc = desc.pc + util::sext(address, 24);
 					desc.delayslots = (j) ? 2 : 0;
 
 					desc.userflags |= (b) ? OP_USERFLAG_CALL : 0;
@@ -377,7 +377,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 					describe_if_condition(desc, cond);
 
-					desc.targetpc = desc.pc + SIGN_EXTEND6((opcode >> 27) & 0x3f);
+					desc.targetpc = desc.pc + util::sext((opcode >> 27) & 0x3f, 6);
 					desc.delayslots = (j) ? 2 : 0;
 
 					desc.userflags |= (b) ? OP_USERFLAG_CALL : 0;
@@ -426,7 +426,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 				case 0x0c:          // do until counter expired             |000|01100|
 				{
-					int offset = SIGN_EXTEND24(opcode & 0xffffff);
+					int offset = util::sext(opcode & 0xffffff, 24);
 
 					LOOP_DESCRIPTOR loop;
 					loop.start_pc = desc.pc + 1;
@@ -445,7 +445,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 					if (!describe_ureg_access(desc, ureg, UREG_READ))
 						return false;
 
-					int offset = SIGN_EXTEND24(opcode & 0xffffff);
+					int offset = util::sext(opcode & 0xffffff, 24);
 
 					LOOP_DESCRIPTOR loop;
 					loop.start_pc = desc.pc + 1;
@@ -460,7 +460,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 				case 0x0e:          // do until                             |000|01110|
 				{
-					int offset = SIGN_EXTEND24(opcode & 0xffffff);
+					int offset = util::sext(opcode & 0xffffff, 24);
 					int cond = (opcode >> 33) & 0x1f;
 
 					LOOP_DESCRIPTOR loop;
@@ -969,7 +969,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 				desc.flags |= OPFLAG_READS_MEMORY;
 			}
 
-			desc.targetpc = desc.pc + SIGN_EXTEND6((opcode >> 27) & 0x3f);
+			desc.targetpc = desc.pc + util::sext((opcode >> 27) & 0x3f, 6);
 			desc.delayslots = 0;
 			break;
 		}

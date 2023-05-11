@@ -28,6 +28,7 @@ MAME Documentation
     debugger/index
     tools/index
 
+    contributing/index
     techspecs/index
 
     security

@@ -23,6 +23,9 @@ TODO:
 #include "sound/ay8910.h"
 #include "speaker.h"
 
+
+namespace {
+
 class supstarf_state : public driver_device
 {
 public:
@@ -274,6 +277,9 @@ ROM_START(supstarfa)
 	ROM_REGION(0x1000, "soundcpu", 0)
 	ROM_LOAD("2532.ic4", 0x0000, 0x1000, BAD_DUMP CRC(b6ef3c7a) SHA1(aabb6f8569685fc3a917a7bb5ebfcc4b20086b15)) // D6 stuck high and probably totally garbage
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1986, supstarf,  0,        supstarf, supstarf, supstarf_state, empty_init, ROT0, "Recreativos Franco", "Super Star (Recreativos Franco, set 1)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, supstarfa, supstarf, supstarf, supstarf, supstarf_state, empty_init, ROT0, "Recreativos Franco", "Super Star (Recreativos Franco, set 2)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

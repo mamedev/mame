@@ -4,7 +4,7 @@
 
     Nichibutsu sound HW
 
-    Shared component between niyanpai.cpp and csplayh5.cpp
+    Shared component between niyanpai.cpp and hrdvd.cpp
 
     Uses a TMPZ84C011 with YM3812 and two DACs
 

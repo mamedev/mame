@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="msx_softcard" description="MSX1 Astron SoftCards">
+
+<!--
+Known releases:
+*5302    Shark Hunter (UK)
+5304    Backgammon (UK)
+5305    Le Mans 2 (UK)
+5306/1  The Wreck (UK)
+*5307    Barnstormer (UK)
+*5310    Sweet Acorn (UK)
+*5311    Chack'n Pop (UK)
+*5312    ChoroQ (UK)
+*5313    Xyzolog (UK)
+*DB014   Front Line (UK)
+*DD150   Graphics Editor (UK)
+*?????   Unknown title, CAD with digitizing for MSX2 (UK)
+*5509    Quiniela Fútbolistica 1X2 (Spain)
+*6202    Backgammon (Spain)
+*6203    La Bellota (Spain)
+*????    Lotería Primitiva (Spain)
+*????    Quiniela Hipica (Spain)
+
+No dump known for entries marked with a *
+-->
+
+	<software name="backgamm">
+		<description>Backgammon (UK)</description>
+		<year>1984</year>
+		<publisher>Electric Software</publisher>
+		<info name="serial" value="5304" />
+		<part name="cart" interface="softcard">
+			<dataarea name="rom" size="0x8000">
+				<rom name="backgammon (europe).rom" size="0x8000" crc="b3694e5a" sha1="363b5a8c94cdb63a7ee72b9d25f7b5053cab319a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lemans2">
+		<description>Le Mans 2 (UK)</description>
+		<year>1984</year>
+		<publisher>Electric Software</publisher>
+		<info name="serial" value="5305" />
+		<part name="cart" interface="softcard">
+			<dataarea name="rom" size="0x8000">
+				<rom name="le mans 2 (europe).rom" size="0x8000" crc="82dddc34" sha1="f69541b86c2b396cdce765c2dec498e11232b3c9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wreck">
+		<description>The Wreck (UK)</description>
+		<year>1984</year>
+		<publisher>Electric Software</publisher>
+		<info name="serial" value="5306/1" />
+		<part name="cart" interface="softcard">
+			<dataarea name="rom" size="0x8000">
+				<rom name="wreck, the (europe).rom" size="0x8000" crc="7efde800" sha1="58e335c943d2647c3ff1e689069d9fa5e1c7ff6e" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

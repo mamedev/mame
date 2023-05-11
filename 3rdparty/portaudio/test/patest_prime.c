@@ -1,7 +1,7 @@
 /** @file patest_prime.c
-	@ingroup test_src
-	@brief Test stream priming mode.
-	@author Ross Bencina http://www.audiomulch.com/~rossb
+    @ingroup test_src
+    @brief Test stream priming mode.
+    @author Ross Bencina http://www.audiomulch.com/~rossb
 */
 
 /*
@@ -32,16 +32,16 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
- 
+
 #include <stdio.h>
 #include <math.h>
 #include "portaudio.h"
@@ -83,8 +83,8 @@ static void InitializeTestData( paTestData *testData )
 */
 static int patestCallback( const void *inputBuffer, void *outputBuffer,
                            unsigned long framesPerBuffer,
-			               const PaStreamCallbackTimeInfo *timeInfo,
-			               PaStreamCallbackFlags statusFlags, void *userData )
+                           const PaStreamCallbackTimeInfo *timeInfo,
+                           PaStreamCallbackFlags statusFlags, void *userData )
 {
     /* Cast data passed through stream to our structure. */
     paTestData *data = (paTestData*)userData;
@@ -92,7 +92,7 @@ static int patestCallback( const void *inputBuffer, void *outputBuffer,
     unsigned int i;
     int result = paContinue;
 
-    /* supress unused parameter warnings */
+    /* suppress unused parameter warnings */
     (void) inputBuffer;
     (void) timeInfo;
     (void) statusFlags;
@@ -105,7 +105,7 @@ static int patestCallback( const void *inputBuffer, void *outputBuffer,
             *out++ = 0.0;  /* left */
             *out++ = 0.0;  /* right */
             --data->idleCountdown;
-            
+
             if( data->idleCountdown <= 0 ) result = paComplete;
             break;
 
@@ -133,7 +133,7 @@ static int patestCallback( const void *inputBuffer, void *outputBuffer,
             break;
         }
     }
-    
+
     return result;
 }
 
@@ -145,12 +145,12 @@ static PaError DoTest( int flags )
     paTestData data;
     PaStreamParameters outputParameters;
 
-    InitializeTestData( &data );       
+    InitializeTestData( &data );
 
     outputParameters.device = Pa_GetDefaultOutputDevice();
     if (outputParameters.device == paNoDevice) {
-      fprintf(stderr,"Error: No default output device.\n");
-      goto error;
+        fprintf(stderr,"Error: No default output device.\n");
+        goto error;
     }
     outputParameters.channelCount = 2;
     outputParameters.hostApiSpecificStreamInfo = NULL;
@@ -200,7 +200,7 @@ int main(void)
     /* Initialize library before making any other calls. */
     err = Pa_Initialize();
     if( err != paNoError ) goto error;
-    
+
     printf("PortAudio Test: Testing stream playback with no priming.\n");
     printf("PortAudio Test: you should see BEEP before you hear it.\n");
     printf("BEEP %d times.\n", NUM_BEEPS );
@@ -227,7 +227,7 @@ int main(void)
     return err;
 error:
     Pa_Terminate();
-    fprintf( stderr, "An error occured while using the portaudio stream\n" );
+    fprintf( stderr, "An error occurred while using the portaudio stream\n" );
     fprintf( stderr, "Error number: %d\n", err );
     fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
     return err;

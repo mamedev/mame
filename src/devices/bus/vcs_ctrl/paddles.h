@@ -28,6 +28,8 @@ public:
 	// construction/destruction
 	vcs_paddles_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	static void reverse_players(device_t *device) { downcast<vcs_paddles_device &>(*device).m_reverse_players = true; }
+
 	// device_vcs_control_port_interface overrides
 	virtual uint8_t vcs_joy_r() override;
 	virtual uint8_t vcs_pot_x_r() override;
@@ -47,6 +49,8 @@ private:
 	required_ioport m_joy;
 	required_ioport m_potx;
 	required_ioport m_poty;
+
+	bool m_reverse_players;
 };
 
 

@@ -33,6 +33,8 @@ Todo:
 #include "sound/spkrdev.h"
 #include "imagedev/cassette.h"
 
+namespace {
+
 class orao_state : public driver_device
 {
 public:
@@ -314,6 +316,8 @@ ROM_START( orao103 )
 	ROM_LOAD( "bas13.ic5", 0x0000, 0x2000, CRC(35daf5da) SHA1(499c5a4bd930c26ec6226623c2793b4c7f771658) )
 	ROM_LOAD( "crt13.ic6", 0x2000, 0x2000, CRC(e7076014) SHA1(0e213287b0b520440af6a2a6297788a9356818c2) )
 ROM_END
+
+} // Anonymous namespace
 
 /* Driver */
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT          COMPANY         FULLNAME    FLAGS

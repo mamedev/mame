@@ -145,8 +145,9 @@ device_memory_interface::space_config_vector alpha_device::memory_space_config()
 	};
 }
 
-bool alpha_device::memory_translate(int spacenum, int intention, offs_t &address)
+bool alpha_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
+	target_space = &space(spacenum);
 	u64 placeholder = s64(s32(address));
 
 	if (cpu_translate(placeholder, intention))
@@ -626,7 +627,7 @@ bool alpha_ev4_device::cpu_translate(u64 &address, int intention)
 	// trim virtual address to 43 bits
 	address &= 0x7ff'ffffffff;
 
-	if (intention & TRANSLATE_FETCH)
+	if (intention == device_memory_interface::TR_FETCH)
 	{
 		// instruction superpage mapping
 		if ((m_ibx[IBX_ICCSR] & IBX_ICCSR_R_MAP) && !(m_ibx[IBX_PS] & IBX_PS_R_CM) && (address >> 41) == 2)
@@ -660,7 +661,7 @@ bool alpha_ev4_device::cpu_translate(u64 &address, int intention)
 
 template <typename T, typename U> std::enable_if_t<std::is_convertible<U, std::function<void(T)>>::value, void> alpha_device::load(u64 address, U &&apply)
 {
-	cpu_translate(address, TRANSLATE_READ);
+	cpu_translate(address, device_memory_interface::TR_READ);
 
 	unsigned const s = (address >> 31) & 6;
 
@@ -675,7 +676,7 @@ template <typename T, typename U> std::enable_if_t<std::is_convertible<U, std::f
 
 template <typename T, typename U> std::enable_if_t<std::is_convertible<U, std::function<void(address_space &, u64, T)>>::value, void> alpha_device::load_l(u64 address, U &&apply)
 {
-	cpu_translate(address, TRANSLATE_READ);
+	cpu_translate(address, device_memory_interface::TR_READ);
 
 	unsigned const s = (address >> 31) & 6;
 
@@ -688,7 +689,7 @@ template <typename T, typename U> std::enable_if_t<std::is_convertible<U, std::f
 
 template <typename T, typename U> std::enable_if_t<std::is_convertible<U, T>::value, void> alpha_device::store(u64 address, U data, T mem_mask)
 {
-	cpu_translate(address, TRANSLATE_WRITE);
+	cpu_translate(address, device_memory_interface::TR_WRITE);
 
 	unsigned const s = (address >> 31) & 6;
 
@@ -703,7 +704,7 @@ template <typename T, typename U> std::enable_if_t<std::is_convertible<U, T>::va
 
 void alpha_device::fetch(u64 address, std::function<void(u32)> &&apply)
 {
-	cpu_translate(address, TRANSLATE_FETCH);
+	cpu_translate(address, device_memory_interface::TR_FETCH);
 
 	apply(icache_fetch(address));
 }

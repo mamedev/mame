@@ -10,7 +10,7 @@
     3 On 3 Dunk Madness (US, prototype?)
     (c)1996 Video System Co.,Ltd.
 
-    Driver by Takahiro Nogi <nogi@kt.rim.or.jp> 2003/08/09 -
+    Driver by Takahiro Nogi 2003/08/09 -
 
     based on other Video System drivers
 

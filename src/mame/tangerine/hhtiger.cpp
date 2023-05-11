@@ -56,6 +56,8 @@ Operating system: CP/M
 #include "logmacro.h"
 
 
+namespace {
+
 class hhtiger_state : public driver_device
 {
 public:
@@ -592,6 +594,8 @@ ROM_START(hhtiger)
 	ROMX_LOAD("rel1.3-789a.ic16", 0x0000, 0x2000, CRC(7fa6fd33) SHA1(0b2768c170ca7077ef5164bfa13d9bf033528115), ROM_BIOS(1))
 	ROMX_LOAD("rel1.3-77c1.ic15", 0x2000, 0x2000, CRC(dd2f15d5) SHA1(139a2b97cb8c27a50e3bfa3f42a9572203e453e0), ROM_BIOS(1))
 ROM_END
+
+} // anonymous namespace
 
 
 /*    YEAR  NAME     PARENT  COMPAT   MACHINE  INPUT    CLASS          INIT        COMPANY               FULLNAME     FLAGS */

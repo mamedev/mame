@@ -55,6 +55,8 @@
 #define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
 
 
+namespace {
+
 #define CGA_PALETTE_SETS 83
 /* one for colour, one for mono, 81 for colour composite */
 
@@ -756,6 +758,9 @@ ROM_START( poisk1 )
 	ROM_REGION(0x2000,"gfx1", ROMREGION_ERASE00)
 	ROM_LOAD("poisk.cga", 0x0000, 0x0800, CRC(f6eb39f0) SHA1(0b788d8d7a8e92cc612d044abcb2523ad964c200))
 ROM_END
+
+} // anonymous namespace
+
 
 /***************************************************************************
 

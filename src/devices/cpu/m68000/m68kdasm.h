@@ -81,7 +81,6 @@ protected:
 	static inline u32 ext_outer_displacement_word(u32 A)    { return (((A)&3) == 2 && ((A)&0x47) < 0x44); }
 	static inline u32 ext_outer_displacement_long(u32 A)    { return (((A)&3) == 3 && ((A)&0x47) < 0x44); }
 
-	static inline s32 sext_7bit_int(u32 value) { return (value & 0x40) ? (value | 0xffffff80) : (value & 0x7f); }
 	static inline s32 make_int_8(u8 value) { return s8(value); }
 	static inline s32 make_int_16(u16 value) { return s16(value); }
 	static inline s32 make_int_32(u32 value) { return s32(value); }

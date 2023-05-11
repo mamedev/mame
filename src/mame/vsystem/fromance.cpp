@@ -28,7 +28,7 @@
     Rettou Juudan Nekkyoku Janshi - Higashi Nippon Hen (列島縦断熱局雀士 東日本編)
     (c)1988 Video System Co.,Ltd.
 
-    Driver by Takahiro Nogi <nogi@kt.rim.or.jp> 2001/02/04 -
+    Driver by Takahiro Nogi 2001/02/04 -
     and Nicola Salmoria, Aaron Giles
 
 ******************************************************************************/

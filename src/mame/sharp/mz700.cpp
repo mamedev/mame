@@ -143,7 +143,7 @@ void mz_state::mz700_io(address_map &map)
 	map(0xe6, 0xe6).w(FUNC(mz_state::mz700_bank_6_w));
 }
 
-void mz_state::mz800_mem(address_map &map)
+void mz800_state::mz800_mem(address_map &map)
 {
 	map(0x0000, 0x0fff).bankr("bankr0").bankw("bankw0");
 	map(0x1000, 0x1fff).bankrw("bank1");
@@ -154,40 +154,40 @@ void mz_state::mz800_mem(address_map &map)
 	map(0xe000, 0xffff).m(m_bankf, FUNC(address_map_bank_device::amap8));
 }
 
-void mz_state::mz800_bankf(address_map &map)
+void mz800_state::mz800_bankf(address_map &map)
 {
 	// bank 0: ram (mz700_bank1)
 	map(0x0000, 0x1fff).ram();
 	// bank 1: devices (mz700_bank3)
 	map(0x2000, 0x2003).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x2004, 0x2007).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0x2008, 0x200b).rw(FUNC(mz_state::mz700_e008_r), FUNC(mz_state::mz700_e008_w));
+	map(0x2008, 0x200b).rw(FUNC(mz800_state::mz700_e008_r), FUNC(mz800_state::mz700_e008_w));
 	map(0x200c, 0x200f).noprw();
 	map(0x2010, 0x3fff).rom().region("monitor", 0x2010);
 	// bank 2: switched out (mz700_bank5)
 	map(0x4000, 0x5fff).noprw();
 }
 
-void mz_state::mz800_io(address_map &map)
+void mz800_state::mz800_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xcc, 0xcc).w(FUNC(mz_state::mz800_write_format_w));
-	map(0xcd, 0xcd).w(FUNC(mz_state::mz800_read_format_w));
-	map(0xce, 0xce).rw(FUNC(mz_state::mz800_crtc_r), FUNC(mz_state::mz800_display_mode_w));
-	map(0xcf, 0xcf).w(FUNC(mz_state::mz800_scroll_border_w));
+	map(0xcc, 0xcc).w(FUNC(mz800_state::mz800_write_format_w));
+	map(0xcd, 0xcd).w(FUNC(mz800_state::mz800_read_format_w));
+	map(0xce, 0xce).rw(FUNC(mz800_state::mz800_crtc_r), FUNC(mz800_state::mz800_display_mode_w));
+	map(0xcf, 0xcf).w(FUNC(mz800_state::mz800_scroll_border_w));
 	map(0xd0, 0xd3).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xd4, 0xd7).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0xe0, 0xe0).rw(FUNC(mz_state::mz800_bank_0_r), FUNC(mz_state::mz800_bank_0_w));
-	map(0xe1, 0xe1).rw(FUNC(mz_state::mz800_bank_1_r), FUNC(mz_state::mz700_bank_1_w));
-	map(0xe2, 0xe2).w(FUNC(mz_state::mz700_bank_2_w));
-	map(0xe3, 0xe3).w(FUNC(mz_state::mz700_bank_3_w));
-	map(0xe4, 0xe4).w(FUNC(mz_state::mz700_bank_4_w));
-	map(0xe5, 0xe5).w(FUNC(mz_state::mz700_bank_5_w));
-	map(0xe6, 0xe6).w(FUNC(mz_state::mz700_bank_6_w));
-	map(0xea, 0xea).rw(FUNC(mz_state::mz800_ramdisk_r), FUNC(mz_state::mz800_ramdisk_w));
-	map(0xeb, 0xeb).w(FUNC(mz_state::mz800_ramaddr_w));
-	map(0xf0, 0xf0).portr("atari_joy1").w(FUNC(mz_state::mz800_palette_w));
-	map(0xf1, 0xf1).portr("atari_joy2");
+	map(0xe0, 0xe0).rw(FUNC(mz800_state::mz800_bank_0_r), FUNC(mz800_state::mz800_bank_0_w));
+	map(0xe1, 0xe1).rw(FUNC(mz800_state::mz800_bank_1_r), FUNC(mz800_state::mz700_bank_1_w));
+	map(0xe2, 0xe2).w(FUNC(mz800_state::mz700_bank_2_w));
+	map(0xe3, 0xe3).w(FUNC(mz800_state::mz700_bank_3_w));
+	map(0xe4, 0xe4).w(FUNC(mz800_state::mz700_bank_4_w));
+	map(0xe5, 0xe5).w(FUNC(mz800_state::mz700_bank_5_w));
+	map(0xe6, 0xe6).w(FUNC(mz800_state::mz700_bank_6_w));
+	map(0xea, 0xea).rw(FUNC(mz800_state::mz800_ramdisk_r), FUNC(mz800_state::mz800_ramdisk_w));
+	map(0xeb, 0xeb).w(FUNC(mz800_state::mz800_ramaddr_w));
+	map(0xf0, 0xf0).r(m_joy[0], FUNC(msx_general_purpose_port_device::read)).w(FUNC(mz800_state::mz800_palette_w));
+	map(0xf1, 0xf1).r(m_joy[1], FUNC(msx_general_purpose_port_device::read));
 	map(0xf2, 0xf2).w("sn76489n", FUNC(sn76489_device::write));
 	map(0xfc, 0xff).rw("z80pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 }
@@ -311,22 +311,6 @@ static INPUT_PORTS_START( mz800 )
 	PORT_MODIFY("JOY")
 	PORT_BIT(0x1f, 0x00, IPT_UNUSED)
 
-	PORT_START("atari_joy1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(1)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2)        PORT_PLAYER(1)
-
-	PORT_START("atari_joy2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(2)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2)        PORT_PLAYER(2)
-
 	PORT_START("system_settings")
 	PORT_DIPNAME(0x01, 0x00, "Mode selection")
 	PORT_DIPLOCATION("SW:4")
@@ -380,8 +364,6 @@ void mz_state::mz700(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, "banke").set_map(&mz_state::mz700_banke).set_options(ENDIANNESS_LITTLE, 8, 16, 0x2000);
 
-	MCFG_MACHINE_RESET_OVERRIDE(mz_state, mz700)
-
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(XTAL(17'734'470)/2, 568, 0, 40*8, 312, 0, 25*8);
@@ -429,21 +411,20 @@ void mz_state::mz700(machine_config &config)
 }
 
 
-void mz_state::mz800(machine_config &config)
+void mz800_state::mz800(machine_config &config)
 {
 	mz700(config);
 	config.device_remove("banke");
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &mz_state::mz800_mem);
-	m_maincpu->set_addrmap(AS_IO, &mz_state::mz800_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mz800_state::mz800_mem);
+	m_maincpu->set_addrmap(AS_IO, &mz800_state::mz800_io);
 
-	ADDRESS_MAP_BANK(config, "bankf").set_map(&mz_state::mz800_bankf).set_options(ENDIANNESS_LITTLE, 8, 16, 0x2000);
+	ADDRESS_MAP_BANK(config, "bankf").set_map(&mz800_state::mz800_bankf).set_options(ENDIANNESS_LITTLE, 8, 16, 0x2000);
 
-	MCFG_MACHINE_RESET_OVERRIDE(mz_state, mz800)
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_mz800);
 
-	m_screen->set_screen_update(FUNC(mz_state::screen_update_mz800));
+	m_screen->set_screen_update(FUNC(mz800_state::screen_update_mz800));
 
 	SN76489(config, "sn76489n", XTAL(17'734'470)/5).add_route(ALL_OUTPUTS, "mono", 1.0);
 
@@ -453,11 +434,16 @@ void mz_state::mz800(machine_config &config)
 	/* devices */
 	m_pit->set_clk<0>(XTAL(17'734'470)/16);
 
+	m_ppi->out_pa_callback().set(FUNC(mz800_state::pio_port_a_w));
+
 	z80pio_device& pio(Z80PIO(config, "z80pio", XTAL(17'734'470)/5));
-	pio.out_int_callback().set(FUNC(mz_state::mz800_z80pio_irq));
-	pio.in_pa_callback().set(FUNC(mz_state::mz800_z80pio_port_a_r));
-	pio.out_pa_callback().set(FUNC(mz_state::mz800_z80pio_port_a_w));
+	pio.out_int_callback().set_inputline(m_maincpu, 0);
+	pio.in_pa_callback().set(FUNC(mz800_state::mz800_z80pio_port_a_r));
+	pio.out_pa_callback().set(FUNC(mz800_state::mz800_z80pio_port_a_w));
 	pio.out_pb_callback().set("cent_data_out", FUNC(output_latch_device::write));
+
+	MSX_GENERAL_PURPOSE_PORT(config, m_joy[0], msx_general_purpose_port_devices, "joystick");
+	MSX_GENERAL_PURPOSE_PORT(config, m_joy[1], msx_general_purpose_port_devices, "joystick");
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 
@@ -510,8 +496,8 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS     INIT        COMPANY  FULLNAME          FLAGS
-COMP( 1982, mz700,  0,      0,      mz700,   mz700, mz_state, init_mz700, "Sharp", "MZ-700",         0 )
-COMP( 1982, mz700j, mz700,  0,      mz700,   mz700, mz_state, init_mz700, "Sharp", "MZ-700 (Japan)", 0 )
-COMP( 1984, mz800,  0,      0,      mz800,   mz800, mz_state, init_mz800, "Sharp", "MZ-800",         MACHINE_NOT_WORKING )
-COMP( 1984, mz1500, 0,      0,      mz800,   mz800, mz_state, init_mz800, "Sharp", "MZ-1500",        MACHINE_NOT_WORKING )    // Japanese version of the MZ-800
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME          FLAGS
+COMP( 1982, mz700,  0,      0,      mz700,   mz700, mz_state,    init_mz700, "Sharp", "MZ-700",         0 )
+COMP( 1982, mz700j, mz700,  0,      mz700,   mz700, mz_state,    init_mz700, "Sharp", "MZ-700 (Japan)", 0 )
+COMP( 1984, mz800,  0,      0,      mz800,   mz800, mz800_state, init_mz800, "Sharp", "MZ-800",         MACHINE_NOT_WORKING )
+COMP( 1984, mz1500, 0,      0,      mz800,   mz800, mz800_state, init_mz800, "Sharp", "MZ-1500",        MACHINE_NOT_WORKING )    // Japanese version of the MZ-800

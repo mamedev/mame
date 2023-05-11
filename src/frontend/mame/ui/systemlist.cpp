@@ -139,7 +139,8 @@ void system_list::do_cache_data(std::string const &datpath, std::string const &t
 	}
 
 	// sort drivers and notify
-	std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t> >(std::locale());
+	std::locale const lcl;
+	std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t> >(lcl);
 	auto const compare_names =
 			[&coll] (std::wstring const &wx, std::wstring const &wy) -> bool
 			{

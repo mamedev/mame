@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Tomasz Slanina
+// copyright-holders: Tomasz Slanina
+
 /****************************************************************************************
 
 Super Wing - (c) 1985 Wing (UPL?)
@@ -10,8 +11,8 @@ probably a sequel to flipjack
 Hardware a bit (interrupts, sound) similar to mouser as well
 
 TODO:
-- unused rom 6.8s (located on the pcb near the gfx rom 7.8p, but contains
-  data (similar to the one in roms 4.5p and 5.5r)
+- unused ROM 6.8s (located on the PCB near the gfx ROM 7.8p, but contains
+  data (similar to the one in ROMs 4.5p and 5.5r)
 
   The game currently crashes after the bonus round rather than moving on to
   the next level, it writes 01 to 0xa187 which is probably ROM bank, however
@@ -23,7 +24,7 @@ TODO:
    the ball into one of the portals at the top left)
 
 
-- dump color prom
+- dump color PROM
 - some unknown DSW and inputs
 - hopper
 - unknown writes
@@ -33,15 +34,28 @@ TODO:
 *****************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/ay8910.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
 
 
-#define MASTER_CLOCK XTAL(18'432'000)
+// configurable logging
+#define LOG_UNKWRITE (1U <<  1)
+
+//#define VERBOSE (LOG_GENERAL | LOG_UNKWRITE)
+
+#include "logmacro.h"
+
+#define LOGUNKWRITE(...) LOGMASKED(LOG_UNKWRITE, __VA_ARGS__)
+
+
+namespace {
 
 class superwng_state : public driver_device
 {
@@ -50,12 +64,11 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_videoram_bg(*this, "videorabg"),
-		m_videoram_fg(*this, "videorafg"),
-		m_colorram_bg(*this, "colorrabg"),
-		m_colorram_fg(*this, "colorrafg"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_videoram(*this, "videoram%u", 0U),
+		m_colorram(*this, "colorram%u", 0U),
+		m_mainbank(*this, "mainbank")
 	{ }
 
 	void superwng(machine_config &config);
@@ -68,108 +81,87 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_shared_ptr<uint8_t> m_videoram_bg;
-	required_shared_ptr<uint8_t> m_videoram_fg;
-	required_shared_ptr<uint8_t> m_colorram_bg;
-	required_shared_ptr<uint8_t> m_colorram_fg;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
+	required_shared_ptr_array<uint8_t, 2> m_videoram; // 0 BG, 1 FG
+	required_shared_ptr_array<uint8_t, 2> m_colorram; // 0 BG, 1 FG
+
+	required_memory_bank m_mainbank;
+
 	uint8_t m_tile_bank = 0;
-	uint8_t m_sound_byte = 0;
 	uint8_t m_nmi_enable = 0;
 
-	tilemap_t * m_bg_tilemap = nullptr;
-	tilemap_t * m_fg_tilemap = nullptr;
+	tilemap_t *m_tilemap[2] {};
 
-	void superwng_nmi_enable_w(uint8_t data);
-	void superwng_sound_interrupt_w(uint8_t data);
-	void superwng_sound_nmi_clear_w(uint8_t data);
-	void superwng_bg_vram_w(offs_t offset, uint8_t data);
-	void superwng_bg_cram_w(offs_t offset, uint8_t data);
-	void superwng_fg_vram_w(offs_t offset, uint8_t data);
-	void superwng_fg_cram_w(offs_t offset, uint8_t data);
-	void superwng_tilebank_w(uint8_t data);
-	void superwng_flip_screen_w(uint8_t data);
-	void superwng_cointcnt1_w(uint8_t data);
-	void superwng_cointcnt2_w(uint8_t data);
-	void superwng_hopper_w(uint8_t data);
-	uint8_t superwng_sound_byte_r();
-	void superwng_unk_a187_w(uint8_t data);
-	void superwng_unk_a185_w(uint8_t data);
+	void nmi_enable_w(uint8_t data);
+	void sound_nmi_clear_w(uint8_t data);
+	template <uint8_t Which> void vram_w(offs_t offset, uint8_t data);
+	template <uint8_t Which> void cram_w(offs_t offset, uint8_t data);
+	void tilebank_w(uint8_t data);
+	void flip_screen_w(uint8_t data);
+	template <uint8_t Which> void cointcnt_w(uint8_t data);
+	void hopper_w(uint8_t data);
+	void unk_a187_w(uint8_t data);
+	void unk_a185_w(uint8_t data);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	void superwng_palette(palette_device &palette) const;
-	uint32_t screen_update_superwng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_tile_info);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(main_nmi_interrupt);
-	INTERRUPT_GEN_MEMBER(superwng_sound_nmi_assert);
+	INTERRUPT_GEN_MEMBER(sound_nmi_assert);
 
-	void superwng_map(address_map &map);
-	void superwng_sound_map(address_map &map);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 };
 
-void superwng_state::superwng_unk_a187_w(uint8_t data)
+void superwng_state::unk_a187_w(uint8_t data)
 {
-	membank("bank1")->set_entry(data&1);
+	m_mainbank->set_entry(data & 1);
 }
 
-void superwng_state::superwng_unk_a185_w(uint8_t data)
+void superwng_state::unk_a185_w(uint8_t data)
 {
-//  printf("superwng_unk_a185_w %02x\n", data);
+	LOGUNKWRITE("unk_a185_w %02x\n", data);
 }
 
-TILE_GET_INFO_MEMBER(superwng_state::get_bg_tile_info)
+template <uint8_t Which>
+TILE_GET_INFO_MEMBER(superwng_state::get_tile_info)
 {
-	int code = m_videoram_bg[tile_index];
-	int attr = m_colorram_bg[tile_index];
+	int code = m_videoram[Which][tile_index];
+	int const attr = m_colorram[Which][tile_index];
 
-	code= (code&0x7f) | ((attr&0x40)<<1) | ((code&0x80)<<1);
-	code|=m_tile_bank?0x200:0;
+	code = (code & 0x7f) | ((attr & 0x40) << 1) | ((code & 0x80) << 1);
+	code |= m_tile_bank ? 0x200 : 0;
 
-	int flipx=(attr&0x80) ? TILE_FLIPX : 0;
-	int flipy=(attr&0x80) ? TILE_FLIPY : 0;
+	int const flipx = (attr & 0x80) ? TILE_FLIPX : 0;
+	int const flipy = (attr & 0x80) ? TILE_FLIPY : 0;
 
-	tileinfo.set(0, code, attr & 0xf, flipx|flipy);
-}
-
-TILE_GET_INFO_MEMBER(superwng_state::get_fg_tile_info)
-{
-	int code = m_videoram_fg[tile_index];
-	int attr = m_colorram_fg[tile_index];
-
-	code= (code&0x7f) | ((attr&0x40)<<1) | ((code&0x80)<<1);
-
-	code|=m_tile_bank?0x200:0;
-
-	int flipx=(attr&0x80) ? TILE_FLIPX : 0;
-	int flipy=(attr&0x80) ? TILE_FLIPY : 0;
-
-	tileinfo.set(0, code, attr & 0xf, flipx|flipy);
+	tileinfo.set(0, code, attr & 0xf, flipx | flipy);
 }
 
 void superwng_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(superwng_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(superwng_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(superwng_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(superwng_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	m_bg_tilemap->set_scrollx(0, 64);
+	m_tilemap[0]->set_scrollx(0, 64);
 }
 
-uint32_t superwng_state::screen_update_superwng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t superwng_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
 	rectangle tmp = cliprect;
 
 	if (flip_screen())
 	{
 		tmp.min_x += 32;
-		m_fg_tilemap->draw(screen, bitmap, tmp, 0, 0);
+		m_tilemap[1]->draw(screen, bitmap, tmp, 0, 0);
 	}
 	else
 	{
 		tmp.max_x -= 32;
-		m_fg_tilemap->draw(screen, bitmap, tmp, 0, 0);
+		m_tilemap[1]->draw(screen, bitmap, tmp, 0, 0);
 	}
 
 	//sprites
@@ -185,16 +177,16 @@ uint32_t superwng_state::screen_update_superwng(screen_device &screen, bitmap_in
 		           x      ?
 		            xxxx  color
 		*/
-		if (~m_videoram_bg[i] & 1)
+		if (~m_videoram[0][i] & 1)
 			continue;
 
-		int code = (m_videoram_bg[i] >> 2) | 0x40;
-		int flip = ~m_videoram_bg[i] >> 1 & 1;
-		int sx = 240 - m_videoram_bg[i + 1];
-		int sy = m_colorram_bg[i];
-		int color = m_colorram_bg[i + 1] & 0xf;
+		int const code = (m_videoram[0][i] >> 2) | 0x40;
+		int const flip = ~m_videoram[0][i] >> 1 & 1;
+		int const sx = 240 - m_videoram[0][i + 1];
+		int const sy = m_colorram[0][i];
+		int const color = m_colorram[0][i + 1] & 0xf;
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
 						code,
 						color,
 						flip, flip,
@@ -205,7 +197,7 @@ uint32_t superwng_state::screen_update_superwng(screen_device &screen, bitmap_in
 }
 
 
-static constexpr uint8_t superwng_colors[]= /* temporary */
+static constexpr uint8_t colors[]= // temporary
 {
 	0x00, 0xc4, 0xff, 0x87, 0x00, 0xb0, 0xff, 0x2f, 0x00, 0x07, 0xff, 0xe0, 0x00, 0x86, 0xff, 0xc6,
 	0x00, 0x07, 0x3f, 0xff, 0x00, 0xb0, 0x38, 0x27, 0x00, 0x20, 0xff, 0x27, 0x00, 0xa4, 0xff, 0x87,
@@ -213,31 +205,31 @@ static constexpr uint8_t superwng_colors[]= /* temporary */
 	0x00, 0xc0, 0x07, 0x3f, 0x00, 0x1f, 0x3f, 0xff, 0x00, 0x86, 0x05, 0xff, 0x00, 0xc0, 0xe8, 0xff
 };
 
-void superwng_state::superwng_palette(palette_device &palette) const
+void superwng_state::palette(palette_device &palette) const
 {
 	for (int i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2;
 
-		bit0 = BIT(superwng_colors[i], 0);
-		bit1 = BIT(superwng_colors[i], 1);
-		bit2 = BIT(superwng_colors[i], 2);
+		bit0 = BIT(colors[i], 0);
+		bit1 = BIT(colors[i], 1);
+		bit2 = BIT(colors[i], 2);
 		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		bit0 = BIT(superwng_colors[i], 3);
-		bit1 = BIT(superwng_colors[i], 4);
-		bit2 = BIT(superwng_colors[i], 5);
+		bit0 = BIT(colors[i], 3);
+		bit1 = BIT(colors[i], 4);
+		bit2 = BIT(colors[i], 5);
 		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		bit0 = BIT(superwng_colors[i], 6);
-		bit1 = BIT(superwng_colors[i], 7);
+		bit0 = BIT(colors[i], 6);
+		bit1 = BIT(colors[i], 7);
 		int const b = 0x4f * bit0 + 0xa8 * bit1;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
-void superwng_state::superwng_nmi_enable_w(uint8_t data)
+void superwng_state::nmi_enable_w(uint8_t data)
 {
 	m_nmi_enable = data;
 }
@@ -248,112 +240,85 @@ WRITE_LINE_MEMBER(superwng_state::main_nmi_interrupt)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-void superwng_state::superwng_sound_interrupt_w(uint8_t data)
-{
-	m_sound_byte = data;
-	m_audiocpu->set_input_line(0, ASSERT_LINE);
-}
-
-uint8_t superwng_state::superwng_sound_byte_r()
-{
-	m_audiocpu->set_input_line(0, CLEAR_LINE);
-	return m_sound_byte;
-}
-
-void superwng_state::superwng_sound_nmi_clear_w(uint8_t data)
+void superwng_state::sound_nmi_clear_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(superwng_state::superwng_sound_nmi_assert)
+INTERRUPT_GEN_MEMBER(superwng_state::sound_nmi_assert)
 {
 	if (BIT(m_nmi_enable, 0))
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-void superwng_state::superwng_bg_vram_w(offs_t offset, uint8_t data)
+template <uint8_t Which>
+void superwng_state::vram_w(offs_t offset, uint8_t data)
 {
-	m_videoram_bg[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[Which][offset] = data;
+	m_tilemap[Which]->mark_tile_dirty(offset);
 }
 
-void superwng_state::superwng_bg_cram_w(offs_t offset, uint8_t data)
+template <uint8_t Which>
+void superwng_state::cram_w(offs_t offset, uint8_t data)
 {
-	m_colorram_bg[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[Which][offset] = data;
+	m_tilemap[Which]->mark_tile_dirty(offset);
 }
 
-void superwng_state::superwng_fg_vram_w(offs_t offset, uint8_t data)
-{
-	m_videoram_fg[offset] = data;
-	m_fg_tilemap->mark_tile_dirty(offset);
-}
-
-void superwng_state::superwng_fg_cram_w(offs_t offset, uint8_t data)
-{
-	m_colorram_fg[offset] = data;
-	m_fg_tilemap->mark_tile_dirty(offset);
-}
-
-void superwng_state::superwng_tilebank_w(uint8_t data)
+void superwng_state::tilebank_w(uint8_t data)
 {
 	m_tile_bank = data;
-	m_bg_tilemap->mark_all_dirty();
-	m_fg_tilemap->mark_all_dirty();
+	m_tilemap[0]->mark_all_dirty();
+	m_tilemap[1]->mark_all_dirty();
 }
 
-void superwng_state::superwng_flip_screen_w(uint8_t data)
+void superwng_state::flip_screen_w(uint8_t data)
 {
 	flip_screen_set(~data & 0x01);
-	m_bg_tilemap->mark_all_dirty();
-	m_fg_tilemap->mark_all_dirty();
+	m_tilemap[0]->mark_all_dirty();
+	m_tilemap[1]->mark_all_dirty();
 }
 
-void superwng_state::superwng_cointcnt1_w(uint8_t data)
+template <uint8_t Which>
+void superwng_state::cointcnt_w(uint8_t data)
 {
-	machine().bookkeeping().coin_counter_w(0, data);
+	machine().bookkeeping().coin_counter_w(Which, data);
 }
 
-void superwng_state::superwng_cointcnt2_w(uint8_t data)
-{
-	machine().bookkeeping().coin_counter_w(1, data);
-}
-
-void superwng_state::superwng_hopper_w(uint8_t data)
+void superwng_state::hopper_w(uint8_t data)
 {
 }
 
-void superwng_state::superwng_map(address_map &map)
+void superwng_state::main_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x6fff).bankr("bank1");
+	map(0x4000, 0x6fff).bankr(m_mainbank);
 	map(0x7000, 0x7fff).ram();
-	map(0x8000, 0x83ff).ram().w(FUNC(superwng_state::superwng_bg_vram_w)).share("videorabg");
-	map(0x8400, 0x87ff).ram().w(FUNC(superwng_state::superwng_fg_vram_w)).share("videorafg");
-	map(0x8800, 0x8bff).ram().w(FUNC(superwng_state::superwng_bg_cram_w)).share("colorrabg");
-	map(0x8c00, 0x8fff).ram().w(FUNC(superwng_state::superwng_fg_cram_w)).share("colorrafg");
+	map(0x8000, 0x83ff).ram().w(FUNC(superwng_state::vram_w<0>)).share(m_videoram[0]);
+	map(0x8400, 0x87ff).ram().w(FUNC(superwng_state::vram_w<1>)).share(m_videoram[1]);
+	map(0x8800, 0x8bff).ram().w(FUNC(superwng_state::cram_w<0>)).share(m_colorram[0]);
+	map(0x8c00, 0x8fff).ram().w(FUNC(superwng_state::cram_w<1>)).share(m_colorram[1]);
 	map(0x9800, 0x99ff).ram();
-	map(0xa000, 0xa000).portr("P1");
-	map(0xa000, 0xa000).w(FUNC(superwng_state::superwng_hopper_w));
+	map(0xa000, 0xa000).portr("P1").w(FUNC(superwng_state::hopper_w));
 	map(0xa080, 0xa080).portr("P2");
-	map(0xa100, 0xa100).portr("DSW1");
-	map(0xa100, 0xa100).w(FUNC(superwng_state::superwng_sound_interrupt_w));
+	map(0xa100, 0xa100).portr("DSW1").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xa180, 0xa180).portr("DSW2");
+	// TODO: the following is almost certainly a LS259 or similar
 	map(0xa180, 0xa180).nopw(); // watchdog? int ack?
-	map(0xa181, 0xa181).w(FUNC(superwng_state::superwng_nmi_enable_w));
-	map(0xa182, 0xa182).w(FUNC(superwng_state::superwng_tilebank_w));
-	map(0xa183, 0xa183).w(FUNC(superwng_state::superwng_flip_screen_w));
-	map(0xa184, 0xa184).w(FUNC(superwng_state::superwng_cointcnt1_w));
-	map(0xa185, 0xa185).w(FUNC(superwng_state::superwng_unk_a185_w));  // unknown, always(?) 0
-	map(0xa186, 0xa186).w(FUNC(superwng_state::superwng_cointcnt2_w));
-	map(0xa187, 0xa187).w(FUNC(superwng_state::superwng_unk_a187_w)); // unknown, always(?) 0
+	map(0xa181, 0xa181).w(FUNC(superwng_state::nmi_enable_w));
+	map(0xa182, 0xa182).w(FUNC(superwng_state::tilebank_w));
+	map(0xa183, 0xa183).w(FUNC(superwng_state::flip_screen_w));
+	map(0xa184, 0xa184).w(FUNC(superwng_state::cointcnt_w<0>));
+	map(0xa185, 0xa185).w(FUNC(superwng_state::unk_a185_w)); // unknown, always(?) 0
+	map(0xa186, 0xa186).w(FUNC(superwng_state::cointcnt_w<1>));
+	map(0xa187, 0xa187).w(FUNC(superwng_state::unk_a187_w)); // unknown, always(?) 0
 }
 
-void superwng_state::superwng_sound_map(address_map &map)
+void superwng_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).ram();
-	map(0x3000, 0x3000).w(FUNC(superwng_state::superwng_sound_nmi_clear_w));
+	map(0x3000, 0x3000).w(FUNC(superwng_state::sound_nmi_clear_w));
 	map(0x4000, 0x4000).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0x5000, 0x5000).w("ay1", FUNC(ay8910_device::address_w));
 	map(0x6000, 0x6000).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
@@ -460,74 +425,78 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_superwng )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,       0, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout,     0, 16 )
+	GFXDECODE_ENTRY( "gfx", 0x0000, charlayout,   0, 16 )
+	GFXDECODE_ENTRY( "gfx", 0x0000, spritelayout, 0, 16 )
 GFXDECODE_END
 
 void superwng_state::machine_start()
 {
 	save_item(NAME(m_tile_bank));
-	save_item(NAME(m_sound_byte));
 	save_item(NAME(m_nmi_enable));
-	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base()+0x4000, 0x4000);
+	m_mainbank->configure_entries(0, 2, memregion("maincpu")->base() + 0x4000, 0x4000);
 }
 
 void superwng_state::machine_reset()
 {
-	m_sound_byte = 0;
 	m_nmi_enable = 0;
 }
 
 void superwng_state::superwng(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, MASTER_CLOCK/4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &superwng_state::superwng_map);
+	static constexpr XTAL MASTER_CLOCK = 18.432_MHz_XTAL;
 
-	Z80(config, m_audiocpu, MASTER_CLOCK/4);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &superwng_state::superwng_sound_map);
-	m_audiocpu->set_periodic_int(FUNC(superwng_state::superwng_sound_nmi_assert), attotime::from_hz(4*60));
+	// basic machine hardware
+	Z80(config, m_maincpu, MASTER_CLOCK / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &superwng_state::main_map);
 
-	/* video hardware */
+	Z80(config, m_audiocpu, MASTER_CLOCK / 4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &superwng_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(superwng_state::sound_nmi_assert), attotime::from_hz(4 * 60));
+
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
+
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(superwng_state::screen_update_superwng));
+	screen.set_screen_update(FUNC(superwng_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(superwng_state::main_nmi_interrupt));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_superwng);
 
-	PALETTE(config, m_palette, FUNC(superwng_state::superwng_palette), 0x40);
+	PALETTE(config, m_palette, FUNC(superwng_state::palette), 0x40);
 
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &ay1(AY8910(config, "ay1", MASTER_CLOCK/12));
-	ay1.port_a_read_callback().set(FUNC(superwng_state::superwng_sound_byte_r));
+	ay8910_device &ay1(AY8910(config, "ay1", MASTER_CLOCK / 12));
+	ay1.port_a_read_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	AY8910(config, "ay2", MASTER_CLOCK/12).add_route(ALL_OUTPUTS, "mono", 0.50);
+	AY8910(config, "ay2", MASTER_CLOCK / 12).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 ROM_START( superwng )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "2.5l",         0x0000, 0x2000, CRC(8d102f8d) SHA1(ff6d994273a2e493a68637822cd0b1a2f69fd054) )
-	ROM_LOAD( "3.5m",         0x2000, 0x2000, CRC(3b08bd19) SHA1(2020e2835df86a6a279bbf9d013a489f0e32a4bd) )
-	ROM_LOAD( "4.5p",         0x4000, 0x2000, CRC(6a49746d) SHA1(f5cd5eb77f60972a3897243f9ee3d61aac0878fc) )
-	ROM_LOAD( "5.5r",         0x6000, 0x2000, CRC(ebd23487) SHA1(16e8faf989aa80dbf9934450ec4ba642a6f88c63) )
-	ROM_LOAD( "6.8s",         0x8000, 0x4000, BAD_DUMP CRC(774433e0) SHA1(82b10d797581c14914bcce320f2aa5d3fb1fba33) ) // banked but probably bad, bits at 0xxx39 offsets appear to be missing / corrupt.
+	ROM_REGION( 0xc000, "maincpu", 0 )
+	ROM_LOAD( "2.5l", 0x0000, 0x2000, CRC(8d102f8d) SHA1(ff6d994273a2e493a68637822cd0b1a2f69fd054) )
+	ROM_LOAD( "3.5m", 0x2000, 0x2000, CRC(3b08bd19) SHA1(2020e2835df86a6a279bbf9d013a489f0e32a4bd) )
+	ROM_LOAD( "4.5p", 0x4000, 0x2000, CRC(6a49746d) SHA1(f5cd5eb77f60972a3897243f9ee3d61aac0878fc) )
+	ROM_LOAD( "5.5r", 0x6000, 0x2000, CRC(ebd23487) SHA1(16e8faf989aa80dbf9934450ec4ba642a6f88c63) )
+	ROM_LOAD( "6.8s", 0x8000, 0x4000, BAD_DUMP CRC(774433e0) SHA1(82b10d797581c14914bcce320f2aa5d3fb1fba33) ) // banked but probably bad, bits at 0xxx39 offsets appear to be missing / corrupt.
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "1.1a",         0x0000, 0x2000, CRC(a70aa39e) SHA1(b03de65d7bd020eb77495997128dce5ccbdbefac) )
+	ROM_REGION( 0x2000, "audiocpu", 0 )
+	ROM_LOAD( "1.1a", 0x0000, 0x2000, CRC(a70aa39e) SHA1(b03de65d7bd020eb77495997128dce5ccbdbefac) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "7.8p",        0x0000, 0x4000, CRC(b472603c) SHA1(96f477a47a5be3db1292fea4f5c91ab155013f74) )
+	ROM_REGION( 0x4000, "gfx", 0 )
+	ROM_LOAD( "7.8p", 0x0000, 0x4000, CRC(b472603c) SHA1(96f477a47a5be3db1292fea4f5c91ab155013f74) )
 
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "bprom.bin", 0x0000, 0x0040, NO_DUMP)
+	ROM_LOAD( "bprom.bin", 0x0000, 0x0040, NO_DUMP )
 ROM_END
 
+} // anonymous namespace
 
-GAME( 1985, superwng,   0,      superwng, superwng, superwng_state, empty_init, ROT90, "Wing", "Super Wing", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // crashes after bonus stage, see notes, bad rom?
+
+GAME( 1985, superwng, 0, superwng, superwng, superwng_state, empty_init, ROT90, "Wing", "Super Wing", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // crashes after bonus stage, see notes, bad ROM?

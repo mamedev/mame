@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese, Roberto Fresca
-#ifndef MAME_INCLUDES_NORAUTP_H
-#define MAME_INCLUDES_NORAUTP_H
+#ifndef MAME_MISC_NORAUTP_H
+#define MAME_MISC_NORAUTP_H
 
 #pragma once
 
@@ -97,4 +97,4 @@ DISCRETE_SOUND_EXTERN( norautp_discrete );
 DISCRETE_SOUND_EXTERN( dphl_discrete );
 DISCRETE_SOUND_EXTERN( kimble_discrete );
 
-#endif // MAME_INCLUDES_NORAUTP_H
+#endif // MAME_MISC_NORAUTP_H

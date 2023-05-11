@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
-#ifndef MAME_MACHINE_ESQVFD_H
-#define MAME_MACHINE_ESQVFD_H
+#ifndef MAME_ENSONIQ_ESQVFD_H
+#define MAME_ENSONIQ_ESQVFD_H
 
 #include <memory>
 #include <tuple>
@@ -100,4 +100,4 @@ DECLARE_DEVICE_TYPE(ESQ1X22,     esq1x22_device)
 DECLARE_DEVICE_TYPE(ESQ2X40,     esq2x40_device)
 DECLARE_DEVICE_TYPE(ESQ2X40_SQ1, esq2x40_sq1_device)
 
-#endif // MAME_MACHINE_ESQVFD_H
+#endif // MAME_ENSONIQ_ESQVFD_H

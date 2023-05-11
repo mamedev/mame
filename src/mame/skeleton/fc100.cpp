@@ -51,6 +51,8 @@ TODO:
 #include "formats/fc100_cas.h"
 
 
+namespace {
+
 class fc100_state : public driver_device
 {
 public:
@@ -582,6 +584,9 @@ ROM_START( fc100 )
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "cg-04-01.u53",  0x0000, 0x1000, CRC(2de75b7f) SHA1(464369d98cbae92ffa322ebaa4404cf5b26825f1) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

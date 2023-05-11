@@ -30,6 +30,9 @@
 
 #include "logmacro.h"
 
+
+namespace {
+
 class nes_sh6578_state : public driver_device
 {
 public:
@@ -54,8 +57,6 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-
-	void sprite_dma_w(address_space &space, uint8_t data);
 
 	virtual void io_w(uint8_t data);
 	virtual void extio_w(uint8_t data);
@@ -106,10 +107,6 @@ private:
 	uint8_t io0_r();
 	uint8_t io1_r();
 
-	uint8_t psg1_4014_r();
-	uint8_t psg1_4015_r();
-	void psg1_4015_w(uint8_t data);
-	void psg1_4017_w(uint8_t data);
 	uint8_t apu_read_mem(offs_t offset);
 
 	DECLARE_WRITE_LINE_MEMBER(apu_irq);
@@ -181,11 +178,6 @@ void nes_sh6578_state::bank_w(int bank, uint16_t offset, uint8_t data)
 	address = offset & 0x00fff;                   // 0x00fff part of address
 	address |= (m_bankswitch[bank] & 0xff) << 12; // 0xff000 part of address
 	m_fullrom->write8(address, data);
-}
-
-void nes_sh6578_state::sprite_dma_w(address_space &space, uint8_t data)
-{
-	m_ppu->spriteram_dma(space, data);
 }
 
 uint8_t nes_sh6578_state::bankswitch_r(offs_t offset)
@@ -452,26 +444,6 @@ void nes_sh6578_max10in1_state::extio_w(uint8_t data)
 
 
 
-uint8_t nes_sh6578_state::psg1_4014_r()
-{
-	return m_apu->read(0x14);
-}
-
-uint8_t nes_sh6578_state::psg1_4015_r()
-{
-	return m_apu->read(0x15);
-}
-
-void nes_sh6578_state::psg1_4015_w(uint8_t data)
-{
-	m_apu->write(0x15, data);
-}
-
-void nes_sh6578_state::psg1_4017_w(uint8_t data)
-{
-	m_apu->write(0x17, data);
-}
-
 WRITE_LINE_MEMBER(nes_sh6578_state::apu_irq)
 {
 	// unimplemented
@@ -492,11 +464,11 @@ void nes_sh6578_state::nes_sh6578_map(address_map& map)
 
 	map(0x2040, 0x207f).rw(m_ppu, FUNC(ppu_sh6578_device::palette_read), FUNC(ppu_sh6578_device::palette_write));
 
-	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
-	map(0x4014, 0x4014).rw(FUNC(nes_sh6578_state::psg1_4014_r), FUNC(nes_sh6578_state::sprite_dma_w));
-	map(0x4015, 0x4015).rw(FUNC(nes_sh6578_state::psg1_4015_r), FUNC(nes_sh6578_state::psg1_4015_w));
+	map(0x4000, 0x4017).w(m_apu, FUNC(nesapu_device::write));
+	map(0x4014, 0x4014).w(m_ppu, FUNC(ppu_sh6578_device::spriteram_dma));
+	map(0x4015, 0x4015).r(m_apu, FUNC(nesapu_device::status_r));
 	map(0x4016, 0x4016).rw(FUNC(nes_sh6578_state::io0_r), FUNC(nes_sh6578_state::io_w));
-	map(0x4017, 0x4017).rw(FUNC(nes_sh6578_state::io1_r), FUNC(nes_sh6578_state::psg1_4017_w));
+	map(0x4017, 0x4017).r(FUNC(nes_sh6578_state::io1_r));
 
 	map(0x4020, 0x4020).w(FUNC(nes_sh6578_state::timing_setting_control_w));
 	//4021 write keyboard output port
@@ -735,6 +707,9 @@ ROM_START( dancmix3 )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "e28f008sa.u5", 0x00000, 0x100000, CRC(faf6480c) SHA1(68bf79910e091443aecc7bf256cd5378a04c550e) )
 ROM_END
+
+} // anonymous namespace
+
 
 CONS( 200?, maxx5in1,  0, 0,  nes_sh6578, nes_sh6578, nes_sh6578_state,  init_nes_sh6578, "Senario / JungleTac", "Vs Maxx 5-in-1 Casino / Senario Card & Casino Games", 0 ) // advertised on box as 'With Solitaire" (was there an even older version without it?)
 

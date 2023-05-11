@@ -16,6 +16,9 @@
 #include "video/scn2674.h"
 #include "screen.h"
 
+
+namespace {
+
 class wy85_state : public driver_device
 {
 public:
@@ -179,5 +182,8 @@ ROM_START(wy85)
 	ROM_REGION(0x2000, "chargen", 0)
 	ROM_LOAD("am9265.1h", 0x0000, 0x2000, CRC(5ee65b55) SHA1(a0b38a38838f262aaea22d212351e7441e4b07e8)) // AM9265EPC
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1985, wy85, 0, 0, wy85, wy85, wy85_state, empty_init, "Wyse Technology", "WY-85 (Rev. A)", MACHINE_IS_SKELETON)

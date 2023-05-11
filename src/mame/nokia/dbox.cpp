@@ -433,6 +433,9 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
+
+namespace {
+
 #define LOCALFLASH 0 //  1 = local flash rom implementation 0 = intelflash_device
 
 class dbox_state : public driver_device
@@ -657,5 +660,8 @@ ROM_START( dbox )
 	ROM_SYSTEM_BIOS(2, "nbc106.bin", "Nokia Bootloader CI v1.06")
 	ROMX_LOAD( "bootci106.bin", 0x000000, 0x020000, BAD_DUMP CRC(641762a9) SHA1(7c5233390cc66d3ddf4c730a3418ccfba1dc2905), ROM_BIOS(2) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1996, dbox, 0, 0, dbox, dbox, dbox_state, init_dbox, "Nokia Multimedia", "D-box 1, Kirsch gruppe", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

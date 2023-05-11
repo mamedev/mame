@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
 
+
 #include "emu.h"
 #include "virge_pci.h"
 
@@ -29,9 +30,20 @@ void virge_pci_device::mmio_map(address_map& map)
 	// image transfer ports
 	map(0x1000000,0x1007fff).w(m_vga, FUNC(s3virge_vga_device::image_xfer));
 
+	//map(0x1008180,0x10081ff) primary/secondary stream control
+
+	//map(0x1008200,0x100821f) memory port controller
+	//map(0x1008220,0x1008227) DMA control
+
 	// MMIO address map
+	map(0x10083b0,0x10083bf).rw(FUNC(virge_pci_device::vga_3b0_r), FUNC(virge_pci_device::vga_3b0_w));
+	map(0x10083c0,0x10083df).rw(FUNC(virge_pci_device::vga_3c0_r), FUNC(virge_pci_device::vga_3c0_w));
+	map(0x10083d0,0x10083df).rw(FUNC(virge_pci_device::vga_3d0_r), FUNC(virge_pci_device::vga_3d0_w));
 	map(0x1008504,0x1008507).rw(m_vga, FUNC(s3virge_vga_device::s3d_sub_status_r), FUNC(s3virge_vga_device::s3d_sub_control_w));
 	map(0x100850c,0x100850f).r(m_vga, FUNC(s3virge_vga_device::s3d_func_ctrl_r));
+
+	//map(0x1008580,0x100858b) video DMA
+	//map(0x1008590,0x100859f) command DMA
 
 	// S3D engine registers
 	map(0x100a000,0x100b7ff).rw(m_vga, FUNC(s3virge_vga_device::s3d_register_r), FUNC(s3virge_vga_device::s3d_register_w));
@@ -39,6 +51,7 @@ void virge_pci_device::mmio_map(address_map& map)
 	// alternate image transfer ports
 	map(0x100d000,0x100efff).w(m_vga, FUNC(s3virge_vga_device::image_xfer));
 
+	//map(0x100ff00, 0x100ff43) LPB control
 }
 
 void virge_pci_device::lfb_map(address_map& map)
@@ -95,7 +108,9 @@ uint32_t virge_pci_device::base_address_r()
 void virge_pci_device::base_address_w(offs_t offset, uint32_t data)
 {
 	pci_device::address_base_w(offset,data);
-	downcast<s3virge_vga_device *>(m_vga.target())->set_linear_address(data & 0xffff0000);
+	// only bits 31-26 are changed here, cfr. page 25-4
+	const u32 new_address = (data & 0xfc000000) | (base_address_r() & 0x3ffffff);
+	downcast<s3virge_vga_device *>(m_vga.target())->set_linear_address(new_address);
 	refresh_linear_window();
 }
 
@@ -124,9 +139,16 @@ void virge_pci_device::vga_3b0_w(offs_t offset, uint32_t data, uint32_t mem_mask
 	if (ACCESSING_BITS_8_15)
 	{
 		downcast<s3_vga_device *>(m_vga.target())->port_03b0_w(offset * 4 + 1, data >> 8);
+		// TODO: make this more transparent
+		// it shouldn't expose the S3 CRTC regs directly and don't repeat on 0x3d0 I/O below.
 		if(offset == 1 && downcast<s3virge_vga_device *>(m_vga.target())->get_crtc_port() == 0x3b0)
 		{
-			if(m_current_crtc_reg == 0x58)
+			if (m_current_crtc_reg == 0x53)
+			{
+				refresh_linear_window();
+				remap_cb();
+			}
+			else if(m_current_crtc_reg == 0x58)
 			{
 				refresh_linear_window();
 				remap_cb();
@@ -197,9 +219,20 @@ void virge_pci_device::vga_3d0_w(offs_t offset, uint32_t data, uint32_t mem_mask
 		downcast<s3_vga_device *>(m_vga.target())->port_03d0_w(offset * 4 + 1, data >> 8);
 		if(offset == 1 && downcast<s3virge_vga_device *>(m_vga.target())->get_crtc_port() == 0x3d0)
 		{
-			if(m_current_crtc_reg >= 0x58 && m_current_crtc_reg <= 0x5a)
+			if (m_current_crtc_reg == 0x53)
 			{
 				refresh_linear_window();
+				remap_cb();
+			}
+			else if(m_current_crtc_reg == 0x58)
+			{
+				refresh_linear_window();
+				remap_cb();
+			}
+			else if(m_current_crtc_reg == 0x59 || m_current_crtc_reg == 0x5a)
+			{
+				refresh_linear_window();
+				remap_cb();
 			}
 		}
 	}

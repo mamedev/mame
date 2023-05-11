@@ -178,6 +178,7 @@
 #include "emupal.h"
 #include "speaker.h"
 
+#include <cstdarg>
 #include <cstdio>
 
 

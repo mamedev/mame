@@ -15,7 +15,7 @@
 #include "bus/psx/parallel.h"
 #include "cpu/m6805/m6805.h"
 #include "cpu/psx/psx.h"
-#include "imagedev/chd_cd.h"
+#include "imagedev/cdromimg.h"
 #include "imagedev/snapquik.h"
 #include "psxcd.h"
 #include "machine/ram.h"
@@ -51,7 +51,6 @@ public:
 
 private:
 	std::vector<uint8_t> m_exe_buffer;
-	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	void psxexe_conv32(uint32_t *uint32);
 	int load_psxexe(std::vector<uint8_t> buffer);
 	void cpe_set_register(int r, int v);
@@ -72,21 +71,6 @@ private:
 	required_device<psxcd_device> m_psxcd;
 };
 
-
-#define VERBOSE_LEVEL ( 0 )
-
-inline void ATTR_PRINTF(3,4)  psx1_state::verboselog( int n_level, const char *s_fmt, ... )
-{
-	if( VERBOSE_LEVEL >= n_level )
-	{
-		va_list v;
-		char buf[ 32768 ];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		logerror( "%s: %s", machine().describe_context(), buf );
-	}
-}
 
 void psx1_state::psxexe_conv32(uint32_t *uint32)
 {
@@ -482,10 +466,10 @@ QUICKLOAD_LOAD_MEMBER(psx1_state::quickload_exe)
 	if (image.fread(reinterpret_cast<void *>(&m_exe_buffer[0]), image.length()) != image.length())
 	{
 		m_exe_buffer.resize(0);
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::UNSPECIFIED, std::string());
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void psx1_state::cd_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )

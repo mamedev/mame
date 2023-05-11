@@ -63,6 +63,8 @@ ROMS:
 #include "tilemap.h"
 
 
+namespace {
+
 class goori_state : public driver_device
 {
 public:
@@ -324,6 +326,9 @@ ROM_START( goori )
 	ROM_REGION( 0x040000, "oki", 0 )
 	ROM_LOAD( "1", 0x000000, 0x040000, CRC(c74351b9) SHA1(397f4b6aea23e6619e099c5cc99f38bae74bc3e8) ) // Unico style label, simply labeled 1
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1999, goori, 0,       goori, goori, goori_state,    empty_init, ROT0, "Unico", "Goori Goori", 0 )
 

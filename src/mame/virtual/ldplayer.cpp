@@ -29,6 +29,8 @@
 #include <cctype>
 
 
+namespace {
+
 class ldplayer_state : public driver_device
 {
 public:
@@ -661,6 +663,7 @@ ROM_START( simpr8210 )
 	DISK_REGION( "laserdisc" )
 ROM_END
 
+} // anonymous namespace
 
 
 /*************************************

@@ -154,9 +154,8 @@ void saturn_state::saturn_backupram_w(offs_t offset, uint8_t data)
 
 WRITE_LINE_MEMBER(saturn_state::m68k_reset_callback)
 {
+	logerror("m68k RESET opcode triggered\n");
 	m_smpc_hle->m68k_reset_trigger();
-
-	printf("m68k RESET opcode triggered\n");
 }
 
 void saturn_state::scsp_irq(offs_t offset, uint8_t data)

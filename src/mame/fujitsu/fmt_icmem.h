@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_FMT_ICMEM_H
-#define MAME_MACHINE_FMT_ICMEM_H
+#ifndef MAME_FUJITSU_FMT_ICMEM_H
+#define MAME_FUJITSU_FMT_ICMEM_H
 
 #pragma once
 
@@ -29,9 +29,9 @@ public:
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "icm"; }
 
-	virtual image_init_result call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
-	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
+	virtual std::pair<std::error_condition, std::string> call_create(int format_type, util::option_resolution *format_options) override;
 
 	uint8_t static_mem_read(offs_t offset);
 	void static_mem_write(offs_t offset, uint8_t data);
@@ -60,4 +60,4 @@ private:
 DECLARE_DEVICE_TYPE(FMT_ICMEM, fmt_icmem_device)
 
 
-#endif  // MAME_MACHINE_FMT_ICMEM_H
+#endif  // MAME_FUJITSU_FMT_ICMEM_H

@@ -52,6 +52,7 @@ public:
 	~input_manager();
 
 	// OSD interface
+	virtual bool class_enabled(input_device_class devclass) const override;
 	virtual osd::input_device &add_device(input_device_class devclass, std::string_view name, std::string_view id, void *internal) override;
 
 	// getters

@@ -25,6 +25,8 @@
 #include "fireball.lh"
 
 
+namespace {
+
 /****************************
 *    LOG defines            *
 ****************************/
@@ -528,6 +530,9 @@ ROM_START(fireball)
 	ROM_REGION16_BE( 0x20, "eeprom", 0 ) // default eeprom must have some specific value at 0x03 at least
 	ROM_LOAD( "fireball.nv", 0x0000, 0x020, CRC(1d0f5f0f) SHA1(8e68fcd8782f39ed3b1df6162db9be83cb3335e4) )  //default setting
 ROM_END
+
+} // anonymous namespace
+
 
 /*************************
 *      Game Drivers      *

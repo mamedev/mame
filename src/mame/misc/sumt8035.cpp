@@ -16,6 +16,8 @@ hardware. We don't have the ROMs for that though.
 #include "cpu/mcs48/mcs48.h"
 
 
+namespace {
+
 class sumt8035_state : public driver_device
 {
 public:
@@ -259,6 +261,8 @@ ROM_START( sm_ultng )
 	ROM_LOAD( "ultnudge.p1", 0x0000, 0x000803, CRC(9dbad684) SHA1(b112f5d56afef0b726bdba9bd69cde7a0484b70b) )
 	ROM_LOAD( "ultnudge.p2", 0x0800, 0x000803, CRC(2e9fbd57) SHA1(3a6a695b6d8e9de5635186301dd857e5f1080078) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1981, sm_ngacc,  0,    summit, summit, sumt8035_state, empty_init, ROT270, "Summit Coin", "Nudge Accumulator (Summit Coin)", MACHINE_IS_SKELETON_MECHANICAL )

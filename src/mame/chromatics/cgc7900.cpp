@@ -310,7 +310,7 @@ void cgc7900_state::disk_command_w(u16 data)
 
 u16 cgc7900_state::unmapped_r()
 {
-	return rand();
+	return machine().rand();
 }
 
 /***************************************************************************

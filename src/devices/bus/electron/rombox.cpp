@@ -178,23 +178,21 @@ void electron_rombox_device::expbus_w(offs_t offset, uint8_t data)
 //  IMPLEMENTATION
 //**************************************************************************
 
-image_init_result electron_rombox_device::load_rom(device_image_interface &image, generic_slot_device *slot)
+std::pair<std::error_condition, std::string> electron_rombox_device::load_rom(device_image_interface &image, generic_slot_device *slot)
 {
-	uint32_t size = slot->common_get_size("rom");
+	uint32_t const size = slot->common_get_size("rom");
 
 	// socket accepts 8K and 16K ROM only
 	if (size != 0x2000 && size != 0x4000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Invalid size: Only 8K/16K is supported");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Invalid size: Only 8K/16K is supported");
 
 	slot->rom_alloc(0x4000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	slot->common_load_rom(slot->get_rom_base(), size, "rom");
 
 	// mirror 8K ROMs
-	uint8_t *crt = slot->get_rom_base();
-	if (size <= 0x2000) memcpy(crt + 0x2000, crt, 0x2000);
+	uint8_t *const crt = slot->get_rom_base();
+	if (size <= 0x2000)
+		memcpy(crt + 0x2000, crt, 0x2000);
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }

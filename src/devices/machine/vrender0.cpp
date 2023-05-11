@@ -130,10 +130,8 @@ void vrender0soc_device::device_add_mconfig(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(vrender0soc_device::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	VIDEO_VRENDER0(config, m_vr0vid, 14318180);
-#ifdef IDLE_LOOP_SPEEDUP
-	m_vr0vid->idleskip_cb().set(FUNC(vrender0soc_device::idle_skip_speedup_w));
-#endif
+	// runs at double speed wrt of the CPU clock
+	VIDEO_VRENDER0(config, m_vr0vid, DERIVED_CLOCK(2, 1));
 
 	PALETTE(config, m_palette, palette_device::RGB_565);
 
@@ -192,10 +190,6 @@ void vrender0soc_device::device_start()
 	save_item(NAME(m_dma[1].src));
 	save_item(NAME(m_dma[1].dst));
 	save_item(NAME(m_dma[1].size));
-
-#ifdef IDLE_LOOP_SPEEDUP
-	save_item(NAME(m_FlipCntRead));
-#endif
 }
 
 void vrender0soc_device::write_line_tx(int port, uint8_t value)
@@ -226,10 +220,6 @@ void vrender0soc_device::device_reset()
 		m_timer_control[i] = 0xff << 8;
 		m_Timer[i]->adjust(attotime::never);
 	}
-
-#ifdef IDLE_LOOP_SPEEDUP
-	m_FlipCntRead = 0;
-#endif
 }
 
 
@@ -318,10 +308,6 @@ void vrender0soc_device::IntReq( int num )
 		m_intst |= (1 << num);
 		m_host_cpu->set_input_line(SE3208_INT, ASSERT_LINE);
 	}
-
-#ifdef IDLE_LOOP_SPEEDUP
-	idle_skip_resume_w(ASSERT_LINE);
-#endif
 }
 
 
@@ -728,29 +714,9 @@ WRITE_LINE_MEMBER(vrender0soc_device::screen_vblank)
 	if (state)
 	{
 		if (crt_active_vblank_irq() == true)
+		{
 			IntReq(24);      //VRender0 VBlank
-
-		m_vr0vid->execute_flipping();
+			m_vr0vid->execute_flipping();
+		}
 	}
 }
-
-/*
- *
- * Hacks
- *
- */
-
-#ifdef IDLE_LOOP_SPEEDUP
-WRITE_LINE_MEMBER(vrender0soc_device::idle_skip_resume_w)
-{
-	m_FlipCntRead = 0;
-	m_host_cpu->resume(SUSPEND_REASON_SPIN);
-}
-
-WRITE_LINE_MEMBER(vrender0soc_device::idle_skip_speedup_w)
-{
-	m_FlipCntRead++;
-	if (m_FlipCntRead >= 16 && irq_pending() == false && state == ASSERT_LINE)
-		m_host_cpu->suspend(SUSPEND_REASON_SPIN, 1);
-}
-#endif

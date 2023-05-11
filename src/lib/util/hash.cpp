@@ -38,7 +38,7 @@ class hash_collection::hash_creator
 {
 public:
 	// constructor
-	hash_creator(bool doing_crc32, bool doing_sha1)
+	hash_creator(bool doing_crc32, bool doing_sha1) noexcept
 	{
 		if (doing_crc32)
 			m_crc32_creator.emplace();
@@ -47,7 +47,7 @@ public:
 	}
 
 	// add the given buffer to the hash
-	void append(void const *buffer, std::size_t length)
+	void append(void const *buffer, std::size_t length) noexcept
 	{
 		// append to each active hash
 		if (m_crc32_creator)
@@ -57,7 +57,7 @@ public:
 	}
 
 	// stop hashing
-	void finish(hash_collection &hashes)
+	void finish(hash_collection &hashes) noexcept
 	{
 		// finish up the CRC32
 		if (m_crc32_creator)
@@ -112,15 +112,16 @@ hash_collection &hash_collection::operator=(const hash_collection &src)
 //  operator== - test for equality
 //-------------------------------------------------
 
-bool hash_collection::operator==(const hash_collection &rhs) const
+bool hash_collection::operator==(const hash_collection &rhs) const noexcept
 {
+	bool matches = false;
+
 	// match CRCs
-	int matches = 0;
 	if (m_has_crc32 && rhs.m_has_crc32)
 	{
 		if (m_crc32 != rhs.m_crc32)
 			return false;
-		matches++;
+		matches = true;
 	}
 
 	// match SHA1s
@@ -128,11 +129,11 @@ bool hash_collection::operator==(const hash_collection &rhs) const
 	{
 		if (m_sha1 != rhs.m_sha1)
 			return false;
-		matches++;
+		matches = true;
 	}
 
-	// if all shared hashes match, return true
-	return (matches > 0);
+	// if at least one type is shared and matches, return true
+	return matches;
 }
 
 
@@ -157,7 +158,7 @@ std::string hash_collection::hash_types() const
 //  set of hashes and flags
 //-------------------------------------------------
 
-void hash_collection::reset()
+void hash_collection::reset() noexcept
 {
 	m_flags.clear();
 	m_has_crc32 = m_has_sha1 = false;
@@ -169,7 +170,7 @@ void hash_collection::reset()
 //  from a string
 //-------------------------------------------------
 
-bool hash_collection::add_from_string(char type, std::string_view string)
+bool hash_collection::add_from_string(char type, std::string_view string) noexcept
 {
 	// handle CRCs
 	if (type == HASH_CRC)
@@ -187,7 +188,7 @@ bool hash_collection::add_from_string(char type, std::string_view string)
 //  remove - remove a hash of the given type
 //-------------------------------------------------
 
-bool hash_collection::remove(char type)
+bool hash_collection::remove(char type) noexcept
 {
 	bool result = false;
 

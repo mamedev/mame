@@ -5,8 +5,8 @@
     Atari Basketball hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_BSKTBALL_H
-#define MAME_INCLUDES_BSKTBALL_H
+#ifndef MAME_ATARI_BSKTBALL_H
+#define MAME_ATARI_BSKTBALL_H
 
 #pragma once
 
@@ -94,4 +94,4 @@ private:
 
 DISCRETE_SOUND_EXTERN( bsktball_discrete );
 
-#endif // MAME_INCLUDES_BSKTBALL_H
+#endif // MAME_ATARI_BSKTBALL_H

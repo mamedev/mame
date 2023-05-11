@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #include "bgfx_p.h"
@@ -155,7 +155,7 @@ EGL_IMPORT
 	static EGL_DISPMANX_WINDOW_T s_dispmanWindow;
 #	endif // BX_PLATFORM_RPI
 
-	void GlContext::create(uint32_t _width, uint32_t _height)
+	void GlContext::create(uint32_t _width, uint32_t _height, uint32_t _flags)
 	{
 #	if BX_PLATFORM_RPI
 		bcm_host_init();
@@ -207,6 +207,12 @@ EGL_IMPORT
 
 			const uint32_t gles = BGFX_CONFIG_RENDERER_OPENGLES;
 
+#if BX_PLATFORM_ANDROID
+			uint32_t msaa = (_flags&BGFX_RESET_MSAA_MASK)>>BGFX_RESET_MSAA_SHIFT;
+            uint32_t msaaSamples = msaa == 0 ? 0 : 1<<msaa;
+			m_msaaContext = true;
+#endif // BX_PLATFORM_ANDROID
+
 			EGLint attrs[] =
 			{
 				EGL_RENDERABLE_TYPE, (gles >= 30) ? EGL_OPENGL_ES3_BIT_KHR : EGL_OPENGL_ES2_BIT,
@@ -218,6 +224,7 @@ EGL_IMPORT
 
 #	if BX_PLATFORM_ANDROID
 				EGL_DEPTH_SIZE, 16,
+				EGL_SAMPLES, (EGLint)msaaSamples,
 #	else
 				EGL_DEPTH_SIZE, 24,
 #	endif // BX_PLATFORM_
@@ -284,11 +291,11 @@ EGL_IMPORT
 #	else
 				if (hasEglKhrCreateContext)
 				{
-					bx::write(&writer, EGLint(EGL_CONTEXT_MAJOR_VERSION_KHR) );
-					bx::write(&writer, EGLint(gles / 10) );
+					bx::write(&writer, EGLint(EGL_CONTEXT_MAJOR_VERSION_KHR), bx::ErrorAssert{} );
+					bx::write(&writer, EGLint(gles / 10), bx::ErrorAssert{} );
 
-					bx::write(&writer, EGLint(EGL_CONTEXT_MINOR_VERSION_KHR) );
-					bx::write(&writer, EGLint(gles % 10) );
+					bx::write(&writer, EGLint(EGL_CONTEXT_MINOR_VERSION_KHR), bx::ErrorAssert{} );
+					bx::write(&writer, EGLint(gles % 10), bx::ErrorAssert{} );
 
 					flags |= BGFX_CONFIG_DEBUG && hasEglKhrNoError ? 0
 						| EGL_CONTEXT_FLAG_NO_ERROR_BIT_KHR
@@ -303,18 +310,18 @@ EGL_IMPORT
 							: 0
 							;
 
-						bx::write(&writer, EGLint(EGL_CONTEXT_FLAGS_KHR) );
-						bx::write(&writer, flags);
+						bx::write(&writer, EGLint(EGL_CONTEXT_FLAGS_KHR), bx::ErrorAssert{} );
+						bx::write(&writer, flags, bx::ErrorAssert{});
 					}
 				}
 				else
 #	endif // BX_PLATFORM_RPI
 				{
-					bx::write(&writer, EGLint(EGL_CONTEXT_CLIENT_VERSION) );
-					bx::write(&writer, EGLint(gles / 10));
+					bx::write(&writer, EGLint(EGL_CONTEXT_CLIENT_VERSION), bx::ErrorAssert{} );
+					bx::write(&writer, EGLint(gles / 10), bx::ErrorAssert{} );
 				}
 
-				bx::write(&writer, EGLint(EGL_NONE) );
+				bx::write(&writer, EGLint(EGL_NONE), bx::ErrorAssert{} );
 
 				m_context = eglCreateContext(m_display, m_config, EGL_NO_CONTEXT, s_contextAttrs);
 				if (NULL != m_context)

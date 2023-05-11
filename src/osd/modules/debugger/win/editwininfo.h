@@ -30,6 +30,8 @@ public:
 
 	virtual bool set_default_focus() override;
 
+	virtual void restore_configuration_from_node(util::xml::data_node const &node) override;
+
 protected:
 	constexpr static DWORD  COMBO_BOX_STYLE     = WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST | WS_VSCROLL;
 	constexpr static DWORD  COMBO_BOX_STYLE_EX  = 0;
@@ -40,6 +42,8 @@ protected:
 	void set_edit_defstr(const std::string &string) { m_edit_defstr = string; }
 
 	virtual void draw_contents(HDC dc) override;
+
+	virtual void save_configuration_to_node(util::xml::data_node &node) override;
 
 private:
 	typedef std::deque<std::basic_string<TCHAR> > history_deque;

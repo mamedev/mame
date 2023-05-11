@@ -130,7 +130,7 @@ void arc_upa_hccs_device::device_start()
 
 int arc_upa_hccs_device::get_analogue_input(int channel_number)
 {
-	return (0xff - m_analog->ch_r(channel_number)) << 8;
+	return m_analog->ch_r(channel_number) << 8;
 }
 
 } // anonymous namespace

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <mamelayout version="2">
 
@@ -217,44 +217,44 @@ license:CC0
 	</element>
 
 	<element name="100p" defstate="0">
-		<text string="100p" state="0">
+		<text string="£ 1" state="0">
 			<color red="1.0" green="1.0" blue="1.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
-		<text string="100p" state="1">
+		<text string="£ 1" state="1">
 			<color red="1.0" green="1.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
 
 	<element name="200p" defstate="0">
-		<text string="200p" state="0">
+		<text string="£ 2" state="0">
 			<color red="1.0" green="1.0" blue="1.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
-		<text string="200p" state="1">
+		<text string="£ 2" state="1">
 			<color red="1.0" green="1.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
 
 	<element name="500p" defstate="0">
-		<text string="500p" state="0">
+		<text string="£ 5" state="0">
 			<color red="1.0" green="1.0" blue="1.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
-		<text string="500p" state="1">
+		<text string="£ 5" state="1">
 			<color red="1.0" green="1.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
 
 	<element name="1000p" defstate="0">
-		<text string="1000p" state="0">
+		<text string="£ 10" state="0">
 			<color red="1.0" green="1.0" blue="1.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
-		<text string="1000p" state="1">
+		<text string="£ 10" state="1">
 			<color red="1.0" green="1.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
@@ -800,7 +800,15 @@ license:CC0
 		<repeat count="16">
 			<param name="i" start="15" increment="-1"/>
 			<param name="x" start="0" increment="9"/>
+			<element name="vfdblank~i~" ref="vfd0">
+				<color state="31" red="0.00" green="0.6" blue="1.00" alpha="0.0"/>
+				<color state="0" red="0.00" green="0.6" blue="1.00" alpha="1.0"/>
+				<bounds x="~x~" y="120" width="9" height="14"/>
+			</element>
 			<element name="vfd~i~" ref="vfd0">
+				<animate name="vfdduty0" />
+				<color state="0" red="0.00" green="0.6" blue="1.00" alpha="0.0"/>
+				<color state="31" red="0.00" green="0.6" blue="1.00" alpha="1.0"/>
 				<bounds x="~x~" y="120" width="9" height="14"/>
 			</element>
 		</repeat>

@@ -5,8 +5,8 @@
     Luxor ABC 1600 Mover emulation
 
 **********************************************************************/
-#ifndef MAME_VIDEO_ABC1600_H
-#define MAME_VIDEO_ABC1600_H
+#ifndef MAME_LUXOR_ABC1600_V_H
+#define MAME_LUXOR_ABC1600_V_H
 
 #pragma once
 
@@ -143,4 +143,4 @@ DECLARE_DEVICE_TYPE(ABC1600_MOVER, abc1600_mover_device)
 
 
 
-#endif // MAME_VIDEO_ABC1600_H
+#endif // MAME_LUXOR_ABC1600_V_H

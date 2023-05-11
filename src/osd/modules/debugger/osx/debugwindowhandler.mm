@@ -494,6 +494,7 @@ NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerCo
 - (void)saveConfigurationToNode:(util::xml::data_node *)node {
 	[super saveConfigurationToNode:node];
 	node->add_child(osd::debugger::NODE_WINDOW_EXPRESSION, [[self expression] UTF8String]);
+	[history saveConfigurationToNode:node];
 }
 
 
@@ -502,6 +503,7 @@ NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerCo
 	util::xml::data_node const *const expr = node->get_child(osd::debugger::NODE_WINDOW_EXPRESSION);
 	if (expr && expr->get_value())
 		[self setExpression:[NSString stringWithUTF8String:expr->get_value()]];
+	[history restoreConfigurationFromNode:node];
 }
 
 @end

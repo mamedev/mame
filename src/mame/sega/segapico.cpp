@@ -118,10 +118,13 @@ C = MB3514 / 9325 M36
 */
 
 #include "emu.h"
-#include "mdconsole.h"
-#include "sound/315-5641.h"
+#include "megadriv.h"
+
 #include "bus/megadrive/rom.h"
-#include "softlist.h"
+#include "sound/315-5641.h"
+
+#include "softlist_dev.h"
+#include "speaker.h"
 
 
 namespace {
@@ -129,11 +132,11 @@ namespace {
 #define PICO_PENX   1
 #define PICO_PENY   2
 
-class pico_base_state : public md_cons_state
+class pico_base_state : public md_core_state
 {
 public:
 	pico_base_state(const machine_config &mconfig, device_type type, const char *tag) :
-		md_cons_state(mconfig, type, tag),
+		md_core_state(mconfig, type, tag),
 		m_sega_315_5641_pcm(*this, "315_5641"),
 		m_io_page(*this, "PAGE"),
 		m_io_pad(*this, "PAD"),
@@ -153,6 +156,8 @@ protected:
 	required_ioport m_io_penx;
 	required_ioport m_io_peny;
 
+	int m_version_hi_nibble;
+
 	uint8_t m_page_register;
 
 	uint16_t pico_read_penpos(int pen);
@@ -171,12 +176,14 @@ public:
 		m_picocart(*this, "picoslot")
 	{ }
 
-	void pico(machine_config &config);
-	void picopal(machine_config &config);
+	void pico_ntsc(machine_config &config);
+	void pico_pal(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	required_device<pico_cart_slot_device> m_picocart;
-	DECLARE_MACHINE_START(pico);
 };
 
 
@@ -376,8 +383,10 @@ static void pico_cart(device_slot_interface &device)
 	device.option_add_internal("rom_sramsafe",  MD_ROM_SRAM);   // not sure these are needed...
 }
 
-MACHINE_START_MEMBER(pico_state,pico)
+void pico_state::machine_start()
 {
+	pico_base_state::machine_start();
+
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000000, 0x7fffff, read16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read)));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x000000, 0x7fffff, write16s_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write)));
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read_a13)), write16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_a13)));
@@ -387,19 +396,20 @@ MACHINE_START_MEMBER(pico_state,pico)
 	m_vdp->stop_timers();
 }
 
-void pico_state::pico(machine_config &config)
+void pico_state::pico_ntsc(machine_config &config)
 {
-	md_ntsc(config);
+	md_core_ntsc(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &pico_state::pico_mem);
 
-	config.device_remove("genesis_snd_z80");
-	config.device_remove("ymsnd");
-
-	MCFG_MACHINE_START_OVERRIDE( pico_state, pico )
+	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
 	PICO_CART_SLOT(config, m_picocart, pico_cart, nullptr).set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("pico");
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	SEGA_315_5641_PCM(config, m_sega_315_5641_pcm, upd7759_device::STANDARD_CLOCK*2);
 	m_sega_315_5641_pcm->fifo_cb().set(FUNC(pico_state::sound_cause_irq));
@@ -407,19 +417,20 @@ void pico_state::pico(machine_config &config)
 	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "rspeaker", 0.16);
 }
 
-void pico_state::picopal(machine_config &config)
+void pico_state::pico_pal(machine_config &config)
 {
-	md_pal(config);
+	md_core_pal(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &pico_state::pico_mem);
 
-	config.device_remove("genesis_snd_z80");
-	config.device_remove("ymsnd");
-
-	MCFG_MACHINE_START_OVERRIDE( pico_state, pico )
+	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
 	PICO_CART_SLOT(config, m_picocart, pico_cart, nullptr).set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("pico");
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	SEGA_315_5641_PCM(config, m_sega_315_5641_pcm, upd7759_device::STANDARD_CLOCK*2);
 	m_sega_315_5641_pcm->fifo_cb().set(FUNC(pico_state::sound_cause_irq));
@@ -447,24 +458,39 @@ ROM_END
 
 void pico_base_state::init_pico()
 {
-	init_megadrie();
-	init_mess_md_common();
+	m_maincpu->set_tas_write_callback(*this, FUNC(pico_base_state::megadriv_tas_callback));
+
+	// TODO: move this to the device interface?
+	m_vdp->set_use_cram(1);
+	m_vdp->set_vdp_pal(true);
+	m_vdp->set_framerate(50);
+	m_vdp->set_total_scanlines(313);
 
 	m_version_hi_nibble = 0x60; // Export PAL
 }
 
 void pico_base_state::init_picou()
 {
-	init_megadriv();
-	init_mess_md_common();
+	m_maincpu->set_tas_write_callback(*this, FUNC(pico_base_state::megadriv_tas_callback));
+
+	// TODO: move this to the device interface?
+	m_vdp->set_use_cram(1);
+	m_vdp->set_vdp_pal(false);
+	m_vdp->set_framerate(60);
+	m_vdp->set_total_scanlines(262);
 
 	m_version_hi_nibble = 0x40; // Export NTSC
 }
 
 void pico_base_state::init_picoj()
 {
-	init_megadrij();
-	init_mess_md_common();
+	m_maincpu->set_tas_write_callback(*this, FUNC(pico_base_state::megadriv_tas_callback));
+
+	// TODO: move this to the device interface?
+	m_vdp->set_use_cram(1);
+	m_vdp->set_vdp_pal(false);
+	m_vdp->set_framerate(60);
+	m_vdp->set_total_scanlines(262);
 
 	m_version_hi_nibble = 0x00; // JPN NTSC
 }
@@ -557,11 +583,14 @@ public:
 	{ }
 
 	void copera(machine_config &config);
-	void copera_mem(address_map &map);
+
+protected:
+	virtual void machine_start() override;
 
 private:
+	void copera_mem(address_map &map);
+
 	required_device<copera_cart_slot_device> m_picocart;
-	DECLARE_MACHINE_START(copera);
 };
 
 
@@ -586,8 +615,10 @@ static void copera_cart(device_slot_interface &device)
 	device.option_add_internal("rom_sramsafe",  MD_ROM_SRAM);   // not sure these are needed...
 }
 
-MACHINE_START_MEMBER(copera_state,copera)
+void copera_state::machine_start()
 {
+	pico_base_state::machine_start();
+
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000000, 0x7fffff, read16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read)));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x000000, 0x7fffff, write16s_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write)));
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read_a13)), write16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_a13)));
@@ -599,21 +630,23 @@ MACHINE_START_MEMBER(copera_state,copera)
 	m_sega_315_5641_pcm->reset_w(1);
 	m_sega_315_5641_pcm->start_w(1);
 
+	m_vdp->stop_timers();
 }
 
 void copera_state::copera(machine_config &config)
 {
-	md_ntsc(config);
+	md_core_ntsc(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &copera_state::copera_mem);
 
-	config.device_remove("genesis_snd_z80");
-	config.device_remove("ymsnd");
-
-	MCFG_MACHINE_START_OVERRIDE( copera_state, copera )
+	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
 	COPERA_CART_SLOT(config, m_picocart, copera_cart, nullptr).set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("copera");
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	SEGA_315_5641_PCM(config, m_sega_315_5641_pcm, upd7759_device::STANDARD_CLOCK);
 	m_sega_315_5641_pcm->fifo_cb().set(FUNC(copera_state::sound_cause_irq));
@@ -631,8 +664,8 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 1994, pico,  0,    0, picopal, pico, pico_state, init_pico,  "Sega", "Pico (Europe, PAL)", MACHINE_NOT_WORKING)
-CONS( 1994, picou, pico, 0, pico,    pico, pico_state, init_picou, "Sega", "Pico (USA, NTSC)", MACHINE_NOT_WORKING)
-CONS( 1993, picoj, pico, 0, pico,    pico, pico_state, init_picoj, "Sega", "Pico (Japan, NTSC)", MACHINE_NOT_WORKING)
+CONS( 1994, pico,  0,    0, pico_pal,  pico, pico_state,   init_pico,  "Sega", "Pico (Europe, PAL)", MACHINE_NOT_WORKING)
+CONS( 1994, picou, pico, 0, pico_ntsc, pico, pico_state,   init_picou, "Sega", "Pico (USA, NTSC)",   MACHINE_NOT_WORKING)
+CONS( 1993, picoj, pico, 0, pico_ntsc, pico, pico_state,   init_picoj, "Sega", "Pico (Japan, NTSC)", MACHINE_NOT_WORKING)
 
-CONS( 1993, copera, 0, 0, copera, pico, copera_state, init_picoj, "Yamaha / Sega", "Yamaha Mixt Book Player Copera", MACHINE_NOT_WORKING)
+CONS( 1993, copera, 0,   0, copera,    pico, copera_state, init_picoj, "Yamaha / Sega", "Yamaha Mixt Book Player Copera", MACHINE_NOT_WORKING)

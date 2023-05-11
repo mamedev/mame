@@ -19,6 +19,12 @@
 
 #include "emu.h"
 
+#include "egret.h"
+#include "macadb.h"
+#include "macscsi.h"
+#include "mactoolbox.h"
+#include "vasp.h"
+
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/nubus.h"
 #include "bus/nubus/cards.h"
@@ -31,11 +37,6 @@
 #include "machine/swim1.h"
 #include "machine/timer.h"
 #include "machine/z80scc.h"
-#include "egret.h"
-#include "macadb.h"
-#include "macscsi.h"
-#include "mactoolbox.h"
-#include "vasp.h"
 
 #include "emupal.h"
 #include "screen.h"

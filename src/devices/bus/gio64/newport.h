@@ -484,6 +484,7 @@ protected:
 		uint8_t loop;
 	};
 	uint8_t get_octant(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t dx, int32_t dy);
+	void do_setup();
 	void do_fline(uint32_t color);
 	void do_iline(uint32_t color);
 

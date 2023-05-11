@@ -150,12 +150,12 @@ uint8_t twin16_state::upd_busy_r()
 
 void twin16_state::upd_reset_w(uint8_t data)
 {
-	m_upd7759->reset_w(data & 2);
+	m_upd7759->reset_w(BIT(data, 1));
 }
 
 void twin16_state::upd_start_w(uint8_t data)
 {
-	m_upd7759->start_w(data & 1);
+	m_upd7759->start_w(!BIT(data, 0));
 }
 
 /* Memory Maps */
@@ -634,6 +634,9 @@ void twin16_state::machine_reset()
 {
 	m_CPUA_register = 0;
 	m_CPUB_register = 0;
+
+	m_upd7759->reset_w(0);
+	m_upd7759->start_w(1);
 }
 
 void twin16_state::machine_start()
@@ -1256,10 +1259,11 @@ void cuebrickj_state::init_cuebrickj()
 
 /* Game Drivers */
 
-//    YEAR, NAME,      PARENT,   MACHINE,   INPUT,     STATE,           INIT,      MONITOR,COMPANY,  FULLNAME,FLAGS
+//    YEAR, NAME,      PARENT,   MACHINE,   INPUT,     STATE,           INIT,           MONITOR,COMPANY,  FULLNAME,FLAGS
 GAME( 1987, devilw,    0,        devilw,    devilw,    twin16_state,    init_twin16,    ROT0,   "Konami", "Devil World", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, majuu,     devilw,   devilw,    devilw,    twin16_state,    init_twin16,    ROT0,   "Konami", "Majuu no Ohkoku", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, darkadv,   devilw,   devilw,    darkadv,   twin16_state,    init_twin16,    ROT0,   "Konami", "Dark Adventure", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1988, vulcan,    0,        twin16,    vulcan,    twin16_state,    init_twin16,    ROT0,   "Konami", "Vulcan Venture (New)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, vulcana,   vulcan,   twin16,    vulcan,    twin16_state,    init_twin16,    ROT0,   "Konami", "Vulcan Venture (Old)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, vulcanb,   vulcan,   twin16,    vulcan,    twin16_state,    init_twin16,    ROT0,   "Konami", "Vulcan Venture (Oldest)", MACHINE_SUPPORTS_SAVE )
@@ -1270,5 +1274,7 @@ GAME( 1988, gradius2b, vulcan,   twin16,    vulcan,    twin16_state,    init_twi
 GAME( 1988, fround,    0,        fround,    fround,    fround_state,    init_fround,    ROT0,   "Konami", "The Final Round (version M)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, froundl,   fround,   fround,    fround,    fround_state,    init_fround,    ROT0,   "Konami", "The Final Round (version L)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, hpuncher,  fround,   twin16,    fround,    twin16_state,    init_twin16,    ROT0,   "Konami", "Hard Puncher (Japan)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1989, miaj,      mia,      miaj,      miaj,      twin16_state,    init_twin16,    ROT0,   "Konami", "M.I.A. - Missing in Action (version R) (Japan)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1989, cuebrickj, cuebrick, cuebrickj, cuebrickj, cuebrickj_state, init_cuebrickj, ROT0,   "Konami", "Cue Brick (Japan)", MACHINE_SUPPORTS_SAVE )

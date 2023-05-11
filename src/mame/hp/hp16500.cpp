@@ -58,6 +58,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class hp16500_state : public driver_device
 {
 public:
@@ -75,7 +78,7 @@ public:
 private:
 	virtual void video_start() override;
 	uint32_t screen_update_hp16500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_hp16500a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	[[maybe_unused]] uint32_t screen_update_hp16500a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<hp_hil_mlc_device> m_mlc;
@@ -538,6 +541,9 @@ ROM_START( hp16500b )
 	ROM_LOAD32_BYTE( "16500-80016.bin", 0x000002, 0x008000, CRC(61457b39) SHA1(f209315ec22a8ee9d44a0ec009b1afb47794bece) )
 	ROM_LOAD32_BYTE( "16500-80017.bin", 0x000003, 0x008000, CRC(e0b1096b) SHA1(426bb9a4756d8087bded4f6b61365d733ffbb09a) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1989, hp1650b,  0, 0, hp1650,   hp16500, hp16500_state, empty_init, "Hewlett Packard", "HP 1650b",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 COMP( 1989, hp1651b,  0, 0, hp1651,   hp16500, hp16500_state, empty_init, "Hewlett Packard", "HP 1651b",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

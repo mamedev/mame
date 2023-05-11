@@ -33,6 +33,7 @@ public:
 	z80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void z80_set_cycle_tables(const uint8_t *op, const uint8_t *cb, const uint8_t *ed, const uint8_t *xy, const uint8_t *xycb, const uint8_t *ex);
+	void set_mtm_cycles(uint8_t mtm_cycles);
 	template <typename... T> void set_memory_map(T &&... args) { set_addrmap(AS_PROGRAM, std::forward<T>(args)...); }
 	template <typename... T> void set_m1_map(T &&... args) { set_addrmap(AS_OPCODES, std::forward<T>(args)...); }
 	template <typename... T> void set_io_map(T &&... args) { set_addrmap(AS_IO, std::forward<T>(args)...); }
@@ -291,6 +292,7 @@ protected:
 	const uint8_t *   m_cc_xy;
 	const uint8_t *   m_cc_xycb;
 	const uint8_t *   m_cc_ex;
+	uint8_t           m_mtm_cycles;
 };
 
 DECLARE_DEVICE_TYPE(Z80, z80_device)

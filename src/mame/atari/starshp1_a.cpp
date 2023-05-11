@@ -6,9 +6,11 @@
  ************************************************************************/
 
 #include "emu.h"
-#include "starshp1.h"
-#include "sound/discrete.h"
 
+#include "starshp1_a.h"
+
+#define STARSHP1_PIXEL_CLOCK       (12096000)
+#define STARSHP1_HTOTAL            (0x300)
 
 /* voltage out for each 1/256 step of MC1408 circuit */
 #define MC1408_DAC(v_ref, r, rf)        ((double)v_ref / (double)r * (double)rf / 256.0)
@@ -16,7 +18,7 @@
 #define OP_AMP_NON_INVERT_GAIN(ri, rf)  ((double)rf / (double)ri + 1)
 
 /* Discrete Sound Input Nodes */
-/* see "starshp1.h" */
+/* see "starshp1_a.h" */
 
 /* Nodes - Sounds */
 #define STARSHP1_PHASOR_SND     NODE_13

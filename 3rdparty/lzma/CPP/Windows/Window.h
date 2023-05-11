@@ -171,7 +171,7 @@ public:
   bool Update() { return BOOLToBool(::UpdateWindow(_window)); }
   bool InvalidateRect(LPCRECT rect, bool backgroundErase = true)
     { return BOOLToBool(::InvalidateRect(_window, rect, BoolToBOOL(backgroundErase))); }
-  void SetRedraw(bool redraw = true) { SendMsg(WM_SETREDRAW, BoolToBOOL(redraw), 0); }
+  void SetRedraw(bool redraw = true) { SendMsg(WM_SETREDRAW, (WPARAM)BoolToBOOL(redraw), 0); }
 
   LONG_PTR SetStyle(LONG_PTR style) { return SetLongPtr(GWL_STYLE, style); }
   LONG_PTR GetStyle() const { return GetLongPtr(GWL_STYLE); }
@@ -244,7 +244,7 @@ public:
 
   int GetTextLength() const
     { return GetWindowTextLength(_window); }
-  UINT GetText(LPTSTR string, int maxCount) const
+  int GetText(LPTSTR string, int maxCount) const
     { return GetWindowText(_window, string, maxCount); }
   bool GetText(CSysString &s);
   #ifndef _UNICODE

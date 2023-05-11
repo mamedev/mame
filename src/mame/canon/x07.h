@@ -5,8 +5,8 @@
     includes/x07.h
 
 *********************************************************************/
-#ifndef MAME_INCLUDES_X07_H
-#define MAME_INCLUDES_X07_H
+#ifndef MAME_CANON_X07_H
+#define MAME_CANON_X07_H
 
 #pragma once
 
@@ -294,4 +294,4 @@ private:
 	void x07_mem(address_map &map);
 };
 
-#endif // MAME_INCLUDES_X07_H
+#endif // MAME_CANON_X07_H

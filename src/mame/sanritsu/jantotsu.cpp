@@ -511,8 +511,8 @@ void jantotsu_state::jantotsu(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	SN76489A(config, "sn1", 18.432_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 0.50);
-	SN76489A(config, "sn2", 18.432_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76489A(config, "sn1", 18.432_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76489A(config, "sn2", 18.432_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	MSM5205(config, m_adpcm, 384_kHz_XTAL);
 	m_adpcm->vck_legacy_callback().set(FUNC(jantotsu_state::adpcm_int));  // interrupt function

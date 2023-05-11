@@ -2264,27 +2264,27 @@ void hyperstone_device::hyperstone_extend()
 
 		// signed half-word multiply/add, single word product sum
 		case EHMAC:
-			m_core->global_regs[15] = (int32_t)m_core->global_regs[15] + mul_16x16(vald >> 16, vals >> 16) + mul_16x16(vald & 0xffff, vals & 0xffff);
+			m_core->global_regs[15] = m_core->global_regs[15] + get_lhs(vald) * get_lhs(vals) + get_rhs(vald) * get_rhs(vals);
 			break;
 
 		// signed half-word multiply/add, double word product sum
 		case EHMACD:
 		{
-			int64_t result = get_double_word<GLOBAL>(14, 15) + (int64_t)mul_16x16(vald >> 16, vals >> 16) + (int64_t)mul_16x16(vald & 0xffff, vals & 0xffff);
+			int64_t result = get_double_word<GLOBAL>(14, 15) + int64_t(get_lhs(vald) * get_lhs(vals)) + int64_t(get_rhs(vald) * get_rhs(vals));
 			set_double_word<GLOBAL>(14, 15, result);
 			break;
 		}
 
 		// half-word complex multiply
 		case EHCMULD:
-			m_core->global_regs[14] = mul_16x16(vald >> 16, vals >> 16    ) - mul_16x16(vald & 0xffff, vals & 0xffff);
-			m_core->global_regs[15] = mul_16x16(vald >> 16, vals &  0xffff) + mul_16x16(vald & 0xffff, vals >> 16   );
+			m_core->global_regs[14] = get_lhs(vald) * get_lhs(vals) - get_rhs(vald) * get_rhs(vals);
+			m_core->global_regs[15] = get_lhs(vald) * get_rhs(vals) + get_rhs(vald) * get_lhs(vals);
 			break;
 
 		// half-word complex multiply/add
 		case EHCMACD:
-			m_core->global_regs[14] += mul_16x16(vald >> 16, vals >> 16    ) - mul_16x16(vald & 0xffff, vals &  0xffff);
-			m_core->global_regs[15] += mul_16x16(vald >> 16, vals &  0xffff) + mul_16x16(vald & 0xffff, vals >> 16    );
+			m_core->global_regs[14] += get_lhs(vald) * get_lhs(vals) - get_rhs(vald) * get_rhs(vals);
+			m_core->global_regs[15] += get_lhs(vald) * get_rhs(vals) + get_rhs(vald) * get_lhs(vals);
 			break;
 
 		// half-word (complex) add/subtract

@@ -730,7 +730,9 @@ void xmen6p_state::xmen6p(machine_config &config)
 	// video hardware
 	config.set_default_layout(layout_dualhsxs);
 
-	SCREEN(config.replace(), m_screen, SCREEN_TYPE_RASTER);
+	config.device_remove("screen");
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);

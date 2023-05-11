@@ -954,7 +954,7 @@ uint16_t sega_32x_device::get_hposition(void)
 		attotime time_elapsed_since_megadriv_scanline_timer;
 		uint16_t value4;
 
-		time_elapsed_since_megadriv_scanline_timer = m_scan_timer->time_elapsed();
+		time_elapsed_since_megadriv_scanline_timer = m_scan_timer->elapsed();
 
 		if (time_elapsed_since_megadriv_scanline_timer.attoseconds() < (ATTOSECONDS_PER_SECOND/get_framerate() /double(m_total_scanlines)))
 		{

@@ -817,7 +817,6 @@ end
 ---------------------------------------------------
 -- Sega custom sound chips
 --@src/devices/sound/segapcm.h,SOUNDS["SEGAPCM"] = true
---@src/devices/sound/multipcm.h,SOUNDS["MULTIPCM"] = true
 --@src/devices/sound/scsp.h,SOUNDS["SCSP"] = true
 --@src/devices/sound/aica.h,SOUNDS["AICA"] = true
 ---------------------------------------------------
@@ -826,13 +825,6 @@ if (SOUNDS["SEGAPCM"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/segapcm.cpp",
 		MAME_DIR .. "src/devices/sound/segapcm.h",
-	}
-end
-
-if (SOUNDS["MULTIPCM"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/sound/multipcm.cpp",
-		MAME_DIR .. "src/devices/sound/multipcm.h",
 	}
 end
 
@@ -1264,6 +1256,33 @@ if (SOUNDS["YMZ770"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/ymz770.cpp",
 		MAME_DIR .. "src/devices/sound/ymz770.h",
+	}
+end
+
+---------------------------------------------------
+-- Yamaha GEW series PCM
+--@src/devices/sound/gew7.h,SOUNDS["GEW7"] = true
+--@src/devices/sound/multipcm.h,SOUNDS["MULTIPCM"] = true
+---------------------------------------------------
+
+if (SOUNDS["GEW7"]~=null or SOUNDS["MULTIPCM"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/gew.cpp",
+		MAME_DIR .. "src/devices/sound/gew.h",
+	}
+end
+
+if (SOUNDS["GEW7"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/gew7.cpp",
+		MAME_DIR .. "src/devices/sound/gew7.h",
+	}
+end
+
+if (SOUNDS["MULTIPCM"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/multipcm.cpp",
+		MAME_DIR .. "src/devices/sound/multipcm.h",
 	}
 end
 

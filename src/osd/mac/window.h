@@ -8,8 +8,10 @@
 //
 //============================================================
 
-#ifndef __MACWINDOW__
-#define __MACWINDOW__
+#ifndef MAME_OSD_MAC_WINDOW_H
+#define MAME_OSD_MAC_WINDOW_H
+
+#pragma once
 
 #include "osdmac.h"
 #include "osdsync.h"
@@ -90,25 +92,4 @@ private:
 	void measure_fps(int update);
 };
 
-struct osd_draw_callbacks
-{
-	osd_renderer *(*create)(osd_window *window);
-};
-
-//============================================================
-//  PROTOTYPES
-//============================================================
-
-//============================================================
-// PROTOTYPES - drawogl.c
-//============================================================
-
-int drawogl_init(running_machine &machine, osd_draw_callbacks *callbacks);
-
-//============================================================
-// PROTOTYPES - drawbgfx.c
-//============================================================
-
-int drawbgfx_init(running_machine &machine, osd_draw_callbacks *callbacks);
-
-#endif /* __MACWINDOW__ */
+#endif // MAME_OSD_MAC_WINDOW_H

@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
+
 /***************************************************************************
 
     Atari "Round" hardware
@@ -20,15 +21,188 @@
 
 
 #include "emu.h"
-#include "offtwall.h"
+
+#include "atarijsa.h"
+#include "atarimo.h"
+#include "atarivad.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
+
 #include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
+// configurable logging
+#define LOG_SOUNDCTRL     (1U <<  1)
+#define LOG_BANKSW        (1U <<  2)
+
+//#define VERBOSE (LOG_GENERAL | LOG_SOUNDCTRL | LOG_BANKSW)
+
+#include "logmacro.h"
+
+#define LOGSOUNDCTRL(...)     LOGMASKED(LOG_SOUNDCTRL,     __VA_ARGS__)
+#define LOGBANKSW(...)        LOGMASKED(LOG_BANKSW,        __VA_ARGS__)
+
+
+namespace {
+
+class offtwall_state : public driver_device
+{
+public:
+	offtwall_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_jsa(*this, "jsa"),
+		m_vad(*this, "vad"),
+		m_mainram(*this, "mainram"),
+		m_bankrom_base(*this, "maincpu")
+	{ }
+
+	void offtwall(machine_config &config);
+
+	void init_offtwall();
+	void init_offtwalc();
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<atari_jsa_iii_device> m_jsa;
+	required_device<atari_vad_device> m_vad;
+	required_shared_ptr<uint16_t> m_mainram;
+
+	uint16_t *m_bankswitch_base = nullptr;
+	required_region_ptr<uint16_t> m_bankrom_base;
+	uint32_t m_bank_offset = 0;
+
+	uint16_t *m_spritecache_count = nullptr;
+	uint16_t *m_unknown_verify_base = nullptr;
+
+	static const atari_motion_objects_config s_mob_config;
+
+	void io_latch_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t bankswitch_r(offs_t offset);
+	uint16_t bankrom_r(address_space &space, offs_t offset);
+	uint16_t spritecache_count_r(offs_t offset);
+	uint16_t unknown_verify_r(offs_t offset);
+	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void main_map(address_map &map);
+};
+
+
+// video
+
+
+/*************************************
+ *
+ *  Tilemap callbacks
+ *
+ *************************************/
+
+TILE_GET_INFO_MEMBER(offtwall_state::get_playfield_tile_info)
+{
+	uint16_t const data1 = m_vad->playfield().basemem_read(tile_index);
+	uint16_t const data2 = m_vad->playfield().extmem_read(tile_index) >> 8;
+	int const code = data1 & 0x7fff;
+	int const color = 0x10 + (data2 & 0x0f);
+	tileinfo.set(0, code, color, (data1 >> 15) & 1);
+}
+
+
+
+/*************************************
+ *
+ *  Video system start
+ *
+ *************************************/
+
+const atari_motion_objects_config offtwall_state::s_mob_config =
+{
+	0,                  // index to which gfx system
+	1,                  // number of motion object banks
+	1,                  // are the entries linked?
+	0,                  // are the entries split?
+	0,                  // render in reverse order?
+	0,                  // render in swapped X/Y order?
+	0,                  // does the neighbor bit affect the next object?
+	8,                  // pixels per SLIP entry (0 for no-slip)
+	0,                  // pixel offset for SLIPs
+	0,                  // maximum number of links to visit/scanline (0=all)
+
+	0x100,              // base palette entry
+	0x100,              // maximum number of colors
+	0,                  // transparent pen index
+
+	{{ 0x00ff,0,0,0 }}, // mask for the link
+	{{ 0,0x7fff,0,0 }}, // mask for the code index
+	{{ 0,0,0x000f,0 }}, // mask for the color
+	{{ 0,0,0xff80,0 }}, // mask for the X position
+	{{ 0,0,0,0xff80 }}, // mask for the Y position
+	{{ 0,0,0,0x0070 }}, // mask for the width, in tiles
+	{{ 0,0,0,0x0007 }}, // mask for the height, in tiles
+	{{ 0,0x8000,0,0 }}, // mask for the horizontal flip
+	{{ 0 }},            // mask for the vertical flip
+	{{ 0 }},            // mask for the priority
+	{{ 0 }},            // mask for the neighbor
+	{{ 0 }},            // mask for absolute coordinates
+
+	{{ 0 }},            // mask for the special value
+	0                   // resulting value to indicate "special"
+};
+
+
+
+/*************************************
+ *
+ *  Main refresh
+ *
+ *************************************/
+
+uint32_t offtwall_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// start drawing
+	m_vad->mob().draw_async(cliprect);
+
+	// draw the playfield
+	m_vad->playfield().draw(screen, bitmap, cliprect, 0, 0);
+
+	// draw and merge the MO
+	bitmap_ind16 &mobitmap = m_vad->mob().bitmap();
+	for (const sparse_dirty_rect *rect = m_vad->mob().first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
+		for (int y = rect->top(); y <= rect->bottom(); y++)
+		{
+			uint16_t const *const mo = &mobitmap.pix(y);
+			uint16_t *const pf = &bitmap.pix(y);
+			for (int x = rect->left(); x <= rect->right(); x++)
+				if (mo[x] != 0xffff)
+				{
+					// not yet verified
+					pf[x] = mo[x];
+				}
+		}
+	return 0;
+}
+
+
+// machine
+
+
+/*************************************
+ *
+ *  Initialization
+ *
+ *************************************/
+
+void offtwall_state::machine_start()
+{
+	save_item(NAME(m_bank_offset));
+}
 
 /*************************************
  *
@@ -38,16 +212,16 @@
 
 void offtwall_state::io_latch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	/* lower byte */
+	// lower byte
 	if (ACCESSING_BITS_0_7)
 	{
-		/* bit 4 resets the sound CPU */
+		// bit 4 resets the sound CPU
 		m_jsa->soundcpu().set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 		if (!(data & 0x10))
 			m_jsa->reset();
 	}
 
-	logerror("sound control = %04X\n", data);
+	LOGSOUNDCTRL("sound control = %04X\n", data);
 }
 
 
@@ -90,9 +264,9 @@ void offtwall_state::io_latch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t offtwall_state::bankswitch_r(offs_t offset)
 {
-	/* this is the table lookup; the bank is determined by the address that was requested */
+	// this is the table lookup; the bank is determined by the address that was requested
 	m_bank_offset = (offset & 3) * 0x1000;
-	logerror("Bankswitch index %d -> %04X\n", offset, m_bank_offset);
+	LOGBANKSW("Bankswitch index %d -> %04X\n", offset, m_bank_offset);
 
 	return m_bankswitch_base[offset];
 }
@@ -100,15 +274,15 @@ uint16_t offtwall_state::bankswitch_r(offs_t offset)
 
 uint16_t offtwall_state::bankrom_r(address_space &space, offs_t offset)
 {
-	/* this is the banked ROM read */
-	logerror("%06X: %04X\n", m_maincpu->pcbase(), offset);
+	// this is the banked ROM read
+	logerror("Banked ROM read: %06X: %04X\n", m_maincpu->pcbase(), offset);
 
 	/* if the values are $3e000 or $3e002 are being read by code just below the
 	    ROM bank area, we need to return the correct value to give the proper checksum */
 	if ((offset == 0x3000 || offset == 0x3001) && m_maincpu->pcbase() > 0x37000)
 	{
-		uint32_t checksum = (space.read_word(0x3fd210) << 16) | space.read_word(0x3fd212);
-		uint32_t us = 0xaaaa5555 - checksum;
+		uint32_t const checksum = (space.read_word(0x3fd210) << 16) | space.read_word(0x3fd212);
+		uint32_t const us = 0xaaaa5555 - checksum;
 		if (offset == 0x3001)
 			return us & 0xffff;
 		else
@@ -140,21 +314,21 @@ uint16_t offtwall_state::bankrom_r(address_space &space, offs_t offset)
 
 uint16_t offtwall_state::spritecache_count_r(offs_t offset)
 {
-	int prevpc = m_maincpu->pcbase();
+	int const prevpc = m_maincpu->pcbase();
 
-	/* if this read is coming from $99f8 or $9992, it's in the sprite copy loop */
+	// if this read is coming from $99f8 or $9992, it's in the sprite copy loop
 	if (prevpc == 0x99f8 || prevpc == 0x9992)
 	{
 		uint16_t *data = &m_spritecache_count[-0x100];
-		int oldword = m_spritecache_count[0];
+		int const oldword = m_spritecache_count[0];
 		int count = oldword >> 8;
-		int i, width = 0;
+		int width = 0;
 
-		/* compute the current total width */
-		for (i = 0; i < count; i++)
+		// compute the current total width
+		for (int i = 0; i < count; i++)
 			width += 1 + ((data[i * 4 + 1] >> 4) & 7);
 
-		/* if we're less than 39, keep adding dummy sprites until we hit it */
+		// if we're less than 39, keep adding dummy sprites until we hit it
 		if (width <= 38)
 		{
 			while (width <= 38)
@@ -166,12 +340,12 @@ uint16_t offtwall_state::spritecache_count_r(offs_t offset)
 				count++;
 			}
 
-			/* update the final count in memory */
+			// update the final count in memory
 			m_spritecache_count[0] = (count << 8) | (oldword & 0xff);
 		}
 	}
 
-	/* and then read the data */
+	// and then read the data
 	return m_spritecache_count[offset];
 }
 
@@ -194,7 +368,7 @@ uint16_t offtwall_state::spritecache_count_r(offs_t offset)
 
 uint16_t offtwall_state::unknown_verify_r(offs_t offset)
 {
-	int prevpc = m_maincpu->pcbase();
+	int const prevpc = m_maincpu->pcbase();
 	if (prevpc < 0x5c5e || prevpc > 0xc432)
 		return m_unknown_verify_base[offset];
 	else
@@ -278,12 +452,12 @@ static INPUT_PORTS_START( offtwall )
 	PORT_START("260010")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Controls ) )
-	PORT_DIPSETTING(      0x0000, "Whirly-gigs" )   /* this is official Atari terminology! */
+	PORT_DIPSETTING(      0x0000, "Whirly-gigs" )   // this is official Atari terminology!
 	PORT_DIPSETTING(      0x0002, "Joysticks" )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )   /* tested at a454 */
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )   /* tested at a466 */
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )   // tested at a454
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )   // tested at a466
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa")  /* tested before writing to 260040 */
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa")  // tested before writing to 260040
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -325,7 +499,7 @@ static const gfx_layout pfmolayout =
 
 
 static GFXDECODE_START( gfx_offtwall )
-	GFXDECODE_ENTRY( "gfx1", 0, pfmolayout,  256, 32 )      /* sprites & playfield */
+	GFXDECODE_ENTRY( "sprites", 0, pfmolayout,  256, 32 )      // sprites & playfield
 GFXDECODE_END
 
 
@@ -338,15 +512,15 @@ GFXDECODE_END
 
 void offtwall_state::offtwall(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 14.318181_MHz_XTAL/2);
+	// basic machine hardware
+	M68000(config, m_maincpu, 14.318181_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &offtwall_state::main_map);
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	/* video hardware */
+	// video hardware
 	GFXDECODE(config, "gfxdecode", "palette", gfx_offtwall);
 	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 2048);
 
@@ -357,13 +531,13 @@ void offtwall_state::offtwall(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	/* note: these parameters are from published specs, not derived */
-	/* the board uses a VAD chip to generate video signals */
-	screen.set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
-	screen.set_screen_update(FUNC(offtwall_state::screen_update_offtwall));
+	/* note: these parameters are from published specs, not derived
+	   the board uses a VAD chip to generate video signals */
+	screen.set_raw(14.318181_MHz_XTAL / 2, 456, 0, 336, 262, 0, 240);
+	screen.set_screen_update(FUNC(offtwall_state::screen_update));
 	screen.set_palette("palette");
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	ATARI_JSA_III(config, m_jsa, 0);
@@ -382,14 +556,14 @@ void offtwall_state::offtwall(machine_config &config)
  *************************************/
 
 ROM_START( offtwall )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 4*64k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "136090-2012.17e", 0x00000, 0x20000, CRC(d08d81eb) SHA1(5a72aa2e4fc6455b94aa59a7719d0ddc8bcc80f2) )
 	ROM_LOAD16_BYTE( "136090-2013.17j", 0x00001, 0x20000, CRC(61c2553d) SHA1(343d39f9b75fd236e9769ec21ab65310f85e31ca) )
 
-	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code
 	ROM_LOAD( "136090-1020.12c", 0x00000, 0x10000, CRC(488112a5) SHA1(55e84855daacfa303d1031de8c9adb992a846e21) )
 
-	ROM_REGION( 0xc0000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0xc0000, "sprites", ROMREGION_INVERT )
 	ROM_LOAD( "136090-1014.14s", 0x000000, 0x20000, CRC(4d64507e) SHA1(cb2ac41aecd2702cd57c746a6f5986cd753bc29e) )
 	ROM_LOAD( "136090-1016.14p", 0x020000, 0x20000, CRC(f5454f3a) SHA1(87d82bd227f7fcfd13b6f4ad88a573d1b96a4fc1) )
 	ROM_LOAD( "136090-1018.14m", 0x040000, 0x20000, CRC(17864231) SHA1(22f93fcb5d413281157ab8545647f3713f98c135) )
@@ -401,28 +575,28 @@ ROM_START( offtwall )
 	ROM_LOAD( "offtwall-eeprom.17l", 0x0000, 0x800, CRC(5eaf2d5b) SHA1(934a76a23960e6ed2cc33c359f9735caee762145) )
 
 	ROM_REGION(0x022f, "jsa:plds", 0)
-	ROM_LOAD("136085-1038.17c.bin", 0x0000, 0x0117, NO_DUMP ) /* GAL16V8A-25LP is read protected */
-	ROM_LOAD("136085-1039.20c.bin", 0x0118, 0x0117, NO_DUMP ) /* GAL16V8A-25LP is read protected */
+	ROM_LOAD("136085-1038.17c.bin", 0x0000, 0x0117, NO_DUMP ) // GAL16V8A-25LP is read protected
+	ROM_LOAD("136085-1039.20c.bin", 0x0118, 0x0117, NO_DUMP ) // GAL16V8A-25LP is read protected
 
 	ROM_REGION(0x2591, "main:plds", 0)
-	ROM_LOAD("136090-1001.14l.bin", 0x0000, 0x201d, NO_DUMP ) /* GAL6001-35P is read protected */
-	ROM_LOAD("136090-1002.11r.bin", 0x201e, 0x0117, NO_DUMP ) /* GAL16V8A-25LP is read protected */
-	ROM_LOAD("136090-1003.15f.bin", 0x2135, 0x0117, CRC(5e723b46) SHA1(e686920d0af342e33f836fec15b6e8b5ef1b8be5)) /* GAL16V8A-25LP */
-	ROM_LOAD("136090-1005.5n.bin",  0x224c, 0x0117, NO_DUMP ) /* GAL16V8A-25LP is read protected */
-	ROM_LOAD("136090-1006.5f.bin",  0x2363, 0x0117, NO_DUMP ) /* GAL16V8A-25LP is read protected */
-	ROM_LOAD("136090-1007.3f.bin",  0x247a, 0x0117, NO_DUMP ) /* GAL16V8A-25LP is read protected */
+	ROM_LOAD("136090-1001.14l.bin", 0x0000, 0x201d, NO_DUMP ) // GAL6001-35P is read protected
+	ROM_LOAD("136090-1002.11r.bin", 0x201e, 0x0117, NO_DUMP ) // GAL16V8A-25LP is read protected
+	ROM_LOAD("136090-1003.15f.bin", 0x2135, 0x0117, CRC(5e723b46) SHA1(e686920d0af342e33f836fec15b6e8b5ef1b8be5)) // GAL16V8A-25LP
+	ROM_LOAD("136090-1005.5n.bin",  0x224c, 0x0117, NO_DUMP ) // GAL16V8A-25LP is read protected
+	ROM_LOAD("136090-1006.5f.bin",  0x2363, 0x0117, NO_DUMP ) // GAL16V8A-25LP is read protected
+	ROM_LOAD("136090-1007.3f.bin",  0x247a, 0x0117, NO_DUMP ) // GAL16V8A-25LP is read protected
 ROM_END
 
 
 ROM_START( offtwallc )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 4*64k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "090-2612.rom", 0x00000, 0x20000, CRC(fc891a3f) SHA1(027815a20fbc6c0c9242768581b97362b39941c2) )
 	ROM_LOAD16_BYTE( "090-2613.rom", 0x00001, 0x20000, CRC(805d79d4) SHA1(943ec9f408ba875bdf1794ce7d24803043480401) )
 
-	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code
 	ROM_LOAD( "136090-1020.12c", 0x00000, 0x10000, CRC(488112a5) SHA1(55e84855daacfa303d1031de8c9adb992a846e21) )
 
-	ROM_REGION( 0xc0000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0xc0000, "sprites", ROMREGION_INVERT )
 	ROM_LOAD( "090-1614.rom", 0x000000, 0x20000, CRC(307ed447) SHA1(acee15e58cd8def8e52a7586aa14240e1f8be319) )
 	ROM_LOAD( "090-1616.rom", 0x020000, 0x20000, CRC(a5bd3d9b) SHA1(756d96eac2398dc68679b7641acbf0e79204eebb) )
 	ROM_LOAD( "090-1618.rom", 0x040000, 0x20000, CRC(c7d9df5d) SHA1(d5e5fbb7faf42d865862b9ac60f94d20820b00f3) )
@@ -444,27 +618,28 @@ ROM_END
 
 void offtwall_state::init_offtwall()
 {
-	/* install son-of-slapstic workarounds */
+	// install son-of-slapstic workarounds
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fde42, 0x3fde43, read16sm_delegate(*this, FUNC(offtwall_state::spritecache_count_r)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x037ec2, 0x037f39, read16sm_delegate(*this, FUNC(offtwall_state::bankswitch_r)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fdf1e, 0x3fdf1f, read16sm_delegate(*this, FUNC(offtwall_state::unknown_verify_r)));
-	m_spritecache_count = m_mainram + (0x3fde42 - 0x3fd800)/2;
+	m_spritecache_count = m_mainram + (0x3fde42 - 0x3fd800) / 2;
 	m_bankswitch_base = (uint16_t *)(memregion("maincpu")->base() + 0x37ec2);
-	m_unknown_verify_base = m_mainram + (0x3fdf1e - 0x3fd800)/2;
+	m_unknown_verify_base = m_mainram + (0x3fdf1e - 0x3fd800) / 2;
 }
 
 
 void offtwall_state::init_offtwalc()
 {
-	/* install son-of-slapstic workarounds */
+	// install son-of-slapstic workarounds
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fde42, 0x3fde43, read16sm_delegate(*this, FUNC(offtwall_state::spritecache_count_r)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x037eca, 0x037f43, read16sm_delegate(*this, FUNC(offtwall_state::bankswitch_r)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fdf24, 0x3fdf25, read16sm_delegate(*this, FUNC(offtwall_state::unknown_verify_r)));
-	m_spritecache_count = m_mainram + (0x3fde42 - 0x3fd800)/2;
+	m_spritecache_count = m_mainram + (0x3fde42 - 0x3fd800) / 2;
 	m_bankswitch_base = (uint16_t *)(memregion("maincpu")->base() + 0x37eca);
-	m_unknown_verify_base = m_mainram + (0x3fdf24 - 0x3fd800)/2;
+	m_unknown_verify_base = m_mainram + (0x3fdf24 - 0x3fd800) / 2;
 }
 
+} // anonymous namespace
 
 
 /*************************************
@@ -473,5 +648,5 @@ void offtwall_state::init_offtwalc()
  *
  *************************************/
 
-GAME( 1991, offtwall, 0,        offtwall, offtwall, offtwall_state, init_offtwall, ROT0, "Atari Games", "Off the Wall (2/3-player upright)", 0 )
-GAME( 1991, offtwallc,offtwall, offtwall, offtwall, offtwall_state, init_offtwalc, ROT0, "Atari Games", "Off the Wall (2-player cocktail)", 0 )
+GAME( 1991, offtwall,  0,        offtwall, offtwall, offtwall_state, init_offtwall, ROT0, "Atari Games", "Off the Wall (2/3-player upright)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, offtwallc, offtwall, offtwall, offtwall, offtwall_state, init_offtwalc, ROT0, "Atari Games", "Off the Wall (2-player cocktail)",  MACHINE_SUPPORTS_SAVE )

@@ -252,7 +252,7 @@ uint8_t segahang_state::sound_data_r()
 uint8_t segahang_state::i8751_r(offs_t offset)
 {
 	offs_t addr = (m_i8751_addr << 16) | (offset ^ 1);
-	uint8 data = m_maincpu->space(AS_PROGRAM).read_byte(addr);
+	uint8_t data = m_maincpu->space(AS_PROGRAM).read_byte(addr);
 
 	LOGMASKED(LOG_MCU, "i8751_r: %06x = %02x\n", addr, data);
 

@@ -107,6 +107,9 @@ This chip *ALWAYS* has a bypass capacitor (ceramic, 104, 0.10 uF) soldered on to
 
 #include "cpu/upd7810/upd7811.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
 
 DEFINE_DEVICE_TYPE(TAITO_CCHIP, taito_cchip_device, "cchip", "Taito TC0030CMD (C-Chip)")
 
@@ -115,7 +118,7 @@ taito_cchip_device::taito_cchip_device(const machine_config &mconfig, const char
 	m_upd7811(*this, "upd7811"),
 	m_upd4464_bank(*this, "upd4464_bank"),
 	m_upd4464_bank68(*this, "upd4464_bank68"),
-	m_upd4464(*this, "upd4464"),
+	m_sharedram(*this, "upd4464", 0x2000, ENDIANNESS_LITTLE),
 	m_in_pa_cb(*this),
 	m_in_pb_cb(*this),
 	m_in_pc_cb(*this),
@@ -138,16 +141,6 @@ ROM_START( taito_cchip )
 ROM_END
 
 
-void taito_cchip_device::cchip_ram_bank(address_map &map)
-{
-	map(0x0000, 0x1fff).ram().share("upd4464"); // upd4464
-}
-
-void taito_cchip_device::cchip_ram_bank68(address_map &map)
-{
-	map(0x0000, 0x1fff).ram().share("upd4464");
-}
-
 u8 taito_cchip_device::asic_r(offs_t offset)
 {
 	if ((offset != 0x001) && (!machine().side_effects_disabled())) // prevent logerror spam for now
@@ -159,11 +152,11 @@ u8 taito_cchip_device::asic_r(offs_t offset)
 
 void taito_cchip_device::asic_w(offs_t offset, u8 data)
 {
-	//logerror("%s: asic_w %04x %02x\n", machine().describe_context(), offset, data);
+	LOG("%s: asic_w %04x %02x\n", machine().describe_context(), offset, data);
 	if (offset == 0x200)
 	{
-		//logerror("cchip set bank to %02x\n", data & 0x7);
-		m_upd4464_bank->set_bank(data & 0x7);
+		LOG("cchip set bank to %02x\n", data & 0x7);
+		m_upd4464_bank->set_entry(data & 0x7);
 	}
 	else
 	{
@@ -173,11 +166,11 @@ void taito_cchip_device::asic_w(offs_t offset, u8 data)
 
 void taito_cchip_device::asic68_w(offs_t offset, u8 data)
 {
-	//logerror("%s: asic68_w %04x %02x\n", machine().describe_context(), offset, data);
+	LOG("%s: asic68_w %04x %02x\n", machine().describe_context(), offset, data);
 	if (offset == 0x200)
 	{
-		//logerror("cchip (68k side) set bank to %02x\n", data & 0x7);
-		m_upd4464_bank68->set_bank(data & 0x7);
+		LOG("cchip (68k side) set bank to %02x\n", data & 0x7);
+		m_upd4464_bank68->set_entry(data & 0x7);
 	}
 	else
 	{
@@ -185,30 +178,10 @@ void taito_cchip_device::asic68_w(offs_t offset, u8 data)
 	}
 }
 
-u8 taito_cchip_device::mem_r(offs_t offset)
-{
-	return m_upd4464_bank->read8(offset & 0x03ff);
-}
-
-void taito_cchip_device::mem_w(offs_t offset, u8 data)
-{
-	return m_upd4464_bank->write8(offset & 0x03ff, data);
-}
-
-u8 taito_cchip_device::mem68_r(offs_t offset)
-{
-	return m_upd4464_bank68->read8(offset & 0x03ff);
-}
-
-void taito_cchip_device::mem68_w(offs_t offset, u8 data)
-{
-	return m_upd4464_bank68->write8(offset & 0x03ff, data);
-}
-
 void taito_cchip_device::cchip_map(address_map &map)
 {
 	//map(0x0000, 0x0fff).rom(); // internal ROM of uPD7811
-	map(0x1000, 0x13ff).m(m_upd4464_bank, FUNC(address_map_bank_device::amap8));
+	map(0x1000, 0x13ff).bankrw(m_upd4464_bank);
 	map(0x1400, 0x17ff).rw(FUNC(taito_cchip_device::asic_r), FUNC(taito_cchip_device::asic_w));
 	map(0x2000, 0x3fff).rom().region("cchip_eprom", 0);
 }
@@ -234,21 +207,6 @@ void taito_cchip_device::device_add_mconfig(machine_config &config)
 	upd.an5_func().set([this] { return BIT(m_in_ad_cb(), 5) ? 0xff : 0; });
 	upd.an6_func().set([this] { return BIT(m_in_ad_cb(), 6) ? 0xff : 0; });
 	upd.an7_func().set([this] { return BIT(m_in_ad_cb(), 7) ? 0xff : 0; });
-
-	ADDRESS_MAP_BANK(config, m_upd4464_bank, 0);
-	m_upd4464_bank->set_map(&taito_cchip_device::cchip_ram_bank);
-	m_upd4464_bank->set_endianness(ENDIANNESS_LITTLE);
-	m_upd4464_bank->set_data_width(8);
-	m_upd4464_bank->set_addr_width(13);
-	m_upd4464_bank->set_stride(0x400);
-
-	// the 68k has a different view into the banked memory?
-	ADDRESS_MAP_BANK(config, m_upd4464_bank68, 0);
-	m_upd4464_bank68->set_map(&taito_cchip_device::cchip_ram_bank68);
-	m_upd4464_bank68->set_endianness(ENDIANNESS_LITTLE);
-	m_upd4464_bank68->set_data_width(8);
-	m_upd4464_bank68->set_addr_width(13);
-	m_upd4464_bank68->set_stride(0x400);
 }
 
 void taito_cchip_device::device_resolve_objects()
@@ -264,15 +222,15 @@ void taito_cchip_device::device_resolve_objects()
 
 void taito_cchip_device::device_start()
 {
-	m_upd4464_bank->set_bank(0);
-	m_upd4464_bank68->set_bank(0);
+	m_upd4464_bank->configure_entries(0, m_sharedram.length() / 0x400, &m_sharedram[0], 0x400);
+	m_upd4464_bank->set_entry(0);
+
+	// the 68k has a different view into the banked memory?
+	m_upd4464_bank68->configure_entries(0, m_sharedram.length() / 0x400, &m_sharedram[0], 0x400);
+	m_upd4464_bank68->set_entry(0);
 
 	save_item(NAME(m_asic_ram));
 	m_asic_ram[0] = m_asic_ram[1] = m_asic_ram[2] = m_asic_ram[3] = 0;
-}
-
-void taito_cchip_device::device_reset()
-{
 }
 
 const tiny_rom_entry *taito_cchip_device::device_rom_region() const

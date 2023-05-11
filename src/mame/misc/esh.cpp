@@ -34,6 +34,8 @@ Todo:
 #include "speaker.h"
 
 
+namespace {
+
 class esh_state : public driver_device
 {
 public:
@@ -452,6 +454,9 @@ ROM_END
 void esh_state::init_esh()
 {
 }
+
+} // anonymous namespace
+
 
 //    YEAR  NAME   PARENT   MACHINE  INPUT  STATE      INIT      MONITOR  COMPANY          FULLNAME                     FLAGS
 GAME( 1983, esh,   0,       esh,     esh,   esh_state, init_esh, ROT0,    "Funai/Gakken",  "Esh's Aurunmilla (set 1)",  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_COLORS)

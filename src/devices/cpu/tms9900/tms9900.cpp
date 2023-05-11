@@ -2222,7 +2222,7 @@ void tms99xx_device::alu_clr_swpb()
 		sign = 0x8000;
 		break;
 	case SWPB:
-		m_current_value = ((m_current_value << 8) | (m_current_value >> 8)) & 0xffff;
+		m_current_value = swapendian_int16(m_current_value);
 		setstatus = false;
 		break;
 	}

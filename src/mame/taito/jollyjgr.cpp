@@ -126,6 +126,8 @@ Notes:
 #include "tilemap.h"
 
 
+namespace {
+
 class jollyjgr_state : public driver_device
 {
 public:
@@ -777,6 +779,7 @@ ROM_START( fspiderb )
 	ROM_LOAD( "82s123.1f", 0x0000, 0x0020, CRC(cda6001a) SHA1(e10fe848e8123e53bd2db8a14cfa2d8c6621d6aa) )
 ROM_END
 
+} // anonymous namespace
 
 
 /*************************************

@@ -646,7 +646,7 @@
 		<disk state="0">
 			<color red="0.13" green="0.13" blue="0.00"/>
 		</disk>
-		<text string="&#xA3;1">
+		<text string="£1">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.10" y="0.10" width="0.80" height="0.80"/>
 		</text>
@@ -666,7 +666,7 @@
 		<disk state="0">
 			<color red="0.13" green="0.13" blue="0.00"/>
 		</disk>
-		<text string="&#xA3;1">
+		<text string="£1">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.10" y="0.10" width="0.80" height="0.80"/>
 		</text>
@@ -686,7 +686,7 @@
 		<disk state="0">
 			<color red="0.13" green="0.13" blue="0.00"/>
 		</disk>
-		<text string="&#xA3;1">
+		<text string="£1">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.10" y="0.10" width="0.80" height="0.80"/>
 		</text>
@@ -706,7 +706,7 @@
 		<disk state="0">
 			<color red="0.13" green="0.13" blue="0.00"/>
 		</disk>
-		<text string="&#xA3;1">
+		<text string="£1">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.10" y="0.10" width="0.80" height="0.80"/>
 		</text>
@@ -1206,7 +1206,7 @@
 		<rect state="0">
 			<color red="0.13" green="0.13" blue="0.13"/>
 		</rect>
-		<text string="&#xA3;4 CASH REPEAT">
+		<text string="£4 CASH REPEAT">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -1246,7 +1246,7 @@
 		<rect state="0">
 			<color red="0.25" green="0.25" blue="0.25"/>
 		</rect>
-		<text string="&#xA3;1">
+		<text string="£1">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -1587,43 +1587,43 @@
 		<disk state="1"> <bounds xc="0.5" yc="0.5" width="0.583333" height="0.583333"/> <color red="1.00" green="1.00" blue="1.00"/> </disk>
 	</element>
 	<element name="label_38">
-		<text string="&#xA3;1.60">
+		<text string="£1.60">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="label_39">
-		<text string="&#xA3;1">
+		<text string="£1">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="label_40">
-		<text string="&#xA3;2.40">
+		<text string="£2.40">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="label_41">
-		<text string="&#xA3;2.00">
+		<text string="£2.00">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="label_42">
-		<text string="&#xA3;3.00">
+		<text string="£3.00">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="label_43">
-		<text string="&#xA3;4.00">
+		<text string="£4.00">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="label_62">
-		<text string="&#xA3;">
+		<text string="£">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.45"/>
 		</text>
@@ -1633,13 +1633,13 @@
 		</text>
 	</element>
 	<element name="label_66">
-		<text string="&#xA3;8.00">
+		<text string="£8.00">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="label_152">
-		<text string="&#xA3;8+REPEAT CHANCE">
+		<text string="£8+REPEAT CHANCE">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -2147,54 +2147,24 @@
 		<element ref="vfd0_background">
 			<bounds x="683" y="559" width="272" height="30"/>
 		</element>
-		<element name="vfd15" ref="vfd0" state="0">
-			<bounds x="683" y="559" width="17" height="30"/>
-		</element>
-		<element name="vfd14" ref="vfd0" state="0">
-			<bounds x="700" y="559" width="17" height="30"/>
-		</element>
-		<element name="vfd13" ref="vfd0" state="0">
-			<bounds x="717" y="559" width="17" height="30"/>
-		</element>
-		<element name="vfd12" ref="vfd0" state="0">
-			<bounds x="734" y="559" width="17" height="30"/>
-		</element>
-		<element name="vfd11" ref="vfd0" state="0">
-			<bounds x="751" y="559" width="17" height="30"/>
-		</element>
-		<element name="vfd10" ref="vfd0" state="0">
-			<bounds x="768" y="559" width="17" height="30"/>
-		</element>
-		<element name="vfd9" ref="vfd0" state="0">
-			<bounds x="785" y="559" width="17" height="30"/>
-		</element>
-		<element name="vfd8" ref="vfd0" state="0">
-			<bounds x="802" y="559" width="17" height="30"/>
-		</element>
-		<element name="vfd7" ref="vfd0" state="0">
-			<bounds x="819" y="559" width="17" height="30"/>
-		</element>
-		<element name="vfd6" ref="vfd0" state="0">
-			<bounds x="836" y="559" width="17" height="30"/>
-		</element>
-		<element name="vfd5" ref="vfd0" state="0">
-			<bounds x="853" y="559" width="17" height="30"/>
-		</element>
-		<element name="vfd4" ref="vfd0" state="0">
-			<bounds x="870" y="559" width="17" height="30"/>
-		</element>
-		<element name="vfd3" ref="vfd0" state="0">
-			<bounds x="887" y="559" width="17" height="30"/>
-		</element>
-		<element name="vfd2" ref="vfd0" state="0">
-			<bounds x="904" y="559" width="17" height="30"/>
-		</element>
-		<element name="vfd1" ref="vfd0" state="0">
-			<bounds x="921" y="559" width="17" height="30"/>
-		</element>
-		<element name="vfd0" ref="vfd0" state="0">
-			<bounds x="938" y="559" width="17" height="30"/>
-		</element>
+
+		<repeat count="16">
+			<param name="n" start="15" increment="-1"/>
+			<param name="x" start="683" increment="17"/>
+			<element name="vfdblank~n~" ref="vfd0" state="0">
+				<animate name="vfdduty0" />
+				<color state="31" red="0.00" green="0.6" blue="1.00" alpha="0.0"/>
+				<color state="0" red="0.00" green="0.6" blue="1.00" alpha="1.0"/>
+				<bounds x="~x~" y="559" width="17" height="30"/>
+			</element>
+			<element name="vfd~n~" ref="vfd0" state="0">
+				<animate name="vfdduty0" />
+				<color state="0" red="0.00" green="0.6" blue="1.00" alpha="0.0"/>
+				<color state="31" red="0.00" green="0.6" blue="1.00" alpha="1.0"/>
+				<bounds x="~x~" y="559" width="17" height="30"/>
+			</element>
+		</repeat>
+
 		<element name="label38" ref="label_38">
 			<bounds x="130" y="569" width="51" height="24"/>
 		</element>

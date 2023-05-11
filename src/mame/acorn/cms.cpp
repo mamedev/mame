@@ -52,6 +52,8 @@
 #include "bus/acorn/bus.h"
 
 
+namespace {
+
 class cms_state : public driver_device
 {
 public:
@@ -204,6 +206,8 @@ ROM_START( cms6502 )
 	ROM_REGION(0x200, "proms", 0)
 	ROM_LOAD("bassys2.ic8", 0x0000, 0x0200, CRC(417ff0b4) SHA1(878718accb83f18456fefaf67a0e4a6a407113e4)) // 512x8
 ROM_END
+
+} // anonymous namespace
 
 
 /* Driver */

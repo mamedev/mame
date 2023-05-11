@@ -42,6 +42,7 @@ d.Parse(json);
 
 ~~~~~~~~~~cpp
 #include "rapidjson/stringbuffer.h"
+#include <rapidjson/writer.h>
 
 StringBuffer buffer;
 Writer<StringBuffer> writer(buffer);
@@ -98,6 +99,7 @@ fclose(fp);
 
 ~~~~~~~~~~cpp
 #include "rapidjson/filewritestream.h"
+#include <rapidjson/writer.h>
 #include <cstdio>
 
 using namespace rapidjson;
@@ -215,6 +217,7 @@ fclose(fp);
 ~~~~~~~~~~cpp
 #include "rapidjson/filewritestream.h"  // FileWriteStream
 #include "rapidjson/encodedstream.h"    // EncodedOutputStream
+#include <rapidjson/writer.h>
 #include <cstdio>
 
 Document d;         // Document 为 GenericDocument<UTF8<> > 
@@ -228,7 +231,7 @@ FileWriteStream bos(fp, writeBuffer, sizeof(writeBuffer));
 typedef EncodedOutputStream<UTF32LE<>, FileWriteStream> OutputStream;
 OutputStream eos(bos, true);   // 写入 BOM
 
-Writer<OutputStream, UTF32LE<>, UTF8<>> writer(eos);
+Writer<OutputStream, UTF8<>, UTF32LE<>> writer(eos);
 d.Accept(writer);   // 这里从内存的 UTF-8 生成 UTF32-LE 文件
 
 fclose(fp);

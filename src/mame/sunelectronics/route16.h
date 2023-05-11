@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Zsolt Vasvari
-#ifndef MAME_INCLUDES_ROUTE16_H
-#define MAME_INCLUDES_ROUTE16_H
+#ifndef MAME_SUNELECTRONICS_ROUTE16_H
+#define MAME_SUNELECTRONICS_ROUTE16_H
 
 #pragma once
 
@@ -84,4 +84,4 @@ protected:
 	uint8_t m_palette_2 = 0;
 };
 
-#endif // MAME_INCLUDES_ROUTE16_H
+#endif // MAME_SUNELECTRONICS_ROUTE16_H

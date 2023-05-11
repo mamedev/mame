@@ -7,7 +7,7 @@
  * References:
  * - https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/apbus/spifireg.h
  * - https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/apbus/spifi.c
- * - https://github.com/mamedev/mame/blob/master/src/devices/machine/ncr5390.cpp
+ * - https://github.com/mamedev/mame/blob/master/src/devices/machine/ncr53c90.cpp
  *
  * TODO:
  *  - NetBSD compatibility

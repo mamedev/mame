@@ -89,8 +89,8 @@ public:
 	};
 
 	h8_dma_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	h8_dma_channel_device(const machine_config &mconfig, const char *tag, device_t *owner,
-			const char *intc, int irq_base, int v0, int v1, int v2, int v3, int v4, int v5, int v6, int v7, int v8,
+	template <typename T> h8_dma_channel_device(const machine_config &mconfig, const char *tag, device_t *owner,
+			T &&intc_tag, int irq_base, int v0, int v1, int v2, int v3, int v4, int v5, int v6, int v7, int v8,
 			int v9 = h8_dma_channel_device::NONE,
 			int va = h8_dma_channel_device::NONE,
 			int vb = h8_dma_channel_device::NONE,
@@ -100,9 +100,10 @@ public:
 			int vf = h8_dma_channel_device::NONE)
 		: h8_dma_channel_device(mconfig, tag, owner, 0)
 	{
-		set_info(intc, irq_base, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, va, vb, vc, vd, ve, vf);
+		intc.set_tag(std::forward<T>(intc_tag));
+		set_info(irq_base, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, va, vb, vc, vd, ve, vf);
 	}
-	void set_info(const char *intc, int irq_base, int v0, int v1, int v2, int v3, int v4, int v5, int v6, int v7, int v8, int v9, int va, int vb, int vc, int vd, int ve, int vf);
+	void set_info(int irq_base, int v0, int v1, int v2, int v3, int v4, int v5, int v6, int v7, int v8, int v9, int va, int vb, int vc, int vd, int ve, int vf);
 
 	uint16_t marah_r();
 	void marah_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -141,8 +142,7 @@ public:
 protected:
 	required_device<h8_dma_device> dmac;
 	required_device<h8_device> cpu;
-	h8_intc_device *intc;
-	const char *intc_tag;
+	required_device<h8_intc_device> intc;
 	h8_dma_state state[2];
 	int irq_base;
 

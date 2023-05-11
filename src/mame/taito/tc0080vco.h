@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_VIDEO_TC0080VCO_H
-#define MAME_VIDEO_TC0080VCO_H
+#ifndef MAME_TAITO_TC0080VCO_H
+#define MAME_TAITO_TC0080VCO_H
 
 #pragma once
 
@@ -103,4 +103,4 @@ private:
 
 DECLARE_DEVICE_TYPE(TC0080VCO, tc0080vco_device)
 
-#endif // MAME_VIDEO_TC0080VCO_H
+#endif // MAME_TAITO_TC0080VCO_H

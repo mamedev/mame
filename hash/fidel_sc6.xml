@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 
-<softwarelist name="fidel_sc6" description="Fidelity SC6 Modules">
+<softwarelist name="fidel_sc6" description="Fidelity SC6 modules">
 
 	<software name="sc6">
 		<description>SC6: original program</description>

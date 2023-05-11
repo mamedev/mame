@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="msx1_flop_525" description="MSX1 5.25&quot; disk images">
+<!--
+    MSX(1) software that was released on 5 1/4" floppies
+-->
+
+	<software name="msxdostb">
+		<description>MSX-DOS Tools (Brazil, v4.3)</description>
+		<year>1991</year>
+		<publisher>Nemesis Informatica</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184320">
+				<rom name="msx-dos tools v4.3 (1991)(nemesis informatica)(br).dsk" size="184320" crc="e93070dd" sha1="f78578bf88fa08d0268d7ed2f3cb62406527c500" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

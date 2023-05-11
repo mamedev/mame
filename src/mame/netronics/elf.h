@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_ELF_H
-#define MAME_INCLUDES_ELF_H
+#ifndef MAME_NETRONICS_ELF_H
+#define MAME_NETRONICS_ELF_H
 
 #pragma once
 
@@ -78,4 +78,4 @@ private:
 	uint8_t m_data = 0;
 };
 
-#endif
+#endif // MAME_NETRONICS_ELF_H

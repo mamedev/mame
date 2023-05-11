@@ -398,15 +398,12 @@ enum
 // GLOBAL CLASS
 struct ui_globals
 {
-	static uint8_t      curdats_view, curdats_total, cur_sw_dats_view, cur_sw_dats_total, rpanel;
-	static bool         default_image, reset;
-	static int          visible_main_lines, visible_sw_lines;
-	static uint16_t     panels_status;
+	static uint8_t      curdats_view, curdats_total, cur_sw_dats_view, cur_sw_dats_total;
+	static bool         reset;
 };
 
 // GLOBAL FUNCTIONS
 char* chartrimcarriage(char str[]);
-const char* strensure(const char* s);
 int getprecisionchr(const char* s);
 std::vector<std::string> tokenize(const std::string &text, char sep);
 

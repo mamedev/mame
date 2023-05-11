@@ -3,11 +3,13 @@
 #ifndef MAME_MACHINE_MM58274C_H
 #define MAME_MACHINE_MM58274C_H
 
+#include "dirtc.h"
+
 /***************************************************************************
     MACROS
 ***************************************************************************/
 
-class mm58274c_device : public device_t
+class mm58274c_device : public device_t, public device_rtc_interface
 {
 public:
 	mm58274c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -25,7 +27,11 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
+
+	// device_rtc_interface overrides
+	virtual bool rtc_feature_y2k() const override { return false; }
+	virtual bool rtc_feature_leap_year() const override { return true; }
+	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
 
 private:
 	// internal state

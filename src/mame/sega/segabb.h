@@ -2,8 +2,8 @@
 // copyright-holders:Olivier Galibert
 // Lindbergh Sega baseboard
 
-#ifndef MAME_MACHINE_SEGABB_H
-#define MAME_MACHINE_SEGABB_H
+#ifndef MAME_SEGA_SEGABB_H
+#define MAME_SEGA_SEGABB_H
 
 #pragma once
 
@@ -25,4 +25,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SEGA_LINDBERGH_BASEBOARD, sega_lindbergh_baseboard_device)
 
-#endif // MAME_MACHINE_SEGABB_H
+#endif // MAME_SEGA_SEGABB_H

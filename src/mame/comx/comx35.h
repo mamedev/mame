@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef MAME_INCLUDES_COMX35_H
-#define MAME_INCLUDES_COMX35_H
+#ifndef MAME_COMX_COMX35_H
+#define MAME_COMX_COMX35_H
 
 #include "bus/comx35/exp.h"
 #include "cpu/cosmac/cosmac.h"
@@ -103,4 +103,4 @@ private:
 	int m_cr1 = 0;                  // interrupt enable
 };
 
-#endif
+#endif // MAME_COMX_COMX35_H

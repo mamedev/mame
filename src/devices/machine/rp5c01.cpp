@@ -13,6 +13,8 @@
     - 12 hour clock
     - test register
     - timer reset
+    - convert I/O to address maps & views
+    - lh5045 doesn't really wrap time correctly
 
 */
 
@@ -23,6 +25,7 @@
 // device type definitions
 DEFINE_DEVICE_TYPE(RP5C01, rp5c01_device, "rp5c01", "Ricoh RP5C01 RTC")
 DEFINE_DEVICE_TYPE(TC8521, tc8521_device, "tc8521", "Toshiba TC8521 RTC")
+DEFINE_DEVICE_TYPE(LH5045, lh5045_device, "lh5045", "Sharp LH5045 RTC")
 
 
 //**************************************************************************
@@ -431,4 +434,23 @@ void rp5c01_device::write(offs_t offset, uint8_t data)
 tc8521_device::tc8521_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: rp5c01_device(mconfig, TC8521, tag, owner, clock)
 {
+}
+
+//-------------------------------------------------
+//  lh5045_device - constructor
+//-------------------------------------------------
+
+lh5045_device::lh5045_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: rp5c01_device(mconfig, LH5045, tag, owner, clock)
+{
+}
+
+TIMER_CALLBACK_MEMBER(lh5045_device::advance_1hz_clock)
+{
+	// inverted & different bit compared to rp5c01
+	if (m_1hz && (!BIT(m_mode, 2)))
+		advance_seconds();
+
+	m_1hz = !m_1hz;
+	set_alarm_line();
 }

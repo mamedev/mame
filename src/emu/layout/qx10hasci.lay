@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="led" defstate="1">
+		<disk state="0">
+			<color red="0.75" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="1">
+			<color red="0.20" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="capslock">
+		<text string="CAPS">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="insert">
+		<text string="INS">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="sf1">
+		<text string="CALC">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="sf2">
+		<text string="SCHED">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="sf3">
+		<text string="DRAW">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<view name="Default Layout">
+		<screen index="0">
+			<bounds x="0" y="30" width="640" height="480" />
+		</screen>
+
+		<element name="led3" ref="led">
+			<bounds x="33" y="17" width="10" height="10" />
+		</element>
+
+		<element name="led2" ref="led">
+			<bounds x="53" y="17" width="10" height="10" />
+		</element>
+
+		<element name="led7" ref="led">
+			<bounds x="83" y="17" width="10" height="10" />
+		</element>
+
+		<element name="led6" ref="led">
+			<bounds x="103" y="17" width="10" height="10" />
+		</element>
+
+		<element name="led5" ref="led">
+			<bounds x="123" y="17" width="10" height="10" />
+		</element>
+
+		<element name="label1" ref="capslock">
+			<bounds x="31" y="0" width="15" height="15" />
+		</element>
+
+		<element name="label2" ref="insert">
+			<bounds x="51" y="0" width="15" height="15" />
+		</element>
+
+		<element name="label3" ref="sf1">
+			<bounds x="81" y="0" width="15" height="15" />
+		</element>
+
+		<element name="label4" ref="sf2">
+			<bounds x="101" y="0" width="15" height="15" />
+		</element>
+
+		<element name="label5" ref="sf3">
+			<bounds x="121" y="0" width="15" height="15" />
+		</element>
+	</view>
+</mamelayout>

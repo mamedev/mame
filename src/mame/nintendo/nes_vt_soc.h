@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_MACHINE_NES_VT_SOC_H
-#define MAME_MACHINE_NES_VT_SOC_H
+#ifndef MAME_NINTENDO_NES_VT_SOC_H
+#define MAME_NINTENDO_NES_VT_SOC_H
 
 #pragma once
 
@@ -87,10 +87,6 @@ protected:
 	void nt_w(offs_t offset, uint8_t data);
 	int calculate_real_video_address(int addr, int extended, int readtype);
 	void scrambled_8000_w(uint16_t offset, uint8_t data);
-	uint8_t psg1_4014_r();
-	uint8_t psg1_4015_r();
-	void psg1_4015_w(uint8_t data);
-	void psg1_4017_w(uint8_t data);
 	void vt_dma_w(uint8_t data);
 	void do_dma(uint8_t data, bool has_ntsc_bug);
 	void vt03_4034_w(uint8_t data);
@@ -185,4 +181,4 @@ DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC, nes_vt02_vt03_soc_device)
 DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC_PAL, nes_vt02_vt03_soc_pal_device)
 DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC_SCRAMBLE, nes_vt02_vt03_soc_scramble_device)
 
-#endif // MAME_MACHINE_NES_VT_SOC_H
+#endif // MAME_NINTENDO_NES_VT_SOC_H

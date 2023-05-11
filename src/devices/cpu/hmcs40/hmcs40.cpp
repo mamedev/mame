@@ -454,6 +454,7 @@ void hmcs40_cpu_device::do_interrupt()
 
 	// line 0/1 for external interrupt, let's use 2 for t/c interrupt
 	int line = (m_iri) ? m_eint_line : 2;
+	standard_irq_callback(line, m_pc);
 
 	// vector $3f, on page 0(timer/counter), or page 1(external)
 	// external interrupt has priority over t/c interrupt
@@ -463,7 +464,6 @@ void hmcs40_cpu_device::do_interrupt()
 	else
 		m_irt = 0;
 
-	standard_irq_callback(line);
 	m_prev_pc = m_pc;
 
 	cycle();

@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:
-/*******************************************************************************
+/**************************************************************************************************
 
     Skeleton driver for TAB Austria "Silverball" PC-based touch games
 
@@ -20,11 +20,19 @@
     The manual points to a HardLock parallel port security dongle, but it was missing
     from the dumped machine.
 
-*******************************************************************************/
+    Acorp 694XT-694XT1 is based off VIA Apollo Pro133 (VT82C694 + VT82C686B)
+    Soyo SY-7IZB is based off Intel 82440ZX
+    SiS 5600/SiS 5595 is a Slot 1 Pentium II MB, the earlier version of what is in sis630.cpp
+
+    TODO:
+    - Existing dumps all punts at dongle checks in sis630.cpp, requiring an emulation of the
+      parallel port device.
+
+**************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "speaker.h"
+#include "machine/pci.h"
 
 namespace {
 
@@ -41,7 +49,6 @@ public:
 
 private:
 	void mem_map(address_map &map);
-	void io_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 };
@@ -49,11 +56,8 @@ private:
 void silverball_state::mem_map(address_map &map)
 {
 	map(0x00000000, 0x0009ffff).ram();
-	map(0xfffc0000, 0xffffffff).rom().region("mb_bios", 0);
-}
-
-void silverball_state::io_map(address_map &map)
-{
+	map(0x000e0000, 0x000fffff).rom().region("bios", 0x20000);
+	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);
 }
 
 static INPUT_PORTS_START(silverball)
@@ -61,15 +65,17 @@ INPUT_PORTS_END
 
 void silverball_state::silverball(machine_config &config)
 {
-	PENTIUM(config, m_maincpu, 133'000'000);
+	PENTIUM(config, m_maincpu, 133'000'000); // Pentium-S minimum, up to a Pentium II
 	m_maincpu->set_addrmap(AS_PROGRAM, &silverball_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &silverball_state::io_map);
+
+	PCI_ROOT(config, "pci", 0);
+	// ...
 }
 
 
 // Silverball machines used different motherboards. By now, we're adding all the known BIOSes here
 #define SILVERBALL_BIOS \
-	ROM_REGION32_LE(0x40000, "mb_bios", 0) \
+	ROM_REGION32_LE(0x40000, "bios", 0) \
 	/* Acorp 694XT/694XT1 (all of them from the Silverball software update files) */ \
 	ROM_SYSTEM_BIOS(0, "bios47", "BIOS47 (Acorp 694XT/694XT1)") \
 	ROMX_LOAD("bios47.bin", 0x00000, 0x40000, CRC(248910ed) SHA1(2901c94fb003e5eaea7e91127ad1f7953826a248), ROM_BIOS(0)) /* 09/03/2001-694X-686A-6A6LJX3AC-00 */ \
@@ -111,14 +117,17 @@ void silverball_state::silverball(machine_config &config)
 	/* Soyo SY-5EAS */ \
 	ROM_SYSTEM_BIOS(17, "bios29", "BIOS29 (Soyo 5EAS)") /* Dumped from the actual Silverball 8.06 machine */ \
 	ROMX_LOAD("bios29.bin", 0x00000, 0x20000, CRC(ddbd94f4) SHA1(60ad74e56265a7936cf19e8480c657223d11f2d0), ROM_BIOS(17)) /* 06/18/1998-EQ82C6618A-ET-2A5LDS2FC-29 */ \
+	ROM_RELOAD( 0x20000, 0x20000 ) \
 	ROM_SYSTEM_BIOS(18, "test", "TEST (Soyo SY-5EAS)") /* BIOS update labeled as "TEST", from the Silverball software update files */ \
-	ROMX_LOAD("test.bin",   0x00000, 0x20000, CRC(ddbd94f4) SHA1(60ad74e56265a7936cf19e8480c657223d11f2d0), ROM_BIOS(18)) /* 06/18/1998-EQ82C6618A-ET-2A5LDS2FC-29 */
+	ROMX_LOAD("test.bin",   0x00000, 0x20000, CRC(ddbd94f4) SHA1(60ad74e56265a7936cf19e8480c657223d11f2d0), ROM_BIOS(18)) /* 06/18/1998-EQ82C6618A-ET-2A5LDS2FC-29 */ \
+	ROM_RELOAD( 0x20000, 0x20000 ) \
+
 
 ROM_START(slvrball806)
 	SILVERBALL_BIOS
 	ROM_DEFAULT_BIOS("bios29") // The one dumped from the actual machine
 
-	DISK_REGION( "ide:0:hdd:image" ) // 16383 cylinders, 16 heads, 63 sectors
+	DISK_REGION( "ide:0:hdd" ) // 16383 cylinders, 16 heads, 63 sectors
 	DISK_IMAGE("silverball_8.06", 0, BAD_DUMP SHA1(4bd03240229a2f59d457e95e04837422c423111b)) // May contain operator data
 ROM_END
 
@@ -126,7 +135,7 @@ ROM_START(slvrball720)
 	SILVERBALL_BIOS
 	ROM_DEFAULT_BIOS("bios29") // Not sure what PCB this HD was dumped from
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE("silverball_7.20", 0, BAD_DUMP SHA1(008d0146b579793f9ba2aa2e43ffa7ec1401f752)) // May contain operator data
 ROM_END
 
@@ -134,7 +143,7 @@ ROM_START(slvrball632)
 	SILVERBALL_BIOS
 	ROM_DEFAULT_BIOS("bios29") // Not sure what PCB this HD was dumped from
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE("silverball_6.32", 0, BAD_DUMP SHA1(0193fbc3b27e0b3ad6139830dfec04172eb3089a)) // May contain operator data
 ROM_END
 
@@ -143,7 +152,7 @@ ROM_START(slvrballbu409)
 	SILVERBALL_BIOS
 	ROM_DEFAULT_BIOS("bios29") // Not sure what PCB this HD was dumped from
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE("silverball_bulova_4.09_1", 0, BAD_DUMP SHA1(da838ddccf285fb4e06d7f752949e745e6b4e2e7)) // May contain operator data
 ROM_END
 
@@ -153,7 +162,7 @@ ROM_START(slvrballbu409b)
 	SILVERBALL_BIOS
 	ROM_DEFAULT_BIOS("bios29") // Not sure what PCB this HD was dumped from
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE("silverball_bulova_4.09_2", 0, BAD_DUMP SHA1(86bf947b39cabcd207f79b7d6132199819e1fed7)) // May contain operator data
 ROM_END
 

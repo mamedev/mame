@@ -231,9 +231,9 @@ void sgi_re2_device::execute()
 	m_pupdata = m_reg[REG_PUPDATA];
 	m_pat = (m_reg[REG_PATH] << 16) | m_reg[REG_PATL];
 	m_dz = (s64(u64(m_reg[REG_DZI]) << 40) >> 26) | m_reg[REG_DZF];
-	m_dr = s32(m_reg[REG_DR] << 8) >> 8;
-	m_dg = s32(m_reg[REG_DG] << 12) >> 12;
-	m_db = s32(m_reg[REG_DB] << 12) >> 12;
+	m_dr = util::sext(m_reg[REG_DR], 24);
+	m_dg = util::sext(m_reg[REG_DG], 20);
+	m_db = util::sext(m_reg[REG_DB], 20);
 	m_z = s64(u64(m_reg[REG_Z]) << 40) >> 26;
 	m_r = m_reg[REG_R];
 	m_g = m_reg[REG_G];

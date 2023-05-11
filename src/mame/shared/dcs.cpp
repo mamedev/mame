@@ -2029,7 +2029,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::dcs_irq )
 
 		/* generate the (internal, thats why the pulse) irq */
 		if (LOG_DCS_IO)
-			logerror("dcs_irq: Genrating interrupt\n");
+			logerror("dcs_irq: Generating interrupt\n");
 		m_cpu->pulse_input_line(ADSP2105_IRQ1, m_cpu->minimum_quantum_time());
 	}
 
@@ -2041,7 +2041,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::dcs_irq )
 
 TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::sport0_irq )
 {
-
 	/* this latches internally, so we just pulse */
 	/* note that there is non-interrupt code that reads/modifies/writes the output_control */
 	/* register; if we don't interlock it, we will eventually lose sound (see CarnEvil) */

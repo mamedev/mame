@@ -1,0 +1,44 @@
+/** @page compile_windows_mingw-w64 Building PortAudio for Windows with MinGW-w64
+@ingroup tutorial
+
+@section comp_mingw-w64_1 PortAudio for Windows with MinGW-w64
+
+MinGW-w64 is a port of Linux toolchains (gcc, clang) to Windows. It comes packaged with Msys2 in its preferred configuration. Msys2 provides a Linux environment and the package manager pacman.
+Install MinGW-w64 from https://www.msys2.org/. Follow the instructions on this page.
+
+Brief excursion: there are many toolchain variants in Msys2, and you must use the same toolchain to compile all projects together. In this tutorial, we will use the msvcrt-gcc toolchain, simply because it's already present on all Windows versions. Readers may eventually want to switch to the ucrt-gcc toolchain later, for their Windows 10+ builds, although there is hardly any benefit to doing so. A list of available toolchains is at https://www.msys2.org/docs/environments/.
+
+In addition, you have a choice of Windows audio APIs; see the bottom of \ref compile_windows for a list.
+
+You can either use msys2's precompiled PortAudio or compile PortAudio yourself. To install msys2's precompiled PortAudio, see the next section. To compile PortAudio on your own, skip to the next next section.
+
+@section comp_mingw-w64_2 Pre-compiled package
+
+Open your msys2 shell and run "pacman -S mingw-w64-x86_64-portaudio". This will get you a default build of PortAudio. I believe it comes with DirectSound, WASAPI, WD/MKS, WD/MKS_DEVICE_INFO, and WMME. Note the "-x86_64" in the middle of the package name. When you install msys2 packages, you specify the toolchain name in the middle, and "-x86_64" chooses the msvcrt-gcc toolchain.
+
+@section comp_mingw-w64_3 Compiling from scratch
+
+We will build with WASAPI only, with no fallback APIs, simply as an example. In the msys2 shell, navigate into your folder of PortAudio. Run:
+
+@code
+pacman -S mingw-w64-x86_64-cmake mingw-w64-x86_64-ninja
+mkdir build
+cd build
+cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release -DPA_USE_DS=0 -DPA_USE_WDMKS=0 -DPA_USE_WDMKS_DEVICE_INFO=0 -DPA_USE_WMME=0
+cmake --build .
+@endcode
+
+To test if it is working, you can run the sawtooth example (warning, it is very loud!):
+
+@code
+gcc ../examples/paex_saw.c -I../src/common -lportaudio
+./a.exe
+@endcode
+
+You can enable the desired fallback APIs again by deleting the terms like "-DPA_USE_WMME=0" in the cmake command. When releasing your application to the public, make sure to copy libportaudio.dll (in the build folder) into your own application's folder. (You'll also need to ship a copy of MinGW-w64's various shared libraries; you can figure out which ones using Microsoft's Process Explorer, and seeing which dlls are accessed from your msys64 folder.)
+
+Or, compile statically to avoid the issue of dll copies.
+
+Back to the Tutorial: \ref tutorial_start
+
+*/

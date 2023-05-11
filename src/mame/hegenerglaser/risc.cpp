@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco, hap
-/******************************************************************************
+/*******************************************************************************
 
 Mephisto Risc 1MB/II (stylized "risc")
 
@@ -15,7 +15,7 @@ Hardware notes:
 - Mephisto modular display module
 - Mephisto modular chessboard
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -68,9 +68,9 @@ void risc_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 u8 risc_state::keys_r(offs_t offset)
 {
@@ -95,9 +95,9 @@ void risc_state::chessm_w(u8 data)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void risc_state::mrisc_mem(address_map &map)
 {
@@ -118,9 +118,9 @@ void risc_state::mrisc_mem(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( mrisc )
 	PORT_START("KEY")
@@ -139,12 +139,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void risc_state::mrisc(machine_config &config)
 {
+	// basic machine hardware
 	M65SC02(config, m_maincpu, 10_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &risc_state::mrisc_mem);
 
@@ -172,9 +173,9 @@ void risc_state::mrisc(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( mrisc )
 	ROM_REGION( 0x20000, "maincpu", 0 )
@@ -194,10 +195,10 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
     Drivers
-***************************************************************************/
+*******************************************************************************/
 
-/*    YEAR  NAME     PARENT   COMPAT  MACHINE   INPUT  CLASS       INIT        COMPANY                    FULLNAME             FLAGS */
-CONS( 1992, mrisc,   0,       0,      mrisc,    mrisc, risc_state, empty_init, "Hegener + Glaser / Tasc", "Mephisto Risc 1MB", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1994, mrisc2,  mrisc,   0,      mrisc,    mrisc, risc_state, empty_init, "Hegener + Glaser / Tasc", "Mephisto Risc II",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME     PARENT   COMPAT  MACHINE   INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1992, mrisc,   0,       0,      mrisc,    mrisc, risc_state, empty_init, "Hegener + Glaser / Tasc", "Mephisto Risc 1MB", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1994, mrisc2,  mrisc,   0,      mrisc,    mrisc, risc_state, empty_init, "Hegener + Glaser / Tasc", "Mephisto Risc II",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

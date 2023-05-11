@@ -33,6 +33,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -282,7 +284,7 @@ INPUT_PORTS_END
 void blockhl_state::blockhl(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI(config, m_maincpu, XTAL(24'000'000)/8); // Konami 052526
+	KONAMI(config, m_maincpu, XTAL(24'000'000)/2); // Konami 052526
 	m_maincpu->set_addrmap(AS_PROGRAM, &blockhl_state::main_map);
 	m_maincpu->line().set(FUNC(blockhl_state::banking_callback));
 
@@ -372,6 +374,8 @@ ROM_START( quarth )
 	ROM_REGION( 0x0100, "priority", 0 ) // priority encoder (not used)
 	ROM_LOAD( "973a11.h10", 0x0000, 0x0100, CRC(46d28fe9) SHA1(9d0811a928c8907785ef483bfbee5445506b3ec8) )
 ROM_END
+
+} // anonymous namespace
 
 
 //**************************************************************************

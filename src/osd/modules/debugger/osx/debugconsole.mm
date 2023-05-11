@@ -404,8 +404,11 @@
 			win = [[MAMEDevicesViewer alloc] initWithMachine:*machine console:self];
 			break;
 		case osd::debugger::WINDOW_TYPE_DEVICE_INFO_VIEWER:
-			// FIXME: needs device info on init, make another variant
-			//win = [[MAMEDeviceInfoViewer alloc] initWithMachine:*machine console:self];
+			{
+				// FIXME: feels like a leaky abstraction, but device is needed for init
+				device_t *const device = machine->root_device().subdevice(node->get_attribute_string(osd::debugger::ATTR_WINDOW_DEVICE_TAG, ":"));
+				win = [[MAMEDeviceInfoViewer alloc] initWithDevice:(device ? *device : machine->root_device()) machine:*machine console:self];
+			}
 			break;
 		default:
 			break;
@@ -437,6 +440,7 @@
 								  : NSMaxY([[[dasmSplit subviews] objectAtIndex:0] frame]));
 	}
 	[dasmView saveConfigurationToNode:node];
+	[history saveConfigurationToNode:node];
 }
 
 
@@ -451,6 +455,7 @@
 			  ofDividerAtIndex:0];
 	}
 	[dasmView restoreConfigurationFromNode:node];
+	[history restoreConfigurationFromNode:node];
 }
 
 

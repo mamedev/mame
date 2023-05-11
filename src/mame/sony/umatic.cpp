@@ -10,6 +10,9 @@
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
 
+
+namespace {
+
 class umatic_state : public driver_device
 {
 public:
@@ -87,6 +90,9 @@ ROM_START(vo5850pm)
 	ROM_REGION(0x2000, "maincpu", 0)
 	ROM_LOAD("2764_s68_ev1-25.ic26", 0x0000, 0x2000, CRC(7f3c191d) SHA1(4843399f86a15133e966c9e8992eafac03818916))
 ROM_END
+
+} // anonymous namespace
+
 
 //   YEAR  NAME   PARENT/COMPAT MACHINE  INPUT    CLASS             INIT COMPANY  FULLNAME                                    FLAGS
 SYST(19??, vo5850pm,    0, 0,   umatic, umatic, umatic_state, empty_init, "Sony", "U-Matic Videocassette Recorder VO-5850PM",  MACHINE_IS_SKELETON)

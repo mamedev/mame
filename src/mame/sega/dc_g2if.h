@@ -6,8 +6,8 @@
 
 **************************************************************************************************/
 
-#ifndef MAME_MACHINE_DC_G2IF_H
-#define MAME_MACHINE_DC_G2IF_H
+#ifndef MAME_SEGA_DC_G2IF_H
+#define MAME_SEGA_DC_G2IF_H
 
 #pragma once
 
@@ -103,4 +103,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(DC_G2IF, dc_g2if_device)
 
-#endif // MAME_MACHINE_DC_G2IF_H
+#endif // MAME_SEGA_DC_G2IF_H

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-#ifndef MAME_INCLUDES_PCD_KBD_H
-#define MAME_INCLUDES_PCD_KBD_H
+#ifndef MAME_SIEMENS_PCD_KBD_H
+#define MAME_SIEMENS_PCD_KBD_H
 
 #pragma once
 
@@ -37,4 +37,4 @@ private:
 
 DECLARE_DEVICE_TYPE(PCD_KEYBOARD, pcd_keyboard_device)
 
-#endif // MAME_INCLUDES_PCD_KBD_H
+#endif // MAME_SIEMENS_PCD_KBD_H

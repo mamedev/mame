@@ -401,8 +401,8 @@ void m6801_cpu_device::m6800_check_irq2()
 {
 	if ((m_tcsr & (TCSR_EICI|TCSR_ICF)) == (TCSR_EICI|TCSR_ICF))
 	{
+		standard_irq_callback(M6801_TIN_LINE, m_pc.w.l);
 		TAKE_ICI;
-		standard_irq_callback(M6801_TIN_LINE);
 	}
 	else if ((m_tcsr & (TCSR_EOCI|TCSR_OCF)) == (TCSR_EOCI|TCSR_OCF))
 	{
@@ -424,8 +424,8 @@ void hd6301x_cpu_device::m6800_check_irq2()
 {
 	if ((m_tcsr & (TCSR_EICI|TCSR_ICF)) == (TCSR_EICI|TCSR_ICF))
 	{
+		standard_irq_callback(M6801_TIN_LINE, m_pc.w.l);
 		TAKE_ICI;
-		standard_irq_callback(M6801_TIN_LINE);
 	}
 	else if ((m_tcsr & (TCSR_EOCI|TCSR_OCF)) == (TCSR_EOCI|TCSR_OCF) ||
 				(m_tcsr2 & (TCSR2_EOCI2|TCSR2_OCF2)) == (TCSR2_EOCI2|TCSR2_OCF2))
@@ -452,8 +452,8 @@ void hd6301y_cpu_device::m6800_check_irq2()
 {
 	if ((m_p6csr & 0xc0) == 0xc0)
 	{
+		standard_irq_callback(M6801_IS_LINE, m_pc.w.l);
 		TAKE_ISI;
-		standard_irq_callback(M6801_IS_LINE);
 	}
 	else
 		hd6301x_cpu_device::m6800_check_irq2();
@@ -970,8 +970,6 @@ void m6801_cpu_device::execute_set_input(int irqline, int state)
 			}
 		}
 		m_sc1_state = ASSERT_LINE == state;
-		if (CLEAR_LINE != state)
-			standard_irq_callback(M6801_SC1_LINE); // re-entrant - do it after setting m_sc1_state
 		break;
 
 	case M6801_TIN_LINE:

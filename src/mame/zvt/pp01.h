@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_PP01_H
-#define MAME_INCLUDES_PP01_H
+#ifndef MAME_ZVT_PP01_H
+#define MAME_ZVT_PP01_H
 
 #pragma once
 
@@ -88,4 +88,4 @@ private:
 	required_ioport_array<17> m_io_keyboard;
 };
 
-#endif // MAME_INCLUDES_PP01_H
+#endif // MAME_ZVT_PP01_H

@@ -37,6 +37,8 @@ Very likely to be 'whatever crystals we had on hand which were close enough for 
 #include "tilemap.h"
 
 
+namespace {
+
 class silvmil_state : public driver_device
 {
 public:
@@ -582,6 +584,8 @@ ROM_START( puzzlovek )
 	ROM_LOAD16_BYTE( "7.u55", 0x100000, 0x80000, CRC(a4c73b48) SHA1(9f26af7b961c96cfd1c45f85f1d6dc4f364e3541) ) // sldh
 	ROM_LOAD16_BYTE( "8.u56", 0x100001, 0x80000, CRC(95b5f049) SHA1(1104dac1fbf6a894b7d8294b3f44a0edbf363157) ) // sldh
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1995, silvmil,    0,        silvmil,   silvmil,   silvmil_state, empty_init, ROT270, "Para", "Silver Millennium", MACHINE_SUPPORTS_SAVE )

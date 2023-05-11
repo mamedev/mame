@@ -5,8 +5,8 @@
     Atari "Stella on Steroids" hardware
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_BEATHEAD_H
-#define MAME_INCLUDES_BEATHEAD_H
+#ifndef MAME_ATARI_BEATHEAD_H
+#define MAME_ATARI_BEATHEAD_H
 
 #pragma once
 
@@ -89,4 +89,4 @@ private:
 	uint8_t           m_irq_state[3]{};
 };
 
-#endif // MAME_INCLUDES_BEATHEAD_H
+#endif // MAME_ATARI_BEATHEAD_H

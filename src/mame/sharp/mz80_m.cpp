@@ -28,12 +28,10 @@ void mz80_state::machine_reset()
 
 uint8_t mz80_state::mz80k_8255_portb_r()
 {
-	char kbdrow[8];
-	sprintf(kbdrow,"LINE%d", m_mz80k_keyboard_line);
-	if (m_mz80k_keyboard_line > 9)
-		return 0xff;
+	if (m_mz80k_keyboard_line < 10)
+		return m_keyboard[m_mz80k_keyboard_line]->read();
 	else
-		return ioport(kbdrow)->read();
+		return 0xff;
 }
 
 uint8_t mz80_state::mz80k_8255_portc_r()

@@ -108,11 +108,11 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float r = tex2D(DiffuseSampler, float2(Input.TexCoordX.x, Input.TexCoordY.x)).r;
-	float g = tex2D(DiffuseSampler, float2(Input.TexCoordX.y, Input.TexCoordY.y)).g;
-	float b = tex2D(DiffuseSampler, float2(Input.TexCoordX.z, Input.TexCoordY.z)).b;
+	float2 ra = tex2D(DiffuseSampler, float2(Input.TexCoordX.x, Input.TexCoordY.x)).ra;
+	float2 ga = tex2D(DiffuseSampler, float2(Input.TexCoordX.y, Input.TexCoordY.y)).ga;
+	float2 ba = tex2D(DiffuseSampler, float2(Input.TexCoordX.z, Input.TexCoordY.z)).ba;
 
-	return float4(r, g, b, 1.0f);
+	return float4(ra.x, ga.x, ba.x, ra.y + ga.y + ba.y);
 }
 
 //-----------------------------------------------------------------------------

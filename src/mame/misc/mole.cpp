@@ -58,6 +58,8 @@
 #include "tilemap.h"
 
 
+namespace {
+
 class mole_state : public driver_device
 {
 public:
@@ -370,6 +372,8 @@ ROM_START( mole ) // ALL ROMS ARE 2732
 	ROM_LOAD( "mda.5a", 0x4000, 0x1000, CRC(41ae1842) SHA1(afc169c3245b0946ef81e65d0b755d498ee71667) )
 	ROM_LOAD( "mba.8a", 0x5000, 0x1000, CRC(50c43fc9) SHA1(af478f3d89cd6c87f32dcdda7fabce25738c340b) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************************

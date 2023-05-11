@@ -137,6 +137,11 @@ public:
 	uint16_t cs1_r(offs_t offset, uint16_t mem_mask = 0xffff) { return internal_read_cs1(offset, mem_mask); }
 	void cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { internal_write_cs0(offset, data, mem_mask); }
 	void cs1_w(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { internal_write_cs1(offset, data, mem_mask); }
+
+	uint16_t cs0_swap_r(offs_t offset, uint16_t mem_mask = 0xffff) { return swapendian_int16(internal_read_cs0(offset, swapendian_int16(mem_mask))); }
+	uint16_t cs1_swap_r(offs_t offset, uint16_t mem_mask = 0xffff) { return swapendian_int16(internal_read_cs1(offset, swapendian_int16(mem_mask))); }
+	void cs0_swap_w(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { internal_write_cs0(offset, swapendian_int16(data), swapendian_int16(mem_mask)); }
+	void cs1_swap_w(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { internal_write_cs1(offset, swapendian_int16(data), swapendian_int16(mem_mask)); }
 };
 
 DECLARE_DEVICE_TYPE(ATA_INTERFACE, ata_interface_device)

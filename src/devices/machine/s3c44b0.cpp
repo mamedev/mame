@@ -16,6 +16,7 @@
 #include "screen.h"
 
 #include <algorithm>
+#include <cstdarg>
 
 
 #define S3C44B0_INTCON    (0x00 / 4) // Interrupt Control

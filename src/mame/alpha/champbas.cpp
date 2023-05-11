@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ernesto Corvi, Jarek Parchanski, Nicola Salmoria, hap
+// copyright-holders:Ernesto Corvi, Jarek Parchanski, Nicola Salmoria
 /***************************************************************************
 
 Talbot                     - (c) 1982 Alpha Denshi Co.
@@ -1298,7 +1298,7 @@ void exctsccr_state::init_exctsccr()
  *
  *************************************/
 
-/*    YEAR  NAME        PARENT    MACHINE     INPUT     INIT                      MONITOR COMPANY, FULLNAME, FLAGS */
+/*    YEAR  NAME        PARENT    MACHINE     INPUT     INIT                           MONITOR COMPANY, FULLNAME, FLAGS */
 GAME( 1982, talbot,     0,        talbot,     talbot,   champbas_state, empty_init,    ROT270, "Alpha Denshi Co. (Volt Electronics license)", "Talbot", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1983, champbas,   0,        champbas,   champbas, champbas_state, init_champbas, ROT0,   "Alpha Denshi Co. (Sega license)", "Champion Base Ball", MACHINE_SUPPORTS_SAVE ) // no protection

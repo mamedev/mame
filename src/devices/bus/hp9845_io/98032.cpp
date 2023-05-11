@@ -13,6 +13,7 @@
 
 #include "emu.h"
 #include "98032.h"
+#include "hp9871.h"
 #include "hp9885.h"
 
 // Debugging
@@ -94,6 +95,7 @@ void hp98032_io_card_device::device_reset()
 	m_int_en = false;
 	m_dma_en = false;
 	m_busy = true;  // Force reset
+	m_pready = false;
 	m_auto_ah = false;
 	set_busy(false);
 	update_irq();
@@ -356,6 +358,7 @@ hp98032_gpio_slot_device::hp98032_gpio_slot_device(const machine_config &mconfig
 {
 	option_reset();
 	option_add("loopback" , HP98032_GPIO_LOOPBACK);
+	option_add("hp9871" , HP9871);
 	option_add("hp9885" , HP9885);
 	set_default_option(nullptr);
 	set_fixed(false);

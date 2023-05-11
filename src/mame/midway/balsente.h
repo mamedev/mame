@@ -7,8 +7,8 @@
     driver by Aaron Giles
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_BALSENTE_H
-#define MAME_INCLUDES_BALSENTE_H
+#ifndef MAME_MIDWAY_BALSENTE_H
+#define MAME_MIDWAY_BALSENTE_H
 
 #pragma once
 
@@ -209,4 +209,4 @@ private:
 	required_memory_bank m_bankef;
 };
 
-#endif // MAME_INCLUDES_BALSENTE_H
+#endif // MAME_MIDWAY_BALSENTE_H

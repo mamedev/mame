@@ -579,8 +579,8 @@ INPUT_PORTS_END
 
 
 static GFXDECODE_START( gfx_gundealr )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,                 0, 16 ) // colors 0-255
-	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_col_2x2_group_packed_msb, 256, 16 ) // colors 256-511
+	GFXDECODE_ENTRY( "bgtiles", 0, gfx_8x8x4_packed_msb,                 0, 16 ) // colors 0-255
+	GFXDECODE_ENTRY( "fgtiles", 0, gfx_8x8x4_col_2x2_group_packed_msb, 256, 16 ) // colors 256-511
 GFXDECODE_END
 
 
@@ -726,10 +726,10 @@ ROM_START( gundealr )
 	ROM_LOAD( "1.3j",   0x00000, 0x10000, CRC(5797e830) SHA1(54bd9fbcafdf3fff55d73ecfe26d8e8df0dd55d9) ) // 27c512; NOTE: the socket is labeled 1, but the ROM has a '2' sticker on it!
 	// banked at 0x8000-0xbfff
 
-	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_REGION( 0x10000, "bgtiles", 0 )
 	ROM_LOAD( "3.6p",         0x00000, 0x10000, CRC(01f99de2) SHA1(2d9e9c50b0669811beb6fa53c0ff1b240fa939c7) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_REGION( 0x20000, "fgtiles", 0 )
 	ROM_LOAD( "2.6b",   0x00000, 0x20000, CRC(7874ec41) SHA1(2d2ff013cc37ce5966aa4b6c6724234655196102) ) // NOTE: the socket is labeled 2, but the ROM has a '1' sticker on it!
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -742,10 +742,10 @@ ROM_START( gundealra )
 	ROM_LOAD( "gundeala.1.3j",   0x00000, 0x10000, CRC(d87e24f1) SHA1(5ac3e20e5848b9cab2a23e083d2566bfd54502d4) )
 	// banked at 0x8000-0xbfff
 
-	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_REGION( 0x10000, "bgtiles", 0 )
 	ROM_LOAD( "gundeala.3.6p",   0x00000, 0x10000, CRC(836cf1a3) SHA1(ca57e7fc3e4497d249af963d1c8610e80ca65aa7) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_REGION( 0x20000, "fgtiles", 0 )
 	ROM_LOAD( "gundeala.2.6b",   0x00000, 0x20000, CRC(4b5fb53c) SHA1(3b73d9aeed334aece75f551f5b7f3cec0aedbfaa) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -758,10 +758,10 @@ ROM_START( gundealrt )
 	ROM_LOAD( "1.3j",         0x00000, 0x10000, CRC(1d951292) SHA1(a8bd34dfaf31c7dc4f9e0ec1fd7d4e10c5b29a85) )
 	// banked at 0x8000-0xbfff
 
-	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_REGION( 0x10000, "bgtiles", 0 )
 	ROM_LOAD( "3.6p",         0x00000, 0x10000, CRC(01f99de2) SHA1(2d9e9c50b0669811beb6fa53c0ff1b240fa939c7) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_REGION( 0x20000, "fgtiles", 0 )
 	ROM_LOAD( "2.6b",         0x00000, 0x20000, CRC(508ed0d0) SHA1(ea6b2d07e2e3d4f6c2a622a73b150ee7709b28de) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -780,10 +780,10 @@ ROM_START( gundealrbl ) // gfx customs done out in TTL logic, different proms, p
 	// 6d58    23       12
 	// 6d60    22       13
 
-	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_REGION( 0x10000, "bgtiles", 0 )
 	ROM_LOAD( "30.3.am27c512.d16",  0x00000, 0x10000, CRC(01f99de2) SHA1(2d9e9c50b0669811beb6fa53c0ff1b240fa939c7) ) // == gundealr "3.16d"
 
-	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_REGION( 0x20000, "fgtiles", 0 )
 	ROM_LOAD( "22.1.d27c010.a16",   0x00000, 0x20000, CRC(7874ec41) SHA1(2d2ff013cc37ce5966aa4b6c6724234655196102) ) // == gundealr "2.6b"
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -791,6 +791,19 @@ ROM_START( gundealrbl ) // gfx customs done out in TTL logic, different proms, p
 
 	ROM_REGION( 0x0400, "pals", 0 )
 	ROM_LOAD( "ep320pc.jed", 0x0000, 0x0400, NO_DUMP) // altera ep320pc on a daughterboard, undumped
+ROM_END
+
+ROM_START( gundealrbl2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gd2.512", 0x00000, 0x10000, CRC(91be1d98) SHA1(bb4814f9598c7429058b440f29b60415ee426088) ) // identical to gundealrbl but for a small patch at 0x607c
+
+	ROM_REGION( 0x10000, "bgtiles", 0 )
+	ROM_LOAD( "gd3.512", 0x00000, 0x10000, CRC(01f99de2) SHA1(2d9e9c50b0669811beb6fa53c0ff1b240fa939c7) )
+
+	ROM_REGION( 0x20000, "fgtiles", 0 )
+	ROM_LOAD( "gd1.010", 0x00000, 0x20000, CRC(7cbb2b1e) SHA1(81b5cb64abcc820c40c42950dc8956894465452b) ) // almost identical to the original, just with the Dooyong copyright blanked
+
+	// there may be PROMs and / or PLDs but the pic is too low res to verify
 ROM_END
 
 ROM_START( yamyam ) // DY-90010001 PCB
@@ -801,10 +814,10 @@ ROM_START( yamyam ) // DY-90010001 PCB
 	ROM_REGION( 0x10000, "mcu", 0 ) // unknown 64 pin MCU at J9 with internal ROM code
 	ROM_LOAD( "mcu", 0x0000, 0x10000, NO_DUMP)
 
-	ROM_REGION( 0x10000, "gfx1", 0 ) // only gfx are different, code is the same
+	ROM_REGION( 0x10000, "bgtiles", 0 ) // only gfx are different, code is the same
 	ROM_LOAD( "b2.16d",       0x00000, 0x10000, CRC(cb4f84ee) SHA1(54319ecbd74b763757eb6d17c8f7be0705ab0714) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_REGION( 0x20000, "fgtiles", 0 )
 	ROM_LOAD( "1.16a",       0x00000, 0x20000, CRC(b122828d) SHA1(90994ba548893a2eacdd58351cfa3952f4af926a) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -819,10 +832,10 @@ ROM_START( yamyamk ) // DY-90010001 PCB
 	ROM_REGION( 0x10000, "mcu", 0 ) // unknown 64 pin MCU at J9 with internal ROM code
 	ROM_LOAD( "mcu", 0x0000, 0x10000, NO_DUMP)
 
-	ROM_REGION( 0x10000, "gfx1", 0 ) // only gfx are different, code is the same
+	ROM_REGION( 0x10000, "bgtiles", 0 ) // only gfx are different, code is the same
 	ROM_LOAD( "2.16d",       0x00000, 0x10000, CRC(dc9691d8) SHA1(118a05a1c94020d6739ed8c805c61b8ab003b6af) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_REGION( 0x20000, "fgtiles", 0 )
 	ROM_LOAD( "1.16a",       0x00000, 0x20000, CRC(b122828d) SHA1(90994ba548893a2eacdd58351cfa3952f4af926a) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -837,10 +850,10 @@ ROM_START( wiseguy ) // DY-90010001 PCB
 	ROM_REGION( 0x10000, "mcu", 0 ) // unknown 64 pin MCU at J9 with internal ROM code
 	ROM_LOAD( "mcu", 0x0000, 0x10000, NO_DUMP)
 
-	ROM_REGION( 0x10000, "gfx1", 0 ) // only gfx are different, code is the same
+	ROM_REGION( 0x10000, "bgtiles", 0 ) // only gfx are different, code is the same
 	ROM_LOAD( "wguyb2.16d",   0x00000, 0x10000, CRC(1c684c46) SHA1(041bc500e31b02a8bf3ce4683a67de998f938ccc) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_REGION( 0x20000, "fgtiles", 0 )
 	ROM_LOAD( "1.16a",       0x00000, 0x20000, CRC(b122828d) SHA1(90994ba548893a2eacdd58351cfa3952f4af926a) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -850,11 +863,12 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1990, gundealr,   0,        gundealr,   gundealr, gundealr_state,   empty_init, ROT270, "Dooyong", "Gun Dealer",                MACHINE_SUPPORTS_SAVE )
-GAME( 1990, gundealra,  gundealr, gundealr,   gundealr, gundealr_state,   empty_init, ROT270, "Dooyong", "Gun Dealer (alt card set)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, gundealrt,  gundealr, gundealr,   gundealt, gundealr_state,   empty_init, ROT270, "Dooyong (Tecmo license)", "Gun Dealer (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, gundealrbl, gundealr, gundealrbl, gundealr, gundealr_state,   empty_init, ROT270, "Dooyong", "Gun Dealer (Yam! Yam!? hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gundealr,    0,        gundealr,   gundealr, gundealr_state,   empty_init, ROT270, "Dooyong",                 "Gun Dealer",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gundealra,   gundealr, gundealr,   gundealr, gundealr_state,   empty_init, ROT270, "Dooyong",                 "Gun Dealer (alt card set)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gundealrt,   gundealr, gundealr,   gundealt, gundealr_state,   empty_init, ROT270, "Dooyong (Tecmo license)", "Gun Dealer (Japan)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gundealrbl,  gundealr, gundealrbl, gundealr, gundealr_state,   empty_init, ROT270, "Dooyong",                 "Gun Dealer (Yam! Yam!? hardware, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gundealrbl2, gundealr, gundealrbl, gundealr, gundealr_state,   empty_init, ROT270, "Dooyong",                 "Gun Dealer (Yam! Yam!? hardware, set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, yamyam,     0,        yamyam,     yamyam,   yamyam_mcu_state, empty_init, ROT0,   "Dooyong", "Yam! Yam!?",                MACHINE_SUPPORTS_SAVE )
-GAME( 1990, yamyamk,    yamyam,   yamyam,     yamyam,   yamyam_mcu_state, empty_init, ROT0,   "Dooyong", "Yam! Yam! (Korea)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1990, wiseguy,    yamyam,   yamyam,     yamyam,   yamyam_mcu_state, empty_init, ROT0,   "Dooyong", "Wise Guy",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1990, yamyam,      0,        yamyam,     yamyam,   yamyam_mcu_state, empty_init, ROT0,   "Dooyong",                 "Yam! Yam!?",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1990, yamyamk,     yamyam,   yamyam,     yamyam,   yamyam_mcu_state, empty_init, ROT0,   "Dooyong",                 "Yam! Yam! (Korea)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1990, wiseguy,     yamyam,   yamyam,     yamyam,   yamyam_mcu_state, empty_init, ROT0,   "Dooyong",                 "Wise Guy",                                MACHINE_SUPPORTS_SAVE )

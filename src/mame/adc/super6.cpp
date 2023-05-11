@@ -233,9 +233,9 @@ void super6_state::fdc_w(uint8_t data)
 	floppy_image_device *floppy = nullptr;
 
 	if ((data & 3) == 0)
-		floppy = m_floppy0->get_device();
+		floppy = m_floppy[0]->get_device();
 	if ((data & 3) == 1)
-		floppy = m_floppy1->get_device();
+		floppy = m_floppy[1]->get_device();
 
 	m_fdc->set_floppy(floppy);
 	if (floppy) floppy->mon_w(0);
@@ -473,8 +473,8 @@ void super6_state::super6(machine_config &config)
 	m_fdc->intrq_wr_callback().set(FUNC(super6_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(super6_state::fdc_drq_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy0, super6_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, super6_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], super6_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], super6_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	Z80DART(config, m_dart, 24_MHz_XTAL / 4);
 	m_dart->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));

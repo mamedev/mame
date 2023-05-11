@@ -6,8 +6,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_K7659KB_H
-#define MAME_MACHINE_K7659KB_H
+#ifndef MAME_DDR_K7659KB_H
+#define MAME_DDR_K7659KB_H
 
 #pragma once
 
@@ -62,4 +62,4 @@ private:
 DECLARE_DEVICE_TYPE(K7659_KEYBOARD, k7659_keyboard_device)
 
 
-#endif // MAME_MACHINE_K7659KB_H
+#endif // MAME_DDR_K7659KB_H

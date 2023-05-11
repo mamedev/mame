@@ -130,7 +130,7 @@ template<bool maincpu> void eprom_state::sync_w(offs_t offset, uint16_t data, ui
 void eprom_state::main_map(address_map &map)
 {
 	map(0x000000, 0x09ffff).rom();
-	map(0x0e0000, 0x0e0fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
+	map(0x0e0000, 0x0e03ff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x160000, 0x16ffff).ram().share("share1");
 	map(0x16cc00, 0x16cc01).w(FUNC(eprom_state::sync_w<true>));
 	map(0x1f0000, 0x1fffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
@@ -156,7 +156,7 @@ void eprom_state::main_map(address_map &map)
 void eprom_state::guts_map(address_map &map)
 {
 	map(0x000000, 0x09ffff).rom();
-	map(0x0e0000, 0x0e0fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
+	map(0x0e0000, 0x0e03ff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x160000, 0x16ffff).ram().share("share1");
 	map(0x16cc00, 0x16cc01).w(FUNC(eprom_state::sync_w<true>));
 	map(0x1f0000, 0x1fffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));

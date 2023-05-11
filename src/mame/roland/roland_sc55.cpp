@@ -40,6 +40,9 @@
 #include "machine/ram.h"
 #include "cpu/h8500/h8532.h"
 
+
+namespace {
+
 static INPUT_PORTS_START( sc55 )
 INPUT_PORTS_END
 
@@ -85,5 +88,8 @@ ROM_START( sc55 )
 	ROM_LOAD( "roland-gss.b_r15209277.ic27", 0x100000, 0x100000, CRC(8dcc592a) SHA1(80e6eb130c18c09955551563f78906163c55cc11) )
 	ROM_LOAD( "roland-gss.c_r15209281.ic26", 0x200000, 0x100000, CRC(e21ebc04) SHA1(7454b817778179806f3f9d1985b3a2ef67ace76f) )
 ROM_END
+
+} // anonymous namespace
+
 
 SYST( 1991, sc55, 0, 0, sc55, sc55, sc55_state, empty_init, "Roland", "Sound Canvas SC-55", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

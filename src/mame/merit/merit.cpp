@@ -78,6 +78,9 @@ Merit Riviera Notes - There are several known versions:
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define MASTER_CLOCK            (XTAL(10'000'000))
 #define CPU_CLOCK               (MASTER_CLOCK / 4)
 #define PIXEL_CLOCK             (MASTER_CLOCK / 1)
@@ -1952,8 +1955,9 @@ ROM_START( dodgectya )
 	ROM_REGION( 0x8000, "gfx2", ROMREGION_ERASEFF )
 	/* No U40 char rom - Verified on 4 PCBs */
 
-	ROM_REGION( 0x0800, "crt209", ROMREGION_ERASEFF )
-	ROM_LOAD( "crt-209_2131-82", 0x00000, 0x0800, NO_DUMP ) /* 2816 EEPROM in Z80 epoxy CPU module */
+	ROM_REGION( 0x0800, "crt209", ROMREGION_ERASEFF ) // two dumps from two PCBs, probably the second one is the good one but loading both until it can be determined for sure
+	ROM_LOAD( "crt-209_2131-82",     0x0000, 0x0800, CRC(f73402df) SHA1(342c3516b4ba09c3f0fa6737ff4b1970662efcb9) )
+	ROM_LOAD( "crt-209_2131-82_alt", 0x0000, 0x0800, CRC(ec540d8a) SHA1(fbc64d4cc56f418bc090b47bb6798e3a90282f56) )
 ROM_END
 
 ROM_START( dodgectyb )
@@ -1968,8 +1972,9 @@ ROM_START( dodgectyb )
 	ROM_REGION( 0x8000, "gfx2", ROMREGION_ERASEFF )
 	/* No U40 char rom - Verified on 4 PCBs */
 
-	ROM_REGION( 0x0800, "crt209", ROMREGION_ERASEFF )
-	ROM_LOAD( "crt-209_2131-82", 0x00000, 0x0800, NO_DUMP ) /* 2816 EEPROM in Z80 epoxy CPU module */
+	ROM_REGION( 0x0800, "crt209", ROMREGION_ERASEFF ) // two dumps from two PCBs, probably the second one is the good one but loading both until it can be determined for sure
+	ROM_LOAD( "crt-209_2131-82",     0x0000, 0x0800, CRC(f73402df) SHA1(342c3516b4ba09c3f0fa6737ff4b1970662efcb9) )
+	ROM_LOAD( "crt-209_2131-82_alt", 0x0000, 0x0800, CRC(ec540d8a) SHA1(fbc64d4cc56f418bc090b47bb6798e3a90282f56) )
 ROM_END
 
 ROM_START( dodgectyc )
@@ -1984,8 +1989,9 @@ ROM_START( dodgectyc )
 	ROM_REGION( 0x8000, "gfx2", ROMREGION_ERASEFF )
 	/* No U40 char rom - Verified on 4 PCBs */
 
-	ROM_REGION( 0x0800, "crt209", ROMREGION_ERASEFF )
-	ROM_LOAD( "crt-209_2131-82", 0x00000, 0x0800, NO_DUMP ) /* 2816 EEPROM in Z80 epoxy CPU module */
+	ROM_REGION( 0x0800, "crt209", ROMREGION_ERASEFF ) // two dumps from two PCBs, probably the second one is the good one but loading both until it can be determined for sure
+	ROM_LOAD( "crt-209_2131-82",     0x0000, 0x0800, CRC(f73402df) SHA1(342c3516b4ba09c3f0fa6737ff4b1970662efcb9) )
+	ROM_LOAD( "crt-209_2131-82_alt", 0x0000, 0x0800, CRC(ec540d8a) SHA1(fbc64d4cc56f418bc090b47bb6798e3a90282f56) )
 ROM_END
 
 ROM_START( trvwzh )
@@ -2644,6 +2650,9 @@ void merit_state::init_dtrvwz5()
 
 	m_decryption_key = 6;
 }
+
+} // anonymous namespace
+
 
 /* Gambling type games */
 

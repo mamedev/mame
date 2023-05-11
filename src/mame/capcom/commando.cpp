@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria
+// copyright-holders: Nicola Salmoria
+
 /***************************************************************************
 
 Commando memory map (preliminary)
@@ -163,18 +164,198 @@ Notes:
 
 
 #include "emu.h"
-#include "commando.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/ymopn.h"
+#include "video/bufsprite.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
-/* Memory Maps */
+namespace {
 
-void commando_state::commando_map(address_map &map)
+class commando_state : public driver_device
+{
+public:
+	commando_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_spriteram(*this, "spriteram"),
+		m_videoram(*this, "videoram%u", 1U),
+		m_colorram(*this, "colorram%u", 1U),
+		m_decrypted_opcodes(*this, "decrypted_opcodes")
+	{ }
+
+	void init_spaceinv();
+	void init_commando();
+
+	void commando(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<buffered_spriteram8_device> m_spriteram;
+
+	// memory pointers
+	required_shared_ptr_array<uint8_t, 2> m_videoram;
+	required_shared_ptr_array<uint8_t, 2> m_colorram;
+	required_shared_ptr<uint8_t> m_decrypted_opcodes;
+
+	// video-related
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	uint8_t m_scroll_x[2]{};
+	uint8_t m_scroll_y[2]{};
+
+	template <uint8_t Which> void videoram_w(offs_t offset, uint8_t data);
+	template <uint8_t Which> void colorram_w(offs_t offset, uint8_t data);
+	void scrollx_w(offs_t offset, uint8_t data);
+	void scrolly_w(offs_t offset, uint8_t data);
+	void c804_w(uint8_t data);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void main_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map);
+	void sound_map(address_map &map);
+};
+
+
+// video
+
+template <uint8_t Which>
+void commando_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[Which][offset] = data;
+	Which ? m_fg_tilemap->mark_tile_dirty(offset) : m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+template <uint8_t Which>
+void commando_state::colorram_w(offs_t offset, uint8_t data)
+{
+	m_colorram[Which][offset] = data;
+	Which ? m_fg_tilemap->mark_tile_dirty(offset) : m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+void commando_state::scrollx_w(offs_t offset, uint8_t data)
+{
+	m_scroll_x[offset] = data;
+	m_bg_tilemap->set_scrollx(0, m_scroll_x[0] | (m_scroll_x[1] << 8));
+}
+
+void commando_state::scrolly_w(offs_t offset, uint8_t data)
+{
+	m_scroll_y[offset] = data;
+	m_bg_tilemap->set_scrolly(0, m_scroll_y[0] | (m_scroll_y[1] << 8));
+}
+
+void commando_state::c804_w(uint8_t data)
+{
+	// bits 0 and 1 are coin counters
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
+
+	// bit 4 resets the sound CPU
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+
+	// bit 7 flips screen
+	flip_screen_set(data & 0x80);
+}
+
+TILE_GET_INFO_MEMBER(commando_state::get_bg_tile_info)
+{
+	int const attr = m_colorram[0][tile_index];
+	int const code = m_videoram[0][tile_index] + ((attr & 0xc0) << 2);
+	int const color = attr & 0x0f;
+	int const flags = TILE_FLIPYX((attr & 0x30) >> 4);
+
+	tileinfo.set(1, code, color, flags);
+}
+
+TILE_GET_INFO_MEMBER(commando_state::get_fg_tile_info)
+{
+	int const attr = m_colorram[1][tile_index];
+	int const code = m_videoram[1][tile_index] + ((attr & 0xc0) << 2);
+	int const color = attr & 0x0f;
+	int const flags = TILE_FLIPYX((attr & 0x30) >> 4);
+
+	tileinfo.set(0, code, color, flags);
+}
+
+void commando_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(commando_state::get_bg_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(commando_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	m_bg_tilemap->set_scrolldx(128, 128);
+	m_bg_tilemap->set_scrolldy(6, 6);
+	m_fg_tilemap->set_scrolldx(128, 128);
+	m_fg_tilemap->set_scrolldy(6, 6);
+
+	m_fg_tilemap->set_transparent_pen(3);
+}
+
+void commando_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	uint8_t *buffered_spriteram = m_spriteram->buffer();
+
+	for (int offs = m_spriteram->bytes() - 4; offs >= 0; offs -= 4)
+	{
+		// bit 1 of attr is not used
+		int const attr = buffered_spriteram[offs + 1];
+		int const bank = (attr & 0xc0) >> 6;
+		int const code = buffered_spriteram[offs] + 256 * bank;
+		int const color = (attr & 0x30) >> 4;
+		int flipx = attr & 0x04;
+		int flipy = attr & 0x08;
+		int sx = buffered_spriteram[offs + 3] - ((attr & 0x01) << 8);
+		int sy = buffered_spriteram[offs + 2];
+
+		if (flip_screen())
+		{
+			sx = 240 - sx;
+			sy = 240 - sy;
+			flipx = !flipx;
+			flipy = !flipy;
+		}
+
+		if (bank < 3)
+			m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, code, color, flipx, flipy, sx + 128, sy + 6, 15);
+	}
+}
+
+uint32_t commando_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
+}
+
+
+// machine
+
+// Memory Maps
+
+void commando_state::main_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc000).portr("SYSTEM");
@@ -183,14 +364,14 @@ void commando_state::commando_map(address_map &map)
 	map(0xc003, 0xc003).portr("DSW1");
 	map(0xc004, 0xc004).portr("DSW2");
 	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xc804, 0xc804).w(FUNC(commando_state::commando_c804_w));
+	map(0xc804, 0xc804).w(FUNC(commando_state::c804_w));
 	// 0xc806 triggers the DMA (not emulated)
-	map(0xc808, 0xc809).w(FUNC(commando_state::commando_scrollx_w));
-	map(0xc80a, 0xc80b).w(FUNC(commando_state::commando_scrolly_w));
-	map(0xd000, 0xd3ff).ram().w(FUNC(commando_state::commando_videoram2_w)).share("videoram2");
-	map(0xd400, 0xd7ff).ram().w(FUNC(commando_state::commando_colorram2_w)).share("colorram2");
-	map(0xd800, 0xdbff).ram().w(FUNC(commando_state::commando_videoram_w)).share("videoram");
-	map(0xdc00, 0xdfff).ram().w(FUNC(commando_state::commando_colorram_w)).share("colorram");
+	map(0xc808, 0xc809).w(FUNC(commando_state::scrollx_w));
+	map(0xc80a, 0xc80b).w(FUNC(commando_state::scrolly_w));
+	map(0xd000, 0xd3ff).ram().w(FUNC(commando_state::videoram_w<1>)).share(m_videoram[1]);
+	map(0xd400, 0xd7ff).ram().w(FUNC(commando_state::colorram_w<1>)).share(m_colorram[1]);
+	map(0xd800, 0xdbff).ram().w(FUNC(commando_state::videoram_w<0>)).share(m_videoram[0]);
+	map(0xdc00, 0xdfff).ram().w(FUNC(commando_state::colorram_w<0>)).share(m_colorram[0]);
 	map(0xe000, 0xfdff).ram();
 	map(0xfe00, 0xff7f).ram().share("spriteram");
 	map(0xff80, 0xffff).ram();
@@ -198,7 +379,7 @@ void commando_state::commando_map(address_map &map)
 
 void commando_state::decrypted_opcodes_map(address_map &map)
 {
-	map(0x0000, 0xbfff).rom().share("decrypted_opcodes");
+	map(0x0000, 0xbfff).rom().share(m_decrypted_opcodes);
 }
 
 void commando_state::sound_map(address_map &map)
@@ -210,7 +391,7 @@ void commando_state::sound_map(address_map &map)
 	map(0x8002, 0x8003).w("ym2", FUNC(ym2203_device::write));
 }
 
-/* Input Ports */
+// Input Ports
 
 static INPUT_PORTS_START( commando )
 	PORT_START("SYSTEM")
@@ -332,23 +513,15 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-/* Graphics Decode Information */
+// Graphics Decode Information
 
 static GFXDECODE_START( gfx_commando )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   192, 16 ) // colors 192-255
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,     0, 16 ) // colors   0-127
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 128,  4 ) // colors 128-191
+	GFXDECODE_ENTRY( "chars",   0, charlayout,   192, 16 ) // colors 192-255
+	GFXDECODE_ENTRY( "tiles",   0, tilelayout,     0, 16 ) // colors   0-127
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 128,  4 ) // colors 128-191
 GFXDECODE_END
 
-/* Sound Interface */
-
-#define XTAL        12000000
-#define PHI_B       XTAL/2/2
-#define PHI_MAIN    XTAL/2/2 // As seen in the schematics:
-// the signal goes into a bus arbitrion logic that doesn't affect its frequency
-// although the CPU gets slowed down when accessing char/background memories
-
-/* Interrupt Generator */
+// Interrupt Generator
 
 WRITE_LINE_MEMBER(commando_state::vblank_irq)
 {
@@ -356,7 +529,7 @@ WRITE_LINE_MEMBER(commando_state::vblank_irq)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); // Z80 - RST 10h - VBLANK
 }
 
-/* Machine Driver */
+// Machine Driver
 
 void commando_state::machine_start()
 {
@@ -375,19 +548,25 @@ void commando_state::machine_reset()
 
 void commando_state::commando(machine_config &config)
 {
-	/* basic machine hardware */
+	static constexpr XTAL MAIN = 12_MHz_XTAL;
+	static constexpr XTAL PHI_B = MAIN / 2 / 2;
+	static constexpr XTAL PHI_MAIN = MAIN / 2 / 2; // As seen in the schematics:
+// the signal goes into a bus arbitration logic that doesn't affect its frequency
+// although the CPU gets slowed down when accessing char/background memories
+
+	// basic machine hardware
 	Z80(config, m_maincpu, PHI_MAIN);  // 3 MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &commando_state::commando_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &commando_state::main_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &commando_state::decrypted_opcodes_map);
 
 	Z80(config, m_audiocpu, PHI_B);    // 3 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &commando_state::sound_map);
 	m_audiocpu->set_periodic_int(FUNC(commando_state::irq0_line_hold), attotime::from_hz(4*60));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL / 2, 384, 128, 0, 262, 22, 246);    // hsync is 50..77, vsync is 257..259
-	screen.set_screen_update(FUNC(commando_state::screen_update_commando));
+	screen.set_raw(MAIN / 2, 384, 128, 0, 262, 22, 246);    // hsync is 50..77, vsync is 257..259
+	screen.set_screen_update(FUNC(commando_state::screen_update));
 	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.screen_vblank().append(FUNC(commando_state::vblank_irq));
 	screen.set_palette(m_palette);
@@ -397,18 +576,18 @@ void commando_state::commando(machine_config &config)
 
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2203(config, "ym1", PHI_B/2).add_route(ALL_OUTPUTS, "mono", 0.15);
+	YM2203(config, "ym1", PHI_B / 2).add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	YM2203(config, "ym2", PHI_B/2).add_route(ALL_OUTPUTS, "mono", 0.15);
+	YM2203(config, "ym2", PHI_B / 2).add_route(ALL_OUTPUTS, "mono", 0.15);
 }
 
 
-/* ROMs */
+// ROMs
 
 ROM_START( commando )
 	ROM_REGION( 0xc000, "maincpu", 0 )
@@ -418,19 +597,19 @@ ROM_START( commando )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "cm02.9f",  0x0000, 0x4000, CRC(f9cc4a74) SHA1(ee8dd73919c6f47f62cc6d999de9510db9f79b8f) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "vt01.5d",  0x0000, 0x4000, CRC(505726e0) SHA1(2435c87c9c9d78a6e703cf0e1f6a0288207fcd4c) )    // characters
+	ROM_REGION( 0x4000, "chars", 0 )
+	ROM_LOAD( "vt01.5d",  0x0000, 0x4000, CRC(505726e0) SHA1(2435c87c9c9d78a6e703cf0e1f6a0288207fcd4c) )
 
-	ROM_REGION( 0x18000, "gfx2", 0 )
-	ROM_LOAD( "vt11.5a",  0x00000, 0x4000, CRC(7b2e1b48) SHA1(5d49e1d8146e4ef744445b68f35677302e875a85) )   // SCR X (tiles)
+	ROM_REGION( 0x18000, "tiles", 0 )
+	ROM_LOAD( "vt11.5a",  0x00000, 0x4000, CRC(7b2e1b48) SHA1(5d49e1d8146e4ef744445b68f35677302e875a85) )   // SCR X
 	ROM_LOAD( "vt12.6a",  0x04000, 0x4000, CRC(81b417d3) SHA1(5ec7e3f0c8069384a5f6eb39232c228b9d7b8c0c) )   // SCR X
 	ROM_LOAD( "vt13.7a",  0x08000, 0x4000, CRC(5612dbd2) SHA1(9e4e1a22b6cbf60607b9a81dae34482ae55f7c47) )   // SCR Y
 	ROM_LOAD( "vt14.8a",  0x0c000, 0x4000, CRC(2b2dee36) SHA1(8792278464fa3da47176582025f6673a15a581e2) )   // SCR Y
 	ROM_LOAD( "vt15.9a",  0x10000, 0x4000, CRC(de70babf) SHA1(6717e23baf55f84d3143fb432140a7c3e102ac26) )   // SCR Z
 	ROM_LOAD( "vt16.10a", 0x14000, 0x4000, CRC(14178237) SHA1(f896e71c7004349c9a46155edfd9f0aaa186065d) )   // SCR Z
 
-	ROM_REGION( 0x18000, "gfx3", 0 )
-	ROM_LOAD( "vt05.7e",  0x00000, 0x4000, CRC(79f16e3d) SHA1(04e1f03a4d6b4cc2b81bce3a290bbb95de900d35) )   // sprites
+	ROM_REGION( 0x18000, "sprites", 0 )
+	ROM_LOAD( "vt05.7e",  0x00000, 0x4000, CRC(79f16e3d) SHA1(04e1f03a4d6b4cc2b81bce3a290bbb95de900d35) )
 	ROM_LOAD( "vt06.8e",  0x04000, 0x4000, CRC(26fee521) SHA1(2fbfc73ee860f72a20229a01d4da9f5cc2e858d3) )
 	ROM_LOAD( "vt07.9e",  0x08000, 0x4000, CRC(ca88bdfd) SHA1(548b05460bc7983cc81f15c70e87f47d10db2812) )
 	ROM_LOAD( "vt08.7h",  0x0c000, 0x4000, CRC(2019c883) SHA1(883c0156ceab99f4849fe36972c4162b4ac8c216) )
@@ -438,12 +617,12 @@ ROM_START( commando )
 	ROM_LOAD( "vt10.9h",  0x14000, 0x4000, CRC(f069d2f8) SHA1(2c92300a9407470b34965021de882f1f7a84730c) )
 
 	ROM_REGION( 0x600, "proms", 0 )
-	ROM_LOAD( "vtb1.1d",  0x0000, 0x0100, CRC(3aba15a1) SHA1(8b057f6e26155dd9e48bde182e680fce4519f600) )    /* red */
-	ROM_LOAD( "vtb2.2d",  0x0100, 0x0100, CRC(88865754) SHA1(ca6dddca98baf00a65b2fb70b69cf4704ef8c831) )    /* green */
-	ROM_LOAD( "vtb3.3d",  0x0200, 0x0100, CRC(4c14c3f6) SHA1(644ac17c7413f094ec9a15cba87bbd421b26321f) )    /* blue */
-	ROM_LOAD( "vtb4.1h",  0x0300, 0x0100, CRC(b388c246) SHA1(038f9851699331ad887b6281a9df053dca3db8fd) )    /* palette selector (not used) */
-	ROM_LOAD( "vtb5.6l",  0x0400, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing (not used) */
-	ROM_LOAD( "vtb6.6e",  0x0500, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )    /* video timing (not used) */
+	ROM_LOAD( "vtb1.1d",  0x0000, 0x0100, CRC(3aba15a1) SHA1(8b057f6e26155dd9e48bde182e680fce4519f600) )    // red
+	ROM_LOAD( "vtb2.2d",  0x0100, 0x0100, CRC(88865754) SHA1(ca6dddca98baf00a65b2fb70b69cf4704ef8c831) )    // green
+	ROM_LOAD( "vtb3.3d",  0x0200, 0x0100, CRC(4c14c3f6) SHA1(644ac17c7413f094ec9a15cba87bbd421b26321f) )    // blue
+	ROM_LOAD( "vtb4.1h",  0x0300, 0x0100, CRC(b388c246) SHA1(038f9851699331ad887b6281a9df053dca3db8fd) )    // palette selector (not used)
+	ROM_LOAD( "vtb5.6l",  0x0400, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    // interrupt timing (not used)
+	ROM_LOAD( "vtb6.6e",  0x0500, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )    // video timing (not used)
 ROM_END
 
 ROM_START( commandou )
@@ -454,19 +633,19 @@ ROM_START( commandou )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "cm02.9f",  0x0000, 0x4000, CRC(f9cc4a74) SHA1(ee8dd73919c6f47f62cc6d999de9510db9f79b8f) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "vt01.5d",  0x0000, 0x4000, CRC(505726e0) SHA1(2435c87c9c9d78a6e703cf0e1f6a0288207fcd4c) )    // characters
+	ROM_REGION( 0x4000, "chars", 0 )
+	ROM_LOAD( "vt01.5d",  0x0000, 0x4000, CRC(505726e0) SHA1(2435c87c9c9d78a6e703cf0e1f6a0288207fcd4c) )
 
-	ROM_REGION( 0x18000, "gfx2", 0 )
-	ROM_LOAD( "vt11.5a",  0x00000, 0x4000, CRC(7b2e1b48) SHA1(5d49e1d8146e4ef744445b68f35677302e875a85) )   // SCR X (tiles)
+	ROM_REGION( 0x18000, "tiles", 0 )
+	ROM_LOAD( "vt11.5a",  0x00000, 0x4000, CRC(7b2e1b48) SHA1(5d49e1d8146e4ef744445b68f35677302e875a85) )   // SCR X
 	ROM_LOAD( "vt12.6a",  0x04000, 0x4000, CRC(81b417d3) SHA1(5ec7e3f0c8069384a5f6eb39232c228b9d7b8c0c) )   // SCR X
 	ROM_LOAD( "vt13.7a",  0x08000, 0x4000, CRC(5612dbd2) SHA1(9e4e1a22b6cbf60607b9a81dae34482ae55f7c47) )   // SCR Y
 	ROM_LOAD( "vt14.8a",  0x0c000, 0x4000, CRC(2b2dee36) SHA1(8792278464fa3da47176582025f6673a15a581e2) )   // SCR Y
 	ROM_LOAD( "vt15.9a",  0x10000, 0x4000, CRC(de70babf) SHA1(6717e23baf55f84d3143fb432140a7c3e102ac26) )   // SCR Z
 	ROM_LOAD( "vt16.10a", 0x14000, 0x4000, CRC(14178237) SHA1(f896e71c7004349c9a46155edfd9f0aaa186065d) )   // SCR Z
 
-	ROM_REGION( 0x18000, "gfx3", 0 )
-	ROM_LOAD( "vt05.7e",  0x00000, 0x4000, CRC(79f16e3d) SHA1(04e1f03a4d6b4cc2b81bce3a290bbb95de900d35) )   // sprites
+	ROM_REGION( 0x18000, "sprites", 0 )
+	ROM_LOAD( "vt05.7e",  0x00000, 0x4000, CRC(79f16e3d) SHA1(04e1f03a4d6b4cc2b81bce3a290bbb95de900d35) )
 	ROM_LOAD( "vt06.8e",  0x04000, 0x4000, CRC(26fee521) SHA1(2fbfc73ee860f72a20229a01d4da9f5cc2e858d3) )
 	ROM_LOAD( "vt07.9e",  0x08000, 0x4000, CRC(ca88bdfd) SHA1(548b05460bc7983cc81f15c70e87f47d10db2812) )
 	ROM_LOAD( "vt08.7h",  0x0c000, 0x4000, CRC(2019c883) SHA1(883c0156ceab99f4849fe36972c4162b4ac8c216) )
@@ -474,12 +653,12 @@ ROM_START( commandou )
 	ROM_LOAD( "vt10.9h",  0x14000, 0x4000, CRC(f069d2f8) SHA1(2c92300a9407470b34965021de882f1f7a84730c) )
 
 	ROM_REGION( 0x600, "proms", 0 )
-	ROM_LOAD( "vtb1.1d",  0x0000, 0x0100, CRC(3aba15a1) SHA1(8b057f6e26155dd9e48bde182e680fce4519f600) )    /* red */
-	ROM_LOAD( "vtb2.2d",  0x0100, 0x0100, CRC(88865754) SHA1(ca6dddca98baf00a65b2fb70b69cf4704ef8c831) )    /* green */
-	ROM_LOAD( "vtb3.3d",  0x0200, 0x0100, CRC(4c14c3f6) SHA1(644ac17c7413f094ec9a15cba87bbd421b26321f) )    /* blue */
-	ROM_LOAD( "vtb4.1h",  0x0300, 0x0100, CRC(b388c246) SHA1(038f9851699331ad887b6281a9df053dca3db8fd) )    /* palette selector (not used) */
-	ROM_LOAD( "vtb5.6l",  0x0400, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing (not used) */
-	ROM_LOAD( "vtb6.6e",  0x0500, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )    /* video timing (not used) */
+	ROM_LOAD( "vtb1.1d",  0x0000, 0x0100, CRC(3aba15a1) SHA1(8b057f6e26155dd9e48bde182e680fce4519f600) )    // red
+	ROM_LOAD( "vtb2.2d",  0x0100, 0x0100, CRC(88865754) SHA1(ca6dddca98baf00a65b2fb70b69cf4704ef8c831) )    // green
+	ROM_LOAD( "vtb3.3d",  0x0200, 0x0100, CRC(4c14c3f6) SHA1(644ac17c7413f094ec9a15cba87bbd421b26321f) )    // blue
+	ROM_LOAD( "vtb4.1h",  0x0300, 0x0100, CRC(b388c246) SHA1(038f9851699331ad887b6281a9df053dca3db8fd) )    // palette selector (not used)
+	ROM_LOAD( "vtb5.6l",  0x0400, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    // interrupt timing (not used)
+	ROM_LOAD( "vtb6.6e",  0x0500, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )    // video timing (not used)
 ROM_END
 
 ROM_START( commandoj )
@@ -490,19 +669,19 @@ ROM_START( commandoj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "so02.9f", 0x0000, 0x4000, CRC(ca20aca5) SHA1(206a8fd4a8985e7ceed7de8349ba02627e881503) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "vt01.5d",  0x0000, 0x4000, CRC(505726e0) SHA1(2435c87c9c9d78a6e703cf0e1f6a0288207fcd4c) )    // characters
+	ROM_REGION( 0x4000, "chars", 0 )
+	ROM_LOAD( "vt01.5d",  0x0000, 0x4000, CRC(505726e0) SHA1(2435c87c9c9d78a6e703cf0e1f6a0288207fcd4c) )
 
-	ROM_REGION( 0x18000, "gfx2", 0 )
-	ROM_LOAD( "vt11.5a",  0x00000, 0x4000, CRC(7b2e1b48) SHA1(5d49e1d8146e4ef744445b68f35677302e875a85) )   // SCR X (tiles)
+	ROM_REGION( 0x18000, "tiles", 0 )
+	ROM_LOAD( "vt11.5a",  0x00000, 0x4000, CRC(7b2e1b48) SHA1(5d49e1d8146e4ef744445b68f35677302e875a85) )   // SCR X
 	ROM_LOAD( "vt12.6a",  0x04000, 0x4000, CRC(81b417d3) SHA1(5ec7e3f0c8069384a5f6eb39232c228b9d7b8c0c) )   // SCR X
 	ROM_LOAD( "vt13.7a",  0x08000, 0x4000, CRC(5612dbd2) SHA1(9e4e1a22b6cbf60607b9a81dae34482ae55f7c47) )   // SCR Y
 	ROM_LOAD( "vt14.8a",  0x0c000, 0x4000, CRC(2b2dee36) SHA1(8792278464fa3da47176582025f6673a15a581e2) )   // SCR Y
 	ROM_LOAD( "vt15.9a",  0x10000, 0x4000, CRC(de70babf) SHA1(6717e23baf55f84d3143fb432140a7c3e102ac26) )   // SCR Z
 	ROM_LOAD( "vt16.10a", 0x14000, 0x4000, CRC(14178237) SHA1(f896e71c7004349c9a46155edfd9f0aaa186065d) )   // SCR Z
 
-	ROM_REGION( 0x18000, "gfx3", 0 )
-	ROM_LOAD( "vt05.7e",  0x00000, 0x4000, CRC(79f16e3d) SHA1(04e1f03a4d6b4cc2b81bce3a290bbb95de900d35) )   // sprites
+	ROM_REGION( 0x18000, "sprites", 0 )
+	ROM_LOAD( "vt05.7e",  0x00000, 0x4000, CRC(79f16e3d) SHA1(04e1f03a4d6b4cc2b81bce3a290bbb95de900d35) )
 	ROM_LOAD( "vt06.8e",  0x04000, 0x4000, CRC(26fee521) SHA1(2fbfc73ee860f72a20229a01d4da9f5cc2e858d3) )
 	ROM_LOAD( "vt07.9e",  0x08000, 0x4000, CRC(ca88bdfd) SHA1(548b05460bc7983cc81f15c70e87f47d10db2812) )
 	ROM_LOAD( "vt08.7h",  0x0c000, 0x4000, CRC(2019c883) SHA1(883c0156ceab99f4849fe36972c4162b4ac8c216) )
@@ -510,12 +689,12 @@ ROM_START( commandoj )
 	ROM_LOAD( "vt10.9h",  0x14000, 0x4000, CRC(f069d2f8) SHA1(2c92300a9407470b34965021de882f1f7a84730c) )
 
 	ROM_REGION( 0x600, "proms", 0 )
-	ROM_LOAD( "vtb1.1d",  0x0000, 0x0100, CRC(3aba15a1) SHA1(8b057f6e26155dd9e48bde182e680fce4519f600) )    /* red */
-	ROM_LOAD( "vtb2.2d",  0x0100, 0x0100, CRC(88865754) SHA1(ca6dddca98baf00a65b2fb70b69cf4704ef8c831) )    /* green */
-	ROM_LOAD( "vtb3.3d",  0x0200, 0x0100, CRC(4c14c3f6) SHA1(644ac17c7413f094ec9a15cba87bbd421b26321f) )    /* blue */
-	ROM_LOAD( "vtb4.1h",  0x0300, 0x0100, CRC(b388c246) SHA1(038f9851699331ad887b6281a9df053dca3db8fd) )    /* palette selector (not used) */
-	ROM_LOAD( "vtb5.6l",  0x0400, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing (not used) */
-	ROM_LOAD( "vtb6.6e",  0x0500, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )    /* video timing (not used) */
+	ROM_LOAD( "vtb1.1d",  0x0000, 0x0100, CRC(3aba15a1) SHA1(8b057f6e26155dd9e48bde182e680fce4519f600) )    // red
+	ROM_LOAD( "vtb2.2d",  0x0100, 0x0100, CRC(88865754) SHA1(ca6dddca98baf00a65b2fb70b69cf4704ef8c831) )    // green
+	ROM_LOAD( "vtb3.3d",  0x0200, 0x0100, CRC(4c14c3f6) SHA1(644ac17c7413f094ec9a15cba87bbd421b26321f) )    // blue
+	ROM_LOAD( "vtb4.1h",  0x0300, 0x0100, CRC(b388c246) SHA1(038f9851699331ad887b6281a9df053dca3db8fd) )    // palette selector (not used)
+	ROM_LOAD( "vtb5.6l",  0x0400, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    // interrupt timing (not used)
+	ROM_LOAD( "vtb6.6e",  0x0500, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )    // video timing (not used)
 ROM_END
 
 ROM_START( commandob )
@@ -526,40 +705,40 @@ ROM_START( commandob )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "cm02.9f",  0x0000, 0x4000, CRC(f9cc4a74) SHA1(ee8dd73919c6f47f62cc6d999de9510db9f79b8f) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "vt01.5d",  0x0000, 0x4000, CRC(505726e0) SHA1(2435c87c9c9d78a6e703cf0e1f6a0288207fcd4c) )    // characters
+	ROM_REGION( 0x4000, "chars", 0 )
+	ROM_LOAD( "vt01.5d",  0x0000, 0x4000, CRC(505726e0) SHA1(2435c87c9c9d78a6e703cf0e1f6a0288207fcd4c) )
 
-	ROM_REGION( 0x18000, "gfx2", 0 )
-	ROM_LOAD( "vt11.5a",  0x00000, 0x4000, CRC(7b2e1b48) SHA1(5d49e1d8146e4ef744445b68f35677302e875a85) )   // SCR X (tiles)
+	ROM_REGION( 0x18000, "tiles", 0 )
+	ROM_LOAD( "vt11.5a",  0x00000, 0x4000, CRC(7b2e1b48) SHA1(5d49e1d8146e4ef744445b68f35677302e875a85) )   // SCR X
 	ROM_LOAD( "vt12.6a",  0x04000, 0x4000, CRC(81b417d3) SHA1(5ec7e3f0c8069384a5f6eb39232c228b9d7b8c0c) )   // SCR X
 	ROM_LOAD( "vt13.7a",  0x08000, 0x4000, CRC(5612dbd2) SHA1(9e4e1a22b6cbf60607b9a81dae34482ae55f7c47) )   // SCR Y
 	ROM_LOAD( "vt14.8a",  0x0c000, 0x4000, CRC(2b2dee36) SHA1(8792278464fa3da47176582025f6673a15a581e2) )   // SCR Y
 	ROM_LOAD( "vt15.9a",  0x10000, 0x4000, CRC(de70babf) SHA1(6717e23baf55f84d3143fb432140a7c3e102ac26) )   // SCR Z
 	ROM_LOAD( "vt16.10a", 0x14000, 0x4000, CRC(14178237) SHA1(f896e71c7004349c9a46155edfd9f0aaa186065d) )   // SCR Z
 
-	ROM_REGION( 0x18000, "gfx3", 0 )
-	ROM_LOAD( "vt05.7e",  0x00000, 0x4000, CRC(79f16e3d) SHA1(04e1f03a4d6b4cc2b81bce3a290bbb95de900d35) )   // sprites
+	ROM_REGION( 0x18000, "sprites", 0 )
+	ROM_LOAD( "vt05.7e",  0x00000, 0x4000, CRC(79f16e3d) SHA1(04e1f03a4d6b4cc2b81bce3a290bbb95de900d35) )
 	ROM_LOAD( "vt06.8e",  0x04000, 0x4000, CRC(26fee521) SHA1(2fbfc73ee860f72a20229a01d4da9f5cc2e858d3) )
 	ROM_LOAD( "vt07.9e",  0x08000, 0x4000, CRC(ca88bdfd) SHA1(548b05460bc7983cc81f15c70e87f47d10db2812) )
 	ROM_LOAD( "vt08.7h",  0x0c000, 0x4000, CRC(2019c883) SHA1(883c0156ceab99f4849fe36972c4162b4ac8c216) )
 	ROM_LOAD( "vt09.8h",  0x10000, 0x4000, CRC(98703982) SHA1(ba9a9b0dcadd4f52502828408c4a19b0bd518351) )
 	ROM_LOAD( "vt10.9h",  0x14000, 0x4000, CRC(f069d2f8) SHA1(2c92300a9407470b34965021de882f1f7a84730c) )
 
-		/* I did not dumped the PROMs of the bootleg board, I'm just adding the parent ones, it has the same
+		/* I did not dump the PROMs of the bootleg board, I'm just adding the parent ones, it has the same
 		   number of PROMs on the same board locations as the original board. */
 	ROM_REGION( 0x600, "proms", 0 )
-	ROM_LOAD( "vtb1.1d",  0x0000, 0x0100, CRC(3aba15a1) SHA1(8b057f6e26155dd9e48bde182e680fce4519f600) )    /* red */
-	ROM_LOAD( "vtb2.2d",  0x0100, 0x0100, CRC(88865754) SHA1(ca6dddca98baf00a65b2fb70b69cf4704ef8c831) )    /* green */
-	ROM_LOAD( "vtb3.3d",  0x0200, 0x0100, CRC(4c14c3f6) SHA1(644ac17c7413f094ec9a15cba87bbd421b26321f) )    /* blue */
-	ROM_LOAD( "vtb4.1h",  0x0300, 0x0100, CRC(b388c246) SHA1(038f9851699331ad887b6281a9df053dca3db8fd) )    /* palette selector (not used) */
-	ROM_LOAD( "vtb5.6l",  0x0400, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing (not used) */
-	ROM_LOAD( "vtb6.6e",  0x0500, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )    /* video timing (not used) */
+	ROM_LOAD( "vtb1.1d",  0x0000, 0x0100, CRC(3aba15a1) SHA1(8b057f6e26155dd9e48bde182e680fce4519f600) )    // red
+	ROM_LOAD( "vtb2.2d",  0x0100, 0x0100, CRC(88865754) SHA1(ca6dddca98baf00a65b2fb70b69cf4704ef8c831) )    // green
+	ROM_LOAD( "vtb3.3d",  0x0200, 0x0100, CRC(4c14c3f6) SHA1(644ac17c7413f094ec9a15cba87bbd421b26321f) )    // blue
+	ROM_LOAD( "vtb4.1h",  0x0300, 0x0100, CRC(b388c246) SHA1(038f9851699331ad887b6281a9df053dca3db8fd) )    // palette selector (not used)
+	ROM_LOAD( "vtb5.6l",  0x0400, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    // interrupt timing (not used)
+	ROM_LOAD( "vtb6.6e",  0x0500, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )    // video timing (not used)
 
 		/* There's a 16L8A PAL (with a 74LS244P and a 74LS367AP) on a tiny sub-board between the CPU1 ROMs
 		   and the CPU1 (a Z80 compatible NEC D780C-1). This sub-board is plugged on what seems to be
 		   a ROM socket. */
 	ROM_REGION( 0x0200, "plds", 0 )
-	ROM_LOAD( "commandob_pal16l8a.bin", 0x0000, 0x0104, NO_DUMP ) /* I Didn't try to dump it... */
+	ROM_LOAD( "commandob_pal16l8a.bin", 0x0000, 0x0104, NO_DUMP ) // I Didn't try to dump it...
 ROM_END
 
 ROM_START( commandob2 )
@@ -570,34 +749,34 @@ ROM_START( commandob2 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "8,so02.9f",  0x0000, 0x4000, CRC(ca20aca5) SHA1(206a8fd4a8985e7ceed7de8349ba02627e881503) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "7,vt01.5d",  0x0000, 0x4000, CRC(505726e0) SHA1(2435c87c9c9d78a6e703cf0e1f6a0288207fcd4c) )    // characters
+	ROM_REGION( 0x4000, "chars", 0 )
+	ROM_LOAD( "7,vt01.5d",  0x0000, 0x4000, CRC(505726e0) SHA1(2435c87c9c9d78a6e703cf0e1f6a0288207fcd4c) )
 
-	ROM_REGION( 0x18000, "gfx2", 0 )
-	ROM_LOAD( "17,vt11.5a",  0x00000, 0x4000, CRC(7b2e1b48) SHA1(5d49e1d8146e4ef744445b68f35677302e875a85) )   // SCR X (tiles)
+	ROM_REGION( 0x18000, "tiles", 0 )
+	ROM_LOAD( "17,vt11.5a",  0x00000, 0x4000, CRC(7b2e1b48) SHA1(5d49e1d8146e4ef744445b68f35677302e875a85) )   // SCR X
 	ROM_LOAD( "16,vt12.6a",  0x04000, 0x4000, CRC(81b417d3) SHA1(5ec7e3f0c8069384a5f6eb39232c228b9d7b8c0c) )   // SCR X
 	ROM_LOAD( "15,vt13.7a",  0x08000, 0x4000, CRC(5612dbd2) SHA1(9e4e1a22b6cbf60607b9a81dae34482ae55f7c47) )   // SCR Y
 	ROM_LOAD( "14,vt14.8a",  0x0c000, 0x4000, CRC(2b2dee36) SHA1(8792278464fa3da47176582025f6673a15a581e2) )   // SCR Y
 	ROM_LOAD( "13,vt15.9a",  0x10000, 0x4000, CRC(de70babf) SHA1(6717e23baf55f84d3143fb432140a7c3e102ac26) )   // SCR Z
 	ROM_LOAD( "12,vt16.10a", 0x14000, 0x4000, CRC(14178237) SHA1(f896e71c7004349c9a46155edfd9f0aaa186065d) )   // SCR Z
 
-	ROM_REGION( 0x18000, "gfx3", 0 )
-	ROM_LOAD( "3,vt05.7e",  0x00000, 0x4000, CRC(79f16e3d) SHA1(04e1f03a4d6b4cc2b81bce3a290bbb95de900d35) )   // sprites
+	ROM_REGION( 0x18000, "sprites", 0 )
+	ROM_LOAD( "3,vt05.7e",  0x00000, 0x4000, CRC(79f16e3d) SHA1(04e1f03a4d6b4cc2b81bce3a290bbb95de900d35) )
 	ROM_LOAD( "2,vt06.8e",  0x04000, 0x4000, CRC(26fee521) SHA1(2fbfc73ee860f72a20229a01d4da9f5cc2e858d3) )
 	ROM_LOAD( "1,vt07.9e",  0x08000, 0x4000, CRC(ca88bdfd) SHA1(548b05460bc7983cc81f15c70e87f47d10db2812) )
 	ROM_LOAD( "6,vt08.7h",  0x0c000, 0x4000, CRC(2019c883) SHA1(883c0156ceab99f4849fe36972c4162b4ac8c216) )
 	ROM_LOAD( "5,vt09.8h",  0x10000, 0x4000, CRC(98703982) SHA1(ba9a9b0dcadd4f52502828408c4a19b0bd518351) )
 	ROM_LOAD( "4,vt10.9h",  0x14000, 0x4000, CRC(f069d2f8) SHA1(2c92300a9407470b34965021de882f1f7a84730c) )
 
-		/* I did not dumped the PROMs of the bootleg board, I'm just adding the parent ones, it has the same
+		/* I did not dump the PROMs of the bootleg board, I'm just adding the parent ones, it has the same
 		   number of PROMs on the same board locations as the original board. */
 	ROM_REGION( 0x600, "proms", 0 )
-	ROM_LOAD( "vtb1.1d",  0x0000, 0x0100, CRC(3aba15a1) SHA1(8b057f6e26155dd9e48bde182e680fce4519f600) )    /* red */
-	ROM_LOAD( "vtb2.2d",  0x0100, 0x0100, CRC(88865754) SHA1(ca6dddca98baf00a65b2fb70b69cf4704ef8c831) )    /* green */
-	ROM_LOAD( "vtb3.3d",  0x0200, 0x0100, CRC(4c14c3f6) SHA1(644ac17c7413f094ec9a15cba87bbd421b26321f) )    /* blue */
-	ROM_LOAD( "vtb4.1h",  0x0300, 0x0100, CRC(b388c246) SHA1(038f9851699331ad887b6281a9df053dca3db8fd) )    /* palette selector (not used) */
-	ROM_LOAD( "vtb5.6l",  0x0400, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing (not used) */
-	ROM_LOAD( "vtb6.6e",  0x0500, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )    /* video timing (not used) */
+	ROM_LOAD( "vtb1.1d",  0x0000, 0x0100, CRC(3aba15a1) SHA1(8b057f6e26155dd9e48bde182e680fce4519f600) )    // red
+	ROM_LOAD( "vtb2.2d",  0x0100, 0x0100, CRC(88865754) SHA1(ca6dddca98baf00a65b2fb70b69cf4704ef8c831) )    // green
+	ROM_LOAD( "vtb3.3d",  0x0200, 0x0100, CRC(4c14c3f6) SHA1(644ac17c7413f094ec9a15cba87bbd421b26321f) )    // blue
+	ROM_LOAD( "vtb4.1h",  0x0300, 0x0100, CRC(b388c246) SHA1(038f9851699331ad887b6281a9df053dca3db8fd) )    // palette selector (not used)
+	ROM_LOAD( "vtb5.6l",  0x0400, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    // interrupt timing (not used)
+	ROM_LOAD( "vtb6.6e",  0x0500, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )    // video timing (not used)
 
 		/* There's a 16L8 PAL (with a 74LS245 and a 74LS08) on a tiny sub-board between the CPU1 ROMs
 		   and the CPU1 (a Z80 compatible NEC D780C-1). This sub-board is plugged on what seems to be
@@ -646,10 +825,10 @@ ROM_START( commandob3 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "b2.9f",   0x0000, 0x4000, CRC(f9cc4a74) SHA1(ee8dd73919c6f47f62cc6d999de9510db9f79b8f) )    // 2c.9f
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "b1.5d",   0x0000, 0x4000, CRC(505726e0) SHA1(2435c87c9c9d78a6e703cf0e1f6a0288207fcd4c) )    // characters
+	ROM_REGION( 0x4000, "chars", 0 )
+	ROM_LOAD( "b1.5d",   0x0000, 0x4000, CRC(505726e0) SHA1(2435c87c9c9d78a6e703cf0e1f6a0288207fcd4c) )
 
-	ROM_REGION( 0x18000, "gfx2", 0 )
+	ROM_REGION( 0x18000, "tiles", 0 )
 	ROM_LOAD( "b12.5a",  0x00000, 0x4000, CRC(7b2e1b48) SHA1(5d49e1d8146e4ef744445b68f35677302e875a85) )   // 11c.5a
 	ROM_LOAD( "b13.6a",  0x04000, 0x4000, CRC(81b417d3) SHA1(5ec7e3f0c8069384a5f6eb39232c228b9d7b8c0c) )   // 12c.6a
 	ROM_LOAD( "b14.7a",  0x08000, 0x4000, CRC(5612dbd2) SHA1(9e4e1a22b6cbf60607b9a81dae34482ae55f7c47) )   // 13c.7a
@@ -657,7 +836,7 @@ ROM_START( commandob3 )
 	ROM_LOAD( "b16.9a",  0x10000, 0x4000, CRC(de70babf) SHA1(6717e23baf55f84d3143fb432140a7c3e102ac26) )   // 15c.9a
 	ROM_LOAD( "b17.10a", 0x14000, 0x4000, CRC(14178237) SHA1(f896e71c7004349c9a46155edfd9f0aaa186065d) )   // 16c.10a
 
-	ROM_REGION( 0x18000, "gfx3", 0 )
+	ROM_REGION( 0x18000, "sprites", 0 )
 	ROM_LOAD( "b6.7e",   0x00000, 0x4000, CRC(79f16e3d) SHA1(04e1f03a4d6b4cc2b81bce3a290bbb95de900d35) )   // 5c.7e
 	ROM_LOAD( "b7.8e",   0x04000, 0x4000, CRC(26fee521) SHA1(2fbfc73ee860f72a20229a01d4da9f5cc2e858d3) )   // 6c.8e
 	ROM_LOAD( "b8.9e",   0x08000, 0x4000, CRC(ca88bdfd) SHA1(548b05460bc7983cc81f15c70e87f47d10db2812) )   // 7c.9e
@@ -666,12 +845,12 @@ ROM_START( commandob3 )
 	ROM_LOAD( "b11.9h",  0x14000, 0x4000, CRC(f069d2f8) SHA1(2c92300a9407470b34965021de882f1f7a84730c) )   // 10c.9h
 
 	ROM_REGION( 0x600, "proms", 0 )
-	ROM_LOAD( "vtb1.1d", 0x0000, 0x0100, CRC(3aba15a1) SHA1(8b057f6e26155dd9e48bde182e680fce4519f600) )    /* red */
-	ROM_LOAD( "vtb2.2d", 0x0100, 0x0100, CRC(88865754) SHA1(ca6dddca98baf00a65b2fb70b69cf4704ef8c831) )    /* green */
-	ROM_LOAD( "vtb3.3d", 0x0200, 0x0100, CRC(4c14c3f6) SHA1(644ac17c7413f094ec9a15cba87bbd421b26321f) )    /* blue */
-	ROM_LOAD( "vtb4.1h", 0x0300, 0x0100, CRC(b388c246) SHA1(038f9851699331ad887b6281a9df053dca3db8fd) )    /* palette selector (not used) */
-	ROM_LOAD( "vtb5.6l", 0x0400, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing (not used) */
-	ROM_LOAD( "vtb6.6e", 0x0500, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )    /* video timing (not used) */
+	ROM_LOAD( "vtb1.1d", 0x0000, 0x0100, CRC(3aba15a1) SHA1(8b057f6e26155dd9e48bde182e680fce4519f600) )    // red
+	ROM_LOAD( "vtb2.2d", 0x0100, 0x0100, CRC(88865754) SHA1(ca6dddca98baf00a65b2fb70b69cf4704ef8c831) )    // green
+	ROM_LOAD( "vtb3.3d", 0x0200, 0x0100, CRC(4c14c3f6) SHA1(644ac17c7413f094ec9a15cba87bbd421b26321f) )    // blue
+	ROM_LOAD( "vtb4.1h", 0x0300, 0x0100, CRC(b388c246) SHA1(038f9851699331ad887b6281a9df053dca3db8fd) )    // palette selector (not used)
+	ROM_LOAD( "vtb5.6l", 0x0400, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    // interrupt timing (not used)
+	ROM_LOAD( "vtb6.6e", 0x0500, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )    // video timing (not used)
 ROM_END
 
 ROM_START( commandou2 )
@@ -682,19 +861,19 @@ ROM_START( commandou2 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "cd02.9f",  0x0000, 0x4000, CRC(f9cc4a74) SHA1(ee8dd73919c6f47f62cc6d999de9510db9f79b8f) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "vt01.5d",  0x0000, 0x4000, CRC(505726e0) SHA1(2435c87c9c9d78a6e703cf0e1f6a0288207fcd4c) )    // characters
+	ROM_REGION( 0x4000, "chars", 0 )
+	ROM_LOAD( "vt01.5d",  0x0000, 0x4000, CRC(505726e0) SHA1(2435c87c9c9d78a6e703cf0e1f6a0288207fcd4c) )
 
-	ROM_REGION( 0x18000, "gfx2", 0 )
-	ROM_LOAD( "vt11.5a",  0x00000, 0x4000, CRC(7b2e1b48) SHA1(5d49e1d8146e4ef744445b68f35677302e875a85) )   // SCR X (tiles)
+	ROM_REGION( 0x18000, "tiles", 0 )
+	ROM_LOAD( "vt11.5a",  0x00000, 0x4000, CRC(7b2e1b48) SHA1(5d49e1d8146e4ef744445b68f35677302e875a85) )   // SCR X
 	ROM_LOAD( "vt12.6a",  0x04000, 0x4000, CRC(81b417d3) SHA1(5ec7e3f0c8069384a5f6eb39232c228b9d7b8c0c) )   // SCR X
 	ROM_LOAD( "vt13.7a",  0x08000, 0x4000, CRC(5612dbd2) SHA1(9e4e1a22b6cbf60607b9a81dae34482ae55f7c47) )   // SCR Y
 	ROM_LOAD( "vt14.8a",  0x0c000, 0x4000, CRC(2b2dee36) SHA1(8792278464fa3da47176582025f6673a15a581e2) )   // SCR Y
 	ROM_LOAD( "vt15.9a",  0x10000, 0x4000, CRC(de70babf) SHA1(6717e23baf55f84d3143fb432140a7c3e102ac26) )   // SCR Z
 	ROM_LOAD( "vt16.10a", 0x14000, 0x4000, CRC(14178237) SHA1(f896e71c7004349c9a46155edfd9f0aaa186065d) )   // SCR Z
 
-	ROM_REGION( 0x18000, "gfx3", 0 )
-	ROM_LOAD( "vt05.7e",  0x00000, 0x4000, CRC(79f16e3d) SHA1(04e1f03a4d6b4cc2b81bce3a290bbb95de900d35) )   // sprites
+	ROM_REGION( 0x18000, "sprites", 0 )
+	ROM_LOAD( "vt05.7e",  0x00000, 0x4000, CRC(79f16e3d) SHA1(04e1f03a4d6b4cc2b81bce3a290bbb95de900d35) )
 	ROM_LOAD( "vt06.8e",  0x04000, 0x4000, CRC(26fee521) SHA1(2fbfc73ee860f72a20229a01d4da9f5cc2e858d3) )
 	ROM_LOAD( "vt07.9e",  0x08000, 0x4000, CRC(ca88bdfd) SHA1(548b05460bc7983cc81f15c70e87f47d10db2812) )
 	ROM_LOAD( "vt08.7h",  0x0c000, 0x4000, CRC(2019c883) SHA1(883c0156ceab99f4849fe36972c4162b4ac8c216) )
@@ -702,12 +881,12 @@ ROM_START( commandou2 )
 	ROM_LOAD( "vt10.9h",  0x14000, 0x4000, CRC(f069d2f8) SHA1(2c92300a9407470b34965021de882f1f7a84730c) )
 
 	ROM_REGION( 0x600, "proms", 0 )
-	ROM_LOAD( "vtb-1.1d",  0x0000, 0x0100, CRC(3aba15a1) SHA1(8b057f6e26155dd9e48bde182e680fce4519f600) )    /* red */
-	ROM_LOAD( "vtb-2.2d",  0x0100, 0x0100, CRC(88865754) SHA1(ca6dddca98baf00a65b2fb70b69cf4704ef8c831) )    /* green */
-	ROM_LOAD( "vtb-3.3d",  0x0200, 0x0100, CRC(4c14c3f6) SHA1(644ac17c7413f094ec9a15cba87bbd421b26321f) )    /* blue */
-	ROM_LOAD( "vtb-4.1h",  0x0300, 0x0100, CRC(b388c246) SHA1(038f9851699331ad887b6281a9df053dca3db8fd) )    /* palette selector (not used) */
-	ROM_LOAD( "vtb-5.6l",  0x0400, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing (not used) */
-	ROM_LOAD( "vtb-6.6e",  0x0500, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )    /* video timing (not used) */
+	ROM_LOAD( "vtb-1.1d",  0x0000, 0x0100, CRC(3aba15a1) SHA1(8b057f6e26155dd9e48bde182e680fce4519f600) )    // red
+	ROM_LOAD( "vtb-2.2d",  0x0100, 0x0100, CRC(88865754) SHA1(ca6dddca98baf00a65b2fb70b69cf4704ef8c831) )    // green
+	ROM_LOAD( "vtb-3.3d",  0x0200, 0x0100, CRC(4c14c3f6) SHA1(644ac17c7413f094ec9a15cba87bbd421b26321f) )    // blue
+	ROM_LOAD( "vtb-4.1h",  0x0300, 0x0100, CRC(b388c246) SHA1(038f9851699331ad887b6281a9df053dca3db8fd) )    // palette selector (not used)
+	ROM_LOAD( "vtb-5.6l",  0x0400, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    // interrupt timing (not used)
+	ROM_LOAD( "vtb-6.6e",  0x0500, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )    // video timing (not used)
 ROM_END
 
 ROM_START( sinvasn )
@@ -718,19 +897,19 @@ ROM_START( sinvasn )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "u2.9f",    0x0000, 0x4000, CRC(cbf8c40e) SHA1(0c8dce034d96d075e012cbb8f68c2817b860d969) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "u1.5d",    0x0000, 0x4000, CRC(f477e13a) SHA1(ec5b80f5d508501e72cba028dc45b2c307ac452b) )    /* characters */
+	ROM_REGION( 0x04000, "chars", 0 )
+	ROM_LOAD( "u1.5d",    0x0000, 0x4000, CRC(f477e13a) SHA1(ec5b80f5d508501e72cba028dc45b2c307ac452b) )
 
-	ROM_REGION( 0x18000, "gfx2", 0 )
-	ROM_LOAD( "vt11.5a",  0x00000, 0x4000, CRC(7b2e1b48) SHA1(5d49e1d8146e4ef744445b68f35677302e875a85) )   // SCR X (tiles)
+	ROM_REGION( 0x18000, "tiles", 0 )
+	ROM_LOAD( "vt11.5a",  0x00000, 0x4000, CRC(7b2e1b48) SHA1(5d49e1d8146e4ef744445b68f35677302e875a85) )   // SCR X
 	ROM_LOAD( "vt12.6a",  0x04000, 0x4000, CRC(81b417d3) SHA1(5ec7e3f0c8069384a5f6eb39232c228b9d7b8c0c) )   // SCR X
 	ROM_LOAD( "vt13.7a",  0x08000, 0x4000, CRC(5612dbd2) SHA1(9e4e1a22b6cbf60607b9a81dae34482ae55f7c47) )   // SCR Y
 	ROM_LOAD( "vt14.8a",  0x0c000, 0x4000, CRC(2b2dee36) SHA1(8792278464fa3da47176582025f6673a15a581e2) )   // SCR Y
 	ROM_LOAD( "vt15.9a",  0x10000, 0x4000, CRC(de70babf) SHA1(6717e23baf55f84d3143fb432140a7c3e102ac26) )   // SCR Z
 	ROM_LOAD( "vt16.10a", 0x14000, 0x4000, CRC(14178237) SHA1(f896e71c7004349c9a46155edfd9f0aaa186065d) )   // SCR Z
 
-	ROM_REGION( 0x18000, "gfx3", 0 )
-	ROM_LOAD( "u5.e7",    0x00000, 0x4000, CRC(2a97c933) SHA1(bfddb0c0f930a7caffad7e52d394d72c09ffb45f) )   /* sprites */
+	ROM_REGION( 0x18000, "sprites", 0 )
+	ROM_LOAD( "u5.e7",    0x00000, 0x4000, CRC(2a97c933) SHA1(bfddb0c0f930a7caffad7e52d394d72c09ffb45f) )
 	ROM_LOAD( "sp06.e8",  0x04000, 0x4000, CRC(d7887212) SHA1(43ad98263d6314d40abf33087127c23a3ad72335) )
 	ROM_LOAD( "sp07.e9",  0x08000, 0x4000, CRC(9abe7a20) SHA1(5f1b851bd66a3ab818b893286d3ebf2194f425c4) )
 	ROM_LOAD( "u8.h7",    0x0c000, 0x4000, CRC(d6b4aa2e) SHA1(5bbf536f73010182b9150dd4fb1e2a42b5b380b0) )
@@ -738,12 +917,12 @@ ROM_START( sinvasn )
 	ROM_LOAD( "sp10.h9",  0x14000, 0x4000, CRC(3c131b0f) SHA1(dd3e63199120502c03eedd024a2eed3b5d3e2a1c) )
 
 	ROM_REGION( 0x0600, "proms", 0 )
-	ROM_LOAD( "vtb1.1d",  0x0000, 0x0100, CRC(3aba15a1) SHA1(8b057f6e26155dd9e48bde182e680fce4519f600) )    /* red */
-	ROM_LOAD( "vtb2.2d",  0x0100, 0x0100, CRC(88865754) SHA1(ca6dddca98baf00a65b2fb70b69cf4704ef8c831) )    /* green */
-	ROM_LOAD( "vtb3.3d",  0x0200, 0x0100, CRC(4c14c3f6) SHA1(644ac17c7413f094ec9a15cba87bbd421b26321f) )    /* blue */
-	ROM_LOAD( "vtb4.1h",  0x0300, 0x0100, CRC(b388c246) SHA1(038f9851699331ad887b6281a9df053dca3db8fd) )    /* palette selector (not used) */
-	ROM_LOAD( "vtb5.6l",  0x0400, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing (not used) */
-	ROM_LOAD( "vtb6.6e",  0x0500, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )    /* video timing (not used) */
+	ROM_LOAD( "vtb1.1d",  0x0000, 0x0100, CRC(3aba15a1) SHA1(8b057f6e26155dd9e48bde182e680fce4519f600) )    // red
+	ROM_LOAD( "vtb2.2d",  0x0100, 0x0100, CRC(88865754) SHA1(ca6dddca98baf00a65b2fb70b69cf4704ef8c831) )    // green
+	ROM_LOAD( "vtb3.3d",  0x0200, 0x0100, CRC(4c14c3f6) SHA1(644ac17c7413f094ec9a15cba87bbd421b26321f) )    // blue
+	ROM_LOAD( "vtb4.1h",  0x0300, 0x0100, CRC(b388c246) SHA1(038f9851699331ad887b6281a9df053dca3db8fd) )    // palette selector (not used)
+	ROM_LOAD( "vtb5.6l",  0x0400, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    // interrupt timing (not used)
+	ROM_LOAD( "vtb6.6e",  0x0500, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )    // video timing (not used)
 ROM_END
 
 ROM_START( sinvasnb )
@@ -754,19 +933,19 @@ ROM_START( sinvasnb )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "u2",       0x0000, 0x4000, CRC(cbf8c40e) SHA1(0c8dce034d96d075e012cbb8f68c2817b860d969) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "u1",       0x0000, 0x4000, CRC(f477e13a) SHA1(ec5b80f5d508501e72cba028dc45b2c307ac452b) )    /* characters */
+	ROM_REGION( 0x04000, "chars", 0 )
+	ROM_LOAD( "u1",       0x0000, 0x4000, CRC(f477e13a) SHA1(ec5b80f5d508501e72cba028dc45b2c307ac452b) )
 
-	ROM_REGION( 0x18000, "gfx2", 0 )
-	ROM_LOAD( "vt11.5a",  0x00000, 0x4000, CRC(7b2e1b48) SHA1(5d49e1d8146e4ef744445b68f35677302e875a85) )   // SCR X (tiles)
+	ROM_REGION( 0x18000, "tiles", 0 )
+	ROM_LOAD( "vt11.5a",  0x00000, 0x4000, CRC(7b2e1b48) SHA1(5d49e1d8146e4ef744445b68f35677302e875a85) )   // SCR X
 	ROM_LOAD( "vt12.6a",  0x04000, 0x4000, CRC(81b417d3) SHA1(5ec7e3f0c8069384a5f6eb39232c228b9d7b8c0c) )   // SCR X
 	ROM_LOAD( "vt13.7a",  0x08000, 0x4000, CRC(5612dbd2) SHA1(9e4e1a22b6cbf60607b9a81dae34482ae55f7c47) )   // SCR Y
 	ROM_LOAD( "vt14.8a",  0x0c000, 0x4000, CRC(2b2dee36) SHA1(8792278464fa3da47176582025f6673a15a581e2) )   // SCR Y
 	ROM_LOAD( "vt15.9a",  0x10000, 0x4000, CRC(de70babf) SHA1(6717e23baf55f84d3143fb432140a7c3e102ac26) )   // SCR Z
 	ROM_LOAD( "vt16.10a", 0x14000, 0x4000, CRC(14178237) SHA1(f896e71c7004349c9a46155edfd9f0aaa186065d) )   // SCR Z
 
-	ROM_REGION( 0x18000, "gfx3", 0 )
-	ROM_LOAD( "u5",       0x00000, 0x4000, CRC(2a97c933) SHA1(bfddb0c0f930a7caffad7e52d394d72c09ffb45f) )   /* sprites */
+	ROM_REGION( 0x18000, "sprites", 0 )
+	ROM_LOAD( "u5",       0x00000, 0x4000, CRC(2a97c933) SHA1(bfddb0c0f930a7caffad7e52d394d72c09ffb45f) )
 	ROM_LOAD( "vt06.e8",  0x04000, 0x4000, CRC(26fee521) SHA1(2fbfc73ee860f72a20229a01d4da9f5cc2e858d3) )
 	ROM_LOAD( "vt07.e9",  0x08000, 0x4000, CRC(ca88bdfd) SHA1(548b05460bc7983cc81f15c70e87f47d10db2812) )
 	ROM_LOAD( "u8",       0x0c000, 0x4000, CRC(d6b4aa2e) SHA1(5bbf536f73010182b9150dd4fb1e2a42b5b380b0) )
@@ -774,12 +953,12 @@ ROM_START( sinvasnb )
 	ROM_LOAD( "vt10.h9",  0x14000, 0x4000, CRC(f069d2f8) SHA1(2c92300a9407470b34965021de882f1f7a84730c) )
 
 	ROM_REGION( 0x0600, "proms", 0 )
-	ROM_LOAD( "vtb1.1d",  0x0000, 0x0100, CRC(3aba15a1) SHA1(8b057f6e26155dd9e48bde182e680fce4519f600) )    /* red */
-	ROM_LOAD( "vtb2.2d",  0x0100, 0x0100, CRC(88865754) SHA1(ca6dddca98baf00a65b2fb70b69cf4704ef8c831) )    /* green */
-	ROM_LOAD( "vtb3.3d",  0x0200, 0x0100, CRC(4c14c3f6) SHA1(644ac17c7413f094ec9a15cba87bbd421b26321f) )    /* blue */
-	ROM_LOAD( "vtb4.1h",  0x0300, 0x0100, CRC(b388c246) SHA1(038f9851699331ad887b6281a9df053dca3db8fd) )    /* palette selector (not used) */
-	ROM_LOAD( "vtb5.6l",  0x0400, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing (not used) */
-	ROM_LOAD( "vtb6.6e",  0x0500, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )    /* video timing (not used) */
+	ROM_LOAD( "vtb1.1d",  0x0000, 0x0100, CRC(3aba15a1) SHA1(8b057f6e26155dd9e48bde182e680fce4519f600) )    // red
+	ROM_LOAD( "vtb2.2d",  0x0100, 0x0100, CRC(88865754) SHA1(ca6dddca98baf00a65b2fb70b69cf4704ef8c831) )    // green
+	ROM_LOAD( "vtb3.3d",  0x0200, 0x0100, CRC(4c14c3f6) SHA1(644ac17c7413f094ec9a15cba87bbd421b26321f) )    // blue
+	ROM_LOAD( "vtb4.1h",  0x0300, 0x0100, CRC(b388c246) SHA1(038f9851699331ad887b6281a9df053dca3db8fd) )    // palette selector (not used)
+	ROM_LOAD( "vtb5.6l",  0x0400, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    // interrupt timing (not used)
+	ROM_LOAD( "vtb6.6e",  0x0500, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )    // video timing (not used)
 ROM_END
 
 ROM_START( mercenario )
@@ -791,10 +970,10 @@ ROM_START( mercenario )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "cm02.9f",  0x0000, 0x4000, CRC(f9cc4a74) SHA1(ee8dd73919c6f47f62cc6d999de9510db9f79b8f) )    // 2c.9f
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "1c.5d",    0x0000, 0x4000, CRC(fe3ebe35) SHA1(298f1620e83929af01bc9c999262c022e9421c41) )    // characters
+	ROM_REGION( 0x4000, "chars", 0 )
+	ROM_LOAD( "1c.5d",    0x0000, 0x4000, CRC(fe3ebe35) SHA1(298f1620e83929af01bc9c999262c022e9421c41) )
 
-	ROM_REGION( 0x18000, "gfx2", 0 )
+	ROM_REGION( 0x18000, "tiles", 0 )
 	ROM_LOAD( "vt11.5a",  0x00000, 0x4000, CRC(7b2e1b48) SHA1(5d49e1d8146e4ef744445b68f35677302e875a85) )   // 11c.5a
 	ROM_LOAD( "vt12.6a",  0x04000, 0x4000, CRC(81b417d3) SHA1(5ec7e3f0c8069384a5f6eb39232c228b9d7b8c0c) )   // 12c.6a
 	ROM_LOAD( "vt13.7a",  0x08000, 0x4000, CRC(5612dbd2) SHA1(9e4e1a22b6cbf60607b9a81dae34482ae55f7c47) )   // 13c.7a
@@ -802,7 +981,7 @@ ROM_START( mercenario )
 	ROM_LOAD( "vt15.9a",  0x10000, 0x4000, CRC(de70babf) SHA1(6717e23baf55f84d3143fb432140a7c3e102ac26) )   // 15c.9a
 	ROM_LOAD( "vt16.10a", 0x14000, 0x4000, CRC(14178237) SHA1(f896e71c7004349c9a46155edfd9f0aaa186065d) )   // 16c.10a
 
-	ROM_REGION( 0x18000, "gfx3", 0 )
+	ROM_REGION( 0x18000, "sprites", 0 )
 	ROM_LOAD( "vt05.7e",  0x00000, 0x4000, CRC(79f16e3d) SHA1(04e1f03a4d6b4cc2b81bce3a290bbb95de900d35) )   // 5c.7e
 	ROM_LOAD( "vt06.8e",  0x04000, 0x4000, CRC(26fee521) SHA1(2fbfc73ee860f72a20229a01d4da9f5cc2e858d3) )   // 6c.8e
 	ROM_LOAD( "vt07.9e",  0x08000, 0x4000, CRC(ca88bdfd) SHA1(548b05460bc7983cc81f15c70e87f47d10db2812) )   // 7c.9e
@@ -811,16 +990,16 @@ ROM_START( mercenario )
 	ROM_LOAD( "vt10.9h",  0x14000, 0x4000, CRC(f069d2f8) SHA1(2c92300a9407470b34965021de882f1f7a84730c) )   // 10c.9h
 
 	ROM_REGION( 0x600, "proms", 0 )
-	ROM_LOAD( "vtb1.1d",  0x0000, 0x0100, CRC(3aba15a1) SHA1(8b057f6e26155dd9e48bde182e680fce4519f600) )    /* red */
-	ROM_LOAD( "vtb2.2d",  0x0100, 0x0100, CRC(88865754) SHA1(ca6dddca98baf00a65b2fb70b69cf4704ef8c831) )    /* green */
-	ROM_LOAD( "vtb3.3d",  0x0200, 0x0100, CRC(4c14c3f6) SHA1(644ac17c7413f094ec9a15cba87bbd421b26321f) )    /* blue */
-	ROM_LOAD( "vtb4.1h",  0x0300, 0x0100, CRC(b388c246) SHA1(038f9851699331ad887b6281a9df053dca3db8fd) )    /* palette selector (not used) */
-	ROM_LOAD( "vtb5.6l",  0x0400, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing (not used) */
-	ROM_LOAD( "vtb6.6e",  0x0500, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )    /* video timing (not used) */
+	ROM_LOAD( "vtb1.1d",  0x0000, 0x0100, CRC(3aba15a1) SHA1(8b057f6e26155dd9e48bde182e680fce4519f600) )    // red
+	ROM_LOAD( "vtb2.2d",  0x0100, 0x0100, CRC(88865754) SHA1(ca6dddca98baf00a65b2fb70b69cf4704ef8c831) )    // green
+	ROM_LOAD( "vtb3.3d",  0x0200, 0x0100, CRC(4c14c3f6) SHA1(644ac17c7413f094ec9a15cba87bbd421b26321f) )    // blue
+	ROM_LOAD( "vtb4.1h",  0x0300, 0x0100, CRC(b388c246) SHA1(038f9851699331ad887b6281a9df053dca3db8fd) )    // palette selector (not used)
+	ROM_LOAD( "vtb5.6l",  0x0400, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    // interrupt timing (not used)
+	ROM_LOAD( "vtb6.6e",  0x0500, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )    // video timing (not used)
 ROM_END
 
 
-/* Driver Initialization */
+// Driver Initialization
 
 void commando_state::init_commando()
 {
@@ -847,15 +1026,18 @@ void commando_state::init_spaceinv()
 	}
 }
 
-/* Game Drivers */
+} // anonymous namespace
 
-GAME( 1985, commando,   0,        commando, commando, commando_state, init_commando, ROT270, "Capcom", "Commando (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, commandou,  commando, commando, commandou,commando_state, init_commando, ROT270, "Capcom (Data East USA license)", "Commando (US set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, commandou2, commando, commando, commando, commando_state, init_commando, ROT270, "Capcom (Data East USA license)", "Commando (US set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, commandoj,  commando, commando, commando, commando_state, init_commando, ROT270, "Capcom", "Senjou no Ookami", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, commandob,  commando, commando, commando, commando_state, init_spaceinv, ROT270, "bootleg", "Commando (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, commandob2, commando, commando, commando, commando_state, init_commando, ROT270, "bootleg", "Commando (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, commandob3, commando, commando, commando, commando_state, init_commando, ROT270, "bootleg", "Commando (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, sinvasn,    commando, commando, commando, commando_state, init_commando, ROT270, "Capcom", "Space Invasion (Europe)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, sinvasnb,   commando, commando, commando, commando_state, init_spaceinv, ROT270, "bootleg", "Space Invasion (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, mercenario, commando, commando, commando, commando_state, init_spaceinv, ROT270, "bootleg", "Mercenario (Commando bootleg)", MACHINE_SUPPORTS_SAVE )
+
+// Game Drivers
+
+GAME( 1985, commando,   0,        commando, commando, commando_state, init_commando, ROT270, "Capcom",                         "Commando (World)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1985, commandou,  commando, commando, commandou,commando_state, init_commando, ROT270, "Capcom (Data East USA license)", "Commando (US set 1)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1985, commandou2, commando, commando, commando, commando_state, init_commando, ROT270, "Capcom (Data East USA license)", "Commando (US set 2)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1985, commandoj,  commando, commando, commando, commando_state, init_commando, ROT270, "Capcom",                         "Senjou no Ookami",              MACHINE_SUPPORTS_SAVE )
+GAME( 1985, commandob,  commando, commando, commando, commando_state, init_spaceinv, ROT270, "bootleg",                        "Commando (bootleg set 1)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1985, commandob2, commando, commando, commando, commando_state, init_commando, ROT270, "bootleg",                        "Commando (bootleg set 2)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1985, commandob3, commando, commando, commando, commando_state, init_commando, ROT270, "bootleg",                        "Commando (bootleg set 3)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sinvasn,    commando, commando, commando, commando_state, init_commando, ROT270, "Capcom",                         "Space Invasion (Europe)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sinvasnb,   commando, commando, commando, commando_state, init_spaceinv, ROT270, "bootleg",                        "Space Invasion (bootleg)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1985, mercenario, commando, commando, commando, commando_state, init_spaceinv, ROT270, "bootleg",                        "Mercenario (Commando bootleg)", MACHINE_SUPPORTS_SAVE )

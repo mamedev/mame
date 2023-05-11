@@ -24,6 +24,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class atarisy4_state : public driver_device
 {
 public:
@@ -1096,6 +1098,8 @@ void airrace_state::machine_reset()
 
 	m_dsp1->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
+
+} // anonymous namespace
 
 
 /*************************************

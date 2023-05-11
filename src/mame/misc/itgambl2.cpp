@@ -60,6 +60,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define MAIN_CLOCK  XTAL(16'000'000)
 #define SND_CLOCK   XTAL(14'318'181)
 
@@ -1158,6 +1161,8 @@ ROM_START( toptcash )
 	ROM_REGION( 0x80000, "upd", 0 ) /* NEC D7759GC samples */
 	ROM_LOAD( "top t. cash msg0.bin", 0x00000, 0x80000, CRC(babe87c7) SHA1(7ed226224c03a094844e838aebaead67e9ae9a2d) ) // 1xxxxxxxxxxxxxxxxxx = 0x00
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************

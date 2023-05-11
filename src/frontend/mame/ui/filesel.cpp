@@ -73,13 +73,26 @@ menu_file_selector::~menu_file_selector()
 
 
 //-------------------------------------------------
+//  recompute_metrics - recompute metrics
+//-------------------------------------------------
+
+void menu_file_selector::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
+
+	// set up custom render proc
+	set_custom_space(line_height() + 3.0F * tb_border(), 0.0F);
+}
+
+
+//-------------------------------------------------
 //  custom_render - perform our special rendering
 //-------------------------------------------------
 
 void menu_file_selector::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	// lay out extra text
-	auto layout = ui().create_layout(container());
+	auto layout = create_layout();
 	layout.add_text(m_current_directory);
 
 	// position this extra text
@@ -90,8 +103,8 @@ void menu_file_selector::custom_render(void *selectedref, float top, float botto
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().background_color());
 
 	// take off the borders
-	x1 += ui().box_lr_border() * machine().render().ui_aspect(&container());
-	y1 += ui().box_tb_border();
+	x1 += lr_border();
+	y1 += tb_border();
 
 	size_t hit_start = 0, hit_span = 0;
 	if (is_mouse_hit()
@@ -347,7 +360,7 @@ void menu_file_selector::update_search()
 //  populate
 //-------------------------------------------------
 
-void menu_file_selector::populate(float &customtop, float &custombottom)
+void menu_file_selector::populate()
 {
 	const file_selector_entry *selected_entry = nullptr;
 
@@ -407,7 +420,8 @@ void menu_file_selector::populate(float &customtop, float &custombottom)
 	if (m_entrylist.size() > first)
 	{
 		// sort the menu entries
-		std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t> >(std::locale());
+		std::locale const lcl;
+		std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t> >(lcl);
 		std::sort(
 				m_entrylist.begin() + first,
 				m_entrylist.end(),
@@ -426,9 +440,6 @@ void menu_file_selector::populate(float &customtop, float &custombottom)
 	// set the selection (if we have one)
 	if (selected_entry)
 		set_selection((void *)selected_entry);
-
-	// set up custom render proc
-	customtop = ui().get_line_height() + 3.0f * ui().box_tb_border();
 }
 
 
@@ -436,40 +447,49 @@ void menu_file_selector::populate(float &customtop, float &custombottom)
 //  handle
 //-------------------------------------------------
 
-void menu_file_selector::handle(event const *ev)
+bool menu_file_selector::handle(event const *ev)
 {
-	// process the menu
-	if (ev)
-	{
-		if (ev->iptkey == IPT_SPECIAL)
-		{
-			// if it's any other key and we're not maxed out, update
-			if (input_character(m_filename, ev->unichar, uchar_is_printable))
-				update_search();
-		}
-		else if (ev->iptkey == IPT_UI_PASTE)
-		{
-			if (paste_text(m_filename, uchar_is_printable))
-				update_search();
-		}
-		else if (ev->iptkey == IPT_UI_CANCEL)
-		{
-			// reset the char buffer also in this case
-			if (!m_filename.empty())
-			{
-				m_filename.clear();
-				ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename);
-			}
-		}
-		else if (ev->itemref && (ev->iptkey == IPT_UI_SELECT))
-		{
-			// handle selections
-			select_item(*reinterpret_cast<file_selector_entry const *>(ev->itemref));
+	if (!ev)
+		return false;
 
-			// reset the char buffer when pressing IPT_UI_SELECT
-			m_filename.clear();
+	if (ev->iptkey == IPT_SPECIAL)
+	{
+		// if it's any other key and we're not maxed out, update
+		if (input_character(m_filename, ev->unichar, uchar_is_printable))
+		{
+			update_search();
+			return true;
 		}
 	}
+	else if (ev->iptkey == IPT_UI_PASTE)
+	{
+		if (paste_text(m_filename, uchar_is_printable))
+		{
+			update_search();
+			return true;
+		}
+	}
+	else if (ev->iptkey == IPT_UI_CANCEL)
+	{
+		// reset the char buffer also in this case
+		if (!m_filename.empty())
+		{
+			m_filename.clear();
+			ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename);
+			return true;
+		}
+	}
+	else if (ev->itemref && (ev->iptkey == IPT_UI_SELECT))
+	{
+		// handle selections
+		select_item(*reinterpret_cast<file_selector_entry const *>(ev->itemref));
+
+		// reset the char buffer when pressing IPT_UI_SELECT
+		m_filename.clear();
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -504,7 +524,7 @@ menu_select_rw::~menu_select_rw()
 //  populate
 //-------------------------------------------------
 
-void menu_select_rw::populate(float &customtop, float &custombottom)
+void menu_select_rw::populate()
 {
 	item_append(_("Select access mode"), FLAG_DISABLE, nullptr);
 	item_append(_("Read-only"), 0, itemref_from_result(result::READONLY));
@@ -519,14 +539,15 @@ void menu_select_rw::populate(float &customtop, float &custombottom)
 //  handle
 //-------------------------------------------------
 
-void menu_select_rw::handle(event const *ev)
+bool menu_select_rw::handle(event const *ev)
 {
-	// process the menu
 	if (ev && ev->iptkey == IPT_UI_SELECT)
 	{
 		m_result = result_from_itemref(ev->itemref);
 		stack_pop();
 	}
+
+	return false;
 }
 
 

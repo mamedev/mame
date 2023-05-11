@@ -36,55 +36,69 @@ Then 2 nibbles are read to form a byte containing the absolute Y coordiante.
 #include "graphic.h"
 
 
-
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(SMS_GRAPHIC, sms_graphic_device, "sms_graphic", "Sega SMS Graphic Board")
-
+namespace {
 
 static INPUT_PORTS_START( sms_graphic )
 	PORT_START("BUTTONS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // MENU
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) // DO
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) // PEN
-	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // some kind of ready signal?
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_TOGGLE PORT_NAME("%p Pen") // pretend pen pressure is all-or-nothing
 
 	PORT_START("X")
-	PORT_BIT( 0xff, 0x00, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(15)
+	PORT_BIT( 0xff, 0x00, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 254 / 268.0, 6 / 268.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(1)
 
 	PORT_START("Y")
-	PORT_BIT( 0xff, 0x00, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(15)
+	PORT_BIT( 0xff, 0x00, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 255 / 224.0, -19 / 224.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(1)
 INPUT_PORTS_END
 
 
-//-------------------------------------------------
-//  input_ports - device-specific input ports
-//-------------------------------------------------
 
-ioport_constructor sms_graphic_device::device_input_ports() const
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+class sms_graphic_device : public device_t, public device_sms_control_interface
 {
-	return INPUT_PORTS_NAME( sms_graphic );
-}
+public:
+	// construction/destruction
+	sms_graphic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
+	// device_sms_control_interface implementation
+	virtual uint8_t in_r() override;
+	virtual void out_w(uint8_t data, uint8_t mem_mask) override;
+
+protected:
+	// device_t implementation
+	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(sms_graphic); }
+	virtual void device_start() override;
+
+private:
+	required_ioport m_buttons;
+	required_ioport m_x_axis;
+	required_ioport m_y_axis;
+
+	uint8_t m_phase;
+	uint8_t m_select;
+	uint8_t m_data;
+};
+
 
 //-------------------------------------------------
 //  sms_graphic_device - constructor
 //-------------------------------------------------
 
-sms_graphic_device::sms_graphic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SMS_GRAPHIC, tag, owner, clock)
-	, device_sms_control_port_interface(mconfig, *this)
-	, m_buttons(*this, "BUTTONS")
-	, m_x(*this, "X")
-	, m_y(*this, "Y")
-	, m_index(0)
-	, m_previous_write(0xff)
-	, m_pressure(0xfd)
+sms_graphic_device::sms_graphic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SMS_GRAPHIC, tag, owner, clock),
+	device_sms_control_interface(mconfig, *this),
+	m_buttons(*this, "BUTTONS"),
+	m_x_axis(*this, "X"),
+	m_y_axis(*this, "Y"),
+	m_phase(0),
+	m_select(0x7f),
+	m_data(0xff)
 {
 }
 
@@ -95,8 +109,12 @@ sms_graphic_device::sms_graphic_device(const machine_config &mconfig, const char
 
 void sms_graphic_device::device_start()
 {
-	save_item(NAME(m_index));
-	save_item(NAME(m_previous_write));
+	m_phase = 0;
+	m_data = 0xff;
+
+	save_item(NAME(m_phase));
+	save_item(NAME(m_select));
+	save_item(NAME(m_data));
 }
 
 
@@ -104,54 +122,55 @@ void sms_graphic_device::device_start()
 //  sms_peripheral_r - joypad read
 //-------------------------------------------------
 
-uint8_t sms_graphic_device::peripheral_r()
+uint8_t sms_graphic_device::in_r()
 {
-	switch (m_index)
-	{
-		case 0:     // Initial state / "I am a board"
-			// If any regular button is pressed raise/lower TL ?
-//          if ((m_buttons->read() & 0x07) != 0x07)
-//              return 0xf0;
-			return 0xd0;
-
-		case 1:    // Read buttons (active low)
-			return m_buttons->read();
-
-		case 2:    // Some thing only FD, FE, and FF cause the other values to be read
-			return m_pressure >> 4;
-
-		case 3:
-			return m_pressure & 0x0f;
-
-		case 4:    // High nibble X?
-			return m_x->read() >> 4;
-
-		case 5:    // Low nibble X?
-			return m_x->read() & 0x0f;
-
-		case 6:   // High nibble Y?
-			return m_y->read() >> 4;
-
-		case 7:   // Low Nibble Y?
-			return m_y->read() & 0x0f;
-	}
-
-	return 0xff;
+	if (BIT(m_select, 5))
+		return 0x20; // low four bits must be low to recognise Graphic Board, TL is a kind of active-low ready flag
+	else if (m_phase)
+		return BIT(m_data, BIT(m_select, 6) ? 0 : 4, 4) | 0x30;
+	else
+		return (m_buttons->read() & 0x1f) | 0x20;
 }
 
-void sms_graphic_device::peripheral_w(uint8_t data)
+
+void sms_graphic_device::out_w(uint8_t data, uint8_t mem_mask)
 {
-	// Check for toggle on TH/TL
-	if ((data ^ m_previous_write) & 0xc0)
+	if (BIT(data, 5))
 	{
-		m_index++;
+		// TR high - deselected
+		m_phase = 0;
+	}
+	else if (!BIT(m_select, 5) && BIT(m_select, 6) && !BIT(data, 6))
+	{
+		// negative edge on TH seems to trigger acquisition
+		switch (m_phase)
+		{
+		case 0:
+			m_data = BIT(m_buttons->read(), 5) ? 0xfe : 0x00; // values made up to satisfy software
+			m_phase = 1;
+			break;
+		case 1:
+			m_data = m_x_axis->read();
+			m_phase = 2;
+			break;
+		case 2:
+			m_data = m_y_axis->read();
+			m_phase = 3;
+			break;
+		default:
+			break; // TODO: what actually happens if you keep clocking TH?
+		}
 	}
 
-	// If TR is high, restart
-	if (data & 0x80)
-	{
-		m_index = 0;
-	}
-
-	m_previous_write = data;
+	m_select = data;
 }
+
+} // anonymous namespace
+
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(SMS_GRAPHIC, device_sms_control_interface, sms_graphic_device, "sms_graphic", "Sega Master System Graphic Board")

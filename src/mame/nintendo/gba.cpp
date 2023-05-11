@@ -20,6 +20,8 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include <cstdarg>
+
 
 /* Sound Registers */
 #define SOUNDCNT_L  HWLO(0x080)  /* 0x4000080  2  R/W   Control Stereo/Volume/Enable */

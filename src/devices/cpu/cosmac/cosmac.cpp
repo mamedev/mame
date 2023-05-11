@@ -1205,8 +1205,6 @@ inline void cosmac_device::dma_input()
 	{
 		m_state = cosmac_state::STATE_0_FETCH;
 	}
-
-	standard_irq_callback(COSMAC_INPUT_LINE_DMAIN);
 }
 
 
@@ -1239,8 +1237,6 @@ inline void cosmac_device::dma_output()
 	{
 		m_state = cosmac_state::STATE_0_FETCH;
 	}
-
-	standard_irq_callback(COSMAC_INPUT_LINE_DMAOUT);
 }
 
 
@@ -1250,6 +1246,8 @@ inline void cosmac_device::dma_output()
 
 inline void cosmac_device::interrupt()
 {
+	standard_irq_callback(COSMAC_INPUT_LINE_INT, R[P]);
+
 	T = (X << 4) | P;
 	X = 2;
 	P = 1;
@@ -1272,8 +1270,6 @@ inline void cosmac_device::interrupt()
 	{
 		m_state = cosmac_state::STATE_0_FETCH;
 	}
-
-	standard_irq_callback(COSMAC_INPUT_LINE_INT);
 }
 
 

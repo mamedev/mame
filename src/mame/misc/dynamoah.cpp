@@ -19,6 +19,9 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
+
+namespace {
+
 class dynamoah_state : public driver_device
 {
 public:
@@ -115,6 +118,9 @@ void dynamoah_state::security_decrypt()
 			romdata[addr] = bitswap<8>(romdata[addr], 4, 1, 2, 7, 6, 0, 3, 5);
 	}
 }
+
+} // anonymous namespace
+
 
 GAME( 199?, dynamoah,  0,        dynamoah, dynamoah, dynamoah_state, security_decrypt, ROT0, "Dynamo", "Air Hockey (6.12?, encrypted)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 199?, dynamoaha, dynamoah, dynamoah, dynamoah, dynamoah_state, security_decrypt, ROT0, "Dynamo", "Air Hockey (6.03, encrypted)", MACHINE_IS_SKELETON_MECHANICAL )

@@ -2144,11 +2144,12 @@ ROM_START( wintbob )
 	/* The wb03.bin below is bad, the set has a different copyright message (IN KOREA is replaced with 1990)
 	   but also clearly suffers from bitrot at the following addresses
 	    4FC2, 5F02, 6642, D6C2, D742
-	   in all cases bit 0x20 is incorrectly set in the bad rom
+	   in all cases bit 0x20 is incorrectly set in the bad ROM
+	   ROM_LOAD16_BYTE( "wb03.bin", 0x00000, 0x10000, CRC(df56e168) SHA1(20dbabdd97e6f3d4bf6500bf9e8476942cb48ae3) )
+	   ROM_LOAD16_BYTE( "wb01.bin", 0x00001, 0x10000, CRC(05722f17) SHA1(9356e2488ea35e0a2978689f2ca6dfa0d57fd2ed) )
+	   A dump from a different PCB confirmed the above. Correct ROM for this copyright message hack is
+	   ROM_LOAD16_BYTE( "wb03.bin", 0x00000, 0x10000, CRC(e2ae422b) SHA1(526abf88747a00527047ec578a20be36f25af257) )
 	*/
-
-//  ROM_LOAD16_BYTE( "wb03.bin", 0x00000, 0x10000, CRC(df56e168) SHA1(20dbabdd97e6f3d4bf6500bf9e8476942cb48ae3) )
-//  ROM_LOAD16_BYTE( "wb01.bin", 0x00001, 0x10000, CRC(05722f17) SHA1(9356e2488ea35e0a2978689f2ca6dfa0d57fd2ed) )
 
 	ROM_LOAD16_BYTE( "wb04.bin", 0x20000, 0x10000, CRC(53be758d) SHA1(56cf85ba23fe699031d73e8f367a1b8ac837d5f8) )
 	ROM_LOAD16_BYTE( "wb02.bin", 0x20001, 0x10000, CRC(fc8e292e) SHA1(857cfeb0be121e64e6117120514ae1f2ffeae4d6) )

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Richard Davies
-#ifndef MAME_AUDIO_PHOENIX_H
-#define MAME_AUDIO_PHOENIX_H
+#ifndef MAME_PHOENIX_PHOENIX_A_H
+#define MAME_PHOENIX_PHOENIX_A_H
 
 #pragma once
 
@@ -59,4 +59,4 @@ DECLARE_DEVICE_TYPE(PHOENIX_SOUND, phoenix_sound_device)
 
 DISCRETE_SOUND_EXTERN(phoenix_discrete);
 
-#endif // MAME_AUDIO_PHOENIX_H
+#endif // MAME_PHOENIX_PHOENIX_A_H

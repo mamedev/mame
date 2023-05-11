@@ -4,12 +4,12 @@
 
     Game Driver for Video System Mahjong series and Pipe Dream.
 
-    Driver by Takahiro Nogi <nogi@kt.rim.or.jp> 2001/02/04 -
+    Driver by Takahiro Nogi 2001/02/04 -
     and Bryan McPhail, Nicola Salmoria, Aaron Giles
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_FROMANCE_H
-#define MAME_INCLUDES_FROMANCE_H
+#ifndef MAME_VSYSTEM_FROMANCE_H
+#define MAME_VSYSTEM_FROMANCE_H
 
 #pragma once
 
@@ -122,4 +122,4 @@ private:
 	void nekkyoku_sub_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_FROMANCE_H
+#endif // MAME_VSYSTEM_FROMANCE_H

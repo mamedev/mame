@@ -93,8 +93,7 @@ public:
 		, m_ieee488(*this, IEEE488_TAG)
 		, m_palette(*this, "palette")
 		, m_ram(*this, RAM_TAG)
-		, m_floppy0(*this, FDC1797_TAG":0")
-		, m_floppy1(*this, FDC1797_TAG":1")
+		, m_floppy(*this, FDC1797_TAG":%u", 0U)
 		, m_rs232(*this, "rs232")
 		, m_rom(*this, Z8400A_TAG)
 		, m_sync_rom(*this, "video")
@@ -145,8 +144,7 @@ private:
 	required_device<ieee488_device> m_ieee488;
 	required_device<palette_device> m_palette;
 	required_device<ram_device> m_ram;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<rs232_port_device> m_rs232;
 	required_region_ptr<uint8_t> m_rom;
 	required_region_ptr<uint8_t> m_sync_rom;
@@ -609,8 +607,8 @@ void vixen_state::i8155_pc_w(uint8_t data)
 	// drive select
 	floppy_image_device *floppy = nullptr;
 
-	if (!BIT(data, 0)) floppy = m_floppy0->get_device();
-	if (!BIT(data, 1)) floppy = m_floppy1->get_device();
+	if (!BIT(data, 0)) floppy = m_floppy[0]->get_device();
+	if (!BIT(data, 1)) floppy = m_floppy[1]->get_device();
 
 	m_fdc->set_floppy(floppy);
 
@@ -861,8 +859,8 @@ void vixen_state::vixen(machine_config &config)
 
 	FD1797(config, m_fdc, 23.9616_MHz_XTAL / 24);
 	m_fdc->intrq_wr_callback().set(FUNC(vixen_state::fdc_intrq_w));
-	FLOPPY_CONNECTOR(config, FDC1797_TAG":0", vixen_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, FDC1797_TAG":1", vixen_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], vixen_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], vixen_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	IEEE488(config, m_ieee488);
 	m_ieee488->srq_callback().set(FUNC(vixen_state::srq_w));
 	m_ieee488->atn_callback().set(FUNC(vixen_state::atn_w));

@@ -39,6 +39,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class atom2_state : public driver_device
 {
 public:
@@ -136,5 +139,8 @@ ROM_START( spongbob )
 	ROM_REGION(0x1000000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD("ic5", 0x0000000, 0x1000000, CRC(d8e9bc95) SHA1(91798ea0f47f3340bc32b754d0be8fec5d093122) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 200?, spongbob,  0, atom2, atom2, atom2_state, empty_init, ROT0, "Sega",      "SpongeBob SquarePants Ticket Boom", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )

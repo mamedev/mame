@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_HP80_OPTROM_H
-#define MAME_MACHINE_HP80_OPTROM_H
+#ifndef MAME_HP_HP80_OPTROM_H
+#define MAME_HP_HP80_OPTROM_H
 
 #pragma once
 
@@ -34,11 +34,11 @@ public:
 	void install_read_handler(address_space& space);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
-	// image-level overrides
-	virtual image_init_result call_load() override;
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 	virtual bool is_reset_on_load() const noexcept override { return true; }
@@ -51,4 +51,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(HP80_OPTROM, hp80_optrom_device)
 
-#endif // MAME_MACHINE_HP80_OPTROM_H
+#endif // MAME_HP_HP80_OPTROM_H

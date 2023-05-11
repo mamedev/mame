@@ -1076,7 +1076,7 @@ void m37710_cpu_device::m37710i_update_irqs()
 
 	if (wantedIRQ != -1)
 	{
-		standard_irq_callback(wantedIRQ);
+		standard_irq_callback(wantedIRQ, REG_PG | REG_PC);
 
 		// make sure we're running to service the interrupt
 		CPU_STOPPED &= ~STOP_LEVEL_WAI;

@@ -28,7 +28,6 @@ private:
 	static const instruction instructions[];
 	static const char *const regs[8];
 
-	static s32 off10(u32 opcode);
 	static std::string imm8(s8 dt);
 	static std::string off16(s16 dt);
 };

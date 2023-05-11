@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
-#ifndef MAME_MACHINE_ZNMCU_H
-#define MAME_MACHINE_ZNMCU_H
+#ifndef MAME_SONY_ZNMCU_H
+#define MAME_SONY_ZNMCU_H
 
 #pragma once
 
@@ -46,4 +46,4 @@ private:
 	emu_timer *m_mcu_timer;
 };
 
-#endif // MAME_MACHINE_ZNMCU_H
+#endif // MAME_SONY_ZNMCU_H

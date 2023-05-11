@@ -13,6 +13,9 @@
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class emu68k_state : public driver_device
 {
 public:
@@ -233,6 +236,9 @@ ROM_START(carnaval)
 	ROM_LOAD16_BYTE("carnaval-1.00-msb.bin", 0x00000, 0x40000, CRC(962b3d2b) SHA1(e4668306e21fef8b0b696f08bed7c6e66941c8b2))
 	ROM_LOAD16_BYTE("carnaval-1.00-lsb.bin", 0x00001, 0x40000, CRC(95506a6f) SHA1(1f6f2cce4fac36f4daa22bded1013f3dd0ca72db))
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1989, proteus1,  0, 0, proteus1,  proteus1,  emu68k_state, empty_init, "E-mu Systems", "Proteus/1 16-Bit Multi-Timbral Digital Sound Module", MACHINE_IS_SKELETON)
 SYST(1989, proteusxr, 0, 0, proteusxr, proteus1,  emu68k_state, empty_init, "E-mu Systems", "Proteus/1 XR 16-Bit Multi-Timbral Digital Sound Module", MACHINE_IS_SKELETON)

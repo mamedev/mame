@@ -108,6 +108,9 @@ Lower PCB is plugged in with components facing up.
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
+
 #define MAIN_CLOCK XTAL(9'987'000)
 
 class marinedt_state : public driver_device
@@ -685,5 +688,8 @@ ROM_START( marinedt )
 	ROM_LOAD( "mg16.4e",  0x0040, 0x0020, CRC(92c868bc) SHA1(483ae6f47845ddacb701528e82bd388d7d66a0fb) ) // (related to sprites)
 	ROM_LOAD( "mg17.bpr", 0x0060, 0x0020, CRC(13261a02) SHA1(050edd18e4f79d19d5206f55f329340432fd4099) ) // sea bitmap colors
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1981, marinedt, 0, marinedt, marinedt, marinedt_state, empty_init, ROT270, "Taito", "Marine Date", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND )

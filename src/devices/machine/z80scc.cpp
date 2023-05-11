@@ -1918,7 +1918,7 @@ void z80scc_channel::do_sccreg_wr1(uint8_t data)
 		LOG("- Receiver Interrupt on Special Conditions only\n");
 		break;
 	}
-	if ((data & WR1_RX_INT_MODE_MASK) == WR1_PARITY_IS_SPEC_COND)
+	if (data & WR1_PARITY_IS_SPEC_COND)
 		LOG("- Parity error is a Special Condition\n");
 	m_uart->check_interrupts();
 }
@@ -2584,7 +2584,7 @@ void z80scc_channel::receive_data(uint8_t data)
 		// store received character but do not step the fifo
 		m_rx_data_fifo[m_rx_fifo_wp] = data;
 
-		logerror("Receive_data() Error %02x\n", m_rx_error_fifo[m_rx_fifo_wp] & (RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR));
+		LOGRCV("Receive_data() Error %02x\n", m_rx_error_fifo[m_rx_fifo_wp] & (RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR));
 	}
 	else
 	{

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
     To load software, you must use the following sequence at the prompt:
      "J" "shift+P" "shift+P" "enter" (this will enter the command LOAD "" and execute it)

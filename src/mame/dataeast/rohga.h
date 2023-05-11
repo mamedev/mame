@@ -5,8 +5,8 @@
     Data East 'Rohga' era hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_ROHGA_H
-#define MAME_INCLUDES_ROHGA_H
+#ifndef MAME_DATAEAST_ROHGA_H
+#define MAME_DATAEAST_ROHGA_H
 
 #pragma once
 
@@ -100,4 +100,4 @@ private:
 	void sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_ROHGA_H
+#endif // MAME_DATAEAST_ROHGA_H

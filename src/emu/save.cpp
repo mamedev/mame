@@ -25,6 +25,8 @@
 #include "emu.h"
 #include "emuopts.h"
 
+#include "main.h"
+
 #include "util/coreutil.h"
 #include "util/ioprocs.h"
 #include "util/ioprocsfilter.h"
@@ -221,7 +223,7 @@ save_error save_manager::check_file(running_machine &machine, util::core_file &f
 	if (file.read(header, sizeof(header), actual) || actual != sizeof(header))
 	{
 		if (errormsg != nullptr)
-			(*errormsg)("Could not read %s save file header",emulator_info::get_appname());
+			(*errormsg)("Could not read %s save file header", emulator_info::get_appname());
 		return STATERR_READ_ERROR;
 	}
 
@@ -548,7 +550,7 @@ save_error save_manager::validate_header(const u8 *header, const char *gamename,
 	if (memcmp(header, STATE_MAGIC_NUM, 8))
 	{
 		if (errormsg != nullptr)
-			(*errormsg)("%sThis is not a %s save file", error_prefix,emulator_info::get_appname());
+			(*errormsg)("%sThis is not a %s save file", error_prefix, emulator_info::get_appname());
 		return STATERR_INVALID_HEADER;
 	}
 

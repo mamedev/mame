@@ -205,6 +205,7 @@ void smpc_hle_device::smpc_regs(address_map &map)
 smpc_hle_device::smpc_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SMPC_HLE, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
+	, device_rtc_interface(mconfig, *this)
 	, m_space_config("regs", ENDIANNESS_LITTLE, 8, 7, 0, address_map_constructor(FUNC(smpc_hle_device::smpc_regs), this))
 	, m_mini_nvram(*this, "smem")
 	, m_mshres(*this)
@@ -244,9 +245,6 @@ void smpc_hle_device::device_add_mconfig(machine_config &config)
 
 void smpc_hle_device::device_start()
 {
-	system_time systime;
-	machine().base_datetime(systime);
-
 //  check if SMEM has valid data via byte 4 in the array, if not then simulate a battery backup fail
 //  (-> call the RTC / Language select menu for Saturn)
 	m_mini_nvram->set_base(&m_smem, 5);
@@ -289,14 +287,6 @@ void smpc_hle_device::device_start()
 	m_rtc_timer = timer_alloc(FUNC(smpc_hle_device::handle_rtc_increment), this);
 	m_intback_timer = timer_alloc(FUNC(smpc_hle_device::intback_continue_request), this);
 	m_sndres_timer = timer_alloc(FUNC(smpc_hle_device::sound_reset), this);
-
-	m_rtc_data[0] = DectoBCD(systime.local_time.year / 100);
-	m_rtc_data[1] = DectoBCD(systime.local_time.year % 100);
-	m_rtc_data[2] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
-	m_rtc_data[3] = DectoBCD(systime.local_time.mday);
-	m_rtc_data[4] = DectoBCD(systime.local_time.hour);
-	m_rtc_data[5] = DectoBCD(systime.local_time.minute);
-	m_rtc_data[6] = DectoBCD(systime.local_time.second);
 }
 
 
@@ -326,6 +316,22 @@ void smpc_hle_device::device_reset()
 	m_cur_dotsel = false;
 
 	m_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
+}
+
+
+//-------------------------------------------------
+//  rtc_clock_updated - update clock with real time
+//-------------------------------------------------
+
+void smpc_hle_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
+{
+	m_rtc_data[0] = DectoBCD(year / 100);
+	m_rtc_data[1] = DectoBCD(year % 100);
+	m_rtc_data[2] = ((day_of_week - 1) << 4) | month;
+	m_rtc_data[3] = DectoBCD(day);
+	m_rtc_data[4] = DectoBCD(hour);
+	m_rtc_data[5] = DectoBCD(minute);
+	m_rtc_data[6] = DectoBCD(second);
 }
 
 device_memory_interface::space_config_vector smpc_hle_device::memory_space_config() const

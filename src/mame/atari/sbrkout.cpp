@@ -45,6 +45,9 @@
 #include "tilemap.h"
 #include "sbrkout.lh"
 
+
+namespace {
+
 class sbrkout_state : public driver_device
 {
 public:
@@ -668,6 +671,9 @@ ROM_START( sbrkoutct ) // built from original Atari source code
 	ROM_LOAD( "006400.m2",    0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )    /* sync (not used) */
 	ROM_LOAD( "006401.e2",    0x0100, 0x0020, CRC(857df8db) SHA1(06313d5bde03220b2bc313d18e50e4bb1d0cfbbb) )    /* memory mapper */
 ROM_END
+
+} // anonymous namespace
+
 
 /*************************************
  *

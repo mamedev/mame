@@ -10,7 +10,6 @@
 #include "model2.h"
 
 #include "debug/debugcon.h"
-#include "debug/debugcmd.h"
 #include "debugger.h"
 
 #include <fstream>

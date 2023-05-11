@@ -20,16 +20,142 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "spy.h"
+
+#include "k051960.h"
+#include "k052109.h"
 #include "konamipt.h"
+#include "konami_helper.h"
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
+#include "sound/k007232.h"
 #include "sound/ymopl.h"
+#include "emupal.h"
 #include "speaker.h"
 
+namespace {
+
+class spy_state : public driver_device
+{
+public:
+	spy_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_ram(*this, "ram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_k007232_1(*this, "k007232_1"),
+		m_k007232_2(*this, "k007232_2"),
+		m_k052109(*this, "k052109"),
+		m_k051960(*this, "k051960"),
+		m_palette(*this, "palette")
+	{ }
+
+	void spy(machine_config &config);
+
+private:
+	/* memory pointers */
+	required_shared_ptr<uint8_t> m_ram;
+	uint8_t      m_pmcram[0x800]{};
+	std::vector<uint8_t> m_paletteram{};
+
+	/* misc */
+	int        m_rambank = 0;
+	int        m_pmcbank = 0;
+	int        m_video_enable = 0;
+	int        m_old_3f90 = 0;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<k007232_device> m_k007232_1;
+	required_device<k007232_device> m_k007232_2;
+	required_device<k052109_device> m_k052109;
+	required_device<k051960_device> m_k051960;
+	required_device<palette_device> m_palette;
+	uint8_t spy_bankedram1_r(offs_t offset);
+	void spy_bankedram1_w(offs_t offset, uint8_t data);
+	void bankswitch_w(uint8_t data);
+	void spy_3f90_w(uint8_t data);
+	void spy_sh_irqtrigger_w(uint8_t data);
+	void sound_bank_w(uint8_t data);
+	uint8_t k052109_051960_r(offs_t offset);
+	void k052109_051960_w(offs_t offset, uint8_t data);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	uint32_t screen_update_spy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void spy_collision(  );
+	void volume_callback0(uint8_t data);
+	void volume_callback1(uint8_t data);
+	K052109_CB_MEMBER(tile_callback);
+	K051960_CB_MEMBER(sprite_callback);
+
+	void spy_map(address_map &map);
+	void spy_sound_map(address_map &map);
+};
+
+
+/***************************************************************************
+
+  Callbacks for the K052109
+
+***************************************************************************/
+
+K052109_CB_MEMBER(spy_state::tile_callback)
+{
+	static const int layer_colorbase[] = { 768 / 16, 0 / 16, 256 / 16 };
+
+	*flags = (*color & 0x20) ? TILE_FLIPX : 0;
+	*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) << 9) | (bank << 13);
+	*color = layer_colorbase[layer] + ((*color & 0xc0) >> 6);
+}
+
+
+/***************************************************************************
+
+  Callbacks for the K051960
+
+***************************************************************************/
+
+K051960_CB_MEMBER(spy_state::sprite_callback)
+{
+	enum { sprite_colorbase = 512 / 16 };
+
+	/* bit 4 = priority over layer A (0 = have priority) */
+	/* bit 5 = priority over layer B (1 = have priority) */
+	*priority = 0x00;
+	if ( *color & 0x10) *priority |= GFX_PMASK_1;
+	if (~*color & 0x20) *priority |= GFX_PMASK_2;
+
+	*color = sprite_colorbase + (*color & 0x0f);
+}
+
+
+/***************************************************************************
+
+  Display refresh
+
+***************************************************************************/
+
+uint32_t spy_state::screen_update_spy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_k052109->tilemap_update();
+
+	screen.priority().fill(0, cliprect);
+
+	if (!m_video_enable)
+		bitmap.fill(768, cliprect); // ?
+	else
+	{
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 1);
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 0, 2);
+		m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), -1, -1);
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
+	}
+
+	return 0;
+}
 
 uint8_t spy_state::spy_bankedram1_r(offs_t offset)
 {
@@ -602,6 +728,8 @@ ROM_START( spyu )
 	ROM_REGION( 0x40000, "k007232_2", 0 ) /* samples for 007232 #1 */
 	ROM_LOAD( "857b04.bin",   0x00000, 0x40000, CRC(20b83c13) SHA1(63062f1c0a9adbbced3d3d73682a2cd1217bee7d) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1989, spy,  0,   spy, spy, spy_state, empty_init, ROT0, "Konami", "S.P.Y. - Special Project Y (World ver. N)", MACHINE_SUPPORTS_SAVE )

@@ -137,6 +137,9 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
+
+namespace {
+
 class force68k_state : public driver_device
 {
 public:
@@ -193,7 +196,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER (centronics_select_w);
 
 	// User EPROM/SRAM slot(s)
-	image_init_result force68k_load_cart(device_image_interface &image, generic_slot_device *slot);
+	std::pair<std::error_condition, std::string> force68k_load_cart(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER (exp1_load) { return force68k_load_cart(image, m_cart); }
 	uint16_t read16_rom(offs_t offset);
 
@@ -407,7 +410,7 @@ void force68k_state::machine_reset ()
 /* A very inefficient User cart emulation of two 8 bit sockets (odd and even) */
 uint16_t force68k_state::read16_rom(offs_t offset){
 	offset = offset % m_cart->common_get_size("rom"); // Don't read outside buffer...
-	return ((m_usrrom [offset] << 8) & 0xff00) | ((m_usrrom [offset] >> 8) & 0x00ff);
+	return swapendian_int16(m_usrrom [offset]);
 }
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0x80000 to 0x0 */
@@ -507,21 +510,21 @@ void force68k_state::fccpu1_eprom_sockets(machine_config &config)
 /***************************
    Rom loading functions
 ****************************/
-image_init_result force68k_state::force68k_load_cart(device_image_interface &image, generic_slot_device *slot)
+std::pair<std::error_condition, std::string> force68k_state::force68k_load_cart(device_image_interface &image, generic_slot_device *slot)
 {
 	uint32_t size = slot->common_get_size("rom");
 
-	if (size > 0x20000) // Max 128Kb
+	if (size > 0x2'0000) // Max 128Kb
 	{
-		LOG("Cartridge size exceeding max size (128Kb): %d\n", size);
-		image.seterror(image_error::INVALIDIMAGE, "Cartridge size exceeding max size (128Kb)");
-		return image_init_result::FAIL;
+		return std::make_pair(
+				image_error::INVALIDLENGTH,
+				util::string_format("Cartridge size %d exceeds max size (128K)", size));
 	}
 
 	slot->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_BIG);
 	slot->common_load_rom(slot->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -727,6 +730,9 @@ ROM_START (fccpu6vb)
 	ROM_REGION (0x1000000, "maincpu", 0)
 ROM_END
 #endif
+
+} // anonymous namespace
+
 
 /* Driver */
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                 FULLNAME          FLAGS */

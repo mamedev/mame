@@ -24,6 +24,8 @@ XTALs: 20 MHz near CPU and sound chip, 25 MHz near video chip
 #include "sound/okim9810.h"
 
 
+namespace {
+
 class dinoking_state : public driver_device
 {
 public:
@@ -83,6 +85,8 @@ ROM_START( dkbattle )
 	ROM_REGION( 0x400000, "oki", 0 )
 	ROM_LOAD( "f54-02.ic27", 0x000000, 0x400000, CRC(bd8e10e9) SHA1(a86fde5860501b06f63bafbc02ebc6160c682b1e) ) // MBM29F033C-90PTN
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 2004, dkkids,   0, dinoking, dinoking, dinoking_state, empty_init, ROT0, "Taito Corporation", "Dinoking Kids",   MACHINE_IS_SKELETON )

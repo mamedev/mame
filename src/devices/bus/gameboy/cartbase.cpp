@@ -351,6 +351,108 @@ void mbc_dual_uniform_device_base::set_bank_rom_high(u16 entry)
 
 
 //**************************************************************************
+//  16 KiB fixed at 0x0000, 8 KiB switchable at 0x4000 and 0x6000
+//**************************************************************************
+
+mbc_8k_device_base::mbc_8k_device_base(
+		machine_config const &mconfig,
+		device_type type,
+		char const *tag,
+		device_t *owner,
+		u32 clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_gb_cart_interface(mconfig, *this),
+	m_bank_rom(*this, { "romlow", "romhigh" }),
+	m_bank_bits_rom(0U),
+	m_bank_mask_rom(0U)
+{
+}
+
+
+void mbc_8k_device_base::device_start()
+{
+}
+
+
+bool mbc_8k_device_base::check_rom(std::string &message)
+{
+	memory_region *const romregion(cart_rom_region());
+	if (!romregion || !romregion->bytes())
+	{
+		// setting default bank on reset causes a fatal error when no banks are configured
+		message = "No ROM data found";
+		return false;
+	}
+
+	auto const rombytes(romregion->bytes());
+	if ((rombytes & (PAGE_ROM_SIZE - 1)) || ((u32(PAGE_ROM_SIZE) << m_bank_bits_rom) < rombytes))
+	{
+		message = util::string_format(
+				"Unsupported cartridge ROM size (must be a multiple of 8 KiB and no larger than %u pages)",
+				1U << m_bank_bits_rom);
+		return false;
+	}
+
+	return true;
+}
+
+
+void mbc_8k_device_base::install_rom(
+		address_space_installer &fixedspace,
+		address_space_installer &lowspace,
+		address_space_installer &highspace)
+{
+	memory_region *const romregion(cart_rom_region());
+	auto const rombytes(romregion->bytes());
+
+	// install the fixed ROM, mirrored if it’s too small
+	if (0x4000 > rombytes)
+		fixedspace.install_rom(0x0000, 0x1fff, 0x2000, romregion->base());
+	else
+		fixedspace.install_rom(0x0000, 0x3fff, 0x0000, romregion->base());
+
+	// configure both banks as views of the ROM
+	m_bank_mask_rom = device_generic_cart_interface::map_non_power_of_two(
+			unsigned(rombytes / PAGE_ROM_SIZE),
+			[this, base = &romregion->as_u8()] (unsigned entry, unsigned page)
+			{
+				LOG(
+						"Install ROM 0x%06X-0x%06X in bank entry %u\n",
+						page * PAGE_ROM_SIZE,
+						(page * PAGE_ROM_SIZE) + (PAGE_ROM_SIZE - 1),
+						entry);
+				m_bank_rom[0]->configure_entry(entry, &base[page * PAGE_ROM_SIZE]);
+				m_bank_rom[1]->configure_entry(entry, &base[page * PAGE_ROM_SIZE]);
+			});
+	lowspace.install_read_bank(0x4000, 0x5fff, m_bank_rom[0]);
+	highspace.install_read_bank(0x6000, 0x7fff, m_bank_rom[1]);
+}
+
+
+void mbc_8k_device_base::set_bank_rom_low(u16 entry)
+{
+	entry &= m_bank_mask_rom;
+	LOG(
+			"%s: Set ROM bank low = 0x%06X\n",
+			machine().describe_context(),
+			entry * PAGE_ROM_SIZE);
+	m_bank_rom[0]->set_entry(entry);
+}
+
+
+void mbc_8k_device_base::set_bank_rom_high(u16 entry)
+{
+	entry &= m_bank_mask_rom;
+	LOG(
+			"%s: Set ROM bank high = 0x%06X\n",
+			machine().describe_context(),
+			entry * PAGE_ROM_SIZE);
+	m_bank_rom[1]->set_entry(entry);
+}
+
+
+
+//**************************************************************************
 //  32 KiB switchable at 0x0000
 //**************************************************************************
 

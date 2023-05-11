@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
-#ifndef MAME_MACHINE_KAY_KBD_H
-#define MAME_MACHINE_KAY_KBD_H
+#ifndef MAME_KAYPRO_KAY_KBD_H
+#define MAME_KAYPRO_KAY_KBD_H
 
 #pragma once
 
@@ -48,4 +48,4 @@ private:
 
 DECLARE_DEVICE_TYPE(KAYPRO_10_KEYBOARD, kaypro_10_keyboard_device)
 
-#endif // MAME_MACHINE_KAY_KBD_H
+#endif // MAME_KAYPRO_KAY_KBD_H

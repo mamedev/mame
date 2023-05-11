@@ -9,6 +9,17 @@
 #include "emu.h"
 #include "svis_snd.h"
 
+// configurable logging
+#define LOG_DMA     (1U <<  1)
+#define LOG_NOISE   (1U <<  2)
+
+//#define VERBOSE (LOG_GENERAL | LOG_DMA | LOG_NOISE)
+
+#include "logmacro.h"
+
+#define LOGDMA(...)       LOGMASKED(LOG_DMA,     __VA_ARGS__)
+#define LOGNOISE(...)     LOGMASKED(LOG_NOISE,   __VA_ARGS__)
+
 
 // device type definition
 DEFINE_DEVICE_TYPE(SVISION_SND, svision_sound_device, "svision_sound", "Super Vision Custom Sound")
@@ -46,6 +57,36 @@ void svision_sound_device::device_start()
 	memset(m_channel, 0, sizeof(m_channel));
 
 	m_mixer_channel = stream_alloc(0, 2, machine().sample_rate());
+
+	save_item(STRUCT_MEMBER(m_noise, reg));
+	save_item(STRUCT_MEMBER(m_noise, on));
+	save_item(STRUCT_MEMBER(m_noise, right));
+	save_item(STRUCT_MEMBER(m_noise, left));
+	save_item(STRUCT_MEMBER(m_noise, play));
+	save_item(STRUCT_MEMBER(m_noise, state));
+	save_item(STRUCT_MEMBER(m_noise, volume));
+	save_item(STRUCT_MEMBER(m_noise, count));
+	save_item(STRUCT_MEMBER(m_noise, step));
+	save_item(STRUCT_MEMBER(m_noise, pos));
+	save_item(STRUCT_MEMBER(m_noise, value));
+
+	save_item(STRUCT_MEMBER(m_dma, reg));
+	save_item(STRUCT_MEMBER(m_dma, on));
+	save_item(STRUCT_MEMBER(m_dma, right));
+	save_item(STRUCT_MEMBER(m_dma, left));
+	save_item(STRUCT_MEMBER(m_dma, ca14to16));
+	save_item(STRUCT_MEMBER(m_dma, start));
+	save_item(STRUCT_MEMBER(m_dma, size));
+	save_item(STRUCT_MEMBER(m_dma, pos));
+	save_item(STRUCT_MEMBER(m_dma, step));
+	save_item(STRUCT_MEMBER(m_dma, finished));
+
+	save_item(STRUCT_MEMBER(m_channel, reg));
+	save_item(STRUCT_MEMBER(m_channel, waveform));
+	save_item(STRUCT_MEMBER(m_channel, volume));
+	save_item(STRUCT_MEMBER(m_channel, pos));
+	save_item(STRUCT_MEMBER(m_channel, size));
+	save_item(STRUCT_MEMBER(m_channel, count));
 }
 
 
@@ -55,8 +96,8 @@ void svision_sound_device::device_start()
 
 void svision_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	auto &left=outputs[0];
-	auto &right=outputs[1];
+	auto &left = outputs[0];
+	auto &right = outputs[1];
 
 	for (int i = 0; i < left.samples(); i++)
 	{
@@ -67,7 +108,7 @@ void svision_sound_device::sound_stream_update(sound_stream &stream, std::vector
 			CHANNEL &channel(m_channel[j]);
 			if (channel.size != 0)
 			{
-				if (channel.on||channel.count)
+				if (channel.on || channel.count)
 				{
 					bool on = false;
 					switch (channel.waveform)
@@ -116,7 +157,7 @@ void svision_sound_device::sound_stream_update(sound_stream &stream, std::vector
 						m_noise.value = m_noise.state & 0x40 ? 1 : 0;
 						b1 = (m_noise.state & 0x40) != 0;
 						b2 = (m_noise.state & 0x20) != 0;
-						m_noise.state=(m_noise.state<<1)+(b1!=b2?1:0);
+						m_noise.state = (m_noise.state << 1) + (b1 != b2 ? 1 : 0);
 						break;
 					case NOISE::Type::Type14Bit:
 					default:
@@ -132,7 +173,7 @@ void svision_sound_device::sound_stream_update(sound_stream &stream, std::vector
 		{
 			uint8_t sample;
 			int16_t s;
-			uint16_t addr = m_dma.start + (unsigned) m_dma.pos / 2;
+			uint16_t const addr = m_dma.start + (unsigned) m_dma.pos / 2;
 			if (addr >= 0x8000 && addr < 0xc000)
 			{
 				sample = ((uint8_t*)m_cartrom->base())[(addr & 0x3fff) | m_dma.ca14to16];
@@ -153,7 +194,7 @@ void svision_sound_device::sound_stream_update(sound_stream &stream, std::vector
 			m_dma.pos += m_dma.step;
 			if (m_dma.pos >= m_dma.size)
 			{
-				m_dma.finished = true;
+				m_dma.finished = true; // TODO: only ever set, never read?
 				m_dma.on = false;
 				m_irq_cb(1);
 			}
@@ -166,7 +207,7 @@ void svision_sound_device::sound_stream_update(sound_stream &stream, std::vector
 
 void svision_sound_device::sounddma_w(offs_t offset, uint8_t data)
 {
-	logerror("%.6f svision snddma write %04x %02x\n", machine().time().as_double(),offset+0x18,data);
+	LOGDMA("%.6f svision snddma write %04x %02x\n", machine().time().as_double(), offset + 0x18, data);
 	m_dma.reg[offset] = data;
 	switch (offset)
 	{
@@ -196,13 +237,13 @@ void svision_sound_device::sounddma_w(offs_t offset, uint8_t data)
 
 void svision_sound_device::noise_w(offs_t offset, uint8_t data)
 {
-	//  logerror("%.6f svision noise write %04x %02x\n",machine.time(),offset+0x28,data);
-	m_noise.reg[offset]=data;
+	LOGNOISE("%.6f svision noise write %04x %02x\n", machine().time().as_double(), offset + 0x28, data);
+	m_noise.reg[offset] = data;
 	switch (offset)
 	{
 		case 0:
-			m_noise.volume=data&0xf;
-			m_noise.step= unscaled_clock() / (256.0*machine().sample_rate()*(1+(data>>4)));
+			m_noise.volume = data & 0xf;
+			m_noise.step = unscaled_clock() / (256.0 * machine().sample_rate() * (1 + (data >> 4)));
 			break;
 		case 1:
 			m_noise.count = data + 1;
@@ -212,11 +253,11 @@ void svision_sound_device::noise_w(offs_t offset, uint8_t data)
 			m_noise.play = data & 2;
 			m_noise.right = data & 4;
 			m_noise.left = data & 8;
-			m_noise.on = data & 0x10; /* honey bee start */
+			m_noise.on = data & 0x10; // honey bee start
 			m_noise.state = 1;
 			break;
 	}
-	m_noise.pos=0.0;
+	m_noise.pos = 0.0;
 }
 
 
@@ -231,37 +272,36 @@ void svision_sound_device::sound_decrement()
 }
 
 
-void svision_sound_device::soundport_w(int which, int offset, int data)
+void svision_sound_device::soundport_w(uint8_t which, offs_t offset, uint8_t data)
 {
-	CHANNEL &channel(m_channel[which]);
 	uint16_t size;
 
 	m_mixer_channel->update();
-	channel.reg[offset] = data;
+	m_channel[which].reg[offset] = data;
 
 	switch (offset)
 	{
 		case 0:
 		case 1:
-			size = channel.reg[0] | ((channel.reg[1] & 7) << 8);
+			size = m_channel[which].reg[0] | ((m_channel[which].reg[1] & 7) << 8);
 			if (size)
 			{
-				//  channel.size=(int)(device->machine().sample_rate()*(size<<5)/4e6);
-				channel.size = (int) (machine().sample_rate() * (size << 5) / unscaled_clock());
+				// m_channel[which].size = (int) (machine().sample_rate() * (size << 5) / 4e6);
+				m_channel[which].size = (int) (machine().sample_rate() * (size << 5) / unscaled_clock());
 			}
 			else
 			{
-				channel.size = 0;
+				m_channel[which].size = 0;
 			}
-			channel.pos = 0;
+			m_channel[which].pos = 0;
 			break;
 		case 2:
-			channel.on = data & 0x40;
-			channel.waveform = (data & 0x30) >> 4;
-			channel.volume = data & 0xf;
+			m_channel[which].on = data & 0x40;
+			m_channel[which].waveform = (data & 0x30) >> 4;
+			m_channel[which].volume = data & 0xf;
 			break;
 		case 3:
-			channel.count = data + 1;
+			m_channel[which].count = data + 1;
 			break;
 	}
 }

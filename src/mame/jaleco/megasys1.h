@@ -7,8 +7,8 @@
                     driver by   Luca Elia (l.elia@tin.it)
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_MEGASYS1_H
-#define MAME_INCLUDES_MEGASYS1_H
+#ifndef MAME_JALECO_MEGASYS1_H
+#define MAME_JALECO_MEGASYS1_H
 
 #pragma once
 
@@ -216,4 +216,4 @@ private:
 	void z80_sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_MEGASYS1_H
+#endif // MAME_JALECO_MEGASYS1_H

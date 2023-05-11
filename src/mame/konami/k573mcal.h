@@ -4,8 +4,8 @@
  * Konami 573 Master Calendar
  *
  */
-#ifndef MAME_MACHINE_K573_MCAL_H
-#define MAME_MACHINE_K573_MCAL_H
+#ifndef MAME_KONAMI_K573_MCAL_H
+#define MAME_KONAMI_K573_MCAL_H
 
 #pragma once
 
@@ -27,8 +27,6 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 protected:
-	template <uint8_t First> void set_port_tags() { }
-
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -49,4 +47,4 @@ private:
 
 DECLARE_DEVICE_TYPE(KONAMI_573_MASTER_CALENDAR, k573mcal_device)
 
-#endif // MAME_MACHINE_K573_MCAL_H
+#endif // MAME_KONAMI_K573_MCAL_H

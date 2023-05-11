@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_MPZ80_H
-#define MAME_INCLUDES_MPZ80_H
+#ifndef MAME_MORROW_MPZ80_H
+#define MAME_MORROW_MPZ80_H
 
 #pragma once
 
@@ -100,4 +100,4 @@ private:
 	void mpz80_mem(address_map &map);
 };
 
-#endif // MAME_INCLUDES_MPZ80_H
+#endif // MAME_MORROW_MPZ80_H

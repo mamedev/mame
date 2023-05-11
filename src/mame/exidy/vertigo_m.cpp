@@ -113,7 +113,6 @@ TIMER_CALLBACK_MEMBER(vertigo_state::sound_command_w)
 	/* It is important that the sound cpu ACKs the sound command
 	   quickly. Otherwise the main CPU gives up with sound. Boosting
 	   the interleave for a while helps. */
-
 	machine().scheduler().perfect_quantum(attotime::from_usec(100));
 }
 
@@ -148,11 +147,9 @@ void vertigo_state::machine_start()
 
 void vertigo_state::machine_reset()
 {
-	int i;
-
 	m_ttl74148->enable_input_w(0);
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 		m_ttl74148->input_line_w(i, 1);
 
 	m_ttl74148->update();

@@ -23,6 +23,9 @@
 #include "sound/mos6581.h"
 #include "video/mos6566.h"
 
+
+namespace {
+
 #define MOS6566_TAG     "u2"
 #define MOS6581_TAG     "u6"
 #define MOS6526_TAG     "u9"
@@ -711,6 +714,7 @@ ROM_START( vic10 )
 	ROM_LOAD( "6703.u4", 0x000, 0x100, NO_DUMP )
 ROM_END
 
+} // anonymous namespace
 
 
 //**************************************************************************

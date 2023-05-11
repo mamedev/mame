@@ -28,6 +28,8 @@ TODO:
 #include "dct11em.lh"
 
 
+namespace {
+
 class dct11em_state : public driver_device
 {
 public:
@@ -310,6 +312,9 @@ ROM_START( dct11em )
 	ROM_LOAD16_BYTE( "23-214e4.e45", 0x8001, 0x2000, CRC(b523dae8) SHA1(cd1a64a2bce9730f7a9177d391663919c7f56073))
 	ROM_COPY("maincpu", 0x8000, 0xc000, 0x2000)
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

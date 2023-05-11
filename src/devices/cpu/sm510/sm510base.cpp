@@ -243,13 +243,13 @@ void sm510_base_device::execute_set_input(int line, int state)
 
 void sm510_base_device::do_interrupt()
 {
+	standard_irq_callback(0, m_pc);
+
 	// note: official doc warns that Bl/Bm and the stack are undefined
 	// after waking up, but we leave it unchanged
 	m_icount--;
 	m_halt = false;
 	wakeup_vector();
-
-	standard_irq_callback(0);
 }
 
 

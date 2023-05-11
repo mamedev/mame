@@ -4,9 +4,13 @@
   (c) 2000 ExPotato Co. Ltd (Excellent Potato)
 
 TODO:
-Nearly everything.
-- [:maincpu] WRMSR: invalid MSR write 00000250 (0404040404040404) at 0002e3b6
-  then jumps to 0?
+- skeleton driver;
+- Throws "Primary master hard disk fail" in shutms11. Disk has a non canonical -chs of 524,255,63.
+  winimage will throw plenty of errors on manual file extraction.
+- In pcipc with a manually rebuilt image will throw an exception in "Internat" module once it loads
+  Windows 98 (and installs the diff drivers).
+
+===================================================================================================
 
   There also appears to be a sequel which may be running on the same hardware, but which does not seem to have been released.
   Come On Baby - Ballympic Heroes!  (c) 2001
@@ -132,7 +136,7 @@ Nearly everything.
 
   --
 
-  The donor PC looks like a standard Windows 98 setup.
+  The donor PC looks like a standard Korean Windows 98 setup.
   The only exceptions we see are that there's a game logo.sys/logo.bmp in the
   root directory to hide the Windows 98 startup screen, and a shortcut to
   the game in the startup programs.
@@ -183,56 +187,34 @@ Nearly everything.
 
 
 #include "emu.h"
-
-#include "pcshare.h"
-
 #include "cpu/i386/i386.h"
-
-#include "emupal.h"
-#include "screen.h"
+#include "machine/pci.h"
 
 
-class comebaby_state : public pcat_base_state
+namespace {
+
+class comebaby_state : public driver_device
 {
 public:
 	comebaby_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pcat_base_state(mconfig, type, tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	void comebaby(machine_config &config);
-	void comebaby_io(address_map &map);
+
+private:
+	required_device<cpu_device> m_maincpu;
+
 	void comebaby_map(address_map &map);
-protected:
-
-	// devices
-
-	// driver_device overrides
-	virtual void video_start() override;
 };
-
-
-void comebaby_state::video_start()
-{
-}
-
-uint32_t comebaby_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return 0;
-}
 
 void comebaby_state::comebaby_map(address_map &map)
 {
 	map(0x00000000, 0x0009ffff).ram();
-	map(0x000a0000, 0x000bffff).ram();
-	map(0x000c0000, 0x000fffff).rom().region("bios", 0);
+//  map(0x000a0000, 0x000bffff).ram();
+	map(0x000e0000, 0x000fffff).rom().region("bios", 0x20000);
 	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);
-}
-
-void comebaby_state::comebaby_io(address_map &map)
-{
-	pcat32_io_common(map);
 }
 
 static INPUT_PORTS_START( comebaby )
@@ -242,32 +224,23 @@ INPUT_PORTS_END
 void comebaby_state::comebaby(machine_config &config)
 {
 	/* basic machine hardware */
-	PENTIUM2(config, m_maincpu, (66666666*19)/2); /* Actually a Celeron */
+	PENTIUM2(config, m_maincpu, 66'666'666); /* Actually a Celeron (66'666'666 * 19) / 2 */
 	m_maincpu->set_addrmap(AS_PROGRAM, &comebaby_state::comebaby_map);
-	m_maincpu->set_addrmap(AS_IO, &comebaby_state::comebaby_io);
 
-	pcat_common(config);
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_screen_update(FUNC(comebaby_state::screen_update));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea_full();
-	screen.set_palette("palette");
-
-	PALETTE(config, "palette").set_entries(0x100);
+	PCI_ROOT(config, "pci", 0);
+	// ...
 }
 
 
 ROM_START(comebaby)
-	ROM_REGION32_LE(0x80000, "bios", 0)  /* motherboard bios */
+	ROM_REGION32_LE(0x40000, "bios", 0)  /* motherboard bios */
 	ROM_LOAD("b1120iag.bin", 0x000000, 0x40000, CRC(9b6f95f1) SHA1(65d6a2fea9911593f093b2e2a43d1534b54d60b3) )
 
 	DISK_REGION( "disks" )
-	DISK_IMAGE( "comebaby", 0, SHA1(ea57919319c0b6a1d4abd7822cff028855bf082f) )
+	DISK_IMAGE( "comebaby", 0, BAD_DUMP SHA1(ea57919319c0b6a1d4abd7822cff028855bf082f) )
 ROM_END
 
+} // anonymous namespace
 
-GAME( 2000, comebaby, 0, comebaby, comebaby, comebaby_state, empty_init, ROT0, "ExPotato", "Come On Baby", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+
+GAME( 2000, comebaby, 0, comebaby, comebaby, comebaby_state, empty_init, ROT0, "ExPotato", "Come On Baby", MACHINE_IS_SKELETON )

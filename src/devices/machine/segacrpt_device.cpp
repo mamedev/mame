@@ -105,6 +105,7 @@
   List of encrypted games currently known:
 
  CPU Part #     Game                    Comments
+  315-5006      Monster Bash            same encryption scheme as 315-5096 - Spatter
   315-5010      Pengo                   unencrypted version available
   315-5013      Super Zaxxon            used Zaxxon for known plaintext attack
   315-5014      Buck Rogers / Zoom 909  unencrypted version available
@@ -123,18 +124,21 @@
   315-5064      Water Match             used Mister Viking for k.p.a.
   315-5065      Bull Fight
   315-5069      Star Force              game by Tehkan; same key as Super Locomotive
-  ???-????      Spatter                 same encryption scheme is used by the Falcon 03155096 CPU (Z80)
   315-5084      Jongkyo                 TABLE INCOMPLETE game by Kiwako; also has a simple bitswap on top
   315-5093      Pitfall II
+  315-5096      Spatter                 same encryption scheme is used by the Falcon 03155096 CPU (Z80)
   315-5098      Ninja Princess          unencrypted version available; same key as Up'n Down
+  315-5099      Spatter
   315-5102      Sega Ninja              unencrypted version available
   315-5110      I'm Sorry               used My Hero for k.p.a.
   315-5114      Champion Pro Wrestling  same key as Regulus
   315-5115      TeddyBoy Blues
   315-5128      Pinball Action          game by Tehkan; also has a simple bitswap on top
   315-5132      My Hero
+  315-5133      Ninja Princess          exactly the same as Sega 315-5048?
   315-5135      Heavy Metal &
                 Wonder Boy (set 1a & 3; bootlegs?)
+  315-5155      TeddyBoy Blues
 
 
   Some text found in the ROMs:
@@ -254,32 +258,32 @@ static void decode(uint8_t *data, uint8_t *opcodes, int size, const uint8_t conv
 
 
 
-
-DEFINE_DEVICE_TYPE(SEGA_315_5132, sega_315_5132_device, "sega_315_5132", "Sega 315-5132")
-DEFINE_DEVICE_TYPE(SEGA_315_5155, sega_315_5155_device, "sega_315_5155", "Sega 315-5155")
-DEFINE_DEVICE_TYPE(SEGA_315_5110, sega_315_5110_device, "sega_315_5110", "Sega 315-5110")
-DEFINE_DEVICE_TYPE(SEGA_315_5135, sega_315_5135_device, "sega_315_5135", "Sega 315-5135")
-DEFINE_DEVICE_TYPE(SEGA_315_5051, sega_315_5051_device, "sega_315_5051", "Sega 315-5051")
-DEFINE_DEVICE_TYPE(SEGA_315_5098, sega_315_5098_device, "sega_315_5098", "Sega 315-5098") // also 315-5030 ?
-DEFINE_DEVICE_TYPE(SEGA_315_5102, sega_315_5102_device, "sega_315_5102", "Sega 315-5102")
-DEFINE_DEVICE_TYPE(SEGA_315_5065, sega_315_5065_device, "sega_315_5065", "Sega 315-5065")
-DEFINE_DEVICE_TYPE(SEGA_315_5064, sega_315_5064_device, "sega_315_5064", "Sega 315-5064")
+DEFINE_DEVICE_TYPE(SEGA_315_5006, sega_315_5006_device, "sega_315_5006", "Sega 315-5006")
+DEFINE_DEVICE_TYPE(SEGA_315_5010, sega_315_5010_device, "sega_315_5010", "Sega 315-5010")
+DEFINE_DEVICE_TYPE(SEGA_315_5013, sega_315_5013_device, "sega_315_5013", "Sega 315-5013")
+DEFINE_DEVICE_TYPE(SEGA_315_5014, sega_315_5014_device, "sega_315_5014", "Sega 315-5014")
+DEFINE_DEVICE_TYPE(SEGA_315_5015, sega_315_5015_device, "sega_315_5015", "Sega 315-5015")
+DEFINE_DEVICE_TYPE(SEGA_315_5018, sega_315_5018_device, "sega_315_5018", "Sega 315-5018")
+DEFINE_DEVICE_TYPE(SEGA_315_5028, sega_315_5028_device, "sega_315_5028", "Sega 315-5028")
 DEFINE_DEVICE_TYPE(SEGA_315_5033, sega_315_5033_device, "sega_315_5033", "Sega 315-5033")
 DEFINE_DEVICE_TYPE(SEGA_315_5041, sega_315_5041_device, "sega_315_5041", "Sega 315-5041")
 DEFINE_DEVICE_TYPE(SEGA_315_5048, sega_315_5048_device, "sega_315_5048", "Sega 315-5048")
-DEFINE_DEVICE_TYPE(SEGA_315_5093, sega_315_5093_device, "sega_315_5093", "Sega 315-5093")
-DEFINE_DEVICE_TYPE(SEGA_315_5099, sega_315_5099_device, "sega_315_5099", "Sega 315-5099")
-DEFINE_DEVICE_TYPE(SEGA_315_5015, sega_315_5015_device, "sega_315_5015", "Sega 315-5015")
-DEFINE_DEVICE_TYPE(SEGA_315_5133, sega_315_5133_device, "sega_315_5133", "Sega 315-5133") // exactly the same as Sega 315-5048?
+DEFINE_DEVICE_TYPE(SEGA_315_5051, sega_315_5051_device, "sega_315_5051", "Sega 315-5051")
 DEFINE_DEVICE_TYPE(SEGA_315_5061, sega_315_5061_device, "sega_315_5061", "Sega 315-5061")
-DEFINE_DEVICE_TYPE(SEGA_315_5028, sega_315_5028_device, "sega_315_5028", "Sega 315-5028")
+DEFINE_DEVICE_TYPE(SEGA_315_5064, sega_315_5064_device, "sega_315_5064", "Sega 315-5064")
+DEFINE_DEVICE_TYPE(SEGA_315_5065, sega_315_5065_device, "sega_315_5065", "Sega 315-5065")
 DEFINE_DEVICE_TYPE(SEGA_315_5084, sega_315_5084_device, "sega_315_5084", "Sega 315-5084")
-DEFINE_DEVICE_TYPE(SEGA_315_5013, sega_315_5013_device, "sega_315_5013", "Sega 315-5013")
-DEFINE_DEVICE_TYPE(SEGA_315_5014, sega_315_5014_device, "sega_315_5014", "Sega 315-5014")
-DEFINE_DEVICE_TYPE(SEGA_315_5018, sega_315_5018_device, "sega_315_5018", "Sega 315-5018")
-DEFINE_DEVICE_TYPE(SEGA_315_5010, sega_315_5010_device, "sega_315_5010", "Sega 315-5010")
-DEFINE_DEVICE_TYPE(SEGA_315_SPAT, sega_315_spat_device, "sega_315_spat", "Sega 315-5xxx (Spatter)") // unknown part number
+DEFINE_DEVICE_TYPE(SEGA_315_5093, sega_315_5093_device, "sega_315_5093", "Sega 315-5093")
+DEFINE_DEVICE_TYPE(SEGA_315_5096, sega_315_5096_device, "sega_315_5096", "Sega 315-5096") // exactly the same as Sega 315-5006?
+DEFINE_DEVICE_TYPE(SEGA_315_5098, sega_315_5098_device, "sega_315_5098", "Sega 315-5098") // also 315-5030 ?
+DEFINE_DEVICE_TYPE(SEGA_315_5099, sega_315_5099_device, "sega_315_5099", "Sega 315-5099")
+DEFINE_DEVICE_TYPE(SEGA_315_5102, sega_315_5102_device, "sega_315_5102", "Sega 315-5102")
+DEFINE_DEVICE_TYPE(SEGA_315_5110, sega_315_5110_device, "sega_315_5110", "Sega 315-5110")
 DEFINE_DEVICE_TYPE(SEGA_315_5128, sega_315_5128_device, "sega_315_5128", "Sega 315-5128")
+DEFINE_DEVICE_TYPE(SEGA_315_5132, sega_315_5132_device, "sega_315_5132", "Sega 315-5132")
+DEFINE_DEVICE_TYPE(SEGA_315_5133, sega_315_5133_device, "sega_315_5133", "Sega 315-5133") // exactly the same as Sega 315-5048?
+DEFINE_DEVICE_TYPE(SEGA_315_5135, sega_315_5135_device, "sega_315_5135", "Sega 315-5135")
+DEFINE_DEVICE_TYPE(SEGA_315_5155, sega_315_5155_device, "sega_315_5155", "Sega 315-5155")
 
 
 
@@ -758,8 +762,9 @@ void sega_315_5099_device::decrypt()
 
 
 
-sega_315_spat_device::sega_315_spat_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : segacrpt_z80_device(mconfig, SEGA_315_SPAT, tag, owner, clock) {}
-void sega_315_spat_device::decrypt()
+sega_315_5006_device::sega_315_5006_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : segacrpt_z80_device(mconfig, SEGA_315_5006, tag, owner, clock) {}
+sega_315_5006_device::sega_315_5006_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) : segacrpt_z80_device(mconfig, type, tag, owner, clock) {}
+void sega_315_5006_device::decrypt()
 {
 	static const uint8_t convtable[32][4] =
 	{
@@ -785,6 +790,9 @@ void sega_315_spat_device::decrypt()
 
 	decode(m_region_ptr, m_decrypted_ptr, m_decode_size, convtable, m_numbanks, m_banksize);
 }
+
+sega_315_5096_device::sega_315_5096_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : sega_315_5006_device(mconfig, SEGA_315_5096, tag, owner, clock) {}
+// == sega_315_5006_device
 
 sega_315_5015_device::sega_315_5015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : segacrpt_z80_device(mconfig, SEGA_315_5015, tag, owner, clock) {}
 void sega_315_5015_device::decrypt()

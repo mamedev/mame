@@ -701,6 +701,9 @@ std::optional<char const *> probe_gbx_footer(std::string_view tag, util::random_
 	case gbxfile::TYPE_MBC5:
 		result = slotoptions::GB_MBC5;
 		break;
+	case gbxfile::TYPE_MBC6:
+		result = slotoptions::GB_MBC6;
+		break;
 	case gbxfile::TYPE_MBC7:
 		{
 			// need to probe for EEPROM size
@@ -731,6 +734,15 @@ std::optional<char const *> probe_gbx_footer(std::string_view tag, util::random_
 	case gbxfile::TYPE_HUC3:
 		result = slotoptions::GB_HUC3;
 		break;
+	case gbxfile::TYPE_TFANGBOOT:
+		result = slotoptions::GB_TFANGBOOT;
+		break;
+	case gbxfile::TYPE_BBD:
+		result = slotoptions::GB_BBD;
+		break;
+	case gbxfile::TYPE_DSHGGB81:
+		result = slotoptions::GB_DSHGGB81;
+		break;
 	case gbxfile::TYPE_SINTAX:
 		result = slotoptions::GB_SINTAX;
 		break;
@@ -742,6 +754,12 @@ std::optional<char const *> probe_gbx_footer(std::string_view tag, util::random_
 		break;
 	case gbxfile::TYPE_VF001:
 		result = slotoptions::GB_VF001;
+		break;
+	case gbxfile::TYPE_LIEBAO:
+		result = slotoptions::GB_LIEBAO;
+		break;
+	case gbxfile::TYPE_NTNEW:
+		result = slotoptions::GB_NTNEW;
 		break;
 	case gbxfile::TYPE_SLMULTI:
 		result = slotoptions::GB_SLMULTI;
@@ -1103,7 +1121,7 @@ void gb_cart_slot_device::device_reset_after_children()
 }
 
 
-image_init_result gb_cart_slot_device::load_image_file(util::random_read &file)
+std::pair<std::error_condition, std::string> gb_cart_slot_device::load_image_file(util::random_read &file)
 {
 	using namespace bus::gameboy;
 
@@ -1120,15 +1138,10 @@ image_init_result gb_cart_slot_device::load_image_file(util::random_read &file)
 		// try reading the GBX footer into temporary space before more checks
 		std::unique_ptr<u8 []> const footer(new (std::nothrow) u8 [gbxtrailer.size]);
 		if (!footer)
-		{
-			seterror(image_error::UNSPECIFIED, "Error allocating memory to read GBX file footer");
-			return image_init_result::FAIL;
-		}
-		if (file.read_at(len - gbxtrailer.size, footer.get(), gbxtrailer.size, actual) || (gbxtrailer.size != actual))
-		{
-			seterror(image_error::UNSPECIFIED, "Error reading GBX file footer");
-			return image_init_result::FAIL;
-		}
+			return std::make_pair(std::errc::not_enough_memory, "Error allocating memory to read GBX file footer");
+		std::error_condition const err = file.read_at(len - gbxtrailer.size, footer.get(), gbxtrailer.size, actual);
+		if (err || (gbxtrailer.size != actual))
+			return std::make_pair(err ? err : std::errc::io_error, "Error reading GBX file footer");
 		if (1 != gbxtrailer.ver_maj)
 		{
 			// some unsupported GBX version - assume footer immediately follows ROM
@@ -1228,11 +1241,9 @@ image_init_result gb_cart_slot_device::load_image_file(util::random_read &file)
 	{
 		LOG("Allocating %u byte cartridge ROM region\n", len);
 		memory_region *const romregion = machine().memory().region_alloc(subtag("rom"), len, 1, ENDIANNESS_LITTLE);
-		if (file.read_at(offset, romregion->base(), len, actual) || (len != actual))
-		{
-			seterror(image_error::UNSPECIFIED, "Error reading ROM data from cartridge file");
-			return image_init_result::FAIL;
-		}
+		std::error_condition const err = file.read_at(offset, romregion->base(), len, actual);
+		if (err || (len != actual))
+			return std::make_pair(err ? err : std::errc::io_error, "Error reading ROM data from cartridge file");
 
 		// allocate cartridge RAM based on header if necessary
 		if (proberam)
@@ -1246,7 +1257,7 @@ image_init_result gb_cart_slot_device::load_image_file(util::random_read &file)
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

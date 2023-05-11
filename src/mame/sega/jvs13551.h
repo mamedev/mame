@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MAME_MACHINE_JVS13551_H
-#define MAME_MACHINE_JVS13551_H
+#ifndef MAME_SEGA_JVS13551_H
+#define MAME_SEGA_JVS13551_H
 
 #pragma once
 
@@ -66,4 +66,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SEGA_837_13551, sega_837_13551_device)
 
-#endif // MAME_MACHINE_JVS13551_H
+#endif // MAME_SEGA_JVS13551_H

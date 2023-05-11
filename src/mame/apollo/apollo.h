@@ -8,8 +8,8 @@
  *
  */
 
-#ifndef MAME_INCLUDES_APOLLO_H
-#define MAME_INCLUDES_APOLLO_H
+#ifndef MAME_APOLLO_APOLLO_H
+#define MAME_APOLLO_APOLLO_H
 
 #pragma once
 
@@ -71,7 +71,7 @@
 std::string apollo_cpu_context(running_machine &machine);
 
 // enable/disable the FPU
-void apollo_set_cpu_has_fpu(m68000_base_device *device, int onoff);
+void apollo_set_cpu_has_fpu(m68000_musashi_device *device, int onoff);
 
 // check for excessive logging
 void apollo_check_log();
@@ -168,7 +168,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	required_device<m68000_base_device> m_maincpu;
+	required_device<m68000_musashi_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_shared_ptr<uint32_t> m_messram_ptr;
 
@@ -387,8 +387,8 @@ public:
 	virtual bool support_command_line_image_creation() const noexcept override { return true; }
 	virtual const char *file_extensions() const noexcept override { return "ani,bin"; }
 
-	virtual image_init_result call_load() override;
-	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 	virtual const char *image_type_name() const noexcept override { return "node_id"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "ni"; }
@@ -716,4 +716,4 @@ private:
 DECLARE_DEVICE_TYPE(APOLLO_STDIO, apollo_stdio_device)
 #endif /* APOLLO_XXL */
 
-#endif // MAME_INCLUDES_APOLLO_H
+#endif // MAME_APOLLO_APOLLO_H

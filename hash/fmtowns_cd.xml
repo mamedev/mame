@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="fmtowns_cd" description="Fujitsu FM Towns CD-ROMs">
 
@@ -15,7 +15,6 @@ Items with * are in the list, but are bad dumps or incomplete.
 
                             Title                                         Publisher             Release date  Media
 4D Boxing (Marty compatible)                                  Electronic Arts Victor            1993/7     CD
-4D Driving (Marty compatible)                                 Electronic Arts Victor            1993/7     CD
 A Christmas Carol                                             DynEd Japan                       1993/3     SET(CD+FD)
 A Jack in the Box                                             Raison                            1989/11    CD
 A Night in Tunisia                                            Raison                            1991/9     CD
@@ -157,7 +156,6 @@ Gendai Yougo no Kiso Chishiki (1992)                          Fujitsu           
 Gendai Yougo no Kiso Chishiki (1993)                          Fujitsu                           1993/9     CD
 Gendai Yougo no Kiso Chishiki (1994)                          Fujitsu                           1994/9     CD
 Ge-Ten 2                                                      Hokusho                           1993/?     ?
-Ginga Uchuu Odyssey 1                                         Fujitsu                           1991/3     CD
 Ginga Uchuu Odyssey 2 (Marty-compatible)                      Fujitsu                           1992/4     CD
 Ginga Yuukyou Densetsu Tobakker                               Ponytail Soft                     1995/11    CD
 Gomen ne Angel: Yokohama Monogatari                           JAST                              1992/1     ?
@@ -178,7 +176,6 @@ Heisei 6-nendo-ban Keizai Hakusho                             Fujitsu           
 Hello Kitty: Asobi no Omochabako                              Fujitsu Parex                     1995/9     CD
 High C Compiler Multimedia Kaihatsu Kit V3.2                  Fujitsu                           ?          CD
 High School War                                               ISC                               1994/9     CD
-HomeSTUDIO V1.1                                               Fujitsu                           1992/12    SET(CD+FD)
 Hot de Art na Barcelona                                       Media Art                         1991/9     CD
 Hyoutan Shima Kouryaku-ki                                     Nihon Dennou Koubou               1994/?     ?
 * Hyper Address Ver. 2.0                                      Datt Japan                        1991/4     SET(CD+FD)
@@ -268,7 +265,6 @@ Mohan Roppou Heisei 6-nendo-ban                               Fujitsu           
 Mokkoriman RPG                                                Illusion                          1994/6     CD
 Moko                                                          Fujitsu Social Science Laboratory 1995/3     CD×03
 Monoshiri Jiyuugaku Bannin Isshu-hen                          Shinkou Human Create              1994/10    CD
-Monster Planet 2255                                           Nihon Media Programming           1990/12    CD
 Moon Crystal                                                  Orange House                      1992/6     ?
 Multimedia Nihon no Rekishi Dai-1-Shou: Kariya-ryou no Kurashi  Tokyo Shoseki                     ?          CD
 Multimedia Nihon no Rekishi Dai-2-Shou: Kome-zukuri no Mura kara Kofun no Kuni e    Tokyo Shoseki                     1995/4     CD
@@ -324,7 +320,6 @@ Petit Collage                                                 Pandora Box       
 Powers of Ten                                                 Datt Japan                        1995/10    CD
 Present                                                       Orange House                      1991/6     ?
 Primary Health Care System                                    Raison                            1990/9     CD
-Psychic Detective Series Vol. 2: Memories (Remake)            Data West                         1994/4     SET(CD+FD)
 * Psychic Detective Series Vol. 5: Nightmare (Remake)         Data West                         1995/4     SET(CD+FD)
 Pyoko-tan no Niji no Shima: Nanairo no Ninjin wo Sagase       Nanken Koubou                     1994/3     CD
 Queen of Duellist Gaiden + Gaiden Alpha Light                 Agumix                            1994/4     CD
@@ -395,7 +390,6 @@ The Book of MIDI                                              Fujitsu           
 The Lost Secret                                               DynEd Japan                       1993/7     SET(CD+FD)
 The Manhole 2                                                 Sun Denshi                        1993/5     ?
 The Sea in Your Eyes: Umi wo Mitsumete                        Inter Limited Logic               1995/4     CD
-The Yachtman                                                  Raison                            1989/11    CD
 Think Read: Chuugaku Series                                   Catena                            ?          SET(CD+FD)
 Think Read: Shougaku Series                                   Catena                            ?          SET(CD+FD)
 Total English 1-nen                                           Uchida Youkou                     1993/9     CD
@@ -1023,7 +1017,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Startup Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="windows_3.0_mme_1.0l20.hdm" size="1261568" crc="e8a3ab4b" sha1="dde6910aff5e45d031541071f29a635b3d558d47" offset="000000" />
+				<rom name="windows_3.0_mme_1.0l20.hdm" size="1261568" crc="e8a3ab4b" sha1="dde6910aff5e45d031541071f29a635b3d558d47" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -1054,7 +1048,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Setup Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="microsoft windows version 3.1 l12 operating system (japan) (setup disk).hdm" size="1261568" crc="6703b021" sha1="55161fea07a7d4da4a744707a11c8a5942bc53c5" offset="000000" />
+				<rom name="microsoft windows version 3.1 l12 operating system (japan) (setup disk).hdm" size="1261568" crc="6703b021" sha1="55161fea07a7d4da4a744707a11c8a5942bc53c5" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -1086,7 +1080,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Setup Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="microsoft windows version 3.1 l11 operating system (japan) (setup disk).hdm" size="1261568" crc="3f97a96e" sha1="3e01bef486f7f0bc34c61c05cf9bc029acfb05fd" offset="000000" />
+				<rom name="microsoft windows version 3.1 l11 operating system (japan) (setup disk).hdm" size="1261568" crc="3f97a96e" sha1="3e01bef486f7f0bc34c61c05cf9bc029acfb05fd" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -1119,13 +1113,13 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Setup Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="microsoft windows version 3.1 l10 operating system (japan) (setup disk).hdm" size="1261568" crc="645fbefd" sha1="092d686e5748b36e223ca7c4ebc0b09698d7f8b4" offset="000000" />
+				<rom name="microsoft windows version 3.1 l10 operating system (japan) (setup disk).hdm" size="1261568" crc="645fbefd" sha1="092d686e5748b36e223ca7c4ebc0b09698d7f8b4" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Setup Disk (Model MX/MA-you)" />
 			<dataarea name="flop" size="1261568">
-				<rom name="microsoft windows version 3.1 l10 operating system (japan) (setup disk - model mx-ma).hdm" size="1261568" crc="e5847c37" sha1="522aaa5a467af715226850a602c063aab94a43c7" offset="000000" />
+				<rom name="microsoft windows version 3.1 l10 operating system (japan) (setup disk - model mx-ma).hdm" size="1261568" crc="e5847c37" sha1="522aaa5a467af715226850a602c063aab94a43c7" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -1281,6 +1275,37 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="4d driving (japan)" sha1="68794807a59b1095c2b10bf2e6a4da3eb6371f8f" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="4ddrivinm" cloneof="4ddrivin">
+		<!--
+		Origin: redump.org
+		<rom name="4D Driving (Japan) (FM Towns Marty Rerelease) (Track 01).bin" size="10231200" crc="1e390b90" sha1="cf375b85c09afb8d3104f0417fc46f7975febd28"/>
+		<rom name="4D Driving (Japan) (FM Towns Marty Rerelease) (Track 02).bin" size="8643600" crc="ab5f071b" sha1="3f2dbd7e0ec41dadd6e374065eb2df1cc01a0bc7"/>
+		<rom name="4D Driving (Japan) (FM Towns Marty Rerelease) (Track 03).bin" size="4762800" crc="f1b9040f" sha1="33930f5755172ac37f192c0dac50ede38f3a3117"/>
+		<rom name="4D Driving (Japan) (FM Towns Marty Rerelease) (Track 04).bin" size="7938000" crc="5af6f044" sha1="5729c270b493d74ef24eef51aaa66eb2242931f4"/>
+		<rom name="4D Driving (Japan) (FM Towns Marty Rerelease) (Track 05).bin" size="7232400" crc="5d877a88" sha1="7e6b2783c25521c59e3da7e706a36cd972c81271"/>
+		<rom name="4D Driving (Japan) (FM Towns Marty Rerelease) (Track 06).bin" size="7938000" crc="37541ef0" sha1="6f93d7add53d6ee7a66e55d59b6b87cd7043af52"/>
+		<rom name="4D Driving (Japan) (FM Towns Marty Rerelease) (Track 07).bin" size="6526800" crc="440e0a71" sha1="0aa104dd90c71d856eff36c9dfe92ee3b13dffa4"/>
+		<rom name="4D Driving (Japan) (FM Towns Marty Rerelease) (Track 08).bin" size="7938000" crc="e30827c1" sha1="eada05052c104fb96340d1114f17a90c906f243c"/>
+		<rom name="4D Driving (Japan) (FM Towns Marty Rerelease) (Track 09).bin" size="1587600" crc="e0ea7260" sha1="301c09953eb42e9766d8c5b62b85b8a738782db8"/>
+		<rom name="4D Driving (Japan) (FM Towns Marty Rerelease) (Track 10).bin" size="3880800" crc="6abdbae0" sha1="bd6003b1595c10b8167f19970af556b552479275"/>
+		<rom name="4D Driving (Japan) (FM Towns Marty Rerelease) (Track 11).bin" size="11113200" crc="881174cd" sha1="97ffa1ac92c65802d40437217a2d8153a26bd0e6"/>
+		<rom name="4D Driving (Japan) (FM Towns Marty Rerelease) (Track 12).bin" size="7585200" crc="4dd0b5a3" sha1="f81d02f3e788b112fc75b11d69ce975bc3bf0c90"/>
+		<rom name="4D Driving (Japan) (FM Towns Marty Rerelease).cue" size="1662" crc="f6ffd662" sha1="a34fb5ec6a31cd17d34931b7f605581b6676de77"/>
+		-->
+		<description>4D Driving (FM Towns Marty version)</description>
+		<year>1993</year>
+		<publisher>エレクトロニック・アーツ・ビクター (Electronic Arts Victor)</publisher>
+		<info name="serial" value="HMD-222A / EFT-7005"/>
+		<info name="alt_title" value="4D ドライビング" />
+		<info name="release" value="199307xx" />
+		<info name="usage" value="Only works on the 386SX-based models (Marty/UX)"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="4d driving (japan) (fm towns marty rerelease)" sha1="fa4dc65e57a643b3b717454515318a3552a88f39" />
 			</diskarea>
 		</part>
 	</software>
@@ -1540,7 +1565,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Boot Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="the 4th unit 7 - wyatt (boot disk).hdm" size="1261568" crc="a516f2c4" sha1="f5ae3995c8a8358b88bb716bb9c88ee8d4083d1d" offset="000000" />
+				<rom name="the 4th unit 7 - wyatt (boot disk).hdm" size="1261568" crc="a516f2c4" sha1="f5ae3995c8a8358b88bb716bb9c88ee8d4083d1d" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -1562,7 +1587,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="serial" value="DWFT 2901"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="wyatt_demo.hdm" size="1261568" crc="2e4a5209" sha1="3179cd145554e0b61a3fabc16ff57b1d4bd8f619" offset="000000" />
+				<rom name="wyatt_demo.hdm" size="1261568" crc="2e4a5209" sha1="3179cd145554e0b61a3fabc16ff57b1d4bd8f619" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -1809,7 +1834,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="a-iv-systemdisk_new.hdm" size="1261568" crc="09173db4" sha1="9b007c8cbdb46596bef5235daf3be94f22da3967" offset="000000" />
+				<rom name="a-iv-systemdisk_new.hdm" size="1261568" crc="09173db4" sha1="9b007c8cbdb46596bef5235daf3be94f22da3967" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -1851,7 +1876,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="a-iv-systemdisk_old.hdm" size="1261568" crc="01b1da33" sha1="6aa1850972b6c8bf7ef82a9bbcba022b777a6df8" offset="000000" />
+				<rom name="a-iv-systemdisk_old.hdm" size="1261568" crc="01b1da33" sha1="6aa1850972b6c8bf7ef82a9bbcba022b777a6df8" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -2092,7 +2117,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="serial" value="HMD-119 / T2061-206"/>
 		<info name="alt_title" value="アフターバーナーIII" />
 		<info name="release" value="199206xx" />
-		<info name="usage" value="Requires 2 MB RAM"/>
+		<info name="usage" value="Requires 2 MB RAM. Supports XE-1AP analog pad in analog MD mode on second controller port.  Use a Towns Pad on first port to navigate menus." />
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="after burner iii (japan)" sha1="fe11d382c3efef8ed4a698f6a9832fb6bcd09167" />
@@ -2142,7 +2167,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="User Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="air management - oozora ni kakeru (japan) (user disk).hdm" size="1261568" crc="1095e60c" sha1="a4f27fedb0d4c5b1aeaf39bbf2fbbd104c40760b" offset="000000" />
+				<rom name="air management - oozora ni kakeru (japan) (user disk).hdm" size="1261568" crc="1095e60c" sha1="a4f27fedb0d4c5b1aeaf39bbf2fbbd104c40760b" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -2169,13 +2194,13 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="2MB/Marty Kidou Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="fujitsu air warrior v2 - version 2.1 level 10 (japan) (2mb-marty kidou disk).hdm" size="1261568" crc="feda4609" sha1="db2dbf8123d918c7fe07dea1c7bcf1e9dbcb94ec" offset="000000" />
+				<rom name="fujitsu air warrior v2 - version 2.1 level 10 (japan) (2mb-marty kidou disk).hdm" size="1261568" crc="feda4609" sha1="db2dbf8123d918c7fe07dea1c7bcf1e9dbcb94ec" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="4MB Kidou Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="fujitsu air warrior v2 - version 2.1 level 10 (japan) (4mb kidou disk).hdm" size="1261568" crc="f3da6f23" sha1="c9ba702fc6d0a90fe53d4e712078627c2f30ea2d" offset="000000" />
+				<rom name="fujitsu air warrior v2 - version 2.1 level 10 (japan) (4mb kidou disk).hdm" size="1261568" crc="f3da6f23" sha1="c9ba702fc6d0a90fe53d4e712078627c2f30ea2d" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -2201,13 +2226,13 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="FM Towns-you System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="fujitsu_air_warrior_v1.2l11_fmtowns.hdm" size="1261568" crc="78bdbda9" sha1="295f8c47497f8bb86fbb26cc957c8ddfbb205000" offset="000000" />
+				<rom name="fujitsu_air_warrior_v1.2l11_fmtowns.hdm" size="1261568" crc="78bdbda9" sha1="295f8c47497f8bb86fbb26cc957c8ddfbb205000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Marty-you System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="fujitsu_air_warrior_v1.2l11_marty.hdm" size="1261568" crc="68c7efca" sha1="93c9db6bb8d0dbce9c7a15e86ba0f9fcf46c6c69" offset="000000" />
+				<rom name="fujitsu_air_warrior_v1.2l11_marty.hdm" size="1261568" crc="68c7efca" sha1="93c9db6bb8d0dbce9c7a15e86ba0f9fcf46c6c69" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -2232,7 +2257,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="fujitsu_air_warrior_v1.2l10.hdm" size="1261568" crc="f38664a6" sha1="3f3abd3cb145bca79414d32c08a98ae7250d4b6f" offset="000000" />
+				<rom name="fujitsu_air_warrior_v1.2l10.hdm" size="1261568" crc="f38664a6" sha1="3f3abd3cb145bca79414d32c08a98ae7250d4b6f" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -2257,7 +2282,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="fujitsu_air_warrior_v1.1_1992-04-09.hdm" size="1261568" crc="1b2ef9de" sha1="9abf50374c6c8ce3d6c577e65c042845c93719f9" offset="000000" />
+				<rom name="fujitsu_air_warrior_v1.1_1992-04-09.hdm" size="1261568" crc="1b2ef9de" sha1="9abf50374c6c8ce3d6c577e65c042845c93719f9" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -2282,7 +2307,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="fujitsu_air_warrior_v1.1_1992-03-16.hdm" size="1261568" crc="3387f260" sha1="ebeacf861162b24c9ea5530d06fc7fa2e4259aaf" offset="000000" />
+				<rom name="fujitsu_air_warrior_v1.1_1992-03-16.hdm" size="1261568" crc="3387f260" sha1="ebeacf861162b24c9ea5530d06fc7fa2e4259aaf" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -2331,7 +2356,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="alice_no_yakata_2.hdm" size="1261568" crc="a05edc06" sha1="90da65a58d50fd00891f4166765c90ff973965d6" offset="000000" />
+				<rom name="alice_no_yakata_2.hdm" size="1261568" crc="a05edc06" sha1="90da65a58d50fd00891f4166765c90ff973965d6" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -2566,7 +2591,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="akiko_gold_disk_a.hdm" size="1261568" crc="fd3d3924" sha1="f52b8c76fcf77c9f2d14938e65e99d2fea25db1f" offset="000000" />
+				<rom name="akiko_gold_disk_a.hdm" size="1261568" crc="fd3d3924" sha1="f52b8c76fcf77c9f2d14938e65e99d2fea25db1f" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -2657,7 +2682,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Kidou / Save Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="amaranth_iii.hdm" size="1261568" crc="05955c2f" sha1="dd81ce76b439af9b93f7c524dce4dab12c31e728" offset="000000" />
+				<rom name="amaranth_iii.hdm" size="1261568" crc="05955c2f" sha1="dd81ce76b439af9b93f7c524dce4dab12c31e728" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -2683,7 +2708,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="ambivalenz-systemdisk.hdm" size="1261568" crc="7f3d6d6e" sha1="61c23afc9dc3b3ceaf2c28d6ab571d9bc83720fa" offset="000000" />
+				<rom name="ambivalenz-systemdisk.hdm" size="1261568" crc="7f3d6d6e" sha1="61c23afc9dc3b3ceaf2c28d6ab571d9bc83720fa" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -2739,7 +2764,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="angel (save disk).hdm" size="1261568" crc="8ea3389b" sha1="60792d763d3cac54d19b04673b1f1811cf19b9a8" offset="000000" />
+				<rom name="angel (save disk).hdm" size="1261568" crc="8ea3389b" sha1="60792d763d3cac54d19b04673b1f1811cf19b9a8" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -2877,7 +2902,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="aoki ookami to shiroki mejika - genchou hishi (system disk).hdm" size="1261568" crc="fd062028" sha1="8153620634e8ae88ca07394c74bafc5f44729e68" offset="000000" />
+				<rom name="aoki ookami to shiroki mejika - genchou hishi (system disk).hdm" size="1261568" crc="fd062028" sha1="8153620634e8ae88ca07394c74bafc5f44729e68" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -2997,7 +3022,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Boot Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="asuka 120 burning fest. excellent (boot disk).hdm" size="1261568" crc="12c7d6e2" sha1="0eb696be9666300d76863ae08882485eb69725d4" offset="000000" />
+				<rom name="asuka 120 burning fest. excellent (boot disk).hdm" size="1261568" crc="12c7d6e2" sha1="0eb696be9666300d76863ae08882485eb69725d4" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -3078,7 +3103,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="atlas ii, the (japan) (system disk).hdm" size="1261568" crc="b1f326e8" sha1="681163e4d8c702c86d743f13697388cdbf2f5eca" offset="000000" />
+				<rom name="atlas ii, the (japan) (system disk).hdm" size="1261568" crc="b1f326e8" sha1="681163e4d8c702c86d743f13697388cdbf2f5eca" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -3178,7 +3203,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="ayumi-chan monogatari.hdm" size="1261568" crc="9bf209ba" sha1="cc2be00834492b0ccf5b25a1b0a5ceb810a2e330" offset="000000" />
+				<rom name="ayumi-chan monogatari.hdm" size="1261568" crc="9bf209ba" sha1="cc2be00834492b0ccf5b25a1b0a5ceb810a2e330" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -3536,7 +3561,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="ballade for maria (disk a).hdm" size="1261568" crc="200678ab" sha1="c658fd357318eb5f1522c88ea333f70bda75a72a" offset="000000" />
+				<rom name="ballade for maria (disk a).hdm" size="1261568" crc="200678ab" sha1="c658fd357318eb5f1522c88ea333f70bda75a72a" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -3576,7 +3601,7 @@ User/save disks that can be created from the game itself are not included.
 			<!-- Image recreated from loose files. It should be redumped from an original disk. -->
 			<feature name="part_id" value="System Data Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="band-kun.hdm" size="1261568" crc="840bd27f" sha1="6bb01bcd936060ebe58961b2b5d69f0b7aa5d33e" offset="000000" status="baddump" />
+				<rom name="band-kun.hdm" size="1261568" crc="840bd27f" sha1="6bb01bcd936060ebe58961b2b5d69f0b7aa5d33e" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -3760,7 +3785,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="bible master (system disk).hdm" size="1261568" crc="6c6415bc" sha1="8338b813203ba455285334a127f938f2f56de672" offset="000000" />
+				<rom name="bible master (system disk).hdm" size="1261568" crc="6c6415bc" sha1="8338b813203ba455285334a127f938f2f56de672" />
 			</dataarea>
 		</part>
 		<part name="cdrom1" interface="fmt_cdrom">
@@ -3794,7 +3819,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="biblemaster2-systemdisk.hdm" size="1261568" crc="f7cbb663" sha1="2e6789e1964500bf729cd78c8095c9c2386fd133" offset="000000" />
+				<rom name="biblemaster2-systemdisk.hdm" size="1261568" crc="f7cbb663" sha1="2e6789e1964500bf729cd78c8095c9c2386fd133" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -4286,7 +4311,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Kidou-you Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="california_x_party.hdm" size="1261568" crc="babe0a6f" sha1="1b2e158c7a38ba3f3c5fb10f7dbf81019eea9f0a" offset="000000" />
+				<rom name="california_x_party.hdm" size="1261568" crc="babe0a6f" sha1="1b2e158c7a38ba3f3c5fb10f7dbf81019eea9f0a" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -4549,7 +4574,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="serial" value="HMC-142"/>
 		<info name="alt_title" value="TAITO チェイスＨＱ" />
 		<info name="release" value="199108xx" />
-		<info name="usage" value="Requires 2 MB RAM"/>
+		<info name="usage" value="Requires 2 MB RAM. Supports analog joystick on second controller port (Personal Computer mode).  Use a Towns Pad on first port to navigate menus." />
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="taito chase h.q. (japan)" sha1="8ec3b12763866865ace239e717297b2defcaba43" />
@@ -4633,7 +4658,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="release" value="199312xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="chiemi-and-naomi.hdm" size="1261568" crc="7b3706d4" sha1="a63be0d0426e54291586f8d246c4fab58630026d" offset="000000" />
+				<rom name="chiemi-and-naomi.hdm" size="1261568" crc="7b3706d4" sha1="a63be0d0426e54291586f8d246c4fab58630026d" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -4898,7 +4923,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="crystal_rinal.hdm" size="1261568" crc="c1ce9e3e" sha1="33a14ab80dcbb22d1c55ce7886aff91f089b92d2" offset="000000" />
+				<rom name="crystal_rinal.hdm" size="1261568" crc="c1ce9e3e" sha1="33a14ab80dcbb22d1c55ce7886aff91f089b92d2" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -5015,7 +5040,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="custommate.hdm" size="1261568" crc="769d513d" sha1="b09a09b655cf7d68be18f0f46dc990eac2fc79d8" offset="000000" />
+				<rom name="custommate.hdm" size="1261568" crc="769d513d" sha1="b09a09b655cf7d68be18f0f46dc990eac2fc79d8" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -5057,7 +5082,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="custommate2.hdm" size="1261568" crc="7ea7f95a" sha1="23be34e523e56b51934b0428f4afeeda1243cdca" offset="000000" />
+				<rom name="custommate2.hdm" size="1261568" crc="7ea7f95a" sha1="23be34e523e56b51934b0428f4afeeda1243cdca" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -5117,7 +5142,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Boot Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="cybercity (boot disk).hdm" size="1261568" crc="384203a7" sha1="8e332eae5055a911c87dd2038f550ec614c30111" offset="000000" />
+				<rom name="cybercity (boot disk).hdm" size="1261568" crc="384203a7" sha1="8e332eae5055a911c87dd2038f550ec614c30111" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -5165,7 +5190,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="cyber motion v1.0.hdm" size="1261568" crc="1094490c" sha1="3016dc7894768814d7544a89899af2a56123f250" offset="000000" />
+				<rom name="cyber motion v1.0.hdm" size="1261568" crc="1094490c" sha1="3016dc7894768814d7544a89899af2a56123f250" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -5266,7 +5291,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="daikoukai jidai (save disk).hdm" size="1261568" crc="a70bd7c7" sha1="887b11e25a7f07644245b3764b62bab6e14839bd" offset="000000" />
+				<rom name="daikoukai jidai (save disk).hdm" size="1261568" crc="a70bd7c7" sha1="887b11e25a7f07644245b3764b62bab6e14839bd" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -5304,7 +5329,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Save Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="daikoukai jidai 2 (save disk).hdm" size="1261568" crc="53f2a3fb" sha1="5523e3ecd3748461a208b4b9e4778bf3e98e831f" offset="000000" />
+				<rom name="daikoukai jidai 2 (save disk).hdm" size="1261568" crc="53f2a3fb" sha1="5523e3ecd3748461a208b4b9e4778bf3e98e831f" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -5333,7 +5358,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="daisenryaku iii '90 (game disk).hdm" size="1261568" crc="d6fae63a" sha1="b55b1e005c22bf68ef523e81695146e6b7180376" offset="000000" />
+				<rom name="daisenryaku iii '90 (game disk).hdm" size="1261568" crc="d6fae63a" sha1="b55b1e005c22bf68ef523e81695146e6b7180376" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -5371,7 +5396,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Boot Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="dalk (boot disk).hdm" size="1261568" crc="64570ac2" sha1="c3b288ed90f57c218b3cfd9f7d962fd61063e88a" offset="000000" />
+				<rom name="dalk (boot disk).hdm" size="1261568" crc="64570ac2" sha1="c3b288ed90f57c218b3cfd9f7d962fd61063e88a" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -5408,7 +5433,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Boot Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="dalk.hdm" size="1261568" crc="61bfa42c" sha1="6fa5c82bb8caa68ba8b39a2da825d049f237eb5d" offset="000000" />
+				<rom name="dalk.hdm" size="1261568" crc="61bfa42c" sha1="6fa5c82bb8caa68ba8b39a2da825d049f237eb5d" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -5466,7 +5491,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="tamashii_no_mon.hdm" size="1261568" crc="a80ca050" sha1="9c99bac43cc237f7b8845676104b08fdf2fcd7d3" offset="000000" />
+				<rom name="tamashii_no_mon.hdm" size="1261568" crc="a80ca050" sha1="9c99bac43cc237f7b8845676104b08fdf2fcd7d3" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -5664,7 +5689,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Boot Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="deep (boot disk).hdm" size="1261568" crc="31dd276f" sha1="2e06321ed8faeaf450623311c4b69e34a1ae3539" offset="000000" />
+				<rom name="deep (boot disk).hdm" size="1261568" crc="31dd276f" sha1="2e06321ed8faeaf450623311c4b69e34a1ae3539" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -5714,7 +5739,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Floppy 0" />
 			<dataarea name="flop" size="1261568">
-				<rom name="fm towns demonstration cd-rom '90. fuyu - the galaxy of fm towns (japan) (floppy 0).hdm" size="1261568" crc="256383c4" sha1="1f65a0b58e04ad1c4eb7c5be4bf456defd734c0b" offset="000000" />
+				<rom name="fm towns demonstration cd-rom '90. fuyu - the galaxy of fm towns (japan) (floppy 0).hdm" size="1261568" crc="256383c4" sha1="1f65a0b58e04ad1c4eb7c5be4bf456defd734c0b" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -5874,7 +5899,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="dengeki_nurse_2_disk_a.hdm" size="1261568" crc="66dce100" sha1="368eb88d1da7120f19036ff4e95e533dd0b0dde4" offset="000000" />
+				<rom name="dengeki_nurse_2_disk_a.hdm" size="1261568" crc="66dce100" sha1="368eb88d1da7120f19036ff4e95e533dd0b0dde4" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -6069,7 +6094,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="diamond_players.hdm" size="1261568" crc="e36732a6" sha1="08ef60cb6eb109d8f60ff2e9c7330dca50210345" offset="000000" status="baddump" />
+				<rom name="diamond_players.hdm" size="1261568" crc="e36732a6" sha1="08ef60cb6eb109d8f60ff2e9c7330dca50210345" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -6189,6 +6214,52 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<!-- PC-9821 / FM Towns hybrid -->
+	<software name="dokidok2">
+		<!--
+		Origin: redump.org
+		<rom name="Doki Doki Disk CD-ban Vol. 2 (Japan) (Track 1).bin" size="14568288" crc="48c72b16" sha1="c8348182dec2be426914437d510a276cad25ca59"/>
+		<rom name="Doki Doki Disk CD-ban Vol. 2 (Japan) (Track 2).bin" size="14779968" crc="5609cadb" sha1="91118ad71a004ccc4a153746e37e526aafaf15f7"/>
+		<rom name="Doki Doki Disk CD-ban Vol. 2 (Japan) (Track 3).bin" size="13726272" crc="66911235" sha1="d30afa8c34ad0302cd447f08db65203aac4f1c0d"/>
+		<rom name="Doki Doki Disk CD-ban Vol. 2 (Japan) (Track 4).bin" size="9132816" crc="a61b2083" sha1="22eda086491881a770be22e006e6894781ac4e39"/>
+		<rom name="Doki Doki Disk CD-ban Vol. 2 (Japan) (Track 5).bin" size="9765504" crc="e626f8df" sha1="c6e0acba72316425cb9a5839b1da6f965c3bb516"/>
+		<rom name="Doki Doki Disk CD-ban Vol. 2 (Japan) (Track 6).bin" size="13030080" crc="c7d623b5" sha1="37c9ee416e255eecce380297dcc19eacd8bc304b"/>
+		<rom name="Doki Doki Disk CD-ban Vol. 2 (Japan) (Track 7).bin" size="18263280" crc="f66ebbc0" sha1="2d1c4c2c59fc55f0ea1629d1c5faefc1e08eb058"/>
+		<rom name="Doki Doki Disk CD-ban Vol. 2 (Japan) (Track 8).bin" size="15706656" crc="ef261e0e" sha1="64e5bcc6a025f92020a373ee54f1c5bcf2af1219"/>
+		<rom name="Doki Doki Disk CD-ban Vol. 2 (Japan).cue" size="884" crc="28bb602b" sha1="4f1c4c5ae5ca8e357a16ab8436774e0f6a6e46a0"/>
+		-->
+		<description>Doki Doki Disk CD-ban - Club D.O. Vol. 2</description>
+		<year>1994</year>
+		<publisher>ディー・オー (D.O.)</publisher>
+		<info name="serial" value="DCD-0004"/>
+		<info name="alt_title" value="どきどきディスクＣＤ版　Ｃｌｕｂ　Ｄ．Ｏ．　ｖｏｌ．２" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="doki doki disk cd-ban vol. 2 (japan)" sha1="7f724424639975dcbc6aa7e003862bf74ce4f199" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- PC-9821 / Windows / FM Towns hybrid -->
+	<software name="dokidok3">
+		<!--
+		Origin: redump.org
+		<rom name="Doki Doki Disk CD-ban Vol. 3 (Japan).bin" size="567871584" crc="608f3a81" sha1="f2da2948f916c0beaa6e0e25b4a230757c82b5e0"/>
+		<rom name="Doki Doki Disk CD-ban Vol. 3 (Japan).cue" size="102" crc="f3037a84" sha1="647b8aa52ab66fde65b4385a044ce86d58e417f9"/>
+		-->
+		<description>Doki Doki Disk CD-ban - Club D.O. Vol. 3</description>
+		<year>1995</year>
+		<publisher>ディー・オー (D.O.)</publisher>
+		<info name="alt_title" value="どきどきディスクＣＤ版　Ｃｌｕｂ　Ｄ．Ｏ．　ｖｏｌ．３" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="doki doki disk cd-ban vol. 3 (japan)" sha1="b69090b18762165bc2f4a90623900a87abb3b35b" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="dokivact">
 		<!--
 		Origin: redump.org (CD) / wiggy2k (floppy)
@@ -6216,7 +6287,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="doki_doki_vacation_disk_a.hdm" size="1261568" crc="4ac3ba75" sha1="21996fd03ddf22159a7552f99fd622c251d2a935" offset="000000" />
+				<rom name="doki_doki_vacation_disk_a.hdm" size="1261568" crc="4ac3ba75" sha1="21996fd03ddf22159a7552f99fd622c251d2a935" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -6778,7 +6849,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="dynamic_english_3_upper_basic.hdm" size="1261568" crc="e1a17802" sha1="e68855807a82dfa02c09aeed3fdc67f9096092ce" offset="000000" />
+				<rom name="dynamic_english_3_upper_basic.hdm" size="1261568" crc="e1a17802" sha1="e68855807a82dfa02c09aeed3fdc67f9096092ce" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -7196,7 +7267,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="emerald dragon (system disk).hdm" size="1261568" crc="35b0d7c1" sha1="55689ee69dc51816b2e2529c67ff9b14380571d5" offset="000000" />
+				<rom name="emerald dragon (system disk).hdm" size="1261568" crc="35b0d7c1" sha1="55689ee69dc51816b2e2529c67ff9b14380571d5" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -7228,7 +7299,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="emit1_v1.30_r2.00_1995-01-20.hdm" size="1261568" crc="68c2fd3b" sha1="aa76ef1e43a943622abe942022b58a24fe64a6bb" offset="000000" />
+				<rom name="emit1_v1.30_r2.00_1995-01-20.hdm" size="1261568" crc="68c2fd3b" sha1="aa76ef1e43a943622abe942022b58a24fe64a6bb" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -7260,7 +7331,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="emit1_v1.30_r2.00_1994-04-26.hdm" size="1261568" crc="eca37c28" sha1="58d7f1add8ad84ce7200b0661f380608d8d0639a" offset="000000" />
+				<rom name="emit1_v1.30_r2.00_1994-04-26.hdm" size="1261568" crc="eca37c28" sha1="58d7f1add8ad84ce7200b0661f380608d8d0639a" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -7292,7 +7363,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="emit1_v1.20_r1.00.hdm" size="1261568" crc="49b1a035" sha1="1b0f1886a587e6b9e4bacdfd90145837a3eb6cc0" offset="000000" />
+				<rom name="emit1_v1.20_r1.00.hdm" size="1261568" crc="49b1a035" sha1="1b0f1886a587e6b9e4bacdfd90145837a3eb6cc0" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -7350,7 +7421,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="emit2.hdm" size="1261568" crc="b0e599e6" sha1="a7ba288dd17aa136e3fad5d5d070d5c87c61d5b6" offset="000000" />
+				<rom name="emit2.hdm" size="1261568" crc="b0e599e6" sha1="a7ba288dd17aa136e3fad5d5d070d5c87c61d5b6" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -7421,7 +7492,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="l_empereur.hdm" size="1261568" crc="0a253a52" sha1="736db4e33ff329f100e1b9607e8ac4c11f5232e5" offset="000000" />
+				<rom name="l_empereur.hdm" size="1261568" crc="0a253a52" sha1="736db4e33ff329f100e1b9607e8ac4c11f5232e5" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -7865,7 +7936,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="europa_sensen.hdm" size="1261568" crc="b6355674" sha1="28ed4ad10c4ba16567cbab278b51ca148587be15" offset="000000" />
+				<rom name="europa_sensen.hdm" size="1261568" crc="b6355674" sha1="28ed4ad10c4ba16567cbab278b51ca148587be15" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -8821,6 +8892,34 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="fmtstdema" cloneof="fmtstdem">
+		<!--
+		Origin: redump.org
+		<rom name="FM Towns Super Technology Demo 1993 (Japan) (Hibaihin) (Track 01).bin" size="249782400" crc="f38e305f" sha1="fd61c4a161477811e970421f2d5d3d94e309c45f"/>
+		<rom name="FM Towns Super Technology Demo 1993 (Japan) (Hibaihin) (Track 02).bin" size="1237152" crc="0ecfb684" sha1="a3b988b06aa284f4b707a92e8dd8b768e3d7e097"/>
+		<rom name="FM Towns Super Technology Demo 1993 (Japan) (Hibaihin) (Track 03).bin" size="1764000" crc="e7887563" sha1="923937048d6b3fe908cbe4115a099a3b7a195d0b"/>
+		<rom name="FM Towns Super Technology Demo 1993 (Japan) (Hibaihin) (Track 04).bin" size="37220400" crc="5e0dbea7" sha1="bbf0062aeadff4b037b405cf75afab237b3c1be2"/>
+		<rom name="FM Towns Super Technology Demo 1993 (Japan) (Hibaihin) (Track 05).bin" size="10231200" crc="20e9edc0" sha1="0b67150bfbb44a70049560c957f2c8f62e14a1b5"/>
+		<rom name="FM Towns Super Technology Demo 1993 (Japan) (Hibaihin) (Track 06).bin" size="25225200" crc="c2f2d7e4" sha1="462fbd4895a6b5979fcd790781e2105f67eb27b0"/>
+		<rom name="FM Towns Super Technology Demo 1993 (Japan) (Hibaihin) (Track 07).bin" size="10584000" crc="3eb77f9e" sha1="d0933ce25ea10cf0c6a1140c20abcc11634f97cc"/>
+		<rom name="FM Towns Super Technology Demo 1993 (Japan) (Hibaihin) (Track 08).bin" size="2646000" crc="532e15b5" sha1="9d214a27b9fe0d5d07540ef682797790ac0e171e"/>
+		<rom name="FM Towns Super Technology Demo 1993 (Japan) (Hibaihin) (Track 09).bin" size="14994000" crc="5d29156b" sha1="886e7fc4bb1b667313ace60439dc0b19e370fd94"/>
+		<rom name="FM Towns Super Technology Demo 1993 (Japan) (Hibaihin) (Track 10).bin" size="75852000" crc="34785a10" sha1="e41e60dca4707cb417334d24d398d85d727cd634"/>
+		<rom name="FM Towns Super Technology Demo 1993 (Japan) (Hibaihin).cue" size="1495" crc="5e4a9cb4" sha1="a14ea5d2a212ac7dd7d37fcb0390d1672b08c8f5"/>
+		-->
+		<description>FM Towns Super Technology Demo 1993 (HME-919)</description>
+		<year>1993</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="serial" value="HME-919"/>
+		<info name="release" value="199311xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="fm towns super technology demo 1993 (japan) (hibaihin)" sha1="97be055f8df22d433faf088a3ae27d465097057c" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="fmtworld">
 		<!--
 		Origin: redump.org
@@ -9288,7 +9387,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="release" value="199409xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="uchuu kaitou funny bee (boot disk).hdm" size="1261568" crc="4bcc3120" sha1="f721efe9534554a1a9e4e2201b8f7c4102987b29" offset="000000" />
+				<rom name="uchuu kaitou funny bee (boot disk).hdm" size="1261568" crc="4bcc3120" sha1="f721efe9534554a1a9e4e2201b8f7c4102987b29" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -9440,7 +9539,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="hstudio">
+	<!-- Video capture requires the FMT-411/412/418 Video Card, which is not currently emulated. Audio recording is also not supported by MAME. -->
+	<software name="hstudio" supported="partial">
 		<!--
 		Origin: redump.org
 		<rom name="HomeStudio V1.2L10 (Japan).bin" size="52567200" crc="92e93784" sha1="abc6e6e30fb071e5ddcf1502e698f20b2b0cca62"/>
@@ -9455,6 +9555,25 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="homestudio v1.2l10 (japan)" sha1="2248f1e971cd4f96f40b57cd6659af2fe64d531d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hstudio11" cloneof="hstudio" supported="partial">
+		<!--
+		Origin: redump.org
+		<rom name="HomeStudio V1.1 L10 (Japan).bin" size="41983200" crc="4836df39" sha1="1ff6e17b1dd6b1391f60fb4707bb626db4a8b001"/>
+		<rom name="HomeStudio V1.1 L10 (Japan).cue" size="93" crc="2454051a" sha1="c7e49b8a5629c729e5089ecd4ef3099ad3611708"/>
+		-->
+		<description>HomeStudio V1.1L10</description>
+		<year>1992</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="serial" value="BD276D060"/>
+		<info name="release" value="199212xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="homestudio v1.1 l10 (japan)" sha1="338e4a26aaae5fc330a2e90efda23cfe1fd0ab53" />
 			</diskarea>
 		</part>
 	</software>
@@ -9508,7 +9627,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="g5.hdm" size="1261568" crc="be71541a" sha1="b6686763b1d4774a623c88bf86eee029224657c7" offset="000000" />
+				<rom name="g5.hdm" size="1261568" crc="be71541a" sha1="b6686763b1d4774a623c88bf86eee029224657c7" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -9645,7 +9764,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="serial" value="HMB-168 / T2034-104"/>
 		<info name="alt_title" value="ギャラクシーフォースII" />
 		<info name="release" value="199103xx" />
-		<info name="usage" value="Requires 2 MB RAM"/>
+		<info name="usage" value="Requires 2 MB RAM. Supports XE-1AP analog pad in analog MD mode on second controller port.  Use a Towns Pad on first port to navigate menus." />
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="galaxy force ii (japan)" sha1="90c869b43bc7f846251f35ef5e5b741f641c6184" />
@@ -9972,12 +10091,33 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="gingaed3sp_gamedisk.hdm" size="1261568" crc="44a6fe22" sha1="f85fe21a0ffb344f8cb24abb87ab6bd853267aca" offset="000000" />
+				<rom name="gingaed3sp_gamedisk.hdm" size="1261568" crc="44a6fe22" sha1="f85fe21a0ffb344f8cb24abb87ab6bd853267aca" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="ginga eiyuu densetsu iii sp (japan)" sha1="a490e0279fbb11f6e0b3d97e1cceb74c0cc09c09" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="gingaod1">
+		<!--
+		Origin: redump.org
+		<rom name="NHK Special - Ginga Uchuu Odyssey Vol. 1 - Tabidachi Waga Taiyoukei (Japan) (Track 1).bin" size="104958000" crc="406c1014" sha1="c59792722f910b107dc71586de4035c58e627a7f"/>
+		<rom name="NHK Special - Ginga Uchuu Odyssey Vol. 1 - Tabidachi Waga Taiyoukei (Japan) (Track 2).bin" size="407484000" crc="7eccede9" sha1="db103fef8a2709bccb6c887c55c4d5d3e4a3f865"/>
+		<rom name="NHK Special - Ginga Uchuu Odyssey Vol. 1 - Tabidachi Waga Taiyoukei (Japan).cue" size="320" crc="3669b6a0" sha1="81bee34885a6acb50c5c7513e21ee6974dcd0856"/>
+		-->
+		<description>NHK Special - Ginga Uchuu Odyssey Vol. 1 - Tabidachi Waga Taiyoukei</description>
+		<year>1991</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="serial" value="HMC-108 / A2760150 / TSC150"/>
+		<info name="alt_title" value="ＮＨＫスペシャル　銀河宇宙オデッセイ①　「旅立ち　わが太陽系」" />
+		<info name="release" value="199103xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="nhk special - ginga uchuu odyssey vol. 1 - tabidachi waga taiyoukei (japan)" sha1="93f1ba6fe8419f7d7a45fe94776c39def396dfd9" />
 			</diskarea>
 		</part>
 	</software>
@@ -10149,7 +10289,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="goh ii towns special (system disk).hdm" size="1261568" crc="b694cf42" sha1="a9084609cd53c81263c05f1310946cbd5a561059" offset="000000" />
+				<rom name="goh ii towns special (system disk).hdm" size="1261568" crc="b694cf42" sha1="a9084609cd53c81263c05f1310946cbd5a561059" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -10461,7 +10601,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="gulfwar_systemdisk.hdm" size="1261568" crc="00f642ac" sha1="27f9c0e58446d1f026f8e2eba514d8f871aa37e2" offset="000000" />
+				<rom name="gulfwar_systemdisk.hdm" size="1261568" crc="00f642ac" sha1="27f9c0e58446d1f026f8e2eba514d8f871aa37e2" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -10828,7 +10968,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="half_moon_ni_kawaru_made.hdm" size="1261568" crc="664957f7" sha1="24dc3bf141e174e52869f29309a0aee1db08ade8" offset="000000" />
+				<rom name="half_moon_ni_kawaru_made.hdm" size="1261568" crc="664957f7" sha1="24dc3bf141e174e52869f29309a0aee1db08ade8" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -10901,7 +11041,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Boot Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="hanafuda de pon (boot disk).hdm" size="1261568" crc="cad3cfe6" sha1="3d4eb251057b7a82cabb683114731013ced571ad" offset="000000" />
+				<rom name="hanafuda de pon (boot disk).hdm" size="1261568" crc="cad3cfe6" sha1="3d4eb251057b7a82cabb683114731013ced571ad" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -11229,7 +11369,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="hiouden ii (japan) (system disk).hdm" size="1261568" crc="0e78d3a2" sha1="b610c81e548fe3ed78ba8b79e7766ec7b50f2bd3" offset="000000" />
+				<rom name="hiouden ii (japan) (system disk).hdm" size="1261568" crc="0e78d3a2" sha1="b610c81e548fe3ed78ba8b79e7766ec7b50f2bd3" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -11514,7 +11654,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="hyper address (japan) (rev a) (system disk).hdm" size="1261568" crc="78e49f11" sha1="4f628a06f80ccd049a0da22998475d4e263b6dd1" offset="000000" />
+				<rom name="hyper address (japan) (rev a) (system disk).hdm" size="1261568" crc="78e49f11" sha1="4f628a06f80ccd049a0da22998475d4e263b6dd1" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -11538,7 +11678,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="hyper address (system disk).hdm" size="1261568" crc="9f587fde" sha1="4344771e7f36b8a3461c9d69ea8cb6057fab19f4" offset="000000" />
+				<rom name="hyper address (system disk).hdm" size="1261568" crc="9f587fde" sha1="4344771e7f36b8a3461c9d69ea8cb6057fab19f4" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -11563,7 +11703,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="release" value="199104xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="hyper_address_ver_2.0.hdm" size="1261568" crc="b547457c" sha1="a86f9f2200f5f54a42504f8ddc228fb99404495a" offset="000000" />
+				<rom name="hyper_address_ver_2.0.hdm" size="1261568" crc="b547457c" sha1="a86f9f2200f5f54a42504f8ddc228fb99404495a" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -11681,7 +11821,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="release" value="199303xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="hyper_land.hdm" size="1261568" crc="c462df32" sha1="8852be06fb139615085ea542a17ed6b13046e90f" offset="000000" />
+				<rom name="hyper_land.hdm" size="1261568" crc="c462df32" sha1="8852be06fb139615085ea542a17ed6b13046e90f" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -11757,7 +11897,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="hyper_planet_1992-02-14.hdm" size="1261568" crc="14bc0b4f" sha1="2aa9ac7e8e655599f19611c8160430867d035d70" offset="000000" />
+				<rom name="hyper_planet_1992-02-14.hdm" size="1261568" crc="14bc0b4f" sha1="2aa9ac7e8e655599f19611c8160430867d035d70" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -11829,7 +11969,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="hyper_planet_marty.hdm" size="1261568" crc="bff17a79" sha1="139be75e703aefe0a3eb1131967de02e1af559e7" offset="000000" />
+				<rom name="hyper_planet_marty.hdm" size="1261568" crc="bff17a79" sha1="139be75e703aefe0a3eb1131967de02e1af559e7" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -11868,7 +12008,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="hyper-planet-19900920.hdm" size="1261568" crc="29830434" sha1="90f294023993e778d06a90fb802618a668e0a23e" offset="000000" />
+				<rom name="hyper-planet-19900920.hdm" size="1261568" crc="29830434" sha1="90f294023993e778d06a90fb802618a668e0a23e" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -11907,7 +12047,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="hyper-planet-19900915.hdm" size="1261568" crc="ec701443" sha1="345ba017d784e42d926dc73548e8149c3a10c6c1" offset="000000" />
+				<rom name="hyper-planet-19900915.hdm" size="1261568" crc="ec701443" sha1="345ba017d784e42d926dc73548e8149c3a10c6c1" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -12008,7 +12148,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="hyper_note_1992-03-03.hdm" size="1261568" crc="a5d9788b" sha1="7179eef7ab264ba7e15b5cd159e7ed817e35fe17" offset="000000" />
+				<rom name="hyper_note_1992-03-03.hdm" size="1261568" crc="a5d9788b" sha1="7179eef7ab264ba7e15b5cd159e7ed817e35fe17" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -12034,7 +12174,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="hyper_note_1991-12-12.hdm" size="1261568" crc="985f94b6" sha1="af4704239151af3b1e80b528d11ad5d9198f99f3" offset="000000" />
+				<rom name="hyper_note_1991-12-12.hdm" size="1261568" crc="985f94b6" sha1="af4704239151af3b1e80b528d11ad5d9198f99f3" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -12117,7 +12257,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="nhk_zoku_kiso_eigo_1.hdm" size="1261568" crc="1bfd75bc" sha1="27bf306f1f46a617249c51c234daf8805d4424f1" offset="000000" />
+				<rom name="nhk_zoku_kiso_eigo_1.hdm" size="1261568" crc="1bfd75bc" sha1="27bf306f1f46a617249c51c234daf8805d4424f1" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -12200,7 +12340,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="nhk_zoku_kiso_eigo_2.hdm" size="1261568" crc="2ce8038a" sha1="ccabd046714c9f613653c6541bfb7326c93053ab" offset="000000" />
+				<rom name="nhk_zoku_kiso_eigo_2.hdm" size="1261568" crc="2ce8038a" sha1="ccabd046714c9f613653c6541bfb7326c93053ab" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -12279,7 +12419,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="nhk_zoku_kiso_eigo_3.hdm" size="1261568" crc="e24c6072" sha1="fea5dcc8d4944ea2c0db97858c24163cc12abc17" offset="000000" />
+				<rom name="nhk_zoku_kiso_eigo_3.hdm" size="1261568" crc="e24c6072" sha1="fea5dcc8d4944ea2c0db97858c24163cc12abc17" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -12366,7 +12506,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="idol project (system disk) (1995-06-16 17-22-18).hdm" size="1261568" crc="59d7e80e" sha1="91c06dc48b2b25bae7050066e115694729efd861" offset="000000" />
+				<rom name="idol project (system disk) (1995-06-16 17-22-18).hdm" size="1261568" crc="59d7e80e" sha1="91c06dc48b2b25bae7050066e115694729efd861" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -12430,7 +12570,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="idol project (system disk) (1995-06-16 15-06-42).hdm" size="1261568" crc="333c3b70" sha1="1bb2803ff13314b69bc8fd9705ec2bc6a7737c12" offset="000000" />
+				<rom name="idol project (system disk) (1995-06-16 15-06-42).hdm" size="1261568" crc="333c3b70" sha1="1bb2803ff13314b69bc8fd9705ec2bc6a7737c12" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -12577,7 +12717,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="問題ディスク第2集 / Mondai Disk Dai-2-shuu" />
 			<dataarea name="flop" size="3444632">
-				<rom name="igo_doujou_mondai_disk_dai-2-shuu.mfm" size="3444632" crc="9cfe32cf" sha1="91a66e690b71758708c05b2dca217256d582c466" offset="000000" />
+				<rom name="igo_doujou_mondai_disk_dai-2-shuu.mfm" size="3444632" crc="9cfe32cf" sha1="91a66e690b71758708c05b2dca217256d582c466" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -12940,7 +13080,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="inindou_datou_nobunaga.hdm" size="1261568" crc="357c74fd" sha1="29ef6aa58cff7779a8e6e98e67970f0e2e501200" offset="000000" />
+				<rom name="inindou_datou_nobunaga.hdm" size="1261568" crc="357c74fd" sha1="29ef6aa58cff7779a8e6e98e67970f0e2e501200" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -13009,7 +13149,7 @@ User/save disks that can be created from the game itself are not included.
 			<!-- The floppy disk is self-bootable and contains updated executable files -->
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="iris-tei_serenade_disk_a.hdm" size="1261568" crc="33b53c9d" sha1="b07e99791bf2c52948e796ac392f0a588d88d4ce" offset="000000" />
+				<rom name="iris-tei_serenade_disk_a.hdm" size="1261568" crc="33b53c9d" sha1="b07e99791bf2c52948e796ac392f0a588d88d4ce" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -13075,7 +13215,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="release" value="199003xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1281968">
-				<rom name="ishin.d88" size="1281968" crc="5885c76c" sha1="29b0773c95d1f69d943c1ee47e957f7b7eb6cb55" offset="000000" />
+				<rom name="ishin.d88" size="1281968" crc="5885c76c" sha1="29b0773c95d1f69d943c1ee47e957f7b7eb6cb55" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -13327,7 +13467,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="jinmon_yuugi.hdm" size="1261568" crc="20ec80fc" sha1="401b3a1ab93f35ff3cff14e473cc87bf250102ac" offset="000000" />
+				<rom name="jinmon_yuugi.hdm" size="1261568" crc="20ec80fc" sha1="401b3a1ab93f35ff3cff14e473cc87bf250102ac" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -13486,7 +13626,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="joshikou_seifuku_monogatari.hdm" size="1261568" crc="3fdba734" sha1="8e8aed41e329bd02479e6b55675110ddc29b33f2" offset="000000" />
+				<rom name="joshikou_seifuku_monogatari.hdm" size="1261568" crc="3fdba734" sha1="8e8aed41e329bd02479e6b55675110ddc29b33f2" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -13790,7 +13930,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Sample Data Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="kid_pix_jr_sample_data_disk.hdm" size="1261568" crc="5e39a314" sha1="7f3eba701dff9f54013ace974e93f7e2e5d5e599" offset="000000" />
+				<rom name="kid_pix_jr_sample_data_disk.hdm" size="1261568" crc="5e39a314" sha1="7f3eba701dff9f54013ace974e93f7e2e5d5e599" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -14067,7 +14207,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="kouryuuki.hdm" size="1261568" crc="c37a6cb0" sha1="a152158d4d74cf7172f5e53ece8f3ddddf88ce45" offset="000000" />
+				<rom name="kouryuuki.hdm" size="1261568" crc="c37a6cb0" sha1="a152158d4d74cf7172f5e53ece8f3ddddf88ce45" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -14417,7 +14557,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="User Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="the legend of kyrandia (user disk).hdm" size="1261568" crc="da0241b6" sha1="12e125595d6a87496cf891bba1f67034d110b9e8" offset="000000" />
+				<rom name="the legend of kyrandia (user disk).hdm" size="1261568" crc="da0241b6" sha1="12e125595d6a87496cf891bba1f67034d110b9e8" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -14633,7 +14773,7 @@ User/save disks that can be created from the game itself are not included.
 			<!-- This disk is included with the CD and contains pre-made saves at the start of the game, but it can also work with any blank disk -->
 			<feature name="part_id" value="Blank Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="lands_of_lore.hdm" size="1261568" crc="eaf15ec6" sha1="6a00499b09999b878c89a3db9ab27ee54ca2b11c" offset="000000" />
+				<rom name="lands_of_lore.hdm" size="1261568" crc="eaf15ec6" sha1="6a00499b09999b878c89a3db9ab27ee54ca2b11c" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -15134,7 +15274,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="lunatic_dawn_ii (system disk).hdm" size="1261568" crc="337421e0" sha1="fd563cc8bece3aa0a1589daa2d6e4a8003e7c251" offset="000000" />
+				<rom name="lunatic_dawn_ii (system disk).hdm" size="1261568" crc="337421e0" sha1="fd563cc8bece3aa0a1589daa2d6e4a8003e7c251" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -15171,7 +15311,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="leading company.hdm" size="1261568" crc="c4ab1147" sha1="8a3e197458a190daa505868338cac65129515d4b" offset="000000" />
+				<rom name="leading company.hdm" size="1261568" crc="c4ab1147" sha1="8a3e197458a190daa505868338cac65129515d4b" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -15312,7 +15452,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="release" value="198911xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="lettuce cooking.bin" size="1261568" crc="76845bb0" sha1="9d7227621f94375c105e3ee8f2cc7d5ebdd60147" offset="000000" />
+				<rom name="lettuce cooking.bin" size="1261568" crc="76845bb0" sha1="9d7227621f94375c105e3ee8f2cc7d5ebdd60147" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -15352,7 +15492,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="lettuce_cooking_2.bin" size="1261568" crc="abe1d915" sha1="7bf0774280992df81fe962cf0328f15899331b98" offset="000000" />
+				<rom name="lettuce_cooking_2.bin" size="1261568" crc="abe1d915" sha1="7bf0774280992df81fe962cf0328f15899331b98" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -15481,7 +15621,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="lip3_disk_a.hdm" size="1261568" crc="4a24ddcb" sha1="a51f7bf887728cbc47f0b71b41190a3510433d7a" offset="000000" />
+				<rom name="lip3_disk_a.hdm" size="1261568" crc="4a24ddcb" sha1="a51f7bf887728cbc47f0b71b41190a3510433d7a" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -15531,7 +15671,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="record of lodoss war - haiiro no majo (system disk).hdm" size="1261568" crc="4303f8cc" sha1="e5d6580d4b56d8b25a401f566dd07157866de128" offset="000000" />
+				<rom name="record of lodoss war - haiiro no majo (system disk).hdm" size="1261568" crc="4303f8cc" sha1="e5d6580d4b56d8b25a401f566dd07157866de128" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -15560,7 +15700,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="record of lodoss war ii - goshiki no maryuu (system disk).hdm" size="1261568" crc="f9bc36bb" sha1="1507af913dec0ab7430c9d12f02b49aa3331f554" offset="000000" />
+				<rom name="record of lodoss war ii - goshiki no maryuu (system disk).hdm" size="1261568" crc="f9bc36bb" sha1="1507af913dec0ab7430c9d12f02b49aa3331f554" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -15698,7 +15838,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="lotr2_game_disk.bin" size="1261568" crc="2b2eb562" sha1="96cb6baeccbce2e1cb37b59066415c9e3f92626b" offset="000000" />
+				<rom name="lotr2_game_disk.bin" size="1261568" crc="2b2eb562" sha1="96cb6baeccbce2e1cb37b59066415c9e3f92626b" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -15871,11 +16011,23 @@ User/save disks that can be created from the game itself are not included.
 
 	<software name="mparadox">
 		<!--
-		Origin: Neo Kobe Collection
-		<rom name="Mad Paradox.ccd" size="3420" crc="ef9f40be" sha1="16e92f8dd2fc987dc1f10fd390fafa77b32cd4f8"/>
-		<rom name="Mad Paradox.cue" size="627" crc="7c437d47" sha1="65fd2011b2cfc913d3a1f4b58d7a1f0ea174eb2e"/>
-		<rom name="Mad Paradox.img" size="432885600" crc="62688cfe" sha1="60b19a3d179ae982b1a60ea4749f5bb3f493fc12"/>
-		<rom name="Mad Paradox.sub" size="17668800" crc="956a82e4" sha1="a85595868e9ce1dc80527695a4c1786eae994541"/>
+		Origin: redump.org
+		<rom name="Mad-Paradox (Japan) (Track 01).bin" size="10231200" crc="2447c4ad" sha1="9af243d162319b3bdc024687d13fe90777a1160d"/>
+		<rom name="Mad-Paradox (Japan) (Track 02).bin" size="20991600" crc="3db6f1da" sha1="6e69310f5c49068001f44641a488c50809bd1611"/>
+		<rom name="Mad-Paradox (Japan) (Track 03).bin" size="21697200" crc="eaf3d7fa" sha1="17c778ec6fa2daeea98aea900dad046be7766cc1"/>
+		<rom name="Mad-Paradox (Japan) (Track 04).bin" size="32986800" crc="047f148b" sha1="41313ceb4f473584f2b5df5e07079b60db44ae3f"/>
+		<rom name="Mad-Paradox (Japan) (Track 05).bin" size="25930800" crc="d7d2257a" sha1="c1fda4e237f7d6597a9335ebdb235ace1ec696cd"/>
+		<rom name="Mad-Paradox (Japan) (Track 06).bin" size="24343200" crc="d89ba44f" sha1="dc06302886a4180dc6d0764417278df115e20245"/>
+		<rom name="Mad-Paradox (Japan) (Track 07).bin" size="29635200" crc="66325ac4" sha1="a2b5d6b5a5399d1d593aeaff3e893bd89914215f"/>
+		<rom name="Mad-Paradox (Japan) (Track 08).bin" size="32457600" crc="5b059dc3" sha1="496114ba158f14a84712224ff3ab31548dd8ea62"/>
+		<rom name="Mad-Paradox (Japan) (Track 09).bin" size="31575600" crc="41f0e035" sha1="ca731d4c7897c5a2d1c6dc4298f66289813c3ced"/>
+		<rom name="Mad-Paradox (Japan) (Track 10).bin" size="26107200" crc="4616f292" sha1="80b977b1c93d4e2f84c357786c7d5592909efa9a"/>
+		<rom name="Mad-Paradox (Japan) (Track 11).bin" size="19051200" crc="74637eb8" sha1="b61c5ab1f90773e8be2adea71f1a1efa3e7b8323"/>
+		<rom name="Mad-Paradox (Japan) (Track 12).bin" size="34398000" crc="ac7fdbbe" sha1="5f396cdacb0bfa04ce9fce918ac7f6568db2005e"/>
+		<rom name="Mad-Paradox (Japan) (Track 13).bin" size="46040400" crc="a395cd23" sha1="b9ec544343edb3419fae1c489aadca777854ffd9"/>
+		<rom name="Mad-Paradox (Japan) (Track 14).bin" size="38808000" crc="49437506" sha1="d3aa1f26d0786379a6d4063cf2d8a9f20fa11b8e"/>
+		<rom name="Mad-Paradox (Japan) (Track 15).bin" size="38631600" crc="9c1ab721" sha1="4175603e77030aed19a7f5c48371edd55db45db4"/>
+		<rom name="Mad-Paradox (Japan).cue" size="1692" crc="00231d06" sha1="bd68f8cfb10e80c91bb8b114f4e3b4ba61353830"/>
 		-->
 		<description>Mad Paradox</description>
 		<year>1994</year>
@@ -15886,7 +16038,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mad paradox" sha1="da8146ef3fcffb9e8679b3f64bb80efc48785e80" />
+				<disk name="mad-paradox (japan)" sha1="71f14435b9b91a85fa069c4d7343bdd603e2ee16" />
 			</diskarea>
 		</part>
 	</software>
@@ -16551,7 +16703,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="manami_disk_a.hdm" size="1261568" crc="ee0f4c44" sha1="7077b77783ee1ccd629c2f767de22e69ee2989cc" offset="000000" />
+				<rom name="manami_disk_a.hdm" size="1261568" crc="ee0f4c44" sha1="7077b77783ee1ccd629c2f767de22e69ee2989cc" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -16878,6 +17030,31 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="martydemo">
+		<!--
+		Origin: redump.org
+		<rom name="FM Towns Marty Tentou Auto Demo '93 Natsu (Japan) (Track 1).bin" size="36227856" crc="03695aab" sha1="8c0ad554deeb2164db5d7865d5a69cfc9dbed799"/>
+		<rom name="FM Towns Marty Tentou Auto Demo '93 Natsu (Japan) (Track 2).bin" size="1674624" crc="41707720" sha1="ebce5abab94017a8cadc0895a1ff6e63177c6bdc"/>
+		<rom name="FM Towns Marty Tentou Auto Demo '93 Natsu (Japan) (Track 3).bin" size="2022720" crc="41f5714c" sha1="815105b8dc8bef106b70a8fb131750ea98bcbed7"/>
+		<rom name="FM Towns Marty Tentou Auto Demo '93 Natsu (Japan) (Track 4).bin" size="2018016" crc="686c8368" sha1="4ab2cd93447f0dd8d71622f4e9ab1d8ef91810b7"/>
+		<rom name="FM Towns Marty Tentou Auto Demo '93 Natsu (Japan) (Track 5).bin" size="2168544" crc="d99a2a3d" sha1="a3be4828b491f1443dc304359a912edfb0cc5786"/>
+		<rom name="FM Towns Marty Tentou Auto Demo '93 Natsu (Japan) (Track 6).bin" size="5503680" crc="2ef9e988" sha1="c2636fbd120fe9b40ded9f02417ea25e31710b5d"/>
+		<rom name="FM Towns Marty Tentou Auto Demo '93 Natsu (Japan) (Track 7).bin" size="7808640" crc="8ed24187" sha1="cb10463072c786bb5157bd25cb53d8e07a7451ea"/>
+		<rom name="FM Towns Marty Tentou Auto Demo '93 Natsu (Japan).cue" size="983" crc="75a5125e" sha1="83d84e16178858bf07734b6550060695820912f6"/>
+		-->
+		<description>FM Towns Marty Tentou Auto Demo '93 Natsu</description>
+		<year>1993</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="serial" value="HME-903-2"/>
+		<info name="alt_title" value="ＦＭ　ＴＯＷＮＳ　マーティ　店頭オート・デモ’９３夏" />
+		<info name="usage" value="Only works on the 386SX-based models (Marty/UX)"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="fm towns marty tentou auto demo '93 natsu (japan)" sha1="0088a64464bf16103ad42cd6729828591bd84306" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="manyoshu">
 		<!--
 		Origin: redump.org
@@ -17049,6 +17226,49 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="microcosm (japan)" sha1="4dbbbd66b018fc9145e990e00adc611c98a58d7a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="medicco">
+		<!--
+		Origin: redump.org
+		<rom name="Medicco to Asobou - Kazu Katachi Ryou (Japan) (Track 01).bin" size="20817552" crc="6384e3cb" sha1="0ff7f862ee234501488f0afef447f70f8ebe1cb0"/>
+		<rom name="Medicco to Asobou - Kazu Katachi Ryou (Japan) (Track 02).bin" size="8464848" crc="c1bc3474" sha1="84660ee1cf827898fb4dd22e6a705997700a6119"/>
+		<rom name="Medicco to Asobou - Kazu Katachi Ryou (Japan) (Track 03).bin" size="16581600" crc="833ecbbe" sha1="25489f26b5db14e305549972a4c6fe3e6b291151"/>
+		<rom name="Medicco to Asobou - Kazu Katachi Ryou (Japan) (Track 04).bin" size="12348000" crc="262436e5" sha1="e2adf0357bfdeffa89a47b45debf5c4e505957ac"/>
+		<rom name="Medicco to Asobou - Kazu Katachi Ryou (Japan) (Track 05).bin" size="2646000" crc="b5633f99" sha1="b0cd60acd9fd40be5944eaa2cdd9c9cd5561c6f0"/>
+		<rom name="Medicco to Asobou - Kazu Katachi Ryou (Japan) (Track 06).bin" size="3528000" crc="062d29e8" sha1="1010c48141e846fcc6de5402836670e8d4ea03cc"/>
+		<rom name="Medicco to Asobou - Kazu Katachi Ryou (Japan) (Track 07).bin" size="8467200" crc="b756e62b" sha1="82af836e0e1fda5819a0bda93d2e6c6a3d27c532"/>
+		<rom name="Medicco to Asobou - Kazu Katachi Ryou (Japan) (Track 08).bin" size="9172800" crc="c1671dec" sha1="245a88e5d5e93f748fe70cd8d98ec0a5e2809450"/>
+		<rom name="Medicco to Asobou - Kazu Katachi Ryou (Japan) (Track 09).bin" size="3880800" crc="5d204ba5" sha1="3d7aa704268a6e6edf174af5ab3775732bbcacf5"/>
+		<rom name="Medicco to Asobou - Kazu Katachi Ryou (Japan) (Track 10).bin" size="4233600" crc="ade29a64" sha1="257f17728937d16e8ec60f148d81abc34577621a"/>
+		<rom name="Medicco to Asobou - Kazu Katachi Ryou (Japan) (Track 11).bin" size="4057200" crc="6eec86c1" sha1="c5c0220e32bcefc62565a1b3afad27dfcd90fe50"/>
+		<rom name="Medicco to Asobou - Kazu Katachi Ryou (Japan) (Track 12).bin" size="7173600" crc="a7210624" sha1="ad7a2e887a5451acda3d1f4ba3ce33d35d0f6e98"/>
+		<rom name="Medicco to Asobou - Kazu Katachi Ryou (Japan) (Track 13).bin" size="8937600" crc="4be3813e" sha1="ea3cad1c822c580f95afd6cc474e8e7f160d8b8e"/>
+		<rom name="Medicco to Asobou - Kazu Katachi Ryou (Japan) (Track 14).bin" size="3292800" crc="3146d649" sha1="5888c613239edd41db510d2faac6f3c346bb0d2b"/>
+		<rom name="Medicco to Asobou - Kazu Katachi Ryou (Japan) (Track 15).bin" size="11642400" crc="e74a9827" sha1="7fc7cfa54e88abe8c435cf7e2297f02900580b4c"/>
+		<rom name="Medicco to Asobou - Kazu Katachi Ryou (Japan) (Track 16).bin" size="16758000" crc="a823a977" sha1="48973804ec1ad34e73776b851dc41a4ae3ae7d37"/>
+		<rom name="Medicco to Asobou - Kazu Katachi Ryou (Japan) (Track 17).bin" size="18522000" crc="d70ee066" sha1="445bf4c93ca98b2e4874c439efae35f867efb654"/>
+		<rom name="Medicco to Asobou - Kazu Katachi Ryou (Japan) (Track 18).bin" size="22050000" crc="f1d3c2ce" sha1="1af88084dfbbe568b2b84a010375223402524afd"/>
+		<rom name="Medicco to Asobou - Kazu Katachi Ryou (Japan) (Track 19).bin" size="17992800" crc="26c25e12" sha1="6fc3eadd381ef3d70886ef2e7d2b46c94f2f536c"/>
+		<rom name="Medicco to Asobou - Kazu Katachi Ryou (Japan) (Track 20).bin" size="13406400" crc="f8f79cbc" sha1="9b31029bc807627b2a859bf3d78405d76a203230"/>
+		<rom name="Medicco to Asobou - Kazu Katachi Ryou (Japan) (Track 21).bin" size="13406400" crc="00ace9b2" sha1="7f5c76fd3851f399a70b14b6af15ebcb35065cf9"/>
+		<rom name="Medicco to Asobou - Kazu Katachi Ryou (Japan) (Track 22).bin" size="21344400" crc="4be4592f" sha1="9a78cfd013c1bd656df9f88301c4d4e22acd584b"/>
+		<rom name="Medicco to Asobou - Kazu Katachi Ryou (Japan) (Track 23).bin" size="14288400" crc="7500a5e0" sha1="8b672b6f9c6611abd5097ed89bc7d7f6317e6612"/>
+		<rom name="Medicco to Asobou - Kazu Katachi Ryou (Japan) (Track 24).bin" size="22579200" crc="a7251670" sha1="152f0112f1c9c9c3443232d719d4a3815f1a1642"/>
+		<rom name="Medicco to Asobou - Kazu Katachi Ryou (Japan) (Track 25).bin" size="25754400" crc="8c1ea776" sha1="a7ccdcd1f799573b8282a20f429ab61149bc8b47"/>
+		<rom name="Medicco to Asobou - Kazu Katachi Ryou (Japan).cue" size="3344" crc="bdfd0c26" sha1="99f0f242b11a9f1b66519b4278a940d06158728c"/>
+		-->
+		<description>Medicco to Asobou - Kazu-Katachi-Ryou</description>
+		<year>1994</year>
+		<publisher>創研 (Souken)</publisher>
+		<info name="serial" value="HMF-173"/>
+		<info name="alt_title" value="″メディッコ″とあそぼう　～かず・かたち・りょう～" />
+		<info name="usage" value="Requires 2 MB RAM. Needs a floppy disk in drive 0 to boot."/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="medicco to asobou - kazu katachi ryou (japan)" sha1="5ddfa986849fdc457e147c7f88d85f79299e271a" />
 			</diskarea>
 		</part>
 	</software>
@@ -17809,6 +18029,25 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="mplanet">
+		<!--
+		Origin: redump.org
+		<rom name="Monster Planet 2255 (Japan).bin" size="105487200" crc="3135652f" sha1="e4022b0e94c48ccfa23afbe591b5bf255b82cd31"/>
+		<rom name="Monster Planet 2255 (Japan).cue" size="93" crc="5785af64" sha1="028e00c502155c01702ca04036cddc9fa80a1ced"/>
+		-->
+		<description>Monster Planet 2255</description>
+		<year>1990</year>
+		<publisher>JAMP</publisher>
+		<info name="serial" value="HMB-226"/>
+		<info name="alt_title" value="モンスタープラネット２２５５" />
+		<info name="release" value="199012xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="monster planet 2255 (japan)" sha1="51373149edb963869f40d65c5a80235caf8b170a" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="moritas2">
 		<!--
 		Origin: redump.org
@@ -17877,7 +18116,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires an FM Towns Marty. Won't run on any other models."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="ms_detective_1_marty.hdm" size="1261568" crc="3e70fc8c" sha1="05d3f256874fec6deccf8f3a4f80d143182f3846" offset="000000" />
+				<rom name="ms_detective_1_marty.hdm" size="1261568" crc="3e70fc8c" sha1="05d3f256874fec6deccf8f3a4f80d143182f3846" />
 			</dataarea>
 		</part>
 		<part name="cdrom1" interface="fmt_cdrom">
@@ -17904,7 +18143,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="ms. detective file #2 - sugata-naki irainin (japan) (user disk).bin" size="1261568" crc="b1d1b54f" sha1="7bf144014a2c44985115fa88cebcb836a6fbddf9" offset="000000" />
+				<rom name="ms. detective file #2 - sugata-naki irainin (japan) (user disk).bin" size="1261568" crc="b1d1b54f" sha1="7bf144014a2c44985115fa88cebcb836a6fbddf9" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -18591,7 +18830,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="3577399">
-				<rom name="new3dgolf_systemdisk.mfm" size="3577399" crc="02c52d10" sha1="97091496c01bb68ac44a7090e85de08dbc82389f" offset="000000" />
+				<rom name="new3dgolf_systemdisk.mfm" size="3577399" crc="02c52d10" sha1="97091496c01bb68ac44a7090e85de08dbc82389f" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -18624,7 +18863,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="3577399">
-				<rom name="new3dgolf_systemdisk.mfm" size="3577399" crc="02c52d10" sha1="97091496c01bb68ac44a7090e85de08dbc82389f" offset="000000" />
+				<rom name="new3dgolf_systemdisk.mfm" size="3577399" crc="02c52d10" sha1="97091496c01bb68ac44a7090e85de08dbc82389f" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -20160,7 +20399,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="nobunaga_no_yabou-bushou_fuuunroku.hdm" size="1261568" crc="91024e24" sha1="28c5f0d822915935b5d3103fd7bd2d47bbf14772" offset="000000" />
+				<rom name="nobunaga_no_yabou-bushou_fuuunroku.hdm" size="1261568" crc="91024e24" sha1="28c5f0d822915935b5d3103fd7bd2d47bbf14772" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -20202,7 +20441,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="nobunaga no yabou - haou-den.hdm" size="1261568" crc="d426a880" sha1="4194c61909c37fdf83daae77dcd84ad996237b0c" offset="000000" />
+				<rom name="nobunaga no yabou - haou-den.hdm" size="1261568" crc="d426a880" sha1="4194c61909c37fdf83daae77dcd84ad996237b0c" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -20234,7 +20473,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="release" value="198912xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="nobunaga no yabou - sengoku gunyuuden.hdm" size="1261568" crc="fe18e2c2" sha1="aed75199e9d8288d41373aa3600b997e69a58265" offset="000000" />
+				<rom name="nobunaga no yabou - sengoku gunyuuden.hdm" size="1261568" crc="fe18e2c2" sha1="aed75199e9d8288d41373aa3600b997e69a58265" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -20272,7 +20511,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="nobunaga no yabou - tenshouki.hdm" size="1261568" crc="e8b01342" sha1="8ce902407676e6a2121df0e82361759fe2f5da9e" offset="000000" />
+				<rom name="nobunaga no yabou - tenshouki.hdm" size="1261568" crc="e8b01342" sha1="8ce902407676e6a2121df0e82361759fe2f5da9e" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -20559,7 +20798,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="nsangel_disk_a.hdm" size="1261568" crc="ba5a137b" sha1="b64d6bc1c303d281ff8ed9f81dbfbaa02ffde8a9" offset="000000" />
+				<rom name="nsangel_disk_a.hdm" size="1261568" crc="ba5a137b" sha1="b64d6bc1c303d281ff8ed9f81dbfbaa02ffde8a9" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -20664,7 +20903,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Install Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="oasys_win_install_disk.hdm" size="737280" crc="5c31e788" sha1="5f8fac6c35206e4994ea2d84dfffe527cb650c36" offset="000000" />
+				<rom name="oasys_win_install_disk.hdm" size="737280" crc="5c31e788" sha1="5f8fac6c35206e4994ea2d84dfffe527cb650c36" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -21005,7 +21244,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="shougaku_ongaku_5-6.hdm" size="1261568" crc="bc8592f0" sha1="e831950f62852b978fab34dc92e8961265bcadbe" offset="000000" />
+				<rom name="shougaku_ongaku_5-6.hdm" size="1261568" crc="bc8592f0" sha1="e831950f62852b978fab34dc92e8961265bcadbe" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -21276,6 +21515,27 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="toudou ryuunosuke tantei nikki - ougon no rashinban - shouyoumaru san francisco kouro satsujin jiken (japan)" sha1="219b0aee03509b414063dfd7f1bc81536d53e0c7" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	    Bundled with the book of the same title (ISBN 978-4756106001). Disc 4 contains software for X68000, FM Towns and UNIX-based systems.
+	    The other discs (currently not dumped) contain DOS/Windows software for IBM compatibles.
+	-->
+	<software name="pack13k">
+		<!--
+		Origin: redump.org
+		<rom name="Pack 13000 Free Soft &amp; Shareware (Japan) (Disc 4).bin" size="680200752" crc="3f6f315b" sha1="4141ad74052022cbacf899133695747a4adb6d5e"/>
+		<rom name="Pack 13000 Free Soft &amp; Shareware (Japan) (Disc 4).cue" size="138" crc="b58121fe" sha1="e83e5d3e62b79b4d9b23a216ab6ae3ce316879e2"/>
+		-->
+		<description>Pack 13000 Free Soft &amp; Shareware</description>
+		<year>1996</year>
+		<publisher>ベクターデザイン (Vector Design)</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<feature name="part_id" value="Disc 4"/>
+			<diskarea name="cdrom">
+				<disk name="pack 13000 free soft &amp; shareware (japan) (disc 4)" sha1="8dfb747d1b6f22fe779507c493c07ad3846f4e26" />
 			</diskarea>
 		</part>
 	</software>
@@ -21553,7 +21813,7 @@ User/save disks that can be created from the game itself are not included.
 		<!-- Image recreated from loose files. It should be redumped from an original disk. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="kikou_shidan_2.hdm" size="1261568" crc="7aaae0e5" sha1="0394f33fe88ceadf6e86e0851775c33b9169fe65" offset="000000" status="baddump" />
+				<rom name="kikou_shidan_2.hdm" size="1261568" crc="7aaae0e5" sha1="0394f33fe88ceadf6e86e0851775c33b9169fe65" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -21627,7 +21887,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="release" value="199309xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="planet_harmony.hdm" size="1261568" crc="288d749b" sha1="dcc91a12ab684dff71a165602c933850005f0bdf" offset="000000" />
+				<rom name="planet_harmony.hdm" size="1261568" crc="288d749b" sha1="dcc91a12ab684dff71a165602c933850005f0bdf" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -21903,7 +22163,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="power dolls (system disk).hdm" size="1261568" crc="5f6c44c7" sha1="721dd113dc6bedfb2d212e3a4de15260c41805f7" offset="000000" />
+				<rom name="power dolls (system disk).hdm" size="1261568" crc="5f6c44c7" sha1="721dd113dc6bedfb2d212e3a4de15260c41805f7" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -22088,7 +22348,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="pro-student-g.hdm" size="1261568" crc="b3786aa4" sha1="1b0f9cfcf93a15c7d063872877b1fcdeb6fd1d44" offset="000000" />
+				<rom name="pro-student-g.hdm" size="1261568" crc="b3786aa4" sha1="1b0f9cfcf93a15c7d063872877b1fcdeb6fd1d44" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -22160,11 +22420,11 @@ User/save disks that can be created from the game itself are not included.
 	<!-- Runs too fast -->
 	<software name="provvdnz" supported="partial">
 		<!--
-		Origin: Neo Kobe Collection
-		<rom name="Provvidenza.ccd" size="1179" crc="f0a1a16b" sha1="a7ef5529bf6c6532223ed683d41c4207833d8d56"/>
-		<rom name="Provvidenza.cue" size="180" crc="998968b0" sha1="5fd75cb0ea61390be09128e4ce05868bbca39599"/>
-		<rom name="Provvidenza.img" size="64562400" crc="ce38ece3" sha1="e10bd585a8e60c806e5cfba2129d79e3bdfb975b"/>
-		<rom name="Provvidenza.sub" size="2635200" crc="8da409c6" sha1="1db91a5e42f8df0ece1a3762a52a465d1422994b"/>
+		Origin: redump.org
+		<rom name="Provvidenza (Japan) (Track 1).bin" size="20815200" crc="dd512cf1" sha1="7e0071cee789e9de42b3ed6a02318af81bde9f05"/>
+		<rom name="Provvidenza (Japan) (Track 2).bin" size="21803040" crc="fa90ec55" sha1="fd2febd10f329802f2e53274be96175a41cc737f"/>
+		<rom name="Provvidenza (Japan) (Track 3).bin" size="21944160" crc="4f6aad52" sha1="d7014f4b7ac00c5adcfeb84a6a055b65f8e96f18"/>
+		<rom name="Provvidenza (Japan).cue" size="344" crc="65de4444" sha1="4c1dadfda1f33eeaf4225b8a9ed274da5a996a5c"/>
 		-->
 		<description>Provvidenza - Legenda la Spada di Alfa</description>
 		<year>1991</year>
@@ -22175,7 +22435,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="provvidenza" sha1="a104b48ade5fbe34b324f0c7f3a3fa0de7b482fc" />
+				<disk name="provvidenza (japan)" sha1="b6dfc03cdf118e01bb33e43c5344c2f8294a106b" />
 			</diskarea>
 		</part>
 	</software>
@@ -22210,7 +22470,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="private_slave.hdm" size="1261568" crc="6a178afb" sha1="37c99495d915448c0b68a576c0b34b5d5ff36c0a" offset="000000" />
+				<rom name="private_slave.hdm" size="1261568" crc="6a178afb" sha1="37c99495d915448c0b68a576c0b34b5d5ff36c0a" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -22262,7 +22522,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Key-Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="psychic_detective_series_vol_1_invitation_remake.hdm" size="1261568" crc="9f790046" sha1="e4737890d114f3afb00e956246ac27c9c8217281" offset="000000" />
+				<rom name="psychic_detective_series_vol_1_invitation_remake.hdm" size="1261568" crc="9f790046" sha1="e4737890d114f3afb00e956246ac27c9c8217281" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -22345,6 +22605,40 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="psydet2r">
+		<!--
+		Origin: redump.org (CD) / cyo.the.vile (floppy)
+		<rom name="Psychic Detective Series Vol. 2 - Memories (Japan) (DCCS) (Track 1).bin" size="154408800" crc="06cc6b63" sha1="3fd6918ce160c2d71ad6f0c3b12cd2bbafdd2ae0"/>
+		<rom name="Psychic Detective Series Vol. 2 - Memories (Japan) (DCCS) (Track 2).bin" size="59606736" crc="bf88d997" sha1="95ced84ebb70039c1d60cb0dcde5bcb21452dc72"/>
+		<rom name="Psychic Detective Series Vol. 2 - Memories (Japan) (DCCS) (Track 3).bin" size="17957520" crc="edb6daec" sha1="caa2aaef7e75387af788d99a98843a33c4d0e78e"/>
+		<rom name="Psychic Detective Series Vol. 2 - Memories (Japan) (DCCS) (Track 4).bin" size="20777568" crc="5d495539" sha1="664c50d425c896628ee0f11794c42b8ffef6b7d9"/>
+		<rom name="Psychic Detective Series Vol. 2 - Memories (Japan) (DCCS) (Track 5).bin" size="11400144" crc="9c01fed1" sha1="be51217750f6e8b0740e6c2b2fce808bab9a8d7a"/>
+		<rom name="Psychic Detective Series Vol. 2 - Memories (Japan) (DCCS) (Track 6).bin" size="14387184" crc="c452db38" sha1="c37f7a5cd86d8ec4277ccc7642c5821990600799"/>
+		<rom name="Psychic Detective Series Vol. 2 - Memories (Japan) (DCCS) (Track 7).bin" size="12733728" crc="7c71e12f" sha1="a9643b99815a482c5ceab0a86212ac0a1746a79b"/>
+		<rom name="Psychic Detective Series Vol. 2 - Memories (Japan) (DCCS) (Track 8).bin" size="15306816" crc="955da58b" sha1="7529962c13bde82640df4e10098092f795d254ac"/>
+		<rom name="Psychic Detective Series Vol. 2 - Memories (Japan) (DCCS) (Track 9).bin" size="49850640" crc="a97077a9" sha1="a6a5876182bd52b6c571a84486557a7e1501e2f9"/>
+		<rom name="Psychic Detective Series Vol. 2 - Memories (Japan) (DCCS).cue" size="1364" crc="8e068e2b" sha1="eb473350e9531df986de20fba15ba1ba0d018da0"/>
+		-->
+		<description>Psychic Detective Series Vol. 2 - Memories (DCCS remake)</description>
+		<year>1994</year>
+		<publisher>データウエスト (Data West)</publisher>
+		<info name="serial" value="DWDC4022"/>
+		<info name="alt_title" value="サイキック・ディテクティヴ・シリーズ　Vol.2　メモリーズ" />
+		<info name="release" value="199407xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Key-Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="psychic_detective_series_vol_2_memories_remake.hdm" size="1261568" crc="7989bedc" sha1="1cf90d32fae70b917926f8e64c4d7d1675193ef5" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="psychic detective series vol. 2 - memories (japan) (dccs)" sha1="3275b87415f0e72ce72a248ef3a9b0a3aaefdd1a" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="psydet3">
 		<!--
 		Origin: redump.org
@@ -22395,7 +22689,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Key-Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="psychic_detective_series_vol_3_aya_remake.hdm" size="1261568" crc="8780e213" sha1="f5873104bc886a392231d41a6f22b902f36734de" offset="000000" />
+				<rom name="psychic_detective_series_vol_3_aya_remake.hdm" size="1261568" crc="8780e213" sha1="f5873104bc886a392231d41a6f22b902f36734de" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -22427,7 +22721,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="psychic detective series vol. 4 - orgel.hdm" size="1261568" crc="81a557bf" sha1="e32d7a6b60a2265a7035a05f8272ac7938cf82bf" offset="000000" />
+				<rom name="psychic detective series vol. 4 - orgel.hdm" size="1261568" crc="81a557bf" sha1="e32d7a6b60a2265a7035a05f8272ac7938cf82bf" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -22479,7 +22773,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Key-Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="psychic_detective_series_vol_4_orgel_remake.hdm" size="1261568" crc="bbf0a03e" sha1="4f4f6161b5fa0b8f1c4e6f0874a8c476aaa42e4f" offset="000000" />
+				<rom name="psychic_detective_series_vol_4_orgel_remake.hdm" size="1261568" crc="bbf0a03e" sha1="4f4f6161b5fa0b8f1c4e6f0874a8c476aaa42e4f" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -22513,7 +22807,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="psychic detective series vol. 5 - nightmare (system disk).hdm" size="1261568" crc="4fae09fe" sha1="2aaa1339b51b09f87a3c1738c76ab67c29649188" offset="000000" />
+				<rom name="psychic detective series vol. 5 - nightmare (system disk).hdm" size="1261568" crc="4fae09fe" sha1="2aaa1339b51b09f87a3c1738c76ab67c29649188" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -22549,7 +22843,7 @@ User/save disks that can be created from the game itself are not included.
 			<feature name="part_id" value="Key-Disk" />
 			<dataarea name="flop" size="1261568">
 				<!-- The original disk contained several bad sectors affecting the IO.SYS file, they have been replaced with the equivalent ones from Orgel -->
-				<rom name="psychic_detective_series_vol_5_nightmare_remake.hdm" size="1261568" crc="ab3cb7c5" sha1="25adac22fbca5c6c0d422554030ebb2295615004" offset="000000" status="baddump" />
+				<rom name="psychic_detective_series_vol_5_nightmare_remake.hdm" size="1261568" crc="ab3cb7c5" sha1="25adac22fbca5c6c0d422554030ebb2295615004" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -22580,7 +22874,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="psychic detective series final - solitude joukan.hdm" size="1261568" crc="96b42a43" sha1="8eab2884ad8416bb3a8a2219c8e41b267f0682c6" offset="000000" />
+				<rom name="psychic detective series final - solitude joukan.hdm" size="1261568" crc="96b42a43" sha1="8eab2884ad8416bb3a8a2219c8e41b267f0682c6" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -22609,7 +22903,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="psychic detective series final - solitude gekan.hdm" size="1261568" crc="1e6f92b3" sha1="a0c3e96599e546c0c212091f52d42adbb2dbbb5b" offset="000000" />
+				<rom name="psychic detective series final - solitude gekan.hdm" size="1261568" crc="1e6f92b3" sha1="a0c3e96599e546c0c212091f52d42adbb2dbbb5b" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -23054,7 +23348,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="release" value="199312xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="railroad_boot.bin" size="1261568" crc="12182b7a" sha1="00094bab0b9969524ec3694a38b1fa3cd1993d8b" offset="000000" />
+				<rom name="railroad_boot.bin" size="1261568" crc="12182b7a" sha1="00094bab0b9969524ec3694a38b1fa3cd1993d8b" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -23138,7 +23432,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Boot Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="rance iv (boot disk).hdm" size="1261568" crc="47d59131" sha1="85a17df16d612b9d6bf0c3d1b2bec45c4e378d70" offset="000000" />
+				<rom name="rance iv (boot disk).hdm" size="1261568" crc="47d59131" sha1="85a17df16d612b9d6bf0c3d1b2bec45c4e378d70" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -23551,7 +23845,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="release" value="199205xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="royal_blood.hdm" size="1261568" crc="9c068cfe" sha1="f3ad4b97516b3efcdb936887c80517494975f09c" offset="000000" />
+				<rom name="royal_blood.hdm" size="1261568" crc="9c068cfe" sha1="f3ad4b97516b3efcdb936887c80517494975f09c" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -23635,7 +23929,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1281968">
-				<rom name="sango2.d88" size="1281968" crc="40a7015d" sha1="79ae6709d7ee2c7f35c07f967e032f790565278b" offset="000000" />
+				<rom name="sango2.d88" size="1281968" crc="40a7015d" sha1="79ae6709d7ee2c7f35c07f967e032f790565278b" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -23679,7 +23973,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="release" value="199206xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="sangokushi_iii.hdm" size="1261568" crc="d6cca565" sha1="4f9fe3054193216855309147f4e4e721bbaaab99" offset="000000" />
+				<rom name="sangokushi_iii.hdm" size="1261568" crc="d6cca565" sha1="4f9fe3054193216855309147f4e4e721bbaaab99" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -23714,7 +24008,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="release" value="199406xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="sangokushi_4.hdm" size="1261568" crc="ef3e8441" sha1="fc1c9db8be644d413c1a6ef0ada6d3f37bf80676" offset="000000" />
+				<rom name="sangokushi_4.hdm" size="1261568" crc="ef3e8441" sha1="fc1c9db8be644d413c1a6ef0ada6d3f37bf80676" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -23907,7 +24201,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Key-Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="scholar movie magazine (boot disk).hdm" size="1261568" crc="6351e1a6" sha1="57e30fa44927653d88d30da0df3236852c669394" offset="000000" />
+				<rom name="scholar movie magazine (boot disk).hdm" size="1261568" crc="6351e1a6" sha1="57e30fa44927653d88d30da0df3236852c669394" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -23940,7 +24234,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="schwarzschild (game disk).hdm" size="1261568" crc="6a3658a7" sha1="e70e032a9ffe0f1454366a0d15fb2fb0ef224117" offset="000000" />
+				<rom name="schwarzschild (game disk).hdm" size="1261568" crc="6a3658a7" sha1="e70e032a9ffe0f1454366a0d15fb2fb0ef224117" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -24283,7 +24577,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="sensual_angels.hdm" size="1261568" crc="18190c59" sha1="bb996d3d071d85e286b69deb7273f04df66b2d53" offset="000000" />
+				<rom name="sensual_angels.hdm" size="1261568" crc="18190c59" sha1="bb996d3d071d85e286b69deb7273f04df66b2d53" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -24331,7 +24625,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="User Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="shamhat - the holy circlet (user disk).hdm" size="1261568" crc="77ae1f06" sha1="b95dae61c620f289d30378774afbd069658ef935" offset="000000" />
+				<rom name="shamhat - the holy circlet (user disk).hdm" size="1261568" crc="77ae1f06" sha1="b95dae61c620f289d30378774afbd069658ef935" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -24359,7 +24653,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="User Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="shamhat - the holy circlet (user disk) (marty version).hdm" size="1261568" crc="2acf7fea" sha1="4ad6670d633eaf158a24d5aa1fc9a3bcec0bbc0e" offset="000000" />
+				<rom name="shamhat - the holy circlet (user disk) (marty version).hdm" size="1261568" crc="2acf7fea" sha1="4ad6670d633eaf158a24d5aa1fc9a3bcec0bbc0e" />
 			</dataarea>
 		</part>
 		<!-- Verified to use the same CD as the original version -->
@@ -24517,7 +24811,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Master Disk" />
 			<dataarea name="flop" size="3583660">
-				<rom name="shinjuku labyrinth (master disk).mfm" size="3583660" crc="78b7c26c" sha1="778befacd1534dc22edffccaebb2957823e488e7" offset="000000" />
+				<rom name="shinjuku labyrinth (master disk).mfm" size="3583660" crc="78b7c26c" sha1="778befacd1534dc22edffccaebb2957823e488e7" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -24721,7 +25015,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="silent_service.hdm" size="1261568" crc="0545c966" sha1="08fa7728486ff44608476fc0643160ad0507f3f6" offset="000000" />
+				<rom name="silent_service.hdm" size="1261568" crc="0545c966" sha1="08fa7728486ff44608476fc0643160ad0507f3f6" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -25046,7 +25340,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Utility Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="soft de hard na monogatari (utility disk).hdm" size="1261568" crc="697505f7" sha1="da19fcc432fbeff6b2252e66b3ac09c09ade68ff" offset="000000" />
+				<rom name="soft de hard na monogatari (utility disk).hdm" size="1261568" crc="697505f7" sha1="da19fcc432fbeff6b2252e66b3ac09c09ade68ff" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -25075,7 +25369,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Utility Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="soft de hard na monogatari 2 (utility disk).hdm" size="1261568" crc="79c5faa6" sha1="6495eb561352706c45ef1c512d84e6335be91bf7" offset="000000" />
+				<rom name="soft de hard na monogatari 2 (utility disk).hdm" size="1261568" crc="79c5faa6" sha1="6495eb561352706c45ef1c512d84e6335be91bf7" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -25112,7 +25406,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Play Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="sotsugyou '93 - graduation (play disk).hdm" size="1261568" crc="fb4ac4d8" sha1="9ac7edfd20421df85d8fd469f45c3805a307023b" offset="000000" />
+				<rom name="sotsugyou '93 - graduation (play disk).hdm" size="1261568" crc="fb4ac4d8" sha1="9ac7edfd20421df85d8fd469f45c3805a307023b" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -25143,7 +25437,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Play Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="sotsugyou '93 - graduation (play disk, older).hdm" size="1261568" crc="7fd6c788" sha1="3709f921e7ebeaa9c69ed658beb704606fe89f54" offset="000000" />
+				<rom name="sotsugyou '93 - graduation (play disk, older).hdm" size="1261568" crc="7fd6c788" sha1="3709f921e7ebeaa9c69ed658beb704606fe89f54" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -25730,7 +26024,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Install Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="speech_trainer_install_disk.hdm" size="1261568" crc="8c6fc5da" sha1="e98f419ad058d911d3fd29cff66b50bb3ea500f4" offset="000000" />
+				<rom name="speech_trainer_install_disk.hdm" size="1261568" crc="8c6fc5da" sha1="e98f419ad058d911d3fd29cff66b50bb3ea500f4" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -26127,7 +26421,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Boot Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="samurai spirits (boot disk).bin" size="1261568" crc="7d10e903" sha1="5893035421003ce336e7516863c3c17a3ed86c0b" offset="000000" />
+				<rom name="samurai spirits (boot disk).bin" size="1261568" crc="7d10e903" sha1="5893035421003ce336e7516863c3c17a3ed86c0b" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -26190,7 +26484,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="FM-Towns-you Game Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="star_cruiser_2.hdm" size="1261568" crc="81b77ac2" sha1="9d022e5582aeb05ace35d300cf18cf13c5c70c0f" offset="000000" />
+				<rom name="star_cruiser_2.hdm" size="1261568" crc="81b77ac2" sha1="9d022e5582aeb05ace35d300cf18cf13c5c70c0f" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -26382,7 +26676,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="release" value="199002xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="suikoden_tenmei_no_chikai.hdm" size="1261568" crc="7315aacc" sha1="43aa869d5053f3ee0d242b431827a6ebdde836ba" offset="000000" />
+				<rom name="suikoden_tenmei_no_chikai.hdm" size="1261568" crc="7315aacc" sha1="43aa869d5053f3ee0d242b431827a6ebdde836ba" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -26408,7 +26702,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="suzaku (system disk).hdm" size="1261568" crc="c1e9ad9e" sha1="cd9d6e6a6198ebc536cfef5082076083596affc9" offset="000000" />
+				<rom name="suzaku (system disk).hdm" size="1261568" crc="c1e9ad9e" sha1="cd9d6e6a6198ebc536cfef5082076083596affc9" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -26482,7 +26776,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="taiken_shiyou_marty_channel.hdm" size="1261568" crc="1055aa90" sha1="3455b8831a63cd5b231e171a339a1f8b1dad3ebd" offset="000000" />
+				<rom name="taiken_shiyou_marty_channel.hdm" size="1261568" crc="1055aa90" sha1="3455b8831a63cd5b231e171a339a1f8b1dad3ebd" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -26572,7 +26866,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="taikou_risshiden.hdm" size="1261568" crc="82c56347" sha1="62f0cb66a1784c147e65f850b62d048e3a6bc2ca" offset="000000" />
+				<rom name="taikou_risshiden.hdm" size="1261568" crc="82c56347" sha1="62f0cb66a1784c147e65f850b62d048e3a6bc2ca" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -26655,7 +26949,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Key Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="tanjou - debut (key disk).hdm" size="1261568" crc="d731671d" sha1="7da7523a000aee0e4a3ee7cd73ee78109f54ea85" offset="000000" />
+				<rom name="tanjou - debut (key disk).hdm" size="1261568" crc="d731671d" sha1="7da7523a000aee0e4a3ee7cd73ee78109f54ea85" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -26736,13 +27030,13 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Computer Graphics - Sakuhin Key Floppy" />
 			<dataarea name="flop" size="1261568">
-				<rom name="tc_station_computer_graphics.hdm" size="1261568" crc="e85e9429" sha1="24182a597114ea21085bd397de2042a84355877a" offset="000000" />
+				<rom name="tc_station_computer_graphics.hdm" size="1261568" crc="e85e9429" sha1="24182a597114ea21085bd397de2042a84355877a" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Music - Sakuhin Key Floppy" />
 			<dataarea name="flop" size="1261568">
-				<rom name="tc_station_music.hdm" size="1261568" crc="35e00b2a" sha1="c7bab85f6348f83dc9b6ca6e139afefc597dd4a5" offset="000000" />
+				<rom name="tc_station_music.hdm" size="1261568" crc="35e00b2a" sha1="c7bab85f6348f83dc9b6ca6e139afefc597dd4a5" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -26767,7 +27061,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Computer Gakushuu Program - Gakushuu Key Floppy" />
 			<dataarea name="flop" size="1261568">
-				<rom name="tc_station_computer_gakushuu_program.hdm" size="1261568" crc="b1ac63cc" sha1="bdb1df429e2759de8702e6a3cf96747a4b515c5b" offset="000000" />
+				<rom name="tc_station_computer_gakushuu_program.hdm" size="1261568" crc="b1ac63cc" sha1="bdb1df429e2759de8702e6a3cf96747a4b515c5b" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -26792,7 +27086,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Collection - Challenge Key Floppy" />
 			<dataarea name="flop" size="1261568">
-				<rom name="tc_station_game_collection.hdm" size="1261568" crc="81c4d7dd" sha1="497b7cb6544dd91d24554674a8d266965affd460" offset="000000" />
+				<rom name="tc_station_game_collection.hdm" size="1261568" crc="81c4d7dd" sha1="497b7cb6544dd91d24554674a8d266965affd460" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -26817,7 +27111,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Photo Collection - Sakuhin Key Floppy" />
 			<dataarea name="flop" size="1261568">
-				<rom name="tc_station_photo_collection.hdm" size="1261568" crc="b2debf74" sha1="7b6de051be578cba2a50b0409dd361db646943a2" offset="000000" />
+				<rom name="tc_station_photo_collection.hdm" size="1261568" crc="b2debf74" sha1="7b6de051be578cba2a50b0409dd361db646943a2" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -26846,37 +27140,37 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="ID Floppy" />
 			<dataarea name="flop" size="1261568">
-				<rom name="tc_station_id_floppy.hdm" size="1261568" crc="fdb64656" sha1="e8edbca97c6e72d00d27141422b3c69c7d886661" offset="000000" />
+				<rom name="tc_station_id_floppy.hdm" size="1261568" crc="fdb64656" sha1="e8edbca97c6e72d00d27141422b3c69c7d886661" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Communication Log Floppy" />
 			<dataarea name="flop" size="1261568">
-				<rom name="tc_station_communication_log.hdm" size="1261568" crc="9f5a3679" sha1="2775fb888b3614c5adcde329057c2ac9e6488593" offset="000000" />
+				<rom name="tc_station_communication_log.hdm" size="1261568" crc="9f5a3679" sha1="2775fb888b3614c5adcde329057c2ac9e6488593" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="TC Yobikou Log Floppy" />
 			<dataarea name="flop" size="1261568">
-				<rom name="tc_station_tc_yobikou_log.hdm" size="1261568" crc="2ec35ef6" sha1="85b9bf8aeaaaab318716c9689119697a1bd92647" offset="000000" />
+				<rom name="tc_station_tc_yobikou_log.hdm" size="1261568" crc="2ec35ef6" sha1="85b9bf8aeaaaab318716c9689119697a1bd92647" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Game Library Log Floppy" />
 			<dataarea name="flop" size="1261568">
-				<rom name="tc_station_game_library_log.hdm" size="1261568" crc="b67211ba" sha1="43ca268574e6a66fe54b7489fbfa0f918ed04c10" offset="000000" />
+				<rom name="tc_station_game_library_log.hdm" size="1261568" crc="b67211ba" sha1="43ca268574e6a66fe54b7489fbfa0f918ed04c10" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Kuruma Jouhou / Uranai Log Floppy" />
 			<dataarea name="flop" size="1261568">
-				<rom name="tc_station_kuruma_uranai_log.hdm" size="1261568" crc="930a0de8" sha1="e044140455ecbbbf21c14fee5a245e4556f24862" offset="000000" />
+				<rom name="tc_station_kuruma_uranai_log.hdm" size="1261568" crc="930a0de8" sha1="e044140455ecbbbf21c14fee5a245e4556f24862" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
 			<feature name="part_id" value="Gazou Souko Log Floppy" />
 			<dataarea name="flop" size="1261568">
-				<rom name="tc_station_gazou_souko_log.hdm" size="1261568" crc="30f0b828" sha1="d6332ef8ce40509872aeabdb4407c76d976dfcdc" offset="000000" />
+				<rom name="tc_station_gazou_souko_log.hdm" size="1261568" crc="30f0b828" sha1="d6332ef8ce40509872aeabdb4407c76d976dfcdc" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -26901,13 +27195,13 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Marty WorPro - Bunsho Key Floppy" />
 			<dataarea name="flop" size="1261568">
-				<rom name="tc_station_worpro.hdm" size="1261568" crc="4d112556" sha1="28ea14fd4b2d10ac76ff28b0a29d532edeaeeb6a" offset="000000" />
+				<rom name="tc_station_worpro.hdm" size="1261568" crc="4d112556" sha1="28ea14fd4b2d10ac76ff28b0a29d532edeaeeb6a" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Marty Hyoukeisan - File Key Floppy" />
 			<dataarea name="flop" size="1261568">
-				<rom name="tc_station_hyoukeisan.hdm" size="1261568" crc="1162c1de" sha1="97c8c8a7294369f6587072a19aa0ac99cd5c8dc5" offset="000000" />
+				<rom name="tc_station_hyoukeisan.hdm" size="1261568" crc="1162c1de" sha1="97c8c8a7294369f6587072a19aa0ac99cd5c8dc5" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -26956,7 +27250,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM. Boot TownsOS V2.1 and run ED.EXP or EP.EXP from the floppy disk."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="teata_vision_v1.2.hdm" size="1261568" crc="88d6b334" sha1="f6784951f3dbcb2704a52ee40240e633263f90bf" offset="000000" />
+				<rom name="teata_vision_v1.2.hdm" size="1261568" crc="88d6b334" sha1="f6784951f3dbcb2704a52ee40240e633263f90bf" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -26980,7 +27274,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM. Boot TownsOS V2.1 and run ED.EXP or EP.EXP from the floppy disk."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="teata_vision_v1.1.hdm" size="1261568" crc="7ed2829a" sha1="4317b1c763ef8e801c278213bf66dd36c8040e01" offset="000000" />
+				<rom name="teata_vision_v1.1.hdm" size="1261568" crc="7ed2829a" sha1="4317b1c763ef8e801c278213bf66dd36c8040e01" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -27004,7 +27298,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM. Boot TownsOS V2.1 and run ED.EXP or EP.EXP from the floppy disk."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="teata_vision_v1.0.hdm" size="1261568" crc="4e7a10aa" sha1="4849a639c174f923743b4b63cc6e9e9362fa2962" offset="000000" />
+				<rom name="teata_vision_v1.0.hdm" size="1261568" crc="4e7a10aa" sha1="4849a639c174f923743b4b63cc6e9e9362fa2962" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -27036,7 +27330,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="release" value="199004xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="teitoku_no_ketsudan.hdm" size="1261568" crc="c944d154" sha1="84c54646887e644e590328608583509f4f8940f6" offset="000000" />
+				<rom name="teitoku_no_ketsudan.hdm" size="1261568" crc="c944d154" sha1="84c54646887e644e590328608583509f4f8940f6" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -27075,7 +27369,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="teitoku no ketsudan ii.hdm" size="1261568" crc="aabcd4f9" sha1="5079e129b96836f6d19503528633ee66e29cfebc" offset="000000" />
+				<rom name="teitoku no ketsudan ii.hdm" size="1261568" crc="aabcd4f9" sha1="5079e129b96836f6d19503528633ee66e29cfebc" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -27121,7 +27415,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Towns-Telop System Programs" />
 			<dataarea name="flop" size="1261568">
-				<rom name="townstelopv100.hdm" size="1261568" crc="b7b525b2" sha1="43fbba547a73a85ee7dbca8777728b31c3a4de44" offset="000000" />
+				<rom name="townstelopv100.hdm" size="1261568" crc="b7b525b2" sha1="43fbba547a73a85ee7dbca8777728b31c3a4de44" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -27172,7 +27466,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="tenka gomen (system disk).hdm" size="1261568" crc="ed6a772a" sha1="b67203849d45824fcb6afac6610621ca95b23966" offset="000000" />
+				<rom name="tenka gomen (system disk).hdm" size="1261568" crc="ed6a772a" sha1="b67203849d45824fcb6afac6610621ca95b23966" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -27201,7 +27495,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="tenshin_ranma_disk_a.hdm" size="1261568" crc="f2af4301" sha1="f6c9e5a32203672113bab7135756baa7528e9253" offset="000000" />
+				<rom name="tenshin_ranma_disk_a.hdm" size="1261568" crc="f2af4301" sha1="f6c9e5a32203672113bab7135756baa7528e9253" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -27266,7 +27560,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Elmo no Mi" />
 			<dataarea name="flop" size="3445721">
-				<rom name="teo_v2.0-elmo_no_mi.mfm" size="3445721" crc="e93fe47c" sha1="7c183c952acc8ee4b0cdfaa849b7e837717383da" offset="000000" />
+				<rom name="teo_v2.0-elmo_no_mi.mfm" size="3445721" crc="e93fe47c" sha1="7c183c952acc8ee4b0cdfaa849b7e837717383da" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -27636,7 +27930,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="tokio (system disk).hdm" size="1261568" crc="664f6038" sha1="d2ceb4c0488cf252edf8eb912d707270c886747e" offset="000000" />
+				<rom name="tokio (system disk).hdm" size="1261568" crc="664f6038" sha1="d2ceb4c0488cf252edf8eb912d707270c886747e" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -27811,7 +28105,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="User Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="the queen of duellist (user disk).hdm" size="1261568" crc="4be69833" sha1="b41753c9994b71a4c6634807fe437b465defde5a" offset="000000" />
+				<rom name="the queen of duellist (user disk).hdm" size="1261568" crc="4be69833" sha1="b41753c9994b71a4c6634807fe437b465defde5a" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -27856,7 +28150,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="User Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="qd_alpha_gaiden_1994-03-10.hdm" size="1261568" crc="59de99dc" sha1="27a4bc28ed4f36e32cc1d62a73a5ac8c1858708a" offset="000000" />
+				<rom name="qd_alpha_gaiden_1994-03-10.hdm" size="1261568" crc="59de99dc" sha1="27a4bc28ed4f36e32cc1d62a73a5ac8c1858708a" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -27894,7 +28188,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="User Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="qd_alpha_gaiden_1994-03-02.hdm" size="1261568" crc="61cf360d" sha1="6e3dd6a2881f6249d8347df418cf47bf6e9f8842" offset="000000" />
+				<rom name="qd_alpha_gaiden_1994-03-02.hdm" size="1261568" crc="61cf360d" sha1="6e3dd6a2881f6249d8347df418cf47bf6e9f8842" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -27920,7 +28214,7 @@ User/save disks that can be created from the game itself are not included.
 		<!-- Image recreated from loose files. It should be redumped from an original disk. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="tokyo_sexy_ave.hdm" size="1261568" crc="e9800125" sha1="cf6a5685426eb7407673eda4cbb2294afae07a4a" offset="000000" status="baddump" />
+				<rom name="tokyo_sexy_ave.hdm" size="1261568" crc="e9800125" sha1="cf6a5685426eb7407673eda4cbb2294afae07a4a" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -28056,7 +28350,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Key Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="touch_the_music_key_disk.hdm" size="1261568" crc="36eb0122" sha1="5936f982ffb13e3dd14e0ae9a9cfc0213c9fc9ba" offset="000000" />
+				<rom name="touch_the_music_key_disk.hdm" size="1261568" crc="36eb0122" sha1="5936f982ffb13e3dd14e0ae9a9cfc0213c9fc9ba" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -28588,7 +28882,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="true_heart_disk_a.hdm" size="1261568" crc="bc249ca9" sha1="8471b573e6c33b3c32de79b4c8b36f3e72d6f6cc" offset="000000" status="baddump" />
+				<rom name="true_heart_disk_a.hdm" size="1261568" crc="bc249ca9" sha1="8471b573e6c33b3c32de79b4c8b36f3e72d6f6cc" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -28623,7 +28917,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="true_heart_disk_a.hdm" size="1261568" crc="bc249ca9" sha1="8471b573e6c33b3c32de79b4c8b36f3e72d6f6cc" offset="000000" status="baddump" />
+				<rom name="true_heart_disk_a.hdm" size="1261568" crc="bc249ca9" sha1="8471b573e6c33b3c32de79b4c8b36f3e72d6f6cc" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -28874,7 +29168,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 4 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="uwaki na anata (boot disk).hdm" size="1261568" crc="27b0fc8b" sha1="4010114d203a210175b59e3d4dc46df0cf805f03" offset="000000" />
+				<rom name="uwaki na anata (boot disk).hdm" size="1261568" crc="27b0fc8b" sha1="4010114d203a210175b59e3d4dc46df0cf805f03" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -28925,7 +29219,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="vain dream (system disk).hdm" size="1261568" crc="193225c1" sha1="2d3ee819482517b3b9d5d5c6e3877f2def4fbc20" offset="000000" />
+				<rom name="vain dream (system disk).hdm" size="1261568" crc="193225c1" sha1="2d3ee819482517b3b9d5d5c6e3877f2def4fbc20" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -28967,7 +29261,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="vain dream ii (system disk).hdm" size="1261568" crc="a95283e8" sha1="a61fd855e256c7216a8d8d5b7f72dcaed319e727" offset="000000" />
+				<rom name="vain dream ii (system disk).hdm" size="1261568" crc="a95283e8" sha1="a61fd855e256c7216a8d8d5b7f72dcaed319e727" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -29145,7 +29439,7 @@ User/save disks that can be created from the game itself are not included.
 		-->
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="videokoubou_systemdisk.hdm" size="1261568" crc="19b8d70a" sha1="a025b5f0ac23fda0509605efc81294855f7cb158" offset="000000" status="baddump"/>
+				<rom name="videokoubou_systemdisk.hdm" size="1261568" crc="19b8d70a" sha1="a025b5f0ac23fda0509605efc81294855f7cb158" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -29204,7 +29498,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="起動ディスク / Kidou Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="viper_gts.hdm" size="1261568" crc="b3b89caa" sha1="926b28bafc53edf095d778ec91c12b7a61925c8c" offset="000000" />
+				<rom name="viper_gts.hdm" size="1261568" crc="b3b89caa" sha1="926b28bafc53edf095d778ec91c12b7a61925c8c" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -29318,7 +29612,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="virtuacall (disk a).hdm" size="1261568" crc="ebdfc4b9" sha1="b4240a3b28093c832a38be17cf72495f4f094f88" offset="000000" />
+				<rom name="virtuacall (disk a).hdm" size="1261568" crc="ebdfc4b9" sha1="b4240a3b28093c832a38be17cf72495f4f094f88" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -29360,7 +29654,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="virtuacall 2 (japan) (disk a).hdm" size="1261568" crc="3aaa7ce2" sha1="55247f3cad3696323c13ccbebb50400f2736bab6" offset="000000" />
+				<rom name="virtuacall 2 (japan) (disk a).hdm" size="1261568" crc="3aaa7ce2" sha1="55247f3cad3696323c13ccbebb50400f2736bab6" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -29710,7 +30004,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="winning_post.hdm" size="1261568" crc="839cf8d5" sha1="2a9f89106e318ac122b2f05d036c81bf8d391121" offset="000000" />
+				<rom name="winning_post.hdm" size="1261568" crc="839cf8d5" sha1="2a9f89106e318ac122b2f05d036c81bf8d391121" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -29752,7 +30046,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="User Disk" />
 			<dataarea name="flop" size="1089776">
-				<rom name="wizardry v - heart of the maelstrom (user disk).d88" size="1089776" crc="0cd772c2" sha1="149e7bc2ab3537444f71b565330e1ecea911dafa" offset="000000" />
+				<rom name="wizardry v - heart of the maelstrom (user disk).d88" size="1089776" crc="0cd772c2" sha1="149e7bc2ab3537444f71b565330e1ecea911dafa" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -29786,7 +30080,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="User Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="wizardry vi - bane of the cosmic forge (user disk).hdm" size="1261568" crc="0092a1da" sha1="557e3bedbd8c3f546ac30fe9d8ce9fd386eda90e" offset="000000" />
+				<rom name="wizardry vi - bane of the cosmic forge (user disk).hdm" size="1261568" crc="0092a1da" sha1="557e3bedbd8c3f546ac30fe9d8ce9fd386eda90e" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -29836,7 +30130,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Save Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="wrestle angels 3 (save disk).hdm" size="1261568" crc="c29e2e9c" sha1="1f4d99366200b8938cc3a1868bc2540a20720740" offset="000000" />
+				<rom name="wrestle angels 3 (save disk).hdm" size="1261568" crc="c29e2e9c" sha1="1f4d99366200b8938cc3a1868bc2540a20720740" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -29861,7 +30155,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="User Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="wrestle angels special (user disk).hdm" size="1261568" crc="7df5c0a6" sha1="09c2ecaba12aabc2b2cf8f4527f491ccd257faac" offset="000000" />
+				<rom name="wrestle angels special (user disk).hdm" size="1261568" crc="7df5c0a6" sha1="09c2ecaba12aabc2b2cf8f4527f491ccd257faac" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -30047,6 +30341,60 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="yachtman">
+		<!--
+		Origin: redump.org
+		<rom name="Yacht Man, The (Japan) (Track 01).bin" size="10231200" crc="f0502459" sha1="9461aaa0422ce1e1e7268aa240a964c5188408b7"/>
+		<rom name="Yacht Man, The (Japan) (Track 02).bin" size="1411200" crc="2c942711" sha1="fb69c7d459c1aa42c8cd0899a49417557f20aaaf"/>
+		<rom name="Yacht Man, The (Japan) (Track 03).bin" size="1587600" crc="f6c8d28c" sha1="04d6a37fde37208e2a8a17a3a3a467dea8653f71"/>
+		<rom name="Yacht Man, The (Japan) (Track 04).bin" size="2116800" crc="ecdc1ffa" sha1="b5b044720623179873a94a0c98c232c390beefa7"/>
+		<rom name="Yacht Man, The (Japan) (Track 05).bin" size="2293200" crc="7e88b46f" sha1="dfe94ad26a122f159a52aac5e4d46860fe9999aa"/>
+		<rom name="Yacht Man, The (Japan) (Track 06).bin" size="1940400" crc="16142d67" sha1="207cbab25cfcbb030008607605315db332dced5f"/>
+		<rom name="Yacht Man, The (Japan) (Track 07).bin" size="2293200" crc="a5100db3" sha1="27822d047933d7fccdb817b8571ddc170ce5c3b7"/>
+		<rom name="Yacht Man, The (Japan) (Track 08).bin" size="2293200" crc="a648fbf0" sha1="a2c3e028d148043a37078d428065e0c4d4859c07"/>
+		<rom name="Yacht Man, The (Japan) (Track 09).bin" size="2116800" crc="4e17daa7" sha1="88d0395d4e63eed2e73ba64691100859553c4754"/>
+		<rom name="Yacht Man, The (Japan) (Track 10).bin" size="2822400" crc="09747c77" sha1="f21613cd868132ba2cfcb651d3d2bb00975c94a1"/>
+		<rom name="Yacht Man, The (Japan) (Track 11).bin" size="2116800" crc="8ee23daf" sha1="6f63699c3d97d7232b64965863de9aa910c20831"/>
+		<rom name="Yacht Man, The (Japan) (Track 12).bin" size="1587600" crc="62932679" sha1="c35b60bef0750bedfa39879baff405b47c6939f8"/>
+		<rom name="Yacht Man, The (Japan) (Track 13).bin" size="1058400" crc="4237c39d" sha1="fa9f303a8c9fe389f1b86fee74d318b863de7a9d"/>
+		<rom name="Yacht Man, The (Japan) (Track 14).bin" size="2646000" crc="02916ab5" sha1="fa602954f2a1c3a9fdfc772d6d488f0562710478"/>
+		<rom name="Yacht Man, The (Japan) (Track 15).bin" size="1940400" crc="6db6be59" sha1="a7091675552bd793b688a8d8c584d3be088ef77e"/>
+		<rom name="Yacht Man, The (Japan) (Track 16).bin" size="1587600" crc="b2c78d13" sha1="a175405cc86c8f89b37c04ae69eacb0c96cbe1bf"/>
+		<rom name="Yacht Man, The (Japan) (Track 17).bin" size="2469600" crc="84deb4de" sha1="c9cbb178ede6ef7a1d97d0d4a57f8f31e5154cbd"/>
+		<rom name="Yacht Man, The (Japan) (Track 18).bin" size="1587600" crc="ca9dad41" sha1="8f5949b022b3c2a2a6c4d51272922e16ce1a9ac6"/>
+		<rom name="Yacht Man, The (Japan) (Track 19).bin" size="1764000" crc="a2a4a5e8" sha1="b2b4f42b3575ee9db580056075bc8f8ac5b761fa"/>
+		<rom name="Yacht Man, The (Japan) (Track 20).bin" size="1587600" crc="ca093c7b" sha1="f440f14be8be483f7c9cab3d37b621e92fc462a7"/>
+		<rom name="Yacht Man, The (Japan) (Track 21).bin" size="2822400" crc="b4b1cb25" sha1="47aacd088a06c272c855387b1a72a3ef571e419c"/>
+		<rom name="Yacht Man, The (Japan) (Track 22).bin" size="1940400" crc="cb22b1a7" sha1="3428d7ac3073d45a6011c693f8760f2948ab749c"/>
+		<rom name="Yacht Man, The (Japan) (Track 23).bin" size="1764000" crc="7d53a1ca" sha1="13cbc85fce9b030df82d0cf48501d469e80067f3"/>
+		<rom name="Yacht Man, The (Japan) (Track 24).bin" size="9349200" crc="f49058d6" sha1="6c4a40c9fb3ee93aaab539a0dddc45f9c15890cc"/>
+		<rom name="Yacht Man, The (Japan) (Track 25).bin" size="10231200" crc="2f0ff433" sha1="316089bfaf756df30709b2a5c2614f69fa2107c0"/>
+		<rom name="Yacht Man, The (Japan) (Track 26).bin" size="4586400" crc="5ff5ed78" sha1="9e5770bc31c505eba3d2e983a3baa2e7265eb33e"/>
+		<rom name="Yacht Man, The (Japan) (Track 27).bin" size="29635200" crc="e158fba3" sha1="913a98452168ffb61924e49bdd53d9218a37cd65"/>
+		<rom name="Yacht Man, The (Japan) (Track 28).bin" size="7056000" crc="6090e6d7" sha1="92483580f104880299121e57f5a325eb05de9800"/>
+		<rom name="Yacht Man, The (Japan) (Track 29).bin" size="15699600" crc="a917e093" sha1="a6cfa339e09e8dd6719ec313ced697d359b24c98"/>
+		<rom name="Yacht Man, The (Japan) (Track 30).bin" size="24519600" crc="4a7f35b8" sha1="023b3a7633bd8bb763f9fcbe264c223887ca713f"/>
+		<rom name="Yacht Man, The (Japan) (Track 31).bin" size="31222800" crc="8740bf2a" sha1="728ab1bd66eb0c4e73bae026e0af3615a6ac0ab4"/>
+		<rom name="Yacht Man, The (Japan) (Track 32).bin" size="21697200" crc="c5f62cb9" sha1="94dbd081f716734a58e922588d9405c5a2019889"/>
+		<rom name="Yacht Man, The (Japan) (Track 33).bin" size="24343200" crc="6e96fe00" sha1="c42e5e9e72da514ee6f738375a06bbf7e4a99b35"/>
+		<rom name="Yacht Man, The (Japan) (Track 34).bin" size="20109600" crc="791b0ec6" sha1="69b44b2b14dd9aca4d8804c0a3397fd35165e0db"/>
+		<rom name="Yacht Man, The (Japan) (Track 35).bin" size="13582800" crc="bd1828bc" sha1="d03f4533d385f8c87b8de83f56fa877154eaf73f"/>
+		<rom name="Yacht Man, The (Japan) (Track 36).bin" size="4233600" crc="4580866a" sha1="aaefaba5020efb03452df764e2897d0f278e3151"/>
+		<rom name="Yacht Man, The (Japan).cue" size="4194" crc="25fc05e9" sha1="49eff678d1bf3a944eba56c3204128a5e3723b91"/>
+		-->
+		<description>The Yachtman</description> <!-- Uses "Yacht Man" in the file icon and "The Yachtman" in the title screen -->
+		<year>1989</year>
+		<publisher>レイゾン (Raison)</publisher>
+		<info name="serial" value="HMA-243"/>
+		<info name="alt_title" value="ザ・ヨットマン" />
+		<info name="release" value="198911xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="yacht man, the (japan)" sha1="c70e8267ad28617595616182a0ca6d7d8bc02242" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!--
 	    DOS/V / Windows / Mac / FM Towns hybrid.
 
@@ -30157,7 +30505,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Utility Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="yami no ketsuzoku special (utility disk).hdm" size="1261568" crc="62e6f35a" sha1="ee1e86547bac53e5e9dc7a010bc60f3b511965b6" offset="000000" />
+				<rom name="yami no ketsuzoku special (utility disk).hdm" size="1261568" crc="62e6f35a" sha1="ee1e86547bac53e5e9dc7a010bc60f3b511965b6" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -30384,7 +30732,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="User Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="yuuwaku (user disk).hdm" size="1261568" crc="985a282d" sha1="fbdbf25410b554156becc935fbf34ea103870c42" offset="000000" />
+				<rom name="yuuwaku (user disk).hdm" size="1261568" crc="985a282d" sha1="fbdbf25410b554156becc935fbf34ea103870c42" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -30539,7 +30887,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="User Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="zan ii towns special (user disk) (1992-04-23).hdm" size="1261568" crc="ef5e668d" sha1="cc7120bd32053775b2916ab24d2edf2312e26cca" offset="000000" />
+				<rom name="zan ii towns special (user disk) (1992-04-23).hdm" size="1261568" crc="ef5e668d" sha1="cc7120bd32053775b2916ab24d2edf2312e26cca" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -30568,7 +30916,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="User Disk" />
 			<dataarea name="flop" size="1261568">
-				<rom name="zan ii towns special (user disk) (1992-03-19).hdm" size="1261568" crc="863e02e3" sha1="28622691fd1a431055f4c586cfe585e0920a6153" offset="000000" />
+				<rom name="zan ii towns special (user disk) (1992-03-19).hdm" size="1261568" crc="863e02e3" sha1="28622691fd1a431055f4c586cfe585e0920a6153" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -30594,7 +30942,7 @@ User/save disks that can be created from the game itself are not included.
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1281968">
-				<rom name="zan3 system disk.d88" size="1281968" crc="cbe7152b" sha1="eed29400e2d84788871027d3fc88c2297aa6a8b7" offset="000000" />
+				<rom name="zan3 system disk.d88" size="1281968" crc="cbe7152b" sha1="eed29400e2d84788871027d3fc88c2297aa6a8b7" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">

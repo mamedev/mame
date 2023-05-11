@@ -26,6 +26,9 @@ Debug cheats:
 #include "speaker.h"
 #include "debugger.h"
 
+
+namespace {
+
 // TBD
 #define MAIN_CLOCK (XTAL(15'468'480) / 4)
 #define VIDEO_CLOCK (XTAL(15'468'480) / 3)
@@ -547,5 +550,8 @@ ROM_START( ron2 )
 	ROM_LOAD( "82s129_3.2n",  0x000, 0x100, CRC(018ab2a0) SHA1(039c574d8fd3c1a8e9eca6a7c79fe92e8496b157) )
 	ROM_LOAD( "82s129_4.2m",  0x100, 0x100, CRC(f3c05d59) SHA1(bd48963aa9f2bedaa0c1fd031d7c93089161d1d9) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1981, ron2,  0,   ron,  ron, ron_state, empty_init, ROT270, "Sanritsu", "Futari Mahjong Ron II", MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS )

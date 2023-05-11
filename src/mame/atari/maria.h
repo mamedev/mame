@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Dan Boris
-#ifndef MAME_VIDEO_MARIA_H
-#define MAME_VIDEO_MARIA_H
+#ifndef MAME_ATARI_MARIA_H
+#define MAME_ATARI_MARIA_H
 
 #pragma once
 
@@ -65,4 +65,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(ATARI_MARIA, atari_maria_device)
 
-#endif // MAME_VIDEO_MARIA_H
+#endif // MAME_ATARI_MARIA_H

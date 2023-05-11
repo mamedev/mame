@@ -54,7 +54,7 @@ inline std::string &path_append(std::string &path, T &&next, U &&... more)
 	if (!path.empty() && !is_directory_separator(path.back()))
 		path.append(PATH_SEPARATOR);
 	path.append(std::forward<T>(next));
-	if constexpr (sizeof...(U))
+	if constexpr (sizeof...(U) > 0U)
 		return path_append(path, std::forward<U>(more)...);
 	else
 		return path;
@@ -72,7 +72,7 @@ template <typename T, typename... U>
 inline std::string path_concat(T &&first, U &&... more)
 {
 	std::string result(std::forward<T>(first));
-	if constexpr (sizeof...(U))
+	if constexpr (sizeof...(U) > 0U)
 		path_append(result, std::forward<U>(more)...);
 	return result;
 }

@@ -90,6 +90,9 @@
 #include "bus/multibus/multibus.h"
 #include "bus/multibus/isbc202.h"
 
+
+namespace {
+
 // CPU oscillator of IPC board: 8 MHz
 #define IPC_XTAL_Y2     8_MHz_XTAL
 
@@ -339,6 +342,9 @@ ROM_START(imds2)
 	ROMX_LOAD("ipc11_a57.bin", 0x0000, 0x0800, CRC(ffb7c036) SHA1(6f60cdfe20621c4b633c972adcb644a1c02eaa39), ROM_BIOS(2))
 	ROMX_LOAD("ipc11_a48.bin", 0x0800, 0x0800, CRC(3696ff28) SHA1(38b435e10a81629430275aec051fb0a55ec1f6fd), ROM_BIOS(2))
 ROM_END
+
+} // anonymous namespace
+
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME */
 COMP( 1979, imds2, 0,      0,      imds2,   imds2, imds2_state, empty_init, "Intel", "Intellec MDS-II", 0)

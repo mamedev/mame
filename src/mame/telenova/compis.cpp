@@ -66,6 +66,9 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define I80186_TAG      "ic1"
 #define I80130_TAG      "ic15"
 #define I8251A_TAG      "ic59"
@@ -874,6 +877,7 @@ ROM_END
 
 #define rom_compis2 rom_compis
 
+} // anonymous namespace
 
 
 //**************************************************************************

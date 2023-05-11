@@ -33,6 +33,9 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 class vtech_storio_state : public driver_device
 {
 public:
@@ -84,12 +87,12 @@ void vtech_storio_state::machine_reset()
 
 DEVICE_IMAGE_LOAD_MEMBER(vtech_storio_state::cart_load)
 {
-	uint32_t size = m_cart->common_get_size("rom");
+	uint32_t const size = m_cart->common_get_size("rom");
 
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 static INPUT_PORTS_START( vtech_storio )
@@ -177,6 +180,9 @@ ROM_START( storionl )
 	ROM_REGION( 0x03af81c6, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "nldut-pack_20111017.bin", 0x000000, 0x03af81c6, CRC(6cfac599) SHA1(d16b45fd287c9d823bde13b88eb6c8158ac2b475) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    year, name,         parent,  compat, machine,      input,        class,              init,       company,  fullname,                             flags
 CONS( 2011, vreader,      0,       0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "V.Reader (US, English, 2011-10-17)", MACHINE_IS_SKELETON )

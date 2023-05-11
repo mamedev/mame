@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
 
-#ifndef MAME_INCLUDES_CDI_H
-#define MAME_INCLUDES_CDI_H
+#ifndef MAME_PHILIPS_CDI_H
+#define MAME_PHILIPS_CDI_H
 
 #include "machine/scc68070.h"
 #include "cdislavehle.h"
@@ -11,6 +11,7 @@
 #include "mcd212.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/m6805/m68hc05.h"
+#include "diserial.h"
 #include "screen.h"
 
 /*----------- driver state -----------*/
@@ -23,8 +24,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_main_rom(*this, "maincpu")
 		, m_lcd(*this, "lcd")
-		, m_plane_ram(*this, "plane%u", 0U)
 		, m_slave_hle(*this, "slave_hle")
+		, m_plane_ram(*this, "plane%u", 0U)
 		, m_servo(*this, "servo")
 		, m_slave(*this, "slave")
 		, m_cdic(*this, "cdic")
@@ -45,6 +46,7 @@ protected:
 	required_device<scc68070_device> m_maincpu;
 	required_region_ptr<uint16_t> m_main_rom;
 	optional_device<screen_device> m_lcd;
+	optional_device<cdislave_hle_device> m_slave_hle;
 
 private:
 	enum servo_portc_bit_t
@@ -72,7 +74,6 @@ private:
 	void bus_error_w(offs_t offset, uint16_t data);
 
 	required_shared_ptr_array<uint16_t, 2> m_plane_ram;
-	optional_device<cdislave_hle_device> m_slave_hle;
 	optional_device<m68hc05c8_device> m_servo;
 	optional_device<m68hc05c8_device> m_slave;
 	optional_device<cdicdic_device> m_cdic;
@@ -81,11 +82,12 @@ private:
 	required_device_array<dmadac_sound_device, 2> m_dmadac;
 };
 
-class quizard_state : public cdi_state
+class quizard_state : public cdi_state, public device_serial_interface
 {
 public:
 	quizard_state(const machine_config &mconfig, device_type type, const char *tag)
 		: cdi_state(mconfig, type, tag)
+		, device_serial_interface(mconfig, *this)
 		, m_mcu(*this, "mcu")
 		, m_inputs(*this, "P%u", 0U)
 	{ }
@@ -96,6 +98,11 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	virtual void tra_callback() override;
+	virtual void rcv_complete() override;
+
+	TIMER_CALLBACK_MEMBER(boot_press_tick);
+
 	uint8_t mcu_p0_r();
 	uint8_t mcu_p1_r();
 	uint8_t mcu_p2_r();
@@ -104,17 +111,18 @@ private:
 	void mcu_p1_w(uint8_t data);
 	void mcu_p2_w(uint8_t data);
 	void mcu_p3_w(uint8_t data);
-	void mcu_tx(uint8_t data);
-	uint8_t mcu_rx();
 
 	void mcu_rx_from_cpu(uint8_t data);
 	void mcu_rtsn_from_cpu(int state);
 
+	uint8_t mcu_button_press();
+
 	required_device<i8751_device> m_mcu;
 	required_ioport_array<3> m_inputs;
 
-	uint8_t m_mcu_rx_from_cpu = 0U;
-	bool m_mcu_initial_byte = false;
+	bool m_boot_press = false;
+	emu_timer *m_boot_timer = nullptr;
+	uint8_t m_mcu_p3 = 0x04;
 };
 
 // Quizard 2 language values:
@@ -122,4 +130,4 @@ private:
 // 0x001: French
 // 0x188: German
 
-#endif // MAME_INCLUDES_CDI_H
+#endif // MAME_PHILIPS_CDI_H

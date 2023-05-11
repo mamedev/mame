@@ -298,7 +298,7 @@ void suprgolf_state::rom2_bank_select_w(uint8_t data)
 	membank("bank1")->set_entry(data & 0x0f);
 
 	//if(data & 0xf0)
-	//	printf("Rom bank select 2 with data %02x activated\n",data);
+	//  printf("Rom bank select 2 with data %02x activated\n",data);
 }
 
 uint8_t suprgolf_state::pedal_extra_bits_r()

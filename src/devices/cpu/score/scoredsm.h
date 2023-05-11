@@ -34,7 +34,6 @@ private:
 	static const char *const m_i1b_op[8];
 	static const char *const m_cr_op[2];
 
-	int32_t sign_extend(uint32_t data, uint8_t len);
 	offs_t disasm(std::ostream &stream, offs_t pc, uint32_t opcode);
 	void disasm32(std::ostream &stream, offs_t pc, uint32_t opcode);
 	void disasm16(std::ostream &stream, offs_t pc, uint16_t opcode);

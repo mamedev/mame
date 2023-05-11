@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_TMC1800_H
-#define MAME_INCLUDES_TMC1800_H
+#ifndef MAME_TELERCAS_TMC1800_H
+#define MAME_TELERCAS_TMC1800_H
 
 #pragma once
 
@@ -199,4 +199,4 @@ protected:
 	int m_keylatch = 0;
 };
 
-#endif
+#endif // MAME_TELERCAS_TMC1800_H

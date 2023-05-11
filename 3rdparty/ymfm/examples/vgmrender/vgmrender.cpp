@@ -9,7 +9,7 @@
 //
 // or:
 //
-//   clang --std=c++14 -I../../src vgmrender.cpp em_inflate.cpp ../../src/ymfm_misc.cpp ../../src/ymfm_opl.cpp ../../src/ymfm_opm.cpp ../../src/ymfm_opn.cpp ../../src/ymfm_adpcm.cpp ../../src/ymfm_pcm.cpp ../../src/ymfm_ssg.cpp -o vgmrender.exe
+//   clang++ --std=c++14 -I../../src vgmrender.cpp em_inflate.cpp ../../src/ymfm_misc.cpp ../../src/ymfm_opl.cpp ../../src/ymfm_opm.cpp ../../src/ymfm_opn.cpp ../../src/ymfm_adpcm.cpp ../../src/ymfm_pcm.cpp ../../src/ymfm_ssg.cpp -o vgmrender.exe
 //
 // or:
 //
@@ -33,11 +33,17 @@
 
 #define LOG_WRITES (0)
 
+// run this many dummy clocks of each chip before generating
+#define EXTRA_CLOCKS (0)
+
+
 // enable this to run the nuked OPN2 core in parallel; output is not captured,
 // but logging can be added to observe behaviors
 #define RUN_NUKED_OPN2 (0)
 #if (RUN_NUKED_OPN2)
 namespace nuked {
+bool s_log_envelopes = false;
+const int s_log_envelopes_channel = 5;
 #include "test/ym3438.h"
 }
 #endif
@@ -89,6 +95,11 @@ public:
 	vgm_chip_base(uint32_t clock, chip_type type, char const *name) :
 		m_type(type),
 		m_name(name)
+	{
+	}
+
+	// destruction
+	virtual ~vgm_chip_base()
 	{
 	}
 
@@ -149,12 +160,19 @@ public:
 		m_pos(0)
 	{
 		m_chip.reset();
+
+		for (int clock = 0; clock < EXTRA_CLOCKS; clock++)
+			m_chip.generate(&m_output);
+
 #if (RUN_NUKED_OPN2)
 		if (type == CHIP_YM2612)
 		{
 			m_external = new nuked::ym3438_t;
 			nuked::OPN2_SetChipType(nuked::ym3438_mode_ym2612);
 			nuked::OPN2_Reset(m_external);
+			nuked::Bit16s buffer[2];
+			for (int clocks = 0; clocks < 24 * EXTRA_CLOCKS; clocks++)
+				nuked::OPN2_Clock(m_external, buffer);
 		}
 #endif
 	}
@@ -191,12 +209,13 @@ public:
 		if (addr1 != 0xffff)
 		{
 			if (LOG_WRITES)
-				printf("%10.5f: %s %03X=%02X\n", double(m_clocks) / double(m_chip.sample_rate(m_clock)), m_name.c_str(), data1, data2);
+				printf("%10.5f: %s %03X=%02X\n", double(output_start) / double(1LL << 32), m_name.c_str(), data1 + 0x100 * (addr1/2), data2);
 			m_chip.write(addr1, data1);
 			m_chip.write(addr2, data2);
 		}
 
 		// generate at the appropriate sample rate
+//		nuked::s_log_envelopes = (output_start >= (22ll << 32) && output_start < (24ll << 32));
 		for ( ; m_pos <= output_start; m_pos += m_step)
 		{
 			m_chip.generate(&m_output);
@@ -256,8 +275,8 @@ public:
 		}
 		else if (m_type == CHIP_YMF278B)
 		{
-			*buffer++ += m_output.data[4];
-			*buffer++ += m_output.data[5];
+			*buffer++ += m_output.data[4 % ChipType::OUTPUTS];
+			*buffer++ += m_output.data[5 % ChipType::OUTPUTS];
 		}
 		else if (ChipType::OUTPUTS == 1)
 		{
@@ -297,7 +316,7 @@ protected:
 //*********************************************************
 
 // global list of active chips
-std::list<vgm_chip_base *> active_chips;
+std::vector<std::unique_ptr<vgm_chip_base>> active_chips;
 
 
 //-------------------------------------------------
@@ -329,7 +348,7 @@ void add_chips(uint32_t clock, chip_type type, char const *chipname)
 	{
 		char name[100];
 		sprintf(name, "%s #%d", chipname, index);
-		active_chips.push_back(new vgm_chip<ChipType>(clockval, type, (numchips == 2) ? name : chipname));
+		active_chips.push_back(std::make_unique<vgm_chip<ChipType>>(clockval, type, (numchips == 2) ? name : chipname));
 	}
 
 	if (type == CHIP_YM2608)
@@ -345,7 +364,7 @@ void add_chips(uint32_t clock, chip_type type, char const *chipname)
 			std::vector<uint8_t> temp(size);
 			fread(&temp[0], 1, size, rom);
 			fclose(rom);
-			for (auto chip : active_chips)
+			for (auto &chip : active_chips)
 				if (chip->type() == type)
 					chip->write_data(ymfm::ACCESS_ADPCM_A, 0, size, &temp[0]);
 		}
@@ -727,9 +746,9 @@ uint32_t parse_header(std::vector<uint8_t> &buffer)
 
 vgm_chip_base *find_chip(chip_type type, uint8_t index)
 {
-	for (auto chip : active_chips)
+	for (auto &chip : active_chips)
 		if (chip->type() == type && index-- == 0)
-			return chip;
+			return chip.get();
 	return nullptr;
 }
 
@@ -1094,7 +1113,7 @@ void generate_all(std::vector<uint8_t> &buffer, uint32_t data_start, uint32_t ou
 		{
 			bool more_remaining = false;
 			int32_t outputs[2] = { 0 };
-			for (auto chip : active_chips)
+			for (auto &chip : active_chips)
 				chip->generate(output_pos, output_step, outputs);
 			output_pos += output_step;
 			wav_buffer.push_back(outputs[0]);
@@ -1386,7 +1405,7 @@ int main(int argc, char *argv[])
 #if (CAPTURE_NATIVE)
 	{
 		int chipnum = 0;
-		for (auto chip : active_chips)
+		for (auto &chip : active_chips)
 			if (err == 0 && chip->m_native_data.size() > 0)
 			{
 				char filename[20];
@@ -1398,7 +1417,7 @@ int main(int argc, char *argv[])
 #if (RUN_NUKED_OPN2)
 	{
 		int chipnum = 0;
-		for (auto chip : active_chips)
+		for (auto &chip : active_chips)
 			if (err == 0 && chip->m_nuked_data.size() > 0)
 			{
 				char filename[20];
@@ -1407,6 +1426,8 @@ int main(int argc, char *argv[])
 			}
 	}
 #endif
+
+	active_chips.clear();
 
 	return err;
 }

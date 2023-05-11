@@ -894,21 +894,21 @@ template <int Width> void ns32000_device<Width>::execute_run()
 		{
 			if (m_nmi_line)
 			{
-				// service interrupt
-				interrupt(NMI, m_pc);
-
 				// notify the debugger
 				if (machine().debug_enabled())
-					debug()->interrupt_hook(INPUT_LINE_NMI);
+					debug()->interrupt_hook(INPUT_LINE_NMI, m_pc);
+
+				// service interrupt
+				interrupt(NMI, m_pc);
 			}
 			else if (m_int_line && (m_psr & PSR_I))
 			{
-				// service interrupt
-				interrupt(NVI, m_pc);
-
 				// notify the debugger
 				if (machine().debug_enabled())
-					debug()->interrupt_hook(INPUT_LINE_IRQ0);
+					debug()->interrupt_hook(INPUT_LINE_IRQ0, m_pc);
+
+				// service interrupt
+				interrupt(NVI, m_pc);
 			}
 
 			// update trace pending
@@ -1232,7 +1232,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						mode[0].rmw_i(size);
 						decode(mode, bytes);
 
-						u32 const src1 = s32(quick << 28) >> 28;
+						u32 const src1 = util::sext(quick, 4);
 						u32 const src2 = gen_read(mode[0]);
 
 						u32 const dst = src1 + src2;
@@ -1251,7 +1251,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						mode[0].read_i(size);
 						decode(mode, bytes);
 
-						u32 const src1 = (s32(quick << 28) >> 28) & size_mask[size];
+						u32 const src1 = util::sext(quick, 4) & size_mask[size];
 						u32 const src2 = gen_read(mode[0]);
 
 						m_psr &= ~(PSR_N | PSR_Z | PSR_L);
@@ -1335,7 +1335,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						mode[0].rmw_i(size);
 						decode(mode, bytes);
 
-						s32 const inc = s32(quick << 28) >> 28;
+						s32 const inc = util::sext(quick, 4);
 						u32 index = gen_read(mode[0]);
 						s32 const dst = displacement(bytes);
 
@@ -1360,7 +1360,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 					mode[0].write_i(size);
 					decode(mode, bytes);
 
-					gen_write(mode[0], s32(quick << 28) >> 28);
+					gen_write(mode[0], util::sext(quick, 4));
 
 					tex = (mode[0].type == REG) ? 3 : mode[0].tea + 2;
 					break;
@@ -3502,9 +3502,10 @@ template <int Width> device_memory_interface::space_config_vector ns32000_device
 	};
 }
 
-template <int Width> bool ns32000_device<Width>::memory_translate(int spacenum, int intention, offs_t &address)
+template <int Width> bool ns32000_device<Width>::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
-	return !m_mmu || m_mmu->translate(space(spacenum), spacenum, address, m_psr & PSR_U, intention & TRANSLATE_WRITE, false, intention & TRANSLATE_DEBUG_MASK) == ns32000_mmu_interface::COMPLETE;
+	target_space = &space(spacenum);
+	return !m_mmu || m_mmu->translate(space(spacenum), spacenum, address, m_psr & PSR_U, intention == TR_WRITE, false, true) == ns32000_mmu_interface::COMPLETE;
 }
 
 template <int Width> std::unique_ptr<util::disasm_interface> ns32000_device<Width>::create_disassembler()

@@ -16,7 +16,7 @@
 #include "k053251.h"
 #include "konami_helper.h"
 
-#include "cpu/m6809/konami.h" // for the callback and the firq irq definition
+#include "cpu/m6809/konami.h"
 #include "cpu/z80/z80.h"
 #include "machine/bankdev.h"
 #include "machine/watchdog.h"
@@ -234,7 +234,7 @@ void parodius_state::main_map(address_map &map)
 	map(0x3fc4, 0x3fc4).w(FUNC(parodius_state::videobank_w));
 	map(0x3fc8, 0x3fc8).w(FUNC(parodius_state::sh_irqtrigger_w));
 	map(0x3fcc, 0x3fcd).rw("k053260", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write));
-	map(0x6000, 0x9fff).bankr(m_mainbank);            // banked ROM
+	map(0x6000, 0x9fff).bankr(m_mainbank);
 	map(0xa000, 0xffff).rom().region("maincpu", 0x3a000);
 }
 
@@ -261,7 +261,7 @@ void parodius_state::sound_map(address_map &map)
 
 static INPUT_PORTS_START( parodius )
 	PORT_START("P1")
-	KONAMI8_ALT_B123(1)                     // button1 = power-up, button2 = shoot, button3 = missile
+	KONAMI8_ALT_B123(1) // button1 = power-up, button2 = shoot, button3 = missile
 
 	PORT_START("P2")
 	KONAMI8_ALT_B123(2)
@@ -355,7 +355,7 @@ void parodius_state::banking_callback(uint8_t data)
 void parodius_state::parodius(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI(config, m_maincpu, 3000000); // 053248
+	KONAMI(config, m_maincpu, 12000000); // 053248
 	m_maincpu->set_addrmap(AS_PROGRAM, &parodius_state::main_map);
 	m_maincpu->line().set(FUNC(parodius_state::banking_callback));
 
@@ -496,7 +496,8 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1990, parodius,  0,        parodius, parodius, parodius_state, empty_init, ROT0, "Konami", "Parodius DA! (World, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, parodiuse, parodius, parodius, parodius, parodius_state, empty_init, ROT0, "Konami", "Parodius DA! (World, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, parodiusj, parodius, parodius, parodius, parodius_state, empty_init, ROT0, "Konami", "Parodius DA! (Japan)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1990, parodiusa, parodius, parodius, parodius, parodius_state, empty_init, ROT0, "Konami", "Parodius DA! (Asia)",         MACHINE_SUPPORTS_SAVE )
+// note that export versions kept in the Japanese titlescreen
+GAME( 1990, parodius,  0,        parodius, parodius, parodius_state, empty_init, ROT0, "Konami", "Parodius Da!: Shinwa kara Owarai e (World, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, parodiuse, parodius, parodius, parodius, parodius_state, empty_init, ROT0, "Konami", "Parodius Da!: Shinwa kara Owarai e (World, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, parodiusj, parodius, parodius, parodius, parodius_state, empty_init, ROT0, "Konami", "Parodius Da!: Shinwa kara Owarai e (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1990, parodiusa, parodius, parodius, parodius, parodius_state, empty_init, ROT0, "Konami", "Parodius Da!: Shinwa kara Owarai e (Asia)",         MACHINE_SUPPORTS_SAVE )

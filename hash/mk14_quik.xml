@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<softwarelist name="mk14_quik" description="MK-14 quickloads">
+
+	<software name="fallman">
+		<description>Falling Man</description>
+		<year>1979</year>
+		<publisher>Practical Electronics</publisher>
+		<sharedfeat name="compatibility" value="VDU"/>
+		<part name="quik" interface="mk14_quik">
+			<feature name="load" value="0xf20"/>
+			<feature name="exec" value="0xf20"/>
+			<dataarea name="rom" size="140">
+				<rom name="fallman.bin" size="140" crc="1fc5a224" sha1="36b8fcc5491f336dd45b0863f654553920ce07cd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="invaders">
+		<description>Invaders</description>
+		<year>2022</year>
+		<publisher>Realtime</publisher>
+		<sharedfeat name="compatibility" value="VDU"/>
+		<part name="quik" interface="mk14_quik">
+			<feature name="load" value="0x400"/>
+			<feature name="exec" value="0x400"/>
+			<dataarea name="rom" size="1020">
+				<rom name="invaders.bin" size="1020" crc="cdea9e08" sha1="5a7ab0822b3d703cd8fb964e26297c05cc9dcfde" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pong">
+		<description>Pong</description>
+		<year>2022</year>
+		<publisher>Milan Humpolik</publisher>
+		<sharedfeat name="compatibility" value="VDU"/>
+		<part name="quik" interface="mk14_quik">
+			<feature name="load" value="0x400"/>
+			<feature name="exec" value="0x400"/>
+			<dataarea name="rom" size="570">
+				<rom name="pong.bin" size="570" crc="1df23d1e" sha1="c3ccf8891b4d317d694e1b5089c729592e54a9b0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

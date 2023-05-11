@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders: ElSemi, Roberto Fresca.
-#ifndef MAME_INCLUDES_EFDT_H
-#define MAME_INCLUDES_EFDT_H
+#ifndef MAME_MISC_EFDT_H
+#define MAME_MISC_EFDT_H
 
 #pragma once
 
@@ -75,4 +75,4 @@ private:
 	void efdt_snd_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_EFDT_H
+#endif // MAME_MISC_EFDT_H

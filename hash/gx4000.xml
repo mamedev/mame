@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="gx4000" description="Amstrad CPC Plus &amp; GX4000 cartridges">
 	<software name="barb2">

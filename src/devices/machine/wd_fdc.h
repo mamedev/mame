@@ -111,6 +111,7 @@ protected:
 	int delay_register_commit;
 	int delay_command_commit;
 	bool spinup_on_interrupt;
+	bool extended_ddam;
 
 	static constexpr int fd179x_step_times[4] = {  6000, 12000, 20000, 30000 };
 	static constexpr int fd176x_step_times[4] = { 12000, 24000, 40000, 60000 };
@@ -199,6 +200,9 @@ private:
 		SETTLE_WAIT,
 		SETTLE_DONE,
 
+		WRITE_PROTECT_WAIT,
+		WRITE_PROTECT_DONE,
+
 		DATA_LOAD_WAIT,
 		DATA_LOAD_WAIT_DONE,
 
@@ -250,12 +254,14 @@ private:
 
 		attotime tm;
 		int state, next_state;
-		uint16_t shift_reg;
+		uint32_t shift_reg;
 		uint16_t crc;
 		int bit_counter, byte_counter, previous_type;
 		bool data_separator_phase, data_bit_context;
 		uint8_t data_reg;
 		uint8_t idbuf[6];
+		template <unsigned B> uint32_t shift_reg_low() const;
+		uint8_t shift_reg_data() const;
 	};
 
 	enum {
@@ -356,7 +362,7 @@ private:
 	void live_run(attotime limit = attotime::never);
 	bool read_one_bit(const attotime &limit);
 	bool write_one_bit(const attotime &limit);
-
+	void reset_data_sync();
 	void live_write_raw(uint16_t raw);
 	void live_write_mfm(uint8_t mfm);
 	void live_write_fm(uint8_t fm);

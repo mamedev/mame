@@ -8,13 +8,15 @@
 
 ***************************************************************************/
 
-#ifndef MAME_INCLUDES_COCO12_H
-#define MAME_INCLUDES_COCO12_H
+#ifndef MAME_TRS_COCO12_H
+#define MAME_TRS_COCO12_H
 
 #pragma once
 
 #include "coco.h"
 #include "6883sam.h"
+#include "machine/mos6551.h"
+#include "sound/ay8910.h"
 #include "video/mc6847.h"
 
 
@@ -25,7 +27,9 @@
 
 #define SAM_TAG         "sam"
 #define VDG_TAG         "vdg"
-
+#define MOSACIA_TAG     "mosacia"
+#define ACIA_TAG        "acia"
+#define PSG_TAG         "psg"
 
 
 //**************************************************************************
@@ -49,10 +53,6 @@ public:
 
 	void coco(machine_config &config);
 	void cocoh(machine_config &config);
-	void cocoe(machine_config &config);
-	void cocoeh(machine_config &config);
-	void coco2(machine_config &config);
-	void coco2h(machine_config &config);
 	void coco2b(machine_config &config);
 	void coco2bh(machine_config &config);
 	void cp400(machine_config &config);
@@ -86,4 +86,23 @@ protected:
 	required_device<mc6847_base_device> m_vdg;
 };
 
-#endif // MAME_INCLUDES_COCO12_H
+class deluxecoco_state : public coco12_state
+{
+public:
+	deluxecoco_state(const machine_config &mconfig, device_type type, const char *tag)
+		: coco12_state(mconfig, type, tag)
+		, m_acia(*this, MOSACIA_TAG)
+		, m_psg(*this, PSG_TAG)
+	{
+	}
+
+	void deluxecoco(machine_config &config);
+
+protected:
+	void deluxecoco_io1(address_map &map);
+
+	required_device<mos6551_device> m_acia;
+	required_device<ay8913_device> m_psg;
+};
+
+#endif // MAME_TRS_COCO12_H

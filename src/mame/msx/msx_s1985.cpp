@@ -3,11 +3,10 @@
 #include "emu.h"
 #include "msx_s1985.h"
 
-const uint8_t manufacturer_id = 0xfe;
 
 DEFINE_DEVICE_TYPE(MSX_S1985, msx_s1985_device, "msx_s1985", "MSX-Engine S1985")
 
-msx_s1985_device::msx_s1985_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_s1985_device::msx_s1985_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_S1985, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
 	, m_selected(false)
@@ -32,7 +31,7 @@ void msx_s1985_device::device_start()
 
 void msx_s1985_device::nvram_default()
 {
-	memset(m_backup_ram, 0xff, sizeof(m_backup_ram));
+	std::fill(std::begin(m_backup_ram), std::end(m_backup_ram), 0xff);
 }
 
 
@@ -50,33 +49,33 @@ bool msx_s1985_device::nvram_write(util::write_stream &file)
 }
 
 
-uint8_t msx_s1985_device::switched_read(offs_t offset)
+u8 msx_s1985_device::switched_read(offs_t offset)
 {
 	if (m_selected)
 	{
 		switch (offset)
 		{
 		case 0:
-			/// Manufacturer ID number register
-			return manufacturer_id ^ 0xff;
+			// Manufacturer ID number register
+			return MANUFACTURER_ID ^ 0xff;
 
 		case 2:
-			/// Back-up RAM read
+			// Back-up RAM read
 			return m_backup_ram[m_backup_ram_address];
 
 		case 7:
 		{
 			// Pattern and foreground/background color read
-			uint8_t data = (m_pattern & 0x80) ? m_color2 : m_color1;
+			u8 data = BIT(m_pattern, 7) ? m_color2 : m_color1;
 
-			if(!machine().side_effects_disabled())
+			if (!machine().side_effects_disabled())
 				m_pattern = (m_pattern << 1) | (m_pattern >> 7);
 
 			return data;
 		}
 
 		default:
-			printf("msx_s1985: unhandled read from offset %02x\n", offset);
+			logerror("msx_s1985: unhandled read from offset %02x\n", offset);
 			break;
 		}
 	}
@@ -85,24 +84,24 @@ uint8_t msx_s1985_device::switched_read(offs_t offset)
 }
 
 
-void msx_s1985_device::switched_write(offs_t offset, uint8_t data)
+void msx_s1985_device::switched_write(offs_t offset, u8 data)
 {
 	if (offset == 0)
 	{
-		/// Manufacturer ID number register
-		m_selected = (data == manufacturer_id);
+		// Manufacturer ID number register
+		m_selected = (data == MANUFACTURER_ID);
 	}
 	else if (m_selected)
 	{
 		switch (offset)
 		{
 		case 1:
-			/// Back-up RAM address latch
+			// Back-up RAM address latch
 			m_backup_ram_address = data & 0x0f;
 			break;
 
 		case 2:
-			/// Back-up RAM write
+			// Back-up RAM write
 			m_backup_ram[m_backup_ram_address] = data;
 			break;
 
@@ -118,7 +117,7 @@ void msx_s1985_device::switched_write(offs_t offset, uint8_t data)
 			break;
 
 		default:
-			printf("msx_s1985: unhandled write %02x to offset %02x\n", data, offset);
+			logerror("msx_s1985: unhandled write %02x to offset %02x\n", data, offset);
 			break;
 		}
 	}

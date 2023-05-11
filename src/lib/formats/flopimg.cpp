@@ -1465,7 +1465,7 @@ std::vector<bool> floppy_image_format_t::generate_bitstream_from_track(int track
 		if(*max_delta < cpll.max_delta)
 			*max_delta = cpll.max_delta;
 	}
-		
+
 	return trackbuf;
 }
 

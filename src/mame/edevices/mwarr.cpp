@@ -48,6 +48,9 @@ Notes:
 #include "speaker.h"
 #include "edevices.h"
 
+
+namespace {
+
 #define MASTER_CLOCK     XTAL(12'000'000)
 #define SOUND_CLOCK      XTAL(45'000'000)
 
@@ -401,6 +404,9 @@ ROM_START( mwarr )
 	ROM_REGION( 0x80000, "oki2", 0 ) /* Samples */
 	ROM_LOAD( "oki1",   0x000000, 0x80000, CRC(bcde2330) SHA1(452d871360fa907d2e4ebad93c3fba9a3fa32fa7) ) // no date
 ROM_END
+
+} // anonymous namespace
+
 
 /*************************************
  *

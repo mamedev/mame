@@ -9,8 +9,8 @@
 
 #include <algorithm>
 
-#define LOG_BASE (1 << 1U)
-#define LOG_IPL (1 << 2U)
+#define LOG_BASE (1U << 1)
+#define LOG_IPL (1U << 2)
 #define VERBOSE (LOG_BASE)
 #include "logmacro.h"
 
@@ -152,7 +152,7 @@ void m68340_cpu_device::m68340_internal_base_w(offs_t offset, uint16_t data, uin
 			m_internal->unmap_readwrite(base + 0x780, base + 0x7bf);
 
 		}
-		
+
 		uint32_t data32 = data;
 		uint32_t mem_mask32 = mem_mask;
 		if (!BIT(offset,0))
@@ -256,6 +256,8 @@ WRITE_LINE_MEMBER( m68340_cpu_device::set_modck )
 
 void m68340_cpu_device::device_start()
 {
+	reset_cb().append(*this, FUNC(m68340_cpu_device::reset_peripherals));
+
 	fscpu32_device::device_start();
 
 	m_m68340SIM    = new m68340_sim();
@@ -271,7 +273,7 @@ void m68340_cpu_device::device_start()
 	m_internal = &space(AS_PROGRAM);
 }
 
-void m68340_cpu_device::m68k_reset_peripherals()
+WRITE_LINE_MEMBER(m68340_cpu_device::reset_peripherals)
 {
 	m_m68340SIM->module_reset();
 	m_m68340DMA->module_reset();

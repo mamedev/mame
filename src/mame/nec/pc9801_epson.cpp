@@ -4,6 +4,9 @@
 
     Epson PC98[01] class machine
 
+    TODO (PC-286VS):
+    - Verify A20 gate usage, seems to reuse the same hookup as later Epson variants;
+
     TODO (PC-386M):
     - Incomplete shadow IPL banking, we currently never bankswitch to the other ROM bank
       (which barely contains program code);
@@ -127,6 +130,14 @@ void pc98_epson_state::epson_vram_bank_w(offs_t offset, u8 data)
 	logerror("%s: Epson $c06 write %02x\n", machine().describe_context(), data);
 }
 
+void pc98_epson_state::pc286vs_map(address_map &map)
+{
+	pc9801ux_map(map);
+	map(0x0e8000, 0x0fffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
+	map(0xee8000, 0xefffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
+	map(0xfe8000, 0xffffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
+}
+
 void pc98_epson_state::pc386m_map(address_map &map)
 {
 	pc9801rs_map(map);
@@ -142,15 +153,27 @@ void pc98_epson_state::pc486se_map(address_map &map)
 	map(0xfffe8000, 0xffffffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
 }
 
-void pc98_epson_state::pc386m_io(address_map &map)
+
+void pc98_epson_state::epson_base_io(address_map &map)
 {
-	pc9801rs_io(map);
 //  map(0x0c03, 0x0c03).r Epson CPU mode, 'R' for Real mode, 'P' for Protected mode (lolwut)
 	map(0x0c05, 0x0c05).w(FUNC(pc98_epson_state::epson_a20_w));
 	map(0x0c06, 0x0c06).w(FUNC(pc98_epson_state::epson_vram_bank_w));
 	map(0x0c07, 0x0c07).w(FUNC(pc98_epson_state::epson_ipl_bank_w));
 //  map(0x0c13, 0x0c13).r Epson <unknown> readback
 //  map(0x0c14, 0x0c14).r Epson <unknown> readback
+}
+
+void pc98_epson_state::pc286vs_io(address_map &map)
+{
+	pc9801ux_io(map);
+	epson_base_io(map);
+}
+
+void pc98_epson_state::pc386m_io(address_map &map)
+{
+	pc9801rs_io(map);
+	epson_base_io(map);
 }
 
 void pc98_epson_state::pc486se_io(address_map &map)
@@ -298,6 +321,32 @@ MACHINE_RESET_MEMBER(pc98_epson_state, pc98_epson)
 	m_ipl->set_bank(0);
 }
 
+void pc98_epson_state::config_base_epson(machine_config &config)
+{
+	m_ipl->set_addrmap(AS_PROGRAM, &pc98_epson_state::pc386m_ipl_bank);
+	// TODO: 19 or 20 address lines?
+	// 20 may be used in case that mixed up ROM & shadow IPL loads are actually possible
+	m_ipl->set_options(ENDIANNESS_LITTLE, 16, 19, 0x18000);
+
+	MCFG_MACHINE_START_OVERRIDE(pc98_epson_state, pc98_epson)
+	MCFG_MACHINE_RESET_OVERRIDE(pc98_epson_state, pc98_epson)
+}
+
+void pc98_epson_state::pc286vs(machine_config &config)
+{
+	pc9801vx(config);
+	i80286_cpu_device &maincpu(I80286(config.replace(), m_maincpu, 10000000));
+	maincpu.set_addrmap(AS_PROGRAM, &pc98_epson_state::pc286vs_map);
+	maincpu.set_addrmap(AS_IO, &pc98_epson_state::pc286vs_io);
+	// TODO: seems to work without using A20 gate, verify
+//  maincpu.set_a20_callback(i80286_cpu_device::a20_cb(&pc98_epson_state::a20_286, this));
+	maincpu.set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+
+	config_base_epson(config);
+
+	// TODO: DMA type & clock
+}
+
 void pc98_epson_state::pc386m(machine_config &config)
 {
 	pc9801rs(config);
@@ -306,14 +355,7 @@ void pc98_epson_state::pc386m(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc98_epson_state::pc386m_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	m_ipl->set_addrmap(AS_PROGRAM, &pc98_epson_state::pc386m_ipl_bank);
-	// TODO: 19 or 20 address lines?
-	// 20 may be used in case that mixed up ROM & shadow IPL loads are actually possible
-	// (which sounds pretty possible)
-	m_ipl->set_options(ENDIANNESS_LITTLE, 16, 19, 0x18000);
-
-	MCFG_MACHINE_START_OVERRIDE(pc98_epson_state, pc98_epson)
-	MCFG_MACHINE_RESET_OVERRIDE(pc98_epson_state, pc98_epson)
+	config_base_epson(config);
 
 	// RAM: 640KB + 14.6MB max
 	// 2 3.5 floppy drives
@@ -373,6 +415,28 @@ void pc98_epson_state::pc486mu(machine_config &config)
 	ROM_CONTINUE(                      0x60001, 0x4000  ) \
 	ROM_REGION( 0x100000, "kanji", ROMREGION_ERASEFF ) \
 	ROM_REGION( 0x80000, "new_chargen", ROMREGION_ERASEFF )
+
+/*
+Epson PC-286VS
+i286 @ 10 (selectable between 6 and 10 MHz)
+NB: pc-9801.net reports @ 16, assume mistake
+640 KB conventional memory + 14.6 MB
+5.25"2DD/2HDx2
+CBus: 4slots
+*/
+
+ROM_START( pc286vs )
+	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	ROM_LOAD( "a2_wvs.2e",    0x10000, 0x08000, CRC(318d6bbe) SHA1(f3ba85f3144e361257d6f7129e7f29fff17c2e1e) )
+	ROM_CONTINUE(             0x00000, 0x10000 )
+	ROM_CONTINUE(             0x28000, 0x08000 ) // bank 1, unconfirmed
+
+	ROM_REGION( 0x80000, "chargen", 0 )
+	ROM_LOAD( "font_286vs.rom", 0x0000, 0x46800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff))
+
+	LOAD_KANJI_ROMS
+	LOAD_IDE_ROM
+ROM_END
 
 /*
 Epson PC-386M
@@ -459,16 +523,18 @@ ROM_END
 // Epson PC98 desktop line
 
 // PC-286 (i286, first model released in Oct 1987)
+COMP( 1989, pc286vs,     0,       0, pc286vs,    pc386m, pc98_epson_state, init_pc9801_kanji, "Epson", "PC-286VS", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
 // PC-286U (same as above except running on V30)
 // PC-286C "PC Club" (same as PC-286?)
 // ...
 
 // PC-386 (i386)
-COMP( 1990, pc386m,     0,        0, pc386m,    pc386m, pc98_epson_state, init_pc9801_kanji,   "Epson", "PC-386M",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1990, pc386m,     0,        0, pc386m,    pc386m, pc98_epson_state, init_pc9801_kanji, "Epson", "PC-386M",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // PC-486 (i486SX/DX)
-COMP( 1994, pc486mu,    0,        0, pc486se,   pc386m, pc98_epson_state, init_pc9801_kanji,   "Epson", "PC-486MU",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1993, pc486se,    pc486mu,  0, pc486se,   pc386m, pc98_epson_state, init_pc9801_kanji,   "Epson", "PC-486SE",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1994, pc486mu,    0,        0, pc486se,   pc386m, pc98_epson_state, init_pc9801_kanji, "Epson", "PC-486MU", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1993, pc486se,    pc486mu,  0, pc486se,   pc386m, pc98_epson_state, init_pc9801_kanji, "Epson", "PC-486SE", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 // PRO-486 (first actual version with i486dx? Supports High-reso)
 // PC-486P/Win (same as a PC-486P but with Windows 3.0a + MS-DOS 3.3 HDD pre-installed?)
 

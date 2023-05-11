@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
@@ -19,9 +19,11 @@
 #define BGFX_EMBEDDED_SHADER_SPIRV(...)
 
 #define BGFX_PLATFORM_SUPPORTS_DX9BC (0 \
+	|| BX_PLATFORM_LINUX                \
 	|| BX_PLATFORM_WINDOWS              \
 	)
 #define BGFX_PLATFORM_SUPPORTS_DXBC (0  \
+	|| BX_PLATFORM_LINUX                \
 	|| BX_PLATFORM_WINDOWS              \
 	|| BX_PLATFORM_WINRT                \
 	|| BX_PLATFORM_XBOXONE              \

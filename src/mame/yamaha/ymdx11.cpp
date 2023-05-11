@@ -17,6 +17,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class yamaha_dx11_state : public driver_device
 {
 public:
@@ -132,5 +135,8 @@ ROM_START(dx11)
 	ROM_REGION(0x4000, "subcpu", 0)
 	ROM_LOAD("hd63b01y0d60p.ic18", 0x0000, 0x4000, NO_DUMP)
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1988, dx11, 0, 0, dx11, dx11, yamaha_dx11_state, empty_init, "Yamaha", "DX11 Digital Programmable Algorithm Synthesizer", MACHINE_IS_SKELETON)

@@ -37,8 +37,7 @@ SYSINTR_GPS      = INT_EINT3, INT_EINT8_23 (EINT18)
 #include "screen.h"
 
 
-#define VERBOSE_LEVEL ( 0 )
-
+namespace {
 
 #define BITS(x,m,n) (((x)>>(n))&(((uint32_t)1<<((m)-(n)+1))-1))
 
@@ -63,7 +62,6 @@ private:
 	required_device<s3c2440_device> m_s3c2440;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	required_device<cpu_device> m_maincpu;
 	required_device<gf4500_device> m_gf4500;
 	uint32_t s3c2440_gpio_port_r(offs_t offset);
@@ -74,18 +72,6 @@ private:
 };
 
 
-inline void gizmondo_state::verboselog( int n_level, const char *s_fmt, ...)
-{
-	if (VERBOSE_LEVEL >= n_level)
-	{
-		va_list v;
-		char buf[32768];
-		va_start( v, s_fmt);
-		vsprintf( buf, s_fmt, v);
-		va_end( v);
-		logerror( "%s: %s", machine().describe_context( ), buf);
-	}
-}
 /*******************************************************************************
     ...
 *******************************************************************************/
@@ -252,5 +238,8 @@ ROM_START( gizmondo )
 	ROM_SYSTEM_BIOS( 0, "fboot", "fboot" )
 	ROMX_LOAD( "fboot.bin", 0, 0x800, CRC(28887c29) SHA1(e625caaa63b9db74cb6d7499dce12ac758c5fe76), ROM_BIOS(0) )
 ROM_END
+
+} // anonymous namespace
+
 
 CONS(2005, gizmondo, 0, 0, gizmondo, gizmondo, gizmondo_state, init_gizmondo, "Tiger Telematics", "Gizmondo", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

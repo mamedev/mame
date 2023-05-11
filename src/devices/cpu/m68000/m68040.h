@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include "m68kcommon.h"
+#include "m68kmusashi.h"
 
-class m68ec040_device : public m68000_base_device
+class m68ec040_device : public m68000_musashi_device
 {
 public:
 	// construction/destruction
@@ -22,7 +22,7 @@ public:
 	virtual void device_start() override;
 };
 
-class m68lc040_device : public m68000_base_device
+class m68lc040_device : public m68000_musashi_device
 {
 public:
 	// construction/destruction
@@ -37,7 +37,7 @@ public:
 	virtual void device_start() override;
 };
 
-class m68040_device : public m68000_base_device
+class m68040_device : public m68000_musashi_device
 {
 public:
 	// construction/destruction

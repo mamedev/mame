@@ -247,6 +247,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class bingoman_state : public driver_device
 {
 public:
@@ -464,6 +466,8 @@ ROM_START( bingomana )
 	ROM_LOAD( "103u0900_atf16v8bql.u09", 0x8000, 0x0892, CRC(63214d15) SHA1(c6f4f68a9bccd954fde13bef94bd28097d6bebfc) )
 	ROM_LOAD( "103u1301_atf16v8bql.u13", 0x9000, 0x0892, CRC(e8b65072) SHA1(b2f7d70ee228c28a19c2594fc3631b8afd4a0f5e) )
 ROM_END
+
+} // anonymous namespace
 
 
 /***************************************************************************

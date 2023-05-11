@@ -14,6 +14,7 @@
 
 #include "emuopts.h"
 #include "fileio.h"
+#include "main.h"
 #include "rendfont.h"
 #include "rendutil.h"
 #include "video/rgbutil.h"
@@ -224,12 +225,18 @@ private:
 			{
 				if (m_float_valid)
 				{
-					m_text = std::to_string(m_float);
+					std::ostringstream stream;
+					stream.imbue(std::locale::classic());
+					stream << m_float;
+					m_text = std::move(stream).str();
 					m_text_valid = true;
 				}
 				else if (m_int_valid)
 				{
-					m_text = std::to_string(m_int);
+					std::ostringstream stream;
+					stream.imbue(std::locale::classic());
+					stream << m_int;
+					m_text = std::move(stream).str();
 					m_text_valid = true;
 				}
 			}
@@ -3197,10 +3204,10 @@ protected:
 						width = font->string_width(ourheight / num_shown, aspect, m_stopnames[fruit]);
 						if (width < bounds.width())
 							break;
-						aspect *= 0.9f;
+						aspect *= 0.95f;
 					}
 
-					s32 curx = bounds.left() + (bounds.width() - width) / 2;
+					float curx = bounds.left() + (bounds.width() - width) / 2.0f;
 
 					// loop over characters
 					std::string_view s = m_stopnames[fruit];
@@ -3227,7 +3234,7 @@ protected:
 								u32 *const d = &dest.pix(effy);
 								for (int x = 0; x < chbounds.width(); x++)
 								{
-									int effx = curx + x + chbounds.left();
+									int effx = int(curx) + x + chbounds.left();
 									if (effx >= bounds.left() && effx <= bounds.right())
 									{
 										u32 spix = rgb_t(src[x]).a();
@@ -3345,10 +3352,10 @@ private:
 						width = font->string_width(dest.height(), aspect, m_stopnames[fruit]);
 						if (width < bounds.width())
 							break;
-						aspect *= 0.9f;
+						aspect *= 0.95f;
 					}
 
-					s32 curx = bounds.left();
+					float curx = bounds.left();
 
 					// allocate a temporary bitmap
 					bitmap_argb32 tempbitmap(dest.width(), dest.height());
@@ -3378,7 +3385,7 @@ private:
 								u32 *const d = &dest.pix(effy);
 								for (int x = 0; x < chbounds.width(); x++)
 								{
-									int effx = basex + curx + x;
+									int effx = basex + int(curx) + x;
 									if (effx >= bounds.left() && effx <= bounds.right())
 									{
 										u32 spix = rgb_t(src[x]).a();
@@ -3700,11 +3707,11 @@ void layout_element::component::draw_text(
 		width = font.string_width(bounds.height(), aspect, str);
 		if (width < bounds.width())
 			break;
-		aspect *= 0.9f;
+		aspect *= 0.95f;
 	}
 
 	// get alignment
-	s32 curx;
+	float curx;
 	switch (align)
 	{
 		// left
@@ -3719,7 +3726,7 @@ void layout_element::component::draw_text(
 
 		// default to center
 		default:
-			curx = bounds.left() + (bounds.width() - width) / 2;
+			curx = bounds.left() + (bounds.width() - width) / 2.0f;
 			break;
 	}
 
@@ -3749,7 +3756,7 @@ void layout_element::component::draw_text(
 				u32 *const d = &dest.pix(effy);
 				for (int x = 0; x < chbounds.width(); x++)
 				{
-					int effx = curx + x + chbounds.left();
+					int effx = int(curx) + x + chbounds.left();
 					if (effx >= bounds.left() && effx <= bounds.right())
 					{
 						u32 spix = rgb_t(src[x]).a();

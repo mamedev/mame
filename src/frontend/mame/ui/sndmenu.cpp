@@ -72,7 +72,7 @@ void menu_sound_options::menu_dismissed()
 //  handle
 //-------------------------------------------------
 
-void menu_sound_options::handle(event const *ev)
+bool menu_sound_options::handle(event const *ev)
 {
 	bool changed = false;
 
@@ -130,8 +130,9 @@ void menu_sound_options::handle(event const *ev)
 		}
 	}
 
-	if (changed)
+	if (changed) // FIXME: most changes only require the item sub text to be updated
 		reset(reset_options::REMEMBER_REF);
+	return false;
 
 }
 
@@ -139,7 +140,7 @@ void menu_sound_options::handle(event const *ev)
 //  populate
 //-------------------------------------------------
 
-void menu_sound_options::populate(float &customtop, float &custombottom)
+void menu_sound_options::populate()
 {
 	uint32_t arrow_flags = get_arrow_flags(uint16_t(0), uint16_t(std::size(m_sound_rate) - 1), m_cur_rates);
 	m_sample_rate = m_sound_rate[m_cur_rates];

@@ -71,6 +71,7 @@ K1000233A
 
 #include "cpu/m6805/m68705.h"
 #include "cpu/z80/z80.h"
+#include "machine/74157.h"
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
@@ -90,6 +91,8 @@ public:
 	pitnrun_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_watchdog(*this, "watchdog"),
+		m_inputmux(*this, "inputmux"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram%u", 1U),
@@ -99,15 +102,21 @@ public:
 
 	void pitnrun(machine_config &config);
 
+	DECLARE_WRITE_LINE_MEMBER(tilt_w); // TODO: privatize eventually
+
 protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
+	uint8_t inputs_r();
+
 	required_device<cpu_device> m_maincpu;
 
-	void main_map(address_map &map);
+	void base_map(address_map &map);
 
 private:
+	required_device<watchdog_timer_device> m_watchdog;
+	required_device<ls157_x2_device> m_inputmux;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -130,6 +139,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(hflip_w);
 	DECLARE_WRITE_LINE_MEMBER(vflip_w);
+	uint8_t inputs_watchdog_r();
 	template <uint8_t Which> void videoram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(char_bank_select_w);
 	void scroll_w(offs_t offset, uint8_t data);
@@ -142,7 +152,9 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 
-	INTERRUPT_GEN_MEMBER(nmi_source);
+	DECLARE_WRITE_LINE_MEMBER(vbl_w);
+
+	void main_map(address_map &map);
 
 	void palette(palette_device &palette) const;
 
@@ -388,7 +400,7 @@ void pitnrun_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 		if (flip_screen_x())
 		{
-			sx = 256 - sx;
+			sx = 242 - sx;
 			flipx = !flipx;
 		}
 		if (flip_screen_y())
@@ -626,10 +638,17 @@ void pitnrun_mcu_state::machine_reset()
 	m_mcu->set_input_line(0, CLEAR_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(pitnrun_state::nmi_source)
+WRITE_LINE_MEMBER(pitnrun_state::tilt_w)
 {
-	if (m_nmi)
-		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	// HACK: this input actually asserts the master reset line on all devices
+	if (state)
+		reset();
+}
+
+WRITE_LINE_MEMBER(pitnrun_state::vbl_w)
+{
+	if (state && m_nmi)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER(pitnrun_state::nmi_enable_w)
@@ -649,7 +668,19 @@ WRITE_LINE_MEMBER(pitnrun_state::vflip_w)
 	flip_screen_y_set(state);
 }
 
-void pitnrun_state::main_map(address_map &map)
+uint8_t pitnrun_state::inputs_r()
+{
+	return ~m_inputmux->output_r();
+}
+
+uint8_t pitnrun_state::inputs_watchdog_r()
+{
+	if (!machine().side_effects_disabled())
+		m_watchdog->reset_w();
+	return ~m_inputmux->output_r();
+}
+
+void pitnrun_state::base_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
@@ -660,21 +691,28 @@ void pitnrun_state::main_map(address_map &map)
 	map(0xa800, 0xa807).w("noiselatch", FUNC(ls259_device::write_d0)); // analog sound
 	map(0xb000, 0xb000).portr("DSW");
 	map(0xb000, 0xb007).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0xb800, 0xb800).portr("INPUTS").w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xb800, 0xb800).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xc800, 0xc801).w(FUNC(pitnrun_state::scroll_w));
 	map(0xc802, 0xc802).w(FUNC(pitnrun_state::scroll_y_w));
 	map(0xc805, 0xc805).w(FUNC(pitnrun_state::h_heed_w));
 	map(0xc806, 0xc806).w(FUNC(pitnrun_state::v_heed_w));
 	map(0xc807, 0xc807).w(FUNC(pitnrun_state::ha_w));
-	map(0xf000, 0xf000).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+}
+
+void pitnrun_state::main_map(address_map &map)
+{
+	base_map(map);
+	map(0xb800, 0xb800).r(FUNC(pitnrun_state::inputs_watchdog_r));
 }
 
 void pitnrun_mcu_state::mcu_map(address_map &map)
 {
-	main_map(map);
+	base_map(map);
+	map(0xb800, 0xb800).r(FUNC(pitnrun_mcu_state::inputs_r));
 	map(0xc804, 0xc804).w(FUNC(pitnrun_mcu_state::mcu_data_w));
 	map(0xd000, 0xd000).r(FUNC(pitnrun_mcu_state::mcu_data_r));
 	map(0xd800, 0xd800).r(FUNC(pitnrun_mcu_state::mcu_status_r));
+	map(0xf000, 0xf000).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 }
 
 void pitnrun_state::sound_prg_map(address_map &map)
@@ -702,20 +740,25 @@ static INPUT_PORTS_START( pitnrun )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("INPUTS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("COCKTAIL")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x07, 0x01, DEF_STR( Coinage ) )  PORT_DIPLOCATION("DSW:1,2,3")
@@ -738,39 +781,21 @@ static INPUT_PORTS_START( pitnrun )
 	PORT_DIPNAME( 0x80, 0x00, "No Hit (Cheat)")     PORT_DIPLOCATION("DSW:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )       // also enables bootup test
+
+	PORT_START("TILT")
+	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_TILT ) PORT_WRITE_LINE_MEMBER(pitnrun_state, tilt_w)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jumpkun )
-	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1  )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_INCLUDE(pitnrun)
 
-	PORT_START("INPUTS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_MODIFY("INPUTS")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 
-	PORT_START("DSW")
-	PORT_DIPNAME( 0x07, 0x01, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSW:1,2,3")
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 1C_7C ) )
+	PORT_MODIFY("COCKTAIL")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+
+	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
@@ -821,9 +846,8 @@ GFXDECODE_END
 
 void pitnrun_state::pitnrun(machine_config &config)
 {
-	Z80(config, m_maincpu, XTAL(18'432'000) / 6); // verified on PCB
+	Z80(config, m_maincpu, 18.432_MHz_XTAL / 6); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &pitnrun_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(pitnrun_state::nmi_source));
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 7B (mislabeled LS156 on schematic)
 	mainlatch.q_out_cb<0>().set(FUNC(pitnrun_state::nmi_enable_w)); // NMION
@@ -831,25 +855,28 @@ void pitnrun_state::pitnrun(machine_config &config)
 	mainlatch.q_out_cb<4>().set_nop(); // COLOR SEL 2 - not used ?
 	mainlatch.q_out_cb<5>().set(FUNC(pitnrun_state::char_bank_select_w));
 	mainlatch.q_out_cb<6>().set(FUNC(pitnrun_state::hflip_w)); // HFLIP
+	mainlatch.q_out_cb<6>().append(m_inputmux, FUNC(ls157_x2_device::select_w));
 	mainlatch.q_out_cb<7>().set(FUNC(pitnrun_state::vflip_w)); // VFLIP
 
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(5'000'000) / 2)); // verified on PCB
+	LS157_X2(config, m_inputmux); // 2F (0-3) & 2H (4-7)
+	m_inputmux->a_in_callback().set_ioport("INPUTS");
+	m_inputmux->b_in_callback().set_ioport("COCKTAIL");
+
+	z80_device &audiocpu(Z80(config, "audiocpu", 5_MHz_XTAL / 2)); // verified on PCB
 	audiocpu.set_addrmap(AS_PROGRAM, &pitnrun_state::sound_prg_map);
 	audiocpu.set_addrmap(AS_IO, &pitnrun_state::sound_io_map);
 	audiocpu.set_vblank_int("screen", FUNC(pitnrun_state::irq0_line_hold));
 
-	WATCHDOG_TIMER(config, "watchdog");
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 16); // LS393 at 8N (+ misc. gates)
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(256, 256);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0, 256, 264, 16, 240);
 	screen.set_screen_update(FUNC(pitnrun_state::screen_update));
 	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(pitnrun_state::vbl_w));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pitnrun);
 	PALETTE(config, m_palette, FUNC(pitnrun_state::palette), 32 * 3);
@@ -878,7 +905,7 @@ void pitnrun_mcu_state::pitnrun_mcu(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &pitnrun_mcu_state::mcu_map);
 
-	M68705P5(config, m_mcu, XTAL(18'432'000) / 6); // verified on PCB
+	M68705P5(config, m_mcu, 18.432_MHz_XTAL / 6); // verified on PCB
 	m_mcu->porta_r().set(FUNC(pitnrun_mcu_state::m68705_porta_r));
 	m_mcu->portb_r().set(FUNC(pitnrun_mcu_state::m68705_portb_r));
 	m_mcu->portc_r().set(FUNC(pitnrun_mcu_state::m68705_portc_r));

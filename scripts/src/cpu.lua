@@ -123,14 +123,50 @@ if CPUS["ARCOMPACT"] then
 		MAME_DIR .. "src/devices/cpu/arcompact/arcompact.cpp",
 		MAME_DIR .. "src/devices/cpu/arcompact/arcompact.h",
 		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_00to01.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_02to03.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_04.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_04_jumps.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_04_loop.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_04_aux.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_04_2f_sop.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_04_2f_3f_zop.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_04_3x.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_05.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_05_2f_sop.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_06to0b.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_0c_16bit.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_0d_16bit.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_0e_16bit.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_0f_16bit.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_0f_00_16bit.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_0f_00_07_16bit.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_12to16_16bit.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_17_16bit.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_18_16bit.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_19_16bit.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_1ato1c_16bit.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_1dto1f_16bit.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_helper.ipp",
 	}
 end
 
 if opt_tool(CPUS, "ARCOMPACT") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompact_common.h")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm.h")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_dispatch.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_internal.h")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_00to01.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_02to03.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_04.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_04_2f_sop.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_04_2f_3f_zop.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_04_3x.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_05.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_05_2f_sop.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_06to0b.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_16bit.cpp")
 end
 
 --------------------------------------------------
@@ -1554,8 +1590,10 @@ if opt_tool(CPUS, "M37710") then
 end
 
 --------------------------------------------------
--- Mostek 6502 and its many derivatives
+-- MOS Technology 6502 and its many derivatives
 --@src/devices/cpu/m6502/deco16.h,CPUS["M6502"] = true
+--@src/devices/cpu/m6502/gew7.h,CPUS["M6502"] = true
+--@src/devices/cpu/m6502/gew12.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m3745x.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m4510.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m50734.h,CPUS["M6502"] = true
@@ -1589,6 +1627,10 @@ if CPUS["M6502"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/m6502/deco16.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/deco16.h",
+		MAME_DIR .. "src/devices/cpu/m6502/gew7.cpp",
+		MAME_DIR .. "src/devices/cpu/m6502/gew7.h",
+		MAME_DIR .. "src/devices/cpu/m6502/gew12.cpp",
+		MAME_DIR .. "src/devices/cpu/m6502/gew12.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m3745x.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/m3745x.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m4510.cpp",
@@ -1601,6 +1643,8 @@ if CPUS["M6502"] then
 		MAME_DIR .. "src/devices/cpu/m6502/m6500_1.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m6502.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/m6502.h",
+		MAME_DIR .. "src/devices/cpu/m6502/m6502mcu.h",
+		MAME_DIR .. "src/devices/cpu/m6502/m6502mcu.ipp",
 		MAME_DIR .. "src/devices/cpu/m6502/m6504.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/m6504.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m6507.cpp",
@@ -1841,9 +1885,9 @@ if CPUS["M6809"] then
 	}
 
 	custombuildtask {
-		{ MAME_DIR .. "src/devices/cpu/m6809/m6809.ops"  , GEN_DIR .. "emu/cpu/m6809/m6809.hxx",   { MAME_DIR .. "src/devices/cpu/m6809/m6809make.py"  , MAME_DIR .. "src/devices/cpu/m6809/base6x09.ops"  }, {"@echo Generating m6809 source file...", PYTHON .. " $(1) $(<) > $(@)" }},
-		{ MAME_DIR .. "src/devices/cpu/m6809/hd6309.ops" , GEN_DIR .. "emu/cpu/m6809/hd6309.hxx",  { MAME_DIR .. "src/devices/cpu/m6809/m6809make.py"  , MAME_DIR .. "src/devices/cpu/m6809/base6x09.ops"  }, {"@echo Generating hd6309 source file...", PYTHON .. " $(1) $(<) > $(@)" }},
-		{ MAME_DIR .. "src/devices/cpu/m6809/konami.ops" , GEN_DIR .. "emu/cpu/m6809/konami.hxx",  { MAME_DIR .. "src/devices/cpu/m6809/m6809make.py"  , MAME_DIR .. "src/devices/cpu/m6809/base6x09.ops"  }, {"@echo Generating konami source file...", PYTHON .. " $(1) $(<) > $(@)" }},
+		{ MAME_DIR .. "src/devices/cpu/m6809/m6809.lst"  , GEN_DIR .. "emu/cpu/m6809/m6809.hxx",   { MAME_DIR .. "src/devices/cpu/m6809/m6809make.py"  , MAME_DIR .. "src/devices/cpu/m6809/base6x09.lst"  }, {"@echo Generating m6809 source file...", PYTHON .. " $(1) $(<) > $(@)" }},
+		{ MAME_DIR .. "src/devices/cpu/m6809/hd6309.lst" , GEN_DIR .. "emu/cpu/m6809/hd6309.hxx",  { MAME_DIR .. "src/devices/cpu/m6809/m6809make.py"  , MAME_DIR .. "src/devices/cpu/m6809/base6x09.lst"  }, {"@echo Generating hd6309 source file...", PYTHON .. " $(1) $(<) > $(@)" }},
+		{ MAME_DIR .. "src/devices/cpu/m6809/konami.lst" , GEN_DIR .. "emu/cpu/m6809/konami.hxx",  { MAME_DIR .. "src/devices/cpu/m6809/m6809make.py"  , MAME_DIR .. "src/devices/cpu/m6809/base6x09.lst"  }, {"@echo Generating konami source file...", PYTHON .. " $(1) $(<) > $(@)" }},
 	}
 end
 
@@ -1882,6 +1926,7 @@ end
 --@src/devices/cpu/m68000/scc68070.h,CPUS["M680X0"] = true
 --@src/devices/cpu/m68000/fscpu32.h,CPUS["M680X0"] = true
 --@src/devices/cpu/m68000/mcf5206e.h,CPUS["M680X0"] = true
+--@src/devices/cpu/m68000/tmp68301.h,CPUS["M680X0"] = true
 --------------------------------------------------
 
 if CPUS["M680X0"] then
@@ -1892,9 +1937,23 @@ if CPUS["M680X0"] then
 		MAME_DIR .. "src/devices/cpu/m68000/m68kops.h",
 		MAME_DIR .. "src/devices/cpu/m68000/m68kfpu.cpp",
 		MAME_DIR .. "src/devices/cpu/m68000/m68kmmu.h",
+		MAME_DIR .. "src/devices/cpu/m68000/m68kmusashi.h",
 		MAME_DIR .. "src/devices/cpu/m68000/m68kcommon.h",
+		MAME_DIR .. "src/devices/cpu/m68000/m68kcommon.cpp",
 		MAME_DIR .. "src/devices/cpu/m68000/m68000.h",
 		MAME_DIR .. "src/devices/cpu/m68000/m68000.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000.lst",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000gen.py",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000-decode.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000-head.h",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000-sdf.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000-sif.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000-sdp.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000-sip.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000-sdfm.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000-sifm.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000-sdpm.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000-sipm.cpp",
 		MAME_DIR .. "src/devices/cpu/m68000/m68008.h",
 		MAME_DIR .. "src/devices/cpu/m68000/m68008.cpp",
 		MAME_DIR .. "src/devices/cpu/m68000/m68010.h",
@@ -1911,6 +1970,8 @@ if CPUS["M680X0"] then
 		MAME_DIR .. "src/devices/cpu/m68000/fscpu32.cpp",
 		MAME_DIR .. "src/devices/cpu/m68000/mcf5206e.h",
 		MAME_DIR .. "src/devices/cpu/m68000/mcf5206e.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/tmp68301.h",
+		MAME_DIR .. "src/devices/cpu/m68000/tmp68301.cpp",
 	}
 end
 
@@ -2206,6 +2267,36 @@ if opt_tool(CPUS, "RSP") then
 end
 
 --------------------------------------------------
+-- Matsushita (Panasonic) MN1400
+--@src/devices/cpu/mn1400/mn1400.h,CPUS["MN1400"] = true
+--------------------------------------------------
+
+if CPUS["MN1400"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/mn1400/mn1400base.cpp",
+		MAME_DIR .. "src/devices/cpu/mn1400/mn1400base.h",
+		MAME_DIR .. "src/devices/cpu/mn1400/mn1400.cpp",
+		MAME_DIR .. "src/devices/cpu/mn1400/mn1400.h",
+		MAME_DIR .. "src/devices/cpu/mn1400/mn1400op.cpp",
+	}
+end
+
+if opt_tool(CPUS, "MN1400") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mn1400/mn1400d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mn1400/mn1400d.h")
+end
+
+--------------------------------------------------
+-- Panafacom MN1610, disassembler only
+--@src/devices/cpu/mn1610/mn1610d.h,CPUS["MN1610"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "MN1610") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mn1610/mn1610d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mn1610/mn1610d.h")
+end
+
+--------------------------------------------------
 -- Panasonic MN1880
 --@src/devices/cpu/mn1880/mn1880.h,CPUS["MN1880"] = true
 --------------------------------------------------
@@ -2446,6 +2537,7 @@ end
 --@src/devices/cpu/tms1000/tms0980.h,CPUS["TMS1000"] = true
 --@src/devices/cpu/tms1000/tms0270.h,CPUS["TMS1000"] = true
 --@src/devices/cpu/tms1000/tp0320.h,CPUS["TMS1000"] = true
+--@src/devices/cpu/tms1000/smc1102.h,CPUS["TMS1000"] = true
 --------------------------------------------------
 
 if CPUS["TMS1000"] then
@@ -2472,6 +2564,8 @@ if CPUS["TMS1000"] then
 		MAME_DIR .. "src/devices/cpu/tms1000/tms0270.h",
 		MAME_DIR .. "src/devices/cpu/tms1000/tp0320.cpp",
 		MAME_DIR .. "src/devices/cpu/tms1000/tp0320.h",
+		MAME_DIR .. "src/devices/cpu/tms1000/smc1102.cpp",
+		MAME_DIR .. "src/devices/cpu/tms1000/smc1102.h",
 	}
 end
 
@@ -2808,6 +2902,7 @@ end
 --------------------------------------------------
 -- Sharp LR35902 (Game Boy CPU)
 --@src/devices/cpu/lr35902/lr35902.h,CPUS["LR35902"] = true
+--@src/devices/cpu/lr35902/lr35902d.h,CPUS["LR35902"] = true
 --------------------------------------------------
 
 if CPUS["LR35902"] then
@@ -2840,11 +2935,13 @@ if CPUS["Z180"] then
 		MAME_DIR .. "src/devices/cpu/z180/z180ed.hxx",
 		MAME_DIR .. "src/devices/cpu/z180/z180fd.hxx",
 		MAME_DIR .. "src/devices/cpu/z180/z180op.hxx",
+		MAME_DIR .. "src/devices/cpu/z180/z180xy.hxx",
 		MAME_DIR .. "src/devices/cpu/z180/z180ops.h",
 		MAME_DIR .. "src/devices/cpu/z180/z180tbl.h",
-		MAME_DIR .. "src/devices/cpu/z180/z180xy.hxx",
 		MAME_DIR .. "src/devices/cpu/z180/z180asci.cpp",
 		MAME_DIR .. "src/devices/cpu/z180/z180asci.h",
+		MAME_DIR .. "src/devices/cpu/z180/z180csio.cpp",
+		MAME_DIR .. "src/devices/cpu/z180/z180csio.h",
 	}
 end
 
@@ -3191,6 +3288,26 @@ end
 if opt_tool(CPUS, "HP2100") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/hp2100/hp2100d.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/hp2100/hp2100d.h")
+end
+
+--------------------------------------------------
+-- SDS Sigma 2 (disassembler only)
+--@src/devices/cpu/sigma2/sigma2.h,CPUS["SIGMA2"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "SIGMA2") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/sigma2/sigma2d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/sigma2/sigma2d.h")
+end
+
+--------------------------------------------------
+-- Control Data Corporation 1700 (disassembler only)
+--@src/devices/cpu/cdc1700/cdc1700.h,CPUS["CDC1700"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "CDC1700") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cdc1700/cdc1700d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cdc1700/cdc1700d.h")
 end
 
 --------------------------------------------------
@@ -3661,11 +3778,48 @@ if opt_tool(CPUS, "V620") then
 end
 
 --------------------------------------------------
--- Panafacom MN1610, disassembler only
---@src/devices/cpu/mn1610/mn1610d.h,CPUS["MN1610"] = true
+-- Altera Nios II
+--@src/devices/cpu/nios2/nios2.h,CPUS["NIOS2"] = true
 --------------------------------------------------
 
-if opt_tool(CPUS, "MN1610") then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mn1610/mn1610d.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mn1610/mn1610d.h")
+if CPUS["NIOS2"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/nios2/nios2.cpp",
+		MAME_DIR .. "src/devices/cpu/nios2/nios2.h",
+	}
+end
+
+if opt_tool(CPUS, "NIOS2") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/nios2/nios2dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/nios2/nios2dasm.h")
+end
+
+--------------------------------------------------
+-- IBM 1800, disassembler only
+--@src/devices/cpu/ibm1800/ibm1800.h,CPUS["IBM1800"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "IBM1800") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ibm1800/ibm1800d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ibm1800/ibm1800d.h")
+end
+
+--------------------------------------------------
+-- Data General Nova, disassembler only
+--@src/devices/cpu/nova/nova.h,CPUS["NOVA"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "NOVA") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/nova/novadasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/nova/novadasm.h")
+end
+
+--------------------------------------------------
+-- Interdata Series 16, disassembler only
+--@src/devices/cpu/interdata16/interdata16.h,CPUS["INTERDATA16"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "INTERDATA16") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/interdata16/dasm16.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/interdata16/dasm16.h")
 end

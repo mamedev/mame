@@ -12,8 +12,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_FD1089_H
-#define MAME_MACHINE_FD1089_H
+#ifndef MAME_SEGA_FD1089_H
+#define MAME_SEGA_FD1089_H
 
 #pragma once
 
@@ -106,4 +106,4 @@ protected:
 };
 
 
-#endif // MAME_MACHINE_FD1089_H
+#endif // MAME_SEGA_FD1089_H

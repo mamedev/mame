@@ -21,12 +21,150 @@ GP1 HDD data contents:
 ***************************************************************************/
 
 #include "emu.h"
-#include "qdrmfgp.h"
 
+#include "k054156_k054157_k056832.h"
+#include "konami_helper.h"
+
+#include "bus/ata/ataintf.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/k053252.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "sound/k054539.h"
+#include "emupal.h"
 #include "speaker.h"
+
+namespace {
+
+class qdrmfgp_state : public driver_device
+{
+public:
+	qdrmfgp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_nvram(*this, "nvram"),
+		m_workram(*this, "workram"),
+		m_k056832(*this, "k056832"),
+		m_k054539(*this, "k054539"),
+		m_k053252(*this, "k053252"),
+		m_ata(*this, "ata"),
+		m_inputs_port(*this, "INPUTS"),
+		m_dsw_port(*this, "DSW"),
+		m_palette(*this, "palette"),
+		m_sndram(*this, "sndram")
+	{
+	}
+
+	void qdrmfgp(machine_config &config);
+	void qdrmfgp2(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(battery_sensor_r);
+
+protected:
+	virtual void machine_reset() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint16_t> m_nvram;
+	required_shared_ptr<uint16_t> m_workram;
+	required_device<k056832_device> m_k056832;
+	required_device<k054539_device> m_k054539;
+	required_device<k053252_device> m_k053252;
+	required_device<ata_interface_device> m_ata;
+	required_ioport m_inputs_port;
+	required_ioport m_dsw_port;
+	required_device<palette_device> m_palette;
+	required_shared_ptr<uint8_t> m_sndram;
+
+	uint16_t m_control = 0;
+	int32_t m_gp2_irq_control = 0;
+	int32_t m_pal = 0;
+	emu_timer *m_gp2_timer = nullptr;
+
+	void gp_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gp2_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t v_rom_r(offs_t offset);
+	uint16_t gp2_vram_r(offs_t offset);
+	uint16_t gp2_vram_mirror_r(offs_t offset);
+	void gp2_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gp2_vram_mirror_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t sndram_r(offs_t offset, uint16_t mem_mask = ~0);
+	void sndram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t inputs_r();
+
+	DECLARE_MACHINE_START(qdrmfgp);
+	DECLARE_VIDEO_START(qdrmfgp);
+	DECLARE_MACHINE_START(qdrmfgp2);
+	DECLARE_VIDEO_START(qdrmfgp2);
+
+	uint32_t screen_update_qdrmfgp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(qdrmfgp2_interrupt);
+	TIMER_CALLBACK_MEMBER(gp2_timer_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(qdrmfgp_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(gp2_ide_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(k054539_irq1_gen);
+	K056832_CB_MEMBER(qdrmfgp_tile_callback);
+	K056832_CB_MEMBER(qdrmfgp2_tile_callback);
+
+	void qdrmfgp2_map(address_map &map);
+	void qdrmfgp_k054539_map(address_map &map);
+	void qdrmfgp_map(address_map &map);
+};
+
+
+K056832_CB_MEMBER(qdrmfgp_state::qdrmfgp_tile_callback)
+{
+	*color = ((*color>>2) & 0x0f) | m_pal;
+}
+
+K056832_CB_MEMBER(qdrmfgp_state::qdrmfgp2_tile_callback)
+{
+	*color = (*color>>1) & 0x7f;
+}
+
+/***************************************************************************
+
+  Start the video hardware emulation.
+
+***************************************************************************/
+
+VIDEO_START_MEMBER(qdrmfgp_state,qdrmfgp)
+{
+	m_k056832->set_layer_association(0);
+
+	m_k056832->set_layer_offs(0, 2, 0);
+	m_k056832->set_layer_offs(1, 4, 0);
+	m_k056832->set_layer_offs(2, 6, 0);
+	m_k056832->set_layer_offs(3, 8, 0);
+}
+
+VIDEO_START_MEMBER(qdrmfgp_state,qdrmfgp2)
+{
+	m_k056832->set_layer_association(0);
+
+	m_k056832->set_layer_offs(0, 3, 1);
+	m_k056832->set_layer_offs(1, 5, 1);
+	m_k056832->set_layer_offs(2, 7, 1);
+	m_k056832->set_layer_offs(3, 9, 1);
+}
+
+/***************************************************************************
+
+  Display refresh
+
+***************************************************************************/
+
+uint32_t qdrmfgp_state::screen_update_qdrmfgp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(m_palette->black_pen(), cliprect);
+
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 3, 0, 1);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 2, 0, 2);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 1, 0, 4);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, 0, 8);
+	return 0;
+}
 
 
 /*************************************
@@ -633,7 +771,7 @@ ROM_START( qdrmfgp )
 	ROM_LOAD( "gq_460_a07.14h", 0x000000, 0x80000, CRC(67d8ea6b) SHA1(11af1b5a33de2a6e24823964d210bef193ecefe4) )
 	ROM_LOAD( "gq_460_a06.12h", 0x080000, 0x80000, CRC(97ed5a77) SHA1(68600fd8d914451284cf181fb4bd5872860fb9ad) )
 
-	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "gq460a08", 0, SHA1(2f142f986fa3c79d5c4102e800980d1706c35f75) )
 ROM_END
 
@@ -650,9 +788,11 @@ ROM_START( qdrmfgp2 )
 	ROM_LOAD( "ge_557_a07.19h", 0x000000, 0x80000, CRC(7491e0c8) SHA1(6459ab5e7af052ef7a1c4ce01cd844c0f4319f2e) )
 	ROM_LOAD( "ge_557_a08.19k", 0x080000, 0x80000, CRC(3da2b20c) SHA1(fdc2cdc27f3299f541944a78ce36ed33a7926056) )
 
-	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "ge557a09", 0, SHA1(1ef8093b542fe0bf8240a5fd64e5af3839b6a04c) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************************

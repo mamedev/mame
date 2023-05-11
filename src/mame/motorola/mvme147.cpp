@@ -183,7 +183,10 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
-/* from documentataion: http://www.m88k.com/Docs/147/147aih.pdf but crystal and divider not known */
+
+namespace {
+
+/* from documentation: http://www.m88k.com/Docs/147/147aih.pdf but crystal and divider not known */
 #define BAUDGEN_CLOCK 5_MHz_XTAL
 #define SCC_CLOCK (BAUDGEN_CLOCK) /* This gives prompt at the RS232 terminal device (9600) */
 
@@ -715,6 +718,9 @@ ROM_START (mvme147)
  */
 
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY     FULLNAME    FLAGS

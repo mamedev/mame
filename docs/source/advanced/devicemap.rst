@@ -120,9 +120,6 @@ such as:
 |     Input: Remapped joystick #2: XInput Player 2 (device id: XInput Player 2)
 |
 
-Note that the devices numbers in the verbose log output are zero-based, while
-the device numbers shown in MAME’s user interface and set in configuration files
-
 
 Limitations
 -----------

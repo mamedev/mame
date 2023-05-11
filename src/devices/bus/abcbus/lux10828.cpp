@@ -302,6 +302,7 @@ static void abc_floppies(device_slot_interface &device)
 void luxor_55_10828_device::floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
+	fr.add(FLOPPY_ABC800I_FORMAT);
 	fr.add(FLOPPY_ABC800_FORMAT);
 }
 

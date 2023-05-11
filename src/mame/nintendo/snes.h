@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese, R. Belmont, Anthony Kruize, Fabio Priuli, Ryan Holtz
 
-#ifndef MAME_INCLUDES_SNES_H
-#define MAME_INCLUDES_SNES_H
+#ifndef MAME_NINTENDO_SNES_H
+#define MAME_NINTENDO_SNES_H
 
 #include "cpu/g65816/g65816.h"
 #include "machine/input_merger.h"
@@ -428,8 +428,6 @@ protected:
 	TIMER_CALLBACK_MEMBER(snes_scanline_tick);
 	TIMER_CALLBACK_MEMBER(snes_hblank_tick);
 	DECLARE_WRITE_LINE_MEMBER(snes_extern_irq_w);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(load_snes_cart);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(load_sufami_cart);
 	void snes_init_timers();
 	void scpu_irq_refresh();
 };
@@ -457,4 +455,4 @@ enum
 	HAS_UNK
 };
 
-#endif // MAME_INCLUDES_SNES_H
+#endif // MAME_NINTENDO_SNES_H

@@ -12,6 +12,8 @@
 
     Emulation by Bryan McPhail, mish@tendril.co.uk
 
+    TODO: determine how to best deal with pcktgalba peculiarities without
+          duplicating too much code
 ***************************************************************************/
 
 #include "emu.h"
@@ -469,6 +471,36 @@ ROM_START( pcktgalb )  // bootleg - "Yada East Corporation"
 	ROM_LOAD( "pal16r6", 0x0200, 0x0104, CRC(43aad537) SHA1(892104f4315d7a739718ce32b910694ea9b13fae) ) // also seen peel18CV8 used on other boards
 ROM_END
 
+ROM_START( pcktgalba )  // strange bootleg with 2 connected PCBs, one for the Pocket Gal bootleg and one for an unknown card game. Pocket Gal used as cover for a stealth gambling game?
+	// Pocket Gal PCB: standard chips emulated in this driver, with no Data East customs
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sex_v1.3", 0x00000, 0x10000, CRC(e278da6b) SHA1(71306fc8f8129cb2f924c67fe8dfdf82f02652e8) ) // minor differences to pcktgalb, probably to allow for game switching
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "2_sex", 0x00000, 0x10000, CRC(cb029b02) SHA1(fbb3da08ed05ae73fbeeb13e0e2ff735aaf83db8) )
+
+	ROM_REGION( 0x20000, "chars", 0 )
+	ROM_LOAD( "5_sex", 0x00000, 0x10000, CRC(3128dc7b) SHA1(d011181e544b8284ecdf54578da5469804e06c63) )
+	ROM_LOAD( "6_sex", 0x10000, 0x10000, CRC(0fc91eeb) SHA1(9d9a54c8dd41c10d07aabb6a2d8dbaf35c6e4533) )
+
+	ROM_REGION( 0x10000, "sprites", 0 )
+	ROM_LOAD( "3_sex", 0x00000, 0x08000, CRC(58182daa) SHA1(55ce4b0ea2cb1c559c12815c9e453624e0d95515) )
+	ROM_LOAD( "4_sex", 0x08000, 0x08000, CRC(33a67af6) SHA1(6d9c04658ed75b970821a5c8b1f60c3c08fdda0a) )
+
+	ROM_REGION( 0x0400, "proms", 0 ) // not dumped for this PCB
+	ROM_LOAD( "prom1", 0x0000, 0x0200, BAD_DUMP CRC(3b6198cb) SHA1(d32b364cfce99637998ca83ad21783f80364dd65) )
+	ROM_LOAD( "prom2", 0x0200, 0x0200, BAD_DUMP CRC(1fbd4b59) SHA1(84e20329003cf09b849b49e1d83edc330d49f404) )
+
+	// unknown card game PCB: Z84C00AB6 (Z80), 2 scratched off chips (possibly I8255?), AY38912A/P, 4 8-dip banks
+	ROM_REGION( 0x4000, "z80", 0 )
+	ROM_LOAD( "7_sex.u45", 0x0000, 0x4000, CRC(65b0b6d0) SHA1(29dc3da40ff990df943b3b0e7474a0ba3fbb6468) ) // seems to contain 2 versions of the program. The second one is almost identical to unkitpkr in midcoin/wallc.cpp
+
+	ROM_REGION( 0x6000, "card_chars", 0 )
+	ROM_LOAD( "8_sex.u35",  0x0000, 0x2000, CRC(36e450e5) SHA1(848000d656cd00d32898c22677940f11789e50d4) ) // 2nd half is identical to unkitpkr in midcoin/wallc.cpp
+	ROM_LOAD( "9_sex.u36",  0x2000, 0x2000, CRC(ffcc1198) SHA1(d90ae88e2755f614fdea11cd6935366f4d588144) ) // "
+	ROM_LOAD( "10_sex.u37", 0x4000, 0x2000, CRC(73cf56a0) SHA1(fd2fdd997bca7b96ddd3898f0b6279c1dd60ec92) ) // "
+ROM_END
+
 ROM_START( pcktgal2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "eb04-2.j7", 0x00000, 0x10000, CRC(0c7f2905) SHA1(882dbc1888a0149486c1fac5568dc3d297c2dadd) )
@@ -572,9 +604,10 @@ void pcktgal_state::init_original()
 
 /***************************************************************************/
 
-GAME( 1987, pcktgal,  0,       pcktgal, pcktgal, pcktgal_state, init_original,  ROT0, "Data East Corporation", "Pocket Gal (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, pcktgalb, pcktgal, bootleg, pcktgal, pcktgal_state, empty_init,     ROT0, "bootleg", "Pocket Gal (Yada East bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pcktgal2, pcktgal, pcktgal2,pcktgal, pcktgal_state, init_original,  ROT0, "Data East Corporation", "Pocket Gal 2 (English)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pcktgal2j,pcktgal, pcktgal2,pcktgal, pcktgal_state, init_original,  ROT0, "Data East Corporation", "Pocket Gal 2 (Japanese)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, spool3,   pcktgal, pcktgal2,pcktgal, pcktgal_state, init_original,  ROT0, "Data East Corporation", "Super Pool III (English)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, pcktgal,  0,       pcktgal, pcktgal, pcktgal_state, init_original,  ROT0, "Data East Corporation", "Pocket Gal (Japan)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1987, pcktgalb, pcktgal, bootleg, pcktgal, pcktgal_state, empty_init,     ROT0, "bootleg", "Pocket Gal (Yada East bootleg)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, pcktgalba,pcktgal, bootleg, pcktgal, pcktgal_state, empty_init,     ROT0, "bootleg", "Pocket Gal / unknown card game",                         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // only the Pocket Gal game is emulated
+GAME( 1989, pcktgal2, pcktgal, pcktgal2,pcktgal, pcktgal_state, init_original,  ROT0, "Data East Corporation", "Pocket Gal 2 (English)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pcktgal2j,pcktgal, pcktgal2,pcktgal, pcktgal_state, init_original,  ROT0, "Data East Corporation", "Pocket Gal 2 (Japanese)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1989, spool3,   pcktgal, pcktgal2,pcktgal, pcktgal_state, init_original,  ROT0, "Data East Corporation", "Super Pool III (English)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1990, spool3i,  pcktgal, pcktgal2,pcktgal, pcktgal_state, init_original,  ROT0, "Data East Corporation (I-Vics license)", "Super Pool III (I-Vics)", MACHINE_SUPPORTS_SAVE )

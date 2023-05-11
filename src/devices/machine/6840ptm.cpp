@@ -182,7 +182,7 @@ void ptm6840_device::deduct_from_counter(int idx)
 			lsb = (m_latch[idx] & 0xff) + 1;
 			msb--;
 
-			if (msb < 0)
+			if (msb == 0xffff)
 			{
 				// If MSB is less than zero, we've timed out, no need to manually reload
 				timed_out = true;

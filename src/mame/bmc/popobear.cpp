@@ -87,6 +87,9 @@ Component Side   A   B   Solder Side
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
+
 class popobear_state : public driver_device
 {
 public:
@@ -682,5 +685,8 @@ ROM_START( popobear )
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "popobear_ta-a-901.u9", 0x00000, 0x40000,  CRC(f1e94926) SHA1(f4d6f5b5811d90d0069f6efbb44d725ff0d07e1c) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 2000, popobear,    0, popobear,    popobear, popobear_state, empty_init, ROT0,  "BMC", "PoPo Bear",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

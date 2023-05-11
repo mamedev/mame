@@ -10,6 +10,9 @@
 #include "cpu/z180/z180.h"
 #include "machine/timekpr.h"
 
+
+namespace {
+
 class daryde_state : public driver_device
 {
 public:
@@ -181,6 +184,9 @@ ROM_START(kurdart)
 
 	// No NVRAM on this PCB
 ROM_END
+
+} // anonymous namespace
+
 
 GAME(1995, cricket, 0, pandart, pandart, daryde_state, empty_init, ROT0, "Daryde S. L.", "Cricket",       MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1999, pandart, 0, pandart, pandart, daryde_state, empty_init, ROT0, "Daryde S. L.", "Panther Darts", MACHINE_IS_SKELETON_MECHANICAL)

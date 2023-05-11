@@ -127,6 +127,9 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
+
+namespace {
+
 class miniforce_state : public driver_device
 {
 public:
@@ -201,6 +204,9 @@ void miniforce_state::miniforce(machine_config &config)
 
 ROM_START(miniforce)
 ROM_END
+
+} // anonymous namespace
+
 
 /* Drivers TODO: setup distinct miniforce machine configurations */
 /*    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY            FULLNAME     FLAGS */

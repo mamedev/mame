@@ -14,6 +14,9 @@ No significant progress can be made until the 8051 has its internal ROM dumped.
 #include "video/i8275.h"
 #include "screen.h"
 
+
+namespace {
+
 class vp60_state : public driver_device
 {
 public:
@@ -126,5 +129,8 @@ ROM_START( vp60 )
 	ROM_REGION(0x400, "keyboard", 0)
 	ROM_LOAD( "195.kbd",    0x0000, 0x0400, CRC(14885da3) SHA1(3b06f658af1a62b28e62d8b3a557b74169917a12) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1982, vp60, 0, 0, vp60, vp60, vp60_state, empty_init, "ADDS", "Viewpoint 60", MACHINE_IS_SKELETON )

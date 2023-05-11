@@ -4,8 +4,8 @@
  * Sega System 24
  *
  */
-#ifndef MAME_INCLUDES_SEGAS24_H
-#define MAME_INCLUDES_SEGAS24_H
+#ifndef MAME_SEGA_SEGAS24_H
+#define MAME_SEGA_SEGAS24_H
 
 #pragma once
 
@@ -201,4 +201,4 @@ private:
 	void dcclubj_cpu2_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_SEGAS24_H
+#endif // MAME_SEGA_SEGAS24_H

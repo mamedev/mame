@@ -126,6 +126,9 @@ as well as Up Right, Cocktail or Flip Screen from the service menu.
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class invqix_state : public driver_device
 {
 public:
@@ -363,5 +366,8 @@ ROM_START( invqix )
 	ROM_REGION16_BE(0x80, "eeprom", 0)
 	ROM_LOAD16_WORD_SWAP( "93c46.ic6", 0x000000, 0x000080, CRC(564b744e) SHA1(4d9ea7dc253797c513258d07a936dfb63d8ed18c) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 2003, invqix, 0, invqix, invqix, invqix_state, empty_init, ROT270, "Taito / Namco", "Space Invaders / Qix Silver Anniversary Edition (Ver. 2.03)", MACHINE_SUPPORTS_SAVE )

@@ -47,8 +47,41 @@ class parent_rom_vector : public std::vector<parent_rom>
 public:
 	using std::vector<parent_rom>::vector;
 
-	void remove_redundant_parents()
+	void remove_redundant_parents(device_t const &device)
 	{
+		// remove parents with no shared ROMs
+		const_reverse_iterator firstparent(crend());
+		for (rom_entry const *region = rom_first_region(device); region && ((crend() == firstparent) || (back().type.get() != firstparent->type.get())); region = rom_next_region(region))
+		{
+			for (rom_entry const *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
+			{
+				util::hash_collection const hashes(rom->hashdata());
+				auto const match(
+						std::find_if(
+							crbegin(),
+							firstparent,
+							[rom, &hashes] (parent_rom const &r)
+							{
+								if (r.length != rom_file_size(rom))
+									return false;
+								else if (!hashes.flag(util::hash_collection::FLAG_NO_DUMP))
+									return r.hashes == hashes;
+								else
+									return r.name == rom->name();
+							}));
+				if (match != firstparent)
+				{
+					firstparent = std::find_if(
+							crbegin(),
+							match,
+							[&match] (parent_rom const &r) { return r.type.get() == match->type.get(); });
+					if (back().type.get() == match->type.get())
+						break;
+				}
+			}
+		}
+		erase(firstparent.base(), cend());
+
 		while (!empty())
 		{
 			// find where the next parent starts
@@ -203,7 +236,7 @@ media_auditor::summary media_auditor::audit_media(const char *validation)
 			}
 		}
 	}
-	parentroms.remove_redundant_parents();
+	parentroms.remove_redundant_parents(m_enumerator.config()->root_device());
 
 	// count ROMs required/found
 	std::size_t found(0);
@@ -279,8 +312,8 @@ media_auditor::summary media_auditor::audit_media(const char *validation)
 			LOG("Total required=%u (shared=%u) found=%u (shared=%u parent=%u)\n", required, shared_required, found, shared_found, parent_found);
 	}
 
-	// if we only find files that are in the parent & either the set has no unique files or the parent is not found, then assume we don't have the set at all
-	if ((found == shared_found) && required && ((required != shared_required) || !parent_found))
+	// if we only find files that are in the parent and either the set has no unique files or the parent is not found, then assume we don't have the set at all
+	if ((found == shared_found) && required && (found != required) && ((required != shared_required) || !parent_found))
 	{
 		m_record_list.clear();
 		return NOTFOUND;

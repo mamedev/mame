@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
-#ifndef MAME_MACHINE_K573DIO_H
-#define MAME_MACHINE_K573DIO_H
+#ifndef MAME_KONAMI_K573DIO_H
+#define MAME_KONAMI_K573DIO_H
 
 #pragma once
 
@@ -96,4 +96,4 @@ private:
 
 DECLARE_DEVICE_TYPE(KONAMI_573_DIGITAL_IO_BOARD, k573dio_device)
 
-#endif // MAME_MACHINE_K573DIO_H
+#endif // MAME_KONAMI_K573DIO_H

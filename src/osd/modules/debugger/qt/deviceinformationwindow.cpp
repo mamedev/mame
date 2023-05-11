@@ -12,8 +12,8 @@
 
 namespace osd::debugger::qt {
 
-DeviceInformationWindow::DeviceInformationWindow(running_machine &machine, device_t *device, QWidget *parent) :
-	WindowQt(machine, nullptr),
+DeviceInformationWindow::DeviceInformationWindow(DebuggerQt &debugger, device_t *device, QWidget *parent) :
+	WindowQt(debugger, nullptr),
 	m_device(device)
 {
 	if (parent)
@@ -29,6 +29,15 @@ DeviceInformationWindow::DeviceInformationWindow(running_machine &machine, devic
 
 DeviceInformationWindow::~DeviceInformationWindow()
 {
+}
+
+
+void DeviceInformationWindow::restoreConfiguration(util::xml::data_node const &node)
+{
+	WindowQt::restoreConfiguration(node);
+
+	auto const tag = node.get_attribute_string(ATTR_WINDOW_DEVICE_TAG, ":");
+	set_device(tag);
 }
 
 
@@ -112,25 +121,6 @@ void DeviceInformationWindow::set_device(const char *tag)
 	if (!m_device)
 		m_device = &m_machine.root_device();
 	fill_device_information();
-}
-
-
-//=========================================================================
-//  DeviceInformationWindowQtConfig
-//=========================================================================
-
-void DeviceInformationWindowQtConfig::applyToQWidget(QWidget *widget)
-{
-	WindowQtConfig::applyToQWidget(widget);
-	DeviceInformationWindow *window = dynamic_cast<DeviceInformationWindow *>(widget);
-	window->set_device(m_device_tag.c_str());
-}
-
-
-void DeviceInformationWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
-{
-	WindowQtConfig::recoverFromXmlNode(node);
-	m_device_tag = node.get_attribute_string(ATTR_WINDOW_DEVICE_TAG, ":");
 }
 
 } // namespace osd::debugger::qt

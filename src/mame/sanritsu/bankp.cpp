@@ -600,6 +600,34 @@ ROM_START( bankp )
 	ROM_LOAD( "315-5073.pal16l4",  0x0000, 0x0001, NO_DUMP ) // read protected
 ROM_END
 
+ROM_START( bankpt )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "11.bin",       0x0000, 0x4000, CRC(056755ce) SHA1(7375b856a5757b8b6336ccc16df460a79c3f25a7) )
+	ROM_LOAD( "10.bin",       0x4000, 0x4000, CRC(d29b1598) SHA1(8c1ee4d23d8d6f93af3e22f2cba189b0055994fb) )
+	ROM_LOAD( "9.bin",        0x8000, 0x4000, CRC(08a8137b) SHA1(1dbda68825101d5474eecc58ff9b5f9fe79b0b33) )
+	ROM_LOAD( "12.bin",       0xc000, 0x2000, CRC(c98ac200) SHA1(1bdb87868deebe03da18280e617530c24118da1c) )
+
+	ROM_REGION( 0x04000, "fgtiles", 0 )
+	ROM_LOAD( "1.bin",        0x0000, 0x2000, CRC(aef34a93) SHA1(513895cd3144977b3d9b5ac7f2bf40384d69e157) )
+	ROM_LOAD( "2.bin",        0x2000, 0x2000, CRC(ca13cb11) SHA1(3aca0b0d3f052a742e1cd0b96bfad834e78fcd7d) )
+
+	ROM_REGION( 0x0c000, "bgtiles", 0 )
+	ROM_LOAD( "8.bin",        0x0000, 0x2000, CRC(c4c4878b) SHA1(423143d81408eda96f87bdc3a306517c473cbe00) )
+	ROM_LOAD( "7.bin",        0x2000, 0x2000, CRC(a18165a1) SHA1(9a7513ea84f9231edba4e637df28a1705c8cdeb0) )
+	ROM_LOAD( "6.bin",        0x4000, 0x2000, CRC(b58aa8fa) SHA1(432b43cd9af4e3dab579cfd191b731aa11ceb121) )
+	ROM_LOAD( "5.bin",        0x6000, 0x2000, CRC(1aa37fce) SHA1(6e2402683145de8972a53c9ec01da9a422392bed) )
+	ROM_LOAD( "4.bin",        0x8000, 0x2000, CRC(05f3a867) SHA1(9da11c3cea967c5f0d7397c0ff4f87b4b1446c4c) )
+	ROM_LOAD( "3.bin",        0xa000, 0x2000, CRC(3fa337e1) SHA1(5fdc45436be27cceb5157bd6201c30e3de28fd7b) )
+
+	ROM_REGION( 0x0220, "proms", 0 )
+	ROM_LOAD( "82s123.bin",   0x0000, 0x020, CRC(eb70c5ae) SHA1(13613dad6c14004278f777d6f3f62712a2a85773) ) // palette
+	ROM_LOAD( "6_82s129.bin", 0x0020, 0x100, CRC(0acca001) SHA1(54c354d825a24a9085867b114a2cd6835baebe55) ) // fgtiles lookup table
+	ROM_LOAD( "5_82s129.bin", 0x0120, 0x100, CRC(e53bafdb) SHA1(7a414f6db5476dd7d0217e5b846ed931381eda02) ) // bgtiles lookup table
+
+	ROM_REGION( 0x035f, "user1", 0 )
+	ROM_LOAD( "82s153.bin",   0x0000, 0x025b, NO_DUMP ) // read protected
+	ROM_LOAD( "pal16r4.bin",  0x0000, 0x0104, NO_DUMP ) // read protected
+ROM_END
 
 ROM_START( combh )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -639,5 +667,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1984, bankp, 0, bankp, bankp, bankp_state, empty_init, ROT0,   "Sanritsu / Sega", "Bank Panic",  MACHINE_SUPPORTS_SAVE )
-GAME( 1987, combh, 0, bankp, combh, bankp_state, empty_init, ROT270, "Sanritsu / Sega", "Combat Hawk", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bankp,  0,     bankp, bankp, bankp_state, empty_init, ROT0,   "Sanritsu / Sega",  "Bank Panic",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bankpt, bankp, bankp, bankp, bankp_state, empty_init, ROT0,   "bootleg (Tecfri)", "Bank Panic (Tecfri bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, combh,  0,     bankp, combh, bankp_state, empty_init, ROT270, "Sanritsu / Sega",  "Combat Hawk",                 MACHINE_SUPPORTS_SAVE )

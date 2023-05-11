@@ -22,15 +22,21 @@ class DasmWindow : public WindowQt
 	Q_OBJECT
 
 public:
-	DasmWindow(running_machine &machine, QWidget *parent = nullptr);
+	DasmWindow(DebuggerQt &debugger, QWidget *parent = nullptr);
 	virtual ~DasmWindow();
+
+	virtual void restoreConfiguration(util::xml::data_node const &node) override;
 
 protected:
 	virtual void saveConfigurationToNode(util::xml::data_node &node) override;
 
+	// Used to intercept the user hitting the up arrow in the input widget
+	virtual bool eventFilter(QObject *obj, QEvent *event) override;
+
 private slots:
 	void cpuChanged(int index);
 	void expressionSubmitted();
+	void expressionEdited(QString const &text);
 
 	void toggleBreakpointAtCursor(bool changedTo);
 	void enableBreakpointAtCursor(bool changedTo);
@@ -52,30 +58,9 @@ private:
 	QAction *m_breakpointToggleAct;
 	QAction *m_breakpointEnableAct;
 	QAction *m_runToCursorAct;
-};
 
-
-//=========================================================================
-//  A way to store the configuration of a window long enough to read/write.
-//=========================================================================
-class DasmWindowQtConfig : public WindowQtConfig
-{
-public:
-	DasmWindowQtConfig() :
-		WindowQtConfig(WINDOW_TYPE_DISASSEMBLY_VIEWER),
-		m_cpu(0),
-		m_rightBar(0)
-	{
-	}
-
-	~DasmWindowQtConfig() {}
-
-	// Settings
-	int m_cpu;
-	int m_rightBar;
-
-	void applyToQWidget(QWidget *widget);
-	void recoverFromXmlNode(util::xml::data_node const &node);
+	// Expression history
+	CommandHistory m_inputHistory;
 };
 
 } // namespace osd::debugger::qt

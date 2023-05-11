@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Mirko Buffoni,Nicola Salmoria,Bryan McPhail,David Haywood,R. Belmont,Alex Marshall,Angelo Salese,Luca Elia
 // thanks-to:Richard Bush
-#ifndef MAME_VIDEO_NMK16SPR_H
-#define MAME_VIDEO_NMK16SPR_H
+#ifndef MAME_NMK_NMK16SPR_H
+#define MAME_NMK_NMK16SPR_H
 
 #pragma once
 
@@ -51,4 +51,4 @@ private:
 
 DECLARE_DEVICE_TYPE(NMK_16BIT_SPRITE, nmk_16bit_sprite_device)
 
-#endif // MAME_VIDEO_NMK16SPR_H
+#endif // MAME_NMK_NMK16SPR_H

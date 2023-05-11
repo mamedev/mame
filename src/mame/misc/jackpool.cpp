@@ -28,6 +28,8 @@ TODO:
 #include "speaker.h"
 
 
+namespace {
+
 class jackpool_state : public driver_device
 {
 public:
@@ -304,5 +306,8 @@ void jackpool_state::init_jackpool()
 	/* patch NVRAM routine */
 	rom[0x9040/2] = 0x6602;
 }
+
+} // anonymous namespace
+
 
 GAME( 1997, jackpool, 0, jackpool, jackpool, jackpool_state, init_jackpool, ROT0, "Electronic Projects", "Jackpot Cards / Jackpot Pool (Italy)",MACHINE_NOT_WORKING )

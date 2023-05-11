@@ -209,6 +209,8 @@ _|_  74LS86PC  74LS299N |RD4B3  | 74LS153PC|V||  _|_  74LS86PC  74LS299N |RD4A3 
 #include "tilemap.h"
 
 
+namespace {
+
 class raiden_ms_state : public driver_device
 {
 public:
@@ -259,10 +261,10 @@ private:
 	required_device_array<generic_latch_8_device, 2> m_soundlatch;
 	required_memory_bank m_soundbank;
 
-	uint16_t pal_read16(offs_t offset, u16 mem_mask = ~0) { uint16_t data = m_palette->read16(offset); return ((data & 0xff00) >> 8) | ((data & 0x00ff) << 8); };
-	uint16_t pal_read16_ext(offs_t offset, u16 mem_mask = ~0) { uint16_t data = m_palette->read16_ext(offset); return ((data & 0xff00) >> 8) | ((data & 0x00ff) << 8);  };
-	void pal_write16(offs_t offset, u16 data, u16 mem_mask = ~0) { m_palette->write16(offset, ((data & 0xff00) >> 8) | ((data & 0x00ff) << 8), ((mem_mask & 0xff00) >> 8) | ((mem_mask & 0x00ff) << 8)); };
-	void pal_write16_ext(offs_t offset, u16 data, u16 mem_mask = ~0) { m_palette->write16_ext(offset, ((data & 0xff00) >> 8) | ((data & 0x00ff) << 8), ((mem_mask & 0xff00) >> 8) | ((mem_mask & 0x00ff) << 8)); };
+	uint16_t pal_read16(offs_t offset, u16 mem_mask = ~0) { uint16_t data = m_palette->read16(offset); return swapendian_int16(data); };
+	uint16_t pal_read16_ext(offs_t offset, u16 mem_mask = ~0) { uint16_t data = m_palette->read16_ext(offset); return swapendian_int16(data);  };
+	void pal_write16(offs_t offset, u16 data, u16 mem_mask = ~0) { m_palette->write16(offset, swapendian_int16(data), swapendian_int16(mem_mask)); };
+	void pal_write16_ext(offs_t offset, u16 data, u16 mem_mask = ~0) { m_palette->write16_ext(offset, swapendian_int16(data), swapendian_int16(mem_mask)); };
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -781,5 +783,8 @@ ROM_START( raidenm )
 	ROM_LOAD( "msraid_6-1-8086-1_645c_gal16v8.u33", 0x000, 0x117, NO_DUMP )
 	ROM_LOAD( "msraid_6-1-8086-1_645d_gal16v8.u27", 0x000, 0x117, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1990, raidenm,  raiden,  raidenm,  raidenm,  raiden_ms_state, init_raidenm, ROT270, "bootleg (Gaelco / Ervisa)", "Raiden (Modular System)", MACHINE_NOT_WORKING )

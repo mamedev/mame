@@ -8,7 +8,7 @@
     driver by Phil Bennett
 
     TODO:
-	    * Improve arm control. To start the game, wiggle left and right
+        * Improve arm control. To start the game, wiggle left and right
           rapidly
         * Accurate video timing
 

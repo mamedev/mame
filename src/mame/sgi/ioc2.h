@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_IOC2_H
-#define MAME_MACHINE_IOC2_H
+#ifndef MAME_SGI_IOC2_H
+#define MAME_SGI_IOC2_H
 
 #pragma once
 
@@ -232,4 +232,4 @@ protected:
 DECLARE_DEVICE_TYPE(SGI_IOC2_GUINNESS,   ioc2_guinness_device)
 DECLARE_DEVICE_TYPE(SGI_IOC2_FULL_HOUSE, ioc2_full_house_device)
 
-#endif // MAME_MACHINE_IOC2_H
+#endif // MAME_SGI_IOC2_H

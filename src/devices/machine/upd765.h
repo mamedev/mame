@@ -241,7 +241,7 @@ protected:
 	live_info cur_live, checkpoint_live;
 	devcb_write_line intrq_cb, drq_cb, hdl_cb, idx_cb;
 	devcb_write8 us_cb;
-	bool cur_irq, other_irq, data_irq, drq, internal_drq, tc, tc_done, locked, mfm, scan_done;
+	bool cur_irq, irq, drq, internal_drq, tc, tc_done, locked, mfm, scan_done;
 	floppy_info flopi[4];
 
 	int fifo_pos, fifo_expected, command_pos, result_pos, sectors_read;
@@ -280,6 +280,9 @@ protected:
 		C_SCAN_HIGH,
 		C_MOTOR_ONOFF,
 		C_VERSION,
+		C_SLEEP,
+		C_ABORT,
+		C_SPECIFY2,
 
 		C_INVALID,
 		C_INCOMPLETE
@@ -483,6 +486,8 @@ public:
 class upd72069_device : public upd72065_device {
 public:
 	upd72069_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void auxcmd_w(uint8_t data) override;
 };
 
 class n82077aa_device : public ps2_fdc_device {
@@ -591,6 +596,34 @@ private:
 	uint8_t m_cr1;
 };
 
+class hd63266f_device : public upd765_family_device {
+public:
+	hd63266f_device(const machine_config &mconfig, const char *tag, device_t* owner, uint32_t clock);
+
+	virtual void map(address_map &map) override;
+	auto inp_rd_callback() { return inp_cb.bind(); } // this is really the ts signal
+
+	void rate_w(u8 state) { state ? set_rate(500000) : set_rate(250000); }
+	void abort_w(u8 data);
+	u8 extstat_r();
+
+protected:
+	virtual void soft_reset() override;
+	virtual void device_start() override;
+
+private:
+	virtual int check_command() override;
+	virtual void execute_command(int cmd) override;
+	virtual void start_command(int cmd) override;
+	void motor_control(int fid, bool start_motor);
+	virtual void index_callback(floppy_image_device *floppy, int state) override;
+
+	u8 motor_on_counter;
+	int delayed_command;
+	u8 motor_state;
+	devcb_read_line inp_cb;
+};
+
 DECLARE_DEVICE_TYPE(UPD765A,        upd765a_device)
 DECLARE_DEVICE_TYPE(UPD765B,        upd765b_device)
 DECLARE_DEVICE_TYPE(I8272A,         i8272a_device)
@@ -607,5 +640,6 @@ DECLARE_DEVICE_TYPE(PC8477B,        pc8477b_device)
 DECLARE_DEVICE_TYPE(WD37C65C,       wd37c65c_device)
 DECLARE_DEVICE_TYPE(MCS3201,        mcs3201_device)
 DECLARE_DEVICE_TYPE(TC8566AF,       tc8566af_device)
+DECLARE_DEVICE_TYPE(HD63266F,       hd63266f_device)
 
 #endif // MAME_DEVICES_MACHINE_UPD765_H

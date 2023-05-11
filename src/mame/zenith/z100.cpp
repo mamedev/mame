@@ -163,6 +163,9 @@ ZDIPSW      EQU 0FFH    ; Configuration dip switches
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class z100_state : public driver_device
 {
 public:
@@ -897,6 +900,8 @@ ROM_START( z100 )
 	ROM_REGION(0x0100, "vrmm", 0) // TBP18S22 Video RAM Mapping Module
 	ROM_LOAD("444-127.u370", 0x0000, 0x0100, CRC(ac386f6b) SHA1(2b62b939d704d90edf59923a8a1a51ef1902f4d7) BAD_DUMP)
 ROM_END
+
+} // anonymous namespace
 
 
 /* Driver */

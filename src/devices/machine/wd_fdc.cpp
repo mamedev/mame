@@ -98,6 +98,8 @@ static const char *const states[] =
 	"SPINUP_DONE",
 	"SETTLE_WAIT",
 	"SETTLE_DONE",
+	"WRITE_PROTECT_WAIT",
+	"WRITE_PROTECT_DONE",
 	"DATA_LOAD_WAIT",
 	"DATA_LOAD_WAIT_DONE",
 	"SEEK_MOVE",
@@ -134,6 +136,16 @@ static const char *const states[] =
 	"WRITE_SECTOR_PRE_BYTE"
 };
 
+template <unsigned B> inline uint32_t wd_fdc_device_base::live_info::shift_reg_low() const
+{
+	return shift_reg & make_bitmask<uint32_t>(B);
+}
+
+inline uint8_t wd_fdc_device_base::live_info::shift_reg_data() const
+{
+	return bitswap<8>(shift_reg, 14, 12, 10, 8, 6, 4, 2, 0);
+}
+
 wd_fdc_device_base::wd_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	intrq_cb(*this),
@@ -148,6 +160,7 @@ wd_fdc_device_base::wd_fdc_device_base(const machine_config &mconfig, device_typ
 	force_ready = false;
 	disable_motor_control = false;
 	spinup_on_interrupt = false;
+	extended_ddam = false;
 	hlt = true; // assume tied to VCC
 }
 
@@ -353,8 +366,10 @@ void wd_fdc_device_base::command_end()
 	main_state = sub_state = IDLE;
 	motor_timeout = 0;
 
-	if(!drq && (status & S_BUSY)) {
-		status &= ~S_BUSY;
+	if(status & S_BUSY) {
+		if (!t_cmd->enabled()) {
+			status &= ~S_BUSY;
+		}
 		intrq = true;
 		if(!intrq_cb.isnull())
 			intrq_cb(intrq);
@@ -868,13 +883,23 @@ void wd_fdc_device_base::write_track_continue()
 			LOGSTATE("SETTLE_DONE\n");
 			if (floppy && floppy->wpt_r()) {
 				LOGSTATE("WRITE_PROT\n");
-				status |= S_WP;
-				command_end();
+				sub_state = WRITE_PROTECT_WAIT;
+				delay_cycles(t_gen, 145);
 				return;
 			}
 			set_drq();
 			sub_state = DATA_LOAD_WAIT;
 			delay_cycles(t_gen, 192);
+			return;
+
+		case WRITE_PROTECT_WAIT:
+			LOGSTATE("WRITE_PROTECT_WAIT\n");
+			return;
+
+		case WRITE_PROTECT_DONE:
+			LOGSTATE("WRITE_PROTECT_DONE\n");
+			status |= S_WP;
+			command_end();
 			return;
 
 		case DATA_LOAD_WAIT:
@@ -980,13 +1005,23 @@ void wd_fdc_device_base::write_sector_continue()
 			LOGSTATE("SETTLE_DONE\n");
 			if (floppy && floppy->wpt_r()) {
 				LOGSTATE("WRITE_PROT\n");
-				status |= S_WP;
-				command_end();
+				sub_state = WRITE_PROTECT_WAIT;
+				delay_cycles(t_gen, 145);
 				return;
 			}
 			sub_state = SCAN_ID;
 			counter = 0;
 			live_start(SEARCH_ADDRESS_MARK_HEADER);
+			return;
+
+		case WRITE_PROTECT_WAIT:
+			LOGSTATE("WRITE_PROTECT_WAIT\n");
+			return;
+
+		case WRITE_PROTECT_DONE:
+			LOGSTATE("WRITE_PROTECT_DONE\n");
+			status |= S_WP;
+			command_end();
 			return;
 
 		case SCAN_ID:
@@ -1054,12 +1089,12 @@ void wd_fdc_device_base::interrupt_start()
 		main_state = sub_state = cur_live.state = IDLE;
 		cur_live.tm = attotime::never;
 		status &= ~S_BUSY;
-		drop_drq();
 		motor_timeout = 0;
 	} else {
 		// when a force interrupt command is issued and there is no
 		// currently running command, return the status type 1 bits
 		status_type_1 = true;
+		drop_drq();
 	}
 
 	intrq_cond = command & 0x0f;
@@ -1136,6 +1171,10 @@ void wd_fdc_device_base::do_generic()
 
 	case SETTLE_WAIT:
 		sub_state = SETTLE_DONE;
+		break;
+
+	case WRITE_PROTECT_WAIT:
+		sub_state = WRITE_PROTECT_DONE;
 		break;
 
 	case SEEK_WAIT_STEP_TIME:
@@ -1515,6 +1554,8 @@ void wd_fdc_device_base::index_callback(floppy_image_device *floppy, int state)
 	case SPINUP_DONE:
 	case SETTLE_WAIT:
 	case SETTLE_DONE:
+	case WRITE_PROTECT_WAIT:
+	case WRITE_PROTECT_DONE:
 	case DATA_LOAD_WAIT:
 	case DATA_LOAD_WAIT_DONE:
 	case SEEK_MOVE:
@@ -1682,6 +1723,14 @@ bool wd_fdc_device_base::read_one_bit(const attotime &limit)
 	return false;
 }
 
+void wd_fdc_device_base::reset_data_sync()
+{
+	cur_live.data_separator_phase = false;
+	cur_live.bit_counter = 0;
+
+	cur_live.data_reg = cur_live.shift_reg_data();
+}
+
 bool wd_fdc_device_base::write_one_bit(const attotime &limit)
 {
 	bool bit = cur_live.shift_reg & 0x8000;
@@ -1765,28 +1814,19 @@ void wd_fdc_device_base::live_run(attotime limit)
 			if(read_one_bit(limit))
 				return;
 
-			LOGSHIFT("%s: shift = %04x data=%02x c=%d\n", cur_live.tm.to_string(), cur_live.shift_reg,
-					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
-					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
-					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
-					(cur_live.shift_reg & 0x0100 ? 0x10 : 0x00) |
-					(cur_live.shift_reg & 0x0040 ? 0x08 : 0x00) |
-					(cur_live.shift_reg & 0x0010 ? 0x04 : 0x00) |
-					(cur_live.shift_reg & 0x0004 ? 0x02 : 0x00) |
-					(cur_live.shift_reg & 0x0001 ? 0x01 : 0x00),
+			LOGSHIFT("%s: shift = %08x data=%02x c=%d\n", cur_live.tm.to_string(), cur_live.shift_reg,
+					cur_live.shift_reg_data(),
 					cur_live.bit_counter);
 
-			if(!dden && cur_live.shift_reg == 0x4489) {
+			if(!dden && cur_live.shift_reg_low<16>() == 0x4489) {
 				cur_live.crc = 0x443b;
-				cur_live.data_separator_phase = false;
-				cur_live.bit_counter = 0;
+				reset_data_sync();
 				cur_live.state = READ_HEADER_BLOCK_HEADER;
 			}
 
-			if(dden && cur_live.shift_reg == 0xf57e) {
+			if(dden && cur_live.shift_reg_low<23>() == 0x2af57e) {
 				cur_live.crc = 0xef21;
-				cur_live.data_separator_phase = false;
-				cur_live.bit_counter = 0;
+				reset_data_sync();
 				if(main_state == READ_ID)
 					cur_live.state = READ_ID_BLOCK_TO_DMA;
 				else
@@ -1799,15 +1839,8 @@ void wd_fdc_device_base::live_run(attotime limit)
 			if(read_one_bit(limit))
 				return;
 
-			LOGSHIFT("%s: shift = %04x data=%02x counter=%d\n", cur_live.tm.to_string(), cur_live.shift_reg,
-					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
-					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
-					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
-					(cur_live.shift_reg & 0x0100 ? 0x10 : 0x00) |
-					(cur_live.shift_reg & 0x0040 ? 0x08 : 0x00) |
-					(cur_live.shift_reg & 0x0010 ? 0x04 : 0x00) |
-					(cur_live.shift_reg & 0x0004 ? 0x02 : 0x00) |
-					(cur_live.shift_reg & 0x0001 ? 0x01 : 0x00),
+			LOGSHIFT("%s: shift = %08x data=%02x counter=%d\n", cur_live.tm.to_string(), cur_live.shift_reg,
+					cur_live.shift_reg_data(),
 					cur_live.bit_counter);
 
 			if(cur_live.bit_counter & 15)
@@ -1816,7 +1849,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 			int slot = cur_live.bit_counter >> 4;
 
 			if(slot < 3) {
-				if(cur_live.shift_reg != 0x4489)
+				if(cur_live.shift_reg_low<16>() != 0x4489)
 					cur_live.state = SEARCH_ADDRESS_MARK_HEADER;
 				break;
 			}
@@ -1887,15 +1920,8 @@ void wd_fdc_device_base::live_run(attotime limit)
 			if(read_one_bit(limit))
 				return;
 
-			LOGSHIFT("%s: shift = %04x data=%02x c=%d.%x\n", cur_live.tm.to_string(), cur_live.shift_reg,
-					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
-					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
-					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
-					(cur_live.shift_reg & 0x0100 ? 0x10 : 0x00) |
-					(cur_live.shift_reg & 0x0040 ? 0x08 : 0x00) |
-					(cur_live.shift_reg & 0x0010 ? 0x04 : 0x00) |
-					(cur_live.shift_reg & 0x0004 ? 0x02 : 0x00) |
-					(cur_live.shift_reg & 0x0001 ? 0x01 : 0x00),
+			LOGSHIFT("%s: shift = %08x data=%02x c=%d.%x\n", cur_live.tm.to_string(), cur_live.shift_reg,
+					cur_live.shift_reg_data(),
 					cur_live.bit_counter >> 4, cur_live.bit_counter & 15);
 
 			if(!dden) {
@@ -1904,10 +1930,9 @@ void wd_fdc_device_base::live_run(attotime limit)
 					return;
 				}
 
-				if(cur_live.bit_counter >= 28*16 && cur_live.shift_reg == 0x4489) {
+				if(cur_live.bit_counter >= 28*16 && cur_live.shift_reg_low<16>() == 0x4489) {
 					cur_live.crc = 0x443b;
-					cur_live.data_separator_phase = false;
-					cur_live.bit_counter = 0;
+					reset_data_sync();
 					cur_live.state = READ_DATA_BLOCK_HEADER;
 				}
 			} else {
@@ -1916,19 +1941,24 @@ void wd_fdc_device_base::live_run(attotime limit)
 					return;
 				}
 
-				if(cur_live.bit_counter >= 11*16 && (cur_live.shift_reg == 0xf56a || cur_live.shift_reg == 0xf56b ||
-														cur_live.shift_reg == 0xf56e || cur_live.shift_reg == 0xf56f)) {
+				if(cur_live.bit_counter >= 11*16 && (cur_live.shift_reg_low<16>() == 0xf56a || cur_live.shift_reg_low<16>() == 0xf56b ||
+														cur_live.shift_reg_low<16>() == 0xf56e || cur_live.shift_reg_low<16>() == 0xf56f)) {
 					cur_live.crc =
-						cur_live.shift_reg == 0xf56a ? 0x8fe7 :
-						cur_live.shift_reg == 0xf56b ? 0x9fc6 :
-						cur_live.shift_reg == 0xf56e ? 0xafa5 :
+						cur_live.shift_reg_low<16>() == 0xf56a ? 0x8fe7 :
+						cur_live.shift_reg_low<16>() == 0xf56b ? 0x9fc6 :
+						cur_live.shift_reg_low<16>() == 0xf56e ? 0xafa5 :
 						0xbf84;
 
-					if((cur_live.data_reg & 0xfe) == 0xf8)
+					reset_data_sync();
+
+					if(extended_ddam) {
+						if(!(cur_live.data_reg & 1))
+							status |= S_DDM;
+						if(!(cur_live.data_reg & 2))
+							status |= S_DDM << 1;
+					} else if((cur_live.data_reg & 0xfe) == 0xf8)
 						status |= S_DDM;
 
-					cur_live.data_separator_phase = false;
-					cur_live.bit_counter = 0;
 					cur_live.state = READ_SECTOR_DATA;
 				}
 			}
@@ -1939,15 +1969,8 @@ void wd_fdc_device_base::live_run(attotime limit)
 			if(read_one_bit(limit))
 				return;
 
-			LOGSHIFT("%s: shift = %04x data=%02x counter=%d\n", cur_live.tm.to_string(), cur_live.shift_reg,
-					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
-					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
-					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
-					(cur_live.shift_reg & 0x0100 ? 0x10 : 0x00) |
-					(cur_live.shift_reg & 0x0040 ? 0x08 : 0x00) |
-					(cur_live.shift_reg & 0x0010 ? 0x04 : 0x00) |
-					(cur_live.shift_reg & 0x0004 ? 0x02 : 0x00) |
-					(cur_live.shift_reg & 0x0001 ? 0x01 : 0x00),
+			LOGSHIFT("%s: shift = %08x data=%02x counter=%d\n", cur_live.tm.to_string(), cur_live.shift_reg,
+					cur_live.shift_reg_data(),
 					cur_live.bit_counter);
 
 			if(cur_live.bit_counter & 15)
@@ -1956,7 +1979,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 			int slot = cur_live.bit_counter >> 4;
 
 			if(slot < 3) {
-				if(cur_live.shift_reg != 0x4489) {
+				if(cur_live.shift_reg_low<16>() != 0x4489) {
 					live_delay(SEARCH_ADDRESS_MARK_DATA_FAILED);
 					return;
 				}
@@ -2020,14 +2043,26 @@ void wd_fdc_device_base::live_run(attotime limit)
 			if(read_one_bit(limit))
 				return;
 
+			if(dden) {
+				//FM Prefix match
+				if(cur_live.shift_reg_low<17>() == 0xabd5) { // 17-bit match
+					cur_live.data_separator_phase = false;
+					cur_live.bit_counter = 5*2; // prefix is 5 of 8 bits
+					cur_live.data_reg = 0xff;
+					break;
+				} else if(cur_live.bit_counter == 16) {
+					cur_live.data_separator_phase = false;
+					cur_live.bit_counter = 0;
+					live_delay(READ_TRACK_DATA_BYTE);
+					return;
+				}
+				break;
+			}
+			// !dden
 			if(cur_live.bit_counter != 16
 				// MFM resyncs
-				&& !(!dden && (cur_live.shift_reg == 0x4489
-							|| cur_live.shift_reg == 0x5224))
-				// FM resyncs
-				&& !(dden && (cur_live.shift_reg == 0xf57e      // FM IDAM
-							|| cur_live.shift_reg == 0xf56f     // FM DAM
-							|| cur_live.shift_reg == 0xf56a))   // FM DDAM
+				&& !((cur_live.shift_reg_low<16>() == 0x4489
+							|| cur_live.shift_reg_low<16>() == 0x5224))
 				)
 				break;
 
@@ -2044,8 +2079,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 			// MZ: TI99 "DISkASSEMBLER" copy protection requires a threshold of 8
 			bool output_byte = cur_live.bit_counter > 8;
 
-			cur_live.data_separator_phase = false;
-			cur_live.bit_counter = 0;
+			reset_data_sync();
 
 			if(output_byte) {
 				live_delay(READ_TRACK_DATA_BYTE);
@@ -2194,7 +2228,11 @@ void wd_fdc_device_base::live_run(attotime limit)
 						live_write_fm(0x00);
 					else if(cur_live.byte_counter < 7) {
 						cur_live.crc = 0xffff;
-						live_write_raw(command & 1 ? 0xf56a : 0xf56f);
+						if(extended_ddam) {
+							static const uint16_t dam[4] = { 0xf56f, 0xf56e, 0xf56b, 0xf56a };
+							live_write_raw(dam[command & 3]);
+						} else
+							live_write_raw(command & 1 ? 0xf56a : 0xf56f);
 					} else if(cur_live.byte_counter < sector_size + 7-1) {
 						if(drq) {
 							status |= S_LOST;
@@ -2340,9 +2378,6 @@ void wd_fdc_device_base::set_drq()
 {
 	if(drq) {
 		status |= S_LOST;
-		drq = false;
-		if(!drq_cb.isnull())
-			drq_cb(false);
 	} else if(!(status & S_LOST)) {
 		drq = true;
 		if(!drq_cb.isnull())
@@ -2701,6 +2736,7 @@ fd1771_device::fd1771_device(const machine_config &mconfig, const char *tag, dev
 	motor_control = false;
 	ready_hooked = true;
 	spinup_on_interrupt = true; // ZX-Spectrum Beta-disk V2 require this, or ReadSector command should set HLD before RDY check
+	extended_ddam = true;
 }
 
 int fd1771_device::calc_sector_size(uint8_t size, uint8_t command) const

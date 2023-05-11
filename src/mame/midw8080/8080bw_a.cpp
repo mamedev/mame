@@ -1062,7 +1062,7 @@ void _8080bw_state::schaser_sh_port_1_w(uint8_t data)
 			/* disable effect - stops at end of low cycle */
 			if (!m_schaser_effect_555_is_low)
 			{
-				m_schaser_effect_555_time_remain = m_schaser_effect_555_timer->time_left();
+				m_schaser_effect_555_time_remain = m_schaser_effect_555_timer->remaining();
 				m_schaser_effect_555_time_remain_savable = m_schaser_effect_555_time_remain.as_double();
 				m_schaser_effect_555_timer->adjust(attotime::never);
 			}
@@ -1581,7 +1581,7 @@ void cane_audio_device::sh_port_1_w(u8 data)
 	m_sn->set_mixer_params(BIT(data, 2), BIT(data, 3), BIT(data, 1));
 
 	m_vco_timer->adjust(attotime::zero, m_vco_timer->param(), attotime::from_hz(1000));
-	m_vco_rc_chargetime = m_vco_timer->start_time();
+	m_vco_rc_chargetime = m_vco_timer->start();
 
 	// Little hack...
 	// To be precise I should enable the 76477 every time the CPU reads or write to a port different from port 3
@@ -1729,7 +1729,7 @@ DISCRETE_SOUND_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(cane_audio_device::vco_voltage_timer)
 {
-	const double delta = (m_vco_timer->fire_time() - m_vco_rc_chargetime).as_double();
+	const double delta = (m_vco_timer->expire() - m_vco_rc_chargetime).as_double();
 	const double voltage = 5 * (1 - std::exp(-delta / 47));
 
 	LOG("t = %d\n", delta);

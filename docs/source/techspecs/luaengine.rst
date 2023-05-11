@@ -53,9 +53,9 @@ Many of the classes are documented on the
 Usage
 -----
 
-MAME supports external scripting via Lua (>= 5.3) scripts, either entered at the
+MAME supports external scripting via Lua scripts, either entered at the
 interactive console or loaded as a file. To reach the console, enable the
-console plugin (e.g. run MAME with ``-plugin console``) and you will be greeted
+console plugin (e.g. run MAME with ``-console``) and you will be greeted
 with a ``[MAME]>`` prompt where you can enter Lua script interactively.
 
 To load a whole script at once, store it in a plain text file and pass it using
@@ -78,7 +78,7 @@ Let’s first run MAME in a terminal to reach the Lua console:
 
 ::
 
-    $ mame -console YOUR_ROM
+    $ mame -console YOUR_SYSTEM
            /|  /|    /|     /|  /|    _______
           / | / |   / |    / | / |   /      /
          /  |/  |  /  |   /  |/  |  /  ____/
@@ -90,10 +90,10 @@ Let’s first run MAME in a terminal to reach the Lua console:
              /  /
             / _/
 
-    mame 0.227
+    mame 0.254
     Copyright (C) Nicola Salmoria and the MAME team
 
-    Lua 5.3
+    Lua 5.4
     Copyright (C) Lua.org, PUC-Rio
 
     [MAME]>
@@ -113,7 +113,7 @@ You can check at runtime which version of MAME you are running, with:
 ::
 
     [MAME]> print(emu.app_name() .. " " .. emu.app_version())
-    mame 0.227
+    mame 0.254
 
 We now start exploring screen related methods.  First, let's enumerate available
 screens:

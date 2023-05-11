@@ -5,8 +5,8 @@
 
 */
 
-#ifndef MAME_VIDEO_SEGAIC24_H
-#define MAME_VIDEO_SEGAIC24_H
+#ifndef MAME_SEGA_SEGAIC24_H
+#define MAME_SEGA_SEGAIC24_H
 
 #pragma once
 
@@ -119,4 +119,4 @@ DECLARE_DEVICE_TYPE(S24TILE,   segas24_tile_device)
 DECLARE_DEVICE_TYPE(S24SPRITE, segas24_sprite_device)
 DECLARE_DEVICE_TYPE(S24MIXER,  segas24_mixer_device)
 
-#endif // MAME_VIDEO_SEGAIC24_H
+#endif // MAME_SEGA_SEGAIC24_H

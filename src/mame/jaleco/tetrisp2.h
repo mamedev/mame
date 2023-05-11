@@ -1,11 +1,20 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
+#ifndef MAME_JALECO_TETRISP2_H
+#define MAME_JALECO_TETRISP2_H
+
+#pragma once
+
+#include "jaleco_ms32_sysctrl.h"
+#include "jaleco_vj_pc.h"
+#include "ms32_sprite.h"
 
 #include "machine/gen_latch.h"
-#include "jaleco_ms32_sysctrl.h"
-#include "ms32_sprite.h"
+
 #include "emupal.h"
+#include "screen.h"
 #include "tilemap.h"
+
 
 class tetrisp2_state : public driver_device
 {
@@ -214,14 +223,19 @@ public:
 		, m_vj_paletteram_m(*this, "paletteram2")
 		, m_vj_paletteram_r(*this, "paletteram3")
 		, m_soundlatch(*this, "soundlatch")
+		, m_jaleco_vj_pc(*this, "jaleco_vj_pc")
+		, m_soundvr(*this, "SOUND_VR%u", 1)
+		, m_rscreen(*this, "rscreen")
 	{ }
 
 	void stepstag(machine_config &config);
 	void vjdash(machine_config &config);
 
-	void init_stepstag();
-
 	DECLARE_VIDEO_START(stepstag);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	u16 stepstag_coins_r();
@@ -229,10 +243,8 @@ private:
 	bool vj_upload_fini = false;
 	void stepstag_b00000_w(u16 data);
 	void stepstag_b20000_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void stepstag_main2pc_w(u16 data);
-	u16 unknown_read_0xc00000();
+	u16 stepstag_sprite_status_status_r();
 	u16 unknown_read_0xffff00();
-	u16 stepstag_pc2main_r();
 	void stepstag_soundlatch_word_w(u16 data);
 	void stepstag_neon_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void stepstag_step_leds_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -241,19 +253,32 @@ private:
 	void stepstag_palette_mid_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void stepstag_palette_right_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	TILE_GET_INFO_MEMBER(stepstag_get_tile_info_fg);
+	void stepstag_spriteram1_updated_w(u16 data);
+	void stepstag_spriteram2_updated_w(u16 data);
+	void stepstag_spriteram3_updated_w(u16 data);
+	void adv7176a_w(u16 data);
+
+	u16 stepstag_soundvolume_r();
+
 	u32 screen_update_stepstag_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	u32 screen_update_stepstag_mid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	u32 screen_update_stepstag_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	u32 screen_update_stepstag_main(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-//  inline int mypal(int x);
+
+	u32 screen_update_vjdash_main(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_vjdash_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update_vjdash_mid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update_vjdash_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	u32 screen_update_nop(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void stepstag_map(address_map &map);
 	void stepstag_sub_map(address_map &map);
 	void vjdash_map(address_map &map);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(field_cb);
+	DECLARE_WRITE_LINE_MEMBER(field_cb);
 	void setup_non_sysctrl_screen(machine_config &config, screen_device *screen, const XTAL xtal);
+
+	void convert_yuv422_to_rgb888(palette_device *paldev, u16 *palram,u32 offset);
 
 	required_device<cpu_device> m_subcpu;
 	optional_device<ms32_sprite_device> m_vj_sprite_l;
@@ -268,5 +293,20 @@ private:
 	optional_shared_ptr<u16> m_vj_paletteram_m;
 	optional_shared_ptr<u16> m_vj_paletteram_r;
 	required_device<generic_latch_16_device> m_soundlatch;
-	void convert_yuv422_to_rgb888(palette_device *paldev, u16 *palram,u32 offset);
+	required_device<jaleco_vj_pc_device> m_jaleco_vj_pc;
+	optional_ioport_array<2> m_soundvr;
+	required_device<screen_device> m_rscreen;
+
+	std::unique_ptr<uint16_t[]> m_spriteram1_data;
+	std::unique_ptr<uint16_t[]> m_spriteram2_data;
+	std::unique_ptr<uint16_t[]> m_spriteram3_data;
+
+	uint8_t m_adv7176a_sclock;
+	uint8_t m_adv7176a_sdata;
+	uint8_t m_adv7176a_state;
+	uint8_t m_adv7176a_byte;
+	uint8_t m_adv7176a_shift;
+	uint16_t m_adv7176a_subaddr;
 };
+
+#endif // MAME_JALECO_TETRISP2_H

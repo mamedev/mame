@@ -17,6 +17,8 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+// ======================> bbc_mastersd_device
+
 class bbc_mastersd_device : public device_t, public device_bbc_cart_interface
 {
 public:
@@ -24,6 +26,8 @@ public:
 	bbc_mastersd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	bbc_mastersd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -35,7 +39,6 @@ protected:
 	virtual uint8_t read(offs_t offset, int infc, int infd, int romqa, int oe, int oe2) override;
 	virtual void write(offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2) override;
 
-private:
 	required_device<spi_sdcard_device> m_sdcard;
 
 	TIMER_CALLBACK_MEMBER(spi_clock);
@@ -52,8 +55,25 @@ private:
 };
 
 
+// ======================> bbc_mastersdr2_device
+
+class bbc_mastersdr2_device : public bbc_mastersd_device
+{
+public:
+	// construction/destruction
+	bbc_mastersdr2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// electron_cart_interface overrides
+	virtual uint8_t read(offs_t offset, int infc, int infd, int romqa, int oe, int oe2) override;
+	virtual void write(offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2) override;
+};
+
+
+
 // device type definition
 DECLARE_DEVICE_TYPE(BBC_MASTERSD, bbc_mastersd_device)
+DECLARE_DEVICE_TYPE(BBC_MASTERSDR2, bbc_mastersdr2_device)
 
 
 #endif // MAME_BUS_BBC_CART_MASTERSD_H

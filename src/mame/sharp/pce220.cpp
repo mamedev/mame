@@ -23,15 +23,18 @@
 ****************************************************************************/
 
 #include "emu.h"
+
+#include "pce220_ser.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/input_merger.h"
 #include "machine/nvram.h"
-#include "pce220_ser.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/beep.h"
 #include "video/hd61202.h"
 #include "video/sed1520.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -53,7 +56,7 @@ public:
 		, m_beep(*this, "beeper")
 		, m_lcdc(*this, "hd61202")
 		, m_input_merger(*this, "input_merger")
-		, m_serial(*this, PCE220SERIAL_TAG)
+		, m_serial(*this, "serial")
 		, m_keyboard(*this, "LINE%u", 0)
 		, m_io_on(*this, "ON")
 		, m_battery(*this, "BATTERY")

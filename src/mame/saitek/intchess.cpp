@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Berger, Achim
-/******************************************************************************
+/*******************************************************************************
 
 SciSys Intelligent Chess
 
@@ -24,7 +24,7 @@ TODO:
   and cyan are not standard 0x00ff00 / 0x00ffff)
 - video timing is unknown, sprite offsets are estimated from photos
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
@@ -118,9 +118,9 @@ INPUT_CHANGED_MEMBER(intchess_state::reset_button)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Video
-******************************************************************************/
+*******************************************************************************/
 
 void intchess_state::init_palette(palette_device &palette) const
 {
@@ -154,6 +154,10 @@ u32 intchess_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
+static GFXDECODE_START( gfx_intchess )
+	GFXDECODE_ENTRY( "gfx", 0, gfx_8x8x1, 0, 2 )
+GFXDECODE_END
+
 void intchess_state::vram_w(offs_t offset, u8 data)
 {
 	// d0-d2: sprite index
@@ -164,9 +168,9 @@ void intchess_state::vram_w(offs_t offset, u8 data)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void intchess_state::update_display()
 {
@@ -211,9 +215,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(intchess_state::cass_input)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void intchess_state::main_map(address_map &map)
 {
@@ -227,9 +231,9 @@ void intchess_state::main_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( intchess )
 	PORT_START("X1")
@@ -266,30 +270,9 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
-    GFX Layouts
-******************************************************************************/
-
-static const gfx_layout layout_8x8 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	8*8
-};
-
-static GFXDECODE_START( gfx_intchess )
-	GFXDECODE_ENTRY( "gfx", 0, layout_8x8, 0, 2 )
-GFXDECODE_END
-
-
-
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void intchess_state::intchess(machine_config &config)
 {
@@ -340,9 +323,9 @@ void intchess_state::intchess(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( intchess )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -357,9 +340,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME      PARENT CMP MACHINE   INPUT     STATE           INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1980, intchess, 0,      0, intchess, intchess, intchess_state, empty_init, "SciSys / Intelligent Games", "Intelligent Chess", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1980, intchess, 0,      0,      intchess, intchess, intchess_state, empty_init, "SciSys / Intelligent Games", "Intelligent Chess", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS )

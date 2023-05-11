@@ -320,7 +320,9 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
+#include "machine/rescap.h"
 #include "sound/dac.h"
+#include "sound/flt_biquad.h"
 #include "sound/ymopl.h"
 #include "speaker.h"
 
@@ -639,13 +641,13 @@ void bigfghtr_state::bigfghtr_mcu_io_map(address_map &map)
 	map(0x00600, 0x03fff).ram().share("sharedram");
 }
 
-void armedf_state::sound_map(address_map &map)
+void armedf_state::sound_map(address_map &map) // common sound map for the terra force bottom pcb, also used on armed f, tatakae big fighter, etc
 {
 	map(0x0000, 0xf7ff).rom();
 	map(0xf800, 0xffff).ram();
 }
 
-void armedf_state::cclimbr2_soundmap(address_map &map)
+void armedf_state::cclimbr2_soundmap(address_map &map) // common sound map for the crazy climber 2 and legion bottom pcbs
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xffff).ram();
@@ -1104,22 +1106,81 @@ void armedf_state::video_config(machine_config &config, int hchar_start, int vst
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 }
 
-void armedf_state::sound_config(machine_config &config)
+void armedf_state::sound_config_common(machine_config &config) // common amongst all pcbs
 {
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(24'000'000)/6));      // 4mhz
-	audiocpu.set_addrmap(AS_PROGRAM, &armedf_state::sound_map);
-	audiocpu.set_addrmap(AS_IO, &armedf_state::sound_portmap);
-	audiocpu.set_periodic_int(FUNC(armedf_state::irq0_line_hold), attotime::from_hz(XTAL(8'000'000)/2/512));    // ?
+	Z80(config, m_audiocpu, XTAL(24'000'000)/6);      // 4mhz
+	m_audiocpu->set_periodic_int(FUNC(armedf_state::irq0_line_hold), attotime::from_hz(XTAL(8'000'000)/2/512));    // ?
 
 	SPEAKER(config, "speaker").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM3812(config, "ymsnd", XTAL(24'000'000)/6).add_route(ALL_OUTPUTS, "speaker", 0.5);  // 4mhz
+	// Note: Component locations here come from the common terra force/sky robo
+	// /takakae! big fighter sound pcb; the locations and components are not
+	// yet verified for other sound pcbs, although from pictures of a legion
+	// pcb, while the component locations are different, the values appear
+	// to be the same.
+	// The 3 mixing resistors for YM, DAC1 and DAC2 are all identical (1K).
+	// However, the actual volume output by the ym3014 dac and the r2r resistors
+	//  is not the same range on each!
+	// The YM3014 dac has a DC offset of 1/2 VDD, then +- 1/4 VDD of signal,
+	//  so min of 1.25v and max of 3.75v, vpp of 2.5v
+	// The R2R dacs are full range, min of 0v and max of (almost) 5v, vpp of ~5.0v
+	// Because of this, we have to compensate as MAME's ymfm core outputs full range.
+	// Math::
+	//  YMFM:  0.3333 * 0.5 = 0.16665
+	//  DAC1:  0.3333 * 1.0 = 0.3333
+	//  DAC2:  0.3333 * 1.0 = 0.3333
+	//  Sum:                  0.83325
+	//  Multiply all 3 values by 1 / 0.83325 (i.e. 1.20012):
+	// Final values are: ym: 0.2; dac1: 0.4; dac2: 0.4
+	FILTER_BIQUAD(config, m_ymfilter).opamp_sk_lowpass_setup(RES_K(4.7), RES_K(4.7), RES_M(999.99), RES_R(0.001), CAP_N(3.3), CAP_N(1.0)); // R17, R16, nothing(infinite resistance), wire(short), C82, C68
+	m_ymfilter->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_BIQUAD(config, m_dacfilter1).opamp_sk_lowpass_setup(RES_K(10), RES_K(10), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7)); // R15, R10, nothing(infinite resistance), wire(short), C81, C60
+	m_dacfilter1->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_BIQUAD(config, m_dacfilter2).opamp_sk_lowpass_setup(RES_K(10), RES_K(10), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7)); // R13, R9, nothing(infinite resistance), wire(short), C66, C61
+	m_dacfilter2->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // 10-pin SIP with 74HC374P latch
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // 10-pin SIP with 74HC374P latch
+	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, m_dacfilter1, 0.4); // SIP R2R DAC @ G11-1 with 74HC374P latch
+	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, m_dacfilter2, 0.4); // SIP R2R DAC @ G11-2 with 74HC374P latch
 }
+
+void armedf_state::sound_config(machine_config &config) // 3526, used on almost all non-bootlegs
+{
+	sound_config_common(config);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &armedf_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &armedf_state::sound_3526_portmap);
+
+	YM3526(config, "ymsnd", XTAL(24'000'000)/6).add_route(ALL_OUTPUTS, m_ymfilter, 0.2);
+}
+
+void armedf_state::sound_config_3812(machine_config &config) // 3812, used on bootlegs and skyrobo/bigfghtr
+{
+	sound_config_common(config);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &armedf_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &armedf_state::sound_portmap);
+
+	YM3812(config, "ymsnd", XTAL(24'000'000)/6).add_route(ALL_OUTPUTS, m_ymfilter, 0.2);
+}
+
+void armedf_state::sound_config_legion(machine_config &config) // 3526, used on non-bootleg legion and cclimbr2
+{
+	sound_config_common(config);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &armedf_state::cclimbr2_soundmap);
+	m_audiocpu->set_addrmap(AS_IO, &armedf_state::sound_3526_portmap);
+
+	YM3526(config, "ymsnd", XTAL(24'000'000)/6).add_route(ALL_OUTPUTS, m_ymfilter, 0.2);
+}
+
+void armedf_state::sound_config_legion_3812(machine_config &config) // 3812, used on legion bootlegs
+{
+	sound_config_common(config);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &armedf_state::cclimbr2_soundmap);
+	m_audiocpu->set_addrmap(AS_IO, &armedf_state::sound_portmap);
+
+	YM3812(config, "ymsnd", XTAL(24'000'000)/6).add_route(ALL_OUTPUTS, m_ymfilter, 0.2);
+}
+
 
 void armedf_state::terraf(machine_config &config)
 {
@@ -1142,11 +1203,6 @@ void armedf_state::terrafjb(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &armedf_state::terrafjb_map);
 	m_maincpu->set_vblank_int("screen", FUNC(armedf_state::irq1_line_assert));
 
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(24'000'000)/6));      // 4mhz
-	audiocpu.set_addrmap(AS_PROGRAM, &armedf_state::sound_map);
-	audiocpu.set_addrmap(AS_IO, &armedf_state::sound_portmap);
-	audiocpu.set_periodic_int(FUNC(armedf_state::irq0_line_hold), attotime::from_hz(XTAL(8'000'000)/2/512));    // ?
-
 	Z80(config, m_extra, XTAL(16'000'000)/4);         // 4mhz?
 	m_extra->set_addrmap(AS_PROGRAM, &armedf_state::terrafjb_extraz80_map);
 	m_extra->set_addrmap(AS_IO, &armedf_state::terrafjb_extraz80_portmap);
@@ -1155,14 +1211,7 @@ void armedf_state::terrafjb(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
 
 	/* sound hardware */
-	SPEAKER(config, "speaker").front_center();
-
-	GENERIC_LATCH_8(config, m_soundlatch);
-
-	YM3812(config, "ymsnd", XTAL(24'000'000)/6).add_route(ALL_OUTPUTS, "speaker", 0.5);      // 4mhz
-
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // unknown DAC
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // unknown DAC
+	sound_config_3812(config);
 }
 
 void armedf_state::terrafb(machine_config &config)
@@ -1194,23 +1243,11 @@ void armedf_state::armedf(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &armedf_state::armedf_map);
 	m_maincpu->set_vblank_int("screen", FUNC(armedf_state::irq1_line_assert));
 
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(24'000'000)/6));      // 4mhz
-	audiocpu.set_addrmap(AS_PROGRAM, &armedf_state::sound_map);
-	audiocpu.set_addrmap(AS_IO, &armedf_state::sound_portmap);
-	audiocpu.set_periodic_int(FUNC(armedf_state::irq0_line_hold), attotime::from_hz(XTAL(8'000'000)/2/512));    // ?
-
 	video_config(config, 12, 8, 248);
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,armedf)
 
 	/* sound hardware */
-	SPEAKER(config, "speaker").front_center();
-
-	GENERIC_LATCH_8(config, m_soundlatch);
-
-	YM3812(config, "ymsnd", XTAL(24'000'000)/6).add_route(ALL_OUTPUTS, "speaker", 0.5);      // 4mhz
-
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
+	sound_config(config);
 }
 
 void armedf_state::cclimbr2(machine_config &config)
@@ -1219,25 +1256,13 @@ void armedf_state::cclimbr2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &armedf_state::cclimbr2_map);
 	m_maincpu->set_vblank_int("screen", FUNC(armedf_state::irq2_line_assert));
 
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(24'000'000)/6));      // 4mhz
-	audiocpu.set_addrmap(AS_PROGRAM, &armedf_state::cclimbr2_soundmap);
-	audiocpu.set_addrmap(AS_IO, &armedf_state::sound_portmap);
-	audiocpu.set_periodic_int(FUNC(armedf_state::irq0_line_hold), attotime::from_hz(XTAL(8'000'000)/2/512));    // ?
-
 	NB1414M4(config, m_nb1414m4, 0);
 
 	video_config(config, 14, 16, 240);
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
 
 	/* sound hardware */
-	SPEAKER(config, "speaker").front_center();
-
-	GENERIC_LATCH_8(config, m_soundlatch);
-
-	YM3812(config, "ymsnd", XTAL(24'000'000)/6).add_route(ALL_OUTPUTS, "speaker", 0.5); // or YM3526?
-
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // unknown DAC
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // unknown DAC
+	sound_config_legion(config);
 }
 
 void armedf_state::legion_common(machine_config &config)
@@ -1245,20 +1270,8 @@ void armedf_state::legion_common(machine_config &config)
 	M68000(config, m_maincpu, XTAL(16'000'000)/2);   // 8mhz
 	m_maincpu->set_vblank_int("screen", FUNC(armedf_state::irq2_line_assert));
 
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(24'000'000)/6));      // 4mhz
-	audiocpu.set_addrmap(AS_PROGRAM, &armedf_state::cclimbr2_soundmap);
-	audiocpu.set_periodic_int(FUNC(armedf_state::irq0_line_hold), attotime::from_hz(XTAL(8'000'000)/2/512));    // ?
-
 	video_config(config, 14, 16, 240);
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
-
-	/* sound hardware */
-	SPEAKER(config, "speaker").front_center();
-
-	GENERIC_LATCH_8(config, m_soundlatch);
-
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // 10-pin SIP with 74HC374P latch
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // 10-pin SIP with 74HC374P latch
 }
 
 void armedf_state::legion(machine_config &config)
@@ -1267,11 +1280,10 @@ void armedf_state::legion(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &armedf_state::legion_map);
 
-	subdevice<z80_device>("audiocpu")->set_addrmap(AS_IO, &armedf_state::sound_3526_portmap);
-
 	NB1414M4(config, m_nb1414m4, 0);
 
-	YM3526(config, "ymsnd", XTAL(24'000'000)/6).add_route(ALL_OUTPUTS, "speaker", 0.5);      // 4mhz
+	/* sound hardware */
+	sound_config_legion(config);
 }
 
 void armedf_state::legionjb(machine_config &config)
@@ -1280,9 +1292,8 @@ void armedf_state::legionjb(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &armedf_state::legionjb_map);
 
-	subdevice<z80_device>("audiocpu")->set_addrmap(AS_IO, &armedf_state::sound_portmap);
-
-	YM3812(config, "ymsnd", XTAL(24'000'000)/6).add_route(ALL_OUTPUTS, "speaker", 0.5); // or YM3526?
+	/* sound hardware */
+	sound_config_legion_3812(config);
 }
 
 void armedf_state::legionjb2(machine_config &config)
@@ -1306,7 +1317,7 @@ void bigfghtr_state::bigfghtr(machine_config &config)
 	video_config(config, 12, 8, 248);
 	MCFG_VIDEO_START_OVERRIDE(bigfghtr_state,armedf)
 
-	sound_config(config);
+	sound_config_3812(config);
 }
 
 /*************************************

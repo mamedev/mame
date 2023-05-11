@@ -265,6 +265,8 @@ IC46->PAL16V8H 74LS393N 74LS368AP 74LS377B1|U||    |   |                        
 #include "sound/ymopn.h"
 
 
+namespace {
+
 class toki_ms_state : public driver_device
 {
 public:
@@ -827,5 +829,8 @@ void toki_ms_state::init_tokims()
 	descramble_16x16tiles(memregion("gfx4")->base(), memregion("gfx4")->bytes());
 	// gfx3 is 8x8 tiles
 }
+
+} // anonymous namespace
+
 
 GAME( 1991, tokims,  toki,  tokims,  tokims,  toki_ms_state, init_tokims, ROT0, "bootleg", "Toki (Modular System)", MACHINE_IMPERFECT_SOUND )

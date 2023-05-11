@@ -106,7 +106,7 @@
 		<rect state="0">
 			<color red="0.22" green="0.22" blue="0.04"/>
 		</rect>
-		<text string="&#xA3;2.40">
+		<text string="£2.40">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -146,7 +146,7 @@
 		<rect state="0">
 			<color red="0.22" green="0.22" blue="0.04"/>
 		</rect>
-		<text string="&#xA3;3.00">
+		<text string="£3.00">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -166,7 +166,7 @@
 		<rect state="0">
 			<color red="0.22" green="0.22" blue="0.04"/>
 		</rect>
-		<text string="&#xA3;3.20">
+		<text string="£3.20">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -246,7 +246,7 @@
 		<rect state="0">
 			<color red="0.22" green="0.22" blue="0.04"/>
 		</rect>
-		<text string="&#xA3;3.60">
+		<text string="£3.60">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -326,7 +326,7 @@
 		<rect state="0">
 			<color red="0.22" green="0.22" blue="0.04"/>
 		</rect>
-		<text string="&#xA3;4.00">
+		<text string="£4.00">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -366,7 +366,7 @@
 		<rect state="0">
 			<color red="0.22" green="0.22" blue="0.04"/>
 		</rect>
-		<text string="&#xA3;5.00">
+		<text string="£5.00">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -410,7 +410,7 @@
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.45"/>
 		</text>
-		<text string="&#xA3;10 ">
+		<text string="£10 ">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.50" width="0.90" height="0.45"/>
 		</text>
@@ -450,7 +450,7 @@
 		<rect state="0">
 			<color red="0.22" green="0.22" blue="0.04"/>
 		</rect>
-		<text string="&#xA3;2.20">
+		<text string="£2.20">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -490,7 +490,7 @@
 		<rect state="0">
 			<color red="0.22" green="0.22" blue="0.04"/>
 		</rect>
-		<text string="&#xA3;1.60">
+		<text string="£1.60">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -550,7 +550,7 @@
 		<rect state="0">
 			<color red="0.22" green="0.22" blue="0.04"/>
 		</rect>
-		<text string="&#xA3;1.20">
+		<text string="£1.20">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -570,7 +570,7 @@
 		<rect state="0">
 			<color red="0.22" green="0.22" blue="0.04"/>
 		</rect>
-		<text string="&#xA3;1.00">
+		<text string="£1.00">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -670,7 +670,7 @@
 		<rect state="0">
 			<color red="0.22" green="0.22" blue="0.04"/>
 		</rect>
-		<text string="&#xA3;2.00">
+		<text string="£2.00">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -774,7 +774,7 @@
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.45"/>
 		</text>
-		<text string="&#xA3;1.00">
+		<text string="£1.00">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.50" width="0.90" height="0.45"/>
 		</text>
@@ -798,7 +798,7 @@
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.45"/>
 		</text>
-		<text string="&#xA3;2.00">
+		<text string="£2.00">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.50" width="0.90" height="0.45"/>
 		</text>
@@ -822,7 +822,7 @@
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.45"/>
 		</text>
-		<text string="&#xA3;1.60">
+		<text string="£1.60">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.50" width="0.90" height="0.45"/>
 		</text>
@@ -846,7 +846,7 @@
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.45"/>
 		</text>
-		<text string="&#xA3;2.40">
+		<text string="£2.40">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.50" width="0.90" height="0.45"/>
 		</text>
@@ -870,7 +870,7 @@
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.45"/>
 		</text>
-		<text string="&#xA3;10.00 Jackpot">
+		<text string="£10.00 Jackpot">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.50" width="0.90" height="0.45"/>
 		</text>
@@ -894,7 +894,7 @@
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.45"/>
 		</text>
-		<text string="&#xA3;3.00">
+		<text string="£3.00">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.50" width="0.90" height="0.45"/>
 		</text>
@@ -1126,7 +1126,7 @@
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.45"/>
 		</text>
-		<text string="&#xA3;1">
+		<text string="£1">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.50" width="0.90" height="0.45"/>
 		</text>
@@ -1839,54 +1839,24 @@
 		<element ref="vfd0_background">
 			<bounds x="268" y="362" width="272" height="30"/>
 		</element>
-		<element name="vfd15" ref="vfd0" state="0">
-			<bounds x="268" y="362" width="17" height="30"/>
-		</element>
-		<element name="vfd14" ref="vfd0" state="0">
-			<bounds x="285" y="362" width="17" height="30"/>
-		</element>
-		<element name="vfd13" ref="vfd0" state="0">
-			<bounds x="302" y="362" width="17" height="30"/>
-		</element>
-		<element name="vfd12" ref="vfd0" state="0">
-			<bounds x="319" y="362" width="17" height="30"/>
-		</element>
-		<element name="vfd11" ref="vfd0" state="0">
-			<bounds x="336" y="362" width="17" height="30"/>
-		</element>
-		<element name="vfd10" ref="vfd0" state="0">
-			<bounds x="353" y="362" width="17" height="30"/>
-		</element>
-		<element name="vfd9" ref="vfd0" state="0">
-			<bounds x="370" y="362" width="17" height="30"/>
-		</element>
-		<element name="vfd8" ref="vfd0" state="0">
-			<bounds x="387" y="362" width="17" height="30"/>
-		</element>
-		<element name="vfd7" ref="vfd0" state="0">
-			<bounds x="404" y="362" width="17" height="30"/>
-		</element>
-		<element name="vfd6" ref="vfd0" state="0">
-			<bounds x="421" y="362" width="17" height="30"/>
-		</element>
-		<element name="vfd5" ref="vfd0" state="0">
-			<bounds x="438" y="362" width="17" height="30"/>
-		</element>
-		<element name="vfd4" ref="vfd0" state="0">
-			<bounds x="455" y="362" width="17" height="30"/>
-		</element>
-		<element name="vfd3" ref="vfd0" state="0">
-			<bounds x="472" y="362" width="17" height="30"/>
-		</element>
-		<element name="vfd2" ref="vfd0" state="0">
-			<bounds x="489" y="362" width="17" height="30"/>
-		</element>
-		<element name="vfd1" ref="vfd0" state="0">
-			<bounds x="506" y="362" width="17" height="30"/>
-		</element>
-		<element name="vfd0" ref="vfd0" state="0">
-			<bounds x="523" y="362" width="17" height="30"/>
-		</element>
+
+		<repeat count="16">
+			<param name="n" start="15" increment="-1"/>
+			<param name="x" start="268" increment="17"/>
+			<element name="vfdblank~n~" ref="vfd0" state="0">
+				<animate name="vfdduty0" />
+				<color state="31" red="0.00" green="0.6" blue="1.00" alpha="0.0"/>
+				<color state="0" red="0.00" green="0.6" blue="1.00" alpha="1.0"/>
+				<bounds x="~x~" y="362" width="17" height="30"/>
+			</element>
+			<element name="vfd~n~" ref="vfd0" state="0">
+				<animate name="vfdduty0" />
+				<color state="0" red="0.00" green="0.6" blue="1.00" alpha="0.0"/>
+				<color state="31" red="0.00" green="0.6" blue="1.00" alpha="1.0"/>
+				<bounds x="~x~" y="362" width="17" height="30"/>
+			</element>
+		</repeat>
+
 		<element name="label109" ref="label_109">
 			<bounds x="876" y="75" width="83" height="13"/>
 		</element>

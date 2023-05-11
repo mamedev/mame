@@ -12,6 +12,7 @@
 
 #include "config.h"
 #include "emuopts.h"
+#include "main.h"
 #include "speaker.h"
 
 #include "wavwrite.h"
@@ -711,7 +712,7 @@ read_stream_view sound_stream::update_view(attotime start, attotime end, u32 out
 	if (start > end)
 		start = end;
 
-	g_profiler.start(PROFILER_SOUND);
+	auto profile = g_profiler.start(PROFILER_SOUND);
 
 	// reposition our start to coincide with the current buffer end
 	attotime update_start = m_output[outputnum].end_time();
@@ -759,7 +760,6 @@ read_stream_view sound_stream::update_view(attotime start, attotime end, u32 out
 #endif
 		}
 	}
-	g_profiler.stop();
 
 	// return the requested view
 	return read_stream_view(m_output_view[outputnum], start);
@@ -1093,14 +1093,6 @@ sound_manager::sound_manager(running_machine &machine) :
 	m_wavfile(),
 	m_first_reset(true)
 {
-	// get filename for WAV file or AVI file if specified
-	const char *wavfile = machine.options().wav_write();
-	const char *avifile = machine.options().avi_write();
-
-	// handle -nosound and lower sample rate if not recording WAV or AVI
-	if (m_nosound_mode && wavfile[0] == 0 && avifile[0] == 0)
-		machine.m_sample_rate = 11025;
-
 	// count the mixers
 #if VERBOSE
 	mixer_interface_enumerator iter(machine.root_device());
@@ -1385,7 +1377,12 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 
 	// master volume attenuation
 	if (util::xml::data_node const *node = parentnode->get_child("attenuation"))
-		set_attenuation(std::clamp(int(node->get_attribute_int("value", 0)), -32, 0));
+	{
+		// treat source INI files or more specific as higher priority than CFG
+		// FIXME: leaky abstraction - this depends on a front-end implementation detail
+		if ((OPTION_PRIORITY_NORMAL + 5) > machine().options().get_entry(OPTION_VOLUME)->priority())
+			set_attenuation(std::clamp(int(node->get_attribute_int("value", 0)), -32, 0));
+	}
 
 	// iterate over channel nodes
 	for (util::xml::data_node const *channelnode = parentnode->get_child("channel"); channelnode != nullptr; channelnode = channelnode->get_next_sibling("channel"))
@@ -1489,7 +1486,7 @@ void sound_manager::update(int param)
 {
 	LOG("sound_update\n");
 
-	g_profiler.start(PROFILER_SOUND);
+	auto profile = g_profiler.start(PROFILER_SOUND);
 
 	// determine the duration of this update
 	attotime update_period = machine().time() - m_last_update;
@@ -1625,6 +1622,4 @@ void sound_manager::update(int param)
 
 	// notify that new samples have been generated
 	emulator_info::sound_hook();
-
-	g_profiler.stop();
 }

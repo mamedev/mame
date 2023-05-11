@@ -6,8 +6,8 @@
     Ninja Gaiden
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_GAIDEN_H
-#define MAME_INCLUDES_GAIDEN_H
+#ifndef MAME_TECMO_GAIDEN_H
+#define MAME_TECMO_GAIDEN_H
 
 #pragma once
 
@@ -153,4 +153,4 @@ private:
 	void sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_GAIDEN_H
+#endif // MAME_TECMO_GAIDEN_H

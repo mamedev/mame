@@ -79,6 +79,8 @@ Dumped 06/15/2000
 #include "speaker.h"
 
 
+namespace {
+
 class srmp6_state : public driver_device
 {
 public:
@@ -735,6 +737,7 @@ ROM_START( srmp6 )
 	ROM_LOAD16_WORD_SWAP( "sx011-01.22", 0x1c00000, 0x0400000, CRC(785409d1) SHA1(3e31254452a30d929161a1ea3a3daa69de058364) ) // CHR07
 ROM_END
 
+} // anonymous namespace
 
 
 /***************************************************************************

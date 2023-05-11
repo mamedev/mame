@@ -7,9 +7,24 @@
 //====================================================================
 
 #include "sound_module.h"
+
 #include "modules/osdmodule.h"
 
-#if defined(OSD_WINDOWS)
+#if defined(OSD_WINDOWS) | defined(SDLMAME_WIN32)
+
+// OSD headers
+#include "modules/lib/osdlib.h"
+#include "modules/lib/osdobj_common.h"
+#include "osdcore.h"
+#include "osdepend.h"
+#include "windows/winutil.h"
+
+// stdlib includes
+#include <algorithm>
+#include <chrono>
+#include <mutex>
+#include <queue>
+#include <thread>
 
 // standard windows headers
 #include <windows.h>
@@ -19,22 +34,10 @@
 // XAudio2 include
 #include <xaudio2.h>
 
-#undef interface
 
-// stdlib includes
-#include <algorithm>
-#include <chrono>
-#include <mutex>
-#include <queue>
-#include <thread>
+namespace osd {
 
-// MAME headers
-#include "osdcore.h"
-#include "osdepend.h"
-
-#include "winutil.h"
-
-#include "modules/lib/osdlib.h"
+namespace {
 
 //============================================================
 //  Constants
@@ -181,29 +184,6 @@ public:
 // The main class for the XAudio2 sound module implementation
 class sound_xaudio2 : public osd_module, public sound_module, public IXAudio2VoiceCallback
 {
-private:
-	Microsoft::WRL::ComPtr<IXAudio2> m_xAudio2;
-	mastering_voice_ptr              m_masterVoice;
-	src_voice_ptr                    m_sourceVoice;
-	DWORD                            m_sample_bytes;
-	std::unique_ptr<BYTE[]>          m_buffer;
-	DWORD                            m_buffer_size;
-	DWORD                            m_buffer_count;
-	DWORD                            m_writepos;
-	std::mutex                       m_buffer_lock;
-	HANDLE                           m_hEventBufferCompleted;
-	HANDLE                           m_hEventDataAvailable;
-	HANDLE                           m_hEventExiting;
-	std::thread                      m_audioThread;
-	std::queue<xaudio2_buffer>       m_queue;
-	std::unique_ptr<bufferpool>      m_buffer_pool;
-	uint32_t                         m_overflows;
-	uint32_t                         m_underflows;
-	BOOL                             m_in_underflow;
-	BOOL                             m_initialized;
-	OSD_DYNAMIC_API(xaudio2, "XAudio2_9.dll", "XAudio2_8.dll");
-	OSD_DYNAMIC_API_FN(xaudio2, HRESULT, WINAPI, XAudio2Create, IXAudio2 **, uint32_t, XAUDIO2_PROCESSOR);
-
 public:
 	sound_xaudio2() :
 		osd_module(OSD_SOUND_PROVIDER, "xaudio2"),
@@ -211,6 +191,8 @@ public:
 		m_xAudio2(nullptr),
 		m_masterVoice(nullptr),
 		m_sourceVoice(nullptr),
+		m_sample_rate(0),
+		m_audio_latency(0),
 		m_sample_bytes(0),
 		m_buffer(nullptr),
 		m_buffer_size(0),
@@ -227,26 +209,24 @@ public:
 	{
 	}
 
-	virtual ~sound_xaudio2() { }
-
 	bool probe() override;
-	int init(osd_options const &options) override;
+	int init(osd_interface &osd, osd_options const &options) override;
 	void exit() override;
 
 	// sound_module
 	void update_audio_stream(bool is_throttled, int16_t const *buffer, int samples_this_frame) override;
 	void set_mastervolume(int attenuation) override;
 
-	// Xaudio callbacks
-	void STDAPICALLTYPE OnVoiceProcessingPassStart(uint32_t bytes_required) override;
-	void STDAPICALLTYPE OnVoiceProcessingPassEnd() override {}
-	void STDAPICALLTYPE OnStreamEnd() override {}
-	void STDAPICALLTYPE OnBufferStart(void* pBufferContext) override {}
-	void STDAPICALLTYPE OnLoopEnd(void* pBufferContext) override {}
-	void STDAPICALLTYPE OnVoiceError(void* pBufferContext, HRESULT error) override {}
-	void STDAPICALLTYPE OnBufferEnd(void *pBufferContext) override;
-
 private:
+	// Xaudio callbacks
+	void STDAPICALLTYPE OnVoiceProcessingPassStart(uint32_t bytes_required) noexcept override;
+	void STDAPICALLTYPE OnVoiceProcessingPassEnd() noexcept override {}
+	void STDAPICALLTYPE OnStreamEnd() noexcept override {}
+	void STDAPICALLTYPE OnBufferStart(void* pBufferContext) noexcept override {}
+	void STDAPICALLTYPE OnLoopEnd(void* pBufferContext) noexcept override {}
+	void STDAPICALLTYPE OnVoiceError(void* pBufferContext, HRESULT error) noexcept override {}
+	void STDAPICALLTYPE OnBufferEnd(void *pBufferContext) noexcept override;
+
 	void create_buffers(const WAVEFORMATEX &format);
 	HRESULT create_voices(const WAVEFORMATEX &format);
 	void process_audio();
@@ -254,6 +234,31 @@ private:
 	void submit_needed();
 	void roll_buffer();
 	BOOL submit_next_queued();
+
+	Microsoft::WRL::ComPtr<IXAudio2> m_xAudio2;
+	mastering_voice_ptr              m_masterVoice;
+	src_voice_ptr                    m_sourceVoice;
+	int                              m_sample_rate;
+	int                              m_audio_latency;
+	DWORD                            m_sample_bytes;
+	std::unique_ptr<BYTE[]>          m_buffer;
+	DWORD                            m_buffer_size;
+	DWORD                            m_buffer_count;
+	DWORD                            m_writepos;
+	std::mutex                       m_buffer_lock;
+	HANDLE                           m_hEventBufferCompleted;
+	HANDLE                           m_hEventDataAvailable;
+	HANDLE                           m_hEventExiting;
+	std::thread                      m_audioThread;
+	std::queue<xaudio2_buffer>       m_queue;
+	std::unique_ptr<bufferpool>      m_buffer_pool;
+	uint32_t                         m_overflows;
+	uint32_t                         m_underflows;
+	BOOL                             m_in_underflow;
+	BOOL                             m_initialized;
+
+	OSD_DYNAMIC_API(xaudio2, "XAudio2_9.dll", "XAudio2_8.dll");
+	OSD_DYNAMIC_API_FN(xaudio2, HRESULT, WINAPI, XAudio2Create, IXAudio2 **, uint32_t, XAUDIO2_PROCESSOR);
 };
 
 //============================================================
@@ -269,14 +274,9 @@ bool sound_xaudio2::probe()
 //  init
 //============================================================
 
-int sound_xaudio2::init(osd_options const &options)
+int sound_xaudio2::init(osd_interface &osd, osd_options const &options)
 {
-	HRESULT result;
-	WAVEFORMATEX format = {0};
-	auto init_start = std::chrono::system_clock::now();
-	std::chrono::milliseconds init_time;
-
-	CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+	auto const init_start = std::chrono::system_clock::now();
 
 	// Make sure our XAudio2Create entrypoint is bound
 	if (!OSD_DYNAMIC_API_TEST(XAudio2Create))
@@ -285,6 +285,13 @@ int sound_xaudio2::init(osd_options const &options)
 		return 1;
 	}
 
+	HRESULT result;
+	std::chrono::milliseconds init_time;
+	WAVEFORMATEX format = { 0 };
+
+	m_sample_rate = options.sample_rate();
+	m_audio_latency = options.audio_latency();
+
 	// Create the IXAudio2 object
 	HR_GOERR(OSD_DYNAMIC_CALL(XAudio2Create, m_xAudio2.GetAddressOf(), 0, XAUDIO2_DEFAULT_PROCESSOR));
 
@@ -292,7 +299,7 @@ int sound_xaudio2::init(osd_options const &options)
 	format.wBitsPerSample = 16;
 	format.wFormatTag = WAVE_FORMAT_PCM;
 	format.nChannels = 2;
-	format.nSamplesPerSec = sample_rate();
+	format.nSamplesPerSec = m_sample_rate;
 	format.nBlockAlign = format.wBitsPerSample * format.nChannels / 8;
 	format.nAvgBytesPerSec = format.nSamplesPerSec * format.nBlockAlign;
 
@@ -311,10 +318,10 @@ int sound_xaudio2::init(osd_options const &options)
 	HR_GOERR(m_sourceVoice->Start());
 
 	// Start the thread listening
-	m_audioThread = std::thread([](sound_xaudio2* self) { self->process_audio(); }, this);
+	m_audioThread = std::thread([] (sound_xaudio2 *self) { self->process_audio(); }, this);
 
 	init_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - init_start);
-	osd_printf_verbose("Sound: XAudio2 initialized. %d ms.\n", static_cast<int>(init_time.count()));
+	osd_printf_verbose("Sound: XAudio2 initialized. %d ms.\n", init_time.count());
 
 	m_initialized = TRUE;
 	return 0;
@@ -377,7 +384,7 @@ void sound_xaudio2::update_audio_stream(
 	int16_t const *buffer,
 	int samples_this_frame)
 {
-	if (!m_initialized || sample_rate() == 0 || !m_buffer)
+	if (!m_initialized || m_sample_rate == 0 || !m_buffer)
 		return;
 
 	uint32_t const bytes_this_frame = samples_this_frame * m_sample_bytes;
@@ -437,7 +444,7 @@ void sound_xaudio2::set_mastervolume(int attenuation)
 //============================================================
 
 // The XAudio2 voice callback triggered when a buffer finishes playing
-void sound_xaudio2::OnBufferEnd(void *pBufferContext)
+void sound_xaudio2::OnBufferEnd(void *pBufferContext) noexcept
 {
 	BYTE* completed_buffer = static_cast<BYTE*>(pBufferContext);
 	if (completed_buffer != nullptr)
@@ -454,7 +461,7 @@ void sound_xaudio2::OnBufferEnd(void *pBufferContext)
 //============================================================
 
 // The XAudio2 voice callback triggered on every pass
-void sound_xaudio2::OnVoiceProcessingPassStart(uint32_t bytes_required)
+void sound_xaudio2::OnVoiceProcessingPassStart(uint32_t bytes_required) noexcept
 {
 	if (bytes_required == 0)
 	{
@@ -528,7 +535,7 @@ HRESULT sound_xaudio2::create_voices(const WAVEFORMATEX &format)
 		m_xAudio2->CreateMasteringVoice(
 			&temp_master_voice,
 			format.nChannels,
-			sample_rate()));
+			m_sample_rate));
 
 	m_masterVoice = mastering_voice_ptr(temp_master_voice);
 
@@ -695,9 +702,15 @@ void sound_xaudio2::roll_buffer()
 	}
 }
 
+} // anonymous namespace
+
+} // namespace osd
+
 
 #else
-MODULE_NOT_SUPPORTED(sound_xaudio2, OSD_SOUND_PROVIDER, "xaudio2")
+
+namespace osd { namespace { MODULE_NOT_SUPPORTED(sound_xaudio2, OSD_SOUND_PROVIDER, "xaudio2") } }
+
 #endif
 
-MODULE_DEFINITION(SOUND_XAUDIO2, sound_xaudio2)
+MODULE_DEFINITION(SOUND_XAUDIO2, osd::sound_xaudio2)

@@ -7611,13 +7611,7 @@ void saturn_state::stv_vdp2_draw_NBG3(bitmap_rgb32 &bitmap, const rectangle &cli
 
 void saturn_state::stv_vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect, int iRP)
 {
-	rectangle roz_clip_rect;
-	int planesizex = 0, planesizey = 0;
-	int planerenderedsizex, planerenderedsizey;
-	uint8_t colour_calculation_enabled;
-	uint8_t fade_control;
-
-	if ( iRP == 1)
+	if (iRP == 1)
 	{
 		stv2_current_tilemap.bitmap_map = STV_VDP2_RAMP_;
 		stv2_current_tilemap.map_offset[0] = STV_VDP2_RAMPA | (STV_VDP2_RAMP_ << 6);
@@ -7671,6 +7665,7 @@ void saturn_state::stv_vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rec
 		stv2_current_tilemap.plane_size = STV_VDP2_RBPLSZ;
 	}
 
+	int planesizex = 0, planesizey = 0;
 	if (stv2_current_tilemap.bitmap_enable)
 	{
 		switch (stv2_current_tilemap.bitmap_size)
@@ -7746,7 +7741,9 @@ void saturn_state::stv_vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rec
 		if ( !m_vdp2.roz_bitmap[iRP-1].valid() )
 			m_vdp2.roz_bitmap[iRP-1].allocate(4096, 4096);
 
+		rectangle roz_clip_rect;
 		roz_clip_rect.min_x = roz_clip_rect.min_y = 0;
+		int planerenderedsizex, planerenderedsizey;
 		if ( (iRP == 1 && STV_VDP2_RAOVR == 3) ||
 				(iRP == 2 && STV_VDP2_RBOVR == 3) )
 		{
@@ -7770,32 +7767,33 @@ void saturn_state::stv_vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rec
 		}
 
 
-		colour_calculation_enabled = stv2_current_tilemap.colour_calculation_enabled;
+		uint8_t const colour_calculation_enabled = stv2_current_tilemap.colour_calculation_enabled;
 		stv2_current_tilemap.colour_calculation_enabled = 0;
 //      window_control = stv2_current_tilemap.window_control;
 //      stv2_current_tilemap.window_control = 0;
-		fade_control = stv2_current_tilemap.fade_control;
+		uint8_t const fade_control = stv2_current_tilemap.fade_control;
 		stv2_current_tilemap.fade_control = 0;
-		g_profiler.start(PROFILER_USER1);
-		if ( LOG_VDP2 ) logerror( "Checking for cached RBG bitmap, cache_dirty = %d, memcmp() = %d\n", stv_rbg_cache_data.is_cache_dirty, memcmp(&stv_rbg_cache_data.layer_data[iRP-1],&stv2_current_tilemap,sizeof(stv2_current_tilemap)));
-		if ( (stv_rbg_cache_data.is_cache_dirty & iRP) ||
-			memcmp(&stv_rbg_cache_data.layer_data[iRP-1],&stv2_current_tilemap,sizeof(stv2_current_tilemap)) != 0 )
 		{
-			m_vdp2.roz_bitmap[iRP-1].fill(m_palette->black_pen(), roz_clip_rect );
-			stv_vdp2_check_tilemap(m_vdp2.roz_bitmap[iRP-1], roz_clip_rect);
-			// prepare cache data
-			stv_rbg_cache_data.watch_vdp2_vram_writes |= iRP;
-			stv_rbg_cache_data.is_cache_dirty &= ~iRP;
-			memcpy(&stv_rbg_cache_data.layer_data[iRP-1], &stv2_current_tilemap, sizeof(stv2_current_tilemap));
-			stv_rbg_cache_data.map_offset_min[iRP-1] = stv_vdp2_layer_data_placement.map_offset_min;
-			stv_rbg_cache_data.map_offset_max[iRP-1] = stv_vdp2_layer_data_placement.map_offset_max;
-			stv_rbg_cache_data.tile_offset_min[iRP-1] = stv_vdp2_layer_data_placement.tile_offset_min;
-			stv_rbg_cache_data.tile_offset_max[iRP-1] = stv_vdp2_layer_data_placement.tile_offset_max;
-			if ( LOG_VDP2 ) logerror( "Cache watch: map = %06X - %06X, tile = %06X - %06X\n", stv_rbg_cache_data.map_offset_min[iRP-1],
-				stv_rbg_cache_data.map_offset_max[iRP-1], stv_rbg_cache_data.tile_offset_min[iRP-1], stv_rbg_cache_data.tile_offset_max[iRP-1] );
+			auto profile1 = g_profiler.start(PROFILER_USER1);
+			if ( LOG_VDP2 ) logerror( "Checking for cached RBG bitmap, cache_dirty = %d, memcmp() = %d\n", stv_rbg_cache_data.is_cache_dirty, memcmp(&stv_rbg_cache_data.layer_data[iRP-1],&stv2_current_tilemap,sizeof(stv2_current_tilemap)));
+			if ( (stv_rbg_cache_data.is_cache_dirty & iRP) ||
+				memcmp(&stv_rbg_cache_data.layer_data[iRP-1],&stv2_current_tilemap,sizeof(stv2_current_tilemap)) != 0 )
+			{
+				m_vdp2.roz_bitmap[iRP-1].fill(m_palette->black_pen(), roz_clip_rect );
+				stv_vdp2_check_tilemap(m_vdp2.roz_bitmap[iRP-1], roz_clip_rect);
+				// prepare cache data
+				stv_rbg_cache_data.watch_vdp2_vram_writes |= iRP;
+				stv_rbg_cache_data.is_cache_dirty &= ~iRP;
+				memcpy(&stv_rbg_cache_data.layer_data[iRP-1], &stv2_current_tilemap, sizeof(stv2_current_tilemap));
+				stv_rbg_cache_data.map_offset_min[iRP-1] = stv_vdp2_layer_data_placement.map_offset_min;
+				stv_rbg_cache_data.map_offset_max[iRP-1] = stv_vdp2_layer_data_placement.map_offset_max;
+				stv_rbg_cache_data.tile_offset_min[iRP-1] = stv_vdp2_layer_data_placement.tile_offset_min;
+				stv_rbg_cache_data.tile_offset_max[iRP-1] = stv_vdp2_layer_data_placement.tile_offset_max;
+				if ( LOG_VDP2 ) logerror( "Cache watch: map = %06X - %06X, tile = %06X - %06X\n", stv_rbg_cache_data.map_offset_min[iRP-1],
+					stv_rbg_cache_data.map_offset_max[iRP-1], stv_rbg_cache_data.tile_offset_min[iRP-1], stv_rbg_cache_data.tile_offset_max[iRP-1] );
+			}
+			// stop profiling USER1
 		}
-
-		g_profiler.stop();
 
 		stv2_current_tilemap.colour_calculation_enabled = colour_calculation_enabled;
 		if ( colour_calculation_enabled )
@@ -7818,9 +7816,8 @@ void saturn_state::stv_vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rec
 
 		stv2_current_tilemap.fade_control = fade_control;
 
-		g_profiler.start(PROFILER_USER2);
+		auto profile2 = g_profiler.start(PROFILER_USER2);
 		stv_vdp2_copy_roz_bitmap(bitmap, m_vdp2.roz_bitmap[iRP-1], cliprect, iRP, planesizex, planesizey, planerenderedsizex, planerenderedsizey );
-		g_profiler.stop();
 	}
 
 }

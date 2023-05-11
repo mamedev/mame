@@ -22,6 +22,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class m74_state : public driver_device
 {
 public:
@@ -113,5 +116,8 @@ ROM_START(shootaw2)
 	ROM_REGION(0x40000, "oki", 0)
 	ROM_LOAD( "unknown_label.5e", 0x000000, 0x040000, CRC(fa75e91e) SHA1(d06ca906135a3f23c1f0dadff75f940ea7ca0e4a) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1996,  shootaw2,  0,  m74,  m74, m74_state, empty_init, ROT0, "Namco", "Shoot Away II", MACHINE_NOT_WORKING )

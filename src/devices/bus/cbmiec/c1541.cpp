@@ -10,8 +10,6 @@
 
     TODO:
 
-    - c1540 fails to load the directory intermittently
-
     - hardware extensions
         - Dolphin-DOS 2.0
         - Dolphin-DOS 3.0
@@ -967,7 +965,6 @@ void c1541_device_base::device_add_mconfig(machine_config &config)
 {
 	M6502(config, m_maincpu, XTAL(16'000'000)/16);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c1541_device_base::c1541_mem);
-	//config.set_perfect_quantum(m_maincpu); FIXME: not safe in a slot device - add barriers
 
 	MOS6522(config, m_via0, XTAL(16'000'000)/16);
 	m_via0->readpa_handler().set(FUNC(c1541_device_base::via0_pa_r));

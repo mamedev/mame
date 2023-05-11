@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Juergen Buchmueller, David Haywood
-#ifndef MAME_MACHINE_DECOCASS_TAPE_H
-#define MAME_MACHINE_DECOCASS_TAPE_H
+#ifndef MAME_DATAEAST_DECOCASS_TAPE_H
+#define MAME_DATAEAST_DECOCASS_TAPE_H
 
 #pragma once
 
@@ -73,4 +73,4 @@ private:
 
 DECLARE_DEVICE_TYPE(DECOCASS_TAPE, decocass_tape_device)
 
-#endif // MAME_MACHINE_DECOCASS_TAPE_H
+#endif // MAME_DATAEAST_DECOCASS_TAPE_H

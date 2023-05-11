@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <functional>
+#include <vector>
 
 
 
@@ -49,7 +51,7 @@ public:
 	void set_bus_slot(int sid) { m_sid = sid; }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 private:
@@ -70,7 +72,7 @@ class wangpcbus_device : public device_t
 public:
 	// construction/destruction
 	wangpcbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~wangpcbus_device() { m_device_list.detach_all(); }
+	~wangpcbus_device();
 
 	auto irq2_wr_callback() { return m_write_irq2.bind(); }
 	auto irq3_wr_callback() { return m_write_irq3.bind(); }
@@ -119,10 +121,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ioerror_w ) { m_write_ioerror(state); }
 
 protected:
-	// device-level overrides
+	// devicedevice_t implementation
 	virtual void device_start() override;
 
 private:
+	using card_vector = std::vector<std::reference_wrapper<device_wangpcbus_card_interface> >;
+
 	devcb_write_line   m_write_irq2;
 	devcb_write_line   m_write_irq3;
 	devcb_write_line   m_write_irq4;
@@ -134,7 +138,7 @@ private:
 	devcb_write_line   m_write_drq3;
 	devcb_write_line   m_write_ioerror;
 
-	simple_list<device_wangpcbus_card_interface> m_device_list;
+	card_vector m_device_list;
 };
 
 
@@ -148,11 +152,8 @@ DECLARE_DEVICE_TYPE(WANGPC_BUS, wangpcbus_device)
 class device_wangpcbus_card_interface : public device_interface
 {
 	friend class wangpcbus_device;
-	template <class ElementType> friend class simple_list;
 
 public:
-	device_wangpcbus_card_interface *next() const { return m_next; }
-
 	// memory access
 	virtual uint16_t wangpcbus_mrdc_r(offs_t offset, uint16_t mem_mask) { return 0; }
 	virtual void wangpcbus_amwc_w(offs_t offset, uint16_t mem_mask, uint16_t data) { }
@@ -175,12 +176,9 @@ protected:
 	virtual void interface_pre_start() override;
 
 	wangpcbus_device *m_bus;
-	wangpcbus_slot_device *m_slot;
+	wangpcbus_slot_device *const m_slot;
 
 	int m_sid;
-
-private:
-	device_wangpcbus_card_interface *m_next;
 };
 
 

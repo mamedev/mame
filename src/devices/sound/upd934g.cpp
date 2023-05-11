@@ -7,7 +7,7 @@
     Percussion Generator
 
     TODO:
-    - Play MUTED and ACCENTED
+    - Correct MUTED and ACCENTED (currently just changes volume)
     - T1 input
     - 8 channels?
 
@@ -35,7 +35,7 @@ DEFINE_DEVICE_TYPE(UPD934G, upd934g_device, "upd934g", "NEC uPD934G")
 upd934g_device::upd934g_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, UPD934G, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
-	m_data_cb(*this),
+	device_rom_interface(mconfig, *this),
 	m_stream(nullptr),
 	m_sample(0),
 	m_ready(false)
@@ -51,9 +51,6 @@ void upd934g_device::device_start()
 	// create sound stream
 	m_stream = stream_alloc(0, 4, 20000);
 
-	// resolve callbacks
-	m_data_cb.resolve_safe(0);
-
 	// register for save states
 	save_pointer(NAME(m_addr), 16);
 
@@ -62,6 +59,7 @@ void upd934g_device::device_start()
 		save_item(NAME(m_channel[i].pos), i);
 		save_item(NAME(m_channel[i].playing), i);
 		save_item(NAME(m_channel[i].volume), i);
+		save_item(NAME(m_channel[i].effect), i);
 	}
 
 	save_item(NAME(m_sample));
@@ -95,7 +93,12 @@ void upd934g_device::sound_stream_update(sound_stream &stream, std::vector<read_
 
 			for (unsigned i = 0; i < outputs[ch].samples(); i++)
 			{
-				int8_t raw = static_cast<int8_t>(m_data_cb(m_channel[ch].pos));
+				int8_t raw = static_cast<int8_t>(read_byte(m_channel[ch].pos));
+
+				// normal, muted, accented
+				const double adjust[] = { 0, 0.7, 0.4, 1.0 };
+				raw *= adjust[m_channel[ch].effect];
+
 				outputs[ch].put_int(i, raw * (m_channel[ch].volume + 1), 32768 / 64);
 
 				if (++m_channel[ch].pos >= end)
@@ -126,25 +129,23 @@ void upd934g_device::write(offs_t offset, uint8_t data)
 		// --5432--  sample number
 		// ------10  volume?
 		m_sample = (data >> 2) & 0x0f;
+
 		switch (data >> 6)
 		{
 		case 0:
 			logerror("CMD STORE ADDRESS sample %x\n", m_sample);
 			break;
 		case 1:
-			logerror("CMD PLAY sample %x (channel %d)\n", m_sample, m_sample >> 1);
+		case 2:
+		case 3:
+			logerror("CMD PLAY sample %x (channel %d, effect %d)\n", m_sample, m_sample >> 1, data >> 6);
 			if (m_sample < 8)
 			{
 				m_channel[m_sample >> 1].pos = m_addr[m_sample];
 				m_channel[m_sample >> 1].playing = m_sample;
 				m_channel[m_sample >> 1].volume = data & 0x03;
+				m_channel[m_sample >> 1].effect = data >> 6;
 			}
-			break;
-		case 2:
-			logerror("CMD PLAY MUTED sample %x (channel %d)\n", m_sample, m_sample >> 1);
-			break;
-		case 3:
-			logerror("CMD PLAY ACCENTED sample %x (channel %d)\n", m_sample, m_sample >> 1);
 			break;
 		}
 		break;

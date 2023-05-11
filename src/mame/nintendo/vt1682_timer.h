@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_MACHINE_VT1682_TIMER_H
-#define MAME_MACHINE_VT1682_TIMER_H
+#ifndef MAME_NINTENDO_VT1682_TIMER_H
+#define MAME_NINTENDO_VT1682_TIMER_H
 
 #pragma once
 
@@ -54,4 +54,4 @@ private:
 	devcb_write_line m_irq_cb;
 };
 
-#endif // MAME_MACHINE_VT1682_TIMER_H
+#endif // MAME_NINTENDO_VT1682_TIMER_H

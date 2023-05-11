@@ -5,8 +5,8 @@
     Atari Food Fight hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_FOODF_H
-#define MAME_INCLUDES_FOODF_H
+#ifndef MAME_ATARI_FOODF_H
+#define MAME_ATARI_FOODF_H
 
 #pragma once
 
@@ -73,4 +73,4 @@ private:
 	output_finder<2> m_leds;
 };
 
-#endif // MAME_INCLUDES_FOODF_H
+#endif // MAME_ATARI_FOODF_H

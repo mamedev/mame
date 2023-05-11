@@ -3254,7 +3254,7 @@ void tms9995_device::alu_single_arithm()
 		set_status_bit(ST_OV, src_val == 0x8000);
 		break;
 	case SWPB:
-		m_current_value = ((m_current_value << 8) | (m_current_value >> 8)) & 0xffff;
+		m_current_value = swapendian_int16(m_current_value);
 		// I don't know what they are doing right now, but we lose a lot of cycles
 		// according to the spec (which can indeed be proved on a real system)
 

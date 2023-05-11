@@ -41,11 +41,14 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	virtual void map_exrom(address_space_installer &space) override;
+	virtual void map_io(address_space_installer &space) override;
+
+private:
 	required_device_array<floppy_connector, 4> m_floppy;
 	required_device<mc6843_device> m_mc6843;
 
-private:
-	uint8_t *m_rom;
+	required_region_ptr<uint8_t> m_rom;
 
 	uint8_t m_control;
 

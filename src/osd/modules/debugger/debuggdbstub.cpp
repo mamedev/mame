@@ -23,6 +23,8 @@
 #include <cinttypes>
 
 
+namespace osd {
+
 namespace {
 
 //-------------------------------------------------------------------------
@@ -407,6 +409,65 @@ static const gdb_register_map gdb_register_map_score7 =
 	}
 };
 
+
+//-------------------------------------------------------------------------
+static const gdb_register_map gdb_register_map_nios2 =
+{
+	"nios2",
+	"org.gnu.gdb.nios2.cpu",
+	{
+		{ "zero",     "zero",     false, TYPE_INT },
+		{ "at",       "at",       false, TYPE_INT },
+		{ "r2",       "r2",       false, TYPE_INT },
+		{ "r3",       "r3",       false, TYPE_INT },
+		{ "r4",       "r4",       false, TYPE_INT },
+		{ "r5",       "r5",       false, TYPE_INT },
+		{ "r6",       "r6",       false, TYPE_INT },
+		{ "r7",       "r7",       false, TYPE_INT },
+		{ "r8",       "r8",       false, TYPE_INT },
+		{ "r9",       "r9",       false, TYPE_INT },
+		{ "r10",      "r10",      false, TYPE_INT },
+		{ "r11",      "r11",      false, TYPE_INT },
+		{ "r12",      "r12",      false, TYPE_INT },
+		{ "r13",      "r13",      false, TYPE_INT },
+		{ "r14",      "r14",      false, TYPE_INT },
+		{ "r15",      "r15",      false, TYPE_INT },
+		{ "r16",      "r16",      false, TYPE_INT },
+		{ "r17",      "r17",      false, TYPE_INT },
+		{ "r18",      "r18",      false, TYPE_INT },
+		{ "r19",      "r19",      false, TYPE_INT },
+		{ "r20",      "r20",      false, TYPE_INT },
+		{ "r21",      "r21",      false, TYPE_INT },
+		{ "r22",      "r22",      false, TYPE_INT },
+		{ "r23",      "r23",      false, TYPE_INT },
+		{ "et",       "et",       false, TYPE_INT },
+		{ "bt",       "bt",       false, TYPE_INT },
+		{ "gp",       "gp",       false, TYPE_DATA_POINTER },
+		{ "sp",       "sp",       true,  TYPE_DATA_POINTER },
+		{ "fp",       "fp",       false, TYPE_DATA_POINTER },
+		{ "ea",       "ea",       false, TYPE_CODE_POINTER },
+		{ "ba",       "sstatus",  false, TYPE_INT }, // this is Altera's fault
+		{ "ra",       "ra",       false, TYPE_CODE_POINTER },
+		{ "status",   "status",   false, TYPE_INT },
+		{ "estatus",  "estatus",  false, TYPE_INT },
+		{ "bstatus",  "bstatus",  false, TYPE_INT },
+		{ "ienable",  "ienable",  false, TYPE_INT },
+		{ "ipending", "ipending", false, TYPE_INT },
+		{ "cpuid",    "cpuid",    false, TYPE_INT },
+		{ "ctl6",     "ctl6",     false, TYPE_INT },
+		{ "exception","exception",false, TYPE_INT },
+		{ "pteaddr",  "pteaddr",  false, TYPE_INT },
+		{ "tlbacc",   "tlbacc",   false, TYPE_INT },
+		{ "tlbmisc",  "tlbmisc",  false, TYPE_INT },
+		{ "eccinj",   "eccinj",   false, TYPE_INT },
+		{ "badaddr",  "badaddr",  false, TYPE_INT },
+		{ "config",   "config",   false, TYPE_INT },
+		{ "mpubase",  "mpubase",  false, TYPE_INT },
+		{ "mpuacc",   "mpuacc",   false, TYPE_INT },
+		{ "PC",       "pc",       true,  TYPE_CODE_POINTER },
+	}
+};
+
 //-------------------------------------------------------------------------
 static const std::map<std::string, const gdb_register_map &> gdb_register_maps = {
 	{ "i486",       gdb_register_map_i486 },
@@ -420,6 +481,7 @@ static const std::map<std::string, const gdb_register_map &> gdb_register_maps =
 	{ "rp2a03",     gdb_register_map_m6502 },
 	{ "m6809",      gdb_register_map_m6809 },
 	{ "score7",     gdb_register_map_score7 },
+	{ "nios2",      gdb_register_map_nios2 },
 };
 
 //-------------------------------------------------------------------------
@@ -456,7 +518,7 @@ public:
 
 	virtual ~debug_gdbstub() { }
 
-	virtual int init(const osd_options &options) override;
+	virtual int init(osd_interface &osd, const osd_options &options) override;
 	virtual void exit() override;
 
 	virtual void init_debugger(running_machine &machine) override;
@@ -570,7 +632,7 @@ private:
 };
 
 //-------------------------------------------------------------------------
-int debug_gdbstub::init(const osd_options &options)
+int debug_gdbstub::init(osd_interface &osd, const osd_options &options)
 {
 	m_debugger_port = options.debugger_port();
 	return 0;
@@ -901,7 +963,8 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_m(const char *buf)
 		return REPLY_ENN;
 
 	offs_t offset = address;
-	if ( !m_memory->translate(m_address_space->spacenum(), TRANSLATE_READ_DEBUG, offset) )
+	address_space *tspace;
+	if ( !m_memory->translate(m_address_space->spacenum(), device_memory_interface::TR_READ, offset, tspace) )
 		return REPLY_ENN;
 
 	// Disable side effects while reading memory.
@@ -911,7 +974,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_m(const char *buf)
 	reply.reserve(length * 2);
 	for ( int i = 0; i < length; i++ )
 	{
-		uint8_t value = m_address_space->read_byte(offset + i);
+		uint8_t value = tspace->read_byte(offset + i);
 		reply += string_format("%02x", value);
 	}
 	send_reply(reply.c_str());
@@ -946,7 +1009,8 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_M(const char *buf)
 		return REPLY_ENN;
 
 	offs_t offset = address;
-	if ( !m_memory->translate(m_address_space->spacenum(), TRANSLATE_READ_DEBUG, offset) )
+	address_space *tspace;
+	if ( !m_memory->translate(m_address_space->spacenum(), device_memory_interface::TR_READ, offset, tspace) )
 		return REPLY_ENN;
 
 	std::vector<uint8_t> data;
@@ -954,7 +1018,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_M(const char *buf)
 		return REPLY_ENN;
 
 	for ( int i = 0; i < length; i++ )
-		m_address_space->write_byte(offset + i, data[i]);
+		tspace->write_byte(offset + i, data[i]);
 
 	return REPLY_OK;
 }
@@ -1158,9 +1222,10 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_z(const char *buf)
 
 	// watchpoints
 	offs_t offset = address;
+	address_space *tspace;
 	if ( type == 2 || type == 3 || type == 4 )
 	{
-		if ( !m_memory->translate(m_address_space->spacenum(), TRANSLATE_READ_DEBUG, offset) )
+		if ( !m_memory->translate(m_address_space->spacenum(), device_memory_interface::TR_READ, offset, tspace) )
 			return REPLY_ENN;
 		m_address_map.erase(offset);
 	}
@@ -1199,9 +1264,10 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_Z(const char *buf)
 
 	// watchpoints
 	offs_t offset = address;
+	address_space *tspace;
 	if ( type == 2 || type == 3 || type == 4 )
 	{
-		if ( !m_memory->translate(m_address_space->spacenum(), TRANSLATE_READ_DEBUG, offset) )
+		if ( !m_memory->translate(m_address_space->spacenum(), device_memory_interface::TR_READ, offset, tspace) )
 			return REPLY_ENN;
 		m_address_map[offset] = address;
 	}
@@ -1435,5 +1501,7 @@ void debug_gdbstub::handle_character(char ch)
 
 } // anonymous namespace
 
+} // namespace osd
+
 //-------------------------------------------------------------------------
-MODULE_DEFINITION(DEBUG_GDBSTUB, debug_gdbstub)
+MODULE_DEFINITION(DEBUG_GDBSTUB, osd::debug_gdbstub)

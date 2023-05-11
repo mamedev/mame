@@ -16,6 +16,7 @@
 #include "formats/atari_dsk.h"
 
 #include <cctype>
+#include <cstdarg>
 
 
 #define VERBOSE_SERIAL  0

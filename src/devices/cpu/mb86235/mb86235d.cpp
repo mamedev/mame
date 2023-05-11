@@ -226,7 +226,7 @@ offs_t mb86235_disassembler::dasm_control(std::ostream &stream, uint32_t pc, uin
 
 	int cop = (opcode >> 22) & 0x1f;
 
-	int rel12 = (opcode & 0x800) ? (0xfffff000 | (opcode & 0xfff)) : (opcode & 0xfff);
+	int rel12 = util::sext<int>(opcode, 12);
 
 	offs_t flags = 0;
 

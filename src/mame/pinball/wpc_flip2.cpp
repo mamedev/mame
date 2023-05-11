@@ -853,10 +853,10 @@ ROM_START(ww_p8)
 	ROM_RELOAD( 0x100000 + 0x60000, 0x20000)
 ROM_END
 
-ROM_START(ww_p1)
+ROM_START(ww_p6) // versions as taken from the labels on the chip (handwritten): U6 = P6, U18 = P0, U15 = P0, but the sound ROMs actually report as P1
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x80000, "code", 0)
-	ROM_LOAD("ww_p8.u6", 0x00000, 0x80000, CRC(251a7f14) SHA1(8e36efc9a14d3cd31967f072bfc185461022864d))
+	ROM_LOAD("ww_p6.u6", 0x00000, 0x80000, CRC(97dd311f) SHA1(7a0079365479fd4af7465a48cafd10a6ef169073))
 	ROM_REGION(0x180000, "sound1", 0)
 	ROM_LOAD("ww_u14.l1", 0x000000, 0x80000, CRC(f3faa427) SHA1(fb0a266b80571b4717caa69f078b7e73e2866b6b))
 	ROM_LOAD("ww_u15.p1", 0x080000, 0x40000, CRC(a2a8e005) SHA1(bdbfc3f6c403d1ebef822a6381574f4a7bd19897))
@@ -975,8 +975,8 @@ GAME(2000,  ww_lh5,     ww_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init
 GAME(1993,  ww_l4,      ww_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "White Water (L-4)",                                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1993,  ww_l3,      ww_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "White Water (L-3)",                                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1992,  ww_l2,      ww_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "White Water (L-2)",                                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1992,  ww_p8,      ww_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "White Water (P-8 P-2 sound)",                              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1992,  ww_p1,      ww_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "White Water (P-8 P-1 sound)",                              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  ww_p8,      ww_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "White Water (P-8)",                                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  ww_p6,      ww_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "White Water (P-6)",                                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1992,  strik_l4,   0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "Strike Master (L-4) (Shuffle)",                            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1996,  lc_11,      0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "League Champ (1.1) (Shuffle)",                             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(20??,  rush,       0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Dave Astill",     "Rush (1.0)",                                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

@@ -562,8 +562,10 @@ static INPUT_PORTS_START( cclownz )
 	PORT_BIT( 0x00ff, 0x0000, IPT_PADDLE ) PORT_PLAYER(1) PORT_SENSITIVITY(50) PORT_KEYDELTA(8) PORT_CENTERDELTA(0) PORT_REVERSE
 INPUT_PORTS_END
 
-
-static INPUT_PORTS_START( franticf ) // how do the directional inputs work?
+// TODO: implement steering wheel properly, identify ticket, identify extra button
+// steering wheel goes thru irq1, catches input thru bit 4 of $4500010, fires off at intervals until it reaches target value
+// What kind of steering wheel this really uses? Impossible to emulate if we don't know the timer resolution
+static INPUT_PORTS_START( franticf )
 	PORT_START("IN0")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
@@ -577,9 +579,7 @@ static INPUT_PORTS_START( franticf ) // how do the directional inputs work?
 	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -672,57 +672,9 @@ Apples Per Game     0x7000  0x6000  0x5000  0x4000  0x3000  0x2000  0x1000  0x00
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( franticfa ) // how do the directional inputs work?
-	PORT_START("IN0")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, "x" )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_INCLUDE( franticf )
 
-	PORT_START("IN1")
+	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
@@ -833,6 +785,13 @@ void lethalj_state::lethalj(machine_config &config)
 	m_screen->set_raw(VIDEO_CLOCK_LETHALJ, 689, 0, 512, 259, 0, 236);
 }
 
+void lethalj_state::franticf(machine_config &config)
+{
+	gameroom(config);
+
+	// TODO: from I/O device
+	m_maincpu->set_periodic_int(FUNC(lethalj_state::irq1_line_hold), attotime::from_hz(300));
+}
 
 
 /*************************************
@@ -1253,8 +1212,9 @@ void lethalj_state::init_cclownz()
  *************************************/
 
 GAME( 1996, lethalj,   0,        lethalj,  lethalj,   lethalj_state, empty_init,    ROT0,  "The Game Room",                 "Lethal Justice (Version 2.3)", 0 )
-GAME( 1998, franticf,  0,        gameroom, franticf,  lethalj_state, empty_init,    ROT0,  "ICE",                           "Frantic Fred (Release 2)", MACHINE_NOT_WORKING ) /* manual states (C) 1998 Innovative Concepts in Entertainment, Inc. */
-GAME( 1996, franticfa, franticf, gameroom, franticfa, lethalj_state, empty_init,    ROT0,  "ICE / The Game Room",           "Frantic Fred", MACHINE_NOT_WORKING )
+/* manual states (C) 1998 Innovative Concepts in Entertainment, Inc. */
+GAME( 1998, franticf,  0,        franticf, franticf,  lethalj_state, empty_init,    ROT0,  "ICE",                           "Frantic Fred (Release 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // unemulated I/Os, flickers when inserting a coin (should disable blitter?)
+GAME( 1996, franticfa, franticf, franticf, franticfa, lethalj_state, empty_init,    ROT0,  "ICE / The Game Room",           "Frantic Fred", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // as above
 GAME( 1997, eggventr,  0,        gameroom, eggventr,  lethalj_state, empty_init,    ROT0,  "ICE / The Game Room",           "Egg Venture (Release 10)", 0 )
 GAME( 1997, eggventr8, eggventr, gameroom, eggventr,  lethalj_state, empty_init,    ROT0,  "ICE / The Game Room",           "Egg Venture (Release 8)", 0 )
 GAME( 1997, eggventr7, eggventr, gameroom, eggventr,  lethalj_state, empty_init,    ROT0,  "ICE / The Game Room",           "Egg Venture (Release 7)", 0 )

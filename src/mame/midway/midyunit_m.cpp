@@ -232,6 +232,13 @@ void midyunit_state::cvsd_protection_w(offs_t offset, uint8_t data)
 	m_cvsd_protection_base[offset] = data;
 }
 
+void midyunit_state::install_hidden_ram(mc6809e_device &cpu, int prot_start, int prot_end)
+{
+	size_t size = 1 + prot_end - prot_start;
+	m_hidden_ram = std::make_unique<uint8_t[]>(size);
+	save_pointer(NAME(m_hidden_ram), size);
+	cpu.space(AS_PROGRAM).install_ram(prot_start, prot_end, m_hidden_ram.get());
+}
 
 void midyunit_state::init_generic(int bpp, int sound, int prot_start, int prot_end)
 {
@@ -292,21 +299,15 @@ void midyunit_state::init_generic(int bpp, int sound, int prot_start, int prot_e
 			break;
 
 		case SOUND_CVSD:
-			m_hidden_ram = std::make_unique<uint8_t[]>(prot_end - prot_start);
-			save_pointer(NAME(m_hidden_ram), prot_end - prot_start);
-			m_cvsd_sound->get_cpu()->space(AS_PROGRAM).install_ram(prot_start, prot_end, m_hidden_ram.get());
+			install_hidden_ram(*m_cvsd_sound->get_cpu(), prot_start, prot_end);
 			break;
 
 		case SOUND_ADPCM:
-			m_hidden_ram = std::make_unique<uint8_t[]>(prot_end - prot_start);
-			save_pointer(NAME(m_hidden_ram), prot_end - prot_start);
-			m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_ram(prot_start, prot_end, m_hidden_ram.get());
+			install_hidden_ram(*m_adpcm_sound->get_cpu(), prot_start, prot_end);
 			break;
 
 		case SOUND_NARC:
-			m_hidden_ram = std::make_unique<uint8_t[]>(prot_end - prot_start);
-			save_pointer(NAME(m_hidden_ram), prot_end - prot_start);
-			m_narc_sound->get_cpu()->space(AS_PROGRAM).install_ram(prot_start, prot_end, m_hidden_ram.get());
+			install_hidden_ram(*m_narc_sound->get_cpu(), prot_start, prot_end);
 			break;
 
 		case SOUND_YAWDIM:

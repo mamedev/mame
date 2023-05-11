@@ -20,7 +20,6 @@ static constexpr uint32_t sprite_expand[16] =
 
 
 
-
 /*************************************
  *
  *  Palette conversion
@@ -209,7 +208,7 @@ inline uint32_t turbo_base_state::sprite_xscale(uint8_t dacinput, double vr1, do
 	{
 		// based on figure 6 of datasheet
 		vco_freq = -0.9892942 * log10(cext) - 0.0309697 * vco_cv * vco_cv
-						+   0.344079975 * vco_cv - 4.086395841;
+				+ 0.344079975 * vco_cv - 4.086395841;
 		vco_freq = pow(10.0, vco_freq);
 	}
 
@@ -236,7 +235,7 @@ void turbo_state::prepare_sprites(uint8_t y)
 	// compute the sprite information, which was done on the previous scanline during HBLANK
 	for (int sprnum = 0; sprnum < 16; sprnum++)
 	{
-		uint8_t *rambase = &m_alt_spriteram[sprnum * 8];
+		uint8_t *rambase = &m_spriteram[sprnum * 8];
 		int level = sprnum & 7;
 		uint8_t clo, chi;
 		uint32_t sum;
@@ -301,6 +300,7 @@ uint32_t turbo_state::get_sprite_bits(uint8_t road)
 
 	// loop over all live levels
 	for (int level = 0; level < 8; level++)
+	{
 		if (sprlive & (1 << level))
 		{
 			// latch the data and advance the offset
@@ -319,7 +319,7 @@ uint32_t turbo_state::get_sprite_bits(uint8_t road)
 				pixdata = m_spriteroms[(level << 14) | ((offs >> 1) & 0x3fff)] >> ((~offs & 1) * 4);
 				m_sprite_info.latched[level] = sprite_expand[pixdata & 0x0f] << level;
 
-				// if bit 3 is 0 and bit 2 is 1, the enable flip/flip is reset
+				// if bit 3 is 0 and bit 2 is 1, the enable flip/flop is reset
 				if ((pixdata & 0x0c) == 0x04)
 				{
 					m_sprite_info.lst &= ~(1 << level);
@@ -331,6 +331,7 @@ uint32_t turbo_state::get_sprite_bits(uint8_t road)
 				m_sprite_info.frac[level] -= 0x1000000;
 			}
 		}
+	}
 
 	return sprdata;
 }
@@ -404,7 +405,7 @@ uint32_t turbo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			// look up AREA1 and AREA2 (p. 142)
 			int area, offs, areatmp;
 			offs = va |                         //  A0- A7 = VA0-VA7
-					((sel & 0x0f) << 8);            //  A8-A11 = SEL0-3
+					((sel & 0x0f) << 8);        //  A8-A11 = SEL0-3
 
 			areatmp = m_roadroms[0x0000 | offs];
 			areatmp = ((areatmp + xx) >> 8) & 0x01;
@@ -416,7 +417,7 @@ uint32_t turbo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 			// look up AREA3 and AREA4 (p. 142)
 			offs = va |                         //  A0- A7 = VA0-VA7
-					((sel & 0xf0) << 4);            //  A8-A11 = SEL4-7
+					((sel & 0xf0) << 4);        //  A8-A11 = SEL4-7
 
 			areatmp = m_roadroms[0x2000 | offs];
 			areatmp = ((areatmp + xx) >> 8) & 0x01;
@@ -427,8 +428,8 @@ uint32_t turbo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			area |= areatmp << 3;
 
 			// look up AREA5 (p. 141)
-			offs = (xx >> 3) |                          //  A0- A4 = H3-H7
-					((m_opc & 0x3f) << 5);    //  A5-A10 = OPC0-5
+			offs = (xx >> 3) |                  //  A0- A4 = H3-H7
+					((m_opc & 0x3f) << 5);      //  A5-A10 = OPC0-5
 
 			areatmp = m_roadroms[0x4000 | offs];
 			areatmp = (areatmp << (xx & 7)) & 0x80;
@@ -443,7 +444,7 @@ uint32_t turbo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 				road = 1;
 
 			// also use the coch value to look up color info in IC13/PR1114 and IC21/PR1117 (p. 144)
-			offs = (coch & 0x0f) |                      // A0-A3: CONT0-3 = COCH0-3
+			offs = (coch & 0x0f) |            // A0-A3: CONT0-3 = COCH0-3
 					((m_fbcol & 0x01) << 4);  //    A4: COL0
 			int bacol = pr1114[offs] | (pr1117[offs] << 8);
 
@@ -471,36 +472,36 @@ uint32_t turbo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 				m_collision |= pr1116[((sprbits >> 24) & 7) | (slipar_acciar >> 1)];
 
 				// look up the sprite priority in IC11/PR1122 (p. 144)
-				int priority = ((sprbits & 0xfe000000) >> 25) |     // A0-A6: PLB1-7
-							((m_fbpla & 0x07) << 7);  // A7-A9: PLA0-2
+				int priority = ((sprbits & 0xfe000000) >> 25) | // A0-A6: PLB1-7
+							((m_fbpla & 0x07) << 7);            // A7-A9: PLA0-2
 				priority = pr1122[priority];
 
 				// use that to look up the overall priority in IC12/PR1123 (p. 144)
 				int mx = (priority & 7) |                       // A0-A2: PR-1122 output, bits 0-2
 						((sprbits & 0x01000000) >> 21) |        //    A3: PLB0
 						((foreraw & 0x80) >> 3) |               //    A4: PLBE
-						((forebits & 0x08) << 2) |          //    A5: PLBF
-						((babit & 0x07) << 6) |             // A6-A8: BABIT1-3
-						((m_fbpla & 0x08) << 6);  //    A9: PLA3
+						((forebits & 0x08) << 2) |              //    A5: PLBF
+						((babit & 0x07) << 6) |                 // A6-A8: BABIT1-3
+						((m_fbpla & 0x08) << 6);                //    A9: PLA3
 				mx = pr1123[mx];
 
 				// the MX output selects one of 16 inputs; build up a 16-bit pattern to match
 				// these in red, green, and blue (p. 144)
-				int red = ((sprbits & 0x0000ff) >> 0) |     //  D0- D7: CDR0-CDR7
+				int red = ((sprbits & 0x0000ff) >> 0) | //  D0- D7: CDR0-CDR7
 						((forebits & 0x01) << 8) |      //      D8: CDRF
-						((bacol & 0x001f) << 9) |           //  D9-D13: BAR0-BAR4
+						((bacol & 0x001f) << 9) |       //  D9-D13: BAR0-BAR4
 						(1 << 14) |                     //     D14: 1
 						(0 << 15);                      //     D15: 0
 
-				int grn = ((sprbits & 0x00ff00) >> 8) |     //  D0- D7: CDG0-CDG7
+				int grn = ((sprbits & 0x00ff00) >> 8) | //  D0- D7: CDG0-CDG7
 						((forebits & 0x02) << 7) |      //      D8: CDGF
-						((bacol & 0x03e0) << 4) |           //  D9-D13: BAG0-BAG4
+						((bacol & 0x03e0) << 4) |       //  D9-D13: BAG0-BAG4
 						(1 << 14) |                     //     D14: 1
 						(0 << 15);                      //     D15: 0
 
-				int blu = ((sprbits & 0xff0000) >> 16) |    //  D0- D7: CDB0-CDB7
+				int blu = ((sprbits & 0xff0000) >> 16) |//  D0- D7: CDB0-CDB7
 						((forebits & 0x04) << 6) |      //      D8: CDBF
-						((bacol & 0x7c00) >> 1) |           //  D9-D13: BAB0-BAB4
+						((bacol & 0x7c00) >> 1) |       //  D9-D13: BAB0-BAB4
 						(1 << 14) |                     //     D14: 1
 						(0 << 15);                      //     D15: 0
 
@@ -509,11 +510,14 @@ uint32_t turbo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 						(((~red >> mx) & 1) << 4) |     //    A4: CDR
 						(((~grn >> mx) & 1) << 5) |     //    A5: CDG
 						(((~blu >> mx) & 1) << 6) |     //    A6: CDB
-						((m_fbcol & 6) << 6); // A7-A8: COL1-2
-				dest[x + ix] = pr1121[offs];
+						((m_fbcol & 6) << 6);           // A7-A8: COL1-2
+
+				if (cliprect.contains(x + ix, y))
+					dest[x + ix] = pr1121[offs];
 			}
 		}
 	}
+
 	return 0;
 }
 
@@ -647,6 +651,7 @@ uint32_t subroc3d_state::get_sprite_bits(uint8_t *plb)
 
 	// loop over all live levels
 	for (int level = 0; level < 8; level++)
+	{
 		if (m_sprite_info.lst & (1 << level))
 		{
 			// latch the data and advance the offset
@@ -667,7 +672,7 @@ uint32_t subroc3d_state::get_sprite_bits(uint8_t *plb)
 				m_sprite_info.latched[level] = sprite_expand[pixdata & 0x0f] << level;
 				m_sprite_info.plb[level] = (plb_end[pixdata & 0x0f] & 1) << level;
 
-				// if bit 3 is 0 and bit 2 is 1, the enable flip/flip is reset
+				// if bit 3 is 0 and bit 2 is 1, the enable flip/flop is reset
 				if (plb_end[pixdata & 0x0f] & 2)
 					m_sprite_info.lst &= ~(1 << level);
 
@@ -676,6 +681,7 @@ uint32_t subroc3d_state::get_sprite_bits(uint8_t *plb)
 				m_sprite_info.frac[level] -= 0x800000;
 			}
 		}
+	}
 
 	return sprdata;
 }
@@ -751,7 +757,7 @@ uint32_t subroc3d_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 				uint8_t mux;
 				if (mplb)
 				{
-					offs = (plb ^ 0xff) |                       // A0-A7: /PLB0-7
+					offs = (plb ^ 0xff) |          // A0-A7: /PLB0-7
 							((m_ply & 0x02) << 7); //    A8: PLY1
 					mux = pr1450[offs] >> ((m_ply & 0x01) * 4);
 				}
@@ -759,8 +765,7 @@ uint32_t subroc3d_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 					mux = 0;
 
 				// CD0-3 are selected from the sprite bits and MUX0-2 (p. 141)
-				sprbits = (sprbits >> (mux & 0x07)) & 0x01010101;
-				uint8_t cd = (sprbits >> (24-3)) | (sprbits >> (16-2)) | (sprbits >> (8-1)) | sprbits;
+				uint8_t cd = bitswap<4>(sprbits >> (mux & 0x07), 24, 16, 8, 0);
 
 				// MUX3 selects either CD0-3 or the foreground output (p. 141)
 				int finalbits;
@@ -770,13 +775,16 @@ uint32_t subroc3d_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 					finalbits = forebits;
 
 				// we then go through a muxer to select one of the 16 outputs computed above (p. 141)
-				offs = (finalbits & 0x0f) |                 // A0-A3: CD0-CD3
-						((mux & 0x08) << 1) |               //    A4: MUX3
+				offs = (finalbits & 0x0f) |    // A0-A3: CD0-CD3
+						((mux & 0x08) << 1) |  //    A4: MUX3
 						(m_col << 5);          // A5-A8: COL0-COL3
-				dest[x + ix] = pr1419[offs];
+
+				if (cliprect.contains(x + ix, y))
+					dest[x + ix] = pr1419[offs];
 			}
 		}
 	}
+
 	return 0;
 }
 
@@ -859,6 +867,7 @@ uint32_t buckrog_state::get_sprite_bits(uint8_t *plb)
 
 	// loop over all live levels
 	for (int level = 0; level < 8; level++)
+	{
 		if (m_sprite_info.lst & (1 << level))
 		{
 			// latch the data and advance the offset
@@ -878,7 +887,7 @@ uint32_t buckrog_state::get_sprite_bits(uint8_t *plb)
 				m_sprite_info.latched[level] = sprite_expand[pixdata & 0x0f] << level;
 				m_sprite_info.plb[level] = (plb_end[pixdata & 0x0f] & 1) << level;
 
-				// if bit 3 is 0 and bit 2 is 1, the enable flip/flip is reset
+				// if bit 3 is 0 and bit 2 is 1, the enable flip/flop is reset
 				if (plb_end[pixdata & 0x0f] & 2)
 					m_sprite_info.lst &= ~(1 << level);
 
@@ -887,6 +896,7 @@ uint32_t buckrog_state::get_sprite_bits(uint8_t *plb)
 				m_sprite_info.frac[level] -= 0x800000;
 			}
 		}
+	}
 
 	return sprdata;
 }
@@ -931,9 +941,9 @@ uint32_t buckrog_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 			// at this point, do the character lookup and the foreground color table lookup in IC93/PR1598 (SH 5/5)
 			uint8_t foreraw = fore[(pr5194[((xx >> 3) - 1) & 0x1f] << 3) | (xx & 0x07)];
-			offs = ((foreraw & 0x03) << 0) |            // A0-A1: BIT0-1
-					((foreraw & 0xf8) >> 1) |           // A2-A6: BANK3-7
-					((m_fchg & 0x03) << 7); // A7-A9: FCHG0-2
+			offs = ((foreraw & 0x03) << 0) |    // A0-A1: BIT0-1
+					((foreraw & 0xf8) >> 1) |   // A2-A6: BANK3-7
+					((m_fchg & 0x03) << 7);     // A7-A9: FCHG0-2
 			uint8_t forebits = pr5198[offs];
 
 			// fetch the STAR bit
@@ -951,23 +961,12 @@ uint32_t buckrog_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 				uint8_t plb;
 				uint32_t sprbits = get_sprite_bits(&plb);
 
-				// the PLB bits go into an LS148 8-to-1 decoder and become MUX0-3 (PROM board SH 2/10)
-				uint8_t mux;
-				if (plb == 0)
-					mux = 8;
-				else
-				{
-					mux = 7;
-					while (!(plb & 0x80))
-					{
-						mux--;
-						plb <<= 1;
-					}
-				}
+				// the PLB bits go into an LS148 8-to-3 decoder and become MUX0-3 (PROM board SH 2/10)
+				uint8_t mux = count_leading_zeros_32(bitswap<8>(plb,0,1,2,3,4,5,6,7)) - 24;
+				if (mux == 8) mux = 0xf;
 
 				// MUX then selects one of the sprites and selects CD0-3
-				sprbits = (sprbits >> (mux & 0x07)) & 0x01010101;
-				uint8_t cd = (sprbits >> (24-3)) | (sprbits >> (16-2)) | (sprbits >> (8-1)) | sprbits;
+				uint8_t cd = bitswap<4>(sprbits >> (mux & 0x07), 24, 16, 8, 0);
 
 				// this info goes into an LS148 8-to-3 decoder to determine the priorities (SH 5/5)
 
@@ -976,15 +975,15 @@ uint32_t buckrog_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 				if (!(forebits & 0x80))
 				{
 					palbits = ((forebits & 0x3c) << 2) |
-								((forebits & 0x06) << 1) |
-								((forebits & 0x01) << 0);
+							((forebits & 0x06) << 1) |
+							((forebits & 0x01) << 0);
 				}
 
 				// priority 6 is if MUX3 is 0; CHNG = 1
 				else if (!(mux & 0x08))
 				{
-					offs = (cd & 0x0f) |                        // A0-A3: CD0-3
-							((mux & 0x07) << 4) |               // A4-A6: MUX0-2
+					offs = (cd & 0x0f) |            // A0-A3: CD0-3
+							((mux & 0x07) << 4) |   // A4-A6: MUX0-2
 							((m_obch & 0x07) << 7); // A7-A9: OBCH0-2
 					palbits = pr5199[offs];
 				}
@@ -993,8 +992,8 @@ uint32_t buckrog_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 				else if (!(forebits & 0x40))
 				{
 					palbits = ((forebits & 0x3c) << 2) |
-								((forebits & 0x06) << 1) |
-								((forebits & 0x01) << 0);
+							((forebits & 0x06) << 1) |
+							((forebits & 0x01) << 0);
 				}
 
 				// priority 1 is if the star is set; CHNG = 2
@@ -1011,9 +1010,11 @@ uint32_t buckrog_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 				}
 
 				// store the final bits for this pixel
-				dest[x + ix] = palbits;
+				if (cliprect.contains(x + ix, y))
+					dest[x + ix] = palbits;
 			}
 		}
 	}
+
 	return 0;
 }

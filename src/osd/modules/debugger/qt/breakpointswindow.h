@@ -17,8 +17,10 @@ class BreakpointsWindow : public WindowQt
 	Q_OBJECT
 
 public:
-	BreakpointsWindow(running_machine &machine, QWidget *parent = nullptr);
+	BreakpointsWindow(DebuggerQt &debugger, QWidget *parent = nullptr);
 	virtual ~BreakpointsWindow();
+
+	virtual void restoreConfiguration(util::xml::data_node const &node) override;
 
 protected:
 	virtual void saveConfigurationToNode(util::xml::data_node &node) override;
@@ -29,28 +31,6 @@ private slots:
 private:
 	// Widgets
 	DebuggerView *m_breakpointsView;
-};
-
-
-//=========================================================================
-//  A way to store the configuration of a window long enough to read/write.
-//=========================================================================
-class BreakpointsWindowQtConfig : public WindowQtConfig
-{
-public:
-	BreakpointsWindowQtConfig() :
-		WindowQtConfig(WINDOW_TYPE_POINTS_VIEWER),
-		m_bwType(0)
-	{
-	}
-
-	~BreakpointsWindowQtConfig() {}
-
-	// Settings
-	int m_bwType;
-
-	void applyToQWidget(QWidget *widget);
-	void recoverFromXmlNode(util::xml::data_node const &node);
 };
 
 } // namespace osd::debugger::qt

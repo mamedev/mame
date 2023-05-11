@@ -20,6 +20,9 @@
 #include "video/mc6845.h"
 #include "screen.h"
 
+
+namespace {
+
 class mdt60_state : public driver_device
 {
 public:
@@ -259,5 +262,8 @@ ROM_START(mdt60)
 	ROM_REGION(0x1000, "charrom", 0)
 	ROM_LOAD("char_gen_b207.u6", 0x0000, 0x1000, CRC(b19432da) SHA1(fa73641c08b778f19a17676a7f4074f69b7b55dd))
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1983, mdt60, 0, 0, mdt60, mdt60, mdt60_state, empty_init, "Morrow Designs", "MDT 60 Video Display Terminal", MACHINE_SUPPORTS_SAVE)

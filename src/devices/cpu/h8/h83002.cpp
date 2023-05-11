@@ -28,8 +28,7 @@ h83002_device::h83002_device(const machine_config &mconfig, const char *tag, dev
 	sci0(*this, "sci0"),
 	sci1(*this, "sci1"),
 	watchdog(*this, "watchdog"),
-	tend0_cb(*this),
-	tend1_cb(*this)
+	tend_cb(*this)
 {
 	syscr = 0;
 }
@@ -170,11 +169,11 @@ void h83002_device::device_add_mconfig(machine_config &config)
 
 void h83002_device::execute_set_input(int inputnum, int state)
 {
-	if(inputnum == H8_INPUT_LINE_TEND0 && !tend0_cb.isnull())
-		tend0_cb(state);
-	else if(inputnum == H8_INPUT_LINE_TEND1 && !tend1_cb.isnull())
-		tend1_cb(state);
-	else if(inputnum >= H8_INPUT_LINE_DREQ0 && inputnum <= H8_INPUT_LINE_DREQ3)
+	if(inputnum == H8_INPUT_LINE_TEND0 || inputnum == H8_INPUT_LINE_TEND1) {
+		if(!tend_cb[inputnum - H8_INPUT_LINE_TEND0].isnull())
+			tend_cb[inputnum - H8_INPUT_LINE_TEND0](state);
+	}
+	else if(inputnum == H8_INPUT_LINE_DREQ0 || inputnum == H8_INPUT_LINE_DREQ1)
 		dma->set_input(inputnum, state);
 	else
 		intc->set_input(inputnum, state);
@@ -219,7 +218,7 @@ void h83002_device::update_irq_filter()
 
 void h83002_device::interrupt_taken()
 {
-	standard_irq_callback(intc->interrupt_taken(taken_irq_vector));
+	standard_irq_callback(intc->interrupt_taken(taken_irq_vector), NPC);
 }
 
 void h83002_device::internal_update(uint64_t current_time)
@@ -244,8 +243,7 @@ void h83002_device::device_start()
 	h8h_device::device_start();
 	dma_device = dma;
 
-	tend0_cb.resolve();
-	tend1_cb.resolve();
+	tend_cb.resolve_all();
 }
 
 void h83002_device::device_reset()

@@ -25,6 +25,9 @@ Known Non-Issues (confirmed on Real Genesis)
 
 #include "emu.h"
 #include "megadriv.h"
+
+#include "machine/input_merger.h"
+
 #include "speaker.h"
 
 #define LOG_AUDIOBANK   (1U << 1) // z80 to 68k space window access at $8000-$ffff
@@ -75,9 +78,6 @@ uint8_t md_base_state::megadriv_68k_YM2612_read(offs_t offset, uint8_t mem_mask)
 		LOG("%s: 68000 attempting to access YM2612 (read) without bus\n", machine().describe_context());
 		return 0;
 	}
-
-	// never executed
-	//return -1;
 }
 
 
@@ -95,9 +95,9 @@ void md_base_state::megadriv_68k_YM2612_write(offs_t offset, uint8_t data, uint8
 }
 
 // this is used by 6 button pads and gets installed in machine_start for drivers requiring it
-TIMER_CALLBACK_MEMBER(md_base_state::io_timeout_timer_callback)
+TIMER_CALLBACK_MEMBER(md_ctrl_state::ioport_timeout)
 {
-	m_io_stage[(int)param] = -1;
+	m_ioport_phase[param] = 0;
 }
 
 
@@ -141,25 +141,27 @@ TIMER_CALLBACK_MEMBER(md_base_state::io_timeout_timer_callback)
 */
 
 INPUT_PORTS_START( md_common )
-	PORT_START("PAD1")      /* Joypad 1 (3 button + start) NOT READ DIRECTLY */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_START("PAD1")      // Joypad 1 (3 button + start)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 B") // b
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 C") // c
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 A") // a
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 START") // start
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("%p B")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("%p C")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("%p A")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START )   PORT_PLAYER(1)
+	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_UNUSED ) // extra buttons on 6-button pad
 
-	PORT_START("PAD2")      /* Joypad 2 (3 button + start) NOT READ DIRECTLY */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_START("PAD2")      // Joypad 2 (3 button + start)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 B") // b
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 C") // c
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 A") // a
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 START") // start
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("%p B")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("%p C")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("%p A")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START )   PORT_PLAYER(2)
+	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_UNUSED ) // extra buttons on 6-button pad
 INPUT_PORTS_END
 
 
@@ -170,310 +172,163 @@ INPUT_PORTS_START( megadriv )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Reset Button") PORT_IMPULSE(1) // reset, resets 68k (and..?)
 INPUT_PORTS_END
 
-INPUT_PORTS_START( megadri6 )
-	PORT_INCLUDE( megadriv )
 
-	PORT_START("EXTRA1")    /* Extra buttons for Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME("P1 Z") // z
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("P1 Y") // y
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("P1 X") // x
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(1) PORT_NAME("P1 MODE") // mode
-
-	PORT_START("EXTRA2")    /* Extra buttons for Joypad 2 (6 button + start + mode) NOT READ DIRECTLY */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2) PORT_NAME("P2 Z") // z
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_NAME("P2 Y") // y
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("P2 X") // x
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(2) PORT_NAME("P2 MODE") // mode
-INPUT_PORTS_END
-
-void md_base_state::megadrive_reset_io()
+template <unsigned N>
+uint8_t md_ctrl_state::ioport_in_3button()
 {
-	int i;
-
-	m_megadrive_io_data_regs[0] = 0x7f;
-	m_megadrive_io_data_regs[1] = 0x7f;
-	m_megadrive_io_data_regs[2] = 0x7f;
-	m_megadrive_io_ctrl_regs[0] = 0x00;
-	m_megadrive_io_ctrl_regs[1] = 0x00;
-	m_megadrive_io_ctrl_regs[2] = 0x00;
-	m_megadrive_io_tx_regs[0] = 0xff;
-	m_megadrive_io_tx_regs[1] = 0xff;
-	m_megadrive_io_tx_regs[2] = 0xff;
-
-	for (i=0; i<3; i++)
-	{
-		m_io_stage[i] = -1;
-	}
-}
-
-/************* 6 buttons version **************************/
-uint8_t md_base_state::megadrive_io_read_data_port_6button(offs_t offset)
-{
-	int portnum = offset;
-	uint8_t retdata, helper = (m_megadrive_io_ctrl_regs[portnum] & 0x3f) | 0xc0; // bits 6 & 7 always come from m_megadrive_io_data_regs
-
-	if (m_megadrive_io_data_regs[portnum] & 0x40)
-	{
-		if (m_io_stage[portnum] == 2)
-		{
-			/* here we read B, C & the additional buttons */
-			retdata = (m_megadrive_io_data_regs[portnum] & helper) |
-						((((m_io_pad_3b[portnum] ? m_io_pad_3b[portnum]->read() : 0) & 0x30) |
-							((m_io_pad_6b[portnum] ? m_io_pad_6b[portnum]->read() : 0) & 0x0f)) & ~helper);
-		}
-		else
-		{
-			/* here we read B, C & the directional buttons */
-			retdata = (m_megadrive_io_data_regs[portnum] & helper) |
-						(((m_io_pad_3b[portnum] ? m_io_pad_3b[portnum]->read() : 0) & 0x3f) & ~helper);
-		}
-	}
+	ioport_value const pad = m_io_pad[N]->read();
+	if (m_ioport_th[N])
+		return BIT(pad, 0, 6);
 	else
+		return (BIT(pad, 6, 2) << 4) | BIT(pad, 0, 2);
+}
+
+template <unsigned N>
+uint8_t md_ctrl_state::ioport_in_6button()
+{
+	ioport_value const pad = m_io_pad[N]->read();
+	switch (m_ioport_phase[N])
 	{
-		if (m_io_stage[portnum] == 1)
-		{
-			/* here we read ((Start & A) >> 2) | 0x00 */
-			retdata = (m_megadrive_io_data_regs[portnum] & helper) |
-						((((m_io_pad_3b[portnum] ? m_io_pad_3b[portnum]->read() : 0) & 0xc0) >> 2) & ~helper);
-		}
-		else if (m_io_stage[portnum]==2)
-		{
-			/* here we read ((Start & A) >> 2) | 0x0f */
-			retdata = (m_megadrive_io_data_regs[portnum] & helper) |
-						(((((m_io_pad_3b[portnum] ? m_io_pad_3b[portnum]->read() : 0) & 0xc0) >> 2) | 0x0f) & ~helper);
-		}
+	default:
+	case 0:
+	case 1:
+		if (m_ioport_th[N])
+			return BIT(pad, 0, 6);
 		else
-		{
-			/* here we read ((Start & A) >> 2) | Up and Down */
-			retdata = (m_megadrive_io_data_regs[portnum] & helper) |
-						(((((m_io_pad_3b[portnum] ? m_io_pad_3b[portnum]->read() : 0) & 0xc0) >> 2) |
-							((m_io_pad_3b[portnum] ? m_io_pad_3b[portnum]->read() : 0) & 0x03)) & ~helper);
-		}
+			return (BIT(pad, 6, 2) << 4) | BIT(pad, 0, 2);
+	case 2:
+		if (m_ioport_th[N])
+			return BIT(pad, 0, 6);
+		else
+			return BIT(pad, 6, 2) << 4;
+	case 3:
+		if (m_ioport_th[N])
+			return (BIT(pad, 4, 2) << 4) | BIT(pad, 8, 4);
+		else
+			return (BIT(pad, 6, 2) << 4) | 0x0f;
 	}
+}
 
-//  osd_printf_debug("read io data port stage %d port %d %02x\n",m_io_stage[portnum],portnum,retdata);
+template <unsigned N>
+void md_ctrl_state::ioport_out_3button(uint8_t data, uint8_t mem_mask)
+{
+	m_ioport_th[N] = BIT(data, 6);
+}
+
+template <unsigned N>
+void md_ctrl_state::ioport_out_6button(uint8_t data, uint8_t mem_mask)
+{
+	uint8_t const th = BIT(data, 6);
+	if (!th)
+	{
+		m_ioport_idle[N]->reset();
+	}
+	else if (!m_ioport_th[N])
+	{
+		m_ioport_idle[N]->adjust(attotime::from_usec(1500), N);
+		m_ioport_phase[N] = (m_ioport_phase[N] + 1) & 0x03;
+	}
+	m_ioport_th[N] = th;
+}
+
+
+uint16_t md_base_state::m68k_version_read()
+{
+	/* Charles MacDonald ( http://cgfm2.emuviews.com/ )
+	  D7 : Console is 1= Export (USA, Europe, etc.) 0= Domestic (Japan)
+	  D6 : Video type is 1= PAL, 0= NTSC
+	  D5 : Sega CD unit is 1= not present, 0= connected.
+	  D4 : Unused (always returns zero)
+	  D3 : Bit 3 of version number
+	  D2 : Bit 2 of version number
+	  D1 : Bit 1 of version number
+	  D0 : Bit 0 of version number
+	*/
+	LOG("%s: read version register\n", machine().describe_context());
+	// Version number contained in bits 3-0
+	// TODO: non-TMSS BIOSes must return 0 here
+	uint16_t const retdata = m_version_hi_nibble | 0x01;
 
 	return retdata | (retdata << 8);
 }
 
-
-/************* 3 buttons version **************************/
-uint8_t md_base_state::megadrive_io_read_data_port_3button(offs_t offset)
+uint16_t md_base_state::m68k_ioport_data_read(offs_t offset)
 {
-	int portnum = offset;
-	uint8_t retdata, helper = (m_megadrive_io_ctrl_regs[portnum] & 0x7f) | 0x80; // bit 7 always comes from m_megadrive_io_data_regs
-
-	if (m_megadrive_io_data_regs[portnum] & 0x40)
-	{
-		/* here we read B, C & the directional buttons */
-		retdata = (m_megadrive_io_data_regs[portnum] & helper) |
-					((((m_io_pad_3b[portnum] ? m_io_pad_3b[portnum]->read() : 0) & 0x3f) | 0x40) & ~helper);
-	}
-	else
-	{
-		/* here we read ((Start & A) >> 2) | Up and Down */
-		retdata = (m_megadrive_io_data_regs[portnum] & helper) |
-					(((((m_io_pad_3b[portnum] ? m_io_pad_3b[portnum]->read() : 0) & 0xc0) >> 2) |
-						((m_io_pad_3b[portnum] ? m_io_pad_3b[portnum]->read() : 0) & 0x03) | 0x40) & ~helper);
-	}
-
-	return retdata;
-}
-
-uint8_t md_base_state::megadrive_io_read_ctrl_port(int portnum)
-{
-	uint8_t retdata;
-	retdata = m_megadrive_io_ctrl_regs[portnum];
-	//osd_printf_debug("read io ctrl port %d %02x\n",portnum,retdata);
-
+	uint16_t retdata = m_ioports[offset]->data_r();
 	return retdata | (retdata << 8);
 }
 
-uint8_t md_base_state::megadrive_io_read_tx_port(int portnum)
+uint16_t md_base_state::m68k_ioport_ctrl_read(offs_t offset)
 {
-	uint8_t retdata;
-	retdata = m_megadrive_io_tx_regs[portnum];
+	uint16_t retdata = m_ioports[offset]->ctrl_r();
 	return retdata | (retdata << 8);
 }
 
-uint8_t md_base_state::megadrive_io_read_rx_port(int portnum)
+template <unsigned N>
+uint16_t md_base_state::m68k_ioport_txdata_read()
 {
-	return 0x00;
-}
-
-uint8_t md_base_state::megadrive_io_read_sctrl_port(int portnum)
-{
-	return 0x00;
-}
-
-
-uint16_t md_base_state::megadriv_68k_io_read(offs_t offset)
-{
-	uint8_t retdata;
-
-	retdata = 0;
-		/* Charles MacDonald ( http://cgfm2.emuviews.com/ )
-		  D7 : Console is 1= Export (USA, Europe, etc.) 0= Domestic (Japan)
-		  D6 : Video type is 1= PAL, 0= NTSC
-		  D5 : Sega CD unit is 1= not present, 0= connected.
-		  D4 : Unused (always returns zero)
-		  D3 : Bit 3 of version number
-		  D2 : Bit 2 of version number
-		  D1 : Bit 1 of version number
-		  D0 : Bit 0 of version number
-		*/
-
-	//return (machine().rand()&0x0f0f)|0xf0f0;//0x0000;
-	switch (offset)
-	{
-		case 0:
-			LOG("%06x read version register\n", m_maincpu->pc());
-			// Version number contained in bits 3-0
-			// TODO: non-TMSS BIOSes must return 0 here
-			retdata = m_version_hi_nibble | 0x01;
-			break;
-
-		/* Joystick Port Registers */
-
-		case 0x1:
-		case 0x2:
-		case 0x3:
-			retdata = m_megadrive_io_read_data_port_ptr(offset-1);
-			break;
-
-		case 0x4:
-		case 0x5:
-		case 0x6:
-			retdata = megadrive_io_read_ctrl_port(offset-4);
-			break;
-
-		/* Serial I/O Registers */
-
-		case 0x7: retdata = megadrive_io_read_tx_port(0); break;
-		case 0x8: retdata = megadrive_io_read_rx_port(0); break;
-		case 0x9: retdata = megadrive_io_read_sctrl_port(0); break;
-
-		case 0xa: retdata = megadrive_io_read_tx_port(1); break;
-		case 0xb: retdata = megadrive_io_read_rx_port(1); break;
-		case 0xc: retdata = megadrive_io_read_sctrl_port(1); break;
-
-		case 0xd: retdata = megadrive_io_read_tx_port(2); break;
-		case 0xe: retdata = megadrive_io_read_rx_port(2); break;
-		case 0xf: retdata = megadrive_io_read_sctrl_port(2); break;
-
-	}
-
+	uint16_t retdata = m_ioports[N]->txdata_r();
 	return retdata | (retdata << 8);
 }
 
-
-void md_base_state::megadrive_io_write_data_port_3button(offs_t offset, uint16_t data)
+template <unsigned N>
+uint16_t md_base_state::m68k_ioport_rxdata_read()
 {
-	int portnum = offset;
-	m_megadrive_io_data_regs[portnum] = data;
-	//osd_printf_debug("Writing IO Data Register #%d data %04x\n",portnum,data);
-
+	uint16_t retdata = m_ioports[N]->rxdata_r();
+	return retdata | (retdata << 8);
 }
 
-
-/****************************** 6 buttons version*****************************/
-
-void md_base_state::megadrive_io_write_data_port_6button(offs_t offset, uint16_t data)
+template <unsigned N>
+uint16_t md_base_state::m68k_ioport_s_ctrl_read()
 {
-	int portnum = offset;
-	if (m_megadrive_io_ctrl_regs[portnum]&0x40)
-	{
-		if (((m_megadrive_io_data_regs[portnum]&0x40)==0x00) && ((data&0x40) == 0x40))
-		{
-			m_io_stage[portnum]++;
-			m_io_timeout[portnum]->adjust(m_maincpu->cycles_to_attotime(8192), portnum);
-		}
-
-	}
-
-	m_megadrive_io_data_regs[portnum] = data;
-	//osd_printf_debug("Writing IO Data Register #%d data %04x\n",portnum,data);
-
+	uint16_t retdata = m_ioports[N]->s_ctrl_r();
+	return retdata | (retdata << 8);
 }
 
-
-/*************************** 3 buttons version ****************************/
-
-void md_base_state::megadrive_io_write_ctrl_port(int portnum, uint16_t data)
+void md_base_state::m68k_ioport_data_write(offs_t offset, uint16_t data)
 {
-	m_megadrive_io_ctrl_regs[portnum] = data;
-//  osd_printf_debug("Setting IO Control Register #%d data %04x\n",portnum,data);
+	m_ioports[offset]->data_w(uint8_t(data));
 }
 
-void md_base_state::megadrive_io_write_tx_port(int portnum, uint16_t data)
+void md_base_state::m68k_ioport_ctrl_write(offs_t offset, uint16_t data)
 {
-	m_megadrive_io_tx_regs[portnum] = data;
+	m_ioports[offset]->ctrl_w(uint8_t(data));
 }
 
-void md_base_state::megadrive_io_write_rx_port(int portnum, uint16_t data)
+template <unsigned N>
+void md_base_state::m68k_ioport_txdata_write(uint16_t data)
 {
+	m_ioports[N]->txdata_w(uint8_t(data));
 }
 
-void md_base_state::megadrive_io_write_sctrl_port(int portnum, uint16_t data)
+template <unsigned N>
+void md_base_state::m68k_ioport_s_ctrl_write(uint16_t data)
 {
-}
-
-
-void md_base_state::megadriv_68k_io_write(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-//  osd_printf_debug("IO Write #%02x data %04x mem_mask %04x\n",offset,data,mem_mask);
-
-
-	switch (offset)
-	{
-		case 0x0:
-			osd_printf_debug("Write to Version Register?!\n");
-			break;
-
-		/* Joypad Port Registers */
-
-		case 0x1:
-		case 0x2:
-		case 0x3:
-			m_megadrive_io_write_data_port_ptr(offset-1,data);
-			break;
-
-		case 0x4:
-		case 0x5:
-		case 0x6:
-			megadrive_io_write_ctrl_port(offset-4,data);
-			break;
-
-		/* Serial I/O Registers */
-
-		case 0x7: megadrive_io_write_tx_port(0,data); break;
-		case 0x8: megadrive_io_write_rx_port(0,data); break;
-		case 0x9: megadrive_io_write_sctrl_port(0,data); break;
-
-		case 0xa: megadrive_io_write_tx_port(1,data); break;
-		case 0xb: megadrive_io_write_rx_port(1,data); break;
-		case 0xc: megadrive_io_write_sctrl_port(1,data); break;
-
-		case 0xd: megadrive_io_write_tx_port(2,data); break;
-		case 0xe: megadrive_io_write_rx_port(2,data); break;
-		case 0xf: megadrive_io_write_sctrl_port(2,data); break;
-	}
+	m_ioports[N]->s_ctrl_w(uint8_t(data));
 }
 
 
 
-void md_base_state::megadriv_map(address_map &map)
+void md_base_state::megadriv_68k_base_map(address_map &map)
 {
-	map(0x000000, 0x3fffff).rom();
-	/*      (0x000000 - 0x3fffff) == GAME ROM (4Meg Max, Some games have special banking too) */
-
 	map(0xa00000, 0xa01fff).rw(FUNC(md_base_state::megadriv_68k_read_z80_ram), FUNC(md_base_state::megadriv_68k_write_z80_ram));
 	map(0xa02000, 0xa03fff).w(FUNC(md_base_state::megadriv_68k_write_z80_ram));
 	map(0xa04000, 0xa04003).rw(FUNC(md_base_state::megadriv_68k_YM2612_read), FUNC(md_base_state::megadriv_68k_YM2612_write));
 
 	map(0xa06000, 0xa06001).w(FUNC(md_base_state::megadriv_68k_z80_bank_write));
 
-	map(0xa10000, 0xa1001f).rw(FUNC(md_base_state::megadriv_68k_io_read), FUNC(md_base_state::megadriv_68k_io_write));
+	map(0xa10000, 0xa10001).r(FUNC(md_base_state::m68k_version_read));
+	map(0xa10002, 0xa10007).rw(FUNC(md_base_state::m68k_ioport_data_read), FUNC(md_base_state::m68k_ioport_data_write));
+	map(0xa10008, 0xa1000d).rw(FUNC(md_base_state::m68k_ioport_ctrl_read), FUNC(md_base_state::m68k_ioport_ctrl_write));
+	map(0xa1000e, 0xa1000f).rw(FUNC(md_base_state::m68k_ioport_txdata_read<0>), FUNC(md_base_state::m68k_ioport_txdata_write<0>));
+	map(0xa10010, 0xa10011).r(FUNC(md_base_state::m68k_ioport_rxdata_read<0>));
+	map(0xa10012, 0xa10013).rw(FUNC(md_base_state::m68k_ioport_s_ctrl_read<0>), FUNC(md_base_state::m68k_ioport_s_ctrl_write<0>));
+	map(0xa10014, 0xa10015).rw(FUNC(md_base_state::m68k_ioport_txdata_read<1>), FUNC(md_base_state::m68k_ioport_txdata_write<1>));
+	map(0xa10016, 0xa10017).r(FUNC(md_base_state::m68k_ioport_rxdata_read<1>));
+	map(0xa10018, 0xa10019).rw(FUNC(md_base_state::m68k_ioport_s_ctrl_read<1>), FUNC(md_base_state::m68k_ioport_s_ctrl_write<1>));
+	map(0xa1001a, 0xa1001b).rw(FUNC(md_base_state::m68k_ioport_txdata_read<2>), FUNC(md_base_state::m68k_ioport_txdata_write<2>));
+	map(0xa1001c, 0xa1001d).r(FUNC(md_base_state::m68k_ioport_rxdata_read<2>));
+	map(0xa1001e, 0xa1001f).rw(FUNC(md_base_state::m68k_ioport_s_ctrl_read<2>), FUNC(md_base_state::m68k_ioport_s_ctrl_write<2>));
 
 	map(0xa11100, 0xa11101).rw(FUNC(md_base_state::megadriv_68k_check_z80_bus), FUNC(md_base_state::megadriv_68k_req_z80_bus));
 	map(0xa11200, 0xa11201).w(FUNC(md_base_state::megadriv_68k_req_z80_reset));
@@ -485,11 +340,12 @@ void md_base_state::megadriv_map(address_map &map)
 	/*       0xe00000 - 0xffffff) == MAIN RAM (64kb, Mirrored, most games use ff0000 - ffffff) */
 }
 
-
-void md_base_state::dcat16_megadriv_map(address_map &map)
+void md_base_state::megadriv_68k_map(address_map &map)
 {
-	megadriv_map(map);
-	map(0x000000, 0x7fffff).rom();
+	megadriv_68k_base_map(map);
+
+	map(0x000000, 0x3fffff).rom();
+	/*      (0x000000 - 0x3fffff) == GAME ROM (4Meg Max, Some games have special banking too) */
 }
 
 
@@ -782,9 +638,9 @@ void md_base_state::megadriv_z80_io_map(address_map &map)
 	map(0x00, 0xff).noprw();
 }
 
-uint32_t md_base_state::screen_update_megadriv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t md_core_state::screen_update_megadriv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	/* Copy our screen buffer here */
+	// Copy our screen buffer here
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		uint32_t *const desty = &bitmap.pix(y, 0);
@@ -808,54 +664,57 @@ uint32_t md_base_state::screen_update_megadriv(screen_device &screen, bitmap_rgb
 
 /*****************************************************************************************/
 
-void md_base_state::video_start()
+void md_core_state::machine_reset()
 {
-	// nothing?
-}
-
-void md_base_state::machine_start()
-{
-	m_io_pad_3b[0] = ioport("PAD1");
-	m_io_pad_3b[1] = ioport("PAD2");
-	m_io_pad_3b[2] = ioport("IN0");
-	m_io_pad_3b[3] = ioport("UNK");
-
-	save_item(NAME(m_io_stage));
-	save_item(NAME(m_megadrive_io_data_regs));
-	save_item(NAME(m_megadrive_io_ctrl_regs));
-	save_item(NAME(m_megadrive_io_tx_regs));
-
-	if (m_z80snd)
-		m_genz80.z80_run_timer = timer_alloc(FUNC(md_base_state::megadriv_z80_run_state), this);
-}
-
-void md_base_state::machine_reset()
-{
-	/* default state of z80 = reset, with bus */
-	osd_printf_debug("Resetting Megadrive / Genesis\n");
-
-	if (m_z80snd)
-	{
-		m_genz80.z80_is_reset = 1;
-		m_genz80.z80_has_bus = 1;
-		m_genz80.z80_bank_addr = 0;
-		m_vdp->set_scanline_counter(-1);
-		m_genz80.z80_run_timer->adjust(attotime::zero);
-	}
-
-	megadrive_reset_io();
-
 	if (!m_vdp->m_use_alt_timing)
 	{
 		m_vdp->m_megadriv_scanline_timer = m_scan_timer;
 		m_vdp->m_megadriv_scanline_timer->adjust(attotime::zero);
 	}
 
-	if (m_megadrive_ram)
-		memset(m_megadrive_ram, 0x00, 0x10000);
-
 	m_vdp->device_reset_old();
 }
+
+
+void md_base_state::machine_start()
+{
+	md_core_state::machine_start();
+
+	m_genz80.z80_run_timer = timer_alloc(FUNC(md_base_state::megadriv_z80_run_state), this);
+}
+
+void md_base_state::machine_reset()
+{
+	md_core_state::machine_reset();
+
+	// default state of z80 = reset, with bus
+	osd_printf_debug("Resetting Megadrive / Genesis\n");
+
+	m_genz80.z80_is_reset = 1;
+	m_genz80.z80_has_bus = 1;
+	m_genz80.z80_bank_addr = 0;
+	m_vdp->set_scanline_counter(-1);
+	m_genz80.z80_run_timer->adjust(attotime::zero);
+
+	if (m_megadrive_ram)
+		memset(m_megadrive_ram, 0x00, 0x10000);
+}
+
+
+void md_ctrl_state::machine_start()
+{
+	md_base_state::machine_start();
+
+	m_ioport_idle[0] = timer_alloc(FUNC(md_ctrl_state::ioport_timeout), this);
+	m_ioport_idle[1] = timer_alloc(FUNC(md_ctrl_state::ioport_timeout), this);
+
+	std::fill(std::begin(m_ioport_th), std::end(m_ioport_th), 1);
+	std::fill(std::begin(m_ioport_phase), std::end(m_ioport_phase), 0);
+
+	save_item(NAME(m_ioport_th));
+	save_item(NAME(m_ioport_phase));
+}
+
 
 void md_base_state::megadriv_stop_scanline_timer()
 {
@@ -868,22 +727,19 @@ void md_base_state::megadriv_stop_scanline_timer()
 // this comes from the VDP on lines 240 (on) 241 (off) and is connected to the z80 irq 0
 WRITE_LINE_MEMBER(md_base_state::vdp_sndirqline_callback_genesis_z80)
 {
-	if (m_z80snd)
+	if (state == ASSERT_LINE)
 	{
-		if (state == ASSERT_LINE)
-		{
-			if ((m_genz80.z80_has_bus == 1) && (m_genz80.z80_is_reset == 0))
-				m_z80snd->set_input_line(0, HOLD_LINE);
-		}
-		else if (state == CLEAR_LINE)
-		{
-			m_z80snd->set_input_line(0, CLEAR_LINE);
-		}
+		if ((m_genz80.z80_has_bus == 1) && (m_genz80.z80_is_reset == 0))
+			m_z80snd->set_input_line(0, HOLD_LINE);
+	}
+	else if (state == CLEAR_LINE)
+	{
+		m_z80snd->set_input_line(0, CLEAR_LINE);
 	}
 }
 
 // this comes from the vdp, and is connected to 68k irq level 6 (main vbl interrupt)
-WRITE_LINE_MEMBER(md_base_state::vdp_lv6irqline_callback_genesis_68k)
+WRITE_LINE_MEMBER(md_core_state::vdp_lv6irqline_callback_genesis_68k)
 {
 	if (state == ASSERT_LINE)
 		m_maincpu->set_input_line(6, HOLD_LINE);
@@ -892,7 +748,7 @@ WRITE_LINE_MEMBER(md_base_state::vdp_lv6irqline_callback_genesis_68k)
 }
 
 // this comes from the vdp, and is connected to 68k irq level 4 (raster interrupt)
-WRITE_LINE_MEMBER(md_base_state::vdp_lv4irqline_callback_genesis_68k)
+WRITE_LINE_MEMBER(md_core_state::vdp_lv4irqline_callback_genesis_68k)
 {
 	if (state == ASSERT_LINE)
 		m_maincpu->set_input_line(4, HOLD_LINE);
@@ -901,7 +757,7 @@ WRITE_LINE_MEMBER(md_base_state::vdp_lv4irqline_callback_genesis_68k)
 }
 
 /* Callback when the 68k takes an IRQ */
-IRQ_CALLBACK_MEMBER(md_base_state::genesis_int_callback)
+IRQ_CALLBACK_MEMBER(md_core_state::genesis_int_callback)
 {
 	if (irqline==4)
 	{
@@ -916,50 +772,126 @@ IRQ_CALLBACK_MEMBER(md_base_state::genesis_int_callback)
 	return (0x60+irqline*4)/4; // vector address
 }
 
-void md_base_state::megadriv_timers(machine_config &config)
+
+void md_core_state::megadriv_timers(machine_config &config)
 {
-	TIMER(config, m_scan_timer).configure_generic("gen_vdp", FUNC(sega315_5313_device::megadriv_scanline_timer_callback));
+	TIMER(config, m_scan_timer).configure_generic(m_vdp, FUNC(sega315_5313_device::megadriv_scanline_timer_callback));
 }
 
-
-void md_base_state::md_ntsc(machine_config &config)
+void md_core_state::md_core_ntsc(machine_config &config)
 {
-	M68000(config, m_maincpu, MASTER_CLOCK_NTSC / 7); /* 7.67 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &md_base_state::megadriv_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(md_base_state::genesis_int_callback));
-
-	/* IRQs are handled via the timers */
-
-	Z80(config, m_z80snd, MASTER_CLOCK_NTSC / 15); /* 3.58 MHz */
-	m_z80snd->set_addrmap(AS_PROGRAM, &md_base_state::megadriv_z80_map);
-	m_z80snd->set_addrmap(AS_IO, &md_base_state::megadriv_z80_io_map);
-	/* IRQ handled via the timers */
+	M68000(config, m_maincpu, MASTER_CLOCK_NTSC / 7); // 7.67 MHz
+	m_maincpu->set_irq_acknowledge_callback(FUNC(md_core_state::genesis_int_callback));
+	// IRQs are handled via the timers
 
 	megadriv_timers(config);
 
 	SEGA315_5313(config, m_vdp, MASTER_CLOCK_NTSC, m_maincpu);
 	m_vdp->set_is_pal(false);
-	m_vdp->snd_irq().set(FUNC(md_base_state::vdp_sndirqline_callback_genesis_z80));
-	m_vdp->lv6_irq().set(FUNC(md_base_state::vdp_lv6irqline_callback_genesis_68k));
-	m_vdp->lv4_irq().set(FUNC(md_base_state::vdp_lv4irqline_callback_genesis_68k));
+	m_vdp->lv6_irq().set(FUNC(md_core_state::vdp_lv6irqline_callback_genesis_68k));
+	m_vdp->lv4_irq().set(FUNC(md_core_state::vdp_lv4irqline_callback_genesis_68k));
 	m_vdp->set_screen("megadriv");
-	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(double(MASTER_CLOCK_NTSC) / 10.0 / 262.0 / 342.0); // same as SMS?
-//  m_screen->set_refresh_hz(double(MASTER_CLOCK_NTSC) / 8.0 / 262.0 / 427.0); // or 427 Htotal?
+	m_screen->set_refresh_hz(MASTER_CLOCK_NTSC / 10 / 262 / 342); // same as SMS?
+//  m_screen->set_refresh_hz(double(MASTER_CLOCK_NTSC) / 8 / 262 / 427); // or 427 Htotal?
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0)); // Vblank handled manually.
 	m_screen->set_size(64*8, 620);
 	m_screen->set_visarea(0, 32*8-1, 0, 28*8-1);
-	m_screen->set_screen_update(FUNC(md_base_state::screen_update_megadriv)); /* Copies a bitmap */
-	m_screen->screen_vblank().set(FUNC(md_base_state::screen_vblank_megadriv)); /* Used to Sync the timing */
+	m_screen->set_screen_update(FUNC(md_core_state::screen_update_megadriv)); /* Copies a bitmap */
+	m_screen->screen_vblank().set(FUNC(md_core_state::screen_vblank_megadriv)); /* Used to Sync the timing */
+}
 
-	/* sound hardware */
+void md_core_state::md_core_pal(machine_config &config)
+{
+	M68000(config, m_maincpu, MASTER_CLOCK_PAL / 7); // 7.67 MHz
+	m_maincpu->set_irq_acknowledge_callback(FUNC(md_core_state::genesis_int_callback));
+	// IRQs are handled via the timers
+
+	megadriv_timers(config);
+
+	SEGA315_5313(config, m_vdp, MASTER_CLOCK_PAL, m_maincpu);
+	m_vdp->set_is_pal(true);
+	m_vdp->lv6_irq().set(FUNC(md_core_state::vdp_lv6irqline_callback_genesis_68k));
+	m_vdp->lv4_irq().set(FUNC(md_core_state::vdp_lv4irqline_callback_genesis_68k));
+	m_vdp->set_screen("megadriv");
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(MASTER_CLOCK_PAL / 10 / 313 / 342); // same as SMS?
+//  m_screen->set_refresh_hz(MASTER_CLOCK_PAL / 8 / 313 / 423); // or 423 Htotal?
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0)); // Vblank handled manually.
+	m_screen->set_size(64*8, 620);
+	m_screen->set_visarea(0, 32*8-1, 0, 28*8-1);
+	m_screen->set_screen_update(FUNC(md_core_state::screen_update_megadriv)); /* Copies a bitmap */
+	m_screen->screen_vblank().set(FUNC(md_core_state::screen_vblank_megadriv)); /* Used to Sync the timing */
+}
+
+
+void md_base_state::megadriv_ioports(machine_config &config)
+{
+	// TODO: this latches video counters as well as setting interrupt level 2
+	auto &hl(INPUT_MERGER_ANY_HIGH(config, "hl"));
+	hl.output_handler().set_inputline(m_maincpu, 2);
+
+	MEGADRIVE_IO_PORT(config, m_ioports[0], 0);
+	m_ioports[0]->hl_handler().set("hl", FUNC(input_merger_device::in_w<0>));
+
+	MEGADRIVE_IO_PORT(config, m_ioports[1], 0);
+	m_ioports[1]->hl_handler().set("hl", FUNC(input_merger_device::in_w<1>));
+
+	MEGADRIVE_IO_PORT(config, m_ioports[2], 0);
+	m_ioports[2]->hl_handler().set("hl", FUNC(input_merger_device::in_w<2>));
+}
+
+
+void md_ctrl_state::ctrl1_3button(machine_config &config)
+{
+	m_ioports[0]->set_in_handler(FUNC(md_ctrl_state::ioport_in_3button<0>));
+	m_ioports[0]->set_out_handler(FUNC(md_ctrl_state::ioport_out_3button<0>));
+}
+
+void md_ctrl_state::ctrl2_3button(machine_config &config)
+{
+	m_ioports[1]->set_in_handler(FUNC(md_ctrl_state::ioport_in_3button<1>));
+	m_ioports[1]->set_out_handler(FUNC(md_ctrl_state::ioport_out_3button<1>));
+}
+
+void md_ctrl_state::ctrl1_6button(machine_config &config)
+{
+	m_ioports[0]->set_in_handler(FUNC(md_ctrl_state::ioport_in_6button<0>));
+	m_ioports[0]->set_out_handler(FUNC(md_ctrl_state::ioport_out_6button<0>));
+}
+
+void md_ctrl_state::ctrl2_6button(machine_config &config)
+{
+	m_ioports[1]->set_in_handler(FUNC(md_ctrl_state::ioport_in_6button<1>));
+	m_ioports[1]->set_out_handler(FUNC(md_ctrl_state::ioport_out_6button<1>));
+}
+
+
+void md_base_state::md_ntsc(machine_config &config)
+{
+	md_core_ntsc(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &md_base_state::megadriv_68k_map);
+
+	Z80(config, m_z80snd, MASTER_CLOCK_NTSC / 15); // 3.58 MHz
+	m_z80snd->set_addrmap(AS_PROGRAM, &md_base_state::megadriv_z80_map);
+	m_z80snd->set_addrmap(AS_IO, &md_base_state::megadriv_z80_io_map);
+	// IRQ handled via the timers
+
+	// I/O port controllers
+	megadriv_ioports(config);
+
+	m_vdp->snd_irq().set(FUNC(md_base_state::vdp_sndirqline_callback_genesis_z80));
+	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+
+	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YM2612(config, m_ymsnd, MASTER_CLOCK_NTSC/7); /* 7.67 MHz */
+	YM2612(config, m_ymsnd, MASTER_CLOCK_NTSC / 7); // 7.67 MHz
 	m_ymsnd->add_route(0, "lspeaker", 0.50);
 	m_ymsnd->add_route(1, "rspeaker", 0.50);
 }
@@ -969,7 +901,7 @@ void md_base_state::md2_ntsc(machine_config &config)
 	md_ntsc(config);
 
 	// Internalized YM3438 in VDP ASIC
-	YM3438(config.replace(), m_ymsnd, MASTER_CLOCK_NTSC/7); /* 7.67 MHz */
+	YM3438(config.replace(), m_ymsnd, MASTER_CLOCK_NTSC / 7); // 7.67 MHz
 	m_ymsnd->add_route(0, "lspeaker", 0.50);
 	m_ymsnd->add_route(1, "rspeaker", 0.50);
 }
@@ -978,41 +910,27 @@ void md_base_state::md2_ntsc(machine_config &config)
 
 void md_base_state::md_pal(machine_config &config)
 {
-	M68000(config, m_maincpu, MASTER_CLOCK_PAL / 7); /* 7.67 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &md_base_state::megadriv_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(md_base_state::genesis_int_callback));
-	/* IRQs are handled via the timers */
+	md_core_pal(config);
 
-	Z80(config, m_z80snd, MASTER_CLOCK_PAL / 15); /* 3.58 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &md_base_state::megadriv_68k_map);
+
+	Z80(config, m_z80snd, MASTER_CLOCK_PAL / 15); // 3.58 MHz
 	m_z80snd->set_addrmap(AS_PROGRAM, &md_base_state::megadriv_z80_map);
 	m_z80snd->set_addrmap(AS_IO, &md_base_state::megadriv_z80_io_map);
-	/* IRQ handled via the timers */
+	// IRQ handled via the timers
 
-	megadriv_timers(config);
+	// I/O port controllers
+	megadriv_ioports(config);
 
-	SEGA315_5313(config, m_vdp, MASTER_CLOCK_PAL, m_maincpu);
-	m_vdp->set_is_pal(true);
 	m_vdp->snd_irq().set(FUNC(md_base_state::vdp_sndirqline_callback_genesis_z80));
-	m_vdp->lv6_irq().set(FUNC(md_base_state::vdp_lv6irqline_callback_genesis_68k));
-	m_vdp->lv4_irq().set(FUNC(md_base_state::vdp_lv4irqline_callback_genesis_68k));
-	m_vdp->set_screen("megadriv");
 	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(double(MASTER_CLOCK_PAL) / 10.0 / 313.0 / 342.0); // same as SMS?
-//  m_screen->set_refresh_hz(double(MASTER_CLOCK_PAL) / 8.0 / 313.0 / 423.0); // or 423 Htotal?
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0)); // Vblank handled manually.
-	m_screen->set_size(64*8, 620);
-	m_screen->set_visarea(0, 32*8-1, 0, 28*8-1);
-	m_screen->set_screen_update(FUNC(md_base_state::screen_update_megadriv)); /* Copies a bitmap */
-	m_screen->screen_vblank().set(FUNC(md_base_state::screen_vblank_megadriv)); /* Used to Sync the timing */
-
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YM2612(config, m_ymsnd, MASTER_CLOCK_PAL / 7); /* 7.67 MHz */
+	YM2612(config, m_ymsnd, MASTER_CLOCK_PAL / 7); // 7.67 MHz
 	m_ymsnd->add_route(0, "lspeaker", 0.50);
 	m_ymsnd->add_route(1, "rspeaker", 0.50);
 }
@@ -1028,35 +946,29 @@ void md_base_state::md2_pal(machine_config &config)
 }
 
 
-void md_base_state::megadriv_tas_callback(offs_t offset, uint8_t data)
+void md_core_state::megadriv_tas_callback(offs_t offset, uint8_t data)
 {
 	// writeback not allowed
 }
 
 void md_base_state::megadriv_init_common()
 {
-	/* Look to see if this system has the standard Sound Z80 */
-	if (m_z80snd)
-	{
-		m_genz80.z80_prgram = std::make_unique<uint8_t[]>(0x2000);
-		membank("bank1")->set_base(m_genz80.z80_prgram.get());
-		save_item(NAME(m_genz80.z80_is_reset));
-		save_item(NAME(m_genz80.z80_has_bus));
-		save_item(NAME(m_genz80.z80_bank_addr));
-		save_pointer(NAME(m_genz80.z80_prgram), 0x2000);
-	}
+	// This system has the standard Sound Z80
+	m_genz80.z80_prgram = std::make_unique<uint8_t[]>(0x2000);
+	membank("bank1")->set_base(m_genz80.z80_prgram.get());
+	save_item(NAME(m_genz80.z80_is_reset));
+	save_item(NAME(m_genz80.z80_has_bus));
+	save_item(NAME(m_genz80.z80_bank_addr));
+	save_pointer(NAME(m_genz80.z80_prgram), 0x2000);
 
 	m_maincpu->set_tas_write_callback(*this, FUNC(md_base_state::megadriv_tas_callback));
-
-	m_megadrive_io_read_data_port_ptr = read8sm_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_3button));
-	m_megadrive_io_write_data_port_ptr = write16sm_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_3button));
 }
 
 void md_base_state::init_megadriv()
 {
 	megadriv_init_common();
 
-	// todo: move this to the device interface?
+	// TODO: move this to the device interface?
 	m_vdp->set_use_cram(1);
 	m_vdp->set_vdp_pal(false);
 	m_vdp->set_framerate(60);
@@ -1069,7 +981,7 @@ void md_base_state::init_megadrij()
 {
 	megadriv_init_common();
 
-	// todo: move this to the device interface?
+	// TODO: move this to the device interface?
 	m_vdp->set_use_cram(1);
 	m_vdp->set_vdp_pal(false);
 	m_vdp->set_framerate(60);
@@ -1082,7 +994,7 @@ void md_base_state::init_megadrie()
 {
 	megadriv_init_common();
 
-	// todo: move this to the device interface?
+	// TODO: move this to the device interface?
 	m_vdp->set_use_cram(1);
 	m_vdp->set_vdp_pal(true);
 	m_vdp->set_framerate(50);
@@ -1091,7 +1003,7 @@ void md_base_state::init_megadrie()
 	m_version_hi_nibble = 0xe0; // Export PAL no-SCD
 }
 
-WRITE_LINE_MEMBER(md_base_state::screen_vblank_megadriv)
+WRITE_LINE_MEMBER(md_core_state::screen_vblank_megadriv)
 {
 	if (m_io_reset.read_safe(0) & 0x01)
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);

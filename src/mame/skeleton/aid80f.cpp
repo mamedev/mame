@@ -26,6 +26,9 @@
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 
+
+namespace {
+
 class aid80f_state : public driver_device
 {
 public:
@@ -138,5 +141,8 @@ ROM_START(aid80f)
 	ROM_LOAD("ddt4.u51", 0x0c00, 0x0400, CRC(c78e34c2) SHA1(5f3a4631d0b806a077b817f566ebbddd77ad7ba5))
 	// U52 socket is empty
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1978, aid80f, 0, 0, aid80f, aid80f, aid80f_state, empty_init, "Mostek", "AID-80F Development System", MACHINE_IS_SKELETON)

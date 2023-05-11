@@ -80,6 +80,9 @@
 #include "screen.h"
 #include "tilemap.h"
 
+
+namespace{
+
 #define MASTER_CLOCK    XTAL(8'000'000)   /* guess */
 
 
@@ -508,6 +511,8 @@ void jokrwild_state::init_jokrwild()
 		srcp[i] = srcp[i] ^ 0xcc ^ offs;
 	}
 }
+
+} // anonymous namespace
 
 
 /*************************

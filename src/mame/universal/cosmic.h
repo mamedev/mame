@@ -5,8 +5,8 @@
     Cosmic Guerilla & other Universal boards (in cosmic.c)
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_COSMIC_H
-#define MAME_INCLUDES_COSMIC_H
+#ifndef MAME_UNIVERSAL_COSMIC_H
+#define MAME_UNIVERSAL_COSMIC_H
 
 #pragma once
 
@@ -119,4 +119,4 @@ private:
 	void panic_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_COSMIC_H
+#endif // MAME_UNIVERSAL_COSMIC_H

@@ -26,7 +26,7 @@
 		<rect state="0">
 			<color red="0.19" green="0.19" blue="0.19"/>
 		</rect>
-		<text string="&#xA3;1">
+		<text string="£1">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -66,7 +66,7 @@
 		<rect state="0">
 			<color red="0.19" green="0.19" blue="0.19"/>
 		</rect>
-		<text string="&#xA3;1">
+		<text string="£1">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -106,7 +106,7 @@
 		<rect state="0">
 			<color red="0.19" green="0.19" blue="0.19"/>
 		</rect>
-		<text string="&#xA3;1">
+		<text string="£1">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -842,7 +842,7 @@
 		<disk state="0">
 			<color red="0.16" green="0.14" blue="0.09"/>
 		</disk>
-		<text string="&#xA3;1">
+		<text string="£1">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.10" y="0.10" width="0.80" height="0.80"/>
 		</text>
@@ -862,7 +862,7 @@
 		<disk state="0">
 			<color red="0.16" green="0.14" blue="0.09"/>
 		</disk>
-		<text string="&#xA3;2">
+		<text string="£2">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.10" y="0.10" width="0.80" height="0.80"/>
 		</text>
@@ -882,7 +882,7 @@
 		<disk state="0">
 			<color red="0.16" green="0.14" blue="0.09"/>
 		</disk>
-		<text string="&#xA3;1.50">
+		<text string="£1.50">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.10" y="0.10" width="0.80" height="0.80"/>
 		</text>
@@ -1906,7 +1906,7 @@
 		<rect state="0">
 			<color red="0.25" green="0.25" blue="0.25"/>
 		</rect>
-		<text string="&#xA3;1">
+		<text string="£1">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -1992,7 +1992,7 @@
 		</led7seg>
 	</element>
 	<element name="label_13">
-		<text string="&#xA3;">
+		<text string="£">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>

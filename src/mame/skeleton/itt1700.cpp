@@ -24,6 +24,8 @@ This device may be related to the Intel 8251, but it is definitely not a SCN2651
 #include "speaker.h"
 
 
+namespace {
+
 class itt1700_state : public driver_device
 {
 public:
@@ -121,5 +123,8 @@ ROM_START(itt1700)
 	ROM_REGION(0x2000, "chargen", 0)
 	ROM_LOAD("173563-001_2764_u56.bin", 0x0000, 0x2000, CRC(8ca58ab9) SHA1(b92e3985dd13afcf63dbb279f5fb9668d5eb645b))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1983, itt1700, 0, 0, itt1700, itt1700, itt1700_state, empty_init, "ITT Courier", "ITT 1700", MACHINE_IS_SKELETON)

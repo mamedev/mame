@@ -68,6 +68,9 @@ For Model III:
 
 #include "utf8.h"
 
+
+namespace {
+
 class meritum_state : public trs80_state
 {
 public:
@@ -468,6 +471,8 @@ ROM_START( meritum_net )
 	ROM_REGION(0x1000, "chargen", ROMREGION_INVERT)
 	ROM_LOAD( "char.ic72", 0x0000, 0x1000, CRC(2c09a5a7) SHA1(146891b3ddfc2de95e6a5371536394a657880054))
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR  NAME         PARENT    COMPAT    MACHINE   INPUT      CLASS          INIT             COMPANY              FULLNAME                FLAGS

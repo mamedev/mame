@@ -5,8 +5,8 @@
  * includes/amstrad.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_AMSTRAD_H
-#define MAME_INCLUDES_AMSTRAD_H
+#ifndef MAME_AMSTRAD_AMSTRAD_H
+#define MAME_AMSTRAD_AMSTRAD_H
 
 #pragma once
 
@@ -38,12 +38,6 @@
 #include "machine/ram.h"
 #include "imagedev/cassette.h"
 #include "bus/centronics/ctronics.h"
-#include "bus/centronics/comxpl80.h"
-#include "bus/centronics/epson_ex800.h"
-#include "bus/centronics/epson_lx800.h"
-#include "bus/centronics/epson_lx810l.h"
-#include "bus/centronics/printer.h"
-#include "bus/centronics/digiblst.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "emupal.h"
@@ -319,4 +313,4 @@ private:
 void cpc_exp_cards(device_slot_interface &device);
 void cpcplus_exp_cards(device_slot_interface &device);
 
-#endif // MAME_INCLUDES_AMSTRAD_H
+#endif // MAME_AMSTRAD_AMSTRAD_H

@@ -221,10 +221,10 @@ brk_m_imp
 	write(SP, irq_taken ? P & ~F_B : P);
 	dec_SP();
 	// BRK uses the vector of the interrupt with the highest priority if any are enabled and pending
+	if(irq_taken)
+		standard_irq_callback(IRQ_LINE, PC);
 	PC = read_arg(m_irq_vector);
 	PC = set_h(PC, read_arg(m_irq_vector+1));
-	if(irq_taken)
-		standard_irq_callback(IRQ_LINE);
 	irq_taken = false;
 	P |= F_I; // Do *not* move after the prefetch
 	prefetch();
@@ -671,6 +671,7 @@ lda_m_aby
 lda_m_idx
 	TMP2 = read_pc_noinc();
 	read_dummy(PC & 0xff);
+	PC++;
 	TMP2 += X;
 	TMP = read(TMP2 & 0xff);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));

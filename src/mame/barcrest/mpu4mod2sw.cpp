@@ -151,8 +151,7 @@ void mpu4mod2_machines_state::mod4psg_f(machine_config &config)
 	m_ay8913->port_a_write_callback().set(FUNC(mpu4mod2_machines_state::ay8912_outport_w));
 	m_ay8913->set_flags(AY8910_SINGLE_OUTPUT);
 	m_ay8913->set_resistors_load(820, 0, 0);
-	m_ay8913->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_ay8913->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_ay8913->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -2479,6 +2478,11 @@ GAME(199?, m4copcsh,  0,          mod2_chr_copcash(R4, RT1), mpu4,            mp
 
 *********************************************************************************************************/
 
+ROM_START( m4tst )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "ut4.p1",  0xC000, 0x4000,  CRC(086dc325) SHA1(923caeb61347ac9d3e6bcec45998ddf04b2c8ffd))
+ROM_END
+
 ROM_START( m4tst2 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
 	ROM_LOAD( "ut2.p1",  0xe000, 0x2000,  CRC(f7fb6575) SHA1(f7961cbd0801b9561d8cd2d23081043d733e1902))
@@ -2494,6 +2498,7 @@ ROM_START( m4rltst )
 	ROM_LOAD( "rtv.p1", 0x08000, 0x08000, CRC(7b78f3f2) SHA1(07ef8e6a08fd70ee48e4463672a1230ecc669532) )
 ROM_END
 
+GAME( 198?, m4tst,    0,          mod2_no_bacta(R4, RT1, OVER),       mpu4,    mpu4mod2_machines_state, init_m4,  ROT0,   "Barcrest","MPU4 Unit Test (Program 4)",MACHINE_MECHANICAL )
 GAME( 198?, m4tst2,   0,          mod2_no_bacta(R4, RT1, OVER),       mpu4,    mpu4mod2_machines_state, init_m4,  ROT0,   "Barcrest","MPU4 Unit Test (Program 2)",MACHINE_MECHANICAL )
 GAME( 198?, m4clr,    0,          mod2_no_bacta(R4, RT1, OVER),       mpu4,    mpu4mod2_machines_state, init_m4,  ROT0,   "Barcrest","MPU4 Meter Clear ROM",MACHINE_MECHANICAL )
 GAME( 198?, m4rltst,  0,          mod2_no_bacta(R4, RT1, OVER),       mpu4,    mpu4mod2_machines_state, init_m4,  ROT0,   "Barcrest","MPU4 Reel Test (3.0)",MACHINE_MECHANICAL )

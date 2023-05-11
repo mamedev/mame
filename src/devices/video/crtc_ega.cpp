@@ -188,9 +188,7 @@ void crtc_ega_device::recompute_parameters(bool postload)
 	{
 		/* update the screen if we have valid data */
 		if ((horiz_pix_total > 0) && (max_visible_x < horiz_pix_total) &&
-			(vert_pix_total > 0) && (max_visible_y < vert_pix_total) &&
-			(hsync_on_pos <= horiz_pix_total) && (vsync_on_pos <= vert_pix_total) &&
-			(hsync_on_pos != hsync_off_pos))
+			(vert_pix_total > 0) && (max_visible_y < vert_pix_total))
 		{
 			attoseconds_t refresh = HZ_TO_ATTOSECONDS(m_clock) * (m_horiz_char_total + 2) * vert_pix_total;
 

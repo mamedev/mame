@@ -372,7 +372,7 @@ return_PI_or_ZERO:
 approximation_completed:
     if (swap) x = float128_sub(float128_pi2, x);
     floatx80 result = float128_to_floatx80(x);
-    if (zSign) floatx80_chs(result);
+    if (zSign) result = floatx80_chs(result);
     int rSign = extractFloatx80Sign(result);
     if (!bSign && rSign)
         return floatx80_add(result, floatx80_pi);

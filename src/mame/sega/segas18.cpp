@@ -1755,7 +1755,7 @@ ROM_END
 */
 ROM_START( bloxeed )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "epr-12911.a6", 0x000000, 0x20000, CRC(a481581a) SHA1(5ce5a0a082622919d2fe0e7d52ec807b2e2c25a2) )
+	ROM_LOAD16_BYTE( "epr-12911.a6", 0x000000, 0x20000, CRC(a481581a) SHA1(5ce5a0a082622919d2fe0e7d52ec807b2e2c25a2) ) // adds (c) 1989 Elorg
 	ROM_LOAD16_BYTE( "epr-12910.a5", 0x000001, 0x20000, CRC(dd1bc3bf) SHA1(c0d79862a349ea4dac103c17325633c5dd4a93d1) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
@@ -1778,6 +1778,35 @@ ROM_START( bloxeedd )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "bootleg_epr-12911.a6", 0x000000, 0x20000, CRC(2d634453) SHA1(7a17084057c89d581125b7823c04219a3fb599a5))
 	ROM_LOAD16_BYTE( "bootleg_epr-12910.a5", 0x000001, 0x20000, CRC(e6d2e9cc) SHA1(3ee269bce104d0da9a2eb0d42a07924f60f4d3a8) )
+
+	ROM_REGION( 0x30000, "tiles", 0 )
+	ROM_LOAD( "opr-12884.b1", 0x00000, 0x10000, CRC(e024aa33) SHA1(d734be240cd05031aaadf9735c0b1b00e8e6d4cb) )
+	ROM_LOAD( "opr-12885.b2", 0x10000, 0x10000, CRC(8041b814) SHA1(29fa49ba9a73eed07865a86ea774e2c6a60aed5b) )
+	ROM_LOAD( "opr-12886.b3", 0x20000, 0x10000, CRC(de32285e) SHA1(8994dc128d6a23763e5fcfca1868b336d4aa0a21) )
+
+	ROM_REGION16_BE( 0x20000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "opr-12891.a11", 0x00000, 0x10000, CRC(90d31a8c) SHA1(1747652a5109ce65add197cf06535f2463a99fdc) )
+	ROM_LOAD16_BYTE( "opr-12887.b11", 0x00001, 0x10000, CRC(f0c0f49d) SHA1(7ecd591265165f3149241e2ceb5059faab88360f) )
+
+	ROM_REGION( 0x200000, "soundcpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "epr-12888.a4", 0x000000, 0x20000, CRC(6f2fc63c) SHA1(3cce22c8f80013f05b5a2d36c42a61a81e4d6cbd) )
+ROM_END
+
+/**************************************************************************************************************************
+    Bloxeed, Sega System 18
+    CPU: FD1094 (317-0139)
+    ROM Board: 171-5874B
+
+    game No. 833-7306
+    ROM  No. 834-7307
+*/
+ROM_START( bloxeeda )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "epr-12890.a6", 0x000000, 0x20000, CRC(b0b85294) SHA1(8d9142f593eb48a5b22a1b4b1ef7f6805e88f9bb) ) // Only shows (c) 1989 SEGA
+	ROM_LOAD16_BYTE( "epr-12889.a5", 0x000001, 0x20000, CRC(96c67e36) SHA1(a9370307ca779a892b1e98ba7f2e3415b7188f91) )
+
+	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
+	ROM_LOAD( "317-0139.key", 0x0000, 0x2000, CRC(9aae84cb) SHA1(806515d61ecacb260b2b5e5fe023b494d35ce315) )
 
 	ROM_REGION( 0x30000, "tiles", 0 )
 	ROM_LOAD( "opr-12884.b1", 0x00000, 0x10000, CRC(e024aa33) SHA1(d734be240cd05031aaadf9735c0b1b00e8e6d4cb) )
@@ -3312,7 +3341,8 @@ GAME( 1990, astorm3,   astorm,   system18_fd1094,      astorm,   segas18_state, 
 GAME( 1990, astormu,   astorm,   system18_fd1094,      astorm,   segas18_state, init_generic_5874, ROT0,   "Sega",          "Alien Storm (US, 3 Players) (FD1094 317-0147)", 0 )
 GAME( 1990, astormj,   astorm,   system18_fd1094,      astorm2p, segas18_state, init_generic_5874, ROT0,   "Sega",          "Alien Storm (Japan, 2 Players) (FD1094 317-0146)", 0 )
 
-GAME( 1989, bloxeed,   0,        system18_fd1094,      bloxeed,  segas18_state, init_generic_5874, ROT0,   "Sega",          "Bloxeed (Japan) (FD1094 317-0139)", 0 )
+GAME( 1989, bloxeed,   0,        system18_fd1094,      bloxeed,  segas18_state, init_generic_5874, ROT0,   "Sega / Elorg",  "Bloxeed (Japan) (FD1094 317-0139)", 0 ) // adds (c) 1989 Elorg
+GAME( 1989, bloxeeda,  bloxeed,  system18_fd1094,      bloxeed,  segas18_state, init_generic_5874, ROT0,   "Sega",          "Bloxeed (Japan, earlier) (FD1094 317-0139)", 0 ) // Only shows (c) 1989 SEGA
 
 GAME( 1991, cltchitr,  0,        system18_fd1094,      cltchitr, segas18_state, init_generic_5987, ROT0,   "Sega",          "Clutch Hitter (US) (FD1094 317-0176)", 0 )
 GAME( 1991, cltchitrj, cltchitr, system18_fd1094,      cltchitr, segas18_state, init_generic_5987, ROT0,   "Sega",          "Clutch Hitter (Japan) (FD1094 317-0175)", 0 )

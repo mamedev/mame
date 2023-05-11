@@ -2,14 +2,6 @@
 // copyright-holders:Juergen Buchmueller, David Haywood
 /*******************************************************************************
 
-    DECO Cassette System driver
-    by Juergen Buchmueller
-
-    with contributions by: David Widel, Nicola Salmoria, Aaron Giles, Brian Troha,
-    Fabio Priuli, Lord Nightmare, The Dumping Union, Team Japump!!!, Hau,
-    Jean-Francois Del Nero, Omar Cornut, Game Preservation Society, Joseph Redon
-
-
     The DECO cassette system consists of three PCBs in a card cage:
 
     **** Early boardset: (1980-1983) (proms unknown for this boardset, no schematics for this boardset) ****
@@ -811,6 +803,19 @@ static INPUT_PORTS_START( cmanhat )
 	/* other dips not verified */
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( cnebula )
+	PORT_INCLUDE( decocass )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )                        PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x00, "6" )
+	/* other dips not verified */
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( cluckypo )
 	PORT_INCLUDE( decocass )
 
@@ -1080,6 +1085,15 @@ void decocass_type1_state::cdsteljn(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cdsteljn)
 }
 
+void decocass_type1_state::cnebula(machine_config &config)
+{
+	decocass(config);
+
+	/* basic machine hardware */
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cnebula)
+}
+
+
 void decocass_type1_state::cmanhat(machine_config &config)
 {
 	decocass(config);
@@ -1336,97 +1350,76 @@ void decocass_type3_state::cfghtice(machine_config &config)
 
 /************ Version A bios roms *************/
 
-/* v0a.7e, New boardset bios, country code A */
-#define DECOCASS_BIOS_A_MAINCPU \
-	ROM_SYSTEM_BIOS( 0, "a",   "Bios A (Japan)" ) \
-	ROM_LOAD_BIOS( 0, "v0a-.7e",    0xf000, 0x1000, CRC(3d33ac34) SHA1(909d59e7a993affd10224402b4370e82a5f5545c) ) /* from RMS-8 board: 2732 EPROM @7E w/'V0A-' label (has HDRA01HDR string inside it), bios code */
-#define DECOCASS_BIOS_A_AUDIOCPU \
-	ROM_LOAD_BIOS( 0, "v1-.5a",     0xf800, 0x0800, CRC(b66b2c2a) SHA1(0097f38beb4872e735e560148052e258a26b08fd) ) /* from RMS-8 board: 2716 eprom @5A w/V1- label,  contains audio cpu code */
-#define DECOCASS_BIOS_A_PROMS \
-	ROM_LOAD_BIOS( 0, "v2.3m",      0x0000, 0x0020, CRC(238fdb40) SHA1(b88e8fabb82092105c3828154608ea067acbf2e5) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3M w/'V2' stamp, unknown purpose (gfx related: row/interrupt/vblank related? vertical counter related) */ \
-	ROM_LOAD_BIOS( 0, "v4.10d",     0x0020, 0x0020, CRC(3b5836b4) SHA1(b630bb277d9ec09d46ef26b944014dd6165b35d8) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @10D w/'V4' stamp, unknown purpose (gfx related: tile banking? horizontal counter related) */ \
-	ROM_LOAD_BIOS( 0, "v3.3j",      0x0040, 0x0020, CRC(51eef657) SHA1(eaedce5caf55624ad6ae706aedf82c5717c60f1f) ) /* from RMS-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3J w/'V3' stamp, handles DRAM banking and timing */
+#define DECOCASS_BIOS_AUDIOCPU(biosindex) \
+	ROM_LOAD_BIOS( biosindex, "v1-.5a",     0xf800, 0x0800, CRC(b66b2c2a) SHA1(0097f38beb4872e735e560148052e258a26b08fd) ) /* from RMS-8 board: 2716 eprom @5A w/V1- label,  contains audio cpu code */
 
-/* Old boardset bios, country code A (for Japan), 2x 2716 EPROM, MD labbeled as RMS-3D and MT as RMS-3T, region code (letter) is (not always) inserted after "-" */ \
-#define DECOCASS_BIOS_A0_MAINCPU \
-	ROM_SYSTEM_BIOS( 1, "a0",   "Bios A (Japan, older)" ) \
-	ROM_LOAD_BIOS( 1, "dsp-3_p0-a.m9",      0xf000, 0x0800, CRC(2541e34b) SHA1(4f983513dbae1350c83a433dea77a4465748b9c6) ) \
-	ROM_LOAD_BIOS( 1, "dsp-3_p1-.l9",       0xf800, 0x0800, CRC(3bfff5f3) SHA1(4e9437cb1b76d64da6b37f01bd6e879fb399e8ce) )
-#define DECOCASS_BIOS_A0_AUDIOCPU \
-	ROM_LOAD_BIOS( 1, "rms-3_p2-.c9",       0xfc00, 0x0400, CRC(6c4a891f) SHA1(5c00cf8b1accfdbb1d61e9b3f6db1594dfbc608b) ) /* 2708 EPROM, contains audio cpu code */
-#define DECOCASS_BIOS_A0_PROMS \
-	ROM_LOAD_BIOS( 1, "dsp-3_p3-.e5",       0x0000, 0x0020, CRC(539a5a64) SHA1(7b7d3cc58ac6f95242240c97046e770d2fd20c96) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, unknown purpose (gfx related: row/interrupt/vblank related? vertical counter related) */ \
-	ROM_LOAD_BIOS( 1, "rms-3_p4-.f6",       0x0020, 0x0020, CRC(9014c0fd) SHA1(7405d39a5f4fcad821448ddaf6bd4e27c0c9e145) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, unknown purpose (gfx related: tile banking? horizontal counter related) */ \
-	ROM_LOAD_BIOS( 1, "dsp-3_p5-.m4",       0x0040, 0x0020, CRC(e52089a0) SHA1(d85c17809b089c6977ee9571f976af6f107fd4d3) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, handles DRAM banking and timing */ \
+#define DECOCASS_BIOS_PROMS(biosindex) \
+	ROM_LOAD_BIOS( biosindex, "v2.3m",      0x0000, 0x0020, CRC(238fdb40) SHA1(b88e8fabb82092105c3828154608ea067acbf2e5) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3M w/'V2' stamp, unknown purpose (gfx related: row/interrupt/vblank related? vertical counter related) */ \
+	ROM_LOAD_BIOS( biosindex, "v4.10d",     0x0020, 0x0020, CRC(3b5836b4) SHA1(b630bb277d9ec09d46ef26b944014dd6165b35d8) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @10D w/'V4' stamp, unknown purpose (gfx related: tile banking? horizontal counter related) */ \
+	ROM_LOAD_BIOS( biosindex, "v3.3j",      0x0040, 0x0020, CRC(51eef657) SHA1(eaedce5caf55624ad6ae706aedf82c5717c60f1f) ) /* from RMS-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3J w/'V3' stamp, handles DRAM banking and timing */
 
-/************ Version B bios roms *************/
+#define DECOCASS_BIOS_AUDIOCPU_OLD(biosindex) \
+	ROM_LOAD_BIOS( biosindex, "rms-3_p2-.c9",       0xfc00, 0x0400, CRC(6c4a891f) SHA1(5c00cf8b1accfdbb1d61e9b3f6db1594dfbc608b) ) /* 2708 EPROM, contains audio cpu code */
 
-/* rms8.7e, New boardset bios, country code B */ \
-#define DECOCASS_BIOS_B_MAINCPU \
-	ROM_SYSTEM_BIOS( 2, "b",   "Bios B (USA)" ) \
-	ROM_LOAD_BIOS( 2, "v0b-.7e",    0xf000, 0x1000, CRC(23d929b7) SHA1(063f83020ba3d6f43ab8471f95ca919767b93aa4) ) /* from RMS-8 board: 2732 EPROM @7E w/'V0B-' label (has HDRB01HDR string inside it), bios code */
-#define DECOCASS_BIOS_B_AUDIOCPU \
-	ROM_LOAD_BIOS( 2, "v1-.5a",     0xf800, 0x0800, CRC(b66b2c2a) SHA1(0097f38beb4872e735e560148052e258a26b08fd) ) /* from RMS-8 board: 2716 eprom @5A w/V1- label,  contains audio cpu code */
-#define DECOCASS_BIOS_B_PROMS \
-	ROM_LOAD_BIOS( 2, "v2.3m",      0x0000, 0x0020, CRC(238fdb40) SHA1(b88e8fabb82092105c3828154608ea067acbf2e5) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3M w/'V2' stamp, unknown purpose (gfx related: row/interrupt/vblank related? vertical counter related) */ \
-	ROM_LOAD_BIOS( 2, "v4.10d",     0x0020, 0x0020, CRC(3b5836b4) SHA1(b630bb277d9ec09d46ef26b944014dd6165b35d8) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @10D w/'V4' stamp, unknown purpose (gfx related: tile banking? horizontal counter related) */ \
-	ROM_LOAD_BIOS( 2, "v3.3j",      0x0040, 0x0020, CRC(51eef657) SHA1(eaedce5caf55624ad6ae706aedf82c5717c60f1f) ) /* from RMS-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3J w/'V3' stamp, handles DRAM banking and timing */
-
-/* Old boardset bios, version B for USA, 2x 2716 EPROM, MD labbeled as RMS-3D and MT as RMS-3T, region code (letter) is (not always) inserted after "-" */ \
-/* dsp3.p0b/p1b, Old boardset bios, country code B?; from DSP-3 board? has HDRB01x string in it, 2x 2716 EPROM? */ \
-#define DECOCASS_BIOS_B0_MAINCPU \
-	ROM_SYSTEM_BIOS( 3, "b0",   "Bios B (USA, older)" ) \
-	ROM_LOAD_BIOS( 3, "dsp-3_p0-b.m9",      0xf000, 0x0800, CRC(b67a91d9) SHA1(681c040be0f0ed1ba0a50161b36d0ad8e1c8c5cb) ) \
-	ROM_LOAD_BIOS( 3, "dsp-3_p1-.l9",       0xf800, 0x0800, CRC(3bfff5f3) SHA1(4e9437cb1b76d64da6b37f01bd6e879fb399e8ce) )
-#define DECOCASS_BIOS_B0_AUDIOCPU \
-	ROM_LOAD_BIOS( 3, "rms-3_p2-.c9",       0xfc00, 0x0400, CRC(6c4a891f) SHA1(5c00cf8b1accfdbb1d61e9b3f6db1594dfbc608b) ) /* 2708 EPROM, contains audio cpu code */
-#define DECOCASS_BIOS_B0_PROMS \
-	ROM_LOAD_BIOS( 3, "dsp-3_p3-.e5",       0x0000, 0x0020, CRC(539a5a64) SHA1(7b7d3cc58ac6f95242240c97046e770d2fd20c96) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, unknown purpose (gfx related: row/interrupt/vblank related? vertical counter related) */ \
-	ROM_LOAD_BIOS( 3, "rms-3_p4-.f6",       0x0020, 0x0020, CRC(9014c0fd) SHA1(7405d39a5f4fcad821448ddaf6bd4e27c0c9e145) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, unknown purpose (gfx related: tile banking? horizontal counter related) */ \
-	ROM_LOAD_BIOS( 3, "dsp-3_p5-.m4",       0x0040, 0x0020, CRC(e52089a0) SHA1(d85c17809b089c6977ee9571f976af6f107fd4d3) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, handles DRAM banking and timing */ \
-
-/* rms8.7e, New boardset bios, country code D */ \
-#define DECOCASS_BIOS_D_MAINCPU \
-	ROM_SYSTEM_BIOS( 4, "d",   "Bios D (Europe?)" ) \
-	ROM_LOAD_BIOS( 4, "v0d-.7e",    0xf000, 0x1000, CRC(1e0c22b1) SHA1(5fec8fef500bbebc13d0173406afc55235d3affb) ) /* handcrafted (single byte changed) because ctisland3 requires region D */
-#define DECOCASS_BIOS_D_AUDIOCPU \
-	ROM_LOAD_BIOS( 4, "v1-.5a",     0xf800, 0x0800, CRC(b66b2c2a) SHA1(0097f38beb4872e735e560148052e258a26b08fd) ) /* from RMS-8 board: 2716 eprom @5A w/V1- label,  contains audio cpu code */
-#define DECOCASS_BIOS_D_PROMS \
-	ROM_LOAD_BIOS( 4, "v2.3m",      0x0000, 0x0020, CRC(238fdb40) SHA1(b88e8fabb82092105c3828154608ea067acbf2e5) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3M w/'V2' stamp, unknown purpose (gfx related: row/interrupt/vblank related? vertical counter related) */ \
-	ROM_LOAD_BIOS( 4, "v4.10d",     0x0020, 0x0020, CRC(3b5836b4) SHA1(b630bb277d9ec09d46ef26b944014dd6165b35d8) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @10D w/'V4' stamp, unknown purpose (gfx related: tile banking? horizontal counter related) */ \
-	ROM_LOAD_BIOS( 4, "v3.3j",      0x0040, 0x0020, CRC(51eef657) SHA1(eaedce5caf55624ad6ae706aedf82c5717c60f1f) ) /* from RMS-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3J w/'V3' stamp, handles DRAM banking and timing */
-
-
+#define DECOCASS_BIOS_PROMS_OLD(biosindex) \
+	ROM_LOAD_BIOS( biosindex, "dsp-3_p3-.e5",       0x0000, 0x0020, CRC(539a5a64) SHA1(7b7d3cc58ac6f95242240c97046e770d2fd20c96) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, unknown purpose (gfx related: row/interrupt/vblank related? vertical counter related) */ \
+	ROM_LOAD_BIOS( biosindex, "rms-3_p4-.f6",       0x0020, 0x0020, CRC(9014c0fd) SHA1(7405d39a5f4fcad821448ddaf6bd4e27c0c9e145) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, unknown purpose (gfx related: tile banking? horizontal counter related) */ \
+	ROM_LOAD_BIOS( biosindex, "dsp-3_p5-.m4",       0x0040, 0x0020, CRC(e52089a0) SHA1(d85c17809b089c6977ee9571f976af6f107fd4d3) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, handles DRAM banking and timing */
 
 /************ Common MCU bios rom *************/
 
 #define DECOCASS_BIOS_MCU \
 	ROM_LOAD( "cassmcu.1c", 0x0000, 0x0400, CRC(a6df18fd) SHA1(1f9ea47e372d31767c936c15852b43df2b0ee8ff) ) /* from B10-B board: "NEC // JAPAN // X1202D-108 // D8041C 535" 8041 MCU @1C, handles cassette and other stuff; This info needs additional verification, as the d8041-535 mcu has not been dumped yet to prove code is the same. */
 
-
-
 #define DECOCASS_BIOS_MAIN \
+	ROM_SYSTEM_BIOS( 0, "a",    "Bios A (Japan)" ) \
+	ROM_SYSTEM_BIOS( 1, "b",    "Bios B (USA)" ) \
+	ROM_SYSTEM_BIOS( 2, "c",    "Bios C (UK)" ) \
+	ROM_SYSTEM_BIOS( 3, "d",    "Bios D (Europe)" ) \
+	ROM_SYSTEM_BIOS( 4, "a0",   "Bios A (Japan, older PCB)" ) \
+	ROM_SYSTEM_BIOS( 5, "b0",   "Bios B (USA, older PCB)" ) \
+	ROM_SYSTEM_BIOS( 6, "c0",   "Bios C (UK, older PCB)" ) \
+	ROM_SYSTEM_BIOS( 7, "d0",   "Bios D (Europe, older PCB)" ) \
+	\
 	ROM_REGION( 0x10000, "maincpu", 0 ) \
-	DECOCASS_BIOS_A_MAINCPU \
-	DECOCASS_BIOS_A0_MAINCPU \
-	DECOCASS_BIOS_B_MAINCPU \
-	DECOCASS_BIOS_B0_MAINCPU \
-	DECOCASS_BIOS_D_MAINCPU \
+	/* New boardset BIOS */ \
+	ROM_LOAD_BIOS(   0, "v0a-.7e",    0xf000, 0x1000, CRC(3d33ac34) SHA1(909d59e7a993affd10224402b4370e82a5f5545c) ) /* from RMS-8 board: 2732 EPROM @7E w/'V0A-' label (has HDRA01HDR string inside it), bios code */ \
+	ROM_LOAD_BIOS(   1, "v0b-.7e",    0xf000, 0x1000, CRC(23d929b7) SHA1(063f83020ba3d6f43ab8471f95ca919767b93aa4) ) /* from RMS-8 board: 2732 EPROM @7E w/'V0B-' label (has HDRB01HDR string inside it), bios code */ \
+	ROM_LOAD_BIOS(   2, "v0c-.7e",    0xf000, 0x1000, CRC(9f505709) SHA1(a9c661ba5a0d3fa5e935fb9c10fa63e2d9809981) ) /* handcrafted (single byte changed) because cnebula requires region C */ \
+	ROM_LOAD_BIOS(   3, "v0d-.7e",    0xf000, 0x1000, CRC(1e0c22b1) SHA1(5fec8fef500bbebc13d0173406afc55235d3affb) ) /* handcrafted (single byte changed) because ctisland3 requires region D */ \
+	\
+	/* Old boardset BIOS, 2x 2716 EPROM, MD labbeled as RMS-3D and MT as RMS-3T, region code (letter) is (not always) inserted after "-" */ \
+	ROM_LOAD_BIOS(   4, "dsp-3_p0-a.m9",      0xf000, 0x0800, CRC(2541e34b) SHA1(4f983513dbae1350c83a433dea77a4465748b9c6) ) \
+	ROM_LOAD_BIOS(   4, "dsp-3_p1-.l9",       0xf800, 0x0800, CRC(3bfff5f3) SHA1(4e9437cb1b76d64da6b37f01bd6e879fb399e8ce) ) \
+	ROM_LOAD_BIOS(   5, "dsp-3_p0-b.m9",      0xf000, 0x0800, CRC(b67a91d9) SHA1(681c040be0f0ed1ba0a50161b36d0ad8e1c8c5cb) ) \
+	ROM_LOAD_BIOS(   5, "dsp-3_p1-.l9",       0xf800, 0x0800, CRC(3bfff5f3) SHA1(4e9437cb1b76d64da6b37f01bd6e879fb399e8ce) ) \
+	ROM_LOAD_BIOS(   6, "dsp-3_p0-c.m9",      0xf000, 0x0800, CRC(c76c4057) SHA1(4093d4ac44feff595e34f361ed1ed84113c9225e) ) \
+	ROM_LOAD_BIOS(   6, "dsp-3_p1-.l9",       0xf800, 0x0800, CRC(3bfff5f3) SHA1(4e9437cb1b76d64da6b37f01bd6e879fb399e8ce) ) \
+	ROM_LOAD_BIOS(   7, "dsp-3_p0-d.m9",      0xf000, 0x0800, CRC(4b7d72bc) SHA1(a70c5ba88404dafee2cc717071c4a249f67ab645) ) \
+	ROM_LOAD_BIOS(   7, "dsp-3_p1-.l9",       0xf800, 0x0800, CRC(3bfff5f3) SHA1(4e9437cb1b76d64da6b37f01bd6e879fb399e8ce) ) \
+	\
 	ROM_REGION( 0x10000, "audiocpu", 0 ) \
-	DECOCASS_BIOS_A_AUDIOCPU \
-	DECOCASS_BIOS_A0_AUDIOCPU \
-	DECOCASS_BIOS_B_AUDIOCPU \
-	DECOCASS_BIOS_B0_AUDIOCPU \
-	DECOCASS_BIOS_D_AUDIOCPU \
+	DECOCASS_BIOS_AUDIOCPU(0) \
+	DECOCASS_BIOS_AUDIOCPU(1) \
+	DECOCASS_BIOS_AUDIOCPU(2) \
+	DECOCASS_BIOS_AUDIOCPU(3) \
+	DECOCASS_BIOS_AUDIOCPU_OLD(4) \
+	DECOCASS_BIOS_AUDIOCPU_OLD(5) \
+	DECOCASS_BIOS_AUDIOCPU_OLD(6) \
+	DECOCASS_BIOS_AUDIOCPU_OLD(7) \
+	\
 	ROM_REGION( 0x00060, "proms", 0 ) \
-	DECOCASS_BIOS_A_PROMS \
-	DECOCASS_BIOS_A0_PROMS \
-	DECOCASS_BIOS_B_PROMS \
-	DECOCASS_BIOS_B0_PROMS \
-	DECOCASS_BIOS_D_PROMS \
+	DECOCASS_BIOS_PROMS(0) \
+	DECOCASS_BIOS_PROMS(1) \
+	DECOCASS_BIOS_PROMS(2) \
+	DECOCASS_BIOS_PROMS(3) \
+	DECOCASS_BIOS_PROMS_OLD(4) \
+	DECOCASS_BIOS_PROMS_OLD(5) \
+	DECOCASS_BIOS_PROMS_OLD(6) \
+	DECOCASS_BIOS_PROMS_OLD(7) \
+	\
 	ROM_REGION( 0x10000, "mcu", 0 )   /* 4k for the 8041 MCU (actually 1K ROM + 64 bytes RAM @ 0x800) */ \
 	DECOCASS_BIOS_MCU
-
 
 #define DECOCASS_BIOS_B_ROMS \
 	DECOCASS_BIOS_MAIN \
@@ -1447,6 +1440,10 @@ void decocass_type3_state::cfghtice(machine_config &config)
 #define DECOCASS_BIOS_D_ROMS \
 	DECOCASS_BIOS_MAIN \
 	ROM_DEFAULT_BIOS( "d" )
+
+#define DECOCASS_BIOS_C_ROMS \
+	DECOCASS_BIOS_MAIN \
+	ROM_DEFAULT_BIOS( "c" )
 
 ROM_START( decocass )
 	DECOCASS_BIOS_MAIN
@@ -1497,6 +1494,18 @@ ROM_START( cterrani )
 
 	ROM_REGION( 0x10000, "cassette", 0 )      /* (max) 64k for cassette image */
 	ROM_LOAD( "dt-1040.cas", 0x0000, 0x8000, CRC(eb71adbc) SHA1(67becfde39c034d4b8edc2eb100050de102773da) )
+ROM_END
+
+/* 06 Nebula */
+ROM_START( cnebula )
+	DECOCASS_BIOS_C_ROMS
+
+	ROM_REGION( 0x00020, "dongle", ROMREGION_ERASE00 )    /* dongle data */
+	/* The dongle data is reverse engineered from manual decryption */
+	ROM_LOAD( "nebula2.pro",   0x0000, 0x0020, CRC(75cae001) SHA1(59b2b47b91945857e6f40dd4baa0e92242fc3519) )
+
+	ROM_REGION( 0x10000, "cassette", 0 )      /* (max) 64k for cassette image */
+	ROM_LOAD( "nebula2.cas", 0x000000, 0x005c00, CRC(aaac39e6) SHA1(890a5439825bef9eb26ca22562e3cc30860415b0) )
 ROM_END
 
 /* 07 Astro Fantasia */
@@ -2124,7 +2133,40 @@ ROM_START( decomult )
 	ROM_LOAD( "v3.3j",      0x0040, 0x0020, CRC(51eef657) SHA1(eaedce5caf55624ad6ae706aedf82c5717c60f1f) )
 
 	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "cassmcu.1c", 0x0000, 0x0400, CRC(a6df18fd) SHA1(1f9ea47e372d31767c936c15852b43df2b0ee8ff) )
+	DECOCASS_BIOS_MCU
+ROM_END
+
+#define DECO_DARK_BIOS \
+	ROM_REGION( 0x10000, "maincpu", 0 ) \
+	ROM_LOAD( "darksoft.7e",    0xf000, 0x1000, CRC(ce3dd5a3) SHA1(456ffa744676c8f6e8662512d3d3ff92b6c49b2f) ) \
+	ROM_REGION( 0x10000, "audiocpu", 0 ) \
+	ROM_LOAD( "v1-.5a",     0xf800, 0x0800, CRC(b66b2c2a) SHA1(0097f38beb4872e735e560148052e258a26b08fd) ) \
+	ROM_REGION( 0x00060, "proms", 0 ) \
+	ROM_LOAD( "v2.3m",      0x0000, 0x0020, CRC(238fdb40) SHA1(b88e8fabb82092105c3828154608ea067acbf2e5) ) \
+	ROM_LOAD( "v4.10d",     0x0020, 0x0020, CRC(3b5836b4) SHA1(b630bb277d9ec09d46ef26b944014dd6165b35d8) ) \
+	ROM_LOAD( "v3.3j",      0x0040, 0x0020, CRC(51eef657) SHA1(eaedce5caf55624ad6ae706aedf82c5717c60f1f) ) \
+	ROM_REGION( 0x10000, "mcu", 0 ) \
+	DECOCASS_BIOS_MCU
+
+ROM_START( decodark )
+	DECO_DARK_BIOS
+
+	ROM_REGION( 0x100000, "dongle", ROMREGION_ERASEFF )
+	ROM_LOAD( "20221213_v17_dongl_27c800.bin",    0x00000, 0x100000, CRC(69553e2b) SHA1(3c7cb985611df06c771bc842d4125dc9220cdda9) )
+ROM_END
+
+ROM_START( decodark16 )
+	DECO_DARK_BIOS
+
+	ROM_REGION( 0x100000, "dongle", ROMREGION_ERASEFF )
+	ROM_LOAD( "20221212_v16_dongl_27c800.bin",    0x00000, 0x100000, CRC(199707bd) SHA1(da936dae54b0f98f03328c8a23494fe323874983) )
+ROM_END
+
+ROM_START( decodark15 )
+	DECO_DARK_BIOS
+
+	ROM_REGION( 0x100000, "dongle", ROMREGION_ERASEFF )
+	ROM_LOAD( "20220726_v15_dongl_27c800.bin",    0x00000, 0x100000, CRC(0e973470) SHA1(3d276dc8facc4f7611dcebacec04e2252779d300) )
 ROM_END
 
 
@@ -2186,12 +2228,12 @@ void decocass_state::init_cdsteljn()
 /* -- */ GAME( 1981, ctsttape,  decocass, ctsttape, decocass, decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Test Tape (DECO Cassette) (US)", 0 )
 /* 01 */ GAME( 1980, chwy,      decocass, chwy,     chwy,     decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Highway Chase (DECO Cassette) (US)", 0 )
 /* 02 */ // 1980.12 Sengoku Ninjatai
-/* 03 */ GAME( 1981, cmanhat,   decocass, cmanhat,  cmanhat,  decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Manhattan (DECO Cassette) (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+/* 03 */ GAME( 1981, cmanhat,   decocass, cmanhat,  cmanhat,  decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Manhattan (DECO Cassette) (Japan)", MACHINE_IMPERFECT_GRAPHICS ) // Colours don't match some videos, but probably different game version
 /* 04 */ GAME( 1981, cterrani,  decocass, cterrani, cterrani, decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Terranean (DECO Cassette) (US)", 0 )
 /* 05 */ // 1981.?? Missile Sprinter
-/* 06 */ // 1980.12 Nebula
+/* 06 */ GAME( 1981, cnebula,   decocass, cnebula,  cnebula,  decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Nebula (DECO Cassette) (UK)", 0 ) // 1980.12 Nebula - "NEBULA2 01/021980.11.25" string in cassette data
 /* 07 */ GAME( 1981, castfant,  decocass, castfant, castfant, decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Astro Fantasia (DECO Cassette) (US)", 0 )
-/* 08 */ GAME( 1981, ctower,    decocass, cfboy0a1, ctower,   decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "The Tower (DECO Cassette) (Europe?)", 0 ) // 1981.03 The Tower (1981.02.04 in cassette data)
+/* 08 */ GAME( 1981, ctower,    decocass, cfboy0a1, ctower,   decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "The Tower (DECO Cassette) (Europe)", 0 ) // 1981.03 The Tower (1981.02.04 in cassette data)
 /* 09 */ GAME( 1981, csuperas,  decocass, csuperas, csuperas, decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Super Astro Fighter (DECO Cassette) (US)", 0 )
 /* 10 */ GAME( 1981, cocean1a,  decocass, cocean1a, cocean1a, decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Ocean to Ocean (Medal) (DECO Cassette MD) (No.10/Ver.1,Japan)", 0 ) /* no lever, 1P/2P buttons used to switch player, cocktail mode not emulated */
 /*    */ GAME( 1981, cocean6b,  cocean1a, cocean1a, cocean1a, decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Ocean to Ocean (Medal) (DECO Cassette MD) (No.10/Ver.6,US)", 0 ) /* lever, 1P/2P buttons used to switch player, cocktail mode not emulated */
@@ -2235,8 +2277,8 @@ void decocass_state::init_cdsteljn()
 /* 33 */ GAME( 1983, cpsoccer,  decocass, cpsoccer, cpsoccer, decocass_type3_state,  init_decocass, ROT270, "Data East Corporation", "Pro Soccer (DECO Cassette) (US)", 0 )
 /*    */ GAME( 1983, cpsoccerj, cpsoccer, cpsoccer, cpsoccer, decocass_type3_state,  init_decocass, ROT270, "Data East Corporation", "Pro Soccer (DECO Cassette) (Japan)", 0 )
 /* 34 */ GAME( 1983, csdtenis,  decocass, csdtenis, csdtenis, decocass_type3_state,  init_decocass, ROT270, "Data East Corporation", "Super Doubles Tennis (DECO Cassette) (Japan)", 0 )
-/* 35 */ GAME( 1985, cflyball,  decocass, decocass, cflyball, decocass_nodong_state, init_decocass, ROT270, "Data East Corporation", "Flying Ball (DECO Cassette) (US)", 0 )
-/* 36 */ // 1984.04 Genesis/Boomer Rang'r
+/* 35 */ // unknown game, was Flying Ball, but that is 43
+/* 36 */ // unknown game
 /* 37 */ GAME( 1983, czeroize,  decocass, czeroize, czeroize, decocass_type3_state,  init_decocass, ROT270, "Data East Corporation", "Zeroize (DECO Cassette) (US)", 0 )
 /* 38 */ GAME( 1984, cscrtry,   decocass, decocass, cscrtry,  decocass_type4_state,  init_decocass, ROT270, "Data East Corporation", "Scrum Try (DECO Cassette) (US) (set 1)", 0 )
 /*    */ GAME( 1984, cscrtry2,  cscrtry,  decocass, cscrtry,  decocass_type4_state,  init_decocass, ROT270, "Data East Corporation", "Scrum Try (DECO Cassette) (US) (set 2)", 0 )
@@ -2245,11 +2287,16 @@ void decocass_state::init_cdsteljn()
 /* 40 */ GAME( 1984, cfghtice,  decocass, cfghtice, cfghtice, decocass_type3_state,  init_decocass, ROT270, "Data East Corporation", "Fighting Ice Hockey (DECO Cassette) (US)", 0 )
 /* 41 */ GAME( 1984, coozumou,  decocass, decocass, cscrtry,  decocass_type4_state,  init_decocass, ROT270, "Data East Corporation", "Oozumou - The Grand Sumo (DECO Cassette) (Japan)", 0 )
 /* 42 */ // 1984.08 Hellow Gateball // not a typo, this is official spelling
-/* 43 */ // 1984.08 Yellow Cab
+/* 43 */ GAME( 1985, cflyball,  decocass, decocass, cflyball, decocass_nodong_state, init_decocass, ROT270, "Data East Corporation", "Flying Ball (DECO Cassette) (US)", 0 )
 /* 44 */ GAME( 1985, cbdash,    decocass, decocass, cbdash,   decocass_type5_state,  init_decocass, ROT270, "Data East Corporation", "Boulder Dash (DECO Cassette) (US)", 0 )
 
 /* UX7 */ // 1984.12 Tokyo MIE Clinic/Tokyo MIE Shinryoujo
 /* UX8 */ // 1985.01 Tokyo MIE Clinic/Tokyo MIE Shinryoujo Part 2
 /* UX9 */ // 1985.05 Geinoujin Shikaku Shiken
 
-/* xx */ GAME( 2008, decomult,  decocass, decocass, decocass, decocass_widel_state,  init_decocass, ROT270, "bootleg (David Widel)", "Deco Cassette System Multigame (ROM based)", 0 )
+GAME( 2008, decomult,  decocass, decocass, decocass, decocass_widel_state,  init_decocass, ROT270, "bootleg (David Widel)", "DECO Cassette System ROM Multigame (David Widel)", 0 )
+
+GAME( 2022, decodark,  decocass, decocass, decocass, decocass_darksoft_state,  init_decocass, ROT270, "bootleg (Darksoft)", "DECO Cassette System ROM Multigame (Darksoft, v17)", 0 ) // fixed an issue with skater
+GAME( 2022, decodark16,decodark, decocass, decocass, decocass_darksoft_state,  init_decocass, ROT270, "bootleg (Darksoft)", "DECO Cassette System ROM Multigame (Darksoft, v16)", 0 ) // added nebula
+GAME( 2022, decodark15,decodark, decocass, decocass, decocass_darksoft_state,  init_decocass, ROT270, "bootleg (Darksoft)", "DECO Cassette System ROM Multigame (Darksoft, v15)", 0 )
+// earlier revisions of this kit were released as early as 2017

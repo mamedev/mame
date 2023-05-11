@@ -157,6 +157,7 @@ struct render_texinfo
 	void *              base;               // base of the data
 	u32                 rowpixels;          // pixels per row
 	u32                 width;              // width of the image
+	u32                 width_margin;       // left margin of the scaled bounds, if applicable
 	u32                 height;             // height of the image
 	u32                 seqid;              // sequence ID
 	u64                 unique_id;          // unique identifier to pass to osd
@@ -339,7 +340,7 @@ private:
 	void get_scaled(u32 dwidth, u32 dheight, render_texinfo &texinfo, render_primitive_list &primlist, u32 flags = 0);
 	const rgb_t *get_adjusted_palette(render_container &container, u32 &out_length);
 
-	static constexpr int MAX_TEXTURE_SCALES = 20;
+	static constexpr int MAX_TEXTURE_SCALES = 100;
 
 	// a scaled_texture contains a single scaled entry for a texture
 	struct scaled_texture

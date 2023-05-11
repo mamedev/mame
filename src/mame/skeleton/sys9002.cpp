@@ -30,6 +30,9 @@ to talk with RS-232.
 #include "machine/i8251.h"
 #include "bus/rs232/rs232.h"
 
+
+namespace {
+
 class sys9002_state : public driver_device
 {
 public:
@@ -178,6 +181,9 @@ ROM_START( sys9002 )
 	ROM_REGION( 0x0800, "chargen", 0 )  // chargen not dumped, using one from mbee for now
 	ROM_LOAD("charrom.bin",  0x0000,  0x0800, BAD_DUMP CRC(b149737b) SHA1(a3cd4f5d0d3c71137cd1f0f650db83333a2e3597) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

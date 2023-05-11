@@ -248,6 +248,13 @@ void atarigt_state::latch_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 	if (ACCESSING_BITS_16_23)
 	{
+		// tmek20 needs following otherwise will cause a Cage CPU crash
+		// that eventually turns into a MAME hardlock.
+		// https://mametesters.org/view.php?id=7146
+		m_cage->reset_w(!BIT(data, 21));
+		// sndres may reset internals instead?
+		// 0 in tmek, 1 in primrage
+		// also cfr. m_cage->control_w
 		//cage_reset_w(space, data & 0x00100000);
 		machine().bookkeeping().coin_counter_w(0, data & 0x00080000);
 		machine().bookkeeping().coin_counter_w(1, data & 0x00010000);

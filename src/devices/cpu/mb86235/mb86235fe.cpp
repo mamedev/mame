@@ -804,7 +804,7 @@ void mb86235_frontend::describe_control(opcode_desc &desc)
 	int ef1 = (desc.opptr.q[0] >> 16) & 0x3f;
 	int ef2 = desc.opptr.q[0] & 0xffff;
 	int cop = (desc.opptr.q[0] >> 22) & 0x1f;
-	int rel12 = (desc.opptr.q[0] & 0x800) ? (0xfffff000 | (desc.opptr.q[0] & 0xfff)) : (desc.opptr.q[0] & 0xfff);
+	int rel12 = util::sext<int>(desc.opptr.q[0], 12);
 
 	switch (cop)
 	{

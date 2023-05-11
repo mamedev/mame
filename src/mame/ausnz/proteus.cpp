@@ -58,6 +58,8 @@
 #include "softlist_dev.h"
 
 
+namespace {
+
 class proteus_state : public driver_device
 {
 public:
@@ -427,6 +429,8 @@ ROM_START(proteus)
 	ROM_SYSTEM_BIOS(1, "86", "300986")
 	ROMX_LOAD("300986.u28", 0x0000, 0x1000, CRC(f607d396) SHA1(0b9d9d3178b5587e60da56885b9e8a83f7d5dd26), ROM_BIOS(1))
 ROM_END
+
+} // anonymous namespace
 
 
 /*    YEAR  NAME     PARENT  COMPAT   MACHINE  INPUT    CLASS          INIT        COMPANY     FULLNAME                     FLAGS */

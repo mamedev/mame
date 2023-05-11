@@ -592,7 +592,7 @@ void m2_powerbus_device::write(offs_t offset, uint32_t data)
 			break;
 		}
 		default:
-			logerror("%s: POWERBUS W: [%x] %x (PC:%x)\n", machine().describe_context(), byte_offs, data);
+			logerror("%s: POWERBUS W: [%x] %x\n", machine().describe_context(), byte_offs, data);
 	}
 }
 

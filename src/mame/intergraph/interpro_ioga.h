@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-#ifndef MAME_MACHINE_INTERPRO_IOGA_H
-#define MAME_MACHINE_INTERPRO_IOGA_H
+#ifndef MAME_INTERGRAPH_INTERPRO_IOGA_H
+#define MAME_INTERGRAPH_INTERPRO_IOGA_H
 
 #pragma once
 
@@ -568,4 +568,4 @@ DECLARE_DEVICE_TYPE(EMERALD_IOGA, emerald_ioga_device)
 DECLARE_DEVICE_TYPE(TURQUOISE_IOGA, turquoise_ioga_device)
 DECLARE_DEVICE_TYPE(SAPPHIRE_IOGA, sapphire_ioga_device)
 
-#endif // MAME_MACHINE_INTERPRO_IOGA_H
+#endif // MAME_INTERGRAPH_INTERPRO_IOGA_H

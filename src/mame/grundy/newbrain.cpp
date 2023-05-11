@@ -64,8 +64,8 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG_COP (1 << 1U)
-#define LOG_VFD (1 << 2U)
+#define LOG_COP (1U << 1)
+#define LOG_VFD (1U << 2)
 #define VERBOSE 0
 #include "logmacro.h"
 

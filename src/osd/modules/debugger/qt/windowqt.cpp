@@ -20,20 +20,23 @@
 
 namespace osd::debugger::qt {
 
-bool WindowQt::s_refreshAll = false;
-bool WindowQt::s_hideAll = false;
-
-
 // Since all debug windows are intended to be top-level, this inherited
 // constructor is always called with a nullptr parent.  The passed-in parent widget,
 // however, is often used to place each child window & the code to do this can
 // be found in most of the inherited classes.
 
-WindowQt::WindowQt(running_machine &machine, QWidget *parent) :
+WindowQt::WindowQt(DebuggerQt &debugger, QWidget *parent) :
 	QMainWindow(parent),
-	m_machine(machine)
+	m_debugger(debugger),
+	m_machine(debugger.machine())
 {
 	setAttribute(Qt::WA_DeleteOnClose, true);
+
+	// Subscribe to signals
+	connect(&debugger, &DebuggerQt::exitDebugger, this, &WindowQt::debuggerExit);
+	connect(&debugger, &DebuggerQt::hideAllWindows, this, &WindowQt::hide);
+	connect(&debugger, &DebuggerQt::showAllWindows, this, &WindowQt::show);
+	connect(&debugger, &DebuggerQt::saveConfiguration, this, &WindowQt::saveConfiguration);
 
 	// The Debug menu bar
 	QAction *debugActOpenMemory = new QAction("New &Memory Window", this);
@@ -133,9 +136,10 @@ WindowQt::~WindowQt()
 {
 }
 
+
 void WindowQt::debugActOpenMemory()
 {
-	MemoryWindow *foo = new MemoryWindow(m_machine, this);
+	MemoryWindow *foo = new MemoryWindow(m_debugger, this);
 	// A valiant effort, but it just doesn't wanna' hide behind the main window & not make a new toolbar icon
 	// foo->setWindowFlags(Qt::Dialog);
 	// foo->setWindowFlags(foo->windowFlags() & ~Qt::WindowStaysOnTopHint);
@@ -145,7 +149,7 @@ void WindowQt::debugActOpenMemory()
 
 void WindowQt::debugActOpenDasm()
 {
-	DasmWindow *foo = new DasmWindow(m_machine, this);
+	DasmWindow *foo = new DasmWindow(m_debugger, this);
 	// A valiant effort, but it just doesn't wanna' hide behind the main window & not make a new toolbar icon
 	// foo->setWindowFlags(Qt::Dialog);
 	// foo->setWindowFlags(foo->windowFlags() & ~Qt::WindowStaysOnTopHint);
@@ -155,7 +159,7 @@ void WindowQt::debugActOpenDasm()
 
 void WindowQt::debugActOpenLog()
 {
-	LogWindow *foo = new LogWindow(m_machine, this);
+	LogWindow *foo = new LogWindow(m_debugger, this);
 	// A valiant effort, but it just doesn't wanna' hide behind the main window & not make a new toolbar icon
 	// foo->setWindowFlags(Qt::Dialog);
 	// foo->setWindowFlags(foo->windowFlags() & ~Qt::WindowStaysOnTopHint);
@@ -165,7 +169,7 @@ void WindowQt::debugActOpenLog()
 
 void WindowQt::debugActOpenPoints()
 {
-	BreakpointsWindow *foo = new BreakpointsWindow(m_machine, this);
+	BreakpointsWindow *foo = new BreakpointsWindow(m_debugger, this);
 	// A valiant effort, but it just doesn't wanna' hide behind the main window & not make a new toolbar icon
 	// foo->setWindowFlags(Qt::Dialog);
 	// foo->setWindowFlags(foo->windowFlags() & ~Qt::WindowStaysOnTopHint);
@@ -175,7 +179,7 @@ void WindowQt::debugActOpenPoints()
 
 void WindowQt::debugActOpenDevices()
 {
-	DevicesWindow *foo = new DevicesWindow(m_machine, this);
+	DevicesWindow *foo = new DevicesWindow(m_debugger, this);
 	// A valiant effort, but it just doesn't wanna' hide behind the main window & not make a new toolbar icon
 	// foo->setWindowFlags(Qt::Dialog);
 	// foo->setWindowFlags(foo->windowFlags() & ~Qt::WindowStaysOnTopHint);
@@ -191,7 +195,7 @@ void WindowQt::debugActRun()
 void WindowQt::debugActRunAndHide()
 {
 	m_machine.debugger().console().get_visible_cpu()->debug()->go();
-	hideAll();
+	m_debugger.hideAll();
 }
 
 void WindowQt::debugActRunToNextCpu()
@@ -245,6 +249,27 @@ void WindowQt::debugActQuit()
 	m_machine.schedule_exit();
 }
 
+void WindowQt::debuggerExit()
+{
+	close();
+}
+
+
+void WindowQt::restoreConfiguration(util::xml::data_node const &node)
+{
+	QPoint p(geometry().topLeft());
+	p.setX(node.get_attribute_int(ATTR_WINDOW_POSITION_X, p.x()));
+	p.setY(node.get_attribute_int(ATTR_WINDOW_POSITION_Y, p.y()));
+
+	QSize s(size());
+	s.setWidth(node.get_attribute_int(ATTR_WINDOW_WIDTH, s.width()));
+	s.setHeight(node.get_attribute_int(ATTR_WINDOW_HEIGHT, s.height()));
+
+	// TODO: sanity checks, restrict to screen area
+
+	setGeometry(p.x(), p.y(), s.width(), s.height());
+}
+
 
 void WindowQt::saveConfiguration(util::xml::data_node &parentnode)
 {
@@ -263,23 +288,115 @@ void WindowQt::saveConfigurationToNode(util::xml::data_node &node)
 }
 
 
-//=========================================================================
-//  WindowQtConfig
-//=========================================================================
-
-void WindowQtConfig::applyToQWidget(QWidget *widget)
+CommandHistory::CommandHistory() :
+	m_history(),
+	m_current(),
+	m_position(-1)
 {
-	widget->setGeometry(m_position.x(), m_position.y(), m_size.x(), m_size.y());
 }
 
 
-void WindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
+CommandHistory::~CommandHistory()
 {
-	m_size.setX(node.get_attribute_int(ATTR_WINDOW_WIDTH, m_size.x()));
-	m_size.setY(node.get_attribute_int(ATTR_WINDOW_HEIGHT, m_size.y()));
-	m_position.setX(node.get_attribute_int(ATTR_WINDOW_POSITION_X, m_position.x()));
-	m_position.setY(node.get_attribute_int(ATTR_WINDOW_POSITION_Y, m_position.y()));
-	m_type = node.get_attribute_int(ATTR_WINDOW_TYPE, m_type);
+}
+
+
+void CommandHistory::add(QString const &entry)
+{
+	if (m_history.empty() || (m_history.front() != entry))
+	{
+		while (m_history.size() >= CAPACITY)
+			m_history.pop_back();
+		m_history.push_front(entry);
+	}
+	m_position = 0;
+}
+
+
+QString const *CommandHistory::previous(QString const &current)
+{
+	if ((m_position + 1) < m_history.size())
+	{
+		if (0 > m_position)
+			m_current = std::make_unique<QString>(current);
+		return &m_history[++m_position];
+	}
+	else
+	{
+		return nullptr;
+	}
+}
+
+
+QString const *CommandHistory::next(QString const &current)
+{
+	if (0 < m_position)
+	{
+		return &m_history[--m_position];
+	}
+	else if (!m_position && m_current && (m_history.front() != *m_current))
+	{
+		--m_position;
+		return m_current.get();
+	}
+	else
+	{
+		return nullptr;
+	}
+}
+
+
+void CommandHistory::edit()
+{
+	if (!m_position)
+		--m_position;
+}
+
+
+void CommandHistory::reset()
+{
+	m_position = -1;
+	m_current.reset();
+}
+
+
+void CommandHistory::clear()
+{
+	m_position = -1;
+	m_current.reset();
+	m_history.clear();
+}
+
+
+void CommandHistory::restoreConfigurationFromNode(util::xml::data_node const &node)
+{
+	clear();
+	util::xml::data_node const *const historynode = node.get_child(NODE_WINDOW_HISTORY);
+	if (historynode)
+	{
+		util::xml::data_node const *itemnode = historynode->get_child(NODE_HISTORY_ITEM);
+		while (itemnode)
+		{
+			if (itemnode->get_value() && *itemnode->get_value())
+			{
+				while (m_history.size() >= CAPACITY)
+					m_history.pop_back();
+				m_history.push_front(QString::fromUtf8(itemnode->get_value()));
+			}
+			itemnode = itemnode->get_next_sibling(NODE_HISTORY_ITEM);
+		}
+	}
+}
+
+
+void CommandHistory::saveConfigurationToNode(util::xml::data_node &node)
+{
+	util::xml::data_node *const historynode = node.add_child(NODE_WINDOW_HISTORY, nullptr);
+	if (historynode)
+	{
+		for (auto it = m_history.crbegin(); m_history.crend() != it; ++it)
+			historynode->add_child(NODE_HISTORY_ITEM, it->toUtf8().data());
+	}
 }
 
 } // namespace osd::debugger::qt

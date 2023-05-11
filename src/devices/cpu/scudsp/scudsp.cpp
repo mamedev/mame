@@ -611,15 +611,13 @@ void scudsp_cpu_device::scudsp_move_immediate( uint32_t opcode )
 	{
 		if ( scudsp_compute_condition( (opcode & 0x3F80000 ) >> 19 ) )
 		{
-			value = opcode & 0x7ffff;
-			if ( value & 0x40000 ) value |= 0xfff80000;
+			value = util::sext( opcode, 19 );
 			scudsp_set_dest_mem_reg_2( (opcode & 0x3C000000) >> 26, value );
 		}
 	}
 	else
 	{
-		value = opcode & 0x1ffffff;
-		if ( value & 0x1000000 ) value |= 0xfe000000;
+		value = util::sext( opcode, 25 );
 		scudsp_set_dest_mem_reg_2( (opcode & 0x3C000000) >> 26, value );
 	}
 	m_icount -= 1;

@@ -22,6 +22,9 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
+private:
+	u8 m_dummy = 0; // needed for save-state support
 };
 
 #endif // MAME_SOUND_MIXER_H

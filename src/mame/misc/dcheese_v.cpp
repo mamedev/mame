@@ -146,10 +146,10 @@ void dcheese_state::do_blit()
 	s32 const srcmaxy = m_blitter_yparam[1] << 12;
 	s32 const srcx = ((m_blitter_xparam[2] & 0x0fff) | ((m_blitter_xparam[3] & 0x0fff) << 12)) << 7;
 	s32 const srcy = ((m_blitter_yparam[2] & 0x0fff) | ((m_blitter_yparam[3] & 0x0fff) << 12)) << 7;
-	s32 const dxdx = s32(((m_blitter_xparam[4] & 0x0fff) | ((m_blitter_xparam[5] & 0x0fff) << 12)) << 12) >> 12;
-	s32 const dxdy = s32(((m_blitter_xparam[6] & 0x0fff) | ((m_blitter_xparam[7] & 0x0fff) << 12)) << 12) >> 12;
-	s32 const dydx = s32(((m_blitter_yparam[4] & 0x0fff) | ((m_blitter_yparam[5] & 0x0fff) << 12)) << 12) >> 12;
-	s32 const dydy = s32(((m_blitter_yparam[6] & 0x0fff) | ((m_blitter_yparam[7] & 0x0fff) << 12)) << 12) >> 12;
+	s32 const dxdx = util::sext((m_blitter_xparam[4] & 0x0fff) | ((m_blitter_xparam[5] & 0x0fff) << 12), 20);
+	s32 const dxdy = util::sext((m_blitter_xparam[6] & 0x0fff) | ((m_blitter_xparam[7] & 0x0fff) << 12), 20);
+	s32 const dydx = util::sext((m_blitter_yparam[4] & 0x0fff) | ((m_blitter_yparam[5] & 0x0fff) << 12), 20);
+	s32 const dydy = util::sext((m_blitter_yparam[6] & 0x0fff) | ((m_blitter_yparam[7] & 0x0fff) << 12), 20);
 	u32 const pagemask = (m_gfxrom.length() - 1) >> 18;
 	int const xstart = m_blitter_xparam[14];
 	int const xend = m_blitter_xparam[15] + 1;

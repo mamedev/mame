@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 
 <softwarelist name="apple2gs_flop_clcracked" description="Apple IIgs cleanly cracked disks">
@@ -13,7 +13,7 @@ license:CC0
 		<info name="release" value="2021-08-13"/>
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- It requires a 512K Apple IIgs -->
-		<!-- The Team Construction Set was sold seperatly, but only works with 4th & Inches so it's included as "Disk 2" -->
+		<!-- The Team Construction Set was sold separately, but only works with 4th & Inches so it's included as "Disk 2" -->
 		<!-- The Team Construction Set disk doesn't check itself for being an original, but runs a nibble count on the 4th & Inches disk -->
 		<!-- Protection: Nibble count on tracks $20 & $21 -->
 
@@ -485,7 +485,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- It requires a 512K Apple IIgs. -->
 		<!--"Destroyer" is a 1987 simulation game developed by Michael Kosaka and Chuck Sommerville, and distributed by Epyx. -->
-		<!-- Protection: Nibble count on tracks $20 & $21 - 10 seperate occurances (Yes 10!) -->
+		<!-- Protection: Nibble count on tracks $20 & $21 - 10 separate occurrences (Yes 10!) -->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">

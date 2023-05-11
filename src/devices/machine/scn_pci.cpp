@@ -49,10 +49,10 @@
 #include "emu.h"
 #include "scn_pci.h"
 
-#define LOG_INIT    (1 << 1U)
-#define LOG_COMMAND (1 << 2U)
-#define LOG_RCVR    (1 << 3U)
-#define LOG_XMTR    (1 << 4U)
+#define LOG_INIT    (1U << 1)
+#define LOG_COMMAND (1U << 2)
+#define LOG_RCVR    (1U << 3)
+#define LOG_XMTR    (1U << 4)
 //#define VERBOSE (LOG_INIT | LOG_COMMAND | LOG_RCVR | LOG_XMTR)
 #include "logmacro.h"
 

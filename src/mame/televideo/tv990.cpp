@@ -42,6 +42,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 #define RS232A_TAG      "rs232a"
 #define RS232B_TAG      "rs232b"
 #define LPT_TAG         "lpt"
@@ -434,6 +436,9 @@ ROM_START( tv995 )
 	ROM_LOAD16_BYTE( "995-65_u3.bin", 0x000000, 0x020000, CRC(2d71b6fe) SHA1(a2a3406c19308eb9232db319ea8f151949b2ac74) )
 	ROM_LOAD16_BYTE( "995-65_u4.bin", 0x000001, 0x020000, CRC(dc002af2) SHA1(9608e7a729c5ac0fc58f673eaf441d2f4f591ec6) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 COMP( 1992, tv990, 0, 0, tv990, tv990, tv990_state, empty_init, "TeleVideo", "TeleVideo 990",    MACHINE_SUPPORTS_SAVE )

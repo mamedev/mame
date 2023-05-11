@@ -58,6 +58,9 @@
 
 #include "pve500.lh"
 
+
+namespace {
+
 #define IO_EXPANDER_PORTA 0
 #define IO_EXPANDER_PORTB 1
 #define IO_EXPANDER_PORTC 2
@@ -468,6 +471,9 @@ ROM_START( pve500 )
 	ROM_REGION( 0x80, "eeprom", 0 ) /* The EEPROM stores the setup data */
 	ROM_LOAD( "pve500.ice3", 0x0000, 0x080, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY  FULLNAME   FLAGS
 COMP( 1995, pve500, 0,      0,      pve500,  pve500, pve500_state, init_pve500, "SONY",  "PVE-500", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)

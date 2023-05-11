@@ -91,12 +91,8 @@ void spg290_cdservo_device::device_reset()
 	m_irq_cb(CLEAR_LINE);
 
 	// generate Q subchannel
-	if (m_cdrom.found())
-	{
-		auto *cdrom = m_cdrom->get_cdrom_file();
-		if (cdrom != nullptr)
-			generate_qsub(cdrom);
-	}
+	if (m_cdrom.found() && m_cdrom->exists())
+		generate_qsub();
 
 	change_status();
 }
@@ -109,7 +105,7 @@ TIMER_CALLBACK_MEMBER(spg290_cdservo_device::cd_update)
 
 		if (BIT(m_control0, 15))        // CDDA
 		{
-			m_cdrom->get_cdrom_file()->read_data(m_cur_sector - 150 - SPG290_LEADIN_LEN, cdbuf, cdrom_file::CD_TRACK_AUDIO);
+			m_cdrom->read_data(m_cur_sector - 150 - SPG290_LEADIN_LEN, cdbuf, cdrom_file::CD_TRACK_AUDIO);
 
 			for (int i=0; i<2352; i++)
 			{
@@ -120,10 +116,10 @@ TIMER_CALLBACK_MEMBER(spg290_cdservo_device::cd_update)
 		}
 		else
 		{
-			m_cdrom->get_cdrom_file()->read_data(m_cur_sector - 150 - SPG290_LEADIN_LEN, cdbuf, cdrom_file::CD_TRACK_MODE1_RAW);
+			m_cdrom->read_data(m_cur_sector - 150 - SPG290_LEADIN_LEN, cdbuf, cdrom_file::CD_TRACK_MODE1_RAW);
 
 			// FIXME: this is required for load iso images
-			if (m_cdrom->get_cdrom_file()->get_track_type(m_qsub[m_cur_sector * 12 + 1] - 1) == cdrom_file::CD_TRACK_MODE1)
+			if (m_cdrom->get_track_type(m_qsub[m_cur_sector * 12 + 1] - 1) == cdrom_file::CD_TRACK_MODE1)
 			{
 				int lba = (bcd_2_dec(cdbuf[12]) * 60 + bcd_2_dec(cdbuf[13])) * 75 + bcd_2_dec(cdbuf[14]);
 				uint32_t msf = cdrom_file::lba_to_msf(lba + 150);
@@ -332,7 +328,7 @@ void spg290_cdservo_device::servo_cmd_w()
 
 void spg290_cdservo_device::change_status()
 {
-	if (m_speed == 0 || !m_cdrom.found() || !m_cdrom->get_cdrom_file())
+	if (m_speed == 0 || !m_cdrom.found() || !m_cdrom->exists())
 		m_cdtimer->adjust(attotime::never);
 	else
 		m_cdtimer->adjust(attotime::from_hz(75 * m_speed), 0, attotime::from_hz(75 * m_speed));
@@ -355,11 +351,11 @@ void spg290_cdservo_device::add_qsub(int sector, uint8_t addrctrl, uint8_t track
 	dest[11] = crc16;
 }
 
-void spg290_cdservo_device::generate_qsub(cdrom_file *cdrom)
+void spg290_cdservo_device::generate_qsub()
 {
-	const cdrom_file::toc &toc = cdrom->get_toc();
-	int numtracks = cdrom->get_last_track();
-	uint32_t total_sectors = cdrom->get_track_start(numtracks - 1) + toc.tracks[numtracks - 1].frames + 150;
+	const cdrom_file::toc &toc = m_cdrom->get_toc();
+	int numtracks = m_cdrom->get_last_track();
+	uint32_t total_sectors = m_cdrom->get_track_start(numtracks - 1) + toc.tracks[numtracks - 1].frames + 150;
 
 	m_tot_sectors = SPG290_LEADIN_LEN + total_sectors + SPG290_LEADOUT_LEN;
 	m_qsub = std::make_unique<uint8_t[]>(m_tot_sectors * 12);
@@ -375,17 +371,17 @@ void spg290_cdservo_device::generate_qsub(cdrom_file *cdrom)
 
 		for(int track = 0; track < numtracks; track++)
 		{
-			uint32_t track_start = cdrom->get_track_start(track) + 150;
+			uint32_t track_start = m_cdrom->get_track_start(track) + 150;
 			if (lba < SPG290_LEADIN_LEN)
-				add_qsub(lba++, cdrom->get_adr_control(track), 0, dec_2_bcd(track + 1), cdrom_file::lba_to_msf(s + 3 + track), cdrom_file::lba_to_msf(track_start));
+				add_qsub(lba++, m_cdrom->get_adr_control(track), 0, dec_2_bcd(track + 1), cdrom_file::lba_to_msf(s + 3 + track), cdrom_file::lba_to_msf(track_start));
 		}
 	}
 
 	// data tracks
 	for(int track = 0; track < numtracks; track++)
 	{
-		uint32_t control = cdrom->get_adr_control(track);
-		uint32_t track_start = cdrom->get_track_start(track);
+		uint32_t control = m_cdrom->get_adr_control(track);
+		uint32_t track_start = m_cdrom->get_track_start(track);
 
 		// pregap
 		uint32_t pregap = toc.tracks[track].pregap;

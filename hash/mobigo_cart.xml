@@ -1,13 +1,15 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
-<softwarelist name="mobigo_cart" description="VTech Mobigo Cartridges">
+<softwarelist name="mobigo_cart" description="VTech MobiGo cartridges">
 
 	<!-- This list is ordered by game description -->
 
-	<!-- 52-250704 - Mobigo 2 Game Cartridge (Internal Game) (ger) is a dummy cartridge to enable the game in the BIOS -->
+	<!-- Dummy carts (just a jumper PCB, without ROM) that enable internal games in the BIOS:
+	    80-250700 - Touch & Learn - Game Pack (US)
+	    80-250704 - MobiGo 2 (GE) -->
 
 	<software name="ben10g" supported="no">
 		<description>Ben 10 - UltimateAlien - Mine der Gedanken (Germany)</description>
@@ -357,19 +359,31 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="spongebg" supported="no">
-		<description>Nickelodeon Spongebob Schwammkopf - Rette das Geheimrezept (Germany)</description>
+	<software name="spongeb" supported="no">
+		<description>Nickelodeon SpongeBob SquarePants - Defending the Secret Formula (USA)</description>
+		<year>2011</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-251500(US)"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-251500 - SpongeBob SquarePants - Defending the Secret Formula (US).bin" size="0x1000000" crc="85266243" sha1="4ffd4ca308d1d3419396e706892ff6eff23d8cd0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spongebg" cloneof="spongeb" supported="no">
+		<description>Nickelodeon SpongeBob Schwammkopf - Rette das Geheimrezept (Germany)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-251504(GER)"/>
 		<part name="cart" interface="mobigo_cart">
 			<dataarea name="rom" size="0x1000000">
-				<rom name="80-251504 - Spongebob Schwammkopf - Rette das Geheimrezept (GER).bin" size="0x1000000" crc="19efae9e" sha1="5c3eeb04cdec48cb92c5410ceef57e4b60adeeee"/>
+				<rom name="80-251504 - SpongeBob Schwammkopf - Rette das Geheimrezept (GER).bin" size="0x1000000" crc="19efae9e" sha1="5c3eeb04cdec48cb92c5410ceef57e4b60adeeee"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="spongebs" cloneof="spongebg" supported="no">
+	<software name="spongebs" cloneof="spongeb" supported="no">
 		<description>Nickelodeon Bob Esponja - Defendiendo la Fórmula Secreta (Spain)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
@@ -490,7 +504,19 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tstory3g" supported="no">
+	<software name="tstory3" supported="no">
+		<description>Disney/Pixar Toy Story 3 (USA)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-250100(US)"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="mobigotoystory3.bin" size="0x1000000" crc="bf7bc6e1" sha1="cc86160f29848d6620923cffd0f740a593ba2d94"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tstory3g" cloneof="tstory3" supported="no">
 		<description>Disney/Pixar Toy Story 3 (Germany)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
@@ -498,17 +524,6 @@ license:CC0
 		<part name="cart" interface="mobigo_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="80-250104 - toy story 3 (ger).bin" size="0x1000000" crc="caafa975" sha1="0dd2b13a05711412493255fcf2b8ac31a3445800"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="tstory3a" supported="no"> <!-- part #? full title? region? -->
-		<description>Disney/Pixar Toy Story 3</description>
-		<year>201?</year>
-		<publisher>VTech</publisher>
-		<part name="cart" interface="mobigo_cart">
-			<dataarea name="rom" size="0x1000000">
-				<rom name="mobigotoystory3.bin" size="0x1000000" crc="bf7bc6e1" sha1="cc86160f29848d6620923cffd0f740a593ba2d94"/>
 			</dataarea>
 		</part>
 	</software>

@@ -24,6 +24,9 @@
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class korg_dss1_state : public driver_device
 {
 public:
@@ -576,6 +579,9 @@ ROM_START(dssmsrk)
 	ROM_REGION(0x10000, "msrk", 0)
 	ROM_LOAD("113003.u30", 0x00000, 0x10000, CRC(81b17db3) SHA1(af8a3167e06641d41b9b9e6e024335c2eb827274))
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1986, dss1,    0,    0, dss1,    dss1, korg_dss1_state,    empty_init, "Korg",               "DSS-1 Digital Sampling Synthesizer",                        MACHINE_IS_SKELETON)
 SYST(1987, dssmsrk, dss1, 0, dssmsrk, dss1, korg_dssmsrk_state, empty_init, "Korg / Sound Logic", "DSS-1 Digital Sampling Synthesizer (Memory/SCSI Retrofit)", MACHINE_IS_SKELETON)

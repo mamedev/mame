@@ -36,6 +36,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class m79152pc_state : public driver_device
 {
 public:
@@ -359,6 +361,9 @@ ROM_START( m79152pc )
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "7641apc.bin", 0x0000, 0x0200, NO_DUMP)
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

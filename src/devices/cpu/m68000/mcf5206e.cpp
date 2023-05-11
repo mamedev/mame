@@ -13,12 +13,12 @@ std::unique_ptr<util::disasm_interface> mcf5206e_device::create_disassembler()
 }
 
 mcf5206e_device::mcf5206e_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_base_device(mconfig, tag, owner, clock, MCF5206E, 32,32)
+	: m68000_musashi_device(mconfig, tag, owner, clock, MCF5206E, 32,32)
 {
 }
 
 void mcf5206e_device::device_start()
 {
-	m68000_base_device::device_start();
+	m68000_musashi_device::device_start();
 	init_cpu_coldfire();
 }

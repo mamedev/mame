@@ -1880,7 +1880,7 @@ void seibuspi_state::sxx2e(machine_config &config)
 	config.device_remove("soundfifo2");
 
 	/* sound hardware */
-	 // Single PCBs only output mono sound, SXX2E : unverified
+	// Single PCBs only output mono sound, SXX2E : unverified
 	config.device_remove("lspeaker");
 	config.device_remove("rspeaker");
 	SPEAKER(config, "mono").front_center();
@@ -3385,6 +3385,11 @@ ROM_START( rdft2 ) /* SPI Cart, Europe */
 	ROM_CONTINUE(                   0x400000, 0x100000 )
 	ROM_LOAD32_BYTE("sound1.u0222", 0x800000, 0x080000, CRC(b7bd3703) SHA1(6427a7e6de10d6743d6e64b984a1d1c647f5643a) )
 
+	ROM_REGION( 0x0345, "pals", 0 ) /* pals */
+	ROM_LOAD("rm81.u0529.bin", 0x0000, 0x0117, CRC(acd55c8e) SHA1(b965e828fecd61b836aca337637e53d7360d9dc4) ) // AMD PALCE16V8H-15SC/4
+	ROM_LOAD("rm82.u0330.bin", 0x0117, 0x0117, CRC(64c71423) SHA1(1da3502bec0c843b7198d1d9ab60f9fd4b110a8e) ) // AMD PALCE16V8H-15SC/4
+	ROM_LOAD("rm83.u0331.bin", 0x022e, 0x0117, CRC(6e10d66b) SHA1(995d2a0da680ec19ee253098c91a4780dd8403c6) ) // AMD PALCE16V8H-15SC/4
+
 	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
 	ROM_LOAD("flash0_blank_region80.u1053", 0x000000, 0x100000, CRC(e2adaff5) SHA1(9297afaf78209724515d8f78de8cee7bc7cb796b) )
 ROM_END
@@ -3421,6 +3426,11 @@ ROM_START( rdft2u ) /* SPI Cart, USA */
 	ROM_LOAD32_WORD("pcm.u0217",    0x000000, 0x100000, CRC(2edc30b5) SHA1(c25d690d633657fc3687636b9070f36bd305ae06) )
 	ROM_CONTINUE(                   0x400000, 0x100000 )
 	ROM_LOAD32_BYTE("sound1.u0222", 0x800000, 0x080000, CRC(b7bd3703) SHA1(6427a7e6de10d6743d6e64b984a1d1c647f5643a) )
+
+	ROM_REGION( 0x0345, "pals", 0 ) /* pals */
+	ROM_LOAD("rm81.u0529.bin", 0x0000, 0x0117, CRC(acd55c8e) SHA1(b965e828fecd61b836aca337637e53d7360d9dc4) ) // AMD PALCE16V8H-15SC/4
+	ROM_LOAD("rm82.u0330.bin", 0x0117, 0x0117, CRC(64c71423) SHA1(1da3502bec0c843b7198d1d9ab60f9fd4b110a8e) ) // AMD PALCE16V8H-15SC/4
+	ROM_LOAD("rm83.u0331.bin", 0x022e, 0x0117, CRC(6e10d66b) SHA1(995d2a0da680ec19ee253098c91a4780dd8403c6) ) // AMD PALCE16V8H-15SC/4
 
 	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
 	ROM_LOAD("flash0_blank_region10.u1053", 0x000000, 0x100000, CRC(4319d998) SHA1(a064ce647453a9b3bccf7f1d6d0d52b5a72e09dd) )
@@ -3459,6 +3469,11 @@ ROM_START( rdft2j ) /* SPI Cart, Japan */
 	ROM_CONTINUE(                   0x400000, 0x100000 )
 	ROM_LOAD32_BYTE("sound1.u0222", 0x800000, 0x080000, CRC(b7bd3703) SHA1(6427a7e6de10d6743d6e64b984a1d1c647f5643a) )
 
+	ROM_REGION( 0x0345, "pals", 0 ) /* pals */
+	ROM_LOAD("rm81.u0529.bin", 0x0000, 0x0117, CRC(acd55c8e) SHA1(b965e828fecd61b836aca337637e53d7360d9dc4) ) // AMD PALCE16V8H-15SC/4
+	ROM_LOAD("rm82.u0330.bin", 0x0117, 0x0117, CRC(64c71423) SHA1(1da3502bec0c843b7198d1d9ab60f9fd4b110a8e) ) // AMD PALCE16V8H-15SC/4
+	ROM_LOAD("rm83.u0331.bin", 0x022e, 0x0117, CRC(6e10d66b) SHA1(995d2a0da680ec19ee253098c91a4780dd8403c6) ) // AMD PALCE16V8H-15SC/4
+
 	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
 	ROM_LOAD("flash0_blank_region01.u1053", 0x000000, 0x100000, CRC(7ae7ab76) SHA1(a2b196f470bf64af94002fc4e2640fadad00418f) )
 ROM_END
@@ -3495,6 +3510,11 @@ ROM_START( rdft2ja ) /* SPI Cart, Japan */
 	ROM_LOAD32_WORD("pcm.u0217",    0x000000, 0x100000, CRC(2edc30b5) SHA1(c25d690d633657fc3687636b9070f36bd305ae06) )
 	ROM_CONTINUE(                   0x400000, 0x100000 )
 	ROM_LOAD32_BYTE("sound1.u0222", 0x800000, 0x080000, CRC(b7bd3703) SHA1(6427a7e6de10d6743d6e64b984a1d1c647f5643a) )
+
+	ROM_REGION( 0x0345, "pals", 0 ) /* pals */
+	ROM_LOAD("rm81.u0529.bin", 0x0000, 0x0117, CRC(acd55c8e) SHA1(b965e828fecd61b836aca337637e53d7360d9dc4) ) // AMD PALCE16V8H-15SC/4
+	ROM_LOAD("rm82.u0330.bin", 0x0117, 0x0117, CRC(64c71423) SHA1(1da3502bec0c843b7198d1d9ab60f9fd4b110a8e) ) // AMD PALCE16V8H-15SC/4
+	ROM_LOAD("rm83.u0331.bin", 0x022e, 0x0117, CRC(6e10d66b) SHA1(995d2a0da680ec19ee253098c91a4780dd8403c6) ) // AMD PALCE16V8H-15SC/4
 
 	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
 	ROM_LOAD("flash0_blank_region01.u1053", 0x000000, 0x100000, CRC(7ae7ab76) SHA1(a2b196f470bf64af94002fc4e2640fadad00418f) )
@@ -3533,6 +3553,11 @@ ROM_START( rdft2jb ) /* SPI Cart, Japan */
 	ROM_CONTINUE(                   0x400000, 0x100000 )
 	ROM_LOAD32_BYTE("sound1.u0222", 0x800000, 0x080000, CRC(b7bd3703) SHA1(6427a7e6de10d6743d6e64b984a1d1c647f5643a) )
 
+	ROM_REGION( 0x0345, "pals", 0 ) /* pals */
+	ROM_LOAD("rm81.u0529.bin", 0x0000, 0x0117, CRC(acd55c8e) SHA1(b965e828fecd61b836aca337637e53d7360d9dc4) ) // AMD PALCE16V8H-15SC/4
+	ROM_LOAD("rm82.u0330.bin", 0x0117, 0x0117, CRC(64c71423) SHA1(1da3502bec0c843b7198d1d9ab60f9fd4b110a8e) ) // AMD PALCE16V8H-15SC/4
+	ROM_LOAD("rm83.u0331.bin", 0x022e, 0x0117, CRC(6e10d66b) SHA1(995d2a0da680ec19ee253098c91a4780dd8403c6) ) // AMD PALCE16V8H-15SC/4
+
 	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
 	ROM_LOAD("flash0_blank_region01.u1053", 0x000000, 0x100000, CRC(7ae7ab76) SHA1(a2b196f470bf64af94002fc4e2640fadad00418f) )
 ROM_END
@@ -3570,6 +3595,11 @@ ROM_START( rdft2jc ) /* SPI SXX2C ROM SUB8 Cart, Japan */
 	ROM_CONTINUE(                   0x400000, 0x100000 )
 	ROM_LOAD32_BYTE("sound1.u0222", 0x800000, 0x080000, CRC(b7bd3703) SHA1(6427a7e6de10d6743d6e64b984a1d1c647f5643a) )
 
+	ROM_REGION( 0x0345, "pals", 0 ) /* pals */
+	ROM_LOAD("rm81.u0529.bin", 0x0000, 0x0117, CRC(acd55c8e) SHA1(b965e828fecd61b836aca337637e53d7360d9dc4) ) // AMD PALCE16V8H-15SC/4
+	ROM_LOAD("rm82.u0330.bin", 0x0117, 0x0117, CRC(64c71423) SHA1(1da3502bec0c843b7198d1d9ab60f9fd4b110a8e) ) // AMD PALCE16V8H-15SC/4
+	ROM_LOAD("rm83.u0331.bin", 0x022e, 0x0117, CRC(6e10d66b) SHA1(995d2a0da680ec19ee253098c91a4780dd8403c6) ) // AMD PALCE16V8H-15SC/4
+
 	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
 	ROM_LOAD("flash0_blank_region01.u1053", 0x000000, 0x100000, CRC(7ae7ab76) SHA1(a2b196f470bf64af94002fc4e2640fadad00418f) )
 ROM_END
@@ -3606,6 +3636,11 @@ ROM_START( rdft2it ) /* SPI Cart, Italy */
 	ROM_LOAD32_WORD("pcm.u0217",    0x000000, 0x100000, CRC(2edc30b5) SHA1(c25d690d633657fc3687636b9070f36bd305ae06) )
 	ROM_CONTINUE(                   0x400000, 0x100000 )
 	ROM_LOAD32_BYTE("seibu8.bin", 0x800000, 0x080000, CRC(b7bd3703) SHA1(6427a7e6de10d6743d6e64b984a1d1c647f5643a) )
+
+	ROM_REGION( 0x0345, "pals", 0 ) /* pals */
+	ROM_LOAD("rm81.u0529.bin", 0x0000, 0x0117, CRC(acd55c8e) SHA1(b965e828fecd61b836aca337637e53d7360d9dc4) ) // AMD PALCE16V8H-15SC/4
+	ROM_LOAD("rm82.u0330.bin", 0x0117, 0x0117, CRC(64c71423) SHA1(1da3502bec0c843b7198d1d9ab60f9fd4b110a8e) ) // AMD PALCE16V8H-15SC/4
+	ROM_LOAD("rm83.u0331.bin", 0x022e, 0x0117, CRC(6e10d66b) SHA1(995d2a0da680ec19ee253098c91a4780dd8403c6) ) // AMD PALCE16V8H-15SC/4
 
 	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
 	ROM_LOAD("flash0_blank_region92.u1053", 0x000000, 0x100000, CRC(204d82d0) SHA1(444f4aefa27d8f5d1a2f7f08f826ea84b0ccbd02) )
@@ -3645,6 +3680,11 @@ ROM_START( rdft2a ) /* SPI Cart, Asia (Metrotainment license); SPI PCB is marked
 	ROM_CONTINUE(                           0x400000, 0x100000 )
 	ROM_LOAD32_BYTE("seibu__8.u0222",       0x800000, 0x080000, CRC(b7bd3703) SHA1(6427a7e6de10d6743d6e64b984a1d1c647f5643a) ) // socket is silkscreened on pcb SOUND1
 
+	ROM_REGION( 0x0345, "pals", 0 ) /* pals */
+	ROM_LOAD("rm81.u0529.bin", 0x0000, 0x0117, CRC(acd55c8e) SHA1(b965e828fecd61b836aca337637e53d7360d9dc4) ) // AMD PALCE16V8H-15SC/4
+	ROM_LOAD("rm82.u0330.bin", 0x0117, 0x0117, CRC(64c71423) SHA1(1da3502bec0c843b7198d1d9ab60f9fd4b110a8e) ) // AMD PALCE16V8H-15SC/4
+	ROM_LOAD("rm83.u0331.bin", 0x022e, 0x0117, CRC(6e10d66b) SHA1(995d2a0da680ec19ee253098c91a4780dd8403c6) ) // AMD PALCE16V8H-15SC/4
+
 	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
 	ROM_LOAD("flash0_blank_region22.u1053", 0x000000, 0x100000, CRC(5fee8413) SHA1(6d6a62fa01293b4ba4b349a39820d024add6ea22) )
 ROM_END
@@ -3681,6 +3721,11 @@ ROM_START( rdft2aa ) /* SPI Cart, Asia (Dream Island license) */
 	ROM_LOAD32_WORD("pcm.u0217",    0x000000, 0x100000, CRC(2edc30b5) SHA1(c25d690d633657fc3687636b9070f36bd305ae06) )
 	ROM_CONTINUE(                   0x400000, 0x100000 )
 	ROM_LOAD32_BYTE("sound1.u0222", 0x800000, 0x080000, CRC(b7bd3703) SHA1(6427a7e6de10d6743d6e64b984a1d1c647f5643a) )
+
+	ROM_REGION( 0x0345, "pals", 0 ) /* pals */
+	ROM_LOAD("rm81.u0529.bin", 0x0000, 0x0117, CRC(acd55c8e) SHA1(b965e828fecd61b836aca337637e53d7360d9dc4) ) // AMD PALCE16V8H-15SC/4
+	ROM_LOAD("rm82.u0330.bin", 0x0117, 0x0117, CRC(64c71423) SHA1(1da3502bec0c843b7198d1d9ab60f9fd4b110a8e) ) // AMD PALCE16V8H-15SC/4
+	ROM_LOAD("rm83.u0331.bin", 0x022e, 0x0117, CRC(6e10d66b) SHA1(995d2a0da680ec19ee253098c91a4780dd8403c6) ) // AMD PALCE16V8H-15SC/4
 
 	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
 	ROM_LOAD("flash0_blank_region24.u1053", 0x000000, 0x100000, CRC(72a33dc4) SHA1(65a52f576ca4d240418fedd9a4922edcd6c0c8d1) )
@@ -3719,6 +3764,11 @@ ROM_START( rdft2t ) /* SPI Cart, Taiwan */
 	ROM_CONTINUE(                   0x400000, 0x100000 )
 	ROM_LOAD32_BYTE("sound1.u0222", 0x800000, 0x080000, CRC(b7bd3703) SHA1(6427a7e6de10d6743d6e64b984a1d1c647f5643a) )
 
+	ROM_REGION( 0x0345, "pals", 0 ) /* pals */
+	ROM_LOAD("rm81.u0529.bin", 0x0000, 0x0117, CRC(acd55c8e) SHA1(b965e828fecd61b836aca337637e53d7360d9dc4) ) // AMD PALCE16V8H-15SC/4
+	ROM_LOAD("rm82.u0330.bin", 0x0117, 0x0117, CRC(64c71423) SHA1(1da3502bec0c843b7198d1d9ab60f9fd4b110a8e) ) // AMD PALCE16V8H-15SC/4
+	ROM_LOAD("rm83.u0331.bin", 0x022e, 0x0117, CRC(6e10d66b) SHA1(995d2a0da680ec19ee253098c91a4780dd8403c6) ) // AMD PALCE16V8H-15SC/4
+
 	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
 	ROM_LOAD("flash0_blank_region20.u1053", 0x000000, 0x100000, CRC(f2051161) SHA1(45cbd5fd9ae0ca0c5c3450bca5f6806ddce3c56f) )
 ROM_END
@@ -3755,6 +3805,11 @@ ROM_START( rdft2s ) /* SPI Cart, Switzerland; SPI PCB is marked "(C)1997 SXX2C R
 	ROM_LOAD32_WORD("raiden-f2__pcm.u0217", 0x000000, 0x100000, CRC(2edc30b5) SHA1(c25d690d633657fc3687636b9070f36bd305ae06) ) // pads are silkscreened on pcb SOUND0
 	ROM_CONTINUE(                           0x400000, 0x100000 )
 	ROM_LOAD32_BYTE("seibu__8.u0222",       0x800000, 0x080000, CRC(b7bd3703) SHA1(6427a7e6de10d6743d6e64b984a1d1c647f5643a) ) // socket is silkscreened on pcb SOUND1
+
+	ROM_REGION( 0x0345, "pals", 0 ) /* pals */
+	ROM_LOAD("rm81.u0529.bin", 0x0000, 0x0117, CRC(acd55c8e) SHA1(b965e828fecd61b836aca337637e53d7360d9dc4) ) // AMD PALCE16V8H-15SC/4
+	ROM_LOAD("rm82.u0330.bin", 0x0117, 0x0117, CRC(64c71423) SHA1(1da3502bec0c843b7198d1d9ab60f9fd4b110a8e) ) // AMD PALCE16V8H-15SC/4
+	ROM_LOAD("rm83.u0331.bin", 0x022e, 0x0117, CRC(6e10d66b) SHA1(995d2a0da680ec19ee253098c91a4780dd8403c6) ) // AMD PALCE16V8H-15SC/4
 
 	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
 	ROM_LOAD("flash0_blank_region9c.u1053", 0x000000, 0x100000, CRC(d73d640c) SHA1(61a99af2a153de9d53e28872a2493e2ba797a325) )

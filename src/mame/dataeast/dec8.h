@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
-#ifndef MAME_INCLUDES_DEC8_H
-#define MAME_INCLUDES_DEC8_H
+#ifndef MAME_DATAEAST_DEC8_H
+#define MAME_DATAEAST_DEC8_H
 
 #pragma once
 
@@ -253,4 +253,4 @@ private:
 	int      m_msm5205next = 0;
 };
 
-#endif // MAME_INCLUDES_DEC8_H
+#endif // MAME_DATAEAST_DEC8_H

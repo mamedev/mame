@@ -52,7 +52,7 @@ void mtx_cfx_device::device_add_mconfig(machine_config &config)
 	m_pia->out_pb_callback().set([this](uint8_t data) { m_ide_data = (m_ide_data & 0x00ff) | (data << 8); });
 	m_pia->out_pc_callback().set(FUNC(mtx_cfx_device::portc_w));
 
-	ATA_INTERFACE(config, m_ide).options(ata_devices, "hdd", nullptr, false);
+	ATA_INTERFACE(config, m_ide).options(ata_devices, "cf", nullptr, false);
 }
 
 

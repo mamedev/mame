@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-#ifndef MAME_MACHINE_ISBC_208_H
-#define MAME_MACHINE_ISBC_208_H
+#ifndef MAME_INTEL_ISBC_208_H
+#define MAME_INTEL_ISBC_208_H
 
 #pragma once
 
@@ -51,4 +51,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ISBC_208, isbc_208_device)
 
-#endif // MAME_MACHINE_ISBC_208_H
+#endif // MAME_INTEL_ISBC_208_H

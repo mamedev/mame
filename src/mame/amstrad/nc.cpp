@@ -1,558 +1,845 @@
-// license:GPL-2.0+
-// copyright-holders:Wilbert Pol, Kevin Thacker
-/******************************************************************************
+// license: GPL-2.0+
+// copyright-holders: Wilbert Pol, Kevin Thacker, Dirk Best
+// thanks-to: Cliff Lawson, Russell Marks, Tim Surtel
+/***************************************************************************
 
-        NC100/NC150/NC200 Notepad computer
+    Amstrad NC100/NC150/N200 portable computer
 
-        system driver
+    Hardware:
+    - Z80 CPU, 4.606000 MHz
+    - RAM: 64k (NC100) or 128k (NC150/200)
+    - ROM: 256k (NC100) or 512k (NC150/200)
+    - Custom ASIC integrating many components
+    - LCD screen with 480x64 (NC100/150) or 480x128 (NC200) pixels
+    - 2 channel sound (programmable frequency beeps)
+    - I8251 compatible UART
+    - RTC: TC8521 (NC100/150) or MC146818 (NC200)
+    - PCMCIA slot (supports SRAM cards up to 1 MB)
+    - 3.5" DD floppy drive, PC compatible FAT format (NC200)
+    - 64 key keyboard
+    - RS232 and Centronics port
+    - Lithium and alkaline batteries
 
+    TODO:
+    - Investigate why the FDC IRQ needs to be delayed
+    - The dw225 rom image is identical to the nc100 v1.06 rom with the
+      last half filled with 0x00. Correct?
+    - Computer can be turned off, but not on anymore
+    - IRQ 6 is not connected
+    - Disk change hardware (disk change is not detected)
+    - Verify card status port
+    - Artwork
 
-        Thankyou to:
-            Cliff Lawson, Russell Marks and Tim Surtel
+    Notes:
+    - Keymap: 'Function' is mapped to 'Left Alt', 'Symbol' is mapped to
+      'Right Alt', 'Menu' is mapped to 'Right Control'
+    - The system will complain and reset the clock if you don't turn it off
+      properly using the 'on/off' key
+    - NC100 self test: Turn off, hold Function+Symbol, reset
+    - NC200 self test: Turn off, hold Function+Control+Symbol, reset
 
-        Documentation:
-
-        NC100:
-            NC100 I/O Specification by Cliff Lawson,
-            NC100EM by Russell Marks
-        NC200:
-            Disassembly of the NC200 ROM + e-mail
-            exchange with Russell Marks
-
-
-        NC100:
-
-        Hardware:
-            - Z80 CPU, 6 MHz
-            - memory powered by lithium batteries!
-            - 2 channel tone (programmable frequency beep's)
-            - LCD screen
-            - laptop/portable computer
-            - qwerty keyboard
-            - serial/parallel connection
-            - Amstrad custom ASIC chip
-            - tc8521 real time clock
-            - intel 8251 compatible uart
-            - PCMCIA Memory cards supported, up to 1mb!
-
-        NC200:
-
-        Hardware:
-            - Z80 CPU
-            - Intel 8251 compatible uart
-            - upd765 compatible floppy disc controller
-            - mc146818 real time clock?
-            - 720k floppy disc drive (compatible with MS-DOS)
-            (disc drive can be not ready).
-            - PCMCIA Memory cards supported, up to 1mb!
-
-        TODO:
-           - find out what the unused key bits are for
-           (checked all unused bits on nc200! - do not seem to have any use!)
-           - complete serial (xmodem protocol!)
-           - overlay would be nice!
-           - finish NC200 disc drive emulation (closer!)
-           - add NC150 driver - ROM needed!!!
-            - on/off control
-            - check values read from other ports that are not described!
-            - what is read from unmapped ports?
-            - what is read from uart when it is off?
-            - check if uart ints are generated when it is off?
-            - are ints cancelled if uart is turned off after int has been caused?
-            - check keyboard ints - are these regular or what??
-
-        PCMCIA memory cards are stored as a direct dump of the contents. There is no header
-        information. No distinction is made between RAM and ROM cards.
-
-        Memory card sizes are a power of 2 in size (e.g. 1mb, 512k, 256k etc),
-        however the code allows any size, but it limits access to power of 2 sizes, with
-        minimum access being 16k. If a file which is less than 16k is used, no memory card
-        will be present. If a file which is greater than 1mb is used, only 1mb will be accessed.
-
-        Interrupt system of NC100:
-
-        The IRQ mask is used to control the interrupt sources that can interrupt.
-
-        The IRQ status can be read to determine which devices are interrupting.
-        Some devices, e.g. serial, cannot be cleared by writing to the irq status
-        register. These can only be cleared by performing an operation on the
-        device (e.g. reading a data register).
-
-        Self Test:
-
-        - requires memory save and real time clock save to be working!
-        (i.e. for MAME nc100 driver, nc100.nv can be created)
-        - turn off nc (use NMI button)
-        - reset+FUNCTION+SYMBOL must be pressed together.
-
-        Note: NC200 Self test does not test disc hardware :(
-
- ******************************************************************************/
+***************************************************************************/
 
 #include "emu.h"
-#include "nc.h"
 
+#include "bus/centronics/ctronics.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
-#include "machine/mc146818.h"   // for NC200 real time clock
-#include "machine/rp5c01.h"     // for NC100 real time clock
-#include "formats/pc_dsk.h"     // for NC200 disk image
+#include "machine/clock.h"
+#include "machine/i8251.h"
+#include "machine/mc146818.h"
+#include "machine/nvram.h"
+#include "machine/pccard.h"
+#include "machine/pccard_sram.h"
+#include "machine/ram.h"
+#include "machine/rp5c01.h"
+#include "machine/timer.h"
+#include "machine/upd765.h"
+#include "sound/beep.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+#include "formats/pc_dsk.h"
+
 #define LOG_GENERAL (1U << 0)
 #define LOG_DEBUG   (1U << 1)
+#define LOG_IRQ     (1U << 2)
 
-//#define VERBOSE (LOG_GENERAL | LOG_DEBUG)
+#define VERBOSE (LOG_GENERAL | LOG_DEBUG)
 #include "logmacro.h"
 
-#define LOGDEBUG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
+
+namespace {
 
 
-/* the serial clock is generated by the nc hardware and connected to the i8251
-receive clock and transmit clock inputs */
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
-/*
-    Port 0x00:
-    ==========
-
-    Display memory start:
-
-    NC100:
-            bit 7           A15
-            bit 6           A14
-            bit 5           A13
-            bit 4           A12
-            bits 3-0        Not Used
-    NC200:
-            bit 7           A15
-            bit 6           A14
-            bit 5           A13
-            bits 4-0        Not Used
-
-    Port 0x010-0x013:
-    =================
-
-    Memory management control:
-
-    NC100 & NC200:
-
-        10              controls 0000-3FFF
-        11              controls 4000-7FFF
-        12              controls 8000-BFFF
-        13              controls C000-FFFF
-
-    Port 0x030:
-    ===========
-
-    NC100:
-            bit 7     select card register 1=common, 0=attribute
-            bit 6     parallel interface Strobe signal
-            bit 5     Not Used
-            bit 4     uPD4711 line driver, 1=off, 0=on
-            bit 3     UART clock and reset, 1=off, 0=on
-
-            bits 2-0  set the baud rate as follows
-
-                    000 = 150
-                    001 = 300
-                    010 = 600
-                    011 = 1200
-                    100 = 2400
-                    101 = 4800
-                    110 = 9600
-                    111 = 19200
-    NC200:
-            bit 7     select card register 1=common, 0=attribute
-            bit 6     parallel interface Strobe signal
-
-            bit 5     used in disc interface; (set to 0)
-
-            bit 4     uPD4711 line driver, 1=off, 0=on
-            bit 3     UART clock and reset, 1=off, 0=on
-
-            bits 2-0  set the baud rate as follows
-
-                    000 = 150
-                    001 = 300
-                    010 = 600
-                    011 = 1200
-                    100 = 2400
-                    101 = 4800
-                    110 = 9600
-                    111 = 19200
-
-
-    Port 0x0a0:
-    ===========
-
-    NC100:
-            bit 7: memory card present 0 = yes, 1 = no
-            bit 6: memory card write protected 1 = yes, 0 = no
-            bit 5: input voltage = 1, if >= to 4 volts
-            bit 4: mem card battery: 0 = battery low
-            bit 3: alkaline batteries. 0 if >=3.2 volts
-            bit 2: lithium battery 0 if >= 2.7 volts
-            bit 1: parallel interface busy (0 if busy)
-            bit 0: parallel interface ack (1 if ack)
-
-    NC200:
-
-            bit 7: memory card present 0 = yes, 1 = no
-            bit 6: memory card write protected 1 = yes, 0 = no
-            bit 5: lithium battery 0 if >= 2.7 volts
-            bit 4: input voltage = 1, if >= to 4 volts
-            bit 3: ??
-            bit 2: alkaline batteries. 0 if >=3.2 volts
-            bit 1: ??
-            bit 0: battery power: if 1: batteries are too low for disk usage, if 0: batteries ok for disc usage
-
-
-    Port 0x060 (IRQ MASK), Port 0x090 (IRQ STATUS):
-    ===============================================
-
-    NC100:
-            bit 7: not used
-            bit 6: not used
-            bit 5: not used
-            bit 4: not used
-            Bit 3: Key scan interrupt (10ms)
-            Bit 2: ACK from parallel interface
-            Bit 1: Tx Ready
-            Bit 0: Rx Ready
-
-    NC200:
-            bit 7: ???
-            bit 6: RTC alarm?
-            bit 5: FDC interrupt
-            bit 4: Power off interrupt
-            Bit 3: Key scan interrupt (10ms)
-            Bit 2: serial interrupt (tx ready/rx ready combined)
-            Bit 1: not used
-            Bit 0: ACK from parallel interface
-
-    Port 0x070: On/off control
-
-    NC200:
-        bit 7: nc200 power on/off: 1 = on, 0=off
-        bit 2: backlight: 1=off, 0=on
-        bit 1: disk motor: 1=off, 0=disk motor???
-        bit 0: upd765 terminal count input
-*/
-
-
-
-/* latched interrupts are interrupts that cannot be cleared by writing to the irq
-mask. latched interrupts can only be cleared by accessing the interrupting
-device e.g. serial chip, fdc */
-/* this is a mask of irqs that are latched, and it is different for nc100 and
-nc200 */
-
-void nc_state::nc_update_interrupts()
+class nc_state : public driver_device
 {
-	m_irq_status &= ~m_irq_latch_mask;
-	m_irq_status |= m_irq_latch;
+public:
+	nc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_ram(*this, RAM_TAG),
+		m_rombank(*this, "rombank%u", 0U),
+		m_rambank(*this, "rambank%u", 0U),
+		m_screen(*this, "screen"),
+		m_beeper1(*this, "beep.1"),
+		m_beeper2(*this, "beep.2"),
+		m_centronics(*this, "centronics"),
+		m_uart(*this, "uart"),
+		m_uart_clock(*this, "uart_clock"),
+		m_nvram(*this, "nvram"),
+		m_pcmcia(*this, "pcmcia"),
+		m_mem_view0(*this, "block0"),
+		m_mem_view1(*this, "block1"),
+		m_mem_view2(*this, "block2"),
+		m_mem_view3(*this, "block3"),
+		m_keyboard(*this, "line%d", 0U),
+		m_battery(*this, "battery")
+	{
+	}
 
-	/* any ints set and they are not masked? */
-	if (
-			(((m_irq_status & m_irq_mask) & 0x3f)!=0)
-			)
+	DECLARE_READ_LINE_MEMBER( pcmcia_card_detect_r ) { return m_pcmcia_card_detect; }
+	DECLARE_READ_LINE_MEMBER( pcmcia_write_protect_r ) { return m_pcmcia_write_protect; }
+	DECLARE_READ_LINE_MEMBER( pcmcia_battery_voltage_r ) { return m_pcmcia_battery_voltage_1 | m_pcmcia_battery_voltage_2; }
+
+	void nc_base(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void update_interrupts();
+
+	uint8_t memory_management_r(offs_t offset);
+	void memory_management_w(offs_t offset, uint8_t data);
+	virtual void uart_control_w(uint8_t data);
+	void nc_sound_w(offs_t offset, uint8_t data);
+	virtual void poweroff_control_w(uint8_t data);
+	uint8_t irq_status_r();
+
+	DECLARE_WRITE_LINE_MEMBER(centronics_busy_w);
+
+	template<int N> uint8_t pcmcia_r(offs_t offset);
+	template<int N> void pcmcia_w(offs_t offset, uint8_t data);
+
+	void mem_map(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
+	required_memory_bank_array<4> m_rombank;
+	required_memory_bank_array<4> m_rambank;
+	required_device<screen_device> m_screen;
+	required_device<beep_device> m_beeper1;
+	required_device<beep_device> m_beeper2;
+	required_device<centronics_device> m_centronics;
+	required_device<i8251_device> m_uart;
+	required_device<clock_device> m_uart_clock;
+	required_device<nvram_device> m_nvram;
+	required_device<pccard_slot_device> m_pcmcia;
+	memory_view m_mem_view0;
+	memory_view m_mem_view1;
+	memory_view m_mem_view2;
+	memory_view m_mem_view3;
+	required_ioport_array<10> m_keyboard;
+	required_ioport m_battery;
+
+	uint8_t m_rom_banks;
+	uint8_t m_ram_banks;
+
+	uint16_t m_display_memory_start = 0;
+	uint8_t m_mmc[4];
+	uint8_t m_uart_control = 0;
+
+	int m_irq_mask = 0;
+	int m_irq_status = 0;
+
+	int m_uart_rxrdy;
+	int m_uart_txrdy;
+	int m_centronics_busy = 0;
+
+	int m_pcmcia_card_detect;
+	int m_pcmcia_write_protect;
+	int m_pcmcia_battery_voltage_1;
+	int m_pcmcia_battery_voltage_2;
+
+	rgb_t m_fg_color;
+	rgb_t m_bg_color;
+
+private:
+	TIMER_DEVICE_CALLBACK_MEMBER(keyscan_timer);
+	void nc_sound_update(int channel);
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	DECLARE_WRITE_LINE_MEMBER( pcmcia_card_detect_w ) { m_pcmcia_card_detect = state; }
+	DECLARE_WRITE_LINE_MEMBER( pcmcia_write_protect_w ) { m_pcmcia_write_protect = state; }
+	DECLARE_WRITE_LINE_MEMBER( pcmcia_battery_voltage_1_w ) { m_pcmcia_battery_voltage_1 = state; }
+	DECLARE_WRITE_LINE_MEMBER( pcmcia_battery_voltage_2_w ) { m_pcmcia_battery_voltage_2 = state; }
+
+	int m_sound_channel_periods[2]{};
+};
+
+class nc100_state : public nc_state
+{
+public:
+	nc100_state(const machine_config &mconfig, device_type type, const char *tag) :
+		nc_state(mconfig, type, tag),
+		m_centronics_ack(0)
 	{
-		logerror("int set %02x\n", m_irq_status & m_irq_mask);
-		/* set int */
-		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
-	else
+
+	DECLARE_INPUT_CHANGED_MEMBER( power_button );
+
+	DECLARE_READ_LINE_MEMBER( centronics_ack_r ) { return m_centronics_ack; }
+	DECLARE_READ_LINE_MEMBER( centronics_busy_r ) { return m_centronics_busy; }
+
+	void nc100(machine_config &config);
+	void nc150(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	void io_map(address_map &map);
+
+	void display_memory_start_w(uint8_t data);
+	void card_wait_control_w(uint8_t data);
+	void irq_mask_w(uint8_t data);
+	void irq_status_w(uint8_t data);
+	uint8_t keyboard_r(offs_t offset);
+
+	DECLARE_WRITE_LINE_MEMBER(uart_txrdy_w);
+	DECLARE_WRITE_LINE_MEMBER(uart_rxrdy_w);
+	DECLARE_WRITE_LINE_MEMBER(centronics_ack_w);
+
+	int m_centronics_ack;
+};
+
+class nc200_state : public nc_state
+{
+public:
+	nc200_state(const machine_config &mconfig, device_type type, const char *tag) :
+		nc_state(mconfig, type, tag),
+		m_rtc(*this, "rtc"),
+		m_fdc(*this, "fdc"),
+		m_floppy(*this, "fdc:0")
 	{
-		/* clear int */
-		m_maincpu->set_input_line(0, CLEAR_LINE);
 	}
+
+	DECLARE_INPUT_CHANGED_MEMBER( power_button );
+
+	void nc200(machine_config &config);
+
+protected:
+	void machine_start() override;
+	void machine_reset() override;
+
+private:
+	required_device<mc146818_device> m_rtc;
+	required_device<upd765a_device> m_fdc;
+	required_device<floppy_connector> m_floppy;
+
+	void io_map(address_map &map);
+
+	void display_memory_start_w(uint8_t data);
+	void card_wait_control_w(uint8_t data);
+	virtual void uart_control_w(uint8_t data) override;
+	uint8_t centronics_busy_r();
+	void irq_mask_w(uint8_t data);
+	virtual void poweroff_control_w(uint8_t data) override;
+	void irq_status_w(uint8_t data);
+	uint8_t keyboard_r(offs_t offset);
+
+	void fdc_int_w(int state);
+	DECLARE_WRITE_LINE_MEMBER(uart_rxrdy_w);
+	void centronics_ack_w(int state);
+
+	emu_timer *m_fdc_irq_timer;
+	TIMER_CALLBACK_MEMBER(fdc_irq);
+};
+
+
+//**************************************************************************
+//  ADDRESS MAPS
+//**************************************************************************
+
+void nc_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x3fff).view(m_mem_view0);
+	m_mem_view0[0](0x0000, 0x3fff).bankr(m_rombank[0]);
+	m_mem_view0[1](0x0000, 0x3fff).bankrw(m_rambank[0]);
+	m_mem_view0[2](0x0000, 0x3fff).rw(FUNC(nc_state::pcmcia_r<0>), FUNC(nc_state::pcmcia_w<0>));
+	m_mem_view0[3](0x0000, 0x3fff).bankr(m_rombank[0]);
+	map(0x4000, 0x7fff).view(m_mem_view1);
+	m_mem_view1[0](0x4000, 0x7fff).bankr(m_rombank[1]);
+	m_mem_view1[1](0x4000, 0x7fff).bankrw(m_rambank[1]);
+	m_mem_view1[2](0x4000, 0x7fff).rw(FUNC(nc_state::pcmcia_r<1>), FUNC(nc_state::pcmcia_w<1>));
+	m_mem_view1[3](0x4000, 0x7fff).bankr(m_rombank[1]);
+	map(0x8000, 0xbfff).view(m_mem_view2);
+	m_mem_view2[0](0x8000, 0xbfff).bankr(m_rombank[2]);
+	m_mem_view2[1](0x8000, 0xbfff).bankrw(m_rambank[2]);
+	m_mem_view2[2](0x8000, 0xbfff).rw(FUNC(nc_state::pcmcia_r<2>), FUNC(nc_state::pcmcia_w<2>));
+	m_mem_view2[3](0x8000, 0xbfff).bankr(m_rombank[2]);
+	map(0xc000, 0xffff).view(m_mem_view3);
+	m_mem_view3[0](0xc000, 0xffff).bankr(m_rombank[3]);
+	m_mem_view3[1](0xc000, 0xffff).bankrw(m_rambank[3]);
+	m_mem_view3[2](0xc000, 0xffff).rw(FUNC(nc_state::pcmcia_r<3>), FUNC(nc_state::pcmcia_w<3>));
+	m_mem_view3[3](0xc000, 0xffff).bankr(m_rombank[3]);
 }
 
-TIMER_CALLBACK_MEMBER(nc_state::nc_keyboard_timer_callback)
+void nc100_state::io_map(address_map &map)
 {
-		LOG("keyboard int\n");
-
-		/* set int */
-		m_irq_status |= (1<<3);
-
-		/* update ints */
-		nc_update_interrupts();
-
-		/* don't trigger again, but don't free it */
-		m_keyboard_timer->reset();
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x00, 0x0f).w(FUNC(nc100_state::display_memory_start_w));
+	map(0x10, 0x13).rw(FUNC(nc100_state::memory_management_r), FUNC(nc100_state::memory_management_w));
+	map(0x20, 0x20).w(FUNC(nc100_state::card_wait_control_w));
+	map(0x30, 0x30).w(FUNC(nc100_state::uart_control_w));
+	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0x50, 0x53).w(FUNC(nc100_state::nc_sound_w));
+	map(0x60, 0x60).w(FUNC(nc100_state::irq_mask_w));
+	map(0x70, 0x70).w(FUNC(nc100_state::poweroff_control_w));
+	map(0x90, 0x90).rw(FUNC(nc100_state::irq_status_r), FUNC(nc100_state::irq_status_w));
+	map(0xa0, 0xa0).portr("battery");
+	map(0xb0, 0xb9).r(FUNC(nc100_state::keyboard_r));
+	map(0xc0, 0xc1).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xd0, 0xdf).rw("rtc", FUNC(tc8521_device::read), FUNC(tc8521_device::write));
 }
 
-void nc_state::nc_refresh_memory_bank_config(int bank)
+void nc200_state::io_map(address_map &map)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	uint8_t *ptr;
-	int mem_type;
-	int mem_bank;
-	char bank1[20];
-	char bank5[20];
-	snprintf(bank1,std::size(bank1),"bank%d",bank+1);
-	snprintf(bank5,std::size(bank5),"bank%d",bank+5);
+	map.global_mask(0xff);
+	map(0x00, 0x0f).w(FUNC(nc200_state::display_memory_start_w));
+	map(0x10, 0x13).rw(FUNC(nc200_state::memory_management_r), FUNC(nc200_state::memory_management_w));
+	map(0x20, 0x20).w(FUNC(nc200_state::card_wait_control_w));
+	map(0x30, 0x30).w(FUNC(nc200_state::uart_control_w));
+	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0x50, 0x53).w(FUNC(nc200_state::nc_sound_w));
+	map(0x60, 0x60).w(FUNC(nc200_state::irq_mask_w));
+	map(0x70, 0x70).w(FUNC(nc200_state::poweroff_control_w));
+	map(0x80, 0x80).r(FUNC(nc200_state::centronics_busy_r));
+	map(0x90, 0x90).rw(FUNC(nc200_state::irq_status_r), FUNC(nc200_state::irq_status_w));
+	map(0xa0, 0xa0).portr("battery");
+	map(0xb0, 0xb9).r(FUNC(nc200_state::keyboard_r));
+	map(0xc0, 0xc1).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xd0, 0xd1).rw(m_rtc, FUNC(mc146818_device::read), FUNC(mc146818_device::write));
+	map(0xe0, 0xe1).m(m_fdc, FUNC(upd765a_device::map));
+}
 
-	mem_type = (m_memory_config[bank]>>6) & 0x03;
-	mem_bank = m_memory_config[bank] & 0x03f;
 
-	space.install_read_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, m_bankhandler_r[bank]);
+//**************************************************************************
+//  INPUT DEFINITIONS
+//**************************************************************************
 
-	switch (mem_type)
+static INPUT_PORTS_START( nc100 )
+	PORT_START("line0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)         PORT_NAME("Left Shift")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_MAMEKEY(RSHIFT)) PORT_NAME("Right Shift")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT)   PORT_CHAR(UCHAR_MAMEKEY(LEFT))   PORT_NAME(u8"\u2190 Word (Red)")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER)  PORT_CHAR(13)                    PORT_NAME(u8"\u21b2")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("line1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LALT)     PORT_CHAR(UCHAR_MAMEKEY(LALT))     PORT_NAME("Function (Yellow)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL)) PORT_NAME("Control")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ESC)      PORT_CHAR(UCHAR_MAMEKEY(ESC))      PORT_NAME("Stop")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)    PORT_CHAR(' ')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)        PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("line2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RALT)     PORT_CHAR(UCHAR_SHIFT_2)           PORT_NAME("Symbol")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)        PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB)      PORT_CHAR('\t')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("line3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR(U'£')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
+
+	PORT_START("line4")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')
+
+	PORT_START("line5")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y') PORT_NAME("y  Y  M+ (Calc)")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
+
+	PORT_START("line6")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)         PORT_CHAR('6') PORT_CHAR('^')   PORT_NAME("6  ^  MRC (Calc)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)      PORT_CHAR(UCHAR_MAMEKEY(DOWN))  PORT_NAME(u8"\u2193 Diary (Blue)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL)       PORT_CHAR(UCHAR_MAMEKEY(DEL))   PORT_NAME(u8"Del\u2192")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT)     PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_NAME(u8"\u2192 Calc (Green)")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('#') PORT_CHAR('~')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)     PORT_CHAR('/') PORT_CHAR('?')   PORT_NAME("/  ?  + (Calc)")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)         PORT_CHAR('h') PORT_CHAR('H')   PORT_NAME("h  H  M- (Calc)")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)         PORT_CHAR('n') PORT_CHAR('N')   PORT_NAME("n  N  CE/C (Calc)")
+
+	PORT_START("line7")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)      PORT_CHAR('=')  PORT_CHAR('+')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)           PORT_CHAR('7')  PORT_CHAR('&')      PORT_NAME("7  &  7 (Calc)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH2)  PORT_CHAR('\\') PORT_CHAR('|')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP)          PORT_CHAR(UCHAR_MAMEKEY(UP))        PORT_NAME(u8"\u2191 (White)")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RCONTROL)    PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))  PORT_NAME("Menu  Secret")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)           PORT_CHAR('u')  PORT_CHAR('U')      PORT_NAME("u  U  4 (Calc)")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)           PORT_CHAR('m')  PORT_CHAR('M')      PORT_NAME("m  M  0 (Calc)")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)           PORT_CHAR('k')  PORT_CHAR('K')      PORT_NAME("k  K  2 (Calc)")
+
+	PORT_START("line8")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)           PORT_CHAR('8')  PORT_CHAR('*')  PORT_NAME("8  *  8 (Calc)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)       PORT_CHAR('-')  PORT_CHAR('_')  PORT_NAME(u8"-  _  ± (Calc)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE)  PORT_CHAR(']')  PORT_CHAR('}')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)   PORT_CHAR('[')  PORT_CHAR('{')  PORT_NAME("[  {  % (Calc)")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)       PORT_CHAR('\'') PORT_CHAR('@')  PORT_NAME(u8"'  @  \u221a (Calc)")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)           PORT_CHAR('i')  PORT_CHAR('I')  PORT_NAME("i  I  5 (Calc)")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)           PORT_CHAR('j')  PORT_CHAR('J')  PORT_NAME("j  J  1 (Calc)")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)       PORT_CHAR(',')  PORT_CHAR('<')  PORT_NAME(",  <  = (Calc)")
+
+	PORT_START("line9")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)         PORT_CHAR('0') PORT_CHAR(')') PORT_NAME(u8"0  )  ÷ (Calc)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)         PORT_CHAR('9') PORT_CHAR('(') PORT_NAME("9  (  9 (Calc)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)                  PORT_NAME("Del\u2190")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)         PORT_CHAR('p') PORT_CHAR('P') PORT_NAME(u8"p  P  × (Calc)")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)     PORT_CHAR(';') PORT_CHAR(':') PORT_NAME(";  :  - (Calc)")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)         PORT_CHAR('l') PORT_CHAR('L') PORT_NAME("l  L  3 (Calc)")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)         PORT_CHAR('o') PORT_CHAR('O') PORT_NAME("o  O  6 (Calc)")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)      PORT_CHAR('.') PORT_CHAR('>') PORT_NAME(".  >  . (Calc)")
+
+	PORT_START("power")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Power On/Off") PORT_CODE(KEYCODE_END) PORT_CHANGED_MEMBER(DEVICE_SELF, nc100_state, power_button, 0)
+
+	PORT_START("battery")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(nc100_state, centronics_ack_r)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(nc100_state, centronics_busy_r)
+	PORT_CONFNAME(0x04, 0x00, "Lithium Battery")
+	PORT_CONFSETTING(   0x00, "Good")
+	PORT_CONFSETTING(   0x04, "Bad")
+	PORT_CONFNAME(0x08, 0x00, "Main Battery")
+	PORT_CONFSETTING(   0x00, "Good")
+	PORT_CONFSETTING(   0x08, "Bad")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(nc100_state, pcmcia_battery_voltage_r)
+	PORT_BIT(0x20, 0x00, IPT_UNKNOWN) // input voltage?
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(nc100_state, pcmcia_write_protect_r)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(nc100_state, pcmcia_card_detect_r)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( nc100de )
+	PORT_INCLUDE(nc100)
+
+	PORT_MODIFY("line0")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_NAME(u8"\u2190 Text (Red)")
+
+	PORT_MODIFY("line1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LALT)     PORT_CHAR(UCHAR_MAMEKEY(LALT))     PORT_NAME("Funktion (Yellow)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL)) PORT_NAME("Befehl")
+
+	PORT_MODIFY("line3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR(U'§') PORT_CHAR(U'\u207f')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')  PORT_CHAR(U'²')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')  PORT_CHAR('@')
+
+	PORT_MODIFY("line4")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$') PORT_CHAR(U'£')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('y') PORT_CHAR('Y')
+
+	PORT_MODIFY("line5")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('z') PORT_CHAR('Z') PORT_NAME("z  Z  M+ (Calc)")
+
+	PORT_MODIFY("line6")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)         PORT_CHAR('6') PORT_CHAR('&') PORT_CHAR('^') PORT_NAME("6  &  ^  MRC (Calc)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)      PORT_CHAR(UCHAR_MAMEKEY(DOWN))               PORT_NAME(u8"\u2193 Kal/Uhr (Blue)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL)       PORT_CHAR(UCHAR_MAMEKEY(DEL))                PORT_NAME(u8"Lösch\u2192")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT)     PORT_CHAR(UCHAR_MAMEKEY(RIGHT))              PORT_NAME(u8"\u2192 Rechner (Green)")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('#') PORT_CHAR('\'')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)     PORT_CHAR('-') PORT_CHAR('_')                PORT_NAME("-  _  + (Calc)")
+
+	PORT_MODIFY("line7")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR(U'´') PORT_CHAR('`')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)          PORT_CHAR('7')  PORT_CHAR('/') PORT_CHAR('{')  PORT_NAME("7  /  {  7 (Calc)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('<')  PORT_CHAR('>') PORT_CHAR('|')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RCONTROL)   PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))             PORT_NAME(u8"Menü  Geheim")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)          PORT_CHAR('m')  PORT_CHAR('M') PORT_CHAR(U'μ') PORT_NAME(u8"m  M  μ  0 (Calc)")
+
+	PORT_MODIFY("line8")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)          PORT_CHAR('8')  PORT_CHAR('(')  PORT_CHAR('[')  PORT_NAME("8  (  [  8 (Calc)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)      PORT_CHAR(U'ß') PORT_CHAR('?')  PORT_CHAR('\\') PORT_NAME(u8"ß  ?  \\  ± (Calc)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('+')  PORT_CHAR('*')  PORT_CHAR('~')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(U'ü') PORT_CHAR(U'Ü')                 PORT_NAME(u8"ü  Ü  % (Calc)")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(U'ä') PORT_CHAR(U'Ä')                 PORT_NAME(u8"ä  Ä  \u221a (Calc)")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)      PORT_CHAR(',')  PORT_CHAR(';')                  PORT_NAME(",  ;  = (Calc)")
+
+	PORT_MODIFY("line9")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)         PORT_CHAR('0')  PORT_CHAR('=')  PORT_CHAR('}') PORT_NAME("0  =  }  ÷ (Calc)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)         PORT_CHAR('9')  PORT_CHAR(')')  PORT_CHAR(']') PORT_NAME("9  )  ]  9 (Calc)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)                                   PORT_NAME(u8"Lösch\u2190")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)     PORT_CHAR(U'ö') PORT_CHAR(U'Ö')                PORT_NAME(u8"ö  Ö  - (Calc)")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)      PORT_CHAR('.')  PORT_CHAR(':')                 PORT_NAME(".  :  . (Calc)")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( nc100dk )
+	PORT_INCLUDE(nc100)
+
+	PORT_MODIFY("line0")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_NAME(u8"\u2190 Ord (Red)")
+
+	PORT_MODIFY("line1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LALT)     PORT_CHAR(UCHAR_MAMEKEY(LALT))     PORT_NAME("Funktion (Yellow)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL)) PORT_NAME("Kontrol")
+
+	PORT_MODIFY("line2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_NAME("Versaler")
+
+	PORT_MODIFY("line3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#') PORT_CHAR(U'£')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"') PORT_CHAR('@')
+
+	PORT_MODIFY("line6")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)         PORT_CHAR('6')  PORT_CHAR('&')  PORT_NAME("6  &  MRC (Calc)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)      PORT_CHAR(UCHAR_MAMEKEY(DOWN))  PORT_NAME(u8"\u2193 Kalend. (Blue)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL)       PORT_CHAR(UCHAR_MAMEKEY(DEL))   PORT_NAME(u8"Slet\u2192")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT)     PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_NAME(u8"\u2192 Regn. (Green)")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\'') PORT_CHAR('*')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)     PORT_CHAR('-')  PORT_CHAR('_')  PORT_NAME("-  _  + (Calc)")
+
+	PORT_MODIFY("line7")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR(U'´') PORT_CHAR('`') PORT_CHAR('|')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)          PORT_CHAR('7')  PORT_CHAR('/') PORT_CHAR('{')  PORT_NAME("7  /  {  7 (Calc)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('<')  PORT_CHAR('>') PORT_CHAR('\\')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RCONTROL)   PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))             PORT_NAME(u8"Menu  Skjult")
+
+	PORT_MODIFY("line8")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)          PORT_CHAR('8')  PORT_CHAR('(')  PORT_CHAR('[') PORT_NAME("8  (  [  8 (Calc)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('+')  PORT_CHAR('?')                 PORT_NAME(u8"+  ?  ± (Calc)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(U'¨') PORT_CHAR('^')  PORT_CHAR('~')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(U'å') PORT_CHAR(U'Å')                PORT_NAME(u8"å  Å  % (Calc)")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(U'ø') PORT_CHAR(U'Ø')                PORT_NAME(u8"ø  Ø  \u221a (Calc)")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)      PORT_CHAR(',')  PORT_CHAR(';')                 PORT_NAME(",  ;  = (Calc)")
+
+	PORT_MODIFY("line9")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)         PORT_CHAR('0')  PORT_CHAR('=')  PORT_CHAR('}') PORT_NAME("0  =  }  ÷ (Calc)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)         PORT_CHAR('9')  PORT_CHAR(')')  PORT_CHAR(']') PORT_NAME("9  )  ]  9 (Calc)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)                                   PORT_NAME(u8"Slet\u2190")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)     PORT_CHAR(U'æ') PORT_CHAR(U'Æ')                PORT_NAME(u8"æ  Æ  - (Calc)")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)      PORT_CHAR('.')  PORT_CHAR(':')                 PORT_NAME(".  :  . (Calc)")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( nc100sv )
+	PORT_INCLUDE(nc100)
+
+	PORT_MODIFY("line0")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_NAME(u8"\u2190 Text (Red)") // label on picture unclear
+
+	PORT_MODIFY("line1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LALT)     PORT_CHAR(UCHAR_MAMEKEY(LALT))     PORT_NAME("Funktion (Yellow)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL)) PORT_NAME("Kontroll")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ESC)      PORT_CHAR(UCHAR_MAMEKEY(ESC))      PORT_NAME("Stopp")
+
+	PORT_MODIFY("line2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_NAME(u8"Versallås")
+
+	PORT_MODIFY("line3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#') PORT_CHAR(U'£')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"') PORT_CHAR('@')
+
+	PORT_MODIFY("line6")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)         PORT_CHAR('6')  PORT_CHAR('&')  PORT_NAME("6  &  MRC (Calc)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)      PORT_CHAR(UCHAR_MAMEKEY(DOWN))  PORT_NAME(u8"\u2193 Kalend. (Blue)") // label on picture unclear
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL)       PORT_CHAR(UCHAR_MAMEKEY(DEL))   PORT_NAME(u8"Rensa\u2192")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT)     PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_NAME(u8"\u2192 Calc (Green)") // label on picture unclear
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\'') PORT_CHAR('*')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)     PORT_CHAR('-')  PORT_CHAR('_')  PORT_NAME("-  _  + (Calc)")
+
+	PORT_MODIFY("line7")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR(U'´') PORT_CHAR('`')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)          PORT_CHAR('7')  PORT_CHAR('/') PORT_CHAR('{') PORT_NAME("7  /  {  7 (Calc)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('<')  PORT_CHAR('>') PORT_CHAR('|')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RCONTROL)   PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))            PORT_NAME(u8"Menu  Hemlig") // label on picture unclear
+
+	PORT_MODIFY("line8")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)          PORT_CHAR('8')  PORT_CHAR('(')  PORT_CHAR('[') PORT_NAME("8  (  [  8 (Calc)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('+')  PORT_CHAR('?')                 PORT_NAME(u8"+  ?  ± (Calc)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(U'¨') PORT_CHAR('^')  PORT_CHAR('~')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(U'å') PORT_CHAR(U'Å')                PORT_NAME(u8"å  Å  % (Calc)")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(U'ä') PORT_CHAR(U'Ä')                PORT_NAME(u8"ä  Ä  \u221a (Calc)")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)      PORT_CHAR(',')  PORT_CHAR(';')                 PORT_NAME(",  ;  = (Calc)")
+
+	PORT_MODIFY("line9")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)         PORT_CHAR('0')  PORT_CHAR('=') PORT_CHAR('}') PORT_NAME("0  =  }  ÷ (Calc)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)         PORT_CHAR('9')  PORT_CHAR(')') PORT_CHAR(']') PORT_NAME("9  )  ]  9 (Calc)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)                                  PORT_NAME(u8"Rensa\u2190")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)     PORT_CHAR(U'ö') PORT_CHAR(U'Ö')               PORT_NAME(u8"ö  Ö  - (Calc)")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)      PORT_CHAR('.')  PORT_CHAR(':')                PORT_NAME(".  :  . (Calc)")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( nc150fr )
+	PORT_INCLUDE(nc100)
+
+	PORT_MODIFY("line0")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_NAME(u8"\u2190 Texte (Red)")
+
+	PORT_MODIFY("line1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_MAMEKEY(LALT))               PORT_NAME("Fonction (Yellow)")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)    PORT_CHAR('(') PORT_CHAR('5') PORT_CHAR('[')
+
+	PORT_MODIFY("line2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_NAME("Maj/Min")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)        PORT_CHAR('&') PORT_CHAR('1')
+
+	PORT_MODIFY("line3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('"')  PORT_CHAR('3') PORT_CHAR('#')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR(U'é') PORT_CHAR('2') PORT_CHAR('~')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('a')  PORT_CHAR('A')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('z')  PORT_CHAR('Z')
+
+	PORT_MODIFY("line4")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR(U'´') PORT_CHAR('4') PORT_CHAR('{')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('w')  PORT_CHAR('W')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('q')  PORT_CHAR('Q')
+
+	PORT_MODIFY("line6")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)         PORT_CHAR('-') PORT_CHAR('6')  PORT_CHAR('|') PORT_NAME("-  6  |  MRC (Calc)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)      PORT_CHAR(UCHAR_MAMEKEY(DOWN))                PORT_NAME(u8"\u2193 Agenda (Blue)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL)       PORT_CHAR(UCHAR_MAMEKEY(DEL))                 PORT_NAME(u8"Eff\u2192")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('*') PORT_CHAR(U'μ')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)     PORT_CHAR('!') PORT_CHAR(U'§')                PORT_NAME(u8"!  §  + (Calc)")
+
+	PORT_MODIFY("line7")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('=')  PORT_CHAR('+') PORT_CHAR('}')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)          PORT_CHAR(U'è') PORT_CHAR('7') PORT_CHAR('`') PORT_NAME(u8"è  7  `  7 (Calc)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('<')  PORT_CHAR('>')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP)         PORT_CHAR(UCHAR_MAMEKEY(UP))                  PORT_NAME(u8"\u2191 Table (White)")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)          PORT_CHAR(',')  PORT_CHAR('?')                PORT_NAME(",  ?  0 (Calc)")
+
+	PORT_MODIFY("line8")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)          PORT_CHAR('_')  PORT_CHAR('8')  PORT_CHAR('\\') PORT_NAME("_  8  \\  8 (Calc)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)      PORT_CHAR(')')  PORT_CHAR(U'°') PORT_CHAR(']')  PORT_NAME(u8")  °  ]  ± (Calc)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('$')  PORT_CHAR(U'£')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('^')  PORT_CHAR(U'¨')                 PORT_NAME(u8"^  ¨  % (Calc)")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(U'ù') PORT_CHAR('%')                  PORT_NAME(u8"ù  %  \u221a (Calc)")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)      PORT_CHAR(':')  PORT_CHAR('/')                  PORT_NAME(":  /  = (Calc)")
+
+	PORT_MODIFY("line9")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)         PORT_CHAR(U'à') PORT_CHAR('0') PORT_CHAR('@') PORT_NAME(u8"à  0  @  ÷ (Calc)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)         PORT_CHAR(U'ç') PORT_CHAR('9') PORT_CHAR('^') PORT_NAME(u8"ç  9  ^  9 (Calc)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)                                  PORT_NAME(u8"Eff\u2190")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)     PORT_CHAR('m')  PORT_CHAR('M')                PORT_NAME(u8"m  M  - (Calc)")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)      PORT_CHAR(';')  PORT_CHAR('.')                PORT_NAME(";  .  . (Calc)")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( nc150it )
+	PORT_INCLUDE(nc100)
+
+	PORT_MODIFY("line0")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_NAME(u8"\u2190 Testi (Red)")
+
+	PORT_MODIFY("line1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LALT)     PORT_CHAR(UCHAR_MAMEKEY(LALT))     PORT_NAME("Funzione (Yellow)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL)) PORT_NAME("CTRL")
+
+	PORT_MODIFY("line2")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_SHIFT_2) PORT_NAME("Simboli")
+
+	PORT_MODIFY("line6")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)         PORT_CHAR('6')  PORT_CHAR('&')  PORT_NAME("6  &  MRC (Calc)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)      PORT_CHAR(UCHAR_MAMEKEY(DOWN))  PORT_NAME(u8"\u2193 Agenda (Blue)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL)       PORT_CHAR(UCHAR_MAMEKEY(DEL))   PORT_NAME(u8"Canc\u2192")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(U'ù') PORT_CHAR(U'§')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)     PORT_CHAR('-')  PORT_CHAR('_')  PORT_NAME("-  _  + (Calc)")
+
+	PORT_MODIFY("line7")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR(U'ì') PORT_CHAR('^')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)          PORT_CHAR('7')  PORT_CHAR('/') PORT_NAME("7  /  7 (Calc)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('<')  PORT_CHAR('>')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP)         PORT_CHAR(UCHAR_MAMEKEY(UP))   PORT_NAME(u8"\u2191 Tabella. El. (White)")
+
+	PORT_MODIFY("line8")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)          PORT_CHAR('8')  PORT_CHAR('(')                 PORT_NAME("8  (  8 (Calc)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('\'') PORT_CHAR('?')                 PORT_NAME(u8"'  ?  ± (Calc)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('+')  PORT_CHAR('*')  PORT_CHAR(']')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(U'è') PORT_CHAR(U'é') PORT_CHAR('[') PORT_NAME("è  é  [  % (Calc)")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(U'à') PORT_CHAR(U'°') PORT_CHAR('#') PORT_NAME(u8"à  °  #  \u221a (Calc)")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)      PORT_CHAR(',')  PORT_CHAR(';')                 PORT_NAME(",  ;  = (Calc)")
+
+	PORT_MODIFY("line9")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)         PORT_CHAR('0')  PORT_CHAR('=')  PORT_NAME(u8"0  =  ÷ (Calc)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)         PORT_CHAR('9')  PORT_CHAR(')')  PORT_NAME("9  )  9 (Calc)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)                    PORT_NAME("Canc\u2190")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)     PORT_CHAR(U'ò') PORT_CHAR(U'ç') PORT_NAME(u8"ò  ç  - (Calc)")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)      PORT_CHAR('.')  PORT_CHAR(':')  PORT_NAME(".  :  . (Calc)")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( nc200 )
+	PORT_INCLUDE(nc100)
+
+	PORT_MODIFY("line0")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
+
+	PORT_MODIFY("line1")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR('(') PORT_NAME("9  (  9 (Calc)")
+
+	PORT_MODIFY("line2")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('^') PORT_NAME("6  ^  MRC (Calc)")
+
+	PORT_MODIFY("line4")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('*') PORT_NAME("8  *  8 (Calc)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&') PORT_NAME("7  &  7 (Calc)")
+
+	PORT_MODIFY("line6")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_MODIFY("line7")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('+')
+
+	PORT_MODIFY("line8")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_MODIFY("line9")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(')') PORT_NAME(u8"0  )  ÷ (Calc)")
+
+	PORT_MODIFY("power")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Power On/Off") PORT_CODE(KEYCODE_END) PORT_CHANGED_MEMBER(DEVICE_SELF, nc200_state, power_button, 0)
+
+	PORT_MODIFY("battery")
+	PORT_CONFNAME(0x01, 0x00, "Battery for Floppy Drive")
+	PORT_CONFSETTING(   0x00, "Good")
+	PORT_CONFSETTING(   0x01, "Bad")
+	PORT_BIT(0x02, 0x00, IPT_UNKNOWN)
+	PORT_CONFNAME(0x04, 0x00, "Main Battery")
+	PORT_CONFSETTING(   0x00, "Good")
+	PORT_CONFSETTING(   0x04, "Bad")
+	PORT_BIT(0x08, 0x00, IPT_UNKNOWN)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(nc200_state, pcmcia_battery_voltage_r)
+	PORT_CONFNAME(0x20, 0x00, "Lithium Battery")
+	PORT_CONFSETTING(   0x00, "Good")
+	PORT_CONFSETTING(   0x20, "Bad")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(nc200_state, pcmcia_write_protect_r)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(nc200_state, pcmcia_card_detect_r)
+INPUT_PORTS_END
+
+
+//**************************************************************************
+//  INPUT HANDLING
+//**************************************************************************
+
+INPUT_CHANGED_MEMBER( nc100_state::power_button )
+{
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+}
+
+INPUT_CHANGED_MEMBER( nc200_state::power_button )
+{
+	m_irq_status |= 0x10;
+	update_interrupts();
+}
+
+uint8_t nc100_state::keyboard_r(offs_t offset)
+{
+	if (offset == 9)
 	{
-		/* ROM */
-		case 3:
-		case 0:
+		m_irq_status &= ~0x08;
+		update_interrupts();
+	}
+
+	return m_keyboard[offset]->read();
+}
+
+uint8_t nc200_state::keyboard_r(offs_t offset)
+{
+	return m_keyboard[offset]->read();
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER( nc_state::keyscan_timer )
+{
+	m_irq_status |= 0x08;
+	update_interrupts();
+}
+
+
+//**************************************************************************
+//  VIDEO EMULATION
+//**************************************************************************
+
+void nc100_state::display_memory_start_w(uint8_t data)
+{
+	// 7654----  a15 to a12 of display memory start address
+	// ----3210  not used
+
+	LOG("display_memory_start_w: %04x\n", data);
+
+	m_display_memory_start = BIT(data, 4, 4) << 12;
+}
+
+void nc200_state::display_memory_start_w(uint8_t data)
+{
+	// 765-----  a15 to a13 of display memory start address
+	// ---43210  not used
+
+	LOG("display_memory_start_w: %04x\n", data);
+
+	m_display_memory_start = BIT(data, 5, 3) << 13;
+}
+
+uint32_t nc_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	for (int y = 0; y <= cliprect.max_y; y++)
+	{
+		// 64 bytes/line
+		uint8_t const *line = reinterpret_cast<uint8_t const *>(m_ram->pointer()) + m_display_memory_start + (y << 6);
+
+		for (int x = 0; x <= cliprect.max_x; x+= 8)
 		{
-			mem_bank &= m_membank_rom_mask;
-			ptr = (memregion("maincpu")->base() + 0x010000) + (mem_bank << 14);
+			for (int i = 0; i < 8; i++)
+				bitmap.pix(y, x + i) = BIT(*line, 7 - i) ? m_fg_color : m_bg_color;
 
-			membank(bank1)->set_base(ptr);
-
-			space.nop_write((bank * 0x4000), (bank * 0x4000) + 0x3fff);
-			LOG("BANK %d: ROM %d\n",bank,mem_bank);
-		}
-		break;
-
-		/* internal RAM */
-		case 1:
-		{
-			mem_bank &= m_membank_internal_ram_mask;
-			ptr = m_ram->pointer() + (mem_bank << 14);
-
-			membank(bank1)->set_base(ptr);
-			membank(bank5)->set_base(ptr);
-
-			space.install_write_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, m_bankhandler_w[bank]);
-			LOG("BANK %d: RAM\n",bank);
-		}
-		break;
-
-		/* card RAM */
-		case 2:
-		{
-			/* card connected? */
-			if (m_card_status && m_card_ram)
-			{
-				mem_bank &= m_membank_card_ram_mask;
-				ptr = m_card_ram->base() + (mem_bank << 14);
-
-				membank(bank1)->set_base(ptr);
-
-				/* write enabled? */
-				if (ioport("EXTRA")->read() & 0x02)
-				{
-					/* yes */
-					membank(bank5)->set_base(ptr);
-					space.install_write_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, m_bankhandler_w[bank]);
-				}
-				else
-				{
-					/* no */
-					space.nop_write((bank * 0x4000), (bank * 0x4000) + 0x3fff);
-				}
-
-				LOG("BANK %d: CARD-RAM\n",bank);
-			}
-			else
-			{
-				/* if no card connected, then writes fail */
-				space.nop_readwrite((bank * 0x4000), (bank * 0x4000) + 0x3fff);
-			}
-		}
-		break;
-	}
-}
-
-void nc_state::nc_refresh_memory_config()
-{
-	nc_refresh_memory_bank_config(0);
-	nc_refresh_memory_bank_config(1);
-	nc_refresh_memory_bank_config(2);
-	nc_refresh_memory_bank_config(3);
-}
-
-
-TIMER_DEVICE_CALLBACK_MEMBER(nc_state::dummy_timer_callback)
-{
-	int inputport_10_state;
-	int changed_bits;
-
-	inputport_10_state = ioport("EXTRA")->read();
-
-	changed_bits = inputport_10_state^m_previous_inputport_10_state;
-
-	/* on/off button changed state? */
-	if (changed_bits & 0x01)
-	{
-		if (inputport_10_state & 0x01)
-		{
-			/* on NC100 on/off button causes a nmi, on
-			nc200 on/off button causes an int */
-			switch (m_nc_type)
-			{
-			case NC_TYPE_1xx:
-				LOG("nmi triggered\n");
-				m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-				break;
-
-			case NC_TYPE_200:
-				m_irq_status |= (1 << 4);
-				nc_update_interrupts();
-				break;
-			}
+			line++;
 		}
 	}
 
-	/* memory card write enable/disable state changed? */
-	if (changed_bits & 0x02)
-	{
-		/* yes refresh memory config */
-		nc_refresh_memory_config();
-	}
-
-	m_previous_inputport_10_state = inputport_10_state;
+	return 0;
 }
 
 
-
-void nc_state::machine_reset()
-{
-	/* setup reset state */
-	m_display_memory_start = 0;
-
-	/* setup reset state */
-	m_memory_config[0] = 0;
-	m_memory_config[1] = 0;
-	m_memory_config[2] = 0;
-	m_memory_config[3] = 0;
-
-	m_previous_inputport_10_state = ioport("EXTRA")->read();
-
-	/* setup reset state ints are masked */
-	m_irq_mask = 0;
-	/* setup reset state no ints wanting servicing */
-	m_irq_status = 0;
-	/* at reset set to 0x0ffff */
-
-	m_irq_latch = 0;
-	m_irq_latch_mask = 0;
-
-	/* setup reset state */
-	m_sound_channel_periods[0] = (m_sound_channel_periods[1] = 0x0ffff);
-
-	/* at reset set to 1 */
-	m_poweroff_control = 1;
-
-	nc_refresh_memory_config();
-	nc_update_interrupts();
-
-	/* at reset set to 0x0ff */
-	m_uart_control = 0x0ff;
-}
-
-void nc_state::nc_map(address_map &map)
-{
-	map(0x0000, 0x3fff).bankr("bank1").bankw("bank5");
-	map(0x4000, 0x7fff).bankr("bank2").bankw("bank6");
-	map(0x8000, 0xbfff).bankr("bank3").bankw("bank7");
-	map(0xc000, 0xffff).bankr("bank4").bankw("bank8");
-}
-
-
-uint8_t nc_state::nc_memory_management_r(offs_t offset)
-{
-	return m_memory_config[offset];
-}
-
-void nc_state::nc_memory_management_w(offs_t offset, uint8_t data)
-{
-	LOG("Memory management W: %02x %02x\n",offset,data);
-		m_memory_config[offset] = data;
-
-		nc_refresh_memory_config();
-}
-
-void nc_state::nc_irq_mask_w(uint8_t data)
-{
-	LOG("irq mask w: %02x\n", data);
-	LOGDEBUG("irq mask nc200 w: %02x\n",data & ((1<<4) | (1<<5) | (1<<6) | (1<<7)));
-
-	/* writing mask clears ints that are to be masked? */
-	m_irq_mask = data;
-
-	nc_update_interrupts();
-}
-
-void nc_state::nc_irq_status_w(uint8_t data)
-{
-	LOG("irq status w: %02x\n", data);
-	data = data ^ 0x0ff;
-
-/* writing to status will clear int, will this re-start the key-scan? */
-#if 0
-		if (
-				/* clearing keyboard int? */
-				((data & (1<<3))!=0) &&
-				/* keyboard int request? */
-				((m_irq_status & (1<<3))!=0)
-			)
-		{
-			/* set timer to occur again */
-			m_keyboard_timer->reset(attotime::from_msec(10));
-		}
-#endif
-		m_irq_status &=~data;
-
-		nc_update_interrupts();
-}
-
-void nc200_state::nc200_irq_status_w(uint8_t data)
-{
-	LOG("irq status w: %02x\n", data);
-	data = data ^ 0x0ff;
-
-	/* Russell Marks confirms that on the NC200, the key scan interrupt must be explicitly
-	cleared. It is not automatically cleared when reading 0x0b9 */
-	if ((data & (1<<3))!=0)
-	{
-		/* set timer to occur again */
-		m_keyboard_timer->reset(attotime::from_msec(10));
-
-		nc_update_interrupts();
-	}
-
-	nc_irq_status_w(data);
-}
-
-uint8_t nc_state::nc_irq_status_r()
-{
-		return ~((m_irq_status & (~m_irq_latch_mask)) | m_irq_latch);
-}
-
-
-uint8_t nc_state::nc_key_data_in_r(offs_t offset)
-{
-	static const char *const keynames[] = {
-		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4",
-		"LINE5", "LINE6", "LINE7", "LINE8", "LINE9"
-	};
-
-	if (offset==9)
-	{
-		/* reading 0x0b9 will clear int and re-start scan procedure! */
-		m_irq_status &= ~(1<<3);
-
-		/* set timer to occur again */
-		m_keyboard_timer->reset(attotime::from_msec(10));
-
-		nc_update_interrupts();
-	}
-
-	return ioport(keynames[offset])->read();
-}
-
+//**************************************************************************
+//  AUDIO EMULATION
+//**************************************************************************
 
 void nc_state::nc_sound_update(int channel)
 {
@@ -622,883 +909,570 @@ void nc_state::nc_sound_w(offs_t offset, uint8_t data)
 	}
 }
 
-static const int baud_rate_table[]=
+
+//**************************************************************************
+//  PCMCIA
+//**************************************************************************
+
+template<int N>
+uint8_t nc_state::pcmcia_r(offs_t offset)
 {
-	128, //150
-	64, //300
-	32, //600
-	16, //1200
-	8, //2400
-	4, //4800
-	2, //9600
-	1, //19200
-};
-
-WRITE_LINE_MEMBER(nc_state::write_uart_clock)
-{
-	m_uart->write_txc(state);
-	m_uart->write_rxc(state);
-}
-
-void nc_state::nc_uart_control_w(uint8_t data)
-{
-	/* same for nc100 and nc200 */
-	m_centronics->write_strobe(BIT(data, 6));
-
-	/* on/off changed state? */
-	if (((m_uart_control ^ data) & (1<<3))!=0)
-	{
-		/* changed uart from off to on */
-		if ((data & (1<<3))==0)
-		{
-			m_uart->reset();
-		}
-	}
-
-	m_uart_clock->set_clock_scale((double)1 / baud_rate_table[(data & 0x07)]);
-
-	m_uart_control = data;
-}
-
-/* NC100 printer emulation */
-/* port 0x040 (write only) = 8-bit printer data */
-/* port 0x030 bit 6 = printer strobe */
-
-
-
-/********************************************************************************************************/
-/* NC100 hardware */
-
-
-
-void nc_state::nc100_display_memory_start_w(uint8_t data)
-{
-	/* bit 7: A15 */
-	/* bit 6: A14 */
-	/* bit 5: A13 */
-	/* bit 4: A12 */
-	/* bit 3-0: not used */
-	m_display_memory_start = (data & 0x0f0)<<(12-4);
-
-	LOG("disp memory w: %04x\n", m_display_memory_start);
-}
-
-
-void nc100_state::nc100_uart_control_w(uint8_t data)
-{
-	nc_uart_control_w(data);
-
-//  /* is this correct?? */
-//  if (data & (1<<3))
-//  {
-//      /* clear latched irq's */
-//      m_irq_latch &= ~3;
-//      nc_update_interrupts(machine);
-//  }
-}
-
-
-WRITE_LINE_MEMBER(nc100_state::nc100_tc8521_alarm_callback)
-{
-	// TODO
-}
-
-WRITE_LINE_MEMBER(nc100_state::nc100_txrdy_callback)
-{
-	m_irq_latch &= ~(1 << 1);
-
-	/* uart on? */
-	if ((m_uart_control & (1 << 3)) == 0)
-	{
-		if (state)
-		{
-			logerror("tx ready\n");
-			m_irq_latch |= (1 << 1);
-		}
-	}
-
-	nc_update_interrupts();
-}
-
-WRITE_LINE_MEMBER(nc100_state::nc100_rxrdy_callback)
-{
-	m_irq_latch &= ~(1<<0);
-
-	if ((m_uart_control & (1<<3))==0)
-	{
-		if (state)
-		{
-			logerror("rx ready\n");
-			m_irq_latch |= (1<<0);
-		}
-	}
-
-	nc_update_interrupts();
-}
-
-WRITE_LINE_MEMBER(nc100_state::write_nc100_centronics_ack)
-{
-	m_centronics_ack = state;
-
-	if (state)
-		m_irq_status |= 0x04;
+	if (BIT(m_uart_control, 7) == 1)
+		return m_pcmcia->read_memory_byte(((m_mmc[N] & 0x3f) << 14) | offset);
 	else
-		m_irq_status &= ~0x04;
-
-	/* trigger an int if the irq is set */
-	nc_update_interrupts();
+		return m_pcmcia->read_reg_byte(((m_mmc[N] & 0x3f) << 14) | offset);
 }
 
-WRITE_LINE_MEMBER(nc_state::write_centronics_busy)
+template<int N>
+void nc_state::pcmcia_w(offs_t offset, uint8_t data)
+{
+	if (BIT(m_uart_control, 7) == 1)
+		m_pcmcia->write_memory_byte(((m_mmc[N] & 0x3f) << 14) | offset, data);
+	else
+		m_pcmcia->write_reg_byte(((m_mmc[N] & 0x3f) << 14) | offset, data);
+}
+
+void nc100_state::card_wait_control_w(uint8_t data)
+{
+	// 7-------  enable memory wait states for card
+	// -6543210  not used
+
+	LOG("card_wait_control_w: %02x\n", data);
+}
+
+void nc200_state::card_wait_control_w(uint8_t data)
+{
+	// 7-------  enable memory wait states for card
+	// -6543---  not used
+	// -----2--  floppy motor
+	// ------1-  unknown (floppy related?)
+	// -------0  fdc terminal count
+
+	LOG("card_wait_control_w: %02x\n", data);
+
+	floppy_image_device *floppy = m_floppy->get_device();
+
+	if (floppy)
+		floppy->mon_w(BIT(data, 2));
+
+	m_fdc->tc_w(BIT(data, 0));
+}
+
+
+//**************************************************************************
+//  CENTRONICS
+//**************************************************************************
+
+WRITE_LINE_MEMBER( nc_state::centronics_busy_w )
 {
 	m_centronics_busy = state;
 }
 
-void nc100_state::machine_reset()
+uint8_t nc200_state::centronics_busy_r()
 {
-	/* 256k of rom */
-	m_membank_rom_mask = 0x0f;
+	// 7654321-  not used
+	// -------0  centronics busy
 
-	m_membank_internal_ram_mask = 3;
-
-	m_membank_card_ram_mask = 0x03f;
-
-	nc_state::machine_reset();
-
-	/* serial */
-	m_irq_latch_mask = (1<<0) | (1<<1);
+	return m_centronics_busy;
 }
 
-
-void nc100_state::nc100_poweroff_control_w(uint8_t data)
+WRITE_LINE_MEMBER( nc100_state::centronics_ack_w )
 {
-	/* bits 7-1: not used */
-	/* bit 0: 1 = no effect, 0 = power off */
-	m_poweroff_control = data;
-	LOG("nc poweroff control: %02x\n",data);
+	LOGMASKED(LOG_IRQ, "centronics_ack_w: %02x\n", state);
+
+	m_centronics_ack = state;
+
+	if (state)
+		m_irq_status |= 0x04;
+
+	update_interrupts();
 }
 
-
-/* nc100 version of card/battery status */
-uint8_t nc100_state::nc100_card_battery_status_r()
+WRITE_LINE_MEMBER( nc200_state::centronics_ack_w )
 {
-	int nc_card_battery_status = 0x0fc;
+	LOGMASKED(LOG_IRQ, "centronics_ack_w: %02x\n", state);
 
-	/* printer */
-	nc_card_battery_status |= m_centronics_ack;
-	nc_card_battery_status |= m_centronics_busy << 1;
-
-	if (m_card_status)
-	{
-		/* card present */
-		nc_card_battery_status &=~(1<<7);
-	}
-
-	if (ioport("EXTRA")->read() & 0x02)
-	{
-		/* card write enable */
-		nc_card_battery_status &=~(1<<6);
-	}
-
-	/* enough power - see bit assignments where
-	nc card battery status is defined */
-	nc_card_battery_status |= (1<<5);
-	nc_card_battery_status &= ~((1<<2) | (1<<3));
-
-	return nc_card_battery_status;
-}
-
-void nc100_state::nc100_memory_card_wait_state_w(uint8_t data)
-{
-	LOG("nc100 memory card wait state: %02x\n",data);
-}
-
-
-
-void nc100_state::nc100_io(address_map &map)
-{
-	map.global_mask(0xff);
-	map.unmap_value_high();
-	map(0x00, 0x0f).w(FUNC(nc100_state::nc100_display_memory_start_w));
-	map(0x10, 0x13).rw(FUNC(nc100_state::nc_memory_management_r), FUNC(nc100_state::nc_memory_management_w));
-	map(0x20, 0x20).w(FUNC(nc100_state::nc100_memory_card_wait_state_w));
-	map(0x30, 0x30).w(FUNC(nc100_state::nc100_uart_control_w));
-	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::write));
-	map(0x50, 0x53).w(FUNC(nc100_state::nc_sound_w));
-	map(0x60, 0x60).w(FUNC(nc100_state::nc_irq_mask_w));
-	map(0x70, 0x70).w(FUNC(nc100_state::nc100_poweroff_control_w));
-	map(0x90, 0x90).rw(FUNC(nc100_state::nc_irq_status_r), FUNC(nc100_state::nc_irq_status_w));
-	map(0x91, 0x9f).r(FUNC(nc100_state::nc_irq_status_r));
-	map(0xa0, 0xaf).r(FUNC(nc100_state::nc100_card_battery_status_r));
-	map(0xb0, 0xb9).r(FUNC(nc100_state::nc_key_data_in_r));
-	map(0xc0, 0xc1).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
-	map(0xd0, 0xdf).rw("rtc", FUNC(tc8521_device::read), FUNC(tc8521_device::write));
-}
-
-
-/* 2008-05 FP:
-Small note about natural keyboard support (both for nc100 and nc200): currently,
-- "Shift" (both L & R) and "Caps Lock" do not work in natural mode (to be investigated)
-- "Function" is mapped to 'Left Control'
-- "Control" is mapped to 'Right Control'
-- "Caps Lock" is mapped to 'Right Alt'
-- "On" is mapped to 'F1'
-- "Stop" is mapped to 'F2'
-- "Symbol" is mapped to 'F3'
-- "Menu" is mapped to 'F4'
-*/
-
-// 2020-09-21: not possible to select a menu item with natural keyboard. However, you can switch over to it after you enter an app.
-static INPUT_PORTS_START(nc100)
-	PORT_START("LINE0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift (Left)") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_MAMEKEY(LSHIFT),UCHAR_SHIFT_1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift (Right)") PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_MAMEKEY(RSHIFT))
-	PORT_BIT(0x04, 0x00, IPT_UNUSED)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cursor Left (Red)") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
-	PORT_BIT(0x20, 0x00, IPT_UNUSED)
-	PORT_BIT(0x40, 0x00, IPT_UNUSED)
-	PORT_BIT(0x80, 0x00, IPT_UNUSED)
-
-	PORT_START("LINE1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Function (Yellow)") PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL)) // 5th row, 1st key on left (where 'fn' is on mac keyboards)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control") PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL),UCHAR_SHIFT_2)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Stop") PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(F2))
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)       PORT_CHAR(' ')
-	PORT_BIT(0x10, 0x00, IPT_UNUSED)
-	PORT_BIT(0x20, 0x00, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)           PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT(0x80, 0x00, IPT_UNUSED)
-
-	PORT_START("LINE2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Caps Lock") PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(RALT))
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Symbol") PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(F3)) // 5th row, 3rd key (where 'Alt' usually stays)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)           PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB)         PORT_CHAR('\t')
-	PORT_BIT(0x10, 0x00, IPT_UNUSED)
-	PORT_BIT(0x20, 0x00, IPT_UNUSED)
-	PORT_BIT(0x40, 0x00, IPT_UNUSED)
-	PORT_BIT(0x80, 0x00, IPT_UNUSED)
-
-	PORT_START("LINE3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)           PORT_CHAR('3') PORT_CHAR(0xA3)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)           PORT_CHAR('2') PORT_CHAR('"')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)           PORT_CHAR('q') PORT_CHAR('Q')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)           PORT_CHAR('w') PORT_CHAR('W')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)           PORT_CHAR('e') PORT_CHAR('E')
-	PORT_BIT(0x20, 0x00, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)           PORT_CHAR('s') PORT_CHAR('S')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)           PORT_CHAR('d') PORT_CHAR('D')
-
-	PORT_START("LINE4")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)           PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT(0x02, 0x00, IPT_UNUSED)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)           PORT_CHAR('z') PORT_CHAR('Z')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)           PORT_CHAR('x') PORT_CHAR('X')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)           PORT_CHAR('a') PORT_CHAR('A')
-	PORT_BIT(0x20, 0x00, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)           PORT_CHAR('r') PORT_CHAR('R')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)           PORT_CHAR('f') PORT_CHAR('F')
-
-	PORT_START("LINE5")
-	PORT_BIT(0x01, 0x00, IPT_UNUSED)
-	PORT_BIT(0x02, 0x00, IPT_UNUSED)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)           PORT_CHAR('b') PORT_CHAR('B')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)           PORT_CHAR('v') PORT_CHAR('V')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)           PORT_CHAR('t') PORT_CHAR('T')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)           PORT_CHAR('y') PORT_CHAR('Y')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)           PORT_CHAR('g') PORT_CHAR('G')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)           PORT_CHAR('c') PORT_CHAR('C')
-
-	PORT_START("LINE6")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)           PORT_CHAR('6') PORT_CHAR('^')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cursor Down (Blue)") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Del>") PORT_CODE(KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(DEL))
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cursor Right (Green)") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)   PORT_CHAR('#') PORT_CHAR('~')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)       PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)           PORT_CHAR('h') PORT_CHAR('H')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)           PORT_CHAR('n') PORT_CHAR('N')
-
-	PORT_START("LINE7")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)      PORT_CHAR('=') PORT_CHAR('+')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)           PORT_CHAR('7') PORT_CHAR('&')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE)       PORT_CHAR('\\') PORT_CHAR('|')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP)          PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Menu") PORT_CODE(KEYCODE_PGUP) PORT_CHAR(UCHAR_MAMEKEY(F4))
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)           PORT_CHAR('u') PORT_CHAR('U')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)           PORT_CHAR('m') PORT_CHAR('M')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)           PORT_CHAR('k') PORT_CHAR('K')
-
-	PORT_START("LINE8")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)           PORT_CHAR('8') PORT_CHAR('*')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)       PORT_CHAR('-') PORT_CHAR('_')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE)  PORT_CHAR(']') PORT_CHAR('}')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)   PORT_CHAR('[') PORT_CHAR('{')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)       PORT_CHAR('\'') PORT_CHAR('@')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)           PORT_CHAR('i') PORT_CHAR('I')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)           PORT_CHAR('j') PORT_CHAR('J')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)       PORT_CHAR(',') PORT_CHAR('<')
-
-	PORT_START("LINE9")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)           PORT_CHAR('0') PORT_CHAR(')')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)           PORT_CHAR('9') PORT_CHAR('(')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Del<") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)           PORT_CHAR('p') PORT_CHAR('P')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)       PORT_CHAR(';') PORT_CHAR(':')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)           PORT_CHAR('l') PORT_CHAR('L')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)           PORT_CHAR('o') PORT_CHAR('O')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)        PORT_CHAR('.') PORT_CHAR('>')
-
-	/* these are not part of the nc100 keyboard */
-	/* extra */
-	PORT_START("EXTRA")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("On Button") PORT_CODE(KEYCODE_END) PORT_CHAR(UCHAR_MAMEKEY(F1))
-	/* pcmcia memory card setting */
-	PORT_DIPNAME( 0x02, 0x002, "PCMCIA Memory card write enable")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-INPUT_PORTS_END
-
-/**********************************************************************************************************/
-/* NC150 hardware */
-/* to be completed! */
-
-#if 0
-void nc_state::nc150_init_machine()
-{
-	m_membank_internal_ram_mask = 7;
-
-	m_membank_card_ram_mask = 0x03f;
-
-	nc_state::machine_reset();
-}
-#endif
-
-
-
-/**********************************************************************************************************/
-/* NC200 hardware */
-
-void nc200_state::nc200_display_memory_start_w(uint8_t data)
-{
-	/* bit 7: A15 */
-	/* bit 6: A14 */
-	/* bit 5: A13 */
-	/* bit 4-0: not used */
-	m_display_memory_start = (data & 0x0e0) << (12 - 4);
-
-	LOG("disp memory w: %04x\n", m_display_memory_start);
-}
-
-
-WRITE_LINE_MEMBER(nc200_state::write_nc200_centronics_ack)
-{
 	if (state)
 		m_irq_status |= 0x01;
+
+	update_interrupts();
+}
+
+
+//**************************************************************************
+//  UART
+//**************************************************************************
+
+void nc_state::uart_control_w(uint8_t data)
+{
+	// 7-------  card register space
+	// -6------  centronics strobe
+	// --5-----  not used
+	// ---4----  line driver on/off
+	// ----3---  uart clock/reset
+	// -----210  baud rate: 150, 300, 600, 1200, 2400, 4800, 9600, 19200
+
+	LOG("uart_control_w: %02x\n", data);
+
+	m_centronics->write_strobe(BIT(data, 6));
+
+	if (BIT(m_uart_control, 3) == 1 && BIT(data, 3) == 0)
+		m_uart->reset();
+
+	m_uart_clock->set_clock_scale(1 << (data & 0x07));
+
+	m_uart_control = data;
+}
+
+void nc200_state::uart_control_w(uint8_t data)
+{
+	// 76------  see above
+	// --5-----  floppy related?
+	// ---43210  see above
+
+	LOG("uart_control_w: %02x\n", data);
+
+	nc_state::uart_control_w(data);
+}
+
+WRITE_LINE_MEMBER( nc100_state::uart_txrdy_w )
+{
+	LOGMASKED(LOG_IRQ, "uart_txrdy_w: %02x\n", state);
+
+	if (m_uart_txrdy == 0 && state == 1)
+		m_irq_status |= 0x02;
+
+	update_interrupts();
+
+	m_uart_txrdy = state;
+}
+
+WRITE_LINE_MEMBER( nc100_state::uart_rxrdy_w )
+{
+	LOGMASKED(LOG_IRQ, "uart_rxrdy_w: %02x\n", state);
+
+	if (m_uart_rxrdy == 0 && state == 1)
+		m_irq_status |= 0x01;
+
+	update_interrupts();
+
+	m_uart_rxrdy = state;
+}
+
+WRITE_LINE_MEMBER( nc200_state::uart_rxrdy_w )
+{
+	LOGMASKED(LOG_IRQ, "uart_rxrdy_w: %02x\n", state);
+
+	if (m_uart_rxrdy == 0 && state == 1)
+		m_irq_status |= 0x04;
+
+	update_interrupts();
+
+	m_uart_rxrdy = state;
+}
+
+
+//**************************************************************************
+//  FLOPPY
+//**************************************************************************
+
+WRITE_LINE_MEMBER( nc200_state::fdc_int_w )
+{
+	LOGMASKED(LOG_IRQ, "fdc_int_w: %02x\n", state);
+
+	if (state)
+		m_fdc_irq_timer->adjust(attotime::from_usec(100), 0);
+}
+
+TIMER_CALLBACK_MEMBER( nc200_state::fdc_irq )
+{
+	LOGMASKED(LOG_IRQ, "fdc_irq assert\n");
+
+	m_irq_status |= 0x20;
+	update_interrupts();
+}
+
+
+//**************************************************************************
+//  INTERRUPTS
+//**************************************************************************
+
+void nc_state::update_interrupts()
+{
+	LOGMASKED(LOG_IRQ, "update_interrupts: %02x & %02x\n", m_irq_status, m_irq_mask);
+
+	if (m_irq_status & m_irq_mask)
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 	else
-		m_irq_status &= ~0x01;
-
-	/* trigger an int if the irq is set */
-	nc_update_interrupts();
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-/* assumption. nc200 uses the same uart chip. The rxrdy and txrdy are combined
-together with a or to generate a single interrupt */
-
-void nc200_state::nc200_refresh_uart_interrupt()
+uint8_t nc_state::irq_status_r()
 {
-	m_irq_latch &=~(1<<2);
-
-	/* uart enabled? */
-	if ((m_uart_control & (1<<3))==0)
-	{
-		if ((m_nc200_uart_interrupt_irq & 0x03)!=0)
-		{
-			m_irq_latch |= (1<<2);
-		}
-	}
-	nc_update_interrupts();
+	return m_irq_status ^ 0xff;
 }
 
-WRITE_LINE_MEMBER(nc200_state::nc200_txrdy_callback)
+void nc100_state::irq_status_w(uint8_t data)
 {
-//  m_nc200_uart_interrupt_irq &=~(1<<0);
-//
-//  if (state)
-//  {
-//      m_nc200_uart_interrupt_irq |=(1<<0);
-//  }
-//
-//  nc200_refresh_uart_interrupt();
+	// 7654----  not used
+	// ----3---  key scan interrupt
+	// -----2--  ack from centronics
+	// ------1-  tx ready from uart
+	// -------0  rx ready from uart
+
+	LOGMASKED(LOG_IRQ, "irq_status_w: %02x\n", data);
+
+	m_irq_status &= data;
 }
 
-WRITE_LINE_MEMBER(nc200_state::nc200_rxrdy_callback)
+void nc200_state::irq_status_w(uint8_t data)
 {
-	m_nc200_uart_interrupt_irq &=~(1<<1);
+	// 7-------  not used
+	// -6------  ?
+	// --5-----  fdc interrupt
+	// ---4----  power off interrupt
+	// ----3---  key scan interrupt
+	// -----2--  rx ready from uart
+	// ------1-  not used
+	// -------0  ack from centronics
 
-	if (state)
-	{
-		m_nc200_uart_interrupt_irq |=(1<<1);
-	}
+	LOGMASKED(LOG_IRQ, "irq_status_w: %02x\n", data);
 
-	nc200_refresh_uart_interrupt();
+	m_irq_status &= data;
+	update_interrupts();
 }
 
-WRITE_LINE_MEMBER(nc200_state::nc200_fdc_interrupt)
+void nc100_state::irq_mask_w(uint8_t data)
 {
-#if 0
-	m_irq_latch &=~(1<<5);
+	// see irq_status_w for bit assignment
 
-	if (state)
-	{
-			m_irq_latch |=(1<<5);
-	}
-#endif
-	m_irq_status &=~(1<<5);
+	LOGMASKED(LOG_IRQ, "irq_mask_w: %02x\n", data);
 
-	if (state)
-	{
-			m_irq_status |=(1<<5);
-	}
-
-	nc_update_interrupts();
+	m_irq_mask = data;
+	update_interrupts();
 }
 
-void nc200_state::nc200_floppy_drive_index_callback(int drive_id)
+void nc200_state::irq_mask_w(uint8_t data)
 {
-	LOGDEBUG("nc200 index pulse\n");
-//  m_irq_status |= (1<<4);
+	// see irq_status_w for bit assignment
 
-//  nc_update_interrupts(Machine);
+	LOGMASKED(LOG_IRQ, "irq_mask_w: %02x\n", data);
+
+	m_irq_mask = data;
+	update_interrupts();
 }
 
-void nc200_state::machine_reset()
+
+//**************************************************************************
+//  MACHINE EMULATION
+//**************************************************************************
+
+void nc_state::poweroff_control_w(uint8_t data)
 {
-	/* 512k of rom */
-	m_membank_rom_mask = 0x1f;
+	// 7654321-  not used
+	// -------0  power off
 
-	m_membank_internal_ram_mask = 7;
+	LOG("poweroff_control_w: %02x\n", data);
+}
 
-	m_membank_card_ram_mask = 0x03f;
+void nc200_state::poweroff_control_w(uint8_t data)
+{
+	// 76543---  not used
+	// -----2--  backlight
+	// ------1-  floppy?
+	// -------0  power off
 
-	nc_state::machine_reset();
+	LOG("poweroff_control_w: %02x\n", data);
 
-	m_nc200_uart_interrupt_irq = 0;
+	nc_state::poweroff_control_w(data);
 
-	/* fdc, serial */
-	m_irq_latch_mask = /*(1<<5) |*/ (1<<2);
+	m_fg_color = BIT(data, 2) ? rgb_t(0x2b, 0x42, 0x66) : rgb_t(0x0c, 0x54, 0x9f);
+	m_bg_color = BIT(data, 2) ? rgb_t(0xae, 0xa0, 0x66) : rgb_t(0xbe, 0xb7, 0x94);
+}
 
-	nc200_video_set_backlight(0);
+uint8_t nc_state::memory_management_r(offs_t offset)
+{
+	return m_mmc[offset];
+}
+
+void nc_state::memory_management_w(offs_t offset, uint8_t data)
+{
+	// 76------  memory mode select
+	// --543210  address lines 19 to 14
+
+	m_mmc[offset] = data;
+
+	memory_view *const mem_view[4] = { &m_mem_view0, &m_mem_view1, &m_mem_view2, &m_mem_view3 };
+	mem_view[offset]->select(BIT(m_mmc[offset], 6, 2));
+	m_rombank[offset]->set_entry(m_mmc[offset] & 0x3f & (m_rom_banks - 1));
+	m_rambank[offset]->set_entry(m_mmc[offset] & 0x3f & (m_ram_banks - 1));
 }
 
 void nc_state::machine_start()
 {
-	std::string region_tag;
-	m_card_ram = memregion(region_tag.assign(m_card->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
-	if (m_card_ram)
-		m_card_size = m_card_ram->bytes();
-	else
-		m_card_size = 0;
+	m_rom_banks = (memregion("maincpu")->bytes() / 0x4000);
+	m_ram_banks = (m_ram->size() / 0x4000);
 
-	/* keyboard timer */
-	m_keyboard_timer = timer_alloc(FUNC(nc_state::nc_keyboard_timer_callback), this);
-	m_keyboard_timer->adjust(attotime::from_msec(10));
+	for (int i = 0; i < 4; i++)
+	{
+		m_rombank[i]->configure_entries(0, m_rom_banks, memregion("maincpu")->base(), 0x4000);
+		m_rambank[i]->configure_entries(0, m_ram_banks, m_ram->pointer(), 0x4000);
+	}
 
 	m_nvram->set_base(m_ram->pointer(), m_ram->size());
+
+	// setup lcd colors
+	m_fg_color = rgb_t(0x38, 0x40, 0x63);
+	m_bg_color = rgb_t(0xad, 0xa0, 0x71);
+
+	// register for save states
+	save_item(NAME(m_display_memory_start));
+	save_item(NAME(m_mmc));
+	save_item(NAME(m_uart_control));
+	save_item(NAME(m_irq_mask));
+	save_item(NAME(m_irq_status));
+	save_item(NAME(m_uart_rxrdy));
+	save_item(NAME(m_uart_txrdy));
+	save_item(NAME(m_centronics_busy));
+	save_item(NAME(m_pcmcia_card_detect));
+	save_item(NAME(m_pcmcia_write_protect));
+	save_item(NAME(m_pcmcia_battery_voltage_1));
+	save_item(NAME(m_pcmcia_battery_voltage_2));
 }
 
-/*
-NC200:
-
-        bit 7: memory card present 0 = yes, 1 = no
-        bit 6: memory card write protected 1=yes 0=no
-        bit 5: lithium battery 0 if >= 2.7 volts
-        bit 4: input voltage = 1, if >= to 4 volts
-        bit 3: ??
-        bit 2: alkaline batteries. 0 if >=3.2 volts
-        bit 1: ??
-        bit 0: battery power: if 1: batteries are too low for disk usage, if 0: batteries ok for disc usage
-*/
-
-
-/* nc200 version of card/battery status */
-uint8_t nc200_state::nc200_card_battery_status_r()
+void nc100_state::machine_start()
 {
-	int nc_card_battery_status = 0x0ff;
+	nc_state::machine_start();
 
-	/* enough power */
-
-	/* input voltage ok */
-	nc_card_battery_status |=(1<<4);
-	/* lithium batteries and alkaline batteries have enough power,
-	and there is enough power for disk usage */
-	nc_card_battery_status &=~((1<<5) | (1<<2) | (1<<0));
-
-	if (m_card_status)
-	{
-		/* card present */
-		nc_card_battery_status&=~(1<<7);
-	}
-
-	if (ioport("EXTRA")->read() & 0x02)
-	{
-		/* card write enable */
-		nc_card_battery_status &=~(1<<6);
-	}
-
-	return nc_card_battery_status;
+	// register for save states
+	save_item(NAME(m_centronics_ack));
 }
 
-
-/* port &80:
-
-  bit 0: Parallel interface BUSY
- */
-
-uint8_t nc200_state::nc200_printer_status_r()
+void nc200_state::machine_start()
 {
-	uint8_t result = 0;
+	nc_state::machine_start();
 
-	result |= m_centronics_busy;
-
-	return result;
+	// allocate a timer to delay the fdc interrupt
+	m_fdc_irq_timer = timer_alloc(FUNC(nc200_state::fdc_irq), this);
 }
 
-
-void nc200_state::nc200_uart_control_w(uint8_t data)
+void nc_state::machine_reset()
 {
-	/* int reset_fdc = (m_uart_control^data) & (1<<5); */
+	// display memory start is set to 0 on reset
+	m_display_memory_start = 0;
 
-	nc_uart_control_w(data);
+	// memory management control is set to 0 on reset
+	memory_management_w(0, 0x00);
+	memory_management_w(1, 0x00);
+	memory_management_w(2, 0x00);
+	memory_management_w(3, 0x00);
 
-	if (data & (1<<3))
-	{
-		m_nc200_uart_interrupt_irq &=~3;
+	// all interrupts masked and none active
+	m_irq_mask = 0;
+	m_irq_status = 0;
+	update_interrupts();
 
-		nc200_refresh_uart_interrupt();
-	}
+	// set to 0x01 on reset
+	poweroff_control_w(0x01);
 
-	/* bit 5 is used in disk interface */
-	LOGDEBUG("bit 5: PC: %04x %02x\n", m_maincpu->pc(), data & (1 << 5));
+	// set to 0xff on reset
+	uart_control_w(0xff);
+
+	/* setup reset state */
+	m_sound_channel_periods[0] = (m_sound_channel_periods[1] = 0x0ffff);
 }
 
-
-/* bit 7: same as nc100 */
-/* bit 2: ?? */
-/* bit 1: ?? */
-/* %10000110 = 0x086 */
-/* %10000010 = 0x082 */
-/* %10000011 = 0x083 */
-/* writes 86,82 */
-
-/* bit 7: nc200 power control: 1=on, 0=off */
-/* bit 1: disk motor??  */
-/* bit 0: UPD765 Terminal Count input */
-
-void nc200_state::nc200_memory_card_wait_state_w(uint8_t data)
+void nc200_state::machine_reset()
 {
-	LOGDEBUG("nc200 memory card wait state: PC: %04x %02x\n", m_maincpu->pc(), data);
-#if 0
-	floppy_drive_set_motor_state(0, 1);
-	floppy_drive_set_ready_state(0, 1, 1);
-#endif
-	m_fdc->tc_w(data & 0x01);
+	nc_state::machine_reset();
+
+	m_fdc_irq_timer->adjust(attotime::never);
 }
 
-/* bit 2: backlight: 1=off, 0=on */
-/* bit 1 cleared to zero in disk code */
-/* bit 0 seems to be the same as nc100 */
-void nc200_state::nc200_poweroff_control_w(uint8_t data)
+
+//**************************************************************************
+//  MACHINE DEFINTIONS
+//**************************************************************************
+
+static void pcmcia_devices(device_slot_interface &device)
 {
-	LOGDEBUG("nc200 power off: PC: %04x %02x\n", m_maincpu->pc(), data);
-
-	nc200_video_set_backlight(((data ^ (1 << 2)) >> 2) & 0x01);
+	device.option_add("melcard_1m", PCCARD_SRAM_MITSUBISHI_1M);
+	device.option_add("sram_1m", PCCARD_SRAM_CENTENNIAL_1M);
 }
-
-void nc200_state::nc200_io(address_map &map)
-{
-	map.global_mask(0xff);
-	map(0x00, 0x0f).w(FUNC(nc200_state::nc100_display_memory_start_w));
-	map(0x10, 0x13).rw(FUNC(nc200_state::nc_memory_management_r), FUNC(nc200_state::nc_memory_management_w));
-	map(0x20, 0x20).w(FUNC(nc200_state::nc200_memory_card_wait_state_w));
-	map(0x30, 0x30).w(FUNC(nc200_state::nc200_uart_control_w));
-	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::write));
-	map(0x50, 0x53).w(FUNC(nc200_state::nc_sound_w));
-	map(0x60, 0x60).w(FUNC(nc200_state::nc_irq_mask_w));
-	map(0x70, 0x70).w(FUNC(nc200_state::nc200_poweroff_control_w));
-	map(0x80, 0x80).r(FUNC(nc200_state::nc200_printer_status_r));
-	map(0x90, 0x90).rw(FUNC(nc200_state::nc_irq_status_r), FUNC(nc200_state::nc200_irq_status_w));
-	map(0xa0, 0xa0).r(FUNC(nc200_state::nc200_card_battery_status_r));
-	map(0xb0, 0xb9).r(FUNC(nc200_state::nc_key_data_in_r));
-	map(0xc0, 0xc1).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
-	map(0xd0, 0xd1).rw("mc", FUNC(mc146818_device::read), FUNC(mc146818_device::write));
-	map(0xe0, 0xe1).m(m_fdc, FUNC(upd765a_device::map));
-}
-
-static INPUT_PORTS_START(nc200)
-	PORT_START("LINE0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift (Left)") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_MAMEKEY(LSHIFT))
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift (Right)") PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_MAMEKEY(RSHIFT))
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)           PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cursor Left (Red)") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
-	PORT_BIT(0x20, 0x00, IPT_UNUSED)
-	PORT_BIT(0x40, 0x00, IPT_UNUSED)
-	PORT_BIT(0x80, 0x00, IPT_UNUSED)
-
-	PORT_START("LINE1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Function (Yellow)") PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL)) // 5th row, 1st key on left (where 'fn' is on mac keyboards)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control") PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Stop") PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(F2))
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)       PORT_CHAR(' ')
-	PORT_BIT(0x10, 0x00, IPT_UNUSED)
-	PORT_BIT(0x20, 0x00, IPT_UNUSED)
-	PORT_BIT(0x40, 0x00, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)           PORT_CHAR('9') PORT_CHAR('(')
-
-	PORT_START("LINE2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Caps Lock") PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(RALT))
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Symbol") PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(F3)) // 5th row, 3rd key (where 'Alt' usually stays)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)           PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB)         PORT_CHAR('\t')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)           PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT(0x20, 0x00, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)           PORT_CHAR('6') PORT_CHAR('^')
-	PORT_BIT(0x80, 0x00, IPT_UNUSED)
-
-	PORT_START("LINE3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)           PORT_CHAR('3') PORT_CHAR(0xA3)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)           PORT_CHAR('2') PORT_CHAR('"')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)           PORT_CHAR('q') PORT_CHAR('Q')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)           PORT_CHAR('w') PORT_CHAR('W')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)           PORT_CHAR('e') PORT_CHAR('E')
-	PORT_BIT(0x20, 0x00, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)           PORT_CHAR('s') PORT_CHAR('S')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)           PORT_CHAR('d') PORT_CHAR('D')
-
-	PORT_START("LINE4")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)           PORT_CHAR('8') PORT_CHAR('*')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)           PORT_CHAR('7') PORT_CHAR('&')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)           PORT_CHAR('z') PORT_CHAR('Z')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)           PORT_CHAR('x') PORT_CHAR('X')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)           PORT_CHAR('a') PORT_CHAR('A')
-	PORT_BIT(0x20, 0x00, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)           PORT_CHAR('r') PORT_CHAR('R')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)           PORT_CHAR('f') PORT_CHAR('F')
-
-	PORT_START("LINE5")
-	PORT_BIT(0x01, 0x00, IPT_UNUSED)
-	PORT_BIT(0x02, 0x00, IPT_UNUSED)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)           PORT_CHAR('b') PORT_CHAR('B')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)           PORT_CHAR('v') PORT_CHAR('V')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)           PORT_CHAR('t') PORT_CHAR('T')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)           PORT_CHAR('y') PORT_CHAR('Y')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)           PORT_CHAR('c') PORT_CHAR('C')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)           PORT_CHAR('g') PORT_CHAR('G')
-
-	PORT_START("LINE6")
-	PORT_BIT(0x01, 0x00, IPT_UNUSED)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cursor Down (Blue)") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Del>") PORT_CODE(KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(DEL))
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cursor Right (Green)") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)   PORT_CHAR('#') PORT_CHAR('~')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)       PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)           PORT_CHAR('h') PORT_CHAR('H')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)           PORT_CHAR('n') PORT_CHAR('N')
-
-	PORT_START("LINE7")
-	PORT_BIT(0x01, 0x00, IPT_UNUSED)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)      PORT_CHAR('=') PORT_CHAR('+')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE)       PORT_CHAR('\\') PORT_CHAR('|')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cursor Up (White)") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Menu") PORT_CODE(KEYCODE_PGUP) PORT_CHAR(UCHAR_MAMEKEY(F4))
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)           PORT_CHAR('u') PORT_CHAR('U')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)           PORT_CHAR('m') PORT_CHAR('M')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)           PORT_CHAR('k') PORT_CHAR('K')
-
-	PORT_START("LINE8")
-	PORT_BIT(0x01, 0x00, IPT_UNUSED)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)       PORT_CHAR('-') PORT_CHAR('_')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE)  PORT_CHAR(']') PORT_CHAR('}')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)   PORT_CHAR('[') PORT_CHAR('{')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)       PORT_CHAR('\'') PORT_CHAR('@')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)           PORT_CHAR('i') PORT_CHAR('I')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)           PORT_CHAR('j') PORT_CHAR('J')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)       PORT_CHAR(',') PORT_CHAR('<')
-
-	PORT_START("LINE9")
-	PORT_BIT(0x01, 0x00, IPT_UNUSED)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)           PORT_CHAR('0') PORT_CHAR(')')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Del<") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR('8')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)           PORT_CHAR('p') PORT_CHAR('P')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)       PORT_CHAR(';') PORT_CHAR(':')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)           PORT_CHAR('l') PORT_CHAR('L')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)           PORT_CHAR('o') PORT_CHAR('O')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)        PORT_CHAR('.') PORT_CHAR('>')
-
-	/* not part of the nc200 keyboard */
-	PORT_START("EXTRA")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("On Button") PORT_CODE(KEYCODE_END) PORT_CHAR(UCHAR_MAMEKEY(F1))
-	/* pcmcia memory card setting */
-	PORT_DIPNAME( 0x02, 0x002, "PCMCIA Memory card write enable")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On) )
-INPUT_PORTS_END
-
-/**********************************************************************************************************/
 
 void nc_state::nc_base(machine_config &config)
 {
-	/* basic machine hardware */
 	Z80(config, m_maincpu, /*6000000*/ 4606000);        /* Russell Marks says this is more accurate */
-	m_maincpu->set_addrmap(AS_PROGRAM, &nc_state::nc_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nc_state::mem_map);
 	config.set_maximum_quantum(attotime::from_hz(60));
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_palette("palette");
+	// ram
+	RAM(config, m_ram).set_default_size("64K");
+	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
-	PALETTE(config, "palette", FUNC(nc_state::nc_colours), NC_NUM_COLOURS);
+	TIMER(config, "keyscan_timer").configure_periodic(FUNC(nc_state::keyscan_timer), attotime::from_msec(10));
 
-	/* sound hardware */
+	// video hardware
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_refresh_hz(50);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	m_screen->set_screen_update(FUNC(nc_state::screen_update));
+
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper1, 0).add_route(ALL_OUTPUTS, "mono", 0.50);
 	BEEP(config, m_beeper2, 0).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	/* printer */
+	// centronics
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
-	m_centronics->busy_handler().set(FUNC(nc_state::write_centronics_busy));
+	m_centronics->busy_handler().set(FUNC(nc_state::centronics_busy_w));
 
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
 
-	/* uart */
+	// uart
 	I8251(config, m_uart, 0);
+	m_uart->txd_handler().set("serial", FUNC(rs232_port_device::write_txd));
+	m_uart->rts_handler().set("serial", FUNC(rs232_port_device::write_rts));
+	m_uart->dtr_handler().set("serial", FUNC(rs232_port_device::write_dtr));
 
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 19200));
-	uart_clock.signal_handler().set(FUNC(nc_state::write_uart_clock));
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 150 * 16));
+	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_rxc));
+	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_txc));
 
-	/* cartridge */
-	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cardslot", generic_plain_slot, nullptr));
-	cartslot.set_device_load(FUNC(nc_state::load_pcmcia_card));
-	cartslot.set_device_unload(FUNC(nc_state::unload_pcmcia_card));
+	rs232_port_device &rs232(RS232_PORT(config, "serial", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_uart, FUNC(i8251_device::write_rxd));
+	rs232.cts_handler().set(m_uart, FUNC(i8251_device::write_cts));
+	rs232.dsr_handler().set(m_uart, FUNC(i8251_device::write_dsr));
 
-	/* internal ram */
-	RAM(config, m_ram).set_default_size("64K");
-	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
-
-	/* dummy timer */
-	TIMER(config, "dummy_timer").configure_periodic(FUNC(nc_state::dummy_timer_callback), attotime::from_hz(50));
+	PCCARD_SLOT(config, m_pcmcia, pcmcia_devices, nullptr);
+	m_pcmcia->card_detect_cb().set(FUNC(nc_state::pcmcia_card_detect_w));
+	m_pcmcia->write_protect_cb().set(FUNC(nc_state::pcmcia_write_protect_w));
+	m_pcmcia->battery_voltage_1_cb().set(FUNC(nc_state::pcmcia_battery_voltage_1_w));
+	m_pcmcia->battery_voltage_2_cb().set(FUNC(nc_state::pcmcia_battery_voltage_2_w));
 }
 
 void nc100_state::nc100(machine_config &config)
 {
 	nc_base(config);
 
-	m_maincpu->set_addrmap(AS_IO, &nc100_state::nc100_io);
+	m_maincpu->set_addrmap(AS_IO, &nc100_state::io_map);
 
-	/* video hardware */
-	screen_device &screen(*subdevice<screen_device>("screen"));
-	screen.set_size(480, 64);
-	screen.set_visarea(0, 480-1, 0, 64-1);
-	screen.set_screen_update(FUNC(nc100_state::screen_update_nc100));
+	// video hardware
+	m_screen->set_size(480, 64);
+	m_screen->set_visarea_full();
 
-	/* printer */
-	m_centronics->ack_handler().set(FUNC(nc100_state::write_nc100_centronics_ack));
+	// centronics
+	m_centronics->ack_handler().set(FUNC(nc100_state::centronics_ack_w));
 
-	/* uart */
-	m_uart->rxrdy_handler().set(FUNC(nc100_state::nc100_rxrdy_callback));
-	m_uart->txrdy_handler().set(FUNC(nc100_state::nc100_txrdy_callback));
+	// uart
+	m_uart->rxrdy_handler().set(FUNC(nc100_state::uart_rxrdy_w));
+	m_uart->txrdy_handler().set(FUNC(nc100_state::uart_txrdy_w));
 
-	/* rtc */
-	tc8521_device &rtc(TC8521(config, "rtc", XTAL(32'768)));
-	rtc.out_alarm_callback().set(FUNC(nc100_state::nc100_tc8521_alarm_callback));
+	// rtc
+	TC8521(config, "rtc", XTAL(32'768));
 }
 
-static void ibmpc_floppies(device_slot_interface &device)
+void nc100_state::nc150(machine_config &config)
 {
-	device.option_add("525dd", FLOPPY_525_DD);
+	nc100(config);
+
+	m_ram->set_default_size("128K");
 }
 
 void nc200_state::nc200(machine_config &config)
 {
 	nc_base(config);
 
-	m_maincpu->set_addrmap(AS_IO, &nc200_state::nc200_io);
+	m_maincpu->set_addrmap(AS_IO, &nc200_state::io_map);
 
-	/* video hardware */
-	screen_device &screen(*subdevice<screen_device>("screen"));
-	screen.set_size(NC200_SCREEN_WIDTH, NC200_SCREEN_HEIGHT);
-	screen.set_visarea(0, NC200_SCREEN_WIDTH-1, 0, NC200_SCREEN_HEIGHT-1);
-	screen.set_screen_update(FUNC(nc200_state::screen_update_nc200));
-
-	palette_device &palette(*subdevice<palette_device>("palette"));
-	palette.set_entries(NC200_NUM_COLOURS);
-	palette.set_init(FUNC(nc200_state::nc_colours));
-
-	/* printer */
-	m_centronics->ack_handler().set(FUNC(nc200_state::write_nc200_centronics_ack));
-
-	/* uart */
-	m_uart->rxrdy_handler().set(FUNC(nc200_state::nc200_rxrdy_callback));
-	m_uart->txrdy_handler().set(FUNC(nc200_state::nc200_txrdy_callback));
-
-	UPD765A(config, m_fdc, 8'000'000, true, true);
-	m_fdc->intrq_wr_callback().set(FUNC(nc200_state::nc200_fdc_interrupt));
-	FLOPPY_CONNECTOR(config, "upd765:0", ibmpc_floppies, "525dd", floppy_image_device::default_pc_floppy_formats);
-	FLOPPY_CONNECTOR(config, "upd765:1", ibmpc_floppies, "525dd", floppy_image_device::default_pc_floppy_formats);
-
-	MC146818(config, "mc", 4.194304_MHz_XTAL);
-
-	/* internal ram */
+	// ram
 	m_ram->set_default_size("128K");
+
+	// video hardware
+	m_screen->set_size(480, 128);
+	m_screen->set_visarea_full();
+
+	// centronics
+	m_centronics->ack_handler().set(FUNC(nc200_state::centronics_ack_w));
+
+	// uart
+	m_uart->rxrdy_handler().set(FUNC(nc200_state::uart_rxrdy_w));
+
+	// floppy
+	UPD765A(config, m_fdc, 4'000'000, true, true);
+	m_fdc->intrq_wr_callback().set(FUNC(nc200_state::fdc_int_w));
+
+	FLOPPY_CONNECTOR(config, "fdc:0", "fdd", FLOPPY_35_DD, true, floppy_image_device::default_pc_floppy_formats);
+
+	// rtc
+	MC146818(config, m_rtc, 4.194304_MHz_XTAL);
 }
 
 
-/***************************************************************************
+//**************************************************************************
+//  ROM DEFINITIONS
+//**************************************************************************
 
-  Game driver(s)
+ROM_START( nc100 )
+	ROM_REGION(0x40000, "maincpu", 0)
+	ROM_DEFAULT_BIOS("106")
+	ROM_SYSTEM_BIOS(0, "100", "ROM v1.00")
+	ROMX_LOAD("nc100.rom",  0x00000, 0x40000, CRC(a699eca3) SHA1(ce217d5a298b959ccc3d7bc5c93b1dba043f1339), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "106", "ROM v1.06")
+	ROMX_LOAD("nc100a.rom", 0x00000, 0x40000, CRC(849884f9) SHA1(ff030dd334ca867d620ee4a94b142ef0d93b69b6), ROM_BIOS(1))
+ROM_END
 
-***************************************************************************/
+ROM_START( nc100de )
+	ROM_REGION(0x40000, "maincpu", 0)
+	ROM_LOAD("nc100_de_a1.rom", 0x00000, 0x40000, CRC(bd9ce223) SHA1(2efb26911832bf1456d76d2508e24c0733dc216d))
+ROM_END
 
-ROM_START(nc100)
-	ROM_REGION(((64*1024)+(256*1024)), "maincpu",0)
-	ROM_SYSTEM_BIOS(0, "106", "ROM v1.06")
-	ROMX_LOAD("nc100a.rom", 0x010000, 0x040000, CRC(849884f9) SHA1(ff030dd334ca867d620ee4a94b142ef0d93b69b6), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "102dk", "ROM v1.02 Danish")
-	ROMX_LOAD("nc100_dk_a1.rom", 0x010000, 0x040000, CRC(ebb54923) SHA1(30321011384c5e10204b9a837430c36fc63580d2), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(2, "102de", "ROM v1.02 German")
-	ROMX_LOAD("nc100_de_a1.rom", 0x010000, 0x040000, CRC(bd9ce223) SHA1(2efb26911832bf1456d76d2508e24c0733dc216d), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS(3, "100", "ROM v1.00")
-	ROMX_LOAD("nc100.rom",  0x010000, 0x040000, CRC(a699eca3) SHA1(ce217d5a298b959ccc3d7bc5c93b1dba043f1339), ROM_BIOS(3))
+ROM_START( nc100dk )
+	ROM_REGION(0x40000, "maincpu", 0)
+	ROM_LOAD("nc100_dk_a1.rom", 0x00000, 0x40000, CRC(ebb54923) SHA1(30321011384c5e10204b9a837430c36fc63580d2))
+ROM_END
+
+ROM_START( nc100sv )
+	ROM_REGION(0x40000, "maincpu", 0)
+	ROM_LOAD("nc100_sv_a1.rom", 0x00000, 0x40000, CRC(86e24cca) SHA1(1ca716c46400e2acfc4665c8e12acc3762f1e401))
+ROM_END
+
+ROM_START( dw225 )
+	ROM_REGION(0x80000, "maincpu", 0)
+	// identical to nc100a.rom with the last half filled with 0x00
+	ROM_LOAD("dr,1.06.ic303", 0x00000, 0x80000, CRC(fcf2f7bd) SHA1(a69951618b24e97154cb4284d215cbf4aa9fb34f))
+ROM_END
+
+ROM_START( nc150fr )
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD("nc150_fr_b2.rom", 0x00000, 0x80000, CRC(be442d14) SHA1(f141d409dc72dc1e6662c21a147231c4df3be6b8))
+ROM_END
+
+ROM_START( nc150it )
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD("nc150_it_b1.rom", 0x00000, 0x80000, CRC(1b2fe2fd) SHA1(67eb6bce0b0d4668401d9c8f5a900dc6bd135c21))
+ROM_END
+
+ROM_START( nc200 )
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD("nc200.rom", 0x00000, 0x80000, CRC(bb8180e7) SHA1(fb5c93b0a3e199202c6a12548d2617f7a09bae47))
 ROM_END
 
 
-ROM_START(dw225)
-	ROM_REGION(((64*1024)+(512*1024)), "maincpu",0)
-	ROM_LOAD("dr,1.06.ic303",  0x010000, 0x080000, CRC(fcf2f7bd) SHA1(a69951618b24e97154cb4284d215cbf4aa9fb34f))
-ROM_END
+} // anonymous namespace
 
 
-ROM_START(nc150)
-	ROM_REGION(((64*1024)+(512*1024)), "maincpu",0)
-	ROM_SYSTEM_BIOS(0, "b2", "French B2")
-	ROMX_LOAD("nc150_fr_b2.rom", 0x010000, 0x080000, CRC(be442d14) SHA1(f141d409dc72dc1e6662c21a147231c4df3be6b8), ROM_BIOS(0)) // French
-	ROM_SYSTEM_BIOS(1, "b1", "Italian B1")
-	ROMX_LOAD("nc150_it_b1.rom", 0x010000, 0x080000, CRC(1b2fe2fd) SHA1(67eb6bce0b0d4668401d9c8f5a900dc6bd135c21), ROM_BIOS(1)) // Italian
-ROM_END
+//**************************************************************************
+//  SYSTEM DRIVERS
+//**************************************************************************
 
-
-ROM_START(nc200)
-	ROM_REGION(((64*1024)+(512*1024)), "maincpu",0)
-	ROM_LOAD("nc200.rom", 0x010000, 0x080000, CRC(bb8180e7) SHA1(fb5c93b0a3e199202c6a12548d2617f7a09bae47))
-ROM_END
-
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT     COMPANY                 FULLNAME           FLAGS
-COMP( 1992, nc100, 0,      0,      nc100,   nc100, nc100_state, init_nc, "Amstrad plc",          "NC100",           0 )
-COMP( 1992, dw225, nc100,  0,      nc100,   nc100, nc100_state, init_nc, "NTS Computer Systems", "DreamWriter 225", 0 )
-COMP( 1992, nc150, nc100,  0,      nc100,   nc100, nc100_state, init_nc, "Amstrad plc",          "NC150",           0 )
-COMP( 1993, nc200, 0,      0,      nc200,   nc200, nc200_state, init_nc, "Amstrad plc",          "NC200",           0 )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS        INIT        COMPANY                 FULLNAME           FLAGS
+COMP( 1992, nc100,   0,      0,      nc100,   nc100,   nc100_state, empty_init, "Amstrad plc",          "NC100",           MACHINE_SUPPORTS_SAVE )
+COMP( 1992, nc100de, nc100,  0,      nc100,   nc100de, nc100_state, empty_init, "Amstrad plc",          "NC100 (Germany)", MACHINE_SUPPORTS_SAVE )
+COMP( 1992, nc100dk, nc100,  0,      nc100,   nc100dk, nc100_state, empty_init, "Amstrad plc",          "NC100 (Denmark)", MACHINE_SUPPORTS_SAVE )
+COMP( 1992, nc100sv, nc100,  0,      nc100,   nc100sv, nc100_state, empty_init, "Amstrad plc",          "NC100 (Sweden)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1992, dw225,   nc100,  0,      nc100,   nc100,   nc100_state, empty_init, "NTS Computer Systems", "DreamWriter 225", MACHINE_SUPPORTS_SAVE )
+COMP( 1992, nc150fr, nc100,  0,      nc150,   nc150fr, nc100_state, empty_init, "Amstrad plc",          "NC150 (France)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1992, nc150it, nc100,  0,      nc150,   nc150it, nc100_state, empty_init, "Amstrad plc",          "NC150 (Italy)",   MACHINE_SUPPORTS_SAVE )
+COMP( 1993, nc200,   0,      0,      nc200,   nc200,   nc200_state, empty_init, "Amstrad plc",          "NC200",           MACHINE_SUPPORTS_SAVE )

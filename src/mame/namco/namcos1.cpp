@@ -4,7 +4,7 @@
 
 Namco System 1
 
-Shadow Land / Yokai Douchuuki      (c) 1987 Namco
+Shadow Land / Youkai Douchuuki     (c) 1987 Namco
 Dragon Spirit                      (c) 1987 Namco
 Blazer                             (c) 1987 Namco
 Quester                            (c) 1987 Namco
@@ -301,7 +301,7 @@ Games:
 
 Date  Name                                  Key  Screen
 ----- ------------------------------------- ---- ------
- 4/87 Yokai Douchuuki / Shadowland          NONE H
+ 4/87 Youkai Douchuuki / Shadowland         NONE H
  6/87 Dragon Spirit (old version)           136  V
 ??/87 Dragon Spirit (new version)           136  V
  7/87 Blazer                                144  V
@@ -2887,8 +2887,8 @@ ROM_END
 
 
 GAME( 1987, shadowld,  0,        ns1,     shadowld, namcos1_state, init_shadowld, ROT180, "Namco", "Shadowland (YD3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, youkaidk2, shadowld, ns1,     shadowld, namcos1_state, init_shadowld, ROT180, "Namco", "Yokai Douchuuki (Japan, new version (YD2, Rev B))", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, youkaidk1, shadowld, ns1,     shadowld, namcos1_state, init_shadowld, ROT180, "Namco", "Yokai Douchuuki (Japan, old version (YD1))", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, youkaidk2, shadowld, ns1,     shadowld, namcos1_state, init_shadowld, ROT180, "Namco", "Youkai Douchuuki (Japan, new version (YD2, Rev B))", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, youkaidk1, shadowld, ns1,     shadowld, namcos1_state, init_shadowld, ROT180, "Namco", "Youkai Douchuuki (Japan, old version (YD1))", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, dspirit,   0,        ns1,     dspirit,  namcos1_state, init_dspirit,  ROT90,  "Namco", "Dragon Spirit (new version (DS3))", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, dspirit2,  dspirit,  ns1,     dspirit,  namcos1_state, init_dspirit,  ROT90,  "Namco", "Dragon Spirit (DS2)", MACHINE_SUPPORTS_SAVE ) /* Atari had rights to US market */
 GAME( 1987, dspirit1,  dspirit,  ns1,     dspirit,  namcos1_state, init_dspirit,  ROT90,  "Namco", "Dragon Spirit (old version (DS1))", MACHINE_SUPPORTS_SAVE )

@@ -7,8 +7,8 @@
     driver by Aaron Giles
 
 **************************************************************************/
-#ifndef MAME_INCLUDES_GAELCO3D_H
-#define MAME_INCLUDES_GAELCO3D_H
+#ifndef MAME_GAELCO_GAELCO3D_H
+#define MAME_GAELCO_GAELCO3D_H
 
 #pragma once
 
@@ -180,4 +180,4 @@ private:
 	void tms_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_GAELCO3D_H
+#endif // MAME_GAELCO_GAELCO3D_H

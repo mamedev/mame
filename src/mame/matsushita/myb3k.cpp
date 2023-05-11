@@ -79,6 +79,9 @@
 #define LOGCENT(...) LOGMASKED(LOG_CENT, __VA_ARGS__)
 #define LOGRAM(...)  LOGMASKED(LOG_RAM, __VA_ARGS__)
 
+
+namespace {
+
 class myb3k_state : public driver_device
 {
 public:
@@ -1066,6 +1069,9 @@ ROM_START( stepone )
 	ROM_LOAD( "steponechrg-v2.07.bin", 0xc000, 0x2000, CRC(8284a391) SHA1(7203c5e9d83be37c1c195946fbee5c53b1bce391))
 	ROM_LOAD( "steponebios-v2.07.bin", 0xe000, 0x2000, CRC(322c1618) SHA1(a7a3cc2af7cc9556007d98014714ba656f6e79d1))
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY       FULLNAME        FLAGS
 COMP( 1982, myb3k,   0,      0,      myb3k,   myb3k, myb3k_state, empty_init, "Matsushita", "MyBrain 3000", 0)

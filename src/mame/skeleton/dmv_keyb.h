@@ -6,8 +6,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_DMV_KEYB_H
-#define MAME_MACHINE_DMV_KEYB_H
+#ifndef MAME_SKELETON_DMV_KEYB_H
+#define MAME_SKELETON_DMV_KEYB_H
 
 #pragma once
 
@@ -58,4 +58,4 @@ private:
 DECLARE_DEVICE_TYPE(DMV_KEYBOARD, dmv_keyboard_device)
 
 
-#endif // MAME_MACHINE_DMV_KEYB_H
+#endif // MAME_SKELETON_DMV_KEYB_H

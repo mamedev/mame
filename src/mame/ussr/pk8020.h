@@ -5,8 +5,8 @@
  * includes/pk8020.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_PK8020_H
-#define MAME_INCLUDES_PK8020_H
+#ifndef MAME_USSR_PK8020_H
+#define MAME_USSR_PK8020_H
 
 #pragma once
 
@@ -112,4 +112,4 @@ private:
 	required_device<palette_device> m_palette;
 };
 
-#endif // MAME_INCLUDES_PK8020_H
+#endif // MAME_USSR_PK8020_H

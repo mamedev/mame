@@ -155,7 +155,7 @@ bgfx_screen_chains
     we want to give each player their own full screen display (two physical
     monitors) along with the LCD, we’ll go with::
 
-        -numscreens 2 -view0 "Player 1" -view1 "Player 2" -video bgfx -bgfx_screen_chains hlsl,unfiltered,unfiltered:hlsl,unfiltered,unfiltered
+        -numscreens 2 -view0 "Player 1" -view1 "Player 2" -video bgfx -bgfx_screen_chains hlsl,unfiltered:hlsl,unfiltered
 
     This sets up the view for each display respectively, keeping HLSL effect on
     the CRT for each window (physical display) while going unfiltered for the
@@ -164,8 +164,7 @@ bgfx_screen_chains
     If using only one window (one display), keep in mind the game still has
     three screens, so we would use::
 
-        bgfx_screen_chains hlsl,unfiltered,unfiltered``
-
+        bgfx_screen_chains hlsl,unfiltered,unfiltered
 
     Note that the commas are on the outside edges, and any colons are in the
     middle.
@@ -177,9 +176,6 @@ bgfx_shadow_mask
 Tweaking BGFX HLSL Settings inside MAME
 ---------------------------------------
 
-*Warning: Currently BGFX HLSL settings are not saved or loaded from any
-configuration files.  This is expected to change in the future.*
-
 Start by loading MAME with the game of your choice (e.g. **mame pacman**).
 
 The tilde key (**~**) brings up the on-screen display options.  Use up and down
@@ -188,6 +184,12 @@ change that setting.  Results will be shown in real time as you’re changing
 these settings.
 
 Note that settings are individually changeable on a per-screen basis.
+
+BGFX slider settings are saved per-system in CFG files.  If the
+``bgfx_screen_chains`` setting has been set (either in an INI file or on the
+command line), it will set the initial effects.  If the ``bgfx_screen_chains``
+setting has not been set, MAME will use the effects you chose the last time you
+ran the system.
 
 
 Using the included pillarbox filters

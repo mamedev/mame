@@ -2,8 +2,8 @@
 // copyright-holders:Robbbert
 //*****************************************************************************
 
-#ifndef MAME_INCLUDES_TRS80M3_H
-#define MAME_INCLUDES_TRS80M3_H
+#ifndef MAME_TRS_TRS80M3_H
+#define MAME_TRS_TRS80M3_H
 
 #pragma once
 
@@ -154,4 +154,4 @@ private:
 	optional_memory_bank                        m_vidbank;
 };
 
-#endif // MAME_INCLUDES_TRS80M3_H
+#endif // MAME_TRS_TRS80M3_H

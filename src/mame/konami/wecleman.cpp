@@ -853,28 +853,30 @@ static INPUT_PORTS_START( hotchase )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(wecleman_state, hotchase_sound_status_r)
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+	// dips and defaults verified with US manual
 	PORT_START("DSW2")  /* $140015.b */
+	// defaults to imperial unit for (undumped) US version
 	PORT_DIPNAME( 0x01, 0x01, "Speed Unit" )
 	PORT_DIPSETTING(    0x01, "KM" )
 	PORT_DIPSETTING(    0x00, "M.P.H." )
-	PORT_DIPNAME( 0x02, 0x02, "Unknown 2-1" )   // single (wheel related)
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Unknown 2-2" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x18, "Unknown 2-3&4" ) // Most likely Difficulty
-	PORT_DIPSETTING(    0x18, "0" )
-	PORT_DIPSETTING(    0x10, "4" )
-	PORT_DIPSETTING(    0x08, "8" )
-	PORT_DIPSETTING(    0x00, "c" )
-	PORT_DIPNAME( 0x20, 0x20, "Unknown 2-5" )   // single
+	PORT_DIPNAME( 0x02, 0x02, "Motor Control" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) ) // Wec Mini Spin. Upright
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )  // Wec Spin Type
+	PORT_DIPNAME( 0x04, 0x00, "Driving Technique" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, "High Technique Required" )
+	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Difficult ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
+	PORT_DIPNAME( 0x20, 0x20, "Steering and Seat Vibration" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	/* wheel <-> brake ; accel -> start */
-	PORT_DIPNAME( 0x40, 0x40, "Unknown 2-6" )   // single (wheel<->brake)
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Steering Wheel Specifications" )
+	PORT_DIPSETTING(    0x40, "Potentiometer" ) // Wec Chequered Flag Type
+	PORT_DIPSETTING(    0x00, "Optical Sensor" ) // Konami GT Type
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -939,15 +941,15 @@ static const gfx_layout wecleman_bg_layout =
 
 static const uint32_t wecleman_road_layout_xoffset[64] =
 {
-		0,7,6,5,4,3,2,1,
-		8,15,14,13,12,11,10,9,
-		16,23,22,21,20,19,18,17,
-		24,31,30,29,28,27,26,25,
+	0,7,6,5,4,3,2,1,
+	8,15,14,13,12,11,10,9,
+	16,23,22,21,20,19,18,17,
+	24,31,30,29,28,27,26,25,
 
-		0+32,7+32,6+32,5+32,4+32,3+32,2+32,1+32,
-		8+32,15+32,14+32,13+32,12+32,11+32,10+32,9+32,
-		16+32,23+32,22+32,21+32,20+32,19+32,18+32,17+32,
-		24+32,31+32,30+32,29+32,28+32,27+32,26+32,25+32
+	0+32,7+32,6+32,5+32,4+32,3+32,2+32,1+32,
+	8+32,15+32,14+32,13+32,12+32,11+32,10+32,9+32,
+	16+32,23+32,22+32,21+32,20+32,19+32,18+32,17+32,
+	24+32,31+32,30+32,29+32,28+32,27+32,26+32,25+32
 };
 
 /* We draw the road, made of 512 pixel lines, using 64x1 tiles */
@@ -977,10 +979,10 @@ GFXDECODE_END
 
 static const uint32_t hotchase_road_layout_xoffset[64] =
 {
-		0*4,0*4,1*4,1*4,2*4,2*4,3*4,3*4,4*4,4*4,5*4,5*4,6*4,6*4,7*4,7*4,
-		8*4,8*4,9*4,9*4,10*4,10*4,11*4,11*4,12*4,12*4,13*4,13*4,14*4,14*4,15*4,15*4,
-		16*4,16*4,17*4,17*4,18*4,18*4,19*4,19*4,20*4,20*4,21*4,21*4,22*4,22*4,23*4,23*4,
-		24*4,24*4,25*4,25*4,26*4,26*4,27*4,27*4,28*4,28*4,29*4,29*4,30*4,30*4,31*4,31*4
+	0*4,0*4,1*4,1*4,2*4,2*4,3*4,3*4,4*4,4*4,5*4,5*4,6*4,6*4,7*4,7*4,
+	8*4,8*4,9*4,9*4,10*4,10*4,11*4,11*4,12*4,12*4,13*4,13*4,14*4,14*4,15*4,15*4,
+	16*4,16*4,17*4,17*4,18*4,18*4,19*4,19*4,20*4,20*4,21*4,21*4,22*4,22*4,23*4,23*4,
+	24*4,24*4,25*4,25*4,26*4,26*4,27*4,27*4,28*4,28*4,29*4,29*4,30*4,30*4,31*4,31*4
 };
 
 /* We draw the road, made of 512 pixel lines, using 64x1 tiles */

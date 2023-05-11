@@ -20,16 +20,11 @@
 #include "speaker.h"
 
 
-void nes_state::nes_vh_sprite_dma_w(address_space &space, uint8_t data)
-{
-	m_ppu->spriteram_dma(space, data);
-}
-
 void nes_state::nes_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().mirror(0x1800).share("mainram");                              // RAM
 	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write)); // PPU registers
-	map(0x4014, 0x4014).w(FUNC(nes_state::nes_vh_sprite_dma_w));                            // stupid address space hole
+	map(0x4014, 0x4014).w(m_ppu, FUNC(ppu2c0x_device::spriteram_dma));                            // stupid address space hole
 	map(0x4016, 0x4016).rw(FUNC(nes_state::nes_in0_r), FUNC(nes_state::nes_in0_w));         // IN0 - input port 1
 	map(0x4017, 0x4017).r(FUNC(nes_state::nes_in1_r));                                      // IN1 - input port 2
 	// 0x4100-0x5fff -> LOW HANDLER defined on a pcb base

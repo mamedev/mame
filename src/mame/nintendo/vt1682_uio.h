@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_MACHINE_VT1682_UIO_H
-#define MAME_MACHINE_VT1682_UIO_H
+#ifndef MAME_NINTENDO_VT1682_UIO_H
+#define MAME_NINTENDO_VT1682_UIO_H
 
 #pragma once
 
@@ -53,4 +53,4 @@ private:
 
 };
 
-#endif // MAME_MACHINE_VT1682_UIO_H
+#endif // MAME_NINTENDO_VT1682_UIO_H

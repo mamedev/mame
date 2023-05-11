@@ -277,7 +277,7 @@ void mpu4mod4oki_machines_state::init_PARENTNAME()
 
 
 #define M4ANDYCP_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "andsnd.bin",  0x000000, 0x080000, CRC(7d568671) SHA1(3a0a6af3dc980f2ccff0b6ef85833eb2e352031a) ) \
 	ROM_LOAD( "andsnd2.bin", 0x080000, 0x080000, CRC(98a586ee) SHA1(94b94d198725e8174e14873b99afa19217a1d4fa) )
 
@@ -387,7 +387,7 @@ GAME_CUSTOM( 1994, m4andycp10c_a,      m4andycp, mod4oki_bootleg_fixedret<0x1c>(
 // GEEN TUBES, can run with door open
 
 #define M4ANDYCP_DUT_ROMS \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "sdac_1.snd", 0x000000, 0x080000, CRC(5ce93532) SHA1(547f98740889e6fbafc5a0c517ff75de41f2acc7) ) \
 	ROM_LOAD( "sdac_2.snd", 0x080000, 0x080000, CRC(22dacd4b) SHA1(ad2dc943d4e3ec54937acacb963da938da809614) )
 
@@ -412,7 +412,7 @@ GAME(199?, m4andycpdut, 0, mod4oki_cheatchr_pal<mpu4_characteriser_pal::phr_char
 
 
 #define M4ANDYFL_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "alfsnd0.1", 0x0000, 0x080000, CRC(6691bc25) SHA1(4dd67b8bbdc5d707814b756005075fcb4f0c8be4) )
 
 #undef GAME_CUSTOM
@@ -519,7 +519,7 @@ GAME_CUSTOM( 1991, m4andyflfr,     m4andyfl,    "alfr.p1",                 0x000
 
 
 #define M4DTYFRE_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "dutsnd.p1", 0x000000, 0x080000, CRC(a5829cec) SHA1(eb65c86125350a7f384f9033f6a217284b6ff3d1) ) \
 	ROM_LOAD( "dutsnd.p2", 0x080000, 0x080000, CRC(1e5d8407) SHA1(64ee6eba3fb7700a06b89a1e0489a0cd54bb89fd) )
 
@@ -624,7 +624,7 @@ GAME_CUSTOM( 1996, m4dtyfrebwb_h,  m4dtyfre, mod4oki_bootleg_fixedret<0x1d>(R4, 
 *****************************************************************************************************************************************************************************/
 
 #define M4SHODF_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "sdfsnd.p1", 0x000000, 0x080000, CRC(a5829cec) SHA1(eb65c86125350a7f384f9033f6a217284b6ff3d1) ) \
 	ROM_LOAD( "sdfsnd.p2", 0x080000, 0x080000, CRC(1e5d8407) SHA1(64ee6eba3fb7700a06b89a1e0489a0cd54bb89fd) )
 
@@ -664,7 +664,7 @@ GAME_CUSTOM( 199?, m4shodf__g,  m4shodf,    "sd8y.p1",  0x0000, 0x010000, CRC(f7
 *****************************************************************************************************************************************************************************/
 
 #define M4PRZDTY_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "pdusnd.p2", 0x000000, 0x080000, CRC(a5829cec) SHA1(eb65c86125350a7f384f9033f6a217284b6ff3d1) ) \
 	ROM_LOAD( "pdusnd.p1", 0x080000, 0x080000, CRC(1e5d8407) SHA1(64ee6eba3fb7700a06b89a1e0489a0cd54bb89fd) )
 
@@ -707,7 +707,7 @@ GAME_CUSTOM( 199?, m4przdty__k,    m4przdty,   "pd8y.p1",  0x0000, 0x010000, CRC
 
 
 #define M4RHOG_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "rr6snd.p1", 0x000000, 0x080000, CRC(a5ec3f46) SHA1(2d6f1adbbd8ac931a99a7d3d9caa2a7a117ac3fa) ) \
 	ROM_LOAD( "rr6snd.p2", 0x080000, 0x080000, CRC(e5b72ef2) SHA1(dcdfa162db8bf3f9610709b5a8f3b695f42b2371) )
 
@@ -825,7 +825,7 @@ GAME_CUSTOM( 1994, m4rhog_h11,       m4rhog, mod4oki_bootleg_fixedret<0x2f>(R4, 
 #define M4ANDYGE_EXTRA_ROMS \
 	ROM_REGION( 0x1200, "plds", 0 ) /* PAL16V8 PLD, like others - CHR? Guess it should be here... */  \
 	ROM_LOAD( "age.bin", 0x0000, 0x000117, CRC(901359e5) SHA1(7dbcd6023e7ce68f4aa7f191f572d74f21f978aa) ) \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "an2snd.p1",  0x000000, 0x080000,  CRC(5394e9ae) SHA1(86ccd8531fc87f34d3c5482ba7e5a2c06ea69491) ) \
 	ROM_LOAD( "an2snd.p2",  0x080000, 0x080000,  CRC(109ace1f) SHA1(9f0e8065186beb61ed50fea834de2d91e68db953) )
 
@@ -920,7 +920,7 @@ GAME_CUSTOM( 199?, m4andyge_h4,        m4andyge, mod4oki_bootleg_fixedret<0x1c>(
 // boots
 
 #define M4DENMEN_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "densnd1.hex", 0x000000, 0x080000, CRC(468a8ec7) SHA1(ec450cd86fda09bc94caf913e9ee7900cfeaa0f2) ) \
 	ROM_LOAD( "densnd2.hex", 0x080000, 0x080000, CRC(1c20a490) SHA1(62eddc469e4b93ea1f82070600fce628dc526f54) )
 
@@ -985,7 +985,7 @@ GAME_CUSTOM( 199?, m4denmen_h3,    m4denmen, mod4oki_bootleg_fixedret<0x10>(R4, 
 // boots
 
 #define M4CRMAZE_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "crmsnd.p1", 0x000000, 0x080000, CRC(e05cdf96) SHA1(c85c7b31b775e3cc2d7f943eb02ff5ebae6c6080) ) \
 	ROM_LOAD( "crmsnd.p2", 0x080000, 0x080000, CRC(11da0781) SHA1(cd63834bf5d5034c2473372bfcc4930c300333f7) ) \
 
@@ -1055,7 +1055,7 @@ GAME_CUSTOM( 199?, m4crmaze__r,    m4crmaze, mod4oki_bootleg_fixedret<0x28>(R4, 
 // boot as long as you set a jackpot key
 
 #define M4SHOCM_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing */
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,input,name,offset,length,hash,company,title) \
@@ -1092,7 +1092,7 @@ GAME_CUSTOM( 199?, m4shocm__j,  m4shocm,    mpu4jackpot8tkn20p,    "scmk.p1",  0
 // these were in the Crystal Maze set, but are Cash Machine
 
 #define M4CASHMN_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "cmasnd.p1", 0x000000, 0x080000, CRC(1e7e13b8) SHA1(2db5c3789ad1b9bdb59e058562bd8be181ba0259) ) \
 	ROM_LOAD( "cmasnd.p2", 0x080000, 0x080000, CRC(cce703a8) SHA1(97487f3df0724d3ee01f6f4deae126aec6d2dd68) )
 
@@ -1199,7 +1199,7 @@ GAME_CUSTOM( 199?, m4cashmn__zb,   m4cashmn,   "cma15t",               0x0000, 0
 *****************************************************************************************************************************************************************************/
 
 #define M4TOPTEN_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "tops1.hex", 0x000000, 0x080000, CRC(70f16892) SHA1(e6448831d3ce7fa251b40023bc7d5d6dee9d6793) ) \
 	ROM_LOAD( "tops2.hex", 0x080000, 0x080000, CRC(5fc888b0) SHA1(8d50ee4f36bd36aed5d0e7a77f76bd6caffc6376) )
 
@@ -1302,7 +1302,7 @@ ROM_START( m4take5 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "take5.bin", 0x0000, 0x020000, CRC(24beb7d6) SHA1(746beccaf57fd0c54c8cf8d742b8ef50563a40fd) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "tfive1.hex", 0x000000, 0x080000, CRC(70f16892) SHA1(e6448831d3ce7fa251b40023bc7d5d6dee9d6793) )
 	ROM_LOAD( "tfive2.hex", 0x080000, 0x080000, CRC(5fc888b0) SHA1(8d50ee4f36bd36aed5d0e7a77f76bd6caffc6376) )
 ROM_END
@@ -1320,10 +1320,10 @@ GAME(199?, m4take5,   m4topten,          mod4oki_bootleg_fixedret<0x69>(R4, RT1,
 *****************************************************************************************************************************************************************************/
 
 #define M4TOOT_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "tocsnd.p1", 0x000000, 0x080000, CRC(b9527b0e) SHA1(4dc5f6794c3e63c8faced34e166dcc748ffb4941) ) \
 	ROM_LOAD( "tocsnd.p2", 0x080000, 0x080000, CRC(f684a488) SHA1(7c93cda3d3b55d9818625f696798c7c2cde79fa8) ) \
-	ROM_REGION( 0x100000, "altmsm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:altmsm6376", 0 ) \
 	ROM_LOAD( "totsnd.p1", 0x0000, 0x080000, CRC(684e9eb1) SHA1(8af28de879ae41efa07dfb07ecbd6c72201749a7) )
 
 #undef GAME_CUSTOM
@@ -1425,7 +1425,7 @@ GAME_CUSTOM( 199?, m4toot__zb,   m4toot, "tot15t",       0x0000, 0x020000, CRC(1
 *****************************************************************************************************************************************************************************/
 
 #define M4EAW_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "er4snd.p1", 0x000000, 0x080000, CRC(32fd0836) SHA1(ea68252b690fe1d6070209cbcfb65fe20926c6ce) ) \
 	ROM_LOAD( "er4snd.p2", 0x080000, 0x080000, CRC(1df9c24f) SHA1(f0d31b1bec6f3a9791f7fabe57b45687df900efa) )
 
@@ -1582,7 +1582,7 @@ GAME_CUSTOM( 199?, m4eaw__bx, m4eaw,  "eun01y.p1",                0x0000, 0x0100
 *****************************************************************************************************************************************************************************/
 
 #define M4WTA_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "winsnd.p1", 0x000000, 0x080000, CRC(a913ad0d) SHA1(5f39b661912da903ce8d6658b7848081b191ea56) ) \
 	ROM_LOAD( "winsnd.p2", 0x080000, 0x080000, CRC(6a22b39f) SHA1(0e0dbeac4310e03490b665fff514392481ad265f) )
 
@@ -1661,7 +1661,7 @@ GAME_CUSTOM( 199?, m4wta__6,  m4wta, mod4oki_bootleg_fixedret<0x60>(R4, RT1, LPL
 *****************************************************************************************************************************************************************************/
 
 #define M4PRZWTA_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "pwnsnd.p1", 0x000000, 0x080000, CRC(c0f5e160) SHA1(eff218a36912fe599e9d73a96b49e75335bba272) ) \
 	ROM_LOAD( "pwnsnd.p2", 0x080000, 0x080000, CRC(d81dfc8f) SHA1(5fcfcba836080b5752911d69dfe650614acbf845) )
 
@@ -1705,7 +1705,7 @@ GAME_CUSTOM( 199?, m4przwta__k,    m4przwta,   "pw8y.p1",  0x0000, 0x020000, CRC
 // Wrong Sound, Need V1
 
 #define M4GOODTM_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "gtrsnd.p1", 0x000000, 0x080000, CRC(23317580) SHA1(c0c5244ddcf976211e2a5e5a0b1dbc6faaec22b4) ) \
 	ROM_LOAD( "gtrsnd.p2", 0x080000, 0x080000, CRC(866ce0d2) SHA1(46e800c7364a6d291c6af87b30c680c530100e74) )
 
@@ -1829,9 +1829,9 @@ GAME_CUSTOM( 199?, m4goodtm__3,    m4goodtm,   "gtr15t",       0x0000, 0x020000,
 *****************************************************************************************************************************************************************************/
 
 #define M4JPGEM_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "altmsm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:altmsm6376", 0 ) \
 	ROM_LOAD( "cg4snd.p1", 0x000000, 0x080000, CRC(e4addde8) SHA1(6b84de51cc5195d551e0787ff92bfa4371ab27a3) ) \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "jagsnd.p1", 0x000000, 0x080000, CRC(7488f7a7) SHA1(d581e9d6b5052ee8fee353a83e9d9031443d060a) )
 
 #undef GAME_CUSTOM
@@ -1986,7 +1986,7 @@ GAME_CUSTOM( 199?, m4jpgem__bd, m4jpgem,    "jgu02y.p1",    0x0000, 0x010000, CR
 *****************************************************************************************************************************************************************************/
 
 #define M4JPGEMC_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 
 #undef GAME_CUSTOM
@@ -2034,7 +2034,7 @@ GAME_CUSTOM( 199?, m4jpgemc__w,    m4jpgemc,   "hge01y.p1",    0x0000, 0x010000,
 *****************************************************************************************************************************************************************************/
 
 #define M4JOLGEM_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "jolly1.hex", 0x000000, 0x080000, CRC(de0edae5) SHA1(e3e21e28ae5e838bd6eacc7cf7b20204d7b0327d) ) \
 	ROM_LOAD( "jolly2.hex", 0x080000, 0x080000, CRC(08ae81a2) SHA1(6459a694cd820f1a55b636f7c5c77674d3fe4bdb) )
 
@@ -2150,10 +2150,10 @@ GAME_CUSTOM( 199?, m4jolgem__an,   m4jolgem,   "jgem15t",      0x0000, 0x020000,
 *****************************************************************************************************************************************************************************/
 
 #define M4HITTOP_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "hi4snd.p1", 0x000000, 0x080000, CRC(066f262b) SHA1(fd48da486592740c68ee497396602199101711a6) ) \
 	ROM_LOAD( "hi4snd.p2", 0x080000, 0x080000, CRC(0ee89f6c) SHA1(7088149000efd1dcdf37aa9b88f7c6491184da24) ) \
-	ROM_REGION( 0x100000, "altmsm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:altmsm6376", 0 ) \
 	ROM_LOAD( "httsnd.p1",   0x000000, 0x080000, CRC(1cfb12d2) SHA1(d909c7ee8ea10587a9a9251af943b0151d2c4a16) )
 
 #undef GAME_CUSTOM
@@ -2278,7 +2278,7 @@ GAME_CUSTOM( 199?, m4hittop__2,    m4hittop,   "hit04y.p1",    0x0000, 0x010000,
 // 17ALM (need hopper, use Q to open door and run in demo mode)
 
 #define M4NNWW_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "cn4snd.p1", 0x0000, 0x080000, CRC(720011ce) SHA1(fa9108463131ea7e64525e080ac0eff2f6708db8) )
 
 #undef GAME_CUSTOM
@@ -2426,7 +2426,7 @@ GAME_CUSTOM( 199?, m4nnwwc__ad, m4nnww,    "cl__xb_x.2_0",     0x0000, 0x010000,
 *****************************************************************************************************************************************************************************/
 
 #define M4RFYM_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "runsnd.p1", 0x000000, 0x080000, CRC(a37a3a6d) SHA1(b82c7e90508795a53b91d7dab7938abf07e8ab4c) ) \
 	ROM_LOAD( "runsnd.p2", 0x080000, 0x080000, CRC(1c03046f) SHA1(5235b2f60f12cbee11fb5e54e1858a11a755f460) )
 
@@ -2533,7 +2533,7 @@ GAME_CUSTOM( 199?, m4rfym__a2,   m4rfym, mod4oki_bootleg_fixedret<0x1e>(R4, RT1,
 *****************************************************************************************************************************************************************************/
 
 #define M4PRZRFM_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
@@ -2572,7 +2572,7 @@ GAME_CUSTOM( 199?, m4przrfm__o,    m4przrfm,   "rm8y.p1",      0x0000, 0x010000,
 *****************************************************************************************************************************************************************************/
 
 #define M4READY_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "rgosnd.p1", 0x000000, 0x080000, CRC(d9345794) SHA1(4ed060fe61b3530e88ba9afea1fb69efed47c955) ) \
 	ROM_LOAD( "rgosnd.p2", 0x080000, 0x080000, CRC(4656f94e) SHA1(2f276ced34a43bb7fc69304f519b913d699c3450) )
 
@@ -2679,7 +2679,7 @@ GAME_CUSTOM( 199?, m4ready__a1, m4ready,    "rgt10dy.p1",   0x0000, 0x010000, CR
 *****************************************************************************************************************************************************************************/
 
 #define M4MAG7S_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "ma7snd1.bin", 0x000000, 0x080000, CRC(f0e31329) SHA1(60b94c3223c8863fe801b93f65ff65e94f3dec83) ) \
 	ROM_LOAD( "ma7snd2.bin", 0x080000, 0x080000, CRC(12110d16) SHA1(fa93a263d1e3fa8b0b2f618f52e5145330f4315d) )
 
@@ -2819,7 +2819,7 @@ GAME_CUSTOM( 199?, m4mag7s__av, m4mag7s,    "mas10w.p1",        0x0000, 0x020000
 *****************************************************************************************************************************************************************************/
 
 #define M4MAKMNT_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "mamsnd.p1", 0x000000, 0x080000, CRC(8dc408e3) SHA1(48a9ffc5cf4fd04ed1320619ca915bbfa2406750) ) \
 	ROM_LOAD( "mamsnd.p2", 0x080000, 0x080000, CRC(6034e17a) SHA1(11e044c87b5fc6461b0c6cfac5c419daee930d7b) )
 
@@ -2943,7 +2943,7 @@ GAME_CUSTOM( 199?, m4makmnt__n,    m4makmnt,   "mam15t",       0x0000, 0x020000,
 *****************************************************************************************************************************************************************************/
 
 #define M4VIVAES_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "vivasnd1.bin", 0x000000, 0x080000, CRC(e7975c75) SHA1(407c3bcff29f4b6599de2c35d96f62c72a897bd1) ) \
 	ROM_LOAD( "vivasnd2.bin", 0x080000, 0x080000, CRC(9f22f32d) SHA1(af64f6bde0b825d474c42c56f6e2253b28d4f90f) )
 
@@ -3045,7 +3045,7 @@ GAME_CUSTOM( 199?, m4vivaes__j,    m4vivaes, mod4oki_bootleg_fixedret<0xb6>(R4, 
 *****************************************************************************************************************************************************************************/
 
 #define M4VIVESS_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing */
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
@@ -3083,7 +3083,7 @@ GAME_CUSTOM( 199?, m4vivess__p,    m4vivess,   "sesy.p1",  0x0000, 0x010000, CRC
 *****************************************************************************************************************************************************************************/
 
 #define M4PRZVE_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "pessnd.p1", 0x000000, 0x080000, CRC(e7975c75) SHA1(407c3bcff29f4b6599de2c35d96f62c72a897bd1) ) \
 	ROM_LOAD( "pessnd.p2", 0x080000, 0x080000, CRC(9f22f32d) SHA1(af64f6bde0b825d474c42c56f6e2253b28d4f90f) )
 
@@ -3125,7 +3125,7 @@ GAME_CUSTOM( 199?, m4przve__k,  m4przve,    "pe8y.p1",  0x0000, 0x010000, CRC(c3
 *****************************************************************************************************************************************************************************/
 
 #define M4POTBLK_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "pbsnd1.hex", 0x000000, 0x080000, CRC(72a3331d) SHA1(b7475ba0ad86a6277e3d4f7b4311a98f3fc29802) ) \
 	ROM_LOAD( "pbsnd2.hex", 0x080000, 0x080000, CRC(c2460eec) SHA1(7c62fbc69ffaa788bf3839e37a75a812a7b8caef) )
 
@@ -3256,7 +3256,7 @@ GAME_CUSTOM( 199?, m4potblk__ax,   m4potblk,   "po_x6a_t.1_1", 0x0000, 0x020000,
 
 
 #define M4PLACBT_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "pybsnd.p1", 0x000000, 0x080000, CRC(3a91784a) SHA1(7297ccec3264aa9f1e7b3a2841f5f8a1e4ca6c54) ) \
 	ROM_LOAD( "pybsnd.p2", 0x080000, 0x080000, CRC(a82f0096) SHA1(45b6b5a2ae06b45add9cdbb9f5e6f834687b4902) )
 
@@ -3361,7 +3361,7 @@ GAME_CUSTOM( 199?, m4placbt__z,    m4placbt,   "pyb15t",       0x0000, 0x020000,
 *****************************************************************************************************************************************************************************/
 
 #define M4C9_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "c9s.hex", 0x0000, 0x080000, CRC(ae952e15) SHA1(a9eed61c3d65ded5e1faa67362f181393cb6339a) )
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
@@ -3459,10 +3459,10 @@ GAME_CUSTOM( 199?, m4c9__m,    m4c9,   "c9510y.p1",    0x0000, 0x010000, CRC(3a9
 
 // what's the difference between these sound roms, does one pair belong with the now split out m4tutbwb sets?
 #define M4TUTFRT_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "altmsm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:altmsm6376", 0 ) \
 	ROM_LOAD( "tftsnd02.p1", 0x000000, 0x080000, CRC(9789e60f) SHA1(7299eb4b6bb2fc90e8a36859102aad5daf66b163) ) \
 	ROM_LOAD( "tftsnd02.p2", 0x080000, 0x080000, CRC(0bdc1dc9) SHA1(909af8ff4d0e3e36e280e9553a73bb1dfdb62144) ) \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "tfsnd1.hex", 0x000000, 0x080000, CRC(a5b623fa) SHA1(eb4d84a7d3977ddea42c4995dddaabace73e6f8a) ) \
 	ROM_LOAD( "tfsnd2.hex", 0x080000, 0x080000, CRC(1275e528) SHA1(0c3c901cb2be1e84dba123677205108cf0388343) )
 
@@ -3567,7 +3567,7 @@ GAME_CUSTOM( 199?, m4tutfrt__au,   m4tutfrt, mod4oki(R4, RT1), mpu4, init_m4,  "
 
 
 #define M4CASHAT_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "cas1.hex", 0x000000, 0x080000, CRC(4711c483) SHA1(af1ceb317b7bb1c2d0c3f7a99049679c356e1860) ) \
 	ROM_LOAD( "cas2.hex", 0x080000, 0x080000, CRC(26ec235c) SHA1(51de955e5def47b82ac8891d09dc0b0e5e19c01d) )
 
@@ -3691,7 +3691,7 @@ GAME_CUSTOM( 199?, m4cashat__0,    m4cashat,   "casattack8.bin",   0x0000, 0x020
 
 
 #define M4RHR_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "generic_redhotroll_sound1.bin", 0x0000, 0x080000, CRC(3e80f8bd) SHA1(2e3a195b49448da11cc0c089a8a9b462894c766b) )
 
 
@@ -3843,7 +3843,7 @@ GAME_CUSTOM( 199?, m4rhr__8,  m4rhr, mod4oki_bootleg_fixedret<0x42>(R4, RT1), mp
 // Wrong Sound, Need V1
 
 #define M4UUAW_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "uuasnd.p1", 0x000000, 0x080000, CRC(be1a1131) SHA1(b7f50d8db6b7d134757e0746e7d9faf9fd3a2c7e) ) \
 	ROM_LOAD( "uuasnd.p2", 0x080000, 0x080000, CRC(c8492b3a) SHA1(d390e37f4a62869079bb38395a2e86a5ad24392f) )
 
@@ -3948,7 +3948,7 @@ GAME_CUSTOM( 199?, m4uuaw__b,    m4uuaw, "upa15t",       0x0000, 0x020000, CRC(8
 *****************************************************************************************************************************************************************************/
 
 #define M4RICHFM_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "rfamouss1.hex", 0x000000, 0x080000, CRC(b237c8b8) SHA1(b2322d68fe57cca0ed49b01ae0d3a0e93a623eac) ) \
 	ROM_LOAD( "rfamouss2.hex", 0x080000, 0x080000, CRC(12c295d5) SHA1(0758354cfb5242b4ce3f5f25c3458d91f4b4a1ec) )
 
@@ -4014,7 +4014,7 @@ GAME_CUSTOM( 199?, m4richfm__e,    m4richfm, mod4oki(R4, RT1, LPLB), mpu4, init_
 *****************************************************************************************************************************************************************************/
 
 #define M4PRZRF_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
@@ -4049,7 +4049,7 @@ GAME_CUSTOM( 199?, m4przrf__j,  m4przrf,    "pr8y.p1",  0x0000, 0x020000, CRC(87
 *****************************************************************************************************************************************************************************/
 
 #define M4VIZ_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "vizsnd.p1", 0x000000, 0x080000, CRC(2b39a622) SHA1(77916650fe19f18025e10fb25de704f7bb733295) ) \
 	ROM_LOAD( "vizsnd.p2", 0x080000, 0x080000, CRC(e309bede) SHA1(a4615436fcfd5f31293f887b8bc972f0d2d6b0cb) )
 
@@ -4108,7 +4108,7 @@ GAME_CUSTOM( 199?, m4viz__c,  m4viz, mod4oki_bootleg_fixedret<0x0c>(R4, RT1), mp
 
 
 #define M4TAKEPK_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "tapsnd1.hex", 0x000000, 0x080000, CRC(8dc408e3) SHA1(48a9ffc5cf4fd04ed1320619ca915bbfa2406750) ) \
 	ROM_LOAD( "tapsnd2.hex", 0x080000, 0x080000, CRC(6034e17a) SHA1(11e044c87b5fc6461b0c6cfac5c419daee930d7b) ) \
 	ROM_LOAD( "typkp2", 0x080000, 0x080000, CRC(753d9bc1) SHA1(c27c8b7cfba7ad67685f637ee3f68a3edb7986e7) ) /* alt copy of tapsnd2 */
@@ -4230,7 +4230,7 @@ GAME_CUSTOM( 199?, m4takepk__0,    m4takepk,   "typ58t",       0x0000, 0x010000,
 
 
 #define M4OVERMN_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "otnsnd.p1", 0x0000, 0x080000, CRC(d4f7ed82) SHA1(16e80bf0956f39a9e8e23384615a07594419db59) )
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
@@ -4303,10 +4303,10 @@ GAME_CUSTOM( 199?, m4overmn__n,    m4overmn,   "otny.p1",  0x0000, 0x010000, CRC
 
 
 #define M4LUXOR_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) /* these appear to be correct for the parent set */ \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) /* these appear to be correct for the parent set */ \
 	ROM_LOAD( "luxorsnd1.hex", 0x000000, 0x080000, CRC(428daceb) SHA1(eec2b7efded3d0e0eea7faa5759a65a021465b13) ) \
 	ROM_LOAD( "luxorsnd2.hex", 0x080000, 0x080000, CRC(860178e6) SHA1(705b1b0ad62a1b594bb123aec3c2b571a6500ce8) ) \
-	ROM_REGION( 0x100000, "altmsm6376", 0 ) /* are these for a different game / machine type? */ \
+	ROM_REGION( 0x100000, "okicard:altmsm6376", 0 ) /* are these for a different game / machine type? */ \
 	ROM_LOAD( "luxor-snd1.bin", 0x000000, 0x080000, CRC(d09394e9) SHA1(d3cbdbaf048d829271a6c2846b16ceee7775d767) ) \
 	ROM_LOAD( "luxor-snd2.bin", 0x080000, 0x080000, CRC(bc720cb9) SHA1(a83c25ecec602ba047dd21de2beec6cd7ac76cbe) )
 
@@ -4367,7 +4367,7 @@ GAME_CUSTOM( 199?, m4luxor__n,  m4luxor, mod4oki_bootleg_fixedret<0x2d>(R4, RT1,
 *****************************************************************************************************************************************************************************/
 
 #define M4PRZLUX_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "plxsnd.p1", 0x000000, 0x080000, CRC(0e682b6f) SHA1(459a7ca216c47af58c03c15d6ef1f9aa7489eba0) ) \
 	ROM_LOAD( "plxsnd.p2", 0x080000, 0x080000, CRC(3ef95a7f) SHA1(9c918769fbf0e687f27e431d934e2327df9ed3bb) )
 
@@ -4398,7 +4398,7 @@ GAME_CUSTOM( 199?, m4przlux__f,    m4przlux,   "plxy.p1",  0x0000, 0x010000, CRC
 *****************************************************************************************************************************************************************************/
 
 #define M4HIJINX_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "hijinx1.hex", 0x000000, 0x080000, CRC(8d5afedb) SHA1(6bf6dadddf8dd3672e3d05167ab9a0793c269176) ) \
 	ROM_LOAD( "hijinx2.hex", 0x080000, 0x080000, CRC(696c8a92) SHA1(d54a1020fea80bacb678bc8bd6b7d4d0854af603) )
 
@@ -4490,9 +4490,9 @@ GAME_CUSTOM( 199?, m4hijinx__b,    m4hijinx,   "hij15t",       0x0000, 0x020000,
 *****************************************************************************************************************************************************************************/
 
 #define M4CASHLN_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "altmsm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:altmsm6376", 0 ) \
 	ROM_LOAD( "cash lines 0.1 snd 1 9c3f.bin", 0x0000, 0x080000, CRC(1746f091) SHA1(d57fcaec3e3b0344671f2c984974bfdac50ec3d7) ) \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "cls1.hex", 0x000000, 0x080000, CRC(d6b5d862) SHA1(eab2ef2999229db7182896267cd83742b2390237) ) \
 	ROM_LOAD( "cls2.hex", 0x080000, 0x080000, CRC(e42e674b) SHA1(1cda06425f3d4797ee0c4ff7426970150e5af4b6) )
 
@@ -4629,7 +4629,7 @@ GAME_CUSTOM( 199?, m4cashln__b,    m4cashln,   "cl15t",        0x0000, 0x020000,
 *****************************************************************************************************************************************************************************/
 
 #define M4LUCKLV_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "llvsnd.p1", 0x000000, 0x080000, CRC(36be26f3) SHA1(b1c66d3ebebd7eb18266bf6b30c4a4db7acdf10d) ) \
 	ROM_LOAD( "llvsnd.p2", 0x080000, 0x080000, CRC(d5c2bb99) SHA1(e2096b8a33e89218d44200e87d1962790120a96c) )
 
@@ -4714,7 +4714,7 @@ GAME_CUSTOM( 199?, m4lucklv__ae,   m4lucklv,   "lluy.p1",  0x0000, 0x010000, CRC
 *****************************************************************************************************************************************************************************/
 
 #define M4LVLCL_EXTRA_ROMS \
-	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x180000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
@@ -4744,7 +4744,7 @@ GAME_CUSTOM( 199?, m4lvlcl__f,  m4lvlcl,    "ll__xgdx.3_1", 0x0000, 0x010000, CR
 *****************************************************************************************************************************************************************************/
 
 #define M4LUCKST_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "lssnd1.bin", 0x000000, 0x080000, CRC(401686bc) SHA1(ab62e6e097b0af2f68ae7f8f686f00cede5ec3aa) ) \
 	ROM_LOAD( "lssnd2.bin", 0x080000, 0x080000, CRC(d9e0c0db) SHA1(3eba5b19ca98d23a94edf2be27ccefaa0e526a56) )
 
@@ -4926,7 +4926,7 @@ GAME_CUSTOM( 199?, m4luckst__b,    m4luckst,   "ls15t",                0x0000, 0
 //Front door code 39 Cash door code 38
 
 #define M4TENTEN_EXTRA_ROMS \
-	ROM_REGION( 0x080000, "msm6376", 0 ) \
+	ROM_REGION( 0x080000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "tttsnd01.p1", 0x0000, 0x080000, CRC(5518474c) SHA1(0b7e98e33f62d80882f2b0b4af0c9056f1ffb78d) )
 
 #undef GAME_CUSTOM
@@ -5058,7 +5058,7 @@ GAME_CUSTOM( 199?, m4tenten__5,    m4tenten,   "t2504y.p1",    0x0000, 0x010000,
 //Front door code 0 Cash door code 0
 
 #define M4ANDYFH_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "afhsnd1.bin", 0x000000, 0x080000, CRC(ce0b1890) SHA1(224d05f936a1b6f84ad682c282c557e87ad8931f) ) \
 	ROM_LOAD( "afhsnd2.bin", 0x080000, 0x080000, CRC(8a4dda7b) SHA1(ee77295609ff646212faa207e56acb2440d859b8) )
 
@@ -5167,7 +5167,7 @@ GAME_CUSTOM( 199?, m4andyfh__ad,   m4andyfh,   "afuy.p1",      0x0000, 0x010000,
 *****************************************************************************************************************************************************************************/
 
 #define M4BDASH_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "blds1.hex", 0x000000, 0x080000, CRC(9cc07f5f) SHA1(e25295eb304624ed77d98d7e974363214c2c2cd1) ) \
 	ROM_LOAD( "blds2.hex", 0x080000, 0x080000, CRC(949bee73) SHA1(9ea2001a4d91236708dc948b4e1cac9978095945) )
 #undef GAME_CUSTOM
@@ -5311,7 +5311,7 @@ GAME_CUSTOM( 199?, m4bdash__a,  m4bdash,    "bdvarg.bin",   0x0000, 0x020000, CR
 *****************************************************************************************************************************************************************************/
 
 #define M4PRZMON_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing */
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
@@ -5351,7 +5351,7 @@ GAME_CUSTOM( 199?, m4przmon__p,    m4przmon,   "fpmy.p1",      0x0000, 0x010000,
 *****************************************************************************************************************************************************************************/
 
 #define M4PRZMNS_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "s_fpmsnd.p1", 0x000000, 0x080000, CRC(e5bfc522) SHA1(38c8430f539d38a51a3d7fb846b625ae2080e930) ) \
 	ROM_LOAD( "s_fpmsnd.p2", 0x080000, 0x080000, CRC(e14803ab) SHA1(41d501f61f202df2dbd2ac13c40a32fff6afc861) )
 #undef GAME_CUSTOM
@@ -5390,7 +5390,7 @@ GAME_CUSTOM( 199?, m4przmns__i,    m4przmns,   "sm8y.p1",  0x0000, 0x010000, CRC
 *****************************************************************************************************************************************************************************/
 
 #define M4PRZHR_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "prlsnd.p1", 0x0000, 0x080000, CRC(d60181ea) SHA1(4ca872e50d59dc96e90ade8cac24ebbab8a3f397) )
 
 #undef GAME_CUSTOM
@@ -5442,9 +5442,9 @@ GAME_CUSTOM( 199?, m4przhr__i,  m4przhr,    "pr3y.p1",  0x0000, 0x010000, CRC(81
 *****************************************************************************************************************************************************************************/
 
 #define M4GCLUE_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "altmsm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:altmsm6376", 0 ) \
 	ROM_LOAD( "c95snd.p1", 0x080000, 0x080000, CRC(ae952e15) SHA1(a9eed61c3d65ded5e1faa67362f181393cb6339a) ) \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "c25snd.p1", 0x000000, 0x080000, CRC(cd8f4ee0) SHA1(a7b9ae93b3a3d231a8239fff12689ec2084ce0c1) )
 
 #undef GAME_CUSTOM
@@ -5492,7 +5492,7 @@ GAME_CUSTOM( 199?, m4gclue__w,  m4gclue,    "c2504y.p1",    0x0000, 0x010000, CR
 *****************************************************************************************************************************************************************************/
 
 #define M4VEGAST_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "uvssnd.p1", 0x000000, 0x080000, CRC(04a47007) SHA1(cfe1f4aa9d29c784b2034c2daa09b8bd7181562e) ) \
 	ROM_LOAD( "uvssnd.p2", 0x080000, 0x080000, CRC(3b35d824) SHA1(e4007d5d13898ed0f91cd270c75b5df8cc62e003) )
 
@@ -5569,7 +5569,7 @@ GAME_CUSTOM( 199?, m4vegast__1,    m4vegast,   "vegas15t",                     0
 
 
 #define M4HOTROD_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "rodsnd.p1", 0x000000, 0x080000, CRC(bfdafedc) SHA1(6acc838ec046d44e7faa727b48925379aa42883d) ) \
 	ROM_LOAD( "rodsnd.p2", 0x080000, 0x080000, CRC(a01e1e67) SHA1(4f86e0bb9bf4c1a4d0190eddfe7dd5bb89c519a2) )
 
@@ -5624,7 +5624,7 @@ GAME_CUSTOM( 199?, m4hotrod__v,    m4hotrod, mod4oki(R4, RT1, LPS), mpu4,  init_
 *****************************************************************************************************************************************************************************/
 
 #define M4BUC_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "buccsnd1.bin", 0x000000, 0x080000, CRC(b671fd7b) SHA1(8123d1ef9d5e2cc8783a78137540e6f13e5e2304) ) \
 	ROM_LOAD( "buccsnd2.bin", 0x080000, 0x080000, CRC(66966b41) SHA1(87e2058f39ef1b19c35e63d55e62e2034fd24c0d) )
 
@@ -5748,7 +5748,7 @@ GAME_CUSTOM( 199?, m4buc__b,  m4buc,  "bucc15t",              0x000000, 0x020000
 *****************************************************************************************************************************************************************************/
 
 #define M4JWLCWN_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "cjesnd.p1", 0x000000, 0x080000, CRC(a2f20c95) SHA1(874b22850732514a26448cee8e0b68f8d042a7c7) ) \
 	ROM_LOAD( "cjesnd.p2", 0x080000, 0x080000, CRC(3dcb7c38) SHA1(3c0e91f4d2ea9e6b25a01702c6f6fdc7cc2e0b65) ) \
 	ROM_LOAD( "jewelp2",   0x080000, 0x080000, CRC(84996453) SHA1(74fe377545503f1b8da9b8998514811f0c1c037c) ) /* alt cje */ \
@@ -5841,7 +5841,7 @@ GAME_CUSTOM( 199?, m4jwlcwn__z,    m4jwlcwn,   "jewel15t",     0x0000, 0x020000,
 *****************************************************************************************************************************************************************************/
 
 #define M4BAGTEL_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "bgtsnd.p1", 0x000000, 0x080000, CRC(40a68dd1) SHA1(d70cf436dca242d49cd3bd39d3f6484a30968d0d) ) \
 	ROM_LOAD( "bgtsnd.p2", 0x080000, 0x080000, CRC(90961429) SHA1(6390e575d030f6d2953ee8460876c50fe48026f8) )
 
@@ -5922,7 +5922,7 @@ GAME_CUSTOM( 199?, m4bagtel__b,    m4bagtel,   "bg201dy.p1",   0x0000, 0x010000,
 *****************************************************************************************************************************************************************************/
 
 #define M4BERSER_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "bessnd.p1", 0x0000, 0x080000, CRC(4eb15200) SHA1(1997a304df5219153418369bd8cc4fd169fb4bd4) )
 
 #undef GAME_CUSTOM
@@ -5999,7 +5999,7 @@ GAME_CUSTOM( 199?, m4berser__1,    m4berser,   "be_05a_4.1_1", 0x0000, 0x010000,
 // hopper error
 
 #define M4TTDIA_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "tdasnd.p1", 0x000000, 0x080000, CRC(6e0bf4ab) SHA1(0cbcdc11d2d64a5fda2cf40bdde850f5c7b56d12) ) \
 	ROM_LOAD( "tdasnd.p2", 0x080000, 0x080000, CRC(66cc2f87) SHA1(6d8af6090b2ab29039aa89a125512190e7e34a03) )
 #undef GAME_CUSTOM
@@ -6063,7 +6063,7 @@ GAME_CUSTOM( 199?, m4ttdia__m,  m4ttdia,    "tda04y.p1",    0x0000, 0x020000, CR
 //Front door code 39 Cash door code 38
 
 #define M4ACTBNK_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "actsnd.p1", 0x000000, 0x080000, CRC(34777fea) SHA1(be784e73586719219ae5c1a3841f0e44edb6b497) ) \
 	ROM_LOAD( "actsnd.p2", 0x080000, 0x080000, CRC(2e832d40) SHA1(622b2c9694714446dbf67beb67d03af97d14ece7) )
 
@@ -6102,7 +6102,7 @@ GAME_CUSTOM( 199?, m4actbnk__i,    m4actbnk,   "actad.p1", 0x0000, 0x010000, CRC
 *****************************************************************************************************************************************************************************/
 
 #define M4CRDOME_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "cd2snd.p1", 0x000000, 0x080000, CRC(65a2dc92) SHA1(2c55a858ab17325189bed1974daf708c380541de) ) \
 	ROM_LOAD( "cd2snd.p2", 0x080000, 0x080000, CRC(b1bb4678) SHA1(8e8ab0a8d1b3e70dcb56d071193fdb5f34af7d14) )
 
@@ -6158,9 +6158,9 @@ GAME_CUSTOM( 199?, m4crdome__l,    m4crdome,   mpu4jackpot8tkn20p,    "cdom15r",
 *****************************************************************************************************************************************************************************/
 
 #define M4ROCKMN_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "altmsm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:altmsm6376", 0 ) \
 	ROM_LOAD( "rokmsnd1",  0x000000, 0x080000, CRC(b51e5d7d) SHA1(71f36f866583d592d029cba47901cbfd17631b06) ) \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "roksnd.p1", 0x000000, 0x080000, CRC(462a690e) SHA1(5a82f63a9d03c89c8fdb0ead1fc40e480aedd787) ) \
 	ROM_LOAD( "roksnd.p2", 0x080000, 0x080000, CRC(37786d14) SHA1(d6dc2d3dbe54ca943092938500d72081153b5a34) )
 
@@ -6199,7 +6199,7 @@ GAME_CUSTOM( 199?, m4rockmn__k,    m4rockmn,   "rok06y.p1",    0x0000, 0x020000,
 // MUX SELECTS ALM
 
 #define M4MADHSE_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "madh1.bin", 0x000000, 0x080000, CRC(2b2af5dd) SHA1(eec0808bf724a055ece3c964d8a43cc5f837a3bd) ) \
 	ROM_LOAD( "madh2.bin", 0x080000, 0x080000, CRC(487d8e1d) SHA1(89e01a153d17564eba112d882b686c91b6c3aecc) )
 
@@ -6256,7 +6256,7 @@ GAME_CUSTOM( 199?, m4madhse__b,    m4madhse,   "mhty.p1",      0x0000, 0x010000,
 // boots, unprotected, no chr reads or lamp scramble
 
 #define M4NHTT_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "nhtsnd01.p1", 0x0000, 0x080000, CRC(2d1d93c6) SHA1(80a8d131bafdb74d20d1ca5cbe2219ee4df0b675) )
 
 #undef GAME_CUSTOM
@@ -6292,7 +6292,7 @@ GAME_CUSTOM( 199?, m4nhtt__j,    m4nhtt, "nht01y.p1",    0x0000, 0x010000, CRC(5
 // gives 'Wrong Sound, Need V1'
 
 #define M4PRZFRT_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "pfrsnd.p1", 0x0000, 0x080000, CRC(71d1af20) SHA1(d87d61c561acbe9cb3dec18d8decf5e970efa272) )
 
 #undef GAME_CUSTOM
@@ -6330,7 +6330,7 @@ GAME_CUSTOM( 199?, m4przfrt__l,    m4przfrt,   "pfr03o.p1",    0x0000, 0x010000,
 // boots
 
 #define M4PRZWO_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "pwo.s1", 0x000000, 0x080000, CRC(1dbd8a33) SHA1(37bd71688475591232422eb0841e23aff58e3800) ) \
 	ROM_LOAD( "pwo.s2", 0x080000, 0x080000, CRC(6c7badef) SHA1(416c36fe2b4253bf7944b3ba412561bd0d21cbe5) )
 
@@ -6363,7 +6363,7 @@ GAME_CUSTOM( 199?, m4przwo__f,  m4przwo,    "pwoy.p1",      0x0000, 0x010000, CR
 // boots
 
 #define M4RHOG2_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "2rhsnd02.p1", 0x000000, 0x080000, CRC(0f4630dc) SHA1(7235e53c74e113230a683de33763023e95090d39) ) \
 	ROM_LOAD( "2rhsnd02.p2", 0x080000, 0x080000, CRC(c2d0540a) SHA1(160080b350d41b95a0c129f9189222d79734e7d0) )
 
@@ -6401,7 +6401,7 @@ GAME_CUSTOM( 199?, m4rhog2__m,  m4rhog2,    "2rh06y.p1",    0x0000, 0x020000, CR
 *****************************************************************************************************************************************************************************/
 
 #define M4LUCKSC_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "clusnd.p1", 0x000000, 0x080000, CRC(9c1042ba) SHA1(e4630bbcb3fe2f7d133275892eaf58c12402c610) ) \
 	ROM_LOAD( "clusnd.p2", 0x080000, 0x080000, CRC(b4b28b80) SHA1(a40b6801740d64e54c5c1738d69737ab9f4cf950) )
 
@@ -6452,7 +6452,7 @@ GAME_CUSTOM( 199?, m4lucksc__l,    m4lucksc,   "lsc_.1_1",     0x0000, 0x020000,
 *****************************************************************************************************************************************************************************/
 
 #define M4TOPDOG_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "topdogsnd.bin", 0x0000, 0x080000, CRC(a29047c6) SHA1(5956674e6b895bd46b99f4d04d5797b53ccc6668) )
 
 #undef GAME_CUSTOM
@@ -6506,7 +6506,7 @@ GAME_CUSTOM( 199?, m4topdog__z,    m4topdog,   "td_30btc.1_1", 0x0000, 0x010000,
 *****************************************************************************************************************************************************************************/
 
 #define M4KINGQ_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "kingsnqueenssnd.bin", 0x0000, 0x080000, CRC(31d722d4) SHA1(efb7079a1036cad8d9c08106f97c70a248b31898) ) \
 	ROM_LOAD( "ee______.1_2", 0x0000, 0x080000, CRC(13012f48) SHA1(392b3bcf6f8e3e01082087637f9d378302d046c4) )
 
@@ -6587,7 +6587,7 @@ GAME_CUSTOM( 199?, m4kingq__t,  m4kingq,    "knq2pprg.bin", 0x0000, 0x010000, CR
 // Hopper error
 
 #define M4KINGQC_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "knqsnd.bin", 0x0000, 0x080000, CRC(13012f48) SHA1(392b3bcf6f8e3e01082087637f9d378302d046c4) ) \
 	ROM_LOAD( "cn______.5_a", 0x0000, 0x080000, CRC(7f82f113) SHA1(98851f8820cb39b45d477151982c80fc91b15e56) )
 
@@ -6648,7 +6648,7 @@ GAME_CUSTOM( 199?, m4kingqc__5,    m4kingqc,   "cn_30btc.1_1", 0x0000, 0x010000,
 *****************************************************************************************************************************************************************************/
 
 #define M4TYPCL_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "ctpsnd02.p1", 0x000000, 0x080000, CRC(6fdd5051) SHA1(3f713314b303d6e1f78e3ca050bed7a45f43d5b3) ) \
 	ROM_LOAD( "ctpsnd02.p2", 0x080000, 0x080000, CRC(994bfb3a) SHA1(3cebfbbe77c4bbb5fb73e6d9b23f721b07c6435e) )
 
@@ -6714,7 +6714,7 @@ INPUT_PORTS_END
 
 
 #define M4ANDYBT_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "abtsnd.p1", 0x000000, 0x080000, CRC(0ba1e73a) SHA1(dde70b1bf973b023c45afb8d3191325514b96e47) ) \
 	ROM_LOAD( "abtsnd.p2", 0x080000, 0x080000, CRC(dcfa85f2) SHA1(30e8467841309a4840824ec89f82044489c94ac5) )
 
@@ -6745,7 +6745,7 @@ GAME_CUSTOM( 199?, m4andybt__c,    m4andybt,   "abt1.5",       0x0000, 0x020000,
 // hopper error
 
 #define M4THESTR_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "thestreaksnd.bin", 0x0000, 0x080000, CRC(fdbd0f88) SHA1(8d0eaa9aa8d505affeb8bd12d7cb13337aa2e2c2) )
 
 #undef GAME_CUSTOM
@@ -6801,7 +6801,7 @@ GAME_CUSTOM( 199?, m4thestr__y,    m4thestr,   "ts_39b_c.1_1", 0x0000, 0x010000,
 
 
 #define M4CPYCAT_EXTRA_ROMS \
-	ROM_REGION( 0x180000, "msm6376", 0 ) \
+	ROM_REGION( 0x180000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "copycatsnd.bin", 0x0000, 0x080000, CRC(cd27a3ce) SHA1(d061fae0ef8584d2e349e91e53f41718128c61e2) )
 
 #undef GAME_CUSTOM
@@ -6867,7 +6867,7 @@ GAME_CUSTOM( 199?, m4cpycat__3,    m4cpycat,   "co_30_kp.4_1", 0x0000, 0x010000,
 
 
 #define M4BNKROL_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "cbrsnd.p1", 0x000000, 0x080000, CRC(3524418a) SHA1(85cf286d9cf97cc9009c0283d632fef2a19f5de2) ) \
 	ROM_LOAD( "cbrsnd.p2", 0x080000, 0x080000, CRC(a53796a3) SHA1(f094f40cc93ea445922a9c5412aa355b7d21b1f4) )
 
@@ -6901,7 +6901,7 @@ GAME_CUSTOM( 199?, m4bnkrol__b,    m4bnkrol,   "br301f.p1", 0x0000, 0x020000, CR
 // boots
 
 #define M4RHRCL_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "rhrcs1.hex", 0x000000, 0x080000, CRC(7e265003) SHA1(3800ddfbdde07bf0af5db5cbe05a85425297fa4a) ) \
 	ROM_LOAD( "rhrcs2.hex", 0x080000, 0x080000, CRC(39843d40) SHA1(7c8efcce4ed4ed53e681680bb33869f14f662609) )
 
@@ -6931,7 +6931,7 @@ GAME_CUSTOM( 199?, m4rhrcl__c,  m4rhrcl,    "rhrc.hex", 0x0000, 0x010000, CRC(e4
 
 
 #define M4RHOGC_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "rhc.s1", 0x000000, 0x080000, CRC(8840737f) SHA1(eb4a4bedfdba1b33fa74b9c2000c0d09a4cca5d7) ) \
 	ROM_LOAD( "rhc.s2", 0x080000, 0x080000, CRC(04eaa2da) SHA1(2c23bde76f6a9406b0cb30246ce8805b5181047f) )
 
@@ -6960,7 +6960,7 @@ GAME_CUSTOM( 199?, m4rhogc__b,  m4rhogc,    "rhcd.p1", 0x0000, 0x010000, CRC(7a7
 // boots
 
 #define M4GB006_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "006snd.p1", 0x000000, 0x080000, CRC(44afef7d) SHA1(d8a4b6dc04e0f337db6d3b5322d066ae5f5bda41) ) \
 	ROM_LOAD( "006snd.p2", 0x080000, 0x080000, CRC(5f3c7cf8) SHA1(500f8fb07ef344d44c062f8d01878df1c917bcfc) )
 
@@ -6990,7 +6990,7 @@ GAME_CUSTOM( 199?, m4gb006__c,  m4gb006,    "bond20_11",    0x0000, 0x010000, CR
 // boots
 
 #define M4CSHENC_EXTRA_ROMS \
-	ROM_REGION( 0x180000, "msm6376", 0 ) \
+	ROM_REGION( 0x180000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "cesnd.p1", 0x000000, 0x080000, CRC(2a10dc1a) SHA1(f6803f6e1fee2b58fe4831f59ddc08ec02792823) ) \
 	ROM_LOAD( "cesnd.p2", 0x080000, 0x080000, CRC(6f0b75c0) SHA1(33898d75a1e51b49950d7843069066d17c4736c5) )
 
@@ -7022,7 +7022,7 @@ GAME_CUSTOM( 199?, m4cshenc__d,    m4cshenc,   "ca_sjb_c.5_1", 0x0000, 0x020000,
 // boots
 
 #define M4RHS_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "rh___snd.1_1", 0x000000, 0x080000, CRC(ceebd8f4) SHA1(fe9f62034aae7d2ec097d80dc471a7fd27ddec8a) ) \
 	ROM_LOAD( "rh___snd.1_2", 0x080000, 0x080000, CRC(1f24cfb6) SHA1(cf1dc9d2a1c1cfb8718c89e245e9bf375fef8bfd) ) \
 	ROM_LOAD( "rh___snd.1_3", 0x100000, 0x080000, CRC(726958d8) SHA1(6373765b80971dd7ff5c8eaeee83966335db4d27) )
@@ -7077,7 +7077,7 @@ GAME_CUSTOM( 199?, m4rhs__l,  m4rhs,  "rocky15t",     0x0000, 0x020000, CRC(3fba
 // boots
 
 #define M4OADRAC_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "oadsnd1.bin", 0x000000, 0x080000, CRC(b9a9b49b) SHA1(261e939da031768e2a2b5b171cbba55c87d1a758) ) \
 	ROM_LOAD( "oadsnd2.bin", 0x080000, 0x080000, CRC(94e34646) SHA1(8787d6757e4ed86417aafac0e042091189974d3b) )
 #undef GAME_CUSTOM
@@ -7112,7 +7112,7 @@ GAME_CUSTOM( 199?, m4oadrac__g,    m4oadrac,   "dr__xb_x.2_1", 0x0000, 0x020000,
 // boots
 
 #define M4TIC_EXTRA_ROMS \
-	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x180000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "ct______.5_a", 0x0000, 0x080000, CRC(9a936f50) SHA1(f3f66d6093a939220d24aee985e210cdfd214db4) )
 
 #undef GAME_CUSTOM
@@ -7168,7 +7168,7 @@ GAME_CUSTOM( 199?, m4tic__r,  m4tic,  "tt_25sbc.3_1", 0x0000, 0x010000, CRC(11c0
 // HOP COIN SENSE ALM (17)
 
 #define M4TICCLA_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "ct______.5_a", 0x0000, 0x080000, CRC(9a936f50) SHA1(f3f66d6093a939220d24aee985e210cdfd214db4) )
 
 #undef GAME_CUSTOM
@@ -7226,7 +7226,7 @@ GAME_CUSTOM( 199?, m4ticcla__0,    m4ticcla,   "ct_30btc.2_1", 0x0000, 0x010000,
 // gives ALM17 (hopper?)
 
 #define M4TICGLC_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "ct______.5_a", 0x0000, 0x080000, CRC(9a936f50) SHA1(f3f66d6093a939220d24aee985e210cdfd214db4) )
 #undef GAME_CUSTOM
 
@@ -7257,7 +7257,7 @@ GAME_CUSTOM( 199?, m4ticglc__d,    m4ticglc,   "tg_30bgc.4_1", 0x0000, 0x010000,
 // boots
 
 #define M4SSCLAS_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "css_____.1_1", 0x0000, 0x080000, CRC(e738fa1e) SHA1(7a1125320e0d488729aec66e658d418b96228fd0) )
 
 #undef GAME_CUSTOM
@@ -7289,7 +7289,7 @@ GAME_CUSTOM( 199?, m4ssclas__a,    m4ssclas,   "cs__x_dx.2_0", 0x0000, 0x010000,
 *****************************************************************************************************************************************************************************/
 
 #define M4SQUID_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "squidsnd.p1", 0x000000, 0x080000, CRC(44cebe30) SHA1(a93f64897b4ba333d044649f28fa5dd68d3d2e94) ) \
 	ROM_LOAD( "squidsnd.p2", 0x080000, 0x080000, CRC(d2a1b073) SHA1(d4931f18d369e89492fe72a7a1c511c8d3c23a71) )
 
@@ -7318,7 +7318,7 @@ GAME_CUSTOM( 199?, m4squid__c,  m4squid,    "sq__xb_x.2_0", 0x0000, 0x020000, CR
 
 
 #define M4CALAMA_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "cala1.hex", 0x000000, 0x080000, CRC(c9768f65) SHA1(a8f2946fdba640033da0e21d4e18293b3fc004bf) ) \
 	ROM_LOAD( "cala2.hex", 0x080000, 0x080000, CRC(56bd2950) SHA1(b109c726514c3ee04c1bbdf5f518f60dfd0375a8) )
 
@@ -7367,7 +7367,7 @@ GAME_CUSTOM( 199?, m4calama__h,    m4calama,   "calamari.cl",  0x0000, 0x020000,
 *****************************************************************************************************************************************************************************/
 
 #define M4COSCAS_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "cc___snd.1_1", 0x000000, 0x080000, CRC(d858f238) SHA1(92a3dfacde8bfa8705e91fab5bb627f9b34ad2dc) ) \
 	ROM_LOAD( "cc___snd.1_2", 0x080000, 0x080000, CRC(bab1bd8e) SHA1(c703d0e24c0a522ebf79895049e85f5471f7d7e9) )
 
@@ -7431,7 +7431,7 @@ GAME_CUSTOM( 199?, m4coscas__a,    m4coscas,   "cosm15g",              0x0000, 0
 // "Wrong Sound, Need V1" but can be bypassed to boot
 
 #define M4DBLDM_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "cddsnd.p1", 0x000000, 0x080000, CRC(e1833e31) SHA1(1486e5afab347d6dee1543a55d1193b7db3c89d7) ) \
 	ROM_LOAD( "cddsnd.p2", 0x080000, 0x080000, CRC(fd33ed2a) SHA1(f68ffadde40f88e7954d4a98bcd7ff023841b55b) )
 
@@ -7460,10 +7460,10 @@ GAME_CUSTOM( 199?, m4dbldm__c,  m4dbldm,    "cdd01.p1",     0x0000, 0x020000, CR
 *****************************************************************************************************************************************************************************/
 
 #define M4SUPBJC_EXTRAS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "sbjsnd1.hex", 0x000000, 0x080000, CRC(70388bec) SHA1(256fa01b57049d73e88b0bb270fccb555b12dfb7) ) \
 	ROM_LOAD( "sbjsnd2.hex", 0x080000, 0x080000, CRC(1d588554) SHA1(48c092ce83d2f881fc217a3d566e896718ad6f24) ) \
-	ROM_REGION( 0x100000, "altmsm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:altmsm6376", 0 ) \
 	ROM_LOAD( "sbj.s1", 0x000000, 0x080000, CRC(9bcba966) SHA1(5ced282aca9d39ebf0828aa19357026d5298e955) ) \
 	ROM_LOAD( "sbj.s2", 0x080000, 0x080000, CRC(1d588554) SHA1(48c092ce83d2f881fc217a3d566e896718ad6f24) )
 
@@ -7512,7 +7512,7 @@ GAME(199?, m4supbjcd, m4supbjc,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::m
 *****************************************************************************************************************************************************************************/
 
 #define M4CRJWL2_EXTRAS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "cjcs1.hex", 0x000000, 0x080000, CRC(2ac3ba9f) SHA1(3332f29f81918c34aeec3da6f7d001dc9922840d) ) \
 	ROM_LOAD( "cjcs2.hex", 0x080000, 0x080000, CRC(89838a9d) SHA1(502243cc0a14e63882b537f05c4cc0eb852e4a0c) )
 
@@ -7577,7 +7577,7 @@ GAME(199?, m4crjwlc,  m4crjwl2,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::d
 *****************************************************************************************************************************************************************************/
 
 #define M4LAZY_EXTRAS \
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "lazybones.sound", 0x000000, 0x080000, NO_DUMP ) \
 
 
@@ -7616,7 +7616,7 @@ ROM_START( m4brook )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "brkl10.epr", 0x0000, 0x010000, CRC(857255b3) SHA1(cfd77918a19b2532a02b8bb3fa8e2716db31fb0e) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "generic_dutch_sound2.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
 ROM_END
 
@@ -7632,7 +7632,7 @@ GAME(1998, m4brook,   0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::p
 
 
 #define M4CHASEI_EXTRAS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "cha.s1", 0x000000, 0x080000, CRC(8200b6bc) SHA1(bcc4ffbddcdcc1dd994fe29e9b24e83272f59442) ) \
 	ROM_LOAD( "cha.s2", 0x080000, 0x080000, CRC(542863fa) SHA1(501d66b2badb5036bb5dd8bac3cdb681f630a982) )
 
@@ -7697,7 +7697,7 @@ GAME(199?, m4chaseig, m4chasei,   mod4oki_bootleg_fixedret<0x1d>(R5, RT2, LPS), 
 *****************************************************************************************************************************************************************************/
 
 #define M4FORTCB_EXTRAS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "cfosnd.p1", 0x000000, 0x080000, CRC(74bbf913) SHA1(52ddc89ab34b11ede2c0e9b9b27e119b0c1eb2d9) ) \
 	ROM_LOAD( "cfosnd.p2", 0x080000, 0x080000, CRC(1b2bb79a) SHA1(5f19ea000f34bb404ed6c8ea5ec7b809ccb1ae36) )
 
@@ -7732,7 +7732,7 @@ GAME(199?, m4fortcbb, m4fortcb,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::f
 *****************************************************************************************************************************************************************************/
 
 #define M4CLBVEG_EXTRAS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "cvegass1.hex", 0x000000, 0x080000, CRC(13a8c857) SHA1(c66e10bca1ad54f467b9c5eacd502c54397c09b2) ) \
 	ROM_LOAD( "cvegass2.hex", 0x080000, 0x080000, CRC(88b37145) SHA1(1c6c9ad2010e1688d3370d1f2a5ae83dc683b500) )
 
@@ -7773,7 +7773,7 @@ GAME(199?, m4clbvegc, m4clbveg,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::c
 *****************************************************************************************************************************************************************************/
 
 #define M4CLBX_EXTRAS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "cxs1.hex", 0x000000, 0x080000, CRC(4ce005f1) SHA1(ee0f59a9c7e0222dd63fa63ccff8f194abd01ddb) ) \
 	ROM_LOAD( "cxs2.hex", 0x080000, 0x080000, CRC(495e0730) SHA1(7ba8150fbcf974ac494a82fd373ff02185543e35) )
 
@@ -7809,7 +7809,7 @@ GAME(199?, m4clbxb,   m4clbx,     mod4oki_cheatchr_pal<mpu4_characteriser_pal::v
 
 
 #define M4CRZJWL_EXTRAS \
-	ROM_REGION( 0x180000, "msm6376", 0 ) \
+	ROM_REGION( 0x180000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "cjsound1.bin", 0x000000, 0x080000, CRC(b023f6b9) SHA1(04c362c6511442d3ab775a5ff2051bfe26d5e624) ) \
 	ROM_LOAD( "cjsound2.bin", 0x080000, 0x080000, CRC(02563a43) SHA1(dfcee4e0fdf81c726c8e13278e7950459bcaab18) ) \
 	ROM_LOAD( "cjsound3.bin", 0x100000, 0x080000, CRC(e722e438) SHA1(070f3772920fa64d5214843c313b27a5b2a4c105) )
@@ -7892,7 +7892,7 @@ GAME(199?, m4cjdlx,   0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m
 *****************************************************************************************************************************************************************************/
 
 #define M4SSB4_EXTRAS \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "b25_v1_2.sound", 0x000000, 0x080000, NO_DUMP ) \
 
 ROM_START( m4sunseta )
@@ -7925,7 +7925,7 @@ ROM_START( m4magtbo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "crmtb14.epr", 0x0000, 0x010000, CRC(79e1746c) SHA1(794317f3aba7b1a7994cde89d81abc2b687d0821) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "generic_dutch_sound2.bin", 0x000000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
 ROM_END
 
@@ -7971,7 +7971,7 @@ GAME(199?, m4magtbo,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::t
 *****************************************************************************************************************************************************************************/
 
 #define M4BRNZE_EXTRAS \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "bv5_v2_1.sound", 0x000000, 0x080000, NO_DUMP ) \
 
 ROM_START( m4brnze )
@@ -8006,7 +8006,7 @@ ROM_START( m4prem )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dpm14.bin", 0x0000, 0x010000, CRC(de344759) SHA1(d3e7514da83bbf1eba63661fb0675a6230af93cd) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "dpms.bin", 0x0000, 0x080000, CRC(93fd4253) SHA1(69feda7ffc56defd515c9cd1ce204af3d9731a3f) )
 ROM_END
 
@@ -8022,7 +8022,7 @@ ROM_START( m4rdht )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "drh12", 0x0000, 0x010000, CRC(b26cd308) SHA1(4e29f6cce773232a1c43cd2fb3ce9b844c446bb8) ) // aka gdjb
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "drh_1.snd", 0x0000, 0x080000, CRC(f652cd0c) SHA1(9ce986bc12bcf22a57e065329e82671d19cc96d7) ) // aka gn.snd
 ROM_END
 
@@ -8038,7 +8038,7 @@ ROM_START( m4rwb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "drw14.bin", 0x0000, 0x010000, CRC(22c30ebe) SHA1(479f66732aac56dae60c80d11f05c084865f9389) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "rwb_1.snd", 0x000000, 0x080000, CRC(e0a6def5) SHA1(e3867b83e588fd6a9039b8d45186480a9d0433ea) )
 	ROM_LOAD( "rwb_2.snd", 0x080000, 0x080000, CRC(54a2b2fd) SHA1(25875ff873bf22df510e7a4c56c336fbabcbdedb) )
 ROM_END
@@ -8055,7 +8055,7 @@ ROM_START( m4amhiwy )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dah20", 0x0000, 0x010000, CRC(e3f92f00) SHA1(122c8a429a1f75dac80b90c4f218bd311813daf5) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "sdr6_1.snd", 0x000000, 0x080000, CRC(63ad952d) SHA1(acc0ac3898fcc281e2d7ba19ada52d727885fe06) )
 	ROM_LOAD( "sdr6_2.snd", 0x080000, 0x080000, CRC(48d2ace5) SHA1(ada0180cc60266c0a6d981a019d66bbedbced21a) )
 ROM_END
@@ -8073,7 +8073,7 @@ ROM_START( m4roadrn )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dro19", 0x0000, 0x010000, CRC(8b591766) SHA1(df156390b427e31cdda64826a6c1d2457c915f25) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "dro_1.snd", 0x000000, 0x080000, CRC(895cfe63) SHA1(02134e149cef3526bbdb6cb93ef3efa283b9d6a2) )
 	ROM_LOAD( "dro_2.snd", 0x080000, 0x080000, CRC(1d5c8d4f) SHA1(15c18ae7286807cdc0feb825b958eae808445690) )
 ROM_END
@@ -8090,7 +8090,7 @@ ROM_START( m4salsa )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dsa15.epr", 0x0000, 0x010000, CRC(22b60b0b) SHA1(4ad184d1557bfd01650684ea9d8ad794fded65f7) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "dsa_1@97c2.snd", 0x0000, 0x080000, CRC(0281a6dd) SHA1(a35a8cd0da32c51f77856ea3eeff7c58fd032333) )
 ROM_END
 
@@ -8107,7 +8107,7 @@ ROM_START( m4ceptr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dce10.bin", 0x0000, 0x010000, CRC(c94d41ef) SHA1(58fdff2de8dd3ead3980f6f34362183d084ce917) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 ) // These are from Place Your Bets (incorrect?)
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) // These are from Place Your Bets (incorrect?)
 	ROM_LOAD( "cepsnd.p1", 0x000000, 0x080000, BAD_DUMP CRC(3a91784a) SHA1(7297ccec3264aa9f1e7b3a2841f5f8a1e4ca6c54) )
 	ROM_LOAD( "cepsnd.p2", 0x080000, 0x080000, BAD_DUMP CRC(a82f0096) SHA1(45b6b5a2ae06b45add9cdbb9f5e6f834687b4902) )
 ROM_END
@@ -8124,7 +8124,7 @@ ROM_START( m4blkwhd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dbw11.bin", 0x0000, 0x010000, CRC(337aaa2c) SHA1(26b12ea3ada9668293c6b44d62458590e5b4ac8f) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "generic_dutch_sound1.bin", 0x0000, 0x080000, CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) )
 ROM_END
 
@@ -8142,7 +8142,7 @@ ROM_START( m4frtgm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "fruit.bin", 0x0000, 0x010000, CRC(dbe44316) SHA1(15cd49dd2e6166f7a7668663f7fea802d6cbb12f) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "generic_dutch_sound1.bin", 0x0000, 0x080000, BAD_DUMP CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) )
 ROM_END
 
@@ -8160,7 +8160,7 @@ ROM_START( m4exgam )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "czep30.bin", 0x0000, 0x010000, CRC(4614e6f6) SHA1(5602a68e9b47394cb31bbcd49a9920e19af6242f) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "generic_dutch_sound2.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
 ROM_END
 
@@ -8177,7 +8177,7 @@ ROM_START( m4ringfr )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "rof03s.p1", 0x0000, 0x020000, CRC(4b4703fe) SHA1(853ce1f5932e09af2b5f3b5314709f13aa35cf19) )
 
-	ROM_REGION( 0x080000, "msm6376", 0 )
+	ROM_REGION( 0x080000, "okicard:msm6376", 0 )
 	ROM_LOAD( "sounds.bin", 0x0000, 0x080000, NO_DUMP )
 ROM_END
 
@@ -8195,7 +8195,7 @@ ROM_START( m4bluedm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dbd10.bin", 0x0000, 0x010000, CRC(b75e319d) SHA1(8b81e852e318cfde1f5ff2123e1ef7076b208253) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "bdsnd.bin", 0x0000, 0x080000, BAD_DUMP CRC(8ac4aae6) SHA1(70dba43b398010a8bd0d82cf91553d3f5e0921f0) ) // also on m4hpyjok, probably wrong here?
 ROM_END
 
@@ -8211,7 +8211,7 @@ ROM_START( m4hpyjok )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dhj12", 0x0000, 0x010000, CRC(982439d7) SHA1(8d27fcecf7a6a7fd774678580074f945675758f4) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "dhjsnd", 0x0000, 0x080000, CRC(8ac4aae6) SHA1(70dba43b398010a8bd0d82cf91553d3f5e0921f0) )
 ROM_END
 
@@ -8228,7 +8228,7 @@ ROM_START( m4gnsmk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dgu16", 0x0000, 0x010000, CRC(6aa23345) SHA1(45e129ec95b1a796f334bedd08469f2ab47a18f8) )
 
-	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 )
 	ROM_LOAD( "sdgu01.s1", 0x000000, 0x080000, CRC(bfb284a2) SHA1(860b98d54a3180fbb00b7b03feae049fb4cf9d7f) )
 	ROM_LOAD( "sdgu01.s2", 0x080000, 0x080000, CRC(1a46ba28) SHA1(d7154e5f92be8631207620eb313b28990c6a1c7f) )
 	ROM_LOAD( "sdgu01.s3", 0x100000, 0x080000, CRC(88bffcf4) SHA1(1da853193f6a22889edff5aafd9440c676a82ea6) )
@@ -8249,7 +8249,7 @@ ROM_START( m4oldtmr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dot11.bin",  0x00000, 0x10000,  CRC(da095666) SHA1(bc7654dc9da1f830a43f925db8079f27e18bb61e))
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "generic_dutch_sound1.bin", 0x0000, 0x080000, CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) )
 ROM_END
 
@@ -8265,7 +8265,7 @@ ROM_START( m4twintm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "d2t11.bin", 0x0000, 0x010000, CRC(6a76ac6f) SHA1(824912ff1fc3155d11d32b597be53481532fdf5e) )
 
-	ROM_REGION( 0x080000, "msm6376", 0 )
+	ROM_REGION( 0x080000, "okicard:msm6376", 0 )
 	ROM_LOAD( "generic_dutch_sound2.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
 ROM_END
 
@@ -8281,7 +8281,7 @@ ROM_START( m4holdtm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dht10.hex", 0x0000, 0x010000, CRC(217d382b) SHA1(a27dd107c554d4787967633dff998d3962ee0ea5) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "generic_dutch_sound2.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
 ROM_END
 
@@ -8297,7 +8297,7 @@ ROM_START( m4showtm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dsh13.bin", 0x0000, 0x010000, CRC(4ce40ff1) SHA1(f145d6c8e926ca4368d43dacda0fa38615988d84) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "generic_dutch_sound1.bin", 0x0000, 0x080000, CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) )
 ROM_END
 
@@ -8313,7 +8313,7 @@ ROM_START( m4steptm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dst11.bin", 0x0000, 0x010000, CRC(3960f210) SHA1(c7c4fe74cb9a53eaa9114a84240de3bce4ffe75e) )
 
-	ROM_REGION( 0x080000, "msm6376", 0 )
+	ROM_REGION( 0x080000, "okicard:msm6376", 0 )
 	ROM_LOAD( "generic_dutch_sound2.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
 ROM_END
 
@@ -8329,7 +8329,7 @@ ROM_START( m4wildtm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "wildtimer.bin", 0x0000, 0x010000, CRC(5bd54924) SHA1(23fcf13c52ee7b9b39f30f999a9102171fffd642) )
 
-	ROM_REGION( 0x080000, "msm6376", 0 )
+	ROM_REGION( 0x080000, "okicard:msm6376", 0 )
 	ROM_LOAD( "generic_dutch_sound2.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
 ROM_END
 
@@ -8342,7 +8342,7 @@ GAME(199?, m4wildtm,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::w
 *****************************************************************************************************************************************************************************/
 
 #define M4TOPTIM_EXTRAS \
-	ROM_REGION( 0x080000, "msm6376", 0 ) \
+	ROM_REGION( 0x080000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "generic_dutch_sound2.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
 
 ROM_START( m4toptim )
@@ -8370,7 +8370,7 @@ ROM_START( m4maglin )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dma21.bin", 0x0000, 0x010000, CRC(836a25e6) SHA1(5f83bb8a2c77dd3b02724c076d6b37d2c1c93b93) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "mlsound1.p1", 0x000000, 0x080000, CRC(ff8749ff) SHA1(509b53f09cdfe5ee865e60ab42fd578586ac53ea) )
 	ROM_LOAD( "mlsound2.p2", 0x080000, 0x080000, CRC(c8165b6c) SHA1(7c5059ee8630da31fc3ad50d84a4730297757d46) )
 ROM_END
@@ -8387,7 +8387,7 @@ ROM_START( m4magrep )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dmr13.bin", 0x0000, 0x010000, CRC(c3015da3) SHA1(23cd505eedf666c012e4064a5fcf5a983f098e83) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "mrdsound.bin", 0x000000, 0x080000, CRC(9b035fa6) SHA1(51b7e5bc3abdf4f1beba2347146a91a2b3f4de35) ) // also in m4luckdvd
 ROM_END
 
@@ -8403,7 +8403,7 @@ ROM_START( m4univ )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dun20", 0x0000, 0x010000, CRC(6a845d4d) SHA1(82bfc3f3a0ede76a4d482efc71b0390610db7acf) )
 
-	ROM_REGION( 0x080000, "msm6376", 0 )
+	ROM_REGION( 0x080000, "okicard:msm6376", 0 )
 	ROM_LOAD( "generic_dutch_sound2.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
 ROM_END
 
@@ -8420,7 +8420,7 @@ ROM_START( m4vivalvd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dlv11.bin", 0x0000, 0x010000, CRC(a890184c) SHA1(26d9952bf2eb4b55d21cdb934ffc73ff1a1cfbac) )
 
-	ROM_REGION( 0x080000, "msm6376", 0 )
+	ROM_REGION( 0x080000, "okicard:msm6376", 0 )
 	ROM_LOAD( "dpms.bin", 0x0000, 0x080000, BAD_DUMP CRC(93fd4253) SHA1(69feda7ffc56defd515c9cd1ce204af3d9731a3f) ) // same as m4prem (incorrect?)
 ROM_END
 
@@ -8436,7 +8436,7 @@ GAME(199?, m4vivalvd, 0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::p
 *****************************************************************************************************************************************************************************/
 
 #define M4TECHNO_EXTRAS \
-	ROM_REGION( 0x080000, "msm6376", 0 ) \
+	ROM_REGION( 0x080000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "generic_redhotroll_sound1.bin", 0x0000, 0x080000, BAD_DUMP CRC(3e80f8bd) SHA1(2e3a195b49448da11cc0c089a8a9b462894c766b) )
 
 ROM_START( m4techno )
@@ -8462,7 +8462,7 @@ GAME(199?, m4technoa, m4techno,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::t
 *****************************************************************************************************************************************************************************/
 
 #define M4TBPLAY_EXTRAS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "dtps10_1", 0x000000, 0x080000, CRC(d1d2c981) SHA1(6a4940248b0bc8df0a9de0d60e98cfebf1962504) ) \
 	ROM_LOAD( "dtps20_1", 0x080000, 0x080000, CRC(f77c4f39) SHA1(dc0e056f4d8c00824b3e672a02da64613bbf204e) )
 
@@ -8515,7 +8515,7 @@ ROM_START( m4luckdvd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dld13", 0x0000, 0x010000, CRC(b8ceb29b) SHA1(84b6ebad300214610635fb8141d18de2b7065435) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "sdld01.snd", 0x000000, 0x080000, BAD_DUMP CRC(9b035fa6) SHA1(51b7e5bc3abdf4f1beba2347146a91a2b3f4de35) ) // also in m4magrep
 ROM_END
 
@@ -8532,7 +8532,7 @@ ROM_START( m4gldjok )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dgj12.bin", 0x0000, 0x010000, CRC(93ee0c35) SHA1(5ae67b14f7f3d8528fa106519a8a27437c997a70) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "sdgj.snd", 0x0000, 0x080000, CRC(b6cd118b) SHA1(51c5d694ed0dfde8d3fd682f2471d83eec236736) )
 ROM_END
 
@@ -8549,7 +8549,7 @@ ROM_START( m4blkcat )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dbl14.bin", 0x0000, 0x010000, CRC(c5db9532) SHA1(309b5122b4a1cb33bbccfb97faf4fa996d29432e) )
 
-	ROM_REGION( 0x080000, "msm6376", 0 )
+	ROM_REGION( 0x080000, "okicard:msm6376", 0 )
 	ROM_LOAD( "dblcsnd.bin", 0x0000, 0x080000, CRC(c90fa8ad) SHA1(a98f03d4b6f5892333279bff7537d4d6d887da62) )
 
 //  ROM_REGION( 0x200000, "msm6376_alt", 0 ) // bad dump of some sound rom? - just dblcsnd.bin in hex format!
@@ -8569,7 +8569,7 @@ ROM_START( m4riotrp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "drt10.bin", 0x0000, 0x010000, CRC(a1badb8a) SHA1(871786ea4e65ecbf61c9a776100321253922d11e) )
 
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "dblcsnd.bin", 0x0000, 0x080000, CRC(c90fa8ad) SHA1(a98f03d4b6f5892333279bff7537d4d6d887da62) )
 ROM_END
 
@@ -8587,7 +8587,7 @@ ROM_START( m4luck7 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dl716.bin", 0x0000, 0x010000, CRC(141b23a9) SHA1(3bfb82ea0ee4104bd8739b545aba617f84bef770) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "dl7snd.bin", 0x0000, 0x080000, CRC(c90fa8ad) SHA1(a98f03d4b6f5892333279bff7537d4d6d887da62) )
 ROM_END
 
@@ -8610,7 +8610,7 @@ ROM_START( m4royjwl )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "rj.bin", 0x0000, 0x020000, CRC(3ffbe4a8) SHA1(47a0309cc9ff315ad9f64e6855863409443e94e2) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "rj_sound1.bin", 0x000000, 0x080000, CRC(443c4901) SHA1(7b3c6737b47dfe04c072f0e157d83c09340c3f9b) )
 	ROM_LOAD( "rj_sound2.bin", 0x080000, 0x080000, CRC(9456523e) SHA1(ea1b6bf16b7d1015c188ad83760336d9851de391) )
 ROM_END
@@ -8627,7 +8627,7 @@ ROM_START( m4nile )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "gjn08.p1", 0x0000, 0x020000, CRC(2bafac0c) SHA1(363d08f798b5bea409510b1a9415098a69f19ee0) )
 
-	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 )
 	ROM_LOAD( "gjnsnd.p1", 0x000000, 0x080000, CRC(1d839591) SHA1(2e4ba74f96e7c0592b85409a3f50ec81e00e064c) )
 	ROM_LOAD( "gjnsnd.p2", 0x080000, 0x080000, CRC(e2829c42) SHA1(2139c1625ad163cce99a522c2cf02ee47a8f9007) )
 	ROM_LOAD( "gjnsnd.p3", 0x100000, 0x080000, CRC(db084eb4) SHA1(9b46a3cb16974942b0edd25b1b080d30fc60c3df) )
@@ -8646,7 +8646,7 @@ ROM_START( m4vegastg )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "vs.p1", 0x0000, 0x020000, CRC(4099d572) SHA1(91a7c1575013e61c754b2c2cb841e7687b76d7f9) )
 
-	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 )
 	ROM_LOAD( "vssound.bin", 0x0000, 0x16ee37, CRC(456da6be) SHA1(f0e293f0a383878b581326f869c2e49bec61d0c5) )
 ROM_END
 
@@ -8663,7 +8663,7 @@ ROM_START( m4ordmnd )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "rab01.p1", 0x0000, 0x020000, CRC(99964fe7) SHA1(3745d09e7a4f417c8e85270d3ffec3e37ee1344d) )
 
-	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 )
 	ROM_LOAD( "odsnd1.bin", 0x000000, 0x080000, CRC(d746bae4) SHA1(293e1dc9edf88a183cc23dbb4576cefbc8f9d028) )
 	ROM_LOAD( "odsnd2.bin", 0x080000, 0x080000, CRC(84ace1f4) SHA1(9cc70e59e9d26006870ea1cc522de33e71b71692) )
 	ROM_LOAD( "odsnd3.bin", 0x100000, 0x080000, CRC(b1b12def) SHA1(d8debf8cfb3af2157d5d1571927588dc1c8d07b6) )
@@ -8682,7 +8682,7 @@ ROM_START( m4vivan )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "vlv.bin", 0x0000, 0x010000, CRC(f20c4858) SHA1(94bf19cfa79a1f5347ab61a80cbbce06942187a2) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "vlvsound1.bin", 0x000000, 0x080000, CRC(ce4da47a) SHA1(7407f8053ee482db4d8d0732fdd7229aa531b405) )
 	ROM_LOAD( "vlvsound2.bin", 0x080000, 0x080000, CRC(571c00d1) SHA1(5e7be40d3caae88dc3a580415f8ab796f6efd67f) )
 ROM_END
@@ -8698,7 +8698,7 @@ GAME( 199?, m4vivan,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::p
 ROM_START( m4spotln )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "gsp01.p1", 0x0000, 0x020000, CRC(54c56a07) SHA1(27f21872a7ffe0c497983fa5bbb59e967bf48974) )
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "gsp01.snd", 0x000000, 0x080000, NO_DUMP )
 ROM_END
 
@@ -8715,7 +8715,7 @@ ROM_START( m4goldnn )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "goldenyears10.bin", 0x0000, 0x020000, CRC(1074bac6) SHA1(967ee64f267a80017fc95bbc6c5a38354e9cab65) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "tgyosnd.p1", 0x000000, 0x080000, CRC(bda49b46) SHA1(fac143003641824bf0db4ac6841292e509fa00da) )
 	ROM_LOAD( "tgyosnd.p2", 0x080000, 0x080000, CRC(43d28a0a) SHA1(5863e493e84641e4fabcd69e6402e3bcca87dde2) )
 	ROM_LOAD( "tgyosnd.p3", 0x100000, 0x080000, CRC(b5b9eb68) SHA1(8d5a0a687dd7096da8dfd2a59c6fe96f4b1949f9) )
@@ -8735,7 +8735,7 @@ ROM_START( m4hilonv )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "hnc02.p1", 0x0000, 0x020000, CRC(33a8022b) SHA1(5168b8f32630aa2cb56f30c941695f1728e4fb7a) )
 
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "hnc02.snd", 0x000000, 0x080000, NO_DUMP )
 ROM_END
 
@@ -8753,7 +8753,7 @@ ROM_START( m4octo )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "oct03.p1", 0x0000, 0x020000, CRC(8df66e94) SHA1(e1ab93982846d83becae36b5814ebbd515b9078e) )
 
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "oct03.snd", 0x000000, 0x080000, NO_DUMP )
 ROM_END
 
@@ -8770,7 +8770,7 @@ ROM_START( m4bigban )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "big04.p1", 0x0000, 0x020000, CRC(f7ead9c6) SHA1(46c10abb892cb6d427ad508aae96752c14b4cb83) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "big04.snd", 0x000000, 0x080000, NO_DUMP )
 ROM_END
 
@@ -8787,7 +8787,7 @@ ROM_START( m4crzcsn )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "crz03.bin", 0x0000, 0x020000, CRC(48610c4f) SHA1(a62ac8b3ee704ee4e98f9d56bfc723d4cbb25b54) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "crz03.snd", 0x000000, 0x080000, NO_DUMP )
 ROM_END
 
@@ -8804,7 +8804,7 @@ ROM_START( m4crzcav )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "gcv05.p1", 0x0000, 0x020000, CRC(b9ba46f6) SHA1(78b745d85b36444c39747982987088a772b20a7e) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "gcv05.snd", 0x000000, 0x080000, NO_DUMP )
 ROM_END
 
@@ -8821,7 +8821,7 @@ ROM_START( m4dragon )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "dgl01.p1", 0x0000, 0x020000, CRC(d7d39c9b) SHA1(5350c9db549edee30815516b1ce74a018390ff3d) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "dgl01.snd", 0x000000, 0x080000, NO_DUMP )
 ROM_END
 
@@ -8836,7 +8836,7 @@ GAME(199?, m4dragon,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m
 
 
 #define M4DRAC_EXTRAS \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_REGION( 0x200000, "okicard:msm6376", 0 ) \
 	ROM_LOAD( "drasnd.p1", 0x000000, 0x080000, CRC(54c3821c) SHA1(1fcc62e2b127dd7f1d5d27a3afdf56dc27f122f8) ) \
 	ROM_LOAD( "drasnd.p2", 0x080000, 0x080000, CRC(9096d2bc) SHA1(1b4c530b7b0fde869980d519255e2585c5461e13) ) \
 	ROM_LOAD( "drasnd.p3", 0x100000, 0x080000, CRC(a07f412b) SHA1(cca8f5cfe620ece45ca40bf801f0643cd76547e9) ) \
@@ -8876,7 +8876,7 @@ ROM_START( m4joljokh )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jollyjokerhungarian.bin", 0x0000, 0x010000, CRC(85b6a406) SHA1(e277f9d3b62faead04d65efbc06de7f4a50ae38d) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "jollyjokerhungariansnd.bin", 0x0000, 0x080000, CRC(93460383) SHA1(2b179a1dde09ebdfe8c84641899df7be87d443e5) )
 ROM_END
 
@@ -8896,7 +8896,7 @@ ROM_START( m4jok300a )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "cjo", 0x0000, 0x020000, CRC(386e99db) SHA1(5bb0b513ef63ffaedd98b8e9e7206658fe784fda) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "generic_dutch_sound1.bin", 0x0000, 0x080000, BAD_DUMP CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) )
 ROM_END
 
@@ -8904,7 +8904,7 @@ ROM_START( m4jok300 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "cjm03.epr", 0x0000, 0x020000, CRC(e5e4986e) SHA1(149b950a739ad308f7759927c344de8193ce67c5) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "generic_dutch_sound1.bin", 0x0000, 0x080000, BAD_DUMP CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) )
 ROM_END
 
@@ -8921,7 +8921,7 @@ ROM_START( m4mgpn )
 	ROM_REGION( 0x010000, "maincpu", 0 )
 	ROM_LOAD( "mgp15.p1", 0x0000, 0x010000, CRC(ec76233f) SHA1(aa8595c639c83026d7fe5c3a161f8b08ff9a8b46) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "mgpsnd.p1", 0x000000, 0x080000, CRC(d5f0b845) SHA1(6d97d0d4d07407bb0a51e1d62da95c664418a9e9) )
 	ROM_LOAD( "mgpsnd.p2", 0x080000, 0x080000, CRC(cefeea06) SHA1(45142ca1bab898dc6f3c32e382ee9157132810a6) )
 	ROM_LOAD( "mgpsnd.p3", 0x100000, 0x080000, CRC(be4b3bd0) SHA1(f14c08dc770a24db8bbd00a65d3edf6ee9895ca3) )
@@ -8940,7 +8940,7 @@ ROM_START( m4luckdv )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cld_16.bin", 0x0000, 0x010000, CRC(89f63938) SHA1(8d3a5628e2c0bf39784afe2f00a007d40ea35423) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "generic_dutch_sound1.bin", 0x000000, 0x080000, BAD_DUMP CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) )
 	ROM_LOAD( "generic_dutch_sound2.bin", 0x080000, 0x080000, BAD_DUMP CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
 ROM_END
@@ -8958,7 +8958,7 @@ ROM_START( m4sctagt )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "gse3_0.p1", 0x0000, 0x010000, CRC(eff705ff) SHA1(6bf96872ef4bcc8f8041c5384d892f072c72be2b) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "generic_dutch_sound1.bin", 0x000000, 0x080000, BAD_DUMP CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) )
 ROM_END
 
@@ -8987,7 +8987,7 @@ ROM_START( m4esctbg )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "ma-15_b-1925-94_esc_1.6a_n-1270.rom1", 0x0000, 0x10000, CRC(6fa2a0ef) SHA1(3b60b545e417a45e61e3babbe27758a053ced926) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "escsnd_0.2_p1.rom2", 0x000000, 0x080000, CRC(2f6517bc) SHA1(b39a4fa17d3e373b7a89663668529d752e595641) )
 	ROM_LOAD( "escsnd_0.2_p2.rom3", 0x080000, 0x080000, CRC(3b0b9fed) SHA1(5a03be7f3a7f40252cfec5f719a845d175e3995c) )
 
@@ -9002,7 +9002,7 @@ ROM_START( m4esctbga )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "ma-15_b-1925-94_esc_1.6a_n-1269.rom1", 0x0000, 0x10000, CRC(8c3f1cf3) SHA1(0e7961bacc4ba701efbbd1ee99b2a72422f96b07) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "escsnd_0.2_p1.rom2", 0x000000, 0x080000, CRC(2f6517bc) SHA1(b39a4fa17d3e373b7a89663668529d752e595641) )
 	ROM_LOAD( "escsnd_0.2_p2.rom3", 0x080000, 0x080000, CRC(3b0b9fed) SHA1(5a03be7f3a7f40252cfec5f719a845d175e3995c) )
 
@@ -9017,7 +9017,7 @@ ROM_START( m4esctbgb )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "ma-15_b-1925-94_esc_1.6a_n-1268.rom1", 0x0000, 0x10000, CRC(d2b47707) SHA1(65096835d94242a5c07b266b8561a9e0d9f95e36) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 )
 	ROM_LOAD( "escsnd_0.2_p1.rom2", 0x000000, 0x080000, CRC(2f6517bc) SHA1(b39a4fa17d3e373b7a89663668529d752e595641) )
 	ROM_LOAD( "escsnd_0.2_p2.rom3", 0x080000, 0x080000, CRC(3b0b9fed) SHA1(5a03be7f3a7f40252cfec5f719a845d175e3995c) )
 
@@ -9038,7 +9038,7 @@ GAME(1994, m4esctbgb, m4esctbg,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::m
 ROM_START( m4nod )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nod.bin", 0x0000, 0x010000, CRC(bc738af5) SHA1(8df436139554ccfb48c4db0a32e3333dbf3c4f46) )
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "nodsnd.bin", 0x0000, 0x080000, CRC(2134494a) SHA1(3b665bf79567a71195b20e76c50b02707d15b78d) )
 ROM_END
 
@@ -9049,7 +9049,7 @@ GAME( 199?, m4nod,    0,          mod4oki(R4, RT1),    mpu4,    mpu4mod4oki_mach
 
 
 #define M4LUCKWB_EXTRAS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) /* these are all different sound roms... */  \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) /* these are all different sound roms... */  \
 	ROM_LOAD( "lwbs3.bin", 0x0000, 0x07dc89, CRC(ee102376) SHA1(3fed581a4654acf285dd430fbfbac33cd67411b8) ) \
 	ROM_LOAD( "lwbs7.bin", 0x0000, 0x080000, CRC(5d4177c7) SHA1(e13f145885bb719b0021ae4ce289261a3eaa2e18) ) \
 	ROM_LOAD( "lwbs8.bin", 0x0000, 0x080000, CRC(187cdf5b) SHA1(87ec189af27c95f278a7531ec13df53a08889af8) ) \

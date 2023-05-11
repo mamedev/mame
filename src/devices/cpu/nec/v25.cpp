@@ -258,7 +258,7 @@ void v25_common_device::nec_interrupt(unsigned int_num, int /*INTSOURCES*/ sourc
 				logerror("%06x: BRKS executed with no decryption table\n",PC());
 			break;
 		case INT_IRQ:   /* get vector */
-			int_num = standard_irq_callback(0);
+			int_num = standard_irq_callback(0, PC());
 			break;
 		default:
 			break;
@@ -451,7 +451,10 @@ void v25_common_device::external_int()
 				m_IRQS = vector;
 				m_ISPR |= (1 << i);
 				if (m_bankswitch_irq & source)
+				{
+					debugger_exception_hook(vector);
 					nec_bankswitch(i);
+				}
 				else
 					nec_interrupt(vector, source);
 			}

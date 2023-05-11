@@ -30,6 +30,8 @@ Test Paste:
 #include "bob85.lh"
 
 
+namespace {
+
 class bob85_state : public driver_device
 {
 public:
@@ -255,6 +257,9 @@ ROM_START( bob85 )
 	ROM_REGION( 0x0300, "maincpu", 0 )
 	ROM_LOAD( "bob85.rom", 0x0000, 0x0300, BAD_DUMP CRC(adde33a8) SHA1(00f26dd0c52005e7705e6cc9cb11a20e572682c6) ) // should be 6 separate 74S287's (256x4)
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

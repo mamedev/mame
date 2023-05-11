@@ -115,7 +115,7 @@ OP80( 0x72, i_movmd ) { PutMemB(DS0, Wreg(BW), Breg(DH)); CLK(1); }
 OP80( 0x73, i_movme ) { PutMemB(DS0, Wreg(BW), Breg(DL)); CLK(1); }
 OP80( 0x74, i_movmh ) { PutMemB(DS0, Wreg(BW), Breg(BH)); CLK(1); }
 OP80( 0x75, i_movml ) { PutMemB(DS0, Wreg(BW), Breg(BL)); CLK(1); }
-OP80( 0x76, i_hlt   ) { logerror("%06x: HALT\n",PC()); m_halted=1; m_icount=0; }
+OP80( 0x76, i_hlt   ) { m_halted=1; m_icount=0; }
 OP80( 0x77, i_movma ) { PutMemB(DS0, Wreg(BW), Breg(AL)); CLK(1); }
 OP80( 0x78, i_movab ) { Breg(AL) = Breg(CH); CLK(1); }
 OP80( 0x79, i_movac ) { Breg(AL) = Breg(CL); CLK(1); }

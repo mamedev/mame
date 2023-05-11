@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino
-#ifndef MAME_INCLUDES_TSAMURAI_H
-#define MAME_INCLUDES_TSAMURAI_H
+#ifndef MAME_TAITO_TSAMURAI_H
+#define MAME_TAITO_TSAMURAI_H
 
 #pragma once
 
@@ -175,4 +175,4 @@ private:
 	int m_sound_command3 = 0;
 };
 
-#endif // MAME_INCLUDES_TSAMURAI_H
+#endif // MAME_TAITO_TSAMURAI_H

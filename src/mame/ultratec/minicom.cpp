@@ -44,6 +44,9 @@ Segment data is sent to each 14seg digit by first writing half of the data to po
 #include "cpu/mcs51/mcs51.h"
 #include "minicom.lh"
 
+
+namespace {
+
 class minicom_state : public driver_device
 {
 public:
@@ -248,6 +251,9 @@ ROM_START( mcom4_02 )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "ultratec_minicom_iv_20020419.rom",  0x0000, 0x2000, CRC(99b6cc35) SHA1(32577005bf02042f893c8880f8ce5b3d8a5f55f9) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS          INIT          COMPANY     FULLNAME                   FLAGS
 COMP( 1997, minicom,  0,      0,      minicom, 0,     minicom_state, init_minicom, "Ultratec", "Minicom IV (1997-08-11)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND ) // fw release data: 11th Aug 1997

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria, Ernesto Corvi
-#ifndef MAME_INCLUDES_IQBLOCK_H
-#define MAME_INCLUDES_IQBLOCK_H
+#ifndef MAME_IGS_IQBLOCK_H
+#define MAME_IGS_IQBLOCK_H
 
 #pragma once
 
@@ -58,4 +58,4 @@ private:
 	void main_portmap(address_map &map);
 };
 
-#endif // MAME_INCLUDES_IQBLOCK_H
+#endif // MAME_IGS_IQBLOCK_H

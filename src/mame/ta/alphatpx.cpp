@@ -82,6 +82,8 @@
 #include "debugger.h"
 
 
+namespace {
+
 //**************************************************************************
 //  TYPE DEFINITIONS - Alphatronic P1, P2, P2S, P2U and Hell 2069
 //**************************************************************************
@@ -1438,6 +1440,8 @@ ROM_START( alphatp30 ) // P30 add-on card with 8088 needs to be emulated to boot
 	ROM_REGION(0x4000, "16bit", 0)
 	ROM_LOAD("caxp_02_02_13.bin", 0x00000, 0x2000, CRC(e6bf6dd5) SHA1(dc87210bbcd96f3c1370565174a45199e3c1bc70)) // P30 ROM from 8088 card
 ROM_END
+
+} // anonymous namespace
 
 
 //**************************************************************************

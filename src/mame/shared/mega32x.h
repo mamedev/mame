@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /* 32X */
-#ifndef MAME_MACHINE_MEGA32X_H
-#define MAME_MACHINE_MEGA32X_H
+#ifndef MAME_SHARED_MEGA32X_H
+#define MAME_SHARED_MEGA32X_H
 
 #pragma once
 
@@ -239,4 +239,4 @@ protected:
 DECLARE_DEVICE_TYPE(SEGA_32X_NTSC, sega_32x_ntsc_device)
 DECLARE_DEVICE_TYPE(SEGA_32X_PAL,  sega_32x_pal_device)
 
-#endif // MAME_MACHINE_MEGA32X_H
+#endif // MAME_SHARED_MEGA32X_H

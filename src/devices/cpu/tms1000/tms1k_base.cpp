@@ -4,13 +4,6 @@
 
   TMS1000 family - base/shared
 
-  TODO:
-  - accurate INIT pin (currently, just use INPUT_LINE_RESET)
-  - emulate newer die revisions? TMS1xxx rev. E and up have 4 cycles
-    per opcode instead of 6. But which steps go where, is unknown.
-    For now, just overclock the MCU instead.
-
-
 The TMS0980 and TMS1000-family MCU cores are very similar. The TMS0980 has a
 slightly bigger addressable area and uses 9bit instructions where the TMS1000
 family uses 8bit instruction. The instruction set themselves are very similar
@@ -100,7 +93,12 @@ tms1k_base_device::tms1k_base_device(const machine_config &mconfig, device_type 
 	m_decode_micro(*this)
 { }
 
-// disasm
+
+
+//-------------------------------------------------
+//  disasm
+//-------------------------------------------------
+
 void tms1k_base_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
@@ -123,6 +121,7 @@ void tms1k_base_device::state_string_export(const device_state_entry &entry, std
 			break;
 	}
 }
+
 
 
 //-------------------------------------------------
@@ -249,14 +248,6 @@ void tms1k_base_device::device_start()
 	set_icountptr(m_icount);
 }
 
-device_memory_interface::space_config_vector tms1k_base_device::memory_space_config() const
-{
-	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_DATA,    &m_data_config)
-	};
-}
-
 
 
 //-------------------------------------------------
@@ -297,6 +288,14 @@ void tms1k_base_device::device_reset()
 //-------------------------------------------------
 //  common internal memory maps
 //-------------------------------------------------
+
+device_memory_interface::space_config_vector tms1k_base_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config)
+	};
+}
 
 void tms1k_base_device::rom_10bit(address_map &map)
 {
@@ -412,109 +411,106 @@ void tms1k_base_device::set_cki_bus()
 // add(latch) and bl(branch latch) are specific to 0980 series, c(chapter) bits are specific to 1100(and 1400) series
 // TMS1400 and up and the CMOS chips have multiple stack levels, branches work a bit differently
 
-void tms1k_base_device::op_br()
+// BR/BL: conditional branch
+
+void tms1k_base_device::op_br1()
 {
-	// BR/BL: conditional branch
-	if (m_stack_levels == 1)
+	if (m_status)
 	{
-		if (m_status)
-		{
-			if (m_clatch == 0)
-				m_pa = m_pb;
-
-			m_ca = m_cb;
-			m_pc = m_opcode & m_pc_mask;
-		}
-	}
-	else
-	{
-		if (m_status)
-		{
-			m_pa = m_pb; // don't care about clatch
-			m_ca = m_cb;
-			m_pc = m_opcode & m_pc_mask;
-		}
-	}
-}
-
-void tms1k_base_device::op_call()
-{
-	// CALL/CALLL: conditional call
-	if (m_stack_levels == 1)
-	{
-		if (m_status)
-		{
-			u8 prev_pa = m_pa;
-
-			if (!m_clatch)
-			{
-				m_clatch = 1;
-				m_sr = m_pc;
-				m_pa = m_pb;
-				m_cs = m_ca;
-			}
-
-			m_ca = m_cb;
-			m_pb = prev_pa;
-			m_pc = m_opcode & m_pc_mask;
-		}
-	}
-	else
-	{
-		if (m_status)
-		{
-			// mask clatch bits (no need to mask others)
-			u8 smask = (1 << m_stack_levels) - 1;
-			m_clatch = (m_clatch << 1 | 1) & smask;
-
-			m_sr = m_sr << m_pc_bits | m_pc;
-			m_pc = m_opcode & m_pc_mask;
-
-			m_ps = m_ps << 4 | m_pa;
+		if (m_clatch == 0)
 			m_pa = m_pb;
 
-			m_cs = m_cs << 2 | m_ca;
-			m_ca = m_cb;
-		}
-		else
-		{
-			m_pb = m_pa;
-			m_cb = m_ca;
-		}
+		m_ca = m_cb;
+		m_pc = m_opcode & m_pc_mask;
 	}
 }
 
-void tms1k_base_device::op_retn()
+void tms1k_base_device::op_brn()
 {
-	// RETN: return from subroutine
-	if (m_stack_levels == 1)
+	if (m_status)
 	{
-		if (m_clatch)
+		m_pa = m_pb; // don't care about clatch
+		m_ca = m_cb;
+		m_pc = m_opcode & m_pc_mask;
+	}
+}
+
+// CALL/CALLL: conditional call
+
+void tms1k_base_device::op_call1()
+{
+	if (m_status)
+	{
+		u8 prev_pa = m_pa;
+
+		if (!m_clatch)
 		{
-			m_clatch = 0;
-			m_pc = m_sr;
-			m_ca = m_cs;
+			m_clatch = 1;
+			m_sr = m_pc;
+			m_pa = m_pb;
+			m_cs = m_ca;
 		}
 
-		m_add = 0;
-		m_bl = 0;
+		m_ca = m_cb;
+		m_pb = prev_pa;
+		m_pc = m_opcode & m_pc_mask;
+	}
+}
+
+void tms1k_base_device::op_calln()
+{
+	if (m_status)
+	{
+		// mask clatch bits (no need to mask others)
+		u8 smask = (1 << m_stack_levels) - 1;
+		m_clatch = (m_clatch << 1 | 1) & smask;
+
+		m_sr = m_sr << m_pc_bits | m_pc;
+		m_pc = m_opcode & m_pc_mask;
+
+		m_ps = m_ps << 4 | m_pa;
 		m_pa = m_pb;
+
+		m_cs = m_cs << 2 | m_ca;
+		m_ca = m_cb;
 	}
 	else
 	{
-		if (m_clatch & 1)
-		{
-			m_clatch >>= 1;
+		m_pb = m_pa;
+		m_cb = m_ca;
+	}
+}
 
-			m_pc = m_sr & m_pc_mask;
-			m_sr >>= m_pc_bits;
+// RETN: return from subroutine
 
-			m_pa = m_pb = m_ps & 0xf;
-			m_ps >>= 4;
+void tms1k_base_device::op_retn1()
+{
+	if (m_clatch)
+	{
+		m_clatch = 0;
+		m_pc = m_sr;
+		m_ca = m_cs;
+	}
 
-			m_ca = m_cb = m_cs & 3;
-			m_cs >>= 2;
-		}
+	m_add = 0;
+	m_bl = 0;
+	m_pa = m_pb;
+}
+
+void tms1k_base_device::op_retnn()
+{
+	if (m_clatch & 1)
+	{
+		m_clatch >>= 1;
+
+		m_pc = m_sr & m_pc_mask;
+		m_sr >>= m_pc_bits;
+
+		m_pa = m_pb = m_ps & 0xf;
+		m_ps >>= 4;
+
+		m_ca = m_cb = m_cs & 3;
+		m_cs >>= 2;
 	}
 }
 
@@ -608,9 +604,9 @@ void tms1k_base_device::op_tpc()
 //  execute
 //-------------------------------------------------
 
-void tms1k_base_device::execute_one()
+void tms1k_base_device::execute_one(int subcycle)
 {
-	switch (m_subcycle)
+	switch (subcycle)
 	{
 	case 0:
 		// fetch: rom address 1/2
@@ -696,16 +692,20 @@ void tms1k_base_device::execute_one()
 		if (m_fixed & F_LDP)   op_ldp();
 		if (m_fixed & F_COMC)  op_comc();
 		if (m_fixed & F_TPC)   op_tpc();
+
 		if (m_fixed & F_TAX)   op_tax();
 		if (m_fixed & F_TAC)   op_tac();
 		if (m_fixed & F_TADM)  op_tadm();
 		if (m_fixed & F_TMA)   op_tma();
+
 		if (m_fixed & F_OFF)   op_off();
 		if (m_fixed & F_SEAC)  op_seac();
 		if (m_fixed & F_REAC)  op_reac();
 		if (m_fixed & F_SAL)   op_sal();
 		if (m_fixed & F_SBL)   op_sbl();
 		if (m_fixed & F_XDA)   op_xda();
+
+		if (m_fixed & F_EXTRA) op_extra();
 
 		// after fixed opcode handling: store status, write ram
 		m_status = status;
@@ -741,8 +741,6 @@ void tms1k_base_device::execute_one()
 		// execute: br/call 1/2
 		break;
 	}
-
-	m_subcycle = (m_subcycle + 1) % 6;
 }
 
 void tms1k_base_device::execute_run()
@@ -750,6 +748,8 @@ void tms1k_base_device::execute_run()
 	while (m_icount > 0)
 	{
 		m_icount--;
-		execute_one();
+
+		execute_one(m_subcycle);
+		m_subcycle = (m_subcycle + 1) % 6;
 	}
 }

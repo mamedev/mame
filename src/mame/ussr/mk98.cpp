@@ -60,6 +60,8 @@
 #define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
 
 
+namespace {
+
 class mk98_state : public driver_device
 {
 public:
@@ -478,6 +480,8 @@ ROM_START( mk98 )
 	ROM_REGION(0x20000, "romdos", 0)
 	ROM_LOAD("e0000.bin", 0, 0x20000, CRC(85785bd5) SHA1(b10811715f44cf8e2b41baea7b62a35082e04048))
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR  NAME   PARENT   COMPAT  MACHINE  INPUT  CLASS        INIT         COMPANY         FULLNAME  FLAGS

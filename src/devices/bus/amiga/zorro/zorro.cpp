@@ -196,7 +196,7 @@ zorro2_bus_device::zorro2_bus_device(const machine_config &mconfig, device_type 
 	m_eint4_handler(*this),
 	m_eint5_handler(*this),
 	m_eint7_handler(*this),
-	m_autoconfig_device(nullptr)
+	m_autoconfig_device(0)
 {
 }
 
@@ -206,7 +206,6 @@ zorro2_bus_device::zorro2_bus_device(const machine_config &mconfig, device_type 
 
 zorro2_bus_device::~zorro2_bus_device()
 {
-	m_dev.detach_all();
 }
 
 //-------------------------------------------------
@@ -228,6 +227,17 @@ void zorro2_bus_device::device_resolve_objects()
 }
 
 //-------------------------------------------------
+//  device_start - device-specific start
+//-------------------------------------------------
+
+void zorro2_bus_device::device_start()
+{
+	zorro_bus_device_base::device_start();
+
+	save_item(NAME(m_autoconfig_device));
+}
+
+//-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
@@ -237,11 +247,11 @@ void zorro2_bus_device::device_reset()
 	zorro_bus_device_base::device_reset();
 
 	// initiate autoconfig
-	m_autoconfig_device = m_dev.first();
+	m_autoconfig_device = 0;
 
 	// if we have a device, start the autoconfig chain
-	if (m_autoconfig_device)
-		m_autoconfig_device->cfgin_w(0);
+	if (m_dev.size() > m_autoconfig_device)
+		m_dev[m_autoconfig_device].get().cfgin_w(0);
 }
 
 //-------------------------------------------------
@@ -258,7 +268,7 @@ void zorro2_bus_device::add_card(device_zorro_card_interface &card)
 				tag(), card.device().tag(), card.device().name());
 	}
 	card.set_zorro_bus(*this);
-	m_dev.append(*zorro2_card);
+	m_dev.emplace_back(*zorro2_card);
 }
 
 // from slot device
@@ -269,23 +279,16 @@ WRITE_LINE_MEMBER( zorro2_bus_device::eint7_w ) { m_eint7_handler(state); }
 
 WRITE_LINE_MEMBER( zorro2_bus_device::cfgout_w )
 {
-	m_autoconfig_device = m_autoconfig_device->next();
-
 	// if there is still a device in the chain, tell it to configure itself
-	if (m_autoconfig_device)
-		m_autoconfig_device->cfgin_w(0);
+	if (m_dev.size() > ++m_autoconfig_device)
+		m_dev[m_autoconfig_device].get().cfgin_w(0);
 }
 
 // from host
 void zorro2_bus_device::fc_w(int code)
 {
-	device_zorro2_card_interface *entry = m_dev.first();
-
-	while (entry)
-	{
-		entry->fc_w(code);
-		entry = entry->next();
-	}
+	for (device_zorro2_card_interface &entry : m_dev)
+		entry.fc_w(code);
 }
 
 
@@ -375,7 +378,6 @@ void device_exp_card_interface::interface_pre_start()
 
 device_zorro2_card_interface::device_zorro2_card_interface(const machine_config &mconfig, device_t &device) :
 	device_zorro_card_interface(mconfig, device),
-	m_next(nullptr),
 	m_slot(nullptr)
 {
 }

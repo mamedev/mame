@@ -47,6 +47,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define MAIN_CLOCK  XTAL(16'000'000)
 
 
@@ -511,6 +514,8 @@ ROM_START( ejollyx9 )
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "nm.u3", 0x00000, 0x80000, CRC(0529696b) SHA1(7e182051baae0b7de1f5a2c18f1b68b695f339d8) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************

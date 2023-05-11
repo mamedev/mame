@@ -396,6 +396,12 @@ protected:
 	// Fast negation period (30ns)
 	virtual attotime scsi_fast_negation_period();
 
+	// Byte transfer rate (immediate)
+	virtual attotime scsi_data_byte_period();
+
+	// Command delay (immediate)
+	virtual attotime scsi_data_command_delay();
+
 	uint8_t scsi_cmdbuf[4096], scsi_sense_buffer[18];
 	int scsi_cmdsize;
 	uint8_t scsi_identify;

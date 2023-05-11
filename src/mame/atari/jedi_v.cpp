@@ -31,7 +31,7 @@
 void jedi_state::video_start()
 {
 #if DEBUG_GFXDECODE
-	/* the sprite pixel determines pen address bits A4-A7 */
+	// the sprite pixel determines pen address bits A4-A7
 	gfx_element *gx0 = m_gfxdecode->gfx(2);
 
 	// allocate memory for the assembled data
@@ -61,7 +61,7 @@ void jedi_state::video_start()
 	gx0->set_granularity(1);
 #endif
 
-	/* register for saving */
+	// register for saving
 	save_item(NAME(m_vscroll));
 	save_item(NAME(m_hscroll));
 	save_item(NAME(m_foreground_bank));
@@ -155,7 +155,7 @@ void jedi_state::hscroll_w(offs_t offset, u8 data)
 
 void jedi_state::draw_background_and_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	u8 background_line_buffer[0x200];  /* RAM chip at 2A */
+	u8 background_line_buffer[0x200]; // RAM chip at 2A
 
 	const u8 *prom1 = &m_proms[0x0000 | ((*m_smoothing_table & 0x03) << 8)];
 	const u8 *prom2 = &m_proms[0x0800 | ((*m_smoothing_table & 0x03) << 8)];
@@ -168,37 +168,37 @@ void jedi_state::draw_background_and_text(bitmap_rgb32 &bitmap, const rectangle 
 
 		for (int x = cliprect.left(); x <= cliprect.right(); x += 2)
 		{
-			u16 tx_col1, tx_col2, bg_col;
+			u16 tx_col1, tx_col2, bg_col = 0;
 
 			const int sy = y + m_vscroll;
 			int sx = x + m_hscroll;
 
-			/* determine offsets into video memory */
+			// determine offsets into video memory
 			const offs_t tx_offs = ((y & 0xf8) << 3) | (x >> 3);
 			const offs_t bg_offs = ((sy & 0x1f0) << 1) | ((sx & 0x1f0) >> 4);
 
-			/* get the character codes */
+			// get the character codes
 			const int tx_code = (m_foreground_bank << 8) | m_foregroundram[tx_offs];
 			const int bg_bank = m_backgroundram[0x0400 | bg_offs];
 			const int bg_code = m_backgroundram[0x0000 | bg_offs] |
-							((bg_bank & 0x01) << 8) |
-							((bg_bank & 0x08) << 6) |
-							((bg_bank & 0x02) << 9);
+					((bg_bank & 0x01) << 8) |
+					((bg_bank & 0x08) << 6) |
+					((bg_bank & 0x02) << 9);
 
-			/* background flip X */
+			// background flip X
 			if (bg_bank & 0x04)
 				sx = sx ^ 0x0f;
 
-			/* calculate the address of the gfx data */
+			// calculate the address of the gfx data
 			const offs_t tx_gfx_offs = (tx_code << 4) | ((y & 0x07) << 1) | ((( x & 0x04) >> 2));
 			const offs_t bg_gfx_offs = (bg_code << 4) | (sy & 0x0e)       | (((sx & 0x08) >> 3));
 
-			/* get the gfx data */
+			// get the gfx data
 			const u8 tx_data  = m_tx_gfx[         tx_gfx_offs];
 			const u8 bg_data1 = m_bg_gfx[0x0000 | bg_gfx_offs];
 			const u8 bg_data2 = m_bg_gfx[0x8000 | bg_gfx_offs];
 
-			/* the text layer pixel determines pen address bits A8 and A9 */
+			// the text layer pixel determines pen address bits A8 and A9
 			if (x & 0x02)
 			{
 				tx_col1 = ((tx_data & 0x0c) << 6);
@@ -210,13 +210,13 @@ void jedi_state::draw_background_and_text(bitmap_rgb32 &bitmap, const rectangle 
 				tx_col2 = ((tx_data & 0x30) << 4);
 			}
 
-			/* the background pixel determines pen address bits A0-A3 */
+			// the background pixel determines pen address bits A0-A3
 			switch (sx & 0x06)
 			{
 			case 0x00: bg_col = ((bg_data1 & 0x80) >> 4) | ((bg_data1 & 0x08) >> 1) | ((bg_data2 & 0x80) >> 6) | ((bg_data2 & 0x08) >> 3); break;
 			case 0x02: bg_col = ((bg_data1 & 0x40) >> 3) | ((bg_data1 & 0x04) >> 0) | ((bg_data2 & 0x40) >> 5) | ((bg_data2 & 0x04) >> 2); break;
 			case 0x04: bg_col = ((bg_data1 & 0x20) >> 2) | ((bg_data1 & 0x02) << 1) | ((bg_data2 & 0x20) >> 4) | ((bg_data2 & 0x02) >> 1); break;
-			default:   bg_col = ((bg_data1 & 0x10) >> 1) | ((bg_data1 & 0x01) << 2) | ((bg_data2 & 0x10) >> 3) | ((bg_data2 & 0x01) >> 0); break;
+			case 0x06: bg_col = ((bg_data1 & 0x10) >> 1) | ((bg_data1 & 0x01) << 2) | ((bg_data2 & 0x10) >> 3) | ((bg_data2 & 0x01) >> 0); break;
 			}
 
 			/* the first pixel is smoothed via a lookup using the current and last pixel value -
@@ -246,19 +246,19 @@ void jedi_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	{
 		int y_size;
 
-		/* coordinates adjustments made to match screenshot */
+		// coordinates adjustments made to match screenshot
 		u8 y = 240 - m_spriteram[offs + 0x80] + 1;
 		const bool flip_x = m_spriteram[offs + 0x40] & 0x10;
 		const bool flip_y = m_spriteram[offs + 0x40] & 0x20;
 		const bool tall = m_spriteram[offs + 0x40] & 0x08;
 
-		/* shuffle the bank bits in */
+		// shuffle the bank bits in
 		u16 code = m_spriteram[offs] |
-						((m_spriteram[offs + 0x40] & 0x04) << 8) |
-						((m_spriteram[offs + 0x40] & 0x40) << 3) |
-						((m_spriteram[offs + 0x40] & 0x02) << 7);
+				((m_spriteram[offs + 0x40] & 0x04) << 8) |
+				((m_spriteram[offs + 0x40] & 0x40) << 3) |
+				((m_spriteram[offs + 0x40] & 0x02) << 7);
 
-		/* adjust for double-height */
+		// adjust for double-height
 		if (tall)
 		{
 			code &= ~1;
@@ -277,9 +277,6 @@ void jedi_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		{
 			u16 x = m_spriteram[offs + 0x100] + ((m_spriteram[offs + 0x40] & 0x01) << 8) - 2;
 
-			if ((y < cliprect.top()) || (y > cliprect.bottom()))
-				continue;
-
 			if (flip_x)
 				x = x + 7;
 
@@ -290,15 +287,15 @@ void jedi_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 				for (int sx = 0; sx < 4; sx++)
 				{
-					/* the sprite pixel determines pen address bits A4-A7 */
+					// the sprite pixel determines pen address bits A4-A7
 					const u32 col = ((data1 & 0x80) >> 0) | ((data1 & 0x08) << 3) | ((data2 & 0x80) >> 2) | ((data2 & 0x08) << 1);
 
 					x = x & 0x1ff;
 
-					if (col)
+					if (col && cliprect.contains(x, y))
 						bitmap.pix(y, x) = (bitmap.pix(y, x) & 0x30f) | col;
 
-					/* next pixel */
+					// next pixel
 					if (flip_x)
 						x = x - 1;
 					else
@@ -328,13 +325,12 @@ void jedi_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 u32 jedi_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	/* if no video, clear it all to black */
+	// if no video, clear it all to black
 	if (m_video_off)
 		bitmap.fill(rgb_t::black(), cliprect);
 	else
 	{
-		/* draw the background/text layers, followed by the sprites
-		   - it needs to be done in this order*/
+		// draw the background/text layers, followed by the sprites - it needs to be done in this order
 		draw_background_and_text(bitmap, cliprect);
 		draw_sprites(bitmap, cliprect);
 		do_pen_lookup(bitmap, cliprect);
@@ -398,7 +394,7 @@ void jedi_state::jedi_video(machine_config &config)
 #endif
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_size(64*8, 262); /* verify vert size */
+	m_screen->set_size(64*8, 262); // verify vert size
 	m_screen->set_visarea(0*8, 37*8-1, 0*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(jedi_state::screen_update));
 

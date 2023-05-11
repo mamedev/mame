@@ -140,8 +140,8 @@ to a 1602 or 1702 PROM (150 millisecond cycle time).
 When pulled low, RW A initiates a 20% programming duty cycle for writing
 to a 1602A or 1702A PROM (15 millisecond cycle time).
 */
-#ifndef MAME_MACHINE_IMM6_76_H
-#define MAME_MACHINE_IMM6_76_H
+#ifndef MAME_INTEL_IMM6_76_H
+#define MAME_INTEL_IMM6_76_H
 
 #pragma once
 
@@ -152,8 +152,8 @@ public:
 	intel_imm6_76_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
 	// device_image_interface implementation
-	virtual image_init_result call_load() override;
-	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 
 	// device_image_interface static info
@@ -199,4 +199,4 @@ private:
 
 DECLARE_DEVICE_TYPE(INTEL_IMM6_76, intel_imm6_76_device)
 
-#endif // MAME_MACHINE_IMM6_76_H
+#endif // MAME_INTEL_IMM6_76_H

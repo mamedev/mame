@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_INCLUDES_MAPPY_H
-#define MAME_INCLUDES_MAPPY_H
+#ifndef MAME_NAMCO_MAPPY_H
+#define MAME_NAMCO_MAPPY_H
 
 #pragma once
 
@@ -109,4 +109,4 @@ private:
 	void superpac_cpu2_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_MAPPY_H
+#endif // MAME_NAMCO_MAPPY_H

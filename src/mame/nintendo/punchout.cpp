@@ -256,6 +256,7 @@ void punchout_state::spnchout_io_map(address_map &map)
 void punchout_state::punchout_sound_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
+	map(0x4000, 0x400f).nopr();
 	map(0x4016, 0x4016).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x4017, 0x4017).r("soundlatch2", FUNC(generic_latch_8_device::read));
 	map(0xe000, 0xffff).rom();

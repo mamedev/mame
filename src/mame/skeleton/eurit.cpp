@@ -17,6 +17,9 @@
 
 #include "utf8.h"
 
+
+namespace {
+
 class eurit_state : public driver_device
 {
 public:
@@ -179,6 +182,8 @@ ROM_START(eurit30)
 	ROM_REGION16_LE(0x20000, "firmware", 0) // Firmware 2.210 deutsch
 	ROM_LOAD("d_2.210", 0x00000, 0x20000, CRC(c77be0ac) SHA1(1eaba66dcb4f64cc33565ca85de25341572ddb2e))
 ROM_END
+
+} // anonymous namespace
 
 
 SYST(1996, eurit30, 0, 0, eurit30, eurit30, eurit_state, empty_init, "Ascom", "Eurit 30", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

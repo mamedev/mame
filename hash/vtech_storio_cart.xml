@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
-<softwarelist name="vtech_storio_cart" description="VTech Storio V.Reader Cartridges">
+<softwarelist name="vtech_storio_cart" description="VTech Storio V.Reader cartridges">
 
 	<!-- These are NAND Flash ROMs containing a FAT16 filesystem -->
 	<!-- Some cartridges (PCB 35-115600-027-402) contains no ROM, but just some bridges between edge connector pins. -->
@@ -74,7 +74,7 @@ license:CC0
 	       | 80-281204(GER)  | Disney/Pixar Cars Toon - Hook in Tokyo
 	       | 80-281300(US)   | Sesame Street - The Happy Scientists
 	       | 80-281400(US)   | SpongeBob SquarePants - Model Sponge
-	  XX   | 80-281404(GER)  | Spongebob Schwammkopf - Ein Schwamm will nach oben
+	  XX   | 80-281404(GER)  | SpongeBob Schwammkopf - Ein Schwamm will nach oben
 	       | 80-281405(FR)   | Bob L'éponge - Bob, la star des éponges
 	       | 80-281422(SP)   | Bob Esponja - Modelo Esponja
 	       | 80-281500(US)   | Tangled
@@ -204,12 +204,12 @@ license:CC0
 	</software>
 
 	<software name="spongbobgr" supported="no">
-		<description>Spongebob Schwammkopf - Ein Schwamm will nach oben (Germany)</description>
+		<description>SpongeBob Schwammkopf - Ein Schwamm will nach oben (Germany)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vtech_storio_cart">
 			<dataarea name="rom" size="0x4200000">
-				<rom name="80-281404 - Spongebob Schwammkopf - Ein Schwamm will nach oben (GER).bin" size="0x4200000" crc="f1a68329" sha1="95c39150ab86233575f4f32574f7077436077adf" />
+				<rom name="80-281404 - SpongeBob Schwammkopf - Ein Schwamm will nach oben (GER).bin" size="0x4200000" crc="f1a68329" sha1="95c39150ab86233575f4f32574f7077436077adf" />
 			</dataarea>
 		</part>
 	</software>

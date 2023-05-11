@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Olivier Galibert
-#ifndef MAME_AUDIO_DSBZ80_H
-#define MAME_AUDIO_DSBZ80_H
+#ifndef MAME_SEGA_DSBZ80_H
+#define MAME_SEGA_DSBZ80_H
 
 #pragma once
 
@@ -61,4 +61,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(DSBZ80, dsbz80_device)
 
-#endif // MAME_AUDIO_DSBZ80_H
+#endif // MAME_SEGA_DSBZ80_H

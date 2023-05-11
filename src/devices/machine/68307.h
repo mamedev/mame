@@ -40,9 +40,9 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual void m68k_reset_peripherals() override;
-
 private:
+	DECLARE_WRITE_LINE_MEMBER(reset_peripherals);
+
 	void set_ipl(int level);
 	DECLARE_WRITE_LINE_MEMBER(timer0_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(timer1_interrupt);
@@ -55,8 +55,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txb) { m_write_b_tx(state);  }
 	uint8_t m68307_duart_input_r() { return m_read_inport();  }
 	void m68307_duart_output_w(uint8_t data) { m_write_outport(data);  }
-
-	void init16_m68307(address_space &space);
 
 	int calc_cs(offs_t address) const;
 

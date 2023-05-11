@@ -383,7 +383,7 @@ uint8_t nes_lz93d50_24c01_device::read_m(offs_t offset)
 
 void nes_lz93d50_24c01_device::device_add_mconfig(machine_config &config)
 {
-	I2C_24C01(config, m_i2cmem);
+	I2C_X24C01(config, m_i2cmem);
 }
 
 void nes_lz93d50_24c02_device::device_add_mconfig(machine_config &config)

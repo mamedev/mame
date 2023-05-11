@@ -43,6 +43,9 @@
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
+
 class dacholer_state : public driver_device
 {
 public:
@@ -841,6 +844,8 @@ ROM_START( itaten )
 	ROM_LOAD( "af-2.1h",  0x0020, 0x0020, CRC(e1cac297) SHA1(f15326d04d006d9d029a6565aebf9daf3657bc2a) )
 	ROM_LOAD( "af-1.3n",  0x0040, 0x0020, CRC(5638e485) SHA1(5d892111936a8eb7646c03a17300069be9a2b442) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1983, dacholer, 0, dacholer, dacholer, dacholer_state, empty_init, ROT0, "Nichibutsu",         "Dacholer",               MACHINE_SUPPORTS_SAVE )

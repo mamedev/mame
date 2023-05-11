@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="ibm5170_hdd" description="IBM PC/AT hard disk images">
 	<!--
@@ -349,6 +349,22 @@ license:CC0
 		<part name="hdd" interface="ide_hdd">
 			<diskarea name="harddriv">
 				<disk name="win95" sha1="284bfaac43d484d097b832cec48620a0f87dd890" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="win98se">
+		<description>Windows 98 Second Edition</description>
+		<year>1999</year>
+		<publisher>Microsoft</publisher>
+		<notes><![CDATA[
+Generated from win98se cdrom and pcipc driver
+WaveTop and TV Data Tuner options installed but not initialized
+Internet Connection Sharing installed but cannot be loaded by Windows for some reason (missing ethernet controller?)
+]]></notes>
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="win98se_eng" sha1="950aec51ec66fee95da4f85979adc1abfde4a62b" writeable="yes" />
 			</diskarea>
 		</part>
 	</software>

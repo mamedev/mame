@@ -116,6 +116,9 @@ To Do / Status:
 #include "softlist_dev.h"
 #include "utf8.h"
 
+
+namespace {
+
 #define MASTER_XTAL 12164800
 
 
@@ -575,6 +578,8 @@ ROM_START(radionic)
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD("trschar.z58",    0x0000, 0x1000, CRC(02e767b6) SHA1(c431fcc6bd04ce2800ca8c36f6f8aeb2f91ce9f7) )
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR  NAME         PARENT   COMPAT   MACHINE   INPUT     CLASS           INIT           COMPANY     FULLNAME                    FLAGS

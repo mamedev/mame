@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 
-<softwarelist name="mephisto_smondial2" description="Mephisto Super Mondial II Modules">
+<softwarelist name="mephisto_smondial2" description="Mephisto Super Mondial II modules">
 
 	<software name="college">
 		<description>College Module</description>

@@ -104,8 +104,12 @@ int k573mcal_device::handle_message(const uint8_t* send_buffer, uint32_t send_si
 	}
 
 	case 0x71: {
-		// msg: 71 ff ff 01
+		// msg: 71 00 00 80 -> Offset = 0x0000, requested size = 0x80 bytes
+		// msg: 71 00 20 10 -> Offset = 0x0020, requested size = 0x10 bytes
+		// "Master Calendar ROM". Contents are specific to the game being initialized.
+		// Only encountered and tested on Hornet games.
 
+		// msg: 71 ff ff 01 -> Offset = 0xffff, requested size = 0x01 bytes, special request for the area specification flag? Used by Sys573
 		uint8_t resp[] = {
 			0x01, // status, must be 1
 			uint8_t(m_in1->read() & 0x0f), // Area specification

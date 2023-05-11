@@ -5,12 +5,14 @@
 
 #include "../../Common/MyWindows.h"
 
-#include <commctrl.h>
+#include <CommCtrl.h>
 
 #include "../Window.h"
 
 namespace NWindows {
 namespace NControl {
+
+#define MY__int_TO_WPARAM(i) ((WPARAM)(INT_PTR)(i))
 
 class CComboBox: public CWindow
 {
@@ -20,19 +22,25 @@ public:
   #ifndef _UNICODE
   LRESULT AddString(LPCWSTR s);
   #endif
-  LRESULT SetCurSel(int index) { return SendMsg(CB_SETCURSEL, index, 0); }
+
+  /* If this parameter is -1, any current selection in the list is removed and the edit control is cleared.*/
+  LRESULT SetCurSel(int index) { return SendMsg(CB_SETCURSEL, MY__int_TO_WPARAM(index), 0); }
+
+  /* If no item is selected, it returns CB_ERR (-1) */
   int GetCurSel() { return (int)SendMsg(CB_GETCURSEL, 0, 0); }
+  
+  /*  If an error occurs, it is CB_ERR (-1) */
   int GetCount() { return (int)SendMsg(CB_GETCOUNT, 0, 0); }
   
-  LRESULT GetLBTextLen(int index) { return SendMsg(CB_GETLBTEXTLEN, index, 0); }
-  LRESULT GetLBText(int index, LPTSTR s) { return SendMsg(CB_GETLBTEXT, index, (LPARAM)s); }
+  LRESULT GetLBTextLen(int index) { return SendMsg(CB_GETLBTEXTLEN, MY__int_TO_WPARAM(index), 0); }
+  LRESULT GetLBText(int index, LPTSTR s) { return SendMsg(CB_GETLBTEXT, MY__int_TO_WPARAM(index), (LPARAM)s); }
   LRESULT GetLBText(int index, CSysString &s);
   #ifndef _UNICODE
   LRESULT GetLBText(int index, UString &s);
   #endif
 
-  LRESULT SetItemData(int index, LPARAM lParam) { return SendMsg(CB_SETITEMDATA, index, lParam); }
-  LRESULT GetItemData(int index) { return SendMsg(CB_GETITEMDATA, index, 0); }
+  LRESULT SetItemData(int index, LPARAM lParam) { return SendMsg(CB_SETITEMDATA, MY__int_TO_WPARAM(index), lParam); }
+  LRESULT GetItemData(int index) { return SendMsg(CB_GETITEMDATA, MY__int_TO_WPARAM(index), 0); }
 
   LRESULT GetItemData_of_CurSel() { return GetItemData(GetCurSel()); }
 
@@ -46,7 +54,11 @@ class CComboBoxEx: public CComboBox
 public:
   bool SetUnicodeFormat(bool fUnicode) { return LRESULTToBool(SendMsg(CBEM_SETUNICODEFORMAT, BOOLToBool(fUnicode), 0)); }
 
-  LRESULT DeleteItem(int index) { return SendMsg(CBEM_DELETEITEM, index, 0); }
+  /* Returns:
+      an INT value that represents the number of items remaining in the control.
+      If (index) is invalid, the message returns CB_ERR. */
+  LRESULT DeleteItem(int index) { return SendMsg(CBEM_DELETEITEM, MY__int_TO_WPARAM(index), 0); }
+
   LRESULT InsertItem(COMBOBOXEXITEM *item) { return SendMsg(CBEM_INSERTITEM, 0, (LPARAM)item); }
   #ifndef _UNICODE
   LRESULT InsertItem(COMBOBOXEXITEMW *item) { return SendMsg(CBEM_INSERTITEMW, 0, (LPARAM)item); }

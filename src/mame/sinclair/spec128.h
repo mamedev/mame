@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_SPEC128_H
-#define MAME_INCLUDES_SPEC128_H
+#ifndef MAME_SINCLAIR_SPEC128_H
+#define MAME_SINCLAIR_SPEC128_H
 
 #pragma once
 
@@ -65,4 +65,4 @@ private:
 #define SPEC128_RETRACE_CYCLES  52
 #define SPEC128_CYCLES_PER_LINE 228
 
-#endif // MAME_INCLUDES_SPEC128_H
+#endif // MAME_SINCLAIR_SPEC128_H

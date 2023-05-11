@@ -35,6 +35,7 @@ enum
 	A800_TELELINK2,
 	A800_MICROCALC,
 	A800_CORINA,
+	A800_CORINA_SRAM,
 	A5200_4K,
 	A5200_8K,
 	A5200_16K,
@@ -101,8 +102,8 @@ public:
 	a800_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~a800_cart_slot_device();
 
-	// image-level overrides
-	virtual image_init_result call_load() override;
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 	virtual bool is_reset_on_load() const noexcept override { return true; }
@@ -125,11 +126,11 @@ public:
 protected:
 	a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 private:
-	device_a800_cart_interface*       m_cart;
+	device_a800_cart_interface *m_cart;
 	int m_type;
 };
 

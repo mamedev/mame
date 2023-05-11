@@ -7,6 +7,9 @@
 #include "spg2xx.h"
 #include "machine/nvram.h"
 
+
+namespace {
+
 class jakks_sharp_state : public spg2xx_game_state
 {
 public:
@@ -94,6 +97,8 @@ ROM_START( jsc_sdoo )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "shckscooby.bin", 0x000000, 0x200000, CRC(ce7039a4) SHA1(d5815149b75262253d03fac946b10c43e96945c0) )
 ROM_END
+
+} // anonymous namespace
 
 
 // The UK version has UK specific voice actors

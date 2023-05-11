@@ -60,6 +60,9 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 class dim68k_state : public driver_device
 {
 public:
@@ -516,6 +519,9 @@ ROM_START( dim68k )
 	ROM_LOAD( "mc102.bin", 0x0000, 0x00fa, CRC(38e2abac) SHA1(0d7e730b46fc162764c69c51dea3bbe8337b1a7d))
 	ROM_LOAD( "mc101.bin", 0x0100, 0x00fa, CRC(caffb3a0) SHA1(36f5140b306565794c4d856e0c20589b8f2a37f4))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

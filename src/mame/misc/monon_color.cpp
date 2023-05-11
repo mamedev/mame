@@ -72,6 +72,9 @@
 
 #include "logmacro.h"
 
+
+namespace {
+
 class monon_color_state : public driver_device
 {
 public:
@@ -985,5 +988,8 @@ ROM_START( mononcol )
 	ROM_FILL( 0x1ffc, 0x1, 0x00 )
 	ROM_FILL( 0x1ffd, 0x1, 0x20 )
 ROM_END
+
+} // anonymous namespace
+
 
 CONS( 2014, mononcol,    0,          0,  monon_color,  monon_color,    monon_color_state, empty_init,    "M&D",   "Monon Color", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

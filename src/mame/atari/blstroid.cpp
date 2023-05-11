@@ -196,7 +196,7 @@ void blstroid_state::blstroid(machine_config &config)
 
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 512);
 
-	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 16,8, TILEMAP_SCAN_ROWS, 64,64).set_info_callback(FUNC(blstroid_state::get_playfield_tile_info));
+	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 16, 8, TILEMAP_SCAN_ROWS, 64, 32).set_info_callback(FUNC(blstroid_state::get_playfield_tile_info));
 
 	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, blstroid_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
@@ -414,24 +414,12 @@ ROM_END
 
 /*************************************
  *
- *  Driver initialization
- *
- *************************************/
-
-void blstroid_state::init_blstroid()
-{
-}
-
-
-
-/*************************************
- *
  *  Game driver(s)
  *
  *************************************/
 
-GAME( 1987, blstroid,  0,        blstroid, blstroid, blstroid_state, init_blstroid, ROT0, "Atari Games", "Blasteroids (rev 4)", 0 )
-GAME( 1987, blstroid3, blstroid, blstroid, blstroid, blstroid_state, init_blstroid, ROT0, "Atari Games", "Blasteroids (rev 3)", 0 )
-GAME( 1987, blstroid2, blstroid, blstroid, blstroid, blstroid_state, init_blstroid, ROT0, "Atari Games", "Blasteroids (rev 2)", 0 )
-GAME( 1987, blstroidg, blstroid, blstroid, blstroid, blstroid_state, init_blstroid, ROT0, "Atari Games", "Blasteroids (German, rev 2)", 0 )
-GAME( 1987, blstroidh, blstroid, blstroid, blstroid, blstroid_state, init_blstroid, ROT0, "Atari Games", "Blasteroids (with heads)", 0 )
+GAME( 1987, blstroid,  0,        blstroid, blstroid, blstroid_state, empty_init, ROT0, "Atari Games", "Blasteroids (rev 4)", 0 )
+GAME( 1987, blstroid3, blstroid, blstroid, blstroid, blstroid_state, empty_init, ROT0, "Atari Games", "Blasteroids (rev 3)", 0 )
+GAME( 1987, blstroid2, blstroid, blstroid, blstroid, blstroid_state, empty_init, ROT0, "Atari Games", "Blasteroids (rev 2)", 0 )
+GAME( 1987, blstroidg, blstroid, blstroid, blstroid, blstroid_state, empty_init, ROT0, "Atari Games", "Blasteroids (German, rev 2)", 0 )
+GAME( 1987, blstroidh, blstroid, blstroid, blstroid, blstroid_state, empty_init, ROT0, "Atari Games", "Blasteroids (with heads)", 0 )

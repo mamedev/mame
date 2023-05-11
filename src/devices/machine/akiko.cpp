@@ -84,8 +84,7 @@ akiko_device::akiko_device(const machine_config &mconfig, const char *tag, devic
 	, m_cdrom_cmd_end(0)
 	, m_cdrom_cmd_resp(0)
 	, m_cdda(*this, "^cdda")
-	, m_cddevice(*this, "^cdrom")
-	, m_cdrom(nullptr)
+	, m_cdrom(*this, "^cdrom")
 	, m_cdrom_toc(nullptr)
 	, m_dma_timer(nullptr)
 	, m_frame_timer(nullptr)
@@ -153,18 +152,6 @@ void akiko_device::device_start()
 
 void akiko_device::device_reset()
 {
-	if (m_cddevice.found())
-	{
-		// CD32 case
-		m_cdrom = m_cddevice->get_cdrom_file();
-	}
-	else
-	{
-		// Arcade case
-		chd_file *chd = machine().rom_load().get_disk_handle(":cdrom");
-		m_cdrom = chd != nullptr ? new cdrom_file(chd) : nullptr;
-	}
-
 	/* create the TOC table */
 	if ( m_cdrom != nullptr && m_cdrom->get_last_track() )
 	{
@@ -222,14 +209,6 @@ void akiko_device::device_reset()
 
 void akiko_device::device_stop()
 {
-	if (!m_cddevice.found())
-	{
-		if( m_cdrom )
-		{
-			delete m_cdrom;
-			m_cdrom = nullptr;
-		}
-	}
 }
 
 void akiko_device::nvram_write(uint32_t data)
@@ -460,7 +439,7 @@ TIMER_CALLBACK_MEMBER(akiko_device::dma_proc)
 	uint8_t   buf[2352];
 	int     index;
 
-	if ( m_cdrom == nullptr )
+	if ( !m_cdrom->exists() )
 		return;
 
 	if ( (m_cdrom_dmacontrol & 0x04000000) == 0 )
@@ -589,7 +568,7 @@ TIMER_CALLBACK_MEMBER( akiko_device::cd_delayed_cmd )
 
 		resp[0] = 0x06;
 
-		if ( m_cdrom == nullptr || m_cdrom_numtracks == 0 )
+		if ( !m_cdrom->exists() || m_cdrom_numtracks == 0 )
 		{
 			resp[1] = 0x80;
 			setup_response( 15, resp );
@@ -665,7 +644,7 @@ void akiko_device::update_cdrom()
 
 			m_cdrom_cmd_start = (m_cdrom_cmd_start + 13) & 0xff;
 
-			if ( m_cdrom == nullptr || m_cdrom_numtracks == 0 )
+			if ( !m_cdrom->exists() || m_cdrom_numtracks == 0 )
 			{
 				resp[1] = 0x80;
 				setup_response( 2, resp );
@@ -775,7 +754,7 @@ void akiko_device::update_cdrom()
 
 			m_cdrom_cmd_start = (m_cdrom_cmd_start + 2) & 0xff;
 
-			if ( m_cdrom == nullptr || m_cdrom_numtracks == 0 )
+			if ( !m_cdrom->exists() || m_cdrom_numtracks == 0 )
 				resp[1] = 0x80;
 
 			setup_response( 20, resp );

@@ -10,6 +10,9 @@ Skeleton driver for ITT Courier 9216 IBM 3179-compatible color display terminal.
 #include "cpu/m68000/m68008.h"
 #include "cpu/mcs48/mcs48.h"
 
+
+namespace {
+
 class itt9216_state : public driver_device
 {
 public:
@@ -101,5 +104,8 @@ ROM_START(itt9216)
 	ROM_REGION(0x2000, "chargen", 0)
 	ROM_LOAD("174055-004.u40", 0x0000, 0x2000, CRC(c8611425) SHA1(31fbdd6ff72a96c59277b6edac9a6360f6e1e49e))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1986, itt9216, 0, 0, itt9216, itt9216, itt9216_state, empty_init, "ITT Courier", "ITT 9216-X", MACHINE_IS_SKELETON)

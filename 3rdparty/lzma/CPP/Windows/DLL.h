@@ -8,10 +8,12 @@
 namespace NWindows {
 namespace NDLL {
 
+#ifdef _WIN32
+
 #ifdef UNDER_CE
-#define My_GetProcAddress(module, procName) ::GetProcAddressA(module, procName)
+#define My_GetProcAddress(module, procName) (void *)::GetProcAddressA(module, procName)
 #else
-#define My_GetProcAddress(module, procName) ::GetProcAddress(module, procName)
+#define My_GetProcAddress(module, procName) (void *)::GetProcAddress(module, procName)
 #endif
 
 /* Win32: Don't call CLibrary::Free() and FreeLibrary() from another
@@ -46,8 +48,32 @@ public:
   bool Free() throw();
   bool LoadEx(CFSTR path, DWORD flags = LOAD_LIBRARY_AS_DATAFILE) throw();
   bool Load(CFSTR path) throw();
-  FARPROC GetProc(LPCSTR procName) const { return My_GetProcAddress(_module, procName); }
+  // FARPROC
+  void *GetProc(LPCSTR procName) const { return My_GetProcAddress(_module, procName); }
 };
+
+#else
+
+typedef void * HMODULE;
+// typedef int (*FARPROC)();
+// typedef void *FARPROC;
+
+class CLibrary
+{
+  HMODULE _module;
+
+  // CLASS_NO_COPY(CLibrary);
+public:
+  CLibrary(): _module(NULL) {};
+  ~CLibrary() { Free(); }
+
+  bool Free() throw();
+  bool Load(CFSTR path) throw();
+  // FARPROC
+  void *GetProc(LPCSTR procName) const; // { return My_GetProcAddress(_module, procName); }
+};
+
+#endif
 
 bool MyGetModuleFileName(FString &path);
 

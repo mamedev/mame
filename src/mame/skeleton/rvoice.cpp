@@ -17,6 +17,9 @@
 
 /* Components */
 
+
+namespace {
+
 class rvoice_state : public driver_device
 {
 public:
@@ -114,6 +117,7 @@ ROM_START(rvoicepc)
 
 ROM_END
 
+} // anonymous namespace
 
 
 /******************************************************************************

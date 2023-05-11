@@ -5,8 +5,8 @@
  Lasso and similar hardware
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_LASSO_H
-#define MAME_INCLUDES_LASSO_H
+#ifndef MAME_SNK_LASSO_H
+#define MAME_SNK_LASSO_H
 
 #pragma once
 
@@ -113,4 +113,4 @@ private:
 	void wwjgtin_main_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_LASSO_H
+#endif // MAME_SNK_LASSO_H

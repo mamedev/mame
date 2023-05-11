@@ -4,7 +4,7 @@
 
     atapicdr.h
 
-    ATAPI CDROM
+    ATAPI CDROM/DVDROM
 
 ***************************************************************************/
 
@@ -37,6 +37,7 @@ protected:
 	virtual void identify_packet_device() override;
 	virtual void process_buffer() override;
 	virtual void ExecCommand() override;
+	u32 m_sequence_counter;
 	bool m_media_change;
 	uint16_t ultra_dma_mode;
 };
@@ -50,8 +51,28 @@ protected:
 	virtual void device_reset() override;
 };
 
+class atapi_dvdrom_device : public atapi_cdrom_device
+{
+public:
+	atapi_dvdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_reset() override;
+};
+
+class atapi_fixed_dvdrom_device : public atapi_cdrom_device
+{
+public:
+	atapi_fixed_dvdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_reset() override;
+};
+
 // device type definition
-DECLARE_DEVICE_TYPE(ATAPI_CDROM,       atapi_cdrom_device)
-DECLARE_DEVICE_TYPE(ATAPI_FIXED_CDROM, atapi_fixed_cdrom_device)
+DECLARE_DEVICE_TYPE(ATAPI_CDROM,        atapi_cdrom_device)
+DECLARE_DEVICE_TYPE(ATAPI_FIXED_CDROM,  atapi_fixed_cdrom_device)
+DECLARE_DEVICE_TYPE(ATAPI_DVDROM,       atapi_dvdrom_device)
+DECLARE_DEVICE_TYPE(ATAPI_FIXED_DVDROM, atapi_fixed_dvdrom_device)
 
 #endif // MAME_BUS_ATA_ATAPICDR_H

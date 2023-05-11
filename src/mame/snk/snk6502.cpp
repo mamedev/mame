@@ -144,7 +144,7 @@ Stephh's notes (based on the games M6502 code and some tests) :
        ON      OFF     OFF      1C_2C
        ON      ON      OFF      1C_6C
 
-    The 3 other combinaisons give 1C_1C
+    The 3 other combinations give 1C_1C
   - From the manual, it says that DSW bit 6 determines the cost of a game :
       * bit 6 = 0 : "25c / game"
       * bit 6 = 1 : "50c / game"

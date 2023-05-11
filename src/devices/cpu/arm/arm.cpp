@@ -264,11 +264,11 @@ uint32_t arm_cpu_device::cpu_read32( int addr )
 			logerror("%08x: Unaligned byte read %08x\n",R15,addr);
 
 		if ((addr&3)==1)
-			return ((result&0x000000ff)<<24)|((result&0xffffff00)>> 8);
+			return rotr_32(result, 8);
 		if ((addr&3)==2)
-			return ((result&0x0000ffff)<<16)|((result&0xffff0000)>>16);
+			return rotr_32(result, 16);
 		if ((addr&3)==3)
-			return ((result&0x00ffffff)<< 8)|((result&0xff000000)>>24);
+			return rotr_32(result, 24);
 	}
 
 	return result;
@@ -446,19 +446,19 @@ void arm_cpu_device::arm_check_irq_state()
 
 	if (m_pendingFiq && (pc&F_MASK)==0)
 	{
+		standard_irq_callback(ARM_FIRQ_LINE, R15 & ADDRESS_MASK);
 		R15 = eARM_MODE_FIQ;    /* Set FIQ mode so PC is saved to correct R14 bank */
 		SetRegister( 14, pc );    /* save PC */
 		R15 = (pc&PSR_MASK)|(pc&IRQ_MASK)|0x1c|eARM_MODE_FIQ|I_MASK|F_MASK; /* Mask both IRQ & FIRQ, set PC=0x1c */
-		standard_irq_callback(ARM_FIRQ_LINE);
 		return;
 	}
 
 	if (m_pendingIrq && (pc&I_MASK)==0)
 	{
+		standard_irq_callback(ARM_IRQ_LINE, R15 & ADDRESS_MASK);
 		R15 = eARM_MODE_IRQ;    /* Set IRQ mode so PC is saved to correct R14 bank */
 		SetRegister( 14, pc );    /* save PC */
 		R15 = (pc&PSR_MASK)|(pc&IRQ_MASK)|0x18|eARM_MODE_IRQ|I_MASK|(pc&F_MASK); /* Mask only IRQ, set PC=0x18 */
-		standard_irq_callback(ARM_IRQ_LINE);
 		return;
 	}
 }

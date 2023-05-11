@@ -5,8 +5,8 @@
     Atari Gauntlet hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_GAUNTLET_H
-#define MAME_INCLUDES_GAUNTLET_H
+#ifndef MAME_ATARI_GAUNTLET_H
+#define MAME_ATARI_GAUNTLET_H
 
 #pragma once
 
@@ -106,4 +106,4 @@ private:
 	void slapstic_tweak(offs_t offset, u16 &, u16);
 };
 
-#endif // MAME_INCLUDES_GAUNTLET_H
+#endif // MAME_ATARI_GAUNTLET_H

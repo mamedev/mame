@@ -256,12 +256,12 @@ offs_t ns32000_disassembler::disassemble(std::ostream &stream, offs_t pc, data_b
 
 		switch (BIT(opbyte, 4, 3))
 		{
-		case 0: util::stream_format(stream, "ADDQ%c   %d, %s", size_char[size], s32(quick << 28) >> 28, mode[0].mode); break;
-		case 1: util::stream_format(stream, "CMPQ%c   %d, %s", size_char[size], s32(quick << 28) >> 28, mode[0].mode); break;
+		case 0: util::stream_format(stream, "ADDQ%c   %d, %s", size_char[size], util::sext(quick, 4), mode[0].mode); break;
+		case 1: util::stream_format(stream, "CMPQ%c   %d, %s", size_char[size], util::sext(quick, 4), mode[0].mode); break;
 		case 2: util::stream_format(stream, "SPR%c    %s, %s", size_char[size], procreg[quick], mode[0].mode); break;
 		case 3: util::stream_format(stream, "S%s%c    %s", cond_code[quick], size_char[size], mode[0].mode); break;
-		case 4: util::stream_format(stream, "ACB%c    %d, %s, 0x%X", size_char[size], s32(quick << 28) >> 28, mode[0].mode, pc + displacement(pc, opcodes, bytes)); flags |= STEP_COND; break;
-		case 5: util::stream_format(stream, "MOVQ%c   %d, %s", size_char[size], s32(quick << 28) >> 28, mode[0].mode); break;
+		case 4: util::stream_format(stream, "ACB%c    %d, %s, 0x%X", size_char[size], util::sext(quick, 4), mode[0].mode, pc + displacement(pc, opcodes, bytes)); flags |= STEP_COND; break;
+		case 5: util::stream_format(stream, "MOVQ%c   %d, %s", size_char[size], util::sext(quick, 4), mode[0].mode); break;
 		case 6: util::stream_format(stream, "LPR%c    %s, %s", size_char[size], procreg[quick], mode[0].mode); break;
 		case 7:
 			// format 3: gggg gooo o111 11ii

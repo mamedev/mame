@@ -66,7 +66,7 @@ void flower_sound_device::device_start()
 	m_iospace = &space(AS_IO);
 	m_stream = stream_alloc(0, 1, clock()/2);
 
-	m_mixer_buffer.resize(clock()/50);
+	m_mixer_buffer.resize(clock()/2);
 	make_mixer_table(MAX_VOICES, defgain);
 
 	save_item(STRUCT_MEMBER(m_channel_list, start_nibbles));

@@ -109,6 +109,9 @@ the Neogeo Pocket.
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 enum flash_state
 {
 	F_READ,                     /* xxxx F0 or 5555 AA 2AAA 55 5555 F0 */
@@ -752,11 +755,8 @@ DEVICE_IMAGE_LOAD_MEMBER(ngp_state::load_ngp_cart)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
-	if (size != 0x8000 && size != 0x80000 && size != 0x100000 && size != 0x200000 && size != 0x400000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-		return image_init_result::FAIL;
-	}
+	if (size != 0x8000 && size != 0x8'0000 && size != 0x10'0000 && size != 0x20'0000 && size != 0x40'0000)
+		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be 32K, 512K, 1M, 2M or 4M)");
 
 	// alloc 0x400000 ROM to simplify mapping in the address map
 	m_cart->rom_alloc(0x400000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
@@ -791,7 +791,7 @@ DEVICE_IMAGE_LOAD_MEMBER(ngp_state::load_ngp_cart)
 		m_flash_chip[1].state = F_READ;
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -906,6 +906,8 @@ ROM_START(ngpc)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("ngpcbios.rom", 0x0000, 0x10000, CRC(6eeb6f40) SHA1(edc13192054a59be49c6d55f83b70e2510968e86))
 ROM_END
+
+} // anonymous namespace
 
 
 //   YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE      INIT        COMPANY  FULLNAME               FLAGS

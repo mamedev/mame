@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
-#ifndef MAME_MACHINE_TELEPRINTER_H
-#define MAME_MACHINE_TELEPRINTER_H
+#ifndef MAME_SHARED_TELEPRINTER_H
+#define MAME_SHARED_TELEPRINTER_H
 
 #pragma once
 
@@ -39,4 +39,4 @@ private:
 
 DECLARE_DEVICE_TYPE(TELEPRINTER, teleprinter_device)
 
-#endif // MAME_MACHINE_TELEPRINTER_H
+#endif // MAME_SHARED_TELEPRINTER_H

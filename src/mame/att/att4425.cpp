@@ -29,6 +29,8 @@
 #include "screen.h"
 
 
+namespace {
+
 #define SCREEN_TAG          "screen"
 #define Z80_TAG             "maincpu"
 #define Z80CTC_TAG          "z80ctc"
@@ -301,6 +303,9 @@ ROM_START( att4425 )
 	ROM_REGION( 0x2000, "chargen", 0 )
 	ROM_LOAD( "char.bin", 0x0000, 0x2000, CRC(cca962cc) SHA1(201d97b954f782ceae8d17a08fb9a1c4d5ae7a58) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* System Drivers */
 

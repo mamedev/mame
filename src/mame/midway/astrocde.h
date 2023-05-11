@@ -5,8 +5,8 @@
     Bally Astrocade-based hardware
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_ASTROCDE_H
-#define MAME_INCLUDES_ASTROCDE_H
+#ifndef MAME_MIDWAY_ASTROCDE_H
+#define MAME_MIDWAY_ASTROCDE_H
 
 #pragma once
 
@@ -269,4 +269,4 @@ private:
 	output_finder<19> m_lamps;
 };
 
-#endif // MAME_INCLUDES_ASTROCDE_H
+#endif // MAME_MIDWAY_ASTROCDE_H

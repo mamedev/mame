@@ -28,7 +28,6 @@
 #include <map>
 #include <unordered_map>
 #include <unordered_set>
-#include <cstdarg>
 
 // core emulator headers -- must be first (profiler needs attotime, attotime needs xtal)
 #include "emucore.h"
@@ -80,7 +79,6 @@
 #include "parameters.h"
 
 // the running machine
-#include "main.h"
 #include "machine.h"
 #include "driver.h"
 

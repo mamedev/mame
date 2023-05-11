@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Sergey Svishchev
-#ifndef MAME_MACHINE_IBM6580_KBD_H
-#define MAME_MACHINE_IBM6580_KBD_H
+#ifndef MAME_IBM_IBM6580_KBD_H
+#define MAME_IBM_IBM6580_KBD_H
 
 #pragma once
 
@@ -48,4 +48,4 @@ private:
 
 DECLARE_DEVICE_TYPE(DW_KEYBOARD, dw_keyboard_device)
 
-#endif // MAME_MACHINE_IBM6580_KBD_H
+#endif // MAME_IBM_IBM6580_KBD_H

@@ -26,9 +26,9 @@
 ## $ python minimaws.py listclones "unkch*"
 ## $ python minimaws.py listbrothers superx
 ##
-## The romident command does not support archives or software lists, but
-## it's far faster than using MAME as it has optimised indexes, and
-## results are grouped by machine rather than by file:
+## The romident command does not support 7zip archives, but it's far
+## faster than using MAME as it has optimised indexes, and results are
+## grouped by machine rather than by file:
 ##
 ## $ python minimaws.py romident 27c64.bin dump-dir
 ##
@@ -36,7 +36,7 @@
 ## equivalent for.  The listaffected command shows all runnable machines
 ## that reference devices defined in specified source files:
 ##
-## $ python minimaws.py listaffected "src/devices/cpu/m6805/*" src/devices/cpu/mcs40/mcs40.cpp
+## $ python minimaws.py listaffected "devices/cpu/m6805/*" devices/cpu/mcs40/mcs40.cpp
 ##
 ## This script can also run a local web server allowing you to explore
 ## systems, devices and source files:
@@ -77,6 +77,11 @@
 ## On any of these, and many other systems, you can select slot options
 ## and see dependent slots update.  Required command-line arguments to
 ## produce the selected configuration are also displayed.
+##
+## Media files can be identified using a web browser interface
+##
+## Checksums and digests are calculated locally - no files are uploaded
+## to the server.
 
 if __name__ == '__main__':
     import argparse

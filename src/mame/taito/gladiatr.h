@@ -146,7 +146,6 @@ private:
 	DECLARE_VIDEO_START(gladiatr);
 
 	uint32_t screen_update_gladiatr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	static void swap_block(u8 *src1, u8 *src2, int len);
 
 	void gladiatr_cpu1_io(address_map &map);
 	void gladiatr_cpu1_map(address_map &map);

@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_HP9825_TAPE_H
-#define MAME_MACHINE_HP9825_TAPE_H
+#ifndef MAME_HP_HP9825_TAPE_H
+#define MAME_HP_HP9825_TAPE_H
 
 #pragma once
 
@@ -91,4 +91,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(HP9825_TAPE, hp9825_tape_device)
 
-#endif // MAME_MACHINE_HP9825_TAPE_H
+#endif // MAME_HP_HP9825_TAPE_H

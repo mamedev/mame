@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert,Andreas Naive
-#ifndef MAME_MACHINE_NAOMIM4_H
-#define MAME_MACHINE_NAOMIM4_H
+#ifndef MAME_SEGA_NAOMIM4_H
+#define MAME_SEGA_NAOMIM4_H
 
 #include "naomibd.h"
 
@@ -57,4 +57,4 @@ private:
 
 DECLARE_DEVICE_TYPE(NAOMI_M4_BOARD, naomi_m4_board)
 
-#endif // MAME_MACHINE_NAOMIM4_H
+#endif // MAME_SEGA_NAOMIM4_H

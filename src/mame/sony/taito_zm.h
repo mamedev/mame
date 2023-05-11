@@ -5,8 +5,8 @@
     Taito Zoom ZSG-2 sound board
 
 ***************************************************************************/
-#ifndef MAME_AUDIO_TAITO_ZM_H
-#define MAME_AUDIO_TAITO_ZM_H
+#ifndef MAME_SONY_TAITO_ZM_H
+#define MAME_SONY_TAITO_ZM_H
 
 #pragma once
 
@@ -59,4 +59,4 @@ private:
 DECLARE_DEVICE_TYPE(TAITO_ZOOM, taito_zoom_device)
 
 
-#endif // MAME_AUDIO_TAITO_ZM_H
+#endif // MAME_SONY_TAITO_ZM_H

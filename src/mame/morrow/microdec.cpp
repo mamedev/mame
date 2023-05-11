@@ -36,6 +36,8 @@ ToDo:
 #include "softlist_dev.h"
 
 
+namespace {
+
 class microdec_state : public driver_device
 {
 public:
@@ -265,6 +267,9 @@ ROM_START( md3 )
 	ROM_SYSTEM_BIOS( 2, "v31", "v3.1" )
 	ROMX_LOAD("md3-31.bin",  0x0000, 0x1000, CRC(bd4014f6) SHA1(5b33220af34c64676756177db4915f97840b2996), ROM_BIOS(2))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

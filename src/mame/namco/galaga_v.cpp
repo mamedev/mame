@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "galaga.h"
 
-#define LOG_DEBUG           (1 << 0U)
+#define LOG_DEBUG           (1U << 0)
 #define LOG_ALL             (LOG_DEBUG)
 
 #define VERBOSE             (LOG_ALL)

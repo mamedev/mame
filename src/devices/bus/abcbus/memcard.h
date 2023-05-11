@@ -12,6 +12,8 @@
 #pragma once
 
 #include "abcbus.h"
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 
 
 
@@ -28,7 +30,7 @@ public:
 	abc_memory_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 protected:
 	// device-level overrides
@@ -39,10 +41,10 @@ protected:
 	virtual uint8_t abcbus_xmemfl(offs_t offset) override;
 
 private:
-	required_memory_region m_dos_rom;
-	required_memory_region m_iec_rom;
-	required_memory_region m_opt_rom;
-	required_memory_region m_prn_rom;
+	required_device<generic_slot_device> m_dos_rom;
+	required_device<generic_slot_device> m_iec_rom;
+	required_device<generic_slot_device> m_opt_rom;
+	required_device<generic_slot_device> m_prn_rom;
 };
 
 

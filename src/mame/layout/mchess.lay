@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <mamelayout version="2">
 
@@ -17,7 +17,7 @@ license:CC0
 
 	<element name="redd">
 		<rect><color red="0.5" green="0.1" blue="0.15" /></rect>
-		<text string="&#x2206;"><color red="0.4" green="0.08" blue="0.1" /></text>
+		<text string="Δ"><color red="0.4" green="0.08" blue="0.1" /></text>
 	</element>
 
 	<element name="hl" defstate="0">

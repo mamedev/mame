@@ -9,9 +9,9 @@
 #include "emu.h"
 #include "hal2.h"
 
-#define LOG_UNKNOWN     (1 << 0U)
-#define LOG_READS       (1 << 1U)
-#define LOG_WRITES      (1 << 2U)
+#define LOG_UNKNOWN     (1U << 0)
+#define LOG_READS       (1U << 1)
+#define LOG_WRITES      (1U << 2)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_READS | LOG_WRITES)
 
 #define VERBOSE         (0)

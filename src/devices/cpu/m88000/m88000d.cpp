@@ -83,10 +83,10 @@ const std::map<u32, const mc88100_disassembler::instruction> mc88100_disassemble
 	{ 0x64000000, { 0xfc000000, "subu",        mc88100_disassembler::addressing::IMM16 }},
 	{ 0x68000000, { 0xfc000000, "divu",        mc88100_disassembler::addressing::IMM16 }},
 	{ 0x6c000000, { 0xfc000000, "mul",         mc88100_disassembler::addressing::IMM16 }},
-	{ 0x70000000, { 0xfc000000, "add",         mc88100_disassembler::addressing::SIMM16 }},
-	{ 0x74000000, { 0xfc000000, "sub",         mc88100_disassembler::addressing::SIMM16 }},
-	{ 0x78000000, { 0xfc000000, "div",         mc88100_disassembler::addressing::SIMM16 }},
-	{ 0x7c000000, { 0xfc000000, "cmp",         mc88100_disassembler::addressing::SIMM16 }},
+	{ 0x70000000, { 0xfc000000, "add",         mc88100_disassembler::addressing::IMM16 }},
+	{ 0x74000000, { 0xfc000000, "sub",         mc88100_disassembler::addressing::IMM16 }},
+	{ 0x78000000, { 0xfc000000, "div",         mc88100_disassembler::addressing::IMM16 }},
+	{ 0x7c000000, { 0xfc000000, "cmp",         mc88100_disassembler::addressing::IMM16 }},
 	{ 0x80004000, { 0xfc00f800, "ldcr",        mc88100_disassembler::addressing::CR }}, // privileged; S1, S2 not used
 	{ 0x80004800, { 0xfc00f800, "fldcr",       mc88100_disassembler::addressing::CR }}, // S1, S2 not used
 	{ 0x80008000, { 0xfc00f800, "stcr",        mc88100_disassembler::addressing::CR }}, // privileged; D not used

@@ -5,8 +5,8 @@
     Namco System NB-1 hardware
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_NAMCONB1_H
-#define MAME_INCLUDES_NAMCONB1_H
+#ifndef MAME_NAMCO_NAMCONB1_H
+#define MAME_NAMCO_NAMCONB1_H
 
 #pragma once
 
@@ -160,4 +160,4 @@ private:
 	void namconb2_am(address_map &map);
 };
 
-#endif // MAME_INCLUDES_NAMCONB1_H
+#endif // MAME_NAMCO_NAMCONB1_H

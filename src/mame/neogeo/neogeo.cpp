@@ -30,7 +30,6 @@
         * Graphical Glitches caused by incorrect timing?
           - Some raster effects are imperfect (off by a couple of lines)
         * 68000 waitstates on ROM region access, determined by jumpers on cart
-          (garou train stage 3 background bug is probably related to this)
         * AES Input clock is incorrect (24.167829MHz for NTSC systems, PAL is same?)
         * PAL region AES behavior is not verified
 
@@ -926,15 +925,20 @@ CUSTOM_INPUT_MEMBER(ngarcade_base_state::startsel_edge_joy_r)
 
 void neogeo_base_state::io_control_w(offs_t offset, uint8_t data)
 {
-	if ((offset & 0x38) == 0x00) // TODO: the mask is supposedly less restrictive on AES?
+	switch (offset & 0x38) // TODO: the mask is supposedly less restrictive on AES?
 	{
+	case 0x00:
 		if (m_ctrl1) m_ctrl1->write_ctrlsel(data & 0x07);
 		if (m_ctrl2) m_ctrl2->write_ctrlsel((data >> 3) & 0x07);
 		if (m_edge) m_edge->write_ctrlsel(data & 0x3f); // FIXME: only MV-1B and MV-1C have this output
-	}
-	else
-	{
-		logerror("PC: %x  Unmapped I/O control write.  Offset: %x  Data: %x\n", m_maincpu->pc(), offset, data);
+		break;
+
+	case 0x08:
+		m_card_bank = data & 0x07;
+		break;
+
+	default:
+		logerror("%s: Unmapped I/O control write.  Offset: %02x  Data: %02x\n", machine().describe_context(), offset, data);
 	}
 }
 
@@ -943,6 +947,7 @@ void ngarcade_base_state::io_control_w(offs_t offset, uint8_t data)
 	switch (offset & 0x78)
 	{
 	case 0x00:
+	case 0x08:
 		neogeo_base_state::io_control_w(offset, data);
 		break;
 
@@ -961,7 +966,7 @@ void ngarcade_base_state::io_control_w(offs_t offset, uint8_t data)
 		break;
 
 	default:
-		logerror("PC: %x  Unmapped I/O control write.  Offset: %x  Data: %x\n", m_maincpu->pc(), offset, data);
+		logerror("%s: Unmapped I/O control write.  Offset: %02x  Data: %02x\n", machine().describe_context(), offset, data);
 	}
 }
 
@@ -1060,18 +1065,15 @@ CUSTOM_INPUT_MEMBER(neogeo_base_state::get_memcard_status)
 }
 
 
-uint16_t neogeo_base_state::memcard_r(offs_t offset)
+uint16_t neogeo_base_state::memcard_r(offs_t offset, uint16_t mem_mask)
 {
 	m_maincpu->eat_cycles(2); // insert waitstate
 
-	uint16_t ret;
-
-	if (m_memcard->present())
-		ret = m_memcard->read(offset) | 0xff00;
+	// memory card enabled by /UDS
+	if (ACCESSING_BITS_8_15 && m_memcard->present())
+		return m_memcard->read((offs_t(m_card_bank) << 21) | offset);
 	else
-		ret = 0xffff;
-
-	return ret;
+		return 0xffff;
 }
 
 
@@ -1079,11 +1081,9 @@ void neogeo_base_state::memcard_w(offs_t offset, uint16_t data, uint16_t mem_mas
 {
 	m_maincpu->eat_cycles(2); // insert waitstate
 
-	if (ACCESSING_BITS_0_7)
-	{
-		if (m_memcard->present())
-			m_memcard->write(offset, data);
-	}
+	// memory card enabled by /UDS
+	if (ACCESSING_BITS_8_15 && m_memcard->present())
+		m_memcard->write((offs_t(m_card_bank) << 21) | offset, data);
 }
 
 /*************************************
@@ -1565,6 +1565,7 @@ void neogeo_base_state::machine_start()
 	save_item(NAME(m_bank_base));
 	save_item(NAME(m_use_cart_vectors));
 	save_item(NAME(m_use_cart_audio));
+	save_item(NAME(m_card_bank));
 }
 
 void ngarcade_base_state::machine_start()
@@ -1585,9 +1586,9 @@ void ngarcade_base_state::machine_start()
 
 	if (m_memcard)
 	{
-		main_program_space.unmap_readwrite(0x800000, 0x800fff);
-		main_program_space.install_read_handler(0x800000, 0x800fff, read16sm_delegate(*this, FUNC(ngarcade_base_state::memcard_r)));
-		main_program_space.install_write_handler(0x800000, 0x800fff, write16s_delegate(*this, FUNC(ngarcade_base_state::memcard_w)));
+		main_program_space.unmap_readwrite(0x800000, 0xbfffff);
+		main_program_space.install_read_handler(0x800000, 0xbfffff, read16s_delegate(*this, FUNC(ngarcade_base_state::memcard_r)));
+		main_program_space.install_write_handler(0x800000, 0xbfffff, write16s_delegate(*this, FUNC(ngarcade_base_state::memcard_w)));
 	}
 
 	// enable rtc and serial mode
@@ -1712,7 +1713,7 @@ void neogeo_base_state::base_main_map(address_map &map)
 	map(0x360000, 0x37ffff).r(FUNC(neogeo_base_state::unmapped_r));
 	map(0x380000, 0x3800ff).mirror(0x01ff00).w(FUNC(neogeo_base_state::io_control_w)).umask16(0x00ff);
 	map(0x3a0000, 0x3a001f).mirror(0x01ffe0).r(FUNC(neogeo_base_state::unmapped_r));
-	map(0x3a0000, 0x3a001f).mirror(0x01ffe0).w("systemlatch", FUNC(hc259_device::write_a3)).umask16(0x00ff); // BITW1 (system control registers)
+	map(0x3a0000, 0x3a001f).mirror(0x01ffe0).w(m_systemlatch, FUNC(hc259_device::write_a3)).umask16(0x00ff); // BITW1 (system control registers)
 	map(0x3c0000, 0x3c0007).mirror(0x01fff8).r(FUNC(neogeo_base_state::video_register_r));
 	map(0x3c0000, 0x3c000f).mirror(0x01fff0).w(FUNC(neogeo_base_state::video_register_w));
 	map(0x3e0000, 0x3fffff).r(FUNC(neogeo_base_state::unmapped_r));
@@ -1762,7 +1763,7 @@ void aes_state::aes_main_map(address_map &map)
 	map(0x000000, 0x00007f).r(FUNC(aes_state::banked_vectors_r));
 	map(0x100000, 0x10ffff).mirror(0x0f0000).ram();
 	// some games have protection devices in the 0x200000 region, it appears to map to cart space, not surprising, the ROM is read here too
-	map(0x800000, 0x800fff).rw(FUNC(aes_state::memcard_r), FUNC(aes_state::memcard_w));
+	map(0x800000, 0xbfffff).rw(FUNC(aes_state::memcard_r), FUNC(aes_state::memcard_w));
 	map(0xc00000, 0xc1ffff).mirror(0x0e0000).rom().region("mainbios", 0);
 	map(0xd00000, 0xffffff).r(FUNC(aes_state::unmapped_r));
 }
@@ -1906,7 +1907,7 @@ INPUT_CHANGED_MEMBER(aes_base_state::aes_jp1)
 {
 	// Shorting JP1 causes a 68000 /BERR (Bus Error). On Dev Bios, this pops up the debug monitor.
 	if (newval)
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, HOLD_LINE);
+		m_maincpu->trigger_bus_error();
 }
 
 
@@ -1932,7 +1933,7 @@ void neogeo_base_state::neogeo_base(machine_config &config)
 	m_systemlatch->q_out_cb<1>().set(FUNC(neogeo_base_state::set_use_cart_vectors));
 	m_systemlatch->q_out_cb<2>().set_nop(); // memory card 1: write enable/disable
 	m_systemlatch->q_out_cb<3>().set_nop(); // memory card 2: write disable/enable
-	m_systemlatch->q_out_cb<4>().set_nop(); // memory card: register select enable/set to normal (what does it mean?)
+	m_systemlatch->q_out_cb<4>().set_nop(); // memory card: register select enable/set to normal
 	m_systemlatch->q_out_cb<7>().set(FUNC(neogeo_base_state::set_palette_bank));
 
 	/* video hardware */
@@ -1974,6 +1975,16 @@ void neogeo_base_state::neogeo_stereo(machine_config &config)
 }
 
 
+void neogeo_base_state::neogeo_memcard(machine_config &config)
+{
+	NG_MEMCARD(config, m_memcard, 0);
+
+	m_systemlatch->q_out_cb<2>().set(m_memcard, FUNC(ng_memcard_device::lock1_w));
+	m_systemlatch->q_out_cb<3>().set(m_memcard, FUNC(ng_memcard_device::unlock2_w));
+	m_systemlatch->q_out_cb<4>().set(m_memcard, FUNC(ng_memcard_device::regsel_w));
+}
+
+
 void ngarcade_base_state::neogeo_arcade(machine_config &config)
 {
 	neogeo_base(config);
@@ -2011,8 +2022,7 @@ void mvs_led_state::mv1(machine_config &config)
 {
 	neogeo_arcade(config);
 	neogeo_stereo(config);
-
-	NG_MEMCARD(config, m_memcard, 0);
+	neogeo_memcard(config);
 
 	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", false);
 
@@ -2055,8 +2065,7 @@ void mvs_led_el_state::mv2f(machine_config &config)
 {
 	neogeo_arcade(config);
 	neogeo_stereo(config);
-
-	NG_MEMCARD(config, m_memcard, 0);
+	neogeo_memcard(config);
 
 	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", false);
 
@@ -2072,8 +2081,7 @@ void mvs_led_el_state::mv4f(machine_config &config)
 {
 	neogeo_arcade(config);
 	neogeo_stereo(config);
-
-	NG_MEMCARD(config, m_memcard, 0);
+	neogeo_memcard(config);
 
 	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", false);
 
@@ -2089,8 +2097,7 @@ void mvs_led_el_state::mv6f(machine_config &config)
 {
 	neogeo_arcade(config);
 	neogeo_stereo(config);
-
-	NG_MEMCARD(config, m_memcard, 0);
+	neogeo_memcard(config);
 
 	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", false);
 
@@ -2106,8 +2113,7 @@ void mvs_led_state::mv1_fixed(machine_config &config)
 {
 	neogeo_arcade(config);
 	neogeo_stereo(config);
-
-	NG_MEMCARD(config, m_memcard, 0);
+	neogeo_memcard(config);
 
 	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", true);
 
@@ -2148,10 +2154,9 @@ void aes_state::aes_ntsc(machine_config &config)
 {
 	neogeo_base(config);
 	neogeo_stereo(config);
+	neogeo_memcard(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &aes_state::aes_main_map);
-
-	NG_MEMCARD(config, m_memcard, 0);
 
 	NEOGEO_CART_SLOT(config, m_slots[0], neogeo_cart, nullptr);
 
@@ -7985,8 +7990,10 @@ ROM_START( irrmaze ) /* MVS ONLY RELEASE */
 	// special BIOS with trackball support, we only have one Irritating Maze bios and that's Asian
 	ROM_SYSTEM_BIOS( 0, "asia-sp1", "Asia MV1B 263" )
 	ROM_LOAD16_WORD_SWAP_BIOS( 0, "236-bios.sp1", 0x00000, 0x020000, CRC(853e6b96) SHA1(de369cb4a7df147b55168fa7aaf0b98c753b735e) )
+	ROM_SYSTEM_BIOS( 1, "japan", "Japan (hack?)" ) // from a 'refurbished' Japanese cabinet, had label of the arcade distributor rather than original sticker however, and looks like a hack of above Asia ROM
+	ROM_LOAD16_WORD_SWAP_BIOS( 1, "236-bios_japan_hack.sp1", 0x00000, 0x020000, CRC(02bf4426) SHA1(f4aa64bfe0b93e5df07b4fe2e0f638d91c7f2e71) )
 	// Universe BIOS 2.2 and later allow joystick play as a cheat
-	NEOGEO_UNIBIOS_2_2_AND_NEWER(1)
+	NEOGEO_UNIBIOS_2_2_AND_NEWER(2)
 
 	ROM_REGION( 0x30000, "cslot1:audiocpu", 0 )
 	ROM_LOAD( "236-m1.m1", 0x00000, 0x20000, CRC(880a1abd) SHA1(905afa157aba700e798243b842792e50729b19a0) ) /* TC531001 */
@@ -12147,7 +12154,7 @@ GAME( 1996, neomrdo,    neogeo,   neobase,   neogeo,    mvs_led_state, empty_ini
 GAME( 1995, goalx3,     neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Goal! Goal! Goal!", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, neodrift,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Neo Drift Out - New Technology", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, breakers,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Breakers", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, puzzldpr,   puzzledp, neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Puzzle De Pon! R!", MACHINE_SUPPORTS_SAVE ) // game concept licensed from Taito
+GAME( 1997, puzzldpr,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Puzzle De Pon! R!", MACHINE_SUPPORTS_SAVE ) // game concept licensed from Taito
 GAME( 1998, breakrev,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Breakers Revenge", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, flipshot,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Battle Flip Shot", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, ctomaday,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Captain Tomaday", MACHINE_SUPPORTS_SAVE )

@@ -53,17 +53,17 @@ void mc10_pak_device::device_start()
 }
 
 //-------------------------------------------------
-//  load - install rom region
+//  load - install ROM region
 //-------------------------------------------------
 
-image_init_result mc10_pak_device::load()
+std::pair<std::error_condition, std::string> mc10_pak_device::load()
 {
-	// if the host has supplied a ROM space, install it
 	memory_region *const romregion(memregion("^rom"));
-	if (romregion)
-		owning_slot().memspace().install_rom(0x5000, 0x5000 + romregion->bytes(), romregion->base());
-	else
-		return image_init_result::FAIL;
+	if (!romregion)
+		return std::make_pair(image_error::BADSOFTWARE, "Software item lacks 'rom' data area");
 
-	return image_init_result::PASS;
+	// if the host has supplied a ROM space, install it
+	owning_slot().memspace().install_rom(0x5000, 0x5000 + romregion->bytes(), romregion->base());
+
+	return std::make_pair(std::error_condition(), std::string());
 }

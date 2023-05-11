@@ -67,7 +67,10 @@
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "screen.h"
+#include "machine/pci.h"
+
+
+namespace {
 
 class odyssey_state : public driver_device
 {
@@ -82,70 +85,28 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void odyssey_map(address_map &map);
 };
 
-void odyssey_state::video_start()
-{
-}
 
-u32 odyssey_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	return 0;
-}
-
-
-/**************************************
-*             Memory Map              *
-**************************************/
 
 void odyssey_state::odyssey_map(address_map &map)
 {
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000e0000, 0x000fffff).rom().region("pmb", 0x60000);
+	map(0xfff80000, 0xffffffff).rom().region("pmb", 0);
 }
-
-
-/**************************************
-*            Input Ports              *
-**************************************/
 
 static INPUT_PORTS_START( odyssey )
 INPUT_PORTS_END
 
-
-/**************************************
-*        Machine Start/Reset          *
-**************************************/
-
-void odyssey_state::machine_start()
-{
-}
-
-void odyssey_state::machine_reset()
-{
-}
-
-
-/**************************************
-*           Machine Config            *
-**************************************/
-
 void odyssey_state::odyssey(machine_config &config)
 {
-	/* basic machine hardware */
-	PENTIUM(config, m_maincpu, 133000000); // a Celeron at 1.70 GHz on the MB I checked.
+	PENTIUM(config, m_maincpu, 133'000'000); // a Celeron at 1.70 GHz on the MB I checked. <- doesn't match being a Triton/Triton-II ... -AS
 	m_maincpu->set_addrmap(AS_PROGRAM, &odyssey_state::odyssey_map);
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 480-1);
-	screen.set_screen_update(FUNC(odyssey_state::screen_update));
+	PCI_ROOT(config, "pci", 0);
+	// ...
 }
 
 
@@ -174,7 +135,8 @@ ROM_START( odyssey )
 
 //  ODYSSEY_BIOS
 
-	ROM_REGION( 0x80000, "maincpu", 0 )  // main BIOS
+	ROM_REGION( 0x80000, "bios", 0 )  // main BIOS
+	// TODO: doesn't seem to have valid x86 boot vectors, may be reused later.
 	ROM_LOAD( "sgi_bios_76.bin", 0x000000, 0x80000, CRC(00592222) SHA1(29281d25aaf2051e0794dece8be146bb63d5c488) )
 
 	ROM_REGION( 0x500000, "other", 0 )  // remaining BIOS
@@ -184,7 +146,7 @@ ROM_START( odyssey )
 	ROM_LOAD( "sgi_bios_31.bin", 0x180000, 0x80000, CRC(0954278b) SHA1(dc04a0604159ddd3d24bdd292b2947cc443054f8) )
 	ROM_LOAD( "sgi_bios_00.bin", 0x200000, 0x80000, CRC(41480fb5) SHA1(073596d3ba40ae67e3be3f410d7b29c77988df47) )
 
-	ROM_REGION( 0x100000, "pmb", 0 )   // Peripheral Memory Board (II) ROMS
+	ROM_REGION32_LE( 0x100000, "pmb", ROMREGION_ERASE00 )   // Peripheral Memory Board (II) ROMS
 	ROM_LOAD( "sgi_u13_165_0017_0_rev_a_l97_1352.bin", 0x00000, 0x80000, CRC(31ca868c) SHA1(d1db4ef12add336e25374fcf5d3238b8fbca05dd) )  // U13 - 165-0017 BIOS (27C040/27C4001 EPROM)
 	ROM_LOAD( "sgi_u5_165_0030_0_at28c010.bin",        0x80000, 0x20000, CRC(75a80169) SHA1(a8ece0f82a49f721fb178dbe25fc859bd65ce44f) )  // U5 - 165-0030 CONFIG (Atmel 28C010-12PC EEPROM)
 
@@ -198,6 +160,8 @@ ROM_START( odyssey )
 	DISK_IMAGE( "odyssey", 0, NO_DUMP )
 
 ROM_END
+
+} // anonymous namespace
 
 
 /**************************************

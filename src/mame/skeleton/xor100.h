@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_XOR100_H
-#define MAME_INCLUDES_XOR100_H
+#ifndef MAME_SKELETON_XOR100_H
+#define MAME_SKELETON_XOR100_H
 
 #pragma once
 
@@ -42,10 +42,7 @@ public:
 		, m_ram(*this, RAM_TAG)
 		, m_centronics(*this, CENTRONICS_TAG)
 		, m_s100(*this, S100_TAG)
-		, m_floppy0(*this, WD1795_TAG":0")
-		, m_floppy1(*this, WD1795_TAG":1")
-		, m_floppy2(*this, WD1795_TAG":2")
-		, m_floppy3(*this, WD1795_TAG":3")
+		, m_floppy(*this, WD1795_TAG":%u", 0U)
 		, m_rom(*this, Z80_TAG)
 		, m_bank1(*this, "bank1")
 		, m_bank2(*this, "bank2")
@@ -88,10 +85,7 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<centronics_device> m_centronics;
 	required_device<s100_bus_device> m_s100;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
+	required_device_array<floppy_connector, 4> m_floppy;
 	required_memory_region m_rom;
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
@@ -110,4 +104,4 @@ private:
 	int m_centronics_select = 0;
 };
 
-#endif // MAME_INCLUDES_XOR100_H
+#endif // MAME_SKELETON_XOR100_H

@@ -33,6 +33,8 @@ Xtals 8MHz, 21.47727MHz
 #include "speaker.h"
 
 
+namespace {
+
 class quizo_state : public driver_device
 {
 public:
@@ -255,6 +257,9 @@ ROM_START( quizoa )
 	ROM_REGION(0x20, "proms", 0)
 	ROM_LOAD("82s123", 0x00, 0x20, CRC(c3f15914) SHA1(19fd8e6f2a1256ae51c500a3bf1d7358810ef97e))
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1985, quizo,  0,       quizo,  quizo, quizo_state, empty_init, ROT0, "Seoul Coin Corp.", "Quiz Olympic (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, quizoa, quizo,   quizo,  quizo, quizo_state, empty_init, ROT0, "Seoul Coin Corp.", "Quiz Olympic (set 2)", MACHINE_SUPPORTS_SAVE )

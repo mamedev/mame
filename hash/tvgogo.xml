@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
     Known cartridges
 
@@ -29,7 +29,7 @@ _(EU)__|__(US)__|____________|_____________________________________
 
 <softwarelist name="tvgogo" description="Toyquest TV Go Go cartridges">
 	<software name="4in1" supported="no">
-		<description>4-in-1 (Flashcard Fishing, Break a Brick, Balloon Juggling, Penguin Maze) (EU)</description>
+		<description>4-in-1 (Flashcard Fishing, Break a Brick, Balloon Juggling, Penguin Maze) (Europe)</description>
 		<year>2005</year>
 		<publisher>Toyquest</publisher>
 		<part name="cart" interface="tvgogo_cart">
@@ -40,7 +40,7 @@ _(EU)__|__(US)__|____________|_____________________________________
 	</software>
 
 	<software name="4in1u" cloneof="4in1" supported="no">
-		<description>4-in-1 (Flashcard Fishing, Break a Brick, Balloon Juggling, Penguin Maze) (US)</description>
+		<description>4-in-1 (Flashcard Fishing, Break a Brick, Balloon Juggling, Penguin Maze) (USA)</description>
 		<year>2005</year>
 		<publisher>Toyquest</publisher>
 		<part name="cart" interface="tvgogo_cart">
@@ -51,7 +51,7 @@ _(EU)__|__(US)__|____________|_____________________________________
 	</software>
 
 	<software name="basebalu" supported="no">
-		<description>Baseball (US)</description>
+		<description>Baseball (USA)</description>
 		<year>2005</year>
 		<publisher>Toyquest</publisher>
 		<part name="cart" interface="tvgogo_cart">
@@ -62,7 +62,7 @@ _(EU)__|__(US)__|____________|_____________________________________
 	</software>
 
 	<software name="tennis" supported="no">
-		<description>Tennis (EU)</description>
+		<description>Tennis (Europe)</description>
 		<year>2005</year>
 		<publisher>Toyquest</publisher>
 		<part name="cart" interface="tvgogo_cart">
@@ -73,7 +73,7 @@ _(EU)__|__(US)__|____________|_____________________________________
 	</software>
 
 	<software name="whacmole" supported="no">
-		<description>Whac-A-Mole (EU)</description>
+		<description>Whac-A-Mole (Europe)</description>
 		<year>2005</year>
 		<publisher>Toyquest</publisher>
 		<part name="cart" interface="tvgogo_cart">
@@ -84,7 +84,7 @@ _(EU)__|__(US)__|____________|_____________________________________
 	</software>
 
 	<software name="whacmoleu" cloneof="whacmole" supported="no">
-		<description>Whac-A-Mole (US)</description>
+		<description>Whac-A-Mole (USA)</description>
 		<year>2005</year>
 		<publisher>Toyquest</publisher>
 		<part name="cart" interface="tvgogo_cart">
@@ -95,7 +95,7 @@ _(EU)__|__(US)__|____________|_____________________________________
 	</software>
 
 	<software name="dodgebalu" supported="no">
-		<description>Dodgeball (US)</description>
+		<description>Dodgeball (USA)</description>
 		<year>2005</year>
 		<publisher>Toyquest</publisher>
 		<part name="cart" interface="tvgogo_cart">
@@ -106,7 +106,7 @@ _(EU)__|__(US)__|____________|_____________________________________
 	</software>
 
 	<software name="basketbal" supported="no">
-		<description>Basketball (EU)</description>
+		<description>Basketball (Europe)</description>
 		<year>2005</year>
 		<publisher>Toyquest</publisher>
 		<part name="cart" interface="tvgogo_cart">
@@ -117,7 +117,7 @@ _(EU)__|__(US)__|____________|_____________________________________
 	</software>
 
 	<software name="basketbalu" cloneof="basketbal" supported="no">
-		<description>Basketball (US)</description>
+		<description>Basketball (USA)</description>
 		<year>2005</year>
 		<publisher>Toyquest</publisher>
 		<part name="cart" interface="tvgogo_cart">

@@ -2889,7 +2889,7 @@ void voodoo_1_device::recompute_video_memory_common(u32 config, u32 rowpixels)
 
 s32 voodoo_1_device::triangle()
 {
-	g_profiler.start(PROFILER_USER2);
+	auto profile = g_profiler.start(PROFILER_USER2);
 
 	// allocate polygon information now
 	auto &poly = m_renderer->alloc_poly();
@@ -3021,7 +3021,7 @@ s32 voodoo_1_device::triangle()
 	if (DEBUG_STATS)
 		m_stats.m_triangles++;
 
-	g_profiler.stop();
+	profile.stop();
 
 	if (LOG_REGISTERS)
 		logerror("cycles = %d\n", TRIANGLE_SETUP_CLOCKS + pixels);

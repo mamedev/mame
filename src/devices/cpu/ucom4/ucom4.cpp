@@ -358,13 +358,13 @@ void ucom4_cpu_device::execute_set_input(int line, int state)
 
 void ucom4_cpu_device::do_interrupt()
 {
+	standard_irq_callback(0, m_pc);
+
 	m_icount--;
 	push_stack();
 	m_pc = 0xf << 2;
 	m_int_f = 0;
 	m_inte_f = (m_family == NEC_UCOM43) ? 0 : 1;
-
-	standard_irq_callback(0);
 }
 
 

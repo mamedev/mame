@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="st_flop" description="Atari ST disk images">
 
 	<software name="10frame" supported="no">
 		<!-- SPS (CAPS) release 3266 -->
-		<description>10th Frame - Pro Bowling Simulator (Euro)</description>
+		<description>10th Frame - Pro Bowling Simulator (Europe)</description>
 		<year>1987</year>
 		<publisher>U.S. Gold</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -20,7 +20,7 @@ license:CC0
 	</software>
 
 	<software name="1943" supported="no">
-		<description>1943 (Euro)</description>
+		<description>1943 (Europe)</description>
 		<year>1987</year>
 		<publisher>Kixx</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -33,7 +33,7 @@ license:CC0
 
 	<software name="500gp" supported="no">
 		<!-- SPS (CAPS) release 3271 -->
-		<description>500cc Grand Prix (Euro)</description>
+		<description>500cc Grand Prix (Europe)</description>
 		<year>1987</year>
 		<publisher>Microids</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -47,9 +47,12 @@ license:CC0
 
 	<software name="5thgear" supported="no">
 		<!-- SPS (CAPS) release 3267 -->
-		<description>5th Gear (Euro)</description>
+		<description>5th Gear (Europe)</description>
 		<year>1989</year>
 		<publisher>Hewson</publisher>
+		<notes><![CDATA[
+11 [bombs] Line 1111 Emulator
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -61,7 +64,7 @@ license:CC0
 
 	<software name="academy" supported="no">
 		<!-- SPS (CAPS) release 3269 -->
-		<description>Academy (Euro)</description>
+		<description>Academy (Europe)</description>
 		<year>1987</year>
 		<publisher>CRL</publisher>
 		<info name="alt_title" value="Academy (Tau Ceti II)" />
@@ -76,7 +79,7 @@ license:CC0
 
 	<software name="actionfg" supported="no">
 		<!-- SPS (CAPS) release 3270 -->
-		<description>Action Fighter (Euro)</description>
+		<description>Action Fighter (Europe)</description>
 		<year>1989</year>
 		<publisher>Firebird</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -90,7 +93,7 @@ license:CC0
 
 	<software name="actnserv" supported="no">
 		<!-- SPS (CAPS) release 3312 -->
-		<description>Action Service (Euro)</description>
+		<description>Action Service (Europe)</description>
 		<year>1989</year>
 		<publisher>Infogrames</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -104,7 +107,7 @@ license:CC0
 
 	<software name="addiball" supported="no">
 		<!-- SPS (CAPS) release 3116 -->
-		<description>Addictaball (Euro)</description>
+		<description>Addictaball (Europe)</description>
 		<year>1987</year>
 		<publisher>Alligata</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -118,9 +121,13 @@ license:CC0
 
 	<software name="tiebreak" supported="no">
 		<!-- SPS (CAPS) release 3174 -->
-		<description>Adidas Championship Tie Break (Euro)</description>
+		<description>Adidas Championship Tie Break (Europe)</description>
 		<year>1990</year>
 		<publisher>Ocean</publisher>
+		<notes><![CDATA[
+Title screen shows a bit of GFX garbage
+Doesn't show credits before main menu, hangs there (input devices don't work)
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -132,9 +139,12 @@ license:CC0
 
 	<software name="advfruit" supported="no">
 		<!-- SPS (CAPS) release 3314 -->
-		<description>Advanced Fruit Machine Simulator (Euro)</description>
+		<description>Advanced Fruit Machine Simulator (Europe)</description>
 		<year>1991</year>
 		<publisher>Codemasters</publisher>
+		<notes><![CDATA[
+White screen, [68k] stalls on bootstrap
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -146,7 +156,7 @@ license:CC0
 
 	<software name="advrugby" supported="no">
 		<!-- SPS (CAPS) release 3117 -->
-		<description>Advanced Rugby Simulator (Euro)</description>
+		<description>Advanced Rugby Simulator (Europe)</description>
 		<year>1988</year>
 		<publisher>Codemasters</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -160,9 +170,10 @@ license:CC0
 
 	<software name="advrobin" supported="no">
 		<!-- SPS (CAPS) release 3213 -->
-		<description>The Adventures of Robin Hood (Euro)</description>
+		<description>The Adventures of Robin Hood (Europe)</description>
 		<year>1991</year>
 		<publisher>Millennium</publisher>
+		<info name="usage" value="Sports manual copy protection"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -174,7 +185,7 @@ license:CC0
 
 	<software name="aburner" supported="no">
 		<!-- SPS (CAPS) release 3118 -->
-		<description>Afterburner (Euro)</description>
+		<description>Afterburner (Europe)</description>
 		<year>1988</year>
 		<publisher>Activision</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -196,7 +207,7 @@ license:CC0
 
 	<software name="alienwrl" supported="no">
 		<!-- SPS (CAPS) release 3272 -->
-		<description>Alien World (Euro)</description>
+		<description>Alien World (Europe)</description>
 		<year>1992</year>
 		<publisher>HiTec Software</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -210,7 +221,7 @@ license:CC0
 
 	<software name="altreal" supported="no">
 		<!-- SPS (CAPS) release 3313 -->
-		<description>Alternate Reality (Euro, v3.0)</description>
+		<description>Alternate Reality (Europe, v3.0)</description>
 		<year>1986</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="alt_title" value="Alternate Reality - The City" />
@@ -225,9 +236,12 @@ license:CC0
 
 	<software name="anarchy" supported="no">
 		<!-- SPS (CAPS) release 3231 -->
-		<description>Anarchy (Euro)</description>
+		<description>Anarchy (Europe)</description>
 		<year>1990</year>
 		<publisher>Psyclapse</publisher>
+		<notes><![CDATA[
+White screen, [68k] stalls on bootstrap
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -239,9 +253,10 @@ license:CC0
 
 	<software name="anotherw" supported="no">
 		<!-- SPS (CAPS) release 3119 -->
-		<description>Another World (Euro)</description>
+		<description>Another World (Europe)</description>
 		<year>1991</year>
 		<publisher>U.S. Gold</publisher>
+		<info name="usage" value="Sports code wheel copy protection" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -261,7 +276,7 @@ license:CC0
 
 	<software name="apprent" supported="no">
 		<!-- SPS (CAPS) release 3273 -->
-		<description>Apprentice (Euro)</description>
+		<description>Apprentice (Europe)</description>
 		<year>1990</year>
 		<publisher>Rainbow Arts</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -275,9 +290,12 @@ license:CC0
 
 	<software name="archipel" supported="no">
 		<!-- SPS (CAPS) release 3227 -->
-		<description>Archipelagos (Euro)</description>
+		<description>Archipelagos (Europe)</description>
 		<year>1989</year>
 		<publisher>Logotron</publisher>
+		<notes><![CDATA[
+4 [bombs] Illegal instruction
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -289,9 +307,12 @@ license:CC0
 
 	<software name="arctfox" supported="no">
 		<!-- SPS (CAPS) release 3253 -->
-		<description>Arcticfox (Euro)</description>
+		<description>Arcticfox (Europe)</description>
 		<year>1986</year>
 		<publisher>Electronic Arts</publisher>
+		<notes><![CDATA[
+"Incompatible image format or corrupted data" on mount
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -303,9 +324,12 @@ license:CC0
 
 	<software name="artdream" supported="no">
 		<!-- SPS (CAPS) release 3234 -->
-		<description>Artificial Dreams (Euro)</description>
+		<description>Artificial Dreams (Europe)</description>
 		<year>1988</year>
 		<publisher>Addictive</publisher>
+		<notes><![CDATA[
+"Incompatible image format or corrupted data" on mount
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -317,7 +341,7 @@ license:CC0
 
 	<software name="atax" supported="no">
 		<!-- SPS (CAPS) release 3230 -->
-		<description>Atax (Euro)</description>
+		<description>Atax (Europe)</description>
 		<year>1988</year>
 		<publisher>Ramware</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -331,9 +355,12 @@ license:CC0
 
 	<software name="atomix" supported="no">
 		<!-- SPS (CAPS) release 3229 -->
-		<description>Atomix (Euro)</description>
+		<description>Atomix (Europe)</description>
 		<year>1989</year>
 		<publisher>Thalion</publisher>
+		<notes><![CDATA[
+Black screen after Thalion logo, attempts to r/w [FPU] $fffa40
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -345,7 +372,7 @@ license:CC0
 
 	<software name="backgamm" supported="no">
 		<!-- SPS (CAPS) release 3254 -->
-		<description>Backgammon Royale (Euro, v2.50 19910104)</description>
+		<description>Backgammon Royale (Europe, v2.50 19910104)</description>
 		<year>1991</year>
 		<publisher>CP Software</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -359,9 +386,10 @@ license:CC0
 
 	<software name="balpow90" supported="no">
 		<!-- SPS (CAPS) release 3252 -->
-		<description>Balance of Power - The 1990 Edition (Euro)</description>
+		<description>Balance of Power - The 1990 Edition (Europe)</description>
 		<year>1989</year>
 		<publisher>Mindscape</publisher>
+		<info name="usage" value="Sports manual copy protection" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -373,7 +401,7 @@ license:CC0
 
 	<software name="ballistx" supported="no">
 		<!-- SPS (CAPS) release 3232 -->
-		<description>Ballistix (Euro)</description>
+		<description>Ballistix (Europe)</description>
 		<year>1989</year>
 		<publisher>Psyclapse</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -387,7 +415,7 @@ license:CC0
 
 	<software name="barbpal" supported="no">
 		<!-- SPS (CAPS) release 3255 -->
-		<description>Barbarian (Euro, Palace)</description>
+		<description>Barbarian (Europe, Palace)</description>
 		<year>1987</year>
 		<publisher>Palace</publisher>
 		<info name="alt_title" value="Barbarian - The Ultimate Warrior" />
@@ -402,29 +430,29 @@ license:CC0
 
 	<software name="btlchess" supported="no">
 		<!-- SPS (CAPS) release 3108 -->
-		<description>Battle Chess (Euro)</description>
+		<description>Battle Chess (Europe)</description>
 		<year>1989</year>
 		<publisher>Interplay</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Animation Disk" />
+			<feature name="part_id" value="Startup Disk" />
 			<dataarea name="flop" size="518252">
-				<rom name="battle chess (europe) (animation disk).ipf" size="518252" crc="e061cbf4" sha1="5f067484e9d29ee8e727bd98b409e798605c8211" offset="0" />
+				<rom name="battle chess (europe) (startup disk).ipf" size="518252" crc="92996e4d" sha1="338ff1b456fba8598d73d97b51dc966c85e53d65" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Startup Disk" />
+			<feature name="part_id" value="Animation Disk" />
 			<dataarea name="flop" size="518252">
-				<rom name="battle chess (europe) (startup disk).ipf" size="518252" crc="92996e4d" sha1="338ff1b456fba8598d73d97b51dc966c85e53d65" offset="0" />
+				<rom name="battle chess (europe) (animation disk).ipf" size="518252" crc="e061cbf4" sha1="5f067484e9d29ee8e727bd98b409e798605c8211" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="btlprobe" supported="no">
 		<!-- SPS (CAPS) release 3233 -->
-		<description>Battle Probe (Euro)</description>
+		<description>Battle Probe (Europe)</description>
 		<year>1988</year>
 		<publisher>Crysys</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -438,9 +466,12 @@ license:CC0
 
 	<software name="bhawk42" supported="no">
 		<!-- SPS (CAPS) release 3120 -->
-		<description>Battlehawks 1942 (Euro, v1.0 19890301)</description>
+		<description>Battlehawks 1942 (Europe, v1.0 19890301)</description>
 		<year>1989</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Lucasfilm</publisher>
+		<notes><![CDATA[
+Fussy on [disk swap], will return to TOS when trying to begin a flight
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -460,7 +491,7 @@ license:CC0
 
 	<software name="bchvolly" supported="no">
 		<!-- SPS (CAPS) release 3353 -->
-		<description>Beach Volley (Euro)</description>
+		<description>Beach Volley (Europe)</description>
 		<year>1991</year>
 		<publisher>Ocean</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -482,7 +513,7 @@ license:CC0
 
 	<software name="beastlrd" supported="no">
 		<!-- SPS (CAPS) release 3352 -->
-		<description>Beastlord (Euro)</description>
+		<description>Beastlord (Europe)</description>
 		<year>1993</year>
 		<publisher>Grandslam</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -504,7 +535,7 @@ license:CC0
 
 	<software name="icepalac" supported="no">
 		<!-- SPS (CAPS) release 3121 -->
-		<description>Beyond the Ice Palace (Euro)</description>
+		<description>Beyond the Ice Palace (Europe)</description>
 		<year>1988</year>
 		<publisher>Elite</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -518,7 +549,7 @@ license:CC0
 
 	<software name="blktiger" supported="no">
 		<!-- SPS (CAPS) release 3192 -->
-		<description>Black Tiger (Euro, Les Chevaliers)</description>
+		<description>Black Tiger (Europe, Les Chevaliers)</description>
 		<year>1990</year>
 		<publisher>U.S. Gold</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -532,7 +563,7 @@ license:CC0
 
 	<software name="blstroid" supported="no">
 		<!-- SPS (CAPS) release 3106 -->
-		<description>Blasteroids (Euro)</description>
+		<description>Blasteroids (Europe)</description>
 		<year>1988</year>
 		<publisher>Image Works</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -554,7 +585,7 @@ license:CC0
 
 	<software name="blzthndr" supported="no">
 		<!-- SPS (CAPS) release 3122 -->
-		<description>Blazing Thunder (Euro)</description>
+		<description>Blazing Thunder (Europe)</description>
 		<year>1991</year>
 		<publisher>HiTec Software</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -568,9 +599,10 @@ license:CC0
 
 	<software name="blockout" supported="no">
 		<!-- SPS (CAPS) release 3256 -->
-		<description>Blockout (Euro)</description>
+		<description>Blockout (Europe)</description>
 		<year>1990</year>
 		<publisher>Rainbow Arts</publisher>
+		<info name="usage" value="Sports manual copy protection" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -582,7 +614,7 @@ license:CC0
 
 	<software name="bloodmon" supported="no">
 		<!-- SPS (CAPS) release 3258 -->
-		<description>Blood Money (Euro, Budget)</description>
+		<description>Blood Money (Europe, Budget)</description>
 		<year>1989</year>
 		<publisher>Sizzlers</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -604,9 +636,12 @@ license:CC0
 
 	<software name="bluesb" supported="no">
 		<!-- SPS (CAPS) release 3341 -->
-		<description>The Blues Brothers (Euro)</description>
+		<description>The Blues Brothers (Europe)</description>
 		<year>1991</year>
 		<publisher>Titus</publisher>
+		<notes><![CDATA[
+"Incompatible image format or corrupted data" on mount
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -618,7 +653,7 @@ license:CC0
 
 	<software name="bmx" supported="no">
 		<!-- SPS (CAPS) release 3201 -->
-		<description>BMX Simulator (Euro)</description>
+		<description>BMX Simulator (Europe)</description>
 		<year>1988</year>
 		<publisher>Codemasters</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -632,9 +667,12 @@ license:CC0
 
 	<software name="bobwinnr" supported="no">
 		<!-- SPS (CAPS) release 3257 -->
-		<description>Bob Winner (Euro)</description>
+		<description>Bob Winner (Europe)</description>
 		<year>1987</year>
 		<publisher>Loriciel</publisher>
+		<notes><![CDATA[
+[keyboard] 'P' doesn't pause the game, 'space bar' doesn't change fighting stance (verify)
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -646,7 +684,7 @@ license:CC0
 
 	<software name="bombjack" supported="no">
 		<!-- SPS (CAPS) release 3262 -->
-		<description>Bomb Jack (Euro, Budget)</description>
+		<description>Bomb Jack (Europe, Budget)</description>
 		<year>1988</year>
 		<publisher>Encore</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -660,7 +698,7 @@ license:CC0
 
 	<software name="bridgema" supported="no">
 		<!-- SPS (CAPS) release 3202 -->
-		<description>Bridge Master (Euro)</description>
+		<description>Bridge Master (Europe)</description>
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -674,7 +712,7 @@ license:CC0
 
 	<software name="bridgepl" supported="no">
 		<!-- SPS (CAPS) release 3316 -->
-		<description>Bridge Player 2000 with Tutor (Euro)</description>
+		<description>Bridge Player 2000 with Tutor (Europe)</description>
 		<year>1987</year>
 		<publisher>CP Software</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -688,7 +726,7 @@ license:CC0
 
 	<software name="bumpy" supported="no">
 		<!-- SPS (CAPS) release 3260 -->
-		<description>Bumpy (Euro)</description>
+		<description>Bumpy (Europe)</description>
 		<year>1989</year>
 		<publisher>Loriciel</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -702,7 +740,7 @@ license:CC0
 
 	<software name="burgermn" supported="no">
 		<!-- SPS (CAPS) release 3259 -->
-		<description>Burger Man (Euro)</description>
+		<description>Burger Man (Europe)</description>
 		<year>1991</year>
 		<publisher>Byte Back</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -716,7 +754,7 @@ license:CC0
 
 	<software name="capblood" supported="no">
 		<!-- SPS (CAPS) release 3186 -->
-		<description>Captain Blood (Euro)</description>
+		<description>Captain Blood (Europe)</description>
 		<year>1988</year>
 		<publisher>Exxos</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -738,7 +776,7 @@ license:CC0
 
 	<software name="capfizz" supported="no">
 		<!-- SPS (CAPS) release 3123 -->
-		<description>Captain Fizz (Euro)</description>
+		<description>Captain Fizz (Europe)</description>
 		<year>1988</year>
 		<publisher>Psyclapse</publisher>
 		<info name="alt_title" value="Captain Fizz Meets the Blaster-Trons (Box)" />
@@ -753,9 +791,10 @@ license:CC0
 
 	<software name="carrierc" supported="no">
 		<!-- SPS (CAPS) release 3150 -->
-		<description>Carrier Command (Euro)</description>
+		<description>Carrier Command (Europe)</description>
 		<year>1988</year>
 		<publisher>Rainbird</publisher>
+		<info name="usage" value="Sports manual copy protection" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -767,7 +806,7 @@ license:CC0
 
 	<software name="cartncap" supported="no">
 		<!-- SPS (CAPS) release 3305 -->
-		<description>Cartoon Capers (Euro)</description>
+		<description>Cartoon Capers (Europe)</description>
 		<year>1990</year>
 		<publisher>Mandarin</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -789,7 +828,7 @@ license:CC0
 
 	<software name="catch23" supported="no">
 		<!-- SPS (CAPS) release 3235 -->
-		<description>Catch 23 (Euro)</description>
+		<description>Catch 23 (Europe)</description>
 		<year>1987</year>
 		<publisher>Electronic Arts</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -803,9 +842,12 @@ license:CC0
 
 	<software name="champbb" supported="no">
 		<!-- SPS (CAPS) release 3203 -->
-		<description>Championship Baseball (Euro)</description>
+		<description>Championship Baseball (Europe)</description>
 		<year>1987</year>
 		<publisher>Gamestar</publisher>
+		<notes><![CDATA[
+4 [bombs] Illegal instruction when trying to execute auto/baseball.prg
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -817,7 +859,7 @@ license:CC0
 
 	<software name="champcrk" supported="no">
 		<!-- SPS (CAPS) release 3311 -->
-		<description>Championship Cricket (Euro)</description>
+		<description>Championship Cricket (Europe)</description>
 		<year>1988</year>
 		<publisher>Crysys</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -831,9 +873,13 @@ license:CC0
 
 	<software name="champwrs" supported="no">
 		<!-- SPS (CAPS) release 3364 -->
-		<description>Championship Wrestling (Euro)</description>
+		<description>Championship Wrestling (Europe)</description>
 		<year>1986</year>
 		<publisher>U.S. Gold</publisher>
+		<notes><![CDATA[
+Crashes when attempting to start a practice match
+]]></notes>
+		<info name="usage" value="Requires joystick in port 0"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -845,7 +891,7 @@ license:CC0
 
 	<software name="chase" supported="no">
 		<!-- SPS (CAPS) release 3286 -->
-		<description>Chase (Euro)</description>
+		<description>Chase (Europe)</description>
 		<year>1988</year>
 		<publisher>Mastertronic</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -859,9 +905,12 @@ license:CC0
 
 	<software name="chasehq" supported="no">
 		<!-- SPS (CAPS) release 3187 -->
-		<description>Chase H.Q. (Euro)</description>
+		<description>Chase H.Q. (Europe)</description>
 		<year>1989</year>
 		<publisher>Ocean</publisher>
+		<notes><![CDATA[
+Keeps returning to TOS on loading
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -873,7 +922,7 @@ license:CC0
 
 	<software name="chsp2150" supported="no">
 		<!-- SPS (CAPS) release 3287 -->
-		<description>Chess Player 2150 (Euro)</description>
+		<description>Chess Player 2150 (Europe)</description>
 		<year>1989</year>
 		<publisher>Oxford Softworks</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -887,7 +936,7 @@ license:CC0
 
 	<software name="chsp2150a" cloneof="chsp2150" supported="no">
 		<!-- SPS (CAPS) release 3124 -->
-		<description>Chess Player 2150 (Euro, TenStar Pack)</description>
+		<description>Chess Player 2150 (Europe, TenStar Pack)</description>
 		<year>1989</year>
 		<publisher>Oxford Softworks</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -901,9 +950,10 @@ license:CC0
 
 	<software name="chesssim" supported="no">
 		<!-- SPS (CAPS) release 3288 -->
-		<description>Chess Simulator (Euro)</description>
+		<description>Chess Simulator (Europe)</description>
 		<year>1990</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Sports manual copy protection" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -915,28 +965,29 @@ license:CC0
 
 	<software name="cm2000" supported="no">
 		<!-- SPS (CAPS) release 3342 -->
-		<description>The Chessmaster 2000 (Euro)</description>
+		<description>The Chessmaster 2000 (Europe)</description>
 		<year>1987</year>
 		<publisher>The Software Toolworks</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Games Disk" />
-			<dataarea name="flop" size="468252">
-				<rom name="chessmaster 2000, the (europe) (games disk).ipf" size="468252" crc="eccf742f" sha1="9148ee62183e73e3e2fbd079fb2fd38110c03c72" offset="0" />
+			<dataarea name="flop" size="468877">
+				<rom name="chessmaster 2000, the (europe).ipf" size="468877" crc="0e515780" sha1="f37c5e84e4343eaea78067082105e86db71ca1ce" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size="468877">
-				<rom name="chessmaster 2000, the (europe).ipf" size="468877" crc="0e515780" sha1="f37c5e84e4343eaea78067082105e86db71ca1ce" offset="0" />
+			<!-- Labeled as "Disk B" in-game -->
+			<feature name="part_id" value="Games Disk" />
+			<dataarea name="flop" size="468252">
+				<rom name="chessmaster 2000, the (europe) (games disk).ipf" size="468252" crc="eccf742f" sha1="9148ee62183e73e3e2fbd079fb2fd38110c03c72" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="chicag30" supported="no">
 		<!-- SPS (CAPS) release 3236 -->
-		<description>Chicago 30's (Euro)</description>
+		<description>Chicago 30's (Europe)</description>
 		<year>1989</year>
 		<publisher>U.S. Gold</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -950,9 +1001,10 @@ license:CC0
 
 	<software name="chipchal" supported="no">
 		<!-- SPS (CAPS) release 3114 -->
-		<description>Chip's Challenge (Euro)</description>
+		<description>Chip's Challenge (Europe)</description>
 		<year>1990</year>
 		<publisher>U.S. Gold</publisher>
+		<info name="usage" value="Sports manual copy protection (combination lock security)" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -964,7 +1016,7 @@ license:CC0
 
 	<software name="cquest2" supported="no">
 		<!-- SPS (CAPS) release 3151 -->
-		<description>Chrono Quest II (Euro)</description>
+		<description>Chrono Quest II (Europe)</description>
 		<year>1990</year>
 		<publisher>Psygnosis</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -993,7 +1045,7 @@ license:CC0
 
 	<software name="chuckie" supported="no">
 		<!-- SPS (CAPS) release 3289 -->
-		<description>Chuckie Egg (Euro)</description>
+		<description>Chuckie Egg (Europe)</description>
 		<year>1988</year>
 		<publisher>Pick &amp; Choose</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1007,7 +1059,7 @@ license:CC0
 
 	<software name="chuckie2" supported="no">
 		<!-- SPS (CAPS) release 3290 -->
-		<description>Chuckie Egg II (Euro)</description>
+		<description>Chuckie Egg II (Europe)</description>
 		<year>1989</year>
 		<publisher>Pick &amp; Choose</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1021,7 +1073,7 @@ license:CC0
 
 	<software name="cloudkng" supported="no">
 		<!-- SPS (CAPS) release 3237 -->
-		<description>Cloud Kingdoms (Euro)</description>
+		<description>Cloud Kingdoms (Europe)</description>
 		<year>1990</year>
 		<publisher>Millennium</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1035,9 +1087,13 @@ license:CC0
 
 	<software name="camelot" supported="no">
 		<!-- SPS (CAPS) release 3152 -->
-		<description>Conquests of Camelot (Euro, v1.019)</description>
+		<description>Conquests of Camelot (Europe, v1.019)</description>
 		<year>1990</year>
 		<publisher>Sierra</publisher>
+		<notes><![CDATA[
+Starting a game will fail on [disk swap], doesn't recognize disk 2
+Has [MIDI] options
+]]></notes>
 		<info name="alt_title" value="Conquests of Camelot - The Search for the Grail" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
@@ -1072,7 +1128,7 @@ license:CC0
 
 	<software name="contcirc" supported="no">
 		<!-- SPS (CAPS) release 3105 -->
-		<description>Continental Circus (Euro)</description>
+		<description>Continental Circus (Europe)</description>
 		<year>1989</year>
 		<publisher>Virgin Mastertronic</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1094,7 +1150,7 @@ license:CC0
 
 	<software name="corruptn" supported="no">
 		<!-- SPS (CAPS) release 3291 -->
-		<description>Corruption (Euro, v1.9)</description>
+		<description>Corruption (Europe, v1.9)</description>
 		<year>1988</year>
 		<publisher>Rainbird</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1108,7 +1164,7 @@ license:CC0
 
 	<software name="crkdown" supported="no">
 		<!-- SPS (CAPS) release 3292 -->
-		<description>Crack Down (Euro, Budget)</description>
+		<description>Crack Down (Europe, Budget)</description>
 		<year>1990</year>
 		<publisher>KIXX</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1122,7 +1178,7 @@ license:CC0
 
 	<software name="cricketc" supported="no">
 		<!-- SPS (CAPS) release 3125 -->
-		<description>Cricket Captain (Euro, v1.5 1991)</description>
+		<description>Cricket Captain (Europe, v1.5 1991)</description>
 		<year>1991?</year>
 		<publisher>D &amp; H Games</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1136,7 +1192,7 @@ license:CC0
 
 	<software name="ccastles" supported="no">
 		<!-- SPS (CAPS) release 3238 -->
-		<description>Crystal Castles (Euro)</description>
+		<description>Crystal Castles (Europe)</description>
 		<year>1986</year>
 		<publisher>Atari</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1150,9 +1206,12 @@ license:CC0
 
 	<software name="cyberbal" supported="no">
 		<!-- SPS (CAPS) release 3293 -->
-		<description>Cyberball (Euro)</description>
+		<description>Cyberball (Europe)</description>
 		<year>1990</year>
 		<publisher>Domark</publisher>
+		<notes><![CDATA[
+Black screen, expects an irq reading work RAM $ac02
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -1172,7 +1231,7 @@ license:CC0
 
 	<software name="cybercn3" supported="no">
 		<!-- SPS (CAPS) release 3126 -->
-		<description>Cybercon III (Euro, 19910406)</description>
+		<description>Cybercon III (Europe, 19910406)</description>
 		<year>1991</year>
 		<publisher>U.S. Gold</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1186,7 +1245,7 @@ license:CC0
 
 	<software name="damesim" supported="no">
 		<!-- SPS (CAPS) release 3365 -->
-		<description>Dames Simulator (Fra)</description>
+		<description>Dames Simulator (France)</description>
 		<year>1990</year>
 		<publisher>Infogrames</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1200,9 +1259,12 @@ license:CC0
 
 	<software name="dariusp" supported="no">
 		<!-- SPS (CAPS) release 3304 -->
-		<description>Darius+ (Euro)</description>
+		<description>Darius+ (Europe)</description>
 		<year>1989</year>
 		<publisher>The Edge</publisher>
+		<notes><![CDATA[
+No backgrounds during gameplay
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -1222,9 +1284,12 @@ license:CC0
 
 	<software name="dayviper" supported="no">
 		<!-- SPS (CAPS) release 3317 -->
-		<description>Day of the Viper (Euro)</description>
+		<description>Day of the Viper (Europe)</description>
 		<year>1989</year>
 		<publisher>Accolade</publisher>
+		<notes><![CDATA[
+Hangs on starfield intro
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -1244,7 +1309,7 @@ license:CC0
 
 	<software name="deep" supported="no">
 		<!-- SPS (CAPS) release 3298 -->
-		<description>The Deep (Euro)</description>
+		<description>The Deep (Europe)</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1264,7 +1329,7 @@ license:CC0
 
 	<software name="dejavu" supported="no">
 		<!-- SPS (CAPS) release 3127 -->
-		<description>Deja Vu - A Nightmare Comes True (Euro)</description>
+		<description>Deja Vu - A Nightmare Comes True (Europe)</description>
 		<year>1987</year>
 		<publisher>Mirrorsoft</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1286,9 +1351,12 @@ license:CC0
 
 	<software name="deliver" supported="no">
 		<!-- SPS (CAPS) release 3310 -->
-		<description>Deliverance (Euro)</description>
+		<description>Deliverance (Europe)</description>
 		<year>1992</year>
 		<publisher>21st Century</publisher>
+		<notes><![CDATA[
+Black screen
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -1308,7 +1376,7 @@ license:CC0
 
 	<software name="demonblu" supported="no">
 		<!-- SPS (CAPS) release 3239 -->
-		<description>Demon Blue (Euro)</description>
+		<description>Demon Blue (Europe)</description>
 		<year>19??</year>
 		<publisher>Micro-Value</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1322,7 +1390,7 @@ license:CC0
 
 	<software name="demoniak" supported="no">
 		<!-- SPS (CAPS) release 3318 -->
-		<description>Demoniak (Euro, v1.0)</description>
+		<description>Demoniak (Europe, v1.0)</description>
 		<year>1991</year>
 		<publisher>Palace</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1336,9 +1404,12 @@ license:CC0
 
 	<software name="dicktr" supported="no">
 		<!-- SPS (CAPS) release 3340 -->
-		<description>Dick Tracy (Euro)</description>
+		<description>Dick Tracy (Europe)</description>
 		<year>1990</year>
 		<publisher>Titus</publisher>
+		<notes><![CDATA[
+"Incompatible image format or corrupted data" on mount
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -1358,7 +1429,7 @@ license:CC0
 
 	<software name="disc" supported="no">
 		<!-- SPS (CAPS) release 3153 -->
-		<description>Disc (Euro, Budget)</description>
+		<description>Disc (Europe, Budget)</description>
 		<year>1991</year>
 		<publisher>Action Sixteen</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1372,7 +1443,7 @@ license:CC0
 
 	<software name="dizzydic" supported="no">
 		<!-- SPS (CAPS) release 3319 -->
-		<description>Dizzy Dice (Euro, Budget)</description>
+		<description>Dizzy Dice (Europe, Budget)</description>
 		<year>1990</year>
 		<publisher>Smash 16</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1386,7 +1457,7 @@ license:CC0
 
 	<software name="ddragon" supported="no">
 		<!-- SPS (CAPS) release 3204 -->
-		<description>Double Dragon (Euro, Magnum 4)</description>
+		<description>Double Dragon (Europe, Magnum 4)</description>
 		<year>1989</year>
 		<publisher>Melbourne House</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1408,9 +1479,12 @@ license:CC0
 
 	<software name="ddragon2" supported="no">
 		<!-- SPS (CAPS) release 3154 -->
-		<description>Double Dragon II - The Revenge (Euro, v1.2, Budget)</description>
+		<description>Double Dragon II - The Revenge (Europe, v1.2, Budget)</description>
 		<year>1989</year>
 		<publisher>16 Blitz</publisher>
+		<notes><![CDATA[
+Hangs during loading with a 000000A0 printed on screen
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -1430,9 +1504,12 @@ license:CC0
 
 	<software name="dspirit" supported="no">
 		<!-- SPS (CAPS) release 3320 -->
-		<description>Dragon Spirit (Euro)</description>
+		<description>Dragon Spirit (Europe)</description>
 		<year>1990</year>
 		<publisher>Domark</publisher>
+		<notes><![CDATA[
+White screen, fails to bootstrap
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -1452,7 +1529,7 @@ license:CC0
 
 	<software name="drakkhen" supported="no">
 		<!-- SPS (CAPS) release 3321 -->
-		<description>Drakkhen (Euro, v1.1)</description>
+		<description>Drakkhen (Europe, v1.1)</description>
 		<year>1989</year>
 		<publisher>Infogrames</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1481,9 +1558,10 @@ license:CC0
 
 	<software name="driller" supported="no">
 		<!-- SPS (CAPS) release 3128 -->
-		<description>Driller (Euro)</description>
+		<description>Driller (Europe)</description>
 		<year>1988</year>
 		<publisher>Incentive</publisher>
+		<info name="usage" value="Sports manual copy protection" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -1495,7 +1573,7 @@ license:CC0
 
 	<software name="dynawars" supported="no">
 		<!-- SPS (CAPS) release 3194 -->
-		<description>Dynasty Wars (Euro, Les Chevaliers)</description>
+		<description>Dynasty Wars (Europe, Les Chevaliers)</description>
 		<year>1990</year>
 		<publisher>U.S. Gold</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1509,9 +1587,13 @@ license:CC0
 
 	<software name="eastwest" supported="no">
 		<!-- SPS (CAPS) release 3322 -->
-		<description>East vs. West Berlin 1948 (Euro)</description>
+		<description>East vs. West Berlin 1948 (Europe)</description>
 		<year>1990</year>
 		<publisher>Rainbow Arts</publisher>
+		<notes><![CDATA[
+White screen, attempts to r/w [FPU] $fffa40 on boot
+Doesn't recognize mouse
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -1531,9 +1613,12 @@ license:CC0
 
 	<software name="elementl" supported="no">
 		<!-- SPS (CAPS) release 3240 -->
-		<description>Elemental (Euro)</description>
+		<description>Elemental (Europe)</description>
 		<year>1988</year>
 		<publisher>Lankhor</publisher>
+		<notes><![CDATA[
+Main menu is unresponsive, likely [GPIO4] irq
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -1545,7 +1630,7 @@ license:CC0
 
 	<software name="elfmv" supported="no">
 		<!-- SPS (CAPS) release 3129 -->
-		<description>Elf (Euro, MicroValue)</description>
+		<description>Elf (Europe, MicroValue)</description>
 		<year>1988</year>
 		<publisher>MicroValue</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1559,9 +1644,10 @@ license:CC0
 
 	<software name="elite" supported="no">
 		<!-- SPS (CAPS) release 3367 -->
-		<description>Elite (Euro)</description>
+		<description>Elite (Europe)</description>
 		<year>1988</year>
 		<publisher>Firebird</publisher>
+		<info name="usage" value="Sports manual copy protection" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -1573,7 +1659,7 @@ license:CC0
 
 	<software name="enterpr" supported="no">
 		<!-- SPS (CAPS) release 3241 -->
-		<description>Enterprise (Euro)</description>
+		<description>Enterprise (Europe)</description>
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1587,9 +1673,12 @@ license:CC0
 
 	<software name="erik" supported="no">
 		<!-- SPS (CAPS) release 3242 -->
-		<description>Erik (Euro)</description>
+		<description>Erik (Europe)</description>
 		<year>1992</year>
 		<publisher>Atlantis Software</publisher>
+		<notes><![CDATA[
+No sound during gameplay
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -1601,9 +1690,13 @@ license:CC0
 
 	<software name="exolon" supported="no">
 		<!-- SPS (CAPS) release 3309 -->
-		<description>Exolon (Euro)</description>
+		<description>Exolon (Europe)</description>
 		<year>1988</year>
 		<publisher>Hewson</publisher>
+		<notes><![CDATA[
+11 [bombs] Line 1111 Emulator for a split second
+Manually trying to execute auto/exolon.prg will crash TOS
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -1615,9 +1708,10 @@ license:CC0
 
 	<software name="eyehorus" supported="no">
 		<!-- SPS (CAPS) release 3243 -->
-		<description>Eye of Horus (Euro)</description>
+		<description>Eye of Horus (Europe)</description>
 		<year>1989</year>
 		<publisher>Logotron</publisher>
+		<info name="usage" value="Sports manual copy protection" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -1629,9 +1723,10 @@ license:CC0
 
 	<software name="f19sf" supported="no">
 		<!-- SPS (CAPS) release 3191 -->
-		<description>F-19 Stealth Fighter (Euro, v1.02)</description>
+		<description>F-19 Stealth Fighter (Europe, v1.02)</description>
 		<year>1990</year>
 		<publisher>Microprose</publisher>
+		<info name="usage" value="Sports manual copy protection (Aircraft Identification Exam)" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -1658,7 +1753,7 @@ license:CC0
 
 	<software name="faceoff" supported="no">
 		<!-- SPS (CAPS) release 3325 -->
-		<description>Face-Off (Euro)</description>
+		<description>Face-Off (Europe)</description>
 		<year>1991</year>
 		<publisher>Krisalis</publisher>
 		<info name="alt_title" value="Face-Off Ice Hockey (Box)" />
@@ -1673,7 +1768,7 @@ license:CC0
 
 	<software name="faceoffa" supported="no">
 		<!-- SPS (CAPS) release 3324 -->
-		<description>Face Off (Euro)</description>
+		<description>Face Off (Europe)</description>
 		<year>1989</year>
 		<publisher>Anco</publisher>
 		<info name="alt_title" value="Ice Hockey (Box)" />
@@ -1687,9 +1782,12 @@ license:CC0
 	</software>
 
 	<software name="fwdizzy" supported="no">
-		<description>Fantasy World Dizzy (Euro)</description>
+		<description>Fantasy World Dizzy (Europe)</description>
 		<year>1991</year>
 		<publisher>Codemasters</publisher>
+		<notes><![CDATA[
+White screen, [68k] stalls on bootstrap
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="2111192">
@@ -1699,9 +1797,12 @@ license:CC0
 	</software>
 
 	<software name="ferrari" supported="no">
-		<description>Ferrari Formula One (Euro)</description>
+		<description>Ferrari Formula One (Europe)</description>
 		<year>1989</year>
 		<publisher>Electronic Arts</publisher>
+		<notes><![CDATA[
+Red screen
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Boot Disk" />
@@ -1719,9 +1820,12 @@ license:CC0
 
 	<software name="firefor2" supported="no">
 		<!-- SPS (CAPS) release 3130 -->
-		<description>Fire and Forget II - The Death Convoy (Euro)</description>
+		<description>Fire and Forget II - The Death Convoy (Europe)</description>
 		<year>1990</year>
 		<publisher>Titus</publisher>
+		<notes><![CDATA[
+"Incompatible image format or corrupted data" on mount
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -1733,7 +1837,7 @@ license:CC0
 
 	<software name="flimboqs" supported="no">
 		<!-- SPS (CAPS) release 3104 -->
-		<description>Flimbo's Quest (Euro)</description>
+		<description>Flimbo's Quest (Europe)</description>
 		<year>1990</year>
 		<publisher>System 3</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1747,7 +1851,7 @@ license:CC0
 
 	<software name="fbmang2" supported="no">
 		<!-- SPS (CAPS) release 3131 -->
-		<description>Football Manager 2 (Euro)</description>
+		<description>Football Manager 2 (Europe)</description>
 		<year>1988</year>
 		<publisher>Addictive</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1760,7 +1864,7 @@ license:CC0
 	</software>
 
 	<software name="foundwst">
-		<description>Foundation's Waste (Euro, Budget)</description>
+		<description>Foundation's Waste (Europe, Budget)</description>
 		<year>1988</year>
 		<publisher>Klassix</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1775,7 +1879,7 @@ license:CC0
 <!-- This is a dual disk Amiga + ST -->
 	<software name="foundwstc" cloneof="foundwst" supported="no">
 		<!-- SPS (CAPS) release 3155? -->
-		<description>Foundation's Waste (Euro, Coverdisk)</description>
+		<description>Foundation's Waste (Europe, The One issue 22 coverdisk)</description>
 		<year>1990</year>
 		<publisher>&lt;coverdisk&gt;</publisher>
 		<info name="magazine" value="The One 22" />
@@ -1791,7 +1895,7 @@ license:CC0
 
 	<software name="fullmp" supported="no">
 		<!-- SPS (CAPS) release 3205 -->
-		<description>Full Metal Planete (Euro)</description>
+		<description>Full Metal Planete (Europe)</description>
 		<year>1989</year>
 		<publisher>Infogrames</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1805,9 +1909,12 @@ license:CC0
 
 	<software name="futbaskt" supported="no">
 		<!-- SPS (CAPS) release 3354 -->
-		<description>Future Basketball (Euro)</description>
+		<description>Future Basketball (Europe)</description>
 		<year>1990</year>
 		<publisher>Hewson</publisher>
+		<notes><![CDATA[
+White screen, never completes bootstrap
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -1819,9 +1926,10 @@ license:CC0
 
 	<software name="futwars" supported="no">
 		<!-- SPS (CAPS) release 3156 -->
-		<description>Future Wars - Time Travellers (Euro)</description>
+		<description>Future Wars - Time Travellers (Europe)</description>
 		<year>1989</year>
 		<publisher>Palace</publisher>
+		<info name="usage" value="Sports code wheel copy protection" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -1848,9 +1956,12 @@ license:CC0
 
 	<software name="gforce2" supported="no">
 		<!-- SPS (CAPS) release 3328 -->
-		<description>Galaxy Force II (Euro)</description>
+		<description>Galaxy Force II (Europe)</description>
 		<year>1990</year>
 		<publisher>Activision</publisher>
+		<notes><![CDATA[
+Red screen with broken GFXs, tight loops at PC=10bbc
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -1870,7 +1981,7 @@ license:CC0
 
 	<software name="gameovr2" supported="no">
 		<!-- SPS (CAPS) release 3333 -->
-		<description>Game Over II (Euro)</description>
+		<description>Game Over II (Europe)</description>
 		<year>1988</year>
 		<publisher>Dinamic</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1884,9 +1995,13 @@ license:CC0
 
 	<software name="gazza" supported="no">
 		<!-- SPS (CAPS) release 3326 -->
-		<description>Gazza's Super Soccer (Euro)</description>
+		<description>Gazza's Super Soccer (Europe)</description>
 		<year>1989</year>
 		<publisher>Empire Interactive</publisher>
+		<notes><![CDATA[
+4 [bombs] Illegal instruction
+Trying to manually launch auto/gazzaeng.prg will just punt to TOS
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -1898,9 +2013,12 @@ license:CC0
 
 	<software name="gemiwing" supported="no">
 		<!-- SPS (CAPS) release 3327 -->
-		<description>Gemini Wing (Euro)</description>
+		<description>Gemini Wing (Europe)</description>
 		<year>1989</year>
 		<publisher>Virgin Mastertronic</publisher>
+		<notes><![CDATA[
+Tries to read [ACIA] byte $fffc02 at PC=74e, expects a value of $39 actual $00
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -1920,7 +2038,7 @@ license:CC0
 
 	<software name="getdextr" supported="no">
 		<!-- SPS (CAPS) release 3355 -->
-		<description>Get Dexter (Euro)</description>
+		<description>Get Dexter (Europe)</description>
 		<year>1987</year>
 		<publisher>Ere Informatique</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1934,9 +2052,12 @@ license:CC0
 
 	<software name="gflchafb" supported="no">
 		<!-- SPS (CAPS) release 3206 -->
-		<description>GFL Championship Football (Euro)</description>
+		<description>GFL Championship Football (Europe)</description>
 		<year>1987</year>
 		<publisher>Gamestar</publisher>
+		<notes><![CDATA[
+White screen
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -1948,9 +2069,12 @@ license:CC0
 
 	<software name="gng" supported="no">
 		<!-- SPS (CAPS) release 3389 -->
-		<description>Ghosts 'n' Goblins (Euro, Finale)</description>
+		<description>Ghosts 'n' Goblins (Europe, Finale)</description>
 		<year>1990</year>
 		<publisher>Elite</publisher>
+		<notes><![CDATA[
+[68k] stalls, hangs on illegal instruction at PC=14b0c
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -1962,7 +2086,7 @@ license:CC0
 
 	<software name="ghouls" supported="no">
 		<!-- SPS (CAPS) release 3195 -->
-		<description>Ghouls 'n' Ghosts (Euro, Les Chevaliers)</description>
+		<description>Ghouls 'n' Ghosts (Europe, Les Chevaliers)</description>
 		<year>1989</year>
 		<publisher>U.S. Gold</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1984,9 +2108,12 @@ license:CC0
 
 	<software name="gomoku" supported="no">
 		<!-- SPS (CAPS) release 3132 -->
-		<description>Gomoku and Renju (Euro)</description>
+		<description>Gomoku and Renju (Europe)</description>
 		<year>1988</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Unresponsive [mouse] on TOS (random)
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -1998,9 +2125,12 @@ license:CC0
 
 	<software name="goofyexp" supported="no">
 		<!-- SPS (CAPS) release 3329 -->
-		<description>Goofy's Railway Express (Euro)</description>
+		<description>Goofy's Railway Express (Europe)</description>
 		<year>1989</year>
 		<publisher>Disney Software</publisher>
+		<notes><![CDATA[
+"Incompatible image format or corrupted data" on mount
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -2012,9 +2142,12 @@ license:CC0
 
 	<software name="gravity" supported="no">
 		<!-- SPS (CAPS) release 3330 -->
-		<description>Gravity (Euro)</description>
+		<description>Gravity (Europe)</description>
 		<year>1990</year>
 		<publisher>Image Works</publisher>
+		<notes><![CDATA[
+Fails on [disk swap] after title screen
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -2034,7 +2167,7 @@ license:CC0
 
 	<software name="growth" supported="no">
 		<!-- SPS (CAPS) release 3244 -->
-		<description>Growth (Euro)</description>
+		<description>Growth (Europe)</description>
 		<year>1988</year>
 		<publisher>Axxiom</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2048,9 +2181,12 @@ license:CC0
 
 	<software name="guardang" supported="no">
 		<!-- SPS (CAPS) release 3307 -->
-		<description>The Guardian Angel (Euro)</description>
+		<description>The Guardian Angel (Europe)</description>
 		<year>1989</year>
 		<publisher>Codemasters</publisher>
+		<notes><![CDATA[
+White screen, [68k] stalls with illegal A0 and A1 stacks
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -2062,7 +2198,7 @@ license:CC0
 
 	<software name="guildthv" supported="no">
 		<!-- SPS (CAPS) release 3207 -->
-		<description>The Guild of Thieves (Euro, v1.0)</description>
+		<description>The Guild of Thieves (Europe, v1.0)</description>
 		<year>1987</year>
 		<publisher>Firebird</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2076,9 +2212,13 @@ license:CC0
 
 	<software name="hacker2" supported="no">
 		<!-- SPS (CAPS) release 3380 -->
-		<description>Hacker II - The Doomsday Papers (Euro)</description>
+		<description>Hacker II - The Doomsday Papers (Europe)</description>
 		<year>1986</year>
 		<publisher>Activision</publisher>
+		<notes><![CDATA[
+Requires a working [printer] according to manual
+Mouse doesn't respond after setting up MFSM system
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -2090,9 +2230,10 @@ license:CC0
 
 	<software name="hammrfst" supported="no">
 		<!-- SPS (CAPS) release 3282 -->
-		<description>Hammerfist (Euro)</description>
+		<description>Hammerfist (Europe)</description>
 		<year>1990</year>
 		<publisher>Activision</publisher>
+		<info name="usage" value="Requires joystick in port 0"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -2104,9 +2245,10 @@ license:CC0
 
 	<software name="hardnova" supported="no">
 		<!-- SPS (CAPS) release 3334 -->
-		<description>Hard Nova (Euro)</description>
+		<description>Hard Nova (Europe)</description>
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
+		<!-- TODO: prompts for an "uranus" disk, which is not provided? -->
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -2126,7 +2268,7 @@ license:CC0
 
 	<software name="hardball" supported="no">
 		<!-- SPS (CAPS) release 3360 -->
-		<description>HardBall! (Euro, Accolade All Time Favourites)</description>
+		<description>HardBall! (Europe, Accolade All Time Favourites)</description>
 		<year>1987</year>
 		<publisher>Accolade</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2140,9 +2282,12 @@ license:CC0
 
 	<software name="harley" supported="no">
 		<!-- SPS (CAPS) release 3331 -->
-		<description>Harley-Davidson - The Road to Sturgis (Euro)</description>
+		<description>Harley-Davidson - The Road to Sturgis (Europe)</description>
 		<year>1990</year>
 		<publisher>Mindscape</publisher>
+		<notes><![CDATA[
+Keeps attempting to bootstrap with no success (cycles between white and black screens)
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -2162,7 +2307,7 @@ license:CC0
 
 	<software name="hellraid" supported="no">
 		<!-- SPS (CAPS) release 3335 -->
-		<description>Hellraider (Euro)</description>
+		<description>Hellraider (Europe)</description>
 		<year>1989</year>
 		<publisher>ARC</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2176,7 +2321,7 @@ license:CC0
 
 	<software name="herolanc" supported="no">
 		<!-- SPS (CAPS) release 3133 -->
-		<description>Heroes of the Lance (Euro)</description>
+		<description>Heroes of the Lance (Europe)</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2205,7 +2350,7 @@ license:CC0
 
 	<software name="hillstrt" supported="no">
 		<!-- SPS (CAPS) release 3134 -->
-		<description>Hill Street Blues (Euro, v1.11 19910326, Budget)</description>
+		<description>Hill Street Blues (Europe, v1.11 19910326, Budget)</description>
 		<year>1991</year>
 		<publisher>Buzz</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2219,7 +2364,7 @@ license:CC0
 
 	<software name="hannabar" supported="no">
 		<!-- SPS (CAPS) release 3332 -->
-		<description>The HiTEC Hanna-Barbera Cartoon Character Collection (Euro)</description>
+		<description>The HiTEC Hanna-Barbera Cartoon Character Collection (Europe)</description>
 		<year>1991</year>
 		<publisher>HiTec Software</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2233,7 +2378,7 @@ license:CC0
 
 	<software name="hostages" supported="no">
 		<!-- SPS (CAPS) release 3190 -->
-		<description>Hostages (Euro)</description>
+		<description>Hostages (Europe)</description>
 		<year>1989</year>
 		<publisher>Infogrames</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2255,7 +2400,7 @@ license:CC0
 
 	<software name="hotshot" supported="no">
 		<!-- SPS (CAPS) release 3216 -->
-		<description>Hotshot (Euro)</description>
+		<description>Hotshot (Europe)</description>
 		<year>1988</year>
 		<publisher>Addictive</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2269,7 +2414,7 @@ license:CC0
 
 	<software name="houndshd" supported="no">
 		<!-- SPS (CAPS) release 3384 -->
-		<description>The Hound of Shadow (Euro)</description>
+		<description>The Hound of Shadow (Europe)</description>
 		<year>1989</year>
 		<publisher>Electronic Arts</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2298,7 +2443,7 @@ license:CC0
 
 	<software name="huntrklr" supported="no">
 		<!-- SPS (CAPS) release 3135 -->
-		<description>Hunter Killer (Euro, v1.01, Budget)</description>
+		<description>Hunter Killer (Europe, v1.01, Budget)</description>
 		<year>1990</year>
 		<publisher>16 Blitz</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2312,7 +2457,7 @@ license:CC0
 
 	<software name="hyperbwl" supported="no">
 		<!-- SPS (CAPS) release 3337 -->
-		<description>Hyperbowl (Euro)</description>
+		<description>Hyperbowl (Europe)</description>
 		<year>1987</year>
 		<publisher>Virgin Mastertronic</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2326,7 +2471,7 @@ license:CC0
 
 	<software name="iball" supported="no">
 		<!-- SPS (CAPS) release 3100 -->
-		<description>I, Ball (Euro)</description>
+		<description>I, Ball (Europe)</description>
 		<year>1987</year>
 		<publisher>British Telecom</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2340,9 +2485,12 @@ license:CC0
 
 	<software name="immortal" supported="no">
 		<!-- SPS (CAPS) release 3343 -->
-		<description>The Immortal (Euro)</description>
+		<description>The Immortal (Europe)</description>
 		<year>1990</year>
 		<publisher>Electronic Arts</publisher>
+		<notes><![CDATA[
+4 [bombs] Illegal instruction when trying to start a game "Error loading file: MAZE0.CNM"
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -2365,6 +2513,9 @@ license:CC0
 		<description>Indiana Jones and the Temple of Doom (USA)</description>
 		<year>1989</year>
 		<publisher>Mindscape</publisher>
+		<notes><![CDATA[
+Fails autobooting, wants a disk B that is missing from the set.
+]]></notes>
 		<sharedfeat name="compatibility" value="NTSC"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -2376,7 +2527,7 @@ license:CC0
 
 	<software name="ininjarb" supported="no">
 		<!-- SPS (CAPS) release 3217 -->
-		<description>International Ninja Rabbits (Euro)</description>
+		<description>International Ninja Rabbits (Europe)</description>
 		<year>1991</year>
 		<publisher>Micro-Value</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2390,7 +2541,7 @@ license:CC0
 
 	<software name="inttruck" supported="no">
 		<!-- SPS (CAPS) release 3338 -->
-		<description>International Truck Racing (Euro)</description>
+		<description>International Truck Racing (Europe)</description>
 		<year>1992</year>
 		<publisher>Zeppelin Games</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2404,7 +2555,7 @@ license:CC0
 
 	<software name="intphase" supported="no">
 		<!-- SPS (CAPS) release 3339 -->
-		<description>Interphase (Euro)</description>
+		<description>Interphase (Europe)</description>
 		<year>1989</year>
 		<publisher>Image Works</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2418,7 +2569,7 @@ license:CC0
 
 	<software name="italy90" supported="no">
 		<!-- SPS (CAPS) release 3136 -->
-		<description>Italy 1990 (Euro, The Lineker Collection)</description>
+		<description>Italy 1990 (Europe, The Lineker Collection)</description>
 		<year>1990</year>
 		<publisher>U.S. Gold</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2432,7 +2583,7 @@ license:CC0
 
 	<software name="ivanhoe" supported="no">
 		<!-- SPS (CAPS) release 3157 -->
-		<description>Ivanhoe (Euro)</description>
+		<description>Ivanhoe (Europe)</description>
 		<year>1990</year>
 		<publisher>Ocean</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2454,7 +2605,7 @@ license:CC0
 
 	<software name="jpond" supported="no">
 		<!-- SPS (CAPS) release 3137 -->
-		<description>James Pond - Underwater Agent (Euro)</description>
+		<description>James Pond - Underwater Agent (Europe)</description>
 		<year>1990</year>
 		<publisher>Millennium</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2468,7 +2619,7 @@ license:CC0
 
 	<software name="robocod" supported="no">
 		<!-- SPS (CAPS) release 3138 -->
-		<description>James Pond II - Codename RoboCod (Euro)</description>
+		<description>James Pond II - Codename RoboCod (Europe)</description>
 		<year>1991</year>
 		<publisher>Millennium</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2482,7 +2633,7 @@ license:CC0
 
 	<software name="jeweldrk" supported="no">
 		<!-- SPS (CAPS) release 3112 -->
-		<description>Jewels of Darkness (Euro)</description>
+		<description>Jewels of Darkness (Europe)</description>
 		<year>1986</year>
 		<publisher>Rainbird</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2496,9 +2647,12 @@ license:CC0
 
 	<software name="kickoff2" supported="no">
 		<!-- SPS (CAPS) release 3158 -->
-		<description>Kick Off 2 (Euro, v1.4e)</description>
+		<description>Kick Off 2 (Europe, v1.4e)</description>
 		<year>1990</year>
 		<publisher>Anco</publisher>
+		<notes><![CDATA[
+"Master file not present or damaged ERROR"
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -2510,9 +2664,12 @@ license:CC0
 
 	<software name="kickoff2re" cloneof="kickoff2" supported="no">
 		<!-- SPS (CAPS) release 3215 -->
-		<description>Kick Off 2 - Return to Europe (Euro, v2.1e)</description>
+		<description>Kick Off 2 - Return to Europe (Europe, v2.1e)</description>
 		<year>1991</year>
 		<publisher>Anco</publisher>
+		<notes><![CDATA[
+"Master file not present or damaged ERROR"
+]]></notes>
 		<info name="usage" value="Requires &quot;Kick Off 2&quot; to work" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
@@ -2525,9 +2682,12 @@ license:CC0
 
 	<software name="kickoff2fw" cloneof="kickoff2" supported="no">
 		<!-- SPS (CAPS) release 3159 -->
-		<description>Kick Off 2 - The Final Whistle (Euro, v2.1e)</description>
+		<description>Kick Off 2 - The Final Whistle (Europe, v2.1e)</description>
 		<year>1991</year>
 		<publisher>Anco</publisher>
+		<notes><![CDATA[
+"Master file not present or damaged ERROR"
+]]></notes>
 		<info name="usage" value="Requires &quot;Kick Off 2&quot; to work" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
@@ -2540,7 +2700,7 @@ license:CC0
 
 	<software name="kickoff2wt" cloneof="kickoff2" supported="no">
 		<!-- SPS (CAPS) release 3183 -->
-		<description>Kick Off 2 - Winning Tactics (Euro)</description>
+		<description>Kick Off 2 - Winning Tactics (Europe)</description>
 		<year>1991</year>
 		<publisher>Anco</publisher>
 		<info name="usage" value="Requires &quot;KO2&quot; or &quot;KO2 Final Whistle&quot; or &quot;Player Manager&quot; to work" />
@@ -2555,9 +2715,10 @@ license:CC0
 
 	<software name="kilcloud" supported="no">
 		<!-- SPS (CAPS) release 3344 -->
-		<description>The Killing Cloud (Euro)</description>
+		<description>The Killing Cloud (Europe)</description>
 		<year>1991</year>
 		<publisher>Image Works</publisher>
+		<info name="usage" value="Sports manual copy protection" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -2577,7 +2738,7 @@ license:CC0
 
 	<software name="kingqst3" supported="no">
 		<!-- SPS (CAPS) release 3208 -->
-		<description>King's Quest III - To Heir is Human (Euro, v1.02 19861118)</description>
+		<description>King's Quest III - To Heir is Human (Europe, v1.02 19861118)</description>
 		<year>1989</year>
 		<publisher>Sierra</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2606,9 +2767,12 @@ license:CC0
 
 	<software name="klax" supported="no">
 		<!-- SPS (CAPS) release 3160 -->
-		<description>Klax (Euro)</description>
+		<description>Klax (Europe)</description>
 		<year>1990</year>
 		<publisher>Domark</publisher>
+		<notes><![CDATA[
+Tight loops at PC=71b26, cmp.l #$a2b2c837 (D0 is 0), boots if bypassed
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -2620,7 +2784,7 @@ license:CC0
 
 	<software name="lasersqd" supported="no">
 		<!-- SPS (CAPS) release 3228 -->
-		<description>Laser Squad (Euro)</description>
+		<description>Laser Squad (Europe)</description>
 		<year>1989</year>
 		<publisher>Blade</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2634,7 +2798,7 @@ license:CC0
 
 	<software name="lastnin3" supported="no">
 		<!-- SPS (CAPS) release 3219 -->
-		<description>Last Ninja 3 (Euro, Budget)</description>
+		<description>Last Ninja 3 (Europe, Budget)</description>
 		<year>1991</year>
 		<publisher>KIXX</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2656,9 +2820,10 @@ license:CC0
 
 	<software name="leadbg" supported="no">
 		<!-- SPS (CAPS) release 3139 -->
-		<description>Leader Board Pro Golf Simulator (Euro)</description>
+		<description>Leader Board Pro Golf Simulator (Europe)</description>
 		<year>1986</year>
 		<publisher>U.S. Gold</publisher>
+		<!-- TODO: "Insert security key" (?) -->
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -2670,7 +2835,7 @@ license:CC0
 
 	<software name="leadbgt1" cloneof="leadbg" supported="no">
 		<!-- SPS (CAPS) release 3161 -->
-		<description>Leader Board Pro Golf Simulator - Tournament Disk #1 (Euro, Leader Board Birdie)</description>
+		<description>Leader Board Pro Golf Simulator - Tournament Disk #1 (Europe, Leader Board Birdie)</description>
 		<year>1986</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="usage" value="Requires &quot;Leader Board Golf Simulation&quot; to work" />
@@ -2685,9 +2850,10 @@ license:CC0
 
 	<software name="lslarry" supported="no">
 		<!-- SPS (CAPS) release 3214 -->
-		<description>Leisure Suit Larry in The Land of the Lounge Lizards (Euro, v1.04 19870618)</description>
+		<description>Leisure Suit Larry in The Land of the Lounge Lizards (Europe, v1.04 19870618)</description>
 		<year>1987</year>
 		<publisher>Sierra</publisher>
+		<info name="usage" value="Sports manual copy protection (parental control quiz)" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -2708,9 +2874,12 @@ license:CC0
 <!-- This is a dual disk Amiga + ST -->
 	<software name="lxcess" supported="no">
 		<!-- SPS (CAPS) release 3058 -->
-		<description>Lethal Xcess (Euro)</description>
+		<description>Lethal Xcess (Europe)</description>
 		<year>1991</year>
 		<publisher>Eclipse</publisher>
+		<notes><![CDATA[
+"Incompatible image format or corrupted data" on mount
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -2729,7 +2898,7 @@ license:CC0
 	</software>
 
 	<software name="leviathan" supported="no">
-		<description>Leviathan (Euro)</description>
+		<description>Leviathan (Europe)</description>
 		<year>1987</year>
 		<publisher>English Software</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2742,7 +2911,7 @@ license:CC0
 
 	<software name="lightcor" supported="no">
 		<!-- SPS (CAPS) release 3297 -->
-		<description>The Light Corridor (Euro)</description>
+		<description>The Light Corridor (Europe)</description>
 		<year>1990</year>
 		<publisher>Infogrames</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2756,7 +2925,7 @@ license:CC0
 
 	<software name="locomotn" supported="no">
 		<!-- SPS (CAPS) release 3276 -->
-		<description>Locomotion (Euro)</description>
+		<description>Locomotion (Europe)</description>
 		<year>1991</year>
 		<publisher>Byte Back</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2770,9 +2939,13 @@ license:CC0
 
 	<software name="logical" supported="no">
 		<!-- SPS (CAPS) release 3277 -->
-		<description>Logical (Euro)</description>
+		<description>Logical (Europe)</description>
 		<year>1991</year>
 		<publisher>Rainbow Arts</publisher>
+		<notes><![CDATA[
+Unresponsive [mouse] on TOS (random)
+]]></notes>
+		<info name="usage" value="Sports code wheel copy protection" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -2784,9 +2957,10 @@ license:CC0
 
 	<software name="luretemp" supported="no">
 		<!-- SPS (CAPS) release 3196 -->
-		<description>Lure of the Temptress (Fra, 19920617)</description>
+		<description>Lure of the Temptress (France, 19920617)</description>
 		<year>1992</year>
 		<publisher>Virgin</publisher>
+		<info name="usage" value="Sports manual copy protection" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -2820,7 +2994,7 @@ license:CC0
 
 	<software name="lurkinh" supported="no">
 		<!-- SPS (CAPS) release 3109 -->
-		<description>The Lurking Horror (Euro, r203)</description>
+		<description>The Lurking Horror (Europe, r203)</description>
 		<year>1987</year>
 		<publisher>Infocom</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2834,7 +3008,7 @@ license:CC0
 
 	<software name="mach3" supported="no">
 		<!-- SPS (CAPS) release 3381 -->
-		<description>Mach 3 (Euro)</description>
+		<description>Mach 3 (Europe)</description>
 		<year>1987</year>
 		<publisher>Loriciel</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2856,9 +3030,12 @@ license:CC0
 
 	<software name="mafdet" supported="no">
 		<!-- SPS (CAPS) release 3278 -->
-		<description>Mafdet and the Book of the Dead (Euro)</description>
+		<description>Mafdet and the Book of the Dead (Europe)</description>
 		<year>1988</year>
 		<publisher>Software Horizons</publisher>
+		<notes><![CDATA[
+Hangs on title screen
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -2870,7 +3047,7 @@ license:CC0
 
 	<software name="manutd" supported="no">
 		<!-- SPS (CAPS) release 3147 -->
-		<description>Manchester United - The Official Computer Game (Euro)</description>
+		<description>Manchester United - The Official Computer Game (Europe)</description>
 		<year>1990</year>
 		<publisher>Krisalis</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2892,7 +3069,7 @@ license:CC0
 
 	<software name="manhdeal" supported="no">
 		<!-- SPS (CAPS) release 3382 -->
-		<description>Manhattan Dealers (Euro)</description>
+		<description>Manhattan Dealers (Europe)</description>
 		<year>1988</year>
 		<publisher>Silmarils</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2914,9 +3091,10 @@ license:CC0
 
 	<software name="mortviel" supported="no">
 		<!-- SPS (CAPS) release 3197 -->
-		<description>Le Manoir de Mortevielle (Fra)</description>
+		<description>Le Manoir de Mortevielle (France)</description>
 		<year>1988</year>
 		<publisher>Lankhor</publisher>
+		<!-- TODO: language barrier, hangs on title screen? -->
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -2936,7 +3114,7 @@ license:CC0
 
 	<software name="matrixmr" supported="no">
 		<!-- SPS (CAPS) release 3275 -->
-		<description>Matrix Marauders (Euro)</description>
+		<description>Matrix Marauders (Europe)</description>
 		<year>1990</year>
 		<publisher>Psyclapse</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2950,36 +3128,39 @@ license:CC0
 
 	<software name="mean18" supported="no">
 		<!-- SPS (CAPS) release 3362 -->
-		<description>Mean 18 + Famous Courses Disk Volume I &amp; Volume II (Euro, Accolade All Time Favourites)</description>
+		<description>Mean 18 + Famous Courses Disk Volume I &amp; Volume II (Europe, Accolade All Time Favourites)</description>
 		<year>1986</year>
 		<publisher>Accolade</publisher>
+		<notes><![CDATA[
+Fails [disk swap], requests disk A again, never leaves TOS
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Program Disk" />
+			<dataarea name="flop" size="469240">
+				<rom name="mean 18 (europe) (compilation - accolade all time favourites) (program disk).ipf" size="469240" crc="33565a50" sha1="a365d46f75c032e13128b726155e2a7e8fd3453f" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Famous Courses Disk - Volume I" />
 			<dataarea name="flop" size="468252">
 				<rom name="mean 18 (europe) (compilation - accolade all time favourites) (famous courses disk - volume i).ipf" size="468252" crc="509f1ea3" sha1="5b5346fa658d909cad7a377c5846e000eba271e6" offset="0" />
 			</dataarea>
 		</part>
 
-		<part name="flop2" interface="floppy_3_5">
+		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Famous Courses Disk - Volume II" />
 			<dataarea name="flop" size="468252">
 				<rom name="mean 18 (europe) (compilation - accolade all time favourites) (famous courses disk - volume ii).ipf" size="468252" crc="515e3b9f" sha1="4aae2d4d2c1073da8ffa9f47ef6ee9507f4f0a6b" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Program Disk" />
-			<dataarea name="flop" size="469240">
-				<rom name="mean 18 (europe) (compilation - accolade all time favourites) (program disk).ipf" size="469240" crc="33565a50" sha1="a365d46f75c032e13128b726155e2a7e8fd3453f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="megatwin" supported="no">
 		<!-- SPS (CAPS) release 3220 -->
-		<description>Mega Twins (Euro)</description>
+		<description>Mega Twins (Europe)</description>
 		<year>1991</year>
 		<publisher>U.S. Gold</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3001,7 +3182,7 @@ license:CC0
 
 	<software name="mercenry" supported="no">
 		<!-- SPS (CAPS) release 3383 -->
-		<description>Mercenary - Escape from Targ &amp; The Second City (Euro, Premier Collection II)</description>
+		<description>Mercenary - Escape from Targ &amp; The Second City (Europe, Premier Collection II)</description>
 		<year>1988</year>
 		<publisher>Novagen</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3015,7 +3196,7 @@ license:CC0
 
 	<software name="metrox" supported="no">
 		<!-- SPS (CAPS) release 3274 -->
-		<description>Metro-Cross (Euro)</description>
+		<description>Metro-Cross (Europe)</description>
 		<year>1987</year>
 		<publisher>U.S. Gold</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3028,9 +3209,12 @@ license:CC0
 	</software>
 
 	<software name="midwintr" supported="no">
-		<description>Midwinter (Euro)</description>
+		<description>Midwinter (Europe)</description>
 		<year>1992</year>
 		<publisher>Kixx XL</publisher>
+		<notes><![CDATA[
+White screen, executes illegal code
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="2150273">
@@ -3041,9 +3225,12 @@ license:CC0
 
 	<software name="mindwhel" supported="no">
 		<!-- SPS (CAPS) release 3264 -->
-		<description>Mindwheel (Euro)</description>
+		<description>Mindwheel (Europe)</description>
 		<year>1985</year>
 		<publisher>Brøderbund</publisher>
+		<notes><![CDATA[
+Unresponsive [mouse] on TOS
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -3055,7 +3242,7 @@ license:CC0
 
 	<software name="missing" supported="no">
 		<!-- SPS (CAPS) release 3265 -->
-		<description>Missing: One Droid (Euro)</description>
+		<description>Missing: One Droid (Europe)</description>
 		<year>1986</year>
 		<publisher>Bug-Byte</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3069,9 +3256,12 @@ license:CC0
 
 	<software name="missgeno" supported="no">
 		<!-- SPS (CAPS) release 3366 -->
-		<description>Mission Genocide (Euro)</description>
+		<description>Mission Genocide (Europe)</description>
 		<year>1987</year>
 		<publisher>Firebird</publisher>
+		<notes><![CDATA[
+Pauses itself when pressing fire on joystick during gameplay (?)
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -3084,9 +3274,12 @@ license:CC0
 <!-- This is a dual disk Amiga + ST -->
 	<software name="monstbus" supported="no">
 		<!-- SPS (CAPS) release 3032 -->
-		<description>Monster Business (Euro)</description>
+		<description>Monster Business (Europe)</description>
 		<year>1991</year>
 		<publisher>Eclipse</publisher>
+		<notes><![CDATA[
+"Incompatible image format or corrupted data" on mount
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -3098,7 +3291,7 @@ license:CC0
 
 	<software name="nevermnd" supported="no">
 		<!-- SPS (CAPS) release 3145 -->
-		<description>Never Mind (Euro)</description>
+		<description>Never Mind (Europe)</description>
 		<year>1989</year>
 		<publisher>Psyclapse</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3120,9 +3313,10 @@ license:CC0
 
 	<software name="mansell" supported="no">
 		<!-- SPS (CAPS) release 3148 -->
-		<description>Nigel Mansell's World Championship (Euro)</description>
+		<description>Nigel Mansell's World Championship (Europe)</description>
 		<year>1992</year>
 		<publisher>Gremlin</publisher>
+		<info name="usage" value="Sports code wheel copy protection" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -3134,9 +3328,12 @@ license:CC0
 
 	<software name="nshift" supported="no">
 		<!-- SPS (CAPS) release 3359 -->
-		<description>Night Shift (Euro)</description>
+		<description>Night Shift (Europe)</description>
 		<year>1990</year>
 		<publisher>Lucasfilm</publisher>
+		<notes><![CDATA[
+Doesn't recognize [disk swap] when prompted to
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -3156,7 +3353,7 @@ license:CC0
 
 	<software name="nightwlk" supported="no">
 		<!-- SPS (CAPS) release 3279 -->
-		<description>Night Walk (Euro)</description>
+		<description>Night Walk (Europe)</description>
 		<year>1988</year>
 		<publisher>Alternative Software</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3170,7 +3367,7 @@ license:CC0
 
 	<software name="ninjarab" supported="no">
 		<!-- SPS (CAPS) release 3218 -->
-		<description>Ninja Rabbits (Euro)</description>
+		<description>Ninja Rabbits (Europe)</description>
 		<year>1991</year>
 		<publisher>MicroValue</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3192,7 +3389,7 @@ license:CC0
 
 	<software name="nitrobc" supported="no">
 		<!-- SPS (CAPS) release 3284 -->
-		<description>Nitro Boost Challenge (Euro)</description>
+		<description>Nitro Boost Challenge (Europe)</description>
 		<year>1989</year>
 		<publisher>Codemasters</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3206,9 +3403,13 @@ license:CC0
 
 	<software name="noexcuse" supported="no">
 		<!-- SPS (CAPS) release 3285 -->
-		<description>No Excuses (Euro)</description>
+		<description>No Excuses (Europe)</description>
 		<year>1988</year>
 		<publisher>Arcana</publisher>
+		<notes><![CDATA[
+Hangs during gameplay, or black screen after title screen, or doesn't recognize keyboard input on main menu
+Cannot choose option 4 (Italian)
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -3220,7 +3421,7 @@ license:CC0
 
 	<software name="northns" supported="no">
 		<!-- SPS (CAPS) release 3283 -->
-		<description>North and South (Euro)</description>
+		<description>North and South (Europe)</description>
 		<year>1989</year>
 		<publisher>Infogrames</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3234,7 +3435,7 @@ license:CC0
 
 	<software name="obliter" supported="no">
 		<!-- SPS (CAPS) release 3363 -->
-		<description>Obliterator (Euro)</description>
+		<description>Obliterator (Europe)</description>
 		<year>1988</year>
 		<publisher>Psygnosis</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3256,9 +3457,10 @@ license:CC0
 
 	<software name="everton" supported="no">
 		<!-- SPS (CAPS) release 3323 -->
-		<description>The Official Everton F.C. Intelligensia (Euro)</description>
+		<description>The Official Everton F.C. Intelligensia (Europe)</description>
 		<year>1990</year>
 		<publisher>Amfas</publisher>
+		<info name="usage" value="Sports manual copy protection" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -3270,9 +3472,12 @@ license:CC0
 
 	<software name="oharrier" supported="no">
 		<!-- SPS (CAPS) release 3393 -->
-		<description>Operation Harrier (Euro)</description>
+		<description>Operation Harrier (Europe)</description>
 		<year>1990</year>
 		<publisher>U.S. Gold</publisher>
+		<notes><![CDATA[
+Black screen
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -3284,9 +3489,10 @@ license:CC0
 
 	<software name="ostealth" supported="no">
 		<!-- SPS (CAPS) release 3198 -->
-		<description>Operation Stealth (Fra)</description>
+		<description>Operation Stealth (France)</description>
 		<year>1990</year>
 		<publisher>U.S. Gold</publisher>
+		<info name="usage" value="Sports code wheel copy protection (codes de couleurs)" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -3313,9 +3519,12 @@ license:CC0
 
 	<software name="othunder" supported="no">
 		<!-- SPS (CAPS) release 3356 -->
-		<description>Operation Thunderbolt (Euro)</description>
+		<description>Operation Thunderbolt (Europe)</description>
 		<year>1989</year>
 		<publisher>Ocean</publisher>
+		<notes><![CDATA[
+Black screen, enables [68k] trace mode
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -3342,7 +3551,7 @@ license:CC0
 
 	<software name="orbit2k" supported="no">
 		<!-- SPS (CAPS) release 3357 -->
-		<description>Orbit 2000 (Euro)</description>
+		<description>Orbit 2000 (Europe)</description>
 		<year>1991</year>
 		<publisher>Byte Back</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3356,9 +3565,10 @@ license:CC0
 
 	<software name="orgames" supported="no">
 		<!-- SPS (CAPS) release 3358 -->
-		<description>Oriental Games (Euro)</description>
+		<description>Oriental Games (Europe)</description>
 		<year>1990</year>
 		<publisher>MicroStyle</publisher>
+		<info name="usage" value="Sports manual copy protection" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -3378,7 +3588,7 @@ license:CC0
 
 	<software name="outcast" supported="no">
 		<!-- SPS (CAPS) release 3263 -->
-		<description>Outcast (Euro)</description>
+		<description>Outcast (Europe)</description>
 		<year>1987</year>
 		<publisher>Mastertronic</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3392,7 +3602,7 @@ license:CC0
 
 	<software name="overland" supported="no">
 		<!-- SPS (CAPS) release 3226 -->
-		<description>Overlander (Euro)</description>
+		<description>Overlander (Europe)</description>
 		<year>1988</year>
 		<publisher>Elite</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3406,9 +3616,12 @@ license:CC0
 
 	<software name="overlanda" cloneof="overland" supported="no">
 		<!-- SPS (CAPS) release 3387 -->
-		<description>Overlander (Euro, Finale)</description>
+		<description>Overlander (Europe, Finale)</description>
 		<year>1988</year>
 		<publisher>Elite</publisher>
+		<notes><![CDATA[
+Executes illegal opcode at PC=126f4, [68k] hangs
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -3420,7 +3633,7 @@ license:CC0
 
 	<software name="goplayer" supported="no">
 		<!-- SPS (CAPS) release 3296 -->
-		<description>The Oxford Softworks Go Player (Euro)</description>
+		<description>The Oxford Softworks Go Player (Europe)</description>
 		<year>1991</year>
 		<publisher>Oxford Softworks</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3434,7 +3647,7 @@ license:CC0
 
 	<software name="pacmania" supported="no">
 		<!-- SPS (CAPS) release 3140 -->
-		<description>Pac-Mania (Euro)</description>
+		<description>Pac-Mania (Europe)</description>
 		<year>1989</year>
 		<publisher>Grandslam</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3448,9 +3661,12 @@ license:CC0
 
 	<software name="pandora" supported="no">
 		<!-- SPS (CAPS) release 3141 -->
-		<description>Pandora (Euro)</description>
+		<description>Pandora (Europe)</description>
 		<year>1988</year>
 		<publisher>Firebird</publisher>
+		<notes><![CDATA[
+Doesn't recognize fire button or space key on title screen
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -3462,9 +3678,12 @@ license:CC0
 
 	<software name="paperboy" supported="no">
 		<!-- SPS (CAPS) release 3386 -->
-		<description>Paperboy (Euro, Finale)</description>
+		<description>Paperboy (Europe, Finale)</description>
 		<year>1989</year>
 		<publisher>Elite</publisher>
+		<notes><![CDATA[
+Executes illegal opcode at PC=af06, [68k] hangs
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -3476,7 +3695,7 @@ license:CC0
 
 	<software name="passwnd2" supported="no">
 		<!-- SPS (CAPS) release 3396 -->
-		<description>Passengers on the Wind 2 (Euro)</description>
+		<description>Passengers on the Wind 2 (Europe)</description>
 		<year>1988</year>
 		<publisher>Infogrames</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3490,7 +3709,7 @@ license:CC0
 
 	<software name="pawn" supported="no">
 		<!-- SPS (CAPS) release 3209 -->
-		<description>The Pawn (Euro, v2.1)</description>
+		<description>The Pawn (Europe, v2.1)</description>
 		<year>1986</year>
 		<publisher>Rainbird</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3504,9 +3723,12 @@ license:CC0
 
 	<software name="pharaoh3" supported="no">
 		<!-- SPS (CAPS) release 3142 -->
-		<description>Pharaoh III (Euro)</description>
+		<description>Pharaoh III (Europe)</description>
 		<year>1989</year>
 		<publisher>Digita International</publisher>
+		<notes><![CDATA[
+F3 doesn't show key configure screen, doesn't seem joystick controllable?
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -3518,7 +3740,7 @@ license:CC0
 
 	<software name="piction" supported="no">
 		<!-- SPS (CAPS) release 3143 -->
-		<description>Pictionary - The Game of Quick Draw (Euro)</description>
+		<description>Pictionary - The Game of Quick Draw (Europe)</description>
 		<year>1989</year>
 		<publisher>Domark</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3532,7 +3754,7 @@ license:CC0
 
 	<software name="pirabarb" supported="no">
 		<!-- SPS (CAPS) release 3395 -->
-		<description>Pirates of the Barbary Coast (Euro)</description>
+		<description>Pirates of the Barbary Coast (Europe)</description>
 		<year>1987</year>
 		<publisher>Cascade Games</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3546,9 +3768,12 @@ license:CC0
 
 	<software name="pmanger" supported="no">
 		<!-- SPS (CAPS) release 3188 -->
-		<description>Player Manager (Euro, Football Crazy Challenge)</description>
+		<description>Player Manager (Europe, Football Crazy Challenge)</description>
 		<year>1990</year>
 		<publisher>Anco</publisher>
+		<notes><![CDATA[
+Hangs after title screen with a broken icon in the middle.
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -3560,7 +3785,7 @@ license:CC0
 
 	<software name="pquest" supported="no">
 		<!-- SPS (CAPS) release 3149 -->
-		<description>Police Quest - In Pursuit of the Death Angel (Euro, v2.0G 19870312)</description>
+		<description>Police Quest - In Pursuit of the Death Angel (Europe, v2.0G 19870312)</description>
 		<year>1987</year>
 		<publisher>Sierra</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3589,7 +3814,7 @@ license:CC0
 
 	<software name="populopl" supported="no">
 		<!-- SPS (CAPS) release 3024 -->
-		<description>Populous - The Promised Lands (Euro)</description>
+		<description>Populous - The Promised Lands (Europe)</description>
 		<year>1989</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="usage" value="Requires &quot;Populous&quot; to work" />
@@ -3604,9 +3829,10 @@ license:CC0
 
 	<software name="presidnt" supported="no">
 		<!-- SPS (CAPS) release 3281 -->
-		<description>The President is Missing (Euro)</description>
+		<description>The President is Missing (Europe)</description>
 		<year>1988</year>
 		<publisher>MicroProse</publisher>
+		<info name="usage" value="Sports manual copy protection (logon procedure)" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -3618,9 +3844,12 @@ license:CC0
 
 	<software name="prince" supported="no">
 		<!-- SPS (CAPS) release 3162 -->
-		<description>Prince (Euro)</description>
+		<description>Prince (Europe)</description>
 		<year>1989</year>
 		<publisher>ARC</publisher>
+		<notes><![CDATA[
+White screen
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -3632,7 +3861,7 @@ license:CC0
 
 	<software name="prison" supported="no">
 		<!-- SPS (CAPS) release 3369 -->
-		<description>Prison (Euro)</description>
+		<description>Prison (Europe)</description>
 		<year>1989</year>
 		<publisher>Krisalis</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3654,9 +3883,12 @@ license:CC0
 
 	<software name="puzznic" supported="no">
 		<!-- SPS (CAPS) release 3368 -->
-		<description>Puzznic (Euro)</description>
+		<description>Puzznic (Europe)</description>
 		<year>1990</year>
 		<publisher>Ocean</publisher>
+		<notes><![CDATA[
+Broken white screen with black box, [68k] stalls at invalid opcode PC=4d1c
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -3671,6 +3903,9 @@ license:CC0
 		<description>Quink (USA)</description>
 		<year>1984</year>
 		<publisher>Mindscape</publisher>
+		<notes><![CDATA[
+Prompts for a disk B: that doesn't exist in the set.
+]]></notes>
 		<sharedfeat name="compatibility" value="NTSC"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -3682,7 +3917,7 @@ license:CC0
 
 	<software name="raffles" supported="no">
 		<!-- SPS (CAPS) release 3163 -->
-		<description>Raffles (Euro)</description>
+		<description>Raffles (Europe)</description>
 		<year>1989</year>
 		<publisher>The Edge</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3696,9 +3931,12 @@ license:CC0
 
 	<software name="rallyx" supported="no">
 		<!-- SPS (CAPS) release 3379 -->
-		<description>Rally Cross (Euro)</description>
+		<description>Rally Cross (Europe)</description>
 		<year>1989</year>
 		<publisher>Anco</publisher>
+		<notes><![CDATA[
+White screen, enables [68k] trace mode
+]]></notes>
 		<info name="alt_title" value="Rally Cross Challenge (Box)" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
@@ -3711,7 +3949,7 @@ license:CC0
 
 	<software name="rghostb" supported="no">
 		<!-- SPS (CAPS) release 3164 -->
-		<description>The Real Ghostbusters (Euro)</description>
+		<description>The Real Ghostbusters (Europe)</description>
 		<year>1988</year>
 		<publisher>Activision</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3725,7 +3963,7 @@ license:CC0
 
 	<software name="redheat" supported="no">
 		<!-- SPS (CAPS) release 3370 -->
-		<description>Red Heat (Euro)</description>
+		<description>Red Heat (Europe)</description>
 		<year>1989</year>
 		<publisher>Ocean</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3747,9 +3985,12 @@ license:CC0
 
 	<software name="redstorm" supported="no">
 		<!-- SPS (CAPS) release 3165 -->
-		<description>Red Storm Rising (Euro, v743.01)</description>
+		<description>Red Storm Rising (Europe, v743.01)</description>
 		<year>1990</year>
 		<publisher>MicroProse</publisher>
+		<notes><![CDATA[
+Prompts user to insert "ORIGINAL" DISK A, assume failed copy protection
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -3769,9 +4010,12 @@ license:CC0
 
 	<software name="resol101" supported="no">
 		<!-- SPS (CAPS) release 3200 -->
-		<description>Resolution 101 (Euro)</description>
+		<description>Resolution 101 (Europe)</description>
 		<year>1990</year>
 		<publisher>Millennium</publisher>
+		<notes><![CDATA[
+During gameplay player loses a life with no chance of actual game.
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -3783,7 +4027,7 @@ license:CC0
 
 	<software name="revmutcm" supported="no">
 		<!-- SPS (CAPS) release 3146 -->
-		<description>Revenge of the Mutant Camels II (Euro)</description>
+		<description>Revenge of the Mutant Camels II (Europe)</description>
 		<year>1988</year>
 		<publisher>Mastertronic</publisher>
 		<info name="alt_title" value="Revenge II (Box)" />
@@ -3798,7 +4042,7 @@ license:CC0
 
 	<software name="roadwars" supported="no">
 		<!-- SPS (CAPS) release 3371 -->
-		<description>Road Wars (Euro)</description>
+		<description>Road Wars (Europe)</description>
 		<year>1987</year>
 		<publisher>Melbourne House</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3812,9 +4056,12 @@ license:CC0
 
 	<software name="robocop" supported="no">
 		<!-- SPS (CAPS) release 3166 -->
-		<description>RoboCop (Euro)</description>
+		<description>RoboCop (Europe)</description>
 		<year>1989</year>
 		<publisher>Ocean</publisher>
+		<notes><![CDATA[
+Fails [disk swap] when prompted to after title screen
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -3834,9 +4081,12 @@ license:CC0
 
 	<software name="rockstar" supported="no">
 		<!-- SPS (CAPS) release 3373 -->
-		<description>Rock Star Ate My Hamster (Euro)</description>
+		<description>Rock Star Ate My Hamster (Europe)</description>
 		<year>1989</year>
 		<publisher>Codemasters</publisher>
+		<notes><![CDATA[
+11 [bombs] Line 1111 Emulator
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -3848,7 +4098,7 @@ license:CC0
 
 	<software name="rodymas3" supported="no">
 		<!-- SPS (CAPS) release 3199 -->
-		<description>Rody &amp; Mastico III (Fra)</description>
+		<description>Rody &amp; Mastico III (France)</description>
 		<year>1991</year>
 		<publisher>Lankhor</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3862,7 +4112,7 @@ license:CC0
 
 	<software name="rotor" supported="no">
 		<!-- SPS (CAPS) release 3372 -->
-		<description>Rotor (Euro)</description>
+		<description>Rotor (Europe)</description>
 		<year>1989</year>
 		<publisher>Arcana</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3876,9 +4126,12 @@ license:CC0
 
 	<software name="sargon3" supported="no">
 		<!-- SPS (CAPS) release 3167 -->
-		<description>Sargon III (Euro)</description>
+		<description>Sargon III (Europe)</description>
 		<year>1988</year>
 		<publisher>Logotron</publisher>
+		<notes><![CDATA[
+"An error has occurred , Re-Load"
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -3890,9 +4143,12 @@ license:CC0
 
 	<software name="sascombs" supported="no">
 		<!-- SPS (CAPS) release 3378 -->
-		<description>SAS Combat Simulator (Euro)</description>
+		<description>SAS Combat Simulator (Europe)</description>
 		<year>1990</year>
 		<publisher>Codemasters</publisher>
+		<notes><![CDATA[
+White screen. Track 1 appears to be malformed, causing CRC errors on reads; 68000 eventually hangs on double bus error after SSP is corrupted.
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -3904,7 +4160,7 @@ license:CC0
 
 	<software name="7gatejam" supported="no">
 		<!-- SPS (CAPS) release 3168 -->
-		<description>The Seven Gates of Jambala (Euro)</description>
+		<description>The Seven Gates of Jambala (Europe)</description>
 		<year>1989</year>
 		<publisher>Grandslam</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3926,9 +4182,12 @@ license:CC0
 
 	<software name="shadgate" supported="no">
 		<!-- SPS (CAPS) release 3315 -->
-		<description>Shadowgate (Euro)</description>
+		<description>Shadowgate (Europe)</description>
 		<year>1987</year>
 		<publisher>Mindscape</publisher>
+		<notes><![CDATA[
+Fails [disk swap]
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -3948,7 +4207,7 @@ license:CC0
 
 	<software name="sidewind" supported="no">
 		<!-- SPS (CAPS) release 3107 -->
-		<description>SideWinder (Euro)</description>
+		<description>SideWinder (Europe)</description>
 		<year>1988</year>
 		<publisher>Mastertronic</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3970,7 +4229,7 @@ license:CC0
 
 	<software name="silkworm" supported="no">
 		<!-- SPS (CAPS) release 3144 -->
-		<description>Silkworm (Euro)</description>
+		<description>Silkworm (Europe)</description>
 		<year>1990</year>
 		<publisher>Virgin Mastertronic</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3984,7 +4243,7 @@ license:CC0
 
 	<software name="sinbad" supported="no">
 		<!-- SPS (CAPS) release 3390 -->
-		<description>Sinbad and the Throne of the Falcon (Euro)</description>
+		<description>Sinbad and the Throne of the Falcon (Europe)</description>
 		<year>1988</year>
 		<publisher>Mirror Image</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4013,9 +4272,12 @@ license:CC0
 
 	<software name="sharrier" supported="no">
 		<!-- SPS (CAPS) release 3391 -->
-		<description>Space Harrier (Euro)</description>
+		<description>Space Harrier (Europe)</description>
 		<year>1988</year>
 		<publisher>Elite</publisher>
+		<notes><![CDATA[
+Randomly hangs, stalls waiting for a $bcbe that never becomes 1, supposed to be provided by [GPIO4] irq, manually triggering a [ikbd] rx_cb 0 will resume comms with [ACIA0]
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -4035,9 +4297,13 @@ license:CC0
 
 	<software name="sharriera" cloneof="sharrier" supported="no">
 		<!-- SPS (CAPS) release 3388 -->
-		<description>Space Harrier (Euro, Finale)</description>
+		<description>Space Harrier (Europe, Finale)</description>
 		<year>1988</year>
 		<publisher>Elite</publisher>
+		<notes><![CDATA[
+Draws "ELTE" instead of "ELITE" on game select
+Random hangs, cfr. sharrier
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -4049,7 +4315,7 @@ license:CC0
 
 	<software name="sharrie2" supported="no">
 		<!-- SPS (CAPS) release 3392 -->
-		<description>Space Harrier II (Euro)</description>
+		<description>Space Harrier II (Europe)</description>
 		<year>1990</year>
 		<publisher>Grandslam</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4071,7 +4337,7 @@ license:CC0
 
 	<software name="sphericl" supported="no">
 		<!-- SPS (CAPS) release 3169 -->
-		<description>Spherical (Euro)</description>
+		<description>Spherical (Europe)</description>
 		<year>1989</year>
 		<publisher>Rainbow Arts</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4093,7 +4359,7 @@ license:CC0
 
 	<software name="spidertr" supported="no">
 		<!-- SPS (CAPS) release 3170 -->
-		<description>Spidertronic (Euro)</description>
+		<description>Spidertronic (Europe)</description>
 		<year>1988</year>
 		<publisher>ERE</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4106,7 +4372,7 @@ license:CC0
 	</software>
 
 	<software name="spidertr1" cloneof="spidertr" supported="no">
-		<description>Spidertronic (Euro, Smash 16)</description>
+		<description>Spidertronic (Europe, Smash 16)</description>
 		<year>1990</year>
 		<publisher>Smash 16</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4119,7 +4385,7 @@ license:CC0
 
 	<software name="spitfr40" supported="no">
 		<!-- SPS (CAPS) release 3101 -->
-		<description>Spitfire 40 (Euro)</description>
+		<description>Spitfire 40 (Europe)</description>
 		<year>1988</year>
 		<publisher>Mirrorsoft</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4133,7 +4399,7 @@ license:CC0
 
 	<software name="spitimag" supported="no">
 		<!-- SPS (CAPS) release 3376 -->
-		<description>Spitting Image (Euro)</description>
+		<description>Spitting Image (Europe)</description>
 		<year>1988</year>
 		<publisher>Domark</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4147,7 +4413,7 @@ license:CC0
 
 	<software name="jedi" supported="no">
 		<!-- SPS (CAPS) release 3374 -->
-		<description>Return of the Jedi (Euro, The Star Wars Trilogy)</description>
+		<description>Return of the Jedi (Europe, The Star Wars Trilogy)</description>
 		<year>1989</year>
 		<publisher>Domark</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4161,7 +4427,7 @@ license:CC0
 
 	<software name="esb" supported="no">
 		<!-- SPS (CAPS) release 3171 -->
-		<description>Star Wars - The Empire Strikes Back (Euro, The Star Wars Trilogy)</description>
+		<description>Star Wars - The Empire Strikes Back (Europe, The Star Wars Trilogy)</description>
 		<year>1989</year>
 		<publisher>Domark</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4175,9 +4441,10 @@ license:CC0
 
 	<software name="starwrek" supported="no">
 		<!-- SPS (CAPS) release 3375 -->
-		<description>Star Wrek (Euro)</description>
+		<description>Star Wrek (Europe)</description>
 		<year>1989</year>
 		<publisher>Castlesoft</publisher>
+		<info name="usage" value="Sports manual copy protection" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -4189,7 +4456,7 @@ license:CC0
 
 	<software name="starblaz" supported="no">
 		<!-- SPS (CAPS) release 3377 -->
-		<description>Starblaze (Euro)</description>
+		<description>Starblaze (Europe)</description>
 		<year>1989</year>
 		<publisher>Logotron</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4203,7 +4470,7 @@ license:CC0
 
 	<software name="starfl" supported="no">
 		<!-- SPS (CAPS) release 3113 -->
-		<description>Starflight (Euro)</description>
+		<description>Starflight (Europe)</description>
 		<year>1989</year>
 		<publisher>Electronic Arts</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4225,7 +4492,7 @@ license:CC0
 
 	<software name="starglid" supported="no">
 		<!-- SPS (CAPS) release 3210 -->
-		<description>Starglider (Euro)</description>
+		<description>Starglider (Europe)</description>
 		<year>1987</year>
 		<publisher>Rainbird</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4240,7 +4507,7 @@ license:CC0
 <!-- This is a dual disk Amiga + ST -->
 	<software name="stargld2" supported="no">
 		<!-- SPS (CAPS) release 3000 -->
-		<description>Starglider 2 (Euro)</description>
+		<description>Starglider 2 (Europe)</description>
 		<year>1988</year>
 		<publisher>Rainbird</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4254,7 +4521,7 @@ license:CC0
 
 	<software name="strquake" supported="no">
 		<!-- SPS (CAPS) release 3399 -->
-		<description>Starquake (Euro)</description>
+		<description>Starquake (Europe)</description>
 		<year>1988</year>
 		<publisher>Mandarin</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4268,9 +4535,12 @@ license:CC0
 
 	<software name="steel" supported="no">
 		<!-- SPS (CAPS) release 3306 -->
-		<description>Steel (Euro)</description>
+		<description>Steel (Europe)</description>
 		<year>1989</year>
 		<publisher>Hewson</publisher>
+		<notes><![CDATA[
+11 [bombs] Line 1111 Emulator, resets TOS if trying to run auto/steel.prg manually
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -4282,9 +4552,12 @@ license:CC0
 
 	<software name="stormstr" supported="no">
 		<!-- SPS (CAPS) release 3115 -->
-		<description>Storm Master (Euro)</description>
+		<description>Storm Master (Europe)</description>
 		<year>1992</year>
 		<publisher>Silmarils</publisher>
+		<notes><![CDATA[
+Hangs on title screen
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -4295,7 +4568,7 @@ license:CC0
 	</software>
 
 	<software name="sf2" supported="no">
-		<description>Street Fighter II: The World Warrior (Euro)</description>
+		<description>Street Fighter II: The World Warrior (Europe)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4331,7 +4604,7 @@ license:CC0
 
 	<software name="strider" supported="no">
 		<!-- SPS (CAPS) release 3193 -->
-		<description>Strider (Euro, Les Chevaliers)</description>
+		<description>Strider (Europe, Les Chevaliers)</description>
 		<year>1989</year>
 		<publisher>U.S. Gold</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4345,7 +4618,7 @@ license:CC0
 
 	<software name="strike" supported="no">
 		<!-- SPS (CAPS) release 3394 -->
-		<description>Strike (Euro)</description>
+		<description>Strike (Europe)</description>
 		<year>1987</year>
 		<publisher>Mastertronic</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4358,9 +4631,13 @@ license:CC0
 	</software>
 
 	<software name="striker" supported="no">
-		<description>Striker (Euro)</description>
+		<description>Striker (Europe)</description>
 		<year>1993</year>
 		<publisher>Gremlin Graphics</publisher>
+		<notes><![CDATA[
+Black screen, hangs in TOS comparing buffers coming from $db0
+Player cursor oddly appears a bit lower compared to the shadow (verify)
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="2150288">
@@ -4371,7 +4648,7 @@ license:CC0
 
 	<software name="stryx" supported="no">
 		<!-- SPS (CAPS) release 3172 -->
-		<description>Stryx (Euro)</description>
+		<description>Stryx (Europe)</description>
 		<year>1989</year>
 		<publisher>Psyclapse</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4393,7 +4670,8 @@ license:CC0
 
 	<software name="sundog" supported="no">
 		<!-- SPS (CAPS) release 3222 -->
-		<description>Sundog - Frozen Legacy (Euro)</description>
+		<description>Sundog - Frozen Legacy (Europe)</description>
+		<!-- Shows (c) 1985 on title screen as per original USA version -->
 		<year>1988</year>
 		<publisher>Mirrorsoft</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4407,7 +4685,7 @@ license:CC0
 
 	<software name="swap" supported="no">
 		<!-- SPS (CAPS) release 3301 -->
-		<description>Swap (Euro, Budget)</description>
+		<description>Swap (Europe, Budget)</description>
 		<year>1991</year>
 		<publisher>Fox Hits</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4421,9 +4699,12 @@ license:CC0
 
 	<software name="taipan" supported="no">
 		<!-- SPS (CAPS) release 3398 -->
-		<description>Tai-Pan (Euro)</description>
+		<description>Tai-Pan (Europe)</description>
 		<year>1987</year>
 		<publisher>Ocean</publisher>
+		<notes><![CDATA[
+Hangs after selecting input device on title screen, looping on [MFP] and [MMU] interactions
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -4435,9 +4716,12 @@ license:CC0
 
 	<software name="tasstime" supported="no">
 		<!-- SPS (CAPS) release 3300 -->
-		<description>Tass Times in Tonetown (Euro)</description>
+		<description>Tass Times in Tonetown (Europe)</description>
 		<year>1986</year>
 		<publisher>Activision</publisher>
+		<notes><![CDATA[
+[68k] stalls after [disk swap], PC=a34a
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -4457,7 +4741,7 @@ license:CC0
 
 	<software name="tauceti" supported="no">
 		<!-- SPS (CAPS) release 3268 -->
-		<description>Tau Ceti (Euro)</description>
+		<description>Tau Ceti (Europe)</description>
 		<year>1987</year>
 		<publisher>Electronic Arts</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4471,7 +4755,7 @@ license:CC0
 
 	<software name="tenniscp" supported="no">
 		<!-- SPS (CAPS) release 3173 -->
-		<description>Tennis Cup (Euro, Budget)</description>
+		<description>Tennis Cup (Europe, Budget)</description>
 		<year>1990</year>
 		<publisher>Action Sixteen</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4485,9 +4769,12 @@ license:CC0
 
 	<software name="terramex" supported="no">
 		<!-- SPS (CAPS) release 3299 -->
-		<description>Terramex (Euro)</description>
+		<description>Terramex (Europe)</description>
 		<year>1987</year>
 		<publisher>Grandslam</publisher>
+		<notes><![CDATA[
+2 [bombs] bus error on title screen
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -4507,9 +4794,12 @@ license:CC0
 
 	<software name="tdriv" supported="no">
 		<!-- SPS (CAPS) release 3361 -->
-		<description>Test Drive (Euro, Accolade All Time Favourites)</description>
+		<description>Test Drive (Europe, Accolade All Time Favourites)</description>
 		<year>1987</year>
 		<publisher>Accolade</publisher>
+		<notes><![CDATA[
+Prompts user to play with same car or a new one after [disk swap] with no gameplay, assume [FDC] copy protection
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -4529,9 +4819,12 @@ license:CC0
 
 	<software name="tparkmys" supported="no">
 		<!-- SPS (CAPS) release 3211 -->
-		<description>Theme Park Mystery - Variations on a Theme (Euro)</description>
+		<description>Theme Park Mystery - Variations on a Theme (Europe)</description>
 		<year>1991</year>
 		<publisher>Image Works</publisher>
+		<notes><![CDATA[
+Mouse pointer becomes invisible when selecting fortune teller cabinet in gameplay
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -4543,7 +4836,7 @@ license:CC0
 
 	<software name="thrust" supported="no">
 		<!-- SPS (CAPS) release 3245 -->
-		<description>Thrust (Euro)</description>
+		<description>Thrust (Europe)</description>
 		<year>1989</year>
 		<publisher>Firebird</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4557,7 +4850,7 @@ license:CC0
 
 	<software name="tburner" supported="no">
 		<!-- SPS (CAPS) release 3295 -->
-		<description>Thunder Burner (Euro)</description>
+		<description>Thunder Burner (Europe)</description>
 		<year>1992</year>
 		<publisher>Loriciel</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4571,7 +4864,7 @@ license:CC0
 
 	<software name="thdrcats" supported="no">
 		<!-- SPS (CAPS) release 3302 -->
-		<description>ThunderCats (Euro, Budget)</description>
+		<description>ThunderCats (Europe, Budget)</description>
 		<year>1988</year>
 		<publisher>Encore</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4585,9 +4878,12 @@ license:CC0
 
 	<software name="thdrwing" supported="no">
 		<!-- SPS (CAPS) release 3225 -->
-		<description>ThunderWing (Euro)</description>
+		<description>ThunderWing (Europe)</description>
 		<year>1989</year>
 		<publisher>Artronic Products</publisher>
+		<notes><![CDATA[
+Player bullets color clash with backgrounds (btanb)
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -4599,7 +4895,7 @@ license:CC0
 
 	<software name="timemag" supported="no">
 		<!-- SPS (CAPS) release 3175 -->
-		<description>Time and Magik (Euro)</description>
+		<description>Time and Magik (Europe)</description>
 		<year>1988</year>
 		<publisher>Mandarin</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4621,7 +4917,7 @@ license:CC0
 
 	<software name="timeblst" supported="no">
 		<!-- SPS (CAPS) release 3346 -->
-		<description>Time Blast (Euro)</description>
+		<description>Time Blast (Europe)</description>
 		<year>19??</year>
 		<publisher>Micro-Value</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4635,7 +4931,7 @@ license:CC0
 
 	<software name="tintin" supported="no">
 		<!-- SPS (CAPS) release 3294 -->
-		<description>Tintin on the Moon (Euro)</description>
+		<description>Tintin on the Moon (Europe)</description>
 		<year>1989</year>
 		<publisher>Infogrames</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4649,7 +4945,7 @@ license:CC0
 
 	<software name="toobin" supported="no">
 		<!-- SPS (CAPS) release 3176 -->
-		<description>Toobin' (Euro)</description>
+		<description>Toobin' (Europe)</description>
 		<year>1989</year>
 		<publisher>Domark</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4663,7 +4959,7 @@ license:CC0
 
 	<software name="bhcats" supported="no">
 		<!-- SPS (CAPS) release 3177 -->
-		<description>Top Cat Starring in Beverly Hills Cats (Euro)</description>
+		<description>Top Cat Starring in Beverly Hills Cats (Europe)</description>
 		<year>1991</year>
 		<publisher>HiTec Software</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4677,9 +4973,12 @@ license:CC0
 
 	<software name="towbabel" supported="no">
 		<!-- SPS (CAPS) release 3178 -->
-		<description>Tower of Babel (Euro)</description>
+		<description>Tower of Babel (Europe)</description>
 		<year>1990</year>
 		<publisher>Rainbird</publisher>
+		<notes><![CDATA[
+"Load time: 50 seconds", never completes [FDC]
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -4690,7 +4989,7 @@ license:CC0
 	</software>
 
 	<software name="traksuit" supported="no">
-		<description>Track Suit Manager (Euro)</description>
+		<description>Track Suit Manager (Europe)</description>
 		<year>1989</year>
 		<publisher>Again Again</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4703,9 +5002,12 @@ license:CC0
 
 	<software name="trailblz" supported="no">
 		<!-- SPS (CAPS) release 3103 -->
-		<description>Trailblazer (Euro)</description>
+		<description>Trailblazer (Europe)</description>
 		<year>1987</year>
 		<publisher>Gremlin</publisher>
+		<notes><![CDATA[
+editor.prg hangs when creating a folder, [FDC] write
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -4717,9 +5019,13 @@ license:CC0
 
 	<software name="trasheap" supported="no">
 		<!-- SPS (CAPS) release 3347 -->
-		<description>Trash Heap (Euro)</description>
+		<description>Trash Heap (Europe)</description>
 		<year>1987</year>
 		<publisher>Robtek</publisher>
+		<notes><![CDATA[
+First two copy protection codes are always W/16 - A/5 (verify)
+]]></notes>
+		<info name="usage" value="Sports code wheel copy protection" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -4739,9 +5045,12 @@ license:CC0
 
 	<software name="trauma" supported="no">
 		<!-- SPS (CAPS) release 3348 -->
-		<description>Trauma (Euro)</description>
+		<description>Trauma (Europe)</description>
 		<year>1989</year>
 		<publisher>Infogrames</publisher>
+		<notes><![CDATA[
+Fails [disk swap] after title screen
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -4761,7 +5070,7 @@ license:CC0
 
 	<software name="treblech" supported="no">
 		<!-- SPS (CAPS) release 3280 -->
-		<description>Treble Champions (Euro, v1.0)</description>
+		<description>Treble Champions (Europe, v1.0)</description>
 		<year>1990</year>
 		<publisher>Challenge Software</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4775,9 +5084,10 @@ license:CC0
 
 	<software name="trinity" supported="no">
 		<!-- SPS (CAPS) release 3212 -->
-		<description>Trinity (Euro, r11)</description>
+		<description>Trinity (Europe, r11)</description>
 		<year>1986</year>
 		<publisher>Infocom</publisher>
+		<info name="usage" value="Requires Medium or High res screen setup in TOS (disk defaults to Low)" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -4789,7 +5099,7 @@ license:CC0
 
 	<software name="trivianb" supported="no">
 		<!-- SPS (CAPS) release 3179 -->
-		<description>Trivial Pursuit - A New Beginning (Euro)</description>
+		<description>Trivial Pursuit - A New Beginning (Europe)</description>
 		<year>1988</year>
 		<publisher>Domark</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4803,7 +5113,7 @@ license:CC0
 
 	<software name="turbogt" supported="no">
 		<!-- SPS (CAPS) release 3261 -->
-		<description>Turbo GT (Euro)</description>
+		<description>Turbo GT (Europe)</description>
 		<year>1989</year>
 		<publisher>Infogrames</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4817,9 +5127,12 @@ license:CC0
 
 	<software name="toutrun" supported="no">
 		<!-- SPS (CAPS) release 3221 -->
-		<description>Turbo Out Run (Euro, Budget)</description>
+		<description>Turbo Out Run (Europe, Budget)</description>
 		<year>1989</year>
 		<publisher>KIXX</publisher>
+		<notes><![CDATA[
+Prompts user on inserting disk 2, but there's only one disk in the set.
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -4831,7 +5144,7 @@ license:CC0
 
 	<software name="turricn2" supported="no">
 		<!-- SPS (CAPS) release 3349 -->
-		<description>Turrican II (Euro, Budget)</description>
+		<description>Turrican II (Europe, Budget)</description>
 		<year>1991</year>
 		<publisher>KIXX</publisher>
 		<info name="alt_title" value="Turrican II - The Final Fight (Box)" />
@@ -4846,9 +5159,12 @@ license:CC0
 
 	<software name="tvfootbl" supported="no">
 		<!-- SPS (CAPS) release 3189 -->
-		<description>TV Sports Football (Euro)</description>
+		<description>TV Sports Football (Europe)</description>
 		<year>1989</year>
 		<publisher>Mirrorsoft</publisher>
+		<notes><![CDATA[
+White screen, [68k] stalls on bootstrap with invalid opcode PC=13eba
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -4860,7 +5176,7 @@ license:CC0
 
 	<software name="twylyte" supported="no">
 		<!-- SPS (CAPS) release 3246 -->
-		<description>Twylyte (Euro)</description>
+		<description>Twylyte (Europe)</description>
 		<year>1989</year>
 		<publisher>Wicked</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4874,9 +5190,10 @@ license:CC0
 
 	<software name="ums" supported="no">
 		<!-- SPS (CAPS) release 3102 -->
-		<description>UMS - The Universal Military Simulator (Euro)</description>
+		<description>UMS - The Universal Military Simulator (Europe)</description>
 		<year>1988</year>
 		<publisher>Rainbird</publisher>
+		<info name="usage" value="Sports manual copy protection" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -4888,29 +5205,32 @@ license:CC0
 
 	<software name="univers3" supported="no">
 		<!-- SPS (CAPS) release 3350 -->
-		<description>Universe 3 (Euro, v1.0)</description>
+		<description>Universe 3 (Europe, v1.0)</description>
 		<year>1990</year>
 		<publisher>Impressions</publisher>
+		<notes><![CDATA[
+Fails [disk swap] when launching univers3.prg
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Data Disk" />
+			<feature name="part_id" value="Game Disk" />
 			<dataarea name="flop" size="918252">
-				<rom name="universe 3 (europe) (v1.0) (data disk).ipf" size="918252" crc="9191ed09" sha1="d5480fd0c2b32249d6d82d4a1b967e8498c125db" offset="0" />
+				<rom name="universe 3 (europe) (v1.0) (game disk).ipf" size="918252" crc="b58abf6c" sha1="c21ac500f72528e457a1c0dbb594db2c79ef98d9" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Game Disk" />
+			<feature name="part_id" value="Data Disk" />
 			<dataarea name="flop" size="918252">
-				<rom name="universe 3 (europe) (v1.0) (game disk).ipf" size="918252" crc="b58abf6c" sha1="c21ac500f72528e457a1c0dbb594db2c79ef98d9" offset="0" />
+				<rom name="universe 3 (europe) (v1.0) (data disk).ipf" size="918252" crc="9191ed09" sha1="d5480fd0c2b32249d6d82d4a1b967e8498c125db" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="untouch" supported="no">
 		<!-- SPS (CAPS) release 3345 -->
-		<description>The Untouchables (Euro)</description>
+		<description>The Untouchables (Europe)</description>
 		<year>1990</year>
 		<publisher>Ocean</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4939,9 +5259,12 @@ license:CC0
 
 	<software name="vectball" supported="no">
 		<!-- SPS (CAPS) release 3224 -->
-		<description>Vectorball (Euro)</description>
+		<description>Vectorball (Europe)</description>
 		<year>1988</year>
 		<publisher>MAD</publisher>
+		<notes><![CDATA[
+2 or 3 [bombs] bus error by pressing fire on title screen
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -4953,9 +5276,10 @@ license:CC0
 
 	<software name="vindictr" supported="no">
 		<!-- SPS (CAPS) release 3351 -->
-		<description>Vindicators (Euro)</description>
+		<description>Vindicators (Europe)</description>
 		<year>1989</year>
 		<publisher>Domark</publisher>
+		<info name="usage" value="Requires joystick in port 0"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -4975,7 +5299,7 @@ license:CC0
 
 	<software name="virus" supported="no">
 		<!-- SPS (CAPS) release 3223 -->
-		<description>Virus (Euro)</description>
+		<description>Virus (Europe)</description>
 		<year>1988</year>
 		<publisher>Firebird</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4989,9 +5313,12 @@ license:CC0
 
 	<software name="wander3d" supported="no">
 		<!-- SPS (CAPS) release 3303 -->
-		<description>Wanderer 3D (Euro, Budget)</description>
+		<description>Wanderer 3D (Europe, Budget)</description>
 		<year>1988</year>
 		<publisher>Encore</publisher>
+		<notes><![CDATA[
+Unsupported optional 3d glasses
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -5003,7 +5330,7 @@ license:CC0
 
 	<software name="wanted" supported="no">
 		<!-- SPS (CAPS) release 3180 -->
-		<description>Wanted (Euro)</description>
+		<description>Wanted (Europe)</description>
 		<year>1988</year>
 		<publisher>Infogrames</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -5025,9 +5352,12 @@ license:CC0
 
 	<software name="warmidle" supported="no">
 		<!-- SPS (CAPS) release 3385 -->
-		<description>War in Middle Earth (Euro)</description>
+		<description>War in Middle Earth (Europe)</description>
 		<year>1989</year>
 		<publisher>Melbourne House</publisher>
+		<notes><![CDATA[
+Fails to recognize [disk swap] after title screen
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -5054,7 +5384,7 @@ license:CC0
 
 	<software name="warhawk" supported="no">
 		<!-- SPS (CAPS) release 3249 -->
-		<description>Warhawk (Euro)</description>
+		<description>Warhawk (Europe)</description>
 		<year>1988</year>
 		<publisher>Silverbird</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -5068,7 +5398,7 @@ license:CC0
 
 	<software name="warlock" supported="no">
 		<!-- SPS (CAPS) release 3181 -->
-		<description>Warlock's Quest (Euro, Budget)</description>
+		<description>Warlock's Quest (Europe, Budget)</description>
 		<year>1988</year>
 		<publisher>Pocket Soft</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -5082,9 +5412,10 @@ license:CC0
 
 	<software name="warlocke" supported="no">
 		<!-- SPS (CAPS) release 3247 -->
-		<description>Warlock (Euro, The Edge)</description>
+		<description>Warlock (Europe, The Edge)</description>
 		<year>19??</year>
 		<publisher>The Edge</publisher>
+		<info name="usage" value="Keyboard only, where pause is space key and S to resume" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -5096,9 +5427,12 @@ license:CC0
 
 	<software name="wtsstill" supported="no">
 		<!-- SPS (CAPS) release 3250 -->
-		<description>Where Time Stood Still (Euro)</description>
+		<description>Where Time Stood Still (Europe)</description>
 		<year>1988</year>
 		<publisher>Ocean</publisher>
+		<notes><![CDATA[
+Randomly hangs after few seconds in gameplay or doesn't recognize fire button on title screen, likely [GPIO4] irq
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -5110,9 +5444,10 @@ license:CC0
 
 	<software name="whirligg" supported="no">
 		<!-- SPS (CAPS) release 3110 -->
-		<description>Whirligig (Euro)</description>
+		<description>Whirligig (Europe)</description>
 		<year>1988</year>
 		<publisher>Firebird</publisher>
+		<info name="usage" value="Sports manual copy protection" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -5124,9 +5459,12 @@ license:CC0
 
 	<software name="wildstrt" supported="no">
 		<!-- SPS (CAPS) release 3182 -->
-		<description>Wild Streets (Euro, Budget)</description>
+		<description>Wild Streets (Europe, Budget)</description>
 		<year>1990</year>
 		<publisher>Fox Hits</publisher>
+		<notes><![CDATA[
+"Incompatible image format or corrupted data" on mount
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -5138,9 +5476,12 @@ license:CC0
 
 	<software name="wcbox" supported="no">
 		<!-- SPS (CAPS) release 3184 -->
-		<description>World Championship Boxing Manager (Euro)</description>
+		<description>World Championship Boxing Manager (Europe)</description>
 		<year>1990</year>
 		<publisher>Krisalis</publisher>
+		<notes><![CDATA[
+Prompts user to insert the "other" disk, fails [disk swap]
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -5160,9 +5501,12 @@ license:CC0
 
 	<software name="wclead" supported="no">
 		<!-- SPS (CAPS) release 3185 -->
-		<description>World Class Leader Board (Euro, Budget)</description>
+		<description>World Class Leader Board (Europe, Budget)</description>
 		<year>1990</year>
 		<publisher>Klassix</publisher>
+		<notes><![CDATA[
+Randomly hangs on main menu, [joystick] or [keyboard] becomes unresponsive, likely [GPIO4] irq
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -5174,7 +5518,7 @@ license:CC0
 
 	<software name="wrangler" supported="no">
 		<!-- SPS (CAPS) release 3248 -->
-		<description>Wrangler (Euro)</description>
+		<description>Wrangler (Europe)</description>
 		<year>1988</year>
 		<publisher>Alternative Software</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -5188,9 +5532,12 @@ license:CC0
 
 	<software name="xout" supported="no">
 		<!-- SPS (CAPS) release 3111 -->
-		<description>X-Out (Euro)</description>
+		<description>X-Out (Europe)</description>
 		<year>1990</year>
 		<publisher>Rainbow Arts</publisher>
+		<notes><![CDATA[
+Static sound during intro and gameplay
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -5210,7 +5557,7 @@ license:CC0
 
 	<software name="xenon" supported="no">
 		<!-- SPS (CAPS) release 3251 -->
-		<description>Xenon (Euro, Budget)</description>
+		<description>Xenon (Europe, Budget)</description>
 		<year>1988</year>
 		<publisher>16 Blitz</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -5224,9 +5571,10 @@ license:CC0
 
 	<!-- S/N: CA400607-012 Rev. B -->
 	<software name="stelang">
-		<description>STE Language Disk (Swe, Rev. B)</description>
+		<description>STE Language Disk (Sweden, rev. B)</description>
 		<year>1989</year>
 		<publisher>Atari</publisher>
+		<info name="usage" value="Requires a STE machine"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">

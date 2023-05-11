@@ -46,7 +46,7 @@ class mbc2_device : public mbc_device_base
 public:
 	mbc2_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	virtual image_init_result load(std::string &message) override ATTR_COLD;
+	virtual std::error_condition load(std::string &message) override ATTR_COLD;
 	virtual void unload() override ATTR_COLD;
 
 protected:
@@ -79,12 +79,12 @@ mbc2_device::mbc2_device(
 }
 
 
-image_init_result mbc2_device::load(std::string &message)
+std::error_condition mbc2_device::load(std::string &message)
 {
 	// first check ROM
 	set_bank_bits_rom(4);
 	if (!check_rom(message))
-		return image_init_result::FAIL;
+		return image_error::BADSOFTWARE;
 
 	// decide whether to enable battery backup
 	memory_region *const nvramregion(cart_nvram_region());
@@ -93,7 +93,7 @@ image_init_result mbc2_device::load(std::string &message)
 		if (nvramregion->bytes() != RAM_SIZE)
 		{
 			message = "Unsupported cartridge NVRAM size (only MBC2 internal 512 nybble RAM is supported)";
-			return image_init_result::FAIL;
+			return std::error_condition();
 		}
 		m_battery_present = true;
 		logerror("Found 'nvram' region, battery backup enabled\n");
@@ -133,16 +133,16 @@ image_init_result mbc2_device::load(std::string &message)
 	install_rom();
 	cart_space()->install_read_handler(
 			0xa000, 0xa1ff, 0x0000, 0x1e00, 0x0000,
-			read8m_delegate(*this, FUNC(mbc2_device::ram_mbc_read)));
+			emu::rw_delegate(*this, FUNC(mbc2_device::ram_mbc_read)));
 	cart_space()->install_write_handler(
 			0xa000, 0xa1ff, 0x0000, 0x1e00, 0x0000,
-			write8sm_delegate(*this, FUNC(mbc2_device::ram_mbc_write)));
+			emu::rw_delegate(*this, FUNC(mbc2_device::ram_mbc_write)));
 	cart_space()->install_write_handler(
 			0x0000, 0x00ff, 0x0000, 0x3e00, 0x0000,
-			write8smo_delegate(*this, FUNC(mbc2_device::ram_mbc_enable)));
+			emu::rw_delegate(*this, FUNC(mbc2_device::ram_mbc_enable)));
 	cart_space()->install_write_handler(
 			0x0100, 0x01ff, 0x0000, 0x3e00, 0x0000,
-			write8smo_delegate(*this, FUNC(mbc2_device::bank_rom_switch)));
+			emu::rw_delegate(*this, FUNC(mbc2_device::bank_rom_switch)));
 
 	// load battery backup if appropriate
 	if (nvramregion)
@@ -153,7 +153,7 @@ image_init_result mbc2_device::load(std::string &message)
 		m_ram_mbc[i] &= 0x0f;
 
 	// all good
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

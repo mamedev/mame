@@ -3,15 +3,16 @@
 /*
  Meijinsen (snk/alpha)
  ---------------------
-
  driver by Tomasz Slanina
 
-It's something between typical alpha 68k hardware
-(alpha mcu, sound hw (same as in jongbou)) and
-old alpha shougi hardware (framebuffer).
+It's something between typical alpha 68k hardware (alpha mcu, sound hw (same as in jongbou))
+and old alpha shougi hardware (framebuffer).
 
-There's probably no upright cabinet, only
-cocktail table (controls in 2p mode are inverted).
+There's probably no upright cabinet, only cocktail table (controls in 2p mode are inverted).
+
+TODO:
+- protection simulation isn't right, there is a problem on the selection screen,
+  it's usually not possible to choose tsume shogi (3 difficulty levels)
 
 Buttons:
  1st = 'decision'
@@ -60,13 +61,17 @@ ALPHA DENSHI CO.,LTD  JUNE / 24 / 1986  FOR
 SOFT  PSG & VOICE  BY M.C & S.H
 
 */
+
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/ay8910.h"
+#include "sound/dac.h"
 #include "video/resnet.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -109,11 +114,11 @@ private:
 	required_ioport m_dsw;
 
 	// misc
-	uint8_t m_deposits1;
-	uint8_t m_deposits2;
-	uint8_t m_credits;
-	uint8_t m_coinvalue;
-	uint8_t m_mcu_latch;
+	uint8_t m_deposits1 = 0;
+	uint8_t m_deposits2 = 0;
+	uint8_t m_credits = 0;
+	uint8_t m_coinvalue = 0;
+	uint8_t m_mcu_latch = 0;
 };
 
 
@@ -135,7 +140,6 @@ uint16_t meijinsn_state::alpha_mcu_r(offs_t offset)
 			return 0;
 
 		case 0x29: // Query microcontroller for coin insert
-
 			m_credits = 0;
 
 			if ((m_coins->read() & 0x3) == 3)
@@ -211,6 +215,7 @@ void meijinsn_state::sound_io_map(address_map &map)
 	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x01, 0x01).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x02, 0x02).w("soundlatch", FUNC(generic_latch_8_device::clear_w));
+	map(0x04, 0x04).w("dac", FUNC(dac_6bit_r2r_device::write));
 	map(0x06, 0x06).nopw();
 }
 
@@ -269,10 +274,10 @@ void meijinsn_state::palette(palette_device &palette) const
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 
 	double weights_r[3], weights_g[3], weights_b[2];
-	compute_resistor_weights(0, 255,    -1.0,
-			3,  resistances_rg, weights_r,  0,  1000+1000,
-			3,  resistances_rg, weights_g,  0,  1000+1000,
-			2,  resistances_b,  weights_b,  0,  1000+1000);
+	compute_resistor_weights(0, 255, -1.0,
+			3, resistances_rg, weights_r, 0, 1000+1000,
+			3, resistances_rg, weights_g, 0, 1000+1000,
+			2, resistances_b,  weights_b, 0, 1000+1000);
 
 	for (int i = 0; i < palette.entries(); i++)
 	{
@@ -352,15 +357,16 @@ void meijinsn_state::machine_reset()
 void meijinsn_state::meijinsn(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 9000000);
+	M68000(config, m_maincpu, 16_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &meijinsn_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(meijinsn_state::interrupt), "screen", 0, 1);
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 4000000));
+	z80_device &audiocpu(Z80(config, "audiocpu", 16_MHz_XTAL / 4));
 	audiocpu.set_addrmap(AS_PROGRAM, &meijinsn_state::sound_map);
 	audiocpu.set_addrmap(AS_IO, &meijinsn_state::sound_io_map);
-	audiocpu.set_periodic_int(FUNC(meijinsn_state::irq0_line_hold), attotime::from_hz(160*60));
+	audiocpu.set_periodic_int(FUNC(meijinsn_state::irq0_line_hold), attotime::from_hz(16_MHz_XTAL / 0x800));
 
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -376,36 +382,37 @@ void meijinsn_state::meijinsn(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, "soundlatch");
-
-	ay8910_device &aysnd(AY8910(config, "aysnd", 2000000));
+	ay8910_device &aysnd(AY8910(config, "aysnd", 16_MHz_XTAL / 8));
 	aysnd.port_a_read_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
-	aysnd.add_route(ALL_OUTPUTS, "mono", 0.75);
+	aysnd.port_b_write_callback().set_nop(); // ?
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.25);
+
+	DAC_6BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
 ROM_START( meijinsn )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "p1", 0x00000, 0x04000, CRC(8c9697a3) SHA1(19258e20a6aaadd6ba3469079fef85bc6dba548c) )
-	ROM_CONTINUE   (       0x20000,  0x4000 )
-	ROM_LOAD16_BYTE( "p2", 0x00001, 0x04000, CRC(f7da3535) SHA1(fdbacd075d45abda782966b16b3ea1ad68d60f91) )
-	ROM_CONTINUE   (       0x20001,  0x4000 )
-	ROM_LOAD16_BYTE( "p3", 0x08000, 0x04000, CRC(0af0b266) SHA1(d68ed31bc932bc5e9c554b2c0df06a751dc8eb96) )
-	ROM_CONTINUE   (       0x28000,  0x4000 )
-	ROM_LOAD16_BYTE( "p4", 0x08001, 0x04000, CRC(aab159c5) SHA1(0c9cad8f9893f4080b498433068e9324c7f2e13c) )
-	ROM_CONTINUE   (       0x28001,  0x4000 )
-	ROM_LOAD16_BYTE( "p5", 0x10000, 0x04000, CRC(0ed10a47) SHA1(9e89ec69f1f4e1ffa712f2e0c590d067c8c63026) )
-	ROM_CONTINUE   (       0x30000,  0x4000 )
-	ROM_LOAD16_BYTE( "p6", 0x10001, 0x04000, CRC(60b58755) SHA1(1786fc1b4c6d1793fb8e9311356fa4119611cfae) )
-	ROM_CONTINUE   (       0x30001,  0x4000 )
-	ROM_LOAD16_BYTE( "p7", 0x18000, 0x04000, CRC(604c76f1) SHA1(37fdf904f5e4d69dc8cb711cf3dece8f3075254a) )
-	ROM_CONTINUE   (       0x38000,  0x4000 )
-	ROM_LOAD16_BYTE( "p8", 0x18001, 0x04000, CRC(e3eaef19) SHA1(b290922f252a790443109e5023c3c35b133275cc) )
-	ROM_CONTINUE   (       0x38001,  0x4000 )
+	ROM_LOAD16_BYTE( "p1", 0x00000, 0x4000, CRC(8c9697a3) SHA1(19258e20a6aaadd6ba3469079fef85bc6dba548c) )
+	ROM_CONTINUE(          0x20000, 0x4000 )
+	ROM_LOAD16_BYTE( "p2", 0x00001, 0x4000, CRC(f7da3535) SHA1(fdbacd075d45abda782966b16b3ea1ad68d60f91) )
+	ROM_CONTINUE(          0x20001, 0x4000 )
+	ROM_LOAD16_BYTE( "p3", 0x08000, 0x4000, CRC(0af0b266) SHA1(d68ed31bc932bc5e9c554b2c0df06a751dc8eb96) )
+	ROM_CONTINUE(          0x28000, 0x4000 )
+	ROM_LOAD16_BYTE( "p4", 0x08001, 0x4000, CRC(aab159c5) SHA1(0c9cad8f9893f4080b498433068e9324c7f2e13c) )
+	ROM_CONTINUE(          0x28001, 0x4000 )
+	ROM_LOAD16_BYTE( "p5", 0x10000, 0x4000, CRC(0ed10a47) SHA1(9e89ec69f1f4e1ffa712f2e0c590d067c8c63026) )
+	ROM_CONTINUE(          0x30000, 0x4000 )
+	ROM_LOAD16_BYTE( "p6", 0x10001, 0x4000, CRC(60b58755) SHA1(1786fc1b4c6d1793fb8e9311356fa4119611cfae) )
+	ROM_CONTINUE(          0x30001, 0x4000 )
+	ROM_LOAD16_BYTE( "p7", 0x18000, 0x4000, CRC(604c76f1) SHA1(37fdf904f5e4d69dc8cb711cf3dece8f3075254a) )
+	ROM_CONTINUE(          0x38000, 0x4000 )
+	ROM_LOAD16_BYTE( "p8", 0x18001, 0x4000, CRC(e3eaef19) SHA1(b290922f252a790443109e5023c3c35b133275cc) )
+	ROM_CONTINUE(          0x38001, 0x4000 )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) // Sound CPU
-	ROM_LOAD( "p9", 0x00000, 0x04000, CRC(aedfefdf) SHA1(f9d35737a0e942fe7d483f87c52efa92a1bbb3e5) )
-	ROM_LOAD( "p10",0x04000, 0x04000, CRC(93b4d764) SHA1(4fedd3fd1f3ef6c5f60ca86219f877df68d3027d) )
+	ROM_LOAD( "p9",  0x00000, 0x04000, CRC(aedfefdf) SHA1(f9d35737a0e942fe7d483f87c52efa92a1bbb3e5) )
+	ROM_LOAD( "p10", 0x04000, 0x04000, CRC(93b4d764) SHA1(4fedd3fd1f3ef6c5f60ca86219f877df68d3027d) )
 
 	ROM_REGION( 0x20, "proms", 0 ) // Colour PROM
 	ROM_LOAD( "clr", 0x00, 0x20, CRC(7b95b5a7) SHA1(c15be28bcd6f5ffdde659f2d352ae409f04b2557) )
@@ -413,26 +420,26 @@ ROM_END
 
 ROM_START( meijinsna ) // ROMs with location were in the archive, the others not, but they pass the ROM check so probably good and the dumper only included ROMs that differed from the set in MAME
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "p1.e12", 0x00000, 0x04000, CRC(fddea817) SHA1(497c5a197c53d0fea2eb2ef62a93f56cd930bd5a) )
-	ROM_CONTINUE   (           0x20000,  0x4000 )
-	ROM_LOAD16_BYTE( "p2.e10", 0x00001, 0x04000, CRC(f05659cc) SHA1(0f8d0da387329886903163333dbf0f36beb4198c) )
-	ROM_CONTINUE   (           0x20001,  0x4000 )
-	ROM_LOAD16_BYTE( "p3.d12", 0x08000, 0x04000, CRC(906e9d49) SHA1(f52757317d441d0cf35cd3726ea8d4fe0d079c9b) )
-	ROM_CONTINUE   (           0x28000,  0x4000 )
-	ROM_LOAD16_BYTE( "p4.d10", 0x08001, 0x04000, CRC(efa31978) SHA1(dadf226b993ecbac3112b7b0ce5047f0d686866e) )
-	ROM_CONTINUE   (           0x28001,  0x4000 )
-	ROM_LOAD16_BYTE( "p5",     0x10000, 0x04000, BAD_DUMP CRC(0ed10a47) SHA1(9e89ec69f1f4e1ffa712f2e0c590d067c8c63026) )
-	ROM_CONTINUE   (           0x30000,  0x4000 )
-	ROM_LOAD16_BYTE( "p6",     0x10001, 0x04000, BAD_DUMP CRC(60b58755) SHA1(1786fc1b4c6d1793fb8e9311356fa4119611cfae) )
-	ROM_CONTINUE   (           0x30001,  0x4000 )
-	ROM_LOAD16_BYTE( "p7",     0x18000, 0x04000, BAD_DUMP CRC(604c76f1) SHA1(37fdf904f5e4d69dc8cb711cf3dece8f3075254a) )
-	ROM_CONTINUE   (           0x38000,  0x4000 )
-	ROM_LOAD16_BYTE( "p8",     0x18001, 0x04000, BAD_DUMP CRC(e3eaef19) SHA1(b290922f252a790443109e5023c3c35b133275cc) )
-	ROM_CONTINUE   (           0x38001,  0x4000 )
+	ROM_LOAD16_BYTE( "p1.e12", 0x00000, 0x4000, CRC(fddea817) SHA1(497c5a197c53d0fea2eb2ef62a93f56cd930bd5a) )
+	ROM_CONTINUE(              0x20000, 0x4000 )
+	ROM_LOAD16_BYTE( "p2.e10", 0x00001, 0x4000, CRC(f05659cc) SHA1(0f8d0da387329886903163333dbf0f36beb4198c) )
+	ROM_CONTINUE(              0x20001, 0x4000 )
+	ROM_LOAD16_BYTE( "p3.d12", 0x08000, 0x4000, CRC(906e9d49) SHA1(f52757317d441d0cf35cd3726ea8d4fe0d079c9b) )
+	ROM_CONTINUE(              0x28000, 0x4000 )
+	ROM_LOAD16_BYTE( "p4.d10", 0x08001, 0x4000, CRC(efa31978) SHA1(dadf226b993ecbac3112b7b0ce5047f0d686866e) )
+	ROM_CONTINUE(              0x28001, 0x4000 )
+	ROM_LOAD16_BYTE( "p5",     0x10000, 0x4000, BAD_DUMP CRC(0ed10a47) SHA1(9e89ec69f1f4e1ffa712f2e0c590d067c8c63026) )
+	ROM_CONTINUE(              0x30000, 0x4000 )
+	ROM_LOAD16_BYTE( "p6",     0x10001, 0x4000, BAD_DUMP CRC(60b58755) SHA1(1786fc1b4c6d1793fb8e9311356fa4119611cfae) )
+	ROM_CONTINUE(              0x30001, 0x4000 )
+	ROM_LOAD16_BYTE( "p7",     0x18000, 0x4000, BAD_DUMP CRC(604c76f1) SHA1(37fdf904f5e4d69dc8cb711cf3dece8f3075254a) )
+	ROM_CONTINUE(              0x38000, 0x4000 )
+	ROM_LOAD16_BYTE( "p8",     0x18001, 0x4000, BAD_DUMP CRC(e3eaef19) SHA1(b290922f252a790443109e5023c3c35b133275cc) )
+	ROM_CONTINUE(              0x38001, 0x4000 )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) // Sound CPU
-	ROM_LOAD( "p9",    0x00000, 0x04000, BAD_DUMP CRC(aedfefdf) SHA1(f9d35737a0e942fe7d483f87c52efa92a1bbb3e5) )
-	ROM_LOAD( "p10.m5",0x04000, 0x04000, BAD_DUMP CRC(c1c1950f) SHA1(0bd428e5f77300866e582938aff519ca4a8fd2ac) ) // dumper's note: p10 would not verify. For emulation it doesn't seem to cause problems but..
+	ROM_LOAD( "p9",  0x00000, 0x04000, BAD_DUMP CRC(aedfefdf) SHA1(f9d35737a0e942fe7d483f87c52efa92a1bbb3e5) )
+	ROM_LOAD( "p10", 0x04000, 0x04000, BAD_DUMP CRC(93b4d764) SHA1(4fedd3fd1f3ef6c5f60ca86219f877df68d3027d) )
 
 	ROM_REGION( 0x20, "proms", 0 ) // Colour PROM
 	ROM_LOAD( "clr", 0x00, 0x20, BAD_DUMP CRC(7b95b5a7) SHA1(c15be28bcd6f5ffdde659f2d352ae409f04b2557) )
@@ -441,5 +448,5 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1986, meijinsn,  0,        meijinsn, meijinsn, meijinsn_state, empty_init, ROT0, "SNK", "Meijinsen (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, meijinsna, meijinsn, meijinsn, meijinsn, meijinsn_state, empty_init, ROT0, "SNK", "Meijinsen (set 2)", MACHINE_SUPPORTS_SAVE ) // this lets the player select an additional game mode (tsume shogi) in single player mode
+GAME( 1986, meijinsn,  0,        meijinsn, meijinsn, meijinsn_state, empty_init, ROT0, "SNK", "Meijinsen (set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, meijinsna, meijinsn, meijinsn, meijinsn, meijinsn_state, empty_init, ROT0, "SNK", "Meijinsen (set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )

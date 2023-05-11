@@ -26,6 +26,9 @@ Exidy discrete hardware games
 #include "netlist/devices/net_lib.h"
 #include "video/fixfreq.h"
 
+
+namespace {
+
 // copied by Pong, not accurate for this driver!
 // start
 #define MASTER_CLOCK    7159000
@@ -272,6 +275,10 @@ ROM_START( deathrac )
 ROM_END
 
 #define rom_rhunting rom_deathrac
+
+} // anonymous namespace
+
+
 GAME( 1977, attckexd,  0,        attack,   0, exidyttl_state, empty_init, ROT0, "Exidy", "Attack (set 1) [TTL]",    MACHINE_IS_SKELETON )
 GAME( 1977, attckexd2, attckexd, attack,   0, exidyttl_state, empty_init, ROT0, "Exidy", "Attack (set 2) [TTL]",    MACHINE_IS_SKELETON )
 GAME( 1976, deathrac,  0,        deathrac, 0, exidyttl_state, empty_init, ROT0, "Exidy", "Death Race [TTL]",        MACHINE_IS_SKELETON )

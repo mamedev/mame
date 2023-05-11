@@ -100,11 +100,11 @@
 
 #define POKEY_DEFAULT_GAIN (32767/11/4)
 
-#define VERBOSE_SOUND   (1 << 1U)
-#define VERBOSE_TIMER   (1 << 2U)
-#define VERBOSE_POLY    (1 << 3U)
-#define VERBOSE_RAND    (1 << 4U)
-#define VERBOSE_IRQ     (1 << 5U)
+#define VERBOSE_SOUND   (1U << 1)
+#define VERBOSE_TIMER   (1U << 2)
+#define VERBOSE_POLY    (1U << 3)
+#define VERBOSE_RAND    (1U << 4)
+#define VERBOSE_IRQ     (1U << 5)
 #define VERBOSE         (0)
 
 #include "logmacro.h"
@@ -257,11 +257,10 @@ void pokey_device::device_start()
 	m_KBCODE = 0x09; // Atari 800 'no key'
 	m_SKCTL = 0;
 
-	// TODO, remove this line:
-	m_SKCTL = SK_RESET;
-	// It's left in place to accomodate demos that don't explicitly reset pokey.
+	// TODO: several a7800 demos don't explicitly reset pokey at startup
 	// See https://atariage.com/forums/topic/337317-a7800-52-release/ and
 	// https://atariage.com/forums/topic/268458-a7800-the-atari-7800-emulator/?do=findComment&comment=5079170)
+	// m_SKCTL = SK_RESET;
 
 	m_SKSTAT = 0;
 	/* This bit should probably get set later. Acid5200 pokey_setoc test tests this. */
@@ -357,6 +356,10 @@ void pokey_device::device_start()
 void pokey_device::device_reset()
 {
 	m_stream->update();
+	// a1200xl reads POT4 twice at startup for reading self-test mode jumpers.
+	// we need to update POT counters here otherwise it will boot to self-test
+	// the first time around no matter the setting.
+	pokey_potgo();
 }
 
 
@@ -501,7 +504,7 @@ void pokey_device::step_keyboard()
 			}
 			break;
 		case 1: /* waiting for key confirmation */
-			if ((m_kbd_latch & 0x3f) == m_kbd_cnt)
+			if (!(m_SKCTL & SK_DEBOUNCE) || (m_kbd_latch & 0x3f) == m_kbd_cnt)
 			{
 				if (ret & 1)
 				{
@@ -523,16 +526,14 @@ void pokey_device::step_keyboard()
 			}
 			break;
 		case 2: /* waiting for release */
-			if ((m_kbd_latch & 0x3f) == m_kbd_cnt)
+			if (!(m_SKCTL & SK_DEBOUNCE) || (m_kbd_latch & 0x3f) == m_kbd_cnt)
 			{
 				if ((ret & 1)==0)
 					m_kbd_state++;
-				else
-					m_SKSTAT |= SK_KEYBD;
 			}
 			break;
 		case 3:
-			if ((m_kbd_latch & 0x3f) == m_kbd_cnt)
+			if (!(m_SKCTL & SK_DEBOUNCE) || (m_kbd_latch & 0x3f) == m_kbd_cnt)
 			{
 				if (ret & 1)
 					m_kbd_state = 2;
@@ -979,11 +980,17 @@ void pokey_device::write_internal(offs_t offset, uint8_t data)
 
 	case POTGO_C:
 		LOG("%s: POKEY POTGO  $%02x\n", machine().describe_context(), data);
-		pokey_potgo();
+		if (m_SKCTL & SK_RESET)
+			pokey_potgo();
 		break;
 
 	case SEROUT_C:
 		LOG("%s: POKEY SEROUT $%02x\n", machine().describe_context(), data);
+		// TODO: convert to real serial comms, fix timings
+		// SEROC (1) serial out in progress (0) serial out complete
+		// in progress status is necessary for a800 telelnk2 to boot
+		m_IRQST &= ~IRQ_SEROC;
+
 		m_serout_w_cb(offset, data);
 		m_SKSTAT |= SK_SEROUT;
 		/*
@@ -1045,6 +1052,12 @@ void pokey_device::write_internal(offs_t offset, uint8_t data)
 			m_clock_cnt[2] = 0;
 			/* FIXME: Serial port reset ! */
 		}
+		if (!(data & SK_KEYSCAN))
+		{
+			m_SKSTAT &= ~SK_KEYBD;
+			m_kbd_cnt = 0;
+			m_kbd_state = 0;
+		}
 		m_old_raw_inval = true;
 		break;
 	}
@@ -1099,9 +1112,6 @@ inline void pokey_device::process_channel(int ch)
 
 void pokey_device::pokey_potgo()
 {
-	if (!(m_SKCTL & SK_RESET))
-		return;
-
 	LOG("pokey_potgo\n");
 
 	m_ALLPOT = 0x00;

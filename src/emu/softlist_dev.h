@@ -43,7 +43,7 @@ enum software_compatibility
 class software_list_loader
 {
 public:
-	virtual bool load_software(device_image_interface &image, software_list_device &swlist, std::string_view swname, const rom_entry *start_entry) const = 0;
+	virtual std::error_condition load_software(device_image_interface &image, software_list_device &swlist, std::string_view swname, const rom_entry *start_entry) const = 0;
 };
 
 
@@ -52,7 +52,7 @@ public:
 class false_software_list_loader : public software_list_loader
 {
 public:
-	virtual bool load_software(device_image_interface &image, software_list_device &swlist, std::string_view swname, const rom_entry *start_entry) const override;
+	virtual std::error_condition load_software(device_image_interface &image, software_list_device &swlist, std::string_view swname, const rom_entry *start_entry) const override;
 	static const software_list_loader &instance() { return s_instance; }
 
 private:
@@ -65,7 +65,7 @@ private:
 class rom_software_list_loader : public software_list_loader
 {
 public:
-	virtual bool load_software(device_image_interface &image, software_list_device &swlist, std::string_view swname, const rom_entry *start_entry) const override;
+	virtual std::error_condition load_software(device_image_interface &image, software_list_device &swlist, std::string_view swname, const rom_entry *start_entry) const override;
 	static const software_list_loader &instance() { return s_instance; }
 
 private:
@@ -78,7 +78,7 @@ private:
 class image_software_list_loader : public software_list_loader
 {
 public:
-	virtual bool load_software(device_image_interface &image, software_list_device &swlist, std::string_view swname, const rom_entry *start_entry) const override;
+	virtual std::error_condition load_software(device_image_interface &image, software_list_device &swlist, std::string_view swname, const rom_entry *start_entry) const override;
 	static const software_list_loader &instance() { return s_instance; }
 
 private:
@@ -121,7 +121,7 @@ public:
 	const std::list<software_info> &get_info() { if (!m_parsed) parse(); return m_infolist; }
 
 	// operations
-	const software_info *find(const std::string &look_for);
+	const software_info *find(std::string_view look_for);
 	void find_approx_matches(std::string_view name, int matches, const software_info **list, const char *interface);
 	void release();
 	software_compatibility is_compatible(const software_part &part) const;

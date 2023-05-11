@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_PC1251_H
-#define MAME_INCLUDES_PC1251_H
+#ifndef MAME_SHARP_PC1251_H
+#define MAME_SHARP_PC1251_H
 
 #include "pocketc.h"
 
@@ -80,4 +80,4 @@ protected:
 	virtual void machine_start() override;
 };
 
-#endif // MAME_INCLUDES_PC1251_H
+#endif // MAME_SHARP_PC1251_H

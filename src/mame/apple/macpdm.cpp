@@ -3,21 +3,26 @@
 
 #include "emu.h"
 
-#include "bus/nubus/nubus.h"
+#include "cuda.h"
+#include "macadb.h"
+
 #include "bus/nscsi/devices.h"
+#include "bus/nubus/nubus.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/6522via.h"
 #include "machine/8530scc.h"
-#include "cuda.h"
-#include "macadb.h"
 #include "machine/mv_sonora.h"
-#include "machine/ncr5390.h"
+#include "machine/ncr53c90.h"
 #include "machine/ram.h"
 #include "machine/swim3.h"
 #include "machine/timer.h"
-#include "softlist_dev.h"
 #include "sound/awacs.h"
+
+#include "softlist_dev.h"
 #include "speaker.h"
+
+
+namespace {
 
 constexpr auto IO_CLOCK = 31.3344_MHz_XTAL;
 constexpr auto ENET_CLOCK = 20_MHz_XTAL;
@@ -108,13 +113,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(sndi_err_irq);
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-	DECLARE_WRITE_LINE_MEMBER(slot2_irq);
-	DECLARE_WRITE_LINE_MEMBER(slot1_irq);
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(slot2_irq);
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(slot1_irq);
 	DECLARE_WRITE_LINE_MEMBER(slot0_irq);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
-	DECLARE_WRITE_LINE_MEMBER(sound_irq);
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
 	DECLARE_WRITE_LINE_MEMBER(scsi_drq);
 
@@ -277,17 +282,18 @@ void macpdm_state::driver_init()
 
 	m_maincpu->space().install_read_tap(0x4000c2e0, 0x4000c2e7, 0, "cuda", [this](offs_t offset, u64 &data, u64 mem_mask) {
 											if(mem_mask == 0xffff000000000000) {
+												address_space *space;
 												offs_t badr = m_maincpu->state_int(PPC_R16);
-												m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, badr);
+												m_maincpu->translate(AS_PROGRAM, device_memory_interface::TR_READ, badr, space);
 												logerror("cuda packet %08x : type %02x cmd %02x - %02x %02x %02x %02x bytecnt %04x\n",
 														 badr,
-														 m_maincpu->space().read_byte(badr),
-														 m_maincpu->space().read_byte(badr+1),
-														 m_maincpu->space().read_byte(badr+2),
-														 m_maincpu->space().read_byte(badr+3),
-														 m_maincpu->space().read_byte(badr+4),
-														 m_maincpu->space().read_byte(badr+5),
-														 m_maincpu->space().read_word(badr+6));
+														 space->read_byte(badr),
+														 space->read_byte(badr+1),
+														 space->read_byte(badr+2),
+														 space->read_byte(badr+3),
+														 space->read_byte(badr+4),
+														 space->read_byte(badr+5),
+														 space->read_word(badr+6));
 											}
 										});
 }
@@ -1023,7 +1029,7 @@ void macpdm_state::pdm_map(address_map &map)
 	// 50f08000 = ethernet ID PROM
 	// 50f0a000 = MACE ethernet controller
 	map(0x50f10000, 0x50f10000).rw(FUNC(macpdm_state::scsi_r), FUNC(macpdm_state::scsi_w)).select(0xf0);
-	map(0x50f10100, 0x50f10101).rw(m_ncr53c94, FUNC(ncr53c94_device::dma16_r), FUNC(ncr53c94_device::dma16_w));
+	map(0x50f10100, 0x50f10101).rw(m_ncr53c94, FUNC(ncr53c94_device::dma16_swap_r), FUNC(ncr53c94_device::dma16_swap_w));
 	map(0x50f14000, 0x50f1401f).rw(m_awacs, FUNC(awacs_device::read), FUNC(awacs_device::write));
 	map(0x50f16000, 0x50f16000).rw(FUNC(macpdm_state::fdc_r), FUNC(macpdm_state::fdc_w)).select(0x1e00);
 
@@ -1154,6 +1160,8 @@ ROM_START( pmac6100 )
 	ROM_REGION64_BE(0x400000, "bootrom", 0)
 	ROM_LOAD( "9feb69b3.rom", 0x000000, 0x400000, CRC(a43fadbc) SHA1(6fac1c4e920a077c077b03902fef9199d5e8f2c3) )
 ROM_END
+
+} // anonymous namespace
 
 
 COMP( 1994, pmac6100,  0, 0, macpdm, macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 6100/60",  MACHINE_NOT_WORKING )

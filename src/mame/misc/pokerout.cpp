@@ -194,6 +194,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define MASTER_CLOCK        XTAL(10'738'000)
 #define VDP_CLOCK           MASTER_CLOCK
 #define CPU_CLOCK           MASTER_CLOCK / 3
@@ -387,6 +390,8 @@ ROM_START(pokerout)
 	ROM_LOAD("brk01_tms128a.6f", 0x0000, 0x4000, CRC(ccf2e9d7) SHA1(b48630d1e6c223aacf4f785b2a70c5c3ed781a51))
 	ROM_LOAD("f_tms128a.8f",     0x4000, 0x4000, CRC(57a7bff2) SHA1(a466c881fcd2a339960936e21da7e2079e7d75ca))
 ROM_END
+
+} // anonymous namespace
 
 
 /***************************************************************************

@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_AUDIO_ATARI_SAC_H
-#define MAME_AUDIO_ATARI_SAC_H
+#ifndef MAME_ATARI_ATARI_SAC_H
+#define MAME_ATARI_ATARI_SAC_H
 
 #pragma once
 
@@ -76,4 +76,4 @@ private:
 };
 
 
-#endif // MAME_AUDIO_ATARI_SAC_H
+#endif // MAME_ATARI_ATARI_SAC_H

@@ -453,7 +453,7 @@ void jaguar_state::blitter_run()
 	uint32_t a1flags = m_blitter_regs[A1_FLAGS] & STATIC_FLAGS_MASK;
 	uint32_t a2flags = m_blitter_regs[A2_FLAGS] & STATIC_FLAGS_MASK;
 
-	g_profiler.start(PROFILER_USER1);
+	auto profile = g_profiler.start(PROFILER_USER1);
 
 	if (a1flags == a2flags)
 	{
@@ -504,42 +504,45 @@ void jaguar_state::blitter_run()
 		return;
 	}
 
-if (LOG_BLITTER_STATS)
-{
-static uint32_t blitter_stats[1000][4];
-static uint64_t blitter_pixels[1000];
-static int blitter_count = 0;
-static int reps = 0;
-int i;
-for (i = 0; i < blitter_count; i++)
-	if (blitter_stats[i][0] == (m_blitter_regs[B_CMD] & STATIC_COMMAND_MASK) &&
-		blitter_stats[i][1] == (m_blitter_regs[A1_FLAGS] & STATIC_FLAGS_MASK) &&
-		blitter_stats[i][2] == (m_blitter_regs[A2_FLAGS] & STATIC_FLAGS_MASK))
-		break;
-if (i == blitter_count)
-{
-	blitter_stats[i][0] = m_blitter_regs[B_CMD] & STATIC_COMMAND_MASK;
-	blitter_stats[i][1] = m_blitter_regs[A1_FLAGS] & STATIC_FLAGS_MASK;
-	blitter_stats[i][2] = m_blitter_regs[A2_FLAGS] & STATIC_FLAGS_MASK;
-	blitter_stats[i][3] = 0;
-	blitter_pixels[i] = 0;
-	blitter_count++;
-}
-blitter_stats[i][3]++;
-blitter_pixels[i] += (m_blitter_regs[B_COUNT] & 0xffff) * (m_blitter_regs[B_COUNT] >> 16);
-if (++reps % 100 == 99)
-{
-	osd_printf_debug("---\nBlitter stats:\n");
-	for (i = 0; i < blitter_count; i++)
-		osd_printf_debug("  CMD=%08X A1=%08X A2=%08X %6d times, %016X pixels\n",
-				blitter_stats[i][0], blitter_stats[i][1], blitter_stats[i][2],
-				blitter_stats[i][3], blitter_pixels[i]);
-	osd_printf_debug("---\n");
-}
-}
+	if (LOG_BLITTER_STATS)
+	{
+		static uint32_t blitter_stats[1000][4];
+		static uint64_t blitter_pixels[1000];
+		static int blitter_count = 0;
+		static int reps = 0;
+		int i;
+		for (i = 0; i < blitter_count; i++)
+		{
+			if (blitter_stats[i][0] == (m_blitter_regs[B_CMD] & STATIC_COMMAND_MASK) &&
+				blitter_stats[i][1] == (m_blitter_regs[A1_FLAGS] & STATIC_FLAGS_MASK) &&
+				blitter_stats[i][2] == (m_blitter_regs[A2_FLAGS] & STATIC_FLAGS_MASK))
+				break;
+		}
+		if (i == blitter_count)
+		{
+			blitter_stats[i][0] = m_blitter_regs[B_CMD] & STATIC_COMMAND_MASK;
+			blitter_stats[i][1] = m_blitter_regs[A1_FLAGS] & STATIC_FLAGS_MASK;
+			blitter_stats[i][2] = m_blitter_regs[A2_FLAGS] & STATIC_FLAGS_MASK;
+			blitter_stats[i][3] = 0;
+			blitter_pixels[i] = 0;
+			blitter_count++;
+		}
+		blitter_stats[i][3]++;
+		blitter_pixels[i] += (m_blitter_regs[B_COUNT] & 0xffff) * (m_blitter_regs[B_COUNT] >> 16);
+		if (++reps % 100 == 99)
+		{
+			osd_printf_debug("---\nBlitter stats:\n");
+			for (i = 0; i < blitter_count; i++)
+			{
+				osd_printf_debug("  CMD=%08X A1=%08X A2=%08X %6d times, %016X pixels\n",
+						blitter_stats[i][0], blitter_stats[i][1], blitter_stats[i][2],
+						blitter_stats[i][3], blitter_pixels[i]);
+			}
+			osd_printf_debug("---\n");
+		}
+	}
 
 	generic_blitter(m_blitter_regs[B_CMD], m_blitter_regs[A1_FLAGS], m_blitter_regs[A2_FLAGS]);
-	g_profiler.stop();
 }
 
 uint32_t jaguar_state::blitter_r(offs_t offset, uint32_t mem_mask)

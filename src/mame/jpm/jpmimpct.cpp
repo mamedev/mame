@@ -248,6 +248,17 @@ void jpmimpct_state::machine_start()
 {
 	m_digits.resolve();
 	m_lamp_output.resolve();
+
+	save_item(NAME(m_optic_pattern));
+	save_item(NAME(m_payen));
+	save_item(NAME(m_hopinhibit));
+	save_item(NAME(m_slidesout));
+	save_item(NAME(m_hopper));
+	save_item(NAME(m_motor));
+	save_item(NAME(m_volume_latch));
+	save_item(NAME(m_global_volume));
+	save_item(NAME(m_coinstate));
+
 }
 
 void jpmimpct_state::machine_reset()

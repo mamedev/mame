@@ -1,3 +1,5 @@
+.. _naming:
+
 MAME Naming Conventions
 =======================
 
@@ -11,25 +13,6 @@ Introduction
 
 To promote consistency and readability in MAME source code, we have some
 naming conventions for various elements.
-
-
-.. _naming-definitions:
-
-Definitions
------------
-
-Snake case
-    All lowercase letters with words separated by underscores:
-    ``this_is_snake_case``
-Screaming snake case
-    All uppercase letters with words separated by underscores:
-    ``SCREAMING_SNAKE_CASE``
-Camel case:
-    Lowercase initial letter, first letter of each subsequent word
-    capitalised, with no separators between words: ``exampleCamelCase``
-Llama case:
-    Uppercase initial letter, first letter of each subsequent word
-    capitalised, with no separators between words: ``LlamaCaseSample``
 
 
 .. _naming-transliteration:
@@ -108,39 +91,5 @@ use lowercase for anything else besides proper nouns and initialisms.
 C++ naming conventions
 ----------------------
 
-Preprocessor macros
-    Macro names should use screaming snake case.  Macros are always
-    global and name conflicts can cause confusing errors – think
-    carefully about what macros really need to be in headers and name
-    them carefully.
-Include guards
-    Include guard macros should begin with ``MAME_``, and end with a
-    capitalised version of the file name, withe separators replaced by
-    underscores.
-Constants
-    Constants should use screaming snake case, whether they are constant
-    globals, constant data members, enumerators or preprocessor
-    constants.
-Functions
-    Free functions names should use snake case.  (There are some utility
-    function that were previously implemented as preprocessor macros
-    that still use screaming snake case.)
-Classes
-    Class names should use snake case.  Abstract class names should end
-    in ``_base``.  Public member functions (including static member
-    functions) should use snake case.
-Device classes
-    Concrete driver ``driver_device`` implementation names
-    conventionally end in ``_state``, while other concrete device class
-    names end in ``_device``.  Concrete ``device_interface`` names
-    conventionally begin with ``device_`` and end with ``_interface``.
-Device types
-    Device types should use screaming snake case.  Remember that device
-    types are names in the global namespace, so choose explicit,
-    unambiguous names.
-Enumerations
-    The enumeration name should use snake case.  The enumerators should
-    use screaming snake case.
-Template parameters
-    Template parameters should use llama case (both type and value
-    parameters).
+For C++ naming conventions, see the relevant section in the C++
+Coding Guidelines: :ref:`contributing-cxx-naming`

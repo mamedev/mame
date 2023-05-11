@@ -5,8 +5,8 @@
  * includes/bk.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_BK_H
-#define MAME_INCLUDES_BK_H
+#ifndef MAME_USSR_BK_H
+#define MAME_USSR_BK_H
 
 #pragma once
 
@@ -59,4 +59,4 @@ private:
 	void bk0010fd_mem(address_map &map);
 };
 
-#endif // MAME_INCLUDES_BK_H
+#endif // MAME_USSR_BK_H

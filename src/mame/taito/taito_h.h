@@ -5,8 +5,8 @@
     Taito H system
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_TAITO_H_H
-#define MAME_INCLUDES_TAITO_H_H
+#ifndef MAME_TAITO_TAITO_H_H
+#define MAME_TAITO_TAITO_H_H
 
 #pragma once
 
@@ -84,4 +84,4 @@ private:
 	void syvalion_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_TAITO_H_H
+#endif // MAME_TAITO_TAITO_H_H

@@ -5,8 +5,8 @@
  * includes/pmd85.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_PMD85_H
-#define MAME_INCLUDES_PMD85_H
+#ifndef MAME_TESLA_PMD85_H
+#define MAME_TESLA_PMD85_H
 
 #pragma once
 
@@ -149,4 +149,4 @@ private:
 };
 
 
-#endif // MAME_INCLUDES_PMD85_H
+#endif // MAME_TESLA_PMD85_H

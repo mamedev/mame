@@ -12,22 +12,23 @@
         bottom right: "LD50 Main PCB Rev.1"
 
         IC1:   Burr-Brown PCM1717E DAC
-        IC2:   unknown SOIC8 ("2429 170")
+        IC2:   Mitsubishi M62429FP volume control
         IC4:   Philips P87C52UBAA MCU
         IC5:   AMD AM29F040 ROM
         IC7/8/9/10: 4x 74HC374
-        IC11:  unknown COB (letter "B" handwritten on epoxy)
-        IC12:  Dream SAM9793
+        IC11:  Jess Technology HE80085 voice MCU (COB, letter "B" handwritten on epoxy)
+               "256KB ROM 128B RAM, 24I/O, EXT, D/A, OP, PWM, 2X16BIT TIMER, WDT" (PIC clone or similar?)
+               https://web.archive.org/web/20010824054714/http://www.jesstech.com/partslist.phtml?cat1=Microcontroller&cat2=8-Bits+MCU+Series&cat3=HE80+Series
+        IC12:  Dream SAM9793 MIDI synth
         XTAL1: 9.6MHz (for SAM9793)
-        XTAL2: 12MHz (for MCU)
+        XTAL2: 12MHz (for 87C52)
 
-    A 10-pin header at the upper left connects to the input matrix and
-    a small plastic LCD assembly on the other side of the board.
+    A 10-pin header at the upper left connects to the LCD.
 
     Most of the sound is provided by the SAM9793, which is just a MIDI
     synth on a chip that takes in serial MIDI input and outputs I2S.
     The four sound effect pads also trigger PCM samples separately,
-    possibly via the black blob at IC11.
+    via the black blob at IC11.
 
     The external ROM contains the demo and rhythms, which are all stored
     as standard type 0 MIDI files.
@@ -35,13 +36,15 @@
     To activate the test mode, hold "Rhythm" and "Assign" when powering on.
     From here, hitting the drum pads will display time/velocity measurements.
 
+    Service manual and schematics:
+    https://archive.org/details/casio-ld-50-sm
+
     TODO:
-    - drum LEDs
     - LCD artwork
     - clickable layout?
     - possibly connect a MIDI out port in lieu of the SAM9793
       (MCS51 core needs proper serial output first)
-    - dump/emulate the other PCM device somehow
+    - dump/emulate the HE80085 somehow
  */
 
 #include "emu.h"
@@ -62,9 +65,10 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_lcdc(*this, "lcdc")
 		, m_datarom(*this, "datarom")
-		, m_inputs(*this, "IN%u", 0)
+		, m_inputs(*this, "IN%u", 0U)
 		, m_pads(*this, "PADS")
 		, m_dial(*this, "DIAL")
+		, m_led(*this, "led%d", 0U)
 	{
 	}
 
@@ -93,9 +97,12 @@ private:
 	required_ioport m_pads;
 	required_ioport m_dial;
 
+	output_finder<4> m_led;
+
 	u8 m_port[4];
 	u32 m_rom_addr;
-	u16 m_shift_data;
+	u16 m_sound_data;
+	u16 m_volume_data;
 };
 
 HD44780_PIXEL_UPDATE(ld50_state::lcd_update)
@@ -141,14 +148,14 @@ u8 ld50_state::port1_r()
 void ld50_state::port2_w(u8 data)
 {
 	/*
-	bit 0: ?
-	bit 1: ?
-	bit 2: ?
+	bit 0: reset output
+	bit 1: unused
+	bit 2: auto power off
 	bit 3: ROM output enable
 	bit 4: ROM address low byte latch
 	bit 5: ROM address mid byte latch
 	bit 6: ROM address hi byte & input latch
-	bit 7: LCD control latch
+	bit 7: LED and LCD control latch
 	*/
 
 	const u8 set = data & ~m_port[2];
@@ -175,6 +182,9 @@ void ld50_state::port2_w(u8 data)
 	}
 	if (BIT(set, 7))
 	{
+		for (unsigned i = 0; i < 4; i++)
+			m_led[i] = !BIT(m_port[0], i);
+
 		m_lcdc->rw_w(BIT(m_port[0], 6));
 		m_lcdc->rs_w(BIT(m_port[0], 7));
 	}
@@ -185,12 +195,12 @@ void ld50_state::port3_w(u8 data)
 	/*
 	bit 0: LCD enable
 	bit 1: MIDI Tx (TODO)
-	bit 2: ?
+	bit 2: unused
 	bit 3: trigger sound effect
-	bit 4: ?
+	bit 4: shift register clock (for volume)
 	bit 5: shift register data
-	bit 6: shift register clock
-	bit 7: ?
+	bit 6: shift register clock (for DAC and sound effects)
+	bit 7: DAC data latch
 
 	The LD-50 transmits MIDI both through the UART registers and manually via port 3.
 	Demo/rhythm playback uses the UART, while drum pads, effect values, etc. are
@@ -198,22 +208,34 @@ void ld50_state::port3_w(u8 data)
 	*/
 
 	const u8 set = data & ~m_port[3];
+	const u8 clr = ~data & m_port[3];
 	m_port[3] = data;
 
 	m_lcdc->e_w(BIT(data, 0));
 
 	if (BIT(set, 3))
 	{
-		logerror("play sound effect %u\n", m_shift_data & 0x1f);
+		logerror("play sound effect %u\n", m_sound_data & 0x1f);
+	}
+	if (BIT(set, 4))
+	{
+		// 11-bit data, least significant bit first
+		m_volume_data >>= 1;
+		m_volume_data |= (BIT(data, 5) << 15);
+	}
+	if (BIT(clr, 4) && BIT(data, 5))
+	{
+		logerror("volume cmd (data = 0x%03x)\n", m_volume_data >> 5);
 	}
 	if (BIT(set, 6))
 	{
-		m_shift_data <<= 1;
-		m_shift_data |= BIT(data, 5);
+		// 16-bit data, most significant bit first
+		m_sound_data <<= 1;
+		m_sound_data |= BIT(data, 5);
 	}
-	if (BIT(set, 7))
+	if (BIT(clr, 7))
 	{
-		logerror("unknown serial cmd (data = 0x%4x)\n", m_shift_data);
+		logerror("DAC cmd (data = 0x%04x)\n", m_sound_data);
 	}
 }
 
@@ -227,9 +249,12 @@ CUSTOM_INPUT_MEMBER(ld50_state::dial_r)
 
 void ld50_state::driver_start()
 {
+	m_led.resolve();
+
 	save_item(NAME(m_port));
 	save_item(NAME(m_rom_addr));
-	save_item(NAME(m_shift_data));
+	save_item(NAME(m_sound_data));
+	save_item(NAME(m_volume_data));
 }
 
 void ld50_state::driver_reset()
@@ -237,7 +262,8 @@ void ld50_state::driver_reset()
 	memset(m_port, 0xff, sizeof m_port);
 
 	m_rom_addr = 0;
-	m_shift_data = 0;
+	m_sound_data = 0;
+	m_volume_data = 0;
 }
 
 void ld50_state::ld50(machine_config &config)

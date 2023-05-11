@@ -452,7 +452,7 @@ uint16_t namcond1_state::mcu_pa_read()
 	return 0xff;
 }
 
-void namcond1_state::mcu_pa_write(uint16 data)
+void namcond1_state::mcu_pa_write(uint16_t data)
 {
 	m_p8 = data;
 }

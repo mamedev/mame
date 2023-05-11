@@ -1,10 +1,180 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 
 <softwarelist name="apricot_flop" description="ACT Apricot PC/Xi floppy disks">
+
+	<software name="ap001">
+		<description>AP001 (Utilities No. 1)</description>
+		<year>198?</year>
+		<publisher>Apricot File (TP Group)</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="330654">
+				<rom name="ap001.dsk" size="330654" crc="d8661e1a" sha1="20ce3827d2f91df565a7912c3d87a5eb53051121"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ap002">
+		<description>AP002 (Utilities No. 2)</description>
+		<year>198?</year>
+		<publisher>Apricot File (TP Group)</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="310294">
+				<rom name="ap002.dsk" size="310294" crc="5665c9d4" sha1="34c773d3c802e7fa6ba4d5814bc412460cfcbc98"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Tries to boot but hangs, probably not supposed to be bootable -->
+	<software name="ap003">
+		<description>AP003 (Apricot Disk No. 3)</description>
+		<year>198?</year>
+		<publisher>Apricot File (TP Group)</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="328608">
+				<rom name="ap003.dsk" size="328608" crc="d6d5fd68" sha1="0d2ce7df1f6933d51aceb75f3c023ceb4b578afa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ap004">
+		<description>AP004 (MS-BASIC Games No. 1)</description>
+		<year>198?</year>
+		<publisher>Apricot File (TP Group)</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="332187">
+				<rom name="ap004.dsk" size="332187" crc="8ab7cbc6" sha1="0e5e39c2b363320f74c673529b7d5d76bbca5278"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ap005">
+		<description>AP005 (GSX Users Disk)</description>
+		<year>198?</year>
+		<publisher>Apricot File (TP Group)</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="319966">
+				<rom name="ap005.dsk" size="319966" crc="942fdbef" sha1="2c46be9b1bc9778d167c2a8c3f245d83345309a4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Is this a later version of the normal AP005 disk (supports more models)? -->
+	<software name="ap005a">
+		<description>AP005 (GSX Users Disk, later?)</description>
+		<year>1987</year>
+		<publisher>Apricot File (TP Group)</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="618905">
+				<rom name="ap005a.imd" size="618905" crc="e548a2df" sha1="b7ff6a555859f0a77bd6447faf62171a6f5667e8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- BASIC games, apparently for MS-BASIC -->
+	<software name="ap006">
+		<description>AP006 (Games No. 2)</description>
+		<year>198?</year>
+		<publisher>Apricot File (TP Group)</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="332165">
+				<rom name="ap006.dsk" size="332165" crc="62ea4ece" sha1="9c28cd54e1555f00bc0cb65777ed0420bb339053"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ap007">
+		<description>AP007 (Utilities No. 4)</description>
+		<year>198?</year>
+		<publisher>Apricot File (TP Group)</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327601">
+				<rom name="ap007.dsk" size="327601" crc="c90d760c" sha1="6a6010450c59e2a697af8e0a08ecf7e405434093"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Great Britain Limited/Inheritance -->
+	<software name="ap008">
+		<description>AP008 (Games No. 3)</description>
+		<year>198?</year>
+		<publisher>Apricot File (TP Group)</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="222230">
+				<rom name="ap008.dsk" size="222230" crc="0e3437ff" sha1="bd189872a2c11206da806a05039322a6f646ba63"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ap009">
+		<description>AP009 (Utilities No. 5)</description>
+		<year>198?</year>
+		<publisher>Apricot File (TP Group)</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="319457">
+				<rom name="ap009.dsk" size="319457" crc="0c63eaf8" sha1="836688f8523b9c9e965de820cc3a46a583d1935f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ap010">
+		<description>AP010 (GW-BASIC Games No. 1)</description>
+		<year>198?</year>
+		<publisher>Apricot File (TP Group)</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="332695">
+				<rom name="ap010.dsk" size="332695" crc="0270bdd9" sha1="cf7b9a9f214e8ea4f1c0f8fb098e605c39bdb5b2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ap012">
+		<description>AP012 (Programmers Disk No. 2)</description>
+		<year>198?</year>
+		<publisher>Apricot File (TP Group)</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="314882">
+				<rom name="ap012.dsk" size="314882" crc="5cd76ccd" sha1="8d72b3d55f280488a377f3fccdb1efbf1c7e883c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Also contains Golf and Pacman -->
+	<software name="ap016">
+		<description>AP016 (Chess)</description>
+		<year>198?</year>
+		<publisher>Apricot File (TP Group)</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="297032">
+				<rom name="ap016.dsk" size="297032" crc="23589d29" sha1="1cced06072b8127f6c1a7df48688547ea227e355"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ap042">
+		<description>AP042 (Printer Utilities)</description>
+		<year>1987</year>
+		<publisher>Apricot File (TP Group)</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="686357">
+				<rom name="ap042.imd" size="686357" crc="d6c7c97c" sha1="b9e0d3918576f5aa6f1e054359d779f822a7e7bc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ap045">
+		<description>AP045 (Utilities No. 13)</description>
+		<year>1987</year>
+		<publisher>Apricot File (TP Group)</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="629636">
+				<rom name="ap045.imd" size="629636" crc="252af8b7" sha1="1edd0095d5736741b27ed0e300f12f4f6bf1d969"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<!-- MS-DOS 2.11 / Release 2.7 -->
 	<software name="burnin">
@@ -53,74 +223,6 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- 20 Feb 85 -->
-	<software name="dos211_27">
-		<description>MS-DOS 2.11 BIOS VR2.7</description>
-		<year>1985</year>
-		<publisher>ACT</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1 (Manager &amp; Tools)" />
-			<dataarea name="flop" size="322937">
-				<rom name="1pcxu04p.dsk" size="322937" crc="cfe455a9" sha1="4f8ccfbe1161404a47d309bd139d321fb0013a1a"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2 (Disk &amp; Editors)" />
-			<dataarea name="flop" size="321919">
-				<rom name="2pcxu04p.dsk" size="321919" crc="22a234ca" sha1="85a3a8d19f2d5357ac71ce8bbacf9512e93bed62"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 3 (SuperWriter)" />
-			<dataarea name="flop" size="277127">
-				<rom name="3pcxu04p.dsk" size="277127" crc="75f9f57d" sha1="40f083ab4a68d213635cc5c2ebb6cb8b202c6514"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 4 (Async &amp; MS-Basic)" />
-			<dataarea name="flop" size="279672">
-				<rom name="4pcxu04p.dsk" size="279672" crc="e1c34b89" sha1="84765d86784742ff1efc8f8fe4101d08703ea291"/>
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 5 (SuperCalc &amp; SuperPlanner)" />
-			<dataarea name="flop" size="223173">
-				<rom name="5pcxu04p.dsk" size="223173" crc="ffc21ff2" sha1="0e332002f5be5e38b83f36789baac03b24289121"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- 17 Oct 85 -->
-	<software name="dos211_31">
-		<description>MS-DOS 2.11 BIOS VR3.1</description>
-		<year>1985</year>
-		<publisher>ACT</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1 (Activity &amp; Tutor)" />
-			<dataarea name="flop" size="326512">
-				<rom name="1pcxeu03p.dsk" size="326512" crc="a54c009f" sha1="85c6426042c5ac37a60e05eddcf499e71d051db6"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2 (Activity &amp; Editors)" />
-			<dataarea name="flop" size="326513">
-				<rom name="2pcxeu03p.dsk" size="326513" crc="339a564a" sha1="e86466629af63f102568e80ddc924ba291e0ca5d"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 3 (Async &amp; Diary)" />
-			<dataarea name="flop" size="295460">
-				<rom name="3pcxeu03p.dsk" size="295460" crc="623b99e9" sha1="8c443772dcbbebb322abc5574605bdedac755266"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 4 (GW-Basic &amp; Sketch)" />
-			<dataarea name="flop" size="267468">
-				<rom name="4pcxeu03p.dsk" size="267468" crc="010b8617" sha1="b17692f58ed9060e5af25268e84d39695b3bbd1e"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<!-- MS-DOS 2.11 / BIOS VR2.4 -->
 	<software name="exptest">
 		<description>Expansion RAM Test 1.0 (TES904)</description>
@@ -129,6 +231,17 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="123910">
 				<rom name="tes904.dsk" size="123910" crc="05c47f4a" sha1="2c58ba1da4f375aac0e26126471ad5de10869f19"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="financem">
+		<description>Finance Manager</description>
+		<year>1985</year>
+		<publisher>InterActive Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="168697">
+				<rom name="finance_manager.imd" size="168697" crc="af506d67" sha1="9c17349b6521fdbffe652aef606781072ad2d4e6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -187,6 +300,29 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="213847">
 				<rom name="msd.dsk" size="213847" crc="fd321be4" sha1="0194728fe30f41564cee7337f9a9751423ab44bf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Not sure how official this is, but a good base for installing to a fresh HDD -->
+	<software name="msdos32">
+		<description>MS-DOS 3.2</description>
+		<year>198?</year>
+		<publisher>ACT</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="636279">
+				<rom name="msdos32.imd" size="636279" crc="389b5d98" sha1="d6f6d7c45eab7b92214178dbf941d52dec4eba22"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdospak">
+		<description>MS-DOS Pack</description>
+		<year>1985</year>
+		<publisher>ACT</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="279596">
+				<rom name="msdos_pack.imd" size="279596" crc="b7bc5d43" sha1="5c6e901fdaa6cb826e9dd3ee041495a39f8cdf53"/>
 			</dataarea>
 		</part>
 	</software>
@@ -473,6 +609,18 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Unsure if this is an offical disk -->
+	<software name="pd4">
+		<description>Public Domain Disk 4</description>
+		<year>1985</year>
+		<publisher>Ansible Information</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="632702">
+				<rom name="public_domain_4.imd" size="632702" crc="484df042" sha1="95662d936cc1e0d100d44cfc63f97307eee31b92"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- MS-DOS 2.11 / BIOS VR2.4 -->
 	<software name="quest">
 		<description>QUEST - The Adventure</description>
@@ -481,6 +629,117 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="324909">
 				<rom name="quest.dsk" size="324909" crc="df11c592" sha1="989dc29d1dead78452b5b0afb9591356484c643d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+
+	Apricot System Software
+
+	Missing (unknown if actually released as separate package):
+	- VR1.4 (MS-DOS 2.00)
+	- VR2.4 (MS-DOS 2.11)
+	- VR2.6 (MS-DOS 2.11)
+	- VR3.1.1 (MS-DOS 3.10)
+	- VR3.1.2 (MS-DOS 3.20)
+
+	Disk labels (guessed):
+	  1pcxu04p
+	  |||||||| unknown
+	  |||||||  unknown
+	  ||||||   unknown
+	  |||||    country (U = UK, A = American, I = International)
+	  ||||     system (PCX = Apricot PC/Xi, PCXCO = Apricot PC/Xi with colour option)
+	  |        disk number in set
+
+	-->
+
+	<!-- 20 Feb 85 -->
+	<software name="ssvr27">
+		<description>System Software VR2.7 (MS-DOS 2.11)</description>
+		<year>1985</year>
+		<publisher>ACT</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 (Manager &amp; Tools)" />
+			<dataarea name="flop" size="322937">
+				<rom name="1pcxu04p.dsk" size="322937" crc="cfe455a9" sha1="4f8ccfbe1161404a47d309bd139d321fb0013a1a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 (Disk &amp; Editors)" />
+			<dataarea name="flop" size="321919">
+				<rom name="2pcxu04p.dsk" size="321919" crc="22a234ca" sha1="85a3a8d19f2d5357ac71ce8bbacf9512e93bed62"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3 (SuperWriter)" />
+			<dataarea name="flop" size="277127">
+				<rom name="3pcxu04p.dsk" size="277127" crc="75f9f57d" sha1="40f083ab4a68d213635cc5c2ebb6cb8b202c6514"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4 (Async &amp; MS-Basic)" />
+			<dataarea name="flop" size="279672">
+				<rom name="4pcxu04p.dsk" size="279672" crc="e1c34b89" sha1="84765d86784742ff1efc8f8fe4101d08703ea291"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5 (SuperCalc &amp; SuperPlanner)" />
+			<dataarea name="flop" size="223173">
+				<rom name="5pcxu04p.dsk" size="223173" crc="ffc21ff2" sha1="0e332002f5be5e38b83f36789baac03b24289121"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Modified? Talks about files being on different disks -->
+	<!-- Hangs on boot -->
+	<!-- 15 May 85 -->
+	<software name="ssvr27a" supported="no">
+		<description>System Software VR2.7 (MS-DOS 2.11, American)</description>
+		<year>1985</year>
+		<publisher>ACT</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="703220">
+				<rom name="1pcxa03r.imd" size="703220" crc="74e44a19" sha1="8afc66f6401bf819a01d92d31a9dcfde489c19db"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="640367">
+				<rom name="2pcxa03r.imd" size="640367" crc="50626110" sha1="45fcbc26b3fdf6e7813ad9aa97a451ebae8e3c22"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- 17 Oct 85 -->
+	<software name="ssvr31">
+		<description>System Software VR3.1 (MS-DOS 2.11)</description>
+		<year>1985</year>
+		<publisher>ACT</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 (Activity &amp; Tutor)" />
+			<dataarea name="flop" size="326512">
+				<rom name="1pcxeu03p.dsk" size="326512" crc="a54c009f" sha1="85c6426042c5ac37a60e05eddcf499e71d051db6"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 (Activity &amp; Editors)" />
+			<dataarea name="flop" size="326513">
+				<rom name="2pcxeu03p.dsk" size="326513" crc="339a564a" sha1="e86466629af63f102568e80ddc924ba291e0ca5d"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3 (Async &amp; Diary)" />
+			<dataarea name="flop" size="295460">
+				<rom name="3pcxeu03p.dsk" size="295460" crc="623b99e9" sha1="8c443772dcbbebb322abc5574605bdedac755266"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4 (GW-Basic &amp; Sketch)" />
+			<dataarea name="flop" size="267468">
+				<rom name="4pcxeu03p.dsk" size="267468" crc="010b8617" sha1="b17692f58ed9060e5af25268e84d39695b3bbd1e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -578,6 +837,30 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="305108">
 				<rom name="wincheck.dsk" size="305108" crc="5ebd6524" sha1="198beba1cba8c8d55fc902e60ce27f04625bfd5c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ws2000">
+		<description>WordStar 2000 (Rel. 1.01 American)</description>
+		<year>1985</year>
+		<publisher>MicroPro International Corp.</publisher>
+		<part name="install" interface="floppy_3_5">
+			<feature name="part_id" value="Installation Disk" />
+			<dataarea name="flop" size="434933">
+				<rom name="wordstar_2000_disk1_install.imd" size="434933" crc="c51d689b" sha1="8dcd7201476c7b8ecc21bb84513fc0ea38ca8b52"/>
+			</dataarea>
+		</part>
+		<part name="program" interface="floppy_3_5">
+			<feature name="part_id" value="Program Disk" />
+			<dataarea name="flop" size="673059">
+				<rom name="wordstar_2000_disk2_program.imd" size="673059" crc="1000d221" sha1="37a858c87fc3744346293c7ff2bc0472b62f9201"/>
+			</dataarea>
+		</part>
+		<part name="tutor" interface="floppy_3_5">
+			<feature name="part_id" value="Tutor Disk" />
+			<dataarea name="flop" size="453840">
+				<rom name="wordstar_2000_disk3_tutor.imd" size="453840" crc="61456041" sha1="9cba8cef7a025370f26bd8f05c5931a83c678842"/>
 			</dataarea>
 		</part>
 	</software>

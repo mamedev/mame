@@ -4392,6 +4392,16 @@ ROM_START( sinvemag )
 	ROM_LOAD( "emag_si.f",    0x1c00, 0x0400, CRC(077f5ef2) SHA1(625de6839073ac4c904f949efc1b2e0afea5d676) )
 ROM_END
 
+ROM_START( sinvemag2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sie.a", 0x0000, 0x0400, CRC(86bb8cb6) SHA1(a75648e7f2446c756d86624b15d387d25ce47b66) )
+	ROM_LOAD( "sie.b", 0x0400, 0x0400, CRC(febe6d1a) SHA1(e1c3a24b4fa5862107ada1f9d7249466e8c3f06a) )
+	ROM_LOAD( "sie.c", 0x0800, 0x0400, CRC(ad6529f0) SHA1(69cbf7e052c4b1ea210c7c92af75a68a34ebf6bb) )
+	ROM_LOAD( "sie.d", 0x1400, 0x0400, CRC(68c4b9da) SHA1(8953dc0427b09b71bd763e65caa7deaca09a15da) )
+	ROM_LOAD( "sie.e", 0x1800, 0x0400, CRC(636a6b7d) SHA1(6061355176f9bf88d5b2caba9fc6828061669853) )
+	ROM_LOAD( "sie.f", 0x1c00, 0x0400, CRC(52062faa) SHA1(c3788ce39b6ddb05115733ebd0de2ece10ef7928) )
+ROM_END
+
 ROM_START( tst_invd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "test.h",       0x0000, 0x0800, CRC(f86a2eea) SHA1(4a72ff01f3e6d16bbe9bf7f123cd98895bfbed9a) )   /*  The Test ROM */
@@ -4518,6 +4528,16 @@ ROM_START( spceking )
 	ROM_LOAD( "spcekng2",     0x0800, 0x0800, CRC(96dcdd42) SHA1(e18d7ffca92e863ef40e235b2be973d8c5879fdb) )
 	ROM_LOAD( "spcekng3",     0x1000, 0x0800, CRC(95fc96ad) SHA1(38175edad0e538a1561cec8f7613f15ae274dd14) )
 	ROM_LOAD( "spcekng4",     0x1800, 0x0800, CRC(54170ada) SHA1(1e8b3774355ec0d448f04805a917f4c1fe64bceb) )
+ROM_END
+
+ROM_START( spcebttl ) // Three PCB stack (U-1109 + 29-22-2 + 29-22-1), almost exact duplicates of Taito PCBs.
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1", 0x0000, 0x0400, CRC(86bb8cb6) SHA1(a75648e7f2446c756d86624b15d387d25ce47b66) )
+	ROM_LOAD( "2", 0x0400, 0x0400, CRC(febe6d1a) SHA1(e1c3a24b4fa5862107ada1f9d7249466e8c3f06a) )
+	ROM_LOAD( "3", 0x0800, 0x0400, CRC(e11ef4ae) SHA1(26f21297cfff1e9922ea20283c5e8eb6a54e8359) )
+	ROM_LOAD( "4", 0x1400, 0x0400, CRC(1293b826) SHA1(165cd5d08a19eadbe954145b12807f10df9e691a) )
+	ROM_LOAD( "5", 0x1800, 0x0400, CRC(3c89b4d5) SHA1(cf0622a9dcdadc5769546fe807a0f168cc6e18dc) )
+	ROM_LOAD( "6", 0x1c00, 0x0400, CRC(e154f4e5) SHA1(eeda4cbae72e0753965cbb99dfbfa927c6a372d1) )
 ROM_END
 
 ROM_START( spcewars )
@@ -5924,6 +5944,7 @@ GAMEL(1978, invadernc,   invaders, invaders,  sicv,      sisv_state,     empty_i
 GAMEL(1978, spcewars,    invaders, spcewars,  spcewars,  _8080bw_state,  empty_init,    ROT270, "Taito / Sanritsu",                   "Space War (Sanritsu)",                                            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invaders ) // Unclassified, licensed or bootleg?
 GAME( 1979, spcewarla,   invaders, spcewarla, spcewars,  _8080bw_state,  empty_init,    ROT270, "bootleg (Leisure and Allied)",       "Space War (Leisure and Allied)",                                  MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // unclassified, licensed or bootleg?
 GAMEL(1978, spceking,    invaders, invaders,  sicv,      sisv_state,     empty_init,    ROT270, "Taito / Leijac Corporation",         "Space King",                                                      MACHINE_SUPPORTS_SAVE, layout_invaders ) // Unclassified, licensed or bootleg?
+GAME( 1978, spcebttl,    invaders, invaders,  sitv,      sisv_state,     empty_init,    ROT270, "bootleg",                            "Space Battle (Space Invaders bootleg)",                           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAMEL(1979, cosmicmo,    invaders, cosmicmo,  cosmicmo,  _8080bw_state,  empty_init,    ROT270, "bootleg (Universal)",                "Cosmic Monsters (version II)",                                    MACHINE_SUPPORTS_SAVE, layout_cosmicm ) // Taito sued, and as settlement they were allowed to sell Universal's Galaxy Wars
 GAMEL(1979, cosmicm2,    invaders, cosmicmo,  cosmicmo,  _8080bw_state,  empty_init,    ROT270, "bootleg (Universal)",                "Cosmic Monsters 2",                                               MACHINE_SUPPORTS_SAVE, layout_cosmicm ) // "
 GAMEL(1980?,sinvzen,     invaders, invaders,  sinvzen,   invaders_state, empty_init,    ROT270, "Taito / Zenitone-Microsec Ltd.",     "Super Invaders (Zenitone-Microsec)",                              MACHINE_SUPPORTS_SAVE, layout_invaders ) // Unclassified, licensed or bootleg?
@@ -5945,7 +5966,8 @@ GAMEL(1979, invasionrz,  invaders, invasion,  invasion,  invasion_state, empty_i
 GAMEL(1979, invasionrza, invaders, invasion,  invasion,  invasion_state, empty_init,    ROT270, "bootleg (R Z SRL Bologna)",          "Invasion (bootleg set 2, R Z SRL Bologna)",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, invadersem,  invaders, invaders,  sitv,      sisv_state,     empty_init,    ROT270, "Electromar",                         "Space Invaders (Electromar, Spanish)",                            MACHINE_SUPPORTS_SAVE, layout_invaders ) // Possibly licensed
 GAMEL(1978, superinv,    invaders, invaders,  superinv,  invaders_state, empty_init,    ROT270, "bootleg",                            "Super Invaders (bootleg set 1)",                                  MACHINE_SUPPORTS_SAVE, layout_invaders ) // Not related to Zenitone-Microsec version
-GAMEL(1978, sinvemag,    invaders, invaders,  sinvemag,  invaders_state, empty_init,    ROT270, "bootleg (Emag)",                     "Super Invaders (bootleg set 2)",                                  MACHINE_SUPPORTS_SAVE, layout_invaders ) // Not related to Zenitone-Microsec version
+GAMEL(1978, sinvemag,    invaders, invaders,  sinvemag,  invaders_state, empty_init,    ROT270, "bootleg (Emag)",                     "Super Invaders (Emag bootleg set 1)",                             MACHINE_SUPPORTS_SAVE, layout_invaders ) // Not related to Zenitone-Microsec version
+GAMEL(1978, sinvemag2,   invaders, invaders,  sinvemag,  invaders_state, empty_init,    ROT270, "bootleg (Emag)",                     "Super Invaders (Emag bootleg set 2)",                             MACHINE_SUPPORTS_SAVE, layout_invaders ) // Not related to Zenitone-Microsec version
 GAMEL(1980, searthin,    invaders, invaders,  searthin,  invaders_state, empty_init,    ROT270, "bootleg (Competitive Video)",        "Super Earth Invasion (set 1)",                                    MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1980, searthina,   invaders, invaders,  searthin,  invaders_state, empty_init,    ROT270, "bootleg (Competitive Video)",        "Super Earth Invasion (set 2)",                                    MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1979, supinvsion,  invaders, invaders,  searthin,  invaders_state, empty_init,    ROT270, "bootleg (Electromar / Irecsa)",      "Super Invasion (Electromar, Spanish)",                            MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS, layout_invaders )
@@ -6000,14 +6022,14 @@ GAME( 1980, polarisb,    polaris,  polaris,   polaris,   _8080bw_state,  empty_i
 GAME( 1980, polariso,    polaris,  polaris,   polaris,   _8080bw_state,  empty_init,    ROT270, "Taito",                              "Polaris (original version)",                                      MACHINE_SUPPORTS_SAVE )
 GAME( 1981, polarisbr,   polaris,  polaris,   polaris,   _8080bw_state,  empty_init,    ROT270, "Taito do Brasil",                    "Polaris (Brazil)",                                                MACHINE_SUPPORTS_SAVE )
 
-GAME( 1980, ballbomb,    0,        ballbomb,  ballbomb,  _8080bw_state,  empty_init,    ROT270, "Taito",                              "Balloon Bomber",                                                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )  // Missing clouds
+GAME( 1980, ballbomb,    0,        ballbomb,  ballbomb,  _8080bw_state,  empty_init,    ROT270, "Taito",                              "Balloon Bomber",                                                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // Missing clouds
 
 GAME( 1980, indianbt,    0,        indianbt,  indianbt,  _8080bw_state,  empty_init,    ROT270, "Taito",                              "Indian Battle",                                                   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1983, indianbtbr,  indianbt, indianbtbr,indianbtbr,_8080bw_state,  empty_init,    ROT270, "Taito do Brasil",                    "Indian Battle (Brazil)",                                          MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1980, steelwkr,    0,        steelwkr,  steelwkr,  _8080bw_state,  empty_init,    ROT0  , "Taito",                              "Steel Worker",                                                    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1980, steelwkr,    0,        steelwkr,  steelwkr,  _8080bw_state,  empty_init,    ROT0,   "Taito",                              "Steel Worker",                                                    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAMEL(1980?,galactic,    0,        invaders,  galactic,  invaders_state, empty_init,    ROT270, "Taito do Brasil",                    "Galactica - Batalha Espacial",                                    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_galactic )
+GAMEL(1980?,galactic,    0,        invaders,  galactic,  invaders_state, empty_init,    ROT270, "Taito do Brasil",                    "Galactica - Batalha Espacial",                                    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_galactic ) // Modified version of Taito Spacian, on Space Invaders hardware
 GAMEL(1980?,spacmiss,    galactic, invaders,  galactic,  invaders_state, empty_init,    ROT270, "bootleg?",                           "Space Missile - Space Fighting Game",                             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_galactic )
 
 // Misc. manufacturers

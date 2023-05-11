@@ -27,6 +27,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class wy100_state : public driver_device
 {
 public:
@@ -259,6 +262,8 @@ ROM_START(wy100)
 	ROM_REGION(0x0800, "chargen", 0)
 	ROM_LOAD("wy100_23-002-01c.bin", 0x0000, 0x0800, CRC(93c31537) SHA1(085e5ad110a76bee83e819a718a7d4cbfb8e07e7))
 ROM_END
+
+} // anonymous namespace
 
 
 COMP(1981, wy100, 0, 0, wy100, wy100, wy100_state, empty_init, "Wyse Technology", "WY-100", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)

@@ -122,6 +122,9 @@
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
+
 class ddealer_state : public driver_device
 {
 public:
@@ -677,5 +680,8 @@ ROM_START( ddealer )
 	ROM_LOAD( "5.ic67", 0x000, 0x100, CRC(1d3d7e17) SHA1(b5aa0d024f0c0b5f72a2d0a23d1576775a7b3826) ) // 82S135
 	ROM_LOAD( "6.ic86", 0x100, 0x100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) // 82S129
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1991, ddealer, 0, ddealer, ddealer, ddealer_state, init_ddealer, ROT0, "NMK", "Double Dealer", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )

@@ -88,6 +88,8 @@ sg1_b.e1       4096     0x92ef3c13      D2732D
 #include "kingdrby.lh"
 
 
+namespace {
+
 class kingdrby_state : public driver_device
 {
 public:
@@ -1235,6 +1237,8 @@ ROM_START( kingdrbb2 )
 	ROM_REGION( 0x200, "proms", 0 ) // mostly 00 (black) -> red (80) changes
 	ROM_LOAD( "clr", 0x000, 0x200, CRC(ffabacc9) SHA1(9769fb27fc5b6998e6600cb6050086385caa3f96) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAMEL( 1981, kingdrby,  0,        kingdrby, kingdrby, kingdrby_state, empty_init, ROT0, "Tazmi",                        "King Derby (1981)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_kingdrby )

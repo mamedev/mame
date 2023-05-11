@@ -25,13 +25,12 @@
     - I think theglob2 is earlier than theglob.  They only differ in one routine,
       but it appears to be a bug fix.  Also, theglob3 appears to be even older.
 
-    To Do:
+    TODO:
 
     - Super Glob uses a busy loop during the color test to split the screen
       between the two palettes.  This effect is not emulated, but since both
       halves of the palette are identical, this is not an issue.  See $039c.
       The other games have a different color test, not using the busy loop.
-
     - dealer/beastf/revngr84: "PSG registers not OK" in service mode thru
       sound menu, internal ay8910 not right?
 
@@ -110,7 +109,7 @@ protected:
 	required_device<palette_device> m_palette;
 
 	// video-related
-	uint8_t m_palette_bank = 0U;
+	uint8_t m_palette_bank = 0;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
@@ -125,14 +124,19 @@ public:
 
 	void tristar8000(machine_config &config);
 
+	DECLARE_CUSTOM_INPUT_MEMBER(coin_r) { return m_coin_latch; }
+	DECLARE_INPUT_CHANGED_MEMBER(coin_switch) { if (newval) m_coin_latch |= param; }
+
 protected:
-	virtual void machine_start() override { m_leds.resolve(); }
+	virtual void machine_start() override;
 
 private:
 	// I/O
 	output_finder<2> m_leds;
+	uint8_t m_coin_latch = 0;
 
-	void port_1_w(uint8_t data);
+	void output_w(uint8_t data);
+	void coin_reset_w(uint8_t data) { m_coin_latch = 0; }
 	void palette(palette_device &palette) const;
 
 	void io_map(address_map &map);
@@ -147,7 +151,7 @@ public:
 		m_mainbank(*this, "mainbank%u", 1U),
 		m_inputs(*this, { "INPUTS", "INPUTS2" }),
 		m_dsw(*this, "DSW")
-		{ }
+	{ }
 
 	void tristar9000(machine_config &config);
 
@@ -230,14 +234,14 @@ void tristar9000_state::pal_w(offs_t offset, uint8_t data)
 	set_pal_color(*m_palette, offset, data);
 }
 
-void tristar8000_state::port_1_w(uint8_t data)
+void tristar8000_state::output_w(uint8_t data)
 {
 	/* D0 - start light #1
 	   D1 - start light #2
 	   D2 - coin counter
 	   D3 - palette select
 	   D4-D7 - unused
-	 */
+	*/
 
 	m_leds[0] = BIT(data, 0);
 	m_leds[1] = BIT(data, 1);
@@ -322,9 +326,9 @@ void tristar8000_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("DSW").w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x01, 0x01).portr("SYSTEM").w(FUNC(tristar8000_state::port_1_w));
+	map(0x01, 0x01).portr("SYSTEM").w(FUNC(tristar8000_state::output_w));
 	map(0x02, 0x02).portr("INPUTS").w("aysnd", FUNC(ay8910_device::data_w));
-	map(0x03, 0x03).portr("UNK");
+	map(0x03, 0x03).w(FUNC(tristar8000_state::coin_reset_w));
 	map(0x06, 0x06).w("aysnd", FUNC(ay8910_device::address_w));
 }
 
@@ -416,14 +420,13 @@ static INPUT_PORTS_START( megadon )
 	PORT_DIPSETTING(    0x80, "Contest" )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(tristar8000_state, coin_r)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START2 )
 	PORT_SERVICE_NO_TOGGLE(0x10, IP_ACTIVE_LOW)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_CUSTOM )   // this has to be HI
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM )   // this has to be HI
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_CUSTOM ) // this has to be HI
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM ) // this has to be HI
 
 	PORT_START("INPUTS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
@@ -432,15 +435,19 @@ static INPUT_PORTS_START( megadon )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("UNK")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	// 2 inputs connected to 74ls74 CLK pins, only one is actually hooked up
+	PORT_START("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, tristar8000_state, coin_switch, 0x01)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_CHANGED_MEMBER(DEVICE_SELF, tristar8000_state, coin_switch, 0x02)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( suprglob )
+	PORT_INCLUDE( megadon )
+
 	// There are odd port mappings (old=new)
 	// 02=10, 04=40, 08=20, 10=02, 20=04, 40=08
-	PORT_START("DSW")
+	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
@@ -465,35 +472,24 @@ static INPUT_PORTS_START( suprglob )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_SERVICE_NO_TOGGLE(0x10, IP_ACTIVE_LOW)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM )   // this has to be LO
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM )   // this has to be HI
+	PORT_MODIFY("SYSTEM")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) // this has to be LO
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM ) // this has to be HI
 
-	PORT_START("INPUTS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_MODIFY("INPUTS")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("UNK")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( igmo )
+	PORT_INCLUDE( suprglob )
+
 	// There are odd port mappings (old=new)
 	// 02=10, 04=40, 08=20, 10=02, 20=04, 40=08
-	PORT_START("DSW")
+	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
@@ -517,32 +513,14 @@ static INPUT_PORTS_START( igmo )
 	PORT_DIPSETTING(    0x88, "7" )
 	PORT_DIPSETTING(    0x8c, "8" )
 
-	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_SERVICE_NO_TOGGLE(0x10, IP_ACTIVE_LOW)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_CUSTOM )   // this has to be HI
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM )   // this has to be HI
-
-	PORT_START("INPUTS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("UNK")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_MODIFY("SYSTEM")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_CUSTOM ) // this has to be HI
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM ) // this has to be HI
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( catapult )
-	PORT_INCLUDE( igmo )
+	PORT_INCLUDE( suprglob )
 
 	// There are odd port mappings (old=new)
 	// 02=08, 04=20, 08=40, 10=02, 20=10, 40=04
@@ -568,13 +546,19 @@ static INPUT_PORTS_START( catapult )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_MODIFY("SYSTEM")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_CUSTOM ) // this has to be HI
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM ) // this has to be HI
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( eeekk )
+	PORT_INCLUDE( suprglob )
+
 	// There are odd port mappings (old=new)
 	// 02=10, 04=40, 08=02, 10=20, 20=04, 40=08
-	PORT_START("DSW")
+	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
@@ -599,28 +583,9 @@ static INPUT_PORTS_START( eeekk )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_SERVICE_NO_TOGGLE(0x10, IP_ACTIVE_LOW)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM )   // this has to be LO
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   // this has to be LO
-
-	PORT_START("INPUTS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("UNK")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_MODIFY("SYSTEM")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) // this has to be LO
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) // this has to be LO
 INPUT_PORTS_END
 
 
@@ -708,6 +673,12 @@ void epos_base_state::video_start()
 	save_item(NAME(m_palette_bank));
 }
 
+void tristar8000_state::machine_start()
+{
+	m_leds.resolve();
+	save_item(NAME(m_coin_latch));
+}
+
 void tristar9000_state::machine_start()
 {
 	uint8_t *rom = memregion("maincpu")->base();
@@ -737,7 +708,7 @@ void tristar9000_state::machine_reset()
 void tristar8000_state::tristar8000(machine_config &config) // EPOS TRISTAR 8000 PCB
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, XTAL(11'000'000) / 4);    // 2.75 MHz schematics confirm 11MHz XTAL (see notes)
+	Z80(config, m_maincpu, XTAL(11'000'000) / 4); // 2.75 MHz schematics confirm 11MHz XTAL (see notes)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tristar8000_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &tristar8000_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(tristar8000_state::irq0_line_hold));
@@ -756,14 +727,14 @@ void tristar8000_state::tristar8000(machine_config &config) // EPOS TRISTAR 8000
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	AY8912(config, "aysnd", XTAL(11'000'000) / 16).add_route(ALL_OUTPUTS, "mono", 1.0); //  0.6875 MHz, confirmed from schematics
+	AY8912(config, "aysnd", XTAL(11'000'000) / 16).add_route(ALL_OUTPUTS, "mono", 1.0); // 0.6875 MHz, confirmed from schematics
 }
 
 
 void tristar9000_state::tristar9000(machine_config &config) // EPOS TRISTAR 9000 PCB
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, XTAL(22'118'400) / 8);    // 2.7648 MHz (measured)
+	Z80(config, m_maincpu, XTAL(22'118'400) / 8); // 2.7648 MHz (measured)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tristar9000_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &tristar9000_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(tristar9000_state::irq0_line_hold));
@@ -1074,14 +1045,14 @@ void tristar9000_state::init_tristar9000()
  *************************************/
 
 // EPOS TRISTAR 8000 PCB based
-GAME( 1982, megadon,  0,        tristar8000,   megadon,  tristar8000_state, empty_init, ROT270, "Epos Corporation (Photar Industries license)", "Megadon", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, catapult, 0,        tristar8000,   catapult, tristar8000_state, empty_init, ROT270, "Epos Corporation", "Catapult",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // bad ROM, hold f2 for test mode
-GAME( 1983, suprglob, 0,        tristar8000,   suprglob, tristar8000_state, empty_init, ROT270, "Epos Corporation", "Super Glob",         MACHINE_SUPPORTS_SAVE )
-GAME( 1983, theglob,  suprglob, tristar8000,   suprglob, tristar8000_state, empty_init, ROT270, "Epos Corporation", "The Glob",           MACHINE_SUPPORTS_SAVE )
-GAME( 1983, theglob2, suprglob, tristar8000,   suprglob, tristar8000_state, empty_init, ROT270, "Epos Corporation", "The Glob (earlier)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, theglob3, suprglob, tristar8000,   suprglob, tristar8000_state, empty_init, ROT270, "Epos Corporation", "The Glob (set 3)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1984, igmo,     0,        tristar8000,   igmo,     tristar8000_state, empty_init, ROT270, "Epos Corporation", "IGMO",               MACHINE_SUPPORTS_SAVE )
-GAME( 1983, eeekk,    0,        tristar8000,   eeekk,    tristar8000_state, empty_init, ROT270, "Epos Corporation", "Eeekk!",             MACHINE_SUPPORTS_SAVE )
+GAME( 1982, megadon,  0,        tristar8000, megadon,  tristar8000_state, empty_init,       ROT270, "Epos Corporation (Photar Industries license)", "Megadon", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, catapult, 0,        tristar8000, catapult, tristar8000_state, empty_init,       ROT270, "Epos Corporation", "Catapult",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // bad ROM, hold f2 for test mode
+GAME( 1983, suprglob, 0,        tristar8000, suprglob, tristar8000_state, empty_init,       ROT270, "Epos Corporation", "Super Glob",         MACHINE_SUPPORTS_SAVE )
+GAME( 1983, theglob,  suprglob, tristar8000, suprglob, tristar8000_state, empty_init,       ROT270, "Epos Corporation", "The Glob",           MACHINE_SUPPORTS_SAVE )
+GAME( 1983, theglob2, suprglob, tristar8000, suprglob, tristar8000_state, empty_init,       ROT270, "Epos Corporation", "The Glob (earlier)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, theglob3, suprglob, tristar8000, suprglob, tristar8000_state, empty_init,       ROT270, "Epos Corporation", "The Glob (set 3)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1984, igmo,     0,        tristar8000, igmo,     tristar8000_state, empty_init,       ROT270, "Epos Corporation", "IGMO",               MACHINE_SUPPORTS_SAVE )
+GAME( 1983, eeekk,    0,        tristar8000, eeekk,    tristar8000_state, empty_init,       ROT270, "Epos Corporation", "Eeekk!",             MACHINE_SUPPORTS_SAVE )
 
 // EPOS TRISTAR 9000 PCB based
 GAME( 1984, dealer,   0,        tristar9000, dealer,   tristar9000_state, init_tristar9000, ROT270, "Epos Corporation", "The Dealer",           MACHINE_SUPPORTS_SAVE )

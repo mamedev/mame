@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Robert Hildinger
-#ifndef MAME_VIDEO_STARFIELD_05XX_H
-#define MAME_VIDEO_STARFIELD_05XX_H
+#ifndef MAME_NAMCO_STARFIELD_05XX_H
+#define MAME_NAMCO_STARFIELD_05XX_H
 
 // used by galaga, bosconian, and their various clones
 class starfield_05xx_device : public device_t
@@ -37,4 +37,4 @@ private:
 
 DECLARE_DEVICE_TYPE(STARFIELD_05XX, starfield_05xx_device)
 
-#endif // MAME_VIDEO_STARFIELD_05XX_H
+#endif // MAME_NAMCO_STARFIELD_05XX_H

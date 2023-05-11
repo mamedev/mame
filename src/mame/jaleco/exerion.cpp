@@ -873,7 +873,6 @@ void exerion_state::exerion(machine_config &config)
 	z80_device &sub(Z80(config, "sub", CPU_CLOCK));
 	sub.set_addrmap(AS_PROGRAM, &exerion_state::sub_map);
 
-
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);

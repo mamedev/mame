@@ -5,8 +5,8 @@
     Turret Tower hardware
 
 ****************************************************************************/
-#ifndef MAME_INCLUDES_TURRETT_H
-#define MAME_INCLUDES_TURRETT_H
+#ifndef MAME_NAMCO_TURRETT_H
+#define MAME_NAMCO_TURRETT_H
 
 #pragma once
 
@@ -145,4 +145,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(TURRETT, turrett_device)
 
-#endif // MAME_INCLUDES_TURRETT_H
+#endif // MAME_NAMCO_TURRETT_H

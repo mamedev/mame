@@ -11,8 +11,14 @@
     Design is decidedly derived from Epson TF-20 and friends,
     cfr. devices/bus/epson_sio/tf20.cpp
 
+    PC-80S32 is the external version of what PC-8801mkII uses built-in,
+    capabilities are unknown at current time.
+
+    Eventually internalized in later PC-88 models,
+    Observed PCBs for internal boards are marked PWD-516 with a 8 digit revision number.
+    For simpicity's sake we just name these board over host classes instead.
+
     TODO:
-    - What's PC-80S32? Is it the 88VA version or a different beast?
     - PC=0x7dd reads from FDC bit 3 in ST3 (twosid_r fn),
       expecting a bit 3 high for all the PC8001 games otherwise keeps looping and eventually dies.
       Are those incorrectly identified as 2DD? Hacked to work for now;
@@ -32,6 +38,8 @@
       Bottom line: Is it trying to access some custom HW?
     - Hookup a bridge for internal BIOSes (later PC8801 models);
     - Save state support (resuming fails latch hookups here);
+    - pc88va2_fd_if_device: currently not hooked up to pc88va2, deasserts DRQ too fast, sub CPU
+      incorrectly tells to master that floppies aren't 2HD?
 
 ===================================================================================================
 
@@ -157,6 +165,9 @@ Used as a communication protocol flags
 //#define VERBOSE 1
 #include "logmacro.h"
 
+#include "formats/pc98fdi_dsk.h"
+#include "formats/xdf_dsk.h"
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -165,7 +176,7 @@ Used as a communication protocol flags
 // device type definition
 DEFINE_DEVICE_TYPE(PC80S31, pc80s31_device,   "pc80s31",  "NEC PC-80S31 Mini Disk Unit I/F")
 DEFINE_DEVICE_TYPE(PC80S31K, pc80s31k_device, "pc80s31k", "NEC PC-80S31K Mini Disk Unit I/F")
-
+DEFINE_DEVICE_TYPE(PC88VA2_FD_IF, pc88va2_fd_if_device, "pc88va2_fd_if", "NEC PC-88VA2 floppy disk interface \"PWD-516 72405162\"")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -193,7 +204,6 @@ pc80s31_device::pc80s31_device(const machine_config &mconfig, device_type type, 
 pc80s31_device::pc80s31_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pc80s31_device(mconfig, PC80S31, tag, owner, clock)
 {
-
 }
 
 ROM_START( pc80s31 )
@@ -247,12 +257,21 @@ void pc80s31_device::fdc_io(address_map &map)
 static void pc88_floppies(device_slot_interface &device)
 {
 	// TODO: definitely not correct for base device
+	// TODO: eventually needs inheriting for pc88va3 (2TD with 9.3 MB capacity)
 	device.option_add("525hd", FLOPPY_525_HD);
 }
 
 IRQ_CALLBACK_MEMBER(pc80s31_device::irq_cb)
 {
 	return m_irq_vector;
+}
+
+// need FDI and XDF for PC-88VA
+static void pc88_floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_XDF_FORMAT);
+	fr.add(FLOPPY_PC98FDI_FORMAT);
 }
 
 void pc80s31_device::device_add_mconfig(machine_config &config)
@@ -269,7 +288,7 @@ void pc80s31_device::device_add_mconfig(machine_config &config)
 
 	for (auto &floppy : m_floppy)
 	{
-		FLOPPY_CONNECTOR(config, floppy, pc88_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats);
+		FLOPPY_CONNECTOR(config, floppy, pc88_floppies, "525hd", pc88_floppy_formats);
 		floppy->enable_sound(true);
 	}
 
@@ -311,6 +330,7 @@ TIMER_CALLBACK_MEMBER(pc80s31_device::tc_zero_tick)
 	// ST2 & 0x73
 	// Data doesn't matter, it also seems to have some activity to the printer port
 	// (debugging left on?)
+	// Update: mostly fixed by separating upd765 irq types when the event above occurs.
 	if ((u8)m_fdc_cpu->state_int(Z80_HALT) == 1)
 	{
 		logerror("%s: attempt to trigger TC while in HALT state (read ID copy protection warning)\n", machine().describe_context());
@@ -416,10 +436,13 @@ void pc80s31_device::motor_control_w(uint8_t data)
 //
 //**************************************************************************
 
-pc80s31k_device::pc80s31k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pc80s31_device(mconfig, PC80S31K, tag, owner, clock)
-{
+pc80s31k_device::pc80s31k_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: pc80s31_device(mconfig, type, tag, owner, clock)
+{}
 
+pc80s31k_device::pc80s31k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pc80s31k_device(mconfig, PC80S31K, tag, owner, clock)
+{
 }
 
 ROM_START( pc80s31k )
@@ -431,9 +454,6 @@ ROM_START( pc80s31k )
 	ROMX_LOAD( "m2mr_disk.rom", 0x0000, 0x2000, CRC(2447516b) SHA1(1492116f15c426f9796dc2bb6fcccf2656c0ca75), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "mh",       "MH disk BIOS" )
 	ROMX_LOAD( "mh_disk.rom", 0x0000, 0x2000, CRC(a222ecf0) SHA1(79e9c0786a14142f7a83690bf41fb4f60c5c1004), ROM_BIOS(2) )
-	// TODO: this may belong to PC-80S32
-	ROM_SYSTEM_BIOS( 3, "88va",     "PC88VA disk BIOS")
-	ROMX_LOAD( "vasubsys.rom", 0x0000, 0x2000, CRC(08962850) SHA1(a9375aa480f85e1422a0e1385acb0ea170c5c2e0), ROM_BIOS(3) )
 ROM_END
 
 const tiny_rom_entry *pc80s31k_device::device_rom_region() const
@@ -458,4 +478,287 @@ void pc80s31k_device::fdc_io(address_map &map)
 
 	map(0xf0, 0xf0).lw8(NAME([this] (u8 data) { m_irq_vector = data; }));
 	map(0xf4, 0xf4).w(FUNC(pc80s31k_device::drive_mode_w));
+}
+
+//**************************************************************************
+//
+//  PC-88VA2 internal board overrides
+//
+// FD-55GFR-351 disk drives
+//
+//**************************************************************************
+
+pc88va2_fd_if_device::pc88va2_fd_if_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pc80s31k_device(mconfig, PC88VA2_FD_IF, tag, owner, clock)
+	, m_write_irq(*this)
+	, m_write_drq(*this)
+{
+}
+
+
+ROM_START( pc88va2_fd_if )
+	ROM_REGION( 0x2000, "fdc_rom", ROMREGION_ERASEFF )
+	ROM_LOAD( "vasubsys.rom", 0x0000, 0x2000, CRC(08962850) SHA1(a9375aa480f85e1422a0e1385acb0ea170c5c2e0) )
+ROM_END
+
+const tiny_rom_entry *pc88va2_fd_if_device::device_rom_region() const
+{
+	return ROM_NAME( pc88va2_fd_if );
+}
+
+void pc88va2_fd_if_device::device_add_mconfig(machine_config &config)
+{
+	pc80s31k_device::device_add_mconfig(config);
+	m_fdc->intrq_wr_callback().append([this](int state) { if(m_fdc_mode & 1) { m_write_irq(state); } });
+	m_fdc->drq_wr_callback().set([this](int state) { printf("%d %d\n", m_fdc_mode, state); if(m_fdc_mode & 1) { m_write_drq(state); } });
+
+//  m_fdc->set_ready_line_connected(false);
+}
+
+void pc88va2_fd_if_device::device_start()
+{
+	pc80s31k_device::device_start();
+
+	m_write_irq.resolve_safe();
+	m_write_drq.resolve_safe();
+
+	m_fdc_timer = timer_alloc(FUNC(pc88va2_fd_if_device::fdc_timer_cb), this);
+	m_fdc_timer->adjust(attotime::never);
+
+	m_motor_start_timer[0] = timer_alloc(FUNC(pc88va2_fd_if_device::motor_start_timer_cb<0>), this);
+	m_motor_start_timer[1] = timer_alloc(FUNC(pc88va2_fd_if_device::motor_start_timer_cb<1>), this);
+	m_motor_start_timer[0]->adjust(attotime::never);
+	m_motor_start_timer[1]->adjust(attotime::never);
+
+	floppy_image_device *floppy;
+	floppy = m_floppy[0]->get_device();
+	if(floppy)
+		floppy->setup_ready_cb(floppy_image_device::ready_cb(&pc88va2_fd_if_device::fdc_update_ready, this));
+
+	floppy = m_floppy[1]->get_device();
+	if(floppy)
+		floppy->setup_ready_cb(floppy_image_device::ready_cb(&pc88va2_fd_if_device::fdc_update_ready, this));
+}
+
+void pc88va2_fd_if_device::device_reset()
+{
+	pc80s31k_device::device_reset();
+
+	m_fdc_mode = 0;
+//  m_fdc_irq_opcode = 0x00; //0x7f ld a,a !
+	m_xtmask = false;
+	m_dmae = false;
+}
+
+void pc88va2_fd_if_device::host_io(address_map &map)
+{
+	map(0x00, 0x00).w(FUNC(pc88va2_fd_if_device::host_mode_w));
+	map(0x02, 0x02).w(FUNC(pc88va2_fd_if_device::host_drive_rate_w));
+	map(0x04, 0x04).w(FUNC(pc88va2_fd_if_device::host_motor_control_w));
+	map(0x06, 0x06).rw(FUNC(pc88va2_fd_if_device::host_ready_r), FUNC(pc88va2_fd_if_device::host_fdc_control_w));
+	map(0x08, 0x08).r(m_fdc, FUNC(upd765a_device::msr_r));
+	map(0x0a, 0x0a).rw(m_fdc, FUNC(upd765a_device::fifo_r), FUNC(upd765a_device::fifo_w));
+}
+
+template <unsigned DriveN> TIMER_CALLBACK_MEMBER(pc88va2_fd_if_device::motor_start_timer_cb)
+{
+	m_floppy[DriveN]->get_device()->mon_w(0);
+}
+
+TIMER_CALLBACK_MEMBER(pc88va2_fd_if_device::fdc_timer_cb)
+{
+	if(m_xtmask)
+	{
+		m_write_irq(1);
+//      m_write_irq(0);
+	}
+}
+
+void pc88va2_fd_if_device::fdc_update_ready(floppy_image_device *, int)
+{
+	if (!BIT(m_fdc_ctrl_2, 5))
+		return;
+	bool force_ready = bool(BIT(m_fdc_ctrl_2, 6));
+
+	floppy_image_device *floppy0, *floppy1;
+	floppy0 = m_floppy[0]->get_device();
+	floppy1 = m_floppy[1]->get_device();
+	if (!floppy0 && !floppy1)
+		force_ready = false;
+
+	//if(floppy && force_ready)
+	//  ready = floppy->ready_r();
+
+	//if(floppy && force_ready)
+	//  ready = floppy->ready_r();
+
+	LOG("Force ready signal %d\n", force_ready);
+
+	if (force_ready)
+	{
+		m_fdc->set_ready_line_connected(false);
+		m_fdc->ready_w(0);
+	}
+	else
+		m_fdc->ready_w(1);
+}
+
+void pc88va2_fd_if_device::host_mode_w(u8 data)
+{
+	m_fdc_mode = data & 1;
+	LOG("$1b0 FDC op mode (%02x) %s mode\n"
+		, data
+		, m_fdc_mode ? "DMA" : "Intelligent (PIO)"
+	);
+//  m_fdc_cpu->set_input_line(INPUT_LINE_HALT, (m_fdc_mode) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+/*
+ * --x- ---- CLK: FDC clock selection (0) 4.8MHz (1) 8 MHz
+ * ---x ---- DS1: Prohibition of the drive selection of FDC (0) Permission (1) Prohibition
+ * ---- xx-- TD1/TD0: Drive 1/0 track density (0) 48 TPI (1) 96 TPI
+ * ---- --xx RV1/RV0: Drive 1/0 mode selection (0) 2D and 2DD mode (1) 2HD mode
+ */
+void pc88va2_fd_if_device::host_drive_rate_w(u8 data)
+{
+	const bool clk = bool(BIT(data, 5));
+	const bool rv1 = bool(BIT(data, 1));
+	const bool rv0 = bool(BIT(data, 0));
+	LOG("$1b2 FDC control port 0 (%02x) %s CLK| %d DS1| %d%d TD1/TD0| %d%d RV1/RV0\n"
+		, data
+		, clk ? "  8 MHz" : "4.8 MHz"
+		, !bool(BIT(data, 4))
+		, bool(BIT(data, 3))
+		, bool(BIT(data, 2))
+		, rv1
+		, rv0
+	);
+	m_floppy[0]->get_device()->set_rpm(rv0 ? 360 : 300);
+	m_floppy[1]->get_device()->set_rpm(rv1 ? 360 : 300);
+
+	//m_fdd[0]->get_device()->ds_w(!BIT(data, 4));
+	//m_fdd[1]->get_device()->ds_w(!BIT(data, 4));
+
+	// TODO: is this correct? sounds more like a controller clock change, while TD1/TD0 should do the rate change
+	m_fdc->set_rate(clk ? 500000 : 250000);
+}
+
+/*
+ * ---- x--- PCM: precompensation control (1) on
+ * ---- --xx M1/M0: Drive 1/0 motor control (0) NOP (1) Change motor status
+ */
+void pc88va2_fd_if_device::host_motor_control_w(u8 data)
+{
+	const bool m0 = bool(BIT(data, 0));
+	const bool m1 = bool(BIT(data, 1));
+
+	LOG("$1b4 FDC control port 1 (%02x) %d PCM| %d%d M1/M0\n"
+		, data
+		, bool(BIT(data, 3))
+		, m1
+		, m0
+	);
+
+	// TODO: fine grain motor timings
+	// docs claims 600 msecs, must be more complex than that
+	if( m0 )
+		m_motor_start_timer[0]->adjust(attotime::from_msec(505));
+	else
+		m_floppy[0]->get_device()->mon_w(1);
+
+
+	if( m1 )
+		m_motor_start_timer[1]->adjust(attotime::from_msec(505));
+	else
+		m_floppy[1]->get_device()->mon_w(1);
+}
+
+/*
+ * FDC control port 2
+ * x--- ---- FDCRST: FDC Reset
+ * -xx- ---- FDCFRY FRYCEN: FDC force ready control
+ * -x0- ---- ignored
+ * -01- ---- force ready release
+ * -11- ---- force ready assert
+ * ---x ---- DMAE: DMA Enable (0) Prohibit DMA (1) Enable DMA
+ * ---- -x-- XTMASK: FDC timer IRQ mask (0) Disable (1) Enable
+ * ---- ---x TTRG: FDC timer trigger (0) FDC timer clearing (1) FDC timer start
+ */
+void pc88va2_fd_if_device::host_fdc_control_w(u8 data)
+{
+	const bool fdcrst = bool(BIT(data, 7));
+	const bool ttrg = bool(BIT(data, 0));
+	const bool cur_xtmask = bool(BIT(data, 2));
+	const bool cur_dmae = bool(BIT(data, 4));
+	LOG("$1b6 FDC control port 2 (%02x) %d FDCRST| %d%d FDCFRY| %d DMAE| %d XTMASK| %d TTRG\n"
+		, data
+		, fdcrst
+		, bool(BIT(data, 6))
+		, bool(BIT(data, 5))
+		, cur_dmae
+		, cur_xtmask
+		, ttrg
+	);
+
+	if( ttrg )
+		m_fdc_timer->adjust(attotime::from_msec(100));
+
+//  if (cur_dmae && !m_dmae)
+	{
+//      m_fdc->set_ready_line_connected(0);
+//      m_fdc->ready_w(0);
+	}
+
+	m_dmae = cur_dmae;
+
+	// TODO: confirm condition
+	// shanghai and famista (at very least) sends a motor off if left idle for a while,
+	// then any attempt to load/save will fail because there's no explicit motor on
+	// written back to $1b4.
+	// Note that this still isn't enough to avoid floppy errors, but makes failures
+	// to be eventually recoverable for now.
+	if (!m_xtmask && cur_xtmask && ttrg)
+	{
+		floppy_image_device *floppy0, *floppy1;
+		floppy0 = m_floppy[0]->get_device();
+		floppy1 = m_floppy[1]->get_device();
+
+		// TODO: check me out
+		if (floppy0)
+			if (m_floppy[0]->get_device()->mon_r() == 1)
+				m_motor_start_timer[0]->adjust(attotime::from_msec(505));
+
+		if (floppy1)
+			if (m_floppy[1]->get_device()->mon_r() == 1)
+				m_motor_start_timer[1]->adjust(attotime::from_msec(505));
+	}
+
+	m_xtmask = cur_xtmask;
+
+	//if (!BIT(m_fdc_ctrl_2, 4) && BIT(data, 4))
+	//  m_maincpu->dreq_w<2>(1);
+	//m_dmac->dreq2_w(1);
+
+	// TODO: 0 -> 1 transition?
+	if( fdcrst )
+		m_fdc->reset();
+
+	m_fdc_ctrl_2 = data;
+
+	//m_fdd[0]->get_device()->mon_w(!(BIT(data, 5)));
+
+	// TODO: verify if this requires updating drive B: as well
+	fdc_update_ready(nullptr, 0);
+}
+
+/*
+ * ---x ---- RDY: (0) Busy (1) Ready
+ */
+u8 pc88va2_fd_if_device::host_ready_r()
+{
+	// TODO: easy to implement, but no SW accesses it so far
+	if (!machine().side_effects_disabled())
+		logerror("Unhandled read $1b6!\n");
+
+	return 0;
 }

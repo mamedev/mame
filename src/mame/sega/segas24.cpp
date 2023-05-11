@@ -709,7 +709,7 @@ void segas24_state::frc_mode_w(uint8_t data)
 
 uint8_t segas24_state::frc_r()
 {
-	int32_t result = (m_frc_cnt_timer->time_elapsed() * (m_frc_mode ? FRC_CLOCK_MODE1 : FRC_CLOCK_MODE0).dvalue()).as_double();
+	int32_t result = (m_frc_cnt_timer->elapsed() * (m_frc_mode ? FRC_CLOCK_MODE1 : FRC_CLOCK_MODE0).dvalue()).as_double();
 
 	result %= ((m_frc_mode) ? 0x67 : 0x100);
 

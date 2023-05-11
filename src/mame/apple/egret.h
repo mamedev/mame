@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
-#ifndef MAME_MACHINE_EGRET_H
-#define MAME_MACHINE_EGRET_H
+#ifndef MAME_APPLE_EGRET_H
+#define MAME_APPLE_EGRET_H
 
 #pragma once
 
@@ -137,4 +137,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(EGRET, egret_device)
 
-#endif // MAME_MACHINE_EGRET_H
+#endif // MAME_APPLE_EGRET_H

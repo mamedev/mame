@@ -5,15 +5,17 @@
     rokola hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_SNK6502_H
-#define MAME_INCLUDES_SNK6502_H
+#ifndef MAME_SNK_SNK6502_H
+#define MAME_SNK_SNK6502_H
 
 #pragma once
 
 #include "machine/bankdev.h"
 #include "machine/timer.h"
+
 #include "emupal.h"
 #include "tilemap.h"
+
 
 class fantasy_sound_device;
 
@@ -139,4 +141,4 @@ private:
 	required_device<fantasy_sound_device> m_sound;
 };
 
-#endif // MAME_INCLUDES_SNK6502_H
+#endif // MAME_SNK_SNK6502_H

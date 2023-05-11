@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_CMI_ANKBD_H
-#define MAME_MACHINE_CMI_ANKBD_H
+#ifndef MAME_FAIRLIGHT_CMI_ANKBD_H
+#define MAME_FAIRLIGHT_CMI_ANKBD_H
 
 #pragma once
 
@@ -49,4 +49,4 @@ private:
 
 DECLARE_DEVICE_TYPE(CMI_ALPHANUMERIC_KEYBOARD, cmi_alphanumeric_keyboard_device)
 
-#endif // MAME_MACHINE_CMI_ANKBD_H
+#endif // MAME_FAIRLIGHT_CMI_ANKBD_H

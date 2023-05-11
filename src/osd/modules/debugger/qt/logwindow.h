@@ -19,8 +19,10 @@ class LogWindow : public WindowQt
 	Q_OBJECT
 
 public:
-	LogWindow(running_machine &machine, QWidget *parent = nullptr);
+	LogWindow(DebuggerQt &debugger, QWidget *parent = nullptr);
 	virtual ~LogWindow();
+
+	virtual void restoreConfiguration(util::xml::data_node const &node) override;
 
 protected:
 	virtual void saveConfigurationToNode(util::xml::data_node &node) override;
@@ -28,24 +30,6 @@ protected:
 private:
 	// Widgets
 	DebuggerView *m_logView;
-};
-
-
-//=========================================================================
-//  A way to store the configuration of a window long enough to read/write.
-//=========================================================================
-class LogWindowQtConfig : public WindowQtConfig
-{
-public:
-	LogWindowQtConfig() :
-		WindowQtConfig(WINDOW_TYPE_ERROR_LOG_VIEWER)
-	{
-	}
-
-	~LogWindowQtConfig() {}
-
-	void applyToQWidget(QWidget *widget);
-	void recoverFromXmlNode(util::xml::data_node const &node);
 };
 
 } // namespace osd::debugger::qt

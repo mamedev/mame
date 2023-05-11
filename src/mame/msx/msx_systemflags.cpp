@@ -7,14 +7,13 @@
 DEFINE_DEVICE_TYPE(MSX_SYSTEMFLAGS, msx_systemflags_device, "msx_systemflags", "MSX System Flags")
 
 
-msx_systemflags_device::msx_systemflags_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_systemflags_device::msx_systemflags_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSX_SYSTEMFLAGS, tag, owner, clock)
 	, m_initial_value(0xff)
 	, m_system_flags(0xff)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 {
 }
-
 
 void msx_systemflags_device::device_start()
 {
@@ -28,14 +27,12 @@ void msx_systemflags_device::device_start()
 	space.install_read_handler(0xf4, 0xf4, read8smo_delegate(*this, FUNC(msx_systemflags_device::read)));
 }
 
-
-uint8_t msx_systemflags_device::read()
+u8 msx_systemflags_device::read()
 {
 	return m_system_flags;
 }
 
-
-void msx_systemflags_device::write(uint8_t data)
+void msx_systemflags_device::write(u8 data)
 {
 	m_system_flags = data;
 }

@@ -37,6 +37,8 @@
 #define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
 
 
+namespace {
+
 static constexpr int EC1841_MEMBOARD_SIZE = 512 * 1024;
 
 
@@ -340,6 +342,9 @@ ROM_START( ec1845 )
 	ROMX_LOAD("184506.bin", 0xf000, 0x0800, CRC(24f5c27c) SHA1(7822dd7f715ef00ccf6d8408be8bbfe01c2eba20), ROM_SKIP(1))
 	ROMX_LOAD("184507.bin", 0xf001, 0x0800, CRC(75122203) SHA1(7b0fbdf1315230633e39574ac7360163bc7361e1), ROM_SKIP(1))
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME    PARENT   COMPAT  MACHINE  INPUT  STATE         INIT         COMPANY      FULLNAME   FLAGS
 COMP( 1986, ec1840, ibm5150, 0,      ec1840,  0,     ec184x_state, init_ec1840, "<unknown>", "EC-1840", 0 )

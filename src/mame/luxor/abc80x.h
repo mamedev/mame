@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_ABC800_H
-#define MAME_INCLUDES_ABC800_H
+#ifndef MAME_LUXOR_ABC800_H
+#define MAME_LUXOR_ABC800_H
 
 #pragma once
 
@@ -14,6 +14,7 @@
 #include "imagedev/snapquik.h"
 #include "bus/abckb/abckb.h"
 #include "bus/abckb/abc800kb.h"
+#include "machine/74259.h"
 #include "machine/e0516.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
@@ -84,6 +85,7 @@ public:
 		m_sio(*this, Z80SIO_TAG),
 		m_discrete(*this, DISCRETE_TAG),
 		m_cassette(*this, CASSETTE_TAG),
+		m_quickload(*this, "quickload"),
 		m_ram(*this, RAM_TAG),
 		m_rom(*this, Z80_TAG),
 		m_video_ram(*this, "video_ram", 0x4000, ENDIANNESS_LITTLE),
@@ -104,6 +106,7 @@ public:
 	required_device<z80sio_device> m_sio;
 	optional_device<discrete_sound_device> m_discrete;
 	optional_device<cassette_image_device> m_cassette;
+	required_device<snapshot_image_device> m_quickload;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
 	memory_share_creator<uint8_t> m_video_ram;
@@ -273,6 +276,7 @@ public:
 		m_crtc(*this, MC6845_TAG),
 		m_palette(*this, "palette"),
 		m_rtc(*this, E0516_TAG),
+		m_sto(*this, "sto"),
 		m_rad_prom(*this, "rad"),
 		m_hru2_prom(*this, "hru"),
 		m_char_rom(*this, MC6845_TAG),
@@ -282,6 +286,7 @@ public:
 	required_device<mc6845_device> m_crtc;
 	required_device<palette_device> m_palette;
 	required_device<e0516_device> m_rtc;
+	required_device<addressable_latch_device> m_sto;
 	required_memory_region m_rad_prom;
 	required_memory_region m_hru2_prom;
 	required_memory_region m_char_rom;
@@ -311,6 +316,12 @@ public:
 	void sso_w(uint8_t data);
 	uint8_t sti_r();
 	void sto_w(uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER( eme_w );
+	DECLARE_WRITE_LINE_MEMBER( _40_w );
+	DECLARE_WRITE_LINE_MEMBER( hru2_a8_w );
+	DECLARE_WRITE_LINE_MEMBER( prot_ini_w );
+	DECLARE_WRITE_LINE_MEMBER( txoff_w );
+	DECLARE_WRITE_LINE_MEMBER( prot_din_w );
 	DECLARE_WRITE_LINE_MEMBER( hs_w );
 	DECLARE_WRITE_LINE_MEMBER( vs_w );
 	void abc806_palette(palette_device &palette) const;
@@ -340,4 +351,4 @@ public:
 	void abc806_mem(address_map &map);
 };
 
-#endif
+#endif // MAME_LUXOR_ABC800_H

@@ -10,6 +10,7 @@
 #include "emu.h"
 #include "ds1204.h"
 
+#include <cstdarg>
 #include <cstdio>
 
 

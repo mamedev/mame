@@ -113,6 +113,9 @@ Main board:
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define NVRAM_HACK
 
 
@@ -522,7 +525,9 @@ ROM_START( bmcbowl )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "bmc_10.bin", 0x00000, 0x20000,  CRC(f840c17f) SHA1(82891a85c8dc60f727b5a8c8e8ab09e8e4bd8af4) )
-
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1994, bmcbowl, 0, bmcbowl, bmcbowl, bmcbowl_state, empty_init, ROT0, "BMC", "Konkyuu no Hoshi", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)

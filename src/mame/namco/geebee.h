@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Juergen Buchmueller
-#ifndef MAME_AUDIO_GEEBEE_H
-#define MAME_AUDIO_GEEBEE_H
+#ifndef MAME_NAMCO_GEEBEE_H
+#define MAME_NAMCO_GEEBEE_H
 
 #pragma once
 
@@ -35,4 +35,4 @@ private:
 
 DECLARE_DEVICE_TYPE(GEEBEE_SOUND, geebee_sound_device)
 
-#endif // MAME_AUDIO_GEEBEE_H
+#endif // MAME_NAMCO_GEEBEE_H

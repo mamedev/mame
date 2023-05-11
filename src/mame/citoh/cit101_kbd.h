@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_CIT101_KBD_H
-#define MAME_MACHINE_CIT101_KBD_H
+#ifndef MAME_CITOH_CIT101_KBD_H
+#define MAME_CITOH_CIT101_KBD_H
 
 #pragma once
 
@@ -87,4 +87,4 @@ protected:
 DECLARE_DEVICE_TYPE(CIT101_KEYBOARD, cit101_keyboard_device)
 DECLARE_DEVICE_TYPE(CIT101E_KEYBOARD, cit101e_keyboard_device)
 
-#endif
+#endif // MAME_CITOH_CIT101_KBD_H

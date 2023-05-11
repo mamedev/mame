@@ -5,8 +5,8 @@
     Malzak
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_MALZAK_H
-#define MAME_INCLUDES_MALZAK_H
+#ifndef MAME_MISC_MALZAK_H
+#define MAME_MISC_MALZAK_H
 
 #pragma once
 
@@ -80,4 +80,4 @@ private:
 	u8  m_playfield_bank = 0;
 };
 
-#endif // MAME_INCLUDES_MALZAK_H
+#endif // MAME_MISC_MALZAK_H

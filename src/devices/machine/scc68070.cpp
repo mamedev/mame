@@ -287,6 +287,8 @@ void scc68070_device::device_resolve_objects()
 
 void scc68070_device::device_start()
 {
+	reset_cb().append(*this, FUNC(scc68070_device::reset_peripherals));
+
 	scc68070_base_device::device_start();
 
 	save_item(NAME(m_ipl));
@@ -448,7 +450,7 @@ void scc68070_device::device_reset()
 	set_timer_callback(0);
 }
 
-void scc68070_device::m68k_reset_peripherals()
+WRITE_LINE_MEMBER(scc68070_device::reset_peripherals)
 {
 	m_lir = 0;
 

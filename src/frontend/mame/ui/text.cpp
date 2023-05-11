@@ -440,7 +440,6 @@ float text_layout::actual_width()
 		m_calculated_actual_width = 0;
 		for (const auto &line : m_lines)
 			m_calculated_actual_width = std::max(m_calculated_actual_width, line->width());
-
 	}
 
 	// return it

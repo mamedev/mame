@@ -49,6 +49,9 @@
 #define VERBOSE         (0)
 #include "logmacro.h"
 
+
+namespace {
+
 #define MASTER_CLOCK    16000000
 
 //Port A bits:
@@ -819,6 +822,9 @@ ROM_START( replica1 )
 	/* on-die 4kbyte eeprom */
 	ROM_REGION( 0x1000, "eeprom", ROMREGION_ERASEFF )
 ROM_END
+
+} // anonymous namespace
+
 
 /*   YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY     FULLNAME */
 COMP(2012, replica1, 0,      0,      replicator, replicator, replicator_state, empty_init, "Makerbot", "Replicator 1 desktop 3d printer", MACHINE_NOT_WORKING)

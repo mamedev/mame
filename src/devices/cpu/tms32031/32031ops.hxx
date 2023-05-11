@@ -1734,7 +1734,7 @@ void tms3203x_device::andn_imm(uint32_t op)
 #define ASH(dreg, src, count)                                       \
 {                                                                   \
 	uint32_t _res;                                                    \
-	int32_t _count = (int16_t)(count << 9) >> 9;    /* 7 LSBs */        \
+	int32_t _count = util::sext(count, 7);    /* 7 LSBs */          \
 	if (_count < 0)                                                 \
 	{                                                               \
 		if (_count >= -31)                                          \
@@ -2117,7 +2117,7 @@ void tms3203x_device::ldm_imm(uint32_t op)
 #define LSH(dreg, src, count)                                       \
 {                                                                   \
 	uint32_t _res;                                                    \
-	int32_t _count = (int16_t)(count << 9) >> 9;    /* 7 LSBs */        \
+	int32_t _count = util::sext(count, 7);    /* 7 LSBs */          \
 	if (_count < 0)                                                 \
 	{                                                               \
 		if (_count >= -31)                                          \
@@ -2219,7 +2219,7 @@ void tms3203x_device::mpyf_imm(uint32_t op)
 
 #define MPYI(dreg, src1, src2)                                      \
 {                                                                   \
-	int64_t _res = (int64_t)((int32_t)(src1 << 8) >> 8) * (int64_t)((int32_t)(src2 << 8) >> 8);\
+	int64_t _res = mul_32x32(util::sext(src1, 24), util::sext(src2, 24));\
 	if (!OVM() || (_res >= -(int64_t)0x80000000 && _res <= (int64_t)0x7fffffff))        \
 		IREG(dreg) = _res;                                          \
 	else                                                            \
@@ -5828,14 +5828,13 @@ void tms3203x_device::mpyaddi_0(uint32_t op)
 	uint32_t src2 = IREG((op >> 16) & 7);
 	uint32_t src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
 	uint32_t src4 = RMEM(INDIRECT_1(op, op));
-	int64_t mres = (int64_t)((int32_t)(src3 << 8) >> 8) * (int64_t)((int32_t)(src4 << 8) >> 8);
+	int64_t mres = mul_32x32(util::sext(src3, 24), util::sext(src4, 24));
 	uint32_t ares = src1 + src2;
 
 	CLR_NZVUF();
 	if (OVM())
 	{
-		if (mres < -(int64_t)0x80000000 || mres > (int64_t)0x7fffffff)
-			mres = (mres < 0) ? 0x80000000 : 0x7fffffff;
+		mres = std::clamp(mres, -(int64_t)0x80000000, (int64_t)0x7fffffff);
 		if (OVERFLOW_ADD(src1,src2,ares))
 			ares = ((int32_t)src1 < 0) ? 0x80000000 : 0x7fffffff;
 	}
@@ -5852,14 +5851,13 @@ void tms3203x_device::mpyaddi_1(uint32_t op)
 	uint32_t src2 = IREG((op >> 16) & 7);
 	uint32_t src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
 	uint32_t src4 = RMEM(INDIRECT_1(op, op));
-	int64_t mres = (int64_t)((int32_t)(src3 << 8) >> 8) * (int64_t)((int32_t)(src1 << 8) >> 8);
+	int64_t mres = mul_32x32(util::sext(src3, 24), util::sext(src1, 24));
 	uint32_t ares = src4 + src2;
 
 	CLR_NZVUF();
 	if (OVM())
 	{
-		if (mres < -(int64_t)0x80000000 || mres > (int64_t)0x7fffffff)
-			mres = (mres < 0) ? 0x80000000 : 0x7fffffff;
+		mres = std::clamp(mres, -(int64_t)0x80000000, (int64_t)0x7fffffff);
 		if (OVERFLOW_ADD(src4,src2,ares))
 			ares = ((int32_t)src4 < 0) ? 0x80000000 : 0x7fffffff;
 	}
@@ -5876,14 +5874,13 @@ void tms3203x_device::mpyaddi_2(uint32_t op)
 	uint32_t src2 = IREG((op >> 16) & 7);
 	uint32_t src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
 	uint32_t src4 = RMEM(INDIRECT_1(op, op));
-	int64_t mres = (int64_t)((int32_t)(src1 << 8) >> 8) * (int64_t)((int32_t)(src2 << 8) >> 8);
+	int64_t mres = mul_32x32(util::sext(src1, 24), util::sext(src2, 24));
 	uint32_t ares = src3 + src4;
 
 	CLR_NZVUF();
 	if (OVM())
 	{
-		if (mres < -(int64_t)0x80000000 || mres > (int64_t)0x7fffffff)
-			mres = (mres < 0) ? 0x80000000 : 0x7fffffff;
+		mres = std::clamp(mres, -(int64_t)0x80000000, (int64_t)0x7fffffff);
 		if (OVERFLOW_ADD(src3,src4,ares))
 			ares = ((int32_t)src3 < 0) ? 0x80000000 : 0x7fffffff;
 	}
@@ -5900,14 +5897,13 @@ void tms3203x_device::mpyaddi_3(uint32_t op)
 	uint32_t src2 = IREG((op >> 16) & 7);
 	uint32_t src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
 	uint32_t src4 = RMEM(INDIRECT_1(op, op));
-	int64_t mres = (int64_t)((int32_t)(src3 << 8) >> 8) * (int64_t)((int32_t)(src1 << 8) >> 8);
+	int64_t mres = mul_32x32(util::sext(src3, 24), util::sext(src1, 24));
 	uint32_t ares = src2 + src4;
 
 	CLR_NZVUF();
 	if (OVM())
 	{
-		if (mres < -(int64_t)0x80000000 || mres > (int64_t)0x7fffffff)
-			mres = (mres < 0) ? 0x80000000 : 0x7fffffff;
+		mres = std::clamp(mres, -(int64_t)0x80000000, (int64_t)0x7fffffff);
 		if (OVERFLOW_ADD(src2,src4,ares))
 			ares = ((int32_t)src2 < 0) ? 0x80000000 : 0x7fffffff;
 	}
@@ -5926,14 +5922,13 @@ void tms3203x_device::mpysubi_0(uint32_t op)
 	uint32_t src2 = IREG((op >> 16) & 7);
 	uint32_t src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
 	uint32_t src4 = RMEM(INDIRECT_1(op, op));
-	int64_t mres = (int64_t)((int32_t)(src3 << 8) >> 8) * (int64_t)((int32_t)(src4 << 8) >> 8);
+	int64_t mres = mul_32x32(util::sext(src3, 24), util::sext(src4, 24));
 	uint32_t ares = src1 - src2;
 
 	CLR_NZVUF();
 	if (OVM())
 	{
-		if (mres < -(int64_t)0x80000000 || mres > (int64_t)0x7fffffff)
-			mres = (mres < 0) ? 0x80000000 : 0x7fffffff;
+		mres = std::clamp(mres, -(int64_t)0x80000000, (int64_t)0x7fffffff);
 		if (OVERFLOW_SUB(src1,src2,ares))
 			ares = ((int32_t)src1 < 0) ? 0x80000000 : 0x7fffffff;
 	}
@@ -5950,14 +5945,13 @@ void tms3203x_device::mpysubi_1(uint32_t op)
 	uint32_t src2 = IREG((op >> 16) & 7);
 	uint32_t src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
 	uint32_t src4 = RMEM(INDIRECT_1(op, op));
-	int64_t mres = (int64_t)((int32_t)(src3 << 8) >> 8) * (int64_t)((int32_t)(src1 << 8) >> 8);
+	int64_t mres = mul_32x32(util::sext(src3, 24), util::sext(src1, 24));
 	uint32_t ares = src4 - src2;
 
 	CLR_NZVUF();
 	if (OVM())
 	{
-		if (mres < -(int64_t)0x80000000 || mres > (int64_t)0x7fffffff)
-			mres = (mres < 0) ? 0x80000000 : 0x7fffffff;
+		mres = std::clamp(mres, -(int64_t)0x80000000, (int64_t)0x7fffffff);
 		if (OVERFLOW_SUB(src4,src2,ares))
 			ares = ((int32_t)src4 < 0) ? 0x80000000 : 0x7fffffff;
 	}
@@ -5974,14 +5968,13 @@ void tms3203x_device::mpysubi_2(uint32_t op)
 	uint32_t src2 = IREG((op >> 16) & 7);
 	uint32_t src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
 	uint32_t src4 = RMEM(INDIRECT_1(op, op));
-	int64_t mres = (int64_t)((int32_t)(src1 << 8) >> 8) * (int64_t)((int32_t)(src2 << 8) >> 8);
+	int64_t mres = mul_32x32(util::sext(src1, 24), util::sext(src2, 24));
 	uint32_t ares = src3 - src4;
 
 	CLR_NZVUF();
 	if (OVM())
 	{
-		if (mres < -(int64_t)0x80000000 || mres > (int64_t)0x7fffffff)
-			mres = (mres < 0) ? 0x80000000 : 0x7fffffff;
+		mres = std::clamp(mres, -(int64_t)0x80000000, (int64_t)0x7fffffff);
 		if (OVERFLOW_SUB(src3,src4,ares))
 			ares = ((int32_t)src3 < 0) ? 0x80000000 : 0x7fffffff;
 	}
@@ -5998,14 +5991,13 @@ void tms3203x_device::mpysubi_3(uint32_t op)
 	uint32_t src2 = IREG((op >> 16) & 7);
 	uint32_t src3 = RMEM(INDIRECT_1_DEF(op, op >> 8));
 	uint32_t src4 = RMEM(INDIRECT_1(op, op));
-	int64_t mres = (int64_t)((int32_t)(src3 << 8) >> 8) * (int64_t)((int32_t)(src1 << 8) >> 8);
+	int64_t mres = mul_32x32(util::sext(src3, 24), util::sext(src1, 24));
 	uint32_t ares = src2 - src4;
 
 	CLR_NZVUF();
 	if (OVM())
 	{
-		if (mres < -(int64_t)0x80000000 || mres > (int64_t)0x7fffffff)
-			mres = (mres < 0) ? 0x80000000 : 0x7fffffff;
+		mres = std::clamp(mres, -(int64_t)0x80000000, (int64_t)0x7fffffff);
 		if (OVERFLOW_SUB(src2,src4,ares))
 			ares = ((int32_t)src2 < 0) ? 0x80000000 : 0x7fffffff;
 	}

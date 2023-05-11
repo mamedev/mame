@@ -4068,7 +4068,7 @@ GAME( 1994, le2j,      le2,      le2,          le2j, konamigx_state, init_konami
 
 GAME( 1994, fantjour,  konamigx, gokuparo,     gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Fantastic Journey (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, fantjoura, fantjour, gokuparo,     gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Fantastic Journey (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, gokuparo,  fantjour, gokuparo,     gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Gokujyou Parodius (ver JAD)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, gokuparo,  fantjour, gokuparo,     gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Gokujou Parodius: Kako no Eikou o Motomete (ver JAD)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1994, crzcross,  konamigx, gokuparo,     puzldama, konamigx_state, init_posthack, ROT0, "Konami", "Crazy Cross (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, puzldama,  crzcross, gokuparo,     puzldama, konamigx_state, init_posthack, ROT0, "Konami", "Taisen Puzzle-dama (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )

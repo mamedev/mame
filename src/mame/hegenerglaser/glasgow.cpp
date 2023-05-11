@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Dirk Verwiebe, Cowering, hap
 // thanks-to:Berger
-/******************************************************************************
+/*******************************************************************************
 
 Mephisto Glasgow 3 S chess computer
 Dirk V.
@@ -11,7 +11,7 @@ TODO:
 - add waitstates, CPU is 12MHz but with DTACK waitstates for slow EPROMs,
   effective speed is less than 10MHz
 
-===============================================================================
+================================================================================
 
 Hardware notes:
 - 68000 CPU
@@ -31,7 +31,7 @@ Hardware notes:
 1*74LS367 3 State Hex Buffers
 1*SG-10   Seiko 4-pin plastic XTAL chip "50H", to IPL0+2
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -88,9 +88,9 @@ void glasgow_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void glasgow_state::control_w(u8 data)
 {
@@ -124,9 +124,9 @@ void glasgow_state::keys_w(u8 data)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void glasgow_state::glasgow_mem(address_map &map)
 {
@@ -142,9 +142,9 @@ void glasgow_state::glasgow_mem(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( glasgow )
 	PORT_START("KEY.0")
@@ -170,13 +170,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void glasgow_state::glasgow(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M68000(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_periodic_int(FUNC(glasgow_state::irq5_line_assert), attotime::from_hz(50));
 	m_maincpu->set_addrmap(AS_PROGRAM, &glasgow_state::glasgow_mem);
@@ -184,20 +184,20 @@ void glasgow_state::glasgow(machine_config &config)
 	MEPHISTO_SENSORS_BOARD(config, m_board);
 	m_board->set_delay(attotime::from_msec(200));
 
-	/* video hardware */
+	// video hardware
 	MEPHISTO_DISPLAY_MODULE1(config, m_display);
 	config.set_default_layout(layout_mephisto_glasgow);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( glasgow )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -236,14 +236,14 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-/*    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY             FULLNAME                  FLAGS */
-CONS( 1984, glasgow,   0,        0,      glasgow,  glasgow, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto III-S Glasgow", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1984, glasgow,   0,        0,      glasgow,  glasgow, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto III-S Glasgow", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 // newer chesscomputers on 4-ROM hardware (see mephisto_amsterdam.cpp for parent sets)
-CONS( 1985, amsterda,  amsterd,  0,      glasgow,  glasgow, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto Amsterdam (Glasgow hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, dallas16a, dallas32, 0,      glasgow,  glasgow, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68000 (Glasgow hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, roma16a,   roma32,   0,      glasgow,  glasgow, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto Roma 68000 (Glasgow hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, amsterda,  amsterd,  0,      glasgow,  glasgow, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto Amsterdam (Glasgow hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, dallas16a, dallas32, 0,      glasgow,  glasgow, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68000 (Glasgow hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1987, roma16a,   roma32,   0,      glasgow,  glasgow, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto Roma 68000 (Glasgow hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

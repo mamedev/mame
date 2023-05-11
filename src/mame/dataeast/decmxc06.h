@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, David Haywood
-#ifndef MAME_VIDEO_DECMXC06_H
-#define MAME_VIDEO_DECMXC06_H
+#ifndef MAME_DATAEAST_DECMXC06_H
+#define MAME_DATAEAST_DECMXC06_H
 
 #pragma once
 
@@ -41,4 +41,4 @@ private:
 
 DECLARE_DEVICE_TYPE(DECO_MXC06, deco_mxc06_device)
 
-#endif // MAME_VIDEO_DECMXC06_H
+#endif // MAME_DATAEAST_DECMXC06_H
