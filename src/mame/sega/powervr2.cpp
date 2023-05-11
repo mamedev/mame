@@ -2502,6 +2502,10 @@ inline void powervr2_device::render_span(bitmap_rgb32 &bitmap, texinfo *ti,
 	if(y1 > 480)
 		y1 = 480;
 
+	// demofist, chocomk (hardlocks with -drc, MT#8088)
+	if (std::isnan(y0) || std::isnan(y1))
+		return;
+
 	float bl[4], br[4], offl[4], offr[4];
 	memcpy(bl, bl_in, sizeof(bl));
 	memcpy(br, br_in, sizeof(br));
