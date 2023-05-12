@@ -96,6 +96,15 @@ namespace {
 #define RAM1        m_ram_pages[0xe9 - 0xc0]
 #define RAM2        m_ram_pages[0xea - 0xc0]
 
+enum
+{
+	SP2K_PG0 = Z84_MCR + 1, SP2K_PG1, SP2K_PG2, SP2K_PG3
+	, SP2K_CNF, SP2K_ALL_MODE
+	, SP2K_PN, SP2K_SC
+	, SP2K_RGMOD, SP2K_PORTY
+	, SP2K_ISA_ADDR_EXT
+};
+
 class sprinter_state : public spectrum_128_state
 {
 public:
@@ -1329,6 +1338,22 @@ void sprinter_state::machine_start()
 	m_hold     = {0, 0}; // cb
 	m_conf_loading = 1;
 	m_conf = 0;
+
+	m_maincpu->state_add_divider(-1);
+	m_maincpu->state_add(SP2K_PG0, "PG0", m_pages[0]);
+	m_maincpu->state_add(SP2K_PG1, "PG1", m_pages[1]);
+	m_maincpu->state_add(SP2K_PG2, "PG2", m_pages[2]);
+	m_maincpu->state_add(SP2K_PG3, "PG3", m_pages[3]);
+
+	m_maincpu->state_add(SP2K_CNF, "CNF", m_cnf);
+	m_maincpu->state_add(SP2K_ALL_MODE, "ALL_MODE", m_all_mode);
+	m_maincpu->state_add(SP2K_PN, "PN", m_pn);
+	m_maincpu->state_add(SP2K_SC, "SC", m_sc);
+
+	m_maincpu->state_add(SP2K_RGMOD, "RGMOD", m_rgmod);
+	m_maincpu->state_add(SP2K_PORTY, "PORT_Y", m_port_y);
+
+	m_maincpu->state_add(SP2K_ISA_ADDR_EXT, "ISA_ADDR_EXT", m_isa_addr_ext);
 }
 
 void sprinter_state::machine_reset()
