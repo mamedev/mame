@@ -69,7 +69,7 @@ void xt446_device::xt446_iomap(address_map &map)
 	map(h8_device::ADC_0, h8_device::ADC_0).lr16(NAME([]() -> u16 { return 0; }));
 	map(h8_device::ADC_1, h8_device::ADC_1).lr16(NAME([]() -> u16 { return 0; }));
 	map(h8_device::ADC_2, h8_device::ADC_2).lr16(NAME([]() -> u16 { return 0; }));
-	map(h8_device::ADC_1, h8_device::ADC_3).lr16(NAME([]() -> u16 { return 0; }));
+	map(h8_device::ADC_3, h8_device::ADC_3).lr16(NAME([]() -> u16 { return 0; }));
 	map(h8_device::ADC_4, h8_device::ADC_4).lr16(NAME([]() -> u16 { return 0; }));
 	map(h8_device::ADC_5, h8_device::ADC_5).lr16(NAME([]() -> u16 { return 0; }));
 	map(h8_device::ADC_6, h8_device::ADC_6).lr16(NAME([]() -> u16 { return 0x200; }));
