@@ -118,7 +118,7 @@ void vicshoot_state::vicshoot(machine_config &config)
 	Z80(config, m_maincpu, 8_MHz_XTAL / 2); // divider not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &vicshoot_state::main_map);
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 8_MHz_XTAL / 2));
+	z80_device &audiocpu(Z80(config, "audiocpu", 8_MHz_XTAL / 2)); // divider not verified
 	audiocpu.set_addrmap(AS_PROGRAM, &vicshoot_state::sound_map);
 
 	// M66500(config, "io0");
@@ -131,13 +131,13 @@ void vicshoot_state::vicshoot(machine_config &config)
 	ciu.set_master_tag(m_maincpu);
 	ciu.set_slave_tag("audiocpu");
 
-	ym2203_device &opn(YM2203(config, "opn", 36_MHz_XTAL / 9)); // divider not verified
+	ym2203_device &opn(YM2203(config, "opn", 8_MHz_XTAL / 2)); // divider not verified
 	opn.irq_handler().set_inputline("audiocpu", 0);
 	opn.add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	OKIM6295(config, "oki0", 1'000'000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5); // resonator and pin7 not verified
+	OKIM6295(config, "oki0", 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	OKIM6295(config, "oki1", 1'000'000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5); // resonator and pin7 not verified
+	OKIM6295(config, "oki1", 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
