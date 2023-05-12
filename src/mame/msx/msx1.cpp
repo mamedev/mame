@@ -13,7 +13,6 @@
 
 #include "msx_ar.lh"
 #include "msx_en.lh"
-#include "msx_en_nocaps.lh"
 #include "msx_jp.lh"
 #include "msx_jp_1fdd.lh"
 #include "msx_kr.lh"
@@ -438,7 +437,7 @@ void msx1_state::mx15(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 
 	m_hw_def.has_printer_port(false);
-	msx1(VDP_TMS9928A, SND_AY8910, config, layout_msx_en_nocaps);
+	msx1(VDP_TMS9928A, SND_AY8910, config, layout_msx_nocode_nocaps);
 }
 
 /* MSX - Casio MX-101 */

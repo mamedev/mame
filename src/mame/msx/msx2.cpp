@@ -26,7 +26,6 @@
 #include "msx_ar_1fdd.lh"
 #include "msx_ar_2fdd.lh"
 #include "msx_en.lh"
-#include "msx_en_1fdd.lh"
 #include "msx_jp.lh"
 #include "msx_jp_1fdd.lh"
 #include "msx_jp_2fdd.lh"
@@ -1932,7 +1931,7 @@ void msx2_state::vg8240(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 0, 4);   // 64KB RAM
 	add_internal_disk_mirrored(config, MSX_SLOT_DISK1_WD2793, "disk", 3, 3, 1, 2, "diskrom");
 
-	msx2_pal(SND_YM2149, config, layout_msx_en_1fdd);
+	msx2_pal(SND_YM2149, config, layout_msx_nocode_1fdd);
 }
 
 /* MSX2 - Phonola NMS 8245 */
