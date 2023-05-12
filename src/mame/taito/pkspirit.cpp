@@ -74,7 +74,7 @@ void pkspirit_state::main_map(address_map &map) // TODO: verify everything
 {
 	map(0x000000, 0x01ffff).rom().region("maincpu", 0);
 	map(0x100000, 0x10001f).rw("te7750", FUNC(te7750_device::read), FUNC(te7750_device::write)).umask16(0x00ff); // maybe
-	map(0x200000, 0x200001).lr16(NAME([] () -> uint16_t { return 0xffff; }));
+	// map(0x200000, 0x200001).r //?
 	map(0x300000, 0x30ffff).ram(); // main RAM?
 	map(0x800001, 0x800001).w("ciu", FUNC(pc060ha_device::master_port_w));
 	map(0x800003, 0x800003).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
@@ -91,7 +91,7 @@ void pkspirit_state::sound_map(address_map &map) // TODO: verify everything
 	map(0xa000, 0xa000).w("ciu", FUNC(pc060ha_device::slave_port_w));
 	map(0xa001, 0xa001).rw("ciu", FUNC(pc060ha_device::slave_comm_r), FUNC(pc060ha_device::slave_comm_w));
 	map(0xc000, 0xc001).rw("opn", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	//map(0xe000, 0xe000).w // bank set?
+	map(0xe000, 0xe000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
 

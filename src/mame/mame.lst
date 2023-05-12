@@ -42465,7 +42465,7 @@ pitnruna                        // PR  (c) 1984 Taito Corporation
 jumpkun                         // prototype
 
 @source:taito/pkspirit.cpp
-pkspirit                        //
+pkspirit                        // D41
 
 @source:taito/qix.cpp
 complexx                        // CX  (c) 1984 Taito America Corporation
@@ -43045,6 +43045,9 @@ cbombersp                       //
 undrfire                        // D67 (c) 1993 Taito Corporation Japan (World)
 undrfirej                       // D67 (c) 1993 Taito Corporation (Japan)
 undrfireu                       // D67 (c) 1993 Taito America Corporation (US)
+
+@source:taito/vicshoot.cpp
+vicshoot                        // D97
 
 @source:taito/volfied.cpp
 volfied                         // C04 (c) 1989 Taito Corporation Japan (World)
