@@ -42464,6 +42464,9 @@ pitnrun                         // PR  (c) 1984 Taito Corporation
 pitnruna                        // PR  (c) 1984 Taito Corporation
 jumpkun                         // prototype
 
+@source:taito/pkspirit.cpp
+pkspirit                        //
+
 @source:taito/qix.cpp
 complexx                        // CX  (c) 1984 Taito America Corporation
 elecyoyo                        // YY  (c) 1982 Taito America Corporation
