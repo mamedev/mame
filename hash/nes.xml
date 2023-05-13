@@ -14280,7 +14280,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="gauntunl">
-		<description>Gauntlet (USA, Unlicensed)</description>
+		<description>Gauntlet (USA, unlicensed)</description>
 		<year>1988</year>
 		<publisher>Tengen</publisher>
 		<part name="cart" interface="nes_cart">
@@ -30388,7 +30388,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="rbibba" cloneof="rbibb">
-		<description>R.B.I. Baseball (USA, Unlicensed)</description>
+		<description>R.B.I. Baseball (USA, unlicensed)</description>
 		<year>1988</year>
 		<publisher>Tengen</publisher>
 		<info name="serial" value="NES-RS-USA"/>
@@ -65631,7 +65631,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- was this ever released on real carts? -->
 	<software name="famikan">
-		<description>Famikan (Japan, unl)</description>
+		<description>Famikan (Japan, unlicensed)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -69400,7 +69400,7 @@ All musics were removed in this game.
 	</software>
 
 	<software name="sangrybr" supported="no">
-		<description>Super Angry Birds (Unl)</description>
+		<description>Super Angry Birds (unlicensed)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
