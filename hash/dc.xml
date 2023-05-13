@@ -458,7 +458,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="0 31719 20990 3"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="4 wheel thunder (usa)" sha1="023e6d8c232ae0ef22b0315ff7a8f14ad5f686fc"/>
+				<disk name="4 wheel thunder (usa)" sha1="4852db60cda2b22a15e11dce047a1d080b629e72"/>
 			</diskarea>
 		</part>
 	</software>
@@ -530,7 +530,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="6 63593 12014 4"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="4x4 evo (usa)" sha1="fc8c5e09e1f6902a52fc79ae54392d700be6fdad"/>
+				<disk name="4x4 evo (usa)" sha1="2ade88e88f99c27362b68608d2983729994cf0b8"/>
 			</diskarea>
 		</part>
 	</software>
@@ -592,7 +592,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="0 10086 51064 5"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="18 wheeler american pro trucker (usa)" sha1="c03adc04607282f755d10abb9b69975b74b25869"/>
+				<disk name="18 wheeler american pro trucker (usa)" sha1="59b96c6f851e9698ae920d80e7ba88ba02eabe8c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -636,7 +636,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="&lt;HDR-0080-0529&gt;HK919C"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="18 wheeler american pro trucker (jpn)" sha1="a385da8a0d05c8df88774f8f4417342d126f40b8"/>
+				<disk name="18 wheeler american pro trucker (jpn)" sha1="c874cd4c18f709d737702d5d48e566dd9aa26a0a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -700,7 +700,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="4 560101 361036"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="21 two one (jpn)" sha1="46468591b751dab05b8fcc92e8d02959b3b11d9c"/>
+				<disk name="21 two one (jpn)" sha1="68fde82b29cf1d12f169240910290bece4aa25dd"/>
 			</diskarea>
 		</part>
 	</software>
@@ -721,7 +721,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="MK-51190-0478SS EMI CD HOLLAND   @ 2"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="90 minutes sega championship football (euro)" sha1="295606d64f2700d497b640df7d6d56beb6fc4889"/>
+				<disk name="90 minutes sega championship football (euro)" sha1="7b08c41c6313df96e7a1ca0a662e9133af5cf187"/>
 			</diskarea>
 		</part>
 	</software>
@@ -770,7 +770,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="4 974365 501587"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="advanced daisenryaku 2001 (jpn)" sha1="6a5aad10b604951e8ad1506d1c0e97fb3d4070df"/>
+				<disk name="advanced daisenryaku 2001 (jpn)" sha1="d7e78aec9e907a84866ddd8e570f251842b0319b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -796,7 +796,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="4 974365 500665"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="advanced daisenryaku sturm uber europa - der deutsche blitzkrieg (jpn)" sha1="665a179438e4da74267acfc5e808bfbf883ad124"/>
+				<disk name="advanced daisenryaku sturm uber europa - der deutsche blitzkrieg (jpn)" sha1="34b0f9b0a12b8ec6cd37956d7f760d9c92535cfd"/>
 			</diskarea>
 		</part>
 	</software>
@@ -820,7 +820,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="4 981670 208605"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="aero dancing i (jpn)" sha1="afa616065462af5ad362b0599c320d82a2e27b42"/>
+				<disk name="aero dancing i (jpn)" sha1="89bc7b2a8102bf00ec2b7915446f7e4093f91f7b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -844,7 +844,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="4 981670 209008"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="aero dancing i jikai-saku made matemasen (jpn)" sha1="a06d7f06ba0b94785ea40cbd29119ba1061a738f"/>
+				<disk name="aero dancing i jikai-saku made matemasen (jpn)" sha1="b8b7885b1a970b3e5f9856d2207d8325af3cd0a6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -865,7 +865,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="6 50008 79913 2"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="aerowings (usa)" sha1="73094cec1b4bd3b264832d7400d85a381471acda"/>
+				<disk name="aerowings (usa)" sha1="f97ef130e0e6d20ff686176981019503bab1bf0f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -931,7 +931,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="4 981670 208209"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="aero dancing todoroki taichou no himitsu disc (jpn)" sha1="1006fbc3b55c5dca5aa1dba71d926ac59564b275"/>
+				<disk name="aero dancing todoroki taichou no himitsu disc (jpn)" sha1="0b2cfcad53608c399e854b38d4143430483e653e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -967,7 +967,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="6 50008 79921 7"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="aerowings 2 airstrike (usa)" sha1="2cb80043518a27527432799636f1ad1ff451d472"/>
+				<disk name="aerowings 2 airstrike (usa)" sha1="c4d6c0467a42e78ba10f1d37dc86e6b6eaaa5d0a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1077,7 +1077,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="4 981670 208407"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="aero dancing f todoroki tsubasa no hatsu hikou (jpn)" sha1="61d31e4edb69f054693d42b176b1917beeec659b"/>
+				<disk name="aero dancing f todoroki tsubasa no hatsu hikou (jpn)" sha1="f8cd4b0de87c4e786097fa10481922a6d37a8460"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1143,7 +1143,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<part interface="cdrom" name="cdrom1">
 			<feature name="part_id" value="After...: Wasureenu Kizuna"/>
 			<diskarea name="cdrom">
-				<disk name="after... wasureenu kizuna (jpn)" sha1="4ca05216dd45b9a5218186e7c2c0b5cd0be76d13"/>
+				<disk name="after... wasureenu kizuna (jpn)" sha1="7a0996757c21bcaafd830a5faae235b069c8e72d"/>
 			</diskarea>
 		</part>
 		<part interface="dc_cdrom" name="cdrom2">
@@ -1193,7 +1193,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="4 513244 900884"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="aikagi hidamari to kanojo no heyagi (jpn)" sha1="13e335cf3ed86fbdbcbac4f3f59c1d05c1056a84"/>
+				<disk name="aikagi hidamari to kanojo no heyagi (jpn)" sha1="d803288952774eaba27a81394400b68164a9f907"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1214,7 +1214,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="T-20112M-0752A   10MM1   C   19, T-20112M-0752A   11M4   C   19, T-20112M-0752A   12M1   C   19"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="air (jpn, rev. a)" sha1="7e17b8331ac245ee22e9150922058cee580ff113"/>
+				<disk name="air (jpn, rev. a)" sha1="4144ef52ba7ddca4e937f6529913e30a468b4492"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1673,10 +1673,10 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<!--
 		<rom name="ALIENFRONT_ONLINE.gdi" size="143" md5="0a3db521ea34e40a63967a0108d4bc78" sha1="397340cf23de1f66776741a3b9da8914c9b48203"/>
 		<rom name="track01.iso" size="921600" md5="98de8e5db931c9106cbf5c53b75f7cc7" sha1="5e23b9e4a63d4720e114bc777640bd65f0edca9b"/>
-		<rom name="track02.raw" size="13 994 400" md5="a55424800b9a45851b3670fa8afbf6a9" sha1="6cd6c33fc86f008d87f9d4385371e5df684c4c60"/>
-		<rom name="track03.iso" size="876 550 144" md5="17f9a991a2b7758f5ae1b2c2a08adb65" sha1="e99bcff45222f59148463dab5833ddf5e8aa93bd"/>
-		<rom name="track04.raw" size="13 818 000" md5="52d4f2952f4aca03f15d23825f5609b0" sha1="b00cc2ffa6abbd0908675ced977586fd9111d881"/>
-		<rom name="track05.iso" size="143 302 656" md5="d4ca27065a01df92300d240093d61ff5" sha1="2db3177f076caaa5e779a70f1ba546ac1b709e26"/>
+		<rom name="track02.raw" size="13994400" md5="a55424800b9a45851b3670fa8afbf6a9" sha1="6cd6c33fc86f008d87f9d4385371e5df684c4c60"/>
+		<rom name="track03.iso" size="876550144" md5="17f9a991a2b7758f5ae1b2c2a08adb65" sha1="e99bcff45222f59148463dab5833ddf5e8aa93bd"/>
+		<rom name="track04.raw" size="13818000" md5="52d4f2952f4aca03f15d23825f5609b0" sha1="b00cc2ffa6abbd0908675ced977586fd9111d881"/>
+		<rom name="track05.iso" size="143302656" md5="d4ca27065a01df92300d240093d61ff5" sha1="2db3177f076caaa5e779a70f1ba546ac1b709e26"/>
 		-->
 		<description>Alien Front Online (USA, prototype 20010625)</description>
 		<year>2001</year>
@@ -1902,7 +1902,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="4 988658 041148"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="angel wish kimi no egao ni chu (jpn)" sha1="65c1da4807da03a1600219f5d90d8b725d190e98"/>
+				<disk name="angel wish kimi no egao ni chu (jpn)" sha1="9979bec207a0fbb9d1e1240ff2d569dc908677cd"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2136,7 +2136,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="4 974365 501211"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="atsumare guru guru onsen bb (jpn)" sha1="d03900d542524f937ac8ab4d7e9a9b60063f7c49"/>
+				<disk name="atsumare guru guru onsen bb (jpn)" sha1="f882d15f60efe7c658e7ba2756c720efec4249af"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2409,7 +2409,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="4 959359 009010"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="bass rush dream ecogear powerworm championship (jpn)" sha1="5600ccd51aaa3e2417ea51980a0033cc54b55350"/>
+				<disk name="bass rush dream ecogear powerworm championship (jpn)" sha1="94b6e4e503066f9412b939de4816afd2b5898fa9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2431,7 +2431,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="4 541823 000014"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="battle beaster (jpn)" sha1="9df8e6349fda2fe264f0f0536b38f77296ace077"/>
+				<disk name="battle beaster (jpn)" sha1="11ff4bbb2cd5f47e50ee7e7a64eb6978ad347c6e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3103,7 +3103,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<part interface="cdrom" name="cdrom1">
 			<feature name="part_id" value="Blue-Sky-Blue[s]: Sora o Mau Tsubasa"/>
 			<diskarea name="cdrom">
-				<disk name="blue-sky-blue[s] sora o mau tsubasa (jpn)" sha1="1b6db61f78b11afc250aac17f5ad4cfa651c9e19"/>
+				<disk name="blue-sky-blue[s] sora o mau tsubasa (jpn)" sha1="2959be03664d42eebcb1692337ea6b2e93bfb9fb"/>
 			</diskarea>
 		</part>
 		<part interface="dc_cdrom" name="cdrom2">
@@ -3131,7 +3131,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="4 995161 013104"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="bokomu no tatsujin (jpn)" sha1="f702c8b81c69c7212a22e0b428f7c7f2e087f56d"/>
+				<disk name="bokomu no tatsujin (jpn)" sha1="b74abada79deadb627f05b50ec7e15a9b3f0c0cc"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3156,7 +3156,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="4 979750 891021"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="boku doraemon (jpn)" sha1="1638034edd680f6a073a97bcd220b6f2dd356ecc"/>
+				<disk name="boku doraemon (jpn)" sha1="934fae7912ab6ff035fc40b33a191f22dfc86eec"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3201,7 +3201,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="4 528311 000022"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="boku no tennis jinsei (jpn)" sha1="31828b64c80c1b1c7632c35c0203b48b391904c5"/>
+				<disk name="boku no tennis jinsei (jpn)" sha1="4153be8019da5c56a5b3dd272be301350375b819"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3223,7 +3223,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="T-19717M-0855   1MM1   C   28"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="boku to, bokura no natsu (jpn)" sha1="52b64f02d20b31a3eaec988337548733639e3199"/>
+				<disk name="boku to, bokura no natsu (jpn)" sha1="7ea6ab499462b72bd9ac072070eec3b181527b99"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3244,7 +3244,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="T-42903M-0774   1MM1   C   1X"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="bomber hehhe (jpn)" sha1="73e7be4dc7ea5a8ee965cc7b265122aecf0bc630"/>
+				<disk name="bomber hehhe (jpn)" sha1="4d7898bc1f25ec339b08f3bd5ba0260dbc2a4fda"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3712,7 +3712,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="&lt;T-46513M-0877&gt;HN412A"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="cafe little wish (jpn)" sha1="117edcda020625b9e0e91b0c099eab704d5cd0a9"/>
+				<disk name="cafe little wish (jpn)" sha1="d2b3533c731c4c154a53a3f1cff9c795fec9552c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4067,7 +4067,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<part interface="cdrom" name="cdrom1">
 			<feature name="part_id" value="Card of Destiny: Hikari to Yami no Tougousha"/>
 			<diskarea name="cdrom">
-				<disk name="card of destiny hikari to yami no tougousha - genteiban (jpn)" sha1="79a8dccf13f16beaa3b6293672c08d90d0c5f64e"/>
+				<disk name="card of destiny hikari to yami no tougousha - genteiban (jpn)" sha1="0bafa0d05b50037cc5da023c0db6ed768de2c475"/>
 			</diskarea>
 		</part>
 		<part interface="dc_cdrom" name="cdrom2">
@@ -4237,7 +4237,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="T-46901M-0807   1MM1   C   24"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="castle fantasia seima taisen (jpn)" sha1="e0702100801e79e1b039b44c6d604d89ec1849b5"/>
+				<disk name="castle fantasia seima taisen (jpn)" sha1="0903f283296b8ff60b722e753145be313c0cedb3"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4571,7 +4571,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="T-37912M-0913   1MS1   C   43"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="cherry blossom (jpn)" sha1="0d6e60904f091dc3cba5bf72e4dc0073b66f1564"/>
+				<disk name="cherry blossom (jpn)" sha1="9969ae4c62c048fc6d8c2b6c786f673716338cf5"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4686,7 +4686,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="T-47107M-0904   3MS1   C   3Z"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="chocolat maid cafe curio (jpn)" sha1="92ddb0d5acf83f3fb6bec362b19082f807f13fe6"/>
+				<disk name="chocolat maid cafe curio (jpn)" sha1="0469b9ffc5202fa5ffa6d94abbbaff5341f16c66"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4823,13 +4823,13 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<part interface="cdrom" name="cdrom1">
 			<feature name="part_id" value="Message Disc"/>
 			<diskarea name="cdrom">
-				<disk name="christmas seaman omoi o tsutaeru mou hitotsu no houhou - message kit (jpn) (message disc)" sha1="044e7326bfaa8d676541a783cd4ca2484108ed85"/>
+				<disk name="christmas seaman omoi o tsutaeru mou hitotsu no houhou - message kit (jpn) (message disc)" sha1="fb4a61854adf81ee83008aeb4dd172121e661a31"/>
 			</diskarea>
 		</part>
 		<part interface="cdrom" name="cdrom2">
 			<feature name="part_id" value="Present Disc"/>
 			<diskarea name="cdrom">
-				<disk name="christmas seaman omoi o tsutaeru mou hitotsu no houhou - present disc (jpn)" sha1="d04cb12d5dd9b674688b665084944851cbe68bf9"/>
+				<disk name="christmas seaman omoi o tsutaeru mou hitotsu no houhou - present disc (jpn)" sha1="7bcaa8d42df6e7920cbbb64fdcf95f7c7b6865df"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4850,7 +4850,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="T-39404M-0241   2M1   C   9Z"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="christmas seaman omoi o tsutaeru mou hitotsu no houhou - present disc (jpn)" sha1="d04cb12d5dd9b674688b665084944851cbe68bf9"/>
+				<disk name="christmas seaman omoi o tsutaeru mou hitotsu no houhou - present disc (jpn)" sha1="7bcaa8d42df6e7920cbbb64fdcf95f7c7b6865df"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5294,13 +5294,13 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<part interface="cdrom" name="cdrom1">
 			<feature name="part_id" value="Disc 1"/>
 			<diskarea name="cdrom">
-				<disk name="comic party (jpn) (disc 1)" sha1="4a26b68634360f6ec4c39763e1ec3aef1d46dff9"/>
+				<disk name="comic party (jpn) (disc 1)" sha1="8710002d130ef4e3fa4d10b645003075e3bacdb4"/>
 			</diskarea>
 		</part>
 		<part interface="cdrom" name="cdrom2">
 			<feature name="part_id" value="Disc 2"/>
 			<diskarea name="cdrom">
-				<disk name="comic party (jpn) (disc 2)" sha1="2b43c0f46256eaa5d9709985d79cffc90c594b9e"/>
+				<disk name="comic party (jpn) (disc 2)" sha1="2d9cd2bbb7e52d09b3276c633230395457df483e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5361,7 +5361,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="&lt;HDR-0160-0695&gt;HL425A"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="confidential mission (jpn)" sha1="be5a2cc59ee335b29821607c617c19ade454fcea"/>
+				<disk name="confidential mission (jpn)" sha1="dd7652f2efdf6144d6e872e0f2d08a5a19ae4144"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5468,7 +5468,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="T-3106M-0437   1M1   C   06"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="cool cool toon (jpn)" sha1="77e8df8a4136d8be06dc63f0ce596d629557710f"/>
+				<disk name="cool cool toon (jpn)" sha1="77905a50ab7b98ab69855f512147ca065a241500"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5541,7 +5541,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="&lt;T-45801M-0737&gt;HL710C"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="cr hissatsu shigotonin pachitte chonmage vpachi (jpn)" sha1="893801607b6e2f91137e626924ae706dcafe6931"/>
+				<disk name="cr hissatsu shigotonin pachitte chonmage vpachi (jpn)" sha1="0313fde372d8718b16fc158732fad3cc3a0e5a52"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5950,7 +5950,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<part interface="cdrom" name="cdrom1">
 			<feature name="part_id" value="D+Vine [Luv]"/>
 			<diskarea name="cdrom">
-				<disk name="d+vine [luv] - shokai genteiban (jpn)" sha1="a55d24f09e8d191a8671fd1fcb63fc2e5c1ceb9c"/>
+				<disk name="d+vine [luv] - shokai genteiban (jpn)" sha1="57c9224d5598180a95b9267922e6f284774eada5"/>
 			</diskarea>
 		</part>
 		<part interface="dc_cdrom" name="cdrom2">
@@ -7226,7 +7226,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="&lt;T-40801M-0206&gt;HJA30A, &lt;T-40801M-0206&gt;HL712A"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="dengen tenshi taisen mahjong shangri-la (jpn)" sha1="da7ca58149c1c2ac838e28d8c319e0b2ac21ec5e"/>
+				<disk name="dengen tenshi taisen mahjong shangri-la (jpn)" sha1="54ed775c45303731b083ed527ba5920b7c4b3583"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7285,7 +7285,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="&lt;T-1102M-0255&gt;HJC18D"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="densha de go 2 kousoku-hen 3000 bandai (jpn)" sha1="9728cf52bb82a33812898c27cf9d96410175f9d4"/>
+				<disk name="densha de go 2 kousoku-hen 3000 bandai (jpn)" sha1="a3bc9e59efa6567d302f926644d4870cde2cc2dd"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7397,7 +7397,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="T-46302M-0753 MT   B04"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="di gi charat fantasy (jpn)" sha1="20c245d693f0d4701be99d71ea164d0cf0468539"/>
+				<disk name="di gi charat fantasy (jpn)" sha1="79a22372a1d8441dfe16a80c6ea86bfaa89f12b7"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7432,7 +7432,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<part interface="cdrom" name="cdrom1">
 			<feature name="part_id" value="Di Gi Charat Fantasy"/>
 			<diskarea name="cdrom">
-				<disk name="di gi charat fantasy (jpn)" sha1="20c245d693f0d4701be99d71ea164d0cf0468539"/>
+				<disk name="di gi charat fantasy (jpn)" sha1="79a22372a1d8441dfe16a80c6ea86bfaa89f12b7"/>
 			</diskarea>
 		</part>
 		<part interface="dc_cdrom" name="cdrom2">
@@ -8017,7 +8017,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="T-46701M-0798   2M1   C   1Z"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="doki doki idol star seeker remix (jpn)" sha1="7f23fb341aa35695fdd5208f4b4bb8395b08224d"/>
+				<disk name="doki doki idol star seeker remix (jpn)" sha1="bd589bc417fc2cd8f19180a4111a1e27856a1525"/>
 			</diskarea>
 		</part>
 	</software>
@@ -11352,7 +11352,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="T-9503M-0080 MT   B01"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="eisei meijin iii game creator yoshimura nobuhiro no zunou (jpn)" sha1="3d8f2e655829790ee2cf83f252c9d05257234fb4"/>
+				<disk name="eisei meijin iii game creator yoshimura nobuhiro no zunou (jpn)" sha1="c35585083c71fa8f12fc16afbecf31ffc3a47456"/>
 			</diskarea>
 		</part>
 	</software>
@@ -11516,7 +11516,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="4 976219 555500"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="eldorado gate dai-7-kan (jpn)" sha1="f21855a78f2511c2faa4c679bd3d9b031d896654"/>
+				<disk name="eldorado gate dai-7-kan (jpn)" sha1="8e624fa15e7ae9e8adc75681da07f41b7137c455"/>
 			</diskarea>
 		</part>
 	</software>
@@ -11576,7 +11576,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="&lt;T-20116M-0839&gt;HM707B"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="elysion eien no sanctuary (jpn)" sha1="ec02aba1dd210bc39c6e94926cbb091fbadfdcb2"/>
+				<disk name="elysion eien no sanctuary (jpn)" sha1="4440564fd55c7845f30bde7c462f44bea6b8d3a7"/>
 			</diskarea>
 		</part>
 	</software>
@@ -11598,7 +11598,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="4 933516 306273"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="erde nezu no ki no shita de (jpn)" sha1="e12bc896c2fc1f7d1bae56e5e28f89734edfb2d7"/>
+				<disk name="erde nezu no ki no shita de (jpn)" sha1="b0d35dc9a1f4ac1bfd7284f55248a73f40eba6a7"/>
 			</diskarea>
 		</part>
 	</software>
@@ -11631,19 +11631,19 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<part interface="cdrom" name="cdrom1">
 			<feature name="part_id" value="Disc 1"/>
 			<diskarea name="cdrom">
-				<disk name="es (jpn) (disc 1)" sha1="6715ff835ceb413c4b52609e078fac1401c69e93"/>
+				<disk name="es (jpn) (disc 1)" sha1="8c9bd2032470d1f50c63c3e14f5f182458619c7a"/>
 			</diskarea>
 		</part>
 		<part interface="cdrom" name="cdrom2">
 			<feature name="part_id" value="Disc 2"/>
 			<diskarea name="cdrom">
-				<disk name="es (jpn) (disc 2)" sha1="b0d04e113e15db3b76f5ad78f712ac85ba10a980"/>
+				<disk name="es (jpn) (disc 2)" sha1="2b853f187c1c918ee629388d2bb10112c31c2ff4"/>
 			</diskarea>
 		</part>
 		<part interface="cdrom" name="cdrom3">
 			<feature name="part_id" value="Disc 3"/>
 			<diskarea name="cdrom">
-				<disk name="es (jpn) (disc 3)" sha1="5f01bb4d23c2f95e2064b91917ffbf5db31e02b7"/>
+				<disk name="es (jpn) (disc 3)" sha1="4f2e75f95c1260f3001bbc1f700865f45eb5390f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -11784,13 +11784,13 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<part interface="cdrom" name="cdrom1">
 			<feature name="part_id" value="Disc 1"/>
 			<diskarea name="cdrom">
-				<disk name="eve zero kanzenban ark of the matter (jpn) (disc 1)" sha1="5cebcca9f26156e1309be7184cfd1dac7c0d664f"/>
+				<disk name="eve zero kanzenban ark of the matter (jpn) (disc 1)" sha1="4516f8a68cd03109c0176ca337ca7b3ed5cdbb52"/>
 			</diskarea>
 		</part>
 		<part interface="cdrom" name="cdrom2">
 			<feature name="part_id" value="Disc 2"/>
 			<diskarea name="cdrom">
-				<disk name="eve zero kanzenban ark of the matter (jpn) (disc 2)" sha1="a5dc69f88b42e53ef7f64ec60d5cd14816a6ba31"/>
+				<disk name="eve zero kanzenban ark of the matter (jpn) (disc 2)" sha1="a703d033949f833c228c508a556a74a28d7e7f21"/>
 			</diskarea>
 		</part>
 	</software>
@@ -11812,7 +11812,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="4 933516 206160"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="ever 17 the out of infinity (jpn)" sha1="0f73c51638e72f419ca1a52ca258297c57801499"/>
+				<disk name="ever 17 the out of infinity (jpn)" sha1="3fc448657d87294f21ae52fdb60054c6f75060a4"/>
 			</diskarea>
 		</part>
 	</software>
@@ -12078,7 +12078,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="T-44404M-0684   1M1   C   15"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="exodus guilty neos (jpn)" sha1="3d296c323a04fe6d2a4e87ccb89e8e9f462db045"/>
+				<disk name="exodus guilty neos (jpn)" sha1="7183ce6a92cb39dbdb090a8c06c006b4d19b49f8"/>
 			</diskarea>
 		</part>
 	</software>
@@ -12930,7 +12930,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="*12S*   T-36801NA   B"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="fighting force 2 (usa, alt 2)" sha1="7814c912238861742b2375d25017ee0cc6d76d81"/>
+				<disk name="fighting force 2 (usa, alt 2)" sha1="ed7852cac7328ed43fb96d8942f76646184fbf7e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -13139,7 +13139,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="4 940261 502461"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="fire pro wrestling d (jpn)" sha1="cc87da492ad9339b1e76eb8fd52d1fc846fc1e8a"/>
+				<disk name="fire pro wrestling d (jpn)" sha1="3018edeaeb29e75a7c8cc832e08c4ea08934a6b0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -13169,13 +13169,13 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<part interface="cdrom" name="cdrom1">
 			<feature name="part_id" value="Disc 1"/>
 			<diskarea name="cdrom">
-				<disk name="first kiss story ii anata ga iru kara (jpn) (disc 1)" sha1="fb04ed48d61fe558335df7631149c99c1654a670"/>
+				<disk name="first kiss story ii anata ga iru kara (jpn) (disc 1)" sha1="1b4b691ef7d3c0e1c048eaefaa8ba70d5a957341"/>
 			</diskarea>
 		</part>
 		<part interface="cdrom" name="cdrom2">
 			<feature name="part_id" value="Disc 2"/>
 			<diskarea name="cdrom">
-				<disk name="first kiss story ii anata ga iru kara (jpn) (disc 2)" sha1="2fdbc76f083c0d1a58e15b8224ba62f4e8a21d89"/>
+				<disk name="first kiss story ii anata ga iru kara (jpn) (disc 2)" sha1="ccd40b88896b0c0497ab15185b0a0d2aff414d51"/>
 			</diskarea>
 		</part>
 	</software>
@@ -13220,25 +13220,25 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<part interface="cdrom" name="cdrom1">
 			<feature name="part_id" value="First Kiss Story II: Anata ga Iru kara - Disc 1"/>
 			<diskarea name="cdrom">
-				<disk name="first kiss story ii anata ga iru kara (jpn) (disc 1)" sha1="fb04ed48d61fe558335df7631149c99c1654a670"/>
+				<disk name="first kiss story ii anata ga iru kara (jpn) (disc 1)" sha1="1b4b691ef7d3c0e1c048eaefaa8ba70d5a957341"/>
 			</diskarea>
 		</part>
 		<part interface="cdrom" name="cdrom2">
 			<feature name="part_id" value="First Kiss Story II: Anata ga Iru kara - Disc 2"/>
 			<diskarea name="cdrom">
-				<disk name="first kiss story ii anata ga iru kara (jpn) (disc 2)" sha1="2fdbc76f083c0d1a58e15b8224ba62f4e8a21d89"/>
+				<disk name="first kiss story ii anata ga iru kara (jpn) (disc 2)" sha1="ccd40b88896b0c0497ab15185b0a0d2aff414d51"/>
 			</diskarea>
 		</part>
 		<part interface="cdrom" name="cdrom3">
 			<feature name="part_id" value="First Kiss Story - Disc 1"/>
 			<diskarea name="cdrom">
-				<disk name="first kiss story (jpn) (disc 1)" sha1="12c0921eecbf28c00b1e9b35b1a132250c786d55"/>
+				<disk name="first kiss story (jpn) (disc 1)" sha1="ea75b417abf8e64e83a63281201ba6799bd0a52d"/>
 			</diskarea>
 		</part>
 		<part interface="cdrom" name="cdrom4">
 			<feature name="part_id" value="First Kiss Story - Disc 2"/>
 			<diskarea name="cdrom">
-				<disk name="first kiss story (jpn) (disc 2)" sha1="25c02a1de0790767237920e2b8b9ae31d257ad46"/>
+				<disk name="first kiss story (jpn) (disc 2)" sha1="356f27f8e85cf931e2eaba2f1093a3a6e47d261a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -13482,7 +13482,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="4 520644 020043"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="fragrance tale (jpn)" sha1="a6061b180e70725d3d44c8a63ca8f7c5b0948238"/>
+				<disk name="fragrance tale (jpn)" sha1="c9698934858848c6bbdb4038de2e301247bb59df"/>
 			</diskarea>
 		</part>
 	</software>
@@ -13709,7 +13709,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="HDR-0187-0794 1M1 C 21, HDR-0187-0794 1MM1 C 21"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="fushigi no dungeon fuurai no shiren gaiden onnakenshi asuka kenzan (jpn)" sha1="82fdc8677f6b24e4c75ff5191fbce47b820dc30b"/>
+				<disk name="fushigi no dungeon fuurai no shiren gaiden onnakenshi asuka kenzan (jpn)" sha1="1fc5129168a5af516e47926f1a54138854351503"/>
 			</diskarea>
 		</part>
 	</software>
@@ -14704,7 +14704,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="4 974365 500047"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="godzilla generations (jpn)" sha1="562f2a2c8e77f9e89b09a4f497f04c386fc169e5"/>
+				<disk name="godzilla generations (jpn)" sha1="7cdf962b7038a7878ef027162d24aaf5ef4021ce"/>
 			</diskarea>
 		</part>
 	</software>
@@ -14746,7 +14746,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="4 540129 000018"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="golem no maigo (jpn)" sha1="6b28518eaca82598ee5f9801d67ec0e4eb3d19dd"/>
+				<disk name="golem no maigo (jpn)" sha1="f30afafc87c37940c95a9b68f44f8d4eebe02ad2"/>
 			</diskarea>
 		</part>
 	</software>
@@ -15368,7 +15368,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="T-2402M-0562A   10M2   C   0Y"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="guilty gear x (jpn)" sha1="6f2d7b2da9300e3db6cf9a4921af8dca728b3679"/>
+				<disk name="guilty gear x (jpn)" sha1="e454ea7eb4988aaaf5dc4ed2374e2410a58ec811"/>
 			</diskarea>
 		</part>
 	</software>
@@ -15613,7 +15613,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="T-13303M-0250   3MM1   C   9Y"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="kidou senshi gundam gaiden colony no ochita chi de... - tokubetsuban (jpn)" sha1="64b3fbf8cd6012f6ed28fd8a4d0928f9025b945b"/>
+				<disk name="kidou senshi gundam gaiden colony no ochita chi de... - tokubetsuban (jpn)" sha1="7d10000af76100b944407a67f79f3bddb58472b4"/>
 			</diskarea>
 		</part>
 	</software>
@@ -15807,7 +15807,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="&lt;T-46512M-0870&gt;HN202A"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="happy breeding (jpn)" sha1="a6a9dba133f5e8717fd2d2fcde80605025ed128e"/>
+				<disk name="happy breeding (jpn)" sha1="b1defc4ad6b1f7a0e6324680b6ada70c4a619eda"/>
 			</diskarea>
 		</part>
 	</software>
@@ -15869,7 +15869,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="T-20106M-0655 3"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="harusame youbi (jpn)" sha1="44b5c1359a672e59cac6cbb9a758e8eae0c001b2"/>
+				<disk name="harusame youbi (jpn)" sha1="0c2821d1cc3171117086ee217683ebde74815cb7"/>
 			</diskarea>
 		</part>
 	</software>
@@ -16012,7 +16012,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="T-2202M-0540   2MM1   C   09"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="heisei mahjong-sou (jpn)" sha1="501b56e244082e5cf43efdce3800b9c8cf910f58"/>
+				<disk name="heisei mahjong-sou (jpn)" sha1="9d3e78cb07831da6bb183b37ed55749e58052296"/>
 			</diskarea>
 		</part>
 	</software>
@@ -16056,7 +16056,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="610-7381-0209 1"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="hello kitty no garden panic (jpn)" sha1="a7bd2309fb7c3a1a726e6600a87913260545ac90"/>
+				<disk name="hello kitty no garden panic (jpn)" sha1="2bd64a0f0a8acdbdb4abaa6cb5c9788a1bb721ba"/>
 			</diskarea>
 		</part>
 	</software>
@@ -16232,7 +16232,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="T-46101M-0730 1"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="himitsu yui ga ita natsu (jpn)" sha1="a0ed3fbac2dd23c6038165d9238e091705f822c2"/>
+				<disk name="himitsu yui ga ita natsu (jpn)" sha1="e066d34d072ce2d8f41bcfdfd30c24a029986944"/>
 			</diskarea>
 		</part>
 	</software>
@@ -16617,7 +16617,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="T-5703M-0150   1M1   C   98"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="idol janshi o tsukucchaou (jpn)" sha1="f31ee28505fdd303caead1160915dc11ee712ca4"/>
+				<disk name="idol janshi o tsukucchaou (jpn)" sha1="a388bc1b87f905c316662a1c8f78543bd50c1dc9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -16701,7 +16701,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="T-45601M-0658   1M2   C   13"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="illbleed (jpn)" sha1="cb6c69e42599a9526e41e78876a8acf9d50cdff8"/>
+				<disk name="illbleed (jpn)" sha1="4def52884214c334074bbad6ac9a96f14acc4f85"/>
 			</diskarea>
 		</part>
 	</software>
@@ -16975,7 +16975,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="&lt;T-19506M-0779&gt;HLA12A"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="inoue ryouko last scene (jpn)" sha1="23423fbfae0e2274d158f20495ebcfc8453869e1"/>
+				<disk name="inoue ryouko last scene (jpn)" sha1="3a465b82c2c94cc6e93f904a08ffae6cd646b8f0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -17014,7 +17014,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="&lt;T-20117M-0874&gt;HN316D"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="interlude (jpn)" sha1="f0602aa16434efd302ab92ee2f7bc2700073dc96"/>
+				<disk name="interlude (jpn)" sha1="81b7e9419a0cb394ba3adc9dc1b87645ff337c1c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -17088,7 +17088,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="T-19722M-0891 MT   B03"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="iris (jpn)" sha1="ca801678eb8ccffc1b6aa9c0713f5d575491304d"/>
+				<disk name="iris (jpn)" sha1="6a8f7ae5cbb51a4649d695fe076c7354b2a091ac"/>
 			</diskarea>
 		</part>
 	</software>
@@ -17207,7 +17207,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="HDR-0028-0165   1M1   C   99, HDR-0028-0165   3M3   C   99"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="j.league pro soccer club o tsukurou (jpn)" sha1="e412efe15d1a924cc3389ab7e7da2bf8f567db56"/>
+				<disk name="j.league pro soccer club o tsukurou (jpn)" sha1="301d48ae9453f59cae5ba14610da7bf1997b4fde"/>
 			</diskarea>
 		</part>
 	</software>
@@ -17234,7 +17234,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="&lt;T-43401M-0462&gt;HK711H"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="jahmong (jpn)" sha1="bb96e19026ebf3e12f212c2bbd3c3a95610eec25"/>
+				<disk name="jahmong (jpn)" sha1="f48495ede4aa81aad5904b8c6bb24e05223ff7dd"/>
 			</diskarea>
 		</part>
 	</software>
@@ -17367,7 +17367,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="&lt;T-41201M-0531&gt;HKA02A"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="jet coaster dream 2 (jpn)" sha1="8858b6252cdc67600ab26a6b9a12767726b5bd17"/>
+				<disk name="jet coaster dream 2 (jpn)" sha1="3181d15a34b34584cdc48a7647ce5a32652f4424"/>
 			</diskarea>
 		</part>
 	</software>
@@ -17859,13 +17859,13 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<part interface="cdrom" name="cdrom1">
 			<feature name="part_id" value="Disc 1"/>
 			<diskarea name="cdrom">
-				<disk name="kaen seibo the virgin on megiddo (jpn) (disc 1)" sha1="585635db615d091f6cce5c7156e475e1f7e92daf"/>
+				<disk name="kaen seibo the virgin on megiddo (jpn) (disc 1)" sha1="486fa13f2cc89b494b59c7e501814d5e3093c04c"/>
 			</diskarea>
 		</part>
 		<part interface="cdrom" name="cdrom2">
 			<feature name="part_id" value="Disc 2"/>
 			<diskarea name="cdrom">
-				<disk name="kaen seibo the virgin on megiddo (jpn) (disc 2)" sha1="7a07dfcde19ecdaf4ead28b5afa9f01468aac576"/>
+				<disk name="kaen seibo the virgin on megiddo (jpn) (disc 2)" sha1="ae9bcd48abe94cc6f79887cecfd4a367a8ed5699"/>
 			</diskarea>
 		</part>
 	</software>
@@ -17909,7 +17909,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="&lt;T-20105M-0486&gt;HL516C"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="kanon (jpn)" sha1="4c915bc782f743c6f87812041c9baccb0e947825"/>
+				<disk name="kanon (jpn)" sha1="81f49e0823557f91ea98e312304c05c5691931d5"/>
 			</diskarea>
 		</part>
 	</software>
@@ -18128,7 +18128,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<part interface="cdrom" name="cdrom1">
 			<feature name="part_id" value="Kaze no Uta"/>
 			<diskarea name="cdrom">
-				<disk name="kaze no uta (jpn)" sha1="96f44ea17e9de2d47061737f7528a7064fc530c2"/>
+				<disk name="kaze no uta (jpn)" sha1="279a9d2dfd1526e4b224203184275396647ab937"/>
 			</diskarea>
 		</part>
 		<part interface="cdrom" name="cdrom2">
@@ -18159,7 +18159,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="T4997766300085"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="kidou senkan nadesico nadesico the mission (jpn)" sha1="21dda612cdc3ee96cd9baea01054b167665920f3"/>
+				<disk name="kidou senkan nadesico nadesico the mission (jpn)" sha1="c7aa3b1016252a124a9b6d9d45f78e42e05192ea"/>
 			</diskarea>
 		</part>
 	</software>
@@ -18281,7 +18281,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="4 519898 002240"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="kimi ga nozomu eien (jpn)" sha1="5c2afe4fa9eea00a0e1f503bd1a328f9ce627c9c"/>
+				<disk name="kimi ga nozomu eien (jpn)" sha1="7622b56158e60972f5ea2b6f82142a9a6c0054f9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -18416,7 +18416,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="T-14301M-0057A   2M1   C   93"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="kita e. white illumination (jpn)" sha1="e389aff777840f4bf82f26573fefff2434b8867a"/>
+				<disk name="kita e. white illumination (jpn)" sha1="acb35e852a28693580ef0380123a29acc7e6b88e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -19125,7 +19125,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="ring_code" value="HDR-0139-0645   2M1   C   12"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="love hina smile again (jpn)" sha1="31d6be18dad7207813b905ca422714e78b3c8b21"/>
+				<disk name="love hina smile again (jpn)" sha1="63af4720ff7fcaa14d48a47958eb3c11c167dd84"/>
 			</diskarea>
 		</part>
 	</software>
