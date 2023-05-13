@@ -9,6 +9,7 @@
 #include "emu.h"
 
 #include "cpu/m6800/m6801.h"
+#include "machine/timekpr.h"
 #include "video/hd44780.h"
 
 #include "emupal.h"
@@ -28,6 +29,7 @@ public:
 		, m_lcdc(*this, "lcdc")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
+		, m_rtc(*this, "rtc")
 	{ }
 
 	void _600cat(machine_config &config);
@@ -50,6 +52,7 @@ private:
 	required_device<hd44780_device> m_lcdc;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<ds1643_device> m_rtc;
 };
 
 HD44780_PIXEL_UPDATE(_600cat_state::lcd_pixel_update)
@@ -111,7 +114,7 @@ void _600cat_state::ser_tx_w(int state)
 void _600cat_state::mem_map(address_map &map)
 {
 	map(0x0380, 0x0381).rw(m_lcdc, FUNC(hd44780_device::read), FUNC(hd44780_device::write));
-	map(0x0400, 0x1ff0).ram();
+	map(0x0400, 0x1fff).lrw8(NAME([this](offs_t offset) { return m_rtc->read(offset + 0x400); }), NAME([this](offs_t offset, u8 data) { m_rtc->write(offset + 0x400, data); }));
 	map(0x2000, 0xffff).rom().region("maincpu", 0x2000);
 }
 
@@ -142,6 +145,8 @@ void _600cat_state::_600cat(machine_config &config)
 	HD44780(config, m_lcdc);
 	m_lcdc->set_lcd_size(4, 20);
 	m_lcdc->set_pixel_update_cb(FUNC(_600cat_state::lcd_pixel_update));
+
+	DS1643(config, m_rtc);
 }
 
 ROM_START( 600cat )
