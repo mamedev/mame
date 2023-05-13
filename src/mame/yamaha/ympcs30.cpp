@@ -45,7 +45,7 @@ void pcs30_state::pcs30_map(address_map &map)
 void pcs30_state::pcs30(machine_config &config)
 {
 	Z80(config, m_maincpu, 4'000'000); // TODO: verify clock
-	m_maincpu->set_addrmap(AS_PROGRAM, &pcs30_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pcs30_state::pcs30_map);
 
 	SPEAKER(config, "speaker").front_center();
 }
