@@ -31,6 +31,7 @@ DEFINE_DEVICE_TYPE(M48T37,  m48t37_device,  "m48t37",  "M48T37 Timekeeper")
 DEFINE_DEVICE_TYPE(M48T58,  m48t58_device,  "m48t58",  "M48T58 Timekeeper")
 DEFINE_DEVICE_TYPE(MK48T08, mk48t08_device, "mk48t08", "MK48T08 Timekeeper")
 DEFINE_DEVICE_TYPE(MK48T12, mk48t12_device, "mk48t12", "MK48T12 Timekeeper")
+DEFINE_DEVICE_TYPE(DS1643,  ds1643_device,  "ds1643",  "DS1643 Nonvolatile Timekeeping RAM")
 
 
 /***************************************************************************
@@ -48,12 +49,12 @@ DEFINE_DEVICE_TYPE(MK48T12, mk48t12_device, "mk48t12", "MK48T12 Timekeeper")
 
 #define CONTROL_W (0x80)
 #define CONTROL_R (0x40)
-#define CONTROL_S (0x20) /* not emulated */
-#define CONTROL_CALIBRATION (0x1f) /* not emulated */
+#define CONTROL_S (0x20) /* not emulated - unused on DS1643 */
+#define CONTROL_CALIBRATION (0x1f) /* not emulated - unused on DS1643 */
 
 #define SECONDS_ST (0x80)
 
-#define DAY_FT (0x40) /* M48T37 - not emulated */
+#define DAY_FT (0x40) /* M48T37/DS1643 - not emulated */
 #define DAY_CEB (0x20) /* M48T35/M48T58 */
 #define DAY_CB (0x10) /* M48T35/M48T58 */
 
@@ -163,6 +164,11 @@ m48t58_device::m48t58_device(const machine_config &mconfig, const char *tag, dev
 	m_offset_flags = -1;
 }
 
+m48t58_device::m48t58_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: timekeeper_device(mconfig, type, tag, owner, clock, 0x2000)
+{
+}
+
 mk48t08_device::mk48t08_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: timekeeper_device(mconfig, MK48T08, tag, owner, clock, 0x2000)
 {
@@ -192,6 +198,11 @@ mk48t12_device::mk48t12_device(const machine_config &mconfig, const char *tag, d
 	m_offset_month = 0x7fe;
 	m_offset_year = 0x7ff;
 	m_offset_century = -1;
+}
+
+ds1643_device::ds1643_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: m48t58_device(mconfig, DS1643, tag, owner, clock)
+{
 }
 
 

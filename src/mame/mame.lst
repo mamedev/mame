@@ -40796,6 +40796,9 @@ zx80                            // 1980 Sinclair ZX-80
 zx81                            // 1981 Sinclair ZX-81
 zx97                            //
 
+@source:skeleton/600cat.cpp
+600cat                          //
+
 @source:skeleton/aaa.cpp
 aaa                             //
 

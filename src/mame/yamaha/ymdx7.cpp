@@ -232,8 +232,6 @@ void yamaha_dx7_state::main_map(address_map &map)
 	//Y6 (0x3000) EGS
 	//Y7 (0x3800) NC
 
-	map(0x0000, 0x001f).m(m_maincpu, FUNC(m6801_cpu_device::m6801_io));
-	map(0x0080, 0x00ff).ram(); /* HR6303R built in RAM */
 	map(0x1000, 0x17ff).ram().share("ram1");/* 2kb RAM1 IC19 M5M118P (Voice Memory part1) */
 	map(0x1800, 0x1fff).ram().share("ram2");/* 2kb RAM2 IC20 M5M118P (Voice Memory part2) */
 	map(0x2000, 0x27ff).ram().share("ram3");/* 2kb RAM3 IC21 M5M118P (Working Area)       */
