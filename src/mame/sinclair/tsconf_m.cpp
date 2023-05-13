@@ -404,6 +404,12 @@ void tsconf_state::sfile_write16(offs_t offset, u16 data)
 	m_sfile->write(dest | 1, data & 0xff);
 };
 
+u8 tsconf_state::tsconf_port_xx1f_r(offs_t offset) {
+	return m_beta->started() && m_beta->is_active()
+		? m_beta->status_r()
+		: 0x00; // TODO kempston read
+}
+
 void tsconf_state::tsconf_port_7ffd_w(u8 data)
 {
 	// LOCK? BIT(data, 5);

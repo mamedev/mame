@@ -156,6 +156,7 @@ private:
 	void tsconf_palette(palette_device &palette) const;
 	void tsconf_update_video_mode();
 
+	u8 tsconf_port_xx1f_r(offs_t offset);
 	void tsconf_port_7ffd_w(u8 data);
 	void tsconf_ula_w(offs_t offset, u8 data);
 	u8 tsconf_port_xxaf_r(offs_t reg);
