@@ -156,10 +156,20 @@ void tsconfdma_device::start_tx(u8 dev, bool s_align, bool d_align, bool align_o
 			for (u16 len = 0; len <= m_block_len; len++)
 			{
 				u16 d_val = m_in_mreq_cb(d_addr);
-				if (d_val != 0)
+				u16 s_val = m_in_mreq_cb(s_addr);
+				if (align_opt)
 				{
-					m_out_mreq_cb(d_addr, d_val);
+					d_val = (d_val & 0xff00) | (((s_val & 0x00ff) ? s_val : d_val) & 0x00ff);
+					d_val = (d_val & 0x00ff) | (((s_val & 0xff00) ? s_val : d_val) & 0xff00);
 				}
+				else
+				{
+					d_val = (d_val & 0xfff0) | (((s_val & 0x000f) ? s_val : d_val) & 0x000f);
+					d_val = (d_val & 0xff0f) | (((s_val & 0x00f0) ? s_val : d_val) & 0x00f0);
+					d_val = (d_val & 0xf0ff) | (((s_val & 0x0f00) ? s_val : d_val) & 0x0f00);
+					d_val = (d_val & 0x0fff) | (((s_val & 0xf000) ? s_val : d_val) & 0xf000);
+				}
+				m_out_mreq_cb(d_addr, d_val);
 				s_addr += 2;
 				d_addr += 2;
 			}
