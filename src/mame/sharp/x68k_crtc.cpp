@@ -39,8 +39,6 @@ x68k_crtc_device::x68k_crtc_device(const machine_config &mconfig, device_type ty
 	, m_width(0)
 	, m_visible_height(0)
 	, m_visible_width(0)
-	, m_hshift(0)
-	, m_vshift(0)
 	, m_interlace(false)
 	, m_oddscanline(false)
 {
@@ -93,8 +91,6 @@ void x68k_crtc_device::device_start()
 	save_item(NAME(m_width));
 	save_item(NAME(m_visible_height));
 	save_item(NAME(m_visible_width));
-	save_item(NAME(m_hshift));
-	save_item(NAME(m_vshift));
 	save_item(NAME(m_interlace));
 	save_item(NAME(m_oddscanline));
 }

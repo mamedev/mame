@@ -28055,7 +28055,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="minic" supported="partial">
+	<software name="minic">
 		<description>Mi ni Ikuzo! Hedgehog</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>

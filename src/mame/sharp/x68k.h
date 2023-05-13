@@ -166,10 +166,8 @@ protected:
 		int gfxlayer_pri[4]{};  // block displayed for each priority level
 		int tile8_dirty[1024]{};
 		int tile16_dirty[256]{};
-		int bg_visible_height = 0;
-		int bg_visible_width = 0;
-		int bg_hshift = 0;
-		int bg_vshift = 0;
+		int bg_hstart = 0;
+		int bg_vstart = 0;
 		int bg_hvres = 0;  // bits 0,1 = H-Res, bits 2,3 = V-Res, bit 4 = L/H Freq (0=15.98kHz, 1=31.5kHz)
 	} m_video;
 	struct

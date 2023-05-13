@@ -49,8 +49,6 @@ public:
 	u16 vend() const { return m_vend; }
 	u16 visible_height() const { return m_visible_height; }
 	u16 visible_width() const { return m_visible_width; }
-	u16 hshift() const { return m_hshift; }
-	u16 vshift() const { return m_vshift; }
 
 protected:
 	// base constructor
