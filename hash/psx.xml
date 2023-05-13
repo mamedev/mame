@@ -43,7 +43,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="007 racing (usa)" sha1="c0fffd6939c403a0b7a179b472ae768c06c05c26"/>
+				<disk name="007 racing (usa)" sha1="b0d5e1641367d45c6f187c5c6249371c95636e5a"/>
 			</diskarea>
 		</part>
 	</software>
