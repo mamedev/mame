@@ -889,7 +889,7 @@ void screen_device::device_start()
 	save_item(NAME(m_vblank_end_time));
 	save_item(NAME(m_frame_number));
 	if (m_oldstyle_vblank_supplied)
-		logerror("%s: Deprecated legacy Old Style screen configured (MCFG_SCREEN_VBLANK_TIME), please use MCFG_SCREEN_RAW_PARAMS instead.\n",this->tag());
+		logerror("%s: Deprecated legacy Old Style screen configured (set_vblank_time), please use set_raw instead.\n",this->tag());
 
 	m_is_primary_screen = (this == screen_device_enumerator(machine().root_device()).first());
 }
