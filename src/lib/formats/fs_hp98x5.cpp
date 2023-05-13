@@ -265,7 +265,7 @@ namespace {
 		// Index into array is fs_type
 		// Key is type code
 		// Value is virtual file extension
-		static const std::array<std::map<u8, std::string_view>, FS_COUNT> m_fs_type_maps;
+		const std::array<std::map<u8, std::string_view>, hp98x5_impl::FS_COUNT> m_fs_type_maps;
 	};
 }
 
@@ -273,6 +273,44 @@ hp98x5_impl::hp98x5_impl(fsblk_t& blockdev, fs_type type)
 	: filesystem_t(blockdev , SECTOR_SIZE)
 	, m_fs_type(type)
 	, m_dir_loaded(false)
+	, m_fs_type_maps({
+			// ********
+			// * 9825 *
+			// ********
+			std::map<u8, std::string_view>{
+				{ 1, "DATA"sv },
+				{ 2, "PROG"sv },
+				{ 3, "KEYS"sv },
+				{ 5, "ALL"sv },
+				{ 6, "BPRG"sv }
+			},
+			// ********
+			// * 9831 *
+			// ********
+			std::map<u8, std::string_view>{
+				{ 1, "DATA"sv },
+				{ 9, "DATA"sv },
+				{ 18, "PROG"sv },
+				{ 19, "KEYS"sv },
+				{ 20, "NULL"sv },
+				{ 21, "MEMORY"sv },
+				{ 22, "BINARY"sv },
+				{ 23, "86DATA"sv }
+			},
+			// ********
+			// * 9845 *
+			// ********
+			std::map<u8, std::string_view>{
+				{ 0, "BKUP"sv },
+				{ 8, "DATA"sv },
+				{ 16,"PROG"sv },
+				{ 24,"KEYS"sv },
+				{ 32,"BDAT"sv },
+				{ 40,"ALL"sv  },
+				{ 48,"BPRG"sv },
+				{ 56,"OPRM"sv },
+				{ 60,"ASMB"sv }
+			}})
 {
 }
 
@@ -1317,46 +1355,6 @@ const std::array<u16, hp98x5_impl::FS_COUNT> hp98x5_impl::m_fmt_interleave = {
 	// * 9845 *
 	// ********
 	7
-};
-
-const std::array<std::map<u8, std::string_view>, hp98x5_impl::FS_COUNT> hp98x5_impl::m_fs_type_maps = {
-	// ********
-	// * 9825 *
-	// ********
-	std::map<u8, std::string_view>{
-		{ 1, "DATA"sv },
-		{ 2, "PROG"sv },
-		{ 3, "KEYS"sv },
-		{ 5, "ALL"sv },
-		{ 6, "BPRG"sv }
-	},
-	// ********
-	// * 9831 *
-	// ********
-	std::map<u8, std::string_view>{
-		{ 1, "DATA"sv },
-		{ 9, "DATA"sv },
-		{ 18, "PROG"sv },
-		{ 19, "KEYS"sv },
-		{ 20, "NULL"sv },
-		{ 21, "MEMORY"sv },
-		{ 22, "BINARY"sv },
-		{ 23, "86DATA"sv }
-	},
-	// ********
-	// * 9845 *
-	// ********
-	std::map<u8, std::string_view>{
-		{ 0, "BKUP"sv },
-		{ 8, "DATA"sv },
-		{ 16,"PROG"sv },
-		{ 24,"KEYS"sv },
-		{ 32,"BDAT"sv },
-		{ 40,"ALL"sv  },
-		{ 48,"BPRG"sv },
-		{ 56,"OPRM"sv },
-		{ 60,"ASMB"sv }
-	}
 };
 
 // +--------------+
