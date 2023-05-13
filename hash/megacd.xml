@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -1027,7 +1027,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<info name="ring_code" value="DADC AUSTRIA SCHTRMO2500 25"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="smurfs, the (europe) (en,fr,de,es,it)" sha1="3e31543e9e02595a1dd245c7f3907151fee40337"/>
+				<disk name="smurfs, the (europe) (en,fr,de,es,it)" sha1="ada0f992b04984aa20da0336e5e4ddf435c7c8f6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2229,7 +2229,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<info name="serial" value="T-88025-50"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="marko's magic football (1994)(domark)(pal)(m4)" sha1="7cc03273fc4b3f5eed54a0598f20ac6425ea2692"/>
+				<disk name="marko's magic football (1994)(domark)(pal)(m4)" sha1="df33c08436e1b5c5a09604c29c1bed6fab7176b4"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2712,7 +2712,7 @@ Requires [disc swap]
 		<info name="ring_code" value="610-5411P-00036A 2"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="sega classics arcade collection - limited edition (1993)(sega)(pal)[compilation][610-5411p-00036a 2]" sha1="a7366d582fc0402789a04a3ec9b1713188e1c81f"/>
+				<disk name="sega classics arcade collection - limited edition (1993)(sega)(pal)[compilation][610-5411p-00036a 2]" sha1="8ff8cd77cb561454096993135cdf8fdc675b1871"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2823,7 +2823,7 @@ Requires [disc swap]
 		<info name="serial" value="T-93185-50"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="sensible soccer (1993)(sony imagesoft)(pal)(m4)" sha1="4369233ffaf1362a0cd9a711c776d07f3259a340"/>
+				<disk name="sensible soccer (1993)(sony imagesoft)(pal)(m4)" sha1="702f56129dd6c2b0730c8cb776f0b549fbe2b229"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3226,7 +3226,7 @@ Requires [disc swap]
 		<info name="serial" value="T-88065-50"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="syndicate (1995)(domark)(pal)(m3)" sha1="2b747453c6065622eab178654193a301f138cbd8"/>
+				<disk name="syndicate (1995)(domark)(pal)(m3)" sha1="c17160c5a52b99cc6ca833d22433fb79ed43a1e2"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3319,7 +3319,7 @@ Requires [disc swap]
 		<info name="ring_code" value="SEGAT115015RE R4C"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="thunderhawk (1993)(core)(pal)(m4)[segat115015re r4c]" sha1="199ebc69bd5f6f95574547f72439f61ec31b1483"/>
+				<disk name="thunderhawk (1993)(core)(pal)(m4)[segat115015re r4c]" sha1="eb2891baf1df4a55124eef0cbe9ebed6b96c4cac"/>
 			</diskarea>
 		</part>
 	</software>
