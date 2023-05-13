@@ -16,9 +16,9 @@
 #include "tsconfdma.h"
 
 #include "beta_m.h"
+#include "bus/centronics/ctronics.h"
 #include "machine/pckeybrd.h"
 #include "machine/spi_sdcard.h"
-
 #include "tilemap.h"
 
 
@@ -26,18 +26,19 @@ class tsconf_state : public spectrum_128_state
 {
 public:
 	tsconf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: spectrum_128_state(mconfig, type, tag),
-		  m_bank0_rom(*this, "bank0_rom"),
-		  m_keyboard(*this, "pc_keyboard"),
-		  m_io_mouse(*this, "mouse_input%u", 1U),
-		  m_beta(*this, BETA_DISK_TAG),
-		  m_dma(*this, "dma"),
-		  m_sdcard(*this, "sdcard"),
-		  m_glukrs(*this, "glukrs"),
-		  m_palette(*this, "palette"),
-		  m_gfxdecode(*this, "gfxdecode"),
-		  m_cram(*this, "cram"),
-		  m_sfile(*this, "sfile")
+		: spectrum_128_state(mconfig, type, tag)
+		, m_bank0_rom(*this, "bank0_rom")
+		, m_keyboard(*this, "pc_keyboard")
+		, m_io_mouse(*this, "mouse_input%u", 1U)
+		, m_beta(*this, BETA_DISK_TAG)
+		, m_dma(*this, "dma")
+		, m_sdcard(*this, "sdcard")
+		, m_glukrs(*this, "glukrs")
+		, m_palette(*this, "palette")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_cram(*this, "cram")
+		, m_sfile(*this, "sfile")
+		, m_centronics(*this, "centronics")
 	{
 	}
 
@@ -213,6 +214,7 @@ private:
 	tilemap_t *m_ts_tilemap[3]{};
 	required_device<ram_device> m_cram;
 	required_device<ram_device> m_sfile;
+	required_device<centronics_device> m_centronics;
 };
 
 /*----------- defined in drivers/tsconf.c -----------*/

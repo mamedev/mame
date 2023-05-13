@@ -158,7 +158,7 @@ void tsconfdma_device::start_tx(u8 dev, bool s_align, bool d_align, bool align_o
 				u16 d_val = m_in_mreq_cb(d_addr);
 				if (d_val != 0)
 				{
-					m_out_mreq_cb(d_addr, m_in_mreq_cb(s_addr));
+					m_out_mreq_cb(d_addr, d_val);
 				}
 				s_addr += 2;
 				d_addr += 2;
