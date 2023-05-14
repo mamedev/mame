@@ -45,7 +45,7 @@
 #define LOG_STATE   (1U << 3)
 #define LOG_DATA    (1U << 4)
 #define LOG_COMMAND (1U << 5)
-#define VERBOSE     (LOG_PULSE | LOG_BITS | LOG_STATE | LOG_DATA | LOG_COMMAND)
+#define VERBOSE     (0)
 
 #include "logmacro.h"
 
