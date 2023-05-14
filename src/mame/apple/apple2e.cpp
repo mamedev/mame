@@ -1663,7 +1663,8 @@ void apple2e_state::do_io(int offset, bool is_iic)
 			}
 		}
 
-		if (m_ioudis)
+		// IIe does not have IOUDIS (ref: on-h/w tests by TomCh)
+		if ((m_ioudis) || (!m_isiic && !m_isace500))
 		{
 			switch (offset)
 			{
