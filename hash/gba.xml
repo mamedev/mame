@@ -52,7 +52,7 @@ license:CC0-1.0
 	<software name="apotris">
 		<description>Apotris (v3.4.5)</description>
 		<year>2023</year>
-		<publisher>Akouzoukos</publisher>
+		<publisher>akouzoukos</publisher>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="4194304">
