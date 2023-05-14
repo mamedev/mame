@@ -43,7 +43,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="007 racing (usa)" sha1="b0d5e1641367d45c6f187c5c6249371c95636e5a"/>
+				<disk name="007 racing (usa)" sha1="c0fffd6939c403a0b7a179b472ae768c06c05c26"/>
 			</diskarea>
 		</part>
 	</software>
@@ -62,7 +62,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="007 - tomorrow never dies (usa)" sha1="f48f0e79572be7d676341fb9f6cb0ccb5a31e0d9"/>
+				<disk name="007 - tomorrow never dies (usa)" sha1="603abd8d718ddb72cf34a0d8eece062c03463dc5"/>
 			</diskarea>
 		</part>
 	</software>
@@ -79,7 +79,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="007 - the world is not enough (usa)" sha1="d79f4b8ce9db7c5dacd841e7d7ebbb306f88de70"/>
+				<disk name="007 - the world is not enough (usa)" sha1="3af01c1f0a584751d161dc2c102639cd8c892ea9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -208,7 +208,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ten pin alley (usa)" sha1="9e54d18bdeeaac86a91d57e223271e0e4cadd6e1"/>
+				<disk name="ten pin alley (usa)" sha1="efa45b20a81d2d285bea24dddf87b1c758a8beb7"/>
 			</diskarea>
 		</part>
 	</software>
@@ -313,7 +313,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="3d lemmings (usa)" sha1="ce0fe62049e1f2567b7e4e66f209d97713fb54d8"/>
+				<disk name="3d lemmings (usa)" sha1="4801d11a8fc06628bc972bfb5a9d5b411fe15101"/>
 			</diskarea>
 		</part>
 	</software>
@@ -359,7 +359,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="3xtreme (usa)" sha1="dbc36461c1491be04b9b41cdb43f5aacc5b8d219"/>
+				<disk name="3xtreme (usa)" sha1="a0678bbf322f512072f7a78f072fdbab6555559b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -402,7 +402,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="fifth element, the (usa)" sha1="bf56ec6d782ed3df91a1d3a113bad7f0fca715b6"/>
+				<disk name="fifth element, the (usa)" sha1="edf59f00c16acfcb4f8e7f44e4c72c6ab44aaa5d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -419,7 +419,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="oddworld - abe's oddysee (usa) (v1.1)" sha1="15418f0f1bd9bb64e7c491e964eaff90ead7ff61"/>
+				<disk name="oddworld - abe's oddysee (usa) (v1.1)" sha1="fdf0041ff97101b468fe943c8461b906466add02"/>
 			</diskarea>
 		</part>
 	</software>
@@ -455,12 +455,12 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom1" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="oddworld - abe's exoddus (usa) (disc 1)" sha1="361b3a54f0716ab523f5ea3569df623f8cdc9872"/>
+				<disk name="oddworld - abe's exoddus (usa) (disc 1)" sha1="660edf4bddb298beff44964951af74b3443dc2bd"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="oddworld - abe's exoddus (usa) (disc 2)" sha1="36e619c28dafd7e4baed28a8d56ffebe93584de7"/>
+				<disk name="oddworld - abe's exoddus (usa) (disc 2)" sha1="5b806ee562fd9cd719a6cc47e0fd0b1353068c2f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -754,7 +754,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="alien resurrection (usa)" sha1="a5c6b0c879e523ac7b19c209ac9c06eaf1ab3a01"/>
+				<disk name="alien resurrection (usa)" sha1="79de3fd8c2541398a4f26f7a81a617946fd1cbfa"/>
 			</diskarea>
 		</part>
 	</software>
@@ -796,7 +796,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="alien trilogy (usa)" sha1="34268b5750155db04b9dd25991d98f428ae5fa68"/>
+				<disk name="alien trilogy (usa)" sha1="29b7f1384cef58ec2404a1aa53a30da71f2fa0fb"/>
 			</diskarea>
 		</part>
 	</software>
@@ -879,7 +879,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="alundra (usa) (v1.1)" sha1="cdfaed8c651dcb09d971bfc9d05f1daaf94d2df3"/>
+				<disk name="alundra (usa) (v1.1)" sha1="bdc6a648003469505ee47c7fa83b1b07a6aa2ea9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -896,7 +896,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="alundra 2 - a new legend begins (usa)" sha1="16111c51d568e112f9e57c24da60a6e68347a58c"/>
+				<disk name="alundra 2 - a new legend begins (usa)" sha1="c0e152d67a02dd91e44660ae81099803d2ec0a11"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1035,7 +1035,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="army men - sarge's heroes (usa)" sha1="489c92c1eb6e6ad3ae4c952e38e0541d2ff90b0e"/>
+				<disk name="army men - sarge's heroes (usa)" sha1="b958c6c0f674d5c6508d204d1f913bee61dbab95"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1162,7 +1162,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ape escape (usa)" sha1="07f05352164077ea5726c3c89e00522bee8261ad"/>
+				<disk name="ape escape (usa)" sha1="11b04950f4300f0a44e3197cf6d57a34cc30f17c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1520,7 +1520,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="armorines - project s.w.a.r.m. (usa)" sha1="b88c2e6abc4f56ab17d3ea245d0c55aede617e5a"/>
+				<disk name="armorines - project s.w.a.r.m. (usa)" sha1="af534a5d5825174d58619669d748f97cf3902087"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1557,7 +1557,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="army men 3d (usa)" sha1="a2e29ff020e5db89de055a9fbed0812658b5acd1"/>
+				<disk name="army men 3d (usa)" sha1="66a85dfac355ba06fc9544eb36d240f3f07b7f8d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1592,7 +1592,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="all-star baseball 97 featuring frank thomas (usa)" sha1="f821a4a160e0c958495c9c2d1d8978fee21c3dc2"/>
+				<disk name="all-star baseball 97 featuring frank thomas (usa)" sha1="e5891c4ef7dac37e97ce94c700f9fc1dcc9fb231"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1609,7 +1609,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="all-star slammin' d-ball (usa)" sha1="ee0142e2f218cc38d24d0ab027e8ca8e4d953755"/>
+				<disk name="all-star slammin' d-ball (usa)" sha1="38d356d59ab2fa8cd6d7058afbe405e1b7338b5b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1633,7 +1633,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="all star racing 2 (usa)" sha1="6b51229aadc6fcab51636481a3ec77579e22b22e"/>
+				<disk name="all star racing 2 (usa)" sha1="67d2403c1008244af761546bfdcee1e98b9a082c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1656,7 +1656,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="all star racing (usa)" sha1="9a89181fe3c5bd9004f0a7525e7f844cc7616085"/>
+				<disk name="all star racing (usa)" sha1="0509a19e098bf71024d82703745b2c2cc2e50413"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1722,7 +1722,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="asteroids (usa)" sha1="04aea1e4423a4f1353288dd63e6911265feccf55"/>
+				<disk name="asteroids (usa)" sha1="e59d3a8fa874f6c01dde1905b63c8e60bd363b20"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1757,7 +1757,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="disney's atlantis - the lost empire (usa)" sha1="9d4a654e3aff0e5c4527cbc4133db64be43b186b"/>
+				<disk name="disney's atlantis - the lost empire (usa)" sha1="b3f6094a44c22f50589ab7eaa3abee23d5190ac2"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1988,7 +1988,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="baldies (usa)" sha1="b249bd2371cbcd4406ad9de138468b229b01469c"/>
+				<disk name="baldies (usa)" sha1="5f6075436bef2bd6c939b27bcdc666b775889d24"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2067,7 +2067,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ballistic (usa)" sha1="df2cf0f292b34d36045d3274b77a2b07879f85e4"/>
+				<disk name="ballistic (usa)" sha1="91ec8debbdc2b725eca16533fc73af5d7e1131dc"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2098,7 +2098,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="bust-a-move 2 - arcade edition (usa)" sha1="67a76852d1c4a729692011aca8f5a798c8ba049b"/>
+				<disk name="bust-a-move 2 - arcade edition (usa)" sha1="b1ff7f7289e80a8660de51792d27a843a6e37e3e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2137,7 +2137,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="bust-a-move 4 (usa)" sha1="7354ae16e8bcaa39f1204b5372790ce8d60309b6"/>
+				<disk name="bust-a-move 4 (usa)" sha1="5fae962b40cfd65c71af587ad5f9bc7cd3f866c0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2173,7 +2173,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="bust-a-move '99 (usa)" sha1="c7873febe1bb6a7cac45c0075a7e8d159e8dbc6c"/>
+				<disk name="bust-a-move '99 (usa)" sha1="33abb06e575e8b8369dd69e1156347bf22b7938c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2341,7 +2341,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="batman forever - the arcade game (usa)" sha1="88393684ae19946abfa096c2e56f53098c5cfa35"/>
+				<disk name="batman forever - the arcade game (usa)" sha1="5406a0cdb0849a48b318d44f8c7c773612c1a60d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2455,7 +2455,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="bushido blade 2 (usa)" sha1="7f0603b6cc467b42156405465b270d8284fe1d50"/>
+				<disk name="bushido blade 2 (usa)" sha1="5d35481b47b07e51cb7011b48d505fa10e30b16f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2532,7 +2532,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="buster bros. collection (usa)" sha1="aec44fbab4d775ad54de562f2f36317848fad19b"/>
+				<disk name="buster bros. collection (usa)" sha1="f27b8779c8bdeba79c05f2964b27883d4e40402b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2740,7 +2740,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="frank thomas big hurt baseball (usa)" sha1="f558c913841efcc8f0089535603159222e16f264"/>
+				<disk name="frank thomas big hurt baseball (usa)" sha1="0f976975a6c425dc66381ae571b92bb3854c4c52"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2808,7 +2808,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="bio f.r.e.a.k.s. (usa)" sha1="cbbef6452d8fefffc41b51476ef0f06a6e1cda90"/>
+				<disk name="bio f.r.e.a.k.s. (usa)" sha1="cdd4839e9276971f5d5206b6e183ea0ea18dfa70"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2876,7 +2876,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="black dawn (usa)" sha1="54eb6a39008efe1fbc3f9926b841517b28f95ec5"/>
+				<disk name="black dawn (usa)" sha1="c293e3a618769b28d3c0f6a45125809959178b62"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3072,7 +3072,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nfl blitz 2000 (usa)" sha1="8ee063c43415f1ffade34d0e5dd7d67ef466acf7"/>
+				<disk name="nfl blitz 2000 (usa)" sha1="57c5607b92a9842b4efb87b7fc663461928af4b9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3256,7 +3256,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="breath of fire iii (usa)" sha1="979b329df58855cd1cb2f60793abec33367409e7"/>
+				<disk name="breath of fire iii (usa)" sha1="b9cf8ac6c5b364898c28be663cc94134d2a6482a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3362,7 +3362,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="bomberman - party edition (usa)" sha1="89f5e21e602e72dfee3fc3f930bbc2f7a89864c8"/>
+				<disk name="bomberman - party edition (usa)" sha1="9e8373fbd06c8752c3d47d8f6b5e305fbb98d32a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3379,7 +3379,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="bomberman world (usa)" sha1="529e4527fa3b086e8860c84c70e3886dd20e5863"/>
+				<disk name="bomberman world (usa)" sha1="16b36158a7454cf6872a05c98f9c89dd539f302d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3942,7 +3942,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="battlesport (usa)" sha1="a3026e6bd0555d065b5a5f01b2e94d070932d0c9"/>
+				<disk name="battlesport (usa)" sha1="ac7e9492b92ecbf78bc585ca489311efae331973"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3994,7 +3994,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="bubble bobble also featuring rainbow islands (usa)" sha1="c43ba72269ba09a2311c112cf2f0889db327ce28"/>
+				<disk name="bubble bobble also featuring rainbow islands (usa)" sha1="1561fd3ea3e4b1426087c0d6d87003faef4d752f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4495,7 +4495,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="centipede (usa)" sha1="0f8b6ee552a0ae5ea36a342a513bdba477cd43b0"/>
+				<disk name="centipede (usa)" sha1="ee59aa0b53f4c6e964b33a6ff660dd267a39a354"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4653,7 +4653,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="chocobo racing (usa)" sha1="d64c6737893dec45980c2088e1a528ce20d00dac"/>
+				<disk name="chocobo racing (usa)" sha1="784566dd126798f9963c05a744ded12d390332ed"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4733,7 +4733,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="cleopatra's fortune (usa)" sha1="3c8c19b3ab98d2098ffd168be7af0c75c2cb7057"/>
+				<disk name="cleopatra's fortune (usa)" sha1="109e3b9958e6dd7cc7251ff4faafb07034d4eff5"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4997,7 +4997,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="college slam (usa)" sha1="0c315070fc9e6be87a1994618fc9a3bfe2ecbbdf"/>
+				<disk name="college slam (usa)" sha1="8e6d3a869461f9de6a2760ffbc314a3e5cbd9937"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5073,7 +5073,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="c - the contra adventure (usa)" sha1="681c9d33763a59fd1a65185d80b687ce24587e2c"/>
+				<disk name="c - the contra adventure (usa)" sha1="077cf80003bc72c6801cf8c95b6a98d3105a9d93"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5101,7 +5101,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="contra - legacy of war (usa)" sha1="9403c380d5f391c8c0adb18fe238cc6a2c5d3999"/>
+				<disk name="contra - legacy of war (usa)" sha1="2d251c9aeb30adead8bf9bb2c0d4e094d9b6969e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5155,7 +5155,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="cool boarders 2 (usa)" sha1="bdd071c0046fb44067b0d7282597b4ac8f5b4929"/>
+				<disk name="cool boarders 2 (usa)" sha1="990a6cac9659a572a1b73acfa7ee7d3ad60b4195"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5189,7 +5189,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="cool boarders 4 (usa)" sha1="b47be79d214644ef36c212ede129c09ef357be52"/>
+				<disk name="cool boarders 4 (usa)" sha1="3fbb6e924df7206cc07a75fa276e97007a9cf118"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5219,7 +5219,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="cool boarders (usa)" sha1="4a7db4f12f28fe2a2af805394ba96de0ef0a5a94"/>
+				<disk name="cool boarders (usa)" sha1="b0923041fcdac9288d73e571fd21e6240ccb34bf"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5417,7 +5417,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="crash bandicoot (usa)" sha1="11ab0c2c674fe9bebc62927c8308cee6d6a1dff3"/>
+				<disk name="crash bandicoot (usa)" sha1="73c7cd894227a54a36a165c746371cc63283103b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5434,7 +5434,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="crash bandicoot 2 - cortex strikes back (usa)" sha1="2edb8097887880020387c168ff2bb04354b1ddf9"/>
+				<disk name="crash bandicoot 2 - cortex strikes back (usa)" sha1="3ff7ccb1b38a9f172f0a96b7c780913401c28b03"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5451,7 +5451,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="crash bandicoot - warped (usa)" sha1="1fc5f8aaf5def00ed131f6424483fe88991d920c"/>
+				<disk name="crash bandicoot - warped (usa)" sha1="80e68dbd89ea40ed6f09d7bdfe2ccc0fe46d766e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5486,7 +5486,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="cardinal syn (usa)" sha1="0a5b77436723f66abc8ac7b7cbaf748bb0b0d044"/>
+				<disk name="cardinal syn (usa)" sha1="bbd9e3af8c886460fc8c4907f93ef4b5bc6cb868"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5740,7 +5740,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ctr - crash team racing (usa)" sha1="6ac9869bd696ed7ce6d3b734f774bdb82047ef3d"/>
+				<disk name="ctr - crash team racing (usa)" sha1="d9d5c97d9bc453c4b6339a3635f8d53353ffa7b2"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5757,7 +5757,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="final fantasy chronicles - chrono trigger (usa) (v1.1)" sha1="968de200edd4fc4e809105618a41696c0b0354c0"/>
+				<disk name="final fantasy chronicles - chrono trigger (usa) (v1.1)" sha1="3c76fb48973021b9b7b3f53efd6ff97d1d8a666e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5815,7 +5815,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="castlevania chronicles (usa)" sha1="7d39bbd905910eb1d31ae395c3a79224f725b82e"/>
+				<disk name="castlevania chronicles (usa)" sha1="545ee61ce191dd672056897988a8c9d9286497ea"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5832,7 +5832,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="capcom vs. snk pro (usa)" sha1="d42a868cb769371d994ed903016a82a48715e065"/>
+				<disk name="capcom vs. snk pro (usa)" sha1="1df7e28ccb8ea8249d26e85c9bf6bb89c1797700"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5853,12 +5853,12 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom1" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="colony wars (usa) (disc 1)" sha1="87a35925848ca127c53828bc738bfca668ebe7c1"/>
+				<disk name="colony wars (usa) (disc 1)" sha1="7c558a7f13d3c9a4d3e5e9d20ee0382bcf3c305c"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="colony wars (usa) (disc 2)" sha1="97dfd9daf9be05574b4107ac74d12123e3f70114"/>
+				<disk name="colony wars (usa) (disc 2)" sha1="bd2c07643b93647fba705678411d83d42fd0af6f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5893,7 +5893,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="colony wars - vengeance (usa)" sha1="c80c017209ab38cfe12192526e564a784b9d9cd7"/>
+				<disk name="colony wars - vengeance (usa)" sha1="2de0f44070c24e6df4cda0c32b24e635c4517082"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6076,17 +6076,17 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom1" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="d (usa) (disc 1)" sha1="59bfa30b9cd0cf6d467ffaaab4a5ac572dae5a62"/>
+				<disk name="d (usa) (disc 1)" sha1="ce5b1b1ac03c6623766ca310ecd1858f2287ea88"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="d (usa) (disc 2)" sha1="343ba13b3651b4e3038e97c494f8ae5aaca41f41"/>
+				<disk name="d (usa) (disc 2)" sha1="b5c259490f06acce90b935a7f4afc3acd28104fb"/>
 			</diskarea>
 		</part>
 		<part name="cdrom3" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="d (usa) (disc 3)" sha1="fca47f407610dfef163a36af2f15095d91d87683"/>
+				<disk name="d (usa) (disc 3)" sha1="14e5ac2aea74b93d34d472530bdbfeec66239aa0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6218,7 +6218,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="destruction derby (usa)" sha1="e45355a420d1ace0501f2f404b6b8b38db328c1c"/>
+				<disk name="destruction derby (usa)" sha1="b3e00cae226deb4f9061388ffb24196b8dc3dba0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6282,7 +6282,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="destruction derby raw (usa)" sha1="a360f3543e19c57c161b18bdd6bc420833d14667"/>
+				<disk name="destruction derby raw (usa)" sha1="3f0db6b6eef98b845c61f4f6f9f8bddd22b2a70c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6571,7 +6571,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="dragonheart - fire &amp; steel (usa)" sha1="f699e517400360896eb6662d1547a0cd1f38ca56"/>
+				<disk name="dragonheart - fire &amp; steel (usa)" sha1="7a463d7c50661e210aed0e971158fd64d1e3c7f4"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6606,7 +6606,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="diablo (usa) (en,fr,de,sv)" sha1="98f6d32fd9318ea9c7e2177b9bc264b978a19412"/>
+				<disk name="diablo (usa) (en,fr,de,sv)" sha1="e45913154e69d68b73e81ec44abbb6bb2f37c274"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6623,7 +6623,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="die hard trilogy 2 - viva las vegas (usa)" sha1="db2f22501c2ad26eb9d80e0857956c588e717323"/>
+				<disk name="die hard trilogy 2 - viva las vegas (usa)" sha1="f9f23d720ab04990149d0a1c28d873d6ff8c9473"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6660,7 +6660,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="die hard trilogy (usa) (v1.1)" sha1="8c2819931074e83032d3290a74882be06c504dd9"/>
+				<disk name="die hard trilogy (usa) (v1.1)" sha1="015f4b16dcef0c0d2bd9fc0d119f27f97a32f7ac"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6800,7 +6800,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="dino crisis (usa) (v1.1)" sha1="bcf33257cde0d08678f6880c264c1388cc1a73c8"/>
+				<disk name="dino crisis (usa) (v1.1)" sha1="d5bd911a9185dd137040bc43726f8d2248c7dd4c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6836,7 +6836,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="dino crisis 2 (usa)" sha1="866ba69cfde3b56960078849dcb18c84c16d9c16"/>
+				<disk name="dino crisis 2 (usa)" sha1="7d9ac5ee241bc94ac64893893bbb4c82ebba250f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6889,7 +6889,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="discworld ii - mortality bytes (usa)" sha1="7b2297b7bd6a2bf37bf7eb6d97b942563987bb67"/>
+				<disk name="discworld ii - mortality bytes (usa)" sha1="43448cc290f1f53288b0501b7196bbd49d7fd7cb"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7071,7 +7071,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="doom (usa)" sha1="dc8481ece400c356eba83373a2b77e5afae7f74f"/>
+				<disk name="doom (usa)" sha1="1fe56d1e220712bdc2681bb55f2e90b457cc593b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7170,7 +7170,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="driver - you are the wheelman (usa) (v1.1)" sha1="14fbbd4d4fa8111d0bba35bd1644366854395fe2"/>
+				<disk name="driver - you are the wheelman (usa) (v1.1)" sha1="608728b6e7e3e584535b5c39c2c0aee35be35510"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7189,12 +7189,12 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom1" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="driver 2 (usa) (disc 1) (v1.1)" sha1="6f14915496207e5694914acea4e4d9b4c83f2639"/>
+				<disk name="driver 2 (usa) (disc 1) (v1.1)" sha1="5a6c7c8177bd826a3b6e6fbb565e0c3002aa3855"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="driver 2 (usa) (disc 2) (v1.1)" sha1="d02381334ab2b96e92bc489bc51929dff57de86f"/>
+				<disk name="driver 2 (usa) (disc 2) (v1.1)" sha1="c5014e627310d3d719e04801a1b035844a7c0ee9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7333,7 +7333,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="darkstalkers - the night warriors (usa)" sha1="05abd2adc8fce631ec887b73e1974111160e9326"/>
+				<disk name="darkstalkers - the night warriors (usa)" sha1="9156b564c4cec38716e3bc204e80480c93dd974d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7350,7 +7350,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="darkstalkers 3 (usa)" sha1="1706692ada422550d4ea86637a5294afe0fae1d0"/>
+				<disk name="darkstalkers 3 (usa)" sha1="8e629c928e68454516571f8b4913f585b822b9a8"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7413,7 +7413,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="duke nukem - time to kill (usa)" sha1="023db69cc8c8adc0b9c51c0aa22c7aca4e130bab"/>
+				<disk name="duke nukem - time to kill (usa)" sha1="33949530e9826e1078fe06adf1f69ba2e53953de"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7657,7 +7657,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ecw hardcore revolution (usa)" sha1="490d497f6d164f5965cfd1ca13c2327fce110112"/>
+				<disk name="ecw hardcore revolution (usa)" sha1="59284d988e456fb0ea191c0f43311f67eb443cfb"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7710,7 +7710,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="einhaender (usa)" sha1="5de113ab0543445a0c6033e887c807620f8ff1f9"/>
+				<disk name="einhaender (usa)" sha1="dd2ba34301ace8399abb7a70b756b5f7f10ebf68"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8227,7 +8227,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="formula 1 98 (usa) (en,fr,de,es,it,fi)" sha1="fde45c916538081833a24abd5cb739d83884d733"/>
+				<disk name="formula 1 98 (usa) (en,fr,de,es,it,fi)" sha1="5b8407c8c5a16a302cf945dc8280a1c0b0291d49"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8245,7 +8245,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="formula 1 championship edition (usa) (en,fr,de,es,it)" sha1="affc201e03129bdf22b13e0b23c525e98bd1170d"/>
+				<disk name="formula 1 championship edition (usa) (en,fr,de,es,it)" sha1="f912bc68926779b42b0c7bbd9870ca0166ffef84"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8360,7 +8360,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="family card games fun pack (usa)" sha1="88e9487308500d1d2d6735bf603ae26f3c2a5e46"/>
+				<disk name="family card games fun pack (usa)" sha1="c4027956a0643350d71f621d268d37250aeeb1e9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8455,7 +8455,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="fatal fury - wild ambition (usa)" sha1="dfda7b8134200fe49eb181736c88c93bf667d384"/>
+				<disk name="fatal fury - wild ambition (usa)" sha1="35cc9c62f2511ce4fc06e34d4d2a619addb3b90b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8637,7 +8637,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="final fantasy chronicles - final fantasy iv (usa) (v1.1)" sha1="13c2db5ca21481ae16436fbe270e296a03371b8b"/>
+				<disk name="final fantasy chronicles - final fantasy iv (usa) (v1.1)" sha1="96a91cb6b297d0f0f601c56167bffbcb9ad0f7af"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8671,7 +8671,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="final fantasy anthology - final fantasy v (usa) (v1.1)" sha1="561aa73f27b7bbe6d85cfc899aa544cba86c9ac1"/>
+				<disk name="final fantasy anthology - final fantasy v (usa) (v1.1)" sha1="9e82d3d6c8441fabea47dd652a6ea5196f2ef438"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8705,7 +8705,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="final fantasy anthology - final fantasy vi (usa) (v1.1)" sha1="4fdce0a4c9aeda24839be92fbd52ec0b1c126ec8"/>
+				<disk name="final fantasy anthology - final fantasy vi (usa) (v1.1)" sha1="249bc9af1de0e75bbd7c30e1fb7b935103ff23c2"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8743,17 +8743,17 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom1" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="final fantasy vii (usa) (disc 1)" sha1="f53774b1c71a120cdb77d271e00c7bd54b928ca0"/>
+				<disk name="final fantasy vii (usa) (disc 1)" sha1="b5665fbb2895d0e4fa010e5e15d68c15ceac3688"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="final fantasy vii (usa) (disc 2)" sha1="487a1a6c5d4feff03fb370f149d89e2d19986e26"/>
+				<disk name="final fantasy vii (usa) (disc 2)" sha1="ca80cb0c94936bef091364ef9060a675914a80bd"/>
 			</diskarea>
 		</part>
 		<part name="cdrom3" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="final fantasy vii (usa) (disc 3)" sha1="9364f48f6f381ddc9d954c534951f686ac65f255"/>
+				<disk name="final fantasy vii (usa) (disc 3)" sha1="87223b2d6c54c4e8d5891d8ae485264cbb887d3c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8776,22 +8776,22 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom1" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="final fantasy viii (usa) (disc 1)" sha1="998c8ff53258bc62ae4d9349aff763f954783295"/>
+				<disk name="final fantasy viii (usa) (disc 1)" sha1="4b589aed4dfdf9ec75c3351ed81d367ea2dd0e7f"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="final fantasy viii (usa) (disc 2)" sha1="2f9bfa1b5f56bc62b70be6a6c66c27576d585593"/>
+				<disk name="final fantasy viii (usa) (disc 2)" sha1="4ca6918c519fc8505d637bc5b20e263eb57961c3"/>
 			</diskarea>
 		</part>
 		<part name="cdrom3" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="final fantasy viii (usa) (disc 3)" sha1="11094511c2c764c12c2632802161f7c594a724fe"/>
+				<disk name="final fantasy viii (usa) (disc 3)" sha1="cd5b06dfa24506866694dfc1e0d799e958723045"/>
 			</diskarea>
 		</part>
 		<part name="cdrom4" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="final fantasy viii (usa) (disc 4)" sha1="c4eadb3360a54f7c71756c7a4f5115aa538856f7"/>
+				<disk name="final fantasy viii (usa) (disc 4)" sha1="2e53f99d622be145cdaecd5fbb7d9e43440232d2"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8814,22 +8814,22 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom1" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="final fantasy ix (usa) (disc 1) (v1.1)" sha1="6cc195d41e08d485d957beb51e222f0c275a662c"/>
+				<disk name="final fantasy ix (usa) (disc 1) (v1.1)" sha1="aa95b490a84e95c18d8ac127ea6ab98ebe3d8d7f"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="final fantasy ix (usa) (disc 2) (v1.1)" sha1="f0d7f01f7278ca3625d1654ee80526688a6731a1"/>
+				<disk name="final fantasy ix (usa) (disc 2) (v1.1)" sha1="3c7c71f6e0d37b31e26a2955d9f1f3ae3d61e95c"/>
 			</diskarea>
 		</part>
 		<part name="cdrom3" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="final fantasy ix (usa) (disc 3) (v1.1)" sha1="2744357291b4ccc6527732f638eff5a0fcf4c9cc"/>
+				<disk name="final fantasy ix (usa) (disc 3) (v1.1)" sha1="66dd04783469215b1074552a222239da2ae21665"/>
 			</diskarea>
 		</part>
 		<part name="cdrom4" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="final fantasy ix (usa) (disc 4) (v1.1)" sha1="308f3e7519293212f75fe7110c269fbcbe23e18e"/>
+				<disk name="final fantasy ix (usa) (disc 4) (v1.1)" sha1="ef8760c71d408d7492f8269f28ef9f5dbce02cef"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8884,7 +8884,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="final fantasy tactics (usa)" sha1="f061d8a0e42a0f976b82bbdc4ae3a7b36d96f6a8"/>
+				<disk name="final fantasy tactics (usa)" sha1="f44672cbf59ac08e0ce5f7473ee9a0e352c6f061"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9048,7 +9048,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="final fantasy origins (usa) (v1.1)" sha1="60ecf85c194d5aa096e39fff6d8300fdc818bb24"/>
+				<disk name="final fantasy origins (usa) (v1.1)" sha1="833a6bf605ab741b2258312874c9955de2086586"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9224,7 +9224,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="fifa soccer 97 (usa)" sha1="173828198c0a07bf9c74216bd89bbaf5759655b1"/>
+				<disk name="fifa soccer 97 (usa)" sha1="a3944ff8ddd5fcd46ea6a914dbb087114c229fea"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9316,7 +9316,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="final doom (usa)" sha1="61b6eeefb1159b4c3a60b53e443c2d34d0c1ea37"/>
+				<disk name="final doom (usa)" sha1="569c9d342e6cad12cc7000a74141a006aa1aeaf3"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9440,7 +9440,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="forsaken (usa)" sha1="29a6f5cd68d957569d91cd1a86f07e1b1afe4ce3"/>
+				<disk name="forsaken (usa)" sha1="8dd5e8d46f0367ab5bf9f6bf464b9bf0bd14d689"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9542,7 +9542,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="freestyle boardin' '99 (usa)" sha1="a114a132941abbe27b3a1172fd75a1e83ff500fc"/>
+				<disk name="freestyle boardin' '99 (usa)" sha1="7a6a4a694f6a744e9abe40de6dd28f3c55740c87"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9560,7 +9560,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="freestyle motocross - mcgrath vs. pastrana (usa)" sha1="2e8b9ccd2086b427193c8a5de9c4e14b1f8b9548"/>
+				<disk name="freestyle motocross - mcgrath vs. pastrana (usa)" sha1="6363a81040545fe3998909117f6fa9d579466adb"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9578,7 +9578,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="frogger (usa)" sha1="dd9ef6dbde1c90923cf5c9078022f322b0f7ab07"/>
+				<disk name="frogger (usa)" sha1="fa22e611dba522775cac04e0412fbdb6b68b67f9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9681,7 +9681,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="galaga - destination earth (usa)" sha1="3a00321afb1228bf007f5d6b870e6f6c898843fc"/>
+				<disk name="galaga - destination earth (usa)" sha1="d4ac318914aaef6295985322b53e9b199feb8e66"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9729,7 +9729,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gauntlet legends (usa)" sha1="7e0f39f5e3fca397d679924836b18914a7989d57"/>
+				<disk name="gauntlet legends (usa)" sha1="9b924cd15c05f01bdd0b1a7090ae039dabf35938"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9764,7 +9764,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="g. darius (usa)" sha1="7c5e7cb9f9313f56b32ee3161a907a5bc6aaac41"/>
+				<disk name="g. darius (usa)" sha1="17aec6a72ea6a0f8dd41cc5c36cafafe8fd06b50"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9787,7 +9787,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gekido - urban fighters (usa)" sha1="99a03064684e94bd96ccedcf6258f18dd633181c"/>
+				<disk name="gekido - urban fighters (usa)" sha1="ebcdd5d5989ab745adbb2d817d42291cded54ef1"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9804,7 +9804,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gekioh - shooting king (usa)" sha1="59b58f25ac0dbeadfd7d78aaa6ed7d993f2b18ed"/>
+				<disk name="gekioh - shooting king (usa)" sha1="d4c4b5956475322cfeb5e55a073ba1c70a2b00e9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9821,7 +9821,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gex (usa)" sha1="497f50122c31968587750a2ce69edfdfc10ae02e"/>
+				<disk name="gex (usa)" sha1="ec0f32b9f76e0bc6febe489f3e4903dc1c2e7e15"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9855,7 +9855,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gex 3 - deep cover gecko (usa)" sha1="9c12acdd9a223ed05086fc87f912c5f5df1c811e"/>
+				<disk name="gex 3 - deep cover gecko (usa)" sha1="631ce1a305a6a220b98bbb2b6d67eb6b15583411"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9911,7 +9911,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="guilty gear (usa) (v1.0)" sha1="42d1118faa2dac97d7c0a7daa6a64bda2973b570"/>
+				<disk name="guilty gear (usa) (v1.0)" sha1="b57095a1daf1ee30cbb3c9507aa501a7bf5617ca"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9928,7 +9928,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ghost in the shell (usa)" sha1="c8403397712d75541a9a789a2f52e9696310be52"/>
+				<disk name="ghost in the shell (usa)" sha1="4910b272fc7edbe9da836b78a7db8acce4a4d9c0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -10350,7 +10350,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gran turismo (usa) (v1.1)" sha1="cea9169f54157b01bbbdb530ebeee8b85a39c3f4"/>
+				<disk name="gran turismo (usa) (v1.1)" sha1="0f6bb343c0fc919de6b6e6076b6e5d97c27663e9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -10388,7 +10388,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<part name="cdrom1" interface="psx_cdrom">
 			<feature name="part_id" value="Arcade Mode"/>
 			<diskarea name="cdrom">
-				<disk name="gran turismo 2 (usa) (arcade mode) (v1.1)" sha1="a30b84274435e2cac3b5232980d7217977e46c85"/>
+				<disk name="gran turismo 2 (usa) (arcade mode) (v1.1)" sha1="67e07f8dcd580ccdf1745bc25520772fec5bb0d3"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
@@ -10415,7 +10415,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<part name="cdrom1" interface="psx_cdrom">
 			<feature name="part_id" value="Arcade Mode"/>
 			<diskarea name="cdrom">
-				<disk name="gran turismo 2 (usa) (arcade mode) (v1.1)" sha1="a30b84274435e2cac3b5232980d7217977e46c85"/>
+				<disk name="gran turismo 2 (usa) (arcade mode) (v1.1)" sha1="e5c8728d348125aaadc5a51ce3692026f2138aa7"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
@@ -10511,7 +10511,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="grand theft auto 2 (usa)" sha1="87627fbb043f13c63392799cb327a503da9ab14f"/>
+				<disk name="grand theft auto 2 (usa)" sha1="3a4ee881dc53edc2c3c822182d742007e6e9356f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -10543,7 +10543,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="grand theft auto - mission pack 1 - london 1969 (usa)" sha1="c7387613ee8abbabbc0d2549a538f0b0957a36d5"/>
+				<disk name="grand theft auto - mission pack 1 - london 1969 (usa)" sha1="1b62bc051314f36924a53885282e2332d2001816"/>
 			</diskarea>
 		</part>
 	</software>
@@ -10610,7 +10610,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gubble (usa)" sha1="8a581696e5cbbf10f709d10002f1d263dac4a3b1"/>
+				<disk name="gubble (usa)" sha1="6780bdcd0cd766439c9b6bc3d9a832278bea4708"/>
 			</diskarea>
 		</part>
 	</software>
@@ -10628,7 +10628,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gundam battle assault 2 (usa)" sha1="b7f2b3a9aef64706d20bfe17016fc9b82c6e8c29"/>
+				<disk name="gundam battle assault 2 (usa)" sha1="595fb715a6aaae0faa4adaedd482901c7303dde3"/>
 			</diskarea>
 		</part>
 	</software>
@@ -10665,7 +10665,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gundam battle assault (usa)" sha1="ece9d43daddd1a8a6c020cb18df9e2045ae1a5d2"/>
+				<disk name="gundam battle assault (usa)" sha1="08d96a6d7aa3fbeacf72d7ceb63575b80caedd70"/>
 			</diskarea>
 		</part>
 	</software>
@@ -10826,7 +10826,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="hbo boxing (usa)" sha1="96fe53a1b8adc1cf54eb0f4f154f1dcdbf24e763"/>
+				<disk name="hbo boxing (usa)" sha1="16462ae80de1c16041ca0128b6ec2c3761c48297"/>
 			</diskarea>
 		</part>
 	</software>
@@ -11101,7 +11101,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="hogs of war (usa)" sha1="cbae32df37fa854c0bea209f61940a41455a1a93"/>
+				<disk name="hogs of war (usa)" sha1="85899ca70527dbe81f2a6eaf5edbcd5ca871481f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -11261,7 +11261,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="hot wheels - extreme racing (usa)" sha1="5d4eeee81caabb3f1b977bee341d93bd56c7648d"/>
+				<disk name="hot wheels - extreme racing (usa)" sha1="f1fdaf5004f2b8046127e01c7ae852fe6dfb387e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -11359,7 +11359,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="hydro thunder (usa)" sha1="286b84560da424c10dd1391ce7f3cd49ff1048f8"/>
+				<disk name="hydro thunder (usa)" sha1="50a8b79a2c251b050f2a49760f5aa9b2950a5dc0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -11415,7 +11415,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="impact racing (usa)" sha1="969605d72e0fb880c1dc5448a3ab09ef82076915"/>
+				<disk name="impact racing (usa)" sha1="821fba81b854ad8ec15c6e8644475ffeb3650bcc"/>
 			</diskarea>
 		</part>
 	</software>
@@ -11451,7 +11451,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="independence day (usa)" sha1="0c8222154bb994fcc615f9c39b73622d560f9804"/>
+				<disk name="independence day (usa)" sha1="dab6552233247e1ad05c656066f2dddec9ef7a76"/>
 			</diskarea>
 		</part>
 	</software>
@@ -11497,7 +11497,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="in the hunt (usa)" sha1="ee934ab08575bc4d361046fdeace43fb32f57b76"/>
+				<disk name="in the hunt (usa)" sha1="e721dd560cc07498943e4b9959e324729e65a760"/>
 			</diskarea>
 		</part>
 	</software>
@@ -11617,7 +11617,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="advanced dungeons &amp; dragons - iron &amp; blood - warriors of ravenloft (usa)" sha1="18245fa03c7b3e9ebadb1f4ddaa9a022c49ba58e"/>
+				<disk name="advanced dungeons &amp; dragons - iron &amp; blood - warriors of ravenloft (usa)" sha1="17801ddab215bcc26034feb352967b41cdc95d40"/>
 			</diskarea>
 		</part>
 	</software>
@@ -11655,7 +11655,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="iron man &amp; x-o manowar in heavy metal (usa)" sha1="8d2aa21eedc311c45dfc6d074a54e5e3638adf3f"/>
+				<disk name="iron man &amp; x-o manowar in heavy metal (usa)" sha1="7e65d61c52f08b39933f57978710888153a475e0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -11689,7 +11689,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="irritating stick (usa)" sha1="3c832ebbddb7bea03214de8ad8a79c081e516cf7"/>
+				<disk name="irritating stick (usa)" sha1="9289c8dabe05a5b590aea9a82a32324b8895525c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -11790,7 +11790,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="international track &amp; field (usa)" sha1="de74c844ed802c43af60db60c652b03c53444588"/>
+				<disk name="international track &amp; field (usa)" sha1="dc937024fdeed3b294b1c3baae36bd6edebb65b9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -11858,7 +11858,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="johnny bazookatone (usa)" sha1="e455f2d675034ce47d24feebe55cdd3e42ca70fd"/>
+				<disk name="johnny bazookatone (usa)" sha1="419614f7156fa21dd6996edba658546d9c6e219a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -11892,7 +11892,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="judge dredd (usa)" sha1="4c139c872708cbf01506dddbabb1233c5e9271ef"/>
+				<disk name="judge dredd (usa)" sha1="cc74396b0e1b24feb5366f704029dab76c88b4fd"/>
 			</diskarea>
 		</part>
 	</software>
@@ -12020,7 +12020,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="jet moto 2 - championship edition (usa)" sha1="c7f10dc476869c636aa0826d03927e3f13332a3e"/>
+				<disk name="jet moto 2 - championship edition (usa)" sha1="b42cb27c9047e3a205ac705f103b84d9a9bb82bc"/>
 			</diskarea>
 		</part>
 	</software>
@@ -12050,7 +12050,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="jet moto (usa)" sha1="69496c1d35ac44334eb92121b3057b679c16d76c"/>
+				<disk name="jet moto (usa)" sha1="251e9d825407a0ca917c8dac11344b0f95698d29"/>
 			</diskarea>
 		</part>
 	</software>
@@ -12100,7 +12100,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="jet moto 3 (usa)" sha1="c2540cd8102c7e5df1080565678cb62b0b36eac5"/>
+				<disk name="jet moto 3 (usa)" sha1="9b41ae93feb09afc8e876653209794f97ad09c70"/>
 			</diskarea>
 		</part>
 	</software>
@@ -12198,7 +12198,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="jojo's bizarre adventure (usa)" sha1="847680c54853a9bb551b848214f61a993f60ab55"/>
+				<disk name="jojo's bizarre adventure (usa)" sha1="1a535aab9dd8a47280f8ee71bce3a33ea2dd68c8"/>
 			</diskarea>
 		</part>
 	</software>
@@ -12297,7 +12297,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="jupiter strike (usa)" sha1="c5e4aebe9edaf950e4303cccf88e334ff4ea4cb5"/>
+				<disk name="jupiter strike (usa)" sha1="db3044e8afc055ec72a6d6034d8a2a276ae75f92"/>
 			</diskarea>
 		</part>
 	</software>
@@ -12382,7 +12382,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="k-1 grand prix (usa)" sha1="be79f2fabda5f7b7898ce19672170f3d4cd3535b"/>
+				<disk name="k-1 grand prix (usa)" sha1="a1262560ed86589598e03e50b3f8e372833a327f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -12414,7 +12414,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="k-1 revenge (usa)" sha1="8f6e555cf4be7d60495b484fd0d51b56a9a41fe8"/>
+				<disk name="k-1 revenge (usa)" sha1="2ca9009bf2df2ce939a73bb4e837e16f0959fb99"/>
 			</diskarea>
 		</part>
 	</software>
@@ -12448,7 +12448,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="blood omen - legacy of kain (usa)" sha1="86db9d235c28087c5d43d60e4816c3fd384a036b"/>
+				<disk name="blood omen - legacy of kain (usa)" sha1="b9d465144c3b42c1fa09e1a59c48d8992021aef9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -12465,7 +12465,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="legacy of kain - soul reaver (usa)" sha1="b66a08f5059e90203b62fe6c839c2e2a2aa03bfc"/>
+				<disk name="legacy of kain - soul reaver (usa)" sha1="7151e18c9833410a3b2d72602903f2968142042d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -12633,7 +12633,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="killing zone (usa)" sha1="96347fadf418e31f762e2d2667dad71434a1fd74"/>
+				<disk name="killing zone (usa)" sha1="cf7c9338c633a29d841fd0327b5877c9fbbcee49"/>
 			</diskarea>
 		</part>
 	</software>
@@ -12666,7 +12666,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="kingsley's adventure (usa)" sha1="d9ff5035cdbfbb6c04a2a6f60cabdbcf9ea0a83d"/>
+				<disk name="kingsley's adventure (usa)" sha1="34e26047072db3fc7092c1ad0a825803f631bfe7"/>
 			</diskarea>
 		</part>
 	</software>
@@ -12683,7 +12683,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="king's field ii (usa)" sha1="c343c9a6c44fa505cf35a9437c670009eddcd017"/>
+				<disk name="king's field ii (usa)" sha1="f43928ccc08fa097a775e1b8f777c8b32c3c1dff"/>
 			</diskarea>
 		</part>
 	</software>
@@ -12700,7 +12700,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="king's field (usa)" sha1="660f25acc3dab1352ef4d60d81d9541c11043d45"/>
+				<disk name="king's field (usa)" sha1="b41a6c67cab617b266e637eb10ef36ad54518b8b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -12792,7 +12792,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="king of fighters '95, the (usa)" sha1="559180dd465fc4333a920f74f586ad70735827e8"/>
+				<disk name="king of fighters '95, the (usa)" sha1="fb4f2e9bd9f855d851caed63240473bd41e38556"/>
 			</diskarea>
 		</part>
 	</software>
@@ -12810,7 +12810,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="king of fighters '99, the (usa)" sha1="953d566b5786bc1ed2726f93b0cdd5b3c2b8b5d8"/>
+				<disk name="king of fighters '99, the (usa)" sha1="280100c9b4613597f4ee0f89482c47dd078f00db"/>
 			</diskarea>
 		</part>
 	</software>
@@ -13083,22 +13083,22 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom1" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="legend of dragoon, the (usa) (disc 1)" sha1="dbab4b64e4f3b582486bb9d3e44149c691f3032d"/>
+				<disk name="legend of dragoon, the (usa) (disc 1)" sha1="e094a24456ffcdfaff840835f0759e1f86c88201"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="legend of dragoon, the (usa) (disc 2)" sha1="f7a98165bcf919bcb721f50eaf4beb9f845160fb"/>
+				<disk name="legend of dragoon, the (usa) (disc 2)" sha1="ac8f2803d8fb0c7f43f356c86121a7b6fd2ede96"/>
 			</diskarea>
 		</part>
 		<part name="cdrom3" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="legend of dragoon, the (usa) (disc 3)" sha1="05a4297cbb8c9accb6b4c40d3afd045fb68e74f0"/>
+				<disk name="legend of dragoon, the (usa) (disc 3)" sha1="f18594fcc92fd8925293459bab3f56beb0b15205"/>
 			</diskarea>
 		</part>
 		<part name="cdrom4" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="legend of dragoon, the (usa) (disc 4)" sha1="7db94128cd99568980fe369620d10946d8aa401b"/>
+				<disk name="legend of dragoon, the (usa) (disc 4)" sha1="f1d1535770b6f15a75a90742bfde56d6b9ae378d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -13147,7 +13147,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="lode runner (usa)" sha1="a92cd56b8d7e0f554e5da6fe6c2e8cb49c00cf8f"/>
+				<disk name="lode runner (usa)" sha1="ce3155f60b6f0d5b349ebb3273c99f055cf4a3f6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -13315,7 +13315,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="disney's the lion king ii - simba's mighty adventure (usa)" sha1="b21b7e2ba91deb94a610d809ee89ba08c8f828c5"/>
+				<disk name="disney's the lion king ii - simba's mighty adventure (usa)" sha1="b14db1fa5383a32fb69089e43a5eb1436c9b4a17"/>
 			</diskarea>
 		</part>
 	</software>
@@ -13361,7 +13361,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="loaded (usa) (en,fr)" sha1="fbc93540a150af582ff241fc9d49c0c1d8a11784"/>
+				<disk name="loaded (usa) (en,fr)" sha1="727bafe2c941a53ce7c52380aade32369017c664"/>
 			</diskarea>
 		</part>
 	</software>
@@ -13419,7 +13419,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="looney tunes racing (usa) (en,fr,es)" sha1="79ebf67729f24b78cf13eedb736950171301f181"/>
+				<disk name="looney tunes racing (usa) (en,fr,es)" sha1="72032b1794885cdeae3301b3805da4f4f501e98b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -13538,12 +13538,12 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom1" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="lunar - silver star story complete (usa) (disc 1)" sha1="eb1fb6c49ffec47ac2b7bf26d7621d9bf90d2010"/>
+				<disk name="lunar - silver star story complete (usa) (disc 1)" sha1="51cfe14a5449efe6b6d4097d4b46d6e9e3623424"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="lunar - silver star story complete (usa) (disc 2)" sha1="0461da91ed7dcbabe2f61444126951840b213ae6"/>
+				<disk name="lunar - silver star story complete (usa) (disc 2)" sha1="f664aa20deee48210e7a76c312f53d580b2d2985"/>
 			</diskarea>
 		</part>
 		<part name="cdrom3" interface="psx_cdrom">
@@ -13571,17 +13571,17 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom1" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="lunar 2 - eternal blue complete (usa) (disc 1)" sha1="1ce47e3775e83b13d8c50662319dacb5e89d9743"/>
+				<disk name="lunar 2 - eternal blue complete (usa) (disc 1)" sha1="897a4777fa5cfbdd792982dd52f6ea9a5d053d9e"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="lunar 2 - eternal blue complete (usa) (disc 2)" sha1="0172a2f6b924da9ab0d2caa12e1ddbce3f628678"/>
+				<disk name="lunar 2 - eternal blue complete (usa) (disc 2)" sha1="79ebabbce45631d667c4e3692f8b6195ec5dc16d"/>
 			</diskarea>
 		</part>
 		<part name="cdrom3" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="lunar 2 - eternal blue complete (usa) (disc 3)" sha1="0e91e547f38869d91b86ee027c2c822083d2e840"/>
+				<disk name="lunar 2 - eternal blue complete (usa) (disc 3)" sha1="084395e85478b80230bf2d3fb67184970e2f7a65"/>
 			</diskarea>
 		</part>
 		<part name="cdrom4" interface="psx_cdrom">
@@ -13605,7 +13605,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="south park - chef's luv shack (usa)" sha1="3d143af6327f81e3d2a9b21429c69ffc10355f17"/>
+				<disk name="south park - chef's luv shack (usa)" sha1="7b9d8f83135f476983315718e9b1c77bc24dcb1e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -13662,7 +13662,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="machine hunter (usa)" sha1="e4d2df64b8d1d0864f0173156f3502ee1f85edc2"/>
+				<disk name="machine hunter (usa)" sha1="383552eb1286d39f1ce409059b29700d59fa0926"/>
 			</diskarea>
 		</part>
 	</software>
@@ -13798,7 +13798,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="madden nfl 98 (usa)" sha1="7124e21295dc612add3d8c7555e4bca2c2670bf5"/>
+				<disk name="madden nfl 98 (usa)" sha1="02c50904e0d3f20f154266c95f4acaee57263788"/>
 			</diskarea>
 		</part>
 	</software>
@@ -13889,7 +13889,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="magic - the gathering - battlemage (usa)" sha1="3bcd8f733bb5ab8cd3726a9d59a51574d148bdea"/>
+				<disk name="magic - the gathering - battlemage (usa)" sha1="be87a3319fab8418b1d548e7787514f9d0a77cd6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -14065,7 +14065,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="colin mcrae rally (usa)" sha1="0765845afa78dc8a1572823294780b1765791667"/>
+				<disk name="colin mcrae rally (usa)" sha1="279449a95bf0b7fbd1215ed1dd4f2d8abfcc63fb"/>
 			</diskarea>
 		</part>
 	</software>
@@ -14083,7 +14083,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="colin mcrae rally 2.0 (usa) (en,fr,es)" sha1="a451bc1214db4b0c0fe9aada8e9798f9fab44272"/>
+				<disk name="colin mcrae rally 2.0 (usa) (en,fr,es)" sha1="3974bfd4be890617807e3bfbfa78bf92030d323a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -14210,7 +14210,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mega man 8 (usa)" sha1="355eb773d9f468cfa2a9ed36b7878f3814f0d263"/>
+				<disk name="mega man 8 (usa)" sha1="e4e71e460de78f5a571f46fb2e1f5b940c9477c3"/>
 			</diskarea>
 		</part>
 	</software>
@@ -14227,7 +14227,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mega man x4 (usa)" sha1="35dc1d61ad36b70177107e20d257325790a3f347"/>
+				<disk name="mega man x4 (usa)" sha1="ad336c1d3481030735d7c10c434c564ec7b1d68d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -14244,7 +14244,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mega man x5 (usa)" sha1="077c266a0b9245def631058d1ea83e919cdbec9f"/>
+				<disk name="mega man x5 (usa)" sha1="c9c6246beb5b6bd6ae45498db2b8026ade8522f0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -14261,7 +14261,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mega man x6 (usa) (v1.1)" sha1="0c6435369163895a333e0df446844b1ae87d58be"/>
+				<disk name="mega man x6 (usa) (v1.1)" sha1="278c3ce12bafea06148777ebfc168d73ec62ddc1"/>
 			</diskarea>
 		</part>
 	</software>
@@ -14278,7 +14278,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mega man x6 (usa) (v1.0)" sha1="0718095e485314c49914c274158b947d5199d21c"/>
+				<disk name="mega man x6 (usa) (v1.0)" sha1="576a04c12f3e635e3b48ebafcf7d1e1295ce07dc"/>
 			</diskarea>
 		</part>
 	</software>
@@ -14338,12 +14338,12 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom1" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="metal gear solid (usa) (disc 1) (v1.0)" sha1="ca11d3f7172718401b4a529e35aedcb5f6e0a6d9"/>
+				<disk name="metal gear solid (usa) (disc 1) (v1.0)" sha1="23c8ef7a30624c517271a9280ed85c9995ece418"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="metal gear solid (usa) (disc 2) (v1.0)" sha1="3f3560a2986639e33d2844239a8847945fca2cc1"/>
+				<disk name="metal gear solid (usa) (disc 2) (v1.0)" sha1="370361be299494ed7876fa80572870f52afa0a73"/>
 			</diskarea>
 		</part>
 	</software>
@@ -14360,7 +14360,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="metal gear solid - vr missions (usa)" sha1="3b7ece83bd06c5802d7025b801c0f8d16b135d5f"/>
+				<disk name="metal gear solid - vr missions (usa)" sha1="19b873b051acc323a0b6b3bb98ddb2c10cac58a1"/>
 			</diskarea>
 		</part>
 	</software>
@@ -14377,7 +14377,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="medal of honor (usa)" sha1="56fbf554551f0f92c3e9795208a943d40dcf1706"/>
+				<disk name="medal of honor (usa)" sha1="f155640f176acd8638e38578a9d2ab9bc9087ea3"/>
 			</diskarea>
 		</part>
 	</software>
@@ -14394,7 +14394,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="medal of honor - underground (usa)" sha1="3bdad42aa0dfa1430ded815378764f3de5aec1ac"/>
+				<disk name="medal of honor - underground (usa)" sha1="c49f2fa8c648d5f7055ce1057c415050286ff8ba"/>
 			</diskarea>
 		</part>
 	</software>
@@ -14449,7 +14449,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="foxkids.com - micro maniacs racing (usa)" sha1="60cc762c02dc1124439ac4306ba464878031c544"/>
+				<disk name="foxkids.com - micro maniacs racing (usa)" sha1="937f7b96e2f8098ab109e5eb971d3a649e1793a8"/>
 			</diskarea>
 		</part>
 	</software>
@@ -14468,7 +14468,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="micro machines v3 (usa)" sha1="30fba5a4fdc0ea1249fda0a4fb746202af4a4dfb"/>
+				<disk name="micro machines v3 (usa)" sha1="d0c9cf70cafaf2025f31c2404c1553f5dca672c3"/>
 			</diskarea>
 		</part>
 	</software>
@@ -14539,7 +14539,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="missile command (usa)" sha1="38179e41ea89de49e7c16908115b192a3258da90"/>
+				<disk name="missile command (usa)" sha1="1163e909b3a83421e7a7672c780c8f27ce4c1283"/>
 			</diskarea>
 		</part>
 	</software>
@@ -14651,7 +14651,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mortal kombat 3 (usa)" sha1="4d34f61a4555ab7ca047212b1101c89fb77f6cc5"/>
+				<disk name="mortal kombat 3 (usa)" sha1="60a313d72beefa8b19cb838623983ccc8b634c6c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -14668,7 +14668,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mortal kombat 4 (usa)" sha1="3eca48bcc496ea0d22648787d7e5e78c4930ce12"/>
+				<disk name="mortal kombat 4 (usa)" sha1="64b679e01f6984d689fa18aa5a51c6da0300d482"/>
 			</diskarea>
 		</part>
 	</software>
@@ -14685,7 +14685,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mortal kombat - special forces (usa)" sha1="e9919c72ccef3a0e8877fbe5f940e83d47bbfcda"/>
+				<disk name="mortal kombat - special forces (usa)" sha1="5e307fb758331fdee0a2d740c051bf6f98af3ae3"/>
 			</diskarea>
 		</part>
 	</software>
@@ -14731,7 +14731,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mortal kombat trilogy (usa) (v1.1)" sha1="9713a08222b02d12f503c2296d28c215e9b07e91"/>
+				<disk name="mortal kombat trilogy (usa) (v1.1)" sha1="bb7ce7deff58cd2573b531b2d3e69ea73ba93631"/>
 			</diskarea>
 		</part>
 	</software>
@@ -14964,7 +14964,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mobile light force (usa)" sha1="9316dad634ed08f3ad2cf3d242300973d8490632"/>
+				<disk name="mobile light force (usa)" sha1="f37e1d8593bb0714b16730ea341a592f27d1ddcb"/>
 			</diskarea>
 		</part>
 	</software>
@@ -14982,7 +14982,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mega man legends (usa)" sha1="594f3159b3a7b1392826197343059205732fed6b"/>
+				<disk name="mega man legends (usa)" sha1="77aab55210eac8354aa7c698ddf3476afccf356b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -15000,7 +15000,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mega man legends 2 (usa)" sha1="8d1592a30125ad666ec5a1f1eaaafc209f06df6e"/>
+				<disk name="mega man legends 2 (usa)" sha1="183034a51563b69164b5cfc7995af86e9c37fed9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -15208,7 +15208,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="monopoly (usa)" sha1="89d9a4e39b7532eb62cf18d37a44cd7758f19e22"/>
+				<disk name="monopoly (usa)" sha1="87b78ac3034312cc57dd94a86751064c93bf5ab2"/>
 			</diskarea>
 		</part>
 	</software>
@@ -15390,7 +15390,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="moto racer world tour (usa)" sha1="2dfef2f8f61302432df5711d8b7d2de87ee4b843"/>
+				<disk name="moto racer world tour (usa)" sha1="d75f1e4c85d6123cab908e484784a4dabe2ca5a4"/>
 			</diskarea>
 		</part>
 	</software>
@@ -15481,7 +15481,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="monster rancher battle card - episode ii (usa)" sha1="411ae96c5383b8f62d8e59893507f53218ef7667"/>
+				<disk name="monster rancher battle card - episode ii (usa)" sha1="91c00f8384f6f57c56f8e8b8b534b781a943b413"/>
 			</diskarea>
 		</part>
 	</software>
@@ -15626,7 +15626,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="marvel super heroes (usa)" sha1="2e43e577c2ed880442e54d0d4976ba1ef75ae206"/>
+				<disk name="marvel super heroes (usa)" sha1="81592bf673c4dbe866cf7daad06b6965f370563d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -15660,7 +15660,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="metal slug x (usa)" sha1="fcb065838e146998c3608b6d77d5a464cf1daea4"/>
+				<disk name="metal slug x (usa)" sha1="bc7953f15bd7b9d2154741b043d6c7dde73f444e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -15683,7 +15683,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ms. pac-man maze madness (usa) (v1.1)" sha1="45fe7713732f29b177c7abb3e5b41adbda1b4e38"/>
+				<disk name="ms. pac-man maze madness (usa) (v1.1)" sha1="321629602dd4368a3aad449c3e75125a59ff40c0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -15938,7 +15938,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="marvel vs. capcom - clash of super heroes (usa)" sha1="90e936d55824b807e9e956e62b00b086e680c9de"/>
+				<disk name="marvel vs. capcom - clash of super heroes (usa)" sha1="7d558cd1650bf313d8a1a5678b592180e2110f8c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -16043,7 +16043,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nagano winter olympics '98 (usa)" sha1="0b986f1fe8805c5198ac936bbd6c7095fd36f01f"/>
+				<disk name="nagano winter olympics '98 (usa)" sha1="96e0e908a22d53cd60e9a1862371a5902b61fcbd"/>
 			</diskarea>
 		</part>
 	</software>
@@ -16069,7 +16069,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="namco museum vol. 1 (usa) (v1.1)" sha1="50a37d173a660cfa9a05d2d07c7b25dc52c34755"/>
+				<disk name="namco museum vol. 1 (usa) (v1.1)" sha1="af19f724d9b57041b6ed0ab11f5977279ff85f3b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -16213,7 +16213,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nanotek warrior (usa)" sha1="21f9021c62593b759d565ef5309cce39713b6ba6"/>
+				<disk name="nanotek warrior (usa)" sha1="4badc333c2390a7ebcd32d12aa31ed6912b12119"/>
 			</diskarea>
 		</part>
 	</software>
@@ -16356,7 +16356,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nascar racing (usa)" sha1="3a109011c05a550085b4b2f86157b4fa29661042"/>
+				<disk name="nascar racing (usa)" sha1="21465648f2b7c6352650d13d48fb8740f57b451f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -16496,7 +16496,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nba basketball 2000 (usa)" sha1="9caf6613ada46e2f3ae32779e8727f05826b1c24"/>
+				<disk name="nba basketball 2000 (usa)" sha1="5107f34115b589a0894d5038849b27c9f1cdc8df"/>
 			</diskarea>
 		</part>
 	</software>
@@ -16594,7 +16594,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nba jam - tournament edition (usa)" sha1="840ac0e924c16224739bb6439a91952bb0fada12"/>
+				<disk name="nba jam - tournament edition (usa)" sha1="370523bd8a770b55a3a38be5b195ad9397f911e2"/>
 			</diskarea>
 		</part>
 	</software>
@@ -17363,7 +17363,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nightmare creatures (usa)" sha1="f2389e82bc41b3afc1ad12b43795e350b717f7c1"/>
+				<disk name="nightmare creatures (usa)" sha1="8592a07f87df446601902a137d69075dde4cf206"/>
 			</diskarea>
 		</part>
 	</software>
@@ -17631,7 +17631,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nfl quarterback club 97 (usa)" sha1="580836aa0eaac13a581a98c67df8c23017b13c5a"/>
+				<disk name="nfl quarterback club 97 (usa)" sha1="bd689204eba515256d945f45b295bc23541b5480"/>
 			</diskarea>
 		</part>
 	</software>
@@ -17701,7 +17701,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="need for speed ii (usa)" sha1="4771b65e81100ac28307b22f719cda2b7709df7c"/>
+				<disk name="need for speed ii (usa)" sha1="54d978f44c97fe927ce5a28d673a34600e1d619d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -17735,7 +17735,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="need for speed - high stakes (usa)" sha1="be8caf7a7eaa4e9999e78c3b8c84c9985e663fb5"/>
+				<disk name="need for speed - high stakes (usa)" sha1="7f231d785984b12ef6d67c77ffc91d6a60d54e0b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -17766,7 +17766,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="need for speed - porsche unleashed (usa)" sha1="3a5ba01e5c10a6e55945af093531119cd8a08b33"/>
+				<disk name="need for speed - porsche unleashed (usa)" sha1="6efeccdc5918c8d131afdfc53783ae5380c1fcc2"/>
 			</diskarea>
 		</part>
 	</software>
@@ -17852,7 +17852,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nhl open ice - 2 on 2 challenge (usa)" sha1="ba6fa14d4337bd030c681f6be920294b35a053fb"/>
+				<disk name="nhl open ice - 2 on 2 challenge (usa)" sha1="ba639897d02c043ae0db9369402930f8d73f948f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -17877,7 +17877,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nhl 97 (usa)" sha1="5d488298c1e49531cd6e329fd51052e67c750550"/>
+				<disk name="nhl 97 (usa)" sha1="f2e1a333096d48d58ee5a4f47b71264d0648564f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -17929,7 +17929,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nhl breakaway 98 (usa)" sha1="f241ed941b2fb1b7fe78cf842f779f0e1981746c"/>
+				<disk name="nhl breakaway 98 (usa)" sha1="ca21c54f8ed8a10913690a8b20ffe0fe98c144a0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -17947,7 +17947,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nhl championship 2000 (usa)" sha1="e279abecb164f2cab5dcc2d430a0575315d91471"/>
+				<disk name="nhl championship 2000 (usa)" sha1="08343902480229df1175ff93c8776f49c172e0df"/>
 			</diskarea>
 		</part>
 	</software>
@@ -18218,12 +18218,12 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom1" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="novastorm (usa) (disc 1)" sha1="b03235765aae4d84497f9c885d980139ca8e4410"/>
+				<disk name="novastorm (usa) (disc 1)" sha1="56b2709a371ddf8dc249d95453e9f80795b65333"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="novastorm (usa) (disc 2)" sha1="67221f49410f43cbbb6b55f706a5b5703cd4a670"/>
+				<disk name="novastorm (usa) (disc 2)" sha1="73329a95c40ad19e5a8e795a557de8a0d7b5460e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -18268,7 +18268,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="next tetris, the (usa)" sha1="e4c71550fe89b90771c1aea8c276713eed06ca69"/>
+				<disk name="next tetris, the (usa)" sha1="7c9c36b4342b110eb0877f219f17adda181d0379"/>
 			</diskarea>
 		</part>
 	</software>
@@ -18286,7 +18286,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="o.d.t. (usa)" sha1="ee356e30a34462ce35f15c7a1775fa2c64d5ab70"/>
+				<disk name="o.d.t. (usa)" sha1="10597fb61fc7b614fb1c5a6665114a0b4fab45d6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -18386,7 +18386,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="olympic summer games (usa)" sha1="e0d8b762e01314cd2029921b7e4b53cbef438dc1"/>
+				<disk name="olympic summer games (usa)" sha1="d5bdc9a83a2bda1475adb3312ccf30ee5593a6e3"/>
 			</diskarea>
 		</part>
 	</software>
@@ -18497,7 +18497,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="pac-man world (usa)" sha1="18dd91e41a5a39b6185d1f1ecdbc45d711bbb074"/>
+				<disk name="pac-man world (usa)" sha1="c17bfd790a0b71a711ed64b8ea91469be6569479"/>
 			</diskarea>
 		</part>
 	</software>
@@ -18531,7 +18531,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="pandemonium (usa)" sha1="40c7499febe8ccf3d62e81bac6876c128d845bca"/>
+				<disk name="pandemonium (usa)" sha1="01a0f5957cffc9c59d3b8196827e64116eaeea98"/>
 			</diskarea>
 		</part>
 	</software>
@@ -18548,7 +18548,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="parappa the rapper (usa) (en,fr,de,es,it)" sha1="91a64f0ecf079964d5d8df0939157e8b53a9a2ff"/>
+				<disk name="parappa the rapper (usa) (en,fr,de,es,it)" sha1="a0228849bf77c2b59830bfc2c5a62cc88a8bb984"/>
 			</diskarea>
 		</part>
 	</software>
@@ -18734,7 +18734,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="pocket fighter (usa)" sha1="d859aefd472ebf7446e966ddcd6f003b8875d557"/>
+				<disk name="pocket fighter (usa)" sha1="e4709a85ed8e1b461295fa0a8585636fc44e2cca"/>
 			</diskarea>
 		</part>
 	</software>
@@ -18802,7 +18802,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="pga tour 98 (usa)" sha1="8e6b6e5c474d11f08e738ea128f0aeaded9b0a09"/>
+				<disk name="pga tour 98 (usa)" sha1="4868ce46755c35c26962ecf50e36429fef1d831c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -18819,7 +18819,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tiger woods 99 pga tour golf (usa) (v1.1)" sha1="7292af853c21299fe5b145e59d7395db0bc307ca"/>
+				<disk name="tiger woods 99 pga tour golf (usa) (v1.1)" sha1="aecc7ccfad0de21e55648a08a8da404e38704b3d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -18870,7 +18870,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="philosoma (usa)" sha1="8ade448fec4d5dc2843067b584d0bc5031d61f1b"/>
+				<disk name="philosoma (usa)" sha1="2a8f5a57b6cb60179487eec66133f77e5e068b4d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -18927,7 +18927,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="pink panther - pinkadelic pursuit (usa)" sha1="d7244b9c1765858cacfdde9fdbcd9085c914599c"/>
+				<disk name="pink panther - pinkadelic pursuit (usa)" sha1="a90123d9053f7f5adfa6ef957f43bb4b06687a12"/>
 			</diskarea>
 		</part>
 	</software>
@@ -18944,7 +18944,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="pinobee (usa)" sha1="7c64c4dc449df84ef7af7a77342d8e89388ba10a"/>
+				<disk name="pinobee (usa)" sha1="6f366d9bea7d7f8d69da6ab6224e2eda766687c5"/>
 			</diskarea>
 		</part>
 	</software>
@@ -19028,7 +19028,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="pitball (usa)" sha1="9d537ff80666fe7aa88ce91d0c32ac4ddd8340d1"/>
+				<disk name="pitball (usa)" sha1="6fe84ef777ca355d118e25b45f5f54f973a5cda3"/>
 			</diskarea>
 		</part>
 	</software>
@@ -19045,7 +19045,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="pitfall 3d - beyond the jungle (usa)" sha1="9e2d24b34db59a19465087cd4888612d17114606"/>
+				<disk name="pitfall 3d - beyond the jungle (usa)" sha1="2ce1320196672709ae3719bfab10f183b306042b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -19468,7 +19468,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="pro pinball - big race usa (usa)" sha1="42816c090226ef0d7942cfae336845b7120bf365"/>
+				<disk name="pro pinball - big race usa (usa)" sha1="082793fafe243b5d65882f9403a7b2bf10f44040"/>
 			</diskarea>
 		</part>
 	</software>
@@ -19506,7 +19506,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="pro pinball - fantastic journey (usa)" sha1="b408150fb52b95e1e8eb85e2c6a609d0d11f0812"/>
+				<disk name="pro pinball - fantastic journey (usa)" sha1="83f8747f57ed1139eae35fcd1e531c812a5fb6f7"/>
 			</diskarea>
 		</part>
 	</software>
@@ -19556,7 +19556,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="pro pinball - timeshock (usa)" sha1="b167931677dc208d460f5a4ab4adf0efb8d82cfb"/>
+				<disk name="pro pinball - timeshock (usa)" sha1="ded80f6e94df5dfb0e04988078ad9aa9ab3603b8"/>
 			</diskarea>
 		</part>
 	</software>
@@ -19688,7 +19688,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="professional underground league of pain (usa)" sha1="383514e0d2311965243a141c5a5f18f23bb12ff4"/>
+				<disk name="professional underground league of pain (usa)" sha1="8f1933b0221455b27479ebe00d218ea865cb51a2"/>
 			</diskarea>
 		</part>
 	</software>
@@ -19893,7 +19893,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="point blank 3 (usa)" sha1="0c45fddde3c36091881c1302ecd39175eef88af3"/>
+				<disk name="point blank 3 (usa)" sha1="2817ab2414f3867454006f095f564d443994d3f0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -20017,7 +20017,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="power shovel (usa)" sha1="b6dc87df1c42c65ab3785c8cd5158b128d71fcd3"/>
+				<disk name="power shovel (usa)" sha1="13936d1357e23408fb584e4b2f8f2a258fa04c15"/>
 			</diskarea>
 		</part>
 	</software>
@@ -20034,7 +20034,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="q-bert (usa)" sha1="133c93ffd5af5241212ba5cad24172fa4f9cfee8"/>
+				<disk name="q-bert (usa)" sha1="fe1441d93e56657c6bc83d4fb036e85e241f606f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -20069,7 +20069,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="quake ii (usa)" sha1="42fd8eafadd029bc27887c9852a4aeb989283830"/>
+				<disk name="quake ii (usa)" sha1="5009e8ea4cdb4c24acf19db8d3190cf25c316d06"/>
 			</diskarea>
 		</part>
 	</software>
@@ -20191,7 +20191,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="raiden project, the (usa)" sha1="cb1e4fae25d42e70fcb3eec5e1c1afcbdc5c2af3"/>
+				<disk name="raiden project, the (usa)" sha1="66d3217fe26ce9aa08023c20b098c365ffa90b0e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -20287,7 +20287,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tom clancy's rainbow six (usa)" sha1="fe52e58df1cfffbae7bb25fa603662b87b84170c"/>
+				<disk name="tom clancy's rainbow six (usa)" sha1="2d30f33cd7c770bffa4b923ed8b5dbb0745dadf3"/>
 			</diskarea>
 		</part>
 	</software>
@@ -20415,7 +20415,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="rascal (usa)" sha1="3c702834316424e1349c36c9757c56c9b758e9eb"/>
+				<disk name="rascal (usa)" sha1="8544b494fa90845e5fd25d3b4f873385e8609262"/>
 			</diskarea>
 		</part>
 	</software>
@@ -20534,7 +20534,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="rayman (usa)" sha1="bb97094982d27a44815198a57c7aedcaaab74e42"/>
+				<disk name="rayman (usa)" sha1="07f8272430ee6ec9d0707fef1667f0e4ebb5b23b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -20552,7 +20552,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="rayman 2 - the great escape (usa) (en,fr,es)" sha1="0060a539f78fdfe27a9e15b25c50bdb0a8957df7"/>
+				<disk name="rayman 2 - the great escape (usa) (en,fr,es)" sha1="580332fd7023842653c212cabd99421ad89dcb8c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -20597,7 +20597,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="rayman rush (usa)" sha1="d0cf85a4b454baaf9eb3ea3c9234fda9fcda05f0"/>
+				<disk name="rayman rush (usa)" sha1="dcf04b288d2c52ee0afb3068a393fdc6c28fd85c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -20614,7 +20614,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="raystorm (usa)" sha1="c24a45839799dc4292e78faf79207e0e0bff6d37"/>
+				<disk name="raystorm (usa)" sha1="a1105f7e11b421df63d5c0586b1fd58a63077fd7"/>
 			</diskarea>
 		</part>
 	</software>
@@ -20674,7 +20674,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="rc de go (usa)" sha1="6d5bd7305164593f1f1a085e3e517965a3e557a6"/>
+				<disk name="rc de go (usa)" sha1="d30a3a92467d1b32f969a63fa55567bdcc19fd12"/>
 			</diskarea>
 		</part>
 	</software>
@@ -20743,7 +20743,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="rc revenge (usa)" sha1="a0deb3cb7f06968d04b287dcea519bb5d2397165"/>
+				<disk name="rc revenge (usa)" sha1="1083fc28192252a2838db6dd46a576e53cfbf307"/>
 			</diskarea>
 		</part>
 	</software>
@@ -20991,12 +20991,12 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom1" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="resident evil 2 (usa) (disc 1)" sha1="7322b79e6d4d539d115388b0ce367af5f3df2a69"/>
+				<disk name="resident evil 2 (usa) (disc 1)" sha1="c0365d8e731a288fe91e48d530d613277984a7be"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="resident evil 2 (usa) (disc 2)" sha1="646c4f732a16149a98756d27211ee4190c50fa3b"/>
+				<disk name="resident evil 2 (usa) (disc 2)" sha1="d31bc0f576bdde73fb5e5300645b4a88df01309a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -21017,12 +21017,12 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom1" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="resident evil 2 - dual shock ver. (usa) (disc 1) (leon)" sha1="163470a70ad2bf13a668665547dde90968efab8c"/>
+				<disk name="resident evil 2 - dual shock ver. (usa) (disc 1) (leon)" sha1="38c5a6c7c5cc25c4838f4b5e80f9fb0eb884ae55"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="resident evil 2 - dual shock ver. (usa) (disc 2) (claire)" sha1="b84c429ddb5cbe366cc747e0a79f7f6e70a88f34"/>
+				<disk name="resident evil 2 - dual shock ver. (usa) (disc 2) (claire)" sha1="9c7a90f0566982068c69ae581b041ba5dde3baed"/>
 			</diskarea>
 		</part>
 	</software>
@@ -21039,7 +21039,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="resident evil 3 - nemesis (usa)" sha1="297ccfe24c4935f0869d6ba89d0e46fd9887773a"/>
+				<disk name="resident evil 3 - nemesis (usa)" sha1="e5c6cf477eb7bc69ea59ab1f464ef97446813548"/>
 			</diskarea>
 		</part>
 	</software>
@@ -21074,7 +21074,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="resident evil - director's cut - dual shock ver. (usa)" sha1="bb90fb489cfb2182541d725b30c09621f32676e8"/>
+				<disk name="resident evil - director's cut - dual shock ver. (usa)" sha1="9ecd4c66e3ccd142a95a35b000e05546fab048b8"/>
 			</diskarea>
 		</part>
 	</software>
@@ -21091,7 +21091,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="resident evil - survivor (usa)" sha1="b5fa1bfc4a8932c9828eb30312daa9236fdd4bf5"/>
+				<disk name="resident evil - survivor (usa)" sha1="2a9eb069ef468dada08eb4415117289efaa491db"/>
 			</diskarea>
 		</part>
 	</software>
@@ -21110,7 +21110,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="re-volt (usa)" sha1="70dea533f66ef91de0e37078eaed57d24f41226c"/>
+				<disk name="re-volt (usa)" sha1="76ff6ff0c3692626268e270a6707eb58a3786c26"/>
 			</diskarea>
 		</part>
 	</software>
@@ -21191,7 +21191,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ridge racer (usa)" sha1="d8db80f9bea0310181454001d9305dbbd3123a55"/>
+				<disk name="ridge racer (usa)" sha1="8ac66ea834865a693bb2e437b8aedb9cd1256649"/>
 			</diskarea>
 		</part>
 	</software>
@@ -21334,7 +21334,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="road rash (usa)" sha1="89336b0c8e5f90ce9ad5d9e6405a9ea81a5a99a7"/>
+				<disk name="road rash (usa)" sha1="0ad49eb687923de7363db773d57fad78bc5ceb31"/>
 			</diskarea>
 		</part>
 	</software>
@@ -21359,7 +21359,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="roadsters (usa)" sha1="b5405e343a91f3e9522fe0c52efd5fe84398efd1"/>
+				<disk name="roadsters (usa)" sha1="870193bf83cb6ab12ca9c07bc19a9306d35f48ca"/>
 			</diskarea>
 		</part>
 	</software>
@@ -21389,7 +21389,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="rock 'em sock 'em robots arena (usa)" sha1="a29a309b78a1c04e83a4837fff290d00eb390873"/>
+				<disk name="rock 'em sock 'em robots arena (usa)" sha1="0be803228de8c56dc37538af0434232081e4ddb1"/>
 			</diskarea>
 		</part>
 	</software>
@@ -21519,7 +21519,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="rollcage stage ii (usa)" sha1="fdc91b071c77f3b374417c9413dfc88ab7d4da78"/>
+				<disk name="rollcage stage ii (usa)" sha1="508f6e5bf1321077b0936c7f9d25fc4c024c2f84"/>
 			</diskarea>
 		</part>
 	</software>
@@ -21551,7 +21551,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="rollcage (usa)" sha1="0a00e8466df9b31dbbbea0cec63254adc28eef65"/>
+				<disk name="rollcage (usa)" sha1="7799fdd199249cd3ada436656e0dc583845a8b9a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -21668,7 +21668,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom1" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="r4 - ridge racer type 4 (usa)" sha1="5bf4db632745058203d3e622c559aadc9728c86e"/>
+				<disk name="r4 - ridge racer type 4 (usa)" sha1="f637a55052d40c054ea10b724e639658ab334617"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
@@ -21691,7 +21691,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="road rash 3d (usa)" sha1="6df63908f9c58acb6eacbe3ab86f1163a4724cd9"/>
+				<disk name="road rash 3d (usa)" sha1="34494c7346d55449a601ee2ebaffb497a0ef1061"/>
 			</diskarea>
 		</part>
 	</software>
@@ -21744,7 +21744,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ridge racer revolution (usa)" sha1="567ed38059cb168a998ac535d592c283df3cdd48"/>
+				<disk name="ridge racer revolution (usa)" sha1="a5a87bf9383964e427e0785c84ee8a706e6e717f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -21865,7 +21865,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="r-type delta (usa)" sha1="fd3cb15de17a3a917edd0edbc8e8d550cedbdf7b"/>
+				<disk name="r-type delta (usa)" sha1="aa58dfc96d015dae777f5c4bdef088bfcec50a64"/>
 			</diskarea>
 		</part>
 	</software>
@@ -22069,7 +22069,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="rush hour (usa)" sha1="3a0d7c90676561f96c293055b92539f0a99503db"/>
+				<disk name="rush hour (usa)" sha1="cea81724f4684b8ef4d130a03d9c07c530bce5ee"/>
 			</diskarea>
 		</part>
 	</software>
@@ -22092,7 +22092,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<part name="cdrom1" interface="psx_cdrom">
 			<feature name="part_id" value="Arcade Disc"/>
 			<diskarea name="cdrom">
-				<disk name="rival schools - united by fate (usa) (disc 1) (arcade disc)" sha1="b22ced7cd2756472c021643bea839e88e24a0df2"/>
+				<disk name="rival schools - united by fate (usa) (disc 1) (arcade disc)" sha1="fb05951b30b08366d3f0f14370a98569bdfa4bdf"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
@@ -22132,7 +22132,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="strikers 1945 (usa)" sha1="208b4b5701241daec9800bba33aa387576c7aa67"/>
+				<disk name="strikers 1945 (usa)" sha1="c46e5e4327047045802c714bb7e47777f4aa47f5"/>
 			</diskarea>
 		</part>
 	</software>
@@ -22344,7 +22344,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="samurai shodown iii - blades of blood (usa)" sha1="ec39b0de944008cfb464b339ffb219682890e7a6"/>
+				<disk name="samurai shodown iii - blades of blood (usa)" sha1="e4621a82a82f93253c29a7536e3ffa5030bbaeaf"/>
 			</diskarea>
 		</part>
 	</software>
@@ -22361,7 +22361,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="samurai shodown - warriors rage (usa)" sha1="5c406bc0e7e9306edd0a801864f43bb66e038d6d"/>
+				<disk name="samurai shodown - warriors rage (usa)" sha1="9ac2ddb993c8810740fd08ce4d4580ea231057b0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -22395,7 +22395,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="super bubble pop (usa)" sha1="86f5077178ba9ac862da42697a592c921a9f5b9a"/>
+				<disk name="super bubble pop (usa)" sha1="82185ff124636de2447919e348600b8a1079e36d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -22484,7 +22484,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="scrabble (usa)" sha1="3f7d0a812be4e9ce6312f1adb39163ff641c0dfd"/>
+				<disk name="scrabble (usa)" sha1="4030820874124b74fc1535c6a39954c80d08008d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -22556,7 +22556,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="sentient (usa)" sha1="28e6a7d9f9de0247f3cbc9688de335f722711361"/>
+				<disk name="sentient (usa)" sha1="d140a7e2fe184ed72ea07fb881a500cffbc17a11"/>
 			</diskarea>
 		</part>
 	</software>
@@ -22640,7 +22640,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="street fighter alpha - warriors' dreams (usa)" sha1="ae3168c4f6097e6fa7083411f76ba94d95d2037d"/>
+				<disk name="street fighter alpha - warriors' dreams (usa)" sha1="711afd8cc92d07f4d10462192cf48d202d9ab3d7"/>
 			</diskarea>
 		</part>
 	</software>
@@ -22658,7 +22658,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="street fighter alpha 2 (usa)" sha1="0bf01b34786c097489bcdaae0c84f07cc4a3ccc2"/>
+				<disk name="street fighter alpha 2 (usa)" sha1="a1c39448d2013c764eba9596e7857208ccb3ce27"/>
 			</diskarea>
 		</part>
 	</software>
@@ -22676,7 +22676,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="street fighter alpha 3 (usa)" sha1="0f9efd002a0653925734af77d4d1fd38a0bed869"/>
+				<disk name="street fighter alpha 3 (usa)" sha1="950830b7b0ad50f58c300506d4b0484dd09e946c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -22771,13 +22771,13 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<part name="cdrom1" interface="psx_cdrom">
 			<feature name="part_id" value="Super Street Fighter II &amp; Super Street Fighter II Turbo"/>
 			<diskarea name="cdrom">
-				<disk name="street fighter collection (usa) (disc 1) (v1.1)" sha1="9eaab12a032b7e9d6a05f342752f1de8fe4d27b3"/>
+				<disk name="street fighter collection (usa) (disc 1) (v1.1)" sha1="15099186368611834f61ce1471b626e2b6071b2e"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
 			<feature name="part_id" value="Super Street Fighter Alpha 2 Gold"/>
 			<diskarea name="cdrom">
-				<disk name="street fighter collection (usa) (disc 2) (v1.1)" sha1="b42293238b6b2dd5ebc9dc990bdc08ab6e6ec8c4"/>
+				<disk name="street fighter collection (usa) (disc 2) (v1.1)" sha1="56530bdbc1a3547a51695486be9865434a56a0fb"/>
 			</diskarea>
 		</part>
 	</software>
@@ -22899,7 +22899,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="street fighter collection 2 (usa)" sha1="56e122837fda765c8515dbd738faa316670538ed"/>
+				<disk name="street fighter collection 2 (usa)" sha1="0e64662c3c641d193fed1bffebb5a5a9e35e3b40"/>
 			</diskarea>
 		</part>
 	</software>
@@ -22916,7 +22916,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="street fighter ex2 plus (usa)" sha1="2a4e2e8bd97b6b647068ba895d36527ef5432899"/>
+				<disk name="street fighter ex2 plus (usa)" sha1="7412bc70b906f05e50994ff80899dfb18073771b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -22933,7 +22933,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="street fighter ex plus alpha (usa)" sha1="383b2a669ece1407d41cf2386e943e6257eaea57"/>
+				<disk name="street fighter ex plus alpha (usa)" sha1="9d9f2d5ad38ad742abb7c7ea3b80e03068a6084b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -22979,7 +22979,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="street fighter - the movie (usa)" sha1="086d63873dea95a64c706202c1eb998f8c6904b7"/>
+				<disk name="street fighter - the movie (usa)" sha1="3a96da37e19cc988aff750d03705cf2f0457ad3a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -23036,7 +23036,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="shadow man (usa)" sha1="485f80a243bff3a4bafa6015d931b3ff6bf78be8"/>
+				<disk name="shadow man (usa)" sha1="70718577aa4bb03dd1006c33094837859f6dee19"/>
 			</diskarea>
 		</part>
 	</software>
@@ -23325,7 +23325,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="silent hill (usa)" sha1="ea7a7503593012e9e726c4549c193f956510ffee"/>
+				<disk name="silent hill (usa)" sha1="fd460847a57795d2368b6b1a2784fa077cffb37f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -23421,7 +23421,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="simpsons wrestling, the (usa)" sha1="c4af5e47f91ab14aab2359a3a4826bd2c88342ec"/>
+				<disk name="simpsons wrestling, the (usa)" sha1="2901283291baa7f1e3e3d9bdc4adce514bd4215d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -23523,7 +23523,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="slam 'n jam '96 featuring magic &amp; kareem (usa)" sha1="d026e97d9bb15470718df2151bba33208ff9fe07"/>
+				<disk name="slam 'n jam '96 featuring magic &amp; kareem (usa)" sha1="1a91ab0f827b68509db476ed24314412de38e05f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -23601,7 +23601,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="slots (usa)" sha1="43b08f17ed50f7ca259f33903012b1609e140c62"/>
+				<disk name="slots (usa)" sha1="b93ee66bcb99189a3cc594736f94902bdd4233e0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -23715,7 +23715,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="smurfs, the (usa) (en,fr,es)" sha1="9a12b993132ec4bb762e7949b1451b851bbdcc3f"/>
+				<disk name="smurfs, the (usa) (en,fr,es)" sha1="c2b14925b21eb5fb34a78ec885249950ff535239"/>
 			</diskarea>
 		</part>
 	</software>
@@ -23758,7 +23758,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="snowboarding (usa)" sha1="15dcedb3041bc9fea57aabad56ee0b9188cc5f50"/>
+				<disk name="snowboarding (usa)" sha1="0a9b080ab657b422d6214939b3e7f83a77c7f860"/>
 			</diskarea>
 		</part>
 	</software>
@@ -23855,7 +23855,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="castlevania - symphony of the night (usa)" sha1="37b2cdcaa49bf773406a6d886a2d5ba8f835cf76"/>
+				<disk name="castlevania - symphony of the night (usa)" sha1="5239b5c6c2f2da5f1d9356670fa614f31e4e3075"/>
 			</diskarea>
 		</part>
 	</software>
@@ -23872,7 +23872,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="soul blade (usa) (v1.1)" sha1="4c8f306c713b7f1820a758f0e02e6410aaa57bed"/>
+				<disk name="soul blade (usa) (v1.1)" sha1="a66be2ea6ade0326bb40e75ffd949fef0e93d1d5"/>
 			</diskarea>
 		</part>
 	</software>
@@ -23924,7 +23924,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="south park (usa)" sha1="283070618ece8b9692baabc8f47735df1a779984"/>
+				<disk name="south park (usa)" sha1="cfa1847f45a5435157506def8e8bc437420cf745"/>
 			</diskarea>
 		</part>
 	</software>
@@ -23942,7 +23942,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="space invaders (usa)" sha1="aa41f19e38d7ffdf451b587433811bc6b4cb3857"/>
+				<disk name="space invaders (usa)" sha1="b3aa1b3e2f509e44d5f840cc2d9fa2aa8bceba82"/>
 			</diskarea>
 		</part>
 	</software>
@@ -23960,7 +23960,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="space jam (usa)" sha1="398d676f0aef38c079c53214bd8e9ff603478e62"/>
+				<disk name="space jam (usa)" sha1="24934636c63dbb820e6716e60aaecc283486636d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -23977,7 +23977,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="space shot (usa)" sha1="ab678f726c6841c2d657820a256f97fd59ed1427"/>
+				<disk name="space shot (usa)" sha1="79446aef0301e34210284080ad3208bdfb6cd265"/>
 			</diskarea>
 		</part>
 	</software>
@@ -24069,7 +24069,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="south park rally (usa)" sha1="dd9351c50f964035ad4d0d932d98970dcb2ba176"/>
+				<disk name="south park rally (usa)" sha1="ca945cf19c22bebd043ec005bb90e8f765b67c04"/>
 			</diskarea>
 		</part>
 	</software>
@@ -24303,7 +24303,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="super puzzle fighter ii turbo (usa)" sha1="23fdf03ffd002de06b2b6366a93d552c00798d45"/>
+				<disk name="super puzzle fighter ii turbo (usa)" sha1="8e42b8bcdfc295bd7cd90bf554f4f30efb36129a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -24338,7 +24338,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="spider - the video game (usa)" sha1="4f04f45cec47033616a45b0acc7550654030fff0"/>
+				<disk name="spider - the video game (usa)" sha1="e332ae9c41bf4385964db272c7ec003e21155421"/>
 			</diskarea>
 		</part>
 	</software>
@@ -24355,7 +24355,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="spider-man (usa)" sha1="66c09444240ddf96f194d2d2e63b42a2af77bc37"/>
+				<disk name="spider-man (usa)" sha1="196e5fb8bc1a96db65107abd338593198a207fae"/>
 			</diskarea>
 		</part>
 	</software>
@@ -24483,7 +24483,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="spyro the dragon (usa)" sha1="ab729c36603444bfde190542f0b42e9262eebeaa"/>
+				<disk name="spyro the dragon (usa)" sha1="1a861139d485f7fcfc3cfd839a4db5bdd95267f9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -24500,7 +24500,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="spyro 2 - ripto's rage (usa)" sha1="4df448b9cfe122821ac8f812f76891209f31d4fe"/>
+				<disk name="spyro 2 - ripto's rage (usa)" sha1="b31b6dfd9d16cb90b6cfcd9a5ea71663a4132d26"/>
 			</diskarea>
 		</part>
 	</software>
@@ -24517,7 +24517,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="spyro - year of the dragon (usa) (v1.1)" sha1="85fa6a1688326cb194d3423f3ddd4381712f2065"/>
+				<disk name="spyro - year of the dragon (usa) (v1.1)" sha1="ca1593703cb4c7a746f03b7f29ca9e788631de3a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -24564,7 +24564,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="street racer (usa)" sha1="67fdc6df29b2ab81d2bcc84d521af9c577b57f38"/>
+				<disk name="street racer (usa)" sha1="3653b9818f7aa8dc2c1f94fe0dd9530816de2949"/>
 			</diskarea>
 		</part>
 	</software>
@@ -24628,7 +24628,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="sports superbike 2 (usa)" sha1="3c3ff1484bd50d2d13e2ece3a86ab63995529647"/>
+				<disk name="sports superbike 2 (usa)" sha1="a119ec81e05090feab67521b45e107a4cb8c0620"/>
 			</diskarea>
 		</part>
 	</software>
@@ -24765,7 +24765,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="star gladiator - episode i - final crusade (usa)" sha1="ef090bb9a672649d6088c960405c3514a2e376c1"/>
+				<disk name="star gladiator - episode i - final crusade (usa)" sha1="cd617da2869cb015112634c449433c10c002933b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -24901,7 +24901,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="streak hoverboard racing (usa)" sha1="ca792dbf94f57729390973a09f7fb5900932d34c"/>
+				<disk name="streak hoverboard racing (usa)" sha1="438af526e14d22d4d191ba48b8ff4ad3b3557a3c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -24937,7 +24937,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="strider (usa)" sha1="fa9e3f112aa7ecd854edb5ab2200e476c807453f"/>
+				<disk name="strider (usa)" sha1="250c17d0565edb1fede48aff809b3a80f5020f34"/>
 			</diskarea>
 		</part>
 	</software>
@@ -24956,7 +24956,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="strider 2 (usa)" sha1="5bae061e35040cae34914d40e4e51eb2b515f736"/>
+				<disk name="strider 2 (usa)" sha1="9d36dbde94c02d9209139ebea7497ad62a1ce969"/>
 			</diskarea>
 		</part>
 	</software>
@@ -24975,7 +24975,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="striker 96 (usa)" sha1="b405a370a8f800edd0d5d1d6a5e25b3826132e5b"/>
+				<disk name="striker 96 (usa)" sha1="2b43bad6cdc0b3f754b41683c0b7c17f32ddd895"/>
 			</diskarea>
 		</part>
 	</software>
@@ -25102,7 +25102,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mortal kombat mythologies - sub-zero (usa)" sha1="d67cc625011a58b0abccbf864bcd7d2027d1bea7"/>
+				<disk name="mortal kombat mythologies - sub-zero (usa)" sha1="f1e1d9e2f54ba89b3da6a94a01c326dc20ade137"/>
 			</diskarea>
 		</part>
 	</software>
@@ -25119,7 +25119,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="suikoden (usa) (v1.1)" sha1="55eeefa1a0afd329e85747d4afe6b038793c9919"/>
+				<disk name="suikoden (usa) (v1.1)" sha1="cdeb30e8cf297186a84eacfa523ce8204f5f604e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -25136,7 +25136,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="suikoden (usa) (v1.0)" sha1="a969814a8fe8d2c7c7033192fc490045b3c1485d"/>
+				<disk name="suikoden (usa) (v1.0)" sha1="f949b37c1109d8650d8c4dcdc062c0d8e9c29440"/>
 			</diskarea>
 		</part>
 	</software>
@@ -25153,7 +25153,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="suikoden ii (usa)" sha1="a47dbce42efb9dc0e2f2d0835d3534774e33dd6d"/>
+				<disk name="suikoden ii (usa)" sha1="37bd1800d6afdfb49d7fa5d33a361a4d9ab5925d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -25214,7 +25214,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="swagman (usa)" sha1="ca6e3eda048cfc1135d794db0636b0cae9884684"/>
+				<disk name="swagman (usa)" sha1="cc4169335d7ba136153f77bda5a41292fe1b5003"/>
 			</diskarea>
 		</part>
 	</software>
@@ -25276,7 +25276,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="star wars - episode i - the phantom menace (usa)" sha1="8ab36c9e46e6bec0e27c611c2890fbfbeb0eeb31"/>
+				<disk name="star wars - episode i - the phantom menace (usa)" sha1="3b5e805896f8222b563e3ebc9c2ffd903a1c9894"/>
 			</diskarea>
 		</part>
 	</software>
@@ -25536,7 +25536,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tail concerto (usa)" sha1="b3adcc6c634b5a8c7a24f9bcc649bba7d4a00848"/>
+				<disk name="tail concerto (usa)" sha1="e06ac367c9f1b2d408caa6c6748c60fdf892c765"/>
 			</diskarea>
 		</part>
 	</software>
@@ -25598,7 +25598,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="disney's tarzan (usa) (v1.1)" sha1="f2779268217aaacb3aa0fa18ea92e154a0d3e47a"/>
+				<disk name="disney's tarzan (usa) (v1.1)" sha1="cbc0f2b3cdddc73356662a5b5b45a037b1e23cde"/>
 			</diskarea>
 		</part>
 	</software>
@@ -25616,7 +25616,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="disney's tarzan (usa) (v1.0)" sha1="a9f0b4f770dbe12dfece2822f525852e0bc1f0b1"/>
+				<disk name="disney's tarzan (usa) (v1.0)" sha1="c4ddc339825d8398f9efaa1cc1962708be6faf87"/>
 			</diskarea>
 		</part>
 	</software>
@@ -25766,7 +25766,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="team buddies (usa)" sha1="3f155d0e980d4ed84630b279da94af78cb339563"/>
+				<disk name="team buddies (usa)" sha1="0803b39feabeecdb224f54e4e1e8f59e3ca49f64"/>
 			</diskarea>
 		</part>
 	</software>
@@ -25919,7 +25919,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tekken (usa)" sha1="b2d2c32c3ab3c597b7017c1d1f7cb7d69496ba17"/>
+				<disk name="tekken (usa)" sha1="cb5cd46bf8c7d5e1d34d4aa25ec54ce9a4632e46"/>
 			</diskarea>
 		</part>
 	</software>
@@ -25938,7 +25938,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tekken 2 (usa) (v1.1)" sha1="ce046321efa2d377c0b241f725fd6f9fbac660ea"/>
+				<disk name="tekken 2 (usa) (v1.1)" sha1="2d3c614e5278f9189b6fdc803fe1b942ec97c442"/>
 			</diskarea>
 		</part>
 	</software>
@@ -25976,7 +25976,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tekken 3 (usa)" sha1="e1537fb7c60ee4e39743847ffadfa33c94912652"/>
+				<disk name="tekken 3 (usa)" sha1="319ec7377eb0c3ef0b6049e440937d26ae743290"/>
 			</diskarea>
 		</part>
 	</software>
@@ -26082,7 +26082,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tennis (usa)" sha1="000a5de8072f21f168f8663429673cd33acea5bf"/>
+				<disk name="tennis (usa)" sha1="213ea8a9a04f09cfb0154b1f3807e743b1b7abbc"/>
 			</diskarea>
 		</part>
 	</software>
@@ -26222,7 +26222,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tetris plus (usa)" sha1="d8d67a9c6eb5246fdc2e5ebb9233a429bbbd9b4f"/>
+				<disk name="tetris plus (usa)" sha1="26f26fc78fb2c507c9a72fdcdc2ed1910dcbc039"/>
 			</diskarea>
 		</part>
 	</software>
@@ -26239,7 +26239,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="thunder force v - perfect system (usa)" sha1="0c01c35c0b08f87763277581abd19d2f082b6c29"/>
+				<disk name="thunder force v - perfect system (usa)" sha1="17658f39053eaed1028a1a470f59388553fd2ded"/>
 			</diskarea>
 		</part>
 	</software>
@@ -26328,7 +26328,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tony hawk's pro skater (usa)" sha1="7a6b07b327d77cd27ebe161a3a64d149ebd19e3e"/>
+				<disk name="tony hawk's pro skater (usa)" sha1="b94afb759d5c2f289f5d4ec910b3d92c79316c0c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -26345,7 +26345,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tony hawk's pro skater 2 (usa)" sha1="1069052c61fe99be3e938b98887355170ac91318"/>
+				<disk name="tony hawk's pro skater 2 (usa)" sha1="76ca2e86180f977c596a53c7257914f338e6a0de"/>
 			</diskarea>
 		</part>
 	</software>
@@ -26379,7 +26379,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tony hawk's pro skater 4 (usa)" sha1="694bed9d4d9cd260d393b67b2825eb01e32c5eb1"/>
+				<disk name="tony hawk's pro skater 4 (usa)" sha1="1cf3955bb1a3e41343dc027985f1d615b8e9c9d6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -26600,7 +26600,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tiny tank (usa)" sha1="87d08ea463c0096f7ca154e92805429d4f52bf5e"/>
+				<disk name="tiny tank (usa)" sha1="e61cd0f24d0afc8846e978e4e5a61d35ca99ffa6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -26824,7 +26824,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tomba (usa)" sha1="e543a25583ef211010dd6736b88c43f8b4132931"/>
+				<disk name="tomba (usa)" sha1="50d87fb5646c60fe419b56a53c20f112806f068b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -26842,7 +26842,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tomba 2 - the evil swine return (usa)" sha1="34859016049661e1083391e9015f73f67a919f24"/>
+				<disk name="tomba 2 - the evil swine return (usa)" sha1="21b5620e342529ea2dbd68ca47da5399eff71199"/>
 			</diskarea>
 		</part>
 	</software>
@@ -26973,7 +26973,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="battle arena toshinden (usa)" sha1="c216b34a840255677fb7fd10bdaa60c5edf863f5"/>
+				<disk name="battle arena toshinden (usa)" sha1="64e5b9f4443b4770668d26c46a8d711017e5f41b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -27007,7 +27007,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="battle arena toshinden 2 (usa)" sha1="2dbd6c7312e3c1edf1baaeea5e1ab1bac598a125"/>
+				<disk name="battle arena toshinden 2 (usa)" sha1="aca3e7f7da0527e3c94e43ab9650461b91fc0c87"/>
 			</diskarea>
 		</part>
 	</software>
@@ -27025,7 +27025,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="battle arena toshinden 3 (usa) (en,ja)" sha1="bcc2a1583b44c4d087d94cb9a3bd152726b29884"/>
+				<disk name="battle arena toshinden 3 (usa) (en,ja)" sha1="03d70fde6dde4439b573c2272b8ad930960f3ae1"/>
 			</diskarea>
 		</part>
 	</software>
@@ -27110,7 +27110,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="triple play baseball (usa)" sha1="81f7c10f296db0136d5c749601270f6d36fc112f"/>
+				<disk name="triple play baseball (usa)" sha1="67642c3ab9777501904d3843f77d9e1a38bea64c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -27310,7 +27310,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tomb raider (usa) (v1.6)" sha1="697842403e9a7e5f662d8d5a56b40480742fe3ac"/>
+				<disk name="tomb raider (usa) (v1.6)" sha1="294b08736f01ca7528a191ed5ee50f849b40dbff"/>
 			</diskarea>
 		</part>
 	</software>
@@ -27387,7 +27387,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tomb raider ii - starring lara croft (usa) (v1.3)" sha1="459ef793bc4b451997c87054b6925afa5f4358d7"/>
+				<disk name="tomb raider ii - starring lara croft (usa) (v1.3)" sha1="bdf8850b894577ec723b82da59d3c53f40893236"/>
 			</diskarea>
 		</part>
 	</software>
@@ -27635,7 +27635,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tomb raider iii - adventures of lara croft (usa) (v1.2)" sha1="0a883e2f47003f50b2b9793159d30421668bb2c6"/>
+				<disk name="tomb raider iii - adventures of lara croft (usa) (v1.2)" sha1="42badae97c44239c7bf61bb8bc1e35beb025a207"/>
 			</diskarea>
 		</part>
 	</software>
@@ -27686,7 +27686,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tomb raider - the last revelation (usa) (v1.1)" sha1="53cd52f5f77979b2547d49db33fc554589733774"/>
+				<disk name="tomb raider - the last revelation (usa) (v1.1)" sha1="26761d10c047676960391d97bb1ce48498689bf0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -28272,7 +28272,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="misadventures of tron bonne, the (usa)" sha1="0695a8d71036b2c3d15440aea80d7d722c26ad56"/>
+				<disk name="misadventures of tron bonne, the (usa)" sha1="7e4316ac95ae0f9d26b9b99820d283d318c276a3"/>
 			</diskarea>
 		</part>
 	</software>
@@ -28338,7 +28338,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="true pinball (usa)" sha1="87a1463306ed777635daf00b70f09212203a61bc"/>
+				<disk name="true pinball (usa)" sha1="a747481095f7860138e405c418e8ff32069e77c1"/>
 			</diskarea>
 		</part>
 	</software>
@@ -28499,7 +28499,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="twisted metal - small brawl (usa)" sha1="7f4d093f996f2e1e6ceb1d8b13477aadedc47155"/>
+				<disk name="twisted metal - small brawl (usa)" sha1="4589bbc09de5f537f0809895fe32d69c26106678"/>
 			</diskarea>
 		</part>
 	</software>
@@ -28527,7 +28527,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="twisted metal 2 (usa)" sha1="ea300893c05cbf43ef4fba616112c542627e6016"/>
+				<disk name="twisted metal 2 (usa)" sha1="ed75cb9b039ce559118bdf624685e221e6dbf906"/>
 			</diskarea>
 		</part>
 	</software>
@@ -28580,7 +28580,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="twisted metal iii (usa) (v1.1)" sha1="0300b5d0bac4c7a24e541b5a9f83979b79cb1dbf"/>
+				<disk name="twisted metal iii (usa) (v1.1)" sha1="5339b19b908e44f34310a6a1ecbc60817665b8ca"/>
 			</diskarea>
 		</part>
 	</software>
@@ -28672,7 +28672,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="twisted metal 4 (usa)" sha1="b6ea4d26c0172bce93825f483699b55988bad28a"/>
+				<disk name="twisted metal 4 (usa)" sha1="3420fe8dbb4b1718f971afffb790ac7e8f4fa1d3"/>
 			</diskarea>
 		</part>
 	</software>
@@ -28697,7 +28697,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="twisted metal (usa)" sha1="b02c5da714570a23ac2f9a55d5a938dce5fd2d6b"/>
+				<disk name="twisted metal (usa)" sha1="67269637d563ed2ffafd842be8908b068548bc2b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -28792,7 +28792,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ultimate brain games (usa)" sha1="a46038894503a5864a1b8ea23661553677789fdf"/>
+				<disk name="ultimate brain games (usa)" sha1="ef1229098eb2ee7ee9d0b4c84625b3875b8c8a0c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -28913,7 +28913,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="vagrant story (usa)" sha1="f70f1bce87e8c7a84953c4d7271cfb2f3622bb4a"/>
+				<disk name="vagrant story (usa)" sha1="d200433ef70d5a859fb49736dbcfea5cb030ba19"/>
 			</diskarea>
 		</part>
 	</software>
@@ -29029,7 +29029,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="vanishing point (usa)" sha1="5ded96e4907f70541f68088e2026d6786e5ed931"/>
+				<disk name="vanishing point (usa)" sha1="ac1adde7e60f76502636afa478308f728a830f08"/>
 			</diskarea>
 		</part>
 	</software>
@@ -29063,7 +29063,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="vegas games 2000 (usa)" sha1="950f66e7efae1a84aa6a1edeb4d7084c0d55153f"/>
+				<disk name="vegas games 2000 (usa)" sha1="f94739301a9352bb0b3f52a99393ef3b6ace448e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -29099,7 +29099,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="viewpoint (usa)" sha1="2019a0a7f0cf294e9f93c5ef7d72243500f1aac2"/>
+				<disk name="viewpoint (usa)" sha1="495e5408ce67261120f5128d9ddb3c1e27320821"/>
 			</diskarea>
 		</part>
 	</software>
@@ -29312,7 +29312,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="need for speed - v-rally (usa)" sha1="02cb03c751ea2d22b065a6588649b6e5d25cd2d1"/>
+				<disk name="need for speed - v-rally (usa)" sha1="ea312ed2010a224acf94675342d5aeeb48214427"/>
 			</diskarea>
 		</part>
 	</software>
@@ -29336,7 +29336,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="need for speed - v-rally 2 (usa)" sha1="a0c2e8b268c5ce33a98ef66652fe7a9a16fa376c"/>
+				<disk name="need for speed - v-rally 2 (usa)" sha1="e4eb2e42ddd69a0e591c008adcb06b9c49260dc5"/>
 			</diskarea>
 		</part>
 	</software>
@@ -29446,7 +29446,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="vr sports powerboat racing (usa)" sha1="5d5db014fbb80d764ea4583867880b0ac125281e"/>
+				<disk name="vr sports powerboat racing (usa)" sha1="922b7edf37558c03d93dd6e093177ceff1ad378d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -29500,7 +29500,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="v-tennis (usa)" sha1="7f9f873b2462d06e13b96435483f0e25ec993587"/>
+				<disk name="v-tennis (usa)" sha1="d4f4d0548ce5014736b3cb842b7feaeafcb9ea99"/>
 			</diskarea>
 		</part>
 	</software>
@@ -29517,7 +29517,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="warcraft ii - the dark saga (usa) (en,fr,de,es,it)" sha1="b33a8b1bd8a007725138b840e6baa386efd881b6"/>
+				<disk name="warcraft ii - the dark saga (usa) (en,fr,de,es,it)" sha1="0cbccd6e495156337aafd0b5d2ca21d287d8ad03"/>
 			</diskarea>
 		</part>
 	</software>
@@ -29588,7 +29588,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="warhawk - the red mercury missions (usa)" sha1="27a6349c15269d5b5ea1cec65fdc6d598cdaf981"/>
+				<disk name="warhawk - the red mercury missions (usa)" sha1="7d0fbd0a88465353f4880746212726786e5bfdc3"/>
 			</diskarea>
 		</part>
 	</software>
@@ -29810,7 +29810,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="world destruction league - thunder tanks (usa)" sha1="2ab20dffff5961a1293b1ea77b50545b76c5d158"/>
+				<disk name="world destruction league - thunder tanks (usa)" sha1="e2834f6a373579793b1cbe475e11b8074aee9540"/>
 			</diskarea>
 		</part>
 	</software>
@@ -29957,7 +29957,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="who wants to be a millionaire - 3rd edition (usa)" sha1="8905733e730fd883cc8ef73731e17c98c4cc1ef6"/>
+				<disk name="who wants to be a millionaire - 3rd edition (usa)" sha1="2bd8d522484e153d83ba40d4af29ff970e905cf5"/>
 			</diskarea>
 		</part>
 	</software>
@@ -30444,7 +30444,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="wwf attitude (usa)" sha1="99705956be9321648758a86fa8921f3678649511"/>
+				<disk name="wwf attitude (usa)" sha1="b268502bd345e64ec78abf064fa7282cd879061c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -30462,7 +30462,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="wwf in your house (usa) (v1.1)" sha1="7f9ee48b66b97c00f825a252abb5e133f6f52a6b"/>
+				<disk name="wwf in your house (usa) (v1.1)" sha1="797f8d3655a02cdf231e973b662343580337e232"/>
 			</diskarea>
 		</part>
 	</software>
@@ -30497,7 +30497,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="wwf wrestlemania - the arcade game (usa)" sha1="887df77fc1b3d73c906f04b6509c1ab710fbb9bb"/>
+				<disk name="wwf wrestlemania - the arcade game (usa)" sha1="9b2b6d1d6d2793a321ece7409ae9a76e77db4ff4"/>
 			</diskarea>
 		</part>
 	</software>
@@ -30531,7 +30531,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="wwf smackdown (usa)" sha1="188a1e58141544712ef6dc9e75ebbbe26831b40c"/>
+				<disk name="wwf smackdown (usa)" sha1="9fb74cc0699ee1a11ee3e2838ec7885636ef7862"/>
 			</diskarea>
 		</part>
 	</software>
@@ -30549,7 +30549,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="wwf war zone (usa) (v1.1)" sha1="17e6c6470688d54e5ec008fe085187afbcaec52c"/>
+				<disk name="wwf war zone (usa) (v1.1)" sha1="fbe408d78500a5441e280e7aaa59f11500c050fb"/>
 			</diskarea>
 		</part>
 	</software>
@@ -30680,12 +30680,12 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom1" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="xenogears (usa) (disc 1)" sha1="2b3ce2abb86c1ef68c4aa5baa54a95887f95015d"/>
+				<disk name="xenogears (usa) (disc 1)" sha1="64a49e3b3bcd14ef74f363d5a5ccf366e283d790"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="xenogears (usa) (disc 2)" sha1="bbb7eaea1bace092a96691ba604ba5c906d3da93"/>
+				<disk name="xenogears (usa) (disc 2)" sha1="918b8d1b36037e47ba87c9504f53f83d151dadc3"/>
 			</diskarea>
 		</part>
 	</software>
@@ -30702,7 +30702,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="xevious 3d-g+ (usa)" sha1="168b85cd3561c918ddb443fef133e2c13ae77519"/>
+				<disk name="xevious 3d-g+ (usa)" sha1="a8ab9950c8b627f67ac0b33731741f089d08f604"/>
 			</diskarea>
 		</part>
 	</software>
@@ -30775,7 +30775,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="x-men - children of the atom (usa)" sha1="da09e144894978fc306eff0e4a4ddcc74de88b38"/>
+				<disk name="x-men - children of the atom (usa)" sha1="db53105be644f4e24440b3e98bf8971feeb69d52"/>
 			</diskarea>
 		</part>
 	</software>
@@ -30803,7 +30803,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="x-men - mutant academy (usa)" sha1="5829f1227cca671c1bc29b820ee97932449730ad"/>
+				<disk name="x-men - mutant academy (usa)" sha1="f278224ff06ea10c46abe85145ab124b043ff000"/>
 			</diskarea>
 		</part>
 	</software>
@@ -30832,7 +30832,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="x-men - mutant academy 2 (usa)" sha1="c80819e5a50d971a3ff7c38650b4757aec5c015c"/>
+				<disk name="x-men - mutant academy 2 (usa)" sha1="7e021fc6b42cdfe18b8572e2d271182d3aa04e04"/>
 			</diskarea>
 		</part>
 	</software>
@@ -30849,7 +30849,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="x-men vs. street fighter (usa)" sha1="a5de42525daba6420653b835e01ea99d8e6b8799"/>
+				<disk name="x-men vs. street fighter (usa)" sha1="05be871ffb7e54985689a10a31638c1324cae3f7"/>
 			</diskarea>
 		</part>
 	</software>
@@ -54779,7 +54779,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="simple 1500 jitsuyou series vol.11 - katei de dekiru tsubo shiatsu (japan) [slpm-86968]" sha1="6328c634cd08e9fef0d3a3f39ca4a288e660c1e9" status="baddump"/>
+				<disk name="simple 1500 jitsuyou series vol.11 - katei de dekiru tsubo shiatsu (japan) [slpm-86968]" sha1="99e83ee7ce9f67b40ad512bde5167964e6539bbd" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
