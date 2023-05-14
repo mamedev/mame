@@ -5217,20 +5217,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/nabupc/keyboard/keyboard.h,BUSES["NABU_KEYBOARD"] = true
----------------------------------------------------
-
-if (BUSES["NABU_KEYBOARD"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/bus/nabupc/keyboard/hlekeyboard.cpp",
-		MAME_DIR .. "src/devices/bus/nabupc/keyboard/hlekeyboard.h",
-		MAME_DIR .. "src/devices/bus/nabupc/keyboard/keyboard.cpp",
-		MAME_DIR .. "src/devices/bus/nabupc/keyboard/keyboard.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/bus/mc68000/sysbus.h,BUSES["MC68000_SYSBUS"] = true
 ---------------------------------------------------
 

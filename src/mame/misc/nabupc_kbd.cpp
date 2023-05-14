@@ -45,55 +45,12 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "keyboard.h"
+#include "nabupc_kbd.h"
 
-#include "cpu/m6800/m6801.h"
-#include "machine/adc0808.h"
+
+DEFINE_DEVICE_TYPE(NABUPC_KEYBOARD, nabupc_keyboard_device, "nabupc_keyboard", "NABU PC keyboard")
 
 namespace  {
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-class keyboard_device: public device_t, public device_rs232_port_interface
-{
-public:
-	// construction/destruction
-	keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-
-	// optional information overrides
-	virtual tiny_rom_entry const *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
-private:
-	void nabu_kb_mem(address_map &map);
-
-	uint8_t port1_r();
-	void port1_w(uint8_t data);
-
-	void irq_w(uint8_t data);
-
-	uint8_t gameport_r(offs_t offset);
-	void adc_latch_w(offs_t offset, uint8_t data);
-	void adc_start_w(offs_t offset, uint8_t data);
-	void cpu_ack_irq_w(offs_t offset, uint8_t data);
-
-	required_device<m6803_cpu_device> m_mcu;
-	required_device<adc0809_device> m_adc;
-
-	required_ioport m_modifiers;
-	required_ioport_array<8> m_keyboard;
-	required_ioport_array<4> m_gameport;
-
-	uint8_t m_port1;
-	uint8_t m_eoc;
-};
 
 //**************************************************************************
 //  KEYBOARD ROM
@@ -108,7 +65,7 @@ ROM_END
 //  KEYBOARD PORTS
 //**************************************************************************
 
-static INPUT_PORTS_START( keyboard_ports )
+INPUT_PORTS_START( keyboard_ports )
 	// Keyboard Matrix
 	PORT_START("ROW0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -195,14 +152,14 @@ static INPUT_PORTS_START( keyboard_ports )
 
 	// Joystick Ports
 	PORT_START("JOYSTICK1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)         PORT_CODE(INPUT_CODE_INVALID)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)         PORT_CODE(INPUT_CODE_INVALID)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)        PORT_CODE(INPUT_CODE_INVALID)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)           PORT_CODE(INPUT_CODE_INVALID)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)         PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)         PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)        PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)           PORT_CODE(KEYCODE_8_PAD)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)               PORT_CODE(INPUT_CODE_INVALID)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)               PORT_CODE(KEYCODE_ENTER_PAD)
 	PORT_START("JOYSTICK2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)         PORT_CODE(INPUT_CODE_INVALID)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)         PORT_CODE(INPUT_CODE_INVALID)
@@ -250,19 +207,21 @@ static INPUT_PORTS_START( keyboard_ports )
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE) PORT_PLAYER(8) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_MINMAX(0, 255) PORT_REVERSE PORT_CODE(INPUT_CODE_INVALID) PORT_CODE_DEC(INPUT_CODE_INVALID) PORT_CODE_INC(INPUT_CODE_INVALID) // pin 5
 INPUT_PORTS_END
 
+} // anonymous namespace
+
 //**************************************************************************
 //  KEYBOARD DEVICE
 //**************************************************************************
 
 //-------------------------------------------------
-//  keyboard_device - constructor
+//  nabupc_keyboard_device - constructor
 //-------------------------------------------------
 
-keyboard_device::keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+nabupc_keyboard_device::nabupc_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NABUPC_KEYBOARD, tag, owner, clock)
-	, device_rs232_port_interface(mconfig, *this)
 	, m_mcu(*this, "mcu")
 	, m_adc(*this, "adc")
+	, m_rxd_cb(*this)
 	, m_modifiers(*this, "MODIFIERS")
 	, m_keyboard(*this, "ROW%u", 0U)
 	, m_gameport(*this, "JOYSTICK%u", 1U)
@@ -271,28 +230,30 @@ keyboard_device::keyboard_device(machine_config const &mconfig, char const *tag,
 {
 }
 
-void keyboard_device::device_start()
+void nabupc_keyboard_device::device_start()
 {
+	m_rxd_cb.resolve_safe();
+
 	save_item(NAME(m_port1));
 	save_item(NAME(m_eoc));
 }
 
-void keyboard_device::device_reset()
+void nabupc_keyboard_device::device_reset()
 {
 	m_port1 &= 0x7f;
-	output_rxd(1);
+	m_rxd_cb(1);
 }
 
-void keyboard_device::device_add_mconfig(machine_config &config)
+void nabupc_keyboard_device::device_add_mconfig(machine_config &config)
 {
 	M6803(config, m_mcu, 3.579545_MHz_XTAL); // Crystal verified from schematics and visual inspection
-	m_mcu->set_addrmap(AS_PROGRAM, &keyboard_device::nabu_kb_mem);
-	m_mcu->in_p1_cb().set(FUNC(keyboard_device::port1_r));
-	m_mcu->out_p1_cb().set(FUNC(keyboard_device::port1_w));
-	m_mcu->out_ser_tx_cb().set(FUNC(keyboard_device::output_rxd));
+	m_mcu->set_addrmap(AS_PROGRAM, &nabupc_keyboard_device::nabu_kb_mem);
+	m_mcu->in_p1_cb().set(FUNC(nabupc_keyboard_device::port1_r));
+	m_mcu->out_p1_cb().set(FUNC(nabupc_keyboard_device::port1_w));
+	m_mcu->out_ser_tx_cb().set(FUNC(nabupc_keyboard_device::ser_tx_w));
 
 	ADC0809(config, m_adc, 3.579545_MHz_XTAL / 4);
-	m_adc->eoc_callback().set(FUNC(keyboard_device::irq_w));
+	m_adc->eoc_callback().set(FUNC(nabupc_keyboard_device::irq_w));
 	m_adc->in_callback<0>().set_ioport("PADDLE1");
 	m_adc->in_callback<1>().set_ioport("PADDLE2");
 	m_adc->in_callback<2>().set_ioport("PADDLE3");
@@ -303,27 +264,27 @@ void keyboard_device::device_add_mconfig(machine_config &config)
 	m_adc->in_callback<7>().set_ioport("PADDLE8");
 }
 
-void keyboard_device::nabu_kb_mem(address_map &map)
+void nabupc_keyboard_device::nabu_kb_mem(address_map &map)
 {
-	map(0x5000, 0x5300).r(FUNC(keyboard_device::gameport_r));
-	map(0x7000, 0x7000).w(FUNC(keyboard_device::adc_start_w));
-	map(0x9000, 0x9000).w(FUNC(keyboard_device::cpu_ack_irq_w));
-	map(0xB000, 0xB700).w(FUNC(keyboard_device::adc_latch_w));
-	map(0xD000, 0xD000).r(m_adc, FUNC(adc0809_device::data_r));
+	map(0x5000, 0x5300).r(FUNC(nabupc_keyboard_device::gameport_r));
+	map(0x7000, 0x7000).w(FUNC(nabupc_keyboard_device::adc_start_w));
+	map(0x9000, 0x9000).w(FUNC(nabupc_keyboard_device::cpu_ack_irq_w));
+	map(0xb000, 0xb700).w(FUNC(nabupc_keyboard_device::adc_latch_w));
+	map(0xd000, 0xd000).r(m_adc, FUNC(adc0809_device::data_r));
 	map(0xf800, 0xffff).rom().region("mcu", 0);
 }
 
-const tiny_rom_entry *keyboard_device::device_rom_region() const
+const tiny_rom_entry *nabupc_keyboard_device::device_rom_region() const
 {
 	return ROM_NAME(nabu_keyboard_rom);
 }
 
-ioport_constructor keyboard_device::device_input_ports() const
+ioport_constructor nabupc_keyboard_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( keyboard_ports );
 }
 
-uint8_t keyboard_device::port1_r()
+uint8_t nabupc_keyboard_device::port1_r()
 {
 	uint8_t data;
 	uint8_t column_mask = 1 << (m_port1 & 7);
@@ -342,12 +303,12 @@ uint8_t keyboard_device::port1_r()
 	return m_port1;
 }
 
-void keyboard_device::port1_w(uint8_t data)
+void nabupc_keyboard_device::port1_w(uint8_t data)
 {
 	m_port1 = data & 0x7f;
 }
 
-void keyboard_device::irq_w(uint8_t data)
+void nabupc_keyboard_device::irq_w(uint8_t data)
 {
 	if (data && !m_eoc) {
 		m_mcu->set_input_line(0, ASSERT_LINE);
@@ -355,33 +316,36 @@ void keyboard_device::irq_w(uint8_t data)
 	m_eoc = data;
 }
 
-uint8_t keyboard_device::gameport_r(offs_t offset)
+uint8_t nabupc_keyboard_device::gameport_r(offs_t offset)
 {
 	uint8_t port = (offset >> 8) & 0x03;
 	return m_gameport[port]->read();
 }
 
-void keyboard_device::adc_latch_w(offs_t offset, uint8_t data)
+void nabupc_keyboard_device::adc_latch_w(offs_t offset, uint8_t data)
 {
 	uint8_t addr = (offset >> 8) & 0x07;
 	m_adc->address_w(addr);
 }
 
-void keyboard_device::adc_start_w(offs_t offset, uint8_t data)
+void nabupc_keyboard_device::adc_start_w(offs_t offset, uint8_t data)
 {
 	m_adc->start_w(1);
 	m_adc->start_w(0);
 }
 
-void keyboard_device::cpu_ack_irq_w(offs_t offset, uint8_t data)
+void nabupc_keyboard_device::cpu_ack_irq_w(offs_t offset, uint8_t data)
 {
 	m_mcu->set_input_line(0, CLEAR_LINE);
 }
 
-} // anonymous namespace
+void nabupc_keyboard_device::ser_tx_w(uint8_t data)
+{
+	m_rxd_cb(data & 1);
+}
+
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE_PRIVATE(NABUPC_KEYBOARD, device_rs232_port_interface, keyboard_device, "nabu_keyboard", "NABU PC keyboard")
