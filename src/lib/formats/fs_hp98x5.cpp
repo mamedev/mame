@@ -265,7 +265,7 @@ namespace {
 		// Index into array is fs_type
 		// Key is type code
 		// Value is virtual file extension
-		const std::array<std::map<u8, std::string_view>, hp98x5_impl::FS_COUNT> m_fs_type_maps;
+		const std::array<std::map<u8, std::string_view>, FS_COUNT> m_fs_type_maps;
 	};
 }
 
