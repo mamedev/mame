@@ -70,6 +70,7 @@ Notes:
 *********************************************************************************************************************/
 
 #include "emu.h"
+#include "subsino_io.h"
 #include "cpu/h8/h83048.h"
 #include "machine/ds2430a.h"
 #include "machine/nvram.h"
@@ -90,8 +91,7 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_eeprom(*this, "eeprom"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_inputs(*this, "IN%u", 0U)
+		m_palette(*this, "palette")
 		{ }
 
 	void lastfght(machine_config &config);
@@ -115,11 +115,9 @@ private:
 	void sd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void blit_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void dest_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t c00000_r();
-	uint16_t c00002_r();
-	uint16_t c00004_r();
-	uint16_t c00006_r();
-	void c00006_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t c00000_r();
+	uint8_t c00002_r();
+	void c00007_w(uint8_t data);
 	uint16_t sound_r();
 	void sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -148,15 +146,11 @@ private:
 	int m_view_roms = 0;
 #endif
 
-	/* misc */
-	uint16_t m_c00006 = 0;
-
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<ds2430a_device> m_eeprom;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_ioport_array<3> m_inputs;
 };
 
 
@@ -366,41 +360,22 @@ void lastfght_state::dest_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_dest ^= 1;
 }
 
-uint16_t lastfght_state::c00000_r()
+uint8_t lastfght_state::c00000_r()
 {
-	// high byte:
 	// bit 7 = blitter busy
 	// bit 6 = blitter?
-	return 0x4000;
-
+	return 0x40;
 }
 
-uint16_t lastfght_state::c00002_r()
+uint8_t lastfght_state::c00002_r()
 {
-	// high byte:
 	// mask 0x1c: from sound?
-	return (machine().rand() & 0x1c00) | m_inputs[0]->read();
+	return (machine().rand() & 0x1c) | 0x03;
 }
 
-uint16_t lastfght_state::c00004_r()
+void lastfght_state::c00007_w(uint8_t data)
 {
-	return m_inputs[1]->read();
-}
-
-uint16_t lastfght_state::c00006_r()
-{
-	// low byte:
-	// bit 7 = protection?
-	// bit 5 = blitter?
-	return (m_c00006 & 0x005f) | (m_inputs[2]->read() & 0xffa0);
-}
-
-void lastfght_state::c00006_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	COMBINE_DATA(&m_c00006);
-	//  popmessage("%04x", m_c00006);
-
-	m_eeprom->data_w(!BIT(m_c00006, 6));
+	m_eeprom->data_w(!BIT(data, 6));
 }
 
 uint16_t lastfght_state::sound_r()
@@ -448,10 +423,7 @@ void lastfght_state::lastfght_map(address_map &map)
 
 	map(0x800014, 0x800015).w(FUNC(lastfght_state::dest_w));
 
-	map(0xc00000, 0xc00001).r(FUNC(lastfght_state::c00000_r));
-	map(0xc00002, 0xc00003).r(FUNC(lastfght_state::c00002_r));
-	map(0xc00004, 0xc00005).r(FUNC(lastfght_state::c00004_r));
-	map(0xc00006, 0xc00007).rw(FUNC(lastfght_state::c00006_r), FUNC(lastfght_state::c00006_w));
+	map(0xc00000, 0xc0001f).rw("io", FUNC(ss9802_device::read), FUNC(ss9802_device::write));
 }
 
 void lastfght_state::ramdac_map(address_map &map)
@@ -464,57 +436,50 @@ void lastfght_state::ramdac_map(address_map &map)
 ***************************************************************************/
 
 static INPUT_PORTS_START( lastfght )
-	PORT_START("IN0")   /* IN0 - c00002&3 */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1       )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER          ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE        )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1       )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER          ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE        )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH,IPT_CUSTOM        )
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH,IPT_CUSTOM        )
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH,IPT_CUSTOM        )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1          )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2          )
 
-	PORT_START("IN1")   /* IN1 - c00004&5 */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1        )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2        )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1         )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  )
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1        )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2        )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1         )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  )
 
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN1          )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN2          )
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2         )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(2)
 
-	PORT_START("IN2")   /* IN2 - c00006&7 */
+	PORT_START("PROT")
 	PORT_BIT( 0x005f, IP_ACTIVE_HIGH, IPT_UNUSED        ) // outputs
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN        ) // blitter?
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", ds2430a_device, data_r)
-
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_PLAYER(2)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_PLAYER(2)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(2)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_START2         )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
@@ -538,7 +503,6 @@ void lastfght_state::machine_start()
 	save_item(NAME(m_y));
 	save_item(NAME(m_w));
 	save_item(NAME(m_h));
-	save_item(NAME(m_c00006));
 }
 
 void lastfght_state::machine_reset()
@@ -557,7 +521,6 @@ void lastfght_state::machine_reset()
 	m_y = 0;
 	m_w = 0;
 	m_h = 0;
-	m_c00006 = 0;
 }
 
 void lastfght_state::lastfght(machine_config &config)
@@ -568,6 +531,16 @@ void lastfght_state::lastfght(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(lastfght_state::irq0_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	ss9802_device &io(SS9802(config, "io"));
+	io.in_port_callback<0>().set(FUNC(lastfght_state::c00000_r));
+	io.in_port_callback<2>().set(FUNC(lastfght_state::c00002_r));
+	io.in_port_callback<3>().set_ioport("IN0");
+	io.in_port_callback<4>().set_ioport("IN1");
+	io.in_port_callback<5>().set_ioport("IN2");
+	io.in_port_callback<6>().set_ioport("IN3");
+	io.in_port_callback<7>().set_ioport("PROT");
+	io.out_port_callback<7>().set(FUNC(lastfght_state::c00007_w));
 
 	DS2430A(config, m_eeprom).set_timing_scale(0.16);
 
