@@ -1055,8 +1055,8 @@ void aleck64_state::aleck64(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(DACRATE_NTSC*2,3093,0,3093,525,0,480);
-	m_screen->set_screen_update(FUNC(aleck64_state::screen_update));
-	m_screen->screen_vblank().set(FUNC(aleck64_state::screen_vblank));
+	m_screen->set_screen_update(FUNC(n64_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(n64_state::screen_vblank));
 
 	PALETTE(config, "palette").set_entries(0x1000);
 
