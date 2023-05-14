@@ -37,7 +37,7 @@ cqgmem_device::cqgmem_device(const machine_config &mconfig, const char *tag, dev
 	device_t(mconfig, EPSON_QX_OPTION_CQGMEM, tag, owner, clock),
 	device_option_expansion_interface(mconfig, *this),
 	device_memory_interface(mconfig, *this),
-	m_ram(*this, RAM_TAG),
+	m_ram(*this, "xmem", 0x100000, ENDIANNESS_LITTLE),
 	m_banks(*this, "bank%u", 0U),
 	m_iobase(*this, "IOBASE"),
 	m_space_config("xmem", ENDIANNESS_LITTLE, 8, 20, 0, address_map_constructor(FUNC(cqgmem_device::xmem_map), this)),
@@ -51,14 +51,6 @@ cqgmem_device::cqgmem_device(const machine_config &mconfig, const char *tag, dev
 ioport_constructor cqgmem_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( cqgmem );
-}
-
-//-------------------------------------------------
-//  device_add_mconfig - device-specific config
-//-------------------------------------------------
-void cqgmem_device::device_add_mconfig(machine_config &config)
-{
-	RAM(config, RAM_TAG).set_default_size("1M");
 }
 
 //-------------------------------------------------
@@ -83,7 +75,7 @@ void cqgmem_device::device_reset()
 		space.install_device(iobase, iobase+0x07, *this, &cqgmem_device::io_map);
 
 		for (int i = 0; i < m_banks.size(); ++i) {
-			m_banks[i]->configure_entries(0, 128, m_ram->pointer(), 0x2000);
+			m_banks[i]->configure_entries(0, 128, m_ram, 0x2000);
 		}
 	}
 
@@ -107,7 +99,7 @@ device_memory_interface::space_config_vector cqgmem_device::memory_space_config(
 
 void cqgmem_device::xmem_map(address_map &map)
 {
-	map(0x00000, 0xfffff).rw(m_ram, FUNC(ram_device::read), FUNC(ram_device::write));
+	map(0x00000, 0xfffff).ram().share("xmem");
 }
 
 void cqgmem_device::write(offs_t offset, uint8_t data)

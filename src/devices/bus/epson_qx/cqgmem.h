@@ -35,7 +35,6 @@ protected:
 	virtual void device_reset() override;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual space_config_vector memory_space_config() const override;
 
@@ -47,7 +46,7 @@ protected:
 private:
 	uint8_t m_banks_enabled;
 
-	required_device<ram_device> m_ram;
+	memory_share_creator<uint8_t> m_ram;
 	memory_bank_array_creator<7> m_banks;
 	required_ioport m_iobase;
 	const address_space_config m_space_config;
