@@ -18063,7 +18063,7 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
-	<software name="queensft" cloneof="queensft">
+	<software name="queensft">
 		<description>The Queen's Footsteps (v1.1.1)</description>
 		<year>2020</year>
 		<publisher>&lt;homebrew&gt;</publisher>
