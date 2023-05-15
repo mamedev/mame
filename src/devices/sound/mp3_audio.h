@@ -13,21 +13,22 @@
 
 #include <stdint.h>
 
-#include "minimp3/minimp3.h"
-
 class mp3_audio
 {
 public:
 	mp3_audio(const void *base);
+	~mp3_audio();
 
 	bool decode_buffer(int &pos, int limit, short *output, int &output_samples, int &sample_rate, int &channels);
 
 	void clear();
 
 private:
+	struct mp3dec_local_t;
+
 	const uint8_t *base;
 
-	mp3dec_t dec;
+	std::unique_ptr<mp3dec_local_t> dec;
 	bool m_found_stream;
 };
 

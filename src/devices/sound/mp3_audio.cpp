@@ -13,15 +13,25 @@
 #define MAX_FRAME_SYNC_MATCHES 2
 #include "minimp3/minimp3.h"
 
+// To avoid modifying minimp3.h, forward declare mp3dec_local_t in mp3_audio.h and then make it an mp3dec_t using inheritance
+struct mp3_audio::mp3dec_local_t : public mp3dec_t
+{
+};
+
 mp3_audio::mp3_audio(const void *_base)
 	: base((const uint8_t *)_base)
 {
+	dec = std::make_unique<mp3dec_local_t>();
 	clear();
+}
+
+mp3_audio::~mp3_audio()
+{
 }
 
 void mp3_audio::clear()
 {
-	mp3dec_init(&dec);
+	mp3dec_init(dec.get());
 	m_found_stream = false;
 }
 
@@ -60,7 +70,7 @@ bool mp3_audio::decode_buffer(int &pos, int limit, short *output, int &output_sa
 		}
 	}
 
-	output_samples = mp3dec_decode_frame(&dec, base, limit, output, &info);
+	output_samples = mp3dec_decode_frame(dec.get(), base, limit, output, &info);
 	sample_rate = info.hz;
 	channels = info.channels;
 	pos = info.frame_bytes;
