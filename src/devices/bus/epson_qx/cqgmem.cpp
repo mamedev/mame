@@ -123,7 +123,7 @@ void cqgmem_device::write(offs_t offset, uint8_t data)
 			view.unmap_readwrite(bank_addr, bank_addr + 0x1fff);
 		}
 	}
-	m_banks_enabled = bank;
+	m_banks_enabled = enable;
 }
 
 void cqgmem_device::io_map(address_map &map)

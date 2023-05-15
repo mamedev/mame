@@ -13,8 +13,6 @@
 
 #include "option.h"
 
-#include "machine/ram.h"
-
 namespace bus::epson_qx {
 
 //**************************************************************************
