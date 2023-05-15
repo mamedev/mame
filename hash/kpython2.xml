@@ -3,6 +3,9 @@
 <!--
 license:CC0-1.0
 -->
+
+<!-- TODO: all dumps but drmnv3 should be updated with chdman's createdvd option -->
+
 <softwarelist name="kpython2" description="Python 2 upgrade DVD-ROM images">
 
 	<software name="gtrfrkv2">
@@ -66,7 +69,7 @@ license:CC0-1.0
 		<publisher>Konami</publisher>
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="f32jaa03" sha1="c659710e70a74f15b2761d85a44c2f51f3a44e0f" />
+				<disk name="f32jaa03" sha1="f8162037cf7645d1e9787636ce2b583176e920df" />
 			</diskarea>
 		</part>
 	</software>
