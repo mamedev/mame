@@ -40,7 +40,7 @@ Canceled games (possibly never got to the proto stage)
     Perfect Dark (demo)                        DIS-NUS-NPDE-USA
     Pokemon Stadium (demo)                     DIS-NUS-NP0E-USA
     Pokemon Stadium 2 (demo)                   DIS-NUS-NP3E-USA
-    Star Wars Racer: Episode 1 (demo)          DIS-NUS-NEPE-USA
+    Star Wars Racer: Episode I (demo)          DIS-NUS-NEPE-USA
     Star Wars Rogue Squadron (demo)            DIS-NUS-NRSE-USA
     Starfox 64 (demo)                          DIS-NUS-NFXE-USA
     Super Mario 64 (demo)                      DIS-NUS-NSME-USA
@@ -79,6 +79,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>007 - GoldenEye (Australia, Europe)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Offset [vi_scaley]
+]]></notes>
 		<info name="serial" value="NUS-NGEP-AUS, NUS-NGEP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -97,6 +100,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>007 - GoldenEye (Japan)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Offset [vi_scaley]
+]]></notes>
 		<info name="serial" value="NUS-NGEJ-JPN"/>
 		<info name="release" value="19970823"/>
 		<info name="alt_title" value="ゴールデンアイ 007"/>
@@ -117,6 +123,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>007 - GoldenEye (USA)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Offset [vi_scaley]
+]]></notes>
 		<info name="serial" value="NUS-NGEE-USA, NUS-NGEE-USA-1"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" /> <!-- Also with NUS-01A-03 -->
@@ -222,6 +231,10 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>40 Winks (Europe, prototype 19991007)</description>
 		<year>1999</year>
 		<publisher>GT Interactive</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+Doubled [vi_scaley] on GT Interactive logo
+]]></notes>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-16F32SB-01" />
 			<feature name="u1" value="U1" /> <!-- Linear Voltage Regulator -->
@@ -443,6 +456,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>AI Shougi 3 (Japan)</description>
 		<year>1998</year>
 		<publisher>I4</publisher>
+		<notes><![CDATA[
+No sound during intro (btanb)
+]]></notes>
 		<info name="serial" value="NUS-NS3J-JPN"/>
 		<info name="release" value="19981218"/>
 		<info name="alt_title" value="AI将棋3"/>
@@ -457,6 +473,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>Aidyn Chronicles - The First Mage (Europe)</description>
 		<year>2001</year>
 		<publisher>T*HQ</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NAYP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
@@ -469,6 +488,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>Aidyn Chronicles - The First Mage (USA, rev 1)</description>
 		<year>2001</year>
 		<publisher>T*HQ</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NAYE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
@@ -486,6 +508,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>Aidyn Chronicles - The First Mage (USA)</description>
 		<year>2001</year>
 		<publisher>T*HQ</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NAYE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
@@ -570,6 +595,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>Akumajou Dracula Mokushiroku Gaiden - Legend of Cornell (Japan)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-ND4J-JPN (RZ031-J1)"/>
 		<info name="release" value="19991225"/>
 		<info name="alt_title" value="悪魔城ドラキュラ黙示録外伝 レジェンド オブ コーネル"/>
@@ -646,6 +674,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>All-Star Baseball 2000 (Europe)</description>
 		<year>1999</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NBEP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
@@ -658,6 +689,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>All-Star Baseball 2000 (USA)</description>
 		<year>1999</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NBEE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -675,6 +709,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>All-Star Baseball 2001 (USA)</description>
 		<year>2000</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NASE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -693,6 +730,10 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>Armorines - Project S.W.A.R.M. (Europe)</description>
 		<year>1999</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+Offset [vi_scaley]
+]]></notes>
 		<info name="serial" value="NUS-NARP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
@@ -705,6 +746,10 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>Armorines - Project S.W.A.R.M. (Germany)</description>
 		<year>1999</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+Offset [vi_scaley]
+]]></notes>
 		<info name="serial" value="NUS-NARD-NOE"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
@@ -717,6 +762,10 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>Armorines - Project S.W.A.R.M. (USA)</description>
 		<year>1999</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+Offset [vi_scaley]
+]]></notes>
 		<info name="serial" value="NUS-NARE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -733,6 +782,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>Army Men - Air Combat (USA)</description>
 		<year>2000</year>
 		<publisher>3DO Company</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NACE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -749,6 +801,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>Army Men - Sarge's Heroes (Europe)</description>
 		<year>1999</year>
 		<publisher>3DO Company</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NAMP-UKV"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x800000">
@@ -761,6 +816,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>Army Men - Sarge's Heroes (USA)</description>
 		<year>1999</year>
 		<publisher>3DO Company</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NAME-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -921,6 +979,10 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>Banjo to Kazooie no Daibouken 2 (Japan)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+Black screen [CIC]
+]]></notes>
 		<info name="serial" value="NUS-NB7J-JPN"/>
 		<info name="release" value="20001127"/>
 		<info name="alt_title" value="バンジョーとカズーイの大冒険2"/>
@@ -982,6 +1044,10 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>Banjo-Tooie (Australia)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+Black screen [CIC]
+]]></notes>
 		<info name="serial" value="NUS-NB7U-AUS"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
@@ -994,6 +1060,10 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>Banjo-Tooie (Europe)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+Black screen [CIC]
+]]></notes>
 		<info name="serial" value="NUS-NB7P-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
@@ -1006,6 +1076,10 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>Banjo-Tooie (USA)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+Black screen [CIC]
+]]></notes>
 		<info name="serial" value="NUS-NB7E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
@@ -1124,6 +1198,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>Battlezone - Rise of the Black Dogs (USA)</description>
 		<year>2000</year>
 		<publisher>Crave Entertainment</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NZOE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -1226,6 +1303,10 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>BioHazard 2 (Japan)</description>
 		<year>2000</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+Hangs on Capcom logo
+]]></notes>
 		<info name="serial" value="NUS-NB5J-JPN"/>
 		<info name="release" value="20000128"/>
 		<info name="alt_title" value="バイオハザード2"/>
@@ -1250,6 +1331,10 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>Blast Corps (Europe)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Heavy flickering
+Hangs after Rare logo
+]]></notes>
 		<info name="serial" value="NUS-NBCP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-01" />
@@ -1267,6 +1352,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>Blast Corps (USA, rev 1)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Heavy flickering
+]]></notes>
 		<info name="serial" value="NUS-NBCE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-01" />
@@ -1278,10 +1366,14 @@ Info on N64 chip labels (from The Cart Scan Repository)
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="blastcrpu1" cloneof="blastcrp" supported="no">
 		<description>Blast Corps (USA)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Heavy flickering
+]]></notes>
 		<info name="serial" value="NUS-NBCE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-01" />
@@ -1298,6 +1390,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>Blastdozer (Japan)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Heavy flickering
+]]></notes>
 		<info name="serial" value="NUS-NBCJ-JPN"/>
 		<info name="release" value="19970321"/>
 		<info name="alt_title" value="ブラストドーザー"/>
@@ -1605,6 +1700,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>A Bug's Life (Europe)</description>
 		<year>1999</year>
 		<publisher>Activision</publisher>
+		<notes><![CDATA[
+Black screen, writes to [cart] space
+]]></notes>
 		<info name="serial" value="NUS-NBYP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0xc00000">
@@ -1617,6 +1715,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>A Bug's Life (France)</description>
 		<year>1999</year>
 		<publisher>Activision</publisher>
+		<notes><![CDATA[
+Black screen, writes to [cart] space
+]]></notes>
 		<info name="serial" value="NUS-NBYF-FRA"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0xc00000">
@@ -1629,6 +1730,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>A Bug's Life (Germany)</description>
 		<year>1999</year>
 		<publisher>Activision</publisher>
+		<notes><![CDATA[
+Black screen, writes to [cart] space
+]]></notes>
 		<info name="serial" value="NUS-NBYD-NOE"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0xc00000">
@@ -1641,6 +1745,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>A Bug's Life (Italy)</description>
 		<year>1999</year>
 		<publisher>Activision</publisher>
+		<notes><![CDATA[
+Black screen, writes to [cart] space
+]]></notes>
 		<info name="serial" value="NUS-NBYI-ITA"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0xc00000">
@@ -1653,6 +1760,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>A Bug's Life (USA)</description>
 		<year>1999</year>
 		<publisher>Activision</publisher>
+		<notes><![CDATA[
+Black screen, writes to [cart] space
+]]></notes>
 		<info name="serial" value="NUS-NBYE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -1721,6 +1831,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>Bust-A-Move 3 DX (Europe)</description>
 		<year>1999</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+"Fatal error: RDP: load_tlut: size = 1" during attract
+]]></notes>
 		<info name="serial" value="NUS-NB3P-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x800000">
@@ -1865,6 +1978,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>Castlevania - Legacy of Darkness (Europe)</description>
 		<year>2000</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-ND4P-EUU"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
@@ -1877,6 +1993,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>Castlevania - Legacy of Darkness (USA)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-ND4E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -1905,6 +2024,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>Chameleon Twist (Europe)</description>
 		<year>1997</year>
 		<publisher>Sunsoft</publisher>
+		<notes><![CDATA[
+Prints a "Warning: [Rumble Pak] is malfunctioning. [Controller Pak] is not designed for use"
+]]></notes>
 		<info name="serial" value="NUS-NCTP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0xc00000">
@@ -2199,6 +2321,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>Command &amp; Conquer (Australia, Europe)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NCCP-AUS, NUS-NCCP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-06A-01" />
@@ -2217,6 +2342,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>Command &amp; Conquer (Germany)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NCCD-NOE"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
@@ -2229,6 +2357,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>Command &amp; Conquer (USA)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NCCE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-06A-01" />
@@ -2247,6 +2378,10 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>Conker's Bad Fur Day (Europe)</description>
 		<year>2001</year>
 		<publisher>T*HQ</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+Hangs after Nintendo logo
+]]></notes>
 		<info name="serial" value="NUS-NFUP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x4000000">
@@ -2259,6 +2394,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>Conker's Bad Fur Day (USA)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+]]></notes>
 		<info name="serial" value="NUS-NFUE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-02A-03" />
@@ -2311,6 +2449,9 @@ patched out (+ a fix for internal checksum)
 		<description>Conker's Bad Fur Day (prototype 20001025, decrypted)</description>
 		<year>2001?</year>
 		<publisher>Rare</publisher>
+		<notes><![CDATA[
+"CPU LOCKUP" after intro with bad sound (verify)
+]]></notes>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x4000000">
 				<rom name="bfd_ntsc_debug_dc.bin" size="0x4000000" crc="c9822f5c" sha1="6956bd77351a91cdd22af454a8d410a3b9c829f0" status="baddump" />
@@ -2322,6 +2463,9 @@ patched out (+ a fix for internal checksum)
 		<description>Conker's Bad Fur Day (prototype 20000826, ECTS demo, decrypted)</description>
 		<year>2001?</year>
 		<publisher>Rare</publisher>
+		<notes><![CDATA[
+Black screen
+]]></notes>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x4000000">
 				<rom name="conker_bfd_ects_dc.bin" size="0x4000000" crc="af9c5972" sha1="92575eed941324b9cd7d29df61e720b04d8b26cb" status="baddump" />
@@ -2469,6 +2613,9 @@ patched out (+ a fix for internal checksum)
 		<description>Custom Robo V2 (Japan)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM] (verify)
+]]></notes>
 		<info name="serial" value="NUS-NCZJ-JPN"/>
 		<info name="release" value="20001110"/>
 		<info name="alt_title" value="カスタムロボV2"/>
@@ -2577,6 +2724,9 @@ patched out (+ a fix for internal checksum)
 		<description>Deadly Arts (USA)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+"Fatal error: SET_SUBB_RGB_INPUT: key_center" after versus screen
+]]></notes>
 		<info name="serial" value="NUS-NGAE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -2633,6 +2783,9 @@ patched out (+ a fix for internal checksum)
 		<description>Derby Stallion 64 (Japan, prototype)</description>
 		<year>2001</year>
 		<publisher>Media Factory</publisher>
+		<notes><![CDATA[
+Black screen
+]]></notes>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
 				<rom name="derby stallion 64 (japan) (beta).bin" size="0x2000000" crc="418fa479" sha1="bca2db2b280261cd0e62b304ba3754a6c56351b5" />
@@ -2818,6 +2971,9 @@ patched out (+ a fix for internal checksum)
 		<description>Donald Duck - Goin' Quackers (USA)</description>
 		<year>2000</year>
 		<publisher>Ubi Soft</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NDQE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
@@ -2834,6 +2990,9 @@ patched out (+ a fix for internal checksum)
 		<description>Donald Duck - Quack Attack (Europe)</description>
 		<year>2000</year>
 		<publisher>Ubi Soft</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NDQP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1400000">
@@ -2846,6 +3005,9 @@ patched out (+ a fix for internal checksum)
 		<description>Donkey Kong 64 (Australia, Europe)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Heavy flickering
+]]></notes>
 		<info name="serial" value="NUS-NDOP-AUS, NUS-NDOP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -2862,6 +3024,9 @@ patched out (+ a fix for internal checksum)
 		<description>Donkey Kong 64 (Japan)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Heavy flickering
+]]></notes>
 		<info name="serial" value="NUS-NDOJ-JPN"/>
 		<info name="release" value="19991210"/>
 		<info name="alt_title" value="ドンキーコング64"/>
@@ -2882,6 +3047,10 @@ patched out (+ a fix for internal checksum)
 		<description>Donkey Kong 64 (USA)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Heavy flickering
+Black screen after pressing start on intro
+]]></notes>
 		<info name="serial" value="NUS-NDOE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -2900,6 +3069,9 @@ patched out (+ a fix for internal checksum)
 		<description>Donkey Kong 64 (USA, kiosk demo)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Gets stuck at offset Rare logo
+]]></notes>
 		<info name="serial" value="DIS-NUS-NDPE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -2918,6 +3090,9 @@ patched out (+ a fix for internal checksum)
 		<description>Doom 64 (Europe)</description>
 		<year>1997</year>
 		<publisher>GT Interactive</publisher>
+		<notes><![CDATA[
+Brightness has no effect in options menu
+]]></notes>
 		<info name="serial" value="NUS-NDMP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x800000">
@@ -2930,6 +3105,9 @@ patched out (+ a fix for internal checksum)
 		<description>Doom 64 (Japan)</description>
 		<year>1997</year>
 		<publisher>GameBank</publisher>
+		<notes><![CDATA[
+Brightness has no effect in options menu
+]]></notes>
 		<info name="serial" value="NUS-NDMJ-JPN"/>
 		<info name="release" value="19970801"/>
 		<info name="alt_title" value="ドゥーム64"/>
@@ -2944,6 +3122,9 @@ patched out (+ a fix for internal checksum)
 		<description>Doom 64 (USA, rev 1)</description>
 		<year>1997</year>
 		<publisher>Midway</publisher>
+		<notes><![CDATA[
+Brightness has no effect in options menu
+]]></notes>
 		<info name="serial" value="NUS-NDME-USA"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x800000">
@@ -2956,6 +3137,9 @@ patched out (+ a fix for internal checksum)
 		<description>Doom 64 (USA)</description>
 		<year>1997</year>
 		<publisher>Midway</publisher>
+		<notes><![CDATA[
+Brightness has no effect in options menu
+]]></notes>
 		<info name="serial" value="NUS-NDME-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-01" />
@@ -2991,6 +3175,9 @@ patched out (+ a fix for internal checksum)
 		<description>Doraemon 2 - Nobita to Hikari no Shinden (Japan)</description>
 		<year>1998</year>
 		<publisher>Epoch</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+]]></notes>
 		<info name="serial" value="NUS-ND2J-JPN"/>
 		<info name="release" value="19981211"/>
 		<info name="alt_title" value="ドラえもん2 のび太と光の神殿"/>
@@ -3005,6 +3192,9 @@ patched out (+ a fix for internal checksum)
 		<description>Doraemon 3 - Nobita no Machi SOS! (Japan)</description>
 		<year>2000</year>
 		<publisher>Epoch</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+]]></notes>
 		<info name="serial" value="NUS-N3DJ-JPN"/>
 		<info name="release" value="20000728"/>
 		<info name="alt_title" value="ドラえもん3 のび太の町SOS!"/>
@@ -3021,11 +3211,14 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
-<!-- Loops on retry message when failing to read backup data. Note: to work on N64 flash carts this proto needs save memory set to flash ram. -->
 	<software name="dbanchou" supported="no">
 		<description>Doubutsu Banchou (Japan, prototype)</description>
 		<year>200?</year>
 		<publisher>Marigul</publisher>
+		<notes><![CDATA[
+Loops on retry message when failing to read backup data after pressing start. 
+Note: to work on N64 flash carts this proto needs save memory set to [Flash RAM].
+]]></notes>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
 				<rom name="doubutsu_banchou.bin" size="0x2000000" crc="7a2e1b99" sha1="15a22d0e2320d4aa3487ec57532110ea4390b849" />
@@ -3385,6 +3578,9 @@ This cart features a RTC, currently unemulated
 		<description>Eikou no Saint Andrews (Japan)</description>
 		<year>1996</year>
 		<publisher>Seta Corporation</publisher>
+		<notes><![CDATA[
+Cannot start a game
+]]></notes>
 		<info name="serial" value="NUS-NSTJ-JPN"/>
 		<info name="release" value="19961129"/>
 		<info name="alt_title" value="栄光のセントアンドリュース"/>
@@ -3455,6 +3651,9 @@ This cart features a RTC, currently unemulated
 		<description>Excitebike 64 (Europe)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+]]></notes>
 		<info name="serial" value="NUS-NMXP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
@@ -3467,6 +3666,9 @@ This cart features a RTC, currently unemulated
 		<description>Excitebike 64 (Japan)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+]]></notes>
 		<info name="serial" value="NUS-NMXJ-JPN"/>
 		<info name="release" value="20000623"/>
 		<info name="alt_title" value="エキサイトバイク64"/>
@@ -3493,6 +3695,9 @@ This cart features a RTC, currently unemulated
 		<description>Excitebike 64 (USA, rev 1)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+]]></notes>
 		<info name="serial" value="NUS-NMXE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
@@ -3505,6 +3710,9 @@ This cart features a RTC, currently unemulated
 		<description>Excitebike 64 (USA)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+]]></notes>
 		<info name="serial" value="NUS-NMXE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -3789,6 +3997,9 @@ This cart features a RTC, currently unemulated
 		<description>F1 Racing Championship (Europe)</description>
 		<year>2000</year>
 		<publisher>Ubi Soft</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NFRP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
@@ -3801,6 +4012,9 @@ This cart features a RTC, currently unemulated
 		<description>F1 Racing Championship (Brazil)</description>
 		<year>2000</year>
 		<publisher>Gradiente</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="f1 racing championship (brazil).bin" size="0x1000000" crc="7ad98002" sha1="4fb7619af8d48b6dd8d8057ad9f6567b9e84f446" />
@@ -3812,6 +4026,9 @@ This cart features a RTC, currently unemulated
 		<description>Famista 64 (Japan)</description>
 		<year>1997</year>
 		<publisher>Namco</publisher>
+		<notes><![CDATA[
+Hangs on (skippable) intro
+]]></notes>
 		<info name="serial" value="NUS-NFSJ-JPN"/>
 		<info name="release" value="19971128"/>
 		<info name="alt_title" value="ファミスタ64"/>
@@ -4197,6 +4414,9 @@ This cart features a RTC, currently unemulated
 		<description>G.A.S.P!! Fighters' NEXTream (Europe)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+"Fatal error: SET_SUBB_RGB_INPUT: key_center" after versus screen
+]]></notes>
 		<info name="serial" value="NUS-NGAP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0xc00000">
@@ -4209,6 +4429,9 @@ This cart features a RTC, currently unemulated
 		<description>G.A.S.P!! Fighters' NEXTream (Japan)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+"Fatal error: SET_SUBB_RGB_INPUT: key_center" after versus screen
+]]></notes>
 		<info name="serial" value="NUS-NGAJ-JPN (RZ007-J1)"/>
 		<info name="release" value="19980326"/>
 		<info name="alt_title" value="ガスプ ファイターズ ネクストリーム"/>
@@ -4255,6 +4478,10 @@ This cart features a RTC, currently unemulated
 		<description>Ganbare! Nippon! Olympics 2000 (Japan)</description>
 		<year>2000</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+Black screen after Konami Sports
+]]></notes>
 		<info name="serial" value="NUS-N3HJ-JPN (RZ035-J1)"/>
 		<info name="release" value="20000713"/>
 		<info name="alt_title" value="がんばれ!ニッポン!オリンピック2000"/>
@@ -4429,12 +4656,13 @@ This cart features a RTC, currently unemulated
 		</part>
 	</software>
 
-<!-- reported as not working on the real hardware, incorrect internal checksum
-     rom with the crc 5f0ad6da is fixed with a correct checksum -->
 	<software name="gloverp" cloneof="glover" supported="no">
 		<description>Glover (prototype 19980716)</description>
 		<year>1998</year>
 		<publisher>Hasbro Interactive</publisher>
+		<notes><![CDATA[
+Reported as not working on real HW, incorrect internal checksum rom with the crc 5f0ad6da is fixed with a correct checksum
+]]></notes>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x4000000">
 				<rom name="glover (prototype).bin" size="0x4000000" crc="4c708e6d" sha1="72484ed65cc8cefe23e6536735d053b822bb7fbf"/>
@@ -4722,18 +4950,21 @@ This cart features a RTC, currently unemulated
 		</part>
 	</software>
 
-	<!-- Notes:
-	    This game requires the Nintendo VRU [NUS-020(USA)], a voice recognition unit that connects
-	    to controller 2 port and has the following hardware inside (parts from the Japanese version [NUS-020(Japan)]):
-	        pcb: NUS-VRU-01
-	        u1: Nintendo VRD-NUS 215 9915J3001
-	        u2: NEC D9930G 9912LP009 (linear CODEC LSI)
-	        u3: Nintendo VCI-NUS 9910XX003 011
+	<!-- 
+
 	-->
 	<software name="heypika" supported="no">
 		<description>Hey You, Pikachu! (USA)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+This game requires the Nintendo VRU [NUS-020(USA)], a voice recognition unit that connects
+to controller 2 port (ETA: port 4 according to the game) and has the following hardware inside (parts from the Japanese version [NUS-020(Japan)]):
+pcb: NUS-VRU-01
+u1: Nintendo VRD-NUS 215 9915J3001
+u2: NEC D9930G 9912LP009 (linear CODEC LSI)
+u3: Nintendo VCI-NUS 9910XX003 011
+]]></notes>
 		<info name="serial" value="NUS-NPGE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
@@ -4919,6 +5150,9 @@ This cart features a RTC, currently unemulated
 		<description>Hybrid Heaven (Europe)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NHVP-EUU"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
@@ -4931,6 +5165,9 @@ This cart features a RTC, currently unemulated
 		<description>Hybrid Heaven (Japan)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NHYJ-JPN (RZ011-J1)"/>
 		<info name="release" value="19990805"/>
 		<info name="alt_title" value="ハイブリッドヘブン"/>
@@ -4945,6 +5182,9 @@ This cart features a RTC, currently unemulated
 		<description>Hybrid Heaven (USA)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NHVE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -5109,6 +5349,9 @@ This cart features a RTC, currently unemulated
 		<description>Indiana Jones and the Infernal Machine (Australia, prototype)</description>
 		<year>2000</year>
 		<publisher>LucasArts</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
 				<rom name="indiana jones and the infernal machine (unreleased pal).bin" size="0x2000000" crc="de726d5a" sha1="be6abe64badfae9dc5f24d564e6c32fdcc442af7" />
@@ -5120,6 +5363,9 @@ This cart features a RTC, currently unemulated
 		<description>Indiana Jones and the Infernal Machine (USA)</description>
 		<year>2000</year>
 		<publisher>LucasArts</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NIJE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
@@ -5136,6 +5382,9 @@ This cart features a RTC, currently unemulated
 		<description>Indy Racing 2000 (USA)</description>
 		<year>2000</year>
 		<publisher>Infogrames</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NICE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -5185,6 +5434,9 @@ This cart features a RTC, currently unemulated
 		<description>International Superstar Soccer 2000 (Europe, English / German)</description>
 		<year>2000</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NISX-EUR, NUS-NISX-SCN"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
@@ -5277,6 +5529,10 @@ This cart features a RTC, currently unemulated
 		<description>International Track &amp; Field - Summer Games (Europe)</description>
 		<year>2000</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+Black screen after KCEO logo
+]]></notes>
 		<info name="serial" value="NUS-N3HP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0xc00000">
@@ -5289,6 +5545,10 @@ This cart features a RTC, currently unemulated
 		<description>International Track &amp; Field 2000 (USA)</description>
 		<year>2000</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+Black screen after KCEO logo
+]]></notes>
 		<info name="serial" value="NUS-N3HE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -5427,6 +5687,9 @@ This cart features a RTC, currently unemulated
 		<description>Jeremy McGrath Supercross 2000 (Europe)</description>
 		<year>2000</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NCOP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
@@ -5439,6 +5702,9 @@ This cart features a RTC, currently unemulated
 		<description>Jeremy McGrath Supercross 2000 (USA)</description>
 		<year>2000</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NCOE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
@@ -5451,6 +5717,9 @@ This cart features a RTC, currently unemulated
 		<description>Jet Force Gemini (Australia, Europe)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Black screen after Rare logo
+]]></notes>
 		<info name="serial" value="NUS-NJFP-AUS, NUS-NJFP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-06A-01" />
@@ -5469,6 +5738,9 @@ This cart features a RTC, currently unemulated
 		<description>Jet Force Gemini (USA)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Black screen after Rare logo
+]]></notes>
 		<info name="serial" value="NUS-NJFE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-06A-01" />
@@ -5487,6 +5759,9 @@ This cart features a RTC, currently unemulated
 		<description>Jet Force Gemini (USA, kiosk demo)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Black screen after Rare logo
+]]></notes>
 		<info name="serial" value="DIS-NUS-NJDE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-06A-01" />
@@ -5532,6 +5807,9 @@ This cart features a RTC, currently unemulated
 		<description>Jikkyou J.League Perfect Striker (Japan)</description>
 		<year>1996</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+"Fatal error: rdp_load_tlut: loading tlut into low half at 0 qwords" when choosing team in Exibition Menu
+]]></notes>
 		<info name="serial" value="NUS-NJPJ-JPN"/>
 		<info name="release" value="19961220"/>
 		<info name="alt_title" value="実況J.LEAGUE パーフェクトストライカー"/>
@@ -5546,7 +5824,7 @@ This cart features a RTC, currently unemulated
 		</part>
 	</software>
 
-	<software name="jikkjl99" cloneof="iss2k" supported="no">
+	<software name="jikkjl99" supported="no">
 		<description>Jikkyou J.League 1999 - Perfect Striker 2 (Japan, rev 1)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
@@ -5560,7 +5838,7 @@ This cart features a RTC, currently unemulated
 		</part>
 	</software>
 
-	<software name="jikkjl99a" cloneof="iss2k" supported="no">
+	<software name="jikkjl99a" cloneof="jikkjl99" supported="no">
 		<description>Jikkyou J.League 1999 - Perfect Striker 2 (Japan)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
@@ -5646,6 +5924,9 @@ This cart features a RTC, currently unemulated
 		<description>Jikkyou Powerful Pro Yakyuu 5 (Japan, rev 2)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+Stuck vertical lines during intro (i.e. when stadiums are displayed)
+]]></notes>
 		<info name="serial" value="NUS-NJ5J-JPN (RZ015-J1)"/>
 		<info name="release" value="19980326"/>
 		<info name="alt_title" value="実況パワフルプロ野球5"/>
@@ -5660,6 +5941,9 @@ This cart features a RTC, currently unemulated
 		<description>Jikkyou Powerful Pro Yakyuu 5 (Japan, rev 1)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+Stuck vertical lines during intro (i.e. when stadiums are displayed)
+]]></notes>
 		<info name="serial" value="NUS-NJ5J-JPN (RZ015-J1)"/>
 		<info name="release" value="19980326"/>
 		<info name="alt_title" value="実況パワフルプロ野球5"/>
@@ -5682,6 +5966,9 @@ This cart features a RTC, currently unemulated
 		<description>Jikkyou Powerful Pro Yakyuu 5 (Japan)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+Stuck vertical lines during intro (i.e. when stadiums are displayed)
+]]></notes>
 		<info name="serial" value="NUS-NJ5J-JPN (RZ015-J1)"/>
 		<info name="release" value="19980326"/>
 		<info name="alt_title" value="実況パワフルプロ野球5"/>
@@ -5868,6 +6155,9 @@ This cart features a RTC, currently unemulated
 		<description>John Romero's Daikatana (Europe)</description>
 		<year>2000</year>
 		<publisher>Kemco</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NDWP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
@@ -5880,6 +6170,10 @@ This cart features a RTC, currently unemulated
 		<description>John Romero's Daikatana (Japan)</description>
 		<year>2000</year>
 		<publisher>Kemco</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+Blackened title screen main banner
+]]></notes>
 		<info name="serial" value="NUS-NDWJ-JPN"/>
 		<info name="release" value="20000407"/>
 		<info name="alt_title" value="JOHN ROMERO'S 大刀 DAIKATANA"/>
@@ -5894,6 +6188,9 @@ This cart features a RTC, currently unemulated
 		<description>John Romero's Daikatana (USA)</description>
 		<year>2000</year>
 		<publisher>Kemco</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NDWE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -5952,6 +6249,9 @@ This cart features a RTC, currently unemulated
 		<description>Killer Instinct Gold (USA, rev 2)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Hangs during attract while showing TJ Combo data
+]]></notes>
 		<info name="serial" value="NUS-NKIE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0xc00000">
@@ -6246,6 +6546,9 @@ This cart features a RTC, currently unemulated
 		<description>The Legend of Zelda - Ocarina of Time (Europe, rev 1)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Hangs during intro when title appears
+]]></notes>
 		<info name="serial" value="NUS-NZLP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
@@ -6258,6 +6561,9 @@ This cart features a RTC, currently unemulated
 		<description>The Legend of Zelda - Ocarina of Time (Australia, Europe)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Hangs during intro when title appears
+]]></notes>
 		<info name="serial" value="NUS-NZLP-AUS, NUS-NZLP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-03A-01" />
@@ -6278,6 +6584,9 @@ This cart features a RTC, currently unemulated
 		<description>The Legend of Zelda - Ocarina of Time (USA, rev 2)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Hangs during intro when title appears
+]]></notes>
 		<info name="serial" value="NUS-CZLE-USA" />
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-03A-01" />
@@ -6298,6 +6607,9 @@ This cart features a RTC, currently unemulated
 		<description>The Legend of Zelda - Ocarina of Time (USA, rev 1)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Hangs during intro when title appears
+]]></notes>
 		<info name="serial" value="NUS-CZLE-USA" />
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-03A-01" />
@@ -6318,6 +6630,9 @@ This cart features a RTC, currently unemulated
 		<description>The Legend of Zelda - Ocarina of Time (Hong Kong, USA)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Hangs during intro when title appears
+]]></notes>
 		<info name="serial" value="NUS-CZLE-HKG, NUS-CZGE-USA (gold cart), NUS-CZLE-USA (grey cart)" />
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-03A-01" />
@@ -6422,6 +6737,9 @@ This cart features a RTC, currently unemulated
 		<description>Lylat Wars (Australia)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Looks too dim, cfr. pre-stage 1
+]]></notes>
 		<info name="serial" value="NUS-NFXU-AUS"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0xc00000">
@@ -6434,6 +6752,9 @@ This cart features a RTC, currently unemulated
 		<description>Lylat Wars (Europe)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Looks too dim, cfr. pre-stage 1
+]]></notes>
 		<info name="serial" value="NUS-NFXP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -6452,6 +6773,9 @@ This cart features a RTC, currently unemulated
 		<description>Mace - The Dark Age (Europe)</description>
 		<year>1997</year>
 		<publisher>Midway</publisher>
+		<notes><![CDATA[
+Cutoff texture symbol during intro
+]]></notes>
 		<info name="serial" value="NUS-NMEP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0xc00000">
@@ -6464,6 +6788,9 @@ This cart features a RTC, currently unemulated
 		<description>Mace - The Dark Age (USA)</description>
 		<year>1997</year>
 		<publisher>Midway</publisher>
+		<notes><![CDATA[
+Cutoff texture symbol during intro
+]]></notes>
 		<info name="serial" value="NUS-NMEE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -6540,6 +6867,9 @@ This cart features a RTC, currently unemulated
 		<description>Madden NFL 2002 (USA)</description>
 		<year>2001</year>
 		<publisher>Electronic Arts</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+]]></notes>
 		<info name="serial" value="NUS-N2ME-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
@@ -6899,8 +7229,12 @@ This cart features a RTC, currently unemulated
 		</part>
 	</software>
 
-<!--
-This cart features two SmartMedia slots to import pictures to manipulate in the game, currently unemulated.
+	<software name="mariopho" supported="no">
+		<description>Mario no Photopie (Japan)</description>
+		<year>1998</year>
+		<publisher>Tokyo Electron</publisher>
+		<notes><![CDATA[
+This cart features two [SmartMedia] slots to import pictures to manipulate in the game, currently unemulated.
 Known SmartMedia cards:
 Dumped Title                                                Japanese title                          Notes
   YES  Illust-shuu - Postcard 1                             イラスト集 ポストカード 1
@@ -6913,11 +7247,7 @@ Dumped Title                                                Japanese title      
    NO  Character-shuu - Hello Kitty                         キャラクター集 Hello Kitty
    NO  Character-shuu - Card Captor Sakura                  キャラクター集 カードキャプターさくら
    NO  Character-shuu - Medarot                             キャラクター集 メダロット                  Unreleased?
--->
-	<software name="mariopho" supported="no">
-		<description>Mario no Photopie (Japan)</description>
-		<year>1998</year>
-		<publisher>Tokyo Electron</publisher>
+]]></notes>
 		<info name="serial" value="NUS-NMPJ-JPN"/>
 		<info name="release" value="19981202"/>
 		<info name="alt_title" value="マリオのふぉとぴー"/>
@@ -7022,6 +7352,9 @@ Dumped Title                                                Japanese title      
 		<description>Mario Party 3 (Europe)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+]]></notes>
 		<info name="serial" value="NUS-NMVP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
@@ -7034,6 +7367,9 @@ Dumped Title                                                Japanese title      
 		<description>Mario Party 3 (Japan)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+]]></notes>
 		<info name="serial" value="NUS-NMVJ-JPN"/>
 		<info name="release" value="20001207"/>
 		<info name="alt_title" value="マリオパーティ3"/>
@@ -7048,6 +7384,9 @@ Dumped Title                                                Japanese title      
 		<description>Mario Party 3 (USA)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+]]></notes>
 		<info name="serial" value="NUS-NMVE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
@@ -7086,6 +7425,9 @@ Dumped Title                                                Japanese title      
 		<description>Mario Tennis (Europe)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+]]></notes>
 		<info name="serial" value="NUS-NM8P-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
@@ -7098,6 +7440,9 @@ Dumped Title                                                Japanese title      
 		<description>Mario Tennis (USA)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+]]></notes>
 		<info name="serial" value="NUS-NM8E-USA, DIS-NUS-NM8E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
@@ -7114,6 +7459,9 @@ Dumped Title                                                Japanese title      
 		<description>Mario Tennis 64 (Japan)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+]]></notes>
 		<info name="serial" value="NUS-NM8J-JPN"/>
 		<info name="release" value="20000721"/>
 		<info name="alt_title" value="マリオテニス64"/>
@@ -8216,6 +8564,9 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<description>Neon Genesis Evangelion (Japan)</description>
 		<year>1999</year>
 		<publisher>Bandai</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+]]></notes>
 		<info name="serial" value="NUS-NEVJ-JPN"/>
 		<info name="release" value="19990625"/>
 		<info name="alt_title" value="新世紀エヴァンゲリオン"/>
@@ -8959,6 +9310,9 @@ Random crashes on exit (verify)
 		<description>PD Ultraman Battle Collection 64 (Japan)</description>
 		<year>1999</year>
 		<publisher>Bandai</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+]]></notes>
 		<info name="serial" value="NUS-NUBJ-JPN"/>
 		<info name="release" value="19990716"/>
 		<info name="alt_title" value="PDウルトラマンバトルコレクション64"/>
@@ -9001,6 +9355,9 @@ Random crashes on exit (verify)
 		<description>Perfect Dark (Europe)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+]]></notes>
 		<info name="serial" value="NUS-NPDP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
@@ -9013,6 +9370,9 @@ Random crashes on exit (verify)
 		<description>Perfect Dark (Japan)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+]]></notes>
 		<info name="serial" value="NUS-NPDJ-JPN"/>
 		<info name="release" value="20001021"/>
 		<info name="alt_title" value="パーフェクトダーク"/>
@@ -9027,6 +9387,9 @@ Random crashes on exit (verify)
 		<description>Perfect Dark (USA, rev 1)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+]]></notes>
 		<info name="serial" value="NUS-NPDE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -9045,6 +9408,9 @@ Random crashes on exit (verify)
 		<description>Perfect Dark (USA)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+]]></notes>
 		<info name="serial" value="NUS-NPDE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
@@ -9122,18 +9488,18 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
-	<!-- Notes:
-	    This game requires the Nintendo VRSユニット [NUS-020(Japan)], a voice recognition unit that connects
-	    to controller 2 port and has the following hardware inside:
-	        pcb: NUS-VRU-01
-	        u1: Nintendo VRD-NUS 215 9915J3001
-	        u2: NEC D9930G 9912LP009 (linear CODEC LSI)
-	        u3: Nintendo VCI-NUS 9910XX003 011
-	-->
 	<software name="pikachu" cloneof="heypika" supported="no">
 		<description>Pikachuu Genki de Chuu (Japan)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+This game requires the Nintendo VRSユニット [NUS-020(Japan)], a voice recognition unit that connects
+to controller 2 port (ETA: port 4 according to the game) and has the following hardware inside (parts from the Japanese version [NUS-020(Japan)]):
+pcb: NUS-VRU-01
+u1: Nintendo VRD-NUS 215 9915J3001
+u2: NEC D9930G 9912LP009 (linear CODEC LSI)
+u3: Nintendo VCI-NUS 9910XX003 011
+]]></notes>
 		<info name="serial" value="NUS-NPGJ-JPN"/>
 		<info name="release" value="19981212"/>
 		<info name="alt_title" value="ピカチュウげんきでちゅう"/>
@@ -10234,6 +10600,10 @@ patched out (+ a fix for internal checksum)
 		<description>Resident Evil 2 (Europe)</description>
 		<year>1999</year>
 		<publisher>Virgin Interactive</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+Hangs on Capcom logo
+]]></notes>
 		<info name="serial" value="NUS-NREP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x4000000">
@@ -10246,6 +10616,10 @@ patched out (+ a fix for internal checksum)
 		<description>Resident Evil 2 (USA, rev 1)</description>
 		<year>1999</year>
 		<publisher>Capcom USA</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+Hangs on Capcom logo
+]]></notes>
 		<info name="serial" value="NUS-NREE-USA-1"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-04B-01" />
@@ -10268,6 +10642,10 @@ patched out (+ a fix for internal checksum)
 		<description>Resident Evil 2 (USA)</description>
 		<year>1999</year>
 		<publisher>Capcom USA</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+Hangs on Capcom logo
+]]></notes>
 		<info name="serial" value="NUS-NREE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-04B-01" />
@@ -10346,6 +10724,9 @@ patched out (+ a fix for internal checksum)
 		<description>Robot Ponkottsu 64 - 7tsu no Umi no Caramel (Japan)</description>
 		<year>1999</year>
 		<publisher>Hudson Soft</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+]]></notes>
 		<info name="serial" value="NUS-NR7J-JPN"/>
 		<info name="release" value="19991224"/>
 		<info name="alt_title" value="ロボットポンコッツ64 七つの海のカラメル"/>
@@ -10465,6 +10846,9 @@ patched out (+ a fix for internal checksum)
 		<description>RR64 - Ridge Racer 64 (Australia, Europe)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+]]></notes>
 		<info name="serial" value="NUS-NRZP-AUS, NUS-NRZP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
@@ -10477,6 +10861,9 @@ patched out (+ a fix for internal checksum)
 		<description>RR64 - Ridge Racer 64 (USA)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+]]></notes>
 		<info name="serial" value="NUS-NRZE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -11278,6 +11665,9 @@ patched out (+ a fix for internal checksum)
 		<description>Star Fox 64 (Japan)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Looks too dim, cfr. pre-stage 1
+]]></notes>
 		<info name="serial" value="NUS-NFXJ-JPN"/>
 		<info name="release" value="19970427"/>
 		<info name="alt_title" value="スターフォックス64"/>
@@ -11310,6 +11700,9 @@ patched out (+ a fix for internal checksum)
 		<description>Star Fox 64 (USA)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Looks too dim, cfr. pre-stage 1
+]]></notes>
 		<info name="serial" value="NUS-NFXE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-01" /> <!-- Also with NUS-01A-02 -->
@@ -11564,6 +11957,9 @@ patched out (+ a fix for internal checksum)
 		<description>Star Wars Episode I - Racer (Australia, Europe)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+]]></notes>
 		<info name="serial" value="NUS-NEPP-AUS, NUS-NEPP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-06A-02" />
@@ -11582,6 +11978,9 @@ patched out (+ a fix for internal checksum)
 		<description>Star Wars Episode I - Racer (Japan)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+]]></notes>
 		<info name="serial" value="NUS-NEPJ-JPN"/>
 		<info name="release" value="19990721"/>
 		<info name="alt_title" value="スター・ウォーズ エピソード1 レーサー"/>
@@ -11596,6 +11995,9 @@ patched out (+ a fix for internal checksum)
 		<description>Star Wars Episode I - Racer (USA)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+]]></notes>
 		<info name="serial" value="NUS-NEPE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-06A-02" />
@@ -14410,6 +14812,10 @@ clips onto the player's ear.
 		<description>Yoshi Story ~ Yoshi's Story - International Version (Japan, USA)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+Backgrounds leaves trails during gameplay
+]]></notes>
 		<info name="serial" value="NUS-NYSJ-JPN"/>
 		<info name="release" value="19971221"/>
 		<info name="alt_title" value="ヨッシーストーリー"/>
@@ -14430,6 +14836,10 @@ clips onto the player's ear.
 		<description>Yoshi's Story (Europe)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+Backgrounds leaves trails during gameplay
+]]></notes>
 		<info name="serial" value="NUS-NYSP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -14448,6 +14858,10 @@ clips onto the player's ear.
 		<description>Yoshi's Story (USA)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Requires [16KB EEPROM]
+Backgrounds leaves trails during gameplay
+]]></notes>
 		<info name="serial" value="NUS-NYSE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -14526,6 +14940,9 @@ clips onto the player's ear.
 		<description>Zelda no Densetsu - Toki no Ocarina (Japan, rev 2)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Hangs during intro when title appears
+]]></notes>
 		<info name="serial" value="NUS-CZLJ-JPN"/>
 		<info name="release" value="19981121"/>
 		<info name="alt_title" value="ゼルダの伝説 時のオカリナ"/>
@@ -14546,6 +14963,9 @@ clips onto the player's ear.
 		<description>Zelda no Densetsu - Toki no Ocarina (Japan, rev 1)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Hangs during intro when title appears
+]]></notes>
 		<info name="serial" value="NUS-CZLJ-JPN"/>
 		<info name="release" value="19981121"/>
 		<info name="alt_title" value="ゼルダの伝説 時のオカリナ"/>
@@ -14568,6 +14988,9 @@ clips onto the player's ear.
 		<description>Zelda no Densetsu - Toki no Ocarina (Japan)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Hangs during intro when title appears
+]]></notes>
 		<info name="serial" value="NUS-CZLJ-JPN"/>
 		<info name="release" value="19981121"/>
 		<info name="alt_title" value="ゼルダの伝説 時のオカリナ"/>
@@ -14608,6 +15031,7 @@ clips onto the player's ear.
 
 <!-- to be verified -->
 
+	<!-- TODO: make these with own parent-clone relationships -->
 	<software name="zeldaootmqd" cloneof="zeldaoot" supported="no">
 		<description>The Legend of Zelda - Ocarina of Time - Master Quest (USA, Debug Edition, GameCube ripped)</description>
 		<year>2003</year>
