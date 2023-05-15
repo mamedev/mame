@@ -151,6 +151,7 @@ Crisis Zone       Namco, 1999    System 23 Evolution 2
 
 * - Guitar Jam is not dumped yet and the hardware type is not confirmed.
     According to Bandai Namco's website it is indeed SS23, and includes an extra sound board with Zoom Corp. DSP.
+	Footage found here: https://twitter.com/kumazou7/status/1602690831567421440
 
 A System 23 unit is comprised of some of the following pieces....
 - SYSTEM23 POWER(A) PCB            Small PCB bolted to the metal box only consisting of power in and network in/out. Only Motocross Go! used this as its
