@@ -19,6 +19,8 @@ public:
 	mp3_audio(const void *base);
 	~mp3_audio();
 
+	void register_save(device_t &host);
+
 	bool decode_buffer(int &pos, int limit, short *output, int &output_samples, int &sample_rate, int &channels);
 
 	void clear();
