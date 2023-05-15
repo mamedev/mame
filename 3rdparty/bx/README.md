@@ -1,7 +1,7 @@
 bx
 ==
 
-Base library.
+Base X-platform library.
 
 [![License](https://img.shields.io/badge/license-BSD--2%20clause-blue.svg)](https://bkaradzic.github.io/bgfx/license.html)
 [![Join the chat at https://discord.gg/9eMbv7J](https://img.shields.io/discord/712512073522872352?color=%237289DA&label=bx&logo=discord&logoColor=white)](https://discord.gg/9eMbv7J)
