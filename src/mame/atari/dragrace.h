@@ -70,6 +70,8 @@ private:
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(frame_callback);
+	TIMER_CALLBACK_MEMBER(scanline_irq);
+	TIMER_CALLBACK_MEMBER(irq_off);
 
 	void main_map(address_map &map);
 
@@ -96,6 +98,8 @@ private:
 
 	// misc
 	uint8_t       m_gear[2]{};
+	emu_timer *m_scan_timer;
+	emu_timer *m_irq_off_timer;
 };
 
 //----------- defined in audio/dragrace.cpp -----------

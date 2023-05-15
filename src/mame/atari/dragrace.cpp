@@ -38,6 +38,21 @@ TIMER_DEVICE_CALLBACK_MEMBER(dragrace_state::frame_callback)
 	m_watchdog->watchdog_enable(m_in[0]->read() & 0x20);
 }
 
+TIMER_CALLBACK_MEMBER(dragrace_state::scanline_irq)
+{
+	m_maincpu->set_input_line(M6800_IRQ_LINE, ASSERT_LINE);
+	m_irq_off_timer->adjust(m_screen->scan_period() * 3);
+
+	// Four IRQs per frame (vpos = 64, 128, 192, 240)
+	int scanline = m_screen->vpos();
+	m_scan_timer->adjust(m_screen->time_until_pos(scanline < 240 ? std::min(scanline + 64, 240) : 64));
+}
+
+TIMER_CALLBACK_MEMBER(dragrace_state::irq_off)
+{
+	m_maincpu->set_input_line(M6800_IRQ_LINE, CLEAR_LINE);
+}
+
 
 void dragrace_state::speed1_w(uint8_t data)
 {
@@ -263,6 +278,10 @@ void dragrace_state::machine_start()
 	m_gear_sel.resolve();
 	m_tacho_sel.resolve();
 
+	m_scan_timer = timer_alloc(FUNC(dragrace_state::scanline_irq), this);
+	m_irq_off_timer = timer_alloc(FUNC(dragrace_state::irq_off), this);
+	m_scan_timer->adjust(m_screen->time_until_pos(64));
+
 	save_item(NAME(m_gear));
 }
 
@@ -277,7 +296,6 @@ void dragrace_state::dragrace(machine_config &config)
 	// basic machine hardware
 	M6800(config, m_maincpu, 12.096_MHz_XTAL / 12);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dragrace_state::main_map);
-	m_maincpu->set_periodic_int(FUNC(dragrace_state::irq0_line_hold), attotime::from_hz(4*60));
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 8);
 
@@ -285,9 +303,7 @@ void dragrace_state::dragrace(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_size(256, 262);
-	m_screen->set_visarea(0, 255, 0, 239);
+	m_screen->set_raw(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 0, 240); // vertical timings determined by sync PROM
 	m_screen->set_screen_update(FUNC(dragrace_state::screen_update));
 	m_screen->set_palette("palette");
 
