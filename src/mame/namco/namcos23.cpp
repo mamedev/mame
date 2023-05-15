@@ -1377,7 +1377,7 @@ Notes:
   LB1235 - Sanyo LB1235 65V 1.5A 4-channel Darlington Driver
   LB1233 - Sanyo LB1233 Darlington Transistor Array with Built-in Current Limiting Resistors
  MB87078 - Fujitsu MB87078 Electronic Volume Control IC (SOIC24)
- LC78815 - Sanyo LM78815 2-Channel 16-Bit D/A Converter (SOIC20)
+ LC78815 - Sanyo LC78815 2-Channel 16-Bit D/A Converter (SOIC20)
   LA4705 - Sanyo LA4705 15W 2-channel Power Amplifier
     J101 - 34 pin flat cable connector for filter board
     J102 - 50 pin flat cable connector for filter board
@@ -1411,7 +1411,7 @@ Notes: (* = these parts on bottom side of PCB)
  74AC00 - 74AC00 Quad 2-Input NAND Gate
 74AC244 - 74AC244 Octal Buffer/Line Driver with Tri-state Outputs
 NJM2100 - New Japan Radio Co. NJM2100 Dual Operational Amplifier
-LC78815 - Sanyo LM78815 2-Channel 16-Bit D/A Converter
+LC78815 - Sanyo LC78815 2-Channel 16-Bit D/A Converter
 
 This board plugs into the mainboard used for Final Furlong and connects to ASCA-1A I/O PCB.
 
@@ -4182,7 +4182,7 @@ ROM_START( finfurl )
 	ROM_LOAD16_WORD_SWAP( "ff2vera.ic3",  0x000000, 0x080000, CRC(ab681078) SHA1(ec8367404458a54893ab6bea29c8a2ba3272b816) )
 
 	ROM_REGION( 0x40000, "iocpu", 0 )   /* I/O board HD643334 H8/3334 MCU code */
-	ROM_LOAD( "asca1_io-a.ic2", 0x000000, 0x040000, CRC(77cdf69a) SHA1(497af1059f85c07bea2dd0d303481623f6019dcf) )
+	ROM_LOAD( "asc1_io-a.ic13", 0x000000, 0x040000, CRC(77cdf69a) SHA1(497af1059f85c07bea2dd0d303481623f6019dcf) )
 
 	ROM_REGION32_BE( 0x800000, "data", 0 )  /* data */
 	ROM_LOAD16_BYTE( "ff2mtah.3j",   0x000000, 0x400000, CRC(161003cd) SHA1(04409333a4776b17700fc6d1aa06a39560132e03) )
