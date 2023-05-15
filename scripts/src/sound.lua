@@ -1287,6 +1287,18 @@ if (SOUNDS["MULTIPCM"]~=null) then
 end
 
 ---------------------------------------------------
+-- MP3 AUDIO
+--@src/devices/sound/mp3_audio.h,SOUNDS["MP3_AUDIO"] = true
+---------------------------------------------------
+
+if (SOUNDS["MP3_AUDIO"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/mp3_audio.cpp",
+		MAME_DIR .. "src/devices/sound/mp3_audio.h",
+	}
+end
+
+---------------------------------------------------
 -- MPEG AUDIO
 --@src/devices/sound/mpeg_audio.h,SOUNDS["MPEG_AUDIO"] = true
 ---------------------------------------------------
@@ -1426,6 +1438,18 @@ if (SOUNDS["LC7535"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/lc7535.cpp",
 		MAME_DIR .. "src/devices/sound/lc7535.h",
+	}
+end
+
+---------------------------------------------------
+-- Sanyo LC82310
+--@src/devices/sound/lc82310.h,SOUNDS["LC82310"] = true
+---------------------------------------------------
+
+if (SOUNDS["LC82310"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/lc82310.cpp",
+		MAME_DIR .. "src/devices/sound/lc82310.h",
 	}
 end
 
