@@ -83,11 +83,13 @@ Wanted Games
 Aerosmith - Quest for Fame              (C) Namco,        2001
 http://www.bandainamcogames.co.jp/am/vg/questforfame/
 
-Soul Calibur Ver.B                      (C) Namco,        199?
+Soul Calibur Ver.B                      (C) Namco,        1998 (flyer date)
+https://flyers.arcade-museum.com/?page=flyer&db=videodb&id=1009&image=1
+https://flyers.arcade-museum.com/?page=flyer&db=videodb&id=4766&image=1
 Probably doesn't exist
 
-Submarines                              (C) Namco,        199?
-http://www.arcadeflyers.com/?page=thumbs&db=videodb&id=5531
+Submarines                              (C) Namco,        1999 (flyer date)
+https://flyers.arcade-museum.com/?page=flyer&db=videodb&id=5531&image=1
 This was cancelled, only the flyer exists.
 It was shown only at an amusement show. Possibly a prototype still exists. Possibly not.
 
@@ -96,6 +98,7 @@ Some kind of music game similar to Konami's Keyboard Mania series
 
 Um Jammer Lammy                         (C) Namco,        1999
 http://www.wailee.com/sys/lpic/UM_Jammer_Lammy.jpg
+https://www.youtube.com/watch?v=Jrwj4lUzKgU
 
 The Namco System 12 system comprises 3 mandatory PCB's....
 MOTHER PCB  - This is the main PCB. It holds all sound circuitry, sound ROMs, program ROMs, shared RAM, bank-switching
