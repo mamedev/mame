@@ -368,12 +368,12 @@ void tsconf_state::ram_page_write(u8 page, offs_t offset, u8 data)
 
 u16 tsconf_state::ram_read16(offs_t offset)
 {
-	return ((m_ram->read(offset & 0xfffffffe)) << 8) | m_ram->read(offset | 1);
+	return ((m_ram->read(offset & ~1)) << 8) | m_ram->read(offset | 1);
 }
 
 void tsconf_state::ram_write16(offs_t offset, u16 data)
 {
-	ram_page_write(0, offset & 0xfffffffe, data >> 8);
+	ram_page_write(0, offset & ~1, data >> 8);
 	ram_page_write(0, offset | 1, data & 0xff);
 }
 
