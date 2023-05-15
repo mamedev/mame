@@ -35,9 +35,13 @@ void lc82310_device::device_start()
 	save_item(NAME(m_ckctl));
 	save_item(NAME(m_dictl));
 	save_item(NAME(m_doctl));
+	save_item(NAME(m_ctl_state));
+	save_item(NAME(m_ctl_cmd));
 	save_item(NAME(m_ctl_bits));
 	save_item(NAME(m_ctl_byte));
 	save_item(NAME(m_ctl_out_byte));
+
+	mp3dec->register_save(*this);
 }
 
 void lc82310_device::device_reset()

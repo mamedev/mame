@@ -29,6 +29,17 @@ mp3_audio::~mp3_audio()
 {
 }
 
+void mp3_audio::register_save(device_t &host)
+{
+	host.save_item(NAME(m_found_stream));
+	host.save_item(NAME(dec->header));
+	host.save_item(NAME(dec->reserv_buf));
+	host.save_item(NAME(dec->mdct_overlap));
+	host.save_item(NAME(dec->qmf_state));
+	host.save_item(NAME(dec->reserv));
+	host.save_item(NAME(dec->free_format_bytes));
+}
+
 void mp3_audio::clear()
 {
 	mp3dec_init(dec.get());

@@ -87,6 +87,8 @@ void mas3507d_device::device_start()
 	save_item(NAME(playback_status));
 
 	save_item(NAME(frame_channels));
+
+	mp3dec->register_save(*this);
 }
 
 void mas3507d_device::device_reset()
