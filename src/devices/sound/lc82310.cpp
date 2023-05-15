@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "lc82310.h"
 #include "mp3_audio.h"
 
@@ -20,7 +21,7 @@ lc82310_device::lc82310_device(const machine_config &mconfig, const char *tag, d
 void lc82310_device::device_start()
 {
 	stream = stream_alloc(0, 2, 44100);
-	mp3dec = std::make_unique<mp3_audio>(static_cast<const uint8_t *>(&mp3data[0]));
+	mp3dec = std::make_unique<mp3_audio>(reinterpret_cast<const uint8_t *>(&mp3data[0]));
 
 	save_item(NAME(mp3data));
 	save_item(NAME(samples));
@@ -222,7 +223,7 @@ void lc82310_device::handle_command(uint8_t cmd, uint8_t param)
 			0.0,                          // 76
 		};
 
-		auto speaker_idx = cmd == CMD_UNK15_VOL ? 1 : 0; // guessed, both are set at the same time in current use cases
+		int speaker_idx = cmd == CMD_UNK15_VOL ? 1 : 0; // guessed, both are set at the same time in current use cases
 		m_output_gain[speaker_idx] = gain_table[std::min<uint8_t>(param, 0x4c)];
 
 		set_output_gain(speaker_idx, m_output_gain[speaker_idx]);

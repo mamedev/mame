@@ -2742,7 +2742,7 @@ void namcos10_memp3_state::port_write(offs_t offset, uint8_t data)
 template <int Port>
 uint8_t namcos10_memp3_state::port_read(offs_t offset)
 {
-	auto r = 0;
+	uint8_t r = 0;
 
 	if (Port == 7) {
 		r = (m_mp3_port7_data & ~1) | m_lc82310->doctl_r();
@@ -2800,8 +2800,8 @@ void namcos10_memp3_state::namcos10_memp3_base(machine_config &config)
 	});
 
 	LC82310(config, m_lc82310, XTAL(16'934'400));
-	m_lc82310->add_route(0, ":lspeaker", 1.0);
-	m_lc82310->add_route(1, ":rspeaker", 1.0);
+	m_lc82310->add_route(0, "lspeaker", 1.0);
+	m_lc82310->add_route(1, "rspeaker", 1.0);
 }
 
 void namcos10_memp3_state::machine_start()

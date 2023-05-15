@@ -53,7 +53,7 @@ mas3507d_device::mas3507d_device(const machine_config &mconfig, const char *tag,
 void mas3507d_device::device_start()
 {
 	stream = stream_alloc(0, 2, 44100);
-	mp3dec = std::make_unique<mp3_audio>(static_cast<const uint8_t *>(&mp3data[0]));
+	mp3dec = std::make_unique<mp3_audio>(reinterpret_cast<const uint8_t *>(&mp3data[0]));
 
 	cb_mpeg_frame_sync.resolve();
 	cb_demand.resolve();
