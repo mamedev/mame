@@ -124,7 +124,7 @@ u8 ss9602_device::read(offs_t offset)
 	else if (offset == 0x12)
 		return read_port_data(9) & 0x0f;
 	else if (offset >= 0x18 && offset <= 0x1e)
-		return "SUBSION"[offset];
+		return "SUBSION"[offset - 0x18];
 	else
 	{
 		if (!machine().side_effects_disabled())
@@ -156,7 +156,7 @@ u8 ss9802_device::read(offs_t offset)
 	else if (offset <= 0x09)
 		return read_port_data(offset);
 	else if (offset >= 0x13 && offset <= 0x19)
-		return "SUBSINO"[offset]; // for xtrain
+		return "SUBSINO"[offset - 0x13]; // for xtrain
 	else
 	{
 		if (!machine().side_effects_disabled())
