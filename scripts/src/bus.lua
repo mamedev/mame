@@ -2212,6 +2212,39 @@ if (BUSES["POFO"]~=null) then
 	}
 end
 
+
+---------------------------------------------------
+--
+--@src/devices/bus/psion/honda/slot.h,BUSES["PSION_HONDA"] = true
+---------------------------------------------------
+
+if (BUSES["PSION_HONDA"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/psion/honda/slot.cpp",
+		MAME_DIR .. "src/devices/bus/psion/honda/slot.h",
+		MAME_DIR .. "src/devices/bus/psion/honda/ssd.cpp",
+		MAME_DIR .. "src/devices/bus/psion/honda/ssd.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/psion/sibo/slot.h,BUSES["PSION_SIBO"] = true
+---------------------------------------------------
+
+if (BUSES["PSION_SIBO"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/psion/sibo/slot.cpp",
+		MAME_DIR .. "src/devices/bus/psion/sibo/slot.h",
+		MAME_DIR .. "src/devices/bus/psion/sibo/3fax.cpp",
+		MAME_DIR .. "src/devices/bus/psion/sibo/3fax.h",
+		MAME_DIR .. "src/devices/bus/psion/sibo/3link.cpp",
+		MAME_DIR .. "src/devices/bus/psion/sibo/3link.h",
+	}
+end
+
+
 ---------------------------------------------------
 --
 --@src/devices/bus/rc2014/rc2014.h,BUSES["RC2014"] = true

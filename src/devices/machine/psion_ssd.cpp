@@ -52,12 +52,12 @@ DEFINE_DEVICE_TYPE(PSION_SSD, psion_ssd_device, "psion_ssd", "Psion Solid State 
 
 void psion_ssd_device::device_add_mconfig(machine_config &config)
 {
-	PSION_ASIC5_PACK(config, m_asic5);
+	PSION_ASIC5(config, m_asic5, DERIVED_CLOCK(1, 1)).set_mode(psion_asic5_device::PACK_MODE);
 	m_asic5->readpa_handler().set([this]() { return m_ssd_data[latched_addr()]; });
 	m_asic5->writepa_handler().set([this](uint8_t data) { m_ssd_data[latched_addr()] = data; });
-	m_asic5->writepb_handler().set([this](uint8_t data) { m_addr_latch = (m_addr_latch & 0xffff00) | (data << 0); });
-	m_asic5->writepd_handler().set([this](uint8_t data) { m_addr_latch = (m_addr_latch & 0xff00ff) | (data << 8); });
-	m_asic5->writepc_handler().set([this](uint8_t data) { m_addr_latch = (m_addr_latch & 0x00ffff) | (data << 16); });
+	m_asic5->writepb_handler().set([this](uint8_t data) { m_port_latch = (m_port_latch & 0xffff00) | (data << 0); });
+	m_asic5->writepd_handler().set([this](uint8_t data) { m_port_latch = (m_port_latch & 0xff00ff) | (data << 8); });
+	m_asic5->writepc_handler().set([this](uint8_t data) { m_port_latch = (m_port_latch & 0x00ffff) | (data << 16); });
 }
 
 
@@ -73,7 +73,7 @@ psion_ssd_device::psion_ssd_device(const machine_config &mconfig, const char *ta
 	, m_door_cb(*this)
 	, m_door_timer(nullptr)
 	, m_info_byte(0)
-	, m_addr_latch(0)
+	, m_port_latch(0)
 	, m_mem_width(0)
 {
 }
@@ -129,7 +129,7 @@ void psion_ssd_device::device_start()
 
 void psion_ssd_device::device_reset()
 {
-	m_addr_latch = 0x00;
+	m_port_latch = 0x00;
 
 	// open the door
 	m_door_cb(ASSERT_LINE);
@@ -159,7 +159,6 @@ const software_list_loader &psion_ssd_device::get_software_list_loader() const
 {
 	return image_software_list_loader::instance();
 }
-
 
 
 TIMER_CALLBACK_MEMBER(psion_ssd_device::close_door)
@@ -206,7 +205,7 @@ void psion_ssd_device::call_unload()
 
 uint32_t psion_ssd_device::latched_addr()
 {
-	return (m_addr_latch & make_bitmask<uint32_t>(m_mem_width)) | (BIT(m_addr_latch, 22, 2) << m_mem_width);
+	return (m_port_latch & make_bitmask<uint32_t>(m_mem_width)) | (BIT(m_port_latch, 22, 2) << m_mem_width);
 }
 
 
@@ -221,38 +220,14 @@ void psion_ssd_device::set_info_byte(uint32_t size, uint8_t type)
 	// No. devices and size
 	switch (size)
 	{
-	case 0x010000: // 64K  (2 x 32K)
-		m_info_byte = 0x09;
-		m_mem_width = 15;
-		break;
-	case 0x020000: // 128K (1 x 128K)
-		m_info_byte = 0x03;
-		m_mem_width = 17;
-		break;
-	case 0x040000: // 256K (2 x 128K)
-		m_info_byte = 0x0b;
-		m_mem_width = 17;
-		break;
-	case 0x080000: // 512K (2 x 256K)
-		m_info_byte = 0x0c;
-		m_mem_width = 18;
-		break;
-	case 0x100000: // 1M   (4 x 256K)
-		m_info_byte = 0x1c;
-		m_mem_width = 18;
-		break;
-	case 0x200000: // 2M   (4 x 512K)
-		m_info_byte = 0x1d;
-		m_mem_width = 19;
-		break;
-	case 0x400000:// 4M   (4 x 1M)
-		m_info_byte = 0x1e;
-		m_mem_width = 20;
-		break;
-	case 0x800000:// 8M   (4 x 2M)
-		m_info_byte = 0x1f;
-		m_mem_width = 21;
-		break;
+	case 0x010000: m_info_byte |= 0x09; m_mem_width = 15; break; // 64K  (2 x 32K)
+	case 0x020000: m_info_byte |= 0x03; m_mem_width = 17; break; // 128K (1 x 128K)
+	case 0x040000: m_info_byte |= 0x0b; m_mem_width = 17; break; // 256K (2 x 128K)
+	case 0x080000: m_info_byte |= 0x0c; m_mem_width = 18; break; // 512K (2 x 256K)
+	case 0x100000: m_info_byte |= 0x1c; m_mem_width = 18; break; // 1M   (4 x 256K)
+	case 0x200000: m_info_byte |= 0x1d; m_mem_width = 19; break; // 2M   (4 x 512K)
+	case 0x400000: m_info_byte |= 0x1e; m_mem_width = 20; break; // 4M   (4 x 1M)
+	case 0x800000: m_info_byte |= 0x1f; m_mem_width = 21; break; // 8M   (4 x 2M)
 	}
 
 	// write protected
@@ -265,7 +240,7 @@ void psion_ssd_device::set_info_byte(uint32_t size, uint8_t type)
 
 uint8_t psion_ssd_device::data_r()
 {
-	if (m_info_byte)
+	if (m_info_byte & 7)
 	{
 		return m_asic5->data_r();
 	}
@@ -274,7 +249,7 @@ uint8_t psion_ssd_device::data_r()
 
 void  psion_ssd_device::data_w(uint16_t data)
 {
-	if (m_info_byte)
+	if (m_info_byte & 7)
 	{
 		m_asic5->data_w(data);
 	}

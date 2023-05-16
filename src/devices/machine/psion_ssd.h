@@ -6,8 +6,8 @@
 
 ****************************************************************************/
 
-#ifndef MAME_PSION_PSION_SSD_H
-#define MAME_PSION_PSION_SSD_H
+#ifndef MAME_MACHINE_PSION_SSD_H
+#define MAME_MACHINE_PSION_SSD_H
 
 #include "machine/psion_asic5.h"
 #include "imagedev/memcard.h"
@@ -57,8 +57,6 @@ private:
 	optional_memory_region  m_region;
 	required_device<psion_asic5_device> m_asic5;
 
-	inline uint32_t mem_addr() const noexcept { return (m_addr_latch & make_bitmask<uint32_t>(m_mem_width)) | (BIT(m_addr_latch, 22, 2) << m_mem_width); }
-
 	TIMER_CALLBACK_MEMBER(close_door);
 
 	devcb_write_line m_door_cb;
@@ -70,7 +68,7 @@ private:
 	uint32_t latched_addr();
 
 	uint8_t m_info_byte;
-	uint32_t m_addr_latch;
+	uint32_t m_port_latch;
 	int m_mem_width;
 
 	static constexpr uint8_t SSD_RAM    = 0;
@@ -81,4 +79,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(PSION_SSD, psion_ssd_device)
 
-#endif // MAME_PSION_PSION_SSD_H
+#endif // MAME_MACHINE_PSION_SSD_H

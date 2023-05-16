@@ -2897,16 +2897,31 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/psion_asic4.h,MACHINES["PSION_ASIC"] = true
 --@src/devices/machine/psion_asic5.h,MACHINES["PSION_ASIC"] = true
 --@src/devices/machine/psion_asic9.h,MACHINES["PSION_ASIC"] = true
 ---------------------------------------------------
 
 if (MACHINES["PSION_ASIC"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/machine/psion_asic4.cpp",
+		MAME_DIR .. "src/devices/machine/psion_asic4.h",
 		MAME_DIR .. "src/devices/machine/psion_asic5.cpp",
 		MAME_DIR .. "src/devices/machine/psion_asic5.h",
 		MAME_DIR .. "src/devices/machine/psion_asic9.cpp",
 		MAME_DIR .. "src/devices/machine/psion_asic9.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/psion_ssd.h,MACHINES["PSION_SSD"] = true
+---------------------------------------------------
+
+if (MACHINES["PSION_SSD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/psion_ssd.cpp",
+		MAME_DIR .. "src/devices/machine/psion_ssd.h",
 	}
 end
 
