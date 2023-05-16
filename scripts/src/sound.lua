@@ -969,7 +969,6 @@ if (SOUNDS["SP0250"]~=null) then
 end
 
 
-
 ---------------------------------------------------
 -- S14001A speech synthesizer
 --@src/devices/sound/s14001a.h,SOUNDS["S14001A"] = true
@@ -1122,11 +1121,12 @@ if (SOUNDS["VLM5030"]~=null) then
 end
 
 ---------------------------------------------------
--- Votrax speech synthesizer
---@src/devices/sound/votrax.h,SOUNDS["VOTRAX"] = true
+-- Votrax SC-01[-A] speech synthesizer
+--@src/devices/sound/votrax.h,SOUNDS["VOTRAX_SC01"] = true
+--@src/devices/sound/votrax.h,SOUNDS["VOTRAX_SC01A"] = true
 ---------------------------------------------------
 
-if (SOUNDS["VOTRAX"]~=null) then
+if (SOUNDS["VOTRAX_SC01"]~=null or SOUNDS["VOTRAX_SC01A"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/votrax.cpp",
 		MAME_DIR .. "src/devices/sound/votrax.h",

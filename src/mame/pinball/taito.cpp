@@ -564,7 +564,7 @@ void taito_8080::taito4(machine_config &config)
 	taito(config);
 
 	SPEAKER(config, "voxsnd").front_center();
-	VOTRAX_SC01(config, m_votrax, 720000); // guess
+	VOTRAX_SC01A(config, m_votrax, 720000); // guess
 	m_votrax->ar_callback().set(FUNC(taito_8080::votrax_request));
 	m_votrax->add_route(ALL_OUTPUTS, "voxsnd", 2.0);
 
