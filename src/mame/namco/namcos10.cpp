@@ -2294,7 +2294,7 @@ void namcos10_memn_state::ns10_ptblank3(machine_config &config)
 			0x0000000057001200ULL,0x00000000000000a4ULL,0x0000000000000150ULL,0x0000000000008004ULL,
 			0x0000000057002204ULL,0x0000000009001000ULL,0x0000000000102000ULL,0x0000000064004888ULL,
 			0x0000000000100008ULL,0x000000a0c0980600ULL,0x000000001801c020ULL,0x00005810881a09c0ULL,
-			//                                                                0x00000c10084a29dcULL  if non_linear[0] is 0x44 instead of of 0x04 then we need this isntead (final plaintext is the same) 
+			//                                                                0x00000c10084a29dcULL  if non_linear[0] is 0x44 instead of of 0x04 then we need this instead (final plaintext is the same) 
 			0x0000000400980600ULL,0x0000000000000300ULL,0x0000000000000080ULL,0x0000000000a00c0aULL
 		}, {
 			0x0000000041051000ULL,0x0000000000000024ULL,0x0000000000000050ULL,0x0000000000008004ULL,
