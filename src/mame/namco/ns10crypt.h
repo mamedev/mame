@@ -55,10 +55,21 @@ private:
 class ns10_type2_decrypter_device : public ns10_decrypter_device
 {
 public:
+	struct wordstate
+	{
+		uint64_t previous_cipherwords;
+		uint64_t previous_plainwords;
+
+		// workaround for incomplete calculation on ptblank3
+		uint8_t* non_linear_region_base;
+		size_t non_linear_region_size;
+		uint32_t non_linear_count;
+	};
+
 	// this encodes the decryption logic, which varies per game and is probably hard-coded into the CPLD
 	struct ns10_crypto_logic
 	{
-		using nonlinear_calculation_function = uint16_t (*)(uint64_t, uint64_t);
+		using nonlinear_calculation_function = uint16_t (*)(wordstate*);
 		using iv_calculation_function = uint64_t (*)(int);
 		uint64_t eMask[16]{};
 		uint64_t dMask[16]{};
@@ -86,8 +97,9 @@ private:
 	virtual void init(int iv) override;
 
 	uint16_t m_mask;
-	uint64_t m_previous_cipherwords;
-	uint64_t m_previous_plainwords;
+
+	wordstate m_wordstate;
+
 	const ns10_crypto_logic m_logic;
 
 	bool m_logic_initialized;

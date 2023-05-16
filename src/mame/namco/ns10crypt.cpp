@@ -211,9 +211,14 @@ const int ns10_type2_decrypter_device::INIT_SBOX[16]{0, 12, 13, 6, 2, 4, 9, 8, 1
 ns10_type2_decrypter_device::ns10_type2_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ns10_decrypter_device(mconfig, NS10_TYPE2_DECRYPTER, tag, owner, clock)
 	, m_mask(0)
-	, m_previous_cipherwords(0)
-	, m_previous_plainwords(0)
 {
+	m_wordstate.previous_cipherwords = 0;
+	m_wordstate.previous_plainwords = 0;
+
+	// workaround for incomplete calculation on ptblank3
+	m_wordstate.non_linear_region_base = nullptr;
+	m_wordstate.non_linear_region_size = 0;
+	m_wordstate.non_linear_count = 0;
 }
 
 ns10_type2_decrypter_device::ns10_type2_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, ns10_crypto_logic &&logic)
@@ -227,20 +232,20 @@ uint16_t ns10_type2_decrypter_device::decrypt(uint16_t cipherword)
 {
 	uint16_t const plainword = cipherword ^ m_mask;
 
-	m_previous_cipherwords <<= 16;
-	m_previous_cipherwords ^= cipherword;
-	m_previous_plainwords <<= 16;
-	m_previous_plainwords ^= plainword;
+	m_wordstate.previous_cipherwords <<= 16;
+	m_wordstate.previous_cipherwords ^= cipherword;
+	m_wordstate.previous_plainwords <<= 16;
+	m_wordstate.previous_plainwords ^= plainword;
 
 	m_mask = 0;
 	for (int j = 15; j >= 0; --j)
 	{
 		m_mask <<= 1;
-		m_mask ^= gf2_reduce(m_logic.eMask[j] & m_previous_cipherwords);
-		m_mask ^= gf2_reduce(m_logic.dMask[j] & m_previous_plainwords);
+		m_mask ^= gf2_reduce(m_logic.eMask[j] & m_wordstate.previous_cipherwords);
+		m_mask ^= gf2_reduce(m_logic.dMask[j] & m_wordstate.previous_plainwords);
 	}
 	m_mask ^= m_logic.xMask;
-	m_mask ^= m_logic.nonlinear_calculation(m_previous_cipherwords, m_previous_plainwords);
+	m_mask ^= m_logic.nonlinear_calculation(&m_wordstate);
 
 	return plainword;
 }
@@ -248,10 +253,10 @@ uint16_t ns10_type2_decrypter_device::decrypt(uint16_t cipherword)
 void ns10_type2_decrypter_device::init(int iv)
 {
 	if (m_logic.iv_calculation)
-		m_previous_cipherwords = m_logic.iv_calculation(iv);
+		m_wordstate.previous_cipherwords = m_logic.iv_calculation(iv);
 	else
-		m_previous_cipherwords = bitswap(INIT_SBOX[iv], 3, 16, 16, 2, 1, 16, 16, 0, 16, 16, 16, 16, 16, 16, 16, 16);
-	m_previous_plainwords = 0;
+		m_wordstate.previous_cipherwords = bitswap(INIT_SBOX[iv], 3, 16, 16, 2, 1, 16, 16, 0, 16, 16, 16, 16, 16, 16, 16, 16);
+	m_wordstate.previous_plainwords = 0;
 	m_mask = 0;
 }
 
@@ -261,4 +266,15 @@ void ns10_type2_decrypter_device::device_start()
 	assert(m_logic_initialized == true);
 
 	m_active = false;
+
+	if (memregion("non_linear"))
+	{
+		m_wordstate.non_linear_region_base = memregion("non_linear")->base();
+		m_wordstate.non_linear_region_size = memregion("non_linear")->bytes();
+	}
+	m_wordstate.non_linear_count = 0;
+
+	save_item(NAME(m_wordstate.previous_cipherwords));
+	save_item(NAME(m_wordstate.previous_plainwords));
+	save_item(NAME(m_wordstate.non_linear_count));
 }
