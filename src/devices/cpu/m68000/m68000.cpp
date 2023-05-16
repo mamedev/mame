@@ -25,10 +25,12 @@ m68000_device::m68000_device(const machine_config &mconfig, device_type type, co
 	  m_opcodes_config("opcodes", ENDIANNESS_BIG, 16, 24),
 	  m_uprogram_config("uprogram", ENDIANNESS_BIG, 16, 24),
 	  m_uopcodes_config("uopcodes", ENDIANNESS_BIG, 16, 24),
-	  m_cpu_space_config("cpu_space", ENDIANNESS_BIG, 16, 24, 0, address_map_constructor(FUNC(m68000_device::default_autovectors_map), this))
+	  m_cpu_space_config("cpu_space", ENDIANNESS_BIG, 16, 24, 0, address_map_constructor(FUNC(m68000_device::default_autovectors_map), this)),
+	  m_mmu(nullptr),
+	  m_disable_spaces(false),
+	  m_disable_specifics(false),
+	  m_disable_interrupt_callback(false)
 {
-	m_mmu = nullptr;
-	m_disable_interrupt_callback = false;
 }
 
 void m68000_device::abort_access(u32 reason)
@@ -150,7 +152,7 @@ device_memory_interface::space_config_vector m68000_device::memory_space_config(
 void m68000_device::default_autovectors_map(address_map &map)
 {
 	if(m_cpu_space_id == AS_CPU_SPACE && !has_configured_map(AS_CPU_SPACE)) {
-		offs_t mask = make_bitmask<offs_t>(24) - 0xf;
+		offs_t mask = make_bitmask<offs_t>(m_cpu_space_config.m_addr_width) - 0xf;
 		map(mask + 0x3, mask + 0x3).before_time(*this, FUNC(m68000_device::vpa_sync)).after_delay(*this, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return autovector(1); }));
 		map(mask + 0x5, mask + 0x5).before_time(*this, FUNC(m68000_device::vpa_sync)).after_delay(*this, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return autovector(2); }));
 		map(mask + 0x7, mask + 0x7).before_time(*this, FUNC(m68000_device::vpa_sync)).after_delay(*this, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return autovector(3); }));
@@ -170,17 +172,21 @@ void m68000_device::device_start()
 	m_rte_instr_callback.resolve();
 	m_tas_write_callback.resolve();
 
-	m_s_program = &space(AS_PROGRAM);
-	m_s_opcodes = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_s_program;
-	m_s_uprogram = has_space(AS_USER_PROGRAM) ? &space(AS_USER_PROGRAM) : m_s_program;
-	m_s_uopcodes = has_space(AS_USER_OPCODES) ? &space(AS_USER_OPCODES) : has_space(AS_USER_PROGRAM) ? m_s_uprogram : m_s_opcodes;
-	m_s_cpu_space = &space(m_cpu_space_id);
+	if(!m_disable_spaces) {
+		m_s_program = &space(AS_PROGRAM);
+		m_s_opcodes = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_s_program;
+		m_s_uprogram = has_space(AS_USER_PROGRAM) ? &space(AS_USER_PROGRAM) : m_s_program;
+		m_s_uopcodes = has_space(AS_USER_OPCODES) ? &space(AS_USER_OPCODES) : has_space(AS_USER_PROGRAM) ? m_s_uprogram : m_s_opcodes;
+		m_s_cpu_space = &space(m_cpu_space_id);
+	}
 
-	m_s_program->specific(m_r_program);
-	m_s_opcodes->specific(m_r_opcodes);
-	m_s_uprogram->specific(m_r_uprogram);
-	m_s_uopcodes->specific(m_r_uopcodes);
-	m_s_cpu_space->specific(m_cpu_space);
+	if(!(m_disable_specifics || m_disable_spaces)) {
+		m_s_program->specific(m_r_program);
+		m_s_opcodes->specific(m_r_opcodes);
+		m_s_uprogram->specific(m_r_uprogram);
+		m_s_uopcodes->specific(m_r_uopcodes);
+		m_s_cpu_space->specific(m_cpu_space);
+	}
 
 	if(m_mmu) {
 		m_handlers_f = s_handlers_if;
@@ -466,106 +472,4 @@ void m68000_device::end_interrupt_vector_lookup()
 {
 	m_int_vector = (m_edb & 0xff) << 2;
 	m_int_next_state = 0;
-}
-
-m68000_mcu_device::m68000_mcu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
-	m68000_device(mconfig, type, tag, owner, clock)
-{
-	m_disable_interrupt_callback = true;
-}
-
-void m68000_mcu_device::execute_run()
-{
-	internal_update(total_cycles());
-
-	m_icount -= m_count_before_instruction_step;
-	if(m_icount < 0) {
-		m_count_before_instruction_step = -m_icount;
-		m_icount = 0;
-	} else
-		m_count_before_instruction_step = 0;
-
-	while(m_bcount && m_icount <= m_bcount)
-		internal_update(total_cycles() + m_icount - m_bcount);
-
-	while(m_icount > 0) {
-		for(;;) {
-			if(m_icount > m_bcount && m_inst_substate)
-				(this->*(m_handlers_p[m_inst_state]))();
-
-			while(m_icount > m_bcount) {
-				if(m_inst_state >= S_first_instruction) {
-					m_ipc = m_pc - 2;
-					m_irdi = m_ird;
-
-					if(machine().debug_flags & DEBUG_FLAG_ENABLED)
-						debugger_instruction_hook(m_ipc);
-				}
-				(this->*(m_handlers_f[m_inst_state]))();
-			}
-
-			if(m_post_run)
-				do_post_run();
-			else
-				break;
-		}
-		if(m_icount > 0)
-			while(m_bcount && m_icount <= m_bcount)
-				internal_update(total_cycles() + m_icount - m_bcount);
-		if(m_icount > 0 && m_inst_substate) {
-			(this->*(m_handlers_p[m_inst_state]))();
-			if(m_post_run)
-				do_post_run();
-		}
-	}
-
-	if(m_icount < 0) {
-		m_count_before_instruction_step = -m_icount;
-		m_icount = 0;
-	}
-}
-
-void m68000_mcu_device::recompute_bcount(uint64_t event_time)
-{
-	if(!event_time || event_time >= total_cycles() + m_icount) {
-		m_bcount = 0;
-		return;
-	}
-	m_bcount = total_cycles() + m_icount - event_time;
-}
-
-void m68000_mcu_device::add_event(uint64_t &event_time, uint64_t new_event)
-{
-	if(!new_event)
-		return;
-	if(!event_time || event_time > new_event)
-		event_time = new_event;
-}
-
-void m68000_mcu_device::device_start()
-{
-	m68000_device::device_start();
-
-	if(m_mmu) {
-		m_handlers_f = s_handlers_ifm;
-		m_handlers_p = s_handlers_ipm;
-	} else {
-		m_handlers_f = s_handlers_dfm;
-		m_handlers_p = s_handlers_dpm;
-	}
-}
-
-void m68000_mcu_device::set_current_interrupt_level(u32 level)
-{
-	if(level == m_int_level)
-		return;
-
-	m_int_level = level;
-
-	/* A transition from < 7 to 7 always interrupts (NMI) */
-	/* Note: Level 7 can also level trigger like a normal IRQ */
-	if(m_int_level == 7)
-		m_nmi_pending = true;
-
-	update_interrupt();
 }

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "m68000.h"
+#include "m68000mcu.h"
 
 class tmp68301_device : public m68000_mcu_device
 {
