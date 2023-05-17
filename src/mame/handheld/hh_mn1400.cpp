@@ -6,7 +6,7 @@
 Matsushita (Panasonic) MN1400 handhelds
 
 TODO:
-- internal artwork for compperf and tmbaskb
+- internal artwork for tmbaskb
 
 *******************************************************************************/
 
@@ -20,6 +20,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
+#include "compperf.lh" // clickable
 #include "scrablexa.lh"
 
 #include "hh_mn1400_test.lh" // common test-layout - use external artwork
@@ -210,7 +211,7 @@ INPUT_PORTS_END
 void compperf_state::compperf(machine_config &config)
 {
 	// basic machine hardware
-	MN1400_28PINS(config, m_maincpu, 300000); // approximation - RC osc. R=18K, C=100pF
+	MN1400_28PINS(config, m_maincpu, 290000); // approximation - RC osc. R=18K, C=100pF
 	m_maincpu->write_c().set(FUNC(compperf_state::write_c));
 	m_maincpu->write_d().set(FUNC(compperf_state::write_d));
 	m_maincpu->write_e().set(FUNC(compperf_state::write_e));
@@ -221,7 +222,7 @@ void compperf_state::compperf(machine_config &config)
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 10);
 	m_display->set_bri_levels(0.25);
-	config.set_default_layout(layout_hh_mn1400_test);
+	config.set_default_layout(layout_compperf);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -378,7 +379,7 @@ INPUT_PORTS_END
 void scrablexa_state::scrablexa(machine_config &config)
 {
 	// basic machine hardware
-	MN1405(config, m_maincpu, 300000); // approximation - RC osc. R=15K, C=100pF
+	MN1405(config, m_maincpu, 310000); // approximation - RC osc. R=15K, C=100pF
 	m_maincpu->write_c().set(FUNC(scrablexa_state::write_c));
 	m_maincpu->write_d().set(FUNC(scrablexa_state::write_d));
 	m_maincpu->write_e().set(FUNC(scrablexa_state::write_e));
@@ -514,7 +515,7 @@ INPUT_PORTS_END
 void tmbaskb_state::tmbaskb(machine_config &config)
 {
 	// basic machine hardware
-	MN1400_28PINS(config, m_maincpu, 300000); // approximation - RC osc. R=18K, C=100pF
+	MN1400_28PINS(config, m_maincpu, 290000); // approximation - RC osc. R=18K, C=100pF
 	m_maincpu->write_c().set(FUNC(tmbaskb_state::write_c));
 	m_maincpu->set_c_mask(0x3ef);
 	m_maincpu->write_d().set(FUNC(tmbaskb_state::write_d));
@@ -554,7 +555,7 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1979, compperf,  0,        0,      compperf,  compperf,  compperf_state,  empty_init, "Lakeside", "Computer Perfection", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+SYST( 1979, compperf,  0,        0,      compperf,  compperf,  compperf_state,  empty_init, "Lakeside", "Computer Perfection", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 SYST( 1980, scrablexa, scrablex, 0,      scrablexa, scrablexa, scrablexa_state, empty_init, "Selchow & Righter", "Scrabble Lexor: Computer Word Game (MN1405 version)", MACHINE_SUPPORTS_SAVE )
 
