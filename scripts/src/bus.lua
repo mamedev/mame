@@ -481,6 +481,8 @@ if (BUSES["ATA"]~=null) then
 		MAME_DIR .. "src/devices/bus/ata/atapicdr.h",
 		MAME_DIR .. "src/devices/bus/ata/atapihle.cpp",
 		MAME_DIR .. "src/devices/bus/ata/atapihle.h",
+		MAME_DIR .. "src/devices/bus/ata/cp2024.cpp",
+		MAME_DIR .. "src/devices/bus/ata/cp2024.h",
 		MAME_DIR .. "src/devices/bus/ata/cr589.cpp",
 		MAME_DIR .. "src/devices/bus/ata/cr589.h",
 		MAME_DIR .. "src/devices/bus/ata/gdrom.cpp",
