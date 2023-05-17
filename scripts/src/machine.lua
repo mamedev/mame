@@ -2897,6 +2897,9 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/psion_asic1.h,MACHINES["PSION_ASIC"] = true
+--@src/devices/machine/psion_asic2.h,MACHINES["PSION_ASIC"] = true
+--@src/devices/machine/psion_asic3.h,MACHINES["PSION_ASIC"] = true
 --@src/devices/machine/psion_asic4.h,MACHINES["PSION_ASIC"] = true
 --@src/devices/machine/psion_asic5.h,MACHINES["PSION_ASIC"] = true
 --@src/devices/machine/psion_asic9.h,MACHINES["PSION_ASIC"] = true
@@ -2904,6 +2907,12 @@ end
 
 if (MACHINES["PSION_ASIC"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/machine/psion_asic1.cpp",
+		MAME_DIR .. "src/devices/machine/psion_asic1.h",
+		MAME_DIR .. "src/devices/machine/psion_asic2.cpp",
+		MAME_DIR .. "src/devices/machine/psion_asic2.h",
+		MAME_DIR .. "src/devices/machine/psion_asic3.cpp",
+		MAME_DIR .. "src/devices/machine/psion_asic3.h",
 		MAME_DIR .. "src/devices/machine/psion_asic4.cpp",
 		MAME_DIR .. "src/devices/machine/psion_asic4.h",
 		MAME_DIR .. "src/devices/machine/psion_asic5.cpp",

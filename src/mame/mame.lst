@@ -37721,6 +37721,11 @@ psionp350                       //
 psionp464                       //
 psionxp                         //
 
+@source:psion/psion3.cpp
+pocketbk                        // 1992 Acorn Pocket Book
+psion3                          // 1991 Psion Series 3
+psion3s                         // 1994 Psion Series 3s
+
 @source:psion/psion3a.cpp
 pocketbk2                       // 1994 Acorn Pocket Book II
 psion3a                         // 1993 Psion Series 3a
