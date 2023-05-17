@@ -30259,6 +30259,9 @@ nost                            // (c) 1993 Face
 nostj                           // (c) 1993 Face
 nostk                           // (c) 1993 Face
 
+@source:misc/mcm70.cpp
+mcm70                           // MCM/70
+
 @source:misc/megaphx.cpp
 hamboy                          // (c) 1990 Dinamic / Inder
 megaphx                         // (c) 1991 Dinamic / Inder
