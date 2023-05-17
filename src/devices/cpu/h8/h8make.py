@@ -52,7 +52,7 @@ def hexsplit(str):
     return res
         
 def has_memory(ins):
-    for s in ["read", "write", "sp_push", "sp_pop", "sp32_push", "sp32_pop", "fetch(", "prefetch_start(", "prefetch(", "prefetch_noirq("]:
+    for s in ["read", "write"]:
         if s in ins:
             return True
     return False
@@ -68,9 +68,16 @@ def save_full_one(f, t, name, source):
     substate = 1
     for line in source:
         if has_memory(line):
-            print("\tif(icount <= bcount) { inst_substate = %d; return; }" % substate, file=f)
             print(line, file=f)
-            substate += 1
+            print("\tif(icount <= bcount) {", file=f)
+            print("\t\tif(access_to_be_redone()) {", file=f)
+            print("\t\t\ticount++;", file=f)
+            print("\t\t\tinst_substate = %d;" % substate, file=f)
+            print("\t\t} else", file=f)
+            print("\t\t\tinst_substate = %d;" % (substate+1), file=f)
+            print("\t\treturn;", file=f)
+            print("\t}", file=f)
+            substate += 2
         elif has_eat(line):
             print("\tif(icount) { icount = bcount; } inst_substate = %d; return;" % substate, file=f)
             substate += 1
@@ -87,11 +94,20 @@ def save_partial_one(f, t, name, source):
     substate = 1
     for line in source:
         if has_memory(line):
-            print("\tif(icount <= bcount) { inst_substate = %d; return; }" % substate, file=f)
             print("\t[[fallthrough]];", file=f)
             print("case %d:;" % substate, file=f)
             print(line, file=f)
-            substate += 1
+            print("\tif(icount <= bcount) {", file=f)
+            print("\t\tif(access_to_be_redone()) {", file=f)
+            print("\t\t\ticount++;", file=f)
+            print("\t\t\tinst_substate = %d;" % substate, file=f)
+            print("\t\t} else", file=f)
+            print("\t\t\tinst_substate = %d;" % (substate+1), file=f)
+            print("\t\treturn;", file=f)
+            print("\t}", file=f)
+            print("\t[[fallthrough]];", file=f)
+            print("case %d:;" % (substate+1), file=f)
+            substate += 2
         elif has_eat(line):
             print("\tif(icount) { icount = bcount; } inst_substate = %d; return;" % substate, file=f)
             print("case %d:;" % substate, file=f)
@@ -156,7 +172,8 @@ class Opcode:
         self.extra_words = extra_words
         base_offset = len(self.val)/2 + self.skip
         for i in range(0, extra_words):
-            self.source.append("\tfetch(%d);\n" % (i+base_offset))
+            self.source.append("\tIR[%d] = read16i(PC);" % (i+base_offset))
+            self.source.append("\tPC += 2;")
 
     def description(self):
         return "%s %s %s" % (self.name, self.am1, self.am2)
@@ -269,7 +286,8 @@ class DispatchStep:
         end = start + self.skip
         s = []
         for i in range(start, end+1):
-            s.append("\tIR[%d] = fetch();" % i)
+            s.append("\tIR[%d] = read16i(PC);" % i)
+            s.append("\tPC += 2;")
         s.append("\tinst_state = 0x%x0000 | IR[%d];" % (self.id, end))
         return s
 

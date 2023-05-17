@@ -95,6 +95,7 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
+	virtual bool cpu_is_interruptible() const override { return true; }
 	virtual uint32_t execute_min_cycles() const noexcept override;
 	virtual uint32_t execute_max_cycles() const noexcept override;
 	virtual uint32_t execute_input_lines() const noexcept override;
@@ -156,17 +157,11 @@ protected:
 	virtual void irq_setup() = 0;
 
 	uint16_t read16i(uint32_t adr);
-	uint16_t fetch();
-	inline void fetch(int slot) { IR[slot] = fetch(); }
 	uint8_t read8(uint32_t adr);
 	void write8(uint32_t adr, uint8_t data);
 	uint16_t read16(uint32_t adr);
 	void write16(uint32_t adr, uint16_t data);
 	void internal(int cycles);
-	inline void prefetch() { prefetch_start(); prefetch_done(); }
-	inline void prefetch_noirq() { prefetch_start(); prefetch_done_noirq(); }
-	inline void prefetch_noirq_notrace() { prefetch_start(); prefetch_done_noirq_notrace(); }
-	void prefetch_start() { NPC = PC & 0xffffff; PIR = fetch(); }
 	void prefetch_switch(uint32_t pc, uint16_t ir) { NPC = pc & 0xffffff; PC = pc+2; PIR = ir; }
 	void prefetch_done();
 	void prefetch_done_noirq();

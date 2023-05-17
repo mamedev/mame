@@ -46,11 +46,11 @@ void h8_device::device_start()
 	uint32_t pcmask = mode_advanced ? 0xffffff : 0xffff;
 	state_add<uint32_t>(H8_PC, "PC",
 		[this]() { return NPC; },
-		[this](uint32_t pc) { PC = PPC = NPC = pc; prefetch_noirq_notrace(); }
+		[this](uint32_t pc) { PC = PPC = NPC = pc; PIR = read16i(PC); PC += 2; prefetch_done_noirq_notrace(); }
 	).mask(pcmask);
 	state_add<uint32_t>(STATE_GENPC, "GENPC",
 		[this]() { return NPC; },
-		[this](uint32_t pc) { PC = PPC = NPC = pc; prefetch_noirq_notrace(); }
+		[this](uint32_t pc) { PC = PPC = NPC = pc; PIR = read16i(PC); PC += 2; prefetch_done_noirq_notrace(); }
 	).mask(pcmask).noshow();
 	state_add(STATE_GENPCBASE, "CURPC",     PPC).mask(pcmask).noshow();
 	state_add(H8_CCR,          "CCR",       CCR);
@@ -359,13 +359,6 @@ uint16_t h8_device::read16i(uint32_t adr)
 {
 	icount--;
 	return cache.read_word(adr & ~1);
-}
-
-uint16_t h8_device::fetch()
-{
-	uint16_t res = read16i(PC);
-	PC += 2;
-	return res;
 }
 
 uint8_t h8_device::read8(uint32_t adr)
