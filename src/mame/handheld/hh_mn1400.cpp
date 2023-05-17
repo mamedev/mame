@@ -210,11 +210,9 @@ INPUT_PORTS_END
 void compperf_state::compperf(machine_config &config)
 {
 	// basic machine hardware
-	MN1400(config, m_maincpu, 300000); // approximation - RC osc. R=18K, C=100pF
+	MN1400_28PINS(config, m_maincpu, 300000); // approximation - RC osc. R=18K, C=100pF
 	m_maincpu->write_c().set(FUNC(compperf_state::write_c));
-	m_maincpu->set_c_mask(0x3e0);
 	m_maincpu->write_d().set(FUNC(compperf_state::write_d));
-	m_maincpu->set_d_mask(0xf, 0x5321);
 	m_maincpu->write_e().set(FUNC(compperf_state::write_e));
 	m_maincpu->read_a().set_ioport("IN.0");
 	m_maincpu->read_b().set_ioport("IN.1");
@@ -516,11 +514,10 @@ INPUT_PORTS_END
 void tmbaskb_state::tmbaskb(machine_config &config)
 {
 	// basic machine hardware
-	MN1400(config, m_maincpu, 300000); // approximation - RC osc. R=18K, C=100pF
+	MN1400_28PINS(config, m_maincpu, 300000); // approximation - RC osc. R=18K, C=100pF
 	m_maincpu->write_c().set(FUNC(tmbaskb_state::write_c));
 	m_maincpu->set_c_mask(0x3ef);
 	m_maincpu->write_d().set(FUNC(tmbaskb_state::write_d));
-	m_maincpu->set_d_mask(0xf, 0x5321);
 	m_maincpu->write_e().set(FUNC(tmbaskb_state::write_e));
 	m_maincpu->read_b().set(FUNC(tmbaskb_state::read_b));
 	m_maincpu->read_sns().set_ioport("IN.3");
