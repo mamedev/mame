@@ -91,8 +91,7 @@ MSX View - ASCII
 MSX-AID - ASCII
 MSX-BASIC kun - ASCII
 MSX-Logo (Jpn) - Promotic International?
-MSX-PLAN - ASCII
-MSX-SERIALl232 - ASCII
+MSX-SERIAL232 - ASCII
 Multitext - Victor
 Music Score Processor - Musician - Cando
 Musician 1 - Cando
@@ -1196,7 +1195,6 @@ kept for now until finding out what those bytes affect...
 
 
 <!-- Unconfirmed dumps (from misc collections) -->
-
 
 	<software name="10yard">
 		<description>10-Yard Fight (Japan)</description>
@@ -3896,8 +3894,8 @@ kept for now until finding out what those bytes affect...
 		<publisher>Eaglesoft</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
-			<dataarea name="rom" size="49152">
-				<rom name="confused (europe).rom" size="49152" crc="63084e71" sha1="9865f0bc4d54137809f0d8b48d5461ddf0c5bf4c" status="baddump" />
+			<dataarea name="rom" size="0xc000">
+				<rom name="confused (europe).rom" size="0xc000" crc="63084e71" sha1="9865f0bc4d54137809f0d8b48d5461ddf0c5bf4c" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -13509,6 +13507,22 @@ kept for now until finding out what those bytes affect...
 
 <!-- Confirmed dumps from cart -->
 
+	<software name="msxplan">
+		<description>MSX-PLAN (Japan)</description>
+		<year>1986</year>
+		<publisher>ASCII</publisher>
+		<info name="alt_title" value="エムエスエックス・プラン" />
+		<info name="usage" value="Application can be started from Basic by typing _MSXPLAN" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="m27256z.rom1" size="0x8000" crc="e9e8e123" sha1="61d99816055858b3bcde3416eed30fd86390393d" />
+				<rom size="0x8000" offset="0x8000" loadflag="reload" />
+			</dataarea>
+		</part>
+	</software>
+
+
 <!-- Unconfirmed dumps (from misc collections) -->
 
 	<!-- Sold with Neos MS-10 mouse. -->
@@ -13558,7 +13572,7 @@ kept for now until finding out what those bytes affect...
 		<year>1984</year>
 		<publisher>HAL Kenkyuujo</publisher>
 		<info name="serial" value="HM-014" />
-		<info name="usage" value="Application can be entered from Basic by typing CALL EDDY2" />
+		<info name="usage" value="Application can be started from Basic by typing CALL EDDY2" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
@@ -13572,7 +13586,7 @@ kept for now until finding out what those bytes affect...
 		<year>1984</year>
 		<publisher>HAL Kenkyuujo</publisher>
 		<info name="serial" value="HM-014" />
-		<info name="usage" value="Application can be entered from Basic by typing CALL EDDY2" />
+		<info name="usage" value="Application can be started from Basic by typing CALL EDDY2" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
@@ -14448,8 +14462,8 @@ kept for now until finding out what those bytes affect...
 		<publisher>Yamaha</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="0"/>
-			<dataarea name="rom" size="49152">
-				<rom name="yrm303.rom" size="49152" crc="29877db7" sha1="4a5cf6fffaa793eca8583ac8b2ba71bf993cccb4" />
+			<dataarea name="rom" size="0xc000">
+				<rom name="yrm303.rom" size="0xc000" crc="29877db7" sha1="4a5cf6fffaa793eca8583ac8b2ba71bf993cccb4" />
 			</dataarea>
 		</part>
 	</software>
@@ -18904,6 +18918,7 @@ legacy FM implementations cannot find it.
 		<year>2012</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="hap"/>
+		<info name="usage" value="Hold key 1-5 at boot to select level."/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<dataarea name="rom" size="0x20000">
