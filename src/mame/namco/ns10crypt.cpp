@@ -162,6 +162,11 @@ ns10_type1_decrypter_device::ns10_type1_decrypter_device(const machine_config &m
 {
 }
 
+void ns10_decrypter_device::device_start()
+{
+	save_item(NAME(m_active));
+}
+
 uint16_t ns10_type1_decrypter_device::decrypt(uint16_t cipherword)
 {
 	uint16_t plainword = m_mask ^ bitswap<16>(cipherword, 9, 13, 15, 7, 14, 8, 6, 10, 11, 12, 3, 5, 0, 1, 4, 2);
@@ -195,7 +200,12 @@ void ns10_type1_decrypter_device::init(int iv)
 
 void ns10_type1_decrypter_device::device_start()
 {
+	ns10_decrypter_device::device_start();
+
 	m_active = false;
+
+	save_item(NAME(m_mask));
+	save_item(NAME(m_counter));
 }
 
 mrdrilr2_decrypter_device::mrdrilr2_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -262,6 +272,8 @@ void ns10_type2_decrypter_device::init(int iv)
 
 void ns10_type2_decrypter_device::device_start()
 {
+	ns10_decrypter_device::device_start();
+
 	// If the logic isn't initialized then this will just fail
 	assert(m_logic_initialized == true);
 
@@ -274,6 +286,7 @@ void ns10_type2_decrypter_device::device_start()
 	}
 	m_wordstate.non_linear_count = 0;
 
+	save_item(NAME(m_mask));
 	save_item(NAME(m_wordstate.previous_cipherwords));
 	save_item(NAME(m_wordstate.previous_plainwords));
 	save_item(NAME(m_wordstate.non_linear_count));

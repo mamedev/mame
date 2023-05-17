@@ -24,7 +24,7 @@ public:
 protected:
 	ns10_decrypter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override = 0;
+	virtual void device_start() override;
 
 	virtual void init(int iv) = 0;
 
