@@ -452,7 +452,9 @@ void m6502_device::state_import(const device_state_entry &entry)
 	case M6502_PC:
 		PC = NPC;
 		irq_taken = false;
-		prefetch();
+		prefetch_start();
+		IR = mintf->read_sync(PC);
+		prefetch_end();
 		PPC = NPC;
 		inst_state = IR | inst_state_base;
 		break;
@@ -483,12 +485,15 @@ void m6502_device::state_string_export(const device_state_entry &entry, std::str
 	}
 }
 
-void m6502_device::prefetch()
+void m6502_device::prefetch_start()
 {
 	sync = true;
 	sync_w(ASSERT_LINE);
 	NPC = PC;
-	IR = mintf->read_sync(PC);
+}
+
+void m6502_device::prefetch_end()
+{
 	sync = false;
 	sync_w(CLEAR_LINE);
 
@@ -499,12 +504,8 @@ void m6502_device::prefetch()
 		PC++;
 }
 
-void m6502_device::prefetch_noirq()
+void m6502_device::prefetch_end_noirq()
 {
-	sync = true;
-	sync_w(ASSERT_LINE);
-	NPC = PC;
-	IR = mintf->read_sync(PC);
 	sync = false;
 	sync_w(CLEAR_LINE);
 	PC++;
