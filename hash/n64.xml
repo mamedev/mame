@@ -7538,6 +7538,10 @@ Requires [16KB EEPROM]
 		<description>Mickey no Racing Challenge USA (Japan)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Horizontal white line on initial Disney/Nintendo/Rare logos
+Black screen after title if left idle
+]]></notes>
 		<info name="serial" value="NUS-NMLJ-JPN"/>
 		<info name="release" value="20010121"/>
 		<info name="alt_title" value="ミッキーのレーシングチャレンジUSA"/>
@@ -7552,6 +7556,10 @@ Requires [16KB EEPROM]
 		<description>Mickey's Speedway USA (Europe)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Horizontal white line on initial Disney/Nintendo/Rare logos
+Black screen after title if left idle
+]]></notes>
 		<info name="serial" value="NUS-NMLP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
@@ -7564,6 +7572,10 @@ Requires [16KB EEPROM]
 		<description>Mickey's Speedway USA (USA)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Horizontal white line on initial Disney/Nintendo/Rare logos
+Black screen after title if left idle
+]]></notes>
 		<info name="serial" value="NUS-NMLE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
@@ -7665,7 +7677,7 @@ Requires [16KB EEPROM]
 	</software>
 
 	<software name="miniracr" supported="no">
-		<description>Mini Racers (prototype)</description>
+		<description>Mini Racers (Japan, prototype)</description>
 		<year>1999</year>
 		<publisher>Looking Glass Studios</publisher>
 		<part name="cart" interface="n64_cart">
@@ -8627,6 +8639,9 @@ Requires [16KB EEPROM]
 		<description>NFL Blitz - Special Edition (USA)</description>
 		<year>2001</year>
 		<publisher>Midway</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NSZE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
@@ -8833,6 +8848,9 @@ Requires [16KB EEPROM]
 		<description>NHL Breakaway 98 (Europe)</description>
 		<year>1998</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+Black screen
+]]></notes>
 		<info name="serial" value="NUS-NHLP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0xc00000">
@@ -8845,6 +8863,9 @@ Requires [16KB EEPROM]
 		<description>NHL Breakaway 98 (USA)</description>
 		<year>1998</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+Black screen
+]]></notes>
 		<info name="serial" value="NUS-NHLE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -8861,6 +8882,9 @@ Requires [16KB EEPROM]
 		<description>NHL Breakaway 99 (Europe)</description>
 		<year>1998</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+Black screen
+]]></notes>
 		<info name="serial" value="NUS-NH9P-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0xc00000">
@@ -8873,6 +8897,9 @@ Requires [16KB EEPROM]
 		<description>NHL Breakaway 99 (USA)</description>
 		<year>1998</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+Black screen
+]]></notes>
 		<info name="serial" value="NUS-NH9E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -8937,6 +8964,9 @@ Requires [16KB EEPROM]
 		<description>Nintendo All-Star! Dairantou Smash Brothers (Japan)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Screen Adjust in Option Mode doesn't move screen
+]]></notes>
 		<info name="serial" value="NUS-NALJ-JPN"/>
 		<info name="release" value="19990115"/>
 		<info name="alt_title" value="ニンテンドウオールスター! 大乱闘スマッシュブラザーズ"/>
@@ -8959,6 +8989,9 @@ Requires [16KB EEPROM]
 		<description>Nuclear Strike 64 (Europe)</description>
 		<year>1999</year>
 		<publisher>T*HQ</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NCEP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
@@ -8971,6 +9004,9 @@ Requires [16KB EEPROM]
 		<description>Nuclear Strike 64 (Germany)</description>
 		<year>1999</year>
 		<publisher>T*HQ</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NCED-NOE"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
@@ -8983,6 +9019,9 @@ Requires [16KB EEPROM]
 		<description>Nuclear Strike 64 (USA)</description>
 		<year>1999</year>
 		<publisher>T*HQ</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NCEE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -12266,6 +12305,9 @@ Requires [16KB EEPROM]
 		<description>Super Smash Bros. (Australia)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Screen Adjust in Option Mode doesn't move screen
+]]></notes>
 		<info name="serial" value="NUS-NALU-AUS"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-03A-01" />
@@ -12284,6 +12326,9 @@ Requires [16KB EEPROM]
 		<description>Super Smash Bros. (Europe)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Screen Adjust in Option Mode doesn't move screen
+]]></notes>
 		<info name="serial" value="NUS-NALP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-03A-01" />
@@ -12304,6 +12349,9 @@ Requires [16KB EEPROM]
 		<description>Super Smash Bros. (USA)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Screen Adjust in Option Mode doesn't move screen
+]]></notes>
 		<info name="serial" value="NUS-NALE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-03A-01" />
