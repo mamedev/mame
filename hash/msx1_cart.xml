@@ -7922,6 +7922,19 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="loveplus">
+		<description>The Love Plus Pack 0 (Korea, pirate)</description>
+		<!-- An online ad for these cartridges is from 2018. -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="loveplus" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="the love plus pack.rom" size="0x200000" crc="5546638c" sha1="b72a26b5980ac826482b658db6a988790c9624ac" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lunarbal">
 		<description>Lunar Ball (Japan)</description>
 		<year>1985</year>
@@ -12027,6 +12040,19 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<!-- Modem hardware not implemented yet. -->
+	<software name="teltron" supported="no">
+		<description>Tel-Tron (Netherlands)</description>
+		<year>1986</year>
+		<publisher>DCS</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="tel-tron - dcs (1986).rom" size="0x4000" crc="d364d16a" sha1="5b7d35b38034e2e50b49c89e563a5614ea125e98" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="telebunn">
 		<description>Telebunnie (Japan)</description>
 		<year>1984</year>
@@ -12313,6 +12339,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Toshiba</publisher>
 		<info name="alt_title" value="トップローラー"/>
 		<info name="serial" value="HX-S119"/>
+		<info name="usage" value="Requires an MSX1 system."/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
@@ -12462,6 +12489,18 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="trundemo">
+		<description>Trun (demo)</description>
+		<year>2016</year>
+		<publisher>VG Source</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="trun - the pets mode (2016) [demo Version].rom" size="0xc000" crc="9770d248" sha1="fd38936e9023936f22f1fae49f2746622acb1e97" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="turboat">
 		<description>Turboat (Japan)</description>
 		<year>1984</year>
@@ -12525,6 +12564,30 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="twin hammer (europe).rom" size="0x8000" crc="28a7cebc" sha1="4fa5382df5a8ff7d631be22bb8445e7bc8018a11" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="twinhamma" cloneof="twinhamm">
+		<description>Twin Hammer (Europe, alt)</description>
+		<year>1989</year>
+		<publisher>Best</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="twin hammer (europe, alt).rom" size="0x8000" crc="8ab1fb6b" sha1="d553729af562f9aed3669990407121ebd0e28132" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="twinhammb" cloneof="twinhamm">
+		<description>Twin Hammer (Europe, alt 2)</description>
+		<year>1989</year>
+		<publisher>Best</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="twin hammer (europe, alt 2).rom" size="0x8000" crc="66b03146" sha1="968b1a88ba6f474ac9cfa2c0bc307119c3a53022" />
 			</dataarea>
 		</part>
 	</software>
@@ -12603,6 +12666,21 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<!-- The Links version? Code starts from $8000 instead of $4000 in the regular releases. -->
+	<software name="hustlerb" cloneof="konbill">
+		<description>Video Hustler (Japan, alt 2)</description>
+		<year>1984</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="RC706" />
+		<info name="alt_title" value="ビデオハスラー" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="video hustler - konami billiards - konami (1984) [the link].rom" size="0x2000" crc="08d007cb" sha1="2b7802d594baab9c04e5a5d1a406fc0f5f295bfc" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="vifam">
 		<description>Vifam (Japan)</description>
 		<year>1984</year>
@@ -12656,6 +12734,20 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="volguard (japan).rom" size="0x8000" crc="874e59fb" sha1="6dfc622e350d29859f05fddb3fa1f974cd4c8bf2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="volguarda" cloneof="volguard">
+		<description>Volguard (Japan, alt)</description>
+		<year>1985</year>
+		<publisher>dB-Soft</publisher>
+		<info name="serial" value="MSI-G2105-LI" />
+		<info name="alt_title" value="ヴォルガード" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="volguard (japan).rom" size="0x8000" crc="a74cb8a9" sha1="ee8476a3828376c81d8c361da541e19f1c2829d6" />
 			</dataarea>
 		</part>
 	</software>
@@ -16108,6 +16200,18 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
+	<software name="ttracer">
+		<description>TT Racer (Al Alamiah)</description>
+		<year>1987</year>
+		<publisher>Al Alamiah</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="TT Racer - Al Alamiah (1987).rom" size="0x8000" crc="1e0d01fd" sha1="5702251cf5b83649109796f901e45ef6d05928ad" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="who">
 		<description>Who? (Arab, v1.14)</description>
 		<year>1987</year>
@@ -16209,6 +16313,21 @@ legacy FM implementations cannot find it.
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="mecca trip.rom" size="0x8000" crc="5c18eabd" sha1="09d2563fd5d9df095aa48be5ead7771c23c50ad2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="meccac" cloneof="mecca">
+		<description>Voyage to Mecca (Arab, alt 3)</description>
+		<year>1985</year>
+		<publisher>Al Alamiah</publisher>
+		<info name="alt_title" value="رحلة إلى مكة"/>
+		<info name="serial" value="R008" />
+		<info name="usage" value="Requires an Arabic MSX" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="trip to mecca (alt 3).rom" size="0x8000" crc="0dff2655" sha1="38db3c065c3b5afbe40112a4fef982725c4646ef" />
 			</dataarea>
 		</part>
 	</software>
@@ -17566,6 +17685,1232 @@ legacy FM implementations cannot find it.
 
 
 <!-- Homebrew / Doujin software -->
+
+	<software name="tgame4">
+		<description>T-Game 4</description>
+		<year>2019</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Ochixn"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="t game 4 - ochixn (2019).rom" size="0x8000" crc="9df841a9" sha1="c65ac427eeedac50e5d47f8bda0137e2a01b0ec0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tgame4a" cloneof="tgame4">
+		<description>T-Game 4 (alt)</description>
+		<year>2019</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Ochixn"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="t game 4 - ochixn (2019).rom" size="0x8000" crc="238686bc" sha1="626f0f095f284f1fa700e1c4911fa14c9ee8079f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tvirus">
+		<description>T-Virus</description>
+		<year>2019</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Dioniso"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="t-virus - dioniso (2004) [2nd version].rom" size="0x2000" crc="72b26927" sha1="ff999ca3e78c347bdbd23cb4c7adbfc02c20a397" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="talespop">
+		<description>Tales of Popolon (English, v1.3.1)</description>
+		<year>2017</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="tales of popolon english v1.3.1.rom" size="0x8000" crc="d9b6c432" sha1="a5a7ef13918d5eebd4bf7fc56f133c6a2e4aa952" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="talespops131" cloneof="talespop">
+		<description>Tales of Popolon (Spanish, v1.3.1)</description>
+		<year>2017</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="tales of popolon spanish v1.3.1.rom" size="0x8000" crc="aaac8ff4" sha1="a38dc03d40d46fc5b3f53c3421a1fa8a49302d5c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="talespop13" cloneof="talespop">
+		<description>Tales of Popolon (English, v1.3)</description>
+		<year>2017</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="tales of popolon english v1.3.rom" size="0x8000" crc="d2dc30e0" sha1="7c6ea1bdef421c4e94f38b042da99fba9d661dae" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="talespops13" cloneof="talespop">
+		<description>Tales of Popolon (Spanish, v1.3)</description>
+		<year>2017</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="tales of popolon spanish v1.3.rom" size="0x8000" crc="1ec4d318" sha1="9b2dd4d896fb60abefc0c60efdb8b86ac9ea8846" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="talespop12" cloneof="talespop">
+		<description>Tales of Popolon (English, v1.2)</description>
+		<year>2017</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="tales of popolon english v1.2.rom" size="0x8000" crc="2640ce32" sha1="f99dce1c4241592872ebbd4eabec00092c7a5ae3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="talespops12" cloneof="talespop">
+		<description>Tales of Popolon (Spanish, v1.2)</description>
+		<year>2017</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="tales of popolon spanish v1.2.rom" size="0x8000" crc="f8255ad7" sha1="9b94af6bf1f8a0eaf8d02fd5fae2a7907fa8cbaa" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="talespop111" cloneof="talespop">
+		<description>Tales of Popolon (English, v1.1.1)</description>
+		<year>2017</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="tales of popolon v1.1.1.rom" size="0x8000" crc="fcda6596" sha1="068b27cc6515bf82169e31d9e011a58d771f5694" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="talespop11" cloneof="talespop">
+		<description>Tales of Popolon (English, v1.1)</description>
+		<year>2017</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="tales of popolon v1.1.rom" size="0x8000" crc="ce9e439e" sha1="6d123be0fbd3618956364a919dff889e4b19be30" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="talespop10" cloneof="talespop">
+		<description>Tales of Popolon (English, v1.0)</description>
+		<year>2017</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="tales of popolon v1.0.rom" size="0x8000" crc="d41234fe" sha1="e1cdfcd67e5fdf25d105b4c8447072f57e2f775c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tekipaki">
+		<description>Teki-Paki</description>
+		<year>2003</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="WYZ"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="teki paki - wyz (2003).rom" size="0x4000" crc="d47a8d23" sha1="f373723b18cb7534ba1e8de61d484800478ee604" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tekipakib" cloneof="tekipaki">
+		<description>Teki-Paki (beta)</description>
+		<year>2003</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="CEZ GS"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="teki-paki [beta-fixed] (cez gs).rom" size="0x4000" crc="3425e876" sha1="5e3953faef309c197c11cec7eefbab92fd70778e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tekmo400">
+		<description>Tekmo 400</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Silicon Sex"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="tekmo 400 - Silicon Sex (2016) [6881].rom" size="0x4000" crc="0e6e546f" sha1="449710e1563fd5c0153747c6063cb2de56ef0e35" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="teodoro">
+		<description>Teodoro no Sabe Volar (English)</description>
+		<year>2012</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Retroworks"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="teodoro no sabe volar - retroworks (2012) [msxdev12] [english].rom" size="0x8000" crc="d2d53275" sha1="ae04c82e2ecde28bfcd19dc39b6c4978410aa908" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="teodoros" cloneof="teodoro">
+		<description>Teodoro no Sabe Volar (Spanish)</description>
+		<year>2012</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Retroworks"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="teodoro no sabe volar - retroworks (2012) [msxdev12] [spanish].rom" size="0x8000" crc="ec05665c" sha1="6e44688cd709dc551fc51b6322f49333c4673dfd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="circmyst">
+		<description>The Circus Mystery (v1.4)</description>
+		<year>2022</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="DTENSO Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="the circus mystery v1.4 - dtenso games (2022).rom" size="0x8000" crc="8128907a" sha1="a759e464c7077abc14f48cbcfd3c860df16b2ac1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="circmyst13" cloneof="circmyst">
+		<description>The Circus Mystery (v1.3)</description>
+		<year>2022</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="DTENSO Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="the circus mystery v1.3 - dtenso games (2022).rom" size="0x8000" crc="d702b829" sha1="f0d8bc54aa96619e7f453fc8b6d00df7c5a4996f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thecure">
+		<description>The Cure</description>
+		<year>2005</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="XL2S Entertainment"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="the cure - xl2s entertainment (2005) [msx-dev05].rom" size="0xc000" crc="7f855276" sha1="e82bbd2d9dbbb30a2b4a259954c5484fa236733a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thecurea" cloneof="thecure">
+		<description>The Cure (alt)</description>
+		<year>2005</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="XL2S Entertainment"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="the cure - xl2s entertainment (2005).rom" size="0xc000" crc="d5a83ba4" sha1="d9fb474c028febd25f8635e4f1413731f12907cb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lostmine">
+		<description>The Lost Mines</description>
+		<year>2015</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Cesar Rincon"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="the lost mine - cesar rincon (2015) [v1.5].rom" size="0x4000" crc="f8992878" sha1="e1e74bd56d04267f52060473afb0c00feaa33387" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mansion">
+		<description>The Mansion (English)</description>
+		<year>2005</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="yermani Soft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="the mansion - yermani soft (2005) [msx-dev05] [english].rom" size="0x4000" crc="932a117b" sha1="6600fab90ca395517d0845f8f380b0e67541b392" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mansions" cloneof="mansion">
+		<description>The Mansion (Spanish)</description>
+		<year>2005</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="yermani Soft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="the mansion - yermani soft (2005) [msx-dev05].rom" size="0x4000" crc="6076165e" sha1="b433357683fb1154d75c677ba01893665880f483" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="menacetr">
+		<description>The Menace from Triton (v1.2)</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="the menace from triton - brain games (2020) [msxdev2020 v1.2].rom" size="0xc000" crc="f7a83771" sha1="d301a822e698e03fa74cb7f8e5908aafea1a3491" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="menacetr11" cloneof="menacetr">
+		<description>The Menace from Triton (v1.1)</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="the menace from triton - brain games (2020) [msxdev2020 v1.1].rom" size="0xc000" crc="02b38a95" sha1="b2ddb1a8f3eb3a05f693945def3d9300f779528a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="menacetr102" cloneof="menacetr">
+		<description>The Menace from Triton (v1.0.2)</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="the menace from triton - brain games (2020) [msxdev2020 v1.0.2].rom" size="0xc000" crc="77b00046" sha1="8e665321900566a41f1d42a9811bf6c71c57e22a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="menacetr101" cloneof="menacetr">
+		<description>The Menace from Triton (v1.0.1)</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="the menace from triton - brain games (2020) [msxdev2020 v1.0.1].rom" size="0xc000" crc="1be020e6" sha1="a6907e9ad48d01be315b3041eb56d619af1b17d2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="menacetr100" cloneof="menacetr">
+		<description>The Menace from Triton (v1.0.0)</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="the menace from triton - brain games (2020) [msxdev2020 v1.0.0].rom" size="0xc000" crc="0c4d364b" sha1="29a648177be7e9be338543f1bc546d1993e75918" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="queensft">
+		<description>The Queen's Footsteps (v1.1.1)</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Davide Bucci"/>
+		<part name="cart1" interface="msx_cart">
+			<feature name="part_id" value="Part 1"/>
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="the queens footsteps  - davide bucci (2020) [part 1] v1.1.1.rom" size="0x8000" crc="d33c34ea" sha1="7a32d06b0c51da09d2ccb33d5ed9cf33df6fcf32" />
+			</dataarea>
+		</part>
+		<part name="cart2" interface="msx_cart">
+			<feature name="part_id" value="Part 2"/>
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="the queens footsteps  - davide bucci (2020) [part 2] v1.1.1.rom" size="0x8000" crc="4ef9e5da" sha1="9477b1f2b22a2acdfe2d162abe8daea5961a6128" />
+			</dataarea>
+		</part>
+		<part name="cart3" interface="msx_cart">
+			<feature name="part_id" value="Part 3"/>
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="the queens footsteps  - davide bucci (2020) [part 3] v1.1.1.rom" size="0x8000" crc="3513159a" sha1="d214330e49fa7fa8d05a904d3eb1cca994d5222c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="queensft10" cloneof="queensft">
+		<description>The Queen's Footsteps (v1.0)</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Davide Bucci"/>
+		<part name="cart1" interface="msx_cart">
+			<feature name="part_id" value="Part 1"/>
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="the queens footsteps  - davide bucci (2020) [part 1] v1.0.rom" size="0x8000" crc="8137ae26" sha1="e01b59ce50743372440dd7e38e2fc2f92d653414" />
+			</dataarea>
+		</part>
+		<part name="cart2" interface="msx_cart">
+			<feature name="part_id" value="Part 2"/>
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="the queens footsteps  - davide bucci (2020) [part 2] v1.0.rom" size="0x8000" crc="9a8fba69" sha1="b0138ea39dc8eedd51907b18b2cef6696e5e8776" />
+			</dataarea>
+		</part>
+		<part name="cart3" interface="msx_cart">
+			<feature name="part_id" value="Part 3"/>
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="the queens footsteps  - davide bucci (2020) [part 3] v1.0.rom" size="0x8000" crc="3266f9ed" sha1="a090c258bcd16ddfc2d818a7c6a650a0f1016b2b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tileshal">
+		<description>Tiles of Shalom</description>
+		<year>2007</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Jipe of the MSX Cafe"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="tiles of shalom - jipe of the msx cafe (2007) [msx-dev07].rom" size="0x4000" crc="a3f3608f" sha1="43c6a757ce5ec5a221e6c0e922638f688de8fd8b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tilez">
+		<description>Tilez</description>
+		<year>2022</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Pleiades Software"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="tilez - pleiades software (2022).rom" size="1597440" crc="4ac0a9ef" sha1="9f065068421e9c0b1d90418e9c14122b268f2210" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tinasadv">
+		<description>Tina's Adventure Island</description>
+		<year>2017</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Imanok"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="tina's adventure island - imanok (2017).rom" size="0x10000" crc="41676177" sha1="37d3202239bca95da7585ea36bb2307b702aeb79" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tinyslot">
+		<description>Tiny Slot Checker (v3.2)</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Tiny Yarou"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="tiny slot checker v3.2 - tiny yarou (2021).rom" size="0x4000" crc="b1760ef3" sha1="34d9bccfd0aa074174bb267c6140ee6f227ef375" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tinyslot2" cloneof="tinyslot">
+		<description>Tiny Slot Checker (v2)</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Tiny Yarou"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="tiny slot checker v2 - tiny yarou (2020).rom" size="0x4000" crc="eabda520" sha1="3ea3d91f1084d1fdc488aa17cd01c88a18e64c77" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tinysloto" cloneof="tinyslot">
+		<description>Tiny Slot Checker (older)</description>
+		<year>2018</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Tiny Yarou"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="tiny slot checker - tiny yarou (2018) [2018.12.22 update].rom" size="0x4000" crc="24672c76" sha1="849a3e72e2d9015deb9ab14166b49934e31c933c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tombgeng">
+		<description>Tomb of Genghis Khan</description>
+		<year>2009</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Impulse9"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="tomb of genghis khan - impulse9 (2009) [msx-dev08].rom" size="0x8000" crc="903d4e51" sha1="da80f0bc07cb0ed36c7c106564b5f04353eb176a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toolblks">
+		<description>Tool Blocks</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Ray2Day MSX Software"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="tool blocks - ray2day (2021).rom" size="0x4000" crc="43c6a114" sha1="3378bcefe65d38a572cc2084c600fe28d1660f12" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tortsun">
+		<description>Tortilla Sunrise (English, v1.1)</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Tortilla Yonkers"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="tortilla sunrise v1.1 - tortilla yonkers (2021)(en).rom" size="0x8000" crc="d7ebfcfd" sha1="9d85f1cb712b57924007ba056e56fb314bae6282" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tortsuns" cloneof="tortsun">
+		<description>Tortilla Sunrise (Spanish, v1.1)</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Tortilla Yonkers"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="tortilla sunrise v1.1 - tortilla yonkers (2021)(es).rom" size="0x8000" crc="d983aec4" sha1="c92f0ac7a114893243f91ca8b37ac42d538811e0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tortsun10" cloneof="tortsun">
+		<description>Tortilla Sunrise (English, v1.0)</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Tortilla Yonkers"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="tortilla sunrise v1.0 - tortilla yonkers (2021)(en).rom" size="0x8000" crc="e3a9b34b" sha1="8dd3de262edba695f0c02b0c5c45a87ad689cd16" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tosscoin">
+		<description>Toss a Coin to your Witcher</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Cobinee"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="toss a coin to your witcher - cobinee (2020).rom" size="0x8000" crc="5e063edf" sha1="258a6e7771e97795a617d5ddcea64cb98e5f3c61" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trafcjam">
+		<description>Traffic Jam</description>
+		<year>2006</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Imanok"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="traffic jam - imanok (2006) [msx-dev06].rom" size="0x8000" crc="0c7929be" sha1="0f7f55fe448d20fc65dc03c2a4f1717761671e43" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trafcjama" cloneof="trafcjam">
+		<description>Traffic Jam (alt)</description>
+		<year>2006</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Imanok"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="traffic jam - imanok (2006) (alt).rom" size="0x8000" crc="6b495c60" sha1="e6af71c99290b6ff2da9d3667e2046651e2c9fca" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tragaper">
+		<description>Tragaperras (Spanish)</description>
+		<year>2005</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="MSxNAKE"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="tragaperras - msxnake (2005) [msx-dev05].rom" size="0x4000" crc="cdc9fd74" sha1="1074acd37ee42661d86b75a8491365ed8ceaa6e0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trail2">
+		<description>Trail 2</description>
+		<year>2012</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Kotai"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="trail 2 - kotai (2012).rom" size="0x20000" crc="e2426fad" sha1="0cfda8f657cd4d06fd9ea5df78db0e97bbf3fffe" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="transbal">
+		<description>Transball (v1.3.2, English)</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="transball-en-v1.3.2.rom" size="0x8000" crc="cbcf03c5" sha1="a2a7974e024e3ab9cef8739557fff3e066d57064" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="transbal132a">
+		<description>Transball (v1.3.2?, English, alt)</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="transball-en-v1.3.2-alt.rom" size="0x8000" crc="09c4a5df" sha1="eb47c7a159ceeb153f5c1d76b36116912b47a2b6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="transbal132s" cloneof="transbal">
+		<description>Transball (v1.3.2, Spanish)</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="transball-es-v1.3.2.rom" size="0x8000" crc="80776cee" sha1="81035452cfa19a5505807a126eaacc57242b0bc0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="transbal131" cloneof="transbal">
+		<description>Transball (v1.3.1, English)</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="transball-en-v1.3.1.rom" size="0x8000" crc="d91e1578" sha1="b591717dfd73e071ff9f807c4881d44cb79a4355" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="transbal131s" cloneof="transbal">
+		<description>Transball (v1.3.1, Spanish)</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="transball-es-v1.3.1.rom" size="0x8000" crc="8386da5e" sha1="c5f3521322ecd64927958b789877c51a79a011c0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="transbal13" cloneof="transbal">
+		<description>Transball (v1.3, English)</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="transball-en-v1.3.rom" size="0x8000" crc="9ca59d8e" sha1="adf5f1cbd779b5e512d57a36d2918ccc7026b6f6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="transbal13s" cloneof="transbal">
+		<description>Transball (v1.3, Spanish)</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="transball-es-v1.3.rom" size="0x8000" crc="77d37fdb" sha1="14f402c67504017a392504a4779ce3ef888b2b64" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="transbal121" cloneof="transbal">
+		<description>Transball (v1.2.1, English)</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="transball-en-v1.2.1.rom" size="0x8000" crc="fa364342" sha1="4a5686f5cd4a42cbcd97a9b36e6ad577a218d293" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="transbal121s" cloneof="transbal">
+		<description>Transball (v1.2.1, Spanish)</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="transball-es-v1.2.1.rom" size="0x8000" crc="7a0137af" sha1="74a7f39624cd009134686b709382b3206aecb706" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="transbal12" cloneof="transbal">
+		<description>Transball (v1.2, English)</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="transball-en-v1.2.rom" size="0x8000" crc="07779fba" sha1="a6eed3fd005f43ad1fab71530830ca8a9628a50b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="transbal12s" cloneof="transbal">
+		<description>Transball (v1.2, Spanish)</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="transball-es-v1.2.rom" size="0x8000" crc="c66709a3" sha1="bfb433a2376666cb95062076bc42fdbb4ef78f0e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="transbal111" cloneof="transbal">
+		<description>Transball (v1.1.1, English)</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="transball-en-v1.1.1.rom" size="0x8000" crc="76a0e4d5" sha1="59999f6849ccf7640bef75c999c4d83224220545" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="transbal111s" cloneof="transbal">
+		<description>Transball (v1.1.1, Spanish)</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="transball-es-v1.1.1.rom" size="0x8000" crc="829f6d87" sha1="bc25847221db30d3475fd92d29bc6dd5f0224c06" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="transbal11" cloneof="transbal">
+		<description>Transball (v1.1, English)</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="transball-en-v1.1.rom" size="0x8000" crc="cdb11a7e" sha1="532376a3cf043e799b72d35ce49283cb11b16b9d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="transbal11s" cloneof="transbal">
+		<description>Transball (v1.1, Spanish)</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="transball-es-v1.1.rom" size="0x8000" crc="50f69393" sha1="d82bee75b434aae937b7d9f5d60317829dbbaa02" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="transbal101s" cloneof="transbal">
+		<description>Transball (v1.0.1, Spanish)</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="transball-es-v1.0.1.rom" size="0x8000" crc="eee79321" sha1="2508316d46f7700ef13c09998eb23dac6844803b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="transbal10" cloneof="transbal">
+		<description>Transball (v1.0, English)</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="transball-en-v1.0.rom" size="0x8000" crc="2da59705" sha1="f24505ac26dd2e6748478b462e2a270f8e6c1a41" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="transbal10s" cloneof="transbal">
+		<description>Transball (v1.0, Spanish)</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="transball-es-v1.0.rom" size="0x8000" crc="9aeca04f" sha1="3d53f6b9bab040e2a2f98e2951e6476142ed9d61" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turfy">
+		<description>Turfy (2019 version)</description>
+		<year>2019</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Uninteresting"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="turfy - uninteresting (2016) [2019 version].rom" size="0x4000" crc="bd74c939" sha1="6822fd309270461d844f3db9a352ee4625346b69"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turfya" cloneof="turfy">
+		<description>Turfy (2016 version)</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Uninteresting"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="turfy - uninteresting (2016).rom" size="0x4000" crc="329e6672" sha1="cdc8812cdf0026538b6542455b9bcf9badb6c648"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="twinlght">
+		<description>Twinlight</description>
+		<year>2019</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Retrosouls"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="twinlight - retrosouls (2017).rom" size="0x8000" crc="3b76ceef" sha1="a1ecd18036afc7f5797f059d308b5be9ca8295f8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="twinlghta" cloneof="twinlght">
+		<description>Twinlight (alt)</description>
+		<year>2019</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Retrosouls"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="twinlight - retrosouls (2017, alt)).rom" size="0x8000" crc="7a6bdbef" sha1="4683a34eb82c5951b316f93d964df508745a437e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="txupinaz">
+		<description>Txupinazo!</description>
+		<year>2007</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Imanok"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="txupinazo - imanok (2007) [msx-dev07].rom" size="0x8000" crc="e1b66d80" sha1="73ec25854aae297c9c3da0a2d4b4f1eae14fe8c6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="udo">
+		<description>U-Do</description>
+		<year>1990</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="MSX-FAN"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="u-do - msx-fan (1990).rom" size="0x2000" crc="b239f439" sha1="a0aabe28306e7633111422baaa5a915d1cc547c7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ufo">
+		<description>U.F.O.</description>
+		<year>20??</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="MSXosaure"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x1000">
+				<rom name="u.f.o - msxosaure (-).rom" size="0x1000" crc="8cf0bedb" sha1="75777156a3fef9677e632a5f4559adfb593952ac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ufoc">
+		<description>UnidentifiedFlyingObject</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Cobinee"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="unidentified flying object - cobinee (2020).rom" size="0x8000" crc="56c7937b" sha1="236141e45b0f0adb58bbce667a887ecb2f3756f8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="univunkn">
+		<description>Universe Unknown</description>
+		<year>2005</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Infinite"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="universe unknown - infinite (2005) [msx-dev05].rom" size="0xc000" crc="a017f389" sha1="059ab9b167c0e71bda811145a6ea04f0a41a0bdf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="univunkna" cloneof="univunkn">
+		<description>Universe Unknown (alt)</description>
+		<year>2005</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Infinite"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="universe unknown - infinite (2005) [competition version].rom" size="0xc000" crc="915f1bfe" sha1="8ab1b72ce852a778a645f566a70fa18ee32fd021"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uptack">
+		<description>Up Tack</description>
+		<year>2019</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Cobinee"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="uptak - cobinee (2019).rom" size="0x8000" crc="5d8d4199" sha1="db5ad4b58f7d5e48194f42c6ffd88f91a4362357"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uridium">
+		<description>Uridium</description>
+		<year>2014</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Trilobyte"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="uridium - trilobyte (2014).rom" size="0xc000" crc="94275107" sha1="e4faeff6c0b64bc1202698699101e78872a51b06"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uridiuma" cloneof="uridium">
+		<description>Uridium (alt)</description>
+		<year>2014</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Trilobyte"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="uridium - trilobyte (2014) (alt).rom" size="0xc000" crc="c62d92da" sha1="8c61f4bd9b6116c9ab6e5485472eab7f297c0a68"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uridiumb" cloneof="uridium">
+		<description>Uridium (alt 2)</description>
+		<year>2014</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Trilobyte"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="uridium - trilobyte (2014) (alt 2).rom" size="0xc000" crc="727a818e" sha1="7c732955507df1eb292184d9648814786819cc0a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uridiumc" cloneof="uridium">
+		<description>Uridium (alt 3)</description>
+		<year>2014</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Trilobyte"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="uridium - trilobyte (2014) (alt 3).rom" size="0xc000" crc="acc012db" sha1="2451a8027bff9d88edb61651a95d69d54cf06d7a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="utopia">
+		<description>Utopia</description>
+		<year>2008</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="DVIK &amp; Joyrex productions"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="utopia - dvik joyrex productions (2008).rom" size="0x80000" crc="20a7c2e9" sha1="b550757c8f5b55dbde16b4a7888f10999f01acfd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="veejing">
+		<description>veejingSX (v0.996b)</description>
+		<year>2013</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="303bcn"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="vjsx0996.rom" size="0x8000" crc="f27ddc7a" sha1="aac7b283b1c4453384d55625c57321fde48b0a7d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="veejing099" cloneof="veejing">
+		<description>veejingSX (v0.99b)</description>
+		<year>2012</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="303bcn"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="vjsx099b.rom" size="0x8000" crc="eb16e78b" sha1="a9721f4a8c846621b77c2283e1eee4d34433581e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="veejing09" cloneof="veejing">
+		<description>veejingSX (v0.9b)</description>
+		<year>2011</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="303bcn"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="vjsx09b.rom" size="0x8000" crc="09a44c23" sha1="3530ab300f841ec7e92e8d38d50ebc09c5794387"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="veejing07" cloneof="veejing">
+		<description>9918-veejing (v0.7b, Russian)</description>
+		<year>2011</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="303bcn"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="veejing7.rom" size="0x8000" crc="ca53cdab" sha1="54290e402561c6871e17076dad41f3c8ed939688"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="veejing01" cloneof="veejing">
+		<description>9918-veejing (v0.1b)</description>
+		<year>2010</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="303bcn"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="9918vj.rom" size="0x8000" crc="8d24e0f3" sha1="eafc1ad38a8ac7e0a54917b802377aa5443ac460"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="viking">
+		<description>Viking (English)</description>
+		<year>2005</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="José Luis Tur"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="viking - jose luis tur (2005) [msx-dev05] [english].rom" size="0x4000" crc="69621a2d" sha1="4db63ea453df9d17cf84a0f977f4768438ec9c45"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vikings" cloneof="viking">
+		<description>Viking (Spanish)</description>
+		<year>2005</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="José Luis Tur"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="viking - jose luis tur (2005) [msx-dev05] [spanish].rom" size="0x4000" crc="9a183b9e" sha1="17315e6b40f89c2cd0d8929eefcb9394b04e4cc6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="viruslpq">
+		<description>Virus LPQ-79 (v1.20)</description>
+		<year>2018</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Pentacour"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="virus lqp-79 - pentacour (2018) [v1.20].rom" size="0xc000" crc="6514414e" sha1="802c70bf8f9a8a97706d8de73777edafe6ae310c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="viruslpq110" cloneof="viruslpq">
+		<description>Virus LPQ-79 (v1.10)</description>
+		<year>2018</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Pentacour"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="virus lqp-79 - pentacour (2018) [v1.10].rom" size="0xc000" crc="60f82bf6" sha1="427b67e7f9237685b26272b6601c45d9b29d8ff1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="viruslpq100" cloneof="viruslpq">
+		<description>Virus LPQ-79 (v1.00)</description>
+		<year>2018</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Pentacour"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="virus lqp-79 - pentacour (2018) [v1.00].rom" size="0xc000" crc="e1baab51" sha1="f474c68a6d5b91c98fba2e922f09e3dcc6e0494c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vvvvvv">
+		<description>VVVVVV (unfinished)</description>
+		<year>2012</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="hap"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="vvvvvv - hap (2012) [unfinished wip] [4919].rom" size="0x20000" crc="63eddb76" sha1="b67666fea28f98b55f661d21c7e30210d4f634a7"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="westenhs">
 		<description>Westen House (English, v1.3.1)</description>
