@@ -26,7 +26,7 @@
         - PSS-6: 32 "ultra mini" keys, mono, 1Mbit ROM, some tone differences
 
     - LCD with large icons, metronome, volume display (1996)
-        - PSR-190: 61 keys, stereo (currently not dumped)
+        - PSR-190: 61 keys, stereo
         - PSR-78: 49 keys, mono
 
     Other known undumped models:
@@ -72,19 +72,20 @@ public:
 		, m_led(*this, "led%u", 0U)
 	{ }
 
-	void psr150(machine_config& config);
-	void psr110(machine_config& config);
-	void pss21(machine_config& config);
-	void pss31(machine_config& config);
-	void psr75(machine_config& config);
-	void pss11(machine_config& config);
-	void psr180_base(machine_config& config);
-	void psr180(machine_config& config);
-	void psr76(machine_config& config);
+	void psr150(machine_config &config);
+	void psr110(machine_config &config);
+	void pss21(machine_config &config);
+	void pss31(machine_config &config);
+	void psr75(machine_config &config);
+	void pss11(machine_config &config);
+	void psr180_base(machine_config &config);
+	void psr180(machine_config &config);
+	void psr76(machine_config &config);
 	void pss12(machine_config &config);
-	void pss6(machine_config& config);
-	void psr190_base(machine_config& config);
-	void psr78(machine_config& config);
+	void pss6(machine_config &config);
+	void psr190_base(machine_config &config);
+	void psr190(machine_config &config);
+	void psr78(machine_config &config);
 
 	template <offs_t Num, u8 PullUps = 0xff>
 	void port_pullup_w(offs_t offset, u8 data, u8 mem_mask);
@@ -210,7 +211,7 @@ void psr150_state::driver_start()
 }
 
 
-void psr150_state::psr150(machine_config& config)
+void psr150_state::psr150(machine_config &config)
 {
 	GEW7(config, m_maincpu, 8_MHz_XTAL);
 	m_maincpu->port_in_cb<0>().set_ioport("PA");
@@ -233,13 +234,13 @@ void psr150_state::psr150(machine_config& config)
 	config.set_default_layout(layout_psr150);
 }
 
-void psr150_state::psr110(machine_config& config)
+void psr150_state::psr110(machine_config &config)
 {
 	psr150(config);
 	config.set_default_layout(layout_psr110);
 }
 
-void psr150_state::pss21(machine_config& config)
+void psr150_state::pss21(machine_config &config)
 {
 	psr150(config);
 	// bits 6-7 indicate model (see also pss11, pss31, psr75)
@@ -248,7 +249,7 @@ void psr150_state::pss21(machine_config& config)
 	config.set_default_layout(layout_pss21);
 }
 
-void psr150_state::pss31(machine_config& config)
+void psr150_state::pss31(machine_config &config)
 {
 	psr150(config);
 	// bits 6-7 indicate model (see also pss11, pss21, psr75)
@@ -257,7 +258,7 @@ void psr150_state::pss31(machine_config& config)
 	config.set_default_layout(layout_pss31);
 }
 
-void psr150_state::psr75(machine_config& config)
+void psr150_state::psr75(machine_config &config)
 {
 	GEW7(config, m_maincpu, 8'000'000);
 	m_maincpu->port_in_cb<0>().set_ioport("PA");
@@ -279,7 +280,7 @@ void psr150_state::psr75(machine_config& config)
 	config.set_default_layout(layout_psr75);
 }
 
-void psr150_state::pss11(machine_config& config)
+void psr150_state::pss11(machine_config &config)
 {
 	GEW7(config, m_maincpu, 8'000'000);
 	m_maincpu->port_out_cb<0>().set_ioport("PA");
@@ -300,7 +301,7 @@ void psr150_state::pss11(machine_config& config)
 	config.set_default_layout(layout_pss11);
 }
 
-void psr150_state::psr180_base(machine_config& config)
+void psr150_state::psr180_base(machine_config &config)
 {
 	GEW7(config, m_maincpu, 8'000'000);
 	m_maincpu->port_out_cb<0>().set_ioport("PA");
@@ -316,7 +317,7 @@ void psr150_state::psr180_base(machine_config& config)
 	m_pwm->set_segmask(0x6, 0xff);
 }
 
-void psr150_state::psr180(machine_config& config)
+void psr150_state::psr180(machine_config &config)
 {
 	psr180_base(config);
 	m_maincpu->add_route(0, "lfilter", 1.0);
@@ -333,7 +334,7 @@ void psr150_state::psr180(machine_config& config)
 	config.set_default_layout(layout_psr180);
 }
 
-void psr150_state::psr76(machine_config& config)
+void psr150_state::psr76(machine_config &config)
 {
 	psr180_base(config);
 	m_maincpu->add_route(0, "filter", 1.0);
@@ -366,7 +367,7 @@ void psr150_state::pss12(machine_config &config)
 	config.set_default_layout(layout_pss12);
 }
 
-void psr150_state::pss6(machine_config& config)
+void psr150_state::pss6(machine_config &config)
 {
 	GEW7(config, m_maincpu, 8'000'000);
 	m_maincpu->port_out_cb<1>().set_ioport("PB");
@@ -382,7 +383,7 @@ void psr150_state::pss6(machine_config& config)
 	config.set_default_layout(layout_pss6);
 }
 
-void psr150_state::psr190_base(machine_config& config)
+void psr150_state::psr190_base(machine_config &config)
 {
 	GEW7(config, m_maincpu, 8'000'000);
 	m_maincpu->port_out_cb<0>().set_ioport("PA");
@@ -390,8 +391,6 @@ void psr150_state::psr190_base(machine_config& config)
 	m_maincpu->port_out_cb<1>().set_ioport("PB");
 	m_maincpu->port_in_cb<2>().set_ioport("PC_R");
 	m_maincpu->port_out_cb<2>().set_ioport("PC_W");
-	// pull up the button select bits, but not the LCD enable bit
-	m_maincpu->port_out_cb<5>().set(&psr150_state::port_pullup_w<5, 0x1f>, "port_pullup_w");
 
 	HD44780(config, m_lcdc);
 	m_lcdc->set_lcd_size(2, 8);
@@ -403,9 +402,27 @@ void psr150_state::psr190_base(machine_config& config)
 	screen.screen_vblank().set(FUNC(psr150_state::render_w));
 }
 
-void psr150_state::psr78(machine_config& config)
+void psr150_state::psr190(machine_config &config)
 {
 	psr190_base(config);
+	m_maincpu->port_out_cb<5>().set(FUNC(psr150_state::port_pullup_w<5>));
+	m_maincpu->add_route(0, "lfilter", 1.0);
+	m_maincpu->add_route(1, "rfilter", 1.0);
+
+	// set up AC filters since the keyboard purposely outputs a DC offset when idle
+	// TODO: there is also a RLC lowpass with R=120, L=3.3mH, C=0.33uF
+	FILTER_RC(config, "lfilter").set_ac().add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_RC(config, "rfilter").set_ac().add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+}
+
+void psr150_state::psr78(machine_config &config)
+{
+	psr190_base(config);
+	// pull up the button select bits, but not the LCD enable bit
+	m_maincpu->port_out_cb<5>().set(&psr150_state::port_pullup_w<5, 0x1f>, "port_pullup_w");
 	m_maincpu->add_route(0, "filter", 1.0);
 
 	// set up AC filter since the keyboard purposely outputs a DC offset when idle
@@ -1506,6 +1523,78 @@ INPUT_PORTS_START(psr76)
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+INPUT_PORTS_START(psr190)
+	PORT_INCLUDE(psr180_keys)
+
+	PORT_MODIFY("PB")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("lcdc", hd44780_device, e_w)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("PC_R")
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x78, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(psr150_state, lcd_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("PC_W")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("lcdc", hd44780_device, rs_w)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("lcdc", hd44780_device, rw_w)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x78, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_MEMBER(psr150_state, lcd_w)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_MODIFY("PF")
+	PORT_BIT( 0x1f, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_MEMBER(psr150_state, KEY_OUT_BITS(11, 5))
+
+	PORT_MODIFY("KEY10") // these are swapped on psr180, but not on psr190
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER  ) PORT_NAME("A5#")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER  ) PORT_NAME("G5#")
+
+	PORT_START("KEY11")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_NAME("Sync Start")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_NAME("Main / Auto Fill B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Tempo Up")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_NAME("Demo")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Keypad 6")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("Keypad +")
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("KEY12")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_NAME("Start / Stop")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_NAME("Ending")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("One Touch Setting")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("Voice")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("Keypad -")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Keypad 0")
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("KEY13")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_NAME("Intro")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_NAME("Jam Track")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("Style")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DOWN) PORT_NAME("Acc. Volume Down")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Keypad 5")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("Keypad 9")
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("KEY14")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_UP) PORT_NAME("Acc. Volume Up")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Large/Small / Minus One")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Song")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Keypad 1")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Keypad 4")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Keypad 8")
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("KEY15")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_NAME("Main / Auto Fill A")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_LEFT) PORT_NAME("Tempo Down")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Keypad 2")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Keypad 3")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("Keypad 7")
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
 INPUT_PORTS_START(psr78)
 	PORT_INCLUDE(psr76_keys)
 
@@ -1613,6 +1702,14 @@ ROM_START( pss6 )
 	ROM_LOAD( "xp733a00.ic2", 0x00000, 0x20000, CRC(5a7ad160) SHA1(01e7b988db37a2553c71d51f585736df286a245c))
 ROM_END
 
+ROM_START( psr190 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "xr814100.ic6", 0x00000, 0x80000, CRC(91743a1d) SHA1(7124d4a53667e41d03c3bc4ac08f991886bc5e42))
+
+	ROM_REGION( 175935, "screen", 0 )
+	ROM_LOAD( "psr190.svg", 0, 175935, CRC(1382c3df) SHA1(504ca22300f220785d1d7476e39cf2077684bb70))
+ROM_END
+
 ROM_START( psr78 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "xr813100.ic6", 0x00000, 0x80000, CRC(cf1b959c) SHA1(6459a322789285ab203bbbd29ddfe0d877514b41))
@@ -1634,4 +1731,5 @@ SYST( 1994, psr180,  0,      0,      psr180,  psr180, psr150_state,  empty_init,
 SYST( 1994, psr76,   psr180, 0,      psr76,   psr76,  psr150_state,  empty_init,  "Yamaha", "PSR-76",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1994, pss12,   0,      0,      pss12,   pss12,  psr150_state,  empty_init,  "Yamaha", "PSS-12",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1994, pss6,    pss12,  0,      pss6,    pss6,   psr150_state,  empty_init,  "Yamaha", "PSS-6",   MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1996, psr78,   0,      0,      psr78,   psr78,  psr150_state,  empty_init,  "Yamaha", "PSR-78",  MACHINE_SUPPORTS_SAVE )
+SYST( 1996, psr190,  0,      0,      psr190,  psr190, psr150_state,  empty_init,  "Yamaha", "PSR-190", MACHINE_SUPPORTS_SAVE )
+SYST( 1996, psr78,   psr190, 0,      psr78,   psr78,  psr150_state,  empty_init,  "Yamaha", "PSR-78",  MACHINE_SUPPORTS_SAVE )
