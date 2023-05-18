@@ -579,7 +579,8 @@ public:
 	void animechmp(machine_config &config);
 	void salarymc(machine_config &config);
 	void gbbchmp(machine_config &config);
-	void konami573(machine_config &config);
+	void konami573(machine_config &config, bool no_cdrom = false);
+	void konami573n(machine_config &config);
 	void drmn2m(machine_config &config);
 	void gtrfrk3m(machine_config &config);
 	void mamboagg(machine_config &config);
@@ -2456,7 +2457,7 @@ void ksys573_state::cr589_config(device_t *device)
 	cdrom->add_region("runtime", true);
 }
 
-void ksys573_state::konami573(machine_config &config)
+void ksys573_state::konami573(machine_config &config, bool no_cdrom)
 {
 	/* basic machine hardware */
 	CXD8530CQ(config, m_maincpu, XTAL(67'737'600));
@@ -2468,9 +2469,12 @@ void ksys573_state::konami573(machine_config &config)
 
 	ATA_INTERFACE(config, m_ata, 0);
 	m_ata->irq_handler().set(FUNC(ksys573_state::ata_interrupt));
-	m_ata->slot(0).option_add("cr589", CR589);
-	m_ata->slot(0).set_option_machine_config("cr589", cr589_config);
-	m_ata->slot(0).set_default_option("cr589");
+	if(!no_cdrom)
+	{
+		m_ata->slot(0).option_add("cr589", CR589);
+		m_ata->slot(0).set_option_machine_config("cr589", cr589_config);
+		m_ata->slot(0).set_default_option("cr589");
+	}
 
 	konami573_cassette_slot_device &cassette(KONAMI573_CASSETTE_SLOT(config, "cassette", 0));
 	cassette.dsr_handler().set("maincpu:sio1", FUNC(psxsio1_device::write_dsr));
@@ -2543,7 +2547,7 @@ void ksys573_state::k573a(machine_config &config)
 
 void ksys573_state::k573ak(machine_config &config)
 {
-   konami573(config);
+	konami573(config, true);
    m_maincpu->set_addrmap(AS_PROGRAM, &ksys573_state::konami573ak_map);
 }
 
@@ -2910,6 +2914,12 @@ void ksys573_state::gtfrk11m(machine_config &config)
 
 // Miscellaneous
 
+void ksys573_state::konami573n(machine_config &config)
+{
+	konami573(config, true);
+}
+
+
 void ksys573_state::konami573x(machine_config &config)
 {
 	konami573(config);
@@ -2929,7 +2939,7 @@ void ksys573_state::fbaitbc(machine_config & config)
 
 void ksys573_state::hyperbbc(machine_config &config)
 {
-	konami573(config);
+	konami573(config, true);
 	cassy(config); // The game doesn't check the security chip
 
 	subdevice<konami573_cassette_slot_device>("cassette")->set_option_machine_config( "game", [this] (device_t *device) { hyperbbc_cassette_install(device); } );
@@ -2945,7 +2955,7 @@ void ksys573_state::hypbbc2p(machine_config &config)
 
 void ksys573_state::animechmp(machine_config &config)
 {
-	konami573(config);
+	konami573(config, true);
 	cassyi(config);
 
 	pccard1_32mb(config);
@@ -2955,7 +2965,7 @@ void ksys573_state::animechmp(machine_config &config)
 
 void ksys573_state::stepchmp(machine_config &config)
 {
-	konami573(config);
+	konami573(config, true);
 	cassyi(config);
 
 	subdevice<konami573_cassette_slot_device>("cassette")->set_option_machine_config("game", [this](device_t* device) { stepchmp_cassette_install(device); });
@@ -2979,7 +2989,7 @@ void ksys573_state::gbbchmp(machine_config &config)
 
 void ksys573_state::gchgchmp(machine_config &config)
 {
-	konami573(config);
+	konami573(config, true);
 	pccard1_16mb(config);
 	cassx(config);
 }
@@ -3004,7 +3014,7 @@ void pnchmn_state::pnchmn2(machine_config &config)
 
 void ksys573_state::gunmania(machine_config &config)
 {
-	konami573(config);
+	konami573(config, true);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ksys573_state::gunmania_map);
 
 	DS2401( config, "ds2401_id" );
@@ -6304,11 +6314,11 @@ double konami573_cassette_xi_device::punchmania_inputs_callback(uint8_t input)
 }
 
 
-GAME( 1997, sys573,    0,        konami573,  konami573, ksys573_state, empty_init,    ROT0,  "Konami", "System 573 BIOS", MACHINE_IS_BIOS_ROOT )
+GAME( 1997, sys573,    0,        konami573n, konami573, ksys573_state, empty_init,    ROT0,  "Konami", "System 573 BIOS", MACHINE_IS_BIOS_ROOT )
 
-GAME( 1997, strgchmp,  sys573,   konami573,  hndlchmp,  ksys573_state, empty_init,    ROT0,  "Konami", "Steering Champ (GQ710 97/12/18 VER. UAA)", MACHINE_IMPERFECT_SOUND )
-GAME( 1997, hndlchmp,  strgchmp, konami573,  hndlchmp,  ksys573_state, empty_init,    ROT0,  "Konami", "Handle Champ (GQ710 97/12/18 VER. SAA)", MACHINE_IMPERFECT_SOUND )
-GAME( 1997, hndlchmpj, strgchmp, konami573,  hndlchmp,  ksys573_state, empty_init,    ROT0,  "Konami", "Handle Champ (GQ710 1997/12/08 VER. JAB)", MACHINE_IMPERFECT_SOUND )
+GAME( 1997, strgchmp,  sys573,   konami573n, hndlchmp,  ksys573_state, empty_init,    ROT0,  "Konami", "Steering Champ (GQ710 97/12/18 VER. UAA)", MACHINE_IMPERFECT_SOUND )
+GAME( 1997, hndlchmp,  strgchmp, konami573n, hndlchmp,  ksys573_state, empty_init,    ROT0,  "Konami", "Handle Champ (GQ710 97/12/18 VER. SAA)", MACHINE_IMPERFECT_SOUND )
+GAME( 1997, hndlchmpj, strgchmp, konami573n, hndlchmp,  ksys573_state, empty_init,    ROT0,  "Konami", "Handle Champ (GQ710 1997/12/08 VER. JAB)", MACHINE_IMPERFECT_SOUND )
 GAME( 1998, darkhleg,  sys573,   konami573x, konami573, ksys573_state, empty_init,    ROT0,  "Konami", "Dark Horse Legend (GX706 VER. JAA)", MACHINE_IMPERFECT_SOUND )
 GAME( 1998, fbaitbc,   sys573,   fbaitbc,    fbaitbc,   ksys573_state, empty_init,    ROT0,  "Konami", "Fisherman's Bait - A Bass Challenge (GE765 VER. UAB)", MACHINE_IMPERFECT_SOUND )
 GAME( 1998, bassangl,  fbaitbc,  fbaitbc,    fbaitbc,   ksys573_state, empty_init,    ROT0,  "Konami", "Bass Angler (GE765 VER. JAA)", MACHINE_IMPERFECT_SOUND )
