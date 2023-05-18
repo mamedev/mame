@@ -731,7 +731,6 @@ private:
 	optional_device<atapi_hle_device> m_image;
 	required_device<pccard_slot_device> m_pccard1;
 	required_device<pccard_slot_device> m_pccard2;
-	cdrom_file *m_available_cdroms[ 2 ];
 	emu_timer *m_atapi_timer;
 	int m_atapi_xferbase;
 	int m_atapi_xfersize;
@@ -1147,12 +1146,6 @@ void ksys573_state::driver_start()
 {
 	m_atapi_timer = timer_alloc( FUNC( ksys573_state::atapi_xfer_end ), this );
 	m_atapi_timer->adjust( attotime::never );
-
-	for (int i = 0; i < 2; i++)
-	{
-		chd_file *chd = machine().rom_load().get_disk_handle(util::string_format(":cdrom%d", i));
-		m_available_cdroms[ i ] = chd ? new cdrom_file(chd) : nullptr;
-	}
 
 	save_item( NAME( m_n_security_control ) );
 	save_item( NAME( m_control ) );
