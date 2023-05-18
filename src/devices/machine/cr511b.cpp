@@ -29,6 +29,7 @@ void cr511b_device::device_add_mconfig(machine_config &config)
 	CDDA(config, m_cdda);
 	m_cdda->add_route(0, ":lspeaker", 1.0);
 	m_cdda->add_route(1, ":rspeaker", 1.0);
+	m_cdda->set_cdrom_tag("cdrom");
 }
 
 
