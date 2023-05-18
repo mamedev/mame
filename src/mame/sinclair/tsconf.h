@@ -222,7 +222,7 @@ private:
 	required_device<centronics_device> m_centronics;
 
 	required_device_array<ym2149_device, 2> m_ay;
-	int m_ay_selected;
+	u8 m_ay_selected;
 	required_ioport m_mod_ay;
 };
 

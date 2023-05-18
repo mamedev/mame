@@ -126,7 +126,7 @@ private:
 	required_ioport_array<3> m_io_mouse;
 	required_device_array<ym2149_device, 2> m_ay;
 
-	int m_ay_selected;
+	u8 m_ay_selected;
 	required_ioport m_mod_ay;
 
 	u8 m_port_bf_data;
