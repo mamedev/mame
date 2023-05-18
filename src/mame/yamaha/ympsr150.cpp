@@ -26,7 +26,7 @@
         - PSS-6: 32 "ultra mini" keys, mono, 1Mbit ROM, some tone differences
 
     - LCD with large icons, metronome, volume display (1996)
-        - PSR-190: 61 keys, stereo (currently not dumped)
+        - PSR-190: 61 keys, stereo
         - PSR-78: 49 keys, mono
 
     Other known undumped models:
