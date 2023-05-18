@@ -2234,6 +2234,19 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/psion/module/slot.h,BUSES["PSION_MODULE"] = true
+---------------------------------------------------
+
+if (BUSES["PSION_MODULE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/psion/module/slot.cpp",
+		MAME_DIR .. "src/devices/bus/psion/module/slot.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/psion/sibo/slot.h,BUSES["PSION_SIBO"] = true
 ---------------------------------------------------
 
