@@ -1207,15 +1207,14 @@ namespace bx
 			int32_t size = write(&writer, _format, argListCopy, &err);
 			va_end(argListCopy);
 
+			size += write(&writer, '\0', &err);
+
 			if (err.isOk() )
 			{
-				size += write(&writer, '\0', &err);
 				return size - 1 /* size without '\0' terminator */;
 			}
-			else
-			{
-				_out[_max-1] = '\0';
-			}
+
+			_out[_max-1] = '\0';
 		}
 
 		Error err;
