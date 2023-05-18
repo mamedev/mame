@@ -368,12 +368,12 @@ void tsconf_state::ram_page_write(u8 page, offs_t offset, u8 data)
 
 u16 tsconf_state::ram_read16(offs_t offset)
 {
-	return ((m_ram->read(offset & 0xfffffffe)) << 8) | m_ram->read(offset | 1);
+	return ((m_ram->read(offset & ~offs_t(1))) << 8) | m_ram->read(offset | 1);
 }
 
 void tsconf_state::ram_write16(offs_t offset, u16 data)
 {
-	ram_page_write(0, offset & 0xfffffffe, data >> 8);
+	ram_page_write(0, offset & ~offs_t(1), data >> 8);
 	ram_page_write(0, offset | 1, data & 0xff);
 }
 
@@ -403,6 +403,12 @@ void tsconf_state::sfile_write16(offs_t offset, u16 data)
 	m_sfile->write(dest, data >> 8);
 	m_sfile->write(dest | 1, data & 0xff);
 };
+
+u8 tsconf_state::tsconf_port_xx1f_r(offs_t offset) {
+	return m_beta->started() && m_beta->is_active()
+		? m_beta->status_r()
+		: 0x00; // TODO kempston read
+}
 
 void tsconf_state::tsconf_port_7ffd_w(u8 data)
 {
@@ -743,6 +749,14 @@ void tsconf_state::tsconf_spi_miso_w(u8 data)
 {
 	m_zctl_di <<= 1;
 	m_zctl_di |= data;
+}
+
+void tsconf_state::tsconf_ay_address_w(u8 data)
+{
+	if ((m_mod_ay->read() == 1) && ((data & 0xfe) == 0xfe))
+		m_ay_selected = data & 1;
+	else
+		m_ay[m_ay_selected]->address_w(data);
 }
 
 IRQ_CALLBACK_MEMBER(tsconf_state::irq_vector)
