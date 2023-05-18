@@ -19,13 +19,32 @@ TEST_CASE("vsnprintf NULL buffer", "No output buffer provided.")
 
 TEST_CASE("vsnprintf truncated", "Truncated output buffer.")
 {
-	char buffer5[5]; // fit
-	REQUIRE(4 == bx::snprintf(buffer5, BX_COUNTOF(buffer5), "abvg") );
-	REQUIRE(0 == bx::strCmp(buffer5, "abvg") );
+	REQUIRE(4 == bx::snprintf(NULL, 0, "abvg") );
+
+	char buffer15[15]; // fit
+	REQUIRE(4    == bx::snprintf(buffer15, BX_COUNTOF(buffer15), "abvg") );
+	REQUIRE('\0' == buffer15[4]);
+	REQUIRE(0    == bx::strCmp(buffer15, "abvg") );
+
+	char buffer1[1]; // truncate
+	REQUIRE(4    == bx::snprintf(buffer1, BX_COUNTOF(buffer1), "abvg") );
+	REQUIRE('\0' == buffer1[BX_COUNTOF(buffer1)-1]);
 
 	char buffer7[7]; // truncate
-	REQUIRE(10 == bx::snprintf(buffer7, BX_COUNTOF(buffer7), "Ten chars!") );
-	REQUIRE(0  == bx::strCmp(buffer7, "Ten ch") );
+	REQUIRE(10   == bx::snprintf(NULL, 0, "Ten chars!") );
+	REQUIRE(10   == bx::snprintf(buffer7, BX_COUNTOF(buffer7), "Ten chars!") );
+	REQUIRE('\0' == buffer7[BX_COUNTOF(buffer7)-1]);
+	REQUIRE(0    == bx::strCmp(buffer7, "Ten ch") );
+
+	REQUIRE(7    == bx::snprintf(NULL, 0, "Seven67") );
+	REQUIRE(7    == bx::snprintf(buffer7, BX_COUNTOF(buffer7), "Seven67") );
+	REQUIRE('\0' == buffer7[BX_COUNTOF(buffer7)-1]);
+	REQUIRE(0    == bx::strCmp(buffer7, "Seven6") );
+
+	REQUIRE(11   == bx::snprintf(NULL, 0, "SevenEleven") );
+	REQUIRE(11   == bx::snprintf(buffer7, BX_COUNTOF(buffer7), "SevenEleven") );
+	REQUIRE('\0' == buffer7[BX_COUNTOF(buffer7)-1]);
+	REQUIRE(0    == bx::strCmp(buffer7, "SevenE") );
 }
 
 static bool test(const char* _expected, const char* _format, ...)
