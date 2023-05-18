@@ -1125,7 +1125,7 @@ void cubo_state::cubo(machine_config &config)
 
 	MICROTOUCH(config, m_microtouch, 9600).stx().set(FUNC(cubo_state::rs232_rx_w));
 
-	CDROM(config, "cd32_cdrom").set_interface("cd32_cdrom");
+	CDROM(config, "cdrom").set_interface("cdrom");
 
 	/* fdc */
 	AMIGA_FDC(config, m_fdc, amiga_state::CLK_7M_PAL);

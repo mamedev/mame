@@ -153,7 +153,7 @@ void akiko_device::device_start()
 void akiko_device::device_reset()
 {
 	/* create the TOC table */
-	if ( m_cdrom != nullptr && m_cdrom->get_last_track() )
+	if ( m_cdrom->exists() && m_cdrom->get_last_track() )
 	{
 		uint8_t *p;
 		int     i, addrctrl = m_cdrom->get_adr_control( 0 );
@@ -709,7 +709,7 @@ void akiko_device::update_cdrom()
 
 			(void)cdda_getstatus(&lba);
 
-			if ( lba > 0 && m_cdrom != nullptr )
+			if ( lba > 0 && m_cdrom->exists() )
 			{
 				uint32_t  disk_pos;
 				uint32_t  track_pos;
@@ -777,7 +777,7 @@ uint32_t akiko_device::read(offs_t offset)
 	switch( offset )
 	{
 		case 0x00/4:    /* ID */
-			if ( m_cdrom != nullptr ) m_cdda->set_cdrom(m_cdrom);
+			if ( m_cdrom->exists() ) m_cdda->set_cdrom(m_cdrom);
 			return 0x0000cafe;
 
 		case 0x04/4:    /* CDROM STATUS 1 */
