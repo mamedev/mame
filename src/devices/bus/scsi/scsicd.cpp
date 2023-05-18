@@ -33,14 +33,12 @@ void scsicd_device::device_start()
 void scsicd_device::device_reset()
 {
 	scsihle_device::device_reset();
-
-	m_cdda->set_cdrom(m_image);
 }
 
 void scsicd_device::device_add_mconfig(machine_config &config)
 {
 	CDROM(config, "image").set_interface("cdrom");
-	CDDA(config, "cdda");
+	CDDA(config, "cdda").set_cdrom_tag("image");
 }
 
 bool scsicd_device::exists() const

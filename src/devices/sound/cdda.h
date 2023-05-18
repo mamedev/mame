@@ -11,9 +11,9 @@
 class cdda_device : public device_t, public device_sound_interface
 {
 public:
-	cdda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 44'100);
+	cdda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 44100);
 
-	void set_cdrom(cdrom_image_device *file);
+	template<typename T> void set_cdrom_tag(T &&tag) { m_disc.set_tag(std::forward<T>(tag)); }
 
 	void start_audio(uint32_t startlba, uint32_t numblocks);
 	void stop_audio();
@@ -37,7 +37,7 @@ protected:
 private:
 	void get_audio_data(write_stream_view &bufL, write_stream_view &bufR);
 
-	cdrom_image_device *  m_disc;
+	required_device<cdrom_image_device> m_disc;
 
 	// internal state
 	sound_stream *      m_stream;
@@ -49,6 +49,8 @@ private:
 	uint32_t              m_audio_samples;
 	uint32_t              m_audio_bptr;
 	int16_t               m_audio_data[2];
+
+	uint32_t              m_sequence_counter;
 
 	devcb_write_line m_audio_end_cb;
 };

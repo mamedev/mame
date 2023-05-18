@@ -1121,7 +1121,6 @@ void lc89510_temp_device::reset_cd(void)
 		if ( m_cdrom->exists() )
 		{
 			segacd.toc = &m_cdrom->get_toc();
-			m_cdda->set_cdrom(m_cdrom);
 			m_cdda->stop_audio(); //stop any pending CD-DA
 		}
 	}
@@ -1164,6 +1163,7 @@ void lc89510_temp_device::device_add_mconfig(machine_config &config)
 	cdda_device &cdda(CDDA(config, "cdda"));
 	cdda.add_route(0, ":lspeaker", 0.50); // TODO: accurate volume balance
 	cdda.add_route(1, ":rspeaker", 0.50);
+	cdda.set_cdrom_tag(m_cdrom);
 }
 
 

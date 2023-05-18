@@ -242,7 +242,6 @@ void pce_cd_device::late_setup()
 	if (m_cdrom->exists())
 	{
 		m_toc = &m_cdrom->get_toc();
-		m_cdda->set_cdrom(m_cdrom);
 		m_last_frame = m_cdrom->get_track_start(m_cdrom->get_last_track() - 1);
 		m_last_frame += m_toc->tracks[m_cdrom->get_last_track() - 1].frames;
 		m_end_frame = m_last_frame;
@@ -277,6 +276,7 @@ void pce_cd_device::device_add_mconfig(machine_config &config)
 	m_msm->add_route(ALL_OUTPUTS, "^rspeaker", 0.50);
 
 	CDDA(config, m_cdda);
+	m_cdda->set_cdrom_tag(m_cdrom);
 	m_cdda->audio_end_cb().set(FUNC(pce_cd_device::cdda_end_mark_cb));
 	m_cdda->add_route(0, "^lspeaker", 1.00);
 	m_cdda->add_route(1, "^rspeaker", 1.00);

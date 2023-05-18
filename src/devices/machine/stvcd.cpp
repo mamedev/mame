@@ -121,6 +121,7 @@ void stvcd_device::device_add_mconfig(machine_config &config)
 	CDDA(config, m_cdda);
 	m_cdda->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
 	m_cdda->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
+	m_cdda->set_cdrom_tag("cdrom");
 }
 
 void stvcd_device::device_start()
@@ -2102,8 +2103,6 @@ void stvcd_device::device_reset()
 	}
 
 	// open device
-	m_cdda->set_cdrom(m_cdrom_image);
-
 	if (m_cdrom_image->exists())
 	{
 		LOG("Opened CD-ROM successfully, reading root directory\n");
@@ -2819,7 +2818,6 @@ void stvcd_device::set_tray_close()
 		return;
 
 	hirqreg |= DCHG;
-	m_cdda->set_cdrom(m_cdrom_image);
 
 	if (m_cdrom_image->exists())
 	{
