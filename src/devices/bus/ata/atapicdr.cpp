@@ -107,6 +107,7 @@ void atapi_cdrom_device::device_reset()
 	atapi_hle_device::device_reset();
 	m_media_change = true;
 	m_sequence_counter = m_image->sequence_counter();
+	m_cdda->set_cdrom(m_image);
 }
 
 void atapi_fixed_cdrom_device::device_reset()
@@ -114,6 +115,7 @@ void atapi_fixed_cdrom_device::device_reset()
 	atapi_hle_device::device_reset();
 	m_media_change = false;
 	m_sequence_counter = m_image->sequence_counter();
+	m_cdda->set_cdrom(m_image);
 }
 
 void atapi_dvdrom_device::device_reset()
@@ -121,6 +123,7 @@ void atapi_dvdrom_device::device_reset()
 	atapi_hle_device::device_reset();
 	m_media_change = true;
 	m_sequence_counter = m_image->sequence_counter();
+	m_cdda->set_cdrom(m_image);
 }
 
 void atapi_fixed_dvdrom_device::device_reset()
@@ -128,6 +131,7 @@ void atapi_fixed_dvdrom_device::device_reset()
 	atapi_hle_device::device_reset();
 	m_media_change = false;
 	m_sequence_counter = m_image->sequence_counter();
+	m_cdda->set_cdrom(m_image);
 }
 
 void atapi_cdrom_device::process_buffer()
