@@ -9391,11 +9391,13 @@ Requires [16KB EEPROM]
 	</software>
 
 	<software name="pdark" supported="no">
+		<!-- v8.7 final -->
 		<description>Perfect Dark (Europe)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<notes><![CDATA[
 Requires [16KB EEPROM]
+[Expansion Pak] compatible
 ]]></notes>
 		<info name="serial" value="NUS-NPDP-EUR"/>
 		<part name="cart" interface="n64_cart">
@@ -9406,11 +9408,13 @@ Requires [16KB EEPROM]
 	</software>
 
 	<software name="pdarkj" cloneof="pdark" supported="no">
+		<!-- v8.9 final -->
 		<description>Perfect Dark (Japan)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<notes><![CDATA[
 Requires [16KB EEPROM]
+[Expansion Pak] compatible
 ]]></notes>
 		<info name="serial" value="NUS-NPDJ-JPN"/>
 		<info name="release" value="20001021"/>
@@ -9423,11 +9427,13 @@ Requires [16KB EEPROM]
 	</software>
 
 	<software name="pdarku" cloneof="pdark" supported="no">
+		<!-- v8.7 final -->
 		<description>Perfect Dark (USA, rev 1)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<notes><![CDATA[
 Requires [16KB EEPROM]
+[Expansion Pak] compatible
 ]]></notes>
 		<info name="serial" value="NUS-NPDE-USA"/>
 		<part name="cart" interface="n64_cart">
@@ -9444,11 +9450,13 @@ Requires [16KB EEPROM]
 	</software>
 
 	<software name="pdarku1" cloneof="pdark" supported="no">
+		<!-- v8.7 final -->
 		<description>Perfect Dark (USA)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<notes><![CDATA[
 Requires [16KB EEPROM]
+[Expansion Pak] compatible
 ]]></notes>
 		<info name="serial" value="NUS-NPDE-USA"/>
 		<part name="cart" interface="n64_cart">
@@ -9460,9 +9468,12 @@ Requires [16KB EEPROM]
 
 	<!-- Decrypted -->
 	<software name="pdarkp" cloneof="pdark" supported="no">
-		<description>Perfect Dark (Europe, prototype 20000426, version 28.7)</description>
+		<description>Perfect Dark (Europe, prototype 20000426, version 28.7 beta)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
 				<rom name="perfect dark eur debug.bin" size="0x2000000" crc="5c6ac287" sha1="278cec1806eb39690cd2a3ae4838cfa8b8e630d2" status="baddump" />
@@ -9471,9 +9482,12 @@ Requires [16KB EEPROM]
 	</software>
 
 	<software name="pdarkup" cloneof="pdark" supported="no">
-		<description>Perfect Dark (USA, prototype 20000322, version 6.4)</description>
+		<description>Perfect Dark (USA, prototype 20000322, version 6.4 beta)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x4000000">
 				<rom name="perfect dark ntsc debug_ec.bin" size="0x4000000" crc="571ca36e" sha1="578eef928e7f93310288ea1e319dc1d00dee51fa" />
@@ -9489,9 +9503,12 @@ patched out (+ a fix for internal checksum)
 -->
 <!-- Why is this a different size than encrypted? -->
 	<software name="pdarkuph" cloneof="pdark" supported="no">
-		<description>Perfect Dark (USA, prototype 20000322, version 6.4, decrypted)</description>
+		<description>Perfect Dark (USA, prototype 20000322, version 6.4 beta, decrypted)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
 				<rom name="pd_ntsc_debug_dc.bin" size="0x2000000" crc="0ea2645f" sha1="40c60733840ee68ac60f0c951055c942a2573bfc" status="baddump" />
@@ -9621,6 +9638,9 @@ u3: Nintendo VCI-NUS 9910XX003 011
 		<description>Pocket Monsters Stadium (Japan)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Hangs during intro [drc]
+]]></notes>
 		<info name="serial" value="NUS-CPSJ-JPN"/>
 		<info name="release" value="19980801"/>
 		<info name="alt_title" value="ポケモンスタジアム"/>
@@ -9635,6 +9655,9 @@ u3: Nintendo VCI-NUS 9910XX003 011
 		<description>Pocket Monsters Stadium 2 (Japan)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Hangs during intro [drc]
+]]></notes>
 		<info name="serial" value="NUS-CP2J-JPN"/>
 		<info name="release" value="19990430"/>
 		<info name="alt_title" value="ポケモンスタジアム2"/>
@@ -9649,6 +9672,9 @@ u3: Nintendo VCI-NUS 9910XX003 011
 		<description>Pocket Monsters Stadium Kin Gin (Japan)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Hangs during intro [drc]
+]]></notes>
 		<info name="serial" value="NUS-NP3J-JPN"/>
 		<info name="release" value="20001214"/>
 		<info name="alt_title" value="ポケモンスタジアム 金銀 クリスタルバージョン対応"/>
@@ -9823,6 +9849,9 @@ u3: Nintendo VCI-NUS 9910XX003 011
 		<description>Pokémon Snap (USA)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Screen Adjust in Option Mode doesn't move screen
+]]></notes>
 		<info name="serial" value="NUS-NPFE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-06A-01" />
@@ -9852,6 +9881,9 @@ u3: Nintendo VCI-NUS 9910XX003 011
 		<description>Pokémon Stadium (Europe, rev 1)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Hangs during intro [drc]
+]]></notes>
 		<info name="serial" value="NUS-NPOP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
@@ -9864,6 +9896,9 @@ u3: Nintendo VCI-NUS 9910XX003 011
 		<description>Pokémon Stadium (Europe)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Hangs during intro [drc]
+]]></notes>
 		<info name="serial" value="NUS-NPOP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-06A-01" />
@@ -9881,6 +9916,9 @@ u3: Nintendo VCI-NUS 9910XX003 011
 		<description>Pokémon Stadium (France)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Hangs during intro [drc]
+]]></notes>
 		<info name="serial" value="NUS-NPOF-FRA"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
@@ -9893,6 +9931,9 @@ u3: Nintendo VCI-NUS 9910XX003 011
 		<description>Pokémon Stadium (Germany)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Hangs during intro [drc]
+]]></notes>
 		<info name="serial" value="NUS-NPOD-NOE"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-06A-01" />
@@ -9911,6 +9952,9 @@ u3: Nintendo VCI-NUS 9910XX003 011
 		<description>Pokémon Stadium (Italy)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Hangs during intro [drc]
+]]></notes>
 		<info name="serial" value="NUS-NPOI-ITA"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
@@ -9923,6 +9967,9 @@ u3: Nintendo VCI-NUS 9910XX003 011
 		<description>Pokémon Stadium (Spain)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Hangs during intro [drc]
+]]></notes>
 		<info name="serial" value="NUS-NPOS-ESP"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-06A-01" />
@@ -9941,6 +9988,9 @@ u3: Nintendo VCI-NUS 9910XX003 011
 		<description>Pokémon Stadium (USA, rev 2)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Hangs during intro [drc]
+]]></notes>
 		<info name="serial" value="NUS-NPOE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
@@ -9953,6 +10003,9 @@ u3: Nintendo VCI-NUS 9910XX003 011
 		<description>Pokémon Stadium (USA, rev 1)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Hangs during intro [drc]
+]]></notes>
 		<info name="serial" value="NUS-NPOE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-06A-01" />
@@ -9969,6 +10022,9 @@ u3: Nintendo VCI-NUS 9910XX003 011
 		<description>Pokémon Stadium (USA)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Hangs during intro [drc]
+]]></notes>
 		<info name="serial" value="NUS-NPOE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-06A-01" />
@@ -9987,6 +10043,9 @@ u3: Nintendo VCI-NUS 9910XX003 011
 		<description>Pokémon Stadium 2 (Europe)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Hangs during intro [drc]
+]]></notes>
 		<info name="serial" value="NUS-NP3P-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-08A-01" />
@@ -10007,6 +10066,9 @@ u3: Nintendo VCI-NUS 9910XX003 011
 		<description>Pokémon Stadium 2 (France)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Hangs during intro [drc]
+]]></notes>
 		<info name="serial" value="NUS-NP3F-FRA"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x4000000">
@@ -10019,6 +10081,9 @@ u3: Nintendo VCI-NUS 9910XX003 011
 		<description>Pokémon Stadium 2 (Germany)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Hangs during intro [drc]
+]]></notes>
 		<info name="serial" value="NUS-NP3D-NOE"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-08A-01" />
@@ -10039,6 +10104,9 @@ u3: Nintendo VCI-NUS 9910XX003 011
 		<description>Pokémon Stadium 2 (Italy)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Hangs during intro [drc]
+]]></notes>
 		<info name="serial" value="NUS-NP3I-ITA"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x4000000">
@@ -10051,6 +10119,9 @@ u3: Nintendo VCI-NUS 9910XX003 011
 		<description>Pokémon Stadium 2 (Spain)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Hangs during intro [drc]
+]]></notes>
 		<info name="serial" value="NUS-NP3S-ESP"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-08A-01" />
@@ -10071,6 +10142,9 @@ u3: Nintendo VCI-NUS 9910XX003 011
 		<description>Pokémon Stadium 2 (USA)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Hangs during intro [drc]
+]]></notes>
 		<info name="serial" value="NUS-NP3E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-08A-01" />
@@ -10181,6 +10255,10 @@ u3: Nintendo VCI-NUS 9910XX003 011
 		<description>Pro Mahjong Kiwame 64 (Japan, rev 1)</description>
 		<year>1997</year>
 		<publisher>Athena</publisher>
+		<notes><![CDATA[
+Empty GFX boxes on backgrounds (cfr. intro and mode select)
+Hangs before gameplay [drc]
+]]></notes>
 		<info name="serial" value="NUS-NKMJ-JPN"/>
 		<info name="release" value="19971121"/>
 		<info name="alt_title" value="プロ麻雀 極64"/>
@@ -10195,6 +10273,10 @@ u3: Nintendo VCI-NUS 9910XX003 011
 		<description>Pro Mahjong Kiwame 64 (Japan)</description>
 		<year>1997</year>
 		<publisher>Athena</publisher>
+		<notes><![CDATA[
+Empty GFX boxes on backgrounds (cfr. intro and mode select)
+Hangs before gameplay [drc]
+]]></notes>
 		<info name="serial" value="NUS-NKMJ-JPN"/>
 		<info name="release" value="19971121"/>
 		<info name="alt_title" value="プロ麻雀 極64"/>
@@ -10209,9 +10291,13 @@ u3: Nintendo VCI-NUS 9910XX003 011
 		<description>Pro Mahjong Tsuwamono 64 - Jansou Battle ni Chousen (Japan)</description>
 		<year>1999</year>
 		<publisher>Culture Brain</publisher>
+		<notes><![CDATA[
+Has tiny white boxes on top of call menu during gameplay (verify, press d-pad down to bring it up)
+]]></notes>
 		<info name="serial" value="NUS-NNRJ-JPN"/>
 		<info name="release" value="19991105"/>
 		<info name="alt_title" value="プロ麻雀 兵 64"/>
+		<info name="usage" value="Option 2 for new game, 1 loads"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x800000">
 				<rom name="pro mahjong tsuwamono 64 - jansou battle ni chousen (japan).bin" size="0x800000" crc="388da567" sha1="7c5565519bb9041ebd25a78ca174143faf872809" />
@@ -10237,6 +10323,9 @@ u3: Nintendo VCI-NUS 9910XX003 011
 		<description>Puyo Puyo Sun 64 (Japan)</description>
 		<year>1997</year>
 		<publisher>Compile</publisher>
+		<notes><![CDATA[
+Backgrounds leaves trails during intro and main menu
+]]></notes>
 		<info name="serial" value="NUS-NPYJ-JPN"/>
 		<info name="release" value="19971031"/>
 		<info name="alt_title" value="ぷよぷよSUN64"/>
@@ -10465,7 +10554,7 @@ u3: Nintendo VCI-NUS 9910XX003 011
 		<year>1998</year>
 		<publisher>Midway</publisher>
 		<notes><![CDATA[
-"Fatal error: RDP: load_tlut: size = 1" during attract
+"Fatal error: RDP: load_tlut: size = 1" during attract and gameplay
 ]]></notes>
 		<info name="serial" value="NUS-N2PE-USA"/>
 		<part name="cart" interface="n64_cart">
@@ -10567,6 +10656,9 @@ u3: Nintendo VCI-NUS 9910XX003 011
 		<description>Re-Volt (Europe)</description>
 		<year>1999</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NRVP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0xc00000">
@@ -10579,6 +10671,9 @@ u3: Nintendo VCI-NUS 9910XX003 011
 		<description>Re-Volt (USA)</description>
 		<year>1999</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NRVE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -10780,6 +10875,9 @@ Requires [16KB EEPROM]
 		<description>Robotech: Crystal Dreams (USA, prototype, earlier)</description>
 		<year>1998</year>
 		<publisher>GameTek</publisher>
+		<notes><![CDATA[
+Hangs during intro (verify)
+]]></notes>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="robotech - crystal dreams (prototype).n64" size="0x1000000" crc="4d6016ab" sha1="b86a1567becb47c30be79370c85706c103b063a9" />
@@ -10792,6 +10890,9 @@ Requires [16KB EEPROM]
 		<description>Robotech: Crystal Dreams (USA, prototype 19990820)</description>
 		<year>1998</year>
 		<publisher>GameTek</publisher>
+		<notes><![CDATA[
+Hangs during intro (verify)
+]]></notes>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0xc00000">
 				<rom name="robotech - crystal dreams (usa) (proto).bin" size="0xc00000" crc="3a711f12" sha1="5ea71103d323530c73e1668cc47a1c287d07e99b" status="baddump" />
@@ -11585,6 +11686,9 @@ Requires [16KB EEPROM]
 		<description>South Park Rally (USA)</description>
 		<year>2000</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+Intro has offset lipsync
+]]></notes>
 		<info name="serial" value="NUS-NPRE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -11688,6 +11792,9 @@ Requires [16KB EEPROM]
 		<description>Spider-Man (USA)</description>
 		<year>2000</year>
 		<publisher>Activision</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NSLE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
@@ -11790,6 +11897,9 @@ Looks too dim, cfr. pre-stage 1
 		<description>Star Twins (Japan)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Black screen after Rare logo
+]]></notes>
 		<info name="serial" value="NUS-NJFJ-JPN"/>
 		<info name="release" value="19991201"/>
 		<info name="alt_title" value="スターツインズ"/>
@@ -12141,6 +12251,9 @@ Requires [16KB EEPROM]
 		<description>Stunt Racer 64 (USA)</description>
 		<year>2000</year>
 		<publisher>Midway</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NR3E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
@@ -12386,6 +12499,9 @@ Screen Adjust in Option Mode doesn't move screen
 		<description>Supercross 2000 (Europe)</description>
 		<year>1999</year>
 		<publisher>Electronic Arts</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NSXP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
@@ -12398,6 +12514,9 @@ Screen Adjust in Option Mode doesn't move screen
 		<description>Supercross 2000 (USA)</description>
 		<year>1999</year>
 		<publisher>Electronic Arts</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NSXE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -12473,6 +12592,9 @@ Screen Adjust in Option Mode doesn't move screen
 		<description>Sydney 2000 (Europe, prototype)</description>
 		<year>2000</year>
 		<publisher>Eidos</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
 				<rom name="syd2k (eur).bin" size="0x2000000" crc="cb366589" sha1="f1ada6fbedf08754db14983678220cbf411da0b6" />
@@ -12484,6 +12606,9 @@ Screen Adjust in Option Mode doesn't move screen
 		<description>Sydney 2000 (USA, prototype)</description>
 		<year>2000</year>
 		<publisher>Eidos</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
 				<rom name="syd2k (usa).bin" size="0x2000000" crc="9b7b6f51" sha1="b9def914d6395b794418f0ccd846cbee123b27ff" />
@@ -12589,15 +12714,15 @@ Screen Adjust in Option Mode doesn't move screen
 		</part>
 	</software>
 
-<!--
-The game came with the Nintendo-Seta Bio Sensor, a special controller with a clip on the end, to measure
-user's heart beat. One end of the sensor plugs into the extension port on the controller, and the other end
-clips onto the player's ear.
--->
 	<software name="tetris64" supported="no">
 		<description>Tetris 64 (Japan)</description>
 		<year>1998</year>
 		<publisher>Seta Corporation</publisher>
+		<notes><![CDATA[
+The game came with the Nintendo-Seta [Bio Sensor], a special controller with a clip on the end, to measure
+user's heart beat. One end of the sensor plugs into the extension port on the controller, and the other end
+clips onto the player's ear.
+]]></notes>
 		<info name="serial" value="NUS-NT6J-JPN"/>
 		<info name="release" value="19981113"/>
 		<info name="alt_title" value="テトリス64"/>
@@ -12804,6 +12929,10 @@ clips onto the player's ear.
 		<description>Tony Hawk's Pro Skater (USA, rev 1)</description>
 		<year>2000</year>
 		<publisher>Activision</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+No text GFXs
+]]></notes>
 		<info name="serial" value="NUS-NTFE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0xc00000">
@@ -12816,6 +12945,10 @@ clips onto the player's ear.
 		<description>Tony Hawk's Pro Skater (USA)</description>
 		<year>2000</year>
 		<publisher>Activision</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+No text GFXs
+]]></notes>
 		<info name="serial" value="NUS-NTFE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -12832,6 +12965,10 @@ clips onto the player's ear.
 		<description>Tony Hawk's Pro Skater 2 (Europe)</description>
 		<year>2001</year>
 		<publisher>Activision</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+No text GFXs
+]]></notes>
 		<info name="serial" value="NUS-NTQP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
@@ -12848,6 +12985,10 @@ clips onto the player's ear.
 		<description>Tony Hawk's Pro Skater 2 (USA)</description>
 		<year>2001</year>
 		<publisher>Activision</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+No text GFXs
+]]></notes>
 		<info name="serial" value="NUS-NTQE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
@@ -12864,6 +13005,10 @@ clips onto the player's ear.
 		<description>Tony Hawk's Pro Skater 3 (USA)</description>
 		<year>2002</year>
 		<publisher>Activision</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+No text GFXs
+]]></notes>
 		<info name="serial" value="NUS-N3TE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
@@ -12880,6 +13025,10 @@ clips onto the player's ear.
 		<description>Tony Hawk's Skateboarding (Australia, Europe)</description>
 		<year>2002</year>
 		<publisher>Activision</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+No text GFXs
+]]></notes>
 		<info name="serial" value="NUS-NTFP-AUS, NUS-NTFP-NOE, NUS-NTFP-UKV"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0xc00000">
@@ -12903,6 +13052,9 @@ clips onto the player's ear.
 		<description>Top Gear Hyper-Bike (Europe)</description>
 		<year>2000</year>
 		<publisher>Kemco</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NGBP-EUR, NUS-NGBP-EUU"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
@@ -12915,6 +13067,9 @@ clips onto the player's ear.
 		<description>Top Gear Hyper-Bike (Japan)</description>
 		<year>2000</year>
 		<publisher>Kemco</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NGBJ-JPN"/>
 		<info name="release" value="20000317"/>
 		<info name="alt_title" value="トップギア・ハイパーバイク"/>
@@ -12929,6 +13084,9 @@ clips onto the player's ear.
 		<description>Top Gear Hyper-Bike (USA)</description>
 		<year>2000</year>
 		<publisher>Kemco</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NGBE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -13483,6 +13641,9 @@ clips onto the player's ear.
 		<description>Turok 2 - Seeds of Evil (Europe, English)</description>
 		<year>1998</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NT2P-EUR, NUS-NT2P-UKV" />
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
@@ -13495,6 +13656,9 @@ clips onto the player's ear.
 		<description>Turok 2 - Seeds of Evil (Europe, English / French / Spanish / Italian)</description>
 		<year>1998</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NT2X-EUR" />
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
@@ -13507,6 +13671,9 @@ clips onto the player's ear.
 		<description>Turok 2 - Seeds of Evil (Germany)</description>
 		<year>1998</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NT2D-NOE" />
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -13525,6 +13692,9 @@ clips onto the player's ear.
 		<description>Turok 2 - Seeds of Evil (USA, kiosk demo)</description>
 		<year>1998</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NTYE-USA" />
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -13543,6 +13713,9 @@ clips onto the player's ear.
 		<description>Turok 2 - Seeds of Evil (USA, rev 1)</description>
 		<year>1998</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NT2E-USA" />
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -13559,6 +13732,9 @@ clips onto the player's ear.
 		<description>Turok 2 - Seeds of Evil (USA)</description>
 		<year>1998</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NT2E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -13577,6 +13753,9 @@ clips onto the player's ear.
 		<description>Turok 3 - Shadow of Oblivion (Europe)</description>
 		<year>2001</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NTKP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
@@ -13589,6 +13768,9 @@ clips onto the player's ear.
 		<description>Turok 3 - Shadow of Oblivion (USA, prototype 20000710, version N4TKER18)</description>
 		<year>2000</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
 				<rom name="turok 3 - shadow of oblivion (usa) (beta).bin" size="0x2000000" crc="a53de25f" sha1="ab268d630c5f206b36f0db0605be8762cd2b96da" />
@@ -13600,6 +13782,9 @@ clips onto the player's ear.
 		<description>Turok 3 - Shadow of Oblivion (USA, prototype 20000531, version N4TKER09)</description>
 		<year>2000</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
 				<rom name="turok 3 - shadow of oblivion (usa) (2000-05-31) (beta).bin" size="0x2000000" crc="505e9066" sha1="12a22310e653b2389110e7708831634e3f9f18db" />
@@ -13611,6 +13796,9 @@ clips onto the player's ear.
 		<description>Turok 3 - Shadow of Oblivion (Europe, prototype 20000606)</description>
 		<year>2000</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
 				<rom name="turok 3 - shadow of oblivion (2000)(acclaim)(beta).bin" size="0x2000000" crc="bf082a47" sha1="26f6558d5c824d17174782ec9a3bed4689828a76" />
@@ -13622,6 +13810,9 @@ clips onto the player's ear.
 		<description>Turok 3 - Shadow of Oblivion (USA)</description>
 		<year>2000</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NTKE-USA" />
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
@@ -13810,6 +14001,9 @@ clips onto the player's ear.
 		<description>Violence Killer - Turok New Generation (Japan)</description>
 		<year>1999</year>
 		<publisher>Media Factory</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+]]></notes>
 		<info name="serial" value="NUS-NT2J-JPN"/>
 		<info name="release" value="19990618"/>
 		<info name="alt_title" value="バイオレンスキラーTUROK NEW GENERATION"/>
