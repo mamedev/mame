@@ -27,17 +27,6 @@ TsConf: https://github.com/tslabs/zx-evo/blob/master/pentevo/docs/TSconf/tsconf_
 FAQ-RUS: https://forum.tslabs.info/viewtopic.php?f=35&t=157
     ROM: https://github.com/tslabs/zx-evo/blob/master/pentevo/rom/bin/ts-bios.rom (validated on: 2021-12-14)
 
-HowTo:
-# Create SD image "wc.img"
-# Copy WC files from archive https://github.com/tslabs/zx-evo/blob/master/pentevo/soft/WC/wc.zip
-# Tech Demos (currently *.spg only): http://prods.tslabs.info/index.php?t=4
-$ chdman createhd -i wc.img -o wc.chd -c none
-$ mame tsconf -hard wc.chd
-# BIOS Setup loads on fresh setup (return to BIOS: RShift+F3)
-# Change "Reset To: BD boot.$c"
-# Reset (F3)
-# Enable keyboard: MAME Setup (Tab) > Keyboard Mode > AT Keyboard: Enabled
-
 TODO:
 - Ram cache
 - VDos
@@ -56,7 +45,7 @@ TODO:
 
 TILE_GET_INFO_MEMBER(tsconf_state::get_tile_info_txt)
 {
-	u8 *m_row_location = &m_ram->pointer()[(m_regs[V_PAGE] << 14) + (tile_index / tilemap.cols() * 256)];
+	u8 *m_row_location = &m_ram->pointer()[get_vpage_offset() + (tile_index / tilemap.cols() * 256)];
 	u8 col = tile_index % tilemap.cols();
 	u8 symbol = m_row_location[col];
 	tileinfo.set(TM_TS_CHAR, symbol, 0, 0);
