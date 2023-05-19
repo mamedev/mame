@@ -15,6 +15,8 @@
     I/O: Paddington PCI I/O ASIC (see heathrow.cpp for details)
     RAM: 2 PC66 DIMM slots, max 128 MB
 
+    PCI addresses scanned: 14.0, 12.0, 0d.0, 0e.0, 0f.0
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -22,9 +24,11 @@
 #include "machine/dimm_spd.h"
 #include "machine/input_merger.h"
 #include "machine/mpc106.h"
+#include "machine/opti82c861.h"
 #include "machine/pci.h"
 #include "machine/pci-ide.h"
 #include "machine/ram.h"
+#include "video/atirage.h"
 #include "burgundy.h"
 #include "cuda.h"
 #include "heathrow.h"
@@ -45,6 +49,8 @@ public:
 	required_device<ram_device> m_ram;
 
 private:
+	u32 m_sense;
+
 	void imac_map(address_map &map);
 
 	virtual void machine_start() override;
@@ -60,6 +66,9 @@ private:
 	{
 		m_maincpu->set_input_line(PPC_IRQ, state);
 	}
+
+	u32 read_sense();
+	void write_sense(u32 data);
 };
 
 imac_state::imac_state(const machine_config &mconfig, device_type type, const char *tag) :
@@ -76,6 +85,8 @@ imac_state::imac_state(const machine_config &mconfig, device_type type, const ch
 
 void imac_state::machine_start()
 {
+	m_sense = 0;
+
 	m_mpc106->set_ram_info((u8 *)m_ram->pointer(), m_ram->size());
 
 	// start off disabling all of the DIMMs
@@ -99,6 +110,8 @@ void imac_state::machine_start()
 			m_dimm0->set_dimm_size(dimm_spd_device::SIZE_64_MIB);
 			break;
 	}
+
+	save_item(NAME(m_sense));
 }
 
 void imac_state::machine_reset()
@@ -112,9 +125,20 @@ void imac_state::imac_map(address_map &map)
 	map.unmap_value_high();
 }
 
+u32 imac_state::read_sense()
+{
+	// ID as a 640x480 13" for now (needs EDID, the old Apple protocol isn't supported)
+	return (m_sense & 0xffff00ff) | (6 << 8);
+}
+
+void imac_state::write_sense(u32 data)
+{
+	m_sense = data;
+}
+
 void imac_state::imac(machine_config &config)
 {
-	PPC740(config, m_maincpu, 66000000);    // actually 233 MHz
+	PPC750(config, m_maincpu, 66000000);    // actually 233 MHz
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 	m_maincpu->set_addrmap(AS_PROGRAM, &imac_state::imac_map);
 
@@ -125,6 +149,12 @@ void imac_state::imac(machine_config &config)
 	paddington.set_maincpu_tag("maincpu");
 	paddington.set_pci_root_tag(":pci:00.0", AS_DATA);
 	paddington.irq_callback().set(FUNC(imac_state::irq_w));
+
+	atirage_device &ati(ATI_RAGEIIC(config, "pci:12.0", 14.318181_MHz_XTAL));
+	ati.gpio_get_cb().set(FUNC(imac_state::read_sense));
+	ati.gpio_set_cb().set(FUNC(imac_state::write_sense));
+
+	OPTI_82C861(config, "pci:14.0", 0);
 
 	MACADB(config, m_macadb, 15.6672_MHz_XTAL);
 
