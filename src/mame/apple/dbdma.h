@@ -16,7 +16,6 @@ public:
 	dbdma_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, address_space *space)
 		: dbdma_device(mconfig, tag, owner, clock)
 	{
-		printf("dbdma: setting space %p\n", space);
 		set_address_space(space);
 	}
 
