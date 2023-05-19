@@ -233,7 +233,7 @@ u8 atirage_device::regs_0_read(offs_t offset)
 
 		case CRTC_DAC_BASE + 1:
 			{
-				u8 result;
+				u8 result = 0;
 				switch (m_dac_state)
 				{
 					case 0: // red
@@ -400,17 +400,10 @@ void atirage_device::update_mode()
 	m_format = m_regs0[CRTC_GEN_CNTL+1] & 7;
 	LOGMASKED(LOG_CRTC, "Setting mode (%d x %d), total (%d x %d) format %d\n", m_hres, m_vres, m_htotal, m_vtotal, m_format);
 
-	int vclk_source = (m_pll_regs[PLL_VCLK_CNTL] & 3);
-	if ((vclk_source != 0) && (vclk_source != 3))
-	{
-		LOGMASKED(LOG_CRTC, "VCLK source (%d) is not VPLL, can't calculate dot clock\n", m_pll_regs[PLL_VCLK_CNTL] & 3);
-		return;
-	}
-
 	double vpll_frequency;
 	int clk_source = m_regs0[CLOCK_CNTL] & 3;
 
-	switch (vclk_source)
+	switch (m_pll_regs[PLL_VCLK_CNTL] & 3)
 	{
 		case 0: // CPUCLK (the PCI bus clock, not to exceed 33 MHz)
 			vpll_frequency = (33000000.0 * m_pll_regs[VCLK0_FB_DIV + clk_source]) / m_pll_regs[PLL_REF_DIV];
@@ -419,6 +412,10 @@ void atirage_device::update_mode()
 		case 3: // PLLVCLK
 			vpll_frequency = ((clock() * 2.0) * m_pll_regs[VCLK0_FB_DIV + clk_source]) / m_pll_regs[PLL_REF_DIV];
 			break;
+
+		default:
+			LOGMASKED(LOG_CRTC, "VCLK source (%d) is not VPLL, can't calculate dot clock\n", m_pll_regs[PLL_VCLK_CNTL] & 3);
+			return;
 	}
 	LOGMASKED(LOG_CRTC, "VPLL freq %f\n", vpll_frequency);
 
