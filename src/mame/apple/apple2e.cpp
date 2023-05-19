@@ -440,6 +440,7 @@ private:
 	bool m_romswitch;
 	bool m_mockingboard4c;
 	bool m_intc8rom;
+	bool m_reset_latch;
 
 	bool m_isiic, m_isiicplus, m_iscec, m_iscecm, m_iscec2000, m_pal;
 	u8 m_migram[0x800];
@@ -1033,6 +1034,7 @@ void apple2e_state::machine_start()
 	}
 
 	m_joystick_x1_time = m_joystick_x2_time = m_joystick_y1_time = m_joystick_y2_time = 0;
+	m_reset_latch = false;
 
 	// setup save states
 	save_item(NAME(m_speaker_state));
@@ -1111,6 +1113,7 @@ void apple2e_state::machine_start()
 	save_item(NAME(m_ace2200_axxx_bank));
 	save_item(NAME(m_laser_speed));
 	save_item(NAME(m_laser_fdc_on));
+	save_item(NAME(m_reset_latch));
 }
 
 void apple2e_state::machine_reset()
@@ -1304,18 +1307,47 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 		// check for ctrl-reset
 		if ((m_kbspecial->read() & 0x88) == 0x88)
 		{
-			m_maincpu->reset();
+			if (!m_reset_latch)
+			{
+				m_reset_latch = true;
+				m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
-			// reset intcxrom to default
-			if ((m_isiic) || (m_isace500))
-			{
-				m_intcxrom = true;
+				// As per Sather: LC resets to read ROM, write RAM, no pre-write, bank 2
+				m_lcram = false;
+				m_lcram2 = true;
+				m_lcprewrite = false;
+				m_lcwriteenable = true;
+
+				// More Sather: all MMU switches off (80STORE, RAMRD, RAMWRT, INTCXROM, ALTZP, SLOTC3ROM, PAGE2, HIRES, INTC8ROM)
+				m_video->a80store_w(false);
+				m_altzp = false;
+				m_ramrd = false;
+				m_ramwrt = false;
+				m_altzp = false;
+				m_video->page2_w(false);
+				m_video->res_w(0);
+
+				// reset intcxrom to default
+				if ((m_isiic) || (m_isace500))
+				{
+					m_intcxrom = true;
+				}
+				else
+				{
+					m_intcxrom = false;
+					m_slotc3rom = false;
+				}
+				auxbank_update();
+				update_slotrom_banks();
 			}
-			else
+		}
+		else    // user released Control-Reset
+		{
+			if (m_reset_latch)
 			{
-				m_intcxrom = false;
+				m_reset_latch = false;
+				m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 			}
-			update_slotrom_banks();
 		}
 
 		// check Franklin F-keys
