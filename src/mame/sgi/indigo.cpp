@@ -24,9 +24,9 @@
 #include "sgi.h"
 #include "light.h"
 
-#define LOG_UNKNOWN     (1 << 0)
-#define LOG_INT         (1 << 1)
-#define LOG_DSP         (1 << 2)
+#define LOG_UNKNOWN     (1U << 1)
+#define LOG_INT         (1U << 2)
+#define LOG_DSP         (1U << 3)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_INT | LOG_DSP)
 
 #define VERBOSE         (LOG_UNKNOWN)

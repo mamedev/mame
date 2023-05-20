@@ -38,7 +38,6 @@
 #include "emupal.h"
 #include "screen.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_OPS     (1U << 1)
 #define LOG_EGS     (1U << 2)
 

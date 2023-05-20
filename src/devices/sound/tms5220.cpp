@@ -368,37 +368,35 @@ emulating the tms5220 in MCU code). Look for a 16-pin chip at U6 labeled
 
 
 /* *****debugging defines***** */
-// general, somewhat obsolete, catch all for debugs which don't fit elsewhere
-#define LOG_GENERAL (1 << 0)
-/* 5220 only; above dumps the data written to the tms52xx to stdout, useful
+/* 5220 only; above dumps the data written to the tms52xx to the error log, useful
    for making logged data dumps for real hardware tests */
-#define LOG_DUMP_INPUT_DATA (1 << 1)
+#define LOG_DUMP_INPUT_DATA (1U << 1)
 // 5220 only; above debugs FIFO stuff: writes, reads and flag updates
-#define LOG_FIFO (1 << 2)
+#define LOG_FIFO (1U << 2)
 // dumps each speech frame as binary
-#define LOG_PARSE_FRAME_DUMP_BIN (1 << 3)
+#define LOG_PARSE_FRAME_DUMP_BIN (1U << 3)
 // dumps each speech frame as hex
-#define LOG_PARSE_FRAME_DUMP_HEX (1 << 4)
+#define LOG_PARSE_FRAME_DUMP_HEX (1U << 4)
 // dumps info if a frame ran out of data
-#define LOG_FRAME_ERRORS (1 << 6)
+#define LOG_FRAME_ERRORS (1U << 6)
 // dumps all non-speech-data command writes
-#define LOG_COMMAND_DUMP (1 << 7)
+#define LOG_COMMAND_DUMP (1U << 7)
 // dumps decoded info about command writes
-#define LOG_COMMAND_VERBOSE (1 << 8)
-// spams the errorlog with i/o ready messages whenever the ready or irq pin is read
-#define LOG_PIN_READS (1 << 9)
+#define LOG_COMMAND_VERBOSE (1U << 8)
+// spams the error log with i/o ready messages whenever the ready or irq pin is read
+#define LOG_PIN_READS (1U << 9)
 // dumps debug information related to the sample generation loop, i.e. whether interpolation is inhibited or not, and what the current and target values for each frame are.
-#define LOG_GENERATION (1 << 10)
+#define LOG_GENERATION (1U << 10)
 // dumps MUCH MORE debug information related to the sample generation loop, namely the excitation, energy, pitch, k*, and output values for EVERY SINGLE SAMPLE during a frame.
-#define LOG_GENERATION_VERBOSE (1 << 11)
+#define LOG_GENERATION_VERBOSE (1U << 11)
 // dumps the lattice filter state data each sample.
-#define LOG_LATTICE (1 << 12)
-// dumps info to stderr whenever the analog clip hardware is (or would be) clipping the signal.
-#define LOG_CLIP (1 << 13)
+#define LOG_LATTICE (1U << 12)
+// dumps info to the error log whenever the analog clip hardware is (or would be) clipping the signal.
+#define LOG_CLIP (1U << 13)
 // debugs the io ready callback timer
-#define LOG_IO_READY (1 << 14)
+#define LOG_IO_READY (1U << 14)
 // debugs the tms5220_data_r and data_w access methods which actually respect rs and ws
-#define LOG_RS_WS (1 << 15)
+#define LOG_RS_WS (1U << 15)
 
 //#define VERBOSE (LOG_GENERAL | LOG_DUMP_INPUT_DATA | LOG_FIFO | LOG_PARSE_FRAME_DUMP_HEX | LOG_FRAME_ERRORS | LOG_COMMAND_DUMP | LOG_COMMAND_VERBOSE | LOG_PIN_READS | LOG_GENERATION | LOG_GENERATION_VERBOSE | LOG_LATTICE | LOG_CLIP | LOG_IO_READY | LOG_RS_WS)
 #include "logmacro.h"

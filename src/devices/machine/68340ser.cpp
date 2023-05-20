@@ -9,11 +9,10 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-//#define LOG_GENERAL (1U <<  0) // Already defined in logmacro.h
-#define LOG_SETUP   (1U <<  1)
-#define LOG_READ    (1U <<  2)
-#define LOG_SERIAL  (1U <<  3)
-#define LOG_INT     (1U <<  4)
+#define LOG_SETUP   (1U << 1)
+#define LOG_READ    (1U << 2)
+#define LOG_SERIAL  (1U << 3)
+#define LOG_INT     (1U << 4)
 
 //#define VERBOSE  (LOG_SETUP|LOG_READ|LOG_SERIAL|LOG_INT)
 #define LOG_OUTPUT_FUNC printf // Needs always to be enabled as the default value 'logerror' is not available here

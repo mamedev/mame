@@ -116,16 +116,16 @@
 #include "emu.h"
 #include "pgram.h"
 
-#define LOG_WARN       (1U<<1)
-#define LOG_WP         (1U<<2)
-#define LOG_DSR        (1U<<3)
-#define LOG_RAM        (1U<<4)
-#define LOG_GRAM       (1U<<5)
-#define LOG_GRAMADDR   (1U<<6)
-#define LOG_CRU        (1U<<7)
-#define LOG_BANK       (1U<<8)
+#define LOG_WARN       (1U << 1)
+#define LOG_WP         (1U << 2)
+#define LOG_DSR        (1U << 3)
+#define LOG_RAM        (1U << 4)
+#define LOG_GRAM       (1U << 5)
+#define LOG_GRAMADDR   (1U << 6)
+#define LOG_CRU        (1U << 7)
+#define LOG_BANK       (1U << 8)
 
-#define VERBOSE ( LOG_GENERAL | LOG_WARN )
+#define VERBOSE (LOG_GENERAL | LOG_WARN)
 
 #include "logmacro.h"
 

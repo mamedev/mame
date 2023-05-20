@@ -29,7 +29,6 @@
 #include "spi_sdcard.h"
 #include "imagedev/harddriv.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_COMMAND (1U << 1)
 #define LOG_SPI     (1U << 2)
 

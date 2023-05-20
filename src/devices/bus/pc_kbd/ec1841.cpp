@@ -37,9 +37,8 @@
 #include "utf8.h"
 
 
-//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
-#define LOG_KEYBOARD  (1U <<  1)
-#define LOG_DEBUG     (1U <<  2)
+#define LOG_KEYBOARD  (1U << 1)
+#define LOG_DEBUG     (1U << 2)
 
 //#define VERBOSE (LOG_DEBUG)
 //#define LOG_OUTPUT_FUNC printf

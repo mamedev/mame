@@ -412,10 +412,9 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-//#define LOG_GENERAL (1U <<  0) // Already defined in logmacro.h
-#define LOG_SETUP   (1U <<  1)
-#define LOG_DISPLAY (1U <<  2)
-#define LOG_FLASH   (1U <<  3)
+#define LOG_SETUP   (1U << 1)
+#define LOG_DISPLAY (1U << 2)
+#define LOG_FLASH   (1U << 3)
 
 #define VERBOSE  (LOG_FLASH)
 #define LOG_OUTPUT_FUNC printf

@@ -74,8 +74,7 @@
 #include "bus/vme/vme_fcisio.h"
 #include "bus/vme/vme_fcscsi.h"
 
-#define LOG_GENERAL 0x01
-#define LOG_SETUP   0x02
+#define LOG_SETUP   (1U << 1)
 
 //#define VERBOSE (LOG_SETUP | LOG_GENERAL)
 

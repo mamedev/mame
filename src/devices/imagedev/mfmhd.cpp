@@ -275,18 +275,18 @@
 #include "util/ioprocs.h"
 #include "util/ioprocsfilter.h"
 
-#define LOG_WARN          (1U<<1)   // Warnings
-#define LOG_CONFIG        (1U<<2)   // Configuration
-#define LOG_STEPS         (1U<<3)   // Steps
-#define LOG_STEPSDETAIL   (1U<<4)   // Steps, more detail
-#define LOG_SIGNALS       (1U<<5)   // Signals
-#define LOG_READ          (1U<<6)   // Read operations
-#define LOG_WRITE         (1U<<7)   // Write operations
-#define LOG_BITS          (1U<<8)   // Bit transfer
-#define LOG_TIMING        (1U<<9)   // Timing
+#define LOG_WARN          (1U << 1)   // Warnings
+#define LOG_CONFIG        (1U << 2)   // Configuration
+#define LOG_STEPS         (1U << 3)   // Steps
+#define LOG_STEPSDETAIL   (1U << 4)   // Steps, more detail
+#define LOG_SIGNALS       (1U << 5)   // Signals
+#define LOG_READ          (1U << 6)   // Read operations
+#define LOG_WRITE         (1U << 7)   // Write operations
+#define LOG_BITS          (1U << 8)   // Bit transfer
+#define LOG_TIMING        (1U << 9)   // Timing
 
 
-#define VERBOSE ( LOG_GENERAL | LOG_CONFIG | LOG_WARN )
+#define VERBOSE (LOG_GENERAL | LOG_CONFIG | LOG_WARN)
 
 #include "logmacro.h"
 

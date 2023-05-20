@@ -26,7 +26,6 @@ Quirks:
 #include "emu.h"
 #include "scc2698b.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_CONFIG_CHANGE (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_CONFIG_CHANGE)

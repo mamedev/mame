@@ -75,14 +75,14 @@
 #include "emu.h"
 #include "pcode.h"
 
-#define LOG_WARN        (1U<<1)   // Warnings
-#define LOG_CONFIG      (1U<<2)   // Configuration
-#define LOG_ROM         (1U<<3)
-#define LOG_GROM        (1U<<4)
-#define LOG_SWITCH      (1U<<5)
-#define LOG_CRU         (1U<<6)
+#define LOG_WARN        (1U << 1)   // Warnings
+#define LOG_CONFIG      (1U << 2)   // Configuration
+#define LOG_ROM         (1U << 3)
+#define LOG_GROM        (1U << 4)
+#define LOG_SWITCH      (1U << 5)
+#define LOG_CRU         (1U << 6)
 
-#define VERBOSE ( LOG_CONFIG | LOG_WARN )
+#define VERBOSE (LOG_CONFIG | LOG_WARN)
 
 #include "logmacro.h"
 

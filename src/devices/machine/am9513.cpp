@@ -29,10 +29,9 @@
 #include "emu.h"
 #include "machine/am9513.h"
 
-#define LOG_GENERAL (1U << 0)
-#define LOG_MODE (1U << 1)
+#define LOG_MODE  (1U << 1)
 #define LOG_INPUT (1U << 2)
-#define LOG_TC (1U << 3)
+#define LOG_TC    (1U << 3)
 //#define VERBOSE (LOG_GENERAL | LOG_MODE)
 
 #include "logmacro.h"

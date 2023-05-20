@@ -5,10 +5,9 @@
 #include "emu.h"
 #include "dmac3.h"
 
-#define LOG_GENERAL (1U << 0)
-#define LOG_REGISTER (1U << 1)
+#define LOG_REGISTER  (1U << 1)
 #define LOG_INTERRUPT (1U << 2)
-#define LOG_DATA (1U << 3)
+#define LOG_DATA      (1U << 3)
 
 #define DMAC3_DEBUG (LOG_GENERAL | LOG_REGISTER | LOG_INTERRUPT)
 #define DMAC3_TRACE (DMAC3_DEBUG | LOG_DATA)

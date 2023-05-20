@@ -16,12 +16,11 @@
 
 
 #ifdef NES_PCB_DEBUG
-#define VERBOSE 1
+#define VERBOSE (LOG_GENERAL)
 #else
-#define VERBOSE 0
+#define VERBOSE (0)
 #endif
-
-#define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 
 //-------------------------------------------------
@@ -333,7 +332,7 @@ TIMER_CALLBACK_MEMBER(nes_900218_device::irq_timer_tick)
 
 void nes_900218_device::write_h(offs_t offset, u8 data)
 {
-	LOG_MMC(("900218 write_h, offset: %04x, data: %02x\n", offset, data));
+	LOGMASKED(LOG_GENERAL, "900218 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	if ((offset & 0x7000) == 0x7000)
 	{
@@ -370,7 +369,7 @@ void nes_900218_device::write_h(offs_t offset, u8 data)
 
 void nes_ax40g_device::write_h(offs_t offset, u8 data)
 {
-	LOG_MMC(("ax40g write_h, offset: %04x, data: %02x\n", offset, data));
+	LOGMASKED(LOG_GENERAL, "ax40g write_h, offset: %04x, data: %02x\n", offset, data);
 
 	nes_konami_vrc2_device::write_h(offset, data);
 
@@ -397,7 +396,7 @@ void nes_ax40g_device::write_h(offs_t offset, u8 data)
 
 void nes_ax5705_device::write_h(offs_t offset, u8 data)
 {
-	LOG_MMC(("ax5705 write_h, offset: %04x, data: %02x\n", offset, data));
+	LOGMASKED(LOG_GENERAL, "ax5705 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	offset = (offset & ~0x1000) | BIT(offset, 3) << 12;
 	switch (offset & 0x7001)
@@ -430,7 +429,7 @@ void nes_ax5705_device::write_h(offs_t offset, u8 data)
 
 void nes_cityfight_device::write_h(offs_t offset, u8 data)
 {
-	LOG_MMC(("unl_cityfight write_h, offset: %04x, data: %02x\n", offset, data));
+	LOGMASKED(LOG_GENERAL, "unl_cityfight write_h, offset: %04x, data: %02x\n", offset, data);
 
 	offset = (offset & ~0x6000) | bitswap<2>(offset, 13, 14) << 13;
 	switch (offset & 0x7800)
@@ -444,7 +443,7 @@ void nes_cityfight_device::write_h(offs_t offset, u8 data)
 				nes_konami_vrc4_device::write_h(offset, data);
 			break;
 		case 0x1800:
-			LOG_MMC(("Extended Audio write, data %x!", data & 0x0f)); // pcmwrite(0x4011, (V & 0xf) << 3); (etabeta's original comment, FCEUX code)
+			LOGMASKED(LOG_GENERAL, "Extended Audio write, data %x!", data & 0x0f); // pcmwrite(0x4011, (V & 0xf) << 3); (etabeta's original comment, FCEUX code)
 			break;
 		default:
 			nes_konami_vrc4_device::write_h(offset, data);
@@ -468,20 +467,20 @@ void nes_cityfight_device::write_h(offs_t offset, u8 data)
 
 u8 nes_shuiguan_device::read_m(offs_t offset)
 {
-//  LOG_MMC(("shuiguan read_m, offset: %04x\n", offset));
+//  LOGMASKED(LOG_GENERAL, "shuiguan read_m, offset: %04x\n", offset);
 	return m_prg[(m_reg * 0x2000 + offset) & (m_prg_size - 1)];
 }
 
 void nes_shuiguan_device::write_m(offs_t offset, u8 data)
 {
-	LOG_MMC(("shuiguan write_m, offset: %04x, data: %02x\n", offset, data));
+	LOGMASKED(LOG_GENERAL, "shuiguan write_m, offset: %04x, data: %02x\n", offset, data);
 	if ((offset & 0x1800) == 0x800)
 		m_reg = offset & 0x1f;
 }
 
 void nes_shuiguan_device::write_h(offs_t offset, u8 data)
 {
-	LOG_MMC(("shuiguan write_h, offset: %04x, data: %02x\n", offset, data));
+	LOGMASKED(LOG_GENERAL, "shuiguan write_h, offset: %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x7800)
 	{
@@ -525,7 +524,7 @@ void nes_shuiguan_device::write_h(offs_t offset, u8 data)
 
 void nes_t230_device::write_h(offs_t offset, u8 data)
 {
-	LOG_MMC(("t230 write_h, offset: %04x, data: %02x\n", offset, data));
+	LOGMASKED(LOG_GENERAL, "t230 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x7000)
 	{
@@ -591,7 +590,7 @@ TIMER_CALLBACK_MEMBER(nes_th21311_device::irq_timer_tick)
 
 void nes_th21311_device::write_h(offs_t offset, u8 data)
 {
-	LOG_MMC(("th21311 write_h, offset: %04x, data: %02x\n", offset, data));
+	LOGMASKED(LOG_GENERAL, "th21311 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	if ((offset & 0x7000) == 0x7000)
 	{
@@ -636,7 +635,7 @@ void nes_th21311_device::write_h(offs_t offset, u8 data)
 
 void nes_waixing_sgz_device::write_h(offs_t offset, u8 data)
 {
-	LOG_MMC(("waixing_sgz write_h, offset: %04x, data: %02x\n", offset, data));
+	LOGMASKED(LOG_GENERAL, "waixing_sgz write_h, offset: %04x, data: %02x\n", offset, data);
 
 	nes_konami_vrc4_device::write_h(offset, data);
 
@@ -689,7 +688,7 @@ void nes_waixing_sgz_device::chr_w(offs_t offset, u8 data)
 
 void nes_2yudb_device::write_h(offs_t offset, u8 data)
 {
-	LOG_MMC(("2yudb write_h, offset: %04x, data: %02x\n", offset, data));
+	LOGMASKED(LOG_GENERAL, "2yudb write_h, offset: %04x, data: %02x\n", offset, data);
 
 	nes_konami_vrc4_device::write_h(offset, data);
 
@@ -722,7 +721,7 @@ void nes_bmc_830506c_device::irq_ack_w()
 
 void nes_bmc_830506c_device::write_h(offs_t offset, u8 data)
 {
-	LOG_MMC(("bmc_830506c write_h, offset: %04x, data: %02x\n", offset, data));
+	LOGMASKED(LOG_GENERAL, "bmc_830506c write_h, offset: %04x, data: %02x\n", offset, data);
 
 	nes_konami_vrc4_device::write_h(offset, data);
 
@@ -752,7 +751,7 @@ void nes_bmc_830506c_device::write_h(offs_t offset, u8 data)
 
 u8 nes_bmc_831128c_device::read_m(offs_t offset)
 {
-// LOG_MMC(("bmc_831128c read_m, offset: %04x, data: %02x\n", offset, data));
+// LOGMASKED(LOG_GENERAL, "bmc_831128c read_m, offset: %04x, data: %02x\n", offset, data);
 
 	if (m_reg == 1)
 		return device_nes_cart_interface::read_m(offset);
@@ -762,7 +761,7 @@ u8 nes_bmc_831128c_device::read_m(offs_t offset)
 
 void nes_bmc_831128c_device::write_m(offs_t offset, u8 data)
 {
-// LOG_MMC(("bmc_831128c write_m, offset: %04x, data: %02x\n", offset, data));
+// LOGMASKED(LOG_GENERAL, "bmc_831128c write_m, offset: %04x, data: %02x\n", offset, data);
 
 	if (m_reg == 1)
 		device_nes_cart_interface::write_m(offset, data);
@@ -770,7 +769,7 @@ void nes_bmc_831128c_device::write_m(offs_t offset, u8 data)
 
 void nes_bmc_831128c_device::write_h(offs_t offset, u8 data)
 {
-	LOG_MMC(("bmc_831128c write_h, offset: %04x, data: %02x\n", offset, data));
+	LOGMASKED(LOG_GENERAL, "bmc_831128c write_h, offset: %04x, data: %02x\n", offset, data);
 
 	u8 page = offset >> 12;
 	if (page != 2 && page != 4)  // ignore writes except $Axxx and $Cxxx
@@ -846,7 +845,7 @@ void nes_bmc_kl06_device::set_prg()
 
 void nes_bmc_kl06_device::write_m(offs_t offset, u8 data)
 {
-	LOG_MMC(("bmc_kl06 write_m, offset: %04x, data: %02x\n", offset, data));
+	LOGMASKED(LOG_GENERAL, "bmc_kl06 write_m, offset: %04x, data: %02x\n", offset, data);
 
 	// 2K RAM for Crisis Force overlays control register
 	nes_konami_vrc4_device::write_m(offset, data);

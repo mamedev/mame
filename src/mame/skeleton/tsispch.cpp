@@ -123,9 +123,8 @@
 
 // defines
 
-//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
-#define LOG_PARAM     (1U <<  1)
-#define LOG_DSP       (1U <<  2)
+#define LOG_PARAM     (1U << 1)
+#define LOG_DSP       (1U << 2)
 
 #define VERBOSE (LOG_GENERAL | LOG_PARAM)
 //#define LOG_OUTPUT_FUNC printf

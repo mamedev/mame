@@ -18,7 +18,6 @@
 #include "emu.h"
 #include "rosetta.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_TLB     (1U << 1)
 #define LOG_RELOAD  (1U << 2)
 #define LOG_ECC     (1U << 3)

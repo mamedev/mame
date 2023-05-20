@@ -17,8 +17,7 @@
 #include "emu.h"
 #include "awacs_macrisc.h"
 
-#define LOG_GENERAL (1U << 0)
-#define LOG_REGISTERS (1U << 0)
+#define LOG_REGISTERS (1U << 1)
 
 #define VERBOSE (0)
 #include "logmacro.h"

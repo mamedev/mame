@@ -55,13 +55,13 @@
 
 #define LOG_OUTPUT_FUNC osd_printf_info
 
-#define LOG_WARN       (1U<<1)   // Warnings
-#define LOG_HEADER     (1U<<2)   // Header
-#define LOG_SHIFT      (1U<<3)   // Shift register
-#define LOG_INTERLEAVE (1U<<4)   // Interleave information
-#define LOG_INFO       (1U<<5)   // Disk info
-#define LOG_DETAIL     (1U<<6)   // Details
-#define LOG_TRACK      (1U<<7)   // Track output
+#define LOG_WARN       (1U << 1)   // Warnings
+#define LOG_HEADER     (1U << 2)   // Header
+#define LOG_SHIFT      (1U << 3)   // Shift register
+#define LOG_INTERLEAVE (1U << 4)   // Interleave information
+#define LOG_INFO       (1U << 5)   // Disk info
+#define LOG_DETAIL     (1U << 6)   // Details
+#define LOG_TRACK      (1U << 7)   // Track output
 
 #define VERBOSE ( LOG_WARN )
 

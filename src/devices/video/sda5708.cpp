@@ -17,11 +17,10 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-//#define LOG_GENERAL (1U <<  0) // Already defined in logmacro.h
-#define LOG_SETUP   (1U <<  1)
-#define LOG_CMD     (1U <<  2)
-#define LOG_DATA    (1U <<  3)
-#define LOG_CNTR    (1U <<  4)
+#define LOG_SETUP   (1U << 1)
+#define LOG_CMD     (1U << 2)
+#define LOG_DATA    (1U << 3)
+#define LOG_CNTR    (1U << 4)
 
 //#define VERBOSE  (LOG_DATA|LOG_SETUP|LOG_CMD|LOG_CNTR|LOG_GENERAL)
 //#define LOG_OUTPUT_STREAM std::cout

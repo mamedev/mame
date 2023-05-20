@@ -67,12 +67,11 @@
 #include "m37710il.h"
 
 // verbose logging for peripherals, etc.
-#define LOG_GENERAL (1U << 0)
 #define LOG_PORTS (1U << 1)
-#define LOG_AD (1U << 2)
-#define LOG_UART (1U << 3)
+#define LOG_AD    (1U << 2)
+#define LOG_UART  (1U << 3)
 #define LOG_TIMER (1U << 4)
-#define LOG_INT (1U << 5)
+#define LOG_INT   (1U << 5)
 //#define VERBOSE (LOG_GENERAL | LOG_PORTS | LOG_AD | LOG_UART | LOG_TIMER | LOG_INT)
 #include "logmacro.h"
 

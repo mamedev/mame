@@ -50,17 +50,17 @@
 // ----------------------------------
 // Flags for debugging
 
-#define LOG_WARN        (1U<<1)    // Warnings
-#define LOG_RW          (1U<<2)     // Read and write accesses
-#define LOG_CRU         (1U<<3)    // Show CRU bit accesses
-#define LOG_CRUD        (1U<<4)    // Show CRU bit accesses (details)
-#define LOG_READY       (1U<<5)    // Show ready line activity
-#define LOG_SIGNALS     (1U<<6)    // Show detailed signal activity
-#define LOG_ADDRESS     (1U<<7)    // Show address bus operations
-#define LOG_MOTOR       (1U<<8)    // Show motor operations
-#define LOG_CONFIG      (1U<<9)    // Configuration
+#define LOG_WARN        (1U << 1)    // Warnings
+#define LOG_RW          (1U << 2)    // Read and write accesses
+#define LOG_CRU         (1U << 3)    // Show CRU bit accesses
+#define LOG_CRUD        (1U << 4)    // Show CRU bit accesses (details)
+#define LOG_READY       (1U << 5)    // Show ready line activity
+#define LOG_SIGNALS     (1U << 6)    // Show detailed signal activity
+#define LOG_ADDRESS     (1U << 7)    // Show address bus operations
+#define LOG_MOTOR       (1U << 8)    // Show motor operations
+#define LOG_CONFIG      (1U << 9)    // Configuration
 
-#define VERBOSE ( LOG_CONFIG | LOG_WARN )
+#define VERBOSE (LOG_CONFIG | LOG_WARN)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(TI99_BWG, bus::ti99::peb::snug_bwg_device, "ti99_bwg", "SNUG BwG Floppy Controller")

@@ -9,10 +9,10 @@
 #include "emu.h"
 #include "midxunit.h"
 
-#define LOG_IO      (1 << 0)
-#define LOG_UART    (1 << 1)
-#define LOG_UNKNOWN (1 << 2)
-#define LOG_SOUND   (1 << 3)
+#define LOG_IO      (1U << 1)
+#define LOG_UART    (1U << 2)
+#define LOG_UNKNOWN (1U << 3)
+#define LOG_SOUND   (1U << 4)
 
 #define VERBOSE     (0)
 #include "logmacro.h"

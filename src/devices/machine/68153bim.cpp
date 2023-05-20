@@ -27,11 +27,10 @@
 #include "68153bim.h"
 #include "cpu/m68000/m68000.h"
 
-//#define LOG_GENERAL (1U <<  0)
-#define LOG_SETUP   (1U <<  1)
-#define LOG_INT     (1U <<  2)
-#define LOG_READ    (1U <<  3)
-#define LOG_IACK    (1U <<  4)
+#define LOG_SETUP   (1U << 1)
+#define LOG_INT     (1U << 2)
+#define LOG_READ    (1U << 3)
+#define LOG_IACK    (1U << 4)
 
 //#define VERBOSE ( LOG_SETUP | LOG_INT | LOG_IACK | LOG_GENERAL | LOG_READ)
 //#define LOG_OUTPUT_FUNC printf

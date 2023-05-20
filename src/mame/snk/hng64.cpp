@@ -677,7 +677,6 @@ LVS-DG2
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 
-#define LOG_GENERAL         (1U << 0)
 #define LOG_COMRW           (1U << 1)
 #define LOG_SNDCOM_UNKNWN   (1U << 2)
 #define LOG_DMA             (1U << 3)

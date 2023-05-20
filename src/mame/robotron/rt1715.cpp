@@ -38,7 +38,7 @@
 #include "screen.h"
 
 
-#define LOG_BANK    (1U <<  1)
+#define LOG_BANK    (1U << 1)
 
 #define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC osd_printf_info

@@ -30,8 +30,6 @@
 // need to set LOG_OUTPUT_FUNC or LOG_OUTPUT_STREAM because there's no logerror outside devices
 #define LOG_OUTPUT_FUNC osd_printf_verbose
 
-#define LOG_GENERAL (1U << 0)
-
 //#define VERBOSE (LOG_GENERAL | LOG_DIB)
 
 #include "logmacro.h"

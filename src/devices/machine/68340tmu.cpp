@@ -14,12 +14,11 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-//#define LOG_GENERAL (1U <<  0) // Already defined in logmacro.h
-#define LOG_SETUP   (1U <<  1)
-#define LOG_READ    (1U <<  2)
-#define LOG_TIMER   (1U <<  3)
-#define LOG_INT     (1U <<  4)
-#define LOG_COUNT   (1U <<  5)
+#define LOG_SETUP   (1U << 1)
+#define LOG_READ    (1U << 2)
+#define LOG_TIMER   (1U << 3)
+#define LOG_INT     (1U << 4)
+#define LOG_COUNT   (1U << 5)
 
 //#define VERBOSE  (LOG_SETUP|LOG_INT|LOG_TIMER)
 

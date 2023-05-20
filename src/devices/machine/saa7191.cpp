@@ -14,11 +14,11 @@
 #include "emu.h"
 #include "saa7191.h"
 
-#define LOG_UNKNOWN     (1 << 0)
-#define LOG_READS       (1 << 1)
-#define LOG_WRITES      (1 << 2)
-#define LOG_ERRORS      (1 << 3)
-#define LOG_I2C_IGNORES (1 << 4)
+#define LOG_UNKNOWN     (1U << 1)
+#define LOG_READS       (1U << 2)
+#define LOG_WRITES      (1U << 3)
+#define LOG_ERRORS      (1U << 4)
+#define LOG_I2C_IGNORES (1U << 5)
 #define LOG_DEFAULT     (LOG_READS | LOG_WRITES | LOG_ERRORS | LOG_I2C_IGNORES | LOG_UNKNOWN)
 
 #define VERBOSE         (LOG_DEFAULT)

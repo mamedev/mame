@@ -9,7 +9,6 @@
 #include "emu.h"
 #include "i8257.h"
 
-//#define LOG_GENERAL (1U << 0) //defined in logmacro.h already
 #define LOG_SETUP     (1U << 1)
 #define LOG_TFR       (1U << 2)
 

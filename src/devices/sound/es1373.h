@@ -24,7 +24,6 @@ public:
 protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
-	virtual void device_stop() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_post_load() override;
@@ -34,8 +33,6 @@ protected:
 
 	// Sound stream
 	sound_stream *m_stream;
-
-	FILE *m_eslog;
 
 private:
 	struct chan_info {

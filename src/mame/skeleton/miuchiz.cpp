@@ -22,7 +22,6 @@
 #include "screen.h"
 
 // defines and logging
-//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
 #define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC printf
 #include "logmacro.h"

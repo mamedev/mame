@@ -30,7 +30,6 @@
 
 #define LOG_PRINTF  (1U << 1)
 #define LOG_SETUP   (1U << 2)
-#define LOG_GENERAL (1U << 3)
 
 #define VERBOSE (LOG_PRINTF | LOG_SETUP | LOG_GENERAL)
 

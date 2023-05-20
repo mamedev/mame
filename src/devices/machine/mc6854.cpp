@@ -33,9 +33,9 @@
 #include "emu.h"
 #include "mc6854.h"
 
-#define LOG_SETUP    ( 1U << 1 )
-#define LOG_BITS     ( 1U << 2 )
-#define LOG_IRQ      ( 1U << 3 )
+#define LOG_SETUP    (1U << 1)
+#define LOG_BITS     (1U << 2)
+#define LOG_IRQ      (1U << 3)
 
 //#define VERBOSE (LOG_IRQ | LOG_BITS | LOG_GENERAL | LOG_SETUP)
 //#define LOG_OUTPUT_STREAM std::cout

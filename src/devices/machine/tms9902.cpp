@@ -43,7 +43,6 @@
 
 #include <cmath>
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_LINES   (1U << 1)
 #define LOG_CRU     (1U << 2)
 #define LOG_DETAIL  (1U << 3)

@@ -9,7 +9,11 @@
 #include "emu.h"
 #include "wpc.h"
 
-#define LOG_WPC (0)
+#define LOG_WPC (1U << 1)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
 
 DEFINE_DEVICE_TYPE(WPCASIC, wpc_device, "wpc", "Williams WPC ASIC")
 
@@ -155,15 +159,15 @@ void wpc_device::write(offs_t offset, uint8_t data)
 		m_firq_cb(0);
 		m_dmd_irqsrc = false;
 		m_dmd_irqline = data;
-		if(LOG_WPC) logerror("WPC: DMD FIRQ line set to %i\n",data);
+		LOGMASKED(LOG_WPC, "WPC: DMD FIRQ line set to %i\n",data);
 		break;
 	case DMD_VISIBLEPAGE:
 		m_dmd_visiblepage = data;
-		if(LOG_WPC) logerror("WPC: DMD Visible page set to %i\n",data);
+		LOGMASKED(LOG_WPC, "WPC: DMD Visible page set to %i\n",data);
 		break;
 	case WPC_ROMBANK:
 		m_bank_w(0,data);
-		if(LOG_WPC) logerror("WPC: ROM bank set to %02x\n",data);
+		LOGMASKED(LOG_WPC, "WPC: ROM bank set to %02x\n",data);
 		break;
 	case WPC_ALPHAPOS:
 		m_alpha_pos = data & 0x1f;
@@ -192,7 +196,7 @@ void wpc_device::write(offs_t offset, uint8_t data)
 		break;
 	case WPC_SWCOLSELECT:
 		m_switch_col = data;
-		if(LOG_WPC) logerror("WPC: Switch column select %02x\n",data);
+		LOGMASKED(LOG_WPC, "WPC: Switch column select %02x\n",data);
 		break;
 	case WPC_SOUNDIF:
 		m_sounddata_w(0,data);

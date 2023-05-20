@@ -584,6 +584,11 @@ YM2203 Japanese datasheet contents, translated: http://www.larwe.com/technical/c
 #include "emu.h"
 #include "ay8910.h"
 
+#define LOG_IGNORED_WRITES (1U << 1)
+#define LOG_WARNINGS       (1U << 2)
+#define VERBOSE (LOG_WARNINGS)
+#include "logmacro.h"
+
 /*************************************
  *
  *  constants
@@ -591,7 +596,6 @@ YM2203 Japanese datasheet contents, translated: http://www.larwe.com/technical/c
  *************************************/
 
 #define ENABLE_REGISTER_TEST        (0)     // Enable preprogrammed registers
-#define LOG_IGNORED_WRITES          (0)
 
 static constexpr stream_buffer::sample_t MAX_OUTPUT = 1.0;
 
@@ -1001,7 +1005,7 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 						}
 					}
 					else if (m_mode & 0xf)
-						logerror("%s: warning: activated unknown mode %02x at %s\n", machine().describe_context(), m_mode & 0xf, name());
+						LOGMASKED(LOG_WARNINGS, "%s: warning: activated unknown mode %02x at %s\n", machine().describe_context(), m_mode & 0xf, name());
 				}
 			}
 			m_envelope[0].set_shape(m_regs[AY_EASHAPE], m_env_step_mask);
@@ -1012,13 +1016,11 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 				if (!m_port_a_write_cb.isnull())
 					m_port_a_write_cb((offs_t)0, m_regs[AY_PORTA]);
 				else
-					logerror("%s: warning: unmapped write %02x to %s Port A\n", machine().describe_context(), v, name());
+					LOGMASKED(LOG_WARNINGS, "%s: warning: unmapped write %02x to %s Port A\n", machine().describe_context(), v, name());
 			}
 			else
 			{
-#if LOG_IGNORED_WRITES
-				logerror("%s: warning: write %02x to %s Port A set as input - ignored\n", machine().describe_context(), v, name());
-#endif
+				LOGMASKED(LOG_IGNORED_WRITES, "%s: warning: write %02x to %s Port A set as input - ignored\n", machine().describe_context(), v, name());
 			}
 			break;
 		case AY_PORTB:
@@ -1027,13 +1029,11 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 				if (!m_port_b_write_cb.isnull())
 					m_port_b_write_cb((offs_t)0, m_regs[AY_PORTB]);
 				else
-					logerror("%s: warning: unmapped write %02x to %s Port B\n", machine().describe_context(), v, name());
+					LOGMASKED(LOG_WARNINGS, "%s: warning: unmapped write %02x to %s Port B\n", machine().describe_context(), v, name());
 			}
 			else
 			{
-#if LOG_IGNORED_WRITES
-				logerror("%s: warning: write %02x to %s Port B set as input - ignored\n", machine().describe_context(), v, name());
-#endif
+				LOGMASKED(LOG_IGNORED_WRITES, "%s: warning: write %02x to %s Port B set as input - ignored\n", machine().describe_context(), v, name());
 			}
 			break;
 		case AY_EBFINE:
@@ -1232,7 +1232,7 @@ void ay8910_device::build_mixer_table()
 
 	if ((m_flags & AY8910_LEGACY_OUTPUT) != 0)
 	{
-		logerror("%s using legacy output levels!\n", name());
+		LOGMASKED(LOG_WARNINGS, "%s using legacy output levels!\n", name());
 		normalize = 1;
 	}
 
@@ -1317,7 +1317,7 @@ void ay8910_device::device_start()
 
 	if ((m_flags & AY8910_SINGLE_OUTPUT) != 0)
 	{
-		logerror("%s device using single output!\n", name());
+		LOGMASKED(LOG_WARNINGS, "%s device using single output!\n", name());
 		m_streams = 1;
 	}
 
@@ -1419,7 +1419,7 @@ void ay8910_device::ay8910_write_ym(int addr, u8 data)
 		}
 		else
 		{
-			logerror("%s: warning - %s upper address mismatch\n", machine().describe_context(), name());
+			LOGMASKED(LOG_WARNINGS, "%s: warning - %s upper address mismatch\n", machine().describe_context(), name());
 		}
 	}
 }
@@ -1441,7 +1441,7 @@ u8 ay8910_device::ay8910_read_ym()
 	{
 	case AY_PORTA:
 		if ((m_regs[AY_ENABLE] & 0x40) != 0)
-			logerror("%s: warning - read from %s Port A set as output\n", machine().describe_context(), name());
+			LOGMASKED(LOG_WARNINGS, "%s: warning - read from %s Port A set as output\n", machine().describe_context(), name());
 		/*
 		   even if the port is set as output, we still need to return the external
 		   data. Some games, like kidniki, need this to work.
@@ -1455,15 +1455,15 @@ u8 ay8910_device::ay8910_read_ym()
 		if (!m_port_a_read_cb.isnull())
 			m_regs[AY_PORTA] = m_port_a_read_cb(0);
 		else
-			logerror("%s: warning - read 8910 Port A\n", machine().describe_context());
+			LOGMASKED(LOG_WARNINGS, "%s: warning - read 8910 Port A\n", machine().describe_context());
 		break;
 	case AY_PORTB:
 		if ((m_regs[AY_ENABLE] & 0x80) != 0)
-			logerror("%s: warning - read from 8910 Port B set as output\n", machine().describe_context());
+			LOGMASKED(LOG_WARNINGS, "%s: warning - read from 8910 Port B set as output\n", machine().describe_context());
 		if (!m_port_b_read_cb.isnull())
 			m_regs[AY_PORTB] = m_port_b_read_cb(0);
 		else
-			logerror("%s: warning - read 8910 Port B\n", machine().describe_context());
+			LOGMASKED(LOG_WARNINGS, "%s: warning - read 8910 Port B\n", machine().describe_context());
 		break;
 	}
 

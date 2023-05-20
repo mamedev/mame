@@ -25,7 +25,6 @@
 #include "bus/rs232/rs232.h"
 #include "formats/ap_dsk35.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_IRQ     (1U << 1)
 
 #define VERBOSE (0)

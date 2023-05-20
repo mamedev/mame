@@ -30,7 +30,6 @@
 #include "emu.h"
 #include "macrtc.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_COMMANDS (1U << 1)
 
 //#define VERBOSE (LOG_COMMANDS)

@@ -25,7 +25,6 @@
 #include "emu.h"
 #include "gayle.h"
 
-//#define LOG_GENERAL (1U << 0)
 #define LOG_REG     (1U << 1)
 #define LOG_IDE     (1U << 2)
 #define LOG_CC      (1U << 3)

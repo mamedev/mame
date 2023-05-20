@@ -32,9 +32,8 @@
 #include "emu.h"
 #include "vme_hcpu30.h"
 
-//#define LOG_GENERAL (1U <<  0)
-#define LOG_SETUP   (1U <<  1)
-#define LOG_INT     (1U <<  2)
+#define LOG_SETUP   (1U << 1)
+#define LOG_INT     (1U << 2)
 
 //#define VERBOSE (LOG_GENERAL | LOG_SETUP | LOG_INT)
 //#define LOG_OUTPUT_FUNC printf

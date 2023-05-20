@@ -126,16 +126,16 @@
 #include "emu.h"
 #include "horizon.h"
 
-#define LOG_WARN        (1U<<1)   // Warnings
-#define LOG_CONFIG      (1U<<2)   // Configuration
-#define LOG_32K         (1U<<3)   // 32K optional RAM r/w
-#define LOG_DSR         (1U<<4)   // DSR
-#define LOG_RAM         (1U<<5)   // RAM chips
-#define LOG_ORAM        (1U<<6)   // outside of RAM chips
-#define LOG_CRU         (1U<<7)   // CRU
-#define LOG_PAGE        (1U<<8)   // Page access
+#define LOG_WARN        (1U << 1)   // Warnings
+#define LOG_CONFIG      (1U << 2)   // Configuration
+#define LOG_32K         (1U << 3)   // 32K optional RAM r/w
+#define LOG_DSR         (1U << 4)   // DSR
+#define LOG_RAM         (1U << 5)   // RAM chips
+#define LOG_ORAM        (1U << 6)   // outside of RAM chips
+#define LOG_CRU         (1U << 7)   // CRU
+#define LOG_PAGE        (1U << 8)   // Page access
 
-#define VERBOSE ( LOG_GENERAL | LOG_CONFIG | LOG_WARN )
+#define VERBOSE (LOG_GENERAL | LOG_CONFIG | LOG_WARN)
 
 #include "logmacro.h"
 

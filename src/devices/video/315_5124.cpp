@@ -72,10 +72,9 @@ PAL frame timing
  * Configurable logging
  ****************************************************************************/
 
-#define LOG_GENERAL    (1U <<  0)
-#define LOG_VIDMODE    (1U <<  1)
-#define LOG_REGWRITE   (1U <<  2)
-#define LOG_VCOUNTREAD (1U <<  3)
+#define LOG_VIDMODE    (1U << 1)
+#define LOG_REGWRITE   (1U << 2)
+#define LOG_VCOUNTREAD (1U << 3)
 
 //#define VERBOSE (LOG_GENERAL | LOG_VIDMODE | LOG_REGWRITE | LOG_VCOUNTREAD)
 //#define LOG_OUTPUT_FUNC osd_printf_info

@@ -40,7 +40,6 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
-#define LOG_GENERAL   (1U << 0)
 #define LOG_STARTSTOP (1U << 1)
 #define LOG_TIMER     (1U << 2)
 #define LOG_VRAM      (1U << 3)

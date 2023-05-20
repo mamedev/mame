@@ -14,7 +14,6 @@
 #include "emu.h"
 #include "dimm_spd.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_DATAOUT (1U << 1)
 
 #define VERBOSE (0)

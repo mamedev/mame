@@ -4,27 +4,24 @@
 #include "emu.h"
 #include "vme_mzr8105.h"
 
-#define LOG_GENERAL 0x01
-#define LOG_SETUP   0x02
-#define LOG_PRINTF  0x04
+#define LOG_SETUP   (1U << 1)
+#define LOG_PRINTF  (0)
 
-#define VERBOSE 0 // (LOG_PRINTF | LOG_SETUP  | LOG_GENERAL)
+#define VERBOSE (0) // (LOG_SETUP | LOG_GENERAL)
 
-#define LOGMASK(mask, ...)   do { if (VERBOSE & mask) logerror(__VA_ARGS__); } while (0)
-#define LOGLEVEL(mask, level, ...) do { if ((VERBOSE & mask) >= level) logerror(__VA_ARGS__); } while (0)
-
-#define LOG(...)      LOGMASK(LOG_GENERAL, __VA_ARGS__)
-#define LOGSETUP(...) LOGMASK(LOG_SETUP,   __VA_ARGS__)
-
-#if VERBOSE & LOG_PRINTF
-#define logerror printf
+#if VERBOSE && LOG_PRINTF
+#define LOG_OUTPUT_FUNC printf
 #endif
+
+#include "logmacro.h"
+
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
 #else
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
+
 
 //**************************************************************************
 //  GLOBAL VARIABLES

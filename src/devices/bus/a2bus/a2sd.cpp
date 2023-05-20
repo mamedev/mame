@@ -22,7 +22,6 @@
 #include "emu.h"
 #include "a2sd.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_SPI     (1U << 1)
 
 //#define VERBOSE (LOG_COMMAND)
