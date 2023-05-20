@@ -277,7 +277,9 @@ SDL2 2.0.6 or later as earlier versions lack required functionality::
 
     sudo apt-get install git build-essential python3 libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libpulse-dev qtbase5-dev qtbase5-dev-tools qtchooser qt5-qmake
 
-Compilation is exactly as described above in All Platforms.  Note the Ubuntu
+Compilation is similar to described above in All Platforms.  If you wish
+to enable SDL events without an X11 window manager, add `SDLMAME_X11=1`
+to the `make` command line. Note the Ubuntu
 Linux modifies GCC to enable the GNU C Library “fortify source” feature by
 default, which may cause issues compiling MAME (see :ref:`compiling-issues`).
 
