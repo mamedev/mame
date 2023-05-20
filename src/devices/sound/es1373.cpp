@@ -94,7 +94,7 @@ void es1373_device::map(address_map &map)
 es1373_device::es1373_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, ES1373, tag, owner, clock)
 	, device_sound_interface(mconfig, *this), m_stream(nullptr)
-	, m_tempCount(0), m_timer(nullptr), m_memory_space(nullptr), m_irq_handler(*this)
+	, m_timer(nullptr), m_memory_space(nullptr), m_irq_handler(*this)
 {
 	set_ids(0x12741371, 0x04, 0x040100, 0x12741371);
 }

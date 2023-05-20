@@ -55,7 +55,6 @@ private:
 	uint32_t calc_size(const uint8_t &format);
 	void send_audio_out(chan_info& chan, uint32_t intr_mask, write_stream_view &outL, write_stream_view &outR);
 
-	uint32_t m_tempCount;
 	emu_timer *m_timer;
 	address_space *m_memory_space;
 	devcb_write_line m_irq_handler;
