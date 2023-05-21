@@ -55,8 +55,8 @@ by the otherwise seemingly unnecessary internal ROMs.
 ************************************************************************************************************/
 
 #include "emu.h"
-#include "subsino_crypt.h"
 #include "subsino_io.h"
+#include "subsino_m.h"
 
 #include "cpu/h8/h83048.h"
 #include "cpu/i86/i186.h"
@@ -3583,7 +3583,7 @@ ROM_END
 
 void subsino2_state::init_mtrain()
 {
-	subsino_decrypt(memregion("maincpu")->base(), crsbingo_bitswaps, crsbingo_xors, 0x8000);
+	subsino_decrypt(machine(), crsbingo_bitswaps, crsbingo_xors, 0x8000);
 }
 
 
@@ -3618,7 +3618,7 @@ ROM_END
 
 void subsino2_state::init_tbonusal()
 {
-	subsino_decrypt(memregion("maincpu")->base(), sharkpy_bitswaps, sharkpy_xors, 0x8000);
+	subsino_decrypt(machine(), sharkpy_bitswaps, sharkpy_xors, 0x8000);
 }
 
 /***************************************************************************
@@ -3919,7 +3919,7 @@ ROM_END
 
 void subsino2_state::init_wtrnymph()
 {
-	subsino_decrypt(memregion("maincpu")->base(), victor5_bitswaps, victor5_xors, 0x8000);
+	subsino_decrypt(machine(), victor5_bitswaps, victor5_xors, 0x8000);
 }
 
 GAME( 1996, mtrain,   0,        mtrain,   mtrain,   subsino2_state, init_mtrain,   ROT0, "Subsino",                          "Magic Train (Ver. 1.31)",               0 )

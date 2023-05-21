@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia, David Haywood, Angelo Salese, Roberto Fresca
-#ifndef MAME_SUBSINO_SUBSINO_CRYPT_H
-#define MAME_SUBSINO_SUBSINO_CRYPT_H
+#ifndef MAME_SUBSINO_SUBSINO_M_H
+#define MAME_SUBSINO_SUBSINO_M_H
 
 #pragma once
 
@@ -18,6 +18,6 @@ void tisubb_bitswaps  (uint8_t *decrypt, int i);
 void victor5_bitswaps (uint8_t *decrypt, int i);
 void victor21_bitswaps(uint8_t *decrypt, int i);
 
-void subsino_decrypt(uint8_t *region, void (*bitswaps)(uint8_t *decrypt, int i), const uint8_t *xors, int size);
+void subsino_decrypt(running_machine& machine, void (*bitswaps)(uint8_t *decrypt, int i), const uint8_t *xors, int size);
 
-#endif // MAME_SUBSINO_SUBSINO_CRYPT_H
+#endif // MAME_SUBSINO_SUBSINO_M_H

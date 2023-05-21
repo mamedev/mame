@@ -21375,7 +21375,6 @@ skyfox                          // (c) 1987 Jaleco + Nichibutsu USA license
 
 @source:jaleco/tetrisp2.cpp
 nndmseal                        // (c) 1997 I'Max/Jaleco
-nndmseal11                      // (c) 1997 I'Max/Jaleco
 nndmseala                       // (c) 1997 I'Max/Jaleco
 nndmsealb                       // (c) 1997 I'Max/Jaleco
 nndmsealc                       // (c) 1997 I'Max/Jaleco
@@ -37732,7 +37731,6 @@ pocketbk2                       // 1994 Acorn Pocket Book II
 psion3a                         // 1993 Psion Series 3a
 psion3a2                        // 1995 Psion Series 3a
 psion3a2_de                     // 1995 Psion Series 3a (German)
-psion3a2_ru                     // 1997 Psion Series 3a (Russian)
 psion3c                         // 1996 Psion Series 3c
 psion3mx                        // 1998 Psion Series 3mx
 
