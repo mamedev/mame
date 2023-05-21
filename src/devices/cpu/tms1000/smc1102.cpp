@@ -19,7 +19,6 @@ SMC1112 die notes (SMC1102 is assumed to be the same):
 - no output PLA
 
 TODO:
-- LCD refresh timing is unknown
 - add (micro)instructions PLA if it turns out it can be customized
 - add halt opcode
 
@@ -252,6 +251,13 @@ void smc1102_cpu_device::execute_run()
 			}
 		}
 
+		// overall, LCD refresh rate is 64Hz
+		if ((m_div & 0x1ff) == 0)
+		{
+			for (int i = 0; i < 4; i++)
+				m_write_segs(i, m_lcd_ram[i]);
+		}
+
 		// 4 cycles per opcode instead of 6
 		switch (m_subcycle)
 		{
@@ -309,7 +315,6 @@ void smc1102_cpu_device::op_tsg()
 {
 	// TSG: transfer LCD S/R to RAM
 	m_lcd_ram[m_opcode & 3] = m_lcd_sr;
-	m_write_segs(m_opcode & 3, m_lcd_sr);
 }
 
 void smc1102_cpu_device::op_intdis()

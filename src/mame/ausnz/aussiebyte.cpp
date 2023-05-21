@@ -517,7 +517,7 @@ void aussiebyte_state::aussiebyte(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
-	VOTRAX_SC01(config, m_votrax, 720000); // 720kHz? needs verify
+	VOTRAX_SC01A(config, m_votrax, 720000); // 720kHz? needs verify
 	m_votrax->ar_callback().set([this] (bool state) { m_port28 = state ? 0 : 1; });
 	m_votrax->add_route(ALL_OUTPUTS, "mono", 1.00);
 

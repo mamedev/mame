@@ -880,7 +880,7 @@ void mtrap_sound_device::device_add_mconfig(machine_config &config)
 	m_cvsd_filter2->add_route(ALL_OUTPUTS, "mono", 1.0);
 	FILTER_BIQUAD(config, m_cvsd_filter).opamp_mfb_lowpass_setup(RES_K(10), RES_K(3.9), RES_K(18), CAP_N(20), CAP_N(2.2));
 	m_cvsd_filter->add_route(ALL_OUTPUTS, m_cvsd_filter2, 1.0);
-	MC3417(config, m_cvsd, 0).add_route(ALL_OUTPUTS, m_cvsd_filter, 0.3086); // each filter has gain of 1.8 for total gain of 3.24, 0.3086 cancels this out. was 0.8
+	MC3417(config, m_cvsd, 0).add_route(ALL_OUTPUTS, m_cvsd_filter, 0.3086); // each filter has gain of 1.8 for total gain of 3.24, 0.3086 cancels this out.
 
 }
 

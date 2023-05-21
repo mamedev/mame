@@ -18841,6 +18841,7 @@ kosmicpt                        // Elektronika
 krybolov                        // Elektronika
 kskatedie                       // Konami
 ktmnt                           // Konami
+ktmnt3                          // Konami
 ktopgun                         // Konami
 kvakazad                        // Elektronika
 morataka                        // Elektronika
@@ -23612,7 +23613,6 @@ winspikej                       // 1997.07 GX705 (Japan)
 @source:konami/konamim2.cpp
 btltryst                        // GX636 (c) 1998
 evilngt                         // GX810 (c) 1998
-evilngte                        // GX810 (c) 1998
 heatof11                        // GX703 (c) 1998
 hellngt                         // GX810 (c) 1998
 polystar                        // GX623 (c) 1997
@@ -28645,6 +28645,7 @@ comebaby                        // (c) 2000 ExPotato
 @source:misc/compucranes.cpp
 mastcrane                       // (c) 199? Compumatic
 mastcranea                      // (c) 199? Compumatic
+mastcraneb                      // (c) 199? Compumatic
 
 @source:misc/coolpool.cpp
 9ballsht                        // (c) 1993 E-Scape EnterMedia + "marketed by Bundra Games"
@@ -30257,6 +30258,9 @@ mcatadvj                        // (c) 1993 Wintechno
 nost                            // (c) 1993 Face
 nostj                           // (c) 1993 Face
 nostk                           // (c) 1993 Face
+
+@source:misc/mcm70.cpp
+mcm70                           // MCM/70
 
 @source:misc/megaphx.cpp
 hamboy                          // (c) 1990 Dinamic / Inder
@@ -33750,7 +33754,8 @@ sgmt1                           // 1994
 supergm3                        // 1996
 
 @source:nintendo/n64.cpp
-n64                             // Nintendo N64
+n64                             // Nintendo N64 (NTSC)
+n64pal                          // Nintendo N64 (PAL)
 n64dd                           // Nintendo N64 (64DD Attachment)
 
 @source:nintendo/n64_gateway.cpp
@@ -37716,6 +37721,11 @@ psionp350                       //
 psionp464                       //
 psionxp                         //
 
+@source:psion/psion3.cpp
+pocketbk                        // 1992 Acorn Pocket Book
+psion3                          // 1991 Psion Series 3
+psion3s                         // 1994 Psion Series 3s
+
 @source:psion/psion3a.cpp
 pocketbk2                       // 1994 Acorn Pocket Book II
 psion3a                         // 1993 Psion Series 3a
@@ -37725,7 +37735,12 @@ psion3c                         // 1996 Psion Series 3c
 psion3mx                        // 1998 Psion Series 3mx
 
 @source:psion/psion5.cpp
-psion5mx                        //
+psion5mx                        // 1999 Psion Series 5mx
+
+@source:psion/psionhc.cpp
+psionhc100                      // 1991 Psion HC 100
+psionhc110                      // 1991 Psion HC 110
+psionhc120                      // 1991 Psion HC 120
 
 @source:psion/siena.cpp
 siena                           // 1996 Psion Siena
@@ -42463,9 +42478,9 @@ othunderu                       // B67 (c) 1988 Taito America Corporation (US, r
 othunderuo                      // B67 (c) 1988 Taito America Corporation (US)
 
 @source:taito/pitnrun.cpp
+jumpkun                         // prototype
 pitnrun                         // PR  (c) 1984 Taito Corporation
 pitnruna                        // PR  (c) 1984 Taito Corporation
-jumpkun                         // prototype
 
 @source:taito/pkspirit.cpp
 pkspirit                        // D41
@@ -45354,6 +45369,9 @@ mu50                            // 1995 MU-50
 @source:yamaha/ymmu80.cpp
 mu80                            // 1994 MU-80
 
+@source:yamaha/ympcs30.cpp
+pcs30                           // 1984
+
 @source:yamaha/ympsr16.cpp
 psr16                           // 1988 PSR-16
 psr36                           // 1988 PSR-36
@@ -45372,6 +45390,7 @@ psr70                           // 1985 PSR-70
 psr110                          // 1993
 psr150                          // 1992
 psr180                          // 1994
+psr190                          // 1996
 psr75                           // 1992
 psr76                           // 1994
 psr78                           // 1996

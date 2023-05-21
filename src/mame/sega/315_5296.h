@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:hap, Charles MacDonald
+// copyright-holders:hap
+// thanks-to:Charles MacDonald
 /**********************************************************************
 
     Sega 315-5296 I/O chip
@@ -12,17 +13,10 @@
 #pragma once
 
 
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// ======================> sega_315_5296_device
-
 class sega_315_5296_device : public device_t
 {
 public:
-	sega_315_5296_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_315_5296_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration helpers
 	auto in_pa_callback() { return m_in_port_cb[0].bind(); }
@@ -47,12 +41,12 @@ public:
 	auto out_cnt1_callback() { return m_out_cnt_cb[1].bind(); }
 	auto out_cnt2_callback() { return m_out_cnt_cb[2].bind(); }
 
-	void set_ddr_override(uint8_t mask) { m_dir_override = mask; }
+	void set_ddr_override(u8 mask) { m_dir_override = mask; }
 
-	uint8_t read(offs_t offset);
-	void write(offs_t offset, uint8_t data);
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
-	uint8_t debug_peek_output(offs_t offset) const { return m_output_latch[offset & 7]; }
+	u8 debug_peek_output(offs_t offset) const { return m_output_latch[offset & 7]; }
 
 protected:
 	// device-level overrides
@@ -64,10 +58,10 @@ private:
 	devcb_write8::array<8> m_out_port_cb;
 	devcb_write_line::array<3> m_out_cnt_cb;
 
-	uint8_t m_output_latch[8];
-	uint8_t m_cnt;
-	uint8_t m_dir;
-	uint8_t m_dir_override;
+	u8 m_output_latch[8];
+	u8 m_cnt;
+	u8 m_dir;
+	u8 m_dir_override;
 };
 
 // device type definition

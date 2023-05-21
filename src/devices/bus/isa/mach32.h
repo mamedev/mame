@@ -53,6 +53,7 @@ public:
 	// construction/destruction
 	mach32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+	uint32_t draw_hw_cursor(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<mach32_8514a_device> m_8514a;  // provides accelerated 2D drawing, derived from the Mach8 device
 
@@ -213,6 +214,13 @@ public:
 	void mach64_config1_w(uint16_t data) { }  // why does the mach64 BIOS write to these, they are read only on the mach32 and earlier
 	void mach64_config2_w(uint16_t data) { }
 
+	void set_color(u8 index, u32 color);
+	u32 framebuffer_r(offs_t offset, u32 mem_mask);
+	void framebuffer_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 framebuffer_be_r(offs_t offset, u32 mem_mask);
+	void framebuffer_be_w(offs_t offset, u32 data, u32 mem_mask);
+	u8 *get_framebuffer_addr() { return &vga.memory[0]; }
+
 protected:
 	mach64_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -222,6 +230,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	required_device<mach64_8514a_device> m_8514a;  // provides accelerated 2D drawing, derived from the Mach8 device
+
+private:
 };
 
 // device type definition

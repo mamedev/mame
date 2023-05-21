@@ -2897,16 +2897,40 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/psion_asic1.h,MACHINES["PSION_ASIC"] = true
+--@src/devices/machine/psion_asic2.h,MACHINES["PSION_ASIC"] = true
+--@src/devices/machine/psion_asic3.h,MACHINES["PSION_ASIC"] = true
+--@src/devices/machine/psion_asic4.h,MACHINES["PSION_ASIC"] = true
 --@src/devices/machine/psion_asic5.h,MACHINES["PSION_ASIC"] = true
 --@src/devices/machine/psion_asic9.h,MACHINES["PSION_ASIC"] = true
 ---------------------------------------------------
 
 if (MACHINES["PSION_ASIC"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/machine/psion_asic1.cpp",
+		MAME_DIR .. "src/devices/machine/psion_asic1.h",
+		MAME_DIR .. "src/devices/machine/psion_asic2.cpp",
+		MAME_DIR .. "src/devices/machine/psion_asic2.h",
+		MAME_DIR .. "src/devices/machine/psion_asic3.cpp",
+		MAME_DIR .. "src/devices/machine/psion_asic3.h",
+		MAME_DIR .. "src/devices/machine/psion_asic4.cpp",
+		MAME_DIR .. "src/devices/machine/psion_asic4.h",
 		MAME_DIR .. "src/devices/machine/psion_asic5.cpp",
 		MAME_DIR .. "src/devices/machine/psion_asic5.h",
 		MAME_DIR .. "src/devices/machine/psion_asic9.cpp",
 		MAME_DIR .. "src/devices/machine/psion_asic9.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/psion_ssd.h,MACHINES["PSION_SSD"] = true
+---------------------------------------------------
+
+if (MACHINES["PSION_SSD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/psion_ssd.cpp",
+		MAME_DIR .. "src/devices/machine/psion_ssd.h",
 	}
 end
 
@@ -4500,6 +4524,18 @@ if (MACHINES["GEN_FIFO"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/gen_fifo.cpp",
 		MAME_DIR .. "src/devices/machine/gen_fifo.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/opti82c861.h,MACHINES["OPTI82C861"] = true
+---------------------------------------------------
+
+if (MACHINES["OPTI82C861"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/opti82c861.cpp",
+		MAME_DIR .. "src/devices/machine/opti82c861.h",
 	}
 end
 

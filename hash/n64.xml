@@ -1671,6 +1671,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>Bust-A-Move '99 (USA)</description>
 		<year>1999</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+"Fatal error: RDP: load_tlut: size = 1" during attract
+]]></notes>
 		<info name="serial" value="NUS-NB3E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -1699,6 +1702,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>Bust-A-Move 2 - Arcade Edition (USA)</description>
 		<year>1998</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+"Fatal error: RDP: load_tlut: size = 1" during attract
+]]></notes>
 		<info name="serial" value="NUS-NBUE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -7680,6 +7686,9 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<description>Mortal Kombat Trilogy (USA)</description>
 		<year>1996</year>
 		<publisher>Midway</publisher>
+		<notes><![CDATA[
+"Fatal error: RDP: load_tlut: size = 1" during attract
+]]></notes>
 		<info name="serial" value="NUS-NMKE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-02A-01" />
@@ -7698,6 +7707,9 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<description>Mortal Kombat Trilogy (prototype 19960513)</description>
 		<year>1996</year>
 		<publisher>Midway</publisher>
+		<notes><![CDATA[
+"Fatal error: RDP: load_tlut: size = 1" during attract
+]]></notes>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="mktril.bin" size="0x1000000" crc="eab22c06" sha1="2f95ce7f8233f1df82e0ad39ad5ba6a5ebfb6db7" />
@@ -8819,6 +8831,9 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<description>Onegai Monsters (Japan)</description>
 		<year>1999</year>
 		<publisher>Bottom Up</publisher>
+		<notes><![CDATA[
+Random crashes on exit (verify)
+]]></notes>
 		<info name="serial" value="NUS-NOMJ-JPN"/>
 		<info name="release" value="19990409"/>
 		<info name="alt_title" value="おねがいモンスター"/>
@@ -9837,6 +9852,9 @@ patched out (+ a fix for internal checksum)
 		<description>Puzzle Bobble 64 (Japan)</description>
 		<year>1999</year>
 		<publisher>Taito Corporation</publisher>
+		<notes><![CDATA[
+"Fatal error: RDP: load_tlut: size = 1" during attract
+]]></notes>
 		<info name="serial" value="NUS-NPBJ-JPN"/>
 		<info name="release" value="19990305"/>
 		<info name="alt_title" value="パズルボブル64"/>
@@ -10041,6 +10059,9 @@ patched out (+ a fix for internal checksum)
 		<description>Rampage 2 - Universal Tour (USA)</description>
 		<year>1998</year>
 		<publisher>Midway</publisher>
+		<notes><![CDATA[
+"Fatal error: RDP: load_tlut: size = 1" during attract
+]]></notes>
 		<info name="serial" value="NUS-N2PE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -10593,6 +10614,9 @@ patched out (+ a fix for internal checksum)
 		<description>S.C.A.R.S. (USA)</description>
 		<year>1998</year>
 		<publisher>Ubi Soft</publisher>
+		<notes><![CDATA[
+"Fatal error: RDP: load_tlut: size = 1" during attract
+]]></notes>
 		<info name="serial" value="NUS-NCSE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -14585,7 +14609,7 @@ clips onto the player's ear.
 <!-- to be verified -->
 
 	<software name="zeldaootmqd" cloneof="zeldaoot" supported="no">
-		<description>The Legend of Zelda - Ocarina of Time - Master Quest (USA, Debug Edition, Ripped from GC)</description>
+		<description>The Legend of Zelda - Ocarina of Time - Master Quest (USA, Debug Edition, GameCube ripped)</description>
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -14596,7 +14620,7 @@ clips onto the player's ear.
 	</software>
 
 	<software name="zeldaootmqu" cloneof="zeldaoot" supported="no">
-		<description>The Legend of Zelda - Ocarina of Time - Master Quest (USA, Ripped from GC)</description>
+		<description>The Legend of Zelda - Ocarina of Time - Master Quest (USA, GameCube ripped)</description>
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -14607,7 +14631,7 @@ clips onto the player's ear.
 	</software>
 
 	<software name="zeldaootmq" cloneof="zeldaoot" supported="no">
-		<description>The Legend of Zelda - Ocarina of Time - Master Quest (Europe, Ripped from GC)</description>
+		<description>The Legend of Zelda - Ocarina of Time - Master Quest (Europe, GameCube ripped)</description>
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -14618,7 +14642,7 @@ clips onto the player's ear.
 	</software>
 
 	<software name="zeldaootmqj" cloneof="zeldaoot" supported="no">
-		<description>Zelda no Densetsu - Toki no Ocarina Ura (Japan, Ripped from GC)</description>
+		<description>Zelda no Densetsu - Toki no Ocarina Ura (Japan, GameCube ripped)</description>
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -14629,7 +14653,7 @@ clips onto the player's ear.
 	</software>
 
 	<software name="zeldaootu3" cloneof="zeldaoot" supported="no">
-		<description>The Legend of Zelda - Ocarina of Time (USA, Ripped from GC)</description>
+		<description>The Legend of Zelda - Ocarina of Time (USA, GameCube ripped)</description>
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -14640,7 +14664,7 @@ clips onto the player's ear.
 	</software>
 
 	<software name="zeldaoot2" cloneof="zeldaoot" supported="no">
-		<description>The Legend of Zelda - Ocarina of Time (Europe, Ripped from GC)</description>
+		<description>The Legend of Zelda - Ocarina of Time (Europe, GameCube ripped)</description>
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -14651,7 +14675,7 @@ clips onto the player's ear.
 	</software>
 
 	<software name="zeldaootj3" cloneof="zeldaoot" supported="no">
-		<description>Zelda no Densetsu - Toki no Ocarina (Japan, Ripped from GC)</description>
+		<description>Zelda no Densetsu - Toki no Ocarina (Japan, GameCube ripped)</description>
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -14662,7 +14686,7 @@ clips onto the player's ear.
 	</software>
 
 	<software name="zeldamaju1" cloneof="zeldamaj" supported="no">
-		<description>The Legend of Zelda - Majora's Mask (USA, Ripped from GC)</description>
+		<description>The Legend of Zelda - Majora's Mask (USA, GameCube ripped)</description>
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -14673,7 +14697,7 @@ clips onto the player's ear.
 	</software>
 
 	<software name="zeldamaj2" cloneof="zeldamaj" supported="no">
-		<description>The Legend of Zelda - Majora's Mask (Europe, Ripped from GC)</description>
+		<description>The Legend of Zelda - Majora's Mask (Europe, GameCube ripped)</description>
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -14684,7 +14708,7 @@ clips onto the player's ear.
 	</software>
 
 	<software name="zeldamajj2" cloneof="zeldamaj" supported="no">
-		<description>Zelda no Densetsu - Mujura no Kamen (Japan, Ripped from GC)</description>
+		<description>Zelda no Densetsu - Mujura no Kamen (Japan, GameCube ripped)</description>
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -14762,13 +14786,15 @@ clips onto the player's ear.
 		</part>
 	</software>
 
-	<!-- Unlicensed cart that allows playing Game Boy games on a Nintendo 64.
-	     Two cart female sockets, one for the Game Boy game and the other for a genuine N64 game cart for bypassing the protection.
-	     Hardware on the cart PCB: Two 29LE010 EEPROMs and a Datel custom LZ9FC17 GAL labeled as "Action Replay" -->
 	<software name="pwrflashe" supported="no">
 		<description>PowerFlash (Europe)</description>
 		<year>19??</year>
 		<publisher>Datel</publisher>
+		<notes><![CDATA[
+Unlicensed cart that allows playing Game Boy games on a Nintendo 64.
+Two cart female sockets, one for the Game Boy game and the other for a genuine N64 game cart for bypassing the protection.
+Hardware on the cart PCB: Two 29LE010 EEPROMs and a Datel custom LZ9FC17 GAL labeled as "Action Replay"
+]]></notes>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x40000">
 				<rom name="PowerFlash (Europe) (Unl).bin" size="0x40000" crc="0e15b8a4" sha1="22169ccc5be0d3bf481056f4a004ee6959e0409b" />
@@ -14780,6 +14806,9 @@ clips onto the player's ear.
 		<description>Xplorer 64 (Germany, v1.067)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Outright crashes with no stack trace with [drc], black screen with "cop1x 4C452044" printed in console otherwise
+]]></notes>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x40000">
 				<rom name="xplorer 64 (germany) (v1.067) (unl).bin" size="0x40000" crc="656acdf5" sha1="3a13b42074c2b6948f55f22d3e4fe44fbf2cde6a" />
@@ -14791,6 +14820,9 @@ clips onto the player's ear.
 		<description>Controller Checker Ver.1.01</description> <!-- label: Ver.00 コントローラ検査機 NUS専用Nカセット-->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+"Fatal error: handle_pif: read button values (bytes to send 1, bytes to receive 0)"
+]]></notes>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x800000">
 				<rom name="cntr64_checker_64mbit.bin" size="0x800000" crc="063e0a52" sha1="6cd924266e64be7bdba0017e38004d56d96c22cb" />
@@ -14815,6 +14847,11 @@ clips onto the player's ear.
 		<description>64GB Checker (Japan, v1.05)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+[Transfer Pak] verifier for Pokemon Stadium
+https://ja.wikipedia.org/wiki/64GB%E3%83%91%E3%83%83%E3%82%AF
+https://bulbapedia.bulbagarden.net/wiki/Transfer_Pak
+]]></notes>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x800000">
 				<rom name="64gb checker v1.05.bin" size="0x800000" crc="049924fd" sha1="caee91a7a1059ae7c6fd299138745f0cd284de3d" />

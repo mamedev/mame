@@ -40,6 +40,20 @@ void seawolf2_state::machine_start()
 	m_port_1_last = m_port_2_last = 0xff;
 }
 
+void ebases_state::machine_start()
+{
+	astrocde_state::machine_start();
+
+	save_item(NAME(m_trackball_last));
+}
+
+void demndrgn_state::machine_start()
+{
+	astrocde_state::machine_start();
+
+	save_item(NAME(m_trackball_last));
+}
+
 void tenpindx_state::machine_start()
 {
 	astrocde_state::machine_start();

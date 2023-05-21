@@ -11,10 +11,10 @@
 
 #include "emu.h"
 #include "machine/psion_asic9.h"
+#include "machine/psion_ssd.h"
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
 //#include "bus/psion/exp/slot.h"
-#include "psion_ssd.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -42,6 +42,8 @@ public:
 	void workabout(machine_config &config);
 	void psionwa(machine_config &config);
 	void psionwamx(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(wakeup);
 
 protected:
 	virtual void machine_start() override;
@@ -83,7 +85,7 @@ static INPUT_PORTS_START( workabout )
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)          PORT_CHAR('6')  PORT_CHAR('^')  PORT_CHAR('}')
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)       PORT_CHAR(UCHAR_MAMEKEY(DOWN))                  PORT_NAME(UTF8_DOWN)
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ESC)        PORT_CHAR(UCHAR_MAMEKEY(ESC))                   PORT_NAME("On/Esc")
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ESC)        PORT_CHAR(UCHAR_MAMEKEY(ESC))                   PORT_NAME("On/Esc")          PORT_CHANGED_MEMBER(DEVICE_SELF, workabout_state, wakeup, 0)
 
 	PORT_START("COL1")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)          PORT_CHAR('t')  PORT_CHAR('T')
@@ -141,7 +143,7 @@ static INPUT_PORTS_START( workabout )
 	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)          PORT_CHAR('k')  PORT_CHAR('K')
 	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)          PORT_CHAR('0')  PORT_CHAR(';')  PORT_CHAR('<')
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)          PORT_CHAR('4')  PORT_CHAR('$')  PORT_CHAR('~')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD)
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_END)                                                        PORT_NAME("Off")
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                                                               PORT_NAME("Contrast")
 	PORT_BIT(0x180, IP_ACTIVE_HIGH, IPT_UNUSED)
 
@@ -155,6 +157,12 @@ static INPUT_PORTS_START( workabout )
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                                                               PORT_NAME("Backlight")
 	PORT_BIT(0x180, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
+
+
+INPUT_CHANGED_MEMBER(workabout_state::wakeup)
+{
+	m_asic9->eint0_w(newval);
+}
 
 
 uint16_t workabout_state::kbd_r()
@@ -186,10 +194,10 @@ void workabout_state::workabout(machine_config &config)
 	m_asic9->port_ab_r().set(FUNC(workabout_state::kbd_r));
 	m_asic9->buz_cb().set(m_speaker, FUNC(speaker_sound_device::level_w));
 	m_asic9->col_cb().set([this](uint8_t data) { m_key_col = data; });
-	m_asic9->data_r<0>().set(m_ssd[0], FUNC(psion_ssd_device::data_r));      // SSD Pack 1
-	m_asic9->data_w<0>().set(m_ssd[0], FUNC(psion_ssd_device::data_w));
-	m_asic9->data_r<1>().set(m_ssd[1], FUNC(psion_ssd_device::data_r));      // SSD Pack 2
-	m_asic9->data_w<1>().set(m_ssd[1], FUNC(psion_ssd_device::data_w));
+	m_asic9->data_r<0>().set(m_ssd[1], FUNC(psion_ssd_device::data_r));      // SSD Pack 1
+	m_asic9->data_w<0>().set(m_ssd[1], FUNC(psion_ssd_device::data_w));
+	m_asic9->data_r<1>().set(m_ssd[0], FUNC(psion_ssd_device::data_r));      // SSD Pack 2
+	m_asic9->data_w<1>().set(m_ssd[0], FUNC(psion_ssd_device::data_w));
 	//m_asic9->data_r<2>().set(m_exp[0], FUNC(psion_exp_slot_device::data_r)); // Expansion port A
 	//m_asic9->data_w<2>().set(m_exp[0], FUNC(psion_exp_slot_device::data_w));
 	//m_asic9->data_r<3>().set(m_exp[1], FUNC(psion_exp_slot_device::data_r)); // Expansion port B

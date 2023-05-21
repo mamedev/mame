@@ -13,7 +13,6 @@
 #include "n64.h"
 
 #include "emupal.h"
-#include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
@@ -410,11 +409,14 @@ void n64_console_state::n64(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(500000));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	/* Video DACRATE is for quarter pixels, so the horizontal is also given in quarter pixels.  However, the horizontal and vertical timing and sizing is adjustable by register and will be reset when the registers are written. */
-	screen.set_raw(DACRATE_NTSC*2,3093,0,3093,525,0,525);
-	screen.set_screen_update(FUNC(n64_state::screen_update_n64));
-	screen.screen_vblank().set(FUNC(n64_state::screen_vblank_n64));
+	// TODO: with 480 vertical will generate invalid vblanks
+	// cfr. amenairc -drc
+	m_screen->set_raw(DACRATE_NTSC*2,3093,0,3093,525,0,525);
+	//m_screen->set_raw(DACRATE_NTSC*2,3093,0,3093,525,0,480);
+	m_screen->set_screen_update(FUNC(n64_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(n64_state::screen_vblank));
 
 	PALETTE(config, "palette").set_entries(0x1000);
 
@@ -434,6 +436,8 @@ void n64_console_state::n64(machine_config &config)
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("n64");
 }
+
+// TODO: different xtal for PAL
 
 void n64_console_state::n64dd(machine_config &config)
 {
@@ -458,7 +462,7 @@ ROM_START( n64 )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for R4300 */
 
 	ROM_REGION32_BE( 0x800, "user1", 0 )
-	ROM_LOAD( "pifdata.bin", 0x0000, 0x0800, CRC(5ec82be9) SHA1(9174eadc0f0ea2654c95fd941406ab46b9dc9bdd) )
+	ROM_LOAD( "pifntsc.bin", 0x0000, 0x0800, CRC(5ec82be9) SHA1(9174eadc0f0ea2654c95fd941406ab46b9dc9bdd) )
 
 	ROM_REGION32_BE( 0x4000000, "user2", ROMREGION_ERASEFF)
 
@@ -468,6 +472,22 @@ ROM_START( n64 )
 	ROM_REGION16_BE( 0x80, "normslope", 0 )
 	ROM_LOAD( "normslp.rom", 0x00, 0x80, CRC(4f2ae525) SHA1(eab43f8cc52c8551d9cff6fced18ef80eaba6f05) )
 ROM_END
+
+ROM_START( n64pal )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for R4300 */
+
+	ROM_REGION32_BE( 0x800, "user1", 0 )
+	ROM_LOAD( "pifpal.bin", 0x0000, 0x0800, CRC(2ae77e68) SHA1(46cae59d31f9298b93f3380879454fcef54ee6cc) )
+
+	ROM_REGION32_BE( 0x4000000, "user2", ROMREGION_ERASEFF)
+
+	ROM_REGION16_BE( 0x80, "normpoint", 0 )
+	ROM_LOAD( "normpnt.rom", 0x00, 0x80, CRC(e7f2a005) SHA1(c27b4a364a24daeee6e99fd286753fd6216362b4) )
+
+	ROM_REGION16_BE( 0x80, "normslope", 0 )
+	ROM_LOAD( "normslp.rom", 0x00, 0x80, CRC(4f2ae525) SHA1(eab43f8cc52c8551d9cff6fced18ef80eaba6f05) )
+ROM_END
+
 
 ROM_START( n64dd )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for R4300 */
@@ -489,6 +509,6 @@ ROM_START( n64dd )
 	ROM_LOAD( "normslp.rom", 0x00, 0x80, CRC(4f2ae525) SHA1(eab43f8cc52c8551d9cff6fced18ef80eaba6f05) )
 ROM_END
 
-CONS(1996, n64,   0,   0, n64,   n64, n64_console_state, empty_init, "Nintendo", "Nintendo 64",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-CONS(1996, n64dd, n64, 0, n64dd, n64, n64_console_state, empty_init, "Nintendo", "Nintendo 64DD", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-
+CONS(1996, n64,    0,   0, n64,   n64, n64_console_state, empty_init, "Nintendo", "Nintendo 64 (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS(1997, n64pal, n64, 0, n64,   n64, n64_console_state, empty_init, "Nintendo", "Nintendo 64 (PAL)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS(1999, n64dd,  n64, 0, n64dd, n64, n64_console_state, empty_init, "Nintendo", "Nintendo 64DD",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
