@@ -2466,8 +2466,33 @@ dumped by sayu
 
 ROM_START( nndmseal )
 	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
-	ROM_LOAD16_BYTE( "1.1", 0x00000, 0x40000, CRC(45acea25) SHA1(f2f2e78be261c3d8c0145a639bc3771f0588401d) )    // 1xxxxxxxxxxxxxxxxx = 0xFF
-	ROM_LOAD16_BYTE( "3.3", 0x00001, 0x40000, CRC(0754d96a) SHA1(1da44994e8bcfd8832755e298c0125b38cfdd16e) )    // 1xxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "cawaii 1 ver1.3.1", 0x00000, 0x40000, CRC(c48ea4d9) SHA1(11a3510d6db293c8b48805959e1b353dd9388d98) )    // 1xxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "cawaii 3 ver1.3.3", 0x00001, 0x40000, CRC(a8b85eb6) SHA1(753372f6301bf1f802707ec59e825253ee3c1e79) )    // 1xxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x100000, "sprite", ROMREGION_ERASE )    /* 8x8x8 (Sprites) */
+/* This game doesn't use sprites, but the region needs to be a valid size for at least one sprite 'page' for the init to work. */
+
+	ROM_REGION( 0x400000, "gfx2", 0 )   // 16x16x8 (Background)
+	ROM_LOAD( "mr97006-02.5", 0x000000, 0x200000, CRC(4793f84e) SHA1(05acba6cc8a527a6050af79a460b08c4676287aa) )
+	ROM_LOAD( "mr97001-01.6", 0x200000, 0x200000, CRC(dd648e8a) SHA1(7036ab30d0ea179c59d74c1fbe4372968722ec0f) )
+
+	ROM_REGION( 0x200000, "gfx3", 0 )   // 16x16x8 (Rotation)
+	ROM_LOAD( "mr97006-01.2", 0x000000, 0x200000, CRC(32283485) SHA1(14ccd25389b97825d9a727809c3a1de803687c16) )
+
+	ROM_REGION( 0x100000, "gfx4", 0 )   // 8x8x8 (Foreground)
+	ROM_LOAD( "mr97006-04.8", 0x000000, 0x100000, CRC(6726a25b) SHA1(4ea49c014477229eaf9de4a0b9bf83021b82c095) )
+
+	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE )   // Samples
+	// filled in from "okisource"
+
+	ROM_REGION( 0x200000, "okisource", 0 )  // Samples
+	ROM_LOAD( "mr96017-04.9", 0x000000, 0x200000, CRC(c2e7b444) SHA1(e2b9d3d94720d01beff1108ef3dfbff805ddd1fd) )
+ROM_END
+
+ROM_START( nndmseal11 )
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_LOAD16_BYTE( "cawaii 1 ver1.1.1", 0x00000, 0x40000, CRC(45acea25) SHA1(f2f2e78be261c3d8c0145a639bc3771f0588401d) )    // 1xxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "cawaii 3 ver1.1.3", 0x00001, 0x40000, CRC(0754d96a) SHA1(1da44994e8bcfd8832755e298c0125b38cfdd16e) )    // 1xxxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x100000, "sprite", ROMREGION_ERASE )    /* 8x8x8 (Sprites) */
 /* This game doesn't use sprites, but the region needs to be a valid size for at least one sprite 'page' for the init to work. */
@@ -3356,7 +3381,8 @@ GAME( 1997, tetrisp2a, tetrisp2, tetrisp2, tetrisp2,  tetrisp2_state, empty_init
 GAME( 1997, tetrisp2j, tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state, empty_init,   ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.2)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1997, tetrisp2ja,tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state, empty_init,   ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.1)",          MACHINE_SUPPORTS_SAVE )
 
-GAME( 1997, nndmseal,  0,        nndmseal, nndmseal,  tetrisp2_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai",                       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1997, nndmseal,  0,        nndmseal, nndmseal,  tetrisp2_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (ver 1.3)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1997, nndmseal11,nndmseal, nndmseal, nndmseal,  tetrisp2_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (ver 1.1)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1997, nndmseala, nndmseal, nndmseal, nndmseal,  tetrisp2_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (Astro Boy ver. 1.0?)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // version guessed
 GAME( 1997, nndmsealb, nndmseal, nndmseal, nndmseal,  tetrisp2_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (Astro Boy ver. 1.1)",  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // appears to have one more mode than the one above, ver taken from PRG ROM labels
 GAME( 1997, nndmsealc, nndmseal, nndmseal, nndmseal,  tetrisp2_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (alternate ver 1.0)",   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // only shows Jaleco copyright even though I'Max is in strings in ROMs. Ver taken from PRG ROM labels
