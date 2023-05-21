@@ -447,7 +447,7 @@ void raidenb_state::raidenb(machine_config &config)
 */
 
 // These versions use the same board and make use of the configuration bytes at 0x1fffd & 0x1fffe
-ROM_START( raiden ) // from a board with 2 daughter cards, no official board #s?
+ROM_START( raidenj ) // from a board with 2 daughter cards, no official board #s?
 	ROM_REGION( 0x060000, "maincpu", 0 ) // v30 main cpu
 	ROM_LOAD16_BYTE( "1.u0253", 0x000000, 0x10000, CRC(a4b12785) SHA1(446314e82ce01315cb3e3d1f323eaa2ad6fb48dd) )
 	ROM_LOAD16_BYTE( "2.u0252", 0x000001, 0x10000, CRC(17640bd5) SHA1(5bbc99900426b1a072b52537ae9a50220c378a0d) )
@@ -488,7 +488,7 @@ ROM_START( raiden ) // from a board with 2 daughter cards, no official board #s?
 	ROM_LOAD( "rd012.u094", 0x0100, 0x0100, NO_DUMP )
 ROM_END
 
-ROM_START( raidena )
+ROM_START( raiden )
 	ROM_REGION( 0x060000, "maincpu", 0 ) // v30 main cpu
 	ROM_LOAD16_BYTE( "1.u0253", 0x000000, 0x10000, CRC(a4b12785) SHA1(446314e82ce01315cb3e3d1f323eaa2ad6fb48dd) )
 	ROM_LOAD16_BYTE( "2.u0252", 0x000001, 0x10000, CRC(17640bd5) SHA1(5bbc99900426b1a072b52537ae9a50220c378a0d) )
@@ -851,8 +851,8 @@ void raiden_state::init_raiden()
 /***************************************************************************/
 
 // Same PCB, differ by region byte(s)
-GAME( 1990, raiden,   0,      raidene,  raiden, raiden_state,  init_raiden,  ROT270, "Seibu Kaihatsu", "Raiden (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, raidena,  raiden, raidene,  raiden, raiden_state,  init_raiden,  ROT270, "Seibu Kaihatsu", "Raiden (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, raiden,   0,      raidene,  raiden, raiden_state,  init_raiden,  ROT270, "Seibu Kaihatsu", "Raiden (World set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, raidenj,  raiden, raidene,  raiden, raiden_state,  init_raiden,  ROT270, "Seibu Kaihatsu", "Raiden (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, raidenu,  raiden, raidene,  raiden, raiden_state,  init_raiden,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, raident,  raiden, raidene,  raiden, raiden_state,  init_raiden,  ROT270, "Seibu Kaihatsu (Liang HWA Electronics license)", "Raiden (Taiwan)", MACHINE_SUPPORTS_SAVE )
 
@@ -867,5 +867,5 @@ GAME( 1990, raidenkb, raiden, raidenkb, raiden, raiden_state,  init_raiden,  ROT
 GAME( 1990, raidenua, raiden, raidenu,  raiden, raiden_state,  empty_init,   ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US set 2, SEI8904 hardware)", MACHINE_SUPPORTS_SAVE )
 
 // Alternate hardware. Main, Sub & Sound CPU code not encrypted. It also sports a Seibu custom CRTC.
-GAME( 1990, raidenb,  raiden, raidenb,  raiden, raidenb_state, empty_init,   ROT270, "Seibu Kaihatsu", "Raiden (set 3, newer hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, raidenb,  raiden, raidenb,  raiden, raidenb_state, empty_init,   ROT270, "Seibu Kaihatsu", "Raiden (World set 2, newer hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, raidenub, raiden, raidenb,  raiden, raidenb_state, empty_init,   ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US set 3, newer hardware)", MACHINE_SUPPORTS_SAVE )
