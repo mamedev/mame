@@ -27943,8 +27943,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- Game crashes immediately after loading, inputs become unresponsive. -->
 	<software name="quake" supported="no">
-		<!-- Game crashes immediately after loading, inputs become unresponsive. -->
 		<description>Quake (demo)</description>
 		<year>2003</year>
 		<publisher>Bobbee Tec</publisher>
