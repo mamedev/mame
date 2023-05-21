@@ -3115,7 +3115,6 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!-- Offset front layer, but playable -->
 	<software name="cuebrunr">
 		<description>Cueb Runner</description>
 		<year>1990</year>
@@ -28051,6 +28050,19 @@ sold through Takeru vending machines -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="meteo_wars.xdf" size="1261568" crc="56127f76" sha1="1cc57c8e9317aa0f2a1e0e93a045446845e185ea" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minic">
+		<description>Mi ni Ikuzo! Hedgehog</description>
+		<year>1993</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="alt_title" value="見に行くぞ！HEDGEHOG" />
+		<info name="developer" value="Kiyoshi Sakai" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="minic.xdf" size="1261568" crc="219d8c01" sha1="b7ad5674fcdce9dd3f903f30612b8efe441dfd93" />
 			</dataarea>
 		</part>
 	</software>

@@ -52,7 +52,7 @@ void atapi_cdrom_device::device_add_mconfig(machine_config &config)
 		GDROM(config, "image").set_interface("cdrom");
 	else
 		CDROM(config, "image").set_interface("cdrom");
-	CDDA(config, "cdda");
+	CDDA(config, "cdda").set_cdrom_tag("image");	
 }
 
 void atapi_cdrom_device::device_start()

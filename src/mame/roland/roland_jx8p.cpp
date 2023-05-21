@@ -60,8 +60,6 @@ void roland_jx8p_state::leds_w(u8 data)
 
 void roland_jx8p_state::jx8p_assigner_map(address_map &map)
 {
-	map(0x0000, 0x001f).m(m_assignercpu, FUNC(hd6303r_cpu_device::m6801_io));
-	map(0x0080, 0x00ff).ram(); // internal RAM
 	map(0x2000, 0x3fff).rw("cartslot", FUNC(generic_slot_device::read_ram), FUNC(generic_slot_device::write_ram));
 	map(0x4000, 0x4007).mirror(0x1ff8).r(FUNC(roland_jx8p_state::switches_r));
 	map(0x6000, 0x6000).mirror(0x1fff).w(FUNC(roland_jx8p_state::leds_w));
@@ -72,8 +70,6 @@ void roland_jx8p_state::jx8p_assigner_map(address_map &map)
 
 void roland_jx8p_state::superjx_assigner_map(address_map &map)
 {
-	map(0x0000, 0x001f).m(m_assignercpu, FUNC(hd6303r_cpu_device::m6801_io));
-	map(0x0080, 0x00ff).ram(); // internal RAM
 	map(0x1000, 0x17ff).mirror(0x800).rw("keyscan", FUNC(mb63h149_device::read), FUNC(mb63h149_device::write));
 	map(0x2000, 0x3fff).rw("cartslot", FUNC(generic_slot_device::read_ram), FUNC(generic_slot_device::write_ram));
 	map(0x4000, 0x4007).mirror(0xff8).r(FUNC(roland_jx8p_state::switches_r));

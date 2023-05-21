@@ -162,7 +162,7 @@ u16 hh_pic16_state::read_inputs(int columns, u16 colmask)
 
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
-		if (~m_inp_mux >> i & 1)
+		if (!BIT(m_inp_mux, i))
 			ret &= m_inputs[i]->read();
 
 	return ret;

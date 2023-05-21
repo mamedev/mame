@@ -334,12 +334,10 @@ void n64_gateway_state::n64_lodgenet(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(500000));
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	/* Video DACRATE is for quarter pixels, so the horizontal is also given in quarter pixels.  However, the horizontal and vertical timing and sizing is adjustable by register and will be reset when the registers are written. */
-	screen.set_raw(DACRATE_NTSC*2,3093,0,3093,525,0,525);
-	screen.set_screen_update(FUNC(n64_state::screen_update_n64));
-	screen.screen_vblank().set(FUNC(n64_state::screen_vblank_n64));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(DACRATE_NTSC*2,3093,0,3093,525,0,525);
+	m_screen->set_screen_update(FUNC(n64_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(n64_state::screen_vblank));
 
 	PALETTE(config, "palette").set_entries(0x1000);
 

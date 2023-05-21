@@ -46,7 +46,7 @@ a permutation table common to all games. The second and final protection check c
 against a game-specific ID code. This byte is composed of EEPROM bits 22 (MSB), 27, 52, 50, 42, 9, 38 and 35 (LSB).
 
 It is unknown where this protection EEPROM exists on any Subsino PCB (if it isn't an external dongle), though the IC package is
-known to be quite small.
+known to be quite small. (The iButton version, DS1971, is another possibility.)
 
 Timings in the Z180-based and H8-based games consistently fail to meet 1-Wire specifications. In the case of the H8-based games,
 this likely has to do with CPU clocks and emulated cycle timings being both too fast. There may also be wait states programmed
@@ -55,7 +55,8 @@ by the otherwise seemingly unnecessary internal ROMs.
 ************************************************************************************************************/
 
 #include "emu.h"
-#include "subsino_m.h"
+#include "subsino_crypt.h"
+#include "subsino_io.h"
 
 #include "cpu/h8/h83048.h"
 #include "cpu/i86/i186.h"
@@ -107,8 +108,6 @@ class subsino2_state : public driver_device
 public:
 	subsino2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_outputs16(*this, "outputs16")
-		, m_outputs(*this, "outputs")
 		, m_maincpu(*this, "maincpu")
 		, m_oki(*this, "oki")
 		, m_gfxdecode(*this, "gfxdecode")
@@ -119,7 +118,6 @@ public:
 		, m_eeprom(*this, "eeprom")
 		, m_keyb(*this, "KEYB_%u", 0U)
 		, m_dsw(*this, "DSW%u", 1U)
-		, m_system(*this, "SYSTEM")
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
@@ -146,8 +144,6 @@ public:
 	void init_wtrnymph();
 	void init_mtrain();
 	void init_tbonusal();
-
-	CUSTOM_INPUT_MEMBER(output_d_r) { return m_outputs[3] & 0x47; }
 
 protected:
 	virtual void video_start() override;
@@ -190,21 +186,36 @@ private:
 	uint8_t vblank_bit6_r();
 	uint8_t bishjan_sound_r();
 	void bishjan_sound_w(uint8_t data);
-	uint16_t bishjan_serial_r();
-	void bishjan_input_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t bishjan_input_r();
-	void bishjan_outputs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void new2001_outputs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void humlan_outputs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void expcard_outputs_w(offs_t offset, uint8_t data);
-	void mtrain_outputs_w(offs_t offset, uint8_t data);
+	uint8_t bishjan_serial_r();
+	uint8_t bishjan_unknown_r();
+	void bishjan_input_w(uint8_t data);
+	uint8_t bishjan_input_r();
+	void bishjan_outputs_w(uint8_t data);
+	uint8_t new2001_sound_ready_r();
+	void new2001_output0_w(uint8_t data);
+	void new2001_output1_w(uint8_t data);
+	void humlan_output0_w(uint8_t data);
+	void humlan_output1_w(uint8_t data);
+	void expcard_out_b_w(uint8_t data);
+	void expcard_out_a_w(uint8_t data);
+	void mtrain_output0_w(uint8_t data);
+	void mtrain_output1_w(uint8_t data);
+	void mtrain_output2_w(uint8_t data);
+	void mtrain_output3_w(uint8_t data);
 	void mtrain_videoram_w(offs_t offset, uint8_t data);
 	void mtrain_tilesize_w(uint8_t data);
-	uint8_t mtrain_prot_r(offs_t offset);
-	void saklove_outputs_w(offs_t offset, uint8_t data);
-	void xplan_outputs_w(offs_t offset, uint8_t data);
-	void xtrain_outputs_w(offs_t offset, uint8_t data);
-	uint8_t xtrain_subsino_r(offs_t offset);
+	void saklove_output0_w(uint8_t data);
+	void saklove_output1_w(uint8_t data);
+	void saklove_output2_w(uint8_t data);
+	void saklove_output3_w(uint8_t data);
+	void xplan_out_d_w(uint8_t data);
+	void xplan_out_c_w(uint8_t data);
+	void xplan_out_b_w(uint8_t data);
+	void xplan_out_a_w(uint8_t data);
+	void xtrain_out_d_w(uint8_t data);
+	void xtrain_out_c_w(uint8_t data);
+	void xtrain_out_b_w(uint8_t data);
+	void xtrain_out_a_w(uint8_t data);
 	void oki_bank_bit0_w(uint8_t data);
 	void oki_bank_bit4_w(uint8_t data);
 
@@ -213,21 +224,16 @@ private:
 	uint32_t screen_update_subsino2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void bishjan_map(address_map &map);
-	void expcard_io(address_map &map);
-	void humlan_map(address_map &map);
 	void mtrain_io(address_map &map);
 	void mtrain_base_map(address_map &map);
 	void mtrain_map(address_map &map);
 	void tbonusal_map(address_map &map);
-	void new2001_base_map(address_map &map);
 	void new2001_map(address_map &map);
 	void ramdac_map(address_map &map);
 	void saklove_io(address_map &map);
 	void saklove_map(address_map &map);
-	void xplan_common_io(address_map &map);
 	void xplan_io(address_map &map);
 	void xplan_map(address_map &map);
-	void xtrain_io(address_map &map);
 
 	virtual void machine_start() override { m_leds.resolve(); }
 
@@ -240,10 +246,8 @@ private:
 	uint8_t m_ss9601_tilesize;
 	uint8_t m_ss9601_disable;
 	uint8_t m_dsw_mask;
-	optional_shared_ptr<uint16_t> m_outputs16;
-	optional_shared_ptr<uint8_t> m_outputs;
-	uint16_t m_bishjan_sound;
-	uint16_t m_bishjan_input;
+	uint8_t m_bishjan_sound;
+	uint8_t m_bishjan_input;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<okim6295_device> m_oki;
@@ -255,7 +259,6 @@ private:
 	required_device<ds2430a_device> m_eeprom;
 	optional_ioport_array<5> m_keyb;
 	optional_ioport_array<4> m_dsw;
-	optional_ioport m_system;
 	output_finder<9> m_leds;
 
 	inline void ss9601_get_tile_info(layer_t *l, tile_data &tileinfo, tilemap_memory_index tile_index);
@@ -940,52 +943,43 @@ void subsino2_state::bishjan_sound_w(uint8_t data)
 	m_bishjan_sound = data;
 }
 
-uint16_t subsino2_state::bishjan_serial_r()
+uint8_t subsino2_state::bishjan_serial_r()
 {
 	return
-		(m_eeprom->data_r() ? 0x8000 : 0) |               // bit 7 - serial communication
-		(machine().rand() & 0x1800) |
-		(((m_bishjan_sound == 0x12) ? 0x40:0x00) << 8) |  // bit 6 - sound communication
+		(m_eeprom->data_r() ? 0x80 : 0) |             // bit 7 - serial communication
+		(machine().rand() & 0x18) |
+		((m_bishjan_sound == 0x12) ? 0x40:0x00);     // bit 6 - sound communication
+}
+
+uint8_t subsino2_state::bishjan_unknown_r()
+{
+	return
 //      (machine().rand() & 0xff);
 //      (((m_screen->frame_number()%60)==0)?0x18:0x00);
 		0x18;
 }
 
-void subsino2_state::bishjan_input_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void subsino2_state::bishjan_input_w(uint8_t data)
 {
-	if (ACCESSING_BITS_8_15)
-		m_bishjan_input = data >> 8;
+	m_bishjan_input = data;
 }
 
-uint16_t subsino2_state::bishjan_input_r()
+uint8_t subsino2_state::bishjan_input_r()
 {
-	uint16_t res = 0xff;
+	uint8_t res = 0xff;
 
 	for (int i = 0; i < 5; i++)
 		if (m_bishjan_input & (1 << i))
 			res = m_keyb[i]->read();
 
-	return  (res << 8) |                    // high byte
-			m_system->read();       // low byte
+	return res;
 }
 
-void subsino2_state::bishjan_outputs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void subsino2_state::bishjan_outputs_w(uint8_t data)
 {
-	COMBINE_DATA( &m_outputs16[offset] );
-
-	switch (offset)
-	{
-		case 0:
-			if (ACCESSING_BITS_0_7)
-			{
-				// coin out         BIT(data, 0)
-				m_hopper->motor_w(BIT(data, 1));   // hopper
-				machine().bookkeeping().coin_counter_w(0, BIT(data, 4));
-			}
-			break;
-	}
-
-//  popmessage("0: %04x", m_outputs16[0]);
+	// coin out         BIT(data, 0)
+	m_hopper->motor_w(BIT(data, 1));   // hopper
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 4));
 }
 
 
@@ -1032,11 +1026,7 @@ void subsino2_state::bishjan_map(address_map &map)
 	map(0xa0001f, 0xa0001f).w(FUNC(subsino2_state::ss9601_disable_w));
 	map(0xa00020, 0xa00025).w(FUNC(subsino2_state::ss9601_scroll_w));
 
-	map(0xc00000, 0xc00001).portr("DSW");                              // SW1
-	map(0xc00002, 0xc00003).portr("JOY").w(FUNC(subsino2_state::bishjan_input_w));   // IN C
-	map(0xc00004, 0xc00005).r(FUNC(subsino2_state::bishjan_input_r));                        // IN A & B
-	map(0xc00006, 0xc00007).r(FUNC(subsino2_state::bishjan_serial_r));                       // IN D
-	map(0xc00008, 0xc00009).portr("RESET").w(FUNC(subsino2_state::bishjan_outputs_w)).share("outputs16");
+	map(0xc00000, 0xc0001f).rw("io", FUNC(ss9802_device::read), FUNC(ss9802_device::write));
 }
 
 void subsino2_state::ramdac_map(address_map &map)
@@ -1048,204 +1038,111 @@ void subsino2_state::ramdac_map(address_map &map)
                                   New 2001
 ***************************************************************************/
 
-void subsino2_state::new2001_outputs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+uint8_t subsino2_state::new2001_sound_ready_r()
 {
-	COMBINE_DATA( &m_outputs16[offset] );
+	return 0x20;
+}
 
-	switch (offset)
-	{
-		case 0:
-			if (ACCESSING_BITS_8_15)
-			{
-				m_leds[0] = BIT(data, 14); // record?
-				m_leds[1] = BIT(data, 13); // shoot now
-				m_leds[2] = BIT(data, 12); // double
-				m_leds[3] = BIT(data, 11); // black/red
-			}
-			if (ACCESSING_BITS_0_7)
-			{
-				m_leds[4] = BIT(data, 7); // start
-				m_leds[5] = BIT(data, 6); // take
-				m_leds[6] = BIT(data, 5); // black/red
+void subsino2_state::new2001_output0_w(uint8_t data)
+{
+	m_leds[0] = BIT(data, 6); // record?
+	m_leds[1] = BIT(data, 5); // shoot now
+	m_leds[2] = BIT(data, 4); // double
+	m_leds[3] = BIT(data, 3); // black/red
+}
 
-				machine().bookkeeping().coin_counter_w(0, data & 0x0010); // coin in / key in
-				m_leds[7] = BIT(data, 2); // ?
-				m_leds[8] = BIT(data, 1); // ?
-			}
-			break;
-	}
+void subsino2_state::new2001_output1_w(uint8_t data)
+{
+	m_leds[4] = BIT(data, 7); // start
+	m_leds[5] = BIT(data, 6); // take
+	m_leds[6] = BIT(data, 5); // black/red
 
-//  popmessage("0: %04x", m_outputs16[0]);
+	machine().bookkeeping().coin_counter_w(0, data & 0x0010); // coin in / key in
+	m_leds[7] = BIT(data, 2); // ?
+	m_leds[8] = BIT(data, 1); // ?
 }
 
 // Same as bishjan (except for i/o and lo2 usage like xplan)
-void subsino2_state::new2001_base_map(address_map &map)
+void subsino2_state::new2001_map(address_map &map)
 {
-	map.global_mask(0xffffff);
-
-	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
-	map(0x080000, 0x0fffff).rom().region("maincpu", 0);
-
-	map(0x200000, 0x207fff).ram().share("nvram"); // battery
+	bishjan_map(map);
 
 	// write both (L1, byte_lo2)
 	map(0x410000, 0x411fff).w(FUNC(subsino2_state::ss9601_videoram_1_hi_lo2_w));
-	// read lo (L1)   (only half tilemap?)
-	map(0x412000, 0x412fff).r(FUNC(subsino2_state::ss9601_videoram_1_lo_r));
-	map(0x413000, 0x4131ff).rw(FUNC(subsino2_state::ss9601_scrollram_1_lo_r), FUNC(subsino2_state::ss9601_scrollram_1_lo_w));
 	// write both (L0 & REEL, byte_lo2)
 	map(0x414000, 0x415fff).w(FUNC(subsino2_state::ss9601_videoram_0_hi_lo2_w));
-	// read lo (REEL)
-	map(0x416000, 0x416fff).r(FUNC(subsino2_state::ss9601_reelram_lo_r));
-	map(0x417000, 0x4171ff).rw(FUNC(subsino2_state::ss9601_scrollram_0_lo_r), FUNC(subsino2_state::ss9601_scrollram_0_lo_w));
 
-	// read hi (L1)
-	map(0x422000, 0x422fff).r(FUNC(subsino2_state::ss9601_videoram_1_hi_r));
-	map(0x423000, 0x4231ff).rw(FUNC(subsino2_state::ss9601_scrollram_1_hi_r), FUNC(subsino2_state::ss9601_scrollram_1_hi_w));
-	// read hi (REEL)
-	map(0x426000, 0x426fff).r(FUNC(subsino2_state::ss9601_reelram_hi_r));
-	map(0x427000, 0x4271ff).rw(FUNC(subsino2_state::ss9601_scrollram_0_hi_r), FUNC(subsino2_state::ss9601_scrollram_0_hi_w));
-
-	// write both (L1, byte_lo)
-	map(0x430000, 0x431fff).w(FUNC(subsino2_state::ss9601_videoram_1_hi_lo_w));
-	map(0x432000, 0x432fff).w(FUNC(subsino2_state::ss9601_videoram_1_hi_lo_w));
-	map(0x433000, 0x4331ff).w(FUNC(subsino2_state::ss9601_scrollram_1_hi_lo_w));
-	// write both (L0 & REEL, byte_lo)
-	map(0x434000, 0x435fff).w(FUNC(subsino2_state::ss9601_videoram_0_hi_lo_w));
-	map(0x436000, 0x436fff).w(FUNC(subsino2_state::ss9601_reelram_hi_lo_w));
-	map(0x437000, 0x4371ff).w(FUNC(subsino2_state::ss9601_scrollram_0_hi_lo_w));
-
-	map(0x600000, 0x600000).rw(FUNC(subsino2_state::bishjan_sound_r), FUNC(subsino2_state::bishjan_sound_w));
 	map(0x600020, 0x600020).w(FUNC(subsino2_state::ss9601_byte_lo2_w));
-	map(0x600040, 0x600040).w(FUNC(subsino2_state::ss9601_scrollctrl_w));
-	map(0x600060, 0x600060).w("ramdac", FUNC(ramdac_device::index_w));
-	map(0x600061, 0x600061).w("ramdac", FUNC(ramdac_device::pal_w));
-	map(0x600062, 0x600062).w("ramdac", FUNC(ramdac_device::mask_w));
-	map(0x600080, 0x600080).w(FUNC(subsino2_state::ss9601_tilesize_w));
-	map(0x6000a0, 0x6000a0).w(FUNC(subsino2_state::ss9601_byte_lo_w));
-
-	map(0xa0001f, 0xa0001f).w(FUNC(subsino2_state::ss9601_disable_w));
-	map(0xa00020, 0xa00025).w(FUNC(subsino2_state::ss9601_scroll_w));
-
-	map(0xc00000, 0xc00001).portr("DSW");
-	map(0xc00002, 0xc00003).portr("IN-C");
-	map(0xc00004, 0xc00005).portr("IN-AB");
-	map(0xc00006, 0xc00007).r(FUNC(subsino2_state::bishjan_serial_r));
-}
-
-void subsino2_state::new2001_map(address_map &map)
-{
-	new2001_base_map(map);
-	map(0xc00008, 0xc00009).w(FUNC(subsino2_state::new2001_outputs_w)).share("outputs16");
 }
 
 /***************************************************************************
                              Humlan's Lyckohjul
 ***************************************************************************/
 
-void subsino2_state::humlan_outputs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void subsino2_state::humlan_output0_w(uint8_t data)
 {
-	COMBINE_DATA( &m_outputs16[offset] );
-
-	switch (offset)
-	{
-		case 0:
-			if (ACCESSING_BITS_8_15)
-			{
-				m_leds[5] = BIT(data, 13); // big or small
-				m_leds[4] = BIT(data, 10); // double
-				m_leds[3] = BIT(data, 9); // big or small
-				m_leds[2] = BIT(data, 8); // bet
-			}
-			if (ACCESSING_BITS_0_7)
-			{
-				m_leds[1] = BIT(data, 7); // take
-				m_leds[0] = BIT(data, 6); // start
-				machine().bookkeeping().coin_counter_w(1, data & 0x0004); // key in
-				machine().bookkeeping().coin_counter_w(0, data & 0x0002); // coin in
-			}
-			break;
-	}
-
-//  popmessage("0: %04x", m_outputs16[0]);
+	m_leds[5] = BIT(data, 5); // big or small
+	m_leds[4] = BIT(data, 2); // double
+	m_leds[3] = BIT(data, 1); // big or small
+	m_leds[2] = BIT(data, 0); // bet
 }
 
-void subsino2_state::humlan_map(address_map &map)
+void subsino2_state::humlan_output1_w(uint8_t data)
 {
-	new2001_base_map(map);
-	map(0xc00008, 0xc00009).w(FUNC(subsino2_state::humlan_outputs_w)).share("outputs16");
+	m_leds[1] = BIT(data, 7); // take
+	m_leds[0] = BIT(data, 6); // start
+	machine().bookkeeping().coin_counter_w(1, data & 0x04); // key in
+	machine().bookkeeping().coin_counter_w(0, data & 0x02); // coin in
 }
 
 /***************************************************************************
                        Express Card / Top Card
 ***************************************************************************/
 
-void subsino2_state::expcard_outputs_w(offs_t offset, uint8_t data)
+void subsino2_state::expcard_out_b_w(uint8_t data)
 {
-	m_outputs[offset] = data;
+	m_leds[1] = BIT(data, 2);   // hold 4 / small & hold 5 / big ?
+	m_leds[2] = BIT(data, 3);   // hold 1 / bet
+	m_leds[3] = BIT(data, 4);   // hold 2 / take ?
+	m_leds[4] = BIT(data, 5);   // hold 3 / double up ?
+}
 
-	switch (offset)
-	{
-		case 0: // D
-			m_eeprom->data_w(!BIT(data, 6));
-			break;
+void subsino2_state::expcard_out_a_w(uint8_t data)
+{
+	machine().bookkeeping().coin_counter_w(0,    data & 0x01 );  // coin in
+	machine().bookkeeping().coin_counter_w(1,    data & 0x02 );  // key in
 
-		case 1: // C
-			m_leds[0] = BIT(data, 1);   // raise
-			break;
-
-		case 2: // B
-			m_leds[1] = BIT(data, 2);   // hold 4 / small & hold 5 / big ?
-			m_leds[2] = BIT(data, 3);   // hold 1 / bet
-			m_leds[3] = BIT(data, 4);   // hold 2 / take ?
-			m_leds[4] = BIT(data, 5);   // hold 3 / double up ?
-			break;
-
-		case 3: // A
-			machine().bookkeeping().coin_counter_w(0,    data & 0x01 );  // coin in
-			machine().bookkeeping().coin_counter_w(1,    data & 0x02 );  // key in
-
-			m_leds[5] = BIT(data, 4);   // start
-			break;
-	}
-
-//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs[0], m_outputs[1], m_outputs[2], m_outputs[3]);
+	m_leds[5] = BIT(data, 4);   // start
 }
 
 /***************************************************************************
                                 Magic Train
 ***************************************************************************/
 
-void subsino2_state::mtrain_outputs_w(offs_t offset, uint8_t data)
+void subsino2_state::mtrain_output0_w(uint8_t data)
 {
-	m_outputs[offset] = data;
+	machine().bookkeeping().coin_counter_w(0,    data & 0x01 );  // key in
+	machine().bookkeeping().coin_counter_w(1,    data & 0x02 );  // coin in
+	machine().bookkeeping().coin_counter_w(2,    data & 0x10 );  // pay out
+//  machine().bookkeeping().coin_counter_w(3,   data & 0x20 );  // hopper motor
+}
 
-	switch (offset)
-	{
-		case 0:
-			machine().bookkeeping().coin_counter_w(0,    data & 0x01 );  // key in
-			machine().bookkeeping().coin_counter_w(1,    data & 0x02 );  // coin in
-			machine().bookkeeping().coin_counter_w(2,    data & 0x10 );  // pay out
-//          machine().bookkeeping().coin_counter_w(3,   data & 0x20 );  // hopper motor
-			break;
+void subsino2_state::mtrain_output1_w(uint8_t data)
+{
+	m_leds[0] = BIT(data, 0);   // stop reel?
+	m_leds[1] = BIT(data, 1);   // stop reel? (double or take)
+	m_leds[2] = BIT(data, 2);   // start all
+	m_leds[3] = BIT(data, 3);   // bet / stop all
+	m_leds[4] = BIT(data, 5);   // stop reel? (double or take)
+}
 
-		case 1:
-			m_leds[0] = BIT(data, 0);   // stop reel?
-			m_leds[1] = BIT(data, 1);   // stop reel? (double or take)
-			m_leds[2] = BIT(data, 2);   // start all
-			m_leds[3] = BIT(data, 3);   // bet / stop all
-			m_leds[4] = BIT(data, 5);   // stop reel? (double or take)
-			break;
+void subsino2_state::mtrain_output2_w(uint8_t data)
+{
+}
 
-		case 2:
-			break;
-
-		case 3:
-			m_eeprom->data_w(!BIT(data, 6));
-			break;
-	}
-
-//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs[0], m_outputs[1], m_outputs[2], m_outputs[3]);
+void subsino2_state::mtrain_output3_w(uint8_t data)
+{
+	m_eeprom->data_w(!BIT(data, 6));
 }
 
 void subsino2_state::mtrain_videoram_w(offs_t offset, uint8_t data)
@@ -1310,11 +1207,6 @@ void subsino2_state::mtrain_tilesize_w(uint8_t data)
 	}
 }
 
-uint8_t subsino2_state::mtrain_prot_r(offs_t offset)
-{
-	return "SUBSION"[offset];
-}
-
 void subsino2_state::mtrain_base_map(address_map &map)
 {
 	map(0x00000, 0x077ff).rom();
@@ -1328,17 +1220,7 @@ void subsino2_state::mtrain_base_map(address_map &map)
 
 	map(0x0912f, 0x0912f).w(FUNC(subsino2_state::ss9601_byte_lo_w));
 
-	map(0x09140, 0x09143).w(FUNC(subsino2_state::mtrain_outputs_w)).share("outputs");
-	map(0x09143, 0x09143).portr("IN-D"); // (not shown in system test) 0x40 serial out, 0x80 serial in
-	map(0x09144, 0x09144).portr("IN-A"); // A
-	map(0x09145, 0x09145).portr("IN-B"); // B
-	map(0x09146, 0x09146).portr("IN-C"); // C
-	map(0x09147, 0x09147).r(FUNC(subsino2_state::dsw_r));
-	map(0x09148, 0x09148).w(FUNC(subsino2_state::dsw_mask_w));
-
-	map(0x09152, 0x09152).r(FUNC(subsino2_state::vblank_bit2_r));
-
-	map(0x09158, 0x0915e).r(FUNC(subsino2_state::mtrain_prot_r));
+	map(0x09140, 0x0915f).rw("io", FUNC(ss9602_device::read), FUNC(ss9602_device::write));
 
 	map(0x09160, 0x09160).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x09161, 0x09161).w("ramdac", FUNC(ramdac_device::pal_w));
@@ -1353,7 +1235,6 @@ void subsino2_state::mtrain_base_map(address_map &map)
 void subsino2_state::mtrain_map(address_map &map)
 {
 	mtrain_base_map(map);
-	map(0x09152, 0x09152).w(FUNC(subsino2_state::oki_bank_bit0_w));
 	map(0x09164, 0x09164).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
@@ -1372,30 +1253,24 @@ void subsino2_state::mtrain_io(address_map &map)
                           Sakura Love - Ying Hua Lian
 ***************************************************************************/
 
-void subsino2_state::saklove_outputs_w(offs_t offset, uint8_t data)
+void subsino2_state::saklove_output0_w(uint8_t data)
 {
-	m_outputs[offset] = data;
+	machine().bookkeeping().coin_counter_w(0,    data & 0x01 );  // coin in
+	machine().bookkeeping().coin_counter_w(1,    data & 0x02 );  // key in
+}
 
-	switch (offset)
-	{
-		case 0:
-			machine().bookkeeping().coin_counter_w(0,    data & 0x01 );  // coin in
-			machine().bookkeeping().coin_counter_w(1,    data & 0x02 );  // key in
-			break;
+void subsino2_state::saklove_output1_w(uint8_t data)
+{
+}
 
-		case 1:
-			break;
+void subsino2_state::saklove_output2_w(uint8_t data)
+{
+}
 
-		case 2:
-			break;
-
-		case 3:
-			// 1, 2, 4
-			m_eeprom->data_w(!BIT(data, 6));
-			break;
-	}
-
-//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs[0], m_outputs[1], m_outputs[2], m_outputs[3]);
+void subsino2_state::saklove_output3_w(uint8_t data)
+{
+	// 1, 2, 4
+	m_eeprom->data_w(!BIT(data, 6));
 }
 
 void subsino2_state::saklove_map(address_map &map)
@@ -1440,54 +1315,38 @@ void subsino2_state::saklove_io(address_map &map)
 	map(0x021f, 0x021f).w(FUNC(subsino2_state::ss9601_disable_w));
 	map(0x0220, 0x0225).w(FUNC(subsino2_state::ss9601_scroll_w));
 
-	map(0x0300, 0x0303).w(FUNC(subsino2_state::saklove_outputs_w)).share("outputs");
-	map(0x0303, 0x0303).portr("IN-D"); // 0x40 serial out, 0x80 serial in
-	map(0x0304, 0x0304).portr("IN-A");
-	map(0x0305, 0x0305).portr("IN-B");
-	map(0x0306, 0x0306).portr("IN-C");
-
-	map(0x0307, 0x0307).r(FUNC(subsino2_state::dsw_r));
-	map(0x0308, 0x0308).w(FUNC(subsino2_state::dsw_mask_w));
-
-	map(0x0312, 0x0312).r(FUNC(subsino2_state::vblank_bit2_r)).w(FUNC(subsino2_state::oki_bank_bit0_w));
-
+	map(0x0300, 0x031f).rw("io", FUNC(ss9602_device::read), FUNC(ss9602_device::write));
 }
 
 /***************************************************************************
                                 X-Plan
 ***************************************************************************/
 
-void subsino2_state::xplan_outputs_w(offs_t offset, uint8_t data)
+void subsino2_state::xplan_out_d_w(uint8_t data)
 {
-	m_outputs[offset] = data;
+	m_eeprom->data_w(!BIT(data, 6));
+}
 
-	switch (offset)
-	{
-		case 0:
-			m_eeprom->data_w(!BIT(data, 6));
-			break;
+void subsino2_state::xplan_out_c_w(uint8_t data)
+{
+	m_leds[0] = BIT(data, 1);   // raise
+}
 
-		case 1:
-			m_leds[0] = BIT(data, 1);   // raise
-			break;
+void subsino2_state::xplan_out_b_w(uint8_t data)
+{
+	m_leds[1] = BIT(data, 2);   // hold 1 / big ?
+	m_leds[2] = BIT(data, 3);   // hold 5 / bet
+	m_leds[3] = BIT(data, 4);   // hold 4 ?
+	m_leds[4] = BIT(data, 5);   // hold 2 / double up
+	m_leds[5] = BIT(data, 6);   // hold 3 / small ?
+}
 
-		case 2: // B
-			m_leds[1] = BIT(data, 2);   // hold 1 / big ?
-			m_leds[2] = BIT(data, 3);   // hold 5 / bet
-			m_leds[3] = BIT(data, 4);   // hold 4 ?
-			m_leds[4] = BIT(data, 5);   // hold 2 / double up
-			m_leds[5] = BIT(data, 6);   // hold 3 / small ?
-			break;
+void subsino2_state::xplan_out_a_w(uint8_t data)
+{
+	machine().bookkeeping().coin_counter_w(0,    data & 0x01 );
+	machine().bookkeeping().coin_counter_w(1,    data & 0x02 );
 
-		case 3: // A
-			machine().bookkeeping().coin_counter_w(0,    data & 0x01 );
-			machine().bookkeeping().coin_counter_w(1,    data & 0x02 );
-
-			m_leds[6] = BIT(data, 4);   // start / take
-			break;
-	}
-
-//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs[0], m_outputs[1], m_outputs[2], m_outputs[3]);
+	m_leds[6] = BIT(data, 4);   // start / take
 }
 
 void subsino2_state::xplan_map(address_map &map)
@@ -1525,7 +1384,7 @@ void subsino2_state::xplan_map(address_map &map)
 	map(0xc0000, 0xfffff).rom().region("maincpu", 0);
 }
 
-void subsino2_state::xplan_common_io(address_map &map)
+void subsino2_state::xplan_io(address_map &map)
 {
 	map(0x0000, 0x0000).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
@@ -1545,88 +1404,45 @@ void subsino2_state::xplan_common_io(address_map &map)
 
 	map(0x0235, 0x0235).noprw(); // INT0 Ack.?
 
-	map(0x0300, 0x0300).r(FUNC(subsino2_state::vblank_bit6_r)).w(FUNC(subsino2_state::oki_bank_bit4_w));
-	map(0x0301, 0x0301).w(FUNC(subsino2_state::dsw_mask_w));
-	map(0x0302, 0x0302).r(FUNC(subsino2_state::dsw_r));
-	map(0x0303, 0x0303).portr("IN-C");
-	map(0x0304, 0x0304).portr("IN-B");
-	map(0x0305, 0x0305).portr("IN-A");
-	map(0x0306, 0x0306).portr("IN-D"); // 0x40 serial out, 0x80 serial in
-}
-
-void subsino2_state::xplan_io(address_map &map)
-{
-	xplan_common_io(map);
-
-	// 306 = d, 307 = c, 308 = b, 309 = a
-	map(0x0306, 0x0309).w(FUNC(subsino2_state::xplan_outputs_w)).share("outputs");
+	map(0x0300, 0x031f).rw("io", FUNC(ss9802_device::read), FUNC(ss9802_device::write));
 }
 
 /***************************************************************************
                                 X-Train
 ***************************************************************************/
 
-void subsino2_state::xtrain_outputs_w(offs_t offset, uint8_t data)
+void subsino2_state::xtrain_out_d_w(uint8_t data)
 {
-	m_outputs[offset] = data;
-
-	switch (offset)
-	{
-		case 0: // D
-			m_hopper->motor_w(BIT(data, 2));
-			m_eeprom->data_w(!BIT(data, 6));
-			break;
-
-		case 1: // C
-			if (m_ticket.found())
-				m_ticket->motor_w(BIT(data, 0));
-
-			m_leds[0] = BIT(data, 1);   // re-double
-			m_leds[1] = BIT(data, 2);   // half double
-			break;
-
-		case 2: // B
-			m_leds[2] = BIT(data, 1);   // hold 3 / small
-			m_leds[3] = BIT(data, 2);   // hold 2 / big
-			m_leds[4] = BIT(data, 3);   // bet
-			m_leds[5] = BIT(data, 4);   // hold1 / take
-			m_leds[6] = BIT(data, 5);   // double up
-			break;
-
-		case 3: // A
-			machine().bookkeeping().coin_counter_w(0, BIT(data, 0)); // coin in
-			machine().bookkeeping().coin_counter_w(1, BIT(data, 1)); // key in
-			machine().bookkeeping().coin_counter_w(2, BIT(data, 2)); // hopper out
-			machine().bookkeeping().coin_counter_w(3, BIT(data, 3)); // ticket out
-
-			m_leds[7] = BIT(data, 4);   // start
-			break;
-	}
-
-//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs[0], m_outputs[1], m_outputs[2], m_outputs[3]);
+	m_hopper->motor_w(BIT(data, 2));
+	m_eeprom->data_w(!BIT(data, 6));
 }
 
-uint8_t subsino2_state::xtrain_subsino_r(offs_t offset)
+void subsino2_state::xtrain_out_c_w(uint8_t data)
 {
-	static const char data[] = { "SUBSINO" };
-	return data[offset];
+	if (m_ticket.found())
+		m_ticket->motor_w(BIT(data, 0));
+
+	m_leds[0] = BIT(data, 1);   // re-double
+	m_leds[1] = BIT(data, 2);   // half double
 }
 
-void subsino2_state::expcard_io(address_map &map)
+void subsino2_state::xtrain_out_b_w(uint8_t data)
 {
-	xplan_common_io(map);
-
-	// 306 = d, 307 = c, 308 = b, 309 = a
-	map(0x0306, 0x0309).w(FUNC(subsino2_state::expcard_outputs_w)).share("outputs");
+	m_leds[2] = BIT(data, 1);   // hold 3 / small
+	m_leds[3] = BIT(data, 2);   // hold 2 / big
+	m_leds[4] = BIT(data, 3);   // bet
+	m_leds[5] = BIT(data, 4);   // hold1 / take
+	m_leds[6] = BIT(data, 5);   // double up
 }
 
-void subsino2_state::xtrain_io(address_map &map)
+void subsino2_state::xtrain_out_a_w(uint8_t data)
 {
-	xplan_common_io(map);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0)); // coin in
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1)); // key in
+	machine().bookkeeping().coin_counter_w(2, BIT(data, 2)); // hopper out
+	machine().bookkeeping().coin_counter_w(3, BIT(data, 3)); // ticket out
 
-	// 306 = d, 307 = c, 308 = b, 309 = a
-	map(0x0306, 0x0309).w(FUNC(subsino2_state::xtrain_outputs_w)).share("outputs");
-	map(0x0313, 0x0319).r(FUNC(subsino2_state::xtrain_subsino_r));
+	m_leds[7] = BIT(data, 4);   // start
 }
 
 
@@ -1660,12 +1476,12 @@ GFXDECODE_END
 
 static INPUT_PORTS_START( bishjan )
 	PORT_START("RESET")
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
 
 	PORT_START("DSW")   // SW1
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Controls ) )      PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(      0x0001, "Keyboard" )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Joystick ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Controls ) )      PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, "Keyboard" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Joystick ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW1:3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:4" )
@@ -1675,74 +1491,74 @@ static INPUT_PORTS_START( bishjan )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )
 
 	PORT_START("JOY")   // IN C
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1         ) PORT_NAME("1 Player Start (Joy Mode)")    // start (joy)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  )   // down (joy)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  )   // left (joy)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )   // right (joy)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1        )   // n (joy)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_MAHJONG_BET    ) PORT_NAME("P1 Mahjong Bet (Joy Mode)")    // bet (joy)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON2        )   // select (joy)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1         ) PORT_NAME("1 Player Start (Joy Mode)")    // start (joy)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  )   // down (joy)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  )   // left (joy)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )   // right (joy)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1        )   // n (joy)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MAHJONG_BET    ) PORT_NAME("P1 Mahjong Bet (Joy Mode)")    // bet (joy)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2        )   // select (joy)
 
 	PORT_START("SYSTEM") // IN A
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE        )   PORT_IMPULSE(1) // service mode (press twice for inputs)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_CUSTOM        )   PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // hopper sensor
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1       )   // stats
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE2       )   // pay out? "hopper empty"
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN1          )   PORT_IMPULSE(2) // coin
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE3       )   // pay out? "hopper empty"
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN2          )   PORT_IMPULSE(2) // coin
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE        )   PORT_IMPULSE(1) // service mode (press twice for inputs)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM        )   PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // hopper sensor
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1       )   // stats
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2       )   // pay out? "hopper empty"
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1          )   PORT_IMPULSE(2) // coin
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE3       )   // pay out? "hopper empty"
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2          )   PORT_IMPULSE(2) // coin
 
 	PORT_START("KEYB_0")    // IN B(0)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_A      )   // a
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_E      )   // e
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_I      )   // i
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_M      )   // m
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_KAN    )   // i2 (kan)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1         )   // b2 (start)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A      )   // a
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E      )   // e
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I      )   // i
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M      )   // m
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN    )   // i2 (kan)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1         )   // b2 (start)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 
 	PORT_START("KEYB_1")    // IN B(1)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_B      )   // b
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_F      )   // f
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_J      )   // j
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_N      )   // n
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_REACH  )   // l2 (reach)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_BET    )   // c2 (bet)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B      )   // b
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F      )   // f
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J      )   // j
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N      )   // n
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH  )   // l2 (reach)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET    )   // c2 (bet)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 
 	PORT_START("KEYB_2")    // IN B(2)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_C      )   // c
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_G      )   // g
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_K      )   // k
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_CHI    )   // k2 (chi)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_RON    )   // m2
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C      )   // c
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G      )   // g
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K      )   // k
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI    )   // k2 (chi)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON    )   // m2
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 
 	PORT_START("KEYB_3")    // IN B(3)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_D      )   // d
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_H      )   // h
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_L      )   // l
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_PON    )   // j2 (pon)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D      )   // d
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H      )   // h
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L      )   // l
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON    )   // j2 (pon)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 
 	PORT_START("KEYB_4")    // IN B(4)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN        )   // g2
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN        )   // e2
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN        )   // d2
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN        )   // f2
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN        )   // g2
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN        )   // e2
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN        )   // d2
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN        )   // f2
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -1750,7 +1566,7 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( new2001 )
-	PORT_START("DSW") // c00000
+	PORT_START("DSW") // c00001
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW1:1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW1:3" )
@@ -1762,35 +1578,36 @@ static INPUT_PORTS_START( new2001 )
 	// high byte related to sound communication
 
 	// JAMMA inputs:
-	PORT_START("IN-C") // c00002
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER         ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_START("IN-C") // c00003
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER         ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	// high byte not read
 
-	PORT_START("IN-AB") // c00004
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE       ) PORT_IMPULSE(1) // service mode (press twice for inputs)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_POKER_HOLD3   ) PORT_NAME("Hold 3 / Black")
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP   ) PORT_NAME("Double Up / Help")
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_HOLD2   ) PORT_NAME("Hold 2 / Red")
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_POKER_HOLD1   ) PORT_NAME("Hold 1 / Take")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_BET    ) PORT_NAME("Bet (Shoot)")
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN1         ) PORT_IMPULSE(1)
+	PORT_START("IN-B") // c00004
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1        ) PORT_NAME("Start")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK   ) // stats (keep pressed during boot for service mode)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN  )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1        ) PORT_NAME("Start")
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK   ) // stats (keep pressed during boot for service mode)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN  )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_START("IN-A") // c00005
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE       ) PORT_IMPULSE(1) // service mode (press twice for inputs)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3   ) PORT_NAME("Hold 3 / Black")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP   ) PORT_NAME("Double Up / Help")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD2   ) PORT_NAME("Hold 2 / Red")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD1   ) PORT_NAME("Hold 1 / Take")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BET    ) PORT_NAME("Bet (Shoot)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1         ) PORT_IMPULSE(1)
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -1798,7 +1615,7 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( humlan )
-	PORT_START("DSW") // c00000
+	PORT_START("DSW") // c00001
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW1:1" ) // used
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW1:3" )
@@ -1810,36 +1627,37 @@ static INPUT_PORTS_START( humlan )
 	// high byte related to sound communication
 
 	// JAMMA inputs:
-	PORT_START("IN-C") // c00002
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN  )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE       ) PORT_IMPULSE(1) // service mode (press twice for inputs)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // ?
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // ?
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER         ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_START("IN-C") // c00003
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN  )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE       ) PORT_IMPULSE(1) // service mode (press twice for inputs)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // ?
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // ?
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER         ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	// high byte not read
 
-	PORT_START("IN-AB") // c00004
+	PORT_START("IN-B") // c00004
 	// 1st-type panel
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1        ) PORT_NAME("Start")
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_POKER_HOLD3   ) PORT_NAME("Hold 3 / Small")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_BET    )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN1         ) PORT_IMPULSE(1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1   ) PORT_NAME("Hold 1 / Take")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP   ) PORT_NAME("Double Up / Help")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD2   ) PORT_NAME("Hold 2 / Big")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK   ) // stats (keep pressed during boot for service mode)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // ?
 
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_POKER_HOLD1   ) PORT_NAME("Hold 1 / Take")
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP   ) PORT_NAME("Double Up / Help")
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_POKER_HOLD2   ) PORT_NAME("Hold 2 / Big")
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK   ) // stats (keep pressed during boot for service mode)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // ?
+	PORT_START("IN-A") // c00005
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1        ) PORT_NAME("Start")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD3   ) PORT_NAME("Hold 3 / Small")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BET    )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1         ) PORT_IMPULSE(1)
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -2064,7 +1882,7 @@ static INPUT_PORTS_START( mtrain )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN    )
 
 	PORT_START("IN-D")  // not shown in test mode
-	PORT_BIT( 0x47, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_CUSTOM_MEMBER(subsino2_state, output_d_r)
+	PORT_BIT( 0x47, IP_ACTIVE_HIGH, IPT_UNUSED  ) // outputs
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER   ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -2211,7 +2029,7 @@ static INPUT_PORTS_START( strain ) // inputs need verifying
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN    )
 
 	PORT_START("IN-D")  // not shown in test mode
-	PORT_BIT( 0x47, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_CUSTOM_MEMBER(subsino2_state, output_d_r)
+	PORT_BIT( 0x47, IP_ACTIVE_HIGH, IPT_UNUSED  ) // outputs
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER   ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -2358,7 +2176,7 @@ static INPUT_PORTS_START( tbonusal ) // inputs need verifying
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN    )
 
 	PORT_START("IN-D")  // not shown in test mode
-	PORT_BIT( 0x47, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_CUSTOM_MEMBER(subsino2_state, output_d_r)
+	PORT_BIT( 0x47, IP_ACTIVE_HIGH, IPT_UNUSED  ) // outputs
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER   ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -2925,7 +2743,7 @@ static INPUT_PORTS_START( wtrnymph )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER      ) PORT_NAME("Play Tetris")     PORT_CODE(KEYCODE_T)   // T |__ play Tetris game
 
 	PORT_START("IN-D")  // not shown in test mode
-	PORT_BIT( 0x47, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_CUSTOM_MEMBER(subsino2_state, output_d_r)
+	PORT_BIT( 0x47, IP_ACTIVE_HIGH, IPT_UNUSED  ) // outputs
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER   ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -2947,6 +2765,18 @@ void subsino2_state::bishjan(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino2_state::bishjan_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	ss9802_device &io(SS9802(config, "io"));
+	io.in_port_callback<1>().set_ioport("DSW");   // SW1
+	io.out_port_callback<2>().set(FUNC(subsino2_state::bishjan_input_w));
+	io.in_port_callback<3>().set_ioport("JOY");   // IN C
+	io.in_port_callback<4>().set(FUNC(subsino2_state::bishjan_input_r));  // IN B
+	io.in_port_callback<5>().set_ioport("SYSTEM");  // IN A
+	io.in_port_callback<6>().set(FUNC(subsino2_state::bishjan_serial_r));  // IN D
+	io.in_port_callback<7>().set(FUNC(subsino2_state::bishjan_unknown_r));
+	io.in_port_callback<9>().set_ioport("RESET");
+	io.out_port_callback<9>().set(FUNC(subsino2_state::bishjan_outputs_w));
+
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	DS2430A(config, m_eeprom).set_timing_scale(0.12);
@@ -2975,6 +2805,15 @@ void subsino2_state::new2001(machine_config &config)
 	bishjan(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino2_state::new2001_map);
 
+	ss9802_device &io(*subdevice<ss9802_device>("io"));
+	io.in_port_callback<0>().set(FUNC(subsino2_state::new2001_sound_ready_r));
+	io.in_port_callback<3>().set_ioport("IN-C");
+	io.in_port_callback<4>().set_ioport("IN-B");
+	io.in_port_callback<5>().set_ioport("IN-A");
+	io.out_port_callback<8>().set(FUNC(subsino2_state::new2001_output0_w));
+	io.out_port_callback<9>().set(FUNC(subsino2_state::new2001_output1_w));
+	io.in_port_callback<9>().set_constant(0);
+
 	m_screen->set_size(640, 256);
 	m_screen->set_visarea(0, 640-1, 0, 256-16-1);
 }
@@ -2983,7 +2822,16 @@ void subsino2_state::humlan(machine_config &config)
 {
 	bishjan(config);
 	H83044(config.replace(), m_maincpu, XTAL(48'000'000) / 3);
-	m_maincpu->set_addrmap(AS_PROGRAM, &subsino2_state::humlan_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &subsino2_state::new2001_map);
+
+	ss9802_device &io(*subdevice<ss9802_device>("io"));
+	io.in_port_callback<0>().set(FUNC(subsino2_state::new2001_sound_ready_r));
+	io.in_port_callback<3>().set_ioport("IN-C");
+	io.in_port_callback<4>().set_ioport("IN-B");
+	io.in_port_callback<5>().set_ioport("IN-A");
+	io.out_port_callback<8>().set(FUNC(subsino2_state::humlan_output0_w));
+	io.out_port_callback<9>().set(FUNC(subsino2_state::humlan_output1_w));
+	io.in_port_callback<9>().set_constant(0);
 
 	m_eeprom->set_timing_scale(0.16);
 
@@ -3000,6 +2848,20 @@ void subsino2_state::mtrain(machine_config &config)
 	Z80180(config, m_maincpu, XTAL(12'000'000));   /* Unknown clock */
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino2_state::mtrain_map);
 	m_maincpu->set_addrmap(AS_IO, &subsino2_state::mtrain_io);
+
+	ss9602_device &io(SS9602(config, "io"));
+	io.out_port_callback<0>().set(FUNC(subsino2_state::mtrain_output0_w));
+	io.out_port_callback<1>().set(FUNC(subsino2_state::mtrain_output1_w));
+	io.out_port_callback<2>().set(FUNC(subsino2_state::mtrain_output2_w));
+	io.out_port_callback<3>().set(FUNC(subsino2_state::mtrain_output3_w));
+	io.in_port_callback<3>().set_ioport("IN-D"); // (not shown in system test) 0x40 serial out, 0x80 serial in
+	io.in_port_callback<4>().set_ioport("IN-A"); // A
+	io.in_port_callback<5>().set_ioport("IN-B"); // B
+	io.in_port_callback<6>().set_ioport("IN-C"); // C
+	io.in_port_callback<7>().set(FUNC(subsino2_state::dsw_r));
+	io.out_port_callback<8>().set(FUNC(subsino2_state::dsw_mask_w));
+	io.in_port_callback<9>().set(FUNC(subsino2_state::vblank_bit2_r));
+	io.out_port_callback<9>().set(FUNC(subsino2_state::oki_bank_bit0_w));
 
 	DS2430A(config, m_eeprom).set_timing_scale(0.73);
 
@@ -3032,6 +2894,7 @@ void subsino2_state::tbonusal(machine_config &config)
 	mtrain(config);
 	config.device_remove("oki");
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino2_state::tbonusal_map);
+	subdevice<ss9602_device>("io")->out_port_callback<9>().set_nop();
 
 	YM3812(config, "ymsnd", 3'000'000).add_route(ALL_OUTPUTS, "mono", 0.80); // ? chip and clock unknown
 }
@@ -3047,6 +2910,20 @@ void subsino2_state::saklove(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &subsino2_state::saklove_io);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	ss9602_device &io(SS9602(config, "io"));
+	io.out_port_callback<0>().set(FUNC(subsino2_state::saklove_output0_w));
+	io.out_port_callback<1>().set(FUNC(subsino2_state::saklove_output1_w));
+	io.out_port_callback<2>().set(FUNC(subsino2_state::saklove_output2_w));
+	io.out_port_callback<3>().set(FUNC(subsino2_state::saklove_output3_w));
+	io.in_port_callback<3>().set_ioport("IN-D"); // 0x40 serial out, 0x80 serial in
+	io.in_port_callback<4>().set_ioport("IN-A");
+	io.in_port_callback<5>().set_ioport("IN-B");
+	io.in_port_callback<6>().set_ioport("IN-C");
+	io.in_port_callback<7>().set(FUNC(subsino2_state::dsw_r));
+	io.out_port_callback<8>().set(FUNC(subsino2_state::dsw_mask_w));
+	io.in_port_callback<9>().set(FUNC(subsino2_state::vblank_bit2_r));
+	io.out_port_callback<9>().set(FUNC(subsino2_state::oki_bank_bit0_w));
 
 	DS2430A(config, m_eeprom);
 
@@ -3085,6 +2962,20 @@ void subsino2_state::xplan(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
+	ss9802_device &io(SS9802(config, "io"));
+	io.in_port_callback<0>().set(FUNC(subsino2_state::vblank_bit6_r));
+	io.out_port_callback<0>().set(FUNC(subsino2_state::oki_bank_bit4_w));
+	io.out_port_callback<1>().set(FUNC(subsino2_state::dsw_mask_w));
+	io.in_port_callback<2>().set(FUNC(subsino2_state::dsw_r));
+	io.in_port_callback<3>().set_ioport("IN-C");
+	io.in_port_callback<4>().set_ioport("IN-B");
+	io.in_port_callback<5>().set_ioport("IN-A");
+	io.in_port_callback<6>().set_ioport("IN-D"); // 0x40 serial out, 0x80 serial in
+	io.out_port_callback<6>().set(FUNC(subsino2_state::xplan_out_d_w));
+	io.out_port_callback<7>().set(FUNC(subsino2_state::xplan_out_c_w));
+	io.out_port_callback<8>().set(FUNC(subsino2_state::xplan_out_b_w)); // B
+	io.out_port_callback<9>().set(FUNC(subsino2_state::xplan_out_a_w)); // A
+
 	DS2430A(config, m_eeprom);
 
 	// video hardware
@@ -3112,7 +3003,12 @@ void subsino2_state::xplan(machine_config &config)
 void subsino2_state::xtrain(machine_config &config)
 {
 	xplan(config);
-	m_maincpu->set_addrmap(AS_IO, &subsino2_state::xtrain_io);
+
+	ss9802_device &io(*subdevice<ss9802_device>("io"));
+	io.out_port_callback<6>().set(FUNC(subsino2_state::xtrain_out_d_w)); // D
+	io.out_port_callback<7>().set(FUNC(subsino2_state::xtrain_out_c_w)); // C
+	io.out_port_callback<8>().set(FUNC(subsino2_state::xtrain_out_b_w)); // B
+	io.out_port_callback<9>().set(FUNC(subsino2_state::xtrain_out_a_w)); // A
 
 	HOPPER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 }
@@ -3127,7 +3023,10 @@ void subsino2_state::ptrain(machine_config &config)
 void subsino2_state::expcard(machine_config &config)
 {
 	xplan(config);
-	m_maincpu->set_addrmap(AS_IO, &subsino2_state::expcard_io);
+
+	ss9802_device &io(*subdevice<ss9802_device>("io"));
+	io.out_port_callback<8>().set(FUNC(subsino2_state::expcard_out_b_w)); // B
+	io.out_port_callback<9>().set(FUNC(subsino2_state::expcard_out_a_w)); // A
 }
 
 
@@ -3684,7 +3583,7 @@ ROM_END
 
 void subsino2_state::init_mtrain()
 {
-	subsino_decrypt(machine(), crsbingo_bitswaps, crsbingo_xors, 0x8000);
+	subsino_decrypt(memregion("maincpu")->base(), crsbingo_bitswaps, crsbingo_xors, 0x8000);
 }
 
 
@@ -3719,7 +3618,7 @@ ROM_END
 
 void subsino2_state::init_tbonusal()
 {
-	subsino_decrypt(machine(), sharkpy_bitswaps, sharkpy_xors, 0x8000);
+	subsino_decrypt(memregion("maincpu")->base(), sharkpy_bitswaps, sharkpy_xors, 0x8000);
 }
 
 /***************************************************************************
@@ -4020,7 +3919,7 @@ ROM_END
 
 void subsino2_state::init_wtrnymph()
 {
-	subsino_decrypt(machine(), victor5_bitswaps, victor5_xors, 0x8000);
+	subsino_decrypt(memregion("maincpu")->base(), victor5_bitswaps, victor5_xors, 0x8000);
 }
 
 GAME( 1996, mtrain,   0,        mtrain,   mtrain,   subsino2_state, init_mtrain,   ROT0, "Subsino",                          "Magic Train (Ver. 1.31)",               0 )

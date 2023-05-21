@@ -127,16 +127,18 @@ void menu_main::populate()
 		item_append(_("menu-main", "Warning Information"), 0, (void *)WARN_INFO);
 
 	for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
-	{
 		if (image.user_loadable())
 		{
 			item_append(_("menu-main", "Media Image Information"), 0, (void *)IMAGE_MENU_IMAGE_INFO);
-
-			item_append(_("menu-main", "File Manager"), 0, (void *)IMAGE_MENU_FILE_MANAGER);
-
 			break;
 		}
-	}
+
+	for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
+		if (image.user_loadable() || image.has_preset_images_selection())
+		{
+			item_append(_("menu-main", "File Manager"), 0, (void *)IMAGE_MENU_FILE_MANAGER);
+			break;
+		}
 
 	if (cassette_device_enumerator(machine().root_device()).first() != nullptr)
 		item_append(_("menu-main", "Tape Control"), 0, (void *)TAPE_CONTROL);

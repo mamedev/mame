@@ -352,7 +352,7 @@ ROM_START(photoply98sp)
 	// Seagate ST31722A
 	// 3303 CYL 1704MB 16 HEADS 63 SECTORS
 	// Funworld label: Feb 1998
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE( "photoplay98sp", 0, BAD_DUMP SHA1(c0d7964edaff6b99184ca64e76c41eaa07abe019) ) // From an operated HDD. A clean one must be recreated from the CDs
 ROM_END
 
@@ -423,7 +423,7 @@ ROM_START(photoply99sp)
 	// Quantum Fireball EX3.2A
 	// C/H/S: 3.2 - 6256/16/63
 	// Funworld label: 09.02.1999
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE( "photoplay99sp", 0, BAD_DUMP SHA1(887e5b8c931d6122a1c3a8eda5cb919eb162eced) ) // From an operated HDD. A clean one must be recreated from the CDs
 ROM_END
 
@@ -438,7 +438,7 @@ ROM_START(photoply99nl)
 	ROM_REGION(0x8000, "video_bios", 0 )
 	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic/Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE( "photoplay99nl", 0, BAD_DUMP SHA1(e3ff2a64f51e0ba07d08cd49cd56cdc866401b4f) ) // Recreated from the CDs using a VM
 ROM_END
 
@@ -455,7 +455,7 @@ ROM_START(photoply2k)
 	ROM_REGION(0x8000, "video_bios", 0 )
 	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.25.u2", 0x000000, 0x8000, CRC(7a859659) SHA1(ff667218261969c48082ec12aa91088a01b0cb2a) ) // Cirrus Logic/Quadtel CL-GD5436/46 PCI VGA BIOS v1.25
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE( "pp201", 0, SHA1(23e1940d485d19401e7d0ad912ddad2cf2ea10b4) )
 ROM_END
 
@@ -477,7 +477,7 @@ ROM_START(photoply2ksp)
 
 	// Western Digital PhD1000-00H
 	// CHS: 2100,16,63
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE( "photoplay2ksp", 0, BAD_DUMP SHA1(2b4b837d85bf8a41d832533afb9363fdb16f7a30) ) // From an operated HDD. A clean one must be recreated from the CDs
 ROM_END
 
@@ -498,7 +498,7 @@ ROM_START(photoply2knl)
 	ROM_REGION(0x800, "dongle", 0)
 	ROM_LOAD("marx_cbn-v-s.bin", 0x000, 0x800, NO_DUMP ) // Size unknown
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE( "photoplay2knl", 0, BAD_DUMP SHA1(75aa190913e798d04db88325006c61965f5034ef) ) // Recreated from the CDs using a VM
 ROM_END
 
@@ -513,7 +513,7 @@ ROM_START(photoply2k1it)
 	ROM_REGION(0x8000, "video_bios", 0 )
 	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic/Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE( "photoplay2k1it", 0, BAD_DUMP SHA1(274ea0ebc051d0f4846bc58a039d342241b4cc28) ) // Manually rebuilded by adding the resources for the folder C:\QP_MSTR from the 2001_NL version
 
 	// Recovery discs for Photo Play 2001
@@ -559,7 +559,7 @@ ROM_START(photoply2k1nl)
 	ROM_REGION(0x8000, "video_bios", 0 )
 	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic/Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE( "photoplay2k1nl", 0, BAD_DUMP SHA1(87c9417119e9566f65db0f1b0f2182db7712c634) ) // Recreated from the CDs using a VM
 
 	// Recovery discs for Photo Play 2001
@@ -605,7 +605,7 @@ ROM_START(photoply2k1mtnl)
 	ROM_REGION(0x8000, "video_bios", 0 )
 	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic/Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE( "photoplay2k1mtnl", 0, BAD_DUMP SHA1(cfa25ce036be9c2379a104a3b50d2aefd851ceeb) ) // Recreated from the CDs using a VM
 ROM_END
 
@@ -620,7 +620,7 @@ ROM_START(photoply2k2be)
 	ROM_REGION(0x8000, "video_bios", 0 )
 	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic/Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE( "photoplay2k2be", 0, BAD_DUMP SHA1(29719b5db60f4cc3787a3a9f6a5937226e282d46) ) // Recreated from the CDs using a VM
 ROM_END
 
@@ -638,7 +638,7 @@ ROM_START(photoply2k4)
 	ROM_REGION(0x8000, "video_bios", 0 )
 	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x000000, 0x8000, BAD_DUMP CRC(7a859659) SHA1(ff667218261969c48082ec12aa91088a01b0cb2a) ) // Cirrus Logic/Quadtel CL-GD5436/46 PCI VGA BIOS v1.25
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	// CYLS:1023,HEADS:64,SECS:63,BPS:512.
 	DISK_IMAGE( "pp2004", 0, SHA1(a3f8861cf91cf7e7446ec931f812e774ada20802) )
 ROM_END

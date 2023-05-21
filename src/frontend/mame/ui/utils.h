@@ -404,7 +404,6 @@ struct ui_globals
 
 // GLOBAL FUNCTIONS
 char* chartrimcarriage(char str[]);
-const char* strensure(const char* s);
 int getprecisionchr(const char* s);
 std::vector<std::string> tokenize(const std::string &text, char sep);
 

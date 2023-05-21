@@ -24,7 +24,6 @@ Refs:
     https://8bit.yarek.pl/interface/zx.generalsound/index.html
 
 TODO:
-- SPI
 - DMA
 - MP3
 
@@ -35,23 +34,37 @@ TODO:
 
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
+#include "machine/spi_sdcard.h"
 #include "sound/dac.h"
 #include "speaker.h"
 
+
+#define LOG_STATUS (1U << 1)
+#define LOG_WARN   (1U << 2)
+
+#define VERBOSE ( /*LOG_GENERAL | LOG_STATUS |*/ LOG_WARN )
+#include "logmacro.h"
+
+#define LOGSTATUS(...) LOGMASKED(LOG_STATUS, __VA_ARGS__)
+#define LOGWARN(...)   LOGMASKED(LOG_WARN,   __VA_ARGS__)
 
 namespace bus::spectrum::zxbus {
 
 namespace {
 
+#define TIMINGS_PERFECT	    1
+
 ROM_START( neogs )
 	ROM_REGION(0x80000, "maincpu", 0)
-	ROM_DEFAULT_BIOS("v1.08")
+	ROM_DEFAULT_BIOS("v1.10.2")
 
-	ROM_SYSTEM_BIOS(0, "v1.08", "v1.08")
-	ROMX_LOAD( "neogs108.rom", 0x0000, 0x80000, CRC(8e261323) SHA1(b500b4aa8dea7506d26ad9e50593d9d3bee11ae1), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(0, "v1.10.2", "v1.10 fix2")
+	ROMX_LOAD( "neogs110_fix2.rom", 0x0000, 0x80000, CRC(641a4976) SHA1(6409c111a8ca3314a52bdcfc3ba944b73c300987), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "v1.08", "v1.08")
+	ROMX_LOAD( "neogs108.rom", 0x0000, 0x80000, CRC(8e261323) SHA1(b500b4aa8dea7506d26ad9e50593d9d3bee11ae1), ROM_BIOS(1))
 
-	ROM_SYSTEM_BIOS(1, "test_muchkin", "Test ROM (Muchkin)")
-	ROMX_LOAD( "testrom_muchkin.rom", 0x0000, 0x80000, CRC(8ab10a88) SHA1(cff3ca96489e517568146a00412107259360d01e), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "test_muchkin", "Test ROM (Muchkin)")
+	ROMX_LOAD( "testrom_muchkin.rom", 0x0000, 0x80000, CRC(8ab10a88) SHA1(cff3ca96489e517568146a00412107259360d01e), ROM_BIOS(2))
 ROM_END
 
 class neogs_device : public device_t, public device_zxbus_card_interface
@@ -67,6 +80,7 @@ public:
 		, m_bank_ram(*this, "bank_ram")
 		, m_view(*this, "view")
 		, m_dac(*this, "dac%u", 0U)
+		, m_sdcard(*this, "sdcard")
 	{ }
 
 protected:
@@ -90,27 +104,49 @@ protected:
 	memory_bank_creator m_bank_rom;
 	memory_bank_creator m_bank_ram;
 	memory_view m_view;
-	required_device_array<dac_word_interface, 8> m_dac;
+	required_device_array<dac_word_interface, 2> m_dac;
+	required_device<spi_sdcard_sdhc_device> m_sdcard;
 
 private:
+	TIMER_CALLBACK_MEMBER(spi_clock);
+
 	template <u8 Bank> u8 ram_bank_r(offs_t offset);
 	template <u8 Bank> void ram_bank_w(offs_t offset, u8 data);
 
-	u8 status_r() { return m_status; }
-	void command_w(u8 data) { m_status |= 0x01; m_command_in = data; }
-	u8 data_r() { m_status &= ~0x80; return m_data_out; }
-	void data_w(u8 data) { m_status |= 0x80; m_data_in = data; }
-	void ctrl_w(u8 data);
+	u8 neogs_status_r();
+	void neogs_command_w(u8 data);
+	u8 neogs_data_r();
+	void neogs_data_w(u8 data);
+	void neogs_ctrl_w(u8 data);
+
+	void status_reset();
+	u8 data_r();
+	void data_w(u8 data);
+
+	void dac_flush();
+
+	void spi_ctrl_w(u8 data);
+	u8 sd_r();
+	void sd_w(u8 data);
 
 	u8 m_data_in;
 	u8 m_data_out;
 	u8 m_command_in;
 	u8 m_status;
 
+	u8 m_spi_ctrl;
+	u8 m_spi_data_out;
+	u8 m_spi_data_in_latch;
+
+	emu_timer *m_spi_clock;
+	int m_spi_clock_cycles;
+	bool m_spi_clock_state;
+
 	u8 m_mpag;
 	u8 m_mpagx;
 	u8 m_gscfg0;
 	u8 m_vol[8];
+	u8 m_sample[8];
 };
 
 void neogs_device::update_config()
@@ -133,12 +169,49 @@ void neogs_device::update_config()
 	m_maincpu->set_clock_scale(cpu_scale);
 }
 
-void neogs_device::ctrl_w(u8 data)
+u8 neogs_device::neogs_status_r()
+{
+	if (!machine().side_effects_disabled())
+		LOGSTATUS(" read STAT & %02X\n", m_status);
+	return m_status | 0x7e;
+}
+
+void neogs_device::neogs_command_w(u8 data)
+{
+	m_status |= 0x01;
+	LOGSTATUS("write CMD & %02X, status: %02X\n", data, m_status);
+	m_command_in = data;
+}
+
+u8 neogs_device::neogs_data_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_status &= ~0x80;
+		LOGSTATUS(" read DATA & %02X, status: %02X\n", m_data_out, m_status);
+	}
+	return m_data_out;
+}
+
+void neogs_device::neogs_data_w(u8 data)
+{
+	m_status |= 0x80;
+	LOGSTATUS("write: DATA & %02X, status: %02X\n", data, m_status);
+	m_data_in = data;
+}
+
+void neogs_device::neogs_ctrl_w(u8 data)
 {
 	if (data & 0x80)
+	{
+		LOG("Reset Request\n");
 		reset();
+	}
 	if (data & 0x40)
+	{
+		LOG("NMI Request\n");
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	}
 	if (data & 0x20)
 		; // LED data:0 - 1-on, 0-off
 }
@@ -153,8 +226,116 @@ template <u8 Bank> void neogs_device::ram_bank_w(offs_t offset, u8 data)
 	m_ram->write((0xc000 * Bank) + offset, data);
 }
 
+void neogs_device::status_reset()
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_status &= ~0x01;
+		LOGSTATUS(" read: 05, status: %02X\n", m_status);
+	}
+}
+
+u8 neogs_device::data_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_status &= ~0x80;
+		LOGSTATUS(" read: 02 & %02X, status: %02X\n", m_data_in, m_status);
+	}
+	return m_data_in;
+}
+
+void neogs_device::data_w(u8 data)
+{
+	m_status |= 0x80;
+	LOGSTATUS("write: 03 & %02X, status: %02X\n", data, m_status);
+	m_data_out = data;
+}
+
+void neogs_device::spi_ctrl_w(u8 data)
+{
+	if (BIT(data, 7))
+		m_spi_ctrl |= (data & 0x0f);
+	else
+		m_spi_ctrl &= (~data & 0x0f);
+}
+
+u8 neogs_device::sd_r()
+{
+	u8 din = m_spi_data_in_latch;
+	if (!machine().side_effects_disabled())
+		sd_w(0xff);
+
+	return din;
+}
+
+void neogs_device::sd_w(u8 data)
+{
+	m_spi_data_out = data;
+#if TIMINGS_PERFECT
+	m_spi_clock_cycles = 8;
+	m_spi_clock->adjust(m_maincpu->clocks_to_attotime(1) / 4, 0, m_maincpu->clocks_to_attotime(1) / 4);
+#else
+	m_sdcard->spi_ss_w(BIT(~m_spi_ctrl, 0));
+	for (u8 m = 0x80; m; m >>= 1)
+	{
+		m_sdcard->spi_mosi_w(m_spi_data_out & m ? 1 : 0);
+		m_sdcard->spi_clock_w(CLEAR_LINE);
+		m_sdcard->spi_clock_w(ASSERT_LINE);
+	}
+#endif
+}
+
+void neogs_device::dac_flush()
+{
+	s16 left = 0;
+	s16 right = 0;
+	for (auto ch = 0; ch < 8; ch++)
+	{
+		const bool leftright = BIT(~ch, 1);
+		const u8 sample = m_sample[ch] ^ (m_gscfg0 & 0x80); // INV7B
+		const s16 out = (sample - 0x80) * m_vol[ch];
+		if (leftright)
+			left += out;
+		else
+			right += out;
+
+		if (BIT(m_gscfg0, 2) && BIT(m_gscfg0, 6)) // PAN4CH
+			;
+	}
+	m_dac[0]->data_w(left);
+	m_dac[1]->data_w(right);
+}
+
+TIMER_CALLBACK_MEMBER(neogs_device::spi_clock)
+{
+	if (m_spi_clock_cycles > 0)
+	{
+		m_sdcard->spi_ss_w(BIT(~m_spi_ctrl, 0));
+
+		if (m_spi_clock_state)
+		{
+			m_sdcard->spi_clock_w(ASSERT_LINE);
+			m_spi_clock_cycles--;
+		}
+		else
+		{
+			m_sdcard->spi_mosi_w(BIT(m_spi_data_out, m_spi_clock_cycles - 1));
+			m_sdcard->spi_clock_w(CLEAR_LINE);
+		}
+
+		m_spi_clock_state = !m_spi_clock_state;
+	}
+	else
+	{
+		m_spi_clock_state = false;
+		m_spi_clock->adjust(attotime::never);
+	}
+}
+
 INTERRUPT_GEN_MEMBER(neogs_device::irq0_line_assert)
 {
+	dac_flush();
 	m_maincpu->pulse_input_line(INPUT_LINE_IRQ0, attotime::from_ticks(32,  m_maincpu->clock()));
 }
 
@@ -177,31 +358,45 @@ void neogs_device::map_io(address_map &map)
 		NAME([this](offs_t offset, u8 data) { m_mpag = data; update_config(); }));
 	map(0x0001, 0x0001).mirror(0xff00).lr8(
 		NAME([this](offs_t offset)          { return m_command_in; }));
-	map(0x0002, 0x0002).mirror(0xff00).lr8(
-		NAME([this](offs_t offset)          { m_status &= ~0x80; return m_data_in; }));
-	map(0x0003, 0x0003).mirror(0xff00).lw8(
-		NAME([this](offs_t offset, u8 data) { m_status |= 0x80; m_data_out = data; }));
+	map(0x0002, 0x0002).mirror(0xff00).r(FUNC(neogs_device::data_r));
+	map(0x0003, 0x0003).mirror(0xff00).w(FUNC(neogs_device::data_w));
 	map(0x0004, 0x0004).mirror(0xff00).lr8(
 		NAME([this](offs_t offset)          { return m_status; }));
 	map(0x0005, 0x0005).mirror(0xff00).lrw8(
-		NAME([this](offs_t offset)          { m_status &= ~0x01; return ~0; }),
-		NAME([this](offs_t offset, u8 data) { m_status &= ~0x01; }));
+		NAME([this](offs_t offset)          { status_reset(); return ~0; }),
+		NAME([this](offs_t offset, u8 data) { m_status &= ~0x01; LOGSTATUS("write: 05, status: %02X\n", m_status); }));
 	map(0x0006, 0x0009).mirror(0xff00).lw8(
 		NAME([this](offs_t offset, u8 data) { m_vol[offset] = data & 0x3f; }));
 	map(0x0016, 0x0019).mirror(0xff00).lw8(
 		NAME([this](offs_t offset, u8 data) { m_vol[4 + offset] = data & 0x3f; }));
 	map(0x0010, 0x0010).mirror(0xff00).lw8(
 		NAME([this](offs_t offset, u8 data) { m_mpagx = data; update_config(); }));
-	//map(0x000a, 0x000a).mirror(0xff00).noprw();
-	//map(0x000b, 0x000b).mirror(0xff00).noprw();
+	map(0x000a, 0x000a).mirror(0xff00).lrw8(
+		NAME([this](offs_t offset)          { if (!machine().side_effects_disabled()) { m_status = (m_status & 0x7f) | (m_mpag << 7); } return ~0; }),
+		NAME([this](offs_t offset, u8 data) { m_status = (m_status & 0x7f) | (m_mpag << 7); }));
+	map(0x000b, 0x000b).mirror(0xff00).lrw8(
+		NAME([this](offs_t offset)          { if (!machine().side_effects_disabled()) { m_status = (m_status & 0xfe) | (m_vol[0] >> 5); } return ~0; }),
+		NAME([this](offs_t offset, u8 data) { m_status = (m_status & 0xfe) | ((m_vol[0] >> 5) & 1); }));
 
 	map(0x000f, 0x000f).mirror(0xff00).lrw8(
 		NAME([this](offs_t offset)          { return m_gscfg0; }),
-		NAME([this](offs_t offset, u8 data) { m_gscfg0 = data; update_config(); }));
+		NAME([this](offs_t offset, u8 data) { m_gscfg0 = data & 0x3f; update_config(); }));
 
-	map(0x0011, 0x0011).mirror(0xff00).nopw();
-	map(0x0013, 0x0013).mirror(0xff00).noprw();
-	map(0x0014, 0x0014).mirror(0xff00).nopr();
+	map(0x0011, 0x0011).mirror(0xff00).lr8(
+		NAME([this]()                       { return m_spi_ctrl; })).w(FUNC(neogs_device::spi_ctrl_w));
+	map(0x0012, 0x0012).mirror(0xff00).lr8(
+		NAME([this](offs_t offset)          { return (m_sdcard->get_card_present() << 1) | 0x05; })); // SSTAT
+
+	//SPI
+	map(0x0013, 0x0013).mirror(0xff00).lr8(
+		NAME([this]()                       { return m_spi_data_in_latch; })).w(FUNC(neogs_device::sd_w));
+	map(0x0014, 0x0014).mirror(0xff00).r(FUNC(neogs_device::sd_r));
+
+	// MP3
+	//map(0x0014, 0x0014).mirror(0xff00).nopw();
+	map(0x0015, 0x0015).mirror(0xff00).lrw8(
+		NAME([](offs_t offset)          { return 0xff; }),
+		NAME([](offs_t offset, u8 data) { ;/* TODO */ }));
 }
 
 void neogs_device::device_add_mconfig(machine_config &config)
@@ -213,11 +408,14 @@ void neogs_device::device_add_mconfig(machine_config &config)
 	m_maincpu->set_io_map(&neogs_device::map_io);
 	m_maincpu->set_periodic_int(FUNC(neogs_device::irq0_line_assert), attotime::from_hz(37.5_kHz_XTAL));
 
+	SPI_SDCARD(config, m_sdcard, 0);
+	m_sdcard->spi_miso_callback().set([this](int state) { m_spi_data_in_latch <<= 1; m_spi_data_in_latch |= state; });
+
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	for (auto i = 0; i < 8; i++)
-		DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[i], 0).add_route(ALL_OUTPUTS, (i & 2) ? "rspeaker" : "lspeaker", 0.5); // TDA1543
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[0], 0).add_route(ALL_OUTPUTS, "lspeaker", 0.75); // TDA1543
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[1], 0).add_route(ALL_OUTPUTS, "rspeaker", 0.75);
 }
 
 const tiny_rom_entry *neogs_device::device_rom_region() const
@@ -227,15 +425,17 @@ const tiny_rom_entry *neogs_device::device_rom_region() const
 
 void neogs_device::neogsmap(address_map &map)
 {
-	map(0x00bb, 0x00bb).mirror(0xff00).rw(FUNC(neogs_device::status_r), FUNC(neogs_device::command_w));
-	map(0x00b3, 0x00b3).mirror(0xff00).rw(FUNC(neogs_device::data_r), FUNC(neogs_device::data_w));
-	map(0x0033, 0x0033).mirror(0xff00).w(FUNC(neogs_device::ctrl_w));
+	map(0x00bb, 0x00bb).mirror(0xff00).rw(FUNC(neogs_device::neogs_status_r), FUNC(neogs_device::neogs_command_w));
+	map(0x00b3, 0x00b3).mirror(0xff00).rw(FUNC(neogs_device::neogs_data_r), FUNC(neogs_device::neogs_data_w));
+	map(0x0033, 0x0033).mirror(0xff00).w(FUNC(neogs_device::neogs_ctrl_w));
 }
 
 void neogs_device::device_start()
 {
 	if (!m_ram->started())
 		throw device_missing_dependencies();
+
+	m_spi_clock = timer_alloc(FUNC(neogs_device::spi_clock), this);
 
 	m_bank_rom->configure_entries(0, m_rom.bytes() / 0x8000,  &m_rom[0], 0x8000);
 	m_bank_ram->configure_entries(0, m_ram->size() / 0x8000, m_ram->pointer(), 0x8000);
@@ -246,11 +446,7 @@ void neogs_device::device_start()
 				if (!machine().side_effects_disabled())
 				{
 					const u8 chanel = BIT(offset, 8, BIT(m_gscfg0, 2) ? 3 : 2); // 8CHANS
-					const u8 sample = data ^ (m_gscfg0 & 0x80); // INV7B
-					const s16 out = (sample - 0x80) * (m_vol[chanel] << 2);
-					m_dac[chanel]->data_w(out);
-					if (BIT(m_gscfg0, 2) && BIT(m_gscfg0, 6)) // PAN4CH
-						;
+					m_sample[chanel] = data;
 				}
 			});
 
@@ -259,9 +455,20 @@ void neogs_device::device_start()
 
 void neogs_device::device_reset()
 {
+	m_spi_clock->adjust(attotime::never);
+	m_spi_clock_cycles = 0;
+	m_spi_clock_state = false;
+	m_spi_ctrl = 0x07;
+
+	u8 vol[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+	std::copy(std::begin(vol), std::end(vol), std::begin(m_vol));
+
+	m_spi_data_in_latch = 0xff;
+	m_spi_data_out = 0xff;
+
 	m_status = 0;
-	m_gscfg0 = 0;
 	m_mpag = 0;
+	m_gscfg0 = 0x30;
 	update_config();
 }
 

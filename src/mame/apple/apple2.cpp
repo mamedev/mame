@@ -177,6 +177,8 @@ private:
 
 	int m_inh_bank;
 
+	bool m_reset_latch;
+
 	double m_x_calibration, m_y_calibration;
 
 	device_a2bus_card_interface *m_slotdevice[8];
@@ -292,6 +294,7 @@ void apple2_state::machine_start()
 	}
 
 	m_joystick_x1_time = m_joystick_x2_time = m_joystick_y1_time = m_joystick_y2_time = 0;
+	m_reset_latch = false;
 
 	// setup save states
 	save_item(NAME(m_speaker_state));
@@ -307,6 +310,7 @@ void apple2_state::machine_start()
 	save_item(NAME(m_inh_bank));
 	save_item(NAME(m_cnxx_slot));
 	save_item(NAME(m_anykeydown));
+	save_item(NAME(m_reset_latch));
 
 	// setup video pointers
 	m_video->set_ram_pointers(m_ram_ptr, m_ram_ptr);
@@ -337,14 +341,38 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2_state::apple2_interrupt)
 			{       // CTRL-RESET
 				if ((m_kbspecial->read() & 0x88) == 0x88)
 				{
-					m_maincpu->reset();
+					if (!m_reset_latch)
+					{
+						m_reset_latch = true;
+						m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+					}
+				}
+				else
+				{
+					if (m_reset_latch)
+					{
+						m_reset_latch = false;
+						m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+					}
 				}
 			}
 			else    // plain RESET
 			{
 				if (m_kbspecial->read() & 0x80)
 				{
-					m_maincpu->reset();
+					if (!m_reset_latch)
+					{
+						m_reset_latch = true;
+						m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+					}
+				}
+				else
+				{
+					if (m_reset_latch)
+					{
+						m_reset_latch = false;
+						m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+					}
 				}
 			}
 		}

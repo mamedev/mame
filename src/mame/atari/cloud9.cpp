@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Mike Balfour, Aaron Giles
+// copyright-holders: Mike Balfour, Aaron Giles
+
 /***************************************************************************
 
     Atari Cloud 9 (prototype) hardware
@@ -17,7 +18,7 @@
 
     Horizontal sync chain:
 
-        Appears to be the same as Crystal Castles. See ccastles.c for
+        Appears to be the same as Crystal Castles. See ccastles.cpp for
         details.
 
         Pixel clock = 5MHz
@@ -93,21 +94,383 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cloud9.h"
 
 #include "cpu/m6502/m6502.h"
+#include "machine/74259.h"
 #include "machine/watchdog.h"
+#include "machine/x2212.h"
 #include "sound/pokey.h"
+#include "video/resnet.h"
+
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
 
 
-#define MASTER_CLOCK          (10000000)
+namespace {
 
-#define PIXEL_CLOCK           (MASTER_CLOCK/2)
-#define HTOTAL                (320)
-#define VTOTAL                (256)
+class cloud9_state : public driver_device
+{
+public:
+	cloud9_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_nvram(*this, "nvram"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_videolatch(*this, "videolatch"),
+		m_videoram(*this, "videoram", 0x8000U, ENDIANNESS_LITTLE),
+		m_spriteram(*this, "spriteram"),
+		m_paletteram(*this, "paletteram"),
+		m_syncprom(*this, "syncprom"),
+		m_wpprom(*this, "wpprom"),
+		m_track(*this, "TRACK%c", 'X')
+	{ }
+
+	DECLARE_READ_LINE_MEMBER(vblank_r);
+	void cloud9(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	// devices
+	required_device<m6502_device> m_maincpu;
+	required_device<x2212_device> m_nvram;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<ls259_device> m_videolatch;
+
+	// memory pointers
+	memory_share_creator<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_paletteram;
+	required_region_ptr<uint8_t> m_syncprom;
+	required_region_ptr<uint8_t> m_wpprom;
+
+	required_ioport_array<2> m_track;
+
+	// video-related
+	bitmap_ind16 m_spritebitmap = 0;
+	double m_rweights[3]{};
+	double m_gweights[3]{};
+	double m_bweights[3]{};
+	uint8_t m_bitmode_addr[2]{};
+
+	// misc
+	int m_vblank_start = 0;
+	int m_vblank_end = 0;
+	emu_timer *m_irq_timer = nullptr;
+	uint8_t m_irq_state = 0U;
+
+	void irq_ack_w(uint8_t data);
+	uint8_t leta_r(offs_t offset);
+	void nvram_recall_w(uint8_t data);
+	void nvram_store_w(uint8_t data);
+	void paletteram_w(offs_t offset, uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	uint8_t bitmode_r();
+	void bitmode_w(uint8_t data);
+	void bitmode_addr_w(offs_t offset, uint8_t data);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(clock_irq);
+	inline void write_vram(uint16_t addr, uint8_t data, uint8_t bitmd, uint8_t pixba);
+	inline void bitmode_autoinc();
+	inline void schedule_next_irq(int curscanline);
+	void program_map(address_map &map);
+};
 
 
+// video
+
+/*************************************
+ *
+ *  Video startup
+ *
+ *************************************/
+
+void cloud9_state::video_start()
+{
+	static const int resistances[3] = { 22000, 10000, 4700 };
+
+	// allocate second bank of videoram
+	membank("videoram_bank")->set_base(m_videoram.target());
+
+	// compute the color output resistor weights at startup
+	compute_resistor_weights(0, 255, -1.0,
+			3,  resistances, m_rweights, 1000, 0,
+			3,  resistances, m_gweights, 1000, 0,
+			3,  resistances, m_bweights, 1000, 0);
+
+	// allocate a bitmap for drawing sprites
+	m_screen->register_screen_bitmap(m_spritebitmap);
+
+	// register for savestates
+	save_item(NAME(m_bitmode_addr));
+}
+
+
+
+/*************************************
+ *
+ *  Palette RAM accesses
+ *
+ *************************************/
+
+void cloud9_state::paletteram_w(offs_t offset, uint8_t data)
+{
+	int bit0, bit1, bit2;
+
+	// extract the raw RGB bits
+	int r = (data & 0xe0) >> 5;
+	int g = (data & 0x1c) >> 2;
+	int b = ((data & 0x03) << 1) | ((offset & 0x40) >> 6);
+
+	// red component (inverted)
+	bit0 = (~r >> 0) & 0x01;
+	bit1 = (~r >> 1) & 0x01;
+	bit2 = (~r >> 2) & 0x01;
+	r = combine_weights(m_rweights, bit0, bit1, bit2);
+
+	// green component (inverted)
+	bit0 = (~g >> 0) & 0x01;
+	bit1 = (~g >> 1) & 0x01;
+	bit2 = (~g >> 2) & 0x01;
+	g = combine_weights(m_gweights, bit0, bit1, bit2);
+
+	// blue component (inverted)
+	bit0 = (~b >> 0) & 0x01;
+	bit1 = (~b >> 1) & 0x01;
+	bit2 = (~b >> 2) & 0x01;
+	b = combine_weights(m_bweights, bit0, bit1, bit2);
+
+	m_palette->set_pen_color(offset & 0x3f, rgb_t(r, g, b));
+}
+
+
+
+/*************************************
+ *
+ *  Video RAM access via the write
+ *  protect PROM
+ *
+ *************************************/
+
+inline void cloud9_state::write_vram(uint16_t addr, uint8_t data, uint8_t bitmd, uint8_t pixba)
+{
+	uint8_t *dest = &m_videoram[0x0000 | (addr & 0x3fff)];
+	uint8_t *dest2 = &m_videoram[0x4000 | (addr & 0x3fff)];
+	uint8_t promaddr = 0;
+
+	/*
+	    Inputs to the write-protect PROM:
+
+	    Bit 7 = BITMD
+	    Bit 6 = video_control[4]
+	    Bit 5 = video_control[6]
+	    Bit 4 = 1 if (A15-A12 != 4)
+	    Bit 3 = !(A13 | A12 | A11)
+	    Bit 2 = A9 & A10
+	    Bit 1 = PIXB
+	    Bit 0 = PIXA
+	*/
+	promaddr |= bitmd << 7;
+	promaddr |= m_videolatch->q4_r() << 6;
+	promaddr |= m_videolatch->q6_r() << 5;
+	promaddr |= ((addr & 0xf000) != 0x4000) << 4;
+	promaddr |= ((addr & 0x3800) == 0x0000) << 3;
+	promaddr |= ((addr & 0x0600) == 0x0600) << 2;
+	promaddr |= (pixba << 0);
+
+	// look up the PROM result
+	uint8_t const wpbits = m_wpprom[promaddr];
+
+	// write to the appropriate parts of VRAM depending on the result
+	if (!(wpbits & 1))
+		dest2[0] = (dest2[0] & 0x0f) | (data & 0xf0);
+	if (!(wpbits & 2))
+		dest2[0] = (dest2[0] & 0xf0) | (data & 0x0f);
+	if (!(wpbits & 4))
+		dest[0] = (dest[0] & 0x0f) | (data & 0xf0);
+	if (!(wpbits & 8))
+		dest[0] = (dest[0] & 0xf0) | (data & 0x0f);
+}
+
+
+
+/*************************************
+ *
+ *  Autoincrement control for bit mode
+ *
+ *************************************/
+
+inline void cloud9_state::bitmode_autoinc()
+{
+	// auto increment in the x-direction if it's enabled
+	if (!m_videolatch->q0_r()) // /AX
+		m_bitmode_addr[0]++;
+
+	// auto increment in the y-direction if it's enabled
+	if (!m_videolatch->q1_r()) // /AY
+		m_bitmode_addr[1]++;
+}
+
+
+
+/*************************************
+ *
+ *  Standard video RAM access
+ *
+ *************************************/
+
+void cloud9_state::videoram_w(offs_t offset, uint8_t data)
+{
+	// direct writes to VRAM go through the write protect PROM as well
+	write_vram(offset, data, 0, 0);
+}
+
+
+
+/*************************************
+ *
+ *  Bit mode video RAM access
+ *
+ *************************************/
+
+uint8_t cloud9_state::bitmode_r()
+{
+	// in bitmode, the address comes from the autoincrement latches
+	uint16_t const addr = (m_bitmode_addr[1] << 6) | (m_bitmode_addr[0] >> 2);
+
+	// the appropriate pixel is selected into the upper 4 bits
+	uint8_t const result = m_videoram[((~m_bitmode_addr[0] & 2) << 13) | addr] << ((m_bitmode_addr[0] & 1) * 4);
+
+	// autoincrement because /BITMD was selected
+	bitmode_autoinc();
+
+	// the upper 4 bits of the data lines are not driven so make them all 1's
+	return (result >> 4) | 0xf0;
+}
+
+
+void cloud9_state::bitmode_w(uint8_t data)
+{
+	// in bitmode, the address comes from the autoincrement latches
+	uint16_t const addr = (m_bitmode_addr[1] << 6) | (m_bitmode_addr[0] >> 2);
+
+	// the lower 4 bits of data are replicated to the upper 4 bits
+	data = (data & 0x0f) | (data << 4);
+
+	// write through the generic VRAM routine, passing the low 2 X bits as PIXB/PIXA
+	write_vram(addr, data, 1, m_bitmode_addr[0] & 3);
+
+	// autoincrement because /BITMD was selected
+	bitmode_autoinc();
+}
+
+
+void cloud9_state::bitmode_addr_w(offs_t offset, uint8_t data)
+{
+	// write through to video RAM and also to the addressing latches
+	write_vram(offset, data, 0, 0);
+	m_bitmode_addr[offset] = data;
+}
+
+
+
+/*************************************
+ *
+ *  Video updating
+ *
+ *************************************/
+
+uint32_t cloud9_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	uint8_t const *const spriteaddr = m_spriteram;
+	int const flip = m_videolatch->q5_r() ? 0xff : 0x00;    // PLAYER2
+	pen_t const black = m_palette->black_pen();
+
+	// draw the sprites
+	m_spritebitmap.fill(0x00, cliprect);
+	for (int offs = 0; offs < 0x20; offs++)
+		if (spriteaddr[offs + 0x00] != 0)
+		{
+			int const x = spriteaddr[offs + 0x60];
+			int const y = 256 - 15 - spriteaddr[offs + 0x00];
+			int const xflip = spriteaddr[offs + 0x40] & 0x80;
+			int const yflip = spriteaddr[offs + 0x40] & 0x40;
+			int const which = spriteaddr[offs + 0x20];
+			int const color = 0;
+
+			m_gfxdecode->gfx(0)->transpen(m_spritebitmap, cliprect, which, color, xflip, yflip, x, y, 0);
+			if (x >= 256 - 16)
+				m_gfxdecode->gfx(0)->transpen(m_spritebitmap, cliprect, which, color, xflip, yflip, x - 256, y, 0);
+		}
+
+	// draw the bitmap to the screen, looping over Y
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+	{
+		uint16_t *const dst = &bitmap.pix(y);
+
+		// if we're in the VBLANK region, just fill with black
+		if (~m_syncprom[y] & 2)
+		{
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
+				dst[x] = black;
+		}
+
+		// non-VBLANK region: merge the sprites and the bitmap
+		else
+		{
+			uint16_t const *const mosrc = &m_spritebitmap.pix(y);
+			int const effy = y ^ flip;
+
+			// two videoram arrays
+			uint8_t const *const src[2]{ &m_videoram[0x4000 | (effy * 64)], &m_videoram[0x0000 | (effy * 64)] };
+
+			// loop over X
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
+			{
+				// if we're in the HBLANK region, just store black
+				if (x >= 256)
+					dst[x] = black;
+
+				// otherwise, process normally
+				else
+				{
+					int const effx = x ^ flip;
+
+					// low 4 bits = left pixel, high 4 bits = right pixel
+					uint8_t pix = (src[(effx >> 1) & 1][effx / 4] >> ((~effx & 1) * 4)) & 0x0f;
+					uint8_t const mopix = mosrc[x];
+
+					// sprites have priority if sprite pixel != 0 or some other condition
+					if (mopix != 0)
+						pix = mopix | 0x10;
+
+					// the high bit is the bank select
+					pix |= m_videolatch->q7_r() << 5;
+
+					// store the pixel value and also a priority value based on the topmost bit
+					dst[x] = pix;
+				}
+			}
+		}
+	}
+	return 0;
+}
+
+
+// machine
+
+static constexpr double MASTER_CLOCK = 10'000'000;
+static constexpr double PIXEL_CLOCK = MASTER_CLOCK / 2;
+static constexpr uint16_t HTOTAL = 320;
+static constexpr uint16_t VTOTAL = 256;
 
 /*************************************
  *
@@ -117,34 +480,34 @@
 
 inline void cloud9_state::schedule_next_irq(int curscanline)
 {
-	/* IRQ is clocked by /32V, so every 64 scanlines */
+	// IRQ is clocked by /32V, so every 64 scanlines
 	curscanline = (curscanline + 64) & 255;
 
-	/* next one at the start of this scanline */
+	// next one at the start of this scanline
 	m_irq_timer->adjust(m_screen->time_until_pos(curscanline), curscanline);
 }
 
 
 TIMER_CALLBACK_MEMBER(cloud9_state::clock_irq)
 {
-	/* assert the IRQ if not already asserted */
+	// assert the IRQ if not already asserted
 	if (!m_irq_state)
 	{
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 		m_irq_state = 1;
 	}
 
-	/* force an update now */
+	// force an update now
 	m_screen->update_partial(m_screen->vpos());
 
-	/* find the next edge */
+	// find the next edge
 	schedule_next_irq(param);
 }
 
 
 READ_LINE_MEMBER(cloud9_state::vblank_r)
 {
-	int scanline = m_screen->vpos();
+	int const scanline = m_screen->vpos();
 	return (~m_syncprom[scanline & 0xff] >> 1) & 1;
 }
 
@@ -160,34 +523,31 @@ void cloud9_state::machine_start()
 {
 	rectangle visarea;
 
-	/* initialize globals */
-	m_syncprom = memregion("proms")->base() + 0x000;
-
-	/* find the start of VBLANK in the SYNC PROM */
+	// find the start of VBLANK in the SYNC PROM
 	for (m_vblank_start = 0; m_vblank_start < 256; m_vblank_start++)
 		if ((m_syncprom[(m_vblank_start - 1) & 0xff] & 2) != 0 && (m_syncprom[m_vblank_start] & 2) == 0)
 			break;
 	if (m_vblank_start == 0)
 		m_vblank_start = 256;
 
-	/* find the end of VBLANK in the SYNC PROM */
+	// find the end of VBLANK in the SYNC PROM
 	for (m_vblank_end = 0; m_vblank_end < 256; m_vblank_end++)
 		if ((m_syncprom[(m_vblank_end - 1) & 0xff] & 2) == 0 && (m_syncprom[m_vblank_end] & 2) != 0)
 			break;
 
-	/* can't handle the wrapping case */
+	// can't handle the wrapping case
 	assert(m_vblank_end < m_vblank_start);
 
-	/* reconfigure the visible area to match */
+	// reconfigure the visible area to match
 	visarea.set(0, 255, m_vblank_end + 1, m_vblank_start);
 	m_screen->configure(320, 256, visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
 
-	/* create a timer for IRQs and set up the first callback */
+	// create a timer for IRQs and set up the first callback
 	m_irq_timer = timer_alloc(FUNC(cloud9_state::clock_irq), this);
 	m_irq_state = 0;
-	schedule_next_irq(0-64);
+	schedule_next_irq(0 - 64);
 
-	/* setup for save states */
+	// setup for save states
 	save_item(NAME(m_irq_state));
 }
 
@@ -218,7 +578,7 @@ void cloud9_state::irq_ack_w(uint8_t data)
 
 uint8_t cloud9_state::leta_r(offs_t offset)
 {
-	return ioport(offset ? "TRACKX" : "TRACKY")->read();
+	return offset ? m_track[0]->read() : m_track[1]->read();
 }
 
 
@@ -252,15 +612,15 @@ void cloud9_state::nvram_store_w(uint8_t data)
  *
  *************************************/
 
-void cloud9_state::cloud9_map(address_map &map)
+void cloud9_state::program_map(address_map &map)
 {
-	map(0x0000, 0x4fff).bankr("bank1").w(FUNC(cloud9_state::cloud9_videoram_w));
-	map(0x0000, 0x0001).w(FUNC(cloud9_state::cloud9_bitmode_addr_w));
-	map(0x0002, 0x0002).rw(FUNC(cloud9_state::cloud9_bitmode_r), FUNC(cloud9_state::cloud9_bitmode_w));
-	map(0x5000, 0x53ff).ram().share("spriteram");
+	map(0x0000, 0x4fff).bankr("videoram_bank").w(FUNC(cloud9_state::videoram_w));
+	map(0x0000, 0x0001).w(FUNC(cloud9_state::bitmode_addr_w));
+	map(0x0002, 0x0002).rw(FUNC(cloud9_state::bitmode_r), FUNC(cloud9_state::bitmode_w));
+	map(0x5000, 0x53ff).ram().share(m_spriteram);
 	map(0x5400, 0x547f).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x5480, 0x54ff).w(FUNC(cloud9_state::irq_ack_w));
-	map(0x5500, 0x557f).ram().w(FUNC(cloud9_state::cloud9_paletteram_w)).share("paletteram");
+	map(0x5500, 0x557f).ram().w(FUNC(cloud9_state::paletteram_w)).share(m_paletteram);
 	map(0x5580, 0x5587).mirror(0x0078).w(m_videolatch, FUNC(ls259_device::write_d7)); // video control registers
 	map(0x5600, 0x5607).mirror(0x0078).w("outlatch", FUNC(ls259_device::write_d7));
 	map(0x5680, 0x56ff).w(FUNC(cloud9_state::nvram_store_w));
@@ -382,7 +742,7 @@ INPUT_PORTS_END
  *************************************/
 
 static GFXDECODE_START( gfx_cloud9 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, gfx_16x16x4_planar, 0, 4 )
+	GFXDECODE_ENTRY( "sprites", 0x0000, gfx_16x16x4_planar, 0, 4 )
 GFXDECODE_END
 
 
@@ -394,9 +754,9 @@ GFXDECODE_END
 
 void cloud9_state::cloud9(machine_config &config)
 {
-	/* basic machine hardware */
-	M6502(config, m_maincpu, MASTER_CLOCK/8);
-	m_maincpu->set_addrmap(AS_PROGRAM, &cloud9_state::cloud9_map);
+	// basic machine hardware
+	M6502(config, m_maincpu, MASTER_CLOCK / 8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cloud9_state::program_map);
 
 	ls259_device &outlatch(LS259(config, "outlatch"));
 	outlatch.q_out_cb<0>().set([this] (int state) { machine().bookkeeping().coin_counter_w(0, state); });
@@ -408,27 +768,27 @@ void cloud9_state::cloud9(machine_config &config)
 
 	X2212(config, "nvram").set_auto_save(true);
 
-	/* video hardware */
+	// video hardware
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cloud9);
 	PALETTE(config, m_palette).set_entries(64);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz((double)PIXEL_CLOCK / (double)VTOTAL / (double)HTOTAL);
 	m_screen->set_size(HTOTAL, VTOTAL);
-	m_screen->set_vblank_time(0);          /* VBLANK is handled manually */
+	m_screen->set_vblank_time(0);          // VBLANK is handled manually
 	m_screen->set_visarea(0, 255, 0, 231);
-	m_screen->set_screen_update(FUNC(cloud9_state::screen_update_cloud9));
+	m_screen->set_screen_update(FUNC(cloud9_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	LS259(config, m_videolatch);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	pokey_device &pokey1(POKEY(config, "pokey1", MASTER_CLOCK/8));
+	pokey_device &pokey1(POKEY(config, "pokey1", MASTER_CLOCK / 8));
 	pokey1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	pokey_device &pokey2(POKEY(config, "pokey2", MASTER_CLOCK/8));
+	pokey_device &pokey2(POKEY(config, "pokey2", MASTER_CLOCK / 8));
 	pokey2.allpot_r().set_ioport("DSW");
 	pokey2.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
@@ -449,17 +809,21 @@ ROM_START( cloud9 )
 	ROM_LOAD( "c9_c000.bin", 0xc000, 0x2000, CRC(26a4d7df) SHA1(8eef0a5f5d1ff13eec75d0c50f5a5dea28486ae5) )
 	ROM_LOAD( "c9_e000.bin", 0xe000, 0x2000, CRC(6e663bce) SHA1(4f4a5dc57ba6bc38a17973a6644849f6f5a2dfd1) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "sprites", 0 )
 	ROM_LOAD( "c9_gfx0.bin", 0x0000, 0x1000, CRC(d01a8019) SHA1(a77d6125b116ab4bf9446e3b99469dad2719f7e5) )
 	ROM_LOAD( "c9_gfx1.bin", 0x1000, 0x1000, CRC(514ac009) SHA1(f05081d8da47e650b0bd12cd00460c98a4f745b1) )
 	ROM_LOAD( "c9_gfx2.bin", 0x2000, 0x1000, CRC(930c1ade) SHA1(ba22cb7b105da2ab8c40574e70f18d594d833452) )
 	ROM_LOAD( "c9_gfx3.bin", 0x3000, 0x1000, CRC(27e9b88d) SHA1(a1d27e62eea9cdff662a3c160f650bbdb32b7f47) )
 
-	ROM_REGION( 0x400, "proms", 0 )
-	ROM_LOAD( "63s141.e10",  0x0000, 0x0100, BAD_DUMP CRC(8e98083f) SHA1(ed29c7ed2226613ed5d09ecef4e645e3b53f7f8d) )    /* Sync PROM */
-	ROM_LOAD( "63s141.m10",  0x0100, 0x0100, BAD_DUMP CRC(b0b039c0) SHA1(724fa88f3f3c62b3c9345cdb13e114a10b7bbdb0) )    /* ??? PROM */
-	ROM_LOAD( "82s129.p3",   0x0200, 0x0100, BAD_DUMP CRC(615d784d) SHA1(e7e6397ae45d6ae8b3670b457ede79c42d18d71f) )    /* VRAM Write Protect PROM */
-	ROM_LOAD( "63s141.m8",   0x0300, 0x0100, BAD_DUMP CRC(6d7479ec) SHA1(7a7c30f5846b98afaaca2af9aab82416ebafe4cc) )    /* ??? PROM */
+	ROM_REGION( 0x100, "syncprom", 0 )
+	ROM_LOAD( "63s141.e10", 0x0000, 0x0100, BAD_DUMP CRC(8e98083f) SHA1(ed29c7ed2226613ed5d09ecef4e645e3b53f7f8d) )  // Sync PROM
+
+	ROM_REGION( 0x100, "wpprom", 0 )
+	ROM_LOAD( "82s129.p3",  0x0000, 0x0100, BAD_DUMP CRC(615d784d) SHA1(e7e6397ae45d6ae8b3670b457ede79c42d18d71f) )  // VRAM Write Protect PROM
+
+	ROM_REGION( 0x200, "unkproms", 0 )
+	ROM_LOAD( "63s141.m10", 0x0000, 0x0100, BAD_DUMP CRC(b0b039c0) SHA1(724fa88f3f3c62b3c9345cdb13e114a10b7bbdb0) )  // ??? PROM
+	ROM_LOAD( "63s141.m8",  0x0100, 0x0100, BAD_DUMP CRC(6d7479ec) SHA1(7a7c30f5846b98afaaca2af9aab82416ebafe4cc) )  // ??? PROM
 ROM_END
 
 
@@ -472,19 +836,24 @@ ROM_START( firebeas )
 	ROM_LOAD( "e000.p2",  0xe000, 0x1000, CRC(8e5045ab) SHA1(8e5e8dd7710dc5ec68602f069dfc30e1bcaf7411) )
 	ROM_RELOAD(           0xf000, 0x1000 )
 
-	ROM_REGION( 0x8000, "gfx1", 0 )
+	ROM_REGION( 0x8000, "sprites", 0 )
 	ROM_LOAD( "mo0000.r12", 0x0000, 0x2000, CRC(5246c979) SHA1(a975ede0a6c2c91f4373ecba1e2f61f1aedcee62) )
 	ROM_LOAD( "mo2000.p12", 0x2000, 0x2000, CRC(1a3b6d57) SHA1(d9015140e69fdc3f73113f0afc3be2579197017a) )
 	ROM_LOAD( "mo4000.n12", 0x4000, 0x2000, CRC(69e18319) SHA1(3bf3cbe4ea06ea71928eff8a57c2ef7dc6e6716a) )
 	ROM_LOAD( "mo6000.m12", 0x6000, 0x2000, CRC(b722997f) SHA1(65a2618ecd8b4923f30f59c1fb95124cf0391964) )
 
-	ROM_REGION( 0x400, "proms", 0 )
-	ROM_LOAD( "63s141.e10", 0x0000, 0x0100, CRC(8e98083f) SHA1(ed29c7ed2226613ed5d09ecef4e645e3b53f7f8d) )  /* Sync PROM */
-	ROM_LOAD( "63s141.m10", 0x0100, 0x0100, CRC(b0b039c0) SHA1(724fa88f3f3c62b3c9345cdb13e114a10b7bbdb0) )  /* ??? PROM */
-	ROM_LOAD( "82s129.p3",  0x0200, 0x0100, CRC(615d784d) SHA1(e7e6397ae45d6ae8b3670b457ede79c42d18d71f) )  /* VRAM Write Protect PROM */
-	ROM_LOAD( "63s141.m8",  0x0300, 0x0100, CRC(6d7479ec) SHA1(7a7c30f5846b98afaaca2af9aab82416ebafe4cc) )  /* ??? PROM */
+	ROM_REGION( 0x100, "syncprom", 0 )
+	ROM_LOAD( "63s141.e10", 0x0000, 0x0100, CRC(8e98083f) SHA1(ed29c7ed2226613ed5d09ecef4e645e3b53f7f8d) )  // Sync PROM
+
+	ROM_REGION( 0x100, "wpprom", 0 )
+	ROM_LOAD( "82s129.p3",  0x0000, 0x0100, CRC(615d784d) SHA1(e7e6397ae45d6ae8b3670b457ede79c42d18d71f) )  // VRAM Write Protect PROM
+
+	ROM_REGION( 0x200, "unkproms", 0 )
+	ROM_LOAD( "63s141.m10", 0x0000, 0x0100, CRC(b0b039c0) SHA1(724fa88f3f3c62b3c9345cdb13e114a10b7bbdb0) )  // ??? PROM
+	ROM_LOAD( "63s141.m8",  0x0100, 0x0100, CRC(6d7479ec) SHA1(7a7c30f5846b98afaaca2af9aab82416ebafe4cc) )  // ??? PROM
 ROM_END
 
+} // anonymous namespace
 
 
 /*************************************

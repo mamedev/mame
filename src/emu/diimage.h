@@ -102,6 +102,7 @@ public:
 	int current_preset_image_id() const;
 	void switch_preset_image(int id);
 	chd_file *current_preset_image_chd() const;
+	void check_preset_images();
 
 	const image_device_format *device_get_indexed_creatable_format(int index) const noexcept { return (index < m_formatlist.size()) ? m_formatlist.at(index).get() : nullptr;  }
 	const image_device_format *device_get_named_creatable_format(std::string_view format_name) const noexcept;
@@ -221,7 +222,6 @@ public:
 protected:
 	// interface-level overrides
 	virtual void interface_config_complete() override;
-	virtual void interface_pre_start() override;
 
 	virtual const software_list_loader &get_software_list_loader() const;
 	virtual bool use_software_list_file_extension_for_filetype() const noexcept { return false; }

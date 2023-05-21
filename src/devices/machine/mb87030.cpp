@@ -125,6 +125,7 @@ void mb87030_device::device_reset()
 	m_tc = 0;
 	m_exbf = 0;
 	m_fifo.clear();
+	m_dreq_handler(false);
 	scsi_bus->ctrl_wait(scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
 	update_state(State::Idle, 0);
 	scsi_set_ctrl(0, S_ALL);
@@ -162,16 +163,8 @@ auto mb87030_device::get_state_name(State state) const
 		return "TransferSendAck";
 	case State::TransferSendData:
 		return "TransferSendData";
-	case State::TransferSendDataDMAReq:
-		return "TransferSendDataDMAReq";
-	case State::TransferSendDataDMAResp:
-		return "TransferSendDataDMAResp";
 	case State::TransferRecvData:
 		return "TransferRecvData";
-	case State::TransferRecvDataDMAReq:
-		return "TransferRecvDataDMAReq";
-	case State::TransferRecvDataDMAResp:
-		return "TransferRecvDataDMAResp";
 
 	case State::TransferWaitDeassertREQ:
 		return "TransferWaitDeassertREQ";
@@ -402,11 +395,10 @@ void mb87030_device::step(bool timeout)
 			break;
 		}
 
-		if (!m_dma_transfer || (m_scmd & SCMD_TERM_MODE)) {
-			update_state((ctrl & S_INP) ? State::TransferRecvData : State::TransferSendData, 1);
-		} else {
-			update_state((ctrl & S_INP) ? State::TransferRecvDataDMAReq : State::TransferSendDataDMAReq, 1);
-		}
+		if (m_dma_transfer && m_tc && !(ctrl & S_INP) && !m_fifo.full())
+			m_dreq_handler(true);
+
+		update_state((ctrl & S_INP) ? State::TransferRecvData : State::TransferSendData, 1);
 		break;
 
 	case State::TransferRecvData:
@@ -420,6 +412,8 @@ void mb87030_device::step(bool timeout)
 
 		LOG("pushing read data: %02X\n", data);
 		m_fifo.enqueue(data);
+		if (m_dma_transfer)
+			m_dreq_handler(true);
 
 		if (m_sdgc & SDGC_XFER_ENABLE) {
 			m_serr |= SERR_XFER_OUT;
@@ -427,20 +421,6 @@ void mb87030_device::step(bool timeout)
 		}
 
 		update_state(State::TransferSendAck, 10);
-		break;
-
-	case State::TransferRecvDataDMAReq:
-		m_hdb = data;
-		m_hdb_loaded = true;
-		update_state(State::TransferRecvDataDMAResp, 10);
-		m_dreq_handler(true);
-		break;
-
-	case State::TransferRecvDataDMAResp:
-		if (m_hdb_loaded)
-			break;
-		update_state(State::TransferSendAck, 10);
-		m_dreq_handler(false);
 		break;
 
 	case State::TransferSendData:
@@ -461,21 +441,6 @@ void mb87030_device::step(bool timeout)
 			update_state(State::TransferSendAck, 10);
 			break;
 		}
-		break;
-
-	case State::TransferSendDataDMAReq:
-		m_hdb_loaded = false;
-		update_state(State::TransferSendDataDMAResp, 10);
-		m_dreq_handler(true);
-		break;
-
-	case State::TransferSendDataDMAResp:
-		if (!m_hdb_loaded)
-			break;
-		m_hdb_loaded = false;
-		m_dreq_handler(false);
-		scsi_bus->data_w(scsi_refid, m_hdb);
-		update_state(State::TransferSendAck, 10);
 		break;
 
 	case State::TransferSendAck:
@@ -531,8 +496,6 @@ void mb87030_device::device_start()
 	save_item(NAME(m_tcm));
 	save_item(NAME(m_tc));
 	save_item(NAME(m_exbf));
-	save_item(NAME(m_hdb));
-	save_item(NAME(m_hdb_loaded));
 	save_item(NAME(m_send_atn_during_selection));
 //  save_item(NAME(m_fifo));
 	save_item(NAME(m_scsi_phase));
@@ -663,6 +626,8 @@ void mb87030_device::scmd_w(uint8_t data)
 
 		m_dma_transfer = !(data & 0x04);
 		LOG("%s Transfer\n", m_dma_transfer ? "DMA" : "Program");
+		if (!m_dma_transfer)
+			m_dreq_handler(false);
 		m_ssts |= SSTS_SPC_BUSY|SSTS_XFER_IN_PROGRESS;
 		update_state(State::TransferWaitReq, 5);
 		break;
@@ -712,7 +677,7 @@ void mb87030_device::tmod_w(uint8_t data)
 
 uint8_t mb87030_device::ints_r()
 {
-	LOG("%s: %02X\n", __FUNCTION__, m_ints);
+	//LOG("%s: %02X\n", __FUNCTION__, m_ints);
 	return m_ints;
 }
 
@@ -762,7 +727,7 @@ void mb87030_device::sdgc_w(uint8_t data)
 
 uint8_t mb87030_device::ssts_r()
 {
-	LOG("%s: %02X\n", __FUNCTION__, m_ssts);
+	//LOG("%s: %02X\n", __FUNCTION__, m_ssts);
 	update_ssts();
 	return m_ssts;
 }
@@ -796,8 +761,11 @@ uint8_t mb87030_device::mbc_r()
 
 uint8_t mb87030_device::dreg_r()
 {
+	if (machine().side_effects_disabled())
+		return m_fifo.peek();
+
 	if (!m_fifo.empty())
-			m_dreg = m_fifo.dequeue();
+		m_dreg = m_fifo.dequeue();
 	LOG("%s: %02X\n", __FUNCTION__, m_dreg);
 
 	if (m_serr & SERR_XFER_OUT) {
@@ -899,22 +867,28 @@ void mb87030_device::exbf_w(uint8_t data)
 
 void mb87030_device::dma_w(uint8_t data)
 {
-	if (machine().side_effects_disabled())
-		return;
 	LOG("dma_w: %02X\n", data);
-	m_hdb = data;
-	m_hdb_loaded = true;
+	m_dreg = data;
+	if (!m_fifo.full()) {
+		m_fifo.enqueue(data);
+		if (m_fifo.full())
+			m_dreq_handler(false);
+	}
 	step(false);
 }
 
 uint8_t mb87030_device::dma_r()
 {
-	uint8_t val = m_hdb;
-
 	if (machine().side_effects_disabled())
-		return 0;
-	LOG("dma_r: %02X\n", val);
-	m_hdb_loaded = false;
+		return m_fifo.peek();
+
+	if (!m_fifo.empty()) {
+		m_dreg = m_fifo.dequeue();
+		if (m_fifo.empty())
+			m_dreq_handler(false);
+	}
+
+	LOG("dma_r: %02X\n", m_dreg);
 	step(false);
-	return val;
+	return m_dreg;
 }

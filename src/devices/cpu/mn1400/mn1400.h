@@ -125,6 +125,14 @@ protected:
 	void op_dc();
 };
 
+
+class mn1400_reduced_cpu_device : public mn1400_cpu_device
+{
+public:
+	mn1400_reduced_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+
 class mn1405_cpu_device : public mn1400_cpu_device
 {
 public:
@@ -132,7 +140,8 @@ public:
 };
 
 
-DECLARE_DEVICE_TYPE(MN1400, mn1400_cpu_device)
+DECLARE_DEVICE_TYPE(MN1400_40PINS, mn1400_cpu_device)
+DECLARE_DEVICE_TYPE(MN1400_28PINS, mn1400_reduced_cpu_device)
 DECLARE_DEVICE_TYPE(MN1405, mn1405_cpu_device)
 
 #endif // MAME_CPU_MN1400_MN1400_H

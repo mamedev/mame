@@ -979,9 +979,10 @@ WRITE_LINE_MEMBER(x68ksupr_state::scsi_irq)
 	}
 }
 
-WRITE_LINE_MEMBER(x68ksupr_state::scsi_drq)
+void x68ksupr_state::scsi_unknown_w(uint8_t data)
 {
-	// TODO
+	// Documentation claims SSTS register is read-only, but x68030 boot code writes #$05 to this address anyway.
+	// Is this an undocumented MB89352 feature, an ASIC register, an original code bug or a bad dump?
 }
 
 void x68k_state::x68k_base_map(address_map &map)
@@ -1051,6 +1052,7 @@ void x68030_state::x68030_map(address_map &map)
 	map(0xe92000, 0xe92003).r(m_okim6258, FUNC(okim6258_device::status_r)).umask32(0x00ff00ff).w(FUNC(x68030_state::adpcm_w)).umask32(0x00ff00ff);
 
 	map(0xe96020, 0xe9603f).m(m_scsictrl, FUNC(mb89352_device::map)).umask32(0x00ff00ff);
+	map(0xe9602d, 0xe9602d).w(FUNC(x68030_state::scsi_unknown_w));
 	map(0xea0000, 0xea1fff).noprw();//.rw(FUNC(x68030_state::exp_r), FUNC(x68030_state::exp_w));  // external SCSI ROM and controller
 	map(0xeafa80, 0xeafa8b).rw(FUNC(x68030_state::areaset_r), FUNC(x68030_state::enh_areaset_w));
 	map(0xfc0000, 0xfdffff).rom();  // internal SCSI ROM
@@ -1385,8 +1387,11 @@ void x68ksupr_state::x68ksupr_base(machine_config &config)
 
 			spc.set_clock(40_MHz_XTAL / 8);
 			spc.out_irq_callback().set(*this, FUNC(x68ksupr_state::scsi_irq));
-			spc.out_dreq_callback().set(*this, FUNC(x68ksupr_state::scsi_drq));
+			spc.out_dreq_callback().set(m_hd63450, FUNC(hd63450_device::drq1_w));
 		});
+
+	m_hd63450->dma_read<1>().set("scsi:7:spc", FUNC(mb89352_device::dma_r));
+	m_hd63450->dma_write<1>().set("scsi:7:spc", FUNC(mb89352_device::dma_w));
 
 	VICON(config, m_crtc, 38.86363_MHz_XTAL);
 	m_crtc->set_clock_69m(69.55199_MHz_XTAL);

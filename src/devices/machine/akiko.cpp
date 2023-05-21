@@ -52,6 +52,11 @@ DEFINE_DEVICE_TYPE(AKIKO, akiko_device, "akiko", "CBM AKIKO")
 
 void akiko_device::device_add_mconfig(machine_config &config)
 {
+	CDROM(config, m_cdrom).set_interface("cdrom");
+	CDDA(config, m_cdda);
+	m_cdda->add_route(0, ":lspeaker", 0.50);
+	m_cdda->add_route(1, ":rspeaker", 0.50);
+	m_cdda->set_cdrom_tag(m_cdrom);
 }
 
 
@@ -83,8 +88,8 @@ akiko_device::akiko_device(const machine_config &mconfig, const char *tag, devic
 	, m_cdrom_cmd_start(0)
 	, m_cdrom_cmd_end(0)
 	, m_cdrom_cmd_resp(0)
-	, m_cdda(*this, "^cdda")
-	, m_cdrom(*this, "^cdrom")
+	, m_cdda(*this, "cdda")
+	, m_cdrom(*this, "cdrom")
 	, m_cdrom_toc(nullptr)
 	, m_dma_timer(nullptr)
 	, m_frame_timer(nullptr)
@@ -153,7 +158,7 @@ void akiko_device::device_start()
 void akiko_device::device_reset()
 {
 	/* create the TOC table */
-	if ( m_cdrom != nullptr && m_cdrom->get_last_track() )
+	if ( m_cdrom->exists() && m_cdrom->get_last_track() )
 	{
 		uint8_t *p;
 		int     i, addrctrl = m_cdrom->get_adr_control( 0 );
@@ -250,6 +255,11 @@ void akiko_device::mem_w8(offs_t offset, uint8_t data)
 {
 	int shift = (offset & 1) ? 0 : 8;
 	m_mem_w(offset, data << shift, 0xff << shift);
+}
+
+void akiko_device::set_mute(bool mute)
+{
+	m_cdda->set_output_gain( 0, mute ? 0.0 : 1.0 );
 }
 
 
@@ -709,7 +719,7 @@ void akiko_device::update_cdrom()
 
 			(void)cdda_getstatus(&lba);
 
-			if ( lba > 0 && m_cdrom != nullptr )
+			if ( lba > 0 && m_cdrom->exists() )
 			{
 				uint32_t  disk_pos;
 				uint32_t  track_pos;
@@ -777,7 +787,6 @@ uint32_t akiko_device::read(offs_t offset)
 	switch( offset )
 	{
 		case 0x00/4:    /* ID */
-			if ( m_cdrom != nullptr ) m_cdda->set_cdrom(m_cdrom);
 			return 0x0000cafe;
 
 		case 0x04/4:    /* CDROM STATUS 1 */

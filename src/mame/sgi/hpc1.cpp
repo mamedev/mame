@@ -13,7 +13,7 @@
 #include "machine/nscsi_bus.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
-#include "bus/sgikbd/sgikbd.h"
+#include "kbd.h"
 #include "hpc1.h"
 #include "speaker.h"
 
@@ -139,7 +139,7 @@ void hpc1_device::device_add_mconfig(machine_config &config)
 	SCC85C30(config, m_scc[0], SCC_PCLK);
 	m_scc[0]->configure_channels(SCC_RXA_CLK.value(), SCC_TXA_CLK.value(), SCC_RXB_CLK.value(), SCC_TXB_CLK.value());
 	m_scc[0]->out_int_callback().set(FUNC(hpc1_device::duart0_int_w));
-	m_scc[0]->out_txda_callback().set("keyboard", FUNC(sgi_keyboard_port_device::write_txd));
+	m_scc[0]->out_txda_callback().set("keyboard_port", FUNC(sgi_kbd_port_device::write_txd));
 
 	SCC85C30(config, m_scc[1], SCC_PCLK);
 	m_scc[1]->configure_channels(SCC_RXA_CLK.value(), SCC_TXA_CLK.value(), SCC_RXB_CLK.value(), SCC_TXB_CLK.value());
@@ -155,9 +155,9 @@ void hpc1_device::device_add_mconfig(machine_config &config)
 	m_scc[2]->configure_channels(SCC_RXA_CLK.value(), SCC_TXA_CLK.value(), SCC_RXB_CLK.value(), SCC_TXB_CLK.value());
 	m_scc[2]->out_int_callback().set(FUNC(hpc1_device::duart2_int_w));
 
-	SGIKBD_PORT(config, "keyboard", default_sgi_keyboard_devices, "hlekbd").rxd_handler().set(m_scc[0], FUNC(z80scc_device::rxa_w));
+	SGI_KBD_PORT(config, "keyboard_port", default_sgi_kbd_devices, "keyboard").rxd_handler().set(m_scc[0], FUNC(z80scc_device::rxa_w));
 
-	rs232_port_device &mouseport(RS232_PORT(config, "mouseport", indigo_mice, "sgimouse"));
+	rs232_port_device &mouseport(RS232_PORT(config, "mouse_port", indigo_mice, "sgimouse"));
 	mouseport.set_fixed(true);
 	mouseport.rxd_handler().set(m_scc[0], FUNC(scc85c30_device::rxb_w));
 	mouseport.cts_handler().set(m_scc[0], FUNC(scc85c30_device::ctsb_w));

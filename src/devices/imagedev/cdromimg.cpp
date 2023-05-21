@@ -65,11 +65,7 @@ void cdrom_image_device::device_config_complete()
 void cdrom_image_device::device_start()
 {
 	if (has_preset_images())
-	{
-		set_image_tag();
-		set_user_loadable(false);
 		setup_current_preset_image();
-	}
 	else
 	{
 		m_cdrom_handle.reset();
@@ -83,7 +79,7 @@ void cdrom_image_device::setup_current_preset_image()
 	m_dvdrom_handle.reset();
 
 	chd_file *chd = current_preset_image_chd();
-	if (chd->is_cd() || chd->is_gd())
+	if (chd->is_cd() || (m_gd_compat && chd->is_gd()))
 		m_cdrom_handle = std::make_unique<cdrom_file>(chd);
 	else if(m_dvd_compat && chd->is_dvd())
 		m_dvdrom_handle = std::make_unique<dvdrom_file>(chd);
@@ -130,7 +126,7 @@ std::pair<std::error_condition, std::string> cdrom_image_device::call_load()
 	// open the CHD file
 	if (chd)
 	{
-		if (chd->is_cd() || chd->is_gd())
+		if (chd->is_cd() || (m_gd_compat && chd->is_gd()))
 			m_cdrom_handle.reset(new cdrom_file(chd));
 		else if(m_dvd_compat && chd->is_dvd())
 			m_dvdrom_handle.reset(new dvdrom_file(chd));

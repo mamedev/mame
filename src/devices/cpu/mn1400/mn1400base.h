@@ -32,10 +32,12 @@ public:
 
 	// up to 12-bit C output port
 	auto write_c() { return m_write_c.bind(); }
+	auto &set_c_mask(u16 mask) { m_c_mask = mask; return *this; }
 
 	// up to 8-bit D output port
-	// for 4-bit, it uses D1-D4 or D1-D3,D5
+	// for 4-bit, it commonly uses D1-D3,D5
 	auto write_d() { return m_write_d.bind(); }
+	auto &set_d_mask(u8 mask, u32 bits) { m_d_mask = mask; m_d_bits = bits; return *this; }
 
 	// 4-bit E output port
 	auto write_e() { return m_write_e.bind(); }
@@ -83,6 +85,7 @@ protected:
 	u16 m_prgmask; // "
 	u16 m_datamask; // "
 
+	virtual void write_c(u16 data);
 	virtual void write_d(u8 data);
 	virtual void cycle();
 	virtual void increment_pc();
@@ -119,6 +122,10 @@ protected:
 	devcb_write16 m_write_c;
 	devcb_write8 m_write_d;
 	devcb_write8 m_write_e;
+
+	u16 m_c_mask;
+	u8 m_d_mask;
+	u32 m_d_bits;
 };
 
 

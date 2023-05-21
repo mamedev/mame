@@ -57,6 +57,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/atirage.h,VIDEOS["ATIRAGE"] = true
+--------------------------------------------------
+
+if (VIDEOS["ATIRAGE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/atirage.cpp",
+		MAME_DIR .. "src/devices/video/atirage.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/bufsprite.h,VIDEOS["BUFSPRITE"] = true
 --------------------------------------------------
 

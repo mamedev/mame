@@ -116,10 +116,11 @@ void device_image_interface::interface_config_complete()
 }
 
 //-------------------------------------------------
-//  interface_pre_start - lookup the chds, if any
+//  check_preset_images - lookup the chds from the
+//  region(s), if any
 //-------------------------------------------------
 
-void device_image_interface::interface_pre_start()
+void device_image_interface::check_preset_images()
 {
 	if (!m_possible_preset_regions.empty())
 	{
@@ -133,16 +134,20 @@ void device_image_interface::interface_pre_start()
 			if (m_current_region == int(m_preset_images.size()))
 				fatalerror("%s: No configured region has an image\n", device().tag());
 		}
+		set_image_tag();
+		set_user_loadable(false);
 	}
 	else
 	{
-		std::string tag = device().tag();
+		std::string tag = device().owner()->tag();
 		auto *chd = device().machine().rom_load().get_disk_handle(tag);
 		if (chd)
 		{
 			m_possible_preset_regions.push_back(tag);
 			m_preset_images.push_back(chd);
 			m_current_region = 0;
+			set_image_tag();
+			set_user_loadable(false);
 		}
 	}			
 }

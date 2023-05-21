@@ -55,8 +55,8 @@
 #include "bus/nscsi/hd.h"
 #include "bus/nscsi/cd.h"
 #include "bus/rs232/rs232.h"
-#include "bus/sgikbd/sgikbd.h"
 #include "bus/rs232/hlemouse.h"
+#include "kbd.h"
 
 // video and audio
 #include "sgi_gr1.h"
@@ -664,7 +664,7 @@ void pi4d2x_state::common(machine_config &config)
 
 	EEPROM_93C56_16BIT(config, m_eeprom);
 
-	DP8573(config, m_rtc).set_use_utc(true); // DP8572AN
+	DP8573(config, m_rtc); // DP8572AN
 
 	PIT8254(config, m_pit);
 	m_pit->set_clk<2>(3.6864_MHz_XTAL);
@@ -712,7 +712,7 @@ void pi4d2x_state::common(machine_config &config)
 
 	// duart 0 (keyboard/mouse)
 	SCN2681(config, m_duart[0], 3.6864_MHz_XTAL); // SCN2681AC1N24
-	sgi_keyboard_port_device &keyboard_port(SGIKBD_PORT(config, "keyboard_port", default_sgi_keyboard_devices, "hlekbd"));
+	sgi_kbd_port_device &keyboard_port(SGI_KBD_PORT(config, "keyboard_port", default_sgi_kbd_devices, "keyboard"));
 	rs232_port_device &mouse_port(RS232_PORT(config, "mouse_port",
 		[](device_slot_interface &device)
 		{
@@ -722,7 +722,7 @@ void pi4d2x_state::common(machine_config &config)
 
 	// duart 0 outputs
 	m_duart[0]->irq_cb().set(FUNC(pi4d2x_state::lio_interrupt<LIO_D0>)).invert();
-	m_duart[0]->a_tx_cb().set(keyboard_port, FUNC(sgi_keyboard_port_device::write_txd));
+	m_duart[0]->a_tx_cb().set(keyboard_port, FUNC(sgi_kbd_port_device::write_txd));
 	m_duart[0]->b_tx_cb().set(mouse_port, FUNC(rs232_port_device::write_txd));
 
 	// duart 0 inputs
@@ -843,8 +843,8 @@ void pi4d3x_state::common(machine_config &config)
 	m_duart[0]->out_int_callback().set(duart_int, FUNC(input_merger_device::in_w<0>));
 
 	// keyboard
-	sgi_keyboard_port_device &keyboard_port(SGIKBD_PORT(config, "keyboard_port", default_sgi_keyboard_devices, "hlekbd"));
-	m_duart[0]->out_txdb_callback().set(keyboard_port, FUNC(sgi_keyboard_port_device::write_txd));
+	sgi_kbd_port_device &keyboard_port(SGI_KBD_PORT(config, "keyboard_port", default_sgi_kbd_devices, "keyboard"));
+	m_duart[0]->out_txdb_callback().set(keyboard_port, FUNC(sgi_kbd_port_device::write_txd));
 	keyboard_port.rxd_handler().set(m_duart[0], FUNC(z80scc_device::rxb_w));
 
 	// mouse

@@ -680,7 +680,7 @@ void votrhv_state::votrhv(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	// TEMPORARY HACK until 1818c device is done
-	VOTRAX_SC01(config, m_votrax, 720000);
+	VOTRAX_SC01A(config, m_votrax, 720000);
 	m_votrax->ar_callback().set(FUNC(votrhv_state::pho_done));
 	m_votrax->add_route(ALL_OUTPUTS, "mono", 1.00);
 }

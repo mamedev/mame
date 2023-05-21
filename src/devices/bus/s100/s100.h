@@ -64,6 +64,8 @@
 
 #pragma once
 
+#include <functional>
+#include <vector>
 
 
 
@@ -78,11 +80,8 @@ class s100_bus_device;
 class device_s100_card_interface : public device_interface
 {
 	friend class s100_bus_device;
-	template <class ElementType> friend class simple_list;
 
 public:
-	device_s100_card_interface *next() const { return m_next; }
-
 	// interrupts
 	virtual void s100_int_w(int state) { }
 	virtual void s100_nmi_w(int state) { }
@@ -125,9 +124,6 @@ protected:
 	virtual void interface_pre_start() override;
 
 	s100_bus_device  *m_bus;
-
-private:
-	device_s100_card_interface *m_next;
 };
 
 
@@ -139,7 +135,7 @@ class s100_bus_device : public device_t
 public:
 	// construction/destruction
 	s100_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~s100_bus_device() { m_device_list.detach_all(); }
+	~s100_bus_device();
 
 	auto irq() { return m_write_irq.bind(); }
 	auto nmi() { return m_write_nmi.bind(); }
@@ -159,7 +155,7 @@ public:
 	auto hold() { return m_write_hold.bind(); }
 	auto error() { return m_write_error.bind(); }
 
-	void add_card(device_s100_card_interface *card);
+	void add_card(device_s100_card_interface &card);
 
 	uint8_t smemr_r(offs_t offset);
 	void mwrt_w(offs_t offset, uint8_t data);
@@ -186,11 +182,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( error_w ) { m_write_error(state); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
+	using card_vector = std::vector<std::reference_wrapper<device_s100_card_interface> >;
+
 	devcb_write_line   m_write_irq;
 	devcb_write_line   m_write_nmi;
 	devcb_write_line   m_write_vi0;
@@ -209,7 +207,7 @@ private:
 	devcb_write_line   m_write_hold;
 	devcb_write_line   m_write_error;
 
-	simple_list<device_s100_card_interface> m_device_list;
+	card_vector m_device_list;
 };
 
 

@@ -4,13 +4,6 @@
 
   Matsushita MN1400, MN1405
 
-TODO:
-- counter input pin (CSLCT and SNS1)
-- are illegal opcodes 0x38/0xe0 and 0x39/0xe1 branch-always and branch-never?
-  right now they're implemented as such
-- is branch emulation correct when near the end of a page?
-- add other MCUs when needed
-
 */
 
 #include "emu.h"
@@ -20,7 +13,8 @@ TODO:
 
 
 // device definitions
-DEFINE_DEVICE_TYPE(MN1400, mn1400_cpu_device, "mn1400", "Matsushita MN1400")
+DEFINE_DEVICE_TYPE(MN1400_40PINS, mn1400_cpu_device, "mn1400", "Matsushita MN1400 (40 pins)")
+DEFINE_DEVICE_TYPE(MN1400_28PINS, mn1400_reduced_cpu_device, "mn1400_reduced", "Matsushita MN1400 (28 pins)")
 DEFINE_DEVICE_TYPE(MN1405, mn1405_cpu_device, "mn1405", "Matsushita MN1405")
 
 
@@ -30,8 +24,16 @@ mn1400_cpu_device::mn1400_cpu_device(const machine_config &mconfig, device_type 
 { }
 
 mn1400_cpu_device::mn1400_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	mn1400_cpu_device(mconfig, MN1400, tag, owner, clock, 2 /* stack levels */, 10 /* rom bits */, address_map_constructor(FUNC(mn1400_cpu_device::program_1kx8), this), 6 /* ram bits */, address_map_constructor(FUNC(mn1400_cpu_device::data_64x4), this))
+	mn1400_cpu_device(mconfig, MN1400_40PINS, tag, owner, clock, 2 /* stack levels */, 10 /* rom bits */, address_map_constructor(FUNC(mn1400_cpu_device::program_1kx8), this), 6 /* ram bits */, address_map_constructor(FUNC(mn1400_cpu_device::data_64x4), this))
 { }
+
+mn1400_reduced_cpu_device::mn1400_reduced_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	mn1400_cpu_device(mconfig, MN1400_28PINS, tag, owner, clock, 2, 10, address_map_constructor(FUNC(mn1400_reduced_cpu_device::program_1kx8), this), 6, address_map_constructor(FUNC(mn1400_reduced_cpu_device::data_64x4), this))
+{
+	// CO5-CO9, DO0-DO3 (scrambled)
+	set_c_mask(0x3e0);
+	set_d_mask(0xf, 0x5321);
+}
 
 mn1405_cpu_device::mn1405_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	mn1400_cpu_device(mconfig, MN1405, tag, owner, clock, 2, 11, address_map_constructor(FUNC(mn1405_cpu_device::program_2kx8), this), 7, address_map_constructor(FUNC(mn1405_cpu_device::data_128x4), this))

@@ -573,7 +573,7 @@ public:
 	cd32_state(const machine_config &mconfig, device_type type, const char *tag)
 		: amiga_state(mconfig, type, tag)
 		, m_player_ports(*this, {"p1_cd32_buttons", "p2_cd32_buttons"})
-		, m_cdda(*this, "cdda")
+		, m_cdda(*this, "akiko:cdda")
 	{ }
 
 	DECLARE_WRITE_LINE_MEMBER( akiko_int_w );
@@ -2239,14 +2239,9 @@ void cd32_state::cd32(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga_aga)
 
-	CDDA(config, m_cdda);
-	m_cdda->add_route(0, "lspeaker", 0.50);
-	m_cdda->add_route(1, "rspeaker", 0.50);
-
 	m_cia_0->pa_wr_callback().set(FUNC(cd32_state::akiko_cia_0_port_a_write));
 	m_cia_0->sp_wr_callback().set_nop();
 
-	CDROM(config, "cdrom").set_interface("cdrom");
 	SOFTWARE_LIST(config, "cd32_list").set_original("cd32");
 	SOFTWARE_LIST(config, "cd_list").set_original("cdtv");
 }

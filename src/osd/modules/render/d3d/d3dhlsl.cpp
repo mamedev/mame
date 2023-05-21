@@ -1570,12 +1570,16 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		//next_index = phosphor_pass(rt, next_index, poly, vertnum);
 
 		// create bloom textures
-		int old_index = next_index;
-		next_index = post_pass(rt, next_index, poly, vertnum, true);
-		next_index = downsample_pass(rt, next_index, poly, vertnum);
+		bool bloom_enabled = (options->bloom_scale > 0.0f);
+		if (bloom_enabled)
+		{
+			int old_index = next_index;
+			next_index = post_pass(rt, next_index, poly, vertnum, true);
+			next_index = downsample_pass(rt, next_index, poly, vertnum);
+			next_index = old_index;
+		}
 
-		// apply bloom textures
-		next_index = old_index;
+		// apply bloom textures (if enabled) and other post effects
 		next_index = post_pass(rt, next_index, poly, vertnum, false);
 		next_index = bloom_pass(rt, next_index, poly, vertnum);
 		next_index = phosphor_pass(rt, next_index, poly, vertnum);

@@ -75,6 +75,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  *MP0121   TMS1000   1979, Waddingtons Compute-A-Tune
  @MP0154   TMS1000   1979, Fonas 2 Player Baseball
  @MP0158   TMS1000   1979, Entex Soccer (6003)
+ *MP0159   TMS1000   1979, Tomy Volleyball
  @MP0163   TMS1000   1979, A-One LSI Match Number/LJN Electronic Concentration
  @MP0166   TMS1000   1980, A-One Arrange Ball/LJN Computer Impulse/Tandy Zingo (model 60-2123)
  @MP0168   TMS1000   1979, Conic Multisport/Tandy Sports Arena (model 60-2158)
@@ -437,7 +438,7 @@ u8 hh_tms1k_state::read_inputs(int columns)
 
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
-		if (m_inp_mux >> i & 1)
+		if (BIT(m_inp_mux, i))
 			ret |= m_inputs[i]->read();
 
 	return ret;

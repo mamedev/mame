@@ -34,8 +34,8 @@ public:
 
 	u16* m_ram16;
 	u32 m_gfx_addr;
-	u32 m_gfx_scroll_0_x, m_gfx_scroll_0_y;
-	u32 m_gfx_scroll_1_x, m_gfx_scroll_1_y;
+	u32 m_gfx_scroll_x, m_gfx_scroll_y;
+	u32 m_gfx_clip_x, m_gfx_clip_y;
 
 	int m_gfx_size;
 	std::unique_ptr<bitmap_rgb32> m_bitmaps;
@@ -50,8 +50,7 @@ public:
 	u32 blitter_r(offs_t offset, u32 mem_mask = ~0);
 	void blitter_w(address_space &space, offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 m_gfx_addr_shadowcopy;
-	u32 m_gfx_scroll_0_x_shadowcopy, m_gfx_scroll_0_y_shadowcopy;
-	u32 m_gfx_scroll_1_x_shadowcopy, m_gfx_scroll_1_y_shadowcopy;
+	u32 m_gfx_clip_x_shadowcopy, m_gfx_clip_y_shadowcopy;
 	std::unique_ptr<u16[]> m_ram16_copy;
 	inline void gfx_upload_shadow_copy(address_space &space, offs_t *addr);
 	inline void gfx_create_shadow_copy(address_space &space);

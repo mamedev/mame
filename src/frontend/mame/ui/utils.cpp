@@ -1970,11 +1970,6 @@ char* chartrimcarriage(char str[])
 	return str;
 }
 
-const char* strensure(const char* s)
-{
-	return s == nullptr ? "" : s;
-}
-
 int getprecisionchr(const char* s)
 {
 	int precision = 1;

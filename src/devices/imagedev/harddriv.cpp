@@ -107,11 +107,9 @@ void harddisk_image_device::device_start()
 
 	m_chd = nullptr;
 
-	if (has_preset_images()) {
-		set_image_tag();
-		set_user_loadable(false);
+	if (has_preset_images())
 		setup_current_preset_image();
-	} else
+	else
 		m_hard_disk_handle.reset();
 }
 

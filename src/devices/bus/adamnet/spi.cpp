@@ -46,6 +46,8 @@ void adam_spi_device::adam_spi_mem(address_map &map)
 {
 	map(0x0000, 0x001f).m(m_maincpu, FUNC(m6801_cpu_device::m6801_io));
 	map(0x0080, 0x00ff).ram();
+	map(0x0100, 0x0103).rw("epci", FUNC(scn2661a_device::read), FUNC(scn2661a_device::write));
+	map(0x0104, 0x01ff).ram();
 	map(0xf800, 0xffff).rom().region("m6801", 0);
 }
 
@@ -60,11 +62,17 @@ void adam_spi_device::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &adam_spi_device::adam_spi_mem);
 	m_maincpu->in_p2_cb().set(FUNC(adam_spi_device::p2_r));
 	m_maincpu->out_p2_cb().set(FUNC(adam_spi_device::p2_w));
-	m_maincpu->set_disable();
 
-	SCN2661A(config, "epci", XTAL(4'915'200));
+	scn2661a_device &epci(SCN2661A(config, "epci", XTAL(4'915'200)));
+	epci.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	epci.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	epci.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 
-	RS232_PORT(config, "rs232", default_rs232_devices, nullptr);
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set("epci", FUNC(scn2661a_device::rxd_w));
+	rs232.cts_handler().set("epci", FUNC(scn2661a_device::cts_w));
+	rs232.dsr_handler().set("epci", FUNC(scn2661a_device::dsr_w));
+	rs232.dcd_handler().set("epci", FUNC(scn2661a_device::dcd_w));
 
 	centronics_device &centronics(CENTRONICS(config, "centronics", centronics_devices, "printer"));
 	centronics.set_data_input_buffer("cent_data_in");

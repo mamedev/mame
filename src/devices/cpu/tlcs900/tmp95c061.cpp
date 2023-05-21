@@ -583,6 +583,10 @@ void tmp95c061_device::tlcs900_handle_ad()
 
 			m_int_reg[TMP95C061_INTE0AD] |= 0x80;
 			m_check_irqs = 1;
+
+			/* AD repeat mode */
+			if ( m_ad_mode & 0x20 )
+				m_ad_cycles_left = ( m_ad_mode & 0x08 ) ? 320 : 160;
 		}
 	}
 }
@@ -1397,7 +1401,7 @@ void tmp95c061_device::admod_w(uint8_t data)
 	{
 		data &= ~0x04;
 		data |= 0x40;
-		m_ad_cycles_left = ( data & 0x08 ) ? 640 : 320;
+		m_ad_cycles_left = ( data & 0x08 ) ? 320 : 160;
 	}
 
 	m_ad_mode = data;

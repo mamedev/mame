@@ -41,7 +41,7 @@ public:
 	bool get_altcharset() const { return m_altcharset; }
 	bool get_monohgr() const    { return m_monohgr; }
 
-	void a80col_w(bool b80Col)      { m_80col = b80Col; }
+	void a80col_w(bool b80Col);
 	void a80store_w(bool b80Store)  { m_80store = b80Store; }
 	void page2_w(bool page2)        { m_page2 = page2; }
 	void altcharset_w(bool altch)   { m_altcharset = altch; }
