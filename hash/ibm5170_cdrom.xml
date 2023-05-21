@@ -4136,7 +4136,7 @@ Untested multiplayer options
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="Leisure Suit Larry's Greatest Hits and Misses! (Europe) (Rerelease)" sha1="219e3894f77fecf94a48fcda1afabe1afeed2f50" />
+				<disk name="Leisure Suit Larry's Greatest Hits and Misses (Europe) (Rerelease)" sha1="219e3894f77fecf94a48fcda1afabe1afeed2f50" />
 			</diskarea>
 		</part>
 	</software>
@@ -4156,7 +4156,7 @@ Untested multiplayer options
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="Leisure Suit Larry's Greatest Hits and Misses! (USA)" sha1="5bda619a06ff852f9f2586c4fbba591aa681d9b6" />
+				<disk name="Leisure Suit Larry's Greatest Hits and Misses (USA)" sha1="5bda619a06ff852f9f2586c4fbba591aa681d9b6" />
 			</diskarea>
 		</part>
 	</software>
