@@ -698,7 +698,6 @@ license:CC0-1.0
 	</software>
 
 	<software name="aerope" cloneof="aero">
-		<!-- Dumped by LongwoodGeek, released by Forest of Illusion -->
 		<description>Aero the Acro-Bat - Rascal Rival Revenge (Europe, prototype earlier)</description>
 		<year>2001?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -777,7 +776,6 @@ license:CC0-1.0
 	</software>
 
 	<software name="agecart1">
-		<!-- Dumped by SmellyGhost, released by Forest of Illusion -->
 		<description>AGB Aging Cartridge (World, version 1.0)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
@@ -811,7 +809,6 @@ license:CC0-1.0
 	</software>
 
 	<software name="agecart9">
-		<!-- Dumped by Suicune41, released by Forest of Illusion -->
 		<description>AGB Aging Cartridge (World, version 9.0)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
@@ -3074,7 +3071,6 @@ license:CC0-1.0
 	</software>
 
 	<software name="command2">
-		<!-- Dumped by DillyDylan, released by Forest of Illusion -->
 		<description>Commandos 2 (USA, prototype, 20021128)</description>
 		<year>2002</year>
 		<publisher>Toyonaka Studios</publisher>
@@ -4912,7 +4908,6 @@ license:CC0-1.0
 	</software>
 
 	<software name="chokkanp" cloneof="polarium">
-		<!-- Dumped by xprism, released by Forest of Illusion -->
 		<description>Chokkan Hitofude Advance (Japan, prototype)</description>
 		<year>20??</year>
 		<publisher>Nintendo</publisher>
@@ -6814,7 +6809,6 @@ license:CC0-1.0
 	</software>
 
 	<software name="darkeden">
-		<!-- Dumped by Ian Dunlop, released by Forest of Illusion -->
 		<description>Dark Eden (demo)</description>
 		<year>2002</year>
 		<publisher>Rival Dreams</publisher>
@@ -7117,7 +7111,6 @@ license:CC0-1.0
 
 	<!-- Pitch demo for a GBA port. -->
 	<software name="demonscrest">
-		<!-- Ian Dunlop, released by Forest of Illusion in original and a patched version to get past the title screen. -->
 		<!-- The patch doesn't seem to be needed in MAME, but on other emulators, you have to patch 0x122384 with 0xc046c046. -->
 		<description>Demon's Crest (prototype)</description>
 		<year>????</year>
@@ -15368,19 +15361,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="holybibl">
-		<!-- Dumped by Gonz, released by Forest of Illusion -->
-		<description>The Holy Bible - World English Bible (USA, prototype)</description>
-		<year>2006</year>
-		<publisher>Crave Entertainment</publisher>
-		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_eeprom_64k" />
-			<dataarea name="rom" size="33554432">
-				<rom name="holy bible, the - world english bible (usa) (prototype).gba" size="33554432" crc="b8fda4f5" sha1="e2dd02ded617f7002ca887639cf91b9cac8cd745"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="homerang">
 		<description>Disney's Home on the Range (Europe)</description>
 		<year>2004</year>
@@ -17677,9 +17657,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- Game crashes with Fatal error: 0800b2a4: Gb Undefined Thumb instruction: b2a9 error -->
 	<software name="kofex2up" cloneof="kofex2" supported="no">
-		<!-- Dumped by March42, released by Forest of Illusion -->
-		<!-- Game crashes with Fatal error: 0800b2a4: Gb Undefined Thumb instruction: b2a9 error -->
 		<description>The King of Fighters EX2 - Howling Blood (USA, prototype, 20030403)</description>
 		<year>2003</year>
 		<publisher>Marvelous Entertainment</publisher>
@@ -20418,7 +20397,6 @@ license:CC0-1.0
 
 		<!-- This is a later build of the game than the retail release, with a different title screen and an options screen; does not say "Licensed by Nintendo" on boot. -->
 	<software name="manicminl">
-		<!-- Released by March42 and Forest of Illusion -->
 		<description>Manic Miner (Europe, 20030307)</description>
 		<year>2003</year>
 		<publisher>Jester Interactive</publisher>
@@ -20679,7 +20657,6 @@ license:CC0-1.0
 	</software>
 
 	<software name="mariokrtxxl">
-		<!-- Released by Forest of Illusion -->
 		<description>Mario Kart XXL (demo, 20040417)</description>
 		<year>2001</year>
 		<publisher>Denaris Entertainment Software</publisher>
@@ -25378,7 +25355,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-		<!-- Game does not work in MAME. -->
+	<!-- Game does not work in MAME, it freezes on the bios screen. -->
 	<software name="paradroid" supported="no">
 		<!-- Released by March42 and Forest of Illusion -->
 		<description>Paradroid (Europe, prototype, 20030320)</description>
@@ -27967,7 +27944,6 @@ license:CC0-1.0
 	</software>
 
 	<software name="quake" supported="no">
-		<!-- Dumped by Randy Linden, released by Forest of Illusion -->
 		<!-- Game crashes immediately after loading, inputs become unresponsive. -->
 		<description>Quake (demo)</description>
 		<year>2003</year>
@@ -28003,7 +27979,6 @@ license:CC0-1.0
 	</software>
 
 	<software name="r3ddemo">
-		<!-- Released by Forest of Illusion -->
 		<description>R3D-Demo V1 (Europe, demo)</description>
 		<year>2004</year>
 		<publisher>Denaris Entertainment Software</publisher>
@@ -28091,7 +28066,6 @@ license:CC0-1.0
 	</software>
 
 	<software name="racinggaup">
-		<!-- Dumped by XBrav, released by Forest of Illusion -->
 		<description>Racing Gears Advance (USA, prototype, 20030922)</description>
 		<year>2003</year>
 		<publisher>Pier 3 Entertainment</publisher>
@@ -29989,7 +29963,6 @@ license:CC0-1.0
 	</software>
 
 	<software name="seaboy">
-		<!-- Dumped by Ian Dunlop, released by Forest of Illusion -->
 		<description>Sea Boy (demo)</description>
 		<year>2003</year>
 		<publisher>Rival Dreams</publisher>
@@ -33148,7 +33121,6 @@ license:CC0-1.0
 	</software>
 
 	<software name="swtrilgyup" cloneof="swtrilgy" supported="no">
-		<!-- Dumped by Rezrospect, released by Forest of Illusion -->
 		<description>Star Wars Trilogy - Apprentice of the Force (USA, prototype)</description>
 		<year>2004</year>
 		<publisher>Ubisoft</publisher>
@@ -37050,7 +37022,6 @@ license:CC0-1.0
 	</software>
 
 	<software name="ultmusclp">
-		<!-- Dumped by Zach Lambert, released by Forest of Illusion -->
 		<description>Ultimate Muscle - The Kinnikuman Legacy - The Path of the Superhero (USA, prototype, 20030429)</description>
 		<year>2003</year>
 		<publisher>Bandai</publisher>
@@ -37273,7 +37244,6 @@ license:CC0-1.0
 	</software>
 
 	<software name="uridiump1">
-		<!-- Released by March42 and Forest of Illusion -->
 		<description>Uridium Advance (Europe, prototype, 20030307)</description>
 		<year>2003</year>
 		<publisher>Jester Interactive</publisher>
@@ -37284,9 +37254,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-		<!-- Game does not work in MAME. -->
+	<!-- Game does not work in MAME, it freezes on the bios screen. -->
 	<software name="uridiump2" supported="no">
-		<!-- Released by March42 and Forest of Illusion -->
 		<description>Uridium Advance (Europe, prototype, 20020911)</description>
 		<year>2003</year>
 		<publisher>Jester Interactive</publisher>
@@ -37297,9 +37266,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-		<!-- Game does not work in MAME. -->
+	<!-- Game does not work in MAME, it freezes on the bios screen. -->
 	<software name="uridpara" supported="no">
-		<!-- Released by March42 and Forest of Illusion -->
 		<description>Uridium Advance and Paradroid 2 in 1 (Europe, prototype, 20030430)</description>
 		<year>2003</year>
 		<publisher>Jester Interactive</publisher>
@@ -41700,6 +41668,20 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- Unreleased, software shows errors when saving bookmarks, but they work fine. -->
+	<software name="holybibl">
+		<description>The Holy Bible - World English Bible (USA, prototype)</description>
+		<year>2006</year>
+		<publisher>Crave Entertainment</publisher>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_eeprom_64k" />
+			<dataarea name="rom" size="33554432">
+				<rom name="holy bible, the - world english bible (usa) (prototype).gba" size="33554432" crc="b8fda4f5" sha1="e2dd02ded617f7002ca887639cf91b9cac8cd745"/>
+			</dataarea>
+		</part>
+	</software>
+
 
 	<software name="mp3playr">
 		<description>Nintendo MP3 Player (Europe)</description>
