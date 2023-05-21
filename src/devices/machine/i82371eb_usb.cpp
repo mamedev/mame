@@ -5,7 +5,7 @@
     PIIX4E USB interface
 
 	TODO:
-	- PIIX4 / PIIX4M dispatches
+	- Actual USB ports;
 
 **************************************************************************************************/
 
@@ -17,7 +17,7 @@
 #define LOG_MAP    (1U << 3) // log full remaps
 
 #define VERBOSE (LOG_GENERAL | LOG_IO | LOG_TODO | LOG_MAP)
-#define LOG_OUTPUT_FUNC osd_printf_warning
+//#define LOG_OUTPUT_FUNC osd_printf_warning
 
 #include "logmacro.h"
 

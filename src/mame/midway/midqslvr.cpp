@@ -449,7 +449,7 @@ ROM_START( hydrthnd )
 	ROM_REGION( 0x2000, "iocpu", 0 )   /* Diego board CY7C63513 MCU code */
 	ROM_LOAD( "diego.u8", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "pci:07.1:ide1:0:hdd" )
 	DISK_IMAGE( "hydro", 0,  BAD_DUMP SHA1(d481d178782943c066b41764628a419cd55f676d) )
 ROM_END
 
@@ -460,7 +460,7 @@ ROM_START( hydrthnd101b )
 	ROM_REGION( 0x2000, "iocpu", 0 )   /* Diego board CY7C63513 MCU code */
 	ROM_LOAD( "diego.u8", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "pci:07.1:ide1:0:hdd" )
 	DISK_IMAGE( "hydro_101b", 0,  SHA1(182a7966c40676031c92dbfbd1b8e594a505a930) )
 ROM_END
 
@@ -471,7 +471,7 @@ ROM_START( hydrthnd100d )
 	ROM_REGION( 0x2000, "iocpu", 0 )   /* Diego board CY7C63513 MCU code */
 	ROM_LOAD( "diego.u8", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "pci:07.1:ide1:0:hdd" )
 	DISK_IMAGE( "hydro_100d", 0,  SHA1(5462f7197b3c510b791093e938a614e706aaed4a) )
 ROM_END
 
@@ -486,7 +486,7 @@ ROM_START( offrthnd )
 	ROM_REGION( 0x2000, "iocpu", 0 )   /* Magicbus board CY7C63513 MCU code */
 	ROM_LOAD( "magicbus.u18", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "pci:07.1:ide1:0:hdd" )
 	DISK_IMAGE( "offrthnd", 0, BAD_DUMP SHA1(d88f1c5b75361a1e310565a8a5a09c674a4a1a22) )
 ROM_END
 
@@ -501,7 +501,7 @@ ROM_START( arctthnd )
 	ROM_REGION( 0x2000, "iocpu", 0 )   /* Substitute board 87C552 MCU code */
 	ROM_LOAD( "87c552.bin", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "pci:07.1:ide1:0:hdd" )
 	DISK_IMAGE( "arctthnd", 0,  SHA1(f4373e57c3f453ac09c735b5d8d99ff811416a23) )
 ROM_END
 
@@ -516,7 +516,7 @@ ROM_START( ultarctc )
 	ROM_REGION( 0x2000, "iocpu", 0 )   /* Substitute board 87C552 MCU code */
 	ROM_LOAD( "87c552.bin", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "pci:07.1:ide1:0:hdd" )
 	DISK_IMAGE( "uarctict", 0, SHA1(8557a1d7ae8dc41c879350cb1c228f4c27a0dd09) )
 ROM_END
 
@@ -534,11 +534,12 @@ ROM_START( ultarctcup )
 	ROM_REGION( 0x2000, "iocpu", 0 )   /* Substitute board 87C552 MCU code */
 	ROM_LOAD( "87c552.bin", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "pci:07.1:ide1:0:hdd" )
 	DISK_IMAGE( "uarctict", 0, SHA1(8557a1d7ae8dc41c879350cb1c228f4c27a0dd09) )
 
+	// TODO: eventually needs mountable option
 	DISK_REGION( "cd" )
-	DISK_IMAGE( "040503_1309", 0, SHA1(453adb81e204b0580ad02c2d98f68525757ec2a1) )
+	DISK_IMAGE_READONLY( "040503_1309", 0, SHA1(453adb81e204b0580ad02c2d98f68525757ec2a1) )
 // sourced from these
 //    ROM_LOAD( "040503_1309.CUE", 0x0000, 0x000004d, CRC(4a9e2de5) SHA1(04d3d90ad4b235c0ac4606557e16a1410d018fa9) )
 //    ROM_LOAD( "040503_1309.BIN", 0x0000, 0x6bd9960, CRC(48a63422) SHA1(9d1cacf07526c5bddf4205c667a9010802f74859) )

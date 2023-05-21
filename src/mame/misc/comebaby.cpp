@@ -6,6 +6,8 @@
 TODO:
 - Throws "Primary master hard disk fail" in shutms11. Disk has a non canonical -chs of 524,255,63.
   winimage will throw plenty of errors on manual file extraction (related to Korean paths?).
+- Currently needs enabled_logical true in super I/O handling (needs the real
+  ITE Giga I/O to fix);
 - In this driver with a manually rebuilt image will loop during the fake "now loading" screen
   (customized Win 98 splash screen);
 - In pcipc with a manually rebuilt image will throw an exception in "Internat" module once it loads
@@ -325,7 +327,7 @@ ROM_START(comebaby)
 	ROM_REGION32_LE(0x40000, "pci:07.0", 0)  /* motherboard bios */
 	ROM_LOAD("b1120iag.bin", 0x000000, 0x40000, CRC(9b6f95f1) SHA1(65d6a2fea9911593f093b2e2a43d1534b54d60b3) )
 
-	DISK_REGION( "pci:07.1:ide1:0:hdd:image" )
+	DISK_REGION( "pci:07.1:ide1:0:hdd" )
 	DISK_IMAGE( "comebaby", 0, BAD_DUMP SHA1(ea57919319c0b6a1d4abd7822cff028855bf082f) )
 ROM_END
 

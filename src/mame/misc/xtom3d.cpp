@@ -18,10 +18,9 @@ TODO:
 - Pinpoint what i/o $2a8 is for during texture init (alt serial flash transfer?)
 - EEPROM (i/o $2ac r/w)
 - Hookup ISA sound board (YMZ280B + YAC516 + 3550A DAC);
-- pumpit1: IDE device doesn't recognize automatic mounting for CD-Rom, side effect of
-  PCI system with MAME internals?
+- pumpit1: MSCDEX hangs often when Voodoo is disabled;
 - pumpit1: black screens all the way with Voodoo enabled, eventually throws a fatal error
-  "pci:01.0:00.0:voodoo: Unsupported cmdFifo packet type 7", may require true AGP comms.
+  "pci:01.0:00.0:voodoo: Unsupported cmdFifo packet type 7", may require true AGP comms or properly initialized SPD DIMMs;
 - Pump it Up: every CD after pumpit1 are really multisession disks, which is unsupported
   by chdman at the time of this writing (and doesn't seem worth converting atm);
 - Pump it Up: CAT702 ZN protection for later games;
@@ -444,7 +443,7 @@ ROM_END
 ROM_START( pumpit1 )
 	PUMPITUP_BIOS
 
-	DISK_REGION( PCI_IDE_ID":ide1:0:cdrom:image" )
+	DISK_REGION( PCI_IDE_ID":ide1:0:cdrom" )
 	DISK_IMAGE_READONLY( "19990930", 0,  SHA1(a848061806c56ba30c75a24233300f175fb3eb9d) )
 ROM_END
 
