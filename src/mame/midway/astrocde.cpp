@@ -250,13 +250,14 @@ WRITE_LINE_MEMBER(astrocde_state::sparkle_w)
 
 CUSTOM_INPUT_MEMBER(ebases_state::trackball_r)
 {
-	return m_trackball[m_input_select]->read();
+	return (m_trackball[m_input_select]->read() - m_trackball_last) & 0xff;
 }
 
 
 void ebases_state::trackball_select_w(uint8_t data)
 {
 	m_input_select = data & 3;
+	m_trackball_last = m_trackball[m_input_select]->read();
 }
 
 
@@ -299,9 +300,14 @@ WRITE_LINE_MEMBER(demndrgn_state::input_select_w)
 	m_input_select = state;
 }
 
-CUSTOM_INPUT_MEMBER(demndrgn_state::joystick_r)
+CUSTOM_INPUT_MEMBER(demndrgn_state::trackball_r)
 {
-	return m_joystick[m_input_select]->read();
+	return (m_trackball[m_input_select]->read() - m_trackball_last) & 0xff;
+}
+
+void demndrgn_state::trackball_reset_w(uint8_t data)
+{
+	m_trackball_last = m_trackball[m_input_select]->read();
 }
 
 
@@ -728,16 +734,16 @@ static INPUT_PORTS_START( ebases )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(ebases_state, trackball_r)
 
 	PORT_START("TRACKX1")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_RESET
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
 	PORT_START("TRACKY1")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_RESET
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
 	PORT_START("TRACKX2")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_RESET PORT_PLAYER(2)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
 	PORT_START("TRACKY2")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_RESET PORT_PLAYER(2)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
 	PORT_START("FAKE")
 	/* Cocktail cabinets had a B/W monitor with color overlay (same one as Space Zap!),
@@ -1059,7 +1065,7 @@ static INPUT_PORTS_START( demndrgn )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2HANDLE")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(demndrgn_state, joystick_r)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(demndrgn_state, trackball_r)
 
 	PORT_START("P3HANDLE")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1075,10 +1081,10 @@ static INPUT_PORTS_START( demndrgn )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "S1:8" )
 
 	PORT_START("MOVEX")
-	PORT_BIT( 0xff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(2) PORT_RESET
+	PORT_BIT( 0xff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(2)
 
 	PORT_START("MOVEY")
-	PORT_BIT( 0xff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(2) PORT_RESET
+	PORT_BIT( 0xff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(2)
 
 	PORT_START("FIREX")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_REVERSE
@@ -1493,6 +1499,7 @@ void demndrgn_state::demndrgn(machine_config &config)
 	outlatch.bit_handler<4>().set(FUNC(demndrgn_state::input_select_w));
 
 	m_astrocade_sound1->so_cb<4>().set("outlatch", FUNC(output_latch_device::write));
+	m_astrocade_sound1->so_cb<4>().append(FUNC(demndrgn_state::trackball_reset_w));
 	m_astrocade_sound1->pot_cb<0>().set_ioport("FIREX");
 	m_astrocade_sound1->pot_cb<1>().set_ioport("FIREY");
 }

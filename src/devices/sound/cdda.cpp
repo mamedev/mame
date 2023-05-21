@@ -38,7 +38,7 @@ void cdda_device::device_start()
 	m_audio_length = 0;
 	m_audio_samples = 0;
 	m_audio_bptr = 0;
-	m_disc = nullptr;
+	m_sequence_counter = 0;
 
 	m_audio_end_cb.resolve_safe();
 
@@ -50,17 +50,8 @@ void cdda_device::device_start()
 	save_pointer( NAME(m_audio_cache), cdrom_file::MAX_SECTOR_DATA * MAX_SECTORS );
 	save_item( NAME(m_audio_samples) );
 	save_item( NAME(m_audio_bptr) );
-}
+	save_item( NAME(m_sequence_counter) );
 
-
-/*-------------------------------------------------
-    cdda_set_cdrom - set the CD-ROM file for the
-    given CDDA stream
--------------------------------------------------*/
-
-void cdda_device::set_cdrom(cdrom_image_device *file)
-{
-	m_disc = file;
 }
 
 
@@ -168,15 +159,16 @@ void cdda_device::get_audio_data(write_stream_view &bufL, write_stream_view &buf
 	{
 		/* if no file, audio not playing, audio paused, or out of disc data,
 		   just zero fill */
-		if (!m_disc || !m_audio_playing || m_audio_pause || (!m_audio_length && !m_audio_samples))
+		if (m_disc->sequence_counter() != m_sequence_counter || !m_disc->exists() || !m_audio_playing || m_audio_pause || (!m_audio_length && !m_audio_samples))
 		{
-			if( m_disc && m_audio_playing && !m_audio_pause && !m_audio_length )
+			if( m_audio_playing && !m_audio_pause && !m_audio_length )
 			{
 				m_audio_playing = false;
 				m_audio_ended_normally = true;
 				m_audio_end_cb(ASSERT_LINE);
 			}
 
+			m_sequence_counter = m_disc->sequence_counter();
 			m_audio_data[0] = m_audio_data[1] = 0;
 			bufL.fill(0, sampindex);
 			bufR.fill(0, sampindex);
@@ -245,7 +237,7 @@ DEFINE_DEVICE_TYPE(CDDA, cdda_device, "cdda", "CD/DA")
 cdda_device::cdda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CDDA, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, m_disc(nullptr)
+	, m_disc(*this, finder_base::DUMMY_TAG)
 	, m_stream(nullptr)
 	, m_audio_end_cb(*this)
 {

@@ -2,7 +2,7 @@
 // copyright-holders:
 
 /*
-    Victory Shoot (c) 19?? Taito
+    Victory Shoot (c) 1995 Taito
     MAIN PCB-B (stickered K11J0817A VICTORY SHOOT)
 
     Main components:
@@ -52,7 +52,7 @@ void vicshoot_state::main_map(address_map &map) // TODO: verify everything
 {
 	map(0x0000, 0x3fff).rom().region("maincpu", 0);
 	map(0xc000, 0xdfff).ram();
-	map(0xe000, 0xe00f).lr8(NAME([this] () -> uint8_t { return machine().rand(); }));
+	// map(0xe000, 0xe00f) // ?
 	map(0xf000, 0xf000).w("ciu", FUNC(pc060ha_device::master_port_w));
 	map(0xf001, 0xf001).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
 }
@@ -162,4 +162,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 19??, vicshoot, 0, vicshoot, vicshoot, vicshoot_state, empty_init, ROT0, "Taito Corporation", "Victory Shoot", MACHINE_IS_SKELETON )
+GAME( 1995, vicshoot, 0, vicshoot, vicshoot, vicshoot_state, empty_init, ROT0, "Taito Corporation", "Victory Shoot", MACHINE_IS_SKELETON ) // a website lists it as 1994, but it was publicized on 1995 magazines. Going with the latter for now

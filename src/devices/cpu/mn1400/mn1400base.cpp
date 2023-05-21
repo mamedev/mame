@@ -31,6 +31,13 @@ MN1456A: MN1455 with double amount ROM/RAM
 MN148x: DAC for TV/VTR tuner
 MN1427: support for FM audio tuner
 
+TODO:
+- counter input pin (CSLCT and SNS1)
+- are illegal opcodes 0x38/0xe0 and 0x39/0xe1 branch-always and branch-never?
+  right now they're implemented as such
+- is branch emulation correct when near the end of a page?
+- add other MCUs when needed
+
 */
 
 #include "emu.h"

@@ -102,8 +102,6 @@ private:
 	u16 m_width;
 	u16 m_visible_height;
 	u16 m_visible_width;
-	u16 m_hshift;
-	u16 m_vshift;
 	//u16 m_video_width;  // horizontal total (in pixels)
 	//u16 m_video_height; // vertical total
 	bool m_interlace;  // 1024 vertical resolution is interlaced

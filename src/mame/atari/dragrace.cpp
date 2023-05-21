@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Stefan Jokisch
+// copyright-holders: Stefan Jokisch
+
 /***************************************************************************
 
     Atari Drag Race Driver
@@ -7,15 +8,158 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "dragrace.h"
+
+#include "dragrace_a.h"
 
 #include "cpu/m6800/m6800.h"
 #include "machine/74259.h"
+#include "machine/timer.h"
+#include "machine/watchdog.h"
 #include "sound/discrete.h"
+
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "dragrace.lh"
 
+
+namespace {
+
+class dragrace_state : public driver_device
+{
+public:
+	dragrace_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_watchdog(*this, "watchdog"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_discrete(*this, "discrete"),
+		m_playfield_ram(*this, "playfield_ram"),
+		m_position_ram(*this, "position_ram"),
+		m_p(*this, "P%u", 1U),
+		m_dial(*this, "DIAL%u", 1U),
+		m_in(*this, "IN%u", 0U),
+		m_gear_sel(*this, "P%ugear", 1U),
+		m_tacho_sel(*this, "tachometer%u", 1U)
+	{
+	}
+
+	void dragrace(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<discrete_sound_device> m_discrete;
+
+	// memory pointers
+	required_shared_ptr<uint8_t> m_playfield_ram;
+	required_shared_ptr<uint8_t> m_position_ram;
+
+	// inputs
+	required_ioport_array<2> m_p, m_dial;
+	required_ioport_array<3> m_in;
+
+	// outputs
+	output_finder<2> m_gear_sel, m_tacho_sel;
+
+	// video-related
+	tilemap_t *m_bg_tilemap = nullptr;
+
+	// misc
+	uint8_t m_gear[2]{};
+	emu_timer *m_scan_timer;
+	emu_timer *m_irq_off_timer;
+
+	void speed1_w(uint8_t data);
+	void speed2_w(uint8_t data);
+	uint8_t input_r(offs_t offset);
+	uint8_t steering_r();
+	uint8_t scanline_r();
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(frame_callback);
+	TIMER_CALLBACK_MEMBER(scanline_irq);
+	TIMER_CALLBACK_MEMBER(irq_off);
+
+	void main_map(address_map &map);
+};
+
+
+// video
+
+TILE_GET_INFO_MEMBER(dragrace_state::get_tile_info)
+{
+	uint8_t code = m_playfield_ram[tile_index];
+	int num = code & 0x1f;
+	int col = 0;
+
+	if ((code & 0xc0) == 0x40)
+		num |= 0x20;
+
+	switch (code & 0xa0)
+	{
+		case 0x00:
+			col = 0;
+			break;
+		case 0x20:
+			col = 1;
+			break;
+		case 0x80:
+			col = (code & 0x40) ? 1 : 0;
+			break;
+		case 0xa0:
+			col = (code & 0x40) ? 3 : 2;
+			break;
+	}
+
+	tileinfo.set(((code & 0xa0) == 0x80) ? 1 : 0, num, col, 0);
+}
+
+
+void dragrace_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dragrace_state::get_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+}
+
+
+uint32_t dragrace_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->mark_all_dirty();
+
+	for (int y = 0; y < 256; y += 4)
+	{
+		rectangle rect = cliprect;
+
+		int const xl = m_position_ram[y + 0] & 15;
+		int const xh = m_position_ram[y + 1] & 15;
+		int const yl = m_position_ram[y + 2] & 15;
+		int const yh = m_position_ram[y + 3] & 15;
+
+		m_bg_tilemap->set_scrollx(0, 16 * xh + xl - 8);
+		m_bg_tilemap->set_scrolly(0, 16 * yh + yl);
+
+		rect.sety((std::max)(rect.top(), y + 0), (std::min)(rect.bottom(), y + 3));
+
+		m_bg_tilemap->draw(screen, bitmap, rect, 0, 0);
+	}
+
+	return 0;
+}
+
+
+// machine
 
 TIMER_DEVICE_CALLBACK_MEMBER(dragrace_state::frame_callback)
 {
@@ -32,10 +176,25 @@ TIMER_DEVICE_CALLBACK_MEMBER(dragrace_state::frame_callback)
 	}
 
 	m_gear_sel[0] = m_gear[0];
-	m_gear_sel[1] =  m_gear[1];
+	m_gear_sel[1] = m_gear[1];
 
 	// watchdog is disabled during service mode
 	m_watchdog->watchdog_enable(m_in[0]->read() & 0x20);
+}
+
+TIMER_CALLBACK_MEMBER(dragrace_state::scanline_irq)
+{
+	m_maincpu->set_input_line(M6800_IRQ_LINE, ASSERT_LINE);
+	m_irq_off_timer->adjust(m_screen->scan_period() * 3);
+
+	// Four IRQs per frame (vpos = 64, 128, 192, 240)
+	int const scanline = m_screen->vpos();
+	m_scan_timer->adjust(m_screen->time_until_pos(scanline < 240 ? std::min(scanline + 64, 240) : 64));
+}
+
+TIMER_CALLBACK_MEMBER(dragrace_state::irq_off)
+{
+	m_maincpu->set_input_line(M6800_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -61,8 +220,8 @@ uint8_t dragrace_state::input_r(offs_t offset)
 {
 	int val = m_in[2]->read();
 
-	uint8_t maskA = 1 << (offset % 8);
-	uint8_t maskB = 1 << (offset / 8);
+	uint8_t const maskA = 1 << (offset % 8);
+	uint8_t const maskB = 1 << (offset / 8);
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -86,7 +245,7 @@ uint8_t dragrace_state::steering_r()
 
 	for (int i = 0; i < 2; i++)
 	{
-		int dial = m_dial[i]->read();
+		int const dial = m_dial[i]->read();
 
 		bitA[i] = ((dial + 1) / 2) & 1;
 		bitB[i] = ((dial + 0) / 2) & 1;
@@ -232,8 +391,8 @@ static const gfx_layout dragrace_tile_layout2 =
 
 
 static GFXDECODE_START( gfx_dragrace )
-	GFXDECODE_ENTRY( "gfx1", 0, dragrace_tile_layout1, 0, 4 )
-	GFXDECODE_ENTRY( "gfx2", 0, dragrace_tile_layout2, 8, 2 )
+	GFXDECODE_ENTRY( "tiles_2c", 0, dragrace_tile_layout1, 0, 4 )
+	GFXDECODE_ENTRY( "tiles_4c", 0, dragrace_tile_layout2, 8, 2 )
 GFXDECODE_END
 
 
@@ -263,6 +422,10 @@ void dragrace_state::machine_start()
 	m_gear_sel.resolve();
 	m_tacho_sel.resolve();
 
+	m_scan_timer = timer_alloc(FUNC(dragrace_state::scanline_irq), this);
+	m_irq_off_timer = timer_alloc(FUNC(dragrace_state::irq_off), this);
+	m_scan_timer->adjust(m_screen->time_until_pos(64));
+
 	save_item(NAME(m_gear));
 }
 
@@ -277,7 +440,6 @@ void dragrace_state::dragrace(machine_config &config)
 	// basic machine hardware
 	M6800(config, m_maincpu, 12.096_MHz_XTAL / 12);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dragrace_state::main_map);
-	m_maincpu->set_periodic_int(FUNC(dragrace_state::irq0_line_hold), attotime::from_hz(4*60));
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 8);
 
@@ -285,9 +447,7 @@ void dragrace_state::dragrace(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_size(256, 262);
-	m_screen->set_visarea(0, 255, 0, 239);
+	m_screen->set_raw(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 0, 240); // vertical timings determined by sync PROM
 	m_screen->set_screen_update(FUNC(dragrace_state::screen_update));
 	m_screen->set_palette("palette");
 
@@ -333,12 +493,12 @@ ROM_START( dragrace )
 	ROM_LOAD( "8514.a1", 0x1800, 0x0800, CRC(ad218690) SHA1(08ba5f4fa4c75d8dad1a7162888d44b3349cbbe4) )
 	ROM_RELOAD(          0xf800, 0x0800 )
 
-	ROM_REGION( 0x800, "gfx1", 0 )   // 2 color tiles
+	ROM_REGION( 0x800, "tiles_2c", 0 )   // 2 color tiles
 	ROM_LOAD( "8519dr.j0", 0x000, 0x200, CRC(aa221ba0) SHA1(450acbf349d77a790a25f3e303c31b38cc426a38) )
 	ROM_LOAD( "8521dr.k0", 0x200, 0x200, CRC(0cb33f12) SHA1(d50cb55391aec03e064eecad1624d50d4c30ccab) )
 	ROM_LOAD( "8520dr.r0", 0x400, 0x200, CRC(ee1ae6a7) SHA1(83491095260c8b7c616ff17ec1e888d05620f166) )
 
-	ROM_REGION( 0x800, "gfx2", 0 )   // 4 color tiles
+	ROM_REGION( 0x800, "tiles_4c", 0 )   // 4 color tiles
 	ROM_LOAD( "8515dr.e0", 0x000, 0x200, CRC(9510a59e) SHA1(aea0782b919279efe55a07007bd55a16f7f59239) )
 	ROM_LOAD( "8517dr.h0", 0x200, 0x200, CRC(8b5bff1f) SHA1(fdcd719c66bff7c4b9f3d56d1e635259dd8add61) )
 	ROM_LOAD( "8516dr.l0", 0x400, 0x200, CRC(d1e74af1) SHA1(f55a3bfd7d152ac9af128697f55c9a0c417779f5) )
@@ -347,6 +507,8 @@ ROM_START( dragrace )
 	ROM_REGION( 0x100, "sync", 0 )  // sync prom located at L8, it's a 82s129
 	ROM_LOAD( "l8.bin", 0x000, 0x100, CRC(3610b453) SHA1(9e33ee04f22a9174c29fafb8e71781fa330a7a08) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAMEL( 1977, dragrace, 0, dragrace, dragrace, dragrace_state, empty_init, 0, "Atari (Kee Games)", "Drag Race", MACHINE_SUPPORTS_SAVE, layout_dragrace )

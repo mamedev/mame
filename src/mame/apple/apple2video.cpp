@@ -152,6 +152,11 @@ WRITE_LINE_MEMBER(a2_video_device::an2_w)
 	m_an2 = state;
 }
 
+void a2_video_device::a80col_w(bool b80Col)
+{
+	screen().update_now();
+	m_80col = b80Col;
+}
 
 // 4-bit left rotate. Bits 4-6 of n must be a copy of bits 0-2.
 static constexpr unsigned rotl4b(unsigned n, unsigned count) { return (n >> (-count & 3)) & 0x0f; }
@@ -440,8 +445,11 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	const int stopcol = ((cliprect.right() / 14) + 1);
 
 	bool const monochrome = monochrome_monitor();
-	bool const render_perfect_blocks = !monochrome && (rgb_monitor() || !composite_lores_artifacts());
-
+	bool render_perfect_blocks = !monochrome && (rgb_monitor() || !composite_lores_artifacts());
+	if (!Double && m_dhires)
+	{
+		render_perfect_blocks = false;
+	}
 	//printf("GR: row %d startcol %d stopcol %d left %d right %d\n", beginrow, startcol, stopcol, cliprect.left(), cliprect.right());
 
 	for (int row = startrow; row <= stoprow; row += 4)
@@ -450,7 +458,6 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 		uint32_t const address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5));
 		uint8_t const *const vram = m_ram_ptr + address;
 		uint8_t const *const vaux = Double ? (m_aux_ptr + address) : nullptr;
-
 		auto const NIBBLE = [&row] (auto byte) { return ((byte) >> (row & 4)) & 0x0f; };
 		if (render_perfect_blocks)
 		{
@@ -490,8 +497,17 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 				}
 				else
 				{
-					words[col+0] = (NIBBLE(vram[col+0]) * 0x1111) & 0x3fff;
-					words[col+1] = (NIBBLE(vram[col+1]) * 0x1111) >> 2;
+					if (m_dhires)
+					{
+						// TODO: lo-res in 7M drawing here (should be just black/white/green/purple)
+						words[col+0] = (NIBBLE(vram[col+0]) * 0x1111) & 0x3fff;
+						words[col+1] = (NIBBLE(vram[col+1]) * 0x1111) >> 2;
+					}
+					else
+					{
+						words[col+0] = (NIBBLE(vram[col+0]) * 0x1111) & 0x3fff;
+						words[col+1] = (NIBBLE(vram[col+1]) * 0x1111) >> 2;
+					}
 				}
 			}
 
@@ -527,7 +543,6 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	bool const is_80_column = (Model == model::IIE || Model == model::IIGS) && m_80col;
 	bool const monochrome = !(m_graphics && composite_monitor() && composite_text_color(is_80_column));
-
 	for (int row = startrow; row < stoprow; row++)
 	{
 		uint32_t const address = start_address + ((((row / 8) & 0x07) << 7) | (((row / 8) & 0x18) * 5));

@@ -93,7 +93,7 @@ void tsconf_state::tsconf_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0000).mirror(0x7ffd).w(FUNC(tsconf_state::tsconf_port_7ffd_w));
-	map(0x001f, 0x001f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::status_r), FUNC(beta_disk_device::command_w));
+	map(0x001f, 0x001f).mirror(0xff00).r(FUNC(tsconf_state::tsconf_port_xx1f_r)).w(m_beta, FUNC(beta_disk_device::command_w));
 	map(0x003f, 0x003f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w));
 	map(0x0057, 0x0057).mirror(0xff00).rw(FUNC(tsconf_state::tsconf_port_57_zctr_r), FUNC(tsconf_state::tsconf_port_57_zctr_w)); // spi config
 	map(0x0077, 0x0077).mirror(0xff00).rw(FUNC(tsconf_state::tsconf_port_77_zctr_r), FUNC(tsconf_state::tsconf_port_77_zctr_w)); // spi data
@@ -102,13 +102,15 @@ void tsconf_state::tsconf_io(address_map &map)
 	map(0x00fe, 0x00fe).select(0xff00).rw(FUNC(tsconf_state::spectrum_ula_r), FUNC(tsconf_state::tsconf_ula_w));
 	map(0x00ff, 0x00ff).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::state_r), FUNC(beta_disk_device::param_w));
 	map(0x00af, 0x00af).select(0xff00).rw(FUNC(tsconf_state::tsconf_port_xxaf_r), FUNC(tsconf_state::tsconf_port_xxaf_w));
-	map(0x8ff7, 0x8ff7).select(0x7000).w(FUNC(tsconf_state::tsconf_port_f7_w)); // 3:bff7 5:dff7 6:eff7
-	map(0xbff7, 0xbff7).r(FUNC(tsconf_state::tsconf_port_f7_r));
 	map(0xfadf, 0xfadf).lr8(NAME([this]() { return 0x80 | (m_io_mouse[2]->read() & 0x07); }));
 	map(0xfbdf, 0xfbdf).lr8(NAME([this]() { return  m_io_mouse[0]->read(); }));
 	map(0xffdf, 0xffdf).lr8(NAME([this]() { return ~m_io_mouse[1]->read(); }));
-	map(0x8000, 0x8000).mirror(0x3ffd).w("ay8912", FUNC(ay8910_device::data_w));
-	map(0xc000, 0xc000).mirror(0x3ffd).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
+	map(0x8ff7, 0x8ff7).select(0x7000).w(FUNC(tsconf_state::tsconf_port_f7_w)); // 3:bff7 5:dff7 6:eff7
+	map(0xbff7, 0xbff7).r(FUNC(tsconf_state::tsconf_port_f7_r));
+	map(0x00fb, 0x00fb).mirror(0xff00).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0x8000, 0x8000).mirror(0x3ffd).lw8(NAME([this](u8 data) { return m_ay[m_ay_selected]->data_w(data); }));
+	map(0xc000, 0xc000).mirror(0x3ffd).lr8(NAME([this]() { return m_ay[m_ay_selected]->data_r(); }))
+		.w(FUNC(tsconf_state::tsconf_ay_address_w));
 }
 
 void tsconf_state::tsconf_switch(address_map &map)
@@ -236,6 +238,7 @@ void tsconf_state::machine_reset()
 
 	m_zctl_cs = 1;
 	m_zctl_di = 0xff;
+	m_ay_selected = 0;
 
 	tsconf_update_bank0();
 	tsconf_update_video_mode();
@@ -258,6 +261,10 @@ INPUT_PORTS_START( tsconf )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Right mouse button") PORT_CODE(MOUSECODE_BUTTON2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Middle mouse button") PORT_CODE(MOUSECODE_BUTTON3)
 
+	PORT_START("MOD_AY")
+	PORT_CONFNAME(0x01, 0x00, "AY MOD")
+	PORT_CONFSETTING(0x00, "Single")
+	PORT_CONFSETTING(0x01, "TurboSound")
 INPUT_PORTS_END
 
 void tsconf_state::tsconf(machine_config &config)
@@ -299,11 +306,21 @@ void tsconf_state::tsconf(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YM2149(config.replace(), "ay8912", 14_MHz_XTAL / 8)
+	config.device_remove("ay8912");
+	YM2149(config, m_ay[0], 14_MHz_XTAL / 8)
 		.add_route(0, "lspeaker", 0.50)
 		.add_route(1, "lspeaker", 0.25)
 		.add_route(1, "rspeaker", 0.25)
 		.add_route(2, "rspeaker", 0.50);
+	YM2149(config, m_ay[1], 14_MHz_XTAL / 8)
+		.add_route(0, "lspeaker", 0.50)
+		.add_route(1, "lspeaker", 0.25)
+		.add_route(1, "rspeaker", 0.25)
+		.add_route(2, "rspeaker", 0.50);
+
+	CENTRONICS(config, m_centronics, centronics_devices, "covox");
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	PALETTE(config, "palette", FUNC(tsconf_state::tsconf_palette), 256);
 	m_screen->set_raw(14_MHz_XTAL / 2, 448, with_hblank(0), 448, 320, with_vblank(0), 320);

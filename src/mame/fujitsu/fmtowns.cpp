@@ -1332,7 +1332,6 @@ void towns_state::towns_cdrom_play_cdda(cdrom_image_device* device)
 	m_towns_cd.cdda_current = msf_to_lbafm(lba1);
 	m_towns_cd.cdda_length = msf_to_lbafm(lba2) - m_towns_cd.cdda_current + 1;
 
-	m_cdda->set_cdrom(device);
 	m_cdda->start_audio(m_towns_cd.cdda_current,m_towns_cd.cdda_length);
 	if(LOG_CD) logerror("CD: CD-DA start from LBA:%i length:%i\n",m_towns_cd.cdda_current,m_towns_cd.cdda_length);
 	if(m_towns_cd.command & 0x20)
@@ -2553,6 +2552,7 @@ void towns_state::towns_base(machine_config &config)
 	SOFTWARE_LIST(config, "fd_list_misc").set_original("fmtowns_flop_misc");
 
 	CDROM(config, m_cdrom, 0).set_interface("fmt_cdrom");
+	m_cdda->set_cdrom_tag(m_cdrom);
 	SOFTWARE_LIST(config, "cd_list").set_original("fmtowns_cd");
 
 	UPD71071(config, m_dma[0], 0);
