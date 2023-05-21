@@ -921,13 +921,17 @@ Offset [vi_scaley]
 		</part>
 	</software>
 
-	<software name="bangaioh" supported="no">
+	<software name="bangaioh" supported="partial">
 		<description>Bakuretsu Muteki Bangaioh (Japan)</description>
 		<year>1999</year>
 		<publisher>ESP Software</publisher>
+		<notes><![CDATA[
+Occasionally flickers with bad GFXs during gameplay
+]]></notes>
 		<info name="serial" value="NUS-NBNJ-JPN"/>
 		<info name="release" value="19990903"/>
 		<info name="alt_title" value="爆裂無敵 バンガイオー"/>
+		<info name="developer" value="Treasure"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
 			<feature name="u1" value="U1 [NUS-NBNJ-0]" />
@@ -1525,7 +1529,7 @@ Heavy flickering
 		</part>
 	</software>
 
-	<software name="bombmnae" supported="no">
+	<software name="bombmnae" supported="yes">
 		<description>Bomberman 64 - Arcade Edition (Japan)</description>
 		<year>2001</year>
 		<publisher>Hudson Soft</publisher>
@@ -1800,6 +1804,9 @@ Black screen, writes to [cart] space
 		<description>Bust-A-Move 2 - Arcade Edition (Europe)</description>
 		<year>1998</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+"Fatal error: RDP: load_tlut: size = 1" during attract
+]]></notes>
 		<info name="serial" value="NUS-NBUP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x800000">
@@ -2743,6 +2750,10 @@ Requires [16KB EEPROM] (verify)
 		<description>Defi au Tetris Magique (France)</description>
 		<year>1999</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+Single vertical blue line on ready GFX text
+PAL timings needs to be tuned in
+]]></notes>
 		<info name="serial" value="NUS-NMTF-FRA"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
@@ -2751,18 +2762,18 @@ Requires [16KB EEPROM] (verify)
 		</part>
 	</software>
 
-	<!-- Notes:
-	    This game is compatible with the Nintendo VRSユニット [NUS-020(Japan)], a voice recognition unit that connects
-	    to controller 2 port and has the following hardware inside:
-	        pcb: NUS-VRU-01
-	        u1: Nintendo VRD-NUS 215 9915J3001
-	        u2: NEC D9930G 9912LP009 (linear CODEC LSI)
-	        u3: Nintendo VCI-NUS 9910XX003 011
-	-->
 	<software name="dendeg64" supported="no">
 		<description>Densha de Go! 64 (Japan)</description>
 		<year>1999</year>
 		<publisher>Taito Corporation</publisher>
+		<notes><![CDATA[
+Compatible with Densha de Go [train controller], in port 3 according to game
+Compatible with the Nintendo [VRSユニット] [NUS-020(Japan)], a voice recognition unit that connects to controller 2 port (ETA: port 4 according to the game) and has the following hardware inside:
+pcb: NUS-VRU-01
+u1: Nintendo VRD-NUS 215 9915J3001
+u2: NEC D9930G 9912LP009 (linear CODEC LSI)
+u3: Nintendo VCI-NUS 9910XX003 011
+]]></notes>
 		<info name="serial" value="NUS-ND6J-JPN"/>
 		<info name="release" value="19990730"/>
 		<info name="alt_title" value="電車でGO ! 64"/>
@@ -3579,7 +3590,7 @@ This cart features a RTC, currently unemulated
 		<year>1996</year>
 		<publisher>Seta Corporation</publisher>
 		<notes><![CDATA[
-Cannot start a game
+Doesn't recognize start button pressed on title screen
 ]]></notes>
 		<info name="serial" value="NUS-NSTJ-JPN"/>
 		<info name="release" value="19961129"/>
@@ -4846,6 +4857,9 @@ Reported as not working on real HW, incorrect internal checksum rom with the crc
 		<description>Heiwa Pachinko World 64 (Japan)</description>
 		<year>1997</year>
 		<publisher>Shouei System</publisher>
+		<notes><![CDATA[
+Doesn't recognize start button pressed on title screen
+]]></notes>
 		<info name="serial" value="NUS-NHPJ-JPN"/>
 		<info name="release" value="19971128"/>
 		<info name="alt_title" value="HEIWA パチンコワールド64"/>
@@ -6945,6 +6959,10 @@ Requires [16KB EEPROM]
 		<description>Magical Tetris Challenge (Europe)</description>
 		<year>1999</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+Single vertical blue line on ready GFX text
+PAL timings needs to be tuned in
+]]></notes>
 		<info name="serial" value="NUS-NMTP-EUR, NUS-NMTP-UKV"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
@@ -6953,10 +6971,14 @@ Requires [16KB EEPROM]
 		</part>
 	</software>
 
-	<software name="mtetriscg" cloneof="mtetrisc" supported="no">
+	<software name="mtetriscg" cloneof="mtetrisc" supported="partial">
 		<description>Magical Tetris Challenge (Germany)</description>
 		<year>1999</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+Single vertical blue line on ready GFX text
+PAL timings needs to be tuned in
+]]></notes>
 		<info name="serial" value="NUS-NMTD-NOE"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
@@ -6965,10 +6987,13 @@ Requires [16KB EEPROM]
 		</part>
 	</software>
 
-	<software name="mtetriscu" cloneof="mtetrisc" supported="no">
+	<software name="mtetriscu" cloneof="mtetrisc" supported="partial">
 		<description>Magical Tetris Challenge (USA)</description>
 		<year>1999</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+Single vertical blue line on ready GFX text
+]]></notes>
 		<info name="serial" value="NUS-NMTE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -6981,10 +7006,13 @@ Requires [16KB EEPROM]
 		</part>
 	</software>
 
-	<software name="mtetriscj" cloneof="mtetrisc" supported="no">
+	<software name="mtetriscj" cloneof="mtetrisc" supported="partial">
 		<description>Magical Tetris Challenge featuring Mickey (Japan)</description>
 		<year>1998</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+Single vertical blue line on ready GFX text
+]]></notes>
 		<info name="serial" value="NUS-NMTJ-JPN"/>
 		<info name="release" value="19981120"/>
 		<info name="alt_title" value="マジカル TETRIS チャレンジ featuring ミッキー"/>
@@ -6999,6 +7027,9 @@ Requires [16KB EEPROM]
 		<description>Mahjong 64 (Japan)</description>
 		<year>1997</year>
 		<publisher>Koei</publisher>
+		<notes><![CDATA[
+Inputs are unresponsive on main menu
+]]></notes>
 		<info name="serial" value="NUS-NMJJ-JPN"/>
 		<info name="release" value="19970404"/>
 		<info name="alt_title" value="麻雀64"/>
@@ -7013,6 +7044,9 @@ Requires [16KB EEPROM]
 		<description>Mahjong Hourouki Classic (Japan)</description>
 		<year>1997</year>
 		<publisher>Imagineer</publisher>
+		<notes><![CDATA[
+Doesn't recognize start button pressed on title screen
+]]></notes>
 		<info name="serial" value="NUS-NMHJ-JPN"/>
 		<info name="release" value="19970801"/>
 		<info name="alt_title" value="麻雀放浪記 CLASSIC"/>
@@ -7023,7 +7057,7 @@ Requires [16KB EEPROM]
 		</part>
 	</software>
 
-	<software name="mjmaster" supported="no">
+	<software name="mjmaster" supported="partial">
 		<description>Mahjong Master (Japan)</description>
 		<year>1996</year>
 		<publisher>Konami</publisher>
@@ -7691,6 +7725,10 @@ Black screen after title if left idle
 		<description>Mischief Makers (Europe)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Occasional GFX flickering
+PAL timings needs to be tuned in
+]]></notes>
 		<info name="serial" value="NUS-NTMP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x800000">
@@ -7699,10 +7737,13 @@ Black screen after title if left idle
 		</part>
 	</software>
 
-	<software name="mischiefu" cloneof="mischief" supported="no">
+	<software name="mischiefu" cloneof="mischief" supported="partial">
 		<description>Mischief Makers (USA, rev 1)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Occasional GFX flickering
+]]></notes>
 		<info name="serial" value="NUS-NTME-USA"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x800000">
@@ -7711,10 +7752,13 @@ Black screen after title if left idle
 		</part>
 	</software>
 
-	<software name="mischiefu1" cloneof="mischief" supported="no">
+	<software name="mischiefu1" cloneof="mischief" supported="partial">
 		<description>Mischief Makers (USA)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Occasional GFX flickering
+]]></notes>
 		<info name="serial" value="NUS-NTME-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -7914,13 +7958,14 @@ Black screen after title if left idle
 		</part>
 	</software>
 
-<!--
-This cart features a built-in RJ-42 Modem Connection port to play online, currently unemulated
--->
 	<software name="moritash" supported="no">
 		<description>Morita Shougi 64 (Japan)</description>
 		<year>1998</year>
 		<publisher>Seta Corporation</publisher>
+		<notes><![CDATA[
+Built-in [RJ-42 Modem] Connection port to play online
+Black screen when attempting to start a game
+]]></notes>
 		<info name="serial" value="NUS-NMSJ-JPN"/>
 		<info name="release" value="19980403"/>
 		<info name="alt_title" value="森田将棋64"/>
@@ -8002,6 +8047,9 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<description>Mortal Kombat Trilogy (Europe)</description>
 		<year>1997</year>
 		<publisher>Midway</publisher>
+		<notes><![CDATA[
+"Fatal error: RDP: load_tlut: size = 1" during attract/gameplay
+]]></notes>
 		<info name="serial" value="NUS-NMKP-NOE"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0xc00000">
@@ -8014,6 +8062,9 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<description>Mortal Kombat Trilogy (USA, rev 2)</description>
 		<year>1996</year>
 		<publisher>Midway</publisher>
+		<notes><![CDATA[
+"Fatal error: RDP: load_tlut: size = 1" during attract/gameplay
+]]></notes>
 		<info name="serial" value="NUS-NMKE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0xc00000">
@@ -8026,6 +8077,9 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<description>Mortal Kombat Trilogy (USA, rev 1)</description>
 		<year>1996</year>
 		<publisher>Midway</publisher>
+		<notes><![CDATA[
+"Fatal error: RDP: load_tlut: size = 1" during attract/gameplay
+]]></notes>
 		<info name="serial" value="NUS-NMKE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-02A-01" />
@@ -8047,7 +8101,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<year>1996</year>
 		<publisher>Midway</publisher>
 		<notes><![CDATA[
-"Fatal error: RDP: load_tlut: size = 1" during attract
+"Fatal error: RDP: load_tlut: size = 1" during attract/gameplay
 ]]></notes>
 		<info name="serial" value="NUS-NMKE-USA"/>
 		<part name="cart" interface="n64_cart">
@@ -8068,7 +8122,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<year>1996</year>
 		<publisher>Midway</publisher>
 		<notes><![CDATA[
-"Fatal error: RDP: load_tlut: size = 1" during attract
+"Fatal error: RDP: load_tlut: size = 1" during attract/gameplay
 ]]></notes>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
@@ -8203,7 +8257,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		</part>
 	</software>
 
-	<software name="namcomus" supported="no">
+	<software name="namcomus" supported="yes">
 		<description>Namco Museum 64 (USA)</description>
 		<year>1999</year>
 		<publisher>Namco</publisher>
@@ -9250,6 +9304,9 @@ Random crashes on exit (verify)
 		<description>Pachinko 365 Nichi (Japan)</description>
 		<year>1998</year>
 		<publisher>Seta Corporation</publisher>
+		<notes><![CDATA[
+Black screen during attract [drc]
+]]></notes>
 		<info name="serial" value="NUS-NPCJ-JPN"/>
 		<info name="release" value="19980529"/>
 		<info name="alt_title" value="パチンコ365日"/>
@@ -9331,7 +9388,7 @@ Random crashes on exit (verify)
 		</part>
 	</software>
 
-	<software name="parlpro" supported="no">
+	<software name="parlpro" supported="yes">
 		<description>Parlor! Pro 64 - Pachinko Jikki Simulation Game (Japan)</description>
 		<year>1999</year>
 		<publisher>Nihon Telenet</publisher>
@@ -12165,6 +12222,10 @@ Requires [16KB EEPROM]
 		<description>StarCraft 64 (Australia)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+Black screen after title
+]]></notes>
 		<info name="serial" value="NUS-NSQP-AUS"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-06A-01" />
@@ -12183,6 +12244,10 @@ Requires [16KB EEPROM]
 		<description>StarCraft 64 (Germany, prototype)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+Black screen after title
+]]></notes>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
 				<rom name="starcraft 64 (germany).bin" size="0x2000000" crc="35f8c03c" sha1="499c53f3d54293edb6889b6953b6e752e94322de" />
@@ -12194,6 +12259,10 @@ Requires [16KB EEPROM]
 		<description>StarCraft 64 (USA)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+Black screen after title
+]]></notes>
 		<info name="serial" value="NUS-NSQE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-06A-01" />
@@ -12212,6 +12281,10 @@ Requires [16KB EEPROM]
 		<description>StarCraft 64 (USA, prototype)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+[Expansion Pak] compatible
+Black screen after title
+]]></notes>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
 				<rom name="starcraft 64 (usa) (beta).bin" size="0x2000000" crc="0dab69e2" sha1="1c58ebc31a5a7d750c980d8730ea4b2a98b6e1d0" />
@@ -12568,10 +12641,13 @@ Screen Adjust in Option Mode doesn't move screen
 		</part>
 	</software>
 
-	<software name="puzldama" supported="no">
+	<software name="puzldama" supported="partial">
 		<description>Susume! Taisen Puzzle Dama - Toukon! Marutama Chou (Japan)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+Initial save init screen has red pixels on text GFX junctions (verify)
+]]></notes>
 		<info name="serial" value="NUS-NPZJ-JPN (RZ022-J1)"/>
 		<info name="release" value="19980326"/>
 		<info name="alt_title" value="進め!対戦ぱずるだま 闘魂!まるたま町"/>
@@ -12714,14 +12790,13 @@ Screen Adjust in Option Mode doesn't move screen
 		</part>
 	</software>
 
-	<software name="tetris64" supported="no">
+	<software name="tetris64" supported="partial">
 		<description>Tetris 64 (Japan)</description>
 		<year>1998</year>
 		<publisher>Seta Corporation</publisher>
 		<notes><![CDATA[
-The game came with the Nintendo-Seta [Bio Sensor], a special controller with a clip on the end, to measure
-user's heart beat. One end of the sensor plugs into the extension port on the controller, and the other end
-clips onto the player's ear.
+Came with the Nintendo-Seta [Bio Sensor], a special controller with a clip on the end, to measure user's heart beat.
+One end of the sensor plugs into the extension port on the controller, and the other end clips onto the player's ear.
 ]]></notes>
 		<info name="serial" value="NUS-NT6J-JPN"/>
 		<info name="release" value="19981113"/>
@@ -13877,6 +13952,10 @@ No text GFXs
 		<description>V-Rally Edition 99 (Europe)</description>
 		<year>1998</year>
 		<publisher>Infogrames</publisher>
+		<notes><![CDATA[
+Has 16:9 screen option
+Occasionally sky background flickers with wrong colors
+]]></notes>
 		<info name="serial" value="NUS-NVLP-EUR, NUS-NVLP-EUU" />
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0xc00000">
@@ -13889,6 +13968,10 @@ No text GFXs
 		<description>V-Rally Edition 99 (Japan)</description>
 		<year>1999</year>
 		<publisher>Spike</publisher>
+		<notes><![CDATA[
+Has 16:9 screen option
+Occasionally sky background flickers with wrong colors
+]]></notes>
 		<info name="serial" value="NUS-NVYJ-JPN"/>
 		<info name="release" value="19991014"/>
 		<info name="alt_title" value="V-RALLY EDITION 99"/>
@@ -13903,6 +13986,10 @@ No text GFXs
 		<description>V-Rally Edition 99 (USA)</description>
 		<year>1999</year>
 		<publisher>Infogrames</publisher>
+		<notes><![CDATA[
+Has 16:9 screen option
+Occasionally sky background flickers with wrong colors
+]]></notes>
 		<info name="serial" value="NUS-NVLE-USA" />
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
@@ -14130,6 +14217,8 @@ No text GFXs
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NWLP-EUR"/>
+		<!-- Player cannot play when it's supposedly his turn -->
+		<info name="usage" value="Needs to run Setup Data initialize on first boot"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="waialae country club - true golf classics (europe) (rev a).bin" size="0x1000000" crc="53a68628" sha1="57cbfa043a2d86c11b35b49855115641184097d7" />
@@ -14142,6 +14231,8 @@ No text GFXs
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NWLP-EUR"/>
+		<!-- Player cannot play when it's supposedly his turn -->
+		<info name="usage" value="Needs to run Setup Data initialize on first boot"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="waialae country club - true golf classics (europe).bin" size="0x1000000" crc="8e6f987b" sha1="b7542c7fc1566d4a9d72b85e3c6d57642614ee29" />
@@ -14154,6 +14245,8 @@ No text GFXs
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NWLE-USA"/>
+		<!-- Player cannot play when it's supposedly his turn -->
+		<info name="usage" value="Needs to run Setup Data initialize on first boot"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="waialae country club - true golf classics (usa) (rev a).bin" size="0x1000000" crc="76ebdb18" sha1="305e4a9fa345cf74000f7f05aec2483f4c7bdf3e" />
@@ -14166,6 +14259,8 @@ No text GFXs
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NWLE-USA"/>
+		<!-- Player cannot play when it's supposedly his turn -->
+		<info name="usage" value="Needs to run Setup Data initialize on first boot"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-03A-01" />
 			<feature name="u1" value="U1 [NUS-NWLE-0]" />
@@ -14712,6 +14807,7 @@ No text GFXs
 		<description>Wonder Project J2 - Koruro no Mori no Jozet (Japan)</description>
 		<year>1996</year>
 		<publisher>Enix</publisher>
+		<!-- TODO: not extensively tested, may be potentially promoted to partial -->
 		<info name="serial" value="NUS-NJ2J-JPN"/>
 		<info name="release" value="19961122"/>
 		<info name="alt_title" value="ワンダープロジェクト ジェイツーコルロの森のジョゼット"/>
@@ -15118,10 +15214,13 @@ Backgrounds leaves trails during gameplay
 		</part>
 	</software>
 
-	<software name="yukeyuke" cloneof="mischief" supported="no">
+	<software name="yukeyuke" cloneof="mischief" supported="partial">
 		<description>Yuke Yuke!! Trouble Makers (Japan)</description>
 		<year>1997</year>
 		<publisher>Enix</publisher>
+		<notes><![CDATA[
+Occasional GFX flickering
+]]></notes>
 		<info name="serial" value="NUS-NTMJ-JPN"/>
 		<info name="release" value="19970627"/>
 		<info name="alt_title" value="ゆけゆけ!!トラブルメーカーズ"/>
@@ -15255,6 +15354,9 @@ Hangs during intro when title appears
 		<description>Zool - Majuu Tsukai Densetsu (Japan)</description>
 		<year>1999</year>
 		<publisher>Imagineer</publisher>
+		<notes><![CDATA[
+Hangs after sky intro (obnoxiously perf demanding)
+]]></notes>
 		<info name="serial" value="NUS-NMZJ-JPN"/>
 		<info name="release" value="19990611"/>
 		<info name="alt_title" value="ズール 魔獣使い伝説"/>
