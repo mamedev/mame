@@ -873,8 +873,8 @@ void vrc5074_device::cpu_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		map_cpu_space();
 		break;
 	case NREG_CPUSTAT + 0:    /* CPU status */
-		if (data & 0x1) LOGMASKED(LOG_GENERAL, "cpu_reg_w: System Cold Reset\n");
-		if (data & 0x2) LOGMASKED(LOG_GENERAL, "cpu_reg_w: CPU Warm Reset\n");
+		if (data & 0x1) logerror("cpu_reg_w: System Cold Reset\n");
+		if (data & 0x2) logerror("cpu_reg_w: CPU Warm Reset\n");
 		[[fallthrough]];
 	case NREG_CPUSTAT + 1:    /* CPU status */
 		LOGMASKED(LOG_NILE, "%s NILE WRITE: CPU status(%03X) = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
@@ -1009,11 +1009,11 @@ uint32_t vrc5074_device::serial_r(offs_t offset)
 void vrc5074_device::serial_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_uart->ins8250_w(offset>>1, data);
-	if (offset == NREG_UARTTHR) {
+	if ((VERBOSE & LOG_SERIAL_DATA) && offset == NREG_UARTTHR) {
 		static std::string debugStr;
-		LOGMASKED(LOG_SERIAL_DATA, "%c", data);
+		logerror("%c", data);
 		if (data == 0xd || debugStr.length()>=80) {
-			LOGMASKED(LOG_SERIAL_DATA, "%s", debugStr.c_str());
+			logerror("%s", debugStr.c_str());
 			debugStr.clear();
 		}
 		else {

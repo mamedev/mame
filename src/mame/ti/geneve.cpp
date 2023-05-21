@@ -944,7 +944,7 @@ WRITE_LINE_MEMBER( geneve_state::joystick_select )
 WRITE_LINE_MEMBER( geneve_state::keyboard_reset )
 {
 	if (state==CLEAR_LINE)
-		LOGMASKED(LOG_GENERAL, "Keyboard reset (line not connected)\n");
+		LOG("Keyboard reset (line not connected)\n");
 }
 
 /*

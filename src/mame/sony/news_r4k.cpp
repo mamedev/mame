@@ -673,12 +673,12 @@ void news_r4k_state::cpu_map_main_memory(address_map &map)
 				   {
 					   if (data == 0x10001)
 					   {
-						   LOGMASKED(LOG_GENERAL, "Enabling RAM map shift!\n");
+						   LOG("Enabling RAM map shift!\n");
 						   m_ram_map_shift = true;
 					   }
 					   else
 					   {
-						   LOGMASKED(LOG_GENERAL, "Disabling RAM map shift!\n");
+						   LOG("Disabling RAM map shift!\n");
 						   m_ram_map_shift = false;
 					   }
 				   }));
@@ -769,7 +769,7 @@ uint8_t news_r4k_state::ram_r(offs_t offset)
 	}
 	else
 	{
-		LOGMASKED(LOG_GENERAL, "Unmapped RAM read attempted at offset 0x%x\n", offset);
+		LOG("Unmapped RAM read attempted at offset 0x%x\n", offset);
 	}
 	return result;
 }
@@ -792,7 +792,7 @@ void news_r4k_state::ram_w(offs_t offset, uint8_t data)
 	}
 	else
 	{
-		LOGMASKED(LOG_GENERAL, "Unmapped RAM write attempted at offset 0x%x (data: 0x%x)\n", offset, data);
+		LOG("Unmapped RAM write attempted at offset 0x%x (data: 0x%x)\n", offset, data);
 	}
 }
 

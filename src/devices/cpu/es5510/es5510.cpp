@@ -352,30 +352,30 @@ uint8_t es5510_device::host_r(address_space &space, offs_t offset)
 
 	switch(offset)
 	{
-	case 0x00: LOGMASKED(LOG_GENERAL, "ES5510: Host Read GPR latch[2]: %02x\n", (gpr_latch >> 16) & 0xff); return (gpr_latch >> 16) & 0xff;
-	case 0x01: LOGMASKED(LOG_GENERAL, "ES5510: Host Read GPR latch[1]: %02x\n", (gpr_latch >>  8) & 0xff); return (gpr_latch >>  8) & 0xff;
-	case 0x02: LOGMASKED(LOG_GENERAL, "ES5510: Host Read GPR latch[0]: %02x\n", (gpr_latch >>  0) & 0xff); return (gpr_latch >>  0) & 0xff;
+	case 0x00: LOG("ES5510: Host Read GPR latch[2]: %02x\n", (gpr_latch >> 16) & 0xff); return (gpr_latch >> 16) & 0xff;
+	case 0x01: LOG("ES5510: Host Read GPR latch[1]: %02x\n", (gpr_latch >>  8) & 0xff); return (gpr_latch >>  8) & 0xff;
+	case 0x02: LOG("ES5510: Host Read GPR latch[0]: %02x\n", (gpr_latch >>  0) & 0xff); return (gpr_latch >>  0) & 0xff;
 
-	case 0x03: LOGMASKED(LOG_GENERAL, "ES5510: Host Read INSTR latch[5]: %02x\n", uint8_t((instr_latch >> 40) & 0xff)); return (instr_latch >> 40) & 0xff;
-	case 0x04: LOGMASKED(LOG_GENERAL, "ES5510: Host Read INSTR latch[4]: %02x\n", uint8_t((instr_latch >> 32) & 0xff)); return (instr_latch >> 32) & 0xff;
-	case 0x05: LOGMASKED(LOG_GENERAL, "ES5510: Host Read INSTR latch[3]: %02x\n", uint8_t((instr_latch >> 24) & 0xff)); return (instr_latch >> 24) & 0xff;
-	case 0x06: LOGMASKED(LOG_GENERAL, "ES5510: Host Read INSTR latch[2]: %02x\n", uint8_t((instr_latch >> 16) & 0xff)); return (instr_latch >> 16) & 0xff;
-	case 0x07: LOGMASKED(LOG_GENERAL, "ES5510: Host Read INSTR latch[1]: %02x\n", uint8_t((instr_latch >>  8) & 0xff)); return (instr_latch >>  8) & 0xff;
-	case 0x08: LOGMASKED(LOG_GENERAL, "ES5510: Host Read INSTR latch[0]: %02x\n", uint8_t((instr_latch >>  0) & 0xff)); return (instr_latch >>  0) & 0xff;
+	case 0x03: LOG("ES5510: Host Read INSTR latch[5]: %02x\n", uint8_t((instr_latch >> 40) & 0xff)); return (instr_latch >> 40) & 0xff;
+	case 0x04: LOG("ES5510: Host Read INSTR latch[4]: %02x\n", uint8_t((instr_latch >> 32) & 0xff)); return (instr_latch >> 32) & 0xff;
+	case 0x05: LOG("ES5510: Host Read INSTR latch[3]: %02x\n", uint8_t((instr_latch >> 24) & 0xff)); return (instr_latch >> 24) & 0xff;
+	case 0x06: LOG("ES5510: Host Read INSTR latch[2]: %02x\n", uint8_t((instr_latch >> 16) & 0xff)); return (instr_latch >> 16) & 0xff;
+	case 0x07: LOG("ES5510: Host Read INSTR latch[1]: %02x\n", uint8_t((instr_latch >>  8) & 0xff)); return (instr_latch >>  8) & 0xff;
+	case 0x08: LOG("ES5510: Host Read INSTR latch[0]: %02x\n", uint8_t((instr_latch >>  0) & 0xff)); return (instr_latch >>  0) & 0xff;
 
-	case 0x09: LOGMASKED(LOG_GENERAL, "ES5510: Host Read DIL latch[2]: %02x\n", (dil_latch >> 16) & 0xff); return (dil_latch >> 16) & 0xff;
-	case 0x0a: LOGMASKED(LOG_GENERAL, "ES5510: Host Read DIL latch[1]: %02x\n", (dil_latch >>  8) & 0xff); return (dil_latch >>  8) & 0xff;
-	case 0x0b: LOGMASKED(LOG_GENERAL, "ES5510: Host Read DIL latch[0]: %02x\n", 0); return 0;
+	case 0x09: LOG("ES5510: Host Read DIL latch[2]: %02x\n", (dil_latch >> 16) & 0xff); return (dil_latch >> 16) & 0xff;
+	case 0x0a: LOG("ES5510: Host Read DIL latch[1]: %02x\n", (dil_latch >>  8) & 0xff); return (dil_latch >>  8) & 0xff;
+	case 0x0b: LOG("ES5510: Host Read DIL latch[0]: %02x\n", 0); return 0;
 
-	case 0x0c: LOGMASKED(LOG_GENERAL, "ES5510: Host Read DOL latch[2]: %02x\n", (dol_latch >> 16) & 0xff); return (dol_latch >> 16) & 0xff;
-	case 0x0d: LOGMASKED(LOG_GENERAL, "ES5510: Host Read DOL latch[1]: %02x\n", (dol_latch >>  8) & 0xff); return (dol_latch >>  8) & 0xff;
-	case 0x0e: LOGMASKED(LOG_GENERAL, "ES5510: Host Read DOL latch[0]: %02x\n", 0xff); return 0xff;
+	case 0x0c: LOG("ES5510: Host Read DOL latch[2]: %02x\n", (dol_latch >> 16) & 0xff); return (dol_latch >> 16) & 0xff;
+	case 0x0d: LOG("ES5510: Host Read DOL latch[1]: %02x\n", (dol_latch >>  8) & 0xff); return (dol_latch >>  8) & 0xff;
+	case 0x0e: LOG("ES5510: Host Read DOL latch[0]: %02x\n", 0xff); return 0xff;
 
-	case 0x0f: LOGMASKED(LOG_GENERAL, "ES5510: Host Read DADR latch[2]: %02x\n", (dadr_latch >> 16) & 0xff); return (dadr_latch >> 16) & 0xff;
-	case 0x10: LOGMASKED(LOG_GENERAL, "ES5510: Host Read DADR latch[1]: %02x\n", (dadr_latch >>  8) & 0xff); return (dadr_latch >>  8) & 0xff;
-	case 0x11: LOGMASKED(LOG_GENERAL, "ES5510: Host Read DADR latch[0]: %02x\n", (dadr_latch >>  0) & 0xff); return (dadr_latch >>  0) & 0xff;
+	case 0x0f: LOG("ES5510: Host Read DADR latch[2]: %02x\n", (dadr_latch >> 16) & 0xff); return (dadr_latch >> 16) & 0xff;
+	case 0x10: LOG("ES5510: Host Read DADR latch[1]: %02x\n", (dadr_latch >>  8) & 0xff); return (dadr_latch >>  8) & 0xff;
+	case 0x11: LOG("ES5510: Host Read DADR latch[0]: %02x\n", (dadr_latch >>  0) & 0xff); return (dadr_latch >>  0) & 0xff;
 
-	case 0x12: LOGMASKED(LOG_GENERAL, "ES5510: Host Reading Host Control\n"); return 0; // Host Control
+	case 0x12: LOG("ES5510: Host Reading Host Control\n"); return 0; // Host Control
 
 	case 0x16: return 0x27; // Program Counter, for test purposes only
 	}
@@ -392,38 +392,38 @@ void es5510_device::host_w(offs_t offset, uint8_t data)
 	switch (offset) {
 	case 0x00:
 		gpr_latch = (gpr_latch&0x00ffff) | ((data&0xff)<<16);
-		LOGMASKED(LOG_GENERAL, "ES5510: Host Write GPR latch[2] = %02x -> %06x (%d)\n", data, gpr_latch, util::sext(gpr_latch, 24));
+		LOG("ES5510: Host Write GPR latch[2] = %02x -> %06x (%d)\n", data, gpr_latch, util::sext(gpr_latch, 24));
 		break;
 	case 0x01:
 		gpr_latch = (gpr_latch&0xff00ff) | ((data&0xff)<< 8);
-		LOGMASKED(LOG_GENERAL, "ES5510: Host Write GPR latch[1] = %02x -> %06x (%d)\n", data, gpr_latch, util::sext(gpr_latch, 24));
+		LOG("ES5510: Host Write GPR latch[1] = %02x -> %06x (%d)\n", data, gpr_latch, util::sext(gpr_latch, 24));
 		break;
 	case 0x02:
 		gpr_latch = (gpr_latch&0xffff00) | ((data&0xff)<< 0);
-		LOGMASKED(LOG_GENERAL, "ES5510: Host Write GPR latch[0] = %02x -> %06x (%d)\n", data, gpr_latch, util::sext(gpr_latch, 24));
+		LOG("ES5510: Host Write GPR latch[0] = %02x -> %06x (%d)\n", data, gpr_latch, util::sext(gpr_latch, 24));
 		break;
 
 		/* 0x03 to 0x08 INSTR Register */
-	case 0x03: instr_latch = ((instr_latch & 0x00ffffffffffULL) | (int64_t(data)&0xff)<<40); LOGMASKED(LOG_GENERAL, "%s",string_format("ES5510: Host Write INSTR latch[5] = %02x -> %012x\n", data, instr_latch).c_str()); break;
-	case 0x04: instr_latch = ((instr_latch & 0xff00ffffffffULL) | (int64_t(data)&0xff)<<32); LOGMASKED(LOG_GENERAL, "%s",string_format("ES5510: Host Write INSTR latch[4] = %02x -> %012x\n", data, instr_latch).c_str()); break;
-	case 0x05: instr_latch = ((instr_latch & 0xffff00ffffffULL) | (int64_t(data)&0xff)<<24); LOGMASKED(LOG_GENERAL, "%s",string_format("ES5510: Host Write INSTR latch[3] = %02x -> %012x\n", data, instr_latch).c_str()); break;
-	case 0x06: instr_latch = ((instr_latch & 0xffffff00ffffULL) | (int64_t(data)&0xff)<<16); LOGMASKED(LOG_GENERAL, "%s",string_format("ES5510: Host Write INSTR latch[2] = %02x -> %012x\n", data, instr_latch).c_str()); break;
-	case 0x07: instr_latch = ((instr_latch & 0xffffffff00ffULL) | (int64_t(data)&0xff)<< 8); LOGMASKED(LOG_GENERAL, "%s",string_format("ES5510: Host Write INSTR latch[1] = %02x -> %012x\n", data, instr_latch).c_str()); break;
-	case 0x08: instr_latch = ((instr_latch & 0xffffffffff00ULL) | (int64_t(data)&0xff)<< 0); LOGMASKED(LOG_GENERAL, "%s",string_format("ES5510: Host Write INSTR latch[0] = %02x -> %012x\n", data, instr_latch).c_str()); break;
+	case 0x03: instr_latch = ((instr_latch & 0x00ffffffffffULL) | (int64_t(data)&0xff)<<40); LOG("%s",string_format("ES5510: Host Write INSTR latch[5] = %02x -> %012x\n", data, instr_latch).c_str()); break;
+	case 0x04: instr_latch = ((instr_latch & 0xff00ffffffffULL) | (int64_t(data)&0xff)<<32); LOG("%s",string_format("ES5510: Host Write INSTR latch[4] = %02x -> %012x\n", data, instr_latch).c_str()); break;
+	case 0x05: instr_latch = ((instr_latch & 0xffff00ffffffULL) | (int64_t(data)&0xff)<<24); LOG("%s",string_format("ES5510: Host Write INSTR latch[3] = %02x -> %012x\n", data, instr_latch).c_str()); break;
+	case 0x06: instr_latch = ((instr_latch & 0xffffff00ffffULL) | (int64_t(data)&0xff)<<16); LOG("%s",string_format("ES5510: Host Write INSTR latch[2] = %02x -> %012x\n", data, instr_latch).c_str()); break;
+	case 0x07: instr_latch = ((instr_latch & 0xffffffff00ffULL) | (int64_t(data)&0xff)<< 8); LOG("%s",string_format("ES5510: Host Write INSTR latch[1] = %02x -> %012x\n", data, instr_latch).c_str()); break;
+	case 0x08: instr_latch = ((instr_latch & 0xffffffffff00ULL) | (int64_t(data)&0xff)<< 0); LOG("%s",string_format("ES5510: Host Write INSTR latch[0] = %02x -> %012x\n", data, instr_latch).c_str()); break;
 
 		/* 0x09 to 0x0b DIL Register (r/o) */
 
 	case 0x0c:
 		dol_latch = (dol_latch&0x00ffff) | ((data&0xff)<<16);
-		LOGMASKED(LOG_GENERAL, "ES5510: Host Write DOL latch[2] = %02x -> %06x (%d)\n", data, dol_latch, util::sext(dol_latch, 24));
+		LOG("ES5510: Host Write DOL latch[2] = %02x -> %06x (%d)\n", data, dol_latch, util::sext(dol_latch, 24));
 		break;
 	case 0x0d:
 		dol_latch = (dol_latch&0xff00ff) | ((data&0xff)<< 8);
-		LOGMASKED(LOG_GENERAL, "ES5510: Host Write DOL latch[1] = %02x -> %06x (%d)\n", data, dol_latch, util::sext(dol_latch, 24));
+		LOG("ES5510: Host Write DOL latch[1] = %02x -> %06x (%d)\n", data, dol_latch, util::sext(dol_latch, 24));
 		break;
 	case 0x0e:
 		dol_latch = (dol_latch&0xffff00) | ((data&0xff)<< 0);
-		LOGMASKED(LOG_GENERAL, "ES5510: Host Write DOL latch[0] = %02x -> %06x (%d)\n", data, dol_latch, util::sext(dol_latch, 24));
+		LOG("ES5510: Host Write DOL latch[0] = %02x -> %06x (%d)\n", data, dol_latch, util::sext(dol_latch, 24));
 		break; //TODO: docs says that this always returns 0xff
 
 	case 0x0f:
@@ -463,7 +463,7 @@ void es5510_device::host_w(offs_t offset, uint8_t data)
 		/* 0x17 Internal Refresh counter (test purpose) */
 		/* 0x18 Host Serial Control */
 	case 0x18:
-		LOGMASKED(LOG_GENERAL, "ES5510: Host Write Host Serial control %02x: %s, %s, ser3 %s, ser2 %s, ser1 %s, ser0 %s\n", data,
+		LOG("ES5510: Host Write Host Serial control %02x: %s, %s, ser3 %s, ser2 %s, ser1 %s, ser0 %s\n", data,
 			data&0x80 ? "Master" : "Slave",
 			data&0x40 ? "Sony" : "I2S",
 			data & 0x20 ? "Out" : "In",
@@ -475,15 +475,15 @@ void es5510_device::host_w(offs_t offset, uint8_t data)
 
 		/* 0x1f Halt enable (w) / Frame Counter (r) */
 	case 0x1f:
-		LOGMASKED(LOG_GENERAL, "ES5510: Host Write Halt Enable %02x; HALT line is %d\n", data, halt_asserted);
+		LOG("ES5510: Host Write Halt Enable %02x; HALT line is %d\n", data, halt_asserted);
 		if (halt_asserted) {
-			LOGMASKED(LOG_GENERAL, "ES5510: Host Write to Halt Enable while HALT line is asserted: Halting!\n");
+			LOG("ES5510: Host Write to Halt Enable while HALT line is asserted: Halting!\n");
 			state = STATE_HALTED;
 		}
 		break;
 
 	case 0x80: /* Read select - GPR + INSTR */
-		LOGMASKED(LOG_GENERAL, "%s",string_format("ES5510: Host Read INSTR+GPR %02x (%s): %012x %06x (%d)\n", data, REGNAME(data & 0xff), instr[data] & 0xffffffffffffULL, gpr[data] & 0xffffff, gpr[data]).c_str());
+		LOG("%s",string_format("ES5510: Host Read INSTR+GPR %02x (%s): %012x %06x (%d)\n", data, REGNAME(data & 0xff), instr[data] & 0xffffffffffffULL, gpr[data] & 0xffffff, gpr[data]).c_str());
 
 		/* Check if an INSTR address is selected */
 		if (data < 0xa0) {
@@ -497,14 +497,14 @@ void es5510_device::host_w(offs_t offset, uint8_t data)
 		break;
 
 	case 0xa0: /* Write select - GPR */
-		LOGMASKED(LOG_GENERAL, "ES5510: Host Write GPR %02x (%s): %06x (%d)\n", data, REGNAME(data&0xff), gpr_latch, util::sext(gpr_latch, 24));
+		LOG("ES5510: Host Write GPR %02x (%s): %06x (%d)\n", data, REGNAME(data&0xff), gpr_latch, util::sext(gpr_latch, 24));
 		write_reg(data, gpr_latch);
 		break;
 
 	case 0xc0: /* Write select - INSTR */
 #if VERBOSE
 		DESCRIBE_INSTR(buf, instr_latch, gpr[data], nullptr, nullptr, nullptr, nullptr);
-		LOGMASKED(LOG_GENERAL, "%s",string_format("ES5510: Host Write INSTR %02x %012x: %s\n", data, instr_latch & 0xffffffffffffULL, buf).c_str());
+		LOG("%s",string_format("ES5510: Host Write INSTR %02x %012x: %s\n", data, instr_latch & 0xffffffffffffULL, buf).c_str());
 #endif
 		if (data < 0xa0) {
 			instr[data] = instr_latch & 0xffffffffffffULL;
@@ -514,7 +514,7 @@ void es5510_device::host_w(offs_t offset, uint8_t data)
 	case 0xe0: /* Write select - GPR + INSTR */
 #if VERBOSE
 		DESCRIBE_INSTR(buf, instr_latch, gpr_latch, nullptr, nullptr, nullptr, nullptr);
-		LOGMASKED(LOG_GENERAL, "%s",string_format("ES5510: Host Write INSTR+GPR %02x (%s): %012x %06x (%d): %s\n", data, REGNAME(data&0xff), instr_latch, gpr_latch, util::sext(gpr_latch, 24), buf).c_str());
+		LOG("%s",string_format("ES5510: Host Write INSTR+GPR %02x (%s): %012x %06x (%d): %s\n", data, REGNAME(data&0xff), instr_latch, gpr_latch, util::sext(gpr_latch, 24), buf).c_str());
 #endif
 		if (data < 0xa0) {
 			instr[data] = instr_latch;
@@ -681,7 +681,7 @@ void es5510_device::execute_set_input(int linenum, int state) {
 }
 
 void es5510_device::list_program(void(p)(const char *, ...)) {
-	LOGMASKED(LOG_GENERAL, "ES5501: Starting!\n");
+	LOG("ES5501: Starting!\n");
 
 	char buf[1024];
 	bool is_written[0x100], is_read[0x100];

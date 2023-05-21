@@ -28,8 +28,6 @@
 
 namespace {
 
-#define LOGGEN(...) LOGMASKED(LOG_GENERAL, __VA_ARGS__)
-
 // class definition
 class miuchiz_state : public driver_device
 {

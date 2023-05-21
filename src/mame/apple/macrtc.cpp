@@ -174,7 +174,7 @@ void rtc3430042_device::rtc_clock_updated(int year, int month, int day, int day_
 		seconds = (uint32_t)((uint32_t)mktime(&cur_time) - mac_reference);
 	}
 
-	LOGMASKED(LOG_GENERAL, "second count 0x%lX\n", (unsigned long) seconds);
+	LOG("second count 0x%lX\n", (unsigned long) seconds);
 
 	m_seconds[0] = seconds & 0xff;
 	m_seconds[1] = (seconds >> 8) & 0xff;
@@ -236,7 +236,7 @@ void rtc3430042_device::rtc_shift_data(int data)
 	if (m_data_dir)
 	{
 		m_data_out = (m_data_byte >> --m_bit_count) & 0x01;
-		LOGMASKED(LOG_GENERAL, "RTC shifted new data %d\n", m_data_out);
+		LOG("RTC shifted new data %d\n", m_data_out);
 	}
 	else
 	{

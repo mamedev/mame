@@ -201,7 +201,7 @@ void nes_sunsoft_dcs_device::pcb_reset()
 
 void nes_sunsoft_dcs_device::write_h(offs_t offset, uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "Sunsoft DCS write_h, offset %04x, data: %02x\n", offset, data);
+	LOG("Sunsoft DCS write_h, offset %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x7000)
 	{
@@ -218,7 +218,7 @@ void nes_sunsoft_dcs_device::write_h(offs_t offset, uint8_t data)
 
 uint8_t nes_sunsoft_dcs_device::read_h(offs_t offset)
 {
-	LOGMASKED(LOG_GENERAL, "Sunsoft DCS read_h, offset: %04x\n", offset);
+	LOG("Sunsoft DCS read_h, offset: %04x\n", offset);
 
 	if (m_exrom_enable && m_subslot->m_cart && offset < 0x4000)
 	{
@@ -233,7 +233,7 @@ uint8_t nes_sunsoft_dcs_device::read_h(offs_t offset)
 
 void nes_sunsoft_dcs_device::write_m(offs_t offset, uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "Sunsoft DCS write_m, offset: %04x, data: %02x\n", offset, data);
+	LOG("Sunsoft DCS write_m, offset: %04x, data: %02x\n", offset, data);
 
 	if (!m_battery.empty() && m_wram_enable)
 		m_battery[offset & (m_battery.size() - 1)] = data;
@@ -249,7 +249,7 @@ void nes_sunsoft_dcs_device::write_m(offs_t offset, uint8_t data)
 
 uint8_t nes_sunsoft_dcs_device::read_m(offs_t offset)
 {
-	LOGMASKED(LOG_GENERAL, "Sunsoft DCS read_m, offset: %04x\n", offset);
+	LOG("Sunsoft DCS read_m, offset: %04x\n", offset);
 
 	if (!m_battery.empty() && m_wram_enable)
 		return m_battery[offset & (m_battery.size() - 1)];

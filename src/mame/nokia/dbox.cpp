@@ -421,7 +421,6 @@
 
 #include "logmacro.h"
 
-//#define LOG(...)        LOGMASKED(LOG_GENERAL, __VA_ARGS__) // Already defined in logmacro.h
 #define LOGSETUP(...)   LOGMASKED(LOG_SETUP,   __VA_ARGS__)
 #define LOGDISPLAY(...) LOGMASKED(LOG_DISPLAY, __VA_ARGS__)
 #define LOGFLASH(...)  LOGMASKED(LOG_FLASH,   __VA_ARGS__)

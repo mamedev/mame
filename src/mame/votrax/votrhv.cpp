@@ -70,7 +70,6 @@
 
 namespace {
 
-#define LOGGEN(...) LOGMASKED(LOG_GENERAL, __VA_ARGS__)
 #define LOGINP(...) LOGMASKED(LOG_INPUT, __VA_ARGS__)
 #define LOGLTX(...) LOGMASKED(LOG_LATCHX, __VA_ARGS__)
 #define LOGLTY(...) LOGMASKED(LOG_LATCHY, __VA_ARGS__)

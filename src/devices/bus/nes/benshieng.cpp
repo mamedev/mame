@@ -73,7 +73,7 @@ void nes_benshieng_device::pcb_reset()
 
 void nes_benshieng_device::write_h(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "benshieng write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("benshieng write_h, offset: %04x, data: %02x\n", offset, data);
 //  m_mmc_dipsetting = ioport("CARTDIPS")->read();
 
 	u8 bank = BIT(offset, 10, 2);

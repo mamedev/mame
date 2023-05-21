@@ -237,8 +237,7 @@ void pioneer_pr8210_device::control_w(uint8_t data)
 		m_accumulator = (m_accumulator << 1) | longpulse;
 
 		// log the deltas for debugging
-		int usecdiff = (int)(delta.attoseconds() / ATTOSECONDS_IN_USEC(1));
-		LOGMASKED(LOG_SERIAL, "bitdelta = %5d (%d) - accum = %04X\n", usecdiff, longpulse, m_accumulator);
+		LOGMASKED(LOG_SERIAL, "bitdelta = %5d (%d) - accum = %04X\n", delta.as_ticks(1'000'000), longpulse, m_accumulator);
 
 		// if we have a complete command, signal it
 		// a complete command is 0,0,1 followed by 5 bits, followed by 0,0

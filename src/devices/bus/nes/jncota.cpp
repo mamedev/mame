@@ -78,7 +78,7 @@ void nes_jncota_kt1001_device::pcb_reset()
 
 void nes_jncota_kt1001_device::write_l(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "jncota_kt1001 write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("jncota_kt1001 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	offset += 0x100;
 	switch (offset & 0x1803)

@@ -486,14 +486,14 @@ void towns_state::towns_video_440_w(offs_t offset, uint8_t data)
 			m_video.towns_video_sel = data & 0x01;
 			break;
 		case 0x0a:
-			LOGMASKED(LOG_GENERAL, "Video: writing register %i (0x44a) [%02x]\n", m_video.towns_video_sel, data);
+			LOG("Video: writing register %i (0x44a) [%02x]\n", m_video.towns_video_sel, data);
 			m_video.towns_video_reg[m_video.towns_video_sel] = data;
 			break;
 		case 0x10:
 			m_video.towns_sprite_sel = data & 0x07;
 			break;
 		case 0x12:
-			LOGMASKED(LOG_GENERAL, "SPR: writing register %i (0x452) [%02x]\n", m_video.towns_sprite_sel, data);
+			LOG("SPR: writing register %i (0x452) [%02x]\n", m_video.towns_sprite_sel, data);
 			if(m_video.towns_sprite_sel == 6)
 				m_video.towns_sprite_page = data & 0x80 ? 1 : 0;
 			else
@@ -663,7 +663,7 @@ void towns_state::towns_video_ff81_w(uint8_t data)
 	m_video.towns_vram_wplane = data & 0x0f;
 	m_video.towns_vram_rplane = (data & 0xc0) >> 6;
 	towns_update_video_banks();
-	LOGMASKED(LOG_GENERAL, "VID: VRAM wplane select (I/O) = 0x%02x\n",m_video.towns_vram_wplane);
+	LOG("VID: VRAM wplane select (I/O) = 0x%02x\n",m_video.towns_vram_wplane);
 }
 
 uint8_t towns_state::towns_video_unknown_r()

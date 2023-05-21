@@ -29,11 +29,12 @@
 
 #include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE
 
+#define LOG_UNHANDLED (1U << 1)
 
 #ifdef NES_PCB_DEBUG
-#define VERBOSE (LOG_GENERAL)
+#define VERBOSE (LOG_UNHANDLED | LOG_GENERAL)
 #else
-#define VERBOSE (0)
+#define VERBOSE (LOG_UNHANDLED)
 #endif
 #include "logmacro.h"
 
@@ -215,7 +216,7 @@ void nes_txrom_device::hblank_irq(int scanline, bool vblank, bool blanked)
 
 		if (m_irq_enable && !blanked && (m_irq_count == 0) && (prior_count || m_irq_clear /*|| !m_mmc3_alt_irq*/)) // according to blargg the latter should be present as well, but it breaks Rampart and Joe & Mac US: they probably use the alt irq!
 		{
-			LOGMASKED(LOG_GENERAL, "irq fired, scanline: %d\n", scanline);
+			LOG("irq fired, scanline: %d\n", scanline);
 			set_irq_line(ASSERT_LINE);
 		}
 	}
@@ -263,7 +264,7 @@ void nes_txrom_device::txrom_write(offs_t offset, uint8_t data)
 {
 	uint8_t mmc_helper, cmd;
 
-	LOGMASKED(LOG_GENERAL, "txrom_write, offset: %04x, data: %02x\n", offset, data);
+	LOG("txrom_write, offset: %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x6001)
 	{
@@ -325,14 +326,14 @@ void nes_txrom_device::txrom_write(offs_t offset, uint8_t data)
 			break;
 
 		default:
-			LOGMASKED(LOG_GENERAL, "txrom_write uncaught: %04x value: %02x\n", offset + 0x8000, data);
+			LOGMASKED(LOG_UNHANDLED, "txrom_write uncaught: %04x value: %02x\n", offset + 0x8000, data);
 			break;
 	}
 }
 
 void nes_txrom_device::write_m(offs_t offset, uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "txrom write_m, offset: %04x, data: %02x\n", offset, data);
+	LOG("txrom write_m, offset: %04x, data: %02x\n", offset, data);
 
 	if (BIT(m_wram_protect, 7) && !BIT(m_wram_protect, 6))
 	{
@@ -345,7 +346,7 @@ void nes_txrom_device::write_m(offs_t offset, uint8_t data)
 
 uint8_t nes_txrom_device::read_m(offs_t offset)
 {
-	LOGMASKED(LOG_GENERAL, "txrom read_m, offset: %04x\n", offset);
+	LOG("txrom read_m, offset: %04x\n", offset);
 
 	if (BIT(m_wram_protect, 7))
 	{
@@ -370,7 +371,7 @@ uint8_t nes_txrom_device::read_m(offs_t offset)
 void nes_hkrom_device::write_m(offs_t offset, uint8_t data)
 {
 	uint8_t write_hi, write_lo;
-	LOGMASKED(LOG_GENERAL, "hkrom write_m, offset: %04x, data: %02x\n", offset, data);
+	LOG("hkrom write_m, offset: %04x, data: %02x\n", offset, data);
 
 	if (offset < 0x1000)
 		return;
@@ -388,7 +389,7 @@ void nes_hkrom_device::write_m(offs_t offset, uint8_t data)
 
 uint8_t nes_hkrom_device::read_m(offs_t offset)
 {
-	LOGMASKED(LOG_GENERAL, "hkrom read_m, offset: %04x\n", offset);
+	LOG("hkrom read_m, offset: %04x\n", offset);
 
 	if (offset < 0x1000)
 		return get_open_bus();
@@ -409,7 +410,7 @@ uint8_t nes_hkrom_device::read_m(offs_t offset)
 void nes_hkrom_device::write_h(offs_t offset, uint8_t data)
 {
 	uint8_t mmc6_helper;
-	LOGMASKED(LOG_GENERAL, "hkrom write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("hkrom write_h, offset: %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x6001)
 	{
@@ -472,7 +473,7 @@ void nes_txsrom_device::set_chr(u8 chr, int chr_base, int chr_mask)
 
 void nes_txsrom_device::write_h(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "txsrom write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("txsrom write_h, offset: %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x6001)
 	{
@@ -515,7 +516,7 @@ void nes_tqrom_device::chr_cb(int start, int bank, int source)
 
 void nes_qj_device::write_m(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "qj write_m, offset: %04x, data: %02x\n", offset, data);
+	LOG("qj write_m, offset: %04x, data: %02x\n", offset, data);
 
 	if (BIT(m_wram_protect, 7) && !BIT(m_wram_protect, 6))
 	{
@@ -541,7 +542,7 @@ void nes_qj_device::write_m(offs_t offset, u8 data)
 
 void nes_zz_device::write_m(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "zz write_m, offset: %04x, data: %02x\n", offset, data);
+	LOG("zz write_m, offset: %04x, data: %02x\n", offset, data);
 
 	if (BIT(m_wram_protect, 7) && !BIT(m_wram_protect, 6))
 	{

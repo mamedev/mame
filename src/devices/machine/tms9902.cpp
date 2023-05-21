@@ -53,7 +53,6 @@
 #define VERBOSE (LOG_ERROR)
 #include "logmacro.h"
 
-#define LOGGENERAL(...)     LOGMASKED(LOG_GENERAL, __VA_ARGS__)
 #define LOGLINES(...)       LOGMASKED(LOG_LINES, __VA_ARGS__)
 #define LOGCRU(...)         LOGMASKED(LOG_CRU, __VA_ARGS__)
 #define LOGDETAIL(...)      LOGMASKED(LOG_DETAIL, __VA_ARGS__)

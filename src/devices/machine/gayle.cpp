@@ -143,7 +143,7 @@ void gayle_device::line_change(int line, int state, int level)
 		// special handling for line 6 (credit card detect)
 		if (line == LINE_CC_DET && BIT(m_gayle_reg[REG_CHANGE], 1))
 		{
-			LOGMASKED(LOG_GENERAL, "resetting due to credit card detection change\n");
+			LOG("resetting due to credit card detection change\n");
 
 			m_rst_w(0);
 			m_rst_w(1);

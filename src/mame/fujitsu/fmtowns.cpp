@@ -1650,7 +1650,7 @@ void towns_state::towns_cdrom_w(offs_t offset, uint8_t data)
 			if(data & 0x40)
 				towns_cdrom_set_irq(TOWNS_CD_IRQ_DMA,0);
 			if(data & 0x04)
-				LOGMASKED(LOG_GENERAL, "CD: sub MPU reset\n");
+				LOG("CD: sub MPU reset\n");
 			m_towns_cd.mpu_irq_enable = data & 0x02;
 			m_towns_cd.dma_irq_enable = data & 0x01;
 			LOGMASKED(LOG_CD, "CD: status write %02x\n",data);

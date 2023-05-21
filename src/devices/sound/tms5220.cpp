@@ -607,7 +607,7 @@ uint8_t tms5220_device::new_int_read()
 	new_int_write(0, 0, 0, 0); // romclk 0, m0 0, m1 0, addr bus nybble = 0/open bus
 	if (!m_data_cb.isnull())
 		return m_data_cb();
-	LOGMASKED(LOG_GENERAL, "WARNING: CALLBACK MISSING, RETURNING 0!\n");
+	LOG("WARNING: CALLBACK MISSING, RETURNING 0!\n");
 	return 0;
 }
 
@@ -739,7 +739,7 @@ void tms5220_device::update_fifo_status_and_ints()
 	// also, in this case, regardless if DDIS was set, unset it.
 	if (m_previous_talk_status && !talk_status())
 	{
-		LOGMASKED(LOG_GENERAL, "Talk status WAS 1, is now 0, unsetting DDIS and firing an interrupt!\n");
+		LOG("Talk status WAS 1, is now 0, unsetting DDIS and firing an interrupt!\n");
 		set_interrupt_state(1);
 		m_DDIS = false;
 	}
@@ -787,7 +787,7 @@ int tms5220_device::extract_bits(int count)
 		while (count--)
 		{
 			val = (val << 1) | new_int_read();
-			LOGMASKED(LOG_GENERAL, "bit read: %d\n", val&1);
+			LOG("bit read: %d\n", val&1);
 		}
 #endif
 	}
@@ -800,7 +800,7 @@ void tms5220_device::perform_dummy_read()
 	if (m_schedule_dummy_read)
 	{
 		int data = new_int_read();
-		LOGMASKED(LOG_GENERAL, "TMS5110 performing dummy read; value read = %1i\n", data & 1);
+		LOG("TMS5110 performing dummy read; value read = %1i\n", data & 1);
 		m_schedule_dummy_read = false;
 	}
 }
@@ -884,7 +884,7 @@ void tms5220_device::process(int16_t *buffer, unsigned int size)
 	int i, bitout;
 	int32_t this_sample;
 
-	LOGMASKED(LOG_GENERAL, "process called with size of %d; IP=%d, PC=%d, subcycle=%d, m_SPEN=%d, m_TALK=%d, m_TALKD=%d\n", size, m_IP, m_PC, m_subcycle, m_SPEN, m_TALK, m_TALKD);
+	LOG("process called with size of %d; IP=%d, PC=%d, subcycle=%d, m_SPEN=%d, m_TALK=%d, m_TALKD=%d\n", size, m_IP, m_PC, m_subcycle, m_SPEN, m_TALK, m_TALKD);
 
 	/* loop until the buffer is full or we've stopped speaking */
 	while (size > 0)
@@ -1217,8 +1217,8 @@ int32_t tms5220_device::matrix_multiply(int32_t a, int32_t b) const
 	while (b>16383) { b-=32768; }
 	while (b<-16384) { b+=32768; }
 	result = ((a*b)>>9); /** TODO: this isn't technically right to the chip, which truncates the lowest result bit, but it causes glitches otherwise. **/
-	if (result>16383) LOGMASKED(LOG_GENERAL, "matrix multiplier overflowed! a: %x, b: %x, result: %x", a, b, result);
-	if (result<-16384) LOGMASKED(LOG_GENERAL, "matrix multiplier underflowed! a: %x, b: %x, result: %x", a, b, result);
+	if (result>16383) LOG("matrix multiplier overflowed! a: %x, b: %x, result: %x", a, b, result);
+	if (result<-16384) LOG("matrix multiplier underflowed! a: %x, b: %x, result: %x", a, b, result);
 	return result;
 }
 
@@ -1540,9 +1540,9 @@ void tms5220_device::parse_frame()
 	LOGMASKED(LOG_PARSE_FRAME_DUMP_BIN | LOG_PARSE_FRAME_DUMP_HEX, "\n");
 
 	if (m_DDIS)
-		LOGMASKED(LOG_GENERAL, "Parsed a frame successfully in FIFO - %d bits remaining\n", (m_fifo_count*8)-(m_fifo_bits_taken));
+		LOG("Parsed a frame successfully in FIFO - %d bits remaining\n", (m_fifo_count*8)-(m_fifo_bits_taken));
 	else
-		LOGMASKED(LOG_GENERAL, "Parsed a frame successfully in ROM\n");
+		LOG("Parsed a frame successfully in ROM\n");
 	return;
 
 	ranout:

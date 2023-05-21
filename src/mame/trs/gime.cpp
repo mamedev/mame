@@ -99,15 +99,15 @@
 #define GIME_TYPE_1987          0
 #define NO_ATTRIBUTE            0x80
 
-#define LOG_INT_MASKING (1U << 1)
-#define LOG_GIME        (1U << 2)
-#define LOG_TIMER       (1U << 3)
-#define LOG_PALETTE     (1U << 4)
-#define LOG_MMU         (1U << 5)
-#define LOG_FBITS       (1U << 6)
-#define LOG_VBITS       (1U << 7)
-#define LOG_PBITS       (1U << 8)
-#define LOG_TBITS       (1U << 9)
+#define LOG_INT_MASKING (1U <<  1)
+#define LOG_GIME        (1U <<  2)
+#define LOG_TIMER       (1U <<  3)
+#define LOG_PALETTE     (1U <<  4)
+#define LOG_MMU         (1U <<  5)
+#define LOG_FBITS       (1U <<  6)
+#define LOG_VBITS       (1U <<  7)
+#define LOG_PBITS       (1U <<  8)
+#define LOG_TBITS       (1U <<  9)
 #define LOG_MBITS       (1U << 10)
 #define LOG_RBITS       (1U << 11)
 

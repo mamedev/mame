@@ -260,7 +260,7 @@ void nes_namcot163_device::pcb_reset()
 
 void nes_namcot3433_device::dxrom_write(offs_t offset, uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "dxrom_write, offset: %04x, data: %02x\n", offset, data);
+	LOG("dxrom_write, offset: %04x, data: %02x\n", offset, data);
 
 	if (!(offset & 1) && m_pcb_ctrl_mirror)
 		set_nt_mirroring(BIT(data, 6) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
@@ -303,7 +303,7 @@ void nes_namcot3433_device::dxrom_write(offs_t offset, uint8_t data)
 
 void nes_namcot3446_device::write_h(offs_t offset, uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "namcot3446 write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("namcot3446 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	if (offset >= 0x2000)
 		return;
@@ -340,7 +340,7 @@ void nes_namcot3446_device::write_h(offs_t offset, uint8_t data)
 void nes_namcot3425_device::write_h(offs_t offset, uint8_t data)
 {
 	uint8_t mode;
-	LOGMASKED(LOG_GENERAL, "namcot3425 write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("namcot3425 write_h, offset: %04x, data: %02x\n", offset, data);
 	if (offset >= 0x2000)
 		return;
 
@@ -409,7 +409,7 @@ TIMER_CALLBACK_MEMBER(nes_namcot340_device::irq_timer_tick)
 
 void nes_namcot340_device::n340_lowrite(offs_t offset, uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "n340_lowrite, offset: %04x, data: %02x\n", offset, data);
+	LOG("n340_lowrite, offset: %04x, data: %02x\n", offset, data);
 	offset += 0x100;
 
 	switch (offset & 0x1800)
@@ -428,7 +428,7 @@ void nes_namcot340_device::n340_lowrite(offs_t offset, uint8_t data)
 
 uint8_t nes_namcot340_device::n340_loread(offs_t offset)
 {
-	LOGMASKED(LOG_GENERAL, "n340_loread, offset: %04x\n", offset);
+	LOG("n340_loread, offset: %04x\n", offset);
 	offset += 0x100;
 
 	switch (offset & 0x1800)
@@ -448,7 +448,7 @@ uint8_t nes_namcot340_device::n340_loread(offs_t offset)
 
 void nes_namcot340_device::n340_hiwrite(offs_t offset, uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "n340_hiwrite, offset: %04x, data: %02x\n", offset, data);
+	LOG("n340_hiwrite, offset: %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x7800)
 	{
@@ -527,7 +527,7 @@ void nes_namcot175_device::write_m(offs_t offset, uint8_t data)
 
 void nes_namcot175_device::write_h(offs_t offset, uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "namcot175 write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("namcot175 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x7800)
 	{
@@ -608,7 +608,7 @@ void nes_namcot163_device::write_m(offs_t offset, uint8_t data)
 
 void nes_namcot163_device::write_l(offs_t offset, uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "namcot163 write_l, offset: %04x, data: %02x\n", offset, data);
+	LOG("namcot163 write_l, offset: %04x, data: %02x\n", offset, data);
 	offset += 0x100;
 
 	switch (offset & 0x1800)
@@ -624,7 +624,7 @@ void nes_namcot163_device::write_l(offs_t offset, uint8_t data)
 
 uint8_t nes_namcot163_device::read_l(offs_t offset)
 {
-	LOGMASKED(LOG_GENERAL, "namcot163 read_l, offset: %04x\n", offset);
+	LOG("namcot163 read_l, offset: %04x\n", offset);
 	offset += 0x100;
 
 	switch (offset & 0x1800)
@@ -646,7 +646,7 @@ void nes_namcot163_device::set_mirror(uint8_t page, uint8_t data)
 
 void nes_namcot163_device::write_h(offs_t offset, uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "namcot163 write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("namcot163 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x7800)
 	{

@@ -82,7 +82,6 @@
 
 #include "logmacro.h"
 
-#define LOG(...)      LOGMASKED(LOG_GENERAL, __VA_ARGS__)
 #define LOGSETUP(...) LOGMASKED(LOG_SETUP,   __VA_ARGS__)
 
 #ifdef _MSC_VER

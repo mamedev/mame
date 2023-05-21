@@ -880,7 +880,7 @@ void dcs2_audio_device::device_start()
 		if (m_ram_map)
 			m_ram_map->set_bank(0);
 		m_data_bank->configure_entries(0, m_sounddata_banks, m_sounddata, soundbank_words * 2);
-		LOGMASKED(LOG_GENERAL, "device_start: audio ram banks: %x size: %x\n", m_sounddata_banks, soundbank_words);
+		LOG("device_start: audio ram banks: %x size: %x\n", m_sounddata_banks, soundbank_words);
 	}
 
 
@@ -1347,7 +1347,7 @@ void dcs_audio_device::denver_w(offs_t offset, uint16_t data)
 			}
 			// Disable timer after DENV_RES_TFS
 			if (!m_timer_ignore && DENV_RES_TFS && DENV_MUTE) {
-				LOGMASKED(LOG_GENERAL, "%s denver_w: Disabling timer\n", machine().describe_context());
+				LOG("%s denver_w: Disabling timer\n", machine().describe_context());
 				m_timer_ignore = true;
 			}
 			break;
@@ -1403,7 +1403,7 @@ void dcs_audio_device::dsio_idma_data_w(offs_t offset, uint32_t data, uint32_t m
 	}
 	if (dsio.start_on_next_write && --dsio.start_on_next_write == 0)
 	{
-		LOGMASKED(LOG_GENERAL, "%s: Starting DSIO CPU\n", machine().describe_context());
+		LOG("%s: Starting DSIO CPU\n", machine().describe_context());
 		m_cpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	}
 	// Restore internal/external mapping
@@ -1444,7 +1444,7 @@ void dcs_audio_device::dmovlay_callback(uint32_t data)
 {
 	// Do some checking first
 	if (data < 0 || data > 1) {
-		LOGMASKED(LOG_GENERAL, "dmovlay_callback: Error! dmovlay called with value = %X\n", data);
+		LOG("dmovlay_callback: Error! dmovlay called with value = %X\n", data);
 	} else {
 		m_dmovlay_val = data;
 		dmovlay_remap_memory();
@@ -1487,7 +1487,7 @@ void dcs_audio_device::reset_w(int state)
 	/* going low halts the CPU */
 	if (!state)
 	{
-		//      LOGMASKED(LOG_GENERAL, "%s: DCS reset = %d\n", machine().describe_context(), state);
+		//      LOG("%s: DCS reset = %d\n", machine().describe_context(), state);
 
 		/* just run through the init code again */
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(dcs_audio_device::dcs_reset),this));
@@ -1809,13 +1809,13 @@ WRITE_LINE_MEMBER(dcs_audio_device::timer_enable_callback)
 {
 	if (state)
 	{
-		//LOGMASKED(LOG_GENERAL, "Timer enabled @ %d cycles/int, or %f Hz\n", m_timer_scale * (m_timer_period + 1), 1.0 / m_cpu->cycles_to_attotime(m_timer_scale * (m_timer_period + 1)).as_double());
+		//LOG("Timer enabled @ %d cycles/int, or %f Hz\n", m_timer_scale * (m_timer_period + 1), 1.0 / m_cpu->cycles_to_attotime(m_timer_scale * (m_timer_period + 1)).as_double());
 		m_timer_enable = state;
 		reset_timer();
 	}
 	else
 	{
-		//LOGMASKED(LOG_GENERAL, "Timer disabled\n");
+		//LOG("Timer disabled\n");
 		// Update the timer so the start count is correct the next time the timer is enabled
 		update_timer_count();
 		m_timer_enable = state;
@@ -1891,7 +1891,7 @@ void dcs_audio_device:: adsp_control_w(offs_t offset, uint16_t data)
 			/* bit 9 forces a reset (not on 2181) */
 			if ((data & 0x0200) && !(m_rev == REV_DSIO || m_rev == REV_DENV))
 			{
-				LOGMASKED(LOG_GENERAL, "%s Rebooting DCS due to SYSCONTROL write = %04X\n", machine().describe_context(), data);
+				LOG("%s Rebooting DCS due to SYSCONTROL write = %04X\n", machine().describe_context(), data);
 				m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 				dcs_boot();
 				m_control_regs[SYSCONTROL_REG] = 0;
@@ -1933,9 +1933,9 @@ void dcs_audio_device:: adsp_control_w(offs_t offset, uint16_t data)
 
 		case S1_CONTROL_REG:
 			if (((data >> 4) & 3) == 2)
-				LOGMASKED(LOG_GENERAL, "DCS: Oh no!, the data is compressed with u-law encoding\n");
+				LOG("DCS: Oh no!, the data is compressed with u-law encoding\n");
 			if (((data >> 4) & 3) == 3)
-				LOGMASKED(LOG_GENERAL, "DCS: Oh no!, the data is compressed with A-law encoding\n");
+				LOG("DCS: Oh no!, the data is compressed with A-law encoding\n");
 			break;
 
 		case TIMER_SCALE_REG:
@@ -2063,7 +2063,7 @@ void dcs_audio_device::sound_tx_callback(offs_t offset, uint32_t data)
 {
 	/* check if it's for SPORT1 */
 	if (offset != 1) {
-		LOGMASKED(LOG_GENERAL, "sound_tx_callback: No code for offset %x\n", offset);
+		LOG("sound_tx_callback: No code for offset %x\n", offset);
 		return;
 	}
 
@@ -2105,7 +2105,7 @@ void dcs_audio_device::sound_tx_callback(offs_t offset, uint32_t data)
 			return;
 		}
 		else
-			LOGMASKED(LOG_GENERAL, "ADSP SPORT1: trying to transmit and autobuffer not enabled!\n");
+			LOG("ADSP SPORT1: trying to transmit and autobuffer not enabled!\n");
 	}
 
 	/* if we get there, something went wrong. Disable playing */

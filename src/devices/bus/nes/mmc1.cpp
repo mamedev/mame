@@ -214,7 +214,7 @@ void nes_sxrom_device::update_regs(int reg)
 
 void nes_sxrom_device::write_h(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "sxrom write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("sxrom write_h, offset: %04x, data: %02x\n", offset, data);
 
 	// There is only one latch and shift counter, shared amongst the 4 regs (testcase: Space Shuttle)
 
@@ -256,7 +256,7 @@ void nes_sxrom_device::write_h(offs_t offset, u8 data)
 void nes_sxrom_device::write_m(offs_t offset, u8 data)
 {
 	u8 bank = BIT(m_reg[1], 2, 2);
-	LOGMASKED(LOG_GENERAL, "sxrom write_m, offset: %04x, data: %02x\n", offset, data);
+	LOG("sxrom write_m, offset: %04x, data: %02x\n", offset, data);
 
 	if (!BIT(m_reg[3], 4) || m_mmc1_type == mmc1_type::MMC1A)  // WRAM enabled
 	{
@@ -270,7 +270,7 @@ void nes_sxrom_device::write_m(offs_t offset, u8 data)
 u8 nes_sxrom_device::read_m(offs_t offset)
 {
 	u8 bank = BIT(m_reg[1], 2, 2);
-	LOGMASKED(LOG_GENERAL, "sxrom read_m, offset: %04x\n", offset);
+	LOG("sxrom read_m, offset: %04x\n", offset);
 
 	if (!BIT(m_reg[3], 4) || m_mmc1_type == mmc1_type::MMC1A)  // WRAM enabled
 	{
@@ -287,7 +287,7 @@ u8 nes_sxrom_device::read_m(offs_t offset)
 void nes_sorom_device::write_m(offs_t offset, u8 data)
 {
 	u8 type = BIT(m_reg[0], 4) ? BIT(m_reg[1], 4) : BIT(m_reg[1], 3);
-	LOGMASKED(LOG_GENERAL, "sorom write_m, offset: %04x, data: %02x\n", offset, data);
+	LOG("sorom write_m, offset: %04x, data: %02x\n", offset, data);
 
 	if (!BIT(m_reg[3], 4) || m_mmc1_type == mmc1_type::MMC1A)  // WRAM enabled
 	{
@@ -301,7 +301,7 @@ void nes_sorom_device::write_m(offs_t offset, u8 data)
 u8 nes_sorom_device::read_m(offs_t offset)
 {
 	u8 type = BIT(m_reg[0], 4) ? BIT(m_reg[1], 4) : BIT(m_reg[1], 3);
-	LOGMASKED(LOG_GENERAL, "sorom read_m, offset: %04x\n", offset);
+	LOG("sorom read_m, offset: %04x\n", offset);
 
 	if (!BIT(m_reg[3], 4) || m_mmc1_type == mmc1_type::MMC1A)  // WRAM enabled
 	{
@@ -317,7 +317,7 @@ u8 nes_sorom_device::read_m(offs_t offset)
 // SZROM has two RAM banks, the first is not battery backed up, the second is.
 void nes_szrom_device::write_m(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "szrom write_m, offset: %04x, data: %02x\n", offset, data);
+	LOG("szrom write_m, offset: %04x, data: %02x\n", offset, data);
 
 	if (!BIT(m_reg[3], 4) || m_mmc1_type == mmc1_type::MMC1A)  // WRAM enabled
 	{
@@ -330,7 +330,7 @@ void nes_szrom_device::write_m(offs_t offset, u8 data)
 
 u8 nes_szrom_device::read_m(offs_t offset)
 {
-	LOGMASKED(LOG_GENERAL, "szrom read_m, offset: %04x\n", offset);
+	LOG("szrom read_m, offset: %04x\n", offset);
 
 	if (!BIT(m_reg[3], 4) || m_mmc1_type == mmc1_type::MMC1A)  // WRAM enabled
 	{

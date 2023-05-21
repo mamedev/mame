@@ -67,7 +67,7 @@ void nes_zemina_device::pcb_reset()
 
 void nes_zemina_device::write_h(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "zemina write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("zemina write_h, offset: %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x6000)
 	{

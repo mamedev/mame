@@ -236,8 +236,7 @@ void at_mb_device::page8_w(offs_t offset, uint8_t data)
 
 	if (offset == 0)
 	{
-		LOGMASKED(LOG_PORT80, " at_page8_w(): Port 80h <== 0x%02x (PC=0x%08x)\n", data,
-							(unsigned) m_maincpu->pc());
+		LOGMASKED(LOG_PORT80, " at_page8_w(): Port 80h <== 0x%02x (PC=0x%08x)\n", data, m_maincpu->pc());
 	}
 
 	switch(offset % 8)

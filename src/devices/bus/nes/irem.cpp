@@ -151,7 +151,7 @@ void nes_h3001_device::pcb_reset()
 
 void nes_lrog017_device::write_h(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "lrog017 write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("lrog017 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	// this pcb is subject to bus conflict
 	data = account_bus_conflict(offset, data);
@@ -170,7 +170,7 @@ void nes_lrog017_device::write_h(offs_t offset, u8 data)
 
 void nes_holydivr_device::write_h(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "holy diver write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("holy diver write_h, offset: %04x, data: %02x\n", offset, data);
 
 	// this pcb is subject to bus conflict
 	data = account_bus_conflict(offset, data);
@@ -194,7 +194,7 @@ void nes_holydivr_device::write_h(offs_t offset, u8 data)
 
 void nes_tam_s1_device::write_h(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "tam s1 write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("tam s1 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	if (offset < 0x4000)
 	{
@@ -221,7 +221,7 @@ void nes_g101_device::set_prg()
 
 void nes_g101_device::write_h(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "g101 write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("g101 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x7000)
 	{
@@ -278,7 +278,7 @@ TIMER_CALLBACK_MEMBER(nes_h3001_device::irq_timer_tick)
 
 void nes_h3001_device::write_h(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "h3001 write_h, offset %04x, data: %02x\n", offset, data);
+	LOG("h3001 write_h, offset %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x7007)
 	{

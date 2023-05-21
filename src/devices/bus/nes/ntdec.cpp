@@ -116,7 +116,7 @@ void nes_ntdec_n715021_device::pcb_reset()
 
 void nes_ntdec_asder_device::write_h(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "ntdec_asder write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("ntdec_asder write_h, offset: %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x6001)    // writes only at even addresses?
 	{
@@ -165,7 +165,7 @@ void nes_ntdec_asder_device::write_h(offs_t offset, u8 data)
 
 void nes_ntdec_fh_device::write_m(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "ntdec_fh write_m, offset: %04x, data: %02x\n", offset, data);
+	LOG("ntdec_fh write_m, offset: %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x07)
 	{
@@ -204,7 +204,7 @@ void nes_ntdec_fh_device::write_m(offs_t offset, u8 data)
 
 void nes_ntdec_n715021_device::write_h(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "ntdec_n715021 write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("ntdec_n715021 write_h, offset: %04x, data: %02x\n", offset, data);
 	prg16_89ab(BIT(offset, 2, 2));
 	chr8(offset & 0x03, CHRROM);
 }

@@ -37,7 +37,6 @@
 
 #include "logmacro.h"
 
-//#define LOG(...)      LOGMASKED(LOG_GENERAL, __VA_ARGS__)
 #define LOGSETUP(...) LOGMASKED(LOG_SETUP,   __VA_ARGS__)
 #define LOGINT(...)   LOGMASKED(LOG_INT,     __VA_ARGS__)
 #define LOGR(...)     LOGMASKED(LOG_READ,    __VA_ARGS__)

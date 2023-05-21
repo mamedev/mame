@@ -284,7 +284,7 @@ void nes_datach_device::pcb_reset()
 
 uint8_t nes_datach_device::read_m(offs_t offset)
 {
-	LOGMASKED(LOG_GENERAL, "Datach read_m, offset: %04x\n", offset);
+	LOG("Datach read_m, offset: %04x\n", offset);
 	uint8_t i2c_val = 0;
 #if TEST_EEPROM
 	if (m_i2c_dir)
@@ -301,7 +301,7 @@ uint8_t nes_datach_device::read_m(offs_t offset)
 
 uint8_t nes_datach_device::read_h(offs_t offset)
 {
-	LOGMASKED(LOG_GENERAL, "Datach read_h, offset: %04x\n", offset);
+	LOG("Datach read_h, offset: %04x\n", offset);
 	// this should be the proper code, but it's a bit slower, so we access directly the subcart below
 	//return m_subslot->read(offset);
 
@@ -313,7 +313,7 @@ uint8_t nes_datach_device::read_h(offs_t offset)
 
 void nes_datach_device::write_h(offs_t offset, uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "Datach write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("Datach write_h, offset: %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x0f)
 	{

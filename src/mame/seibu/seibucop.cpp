@@ -109,7 +109,8 @@
 #define LOG_COMMANDS     (1U << 1)
 #define LOG_TRIGONOMETRY (1U << 2)
 #define LOG_DIVISION     (1U << 3)
-#define LOG_MOVE0905     (1U << 4)
+#define LOG_MOVE0205     (1U << 4)
+#define LOG_MOVE0905     (1U << 5)
 
 #define VERBOSE (0)
 #include "logmacro.h"

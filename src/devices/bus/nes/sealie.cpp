@@ -128,7 +128,7 @@ void nes_8bitxmas_device::pcb_reset()
 
 void nes_cufrom_device::write_h(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "cufrom write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("cufrom write_h, offset: %04x, data: %02x\n", offset, data);
 
 	prg16_89ab(BIT(data, 2, 3));
 	chr8(data & 0x03, CHRRAM);
@@ -153,7 +153,7 @@ void nes_cufrom_device::write_h(offs_t offset, u8 data)
 
 void nes_dpcmcart_device::write_h(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "dpcmcart write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("dpcmcart write_h, offset: %04x, data: %02x\n", offset, data);
 	prg16_89ab(offset & 0x0fff);
 }
 
@@ -176,7 +176,7 @@ void nes_dpcmcart_device::write_h(offs_t offset, u8 data)
 
 void nes_unrom512_device::write_h(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "unrom512 write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("unrom512 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	// this pcb is subject to bus conflict in its nonflashable configuration
 	data = account_bus_conflict(offset, data);
@@ -229,7 +229,7 @@ void nes_8bitxmas_device::update_led()
 
 void nes_8bitxmas_device::write_h(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "8bitxmas write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("8bitxmas write_h, offset: %04x, data: %02x\n", offset, data);
 
 	if (BIT(offset, 14))
 		nes_unrom512_device::write_h(offset, data);

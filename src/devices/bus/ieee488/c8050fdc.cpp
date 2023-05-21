@@ -215,7 +215,7 @@ void c8050_fdc_device::ds_w(int ds)
 		live_sync();
 		m_ds = cur_live.ds = ds;
 		pll_reset(cur_live.tm);
-		LOGMASKED(LOG_GENERAL, "%s %s DS %u\n", machine().time().as_string(), machine().describe_context(), ds);
+		LOG("%s %s DS %u\n", machine().time().as_string(), machine().describe_context(), ds);
 		checkpoint();
 		live_run();
 	}
@@ -452,7 +452,7 @@ void c8050_fdc_device::live_run(const attotime &limit)
 
 			if (ready != cur_live.ready) {
 				if (cur_live.rw_sel && !ready)
-					LOGMASKED(LOG_GENERAL, "%s READY %u : %02x\n", cur_live.tm.as_string(),ready,GCR_DECODE(cur_live.e, cur_live.i));
+					LOG("%s READY %u : %02x\n", cur_live.tm.as_string(),ready,GCR_DECODE(cur_live.e, cur_live.i));
 				cur_live.ready = ready;
 				syncpoint = true;
 			}
@@ -464,7 +464,7 @@ void c8050_fdc_device::live_run(const attotime &limit)
 			}
 
 			if (sync != cur_live.sync) {
-				LOGMASKED(LOG_GENERAL, "%s SYNC %u\n", cur_live.tm.as_string(), sync);
+				LOG("%s SYNC %u\n", cur_live.tm.as_string(), sync);
 				cur_live.sync = sync;
 				syncpoint = true;
 			}
@@ -506,7 +506,7 @@ uint8_t c8050_fdc_device::read()
 
 void c8050_fdc_device::write(uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "%s %s PI %02x\n", machine().time().as_string(), machine().describe_context(), data);
+	LOG("%s %s PI %02x\n", machine().time().as_string(), machine().describe_context(), data);
 
 	if (m_pi != data)
 	{
@@ -536,7 +536,7 @@ WRITE_LINE_MEMBER( c8050_fdc_device::drv_sel_w )
 		live_sync();
 		m_drv_sel = cur_live.drv_sel = state;
 		checkpoint();
-		LOGMASKED(LOG_GENERAL, "%s %s DRV SEL %u\n", machine().time().as_string(), machine().describe_context(), state);
+		LOG("%s %s DRV SEL %u\n", machine().time().as_string(), machine().describe_context(), state);
 		live_run();
 	}
 }
@@ -548,7 +548,7 @@ WRITE_LINE_MEMBER( c8050_fdc_device::mode_sel_w )
 		live_sync();
 		m_mode_sel = cur_live.mode_sel = state;
 		checkpoint();
-		LOGMASKED(LOG_GENERAL, "%s %s MODE SEL %u\n", machine().time().as_string(), machine().describe_context(), state);
+		LOG("%s %s MODE SEL %u\n", machine().time().as_string(), machine().describe_context(), state);
 		live_run();
 	}
 }
@@ -560,7 +560,7 @@ WRITE_LINE_MEMBER( c8050_fdc_device::rw_sel_w )
 		live_sync();
 		m_rw_sel = cur_live.rw_sel = state;
 		checkpoint();
-		LOGMASKED(LOG_GENERAL, "%s %s RW SEL %u\n", machine().time().as_string(), machine().describe_context(), state);
+		LOG("%s %s RW SEL %u\n", machine().time().as_string(), machine().describe_context(), state);
 		if (m_rw_sel) {
 			pll_stop_writing(get_floppy(), cur_live.tm);
 		} else {
@@ -576,7 +576,7 @@ WRITE_LINE_MEMBER( c8050_fdc_device::mtr0_w )
 	{
 		live_sync();
 		m_mtr0 = state;
-		LOGMASKED(LOG_GENERAL, "%s %s MTR0 %u\n", machine().time().as_string(), machine().describe_context(), state);
+		LOG("%s %s MTR0 %u\n", machine().time().as_string(), machine().describe_context(), state);
 		m_floppy0->mon_w(state);
 		checkpoint();
 
@@ -598,7 +598,7 @@ WRITE_LINE_MEMBER( c8050_fdc_device::mtr1_w )
 	{
 		live_sync();
 		m_mtr1 = state;
-		LOGMASKED(LOG_GENERAL, "%s %s MTR1 %u\n", machine().time().as_string(), machine().describe_context(), state);
+		LOG("%s %s MTR1 %u\n", machine().time().as_string(), machine().describe_context(), state);
 		if (m_floppy1) m_floppy1->mon_w(state);
 		checkpoint();
 
@@ -620,7 +620,7 @@ WRITE_LINE_MEMBER( c8050_fdc_device::odd_hd_w )
 	{
 		live_sync();
 		m_odd_hd = cur_live.odd_hd = state;
-		LOGMASKED(LOG_GENERAL, "%s %s ODD HD %u\n", machine().time().as_string(), machine().describe_context(), state);
+		LOG("%s %s ODD HD %u\n", machine().time().as_string(), machine().describe_context(), state);
 		m_floppy0->ss_w(!state);
 		if (m_floppy1) m_floppy1->ss_w(!state);
 		checkpoint();

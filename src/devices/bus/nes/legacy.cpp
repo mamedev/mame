@@ -122,7 +122,7 @@ void nes_ffe8_device::pcb_reset()
 
 void nes_ffe3_device::write_h(offs_t offset, uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "mapper8 write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("mapper8 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	chr8(data & 0x07, CHRROM);
 	prg16_89ab(data >> 3);
@@ -157,7 +157,7 @@ TIMER_CALLBACK_MEMBER(nes_ffe4_device::irq_timer_tick)
 
 void nes_ffe4_device::write_l(offs_t offset, uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "mapper6 write_l, offset: %04x, data: %02x\n", offset, data);
+	LOG("mapper6 write_l, offset: %04x, data: %02x\n", offset, data);
 
 	switch (offset)
 	{
@@ -205,7 +205,7 @@ uint8_t nes_ffe4_device::chr_r(offs_t offset)
 
 void nes_ffe4_device::write_h(offs_t offset, uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "mapper6 write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("mapper6 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	if (!m_latch)  // when in "FFE mode" we are forced to use CHRRAM/EXRAM bank?
 	{
@@ -240,7 +240,7 @@ void nes_ffe4_device::write_h(offs_t offset, uint8_t data)
 
 void nes_ffe8_device::write_l(offs_t offset, uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "mapper17 write_l, offset: %04x, data: %02x\n", offset, data);
+	LOG("mapper17 write_l, offset: %04x, data: %02x\n", offset, data);
 
 	switch (offset)
 	{

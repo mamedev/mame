@@ -134,18 +134,18 @@ private:
  void yamaha_dx7_state::dx7_acept_w(offs_t address, u8 data)
 {
 	m_acept++;
-	LOGMASKED(LOG_GENERAL, "ACEPT reg:0x%x = 0x%x \n", address, data);
+	LOG("ACEPT reg:0x%x = 0x%x \n", address, data);
 	m_irq0 = 1;
 	m_maincpu->set_input_line(M6800_IRQ_LINE, CLEAR_LINE);
 }
 u8 yamaha_dx7_state::dx7_p1_r(offs_t)
 {
-	LOGMASKED(LOG_GENERAL, "reading PORT1\n");
+	LOG("reading PORT1\n");
 	return m_PORT1;
 }
 u8 yamaha_dx7_state::dx7_p2_r(offs_t)
 {
-	LOGMASKED(LOG_GENERAL, "reading PORT2\n");
+	LOG("reading PORT2\n");
 	u8 temp = 0; //P0 is WRITE! does the CPU re-reads its OWN data? can it?
 	if(m_irq0)
 	{
@@ -162,7 +162,7 @@ u8 yamaha_dx7_state::dx7_p2_r(offs_t)
 }
 void yamaha_dx7_state::dx7_p2_w(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "W PORT2 0x%x\n", data);
+	LOG("W PORT2 0x%x\n", data);
 	m_PORT2 = data;
 }
 

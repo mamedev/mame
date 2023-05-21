@@ -26,7 +26,7 @@
 #define LOG_CONTROL_CHANGES (1U << 1)
 #define LOG_NANS            (1U << 2)
 #define LOG_VALUES          (1U << 3)
-#define VERBOSE (0)
+#define VERBOSE (LOG_NANS)
 #include "logmacro.h"
 
 

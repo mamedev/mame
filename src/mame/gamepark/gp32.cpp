@@ -268,7 +268,7 @@ TIMER_CALLBACK_MEMBER(gp32_state::s3c240x_lcd_timer_exp)
 			case BPPMODE_TFT_04 : s3c240x_lcd_render_04(); break;
 			case BPPMODE_TFT_08 : s3c240x_lcd_render_08(); break;
 			case BPPMODE_TFT_16 : s3c240x_lcd_render_16(); break;
-			default : LOGMASKED(LOG_GENERAL, "s3c240x_lcd_timer_exp: bppmode %d not supported\n", m_s3c240x_lcd.bppmode); break;
+			default : LOG("s3c240x_lcd_timer_exp: bppmode %d not supported\n", m_s3c240x_lcd.bppmode); break;
 		}
 		if ((m_s3c240x_lcd.vpos == 0) && (m_s3c240x_lcd.hpos == 0)) break;
 	}
@@ -391,7 +391,7 @@ void gp32_state::s3c240x_lcd_palette_w(offs_t offset, uint32_t data, uint32_t me
 	COMBINE_DATA(&m_s3c240x_lcd_palette[offset]);
 	if (mem_mask != 0xffffffff)
 	{
-		LOGMASKED(LOG_GENERAL, "s3c240x_lcd_palette_w: unknown mask %08x\n", mem_mask);
+		LOG("s3c240x_lcd_palette_w: unknown mask %08x\n", mem_mask);
 	}
 	m_palette->set_pen_color( offset, s3c240x_get_color_5551( data & 0xFFFF));
 }

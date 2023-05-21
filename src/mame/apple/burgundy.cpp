@@ -145,12 +145,12 @@ void burgundy_device::write_macrisc(offs_t offset, uint32_t data)
 				{
 					if ((m_registers[0x60] & 6) != 0)
 					{
-						LOGMASKED(LOG_GENERAL, "%s: Playback enabled\n", tag());
+						LOG("%s: Playback enabled\n", tag());
 						m_active |= ACTIVE_OUT;
 					}
 					else
 					{
-						LOGMASKED(LOG_GENERAL, "%s: Playback disabled\n", tag());
+						LOG("%s: Playback disabled\n", tag());
 						m_active &= ~ACTIVE_OUT;
 					}
 				}

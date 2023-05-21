@@ -133,15 +133,8 @@
 #include "cpu/m68000/m68010.h"
 #include "machine/68230pit.h"
 
-#define LOG_SETUP   (1U << 1)
-#define LOG_PRINTF  (0)
-
-#define VERBOSE (0) // (LOG_SETUP | LOG_GENERAL)
-
-#if VERBOSE && LOG_PRINTF
-#define LOG_OUTPUT_FUNC printf
-#endif
-
+#define VERBOSE (0) // (LOG_GENERAL)
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 

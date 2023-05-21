@@ -150,7 +150,7 @@ void nes_action53_device::update_mirr()
 
 void nes_action53_device::write_l(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "action 53 write_l, offset: %04x, data: %02x\n", offset, data);
+	LOG("action 53 write_l, offset: %04x, data: %02x\n", offset, data);
 	offset += 0x100;
 	if (offset >= 0x1000)
 		m_sel = bitswap<2>(data, 7, 0);
@@ -159,7 +159,7 @@ void nes_action53_device::write_l(offs_t offset, u8 data)
 
 void nes_action53_device::write_h(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "action 53 write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("action 53 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	if (m_reg[m_sel] != data)
 	{

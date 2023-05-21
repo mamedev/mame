@@ -73,7 +73,7 @@ nes_hengg_xhzs_device::nes_hengg_xhzs_device(const machine_config &mconfig, cons
 
 void nes_hengg_srich_device::write_h(offs_t offset, uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "hengg_srich write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("hengg_srich write_h, offset: %04x, data: %02x\n", offset, data);
 
 	prg32(data);
 	set_nt_mirroring(BIT(data, 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
@@ -100,7 +100,7 @@ void nes_hengg_srich_device::write_h(offs_t offset, uint8_t data)
 
 void nes_hengg_xhzs_device::write_l(offs_t offset, uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "hengg_xhzs write_l, offset: %04x, data: %02x\n", offset, data);
+	LOG("hengg_xhzs write_l, offset: %04x, data: %02x\n", offset, data);
 	offset += 0x4100;
 
 	if (offset & 0x5000)
@@ -109,7 +109,7 @@ void nes_hengg_xhzs_device::write_l(offs_t offset, uint8_t data)
 
 void nes_hengg_xhzs_device::write_h(offs_t offset, uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "hengg_xhzs write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("hengg_xhzs write_h, offset: %04x, data: %02x\n", offset, data);
 
 	set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }

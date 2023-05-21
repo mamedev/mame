@@ -377,7 +377,7 @@ void philips_22vp931_device::i8049_output0_w(uint8_t data)
 	    $01 = inverted -> VIDEO MUTE
 	*/
 
-	if ((m_i8049_out0 ^ data) & 0xff)
+	if ((VERBOSE & LOG_PORTS) && (m_i8049_out0 ^ data) & 0xff)
 	{
 		std::string flags;
 		if ( (data & 0x80)) flags += " ???";
@@ -389,7 +389,7 @@ void philips_22vp931_device::i8049_output0_w(uint8_t data)
 		if (!(data & 0x02)) flags += " AUDMUTE1";
 		if (!(data & 0x01)) flags += " VIDMUTE";
 
-		LOGMASKED(LOG_PORTS, "out0: %s %s\n", flags, machine().describe_context());
+		logerror("out0: %s %s\n", flags, machine().describe_context());
 		m_i8049_out0 = data;
 	}
 
@@ -418,11 +418,11 @@ void philips_22vp931_device::i8049_output1_w(uint8_t data)
 
 	int32_t speed;
 
-	if ((m_i8049_out1 ^ data) & 0x08)
+	if ((VERBOSE & LOG_PORTS) && (m_i8049_out1 ^ data) & 0x08)
 	{
 		std::string flags;
 		if (!(data & 0x08)) flags += " SMS";
-		LOGMASKED(LOG_PORTS, "out1: %s %s\n", flags, machine().describe_context());
+		logerror("out1: %s %s\n", flags, machine().describe_context());
 		m_i8049_out1 = data;
 	}
 
@@ -566,7 +566,7 @@ void philips_22vp931_device::i8049_port1_w(uint8_t data)
 	    $01 = P10 = (out) D100 -> some op-amp then to C334, B56, B332
 	*/
 
-	if ((m_i8049_port1 ^ data) & 0x1f)
+	if ((VERBOSE & LOG_PORTS) && (m_i8049_port1 ^ data) & 0x1f)
 	{
 		std::string flags;
 		if (!(data & 0x10)) flags += " SPEED";
@@ -574,7 +574,7 @@ void philips_22vp931_device::i8049_port1_w(uint8_t data)
 		if (!(data & 0x04)) flags += " REV";
 		if (!(data & 0x02)) flags += " FORW";
 		if (!(data & 0x01)) flags += " OPAMP";
-		LOGMASKED(LOG_PORTS, "port1: %s %s\n", flags, machine().describe_context());
+		logerror("port1: %s %s\n", flags, machine().describe_context());
 	}
 
 	// if bit 0 is set, we are not tracking

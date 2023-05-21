@@ -456,7 +456,7 @@ uint32_t m6809_base_device::execute_input_lines() const noexcept
 
 void m6809_base_device::execute_set_input(int inputnum, int state)
 {
-	LOGMASKED(LOG_INTERRUPTS, "%s: inputnum=%s state=%d totalcycles=%d\n", machine().describe_context(), inputnum_string(inputnum), state, (int) attotime_to_clocks(machine().time()));
+	LOGMASKED(LOG_INTERRUPTS, "%s: inputnum=%s state=%d totalcycles=%d\n", machine().describe_context(), inputnum_string(inputnum), state, attotime_to_clocks(machine().time()));
 
 	switch(inputnum)
 	{

@@ -9,13 +9,13 @@
 #include "emu.h"
 #include "segaic16_m.h"
 
+#include <algorithm>
+
 #define LOG_DIVIDE  (1U << 1)
 #define LOG_COMPARE (1U << 2)
 
 #define VERBOSE (0)
 #include "logmacro.h"
-
-#include <algorithm>
 
 
 //**************************************************************************

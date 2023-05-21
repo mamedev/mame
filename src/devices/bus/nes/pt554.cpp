@@ -57,7 +57,7 @@ nes_bandai_pt554_device::nes_bandai_pt554_device(const machine_config &mconfig, 
 
 void nes_bandai_pt554_device::write_m(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "Bandai PT-554 Sound write, data: %02x\n", data);
+	LOG("Bandai PT-554 Sound write, data: %02x\n", data);
 
 	// the actual chip starts speech synthesis when SYNC is held low >18µs
 	if (!BIT(data, 6))

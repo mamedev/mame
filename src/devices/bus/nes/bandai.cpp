@@ -34,10 +34,12 @@
 #include "emu.h"
 #include "bandai.h"
 
+#define LOG_UNHANDLED (1U << 1)
+
 #ifdef NES_PCB_DEBUG
-#define VERBOSE (LOG_GENERAL)
+#define VERBOSE (LOG_UNHANDLED | LOG_GENERAL)
 #else
-#define VERBOSE (0)
+#define VERBOSE (LOG_UNHANDLED)
 #endif
 #include "logmacro.h"
 
@@ -247,7 +249,7 @@ void nes_oekakids_device::ppu_latch(offs_t offset)
 
 void nes_oekakids_device::write_h(offs_t offset, uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "oeka kids write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("oeka kids write_h, offset: %04x, data: %02x\n", offset, data);
 
 	prg32(data & 0x03);
 	m_reg = data & 0x04;
@@ -299,7 +301,7 @@ TIMER_CALLBACK_MEMBER(nes_fcg_device::irq_timer_tick)
 
 void nes_fcg_device::fcg_write(offs_t offset, uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "lz93d50_write, offset: %04x, data: %02x\n", offset, data);
+	LOG("lz93d50_write, offset: %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x0f)
 	{
@@ -330,14 +332,14 @@ void nes_fcg_device::fcg_write(offs_t offset, uint8_t data)
 			m_irq_count = (m_irq_count & 0x00ff) | (data << 8);
 			break;
 		default:
-			LOGMASKED(LOG_GENERAL, "lz93d50_write uncaught write, offset: %04x, data: %02x\n", offset, data);
+			LOGMASKED(LOG_UNHANDLED, "lz93d50_write uncaught write, offset: %04x, data: %02x\n", offset, data);
 			break;
 	}
 }
 
 void nes_fcg_device::write_m(offs_t offset, uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "lz93d50 write_m, offset: %04x, data: %02x\n", offset, data);
+	LOG("lz93d50 write_m, offset: %04x, data: %02x\n", offset, data);
 
 	if (m_battery.empty() && m_prgram.empty())
 		fcg_write(offset & 0x0f, data);
@@ -352,7 +354,7 @@ void nes_fcg_device::write_m(offs_t offset, uint8_t data)
 
 void nes_lz93d50_24c01_device::write_h(offs_t offset, uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "lz93d50_24c01 write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("lz93d50_24c01 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x0f)
 	{
@@ -369,7 +371,7 @@ void nes_lz93d50_24c01_device::write_h(offs_t offset, uint8_t data)
 
 uint8_t nes_lz93d50_24c01_device::read_m(offs_t offset)
 {
-	LOGMASKED(LOG_GENERAL, "lz93d50 EEPROM read, offset: %04x\n", offset);
+	LOG("lz93d50 EEPROM read, offset: %04x\n", offset);
 	if (m_i2c_dir)
 		return (m_i2cmem->read_sda() & 1) << 4;
 	else
@@ -421,19 +423,19 @@ void nes_fjump2_device::set_prg()
 
 uint8_t nes_fjump2_device::read_m(offs_t offset)
 {
-	LOGMASKED(LOG_GENERAL, "fjump2 read_m, offset: %04x\n", offset);
+	LOG("fjump2 read_m, offset: %04x\n", offset);
 	return m_battery[offset & (m_battery.size() - 1)];
 }
 
 void nes_fjump2_device::write_m(offs_t offset, uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "fjump2 write_m, offset: %04x, data: %02x\n", offset, data);
+	LOG("fjump2 write_m, offset: %04x, data: %02x\n", offset, data);
 	m_battery[offset & (m_battery.size() - 1)] = data;
 }
 
 void nes_fjump2_device::write_h(offs_t offset, uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "fjump2 write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("fjump2 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x0f)
 	{

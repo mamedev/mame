@@ -819,7 +819,7 @@ void pdp1_device::execute_run()
 					else
 					{
 						/* what the heck? */
-						LOGMASKED(LOG_GENERAL, "It seems this tape should not be operated in read-in mode\n");
+						LOG("It seems this tape should not be operated in read-in mode\n");
 
 						m_rim = 0;      /* exit read-in mode (right???) */
 						m_rim_step = 0;
@@ -1474,7 +1474,7 @@ void pdp1_device::execute_instruction()
 				}
 				break;
 			default:
-				LOGMASKED(LOG_GENERAL, "Undefined shift: 0%06o at 0%06o\n", MB, PREVIOUS_PC);
+				LOG("Undefined shift: 0%06o at 0%06o\n", MB, PREVIOUS_PC);
 				break;
 			}
 			break;
@@ -1590,7 +1590,7 @@ void pdp1_device::execute_instruction()
 			break;
 		}
 	default:
-		LOGMASKED(LOG_GENERAL, "Illegal instruction: 0%06o at 0%06o\n", MB, PREVIOUS_PC);
+		LOG("Illegal instruction: 0%06o at 0%06o\n", MB, PREVIOUS_PC);
 
 		/* let us stop the CPU, like a real pdp-1 */
 		m_run = 0;
@@ -1613,7 +1613,7 @@ void pdp1_device::null_iot(int op2, int nac, int mb, int &io, int ac)
 	if (op2 == 000)
 		LOGMASKED(LOG_IOT_EXTRA, "IOT sync instruction: mb=0%06o, pc=0%06o\n", (unsigned) mb, (unsigned) m_pc);
 	if (op2 != 000)
-		LOGMASKED(LOG_GENERAL, "Not supported IOT command (no external IOT function given) 0%06o at 0%06o\n", mb, m_pc);
+		LOG("Not supported IOT command (no external IOT function given) 0%06o at 0%06o\n", mb, m_pc);
 }
 
 
@@ -1626,7 +1626,7 @@ void pdp1_device::lem_eem_iot(int op2, int nac, int mb, int &io, int ac)
 {
 	if (! m_extend_support) /* extend mode supported? */
 	{
-		LOGMASKED(LOG_GENERAL, "Ignoring internal error in file " __FILE__ " line %d.\n", __LINE__);
+		LOG("Ignoring internal error in file " __FILE__ " line %d.\n", __LINE__);
 		return;
 	}
 	LOGMASKED(LOG_EXTRA, "EEM/LEM instruction: mb=0%06o, pc=0%06o\n", mb, m_pc);
@@ -1662,7 +1662,7 @@ void pdp1_device::sbs_iot(int op2, int nac, int mb, int &io, int ac)
 		field_interrupt();
 		break;
 	default:
-		LOGMASKED(LOG_GENERAL, "Ignoring internal error in file " __FILE__ " line %d.\n", __LINE__);
+		LOG("Ignoring internal error in file " __FILE__ " line %d.\n", __LINE__);
 		break;
 	}
 }
@@ -1681,7 +1681,7 @@ void pdp1_device::type_20_sbs_iot(int op2, int nac, int mb, int &io, int ac)
 	int channel, mask;
 	if (! m_type_20_sbs)    /* type 20 sequence break system supported? */
 	{
-		LOGMASKED(LOG_GENERAL, "Ignoring internal error in file " __FILE__ " line %d.\n", __LINE__);
+		LOG("Ignoring internal error in file " __FILE__ " line %d.\n", __LINE__);
 		return;
 	}
 	channel = (mb >> 6) & 017;
@@ -1709,7 +1709,7 @@ void pdp1_device::type_20_sbs_iot(int op2, int nac, int mb, int &io, int ac)
 		field_interrupt();
 		break;
 	default:
-		LOGMASKED(LOG_GENERAL, "Ignoring internal error in file " __FILE__ " line %d.\n", __LINE__);
+		LOG("Ignoring internal error in file " __FILE__ " line %d.\n", __LINE__);
 		break;
 	}
 

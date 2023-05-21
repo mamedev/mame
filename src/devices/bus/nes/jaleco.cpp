@@ -23,11 +23,12 @@
 
 #include "speaker.h"
 
+#define LOG_UNHANDLED (1U << 1)
 
 #ifdef NES_PCB_DEBUG
-#define VERBOSE (LOG_GENERAL)
+#define VERBOSE (LOG_UNHANDLED | LOG_GENERAL)
 #else
-#define VERBOSE (0)
+#define VERBOSE (LOG_UNHANDLED)
 #endif
 #include "logmacro.h"
 
@@ -205,7 +206,7 @@ void nes_ss88006_device::pcb_reset()
 
 void nes_jf11_device::write_m(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "jf11 write_m, offset: %04x, data: %02x\n", offset, data);
+	LOG("jf11 write_m, offset: %04x, data: %02x\n", offset, data);
 	chr8(data, CHRROM);
 	prg32(data >> 4);
 }
@@ -226,7 +227,7 @@ void nes_jf11_device::write_m(offs_t offset, u8 data)
 
 void nes_jf13_device::write_m(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "jf13 write_m, offset: %04x, data: %02x\n", offset, data);
+	LOG("jf13 write_m, offset: %04x, data: %02x\n", offset, data);
 
 	if (offset < 0x1000)
 	{
@@ -249,7 +250,7 @@ void nes_jf13_device::write_m(offs_t offset, u8 data)
 
 void nes_jf16_device::write_h(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "jf16 write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("jf16 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	// this pcb is subject to bus conflict
 	data = account_bus_conflict(offset, data);
@@ -278,7 +279,7 @@ void nes_jf16_device::write_h(offs_t offset, u8 data)
 
 void nes_jf17_device::write_h(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "jf17 write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("jf17 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	// this pcb is subject to bus conflict
 	data = account_bus_conflict(offset, data);
@@ -336,7 +337,7 @@ TIMER_CALLBACK_MEMBER(nes_ss88006_device::irq_timer_tick)
 
 u8 nes_ss88006_device::read_m(offs_t offset)
 {
-	LOGMASKED(LOG_GENERAL, "ss88006 read_m, offset: %04x\n", offset);
+	LOG("ss88006 read_m, offset: %04x\n", offset);
 
 	if (m_wram_protect & 1) // RAM enabled
 		return device_nes_cart_interface::read_m(offset);
@@ -346,7 +347,7 @@ u8 nes_ss88006_device::read_m(offs_t offset)
 
 void nes_ss88006_device::write_m(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "ss88006 write_m, offset: %04x, data: %02x\n", offset, data);
+	LOG("ss88006 write_m, offset: %04x, data: %02x\n", offset, data);
 
 	if (m_wram_protect == 0x03) // RAM enabled and writable
 		device_nes_cart_interface::write_m(offset, data);
@@ -354,7 +355,7 @@ void nes_ss88006_device::write_m(offs_t offset, u8 data)
 
 void nes_ss88006_device::write_h(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "ss88006 write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("ss88006 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	int bank, shift;
 
@@ -424,7 +425,7 @@ void nes_ss88006_device::write_h(offs_t offset, u8 data)
 			break;
 
 		default:
-			LOGMASKED(LOG_GENERAL, "Jaleco SS88006 uncaught write, addr: %04x, value: %02x\n", offset + 0x8000, data);
+			LOGMASKED(LOG_UNHANDLED, "Jaleco SS88006 uncaught write, addr: %04x, value: %02x\n", offset + 0x8000, data);
 			break;
 	}
 }

@@ -111,7 +111,7 @@ void nes_nanjing_device::hblank_irq(int scanline, bool vblank, bool blanked)
 
 void nes_nanjing_device::write_l(offs_t offset, uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "nanjing write_l, offset: %04x, data: %02x\n", offset, data);
+	LOG("nanjing write_l, offset: %04x, data: %02x\n", offset, data);
 
 	offset += 0x100;
 
@@ -155,7 +155,7 @@ void nes_nanjing_device::write_l(offs_t offset, uint8_t data)
 uint8_t nes_nanjing_device::read_l(offs_t offset)
 {
 	uint8_t value = 0;
-	LOGMASKED(LOG_GENERAL, "nanjing read_l, offset: %04x\n", offset);
+	LOG("nanjing read_l, offset: %04x\n", offset);
 
 	offset += 0x100;
 

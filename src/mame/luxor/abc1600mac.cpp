@@ -201,7 +201,7 @@ inline offs_t abc1600_mac_device::get_physical_offset(offs_t offset, int task, b
 		m_cause = ((offset >> 13) & 0x1f) | DMAOK;
 	}
 
-	if (offset != virtual_offset) LOGMASKED(LOG_GENERAL, "%s MAC %05x:%06x (SEGA %03x SEGD %02x PGA %03x PGD %04x NONX %u WP %u TASK %u FC %u MAGIC %u)\n",
+	if (offset != virtual_offset) LOG("%s MAC %05x:%06x (SEGA %03x SEGD %02x PGA %03x PGD %04x NONX %u WP %u TASK %u FC %u MAGIC %u)\n",
 		machine().describe_context(), offset, virtual_offset, sega, segd, pga, page_data, nonx, wp, task, m_cpu->get_fc(), m_magic);
 
 	return virtual_offset;

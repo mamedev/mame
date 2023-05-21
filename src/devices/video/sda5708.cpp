@@ -27,7 +27,6 @@
 
 #include "logmacro.h"
 
-//#define LOG(...)      LOGMASKED(LOG_GENERAL, __VA_ARGS__) // Already defined in logmacro.h
 #define LOGSETUP(...) LOGMASKED(LOG_SETUP,   __VA_ARGS__)
 #define LOGCMD(...)   LOGMASKED(LOG_CMD,     __VA_ARGS__)
 #define LOGDATA(...)  LOGMASKED(LOG_DATA,    __VA_ARGS__)

@@ -298,7 +298,7 @@ void nes_aladdin_device::pcb_reset()
 
 uint8_t nes_aladdin_device::read_h(offs_t offset)
 {
-	LOGMASKED(LOG_GENERAL, "aladdin read_h, offset: %04x\n", offset);
+	LOG("aladdin read_h, offset: %04x\n", offset);
 	// this shall be the proper code, but it's a bit slower, so we access directly the subcart below
 	//return m_subslot->read(offset);
 
@@ -310,7 +310,7 @@ uint8_t nes_aladdin_device::read_h(offs_t offset)
 
 void nes_aladdin_device::write_h(offs_t offset, uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "aladdin write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("aladdin write_h, offset: %04x, data: %02x\n", offset, data);
 	m_subslot->write_prg(offset, data);
 }
 

@@ -20,6 +20,8 @@
 #include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE
 
 
+#define LOG_HIFREQ (1U << 1)
+
 #ifdef NES_PCB_DEBUG
 #define VERBOSE (LOG_GENERAL)
 #else
@@ -110,7 +112,7 @@ void nes_batmap_srrx_device::pcb_reset()
 
 void nes_batmap_000_device::write_h(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "batmap_000 write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("batmap_000 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x6001)
 	{
@@ -172,7 +174,7 @@ void nes_batmap_srrx_device::hblank_irq(int scanline, bool vblank, bool blanked)
 
 		if (m_irq_enable && !blanked && !m_irq_count)
 		{
-			LOGMASKED(LOG_GENERAL, "irq fired, scanline: %d\n", scanline);
+			LOG("irq fired, scanline: %d\n", scanline);
 			set_irq_line(ASSERT_LINE);
 		}
 	}
@@ -186,7 +188,7 @@ u8 nes_batmap_srrx_device::read_dpcm()
 
 u8 nes_batmap_srrx_device::read_l(offs_t offset)
 {
-	LOGMASKED(LOG_GENERAL, "batmap_srrx read_l, offset: %04x", offset);
+	LOGMASKED(LOG_HIFREQ, "batmap_srrx read_l, offset: %04x", offset);
 
 	offset += 0x100;
 	switch (offset & 0x1800)
@@ -202,13 +204,13 @@ u8 nes_batmap_srrx_device::read_l(offs_t offset)
 
 u8 nes_batmap_srrx_device::read_m(offs_t offset)
 {
-	LOGMASKED(LOG_GENERAL, "batmap_srrx read_m, offset: %04x", offset);
+	LOGMASKED(LOG_HIFREQ, "batmap_srrx read_m, offset: %04x", offset);
 	return m_prg[(m_reg * 0x2000 + offset) & (m_prg_size - 1)];
 }
 
 u8 nes_batmap_srrx_device::read_h(offs_t offset)
 {
-	LOGMASKED(LOG_GENERAL, "batmap_srrx read_h, offset: %04x", offset);
+	LOG("batmap_srrx read_h, offset: %04x", offset);
 
 	if ((offset & 0x7000) == 0x4000)
 		return read_dpcm();
@@ -218,7 +220,7 @@ u8 nes_batmap_srrx_device::read_h(offs_t offset)
 
 void nes_batmap_srrx_device::write_h(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "batmap_srrx write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("batmap_srrx write_h, offset: %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x7000)
 	{

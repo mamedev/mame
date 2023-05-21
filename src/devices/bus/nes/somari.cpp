@@ -259,7 +259,7 @@ void nes_somari_device::update_mirror()
 
 void nes_somari_device::write_h(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "somari write_h, mode %d, offset: %04x, data: %02x\n", m_board_mode, offset, data);
+	LOG("somari write_h, mode %d, offset: %04x, data: %02x\n", m_board_mode, offset, data);
 
 	switch (m_board_mode)
 	{
@@ -278,7 +278,7 @@ void nes_somari_device::update_all_banks()
 
 void nes_somari_device::write_m(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "somari write_m, offset: %04x, data: %02x\n", offset, data);
+	LOG("somari write_m, offset: %04x, data: %02x\n", offset, data);
 
 	if (offset & 0x100)
 	{

@@ -17,6 +17,7 @@
 #include "emu.h"
 #include "event.h"
 
+#define LOG_HIFREQ (1U << 1)
 
 #ifdef NES_PCB_DEBUG
 #define VERBOSE (LOG_GENERAL)
@@ -193,7 +194,7 @@ void nes_event_device::set_prg()
 
 u8 nes_event2_device::read_l(offs_t offset)
 {
-	LOGMASKED(LOG_GENERAL, "event2 read_l, offset: %04x\n", offset);
+	LOGMASKED(LOG_HIFREQ, "event2 read_l, offset: %04x\n", offset);
 	offset += 0x100;
 	if (offset >= 0x1800)
 		return (m_timer_count >= (0x10 | m_dsw->read()) << 25) ? 0x80 : 0;
@@ -205,7 +206,7 @@ u8 nes_event2_device::read_l(offs_t offset)
 
 u8 nes_event2_device::read_m(offs_t offset)
 {
-	LOGMASKED(LOG_GENERAL, "event2 read_m, offset: %04x\n", offset);
+	LOGMASKED(LOG_HIFREQ, "event2 read_m, offset: %04x\n", offset);
 	if (m_prgram.empty())
 		return get_open_bus();
 	else
@@ -214,7 +215,7 @@ u8 nes_event2_device::read_m(offs_t offset)
 
 void nes_event2_device::write_l(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "event2 write_l, offset: %04x, data: %02x\n", offset, data);
+	LOG("event2 write_l, offset: %04x, data: %02x\n", offset, data);
 
 	offset += 0x100;
 	switch (offset & 0x1c00)
@@ -242,7 +243,7 @@ void nes_event2_device::write_l(offs_t offset, u8 data)
 
 void nes_event2_device::write_m(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "event2 write_m, offset: %04x, data: %02x\n", offset, data);
+	LOGMASKED(LOG_HIFREQ, "event2 write_m, offset: %04x, data: %02x\n", offset, data);
 	if (!m_prgram.empty())
 		m_prgram[offset % m_prgram.size()] = data;
 }

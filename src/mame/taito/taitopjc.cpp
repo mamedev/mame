@@ -163,7 +163,7 @@ private:
 	uint32_t videochip_r(offs_t address);
 	void videochip_w(offs_t address, uint32_t data);
 	void video_exit();
-	void print_display_list();
+	[[maybe_unused]] void print_display_list();
 	TILE_GET_INFO_MEMBER(tile_get_info);
 	TILEMAP_MAPPER_MEMBER(tile_scan_layer0);
 	TILEMAP_MAPPER_MEMBER(tile_scan_layer1);
@@ -455,7 +455,7 @@ void taitopjc_state::print_display_list()
 	uint16_t cmd = m_dsp_ram[0xffe];
 	if (cmd == 0x5245)
 	{
-		LOGMASKED(LOG_DISPLAY_LIST, "DSP command RE\n");
+		logerror("DSP command RE\n");
 		bool end = false;
 		do
 		{
@@ -467,7 +467,7 @@ void taitopjc_state::print_display_list()
 				for (int i=0; i < count; i++)
 				{
 					uint16_t s = m_dsp_ram[ptr++];
-					LOGMASKED(LOG_DISPLAY_LIST, "   %04X -> [%04X]\n", s, d);
+					logerror("   %04X -> [%04X]\n", s, d);
 					d++;
 				}
 			}
@@ -480,31 +480,31 @@ void taitopjc_state::print_display_list()
 				switch (w)
 				{
 					case 0x406d:
-						LOGMASKED(LOG_DISPLAY_LIST, "   Call %04X [%04X %04X]\n", w, m_dsp_ram[ptr], m_dsp_ram[ptr+1]);
+						logerror("   Call %04X [%04X %04X]\n", w, m_dsp_ram[ptr], m_dsp_ram[ptr+1]);
 						ptr += 2;
 						break;
 					case 0x40cd:
-						LOGMASKED(LOG_DISPLAY_LIST, "   Call %04X [%04X %04X]\n", w, m_dsp_ram[ptr], m_dsp_ram[ptr+1]);
+						logerror("   Call %04X [%04X %04X]\n", w, m_dsp_ram[ptr], m_dsp_ram[ptr+1]);
 						ptr += 2;
 						break;
 					case 0x40ac:
-						LOGMASKED(LOG_DISPLAY_LIST, "   Call %04X [%04X %04X %04X %04X %04X %04X %04X %04X]\n", w, m_dsp_ram[ptr], m_dsp_ram[ptr+1], m_dsp_ram[ptr+2], m_dsp_ram[ptr+3], m_dsp_ram[ptr+4], m_dsp_ram[ptr+5], m_dsp_ram[ptr+6], m_dsp_ram[ptr+7]);
+						logerror("   Call %04X [%04X %04X %04X %04X %04X %04X %04X %04X]\n", w, m_dsp_ram[ptr], m_dsp_ram[ptr+1], m_dsp_ram[ptr+2], m_dsp_ram[ptr+3], m_dsp_ram[ptr+4], m_dsp_ram[ptr+5], m_dsp_ram[ptr+6], m_dsp_ram[ptr+7]);
 						ptr += 8;
 						break;
 					case 0x4774:
-						LOGMASKED(LOG_DISPLAY_LIST, "   Call %04X [%04X %04X %04X]\n", w, m_dsp_ram[ptr], m_dsp_ram[ptr+1], m_dsp_ram[ptr+2]);
+						logerror("   Call %04X [%04X %04X %04X]\n", w, m_dsp_ram[ptr], m_dsp_ram[ptr+1], m_dsp_ram[ptr+2]);
 						ptr += 3;
 						break;
 					case 0x47d9:
-						LOGMASKED(LOG_DISPLAY_LIST, "   Call %04X [%04X %04X %04X %04X %04X %04X %04X %04X]\n", w, m_dsp_ram[ptr], m_dsp_ram[ptr+1], m_dsp_ram[ptr+2], m_dsp_ram[ptr+3], m_dsp_ram[ptr+4], m_dsp_ram[ptr+5], m_dsp_ram[ptr+6], m_dsp_ram[ptr+7]);
+						logerror("   Call %04X [%04X %04X %04X %04X %04X %04X %04X %04X]\n", w, m_dsp_ram[ptr], m_dsp_ram[ptr+1], m_dsp_ram[ptr+2], m_dsp_ram[ptr+3], m_dsp_ram[ptr+4], m_dsp_ram[ptr+5], m_dsp_ram[ptr+6], m_dsp_ram[ptr+7]);
 						ptr += 8;
 						break;
 					default:
 					{
-						LOGMASKED(LOG_DISPLAY_LIST, "Unknown call %04X\n", w);
+						logerror("Unknown call %04X\n", w);
 						for (int i=0; i < 10; i++)
 						{
-							LOGMASKED(LOG_DISPLAY_LIST, "%04X\n", m_dsp_ram[ptr++]);
+							logerror("%04X\n", m_dsp_ram[ptr++]);
 						}
 						if (FATAL_UNKNOWN_CALLS)
 							fatalerror("Unknown call %04X\n", w);
@@ -517,7 +517,7 @@ void taitopjc_state::print_display_list()
 	else
 	{
 		if (cmd != 0)
-			LOGMASKED(LOG_DISPLAY_LIST, "DSP command %04X\n", cmd);
+			logerror("DSP command %04X\n", cmd);
 		return;
 	}
 }
@@ -541,7 +541,9 @@ void taitopjc_state::dsp_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 		}
 		#endif
 
+#if (VERBOSE & LOG_DISPLAY_LIST)
 		print_display_list();
+#endif
 	}
 
 	if (ACCESSING_BITS_48_63)

@@ -1837,7 +1837,7 @@ uint8_t vga_device::port_03d0_r(offs_t offset)
 		data = vga_crtc_r(offset);
 	if(offset == 8)
 	{
-		LOGMASKED(LOG_GENERAL, "VGA: 0x3d8 read %s\n", machine().describe_context());
+		LOG("VGA: 0x3d8 read %s\n", machine().describe_context());
 		data = 0; // TODO: PC-200 reads back CGA register here, everything else returns open bus OR CGA emulation of register 0x3d8
 	}
 
@@ -2777,14 +2777,14 @@ void s3_vga_device::s3_crtc_reg_write(uint8_t index, uint8_t data)
 				if(s3.reg_lock2 == 0xa5)
 				{
 					s3.strapping = (s3.strapping & 0xffffff00) | data;
-					LOGMASKED(LOG_GENERAL, "CR36: Strapping data = %08x\n",s3.strapping);
+					LOG("CR36: Strapping data = %08x\n",s3.strapping);
 				}
 				break;
 			case 0x37:
 				if(s3.reg_lock2 == 0xa5)
 				{
 					s3.strapping = (s3.strapping & 0xffff00ff) | (data << 8);
-					LOGMASKED(LOG_GENERAL, "CR37: Strapping data = %08x\n",s3.strapping);
+					LOG("CR37: Strapping data = %08x\n",s3.strapping);
 				}
 				break;
 			case 0x38:
@@ -3031,7 +3031,7 @@ bit    0  Vertical Total bit 10. Bit 10 of the Vertical Total register (3d4h
 				if(s3.reg_lock2 == 0xa5)
 				{
 					s3.strapping = (s3.strapping & 0xff00ffff) | (data << 16);
-					LOGMASKED(LOG_GENERAL, "CR68: Strapping data = %08x\n",s3.strapping);
+					LOG("CR68: Strapping data = %08x\n",s3.strapping);
 				}
 				break;
 			case 0x69:
@@ -3047,7 +3047,7 @@ bit    0  Vertical Total bit 10. Bit 10 of the Vertical Total register (3d4h
 				if(s3.reg_lock2 == 0xa5)
 				{
 					s3.strapping = (s3.strapping & 0x00ffffff) | (data << 24);
-					LOGMASKED(LOG_GENERAL, "CR6F: Strapping data = %08x\n",s3.strapping);
+					LOG("CR6F: Strapping data = %08x\n",s3.strapping);
 				}
 				break;
 			default:
@@ -5173,7 +5173,7 @@ void ati_vga_device::set_dot_clock()
 		LOGMASKED(LOG_INVALID, "Invalid dot clock %i selected.\n",clock_type);
 		break;
 	}
-//  LOGMASKED(LOG_GENERAL, "ATI: Clock select type %i (%iHz / %i)\n",clock_type,clock,div);
+//  LOG("ATI: Clock select type %i (%iHz / %i)\n",clock_type,clock,div);
 	recompute_params_clock(divisor,clock / div);
 
 }
@@ -5966,7 +5966,7 @@ u32 xga_copro_device::read_map_pixel(int x, int y, int map)
 			wbytes = width;
 			addr += y * wbytes;
 			addr += x;
-			//LOGMASKED(LOG_GENERAL, "r %d %d %d %d %d %x\n",map,width, height,x,y, addr);
+			//LOG("r %d %d %d %d %d %x\n",map,width, height,x,y, addr);
 			return m_mem_read_cb(addr);
 		case 4:
 			wbytes = width * 2;
@@ -6032,7 +6032,7 @@ void xga_copro_device::write_map_pixel(int x, int y, int map, u32 pixel)
 			wbytes = width;
 			addr += y * wbytes;
 			addr += x;
-			//LOGMASKED(LOG_GENERAL, "w %d %d %d %d %d %x %x\n",map,width, height,x,y, addr, pixel);
+			//LOG("w %d %d %d %d %d %x %x\n",map,width, height,x,y, addr, pixel);
 			m_mem_write_cb(addr, (u8)pixel);
 			break;
 		case 4:

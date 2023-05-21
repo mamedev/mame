@@ -91,7 +91,7 @@ void dmac3_device::csr_w(dmac3_controller controller, uint32_t data)
 	LOGMASKED(LOG_REGISTER, "dmac3-%d csr_w: 0x%x\n", controller, data);
 	if (data & CSR_RESET)
 	{
-		LOGMASKED(LOG_GENERAL, "dmac3-%d chip reset\n", controller);
+		LOG("dmac3-%d chip reset\n", controller);
 		reset_controller(controller);
 	}
 	else

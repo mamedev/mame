@@ -81,7 +81,7 @@ void nes_racermate_device::update_banks()
 
 void nes_racermate_device::write_h(offs_t offset, uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "racermate write_h, offset: %04x, data: %02x\n", offset, data);
+	LOG("racermate write_h, offset: %04x, data: %02x\n", offset, data);
 
 	if (offset == 0x3000)
 	{

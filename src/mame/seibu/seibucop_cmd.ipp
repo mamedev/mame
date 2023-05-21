@@ -28,6 +28,7 @@ void raiden2cop_device::execute_0205(int offset, uint16_t data)
 	int npos = ppos + m_host_space->read_dword(cop_regs[0] + 0x10 + offset * 4);
 	int delta = (npos >> 16) - (ppos >> 16);
 	m_host_space->write_dword(cop_regs[0] + 4 + offset * 4, npos);
+	// LOGMASKED(LOG_MOVE0205, ...);
 	cop_write_word(cop_regs[0] + 0x1e + offset * 4, cop_read_word(cop_regs[0] + 0x1e + offset * 4) + delta);
 }
 

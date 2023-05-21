@@ -60,7 +60,7 @@ nes_hes_device::nes_hes_device(const machine_config &mconfig, const char *tag, d
 
 void nes_hes_device::write_l(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "hes write_l, offset: %04x, data: %02x\n", offset, data);
+	LOG("hes write_l, offset: %04x, data: %02x\n", offset, data);
 
 	offset += 0x100;
 	if (BIT(offset, 8)) // $41xx, $43xx, ... $5fxx
