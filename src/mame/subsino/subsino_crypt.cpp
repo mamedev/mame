@@ -81,34 +81,14 @@ void victor21_bitswaps(uint8_t *decrypt, int i)
 
 // Decrypt:
 
-[[maybe_unused]] static void dump_decrypted(running_machine& machine, uint8_t* decrypt)
+void subsino_decrypt(uint8_t *region, void (*bitswaps)(uint8_t *decrypt, int i), const uint8_t *xors, int size)
 {
-	auto filename = "dat_" + std::string(machine.system().name);
-	auto fp = fopen(filename.c_str(), "w+b");
-	if (fp)
-	{
-		fwrite(decrypt, 0x10000, 1, fp);
-		fclose(fp);
-	}
-}
+	std::unique_ptr<uint8_t[]> decrypt = std::make_unique<uint8_t[]>(size);
 
-void subsino_decrypt(running_machine& machine, void (*bitswaps)(uint8_t *decrypt, int i), const uint8_t *xors, int size)
-{
-	std::unique_ptr<uint8_t[]> decrypt = std::make_unique<uint8_t[]>(0x10000);
-	uint8_t *const region = machine.root_device().memregion("maincpu")->base();
-
-	for (int i = 0; i < 0x10000; i++)
+	for (int i = 0; i < size; i++)
 	{
-		if (i < size)
-		{
-			decrypt[i] = region[i] ^ xors[i & 7];
-			bitswaps(decrypt.get(), i);
-		}
-		else
-		{
-			decrypt[i] = region[i];
-		}
+		decrypt[i] = region[i] ^ xors[i & 7];
+		bitswaps(decrypt.get(), i);
 	}
-//  dump_decrypted(machine, decrypt);
-	memcpy(region, decrypt.get(), 0x10000);
+	memcpy(region, decrypt.get(), size);
 }
