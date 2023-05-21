@@ -31733,7 +31733,9 @@ wmstopb                         // (c) 1999 WMS - Top Banana (Russian)
 yukongld                        // (c) 2000 WMS - Yukon Gold (Russian)
 
 @source:misc/xtom3d.cpp
-xtom3d                          //
+pumpit1                         // (c) 1999 Andamiro
+pumpitup                        // (c) 1999 Andamiro
+xtom3d                          // (c) 1999 Andamiro
 
 @source:misc/xyonix.cpp
 xyonix                          // [1989 Philko]

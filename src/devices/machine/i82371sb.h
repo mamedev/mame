@@ -23,8 +23,8 @@
 
 #include "machine/am9517a.h"
 
-
-class i82371sb_isa_device : public pci_device {
+class i82371sb_isa_device : public pci_device
+{
 public:
 	template <typename T>
 	i82371sb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
@@ -67,7 +67,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pc_irq15_w);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	i82371sb_isa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_add_mconfig(machine_config & config) override;
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -111,7 +113,7 @@ private:
 	uint8_t pc_dma_read_byte(offs_t offset);
 	void pc_dma_write_byte(offs_t offset, uint8_t data);
 	uint8_t pc_dma_read_word(offs_t offset);
-	void pc_dma_write_word(offs_t offset,uint8_t data);
+	void pc_dma_write_word(offs_t offset, uint8_t data);
 	uint8_t get_slave_ack(offs_t offset);
 
 	void internal_io_map(address_map &map);
@@ -186,7 +188,7 @@ private:
 
 	void map_bios(address_space *memory_space, uint32_t start, uint32_t end);
 
-	//southbridge
+	// southbridge
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic8259_master;
 	required_device<pic8259_device> m_pic8259_slave;
@@ -217,8 +219,8 @@ private:
 
 DECLARE_DEVICE_TYPE(I82371SB_ISA, i82371sb_isa_device)
 
-
-class i82371sb_ide_device : public pci_device {
+class i82371sb_ide_device : public pci_device
+{
 public:
 	template <typename T>
 	i82371sb_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
@@ -236,6 +238,8 @@ public:
 	void set_cpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
 
 protected:
+	i82371sb_ide_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
@@ -243,7 +247,7 @@ protected:
 
 	virtual void reset_all_mappings() override;
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
-		uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
+						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 	virtual void config_map(address_map &map) override;
 

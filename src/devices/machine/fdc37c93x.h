@@ -99,6 +99,8 @@ public:
 	static void floppy_formats(format_registration &fr);
 
 protected:
+	fdc37c93x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -106,6 +108,9 @@ protected:
 	virtual uint8_t dack_r(int line) override;
 	virtual void dack_w(int line, uint8_t data) override;
 	virtual void eop_w(int state) override;
+
+	u8 m_device_id = 0;
+	u8 m_device_rev = 0;
 
 private:
 	// put your private members here
@@ -192,6 +197,15 @@ private:
 	uint16_t read_auxio_configuration_register(int index);
 };
 
+class fdc37m707_device : public fdc37c93x_device
+{
+public:
+	fdc37m707_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	~fdc37m707_device() {}
+};
+
 DECLARE_DEVICE_TYPE(FDC37C93X, fdc37c93x_device);
+DECLARE_DEVICE_TYPE(FDC37M707, fdc37m707_device);
+
 
 #endif // MAME_MACHINE_FDC37C93X_H
