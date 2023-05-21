@@ -835,6 +835,7 @@ void ngp_state::ngp_common(machine_config &config)
 	m_maincpu->set_am8_16(1);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ngp_state::ngp_mem);
 	m_maincpu->porta_write().set(FUNC(ngp_state::ngp_tlcs900_porta));
+	m_maincpu->an_read<0>().set_constant(0x3ff);
 
 	z80_device &soundcpu(Z80(config, "soundcpu", 6.144_MHz_XTAL/2));
 	soundcpu.set_addrmap(AS_PROGRAM, &ngp_state::z80_mem);
