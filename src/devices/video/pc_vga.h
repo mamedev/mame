@@ -675,34 +675,6 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(S3_VGA, s3_vga_device)
 
-// ======================> gamtor_vga_device
-
-class gamtor_vga_device :  public svga_device
-{
-public:
-	// construction/destruction
-	gamtor_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-
-	virtual uint8_t port_03b0_r(offs_t offset) override;
-	virtual void port_03b0_w(offs_t offset, uint8_t data) override;
-	virtual uint8_t port_03c0_r(offs_t offset) override;
-	virtual void port_03c0_w(offs_t offset, uint8_t data) override;
-	virtual uint8_t port_03d0_r(offs_t offset) override;
-	virtual void port_03d0_w(offs_t offset, uint8_t data) override;
-//  virtual uint8_t mem_r(offs_t offset) override;
-//  virtual void mem_w(offs_t offset, uint8_t data) override;
-	virtual uint8_t mem_linear_r(offs_t offset) override;
-	virtual void mem_linear_w(offs_t offset,uint8_t data) override;
-
-protected:
-	virtual uint16_t offset() override;
-};
-
-
-// device type definition
-DECLARE_DEVICE_TYPE(GAMTOR_VGA, gamtor_vga_device)
-
 /*
   pega notes (paradise)
   build in amstrad pc1640

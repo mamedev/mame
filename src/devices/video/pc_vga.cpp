@@ -124,7 +124,6 @@ enum
 DEFINE_DEVICE_TYPE(VGA,        vga_device,        "vga",        "VGA")
 DEFINE_DEVICE_TYPE(TSENG_VGA,  tseng_vga_device,  "tseng_vga",  "Tseng Labs VGA")
 DEFINE_DEVICE_TYPE(S3_VGA,     s3_vga_device,     "s3_vga",     "S3 Graphics VGA")
-DEFINE_DEVICE_TYPE(GAMTOR_VGA, gamtor_vga_device, "gamtor_vga", "GAMTOR VGA")
 DEFINE_DEVICE_TYPE(ATI_VGA,    ati_vga_device,    "ati_vga",    "ATi VGA")
 DEFINE_DEVICE_TYPE(IBM8514A,   ibm8514a_device,   "ibm8514a",   "IBM 8514/A Video")
 DEFINE_DEVICE_TYPE(MACH8,      mach8_device,      "mach8",      "Mach8")
@@ -159,11 +158,6 @@ s3_vga_device::s3_vga_device(const machine_config &mconfig, const char *tag, dev
 
 s3_vga_device::s3_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: ati_vga_device(mconfig, type, tag, owner, clock)
-{
-}
-
-gamtor_vga_device::gamtor_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: svga_device(mconfig, GAMTOR_VGA, tag, owner, clock)
 {
 }
 
@@ -4993,110 +4987,6 @@ void s3_vga_device::mem_w(offs_t offset, uint8_t data)
 
 	if((offset + (svga.bank_w*0x10000)) < vga.svga_intf.vram_size)
 		vga_device::mem_w(offset,data);
-}
-
-/******************************************
-
-gamtor.cpp implementation
-
-******************************************/
-
-// TODO: Chips & Technologies 65550 with swapped address lines? Move to separate file regardless
-// 65550 is used by Apple PowerBook 2400c
-// 65535 is used by IBM PC-110
-
-uint8_t gamtor_vga_device::mem_linear_r(offs_t offset)
-{
-	if (!machine().side_effects_disabled())
-		logerror("Reading gamtor SVGA memory %08x\n", offset);
-	return vga.memory[offset];
-}
-
-void gamtor_vga_device::mem_linear_w(offs_t offset, uint8_t data)
-{
-	if (offset & 2)
-		vga.memory[(offset >> 2) + 0x20000] = data;
-	else
-		vga.memory[(offset & 1) | (offset >> 1)] = data;
-}
-
-
-uint8_t gamtor_vga_device::port_03b0_r(offs_t offset)
-{
-	uint8_t res;
-
-	switch(offset)
-	{
-		default:
-			res = vga_device::port_03b0_r(offset ^ 3);
-			break;
-	}
-
-	return res;
-}
-
-void gamtor_vga_device::port_03b0_w(offs_t offset, uint8_t data)
-{
-	switch(offset)
-	{
-		default:
-			vga_device::port_03b0_w(offset ^ 3,data);
-			break;
-	}
-}
-
-uint8_t gamtor_vga_device::port_03c0_r(offs_t offset)
-{
-	uint8_t res;
-
-	switch(offset)
-	{
-		default:
-			res = vga_device::port_03c0_r(offset ^ 3);
-			break;
-	}
-
-	return res;
-}
-
-void gamtor_vga_device::port_03c0_w(offs_t offset, uint8_t data)
-{
-	switch(offset)
-	{
-		default:
-			vga_device::port_03c0_w(offset ^ 3,data);
-			break;
-	}
-}
-
-uint8_t gamtor_vga_device::port_03d0_r(offs_t offset)
-{
-	uint8_t res;
-
-	switch(offset)
-	{
-		default:
-			res = vga_device::port_03d0_r(offset ^ 3);
-			break;
-	}
-
-	return res;
-}
-
-void gamtor_vga_device::port_03d0_w(offs_t offset, uint8_t data)
-{
-	switch(offset)
-	{
-		default:
-			vga_device::port_03d0_w(offset ^ 3,data);
-			break;
-	}
-}
-
-uint16_t gamtor_vga_device::offset()
-{
-	// TODO: pinpoint whatever extra register that wants this shifted by 1
-	return vga_device::offset() << 1;
 }
 
 uint16_t ati_vga_device::offset()
