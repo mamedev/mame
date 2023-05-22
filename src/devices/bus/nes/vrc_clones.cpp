@@ -752,12 +752,13 @@ void nes_bmc_830506c_device::write_h(offs_t offset, u8 data)
 
 u8 nes_bmc_831128c_device::read_m(offs_t offset)
 {
-	LOGMASKED(LOG_HIFREQ, "bmc_831128c read_m, offset: %04x, data: %02x\n", offset, data);
-
+	u8 data = 0;
 	if (m_reg == 1)
-		return device_nes_cart_interface::read_m(offset);
+		data = device_nes_cart_interface::read_m(offset);
 	else
-		return m_prg[(m_reg * 0x2000 + offset) & (m_prg_size - 1)];
+		data = m_prg[(m_reg * 0x2000 + offset) & (m_prg_size - 1)];
+	LOGMASKED(LOG_HIFREQ, "bmc_831128c read_m, offset: %04x, data: %02x\n", offset, data);
+	return data;
 }
 
 void nes_bmc_831128c_device::write_m(offs_t offset, u8 data)

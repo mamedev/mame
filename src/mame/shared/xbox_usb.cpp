@@ -75,6 +75,7 @@ uint32_t ohci_usb_controller::read(offs_t offset)
 	uint32_t ret;
 
 	if (LOG_OHCI)
+	{
 		if (offset >= 0x54 / 4)
 			m_maincpu->machine().logerror("usb controller 0 register HcRhPortStatus[%d] read\n", (offset - 0x54 / 4) + 1);
 		else
@@ -88,7 +89,7 @@ void ohci_usb_controller::write(offs_t offset, uint32_t data)
 {
 	uint32_t old = ohcist.hc_regs[offset];
 
-	if (LOG_OCHI)
+	if (LOG_OHCI)
 	{
 		if (offset >= 0x54 / 4)
 			m_maincpu->machine().logerror("usb controller 0 register HcRhPortStatus[%d] write %08X\n", (offset - 0x54 / 4) + 1, data);
