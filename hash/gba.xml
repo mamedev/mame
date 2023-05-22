@@ -810,7 +810,7 @@ license:CC0-1.0
 
 	<software name="agecart9">
 		<description>AGB Aging Cartridge (World, version 9.0)</description>
-		<year>2001</year>
+		<year>2004?</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-01" />
@@ -4909,7 +4909,7 @@ license:CC0-1.0
 
 	<software name="chokkanp" cloneof="polarium">
 		<description>Chokkan Hitofude Advance (Japan, prototype)</description>
-		<year>20??</year>
+		<year>200?</year>
 		<publisher>Nintendo</publisher>
 		<info name="alt_title" value="直感ヒトフデADVANCE"/>
 		<part name="cart" interface="gba_cart">
@@ -7113,7 +7113,7 @@ license:CC0-1.0
 	<software name="demonscrest">
 		<!-- The patch doesn't seem to be needed in MAME, but on other emulators, you have to patch 0x122384 with 0xc046c046. -->
 		<description>Demon's Crest (prototype)</description>
-		<year>????</year>
+		<year>2002?</year>
 		<publisher>Rival Dreams</publisher>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="1407220">
@@ -20395,7 +20395,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-		<!-- This is a later build of the game than the retail release, with a different title screen and an options screen; does not say "Licensed by Nintendo" on boot. -->
+	<!-- This is a later build of the game than the retail release, with a different title screen and an options screen; does not say "Licensed by Nintendo" on boot. -->
 	<software name="manicminl">
 		<description>Manic Miner (Europe, 20030307)</description>
 		<year>2003</year>
@@ -20658,7 +20658,7 @@ license:CC0-1.0
 
 	<software name="mariokrtxxl">
 		<description>Mario Kart XXL (demo, 20040417)</description>
-		<year>2001</year>
+		<year>2004</year>
 		<publisher>Denaris Entertainment Software</publisher>
 		<info name="alt_title" value="Mario Kart Demo V1.0"/>
 		<part name="cart" interface="gba_cart">
