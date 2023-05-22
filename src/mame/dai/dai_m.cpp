@@ -211,5 +211,5 @@ uint8_t dai_state::amd9511_r()
 
 void dai_state::amd9511_w(offs_t offset, uint8_t data)
 {
-	LOG("Writing to AMD9511 math chip, %04x, %02x\n", offset, data);
+	logerror("Writing to AMD9511 math chip, %04x, %02x\n", offset, data);
 }

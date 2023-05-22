@@ -217,7 +217,7 @@ void bebox_state::bebox_crossproc_interrupts_w(offs_t offset, uint64_t data, uin
 			else
 				line = crossproc_map[i].active_high ? CLEAR_LINE : ASSERT_LINE;
 
-            LOGMASKED(LOG_INTERRUPTS, "bebox_crossproc_interrupts_w(): CPU #%d %s %s\n",
+			LOGMASKED(LOG_INTERRUPTS, "bebox_crossproc_interrupts_w(): CPU #%d %s %s\n",
 				crossproc_map[i].cpunum, line ? "Asserting" : "Clearing",
 				(crossproc_map[i].inputline == 0/*PPC_INPUT_LINE_SMI*/) ? "SMI" : "TLBISYNC");
 

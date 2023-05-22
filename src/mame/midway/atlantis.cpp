@@ -355,7 +355,8 @@ uint8_t atlantis_state::cmos_r(offs_t offset)
 	// Initial RTC check expects reads to the RTC to take some time
 	if (offset == 0x7ff9)
 		m_maincpu->eat_cycles(30);
-	LOGMASKED(LOG_RTC, "%s:RTC read from offset %04X = %08X\n", machine().describe_context(), offset, result);
+	else if (offset >= 0x7ff0 && offset != 0x7ff9)
+		LOGMASKED(LOG_RTC, "%s:RTC read from offset %04X = %08X\n", machine().describe_context(), offset, result);
 	return result;
 }
 
