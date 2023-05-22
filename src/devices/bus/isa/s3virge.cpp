@@ -759,7 +759,7 @@ uint8_t s3virge_vga_device::port_03b0_r(offs_t offset)
 {
 	uint8_t res = 0xff;
 
-	if (CRTC_PORT_ADDR == 0x3b0)
+	if (get_crtc_port() == 0x3b0)
 	{
 		switch(offset)
 		{
@@ -777,7 +777,7 @@ uint8_t s3virge_vga_device::port_03b0_r(offs_t offset)
 
 void s3virge_vga_device::port_03b0_w(offs_t offset, uint8_t data)
 {
-	if (CRTC_PORT_ADDR == 0x3b0)
+	if (get_crtc_port() == 0x3b0)
 	{
 		switch(offset)
 		{
@@ -820,7 +820,7 @@ uint8_t s3virge_vga_device::port_03d0_r(offs_t offset)
 {
 	uint8_t res = 0xff;
 
-	if (CRTC_PORT_ADDR == 0x3d0)
+	if (get_crtc_port() == 0x3d0)
 	{
 		switch(offset)
 		{
@@ -838,7 +838,7 @@ uint8_t s3virge_vga_device::port_03d0_r(offs_t offset)
 
 void s3virge_vga_device::port_03d0_w(offs_t offset, uint8_t data)
 {
-	if (CRTC_PORT_ADDR == 0x3d0)
+	if (get_crtc_port() == 0x3d0)
 	{
 		switch(offset)
 		{

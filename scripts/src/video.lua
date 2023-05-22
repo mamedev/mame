@@ -827,6 +827,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/pc_xga.h,VIDEOS["PC_XGA"] = true
+--------------------------------------------------
+
+if (VIDEOS["PC_XGA"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pc_xga.cpp",
+		MAME_DIR .. "src/devices/video/pc_xga.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/virge_pci.h,VIDEOS["VIRGE_PCI"] = true
 --------------------------------------------------
 

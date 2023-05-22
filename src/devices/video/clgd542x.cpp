@@ -15,8 +15,6 @@
 #define LOG_REG 0
 #define LOG_BLIT 1
 
-#define CRTC_PORT_ADDR ((vga.miscellaneous_output&1)?0x3d0:0x3b0)
-
 //#define TEXT_LINES (LINES_HELPER)
 #define LINES (vga.crtc.vert_disp_end+1)
 #define TEXT_LINES (vga.crtc.vert_disp_end+1)
@@ -1016,7 +1014,7 @@ uint8_t cirrus_gd5428_device::port_03b0_r(offs_t offset)
 {
 	uint8_t res = 0xff;
 
-	if (CRTC_PORT_ADDR == 0x3b0)
+	if (get_crtc_port() == 0x3b0)
 	{
 		switch(offset)
 		{
@@ -1036,7 +1034,7 @@ uint8_t cirrus_gd5428_device::port_03d0_r(offs_t offset)
 {
 	uint8_t res = 0xff;
 
-	if (CRTC_PORT_ADDR == 0x3d0)
+	if (get_crtc_port() == 0x3d0)
 	{
 		switch(offset)
 		{
@@ -1054,7 +1052,7 @@ uint8_t cirrus_gd5428_device::port_03d0_r(offs_t offset)
 
 void cirrus_gd5428_device::port_03b0_w(offs_t offset, uint8_t data)
 {
-	if (CRTC_PORT_ADDR == 0x3b0)
+	if (get_crtc_port() == 0x3b0)
 	{
 		switch(offset)
 		{
@@ -1072,7 +1070,7 @@ void cirrus_gd5428_device::port_03b0_w(offs_t offset, uint8_t data)
 
 void cirrus_gd5428_device::port_03d0_w(offs_t offset, uint8_t data)
 {
-	if (CRTC_PORT_ADDR == 0x3d0)
+	if (get_crtc_port() == 0x3d0)
 	{
 		switch(offset)
 		{
