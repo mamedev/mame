@@ -1607,6 +1607,7 @@ license:CC0-1.0
 		<info name="release" value="19930226" />
 		<info name="alt_title" value="バートのサバイバルキャンプ ~ Bart no Survival Camp (Box)" />
 		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="0x20000">
 				<rom name="bart no survival camp (japan).bin" size="0x20000" crc="0fd66b1a" sha1="f0d855bba656b628c7dd9ed9e586853be75b790f" />
 			</dataarea>
