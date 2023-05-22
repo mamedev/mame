@@ -298,11 +298,13 @@ const int ns10_type2_decrypter_nonlinear_device::INIT_SBOX[16]{0, 12, 13, 6, 2, 
 
 ns10_type2_decrypter_nonlinear_device::ns10_type2_decrypter_nonlinear_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ns10_decrypter_device(mconfig, NS10_TYPE2_DECRYPTER_NONLINEAR, tag, owner, clock)
+	, m_nonlinear_region(*this, "nonlinear_table")
 {
 }
 
 ns10_type2_decrypter_nonlinear_device::ns10_type2_decrypter_nonlinear_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, ns10_crypto_logic &&logic)
 	: ns10_decrypter_device(mconfig, NS10_TYPE2_DECRYPTER_NONLINEAR, tag, owner, clock)
+	, m_nonlinear_region(*this, "nonlinear_table")
 	, m_logic(std::move(logic))
 {
 	m_logic_initialized = true;
@@ -326,9 +328,9 @@ uint16_t ns10_type2_decrypter_nonlinear_device::decrypt(uint16_t cipherword)
 	}
 	m_mask ^= m_logic.xMask;
 
-	uint8_t nonlinear_bit = BIT(m_nonlinear_region_base[m_nonlinear_count / 8], 7 - (m_nonlinear_count % 8));
+	uint8_t nonlinear_bit = BIT(m_nonlinear_region->base()[m_nonlinear_count / 8], 7 - (m_nonlinear_count % 8));
 	m_nonlinear_count++;
-	if (m_nonlinear_count >= m_nonlinear_region_size * 8)
+	if (m_nonlinear_count >= m_nonlinear_region->bytes() * 8)
 		m_nonlinear_count = 0;
 	m_mask ^= m_logic.nonlinear_calculation(nonlinear_bit);
 
@@ -353,18 +355,10 @@ void ns10_type2_decrypter_nonlinear_device::device_start()
 	if (!m_logic_initialized)
 		fatalerror("ns10_type2_decrypter_nonlinear_device: Required logic data for decrypter device not initialized");
 
-	// If the entire purpose for this separate device doesn't exist then just fail, this is a programmer error
-	auto nonlinear_table = memregion("nonlinear_table");
-	if (nonlinear_table == nullptr)
-		fatalerror("ns10_type2_decrypter_nonlinear_device: Non-linear bit lookup table memory region not found");
-
 	save_item(NAME(m_mask));
 	save_item(NAME(m_previous_cipherwords));
 	save_item(NAME(m_previous_plainwords));
 	save_item(NAME(m_nonlinear_count));
-
-	m_nonlinear_region_base = nonlinear_table->base();
-	m_nonlinear_region_size = nonlinear_table->bytes();
 }
 
 void ns10_type2_decrypter_nonlinear_device::device_reset()

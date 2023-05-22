@@ -136,8 +136,7 @@ private:
 	uint64_t m_previous_plainwords;
 	uint32_t m_nonlinear_count;
 
-	uint8_t *m_nonlinear_region_base;
-	size_t m_nonlinear_region_size;
+	required_memory_region m_nonlinear_region;
 
 	const ns10_crypto_logic m_logic;
 
