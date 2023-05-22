@@ -1466,6 +1466,18 @@ if (SOUNDS["LC82310"]~=null) then
 end
 
 ---------------------------------------------------
+-- NEC uPD933
+--@src/devices/sound/upd933.h,SOUNDS["UPD933"] = true
+---------------------------------------------------
+
+if (SOUNDS["UPD933"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/upd933.cpp",
+		MAME_DIR .. "src/devices/sound/upd933.h",
+	}
+end
+
+---------------------------------------------------
 -- NEC uPD934G
 --@src/devices/sound/upd934g.h,SOUNDS["UPD934G"] = true
 ---------------------------------------------------
