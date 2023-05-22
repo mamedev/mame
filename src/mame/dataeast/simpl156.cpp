@@ -205,7 +205,7 @@ void simpl156_state::rowscroll_w(offs_t offset, u32 data, u32 mem_mask)
 	COMBINE_DATA(&m_rowscroll[Layer][offset]);
 }
 
-/* Memory Map controled by PALs */
+/* Memory Map controlled by PALs */
 
 void simpl156_state::base_map(address_map &map)
 {
