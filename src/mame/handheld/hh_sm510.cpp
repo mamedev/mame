@@ -5284,6 +5284,9 @@ ROM_END
   * Sharp SM511 under epoxy (die label KMS73B, 781)
   * lcd screen with custom segments, 1-bit sound
 
+  There's also a rare version from 1992 called "Bull's-Eye: Barbecue Sauce",
+  assumed to be a promotional item licensed to Heinz.
+
 *******************************************************************************/
 
 class kloneran_state : public hh_sm510_state
