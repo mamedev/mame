@@ -3398,7 +3398,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="ratatfr" cloneof="ratatit">
+	<software name="ratatfr" cloneof="ratat">
 		<description>Disney/Pixar Ratatouille - Les nouvelles recettes de Rémy (France)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -3413,7 +3413,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="ratatsp" cloneof="ratatit">
+	<software name="ratatsp" cloneof="ratat">
 		<description>Disney/Pixar Ratatouille - Las recetas del Remy (Spain)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
