@@ -25357,7 +25357,6 @@ license:CC0-1.0
 
 	<!-- Game does not work in MAME, it freezes on the bios screen. -->
 	<software name="paradroid" supported="no">
-		<!-- Released by March42 and Forest of Illusion -->
 		<description>Paradroid (Europe, prototype, 20030320)</description>
 		<year>2003</year>
 		<publisher>Jester Interactive</publisher>
@@ -25450,7 +25449,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-<!-- This was the last development build, released by the programmer, James Boulton. It was never completed due to lack of publisher interest. -->
+	<!-- This was the last development build, released by the programmer, James Boulton. It was never completed due to lack of publisher interest. -->
 	<software name="perplexd" supported="partial">
 		<description>Perplexus Diodomin (prototype)</description>
 		<year>2002</year>

@@ -28,14 +28,13 @@ public:
 	auto rxd_cb() { return m_rxd_cb.bind(); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
-
-	// optional information overrides
 	virtual tiny_rom_entry const *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
+
 private:
 	void nabu_kb_mem(address_map &map);
 

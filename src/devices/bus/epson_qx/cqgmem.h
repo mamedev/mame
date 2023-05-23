@@ -28,20 +28,18 @@ public:
 	cqgmem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
-	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
 	virtual space_config_vector memory_space_config() const override;
 
+private:
 	void write(offs_t offset, uint8_t data);
 
 	void io_map(address_map &map);
 	void xmem_map(address_map &map);
 
-private:
 	uint8_t m_banks_enabled;
 
 	memory_share_creator<uint8_t> m_ram;

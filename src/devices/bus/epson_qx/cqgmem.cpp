@@ -13,7 +13,7 @@
 //  CQGMEM DEVICE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(EPSON_QX_OPTION_CQGMEM, bus::epson_qx::cqgmem_device, "option_cqgmem", "Epson QX-10 1MB Memory Expansion")
+DEFINE_DEVICE_TYPE(EPSON_QX_OPTION_CQGMEM, bus::epson_qx::cqgmem_device, "epson_qx_option_cqgmem", "Commodity Quote Graphics 1MB Memory Expansion")
 
 namespace bus::epson_qx {
 
@@ -60,6 +60,10 @@ void cqgmem_device::device_start()
 {
 	m_installed = false;
 
+	for (int i = 0; i < m_banks.size(); ++i) {
+		m_banks[i]->configure_entries(0, 128, m_ram, 0x2000);
+	}
+
 	save_item(NAME(m_installed));
 	save_item(NAME(m_banks_enabled));
 }
@@ -73,23 +77,20 @@ void cqgmem_device::device_reset()
 		address_space &space = m_bus->iospace();
 		offs_t iobase = m_iobase->read() & 0xf0;
 		space.install_device(iobase, iobase+0x07, *this, &cqgmem_device::io_map);
-
-		for (int i = 0; i < m_banks.size(); ++i) {
-			m_banks[i]->configure_entries(0, 128, m_ram, 0x2000);
-		}
+		m_installed = true;
 	}
 
-	m_banks_enabled = 0;
+	m_banks_enabled = 0; // FIXME: should probably unmap any enabled banks before clearing this on reset
 
 	for (int i = 0; i < m_banks.size(); ++i) {
 		m_banks[i]->set_entry(0);
 	}
 }
 
+//-------------------------------------------------
 //  memory_space_config - return a description of
 //  any address spaces owned by this device
 //-------------------------------------------------
-
 device_memory_interface::space_config_vector cqgmem_device::memory_space_config() const
 {
 	return space_config_vector {
@@ -106,10 +107,10 @@ void cqgmem_device::write(offs_t offset, uint8_t data)
 {
 	memory_view::memory_view_entry &view = m_bus->memview();
 
-	uint8_t bank = offset & 0x07;
-	uint8_t page = data & 0x7f;
-	uint8_t enable = (m_banks_enabled & ~((data & 0x80) >> bank)) |  ((data & 0x80) >> bank);
-	uint16_t bank_addr = bank * 0x2000;
+	uint8_t const bank = offset & 0x07;
+	uint8_t const page = data & 0x7f;
+	uint8_t const enable = (m_banks_enabled & ~(0x80 >> bank)) | ((data & 0x80) >> bank);
+	uint16_t const bank_addr = bank * 0x2000;
 
 	m_banks[bank]->set_entry(page);
 
