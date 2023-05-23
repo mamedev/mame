@@ -27,9 +27,9 @@
 #include "sound/tms5220.h"
 #include "speaker.h"
 
-#define LOG_READYQ (1 << 0)
-#define LOG_READ (1 << 1)
-#define LOG_WRITE (1 << 2)
+#define LOG_READYQ (1U << 1)
+#define LOG_READ   (1U << 2)
+#define LOG_WRITE  (1U << 3)
 
 //#define VERBOSE (LOG_READYQ | LOG_READ | LOG_WRITE)
 #include "logmacro.h"

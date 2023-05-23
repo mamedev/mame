@@ -198,7 +198,7 @@
 
 
 // configurable logging
-#define LOG_UNKOPCODES     (1U <<  1)
+#define LOG_UNKOPCODES     (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_UNKOPCODES)
 

@@ -3,14 +3,21 @@
 #include "emu.h"
 #include "vrc5074.h"
 
-#define LOG_NILE            (0)
-#define LOG_NILE_IRQS       (0)
-#define LOG_PCI             (0)
-#define LOG_TIMERS          (0)
-#define LOG_MAP             (0)
-#define LOG_NILE_MASTER     (0)
-#define LOG_NILE_TARGET     (0)
-#define PRINTF_SERIAL       (0)
+#define LOG_NILE            (1U << 1)
+#define LOG_NILE_IRQS       (1U << 2)
+#define LOG_TIMERS          (1U << 3)
+#define LOG_MAP             (1U << 4)
+#define LOG_NILE_MASTER     (1U << 5)
+#define LOG_NILE_TARGET     (1U << 6)
+#define LOG_SERIAL_READS    (1U << 7)
+#define LOG_SERIAL_WRITES   (1U << 8)
+#define LOG_SERIAL_DATA     (1U << 9)
+#define LOG_SDRAM           (1U << 10)
+#define LOG_ERRORS          (1U << 11)
+#define LOG_UNKNOWNS        (1U << 12)
+#define LOG_DMACTRL         (1U << 13)
+#define VERBOSE (0)
+#include "logmacro.h"
 
 /* NILE 4 registers 0x000-0x0ff */
 #define NREG_SDRAM0         (0x000/4)
@@ -216,8 +223,7 @@ void vrc5074_device::device_start()
 	if (m_updateRegion) {
 		romSize = m_updateRegion->bytes();
 		m_cpu_space->install_rom(0x1fd00000, 0x1fd00000 + romSize - 1, m_updateRegion->base());
-		if (LOG_NILE)
-			logerror("%s: vrc5074_device::device_start UPDATE Mapped size: 0x%08X start: 0x1fd00000 end: %08X\n", tag(), romSize, 0x1fd00000 + romSize - 1);
+		LOGMASKED(LOG_NILE, "%s: vrc5074_device::device_start UPDATE Mapped size: 0x%08X start: 0x1fd00000 end: %08X\n", tag(), romSize, 0x1fd00000 + romSize - 1);
 	}
 	// Nile cpu register mapppings
 	m_cpu_space->install_device(0x1fa00000, 0x1fa001ff, *static_cast<vrc5074_device *>(this), &vrc5074_device::cpu_map);
@@ -300,8 +306,7 @@ void vrc5074_device::map_cpu_space()
 				m_cpu_space->install_ram(winStart, winStart + winSize - 1, m_sdram[index].data());
 				m_cpu->add_fastram(winStart, winStart + winSize - 1, false, m_sdram[index].data());
 			}
-			if (LOG_NILE | LOG_MAP)
-				logerror("map_cpu_space ram_size=%08X ram_base=%08X\n", winSize, winStart);
+			LOGMASKED(LOG_NILE | LOG_MAP, "map_cpu_space ram_size=%08X ram_base=%08X\n", winSize, winStart);
 		}
 	}
 
@@ -317,8 +322,7 @@ void vrc5074_device::map_cpu_space()
 			if (winSize > 0 && m_cs_devices[index - 2] != nullptr) {
 				m_cpu_space->install_device_delegate(winStart, winStart + winSize - 1, *m_cs_devices[index - 2], m_cs_maps[index - 2]);
 			}
-			if (LOG_NILE | LOG_MAP)
-				logerror("map_cpu_space cs%d_size=%08X cs%d_base=%08X\n", index, winSize, index, winStart);
+			LOGMASKED(LOG_NILE | LOG_MAP, "map_cpu_space cs%d_size=%08X cs%d_base=%08X\n", index, winSize, index, winStart);
 		}
 	}
 
@@ -341,8 +345,7 @@ void vrc5074_device::map_cpu_space()
 					m_cpu_space->install_write_handler(winStart, winStart + winSize - 1, write32s_delegate(*this, FUNC(vrc5074_device::pci1_w)));
 				}
 			}
-			if (LOG_NILE | LOG_MAP)
-				logerror("map_cpu_space pci%d_size=%08X pci%d_base=%08X\n", index, winSize, index, winStart);
+			LOGMASKED(LOG_NILE | LOG_MAP, "map_cpu_space pci%d_size=%08X pci%d_base=%08X\n", index, winSize, index, winStart);
 		}
 	}
 }
@@ -364,8 +367,7 @@ void vrc5074_device::map_extra(uint64_t memory_window_start, uint64_t memory_win
 		winEnd = winStart + winSize -1;
 		memory_space->install_read_handler(winStart, winEnd, read32s_delegate(*this, FUNC(vrc5074_device::target1_r)));
 		memory_space->install_write_handler(winStart, winEnd, write32s_delegate(*this, FUNC(vrc5074_device::target1_w)));
-		if (LOG_NILE | LOG_MAP)
-			logerror("%s: map_extra Target Window 1 start=%08X end=%08X size=%08X\n", tag(), winStart, winEnd, winSize);
+		LOGMASKED(LOG_NILE | LOG_MAP, "%s: map_extra Target Window 1 start=%08X end=%08X size=%08X\n", tag(), winStart, winEnd, winSize);
 	}
 	//// PCI Target Window 2
 	//if (m_cpu_regs[NREG_PCITW2]&0x1000) {
@@ -374,8 +376,7 @@ void vrc5074_device::map_extra(uint64_t memory_window_start, uint64_t memory_win
 	//  winSize = winEnd - winStart + 1;
 	//  memory_space->install_read_handler(winStart, winEnd, read32s_delegate(*this, FUNC(vrc5074_device::target2_r)));
 	//  memory_space->install_write_handler(winStart, winEnd, write32s_delegate(*this, FUNC(vrc5074_device::target2_w)));
-	//  if (LOG_NILE)
-	//      logerror("%s: map_extra Target Window 2 start=%08X end=%08X size=%08X laddr=%08X\n", tag(), winStart, winEnd, winSize,  m_target2_laddr);
+	//  LOGMASKED(LOG_NILE, "%s: map_extra Target Window 2 start=%08X end=%08X size=%08X laddr=%08X\n", tag(), winStart, winEnd, winSize,  m_target2_laddr);
 	//}
 }
 
@@ -395,7 +396,7 @@ void vrc5074_device::sdram_addr_w(offs_t offset, uint32_t data, uint32_t mem_mas
 		m_sdram_addr[0] = data;
 	else if (offset == 2)
 		m_sdram_addr[1] = data;
-	logerror("sdram_addr_w: offset: %08X data: %08X mem_mask: %08X\n", offset*4, data, mem_mask);
+	LOGMASKED(LOG_SDRAM, "sdram_addr_w: offset: %08X data: %08X mem_mask: %08X\n", offset*4, data, mem_mask);
 }
 
 void vrc5074_device::setup_pci_space()
@@ -405,9 +406,8 @@ void vrc5074_device::setup_pci_space()
 		m_pci_mask[index] = (1 << (36 - mask)) - 1;
 		m_pci_laddr[index] = m_cpu_regs[NREG_PCIINIT0 + index * 2] & (~m_pci_mask[index]);
 		m_pci_type[index] = m_cpu_regs[NREG_PCIINIT0 + index * 2] & 0xe;
-		if (1 && LOG_NILE)
-			logerror("setup_pci_space: mask_sel=%x pci_type=%x pci_mask[%d]=%08X pci_laddr[%d]=%08X\n",
-				mask, m_pci_type[index], index, m_pci_mask[index], index, m_pci_laddr[index]);
+		LOGMASKED(LOG_NILE, "setup_pci_space: mask_sel=%x pci_type=%x pci_mask[%d]=%08X pci_laddr[%d]=%08X\n",
+			mask, m_pci_type[index], index, m_pci_mask[index], index, m_pci_laddr[index]);
 	}
 }
 // PCI Master Window 0
@@ -442,11 +442,10 @@ uint32_t vrc5074_device::pci0_r(offs_t offset, uint32_t mem_mask)
 		}
 		break;
 	default:
-		logerror("Unknown PCI type\n");
+		LOGMASKED(LOG_UNKNOWNS, "Unknown PCI type\n");
 		break;
 	}
-	if (LOG_NILE_MASTER)
-		logerror("%s nile pci0_r offset %08X = %08X & %08X\n", machine().describe_context(), pci_addr, result, mem_mask);
+	LOGMASKED(LOG_NILE_MASTER, "%s nile pci0_r offset %08X = %08X & %08X\n", machine().describe_context(), pci_addr, result, mem_mask);
 	return result;
 }
 void vrc5074_device::pci0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
@@ -480,12 +479,11 @@ void vrc5074_device::pci0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		}
 		break;
 	default:
-		logerror("Unknown PCI type\n");
+		LOGMASKED(LOG_UNKNOWNS, "Unknown PCI type\n");
 		break;
 	}
 	//this->space(AS_DATA).write_dword(m_pci0_laddr | (offset*4), data, mem_mask);
-	if (LOG_NILE_MASTER)
-		logerror("%s nile pci0_w offset %08X = %08X & %08X\n", machine().describe_context(), pci_addr, data, mem_mask);
+	LOGMASKED(LOG_NILE_MASTER, "%s nile pci0_w offset %08X = %08X & %08X\n", machine().describe_context(), pci_addr, data, mem_mask);
 }
 
 // PCI Master Window 1
@@ -520,11 +518,10 @@ uint32_t vrc5074_device::pci1_r(offs_t offset, uint32_t mem_mask)
 		}
 		break;
 	default:
-		logerror("Unknown PCI type\n");
+		LOGMASKED(LOG_UNKNOWNS, "Unknown PCI type\n");
 		break;
 	}
-	if (LOG_NILE_MASTER)
-		logerror("%s nile pci1_r offset %08X = %08X & %08X\n", machine().describe_context(), pci_addr, result, mem_mask);
+	LOGMASKED(LOG_NILE_MASTER, "%s nile pci1_r offset %08X = %08X & %08X\n", machine().describe_context(), pci_addr, result, mem_mask);
 	return result;
 }
 void vrc5074_device::pci1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
@@ -557,20 +554,18 @@ void vrc5074_device::pci1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		}
 		break;
 	default:
-		logerror("Unknown PCI type\n");
+		LOGMASKED(LOG_UNKNOWNS, "Unknown PCI type\n");
 		break;
 	}
 	//this->space(AS_DATA).write_dword(m_pci0_laddr | (offset*4), data, mem_mask);
-	if (LOG_NILE_MASTER)
-		logerror("%s nile pci1_w offset %08X = %08X & %08X\n", machine().describe_context(), pci_addr, data, mem_mask);
+	LOGMASKED(LOG_NILE_MASTER, "%s nile pci1_w offset %08X = %08X & %08X\n", machine().describe_context(), pci_addr, data, mem_mask);
 }
 
 // PCI Target Window 1
 uint32_t vrc5074_device::target1_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = m_sdram[0][offset];
-	if (LOG_NILE_TARGET)
-		logerror("%s nile target1 read from offset %02X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
+	LOGMASKED(LOG_NILE_TARGET, "%s nile target1 read from offset %02X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 	return result;
 }
 void vrc5074_device::target1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
@@ -578,8 +573,7 @@ void vrc5074_device::target1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	//m_cpu->space(AS_PROGRAM).write_dword(m_target1_laddr | (offset*4), data, mem_mask);
 	COMBINE_DATA(&m_sdram[0][offset]);
 	//m_sdram[0][offset] = data;
-	if (LOG_NILE_TARGET)
-		logerror("%s nile target1 write to offset %02X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
+	LOGMASKED(LOG_NILE_TARGET, "%s nile target1 write to offset %02X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 }
 
 // DMA Transfer
@@ -589,8 +583,7 @@ TIMER_CALLBACK_MEMBER (vrc5074_device::dma_transfer)
 
 	//// Check for dma suspension
 	//if (m_cpu_regs[NREG_DMACR1 + which * 0xc] & DMA_SUS) {
-	//  if (LOG_NILE)
-	//      logerror("%s nile DMA Suspended PCI: %08X MEM: %08X Words: %X\n", machine().describe_context(), m_cpu_regs[NREG_DMA_CPAR], m_cpu_regs[NREG_DMA_CMAR], m_cpu_regs[NREG_DMA_REM]);
+	//  LOGMASKED(LOG_NILE, "%s nile DMA Suspended PCI: %08X MEM: %08X Words: %X\n", machine().describe_context(), m_cpu_regs[NREG_DMA_CPAR], m_cpu_regs[NREG_DMA_CMAR], m_cpu_regs[NREG_DMA_REM]);
 	//  return;
 	//}
 
@@ -638,7 +631,7 @@ TIMER_CALLBACK_MEMBER (vrc5074_device::dma_transfer)
 	//      if (m_irq_num != -1) {
 	//          m_cpu->set_input_line(m_irq_num, ASSERT_LINE);
 	//      } else {
-	//          logerror("vrc5074_device::dma_transfer Error: DMA configured to trigger interrupt but no interrupt line configured\n");
+	//          LOGMASKED(LOG_ERRORS, "vrc5074_device::dma_transfer Error: DMA configured to trigger interrupt but no interrupt line configured\n");
 	//      }
 	//  }
 	//  // Turn off the timer
@@ -671,8 +664,7 @@ void vrc5074_device::update_pci_irq(const int index, const int state)
 {
 	m_nile_irq_state &= ~(1 << (index + 8));
 	m_nile_irq_state |= state << (index + 8);
-	if (LOG_NILE_IRQS)
-		logerror("update_pci_irq: m_nile_irq_state: %04x index=%d state=%d\n", m_nile_irq_state, index, state);
+	LOGMASKED(LOG_NILE_IRQS, "update_pci_irq: m_nile_irq_state: %04x index=%d state=%d\n", m_nile_irq_state, index, state);
 	update_nile_irqs();
 }
 
@@ -722,10 +714,10 @@ void vrc5074_device::update_nile_irqs()
 
 	/* push out the state */
 	uint8_t change = m_irq_pins ^ irq;
-	if (LOG_NILE_IRQS) logerror("NILE IRQs:");
+	LOGMASKED(LOG_NILE_IRQS, "NILE IRQs:");
 	for (i = 0; i < 6; i++)
 	{
-		if (LOG_NILE_IRQS) logerror(" %d", (irq & (1 << i)) ? 1 : 0);
+		LOGMASKED(LOG_NILE_IRQS, " %d", (irq & (1 << i)) ? 1 : 0);
 		if (change & (1 << i)) {
 			if (irq & (1 << i))
 			{
@@ -738,7 +730,7 @@ void vrc5074_device::update_nile_irqs()
 		}
 	}
 	m_irq_pins = irq;
-	if (LOG_NILE_IRQS) logerror("\n");
+	LOGMASKED(LOG_NILE_IRQS, "\n");
 }
 
 
@@ -746,7 +738,7 @@ TIMER_CALLBACK_MEMBER(vrc5074_device::nile_timer_callback)
 {
 	int which = param;
 
-	if (LOG_TIMERS | LOG_NILE_IRQS) logerror("timer %d fired period: %e\n", which, m_timer_period[which]);
+	LOGMASKED(LOG_TIMERS | LOG_NILE_IRQS, "timer %d fired period: %e\n", which, m_timer_period[which]);
 
 	/* adjust the timer to fire again */
 	{
@@ -780,38 +772,38 @@ uint32_t vrc5074_device::cpu_reg_r(offs_t offset)
 	{
 	case NREG_CPUSTAT + 0:    /* CPU status */
 	case NREG_CPUSTAT + 1:    /* CPU status */
-		if (LOG_NILE) logerror("%s NILE READ: CPU status(%03X) = %08X\n", machine().describe_context(), offset * 4, result);
+		LOGMASKED(LOG_NILE, "%s NILE READ: CPU status(%03X) = %08X\n", machine().describe_context(), offset * 4, result);
 		logit = 0;
 		break;
 
 	case NREG_INTCTRL + 0:    /* Interrupt control */
 	case NREG_INTCTRL + 1:    /* Interrupt control */
-		if (LOG_NILE) logerror("%s NILE READ: interrupt control(%03X) = %08X\n", machine().describe_context(), offset * 4, result);
+		LOGMASKED(LOG_NILE, "%s NILE READ: interrupt control(%03X) = %08X\n", machine().describe_context(), offset * 4, result);
 		//update_nile_irqs();
 		logit = 0;
 		break;
 
 	case NREG_INTSTAT0 + 0:   /* Interrupt status 0 */
 	case NREG_INTSTAT0 + 1:   /* Interrupt status 0 */
-		if (LOG_NILE | LOG_NILE_IRQS) logerror("%s NILE READ: interrupt status 0(%03X) = %08X\n", machine().describe_context(), offset * 4, result);
+		LOGMASKED(LOG_NILE | LOG_NILE_IRQS, "%s NILE READ: interrupt status 0(%03X) = %08X\n", machine().describe_context(), offset * 4, result);
 		logit = 0;
 		break;
 
 	case NREG_INTSTAT1 + 0:   /* Interrupt status 1 */
 	case NREG_INTSTAT1 + 1:   /* Interrupt status 1 */
-		if (LOG_NILE | LOG_NILE_IRQS) logerror("%s NILE READ: interrupt status 1/enable(%03X) = %08X\n", machine().describe_context(), offset * 4, result);
+		LOGMASKED(LOG_NILE | LOG_NILE_IRQS, "%s NILE READ: interrupt status 1/enable(%03X) = %08X\n", machine().describe_context(), offset * 4, result);
 		logit = 0;
 		break;
 
 	case NREG_INTCLR + 0:     /* Interrupt clear */
 	case NREG_INTCLR + 1:     /* Interrupt clear */
-		if (LOG_NILE) logerror("%s NILE READ: interrupt clear(%03X) = %08X\n", machine().describe_context(), offset * 4, result);
+		LOGMASKED(LOG_NILE, "%s NILE READ: interrupt clear(%03X) = %08X\n", machine().describe_context(), offset * 4, result);
 		logit = 0;
 		break;
 
 	case NREG_INTPPES + 0:    /* PCI Interrupt control */
 	case NREG_INTPPES + 1:    /* PCI Interrupt control */
-		if (LOG_NILE) logerror("%s NILE READ: PCI interrupt ppes(%03X) = %08X\n", machine().describe_context(), offset * 4, result);
+		LOGMASKED(LOG_NILE, "%s NILE READ: PCI interrupt ppes(%03X) = %08X\n", machine().describe_context(), offset * 4, result);
 		logit = 0;
 		break;
 
@@ -837,12 +829,12 @@ uint32_t vrc5074_device::cpu_reg_r(offs_t offset)
 			result = m_cpu_regs[offset] = m_timer[which]->remaining().as_double() * clock();
 		}
 
-		if (LOG_TIMERS) logerror("%s NILE READ: timer %d counter(%03X) = %08X\n", machine().describe_context(), which, offset * 4, result);
+		LOGMASKED(LOG_TIMERS, "%s NILE READ: timer %d counter(%03X) = %08X\n", machine().describe_context(), which, offset * 4, result);
 		logit = 0;
 		break;
 	}
-	if (LOG_NILE && logit)
-		logerror("%s cpu_reg_r offset %03X = %08X\n", machine().describe_context(), offset * 4, result);
+	if (logit)
+		LOGMASKED(LOG_NILE, "%s cpu_reg_r offset %03X = %08X\n", machine().describe_context(), offset * 4, result);
 	return result;
 }
 
@@ -885,34 +877,34 @@ void vrc5074_device::cpu_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		if (data & 0x2) logerror("cpu_reg_w: CPU Warm Reset\n");
 		[[fallthrough]];
 	case NREG_CPUSTAT + 1:    /* CPU status */
-		if (LOG_NILE) logerror("%s NILE WRITE: CPU status(%03X) = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
+		LOGMASKED(LOG_NILE, "%s NILE WRITE: CPU status(%03X) = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
 		logit = 0;
 		break;
 
 	case NREG_INTCTRL + 0:    /* Interrupt control */
 	case NREG_INTCTRL + 1:    /* Interrupt control */
-		if (LOG_NILE | LOG_NILE_IRQS) logerror("%s NILE WRITE: interrupt control(%03X) = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
+		LOGMASKED(LOG_NILE | LOG_NILE_IRQS, "%s NILE WRITE: interrupt control(%03X) = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
 		logit = 0;
 		update_nile_irqs();
 		break;
 
 	case NREG_INTSTAT0 + 0:   /* Interrupt status 0 */
 	case NREG_INTSTAT0 + 1:   /* Interrupt status 0 */
-		if (LOG_NILE | LOG_NILE_IRQS) logerror("%s NILE WRITE: interrupt status 0/1(%03X) = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
+		LOGMASKED(LOG_NILE | LOG_NILE_IRQS, "%s NILE WRITE: interrupt status 0/1(%03X) = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
 		logit = 0;
 		//update_nile_irqs();
 		break;
 
 	case NREG_INTSTAT1 + 0:   /* Interrupt status 1 */
 	case NREG_INTSTAT1 + 1:   /* Interrupt status 1 */
-		if (LOG_NILE | LOG_NILE_IRQS) logerror("%s NILE WRITE: interrupt status 0/1 enable(%03X) = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
+		LOGMASKED(LOG_NILE | LOG_NILE_IRQS, "%s NILE WRITE: interrupt status 0/1 enable(%03X) = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
 		logit = 0;
 		//update_nile_irqs();
 		break;
 
 	case NREG_INTCLR + 0:     /* Interrupt clear */
 	//case NREG_INTCLR + 1:     /* Interrupt clear */
-		if (LOG_NILE | LOG_NILE_IRQS) logerror("%s NILE WRITE: interrupt clear(%03X) = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
+		LOGMASKED(LOG_NILE | LOG_NILE_IRQS, "%s NILE WRITE: interrupt clear(%03X) = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
 		logit = 0;
 		// Only edge triggered interrupts are cleared
 		// TODO: Check which are edge triggered for midway vegas it is only the lower (non-pci) interrupts
@@ -922,7 +914,7 @@ void vrc5074_device::cpu_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 	case NREG_INTPPES + 0:    /* PCI Interrupt control */
 	case NREG_INTPPES + 1:    /* PCI Interrupt control */
-		if (LOG_NILE) logerror("%s NILE WRITE: PCI interrupt ppes(%03X) = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
+		LOGMASKED(LOG_NILE, "%s NILE WRITE: PCI interrupt ppes(%03X) = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
 		logit = 0;
 		break;
 
@@ -946,7 +938,7 @@ void vrc5074_device::cpu_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	case NREG_DMACTRL0:
 	case NREG_DMACTRL1:
 		which = (offset - NREG_DMACTRL0) / 6;
-		logerror("%s NILE WRITE: DMACTRL %d = %08X\n", machine().describe_context(), which, data);
+		LOGMASKED(LOG_DMACTRL, "%s NILE WRITE: DMACTRL %d = %08X\n", machine().describe_context(), which, data);
 		logit = 0;
 		break;
 	case NREG_T0CTRL + 1:     /* SDRAM timer control (control bits) */
@@ -954,20 +946,20 @@ void vrc5074_device::cpu_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	case NREG_T2CTRL + 1:     /* general purpose timer control (control bits) */
 	case NREG_T3CTRL + 1:     /* watchdog timer control (control bits) */
 		which = (offset - NREG_T0CTRL) / 4;
-		if (LOG_NILE | LOG_TIMERS) logerror("%s NILE WRITE: timer %d control(%03X) = %08X & %08X\n", machine().describe_context(), which, offset * 4, data, mem_mask);
+		LOGMASKED(LOG_NILE | LOG_TIMERS, "%s NILE WRITE: timer %d control(%03X) = %08X & %08X\n", machine().describe_context(), which, offset * 4, data, mem_mask);
 		logit = 0;
 		m_timer_period[which] = (uint64_t(m_cpu_regs[NREG_T0CTRL + which * 4]) + 1) * attotime::from_hz(clock()).as_double();
 		if (m_cpu_regs[offset] & 2) {
 			// Cascade timer
 			uint32_t scaleSrc = (m_cpu_regs[offset] >> 2) & 0x3;
 			m_timer_period[which] += (uint64_t(m_cpu_regs[NREG_T0CTRL + scaleSrc * 4]) + 1) * attotime::from_hz(clock()).as_double();
-			logerror("Timer scale: timer %d is scaled by %08X\n", which, m_cpu_regs[NREG_T0CTRL + which * 4]);
+			LOGMASKED(LOG_TIMERS, "Timer scale: timer %d is scaled by %08X\n", which, m_cpu_regs[NREG_T0CTRL + which * 4]);
 		}
 		/* timer just enabled? */
 		if (!(olddata & 1) && (m_cpu_regs[offset] & 1))
 		{
 			m_timer[which]->adjust(attotime::from_hz(clock()) * m_cpu_regs[NREG_T0CNTR + which * 4], which);
-			if (LOG_TIMERS) logerror("Starting timer %d at a rate of %f Hz\n", which, attotime::from_double(m_timer_period[which]).as_hz());
+			LOGMASKED(LOG_TIMERS, "Starting timer %d at a rate of %f Hz\n", which, attotime::from_double(m_timer_period[which]).as_hz());
 		}
 
 		/* timer disabled? */
@@ -983,7 +975,7 @@ void vrc5074_device::cpu_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	case NREG_T2CNTR:       /* general purpose timer control (counter) */
 	case NREG_T3CNTR:       /* watchdog timer control (counter) */
 		which = (offset - NREG_T0CNTR) / 4;
-		if (LOG_TIMERS) logerror("%s NILE WRITE: timer %d counter(%03X) = %08X & %08X\n", machine().describe_context(), which, offset * 4, data, mem_mask);
+		LOGMASKED(LOG_TIMERS, "%s NILE WRITE: timer %d counter(%03X) = %08X & %08X\n", machine().describe_context(), which, offset * 4, data, mem_mask);
 		logit = 0;
 
 		if (m_cpu_regs[offset - 1] & 1)
@@ -993,8 +985,8 @@ void vrc5074_device::cpu_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		break;
 	}
 
-	if (LOG_NILE && logit)
-		logerror("%s cpu_reg_w offset %03X = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
+	if (logit)
+		LOGMASKED(LOG_NILE, "%s cpu_reg_w offset %03X = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
 }
 
 WRITE_LINE_MEMBER(vrc5074_device::uart_irq_callback)
@@ -1002,8 +994,7 @@ WRITE_LINE_MEMBER(vrc5074_device::uart_irq_callback)
 	if (state ^ m_uart_irq) {
 		m_uart_irq = state;
 		update_nile_irqs();
-		if (LOG_NILE | LOG_NILE_IRQS)
-			logerror("uart_irq_callback: state = %d\n", state);
+		LOGMASKED(LOG_NILE_IRQS, "uart_irq_callback: state = %d\n", state);
 	}
 }
 
@@ -1011,17 +1002,16 @@ uint32_t vrc5074_device::serial_r(offs_t offset)
 {
 	uint32_t result = m_uart->ins8250_r(offset>>1);
 
-	if (0 && LOG_NILE)
-		logerror("%s serial_r offset %03X = %08X (%08x)\n", machine().describe_context(), offset>>1, result, offset*4);
+	LOGMASKED(LOG_SERIAL_READS, "%s serial_r offset %03X = %08X (%08x)\n", machine().describe_context(), offset>>1, result, offset*4);
 	return result;
 }
 
 void vrc5074_device::serial_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_uart->ins8250_w(offset>>1, data);
-	if (PRINTF_SERIAL && offset == NREG_UARTTHR) {
+	if ((VERBOSE & LOG_SERIAL_DATA) && offset == NREG_UARTTHR) {
 		static std::string debugStr;
-		printf("%c", data);
+		logerror("%c", data);
 		if (data == 0xd || debugStr.length()>=80) {
 			logerror("%s", debugStr.c_str());
 			debugStr.clear();
@@ -1030,6 +1020,5 @@ void vrc5074_device::serial_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			debugStr += char(data);
 		}
 	}
-	if (0 && LOG_NILE)
-		logerror("%s serial_w offset %03X = %08X & %08X (%08x)\n", machine().describe_context(), offset>>1, data, mem_mask, offset*4);
+	LOGMASKED(LOG_SERIAL_WRITES, "%s serial_w offset %03X = %08X & %08X (%08x)\n", machine().describe_context(), offset>>1, data, mem_mask, offset*4);
 }

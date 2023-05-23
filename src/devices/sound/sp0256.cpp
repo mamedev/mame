@@ -23,7 +23,6 @@
 #include "emu.h"
 #include "sp0256.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_FIFO    (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_FIFO)

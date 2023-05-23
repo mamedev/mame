@@ -136,9 +136,9 @@
 
 #include "x68000.lh"
 
-#define LOG_FDC (1 << 1)
-#define LOG_SYS (1 << 2)
-#define LOG_IRQ (1 << 3)
+#define LOG_FDC (1U << 1)
+#define LOG_SYS (1U << 2)
+#define LOG_IRQ (1U << 3)
 //#define VERBOSE (LOG_FDC | LOG_SYS | LOG_IRQ)
 #include "logmacro.h"
 

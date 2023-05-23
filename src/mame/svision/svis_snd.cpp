@@ -10,8 +10,8 @@
 #include "svis_snd.h"
 
 // configurable logging
-#define LOG_DMA     (1U <<  1)
-#define LOG_NOISE   (1U <<  2)
+#define LOG_DMA     (1U << 1)
+#define LOG_NOISE   (1U << 2)
 
 //#define VERBOSE (LOG_GENERAL | LOG_DMA | LOG_NOISE)
 

@@ -77,7 +77,6 @@
 #include "screen.h"
 #include "video/bt47x.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_MCU     (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL|LOG_MCU)

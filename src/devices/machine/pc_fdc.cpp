@@ -17,8 +17,6 @@
 #include "machine/pc_fdc.h"
 #include "imagedev/floppy.h"
 
-//#define LOG_GENERAL   (1U << 0) //defined in logmacro.h already
-
 //#define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_STREAM std::cout
 

@@ -16,8 +16,8 @@
 #include "emu.h"
 #include "acorn_bmu.h"
 
-#define LOG_DATA (1 << 1)
-#define LOG_LINE (1 << 2)
+#define LOG_DATA (1U << 1)
+#define LOG_LINE (1U << 2)
 
 #define VERBOSE (0)
 #include "logmacro.h"

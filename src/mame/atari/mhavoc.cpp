@@ -207,8 +207,8 @@
 
 
 // configurable logging
-#define LOG_COMMS     (1U <<  1)
-#define LOG_A1OUT     (1U <<  2)
+#define LOG_COMMS     (1U << 1)
+#define LOG_A1OUT     (1U << 2)
 
 //#define VERBOSE (LOG_GENERAL | LOG_COMMS | LOG_A1OUT)
 

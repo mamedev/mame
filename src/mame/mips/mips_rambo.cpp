@@ -17,7 +17,6 @@
 #include "emu.h"
 #include "mips_rambo.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_REG     (1U << 1)
 #define LOG_DMA     (1U << 2)
 

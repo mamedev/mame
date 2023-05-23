@@ -40,15 +40,15 @@
 #include "emu.h"
 #include "at29x.h"
 
-#define LOG_DETAIL      (1U<<1)     // More detail
-#define LOG_WARN        (1U<<2)     // Warning
-#define LOG_PRG         (1U<<3)     // Programming
-#define LOG_READ        (1U<<4)     // Reading
-#define LOG_WRITE       (1U<<5)     // Writing
-#define LOG_CONFIG      (1U<<6)     // Configuration
-#define LOG_STATE       (1U<<7)     // State machine
+#define LOG_DETAIL      (1U << 1)     // More detail
+#define LOG_WARN        (1U << 2)     // Warning
+#define LOG_PRG         (1U << 3)     // Programming
+#define LOG_READ        (1U << 4)     // Reading
+#define LOG_WRITE       (1U << 5)     // Writing
+#define LOG_CONFIG      (1U << 6)     // Configuration
+#define LOG_STATE       (1U << 7)     // State machine
 
-#define VERBOSE ( LOG_GENERAL | LOG_WARN )
+#define VERBOSE (LOG_GENERAL | LOG_WARN)
 
 #include "logmacro.h"
 

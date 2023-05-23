@@ -29,11 +29,12 @@
 //  DEBUGGING
 //**************************************************************************
 
-#define LOG_PORT_IO                 0
-#define LOG_STATUS_CHANGES          0
-#define LOG_FRAMES_SEEN             0
-#define LOG_COMMANDS                0
-
+#define LOG_PORT_IO        (1U << 1)
+#define LOG_STATUS_CHANGES (1U << 2)
+#define LOG_FRAMES_SEEN    (1U << 3)
+#define LOG_COMMANDS       (1U << 4)
+#define VERBOSE (0)
+#include "logmacro.h"
 
 
 //**************************************************************************
@@ -131,8 +132,7 @@ pioneer_ldv1000_device::pioneer_ldv1000_device(const machine_config &mconfig, co
 void pioneer_ldv1000_device::data_w(uint8_t data)
 {
 	m_command = data;
-	if (LOG_COMMANDS)
-		logerror("-> COMMAND = %02X (%s)\n", data, (m_portc1 & 0x10) ? "valid" : "invalid");
+	LOGMASKED(LOG_COMMANDS, "-> COMMAND = %02X (%s)\n", data, (m_portc1 & 0x10) ? "valid" : "invalid");
 }
 
 
@@ -327,11 +327,9 @@ void pioneer_ldv1000_device::player_vsync(const vbi_metadata &vbi, int fieldnum,
 
 int32_t pioneer_ldv1000_device::player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime)
 {
-	if (LOG_FRAMES_SEEN)
-	{
-		int frame = frame_from_metadata(vbi);
-		if (frame != FRAME_NOT_PRESENT) logerror("== %d\n", frame);
-	}
+	int frame = frame_from_metadata(vbi);
+	if (frame != FRAME_NOT_PRESENT)
+		LOGMASKED(LOG_FRAMES_SEEN, "== %d\n", frame);
 	return fieldnum;
 }
 
@@ -420,8 +418,8 @@ uint8_t pioneer_ldv1000_device::z80_controller_r()
 
 void pioneer_ldv1000_device::z80_controller_w(uint8_t data)
 {
-	if (LOG_STATUS_CHANGES && data != m_status)
-		logerror("%s:CONTROLLER.W=%02X\n", machine().describe_context(), data);
+	if (data != m_status)
+		LOGMASKED(LOG_STATUS_CHANGES, "%s:CONTROLLER.W=%02X\n", machine().describe_context(), data);
 	m_status = data;
 }
 
@@ -434,8 +432,7 @@ void pioneer_ldv1000_device::z80_controller_w(uint8_t data)
 void pioneer_ldv1000_device::ppi0_porta_w(uint8_t data)
 {
 	m_counter_start = data;
-	if (LOG_PORT_IO)
-		logerror("%s:PORTA.0=%02X\n", machine().describe_context(), data);
+	LOGMASKED(LOG_PORT_IO, "%s:PORTA.0=%02X\n", machine().describe_context(), data);
 }
 
 
@@ -490,9 +487,9 @@ void pioneer_ldv1000_device::ppi0_portc_w(uint8_t data)
 	// set the new value
 	uint8_t prev = m_portc0;
 	m_portc0 = data;
-	if (LOG_PORT_IO && ((data ^ prev) & 0x0f) != 0)
+	if ((data ^ prev) & 0x0f)
 	{
-		logerror("%s:PORTC.0=%02X%s%s%s\n", machine().describe_context(), data,
+		LOGMASKED(LOG_PORT_IO, "%s:PORTC.0=%02X%s%s%s\n", machine().describe_context(), data,
 			(data & 0x01) ? " PRELOAD" : "",
 			!(data & 0x02) ? " /MULTIJUMP" : "",
 			(data & 0x04) ? " SCANMODE" : "");
@@ -579,9 +576,9 @@ void pioneer_ldv1000_device::ppi1_portb_w(uint8_t data)
 	// set the new value
 	uint8_t prev = m_portb1;
 	m_portb1 = data;
-	if (LOG_PORT_IO && ((data ^ prev) & 0xff) != 0)
+	if ((data ^ prev) & 0xff)
 	{
-		logerror("%s:PORTB.1=%02X: %s%s%s%s%s%s\n", machine().describe_context(), data,
+		LOGMASKED(LOG_PORT_IO, "%s:PORTB.1=%02X: %s%s%s%s%s%s\n", machine().describe_context(), data,
 			!(data & 0x01) ? " FOCSON" : "",
 			!(data & 0x02) ? " SPDLRUN" : "",
 			!(data & 0x04) ? " JUMPTRIG" : "",
@@ -632,9 +629,9 @@ void pioneer_ldv1000_device::ppi1_portc_w(uint8_t data)
 	// set the new value
 	uint8_t prev = m_portc1;
 	m_portc1 = data;
-	if (LOG_PORT_IO && ((data ^ prev) & 0xcf) != 0)
+	if ((data ^ prev) & 0xcf)
 	{
-		logerror("%s:PORTC.1=%02X%s%s%s%s%s%s%s%s\n", machine().describe_context(), data,
+		LOGMASKED(LOG_PORT_IO, "%s:PORTC.1=%02X%s%s%s%s%s%s%s%s\n", machine().describe_context(), data,
 			(data & 0x01) ? " AUD1" : "",
 			(data & 0x02) ? " AUD2" : "",
 			(data & 0x04) ? " AUDEN" : "",

@@ -38,8 +38,8 @@ DEFINE_DEVICE_TYPE(I8156, i8156_device, "i8156", "Intel 8156 RAM, I/O & Timer")
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG_PORT (1U << 0)
-#define LOG_TIMER (1U << 1)
+#define LOG_PORT  (1U << 1)
+#define LOG_TIMER (1U << 2)
 #define VERBOSE (0)
 #include "logmacro.h"
 

@@ -37,15 +37,15 @@ TODO:
 #include "arm7core.h"   //include arm7 core
 #include "arm7help.h"
 
-#define LOG_MMU             (1 << 0)
-#define LOG_DSP             (1 << 1)
-#define LOG_COPRO_READS     (1 << 2)
-#define LOG_COPRO_WRITES    (1 << 3)
-#define LOG_COPRO_UNKNOWN   (1 << 4)
-#define LOG_COPRO_RESERVED  (1 << 5)
-#define LOG_TLB             (1 << 6)
-#define LOG_TLB_MISS        (1 << 7)
-#define LOG_PREFETCH        (1 << 8)
+#define LOG_MMU             (1U << 1)
+#define LOG_DSP             (1U << 2)
+#define LOG_COPRO_READS     (1U << 3)
+#define LOG_COPRO_WRITES    (1U << 4)
+#define LOG_COPRO_UNKNOWN   (1U << 5)
+#define LOG_COPRO_RESERVED  (1U << 6)
+#define LOG_TLB             (1U << 7)
+#define LOG_TLB_MISS        (1U << 8)
+#define LOG_PREFETCH        (1U << 9)
 
 #define VERBOSE             (0) // (LOG_COPRO_READS | LOG_COPRO_WRITES | LOG_COPRO_UNKNOWN | LOG_COPRO_RESERVED)
 #include "logmacro.h"

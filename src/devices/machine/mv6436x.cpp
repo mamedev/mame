@@ -11,7 +11,6 @@
 #include "emu.h"
 #include "mv6436x.h"
 
-//#define LOG_GENERAL    (1U << 0)
 #define LOG_PCI_CONFIG (1U << 1)
 #define LOG_PCI_MEM    (1U << 2)
 #define LOG_PCI_IO     (1U << 3)

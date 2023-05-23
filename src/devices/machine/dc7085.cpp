@@ -18,7 +18,6 @@
 #include "emu.h"
 #include "dc7085.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_REG     (1U << 1)
 #define LOG_RX      (1U << 2)
 #define LOG_TX      (1U << 3)

@@ -9,7 +9,6 @@
 #include "emu.h"
 #include "vt8231_isa.h"
 
-//#define LOG_GENERAL (1U << 0)
 #define LOG_MAPPING (1U << 1)
 #define LOG_REG     (1U << 2)
 #define LOG_SUPERIO (1U << 3)

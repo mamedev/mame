@@ -244,7 +244,6 @@
 
 #include "debugger.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_MMU     (1U << 1)
 #define LOG_IOCB    (1U << 2)
 

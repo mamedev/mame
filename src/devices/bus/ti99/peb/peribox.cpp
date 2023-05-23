@@ -201,12 +201,12 @@ CRUCLK*  51||52  DBIN
 #include "scsicard.h"
 #include "tipi.h"
 
-#define LOG_WARN        (1U<<1)   // Warnings
-#define LOG_CONFIG      (1U<<2)   // Configuration
-#define LOG_INT         (1U<<3)
-#define LOG_READY       (1U<<4)
+#define LOG_WARN        (1U << 1)   // Warnings
+#define LOG_CONFIG      (1U << 2)   // Configuration
+#define LOG_INT         (1U << 3)
+#define LOG_READY       (1U << 4)
 
-#define VERBOSE ( LOG_CONFIG | LOG_WARN )
+#define VERBOSE (LOG_CONFIG | LOG_WARN)
 
 #include "logmacro.h"
 

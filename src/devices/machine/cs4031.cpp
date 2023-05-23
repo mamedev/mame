@@ -28,7 +28,6 @@
 #include "emu.h"
 #include "machine/cs4031.h"
 
-#define LOG_GENERAL     (1U << 0)
 #define LOG_REGISTER    (1U << 1)
 #define LOG_MEMORY      (1U << 2)
 #define LOG_IO          (1U << 3)

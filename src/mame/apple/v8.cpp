@@ -37,7 +37,7 @@
 #include "formats/ap_dsk35.h"
 #include "layout/generic.h"
 
-#define LOG_RAM (1U << 0)
+#define LOG_RAM (1U << 1)
 
 #define VERBOSE (LOG_RAM)
 #include "logmacro.h"

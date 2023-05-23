@@ -5,7 +5,6 @@
 
 #include "k573fpga.h"
 
-#define LOG_GENERAL  (1 << 0)
 #define VERBOSE      (LOG_GENERAL)
 // #define LOG_OUTPUT_STREAM std::cout
 

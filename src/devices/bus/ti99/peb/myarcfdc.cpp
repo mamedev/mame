@@ -28,17 +28,17 @@
 // ----------------------------------
 // Flags for debugging
 
-#define LOG_WARN        (1U<<1)    // Warnings
-#define LOG_CONFIG      (1U<<2)    // Configuration
-#define LOG_EPROM       (1U<<3)    // Access to EPROM
-#define LOG_CONTR       (1U<<4)    // Access to controller
-#define LOG_RAM         (1U<<5)    // Access to SRAM
-#define LOG_IRQ         (1U<<7)    // IRQ line
-#define LOG_DRQ         (1U<<8)    // DRQ line
-#define LOG_DRIVE       (1U<<9)    // Drive operations
-#define LOG_CRU         (1U<<10)   // CRU operations
+#define LOG_WARN        (1U << 1)    // Warnings
+#define LOG_CONFIG      (1U << 2)    // Configuration
+#define LOG_EPROM       (1U << 3)    // Access to EPROM
+#define LOG_CONTR       (1U << 4)    // Access to controller
+#define LOG_RAM         (1U << 5)    // Access to SRAM
+#define LOG_IRQ         (1U << 6)    // IRQ line
+#define LOG_DRQ         (1U << 7)    // DRQ line
+#define LOG_DRIVE       (1U << 8)    // Drive operations
+#define LOG_CRU         (1U << 9)    // CRU operations
 
-#define VERBOSE ( LOG_GENERAL | LOG_WARN | LOG_CONFIG )
+#define VERBOSE (LOG_GENERAL | LOG_WARN | LOG_CONFIG)
 #include "logmacro.h"
 
 #define BUFFER_TAG "ram"

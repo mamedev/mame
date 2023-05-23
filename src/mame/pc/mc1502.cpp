@@ -35,9 +35,8 @@
 #include "speaker.h"
 
 
-//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
-#define LOG_KEYBOARD  (1U <<  1)
-#define LOG_PPI       (1U <<  2)
+#define LOG_KEYBOARD  (1U << 1)
+#define LOG_PPI       (1U << 2)
 
 //#define VERBOSE (LOG_GENERAL | LOG_VRAM)
 //#define LOG_OUTPUT_STREAM std::cout

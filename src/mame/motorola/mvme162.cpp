@@ -160,14 +160,10 @@
 #include "machine/clock.h"
 #include "machine/timekpr.h"
 
-#define LOG_SETUP   (1U <<  1)
-
-//#define VERBOSE (LOG_GENERAL | LOG_SETUP)
-//#define LOG_OUTPUT_STREAM std::cout
-
+#define VERBOSE (0) // (LOG_GENERAL)
+//#define LOG_OUTPUT_STREAM osd_printf_info
 #include "logmacro.h"
 
-#define LOGSETUP(...) LOGMASKED(LOG_SETUP,   __VA_ARGS__)
 
 //**************************************************************************
 //  MACROS / CONSTANTS

@@ -106,22 +106,23 @@
 #include "seibucop.h"
 #include "debugger.h"
 
+#define LOG_COMMANDS     (1U << 1)
+#define LOG_TRIGONOMETRY (1U << 2)
+#define LOG_DIVISION     (1U << 3)
+#define LOG_MOVE0205     (1U << 4)
+#define LOG_MOVE0905     (1U << 5)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
+
 // use Z to dump out table info
 //#define TABLE_DUMPER
-
-#define LOG_Commands    0
-#define LOG_Phytagoras  0
-#define LOG_Division    0
-#define LOG_Move0205    0
-#define LOG_Move0905    0
 
 #include "seibucop_dma.ipp"
 #include "seibucop_cmd.ipp"
 
 #include <algorithm>
-
-#define seibu_cop_log \
-	if (LOG_Commands) logerror
 
 
 DEFINE_DEVICE_TYPE(RAIDEN2COP, raiden2cop_device, "raiden2cop", "Seibu COP (Raiden 2)")
@@ -635,7 +636,7 @@ int raiden2cop_device::find_trigger_match(uint16_t triggerval, uint16_t mask)
 				otherlog = 0;
 			}
 
-			seibu_cop_log("    Cop Command %04x found in slot %02x with other params %04x %04x\n", triggerval, i, cop_func_value[i], cop_func_mask[i]);
+			LOGMASKED(LOG_COMMANDS, "    Cop Command %04x found in slot %02x with other params %04x %04x\n", triggerval, i, cop_func_value[i], cop_func_mask[i]);
 
 			if (otherlog == 1) printf("used command %04x\n", triggerval);
 
@@ -647,18 +648,18 @@ int raiden2cop_device::find_trigger_match(uint16_t triggerval, uint16_t mask)
 	if (matched == 1)
 	{
 		int j;
-		seibu_cop_log("     Sequence: ");
+		LOGMASKED(LOG_COMMANDS, "     Sequence: ");
 		for (j=0;j<0x8;j++)
 		{
-			seibu_cop_log("%04x ", cop_program[command*8+j]);
+			LOGMASKED(LOG_COMMANDS, "%04x ", cop_program[command*8+j]);
 		}
-		seibu_cop_log("\n");
+		LOGMASKED(LOG_COMMANDS, "\n");
 
 		return command;
 	}
 	else if (matched == 0)
 	{
-		seibu_cop_log("    Cop Command %04x NOT IN TABLE!\n", triggerval);
+		LOGMASKED(LOG_COMMANDS, "    Cop Command %04x NOT IN TABLE!\n", triggerval);
 		printf("Command Not Found!\n");
 		return -1;
 	}
@@ -1364,7 +1365,7 @@ void raiden2cop_device::LEGACY_cop_cmd_w(offs_t offset, uint16_t data)
 	int command;
 
 
-	//seibu_cop_log("%s: COPX execute table macro command %04x | regs %08x %08x %08x %08x %08x\n", machine().describe_context(), data,  cop_regs[0], cop_regs[1], cop_regs[2], cop_regs[3], cop_regs[4]);
+	//LOGMASKED(LOG_COMMANDS, "%s: COPX execute table macro command %04x | regs %08x %08x %08x %08x %08x\n", machine().describe_context(), data,  cop_regs[0], cop_regs[1], cop_regs[2], cop_regs[3], cop_regs[4]);
 
 
 	command = find_trigger_match(data, 0xf800);

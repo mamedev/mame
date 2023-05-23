@@ -13,9 +13,8 @@
 #include "imagedev/harddriv.h"
 #include "machine/74259.h"
 
-//#define LOG_GENERAL (1U <<  0)
-#define LOG_REGS    (1U <<  1)
-#define LOG_DATA    (1U <<  2)
+#define LOG_REGS    (1U << 1)
+#define LOG_DATA    (1U << 2)
 
 //#define VERBOSE  (LOG_REGS)
 //#define LOG_OUTPUT_STREAM std::cout

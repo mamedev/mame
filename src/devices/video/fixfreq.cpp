@@ -23,9 +23,7 @@
 
 #include <iostream>
 
-// for quick and dirty debugging
-#define LOG_GENERAL (1U << 0)
-
+// for debug logging
 #define VERBOSE 0
 #define LOG_OUTPUT_STREAM std::cerr
 

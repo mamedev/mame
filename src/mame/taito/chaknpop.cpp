@@ -125,8 +125,8 @@ Notes:
 
 
 // configurable logging
-#define LOG_UNKWRITE     (1U <<  1)
-#define LOG_COINLOCK     (1U <<  2)
+#define LOG_UNKWRITE     (1U << 1)
+#define LOG_COINLOCK     (1U << 2)
 
 //#define VERBOSE (LOG_GENERAL | LOG_UNKWRITE | LOG_COINLOCK)
 

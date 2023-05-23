@@ -27,13 +27,13 @@
 #include "machine/spchrom.h"
 #include "speaker.h"
 
-#define LOG_WARN        (1U<<1)    // Warnings
-#define LOG_CONFIG      (1U<<2)
-#define LOG_MEM         (1U<<3)
-#define LOG_ADDR        (1U<<4)
-#define LOG_READY       (1U<<5)
+#define LOG_WARN        (1U << 1)    // Warnings
+#define LOG_CONFIG      (1U << 2)
+#define LOG_MEM         (1U << 3)
+#define LOG_ADDR        (1U << 4)
+#define LOG_READY       (1U << 5)
 
-#define VERBOSE ( LOG_CONFIG | LOG_WARN )
+#define VERBOSE (LOG_CONFIG | LOG_WARN)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(TI99_SPEECH, bus::ti99::peb::ti_speech_synthesizer_device, "ti99_speech", "TI-99 Speech synthesizer (on adapter card)")

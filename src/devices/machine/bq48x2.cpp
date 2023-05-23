@@ -8,13 +8,13 @@
 #include "emu.h"
 #include "bq48x2.h"
 
-#define LOG_WARN         (1U<<1)    // Warnings
-#define LOG_CLOCK        (1U<<2)    // Clock operation
-#define LOG_REGW         (1U<<3)    // Register write
-#define LOG_WATCHDOG     (1U<<4)    // Watchdog
-#define LOG_SRAM         (1U<<5)    // SRAM
+#define LOG_WARN         (1U << 1)    // Warnings
+#define LOG_CLOCK        (1U << 2)    // Clock operation
+#define LOG_REGW         (1U << 3)    // Register write
+#define LOG_WATCHDOG     (1U << 4)    // Watchdog
+#define LOG_SRAM         (1U << 5)    // SRAM
 
-#define VERBOSE ( LOG_GENERAL | LOG_WARN )
+#define VERBOSE (LOG_GENERAL | LOG_WARN)
 #include "logmacro.h"
 
 // device type definition

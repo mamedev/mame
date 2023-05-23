@@ -8,8 +8,7 @@
 #include "emu.h"
 #include "opti82c861.h"
 
-#define LOG_GENERAL     (1U << 0)
-#define LOG_REGISTERS   (1U << 0)
+#define LOG_REGISTERS   (1U << 1)
 
 #define VERBOSE (0)
 #include "logmacro.h"

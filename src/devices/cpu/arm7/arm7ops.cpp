@@ -5,7 +5,7 @@
 #include "arm7core.h"
 #include "arm7help.h"
 
-#define LOG_OPS     (1 << 0)
+#define LOG_OPS     (1U << 1)
 
 #define VERBOSE     (0)
 #include "logmacro.h"

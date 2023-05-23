@@ -206,7 +206,7 @@ Some logic, resistors/caps/transistors, some connectors etc.
 
 
 // configurable logging
-#define LOG_CUSKEY     (1U <<  1)
+#define LOG_CUSKEY     (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_CUSKEY)
 

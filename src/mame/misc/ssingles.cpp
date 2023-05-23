@@ -159,7 +159,7 @@ Dumped by Chack'n
 
 
 // configurable logging
-#define LOG_ATAMANOTPROT     (1U <<  1)
+#define LOG_ATAMANOTPROT     (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_ATAMANOTPROT)
 

@@ -64,7 +64,7 @@
 #include "cpu/m6502/m65ce02.h"
 #include "sound/dac.h"
 
-#define LOG_VDP (1U <<  1)
+#define LOG_VDP (1U << 1)
 #define LOG_MUSICMCUCOMMS (1U << 2)
 
 //#define VERBOSE     (LOG_VDP)

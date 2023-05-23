@@ -25,7 +25,6 @@
 #include "emu.h"
 #include "gayle.h"
 
-//#define LOG_GENERAL (1U << 0)
 #define LOG_REG     (1U << 1)
 #define LOG_IDE     (1U << 2)
 #define LOG_CC      (1U << 3)
@@ -144,7 +143,7 @@ void gayle_device::line_change(int line, int state, int level)
 		// special handling for line 6 (credit card detect)
 		if (line == LINE_CC_DET && BIT(m_gayle_reg[REG_CHANGE], 1))
 		{
-			LOGMASKED(LOG_GENERAL, "resetting due to credit card detection change\n");
+			LOG("resetting due to credit card detection change\n");
 
 			m_rst_w(0);
 			m_rst_w(1);

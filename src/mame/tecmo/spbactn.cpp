@@ -151,7 +151,7 @@ cpu #0 (PC=00001A1A): unmapped memory word write to 00090030 = 00F7 & 00FF
 #include "spbactnp.lh"
 
 // configurable logging
-#define LOG_PROTO     (1U <<  1)
+#define LOG_PROTO     (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_PROTO)
 

@@ -8,9 +8,9 @@
 
 #define LOG_UIO     (1U << 1)
 
-#define LOG_ALL           ( LOG_UIO )
+#define LOG_ALL     (LOG_UIO)
 
-#define VERBOSE             (0)
+#define VERBOSE     (0)
 #include "logmacro.h"
 
 

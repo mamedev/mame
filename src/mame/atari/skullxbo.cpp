@@ -37,7 +37,7 @@
 
 
 // configurable logging
-#define LOG_UNKMOBWR     (1U <<  1)
+#define LOG_UNKMOBWR     (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_UNKMOBWR)
 

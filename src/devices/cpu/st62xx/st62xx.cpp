@@ -16,9 +16,9 @@
 #include "st62xx.h"
 #include "st62xx_dasm.h"
 
-#define LOG_UNIMPL      (1 << 1)
-#define LOG_GPIO        (1 << 2)
-#define LOG_TIMER       (1 << 3)
+#define LOG_UNIMPL      (1U << 1)
+#define LOG_GPIO        (1U << 2)
+#define LOG_TIMER       (1U << 3)
 #define LOG_ALL         (LOG_UNIMPL | LOG_GPIO | LOG_TIMER)
 
 #define VERBOSE         (LOG_ALL)

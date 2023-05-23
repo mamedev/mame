@@ -18,12 +18,11 @@
 
 
 #ifdef NES_PCB_DEBUG
-#define VERBOSE 1
+#define VERBOSE (LOG_GENERAL)
 #else
-#define VERBOSE 0
+#define VERBOSE (0)
 #endif
-
-#define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 
 //-------------------------------------------------
@@ -87,7 +86,7 @@ void nes_nanjing_device::pcb_reset()
 
  iNES: mapper 163
 
- In MESS: Unsupported.
+ In MAME: Unsupported.
 
  -------------------------------------------------*/
 
@@ -112,7 +111,7 @@ void nes_nanjing_device::hblank_irq(int scanline, bool vblank, bool blanked)
 
 void nes_nanjing_device::write_l(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("nanjing write_l, offset: %04x, data: %02x\n", offset, data));
+	LOG("nanjing write_l, offset: %04x, data: %02x\n", offset, data);
 
 	offset += 0x100;
 
@@ -156,7 +155,7 @@ void nes_nanjing_device::write_l(offs_t offset, uint8_t data)
 uint8_t nes_nanjing_device::read_l(offs_t offset)
 {
 	uint8_t value = 0;
-	LOG_MMC(("nanjing read_l, offset: %04x\n", offset));
+	LOG("nanjing read_l, offset: %04x\n", offset);
 
 	offset += 0x100;
 

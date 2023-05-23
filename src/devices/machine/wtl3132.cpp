@@ -16,7 +16,6 @@
 #include "emu.h"
 #include "wtl3132.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_REGS    (1U << 1)
 #define LOG_IO      (1U << 2)
 #define LOG_BYPASS  (1U << 3)

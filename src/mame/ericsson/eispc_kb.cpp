@@ -81,11 +81,11 @@
 //**************************************************************************
 //  CONFIGURABLE LOGGING
 //**************************************************************************
-#define LOG_PORTS   (1U <<  1)
-#define LOG_RESET   (1U <<  2)
-#define LOG_BITS    (1U <<  3)
-#define LOG_UI      (1U <<  4)
-#define LOG_LEDS    (1U <<  5)
+#define LOG_PORTS   (1U << 1)
+#define LOG_RESET   (1U << 2)
+#define LOG_BITS    (1U << 3)
+#define LOG_UI      (1U << 4)
+#define LOG_LEDS    (1U << 5)
 
 //#define VERBOSE (LOG_LEDS)
 //#define LOG_OUTPUT_STREAM std::cout

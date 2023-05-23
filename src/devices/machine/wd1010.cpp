@@ -9,12 +9,11 @@
 #include "emu.h"
 #include "wd1010.h"
 
-//#define LOG_GENERAL (1U <<  0)
-#define LOG_CMD     (1U <<  1)
-#define LOG_INT     (1U <<  2)
-#define LOG_SEEK    (1U <<  3)
-#define LOG_REGS    (1U <<  4)
-#define LOG_DATA    (1U <<  5)
+#define LOG_CMD     (1U << 1)
+#define LOG_INT     (1U << 2)
+#define LOG_SEEK    (1U << 3)
+#define LOG_REGS    (1U << 4)
+#define LOG_DATA    (1U << 5)
 
 #define VERBOSE  (LOG_CMD | LOG_INT | LOG_SEEK | LOG_REGS | LOG_DATA)
 //#define LOG_OUTPUT_STREAM std::cout

@@ -16,7 +16,6 @@
 
 #include "softfloat3/source/include/softfloat.h"
 
-#define LOG_GENERAL (1U << 0)
 //#define VERBOSE (LOG_GENERAL)
 
 #include "logmacro.h"
