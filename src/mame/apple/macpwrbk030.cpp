@@ -504,7 +504,7 @@ u32 macpb030_state::screen_update_macpbwd(screen_device &screen, bitmap_rgb32 &b
 		for (int x = 0; x < 640; x++)
 		{
 			u8 const pixels = vram8[(y * 640) + (BYTE4_XOR_BE(x))];
-			*line++ = m_colors[pixels ^ 0xff];
+			*line++ = m_wd_palette[pixels];
 		}
 	}
 

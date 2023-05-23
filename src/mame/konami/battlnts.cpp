@@ -324,10 +324,10 @@ void battlnts_state::machine_reset()
 void battlnts_state::battlnts(machine_config &config)
 {
 	// basic machine hardware
-	HD6309(config, m_maincpu, XTAL(24'000'000) / 2);  // 3'000'000 * 4?
+	HD6309E(config, m_maincpu, XTAL(24'000'000) / 8); // HD63C09EP
 	m_maincpu->set_addrmap(AS_PROGRAM, &battlnts_state::main_map);
 
-	Z80(config, m_audiocpu, XTAL(24'000'000) / 6); // 3579545?
+	Z80(config, m_audiocpu, XTAL(24'000'000) / 6); // 3579545? (no such XTAL on board)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &battlnts_state::sound_map);
 
 	WATCHDOG_TIMER(config, "watchdog");

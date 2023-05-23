@@ -26,7 +26,10 @@
       the 3D hardware is emulated.
 
     - Serial number data is at offset 0x201 in the BIOS.  Until the games are running
-      and displaying it I'm not going to meddle with it though.
+      and displaying it I'm not going to meddle with it though.  Some newer Namco SS22 games
+      have similar data there.
+      The only difference between motoxgov2a and motoxgov2a2, motoxgov1a and motoxgov1a2,
+      panicprkj and panicprkj2 is this data.
 
     - Improve GMEN hookups/comms.
 
@@ -35,9 +38,9 @@
       disable inputs because of this.
 
     - Super System 23 tests irqs in the post.  timecrs2v4a's code can
-    potentially test 7 sources, but only actually test 5.  With each
-    source there is code to clear the interrupt and code to raise it.
-    Levels 0 and 1 are not connected to anything according to the code.
+      potentially test 7 sources, but only actually test 5.  With each
+      source there is code to clear the interrupt and code to raise it.
+      Levels 0 and 1 are not connected to anything according to the code.
 
       VBlank (level 2):
         clear: ad00000a.h = 0
@@ -4373,7 +4376,7 @@ ROM_END
 ROM_START( motoxgov1a )
 	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
 	ROM_LOAD16_BYTE( "mg1vera.ic2",  0x000000, 0x200000, CRC(5ba13d9e) SHA1(7f6484df644772f2478155c05844532f8abbd196) )
-	ROM_LOAD16_BYTE( "mg1vera.ic1",  0x000001, 0x200000, CRC(6b2bda52) SHA1(922ea739c8a62c7147126bf20ed3ffe8faec8842) )
+	ROM_LOAD16_BYTE( "mg1vera.ic1",  0x000001, 0x200000, CRC(193b463e) SHA1(f62eed49f7f8bf01b8b4deb1578ddee1d4a54ca3) )
 
 	ROM_REGION( 0x80000, "subcpu", 0 )  /* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "mg3vera.ic3",  0x000000, 0x080000, CRC(9e3d46a8) SHA1(9ffa5b91ea51cc0fb97def25ce47efa3441f3c6f) )

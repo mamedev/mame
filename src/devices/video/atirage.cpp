@@ -4,7 +4,7 @@
     ATI Rage PCI/AGP SVGA
 
     This implementation targets the mach64 VT and 3D Rage chips.  Rage 128 has similar registers
-	but they're mapped differently.
+    but they're mapped differently.
 
     mach64 VT = mach64 with video decoding.  Uses a Rage-compatible register layout, as opposed to earlier mach64.
     mach64 GT = Rage I (mach64 acceleration and VGA with 3D polygons and MPEG-1 decode)
@@ -29,7 +29,6 @@
 #include "screen.h"
 #include "atirage.h"
 
-#define LOG_GENERAL     (1U << 0)
 #define LOG_REGISTERS   (1U << 1)
 #define LOG_CRTC        (1U << 2)
 #define LOG_DAC         (1U << 3)
@@ -267,18 +266,6 @@ u8 atirage_device::regs_0_read(offs_t offset)
 
 		case CLOCK_CNTL + 2:
 			return m_pll_regs[(m_regs0[CLOCK_CNTL+1] >> 2) & 0xf] << 16;
-
-		case GP_IO:           // monitor sense - either 3-line Apple or EDID
-			return read_gpio() & 0xff;
-
-		case GP_IO + 1:
-			return (read_gpio() & 0xff00) >> 8;
-
-		case GP_IO + 2:
-			return (read_gpio() & 0xff0000) >> 16;
-
-		case GP_IO + 3:
-			return read_gpio() >> 24;
 	}
 
 	return m_regs0[offset];
@@ -336,7 +323,7 @@ void atirage_device::regs_0_write(offs_t offset, u8 data)
 
 		case CRTC_DAC_BASE + 3:
 			m_dac_state = 0;
-			m_dac_rindex = data >> 24;
+			m_dac_rindex = data;
 			break;
 
 		case CRTC_OFF_PITCH:
@@ -356,7 +343,23 @@ void atirage_device::regs_0_write(offs_t offset, u8 data)
 		case GP_IO + 1:
 		case GP_IO + 2:
 		case GP_IO + 3:
-			write_gpio(*(u32 *)&m_regs0[GP_IO]);
+			{
+				u16 old_data = *(u16 *)&m_regs0[GP_IO];
+				const u16 ddr = *(u16 *)&m_regs0[GP_IO+2];
+
+				old_data &= ddr;                // 0 bits are input
+
+				// send the data to an external handler
+				// AND the pullups by the inverse of DDR, so bits set to input get the pullup
+				write_gpio(old_data | (m_gpio_pullups & (ddr ^ 0xffff)));
+
+				// get the updated data from the port
+				u16 new_data = read_gpio();
+				new_data &= (ddr ^ 0xffff);     // AND against inverted DDR mask so 0 bits are output
+				new_data |= old_data;
+				m_regs0[GP_IO] = (new_data & 0xff);
+				m_regs0[GP_IO + 1] = (new_data >> 8) & 0xff;
+			}
 			break;
 	}
 }
