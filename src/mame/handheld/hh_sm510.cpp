@@ -5664,8 +5664,8 @@ ROM_START( ktmntbb )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "793.melody", 0x000, 0x100, CRC(cddefb96) SHA1(e9b6d3947c415a3ed520a3dab66a381159dfd79b) )
 
-	ROM_REGION( 873514, "screen", 0)
-	ROM_LOAD( "ktmntbb.svg", 0, 873514, CRC(808148a2) SHA1(14a288c77bc519b0385dfa9da4e965d0ea0dfec9) )
+	ROM_REGION( 873508, "screen", 0)
+	ROM_LOAD( "ktmntbb.svg", 0, 873508, CRC(cc4bbfbd) SHA1(1b300e24a8890ad36a7f6e65ba8d5e41e2de2858) )
 ROM_END
 
 
