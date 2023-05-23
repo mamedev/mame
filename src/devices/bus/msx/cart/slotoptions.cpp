@@ -44,6 +44,7 @@ char const *const KANJI           = "kanji";
 char const *const KEYBOARD_MASTER = "keyboard_master";
 char const *const KONAMI          = "konami";
 char const *const KONAMI_SCC      = "konami_scc";
+char const *const KOREAN_25IN1    = "korean_25in1";
 char const *const KOREAN_80IN1    = "korean_80in1";
 char const *const KOREAN_90IN1    = "korean_90in1";
 char const *const KOREAN_126IN1   = "korean_126in1";
