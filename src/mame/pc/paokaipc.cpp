@@ -9,16 +9,12 @@
     Some kind of x86 pc-like hardware, exact CPU type etc. unknown hardware is by Paokai,
     motherboard has logos, large chip with logo too, http://www.paokai.com.tw/
 
-    CF card has a Linux partition, partially bootable with m55hipl driver.
-    - starts with a "LILO boot", fails with a recoverable "undefined video mode"
-      (press RETURN or SPACE);
+    CF card has a Linux partition, partially bootable with shutms11 driver.
+    - starts with a "LILO boot", loads a proprietary driver TWDrv.o (?) then eventually
+      crashes not finding sound modules;
     - Shows being a "gcc 3.2.2 (Red Hat Linux 3.2.2-5)" distro.
       Notice that latter seems mislabeled, and RedHat is actually version 9
       http://rpm.pbone.net/info_idpl_19558085_distro_redhat9_com_gcc-3.2.2-5.i386.rpm.html
-    - Has pretty verbose terminal log, checks PnP, USB, Pentium f0 0f bug,
-      assumes "33 MHz system bus" for IDE PIO mode, returns PIIX only during PCI scan
-      (that's what m55hipl has as default);
-    - Eventually hangs at a "Setting the clock:" prompt;
 
 **************************************************************************************************/
 
