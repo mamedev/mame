@@ -11614,7 +11614,7 @@ kept for now until finding out what those bytes affect...
 		<description>Super Bioman 1 (Korea)</description>
 		<year>199?</year>
 		<publisher>Zemina</publisher>
-		<info name="alt_title" value="슈퍼바이오맨1"/>
+		<info name="alt_title" value="슈퍼 바이오맨 1"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<dataarea name="rom" size="0x10000">
@@ -11627,7 +11627,7 @@ kept for now until finding out what those bytes affect...
 		<description>Super Bioman 1 (Korea, alt)</description>
 		<year>199?</year>
 		<publisher>Zemina</publisher>
-		<info name="alt_title" value="슈퍼바이오맨1"/>
+		<info name="alt_title" value="슈퍼 바이오맨 1"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<dataarea name="rom" size="0x10000">
@@ -11640,7 +11640,7 @@ kept for now until finding out what those bytes affect...
 		<description>Super Bioman 4 (Korea)</description>
 		<year>199?</year>
 		<publisher>Zemina</publisher>
-		<info name="alt_title" value="슈퍼바이오맨4"/>
+		<info name="alt_title" value="슈퍼 바이오맨 4"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
