@@ -47,11 +47,8 @@
 #include "emu.h"
 #include "pc_vga.h"
 
-// TODO: why?
-#include "bus/isa/trident.h"
 #include "machine/eepromser.h"
 
-#include "debugger.h"
 #include "screen.h"
 
 

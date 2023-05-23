@@ -23,15 +23,7 @@ TODO:
 - Various graphics bugs (title screen uses ROZ?);
 - fix 129 Hz refresh rate bug;
 - inputs (is there a service mode?)
-
-I/O Memo (http://bochs.sourceforge.net/techspec/PORTS.LST):
-46E8    ----    8514/A and compatible video cards (e.g. ATI Graphics Ultra)
-46E8    w   ROM page select
-83C0-83CF ----  Compaq QVision - Line Draw Engine
-83C4      ----  Compaq Qvision EISA - Virtual Controller Select
-83C6-83C9 ----  Compaq Qvision EISA - DAC color registers
-
-43c4 is a 83c4 mirror?
+- hostinv: is an El Torito CD-ROM, can't boot here until PCI section is rewritten;
 
 =====================================================================================
 
@@ -122,8 +114,6 @@ compatible with chipset VIA.
 something wrong in the disk geometry reported by calchase.chd (20,255,63) since BIOS does not accept
  255 heads as parameter. Perhaps a bad dump?
 
- TODO: A lot of work to do yet!!!
-
 - update by peter ferrie:
 - corrected memory map to 64kb blocks
 - corrected access to PAM register
@@ -134,7 +124,7 @@ something wrong in the disk geometry reported by calchase.chd (20,255,63) since 
 
 #include "pcshare.h"
 
-#include "bus/isa/trident.h"
+#include "bus/isa/svga_trident.h"
 #include "cpu/i386/i386.h"
 #include "machine/lpci.h"
 #include "machine/pckeybrd.h"
@@ -176,7 +166,6 @@ private:
 	uint8_t m_mtxc_config_reg[256]{};
 	uint8_t m_piix4_config_reg[4][256]{};
 
-	uint32_t m_idle_skip_ram = 0;
 	void bios_ext_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint8_t nvram_r(offs_t offset);
@@ -387,14 +376,14 @@ uint16_t calchase_state::iocard_r()
 	return m_iocard[N]->read();
 }
 
-
 void calchase_state::calchase_map(address_map &map)
 {
 	map(0x00000000, 0x0009ffff).ram();
-	map(0x000a0000, 0x000bffff).rw("vga", FUNC(trident_vga_device::mem_r), FUNC(trident_vga_device::mem_w)); // VGA VRAM
-	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
-	map(0x000c8000, 0x000cffff).noprw();
+//	map(0x000a0000, 0x000bffff).rw("vga", FUNC(trident_vga_device::mem_r), FUNC(trident_vga_device::mem_w)); // VGA VRAM
+//	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
+//	map(0x000c8000, 0x000cffff).noprw();
 	//map(0x000d0000, 0x000d0003).ram();  // XYLINX - Sincronus serial communication
+	// TODO: route to ISA bus
 	map(0x000d0004, 0x000d0005).r(FUNC(calchase_state::iocard_r<0>));
 	map(0x000d000c, 0x000d000d).r(FUNC(calchase_state::iocard_r<1>));
 	map(0x000d0032, 0x000d0033).r(FUNC(calchase_state::iocard_r<2>));
@@ -409,54 +398,22 @@ void calchase_state::calchase_map(address_map &map)
 	map(0x000f0000, 0x000fffff).bankr("bios_bank").w(FUNC(calchase_state::bios_ram_w));
 	map(0x00100000, 0x03ffffff).ram();  // 64MB
 	map(0x04000000, 0x28ffffff).noprw();
-	//map(0x04000000, 0x040001ff).ram();
-	//map(0x08000000, 0x080001ff).ram();
-	//map(0x0c000000, 0x0c0001ff).ram();
-	//map(0x10000000, 0x100001ff).ram();
-	//map(0x14000000, 0x140001ff).ram();
-	//map(0x18000000, 0x180001ff).ram();
-	//map(0x20000000, 0x200001ff).ram();
-	//map(0x28000000, 0x280001ff).ram();
 	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
 }
 
 void calchase_state::calchase_io(address_map &map)
 {
 	pcat32_io_common(map);
-	//map(0x00e8, 0x00eb).noprw();
 	map(0x00e8, 0x00ef).noprw(); //AMI BIOS write to this ports as delays between I/O ports operations sending al value -> NEWIODELAY
-	map(0x0170, 0x0177).noprw(); //To debug
+//	map(0x0170, 0x0177).noprw(); //To debug
 	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
-	map(0x0200, 0x021f).noprw(); //To debug
-	map(0x0260, 0x026f).noprw(); //To debug
-	map(0x0278, 0x027b).nopw();//.w(FUNC(calchase_state::pnp_config_w));
-	map(0x0280, 0x0287).noprw(); //To debug
-	map(0x02a0, 0x02a7).noprw(); //To debug
-	map(0x02c0, 0x02c7).noprw(); //To debug
-	map(0x02e0, 0x02ef).noprw(); //To debug
-	map(0x02f8, 0x02ff).noprw(); //To debug
-	map(0x0320, 0x038f).noprw(); //To debug
-	map(0x03a0, 0x03a7).noprw(); //To debug
-	map(0x03b0, 0x03bf).rw("vga", FUNC(trident_vga_device::port_03b0_r), FUNC(trident_vga_device::port_03b0_w));
-	map(0x03c0, 0x03cf).rw("vga", FUNC(trident_vga_device::port_03c0_r), FUNC(trident_vga_device::port_03c0_w));
-	map(0x03d0, 0x03df).rw("vga", FUNC(trident_vga_device::port_03d0_r), FUNC(trident_vga_device::port_03d0_w));
-	map(0x03e0, 0x03ef).noprw(); //To debug
-	map(0x0378, 0x037f).noprw(); //To debug
-	// map(0x0300, 0x03af).noprw();
-	// map(0x03b0, 0x03df).noprw();
 	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
-	map(0x03f8, 0x03ff).noprw(); // To debug Serial Port COM1:
-	map(0x0a78, 0x0a7b).nopw();//.w(FUNC(calchase_state::pnp_data_w));
+//	map(0x03f8, 0x03ff).noprw(); // To debug Serial Port COM1:
+//	map(0x0a78, 0x0a7b).nopw();//.w(FUNC(calchase_state::pnp_data_w));
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
-	map(0x42e8, 0x43ef).noprw(); //To debug
-	map(0x43c4, 0x43cb).rw("vga", FUNC(trident_vga_device::port_43c6_r), FUNC(trident_vga_device::port_43c6_w));  // Trident Memory and Video Clock register
-	map(0x46e8, 0x46ef).noprw(); //To debug
-	map(0x4ae8, 0x4aef).noprw(); //To debug
-	map(0x83c4, 0x83cb).rw("vga", FUNC(trident_vga_device::port_83c6_r), FUNC(trident_vga_device::port_83c6_w));  // Trident LUTDAC
-	map(0x92e8, 0x92ef).noprw(); //To debug
+//	map(0x43c4, 0x43cb).rw("vga", FUNC(trident_vga_device::port_43c6_r), FUNC(trident_vga_device::port_43c6_w));  // Trident Memory and Video Clock register
+//	map(0x83c4, 0x83cb).rw("vga", FUNC(trident_vga_device::port_83c6_r), FUNC(trident_vga_device::port_83c6_w));  // Trident LUTDAC
 }
-
-
 
 static INPUT_PORTS_START( calchase )
 	PORT_START("IOCARD1")
@@ -498,7 +455,7 @@ static INPUT_PORTS_START( calchase )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IOCARD3")
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("isa1:tgui9680:screen")
 	PORT_BIT( 0xdfff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IOCARD4")
@@ -541,7 +498,7 @@ static INPUT_PORTS_START( calchase )
 	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") //eggsplc
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("isa1:tgui9680:screen") // eggsplc
 	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
@@ -619,6 +576,11 @@ void calchase_state::machine_reset()
 	membank("bios_ext")->set_base(memregion("bios")->base() + 0);
 }
 
+void calchase_isa16_cards(device_slot_interface &device)
+{
+	device.option_add("tgui9680", ISA16_SVGA_TGUI9680);
+}
+
 void calchase_state::calchase(machine_config &config)
 {
 	PENTIUM(config, m_maincpu, 133000000); // Cyrix 686MX-PR200 CPU
@@ -638,7 +600,13 @@ void calchase_state::calchase(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // DS1220Y
 
 	/* video hardware */
-	pcvideo_trident_vga(config);
+	//pcvideo_trident_vga(config);
+
+	// FIXME: determine ISA bus clock
+	isa16_device &isa(ISA16(config, "isa", 0));
+	isa.set_memspace("maincpu", AS_PROGRAM);
+	isa.set_iospace("maincpu", AS_IO);
+	ISA16_SLOT(config, "isa1", 0, "isa", calchase_isa16_cards, "tgui9680", true);
 
 	ds12885_device &rtc(DS12885(config.replace(), "rtc"));
 	rtc.irq().set("pic8259_2", FUNC(pic8259_device::ir0_w));
@@ -669,8 +637,11 @@ void calchase_state::hostinv(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // DS1220Y
 
-	/* video hardware */
-	pcvideo_trident_vga(config);
+	// TODO: determine isa bus clock
+	isa16_device &isa(ISA16(config, "isa", 0));
+	isa.set_memspace("maincpu", AS_PROGRAM);
+	isa.set_iospace("maincpu", AS_IO);
+	ISA16_SLOT(config, "isa1", 0, "isa", calchase_isa16_cards, "tgui9680", true);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -679,28 +650,11 @@ void calchase_state::hostinv(machine_config &config)
 	DAC_12BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
 }
 
-
-uint32_t calchase_state::calchase_idle_skip_r()
-{
-	if(m_maincpu->pc()==0x1406f48)
-		m_maincpu->spin_until_interrupt();
-
-	return m_idle_skip_ram;
-}
-
-void calchase_state::calchase_idle_skip_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	COMBINE_DATA(&m_idle_skip_ram);
-}
-
 void calchase_state::init_calchase()
 {
 	m_bios_ram = std::make_unique<uint32_t[]>(0x20000/4);
 
 	intel82439tx_init();
-
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3f0b160, 0x3f0b163, read32smo_delegate(*this, FUNC(calchase_state::calchase_idle_skip_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x3f0b160, 0x3f0b163, write32s_delegate(*this, FUNC(calchase_state::calchase_idle_skip_w)));
 }
 
 void calchase_state::init_hostinv()
@@ -714,24 +668,16 @@ ROM_START( calchase )
 	ROM_REGION32_LE( 0x40000, "bios", 0 )
 	ROM_LOAD( "mb_bios.bin", 0x00000, 0x20000, CRC(dea7a51b) SHA1(e2028c00bfa6d12959fc88866baca8b06a1eab68) )
 
-	ROM_REGION32_LE( 0x8000, "video_bios", 0 )
-	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
-	ROM_CONTINUE(                                 0x0001, 0x4000 )
-
 	ROM_REGION( 0x800, "nvram", 0 )
 	ROM_LOAD( "ds1220y_nv.bin", 0x000, 0x800, CRC(7912c070) SHA1(b4c55c7ca76bcd8dad1c4b50297233349ae02ed3) )
 
 	DISK_REGION( "ide:0:hdd" )
-	DISK_IMAGE_READONLY( "calchase", 0,BAD_DUMP SHA1(6ae51a9b3f31cf4166322328a98c0235b0874eb3) )
+	DISK_IMAGE_READONLY( "calchase", 0, BAD_DUMP SHA1(6ae51a9b3f31cf4166322328a98c0235b0874eb3) )
 ROM_END
 
 ROM_START( hostinv )
 	ROM_REGION32_LE( 0x40000, "bios", 0 )
 	ROM_LOAD( "hostinv_bios.bin", 0x000000, 0x020000, CRC(5111e4b8) SHA1(20ab93150b61fd068f269368450734bba5dcb284) )
-
-	ROM_REGION32_LE( 0x8000, "video_bios", 0 )
-	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
-	ROM_CONTINUE(                                 0x0001, 0x4000 )
 
 	ROM_REGION( 0x800, "nvram", ROMREGION_ERASEFF )
 	ROM_LOAD( "ds1220y_hostinv.bin", 0x000, 0x800, NO_DUMP )
@@ -743,10 +689,6 @@ ROM_END
 ROM_START( eggsplc )
 	ROM_REGION32_LE( 0x40000, "bios", 0 )
 	ROM_LOAD( "hostinv_bios.bin", 0x000000, 0x020000, CRC(5111e4b8) SHA1(20ab93150b61fd068f269368450734bba5dcb284) )
-
-	ROM_REGION32_LE( 0x8000, "video_bios", 0 )
-	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
-	ROM_CONTINUE(                                 0x0001, 0x4000 )
 
 	ROM_REGION( 0x800, "nvram", ROMREGION_ERASEFF )
 	ROM_LOAD( "ds1220y_eggsplc.bin", 0x000, 0x800, NO_DUMP )
