@@ -5214,3 +5214,15 @@ if (MACHINES["PCCARD_SRAM"]~=null) then
 		MAME_DIR .. "src/devices/machine/pccard_sram.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/tc9223.h,MACHINES["TC9223"] = true
+---------------------------------------------------
+
+if (MACHINES["TC9223"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/tc9223.cpp",
+		MAME_DIR .. "src/devices/machine/tc9223.h",
+	}
+end
