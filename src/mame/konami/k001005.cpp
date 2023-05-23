@@ -20,9 +20,6 @@
 
 */
 
-#define LOG_POLY_FIFO   0
-
-
 k001005_renderer::k001005_renderer(device_t &parent, screen_device &screen, device_t *k001006)
 	: poly_manager<float, k001005_polydata, 10>(screen.machine())
 {

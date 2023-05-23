@@ -32,7 +32,6 @@
 #include "screen.h"
 
 
-//#define LOG_GENERAL (1U << 0) //defined in logmacro.h already
 #define LOG_VRAM    (1U << 1)
 #define LOG_CMD     (1U << 2)
 

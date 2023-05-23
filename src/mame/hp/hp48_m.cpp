@@ -16,18 +16,11 @@
 
 #include "screen.h"
 
+#define LOG_SERIAL  (1U << 1)
+#define LOG_INVALID (1U << 2)
 
-/***************************************************************************
-    DEBUGGING
-***************************************************************************/
-
-
-#define VERBOSE          0
-#define VERBOSE_SERIAL   0
-
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
-#define LOG_SERIAL(x)  do { if (VERBOSE_SERIAL) logerror x; } while (0)
-
+#define VERBOSE (LOG_INVALID)
+#include "logmacro.h"
 
 
 /***************************************************************************
@@ -80,7 +73,7 @@ void hp48_state::pulse_irq(int irq_line)
 /* end of receive event */
 TIMER_CALLBACK_MEMBER(hp48_state::rs232_byte_recv_cb)
 {
-	LOG_SERIAL(("%f hp48_state::rs232_byte_recv_cb: end of receive, data=%02x\n", machine().time().as_double(), param));
+	LOGMASKED(LOG_SERIAL, "%f hp48_state::rs232_byte_recv_cb: end of receive, data=%02x\n", machine().time().as_double(), param);
 
 	m_io[0x14] = param & 0xf; /* receive zone */
 	m_io[0x15] = param >> 4;
@@ -97,7 +90,7 @@ TIMER_CALLBACK_MEMBER(hp48_state::rs232_byte_recv_cb)
 /* outside world initiates a receive event */
 void hp48_state::rs232_start_recv_byte(uint8_t data)
 {
-	LOG_SERIAL(("%f hp48_state::rs232_start_recv_byte: start receiving, data=%02x\n", machine().time().as_double(), data));
+	LOGMASKED(LOG_SERIAL, "%f hp48_state::rs232_start_recv_byte: start receiving, data=%02x\n", machine().time().as_double(), data);
 
 	m_io[0x11] |= 2;  /* set byte receiving */
 
@@ -115,7 +108,7 @@ void hp48_state::rs232_start_recv_byte(uint8_t data)
 /* end of send event */
 TIMER_CALLBACK_MEMBER(hp48_state::rs232_byte_sent_cb)
 {
-	LOG_SERIAL(("%f hp48_state::rs232_byte_sent_cb: end of send, data=%02x\n", machine().time().as_double(), param));
+	LOGMASKED(LOG_SERIAL, "%f hp48_state::rs232_byte_sent_cb: end of send, data=%02x\n", machine().time().as_double(), param);
 
 	m_io[0x12] &= ~3; /* clear byte sending and buffer full */
 
@@ -131,7 +124,7 @@ void hp48_state::rs232_send_byte()
 {
 	uint8_t data = HP48_IO_8(0x16); /* byte to send */
 
-	LOG_SERIAL(("%s %f hp48_state::rs232_send_byte: start sending, data=%02x\n", machine().describe_context(), machine().time().as_double(), data));
+	LOGMASKED(LOG_SERIAL, "%s %f hp48_state::rs232_send_byte: start sending, data=%02x\n", machine().describe_context(), machine().time().as_double(), data);
 
 	/* set byte sending and send buffer full */
 	m_io[0x12] |= 3;
@@ -149,7 +142,7 @@ void hp48_state::rs232_send_byte()
 /* CPU sets OUT register (keyboard + beeper) */
 void hp48_state::reg_out(uint32_t data)
 {
-	LOG(("%s %f hp48_state::reg_out: %03x\n", machine().describe_context(), machine().time().as_double(), data));
+	LOG("%s %f hp48_state::reg_out: %03x\n", machine().describe_context(), machine().time().as_double(), data);
 
 	/* bits 0-8: keyboard lines */
 	m_out = data & 0x1ff;
@@ -185,7 +178,7 @@ int hp48_state::get_in()
 uint32_t hp48_state::reg_in()
 {
 	int in = get_in();
-	LOG(("%s %f hp48_state::reg_in: %04x\n", machine().describe_context(), machine().time().as_double(), in));
+	LOG("%s %f hp48_state::reg_in: %04x\n", machine().describe_context(), machine().time().as_double(), in);
 	return in;
 }
 
@@ -197,7 +190,7 @@ void hp48_state::update_kdn()
 	/* interrupt on raising edge */
 	if (in && !m_kdn)
 	{
-		LOG(("%f hp48_state::update_kdn: interrupt\n", machine().time().as_double()));
+		LOG("%f hp48_state::update_kdn: interrupt\n", machine().time().as_double());
 		m_io[0x19] |= 8; // service request
 		pulse_irq(SATURN_WAKEUP_LINE);
 		pulse_irq(SATURN_IRQ_LINE);
@@ -212,7 +205,7 @@ TIMER_CALLBACK_MEMBER(hp48_state::kbd_cb)
 	/* NMI for ON key */
 	if (ioport( "ON" )->read())
 	{
-		LOG(("%f hp48_state::kbd_cb: keyboard interrupt, on key\n", machine().time().as_double()));
+		LOG("%f hp48_state::kbd_cb: keyboard interrupt, on key\n", machine().time().as_double());
 		m_io[0x19] |= 8; // set service request
 		pulse_irq(SATURN_WAKEUP_LINE);
 		pulse_irq(SATURN_NMI_LINE);
@@ -226,7 +219,7 @@ TIMER_CALLBACK_MEMBER(hp48_state::kbd_cb)
 /* RSI opcode */
 WRITE_LINE_MEMBER( hp48_state::rsi )
 {
-	LOG(("%s %f hp48_state::rsi\n", machine().describe_context(), machine().time().as_double()));
+	LOG("%s %f hp48_state::rsi\n", machine().describe_context(), machine().time().as_double());
 
 	// enables interrupts on key repeat (normally, there is only one interrupt, when the key is pressed)
 	m_kdn = 0;
@@ -265,7 +258,7 @@ void hp48_state::update_annunciators()
 
 void hp48_state::io_w(offs_t offset, uint8_t data)
 {
-	LOG(("%s %f hp48_state::io_w: off=%02x data=%x\n", machine().describe_context(), machine().time().as_double(), offset, data));
+	LOG("%s %f hp48_state::io_w: off=%02x data=%x\n", machine().describe_context(), machine().time().as_double(), offset, data);
 
 	switch (offset)
 	{
@@ -307,12 +300,12 @@ void hp48_state::io_w(offs_t offset, uint8_t data)
 
 	/* cards */
 	case 0x0e:
-		LOG(("%s: card control write %02x\n", machine().describe_context(), data));
+		LOG("%s: card control write %02x\n", machine().describe_context(), data);
 
 		/* bit 0: software interrupt */
 		if (data & 1)
 		{
-			LOG(("%f hp48_state::io_w: software interrupt requested\n", machine().time().as_double()));
+			LOG("%f hp48_state::io_w: software interrupt requested\n", machine().time().as_double());
 			pulse_irq(SATURN_IRQ_LINE);
 			data &= ~1;
 		}
@@ -325,7 +318,7 @@ void hp48_state::io_w(offs_t offset, uint8_t data)
 		break;
 
 	case 0x0f:
-		LOG(("%s: card info write %02x\n", machine().describe_context(), data));
+		LOG("%s: card info write %02x\n", machine().describe_context(), data);
 		m_io[0x0f] = data;
 		break;
 
@@ -446,7 +439,7 @@ uint8_t hp48_state::io_r(offs_t offset)
 	/* cards */
 	case 0x0e: /* detection */
 		data = m_io[0x0e];
-		LOG(( "%s: card control read %02x\n", machine().describe_context(), data ));
+		LOG("%s: card control read %02x\n", machine().describe_context(), data);
 		break;
 	case 0x0f: /* card info */
 		data = 0;
@@ -480,14 +473,14 @@ uint8_t hp48_state::io_r(offs_t offset)
 					data |= 8;
 			}
 		}
-		LOG(( "%s: card info read %02x\n", machine().describe_context(), data ));
+		LOG("%s: card info read %02x\n", machine().describe_context(), data);
 		break;
 
 
 	default: data = m_io[offset];
 	}
 
-	LOG(("%s %f hp48_state::io_r: off=%02x data=%x\n", machine().describe_context(), machine().time().as_double(), offset, data));
+	LOG("%s %f hp48_state::io_r: off=%02x data=%x\n", machine().describe_context(), machine().time().as_double(), offset, data);
 	return data;
 }
 
@@ -510,7 +503,7 @@ uint8_t hp48_state::bank_r(offs_t offset)
 	offset &= 0x7e;
 	if ( m_bank_switch != offset )
 	{
-		LOG(( "%s %f hp48_state::bank_r: off=%03x\n", machine().describe_context(), machine().time().as_double(), offset ));
+		LOG("%s %f hp48_state::bank_r: off=%03x\n", machine().describe_context(), machine().time().as_double(), offset);
 		m_bank_switch = offset;
 		apply_modules();
 	}
@@ -523,7 +516,7 @@ void hp48_state::hp49_bank_w(offs_t offset, uint8_t data)
 	offset &= 0x7e;
 	if ( m_bank_switch != offset )
 	{
-		LOG(("%s %f hp49_bank_w: off=%03x\n", machine().describe_context(), machine().time().as_double(), offset));
+		LOG("%s %f hp49_bank_w: off=%03x\n", machine().describe_context(), machine().time().as_double(), offset);
 		m_bank_switch = offset;
 		apply_modules();
 	}
@@ -542,7 +535,7 @@ TIMER_CALLBACK_MEMBER(hp48_state::timer1_cb)
 	/* wake-up on carry */
 	if ((m_io[0x2e] & 4) && (m_timer1 == 0xf))
 	{
-		LOG(("wake-up on timer1\n"));
+		LOG("wake-up on timer1\n");
 		m_io[0x2e] |= 8;                                      /* set service request */
 		m_io[0x18] |= 4;                                      /* set service request */
 		pulse_irq(SATURN_WAKEUP_LINE);
@@ -550,7 +543,7 @@ TIMER_CALLBACK_MEMBER(hp48_state::timer1_cb)
 	/* interrupt on carry */
 	if ((m_io[0x2e] & 2) && (m_timer1 == 0xf))
 	{
-		LOG(("generate timer1 interrupt\n"));
+		LOG("generate timer1 interrupt\n");
 		m_io[0x2e] |= 8; /* set service request */
 		m_io[0x18] |= 4; /* set service request */
 		pulse_irq(SATURN_NMI_LINE);
@@ -566,7 +559,7 @@ TIMER_CALLBACK_MEMBER(hp48_state::timer2_cb)
 	/* wake-up on carry */
 	if ((m_io[0x2f] & 4) && (m_timer2 == 0xffffffff))
 	{
-		LOG(("wake-up on timer2\n"));
+		LOG("wake-up on timer2\n");
 		m_io[0x2f] |= 8;                                      /* set service request */
 		m_io[0x18] |= 4;                                      /* set service request */
 		pulse_irq(SATURN_WAKEUP_LINE);
@@ -574,7 +567,7 @@ TIMER_CALLBACK_MEMBER(hp48_state::timer2_cb)
 	/* interrupt on carry */
 	if ((m_io[0x2f] & 2) && (m_timer2 == 0xffffffff))
 	{
-		LOG(("generate timer2 interrupt\n"));
+		LOG("generate timer2 interrupt\n");
 		m_io[0x2f] |= 8;                                      /* set service request */
 		m_io[0x18] |= 4;                                      /* set service request */
 		pulse_irq(SATURN_NMI_LINE);
@@ -636,8 +629,8 @@ void hp48_state::apply_modules()
 	{
 		int bank_lo = (m_bank_switch >> 5) & 3;
 		int bank_hi = (m_bank_switch >> 1) & 15;
-		LOG(("hp48_state::apply_modules: low ROM bank is %i\n", bank_lo));
-		LOG(("hp48_state::apply_modules: high ROM bank is %i\n", bank_hi));
+		LOG("hp48_state::apply_modules: low ROM bank is %i\n", bank_lo);
+		LOG("hp48_state::apply_modules: high ROM bank is %i\n", bank_hi);
 		if (m_rom)
 		{
 			space.install_rom(0x00000, 0x3ffff, 0x80000, m_rom + bank_lo * 0x40000);
@@ -650,7 +643,7 @@ void hp48_state::apply_modules()
 		if (m_port[1].found() && m_port[1]->port_size() > 0)
 		{
 			int off = (m_bank_switch << 16) % m_port[1]->port_size();
-			LOG(("hp48_state::apply_modules: port 2 offset is %i\n", off));
+			LOG("hp48_state::apply_modules: port 2 offset is %i\n", off);
 			m_modules[HP48_NCE3].data = m_port[1]->port_data() + off;
 		}
 
@@ -658,7 +651,7 @@ void hp48_state::apply_modules()
 		if (m_io[0x29] & 8)
 		{
 			/* A19 */
-			LOG(("hp48_state::apply_modules: A19 enabled, NCE3 disabled\n"));
+			LOG("hp48_state::apply_modules: A19 enabled, NCE3 disabled\n");
 			nce3_enable = 0;
 			if (m_rom)
 				space.install_rom(0, 0xfffff, m_rom);
@@ -667,7 +660,7 @@ void hp48_state::apply_modules()
 		{
 			/* NCE3 */
 			nce3_enable = m_bank_switch >> 6;
-			LOG(("hp48_apply_modules: A19 disabled, NCE3 %s\n", nce3_enable ? "enabled" : "disabled"));
+			LOG("hp48_apply_modules: A19 disabled, NCE3 %s\n", nce3_enable ? "enabled" : "disabled");
 			if (m_rom)
 				space.install_rom(0, 0x7ffff, 0x80000, m_rom);
 		}
@@ -695,7 +688,7 @@ void hp48_state::apply_modules()
 		/* our code assumes that the 20-bit select_mask is all 1s followed by all 0s */
 		if (nselect_mask & (nselect_mask + 1))
 		{
-			logerror("hp48_apply_modules: invalid mask %05x for module %s\n", select_mask, hp48_module_names[i]);
+			LOGMASKED(LOG_INVALID, "hp48_apply_modules: invalid mask %05x for module %s\n", select_mask, hp48_module_names[i]);
 			continue;
 		}
 
@@ -730,7 +723,7 @@ void hp48_state::apply_modules()
 			}
 		}
 
-		LOG(("hp48_apply_modules: module %s configured at %05x-%05x, mirror %05x\n", hp48_module_names[i], base, end, mirror));
+		LOG("hp48_apply_modules: module %s configured at %05x-%05x, mirror %05x\n", hp48_module_names[i], base, end, mirror);
 
 		if (i == 0)
 		{
@@ -764,7 +757,7 @@ void hp48_state::reset_modules()
 /* RESET opcode */
 WRITE_LINE_MEMBER( hp48_state::mem_reset )
 {
-	LOG(("%s %f hp48_state::mem_reset\n", machine().describe_context(), machine().time().as_double()));
+	LOG("%s %f hp48_state::mem_reset\n", machine().describe_context(), machine().time().as_double());
 	reset_modules();
 }
 
@@ -772,7 +765,7 @@ WRITE_LINE_MEMBER( hp48_state::mem_reset )
 /* CONFIG opcode */
 void hp48_state::mem_config(uint32_t data)
 {
-	LOG(("%s %f hp48_state::mem_config: %05x\n", machine().describe_context(), machine().time().as_double(), data));
+	LOG("%s %f hp48_state::mem_config: %05x\n", machine().describe_context(), machine().time().as_double(), data);
 
 	/* find the highest priority unconfigured module (except non-configurable NCE1)... */
 	for (int i = 0; i < 5; i++)
@@ -790,7 +783,7 @@ void hp48_state::mem_config(uint32_t data)
 		{
 			m_modules[i].base = data & m_modules[i].mask;
 			m_modules[i].state = HP48_MODULE_CONFIGURED;
-			LOG(("hp48_mem_config: module %s configured base=%05x, mask=%05x\n", hp48_module_names[i], m_modules[i].base, m_modules[i].mask));
+			LOG("hp48_mem_config: module %s configured base=%05x, mask=%05x\n", hp48_module_names[i], m_modules[i].base, m_modules[i].mask);
 			apply_modules();
 			break;
 		}
@@ -801,7 +794,7 @@ void hp48_state::mem_config(uint32_t data)
 /* UNCFG opcode */
 void hp48_state::mem_unconfig(uint32_t data)
 {
-	LOG(("%s %f hp48_state::mem_unconfig: %05x\n", machine().describe_context(), machine().time().as_double(), data));
+	LOG("%s %f hp48_state::mem_unconfig: %05x\n", machine().describe_context(), machine().time().as_double(), data);
 
 	/* find the highest priority fully configured module at address v (except NCE1)... */
 	for (int i = 0; i < 5; i++)
@@ -810,7 +803,7 @@ void hp48_state::mem_unconfig(uint32_t data)
 		if (m_modules[i].state == HP48_MODULE_CONFIGURED && (m_modules[i].base == (data & m_modules[i].mask)))
 		{
 			m_modules[i].state = i > 0 ? HP48_MODULE_UNCONFIGURED : HP48_MODULE_MASK_KNOWN;
-			LOG(("hp48_mem_unconfig: module %s\n", hp48_module_names[i]));
+			LOG("hp48_mem_unconfig: module %s\n", hp48_module_names[i]);
 			apply_modules();
 			break;
 		}
@@ -841,7 +834,7 @@ uint32_t hp48_state::mem_id()
 		}
 	}
 
-	LOG(("%s %f mem_id = %02x\n", machine().describe_context(), machine().time().as_double(), data));
+	LOG("%s %f mem_id = %02x\n", machine().describe_context(), machine().time().as_double(), data);
 
 	return data; /* everything is configured */
 }
@@ -889,7 +882,7 @@ void hp48_state::encode_nibble(uint8_t* dst, uint8_t* src, int size)
 
 void hp48_state::init_hp48()
 {
-	LOG(( "hp48: driver init called\n" ));
+	LOG("hp48: driver init called\n");
 	for (int i = 0; i < 6; i++)
 	{
 		m_modules[i].off_mask = 0x00fff;  // 2 KB
@@ -906,7 +899,7 @@ void hp48_state::init_hp48()
 
 void hp48_state::machine_reset()
 {
-	LOG(("hp48: machine reset called\n"));
+	LOG("hp48: machine reset called\n");
 	m_bank_switch = 0;
 	m_cur_screen = 0;
 	reset_modules();
@@ -915,7 +908,7 @@ void hp48_state::machine_reset()
 
 void hp48_state::base_machine_start(hp48_models model)
 {
-	LOG(( "hp48_state::machine_start: model %i\n", model ));
+	LOG("hp48_state::machine_start: model %i\n", model);
 
 	m_model = model;
 

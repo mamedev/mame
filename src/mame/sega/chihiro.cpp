@@ -447,9 +447,11 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 
 #include <functional>
 
-#define LOG_PCI
-//#define LOG_BASEBOARD
-//#define VERBOSE_MSG
+#define LOG_BASEBOARD (1U << 1)
+#define LOG_EXTRA     (1U << 2)
+
+#define VERBOSE (0)
+#include "logmacro.h"
 
 /*
  * Class declaration for jvs_master
@@ -924,9 +926,7 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 {
 	int sense;
 
-#ifdef VERBOSE_MSG
-	printf("Control request to an2131qc: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
-#endif
+	LOGMASKED(LOG_EXTRA, "Control request to an2131qc: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
 	if (endpoint != 0)
 		return -1;
 	// default valuse for data stage
@@ -1034,9 +1034,7 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 		// data sent by the host contains first a byte with value 0 that is ignored, then a byte specifying the number of packets that follow, then the data for each packet
 		// the data for each packet contains first a byte with value 0, then the sync byte (0xe0) then all the other bytes of the packet ending with the checksum byte
 		// broadcast packets must have a destination node address of value 0xff
-#ifdef VERBOSE_MSG
-		printf(" Jvs packets data of %d bytes\n\r", setup->wIndex);
-#endif
+		LOGMASKED(LOG_EXTRA, " Jvs packets data of %d bytes\n\r", setup->wIndex);
 		endpoints[endpoint].buffer[0] = 0;
 		if (jvs.buffer_out_used == 0)
 		{
@@ -1079,9 +1077,7 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 
 int ohci_hlean2131qc_device::handle_bulk_pid(int endpoint, int pid, uint8_t *buffer, int size)
 {
-#ifdef VERBOSE_MSG
-	printf("Bulk request to an2131qc: %x %d %x\n\r", endpoint, pid, size);
-#endif
+	LOGMASKED(LOG_EXTRA, "Bulk request to an2131qc: %x %d %x\n\r", endpoint, pid, size);
 	if (((endpoint == 1) || (endpoint == 2)) && (pid == InPid))
 	{
 		if (size > endpoints[endpoint].remain)
@@ -1102,19 +1098,15 @@ int ohci_hlean2131qc_device::handle_bulk_pid(int endpoint, int pid, uint8_t *buf
 	{
 		if (size > endpoints[4].remain)
 			size = endpoints[4].remain;
-#ifdef VERBOSE_MSG
 		for (int n = 0; n < size; n++)
-			printf(" %02x", buffer[n]);
-#endif
+			LOGMASKED(LOG_EXTRA, " %02x", buffer[n]);
 		if (size > 0) {
 			memcpy(endpoints[4].position, buffer, size);
 			endpoints[4].position = endpoints[4].position + size;
 			endpoints[4].remain = endpoints[4].remain - size;
 			if (endpoints[4].remain == 0)
 			{
-#ifdef VERBOSE_MSG
-				printf("\n\r");
-#endif
+				LOGMASKED(LOG_EXTRA, "\n\r");
 				// extract packets
 				process_jvs_packet();
 			}
@@ -1244,9 +1236,7 @@ void ohci_hlean2131sc_device::initialize()
 
 int ohci_hlean2131sc_device::handle_nonstandard_request(int endpoint, USBSetupPacket *setup)
 {
-#ifdef VERBOSE_MSG
-	printf("Control request to an2131sc: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
-#endif
+	LOGMASKED(LOG_EXTRA, "Control request to an2131sc: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
 	if (endpoint != 0)
 		return -1;
 	// default valuse for data stage
@@ -1415,9 +1405,7 @@ int ohci_hlean2131sc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 
 int ohci_hlean2131sc_device::handle_bulk_pid(int endpoint, int pid, uint8_t *buffer, int size)
 {
-#ifdef VERBOSE_MSG
-	printf("Bulk request to an2131sc: %x %d %x\n\r", endpoint, pid, size);
-#endif
+	LOGMASKED(LOG_EXTRA, "Bulk request to an2131sc: %x %d %x\n\r", endpoint, pid, size);
 	if (((endpoint == 1) || (endpoint == 2)) && (pid == InPid))
 	{
 		if (size > endpoints[endpoint].remain)
@@ -1475,9 +1463,7 @@ int ohci_hlean2131sc_device::handle_bulk_pid(int endpoint, int pid, uint8_t *buf
 void ohci_hlean2131sc_device::process_packet()
 {
 	uint8_t result = 0;
-#ifdef VERBOSE_MSG
-		printf("%02X %02X %02X %02X\n\r", packet[0], packet[1], packet[2], packet[3]);
-#endif
+	LOGMASKED(LOG_EXTRA, "%02X %02X %02X %02X\n\r", packet[0], packet[1], packet[2], packet[3]);
 	if (packet[0] == 0xff) // 00 00 7f
 		result = 2;
 	else if (packet[0] == 0x81) // 30 7f 4e
@@ -1675,12 +1661,12 @@ void chihiro_state::baseboard_ide_event(int type, uint8_t *read_buffer, uint8_t 
 
 	if ((type != 3) || ((write_buffer[0] == 0) && (write_buffer[1] == 0)))
 		return;
-#ifdef LOG_BASEBOARD
-	logerror("Baseboard sector command:\n");
+
+	LOGMASKED(LOG_BASEBOARD, "Baseboard sector command:\n");
 	for (int a = 0; a < 32; a++)
-		logerror(" %02X", write_buffer[a]);
-	logerror("\n");
-#endif
+		LOGMASKED(LOG_BASEBOARD, " %02X", write_buffer[a]);
+	LOGMASKED(LOG_BASEBOARD, "\n");
+
 	// response
 	// second word 8001 (8000+counter), first word=first word of written data (command ?), second dword ?
 	read_buffer[0] = write_buffer[0];

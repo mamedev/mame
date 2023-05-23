@@ -5,17 +5,15 @@
  *
  *   https://nabu.ca/
  *
- *   TODO:
- *     - Original keyboard support
  *
  ***********************************************************************/
 
 #include "emu.h"
 
+#include "nabupc_kbd.h"
+
 #include "bus/centronics/ctronics.h"
 #include "bus/nabupc/adapter.h"
-#include "bus/nabupc/keyboard/hlekeyboard.h"
-#include "bus/nabupc/keyboard/keyboard.h"
 #include "bus/nabupc/option.h"
 #include "bus/rs232/null_modem.h"
 #include "bus/rs232/pty.h"
@@ -268,13 +266,6 @@ static void hcca_devices(device_slot_interface &device)
 	device.option_add("hcca_adapter",  NABUPC_NETWORK_ADAPTER);
 }
 
-// Keyboard Devices
-static void keyboard_devices(device_slot_interface &device)
-{
-	device.option_add("nabu", NABUPC_KEYBOARD);
-	device.option_add("nabu_hle", NABUPC_HLE_KEYBOARD);
-}
-
 //**************************************************************************
 //  MACHINE CONFIGURATION
 //**************************************************************************
@@ -311,8 +302,8 @@ void nabupc_state::nabupc(machine_config &config)
 	I8251(config, m_kbduart, 10.738635_MHz_XTAL / 6);
 	m_kbduart->rxrdy_handler().set(*this, FUNC(nabupc_state::int_w<5>));
 
-	rs232_port_device &kbd(RS232_PORT(config, "kbd", keyboard_devices, "nabu"));
-	kbd.rxd_handler().set(m_kbduart, FUNC(i8251_device::write_rxd));
+	nabupc_keyboard_device &kbd(NABUPC_KEYBOARD(config, "kbd"));
+	kbd.rxd_cb().set(m_kbduart, FUNC(i8251_device::write_rxd));
 
 	// HCCA
 	AY31015(config, m_hccauart);

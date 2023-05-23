@@ -11,7 +11,11 @@
 
 #include <functional>
 
-//#define LOG_AUDIO
+#define LOG_AUDIO (1U << 1)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
 
 /*
  * Host
@@ -1109,9 +1113,7 @@ TIMER_CALLBACK_MEMBER(mcpx_apu_device::audio_update)
 
 uint32_t mcpx_apu_device::apu_r(offs_t offset, uint32_t mem_mask)
 {
-#ifdef LOG_AUDIO
-	logerror("Audio_APU: read from %08X mask %08X\n", 0xfe800000 + offset * 4, mem_mask);
-#endif
+	LOGMASKED(LOG_AUDIO, "Audio_APU: read from %08X mask %08X\n", 0xfe800000 + offset * 4, mem_mask);
 	if (offset == 0x20010 / 4) // some kind of internal counter or state value
 		return 0x20 + 4 + 8 + 0x48 + 0x80;
 	return apust.memory[offset];
@@ -1121,9 +1123,7 @@ void mcpx_apu_device::apu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t v;
 
-#ifdef LOG_AUDIO
-	logerror("Audio_APU: write at %08X mask %08X value %08X\n", 0xfe800000 + offset * 4, mem_mask, data);
-#endif
+	LOGMASKED(LOG_AUDIO, "Audio_APU: write at %08X mask %08X value %08X\n", 0xfe800000 + offset * 4, mem_mask, data);
 	apust.memory[offset] = data;
 	if (offset == 0x02040 / 4) // address of memory area with scatter-gather info (gpdsp scratch dma)
 		apust.gpdsp_sgaddress = data;
@@ -1288,9 +1288,7 @@ uint32_t mcpx_ac97_audio_device::ac97_audio_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = 0;
 
-#ifdef LOG_AUDIO
-	logerror("Audio_AC3: read from %08X mask %08X\n", 0xfec00000 + offset * 4, mem_mask);
-#endif
+	LOGMASKED(LOG_AUDIO, "Audio_AC3: read from %08X mask %08X\n", 0xfec00000 + offset * 4, mem_mask);
 	if (offset < 0x80 / 4)
 	{
 		ret = ac97st.mixer_regs[offset];
@@ -1317,9 +1315,7 @@ uint32_t mcpx_ac97_audio_device::ac97_audio_r(offs_t offset, uint32_t mem_mask)
 
 void mcpx_ac97_audio_device::ac97_audio_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-#ifdef LOG_AUDIO
-	logerror("Audio_AC3: write at %08X mask %08X value %08X\n", 0xfec00000 + offset * 4, mem_mask, data);
-#endif
+	LOGMASKED(LOG_AUDIO, "Audio_AC3: write at %08X mask %08X value %08X\n", 0xfec00000 + offset * 4, mem_mask, data);
 	if (offset < 0x80 / 4)
 	{
 		COMBINE_DATA(ac97st.mixer_regs + offset);

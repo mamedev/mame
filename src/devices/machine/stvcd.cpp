@@ -45,10 +45,10 @@ DASM notes:
 
 #include "coreutil.h"
 
-#define LOG_WARN           (1U <<  1)
-#define LOG_CMD            (1U <<  2)
-#define LOG_SEEK           (1U <<  3)
-#define LOG_XFER           (1U <<  4)
+#define LOG_WARN           (1U << 1)
+#define LOG_CMD            (1U << 2)
+#define LOG_SEEK           (1U << 3)
+#define LOG_XFER           (1U << 4)
 
 #define VERBOSE (LOG_CMD | LOG_WARN)
 //#define LOG_OUTPUT_FUNC osd_printf_info

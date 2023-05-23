@@ -30,9 +30,9 @@
 #include "emu.h"
 #include "forti.h"
 
-#define LOG_READY       (1U<<1)
+#define LOG_READY       (1U << 1)
 
-#define VERBOSE ( LOG_GENERAL )
+#define VERBOSE (LOG_GENERAL)
 
 #include "logmacro.h"
 

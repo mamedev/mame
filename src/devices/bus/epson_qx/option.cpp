@@ -8,6 +8,7 @@
 #include "emu.h"
 #include "option.h"
 
+#include "cqgmem.h"
 #include "cr1510.h"
 #include "ide.h"
 #include "multifont.h"
@@ -210,6 +211,7 @@ void device_option_expansion_interface::interface_pre_start()
 
 void option_bus_devices(device_slot_interface &device)
 {
+	device.option_add("cqgmem", EPSON_QX_OPTION_CQGMEM);
 	device.option_add("cr1510", EPSON_QX_OPTION_CR1510);
 	device.option_add("ide", EPSON_QX_OPTION_IDE);
 	device.option_add("multifont", EPSON_QX_OPTION_MULTIFONT);

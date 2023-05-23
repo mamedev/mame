@@ -46,9 +46,9 @@
 
 #include <vector>
 
-#define LOG_RTC             (1 << 0)
-#define LOG_INVALID_SEGMENT (1 << 1)
-#define LOG_OTHER           (1 << 2)
+#define LOG_RTC             (1U << 1)
+#define LOG_INVALID_SEGMENT (1U << 2)
+#define LOG_OTHER           (1U << 3)
 
 #define VERBOSE     (0)
 

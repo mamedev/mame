@@ -49,8 +49,8 @@
 #include "speaker.h"
 
 
-#define LOG_KEYBOARD  (1U <<  1)
-#define LOG_DEBUG     (1U <<  2)
+#define LOG_KEYBOARD  (1U << 1)
+#define LOG_DEBUG     (1U << 2)
 
 #define VERBOSE (LOG_GENERAL|LOG_DEBUG)
 //#define LOG_OUTPUT_FUNC printf

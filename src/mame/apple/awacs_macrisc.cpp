@@ -17,8 +17,7 @@
 #include "emu.h"
 #include "awacs_macrisc.h"
 
-#define LOG_GENERAL (1U << 0)
-#define LOG_REGISTERS (1U << 0)
+#define LOG_REGISTERS (1U << 1)
 
 #define VERBOSE (0)
 #include "logmacro.h"
@@ -149,7 +148,7 @@ void awacs_macrisc_device::write_macrisc(offs_t offset, uint32_t data)
 	{
 		case 0: // Audio Control
 			m_stream->set_sample_rate(clock() / rates[(data >> 8) & 7]);
-			LOGMASKED(LOG_GENERAL, "%s: sample rate to %d Hz\n", tag(), clock() / rates[(data >> 8) & 7]);
+			LOG("%s: sample rate to %d Hz\n", tag(), clock() / rates[(data >> 8) & 7]);
 			break;
 
 		case 4: // Audio CODEC Control
@@ -206,5 +205,5 @@ void screamer_device::write_macrisc(offs_t offset, uint32_t data)
 	{
 		m_active &= ~ACTIVE_OUT;
 	}
-	LOGMASKED(LOG_GENERAL, "%s: Playback %s reg 6 %x)\n", tag(), !BIT(m_registers[6], 1) ? "on" : "off", m_registers[6]);
+	LOG("%s: Playback %s reg 6 %x)\n", tag(), !BIT(m_registers[6], 1) ? "on" : "off", m_registers[6]);
 }

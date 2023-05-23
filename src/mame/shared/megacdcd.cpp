@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "megacdcd.h"
 
-#define LOG_WARN           (1U <<  1)
+#define LOG_WARN           (1U << 1)
 
 #define VERBOSE (LOG_GENERAL | LOG_WARN)
 //#define LOG_OUTPUT_FUNC osd_printf_info

@@ -90,16 +90,18 @@
 #include "screen.h"
 #include "speaker.h"
 
+#define LOG_PROTECTION (1U << 1)
+#define LOG_PALETTE    (1U << 2)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
 
 namespace {
 
 #define XL1_CLOCK           XTAL(640'000)
 #define XL2_CLOCK           XTAL(53'693'175)
 
-
-#define LOG_PROTECTION      0
-#define LOG_PALETTE         0
-#define LOG_IOCHIP          0
 
 typedef device_delegate<int (int in)> segac2_prot_delegate;
 
@@ -561,7 +563,7 @@ void segac2_state::control_w(uint8_t data)
 /* protection chip reads */
 uint8_t segac2_state::prot_r()
 {
-	if (LOG_PROTECTION) logerror("%06X:protection r=%02X\n", m_maincpu->pcbase(), m_prot_read_buf);
+	LOGMASKED(LOG_PROTECTION, "%06X:protection r=%02X\n", m_maincpu->pcbase(), m_prot_read_buf);
 	return m_prot_read_buf | 0xf0;
 }
 
@@ -581,7 +583,7 @@ void segac2_state::prot_w(uint8_t data)
 
 	/* determine the value to return, should a read occur */
 	m_prot_read_buf = m_prot_func(table_index);
-	if (LOG_PROTECTION) logerror("%06X:protection w=%02X, new result=%02X\n", m_maincpu->pcbase(), data & 0x0f, m_prot_read_buf);
+	LOGMASKED(LOG_PROTECTION, "%06X:protection w=%02X, new result=%02X\n", m_maincpu->pcbase(), data & 0x0f, m_prot_read_buf);
 
 	/* if the palette changed, force an update */
 	if (new_sp_palbase != m_sp_palbase || new_bg_palbase != m_bg_palbase)
@@ -590,7 +592,7 @@ void segac2_state::prot_w(uint8_t data)
 		m_sp_palbase = new_sp_palbase;
 		m_bg_palbase = new_bg_palbase;
 		recompute_palette_tables();
-		if (LOG_PALETTE && m_screen) logerror("Set palbank: %d/%d (scan=%d)\n", m_bg_palbase, m_sp_palbase, m_screen->vpos());
+		if (m_screen) LOGMASKED(LOG_PALETTE, "Set palbank: %d/%d (scan=%d)\n", m_bg_palbase, m_sp_palbase, m_screen->vpos());
 	}
 }
 

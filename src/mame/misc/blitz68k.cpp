@@ -65,8 +65,8 @@ To Do:
 #include "speaker.h"
 
 // configurable logging
-#define LOG_MCU     (1U <<  1)
-#define LOG_BLITTER (1U <<  2)
+#define LOG_MCU     (1U << 1)
+#define LOG_BLITTER (1U << 2)
 
 //#define VERBOSE (LOG_GENERAL | LOG_MCU | LOG_BLITTER)
 

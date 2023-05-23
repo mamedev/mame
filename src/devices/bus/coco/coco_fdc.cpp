@@ -89,7 +89,6 @@
 #include "formats/sdf_dsk.h"
 #include "formats/vdk_dsk.h"
 
-//#define LOG_GENERAL   (1U << 0) //defined in logmacro.h already
 #define LOG_WDFDC   (1U << 1) // Shows register setup
 #define LOG_WDIO    (1U << 2) // Shows data read and write
 #define LOG_WDSCII  (1U << 3) // Shows SCII register setup

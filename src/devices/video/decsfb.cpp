@@ -26,7 +26,6 @@
 #define MODE_TRANSPARENTLINE    6
 #define MODE_COPY       7
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_REG     (1U << 1)
 #define LOG_IRQ     (1U << 2)
 

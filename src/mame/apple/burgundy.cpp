@@ -11,8 +11,7 @@
 #include "emu.h"
 #include "burgundy.h"
 
-#define LOG_GENERAL (1U << 0)
-#define LOG_REGISTERS (1U << 0)
+#define LOG_REGISTERS (1U << 1)
 
 #define VERBOSE (0)
 #include "logmacro.h"
@@ -146,12 +145,12 @@ void burgundy_device::write_macrisc(offs_t offset, uint32_t data)
 				{
 					if ((m_registers[0x60] & 6) != 0)
 					{
-						LOGMASKED(LOG_GENERAL, "%s: Playback enabled\n", tag());
+						LOG("%s: Playback enabled\n", tag());
 						m_active |= ACTIVE_OUT;
 					}
 					else
 					{
-						LOGMASKED(LOG_GENERAL, "%s: Playback disabled\n", tag());
+						LOG("%s: Playback disabled\n", tag());
 						m_active &= ~ACTIVE_OUT;
 					}
 				}

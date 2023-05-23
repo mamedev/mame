@@ -47,8 +47,11 @@
 #include "emu.h"
 #include "apple3.h"
 
-#define LOG_MEMORY      0
-#define LOG_INDXADDR    0
+#define LOG_MEMORY   (1U << 1)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
 
 #define ENV_SLOWSPEED   (0x80)
 #define ENV_IOENABLE    (0x40)
@@ -527,10 +530,7 @@ void apple3_state::apple3_update_memory()
 	uint16_t bank;
 	uint8_t page;
 
-	if (LOG_MEMORY)
-	{
-		logerror("apple3_update_memory(): via_0_b=0x%02x via_1_a=0x0x%02x\n", m_via_0_b, m_via_1_a);
-	}
+	LOGMASKED(LOG_MEMORY, "apple3_update_memory(): via_0_b=0x%02x via_1_a=0x0x%02x\n", m_via_0_b, m_via_1_a);
 
 	m_maincpu->set_unscaled_clock(((m_via_0_a & ENV_SLOWSPEED) ? APPLE2_CLOCK : (14.318181_MHz_XTAL / 7)), true);
 

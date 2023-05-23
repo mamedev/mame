@@ -25,7 +25,7 @@
 
 
 // configurable logging
-#define LOG_REGS     (1U <<  1)
+#define LOG_REGS     (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_REGS)
 

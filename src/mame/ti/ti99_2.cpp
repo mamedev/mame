@@ -174,9 +174,9 @@
 #define TI992_ROM          "rom_region"
 #define TI992_SCREEN_TAG   "screen"
 
-#define LOG_WARN           (1U<<1)   // Warnings
-#define LOG_CRU            (1U<<2)   // CRU activities
-#define LOG_SIGNALS        (1U<<3)   // Signals like HOLD/HOLDA
+#define LOG_WARN           (1U << 1)   // Warnings
+#define LOG_CRU            (1U << 2)   // CRU activities
+#define LOG_SIGNALS        (1U << 3)   // Signals like HOLD/HOLDA
 
 // Minimum log should be config and warnings
 #define VERBOSE ( LOG_GENERAL | LOG_WARN )

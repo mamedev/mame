@@ -7,7 +7,7 @@
 
 #include "screen.h"
 
-#define LOG_DEBUG     (1U <<  1)
+#define LOG_DEBUG     (1U << 1)
 
 //#define VERBOSE (LOG_DEBUG)
 #include "logmacro.h"

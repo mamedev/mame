@@ -40,15 +40,15 @@
 #include "screen.h"
 #include "speaker.h"
 
-#define LOG_UNKNOWN (1 << 0)
-#define LOG_FTLB    (1 << 1)
-#define LOG_IRQS    (1 << 2)
-#define LOG_INTC    (1 << 3)
-#define LOG_TIMER   (1 << 4)
-#define LOG_CLOCK   (1 << 5)
-#define LOG_RTC     (1 << 6)
-#define LOG_LCD     (1 << 7)
-#define LOG_AUDIO   (1 << 8)
+#define LOG_UNKNOWN (1U << 1)
+#define LOG_FTLB    (1U << 2)
+#define LOG_IRQS    (1U << 3)
+#define LOG_INTC    (1U << 4)
+#define LOG_TIMER   (1U << 5)
+#define LOG_CLOCK   (1U << 6)
+#define LOG_RTC     (1U << 7)
+#define LOG_LCD     (1U << 8)
+#define LOG_AUDIO   (1U << 9)
 #define LOG_ALL     (LOG_UNKNOWN | LOG_FTLB | LOG_IRQS | LOG_INTC | LOG_TIMER | LOG_CLOCK | LOG_RTC | LOG_LCD | LOG_AUDIO)
 #define LOG_DEFAULT LOG_ALL
 

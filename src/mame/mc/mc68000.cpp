@@ -42,7 +42,6 @@
 #include "screen.h"
 
 
-//#define LOG_GENERAL  (1U << 0)
 #define LOG_IO_READ  (1U << 1)
 #define LOG_IO_WRITE (1U << 2)
 

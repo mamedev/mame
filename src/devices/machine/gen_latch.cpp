@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "gen_latch.h"
 
-#define LOG_WARN (1U << 0)
+#define LOG_WARN (1U << 1)
 #define VERBOSE (LOG_WARN)
 
 #include "logmacro.h"

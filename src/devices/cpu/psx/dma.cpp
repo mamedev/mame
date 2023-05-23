@@ -10,8 +10,7 @@
 #include "emu.h"
 #include "dma.h"
 
-//#define LOG_GENERAL (1U << 0)
-#define LOG_CONTROL (1U << 1)
+#define LOG_CONTROL   (1U << 1)
 #define LOG_INTERRUPT (1U << 2)
 
 #define VERBOSE (0)

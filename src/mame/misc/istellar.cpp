@@ -33,7 +33,7 @@ Todo:
 
 
 // configurable logging
-#define LOG_CPU2     (1U <<  1)
+#define LOG_CPU2     (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_CPU2)
 

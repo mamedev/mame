@@ -101,9 +101,12 @@
 #include "bus/ata/ataintf.h"
 #include "bus/lpci/pci.h"
 
-#define LOG_CPUIMASK    1
-#define LOG_UART        1
-#define LOG_INTERRUPTS  1
+#define LOG_CPUIMASK   (1U << 1)
+#define LOG_INTERRUPTS (1U << 2)
+
+#define VERBOSE (LOG_CPUIMASK | LOG_INTERRUPTS)
+#include "logmacro.h"
+
 
 /*************************************
  *
@@ -151,11 +154,8 @@ void bebox_state::bebox_cpu0_imask_w(offs_t offset, uint64_t data, uint64_t mem_
 
 	if (old_imask != m_cpu_imask[0])
 	{
-		if (LOG_CPUIMASK)
-		{
-			logerror("%s BeBox CPU #0 imask=0x%08x\n",
-				machine().describe_context(), m_cpu_imask[0]);
-		}
+		LOGMASKED(LOG_CPUIMASK, "%s BeBox CPU #0 imask=0x%08x\n",
+			machine().describe_context(), m_cpu_imask[0]);
 		bebox_update_interrupts();
 	}
 }
@@ -168,11 +168,8 @@ void bebox_state::bebox_cpu1_imask_w(offs_t offset, uint64_t data, uint64_t mem_
 
 	if (old_imask != m_cpu_imask[1])
 	{
-		if (LOG_CPUIMASK)
-		{
-			logerror("%s BeBox CPU #1 imask=0x%08x\n",
-				machine().describe_context(), m_cpu_imask[1]);
-		}
+		LOGMASKED(LOG_CPUIMASK, "%s BeBox CPU #1 imask=0x%08x\n",
+			machine().describe_context(), m_cpu_imask[1]);
 		bebox_update_interrupts();
 	}
 }
@@ -220,14 +217,9 @@ void bebox_state::bebox_crossproc_interrupts_w(offs_t offset, uint64_t data, uin
 			else
 				line = crossproc_map[i].active_high ? CLEAR_LINE : ASSERT_LINE;
 
-			if (LOG_INTERRUPTS)
-			{
-/*
-                logerror("bebox_crossproc_interrupts_w(): CPU #%d %s %s\n",
-                    crossproc_map[i].cpunum, line ? "Asserting" : "Clearing",
-                    (crossproc_map[i].inputline == PPC_INPUT_LINE_SMI) ? "SMI" : "TLBISYNC");
-                    */
-			}
+			LOGMASKED(LOG_INTERRUPTS, "bebox_crossproc_interrupts_w(): CPU #%d %s %s\n",
+				crossproc_map[i].cpunum, line ? "Asserting" : "Clearing",
+				(crossproc_map[i].inputline == 0/*PPC_INPUT_LINE_SMI*/) ? "SMI" : "TLBISYNC");
 
 			m_ppc[crossproc_map[i].cpunum]->set_input_line(crossproc_map[i].inputline, line);
 		}
@@ -253,11 +245,8 @@ void bebox_state::bebox_update_interrupts()
 	{
 		interrupt = m_interrupts & m_cpu_imask[cpunum];
 
-		if (LOG_INTERRUPTS)
-		{
-			logerror("\tbebox_update_interrupts(): CPU #%d [%08X|%08X] IRQ %s\n", cpunum,
-				m_interrupts, m_cpu_imask[cpunum], interrupt ? "on" : "off");
-		}
+		LOGMASKED(LOG_INTERRUPTS, "\tbebox_update_interrupts(): CPU #%d [%08X|%08X] IRQ %s\n", cpunum,
+			m_interrupts, m_cpu_imask[cpunum], interrupt ? "on" : "off");
 
 		m_ppc[cpunum]->set_input_line(INPUT_LINE_IRQ0, interrupt ? ASSERT_LINE : CLEAR_LINE);
 	}
@@ -303,18 +292,15 @@ void bebox_state::bebox_set_irq_bit(unsigned int interrupt_bit, int val)
 	};
 	uint32_t old_interrupts;
 
-	if (LOG_INTERRUPTS)
-	{
-		/* make sure that we don't shoot ourself in the foot */
-		if ((interrupt_bit >= std::size(interrupt_names)) || !interrupt_names[interrupt_bit])
-			throw emu_fatalerror("bebox_state::bebox_set_irq_bit: Raising invalid interrupt");
+	/* make sure that we don't shoot ourself in the foot */
+	if ((interrupt_bit >= std::size(interrupt_names)) || !interrupt_names[interrupt_bit])
+		throw emu_fatalerror("bebox_state::bebox_set_irq_bit: Raising invalid interrupt");
 
-		logerror("bebox_set_irq_bit(): pc[0]=0x%08x pc[1]=0x%08x %s interrupt #%u (%s)\n",
-			unsigned(m_ppc[0]->pc()),
-			unsigned(m_ppc[1]->pc()),
-			val ? "Asserting" : "Clearing",
-			interrupt_bit, interrupt_names[interrupt_bit]);
-	}
+	LOGMASKED(LOG_INTERRUPTS, "bebox_set_irq_bit(): pc[0]=0x%08x pc[1]=0x%08x %s interrupt #%u (%s)\n",
+		unsigned(m_ppc[0]->pc()),
+		unsigned(m_ppc[1]->pc()),
+		val ? "Asserting" : "Clearing",
+		interrupt_bit, interrupt_names[interrupt_bit]);
 
 	old_interrupts = m_interrupts;
 	if (val)

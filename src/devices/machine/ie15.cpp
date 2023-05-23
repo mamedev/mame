@@ -19,7 +19,6 @@
 #include "ie15.lh"
 
 
-//#define LOG_GENERAL (1U << 0) //defined in logmacro.h already
 #define LOG_RAM      (1U << 1)
 #define LOG_CPU      (1U << 2)
 #define LOG_KBD      (1U << 3)

@@ -20,11 +20,10 @@
  * Configurable logging
  ****************************************************************************/
 
-#define LOG_GENERAL (1U <<  0)
-#define LOG_INT     (1U <<  1)
-#define LOG_IOPORT  (1U <<  2)
-#define LOG_TIMER   (1U <<  3)
-#define LOG_EPROM   (1U <<  4)
+#define LOG_INT     (1U << 1)
+#define LOG_IOPORT  (1U << 2)
+#define LOG_TIMER   (1U << 3)
+#define LOG_EPROM   (1U << 4)
 
 //#define VERBOSE (LOG_GENERAL | LOG_IOPORT | LOG_TIMER | LOG_EPROM)
 //#define LOG_OUTPUT_FUNC printf

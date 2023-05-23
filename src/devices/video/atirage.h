@@ -21,6 +21,8 @@ public:
 	auto gpio_get_cb() { return read_gpio.bind(); }
 	auto gpio_set_cb() { return write_gpio.bind(); }
 
+	void set_gpio_pullups(u16 pullups) { m_gpio_pullups = pullups; }
+
 protected:
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -38,14 +40,15 @@ protected:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
-	devcb_read32 read_gpio;
-	devcb_write32 write_gpio;
+	devcb_read16 read_gpio;
+	devcb_write16 write_gpio;
 
 	u32 m_user_cfg;
 	u32 m_hres, m_vres, m_htotal, m_vtotal, m_format, m_pixel_clock;
 	u8 m_dac_windex, m_dac_rindex, m_dac_state, m_dac_mask;
 	u32 m_dac_colors[256];
 	u8 m_pll_regs[16];
+	u16 m_gpio_pullups;
 
 	u8 regs_0_read(offs_t offset);
 	void regs_0_write(offs_t offset, u8 data);

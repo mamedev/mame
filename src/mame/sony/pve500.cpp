@@ -41,9 +41,6 @@
    * Initial driver skeleton
 */
 
-#define LOG_7SEG_DISPLAY_SIGNALS 0
-#define DEBUGGING_INDUCE_SELFDIAGNOSE 0
-
 #include "emu.h"
 #include "bus/rs232/rs232.h" /* actually meant to be RS422 ports */
 #include "cpu/mb88xx/mb88xx.h"
@@ -58,8 +55,15 @@
 
 #include "pve500.lh"
 
+#define LOG_7SEG_DISPLAY_SIGNALS (1U << 1)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
 
 namespace {
+
+#define DEBUGGING_INDUCE_SELFDIAGNOSE 0
 
 #define IO_EXPANDER_PORTA 0
 #define IO_EXPANDER_PORTB 1
@@ -318,9 +322,7 @@ void pve500_state::io_sc_w(uint8_t data)
 {
 	const int swap[4] = {2,1,0,3};
 
-#if LOG_7SEG_DISPLAY_SIGNALS
-	printf("CXD1095 PORTA (io_SC=%02X)\n", data);
-#endif
+	LOGMASKED(LOG_7SEG_DISPLAY_SIGNALS, "CXD1095 PORTA (io_SC=%02X)\n", data);
 	io_SC = data;
 
 	for (int j=0; j<8; j++){
@@ -337,25 +339,19 @@ void pve500_state::io_sc_w(uint8_t data)
 
 void pve500_state::io_le_w(uint8_t data)
 {
-#if LOG_7SEG_DISPLAY_SIGNALS
-	printf("CXD1095 PORTB (io_LE=%02X)\n", data);
-#endif
+	LOGMASKED(LOG_7SEG_DISPLAY_SIGNALS, "CXD1095 PORTB (io_LE=%02X)\n", data);
 	io_LE = data;
 }
 
 void pve500_state::io_ld_w(uint8_t data)
 {
-#if LOG_7SEG_DISPLAY_SIGNALS
-	printf("CXD1095 PORTD (io_LD=%02X)\n", data);
-#endif
+	LOGMASKED(LOG_7SEG_DISPLAY_SIGNALS, "CXD1095 PORTD (io_LD=%02X)\n", data);
 	io_LD = data;
 }
 
 void pve500_state::io_sel_w(uint8_t data)
 {
-#if LOG_7SEG_DISPLAY_SIGNALS
-	printf("CXD1095 PORTE (io_SEL=%02X)\n", data);
-#endif
+	LOGMASKED(LOG_7SEG_DISPLAY_SIGNALS, "CXD1095 PORTE (io_SEL=%02X)\n", data);
 	io_SEL = data;
 	for (int i=0; i<4; i++){
 		if (BIT(io_SEL, i)){

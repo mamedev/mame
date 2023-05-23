@@ -14,7 +14,6 @@
 #include "m88000.h"
 #include "m88000d.h"
 
-#define LOG_GENERAL   (1U << 0)
 #define LOG_EXCEPTION (1U << 1)
 
 //#define VERBOSE       (LOG_GENERAL|LOG_EXCEPTION)

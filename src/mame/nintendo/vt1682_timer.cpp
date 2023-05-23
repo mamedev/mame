@@ -7,11 +7,11 @@
 #include "emu.h"
 #include "vt1682_timer.h"
 
-#define LOG_TIMER     (1U << 1)
+#define LOG_TIMER   (1U << 1)
 
-#define LOG_ALL           ( LOG_TIMER )
+#define LOG_ALL     (LOG_TIMER)
 
-#define VERBOSE             (LOG_TIMER)
+#define VERBOSE     (LOG_TIMER)
 #include "logmacro.h"
 
 // NOTE, system timer base clock can also be changed with "0x210B TSYNEN"

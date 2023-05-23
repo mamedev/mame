@@ -425,12 +425,11 @@ Notes: (all ICs shown)
 
 #include "pnchmn.lh"
 
-#define LOG_GENERAL  (1 << 0)
-#define LOG_CDROM    (1 << 1)
-#define LOG_CONTROL  (1 << 2)
-#define LOG_SECURITY (1 << 3)
-#define LOG_JVS      (1 << 4)
-#define LOG_IOBOARD  (1 << 5)
+#define LOG_CDROM    (1U << 1)
+#define LOG_CONTROL  (1U << 2)
+#define LOG_SECURITY (1U << 3)
+#define LOG_JVS      (1U << 4)
+#define LOG_IOBOARD  (1U << 5)
 // #define VERBOSE      (LOG_GENERAL | LOG_CDROM | LOG_CONTROL | LOG_SECURITY | LOG_JVS | LOG_IOBOARD)
 // #define LOG_OUTPUT_STREAM std::cout
 

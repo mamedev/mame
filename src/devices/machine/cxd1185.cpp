@@ -16,7 +16,6 @@
 #include "emu.h"
 #include "cxd1185.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_CMD     (1U << 1)
 #define LOG_REG     (1U << 2)
 #define LOG_STATE   (1U << 3)
@@ -902,7 +901,7 @@ void cxd1185_device::port_w(u8 data)
 {
 	u8 const mask = ~(PCN | ((m_ioport & PCN) >> 4));
 
-	LOGMASKED(LOG_GENERAL, "port_w 0x%02x mask 0x%02x\n", data, mask);
+	LOG("port_w 0x%02x mask 0x%02x\n", data, mask);
 
 	m_ioport &= ~mask;
 	m_ioport |= data & mask;

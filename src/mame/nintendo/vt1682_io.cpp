@@ -4,11 +4,11 @@
 #include "emu.h"
 #include "vt1682_io.h"
 
-#define LOG_IO     (1U << 1)
+#define LOG_IO      (1U << 1)
 
-#define LOG_ALL           ( LOG_IO )
+#define LOG_ALL     (LOG_IO)
 
-#define VERBOSE             (0)
+#define VERBOSE     (0)
 #include "logmacro.h"
 
 
