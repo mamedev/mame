@@ -1,9 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
 /*
- * svga_trident.c
+ * svga_trident.cpp
  *
  *  Created on: 6/09/2014
+ *
+ * TODO:
+ * - this is a PCI card, not ISA!
+ * \- the only client is pc/calchase.cpp, which at the time of this writing uses legacy PCI bus;
+ *
  */
 
 #include "emu.h"
