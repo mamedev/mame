@@ -28099,13 +28099,13 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 		</part>
 	</software>
 
-	<software name="debagame" supported="partial">
-		<description>Debagame Tester: Second Impact (Ver 10.24)</description>
+	<software name="debucame" supported="partial">
+		<description>Debug Camera Tester: Second Impact (Ver 10.24)</description>
 		<!-- S/N PP00000897 -->
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="GBD-IMPACT8M" />
-		<info name="alt_title" value="デバガメテスター SECOND IMPACT Ver10.24" />
+		<info name="alt_title" value="デバガメテスター: Second Impact" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="MGB-MGBD-X2" />
 			<feature name="u1" value="U1 [MAC-GBD 9744 S]" />
