@@ -4108,6 +4108,8 @@ end
 ---------------------------------------------------
 if (BUSES["EPSON_QX"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/epson_qx/cqgmem.cpp",
+		MAME_DIR .. "src/devices/bus/epson_qx/cqgmem.h",
 		MAME_DIR .. "src/devices/bus/epson_qx/cr1510.cpp",
 		MAME_DIR .. "src/devices/bus/epson_qx/cr1510.h",
 		MAME_DIR .. "src/devices/bus/epson_qx/ide.cpp",
