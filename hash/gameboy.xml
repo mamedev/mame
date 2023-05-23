@@ -28099,7 +28099,7 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 		</part>
 	</software>
 
-	<software name="debugcam" supported="partial">
+	<software name="debucame" supported="partial">
 		<description>Debug Camera Tester: Second Impact (Ver 10.24)</description>
 		<!-- S/N PP00000897 -->
 		<year>1997</year>
