@@ -22,6 +22,8 @@ tsconfdma_device::tsconfdma_device(const machine_config &mconfig, const char *ta
 
 void tsconfdma_device::device_start()
 {
+	m_dma_clock = timer_alloc(FUNC(tsconfdma_device::dma_clock), this);
+
 	m_in_mreq_cb.resolve_safe(0);
 	m_out_mreq_cb.resolve_safe();
 	m_in_mspi_cb.resolve_safe(0);
@@ -37,10 +39,14 @@ void tsconfdma_device::device_start()
 	save_item(NAME(m_align_s));
 	save_item(NAME(m_align_d));
 	save_item(NAME(m_align));
+	save_item(NAME(m_asz));
+	save_item(NAME(m_task));
 }
 
 void tsconfdma_device::device_reset()
 {
+	m_dma_clock->adjust(attotime::never);
+
 	m_block_num = 0;
 	m_ready = ASSERT_LINE;
 }
@@ -52,32 +58,32 @@ int tsconfdma_device::is_ready()
 
 void tsconfdma_device::set_saddr_l(u8 addr_l)
 {
-	m_address_s = (m_address_s & 0xffffff00) | (addr_l & 0xfe);
+	m_address_s = (m_address_s & 0x3fff00) | (addr_l & 0xfe);
 }
 
 void tsconfdma_device::set_saddr_h(u8 addr_h)
 {
-	m_address_s = (m_address_s & 0xffffc0ff) | ((addr_h & 0x3f) << 8);
+	m_address_s = (m_address_s & 0x3fc0ff) | ((addr_h & 0x3f) << 8);
 }
 
 void tsconfdma_device::set_saddr_x(u8 addr_x)
 {
-	m_address_s = (m_address_s & 0x0003fff) | (addr_x << 14);
+	m_address_s = (m_address_s & 0x003fff) | (addr_x << 14);
 }
 
 void tsconfdma_device::set_daddr_l(u8 addr_l)
 {
-	m_address_d = (m_address_d & 0xffffff00) | (addr_l & 0xfe);
+	m_address_d = (m_address_d & 0x3fff00) | (addr_l & 0xfe);
 }
 
 void tsconfdma_device::set_daddr_h(u8 addr_h)
 {
-	m_address_d = (m_address_d & 0xffffc0ff) | ((addr_h & 0x3f) << 8);
+	m_address_d = (m_address_d & 0x3fc0ff) | ((addr_h & 0x3f) << 8);
 }
 
 void tsconfdma_device::set_daddr_x(u8 addr_x)
 {
-	m_address_d = (m_address_d & 0x0003fff) | (addr_x << 14);
+	m_address_d = (m_address_d & 0x003fff) | (addr_x << 14);
 }
 
 void tsconfdma_device::set_block_len(u8 len)
@@ -99,11 +105,20 @@ void tsconfdma_device::set_block_num_h(u8 num_h)
 
 void tsconfdma_device::start_tx(u8 dev, bool s_align, bool d_align, bool align_opt)
 {
+	m_task = dev;
+	m_align_s = s_align;
+	m_align_d = d_align;
+	m_asz = align_opt;
+	m_align = m_asz ? 512 : 256;
 	m_ready = CLEAR_LINE;
-	m_align = align_opt ? 512 : 256;
 
 	// TODO Transfers 2 byte/cycle at 7MHz
-	switch (dev)
+	m_dma_clock->adjust(attotime::from_ticks(m_block_num + 1, 7_MHz_XTAL));
+}
+
+TIMER_CALLBACK_MEMBER(tsconfdma_device::dma_clock)
+{
+	switch (m_task)
 	{
 	case 0b0001: // Mem -> Mem
 		for (u16 block = 0; block <= m_block_num; block++)
@@ -113,11 +128,11 @@ void tsconfdma_device::start_tx(u8 dev, bool s_align, bool d_align, bool align_o
 			for (u16 len = 0; len <= m_block_len; len++)
 			{
 				m_out_mreq_cb(d_addr, m_in_mreq_cb(s_addr));
-				s_addr += 2;
-				d_addr += 2;
+				s_addr = (s_addr + 2) & 0x3fffff;
+				d_addr = (d_addr + 2) & 0x3fffff;
 			}
-			m_address_s = s_align ? (m_address_s + m_align) : s_addr;
-			m_address_d = d_align ? (m_address_d + m_align) : d_addr;
+			m_address_s = m_align_s ? (m_address_s + m_align) : s_addr;
+			m_address_d = m_align_d ? (m_address_d + m_align) : d_addr;
 		}
 		break;
 
@@ -127,10 +142,12 @@ void tsconfdma_device::start_tx(u8 dev, bool s_align, bool d_align, bool align_o
 			auto d_addr = m_address_d;
 			for (u16 len = 0; len <= m_block_len; len++)
 			{
+				if (d_addr == 3801154)
+					printf("!");
 				m_out_mreq_cb(d_addr, m_in_mspi_cb());
-				d_addr += 2;
+				d_addr = (d_addr + 2) & 0x3fffff;
 			}
-			m_address_d = d_align ? (m_address_d + m_align) : d_addr;
+			m_address_d = m_align_d ? (m_address_d + m_align) : d_addr;
 		}
 		break;
 
@@ -142,9 +159,9 @@ void tsconfdma_device::start_tx(u8 dev, bool s_align, bool d_align, bool align_o
 			for (u16 len = 0; len <= m_block_len; len++)
 			{
 				m_out_mreq_cb(d_addr, data);
-				d_addr += 2;
+				d_addr = (d_addr + 2) & 0x3fffff;
 			}
-			m_address_d = d_align ? (m_address_d + m_align) : d_addr;
+			m_address_d = m_align_d ? (m_address_d + m_align) : d_addr;
 		}
 		break;
 
@@ -157,7 +174,7 @@ void tsconfdma_device::start_tx(u8 dev, bool s_align, bool d_align, bool align_o
 			{
 				u16 d_val = m_in_mreq_cb(d_addr);
 				u16 s_val = m_in_mreq_cb(s_addr);
-				if (align_opt)
+				if (m_asz)
 				{
 					d_val = (d_val & 0xff00) | (((s_val & 0x00ff) ? s_val : d_val) & 0x00ff);
 					d_val = (d_val & 0x00ff) | (((s_val & 0xff00) ? s_val : d_val) & 0xff00);
@@ -170,11 +187,11 @@ void tsconfdma_device::start_tx(u8 dev, bool s_align, bool d_align, bool align_o
 					d_val = (d_val & 0x0fff) | (((s_val & 0xf000) ? s_val : d_val) & 0xf000);
 				}
 				m_out_mreq_cb(d_addr, d_val);
-				s_addr += 2;
-				d_addr += 2;
+				s_addr = (s_addr + 2) & 0x3fffff;
+				d_addr = (d_addr + 2) & 0x3fffff;
 			}
-			m_address_s = s_align ? (m_address_s + m_align) : s_addr;
-			m_address_d = d_align ? (m_address_d + m_align) : d_addr;
+			m_address_s = m_align_s ? (m_address_s + m_align) : s_addr;
+			m_address_d = m_align_d ? (m_address_d + m_align) : d_addr;
 		}
 		break;
 
@@ -186,11 +203,11 @@ void tsconfdma_device::start_tx(u8 dev, bool s_align, bool d_align, bool align_o
 			for (u16 len = 0; len <= m_block_len; len++)
 			{
 				m_out_cram_cb(d_addr, m_in_mreq_cb(s_addr));
-				s_addr += 2;
-				d_addr += 2;
+				s_addr = (s_addr + 2) & 0x3fffff;
+				d_addr = (d_addr + 2) & 0x3fffff;
 			}
-			m_address_s = s_align ? (m_address_s + m_align) : s_addr;
-			m_address_d = d_align ? (m_address_d + m_align) : d_addr;
+			m_address_s = m_align_s ? (m_address_s + m_align) : s_addr;
+			m_address_d = m_align_d ? (m_address_d + m_align) : d_addr;
 		}
 		break;
 
@@ -202,19 +219,20 @@ void tsconfdma_device::start_tx(u8 dev, bool s_align, bool d_align, bool align_o
 			for (u16 len = 0; len <= m_block_len; len++)
 			{
 				m_out_sfile_cb(d_addr, m_in_mreq_cb(s_addr));
-				s_addr += 2;
-				d_addr += 2;
+				s_addr = (s_addr + 2) & 0x3fffff;
+				d_addr = (d_addr + 2) & 0x3fffff;
 			}
-			m_address_s = s_align ? (m_address_s + m_align) : s_addr;
-			m_address_d = d_align ? (m_address_d + m_align) : d_addr;
+			m_address_s = m_align_s ? (m_address_s + m_align) : s_addr;
+			m_address_d = m_align_d ? (m_address_d + m_align) : d_addr;
 		}
 		break;
 
 	default:
-		logerror("'tsdma': TX %02X: %06X (%02X:%04X) -> %06X\n", dev, m_address_s, m_block_len, m_block_num, m_address_d);
+		logerror("'tsdma': TX %02X: %06X (%02X:%04X) -> %06X\n", m_task, m_address_s, m_block_len, m_block_num, m_address_d);
 		break;
 	}
 
+	m_dma_clock->adjust(attotime::never);
 	m_ready = ASSERT_LINE;
 	m_on_ready_cb(0);
 }

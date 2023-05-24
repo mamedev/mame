@@ -36,7 +36,7 @@ public:
 	void set_block_num_h(uint8_t num_h);
 	void start_tx(uint8_t dev, bool s_align, bool d_align, bool blitting_opt);
 
-private:
+protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -47,14 +47,21 @@ private:
 	devcb_write16 m_out_sfile_cb;
 	devcb_write_line m_on_ready_cb;
 
+private:
+	TIMER_CALLBACK_MEMBER(dma_clock);
+
 	u8 m_ready;
 
 	offs_t m_address_s;
 	offs_t m_address_d;
 	u8 m_block_len;
 	u16 m_block_num;
+
+	emu_timer *m_dma_clock;
+	u8 m_task;
 	bool m_align_s;
 	bool m_align_d;
+	bool m_asz;
 	u16 m_align;
 };
 

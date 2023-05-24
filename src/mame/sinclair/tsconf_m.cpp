@@ -162,7 +162,7 @@ void tsconf_state::spectrum_update_screen(screen_device &screen, bitmap_ind16 &b
 void tsconf_state::tsconf_UpdateZxScreenBitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u8 pal_offset = m_regs[PAL_SEL] << 4;
-	u8 *screen_location = m_ram->pointer() + PAGE4K(BIT(m_port_7ffd_data, 3) ? 7 : 5);
+	u8 *screen_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE]);
 	u8 *attrs_location = screen_location + 0x1800;
 	bool invert_attrs = u64(screen.frame_number() / m_frame_invert_count) & 1;
 	for (u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
@@ -384,7 +384,8 @@ void tsconf_state::ram_write16(offs_t offset, u16 data)
 
 u16 tsconf_state::spi_read16()
 {
-	return (tsconf_port_57_zctr_r(0) << 8) | tsconf_port_57_zctr_r(0);
+	const u16 data_hi = tsconf_port_57_zctr_r() << 8;
+	return data_hi | tsconf_port_57_zctr_r();
 }
 
 void tsconf_state::cram_write(u16 offset, u8 data)
@@ -418,7 +419,6 @@ u8 tsconf_state::tsconf_port_xx1f_r(offs_t offset) {
 void tsconf_state::tsconf_port_7ffd_w(u8 data)
 {
 	// LOCK? BIT(data, 5);
-	m_port_7ffd_data = data;
 	u8 page3 = (m_regs[PAGE3] & ~0x07) | BIT(data, 0, 3); // 128K: 0..2 -> 0..2
 	switch (BIT(m_regs[MEM_CONFIG], 6, 2))
 	{
@@ -433,6 +433,7 @@ void tsconf_state::tsconf_port_7ffd_w(u8 data)
 	}
 	tsconf_port_xxaf_w(PAGE3 << 8, page3);
 	tsconf_port_xxaf_w(MEM_CONFIG << 8, (m_regs[MEM_CONFIG] & 0xfe) | BIT(data, 4)); // ROM128
+	tsconf_port_xxaf_w(V_PAGE << 8, BIT(data, 3) ? 7 : 5);
 }
 
 void tsconf_state::tsconf_ula_w(offs_t offset, u8 data)
@@ -698,38 +699,38 @@ void tsconf_state::tsconf_port_f7_w(offs_t offset, u8 data)
 	}
 }
 
-void tsconf_state::tsconf_port_77_zctr_w(offs_t port, u8 data)
+void tsconf_state::tsconf_port_77_zctr_w(u8 data)
 {
 	m_sdcard->spi_ss_w(BIT(data, 0));
 	m_zctl_cs = BIT(data, 1);
 }
 
-u8 tsconf_state::tsconf_port_77_zctr_r(offs_t port)
+u8 tsconf_state::tsconf_port_77_zctr_r()
 {
 	return 0x02 | (m_sdcard->get_card_present() ? 0x00 : 0x01);
 }
 
-void tsconf_state::tsconf_port_57_zctr_w(offs_t port, u8 data)
+void tsconf_state::tsconf_port_57_zctr_w(u8 data)
 {
 	if (!m_zctl_cs)
 	{
 		for (u8 m = 0x80; m; m >>= 1)
 		{
-			m_sdcard->spi_clock_w(CLEAR_LINE); // 0-S R
 			m_sdcard->spi_mosi_w(data & m ? 1 : 0);
+			m_sdcard->spi_clock_w(CLEAR_LINE); // 0-S R
 			m_sdcard->spi_clock_w(ASSERT_LINE); // 1-L W
 		}
 	}
 }
 
-u8 tsconf_state::tsconf_port_57_zctr_r(offs_t port)
+u8 tsconf_state::tsconf_port_57_zctr_r()
 {
 	if (m_zctl_cs)
 		return 0xff;
 
 	u8 data = m_zctl_di;
 	if (!machine().side_effects_disabled())
-		tsconf_port_57_zctr_w(0, 0xff);
+		tsconf_port_57_zctr_w(0xff);
 
 	return data;
 }
