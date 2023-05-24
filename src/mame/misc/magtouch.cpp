@@ -214,8 +214,12 @@ void magtouch_state::magtouch(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	/* video hardware */
-	pcvideo_trident_vga(config);
-	tvga9000_device &vga(TVGA9000_VGA(config.replace(), "vga", 0));
+	// TODO: map to ISA bus
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
+	screen.set_screen_update("vga", FUNC(tvga9000_device::screen_update));
+
+	tvga9000_device &vga(TVGA9000_VGA(config, "vga", 0));
 	vga.set_screen("screen");
 	vga.set_vram_size(0x200000);
 

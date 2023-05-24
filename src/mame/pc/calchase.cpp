@@ -682,9 +682,6 @@ void calchase_state::calchase(machine_config &config)
 	pcibus.set_device(0, FUNC(calchase_state::intel82439tx_pci_r), FUNC(calchase_state::intel82439tx_pci_w));
 	pcibus.set_device(7, FUNC(calchase_state::intel82371ab_pci_r), FUNC(calchase_state::intel82371ab_pci_w));
 
-	/* video hardware */
-	//pcvideo_trident_vga(config);
-
 	// FIXME: determine ISA bus clock
 	isa16_device &isa(ISA16(config, "isa", 0));
 	isa.set_memspace("maincpu", AS_PROGRAM);
