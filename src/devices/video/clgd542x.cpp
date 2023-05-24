@@ -1153,28 +1153,17 @@ void cirrus_gd5428_device::cirrus_crtc_reg_write(uint8_t index, uint8_t data)
 
 }
 
-inline uint8_t cirrus_gd5428_device::cirrus_vga_latch_write(int offs, uint8_t data)
+uint8_t cirrus_gd5428_device::vga_latch_write(int offs, uint8_t data)
 {
 	uint8_t res = 0;
 	uint8_t mode_mask = (gc_mode_ext & 0x04) ? 0x07 : 0x03;
 
 	switch (vga.gc.write_mode & mode_mask) {
 	case 0:
-		data = rotate_right(data);
-		if(vga.gc.enable_set_reset & 1<<offs)
-			res = vga_logical_op((vga.gc.set_reset & 1<<offs) ? vga.gc.bit_mask : 0, offs,vga.gc.bit_mask);
-		else
-			res = vga_logical_op(data, offs, vga.gc.bit_mask);
-		break;
 	case 1:
-		res = vga.gc.latch[offs];
-		break;
 	case 2:
-		res = vga_logical_op((data & 1<<offs) ? 0xff : 0x00,offs,vga.gc.bit_mask);
-		break;
 	case 3:
-		data = rotate_right(data);
-		res = vga_logical_op((vga.gc.set_reset & 1<<offs) ? 0xff : 0x00,offs,data&vga.gc.bit_mask);
+		res = vga_device::vga_latch_write(offs, data);
 		break;
 	case 4:
 		res = vga.gc.latch[offs];
@@ -1493,11 +1482,11 @@ void cirrus_gd5428_device::mem_w(offs_t offset, uint8_t data)
 				{
 					if(gc_mode_ext & 0x02)
 					{
-						vga.memory[(((offset+addr) << 1)+i*0x10000) % vga.svga_intf.vram_size] = (vga.sequencer.data[4] & 4) ? cirrus_vga_latch_write(i,data) : data;
-						vga.memory[(((offset+addr) << 1)+i*0x10000+1) % vga.svga_intf.vram_size] = (vga.sequencer.data[4] & 4) ? cirrus_vga_latch_write(i,data) : data;
+						vga.memory[(((offset+addr) << 1)+i*0x10000) % vga.svga_intf.vram_size] = (vga.sequencer.data[4] & 4) ? vga_latch_write(i,data) : data;
+						vga.memory[(((offset+addr) << 1)+i*0x10000+1) % vga.svga_intf.vram_size] = (vga.sequencer.data[4] & 4) ? vga_latch_write(i,data) : data;
 					}
 					else
-						vga.memory[(((offset+addr))+i*0x10000) % vga.svga_intf.vram_size] = (vga.sequencer.data[4] & 4) ? cirrus_vga_latch_write(i,data) : data;
+						vga.memory[(((offset+addr))+i*0x10000) % vga.svga_intf.vram_size] = (vga.sequencer.data[4] & 4) ? vga_latch_write(i,data) : data;
 				}
 			}
 			return;

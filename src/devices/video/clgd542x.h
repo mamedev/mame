@@ -86,7 +86,7 @@ protected:
 	uint8_t m_vclk_num[4];
 	uint8_t m_vclk_denom[4];
 
-	inline uint8_t cirrus_vga_latch_write(int offs, uint8_t data);
+	virtual uint8_t vga_latch_write(int offs, uint8_t data) override;
 
 private:
 	void cirrus_define_video_mode();

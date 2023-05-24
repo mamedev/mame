@@ -1181,7 +1181,7 @@ uint32_t s3_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 /***************************************************************************/
 
-inline uint8_t vga_device::vga_latch_write(int offs, uint8_t data)
+uint8_t vga_device::vga_latch_write(int offs, uint8_t data)
 {
 	uint8_t res = 0;
 
