@@ -46,7 +46,6 @@ protected:
 	void pcvideo_trident_vga(machine_config &config);
 	void pcvideo_s3_vga(machine_config &config);
 	void pcvideo_cirrus_gd5428(machine_config &config);
-	void pcvideo_cirrus_gd5430(machine_config &config);
 
 	void pcat32_io_common(address_map &map);
 

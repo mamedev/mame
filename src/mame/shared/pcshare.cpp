@@ -187,18 +187,6 @@ void pcat_base_state::pcvideo_cirrus_gd5428(machine_config &config)
 
 }
 
-void pcat_base_state::pcvideo_cirrus_gd5430(machine_config &config)
-{
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
-	screen.set_screen_update("vga", FUNC(cirrus_gd5430_device::screen_update));
-
-	cirrus_gd5430_device &vga(CIRRUS_GD5430(config, "vga", 0));
-	vga.set_screen("screen");
-	vga.set_vram_size(0x200000);
-
-}
-
 void pcat_base_state::pcat_common(machine_config &config)
 {
 	PIC8259(config, m_pic8259_1, 0);

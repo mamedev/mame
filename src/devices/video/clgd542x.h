@@ -88,9 +88,6 @@ protected:
 
 	inline uint8_t cirrus_vga_latch_write(int offs, uint8_t data);
 
-	void pcvideo_cirrus_gd5428(machine_config &config);
-	void pcvideo_cirrus_gd5430(machine_config &config);
-
 private:
 	void cirrus_define_video_mode();
 	uint8_t cirrus_seq_reg_read(uint8_t index);
