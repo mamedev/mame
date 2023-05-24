@@ -8,7 +8,7 @@ license:CC0-1.0
 	ROMs dumped from RAM and marked as "bad dumps":
 		- Cumana DOS v2.0
 
-	TO DO: Most cartridges with two EPROMs have been dumped as one single ROM, such entries should be marked as "bad dump" until proper split dumps exist.
+	TO DO: Most cartridges with two EPROMs have been dumped as one single file, such entries should be marked as "bad dump" until proper split dumps exist.
 
 -->
 <softwarelist name="dragon_cart" description="Dragon cartridges">
