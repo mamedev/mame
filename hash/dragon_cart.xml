@@ -3,13 +3,13 @@
 <!--
 license:CC0-1.0
 
-Compiled by K1W1 and Cowering (from GoodCoCo)
+	Nearly all of the cartridges on this Dragon softwarelist will also run on the CoCo 2/3, CP400.
+	
+	ROMs dumped from RAM and marked as "bad dumps":
+		- Cumana DOS v2.0
 
-  * Nearly all of the cartridges on this Dragon softwarelist will also run on the CoCo 2/3, CP400.
+	TO DO: Most cartridges with two EPROMs have been dumped as one single ROM, such entries should be marked as "bad dump" until proper split dumps exist.
 
-  * These ROMs appear to have been dumped from RAM and have been marked as "Bad Dumps"
-
-    - Cumana DOS v2.0
 -->
 <softwarelist name="dragon_cart" description="Dragon cartridges">
 
@@ -163,15 +163,21 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 	</software>
 
 	<software name="cyrus">
-		<description>Cyrus Chess</description>
+		<description>Cyrus</description>
 		<year>1982</year>
 		<publisher>Dragon Data</publisher>
 		<info name="developer" value="Intelligent Software" />
 		<info name="author" value="David Levy &amp; Richard Lang" />
 		<info name="serial" value="A0108" />
+		<info name="alt_title" value="Cyrus Chess Program (manual)" />
+		<info name="alt_title" value="Chess (cartridge, box)" />
 		<part name="cart" interface="coco_cart">
+			<feature name="pcb" value="21-83"/>
+			<feature name="ic1" value="TMS 2532JL-45 MEP8332"/>
+			<feature name="ic2" value="TMS 2532JL-45 MEP8332"/>
 			<dataarea name="rom" size="8192">
-				<rom name="cyrus chess (1982)(a0108)(dragon data).rom" size="8192" crc="d4c36a96" sha1="953f35586b0fc7c5b1f5ccb9fd20e0e6e1041d9c"/>
+				<rom name="0.ic1" size="4096" crc="6B452AC3" sha1="38f5c6804aa7c8c5ff791bfcfc01318449800fcd" offset="0x0000" />
+				<rom name="1.ic2" size="4096" crc="9A0D3B20" sha1="104a0d27ec35f25af33e784e302b079bf05f4f45" offset="0x1000" />
 			</dataarea>
 		</part>
 	</software>
@@ -414,9 +420,12 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<publisher>Belrampa Servicios, SA</publisher>
 		<info name="usage" value="Disable Cart Auto-Start, EXEC 49152" />
 		<part name="cart" interface="coco_cart">
+			<feature name="pcb" value="RE-075"/>		<!--	PCB with "59" written with marker	-->
+			<feature name="ic1" value="TMS ?"/>			<!--	Illegible	-->
+			<feature name="ic2" value="TMS 2564JDL-45 DBP8127"/>
 			<dataarea name="rom" size="16384">
-				<rom name="test de conduccion 1 (1982)(belrampa servicios, sa).rom" size="8192" crc="65d3153d" sha1="c44277f3d7ec615947465d20674b0771bdd44867" offset="0x0000" />
-				<rom name="test de conduccion 2 (1982)(belrampa servicios, sa).rom" size="8192" crc="477921ca" sha1="a3d23148842fd7eb3b4f04d63a701a88573cbfb5" offset="0x2000" />
+				<rom name="1.ic1" size="8192" crc="65d3153d" sha1="c44277f3d7ec615947465d20674b0771bdd44867" offset="0x0000" />
+				<rom name="2.ic2" size="8192" crc="477921ca" sha1="a3d23148842fd7eb3b4f04d63a701a88573cbfb5" offset="0x2000" />
 			</dataarea>
 		</part>
 	</software>
