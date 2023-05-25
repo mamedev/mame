@@ -10,18 +10,19 @@
  *   Bt476   80Mhz   8 bit            3     6 bit
  *   Bt477   80MHz   8 bit   4 bit    3     8 bit  sleep mode, compatibility mode
  *   Bt478   80MHz   8 bit   4 bit    3     8 bit
+ *   Bt479   80MHz   8 bit   4 bit    3     8 bit  1024 palette entries, 16 windows, compatibility mode
  *
  * Not emulated:
  *
  *   Bt473   80MHz  24 bit   4 bit    3     8 bit  true color/passthrough/bypass modes
  *   Bt474   85MHz 4x8 bit 4x4 bit    3     8 bit  sleep mode, vga mode
- *   Bt479   80MHz   8 bit   4 bit    3     8 bit  16 windows, compatibility mode
  *
  * Sources:
- *   - http://www.bitsavers.org/components/brooktree/_dataBooks/1991_Brooktree_Product_Databook.pdf
+ *   - Brooktree Product Databook 1991
  *
  * TODO:
  *   - remaining devices
+ *   - bt479 window mode, overlay mask, 10-bit modes
  */
 
 #include "emu.h"
@@ -40,7 +41,7 @@ DEFINE_DEVICE_TYPE(BT475, bt475_device, "bt475", "Brooktree Bt475 256 Color RAMD
 DEFINE_DEVICE_TYPE(BT476, bt476_device, "bt476", "Brooktree Bt476 256 Color RAMDAC")
 DEFINE_DEVICE_TYPE(BT477, bt477_device, "bt477", "Brooktree Bt477 256 Color RAMDAC")
 DEFINE_DEVICE_TYPE(BT478, bt478_device, "bt478", "Brooktree Bt478 256 Color RAMDAC")
-//DEFINE_DEVICE_TYPE(BT479, bt479_device, "bt479", "Brooktree Bt479 1024 Color RAMDAC")
+DEFINE_DEVICE_TYPE(BT479, bt479_device, "bt479", "Brooktree Bt479 1024 Color RAMDAC")
 
 void bt47x_device_base::map(address_map &map)
 {
@@ -57,11 +58,81 @@ void bt47x_device_base::map(address_map &map)
 	}
 }
 
+u8 bt47x_device_base::read(offs_t offset)
+{
+	u8 data = 0;
+	switch (offset)
+	{
+	case 0: data = address_r(); break;
+	case 1: data = palette_r(); break;
+	case 2: data = mask_r(); break;
+	case 3: data = address_r(); break;
+	case 4: if (m_overlay_colors) data = address_r(); break;
+	case 5: if (m_overlay_colors) data = overlay_r(); break;
+	case 7: if (m_overlay_colors) data = address_r(); break;
+	}
+
+	return data;
+}
+
+void bt47x_device_base::write(offs_t offset, u8 data)
+{
+	switch (offset)
+	{
+	case 0: address_w(data); break;
+	case 1: palette_w(data); break;
+	case 2: mask_w(data); break;
+	case 3: address_w(data); break;
+	case 4: if (m_overlay_colors) address_w(data); break;
+	case 5: if (m_overlay_colors) overlay_w(data); break;
+	case 7: if (m_overlay_colors) address_w(data); break;
+	}
+}
+
 void bt475_device_base::map(address_map &map)
 {
 	bt47x_device_base::map(map);
 
 	map(0x06, 0x06).rw(FUNC(bt475_device_base::command_r), FUNC(bt475_device_base::command_w));
+}
+
+u8 bt475_device_base::read(offs_t offset)
+{
+	if (offset == 6)
+		return command_r();
+	else
+		return bt47x_device_base::read(offset);
+}
+
+void bt475_device_base::write(offs_t offset, u8 data)
+{
+	if (offset == 6)
+		command_w(data);
+	else
+		bt47x_device_base::write(offset, data);
+}
+
+void bt479_device::map(address_map &map)
+{
+	bt47x_device_base::map(map);
+
+	map(0x06, 0x06).rw(FUNC(bt479_device::control_r), FUNC(bt479_device::control_w));
+}
+
+u8 bt479_device::read(offs_t offset)
+{
+	if (offset == 6)
+		return control_r();
+	else
+		return bt47x_device_base::read(offset);
+}
+
+void bt479_device::write(offs_t offset, u8 data)
+{
+	if (offset == 6)
+		control_w(data);
+	else
+		bt47x_device_base::write(offset, data);
 }
 
 bt47x_device_base::bt47x_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, unsigned const palette_colors, unsigned const overlay_colors, unsigned const color_bits)
@@ -103,6 +174,11 @@ bt478_device::bt478_device(machine_config const &mconfig, char const *tag, devic
 {
 }
 
+bt479_device::bt479_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: bt47x_device_base(mconfig, BT479, tag, owner, clock, 1024, 16, 8)
+{
+}
+
 void bt47x_device_base::device_start()
 {
 	save_item(NAME(m_address));
@@ -119,6 +195,18 @@ void bt475_device_base::device_start()
 	bt47x_device_base::device_start();
 
 	save_item(NAME(m_command));
+}
+
+void bt479_device::device_start()
+{
+	bt47x_device_base::device_start();
+
+	save_item(NAME(m_window));
+	save_item(NAME(m_command));
+	save_item(NAME(m_flood));
+
+	m_command[0] = 0;
+	m_command[1] = 0;
 }
 
 u8 bt47x_device_base::address_r()
@@ -139,22 +227,27 @@ void bt47x_device_base::address_w(u8 data)
 	m_address = data;
 }
 
-void bt47x_device_base::increment_address(bool const side_effects)
+void bt47x_device_base::increment_address(bool const rgb, bool const side_effects)
 {
 	if (!machine().side_effects_disabled() || side_effects)
 	{
-		// increment component index and address register
-		m_address_rgb = (m_address_rgb + 1) % 3;
-		if (m_address_rgb == 0)
+		if (rgb)
+		{
+			// increment component index and address register
+			m_address_rgb = (m_address_rgb + 1) % 3;
+			if (m_address_rgb == 0)
+				m_address++;
+		}
+		else
 			m_address++;
 	}
 }
 
 u8 bt47x_device_base::palette_r()
 {
-	u8 const data = m_color_ram[m_address][m_address_rgb];
+	u8 const data = m_color_ram[address()][m_address_rgb];
 
-	increment_address();
+	increment_address(true);
 
 	LOGMASKED(LOG_READS, "palette_r 0x%02x\n", data);
 
@@ -165,16 +258,16 @@ void bt47x_device_base::palette_w(u8 data)
 {
 	LOG("palette_w 0x%02x\n", data);
 
-	m_color_ram[m_address][m_address_rgb] = data;
+	m_color_ram[address()][m_address_rgb] = data;
 
 	// update the mame palette to match the device
 	if (m_address_rgb == 2)
-		set_pen_color(m_address, rgb_t(
-			m_color_ram[m_address][0] << (8 - color_bits()),
-			m_color_ram[m_address][1] << (8 - color_bits()),
-			m_color_ram[m_address][2] << (8 - color_bits())));
+		set_pen_color(address(), rgb_t(
+			m_color_ram[address()][0] << (8 - color_bits()),
+			m_color_ram[address()][1] << (8 - color_bits()),
+			m_color_ram[address()][2] << (8 - color_bits())));
 
-	increment_address(true);
+	increment_address(true, true);
 }
 
 u8 bt47x_device_base::mask_r()
@@ -196,7 +289,7 @@ u8 bt47x_device_base::overlay_r()
 	unsigned const index = m_palette_colors + (m_address & (m_overlay_colors - 1));
 	u8 const data = m_color_ram[index][m_address_rgb];
 
-	increment_address();
+	increment_address(true);
 
 	LOGMASKED(LOG_READS, "overlay_r 0x%02x\n", data);
 
@@ -217,7 +310,7 @@ void bt47x_device_base::overlay_w(u8 data)
 			m_color_ram[index][1] << (8 - color_bits()),
 			m_color_ram[index][2] << (8 - color_bits())));
 
-	increment_address(true);
+	increment_address(true, true);
 }
 
 u8 bt475_device_base::command_r()
@@ -232,4 +325,62 @@ void bt475_device_base::command_w(u8 data)
 	LOG("command_w 0x%02x\n", data);
 
 	m_command = data;
+}
+
+enum bt479_command_0_mask : u8
+{
+	BT479_CR0_OL = 0x0f, // overlay read mask
+	BT479_CR0_CP = 0xf0, // color palette select
+};
+
+u8 bt479_device::control_r()
+{
+	unsigned const address = bt47x_device_base::address();
+	u8 data = 0;
+
+	switch (address)
+	{
+	case 0x82:
+	case 0x83:
+		data = m_command[address & 1];
+		break;
+	case 0x84:
+	case 0x85:
+		data = m_flood[address & 1];
+		break;
+	default:
+		if (address < 0x80)
+			data = m_window[address];
+		break;
+	}
+
+	LOGMASKED(LOG_READS, "control_r 0x%02x\n", data);
+	increment_address(false);
+	return data;
+}
+
+void bt479_device::control_w(u8 data)
+{
+	unsigned const address = bt47x_device_base::address();
+	LOG("control_w address 0x%02x data 0x%02x\n", address, data);
+
+	switch (address)
+	{
+	case 0x82:
+	case 0x83:
+		LOG("control_w command%d 0x%02x\n", address & 1, data);
+		m_command[address & 1] = data;
+		break;
+	case 0x84:
+	case 0x85:
+		LOG("control_w flood%d 0x%02x\n", address & 1, data);
+		m_flood[address & 1] = data;
+		break;
+	default:
+		if (address < 0x80)
+			m_window[address] = data;
+		break;
+	}
+
+	increment_address(false, true);
 }
