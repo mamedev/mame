@@ -83,7 +83,7 @@ video card
 #include "machine/ins8250.h"
 #include "machine/microtch.h"
 #include "machine/nvram.h"
-#include "bus/isa/trident.h"
+#include "video/pc_vga_trident.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/sblaster.h"
 

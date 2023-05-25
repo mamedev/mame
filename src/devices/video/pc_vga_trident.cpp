@@ -9,9 +9,8 @@
  */
 
 #include "emu.h"
-#include "trident.h"
+#include "pc_vga_trident.h"
 
-#include "debugger.h"
 #include "screen.h"
 
 #define LOG_WARN  (1U << 1)

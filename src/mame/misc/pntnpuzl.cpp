@@ -138,12 +138,11 @@ CN1 standard DB15 VGA connector (15KHz)
 */
 
 #include "emu.h"
-#include "bus/isa/trident.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs96/i8x9x.h"
 #include "machine/6522via.h"
 #include "machine/eepromser.h"
-#include "video/pc_vga.h"
+#include "video/pc_vga_trident.h"
 
 #include "screen.h"
 

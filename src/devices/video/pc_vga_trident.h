@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef MAME_BUS_ISA_TRIDENT_H
-#define MAME_BUS_ISA_TRIDENT_H
+#ifndef MAME_VIDEO_PC_VGA_TRIDENT_H
+#define MAME_VIDEO_PC_VGA_TRIDENT_H
 
 #pragma once
 
@@ -167,4 +167,4 @@ public:
 DECLARE_DEVICE_TYPE(TRIDENT_VGA,  tgui9860_device)
 DECLARE_DEVICE_TYPE(TVGA9000_VGA, tvga9000_device)
 
-#endif // MAME_BUS_ISA_TRIDENT_H
+#endif // MAME_VIDEO_PC_VGA_TRIDENT_H

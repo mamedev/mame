@@ -10,8 +10,7 @@
 #define MAME_BUS_ISA_SVGA_TRIDENT_H
 
 #include "isa.h"
-#include "video/pc_vga.h"
-#include "bus/isa/trident.h"
+#include "video/pc_vga_trident.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
