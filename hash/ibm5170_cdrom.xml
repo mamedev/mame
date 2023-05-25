@@ -2554,6 +2554,24 @@ Offset [CDDA] audio, does not stop when exiting game (including getting to Windo
 		</part>
 	</software>
 
+	<!-- Source: http://redump.org/disc/7455/ -->
+	<!-- <rom name="Jungle Strike &amp; Desert Strike (Europe).cue" size="127" crc="0fe06781" sha1="92e7f629fa95fa2adb50fe316416f40b2190977e"/> -->
+	<!-- <rom name="Jungle Strike &amp; Desert Strike (Europe).bin" size="300816096" crc="6679aae1" sha1="eeb65e9632f79795be82f92b6c329b773103c2ee"/> -->
+	<software name="dstrjstr">
+		<description>Desert Strike &amp; Jungle Strike (Europe)</description>
+		<year>1995</year>
+		<publisher>Gremlin Interactive</publisher>
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Jungle Strike &amp; Desert Strike (Europe)" sha1="cd3cc99dfeab63ac20eaa0ff4237b7754d033a3b" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS 6.0 / Windows 95 -->
 	<!-- Pentium class 90 MHz -->
 	<!-- DirectDraw 2 -->
@@ -2604,6 +2622,25 @@ Untested (and likely unsupported) Spawned Diablo and multi player mode
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="diablo" sha1="c9d7819a9a9b3fe0927c89a9d9d220b0b7307300" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/10119/ -->
+	<!-- <rom name="Dig, The (USA) (Alt).cue" size="86" crc="70a55b7e" sha1="e250f19c0560de1afa1c890cb236da16875d343f"/> -->
+	<!-- <rom name="Dig, The (USA) (Alt).bin" size="761203632" crc="7a6762e5" sha1="a5a98e2a2111aef6023a6e3d6a062d989c7f22c6"/> -->
+	<software name="thedig">
+		<description>The Dig (USA)</description>
+		<year>1995</year>
+		<publisher>LucasArts</publisher>
+		<info name="developer" value="LucasArts" />
+		<info name="region" value="USA" />
+		<info name="version" value="v1.0" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dig, The (USA) (Alt)" sha1="c4087004a4716ab167c5dc9d8556b8a985b3846a" />
 			</diskarea>
 		</part>
 	</software>
@@ -3129,6 +3166,26 @@ This release doesn't have audio speech.
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Formula One Grand Prix (Netherlands) (Crucial)" sha1="03b22b58db9eb73171cd4ed3f342ddc2303aad1b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/62578/ -->
+	<!-- <rom name="First Samurai (Europe).cue" size="111" crc="8167e362" sha1="1d688277f3e8443fd804264bc6a6c4bf2b3fa4c9"/> -->
+	<!-- <rom name="First Samurai (Europe).bin" size="112910112" crc="51e88f85" sha1="929e983574ac52f9856552889b311a41ce005c14"/> -->
+	<software name="1samurai">
+		<description>First Samurai (Europe)</description>
+		<year>1994</year>
+		<publisher>Ubi Soft</publisher>
+		<info name="copy_protection" value="Requires Game Access Code at installation setup" />
+		<info name="developer" value="Vivid Image" />
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="First Samurai (Europe)" sha1="76b1f801623df6c2d0e5bc7d00ea619e24aa75c3" />
 			</diskarea>
 		</part>
 	</software>
@@ -3888,6 +3945,64 @@ Untested multiplayer options
 		</part>
 	</software>
 
+	<!-- Source: http://redump.org/disc/16381/ -->
+	<!-- <rom name="Jazz Jackrabbit (Europe) (Rerelease) (19970206).cue" size="136" crc="ca92a488" sha1="f2dbc8a8b9c348b9eed08893bea134d5e509de4b"/> -->
+	<!-- <rom name="Jazz Jackrabbit (Europe) (Rerelease) (19970206).bin" size="66956736" crc="9c484fe1" sha1="3ac7413643dba737c2040572b45e932338ce9cb8"/> -->
+	<software name="jazz">
+		<description>Jazz Jackrabbit (Europe, re-release)</description>
+		<year>1997</year>
+		<publisher>Project Two Interactive</publisher>
+		<info name="developer" value="Epic MegaGames" />
+		<info name="region" value="Europe" />
+		<info name="version" value="1.3" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Jazz Jackrabbit (Europe) (Rerelease) (19970206)" sha1="109347c392d40a67c3712f0be258810b44e29783" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/40259/ -->
+	<!-- <rom name="Jazz Jackrabbit (Europe) (v1.3).cue" size="97" crc="987ee42c" sha1="ba2d3fb863baae372a130a2ba7862566665dcf51"/> -->
+	<!-- <rom name="Jazz Jackrabbit (Europe) (v1.3).bin" size="35515200" crc="e18f2c8c" sha1="b85532eac09143d4f5d4eee44d4570f8c9766bc4"/> -->
+	<software name="jazz_a" cloneof="jazz">
+		<description>Jazz Jackrabbit (Europe)</description>
+		<year>1995</year>
+		<publisher>ROMWARE</publisher>
+		<info name="developer" value="Epic MegaGames" />
+		<info name="region" value="Europe" />
+		<info name="version" value="1.3" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Jazz Jackrabbit (Europe) (v1.3)" sha1="6c95e96055f9e5d780c259858e0e4e21052cd430" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/10255/ -->
+	<!-- <rom name="Jazz Jackrabbit 2 (Europe) (En,Fr,De,Es,It,Nl).cue" size="135" crc="35715469" sha1="58cb72bf0006a9a816d35ced39a6696f3cc9a372"/> -->
+	<!-- <rom name="Jazz Jackrabbit 2 (Europe) (En,Fr,De,Es,It,Nl).bin" size="71599584" crc="41548653" sha1="d1da13be06a767c10fcf48a391444628dda512af"/> -->
+	<software name="jazz2">
+		<description>Jazz Jackrabbit 2 (Europe)</description>
+		<year>1998</year>
+		<publisher>Project Two Interactive</publisher>
+		<info name="developer" value="Epic MegaGames / Orange Games" />
+		<info name="language" value="English/Dutch/French/German/Italian/Spanish" />
+		<info name="region" value="Europe" />
+		<info name="version" value="1.20" />
+		<sharedfeat name="platform" value="Windows 95" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Jazz Jackrabbit 2 (Europe) (En,Fr,De,Es,It,Nl)" sha1="d65c7fad030b5862b8ba94962bb0d16a5c3ea241" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Untouched image from original CD created with an ASUS DRW-1814BLT (EAC drive sample read offset reported as +6)
 	   If you subtract 0x18 (4 * 6) bytes from a .wav extracted from this CHD the audio matches a rip done with EAC (verified) -->
 	<software name="kingsq6e">
@@ -3995,14 +4110,53 @@ Untested multiplayer options
 		<publisher>Sierra On-line</publisher>
 		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Sierra On-line" />
-		<info name="usage" value="DOS" />
 		<info name="region" value="USA" />
 		<info name="version" value="1.000 September 19, 1995" />
 		<sharedfeat name="platform" value="DOS" />
 
-		<part name="cdrom1" interface="cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Leisure Suit Larry in the Land of the Lounge Lizards (USA)" sha1="5f1ca791067c47357e35aa105ad9b1da5b34f38f" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/35308/ -->
+	<!-- <rom name="Leisure Suit Larry's Greatest Hits and Misses! (Europe) (Rerelease).cue" size="133" crc="2ca22882" sha1="a84676dc1f556ef15d84fd6ff425e7a1d92134f2"/> -->
+	<!-- <rom name="Leisure Suit Larry's Greatest Hits and Misses! (Europe) (Rerelease).bin" size="218935920" crc="b1d7bfc4" sha1="a87b3f32510ef1dfa196b901fcdf2667fdc87934"/> -->
+	<software name="larryghm">
+		<description>Leisure Suit Larry's Greatest Hits and Misses! (Europe, re-release)</description>
+		<year>1994</year>
+		<publisher>Sierra On-line</publisher>
+		<info name="copy_protection" value="Some games require manual" />
+		<info name="developer" value="Sierra On-line" />
+		<info name="region" value="Europe" />
+		<info name="version" value="1.000 - 12/07/94" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Leisure Suit Larry's Greatest Hits and Misses (Europe) (Rerelease)" sha1="219e3894f77fecf94a48fcda1afabe1afeed2f50" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/10242/ -->
+	<!-- <rom name="Leisure Suit Larry's Greatest Hits and Misses! (USA).cue" size="118" crc="94c086ce" sha1="45b88ec424ad8015affb5f28ce372490360fb124"/> -->
+	<!-- <rom name="Leisure Suit Larry's Greatest Hits and Misses! (USA).bin" size="180285504" crc="32880885" sha1="be23e0b34d9cf9bc28368036f9fcad4b327e2bbd"/> -->
+	<software name="larryghm_us" cloneof="larryghm">
+		<description>Leisure Suit Larry's Greatest Hits and Misses! (USA)</description>
+		<year>1994</year>
+		<publisher>Sierra On-line</publisher>
+		<info name="copy_protection" value="Some games require manual" />
+		<info name="developer" value="Sierra On-line" />
+		<info name="region" value="USA" />
+		<info name="version" value="1.000 - 12/07/94" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Leisure Suit Larry's Greatest Hits and Misses (USA)" sha1="5bda619a06ff852f9f2586c4fbba591aa681d9b6" />
 			</diskarea>
 		</part>
 	</software>
@@ -4021,6 +4175,24 @@ Untested multiplayer options
 		<part name="cdrom2" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="buichi terasawa's takeru - letter of the law (1996)(sunsoft)(disc 2 of 2)[chapter 3]" sha1="ed0568d749cda155717289ab29d48013a9dfe9b5" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/88946/ -->
+	<!-- <rom name="Links - The Challenge of Golf (USA).cue" size="124" crc="7ec080cd" sha1="a81bc6af4c76e9d22e897be1554dd9fbcfd81d5d"/> -->
+	<!-- <rom name="Links - The Challenge of Golf (USA).bin" size="15645504" crc="04e0aa4f" sha1="06d91f9815fef3b166bde5feeea3a01ab801acd9"/> -->
+	<software name="links">
+		<description>Links - The Challenge of Golf (USA)</description>
+		<year>1995</year>
+		<publisher>Softkey</publisher>
+		<info name="developer" value="Access Software" />
+		<info name="region" value="USA" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Links - The Challenge of Golf (USA)" sha1="9c445b7b5e848486f70e57a7e5f2b06b13baa54e" />
 			</diskarea>
 		</part>
 	</software>
@@ -4044,6 +4216,69 @@ https://www.pcgamingwiki.com/wiki/The_Adventures_of_Lomax
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="lomax" sha1="d2a24858266e0d906d93d3027bfc89634c125556"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/70315 -->
+	<!-- <rom name="Loom (USA).cue" size="190" crc="638d550f" sha1="d4e869c826b1c696d0ccf9a7af26257a70dd50c2"/> -->
+	<!-- <rom name="Loom (USA) (Track 1).bin" size="52233216" crc="9b6dcb37" sha1="4beac526c9a9de1540863d45515016b78b8eb800"/> -->
+	<!-- <rom name="Loom (USA) (Track 2).bin" size="579102384" crc="215c7a30" sha1="b8ce5da68f1839986c70d8057f802bcb400e8262"/> -->
+	<software name="loom">
+		<description>Loom (USA)</description>
+		<year>1992</year>
+		<publisher>LucasArts</publisher>
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<info name="version" value="CD version (42) (1.0) 10 February 1992" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_id" value="Game Disk"/>
+			<diskarea name="cdrom">
+				<disk name="Loom (USA)" sha1="8177bebadf8625bee31bc3ff68647cbbd97ac63a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/67761 -->
+	<!-- <rom name="Loom (USA) (Alt).cue" size="202" crc="99942344" sha1="9f98633e3c45edbb8390fec620c3a836be80d271"/> -->
+	<!-- <rom name="Loom (USA) (Alt) (Track 1).bin" size="52237920" crc="5cba4c4d" sha1="ae77995a38b1dd946185bc2c966d5bd8f3a2507b"/> -->
+	<!-- <rom name="Loom (USA) (Alt) (Track 2).bin" size="579097680" crc="7b7098fe" sha1="e52aa20225d2fdcc8a7441808ade70258f088eeb"/> -->
+	<software name="loom_a" cloneof="loom">
+		<description>Loom (USA, alt)</description>
+		<year>1992</year>
+		<publisher>LucasArts</publisher>
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<info name="version" value="CD version (42) (1.0) 10 February 1992" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_id" value="Game Disk"/>
+			<diskarea name="cdrom">
+				<disk name="Loom (USA) (Alt)" sha1="569755da87b8538f3a22b4ee472582ba2908011b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/36037 -->
+	<!-- <rom name="Loom (USA) (Alt 2).cue" size="229" crc="b6ea840e" sha1="8702015d980be62e1642fafab7961a8b8b670975"/> -->
+	<!-- <rom name="Loom (USA) (Alt 2) (Track 1).bin" size="52567200" crc="77decfeb" sha1="0e6c2b92b087cbf6ce4c4c863346f727aa20b832"/> -->
+	<!-- <rom name="Loom (USA) (Alt 2) (Track 2).bin" size="579116496" crc="7e8466af" sha1="b298303d7b9d45a272d27c9d489df9e4777c2e37"/> -->
+	<software name="loom_b" cloneof="loom">
+		<description>Loom (USA, alt 2)</description>
+		<year>1992</year>
+		<publisher>LucasArts</publisher>
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<info name="version" value="CD version (42) (1.0) 10 February 1992" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_id" value="Game Disk"/>
+			<diskarea name="cdrom">
+				<disk name="Loom (USA) (Alt 2)" sha1="9c77052f5fe433fec9f345d2406f370962ba70e7" />
 			</diskarea>
 		</part>
 	</software>
@@ -4090,6 +4325,52 @@ https://www.pcgamingwiki.com/wiki/The_Adventures_of_Lomax
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="freddi fisk och fallet med de forsvunna sjograsfrona (sweden)" sha1="10c19256b8aca3d1b868a97a08670ba72bb9e257" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/94155/ -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 01).bin" size="145261872" crc="91cbf5b6" sha1="e5a90874005999494028ad10276f9fbc074e7848"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 02).bin" size="21619584" crc="c779c5d8" sha1="6bd56e351245e19122eab656ee6fb211082f479e"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 03).bin" size="21904176" crc="b946d1e1" sha1="94f9b55e5a19ce8ae0eb511636bfa6b14476d8b3"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 04).bin" size="21838320" crc="88effc58" sha1="9ec61dde9ef8705f007e1c96e27284c27983c4b1"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 05).bin" size="20394192" crc="bed864fe" sha1="d98d0c3cba3d69d062087bc475cdcef3b2f61741"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 06).bin" size="22482768" crc="d0dfb720" sha1="432290cbcee12d09d9d1c81bd178df8458b56229"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 07).bin" size="2196768" crc="8834718f" sha1="24a119a9564daea9549eb354bb8d2dc8d02c5dc0"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 08).bin" size="12336240" crc="3fa67412" sha1="3a526158338f70a121f3c7fdad11a99935471a0b"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 09).bin" size="24531360" crc="b3294034" sha1="6f3b2215cc51236a2d5d6aa280e615ec8f874148"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 10).bin" size="21880656" crc="ecafe27c" sha1="fb58a9110b1d66d43f11847a906e3b100bb10b4b"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 11).bin" size="16520448" crc="172288ff" sha1="22ef8a14afddac8eb71ff123607082030a57aeb1"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 12).bin" size="24489024" crc="bcadc8ae" sha1="8d099ac4ac7cf50c4d60f7e3930e56d3c65aa167"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 13).bin" size="21694848" crc="42948762" sha1="40847b2f0f96d4f4498fde640d7af0f817ce4f8d"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 14).bin" size="3248112" crc="526cd2cd" sha1="27b140f6e29d54dbb1408186525ee9293170da43"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 15).bin" size="27944112" crc="6e57326e" sha1="731af3abc2703e8cfefab639eb1a0f5569fd4a39"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 16).bin" size="26262432" crc="cf1b8965" sha1="062d3d04790c31cce0b2e3e4e1b3db5c6cfff282"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 17).bin" size="39158448" crc="52bd0037" sha1="89d3c8f10f58b4fe09816dfd0dfb921b4fdad7b2"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 18).bin" size="28593264" crc="20faa4c2" sha1="d35de091587318a97a3ead4c496086f9d9ddeb3e"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 19).bin" size="27864144" crc="a54a10f6" sha1="78714a5833e0182e6e3dee85c82f48358206272f"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 20).bin" size="3243408" crc="0978cb81" sha1="50a12f3bb113a2fc33e497b80864b064d086654f"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 21).bin" size="2972928" crc="74a60e03" sha1="5454c643f1e189b276780e30ba678da479c299ad"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 22).bin" size="23741088" crc="1bb08b0e" sha1="23a797a734caa4fda8452189683493caad9b9d99"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 23).bin" size="25133472" crc="413c8f39" sha1="9c32335f91c702b2006494d03bda03e70b995a46"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 24).bin" size="21574896" crc="64070bcf" sha1="b79c2486712f99cf8e568fcbcf6f2f7e7eea9e82"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 25).bin" size="26168352" crc="d553d5ee" sha1="527440e98545093e903d083c92687d0ce8f50621"/> -->
+	<software name="monkeymd">
+		<description>Monkey Island Madness (USA)</description>
+		<year>1997</year>
+		<publisher>LucasArts</publisher>
+		<notes><![CDATA[
+The Secret of Monkey Island (CD-ROM version 2.3b)
+Monkey Island 2: LeChuck's Revenge (v1.0 11/21/91)
+The Curse of Monkey Island (Windows 95 demo version)
+]]></notes>
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Monkey Island Madness (USA)" sha1="2749dffef8844ef0edffb206a7d127b9fe3d34fb" />
 			</diskarea>
 		</part>
 	</software>
