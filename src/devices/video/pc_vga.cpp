@@ -51,6 +51,15 @@
 
 #include "screen.h"
 
+#define LOG_WARN      (1U << 1)
+#define LOG_REGS      (1U << 2) // deprecated
+
+#define VERBOSE (LOG_GENERAL | LOG_WARN)
+#include "logmacro.h"
+
+#define LOGWARN(...)           LOGMASKED(LOG_WARN, __VA_ARGS__)
+#define LOGREGS(...)           LOGMASKED(LOG_REGS, __VA_ARGS__)
+
 
 /***************************************************************************
 
@@ -100,17 +109,6 @@ enum
 #define TGA_START_ADDRESS (vga.crtc.start_addr<<2)
 #define TGA_LINE_LENGTH (vga.crtc.offset<<3)
 
-
-/***************************************************************************
-
-    Static declarations
-
-***************************************************************************/
-
-#define LOG_ACCESSES    0
-#define LOG_REGISTERS   0
-
-#define LOG_8514        1
 
 /***************************************************************************
 
@@ -1351,7 +1349,7 @@ void vga_device::recompute_params_clock(int divisor, int xtal)
 void vga_device::recompute_params()
 {
 	if(vga.miscellaneous_output & 8)
-		logerror("Warning: VGA external clock latch selected\n");
+		LOGWARN("Warning: VGA external clock latch selected\n");
 	else
 		recompute_params_clock(1, ((vga.miscellaneous_output & 0xc) ? XTAL(28'636'363) : XTAL(25'174'800)).value());
 }
@@ -1502,7 +1500,7 @@ void vga_device::crtc_reg_write(uint8_t index, uint8_t data)
 			vga.crtc.line_compare |= data & 0xff;
 			break;
 		default:
-			logerror("Unhandled CRTC reg w %02x %02x\n",index,data);
+			LOG( "Unhandled CRTC reg w %02x %02x\n",index,data);
 			break;
 	}
 }
@@ -1613,13 +1611,10 @@ void vga_device::vga_crtc_w(offs_t offset, uint8_t data)
 			break;
 
 		case 5:
-			if (LOG_REGISTERS)
-			{
-				logerror("vga_crtc_w(): CRTC[0x%02X%s] = 0x%02X\n",
-					vga.crtc.index,
-					(vga.crtc.index < vga.svga_intf.crtc_regcount) ? "" : "?",
-					data);
-			}
+			LOGREGS("vga_crtc_w(): CRTC[0x%02X%s] = 0x%02X\n",
+				vga.crtc.index,
+				(vga.crtc.index < vga.svga_intf.crtc_regcount) ? "" : "?",
+				data);
 
 			crtc_reg_write(vga.crtc.index,data);
 			//screen().update_partial(screen().vpos());
@@ -1695,7 +1690,7 @@ uint8_t vga_device::gc_reg_read(uint8_t index)
 
 uint8_t vga_device::seq_reg_read(uint8_t index)
 {
-	logerror("Reading unmapped sequencer read register %02x (SVGA?)\n", index);
+	LOG( "Reading unmapped sequencer read register %02x (SVGA?)\n", index);
 	return 0;
 }
 
@@ -1825,7 +1820,7 @@ uint8_t vga_device::port_03d0_r(offs_t offset)
 		data = vga_crtc_r(offset);
 	if(offset == 8)
 	{
-		logerror("VGA: 0x3d8 read %s\n", machine().describe_context());
+		LOG("VGA: 0x3d8 read %s\n", machine().describe_context());
 		data = 0; // TODO: PC-200 reads back CGA register here, everything else returns open bus OR CGA emulation of register 0x3d8
 	}
 
@@ -1834,9 +1829,6 @@ uint8_t vga_device::port_03d0_r(offs_t offset)
 
 void vga_device::port_03b0_w(offs_t offset, uint8_t data)
 {
-	if (LOG_ACCESSES)
-		logerror("vga_port_03b0_w(): port=0x%04x data=0x%02x\n", offset + 0x3b0, data);
-
 	if (get_crtc_port() == 0x3b0)
 		vga_crtc_w(offset, data);
 }
@@ -1909,9 +1901,6 @@ void vga_device::gc_reg_write(uint8_t index,uint8_t data)
 
 void vga_device::port_03c0_w(offs_t offset, uint8_t data)
 {
-	if (LOG_ACCESSES)
-		logerror("vga_port_03c0_w(): port=0x%04x data=0x%02x\n", offset + 0x3c0, data);
-
 	switch (offset) {
 	case 0:
 		if (vga.attribute.state==0)
@@ -1935,13 +1924,10 @@ void vga_device::port_03c0_w(offs_t offset, uint8_t data)
 		vga.sequencer.index = data;
 		break;
 	case 5:
-		if (LOG_REGISTERS)
-		{
-			logerror("vga_port_03c0_w(): SEQ[0x%02X%s] = 0x%02X\n",
-				vga.sequencer.index,
-				(vga.sequencer.index < vga.svga_intf.seq_regcount) ? "" : "?",
-				data);
-		}
+		LOGREGS("vga_port_03c0_w(): SEQ[0x%02X%s] = 0x%02X\n",
+			vga.sequencer.index,
+			(vga.sequencer.index < vga.svga_intf.seq_regcount) ? "" : "?",
+			data);
 		if (vga.sequencer.index < vga.svga_intf.seq_regcount)
 		{
 			vga.sequencer.data[vga.sequencer.index] = data;
@@ -1997,9 +1983,6 @@ void vga_device::port_03c0_w(offs_t offset, uint8_t data)
 
 void vga_device::port_03d0_w(offs_t offset, uint8_t data)
 {
-	if (LOG_ACCESSES)
-		logerror("vga_port_03d0_w(): port=0x%04x data=0x%02x\n", offset + 0x3d0, data);
-
 	if (get_crtc_port() == 0x3d0)
 		vga_crtc_w(offset, data);
 }
@@ -2771,14 +2754,14 @@ void s3_vga_device::s3_crtc_reg_write(uint8_t index, uint8_t data)
 				if(s3.reg_lock2 == 0xa5)
 				{
 					s3.strapping = (s3.strapping & 0xffffff00) | data;
-					logerror("CR36: Strapping data = %08x\n",s3.strapping);
+					LOG("CR36: Strapping data = %08x\n",s3.strapping);
 				}
 				break;
 			case 0x37:
 				if(s3.reg_lock2 == 0xa5)
 				{
 					s3.strapping = (s3.strapping & 0xffff00ff) | (data << 8);
-					logerror("CR37: Strapping data = %08x\n",s3.strapping);
+					LOG("CR37: Strapping data = %08x\n",s3.strapping);
 				}
 				break;
 			case 0x38:
@@ -3025,7 +3008,7 @@ bit    0  Vertical Total bit 10. Bit 10 of the Vertical Total register (3d4h
 				if(s3.reg_lock2 == 0xa5)
 				{
 					s3.strapping = (s3.strapping & 0xff00ffff) | (data << 16);
-					logerror("CR68: Strapping data = %08x\n",s3.strapping);
+					LOG("CR68: Strapping data = %08x\n",s3.strapping);
 				}
 				break;
 			case 0x69:
@@ -3041,11 +3024,11 @@ bit    0  Vertical Total bit 10. Bit 10 of the Vertical Total register (3d4h
 				if(s3.reg_lock2 == 0xa5)
 				{
 					s3.strapping = (s3.strapping & 0x00ffffff) | (data << 24);
-					logerror("CR6F: Strapping data = %08x\n",s3.strapping);
+					LOG("CR6F: Strapping data = %08x\n",s3.strapping);
 				}
 				break;
 			default:
-				if(LOG_8514) logerror("S3: 3D4 index %02x write %02x\n",index,data);
+				LOG( "S3: 3D4 index %02x write %02x\n",index,data);
 				break;
 		}
 	}
@@ -3506,7 +3489,7 @@ uint16_t ibm8514a_device::ibm8514_line_error_r()
 void ibm8514a_device::ibm8514_line_error_w(uint16_t data)
 {
 	ibm8514.line_errorterm = data;
-	if(LOG_8514) logerror("8514/A: Line Parameter/Error Term write %04x\n",data);
+	LOG( "8514/A: Line Parameter/Error Term write %04x\n",data);
 }
 
 /*
@@ -3534,7 +3517,7 @@ uint16_t ibm8514a_device::ibm8514_gpstatus_r()
 {
 	uint16_t ret = 0x0000;
 
-	//if(LOG_8514) logerror("S3: 9AE8 read\n");
+	//LOG( "S3: 9AE8 read\n");
 	if(ibm8514.gpbusy == true)
 		ret |= 0x0200;
 	if(ibm8514.data_avail == true)
@@ -3686,7 +3669,7 @@ void ibm8514a_device::ibm8514_cmd_w(uint16_t data)
 	case 0x0000:  // NOP (for "Short Stroke Vectors")
 		ibm8514.state = IBM8514_IDLE;
 		ibm8514.gpbusy = false;
-		if(LOG_8514) logerror("8514/A: Command (%04x) - NOP (Short Stroke Vector)\n",ibm8514.current_cmd);
+		LOG( "8514/A: Command (%04x) - NOP (Short Stroke Vector)\n",ibm8514.current_cmd);
 		break;
 	case 0x2000:  // Line
 		ibm8514.state = IBM8514_IDLE;
@@ -3697,12 +3680,12 @@ void ibm8514a_device::ibm8514_cmd_w(uint16_t data)
 			{
 				ibm8514.state = IBM8514_DRAWING_LINE;
 				ibm8514.data_avail = true;
-				if(LOG_8514) logerror("8514/A: Command (%04x) - Vector Line (WAIT) %i,%i \n",ibm8514.current_cmd,ibm8514.curr_x,ibm8514.curr_y);
+				LOG( "8514/A: Command (%04x) - Vector Line (WAIT) %i,%i \n",ibm8514.current_cmd,ibm8514.curr_x,ibm8514.curr_y);
 			}
 			else
 			{
 				ibm8514_draw_vector(ibm8514.rect_width,(data & 0x00e0) >> 5,(data & 0010) ? true : false);
-				if(LOG_8514) logerror("8514/A: Command (%04x) - Vector Line - %i,%i \n",ibm8514.current_cmd,ibm8514.curr_x,ibm8514.curr_y);
+				LOG( "8514/A: Command (%04x) - Vector Line - %i,%i \n",ibm8514.current_cmd,ibm8514.curr_x,ibm8514.curr_y);
 			}
 		}
 		else
@@ -3716,7 +3699,7 @@ void ibm8514a_device::ibm8514_cmd_w(uint16_t data)
 			int count = 0;
 			int16_t temp;
 
-			if(LOG_8514) logerror("8514/A: Command (%04x) - Line (Bresenham) - %i,%i  Axial %i, Diagonal %i, Error %i, Major Axis %i, Minor Axis %i\n",ibm8514.current_cmd,
+			LOG( "8514/A: Command (%04x) - Line (Bresenham) - %i,%i  Axial %i, Diagonal %i, Error %i, Major Axis %i, Minor Axis %i\n",ibm8514.current_cmd,
 				ibm8514.curr_x,ibm8514.curr_y,ibm8514.line_axial_step,ibm8514.line_diagonal_step,ibm8514.line_errorterm,ibm8514.rect_width,ibm8514.rect_height);
 
 			if((data & 0x0040))
@@ -3748,12 +3731,12 @@ void ibm8514a_device::ibm8514_cmd_w(uint16_t data)
 			//ibm8514.gpbusy = true;  // DirectX 5 keeps waiting for the busy bit to be clear...
 			ibm8514.bus_size = (data & 0x0600) >> 9;
 			ibm8514.data_avail = true;
-			if(LOG_8514) logerror("8514/A: Command (%04x) - Rectangle Fill (WAIT) %i,%i Width: %i Height: %i Colour: %08x\n",ibm8514.current_cmd,ibm8514.curr_x,
+			LOG( "8514/A: Command (%04x) - Rectangle Fill (WAIT) %i,%i Width: %i Height: %i Colour: %08x\n",ibm8514.current_cmd,ibm8514.curr_x,
 					ibm8514.curr_y,ibm8514.rect_width,ibm8514.rect_height,ibm8514.fgcolour);
 			break;
 		}
-		if(LOG_8514) logerror("8514/A: Command (%04x) - Rectangle Fill %i,%i Width: %i Height: %i Colour: %08x\n",ibm8514.current_cmd,ibm8514.curr_x,
-				ibm8514.curr_y,ibm8514.rect_width,ibm8514.rect_height,ibm8514.fgcolour);
+		LOG( "8514/A: Command (%04x) - Rectangle Fill %i,%i Width: %i Height: %i Colour: %08x\n",ibm8514.current_cmd,ibm8514.curr_x,
+			ibm8514.curr_y,ibm8514.rect_width,ibm8514.rect_height,ibm8514.fgcolour);
 		off = 0;
 		off += (IBM8514_LINE_LENGTH * ibm8514.curr_y);
 		off += ibm8514.curr_x;
@@ -3802,8 +3785,8 @@ void ibm8514a_device::ibm8514_cmd_w(uint16_t data)
 		break;
 	case 0xc000:  // BitBLT
 		// TODO: a10cuba sets up blantantly invalid parameters here, CPU core bug maybe?
-		if(LOG_8514) logerror("8514/A: Command (%04x) - BitBLT from %i,%i to %i,%i  Width: %i  Height: %i\n",ibm8514.current_cmd,
-				ibm8514.curr_x,ibm8514.curr_y,ibm8514.dest_x,ibm8514.dest_y,ibm8514.rect_width,ibm8514.rect_height);
+		LOG( "8514/A: Command (%04x) - BitBLT from %i,%i to %i,%i  Width: %i  Height: %i\n",ibm8514.current_cmd,
+			ibm8514.curr_x,ibm8514.curr_y,ibm8514.dest_x,ibm8514.dest_y,ibm8514.rect_width,ibm8514.rect_height);
 		off = 0;
 		off += (IBM8514_LINE_LENGTH * ibm8514.dest_y);
 		off += ibm8514.dest_x;
@@ -3879,8 +3862,8 @@ void ibm8514a_device::ibm8514_cmd_w(uint16_t data)
 		ibm8514.curr_y = ibm8514.prev_y;
 		break;
 	case 0xe000:  // Pattern Fill
-		if(LOG_8514) logerror("8514/A: Command (%04x) - Pattern Fill - source %i,%i  dest %i,%i  Width: %i Height: %i\n",ibm8514.current_cmd,
-				ibm8514.curr_x,ibm8514.curr_y,ibm8514.dest_x,ibm8514.dest_y,ibm8514.rect_width,ibm8514.rect_height);
+		LOG( "8514/A: Command (%04x) - Pattern Fill - source %i,%i  dest %i,%i  Width: %i Height: %i\n",ibm8514.current_cmd,
+			ibm8514.curr_x,ibm8514.curr_y,ibm8514.dest_x,ibm8514.dest_y,ibm8514.rect_width,ibm8514.rect_height);
 		off = 0;
 		off += (IBM8514_LINE_LENGTH * ibm8514.dest_y);
 		off += ibm8514.dest_x;
@@ -3950,7 +3933,8 @@ void ibm8514a_device::ibm8514_cmd_w(uint16_t data)
 	default:
 		ibm8514.state = IBM8514_IDLE;
 		ibm8514.gpbusy = false;
-		if(LOG_8514) logerror("8514/A: Unknown command: %04x\n",data);
+		LOG( "8514/A: Unknown command: %04x\n",data);
+		break;
 	}
 }
 
@@ -3975,7 +3959,7 @@ void ibm8514a_device::ibm8514_desty_w(uint16_t data)
 {
 	ibm8514.line_axial_step = data;
 	ibm8514.dest_y = data;
-	if(LOG_8514) logerror("8514/A: Line Axial Step / Destination Y write %04x\n",data);
+	LOG( "8514/A: Line Axial Step / Destination Y write %04x\n",data);
 }
 
 /*
@@ -4000,7 +3984,7 @@ void ibm8514a_device::ibm8514_destx_w(uint16_t data)
 {
 	ibm8514.line_diagonal_step = data;
 	ibm8514.dest_x = data;
-	if(LOG_8514) logerror("8514/A: Line Diagonal Step / Destination X write %04x\n",data);
+	LOG( "8514/A: Line Diagonal Step / Destination X write %04x\n",data);
 }
 
 /*
@@ -4152,7 +4136,7 @@ void ibm8514a_device::ibm8514_ssv_w(uint16_t data)
 		ibm8514_draw_ssv(data >> 8);
 		ibm8514_draw_ssv(data & 0xff);
 	}
-	if(LOG_8514) logerror("8514/A: Short Stroke Vector write %04x\n",data);
+	LOG( "8514/A: Short Stroke Vector write %04x\n",data);
 }
 
 void ibm8514a_device::ibm8514_wait_draw_vector()
@@ -4242,7 +4226,7 @@ uint16_t ibm8514a_device::ibm8514_width_r()
 void ibm8514a_device::ibm8514_width_w(uint16_t data)
 {
 	ibm8514.rect_width = data & 0x1fff;
-	if(LOG_8514) logerror("8514/A: Major Axis Pixel Count / Rectangle Width write %04x\n",data);
+	LOG( "8514/A: Major Axis Pixel Count / Rectangle Width write %04x\n",data);
 }
 
 uint16_t ibm8514a_device::ibm8514_currentx_r()
@@ -4254,7 +4238,7 @@ void ibm8514a_device::ibm8514_currentx_w(uint16_t data)
 {
 	ibm8514.curr_x = data;
 	ibm8514.prev_x = data;
-	if(LOG_8514) logerror("8514/A: Current X set to %04x (%i)\n",data,ibm8514.curr_x);
+	LOG( "8514/A: Current X set to %04x (%i)\n",data,ibm8514.curr_x);
 }
 
 uint16_t ibm8514a_device::ibm8514_currenty_r()
@@ -4266,7 +4250,7 @@ void ibm8514a_device::ibm8514_currenty_w(uint16_t data)
 {
 	ibm8514.curr_y = data;
 	ibm8514.prev_y = data;
-	if(LOG_8514) logerror("8514/A: Current Y set to %04x (%i)\n",data,ibm8514.curr_y);
+	LOG( "8514/A: Current Y set to %04x (%i)\n",data,ibm8514.curr_y);
 }
 
 uint16_t ibm8514a_device::ibm8514_fgcolour_r()
@@ -4277,7 +4261,7 @@ uint16_t ibm8514a_device::ibm8514_fgcolour_r()
 void ibm8514a_device::ibm8514_fgcolour_w(uint16_t data)
 {
 	ibm8514.fgcolour = data;
-	if(LOG_8514) logerror("8514/A: Foreground Colour write %04x\n",data);
+	LOG( "8514/A: Foreground Colour write %04x\n",data);
 }
 
 uint16_t ibm8514a_device::ibm8514_bgcolour_r()
@@ -4288,7 +4272,7 @@ uint16_t ibm8514a_device::ibm8514_bgcolour_r()
 void ibm8514a_device::ibm8514_bgcolour_w(uint16_t data)
 {
 	ibm8514.bgcolour = data;
-	if(LOG_8514) logerror("8514/A: Background Colour write %04x\n",data);
+	LOG( "8514/A: Background Colour write %04x\n",data);
 }
 
 /*
@@ -4310,7 +4294,7 @@ uint16_t ibm8514a_device::ibm8514_read_mask_r()
 void ibm8514a_device::ibm8514_read_mask_w(uint16_t data)
 {
 	ibm8514.read_mask = (ibm8514.read_mask & 0xffff0000) | data;
-	if(LOG_8514) logerror("8514/A: Read Mask (Low) write = %08x\n",ibm8514.read_mask);
+	LOG( "8514/A: Read Mask (Low) write = %08x\n",ibm8514.read_mask);
 }
 
 /*
@@ -4331,7 +4315,7 @@ uint16_t ibm8514a_device::ibm8514_write_mask_r()
 void ibm8514a_device::ibm8514_write_mask_w(uint16_t data)
 {
 	ibm8514.write_mask = (ibm8514.write_mask & 0xffff0000) | data;
-	if(LOG_8514) logerror("8514/A: Write Mask (Low) write = %08x\n",ibm8514.write_mask);
+	LOG( "8514/A: Write Mask (Low) write = %08x\n",ibm8514.write_mask);
 }
 
 uint16_t ibm8514a_device::ibm8514_multifunc_r()
@@ -4350,7 +4334,7 @@ uint16_t ibm8514a_device::ibm8514_multifunc_r()
 		return ibm8514.scissors_right;
 		// TODO: remaining functions
 	default:
-		if(LOG_8514) logerror("8514/A: Unimplemented multifunction register %i selected\n",ibm8514.multifunc_sel);
+		LOG( "8514/A: Unimplemented multifunction register %i selected\n",ibm8514.multifunc_sel);
 		return 0xff;
 	}
 }
@@ -4367,7 +4351,7 @@ bit  0-10  (911/924) Rectangle Height. Height of BITBLT or rectangle command.
 */
 	case 0x0000:
 		ibm8514.rect_height = data & 0x0fff;
-		if(LOG_8514) logerror("8514/A: Minor Axis Pixel Count / Rectangle Height write %04x\n",data);
+		LOG( "8514/A: Minor Axis Pixel Count / Rectangle Height write %04x\n",data);
 		break;
 /*
 BEE8h index 01h W(R/W):  Top Scissors Register (SCISSORS_T).
@@ -4392,19 +4376,19 @@ bit  0-10  (911,924) Clipping Right Limit. Defines the right bound of the
  */
 	case 0x1000:
 		ibm8514.scissors_top = data & 0x0fff;
-		if(LOG_8514) logerror("S3: Scissors Top write %04x\n",data);
+		LOG( "S3: Scissors Top write %04x\n",data);
 		break;
 	case 0x2000:
 		ibm8514.scissors_left = data & 0x0fff;
-		if(LOG_8514) logerror("S3: Scissors Left write %04x\n",data);
+		LOG( "S3: Scissors Left write %04x\n",data);
 		break;
 	case 0x3000:
 		ibm8514.scissors_bottom = data & 0x0fff;
-		if(LOG_8514) logerror("S3: Scissors Bottom write %04x\n",data);
+		LOG( "S3: Scissors Bottom write %04x\n",data);
 		break;
 	case 0x4000:
 		ibm8514.scissors_right = data & 0x0fff;
-		if(LOG_8514) logerror("S3: Scissors Right write %04x\n",data);
+		LOG( "S3: Scissors Right write %04x\n",data);
 		break;
 /*
 BEE8h index 0Ah W(R/W):  Pixel Control Register (PIX_CNTL).
@@ -4418,11 +4402,11 @@ BIT     2  (911-928) Pack Data. If set image read data is a monochrome bitmap,
  */
 	case 0xa000:
 		ibm8514.pixel_control = data;
-		if(LOG_8514) logerror("S3: Pixel control write %04x\n",data);
+		LOG( "S3: Pixel control write %04x\n",data);
 		break;
 	case 0xe000:
 		ibm8514.multifunc_misc = data;
-		if(LOG_8514) logerror("S3: Multifunction Miscellaneous write %04x\n",data);
+		LOG( "S3: Multifunction Miscellaneous write %04x\n",data);
 		break;
 /*
 BEE8h index 0Fh W(W):  Read Register Select Register (READ_SEL)    (801/5,928)
@@ -4444,10 +4428,11 @@ bit   0-2  (911-928) READ-REG-SEL. Read Register Select. Selects the register
  */
 	case 0xf000:
 		ibm8514.multifunc_sel = data & 0x000f;
-		if(LOG_8514) logerror("S3: Multifunction select write %04x\n",data);
+		LOG( "S3: Multifunction select write %04x\n",data);
 		break;
 	default:
-		if(LOG_8514) logerror("S3: Unimplemented multifunction register %i write %03x\n",data >> 12,data & 0x0fff);
+		LOG( "S3: Unimplemented multifunction register %i write %03x\n",data >> 12,data & 0x0fff);
+		break;
 	}
 }
 
@@ -4643,7 +4628,7 @@ uint16_t ibm8514a_device::ibm8514_backmix_r()
 void ibm8514a_device::ibm8514_backmix_w(uint16_t data)
 {
 	ibm8514.bgmix = data;
-	if(LOG_8514) logerror("8514/A: BG Mix write %04x\n",data);
+	LOG( "8514/A: BG Mix write %04x\n",data);
 }
 
 uint16_t ibm8514a_device::ibm8514_foremix_r()
@@ -4654,7 +4639,7 @@ uint16_t ibm8514a_device::ibm8514_foremix_r()
 void ibm8514a_device::ibm8514_foremix_w(uint16_t data)
 {
 	ibm8514.fgmix = data;
-	if(LOG_8514) logerror("8514/A: FG Mix write %04x\n",data);
+	LOG( "8514/A: FG Mix write %04x\n",data);
 }
 
 uint16_t ibm8514a_device::ibm8514_pixel_xfer_r(offs_t offset)
@@ -4681,7 +4666,7 @@ void ibm8514a_device::ibm8514_pixel_xfer_w(offs_t offset, uint16_t data)
 	if(ibm8514.state == IBM8514_DRAWING_LINE)
 		ibm8514_wait_draw_vector();
 
-	if(LOG_8514) logerror("8514/A: Pixel Transfer = %08x\n",ibm8514.pixel_xfer);
+	LOG( "8514/A: Pixel Transfer = %08x\n",ibm8514.pixel_xfer);
 }
 
 uint8_t s3_vga_device::mem_r(offs_t offset)
@@ -4952,7 +4937,8 @@ void s3_vga_device::mem_w(offs_t offset, uint8_t data)
 			dev->ibm8514_wait_draw();
 			break;
 		default:
-			if(LOG_8514) logerror("S3: MMIO offset %05x write %02x\n",offset+0xa0000,data);
+			LOG( "S3: MMIO offset %05x write %02x\n",offset+0xa0000,data);
+			break;
 		}
 		return;
 	}
@@ -5057,9 +5043,10 @@ void ati_vga_device::set_dot_clock()
 		break;
 	default:
 		clock = XTAL(42'954'545).value();
-		logerror("Invalid dot clock %i selected.\n",clock_type);
+		LOGWARN( "Invalid dot clock %i selected.\n",clock_type);
+		break;
 	}
-//  logerror("ATI: Clock select type %i (%iHz / %i)\n",clock_type,clock,div);
+//  LOG("ATI: Clock select type %i (%iHz / %i)\n",clock_type,clock,div);
 	recompute_params_clock(divisor,clock / div);
 
 }
@@ -5129,19 +5116,19 @@ uint8_t ati_vga_device::ati_port_ext_r(offs_t offset)
 		{
 		case 0x20:
 			ret = 0x10;  // 16-bit ROM access
-			logerror("ATI20 read\n");
+			LOG( "ATI20 read\n");
 			break;
 		case 0x28:  // Vertical line counter (high)
 			ret = (screen().vpos() >> 8) & 0x03;
-			logerror("ATI28 (vertical line high) read\n");
+			LOG( "ATI28 (vertical line high) read\n");
 			break;
 		case 0x29:  // Vertical line counter (low)
 			ret = screen().vpos() & 0xff;  // correct?
-			logerror("ATI29 (vertical line low) read\n");
+			LOG( "ATI29 (vertical line low) read\n");
 			break;
 		case 0x2a:
 			ret = ati.vga_chip_id;  // Chip revision (6 for the 28800-6, 5 for the 28800-5) This register is not listed in ATI's mach32 docs
-			logerror("ATI2A (VGA ID) read\n");
+			LOG( "ATI2A (VGA ID) read\n");
 			break;
 		case 0x37:
 			{
@@ -5153,11 +5140,12 @@ uint8_t ati_vga_device::ati_port_ext_r(offs_t offset)
 		case 0x3d:
 			ret = ati.ext_reg[ati.ext_reg_select] & 0x0f;
 			ret |= 0x10;  // EGA DIP switch emulation
-			logerror("ATI3D (EGA DIP emulation) read\n");
+			LOG( "ATI3D (EGA DIP emulation) read\n");
 			break;
 		default:
 			ret = ati.ext_reg[ati.ext_reg_select];
-			logerror("ATI: Extended VGA register 0x01CE index %02x read\n",ati.ext_reg_select);
+			LOG( "ATI: Extended VGA register 0x01CE index %02x read\n",ati.ext_reg_select);
+			break;
 		}
 		break;
 	}
@@ -5179,15 +5167,15 @@ void ati_vga_device::ati_port_ext_w(offs_t offset, uint8_t data)
 			vga.crtc.start_addr_latch = (vga.crtc.start_addr_latch & 0xfffdffff) | ((data & 0x10) << 13);
 			vga.crtc.cursor_addr = (vga.crtc.cursor_addr & 0xfffdffff) | ((data & 0x08) << 14);
 			ati.ext_reg[ati.ext_reg_select] = data & 0x1f;
-			logerror("ATI: ATI23 write %02x\n",data);
+			LOG( "ATI: ATI23 write %02x\n",data);
 			break;
 		case 0x26:
 			ati.ext_reg[ati.ext_reg_select] = data & 0xc9;
-			logerror("ATI: ATI26 write %02x\n",data);
+			LOG( "ATI: ATI26 write %02x\n",data);
 			break;
 		case 0x2b:
 			ati.ext_reg[ati.ext_reg_select] = data & 0xdf;
-			logerror("ATI: ATI2B write %02x\n",data);
+			LOG( "ATI: ATI2B write %02x\n",data);
 			break;
 		case 0x2d:
 			if(data & 0x08)
@@ -5196,17 +5184,17 @@ void ati_vga_device::ati_port_ext_w(offs_t offset, uint8_t data)
 				// bit 1 = bit 8 of horizontal blank start
 				// bit 2 = bit 8 of horizontal retrace start
 			}
-			logerror("ATI: ATI2D (extensions) write %02x\n",data);
+			LOG( "ATI: ATI2D (extensions) write %02x\n",data);
 			break;
 		case 0x30:
 			vga.crtc.start_addr_latch = (vga.crtc.start_addr_latch & 0xfffeffff) | ((data & 0x40) << 10);
 			vga.crtc.cursor_addr = (vga.crtc.cursor_addr & 0xfffeffff) | ((data & 0x04) << 14);
 			ati.ext_reg[ati.ext_reg_select] = data & 0x7d;
-			logerror("ATI: ATI30 write %02x\n",data);
+			LOG( "ATI: ATI30 write %02x\n",data);
 			break;
 		case 0x31:
 			ati.ext_reg[ati.ext_reg_select] = data & 0x7f;
-			logerror("ATI: ATI31 write %02x\n",data);
+			LOG( "ATI: ATI31 write %02x\n",data);
 			break;
 		case 0x32:  // memory page select
 			if(ati.ext_reg[0x3e] & 0x08)
@@ -5219,7 +5207,7 @@ void ati_vga_device::ati_port_ext_w(offs_t offset, uint8_t data)
 				svga.bank_r = ((data & 0x1e) >> 1);
 				svga.bank_w = ((data & 0x1e) >> 1);
 			}
-			//logerror("ATI: Memory Page Select write %02x (read: %i write %i)\n",data,svga.bank_r,svga.bank_w);
+			//LOG( "ATI: Memory Page Select write %02x (read: %i write %i)\n",data,svga.bank_r,svga.bank_w);
 			break;
 		case 0x33:  // EEPROM
 			ati.ext_reg[ati.ext_reg_select] = data & 0xef;
@@ -5234,38 +5222,41 @@ void ati_vga_device::ati_port_ext_w(offs_t offset, uint8_t data)
 				}
 			}
 			else
-				logerror("ATI: ATI33 write %02x\n",data);
+			{
+				LOG( "ATI: ATI33 write %02x\n",data);
+			}
 			break;
 		case 0x38:
 			ati.ext_reg[ati.ext_reg_select] = data & 0xef;
-			logerror("ATI: ATI38 write %02x\n",data);
+			LOG( "ATI: ATI38 write %02x\n",data);
 			break;
 		case 0x39:
 			ati.ext_reg[ati.ext_reg_select] = data & 0xfe;
-			logerror("ATI: ATI39 write %02x\n",data);
+			LOG( "ATI: ATI39 write %02x\n",data);
 			break;
 		case 0x3a:  // General purpose read-write bits
 			ati.ext_reg[ati.ext_reg_select] = data & 0x07;
-			logerror("ATI: ATI3A write %02x\n",data);
+			LOG( "ATI: ATI3A write %02x\n",data);
 			break;
 		case 0x3c:  // Reserved, should be 0
 			ati.ext_reg[ati.ext_reg_select] = 0;
-			logerror("ATI: ATI3C write %02x\n",data);
+			LOG( "ATI: ATI3C write %02x\n",data);
 			break;
 		case 0x3d:
 			ati.ext_reg[ati.ext_reg_select] = data & 0xfd;
-			logerror("ATI: ATI3D write %02x\n",data);
+			LOG( "ATI: ATI3D write %02x\n",data);
 			break;
 		case 0x3e:
 			ati.ext_reg[ati.ext_reg_select] = data & 0x1f;
-			logerror("ATI: ATI3E write %02x\n",data);
+			LOG( "ATI: ATI3E write %02x\n",data);
 			break;
 		case 0x3f:
 			ati.ext_reg[ati.ext_reg_select] = data & 0x0f;
-			logerror("ATI: ATI3F write %02x\n",data);
+			LOG( "ATI: ATI3F write %02x\n",data);
 			break;
 		default:
-			logerror("ATI: Extended VGA register 0x01CE index %02x write %02x\n",ati.ext_reg_select,data);
+			LOG( "ATI: Extended VGA register 0x01CE index %02x write %02x\n",ati.ext_reg_select,data);
+			break;
 		}
 		break;
 	}
@@ -5324,7 +5315,7 @@ void ibm8514a_device::ibm8514_htotal_w(offs_t offset, uint8_t data)
 			break;
 	}
 	//vga.crtc.horz_total = data & 0x01ff;
-	if(LOG_8514) logerror("8514/A: Horizontal total write %04x\n",data);
+	LOG( "8514/A: Horizontal total write %04x\n",data);
 }
 
 /*
@@ -5376,7 +5367,7 @@ void ibm8514a_device::ibm8514_subcontrol_w(uint16_t data)
 {
 	ibm8514.subctrl = data;
 	ibm8514.substatus &= ~(data & 0x0f);  // reset interrupts
-//  if(LOG_8514) logerror("8514/A: Subsystem control write %04x\n",data);
+//  LOG( "8514/A: Subsystem control write %04x\n",data);
 }
 
 uint16_t ibm8514a_device::ibm8514_subcontrol_r()
@@ -5428,7 +5419,7 @@ void ibm8514a_device::ibm8514_vtotal_w(uint16_t data)
 {
 	ibm8514.vtotal = data;
 //  vga.crtc.vert_total = data;
-	if(LOG_8514) logerror("8514/A: Vertical total write %04x\n",data);
+	LOG( "8514/A: Vertical total write %04x\n",data);
 }
 
 uint16_t ibm8514a_device::ibm8514_vdisp_r()
@@ -5440,7 +5431,7 @@ void ibm8514a_device::ibm8514_vdisp_w(uint16_t data)
 {
 	ibm8514.vdisp = data;
 //  vga.crtc.vert_disp_end = data >> 3;
-	if(LOG_8514) logerror("8514/A: Vertical Displayed write %04x\n",data);
+	LOG( "8514/A: Vertical Displayed write %04x\n",data);
 }
 
 uint16_t ibm8514a_device::ibm8514_vsync_r()
@@ -5451,7 +5442,7 @@ uint16_t ibm8514a_device::ibm8514_vsync_r()
 void ibm8514a_device::ibm8514_vsync_w(uint16_t data)
 {
 	ibm8514.vsync = data;
-	if(LOG_8514) logerror("8514/A: Vertical Sync write %04x\n",data);
+	LOG( "8514/A: Vertical Sync write %04x\n",data);
 }
 
 void ibm8514a_device::enabled()
@@ -5468,7 +5459,7 @@ uint16_t mach8_device::mach8_ec0_r()
 void mach8_device::mach8_ec0_w(uint16_t data)
 {
 	ibm8514.ec0 = data;
-	if(LOG_8514) logerror("8514/A: Extended configuration 0 write %04x\n",data);
+	LOG( "8514/A: Extended configuration 0 write %04x\n",data);
 }
 
 uint16_t mach8_device::mach8_ec1_r()
@@ -5479,7 +5470,7 @@ uint16_t mach8_device::mach8_ec1_r()
 void mach8_device::mach8_ec1_w(uint16_t data)
 {
 	ibm8514.ec1 = data;
-	if(LOG_8514) logerror("8514/A: Extended configuration 1 write %04x\n",data);
+	LOG( "8514/A: Extended configuration 1 write %04x\n",data);
 }
 
 uint16_t mach8_device::mach8_ec2_r()
@@ -5490,7 +5481,7 @@ uint16_t mach8_device::mach8_ec2_r()
 void mach8_device::mach8_ec2_w(uint16_t data)
 {
 	ibm8514.ec2 = data;
-	if(LOG_8514) logerror("8514/A: Extended configuration 2 write %04x\n",data);
+	LOG( "8514/A: Extended configuration 2 write %04x\n",data);
 }
 
 uint16_t mach8_device::mach8_ec3_r()
@@ -5501,7 +5492,7 @@ uint16_t mach8_device::mach8_ec3_r()
 void mach8_device::mach8_ec3_w(uint16_t data)
 {
 	ibm8514.ec3 = data;
-	if(LOG_8514) logerror("8514/A: Extended configuration 3 write %04x\n",data);
+	LOG( "8514/A: Extended configuration 3 write %04x\n",data);
 }
 
 uint16_t mach8_device::mach8_ext_fifo_r()
@@ -5512,7 +5503,7 @@ uint16_t mach8_device::mach8_ext_fifo_r()
 void mach8_device::mach8_linedraw_index_w(uint16_t data)
 {
 	mach8.linedraw = data & 0x07;
-	if(LOG_8514) logerror("Mach8: Line Draw Index write %04x\n",data);
+	LOG( "Mach8: Line Draw Index write %04x\n",data);
 }
 
 uint16_t mach8_device::mach8_bresenham_count_r()
@@ -5523,7 +5514,7 @@ uint16_t mach8_device::mach8_bresenham_count_r()
 void mach8_device::mach8_bresenham_count_w(uint16_t data)
 {
 	ibm8514.rect_width = data & 0x1fff;
-	if(LOG_8514) logerror("Mach8: Bresenham count write %04x\n",data);
+	LOG( "Mach8: Bresenham count write %04x\n",data);
 }
 
 uint16_t mach8_device::mach8_linedraw_r()
@@ -5561,7 +5552,7 @@ void mach8_device::mach8_linedraw_w(uint16_t data)
 		mach8.linedraw = 4;
 		break;
 	}
-	logerror("ATI: Linedraw register write %04x, mode %i\n",data,mach8.linedraw);
+	LOG( "ATI: Linedraw register write %04x, mode %i\n",data,mach8.linedraw);
 }
 
 uint16_t mach8_device::mach8_sourcex_r()
@@ -5592,7 +5583,7 @@ uint16_t mach8_device::mach8_scratch0_r()
 void mach8_device::mach8_scratch0_w(uint16_t data)
 {
 	mach8.scratch0 = data;
-	if(LOG_8514) logerror("Mach8: Scratch Pad 0 write %04x\n",data);
+	LOG( "Mach8: Scratch Pad 0 write %04x\n",data);
 }
 
 uint16_t mach8_device::mach8_scratch1_r()
@@ -5603,32 +5594,32 @@ uint16_t mach8_device::mach8_scratch1_r()
 void mach8_device::mach8_scratch1_w(uint16_t data)
 {
 	mach8.scratch1 = data;
-	if(LOG_8514) logerror("Mach8: Scratch Pad 1 write %04x\n",data);
+	LOG( "Mach8: Scratch Pad 1 write %04x\n",data);
 }
 
 void mach8_device::mach8_crt_pitch_w(uint16_t data)
 {
 	mach8.crt_pitch = data & 0x00ff;
 	m_vga->set_offset(mach8.crt_pitch);
-	if(LOG_8514) logerror("Mach8: CRT pitch write %04x\n",mach8.crt_pitch);
+	LOG( "Mach8: CRT pitch write %04x\n",mach8.crt_pitch);
 }
 
 void mach8_device::mach8_ge_offset_l_w(uint16_t data)
 {
 	mach8.ge_offset = (mach8.ge_offset & 0x0f0000) | data;
-	if(LOG_8514) logerror("Mach8: Graphics Engine Offset (Low) write %05x\n",mach8.ge_offset);
+	LOG( "Mach8: Graphics Engine Offset (Low) write %05x\n",mach8.ge_offset);
 }
 
 void mach8_device::mach8_ge_offset_h_w(uint16_t data)
 {
 	mach8.ge_offset = (mach8.ge_offset & 0x00ffff) | ((data & 0x000f) << 16);
-	if(LOG_8514) logerror("Mach8: Graphics Engine Offset (High) write %05x\n",mach8.ge_offset);
+	LOG( "Mach8: Graphics Engine Offset (High) write %05x\n",mach8.ge_offset);
 }
 
 void mach8_device::mach8_ge_pitch_w(uint16_t data)
 {
 	mach8.ge_pitch = data & 0x00ff;
-	if(LOG_8514) logerror("Mach8: Graphics Engine pitch write %04x\n",mach8.ge_pitch);
+	LOG( "Mach8: Graphics Engine pitch write %04x\n",mach8.ge_pitch);
 }
 
 void mach8_device::mach8_scan_x_w(uint16_t data)
@@ -5642,7 +5633,7 @@ void mach8_device::mach8_scan_x_w(uint16_t data)
 		ibm8514.data_avail = true;
 	}
 	// TODO: non-wait version of Scan To X
-	if(LOG_8514) logerror("Mach8: Scan To X write %04x\n",mach8.scan_x);
+	LOG( "Mach8: Scan To X write %04x\n",mach8.scan_x);
 }
 
 void mach8_device::mach8_pixel_xfer_w(offs_t offset, uint16_t data)
@@ -5708,7 +5699,7 @@ void mach8_device::mach8_wait_scan()
 void mach8_device::mach8_dp_config_w(uint16_t data)
 {
 	mach8.dp_config = data;
-	if(LOG_8514) logerror("Mach8: Data Path Configuration write %04x\n",mach8.dp_config);
+	LOG( "Mach8: Data Path Configuration write %04x\n",mach8.dp_config);
 }
 
 /*

@@ -9,8 +9,8 @@
 #include "emu.h"
 #include "com8116.h"
 
-#define LOG_SELECTED (1 << 0)
-#define LOG_TABLE (1 << 1)
+#define LOG_SELECTED (1U << 1)
+#define LOG_TABLE    (1U << 2)
 //#define VERBOSE (LOG_TABLE)
 #include "logmacro.h"
 

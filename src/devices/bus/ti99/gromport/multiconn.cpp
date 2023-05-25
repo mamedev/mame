@@ -43,9 +43,9 @@
 #include "emu.h"
 #include "multiconn.h"
 
-#define LOG_WARN             (1U<<1)
-#define LOG_CHANGE          (1U<<2)
-#define VERBOSE ( LOG_WARN )
+#define LOG_WARN            (1U << 1)
+#define LOG_CHANGE          (1U << 2)
+#define VERBOSE (LOG_WARN)
 
 #include "logmacro.h"
 

@@ -103,7 +103,7 @@ void pcat_dyn_state::bank2_w(uint8_t data)
 void pcat_dyn_state::pcat_map(address_map &map)
 {
 	map(0x00000000, 0x0009ffff).ram();
-	map(0x000a0000, 0x000bffff).rw("vga", FUNC(trident_vga_device::mem_r), FUNC(trident_vga_device::mem_w));
+	map(0x000a0000, 0x000bffff).rw("vga", FUNC(tvga9000_device::mem_r), FUNC(tvga9000_device::mem_w));
 	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
 	map(0x000d0000, 0x000d0fff).rom().region("game_prg", 0x0000).w(FUNC(pcat_dyn_state::bank1_w));
 	map(0x000d1000, 0x000d1fff).rom().region("game_prg", 0x1000).w(FUNC(pcat_dyn_state::bank2_w));
@@ -118,9 +118,9 @@ void pcat_dyn_state::pcat_map(address_map &map)
 void pcat_dyn_state::pcat_io(address_map &map)
 {
 	pcat32_io_common(map);
-	map(0x03b0, 0x03bf).rw("vga", FUNC(trident_vga_device::port_03b0_r), FUNC(trident_vga_device::port_03b0_w));
-	map(0x03c0, 0x03cf).rw("vga", FUNC(trident_vga_device::port_03c0_r), FUNC(trident_vga_device::port_03c0_w));
-	map(0x03d0, 0x03df).rw("vga", FUNC(trident_vga_device::port_03d0_r), FUNC(trident_vga_device::port_03d0_w));
+	map(0x03b0, 0x03bf).rw("vga", FUNC(tvga9000_device::port_03b0_r), FUNC(tvga9000_device::port_03b0_w));
+	map(0x03c0, 0x03cf).rw("vga", FUNC(tvga9000_device::port_03c0_r), FUNC(tvga9000_device::port_03c0_w));
+	map(0x03d0, 0x03df).rw("vga", FUNC(tvga9000_device::port_03d0_r), FUNC(tvga9000_device::port_03d0_w));
 	map(0x03f8, 0x03ff).rw("ns16550", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 	map(0x0530, 0x0533).r(FUNC(pcat_dyn_state::audio_r));
 	map(0x0534, 0x0537).rw("ad1848", FUNC(ad1848_device::read), FUNC(ad1848_device::write));

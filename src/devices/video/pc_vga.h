@@ -11,6 +11,8 @@
 #ifndef MAME_VIDEO_PC_VGA_H
 #define MAME_VIDEO_PC_VGA_H
 
+#pragma once
+
 #include "screen.h"
 
 // ======================> vga_device

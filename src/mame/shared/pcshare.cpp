@@ -140,18 +140,6 @@ void pcat_base_state::pcat32_io_common(address_map &map)
 	map(0x00c0, 0x00df).rw(m_dma8237_2, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask32(0x00ff00ff);
 }
 
-
-void pcat_base_state::pcvideo_vga(machine_config &config)
-{
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
-	screen.set_screen_update("vga", FUNC(vga_device::screen_update));
-
-	vga_device &vga(VGA(config, "vga", 0));
-	vga.set_screen("screen");
-	vga.set_vram_size(0x100000);
-}
-
 void pcat_base_state::pcat_common(machine_config &config)
 {
 	PIC8259(config, m_pic8259_1, 0);

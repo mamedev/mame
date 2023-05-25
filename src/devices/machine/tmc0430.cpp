@@ -94,13 +94,13 @@
 #include "emu.h"
 #include "tmc0430.h"
 
-#define LOG_DETAIL      (1U<<1)     // More detail
-#define LOG_ADDRESS     (1U<<2)     // Address bus
-#define LOG_CLOCK       (1U<<3)     // Clock line
-#define LOG_READY       (1U<<4)     // Ready line
-#define LOG_LINES       (1U<<5)     // Select/mode lines
+#define LOG_DETAIL      (1U << 1)     // More detail
+#define LOG_ADDRESS     (1U << 2)     // Address bus
+#define LOG_CLOCK       (1U << 3)     // Clock line
+#define LOG_READY       (1U << 4)     // Ready line
+#define LOG_LINES       (1U << 5)     // Select/mode lines
 
-#define VERBOSE ( LOG_GENERAL )
+#define VERBOSE (LOG_GENERAL)
 
 #include "logmacro.h"
 

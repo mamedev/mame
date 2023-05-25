@@ -31,12 +31,11 @@
 #include "nxrom.h"
 
 #ifdef NES_PCB_DEBUG
-#define VERBOSE 1
+#define VERBOSE (LOG_GENERAL)
 #else
-#define VERBOSE 0
+#define VERBOSE (0)
 #endif
-
-#define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 
 //-------------------------------------------------
@@ -221,7 +220,7 @@ void nes_nochr_device::pcb_reset()
 
  iNES: mapper 0
 
- In MESS: Supported, no need of specific handlers or IRQ
+ In MAME: Supported, no need of specific handlers or IRQ
 
  -------------------------------------------------*/
 
@@ -233,13 +232,13 @@ void nes_nochr_device::pcb_reset()
  This is an homebrew extension to map linearly 46KB
  or PRG in boards with no PRG bankswitch logic
 
- In MESS: Supported
+ In MAME: Supported
 
  -------------------------------------------------*/
 
 uint8_t nes_nrom368_device::read_l(offs_t offset)
 {
-	LOG_MMC(("nrom368 read_l, offset: %04x\n", offset));
+	LOG("nrom368 read_l, offset: %04x\n", offset);
 	offset += 0x100;
 	if (offset >= 0x800)
 		return m_prg[offset - 0x800];
@@ -249,13 +248,13 @@ uint8_t nes_nrom368_device::read_l(offs_t offset)
 
 uint8_t nes_nrom368_device::read_m(offs_t offset)
 {
-	LOG_MMC(("nrom368 read_m, offset: %04x\n", offset));
+	LOG("nrom368 read_m, offset: %04x\n", offset);
 	return m_prg[0x1800 + (offset & 0x1fff)];
 }
 
 uint8_t nes_nrom368_device::read_h(offs_t offset)
 {
-	LOG_MMC(("nrom368 read_h, offset: %04x\n", offset));
+	LOG("nrom368 read_h, offset: %04x\n", offset);
 	return m_prg[0x3800 + (offset & 0x7fff)];
 }
 
@@ -276,13 +275,13 @@ uint8_t nes_nrom368_device::read_h(offs_t offset)
 
  iNES: mapper 7
 
- In MESS: Supported
+ In MAME: Supported
 
  -------------------------------------------------*/
 
 void nes_axrom_device::write_h(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("axrom write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("axrom write_h, offset: %04x, data: %02x\n", offset, data);
 
 	// this pcb is subject to bus conflict
 	data = account_bus_conflict(offset, data);
@@ -305,7 +304,7 @@ void nes_bxrom_device::write_h(offs_t offset, uint8_t data)
 {
 	/* This portion of the mapper is nearly identical to Mapper 7, except no one-screen mirroring */
 	/* Deadly Towers is really a BxROM game - the demo screens look wrong using mapper 7. */
-	LOG_MMC(("bxrom write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("bxrom write_h, offset: %04x, data: %02x\n", offset, data);
 
 	// this pcb is subject to bus conflict, but the same is not true for some pirate variants
 	data = account_bus_conflict(offset, data);
@@ -331,15 +330,15 @@ void nes_bxrom_device::write_h(offs_t offset, uint8_t data)
 
  Notice that BANDAI_PT554 board (Aerobics Studio) uses very
  similar hardware but with an additional sound chip which
- gets writes to 0x6000 (currently unemulated in MESS)
+ gets writes to 0x6000 (currently unemulated in MAME)
 
- In MESS: Supported
+ In MAME: Supported
 
  -------------------------------------------------*/
 
 void nes_cnrom_device::write_h(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("cxrom write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("cxrom write_h, offset: %04x, data: %02x\n", offset, data);
 
 	// this pcb is subject to bus conflict, but the same is not true for some pirate variants
 	data = account_bus_conflict(offset, data);
@@ -381,13 +380,13 @@ uint8_t nes_cnrom_device::chr_r(offs_t offset)
 
  iNES: mapper 13
 
- In MESS: Supported
+ In MAME: Supported
 
  -------------------------------------------------*/
 
 void nes_cprom_device::write_h(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("cprom write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("cprom write_h, offset: %04x, data: %02x\n", offset, data);
 
 	// this pcb is subject to bus conflict
 	data = account_bus_conflict(offset, data);
@@ -408,7 +407,7 @@ void nes_cprom_device::write_h(offs_t offset, uint8_t data)
 
 void nes_gxrom_device::write_h(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("gxrom write_h, offset %04x, data: %02x\n", offset, data));
+	LOG("gxrom write_h, offset %04x, data: %02x\n", offset, data);
 
 	// this pcb is subject to bus conflict
 	data = account_bus_conflict(offset, data);
@@ -428,13 +427,13 @@ void nes_gxrom_device::write_h(offs_t offset, uint8_t data)
 
  iNES: mapper 2
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
 void nes_uxrom_device::write_h(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("uxrom write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("uxrom write_h, offset: %04x, data: %02x\n", offset, data);
 
 	// this pcb is subject to bus conflict
 	data = account_bus_conflict(offset, data);
@@ -454,13 +453,13 @@ void nes_uxrom_device::write_h(offs_t offset, uint8_t data)
 
  iNES: mapper 180
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
 void nes_uxrom_cc_device::write_h(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("uxrom_cc write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("uxrom_cc write_h, offset: %04x, data: %02x\n", offset, data);
 
 	prg16_cdef(data);
 }
@@ -475,13 +474,13 @@ void nes_uxrom_cc_device::write_h(offs_t offset, uint8_t data)
 
  iNES: mapper 94
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
 void nes_un1rom_device::write_h(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("un1rom write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("un1rom write_h, offset: %04x, data: %02x\n", offset, data);
 
 	// this pcb is subject to bus conflict
 	data = account_bus_conflict(offset, data);

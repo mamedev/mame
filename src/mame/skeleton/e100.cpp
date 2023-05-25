@@ -45,13 +45,12 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-//#define LOG_GENERAL (1U <<  0)
-#define LOG_SETUP   (1U <<  1)
-#define LOG_SCAN    (1U <<  2)
-#define LOG_BANK    (1U <<  3)
-#define LOG_SCREEN  (1U <<  4)
-#define LOG_READ    (1U <<  5)
-#define LOG_CS      (1U <<  6)
+#define LOG_SETUP   (1U << 1)
+#define LOG_SCAN    (1U << 2)
+#define LOG_BANK    (1U << 3)
+#define LOG_SCREEN  (1U << 4)
+#define LOG_READ    (1U << 5)
+#define LOG_CS      (1U << 6)
 
 //#define VERBOSE (LOG_READ | LOG_GENERAL | LOG_SETUP | LOG_BANK)
 //#define LOG_OUTPUT_FUNC printf

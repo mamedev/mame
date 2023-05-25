@@ -3,7 +3,6 @@
 #include "emu.h"
 #include "gt64xxx.h"
 
-#define LOG_GENERAL         (1U << 0)
 #define LOG_GALILEO         (1U << 1)
 #define LOG_TIMERS          (1U << 2)
 #define LOG_DMA             (1U << 3)

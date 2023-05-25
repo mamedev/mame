@@ -24,21 +24,6 @@
 
 #define MPU4_MASTER_CLOCK           XTAL(6'880'000)
 
-
-
-#ifdef MAME_DEBUG
-#define MPU4VERBOSE 1
-#else
-#define MPU4VERBOSE 0
-#endif
-
-#define LOG(x)  do { if (MPU4VERBOSE) logerror x; } while (0)
-#define LOG_CHR(x)  do { if (MPU4VERBOSE) logerror x; } while (0)
-#define LOG_CHR_FULL(x) do { if (MPU4VERBOSE) logerror x; } while (0)
-#define LOG_IC3(x)  do { if (MPU4VERBOSE) logerror x; } while (0)
-#define LOG_IC8(x)  do { if (MPU4VERBOSE) logerror x; } while (0)
-
-
 //reel info
 #define STANDARD_REEL  0    // As originally designed 3/4 reels
 #define FIVE_REEL_5TO8 1    // Interfaces to meter port, allows some mechanical metering, but there is significant 'bounce' in the extra reel

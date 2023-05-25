@@ -49,10 +49,13 @@ XTAL values appear to be 3579.545 (X1) and 11.200 (X2).
 #include "screen.h"
 #include "speaker.h"
 
+#define LOG_AUDIO_COMM  (1U << 1)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
 
 namespace {
-
-#define LOG_AUDIO_COMM  (0)
 
 #define MAIN_CPU_MASTER_CLOCK   (11.2_MHz_XTAL)
 #define PIXEL_CLOCK             (MAIN_CPU_MASTER_CLOCK / 2)
@@ -146,7 +149,7 @@ uint8_t r2dtank_state::audio_command_r()
 {
 	uint8_t ret = m_soundlatch->read();
 
-if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", m_audiocpu->pc(), ret);
+	LOGMASKED(LOG_AUDIO_COMM, "%08X  CPU#1  Audio Command Read: %x\n", m_audiocpu->pc(), ret);
 
 	return ret;
 }
@@ -157,14 +160,14 @@ void r2dtank_state::audio_command_w(uint8_t data)
 	m_soundlatch->write(~data);
 	m_audiocpu->set_input_line(M6802_IRQ_LINE, HOLD_LINE);
 
-if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", m_maincpu->pc(), data^0xff);
+	LOGMASKED(LOG_AUDIO_COMM, "%08X   CPU#0  Audio Command Write: %x\n", m_maincpu->pc(), data^0xff);
 }
 
 
 uint8_t r2dtank_state::audio_answer_r()
 {
 	uint8_t ret = m_soundlatch2->read();
-if (LOG_AUDIO_COMM) logerror("%08X  CPU#0  Audio Answer Read: %x\n", m_maincpu->pc(), ret);
+	LOGMASKED(LOG_AUDIO_COMM, "%08X  CPU#0  Audio Answer Read: %x\n", m_maincpu->pc(), ret);
 
 	return ret;
 }
@@ -179,7 +182,7 @@ void r2dtank_state::audio_answer_w(uint8_t data)
 	m_soundlatch2->write(data);
 	m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 
-if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Answer Write: %x\n", m_audiocpu->pc(), data);
+	LOGMASKED(LOG_AUDIO_COMM, "%08X  CPU#1  Audio Answer Write: %x\n", m_audiocpu->pc(), data);
 }
 
 
@@ -194,7 +197,7 @@ void r2dtank_state::AY8910_select_w(uint8_t data)
 	   D5-D7 - not used */
 	m_AY8910_selected = data;
 
-if (LOG_AUDIO_COMM) logerror("%s:  CPU#1  AY8910_select_w: %x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_AUDIO_COMM, "%s:  CPU#1  AY8910_select_w: %x\n", machine().describe_context(), data);
 }
 
 

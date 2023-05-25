@@ -72,13 +72,13 @@
 #include "datamux.h"
 #include "cpu/tms9900/tms99com.h"
 
-#define LOG_WARN        (1U<<1)   // Warnings
-#define LOG_READY       (1U<<2)   // READY line
-#define LOG_ACCESS      (1U<<3)   // Access to this GROM
-#define LOG_ADDRESS     (1U<<4)   // Address register
-#define LOG_WAITCOUNT   (1U<<5)   // Wait state counter
+#define LOG_WARN        (1U << 1)   // Warnings
+#define LOG_READY       (1U << 2)   // READY line
+#define LOG_ACCESS      (1U << 3)   // Access to this GROM
+#define LOG_ADDRESS     (1U << 4)   // Address register
+#define LOG_WAITCOUNT   (1U << 5)   // Wait state counter
 
-#define VERBOSE ( LOG_GENERAL | LOG_WARN )
+#define VERBOSE (LOG_GENERAL | LOG_WARN)
 
 #include "logmacro.h"
 

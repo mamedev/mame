@@ -10,7 +10,6 @@
 #include "emu.h"
 #include "mpc106.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_RAM     (1U << 1)
 
 #define VERBOSE (0)

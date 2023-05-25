@@ -49,9 +49,8 @@
 #include "ms0515.lh"
 
 
-#define LOG_GENERAL (1U <<  0)
-#define LOG_BANK    (1U <<  1)
-#define LOG_SYSREG  (1U <<  2)
+#define LOG_BANK    (1U << 1)
+#define LOG_SYSREG  (1U << 2)
 
 //#define VERBOSE (LOG_GENERAL | LOG_BANK | LOG_SYSREG)
 //#define LOG_OUTPUT_FUNC osd_printf_info

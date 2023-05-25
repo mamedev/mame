@@ -419,11 +419,11 @@ void polygonet_state::sys_w(offs_t offset, u8 data)
 				m_maincpu->set_input_line(M68K_IRQ_5, CLEAR_LINE);
 
 			m_sys1 = data;
-			LOGMASKED(LOG_GENERAL, "sys1 write: %02x\n", data);
+			LOG("sys1 write: %02x\n", data);
 			break;
 
 		default:
-			LOGMASKED(LOG_GENERAL, "Unknown sys_w write: %08x = %02x\n", offset, data);
+			LOG("Unknown sys_w write: %08x = %02x\n", offset, data);
 			break;
 	}
 }
@@ -835,13 +835,13 @@ void polygonet_state::ttl_vram_w(offs_t offset, u32 data, u32 mem_mask)
 void polygonet_state::fix_regs_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_fix_regs[offset]);
-	LOGMASKED(LOG_GENERAL, "fix_regs_w: %08x = %08x & %08x\n", offset, data, mem_mask);
+	LOG("fix_regs_w: %08x = %08x & %08x\n", offset, data, mem_mask);
 }
 
 u32 polygonet_state::fix_regs_r(offs_t offset, u32 mem_mask)
 {
 	const u32 data = m_fix_regs[offset];
-	LOGMASKED(LOG_GENERAL, "fix_regs_r: %08x: %08x & %08x\n", offset, data, mem_mask);
+	LOG("fix_regs_r: %08x: %08x & %08x\n", offset, data, mem_mask);
 	return data;
 }
 

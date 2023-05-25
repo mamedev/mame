@@ -59,19 +59,19 @@
 #include "formats/mfm_hd.h"
 #include "formats/ti99_dsk.h"       // Format
 
-#define LOG_WARN        (1U<<1)    // Warnings
-#define LOG_EMU         (1U<<2)
-#define LOG_COMP        (1U<<3)
-#define LOG_RAM         (1U<<4)
-#define LOG_ROM         (1U<<5)
-#define LOG_LINES       (1U<<6)
-#define LOG_DMA         (1U<<7)
-#define LOG_MOTOR       (1U<<8)
-#define LOG_INT         (1U<<9)
-#define LOG_CRU         (1U<<10)
-#define LOG_CONFIG      (1U<<15)    // Configuration
+#define LOG_WARN        (1U << 1)   // Warnings
+#define LOG_EMU         (1U << 2)
+#define LOG_COMP        (1U << 3)
+#define LOG_RAM         (1U << 4)
+#define LOG_ROM         (1U << 5)
+#define LOG_LINES       (1U << 6)
+#define LOG_DMA         (1U << 7)
+#define LOG_MOTOR       (1U << 8)
+#define LOG_INT         (1U << 9)
+#define LOG_CRU         (1U << 10)
+#define LOG_CONFIG      (1U << 15)  // Configuration
 
-#define VERBOSE ( LOG_GENERAL | LOG_CONFIG | LOG_WARN )
+#define VERBOSE (LOG_GENERAL | LOG_CONFIG | LOG_WARN)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(TI99_HFDC, bus::ti99::peb::myarc_hfdc_device, "ti99_hfdc", "Myarc Hard and Floppy Disk Controller")

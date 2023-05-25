@@ -23,7 +23,11 @@
 
 
 // logging
-#define LOG_CONTROL_CHANGES (0)
+#define LOG_CONTROL_CHANGES (1U << 1)
+#define LOG_NANS            (1U << 2)
+#define LOG_VALUES          (1U << 3)
+#define VERBOSE (LOG_NANS)
+#include "logmacro.h"
 
 
 // use 0.25 as the base volume for pulses
@@ -200,7 +204,7 @@ double cem3394_device::filter(double input, double cutoff)
 	// catch any NaNs
 	if (std::isnan(output))
 	{
-		logerror("NAN - vco: %6.0f cutoff: %6.0f res: %.5f output: %.5f\n", m_vco_step / m_inv_sample_rate, cutoff, m_filter_resonance, output);
+		LOGMASKED(LOG_NANS, "NAN - vco: %6.0f cutoff: %6.0f res: %.5f output: %.5f\n", m_vco_step / m_inv_sample_rate, cutoff, m_filter_resonance, output);
 		output = 0;
 		m_filter_out[0] = m_filter_out[1] = 0;
 	}
@@ -253,7 +257,7 @@ double cem3394_device::filter(double input, double cutoff)
 	// catch NaNs
 	if (std::isnan(output))
 	{
-		logerror("NAN - vco: %6.0f cutoff: %6.0f res: %.5f output: %.5f\n", m_vco_step / m_inv_sample_rate, cutoff, m_filter_resonance, output);
+		LOGMASKED(LOG_NANS, "NAN - vco: %6.0f cutoff: %6.0f res: %.5f output: %.5f\n", m_vco_step / m_inv_sample_rate, cutoff, m_filter_resonance, output);
 		output = 0;
 	}
 
@@ -298,7 +302,7 @@ void cem3394_device::sound_stream_update(sound_stream &stream, std::vector<read_
 	auto &buffer = outputs[0];
 
 	if (m_wave_select == 0 && m_mixer_external == 0)
-		logerror("%f V didn't cut it\n", m_values[WAVE_SELECT]);
+		LOGMASKED(LOG_VALUES, "%f V didn't cut it\n", m_values[WAVE_SELECT]);
 
 	// loop over samples
 	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
@@ -452,7 +456,7 @@ void cem3394_device::set_voltage(int input, double voltage)
 		case VCO_FREQUENCY:
 			temp = m_vco_zero_freq * pow(2.0, -voltage * (1.0 / 0.75));
 			m_vco_step = temp * m_inv_sample_rate;
-			if (LOG_CONTROL_CHANGES) logerror("VCO_FREQ=%6.3fV -> freq=%f\n", voltage, temp);
+			LOGMASKED(LOG_CONTROL_CHANGES, "VCO_FREQ=%6.3fV -> freq=%f\n", voltage, temp);
 			break;
 
 		// wave select determines triangle/sawtooth enable
@@ -464,7 +468,7 @@ void cem3394_device::set_voltage(int input, double voltage)
 				m_wave_select |= WAVE_TRIANGLE | WAVE_SAWTOOTH;
 			else if (voltage >=  2.3 && voltage <=  3.9)
 				m_wave_select |= WAVE_SAWTOOTH;
-			if (LOG_CONTROL_CHANGES) logerror("WAVE_SEL=%6.3fV -> tri=%d saw=%d\n", voltage, (m_wave_select & WAVE_TRIANGLE) ? 1 : 0, (m_wave_select & WAVE_SAWTOOTH) ? 1 : 0);
+			LOGMASKED(LOG_CONTROL_CHANGES, "WAVE_SEL=%6.3fV -> tri=%d saw=%d\n", voltage, (m_wave_select & WAVE_TRIANGLE) ? 1 : 0, (m_wave_select & WAVE_SAWTOOTH) ? 1 : 0);
 			break;
 
 		// pulse width determines duty cycle; 0.0 means 0%, 2.0 means 100%
@@ -481,13 +485,13 @@ void cem3394_device::set_voltage(int input, double voltage)
 					m_pulse_width = MINIMUM_WIDTH + (MAXIMUM_WIDTH - MINIMUM_WIDTH) * m_pulse_width;
 				m_wave_select |= WAVE_PULSE;
 			}
-			if (LOG_CONTROL_CHANGES) logerror("PULSE_WI=%6.3fV -> raw=%f adj=%f\n", voltage, voltage * 0.5, m_pulse_width);
+			LOGMASKED(LOG_CONTROL_CHANGES, "PULSE_WI=%6.3fV -> raw=%f adj=%f\n", voltage, voltage * 0.5, m_pulse_width);
 			break;
 
 		// final gain is pretty self-explanatory; 0.0 means ~90dB, 4.0 means 0dB
 		case FINAL_GAIN:
 			m_volume = compute_db_volume(voltage);
-			if (LOG_CONTROL_CHANGES) logerror("TOT_GAIN=%6.3fV -> vol=%f\n", voltage, m_volume);
+			LOGMASKED(LOG_CONTROL_CHANGES, "TOT_GAIN=%6.3fV -> vol=%f\n", voltage, m_volume);
 			break;
 
 		// mixer balance is a pan between the external input and the internal input
@@ -503,13 +507,13 @@ void cem3394_device::set_voltage(int input, double voltage)
 				m_mixer_internal = compute_db_volume(3.55 - 0.45 * (voltage * 0.25));
 				m_mixer_external = compute_db_volume(3.55 + voltage);
 			}
-			if (LOG_CONTROL_CHANGES) logerror(" BALANCE=%6.3fV -> int=%f ext=%f\n", voltage, m_mixer_internal, m_mixer_external);
+			LOGMASKED(LOG_CONTROL_CHANGES, " BALANCE=%6.3fV -> int=%f ext=%f\n", voltage, m_mixer_internal, m_mixer_external);
 			break;
 
 		// filter frequency varies from -3.0 to +4.0, at 0.375V/octave
 		case FILTER_FREQENCY:
 			m_filter_frequency = m_filter_zero_freq * pow(2.0, -voltage * (1.0 / 0.375));
-			if (LOG_CONTROL_CHANGES) logerror("FLT_FREQ=%6.3fV -> freq=%f\n", voltage, m_filter_frequency);
+			LOGMASKED(LOG_CONTROL_CHANGES, "FLT_FREQ=%6.3fV -> freq=%f\n", voltage, m_filter_frequency);
 			break;
 
 		// modulation depth is 0.01*freq at 0V and 2.0*freq at 3.5V
@@ -520,7 +524,7 @@ void cem3394_device::set_voltage(int input, double voltage)
 				m_filter_modulation = 1.99;
 			else
 				m_filter_modulation = (voltage * (1.0 / 3.5)) * 1.98 + 0.01;
-			if (LOG_CONTROL_CHANGES) logerror("FLT_MODU=%6.3fV -> mod=%f\n", voltage, m_filter_modulation);
+			LOGMASKED(LOG_CONTROL_CHANGES, "FLT_MODU=%6.3fV -> mod=%f\n", voltage, m_filter_modulation);
 			break;
 
 		// this is not yet implemented
@@ -531,7 +535,7 @@ void cem3394_device::set_voltage(int input, double voltage)
 				m_filter_resonance = 1.0;
 			else
 				m_filter_resonance = voltage * (1.0 / 2.5);
-			if (LOG_CONTROL_CHANGES) logerror("FLT_RESO=%6.3fV -> mod=%f\n", voltage, m_filter_resonance);
+			LOGMASKED(LOG_CONTROL_CHANGES, "FLT_RESO=%6.3fV -> mod=%f\n", voltage, m_filter_resonance);
 			break;
 	}
 }

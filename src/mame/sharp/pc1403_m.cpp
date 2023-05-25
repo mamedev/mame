@@ -7,7 +7,7 @@
 #include "pc1403.h"
 #include "machine/ram.h"
 
-#define LOG_ASIC (1 << 0)
+#define LOG_ASIC (1U << 1)
 
 #define VERBSOE  (0)
 #include "logmacro.h"

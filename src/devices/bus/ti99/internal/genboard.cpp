@@ -411,25 +411,25 @@
 ***************************************************************************/
 #include "emu.h"
 
-#define LOG_WARN     (1U<<1)
-#define LOG_DETAIL   (1U<<2)
-#define LOG_READ     (1U<<3)
-#define LOG_WRITE    (1U<<4)
-#define LOG_KEYBOARD (1U<<5)
-#define LOG_CLOCK    (1U<<6)
-#define LOG_READY    (1U<<7)
-#define LOG_SETTING  (1U<<8)
-#define LOG_CRU      (1U<<9)
-#define LOG_CRUKEY   (1U<<10)
-#define LOG_DECODE   (1U<<11)
-#define LOG_ADDRESS  (1U<<12)
-#define LOG_LINES    (1U<<13)
-#define LOG_WAIT     (1U<<14)
-#define LOG_GROM      (1U<<15)
-#define LOG_MAPPER    (1U<<16)
+#define LOG_WARN     (1U << 1)
+#define LOG_DETAIL   (1U << 2)
+#define LOG_READ     (1U << 3)
+#define LOG_WRITE    (1U << 4)
+#define LOG_KEYBOARD (1U << 5)
+#define LOG_CLOCK    (1U << 6)
+#define LOG_READY    (1U << 7)
+#define LOG_SETTING  (1U << 8)
+#define LOG_CRU      (1U << 9)
+#define LOG_CRUKEY   (1U << 10)
+#define LOG_DECODE   (1U << 11)
+#define LOG_ADDRESS  (1U << 12)
+#define LOG_LINES    (1U << 13)
+#define LOG_WAIT     (1U << 14)
+#define LOG_GROM     (1U << 15)
+#define LOG_MAPPER   (1U << 16)
 
 // Minimum log should be warnings
-#define VERBOSE ( LOG_GENERAL | LOG_WARN )
+#define VERBOSE (LOG_GENERAL | LOG_WARN)
 
 #include "genboard.h"
 #include "logmacro.h"

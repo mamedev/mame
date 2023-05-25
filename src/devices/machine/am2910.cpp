@@ -14,9 +14,9 @@
 #include "emu.h"
 #include "am2910.h"
 
-#define LOG_INSN    (1 << 0)
-#define LOG_STACK   (1 << 1)
-#define LOG_ERROR   (1 << 2)
+#define LOG_INSN    (1U << 1)
+#define LOG_STACK   (1U << 2)
+#define LOG_ERROR   (1U << 3)
 #define LOG_ALL     (LOG_INSN | LOG_STACK | LOG_ERROR)
 
 #define VERBOSE     (0)

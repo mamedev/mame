@@ -59,7 +59,6 @@
 #include "emu.h"
 #include "sgi_gr1.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_READS   (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL)

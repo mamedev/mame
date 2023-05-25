@@ -9,23 +9,21 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-//#define LOG_GENERAL (1U <<  0) // Already defined in logmacro.h
-#define LOG_SETUP   (1U <<  1)
-#define LOG_READ    (1U <<  2)
-#define LOG_PORTS   (1U <<  3)
-#define LOG_SIM     (1U <<  4)
-#define LOG_CLOCK   (1U <<  5)
-#define LOG_DATA    (1U <<  6)
-#define LOG_INT     (1U <<  7)
-#define LOG_PIT     (1U <<  8)
-#define LOG_CS      (1U <<  9)
+#define LOG_SETUP   (1U << 1)
+#define LOG_READ    (1U << 2)
+#define LOG_PORTS   (1U << 3)
+#define LOG_SIM     (1U << 4)
+#define LOG_CLOCK   (1U << 5)
+#define LOG_DATA    (1U << 6)
+#define LOG_INT     (1U << 7)
+#define LOG_PIT     (1U << 8)
+#define LOG_CS      (1U << 9)
 
 #define VERBOSE  (LOG_PIT)
 #define LOG_OUTPUT_FUNC printf // Needs always to be enabled as the default value 'logerror' is not available here
 
 #include "logmacro.h"
 
-//#define LOG(...) LOGMASKED(LOG_GENERAL,   __VA_ARGS__) // Already defined in logmacro.h
 #define LOGSETUP(...) LOGMASKED(LOG_SETUP, __VA_ARGS__)
 #define LOGR(...)     LOGMASKED(LOG_READ,  __VA_ARGS__)
 #define LOGPORTS(...) LOGMASKED(LOG_PORTS, __VA_ARGS__)

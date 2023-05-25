@@ -40,10 +40,10 @@ Registers per channel:
 
 #include "wavwrite.h"
 
-#define VERBOSE_SOUND 0
-#define VERBOSE_READ_WRITES 0
-#define LOG_SOUND(x) do { if (VERBOSE_SOUND) logerror x; } while (0)
-#define LOG_READ_WRITES(x) do { if (VERBOSE_READ_WRITES) logerror x; } while (0)
+#define LOG_SOUND       (1U << 1)
+#define LOG_READ_WRITES (1U << 2)
+#define VERBOSE (0)
+#include "logmacro.h"
 
 //#define ALT_MIX
 
@@ -135,7 +135,7 @@ void gaelco_gae1_device::sound_stream_update(sound_stream &stream, std::vector<r
 				}
 				else
 				{
-					LOG_SOUND(("(GAE1) Playing unknown sample format in channel: %02d, type: %02x, bank: %02x, end: %08x, Length: %04x\n", ch, type, bank, end_pos, m_sndregs[base_offset + 3]));
+					LOGMASKED(LOG_SOUND, "(GAE1) Playing unknown sample format in channel: %02d, type: %02x, bank: %02x, end: %08x, Length: %04x\n", ch, type, bank, end_pos, m_sndregs[base_offset + 3]);
 					//channel->active = 0;
 					// play2000 expects these to expire, are they valid? this is unrelated to the missing sounds in touchgo which never hits here
 					m_sndregs[base_offset + 3]--;
@@ -192,7 +192,7 @@ void gaelco_gae1_device::sound_stream_update(sound_stream &stream, std::vector<r
 
 uint16_t gaelco_gae1_device::gaelcosnd_r(offs_t offset)
 {
-	LOG_READ_WRITES(("%s: (GAE1): read from %04x\n", machine().describe_context(), offset));
+	LOGMASKED(LOG_READ_WRITES, "%s: (GAE1): read from %04x\n", machine().describe_context(), offset);
 
 	/* first update the stream to this point in time */
 	m_stream->update();
@@ -208,7 +208,7 @@ void gaelco_gae1_device::gaelcosnd_w(offs_t offset, uint16_t data, uint16_t mem_
 {
 	sound_channel *channel = &m_channel[offset >> 3];
 
-	LOG_READ_WRITES(("%s: (GAE1): write %04x to %04x\n", machine().describe_context(), data, offset));
+	LOGMASKED(LOG_READ_WRITES, "%s: (GAE1): write %04x to %04x\n", machine().describe_context(), data, offset);
 
 	/* first update the stream to this point in time */
 	m_stream->update();
@@ -221,7 +221,7 @@ void gaelco_gae1_device::gaelcosnd_w(offs_t offset, uint16_t data, uint16_t mem_
 		// if sample end position isn't 0, and length isn't 0
 		if ((m_sndregs[offset - 1] != 0) && (data != 0))
 		{
-			LOG_SOUND(("(GAE1) Playing or Queuing 1st chunk in channel: %02d, type: %02x, bank: %02x, end: %08x, Length: %04x\n", offset >> 3, (m_sndregs[offset - 2] >> 4) & 0x0f, m_sndregs[offset - 2] & 0x03, m_sndregs[offset - 1] << 8, data));
+			LOGMASKED(LOG_SOUND, "(GAE1) Playing or Queuing 1st chunk in channel: %02d, type: %02x, bank: %02x, end: %08x, Length: %04x\n", offset >> 3, (m_sndregs[offset - 2] >> 4) & 0x0f, m_sndregs[offset - 2] & 0x03, m_sndregs[offset - 1] << 8, data);
 
 			channel->loop = 1;
 
@@ -244,7 +244,7 @@ void gaelco_gae1_device::gaelcosnd_w(offs_t offset, uint16_t data, uint16_t mem_
 		// if sample end position isn't 0, and length isn't 0
 		if ((m_sndregs[offset - 1] != 0) && (data != 0))
 		{
-			LOG_SOUND(("(GAE1) Playing or Queuing 2nd chunk in channel: %02d, type: %02x, bank: %02x, end: %08x, Length: %04x\n", offset >> 3, (m_sndregs[offset - 2] >> 4) & 0x0f, m_sndregs[offset - 2] & 0x03, m_sndregs[offset - 1] << 8, data));
+			LOGMASKED(LOG_SOUND, "(GAE1) Playing or Queuing 2nd chunk in channel: %02d, type: %02x, bank: %02x, end: %08x, Length: %04x\n", offset >> 3, (m_sndregs[offset - 2] >> 4) & 0x0f, m_sndregs[offset - 2] & 0x03, m_sndregs[offset - 1] << 8, data);
 
 			channel->loop = 1;
 

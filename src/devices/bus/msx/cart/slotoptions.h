@@ -47,6 +47,7 @@ extern char const *const KANJI;
 extern char const *const KEYBOARD_MASTER;
 extern char const *const KONAMI;
 extern char const *const KONAMI_SCC;
+extern char const *const KOREAN_25IN1;
 extern char const *const KOREAN_80IN1;
 extern char const *const KOREAN_90IN1;
 extern char const *const KOREAN_126IN1;

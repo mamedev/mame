@@ -48,12 +48,6 @@
 #include "cpu/sh/sh2.h"
 #include "cpu/scudsp/scudsp.h"
 
-/* TODO: do this in a verboselog style */
-#define LOG_CDB  0
-#define LOG_SCU  1
-#define LOG_IRQ  0
-#define LOG_IOGA 0
-
 
 
 /**************************************************************************************/

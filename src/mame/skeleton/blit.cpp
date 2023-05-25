@@ -44,9 +44,8 @@
 #define RS232_K_TAG "keyboard"
 
 
-//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
-#define LOG_PIA       (1U <<  1)
-#define LOG_DEBUG     (1U <<  2)
+#define LOG_PIA       (1U << 1)
+#define LOG_DEBUG     (1U << 2)
 
 //#define VERBOSE (LOG_DEBUG)
 //#define LOG_OUTPUT_FUNC osd_printf_info

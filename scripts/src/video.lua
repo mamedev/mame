@@ -818,6 +818,8 @@ if (VIDEOS["PC_VGA"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/pc_vga.cpp",
 		MAME_DIR .. "src/devices/video/pc_vga.h",
+		MAME_DIR .. "src/devices/bus/isa/trident.cpp",
+		MAME_DIR .. "src/devices/bus/isa/trident.h",
 		MAME_DIR .. "src/devices/video/clgd542x.cpp",
 		MAME_DIR .. "src/devices/video/clgd542x.h",
 	}

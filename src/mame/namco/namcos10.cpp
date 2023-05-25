@@ -2289,7 +2289,24 @@ void namcos10_memn_state::ns10_ptblank3(machine_config &config)
 
 	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xc, 0xf, 0xe, 0x8, 0x9, 0xb, 0xa, 0x5, 0x7, 0x4, 0x6, 0x1, 0x0, 0x2, 0x3); };
 
-	// NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, logic);
+	NS10_TYPE2_DECRYPTER_NONLINEAR(config, m_decrypter, 0, ns10_type2_decrypter_nonlinear_device::ns10_crypto_logic{
+		{
+			0x0000000057001200ULL,0x00000000000000a4ULL,0x0000000000000150ULL,0x0000000000008004ULL,
+			0x0000000057002204ULL,0x0000000009001000ULL,0x0000000000102000ULL,0x0000000064004888ULL,
+			0x0000000000100008ULL,0x000000a0c0980600ULL,0x000000001801c020ULL,0x00005810881a09c0ULL,
+			//                                                                0x00000c10084a29dcULL  if non_linear[0] is 0x44 instead of of 0x04 then we need this instead (final plaintext is the same)
+			0x0000000400980600ULL,0x0000000000000300ULL,0x0000000000000080ULL,0x0000000000a00c0aULL
+		}, {
+			0x0000000041051000ULL,0x0000000000000024ULL,0x0000000000000050ULL,0x0000000000008004ULL,
+			0x0000000041052200ULL,0x0000000009401100ULL,0x0000000000122000ULL,0x0000000004100898ULL,
+			0x0000000000120088ULL,0x0000000040a80400ULL,0x0000000019004000ULL,0x000001859830281dULL,
+			0x0000002400880201ULL,0x0000000000000300ULL,0x00000000000000c0ULL,0x0000000000000408ULL
+		},
+		0xe1b8,
+		[] (uint16_t nonlinear_bit) -> uint16_t {
+			return nonlinear_bit << 11;
+		}
+	});
 }
 
 void namcos10_memn_state::ns10_puzzball(machine_config &config)
@@ -3460,12 +3477,12 @@ ROM_START( gunbalina )
 
 	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
 	ROM_LOAD( "gnn1a.8e", 0x0000000, 0x1080000, CRC(981b03d4) SHA1(1c55458f1b2964afe2cf4e9d84548c0699808e9f) )
-	ROM_LOAD( "ptblank3_prog.bin", 0x00029400, 0x002de3f0, CRC(1612383d) SHA1(e2f339444fe01a4f51ee784692c6d7f989080dc7) ) // Program code is unencrypted but scrambled
-	ROM_CONTINUE( 0x1056c00, 0x25200 )
-	ROM_COPY( "nand0", 0x84000, 0x1052a00, 0x4200 ) // relocate block 0x20
 
 	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
 	ROM_LOAD( "gnn1a.8d", 0x0000000, 0x1080000, CRC(6cd343e0) SHA1(dcec44abae1504025895f42fe574549e5010f7d5) )
+
+	ROM_REGION( 0x2ec00, "decrypter:nonlinear_table", 0 )
+	ROM_LOAD( "ptblank3_nonlinear", 0x00000, 0x2ec00, CRC(5997d7dd) SHA1(ab3f32fd92ee20ca3c7642686d9d8039d0b6cbc5) )
 ROM_END
 
 ROM_START( kd2001 )
@@ -3602,11 +3619,12 @@ ROM_START( ptblank3 )
 
 	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
 	ROM_LOAD( "gnn2vera_0.8e", 0x0000000, 0x1080000, CRC(3777ef6b) SHA1(44dce83f75d10f843db0feef4c2a738442434246) )
-	ROM_LOAD( "ptblank3_prog.bin", 0x00029400, 0x002de3f0, CRC(1612383d) SHA1(e2f339444fe01a4f51ee784692c6d7f989080dc7) ) // Program code is unencrypted but scrambled
-	ROM_CONTINUE(0x1056c00, 0x25200)
 
 	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
 	ROM_LOAD( "gnn2vera_1.8d", 0x0000000, 0x1080000, CRC(82d2cfb5) SHA1(4b5e713a55e74a7b32b1b9b5811892df2df86256) )
+
+	ROM_REGION( 0x2ec00, "decrypter:nonlinear_table", 0 )
+	ROM_LOAD( "ptblank3_nonlinear", 0x00000, 0x2ec00, CRC(5997d7dd) SHA1(ab3f32fd92ee20ca3c7642686d9d8039d0b6cbc5) )
 ROM_END
 
 ROM_START( puzzball )

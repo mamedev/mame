@@ -57,12 +57,12 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define LOG_FBITS   (1U <<  1)
-#define LOG_VBITS   (1U <<  2)
-#define LOG_PBITS   (1U <<  3)
-#define LOG_TBITS   (1U <<  4)
-#define LOG_MBITS   (1U <<  5)
-#define LOG_RBITS   (1U <<  6)
+#define LOG_FBITS   (1U << 1)
+#define LOG_VBITS   (1U << 2)
+#define LOG_PBITS   (1U << 3)
+#define LOG_TBITS   (1U << 4)
+#define LOG_MBITS   (1U << 5)
+#define LOG_RBITS   (1U << 6)
 
 #define VERBOSE (0)
 // #define VERBOSE (LOG_FBITS)

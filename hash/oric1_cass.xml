@@ -3,7 +3,18 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="oric1_cass" description="Tangerine Oric 1 cassettes">
+<softwarelist name="oric1_cass" description="Tangerine Oric-1 cassettes">
+
+	<software name="1815" supported="no">
+		<description>1815</description>
+		<year>1984</year>
+		<publisher>Cobra Soft</publisher>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="59262">
+				<rom name="1815.tap" size="59262" crc="16180767" sha1="044f9aa8609a80fcc039015bf4498a3fe209811e"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="3dfongus">
 		<description>3D Fongus</description>
@@ -350,6 +361,30 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="banditex">
+		<description>Bandit (Express Software)</description>
+		<year>1983</year>
+		<publisher>Express Software</publisher>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="6239">
+				<rom name="Bandit (Express Software).tap" size="6239" crc="87c649ae" sha1="ed0b03068f439e9058c5f7300922377a3f1b2485"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basemerc">
+		<description>Base Mercure</description>
+		<year>1983</year>
+		<publisher>ASN Informatique</publisher>
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="25580">
+				<rom name="basemerc.tap" size="25580" crc="529c90e4" sha1="f7620759573c125f2b9899c2c766a4170052be25"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bataille">
 		<description>La Bataille Des Couleurs</description>
 		<year>1983</year>
@@ -514,6 +549,19 @@ Type-in from magazine
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="1458">
 				<rom name="Casse Brique (19xx)(Loriciels)(Atmos)(FR)[a].tap" size="1458" crc="305a14d6" sha1="2fe005ad83d000e98855d7dc140eb6802e8f7c11"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="caspak">
+		<description>Caspak</description>
+		<year>1983</year>
+		<publisher>Loriciels</publisher>
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="19565">
+				<rom name="caspak-o.tap" size="19565" crc="ea643dd1" sha1="05f861daf631d682b1d2cf81fa4bbeb32f237906"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1091,6 +1139,17 @@ Type-in from magazine
 		</part>
 	</software>
 
+	<software name="dinkkong">
+		<description>Dinky Kong</description>
+		<year>1983</year>
+		<publisher>Severn Software</publisher>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="9918">
+				<rom name="dinky.tap" size="9918" crc="fb32e7f0" sha1="2d72e25767be66851dc6b1c689a92ef5dcb78f64"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="doggy">
 		<description>Doggy</description>
 		<year>1984</year>
@@ -1204,7 +1263,7 @@ Type-in from magazine
 	</software>
 
 	<software name="drapeaux">
-		<description>Les Drapeaux Aux Jeux Olympiques</description>
+		<description>Les Drapeaux aux Jeux Olympiques</description>
 		<year>1984</year>
 		<publisher>Jean-Pierre Suau</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -1912,7 +1971,7 @@ Type-in from magazine
 	</software>
 
 	<software name="jeudugigabonux">
-		<description>Le Jeu Du Gigabonux (v0.2)</description>
+		<description>Le Jeu du Gigabonux (v0.2)</description>
 		<year>1995</year>
 		<publisher>Simon Guyart</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -1923,7 +1982,7 @@ Type-in from magazine
 	</software>
 
 	<software name="jeudugigabonuxd" cloneof="jeudugigabonux">
-		<description>Le Jeu Du Gigabonux (v0.1)</description>
+		<description>Le Jeu du Gigabonux (v0.1)</description>
 		<year>1995</year>
 		<publisher>Simon Guyart</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -1934,7 +1993,7 @@ Type-in from magazine
 	</software>
 
 	<software name="jeudugigabonux1" cloneof="jeudugigabonux">
-		<description>Le Jeu Du Gigabonux (v0.2, alt)</description>
+		<description>Le Jeu du Gigabonux (v0.2, alt)</description>
 		<year>1995</year>
 		<publisher>Simon Guyart</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -1945,7 +2004,7 @@ Type-in from magazine
 	</software>
 
 	<software name="jeudupendu">
-		<description>Jeu Du Pendu</description>
+		<description>Jeu du Pendu</description>
 		<year>1983</year>
 		<publisher>ASN Diffusion</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -2179,9 +2238,25 @@ Type-in from magazine
 		<description>Lone Raider</description>
 		<year>1983</year>
 		<publisher>Severn Software</publisher>
+		<info name="region" value="UK" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="41835">
 				<rom name="Lone Raider (1983)(Severn Software)(GB)[48K].tap" size="41835" crc="d00e9fe8" sha1="062976bfc8a2a39d405e1ea4fbb10ca6ac5306da"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loneraider_fr" cloneof="loneraider" supported="no">
+		<description>Lone Raider (France)</description>
+		<year>1983</year>
+		<publisher>Infogrames</publisher>
+		<notes><![CDATA[
+The cassette stops during the game loading
+]]></notes>
+		<info name="region" value="France" />
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="42365">
+				<rom name="loneraidfr.tap" size="42365" crc="07946200" sha1="8ebc6fd538b0def7efa5e2e8a79d0642d3b17147"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2242,7 +2317,7 @@ Type-in from magazine
 	</software>
 
 	<software name="manoir">
-		<description>Le Manoir Du Dr.Genius</description>
+		<description>Le Manoir du Dr.Genius</description>
 		<year>1983</year>
 		<publisher>Loriciels</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -2486,7 +2561,7 @@ Type-in from magazine
 	</software>
 
 	<software name="mystere">
-		<description>Le Mystere De Kikekankoi</description>
+		<description>Le Mystere de Kikekankoi</description>
 		<year>1983</year>
 		<publisher>Loriciels</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -2810,7 +2885,7 @@ Type-in from magazine
 	</software>
 
 	<software name="parcours">
-		<description>Le Parcours Du Combattant</description>
+		<description>Le Parcours du Combattant</description>
 		<year>19??</year>
 		<publisher>Hebdogiciel</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -3481,7 +3556,7 @@ Type-in from magazine
 	</software>
 
 	<software name="sprity">
-		<description>Sprity Dans La Cave</description>
+		<description>Sprity dans la Cave</description>
 		<year>1985</year>
 		<publisher>Minveille, Philippe</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -3822,7 +3897,7 @@ Type-in from magazine
 	</software>
 
 	<software name="tourdu">
-		<description>Le Tour Du Monde En 80 Jours</description>
+		<description>Le Tour du Monde en 80 Jours</description>
 		<year>1984</year>
 		<publisher>No Man's Land</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -3833,7 +3908,7 @@ Type-in from magazine
 	</software>
 
 	<software name="tourdu1" cloneof="tourdu">
-		<description>Le Tour Du Monde En 80 Jours (demo)</description>
+		<description>Le Tour du Monde en 80 Jours (demo)</description>
 		<year>1984</year>
 		<publisher>No Man's Land</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -3935,7 +4010,7 @@ Type-in from magazine
 	</software>
 
 	<software name="trident">
-		<description>Le Trident De Neptune</description>
+		<description>Le Trident de Neptune</description>
 		<year>1984</year>
 		<publisher>No Man's Land</publisher>
 		<part name="cass" interface="oric1_cass">

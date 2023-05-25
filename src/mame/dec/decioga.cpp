@@ -10,8 +10,8 @@
 #include "emu.h"
 #include "decioga.h"
 
-#define LOG_DMA         (1U << 0)
-#define LOG_LANCE_DMA   (1U << 1)
+#define LOG_DMA         (1U << 1)
+#define LOG_LANCE_DMA   (1U << 2)
 
 #define VERBOSE (LOG_DMA|LOG_LANCE_DMA)
 

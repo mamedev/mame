@@ -11,15 +11,15 @@
 #include "emu.h"
 #include "sgi.h"
 
-#define LOG_UNKNOWN     (1 << 0)
-#define LOG_READS       (1 << 1)
-#define LOG_WRITES      (1 << 2)
-#define LOG_RPSS        (1 << 3)
-#define LOG_WATCHDOG    (1 << 4)
-#define LOG_MEMCFG      (1 << 5)
-#define LOG_MEMCFG_EXT  (1 << 6)
-#define LOG_EEPROM      (1 << 7)
-#define LOG_DMA         (1 << 8)
+#define LOG_UNKNOWN     (1U << 1)
+#define LOG_READS       (1U << 2)
+#define LOG_WRITES      (1U << 3)
+#define LOG_RPSS        (1U << 4)
+#define LOG_WATCHDOG    (1U << 5)
+#define LOG_MEMCFG      (1U << 6)
+#define LOG_MEMCFG_EXT  (1U << 7)
+#define LOG_EEPROM      (1U << 8)
+#define LOG_DMA         (1U << 9)
 #define LOG_DEFAULT     (LOG_READS | LOG_WRITES | LOG_RPSS | LOG_WATCHDOG | LOG_UNKNOWN)
 
 #define VERBOSE         (0)

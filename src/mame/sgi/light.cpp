@@ -9,7 +9,7 @@
 #include "light.h"
 #include "screen.h"
 
-#define LOG_REX (1 << 0)
+#define LOG_REX (1U << 1)
 #define LOG_ALL (LOG_REX)
 
 #define VERBOSE (0)

@@ -134,15 +134,9 @@
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"
 
-//#define LOG_GENERAL (1U <<  0)
-#define LOG_SETUP   (1U <<  1)
-
-//#define VERBOSE (LOG_GENERAL | LOG_SETUP)
+#define VERBOSE (0) // (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC printf
-
 #include "logmacro.h"
-
-#define LOGSETUP(...) LOGMASKED(LOG_SETUP,  __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__

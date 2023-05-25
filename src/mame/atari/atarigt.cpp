@@ -60,8 +60,12 @@
 #include "machine/eeprompar.h"
 #include "speaker.h"
 
+#define LOG_PROTECTION      (1U << 1)
 
-#define LOG_PROTECTION      (0)
+#define VERBOSE (0)
+#include "logmacro.h"
+
+
 #define HACK_TMEK_CONTROLS  (0)
 
 
@@ -332,7 +336,7 @@ void atarigt_state::tmek_protection_w(address_space &space, offs_t offset, uint1
         Read ($38488)
 */
 
-	if (LOG_PROTECTION) logerror("%s:Protection W@%06X = %04X\n", machine().describe_context(), offset, data);
+	LOGMASKED(LOG_PROTECTION, "%s:Protection W@%06X = %04X\n", machine().describe_context(), offset, data);
 
 	/* track accesses */
 	tmek_update_mode(offset);
@@ -347,7 +351,7 @@ void atarigt_state::tmek_protection_w(address_space &space, offs_t offset, uint1
 
 void atarigt_state::tmek_protection_r(address_space &space, offs_t offset, uint16_t *data)
 {
-	if (LOG_PROTECTION) logerror("%s:Protection R@%06X\n", machine().describe_context(), offset);
+	LOGMASKED(LOG_PROTECTION, "%s:Protection R@%06X\n", machine().describe_context(), offset);
 
 	/* track accesses */
 	tmek_update_mode(offset);
@@ -387,21 +391,21 @@ void atarigt_state::primrage_update_mode(offs_t offset)
 		/* this is from the code at $20f90 */
 		if (m_protaddr[1] == 0xdcc7c4 && m_protaddr[2] == 0xdcc7c4 && m_protaddr[3] == 0xdc4010)
 		{
-			if (LOG_PROTECTION) logerror("prot:Entering mode 1\n");
+			LOGMASKED(LOG_PROTECTION, "prot:Entering mode 1\n");
 			m_protmode = 1;
 		}
 
 		/* this is from the code at $27592 */
 		if (m_protaddr[0] == 0xdcc7ca && m_protaddr[1] == 0xdcc7ca && m_protaddr[2] == 0xdcc7c6 && m_protaddr[3] == 0xdc4022)
 		{
-			if (LOG_PROTECTION) logerror("prot:Entering mode 2\n");
+			LOGMASKED(LOG_PROTECTION, "prot:Entering mode 2\n");
 			m_protmode = 2;
 		}
 
 		/* this is from the code at $3d8dc */
 		if (m_protaddr[0] == 0xdcc7c0 && m_protaddr[1] == 0xdcc7c0 && m_protaddr[2] == 0xdc80f2 && m_protaddr[3] == 0xdc7af2)
 		{
-			if (LOG_PROTECTION) logerror("prot:Entering mode 3\n");
+			LOGMASKED(LOG_PROTECTION, "prot:Entering mode 3\n");
 			m_protmode = 3;
 		}
 	}
@@ -411,20 +415,17 @@ void atarigt_state::primrage_update_mode(offs_t offset)
 
 void atarigt_state::primrage_protection_w(address_space &space, offs_t offset, uint16_t data)
 {
-	if (LOG_PROTECTION)
-	{
-	uint32_t pc = m_maincpu->pcbase();
-	switch (pc)
+	switch (m_maincpu->pcbase())
 	{
 		/* protection code from 20f90 - 21000 */
 		case 0x20fba:
 			if (offset % 16 == 0) logerror("\n   ");
-			logerror("W@%06X(%04X) ", offset, data);
+			LOGMASKED(LOG_PROTECTION, "W@%06X(%04X) ", offset, data);
 			break;
 
 		/* protection code from 27592 - 27664 */
 		case 0x275f6:
-			logerror("W@%06X(%04X) ", offset, data);
+			LOGMASKED(LOG_PROTECTION, "W@%06X(%04X) ", offset, data);
 			break;
 
 		/* protection code from 3d8dc - 3d95a */
@@ -432,23 +433,22 @@ void atarigt_state::primrage_protection_w(address_space &space, offs_t offset, u
 		case 0x3d932:
 		case 0x3d938:
 		case 0x3d93e:
-			logerror("W@%06X(%04X) ", offset, data);
+			LOGMASKED(LOG_PROTECTION, "W@%06X(%04X) ", offset, data);
 			break;
 		case 0x3d944:
-			logerror("W@%06X(%04X) - done\n", offset, data);
+			LOGMASKED(LOG_PROTECTION, "W@%06X(%04X) - done\n", offset, data);
 			break;
 
 		/* protection code from 437fa - 43860 */
 		case 0x43830:
 		case 0x43838:
-			logerror("W@%06X(%04X) ", offset, data);
+			LOGMASKED(LOG_PROTECTION, "W@%06X(%04X) ", offset, data);
 			break;
 
 		/* catch anything else */
 		default:
-			logerror("%s:Unknown protection W@%06X = %04X\n", machine().describe_context(), offset, data);
+			LOGMASKED(LOG_PROTECTION, "%s:Unknown protection W@%06X = %04X\n", machine().describe_context(), offset, data);
 			break;
-	}
 	}
 
 /* mask = 0x78fff */
@@ -463,7 +463,7 @@ void atarigt_state::primrage_protection_w(address_space &space, offs_t offset, u
 	if (m_protmode == 2)
 	{
 		int temp = (offset - 0xdc7800) >> 1;
-		if (LOG_PROTECTION) logerror("prot:mode 2 param = %04X\n", temp);
+		LOGMASKED(LOG_PROTECTION, "prot:mode 2 param = %04X\n", temp);
 		m_protresult = temp * 0x6915 + 0x6915;
 	}
 
@@ -471,7 +471,7 @@ void atarigt_state::primrage_protection_w(address_space &space, offs_t offset, u
 	{
 		if (offset == 0xdc4700)
 		{
-			if (LOG_PROTECTION) logerror("prot:Clearing mode 3\n");
+			LOGMASKED(LOG_PROTECTION, "prot:Clearing mode 3\n");
 			m_protmode = 0;
 		}
 	}
@@ -484,22 +484,20 @@ void atarigt_state::primrage_protection_r(address_space &space, offs_t offset, u
 	/* track accesses */
 	primrage_update_mode(offset);
 
-if (LOG_PROTECTION)
-{
 	uint32_t pc = m_maincpu->pcbase();
 	uint32_t p1, p2, a6;
 	switch (pc)
 	{
 		/* protection code from 20f90 - 21000 */
 		case 0x20f90:
-			logerror("Known Protection @ 20F90: R@%06X ", offset);
+			LOGMASKED(LOG_PROTECTION, "Known Protection @ 20F90: R@%06X ", offset);
 			break;
 		case 0x20f98:
 		case 0x20fa0:
-			logerror("R@%06X ", offset);
+			LOGMASKED(LOG_PROTECTION, "R@%06X ", offset);
 			break;
 		case 0x20fcc:
-			logerror("R@%06X - done\n", offset);
+			LOGMASKED(LOG_PROTECTION, "R@%06X - done\n", offset);
 			break;
 
 		/* protection code from 27592 - 27664 */
@@ -509,50 +507,49 @@ if (LOG_PROTECTION)
 			a6 = m_maincpu->state_int(M68K_A6);
 			p1 = (space.read_word(a6+8) << 16) | space.read_word(a6+10);
 			p2 = (space.read_word(a6+12) << 16) | space.read_word(a6+14);
-			logerror("Known Protection @ 275BC(%08X, %08X): R@%06X ", p1, p2, offset);
+			LOGMASKED(LOG_PROTECTION, "Known Protection @ 275BC(%08X, %08X): R@%06X ", p1, p2, offset);
 			break;
 		case 0x275d2:
 		case 0x275d8:
 		case 0x275de:
 		case 0x2761e:
 		case 0x2762e:
-			logerror("R@%06X ", offset);
+			LOGMASKED(LOG_PROTECTION, "R@%06X ", offset);
 			break;
 		case 0x2763e:
-			logerror("R@%06X - done\n", offset);
+			LOGMASKED(LOG_PROTECTION, "R@%06X - done\n", offset);
 			break;
 
 		/* protection code from 3d8dc - 3d95a */
 		case 0x3d8f4:
 			a6 = m_maincpu->state_int(M68K_A6);
 			p1 = (space.read_word(a6+12) << 16) | space.read_word(a6+14);
-			logerror("Known Protection @ 3D8F4(%08X): R@%06X ", p1, offset);
+			LOGMASKED(LOG_PROTECTION, "Known Protection @ 3D8F4(%08X): R@%06X ", p1, offset);
 			break;
 		case 0x3d8fa:
 		case 0x3d90e:
-			logerror("R@%06X ", offset);
+			LOGMASKED(LOG_PROTECTION, "R@%06X ", offset);
 			break;
 
 		/* protection code from 437fa - 43860 */
 		case 0x43814:
 			a6 = m_maincpu->state_int(M68K_A6);
 			p1 = space.read_dword(a6+14) & 0xffffff;
-			logerror("Known Protection @ 43814(%08X): R@%06X ", p1, offset);
+			LOGMASKED(LOG_PROTECTION, "Known Protection @ 43814(%08X): R@%06X ", p1, offset);
 			break;
 		case 0x4381c:
 		case 0x43840:
-			logerror("R@%06X ", offset);
+			LOGMASKED(LOG_PROTECTION, "R@%06X ", offset);
 			break;
 		case 0x43848:
-			logerror("R@%06X - done\n", offset);
+			LOGMASKED(LOG_PROTECTION, "R@%06X - done\n", offset);
 			break;
 
 		/* catch anything else */
 		default:
-			logerror("%s:Unknown protection R@%06X\n", machine().describe_context(), offset);
+			LOGMASKED(LOG_PROTECTION, "%s:Unknown protection R@%06X\n", machine().describe_context(), offset);
 			break;
 	}
-}
 
 	/* handle specific reads */
 	switch (offset)
@@ -571,7 +568,7 @@ if (LOG_PROTECTION)
 			{
 				*data = m_protresult;
 				m_protmode = 0;
-			if (LOG_PROTECTION) logerror("prot:Clearing mode 2\n");
+				LOGMASKED(LOG_PROTECTION, "prot:Clearing mode 2\n");
 			}
 			break;
 
@@ -579,7 +576,7 @@ if (LOG_PROTECTION)
 			if (m_protmode == 1)
 			{
 				m_protmode = 0;
-			if (LOG_PROTECTION) logerror("prot:Clearing mode 1\n");
+				LOGMASKED(LOG_PROTECTION, "prot:Clearing mode 1\n");
 			}
 			break;
 	}

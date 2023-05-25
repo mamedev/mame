@@ -11,14 +11,11 @@
 
 #include <algorithm>
 
-//**************************************************************************
-//  DEBUGGING
-//**************************************************************************
+#define LOG_DIVIDE  (1U << 1)
+#define LOG_COMPARE (1U << 2)
 
-#define LOG_MULTIPLY    (0)
-#define LOG_DIVIDE      (0)
-#define LOG_COMPARE     (0)
-
+#define VERBOSE (0)
+#include "logmacro.h"
 
 
 //**************************************************************************
@@ -139,7 +136,7 @@ u16 sega_315_5249_divider_device::read(offs_t offset)
 
 void sega_315_5249_divider_device::write(offs_t offset, u16 data, u16 mem_mask)
 {
-	if (LOG_DIVIDE) logerror("divide_w(%X) = %04X\n", offset, data);
+	LOGMASKED(LOG_DIVIDE, "divide_w(%X) = %04X\n", offset, data);
 
 	// only 4 effective write registers
 	switch (offset & 3)
@@ -307,7 +304,7 @@ void sega_315_5250_compare_timer_device::interrupt_ack()
 
 u16 sega_315_5250_compare_timer_device::read(offs_t offset)
 {
-	if (LOG_COMPARE) logerror("compare_r(%X) = %04X\n", offset, m_regs[offset]);
+	LOGMASKED(LOG_COMPARE, "compare_r(%X) = %04X\n", offset, m_regs[offset]);
 	switch (offset & 15)
 	{
 		case 0x0:   return m_regs[0];
@@ -331,7 +328,7 @@ u16 sega_315_5250_compare_timer_device::read(offs_t offset)
 
 void sega_315_5250_compare_timer_device::write(offs_t offset, u16 data, u16 mem_mask)
 {
-	if (LOG_COMPARE) logerror("compare_w(%X) = %04X\n", offset, data);
+	LOGMASKED(LOG_COMPARE, "compare_w(%X) = %04X\n", offset, data);
 	switch (offset & 15)
 	{
 		case 0x0:   COMBINE_DATA(&m_regs[0]); execute(); break;

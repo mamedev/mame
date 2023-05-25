@@ -4,10 +4,10 @@
 #include "psxcd.h"
 #include "debugger.h"
 
-#define LOG_CMD  (1 << 1)
-#define LOG_MISC (1 << 2)
+#define LOG_CMD  (1U << 1)
+#define LOG_MISC (1U << 2)
 
-#define VERBOSE ( 0 )
+#define VERBOSE (0)
 #include "logmacro.h"
 
 enum cdrom_events

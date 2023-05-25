@@ -43,11 +43,14 @@
 
 #include "cops.lh"
 
+#define LOG_CDROM   (1U << 1)
+#define LOG_DACIA   (1U << 2)
+
+#define VERBOSE (LOG_CDROM | LOG_DACIA)
+#include "logmacro.h"
+
 
 namespace {
-
-#define LOG_CDROM   1
-#define LOG_DACIA   1
 
 #define CMP_REGISTER 0
 #define AUX_REGISTER 1
@@ -219,12 +222,12 @@ void cops_state::cdrom_data_w(uint8_t data)
 	const char *regs[4] = { "CMD", "PARAM", "WRITE", "CTRL" };
 	m_cdrom_data = bitswap<8>(data,0,1,2,3,4,5,6,7);
 	uint8_t reg = ((m_cdrom_ctrl & 4) >> 1) | ((m_cdrom_ctrl & 8) >> 3);
-	if (LOG_CDROM) logerror("%s:cdrom_data_w(reg = %s, data = %02x)\n", machine().describe_context(), regs[reg & 0x03], m_cdrom_data);
+	LOGMASKED(LOG_CDROM, "%s:cdrom_data_w(reg = %s, data = %02x)\n", machine().describe_context(), regs[reg & 0x03], m_cdrom_data);
 }
 
 void cops_state::cdrom_ctrl_w(uint8_t data)
 {
-	if (LOG_CDROM) logerror("%s:cdrom_ctrl_w(%02x)\n", machine().describe_context(), data);
+	LOGMASKED(LOG_CDROM, "%s:cdrom_ctrl_w(%02x)\n", machine().describe_context(), data);
 	m_cdrom_ctrl = data;
 }
 
@@ -232,7 +235,7 @@ uint8_t cops_state::cdrom_data_r()
 {
 	const char *regs[4] = { "STATUS", "RESULT", "READ", "FIFOST" };
 	uint8_t reg = ((m_cdrom_ctrl & 4) >> 1) | ((m_cdrom_ctrl & 8) >> 3);
-	if (LOG_CDROM) logerror("%s:cdrom_data_r(reg = %s)\n", machine().describe_context(), regs[reg & 0x03]);
+	LOGMASKED(LOG_CDROM, "%s:cdrom_data_r(reg = %s)\n", machine().describe_context(), regs[reg & 0x03]);
 	return machine().rand()&0xff;
 }
 /*************************************
@@ -392,7 +395,7 @@ uint8_t cops_state::dacia_r(offs_t offset)
 			csr |= (m_dacia_dtr1 << 1);
 			csr |= (m_dacia_cts <<4);
 			csr |= (m_dacia_fe1 <<7);
-			if (LOG_DACIA) logerror("CSR1 %02x\n",csr);
+			LOGMASKED(LOG_DACIA, "CSR1 %02x\n",csr);
 			return csr;
 		}
 
@@ -401,8 +404,8 @@ uint8_t cops_state::dacia_r(offs_t offset)
 			m_dacia_receiver_full = 0;
 			m_dacia_fe1=0;
 
-//          if (LOG_DACIA) logerror("RDR1 %02x\n",m_dacia_receiver_data);
-			if (LOG_DACIA) logerror("RDR1 %02x\n",m_ld->status_r());
+//          LOGMASKED(LOG_DACIA, "RDR1 %02x\n",m_dacia_receiver_data);
+			LOGMASKED(LOG_DACIA, "RDR1 %02x\n",m_ld->status_r());
 			return m_ld->status_r();
 		}
 		case 4: /* ISR2: Interrupt Status Register */
@@ -420,7 +423,7 @@ uint8_t cops_state::dacia_r(offs_t offset)
 			csr2 |= (m_dacia_dtr2 << 1);
 			csr2 |= (m_dacia_cts <<4);
 			csr2 |= (m_dacia_fe2 <<7);
-			if (LOG_DACIA) logerror("CSR2 %02x\n",csr2);
+			LOGMASKED(LOG_DACIA, "CSR2 %02x\n",csr2);
 			return csr2;
 		}
 
@@ -428,12 +431,12 @@ uint8_t cops_state::dacia_r(offs_t offset)
 			m_dacia_receiver_full2 = 0;
 			m_dacia_fe2=0;
 
-			if (LOG_DACIA) logerror("RDR2 %02x\n",m_ld->status_r());
+			LOGMASKED(LOG_DACIA, "RDR2 %02x\n",m_ld->status_r());
 			return m_ld->status_r();
 
 
-			default:
-			if (LOG_DACIA) logerror("%s:dacia_r(%02x)\n", machine().describe_context(), offset);
+		default:
+			LOGMASKED(LOG_DACIA, "%s:dacia_r(%02x)\n", machine().describe_context(), offset);
 			return 0;
 	}
 }
@@ -453,7 +456,7 @@ void cops_state::dacia_w(offs_t offset, uint8_t data)
 			{
 				m_dacia_irq1_reg &= ~(data & 0x7f);
 			}
-			if (LOG_DACIA) logerror("DACIA IRQ 1 Register: %02x\n", m_dacia_irq1_reg);
+			LOGMASKED(LOG_DACIA, "DACIA IRQ 1 Register: %02x\n", m_dacia_irq1_reg);
 			update_dacia_irq();
 			break;
 
@@ -465,7 +468,7 @@ void cops_state::dacia_w(offs_t offset, uint8_t data)
 				m_parity_1 = (data & 0x04);
 				m_parity_mode_1 = ((data & 0x18) >> 3);
 				m_bpc_1 = ((data & 0x60) >> 5) +5;
-				if (LOG_DACIA) logerror("DACIA Format Register: %02x\n", data);
+				LOGMASKED(LOG_DACIA, "DACIA Format Register: %02x\n", data);
 			}
 			else // Control register
 			{
@@ -480,11 +483,11 @@ void cops_state::dacia_w(offs_t offset, uint8_t data)
 				{
 					m_dacia_reg1 = CMP_REGISTER;
 				}
-				if (LOG_DACIA) logerror("DACIA TIME %02d\n", (XTAL(3'686'400) / m_dacia_ic_div_1).value());
+				LOGMASKED(LOG_DACIA, "DACIA TIME %02d\n", (XTAL(3'686'400) / m_dacia_ic_div_1).value());
 
 //              m_ld_timer->adjust(attotime::from_hz(XTAL(3'686'400) / m_dacia_ic_div_1), 0, attotime::from_hz(XTAL(3'686'400) / m_dacia_ic_div_1));
 
-				if (LOG_DACIA) logerror("DACIA Ctrl Register: %02x\n", data);
+				LOGMASKED(LOG_DACIA, "DACIA Ctrl Register: %02x\n", data);
 
 			}
 			break;
@@ -494,16 +497,16 @@ void cops_state::dacia_w(offs_t offset, uint8_t data)
 			{
 				m_dacia_cmp1 = 1;
 				m_dacia_cmpval1 = data;
-				if (LOG_DACIA) logerror("DACIA Compare mode: %02x \n", data);
+				LOGMASKED(LOG_DACIA, "DACIA Compare mode: %02x \n", data);
 //              update_dacia_irq();
 			}
 			else
 			{
-				if (LOG_DACIA) logerror("DACIA Aux ctrl: %02x \n", data);
+				LOGMASKED(LOG_DACIA, "DACIA Aux ctrl: %02x \n", data);
 			}
 			[[fallthrough]]; // FIXME: really?
 		case 3: /* Transmit Data Register 1 */
-			if (LOG_DACIA) logerror("DACIA Transmit: %02x %c\n", data, (char)data);
+			LOGMASKED(LOG_DACIA, "DACIA Transmit: %02x %c\n", data, (char)data);
 			m_ld->command_w(data);
 			break;
 
@@ -518,7 +521,7 @@ void cops_state::dacia_w(offs_t offset, uint8_t data)
 			{
 				m_dacia_irq2_reg &= ~(data & 0x7f);
 			}
-			if (LOG_DACIA) logerror("DACIA IRQ 2 Register: %02x\n", m_dacia_irq2_reg);
+			LOGMASKED(LOG_DACIA, "DACIA IRQ 2 Register: %02x\n", m_dacia_irq2_reg);
 			update_dacia_irq();
 			break;
 
@@ -530,7 +533,7 @@ void cops_state::dacia_w(offs_t offset, uint8_t data)
 				m_parity_2 = (data & 0x04);
 				m_parity_mode_2 = ((data & 0x18) >> 3);
 				m_bpc_2 = ((data & 0x60) >> 5) +5;
-				if (LOG_DACIA) logerror("DACIA Format Register 2: %02x\n", data);
+				LOGMASKED(LOG_DACIA, "DACIA Format Register 2: %02x\n", data);
 			}
 			else // Control register
 			{
@@ -545,11 +548,11 @@ void cops_state::dacia_w(offs_t offset, uint8_t data)
 				{
 					m_dacia_reg2 = CMP_REGISTER;
 				}
-				if (LOG_DACIA) logerror("DACIA TIME 2 %02d\n", (XTAL(3'686'400) / m_dacia_ic_div_1).value());
+				LOGMASKED(LOG_DACIA, "DACIA TIME 2 %02d\n", (XTAL(3'686'400) / m_dacia_ic_div_1).value());
 
 				m_ld_timer->adjust(attotime::from_hz(XTAL(3'686'400) / m_dacia_ic_div_2), 0, attotime::from_hz(XTAL(3'686'400) / m_dacia_ic_div_2));
 
-				if (LOG_DACIA) logerror("DACIA Ctrl Register 2: %02x\n", data);
+				LOGMASKED(LOG_DACIA, "DACIA Ctrl Register 2: %02x\n", data);
 
 			}
 			break;
@@ -559,16 +562,16 @@ void cops_state::dacia_w(offs_t offset, uint8_t data)
 			{
 				m_dacia_cmp2 =1;
 				m_dacia_cmpval2=data;
-				if (LOG_DACIA) logerror("DACIA Compare mode 2: %02x \n", data);
+				LOGMASKED(LOG_DACIA, "DACIA Compare mode 2: %02x \n", data);
 //              update_dacia_irq();
 			}
 			else
 			{
-				if (LOG_DACIA) logerror("DACIA Aux ctrl 2: %02x \n", data);
+				LOGMASKED(LOG_DACIA, "DACIA Aux ctrl 2: %02x \n", data);
 			}
 			[[fallthrough]]; // FIXME: really?
 		case 7: /* Transmit Data Register 2 */
-			if (LOG_DACIA) logerror("DACIA Transmit 2: %02x %c\n", data, (char)data);
+			LOGMASKED(LOG_DACIA, "DACIA Transmit 2: %02x %c\n", data, (char)data);
 
 		//  for (int i=0; i <8; i++)
 			{

@@ -4875,7 +4875,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tomy(tronic) Tron (manufactured in Japan)
+  Tomy Tron (manufactured in Japan)
   * PCB label: THN-02 2E114E07
   * Hitachi HD38800A88 MCU
   * cyan/red/green VFD NEC FIP10AM24T no. 2-8 1

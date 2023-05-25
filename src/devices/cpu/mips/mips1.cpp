@@ -16,7 +16,6 @@
 #include "mips1dsm.h"
 #include "softfloat3/source/include/softfloat.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_TLB     (1U << 1)
 #define LOG_IOP     (1U << 2)
 #define LOG_RISCOS  (1U << 3)

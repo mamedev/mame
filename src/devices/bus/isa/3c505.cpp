@@ -25,7 +25,6 @@
 #include "emu.h"
 #include "3c505.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_REG     (1U << 1)
 #define LOG_DATA    (1U << 2)
 

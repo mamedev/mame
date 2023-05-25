@@ -9,9 +9,9 @@
 #include "emu.h"
 #include "locomo.h"
 
-#define LOG_UNKNOWN     (1 << 1)
-#define LOG_READS       (1 << 2)
-#define LOG_WRITES      (1 << 3)
+#define LOG_UNKNOWN     (1U << 1)
+#define LOG_READS       (1U << 2)
+#define LOG_WRITES      (1U << 3)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_READS | LOG_WRITES)
 
 #define VERBOSE         (LOG_ALL)

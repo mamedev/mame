@@ -4,6 +4,10 @@
 #include "emu.h"
 #include "pc_xga.h"
 
+
+#define VERBOSE (LOG_GENERAL)
+#include "logmacro.h"
+
 DEFINE_DEVICE_TYPE(XGA_COPRO,  xga_copro_device,  "xga_copro",  "IBM XGA Coprocessor")
 DEFINE_DEVICE_TYPE(OTI111,     oak_oti111_vga_device,  "oti111_vga",  "Oak Technologies Spitfire 64111")
 
@@ -22,40 +26,40 @@ void xga_copro_device::start_command()
 		case 11:
 			if(m_var == TYPE::OTI111)
 			{
-				logerror("oak specific textblt\n");
+				LOG("oak specific textblt\n");
 				break;
 			}
 			[[fallthrough]];
 		case 12:
 			if(m_var == TYPE::OTI111)
 			{
-				logerror("oak specific fast pattern copy\n");
+				LOG("oak specific fast pattern copy\n");
 				break;
 			}
 			[[fallthrough]];
 		default:
-			logerror("invalid pel op step func %d\n", (m_pelop >> 24) & 15);
+			LOG("invalid pel op step func %d\n", (m_pelop >> 24) & 15);
 			break;
 		case 2:
-			logerror("draw and step read\n");
+			LOG("draw and step read\n");
 			break;
 		case 3:
-			logerror("line draw read\n");
+			LOG("line draw read\n");
 			break;
 		case 4:
-			logerror("draw and step write\n");
+			LOG("draw and step write\n");
 			break;
 		case 5:
-			logerror("line draw write\n");
+			LOG("line draw write\n");
 			break;
 		case 8:
 			do_pxblt();
 			break;
 		case 9:
-			logerror("inverting pxblt\n");
+			LOG("inverting pxblt\n");
 			break;
 		case 10:
-			logerror("area fill pxblt\n");
+			LOG("area fill pxblt\n");
 			break;
 	}
 }
@@ -98,7 +102,7 @@ u32 xga_copro_device::read_map_pixel(int x, int y, int map)
 			wbytes = width;
 			addr += y * wbytes;
 			addr += x;
-			//logerror("r %d %d %d %d %d %x\n",map,width, height,x,y, addr);
+			//LOG("r %d %d %d %d %d %x\n",map,width, height,x,y, addr);
 			return m_mem_read_cb(addr);
 		case 4:
 			wbytes = width * 2;
@@ -117,7 +121,7 @@ u32 xga_copro_device::read_map_pixel(int x, int y, int map)
 			return m_mem_read_cb(addr) | (m_mem_read_cb(addr + 1) << 8) |
 					(m_mem_read_cb(addr + 2) << 16) | (m_mem_read_cb(addr + 3) << 24);
 	}
-	logerror("invalid pixel map mode %d %d\n", map, m_pelmap_format[map] & 7);
+	LOG("invalid pixel map mode %d %d\n", map, m_pelmap_format[map] & 7);
 	return 0;
 }
 
@@ -164,7 +168,7 @@ void xga_copro_device::write_map_pixel(int x, int y, int map, u32 pixel)
 			wbytes = width;
 			addr += y * wbytes;
 			addr += x;
-			//logerror("w %d %d %d %d %d %x %x\n",map,width, height,x,y, addr, pixel);
+			//LOG("w %d %d %d %d %d %x %x\n",map,width, height,x,y, addr, pixel);
 			m_mem_write_cb(addr, (u8)pixel);
 			break;
 		case 4:
@@ -202,7 +206,7 @@ void xga_copro_device::write_map_pixel(int x, int y, int map, u32 pixel)
 			}
 			break;
 		default:
-			logerror("invalid pixel map mode %d %d\n", map, m_pelmap_format[map] & 7);
+			LOG("invalid pixel map mode %d %d\n", map, m_pelmap_format[map] & 7);
 			break;
 	}
 }
@@ -305,11 +309,11 @@ void xga_copro_device::do_pxblt()
 	u8 srcmap = ((m_pelop >> 20) & 0xf) - 1;
 	u8 dstmap = ((m_pelop >> 16) & 0xf) - 1;
 	u8 patmap = ((m_pelop >> 12) & 0xf) - 1;
-	logerror("pxblt src %d pat %d dst %d dim1 %d dim2 %d srcbase %x dstbase %x\n", srcmap+1, dstmap+1, patmap+1, m_opdim1 & 0xfff, m_opdim2 & 0xfff, m_pelmap_base[srcmap+1], m_pelmap_base[dstmap+1]);
-	logerror("%d %d %d %d\n", m_srcxaddr & 0xfff, m_srcyaddr & 0xfff, m_dstxaddr & 0xfff, m_dstyaddr & 0xfff);
+	LOG("pxblt src %d pat %d dst %d dim1 %d dim2 %d srcbase %x dstbase %x\n", srcmap+1, dstmap+1, patmap+1, m_opdim1 & 0xfff, m_opdim2 & 0xfff, m_pelmap_base[srcmap+1], m_pelmap_base[dstmap+1]);
+	LOG("%d %d %d %d\n", m_srcxaddr & 0xfff, m_srcyaddr & 0xfff, m_dstxaddr & 0xfff, m_dstyaddr & 0xfff);
 	if((srcmap > 2) || (dstmap > 2) || ((patmap > 2) && (patmap != 7) && (patmap != 8)))
 	{
-		logerror("invalid pelmap\n");
+		LOG("invalid pelmap\n");
 		return;
 	}
 	if(dir & 1)
