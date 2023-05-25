@@ -158,6 +158,8 @@ public:
 class tvga9000_device : public trident_vga_device
 {
 public:
+	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
+
 	tvga9000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void trident_define_video_mode() override;

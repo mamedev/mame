@@ -5,6 +5,20 @@
  *
  * Implementation of Trident VGA GUI accelerators
  *
+ * TODO:
+ * - TVGA8200LX (just bog standard VGA?)
+ * - TVGA8800 early SVGA
+ * - TVGA8900 (2MB VRAM)
+ * - TVGA9000 needs to be downgraded from '9680
+ * \- none of the SVGA modes works
+ * \- subclassed from TGUI9680 just for pntnpuzl, consider swapping inheritance or even decouple;
+ * \- it's also really a downgraded version of '8900
+ * - TVGA92xx, TVGA938x (2d accelerator)
+ * - TVGA94xx (PCI version of above)
+ * - TGUI9680 is a PCI SVGA
+ * \- several missing features (namely YUV-to-RGB conversions)
+ * - ProVidia 968x ('9680 + TV video out & AD724 for NTSC/PAL conversion)
+ * - AGP cards (3DImage, Blade3D, XP series)
  *
  */
 
