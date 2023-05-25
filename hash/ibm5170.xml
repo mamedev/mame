@@ -9656,7 +9656,7 @@ license:CC0-1.0
 		<year>1993</year>
 		<publisher>Dynamix</publisher>
 		<notes><![CDATA[
-The disks have a modified OEM ID by Windows
+The disks have had their OEM IDs modified by Windows
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
