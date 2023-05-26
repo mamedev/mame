@@ -7,7 +7,6 @@
 
 #include "debugger.h"
 
-//#define LOG_GENERAL   (1U << 0) //defined in logmacro.h already
 #define LOG_SETUP   (1U << 1) // Shows register setup
 #define LOG_SHIFT   (1U << 2) // Shows shift register contents
 #define LOG_COMP    (1U << 3) // Shows operations on the CPU side

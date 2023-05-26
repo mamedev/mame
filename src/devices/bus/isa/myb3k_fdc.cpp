@@ -27,7 +27,6 @@
 #include "formats/pc_dsk.h"
 #include "formats/imd_dsk.h"
 
-//#define LOG_GENERAL (1U << 0) //defined in logmacro.h already
 #define LOG_READ    (1U << 1)
 #define LOG_CMD     (1U << 2)
 

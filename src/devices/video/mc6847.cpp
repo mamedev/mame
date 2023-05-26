@@ -90,11 +90,13 @@
 #define TIMER_FSYNC_OFF_TIME    (TIMER_HSYNC_PERIOD * TOP_BORDER + TIMER_HSYNC_ON_TIME)
 #define TIMER_FSYNC_ON_TIME     (TIMER_HSYNC_PERIOD * (TOP_BORDER + 192) + TIMER_HSYNC_ON_TIME)
 
-#define LOG_SCANLINE            0
-#define LOG_HSYNC               0
-#define LOG_FSYNC               0
-#define LOG_FLUSH               0
-#define LOG_INPUT               0
+#define LOG_SCANLINE (1U << 1)
+#define LOG_HSYNC    (1U << 2)
+#define LOG_FSYNC    (1U << 3)
+#define LOG_FLUSH    (1U << 4)
+#define LOG_INPUT    (1U << 5)
+#define VERBOSE (0)
+#include "logmacro.h"
 
 
 const uint32_t mc6847_base_device::s_palette[mc6847_base_device::PALETTE_LENGTH] =
@@ -284,8 +286,7 @@ TIMER_CALLBACK_MEMBER(mc6847_friend_device::change_horizontal_sync)
 	// are we on a rising edge?
 	if (line && !m_horizontal_sync)
 	{
-		if (LOG_SCANLINE)
-			logerror("%s: change_horizontal_sync():  Recording scanline\n", describe_context());
+		LOGMASKED(LOG_SCANLINE, "%s: change_horizontal_sync():  Recording scanline\n", describe_context());
 
 		// first store the scanline
 		{
@@ -328,8 +329,7 @@ TIMER_CALLBACK_MEMBER(mc6847_friend_device::change_horizontal_sync)
 		m_horizontal_sync = line;
 
 		// log if apprpriate
-		if (LOG_HSYNC)
-			logerror("%s: change_horizontal_sync(): line=%d\n", describe_context(), line ? 1 : 0);
+		LOGMASKED(LOG_HSYNC, "%s: change_horizontal_sync(): line=%d\n", describe_context(), line ? 1 : 0);
 
 		// invoke callback
 		m_write_hsync(line);
@@ -354,8 +354,7 @@ TIMER_CALLBACK_MEMBER(mc6847_friend_device::change_field_sync)
 		m_field_sync = line;
 
 		/* log if apprpriate */
-		if (LOG_FSYNC)
-			logerror("%s: change_field_sync(): line=%d\n", describe_context(), line ? 1 : 0);
+		LOGMASKED(LOG_FSYNC, "%s: change_field_sync(): line=%d\n", describe_context(), line ? 1 : 0);
 
 		/* invoke callback */
 		m_write_fsync(line);
@@ -482,8 +481,7 @@ void mc6847_friend_device::video_flush()
 		uint32_t new_partial_scanline_clocks = get_clocks_since_hsync();
 		if (m_partial_scanline_clocks < new_partial_scanline_clocks)
 		{
-			if (LOG_FLUSH)
-				logerror("%s: new_partial_scanline_clocks=%u\n", describe_context(), new_partial_scanline_clocks);
+			LOGMASKED(LOG_FLUSH, "%s: new_partial_scanline_clocks=%u\n", describe_context(), new_partial_scanline_clocks);
 
 			m_recording_scanline = true;
 			record_partial_body_scanline(m_physical_scanline, m_logical_scanline, m_partial_scanline_clocks, new_partial_scanline_clocks);
@@ -627,8 +625,7 @@ void mc6847_base_device::device_reset()
 uint8_t mc6847_base_device::input(uint16_t address)
 {
 	uint8_t data = m_input_cb(address);
-	if (LOG_INPUT)
-		logerror("%s: input: address=0x%04X data=0x%02X\n", describe_context(), address, data);
+	LOGMASKED(LOG_INPUT, "%s: input: address=0x%04X data=0x%02X\n", describe_context(), address, data);
 	return data;
 }
 

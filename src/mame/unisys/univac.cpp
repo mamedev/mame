@@ -109,7 +109,6 @@ After entering the characters, press FCTN and CTRL PAGE keys again to save the s
 #include "screen.h"
 #include "speaker.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_PARITY  (1U << 1)
 #define LOG_NVRAM   (1U << 2)
 

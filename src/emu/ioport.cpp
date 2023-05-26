@@ -886,7 +886,7 @@ ioport_type_class ioport_field::type_class() const noexcept
 		return INPUT_CLASS_KEYBOARD;
 
 	// configuration settings (specific names required)
-	if (m_type == IPT_CONFIG)
+	if (m_type == IPT_CONFIG || m_type == IPT_ADJUSTER)
 		return INPUT_CLASS_CONFIG;
 
 	// DIP switches (specific names required)

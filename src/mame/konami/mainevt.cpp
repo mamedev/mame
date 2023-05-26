@@ -48,7 +48,7 @@ Both games run on Konami's PWB351024A PCB
 
 
 // configurable logging
-#define LOG_SHBANK     (1U <<  1)
+#define LOG_SHBANK     (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_SHBANK)
 

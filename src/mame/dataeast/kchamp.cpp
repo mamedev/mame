@@ -354,7 +354,6 @@ static GFXDECODE_START( gfx_kchamp )
 GFXDECODE_END
 
 
-
 WRITE_LINE_MEMBER(kchamp_state::vblank_irq)
 {
 	if (state && m_nmi_enable)
@@ -562,6 +561,48 @@ ROM_START( kchamp )
 	ROM_LOAD( "br25", 0x0200, 0x0100, CRC(ba4a5651) SHA1(77e81bd64ab59a7466d20eabdff4be241e963c52) ) // Blue
 ROM_END
 
+ROM_START( kchamp2p )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "karate_champ_bs14-8.ic80",  0x00000, 0x2000, CRC(e9f93e89) SHA1(ae7fd8eab57049a1b6c30f7141e670c4137995c9) )
+	ROM_LOAD( "karate_champ_bs15-8.ic74",  0x02000, 0x2000, CRC(572961f2) SHA1(c72df0c18d6b3f86eb96f1e5c08702058d7a2104) )
+	ROM_LOAD( "karate_champ_bs16-8.ic66",  0x04000, 0x2000, CRC(651a02b9) SHA1(69a8eae7387d46f7c1e751a1b91180ec7279e037) )
+	ROM_LOAD( "karate_champ_bs17-8.ic60",  0x06000, 0x2000, CRC(523968a4) SHA1(640d51561e479fd3554763cf8a793dc23af061da) )
+	ROM_LOAD( "karate_champ_bs18-8.ic56",  0x08000, 0x2000, CRC(49a18c37) SHA1(0ffd330e890cf57110b04adda4c3a4961bde54cb) )
+	ROM_LOAD( "karate_champ_bs19-8.ic49",  0x0a000, 0x2000, CRC(9a8c9311) SHA1(04ef9ebcee26945de0f13e0b110dee7f4af35e06) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Sound CPU
+	ROM_LOAD( "karate_champ_bo26-8.ic39",  0x00000, 0x2000, CRC(645650de) SHA1(254a865f0c49bae88efd000c948a9c12eaed5eaf) )
+	ROM_LOAD( "karate_champ_bo25-8.ic44",  0x02000, 0x2000, CRC(33171e07) SHA1(55ee74c9f1d86ec13d92ea0d1b700bbe24b79def) ) // ADPCM
+	ROM_LOAD( "karate_champ_bs24-8.ic50",  0x04000, 0x2000, CRC(910b48b9) SHA1(c6a2f8266ff1f14b462b92d47a4a86542df77cdd) ) // ADPCM
+	ROM_LOAD( "karate_champ_bs23-8.ic57",  0x06000, 0x2000, CRC(47f66aac) SHA1(484802cfbff7c5f51dd97cb3b2321e137b03481c) )
+	ROM_LOAD( "karate_champ_bs22-8.ic61",  0x08000, 0x2000, CRC(5928e749) SHA1(a4dbd6f2a6a7aa9597875dfd781e55b0fb14d49b) )
+	ROM_LOAD( "karate_champ_bs21-8.ic67",  0x0a000, 0x2000, CRC(ca17e3ba) SHA1(91a3ccd6045dcef5f3293d669fe5a4df59cd954b) )
+	ROM_LOAD( "karate_champ_bs20-8.ic75",  0x0c000, 0x2000, CRC(ada4f2cd) SHA1(15a4ed7497cb6c06f523ebe38bc4eb6dbcd09549) )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_LOAD( "karate_champ_bs00-8.ic89",  0x00000, 0x2000, CRC(a4fa98a1) SHA1(33b9a1a56d72ffa5f4e16b69e6e19af5a2882b2c) ) // plane0, tiles
+	ROM_LOAD( "karate_champ_bs01-8.ic91",  0x04000, 0x2000, CRC(fea09f7c) SHA1(174fc8022c455438538e6a3b67c7effc857ae634) ) // plane1, tiles
+
+	ROM_REGION( 0x18000, "gfx2", 0 )
+	ROM_LOAD( "karate_champ_bs13-8.ic128", 0x00000, 0x2000, CRC(eaad4168) SHA1(f31b05ffb86677157f3a44cdcf0f9a729e0ab259) ) // Top, plane0, sprites
+	ROM_LOAD( "karate_champ_bs04-8.ic116", 0x02000, 0x2000, CRC(10a47e2d) SHA1(97fe2de3ce2b8dc017dceffce494be18695708d2) ) // Bot, plane0, sprites
+	ROM_LOAD( "karate_champ_bs12-8.ic127", 0x04000, 0x2000, CRC(b4842ea9) SHA1(471475f65edbd292b9162ad50e5cb0c7144845b0) ) // Top, plane0, sprites
+	ROM_LOAD( "karate_champ_bs03-8.ic115", 0x06000, 0x2000, CRC(8cd166a5) SHA1(4b623c4c0025d75b3ed9746f8b6730bf3e65d85a) ) // Bot, plane0, sprites
+	ROM_LOAD( "karate_champ_bs11-8.ic126", 0x08000, 0x2000, CRC(4cbd3aa3) SHA1(a9a683dcc4f52b18450659a20434a4d2a7b411d9) ) // Top, plane0, sprites
+	ROM_LOAD( "karate_champ_bs02-8.ic114", 0x0a000, 0x2000, CRC(6be342a6) SHA1(0b8ac7ef7c6a6464fbc027a9fd17fa7ce1ffd962) ) // Bot, plane0, sprites
+	ROM_LOAD( "karate_champ_bs07-8.ic120", 0x0c000, 0x2000, CRC(cb91d16b) SHA1(bf32a03e7882b74280b29fa004429b77ad52e5ee) ) // Top, plane1, sprites
+	ROM_LOAD( "karate_champ_bs10-8.ic124", 0x0e000, 0x2000, CRC(489c9c04) SHA1(d920ef4f03e1b2e871df0cb2d672689c89febe96) ) // Bot, plane1, sprites
+	ROM_LOAD( "karate_champ_bs06-8.ic119", 0x10000, 0x2000, CRC(7346db8a) SHA1(d2b2c1700ae0ff9c614a9981a3da3d69879e9f25) ) // Top, plane1, sprites
+	ROM_LOAD( "karate_champ_bs09-8.ic123", 0x12000, 0x2000, CRC(b78714fc) SHA1(4df7f15c37d56a9d66d0049aad65b32063e5c29a) ) // Bot, plane1, sprites
+	ROM_LOAD( "karate_champ_bs05-8.ic118", 0x14000, 0x2000, CRC(b2557102) SHA1(ec4285029fc3ee1ad0adb05f363b234c67f8903d) ) // Top, plane1, sprites
+	ROM_LOAD( "karate_champ_bs08-8.ic122", 0x16000, 0x2000, CRC(c85aba0e) SHA1(4be21b38623c2a8ae7f1e7397fb002e4cb9e4614) ) // Bot, plane1, sprites
+
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "be27.ic34", 0x000, 0x100, CRC(f05bda76) SHA1(0842092e28a15de3b4c198e48f650dbbe3cc95ce) ) // Red
+	ROM_LOAD( "be28.ic24", 0x100, 0x100, CRC(d26d6fa9) SHA1(72a30bdc3410f2704539a32aeef69ee803e39f82) ) // Green
+	ROM_LOAD( "be29.ic18", 0x200, 0x100, CRC(111ccb15) SHA1(4928a7ccc8649520cad3b119ff0b0ca1276c95ae) ) // Blue
+ROM_END
+
 ROM_START( karatedo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "be14", 0x0000, 0x2000, CRC(44e60aa0) SHA1(6d007d7082c15182832f947444b00b7feb0e7738) )
@@ -581,8 +622,8 @@ ROM_START( karatedo )
 	ROM_LOAD( "be20", 0xc000, 0x2000, CRC(cbe8a533) SHA1(04cb41c487c2f951417628ed2888e04d59a39d29) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "be00",     0x00000, 0x2000, CRC(cec020f2) SHA1(07c501cc24797000f369fd98a26efe13875107bb) )  // plane0, tiles
-	ROM_LOAD( "be01",     0x04000, 0x2000, CRC(cd96271c) SHA1(bcc71010e5489b19ad1553141c7b2e366bbbc68f) )  // plane1, tiles
+	ROM_LOAD( "be00", 0x0000, 0x2000, CRC(cec020f2) SHA1(07c501cc24797000f369fd98a26efe13875107bb) )  // plane0, tiles
+	ROM_LOAD( "be01", 0x4000, 0x2000, CRC(cd96271c) SHA1(bcc71010e5489b19ad1553141c7b2e366bbbc68f) )  // plane1, tiles
 
 	ROM_REGION( 0x18000, "gfx2", 0 )
 	ROM_LOAD( "be13",     0x00000, 0x2000, CRC(fb358707) SHA1(37124f1f545787723fecf466d8dcd31b88cdd75d) )  // Top, plane0, sprites
@@ -647,8 +688,8 @@ ROM_START( kchamptec )
 	ROM_LOAD( "br25.3", 0x0200,  0x0100, CRC(ba4a5651) SHA1(77e81bd64ab59a7466d20eabdff4be241e963c52) ) // Blue
 ROM_END
 
-/* Bootleg from the Spanish company "Automaticos Arfyc"
-   Just different color PROMs and a few bytes on the K26/BE26 sound ROM
+/* Bootleg from the Spanish company "Automaticos Arfyc".
+   Color PROMs like 'kchamp2p' and a few unique bytes on the K26/BE26 sound ROM.
    Frequencies measured on the PCB:
     Program Z80: 2.99684 MHz (12.000 MHz xtal / 4)
     Sound Z80:   4.43141 MHz (8.867238 MHz xtal / 2)
@@ -950,8 +991,9 @@ void kchamp_state::init_kchampvs2()
 	m_msm_play_lo_nibble = true;
 }
 
-
+//    YEAR  NAME       PARENT  MACHINE       INPUT     CLASS          INIT            ROT    COMPANY                  FULLNAME                                FLAGS
 GAME( 1984, kchamp,    0,      kchamp,       kchamp,   kchamp_state,  empty_init,     ROT90, "Data East USA",         "Karate Champ (US)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kchamp2p,  kchamp, kchamp,       kchampvs, kchamp_state,  empty_init,     ROT90, "Data East USA",         "Karate Champ (US, 2 players)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1984, karatedo,  kchamp, kchamp,       kchamp,   kchamp_state,  empty_init,     ROT90, "Data East Corporation", "Karate Dou (Japan)",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1984, kchamptec, kchamp, kchamp,       kchamp,   kchamp_state,  empty_init,     ROT90, "bootleg (Tecfri)",      "Karate Champ (Tecfri bootleg)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1984, karateda,  kchamp, kchamp_arfyc, kchamp,   kchamp_state,  empty_init,     ROT90, "bootleg (Arfyc)",       "Karate Dou (Arfyc bootleg)",           MACHINE_SUPPORTS_SAVE )

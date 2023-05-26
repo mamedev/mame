@@ -16,7 +16,6 @@
 #include "emu.h"
 #include "machine/pic8259.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_ICW     (1U << 1)
 #define LOG_OCW     (1U << 2)
 

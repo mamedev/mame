@@ -25,7 +25,7 @@
 #include "emupal.h"
 #include "speaker.h"
 
-#define LOG_MCU     (1 << 1)
+#define LOG_MCU     (1U << 1)
 #define LOG_ALL     (LOG_MCU)
 
 #define VERBOSE     (0)

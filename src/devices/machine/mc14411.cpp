@@ -33,15 +33,13 @@
     MACROS
 ***************************************************************************/
 
-//#define LOG_GENERAL (1U <<  0) // Already defined in logmacro.h
-#define LOG_SETUP   (1U <<  1)
+#define LOG_SETUP   (1U << 1)
 
 //#define VERBOSE  (LOG_GENERAL|LOG_SETUP)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
 
-//#define LOG(...) LOGMASKED(LOG_GENERAL,   __VA_ARGS__) // Already defined in logmacro.h
 #define LOGSETUP(...) LOGMASKED(LOG_SETUP,   __VA_ARGS__)
 
 

@@ -22,8 +22,8 @@
 #include "machine/bankdev.h"
 #include "machine/timer.h"
 
-#define LOG_DMA       (1U << 2)
-#define LOG_PPU       (1U << 1)
+#define LOG_DMA       (1U << 1)
+#define LOG_PPU       (1U << 2)
 
 //#define VERBOSE             (LOG_PPU)
 #define VERBOSE             (0)

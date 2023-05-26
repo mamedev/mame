@@ -75,20 +75,20 @@
 #include "hx5102.h"
 #include "formats/ti99_dsk.h"
 
-#define LOG_HEXBUS         (1U<<1)   // Hexbus operation
-#define LOG_RESET          (1U<<2)   // Reset
-#define LOG_WARN           (1U<<3)   // Warnings
-#define LOG_READY          (1U<<4)   // READY
-#define LOG_SIGNALS        (1U<<5)   // IRQ/DRQ
-#define LOG_CRU            (1U<<6)   // CRU
-#define LOG_RAM            (1U<<7)   // RAM
-#define LOG_DMA            (1U<<8)   // DMA
-#define LOG_MOTOR          (1U<<9)   // Motor activity
-#define LOG_STATUS         (1U<<10)  // Main status register
-#define LOG_FIFO           (1U<<11)  // Data register
+#define LOG_HEXBUS         (1U << 1)   // Hexbus operation
+#define LOG_RESET          (1U << 2)   // Reset
+#define LOG_WARN           (1U << 3)   // Warnings
+#define LOG_READY          (1U << 4)   // READY
+#define LOG_SIGNALS        (1U << 5)   // IRQ/DRQ
+#define LOG_CRU            (1U << 6)   // CRU
+#define LOG_RAM            (1U << 7)   // RAM
+#define LOG_DMA            (1U << 8)   // DMA
+#define LOG_MOTOR          (1U << 9)   // Motor activity
+#define LOG_STATUS         (1U << 10)  // Main status register
+#define LOG_FIFO           (1U << 11)  // Data register
 
 // Minimum log should be config and warnings
-#define VERBOSE ( LOG_GENERAL | LOG_WARN )
+#define VERBOSE (LOG_GENERAL | LOG_WARN)
 
 #include "logmacro.h"
 

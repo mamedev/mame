@@ -17,10 +17,10 @@
 #include "util/ioprocs.h"
 #include "util/ioprocsfilter.h"
 
-#define LOG_WARN          (1U<<1)   // Warnings
-#define LOG_DETAIL        (1U<<2)   // Details
+#define LOG_WARN          (1U << 1)   // Warnings
+#define LOG_DETAIL        (1U << 2)   // Details
 
-#define VERBOSE ( LOG_WARN )
+#define VERBOSE (LOG_WARN)
 
 #include "logmacro.h"
 

@@ -9,14 +9,14 @@
 #include "emu.h"
 #include "hpc3.h"
 
-#define LOG_UNKNOWN     (1 << 0)
-#define LOG_PBUS_DMA    (1 << 1)
-#define LOG_SCSI        (1 << 2)
-#define LOG_SCSI_DMA    (1 << 3)
-#define LOG_SCSI_IRQ    (1 << 4)
-#define LOG_ETHERNET    (1 << 5)
-#define LOG_CHAIN       (1 << 6)
-#define LOG_EEPROM      (1 << 7)
+#define LOG_UNKNOWN     (1U << 1)
+#define LOG_PBUS_DMA    (1U << 2)
+#define LOG_SCSI        (1U << 3)
+#define LOG_SCSI_DMA    (1U << 4)
+#define LOG_SCSI_IRQ    (1U << 5)
+#define LOG_ETHERNET    (1U << 6)
+#define LOG_CHAIN       (1U << 7)
+#define LOG_EEPROM      (1U << 8)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_PBUS_DMA | LOG_SCSI | LOG_SCSI_DMA | LOG_SCSI_IRQ | LOG_ETHERNET | LOG_CHAIN | LOG_EEPROM)
 
 #define VERBOSE         (0)

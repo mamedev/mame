@@ -17,7 +17,6 @@
     DEBUGGING
 ***************************************************************************/
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_PACKETS (1U << 1)
 #define LOG_TX      (1U << 2)
 #define LOG_RX      (1U << 3)

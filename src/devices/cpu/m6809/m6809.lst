@@ -684,7 +684,7 @@ XDEC8:
 	else
 		m_cc &= ~CC_C;
 
-	m_temp.b.l = set_flags<uint8_t>(CC_NZ, m_temp.b.l, 1, m_temp.b.l - 1);
+	m_temp.b.l = set_flags<uint8_t>(CC_NZV, m_temp.b.l, 1, m_temp.b.l - 1);
 	if(!hd6309_native_mode() || !is_register_addressing_mode())
 	{
 		@dummy_read_opcode_arg(0);

@@ -3,7 +3,6 @@
 #include "emu.h"
 #include "bus/nscsi/s1410.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_COMMAND (1U << 1)
 #define LOG_DATA    (1U << 2)
 

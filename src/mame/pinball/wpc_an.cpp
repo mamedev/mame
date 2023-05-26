@@ -96,10 +96,13 @@ TODO: (wpc in general)
 
 #include "wpc_an.lh"
 
+#define LOG_WPC (1U << 1)
+
+#define VERBOSE (LOG_WPC)
+#include "logmacro.h"
+
 
 namespace {
-
-#define LOG_WPC (1)
 
 class wpc_an_state : public driver_device
 {
@@ -379,7 +382,7 @@ void wpc_an_state::ram_w(offs_t offset, uint8_t data)
 	if((!m_wpc->memprotect_active()) || ((offset & m_wpc->get_memprotect_mask()) != m_wpc->get_memprotect_mask()))
 		m_ram[offset] = data;
 	else
-		if(LOG_WPC) logerror("WPC: Memory protection violation at 0x%04x (mask=0x%04x)\n",offset,m_wpc->get_memprotect_mask());
+		LOGMASKED(LOG_WPC, "WPC: Memory protection violation at 0x%04x (mask=0x%04x)\n",offset,m_wpc->get_memprotect_mask());
 }
 
 void wpc_an_state::machine_start()

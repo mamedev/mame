@@ -123,9 +123,8 @@
 
 // defines
 
-//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
-#define LOG_PARAM     (1U <<  1)
-#define LOG_DSP       (1U <<  2)
+#define LOG_PARAM     (1U << 1)
+#define LOG_DSP       (1U << 2)
 
 #define VERBOSE (LOG_GENERAL | LOG_PARAM)
 //#define LOG_OUTPUT_FUNC printf
@@ -133,7 +132,6 @@
 
 namespace {
 
-#define LOGGEN(...) LOGMASKED(LOG_GENERAL, __VA_ARGS__)
 #define LOGPRM(...) LOGMASKED(LOG_PARAM, __VA_ARGS__)
 #define LOGDSP(...) LOGMASKED(LOG_DSP, __VA_ARGS__)
 
@@ -238,19 +236,19 @@ uint16_t tsispch_state::dsp_status_r()
 
 void tsispch_state::dsp_status_w(uint16_t data)
 {
-	LOGGEN("warning: upd772x status register should never be written to!\n");
+	LOG("warning: upd772x status register should never be written to!\n");
 	m_dsp->snesdsp_write(false, data);
 }
 
 WRITE_LINE_MEMBER( tsispch_state::dsp_to_8086_p0_w )
 {
-	LOGGEN("upd772x changed p0 state to %d!\n",state);
+	LOG("upd772x changed p0 state to %d!\n",state);
 	//TODO: do stuff here!
 }
 
 WRITE_LINE_MEMBER( tsispch_state::dsp_to_8086_p1_w )
 {
-	LOGGEN("upd772x changed p1 state to %d!\n",state);
+	LOG("upd772x changed p1 state to %d!\n",state);
 	//TODO: do stuff here!
 }
 
@@ -259,7 +257,7 @@ WRITE_LINE_MEMBER( tsispch_state::dsp_to_8086_p1_w )
 *****************************************************************************/
 void tsispch_state::machine_reset()
 {
-	LOGGEN("machine reset\n");
+	LOG("machine reset\n");
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // starts in reset
 }
 
@@ -267,7 +265,7 @@ void tsispch_state::init_prose2k()
 {
 	uint8_t *dspsrc = (uint8_t *)(memregion("dspprgload")->base());
 	uint32_t *dspprg = (uint32_t *)(memregion("dspprg")->base());
-	LOGGEN("driver init\n");
+	LOG("driver init\n");
 	// unpack 24 bit 7720 data into 32 bit space and shuffle it so it can run as 7725 code
 	// data format as-is in dspsrc: (L = always 0, X = doesn't matter)
 	// source upd7720                  dest upd7725

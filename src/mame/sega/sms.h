@@ -22,10 +22,6 @@
 
 #include "screen.h"
 
-#define LOG_REG
-#define LOG_PAGING
-#define LOG_COLOR
-
 
 class sms_state : public driver_device
 {

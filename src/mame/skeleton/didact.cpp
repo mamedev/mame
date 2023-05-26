@@ -63,10 +63,10 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG_SETUP    (1U <<  1)
-#define LOG_READ     (1U <<  2)
-#define LOG_DISPLAY  (1U <<  3)
-#define LOG_KEYBOARD (1U <<  4)
+#define LOG_SETUP    (1U << 1)
+#define LOG_READ     (1U << 2)
+#define LOG_DISPLAY  (1U << 3)
+#define LOG_KEYBOARD (1U << 4)
 
 //#define VERBOSE (LOG_KEYBOARD)
 //#define LOG_OUTPUT_FUNC printf

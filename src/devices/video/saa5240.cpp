@@ -9,8 +9,8 @@
 #include "emu.h"
 #include "saa5240.h"
 
-#define LOG_DATA (1 << 1)
-#define LOG_LINE (1 << 2)
+#define LOG_DATA (1U << 1)
+#define LOG_LINE (1U << 2)
 
 #define VERBOSE (LOG_DATA)
 #include "logmacro.h"

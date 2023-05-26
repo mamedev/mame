@@ -3,7 +3,6 @@
 #include "emu.h"
 #include "vrc4373.h"
 
-#define LOG_GENERAL         (1U << 0)
 #define LOG_NILE            (1U << 1)
 #define LOG_NILE_MASTER     (1U << 2)
 #define LOG_NILE_TARGET     (1U << 3)

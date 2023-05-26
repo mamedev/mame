@@ -140,8 +140,13 @@ void x68k_crtc_device::text_copy(unsigned src, unsigned dest, u8 planes)
 
 TIMER_CALLBACK_MEMBER(x68k_crtc_device::operation_end)
 {
-	int bit = param;
-	m_operation &= ~bit;
+	if(!(m_operation & param))
+	{
+		m_operation |= param;
+		m_operation_end_timer->adjust(attotime::from_msec(5), param);
+	}
+	else
+		m_operation &= ~param;
 }
 
 void x68k_crtc_device::refresh_mode()
@@ -414,7 +419,7 @@ void x68k_crtc_device::crtc_w(offs_t offset, u16 data, u16 mem_mask)
 		refresh_mode();
 		break;
 	case 576:  // operation register
-		m_operation = data;
+		m_operation = data & ~2;
 		if (data & 0x02)  // high-speed graphic screen clear
 		{
 			// this is based on the docs except for the higher color depth modes which isn't
@@ -461,7 +466,7 @@ void x68k_crtc_device::crtc_w(offs_t offset, u16 data, u16 mem_mask)
 				}
 
 			}
-			m_operation_end_timer->adjust(attotime::from_msec(10), 0x02);  // time taken to do operation is a complete guess.
+			m_operation_end_timer->adjust(attotime::from_msec(5), 0x02);  // time taken to do operation is a complete guess.
 		}
 		break;
 	}

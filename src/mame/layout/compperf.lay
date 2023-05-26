@@ -6,7 +6,7 @@ license:CC0-1.0
 
 <!-- define elements -->
 
-	<element name="silver"><rect><color red="0.7" green="0.72" blue="0.75" /></rect></element>
+	<element name="silver"><rect><color red="0.7" green="0.71" blue="0.73" /></rect></element>
 	<element name="whited"><disk><color red="1" green="1" blue="1" /></disk></element>
 	<element name="blackd"><disk><color red="0" green="0" blue="0" /></disk></element>
 

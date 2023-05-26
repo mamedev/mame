@@ -22,6 +22,7 @@
 #include "kanji.h"
 #include "konami.h"
 #include "korean.h"
+#include "loveplus.h"
 #include "majutsushi.h"
 #include "moonsound.h"
 #include "msx_audio.h"
@@ -66,9 +67,11 @@ void msx_cart(device_slot_interface &device, bool is_in_subslot)
 	device.option_add_internal(slotoptions::KEYBOARD_MASTER, MSX_CART_KEYBOARD_MASTER);
 	device.option_add_internal(slotoptions::KONAMI,          MSX_CART_KONAMI);
 	device.option_add_internal(slotoptions::KONAMI_SCC,      MSX_CART_KONAMI_SCC);
+	device.option_add_internal(slotoptions::KOREAN_25IN1,    MSX_CART_KOREAN_25IN1);
 	device.option_add_internal(slotoptions::KOREAN_80IN1,    MSX_CART_KOREAN_80IN1);
 	device.option_add_internal(slotoptions::KOREAN_90IN1,    MSX_CART_KOREAN_90IN1);
 	device.option_add_internal(slotoptions::KOREAN_126IN1,   MSX_CART_KOREAN_126IN1);
+	device.option_add_internal(slotoptions::LOVEPLUS,        MSX_CART_LOVEPLUS);
 	device.option_add_internal(slotoptions::MAJUSTUSHI,      MSX_CART_MAJUTSUSHI);
 	device.option_add_internal(slotoptions::MSXAUD_FSCA1,    MSX_CART_MSX_AUDIO_FSCA1);
 	device.option_add_internal(slotoptions::MSXAUD_HXMU900,  MSX_CART_MSX_AUDIO_HXMU900);

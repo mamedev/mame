@@ -166,8 +166,10 @@ SMPC NVRAM contents:
 #include "coreutil.h"
 
 
-#define LOG_SMPC 0
-#define LOG_PAD_CMD 0
+#define LOG_PAD_CMD (1U << 1)
+#define VERBOSE (0)
+#include "logmacro.h"
+
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -359,13 +361,13 @@ void smpc_hle_device::ireg_w(offs_t offset, uint8_t data)
 		{
 			if(data & 0x40)
 			{
-				if(LOG_PAD_CMD) printf("SMPC: BREAK request\n");
+				LOGMASKED(LOG_PAD_CMD, "SMPC: BREAK request\n");
 				sr_ack();
 				m_intback_stage = 0;
 			}
 			else if(data & 0x80)
 			{
-				if(LOG_PAD_CMD) printf("SMPC: CONTINUE request\n");
+				LOGMASKED(LOG_PAD_CMD, "SMPC: CONTINUE request\n");
 
 				m_intback_timer->adjust(attotime::from_usec(700));  // TODO: is timing correct?
 

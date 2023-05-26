@@ -15,7 +15,6 @@
 #include "emu.h"
 #include "ncr5380.h"
 
-#define LOG_GENERAL  (1U << 0)
 #define LOG_REGW     (1U << 1)
 #define LOG_REGR     (1U << 2)
 #define LOG_SCSI     (1U << 3)

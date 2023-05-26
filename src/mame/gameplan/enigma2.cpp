@@ -132,10 +132,13 @@ DIP Switches
 #include "screen.h"
 #include "speaker.h"
 
+#define LOG_PROT    (1U << 1)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
 
 namespace {
-
-#define LOG_PROT    (0)
 
 /* these values provide a fairly low refresh rate of around 53Hz, but
    they were derived from the schematics.  The horizontal synch chain
@@ -475,7 +478,7 @@ uint8_t enigma2_state::dip_switch_r(offs_t offset)
 {
 	uint8_t ret = 0x00;
 
-	if (LOG_PROT) logerror("DIP SW Read: %x at %x (prot data %x)\n", offset, m_maincpu->pc(), m_protection_data);
+	LOGMASKED(LOG_PROT, "DIP SW Read: %x at %x (prot data %x)\n", offset, m_maincpu->pc(), m_protection_data);
 	switch (offset)
 	{
 	case 0x01:
@@ -523,7 +526,7 @@ uint8_t enigma2_state::sound_latch_r()
 
 void enigma2_state::protection_data_w(uint8_t data)
 {
-	if (LOG_PROT) logerror("%s: Protection Data Write: %x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_PROT, "%s: Protection Data Write: %x\n", machine().describe_context(), data);
 	m_protection_data = data;
 }
 

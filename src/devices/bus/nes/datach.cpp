@@ -18,16 +18,14 @@
 #include "datach.h"
 
 #ifdef NES_PCB_DEBUG
-#define VERBOSE 1
+#define VERBOSE (LOG_GENERAL)
 #else
-#define VERBOSE 0
+#define VERBOSE (0)
 #endif
-
-#define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 #define EEPROM_INTERNAL 0
 #define EEPROM_EXTERNAL 1
-
 
 #define TEST_EEPROM 0
 
@@ -267,7 +265,7 @@ void nes_datach_device::pcb_reset()
 
  iNES: mappers 157
 
- In MESS: Supported
+ In MAME: Supported
 
  TODO: Datach carts should actually be handled
  separately! Original carts were minicarts to be
@@ -286,7 +284,7 @@ void nes_datach_device::pcb_reset()
 
 uint8_t nes_datach_device::read_m(offs_t offset)
 {
-	LOG_MMC(("Datach read_m, offset: %04x\n", offset));
+	LOG("Datach read_m, offset: %04x\n", offset);
 	uint8_t i2c_val = 0;
 #if TEST_EEPROM
 	if (m_i2c_dir)
@@ -303,8 +301,8 @@ uint8_t nes_datach_device::read_m(offs_t offset)
 
 uint8_t nes_datach_device::read_h(offs_t offset)
 {
-	LOG_MMC(("Datach read_h, offset: %04x\n", offset));
-	// this shall be the proper code, but it's a bit slower, so we access directly the subcart below
+	LOG("Datach read_h, offset: %04x\n", offset);
+	// this should be the proper code, but it's a bit slower, so we access directly the subcart below
 	//return m_subslot->read(offset);
 
 	if (m_subslot->m_cart)
@@ -315,7 +313,7 @@ uint8_t nes_datach_device::read_h(offs_t offset)
 
 void nes_datach_device::write_h(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("Datach write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("Datach write_h, offset: %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x0f)
 	{

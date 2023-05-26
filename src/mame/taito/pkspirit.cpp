@@ -190,7 +190,7 @@ void pkspirit_state::pkspirit(machine_config &config)
 	opn.irq_handler().set_inputline("audiocpu", 0);
 	opn.add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	OKIM6295(config, "oki", 1'000'000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5); // resonator and pin7 not verified
+	OKIM6295(config, "oki", 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5); // all verified
 }
 
 

@@ -150,6 +150,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info_16c);
 
 	u8 get_border_color(u16 hpos = ~0, u16 vpos = ~0) override;
+	u32 get_vpage_offset();
 	rectangle get_screen_area() override;
 	void spectrum_update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 	void tsconf_UpdateZxScreenBitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -164,10 +165,10 @@ private:
 	void tsconf_ula_w(offs_t offset, u8 data);
 	u8 tsconf_port_xxaf_r(offs_t reg);
 	void tsconf_port_xxaf_w(offs_t reg, u8 data);
-	u8 tsconf_port_77_zctr_r(offs_t reg);
-	void tsconf_port_77_zctr_w(offs_t reg, u8 data);
-	u8 tsconf_port_57_zctr_r(offs_t reg);
-	void tsconf_port_57_zctr_w(offs_t reg, u8 data);
+	u8 tsconf_port_77_zctr_r();
+	void tsconf_port_77_zctr_w(u8 data);
+	u8 tsconf_port_57_zctr_r();
+	void tsconf_port_57_zctr_w(u8 data);
 	void tsconf_spi_miso_w(u8 data);
 	u8 tsconf_port_f7_r(offs_t offset);
 	void tsconf_port_f7_w(offs_t offset, u8 data);

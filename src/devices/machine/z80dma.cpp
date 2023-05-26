@@ -26,7 +26,6 @@
 #include "emu.h"
 #include "z80dma.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_DMA     (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_DMA)
