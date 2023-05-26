@@ -63,6 +63,8 @@ private:
 	bool m_align_d;
 	bool m_asz;
 	u16 m_align;
+	u32 m_m1;
+	u32 m_m2;
 };
 
 DECLARE_DEVICE_TYPE(TSCONF_DMA, tsconfdma_device)

@@ -39,6 +39,8 @@ void tsconfdma_device::device_start()
 	save_item(NAME(m_align_s));
 	save_item(NAME(m_align_d));
 	save_item(NAME(m_align));
+	save_item(NAME(m_m1));
+	save_item(NAME(m_m2));
 	save_item(NAME(m_asz));
 	save_item(NAME(m_task));
 }
@@ -110,6 +112,8 @@ void tsconfdma_device::start_tx(u8 dev, bool s_align, bool d_align, bool align_o
 	m_align_d = d_align;
 	m_asz = align_opt;
 	m_align = m_asz ? 512 : 256;
+	m_m1 = m_asz ? 0x3ffe00 : 0x3fff00;
+	m_m2 = m_asz ? 0x0001ff : 0x0000ff;
 	m_ready = CLEAR_LINE;
 
 	// TODO Transfers 2 byte/cycle at 7MHz
@@ -128,8 +132,8 @@ TIMER_CALLBACK_MEMBER(tsconfdma_device::dma_clock)
 			for (u16 len = 0; len <= m_block_len; len++)
 			{
 				m_out_mreq_cb(d_addr, m_in_mreq_cb(s_addr));
-				s_addr = (s_addr + 2) & 0x3fffff;
-				d_addr = (d_addr + 2) & 0x3fffff;
+				s_addr = m_align_s ? ((s_addr & m_m1) | ((s_addr + 2) & m_m2)) : ((s_addr + 2) & 0x3fffff);
+				d_addr = m_align_d ? ((d_addr & m_m1) | ((d_addr + 2) & m_m2)) : ((d_addr + 2) & 0x3fffff);
 			}
 			m_address_s = m_align_s ? (m_address_s + m_align) : s_addr;
 			m_address_d = m_align_d ? (m_address_d + m_align) : d_addr;
@@ -142,10 +146,8 @@ TIMER_CALLBACK_MEMBER(tsconfdma_device::dma_clock)
 			auto d_addr = m_address_d;
 			for (u16 len = 0; len <= m_block_len; len++)
 			{
-				if (d_addr == 3801154)
-					printf("!");
 				m_out_mreq_cb(d_addr, m_in_mspi_cb());
-				d_addr = (d_addr + 2) & 0x3fffff;
+				d_addr = m_align_d ? ((d_addr & m_m1) | ((d_addr + 2) & m_m2)) : ((d_addr + 2) & 0x3fffff);
 			}
 			m_address_d = m_align_d ? (m_address_d + m_align) : d_addr;
 		}
@@ -159,7 +161,7 @@ TIMER_CALLBACK_MEMBER(tsconfdma_device::dma_clock)
 			for (u16 len = 0; len <= m_block_len; len++)
 			{
 				m_out_mreq_cb(d_addr, data);
-				d_addr = (d_addr + 2) & 0x3fffff;
+				d_addr = m_align_d ? ((d_addr & m_m1) | ((d_addr + 2) & m_m2)) : ((d_addr + 2) & 0x3fffff);
 			}
 			m_address_d = m_align_d ? (m_address_d + m_align) : d_addr;
 		}
@@ -187,8 +189,8 @@ TIMER_CALLBACK_MEMBER(tsconfdma_device::dma_clock)
 					d_val = (d_val & 0x0fff) | (((s_val & 0xf000) ? s_val : d_val) & 0xf000);
 				}
 				m_out_mreq_cb(d_addr, d_val);
-				s_addr = (s_addr + 2) & 0x3fffff;
-				d_addr = (d_addr + 2) & 0x3fffff;
+				s_addr = m_align_s ? ((s_addr & m_m1) | ((s_addr + 2) & m_m2)) : ((s_addr + 2) & 0x3fffff);
+				d_addr = m_align_d ? ((d_addr & m_m1) | ((d_addr + 2) & m_m2)) : ((d_addr + 2) & 0x3fffff);
 			}
 			m_address_s = m_align_s ? (m_address_s + m_align) : s_addr;
 			m_address_d = m_align_d ? (m_address_d + m_align) : d_addr;
@@ -203,8 +205,8 @@ TIMER_CALLBACK_MEMBER(tsconfdma_device::dma_clock)
 			for (u16 len = 0; len <= m_block_len; len++)
 			{
 				m_out_cram_cb(d_addr, m_in_mreq_cb(s_addr));
-				s_addr = (s_addr + 2) & 0x3fffff;
-				d_addr = (d_addr + 2) & 0x3fffff;
+				s_addr = m_align_s ? ((s_addr & m_m1) | ((s_addr + 2) & m_m2)) : ((s_addr + 2) & 0x3fffff);
+				d_addr = m_align_d ? ((d_addr & m_m1) | ((d_addr + 2) & m_m2)) : ((d_addr + 2) & 0x3fffff);
 			}
 			m_address_s = m_align_s ? (m_address_s + m_align) : s_addr;
 			m_address_d = m_align_d ? (m_address_d + m_align) : d_addr;
@@ -219,8 +221,8 @@ TIMER_CALLBACK_MEMBER(tsconfdma_device::dma_clock)
 			for (u16 len = 0; len <= m_block_len; len++)
 			{
 				m_out_sfile_cb(d_addr, m_in_mreq_cb(s_addr));
-				s_addr = (s_addr + 2) & 0x3fffff;
-				d_addr = (d_addr + 2) & 0x3fffff;
+				s_addr = m_align_s ? ((s_addr & m_m1) | ((s_addr + 2) & m_m2)) : ((s_addr + 2) & 0x3fffff);
+				d_addr = m_align_d ? ((d_addr & m_m1) | ((d_addr + 2) & m_m2)) : ((d_addr + 2) & 0x3fffff);
 			}
 			m_address_s = m_align_s ? (m_address_s + m_align) : s_addr;
 			m_address_d = m_align_d ? (m_address_d + m_align) : d_addr;
