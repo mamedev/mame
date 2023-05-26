@@ -28,15 +28,15 @@ TODO:
 #include "romload.h"
 #include "sound/cdda.h"
 
-#define LOG_DECODES     (1 << 1)
-#define LOG_SAMPLES     (1 << 2)
-#define LOG_COMMANDS    (1 << 3)
-#define LOG_SECTORS     (1 << 4)
-#define LOG_IRQS        (1 << 5)
-#define LOG_READS       (1 << 6)
-#define LOG_WRITES      (1 << 7)
-#define LOG_UNKNOWNS    (1 << 8)
-#define LOG_RAM         (1 << 9)
+#define LOG_DECODES     (1U << 1)
+#define LOG_SAMPLES     (1U << 2)
+#define LOG_COMMANDS    (1U << 3)
+#define LOG_SECTORS     (1U << 4)
+#define LOG_IRQS        (1U << 5)
+#define LOG_READS       (1U << 6)
+#define LOG_WRITES      (1U << 7)
+#define LOG_UNKNOWNS    (1U << 8)
+#define LOG_RAM         (1U << 9)
 #define LOG_ALL         (LOG_DECODES | LOG_SAMPLES | LOG_COMMANDS | LOG_SECTORS | LOG_IRQS | LOG_READS | LOG_WRITES | LOG_UNKNOWNS | LOG_RAM)
 
 #define VERBOSE         (0)

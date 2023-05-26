@@ -88,7 +88,9 @@ DEFINE_DEVICE_TYPE(COP446C, cop446c_cpu_device, "cop446c", "National Semiconduct
     CONSTANTS
 ***************************************************************************/
 
-#define LOG_MICROBUS 0
+#define LOG_MICROBUS (1U << 1)
+#define VERBOSE (0)
+#include "logmacro.h"
 
 // step through skipped instructions in debugger
 #define COP_DEBUG_SKIP 0
@@ -1382,14 +1384,14 @@ std::unique_ptr<util::disasm_interface> cop400_cpu_device::create_disassembler()
 
 uint8_t cop400_cpu_device::microbus_r()
 {
-	if (LOG_MICROBUS) logerror("%s %s MICROBUS R %02x\n", machine().time().as_string(), machine().describe_context(), Q);
+	LOGMASKED(LOG_MICROBUS, "%s %s MICROBUS R %02x\n", machine().time().as_string(), machine().describe_context(), Q);
 
 	return Q;
 }
 
 void cop400_cpu_device::microbus_w(uint8_t data)
 {
-	if (LOG_MICROBUS) logerror("%s %s MICROBUS W %02x\n", machine().time().as_string(), machine().describe_context(), data);
+	LOGMASKED(LOG_MICROBUS, "%s %s MICROBUS W %02x\n", machine().time().as_string(), machine().describe_context(), data);
 
 	WRITE_G(G & 0xe);
 

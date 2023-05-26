@@ -45,7 +45,6 @@
 #include "mc68901.h"
 #include "cpu/m68000/m68000.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_RCV     (1U << 1)
 #define LOG_XMIT    (1U << 2)
 

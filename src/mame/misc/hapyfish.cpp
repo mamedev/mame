@@ -59,10 +59,10 @@
 
 #include <algorithm>
 
-#define LOG_GPIO    (1 << 0)
-#define LOG_ADC     (1 << 1)
-#define LOG_I2C     (1 << 2)
-#define LOG_INPUTS  (1 << 3)
+#define LOG_GPIO    (1U << 1)
+#define LOG_ADC     (1U << 2)
+#define LOG_I2C     (1U << 3)
+#define LOG_INPUTS  (1U << 4)
 
 #define VERBOSE     (LOG_GPIO | LOG_ADC | LOG_I2C | LOG_INPUTS)
 #include "logmacro.h"

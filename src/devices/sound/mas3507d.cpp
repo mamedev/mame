@@ -15,12 +15,11 @@
 #include "mas3507d.h"
 #include "mp3_audio.h"
 
-#define LOG_GENERAL  (1 << 0)
-#define LOG_READ     (1 << 1)
-#define LOG_WRITE    (1 << 2)
-#define LOG_REGISTER (1 << 3)
-#define LOG_CONFIG   (1 << 4)
-#define LOG_OTHER    (1 << 5)
+#define LOG_READ     (1U << 1)
+#define LOG_WRITE    (1U << 2)
+#define LOG_REGISTER (1U << 3)
+#define LOG_CONFIG   (1U << 4)
+#define LOG_OTHER    (1U << 5)
 // #define VERBOSE      (LOG_GENERAL | LOG_READ | LOG_WRITE | LOG_REGISTER | LOG_CONFIG | LOG_OTHER)
 // #define LOG_OUTPUT_STREAM std::cout
 

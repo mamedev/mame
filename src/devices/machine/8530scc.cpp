@@ -19,7 +19,8 @@ DEFINE_DEVICE_TYPE(SCC8530, scc8530_legacy_device, "scc8530l", "Zilog 8530 SCC (
     PARAMETERS
 ***************************************************************************/
 
-#define LOG_SCC (0)
+#define VERBOSE (0)
+#include "logmacro.h"
 
 /***************************************************************************
     IMPLEMENTATION
@@ -79,9 +80,7 @@ void scc8530_legacy_device::updateirqs()
 		lastIRQStat = irqstat;
 
 		// tell the driver the new IRQ line status if possible
-#if LOG_SCC
-		printf("SCC8530 IRQ status => %d\n", irqstat);
-#endif
+		LOG("SCC8530 IRQ status => %d\n", irqstat);
 		if(!intrq_cb.isnull())
 			intrq_cb(irqstat);
 	}
@@ -225,9 +224,7 @@ void scc8530_legacy_device::acknowledge()
 
 uint8_t scc8530_legacy_device::getareg()
 {
-	#if LOG_SCC
-	printf("SCC: port A reg %d read 0x%02x\n", reg, channel[0].reg_val[reg]);
-	#endif
+	LOG("SCC: port A reg %d read 0x%02x\n", reg, channel[0].reg_val[reg]);
 
 	if (reg == 0)
 	{
@@ -256,9 +253,7 @@ uint8_t scc8530_legacy_device::getareg()
 
 uint8_t scc8530_legacy_device::getbreg()
 {
-	#if LOG_SCC
-	printf("SCC: port B reg %i read 0x%02x\n", reg, channel[1].reg_val[reg]);
-	#endif
+	LOG("SCC: port B reg %i read 0x%02x\n", reg, channel[1].reg_val[reg]);
 
 	if (reg == 0)
 	{
@@ -298,9 +293,7 @@ void scc8530_legacy_device::putreg(int ch, uint8_t data)
 	Chan *pChan = &channel[ch];
 
 	channel[ch].reg_val[reg] = data;
-	#if LOG_SCC
-	printf("SCC: port %c reg %d write 0x%02x\n", 'A'+ch, reg, data);
-	#endif
+	LOG("SCC: port %c reg %d write 0x%02x\n", 'A'+ch, reg, data);
 
 	switch (reg)
 	{

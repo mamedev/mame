@@ -993,7 +993,7 @@ void kchamp_state::init_kchampvs2()
 
 //    YEAR  NAME       PARENT  MACHINE       INPUT     CLASS          INIT            ROT    COMPANY                  FULLNAME                                FLAGS
 GAME( 1984, kchamp,    0,      kchamp,       kchamp,   kchamp_state,  empty_init,     ROT90, "Data East USA",         "Karate Champ (US)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kchamp2p,  0,      kchamp,       kchampvs, kchamp_state,  empty_init,     ROT90, "Data East USA",         "Karate Champ (US, 2 players)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kchamp2p,  kchamp, kchamp,       kchampvs, kchamp_state,  empty_init,     ROT90, "Data East USA",         "Karate Champ (US, 2 players)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1984, karatedo,  kchamp, kchamp,       kchamp,   kchamp_state,  empty_init,     ROT90, "Data East Corporation", "Karate Dou (Japan)",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1984, kchamptec, kchamp, kchamp,       kchamp,   kchamp_state,  empty_init,     ROT90, "bootleg (Tecfri)",      "Karate Champ (Tecfri bootleg)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1984, karateda,  kchamp, kchamp_arfyc, kchamp,   kchamp_state,  empty_init,     ROT90, "bootleg (Arfyc)",       "Karate Dou (Arfyc bootleg)",           MACHINE_SUPPORTS_SAVE )

@@ -22,12 +22,11 @@
 
 
 #ifdef NES_PCB_DEBUG
-#define VERBOSE 1
+#define VERBOSE (LOG_GENERAL)
 #else
-#define VERBOSE 0
+#define VERBOSE (0)
 #endif
-
-#define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 
 //-------------------------------------------------
@@ -109,7 +108,7 @@ void nes_rex_sl1632_device::pcb_reset()
 
 void nes_rex_dbz5_device::write_l(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("rex_dbz write_l, offset: %04x, data: %02x\n", offset, data));
+	LOG("rex_dbz write_l, offset: %04x, data: %02x\n", offset, data);
 
 	m_extra = data;
 	set_chr(m_chr_source, m_chr_base, m_chr_mask);
@@ -118,7 +117,7 @@ void nes_rex_dbz5_device::write_l(offs_t offset, uint8_t data)
 /* we would need to use this read handler in 0x6000-0x7fff as well */
 uint8_t nes_rex_dbz5_device::read_l(offs_t offset)
 {
-	LOG_MMC(("rex_dbz read_l, offset: %04x\n", offset));
+	LOG("rex_dbz read_l, offset: %04x\n", offset);
 	return 0x01;
 }
 
@@ -170,7 +169,7 @@ void nes_rex_sl1632_device::chr_cb(int start, int bank, int source)
 
 void nes_rex_sl1632_device::write_h(offs_t offset, u8 data)
 {
-	LOG_MMC(("rex_sl1632 write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("rex_sl1632 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	if (offset == 0x2131)       // Mode control register at $A131
 	{

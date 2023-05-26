@@ -62,10 +62,10 @@ A4 = MAX232
 #include "screen.h"
 #include "softlist_dev.h"
 
-#define LOG_CARD_A_READ     (1 << 1u)
-#define LOG_CARD_A_WRITE    (1 << 2u)
-#define LOG_CARD_B_READ     (1 << 3u)
-#define LOG_CARD_B_WRITE    (1 << 4u)
+#define LOG_CARD_A_READ     (1U << 1)
+#define LOG_CARD_A_WRITE    (1U << 2)
+#define LOG_CARD_B_READ     (1U << 3)
+#define LOG_CARD_B_WRITE    (1U << 4)
 #define LOG_ALL             (LOG_CARD_A_READ | LOG_CARD_A_WRITE | LOG_CARD_B_READ | LOG_CARD_B_WRITE)
 
 #define VERBOSE (LOG_ALL)

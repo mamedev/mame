@@ -20,10 +20,10 @@
 #include "axc51.h"
 #include "axc51dasm.h"
 
-#define LOG_UNSORTED  (1U <<  1)
-#define LOG_PORTS     (1U <<  2)
-#define LOG_UNHANDLED (1U <<  3)
-#define LOG_UNHANDLED_XSFR (1U <<  4)
+#define LOG_UNSORTED       (1U << 1)
+#define LOG_PORTS          (1U << 2)
+#define LOG_UNHANDLED      (1U << 3)
+#define LOG_UNHANDLED_XSFR (1U << 4)
 
 
 

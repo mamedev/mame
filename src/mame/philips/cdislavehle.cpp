@@ -20,11 +20,11 @@ TODO:
 
 #include <algorithm>
 
-#define LOG_IRQS        (1 << 0)
-#define LOG_COMMANDS    (1 << 1)
-#define LOG_READS       (1 << 2)
-#define LOG_WRITES      (1 << 3)
-#define LOG_UNKNOWNS    (1 << 4)
+#define LOG_IRQS        (1U << 1)
+#define LOG_COMMANDS    (1U << 2)
+#define LOG_READS       (1U << 3)
+#define LOG_WRITES      (1U << 4)
+#define LOG_UNKNOWNS    (1U << 5)
 #define LOG_ALL         (LOG_IRQS | LOG_COMMANDS | LOG_READS | LOG_WRITES | LOG_UNKNOWNS)
 
 #define VERBOSE         (0)

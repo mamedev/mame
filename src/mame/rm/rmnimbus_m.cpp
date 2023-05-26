@@ -65,6 +65,18 @@ chdman createhd -o ST125N.chd -chs 41921,1,1 -ss 512
 #include "rmnimbus.h"
 #include "imagedev/floppy.h"
 
+#define LOG_SIO             (1U << 1)
+#define LOG_DISK_HDD        (1U << 2)
+#define LOG_DISK            (1U << 3)
+#define LOG_PC8031          (1U << 4)
+#define LOG_PC8031_186      (1U << 5)
+#define LOG_PC8031_PORT     (1U << 6)
+#define LOG_IOU             (1U << 7)
+#define LOG_RAM             (1U << 8)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
 
 
 /*-------------------------------------------------------------------------*/
@@ -122,15 +134,6 @@ chdman createhd -o ST125N.chd -chs 41921,1,1 -ss 512
 #define LINEAR_ADDR(seg,ofs)    ((seg<<4)+ofs)
 
 #define OUTPUT_SEGOFS(mess,seg,ofs)  logerror("%s=%04X:%04X [%08X]\n",mess,seg,ofs,((seg<<4)+ofs))
-
-#define LOG_SIO             0
-#define LOG_DISK_HDD        0
-#define LOG_DISK            0
-#define LOG_PC8031          0
-#define LOG_PC8031_186      0
-#define LOG_PC8031_PORT     0
-#define LOG_IOU             0
-#define LOG_RAM             0
 
 
 void rmnimbus_state::external_int(uint8_t vector, bool state)
@@ -343,7 +346,7 @@ void rmnimbus_state::nimbus_bank_memory()
 	map_blocks[1]  = (ramblocks[ramblock][1].blocksize==0) ? nullptr : &ram[ramblocks[ramblock][1].blockbase*1024];
 	map_blocks[2]  = (ramblocks[ramblock][2].blocksize==0) ? nullptr : &ram[ramblocks[ramblock][2].blockbase*1024];
 
-	//if(LOG_RAM) logerror("\n\nmcu_reg080=%02X, ramblock=%d, map_blocks[0]=%X, map_blocks[1]=%X, map_blocks[2]=%X\n",m_mcu_reg080,ramblock,(int)map_blocks[0],(int)map_blocks[1],(int)map_blocks[2]);
+	//LOGMASKED(LOG_RAM, "\n\nmcu_reg080=%02X, ramblock=%d, map_blocks[0]=%X, map_blocks[1]=%X, map_blocks[2]=%X\n",m_mcu_reg080,ramblock,(int)map_blocks[0],(int)map_blocks[1],(int)map_blocks[2]);
 
 	for(blockno=0;blockno<8;blockno++)
 	{
@@ -360,7 +363,7 @@ void rmnimbus_state::nimbus_bank_memory()
 		block_ofs=(ramsel==0x07) ? 0 : ((blockno % 4)*128);
 
 
-		if(LOG_RAM) logerror("mapped %s",bank);
+		LOGMASKED(LOG_RAM, "mapped %s",bank);
 
 		if((map_blockno>-1) && (block_ofs < ramblocks[ramblock][map_blockno].blocksize) &&
 			(map_blocks[map_blockno]!=nullptr))
@@ -369,12 +372,12 @@ void rmnimbus_state::nimbus_bank_memory()
 
 			membank(bank)->set_base(map_base);
 			space.install_readwrite_bank(memmap[blockno].start, memmap[blockno].end, membank(bank));
-			//if(LOG_RAM) logerror(", base=%X\n",(int)map_base);
+			//LOGMASKED(LOG_RAM, ", base=%X\n",(int)map_base);
 		}
 		else
 		{
 			space.nop_readwrite(memmap[blockno].start, memmap[blockno].end);
-			if(LOG_RAM) logerror("NOP\n");
+			LOGMASKED(LOG_RAM, "NOP\n");
 		}
 	}
 }
@@ -407,8 +410,7 @@ Z80SIO, used for the keyboard interface
 
 WRITE_LINE_MEMBER(rmnimbus_state::sio_interrupt)
 {
-	if(LOG_SIO)
-		logerror("SIO Interrupt state=%02X\n",state);
+	LOGMASKED(LOG_SIO, "SIO Interrupt state=%02X\n",state);
 
 	external_int(0, state);
 }
@@ -423,8 +425,7 @@ void rmnimbus_state::fdc_reset()
 
 WRITE_LINE_MEMBER(rmnimbus_state::nimbus_fdc_intrq_w)
 {
-	if(LOG_DISK)
-		logerror("nimbus_drives_intrq = %d\n",state);
+	LOGMASKED(LOG_DISK, "nimbus_drives_intrq = %d\n",state);
 
 	if(m_iou_reg092 & DISK_INT_ENABLE)
 	{
@@ -434,8 +435,7 @@ WRITE_LINE_MEMBER(rmnimbus_state::nimbus_fdc_intrq_w)
 
 WRITE_LINE_MEMBER(rmnimbus_state::nimbus_fdc_drq_w)
 {
-	if(LOG_DISK)
-		logerror("nimbus_drives_drq_w(%d)\n", state);
+	LOGMASKED(LOG_DISK, "nimbus_drives_drq_w(%d)\n", state);
 
 	m_maincpu->drq1_w(state && FDC_DRQ_ENABLED());
 }
@@ -508,8 +508,7 @@ uint8_t rmnimbus_state::scsi_r(offs_t offset)
 			break;
 	}
 
-	if(LOG_DISK_HDD)
-		logerror("Nimbus HDCR at pc=%08X from %04X data=%02X\n",pc,(offset*2)+0x410,result);
+	LOGMASKED(LOG_DISK_HDD, "Nimbus HDCR at pc=%08X from %04X data=%02X\n",pc,(offset*2)+0x410,result);
 
 	return result;
 }
@@ -561,8 +560,7 @@ void rmnimbus_state::scsi_w(offs_t offset, uint8_t data)
 {
 	int pc=m_maincpu->pc();
 
-	if(LOG_DISK_HDD)
-		logerror("Nimbus HDCW at %05X write of %02X to %04X\n",pc,data,(offset*2)+0x410);
+	LOGMASKED(LOG_DISK_HDD, "Nimbus HDCW at %05X write of %02X to %04X\n",pc,data,(offset*2)+0x410);
 
 	switch(offset*2)
 	{
@@ -730,8 +728,7 @@ uint8_t rmnimbus_state::nimbus_pc8031_r(offs_t offset)
 		default : result=0; break;
 	}
 
-	if(LOG_PC8031_186)
-		logerror("Nimbus PCIOR %08X read of %04X returns %02X\n",pc,(offset*2)+0xC0,result);
+	LOGMASKED(LOG_PC8031_186, "Nimbus PCIOR %08X read of %04X returns %02X\n",pc,(offset*2)+0xC0,result);
 
 	return result;
 }
@@ -755,9 +752,7 @@ void rmnimbus_state::nimbus_pc8031_w(offs_t offset, uint8_t data)
 						break;
 	}
 
-	if(LOG_PC8031_186)
-		logerror("Nimbus PCIOW %08X write of %02X to %04X\n",pc,data,(offset*2)+0xC0);
-
+	LOGMASKED(LOG_PC8031_186, "Nimbus PCIOW %08X write of %02X to %04X\n",pc,data,(offset*2)+0xC0);
 }
 
 /* 8031/8051 Peripheral controller 8031/8051 side */
@@ -781,8 +776,7 @@ uint8_t rmnimbus_state::nimbus_pc8031_iou_r(offs_t offset)
 	if(((offset==2) || (offset==3)) && (m_iou_reg092 & PC8031_INT_ENABLE))
 		external_int(EXTERNAL_INT_PC8031_8C, true);
 
-	if(LOG_PC8031)
-		logerror("8031: PCIOR %04X read of %04X returns %02X\n",pc,offset,result);
+	LOGMASKED(LOG_PC8031, "8031: PCIOR %04X read of %04X returns %02X\n",pc,offset,result);
 
 	return result;
 }
@@ -791,8 +785,7 @@ void rmnimbus_state::nimbus_pc8031_iou_w(offs_t offset, uint8_t data)
 {
 	int pc=m_iocpu->pc();
 
-	if(LOG_PC8031)
-		logerror("8031 PCIOW %04X write of %02X to %04X\n",pc,data,offset);
+	LOGMASKED(LOG_PC8031, "8031 PCIOW %04X write of %02X to %04X\n",pc,data,offset);
 
 	switch(offset & 0x03)
 	{
@@ -831,8 +824,7 @@ uint8_t rmnimbus_state::nimbus_pc8031_port1_r()
 	int pc=m_iocpu->pc();
 	uint8_t   result = (m_eeprom_bits & ~4) | (m_eeprom->do_read() << 2);
 
-	if(LOG_PC8031_PORT)
-		logerror("8031: PCPORTR %04X read of P1 returns %02X\n",pc,result);
+	LOGMASKED(LOG_PC8031_PORT, "8031: PCPORTR %04X read of P1 returns %02X\n",pc,result);
 
 	return result;
 }
@@ -842,8 +834,7 @@ uint8_t rmnimbus_state::nimbus_pc8031_port3_r()
 	int pc=m_iocpu->pc();
 	uint8_t   result = 0;
 
-	if(LOG_PC8031_PORT)
-		logerror("8031: PCPORTR %04X read of P3 returns %02X\n",pc,result);
+	LOGMASKED(LOG_PC8031_PORT, "8031: PCPORTR %04X read of P3 returns %02X\n",pc,result);
 
 	return result;
 }
@@ -867,16 +858,13 @@ void rmnimbus_state::nimbus_pc8031_port1_w(uint8_t data)
 	m_eeprom->clk_write((data & 1) ? 1 : 0);
 	m_eeprom_bits = data;
 
-	if(LOG_PC8031_PORT)
-		logerror("8031 PCPORTW %04X write of %02X to P1\n",pc,data);
+	LOGMASKED(LOG_PC8031_PORT, "8031 PCPORTW %04X write of %02X to P1\n",pc,data);
 }
 
 void rmnimbus_state::nimbus_pc8031_port3_w(uint8_t data)
 {
-	int pc=m_iocpu->pc();
-
-	if(LOG_PC8031_PORT)
-		logerror("8031 PCPORTW %04X write of %02X to P3\n",pc,data);
+	int pc = m_iocpu->pc();
+	LOGMASKED(LOG_PC8031_PORT, "8031 PCPORTW %04X write of %02X to P3\n",pc,data);
 }
 
 
@@ -891,8 +879,7 @@ uint8_t rmnimbus_state::nimbus_iou_r(offs_t offset)
 		result=m_iou_reg092;
 	}
 
-	if(LOG_IOU)
-		logerror("Nimbus IOUR %08X read of %04X returns %02X\n",pc,(offset*2)+0x92,result);
+	LOGMASKED(LOG_IOU, "Nimbus IOUR %08X read of %04X returns %02X\n",pc,(offset*2)+0x92,result);
 
 	return result;
 }
@@ -901,8 +888,7 @@ void rmnimbus_state::nimbus_iou_w(offs_t offset, uint8_t data)
 {
 	int pc=m_maincpu->pc();
 
-	if(LOG_IOU)
-		logerror("Nimbus IOUW %08X write of %02X to %04X\n",pc,data,(offset*2)+0x92);
+	LOGMASKED(LOG_IOU, "Nimbus IOUW %08X write of %02X to %04X\n",pc,data,(offset*2)+0x92);
 
 	if(offset==0)
 	{

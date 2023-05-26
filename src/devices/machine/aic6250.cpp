@@ -29,7 +29,6 @@
 #include "emu.h"
 #include "aic6250.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_REG     (1U << 1)
 #define LOG_STATE   (1U << 2)
 #define LOG_CONFIG  (1U << 3)

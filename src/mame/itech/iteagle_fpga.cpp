@@ -4,12 +4,21 @@
 #include "iteagle_fpga.h"
 #include "coreutil.h"
 
-#define LOG_FPGA            (0)
-#define LOG_SERIAL          (0)
-#define LOG_RTC             (0)
-#define LOG_RAM             (0)
-#define LOG_EEPROM          (0)
-#define LOG_PERIPH          (0)
+#define LOG_FPGA            (1U << 1)
+#define LOG_FPGA_VERBOSE    (1U << 2)
+#define LOG_SERIAL          (1U << 3)
+#define LOG_SERIAL_VERBOSE  (1U << 4)
+#define LOG_LEDSIGN         (1U << 5)
+#define LOG_MODEM           (1U << 6)
+#define LOG_RTC             (1U << 7)
+#define LOG_RAM             (1U << 8)
+#define LOG_EEPROM          (1U << 9)
+#define LOG_PERIPH          (1U << 10)
+#define LOG_UNKNOWN         (1U << 11)
+
+#define VERBOSE (LOG_UNKNOWN)
+#include "logmacro.h"
+
 
 #define AM85C30_TAG "am85c30_0"
 #define COM1_TAG "com1"
@@ -181,8 +190,7 @@ void iteagle_fpga_device::update_sequence(uint32_t data)
 			m_seq = (m_seq>>8) | ((feed&0xff)<<16);
 			m_fpga_regs[offset] = (m_fpga_regs[offset]&0xFFFFFF00) | ((val1 + m_seq_rem1 + m_seq_rem2) & 0xff);
 		}
-		if (0 && LOG_FPGA)
-			logerror("%s:fpga update_sequence In: %02X Seq: %06X Out: %02X\n", machine().describe_context(), data, m_seq, m_fpga_regs[offset]&0xff);
+		LOGMASKED(LOG_FPGA_VERBOSE, "%s:fpga update_sequence In: %02X Seq: %06X Out: %02X\n", machine().describe_context(), data, m_seq, m_fpga_regs[offset]&0xff);
 	}
 }
 
@@ -209,9 +217,8 @@ void iteagle_fpga_device::update_sequence_eg1(uint32_t data)
 		m_seq = (m_seq>>9) | ((feed&0x1ff)<<15);
 		m_fpga_regs[offset] = (m_fpga_regs[offset]&0xFFFFFF00) | ((val1 + m_seq_rem1 + m_seq_rem2) & 0xff);
 	}
-	if (0 && LOG_FPGA)
-		logerror("%s:fpga update_sequence In: %02X Seq: %06X Out: %02X other %02X%02X%02X\n", machine().describe_context(),
-			data, m_seq, m_fpga_regs[offset]&0xff, m_seq_rem2, m_seq_rem1, val1);
+	LOGMASKED(LOG_FPGA_VERBOSE, "%s:fpga update_sequence In: %02X Seq: %06X Out: %02X other %02X%02X%02X\n", machine().describe_context(),
+		data, m_seq, m_fpga_regs[offset]&0xff, m_seq_rem2, m_seq_rem1, val1);
 }
 
 //-------------------------------------------------
@@ -229,8 +236,7 @@ TIMER_CALLBACK_MEMBER(iteagle_fpga_device::assert_vblank_irq)
 	//m_fpga_regs[0x04/4] |=  0x02080000;
 	m_fpga_regs[0x04 / 4] |= 0x00080000;
 	m_cpu->set_input_line(m_irq_num, ASSERT_LINE);
-	if (LOG_FPGA)
-		logerror("%s:fpga assert_vblank_irq Setting interrupt(%i)\n", machine().describe_context(), m_irq_num);
+	LOGMASKED(LOG_FPGA, "%s:fpga assert_vblank_irq Setting interrupt(%i)\n", machine().describe_context(), m_irq_num);
 }
 
 WRITE_LINE_MEMBER(iteagle_fpga_device::vblank_update)
@@ -247,16 +253,13 @@ WRITE_LINE_MEMBER(iteagle_fpga_device::vblank_update)
 			//m_timer->adjust(m_screen->time_until_pos(std::max(0, m_gun_y - BEAM_DY), std::max(0, m_gun_x - BEAM_DX)));
 			//printf("w: %d h: %d x: %d y: %d\n", visarea.width(), visarea.height(), m_gun_x, m_gun_y);
 		}
-		if (LOG_FPGA)
-			logerror("%s:fpga vblank_update Setting interrupt(%i)\n", machine().describe_context(), m_irq_num);
+		LOGMASKED(LOG_FPGA, "%s:fpga vblank_update Setting interrupt(%i)\n", machine().describe_context(), m_irq_num);
 	}
 }
 
 WRITE_LINE_MEMBER(iteagle_fpga_device::serial_interrupt)
 {
-	if (LOG_SERIAL) {
-		logerror("serial_interrupt: intr(%i) = %i\n", m_serial_irq_num, state);
-	}
+	LOGMASKED(LOG_SERIAL, "serial_interrupt: intr(%i) = %i\n", m_serial_irq_num, state);
 	m_cpu->set_input_line(m_serial_irq_num, state);
 }
 
@@ -278,28 +281,26 @@ uint32_t iteagle_fpga_device::fpga_r(offs_t offset, uint32_t mem_mask)
 	switch (offset) {
 		case 0x00/4:
 			result = (m_in_cb[IO_SYSTEM](0) << 16) | (m_in_cb[IO_IN1](0));
-			if (LOG_FPGA && m_prev_reg!=offset)
-				logerror("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
+			if (m_prev_reg != offset)
+				LOGMASKED(LOG_FPGA, "%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
 		case 0x04/4:
 			result = (result & 0xFF0FFFFF) | ((m_in_cb[IO_SW5](0) & 0xf) << 20);
-			if (0 && LOG_FPGA && !ACCESSING_BITS_0_7)
-				logerror("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
+			if (!ACCESSING_BITS_0_7)
+				LOGMASKED(LOG_FPGA_VERBOSE, "%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
 		case 0x08/4:
 			result = (m_tracky_cb(0) << 8) | m_trackx_cb(0);
-			if (LOG_FPGA && m_prev_reg!=offset)
-				logerror("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
+			if (m_prev_reg!=offset)
+				LOGMASKED(LOG_FPGA, "%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
 		case 0x14/4: // GUN1-- Interrupt & 0x4==0x00080000
 			result = (m_gun_y << 16) | (m_gun_x << 0);
-			if (LOG_FPGA)
-				logerror("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
+			LOGMASKED(LOG_FPGA, "%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
 		case 0x18/4: // Interrupt & 0x4==0x02000000
 			result = 0;
-			if (LOG_FPGA)
-				logerror("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
+			LOGMASKED(LOG_FPGA, "%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
 		case 0x0c/4: //
 			result = 0;
@@ -323,8 +324,8 @@ uint32_t iteagle_fpga_device::fpga_r(offs_t offset, uint32_t mem_mask)
 				result |= m_scc1->da_r(offset) << 24;
 				if (LOG_SERIAL) m_serial0_1.read_data(0);
 			}
-			if (0 && LOG_FPGA && m_prev_reg != offset)
-				logerror("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
+			if (m_prev_reg != offset)
+				LOGMASKED(LOG_SERIAL_VERBOSE, "%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
 		case 0x1c/4:
 			result = 0;
@@ -336,11 +337,11 @@ uint32_t iteagle_fpga_device::fpga_r(offs_t offset, uint32_t mem_mask)
 			}
 			if (ACCESSING_BITS_16_23) {
 				result |= m_serial2_3.read_data(1) << 16;
-				logerror("fpga_r: LEDSIGN read byte: %02X\n", uint8_t(result >> 16));
+				LOGMASKED(LOG_LEDSIGN, "fpga_r: LEDSIGN read byte: %02X\n", uint8_t(result >> 16));
 			}
 			if (ACCESSING_BITS_24_31) {
 				result |= m_serial2_3.read_data(0) << 24;
-				logerror("fpga_r: MODEM read byte: %c\n", (result >> 24) & 0xff);
+				LOGMASKED(LOG_MODEM, "fpga_r: MODEM read byte: %c\n", (result >> 24) & 0xff);
 			}
 			// Clear interrupts
 			if (ACCESSING_BITS_16_31) {
@@ -348,12 +349,10 @@ uint32_t iteagle_fpga_device::fpga_r(offs_t offset, uint32_t mem_mask)
 					m_cpu->set_input_line(m_serial_irq_num, CLEAR_LINE);
 				}
 			}
-			if (LOG_FPGA)
-				logerror("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
+			LOGMASKED(LOG_FPGA, "%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
 		default:
-			if (LOG_FPGA)
-				logerror("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
+			LOGMASKED(LOG_FPGA, "%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			osd_printf_debug("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
 	}
@@ -373,35 +372,29 @@ void iteagle_fpga_device::fpga_w(offs_t offset, uint32_t data, uint32_t mem_mask
 				else
 					// ATMEL Chip access.  Returns version id's when bit 7 is set.
 					update_sequence(data & 0xff);
-				if (0 && LOG_FPGA)
-						logerror("%s:fpga_w offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
+				LOGMASKED(LOG_FPGA_VERBOSE, "%s:fpga_w offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 			} else if (ACCESSING_BITS_8_15) {
 				// Interrupt enable?
-				if (LOG_FPGA)
-						logerror("%s:fpga_w offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
+				LOGMASKED(LOG_FPGA, "%s:fpga_w offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 			} else if (ACCESSING_BITS_24_31 && (data & 0x01000000)) {
 			// Interrupt clear/enable
 				m_cpu->set_input_line(m_irq_num, CLEAR_LINE);
-				if (LOG_FPGA)
-						logerror("%s:fpga_w offset %04X = %08X & %08X Clearing interrupt(%i)\n", machine().describe_context(), offset*4, data, mem_mask, m_irq_num);
+				LOGMASKED(LOG_FPGA, "%s:fpga_w offset %04X = %08X & %08X Clearing interrupt(%i)\n", machine().describe_context(), offset*4, data, mem_mask, m_irq_num);
 			} else {
-				if (LOG_FPGA)
-						logerror("%s:fpga_w offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
+				LOGMASKED(LOG_FPGA, "%s:fpga_w offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 			}
 			break;
 		case 0x14/4:
 			if (ACCESSING_BITS_0_7 && (data&0x1)) {
 				m_fpga_regs[0x04/4] &=  ~0x00080000;
 			}
-			if (LOG_FPGA)
-					logerror("%s:fpga_w offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
+			LOGMASKED(LOG_FPGA, "%s:fpga_w offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 			break;
 		case 0x18/4:
 			if (ACCESSING_BITS_0_7 && (data&0x1)) {
 				m_fpga_regs[0x04/4] &=  ~0x02000000;
 			}
-			if (LOG_FPGA)
-					logerror("%s:fpga_w offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
+			LOGMASKED(LOG_FPGA, "%s:fpga_w offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 			break;
 		case 0x0c/4:
 			if (ACCESSING_BITS_0_7) {
@@ -432,8 +425,7 @@ void iteagle_fpga_device::fpga_w(offs_t offset, uint32_t data, uint32_t mem_mask
 				m_scc1->da_w(offset, (data >> 24) & 0xff);
 				if (LOG_SERIAL) m_serial0_1.write_data((data >> 24) & 0xff, 0);
 			}
-			if (1 && LOG_FPGA)
-					logerror("%s:fpga_w offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
+			LOGMASKED(LOG_FPGA, "%s:fpga_w offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 			break;
 		case 0x1c/4:
 			if (ACCESSING_BITS_0_7) {
@@ -492,12 +484,10 @@ void iteagle_fpga_device::fpga_w(offs_t offset, uint32_t data, uint32_t mem_mask
 
 			}
 
-			if (LOG_FPGA)
-					logerror("%s:fpga_w offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
+			LOGMASKED(LOG_FPGA, "%s:fpga_w offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 			break;
 		default:
-			if (LOG_FPGA)
-					logerror("%s:fpga_w offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
+			LOGMASKED(LOG_FPGA, "%s:fpga_w offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 			osd_printf_debug("%s:fpga_w offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 			break;
 	}
@@ -596,8 +586,7 @@ uint32_t iteagle_fpga_device::rtc_r(offs_t offset, uint32_t mem_mask)
 
 	switch (offset) {
 		default:
-			if (LOG_RTC)
-				logerror("%s:RTC read from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
+			LOGMASKED(LOG_RTC, "%s:RTC read from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
 	}
 	return result;
@@ -627,13 +616,10 @@ void iteagle_fpga_device::rtc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 				m_rtc_regs[0x7FC/4] = (raw[7]<<24) | (raw[6]<<16) | (raw[5]<<8) | (raw[4] <<0);
 				//m_rtc_regs[0x7FC/4] = (0x95<<24) | (raw[6]<<16) | (raw[5]<<8) | (raw[4] <<0);
 			}
-			if (LOG_RTC)
-				logerror("%s:RTC write to offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
-
+			LOGMASKED(LOG_RTC, "%s:RTC write to offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 			break;
 		default:
-			if (LOG_RTC)
-				logerror("%s:RTC write to offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
+			LOGMASKED(LOG_RTC, "%s:RTC write to offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 			break;
 	}
 
@@ -645,33 +631,30 @@ void iteagle_fpga_device::rtc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 uint32_t iteagle_fpga_device::e1_nvram_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = m_e1_nv_data[offset];
-	if (LOG_RAM)
-		logerror("FPGA e1_nvram_r from offset %04X = %08X & %08X\n", offset * 4, result, mem_mask);
+	LOGMASKED(LOG_RAM, "FPGA e1_nvram_r from offset %04X = %08X & %08X\n", offset * 4, result, mem_mask);
 	return result;
 }
 
 void iteagle_fpga_device::e1_nvram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_e1_nv_data[offset]);
-	if (LOG_RAM)
-		logerror("FPGA e1_ram_w to offset %04X = %08X & %08X\n", offset * 4, data, mem_mask);
+	LOGMASKED(LOG_RAM, "FPGA e1_ram_w to offset %04X = %08X & %08X\n", offset * 4, data, mem_mask);
 }
+
 //*************************************
 //*  FPGA RAM -- Eagle 1 only
 //*************************************
 uint32_t iteagle_fpga_device::e1_ram_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = m_e1_ram[offset];
-	if (LOG_RAM)
-		logerror("%s:FPGA e1_ram_r from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
+	LOGMASKED(LOG_RAM, "%s:FPGA e1_ram_r from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 	return result;
 }
 
 void iteagle_fpga_device::e1_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_e1_ram[offset]);
-	if (LOG_RAM)
-		logerror("%s:FPGA e1_ram_w to offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
+	LOGMASKED(LOG_RAM, "%s:FPGA e1_ram_w to offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 }
 
 //************************************
@@ -760,14 +743,13 @@ uint32_t iteagle_eeprom_device::eeprom_r(offs_t offset, uint32_t mem_mask)
 		case 0xC/4: // I2C Handler
 			if (ACCESSING_BITS_16_23) {
 				result = m_eeprom->do_read()<<(16+3);
-				if (LOG_EEPROM)
-					logerror("%s:eeprom_r from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
-			}   else {
-					logerror("%s:eeprom_r from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
+				LOGMASKED(LOG_EEPROM, "%s:eeprom_r from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
+			} else {
+				LOGMASKED(LOG_UNKNOWN, "%s:eeprom_r from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			}
 			break;
 		default:
-				logerror("%s:eeprom read from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
+			LOGMASKED(LOG_UNKNOWN, "%s:eeprom read from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
 	}
 	return result;
@@ -788,16 +770,13 @@ void iteagle_eeprom_device::eeprom_w(offs_t offset, uint32_t data, uint32_t mem_
 				m_eeprom->di_write((data  & 0x040000) >> (16+2));
 				m_eeprom->cs_write((data  & 0x020000) ? ASSERT_LINE : CLEAR_LINE);
 				m_eeprom->clk_write((data & 0x010000) ? ASSERT_LINE : CLEAR_LINE);
-				if (LOG_EEPROM)
-					logerror("%s:eeprom_w to offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
-			}   else {
-				//if (LOG_EEPROM)
-					logerror("%s:eeprom_w to offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
+				LOGMASKED(LOG_EEPROM, "%s:eeprom_w to offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
+			} else {
+				LOGMASKED(LOG_UNKNOWN, "%s:eeprom_w to offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 			}
 			break;
 		default:
-			//if (LOG_EEPROM)
-				logerror("%s:eeprom write to offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
+			LOGMASKED(LOG_UNKNOWN, "%s:eeprom write to offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 			break;
 	}
 }
@@ -862,8 +841,7 @@ uint32_t iteagle_periph_device::ctrl_r(offs_t offset, uint32_t mem_mask)
 	uint32_t result = m_ctrl_regs[offset];
 	switch (offset) {
 		case 0x0/4:
-			if (LOG_PERIPH)
-				logerror("%s:fpga ctrl_r from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
+			LOGMASKED(LOG_PERIPH, "%s:fpga ctrl_r from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			osd_printf_debug("%s:fpga ctrl_r from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
 		case 0x70/4:
@@ -894,12 +872,10 @@ uint32_t iteagle_periph_device::ctrl_r(offs_t offset, uint32_t mem_mask)
 				// High 128 bytes of rtc ram
 				result = (result & 0x00ffffff) | (m_rtc_regs[m_ctrl_regs[0x72 / 4] & 0xff] << 24);
 			}
-			if (LOG_PERIPH)
-				logerror("%s:fpga ctrl_r from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
+			LOGMASKED(LOG_PERIPH, "%s:fpga ctrl_r from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
 		default:
-			if (LOG_PERIPH)
-				logerror("%s:fpga ctrl_r from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
+			LOGMASKED(LOG_PERIPH, "%s:fpga ctrl_r from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			osd_printf_debug("%s:fpga ctrl_r from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
 	}
@@ -926,6 +902,5 @@ void iteagle_periph_device::ctrl_w(offs_t offset, uint32_t data, uint32_t mem_ma
 		default:
 			break;
 	}
-	if (LOG_PERIPH)
-		logerror("%s:fpga ctrl_w to offset %04X = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
+	LOGMASKED(LOG_PERIPH, "%s:fpga ctrl_w to offset %04X = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
 }

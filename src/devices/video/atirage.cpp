@@ -470,7 +470,7 @@ u32 atirage_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 			break;
 
 		default:
-			LOGMASKED(LOG_GENERAL, "Unknown pixel format %d\n", m_format);
+			LOG("Unknown pixel format %d\n", m_format);
 			break;
 	}
 

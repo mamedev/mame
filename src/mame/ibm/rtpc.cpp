@@ -105,7 +105,6 @@
 #include "imagedev/floppy.h"
 #include "formats/pc_dsk.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_KLS     (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL|LOG_KLS)

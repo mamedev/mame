@@ -8,8 +8,6 @@
 #include "emu.h"
 #include "dbdma.h"
 
-#define LOG_GENERAL (1U << 0)
-
 #define VERBOSE (0)
 #include "logmacro.h"
 
@@ -87,11 +85,11 @@ void dbdma_device::control_w(u32 data)
 
 	m_status &= (mask ^ 0xffff);
 	m_status |= (data & mask);
-	LOGMASKED(LOG_GENERAL, "%s: channel status/control to %04x (raw %08x)\n", tag(), m_status, data);
+	LOG("%s: channel status/control to %04x (raw %08x)\n", tag(), m_status, data);
 
 	if (m_status & STATUS_RUN)
 	{
-		LOGMASKED(LOG_GENERAL, "%s: channel set to RUN, also setting ACTIVE\n", tag());
+		LOG("%s: channel set to RUN, also setting ACTIVE\n", tag());
 		m_status |= STATUS_ACTIVE;
 	}
 	else
@@ -129,7 +127,7 @@ void dbdma_device::cmdpointer_w(u32 data)
 {
 	if (!(m_status & STATUS_ACTIVE))
 	{
-		LOGMASKED(LOG_GENERAL, "%s: %08x to command pointer\n", tag(), swapendian_int32(data));
+		LOG("%s: %08x to command pointer\n", tag(), swapendian_int32(data));
 		m_command_pointer = data;
 
 		new_command();
@@ -253,7 +251,7 @@ void dbdma_device::step_program()
 			if (m_currentXfer >= m_xferLimit)
 			{
 				m_command_pointer += 16;
-				LOGMASKED(LOG_GENERAL, "%s: Advancing command pointer to %08x\n", tag(), m_command_pointer);
+				LOG("%s: Advancing command pointer to %08x\n", tag(), m_command_pointer);
 				new_command();
 			}
 		}
@@ -268,6 +266,6 @@ void dbdma_device::new_command()
 	m_currentXfer = m_statusCount & 0xffff;
 	m_xferLimit = m_opcode & 0xffff;
 
-	LOGMASKED(LOG_GENERAL, "%s: new command %08x %08x %08x %08x\n", tag(), m_opcode, m_address, m_cmdDep, m_statusCount);
-	LOGMASKED(LOG_GENERAL, "%s: opcode %d\n", tag(), m_opcode >> 28);
+	LOG("%s: new command %08x %08x %08x %08x\n", tag(), m_opcode, m_address, m_cmdDep, m_statusCount);
+	LOG("%s: opcode %d\n", tag(), m_opcode >> 28);
 }

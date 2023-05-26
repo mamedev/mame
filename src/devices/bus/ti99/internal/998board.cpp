@@ -107,24 +107,24 @@
 #include "998board.h"
 #include "cpu/tms9900/tms99com.h"
 
-#define LOG_DETAIL      (1U<<1)     // More detail
-#define LOG_CRU         (1U<<2)     // CRU logging
-#define LOG_ADDRESS     (1U<<3)     // Address bus
-#define LOG_MEM         (1U<<4)     // Memory access
-#define LOG_MAP         (1U<<5)     // Mapper
-#define LOG_READY       (1U<<6)     // READY line
-#define LOG_CLOCK       (1U<<7)     // CLKOUT
-#define LOG_MOFETTA     (1U<<8)     // Mofetta operation
-#define LOG_AMIGO       (1U<<9)     // Amigo operation
-#define LOG_OSO         (1U<<10)    // Oso operation
-#define LOG_HEXBUS      (1U<<11)    // Hexbus operation
-#define LOG_WS          (1U<<12)    // Wait states
-#define LOG_CPURY       (1U<<13)    // Combined ready line
-#define LOG_GROM        (1U<<14)    // GROM operation
-#define LOG_PUNMAP      (1U<<15)    // Unmapped physical addresss
-#define LOG_WARN        (1U<<31)    // Warnings
+#define LOG_DETAIL      (1U << 1)     // More detail
+#define LOG_CRU         (1U << 2)     // CRU logging
+#define LOG_ADDRESS     (1U << 3)     // Address bus
+#define LOG_MEM         (1U << 4)     // Memory access
+#define LOG_MAP         (1U << 5)     // Mapper
+#define LOG_READY       (1U << 6)     // READY line
+#define LOG_CLOCK       (1U << 7)     // CLKOUT
+#define LOG_MOFETTA     (1U << 8)     // Mofetta operation
+#define LOG_AMIGO       (1U << 9)     // Amigo operation
+#define LOG_OSO         (1U << 10)    // Oso operation
+#define LOG_HEXBUS      (1U << 11)    // Hexbus operation
+#define LOG_WS          (1U << 12)    // Wait states
+#define LOG_CPURY       (1U << 13)    // Combined ready line
+#define LOG_GROM        (1U << 14)    // GROM operation
+#define LOG_PUNMAP      (1U << 15)    // Unmapped physical addresss
+#define LOG_WARN        (1U << 31)    // Warnings
 
-#define VERBOSE ( LOG_WARN )
+#define VERBOSE (LOG_WARN)
 
 #include "logmacro.h"
 

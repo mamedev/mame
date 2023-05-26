@@ -11,12 +11,12 @@
 
 DEFINE_DEVICE_TYPE(SPG24X_VIDEO, spg24x_video_device, "spg24x_video", "SPG240-series System-on-a-Chip (Video)")
 
-#define LOG_IRQS            (1U << 4)
-#define LOG_VLINES          (1U << 5)
-#define LOG_DMA             (1U << 9)
-#define LOG_PPU_READS       (1U << 22)
-#define LOG_PPU_WRITES      (1U << 23)
-#define LOG_UNKNOWN_PPU     (1U << 24)
+#define LOG_IRQS            (1U << 1)
+#define LOG_VLINES          (1U << 2)
+#define LOG_DMA             (1U << 3)
+#define LOG_PPU_READS       (1U << 4)
+#define LOG_PPU_WRITES      (1U << 5)
+#define LOG_UNKNOWN_PPU     (1U << 6)
 #define LOG_PPU             (LOG_PPU_READS | LOG_PPU_WRITES | LOG_UNKNOWN_PPU)
 #define LOG_ALL             (LOG_IRQS | LOG_PPU | LOG_VLINES | LOG_DMA )
 

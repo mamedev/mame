@@ -54,6 +54,7 @@ TODO:
   "First Up" button after the alarm sound.
 - finish bshipb SN76477 sound (incomplete output PLA)
 - redo internal artwork for the baseball games (embedded SVG for diamond shapes)
+- tmvolleyb internal artwork
 - improve elecbowl driver
 - tithermos temperature sensor comparator (right now just the digital clock works)
 - is alphie(patent) the same as the final version?
@@ -75,7 +76,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  *MP0121   TMS1000   1979, Waddingtons Compute-A-Tune
  @MP0154   TMS1000   1979, Fonas 2 Player Baseball
  @MP0158   TMS1000   1979, Entex Soccer (6003)
- *MP0159   TMS1000   1979, Tomy Volleyball
+ @MP0159   TMS1000   1979, Tomy Volleyball
  @MP0163   TMS1000   1979, A-One LSI Match Number/LJN Electronic Concentration
  @MP0166   TMS1000   1980, A-One Arrange Ball/LJN Computer Impulse/Tandy Zingo (model 60-2123)
  @MP0168   TMS1000   1979, Conic Multisport/Tandy Sports Arena (model 60-2158)
@@ -349,7 +350,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "xl25.lh" // clickable
 #include "zodiac.lh" // clickable
 
-//#include "hh_tms1k_test.lh" // common test-layout - use external artwork
+#include "hh_tms1k_test.lh" // common test-layout - use external artwork
 
 
 namespace {
@@ -15355,7 +15356,149 @@ ROM_END
 
 /*******************************************************************************
 
-  Tomy(tronics) Break Up (manufactured in Japan)
+  Tomy Volleyball
+  * TMS1000 MP0159 (die label: 1000B, MP0159)
+  * 2 7seg LEDs, 14 other LEDs, 1-bit sound
+
+*******************************************************************************/
+
+class tmvolleyb_state : public hh_tms1k_state
+{
+public:
+	tmvolleyb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void tmvolleyb(machine_config &config);
+
+private:
+	void update_display();
+	void write_r(u32 data);
+	void write_o(u16 data);
+	u8 read_k();
+};
+
+// handlers
+
+void tmvolleyb_state::update_display()
+{
+	// O7 also selects left digit
+	m_display->matrix((m_o >> 7 & 1) | (m_r >> 3 & 0xe), m_o);
+}
+
+void tmvolleyb_state::write_r(u32 data)
+{
+	// R0-R3,R7-R9: input mux
+	m_inp_mux = (data & 0xf) | (data >> 3 & 0x70);
+
+	// R4-R6: led select
+	m_r = data;
+	update_display();
+
+	// R10: speaker out
+	m_speaker->level_w(BIT(data, 10));
+}
+
+void tmvolleyb_state::write_o(u16 data)
+{
+	// O0-O7: digit segment/led data
+	m_o = data;
+	update_display();
+}
+
+u8 tmvolleyb_state::read_k()
+{
+	// K: multiplexed inputs
+	return read_inputs(7);
+}
+
+// inputs
+
+static INPUT_PORTS_START( tmvolleyb )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_NAME("Score")
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("P2 Serve")
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("P1 Serve")
+
+	PORT_START("IN.4") // R7
+	PORT_BIT( 0x01, 0x01, IPT_CUSTOM ) PORT_CONDITION("IN.7", 0x01, EQUALS, 0x01) // Game 2
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // R8
+	PORT_BIT( 0x02, 0x02, IPT_CUSTOM ) PORT_CONDITION("IN.7", 0x01, EQUALS, 0x00) // Game 1
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // R9
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x08, 0x08, DEF_STR( Players ) )
+	PORT_CONFSETTING(    0x08, "1" )
+	PORT_CONFSETTING(    0x00, "2" )
+
+	PORT_START("IN.7") // fake
+	PORT_CONFNAME( 0x01, 0x00, "Game" )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x01, "2" )
+INPUT_PORTS_END
+
+// config
+
+void tmvolleyb_state::tmvolleyb(machine_config &config)
+{
+	// basic machine hardware
+	TMS1000(config, m_maincpu, 325000); // approximation - RC osc. R=47K, C=47pF
+	m_maincpu->read_k().set(FUNC(tmvolleyb_state::read_k));
+	m_maincpu->write_r().set(FUNC(tmvolleyb_state::write_r));
+	m_maincpu->write_o().set(FUNC(tmvolleyb_state::write_o));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(4, 8);
+	m_display->set_segmask(3, 0x7f);
+	config.set_default_layout(layout_hh_tms1k_test);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( tmvolleyb )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp0159_tomy_volley", 0x0000, 0x0400, CRC(0088b0cc) SHA1(90f222d6a3bef7b27709ef2816c15867921a8d4c) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_tmvolleyb_output.pla", 0, 365, CRC(01af7efd) SHA1(d90656a7884b37c7fd49989f8d38dd376b74557b) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Tomy Break Up (manufactured in Japan)
   * PCB label: TOMY B.O.
   * TMS1040 MP2726 TOMY WIPE (die label: 1040B, MP2726A)
   * TMS1025N2LL I/O expander
@@ -15506,8 +15649,8 @@ static INPUT_PORTS_START( tbreakup )
 
 	PORT_START("IN.3") // fake
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, tbreakup_state, skill_switch, 0)
-	PORT_CONFSETTING(    0x00, "Pro 1" )
-	PORT_CONFSETTING(    0x01, "Pro 2" )
+	PORT_CONFSETTING(    0x00, "1" ) // PRO 1
+	PORT_CONFSETTING(    0x01, "2" ) // PRO 2
 INPUT_PORTS_END
 
 // config
@@ -16608,6 +16751,7 @@ SYST( 1989, copycata,   copycat,   0,      copycata,  copycata,  copycata_state,
 SYST( 1981, ditto,      0,         0,      ditto,     ditto,     ditto_state,     empty_init, "Tiger Electronics", "Ditto", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1982, t7in1ss,    0,         0,      t7in1ss,   t7in1ss,   t7in1ss_state,   empty_init, "Tiger Electronics", "7 in 1 Sports Stadium", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
+SYST( 1979, tmvolleyb,  0,         0,      tmvolleyb, tmvolleyb, tmvolleyb_state, empty_init, "Tomy", "Volleyball (Tomy)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 SYST( 1979, tbreakup,   0,         0,      tbreakup,  tbreakup,  tbreakup_state,  empty_init, "Tomy", "Break Up (Tomy)", MACHINE_SUPPORTS_SAVE )
 SYST( 1980, phpball,    0,         0,      phpball,   phpball,   phpball_state,   empty_init, "Tomy", "Power House Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 

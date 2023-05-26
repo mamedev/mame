@@ -20,17 +20,17 @@
 #include "corestr.h"
 #include "formats/rpk.h"
 
-#define LOG_WARN         (1U<<1)   // Warnings
-#define LOG_CONFIG       (1U<<2)   // Configuration
-#define LOG_CHANGE       (1U<<3)   // Cart change
-#define LOG_BANKSWITCH   (1U<<4)   // Bank switch operation
-#define LOG_CRU          (1U<<5)   // CRU access
-#define LOG_READ         (1U<<6)   // Read operation
-#define LOG_WRITE        (1U<<7)   // Write operation
-#define LOG_RPK          (1U<<8)   // RPK handler
-#define LOG_WARNW        (1U<<9)   // Warn when writing to cartridge space
+#define LOG_WARN         (1U << 1)   // Warnings
+#define LOG_CONFIG       (1U << 2)   // Configuration
+#define LOG_CHANGE       (1U << 3)   // Cart change
+#define LOG_BANKSWITCH   (1U << 4)   // Bank switch operation
+#define LOG_CRU          (1U << 5)   // CRU access
+#define LOG_READ         (1U << 6)   // Read operation
+#define LOG_WRITE        (1U << 7)   // Write operation
+#define LOG_RPK          (1U << 8)   // RPK handler
+#define LOG_WARNW        (1U << 9)   // Warn when writing to cartridge space
 
-#define VERBOSE ( LOG_GENERAL | LOG_WARN | LOG_CONFIG )
+#define VERBOSE (LOG_GENERAL | LOG_WARN | LOG_CONFIG)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(TI99_CART, bus::ti99::gromport::ti99_cartridge_device, "ti99cart", "TI-99 cartridge")

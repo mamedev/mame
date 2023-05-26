@@ -27,10 +27,8 @@ void raiden2cop_device::execute_0205(int offset, uint16_t data)
 	int ppos =        m_host_space->read_dword(cop_regs[0] + 0x04 + offset * 4);
 	int npos = ppos + m_host_space->read_dword(cop_regs[0] + 0x10 + offset * 4);
 	int delta = (npos >> 16) - (ppos >> 16);
-#if LOG_Move0205
-	// ...
-#endif
 	m_host_space->write_dword(cop_regs[0] + 4 + offset * 4, npos);
+	// LOGMASKED(LOG_MOVE0205, ...);
 	cop_write_word(cop_regs[0] + 0x1e + offset * 4, cop_read_word(cop_regs[0] + 0x1e + offset * 4) + delta);
 }
 
@@ -44,9 +42,7 @@ void raiden2cop_device::execute_0205(int offset, uint16_t data)
 
 void raiden2cop_device::execute_0904(int offset, uint16_t data)
 {
-#if LOG_Move0905
-	printf("cmd %04x: %08x %08x [%08x]\n",data, m_host_space->read_dword(cop_regs[0] + 16 + offset * 4),m_host_space->read_dword(cop_regs[0] + 0x28 + offset * 4),cop_regs[0]);
-#endif
+	LOGMASKED(LOG_MOVE0905, "cmd %04x: %08x %08x [%08x]\n",data, m_host_space->read_dword(cop_regs[0] + 16 + offset * 4),m_host_space->read_dword(cop_regs[0] + 0x28 + offset * 4),cop_regs[0]);
 
 	if (data&0x0001)
 		m_host_space->write_dword(cop_regs[0] + 16 + offset * 4, m_host_space->read_dword(cop_regs[0] + 16 + offset * 4) + m_host_space->read_dword(cop_regs[0] + 0x28 + offset * 4));
@@ -179,9 +175,7 @@ void raiden2cop_device::execute_338e(int offset, uint16_t data, bool is_yflip)
 		cop_angle &= 0xff;
 	}
 
-#if LOG_Phytagoras
-	printf("cmd %04x: dx = %d dy = %d angle = %02x %04x\n",data,dx,dy,cop_angle);
-#endif
+	LOGMASKED(LOG_TRIGONOMETRY, "cmd %04x: dx = %d dy = %d angle = %02x %04x\n",data,dx,dy,cop_angle);
 
 	if (data & 0x0080) {
 		// TODO: byte or word?
@@ -212,9 +206,7 @@ void raiden2cop_device::execute_3b30(int offset, uint16_t data)
 	dy = dy >> 16;
 	cop_dist = sqrt((double)(dx*dx + dy*dy));
 
-#if LOG_Phytagoras
-	printf("cmd %04x: dx = %d dy = %d dist = %08x \n",data,dx >> 16,dy >> 16,cop_dist);
-#endif
+	LOGMASKED(LOG_TRIGONOMETRY, "cmd %04x: dx = %d dy = %d dist = %08x \n",data,dx >> 16,dy >> 16,cop_dist);
 
 	if (data & 0x0080)
 		cop_write_word(cop_regs[0] + (data & 0x200 ? 0x3a : 0x38), cop_dist);
@@ -228,9 +220,7 @@ void raiden2cop_device::execute_42c2(int offset, uint16_t data)
 {
 	int div = cop_read_word(cop_regs[0] + (0x36));
 
-#if LOG_Division
-	printf("cmd %04x: div = %04x scale = %04x\n",data,div,cop_scale);
-#endif
+	LOGMASKED(LOG_DIVISION, "cmd %04x: div = %04x scale = %04x\n",data,div,cop_scale);
 
 	if (!div)
 	{
@@ -242,12 +232,10 @@ void raiden2cop_device::execute_42c2(int offset, uint16_t data)
 	/* TODO: bits 5-6-15 */
 	cop_status = 7;
 
-#if LOG_Division
-	printf("res = %04x dist %04x\n",(cop_dist << (5 - cop_scale)) / div,cop_dist);
+	LOGMASKED(LOG_DIVISION, "res = %04x dist %04x\n",(cop_dist << (5 - cop_scale)) / div,cop_dist);
 
 //  if(div & 0x8000)
 //      machine().debugger().debug_break();
-#endif
 
 	cop_write_word(cop_regs[0] + (0x38), (cop_dist << (5 - cop_scale)) / div);
 }
@@ -678,9 +666,7 @@ void raiden2cop_device::LEGACY_execute_e30e(int offset, uint16_t data)
 		cop_angle &= 0xff;
 	}
 
-#if LOG_Phytagoras
-	printf("cmd %04x: dx = %d dy = %d angle = %02x %04x\n",data,dx,dy,cop_angle);
-#endif
+	LOGMASKED(LOG_TRIGONOMETRY, "cmd %04x: dx = %d dy = %d angle = %02x %04x\n",data,dx,dy,cop_angle);
 
 	// TODO: byte or word?
 	if (data & 0x0080)

@@ -209,18 +209,13 @@
 #include "hyprdriv.lh"
 #include "sfrush.lh"
 
+#define LOG_WIDGET (1U << 1)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
 
 namespace {
-
-/*************************************
- *
- *  Debugging constants
- *
- *************************************/
-
-#define LOG_WIDGET          (0)
-
-
 
 /*************************************
  *
@@ -1053,16 +1048,14 @@ uint32_t seattle_state::widget_r(offs_t offset, uint32_t mem_mask)
 			break;
 	}
 
-	if (LOG_WIDGET)
-		logerror("Widget read (%02X) = %08X & %08X\n", offset*4, result, mem_mask);
+	LOGMASKED(LOG_WIDGET, "Widget read (%02X) = %08X & %08X\n", offset*4, result, mem_mask);
 	return result;
 }
 
 
 void seattle_state::widget_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	if (LOG_WIDGET)
-		logerror("Widget write (%02X) = %08X & %08X\n", offset*4, data, mem_mask);
+	LOGMASKED(LOG_WIDGET, "Widget write (%02X) = %08X & %08X\n", offset*4, data, mem_mask);
 
 	switch (offset)
 	{

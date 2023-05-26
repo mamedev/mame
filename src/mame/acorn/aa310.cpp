@@ -149,7 +149,7 @@
 #include "softlist.h"
 #include "speaker.h"
 
-#define LOG_POST (1 << 0)
+#define LOG_POST (1U << 1)
 
 #define VERBOSE (LOG_POST)
 #include "logmacro.h"

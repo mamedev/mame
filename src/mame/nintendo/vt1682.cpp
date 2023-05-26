@@ -76,7 +76,7 @@
 #define LOG_SRAM_WRITES      (1U << 2)
 #define LOG_OTHER            (1U << 3)
 
-#define LOG_ALL           ( LOG_VRAM_WRITES | LOG_SRAM_WRITES | LOG_OTHER )
+#define LOG_ALL           (LOG_VRAM_WRITES | LOG_SRAM_WRITES | LOG_OTHER)
 
 #define VERBOSE             (0)
 #include "logmacro.h"

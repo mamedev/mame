@@ -60,10 +60,9 @@
 
 // defines
 
-//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
-#define LOG_INPUT     (1U <<  1)
-#define LOG_LATCHX    (1U <<  2)
-#define LOG_LATCHY    (1U <<  3)
+#define LOG_INPUT     (1U << 1)
+#define LOG_LATCHX    (1U << 2)
+#define LOG_LATCHY    (1U << 3)
 
 #define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC printf
@@ -71,7 +70,6 @@
 
 namespace {
 
-#define LOGGEN(...) LOGMASKED(LOG_GENERAL, __VA_ARGS__)
 #define LOGINP(...) LOGMASKED(LOG_INPUT, __VA_ARGS__)
 #define LOGLTX(...) LOGMASKED(LOG_LATCHX, __VA_ARGS__)
 #define LOGLTY(...) LOGMASKED(LOG_LATCHY, __VA_ARGS__)

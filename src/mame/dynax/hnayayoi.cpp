@@ -57,8 +57,8 @@ TODO:
 
 
 // configurable logging
-#define LOG_IRQ     (1U <<  1)
-#define LOG_BLITTER (1U <<  2)
+#define LOG_IRQ     (1U << 1)
+#define LOG_BLITTER (1U << 2)
 
 //#define VERBOSE (LOG_GENERAL | LOG_IRQ | LOG_BLITTER)
 

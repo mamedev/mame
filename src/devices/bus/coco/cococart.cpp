@@ -73,7 +73,6 @@
     PARAMETERS
 ***************************************************************************/
 
-//#define LOG_GENERAL   (1U << 0) //defined in logmacro.h already
 #define LOG_CART (1U << 1) // shows cart line changes
 #define LOG_NMI  (1U << 2) // shows switch changes
 #define LOG_HALT (1U << 3) // shows switch changes

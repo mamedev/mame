@@ -28,7 +28,6 @@
 
 #include "softfloat3/source/include/softfloat.h"
 
-#define LOG_GENERAL   (1U << 0)
 #define LOG_EXCEPTION (1U << 1)
 #define LOG_SYSCALLS  (1U << 2)
 
