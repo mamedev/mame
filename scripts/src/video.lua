@@ -837,6 +837,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/pc_vga_tseng.h,VIDEOS["PC_VGA_TSENG"] = true
+--------------------------------------------------
+
+if (VIDEOS["PC_VGA_TSENG"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pc_vga_tseng.cpp",
+		MAME_DIR .. "src/devices/video/pc_vga_tseng.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/pc_xga.h,VIDEOS["PC_XGA"] = true
 --------------------------------------------------
 

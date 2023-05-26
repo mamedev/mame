@@ -8,21 +8,25 @@
 
 #include "emu.h"
 #include "svga_tseng.h"
-#include "video/pc_vga.h"
 
-#include "screen.h"
-
-
+/*
+ *  (tseng labs famous et4000 isa vga card (oem))
+ *  ROM_LOAD("et4000b.bin", 0xc0000, 0x8000, CRC(a903540d) SHA1(unknown) )
+ *  Version 8.06X 04/15/92 (yay for semver)
+ *  Tested, looks corrupted
+ *  ROM_LOAD("et4000.bin.other", 0xc0000, 0x8000, CRC(f01e4be0) SHA1(95d75ff41bcb765e50bd87a8da01835fd0aa01d5) )
+ */
 ROM_START( et4000 )
 	ROM_REGION(0x8000,"et4000", 0)
-	ROM_LOAD("et4000.bin", 0x00000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9) )
+	ROM_SYSTEM_BIOS(0, "v801x", "Version 8.01X 04/07/93")
+	ROMX_LOAD("et4000.bin", 0x00000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9), ROM_BIOS(0) )
 ROM_END
 
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(ISA8_SVGA_ET4K, isa8_svga_et4k_device, "et4000", "SVGA Tseng ET4000 Graphics Card")
+DEFINE_DEVICE_TYPE(ISA8_SVGA_ET4K, isa8_svga_et4k_device, "et4000", "SVGA Tseng ET4000AX Graphics Card")
 
 
 //-------------------------------------------------
