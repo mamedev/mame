@@ -19,8 +19,8 @@ public:
 	void clk_w(int state);
 
 protected:
-	void device_start();
-	void device_reset();
+	void device_start() override;
+	void device_reset() override;
 
 private:
 	u16 m_shift;
