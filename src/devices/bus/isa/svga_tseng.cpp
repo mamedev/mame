@@ -15,14 +15,17 @@
 /*
  *  (tseng labs famous et4000 isa vga card (oem))
  *  ROM_LOAD("et4000b.bin", 0xc0000, 0x8000, CRC(a903540d) SHA1(unknown) )
- *  Version 8.06X 04/15/92 (yay for semver)
- *  Tested, looks corrupted
+ *
+ *  Version "8.06X 04/15/92" (yay for semver)
+ *  Tested, draws corrupted GFX, likely bad
  *  ROM_LOAD("et4000.bin.other", 0xc0000, 0x8000, CRC(f01e4be0) SHA1(95d75ff41bcb765e50bd87a8da01835fd0aa01d5) )
  */
 ROM_START( et4000 )
 	ROM_REGION(0x8000,"et4000", 0)
-	ROM_SYSTEM_BIOS(0, "v801x", "Version 8.01X 04/07/93")
+	ROM_SYSTEM_BIOS(0, "v801x", "Tseng Version 8.01X 04/07/93")
 	ROMX_LOAD("et4000.bin", 0x00000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS(1, "v800x", "ColorImage Version 8.00X 09/18/90")
+	ROMX_LOAD("cvet4kax.bin", 0x00000, 0x8000, CRC(a3ab496c) SHA1(8644b4178cd0e841139bfa06c9da493dd74d22e8), ROM_BIOS(1) )
 ROM_END
 
 //**************************************************************************
