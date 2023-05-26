@@ -4,6 +4,9 @@
 
   ISA SVGA Tseng wrapper
 
+  TODO:
+  - Implement Korean font ROM for Kasan 16
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -27,6 +30,7 @@ ROM_END
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(ISA8_SVGA_ET4K, isa8_svga_et4k_device, "et4000", "SVGA Tseng ET4000AX Graphics Card")
+DEFINE_DEVICE_TYPE(ISA8_SVGA_ET4K_KASAN16, isa8_svga_et4k_kasan16_device, "et4000_kasan16", "SVGA Kasan Hangulmadang-16 ET4000AX Graphics Card")
 
 
 //-------------------------------------------------
@@ -62,9 +66,14 @@ const tiny_rom_entry *isa8_svga_et4k_device::device_rom_region() const
 //-------------------------------------------------
 
 isa8_svga_et4k_device::isa8_svga_et4k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ISA8_SVGA_ET4K, tag, owner, clock),
-	device_isa8_card_interface(mconfig, *this),
-	m_vga(*this, "vga")
+	isa8_svga_et4k_device(mconfig, ISA8_SVGA_ET4K, tag, owner, clock)
+{
+}
+
+isa8_svga_et4k_device::isa8_svga_et4k_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_isa8_card_interface(mconfig, *this)
+	, m_vga(*this, "vga")
 {
 }
 
@@ -121,4 +130,30 @@ void isa8_svga_et4k_device::map_ram()
 void isa8_svga_et4k_device::map_rom()
 {
 	m_isa->install_rom(this, 0xc0000, 0xc7fff, "et4000");
+}
+
+/*
+ * Korean cards
+ *
+ * Same as regular ET4000AX with extra font I/Os
+ */
+
+isa8_svga_et4k_kasan16_device::isa8_svga_et4k_kasan16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: isa8_svga_et4k_device(mconfig, ISA8_SVGA_ET4K_KASAN16, tag, owner, clock)
+	, m_hangul_rom(*this, "hangul")
+{
+}
+
+ROM_START( kasan16 )
+	ROM_REGION(0x8000,"et4000", 0)
+	ROM_SYSTEM_BIOS(0, "v802x", "Version 8.02X 06/13/90, Kasan BIOS Ver 1.0a 05/01/91")
+	ROMX_LOAD("et4000_kasan16.bin", 0x00000, 0x8000, CRC(57bcc3ad) SHA1(a55e7eb27ef2b4f118ea2028835e88988f07cf57), ROM_BIOS(0) )
+
+	ROM_REGION(0x80000, "hangul", 0)
+	ROM_LOAD("kasan_ksc5601.rom", 0x00000, 0x80000, CRC(a547c5ec) SHA1(1358feb2ccaca040a176bedc7c256ec481351b41) )
+ROM_END
+
+const tiny_rom_entry *isa8_svga_et4k_kasan16_device::device_rom_region() const
+{
+	return ROM_NAME( kasan16 );
 }

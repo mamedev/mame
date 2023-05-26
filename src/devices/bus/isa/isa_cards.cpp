@@ -105,6 +105,7 @@ void pc_isa8_cards(device_slot_interface &device)
 	device.option_add("pgc", ISA8_PGC);
 	device.option_add("vga", ISA8_VGA);
 	device.option_add("svga_et4k", ISA8_SVGA_ET4K);
+	device.option_add("svga_et4k_kasan16", ISA8_SVGA_ET4K_KASAN16);
 	device.option_add("num9rev",ISA8_NUM_9_REV);
 	device.option_add("com", ISA8_COM);
 	device.option_add("fdc", ISA8_FDC_SUPERIO);
@@ -158,6 +159,7 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("pgc", ISA8_PGC);
 	device.option_add("vga", ISA8_VGA);
 	device.option_add("svga_et4k", ISA8_SVGA_ET4K);
+	device.option_add("svga_et4k_kasan16", ISA8_SVGA_ET4K_KASAN16);
 	device.option_add("num9rev",ISA8_NUM_9_REV);
 	device.option_add("com", ISA8_COM);
 	device.option_add("comat", ISA8_COM_AT);
