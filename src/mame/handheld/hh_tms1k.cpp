@@ -54,7 +54,6 @@ TODO:
   "First Up" button after the alarm sound.
 - finish bshipb SN76477 sound (incomplete output PLA)
 - redo internal artwork for the baseball games (embedded SVG for diamond shapes)
-- tmvolleyb internal artwork
 - improve elecbowl driver
 - tithermos temperature sensor comparator (right now just the digital clock works)
 - is alphie(patent) the same as the final version?
@@ -170,6 +169,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP3476   TMS1100   1979, Milton Bradley Super Simon
   MP3479   TMS1100   1980, Microvision cartridge: Baseball
   MP3481   TMS1100   1979, Microvision cartridge: Connect Four
+ *MP3487   TMS1100   1980, Lakeside Strobe
  @MP3489   TMS1100   1980, Kenner Live Action Football
  @MP3491   TMS1100   1979, Mattel Thoroughbred Horse Race Analyzer
  *MP3493   TMS1100   1980, Milton Bradley OMNI Entertainment System (1/2)
@@ -345,12 +345,13 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "timaze.lh"
 #include "tisr16.lh"
 #include "tithermos.lh"
+#include "tmvolleyb.lh" // clickable
 #include "vclock3.lh"
 #include "wizatron.lh"
 #include "xl25.lh" // clickable
 #include "zodiac.lh" // clickable
 
-#include "hh_tms1k_test.lh" // common test-layout - use external artwork
+//#include "hh_tms1k_test.lh" // common test-layout - use external artwork
 
 
 namespace {
@@ -15357,7 +15358,7 @@ ROM_END
 /*******************************************************************************
 
   Tomy Volleyball
-  * TMS1000 MP0159 (die label: 1000B, MP0159)
+  * TMS1000 MP0159 TOMY VOLLEY (die label: 1000B, MP0159)
   * 2 7seg LEDs, 14 other LEDs, 1-bit sound
 
 *******************************************************************************/
@@ -15472,7 +15473,7 @@ void tmvolleyb_state::tmvolleyb(machine_config &config)
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 8);
 	m_display->set_segmask(3, 0x7f);
-	config.set_default_layout(layout_hh_tms1k_test);
+	config.set_default_layout(layout_tmvolleyb);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -15687,7 +15688,7 @@ void tbreakup_state::tbreakup(machine_config &config)
 
 ROM_START( tbreakup )
 	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "mp2726a", 0x0000, 0x0400, CRC(1f7c28e2) SHA1(164cda4eb3f0b1d20955212a197c9aadf8d18a06) )
+	ROM_LOAD( "mp2726_tomy_wipe", 0x0000, 0x0400, CRC(1f7c28e2) SHA1(164cda4eb3f0b1d20955212a197c9aadf8d18a06) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
@@ -15822,7 +15823,7 @@ void phpball_state::phpball(machine_config &config)
 
 ROM_START( phpball )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "mp1180", 0x0000, 0x0800, CRC(2163b92d) SHA1(bc53d1911e88b4e89d951c6f769703105c13389c) )
+	ROM_LOAD( "mp1180_tomy_pinb", 0x0000, 0x0800, CRC(2163b92d) SHA1(bc53d1911e88b4e89d951c6f769703105c13389c) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
@@ -16751,7 +16752,7 @@ SYST( 1989, copycata,   copycat,   0,      copycata,  copycata,  copycata_state,
 SYST( 1981, ditto,      0,         0,      ditto,     ditto,     ditto_state,     empty_init, "Tiger Electronics", "Ditto", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1982, t7in1ss,    0,         0,      t7in1ss,   t7in1ss,   t7in1ss_state,   empty_init, "Tiger Electronics", "7 in 1 Sports Stadium", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
-SYST( 1979, tmvolleyb,  0,         0,      tmvolleyb, tmvolleyb, tmvolleyb_state, empty_init, "Tomy", "Volleyball (Tomy)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+SYST( 1979, tmvolleyb,  0,         0,      tmvolleyb, tmvolleyb, tmvolleyb_state, empty_init, "Tomy", "Volleyball (Tomy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1979, tbreakup,   0,         0,      tbreakup,  tbreakup,  tbreakup_state,  empty_init, "Tomy", "Break Up (Tomy)", MACHINE_SUPPORTS_SAVE )
 SYST( 1980, phpball,    0,         0,      phpball,   phpball,   phpball_state,   empty_init, "Tomy", "Power House Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 

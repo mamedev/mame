@@ -5,9 +5,6 @@
 
 Matsushita (Panasonic) MN1400 handhelds
 
-TODO:
-- internal artwork for tmbaskb
-
 *******************************************************************************/
 
 #include "emu.h"
@@ -22,8 +19,9 @@ TODO:
 // internal artwork
 #include "compperf.lh" // clickable
 #include "scrablexa.lh"
+#include "tmbaskb.lh" // clickable
 
-#include "hh_mn1400_test.lh" // common test-layout - use external artwork
+//#include "hh_mn1400_test.lh" // common test-layout - use external artwork
 
 
 namespace {
@@ -111,6 +109,10 @@ u16 hh_mn1400_state::read_inputs(int columns)
   * PCB label: Lakeside, PANASONIC, TCI-A4H94HB
   * MN1400ML (28 pins, die label: 1400 ML-0)
   * 10 LEDs, 2-bit sound
+
+  known releases:
+  - USA: Computer Perfection, published by Lakeside
+  - UK: Computer Perfection, published by Action GT
 
 *******************************************************************************/
 
@@ -506,9 +508,9 @@ static INPUT_PORTS_START( tmbaskb )
 	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x01, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
-	PORT_CONFNAME( 0x02, 0x02, DEF_STR( Difficulty ) )
-	PORT_CONFSETTING(    0x02, "1" ) // PRO1
-	PORT_CONFSETTING(    0x00, "2" ) // PRO2
+	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x00, "1" ) // PRO1
+	PORT_CONFSETTING(    0x02, "2" ) // PRO2
 INPUT_PORTS_END
 
 // config
@@ -527,7 +529,7 @@ void tmbaskb_state::tmbaskb(machine_config &config)
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(6, 8);
 	m_display->set_segmask(3, 0x7f);
-	config.set_default_layout(layout_hh_mn1400_test);
+	config.set_default_layout(layout_tmbaskb);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -560,4 +562,4 @@ SYST( 1979, compperf,  0,        0,      compperf,  compperf,  compperf_state,  
 
 SYST( 1980, scrablexa, scrablex, 0,      scrablexa, scrablexa, scrablexa_state, empty_init, "Selchow & Righter", "Scrabble Lexor: Computer Word Game (MN1405 version)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1980, tmbaskb,   0,        0,      tmbaskb,   tmbaskb,   tmbaskb_state,   empty_init, "Tomy", "Basketball (Tomy)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+SYST( 1980, tmbaskb,   0,        0,      tmbaskb,   tmbaskb,   tmbaskb_state,   empty_init, "Tomy", "Basketball (Tomy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
