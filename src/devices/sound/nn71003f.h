@@ -25,7 +25,7 @@ public:
 	void sclk_w(int state);
 	void mosi_w(int state);
 	auto miso_cb() { return m_miso.bind(); }
-	
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;

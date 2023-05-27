@@ -10,7 +10,7 @@
 #include "lpc-acpi.h"
 #include "pci-smbus.h"
 
-class i82371eb_acpi_device : public pci_device 
+class i82371eb_acpi_device : public pci_device
 {
 public:
 	i82371eb_acpi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -20,7 +20,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-//	virtual void reset_all_mappings() override;
+//  virtual void reset_all_mappings() override;
 
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;

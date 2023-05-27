@@ -121,7 +121,7 @@ void kaypro84_state::kaypro484_io(address_map &map)
 {
 	kaypro10_io(map);
 	map(0x20, 0x23).rw("z80pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
-    map(0x24, 0x24).mirror(3).rw(FUNC(kaypro84_state::rtc_r), FUNC(kaypro84_state::rtc_w));
+	map(0x24, 0x24).mirror(3).rw(FUNC(kaypro84_state::rtc_r), FUNC(kaypro84_state::rtc_w));
 }
 
 

@@ -20,7 +20,7 @@ void tc9223_device::device_start()
 	save_item(NAME(m_shift));
 	save_item(NAME(m_stb));
 	save_item(NAME(m_clk));
-	save_item(NAME(m_dat));		  
+	save_item(NAME(m_dat));
 }
 
 void tc9223_device::device_reset()

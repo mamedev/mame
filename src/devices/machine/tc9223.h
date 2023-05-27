@@ -2,10 +2,8 @@
 // copyright-holders:Olivier Galibert
 
 // TC9223P/TC9223F PLL-based frequency synthesizer
-
-
-#ifndef DEVICES_MACHINE_TC9223_H
-#define DEVICES_MACHINE_TC9223_H
+#ifndef MAME_MACHINE_TC9223_H
+#define MAME_MACHINE_TC9223_H
 
 #pragma once
 
@@ -19,15 +17,14 @@ public:
 	void clk_w(int state);
 
 protected:
-	void device_start() override;
-	void device_reset() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	u16 m_shift;
-	int m_stb, m_clk, m_dat;
+	u8 m_stb, m_clk, m_dat;
 };
 
 DECLARE_DEVICE_TYPE(TC9223, tc9223_device)
 
-#endif
-
+#endif // MAME_MACHINE_TC9223_H

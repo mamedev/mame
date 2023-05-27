@@ -258,7 +258,7 @@ void zr36110_device::setupx_w(u16 data)
 
 void zr36110_device::cmd8_w(u8 data)
 {
-	//	LOG("cmd_w %02x\n", data);
+	//  LOG("cmd_w %02x\n", data);
 
 	if(m_cmd_phase) {
 		m_cmd |= data;

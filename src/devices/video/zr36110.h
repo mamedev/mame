@@ -71,7 +71,7 @@ private:
 		S_DNEXT  = 0x7,
 		S_END    = 0x8
 	};
-	
+
 	devcb_write_line m_drq_w;
 	devcb_write_line m_sp_frm_w[2];
 	devcb_write_line m_sp_dat_w[2];

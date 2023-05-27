@@ -319,7 +319,7 @@ private:
 //  DECLARE_WRITE_LINE_MEMBER(vblank_assert);
 
 	static void romdisk_config(device_t *device);
-//	static void cdrom_config(device_t *device);
+//  static void cdrom_config(device_t *device);
 };
 
 
@@ -370,7 +370,7 @@ void xtom3d_state::xtom3d(machine_config &config)
 	ide.irq_sec().set("pci:07.0", FUNC(i82371eb_isa_device::pc_mirq0_w));
 
 	ide.subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_default_option("cdrom");
-//	ide.subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_fixed(true);
+//  ide.subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_fixed(true);
 
 	ide.subdevice<bus_master_ide_controller_device>("ide2")->slot(0).set_default_option(nullptr);
 
@@ -426,7 +426,7 @@ ROM_END
 
 // provided dump is half size and definitely don't seem sane,
 // just assume they didn't change that part
-//	ROM_LOAD( "bios.u22", 0x000000, 0x010000, BAD_DUMP CRC(574bb327) SHA1(c24484e9b304b9d570c5ead6be768f563d5c389f) )
+//  ROM_LOAD( "bios.u22", 0x000000, 0x010000, BAD_DUMP CRC(574bb327) SHA1(c24484e9b304b9d570c5ead6be768f563d5c389f) )
 
 #define PUMPITUP_BIOS \
 	ROM_REGION32_LE(0x20000, "pci:07.0", 0) \
