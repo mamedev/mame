@@ -646,10 +646,10 @@ bool mips1core_device_base::memory_translate(int spacenum, int intention, offs_t
 	target_space = &space(spacenum);
 	if (spacenum != AS_PROGRAM)
 		return true;
-	return memory_translate(intention, address, true);
+	return translate(intention, address, true);
 }
 
-bool mips1core_device_base::memory_translate(int intention, offs_t &address, bool debug)
+bool mips1core_device_base::translate(int intention, offs_t &address, bool debug)
 {
 	// check for kernel memory address
 	if (BIT(address, 31))
@@ -1108,7 +1108,7 @@ template <typename T, bool Aligned, typename U> std::enable_if_t<std::is_convert
 		return;
 	}
 
-	if (memory_translate(TR_READ, address, false))
+	if (translate(TR_READ, address, false))
 	{
 		// align address for ld[lr] instructions
 		if (!Aligned)
@@ -1138,7 +1138,7 @@ template <typename T, bool Aligned, typename U> std::enable_if_t<std::is_convert
 		return;
 	}
 
-	if (memory_translate(TR_WRITE, address, false))
+	if (translate(TR_WRITE, address, false))
 	{
 		// align address for sd[lr] instructions
 		if (!Aligned)
@@ -1162,7 +1162,7 @@ bool mips1core_device_base::fetch(u32 address, std::function<void(u32)> &&apply)
 		return false;
 	}
 
-	if (memory_translate(TR_FETCH, address, false))
+	if (translate(TR_FETCH, address, false))
 	{
 		u32 const data = space(AS_PROGRAM).read_dword(address);
 
@@ -1952,7 +1952,7 @@ template <typename T> void mips1_device_base::set_cop1_reg(unsigned const reg, T
 		m_f[reg] = data;
 }
 
-bool mips1_device_base::memory_translate(int intention, offs_t &address, bool debug)
+bool mips1_device_base::translate(int intention, offs_t &address, bool debug)
 {
 	// check for kernel memory address
 	if (BIT(address, 31))

@@ -165,10 +165,11 @@ protected:
 	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
 	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
-	virtual bool memory_translate(int intention, offs_t &address, bool debug);
 
 	// device_disasm_interface implementation
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+	virtual bool translate(int intention, offs_t &address, bool debug);
 
 	void icache_map(address_map &map);
 	void dcache_map(address_map &map);
@@ -298,7 +299,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual bool memory_translate(int intention, offs_t &address, bool debug) override;
+	virtual bool translate(int intention, offs_t &address, bool debug) override;
 
 	virtual void handle_cop0(u32 const op) override;
 	virtual u32 get_cop0_reg(unsigned const reg) override;
