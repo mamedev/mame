@@ -35,29 +35,39 @@ void heath_z37_fdc_device::ctrl_w(uint8_t val)
 {
 	m_control_reg = val;
 
+	bool motor_on = BIT(val, ctrl_MotorsOn_c);
+
 	m_intrq_allowed = bool(BIT(val, ctrl_EnableIntReq_c));
 	m_drq_allowed = bool(BIT(val, ctrl_EnableDrqInt_c));
 	m_fdc->dden_w(BIT(val, ctrl_SetMFMRecording_c));
-	m_fdc->mr_w(BIT(val, ctrl_MotorsOn_c));
 
+	m_block_interrupt_cb(m_drq_allowed ? ASSERT_LINE : CLEAR_LINE);
+
+	m_floppy = nullptr;
 	if (BIT(val, ctrl_Drive_0_c))
 	{
 		m_floppy = m_floppies[0]->get_device();
 	}
-	if (BIT(val, ctrl_Drive_1_c))
+	else if (BIT(val, ctrl_Drive_1_c))
 	{
 		m_floppy = m_floppies[1]->get_device();
 	}
-	if (BIT(val, ctrl_Drive_2_c))
+	else if (BIT(val, ctrl_Drive_2_c))
 	{
 		m_floppy = m_floppies[2]->get_device();
 	}
-	if (BIT(val, ctrl_Drive_3_c))
+	else if (BIT(val, ctrl_Drive_3_c))
 	{
 		m_floppy = m_floppies[3]->get_device();
 	}
 
 	m_fdc->set_floppy(m_floppy);
+
+	// TODO - check to see if all motor line controls all drives, not just the selected one.
+	if (m_floppy)
+	{
+		m_floppy->mon_w(!motor_on);
+	}
 }
 
 uint8_t heath_z37_fdc_device::ctrl_r()
@@ -161,7 +171,6 @@ uint8_t heath_z37_fdc_device::read(offs_t reg)
 
 void heath_z37_fdc_device::device_start()
 {
-
 	save_item(NAME(m_control_reg));
 	save_item(NAME(m_interface_reg));
 	save_item(NAME(m_intrq_allowed));
@@ -174,7 +183,6 @@ void heath_z37_fdc_device::device_start()
 	m_intrq_allowed = false;
 	m_drq_allowed = false;
 	m_access_track_sector = false;
-
 }
 
 static void z37_floppies(device_slot_interface &device)
@@ -192,34 +200,35 @@ static void z37_floppies(device_slot_interface &device)
 
 void heath_z37_fdc_device::device_add_mconfig(machine_config &config)
 {
-
 	FD1797(config, m_fdc, 16_MHz_XTAL / 16);
 	m_fdc->intrq_wr_callback().set(FUNC(heath_z37_fdc_device::raise_irq));
 	m_fdc->drq_wr_callback().set(FUNC(heath_z37_fdc_device::raise_drq));
 
-	FLOPPY_CONNECTOR(config, m_floppies[0], z37_floppies, "ssdd", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppies[1], z37_floppies, "ssdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppies[0], z37_floppies, "qd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppies[1], z37_floppies, "qd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppies[2], z37_floppies, "qd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppies[3], z37_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
-
 }
 
 void heath_z37_fdc_device::device_resolve_objects()
 {
 	m_raise_irq_cb.resolve_safe();
 	m_raise_drq_cb.resolve_safe();
+	m_block_interrupt_cb.resolve_safe();
 }
 
 void heath_z37_fdc_device::raise_irq(uint8_t data)
 {
-	if (m_intrq_allowed) {
+	if (m_intrq_allowed)
+	{
 		m_raise_irq_cb(data);
 	}
 }
 
 void heath_z37_fdc_device::raise_drq(uint8_t data)
 {
-	if (m_drq_allowed) {
+	if (m_drq_allowed)
+	{
 		m_raise_drq_cb(data);
 	}
 }
