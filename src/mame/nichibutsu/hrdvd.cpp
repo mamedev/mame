@@ -133,9 +133,9 @@ void hrdvd_state::pb_w(uint16_t data)
 {
 	u8 delta = data ^ m_pb;
 	m_pb = (m_pb & 0xc0) | (data & 0x3f);
-	m_mpega->cmd_atn_w(BIT(m_pb, 0));
-	m_mpega->cmd_clk_w(BIT(m_pb, 1));
-	m_mpega->cmd_dat_w(BIT(m_pb, 2));
+	m_mpega->ss_w(BIT(m_pb, 0));
+	m_mpega->sclk_w(BIT(m_pb, 1));
+	m_mpega->mosi_w(BIT(m_pb, 2));
 	if(delta & 0x38)
 		logerror("pb %02x\n", data);
 }

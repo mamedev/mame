@@ -14,54 +14,54 @@ DEFINE_DEVICE_TYPE(NN71003F, nn71003f_device, "nn71003f", "NN71003F mpeg audio c
 nn71003f_device::nn71003f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NN71003F, tag, owner, clock),
 	  device_sound_interface(mconfig, *this),
-	  m_irq_cb(*this)
+	  m_miso(*this)
 {
 }
 
 void nn71003f_device::device_start()
 {
-	m_irq_cb.resolve_safe();
-	save_item(NAME(m_cmd_atn));
-	save_item(NAME(m_cmd_clk));
-	save_item(NAME(m_cmd_dat));
+	m_miso.resolve_safe();
+	save_item(NAME(m_ss));
+	save_item(NAME(m_sclk));
+	save_item(NAME(m_mosi));
 }
 
 void nn71003f_device::device_reset()
 {
-	m_cmd_atn = 0;
-	m_cmd_clk = 0;
-	m_cmd_dat = 0;
+	m_ss = 0;
+	m_sclk = 0;
+	m_mosi = 0;
 }
 
-void nn71003f_device::cmd_atn_w(int state)
+void nn71003f_device::ss_w(int state)
 {
-	if(state == m_cmd_atn)
+	if(state == m_ss)
 		return;
-	m_cmd_atn = state;
-	if(!m_cmd_atn)
-		m_cmd_cnt = 0;
+	m_ss = state;
+	if(!m_ss)
+		m_spi_cnt = 0;
 }
 
-void nn71003f_device::cmd_clk_w(int state)
+void nn71003f_device::sclk_w(int state)
 {
-	if(state == m_cmd_clk)
+	if(state == m_sclk)
 		return;
-	m_cmd_clk = state;
-	if(!m_cmd_clk)
+	m_sclk = state;
+	if(!m_sclk)
 		return;
-	m_cmd_byte = (m_cmd_byte << 1) | m_cmd_dat;
-	m_cmd_cnt ++;
-	if(m_cmd_cnt & 7)
+	m_spi_byte = (m_spi_byte << 1) | m_mosi;
+	m_spi_cnt ++;
+	if(m_spi_cnt & 7)
 		return;
 
-	logerror("CMD %x: %02x\n", m_cmd_cnt >> 3, m_cmd_byte);
+	logerror("SPI %x: %02x\n", m_spi_cnt >> 3, m_spi_byte);
 }
 
-void nn71003f_device::cmd_dat_w(int state)
+void nn71003f_device::mosi_w(int state)
 {
-	if(state == m_cmd_dat)
+	if(state == m_mosi)
 		return;
-	m_cmd_dat = state;
+	m_mosi = state;
 }
 
 void nn71003f_device::frm_w(int state)
