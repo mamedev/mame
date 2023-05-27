@@ -644,7 +644,7 @@ device_memory_interface::space_config_vector mips1core_device_base::memory_space
 bool mips1core_device_base::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
 	target_space = &space(spacenum);
-	if(spacenum != AS_PROGRAM)
+	if (spacenum != AS_PROGRAM)
 		return true;
 	return memory_translate(intention, address, true);
 }
@@ -886,7 +886,7 @@ void mips1core_device_base::address_error(int intention, u32 const address)
 
 		m_cop0[COP0_BadVAddr] = address;
 
-		generate_exception((intention & TR_WRITE) ? EXCEPTION_ADDRSTORE : EXCEPTION_ADDRLOAD);
+		generate_exception((intention == TR_WRITE) ? EXCEPTION_ADDRSTORE : EXCEPTION_ADDRLOAD);
 
 		// address errors shouldn't typically occur, so a breakpoint is handy
 		machine().debug_break();
@@ -1952,14 +1952,6 @@ template <typename T> void mips1_device_base::set_cop1_reg(unsigned const reg, T
 		m_f[reg] = data;
 }
 
-bool mips1_device_base::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
-{
-	target_space = &space(spacenum);
-	if(spacenum != AS_PROGRAM)
-		return true;
-	return memory_translate(intention, address, true);
-}
-
 bool mips1_device_base::memory_translate(int intention, offs_t &address, bool debug)
 {
 	// check for kernel memory address
@@ -2014,7 +2006,7 @@ bool mips1_device_base::memory_translate(int intention, offs_t &address, bool de
 		}
 
 		// test dirty
-		if ((intention & TR_WRITE) && !(entry[1] & EL_D))
+		if ((intention == TR_WRITE) && !(entry[1] & EL_D))
 		{
 			refill = false;
 			modify = true;
@@ -2041,7 +2033,7 @@ bool mips1_device_base::memory_translate(int intention, offs_t &address, bool de
 					(m_cop0[COP0_EntryHi] & EH_ASID) >> 6, address, machine().describe_context());
 			else
 				LOGMASKED(LOG_TLB, "asid %2d tlb miss %c address 0x%08x (%s)\n",
-					(m_cop0[COP0_EntryHi] & EH_ASID) >> 6, (intention & TR_WRITE) ? 'w' : 'r', address, machine().describe_context());
+					(m_cop0[COP0_EntryHi] & EH_ASID) >> 6, (intention == TR_WRITE) ? 'w' : 'r', address, machine().describe_context());
 		}
 
 		// load tlb exception registers
@@ -2049,7 +2041,7 @@ bool mips1_device_base::memory_translate(int intention, offs_t &address, bool de
 		m_cop0[COP0_EntryHi] = key;
 		m_cop0[COP0_Context] = (m_cop0[COP0_Context] & PTE_BASE) | ((address >> 10) & BAD_VPN);
 
-		generate_exception(modify ? EXCEPTION_TLBMOD : (intention & TR_WRITE) ? EXCEPTION_TLBSTORE : EXCEPTION_TLBLOAD, refill);
+		generate_exception(modify ? EXCEPTION_TLBMOD : (intention == TR_WRITE) ? EXCEPTION_TLBSTORE : EXCEPTION_TLBLOAD, refill);
 	}
 
 	return false;
