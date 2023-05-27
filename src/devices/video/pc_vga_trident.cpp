@@ -189,7 +189,6 @@ void trident_vga_device::device_start()
 
 
 	// copy over interfaces
-	vga.read_dipswitch.set(nullptr); //read_dipswitch;
 	vga.memory = std::make_unique<uint8_t []>(vga.svga_intf.vram_size);
 	memset(&vga.memory[0], 0, vga.svga_intf.vram_size);
 

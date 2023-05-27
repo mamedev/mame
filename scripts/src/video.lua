@@ -283,6 +283,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/riva128.h,VIDEOS["RIVA128"] = true
+--------------------------------------------------
+
+if (VIDEOS["RIVA128"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/riva128.cpp",
+		MAME_DIR .. "src/devices/video/riva128.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/gf4500.h,VIDEOS["GF4500"] = true
 --------------------------------------------------
 
@@ -820,6 +832,18 @@ if (VIDEOS["PC_VGA"]~=null) then
 		MAME_DIR .. "src/devices/video/pc_vga.h",
 		MAME_DIR .. "src/devices/video/clgd542x.cpp",
 		MAME_DIR .. "src/devices/video/clgd542x.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/pc_vga_nvidia.h,VIDEOS["PC_VGA_NVIDIA"] = true
+--------------------------------------------------
+
+if (VIDEOS["PC_VGA_NVIDIA"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pc_vga_nvidia.cpp",
+		MAME_DIR .. "src/devices/video/pc_vga_nvidia.h",
 	}
 end
 

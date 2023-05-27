@@ -66,6 +66,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// device_palette_interface overrides
 	virtual uint32_t palette_entries() const noexcept override { return 0x100; }
@@ -117,9 +118,7 @@ protected:
 
 	struct vga_t
 	{
-		vga_t(device_t &owner) : read_dipswitch(owner) { }
-
-		read8smo_delegate read_dipswitch;
+		vga_t(device_t &owner) { }
 		struct
 		{
 			size_t vram_size;
@@ -239,6 +238,8 @@ protected:
 		/* oak vga */
 		struct { uint8_t reg; } oak;
 	} vga;
+
+	required_ioport m_input_sense;
 
 	emu_timer *m_vblank_timer;
 };
@@ -634,31 +635,6 @@ DECLARE_DEVICE_TYPE(S3_VGA, s3_vga_device)
   build in amstrad pc1640
 
   ROM_LOAD("40100", 0xc0000, 0x8000, CRC(d2d1f1ae) SHA1(98302006ee38a17c09bd75504cc18c0649174e33) )
-
-  4 additional dipswitches
-  seems to have emulation modes at register level
-  (mda/hgc lines bit 8 not identical to ega/vga)
-
-  standard ega/vga dipswitches
-  00000000  320x200
-  00000001  640x200 hanging
-  00000010  640x200 hanging
-  00000011  640x200 hanging
-
-  00000100  640x350 hanging
-  00000101  640x350 hanging EGA mono
-  00000110  320x200
-  00000111  640x200
-
-  00001000  640x200
-  00001001  640x200
-  00001010  720x350 partial visible
-  00001011  720x350 partial visible
-
-  00001100  320x200
-  00001101  320x200
-  00001110  320x200
-  00001111  320x200
 
 */
 

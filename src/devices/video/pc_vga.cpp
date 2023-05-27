@@ -49,12 +49,14 @@
 
 #define LOG_WARN      (1U << 1)
 #define LOG_REGS      (1U << 2) // deprecated
+#define LOG_DSW       (1U << 3) // Input sense at $3c2
 
-#define VERBOSE (LOG_GENERAL | LOG_WARN)
+#define VERBOSE (LOG_GENERAL | LOG_WARN | LOG_DSW)
 #include "logmacro.h"
 
 #define LOGWARN(...)           LOGMASKED(LOG_WARN, __VA_ARGS__)
 #define LOGREGS(...)           LOGMASKED(LOG_REGS, __VA_ARGS__)
+#define LOGDSW(...)            LOGMASKED(LOG_DSW, __VA_ARGS__)
 
 
 /***************************************************************************
@@ -123,6 +125,7 @@ vga_device::vga_device(const machine_config &mconfig, device_type type, const ch
 	, device_video_interface(mconfig, *this)
 	, device_palette_interface(mconfig, *this)
 	, vga(*this)
+	, m_input_sense(*this, "VGA_SENSE")
 {
 }
 
@@ -230,7 +233,6 @@ void vga_device::device_start()
 
 
 	// copy over interfaces
-	vga.read_dipswitch.set(nullptr); //read_dipswitch;
 	vga.svga_intf.seq_regcount = 0x05;
 	vga.svga_intf.crtc_regcount = 0x19;
 
@@ -1669,6 +1671,45 @@ uint8_t vga_device::seq_reg_read(uint8_t index)
 	return 0;
 }
 
+/*
+  4 additional dipswitches
+  seems to have emulation modes at register level
+  (mda/hgc lines bit 8 not identical to ega/vga)
+
+  standard ega/vga dipswitches
+  00000000  320x200
+  00000001  640x200 hanging
+  00000010  640x200 hanging
+  00000011  640x200 hanging
+
+  00000100  640x350 hanging
+  00000101  640x350 hanging EGA mono
+  00000110  320x200
+  00000111  640x200
+
+  00001000  640x200
+  00001001  640x200
+  00001010  720x350 partial visible
+  00001011  720x350 partial visible
+
+  00001100  320x200
+  00001101  320x200
+  00001110  320x200
+  00001111  320x200
+*/
+static INPUT_PORTS_START(vga_sense)
+	PORT_START("VGA_SENSE")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+ioport_constructor vga_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(vga_sense);
+}
+
 uint8_t vga_device::port_03c0_r(offs_t offset)
 {
 	uint8_t data = 0xff;
@@ -1687,36 +1728,14 @@ uint8_t vga_device::port_03c0_r(offs_t offset)
 			break;
 
 		case 2:
-			// TODO: in VGA bit 4 is actually always on?
+		{
 			data = 0x60; // is VGA
-			switch ((vga.miscellaneous_output>>2)&3)
-			{
-				case 3:
-					if (!vga.read_dipswitch.isnull() && vga.read_dipswitch() & 0x01)
-						data |= 0x10;
-					else
-						data |= 0x10;
-					break;
-				case 2:
-					if (!vga.read_dipswitch.isnull() && vga.read_dipswitch() & 0x02)
-						data |= 0x10;
-					else
-						data |= 0x10;
-					break;
-				case 1:
-					if (!vga.read_dipswitch.isnull() && vga.read_dipswitch() & 0x04)
-						data |= 0x10;
-					else
-						data |= 0x10;
-					break;
-				case 0:
-					if (!vga.read_dipswitch.isnull() && vga.read_dipswitch() & 0x08)
-						data |= 0x10;
-					else
-						data |= 0x10;
-					break;
-			}
+			const u8 sense_bit = (3 - (vga.miscellaneous_output >> 2)) & 3;
+			LOGDSW("Reading sense bit %d\n", sense_bit);
+			if(BIT(m_input_sense->read(), sense_bit))
+				data |= 0x10;
 			break;
+		}
 
 		case 3:
 			data = vga.oak.reg;

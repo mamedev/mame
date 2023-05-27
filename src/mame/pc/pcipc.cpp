@@ -34,6 +34,7 @@
 #include "machine/pci.h"
 #include "video/mga2064w.h"
 #include "video/virge_pci.h"
+#include "video/riva128.h"
 
 
 namespace {
@@ -52,6 +53,7 @@ public:
 
 	void pcipc(machine_config &config);
 	void pcipctx(machine_config &config);
+	void pcinv3(machine_config &config);
 
 	pcipc_state(const machine_config &mconfig, device_type type, const char *tag);
 
@@ -580,6 +582,12 @@ void pcipc_state::pcipctx(machine_config &config)
 	MGA2064W(config, "pci:12.0", 0);
 }
 
+void pcipc_state::pcinv3(machine_config &config)
+{
+	pcipc_state::pcipc(config);
+	RIVA128(config.replace(), "pci:12.0", 0);
+}
+
 ROM_START(pcipc)
 	ROM_REGION32_LE(0x40000, "pci:07.0", 0) /* PC bios */
 	ROM_SYSTEM_BIOS(0, "m55ns04", "m55ns04") // Micronics M55HI-Plus with no sound
@@ -603,11 +611,18 @@ ROM_START(pcipctx)
 	ROM_LOAD("ibm-vga.bin", 0x00000, 0x8000, BAD_DUMP CRC(74e3fadb) SHA1(dce6491424f1726203776dfae9a967a98a4ba7b5) )
 ROM_END
 
+ROM_START(pcinv3)
+	ROM_REGION32_LE(0x40000, "pci:07.0", 0) /* PC bios */
+	ROM_SYSTEM_BIOS(0, "m55ns04", "m55ns04") // Micronics M55HI-Plus with no sound
+	ROMX_LOAD("m55-04ns.rom", 0x20000, 0x20000, CRC(0116b2b0) SHA1(19b0203decfd4396695334517488d488aec3ccde), ROM_BIOS(0))
+ROM_END
+
 static INPUT_PORTS_START(pcipc)
 INPUT_PORTS_END
 
 } // anonymous namespace
 
 
-COMP(1998, pcipc,   0, 0, pcipc,   pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX)", MACHINE_NO_SOUND)
-COMP(1998, pcipctx, 0, 0, pcipctx, pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430TX)", MACHINE_NO_SOUND)
+COMP(1998, pcipc,    0,     0, pcipc,   pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX)", MACHINE_NO_SOUND)
+COMP(1998, pcinv3,   pcipc, 0, pcinv3,pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX with Riva 128)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1998, pcipctx,  0,     0, pcipctx, pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430TX)", MACHINE_NO_SOUND)
