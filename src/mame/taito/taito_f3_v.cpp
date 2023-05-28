@@ -1840,7 +1840,8 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 		y += y_inc;
 	}
 
-	tilemap_t* tm = tmap;
+	const tilemap_t* tm = tmap;
+	const u16* pfdata = pf_data_n;
 
 	y = y_start;
 	while (y != y_end)
@@ -1848,30 +1849,35 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 		u32 x_index_fx;
 		u32 y_index;
 
-		/* The football games use values in the range 0x200 - 0x3ff where the crowd should be drawn - !?
-
-		   This appears to cause it to reference outside of the normal tilemap RAM area into the unused
-		   area on the 32x32 tilemap configuration.. but exactly how isn't understood
-
-		    Until this is understood we're creating additional tilemaps for the otherwise unused area of
-		    RAM and forcing it to look up there.
-
-		    the crowd area still seems to 'lag' behind the pitch area however.. but these are the values
-		    in ram??
+		/* lines with 0x0200 set in column scroll look up in alternate tilemaps
+		   used by kaiser knuckle (high score list), kirameki (some partial backgrounds),
+		   football games (crowd/sides, goals)
+		   
+		   per haze re football games:
+		   "the crowd area still seems to 'lag' behind the pitch area however.. but these are the values
+		   in ram??"
 		*/
 		const int cs = _colscroll[y];
-
 		if (cs & 0x200)
 		{
 			if (m_tilemap[4] && m_tilemap[5])
 			{
-				if (tmap == m_tilemap[2]) tmap = m_tilemap[4]; // pitch -> crowd
-				if (tmap == m_tilemap[3]) tmap = m_tilemap[5]; // corruption on goals -> blank (hthero94)
+				if (tmap == m_tilemap[2])
+				{
+					tmap = m_tilemap[4]; // pitch -> crowd
+					pf_data_n = m_pf_data[4];
+				}
+				if (tmap == m_tilemap[3])
+				{
+					tmap = m_tilemap[5]; // corruption on goals -> blank (hthero94)
+					pf_data_n = m_pf_data[5];
+				}
 			}
 		}
 		else
 		{
 			tmap = tm;
+			pf_data_n = pfdata;
 		}
 
 		/* set pixmap pointer */
