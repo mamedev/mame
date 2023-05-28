@@ -31,6 +31,7 @@ protected:
 
 	virtual void mmio_map(address_map &map);
 	virtual void vram_aperture_map(address_map &map);
+	virtual void indirect_io_map(address_map &map);
 private:
 	required_device<nvidia_nv3_vga_device> m_svga;
 	required_memory_region m_vga_rom;

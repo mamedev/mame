@@ -21,7 +21,6 @@ riva128_device::riva128_device(const machine_config &mconfig, const char *tag, d
 	// 0x0018 RIVA 128 (NV3)
 	// 0x0019 RIVA 128 ZX (NV3T)
 	set_ids(0x12d20018, 0x00, 0x030000, 0x00);
-
 }
 
 ROM_START( riva128 )
@@ -49,7 +48,7 @@ void riva128_device::device_add_mconfig(machine_config &config)
 	m_svga->set_screen("screen");
 	// FIXME: shared RAM
 	// reports as 4MB in AIDA16
-	m_svga->set_vram_size(2*1024*1024);
+	m_svga->set_vram_size(4*1024*1024);
 }
 
 void riva128_device::device_start()
@@ -58,7 +57,8 @@ void riva128_device::device_start()
 
 	add_map( 16*1024*1024, M_MEM, FUNC(riva128_device::mmio_map));
 	add_map(128*1024*1024, M_MEM, FUNC(riva128_device::vram_aperture_map));
-//	add_map( 0x100, M_IO, indirect memory access I/Os (NV3 only)
+	// indirect memory access I/Os (NV3 only)
+	add_map(0x100, M_IO, FUNC(riva128_device::indirect_io_map));
 
 	add_rom((u8 *)m_vga_rom->base(), 0x8000);
 	expansion_rom_base = 0xc0000;
@@ -80,6 +80,7 @@ void riva128_device::device_reset()
 	remap_cb();
 }
 
+// TODO: counter-check everything
 void riva128_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
@@ -109,6 +110,11 @@ void riva128_device::mmio_map(address_map &map)
 }
 
 void riva128_device::vram_aperture_map(address_map &map)
+{
+	
+}
+
+void riva128_device::indirect_io_map(address_map &map)
 {
 	
 }
