@@ -86,13 +86,13 @@ private:
 	static const int div_bh[8];
 	static const int div_s[8];
 
-	required_device<h8_device> cpu;
-	h8_intc_device *intc;
-	const char *intc_tag;
-	int irq;
-	int type;
-	uint8_t tcnt, tcsr, rst;
-	uint64_t tcnt_cycle_base;
+	required_device<h8_device> m_cpu;
+	h8_intc_device *m_intc;
+	const char *m_intc_tag;
+	int m_irq;
+	int m_type;
+	uint8_t m_tcnt, m_tcsr, m_rst;
+	uint64_t m_tcnt_cycle_base;
 
 	void tcnt_update(uint64_t current_time = 0);
 };

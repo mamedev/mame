@@ -17,16 +17,16 @@ class h8_disassembler : public util::disasm_interface
 {
 protected:
 	struct disasm_entry {
-		int slot;
-		u32 val, mask;
-		u16 val0, mask0;
-		const char *opcode;
-		int am1, am2;
-		offs_t flags;
+		int m_slot;
+		u32 m_val, m_mask;
+		u16 m_val0, m_mask0;
+		const char *m_opcode;
+		int m_am1, m_am2;
+		offs_t m_flags;
 	};
 
 public:
-	h8_disassembler(const disasm_entry *_table, bool _advanced);
+	h8_disassembler(const disasm_entry *table, bool advanced);
 	h8_disassembler();
 
 	virtual u32 opcode_alignment() const override;
@@ -97,8 +97,8 @@ protected:
 
 	void disassemble_am(std::ostream &stream, int am, offs_t pc, const data_buffer &opcodes, u32 opcode, int slot, int offset);
 
-	const disasm_entry *const table;
-	const bool advanced;
+	const disasm_entry *const m_table;
+	const bool m_advanced;
 
 	static const disasm_entry disasm_entries[];
 };

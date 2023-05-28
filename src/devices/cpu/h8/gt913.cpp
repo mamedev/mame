@@ -29,7 +29,7 @@ gt913_device::gt913_device(const machine_config &mconfig, const char *tag, devic
 	h8_device(mconfig, GT913, tag, owner, clock, address_map_constructor(FUNC(gt913_device::map), this)),
 	device_mixer_interface(mconfig, *this, 2),
 	m_rom(*this, DEVICE_SELF),
-	data_config("data", ENDIANNESS_BIG, 16, 22, 0),
+	m_data_config("data", ENDIANNESS_BIG, 16, 22, 0),
 	m_intc(*this, "intc"),
 	m_sound(*this, "gt_sound"),
 	m_kbd(*this, "kbd"),
@@ -37,7 +37,7 @@ gt913_device::gt913_device(const machine_config &mconfig, const char *tag, devic
 	m_sci(*this, "sci%u", 0),
 	m_port(*this, "port%u", 1)
 {
-	has_hc = false;
+	m_has_hc = false;
 }
 
 std::unique_ptr<util::disasm_interface> gt913_device::create_disassembler()
@@ -54,7 +54,7 @@ void gt913_device::map(address_map &map)
 	/* ctk530 writes here to latch LED matrix data, which generates an active high strobe on pin 99 (PLE/P16)
 	   there's otherwise no external address decoding (or the usual read/write strobes) used for the LED latches.
 	   just treat as a 16-bit write-only port for now */
-	map(0xe000, 0xe001).lw16(NAME([this](uint16_t data) { io.write_word(h8_device::PORT_4, data); }));
+	map(0xe000, 0xe001).lw16(NAME([this](uint16_t data) { m_io.write_word(h8_device::PORT_4, data); }));
 
 	map(0xfac0, 0xffbf).ram();
 
@@ -105,13 +105,12 @@ void gt913_device::device_add_mconfig(machine_config &config)
 	m_sound->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
 
 	GT913_KBD_HLE(config, m_kbd, 0);
-	m_kbd->irq_cb().set([this] (int val)
-	{
-		if (val)
-			m_intc->internal_interrupt(5);
-		else
-			m_intc->clear_interrupt(5);
-	});
+	m_kbd->irq_cb().set([this] (int val) {
+							if(val)
+								m_intc->internal_interrupt(5);
+							else
+								m_intc->clear_interrupt(5);
+						});
 	GT913_IO_HLE(config, m_io_hle, "intc", 6, 7);
 	H8_SCI(config, m_sci[0], "intc", 8, 9, 10, 0);
 	H8_SCI(config, m_sci[1], "intc", 11, 12, 13, 0);
@@ -149,7 +148,7 @@ uint8_t gt913_device::uart_control_r(offs_t offset)
 
 void gt913_device::syscr_w(uint8_t data)
 {
-	if (BIT(m_syscr ^ data, 2))
+	if(BIT(m_syscr ^ data, 2))
 		// NMI active edge has changed
 		m_intc->set_input(INPUT_LINE_NMI, CLEAR_LINE);
 
@@ -173,10 +172,10 @@ uint8_t gt913_device::data_r(offs_t offset)
 
 uint8_t gt913_device::read8ib(uint32_t adr)
 {
-	if (BIT(m_syscr, 0))
+	if(BIT(m_syscr, 0))
 		// indirect bank disabled
-		return program.read_byte(adr);
-	else if ((IR[0] & 0x0070) == 0)
+		return m_program.read_byte(adr);
+	else if((m_IR[0] & 0x0070) == 0)
 		// indirect bank enabled, using bankh for r0
 		return m_data.read_byte(adr | ((m_banknum >> 6) << 16));
 	else
@@ -186,10 +185,10 @@ uint8_t gt913_device::read8ib(uint32_t adr)
 
 void gt913_device::write8ib(uint32_t adr, uint8_t data)
 {
-	if (BIT(m_syscr, 0))
+	if(BIT(m_syscr, 0))
 		// indirect bank disabled
-		program.write_byte(adr, data);
-	else if ((IR[0] & 0x0070) == 0)
+		m_program.write_byte(adr, data);
+	else if((m_IR[0] & 0x0070) == 0)
 		// indirect bank enabled, using bankh for r0
 		m_data.write_byte(adr | ((m_banknum >> 6) << 16), data);
 	else
@@ -201,10 +200,10 @@ uint16_t gt913_device::read16ib(uint32_t adr)
 {
 	adr &= ~1;
 
-	if (BIT(m_syscr, 0))
+	if(BIT(m_syscr, 0))
 		// indirect bank disabled
-		return program.read_word(adr);
-	else if ((IR[0] & 0x0070) == 0)
+		return m_program.read_word(adr);
+	else if((m_IR[0] & 0x0070) == 0)
 		// indirect bank enabled, using bankh for r0
 		return m_data.read_word(adr | ((m_banknum >> 6) << 16));
 	else
@@ -216,10 +215,10 @@ void gt913_device::write16ib(uint32_t adr, uint16_t data)
 {
 	adr &= ~1;
 
-	if (BIT(m_syscr, 0))
+	if(BIT(m_syscr, 0))
 		// indirect bank disabled
-		program.write_word(adr, data);
-	else if ((IR[0] & 0x0070) == 0)
+		m_program.write_word(adr, data);
+	else if((m_IR[0] & 0x0070) == 0)
 		// indirect bank enabled, using bankh for r0
 		m_data.write_word(adr | ((m_banknum >> 6) << 16), data);
 	else
@@ -229,12 +228,12 @@ void gt913_device::write16ib(uint32_t adr, uint16_t data)
 
 void gt913_device::irq_setup()
 {
-	CCR |= F_H;
+	m_CCR |= F_H;
 }
 
 void gt913_device::update_irq_filter()
 {
-	if (CCR & F_H)
+	if(m_CCR & F_H)
 		m_intc->set_filter(2, -1);
 	else
 		m_intc->set_filter(0, -1);
@@ -242,7 +241,7 @@ void gt913_device::update_irq_filter()
 
 void gt913_device::interrupt_taken()
 {
-	standard_irq_callback(m_intc->interrupt_taken(taken_irq_vector), NPC);
+	standard_irq_callback(m_intc->interrupt_taken(m_taken_irq_vector), m_NPC);
 }
 
 void gt913_device::internal_update(uint64_t current_time)
@@ -257,9 +256,8 @@ void gt913_device::internal_update(uint64_t current_time)
 
 void gt913_device::execute_set_input(int inputnum, int state)
 {
-	if (inputnum == INPUT_LINE_NMI)
-	{
-		if (BIT(m_syscr, 2))
+	if(inputnum == INPUT_LINE_NMI) {
+		if(BIT(m_syscr, 2))
 			state ^= ASSERT_LINE;
 	}
 
@@ -269,9 +267,9 @@ void gt913_device::execute_set_input(int inputnum, int state)
 device_memory_interface::space_config_vector gt913_device::memory_space_config() const
 {
 	return space_config_vector{
-		std::make_pair(AS_PROGRAM, &program_config),
-		std::make_pair(AS_IO,      &io_config),
-		std::make_pair(AS_DATA,    &data_config)
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config),
+		std::make_pair(AS_DATA,    &m_data_config)
 	};
 }
 

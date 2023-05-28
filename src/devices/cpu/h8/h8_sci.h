@@ -46,8 +46,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(rx_w);
 	DECLARE_WRITE_LINE_MEMBER(clk_w);
 
-	auto tx_handler() { return tx_cb.bind(); }
-	auto clk_handler() { return clk_cb.bind(); }
+	auto tx_handler() { return m_tx_cb.bind(); }
+	auto clk_handler() { return m_clk_cb.bind(); }
 
 	uint64_t internal_update(uint64_t current_time);
 
@@ -102,24 +102,24 @@ protected:
 		SSR_MPBT = 0x01
 	};
 
-	required_device<h8_device> cpu;
-	devcb_write_line tx_cb, clk_cb;
-	h8_intc_device *intc;
-	const char *intc_tag;
-	attotime external_clock_period, cur_sync_time;
-	double external_to_internal_ratio, internal_to_external_ratio;
-	emu_timer *sync_timer;
+	required_device<h8_device> m_cpu;
+	devcb_write_line m_tx_cb, m_clk_cb;
+	h8_intc_device *m_intc;
+	const char *m_intc_tag;
+	attotime m_external_clock_period, m_cur_sync_time;
+	double m_external_to_internal_ratio, m_internal_to_external_ratio;
+	emu_timer *m_sync_timer;
 
-	int eri_int, rxi_int, txi_int, tei_int;
+	int m_eri_int, m_rxi_int, m_txi_int, m_tei_int;
 
-	int tx_state, rx_state, tx_bit, rx_bit, clock_state, tx_parity, rx_parity, ext_clock_counter;
-	clock_mode_t clock_mode;
-	bool clock_value, ext_clock_value, rx_value;
+	int m_tx_state, m_rx_state, m_tx_bit, m_rx_bit, m_clock_state, m_tx_parity, m_rx_parity, m_ext_clock_counter;
+	clock_mode_t m_clock_mode;
+	bool m_clock_value, m_ext_clock_value, m_rx_value;
 
-	uint8_t rdr, tdr, smr, scr, ssr, brr, rsr, tsr;
-	uint64_t clock_base, divider;
+	uint8_t m_rdr, m_tdr, m_smr, m_scr, m_ssr, m_brr, m_rsr, m_tsr;
+	uint64_t m_clock_base, m_divider;
 
-	std::string last_clock_message;
+	std::string m_last_clock_message;
 
 	void device_start() override;
 	void device_reset() override;

@@ -69,7 +69,7 @@ public:
 	void set_current_dma(h8_dma_state *state);
 	void set_current_dtc(h8_dtc_state *state);
 	void request_state(int state);
-	bool access_is_dma() const { return inst_state == STATE_DMA || inst_state == STATE_DTC; }
+	bool access_is_dma() const { return m_inst_state == STATE_DMA || m_inst_state == STATE_DTC; }
 
 protected:
 	enum {
@@ -113,36 +113,36 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	address_space_config program_config, io_config;
-	memory_access<32, 1, 0, ENDIANNESS_BIG>::cache cache;
-	memory_access<32, 1, 0, ENDIANNESS_BIG>::specific program;
-	memory_access<16, 1, -1, ENDIANNESS_BIG>::specific io;
-	h8_dma_device *dma_device;
-	h8_dtc_device *dtc_device;
-	h8_dma_state *current_dma;
-	h8_dtc_state *current_dtc;
+	address_space_config m_program_config, m_io_config;
+	memory_access<32, 1, 0, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<32, 1, 0, ENDIANNESS_BIG>::specific m_program;
+	memory_access<16, 1, -1, ENDIANNESS_BIG>::specific m_io;
+	h8_dma_device *m_dma_device;
+	h8_dtc_device *m_dtc_device;
+	h8_dma_state *m_current_dma;
+	h8_dtc_state *m_current_dtc;
 
-	uint32_t  PPC;                    /* previous program counter */
-	uint32_t  NPC;                    /* next start-of-instruction program counter */
-	uint32_t  PC;                     /* program counter */
-	uint16_t  PIR;                    /* Prefetched word */
-	uint16_t  IR[5];                  /* Fetched instruction */
-	uint16_t  R[16];                  /* Rn (0-7), En (8-15, h8-300h+) */
-	uint8_t   EXR;                    /* Interrupt/trace register (h8s/2000+) */
-	uint8_t   CCR;                    /* Condition-code register */
-	int64_t   MAC;                    /* Multiply accumulator (h8s/2600+) */
-	uint8_t   MACF;                   /* MAC flags (h8s/2600+) */
-	uint32_t  TMP1, TMP2;
-	uint32_t  TMPR;                   /* For debugger ER register import */
+	uint32_t  m_PPC;                    /* previous program counter */
+	uint32_t  m_NPC;                    /* next start-of-instruction program counter */
+	uint32_t  m_PC;                     /* program counter */
+	uint16_t  m_PIR;                    /* Prefetched word */
+	uint16_t  m_IR[5];                  /* Fetched instruction */
+	uint16_t  m_R[16];                  /* Rn (0-7), En (8-15, h8-300h+) */
+	uint8_t   m_EXR;                    /* Interrupt/trace register (h8s/2000+) */
+	uint8_t   m_CCR;                    /* Condition-code register */
+	int64_t   m_MAC;                    /* Multiply accumulator (h8s/2600+) */
+	uint8_t   m_MACF;                   /* MAC flags (h8s/2600+) */
+	uint32_t  m_TMP1, m_TMP2;
+	uint32_t  m_TMPR;                   /* For debugger ER register import */
 
-	bool has_exr, has_mac, has_trace, supports_advanced, mode_advanced, mode_a20, mac_saturating;
-	bool has_hc; // GT913's CCR bit 5 is I, not H
+	bool m_has_exr, m_has_mac, m_has_trace, m_supports_advanced, m_mode_advanced, m_mode_a20, m_mac_saturating;
+	bool m_has_hc; // GT913's CCR bit 5 is I, not H
 
-	int inst_state, inst_substate, requested_state;
-	int icount, bcount, count_before_instruction_step;
-	int irq_vector, taken_irq_vector;
-	int irq_level, taken_irq_level;
-	bool irq_required, irq_nmi;
+	int m_inst_state, m_inst_substate, m_requested_state;
+	int m_icount, m_bcount, m_count_before_instruction_step;
+	int m_irq_vector, m_taken_irq_vector;
+	int m_irq_level, m_taken_irq_level;
+	bool m_irq_required, m_irq_nmi;
 
 	virtual void do_exec_full();
 	virtual void do_exec_partial();
@@ -162,7 +162,7 @@ protected:
 	uint16_t read16(uint32_t adr);
 	void write16(uint32_t adr, uint16_t data);
 	void internal(int cycles);
-	void prefetch_switch(uint32_t pc, uint16_t ir) { NPC = pc & 0xffffff; PC = pc+2; PIR = ir; }
+	void prefetch_switch(uint32_t pc, uint16_t ir) { m_NPC = pc & 0xffffff; m_PC = pc+2; m_PIR = ir; }
 	void prefetch_done();
 	void prefetch_done_noirq();
 	void prefetch_done_noirq_notrace();
@@ -260,16 +260,16 @@ protected:
 
 	inline void r8_w(int reg, uint8_t val) {
 		if(reg & 8)
-			R[reg & 7] = (R[reg & 7] & 0xff00) | val;
+			m_R[reg & 7] = (m_R[reg & 7] & 0xff00) | val;
 		else
-			R[reg & 7] = (R[reg & 7] & 0xff) | (val << 8);
+			m_R[reg & 7] = (m_R[reg & 7] & 0xff) | (val << 8);
 	}
 
 	inline uint8_t r8_r(int reg) {
 		if(reg & 8)
-			return R[reg & 7];
+			return m_R[reg & 7];
 		else
-			return R[reg & 7] >> 8;
+			return m_R[reg & 7] >> 8;
 	}
 
 	// Note that the decode is so that there's no risk of a h8-300
@@ -280,8 +280,8 @@ protected:
 	// and the h8-300h is r32 of course, we have to be careful to mask
 	// in h8.lst there if the top bit is 1.
 
-	inline void r16_w(int reg, uint16_t val) { R[reg & 0xf] = val; }
-	inline uint16_t r16_r(int reg) { return R[reg & 0xf]; }
+	inline void r16_w(int reg, uint16_t val) { m_R[reg & 0xf] = val; }
+	inline uint16_t r16_r(int reg) { return m_R[reg & 0xf]; }
 
 #define O(o) void o ## _full(); void o ## _partial()
 	O(add_b_imm8_r8u); O(add_b_r8h_r8l); O(add_w_imm16_r16l); O(add_w_r16h_r16l);

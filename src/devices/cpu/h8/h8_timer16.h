@@ -89,22 +89,22 @@ public:
 	uint8_t tisr_r(int offset) const;
 
 protected:
-	required_device<h8_device> cpu;
-	h8_timer16_channel_device *chained_timer;
-	h8_intc_device *intc;
-	const char *chain_tag, *intc_tag;
-	int interrupt[6];
-	uint8_t tier_mask;
+	required_device<h8_device> m_cpu;
+	h8_timer16_channel_device *m_chained_timer;
+	h8_intc_device *m_intc;
+	const char *m_chain_tag, *m_intc_tag;
+	int m_interrupt[6];
+	uint8_t m_tier_mask;
 
-	int tgr_count, tbr_count;
-	int tgr_clearing;
-	uint8_t tcr, tier, ier, isr;
-	int clock_type, clock_divider;
-	uint16_t tcnt, tgr[6];
-	uint64_t last_clock_update, event_time;
-	uint32_t phase, counter_cycle;
-	bool counter_incrementing;
-	bool channel_active;
+	int m_tgr_count, m_tbr_count;
+	int m_tgr_clearing;
+	uint8_t m_tcr, m_tier, m_ier, m_isr;
+	int m_clock_type, m_clock_divider;
+	uint16_t m_tcnt, m_tgr[6];
+	uint64_t m_last_clock_update, m_event_time;
+	uint32_t m_phase, m_counter_cycle;
+	bool m_counter_incrementing;
+	bool m_channel_active;
 
 	h8_timer16_channel_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -154,7 +154,7 @@ public:
 	void set_chain(const char *chain_tag);
 
 protected:
-	int count_types[8];
+	int m_count_types[8];
 
 	virtual void tcr_update() override;
 	virtual void tier_update() override;
@@ -191,11 +191,11 @@ public:
 	void tolr_w(uint8_t data);
 
 protected:
-	required_device<h8_device> cpu;
-	h8_timer16_channel_device *timer_channel[6];
-	int timer_count;
-	uint8_t default_tstr;
-	uint8_t tstr;
+	required_device<h8_device> m_cpu;
+	h8_timer16_channel_device *m_timer_channel[6];
+	int m_timer_count;
+	uint8_t m_default_tstr;
+	uint8_t m_tstr;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

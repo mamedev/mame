@@ -2,11 +2,11 @@
 # copyright-holders:Olivier Galibert
 
 macro fetch
-	PIR = read16i(PC);
-	PC += 2;
+	m_PIR = read16i(m_PC);
+	m_PC += 2;
 
 macro prefetch_start
-	NPC = PC & 0xffffff;
+	m_NPC = m_PC & 0xffffff;
 	fetch
 
 macro prefetch
@@ -23,81 +23,81 @@ macro prefetch_noirq_notrace
 
 macro bxx_any %cond
 	prefetch_start
-	TMP2 = read16i(TMP1);
+	m_TMP2 = read16i(m_TMP1);
 	if(%cond)
-		prefetch_switch(TMP1, TMP2);
+		prefetch_switch(m_TMP1, m_TMP2);
 	prefetch_done();
 
 macro bxx_8 %cond
-	TMP1 = PC + int8_t(IR[0]);
+	m_TMP1 = m_PC + int8_t(m_IR[0]);
 	bxx_any %cond
 
 macro bxx_16 %cond
-	TMP1 = PC + int16_t(IR[1]);
+	m_TMP1 = m_PC + int16_t(m_IR[1]);
 	bxx_any %cond
 
 macro bset %bit
-	TMP1 |= 1 << ((%bit) & 7);
+	m_TMP1 |= 1 << ((%bit) & 7);
 
 macro bnot %bit
-	TMP1 ^= 1 << ((%bit) & 7);
+	m_TMP1 ^= 1 << ((%bit) & 7);
 
 macro bclr %bit
-	TMP1 &= ~(1 << ((%bit) & 7));
+	m_TMP1 &= ~(1 << ((%bit) & 7));
 
 macro btst %bit
-	if(TMP1 & (1 << ((%bit) & 7)))
-		CCR &= ~F_Z;
+	if(m_TMP1 & (1 << ((%bit) & 7)))
+		m_CCR &= ~F_Z;
 	else
-		CCR |= F_Z;
+		m_CCR |= F_Z;
 
 macro bor %bit
-	if(TMP1 & (1 << ((%bit) & 7)))
-		CCR |= F_C;
+	if(m_TMP1 & (1 << ((%bit) & 7)))
+		m_CCR |= F_C;
 
 macro bior %bit
-	if(!(TMP1 & (1 << ((%bit) & 7))))
-		CCR |= F_C;
+	if(!(m_TMP1 & (1 << ((%bit) & 7))))
+		m_CCR |= F_C;
 
 macro bxor %bit
-	if(TMP1 & (1 << ((%bit) & 7)))
-		CCR ^= F_C;
+	if(m_TMP1 & (1 << ((%bit) & 7)))
+		m_CCR ^= F_C;
 
 macro bixor %bit
-	if(!(TMP1 & (1 << ((%bit) & 7))))
-		CCR ^= F_C;
+	if(!(m_TMP1 & (1 << ((%bit) & 7))))
+		m_CCR ^= F_C;
 
 macro band %bit
-	if(!(TMP1 & (1 << ((%bit) & 7))))
-		CCR &= ~F_C;
+	if(!(m_TMP1 & (1 << ((%bit) & 7))))
+		m_CCR &= ~F_C;
 
 macro biand %bit
-	if(TMP1 & (1 << ((%bit) & 7)))
-		CCR &= ~F_C;
+	if(m_TMP1 & (1 << ((%bit) & 7)))
+		m_CCR &= ~F_C;
 
 macro bld %bit
-	if(TMP1 & (1 << ((%bit) & 7)))
-		CCR |= F_C;
+	if(m_TMP1 & (1 << ((%bit) & 7)))
+		m_CCR |= F_C;
 	else
-		CCR &= ~F_C;
+		m_CCR &= ~F_C;
 
 macro bild %bit
-	if(!(TMP1 & (1 << ((%bit) & 7))))
-		CCR |= F_C;
+	if(!(m_TMP1 & (1 << ((%bit) & 7))))
+		m_CCR |= F_C;
 	else
-		CCR &= ~F_C;
+		m_CCR &= ~F_C;
 
 macro bst %bit
-	if(CCR & F_C)
-		TMP1 |= 1 << ((%bit) & 7);
+	if(m_CCR & F_C)
+		m_TMP1 |= 1 << ((%bit) & 7);
 	else
-		TMP1 &= ~(1 << ((%bit) & 7));
+		m_TMP1 &= ~(1 << ((%bit) & 7));
 
 macro bist %bit
-	if(!(CCR & F_C))
-		TMP1 |= 1 << ((%bit) & 7);
+	if(!(m_CCR & F_C))
+		m_TMP1 |= 1 << ((%bit) & 7);
 	else
-		TMP1 &= ~(1 << ((%bit) & 7));
+		m_TMP1 &= ~(1 << ((%bit) & 7));
 
 macro jsr16 %opc %spreg
 	prefetch_start
@@ -108,7 +108,7 @@ macro jsr16 %opc %spreg
 
 macro jsr32 %opc %spreg
 	prefetch_start
-	if(mode_advanced) {
+	if(m_mode_advanced) {
 		%spreg = r32_r(7) - 4;
 		r32_w(7, %spreg);
 		write16(%spreg, %opc >> 16);
@@ -121,28 +121,28 @@ macro jsr32 %opc %spreg
 	prefetch_done();
 
 10000 reset
-	CCR |= (has_hc ? F_I : F_H);
-	EXR = EXR_I | EXR_NC;
-	if(mode_advanced) {
-		IR[0] = read16i(0);
-		IR[1] = read16i(2);
-		PC = (IR[0] << 16) | IR[1];
+	m_CCR |= (m_has_hc ? F_I : F_H);
+	m_EXR = EXR_I | EXR_NC;
+	if(m_mode_advanced) {
+		m_IR[0] = read16i(0);
+		m_IR[1] = read16i(2);
+		m_PC = (m_IR[0] << 16) | m_IR[1];
 	} else {
-		PC = read16i(0);
+		m_PC = read16i(0);
 	}
 	update_irq_filter();
 	prefetch_noirq
 
 10001 irq o
 	internal(1);
-	TMP1 = r16_r(7) - 2;
-	r16_w(7, TMP1);
-	write16(TMP1, NPC);
-	TMP1 = r16_r(7) - 2;
-	r16_w(7, TMP1);
-	write16(TMP1, (CCR << 8) | ((PC >> 16) & 0xff));
-	debugger_exception_hook(taken_irq_vector);
-	PC = read16i(2*taken_irq_vector);
+	m_TMP1 = r16_r(7) - 2;
+	r16_w(7, m_TMP1);
+	write16(m_TMP1, m_NPC);
+	m_TMP1 = r16_r(7) - 2;
+	r16_w(7, m_TMP1);
+	write16(m_TMP1, (m_CCR << 8) | ((m_PC >> 16) & 0xff));
+	debugger_exception_hook(m_taken_irq_vector);
+	m_PC = read16i(2*m_taken_irq_vector);
 	internal(1);
 	irq_setup();
 	update_irq_filter();
@@ -151,24 +151,24 @@ macro jsr32 %opc %spreg
 
 10001 irq h
 	internal(1);
-	TMP1 = r32_r(7) - 2;
-	r32_w(7, TMP1);
-	write16(TMP1, NPC);
-	TMP1 = r32_r(7) - 2;
-	r32_w(7, TMP1);
-	write16(TMP1, (CCR << 8) | ((NPC >> 16) & 0xff));
+	m_TMP1 = r32_r(7) - 2;
+	r32_w(7, m_TMP1);
+	write16(m_TMP1, m_NPC);
+	m_TMP1 = r32_r(7) - 2;
+	r32_w(7, m_TMP1);
+	write16(m_TMP1, (m_CCR << 8) | ((m_NPC >> 16) & 0xff));
 	if(exr_in_stack()) {
-		TMP1 = r32_r(7) - 2;
-		r32_w(7, TMP1);
-		write16(TMP1, EXR << 8);
+		m_TMP1 = r32_r(7) - 2;
+		r32_w(7, m_TMP1);
+		write16(m_TMP1, m_EXR << 8);
 	}
-	debugger_exception_hook(taken_irq_vector);
-	if(mode_advanced) {
-		IR[0] = read16i(4*taken_irq_vector);
-		IR[1] = read16i(4*taken_irq_vector+2);
-		PC = (IR[0] << 16) | IR[1];
+	debugger_exception_hook(m_taken_irq_vector);
+	if(m_mode_advanced) {
+		m_IR[0] = read16i(4*m_taken_irq_vector);
+		m_IR[1] = read16i(4*m_taken_irq_vector+2);
+		m_PC = (m_IR[0] << 16) | m_IR[1];
 	} else {
-		PC = read16i(2*taken_irq_vector);
+		m_PC = read16i(2*m_taken_irq_vector);
 	}
 	internal(1);
 	irq_setup();
@@ -178,98 +178,98 @@ macro jsr32 %opc %spreg
 
 10002 trace s20
 	internal(1);
-	TMP1 = r32_r(7) - 2;
-	r32_w(7, TMP1);
-	write16(TMP1, NPC);
-	TMP1 = r32_r(7) - 2;
-	r32_w(7, TMP1);
-	write16(TMP1, (CCR << 8) | ((NPC >> 16) & 0xff));
-	TMP1 = r32_r(7) - 2;
-	r32_w(7, TMP1);
-	write16(TMP1, EXR << 8);
-	taken_irq_vector = trace_setup();
-	debugger_exception_hook(taken_irq_vector);
-	if(mode_advanced) {
-		IR[0] = read16i(4*taken_irq_vector);
-		IR[1] = read16i(4*taken_irq_vector+2);
-		PC = (IR[0] << 16) | IR[1];
+	m_TMP1 = r32_r(7) - 2;
+	r32_w(7, m_TMP1);
+	write16(m_TMP1, m_NPC);
+	m_TMP1 = r32_r(7) - 2;
+	r32_w(7, m_TMP1);
+	write16(m_TMP1, (m_CCR << 8) | ((m_NPC >> 16) & 0xff));
+	m_TMP1 = r32_r(7) - 2;
+	r32_w(7, m_TMP1);
+	write16(m_TMP1, m_EXR << 8);
+	m_taken_irq_vector = trace_setup();
+	debugger_exception_hook(m_taken_irq_vector);
+	if(m_mode_advanced) {
+		m_IR[0] = read16i(4*m_taken_irq_vector);
+		m_IR[1] = read16i(4*m_taken_irq_vector+2);
+		m_PC = (m_IR[0] << 16) | m_IR[1];
 	} else {
-		PC = read16i(2*taken_irq_vector);
+		m_PC = read16i(2*m_taken_irq_vector);
 	}
 	internal(1);
 	prefetch_noirq
 
 10003 dma
-	if(current_dma->count == 1)
-		dma_device->count_last(current_dma->id);
-	if(current_dma->mode_16) {
-		TMP1 = read16(current_dma->source);
-		write16(current_dma->dest, TMP1);
+	if(m_current_dma->m_count == 1)
+		m_dma_device->count_last(m_current_dma->m_id);
+	if(m_current_dma->m_mode_16) {
+		m_TMP1 = read16(m_current_dma->m_source);
+		write16(m_current_dma->m_dest, m_TMP1);
 	} else {
-		TMP1 = read8(current_dma->source);
-		write8(current_dma->dest, TMP1);
+		m_TMP1 = read8(m_current_dma->m_source);
+		write8(m_current_dma->m_dest, m_TMP1);
 	}
-	current_dma->source += current_dma->incs;
-	current_dma->dest   += current_dma->incd;
-	current_dma->count--;
-	if(!current_dma->autoreq)
-		current_dma->suspended = true;
-	if(!current_dma->count) {
-		uint8_t id = current_dma->id;
-		current_dma = nullptr;
-		dma_device->count_done(id);
+	m_current_dma->m_source += m_current_dma->m_incs;
+	m_current_dma->m_dest   += m_current_dma->m_incd;
+	m_current_dma->m_count--;
+	if(!m_current_dma->m_autoreq)
+		m_current_dma->m_suspended = true;
+	if(!m_current_dma->m_count) {
+		uint8_t id = m_current_dma->m_id;
+		m_current_dma = nullptr;
+		m_dma_device->count_done(id);
 	}
 	prefetch_done();
 
 10004 dtc s20
-	if(current_dtc->sra & 0x01000000) {
-		TMP1 = read16(current_dtc->sra & 0xffffff);
-		write16(current_dtc->dar & 0xffffff, TMP1);
+	if(m_current_dtc->m_sra & 0x01000000) {
+		m_TMP1 = read16(m_current_dtc->m_sra & 0xffffff);
+		write16(m_current_dtc->m_dar & 0xffffff, m_TMP1);
 	} else {
-		TMP1 = read8(current_dtc->sra & 0xffffff);
-		write8(current_dtc->dar & 0xffffff, TMP1);
+		m_TMP1 = read8(m_current_dtc->m_sra & 0xffffff);
+		write8(m_current_dtc->m_dar & 0xffffff, m_TMP1);
 	}
-	current_dtc->sra = (current_dtc->sra & 0xff000000) | ((current_dtc->sra + current_dtc->incs) & 0x00ffffff);
-	current_dtc->dar = (current_dtc->dar & 0xff000000) | ((current_dtc->dar + current_dtc->incd) & 0x00ffffff);
-	current_dtc->count--;
-	if(!current_dtc->count) {
-		uint8_t id = current_dtc->id;
-		current_dtc = nullptr;
-		dtc_device->count_done(id);
+	m_current_dtc->m_sra = (m_current_dtc->m_sra & 0xff000000) | ((m_current_dtc->m_sra + m_current_dtc->m_incs) & 0x00ffffff);
+	m_current_dtc->m_dar = (m_current_dtc->m_dar & 0xff000000) | ((m_current_dtc->m_dar + m_current_dtc->m_incd) & 0x00ffffff);
+	m_current_dtc->m_count--;
+	if(!m_current_dtc->m_count) {
+		uint8_t id = m_current_dtc->m_id;
+		m_current_dtc = nullptr;
+		m_dtc_device->count_done(id);
 	}
 	prefetch_done();
 
 10005 dtc_vector s20
-	TMP1 = dtc_device->get_waiting_vector();
-	if(TMP1 < h8_dtc_device::DTC_CHAINED) {
-		TMP2 = dtc_device->get_vector_address(TMP1);
-		TMP2 = read16(TMP2);
-		TMP2 |= 0xff0000;
+	m_TMP1 = m_dtc_device->get_waiting_vector();
+	if(m_TMP1 < h8_dtc_device::DTC_CHAINED) {
+		m_TMP2 = m_dtc_device->get_vector_address(m_TMP1);
+		m_TMP2 = read16(m_TMP2);
+		m_TMP2 |= 0xff0000;
 	} else {
-		TMP1 -= h8_dtc_device::DTC_CHAINED;
-		TMP2 = dtc_device->get_object(TMP1)->base + 12;
+		m_TMP1 -= h8_dtc_device::DTC_CHAINED;
+		m_TMP2 = m_dtc_device->get_object(m_TMP1)->m_base + 12;
 	}
 
-	dtc_device->get_object(TMP1)->base = TMP2;
-	dtc_device->get_object(TMP1)->sra  = read16(TMP2) << 16;
-	dtc_device->get_object(TMP1)->sra |= read16(TMP2+2);
-	dtc_device->get_object(TMP1)->dar  = read16(TMP2+4) << 16;
-	dtc_device->get_object(TMP1)->dar |= read16(TMP2+6);
-	dtc_device->get_object(TMP1)->cr   = read16(TMP2+8) << 16;
-	dtc_device->get_object(TMP1)->cr  |= read16(TMP2+10);
-	dtc_device->vector_done(TMP1);
+	m_dtc_device->get_object(m_TMP1)->m_base = m_TMP2;
+	m_dtc_device->get_object(m_TMP1)->m_sra  = read16(m_TMP2) << 16;
+	m_dtc_device->get_object(m_TMP1)->m_sra |= read16(m_TMP2+2);
+	m_dtc_device->get_object(m_TMP1)->m_dar  = read16(m_TMP2+4) << 16;
+	m_dtc_device->get_object(m_TMP1)->m_dar |= read16(m_TMP2+6);
+	m_dtc_device->get_object(m_TMP1)->m_cr   = read16(m_TMP2+8) << 16;
+	m_dtc_device->get_object(m_TMP1)->m_cr  |= read16(m_TMP2+10);
+	m_dtc_device->vector_done(m_TMP1);
 	prefetch_done();
 
 10006 dtc_writeback s20
-	TMP1 = dtc_device->get_waiting_writeback();
-	TMP2 = dtc_device->get_object(TMP1)->base;
-	write16(TMP2, dtc_device->get_object(TMP1)->sra >> 16);
-	write16(TMP2+2, dtc_device->get_object(TMP1)->sra);
-	write16(TMP2+4, dtc_device->get_object(TMP1)->dar >> 16);
-	write16(TMP2+6, dtc_device->get_object(TMP1)->dar);
-	write16(TMP2+8, dtc_device->get_object(TMP1)->cr >> 16);
-	write16(TMP2+10, dtc_device->get_object(TMP1)->cr);
-	dtc_device->writeback_done(TMP1);
+	m_TMP1 = m_dtc_device->get_waiting_writeback();
+	m_TMP2 = m_dtc_device->get_object(m_TMP1)->m_base;
+	write16(m_TMP2, m_dtc_device->get_object(m_TMP1)->m_sra >> 16);
+	write16(m_TMP2+2, m_dtc_device->get_object(m_TMP1)->m_sra);
+	write16(m_TMP2+4, m_dtc_device->get_object(m_TMP1)->m_dar >> 16);
+	write16(m_TMP2+6, m_dtc_device->get_object(m_TMP1)->m_dar);
+	write16(m_TMP2+8, m_dtc_device->get_object(m_TMP1)->m_cr >> 16);
+	write16(m_TMP2+10, m_dtc_device->get_object(m_TMP1)->m_cr);
+	m_dtc_device->writeback_done(m_TMP1);
 	prefetch_done();
 
 0000         ffff         0 nop      -        -
@@ -277,466 +277,466 @@ macro jsr32 %opc %spreg
 
 01006900     ffffff88     0 mov.l    r32ih    r32l     h
 	prefetch_start
-	TMP2 = r32_r(IR[1] >> 4);
-	TMP1 = read16(TMP2) << 16;
-	TMP1 |= read16(TMP2+2);
-	set_nzv32(TMP1);
-	r32_w(IR[1], TMP1);
+	m_TMP2 = r32_r(m_IR[1] >> 4);
+	m_TMP1 = read16(m_TMP2) << 16;
+	m_TMP1 |= read16(m_TMP2+2);
+	set_nzv32(m_TMP1);
+	r32_w(m_IR[1], m_TMP1);
 	prefetch_done();
 
 01006980     ffffff88     0 mov.l    r32l     r32ih    h
 	prefetch_start
-	TMP2 = r32_r(IR[1] >> 4);
-	TMP1 = r32_r(IR[1]);
-	set_nzv32(TMP1);
-	write16(TMP2, TMP1 >> 16);
-	write16(TMP2+2, TMP1);
+	m_TMP2 = r32_r(m_IR[1] >> 4);
+	m_TMP1 = r32_r(m_IR[1]);
+	set_nzv32(m_TMP1);
+	write16(m_TMP2, m_TMP1 >> 16);
+	write16(m_TMP2+2, m_TMP1);
 	prefetch_done();
 
 01006b00     fffffff8     0 mov.l    abs16    r32l     h
 	prefetch_start
-	TMP2 = int16_t(IR[2]);
-	TMP1 = read16(TMP2) << 16;
-	TMP1 |= read16(TMP2+2);
-	set_nzv32(TMP1);
-	r32_w(IR[1], TMP1);
+	m_TMP2 = int16_t(m_IR[2]);
+	m_TMP1 = read16(m_TMP2) << 16;
+	m_TMP1 |= read16(m_TMP2+2);
+	set_nzv32(m_TMP1);
+	r32_w(m_IR[1], m_TMP1);
 	prefetch_done();
 
 01006b20     fffffff8     0 mov.l    abs32    r32l     h
 	prefetch_start
-	TMP2 = (IR[2] << 16) | IR[3];
-	TMP1 = read16(TMP2) << 16;
-	TMP1 |= read16(TMP2+2);
-	set_nzv32(TMP1);
-	r32_w(IR[1], TMP1);
+	m_TMP2 = (m_IR[2] << 16) | m_IR[3];
+	m_TMP1 = read16(m_TMP2) << 16;
+	m_TMP1 |= read16(m_TMP2+2);
+	set_nzv32(m_TMP1);
+	r32_w(m_IR[1], m_TMP1);
 	prefetch_done();
 
 01006b80     fffffff8     0 mov.l    r32l     abs16    h
 	prefetch_start
-	TMP1 = r32_r(IR[1]);
-	TMP2 = int16_t(IR[2]);
-	set_nzv32(TMP1);
-	write16(TMP2, TMP1 >> 16);
-	write16(TMP2+2, TMP1);
+	m_TMP1 = r32_r(m_IR[1]);
+	m_TMP2 = int16_t(m_IR[2]);
+	set_nzv32(m_TMP1);
+	write16(m_TMP2, m_TMP1 >> 16);
+	write16(m_TMP2+2, m_TMP1);
 	prefetch_done();
 
 01006ba0     fffffff8     0 mov.l    r32l     abs32    h
 	prefetch_start
-	TMP1 = r32_r(IR[1]);
-	TMP2 = (IR[2] << 16) | IR[3];
-	set_nzv32(TMP1);
-	write16(TMP2, TMP1 >> 16);
-	write16(TMP2+2, TMP1);
+	m_TMP1 = r32_r(m_IR[1]);
+	m_TMP2 = (m_IR[2] << 16) | m_IR[3];
+	set_nzv32(m_TMP1);
+	write16(m_TMP2, m_TMP1 >> 16);
+	write16(m_TMP2+2, m_TMP1);
 	prefetch_done();
 
 01006d00     ffffff88     0 mov.l    r32ph    r32l     h
 	prefetch_start
 	internal(1);
-	TMP2 = r32_r(IR[1] >> 4);
-	TMP1 = read16(TMP2) << 16;
-	TMP1 |= read16(TMP2+2);
-	TMP2 += 4;
-	r32_w(IR[1] >> 4, TMP2);
-	set_nzv32(TMP1);
-	r32_w(IR[1], TMP1);
+	m_TMP2 = r32_r(m_IR[1] >> 4);
+	m_TMP1 = read16(m_TMP2) << 16;
+	m_TMP1 |= read16(m_TMP2+2);
+	m_TMP2 += 4;
+	r32_w(m_IR[1] >> 4, m_TMP2);
+	set_nzv32(m_TMP1);
+	r32_w(m_IR[1], m_TMP1);
 	prefetch_done();
 
 01006d80     ffffff88     0 mov.l    r32l     pr32h    h
 	prefetch_start
 	internal(1);
-	TMP1 = r32_r(IR[1]);
-	TMP2 = r32_r(IR[1] >> 4);
-	TMP2 -= 4;
-	r32_w(IR[1] >> 4, TMP2);
-	write16(TMP2, TMP1 >> 16);
-	write16(TMP2+2, TMP1);
-	set_nzv32(TMP1);
+	m_TMP1 = r32_r(m_IR[1]);
+	m_TMP2 = r32_r(m_IR[1] >> 4);
+	m_TMP2 -= 4;
+	r32_w(m_IR[1] >> 4, m_TMP2);
+	write16(m_TMP2, m_TMP1 >> 16);
+	write16(m_TMP2+2, m_TMP1);
+	set_nzv32(m_TMP1);
 	prefetch_done();
 
 01006f00     ffffff88     0 mov.l    r32d16h  r32l     h
 	prefetch_start
-	TMP1 = r32_r(IR[1] >> 4) + int16_t(IR[2]);
-	TMP2 = read16(TMP1) << 16;
-	TMP2 |= read16(TMP1+2);
-	set_nzv32(TMP2);
-	r32_w(IR[1], TMP2);
+	m_TMP1 = r32_r(m_IR[1] >> 4) + int16_t(m_IR[2]);
+	m_TMP2 = read16(m_TMP1) << 16;
+	m_TMP2 |= read16(m_TMP1+2);
+	set_nzv32(m_TMP2);
+	r32_w(m_IR[1], m_TMP2);
 	prefetch_done();
 
 01006f80     ffffff88     0 mov.l    r32l     r32d16h  h
 	prefetch_start
-	TMP1 = r32_r(IR[1] >> 4) + int16_t(IR[2]);
-	TMP2 = r32_r(IR[1]);
-	set_nzv32(TMP2);
-	write16(TMP1, TMP2 >> 16);
-	write16(TMP1+2, TMP2);
+	m_TMP1 = r32_r(m_IR[1] >> 4) + int16_t(m_IR[2]);
+	m_TMP2 = r32_r(m_IR[1]);
+	set_nzv32(m_TMP2);
+	write16(m_TMP1, m_TMP2 >> 16);
+	write16(m_TMP1+2, m_TMP2);
 	prefetch_done();
 
 010078006b20 ffffff0ffff8 0 mov.l    r32d32hh r32l     h
 	prefetch_start
-	TMP1 = r32_r(IR[1] >> 4) + (IR[3] << 16) + IR[4];
-	TMP2 = read16(TMP1) << 16;
-	TMP2 |= read16(TMP1+2);
-	set_nzv32(TMP2);
-	r32_w(IR[2], TMP2);
+	m_TMP1 = r32_r(m_IR[1] >> 4) + (m_IR[3] << 16) + m_IR[4];
+	m_TMP2 = read16(m_TMP1) << 16;
+	m_TMP2 |= read16(m_TMP1+2);
+	set_nzv32(m_TMP2);
+	r32_w(m_IR[2], m_TMP2);
 	prefetch_done();
 
 010078006ba0 ffffff0ffff8 0 mov.l    r32l     r32d32hh h
 	prefetch_start
-	TMP1 = r32_r(IR[1] >> 4) + (IR[3] << 16) + IR[4];
-	TMP2 = r32_r(IR[2]);
-	set_nzv32(TMP2);
-	write16(TMP1, TMP2 >> 16);
-	write16(TMP1+2, TMP2);
+	m_TMP1 = r32_r(m_IR[1] >> 4) + (m_IR[3] << 16) + m_IR[4];
+	m_TMP2 = r32_r(m_IR[2]);
+	set_nzv32(m_TMP2);
+	write16(m_TMP1, m_TMP2 >> 16);
+	write16(m_TMP1+2, m_TMP2);
 	prefetch_done();
 
 01106d71     fffffff9     0 ldm.l    spp      r32n2l   s20
 	prefetch_start
 	internal(1);
-	TMP1 = r32_r(7);
-	TMP2 = read16(TMP1) << 16;
-	TMP2 |= read16(TMP1+2);
-	r32_w(IR[1], TMP2);
-	if((IR[1] & 7) == 7)
-		TMP1 = TMP2;
-	TMP1 += 4;
-	r32_w(7, TMP1);
-	TMP2 = read16(TMP1) << 16;
-	TMP2 |= read16(TMP1+2);
-	r32_w(IR[1]-1, TMP2);
-	TMP1 += 4;
-	r32_w(7, TMP1);
+	m_TMP1 = r32_r(7);
+	m_TMP2 = read16(m_TMP1) << 16;
+	m_TMP2 |= read16(m_TMP1+2);
+	r32_w(m_IR[1], m_TMP2);
+	if((m_IR[1] & 7) == 7)
+		m_TMP1 = m_TMP2;
+	m_TMP1 += 4;
+	r32_w(7, m_TMP1);
+	m_TMP2 = read16(m_TMP1) << 16;
+	m_TMP2 |= read16(m_TMP1+2);
+	r32_w(m_IR[1]-1, m_TMP2);
+	m_TMP1 += 4;
+	r32_w(7, m_TMP1);
 	prefetch_done();
 
 01106df0     fffffff9     0 stm.l    r32n2l   psp      s20
 	prefetch_start
 	internal(1);
-	TMP1 = r32_r(7);
-	TMP1 -= 4;
-	r32_w(7, TMP1);
-	TMP2 = r32_r(IR[1]);
-	write16(TMP1, TMP2 >> 16);
-	write16(TMP1+2, TMP2);
-	TMP1 -= 4;
-	r32_w(7, TMP1);
-	TMP2 = r32_r(IR[1]+1);
-	write16(TMP1, TMP2 >> 16);
-	write16(TMP1+2, TMP2);
+	m_TMP1 = r32_r(7);
+	m_TMP1 -= 4;
+	r32_w(7, m_TMP1);
+	m_TMP2 = r32_r(m_IR[1]);
+	write16(m_TMP1, m_TMP2 >> 16);
+	write16(m_TMP1+2, m_TMP2);
+	m_TMP1 -= 4;
+	r32_w(7, m_TMP1);
+	m_TMP2 = r32_r(m_IR[1]+1);
+	write16(m_TMP1, m_TMP2 >> 16);
+	write16(m_TMP1+2, m_TMP2);
 	prefetch_done();
 
 01206d72     fffffffb     0 ldm.l    spp      r32n3l   s20
 	prefetch_start
 	internal(1);
-	TMP1 = r32_r(7);
-	TMP2 = read16(TMP1) << 16;
-	TMP2 |= read16(TMP1+2);
-	r32_w(IR[1], TMP2);
-	TMP1 += 4;
-	r32_w(7, TMP1);
-	TMP2 = read16(TMP1) << 16;
-	TMP2 |= read16(TMP1+2);
-	r32_w(IR[1]-1, TMP2);
-	TMP1 += 4;
-	r32_w(7, TMP1);
-	TMP2 = read16(TMP1) << 16;
-	TMP2 |= read16(TMP1+2);
-	r32_w(IR[1]-2, TMP2);
-	TMP1 += 4;
-	r32_w(7, TMP1);
+	m_TMP1 = r32_r(7);
+	m_TMP2 = read16(m_TMP1) << 16;
+	m_TMP2 |= read16(m_TMP1+2);
+	r32_w(m_IR[1], m_TMP2);
+	m_TMP1 += 4;
+	r32_w(7, m_TMP1);
+	m_TMP2 = read16(m_TMP1) << 16;
+	m_TMP2 |= read16(m_TMP1+2);
+	r32_w(m_IR[1]-1, m_TMP2);
+	m_TMP1 += 4;
+	r32_w(7, m_TMP1);
+	m_TMP2 = read16(m_TMP1) << 16;
+	m_TMP2 |= read16(m_TMP1+2);
+	r32_w(m_IR[1]-2, m_TMP2);
+	m_TMP1 += 4;
+	r32_w(7, m_TMP1);
 	prefetch_done();
 
 01206df0     fffffffb     0 stm.l    r32n3l   psp      s20
 	prefetch_start
 	internal(1);
-	TMP1 = r32_r(7);
-	TMP1 -= 4;
-	r32_w(7, TMP1);
-	TMP2 = r32_r(IR[1]);
-	write16(TMP1, TMP2 >> 16);
-	write16(TMP1+2, TMP2);
-	TMP1 -= 4;
-	r32_w(7, TMP1);
-	TMP2 = r32_r(IR[1]+1);
-	write16(TMP1, TMP2 >> 16);
-	write16(TMP1+2, TMP2);
-	TMP1 -= 4;
-	r32_w(7, TMP1);
-	TMP2 = r32_r(IR[1]+2);
-	write16(TMP1, TMP2 >> 16);
-	write16(TMP1+2, TMP2);
+	m_TMP1 = r32_r(7);
+	m_TMP1 -= 4;
+	r32_w(7, m_TMP1);
+	m_TMP2 = r32_r(m_IR[1]);
+	write16(m_TMP1, m_TMP2 >> 16);
+	write16(m_TMP1+2, m_TMP2);
+	m_TMP1 -= 4;
+	r32_w(7, m_TMP1);
+	m_TMP2 = r32_r(m_IR[1]+1);
+	write16(m_TMP1, m_TMP2 >> 16);
+	write16(m_TMP1+2, m_TMP2);
+	m_TMP1 -= 4;
+	r32_w(7, m_TMP1);
+	m_TMP2 = r32_r(m_IR[1]+2);
+	write16(m_TMP1, m_TMP2 >> 16);
+	write16(m_TMP1+2, m_TMP2);
 	prefetch_done();
 
 01306d73     fffffffb     0 ldm.l    spp      r32n4l   s20
 	prefetch_start
 	internal(1);
-	TMP1 = r32_r(7);
-	TMP2 = read16(TMP1) << 16;
-	TMP2 |= read16(TMP1+2);
-	r32_w(IR[1], TMP2);
-	if((IR[1] & 7) == 7)
-		TMP1 = TMP2;
-	TMP1 += 4;
-	r32_w(7, TMP1);
-	TMP2 = read16(TMP1) << 16;
-	TMP2 |= read16(TMP1+2);
-	r32_w(IR[1]-1, TMP2);
-	TMP1 += 4;
-	r32_w(7, TMP1);
-	TMP2 = read16(TMP1) << 16;
-	TMP2 |= read16(TMP1+2);
-	r32_w(IR[1]-2, TMP2);
-	TMP1 += 4;
-	r32_w(7, TMP1);
-	TMP2 = read16(TMP1) << 16;
-	TMP2 |= read16(TMP1+2);
-	r32_w(IR[1]-3, TMP2);
-	TMP1 += 4;
-	r32_w(7, TMP1);
+	m_TMP1 = r32_r(7);
+	m_TMP2 = read16(m_TMP1) << 16;
+	m_TMP2 |= read16(m_TMP1+2);
+	r32_w(m_IR[1], m_TMP2);
+	if((m_IR[1] & 7) == 7)
+		m_TMP1 = m_TMP2;
+	m_TMP1 += 4;
+	r32_w(7, m_TMP1);
+	m_TMP2 = read16(m_TMP1) << 16;
+	m_TMP2 |= read16(m_TMP1+2);
+	r32_w(m_IR[1]-1, m_TMP2);
+	m_TMP1 += 4;
+	r32_w(7, m_TMP1);
+	m_TMP2 = read16(m_TMP1) << 16;
+	m_TMP2 |= read16(m_TMP1+2);
+	r32_w(m_IR[1]-2, m_TMP2);
+	m_TMP1 += 4;
+	r32_w(7, m_TMP1);
+	m_TMP2 = read16(m_TMP1) << 16;
+	m_TMP2 |= read16(m_TMP1+2);
+	r32_w(m_IR[1]-3, m_TMP2);
+	m_TMP1 += 4;
+	r32_w(7, m_TMP1);
 	prefetch_done();
 
 01306df0     fffffffb     0 stm.l    r32n4l   psp      s20
 	prefetch_start
 	internal(1);
-	TMP1 = r32_r(7);
-	TMP1 -= 4;
-	r32_w(7, TMP1);
-	TMP2 = r32_r(IR[1]);
-	write16(TMP1, TMP2 >> 16);
-	write16(TMP1+2, TMP2);
-	TMP1 -= 4;
-	r32_w(7, TMP1);
-	TMP2 = r32_r(IR[1]+1);
-	write16(TMP1, TMP2 >> 16);
-	write16(TMP1+2, TMP2);
-	TMP1 -= 4;
-	r32_w(7, TMP1);
-	TMP2 = r32_r(IR[1]+2);
-	write16(TMP1, TMP2 >> 16);
-	write16(TMP1+2, TMP2);
-	TMP1 -= 4;
-	r32_w(7, TMP1);
-	TMP2 = r32_r(IR[1]+3);
-	write16(TMP1, TMP2 >> 16);
-	write16(TMP1+2, TMP2);
+	m_TMP1 = r32_r(7);
+	m_TMP1 -= 4;
+	r32_w(7, m_TMP1);
+	m_TMP2 = r32_r(m_IR[1]);
+	write16(m_TMP1, m_TMP2 >> 16);
+	write16(m_TMP1+2, m_TMP2);
+	m_TMP1 -= 4;
+	r32_w(7, m_TMP1);
+	m_TMP2 = r32_r(m_IR[1]+1);
+	write16(m_TMP1, m_TMP2 >> 16);
+	write16(m_TMP1+2, m_TMP2);
+	m_TMP1 -= 4;
+	r32_w(7, m_TMP1);
+	m_TMP2 = r32_r(m_IR[1]+2);
+	write16(m_TMP1, m_TMP2 >> 16);
+	write16(m_TMP1+2, m_TMP2);
+	m_TMP1 -= 4;
+	r32_w(7, m_TMP1);
+	m_TMP2 = r32_r(m_IR[1]+3);
+	write16(m_TMP1, m_TMP2 >> 16);
+	write16(m_TMP1+2, m_TMP2);
 	prefetch_done();
 
 01406900     ffffff8f     0 ldc.w    r32ih    ccr      h
 	prefetch_start
-	TMP1 = r32_r(IR[1] >> 4);
-	CCR = read16(TMP1) >> 8;
+	m_TMP1 = r32_r(m_IR[1] >> 4);
+	m_CCR = read16(m_TMP1) >> 8;
 	update_irq_filter();
 	prefetch_done_noirq();
 
 01406980     ffffff8f     0 stc.w    ccr      r32ih    h
 	prefetch_start
-	TMP1 = r32_r(IR[1] >> 4);
-	write16(TMP1, (CCR << 8) | CCR);
+	m_TMP1 = r32_r(m_IR[1] >> 4);
+	write16(m_TMP1, (m_CCR << 8) | m_CCR);
 	prefetch_done();
 
 01406b00     ffffffff     0 ldc.w    abs16    ccr      h
 	prefetch_start
-	TMP1 = int16_t(IR[2]);
-	CCR = read16(TMP1) >> 8;
+	m_TMP1 = int16_t(m_IR[2]);
+	m_CCR = read16(m_TMP1) >> 8;
 	update_irq_filter();
 	prefetch_done_noirq();
 
 01406b20     ffffffff     0 ldc.w    abs32    ccr      h
 	prefetch_start
-	TMP1 = (IR[2] << 16) | IR[3];
-	CCR = read16(TMP1) >> 8;
+	m_TMP1 = (m_IR[2] << 16) | m_IR[3];
+	m_CCR = read16(m_TMP1) >> 8;
 	update_irq_filter();
 	prefetch_done_noirq();
 
 01406b80     ffffffff     0 stc.w    ccr      abs16    h
 	prefetch_start
-	TMP1 = int16_t(IR[2]);
-	write16(TMP1, (CCR << 8) | CCR);
+	m_TMP1 = int16_t(m_IR[2]);
+	write16(m_TMP1, (m_CCR << 8) | m_CCR);
 	prefetch_done();
 
 01406ba0     ffffffff     0 stc.w    ccr      abs32    h
 	prefetch_start
-	TMP1 = (IR[2] << 16) | IR[3];
-	write16(TMP1, (CCR << 8) | CCR);
+	m_TMP1 = (m_IR[2] << 16) | m_IR[3];
+	write16(m_TMP1, (m_CCR << 8) | m_CCR);
 	prefetch_done();
 
 01406d00     ffffff8f     0 ldc.w    r32ph    ccr      h
 	prefetch_start
 	internal(1);
-	TMP1 = r32_r(IR[1] >> 4);
-	r32_w(IR[1] >> 4, TMP1+2);
-	CCR = read16(TMP1) >> 8;
+	m_TMP1 = r32_r(m_IR[1] >> 4);
+	r32_w(m_IR[1] >> 4, m_TMP1+2);
+	m_CCR = read16(m_TMP1) >> 8;
 	update_irq_filter();
 	prefetch_done_noirq();
 
 01406d80     ffffff8f     0 stc.w    ccr      pr32h    h
 	prefetch_start
 	internal(1);
-	TMP1 = r32_r(IR[1] >> 4) - 2;
-	r32_w(IR[1] >> 4, TMP1);
-	write16(TMP1, (CCR << 8) | CCR);
+	m_TMP1 = r32_r(m_IR[1] >> 4) - 2;
+	r32_w(m_IR[1] >> 4, m_TMP1);
+	write16(m_TMP1, (m_CCR << 8) | m_CCR);
 	prefetch_done();
 
 01406f00     ffffff8f     0 ldc.w    r32d16h  ccr      h
 	prefetch_start
-	TMP1 = r32_r(IR[1] >> 4) + int16_t(IR[2]);
-	CCR = read16(TMP1) >> 8;
+	m_TMP1 = r32_r(m_IR[1] >> 4) + int16_t(m_IR[2]);
+	m_CCR = read16(m_TMP1) >> 8;
 	update_irq_filter();
 	prefetch_done_noirq();
 
 01406f80     ffffff8f     0 stc.w    ccr      r32d16h  h
 	prefetch_start
-	TMP1 = r32_r(IR[1] >> 4) + int16_t(IR[2]);
-	write16(TMP1, (CCR << 8) | CCR);
+	m_TMP1 = r32_r(m_IR[1] >> 4) + int16_t(m_IR[2]);
+	write16(m_TMP1, (m_CCR << 8) | m_CCR);
 	prefetch_done();
 
 014078006b20 ffffff8fffff 0 ldc.w    r32d32hh ccr      h
 	prefetch_start
-	TMP1 = r32_r(IR[1] >> 4) + (IR[3] << 16) + IR[4];
-	CCR = read16(TMP1) >> 8;
+	m_TMP1 = r32_r(m_IR[1] >> 4) + (m_IR[3] << 16) + m_IR[4];
+	m_CCR = read16(m_TMP1) >> 8;
 	update_irq_filter();
 	prefetch_done_noirq();
 
 014078806ba0 ffffff8fffff 0 stc.w    ccr      r32d32hh h
 	prefetch_start
-	TMP1 = r32_r(IR[1] >> 4) + (IR[3] << 16) + IR[4];
-	write16(TMP1, (CCR << 8) | CCR);
+	m_TMP1 = r32_r(m_IR[1] >> 4) + (m_IR[3] << 16) + m_IR[4];
+	write16(m_TMP1, (m_CCR << 8) | m_CCR);
 	prefetch_done();
 
 01410400     ffffff00     0 orc      imm8     exr      s20
-	EXR |= IR[1];
+	m_EXR |= m_IR[1];
 	update_irq_filter();
 	prefetch_noirq
 
 01410500     ffffff00     0 xorc     imm8     exr      s20
-	EXR ^= IR[1] & ~EXR_NC;
+	m_EXR ^= m_IR[1] & ~EXR_NC;
 	update_irq_filter();
 	prefetch_noirq
 
 01410600     ffffff00     0 andc     imm8     exr      s20
-	EXR &= IR[1] | EXR_NC;
+	m_EXR &= m_IR[1] | EXR_NC;
 	update_irq_filter();
 	prefetch_noirq
 
 01410700     ffffff00     0 ldc      imm8     exr      s20
-	EXR = IR[1] | EXR_NC;
+	m_EXR = m_IR[1] | EXR_NC;
 	update_irq_filter();
 	prefetch_noirq
 
 01416900     ffffff8f     0 ldc.w    r32ih    exr      s20
 	prefetch_start
-	TMP1 = r32_r(IR[1] >> 4);
-	EXR = (read16(TMP1) >> 8) | EXR_NC;
+	m_TMP1 = r32_r(m_IR[1] >> 4);
+	m_EXR = (read16(m_TMP1) >> 8) | EXR_NC;
 	update_irq_filter();
 	prefetch_done_noirq();
 
 01416980     ffffff8f     0 stc.w    exr      r32ih    s20
 	prefetch_start
-	TMP1 = r32_r(IR[1] >> 4);
-	write16(TMP1, (EXR << 8) | EXR);
+	m_TMP1 = r32_r(m_IR[1] >> 4);
+	write16(m_TMP1, (m_EXR << 8) | m_EXR);
 	prefetch_done();
 
 01416b00     ffffffff     0 ldc.w    abs16    exr      s20
 	prefetch_start
-	TMP1 = int16_t(IR[2]);
-	EXR = (read16(TMP1) >> 8) | EXR_NC;
+	m_TMP1 = int16_t(m_IR[2]);
+	m_EXR = (read16(m_TMP1) >> 8) | EXR_NC;
 	update_irq_filter();
 	prefetch_done_noirq();
 
 01416b20     ffffffff     0 ldc.w    abs32    exr      s20
 	prefetch_start
-	TMP1 = (IR[2] << 16) | IR[3];
-	EXR = (read16(TMP1) >> 8) | EXR_NC;
+	m_TMP1 = (m_IR[2] << 16) | m_IR[3];
+	m_EXR = (read16(m_TMP1) >> 8) | EXR_NC;
 	update_irq_filter();
 	prefetch_done_noirq();
 
 01416b80     ffffffff     0 stc.w    exr      abs16    s20
 	prefetch_start
-	TMP1 = int16_t(IR[2]);
-	write16(TMP1, (EXR << 8) | EXR);
+	m_TMP1 = int16_t(m_IR[2]);
+	write16(m_TMP1, (m_EXR << 8) | m_EXR);
 	prefetch_done();
 
 01416ba0     ffffffff     0 stc.w    exr      abs32    s20
 	prefetch_start
-	TMP1 = (IR[2] << 16) | IR[3];
-	write16(TMP1, (EXR << 8) | EXR);
+	m_TMP1 = (m_IR[2] << 16) | m_IR[3];
+	write16(m_TMP1, (m_EXR << 8) | m_EXR);
 	prefetch_done();
 
 01416d00     ffffff8f     0 ldc.w    r32ph    exr      s20
 	prefetch_start
 	internal(1);
-	TMP1 = r32_r(IR[1] >> 4);
-	r32_w(IR[1] >> 4, TMP1+2);
-	EXR = (read16(TMP1) >> 8) | EXR_NC;
+	m_TMP1 = r32_r(m_IR[1] >> 4);
+	r32_w(m_IR[1] >> 4, m_TMP1+2);
+	m_EXR = (read16(m_TMP1) >> 8) | EXR_NC;
 	update_irq_filter();
 	prefetch_done_noirq();
 
 01416d80     ffffff8f     0 stc.w    exr      pr32h    s20
 	prefetch_start
 	internal(1);
-	TMP1 = r32_r(IR[1] >> 4) - 2;
-	r32_w(IR[1] >> 4, TMP1);
-	write16(TMP1, (EXR << 8) | EXR);
+	m_TMP1 = r32_r(m_IR[1] >> 4) - 2;
+	r32_w(m_IR[1] >> 4, m_TMP1);
+	write16(m_TMP1, (m_EXR << 8) | m_EXR);
 	prefetch_done();
 
 01416f00     ffffff8f     0 ldc.w    r32d16h  exr      s20
 	prefetch_start
-	TMP1 = r32_r(IR[1] >> 4) + int16_t(IR[2]);
-	EXR = (read16(TMP1) >> 8) | EXR_NC;
+	m_TMP1 = r32_r(m_IR[1] >> 4) + int16_t(m_IR[2]);
+	m_EXR = (read16(m_TMP1) >> 8) | EXR_NC;
 	update_irq_filter();
 	prefetch_done_noirq();
 
 01416f80     ffffff8f     0 stc.w    exr      r32d16h  s20
 	prefetch_start
-	TMP1 = r32_r(IR[1] >> 4) + int16_t(IR[2]);
-	write16(TMP1, (EXR << 8) | EXR);
+	m_TMP1 = r32_r(m_IR[1] >> 4) + int16_t(m_IR[2]);
+	write16(m_TMP1, (m_EXR << 8) | m_EXR);
 	prefetch_done();
 
 014178006b20 ffffff8fffff 0 ldc.w    r32d32hh exr      s20
 	prefetch_start
-	TMP1 = r32_r(IR[1] >> 4) + (IR[3] << 16) + IR[4];
-	EXR = (read16(TMP1) >> 8) | EXR_NC;
+	m_TMP1 = r32_r(m_IR[1] >> 4) + (m_IR[3] << 16) + m_IR[4];
+	m_EXR = (read16(m_TMP1) >> 8) | EXR_NC;
 	update_irq_filter();
 	prefetch_done_noirq();
 
 014178806ba0 ffffff8fffff 0 stc.w    exr      r32d32hh s20
 	prefetch_start
-	TMP1 = r32_r(IR[1] >> 4) + (IR[3] << 16) + IR[4];
-	write16(TMP1, (EXR << 8) | EXR);
+	m_TMP1 = r32_r(m_IR[1] >> 4) + (m_IR[3] << 16) + m_IR[4];
+	write16(m_TMP1, (m_EXR << 8) | m_EXR);
 	prefetch_done();
 
 01606d00     ffffff88     0 mac      r32ph    r32pl    s26
 	prefetch_start
-	TMP1 = read16(r32_r(IR[1]));
-	r32_w(IR[1], r32_r(IR[1]) + 2);
-	TMP2 = read16(r32_r(IR[1] >> 4));
-	r32_w(IR[1] >> 4, r32_r(IR[1] >> 4) + 2);
-	MAC += int16_t(TMP1)*int16_t(TMP2);
-	MACF &= ~(F_Z|F_N);
-	if(MAC)
-		MACF |= F_Z;
-	else if(MAC < 0)
-		MACF |= F_N;
-	if(mac_saturating) {
-		if(MAC < -0x80000000LL) {
-			MAC = -0x80000000LL;
-			MACF |= F_V;
-		} else if(MAC > 0x7fffffffLL) {
-			MAC = 0x7fffffffLL;
-			MACF |= F_V;
+	m_TMP1 = read16(r32_r(m_IR[1]));
+	r32_w(m_IR[1], r32_r(m_IR[1]) + 2);
+	m_TMP2 = read16(r32_r(m_IR[1] >> 4));
+	r32_w(m_IR[1] >> 4, r32_r(m_IR[1] >> 4) + 2);
+	m_MAC += int16_t(m_TMP1)*int16_t(m_TMP2);
+	m_MACF &= ~(F_Z|F_N);
+	if(m_MAC)
+		m_MACF |= F_Z;
+	else if(m_MAC < 0)
+		m_MACF |= F_N;
+	if(m_mac_saturating) {
+		if(m_MAC < -0x80000000LL) {
+			m_MAC = -0x80000000LL;
+			m_MACF |= F_V;
+		} else if(m_MAC > 0x7fffffffLL) {
+			m_MAC = 0x7fffffffLL;
+			m_MACF |= F_V;
 		}
 	} else {
-		if(MAC < -0x20000000000LL) {
-			MAC = -0x20000000000LL;
-			MACF |= F_V;
-		} else if(MAC > 0x1ffffffffffLL) {
-			MAC = 0x1ffffffffffLL;
-			MACF |= F_V;
+		if(m_MAC < -0x20000000000LL) {
+			m_MAC = -0x20000000000LL;
+			m_MACF |= F_V;
+		} else if(m_MAC > 0x1ffffffffffLL) {
+			m_MAC = 0x1ffffffffffLL;
+			m_MACF |= F_V;
 		}
 	}
 	prefetch_done();
 
 0180         ffff         0 sleep    -        -
 	prefetch_start
-	while(!irq_vector) {
+	while(!m_irq_vector) {
 		eat-all-cycles;
 	}
 	prefetch_done();
@@ -744,34 +744,34 @@ macro jsr32 %opc %spreg
 01a0         ffff         0 clrmac   -        -        s26
 	prefetch_start
 	internal(1);
-	MAC = 0;
-	MACF &= ~F_V;
+	m_MAC = 0;
+	m_MACF &= ~F_V;
 	prefetch_done();
 
 01c05000     ffffff00     0 mulxs.b  r8h      r16l     h
 	prefetch_start
-	TMP1 = int8_t(r16_r(IR[1])) * int8_t(r8_r(IR[1] >> 4));
-	set_nz16(TMP1);
-	r16_w(IR[1], TMP1);
-	internal(has_mac ? 2 : 11);
+	m_TMP1 = int8_t(r16_r(m_IR[1])) * int8_t(r8_r(m_IR[1] >> 4));
+	set_nz16(m_TMP1);
+	r16_w(m_IR[1], m_TMP1);
+	internal(m_has_mac ? 2 : 11);
 	prefetch_done();
 
 01c05200     ffffff08     0 mulxs.w  r16h     r32l     h
 	prefetch_start
-	TMP1 = int16_t(r32_r(IR[1])) * int16_t(r16_r(IR[1] >> 4));
-	set_nz32(TMP1);
-	r32_w(IR[1], TMP1);
-	internal(has_mac ? 3 : 19);
+	m_TMP1 = int16_t(r32_r(m_IR[1])) * int16_t(r16_r(m_IR[1] >> 4));
+	set_nz32(m_TMP1);
+	r32_w(m_IR[1], m_TMP1);
+	internal(m_has_mac ? 3 : 19);
 	prefetch_done();
 
 01d05100     ffffff00     0 divxs.b  r8h      r16l     h
 	prefetch_start
 	internal(11);
-	TMP1 = int16_t(r16_r(IR[1]));
-	TMP2 = int8_t(r8_r(IR[1] >> 4));
-	CCR &= ~(F_Z|F_N);
-	if(!TMP2) {
-		CCR |= F_Z;
+	m_TMP1 = int16_t(r16_r(m_IR[1]));
+	m_TMP2 = int8_t(r8_r(m_IR[1] >> 4));
+	m_CCR &= ~(F_Z|F_N);
+	if(!m_TMP2) {
+		m_CCR |= F_Z;
 	} else {
 		// Conditions:
 		//    p = q*d + r
@@ -782,45 +782,45 @@ macro jsr32 %opc %spreg
 		// p = -20, d = +3 -> q = -7, r =  1
 		// p = -20, d = -3 -> q =  7, r = -1
 		int q, r;
-		if(TMP2 < 0) {
-			if(TMP1 < 0) { // - -
-				q = (-TMP1) / (-TMP2);
-				r = (-TMP1) % (-TMP2);
+		if(m_TMP2 < 0) {
+			if(m_TMP1 < 0) { // - -
+				q = (-m_TMP1) / (-m_TMP2);
+				r = (-m_TMP1) % (-m_TMP2);
 				if(r) {
-					r = r + TMP2;
+					r = r + m_TMP2;
 					q++;
 				}
 			} else {       // + -
-				CCR |= F_N;
-				q = -(TMP1 / (-TMP2));
-				r = -(TMP1 % (-TMP2));
+				m_CCR |= F_N;
+				q = -(m_TMP1 / (-m_TMP2));
+				r = -(m_TMP1 % (-m_TMP2));
 			}
 		} else {
-			if(TMP1 < 0) { // - +
-				CCR |= F_N;
-				q = -((-TMP1) / TMP2);
-				r = (-TMP1) % TMP2;
+			if(m_TMP1 < 0) { // - +
+				m_CCR |= F_N;
+				q = -((-m_TMP1) / m_TMP2);
+				r = (-m_TMP1) % m_TMP2;
 				if(r) {
-					r = TMP2 - r;
+					r = m_TMP2 - r;
 					q--;
 				}
 			} else {       // + +
-				q = TMP1 / TMP2;
-				r = TMP1 % TMP2;
+				q = m_TMP1 / m_TMP2;
+				r = m_TMP1 % m_TMP2;
 			}
 		}
-		r16_w(IR[1], (q & 0xff) | ((r & 0xff) << 8));
+		r16_w(m_IR[1], (q & 0xff) | ((r & 0xff) << 8));
 	}
 	prefetch_done();
 
 01d05300     ffffff08     0 divxs.w  r16h     r32l     h
 	prefetch_start
 	internal(19);
-	TMP1 = r32_r(IR[1]);
-	TMP2 = int16_t(r16_r(IR[1] >> 4));
-	CCR &= ~(F_Z|F_N);
-	if(!TMP2) {
-		CCR |= F_Z;
+	m_TMP1 = r32_r(m_IR[1]);
+	m_TMP2 = int16_t(r16_r(m_IR[1] >> 4));
+	m_CCR &= ~(F_Z|F_N);
+	if(!m_TMP2) {
+		m_CCR |= F_Z;
 	} else {
 		// Conditions:
 		//    p = q*d + r
@@ -831,609 +831,609 @@ macro jsr32 %opc %spreg
 		// p = -20, d = +3 -> q = -7, r =  1
 		// p = -20, d = -3 -> q =  7, r = -1
 		int q, r;
-		if(TMP2 < 0) {
-			if(TMP1 < 0) { // - -
-				q = (-TMP1) / (-TMP2);
-				r = (-TMP1) % (-TMP2);
+		if(m_TMP2 < 0) {
+			if(m_TMP1 < 0) { // - -
+				q = (-m_TMP1) / (-m_TMP2);
+				r = (-m_TMP1) % (-m_TMP2);
 				if(r) {
-					r = r + TMP2;
+					r = r + m_TMP2;
 					q++;
 				}
 			} else {       // + -
-				CCR |= F_N;
-				q = -(TMP1 / (-TMP2));
-				r = -(TMP1 % (-TMP2));
+				m_CCR |= F_N;
+				q = -(m_TMP1 / (-m_TMP2));
+				r = -(m_TMP1 % (-m_TMP2));
 			}
 		} else {
-			if(TMP1 < 0) { // - +
-				CCR |= F_N;
-				q = -((-TMP1) / TMP2);
-				r = (-TMP1) % TMP2;
+			if(m_TMP1 < 0) { // - +
+				m_CCR |= F_N;
+				q = -((-m_TMP1) / m_TMP2);
+				r = (-m_TMP1) % m_TMP2;
 				if(r) {
-					r = TMP2 - r;
+					r = m_TMP2 - r;
 					q--;
 				}
 			} else {       // + +
-				q = TMP1 / TMP2;
-				r = TMP1 % TMP2;
+				q = m_TMP1 / m_TMP2;
+				r = m_TMP1 % m_TMP2;
 			}
 		}
-		r32_w(IR[1], (q & 0xffff) | ((r & 0xffff) << 16));
+		r32_w(m_IR[1], (q & 0xffff) | ((r & 0xffff) << 16));
 	}
 	prefetch_done();
 
 01e07b0c     ffffffaf     0 tas      r32ih    -        s20
 	prefetch_start
-	TMP1 = r32_r(IR[1] >> 4);
-	TMP2 = read8(TMP1);
-	set_nzv8(TMP2);
-	write8(TMP1, TMP2 | 0x80);
+	m_TMP1 = r32_r(m_IR[1] >> 4);
+	m_TMP2 = read8(m_TMP1);
+	set_nzv8(m_TMP2);
+	write8(m_TMP1, m_TMP2 | 0x80);
 	prefetch_done();
 
 01f06400     ffffff88     0 or.l     r32h     r32l     h
-	TMP1 = r32_r(IR[1] >> 4) | r32_r(IR[1]);
-	set_nzv32(TMP1);
-	r32_w(IR[1], TMP1);
+	m_TMP1 = r32_r(m_IR[1] >> 4) | r32_r(m_IR[1]);
+	set_nzv32(m_TMP1);
+	r32_w(m_IR[1], m_TMP1);
 	prefetch
 
 01f06500     ffffff88     0 xor.l    r32h     r32l     h
-	TMP1 = r32_r(IR[1] >> 4) ^ r32_r(IR[1]);
-	set_nzv32(TMP1);
-	r32_w(IR[1], TMP1);
+	m_TMP1 = r32_r(m_IR[1] >> 4) ^ r32_r(m_IR[1]);
+	set_nzv32(m_TMP1);
+	r32_w(m_IR[1], m_TMP1);
 	prefetch
 
 01f06600     ffffff88     0 and.l    r32h     r32l     h
-	TMP1 = r32_r(IR[1] >> 4) & r32_r(IR[1]);
-	set_nzv32(TMP1);
-	r32_w(IR[1], TMP1);
+	m_TMP1 = r32_r(m_IR[1] >> 4) & r32_r(m_IR[1]);
+	set_nzv32(m_TMP1);
+	r32_w(m_IR[1], m_TMP1);
 	prefetch
 
 0200         fff0         0 stc      ccr      r8l
-	r8_w(IR[0], CCR);
+	r8_w(m_IR[0], m_CCR);
 	prefetch
 
 0210         fff0         0 stc      exr      r8l      s20
-	r8_w(IR[0], EXR);
+	r8_w(m_IR[0], m_EXR);
 	prefetch
 
 0220         fff8         0 stmac    mach     r32l     s26
-	r32_w(IR[0], MAC >> 32);
-	CCR = (CCR & ~(F_V|F_N|F_Z)) | MACF;
+	r32_w(m_IR[0], m_MAC >> 32);
+	m_CCR = (m_CCR & ~(F_V|F_N|F_Z)) | m_MACF;
 	prefetch
 
 0230         fff8         0 stmac    macl     r32l     s26
-	r32_w(IR[0], MAC);
-	CCR = (CCR & ~(F_V|F_N|F_Z)) | MACF;
+	r32_w(m_IR[0], m_MAC);
+	m_CCR = (m_CCR & ~(F_V|F_N|F_Z)) | m_MACF;
 	prefetch
 
 0300         fff0         0 ldc      r8l      ccr
-	CCR = r8_r(IR[0]);
+	m_CCR = r8_r(m_IR[0]);
 	update_irq_filter();
 	prefetch_noirq
 
 0310         fff0         0 ldc      r8l      exr      s20
-	EXR = r8_r(IR[0]) | EXR_NC;
+	m_EXR = r8_r(m_IR[0]) | EXR_NC;
 	update_irq_filter();
 	prefetch_noirq
 
 0320         fff8         0 ldmac    r32l     mach     s26
 	prefetch_start
 	internal(1);
-	TMP1 = r32_r(IR[0]);
-	if(TMP1 & 0x200)
-		TMP1 |= 0xfffffc00;
+	m_TMP1 = r32_r(m_IR[0]);
+	if(m_TMP1 & 0x200)
+		m_TMP1 |= 0xfffffc00;
 	else
-		TMP1 &= ~0xfffffc00;
-	MAC = (MAC & 0x00000000ffffffffULL) | (uint64_t(TMP1) << 32);
-	MACF &= ~F_V;
+		m_TMP1 &= ~0xfffffc00;
+	m_MAC = (m_MAC & 0x00000000ffffffffULL) | (uint64_t(m_TMP1) << 32);
+	m_MACF &= ~F_V;
 	prefetch_done();
 
 0330         fff8         0 ldmac    r32l     macl     s26
 	prefetch_start
 	internal(1);
-	MAC = (MAC & 0xffffffff00000000ULL) | r32_r(IR[0]);
-	MACF &= ~F_V;
+	m_MAC = (m_MAC & 0xffffffff00000000ULL) | r32_r(m_IR[0]);
+	m_MACF &= ~F_V;
 	prefetch_done();
 
 0400         ff00         0 orc      imm8     ccr
-	CCR |= IR[0];
+	m_CCR |= m_IR[0];
 	update_irq_filter();
 	prefetch_noirq
 
 0500         ff00         0 xorc     imm8     ccr
-	CCR ^= IR[0];
+	m_CCR ^= m_IR[0];
 	update_irq_filter();
 	prefetch_noirq
 
 0600         ff00         0 andc     imm8     ccr
-	CCR &= IR[0];
+	m_CCR &= m_IR[0];
 	update_irq_filter();
 	prefetch_noirq
 
 0700         ff00         0 ldc      imm8     ccr
-	CCR = IR[0];
+	m_CCR = m_IR[0];
 	update_irq_filter();
 	prefetch_noirq
 
 0800         ff00         0 add.b    r8h      r8l
-	r8_w(IR[0], do_add8(r8_r(IR[0]), r8_r(IR[0] >> 4)));
+	r8_w(m_IR[0], do_add8(r8_r(m_IR[0]), r8_r(m_IR[0] >> 4)));
 	prefetch
 
 0900         ff00         0 add.w    r16h     r16l
-	r16_w(IR[0], do_add16(r16_r(IR[0]), r16_r(IR[0] >> 4)));
+	r16_w(m_IR[0], do_add16(r16_r(m_IR[0]), r16_r(m_IR[0] >> 4)));
 	prefetch
 
 0a00         fff0         0 inc.b    one      r8l
-	r8_w(IR[0], do_inc8(r8_r(IR[0]), 1));
+	r8_w(m_IR[0], do_inc8(r8_r(m_IR[0]), 1));
 	prefetch
 
 0a80         ff88         0 add.l    r32h     r32l     h
-	r32_w(IR[0], do_add32(r32_r(IR[0]), r32_r(IR[0] >> 4)));
+	r32_w(m_IR[0], do_add32(r32_r(m_IR[0]), r32_r(m_IR[0] >> 4)));
 	prefetch
 
 0b00         fff8         0 adds.l   one      r16l     o
-	r16_w(IR[0], r16_r(IR[0])+1);
+	r16_w(m_IR[0], r16_r(m_IR[0])+1);
 	prefetch
 
 0b00         fff8         0 adds.l   one      r32l     h
-	r32_w(IR[0], r32_r(IR[0])+1);
+	r32_w(m_IR[0], r32_r(m_IR[0])+1);
 	prefetch
 
 0b50         fff0         0 inc.w    one      r16l     h
-	r16_w(IR[0], do_inc16(r16_r(IR[0]), 1));
+	r16_w(m_IR[0], do_inc16(r16_r(m_IR[0]), 1));
 	prefetch
 
 0b70         fff8         0 inc.l    one      r32l     h
-	r32_w(IR[0], do_inc32(r32_r(IR[0]), 1));
+	r32_w(m_IR[0], do_inc32(r32_r(m_IR[0]), 1));
 	prefetch
 
 0b80         fff8         0 adds.l   two      r16l     o
-	r16_w(IR[0], r16_r(IR[0])+2);
+	r16_w(m_IR[0], r16_r(m_IR[0])+2);
 	prefetch
 
 0b80         fff8         0 adds.l   two      r32l     h
-	r32_w(IR[0], r32_r(IR[0])+2);
+	r32_w(m_IR[0], r32_r(m_IR[0])+2);
 	prefetch
 
 0b90         fff8         0 adds.l   four     r16l     o
-	r16_w(IR[0], r16_r(IR[0])+4);
+	r16_w(m_IR[0], r16_r(m_IR[0])+4);
 	prefetch
 
 0b90         fff8         0 adds.l   four     r32l     h
-	r32_w(IR[0], r32_r(IR[0])+4);
+	r32_w(m_IR[0], r32_r(m_IR[0])+4);
 	prefetch
 
 0bd0         fff0         0 inc.w    two      r16l     h
-	r16_w(IR[0], do_inc16(r16_r(IR[0]), 2));
+	r16_w(m_IR[0], do_inc16(r16_r(m_IR[0]), 2));
 	prefetch
 
 0bf0         fff8         0 inc.l    two      r32l     h
-	r32_w(IR[0], do_inc32(r32_r(IR[0]), 2));
+	r32_w(m_IR[0], do_inc32(r32_r(m_IR[0]), 2));
 	prefetch
 
 0c00         ff00         0 mov.b    r8h      r8l
-	TMP1 = r8_r(IR[0] >> 4);
-	set_nzv8(TMP1);
-	r8_w(IR[0], TMP1);
+	m_TMP1 = r8_r(m_IR[0] >> 4);
+	set_nzv8(m_TMP1);
+	r8_w(m_IR[0], m_TMP1);
 	prefetch
 
 0d00         ff00         0 mov.w    r16h     r16l
-	TMP1 = r16_r(IR[0] >> 4);
-	set_nzv16(TMP1);
-	r16_w(IR[0], TMP1);
+	m_TMP1 = r16_r(m_IR[0] >> 4);
+	set_nzv16(m_TMP1);
+	r16_w(m_IR[0], m_TMP1);
 	prefetch
 
 0e00         ff00         0 addx.b   r8h      r8l
-	r8_w(IR[0], do_addx8(r8_r(IR[0]), r8_r(IR[0] >> 4)));
+	r8_w(m_IR[0], do_addx8(r8_r(m_IR[0]), r8_r(m_IR[0] >> 4)));
 	prefetch
 
 0f00         fff0         0 daa.b    r8l      -
-	TMP1 = r8_r(IR[0]);
-	TMP2 = 0;
-	if(CCR & F_C) {
-		if(has_hc && (CCR & F_H)) {
-			if((TMP1 & 0xf0) <= 0x30 && (TMP1 & 0x0f) <= 3)
-				TMP2 = 0x66;
+	m_TMP1 = r8_r(m_IR[0]);
+	m_TMP2 = 0;
+	if(m_CCR & F_C) {
+		if(m_has_hc && (m_CCR & F_H)) {
+			if((m_TMP1 & 0xf0) <= 0x30 && (m_TMP1 & 0x0f) <= 3)
+				m_TMP2 = 0x66;
 		} else {
-			if((TMP1 & 0xf0) <= 0x20)
-				TMP2 = (TMP1 & 0x0f) <= 9 ? 0x60 : 0x66;
+			if((m_TMP1 & 0xf0) <= 0x20)
+				m_TMP2 = (m_TMP1 & 0x0f) <= 9 ? 0x60 : 0x66;
 		}
 	} else {
-		if(has_hc && (CCR & F_H)) {
-			if((TMP1 & 0x0f) <= 3)
-				TMP2 = (TMP1 & 0xf0) <= 0x90 ? 0x06 : 0x66;
+		if(m_has_hc && (m_CCR & F_H)) {
+			if((m_TMP1 & 0x0f) <= 3)
+				m_TMP2 = (m_TMP1 & 0xf0) <= 0x90 ? 0x06 : 0x66;
 		} else {
-			if((TMP1 & 0x0f) <= 9)
-				TMP2 = (TMP1 & 0xf0) <= 0x90 ? 0x00 : 0x60;
+			if((m_TMP1 & 0x0f) <= 9)
+				m_TMP2 = (m_TMP1 & 0xf0) <= 0x90 ? 0x00 : 0x60;
 			else
-				TMP2 = (TMP1 & 0xf0) <= 0x80 ? 0x06 : 0x66;
+				m_TMP2 = (m_TMP1 & 0xf0) <= 0x80 ? 0x06 : 0x66;
 		}
 	}
-	r8_w(IR[0], do_add8(TMP1, TMP2));
+	r8_w(m_IR[0], do_add8(m_TMP1, m_TMP2));
 	prefetch
 
 0f80         ff88         0 mov.l    r32h     r32l     h
-	TMP1 = r32_r(IR[0] >> 4);
-	set_nzv32(TMP1);
-	r32_w(IR[0], TMP1);
+	m_TMP1 = r32_r(m_IR[0] >> 4);
+	set_nzv32(m_TMP1);
+	r32_w(m_IR[0], m_TMP1);
 	prefetch
 
 1000         fff0         0 shll.b   r8l      -
-	r8_w(IR[0], do_shll8(r8_r(IR[0])));
+	r8_w(m_IR[0], do_shll8(r8_r(m_IR[0])));
 	prefetch
 
 1010         fff0         0 shll.w   r16l     -        h
-	r16_w(IR[0], do_shll16(r16_r(IR[0])));
+	r16_w(m_IR[0], do_shll16(r16_r(m_IR[0])));
 	prefetch
 
 1030         fff8         0 shll.l   r32l     -        h
-	r32_w(IR[0], do_shll32(r32_r(IR[0])));
+	r32_w(m_IR[0], do_shll32(r32_r(m_IR[0])));
 	prefetch
 
 1040         fff0         0 shll.b   two      r8l      s20
-	r8_w(IR[0], do_shll2_8(r8_r(IR[0])));
+	r8_w(m_IR[0], do_shll2_8(r8_r(m_IR[0])));
 	prefetch
 
 1050         fff0         0 shll.w   two      r16l     s20
-	r16_w(IR[0], do_shll2_16(r16_r(IR[0])));
+	r16_w(m_IR[0], do_shll2_16(r16_r(m_IR[0])));
 	prefetch
 
 1070         fff8         0 shll.l   two      r32l     s20
-	r32_w(IR[0], do_shll2_32(r32_r(IR[0])));
+	r32_w(m_IR[0], do_shll2_32(r32_r(m_IR[0])));
 	prefetch
 
 1080         fff0         0 shal.b   r8l      -
-	r8_w(IR[0], do_shal8(r8_r(IR[0])));
+	r8_w(m_IR[0], do_shal8(r8_r(m_IR[0])));
 	prefetch
 
 1090         fff0         0 shal.w   r16l     -        h
-	r16_w(IR[0], do_shal16(r16_r(IR[0])));
+	r16_w(m_IR[0], do_shal16(r16_r(m_IR[0])));
 	prefetch
 
 10b0         fff8         0 shal.l   r32l     -        h
-	r32_w(IR[0], do_shal32(r32_r(IR[0])));
+	r32_w(m_IR[0], do_shal32(r32_r(m_IR[0])));
 	prefetch
 
 10c0         fff0         0 shal.b   two      r8l      s20
-	r8_w(IR[0], do_shal2_8(r8_r(IR[0])));
+	r8_w(m_IR[0], do_shal2_8(r8_r(m_IR[0])));
 	prefetch
 
 10d0         fff0         0 shal.w   two      r16l     s20
-	r16_w(IR[0], do_shal2_16(r16_r(IR[0])));
+	r16_w(m_IR[0], do_shal2_16(r16_r(m_IR[0])));
 	prefetch
 
 10f0         fff8         0 shal.l   two      r32l     s20
-	r32_w(IR[0], do_shal2_32(r32_r(IR[0])));
+	r32_w(m_IR[0], do_shal2_32(r32_r(m_IR[0])));
 	prefetch
 
 1100         fff0         0 shlr.b   r8l      -
-	r8_w(IR[0], do_shlr8(r8_r(IR[0])));
+	r8_w(m_IR[0], do_shlr8(r8_r(m_IR[0])));
 	prefetch
 
 1110         fff0         0 shlr.w   r16l     -        h
-	r16_w(IR[0], do_shlr16(r16_r(IR[0])));
+	r16_w(m_IR[0], do_shlr16(r16_r(m_IR[0])));
 	prefetch
 
 1130         fff8         0 shlr.l   r32l     -        h
-	r32_w(IR[0], do_shlr32(r32_r(IR[0])));
+	r32_w(m_IR[0], do_shlr32(r32_r(m_IR[0])));
 	prefetch
 
 1140         fff0         0 shlr.b   two      r8l      s20
-	r8_w(IR[0], do_shlr2_8(r8_r(IR[0])));
+	r8_w(m_IR[0], do_shlr2_8(r8_r(m_IR[0])));
 	prefetch
 
 1150         fff0         0 shlr.w   two      r16l     s20
-	r16_w(IR[0], do_shlr2_16(r16_r(IR[0])));
+	r16_w(m_IR[0], do_shlr2_16(r16_r(m_IR[0])));
 	prefetch
 
 1170         fff8         0 shlr.l   two      r32l     s20
-	r32_w(IR[0], do_shlr2_32(r32_r(IR[0])));
+	r32_w(m_IR[0], do_shlr2_32(r32_r(m_IR[0])));
 	prefetch
 
 1180         fff0         0 shar.b   r8l      -
-	r8_w(IR[0], do_shar8(r8_r(IR[0])));
+	r8_w(m_IR[0], do_shar8(r8_r(m_IR[0])));
 	prefetch
 
 1190         fff0         0 shar.w   r16l     -        h
-	r16_w(IR[0], do_shar16(r16_r(IR[0])));
+	r16_w(m_IR[0], do_shar16(r16_r(m_IR[0])));
 	prefetch
 
 11b0         fff8         0 shar.l   r32l     -        h
-	r32_w(IR[0], do_shar32(r32_r(IR[0])));
+	r32_w(m_IR[0], do_shar32(r32_r(m_IR[0])));
 	prefetch
 
 11c0         fff0         0 shar.b   two      r8l      s20
-	r8_w(IR[0], do_shar2_8(r8_r(IR[0])));
+	r8_w(m_IR[0], do_shar2_8(r8_r(m_IR[0])));
 	prefetch
 
 11d0         fff0         0 shar.w   two      r16l     s20
-	r16_w(IR[0], do_shar2_16(r16_r(IR[0])));
+	r16_w(m_IR[0], do_shar2_16(r16_r(m_IR[0])));
 	prefetch
 
 11f0         fff8         0 shar.l   two      r32l     s20
-	r32_w(IR[0], do_shar2_32(r32_r(IR[0])));
+	r32_w(m_IR[0], do_shar2_32(r32_r(m_IR[0])));
 	prefetch
 
 1200         fff0         0 rotxl.b  r8l      -
-	r8_w(IR[0], do_rotxl8(r8_r(IR[0])));
+	r8_w(m_IR[0], do_rotxl8(r8_r(m_IR[0])));
 	prefetch
 
 1210         fff0         0 rotxl.w  r16l     -        h
-	r16_w(IR[0], do_rotxl16(r16_r(IR[0])));
+	r16_w(m_IR[0], do_rotxl16(r16_r(m_IR[0])));
 	prefetch
 
 1230         fff8         0 rotxl.l  r32l     -        h
-	r32_w(IR[0], do_rotxl32(r32_r(IR[0])));
+	r32_w(m_IR[0], do_rotxl32(r32_r(m_IR[0])));
 	prefetch
 
 1240         fff0         0 rotxl.b  two      r8l      s20
-	r8_w(IR[0], do_rotxl2_8(r8_r(IR[0])));
+	r8_w(m_IR[0], do_rotxl2_8(r8_r(m_IR[0])));
 	prefetch
 
 1250         fff0         0 rotxl.w  two      r16l     s20
-	r16_w(IR[0], do_rotxl2_16(r16_r(IR[0])));
+	r16_w(m_IR[0], do_rotxl2_16(r16_r(m_IR[0])));
 	prefetch
 
 1270         fff8         0 rotxl.l  two      r32l     s20
-	r32_w(IR[0], do_rotxl2_32(r32_r(IR[0])));
+	r32_w(m_IR[0], do_rotxl2_32(r32_r(m_IR[0])));
 	prefetch
 
 1280         fff0         0 rotl.b   r8l      -
-	r8_w(IR[0], do_rotl8(r8_r(IR[0])));
+	r8_w(m_IR[0], do_rotl8(r8_r(m_IR[0])));
 	prefetch
 
 1290         fff0         0 rotl.w   r16l     -        h
-	r16_w(IR[0], do_rotl16(r16_r(IR[0])));
+	r16_w(m_IR[0], do_rotl16(r16_r(m_IR[0])));
 	prefetch
 
 12b0         fff8         0 rotl.l   r32l     -        h
-	r32_w(IR[0], do_rotl32(r32_r(IR[0])));
+	r32_w(m_IR[0], do_rotl32(r32_r(m_IR[0])));
 	prefetch
 
 12c0         fff0         0 rotl.b   two      r8l      s20
-	r8_w(IR[0], do_rotl2_8(r8_r(IR[0])));
+	r8_w(m_IR[0], do_rotl2_8(r8_r(m_IR[0])));
 	prefetch
 
 12d0         fff0         0 rotl.w   two      r16l     s20
-	r16_w(IR[0], do_rotl2_16(r16_r(IR[0])));
+	r16_w(m_IR[0], do_rotl2_16(r16_r(m_IR[0])));
 	prefetch
 
 12f0         fff8         0 rotl.l   two      r32l     s20
-	r32_w(IR[0], do_rotl2_32(r32_r(IR[0])));
+	r32_w(m_IR[0], do_rotl2_32(r32_r(m_IR[0])));
 	prefetch
 
 1300         fff0         0 rotxr.b  r8l      -
-	r8_w(IR[0], do_rotxr8(r8_r(IR[0])));
+	r8_w(m_IR[0], do_rotxr8(r8_r(m_IR[0])));
 	prefetch
 
 1310         fff0         0 rotxr.w  r16l     -        h
-	r16_w(IR[0], do_rotxr16(r16_r(IR[0])));
+	r16_w(m_IR[0], do_rotxr16(r16_r(m_IR[0])));
 	prefetch
 
 1330         fff8         0 rotxr.l  r32l     -        h
-	r32_w(IR[0], do_rotxr32(r32_r(IR[0])));
+	r32_w(m_IR[0], do_rotxr32(r32_r(m_IR[0])));
 	prefetch
 
 1340         fff0         0 rotxr.b  two      r8l      s20
-	r8_w(IR[0], do_rotxr2_8(r8_r(IR[0])));
+	r8_w(m_IR[0], do_rotxr2_8(r8_r(m_IR[0])));
 	prefetch
 
 1350         fff0         0 rotxr.w  two      r16l     s20
-	r16_w(IR[0], do_rotxr2_16(r16_r(IR[0])));
+	r16_w(m_IR[0], do_rotxr2_16(r16_r(m_IR[0])));
 	prefetch
 
 1370         fff8         0 rotxr.l  two      r32l     s20
-	r32_w(IR[0], do_rotxr2_32(r32_r(IR[0])));
+	r32_w(m_IR[0], do_rotxr2_32(r32_r(m_IR[0])));
 	prefetch
 
 1380         fff0         0 rotr.b   r8l      -
-	r8_w(IR[0], do_rotr8(r8_r(IR[0])));
+	r8_w(m_IR[0], do_rotr8(r8_r(m_IR[0])));
 	prefetch
 
 1390         fff0         0 rotr.w   r16l     -        h
-	r16_w(IR[0], do_rotr16(r16_r(IR[0])));
+	r16_w(m_IR[0], do_rotr16(r16_r(m_IR[0])));
 	prefetch
 
 13b0         fff8         0 rotr.l   r32l     -        h
-	r32_w(IR[0], do_rotr32(r32_r(IR[0])));
+	r32_w(m_IR[0], do_rotr32(r32_r(m_IR[0])));
 	prefetch
 
 13c0         fff0         0 rotr.b   two      r8l      s20
-	r8_w(IR[0], do_rotr2_8(r8_r(IR[0])));
+	r8_w(m_IR[0], do_rotr2_8(r8_r(m_IR[0])));
 	prefetch
 
 13d0         fff0         0 rotr.w   two      r16l     s20
-	r16_w(IR[0], do_rotr2_16(r16_r(IR[0])));
+	r16_w(m_IR[0], do_rotr2_16(r16_r(m_IR[0])));
 	prefetch
 
 13f0         fff8         0 rotr.l   two      r32l     s20
-	r32_w(IR[0], do_rotr2_32(r32_r(IR[0])));
+	r32_w(m_IR[0], do_rotr2_32(r32_r(m_IR[0])));
 	prefetch
 
 1400         ff00         0 or.b     r8h      r8l
-	TMP1 = r8_r(IR[0] >> 4) | r8_r(IR[0]);
-	set_nzv8(TMP1);
-	r8_w(IR[0], TMP1);
+	m_TMP1 = r8_r(m_IR[0] >> 4) | r8_r(m_IR[0]);
+	set_nzv8(m_TMP1);
+	r8_w(m_IR[0], m_TMP1);
 	prefetch
 
 1500         ff00         0 xor.b    r8h      r8l
-	TMP1 = r8_r(IR[0] >> 4) ^ r8_r(IR[0]);
-	set_nzv8(TMP1);
-	r8_w(IR[0], TMP1);
+	m_TMP1 = r8_r(m_IR[0] >> 4) ^ r8_r(m_IR[0]);
+	set_nzv8(m_TMP1);
+	r8_w(m_IR[0], m_TMP1);
 	prefetch
 
 1600         ff00         0 and.b    r8h      r8l
-	TMP1 = r8_r(IR[0] >> 4) & r8_r(IR[0]);
-	set_nzv8(TMP1);
-	r8_w(IR[0], TMP1);
+	m_TMP1 = r8_r(m_IR[0] >> 4) & r8_r(m_IR[0]);
+	set_nzv8(m_TMP1);
+	r8_w(m_IR[0], m_TMP1);
 	prefetch
 
 1700         fff0         0 not.b    r8l      -
-	TMP1 = ~r8_r(IR[0]);
-	set_nzv8(TMP1);
-	r8_w(IR[0], TMP1);
+	m_TMP1 = ~r8_r(m_IR[0]);
+	set_nzv8(m_TMP1);
+	r8_w(m_IR[0], m_TMP1);
 	prefetch
 
 1710         fff0         0 not.w    r16l     -        h
-	TMP1 = ~r16_r(IR[0]);
-	set_nzv16(TMP1);
-	r16_w(IR[0], TMP1);
+	m_TMP1 = ~r16_r(m_IR[0]);
+	set_nzv16(m_TMP1);
+	r16_w(m_IR[0], m_TMP1);
 	prefetch
 
 1730         fff8         0 not.l    r32l     -        h
-	TMP1 = ~r32_r(IR[0]);
-	set_nzv32(TMP1);
-	r32_w(IR[0], TMP1);
+	m_TMP1 = ~r32_r(m_IR[0]);
+	set_nzv32(m_TMP1);
+	r32_w(m_IR[0], m_TMP1);
 	prefetch
 
 1750         fff0         0 extu.w   r16l     -        h
-	CCR &= ~(F_N|F_Z|F_V);
-	TMP1 = uint8_t(r16_r(IR[0]));
-	if(!TMP1)
-		CCR |= F_Z;
-	r16_w(IR[0], TMP1);
+	m_CCR &= ~(F_N|F_Z|F_V);
+	m_TMP1 = uint8_t(r16_r(m_IR[0]));
+	if(!m_TMP1)
+		m_CCR |= F_Z;
+	r16_w(m_IR[0], m_TMP1);
 	prefetch
 
 1770         fff8         0 extu.l   r32l     -        h
-	CCR &= ~(F_N|F_Z|F_V);
-	TMP1 = uint16_t(r32_r(IR[0]));
-	if(!TMP1)
-		CCR |= F_Z;
-	r32_w(IR[0], TMP1);
+	m_CCR &= ~(F_N|F_Z|F_V);
+	m_TMP1 = uint16_t(r32_r(m_IR[0]));
+	if(!m_TMP1)
+		m_CCR |= F_Z;
+	r32_w(m_IR[0], m_TMP1);
 	prefetch
 
 1780         fff0         0 neg.b    r8l      -
-	r8_w(IR[0], do_sub8(0, r8_r(IR[0])));
+	r8_w(m_IR[0], do_sub8(0, r8_r(m_IR[0])));
 	prefetch
 
 1790         fff0         0 neg.w    r16l     -        h
-	r16_w(IR[0], do_sub16(0, r16_r(IR[0])));
+	r16_w(m_IR[0], do_sub16(0, r16_r(m_IR[0])));
 	prefetch
 
 17b0         fff8         0 neg.l    r32l     -        h
-	r32_w(IR[0], do_sub32(0, r32_r(IR[0])));
+	r32_w(m_IR[0], do_sub32(0, r32_r(m_IR[0])));
 	prefetch
 
 17d0         fff0         0 exts.w   r16l     -        h
-	CCR &= ~(F_N|F_Z|F_V);
-	TMP1 = int8_t(r16_r(IR[0]));
-	if(!TMP1)
-		CCR |= F_Z;
-	r16_w(IR[0], TMP1);
+	m_CCR &= ~(F_N|F_Z|F_V);
+	m_TMP1 = int8_t(r16_r(m_IR[0]));
+	if(!m_TMP1)
+		m_CCR |= F_Z;
+	r16_w(m_IR[0], m_TMP1);
 	prefetch
 
 17f0         fff8         0 exts.l   r32l     -        h
-	CCR &= ~(F_N|F_Z|F_V);
-	TMP1 = int16_t(r32_r(IR[0]));
-	if(!TMP1)
-		CCR |= F_Z;
-	r32_w(IR[0], TMP1);
+	m_CCR &= ~(F_N|F_Z|F_V);
+	m_TMP1 = int16_t(r32_r(m_IR[0]));
+	if(!m_TMP1)
+		m_CCR |= F_Z;
+	r32_w(m_IR[0], m_TMP1);
 	prefetch
 
 1800         ff00         0 sub.b    r8h      r8l
-	r8_w(IR[0], do_sub8(r8_r(IR[0]), r8_r(IR[0] >> 4)));
+	r8_w(m_IR[0], do_sub8(r8_r(m_IR[0]), r8_r(m_IR[0] >> 4)));
 	prefetch
 
 1900         ff00         0 sub.w    r16h     r16l
-	r16_w(IR[0], do_sub16(r16_r(IR[0]), r16_r(IR[0] >> 4)));
+	r16_w(m_IR[0], do_sub16(r16_r(m_IR[0]), r16_r(m_IR[0] >> 4)));
 	prefetch
 
 1a00         fff0         0 dec.b    one      r8l
-	r8_w(IR[0], do_dec8(r8_r(IR[0]), 1));
+	r8_w(m_IR[0], do_dec8(r8_r(m_IR[0]), 1));
 	prefetch
 
 1a80         ff88         0 sub.l    r32h     r32l     h
-	r32_w(IR[0], do_sub32(r32_r(IR[0]), r32_r(IR[0] >> 4)));
+	r32_w(m_IR[0], do_sub32(r32_r(m_IR[0]), r32_r(m_IR[0] >> 4)));
 	prefetch
 
 1b00         fff8         0 subs.l   one      r16l     o
-	r16_w(IR[0], r16_r(IR[0])-1);
+	r16_w(m_IR[0], r16_r(m_IR[0])-1);
 	prefetch
 
 1b00         fff8         0 subs.l   one      r32l     h
-	r32_w(IR[0], r32_r(IR[0])-1);
+	r32_w(m_IR[0], r32_r(m_IR[0])-1);
 	prefetch
 
 1b50         fff0         0 dec.w    one      r16l
-	r16_w(IR[0], do_dec16(r16_r(IR[0]), 1));
+	r16_w(m_IR[0], do_dec16(r16_r(m_IR[0]), 1));
 	prefetch
 
 1b70         fff8         0 dec.l    one      r32l     h
-	r32_w(IR[0], do_dec32(r32_r(IR[0]), 1));
+	r32_w(m_IR[0], do_dec32(r32_r(m_IR[0]), 1));
 	prefetch
 
 1b80         fff8         0 subs.l   two      r16l     o
-	r16_w(IR[0], r16_r(IR[0])-2);
+	r16_w(m_IR[0], r16_r(m_IR[0])-2);
 	prefetch
 
 1b80         fff8         0 subs.l   two      r32l     h
-	r32_w(IR[0], r32_r(IR[0])-2);
+	r32_w(m_IR[0], r32_r(m_IR[0])-2);
 	prefetch
 
 1b90         fff8         0 subs.l   four     r16l     o
-	r16_w(IR[0], r16_r(IR[0])-4);
+	r16_w(m_IR[0], r16_r(m_IR[0])-4);
 	prefetch
 
 1b90         fff8         0 subs.l   four     r32l     h
-	r32_w(IR[0], r32_r(IR[0])-4);
+	r32_w(m_IR[0], r32_r(m_IR[0])-4);
 	prefetch
 
 1bd0         fff0         0 dec.w    two      r16l
-	r16_w(IR[0], do_dec16(r16_r(IR[0]), 2));
+	r16_w(m_IR[0], do_dec16(r16_r(m_IR[0]), 2));
 	prefetch
 
 1bf0         fff8         0 dec.l    two      r32l     h
-	r32_w(IR[0], do_dec32(r32_r(IR[0]), 2));
+	r32_w(m_IR[0], do_dec32(r32_r(m_IR[0]), 2));
 	prefetch
 
 1c00         ff00         0 cmp.b    r8h      r8l
-	do_sub8(r8_r(IR[0]), r8_r(IR[0] >> 4));
+	do_sub8(r8_r(m_IR[0]), r8_r(m_IR[0] >> 4));
 	prefetch
 
 1d00         ff00         0 cmp.w    r16h     r16l
-	do_sub16(r16_r(IR[0]), r16_r(IR[0] >> 4));
+	do_sub16(r16_r(m_IR[0]), r16_r(m_IR[0] >> 4));
 	prefetch
 
 1e00         ff00         0 subx.b   r8h      r8l
-	r8_w(IR[0], do_subx8(r8_r(IR[0]), r8_r(IR[0] >> 4)));
+	r8_w(m_IR[0], do_subx8(r8_r(m_IR[0]), r8_r(m_IR[0] >> 4)));
 	prefetch
 
 1f00         fff0         0 das.b    r8l      -
-	TMP1 = r8_r(IR[0]);
-	TMP2 = 0;
-	if(CCR & F_C) {
-		if(has_hc && (CCR & F_H)) {
-			if((TMP1 & 0xf0) >= 0x60 && (TMP1 & 0x0f) >= 6)
-				TMP2 = 0x9a;
+	m_TMP1 = r8_r(m_IR[0]);
+	m_TMP2 = 0;
+	if(m_CCR & F_C) {
+		if(m_has_hc && (m_CCR & F_H)) {
+			if((m_TMP1 & 0xf0) >= 0x60 && (m_TMP1 & 0x0f) >= 6)
+				m_TMP2 = 0x9a;
 		} else {
-			if((TMP1 & 0xf0) >= 0x70 && (TMP1 & 0x0f) <= 9)
-				TMP2 = 0xa0;
+			if((m_TMP1 & 0xf0) >= 0x70 && (m_TMP1 & 0x0f) <= 9)
+				m_TMP2 = 0xa0;
 		}
 	} else {
-		if(has_hc && (CCR & F_H)) {
-			if((TMP1 & 0xf0) <= 0x80 && (TMP1 & 0x0f) >= 6)
-				TMP2 = 0xfa;
+		if(m_has_hc && (m_CCR & F_H)) {
+			if((m_TMP1 & 0xf0) <= 0x80 && (m_TMP1 & 0x0f) >= 6)
+				m_TMP2 = 0xfa;
 		}
 	}
-	r8_w(IR[0], do_add8(TMP1, TMP2));
+	r8_w(m_IR[0], do_add8(m_TMP1, m_TMP2));
 	prefetch
 
 1f80         ff88         0 cmp.l    r32h     r32l     h
-	do_sub32(r32_r(IR[0]), r32_r(IR[0] >> 4));
+	do_sub32(r32_r(m_IR[0]), r32_r(m_IR[0] >> 4));
 	prefetch
 
 2000         f000         0 mov.b    abs8     r8u
 	prefetch_start
-	TMP1 = read8(0xffffff00 | IR[0]);
-	set_nzv8(TMP1);
-	r8_w(IR[0] >> 8, TMP1);
+	m_TMP1 = read8(0xffffff00 | m_IR[0]);
+	set_nzv8(m_TMP1);
+	r8_w(m_IR[0] >> 8, m_TMP1);
 	prefetch_done();
 
 3000         f000         0 mov.b    r8u      abs8
 	prefetch_start
-	TMP1 = r8_r(IR[0] >> 8);
-	set_nzv8(TMP1);
-	write8(0xffffff00 | IR[0], TMP1);
+	m_TMP1 = r8_r(m_IR[0] >> 8);
+	set_nzv8(m_TMP1);
+	write8(0xffffff00 | m_IR[0], m_TMP1);
 	prefetch_done();
 
 4000         ff00         0 bt       rel8     -
@@ -1443,182 +1443,182 @@ macro jsr32 %opc %spreg
 	bxx_8 false
 
 4200         ff00         0 bhi      rel8     -
-	bxx_8 !(CCR & (F_C|F_Z))
+	bxx_8 !(m_CCR & (F_C|F_Z))
 
 4300         ff00         0 bls      rel8     -
-	bxx_8 CCR & (F_C|F_Z)
+	bxx_8 m_CCR & (F_C|F_Z)
 
 4400         ff00         0 bcc      rel8     -
-	bxx_8 !(CCR & F_C)
+	bxx_8 !(m_CCR & F_C)
 
 4500         ff00         0 bcs      rel8     -
-	bxx_8 CCR & F_C
+	bxx_8 m_CCR & F_C
 
 4600         ff00         0 bne      rel8     -
-	bxx_8 !(CCR & F_Z)
+	bxx_8 !(m_CCR & F_Z)
 
 4700         ff00         0 beq      rel8     -
-	bxx_8 CCR & F_Z
+	bxx_8 m_CCR & F_Z
 
 4800         ff00         0 bvc      rel8     -
-	bxx_8 !(CCR & F_V)
+	bxx_8 !(m_CCR & F_V)
 
 4900         ff00         0 bvs      rel8     -
-	bxx_8 CCR & F_V
+	bxx_8 m_CCR & F_V
 
 4a00         ff00         0 bpl      rel8     -
-	bxx_8 !(CCR & F_N)
+	bxx_8 !(m_CCR & F_N)
 
 4b00         ff00         0 bmi      rel8     -
-	bxx_8 CCR & F_N
+	bxx_8 m_CCR & F_N
 
 4c00         ff00         0 bge      rel8     -
-	bxx_8 !((CCR & (F_N|F_V)) == F_N || (CCR & (F_N|F_V)) == F_V)
+	bxx_8 !((m_CCR & (F_N|F_V)) == F_N || (m_CCR & (F_N|F_V)) == F_V)
 
 4d00         ff00         0 blt      rel8     -
-	bxx_8 (CCR & (F_N|F_V)) == F_N || (CCR & (F_N|F_V)) == F_V
+	bxx_8 (m_CCR & (F_N|F_V)) == F_N || (m_CCR & (F_N|F_V)) == F_V
 
 4e00         ff00         0 bgt      rel8     -
-	bxx_8 !((CCR & F_Z) || (CCR & (F_N|F_V)) == F_N || (CCR & (F_N|F_V)) == F_V)
+	bxx_8 !((m_CCR & F_Z) || (m_CCR & (F_N|F_V)) == F_N || (m_CCR & (F_N|F_V)) == F_V)
 
 4f00         ff00         0 ble      rel8     -
-	bxx_8 (CCR & F_Z) || (CCR & (F_N|F_V)) == F_N || (CCR & (F_N|F_V)) == F_V
+	bxx_8 (m_CCR & F_Z) || (m_CCR & (F_N|F_V)) == F_N || (m_CCR & (F_N|F_V)) == F_V
 
 5000         ff00         0 mulxu.b  r8h      r16l
 	prefetch_start
-	r16_w(IR[0], uint8_t(r16_r(IR[0])) * r8_r(IR[0] >> 4));
-	internal(has_mac ? 2 : 11);
+	r16_w(m_IR[0], uint8_t(r16_r(m_IR[0])) * r8_r(m_IR[0] >> 4));
+	internal(m_has_mac ? 2 : 11);
 	prefetch_done();
 
 5100         ff00         0 divxu.b  r8h      r16l
 	prefetch_start
 	internal(11);
-	TMP1 = r16_r(IR[0]);
-	TMP2 = r8_r(IR[0] >> 4);
-	CCR &= ~(F_Z|F_N);
-	if(TMP2 & 0x80)
-		CCR |= F_N;
-	if(!TMP2) {
-		CCR |= F_Z;
+	m_TMP1 = r16_r(m_IR[0]);
+	m_TMP2 = r8_r(m_IR[0] >> 4);
+	m_CCR &= ~(F_Z|F_N);
+	if(m_TMP2 & 0x80)
+		m_CCR |= F_N;
+	if(!m_TMP2) {
+		m_CCR |= F_Z;
 	} else {
-		int q = TMP1 / TMP2;
-		int r = TMP1 % TMP2;
-		r16_w(IR[0], (q & 0xff) | ((r & 0xff) << 8));
+		int q = m_TMP1 / m_TMP2;
+		int r = m_TMP1 % m_TMP2;
+		r16_w(m_IR[0], (q & 0xff) | ((r & 0xff) << 8));
 	}
 	prefetch_done();
 
 5200         ff08         0 mulxu.w  r16h     r32l     h
 	prefetch_start
-	r32_w(IR[0], uint16_t(r32_r(IR[0])) * r16_r(IR[0] >> 4));
-	internal(has_mac ? 3 : 19);
+	r32_w(m_IR[0], uint16_t(r32_r(m_IR[0])) * r16_r(m_IR[0] >> 4));
+	internal(m_has_mac ? 3 : 19);
 	prefetch_done();
 
 5300         ff08         0 divxu.w  r16h     r32l     h
 	prefetch_start
 	internal(11);
-	TMP1 = r32_r(IR[0]);
-	TMP2 = r16_r(IR[0] >> 4);
-	CCR &= ~(F_Z|F_N);
-	if(TMP2 & 0x80)
-		CCR |= F_N;
-	if(!TMP2) {
-		CCR |= F_Z;
+	m_TMP1 = r32_r(m_IR[0]);
+	m_TMP2 = r16_r(m_IR[0] >> 4);
+	m_CCR &= ~(F_Z|F_N);
+	if(m_TMP2 & 0x80)
+		m_CCR |= F_N;
+	if(!m_TMP2) {
+		m_CCR |= F_Z;
 	} else {
-		int q = TMP1 / TMP2;
-		int r = TMP1 % TMP2;
-		r32_w(IR[0], (q & 0xffff) | ((r & 0xffff) << 16));
+		int q = m_TMP1 / m_TMP2;
+		int r = m_TMP1 % m_TMP2;
+		r32_w(m_IR[0], (q & 0xffff) | ((r & 0xffff) << 16));
 	}
 	prefetch_done();
 
 5470         ffff         0 rts      -        -        o
 	fetch
-	TMP1 = r16_r(7);
-	TMP2 = read16(TMP1);
-	r16_w(7, TMP1+2);
+	m_TMP1 = r16_r(7);
+	m_TMP2 = read16(m_TMP1);
+	r16_w(7, m_TMP1+2);
 	internal(1);
-	PC = TMP2;
+	m_PC = m_TMP2;
 	prefetch
 
 5470         ffff         0 rts      -        -        h
 	fetch
-	TMP1 = r32_r(7);
-	if(mode_advanced) {
-		TMP2 = read16(TMP1) << 16;
-		TMP2 |= read16(TMP1+2);
-		r32_w(7, TMP1+4);
+	m_TMP1 = r32_r(7);
+	if(m_mode_advanced) {
+		m_TMP2 = read16(m_TMP1) << 16;
+		m_TMP2 |= read16(m_TMP1+2);
+		r32_w(7, m_TMP1+4);
 	} else {
-		TMP2 = read16(TMP1);
-		r32_w(7, TMP1+2);
+		m_TMP2 = read16(m_TMP1);
+		r32_w(7, m_TMP1+2);
 	}
 	internal(1);
-	PC = TMP2;
+	m_PC = m_TMP2;
 	prefetch
 
 5500         ff00         0 bsr      rel8     -        o
-	TMP2 = PC;
-	PC += int8_t(IR[0]);
-	jsr16 TMP2 TMP1
+	m_TMP2 = m_PC;
+	m_PC += int8_t(m_IR[0]);
+	jsr16 m_TMP2 m_TMP1
 
 5500         ff00         0 bsr      rel8     -        h
-	TMP2 = PC;
-	PC += int8_t(IR[0]);
-	jsr32 TMP2 TMP1
+	m_TMP2 = m_PC;
+	m_PC += int8_t(m_IR[0]);
+	jsr32 m_TMP2 m_TMP1
 
 5670         ffff         0 rte      -        -        o
 	fetch
-	TMP1 = r16_r(7);
-	CCR = read16(TMP1) >> 8;
-	TMP1 = r16_r(7);
-	TMP2 = read16(TMP1+2);
-	r16_w(7, TMP1+4);
+	m_TMP1 = r16_r(7);
+	m_CCR = read16(m_TMP1) >> 8;
+	m_TMP1 = r16_r(7);
+	m_TMP2 = read16(m_TMP1+2);
+	r16_w(7, m_TMP1+4);
 	internal(1);
-	PC = TMP2;
+	m_PC = m_TMP2;
 	update_irq_filter();
 	prefetch_noirq_notrace
 
 5670         ffff         0 rte      -        -        h
 	fetch
-	TMP1 = r32_r(7);
-	if(mode_advanced) {
+	m_TMP1 = r32_r(7);
+	if(m_mode_advanced) {
 		if(exr_in_stack()) {
-			EXR = (read16(TMP1) >> 8) | EXR_NC;
-			TMP1 += 2;
+			m_EXR = (read16(m_TMP1) >> 8) | EXR_NC;
+			m_TMP1 += 2;
 		}
-		TMP2 = read16(TMP1);
-		CCR = TMP2 >> 8;
-		TMP2 = (TMP2 & 0xff) << 16;
-		TMP2 |= read16(TMP1+2);
-		r32_w(7, TMP1+4);
+		m_TMP2 = read16(m_TMP1);
+		m_CCR = m_TMP2 >> 8;
+		m_TMP2 = (m_TMP2 & 0xff) << 16;
+		m_TMP2 |= read16(m_TMP1+2);
+		r32_w(7, m_TMP1+4);
 	} else {
-		TMP2 = read16(TMP1);
-		r32_w(7, TMP1+2);
+		m_TMP2 = read16(m_TMP1);
+		r32_w(7, m_TMP1+2);
 	}
 	internal(1);
-	PC = TMP2;
+	m_PC = m_TMP2;
 	update_irq_filter();
 	prefetch_noirq_notrace
 
 5700         ffcf         0 trapa    imm2     -        h
 	internal(1);
-	TMP1 = r32_r(7) - 2;
-	r32_w(7, TMP1);
-	write16(TMP1, NPC);
-	TMP1 = r32_r(7) - 2;
-	r32_w(7, TMP1);
-	write16(TMP1, (CCR << 8) | ((NPC >> 16) & 0xff));
+	m_TMP1 = r32_r(7) - 2;
+	r32_w(7, m_TMP1);
+	write16(m_TMP1, m_NPC);
+	m_TMP1 = r32_r(7) - 2;
+	r32_w(7, m_TMP1);
+	write16(m_TMP1, (m_CCR << 8) | ((m_NPC >> 16) & 0xff));
 	if(exr_in_stack()) {
-		TMP1 = r32_r(7) - 2;
-		r32_w(7, TMP1);
-		write16(TMP1, EXR << 8);
+		m_TMP1 = r32_r(7) - 2;
+		r32_w(7, m_TMP1);
+		write16(m_TMP1, m_EXR << 8);
 	}
-	taken_irq_vector = trapa_setup() + ((IR[0] >> 4) & 3);
-	debugger_exception_hook(taken_irq_vector);
-	if(mode_advanced) {
-		IR[0] = read16i(4*taken_irq_vector);
-		IR[1] = read16i(4*taken_irq_vector+2);
-		PC = (IR[0] << 16) | IR[1];
+	m_taken_irq_vector = trapa_setup() + ((m_IR[0] >> 4) & 3);
+	debugger_exception_hook(m_taken_irq_vector);
+	if(m_mode_advanced) {
+		m_IR[0] = read16i(4*m_taken_irq_vector);
+		m_IR[1] = read16i(4*m_taken_irq_vector+2);
+		m_PC = (m_IR[0] << 16) | m_IR[1];
 	} else {
-		PC = read16i(2*taken_irq_vector);
+		m_PC = read16i(2*m_taken_irq_vector);
 	}
 	internal(1);
 	update_irq_filter();
@@ -1631,868 +1631,868 @@ macro jsr32 %opc %spreg
 	bxx_16 false
 
 5820         ffff         0 bhi      rel16    -        h
-	bxx_16 !(CCR & (F_C|F_Z))
+	bxx_16 !(m_CCR & (F_C|F_Z))
 
 5830         ffff         0 bls      rel16    -        h
-	bxx_16 CCR & (F_C|F_Z)
+	bxx_16 m_CCR & (F_C|F_Z)
 
 5840         ffff         0 bcc      rel16    -        h
-	bxx_16 !(CCR & F_C)
+	bxx_16 !(m_CCR & F_C)
 
 5850         ffff         0 bcs      rel16    -        h
-	bxx_16 CCR & F_C
+	bxx_16 m_CCR & F_C
 
 5860         ffff         0 bne      rel16    -        h
-	bxx_16 !(CCR & F_Z)
+	bxx_16 !(m_CCR & F_Z)
 
 5870         ffff         0 beq      rel16    -        h
-	bxx_16 CCR & F_Z
+	bxx_16 m_CCR & F_Z
 
 5880         ffff         0 bvc      rel16    -        h
-	bxx_16 !(CCR & F_V)
+	bxx_16 !(m_CCR & F_V)
 
 5890         ffff         0 bvs      rel16    -        h
-	bxx_16 CCR & F_V
+	bxx_16 m_CCR & F_V
 
 58a0         ffff         0 bpl      rel16    -        h
-	bxx_16 !(CCR & F_N)
+	bxx_16 !(m_CCR & F_N)
 
 58b0         ffff         0 bmi      rel16    -        h
-	bxx_16 CCR & F_N
+	bxx_16 m_CCR & F_N
 
 58c0         ffff         0 bge      rel16    -        h
-	bxx_16 !((CCR & (F_N|F_V)) == F_N || (CCR & (F_N|F_V)) == F_V)
+	bxx_16 !((m_CCR & (F_N|F_V)) == F_N || (m_CCR & (F_N|F_V)) == F_V)
 
 58d0         ffff         0 blt      rel16    -        h
-	bxx_16 (CCR & (F_N|F_V)) == F_N || (CCR & (F_N|F_V)) == F_V
+	bxx_16 (m_CCR & (F_N|F_V)) == F_N || (m_CCR & (F_N|F_V)) == F_V
 
 58e0         ffff         0 bgt      rel16    -        h
-	bxx_16 !((CCR & F_Z) || (CCR & (F_N|F_V)) == F_N || (CCR & (F_N|F_V)) == F_V)
+	bxx_16 !((m_CCR & F_Z) || (m_CCR & (F_N|F_V)) == F_N || (m_CCR & (F_N|F_V)) == F_V)
 
 58f0         ffff         0 ble      rel16    -        h
-	bxx_16 (CCR & F_Z) || (CCR & (F_N|F_V)) == F_N || (CCR & (F_N|F_V)) == F_V
+	bxx_16 (m_CCR & F_Z) || (m_CCR & (F_N|F_V)) == F_N || (m_CCR & (F_N|F_V)) == F_V
 
 5900         ff8f         0 jmp      r16h     -        o
 	fetch
-	PC = r16_r(IR[0] >> 4);
+	m_PC = r16_r(m_IR[0] >> 4);
 	prefetch
 
 5900         ff8f         0 jmp      r32h     -        h
 	fetch
-	PC = r32_r(IR[0] >> 4);
+	m_PC = r32_r(m_IR[0] >> 4);
 	prefetch
 
 5a00         ffff         0 jmp      abs16e   -        o
 	internal(1);
-	PC = IR[1];
+	m_PC = m_IR[1];
 	prefetch
 
 5a00         ff00         0 jmp      abs24e   -        h
 	internal(1);
-	PC = ((IR[0] & 0xff) << 16) | IR[1];
+	m_PC = ((m_IR[0] & 0xff) << 16) | m_IR[1];
 	prefetch
 
 5b00         ff00         0 jmp      abs8i    -        o
 	fetch
-	PC = read16(IR[0] & 0xff);
+	m_PC = read16(m_IR[0] & 0xff);
 	internal(1);
 	prefetch
 
 5b00         ff00         0 jmp      abs8i    -        h
 	fetch
-	if(mode_advanced) {
-		TMP1 = read16(IR[0] & 0xff) << 16;
-		TMP1 |= read16((IR[0] & 0xff) + 2);
-		PC = TMP1;
+	if(m_mode_advanced) {
+		m_TMP1 = read16(m_IR[0] & 0xff) << 16;
+		m_TMP1 |= read16((m_IR[0] & 0xff) + 2);
+		m_PC = m_TMP1;
 	} else {
-		PC = read16(IR[0] & 0xff);
+		m_PC = read16(m_IR[0] & 0xff);
 	}
 	internal(1);
 	prefetch
 
 5c00         ffff         0 bsr      rel16    -        h
 	internal(1);
-	TMP2 = PC;
-	PC += int16_t(IR[1]);
-	jsr32 TMP2 TMP1
+	m_TMP2 = m_PC;
+	m_PC += int16_t(m_IR[1]);
+	jsr32 m_TMP2 m_TMP1
 
 5d00         ff8f         0 jsr      r16h     -        o
-	TMP2 = PC;
-	PC = r16_r(IR[0] >> 4);
-	jsr16 TMP2 TMP1
+	m_TMP2 = m_PC;
+	m_PC = r16_r(m_IR[0] >> 4);
+	jsr16 m_TMP2 m_TMP1
 
 5d00         ff8f         0 jsr      r32h     -        h
-	TMP2 = PC;
-	PC = r32_r(IR[0] >> 4);
-	jsr32 TMP2 TMP1
+	m_TMP2 = m_PC;
+	m_PC = r32_r(m_IR[0] >> 4);
+	jsr32 m_TMP2 m_TMP1
 
 5e00         ffff         0 jsr      abs16e   -        o
 	internal(1);
-	TMP2 = PC;
-	PC = IR[1];
-	jsr16 TMP2 TMP1
+	m_TMP2 = m_PC;
+	m_PC = m_IR[1];
+	jsr16 m_TMP2 m_TMP1
 
 5e00         ff00         0 jsr      abs24e   -        h
 	internal(1);
-	TMP2 = PC;
-	PC = ((IR[0] & 0xff) << 16) | IR[1];
-	jsr32 TMP2 TMP1
+	m_TMP2 = m_PC;
+	m_PC = ((m_IR[0] & 0xff) << 16) | m_IR[1];
+	jsr32 m_TMP2 m_TMP1
 
 5f00         ff00         0 jsr      abs8i    -        o
 	fetch
-	TMP2 = PC;
-	PC = read16(IR[0] & 0xff);
-	jsr16 TMP2 TMP1
+	m_TMP2 = m_PC;
+	m_PC = read16(m_IR[0] & 0xff);
+	jsr16 m_TMP2 m_TMP1
 
 5f00         ff00         0 jsr      abs8i    -        h
 	fetch
-	TMP2 = PC;
-	if(mode_advanced) {
-		TMP1 = read16(IR[0] & 0xff) << 16;
-		TMP1 |= read16((IR[0] & 0xff) + 2);
-		PC = TMP1;
+	m_TMP2 = m_PC;
+	if(m_mode_advanced) {
+		m_TMP1 = read16(m_IR[0] & 0xff) << 16;
+		m_TMP1 |= read16((m_IR[0] & 0xff) + 2);
+		m_PC = m_TMP1;
 	} else {
-		PC = read16(IR[0] & 0xff);
+		m_PC = read16(m_IR[0] & 0xff);
 	}
-	jsr32 TMP2 TMP1
+	jsr32 m_TMP2 m_TMP1
 
 6000         ff00         0 bset     r8h      r8l
-	TMP1 = r8_r(IR[0]);
-	bset r8_r(IR[0] >> 4)
-	r8_w(IR[0], TMP1);
+	m_TMP1 = r8_r(m_IR[0]);
+	bset r8_r(m_IR[0] >> 4)
+	r8_w(m_IR[0], m_TMP1);
 	prefetch
 
 6100         ff00         0 bnot     r8h      r8l
-	TMP1 = r8_r(IR[0]);
-	bnot r8_r(IR[0] >> 4)
-	r8_w(IR[0], TMP1);
+	m_TMP1 = r8_r(m_IR[0]);
+	bnot r8_r(m_IR[0] >> 4)
+	r8_w(m_IR[0], m_TMP1);
 	prefetch
 
 6200         ff00         0 bclr     r8h      r8l
-	TMP1 = r8_r(IR[0]);
-	bclr r8_r(IR[0] >> 4)
-	r8_w(IR[0], TMP1);
+	m_TMP1 = r8_r(m_IR[0]);
+	bclr r8_r(m_IR[0] >> 4)
+	r8_w(m_IR[0], m_TMP1);
 	prefetch
 
 6300         ff00         0 btst     r8h      r8l
-	TMP1 = r8_r(IR[0]);
-	btst r8_r(IR[0] >> 4)
+	m_TMP1 = r8_r(m_IR[0]);
+	btst r8_r(m_IR[0] >> 4)
 	prefetch
 
 6400         ff00         0 or.w     r16h     r16l     h
-	TMP1 = r16_r(IR[0] >> 4) | r16_r(IR[0]);
-	set_nzv16(TMP1);
-	r16_w(IR[0], TMP1);
+	m_TMP1 = r16_r(m_IR[0] >> 4) | r16_r(m_IR[0]);
+	set_nzv16(m_TMP1);
+	r16_w(m_IR[0], m_TMP1);
 	prefetch
 
 6500         ff00         0 xor.w    r16h     r16l     h
-	TMP1 = r16_r(IR[0] >> 4) ^ r16_r(IR[0]);
-	set_nzv16(TMP1);
-	r16_w(IR[0], TMP1);
+	m_TMP1 = r16_r(m_IR[0] >> 4) ^ r16_r(m_IR[0]);
+	set_nzv16(m_TMP1);
+	r16_w(m_IR[0], m_TMP1);
 	prefetch
 
 6600         ff00         0 and.w    r16h     r16l     h
-	TMP1 = r16_r(IR[0] >> 4) & r16_r(IR[0]);
-	set_nzv16(TMP1);
-	r16_w(IR[0], TMP1);
+	m_TMP1 = r16_r(m_IR[0] >> 4) & r16_r(m_IR[0]);
+	set_nzv16(m_TMP1);
+	r16_w(m_IR[0], m_TMP1);
 	prefetch
 
 6700         ff80         0 bst      imm3     r8l
-	TMP1 = r8_r(IR[0]);
-	bst IR[0] >> 4
-	r8_w(IR[0], TMP1);
+	m_TMP1 = r8_r(m_IR[0]);
+	bst m_IR[0] >> 4
+	r8_w(m_IR[0], m_TMP1);
 	prefetch
 
 6780         ff80         0 bist     imm3     r8l
-	TMP1 = r8_r(IR[0]);
-	bist IR[0] >> 4
-	r8_w(IR[0], TMP1);
+	m_TMP1 = r8_r(m_IR[0]);
+	bist m_IR[0] >> 4
+	r8_w(m_IR[0], m_TMP1);
 	prefetch
 
 6800         ff80         0 mov.b    r16ih    r8l      o
 	prefetch_start
-	TMP1 = read8(r16_r(IR[0] >> 4));
-	set_nzv8(TMP1);
-	r8_w(IR[0], TMP1);
+	m_TMP1 = read8(r16_r(m_IR[0] >> 4));
+	set_nzv8(m_TMP1);
+	r8_w(m_IR[0], m_TMP1);
 	prefetch_done();
 
 6800         ff80         0 mov.b    r32ih    r8l      h
 	prefetch_start
-	TMP1 = read8(r32_r(IR[0] >> 4));
-	set_nzv8(TMP1);
-	r8_w(IR[0], TMP1);
+	m_TMP1 = read8(r32_r(m_IR[0] >> 4));
+	set_nzv8(m_TMP1);
+	r8_w(m_IR[0], m_TMP1);
 	prefetch_done();
 
 6880         ff80         0 mov.b    r8l      r16ih    o
 	prefetch_start
-	TMP1 = r8_r(IR[0]);
-	set_nzv8(TMP1);
-	write8(r16_r((IR[0] >> 4) & 7), TMP1);
+	m_TMP1 = r8_r(m_IR[0]);
+	set_nzv8(m_TMP1);
+	write8(r16_r((m_IR[0] >> 4) & 7), m_TMP1);
 	prefetch_done();
 
 6880         ff80         0 mov.b    r8l      r32ih    h
 	prefetch_start
-	TMP1 = r8_r(IR[0]);
-	set_nzv8(TMP1);
-	write8(r32_r(IR[0] >> 4), TMP1);
+	m_TMP1 = r8_r(m_IR[0]);
+	set_nzv8(m_TMP1);
+	write8(r32_r(m_IR[0] >> 4), m_TMP1);
 	prefetch_done();
 
 6900         ff88         0 mov.w    r16ih    r16l     o
 	prefetch_start
-	TMP1 = read16(r16_r(IR[0] >> 4));
-	set_nzv16(TMP1);
-	r16_w(IR[0], TMP1);
+	m_TMP1 = read16(r16_r(m_IR[0] >> 4));
+	set_nzv16(m_TMP1);
+	r16_w(m_IR[0], m_TMP1);
 	prefetch_done();
 
 6900         ff80         0 mov.w    r32ih    r16l     h
 	prefetch_start
-	TMP1 = read16(r32_r(IR[0] >> 4));
-	set_nzv16(TMP1);
-	r16_w(IR[0], TMP1);
+	m_TMP1 = read16(r32_r(m_IR[0] >> 4));
+	set_nzv16(m_TMP1);
+	r16_w(m_IR[0], m_TMP1);
 	prefetch_done();
 
 6980         ff88         0 mov.w    r16l     r16ih    o
 	prefetch_start
-	TMP1 = r16_r(IR[0]);
-	set_nzv16(TMP1);
-	write16(r16_r((IR[0] >> 4) & 7), TMP1);
+	m_TMP1 = r16_r(m_IR[0]);
+	set_nzv16(m_TMP1);
+	write16(r16_r((m_IR[0] >> 4) & 7), m_TMP1);
 	prefetch_done();
 
 6980         ff80         0 mov.w    r16l     r32ih    h
 	prefetch_start
-	TMP1 = r16_r(IR[0]);
-	set_nzv16(TMP1);
-	write16(r32_r(IR[0] >> 4), TMP1);
+	m_TMP1 = r16_r(m_IR[0]);
+	set_nzv16(m_TMP1);
+	write16(r32_r(m_IR[0] >> 4), m_TMP1);
 	prefetch_done();
 
 6a00         fff0         0 mov.b    abs16    r8l
 	prefetch_start
-	TMP1 = read8(int16_t(IR[1]));
-	set_nzv8(TMP1);
-	r8_w(IR[0], TMP1);
+	m_TMP1 = read8(int16_t(m_IR[1]));
+	set_nzv8(m_TMP1);
+	r8_w(m_IR[0], m_TMP1);
 	prefetch_done();
 
 6a106300     ffffff0f     1 btst     r8h      abs16
-	TMP2 = int16_t(IR[1]);
-	TMP1 = read8(TMP2);
-	btst r8_r(IR[2] >> 4)
+	m_TMP2 = int16_t(m_IR[1]);
+	m_TMP1 = read8(m_TMP2);
+	btst r8_r(m_IR[2] >> 4)
 	prefetch
 
 6a107300     ffffff8f     1 btst     imm3     abs16
-	TMP2 = int16_t(IR[1]);
-	TMP1 = read8(TMP2);
-	btst IR[2] >> 4
+	m_TMP2 = int16_t(m_IR[1]);
+	m_TMP1 = read8(m_TMP2);
+	btst m_IR[2] >> 4
 	prefetch
 
 6a107400     ffffff8f     1 bor      imm3     abs16
-	TMP2 = int16_t(IR[1]);
-	TMP1 = read8(TMP2);
-	bor IR[2] >> 4
+	m_TMP2 = int16_t(m_IR[1]);
+	m_TMP1 = read8(m_TMP2);
+	bor m_IR[2] >> 4
 	prefetch
 
 6a107480     ffffff8f     1 bior     imm3     abs16
-	TMP2 = int16_t(IR[1]);
-	TMP1 = read8(TMP2);
-	bior IR[2] >> 4
+	m_TMP2 = int16_t(m_IR[1]);
+	m_TMP1 = read8(m_TMP2);
+	bior m_IR[2] >> 4
 	prefetch
 
 6a107500     ffffff8f     1 bxor     imm3     abs16
-	TMP2 = int16_t(IR[1]);
-	TMP1 = read8(TMP2);
-	bxor IR[2] >> 4
+	m_TMP2 = int16_t(m_IR[1]);
+	m_TMP1 = read8(m_TMP2);
+	bxor m_IR[2] >> 4
 	prefetch
 
 6a107580     ffffff8f     1 bixor    imm3     abs16
-	TMP2 = int16_t(IR[1]);
-	TMP1 = read8(TMP2);
-	bixor IR[2] >> 4
+	m_TMP2 = int16_t(m_IR[1]);
+	m_TMP1 = read8(m_TMP2);
+	bixor m_IR[2] >> 4
 	prefetch
 
 6a107600     ffffff8f     1 band     imm3     abs16
-	TMP2 = int16_t(IR[1]);
-	TMP1 = read8(TMP2);
-	band IR[2] >> 4
+	m_TMP2 = int16_t(m_IR[1]);
+	m_TMP1 = read8(m_TMP2);
+	band m_IR[2] >> 4
 	prefetch
 
 6a107680     ffffff8f     1 biand    imm3     abs16
-	TMP2 = int16_t(IR[1]);
-	TMP1 = read8(TMP2);
-	biand IR[2] >> 4
+	m_TMP2 = int16_t(m_IR[1]);
+	m_TMP1 = read8(m_TMP2);
+	biand m_IR[2] >> 4
 	prefetch
 
 6a107700     ffffff8f     1 bld      imm3     abs16
-	TMP2 = int16_t(IR[1]);
-	TMP1 = read8(TMP2);
-	bld IR[2] >> 4
+	m_TMP2 = int16_t(m_IR[1]);
+	m_TMP1 = read8(m_TMP2);
+	bld m_IR[2] >> 4
 	prefetch
 
 6a107780     ffffff8f     1 bild     imm3     abs16
-	TMP2 = int16_t(IR[1]);
-	TMP1 = read8(TMP2);
-	bild IR[2] >> 4
+	m_TMP2 = int16_t(m_IR[1]);
+	m_TMP1 = read8(m_TMP2);
+	bild m_IR[2] >> 4
 	prefetch
 
 6a186000     ffffff0f     1 bset     r8h      abs16
-	TMP2 = int16_t(IR[1]);
-	TMP1 = read8(TMP2);
+	m_TMP2 = int16_t(m_IR[1]);
+	m_TMP1 = read8(m_TMP2);
 	prefetch_start
-	bset r8_r(IR[2] >> 4)
-	write8(TMP2, TMP1);
+	bset r8_r(m_IR[2] >> 4)
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 6a186100     ffffff0f     1 bnot     r8h      abs16
-	TMP2 = int16_t(IR[1]);
-	TMP1 = read8(TMP2);
+	m_TMP2 = int16_t(m_IR[1]);
+	m_TMP1 = read8(m_TMP2);
 	prefetch_start
-	bnot r8_r(IR[2] >> 4)
-	write8(TMP2, TMP1);
+	bnot r8_r(m_IR[2] >> 4)
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 6a186200     ffffff0f     1 bclr     r8h      abs16
-	TMP2 = int16_t(IR[1]);
-	TMP1 = read8(TMP2);
+	m_TMP2 = int16_t(m_IR[1]);
+	m_TMP1 = read8(m_TMP2);
 	prefetch_start
-	bclr r8_r(IR[2] >> 4)
-	write8(TMP2, TMP1);
+	bclr r8_r(m_IR[2] >> 4)
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 6a186700     ffffff8f     1 bst      imm3     abs16
-	TMP2 = int16_t(IR[2]);
-	TMP1 = read8(TMP2);
+	m_TMP2 = int16_t(m_IR[2]);
+	m_TMP1 = read8(m_TMP2);
 	prefetch_start
-	bst IR[2] >> 4
-	write8(TMP2, TMP1);
+	bst m_IR[2] >> 4
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 6a186780     ffffff8f     1 bist     imm3     abs16
-	TMP2 = int16_t(IR[1]);
-	TMP1 = read8(TMP2);
+	m_TMP2 = int16_t(m_IR[1]);
+	m_TMP1 = read8(m_TMP2);
 	prefetch_start
-	bist IR[2] >> 4
-	write8(TMP2, TMP1);
+	bist m_IR[2] >> 4
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 6a187000     ffffff8f     1 bset     imm3     abs16
-	TMP2 = int16_t(IR[1]);
-	TMP1 = read8(TMP2);
+	m_TMP2 = int16_t(m_IR[1]);
+	m_TMP1 = read8(m_TMP2);
 	prefetch_start
-	bset IR[2] >> 4
-	write8(TMP2, TMP1);
+	bset m_IR[2] >> 4
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 6a187100     ffffff8f     1 bnot     imm3     abs16
-	TMP2 = int16_t(IR[1]);
-	TMP1 = read8(TMP2);
+	m_TMP2 = int16_t(m_IR[1]);
+	m_TMP1 = read8(m_TMP2);
 	prefetch_start
-	bnot IR[2] >> 4
-	write8(TMP2, TMP1);
+	bnot m_IR[2] >> 4
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 6a187200     ffffff8f     1 bclr     imm3     abs16
-	TMP2 = int16_t(IR[1]);
-	TMP1 = read8(TMP2);
+	m_TMP2 = int16_t(m_IR[1]);
+	m_TMP1 = read8(m_TMP2);
 	prefetch_start
-	bclr IR[2] >> 4
-	write8(TMP2, TMP1);
+	bclr m_IR[2] >> 4
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 6a20         fff0         0 mov.b    abs32    r8l      h
 	prefetch_start
-	TMP1 = read8((IR[1] << 16) | IR[2]);
-	set_nzv8(TMP1);
-	r8_w(IR[0], TMP1);
+	m_TMP1 = read8((m_IR[1] << 16) | m_IR[2]);
+	set_nzv8(m_TMP1);
+	r8_w(m_IR[0], m_TMP1);
 	prefetch_done();
 
 6a306300     ffffff0f     2 btst     r8h      abs32    h
-	TMP2 = (IR[1] << 16) | IR[2];
-	TMP1 = read8(TMP2);
-	btst r8_r(IR[3] >> 4)
+	m_TMP2 = (m_IR[1] << 16) | m_IR[2];
+	m_TMP1 = read8(m_TMP2);
+	btst r8_r(m_IR[3] >> 4)
 	prefetch
 
 6a307300     ffffff8f     2 btst     imm3     abs32    h
-	TMP2 = (IR[1] << 16) | IR[2];
-	TMP1 = read8(TMP2);
-	btst IR[3] >> 4
+	m_TMP2 = (m_IR[1] << 16) | m_IR[2];
+	m_TMP1 = read8(m_TMP2);
+	btst m_IR[3] >> 4
 	prefetch
 
 6a307400     ffffff8f     2 bor      imm3     abs32    h
-	TMP2 = (IR[1] << 16) | IR[2];
-	TMP1 = read8(TMP2);
-	bor IR[3] >> 4
+	m_TMP2 = (m_IR[1] << 16) | m_IR[2];
+	m_TMP1 = read8(m_TMP2);
+	bor m_IR[3] >> 4
 	prefetch
 
 6a307480     ffffff8f     2 bior     imm3     abs32    h
-	TMP2 = (IR[1] << 16) | IR[2];
-	TMP1 = read8(TMP2);
-	bior IR[3] >> 4
+	m_TMP2 = (m_IR[1] << 16) | m_IR[2];
+	m_TMP1 = read8(m_TMP2);
+	bior m_IR[3] >> 4
 	prefetch
 
 6a307500     ffffff8f     2 bxor     imm3     abs32    h
-	TMP2 = (IR[1] << 16) | IR[2];
-	TMP1 = read8(TMP2);
-	bxor IR[3] >> 4
+	m_TMP2 = (m_IR[1] << 16) | m_IR[2];
+	m_TMP1 = read8(m_TMP2);
+	bxor m_IR[3] >> 4
 	prefetch
 
 6a307580     ffffff8f     2 bixor    imm3     abs32    h
-	TMP2 = (IR[1] << 16) | IR[2];
-	TMP1 = read8(TMP2);
-	bixor IR[3] >> 4
+	m_TMP2 = (m_IR[1] << 16) | m_IR[2];
+	m_TMP1 = read8(m_TMP2);
+	bixor m_IR[3] >> 4
 	prefetch
 
 6a307600     ffffff8f     2 band     imm3     abs32    h
-	TMP2 = (IR[1] << 16) | IR[2];
-	TMP1 = read8(TMP2);
-	band IR[3] >> 4
+	m_TMP2 = (m_IR[1] << 16) | m_IR[2];
+	m_TMP1 = read8(m_TMP2);
+	band m_IR[3] >> 4
 	prefetch
 
 6a307680     ffffff8f     2 biand    imm3     abs32    h
-	TMP2 = (IR[1] << 16) | IR[2];
-	TMP1 = read8(TMP2);
-	biand IR[3] >> 4
+	m_TMP2 = (m_IR[1] << 16) | m_IR[2];
+	m_TMP1 = read8(m_TMP2);
+	biand m_IR[3] >> 4
 	prefetch
 
 6a307700     ffffff8f     2 bld      imm3     abs32    h
-	TMP2 = (IR[1] << 16) | IR[2];
-	TMP1 = read8(TMP2);
-	bld IR[3] >> 4
+	m_TMP2 = (m_IR[1] << 16) | m_IR[2];
+	m_TMP1 = read8(m_TMP2);
+	bld m_IR[3] >> 4
 	prefetch
 
 6a307780     ffffff8f     2 bild     imm3     abs32    h
-	TMP2 = (IR[1] << 16) | IR[2];
-	TMP1 = read8(TMP2);
-	bild IR[3] >> 4
+	m_TMP2 = (m_IR[1] << 16) | m_IR[2];
+	m_TMP1 = read8(m_TMP2);
+	bild m_IR[3] >> 4
 	prefetch
 
 6a386000     ffffff0f     2 bset     r8h      abs32    h
-	TMP2 = (IR[1] << 16) | IR[2];
-	TMP1 = read8(TMP2);
+	m_TMP2 = (m_IR[1] << 16) | m_IR[2];
+	m_TMP1 = read8(m_TMP2);
 	prefetch_start
-	bset r8_r(IR[3] >> 4)
-	write8(TMP2, TMP1);
+	bset r8_r(m_IR[3] >> 4)
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 6a386100     ffffff0f     2 bnot     r8h      abs32    h
-	TMP2 = (IR[1] << 16) | IR[2];
-	TMP1 = read8(TMP2);
+	m_TMP2 = (m_IR[1] << 16) | m_IR[2];
+	m_TMP1 = read8(m_TMP2);
 	prefetch_start
-	bnot r8_r(IR[3] >> 4)
-	write8(TMP2, TMP1);
+	bnot r8_r(m_IR[3] >> 4)
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 6a386200     ffffff0f     2 bclr     r8h      abs32    h
-	TMP2 = (IR[1] << 16) | IR[2];
-	TMP1 = read8(TMP2);
+	m_TMP2 = (m_IR[1] << 16) | m_IR[2];
+	m_TMP1 = read8(m_TMP2);
 	prefetch_start
-	bclr r8_r(IR[3] >> 4)
-	write8(TMP2, TMP1);
+	bclr r8_r(m_IR[3] >> 4)
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 6a386700     ffffff8f     2 bst      imm3     abs32    h
-	TMP2 = (IR[1] << 16) | IR[2];
-	TMP1 = read8(TMP2);
+	m_TMP2 = (m_IR[1] << 16) | m_IR[2];
+	m_TMP1 = read8(m_TMP2);
 	prefetch_start
-	bst IR[3] >> 4
-	write8(TMP2, TMP1);
+	bst m_IR[3] >> 4
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 6a386780     ffffff8f     2 bist     imm3     abs32    h
-	TMP2 = (IR[1] << 16) | IR[2];
-	TMP1 = read8(TMP2);
+	m_TMP2 = (m_IR[1] << 16) | m_IR[2];
+	m_TMP1 = read8(m_TMP2);
 	prefetch_start
-	bist IR[3] >> 4
-	write8(TMP2, TMP1);
+	bist m_IR[3] >> 4
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 6a387000     ffffff8f     2 bset     imm3     abs32    h
-	TMP2 = (IR[1] << 16) | IR[2];
-	TMP1 = read8(TMP2);
+	m_TMP2 = (m_IR[1] << 16) | m_IR[2];
+	m_TMP1 = read8(m_TMP2);
 	prefetch_start
-	bset IR[3] >> 4
-	write8(TMP2, TMP1);
+	bset m_IR[3] >> 4
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 6a387100     ffffff8f     2 bnot     imm3     abs32    h
-	TMP2 = (IR[1] << 16) | IR[2];
-	TMP1 = read8(TMP2);
+	m_TMP2 = (m_IR[1] << 16) | m_IR[2];
+	m_TMP1 = read8(m_TMP2);
 	prefetch_start
-	bnot IR[3] >> 4
-	write8(TMP2, TMP1);
+	bnot m_IR[3] >> 4
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 6a387200     ffffff8f     2 bclr     imm3     abs32    h
-	TMP2 = (IR[1] << 16) | IR[2];
-	TMP1 = read8(TMP2);
+	m_TMP2 = (m_IR[1] << 16) | m_IR[2];
+	m_TMP1 = read8(m_TMP2);
 	prefetch_start
-	bclr IR[3] >> 4
-	write8(TMP2, TMP1);
+	bclr m_IR[3] >> 4
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 6a40         fff0         0 movfpe   abs16    r8l
 6a80         fff0         0 mov.b    r8l      abs16
 	prefetch_start
-	TMP1 = r8_r(IR[0]);
-	set_nzv8(TMP1);
-	write8(int16_t(IR[1]), TMP1);
+	m_TMP1 = r8_r(m_IR[0]);
+	set_nzv8(m_TMP1);
+	write8(int16_t(m_IR[1]), m_TMP1);
 	prefetch_done();
 
 6aa0         fff0         0 mov.b    r8l      abs32    h
 	prefetch_start
-	TMP1 = r8_r(IR[0]);
-	set_nzv8(TMP1);
-	write8((IR[1] << 16) | IR[2], TMP1);
+	m_TMP1 = r8_r(m_IR[0]);
+	set_nzv8(m_TMP1);
+	write8((m_IR[1] << 16) | m_IR[2], m_TMP1);
 	prefetch_done();
 
 6ac0         fff0         0 movtpe   r8l      abs16
 6b00         fff0         0 mov.w    abs16    r16l
 	prefetch_start
-	TMP1 = read16(int16_t(IR[1]));
-	set_nzv16(TMP1);
-	r16_w(IR[0], TMP1);
+	m_TMP1 = read16(int16_t(m_IR[1]));
+	set_nzv16(m_TMP1);
+	r16_w(m_IR[0], m_TMP1);
 	prefetch_done();
 
 6b20         fff0         0 mov.w    abs32    r16l     h
 	prefetch_start
-	TMP1 = read16((IR[1] << 16) | IR[2]);
-	set_nzv16(TMP1);
-	r16_w(IR[0], TMP1);
+	m_TMP1 = read16((m_IR[1] << 16) | m_IR[2]);
+	set_nzv16(m_TMP1);
+	r16_w(m_IR[0], m_TMP1);
 	prefetch_done();
 
 6b80         fff0         0 mov.w    r16l     abs16
 	prefetch_start
-	TMP1 = r16_r(IR[0]);
-	set_nzv16(TMP1);
-	write16(int16_t(IR[1]), TMP1);
+	m_TMP1 = r16_r(m_IR[0]);
+	set_nzv16(m_TMP1);
+	write16(int16_t(m_IR[1]), m_TMP1);
 	prefetch_done();
 
 6ba0         fff0         0 mov.w    r16l     abs32    h
 	prefetch_start
-	TMP1 = r16_r(IR[0]);
-	set_nzv16(TMP1);
-	write16((IR[1] << 16) | IR[2], TMP1);
+	m_TMP1 = r16_r(m_IR[0]);
+	set_nzv16(m_TMP1);
+	write16((m_IR[1] << 16) | m_IR[2], m_TMP1);
 	prefetch_done();
 
 6c00         ff80         0 mov.b    r16ph    r8l      o
-	TMP2 = r16_r(IR[0] >> 4);
+	m_TMP2 = r16_r(m_IR[0] >> 4);
 	prefetch_start
 	internal(1);
-	TMP1 = read8(TMP2);
-	TMP2 += 1;
-	r16_w(IR[0] >> 4, TMP2);
-	set_nzv8(TMP1);
-	r8_w(IR[0], TMP1);
+	m_TMP1 = read8(m_TMP2);
+	m_TMP2 += 1;
+	r16_w(m_IR[0] >> 4, m_TMP2);
+	set_nzv8(m_TMP1);
+	r8_w(m_IR[0], m_TMP1);
 	prefetch_done();
 
 6c00         ff80         0 mov.b    r32ph    r8l      h
-	TMP2 = r32_r(IR[0] >> 4);
+	m_TMP2 = r32_r(m_IR[0] >> 4);
 	prefetch_start
 	internal(1);
-	TMP1 = read8(TMP2);
-	TMP2 += 1;
-	r32_w(IR[0] >> 4, TMP2);
-	set_nzv8(TMP1);
-	r8_w(IR[0], TMP1);
+	m_TMP1 = read8(m_TMP2);
+	m_TMP2 += 1;
+	r32_w(m_IR[0] >> 4, m_TMP2);
+	set_nzv8(m_TMP1);
+	r8_w(m_IR[0], m_TMP1);
 	prefetch_done();
 
 6c80         ff80         0 mov.b    r8l      pr16h    o
-	TMP1 = r8_r(IR[0]);
-	TMP2 = r16_r((IR[0] >> 4) & 7);
+	m_TMP1 = r8_r(m_IR[0]);
+	m_TMP2 = r16_r((m_IR[0] >> 4) & 7);
 	prefetch_start
 	internal(1);
-	TMP2 -= 1;
-	r16_w((IR[0] >> 4) & 7, TMP2);
-	set_nzv8(TMP1);
-	write8(TMP2, TMP1);
+	m_TMP2 -= 1;
+	r16_w((m_IR[0] >> 4) & 7, m_TMP2);
+	set_nzv8(m_TMP1);
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 6c80         ff80         0 mov.b    r8l      pr32h    h
-	TMP1 = r8_r(IR[0]);
-	TMP2 = r32_r(IR[0] >> 4);
+	m_TMP1 = r8_r(m_IR[0]);
+	m_TMP2 = r32_r(m_IR[0] >> 4);
 	prefetch_start
 	internal(1);
-	TMP2 -= 1;
-	r32_w(IR[0] >> 4, TMP2);
-	set_nzv8(TMP1);
-	write8(TMP2, TMP1);
+	m_TMP2 -= 1;
+	r32_w(m_IR[0] >> 4, m_TMP2);
+	set_nzv8(m_TMP1);
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 6d00         ff88         0 mov.w    r16ph    r16l     o
-	TMP2 = r16_r(IR[0] >> 4);
+	m_TMP2 = r16_r(m_IR[0] >> 4);
 	prefetch_start
 	internal(1);
-	TMP1 = read16(TMP2);
-	TMP2 += 2;
-	r16_w(IR[0] >> 4, TMP2);
-	set_nzv16(TMP1);
-	r16_w(IR[0], TMP1);
+	m_TMP1 = read16(m_TMP2);
+	m_TMP2 += 2;
+	r16_w(m_IR[0] >> 4, m_TMP2);
+	set_nzv16(m_TMP1);
+	r16_w(m_IR[0], m_TMP1);
 	prefetch_done();
 
 6d00         ff80         0 mov.w    r32ph    r16l     h
-	TMP2 = r32_r(IR[0] >> 4);
+	m_TMP2 = r32_r(m_IR[0] >> 4);
 	prefetch_start
 	internal(1);
-	TMP1 = read16(TMP2);
-	TMP2 += 2;
-	r32_w(IR[0] >> 4, TMP2);
-	set_nzv16(TMP1);
-	r16_w(IR[0], TMP1);
+	m_TMP1 = read16(m_TMP2);
+	m_TMP2 += 2;
+	r32_w(m_IR[0] >> 4, m_TMP2);
+	set_nzv16(m_TMP1);
+	r16_w(m_IR[0], m_TMP1);
 	prefetch_done();
 
 6d80         ff88         0 mov.w    r16l     pr16h    o
-	TMP1 = r16_r(IR[0]);
-	TMP2 = r16_r((IR[0] >> 4) & 7);
+	m_TMP1 = r16_r(m_IR[0]);
+	m_TMP2 = r16_r((m_IR[0] >> 4) & 7);
 	prefetch_start
 	internal(1);
-	TMP2 -= 2;
-	r16_w((IR[0] >> 4) & 7, TMP2);
-	set_nzv16(TMP1);
-	write16(TMP2, TMP1);
+	m_TMP2 -= 2;
+	r16_w((m_IR[0] >> 4) & 7, m_TMP2);
+	set_nzv16(m_TMP1);
+	write16(m_TMP2, m_TMP1);
 	prefetch_done();
 
 6d80         ff80         0 mov.w    r16l     pr32h    h
-	TMP1 = r16_r(IR[0]);
-	TMP2 = r32_r(IR[0] >> 4);
+	m_TMP1 = r16_r(m_IR[0]);
+	m_TMP2 = r32_r(m_IR[0] >> 4);
 	prefetch_start
 	internal(1);
-	TMP2 -= 2;
-	r32_w(IR[0] >> 4, TMP2);
-	set_nzv16(TMP1);
-	write16(TMP2, TMP1);
+	m_TMP2 -= 2;
+	r32_w(m_IR[0] >> 4, m_TMP2);
+	set_nzv16(m_TMP1);
+	write16(m_TMP2, m_TMP1);
 	prefetch_done();
 
 6e00         ff80         0 mov.b    r16d16h  r8l      o
 	prefetch_start
-	TMP1 = uint16_t(r16_r(IR[0] >> 4) + IR[1]);
-	TMP2 = read8(TMP1);
-	set_nzv8(TMP2);
-	r8_w(IR[0], TMP2);
+	m_TMP1 = uint16_t(r16_r(m_IR[0] >> 4) + m_IR[1]);
+	m_TMP2 = read8(m_TMP1);
+	set_nzv8(m_TMP2);
+	r8_w(m_IR[0], m_TMP2);
 	prefetch_done();
 
 6e00         ff80         0 mov.b    r32d16h  r8l      h
 	prefetch_start
-	TMP1 = r32_r(IR[0] >> 4) + int16_t(IR[1]);
-	TMP2 = read8(TMP1);
-	set_nzv8(TMP2);
-	r8_w(IR[0], TMP2);
+	m_TMP1 = r32_r(m_IR[0] >> 4) + int16_t(m_IR[1]);
+	m_TMP2 = read8(m_TMP1);
+	set_nzv8(m_TMP2);
+	r8_w(m_IR[0], m_TMP2);
 	prefetch_done();
 
 6e80         ff80         0 mov.b    r8l      r16d16h  o
 	prefetch_start
-	TMP1 = uint16_t(r16_r((IR[0] >> 4) & 7) + IR[1]);
-	TMP2 = r8_r(IR[0]);
-	set_nzv8(TMP2);
-	write8(TMP1, TMP2);
+	m_TMP1 = uint16_t(r16_r((m_IR[0] >> 4) & 7) + m_IR[1]);
+	m_TMP2 = r8_r(m_IR[0]);
+	set_nzv8(m_TMP2);
+	write8(m_TMP1, m_TMP2);
 	prefetch_done();
 
 6e80         ff80         0 mov.b    r8l      r32d16h  h
 	prefetch_start
-	TMP1 = r32_r(IR[0] >> 4) + int16_t(IR[1]);
-	TMP2 = r8_r(IR[0]);
-	set_nzv8(TMP2);
-	write8(TMP1, TMP2);
+	m_TMP1 = r32_r(m_IR[0] >> 4) + int16_t(m_IR[1]);
+	m_TMP2 = r8_r(m_IR[0]);
+	set_nzv8(m_TMP2);
+	write8(m_TMP1, m_TMP2);
 	prefetch_done();
 
 6f00         ff80         0 mov.w    r16d16h  r16l     o
 	prefetch_start
-	TMP1 = uint16_t(r16_r(IR[0] >> 4) + IR[1]);
-	TMP2 = read16(TMP1);
-	set_nzv16(TMP2);
-	r16_w(IR[0], TMP2);
+	m_TMP1 = uint16_t(r16_r(m_IR[0] >> 4) + m_IR[1]);
+	m_TMP2 = read16(m_TMP1);
+	set_nzv16(m_TMP2);
+	r16_w(m_IR[0], m_TMP2);
 	prefetch_done();
 
 6f00         ff80         0 mov.w    r32d16h  r16l     h
 	prefetch_start
-	TMP1 = r32_r(IR[0] >> 4) + int16_t(IR[1]);
-	TMP2 = read16(TMP1);
-	set_nzv16(TMP2);
-	r16_w(IR[0], TMP2);
+	m_TMP1 = r32_r(m_IR[0] >> 4) + int16_t(m_IR[1]);
+	m_TMP2 = read16(m_TMP1);
+	set_nzv16(m_TMP2);
+	r16_w(m_IR[0], m_TMP2);
 	prefetch_done();
 
 6f80         ff80         0 mov.w    r16l     r16d16h  o
 	prefetch_start
-	TMP1 = uint16_t(r16_r((IR[0] >> 4) & 7) + IR[1]);
-	TMP2 = r16_r(IR[0]);
-	set_nzv16(TMP2);
-	write16(TMP1, TMP2);
+	m_TMP1 = uint16_t(r16_r((m_IR[0] >> 4) & 7) + m_IR[1]);
+	m_TMP2 = r16_r(m_IR[0]);
+	set_nzv16(m_TMP2);
+	write16(m_TMP1, m_TMP2);
 	prefetch_done();
 
 6f80         ff80         0 mov.w    r16l     r32d16h  h
 	prefetch_start
-	TMP1 = r32_r(IR[0] >> 4) + int16_t(IR[1]);
-	TMP2 = r16_r(IR[0]);
-	set_nzv16(TMP2);
-	write16(TMP1, TMP2);
+	m_TMP1 = r32_r(m_IR[0] >> 4) + int16_t(m_IR[1]);
+	m_TMP2 = r16_r(m_IR[0]);
+	set_nzv16(m_TMP2);
+	write16(m_TMP1, m_TMP2);
 	prefetch_done();
 
 7000         ff80         0 bset     imm3     r8l
-	TMP1 = r8_r(IR[0]);
-	bset IR[0] >> 4
-	r8_w(IR[0], TMP1);
+	m_TMP1 = r8_r(m_IR[0]);
+	bset m_IR[0] >> 4
+	r8_w(m_IR[0], m_TMP1);
 	prefetch
 
 7100         ff80         0 bnot     imm3     r8l
-	TMP1 = r8_r(IR[0]);
-	bnot IR[0] >> 4
-	r8_w(IR[0], TMP1);
+	m_TMP1 = r8_r(m_IR[0]);
+	bnot m_IR[0] >> 4
+	r8_w(m_IR[0], m_TMP1);
 	prefetch
 
 7200         ff80         0 bclr     imm3     r8l
-	TMP1 = r8_r(IR[0]);
-	bclr IR[0] >> 4
-	r8_w(IR[0], TMP1);
+	m_TMP1 = r8_r(m_IR[0]);
+	bclr m_IR[0] >> 4
+	r8_w(m_IR[0], m_TMP1);
 	prefetch
 
 7300         ff80         0 btst     imm3     r8l
-	TMP1 = r8_r(IR[0]);
-	btst IR[0] >> 4
+	m_TMP1 = r8_r(m_IR[0]);
+	btst m_IR[0] >> 4
 	prefetch
 
 7400         ff80         0 bor      imm3     r8l
-	TMP1 = r8_r(IR[0]);
-	bor IR[0] >> 4
+	m_TMP1 = r8_r(m_IR[0]);
+	bor m_IR[0] >> 4
 	prefetch
 
 7480         ff80         0 bior     imm3     r8l
-	TMP1 = r8_r(IR[0]);
-	bior IR[0] >> 4
+	m_TMP1 = r8_r(m_IR[0]);
+	bior m_IR[0] >> 4
 	prefetch
 
 7500         ff80         0 bxor     imm3     r8l
-	TMP1 = r8_r(IR[0]);
-	bxor IR[0] >> 4
+	m_TMP1 = r8_r(m_IR[0]);
+	bxor m_IR[0] >> 4
 	prefetch
 
 7580         ff80         0 bixor    imm3     r8l
-	TMP1 = r8_r(IR[0]);
-	bixor IR[0] >> 4
+	m_TMP1 = r8_r(m_IR[0]);
+	bixor m_IR[0] >> 4
 	prefetch
 
 7600         ff80         0 band     imm3     r8l
-	TMP1 = r8_r(IR[0]);
-	band IR[0] >> 4
+	m_TMP1 = r8_r(m_IR[0]);
+	band m_IR[0] >> 4
 	prefetch
 
 7680         ff80         0 biand    imm3     r8l
-	TMP1 = r8_r(IR[0]);
-	biand IR[0] >> 4
+	m_TMP1 = r8_r(m_IR[0]);
+	biand m_IR[0] >> 4
 	prefetch
 
 7700         ff80         0 bld      imm3     r8l
-	TMP1 = r8_r(IR[0]);
-	bld IR[0] >> 4
+	m_TMP1 = r8_r(m_IR[0]);
+	bld m_IR[0] >> 4
 	prefetch
 
 7780         ff80         0 bild     imm3     r8l
-	TMP1 = r8_r(IR[0]);
-	bild IR[0] >> 4
+	m_TMP1 = r8_r(m_IR[0]);
+	bild m_IR[0] >> 4
 	prefetch
 
 78006a20     ff8ffff0     0 mov.b    r32d32hh r8l      h
 	prefetch_start
-	TMP1 = r32_r(IR[0] >> 4) + (IR[2] << 16) + IR[3];
-	TMP2 = read8(TMP1);
-	set_nzv8(TMP2);
-	r8_w(IR[1], TMP2);
+	m_TMP1 = r32_r(m_IR[0] >> 4) + (m_IR[2] << 16) + m_IR[3];
+	m_TMP2 = read8(m_TMP1);
+	set_nzv8(m_TMP2);
+	r8_w(m_IR[1], m_TMP2);
 	prefetch_done();
 
 78006aa0     ff8ffff0     0 mov.b    r8l      r32d32hh h
 	prefetch_start
-	TMP1 = r32_r(IR[0] >> 4) + (IR[2] << 16) + IR[3];
-	TMP2 = r8_r(IR[1]);
-	set_nzv8(TMP2);
-	write8(TMP1, TMP2);
+	m_TMP1 = r32_r(m_IR[0] >> 4) + (m_IR[2] << 16) + m_IR[3];
+	m_TMP2 = r8_r(m_IR[1]);
+	set_nzv8(m_TMP2);
+	write8(m_TMP1, m_TMP2);
 	prefetch_done();
 
 78006b20     ff8ffff0     0 mov.w    r32d32hh r16l     h
 	prefetch_start
-	TMP1 = r32_r(IR[0] >> 4) + (IR[2] << 16) + IR[3];
-	TMP2 = read16(TMP1);
-	set_nzv16(TMP2);
-	r16_w(IR[1], TMP2);
+	m_TMP1 = r32_r(m_IR[0] >> 4) + (m_IR[2] << 16) + m_IR[3];
+	m_TMP2 = read16(m_TMP1);
+	set_nzv16(m_TMP2);
+	r16_w(m_IR[1], m_TMP2);
 	prefetch_done();
 
 78006ba0     ff8ffff0     0 mov.w    r16l     r32d32hh h
 	prefetch_start
-	TMP1 = r32_r(IR[0] >> 4) + (IR[2] << 16) + IR[3];
-	TMP2 = r16_r(IR[1]);
-	set_nzv16(TMP2);
-	write16(TMP1, TMP2);
+	m_TMP1 = r32_r(m_IR[0] >> 4) + (m_IR[2] << 16) + m_IR[3];
+	m_TMP2 = r16_r(m_IR[1]);
+	set_nzv16(m_TMP2);
+	write16(m_TMP1, m_TMP2);
 	prefetch_done();
 
 7900         fff0         0 mov.w    imm16    r16l
-	set_nzv16(IR[1]);
-	r16_w(IR[0], IR[1]);
+	set_nzv16(m_IR[1]);
+	r16_w(m_IR[0], m_IR[1]);
 	prefetch
 
 7910         fff0         0 add.w    imm16    r16l
-	r16_w(IR[0], do_add16(r16_r(IR[0]), IR[1]));
+	r16_w(m_IR[0], do_add16(r16_r(m_IR[0]), m_IR[1]));
 	prefetch
 
 7920         fff0         0 cmp.w    imm16    r16l
-	do_sub16(r16_r(IR[0]), IR[1]);
+	do_sub16(r16_r(m_IR[0]), m_IR[1]);
 	prefetch
 
 7930         fff0         0 sub.w    imm16    r16l
-	r16_w(IR[0], do_sub16(r16_r(IR[0]), IR[1]));
+	r16_w(m_IR[0], do_sub16(r16_r(m_IR[0]), m_IR[1]));
 	prefetch
 
 7940         fff0         0 or.w     imm16    r16l
-	TMP1 = IR[1] | r16_r(IR[0]);
-	set_nzv16(TMP1);
-	r16_w(IR[0], TMP1);
+	m_TMP1 = m_IR[1] | r16_r(m_IR[0]);
+	set_nzv16(m_TMP1);
+	r16_w(m_IR[0], m_TMP1);
 	prefetch
 
 7950         fff0         0 xor.w    imm16    r16l
-	TMP1 = IR[1] ^ r16_r(IR[0]);
-	set_nzv16(TMP1);
-	r16_w(IR[0], TMP1);
+	m_TMP1 = m_IR[1] ^ r16_r(m_IR[0]);
+	set_nzv16(m_TMP1);
+	r16_w(m_IR[0], m_TMP1);
 	prefetch
 
 7960         fff0         0 and.w    imm16    r16l
-	TMP1 = IR[1] & r16_r(IR[0]);
-	set_nzv16(TMP1);
-	r16_w(IR[0], TMP1);
+	m_TMP1 = m_IR[1] & r16_r(m_IR[0]);
+	set_nzv16(m_TMP1);
+	r16_w(m_IR[0], m_TMP1);
 	prefetch
 
 7a00         fff8         0 mov.l    imm32    r32l     h
-	TMP1 = (IR[1] << 16) | IR[2];
-	set_nzv32(TMP1);
-	r32_w(IR[0], TMP1);
+	m_TMP1 = (m_IR[1] << 16) | m_IR[2];
+	set_nzv32(m_TMP1);
+	r32_w(m_IR[0], m_TMP1);
 	prefetch
 
 7a10         fff8         0 add.l    imm32    r32l     h
-	r32_w(IR[0], do_add32(r32_r(IR[0]), (IR[1] << 16) | IR[2]));
+	r32_w(m_IR[0], do_add32(r32_r(m_IR[0]), (m_IR[1] << 16) | m_IR[2]));
 	prefetch
 
 7a20         fff8         0 cmp.l    imm32    r32l     h
-	do_sub32(r32_r(IR[0]), (IR[1] << 16) | IR[2]);
+	do_sub32(r32_r(m_IR[0]), (m_IR[1] << 16) | m_IR[2]);
 	prefetch
 
 7a30         fff8         0 sub.l    imm32    r32l     h
-	r32_w(IR[0], do_sub32(r32_r(IR[0]), (IR[1] << 16) | IR[2]));
+	r32_w(m_IR[0], do_sub32(r32_r(m_IR[0]), (m_IR[1] << 16) | m_IR[2]));
 	prefetch
 
 7a40         fff8         0 or.l     imm32    r32l     h
-	TMP1 = r32_r(IR[0]) | ((IR[1] << 16) | IR[2]);
-	set_nzv32(TMP1);
-	r32_w(IR[0], TMP1);
+	m_TMP1 = r32_r(m_IR[0]) | ((m_IR[1] << 16) | m_IR[2]);
+	set_nzv32(m_TMP1);
+	r32_w(m_IR[0], m_TMP1);
 	prefetch
 
 7a50         fff8         0 xor.l    imm32    r32l     h
-	TMP1 = r32_r(IR[0]) ^ ((IR[1] << 16) | IR[2]);
-	set_nzv32(TMP1);
-	r32_w(IR[0], TMP1);
+	m_TMP1 = r32_r(m_IR[0]) ^ ((m_IR[1] << 16) | m_IR[2]);
+	set_nzv32(m_TMP1);
+	r32_w(m_IR[0], m_TMP1);
 	prefetch
 
 7a60         fff8         0 and.l    imm32    r32l     h
-	TMP1 = r32_r(IR[0]) & ((IR[1] << 16) | IR[2]);
-	set_nzv32(TMP1);
-	r32_w(IR[0], TMP1);
+	m_TMP1 = r32_r(m_IR[0]) & ((m_IR[1] << 16) | m_IR[2]);
+	set_nzv32(m_TMP1);
+	r32_w(m_IR[0], m_TMP1);
 	prefetch
 
 7b5c598f     ffffffff     0 eepmov.b -        -        o
 	while(r8_r(4+8)) {
-		TMP1 = read8(r16_r(5));
-		write8(r16_r(6), TMP1);
+		m_TMP1 = read8(r16_r(5));
+		write8(r16_r(6), m_TMP1);
 		r16_w(5, r16_r(5)+1);
 		r16_w(6, r16_r(6)+1);
 		r8_w(4+8, r8_r(4+8)-1);
@@ -2501,8 +2501,8 @@ macro jsr32 %opc %spreg
 
 7b5c598f     ffffffff     0 eepmov.b -        -        h
 	while(r8_r(4+8)) {
-		TMP1 = read8(r32_r(5));
-		write8(r32_r(6), TMP1);
+		m_TMP1 = read8(r32_r(5));
+		write8(r32_r(6), m_TMP1);
 		r32_w(5, r32_r(5)+1);
 		r32_w(6, r32_r(6)+1);
 		r8_w(4+8, r8_r(4+8)-1);
@@ -2511,8 +2511,8 @@ macro jsr32 %opc %spreg
 
 7bd4598f     ffffffff     0 eepmov.w -        -        h
 	while(r16_r(4)) {
-		TMP1 = read8(r32_r(5));
-		write8(r32_r(6), TMP1);
+		m_TMP1 = read8(r32_r(5));
+		write8(r32_r(6), m_TMP1);
 		r32_w(5, r32_r(5)+1);
 		r32_w(6, r32_r(6)+1);
 		r16_w(4, r16_r(4)-1);
@@ -2520,412 +2520,412 @@ macro jsr32 %opc %spreg
 	prefetch
 
 7c006300     ff8fff0f     0 btst     r8h      r16ihh   o
-	TMP2 = r16_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	btst r8_r(IR[1] >> 4)
+	m_TMP2 = r16_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	btst r8_r(m_IR[1] >> 4)
 	prefetch
 
 7c006300     ff8fff0f     0 btst     r8h      r32ihh   h
-	TMP2 = r32_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	btst r8_r(IR[1] >> 4)
+	m_TMP2 = r32_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	btst r8_r(m_IR[1] >> 4)
 	prefetch
 
 7c007300     ff8fff8f     0 btst     imm3     r16ihh   o
-	TMP2 = r16_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	btst IR[1] >> 4
+	m_TMP2 = r16_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	btst m_IR[1] >> 4
 	prefetch
 
 7c007300     ff8fff8f     0 btst     imm3     r32ihh   h
-	TMP2 = r32_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	btst IR[1] >> 4
+	m_TMP2 = r32_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	btst m_IR[1] >> 4
 	prefetch
 
 7c007400     ff8fff8f     0 bor      imm3     r16ihh   o
-	TMP2 = r16_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	bor IR[1] >> 4
+	m_TMP2 = r16_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	bor m_IR[1] >> 4
 	prefetch
 
 7c007400     ff8fff8f     0 bor      imm3     r32ihh   h
-	TMP2 = r32_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	bor IR[1] >> 4
+	m_TMP2 = r32_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	bor m_IR[1] >> 4
 	prefetch
 
 7c007480     ff8fff8f     0 bior     imm3     r16ihh   o
-	TMP2 = r16_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	bior IR[1] >> 4
+	m_TMP2 = r16_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	bior m_IR[1] >> 4
 	prefetch
 
 7c007480     ff8fff8f     0 bior     imm3     r32ihh   h
-	TMP2 = r32_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	bior IR[1] >> 4
+	m_TMP2 = r32_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	bior m_IR[1] >> 4
 	prefetch
 
 7c007500     ff8fff8f     0 bxor     imm3     r16ihh   o
-	TMP2 = r16_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	bxor IR[1] >> 4
+	m_TMP2 = r16_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	bxor m_IR[1] >> 4
 	prefetch
 
 7c007500     ff8fff8f     0 bxor     imm3     r32ihh   h
-	TMP2 = r32_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	bxor IR[1] >> 4
+	m_TMP2 = r32_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	bxor m_IR[1] >> 4
 	prefetch
 
 7c007580     ff8fff8f     0 bixor    imm3     r16ihh   o
-	TMP2 = r16_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	bixor IR[1] >> 4
+	m_TMP2 = r16_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	bixor m_IR[1] >> 4
 	prefetch
 
 7c007580     ff8fff8f     0 bixor    imm3     r32ihh   h
-	TMP2 = r32_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	bixor IR[1] >> 4
+	m_TMP2 = r32_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	bixor m_IR[1] >> 4
 	prefetch
 
 7c007600     ff8fff8f     0 band     imm3     r16ihh   o
-	TMP2 = r16_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	band IR[1] >> 4
+	m_TMP2 = r16_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	band m_IR[1] >> 4
 	prefetch
 
 7c007600     ff8fff8f     0 band     imm3     r32ihh   h
-	TMP2 = r32_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	band IR[1] >> 4
+	m_TMP2 = r32_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	band m_IR[1] >> 4
 	prefetch
 
 7c007680     ff8fff8f     0 biand    imm3     r16ihh   o
-	TMP2 = r16_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	biand IR[1] >> 4
+	m_TMP2 = r16_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	biand m_IR[1] >> 4
 	prefetch
 
 7c007680     ff8fff8f     0 biand    imm3     r32ihh   h
-	TMP2 = r32_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	biand IR[1] >> 4
+	m_TMP2 = r32_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	biand m_IR[1] >> 4
 	prefetch
 
 7c007700     ff8fff8f     0 bld      imm3     r16ihh   o
-	TMP2 = r16_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	bld IR[1] >> 4
+	m_TMP2 = r16_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	bld m_IR[1] >> 4
 	prefetch
 
 7c007700     ff8fff8f     0 bld      imm3     r32ihh   h
-	TMP2 = r32_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	bld IR[1] >> 4
+	m_TMP2 = r32_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	bld m_IR[1] >> 4
 	prefetch
 
 7c007780     ff8fff8f     0 bild     imm3     r16ihh   o
-	TMP2 = r16_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	bild IR[1] >> 4
+	m_TMP2 = r16_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	bild m_IR[1] >> 4
 	prefetch
 
 7c007780     ff8fff8f     0 bild     imm3     r32ihh   h
-	TMP2 = r32_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	bild IR[1] >> 4
+	m_TMP2 = r32_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	bild m_IR[1] >> 4
 	prefetch
 
 7d006000     ff8fff0f     0 bset     r8h      r16ihh   o
-	TMP2 = r16_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	bset r8_r(IR[1] >> 4)
+	m_TMP2 = r16_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	bset r8_r(m_IR[1] >> 4)
 	prefetch_start
-	write8(TMP2, TMP1);
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 7d006000     ff8fff0f     0 bset     r8h      r32ihh   h
-	TMP2 = r32_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	bset r8_r(IR[1] >> 4)
+	m_TMP2 = r32_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	bset r8_r(m_IR[1] >> 4)
 	prefetch_start
-	write8(TMP2, TMP1);
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 7d006100     ff8fff0f     0 bnot     r8h      r16ihh   o
-	TMP2 = r16_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	bnot r8_r(IR[1] >> 4)
+	m_TMP2 = r16_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	bnot r8_r(m_IR[1] >> 4)
 	prefetch_start
-	write8(TMP2, TMP1);
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 7d006100     ff8fff0f     0 bnot     r8h      r32ihh   h
-	TMP2 = r32_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	bnot r8_r(IR[1] >> 4)
+	m_TMP2 = r32_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	bnot r8_r(m_IR[1] >> 4)
 	prefetch_start
-	write8(TMP2, TMP1);
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 7d006200     ff8fff0f     0 bclr     r8h      r16ihh   o
-	TMP2 = r16_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	bclr r8_r(IR[1] >> 4)
+	m_TMP2 = r16_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	bclr r8_r(m_IR[1] >> 4)
 	prefetch_start
-	write8(TMP2, TMP1);
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 7d006200     ff8fff0f     0 bclr     r8h      r32ihh   h
-	TMP2 = r32_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	bclr r8_r(IR[1] >> 4)
+	m_TMP2 = r32_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	bclr r8_r(m_IR[1] >> 4)
 	prefetch_start
-	write8(TMP2, TMP1);
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 7d006700     ff8fff8f     0 bst      imm3     r16ihh   o
-	TMP2 = r16_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	bst IR[1] >> 4
+	m_TMP2 = r16_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	bst m_IR[1] >> 4
 	prefetch_start
-	write8(TMP2, TMP1);
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 7d006700     ff8fff8f     0 bst      imm3     r32ihh   h
-	TMP2 = r32_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	bst IR[1] >> 4
+	m_TMP2 = r32_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	bst m_IR[1] >> 4
 	prefetch_start
-	write8(TMP2, TMP1);
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 7d006780     ff8fff8f     0 bist     imm3     r16ihh   o
-	TMP2 = r16_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	bist IR[1] >> 4
+	m_TMP2 = r16_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	bist m_IR[1] >> 4
 	prefetch_start
-	write8(TMP2, TMP1);
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 7d006780     ff8fff8f     0 bist     imm3     r32ihh   h
-	TMP2 = r32_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	bist IR[1] >> 4
+	m_TMP2 = r32_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	bist m_IR[1] >> 4
 	prefetch_start
-	write8(TMP2, TMP1);
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 7d007000     ff8fff8f     0 bset     imm3     r16ihh   o
-	TMP2 = r16_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	bset IR[1] >> 4
+	m_TMP2 = r16_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	bset m_IR[1] >> 4
 	prefetch_start
-	write8(TMP2, TMP1);
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 7d007000     ff8fff8f     0 bset     imm3     r32ihh   h
-	TMP2 = r32_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	bset IR[1] >> 4
+	m_TMP2 = r32_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	bset m_IR[1] >> 4
 	prefetch_start
-	write8(TMP2, TMP1);
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 7d007100     ff8fff8f     0 bnot     imm3     r16ihh   o
-	TMP2 = r16_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	bnot IR[1] >> 4
+	m_TMP2 = r16_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	bnot m_IR[1] >> 4
 	prefetch_start
-	write8(TMP2, TMP1);
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 7d007100     ff8fff8f     0 bnot     imm3     r32ihh   h
-	TMP2 = r32_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	bnot IR[1] >> 4
+	m_TMP2 = r32_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	bnot m_IR[1] >> 4
 	prefetch_start
-	write8(TMP2, TMP1);
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 7d007200     ff8fff8f     0 bclr     imm3     r16ihh   o
-	TMP2 = r16_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	bclr IR[1] >> 4
+	m_TMP2 = r16_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	bclr m_IR[1] >> 4
 	prefetch_start
-	write8(TMP2, TMP1);
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 7d007200     ff8fff8f     0 bclr     imm3     r32ihh   h
-	TMP2 = r32_r(IR[0] >> 4);
-	TMP1 = read8(TMP2);
-	bclr IR[1] >> 4
+	m_TMP2 = r32_r(m_IR[0] >> 4);
+	m_TMP1 = read8(m_TMP2);
+	bclr m_IR[1] >> 4
 	prefetch_start
-	write8(TMP2, TMP1);
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 7e006300     ff00ff0f     0 btst     r8h      abs8
-	TMP2 = 0xffffff00 | IR[0];
-	TMP1 = read8(TMP2);
-	btst r8_r(IR[1] >> 4)
+	m_TMP2 = 0xffffff00 | m_IR[0];
+	m_TMP1 = read8(m_TMP2);
+	btst r8_r(m_IR[1] >> 4)
 	prefetch
 
 7e007300     ff00ff8f     0 btst     imm3     abs8
-	TMP2 = 0xffffff00 | IR[0];
-	TMP1 = read8(TMP2);
-	btst IR[1] >> 4
+	m_TMP2 = 0xffffff00 | m_IR[0];
+	m_TMP1 = read8(m_TMP2);
+	btst m_IR[1] >> 4
 	prefetch
 
 7e007400     ff00ff8f     0 bor      imm3     abs8
-	TMP2 = 0xffffff00 | IR[0];
-	TMP1 = read8(TMP2);
-	bor IR[1] >> 4
+	m_TMP2 = 0xffffff00 | m_IR[0];
+	m_TMP1 = read8(m_TMP2);
+	bor m_IR[1] >> 4
 	prefetch
 
 7e007480     ff00ff8f     0 bior     imm3     abs8
-	TMP2 = 0xffffff00 | IR[0];
-	TMP1 = read8(TMP2);
-	bior IR[1] >> 4
+	m_TMP2 = 0xffffff00 | m_IR[0];
+	m_TMP1 = read8(m_TMP2);
+	bior m_IR[1] >> 4
 	prefetch
 
 7e007500     ff00ff8f     0 bxor     imm3     abs8
-	TMP2 = 0xffffff00 | IR[0];
-	TMP1 = read8(TMP2);
-	bxor IR[1] >> 4
+	m_TMP2 = 0xffffff00 | m_IR[0];
+	m_TMP1 = read8(m_TMP2);
+	bxor m_IR[1] >> 4
 	prefetch
 
 7e007580     ff00ff8f     0 bixor    imm3     abs8
-	TMP2 = 0xffffff00 | IR[0];
-	TMP1 = read8(TMP2);
-	bixor IR[1] >> 4
+	m_TMP2 = 0xffffff00 | m_IR[0];
+	m_TMP1 = read8(m_TMP2);
+	bixor m_IR[1] >> 4
 	prefetch
 
 7e007600     ff00ff8f     0 band     imm3     abs8
-	TMP2 = 0xffffff00 | IR[0];
-	TMP1 = read8(TMP2);
-	band IR[1] >> 4
+	m_TMP2 = 0xffffff00 | m_IR[0];
+	m_TMP1 = read8(m_TMP2);
+	band m_IR[1] >> 4
 	prefetch
 
 7e007680     ff00ff8f     0 biand    imm3     abs8
-	TMP2 = 0xffffff00 | IR[0];
-	TMP1 = read8(TMP2);
-	biand IR[1] >> 4
+	m_TMP2 = 0xffffff00 | m_IR[0];
+	m_TMP1 = read8(m_TMP2);
+	biand m_IR[1] >> 4
 	prefetch
 
 7e007700     ff00ff8f     0 bld      imm3     abs8
-	TMP2 = 0xffffff00 | IR[0];
-	TMP1 = read8(TMP2);
-	bld IR[1] >> 4
+	m_TMP2 = 0xffffff00 | m_IR[0];
+	m_TMP1 = read8(m_TMP2);
+	bld m_IR[1] >> 4
 	prefetch
 
 7e007780     ff00ff8f     0 bild     imm3     abs8
-	TMP2 = 0xffffff00 | IR[0];
-	TMP1 = read8(TMP2);
-	bild IR[1] >> 4
+	m_TMP2 = 0xffffff00 | m_IR[0];
+	m_TMP1 = read8(m_TMP2);
+	bild m_IR[1] >> 4
 	prefetch
 
 7f006000     ff00ff0f     0 bset     r8h      abs8
-	TMP2 = 0xffffff00 | IR[0];
-	TMP1 = read8(TMP2);
-	bset r8_r(IR[1] >> 4)
+	m_TMP2 = 0xffffff00 | m_IR[0];
+	m_TMP1 = read8(m_TMP2);
+	bset r8_r(m_IR[1] >> 4)
 	prefetch_start
-	write8(TMP2, TMP1);
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 7f006100     ff00ff0f     0 bnot     r8h      abs8
-	TMP2 = 0xffffff00 | IR[0];
-	TMP1 = read8(TMP2);
-	bnot r8_r(IR[1] >> 4)
+	m_TMP2 = 0xffffff00 | m_IR[0];
+	m_TMP1 = read8(m_TMP2);
+	bnot r8_r(m_IR[1] >> 4)
 	prefetch_start
-	write8(TMP2, TMP1);
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 7f006200     ff00ff0f     0 bclr     r8h      abs8
-	TMP2 = 0xffffff00 | IR[0];
-	TMP1 = read8(TMP2);
-	bclr r8_r(IR[1] >> 4)
+	m_TMP2 = 0xffffff00 | m_IR[0];
+	m_TMP1 = read8(m_TMP2);
+	bclr r8_r(m_IR[1] >> 4)
 	prefetch_start
-	write8(TMP2, TMP1);
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 7f006700     ff00ff8f     0 bst      imm3     abs8
-	TMP2 = 0xffffff00 | IR[0];
-	TMP1 = read8(TMP2);
+	m_TMP2 = 0xffffff00 | m_IR[0];
+	m_TMP1 = read8(m_TMP2);
 	prefetch_start
-	bst IR[0] >> 4
-	write8(TMP2, TMP1);
+	bst m_IR[0] >> 4
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 7f006780     ff00ff8f     0 bist     imm3     abs8
-	TMP2 = 0xffffff00 | IR[0];
-	TMP1 = read8(TMP2);
+	m_TMP2 = 0xffffff00 | m_IR[0];
+	m_TMP1 = read8(m_TMP2);
 	prefetch_start
-	bist IR[0] >> 4
-	write8(TMP2, TMP1);
+	bist m_IR[0] >> 4
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 7f007000     ff00ff8f     0 bset     imm3     abs8
-	TMP2 = 0xffffff00 | IR[0];
-	TMP1 = read8(TMP2);
+	m_TMP2 = 0xffffff00 | m_IR[0];
+	m_TMP1 = read8(m_TMP2);
 	prefetch_start
-	bset IR[1] >> 4
-	write8(TMP2, TMP1);
+	bset m_IR[1] >> 4
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 7f007100     ff00ff8f     0 bnot     imm3     abs8
-	TMP2 = 0xffffff00 | IR[0];
-	TMP1 = read8(TMP2);
+	m_TMP2 = 0xffffff00 | m_IR[0];
+	m_TMP1 = read8(m_TMP2);
 	prefetch_start
-	bnot IR[1] >> 4
-	write8(TMP2, TMP1);
+	bnot m_IR[1] >> 4
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 7f007200     ff00ff8f     0 bclr     imm3     abs8
-	TMP2 = 0xffffff00 | IR[0];
-	TMP1 = read8(TMP2);
+	m_TMP2 = 0xffffff00 | m_IR[0];
+	m_TMP1 = read8(m_TMP2);
 	prefetch_start
-	bclr IR[1] >> 4
-	write8(TMP2, TMP1);
+	bclr m_IR[1] >> 4
+	write8(m_TMP2, m_TMP1);
 	prefetch_done();
 
 8000         f000         0 add.b    imm8     r8u
-	r8_w(IR[0] >> 8, do_add8(r8_r(IR[0] >> 8), IR[0]));
+	r8_w(m_IR[0] >> 8, do_add8(r8_r(m_IR[0] >> 8), m_IR[0]));
 	prefetch
 
 9000         f000         0 addx.b   imm8     r8u
-	r8_w(IR[0] >> 8, do_addx8(r8_r(IR[0] >> 8), IR[0]));
+	r8_w(m_IR[0] >> 8, do_addx8(r8_r(m_IR[0] >> 8), m_IR[0]));
 	prefetch
 
 a000         f000         0 cmp.b    imm8     r8u
-	do_sub8(r8_r(IR[0]>>8), IR[0]);
+	do_sub8(r8_r(m_IR[0]>>8), m_IR[0]);
 	prefetch
 
 b000         f000         0 subx.b   imm8     r8u
-	r8_w(IR[0] >> 8, do_subx8(r8_r(IR[0] >> 8), IR[0]));
+	r8_w(m_IR[0] >> 8, do_subx8(r8_r(m_IR[0] >> 8), m_IR[0]));
 	prefetch
 
 c000         f000         0 or.b     imm8     r8u
-	TMP1 = IR[0] | r8_r(IR[0] >> 8);
-	set_nzv8(TMP1);
-	r8_w(IR[0] >> 8, TMP1);
+	m_TMP1 = m_IR[0] | r8_r(m_IR[0] >> 8);
+	set_nzv8(m_TMP1);
+	r8_w(m_IR[0] >> 8, m_TMP1);
 	prefetch
 
 d000         f000         0 xor.b    imm8     r8u
-	TMP1 = IR[0] ^ r8_r(IR[0] >> 8);
-	set_nzv8(TMP1);
-	r8_w(IR[0] >> 8, TMP1);
+	m_TMP1 = m_IR[0] ^ r8_r(m_IR[0] >> 8);
+	set_nzv8(m_TMP1);
+	r8_w(m_IR[0] >> 8, m_TMP1);
 	prefetch
 
 e000         f000         0 and.b    imm8     r8u
-	TMP1 = IR[0] & r8_r(IR[0] >> 8);
-	set_nzv8(TMP1);
-	r8_w(IR[0] >> 8, TMP1);
+	m_TMP1 = m_IR[0] & r8_r(m_IR[0] >> 8);
+	set_nzv8(m_TMP1);
+	r8_w(m_IR[0] >> 8, m_TMP1);
 	prefetch
 
 f000         f000         0 mov.b    imm8     r8u
-	set_nzv8(IR[0]);
-	r8_w(IR[0] >> 8, IR[0]);
+	set_nzv8(m_IR[0]);
+	r8_w(m_IR[0] >> 8, m_IR[0]);
 	prefetch
