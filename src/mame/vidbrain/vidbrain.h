@@ -59,8 +59,8 @@ private:
 	uint8_t keyboard_r();
 	void sound_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( ext_int_w );
-	DECLARE_WRITE_LINE_MEMBER( hblank_w );
+	void ext_int_w(int state);
+	void hblank_w(int state);
 	uint8_t memory_read_byte(offs_t offset);
 
 	required_device<cpu_device> m_maincpu;

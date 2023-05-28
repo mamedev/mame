@@ -35,11 +35,11 @@ protected:
 
 private:
 	//dmac
-	DECLARE_WRITE_LINE_MEMBER(dma_irq);
+	void dma_irq(int state);
 	uint8_t dma_iack();
 
 	//fdc
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
+	void fdc_irq(int state);
 	uint8_t fdc_read_byte();
 	void fdc_write_byte(uint8_t data);
 

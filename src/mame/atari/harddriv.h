@@ -95,8 +95,8 @@ public:
 	mc68681_device* get_duart() { return m_duartn68681; }
 	screen_device* get_screen() { return m_screen; }
 
-	DECLARE_WRITE_LINE_MEMBER(video_int_write_line);
-	DECLARE_WRITE_LINE_MEMBER(sound_int_write_line);
+	void video_int_write_line(int state);
+	void sound_int_write_line(int state);
 
 protected:
 
@@ -110,7 +110,7 @@ protected:
 	/* Driver/Multisync board */
 	void hd68k_irq_ack_w(uint16_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(harddriv_duart_irq_handler);
+	void harddriv_duart_irq_handler(int state);
 
 	uint16_t hd68k_gsp_io_r(offs_t offset);
 	void hd68k_gsp_io_w(offs_t offset, uint16_t data);
@@ -140,8 +140,8 @@ protected:
 
 	void hdgsp_protection_w(uint16_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( hdgsp_irq_gen );
-	DECLARE_WRITE_LINE_MEMBER( hdmsp_irq_gen );
+	void hdgsp_irq_gen(int state);
+	void hdmsp_irq_gen(int state);
 
 	/* ADSP board */
 	uint16_t hd68k_adsp_program_r(offs_t offset);
@@ -260,11 +260,11 @@ protected:
 
 	void display_speedups();
 
-	DECLARE_WRITE_LINE_MEMBER(hdds3sdsp_timer_enable_callback);
+	void hdds3sdsp_timer_enable_callback(int state);
 	void hdds3sdsp_serial_tx_callback(uint32_t data);
 	uint32_t hdds3sdsp_serial_rx_callback();
 
-	DECLARE_WRITE_LINE_MEMBER(hdds3xdsp_timer_enable_callback);
+	void hdds3xdsp_timer_enable_callback(int state);
 	void hdds3xdsp_serial_tx_callback(uint32_t data);
 	uint32_t hdds3xdsp_serial_rx_callback();
 
@@ -522,11 +522,11 @@ private:
 	uint16_t hdsnd68k_320port_r(offs_t offset);
 	uint16_t hdsnd68k_status_r();
 	void hdsnd68k_latches_w(offs_t offset, uint16_t data);
-	DECLARE_WRITE_LINE_MEMBER(speech_write_w);
-	DECLARE_WRITE_LINE_MEMBER(speech_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(speech_rate_w);
-	DECLARE_WRITE_LINE_MEMBER(cram_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(led_w);
+	void speech_write_w(int state);
+	void speech_reset_w(int state);
+	void speech_rate_w(int state);
+	void cram_enable_w(int state);
+	void led_w(int state);
 	void hdsnd68k_speech_w(offs_t offset, uint16_t data);
 	void hdsnd68k_irqclr_w(uint16_t data);
 	uint16_t hdsnd68k_320ram_r(offs_t offset);
@@ -576,7 +576,7 @@ private:
 	void update_68k_interrupts();
 	TIMER_CALLBACK_MEMBER( delayed_68k_w );
 
-	DECLARE_READ_LINE_MEMBER(hdsnddsp_get_bio);
+	int hdsnddsp_get_bio();
 };
 
 /* Hard Drivin' */

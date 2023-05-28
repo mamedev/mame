@@ -129,7 +129,7 @@ public:
 	auto portb_w() { return m_port_cb_w[1].bind(); }
 	auto portc_w() { return m_port_cb_w[2].bind(); }
 
-	WRITE_LINE_MEMBER(timer_w) { m_timer.timer_w(state); }
+	void timer_w(int state) { m_timer.timer_w(state); }
 
 protected:
 	// state index constants

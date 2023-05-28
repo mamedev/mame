@@ -89,11 +89,11 @@ public:
 	void init_pve500();
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(mb8421_intl);
-	DECLARE_WRITE_LINE_MEMBER(mb8421_intr);
-	DECLARE_WRITE_LINE_MEMBER(GPI_w);
-	DECLARE_WRITE_LINE_MEMBER(cxdio_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(external_monitor_w);
+	void mb8421_intl(int state);
+	void mb8421_intr(int state);
+	void GPI_w(int state);
+	void cxdio_reset_w(int state);
+	void external_monitor_w(int state);
 
 	uint8_t io_ky_r();
 	void io_sc_w(uint8_t data);
@@ -120,18 +120,18 @@ private:
 	int LD_data[4]{};
 };
 
-WRITE_LINE_MEMBER(pve500_state::GPI_w)
+void pve500_state::GPI_w(int state)
 {
 	/* TODO: Implement-me */
 }
 
-WRITE_LINE_MEMBER(pve500_state::cxdio_reset_w)
+void pve500_state::cxdio_reset_w(int state)
 {
 	if (!state)
 		m_cxdio->reset();
 }
 
-WRITE_LINE_MEMBER(pve500_state::external_monitor_w)
+void pve500_state::external_monitor_w(int state)
 {
 	/* TODO: Implement-me */
 }
@@ -277,13 +277,13 @@ void pve500_state::machine_reset()
 	m_buzzer->set_state(0);
 }
 
-WRITE_LINE_MEMBER(pve500_state::mb8421_intl)
+void pve500_state::mb8421_intl(int state)
 {
 	// shared ram interrupt request from subcpu side
 	m_maincpu->trg1(state);
 }
 
-WRITE_LINE_MEMBER(pve500_state::mb8421_intr)
+void pve500_state::mb8421_intr(int state)
 {
 	// shared ram interrupt request from maincpu side
 	m_subcpu->trg1(state);

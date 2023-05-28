@@ -453,8 +453,8 @@ private:
 	void update_display();
 	void write_d(u8 data);
 	void write_g(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(write_sk);
-	DECLARE_WRITE_LINE_MEMBER(write_so);
+	void write_sk(int state);
+	void write_so(int state);
 	void write_l(u8 data);
 };
 
@@ -482,7 +482,7 @@ void einvaderc_state::write_g(u8 data)
 	update_display();
 }
 
-WRITE_LINE_MEMBER(einvaderc_state::write_sk)
+void einvaderc_state::write_sk(int state)
 {
 	// SK: speaker out + led grid 8
 	m_speaker->level_w(state);
@@ -490,7 +490,7 @@ WRITE_LINE_MEMBER(einvaderc_state::write_sk)
 	update_display();
 }
 
-WRITE_LINE_MEMBER(einvaderc_state::write_so)
+void einvaderc_state::write_so(int state)
 {
 	// SO: led grid 9
 	m_so = state;
@@ -708,7 +708,7 @@ public:
 
 	void lchicken(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(motor_switch_r);
+	int motor_switch_r();
 
 protected:
 	virtual void machine_start() override;
@@ -739,7 +739,7 @@ void lchicken_state::machine_start()
 
 // handlers
 
-READ_LINE_MEMBER(lchicken_state::motor_switch_r)
+int lchicken_state::motor_switch_r()
 {
 	return m_motor_pos > 0xe8; // approximation
 }
@@ -1786,7 +1786,7 @@ public:
 
 private:
 	void update_display();
-	DECLARE_WRITE_LINE_MEMBER(write_so);
+	void write_so(int state);
 	void write_d(u8 data);
 	void write_l(u8 data);
 	u8 read_g();
@@ -1800,7 +1800,7 @@ void lightfgt_state::update_display()
 	m_display->matrix(grid, m_l);
 }
 
-WRITE_LINE_MEMBER(lightfgt_state::write_so)
+void lightfgt_state::write_so(int state)
 {
 	// SO: led grid 0 (and input mux)
 	m_so = state;
@@ -1923,7 +1923,7 @@ private:
 	void write_g(u8 data);
 	u8 read_l();
 	u8 read_in();
-	DECLARE_WRITE_LINE_MEMBER(write_so);
+	void write_so(int state);
 };
 
 // handlers
@@ -1953,7 +1953,7 @@ u8 bshipg_state::read_in()
 	return read_inputs(4, 0xf00) >> 8;
 }
 
-WRITE_LINE_MEMBER(bshipg_state::write_so)
+void bshipg_state::write_so(int state)
 {
 	// SO: led
 	m_display->matrix(1, state);
@@ -2082,7 +2082,7 @@ private:
 	void write_g(u8 data);
 	void write_l(u8 data);
 	u8 read_in();
-	DECLARE_WRITE_LINE_MEMBER(write_sk);
+	void write_sk(int state);
 };
 
 // handlers
@@ -2121,7 +2121,7 @@ u8 qkracer_state::read_in()
 	return read_inputs(5, 0xf);
 }
 
-WRITE_LINE_MEMBER(qkracer_state::write_sk)
+void qkracer_state::write_sk(int state)
 {
 	// SK: green led
 	m_sk = state;
@@ -2441,7 +2441,7 @@ private:
 	void update_display();
 	void write_d(u8 data);
 	void write_l(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(write_sk);
+	void write_sk(int state);
 };
 
 // handlers
@@ -2465,7 +2465,7 @@ void vidchal_state::write_l(u8 data)
 	update_display();
 }
 
-WRITE_LINE_MEMBER(vidchal_state::write_sk)
+void vidchal_state::write_sk(int state)
 {
 	// SK: hit led
 	m_sk = state;
@@ -2548,7 +2548,7 @@ private:
 	void write_l(u8 data);
 	void write_g(u8 data);
 	u8 read_g();
-	DECLARE_WRITE_LINE_MEMBER(write_sk);
+	void write_sk(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(power_off) { set_power(false); }
 };
@@ -2589,7 +2589,7 @@ u8 lilcomp_state::read_g()
 	return read_inputs(3, m_g);
 }
 
-WRITE_LINE_MEMBER(lilcomp_state::write_sk)
+void lilcomp_state::write_sk(int state)
 {
 	if (state == m_sk)
 		return;

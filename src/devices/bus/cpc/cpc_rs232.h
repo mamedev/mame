@@ -43,9 +43,9 @@ protected:
 	required_device<rs232_port_device> m_rs232;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(pit_out0_w);
-	DECLARE_WRITE_LINE_MEMBER(pit_out1_w);
-	DECLARE_WRITE_LINE_MEMBER(pit_out2_w);
+	void pit_out0_w(int state);
+	void pit_out1_w(int state);
+	void pit_out2_w(int state);
 
 	cpc_expansion_slot_device *m_slot;
 };

@@ -52,11 +52,11 @@ private:
 
 	static uint8_t status_val(offs_t offset);
 
-	DECLARE_WRITE_LINE_MEMBER(hpblp_interrupt);
+	void hpblp_interrupt(int state);
 	TIMER_CALLBACK_MEMBER(timer10ms);
 
 	// M68000 part
-	DECLARE_WRITE_LINE_MEMBER(gpib_irq);
+	void gpib_irq(int state);
 	void m68map(address_map &map);
 
 	uint16_t bus_r(offs_t offset, uint16_t mem_mask);

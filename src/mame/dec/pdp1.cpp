@@ -1472,7 +1472,7 @@ void pdp1_state::iot_cks(int op2, int nac, int mb, int &io, int ac)
 }
 
 template <int Mask>
-WRITE_LINE_MEMBER(pdp1_state::io_status_w)
+void pdp1_state::io_status_w(int state)
 {
 	if (state)
 		m_io_status |= Mask;

@@ -265,7 +265,7 @@ void i82357_device::nmi_ext_w(u8 data)
 	m_nmi_check->adjust(attotime::zero);
 }
 
-WRITE_LINE_MEMBER(i82357_device::in_iochk)
+void i82357_device::in_iochk(int state)
 {
 	if (!state && !(m_nmi_reg & NMI_PARITY_DISABLE))
 	{
@@ -277,7 +277,7 @@ WRITE_LINE_MEMBER(i82357_device::in_iochk)
 		m_nmi_reg &= ~NMI_IOCHK;
 }
 
-WRITE_LINE_MEMBER(i82357_device::in_parity)
+void i82357_device::in_parity(int state)
 {
 	if (!state && !(m_nmi_reg & NMI_IOCHK_DISABLE))
 	{

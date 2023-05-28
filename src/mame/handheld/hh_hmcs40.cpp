@@ -3361,7 +3361,7 @@ protected:
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
 
-	DECLARE_WRITE_LINE_MEMBER(speaker_w);
+	void speaker_w(int state);
 	void cop_irq_w(u8 data);
 	u8 cop_latch_r();
 	u8 cop_ack_r();
@@ -3433,7 +3433,7 @@ void eturtles_state::update_int()
 
 // handlers: COP side
 
-WRITE_LINE_MEMBER(eturtles_state::speaker_w)
+void eturtles_state::speaker_w(int state)
 {
 	// SK: speaker out
 	m_speaker->level_w(!state);

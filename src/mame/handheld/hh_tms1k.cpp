@@ -396,7 +396,7 @@ protected:
 
 	u8 read_inputs(int columns);
 	u8 read_rotated_inputs(int columns, u8 rowmask = 0xf);
-	virtual DECLARE_WRITE_LINE_MEMBER(auto_power_off);
+	virtual void auto_power_off(int state);
 	virtual void power_off();
 	virtual void set_power(bool state);
 	void switch_change(int sel, u32 mask, bool next);
@@ -481,7 +481,7 @@ INPUT_CHANGED_MEMBER(hh_tms1k_state::power_button)
 	set_power((bool)param);
 }
 
-WRITE_LINE_MEMBER(hh_tms1k_state::auto_power_off)
+void hh_tms1k_state::auto_power_off(int state)
 {
 	// devices with a TMS0980 can auto power-off
 	if (state)

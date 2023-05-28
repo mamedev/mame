@@ -34,9 +34,9 @@ public:
 	m50458_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
-	DECLARE_WRITE_LINE_MEMBER( write_bit );
-	DECLARE_WRITE_LINE_MEMBER( set_cs_line );
-	DECLARE_WRITE_LINE_MEMBER( set_clock_line );
+	void write_bit(int state);
+	void set_cs_line(int state);
+	void set_clock_line(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

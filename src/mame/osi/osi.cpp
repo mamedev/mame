@@ -452,7 +452,7 @@ void c1pmf_state::osi470_pia_pb_w(uint8_t data)
 	*/
 }
 
-WRITE_LINE_MEMBER( c1pmf_state::osi470_pia_cb2_w )
+void c1pmf_state::osi470_pia_cb2_w(int state)
 {
 }
 

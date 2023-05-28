@@ -333,7 +333,7 @@ void amiga_dmac_device::register_write(offs_t offset, uint16_t data, uint16_t me
 }
 
 // this signal tells us to expose our autoconfig values
-WRITE_LINE_MEMBER( amiga_dmac_device::configin_w )
+void amiga_dmac_device::configin_w(int state)
 {
 	LOG("%s('%s'): configin_w (%d)\n", shortname(), basetag(), state);
 
@@ -388,7 +388,7 @@ WRITE_LINE_MEMBER( amiga_dmac_device::configin_w )
 }
 
 // this sets the ram size depending on the line voltage
-WRITE_LINE_MEMBER( amiga_dmac_device::ramsz_w )
+void amiga_dmac_device::ramsz_w(int state)
 {
 	LOG("%s('%s'): ramsz_w (%d)\n", shortname(), basetag(), state);
 
@@ -402,7 +402,7 @@ WRITE_LINE_MEMBER( amiga_dmac_device::ramsz_w )
 }
 
 // reset the device
-WRITE_LINE_MEMBER( amiga_dmac_device::rst_w )
+void amiga_dmac_device::rst_w(int state)
 {
 	LOG("%s('%s'): rst_w (%d)\n", shortname(), basetag(), state);
 
@@ -413,7 +413,7 @@ WRITE_LINE_MEMBER( amiga_dmac_device::rst_w )
 }
 
 // external interrupt
-WRITE_LINE_MEMBER( amiga_dmac_device::intx_w )
+void amiga_dmac_device::intx_w(int state)
 {
 	LOG("%s('%s'): intx_w (%d)\n", shortname(), basetag(), state);
 
@@ -426,7 +426,7 @@ WRITE_LINE_MEMBER( amiga_dmac_device::intx_w )
 }
 
 // data request
-WRITE_LINE_MEMBER( amiga_dmac_device::xdreq_w )
+void amiga_dmac_device::xdreq_w(int state)
 {
 	LOG("%s('%s'): xdreq_w (%d)\n", shortname(), basetag(), state);
 

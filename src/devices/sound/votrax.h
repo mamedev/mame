@@ -26,7 +26,7 @@ public:
 
 	void write(uint8_t data);
 	void inflection_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER(request) { m_stream->update(); return m_ar_state; }
+	int request() { m_stream->update(); return m_ar_state; }
 
 protected:
 	// overridable type for subclass

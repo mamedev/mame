@@ -122,7 +122,7 @@ public:
 	auto out_lsclk() { return m_out_lsclk_cb.bind(); }
 	auto out_ld() { return m_out_ld_cb.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(irq5_w);
+	void irq5_w(int state);
 
 	template <typename... T>
 	void set_lcd_info_changed(T &&... args)

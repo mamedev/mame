@@ -242,12 +242,12 @@ protected:
 	void pic_portb_w(offs_t offset, uint8_t data, uint8_t mask);
 	void output_w(offs_t offset, uint16_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(cpu_int1);
+	void cpu_int1(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(scc66470_irq);
-	DECLARE_WRITE_LINE_MEMBER(cpu_i2c_scl);
-	DECLARE_WRITE_LINE_MEMBER(cpu_i2c_sda_write);
-	DECLARE_READ_LINE_MEMBER(cpu_i2c_sda_read);
+	void scc66470_irq(int state);
+	void cpu_i2c_scl(int state);
+	void cpu_i2c_sda_write(int state);
+	int cpu_i2c_sda_read();
 
 	void update_sda(uint8_t device, uint8_t state);
 	void update_scl(uint8_t device, uint8_t state);
@@ -322,7 +322,7 @@ private:
 	void write_ds1207_ds2401(offs_t offset, uint8_t data);
 	void output_w(offs_t offset, uint16_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(cpu_int1);
+	void cpu_int1(int state);
 
 	optional_device<ds2401_device> m_ds2401;
 	optional_device<ds1207_device> m_ds1207;
@@ -773,19 +773,19 @@ void magicard_base_state::machine_reset()
 *    Machine Drivers     *
 *************************/
 
-WRITE_LINE_MEMBER(magicard_base_state::scc66470_irq)
+void magicard_base_state::scc66470_irq(int state)
 {
 	m_maincpu->int2_w(state);
 }
 
-WRITE_LINE_MEMBER(magicard_base_state::cpu_int1)
+void magicard_base_state::cpu_int1(int state)
 {
 	// TODO: is this used by games on magicard hardware ?
 	m_maincpu->int1_w(1);
 	m_maincpu->int1_w(0);
 }
 
-WRITE_LINE_MEMBER(hotslots_state::cpu_int1)
+void hotslots_state::cpu_int1(int state)
 {
 	m_maincpu->int1_w(state);
 }
@@ -822,17 +822,17 @@ void magicard_base_state::update_sda(uint8_t device, uint8_t state)
 	m_i2cmem->write_sda(m_sda_state ? 0 : 1);
 }
 
-WRITE_LINE_MEMBER(magicard_base_state::cpu_i2c_scl)
+void magicard_base_state::cpu_i2c_scl(int state)
 {
 	update_scl(I2C_CPU, state);
 }
 
-WRITE_LINE_MEMBER(magicard_base_state::cpu_i2c_sda_write)
+void magicard_base_state::cpu_i2c_sda_write(int state)
 {
 	update_sda(I2C_CPU, state);
 }
 
-READ_LINE_MEMBER(magicard_base_state::cpu_i2c_sda_read)
+int magicard_base_state::cpu_i2c_sda_read()
 {
 	return (m_sda_state ? 0 : 1) & (m_i2cmem->read_sda() ? 1 : 0);
 }

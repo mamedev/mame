@@ -217,7 +217,7 @@ TIMER_CALLBACK_MEMBER(hp48_state::kbd_cb)
 }
 
 /* RSI opcode */
-WRITE_LINE_MEMBER( hp48_state::rsi )
+void hp48_state::rsi(int state)
 {
 	LOG("%s %f hp48_state::rsi\n", machine().describe_context(), machine().time().as_double());
 
@@ -755,7 +755,7 @@ void hp48_state::reset_modules()
 
 
 /* RESET opcode */
-WRITE_LINE_MEMBER( hp48_state::mem_reset )
+void hp48_state::mem_reset(int state)
 {
 	LOG("%s %f hp48_state::mem_reset\n", machine().describe_context(), machine().time().as_double());
 	reset_modules();

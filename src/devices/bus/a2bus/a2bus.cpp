@@ -257,8 +257,8 @@ void a2bus_device::recalc_inh(int slot)
 }
 
 // interrupt request from a2bus card
-WRITE_LINE_MEMBER( a2bus_device::irq_w ) { m_out_irq_cb(state); }
-WRITE_LINE_MEMBER( a2bus_device::nmi_w ) { m_out_nmi_cb(state); }
+void a2bus_device::irq_w(int state) { m_out_irq_cb(state); }
+void a2bus_device::nmi_w(int state) { m_out_nmi_cb(state); }
 
 //**************************************************************************
 //  DEVICE CONFIG A2BUS CARD INTERFACE

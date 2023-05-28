@@ -49,7 +49,7 @@ void starwars_state::starwars_nstore_w(uint8_t data)
 	m_novram->store(0);
 }
 
-WRITE_LINE_MEMBER(starwars_state::recall_w)
+void starwars_state::recall_w(int state)
 {
 	m_novram->recall(!state);
 }
@@ -60,12 +60,12 @@ WRITE_LINE_MEMBER(starwars_state::recall_w)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(starwars_state::coin1_counter_w)
+void starwars_state::coin1_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(starwars_state::coin2_counter_w)
+void starwars_state::coin2_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }
@@ -78,7 +78,7 @@ WRITE_LINE_MEMBER(starwars_state::coin2_counter_w)
  *
  *************************************/
 
-READ_LINE_MEMBER(starwars_state::matrix_flag_r)
+int starwars_state::matrix_flag_r()
 {
 	/* set the matrix processor flag */
 	return m_math_run ? 1 : 0;
@@ -320,7 +320,7 @@ uint8_t starwars_state::starwars_prng_r()
 	return machine().rand();
 }
 
-WRITE_LINE_MEMBER(starwars_state::prng_reset_w)
+void starwars_state::prng_reset_w(int state)
 {
 }
 

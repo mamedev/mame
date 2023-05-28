@@ -78,16 +78,16 @@ public:
 	void palette_w(offs_t offset, uint8_t data);
 	uint8_t line_r();
 
-	DECLARE_WRITE_LINE_MEMBER(noise_w);
+	void noise_w(int state);
 	void dac_w(offs_t offset, uint8_t data);
 	uint8_t via_audio_pa_r();
 	void via_audio_pa_w(uint8_t data);
 	void via_audio_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(ptm_o1_w);
-	DECLARE_WRITE_LINE_MEMBER(ptm_o2_w);
-	DECLARE_WRITE_LINE_MEMBER(ptm_o3_w);
-	DECLARE_WRITE_LINE_MEMBER(dmod_clr_w);
-	DECLARE_WRITE_LINE_MEMBER(dmod_data_w);
+	void ptm_o1_w(int state);
+	void ptm_o2_w(int state);
+	void ptm_o3_w(int state);
+	void dmod_clr_w(int state);
+	void dmod_data_w(int state);
 
 	uint8_t via_system_pa_r();
 	uint8_t via_system_pb_r();
@@ -303,7 +303,7 @@ TIMER_CALLBACK_MEMBER( beezer_state::dac_update_cb )
 	m_dac->sb_w(m_ch_sign[ch] ^ BIT(m_dac_data[ch], 7));
 }
 
-WRITE_LINE_MEMBER( beezer_state::noise_w )
+void beezer_state::noise_w(int state)
 {
 	m_noise = state;
 	m_via_audio->write_pb6(m_noise);
@@ -340,12 +340,12 @@ void beezer_state::via_audio_pb_w(uint8_t data)
 	m_ch_sign[0] = BIT(data, 7);
 }
 
-WRITE_LINE_MEMBER( beezer_state::ptm_o1_w )
+void beezer_state::ptm_o1_w(int state)
 {
 	m_ch_sign[1] = state;
 }
 
-WRITE_LINE_MEMBER( beezer_state::ptm_o2_w )
+void beezer_state::ptm_o2_w(int state)
 {
 	// on rising edge, enable noise input to ptm c3
 	if (m_ch_sign[2] == 0 && state == 1)
@@ -354,17 +354,17 @@ WRITE_LINE_MEMBER( beezer_state::ptm_o2_w )
 	m_ch_sign[2] = state;
 }
 
-WRITE_LINE_MEMBER( beezer_state::ptm_o3_w )
+void beezer_state::ptm_o3_w(int state)
 {
 	m_ch_sign[3] = state;
 }
 
-WRITE_LINE_MEMBER( beezer_state::dmod_clr_w )
+void beezer_state::dmod_clr_w(int state)
 {
 	// schematics don't show where this is connected
 }
 
-WRITE_LINE_MEMBER( beezer_state::dmod_data_w )
+void beezer_state::dmod_data_w(int state)
 {
 	// schematics don't show where this is connected
 }

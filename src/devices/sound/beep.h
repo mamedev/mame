@@ -31,7 +31,7 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 public:
-	DECLARE_WRITE_LINE_MEMBER(set_state);   // enable/disable sound output
+	void set_state(int state);   // enable/disable sound output
 	void set_clock(uint32_t frequency);       // output frequency
 
 private:

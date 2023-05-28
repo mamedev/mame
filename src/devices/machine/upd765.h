@@ -48,8 +48,8 @@ public:
 	void tc_w(bool val);
 	void ready_w(bool val);
 
-	DECLARE_WRITE_LINE_MEMBER(tc_line_w) { tc_w(state == ASSERT_LINE); }
-	DECLARE_WRITE_LINE_MEMBER(reset_w);
+	void tc_line_w(int state) { tc_w(state == ASSERT_LINE); }
+	void reset_w(int state);
 
 	void set_rate(int rate); // rate in bps, to be used when the fdc is externally frequency-controlled
 

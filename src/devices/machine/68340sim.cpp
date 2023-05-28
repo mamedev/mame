@@ -560,7 +560,7 @@ void m68340_cpu_device::do_tick_pit()
 	}
 }
 
-WRITE_LINE_MEMBER( m68340_cpu_device::extal_w )
+void m68340_cpu_device::extal_w(int state)
 {
 	LOGPIT("%s H1 set to %d\n", FUNCNAME, state);
 	m_extal = state;

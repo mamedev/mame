@@ -1752,23 +1752,23 @@ void tetrisp2_state::init_rockn3()
 	m_rockn_protectdata = 4;
 }
 
-WRITE_LINE_MEMBER(tetrisp2_state::field_irq_w)
+void tetrisp2_state::field_irq_w(int state)
 {
 	// irq1 is valid on all games but tetrisp2, but always masked by SR?
 	m_maincpu->set_input_line(1, (state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(tetrisp2_state::vblank_irq_w)
+void tetrisp2_state::vblank_irq_w(int state)
 {
 	m_maincpu->set_input_line(2, (state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(tetrisp2_state::timer_irq_w)
+void tetrisp2_state::timer_irq_w(int state)
 {
 	m_maincpu->set_input_line(4, (state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(tetrisp2_state::sound_reset_line_w)
+void tetrisp2_state::sound_reset_line_w(int state)
 {
 	logerror("%s: sound_reset_line_w %d but no CPU to reset?\n", machine().describe_context(), state);
 }
@@ -1930,22 +1930,22 @@ void tetrisp2_state::rockn2(machine_config &config)
 	ymz.add_route(1, "rspeaker", 1.0);
 }
 
-WRITE_LINE_MEMBER(rocknms_state::sub_field_irq_w)
+void rocknms_state::sub_field_irq_w(int state)
 {
 	m_subcpu->set_input_line(1, (state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(rocknms_state::sub_vblank_irq_w)
+void rocknms_state::sub_vblank_irq_w(int state)
 {
 	m_subcpu->set_input_line(2, (state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(rocknms_state::sub_timer_irq_w)
+void rocknms_state::sub_timer_irq_w(int state)
 {
 	m_subcpu->set_input_line(4, (state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(rocknms_state::sub_sound_reset_line_w)
+void rocknms_state::sub_sound_reset_line_w(int state)
 {
 	logerror("%s: sound_reset_line_w %d on sub CPU but no CPU to reset?\n", machine().describe_context(), state);
 }
@@ -2012,7 +2012,7 @@ void rocknms_state::rocknms(machine_config &config)
 	ymz.add_route(1, "rspeaker", 1.0);
 }
 
-WRITE_LINE_MEMBER(stepstag_state::field_cb)
+void stepstag_state::field_cb(int state)
 {
 	// TODO: pinpoint the exact source, translate to configure_scanline if necessary
 	// irq 4 is definitely a 30 Hz-ish here as well,

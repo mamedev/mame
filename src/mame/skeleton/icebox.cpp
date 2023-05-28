@@ -180,8 +180,8 @@ public:
 	void icebox(machine_config &config);
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(drq_w);
-	DECLARE_WRITE_LINE_MEMBER(intrq_w);
+	void drq_w(int state);
+	void intrq_w(int state);
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 	void machine_reset() override;
@@ -293,14 +293,14 @@ void icebox_state::port_f1_w(u8 data)
 }
 
 // The next byte from floppy is available. Enable CPU so it can get the NOP byte, via IM0.
-WRITE_LINE_MEMBER(icebox_state::drq_w)
+void icebox_state::drq_w(int state)
 {
 	if (BIT(m_f1, 2))
 		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE, 0x00); // Z80
 }
 
 // The next byte from floppy is available. Enable CPU so it can get the NOP byte, via IM0.
-WRITE_LINE_MEMBER(icebox_state::intrq_w)
+void icebox_state::intrq_w(int state)
 {
 	if (BIT(m_f1, 2))
 		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE, 0x00); // Z80

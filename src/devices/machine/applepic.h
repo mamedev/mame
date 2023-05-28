@@ -33,9 +33,9 @@ public:
 	void host_w(offs_t offset, u8 data);
 
 	// peripheral device requests
-	DECLARE_WRITE_LINE_MEMBER(pint_w);
-	DECLARE_WRITE_LINE_MEMBER(reqa_w);
-	DECLARE_WRITE_LINE_MEMBER(reqb_w);
+	void pint_w(int state);
+	void reqa_w(int state);
+	void reqb_w(int state);
 
 protected:
 	// device-level overrides

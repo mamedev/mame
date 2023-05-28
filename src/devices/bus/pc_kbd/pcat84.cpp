@@ -545,7 +545,7 @@ void ibm_pc_at_84_keyboard_device::p2_w(uint8_t data)
 //  t0_r -
 //-------------------------------------------------
 
-READ_LINE_MEMBER( ibm_pc_at_84_keyboard_device::t0_r )
+int ibm_pc_at_84_keyboard_device::t0_r()
 {
 	return !data_signal();
 }
@@ -555,7 +555,7 @@ READ_LINE_MEMBER( ibm_pc_at_84_keyboard_device::t0_r )
 //  t1_r -
 //-------------------------------------------------
 
-READ_LINE_MEMBER( ibm_pc_at_84_keyboard_device::t1_r )
+int ibm_pc_at_84_keyboard_device::t1_r()
 {
 	return key_depressed();
 }

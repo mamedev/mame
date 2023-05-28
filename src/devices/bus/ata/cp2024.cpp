@@ -61,19 +61,19 @@ void cp2024_device::write_cs1(offs_t offset, u16 data, u16 mem_mask)
 {
 }
 
-WRITE_LINE_MEMBER(cp2024_device::write_dmack)
+void cp2024_device::write_dmack(int state)
 {
 }
 
-WRITE_LINE_MEMBER(cp2024_device::write_csel)
+void cp2024_device::write_csel(int state)
 {
 }
 
-WRITE_LINE_MEMBER(cp2024_device::write_dasp)
+void cp2024_device::write_dasp(int state)
 {
 }
 
-WRITE_LINE_MEMBER(cp2024_device::write_pdiag)
+void cp2024_device::write_pdiag(int state)
 {
 }
 

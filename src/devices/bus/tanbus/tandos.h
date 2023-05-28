@@ -48,9 +48,9 @@ protected:
 private:
 	void control_w(uint8_t data);
 	uint8_t status_r();
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_hld_w);
+	void fdc_irq_w(int state);
+	void fdc_drq_w(int state);
+	void fdc_hld_w(int state);
 
 	required_memory_region m_dos_rom;
 	required_device<ieee488_device> m_ieee;

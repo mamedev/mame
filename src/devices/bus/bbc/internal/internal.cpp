@@ -146,7 +146,7 @@ void bbc_internal_slot_device::latch_fe60_w(uint8_t data)
 		m_card->latch_fe60_w(data);
 }
 
-WRITE_LINE_MEMBER(bbc_internal_slot_device::irq6502_w)
+void bbc_internal_slot_device::irq6502_w(int state)
 {
 	if (m_card)
 		m_card->irq6502_w(state);

@@ -288,15 +288,15 @@ protected:
 	virtual void machine_start() override;
 
 public:
-	DECLARE_WRITE_LINE_MEMBER(ppc1_int);
-	DECLARE_WRITE_LINE_MEMBER(ppc2_int);
+	void ppc1_int(int state);
+	void ppc2_int(int state);
 
 	void cde_sdbg_out(uint32_t data);
 
 	void ldac_out(uint16_t data);
 	void rdac_out(uint16_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(ata_int);
+	void ata_int(int state);
 
 	uint16_t konami_io0_r(offs_t offset);
 	void konami_io0_w(offs_t offset, uint16_t data);
@@ -365,12 +365,12 @@ private:
  *
  *************************************/
 
-WRITE_LINE_MEMBER(konamim2_state::ppc1_int)
+void konamim2_state::ppc1_int(int state)
 {
 	m_ppc1->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(konamim2_state::ppc2_int)
+void konamim2_state::ppc2_int(int state)
 {
 	m_ppc2->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -408,7 +408,7 @@ void konamim2_state::rdac_out(uint16_t data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER( konamim2_state::ata_int )
+void konamim2_state::ata_int(int state)
 {
 //  m_atapi_timer->adjust( attotime::from_msec(10), state );
 	m_ata_int = state;

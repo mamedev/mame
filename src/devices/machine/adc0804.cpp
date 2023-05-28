@@ -244,7 +244,7 @@ u8 adc0804_device::read_and_write()
 //  rd_w - enable data bus by line write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(adc0804_device::rd_w)
+void adc0804_device::rd_w(int state)
 {
 	assert(m_rd_mode == RD_BITBANGED);
 
@@ -263,7 +263,7 @@ WRITE_LINE_MEMBER(adc0804_device::rd_w)
 //  wr_w - begin conversion by line write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(adc0804_device::wr_w)
+void adc0804_device::wr_w(int state)
 {
 	// WR input is active low
 	if (!state && !m_wr_active)

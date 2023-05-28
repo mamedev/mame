@@ -95,7 +95,7 @@ protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
+	void vsync_changed(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(hsync_changed);
 
 private:
@@ -139,8 +139,8 @@ private:
 	POISK1_UPDATE_ROW(cga_gfx_1bpp_update_row);
 	POISK1_UPDATE_ROW(poisk1_gfx_1bpp_update_row);
 
-	DECLARE_WRITE_LINE_MEMBER(p1_pit8253_out2_changed);
-	DECLARE_WRITE_LINE_MEMBER(p1_speaker_set_spkrdata);
+	void p1_pit8253_out2_changed(int state);
+	void p1_speaker_set_spkrdata(int state);
 	uint8_t p1_trap_r(offs_t offset);
 	void p1_trap_w(offs_t offset, uint8_t data);
 	uint8_t p1_cga_r(offs_t offset);
@@ -437,7 +437,7 @@ void p1_state::video_start()
 	space.install_ram(0xb8000, 0xbffff, m_video.videoram);
 }
 
-WRITE_LINE_MEMBER(p1_state::vsync_changed)
+void p1_state::vsync_changed(int state)
 {
 	m_vsync = state ? 9 : 0;
 }
@@ -479,13 +479,13 @@ uint32_t p1_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 
 // Timer.  Poisk-1 uses single XTAL for everything? -- check
 
-WRITE_LINE_MEMBER(p1_state::p1_speaker_set_spkrdata)
+void p1_state::p1_speaker_set_spkrdata(int state)
 {
 	m_p1_spkrdata = state ? 1 : 0;
 	m_speaker->level_w(m_p1_spkrdata & m_p1_input);
 }
 
-WRITE_LINE_MEMBER(p1_state::p1_pit8253_out2_changed)
+void p1_state::p1_pit8253_out2_changed(int state)
 {
 	m_p1_input = state ? 1 : 0;
 	m_speaker->level_w(m_p1_spkrdata & m_p1_input);

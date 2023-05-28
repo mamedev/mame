@@ -56,7 +56,7 @@ public:
 
 	void sharkatt(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(slam_w);
+	void slam_w(int state);
 
 protected:
 	virtual void video_start() override;
@@ -450,7 +450,7 @@ void thief_state::coprocessor_w(offs_t offset, uint8_t data)
 
 // machine
 
-WRITE_LINE_MEMBER(sharkatt_state::slam_w)
+void sharkatt_state::slam_w(int state)
 {
 	// SLAM switch causes an NMI if it's pressed
 	m_maincpu->set_input_line(INPUT_LINE_NMI, state ? CLEAR_LINE : ASSERT_LINE);

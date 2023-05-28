@@ -88,7 +88,7 @@ void cvsd_device_base::device_reset()
     //m_stream->set_sample_rate(clock());
 }*/
 
-READ_LINE_MEMBER( cvsd_device_base::clock_r )
+int cvsd_device_base::clock_r()
 {
 	// prevent debugger from changing the internal state
 	if (!machine().side_effects_disabled())
@@ -96,12 +96,12 @@ READ_LINE_MEMBER( cvsd_device_base::clock_r )
 	return clock_state_r();
 }
 
-WRITE_LINE_MEMBER( cvsd_device_base::mclock_w )
+void cvsd_device_base::mclock_w(int state)
 {
 	clock_w(state);
 }
 
-WRITE_LINE_MEMBER( cvsd_device_base::digin_w )
+void cvsd_device_base::digin_w(int state)
 {
 	digit_w(state);
 }
@@ -112,12 +112,12 @@ WRITE_LINE_MEMBER( cvsd_device_base::digin_w )
     assert(0);
 }*/
 
-WRITE_LINE_MEMBER( cvsd_device_base::dec_encq_w )
+void cvsd_device_base::dec_encq_w(int state)
 {
 	assert(0);
 }
 
-READ_LINE_MEMBER( cvsd_device_base::digout_r )
+int cvsd_device_base::digout_r()
 {
 	return 0;
 }
@@ -269,12 +269,12 @@ void hc55516_device::device_reset()
 
 // device specific functions
 
-WRITE_LINE_MEMBER( hc55516_device::fzq_w )
+void hc55516_device::fzq_w(int state)
 {
 	m_buffered_fzq = state;
 }
 
-READ_LINE_MEMBER( hc55516_device::agc_r )
+int hc55516_device::agc_r()
 {
 	// prevent debugger from changing the internal state
 	if (!machine().side_effects_disabled())

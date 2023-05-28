@@ -94,7 +94,7 @@ void t6721a_device::write(uint8_t data)
 //  di_w - data input write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( t6721a_device::di_w )
+void t6721a_device::di_w(int state)
 {
 }
 
@@ -103,7 +103,7 @@ WRITE_LINE_MEMBER( t6721a_device::di_w )
 //  eos_r - eos read
 //-------------------------------------------------
 
-READ_LINE_MEMBER( t6721a_device::eos_r )
+int t6721a_device::eos_r()
 {
 	return 1;
 }

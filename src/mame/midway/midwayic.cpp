@@ -176,7 +176,7 @@ void midway_serial_pic_device::device_reset()
 	generate_serial_data(m_upper);
 }
 
-WRITE_LINE_MEMBER(midway_serial_pic_device::reset_w)
+void midway_serial_pic_device::reset_w(int state)
 {
 	if (state)
 	{
@@ -269,7 +269,7 @@ void midway_serial_pic_emu_device::device_start()
 	m_status = 0;
 }
 
-WRITE_LINE_MEMBER(midway_serial_pic_emu_device::reset_w)
+void midway_serial_pic_emu_device::reset_w(int state)
 {
 	if (!state) // fixme, PIC should be stopped while 0 and start running at 0->1 transition
 		m_pic->reset();
@@ -851,7 +851,7 @@ void midway_ioasic_device::cage_irq_handler(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(midway_ioasic_device::ioasic_input_empty)
+void midway_ioasic_device::ioasic_input_empty(int state)
 {
 	LOGFIFO("ioasic_input_empty(%d)\n", state);
 	if (state)
@@ -862,7 +862,7 @@ WRITE_LINE_MEMBER(midway_ioasic_device::ioasic_input_empty)
 }
 
 
-WRITE_LINE_MEMBER(midway_ioasic_device::ioasic_output_full)
+void midway_ioasic_device::ioasic_output_full(int state)
 {
 	LOGFIFO("ioasic_output_full(%d)\n", state);
 	if (state)
@@ -950,7 +950,7 @@ uint16_t midway_ioasic_device::fifo_status_r(address_space &space)
 }
 
 
-WRITE_LINE_MEMBER(midway_ioasic_device::fifo_reset_w)
+void midway_ioasic_device::fifo_reset_w(int state)
 {
 	/* on the high state, reset the FIFO data */
 	if (state)

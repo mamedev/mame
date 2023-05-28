@@ -144,7 +144,7 @@ TIMER_CALLBACK_MEMBER(gameplan_state::clear_screen_done_callback)
 }
 
 
-WRITE_LINE_MEMBER(gameplan_state::video_command_trigger_w)
+void gameplan_state::video_command_trigger_w(int state)
 {
 	if (state == 0)
 	{

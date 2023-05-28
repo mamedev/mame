@@ -157,12 +157,12 @@ private:
 	void u11_a_w(u8 data);
 	u8 u11_b_r();
 	void u11_b_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(u7_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(u10_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(u11_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(u7_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(u10_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
+	void u7_ca2_w(int state);
+	void u10_ca2_w(int state);
+	void u11_ca2_w(int state);
+	void u7_cb2_w(int state);
+	void u10_cb2_w(int state);
+	void u11_cb2_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(u10_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
 	void granny_crtc_w(offs_t offset, u8 data);
@@ -558,22 +558,22 @@ void by133_state::sound_data_w(u8 data)
 	m_vid_to_mpu = data;
 }
 
-WRITE_LINE_MEMBER( by133_state::u7_ca2_w )
+void by133_state::u7_ca2_w(int state)
 {
 	// comms out
 }
 
-WRITE_LINE_MEMBER( by133_state::u10_ca2_w )
+void by133_state::u10_ca2_w(int state)
 {
 	// enable digital display
 }
 
-WRITE_LINE_MEMBER( by133_state::u11_ca2_w )
+void by133_state::u11_ca2_w(int state)
 {
 	// green led
 }
 
-WRITE_LINE_MEMBER( by133_state::u7_cb2_w )
+void by133_state::u7_cb2_w(int state)
 {
 	// red led
 	m_beep->set_clock(950);
@@ -581,13 +581,13 @@ WRITE_LINE_MEMBER( by133_state::u7_cb2_w )
 	m_sound_int_handler(state);
 }
 
-WRITE_LINE_MEMBER( by133_state::u10_cb2_w )
+void by133_state::u10_cb2_w(int state)
 {
 	// lamp strobe #1
 	m_u10_cb2 = state;
 }
 
-WRITE_LINE_MEMBER( by133_state::u11_cb2_w )
+void by133_state::u11_cb2_w(int state)
 {
 	// solenoid-sound selector
 

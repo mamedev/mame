@@ -83,7 +83,7 @@ INPUT_CHANGED_MEMBER( decocpu_type1_device::main_nmi )
 		m_cpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE_LINE_MEMBER(decocpu_type1_device::cpu_pia_irq)
+void decocpu_type1_device::cpu_pia_irq(int state)
 {
 	if (state == CLEAR_LINE)
 	{

@@ -92,8 +92,8 @@ public:
 	{ }
 
 protected:
-	DECLARE_READ_LINE_MEMBER(cass_r);
-	DECLARE_WRITE_LINE_MEMBER(cass_w);
+	int cass_r();
+	void cass_w(int state);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	void mem_map(address_map &map);
 	required_device<s2650_device> m_maincpu;
@@ -151,12 +151,12 @@ private:
 	required_device<generic_terminal_device> m_terminal;
 };
 
-WRITE_LINE_MEMBER( ravens_base::cass_w )
+void ravens_base::cass_w(int state)
 {
 	m_cass->output(state ? -1.0 : +1.0);
 }
 
-READ_LINE_MEMBER( ravens_base::cass_r )
+int ravens_base::cass_r()
 {
 	return (m_cass->input() > 0.03) ? 1 : 0;
 }

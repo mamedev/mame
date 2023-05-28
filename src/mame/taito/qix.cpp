@@ -1443,12 +1443,12 @@ void qix_state::init_kram3()
 	m_bank1->set_entry(0);
 }
 
-WRITE_LINE_MEMBER(qix_state::kram3_lic_maincpu_changed)
+void qix_state::kram3_lic_maincpu_changed(int state)
 {
 	m_bank0->set_entry( state ? 1 : 0 );
 }
 
-WRITE_LINE_MEMBER(qix_state::kram3_lic_videocpu_changed)
+void qix_state::kram3_lic_videocpu_changed(int state)
 {
 	m_bank1->set_entry( state ? 1 : 0 );
 }

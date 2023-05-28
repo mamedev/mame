@@ -29,7 +29,7 @@ protected:
 	uint16_t dma_r(offs_t offset);
 	void dma_w(offs_t offset, uint16_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void irq_w(int state);
 
 private:
 
@@ -89,8 +89,8 @@ private:
 	static constexpr int REG1_1TQ4_CONTROL = 0x208;
 	static constexpr int REG1_1TQ4_STATUS = 0x20a;
 
-	WRITE_LINE_MEMBER(dmar0_in) override;
-	WRITE_LINE_MEMBER(dmar1_in) override;
+	void dmar0_in(int state) override;
+	void dmar1_in(int state) override;
 
 	void dma_transfer(int channel);
 	void update_irq();

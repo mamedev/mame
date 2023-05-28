@@ -37,7 +37,7 @@ protected:
 
 	virtual void pre_opcode_fetch(offs_t offset) override;
 	virtual uint8_t mreq_r(offs_t offset) override;
-	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
+	virtual int romcs() override;
 
 	// passthru
 	virtual void post_opcode_fetch(offs_t offset) override { m_exp->post_opcode_fetch(offset); }

@@ -96,7 +96,7 @@ void psion_asic2_device::device_reset()
 }
 
 
-WRITE_LINE_MEMBER(psion_asic2_device::on_clr_w)
+void psion_asic2_device::on_clr_w(int state)
 {
 	if (state)
 		m_a2_status |= 0x01; // A1OnKey
@@ -106,7 +106,7 @@ WRITE_LINE_MEMBER(psion_asic2_device::on_clr_w)
 	update_interrupts();
 }
 
-WRITE_LINE_MEMBER(psion_asic2_device::dnmi_w)
+void psion_asic2_device::dnmi_w(int state)
 {
 	if (state)
 		m_a2_interrupt_status |= 0x01; // DNMI
@@ -116,7 +116,7 @@ WRITE_LINE_MEMBER(psion_asic2_device::dnmi_w)
 	update_interrupts();
 }
 
-WRITE_LINE_MEMBER(psion_asic2_device::frcovl_w)
+void psion_asic2_device::frcovl_w(int state)
 {
 	if (BIT(m_a2_control2, 4))
 	{
@@ -124,7 +124,7 @@ WRITE_LINE_MEMBER(psion_asic2_device::frcovl_w)
 	}
 }
 
-WRITE_LINE_MEMBER(psion_asic2_device::reset_w)
+void psion_asic2_device::reset_w(int state)
 {
 	if (!state)
 		m_a2_status |= 0x04; // A1ResetFlag

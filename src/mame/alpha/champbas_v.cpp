@@ -181,19 +181,19 @@ void champbas_state::tilemap_w(offs_t offset, uint8_t data)
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE_LINE_MEMBER(champbas_state::gfxbank_w)
+void champbas_state::gfxbank_w(int state)
 {
 	m_gfx_bank = state;
 	m_bg_tilemap->mark_all_dirty();
 }
 
-WRITE_LINE_MEMBER(champbas_state::palette_bank_w)
+void champbas_state::palette_bank_w(int state)
 {
 	m_palette_bank = state;
 	m_bg_tilemap->set_palette_offset(m_palette_bank << 8);
 }
 
-WRITE_LINE_MEMBER(champbas_state::flipscreen_w)
+void champbas_state::flipscreen_w(int state)
 {
 	flip_screen_set(!state);
 }

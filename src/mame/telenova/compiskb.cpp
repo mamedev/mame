@@ -253,7 +253,7 @@ void compis_keyboard_device::device_start()
 //  si_w - serial input write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( compis_keyboard_device::si_w )
+void compis_keyboard_device::si_w(int state)
 {
 	m_maincpu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
 }

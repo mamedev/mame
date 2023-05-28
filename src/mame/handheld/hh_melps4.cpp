@@ -137,7 +137,7 @@ private:
 	void update_display();
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
-	DECLARE_WRITE_LINE_MEMBER(speaker_w);
+	void speaker_w(int state);
 	u16 input_r();
 };
 
@@ -168,7 +168,7 @@ void cfrogger_state::grid_w(u16 data)
 	update_display();
 }
 
-WRITE_LINE_MEMBER(cfrogger_state::speaker_w)
+void cfrogger_state::speaker_w(int state)
 {
 	// T: speaker out
 	m_speaker->level_w(state);
@@ -265,7 +265,7 @@ private:
 	void update_display();
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
-	DECLARE_WRITE_LINE_MEMBER(speaker_w);
+	void speaker_w(int state);
 	u16 input_r();
 };
 
@@ -296,7 +296,7 @@ void gjungler_state::grid_w(u16 data)
 	update_display();
 }
 
-WRITE_LINE_MEMBER(gjungler_state::speaker_w)
+void gjungler_state::speaker_w(int state)
 {
 	// T: speaker out
 	m_speaker->level_w(state);

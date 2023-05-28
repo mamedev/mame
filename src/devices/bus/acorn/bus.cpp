@@ -97,8 +97,8 @@ void acorn_bus_device::device_reset()
 }
 
 // interrupt request from acorn_bus card
-WRITE_LINE_MEMBER(acorn_bus_device::irq_w) { m_out_irq_cb(state); }
-WRITE_LINE_MEMBER(acorn_bus_device::nmi_w) { m_out_nmi_cb(state); }
+void acorn_bus_device::irq_w(int state) { m_out_irq_cb(state); }
+void acorn_bus_device::nmi_w(int state) { m_out_nmi_cb(state); }
 
 
 

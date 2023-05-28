@@ -68,7 +68,7 @@ private:
 	uint8_t pia_pa_r();
 	uint8_t pia_pb_r();
 	void pia_pb_w(uint8_t data) { mmu(data); }
-	WRITE_LINE_MEMBER(pia_cb2_w) { } // This is used by Floppy drive on Atari 8bits Home Computers
+	void pia_cb2_w(int state) { } // This is used by Floppy drive on Atari 8bits Home Computers
 	TIMER_DEVICE_CALLBACK_MEMBER(mf_interrupt);
 
 	bool atari_input_disabled() const { return !BIT(m_portb_out, 7); }

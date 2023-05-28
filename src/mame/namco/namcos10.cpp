@@ -748,8 +748,8 @@ private:
 	template <int N> uint16_t exio_lightgun_io_r();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(io_update_interrupt_callback);
-	DECLARE_WRITE_LINE_MEMBER(cdrom_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(cdrom_dmarq);
+	void cdrom_interrupt(int state);
+	void cdrom_dmarq(int state);
 
 	devcb_write_line m_io_update_interrupt;
 
@@ -1086,7 +1086,7 @@ void namcos10_state::namcos10_base(machine_config &config)
 	m_ata->dmarq_handler().set(FUNC(namcos10_state::cdrom_dmarq));
 }
 
-WRITE_LINE_MEMBER(namcos10_state::cdrom_interrupt)
+void namcos10_state::cdrom_interrupt(int state)
 {
 	if (state)
 		m_int |= 4;
@@ -1096,7 +1096,7 @@ WRITE_LINE_MEMBER(namcos10_state::cdrom_interrupt)
 	m_io_update_interrupt(state);
 }
 
-WRITE_LINE_MEMBER(namcos10_state::cdrom_dmarq)
+void namcos10_state::cdrom_dmarq(int state)
 {
 	if (!state)
 		return;

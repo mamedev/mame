@@ -330,7 +330,7 @@ void mtx_sdx_device::sdx_control_w(uint8_t data)
 	m_fdc->dden_w(!BIT(data, 4));
 }
 
-WRITE_LINE_MEMBER(mtx_sdx_device::motor_w)
+void mtx_sdx_device::motor_w(int state)
 {
 	if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(0);
 	if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(0);

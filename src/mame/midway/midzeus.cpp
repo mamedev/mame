@@ -104,8 +104,8 @@ private:
 	uint32_t disk_asic_r(offs_t offset);
 	void disk_asic_w(offs_t offset, uint32_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(firewire_irq);
-	DECLARE_WRITE_LINE_MEMBER(zeus_irq);
+	void firewire_irq(int state);
+	void zeus_irq(int state);
 
 	uint32_t zeus2_timekeeper_r(offs_t offset);
 	void zeus2_timekeeper_w(offs_t offset, uint32_t data);
@@ -186,7 +186,7 @@ INTERRUPT_GEN_MEMBER(midzeus_state::display_irq)
 	m_display_irq_off_timer->adjust(attotime::from_hz(30000000));
 }
 
-WRITE_LINE_MEMBER(midzeus2_state::zeus_irq)
+void midzeus2_state::zeus_irq(int state)
 {
 	m_maincpu->set_input_line(TMS3203X_IRQ2, ASSERT_LINE);
 }
@@ -520,7 +520,7 @@ void midzeus2_state::crusnexo_leds_w(offs_t offset, uint32_t data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(midzeus2_state::firewire_irq)
+void midzeus2_state::firewire_irq(int state)
 {
 	m_fw_int = state;
 	update_firewire_irq();

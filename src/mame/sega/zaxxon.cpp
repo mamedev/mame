@@ -303,14 +303,14 @@ INPUT_CHANGED_MEMBER(zaxxon_state::service_switch)
 }
 
 
-WRITE_LINE_MEMBER(zaxxon_state::vblank_int)
+void zaxxon_state::vblank_int(int state)
 {
 	if (state && m_int_enabled)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 
-WRITE_LINE_MEMBER(zaxxon_state::int_enable_w)
+void zaxxon_state::int_enable_w(int state)
 {
 	m_int_enabled = state;
 	if (!m_int_enabled)
@@ -391,13 +391,13 @@ void zaxxon_state::zaxxon_control_w(offs_t offset, uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(zaxxon_state::coin_counter_a_w)
+void zaxxon_state::coin_counter_a_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
 
-WRITE_LINE_MEMBER(zaxxon_state::coin_counter_b_w)
+void zaxxon_state::coin_counter_b_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }
@@ -407,7 +407,7 @@ WRITE_LINE_MEMBER(zaxxon_state::coin_counter_b_w)
 // each coin input, which then needs to be explicitly cleared by the game.
 // Each coin input first passes through a debounce circuit consisting of a
 // LS175 quad flip-flop and LS10 3-input NAND gate, which is not emulated.
-WRITE_LINE_MEMBER(zaxxon_state::coin_enable_w)
+void zaxxon_state::coin_enable_w(int state)
 {
 	for (int n = 0; n < 3; n++)
 		if (!BIT(m_mainlatch[0]->output_state(), n))
@@ -423,7 +423,7 @@ INPUT_CHANGED_MEMBER(zaxxon_state::zaxxon_coin_inserted)
 
 
 template <int Num>
-READ_LINE_MEMBER(zaxxon_state::zaxxon_coin_r)
+int zaxxon_state::zaxxon_coin_r()
 {
 	return m_coin_status[Num];
 }

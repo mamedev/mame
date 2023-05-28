@@ -55,7 +55,7 @@ void artmagic_state::update_irq_state()
 }
 
 
-WRITE_LINE_MEMBER(artmagic_state::m68k_gen_int)
+void artmagic_state::m68k_gen_int(int state)
 {
 	m_tms_irq = state;
 	update_irq_state();
@@ -364,7 +364,7 @@ void artmagic_state::stonebal_protection()
 }
 
 
-READ_LINE_MEMBER(artmagic_state::prot_r)
+int artmagic_state::prot_r()
 {
 	return m_prot_output_bit;
 }

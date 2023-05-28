@@ -182,7 +182,7 @@ void applepic_device::host_w(offs_t offset, u8 data)
 		m_ram_address = u16(data) << 8 | (m_ram_address & 0x00ff);
 }
 
-WRITE_LINE_MEMBER(applepic_device::pint_w)
+void applepic_device::pint_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -198,7 +198,7 @@ WRITE_LINE_MEMBER(applepic_device::pint_w)
 	}
 }
 
-WRITE_LINE_MEMBER(applepic_device::reqa_w)
+void applepic_device::reqa_w(int state)
 {
 	if (state == ASSERT_LINE)
 		m_dma_channel[0].control |= 0x02;
@@ -206,7 +206,7 @@ WRITE_LINE_MEMBER(applepic_device::reqa_w)
 		m_dma_channel[0].control &= 0xfd;
 }
 
-WRITE_LINE_MEMBER(applepic_device::reqb_w)
+void applepic_device::reqb_w(int state)
 {
 	if (state == ASSERT_LINE)
 		m_dma_channel[1].control |= 0x02;

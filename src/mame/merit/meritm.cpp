@@ -265,12 +265,12 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(vblank_start_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(vblank_end_tick);
-	void crt250_switch_banks(  );
-	void switch_banks(  );
+	void crt250_switch_banks();
+	void switch_banks();
 	int touch_coord_transform(int *touch_x, int *touch_y);
 	uint8_t binary_to_BCD(uint8_t data);
-	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(vdp0_interrupt);
-	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(vdp1_interrupt);
+	[[maybe_unused]] void vdp0_interrupt(int state);
+	[[maybe_unused]] void vdp1_interrupt(int state);
 	void crt250_crt258_io_map(address_map &map);
 	void crt250_io_map(address_map &map);
 	void crt250_map(address_map &map);
@@ -321,7 +321,7 @@ int meritm_state::touch_coord_transform(int *touch_x, int *touch_y)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(meritm_state::vdp0_interrupt)
+void meritm_state::vdp0_interrupt(int state)
 {
 	if (state != m_interrupt_vdp0_state)
 	{
@@ -331,7 +331,7 @@ WRITE_LINE_MEMBER(meritm_state::vdp0_interrupt)
 	}
 }
 
-WRITE_LINE_MEMBER(meritm_state::vdp1_interrupt)
+void meritm_state::vdp1_interrupt(int state)
 {
 	if (state != m_interrupt_vdp1_state)
 	{

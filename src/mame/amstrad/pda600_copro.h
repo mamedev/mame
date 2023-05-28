@@ -28,9 +28,9 @@ public:
 	auto tx_callback()    { return m_tx_cb.bind(); }
 	auto tone_callback()  { return m_tone_cb.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( wakeup_w );
-	DECLARE_WRITE_LINE_MEMBER( reset_w )    { if (state)  device_reset(); }
-	DECLARE_WRITE_LINE_MEMBER( write_txd )  { rx_w(state); }
+	void wakeup_w(int state);
+	void reset_w(int state)    { if (state)  device_reset(); }
+	void write_txd(int state)  { rx_w(state); }
 
 private:
 	// device-level overrides

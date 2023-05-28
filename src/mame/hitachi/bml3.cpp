@@ -125,8 +125,8 @@ private:
 	void firq_mask_w(u8 data);
 	uint8_t firq_status_r();
 	void relay_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(acia_rts_w);
-	DECLARE_WRITE_LINE_MEMBER(acia_irq_w);
+	void acia_rts_w(int state);
+	void acia_irq_w(int state);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
@@ -873,12 +873,12 @@ void bml3_state::piaA_w(uint8_t data)
 		m_bankg.disable();
 }
 
-WRITE_LINE_MEMBER( bml3_state::acia_rts_w )
+void bml3_state::acia_rts_w(int state)
 {
 	logerror("%02x TAPE RTS\n",state);
 }
 
-WRITE_LINE_MEMBER( bml3_state::acia_irq_w )
+void bml3_state::acia_irq_w(int state)
 {
 	logerror("%02x TAPE IRQ\n",state);
 }

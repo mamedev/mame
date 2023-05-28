@@ -210,9 +210,9 @@ private:
 	void show_leds123();
 	void show_leds12();
 	void crtc_lpen_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_irq1);
-	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_irq3);
-	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_irq5);
+	void crtc_vsync_irq1(int state);
+	void crtc_vsync_irq3(int state);
+	void crtc_vsync_irq5(int state);
 	DECLARE_VIDEO_START(blitz68k);
 	DECLARE_VIDEO_START(blitz68k_addr_factor1);
 	uint32_t screen_update_blitz68k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -1766,17 +1766,17 @@ INPUT_PORTS_END
 
 // R6845AP used for video sync signals only
 
-WRITE_LINE_MEMBER(blitz68k_state::crtc_vsync_irq1)
+void blitz68k_state::crtc_vsync_irq1(int state)
 {
 	m_maincpu->set_input_line(1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(blitz68k_state::crtc_vsync_irq3)
+void blitz68k_state::crtc_vsync_irq3(int state)
 {
 	m_maincpu->set_input_line(3, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(blitz68k_state::crtc_vsync_irq5)
+void blitz68k_state::crtc_vsync_irq5(int state)
 {
 	m_maincpu->set_input_line(5, state ? ASSERT_LINE : CLEAR_LINE);
 }

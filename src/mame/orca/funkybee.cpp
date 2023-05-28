@@ -127,10 +127,10 @@ private:
 	tilemap_t *m_bg_tilemap = nullptr;
 	uint8_t m_gfx_bank = 0U;
 	uint8_t input_port_0_r();
-	template <uint8_t Which> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
+	template <uint8_t Which> void coin_counter_w(int state);
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(gfx_bank_w);
+	void gfx_bank_w(int state);
 	void scroll_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
@@ -188,7 +188,7 @@ void funkybee_state::colorram_w(offs_t offset, uint8_t data)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE_LINE_MEMBER(funkybee_state::gfx_bank_w)
+void funkybee_state::gfx_bank_w(int state)
 {
 	m_gfx_bank = state;
 	machine().tilemap().mark_all_dirty();
@@ -295,7 +295,7 @@ uint8_t funkybee_state::input_port_0_r()
 }
 
 template <uint8_t Which>
-WRITE_LINE_MEMBER(funkybee_state::coin_counter_w)
+void funkybee_state::coin_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(Which, state);
 }

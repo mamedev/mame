@@ -532,7 +532,7 @@ public:
 
 private:
 	TIMER_DEVICE_CALLBACK_MEMBER(hack_timer);
-	DECLARE_WRITE_LINE_MEMBER(tx_a);
+	void tx_a(int state);
 
 	required_device<harddriv_state> m_mainpcb;
 	optional_device<harddriv_state> m_leftpcb;
@@ -1440,7 +1440,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-WRITE_LINE_MEMBER(harddriv_state::video_int_write_line)
+void harddriv_state::video_int_write_line(int state)
 {
 	if (state)
 	{
@@ -1665,7 +1665,7 @@ void harddriv_state::dsk2(machine_config &config)
 }
 
 
-WRITE_LINE_MEMBER(harddriv_state::sound_int_write_line)
+void harddriv_state::sound_int_write_line(int state)
 {
 	m_sound_int_state = state;
 	update_interrupts();
@@ -2073,7 +2073,7 @@ void harddriv_new_state::steeltalp_machine(machine_config &config)
 	STEELTALP_BOARD(config, "mainpcb", 0);
 }
 
-WRITE_LINE_MEMBER(harddriv_new_state::tx_a)
+void harddriv_new_state::tx_a(int state)
 {
 	// passive connection, one way, to both screens
 	m_leftpcb->get_duart()->rx_a_w(state);

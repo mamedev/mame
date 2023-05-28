@@ -153,7 +153,7 @@ protected:
 	void fgvideoram_w(offs_t offset, uint8_t data);
 	void txvideoram_w(offs_t offset, uint8_t data);
 	void bankswitch_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void adpcm_int(int state);
 
 	void sound_map(address_map &map);
 	void sub_map(address_map &map);
@@ -637,7 +637,7 @@ GFXDECODE_END
 
 
 
-WRITE_LINE_MEMBER(wc90b_state::adpcm_int)
+void wc90b_state::adpcm_int(int state)
 {
 	m_toggle ^= 1;
 	if(m_toggle)

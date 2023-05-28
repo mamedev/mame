@@ -211,11 +211,11 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
 	uint8_t sound_irq_ack_r();
 	void sound_irq_ack_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(sound_reset_w);
+	void sound_reset_w(int state);
 	uint8_t switch_6502_r();
-	DECLARE_WRITE_LINE_MEMBER(speech_squeak_w);
-	template <uint8_t Which> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
+	void speech_squeak_w(int state);
+	template <uint8_t Which> void coin_counter_w(int state);
+	void coin_counter_right_w(int state);
 	void mixer_w(uint8_t data);
 	void common_init();
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
@@ -460,7 +460,7 @@ void gauntlet_state::sound_irq_ack_w(uint8_t data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(gauntlet_state::sound_reset_w)
+void gauntlet_state::sound_reset_w(int state)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 	m_soundctl->clear_w(state);
@@ -498,14 +498,14 @@ uint8_t gauntlet_state::switch_6502_r()
  *
  *************************************/
 
-WRITE_LINE_MEMBER(gauntlet_state::speech_squeak_w)
+void gauntlet_state::speech_squeak_w(int state)
 {
 	uint8_t const data = 5 | (state ? 2 : 0);
 	m_tms5220->set_unscaled_clock(14.318181_MHz_XTAL/2 / (16 - data));
 }
 
 template <uint8_t Which>
-WRITE_LINE_MEMBER(gauntlet_state::coin_counter_w)
+void gauntlet_state::coin_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(Which, state);
 }

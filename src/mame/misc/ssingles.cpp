@@ -218,7 +218,7 @@ private:
 	uint8_t atamanot_prot_r(offs_t offset);
 	void atamanot_prot_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(atamanot_irq);
+	void atamanot_irq(int state);
 	MC6845_UPDATE_ROW(ssingles_update_row);
 	MC6845_UPDATE_ROW(atamanot_update_row);
 
@@ -584,7 +584,7 @@ void ssingles_state::ssingles(machine_config &config)
 	AY8910(config, "ay2", 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.5); // ? MHz
 }
 
-WRITE_LINE_MEMBER(ssingles_state::atamanot_irq)
+void ssingles_state::atamanot_irq(int state)
 {
 	// ...
 }

@@ -4763,7 +4763,7 @@ void nv2a_renderer::combiner_compute_alpha_outputs(int id, int stage_number)
 	combiner.work[id].functions.Aop3 = std::clamp((combiner.work[id].functions.Aop3 + bias) * scale, -1.0f, 1.0f);
 }
 
-WRITE_LINE_MEMBER(nv2a_renderer::vblank_callback)
+void nv2a_renderer::vblank_callback(int state)
 {
 	LOGMASKED(LOG_NV2A_VERBOSE, "vblank_callback\n\r");
 	if ((state != 0) && (puller_waiting == 1)) {

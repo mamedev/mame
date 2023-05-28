@@ -468,34 +468,34 @@ INPUT_PORTS_END
 //  COSMAC_INTERFACE( cosmac_intf )
 //-------------------------------------------------
 
-READ_LINE_MEMBER(vip_state::clear_r)
+int vip_state::clear_r()
 {
 	return BIT(m_run->read(), 0);
 }
 
-READ_LINE_MEMBER(vip_state::ef1_r)
+int vip_state::ef1_r()
 {
 	return m_vdc_ef1 || m_exp->ef1_r();
 }
 
-READ_LINE_MEMBER(vip_state::ef2_r)
+int vip_state::ef2_r()
 {
 	m_leds[LED_TAPE] = m_cassette->input() > 0 ? 1 : 0;
 
 	return (m_cassette->input() < 0) ? ASSERT_LINE : CLEAR_LINE;
 }
 
-READ_LINE_MEMBER(vip_state::ef3_r)
+int vip_state::ef3_r()
 {
 	return !BIT(m_keypad->read(), m_keylatch) || m_byteio_ef3 || m_exp_ef3;
 }
 
-READ_LINE_MEMBER(vip_state::ef4_r)
+int vip_state::ef4_r()
 {
 	return m_byteio_ef4 || m_exp_ef4;
 }
 
-WRITE_LINE_MEMBER(vip_state::q_w)
+void vip_state::q_w(int state)
 {
 	// sound output
 	m_beeper->write(NODE_01, state);
@@ -515,21 +515,21 @@ WRITE_LINE_MEMBER(vip_state::q_w)
 //  CDP1861_INTERFACE( vdc_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(vip_state::vdc_int_w)
+void vip_state::vdc_int_w(int state)
 {
 	m_vdc_int = state;
 
 	update_interrupts();
 }
 
-WRITE_LINE_MEMBER(vip_state::vdc_dma_out_w)
+void vip_state::vdc_dma_out_w(int state)
 {
 	m_vdc_dma_out = state;
 
 	update_interrupts();
 }
 
-WRITE_LINE_MEMBER(vip_state::vdc_ef1_w)
+void vip_state::vdc_ef1_w(int state)
 {
 	m_vdc_ef1 = state;
 }
@@ -566,7 +566,7 @@ DISCRETE_SOUND_END
 //  VIP_BYTEIO_PORT_INTERFACE( byteio_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(vip_state::byteio_inst_w)
+void vip_state::byteio_inst_w(int state)
 {
 	if (!state)
 	{
@@ -579,21 +579,21 @@ WRITE_LINE_MEMBER(vip_state::byteio_inst_w)
 //  VIP_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(vip_state::exp_int_w)
+void vip_state::exp_int_w(int state)
 {
 	m_exp_int = state;
 
 	update_interrupts();
 }
 
-WRITE_LINE_MEMBER(vip_state::exp_dma_out_w)
+void vip_state::exp_dma_out_w(int state)
 {
 	m_exp_dma_out = state;
 
 	update_interrupts();
 }
 
-WRITE_LINE_MEMBER(vip_state::exp_dma_in_w)
+void vip_state::exp_dma_in_w(int state)
 {
 	m_exp_dma_in = state;
 

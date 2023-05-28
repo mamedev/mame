@@ -45,7 +45,7 @@
 #define LOGWARN(...)      LOGMASKED(LOG_WARN, __VA_ARGS__)
 #define LOGXFER(...)      LOGMASKED(LOG_XFER, __VA_ARGS__)
 
-WRITE_LINE_MEMBER(dc_cons_state::ata_interrupt)
+void dc_cons_state::ata_interrupt(int state)
 {
 	if (state)
 		dc_sysctrl_regs[SB_ISTEXT] |= IST_EXT_GDROM;

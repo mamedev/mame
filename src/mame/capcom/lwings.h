@@ -89,8 +89,8 @@ private:
 	DECLARE_VIDEO_START(avengersb);
 	uint32_t screen_update_lwings(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_trojan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(lwings_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(avengers_interrupt);
+	void lwings_interrupt(int state);
+	void avengers_interrupt(int state);
 	inline int is_sprite_on( uint8_t *buffered_spriteram, int offs );
 	void lwings_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void trojan_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );

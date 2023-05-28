@@ -42,7 +42,7 @@ protected:
 	virtual void write_p1(u8 data) override;
 	virtual void io_write(offs_t offset, u8 data) override;
 	virtual u8 io_read(offs_t offset) override;
-	virtual DECLARE_READ_LINE_MEMBER(t0_read) override { return m_latch[0]->pending_r(); }
+	virtual int t0_read() override { return m_latch[0]->pending_r(); }
 
 private:
 	required_device<cpu_device> m_maincpu;

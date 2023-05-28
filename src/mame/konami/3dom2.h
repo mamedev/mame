@@ -244,7 +244,7 @@ public:
 	// Static configuration helpers
 	auto int_handler() { return m_int_handler.bind(); }
 
-	template<uint32_t line> WRITE_LINE_MEMBER( int_line )
+	template<uint32_t line> void int_line(int state)
 	{
 		if (state)
 			m_int_status |= 1 << line;

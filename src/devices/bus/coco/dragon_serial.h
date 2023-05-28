@@ -39,7 +39,7 @@ protected:
 	virtual void scs_write(offs_t offset, u8 data) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	void write_acia_clock(int state);
 
 	required_memory_region m_eprom;
 	required_device<acia6850_device> m_acia;

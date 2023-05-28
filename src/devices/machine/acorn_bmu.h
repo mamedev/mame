@@ -23,9 +23,9 @@ class acorn_bmu_device : public device_t
 public:
 	acorn_bmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER(scl_w);
-	DECLARE_WRITE_LINE_MEMBER(sda_w);
-	DECLARE_READ_LINE_MEMBER(sda_r);
+	void scl_w(int state);
+	void sda_w(int state);
+	int sda_r();
 
 protected:
 	// device-level overrides

@@ -119,11 +119,11 @@ private:
 
 	TIMER_CALLBACK_MEMBER(clock_brg);
 
-	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
+	void write_keyboard_clock(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(write_brga);
-	DECLARE_WRITE_LINE_MEMBER(write_brgb);
-	DECLARE_WRITE_LINE_MEMBER(write_brgc);
+	void write_brga(int state);
+	void write_brgb(int state);
+	void write_brgc(int state);
 
 	void ksm_ppi_porta_w(uint8_t data);
 	void ksm_ppi_portc_w(uint8_t data);
@@ -256,19 +256,19 @@ void ksm_state::ksm_ppi_portc_w(uint8_t data)
 	update_brg(brga, brgb, brgc);
 }
 
-WRITE_LINE_MEMBER(ksm_state::write_keyboard_clock)
+void ksm_state::write_keyboard_clock(int state)
 {
 	m_i8251kbd->write_txc(state);
 	m_i8251kbd->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER(ksm_state::write_brga)
+void ksm_state::write_brga(int state)
 {
 	brga = state;
 	update_brg(brga, brgb, brgc);
 }
 
-WRITE_LINE_MEMBER(ksm_state::write_brgb)
+void ksm_state::write_brgb(int state)
 {
 	brgb = state;
 	update_brg(brga, brgb, brgc);

@@ -58,11 +58,11 @@ private:
 	uint8_t io_read_byte(offs_t offset);
 	void io_write_byte(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( write_sasi_req );
-	DECLARE_WRITE_LINE_MEMBER( write_sasi_io );
-	DECLARE_WRITE_LINE_MEMBER( write_sasi_cd );
-	DECLARE_WRITE_LINE_MEMBER( write_sasi_msg );
-	DECLARE_WRITE_LINE_MEMBER( write_sasi_bsy );
+	void write_sasi_req(int state);
+	void write_sasi_io(int state);
+	void write_sasi_cd(int state);
+	void write_sasi_msg(int state);
+	void write_sasi_bsy(int state);
 
 	uint8_t sasi_status_r();
 	void stat_w(uint8_t data);

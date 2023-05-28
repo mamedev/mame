@@ -157,7 +157,7 @@ protected:
 	u32 screen_update_seta_no_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_seta(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_seta_buffer_sprites);
+	void screen_vblank_seta_buffer_sprites(int state);
 	u16 ipl0_ack_r();
 	void ipl0_ack_w(u16 data);
 	u16 ipl1_ack_r();
@@ -174,7 +174,7 @@ protected:
 	void set_pens();
 	void seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_bank_size);
 	void uPD71054_timer_init();
-	DECLARE_WRITE_LINE_MEMBER(pit_out0);
+	void pit_out0(int state);
 
 	void atehate_map(address_map &map);
 	void blandia_map(address_map &map);
@@ -465,7 +465,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_sensors_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_sensors_r);
 
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 
 protected:
 	virtual void machine_start() override;

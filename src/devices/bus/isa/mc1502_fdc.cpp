@@ -130,7 +130,7 @@ uint8_t mc1502_fdc_device::mc1502_wd17xx_motor_r()
 	return motor_on;
 }
 
-WRITE_LINE_MEMBER(mc1502_fdc_device::mc1502_fdc_irq_drq)
+void mc1502_fdc_device::mc1502_fdc_irq_drq(int state)
 {
 	if (state)
 		m_isa->set_ready(CLEAR_LINE); // deassert I/O CH RDY

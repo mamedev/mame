@@ -43,7 +43,7 @@ public:
 
 	void init_wecleman();
 
-	DECLARE_READ_LINE_MEMBER(hotchase_sound_status_r);
+	int hotchase_sound_status_r();
 
 protected:
 	virtual void machine_start() override;

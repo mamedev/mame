@@ -96,19 +96,19 @@ void dai_sound_device::set_volume(offs_t offset, uint8_t data)
 //  PIT callbacks
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(dai_sound_device::set_input_ch0)
+void dai_sound_device::set_input_ch0(int state)
 {
 	m_mixer_channel->update();
 	m_dai_input[0] = state;
 }
 
-WRITE_LINE_MEMBER(dai_sound_device::set_input_ch1)
+void dai_sound_device::set_input_ch1(int state)
 {
 	m_mixer_channel->update();
 	m_dai_input[1] = state;
 }
 
-WRITE_LINE_MEMBER(dai_sound_device::set_input_ch2)
+void dai_sound_device::set_input_ch2(int state)
 {
 	m_mixer_channel->update();
 	m_dai_input[2] = state;

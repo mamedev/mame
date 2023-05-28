@@ -157,7 +157,7 @@ private:
 	void lamps2_w(offs_t offset, uint8_t data);
 	void tower_lamps_w(offs_t offset, uint8_t data);
 	void coin_enable_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(ptm2_irq);
+	void ptm2_irq(int state);
 	void audiocpu_irq_update();
 
 	virtual void machine_start() override;
@@ -192,7 +192,7 @@ void sigmab52_state::audiocpu_irq_update()
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, (m_6840ptm_2->irq_state() || m_audiocpu_cmd_irq) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(sigmab52_state::ptm2_irq)
+void sigmab52_state::ptm2_irq(int state)
 {
 	audiocpu_irq_update();
 }

@@ -144,8 +144,8 @@ public:
 	// external access
 	void pa_w(uint8_t data);
 	void pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(ca_w);
-	DECLARE_WRITE_LINE_MEMBER(cb_w);
+	void ca_w(int state);
+	void cb_w(int state);
 
 protected:
 	venture_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -161,8 +161,8 @@ private:
 
 	void pia_pa_w(uint8_t data);
 	void pia_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_cb2_w);
+	void pia_ca2_w(int state);
+	void pia_cb2_w(int state);
 
 	void venture_audio(machine_config &config);
 
@@ -214,8 +214,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(irq_clear_w);
-	DECLARE_WRITE_LINE_MEMBER(main_ack_w);
+	void irq_clear_w(int state);
+	void main_ack_w(int state);
 
 	void victory_audio_map(address_map &map);
 

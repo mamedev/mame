@@ -25,7 +25,7 @@
 DMA8237 Controller
 ******************/
 
-WRITE_LINE_MEMBER( pcat_base_state::pc_dma_hrq_changed )
+void pcat_base_state::pc_dma_hrq_changed(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
@@ -103,10 +103,10 @@ void pcat_base_state::set_dma_channel(int channel, int state)
 	if (!state) m_dma_channel = channel;
 }
 
-WRITE_LINE_MEMBER( pcat_base_state::pc_dack0_w ) { set_dma_channel(0, state); }
-WRITE_LINE_MEMBER( pcat_base_state::pc_dack1_w ) { set_dma_channel(1, state); }
-WRITE_LINE_MEMBER( pcat_base_state::pc_dack2_w ) { set_dma_channel(2, state); }
-WRITE_LINE_MEMBER( pcat_base_state::pc_dack3_w ) { set_dma_channel(3, state); }
+void pcat_base_state::pc_dack0_w(int state) { set_dma_channel(0, state); }
+void pcat_base_state::pc_dack1_w(int state) { set_dma_channel(1, state); }
+void pcat_base_state::pc_dack2_w(int state) { set_dma_channel(2, state); }
+void pcat_base_state::pc_dack3_w(int state) { set_dma_channel(3, state); }
 
 /******************
 8259 IRQ controller
@@ -120,7 +120,7 @@ uint8_t pcat_base_state::get_slave_ack(offs_t offset)
 	return 0x00;
 }
 
-WRITE_LINE_MEMBER( pcat_base_state::at_pit8254_out2_changed )
+void pcat_base_state::at_pit8254_out2_changed(int state)
 {
 	m_pit_out2 = state;
 	//at_speaker_set_input( state ? 1 : 0 );

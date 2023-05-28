@@ -196,7 +196,7 @@ void ds1302_device::rtc_clock_updated(int year, int month, int day, int day_of_w
 //  ce_w - chip enable write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( ds1302_device::ce_w )
+void ds1302_device::ce_w(int state)
 {
 	if (state && !m_ce)
 	{
@@ -388,7 +388,7 @@ void ds1302_device::output_bit()
 //  sclk_w - serial clock write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( ds1302_device::sclk_w )
+void ds1302_device::sclk_w(int state)
 {
 	//LOG("Serial CLK: %u\n", state);
 
@@ -408,7 +408,7 @@ WRITE_LINE_MEMBER( ds1302_device::sclk_w )
 //  io_w - I/O write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( ds1302_device::io_w )
+void ds1302_device::io_w(int state)
 {
 	//LOG("Serial I/O: %u\n", state);
 
@@ -420,7 +420,7 @@ WRITE_LINE_MEMBER( ds1302_device::io_w )
 //  io_r - I/O read
 //-------------------------------------------------
 
-READ_LINE_MEMBER( ds1302_device::io_r )
+int ds1302_device::io_r()
 {
 	return m_io;
 }

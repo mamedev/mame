@@ -835,7 +835,7 @@ CUSTOM_INPUT_MEMBER(captflag_state::motor_pos_r)
 }
 
 template <int N>
-READ_LINE_MEMBER(captflag_state::motor_busy_r)
+int captflag_state::motor_busy_r()
 {
 //  timer_device & dev = ((side == RIGHT) ? m_motor_right : m_motor_left);
 //  return (dev.remaining() == attotime::never) ? 0 : 1;
@@ -2060,7 +2060,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::bigrun_scanline)
 		m_cpu1->set_input_line(2, HOLD_LINE);
 }
 
-WRITE_LINE_MEMBER(cischeat_state::sound_irq)
+void cischeat_state::sound_irq(int state)
 {
 	if(state)
 		m_soundcpu->set_input_line(4, HOLD_LINE);

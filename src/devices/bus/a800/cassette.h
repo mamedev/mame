@@ -29,7 +29,7 @@ public:
 	// construction/destruction
 	a8sio_cassette_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE_LINE_MEMBER( motor_w ) override;
+	virtual void motor_w(int state) override;
 
 protected:
 	a8sio_cassette_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

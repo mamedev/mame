@@ -127,12 +127,12 @@ void gladiatr_state_base::paletteram_w(offs_t offset, u8 data)
 }
 
 
-WRITE_LINE_MEMBER(gladiatr_state_base::spritebuffer_w)
+void gladiatr_state_base::spritebuffer_w(int state)
 {
 	m_sprite_buffer = state;
 }
 
-WRITE_LINE_MEMBER(gladiatr_state::spritebank_w)
+void gladiatr_state::spritebank_w(int state)
 {
 	m_sprite_bank = state ? 4 : 2;
 }

@@ -144,7 +144,7 @@ void ide_pci_device::ide2_write_cs1(offs_t offset, uint32_t data, uint32_t mem_m
 	m_ide2->write_cs1(1, data, mem_mask);
 }
 
-WRITE_LINE_MEMBER(ide_pci_device::ide_interrupt)
+void ide_pci_device::ide_interrupt(int state)
 {
 	// Call the callback
 	m_irq_handler(state);

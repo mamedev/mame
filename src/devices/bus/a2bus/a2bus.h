@@ -99,8 +99,8 @@ public:
 	uint8_t dma_r(uint16_t offset);
 	void dma_w(uint16_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( irq_w );
-	DECLARE_WRITE_LINE_MEMBER( nmi_w );
+	void irq_w(int state);
+	void nmi_w(int state);
 
 protected:
 	a2bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

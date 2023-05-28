@@ -123,13 +123,13 @@ private:
 
 	void fdc_select_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(duart1_irq);
-	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(duart2_irq);
+	void duart1_irq(int state);
+	[[maybe_unused]] void duart2_irq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(irq5_w);
+	void irq5_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(keyboard_clock_w);
-	DECLARE_WRITE_LINE_MEMBER(keyboard_data_w);
+	void keyboard_clock_w(int state);
+	void keyboard_data_w(int state);
 
 	static void floppy_formats(format_registration &fr);
 
@@ -170,7 +170,7 @@ static void pt68k_floppies(device_slot_interface &device)
 }
 
 // XT keyboard interface - done in TTL instead of an 804x
-WRITE_LINE_MEMBER(pt68k4_state::keyboard_clock_w)
+void pt68k4_state::keyboard_clock_w(int state)
 {
 //  printf("KCLK: %d\n", state ? 1 : 0);
 
@@ -200,7 +200,7 @@ WRITE_LINE_MEMBER(pt68k4_state::keyboard_clock_w)
 	m_kclk = (state == ASSERT_LINE) ? true : false;
 }
 
-WRITE_LINE_MEMBER(pt68k4_state::keyboard_data_w)
+void pt68k4_state::keyboard_data_w(int state)
 {
 //  printf("KDATA: %d\n", state ? 1 : 0);
 	m_kdata = (state == ASSERT_LINE) ? 0x80 : 0x00;
@@ -381,19 +381,19 @@ void pt68k4_state::irq5_update()
 	}
 }
 
-WRITE_LINE_MEMBER(pt68k4_state::duart1_irq)
+void pt68k4_state::duart1_irq(int state)
 {
 	m_irq5_duart1 = state;
 	irq5_update();
 }
 
-WRITE_LINE_MEMBER(pt68k4_state::irq5_w)
+void pt68k4_state::irq5_w(int state)
 {
 	m_irq5_isa = state;
 	irq5_update();
 }
 
-WRITE_LINE_MEMBER(pt68k4_state::duart2_irq)
+void pt68k4_state::duart2_irq(int state)
 {
 	m_maincpu->set_input_line(M68K_IRQ_4, state);
 }

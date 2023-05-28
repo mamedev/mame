@@ -326,7 +326,7 @@ void cosmic_state::magspot_map(address_map &map)
 }
 
 
-WRITE_LINE_MEMBER(cosmic_state::panic_coin_inserted)
+void cosmic_state::panic_coin_inserted(int state)
 {
 	if (m_sound_enabled && !state) m_samples->start(0, 10);   /* Coin - Not triggered by software */
 

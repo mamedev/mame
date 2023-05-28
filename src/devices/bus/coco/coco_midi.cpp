@@ -35,7 +35,7 @@ class coco_midi_device :
 		// optional information overrides
 		virtual void device_add_mconfig(machine_config &config) override;
 		required_device<acia6850_device> m_acia;
-		DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
+		void acia_irq_w(int state);
 
 	private:
 		required_device<midi_port_device> m_mdthru;
@@ -88,7 +88,7 @@ void coco_midi_device::device_start()
 			write8sm_delegate(m_acia, FUNC(acia6850_device::write)));
 }
 
-WRITE_LINE_MEMBER(coco_midi_device::acia_irq_w)
+void coco_midi_device::acia_irq_w(int state)
 {
 	set_line_value(line::CART, state == 0);
 }

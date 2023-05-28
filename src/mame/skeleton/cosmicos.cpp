@@ -372,36 +372,36 @@ TIMER_DEVICE_CALLBACK_MEMBER(cosmicos_state::int_tick)
 	m_maincpu->set_input_line(COSMAC_INPUT_LINE_INT, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( cosmicos_state::dmaout_w )
+void cosmicos_state::dmaout_w(int state)
 {
 	m_dmaout = state;
 }
 
-WRITE_LINE_MEMBER( cosmicos_state::efx_w )
+void cosmicos_state::efx_w(int state)
 {
 	m_efx = state;
 }
 
 /* CDP1802 Configuration */
 
-READ_LINE_MEMBER( cosmicos_state::wait_r )
+int cosmicos_state::wait_r()
 {
 	return m_wait;
 }
 
-READ_LINE_MEMBER( cosmicos_state::clear_r )
+int cosmicos_state::clear_r()
 {
 	return m_clear;
 }
 
-READ_LINE_MEMBER( cosmicos_state::ef1_r )
+int cosmicos_state::ef1_r()
 {
 	uint8_t special = m_special->read();
 
 	return BIT(special, 0);
 }
 
-READ_LINE_MEMBER( cosmicos_state::ef2_r )
+int cosmicos_state::ef2_r()
 {
 	uint8_t special = m_special->read();
 	int casin = (m_cassette)->input() < 0.0;
@@ -411,19 +411,19 @@ READ_LINE_MEMBER( cosmicos_state::ef2_r )
 	return BIT(special, 1) | BIT(special, 3) | casin;
 }
 
-READ_LINE_MEMBER( cosmicos_state::ef3_r )
+int cosmicos_state::ef3_r()
 {
 	uint8_t special = m_special->read();
 
 	return BIT(special, 2) | BIT(special, 3);
 }
 
-READ_LINE_MEMBER( cosmicos_state::ef4_r )
+int cosmicos_state::ef4_r()
 {
 	return BIT(m_buttons->read(), 0);
 }
 
-WRITE_LINE_MEMBER( cosmicos_state::q_w )
+void cosmicos_state::q_w(int state)
 {
 	/* cassette */
 	m_cassette->output(state ? +1.0 : -1.0);

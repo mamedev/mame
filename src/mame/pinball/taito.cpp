@@ -108,8 +108,8 @@ private:
 	u8 io_r(offs_t offset);
 	void io_w(offs_t offset, u8 data);
 	void pia_pb_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(pia_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(votrax_request);
+	void pia_cb2_w(int state);
+	void votrax_request(int state);
 	void shock_main_map(address_map &map);
 	void shock_audio_map(address_map &map);
 	void main_map(address_map &map);
@@ -383,7 +383,7 @@ void taito_8080::io_w(offs_t offset, u8 data)
 		m_samples->start(0, 5); // outhole
 }
 
-WRITE_LINE_MEMBER( taito_8080::pia_cb2_w )
+void taito_8080::pia_cb2_w(int state)
 {
 	if (state)
 	{
@@ -405,7 +405,7 @@ void taito_8080::pia_pb_w(u8 data)
 		m_votrax_cmd = 0x3e; // stop the rattling
 }
 
-WRITE_LINE_MEMBER( taito_8080::votrax_request )
+void taito_8080::votrax_request(int state)
 {
 	m_pia->ca1_w(state);
 }

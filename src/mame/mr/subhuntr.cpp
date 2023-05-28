@@ -65,9 +65,9 @@ private:
 	void txtram_w(offs_t offset, u8 data);
 	u8 intack_r();
 
-	DECLARE_WRITE_LINE_MEMBER(pvi1_intreq_w);
-	DECLARE_WRITE_LINE_MEMBER(pvi2_intreq_w);
-	DECLARE_WRITE_LINE_MEMBER(pvi3_intreq_w);
+	void pvi1_intreq_w(int state);
+	void pvi2_intreq_w(int state);
+	void pvi3_intreq_w(int state);
 
 	void palette_init(palette_device &palette) const;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, rectangle const &cliprect);
@@ -156,19 +156,19 @@ u8 subhuntr_state::intack_r()
 	return vector;
 }
 
-WRITE_LINE_MEMBER(subhuntr_state::pvi1_intreq_w)
+void subhuntr_state::pvi1_intreq_w(int state)
 {
 	if (state)  set_intreq(6, 0x02);
 	else        clr_intreq(6);
 }
 
-WRITE_LINE_MEMBER(subhuntr_state::pvi2_intreq_w)
+void subhuntr_state::pvi2_intreq_w(int state)
 {
 	if (state)  set_intreq(5, 0x04);
 	else        clr_intreq(5);
 }
 
-WRITE_LINE_MEMBER(subhuntr_state::pvi3_intreq_w)
+void subhuntr_state::pvi3_intreq_w(int state)
 {
 	if (state)  set_intreq(3, 0x08);
 	else        clr_intreq(3);

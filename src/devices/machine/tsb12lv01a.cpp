@@ -69,7 +69,7 @@ void tsb12lv01a_device::device_reset()
 	m_grf_status = 0x00000000;
 }
 
-WRITE_LINE_MEMBER(tsb12lv01a_device::phy_reset_w)
+void tsb12lv01a_device::phy_reset_w(int state)
 {
 	if (state)
 	{

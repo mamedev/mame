@@ -172,7 +172,7 @@ private:
 	uint8_t m_bitmap_videoram_address_y = 0;
 	tilemap_t *m_bg_tilemap = nullptr;
 
-	template <uint8_t Which> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
+	template <uint8_t Which> void coin_counter_w(int state);
 	void custom_w(uint8_t data);
 	void irq_reset_0_w(uint8_t data);
 	void irq_reset_1_w(uint8_t data);
@@ -390,7 +390,7 @@ uint32_t cloak_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
  *************************************/
 
 template <uint8_t Which>
-WRITE_LINE_MEMBER(cloak_state::coin_counter_w)
+void cloak_state::coin_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(Which, state);
 }

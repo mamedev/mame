@@ -99,7 +99,7 @@ private:
 	void dim68k_video_reset_w(u16 data);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
+	void fdc_irq_w(int state);
 
 	void mem_map(address_map &map);
 
@@ -172,7 +172,7 @@ void dim68k_state::dim68k_speaker_w(u16 data)
 	m_speaker->level_w(m_speaker_bit);
 }
 
-WRITE_LINE_MEMBER(dim68k_state::fdc_irq_w)
+void dim68k_state::fdc_irq_w(int state)
 {
 	if (state)
 	{

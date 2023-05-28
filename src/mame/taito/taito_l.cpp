@@ -208,7 +208,7 @@ u8 taitol_state::mcu_control_r()
 	return 0x1;
 }
 
-WRITE_LINE_MEMBER(champwr_state::msm5205_vck)
+void champwr_state::msm5205_vck(int state)
 {
 	if (m_adpcm_data != -1)
 	{

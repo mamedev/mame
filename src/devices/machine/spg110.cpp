@@ -41,16 +41,16 @@ spg110_device::spg110_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-WRITE_LINE_MEMBER(spg110_device::videoirq_w)
+void spg110_device::videoirq_w(int state)
 {
 	set_state_unsynced(UNSP_IRQ0_LINE, state);
 }
 
-WRITE_LINE_MEMBER(spg110_device::ffreq1_w)
+void spg110_device::ffreq1_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER(spg110_device::ffreq2_w)
+void spg110_device::ffreq2_w(int state)
 {
 }
 
@@ -82,7 +82,7 @@ uint16_t spg110_device::space_r(offs_t offset)
 	return cpuspace.read_word(offset);
 }
 
-WRITE_LINE_MEMBER(spg110_device::audioirq_w)
+void spg110_device::audioirq_w(int state)
 {
 	set_state_unsynced(UNSP_FIQ_LINE, state);
 }

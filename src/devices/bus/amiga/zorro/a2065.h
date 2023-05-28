@@ -37,7 +37,7 @@ public:
 
 	uint16_t lance_ram_r(offs_t offset);
 	void lance_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER( lance_irq_w );
+	void lance_irq_w(int state);
 
 protected:
 	// device-level overrides
@@ -45,7 +45,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 	// device_zorro2_card_interface overrides
-	virtual DECLARE_WRITE_LINE_MEMBER( cfgin_w ) override;
+	virtual void cfgin_w(int state) override;
 
 	// amiga_autoconfig overrides
 	virtual void autoconfig_base_address(offs_t address) override;

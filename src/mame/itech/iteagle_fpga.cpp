@@ -239,7 +239,7 @@ TIMER_CALLBACK_MEMBER(iteagle_fpga_device::assert_vblank_irq)
 	LOGMASKED(LOG_FPGA, "%s:fpga assert_vblank_irq Setting interrupt(%i)\n", machine().describe_context(), m_irq_num);
 }
 
-WRITE_LINE_MEMBER(iteagle_fpga_device::vblank_update)
+void iteagle_fpga_device::vblank_update(int state)
 {
 	m_vblank_state = state;
 	if (state && m_fpga_regs[0x4 / 4] & 0x01000000) {
@@ -257,7 +257,7 @@ WRITE_LINE_MEMBER(iteagle_fpga_device::vblank_update)
 	}
 }
 
-WRITE_LINE_MEMBER(iteagle_fpga_device::serial_interrupt)
+void iteagle_fpga_device::serial_interrupt(int state)
 {
 	LOGMASKED(LOG_SERIAL, "serial_interrupt: intr(%i) = %i\n", m_serial_irq_num, state);
 	m_cpu->set_input_line(m_serial_irq_num, state);

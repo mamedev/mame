@@ -91,7 +91,7 @@ void ds75160a_device::write(uint8_t data)
 //  te_w - transmit enable
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( ds75160a_device::te_w )
+void ds75160a_device::te_w(int state)
 {
 	if (m_te != state)
 	{
@@ -106,7 +106,7 @@ WRITE_LINE_MEMBER( ds75160a_device::te_w )
 //  pe_w - parallel enable
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( ds75160a_device::pe_w )
+void ds75160a_device::pe_w(int state)
 {
 	m_pe = state;
 }

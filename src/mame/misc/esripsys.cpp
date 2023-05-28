@@ -42,7 +42,7 @@
  *
  *************************************/
 
-WRITE_LINE_MEMBER(esripsys_state::ptm_irq)
+void esripsys_state::ptm_irq(int state)
 {
 	m_soundcpu->set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }

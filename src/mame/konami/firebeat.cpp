@@ -426,9 +426,9 @@ protected:
 	void lamp_output3_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	INTERRUPT_GEN_MEMBER(firebeat_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(ata_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(gcu_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(sound_irq_callback);
+	void ata_interrupt(int state);
+	void gcu_interrupt(int state);
+	void sound_irq_callback(int state);
 
 	int m_cabinet_info = 0;
 
@@ -495,8 +495,8 @@ protected:
 	void spu_map(address_map &map);
 	void rf5c400_map(address_map& map);
 
-	DECLARE_WRITE_LINE_MEMBER(spu_ata_dmarq);
-	DECLARE_WRITE_LINE_MEMBER(spu_ata_interrupt);
+	void spu_ata_dmarq(int state);
+	void spu_ata_interrupt(int state);
 	TIMER_CALLBACK_MEMBER(spu_dma_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(spu_timer_callback);
 
@@ -609,8 +609,8 @@ private:
 	void midi_uart_w(offs_t offset, uint8_t data);
 
 //  TIMER_CALLBACK_MEMBER(keyboard_timer_callback);
-	DECLARE_WRITE_LINE_MEMBER(midi_keyboard_right_irq_callback);
-	DECLARE_WRITE_LINE_MEMBER(midi_keyboard_left_irq_callback);
+	void midi_keyboard_right_irq_callback(int state);
+	void midi_keyboard_left_irq_callback(int state);
 
 //  emu_timer *m_keyboard_timer;
 //  int m_keyboard_state[2];
@@ -653,7 +653,7 @@ private:
 	uint8_t midi_uart_r(offs_t offset);
 	void midi_uart_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(midi_st224_irq_callback);
+	void midi_st224_irq_callback(int state);
 
 	required_device<fdc37c665gt_device> m_fdc;
 	required_device<floppy_connector> m_floppy;
@@ -664,7 +664,7 @@ private:
 	required_ioport_array<2> m_io_turntables;
 	required_ioport_array<7> m_io_effects;
 
-	DECLARE_WRITE_LINE_MEMBER(floppy_irq_callback);
+	void floppy_irq_callback(int state);
 };
 
 class firebeat_popn_state : public firebeat_spu_state
@@ -1163,17 +1163,17 @@ INTERRUPT_GEN_MEMBER(firebeat_state::firebeat_interrupt)
 	device.execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(firebeat_state::ata_interrupt)
+void firebeat_state::ata_interrupt(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ4, state);
 }
 
-WRITE_LINE_MEMBER(firebeat_state::gcu_interrupt)
+void firebeat_state::gcu_interrupt(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
 }
 
-WRITE_LINE_MEMBER(firebeat_state::sound_irq_callback)
+void firebeat_state::sound_irq_callback(int state)
 {
 }
 
@@ -1365,7 +1365,7 @@ void firebeat_spu_state::firebeat_waveram_w(offs_t offset, uint16_t data, uint16
 	COMBINE_DATA(&m_waveram[offset + m_wave_bank]);
 }
 
-WRITE_LINE_MEMBER(firebeat_spu_state::spu_ata_dmarq)
+void firebeat_spu_state::spu_ata_dmarq(int state)
 {
 	if (m_spuata != nullptr && m_spu_ata_dmarq != state)
 	{
@@ -1398,7 +1398,7 @@ TIMER_CALLBACK_MEMBER(firebeat_spu_state::spu_dma_callback)
 	}
 }
 
-WRITE_LINE_MEMBER(firebeat_spu_state::spu_ata_interrupt)
+void firebeat_spu_state::spu_ata_interrupt(int state)
 {
 	if (state == 0)
 		m_audiocpu->set_input_line(INPUT_LINE_IRQ2, state);
@@ -1422,7 +1422,7 @@ static void pc_hd_floppies(device_slot_interface &device)
 	device.option_add("35hd", FLOPPY_35_HD);
 }
 
-WRITE_LINE_MEMBER(firebeat_bm3_state::floppy_irq_callback)
+void firebeat_bm3_state::floppy_irq_callback(int state)
 {
 	if (BIT(m_extend_board_irq_enable, 2) == 0 && state)
 	{
@@ -1513,7 +1513,7 @@ uint16_t firebeat_bm3_state::sensor_r(offs_t offset)
 	return 0;
 }
 
-WRITE_LINE_MEMBER(firebeat_bm3_state::midi_st224_irq_callback)
+void firebeat_bm3_state::midi_st224_irq_callback(int state)
 {
 	if (BIT(m_extend_board_irq_enable, 0) == 0 && state != CLEAR_LINE)
 	{
@@ -1882,7 +1882,7 @@ void firebeat_kbm_state::midi_uart_w(offs_t offset, uint8_t data)
 	m_duart_midi->write(offset >> 6, data);
 }
 
-WRITE_LINE_MEMBER(firebeat_kbm_state::midi_keyboard_right_irq_callback)
+void firebeat_kbm_state::midi_keyboard_right_irq_callback(int state)
 {
 	if (BIT(m_extend_board_irq_enable, 1) == 0 && state != CLEAR_LINE)
 	{
@@ -1893,7 +1893,7 @@ WRITE_LINE_MEMBER(firebeat_kbm_state::midi_keyboard_right_irq_callback)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(firebeat_kbm_state::midi_keyboard_left_irq_callback)
+void firebeat_kbm_state::midi_keyboard_left_irq_callback(int state)
 {
 	if (BIT(m_extend_board_irq_enable, 0) == 0 && state != CLEAR_LINE)
 	{

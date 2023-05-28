@@ -381,7 +381,7 @@ void ms7004_device::device_reset()
 }
 
 
-WRITE_LINE_MEMBER(ms7004_device::write_rxd)
+void ms7004_device::write_rxd(int state)
 {
 	m_maincpu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -466,7 +466,7 @@ void ms7004_device::i8243_port_w(uint8_t data)
 //  t1_r -
 //-------------------------------------------------
 
-READ_LINE_MEMBER(ms7004_device::t1_r)
+int ms7004_device::t1_r()
 {
 	if (!BIT(m_p1, 4))
 		return m_keylatch;

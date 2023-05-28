@@ -121,16 +121,16 @@ private:
 	void dynax_blitter_rev1_start_w(uint8_t data);
 	void dynax_blitter_rev1_clear_w(uint8_t data);
 	void palbank_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
-	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(nmi_clock_w);
+	void coin_counter_w(int state);
+	void nmi_enable_w(int state);
+	void nmi_clock_w(int state);
 	DECLARE_VIDEO_START(untoucha);
 	MC6845_UPDATE_ROW(hnayayoi_update_row);
 	MC6845_UPDATE_ROW(untoucha_update_row);
 	void common_vh_start(int num_pixmaps);
 	void copy_pixel(int x, int y, int pen);
 	void draw_layer_interleaved(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t row, uint16_t y, uint8_t x_count, int left_pixmap, int right_pixmap, int palbase, bool transp);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	void irqhandler(int state);
 
 	void hnayayoi_map(address_map &map);
 	void hnayayoi_io_map(address_map &map);
@@ -406,13 +406,13 @@ void hnayayoi_state::keyboard_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(hnayayoi_state::coin_counter_w)
+void hnayayoi_state::coin_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
 
-WRITE_LINE_MEMBER(hnayayoi_state::nmi_enable_w)
+void hnayayoi_state::nmi_enable_w(int state)
 {
 	m_nmi_enable = state;
 	if (!state)
@@ -420,7 +420,7 @@ WRITE_LINE_MEMBER(hnayayoi_state::nmi_enable_w)
 }
 
 
-WRITE_LINE_MEMBER(hnayayoi_state::nmi_clock_w)
+void hnayayoi_state::nmi_clock_w(int state)
 {
 	if (m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, state);
@@ -923,7 +923,7 @@ INPUT_PORTS_END
 
 
 
-WRITE_LINE_MEMBER(hnayayoi_state::irqhandler)
+void hnayayoi_state::irqhandler(int state)
 {
 	LOGIRQ("irq");
 //  m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);

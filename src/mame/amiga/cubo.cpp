@@ -344,9 +344,9 @@ public:
 	uint16_t handle_joystick_potgor(uint16_t potgor);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(cubo_input);
-	template <int P> DECLARE_READ_LINE_MEMBER(cd32_sel_mirror_input);
+	template <int P> int cd32_sel_mirror_input();
 
-	DECLARE_WRITE_LINE_MEMBER( akiko_int_w );
+	void akiko_int_w(int state);
 	void akiko_cia_0_port_a_write(uint8_t data);
 
 	void init_cubo();
@@ -389,7 +389,7 @@ private:
 };
 
 
-WRITE_LINE_MEMBER( cubo_state::akiko_int_w )
+void cubo_state::akiko_int_w(int state)
 {
 	set_interrupt(INTENA_SETCLR | INTENA_PORTS);
 }
@@ -543,7 +543,7 @@ CUSTOM_INPUT_MEMBER( cubo_state::cubo_input )
 }
 
 template <int P>
-READ_LINE_MEMBER( cubo_state::cd32_sel_mirror_input )
+int cubo_state::cd32_sel_mirror_input()
 {
 	uint8_t bits = m_player_ports[P]->read();
 	return (bits & 0x20)>>5;

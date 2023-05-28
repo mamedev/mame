@@ -54,8 +54,8 @@ private:
 	static void floppy_formats(format_registration &fr);
 
 	uint8_t fdc_input_r();
-	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void fdc_irq_w(int state);
+	void fdc_drq_w(int state);
 
 	required_device<mcs3201_device> m_fdc;
 	required_ioport m_config;

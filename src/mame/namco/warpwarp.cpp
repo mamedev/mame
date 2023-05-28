@@ -220,7 +220,7 @@ void warpwarp_state::machine_start()
 }
 
 /* Interrupt Gen */
-WRITE_LINE_MEMBER(warpwarp_state::vblank_irq)
+void warpwarp_state::vblank_irq(int state)
 {
 	if (state && m_ball_on)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -266,30 +266,30 @@ void warpwarp_state::geebee_out6_w(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(warpwarp_state::counter_w)
+void warpwarp_state::counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(warpwarp_state::lock_out_w)
+void warpwarp_state::lock_out_w(int state)
 {
 	machine().bookkeeping().coin_lockout_global_w(!state);
 }
 
-WRITE_LINE_MEMBER(warpwarp_state::geebee_bgw_w)
+void warpwarp_state::geebee_bgw_w(int state)
 {
 	m_geebee_bgw = state;
 	machine().tilemap().mark_all_dirty();
 }
 
-WRITE_LINE_MEMBER(warpwarp_state::ball_on_w)
+void warpwarp_state::ball_on_w(int state)
 {
 	m_ball_on = state;
 	if (!state)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(warpwarp_state::inv_w)
+void warpwarp_state::inv_w(int state)
 {
 	flip_screen_set(state);
 }

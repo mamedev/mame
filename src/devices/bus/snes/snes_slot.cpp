@@ -170,7 +170,7 @@ void device_sns_cart_interface::rom_map_setup(uint32_t size)
 //  write_irq - set the cart IRQ output
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(device_sns_cart_interface::write_irq)
+void device_sns_cart_interface::write_irq(int state)
 {
 	if (m_slot != nullptr)
 		m_slot->write_irq(state);

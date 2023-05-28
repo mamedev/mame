@@ -277,7 +277,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mtx_state::ctc_tick)
 	m_z80ctc->trg2(0);
 }
 
-WRITE_LINE_MEMBER(mtx_state::ctc_trg1_w)
+void mtx_state::ctc_trg1_w(int state)
 {
 	if (m_z80dart)
 	{
@@ -286,7 +286,7 @@ WRITE_LINE_MEMBER(mtx_state::ctc_trg1_w)
 	}
 }
 
-WRITE_LINE_MEMBER(mtx_state::ctc_trg2_w)
+void mtx_state::ctc_trg2_w(int state)
 {
 	if (m_z80dart)
 	{

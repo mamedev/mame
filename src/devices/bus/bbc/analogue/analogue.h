@@ -60,7 +60,7 @@ public:
 	// callbacks
 	auto lpstb_handler() { return m_lpstb_handler.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(lpstb_w) { m_lpstb_handler(state); }
+	void lpstb_w(int state) { m_lpstb_handler(state); }
 
 	uint8_t ch_r(int channel);
 	uint8_t pb_r();

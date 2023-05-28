@@ -42,9 +42,9 @@ private:
 	uint8_t port_314;
 	bool intrq_state, drq_state, hld_state;
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_hld_w);
+	void fdc_irq_w(int state);
+	void fdc_drq_w(int state);
+	void fdc_hld_w(int state);
 
 	void port_314_w(uint8_t data);
 	uint8_t port_314_r();

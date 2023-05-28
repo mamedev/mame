@@ -44,8 +44,8 @@ private:
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_nmi_handler;
 
-	DECLARE_WRITE_LINE_MEMBER(handle_irq);
-	DECLARE_WRITE_LINE_MEMBER(handle_nmi);
+	void handle_irq(int state);
+	void handle_nmi(int state);
 
 	uint8_t flip_bits(uint8_t data);
 	uint8_t pia_pa_r();

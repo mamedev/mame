@@ -72,9 +72,9 @@ private:
 
 	// video state
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_tick);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
-	DECLARE_WRITE_LINE_MEMBER(cassette_w);
+	void ctc_z0_w(int state);
+	void ctc_z2_w(int state);
+	void cassette_w(int state);
 	void amu880_io(address_map &map);
 	void amu880_mem(address_map &map);
 

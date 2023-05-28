@@ -239,13 +239,13 @@ void hle_msmouse_device_base::device_start()
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(hle_msmouse_device_base::start_mouse), this));
 }
 
-WRITE_LINE_MEMBER(hle_msmouse_device_base::input_dtr)
+void hle_msmouse_device_base::input_dtr(int state)
 {
 	m_dtr = state ? 1U : 0U;
 	check_enable();
 }
 
-WRITE_LINE_MEMBER(hle_msmouse_device_base::input_rts)
+void hle_msmouse_device_base::input_rts(int state)
 {
 	m_rts = state ? 1U : 0U;
 	check_enable();

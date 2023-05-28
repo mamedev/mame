@@ -202,13 +202,13 @@ INPUT_CHANGED_MEMBER( s11_state::audio_nmi )
 			m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE_LINE_MEMBER( s11_state::pia_irq )
+void s11_state::pia_irq(int state)
 {
 	m_pia_irq_active = state;
 	m_mainirq->in_w<1>(state);
 }
 
-WRITE_LINE_MEMBER( s11_state::main_irq )
+void s11_state::main_irq(int state)
 {
 	// handle the fact that the Advance and Up/Down switches are gated by the combined timer/pia irq signal
 	if(state == CLEAR_LINE)
@@ -229,7 +229,7 @@ void s11_state::sound_w(u8 data)
 	m_sound_data = data;
 }
 
-WRITE_LINE_MEMBER( s11_state::pia21_ca2_w )
+void s11_state::pia21_ca2_w(int state)
 {
 // sound ns
 	if(m_pias)
@@ -353,7 +353,7 @@ void s11_state::pia34_pb_w(u8 data)
 		m_ps88->data_w(data);
 }
 
-WRITE_LINE_MEMBER( s11_state::pia34_cb2_w )
+void s11_state::pia34_cb2_w(int state)
 {
 	if(m_bg)
 		m_bg->ctrl_w(state); // MCB2 through CPU interface
@@ -367,14 +367,14 @@ void s11_state::bank_w(u8 data)
 	membank("bank1")->set_entry(BIT(data, 0));
 }
 
-WRITE_LINE_MEMBER( s11_state::pias_ca2_w )
+void s11_state::pias_ca2_w(int state)
 {
 // speech clock
 	if(m_hc55516)
 		m_hc55516->clock_w(state);
 }
 
-WRITE_LINE_MEMBER( s11_state::pias_cb2_w )
+void s11_state::pias_cb2_w(int state)
 {
 // speech data
 	if(m_hc55516)

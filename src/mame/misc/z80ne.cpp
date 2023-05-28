@@ -244,7 +244,7 @@ protected:
 	void lx383_w(offs_t offset, uint8_t data);
 	uint8_t lx385_ctrl_r();
 	void lx385_ctrl_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(lx385_uart_tx_clock_w);
+	void lx385_uart_tx_clock_w(int state);
 
 	TIMER_CALLBACK_MEMBER(cassette_tc);
 	TIMER_CALLBACK_MEMBER(kbd_scan);
@@ -300,8 +300,8 @@ public:
 protected:
 	virtual void machine_reset() override;
 
-	DECLARE_READ_LINE_MEMBER(lx387_shift_r);
-	DECLARE_READ_LINE_MEMBER(lx387_control_r);
+	int lx387_shift_r();
+	int lx387_control_r();
 	uint8_t lx387_data_r();
 	uint8_t lx388_mc6847_videoram_r(offs_t offset);
 	uint8_t lx388_read_field_sync();
@@ -898,18 +898,18 @@ void z80ne_state::lx385_ctrl_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(z80ne_state::lx385_uart_tx_clock_w)
+void z80ne_state::lx385_uart_tx_clock_w(int state)
 {
 	if (BIT(m_lx385_ctrl, 2))
 		m_uart->write_tcp(state);
 }
 
-READ_LINE_MEMBER(z80net_state::lx387_shift_r)
+int z80net_state::lx387_shift_r()
 {
 	return BIT(m_io_modifiers->read(), 0) || BIT(m_io_modifiers->read(), 2);
 }
 
-READ_LINE_MEMBER(z80net_state::lx387_control_r)
+int z80net_state::lx387_control_r()
 {
 	return BIT(m_io_modifiers->read(), 1);
 }

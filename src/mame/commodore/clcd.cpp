@@ -428,7 +428,7 @@ public:
 		machine().scheduler().perfect_quantum(attotime::from_usec(2000));
 	}
 
-	WRITE_LINE_MEMBER(write_sl)
+	void write_sl(int state)
 	{
 		if (m_key_poll != state)
 		{
@@ -452,7 +452,7 @@ public:
 		}
 	}
 
-	WRITE_LINE_MEMBER(via0_cb1_w)
+	void via0_cb1_w(int state)
 	{
 		int newm_key_clk = state & 1;
 		if (m_key_clk != newm_key_clk)
@@ -498,7 +498,7 @@ public:
 		//int centronics_unknown = !BIT(data,5);
 	}
 
-	WRITE_LINE_MEMBER(write_power_on)
+	void write_power_on(int state)
 	{
 		if (m_power_on != state)
 		{
@@ -507,7 +507,7 @@ public:
 		}
 	}
 
-	WRITE_LINE_MEMBER(write_power)
+	void write_power(int state)
 	{
 		if (m_power != state)
 		{

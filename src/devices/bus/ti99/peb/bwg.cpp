@@ -123,7 +123,7 @@ void snug_bwg_device::operate_ready_line()
 /*
     Callbacks from the WD1773 chip
 */
-WRITE_LINE_MEMBER( snug_bwg_device::fdc_irq_w )
+void snug_bwg_device::fdc_irq_w(int state)
 {
 	LOGMASKED(LOG_SIGNALS, "set intrq = %d\n", state);
 	m_IRQ = (line_state)state;
@@ -132,7 +132,7 @@ WRITE_LINE_MEMBER( snug_bwg_device::fdc_irq_w )
 	operate_ready_line();
 }
 
-WRITE_LINE_MEMBER( snug_bwg_device::fdc_drq_w )
+void snug_bwg_device::fdc_drq_w(int state)
 {
 	LOGMASKED(LOG_SIGNALS, "set drq = %d\n", state);
 	m_DRQ = (line_state)state;
@@ -390,19 +390,19 @@ void snug_bwg_device::cruwrite(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(snug_bwg_device::den_w)
+void snug_bwg_device::den_w(int state)
 {
 	// (De)select the card. Indicated by a LED on the board.
 	m_selected = state;
 	LOGMASKED(LOG_CRU, "Map DSR (bit 0) = %d\n", m_selected);
 }
 
-WRITE_LINE_MEMBER(snug_bwg_device::mop_w)
+void snug_bwg_device::mop_w(int state)
 {
 	m_motormf->b_w(state);
 }
 
-WRITE_LINE_MEMBER(snug_bwg_device::waiten_w)
+void snug_bwg_device::waiten_w(int state)
 {
 	/* Set disk ready/hold (bit 2) */
 	// 0: ignore IRQ and DRQ
@@ -412,29 +412,29 @@ WRITE_LINE_MEMBER(snug_bwg_device::waiten_w)
 	LOGMASKED(LOG_CRU, "Arm wait state logic (bit 2) = %d\n", state);
 }
 
-WRITE_LINE_MEMBER(snug_bwg_device::hlt_w)
+void snug_bwg_device::hlt_w(int state)
 {
 	// Load disk heads (HLT pin) (bit 3). Not implemented.
 	LOGMASKED(LOG_CRU, "Set head load (bit 3) = %d\n", state);
 }
 
 /* Drive selects */
-WRITE_LINE_MEMBER(snug_bwg_device::dsel1_w)
+void snug_bwg_device::dsel1_w(int state)
 {
 	select_drive(1, state);
 }
 
-WRITE_LINE_MEMBER(snug_bwg_device::dsel2_w)
+void snug_bwg_device::dsel2_w(int state)
 {
 	select_drive(2, state);
 }
 
-WRITE_LINE_MEMBER(snug_bwg_device::dsel3_w)
+void snug_bwg_device::dsel3_w(int state)
 {
 	select_drive(3, state);
 }
 
-WRITE_LINE_MEMBER(snug_bwg_device::dsel4_w)
+void snug_bwg_device::dsel4_w(int state)
 {
 	select_drive(4, state);
 }
@@ -472,7 +472,7 @@ void snug_bwg_device::select_drive(int n, int state)
 	}
 }
 
-WRITE_LINE_MEMBER(snug_bwg_device::sidsel_w)
+void snug_bwg_device::sidsel_w(int state)
 {
 	// Select side of disk (bit 7)
 	if (m_sel_floppy != 0)
@@ -482,7 +482,7 @@ WRITE_LINE_MEMBER(snug_bwg_device::sidsel_w)
 	}
 }
 
-WRITE_LINE_MEMBER(snug_bwg_device::dden_w)
+void snug_bwg_device::dden_w(int state)
 {
 	/* double density enable (active low) */
 	LOGMASKED(LOG_CRU, "Set density (bit 10) = %d (%s)\n", state, (state!=0)? "single" : "double");
@@ -492,7 +492,7 @@ WRITE_LINE_MEMBER(snug_bwg_device::dden_w)
 /*
     All floppy motors are operated by the same line.
 */
-WRITE_LINE_MEMBER(snug_bwg_device::motorona_w)
+void snug_bwg_device::motorona_w(int state)
 {
 	m_MOTOR_ON = state;
 	LOGMASKED(LOG_MOTOR, "Motor %s\n", state? "on" : "off");

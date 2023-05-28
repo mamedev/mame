@@ -1762,12 +1762,12 @@ Notes:
       *         - Unpopulated DIP42 socket
 */
 
-READ_LINE_MEMBER(jdredd_state::gun_mux_r)
+int jdredd_state::gun_mux_r()
 {
 	return m_gun_mux;
 }
 
-WRITE_LINE_MEMBER(jdredd_state::vblank)
+void jdredd_state::vblank(int state)
 {
 	if (state)
 	{

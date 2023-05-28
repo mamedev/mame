@@ -77,17 +77,17 @@ private:
 	uint8_t firefox_disc_status_r();
 	uint8_t firefox_disc_data_r();
 	void firefox_disc_read_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(firefox_disc_lock_w);
-	DECLARE_WRITE_LINE_MEMBER(audio_enable_left_w);
-	DECLARE_WRITE_LINE_MEMBER(audio_enable_right_w);
-	DECLARE_WRITE_LINE_MEMBER(firefox_disc_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(firefox_disc_write_w);
+	void firefox_disc_lock_w(int state);
+	void audio_enable_left_w(int state);
+	void audio_enable_right_w(int state);
+	void firefox_disc_reset_w(int state);
+	void firefox_disc_write_w(int state);
 	void firefox_disc_data_w(uint8_t data);
 	void tileram_w(offs_t offset, uint8_t data);
 	void tile_palette_w(offs_t offset, uint8_t data);
 	void sprite_palette_w(offs_t offset, uint8_t data);
 	void firefox_objram_bank_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(sound_reset_w);
+	void sound_reset_w(int state);
 	uint8_t adc_r();
 	void adc_select_w(uint8_t data);
 	void nvram_w(offs_t offset, uint8_t data);
@@ -96,8 +96,8 @@ private:
 	void main_irq_clear_w(uint8_t data);
 	void main_firq_clear_w(uint8_t data);
 	void self_reset_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
+	void coin_counter_right_w(int state);
+	void coin_counter_left_w(int state);
 	uint8_t riot_porta_r();
 	void riot_porta_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(bgtile_get_info);
@@ -193,28 +193,28 @@ void firefox_state::firefox_disc_read_w(uint8_t data)
 	m_n_disc_read_data = m_laserdisc->data_r();
 }
 
-WRITE_LINE_MEMBER(firefox_state::firefox_disc_lock_w)
+void firefox_state::firefox_disc_lock_w(int state)
 {
 	m_n_disc_lock = state;
 }
 
-WRITE_LINE_MEMBER(firefox_state::audio_enable_left_w)
+void firefox_state::audio_enable_left_w(int state)
 {
 	m_laserdisc->set_output_gain(0, state ? 1.0 : 0.0);
 }
 
-WRITE_LINE_MEMBER(firefox_state::audio_enable_right_w)
+void firefox_state::audio_enable_right_w(int state)
 {
 	m_laserdisc->set_output_gain(1, state ? 1.0 : 0.0);
 }
 
-WRITE_LINE_MEMBER(firefox_state::firefox_disc_reset_w)
+void firefox_state::firefox_disc_reset_w(int state)
 {
 	m_laserdisc->reset_w(state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /* active low on dbb7 */
-WRITE_LINE_MEMBER(firefox_state::firefox_disc_write_w)
+void firefox_state::firefox_disc_write_w(int state)
 {
 	if (state == 0)
 		m_laserdisc->data_w(m_n_disc_data);
@@ -330,7 +330,7 @@ void firefox_state::firefox_objram_bank_w(uint8_t data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(firefox_state::sound_reset_w)
+void firefox_state::sound_reset_w(int state)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 	if (state != 0)
@@ -422,12 +422,12 @@ void firefox_state::self_reset_w(uint8_t data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(firefox_state::coin_counter_right_w)
+void firefox_state::coin_counter_right_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(firefox_state::coin_counter_left_w)
+void firefox_state::coin_counter_left_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }

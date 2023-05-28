@@ -84,14 +84,14 @@ protected:
 	required_device<floppy_connector> m_floppy1;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( dma_int_w );
+	void dma_int_w(int state);
 
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
 	uint8_t io_read_byte(offs_t offset);
 	void io_write_byte(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
+	void fdc_intrq_w(int state);
 
 	uint8_t out_r();
 	void inp_w(uint8_t data);

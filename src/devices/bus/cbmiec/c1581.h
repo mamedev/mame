@@ -67,8 +67,8 @@ private:
 
 	void update_iec();
 
-	DECLARE_WRITE_LINE_MEMBER( cnt_w );
-	DECLARE_WRITE_LINE_MEMBER( sp_w );
+	void cnt_w(int state);
+	void sp_w(int state);
 	uint8_t cia_pa_r();
 	void cia_pa_w(uint8_t data);
 	uint8_t cia_pb_r();

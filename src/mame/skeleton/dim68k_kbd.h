@@ -41,7 +41,7 @@ private:
 	// MCU handlers
 	u8 p1_r();
 	void p2_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(prog_w);
+	void prog_w(int state);
 	u8 eprom_r();
 
 	// address map

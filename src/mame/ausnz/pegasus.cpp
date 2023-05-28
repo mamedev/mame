@@ -89,9 +89,9 @@ private:
 	void pegasus_controls_w(u8 data);
 	void pegasus_keyboard_w(u8 data);
 	void pegasus_pcg_w(offs_t offset, u8 data);
-	DECLARE_READ_LINE_MEMBER(pegasus_cassette_r);
-	DECLARE_WRITE_LINE_MEMBER(pegasus_cassette_w);
-	DECLARE_WRITE_LINE_MEMBER(pegasus_firq_clr);
+	int pegasus_cassette_r();
+	void pegasus_cassette_w(int state);
+	void pegasus_firq_clr(int state);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(pegasus_firq);
 	std::pair<std::error_condition, std::string> load_cart(device_image_interface &image, generic_slot_device *slot, const char *reg_tag);
@@ -127,7 +127,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pegasus_state::pegasus_firq)
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-WRITE_LINE_MEMBER( pegasus_state::pegasus_firq_clr )
+void pegasus_state::pegasus_firq_clr(int state)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
@@ -161,12 +161,12 @@ void pegasus_state::pegasus_controls_w(u8 data)
 	m_control_bits = data;
 }
 
-READ_LINE_MEMBER( pegasus_state::pegasus_cassette_r )
+int pegasus_state::pegasus_cassette_r()
 {
 	return m_cass->input();
 }
 
-WRITE_LINE_MEMBER( pegasus_state::pegasus_cassette_w )
+void pegasus_state::pegasus_cassette_w(int state)
 {
 	m_cass->output(state ? 1 : -1);
 }

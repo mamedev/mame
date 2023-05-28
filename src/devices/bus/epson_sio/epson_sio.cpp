@@ -85,13 +85,13 @@ void epson_sio_device::device_start()
 }
 
 
-WRITE_LINE_MEMBER( epson_sio_device::tx_w )
+void epson_sio_device::tx_w(int state)
 {
 	if (m_cart != nullptr)
 		m_cart->tx_w(state);
 }
 
-WRITE_LINE_MEMBER( epson_sio_device::pout_w )
+void epson_sio_device::pout_w(int state)
 {
 	if (m_cart != nullptr)
 		m_cart->pout_w(state);

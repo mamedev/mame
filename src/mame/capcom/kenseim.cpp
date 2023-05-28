@@ -180,9 +180,9 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(cmd_1234_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(cmd_5678_r);
-	DECLARE_READ_LINE_MEMBER(cmd_9_r);
-	DECLARE_READ_LINE_MEMBER(cmd_req_r);
-	DECLARE_READ_LINE_MEMBER(cmd_LVm_r);
+	int cmd_9_r();
+	int cmd_req_r();
+	int cmd_LVm_r();
 
 private:
 	void mole_up(int side, int mole)
@@ -384,17 +384,17 @@ CUSTOM_INPUT_MEMBER(kenseim_state::cmd_5678_r)
 	return (m_to_68k_cmd_low & 0xf0) >> 4;
 }
 
-READ_LINE_MEMBER(kenseim_state::cmd_9_r)
+int kenseim_state::cmd_9_r()
 {
 	return m_to_68k_cmd_d9;
 }
 
-READ_LINE_MEMBER(kenseim_state::cmd_req_r)
+int kenseim_state::cmd_req_r()
 {
 	return m_to_68k_cmd_req;
 }
 
-READ_LINE_MEMBER(kenseim_state::cmd_LVm_r)
+int kenseim_state::cmd_LVm_r()
 {
 	return m_to_68k_cmd_LVm;
 }

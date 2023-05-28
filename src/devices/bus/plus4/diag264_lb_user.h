@@ -32,23 +32,23 @@ protected:
 	virtual void device_start() override;
 
 	// device_pet_user_port_interface overrides
-	virtual DECLARE_WRITE_LINE_MEMBER(input_b) override { output_6(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(input_k) override { output_7(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(input_4) override { output_j(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(input_5) override { output_f(state); }
+	virtual void input_b(int state) override { output_6(state); }
+	virtual void input_k(int state) override { output_7(state); }
+	virtual void input_4(int state) override { output_j(state); }
+	virtual void input_5(int state) override { output_f(state); }
 
-	virtual DECLARE_WRITE_LINE_MEMBER(input_6) override { output_b(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(input_7) override { output_k(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(input_j) override { output_4(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(input_f) override { output_5(state); }
+	virtual void input_6(int state) override { output_b(state); }
+	virtual void input_7(int state) override { output_k(state); }
+	virtual void input_j(int state) override { output_4(state); }
+	virtual void input_f(int state) override { output_5(state); }
 
-	virtual DECLARE_WRITE_LINE_MEMBER(input_c) override { output_m(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(input_d) override { output_l(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(input_e) override { output_h(state); }
+	virtual void input_c(int state) override { output_m(state); }
+	virtual void input_d(int state) override { output_l(state); }
+	virtual void input_e(int state) override { output_h(state); }
 
-	virtual DECLARE_WRITE_LINE_MEMBER(input_m) override { output_c(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(input_l) override { output_d(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(input_h) override { output_e(state); }
+	virtual void input_m(int state) override { output_c(state); }
+	virtual void input_l(int state) override { output_d(state); }
+	virtual void input_h(int state) override { output_e(state); }
 };
 
 // device type definition

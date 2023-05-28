@@ -125,7 +125,7 @@ protected:
 	std::unique_ptr<uint8_t[]> m_ntram;
 	std::unique_ptr<uint8_t[]> m_chrram;
 
-	DECLARE_WRITE_LINE_MEMBER(apu_irq);
+	void apu_irq(int state);
 	uint8_t apu_read_mem(offs_t offset);
 
 	uint8_t external_space_read(offs_t offset);

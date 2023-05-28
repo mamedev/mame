@@ -112,10 +112,10 @@ void z80ctc_device::write(offs_t offset, uint8_t data)
 //  trigger
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( z80ctc_device::trg0 ) { m_channel[0]->trigger(state != 0); }
-WRITE_LINE_MEMBER( z80ctc_device::trg1 ) { m_channel[1]->trigger(state != 0); }
-WRITE_LINE_MEMBER( z80ctc_device::trg2 ) { m_channel[2]->trigger(state != 0); }
-WRITE_LINE_MEMBER( z80ctc_device::trg3 ) { m_channel[3]->trigger(state != 0); }
+void z80ctc_device::trg0(int state) { m_channel[0]->trigger(state != 0); }
+void z80ctc_device::trg1(int state) { m_channel[1]->trigger(state != 0); }
+void z80ctc_device::trg2(int state) { m_channel[2]->trigger(state != 0); }
+void z80ctc_device::trg3(int state) { m_channel[3]->trigger(state != 0); }
 
 
 //-------------------------------------------------

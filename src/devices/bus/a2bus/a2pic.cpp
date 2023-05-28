@@ -40,10 +40,10 @@ protected:
 
 private:
 	// printer status inputs
-	DECLARE_WRITE_LINE_MEMBER(ack_w);
-	DECLARE_WRITE_LINE_MEMBER(perror_w);
-	DECLARE_WRITE_LINE_MEMBER(select_w);
-	DECLARE_WRITE_LINE_MEMBER(fault_w);
+	void ack_w(int state);
+	void perror_w(int state);
+	void select_w(int state);
+	void fault_w(int state);
 
 	// timer handlers
 	TIMER_CALLBACK_MEMBER(release_strobe);
@@ -384,25 +384,25 @@ void a2bus_pic_device::device_reset()
 //  printer status inputs
 //----------------------------------------------
 
-WRITE_LINE_MEMBER(a2bus_pic_device::ack_w)
+void a2bus_pic_device::ack_w(int state)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_pic_device::set_ack_in), this), state ? 1 : 0);
 }
 
 
-WRITE_LINE_MEMBER(a2bus_pic_device::perror_w)
+void a2bus_pic_device::perror_w(int state)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_pic_device::set_perror_in), this), state ? 1 : 0);
 }
 
 
-WRITE_LINE_MEMBER(a2bus_pic_device::select_w)
+void a2bus_pic_device::select_w(int state)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_pic_device::set_select_in), this), state ? 1 : 0);
 }
 
 
-WRITE_LINE_MEMBER(a2bus_pic_device::fault_w)
+void a2bus_pic_device::fault_w(int state)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_pic_device::set_fault_in), this), state ? 1 : 0);
 }

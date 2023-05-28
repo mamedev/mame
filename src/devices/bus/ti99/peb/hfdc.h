@@ -56,9 +56,9 @@ protected:
 	TIMER_CALLBACK_MEMBER(motor_off);
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( dmarq_w );
-	DECLARE_WRITE_LINE_MEMBER( intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( dip_w );
+	void dmarq_w(int state);
+	void intrq_w(int state);
+	void dip_w(int state);
 	void auxbus_out(offs_t offset, uint8_t data);
 	uint8_t read_buffer();
 	void write_buffer(uint8_t data);

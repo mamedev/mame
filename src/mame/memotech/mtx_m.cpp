@@ -202,22 +202,22 @@ void mtx_state::mtx_cst_motor_w(uint8_t data)
     mtx_prt_r - centronics status
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER(mtx_state::write_centronics_busy)
+void mtx_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-WRITE_LINE_MEMBER(mtx_state::write_centronics_fault)
+void mtx_state::write_centronics_fault(int state)
 {
 	m_centronics_fault = state;
 }
 
-WRITE_LINE_MEMBER(mtx_state::write_centronics_perror)
+void mtx_state::write_centronics_perror(int state)
 {
 	m_centronics_perror = state;
 }
 
-WRITE_LINE_MEMBER(mtx_state::write_centronics_select)
+void mtx_state::write_centronics_select(int state)
 {
 	m_centronics_select = state;
 }

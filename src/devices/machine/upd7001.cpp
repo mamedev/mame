@@ -105,7 +105,7 @@ void upd7001_device::device_start()
 //  cs_w - active-low chip select
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(upd7001_device::cs_w)
+void upd7001_device::cs_w(int state)
 {
 	if (!state && !m_cs_active)
 	{
@@ -166,7 +166,7 @@ TIMER_CALLBACK_MEMBER(upd7001_device::output_enabled)
 //  sck_w - shift data out of and into register
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(upd7001_device::sck_w)
+void upd7001_device::sck_w(int state)
 {
 	if (m_cs_active)
 	{
@@ -196,7 +196,7 @@ WRITE_LINE_MEMBER(upd7001_device::sck_w)
 //  select input to convert
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(upd7001_device::dl_w)
+void upd7001_device::dl_w(int state)
 {
 	if (state && !m_dl && m_cs_active)
 		m_mpx = m_sr & 3;

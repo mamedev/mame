@@ -523,7 +523,7 @@ static const z80_daisy_config abc80_daisy_chain[] =
 //  ABC80_KEYBOARD_INTERFACE
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( abc80_state::keydown_w )
+void abc80_state::keydown_w(int state)
 {
 	m_key_strobe = state;
 

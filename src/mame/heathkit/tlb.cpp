@@ -240,17 +240,17 @@ uint8_t heath_tlb_device::kbd_flags_r()
 	return rv;
 }
 
-READ_LINE_MEMBER(heath_tlb_device::mm5740_shift_r)
+int heath_tlb_device::mm5740_shift_r()
 {
 	return ((m_kbspecial->read() ^ 0x120) & 0x120) ? ASSERT_LINE : CLEAR_LINE;
 }
 
-READ_LINE_MEMBER(heath_tlb_device::mm5740_control_r)
+int heath_tlb_device::mm5740_control_r()
 {
 	return ((m_kbspecial->read() ^ 0x10) & 0x10) ? ASSERT_LINE: CLEAR_LINE;
 }
 
-WRITE_LINE_MEMBER(heath_tlb_device::mm5740_data_ready_w)
+void heath_tlb_device::mm5740_data_ready_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -694,7 +694,7 @@ void heath_tlb_device::serial_out_b(uint8_t data)
 	m_write_sd(data);
 }
 
-WRITE_LINE_MEMBER(heath_tlb_device::cb1_w)
+void heath_tlb_device::cb1_w(int state)
 {
 	m_ace->rx_w(state);
 }

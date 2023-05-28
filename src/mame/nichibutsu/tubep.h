@@ -49,16 +49,16 @@ protected:
 
 	void nsc_map(address_map &map);
 
-	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
-	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
+	void coin1_counter_w(int state);
+	void coin2_counter_w(int state);
 	void main_cpu_irq_line_clear_w(uint8_t data);
 	void second_cpu_irq_line_clear_w(uint8_t data);
 	uint8_t tubep_soundlatch_r();
 	uint8_t tubep_sound_irq_ack();
 	void tubep_textram_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(screen_flip_w);
-	DECLARE_WRITE_LINE_MEMBER(background_romselect_w);
-	DECLARE_WRITE_LINE_MEMBER(colorproms_A4_line_w);
+	void screen_flip_w(int state);
+	void background_romselect_w(int state);
+	void colorproms_A4_line_w(int state);
 	void background_a000_w(uint8_t data);
 	void background_c000_w(uint8_t data);
 	void sprite_control_w(offs_t offset, uint8_t data);
@@ -147,7 +147,7 @@ private:
 	void voice_input_w(uint8_t data);
 	void voice_intensity_control_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(adpcm_vck_w);
+	void adpcm_vck_w(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

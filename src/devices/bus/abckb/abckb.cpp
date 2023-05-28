@@ -87,7 +87,7 @@ void abc_keyboard_port_device::device_reset()
 //  write_rx -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( abc_keyboard_port_device::write_rx )
+void abc_keyboard_port_device::write_rx(int state)
 {
 	m_out_rx_handler(state);
 }
@@ -97,7 +97,7 @@ WRITE_LINE_MEMBER( abc_keyboard_port_device::write_rx )
 //  txd_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( abc_keyboard_port_device::txd_w )
+void abc_keyboard_port_device::txd_w(int state)
 {
 	if (m_card)
 		m_card->txd_w(state);
@@ -108,7 +108,7 @@ WRITE_LINE_MEMBER( abc_keyboard_port_device::txd_w )
 //  trxc_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( abc_keyboard_port_device::trxc_w )
+void abc_keyboard_port_device::trxc_w(int state)
 {
 	m_out_trxc_handler(state);
 }
@@ -118,7 +118,7 @@ WRITE_LINE_MEMBER( abc_keyboard_port_device::trxc_w )
 //  keydown_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( abc_keyboard_port_device::keydown_w )
+void abc_keyboard_port_device::keydown_w(int state)
 {
 	m_out_keydown_handler(state);
 }

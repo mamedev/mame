@@ -107,7 +107,7 @@ public:
 		}
 	}
 
-	template <int N> DECLARE_WRITE_LINE_MEMBER(interrupt) { m_interrupt_cb[N](state); }
+	template <int N> void interrupt(int state) { m_interrupt_cb[N](state); }
 
 	u64 read(offs_t offset, u64 mem_mask);
 	void write(offs_t offset, u64 data, u64 mem_mask);

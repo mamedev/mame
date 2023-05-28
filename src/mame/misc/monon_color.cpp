@@ -156,7 +156,7 @@ private:
 		return m_cart->read();
 	}
 
-	DECLARE_WRITE_LINE_MEMBER(spidir_w)
+	void spidir_w(int state)
 	{
 		m_cart->dir_w(state);
 	}

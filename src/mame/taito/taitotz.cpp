@@ -628,7 +628,7 @@ private:
 	INTERRUPT_GEN_MEMBER(taitotz_vbi);
 	uint16_t tlcs_ide0_r(offs_t offset, uint16_t mem_mask = ~0);
 	uint16_t tlcs_ide1_r(offs_t offset, uint16_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
+	void ide_interrupt(int state);
 	void draw_tile(uint32_t pos, uint32_t tile);
 	uint32_t video_mem_r(uint32_t address);
 	void video_mem_w(uint32_t address, uint32_t data);
@@ -2625,7 +2625,7 @@ INTERRUPT_GEN_MEMBER(taitotz_state::taitotz_vbi)
 	m_iocpu->set_input_line(TLCS900_INT3, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(taitotz_state::ide_interrupt)
+void taitotz_state::ide_interrupt(int state)
 {
 	m_iocpu->set_input_line(TLCS900_INT2, state);
 }

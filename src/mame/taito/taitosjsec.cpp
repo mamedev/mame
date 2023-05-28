@@ -70,12 +70,12 @@ void taito_sj_security_mcu_device::data_w(offs_t offset, u8 data)
 	}
 }
 
-WRITE_LINE_MEMBER(taito_sj_security_mcu_device::busak_w)
+void taito_sj_security_mcu_device::busak_w(int state)
 {
 	m_busak = (ASSERT_LINE == state);
 }
 
-WRITE_LINE_MEMBER(taito_sj_security_mcu_device::reset_w)
+void taito_sj_security_mcu_device::reset_w(int state)
 {
 	m_reset = (ASSERT_LINE == state);
 	if (CLEAR_LINE != state)

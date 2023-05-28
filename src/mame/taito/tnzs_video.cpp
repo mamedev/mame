@@ -38,7 +38,7 @@ uint32_t tnzs_video_state_base::screen_update_tnzs(screen_device &screen, bitmap
 	return 0;
 }
 
-WRITE_LINE_MEMBER(tnzs_video_state_base::screen_vblank_tnzs)
+void tnzs_video_state_base::screen_vblank_tnzs(int state)
 {
 	// rising edge
 	if (state)

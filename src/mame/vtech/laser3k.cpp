@@ -110,9 +110,9 @@ private:
 	void hgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 	void dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 
-	DECLARE_READ_LINE_MEMBER(ay3600_shift_r);
-	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
-	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
+	int ay3600_shift_r();
+	int ay3600_control_r();
+	void ay3600_data_ready_w(int state);
 
 	void banks_map(address_map &map);
 	void laser3k_map(address_map &map);
@@ -712,7 +712,7 @@ uint32_t laser3k_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-READ_LINE_MEMBER(laser3k_state::ay3600_shift_r)
+int laser3k_state::ay3600_shift_r()
 {
 	// either shift key
 	if (m_kbspecial->read() & 0x06)
@@ -723,7 +723,7 @@ READ_LINE_MEMBER(laser3k_state::ay3600_shift_r)
 	return CLEAR_LINE;
 }
 
-READ_LINE_MEMBER(laser3k_state::ay3600_control_r)
+int laser3k_state::ay3600_control_r()
 {
 	if (m_kbspecial->read() & 0x08)
 	{
@@ -788,7 +788,7 @@ static const uint8_t key_remap[0x32][4] =
 	{ 0x0d,0x0d,0x0d,0x0d },    /* Enter   31     */
 };
 
-WRITE_LINE_MEMBER(laser3k_state::ay3600_data_ready_w)
+void laser3k_state::ay3600_data_ready_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
