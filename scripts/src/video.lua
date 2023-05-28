@@ -847,6 +847,30 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/ati_mach8.h,VIDEOS["ATI_MACH8"] = true
+--------------------------------------------------
+
+if (VIDEOS["ATI_MACH8"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/ati_mach8.cpp",
+		MAME_DIR .. "src/devices/video/ati_mach8.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/ati_mach8.h,VIDEOS["ATI_MACH32"] = true
+--------------------------------------------------
+
+if (VIDEOS["ATI_MACH32"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/ati_mach32.cpp",
+		MAME_DIR .. "src/devices/video/ati_mach32.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/clgd542x.h,VIDEOS["PC_VGA_CIRRUS"] = true
 --------------------------------------------------
 

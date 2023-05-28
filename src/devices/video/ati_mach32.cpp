@@ -10,7 +10,7 @@
  */
 
 #include "emu.h"
-#include "mach32.h"
+#include "video/ati_mach32.h"
 
 #include "screen.h"
 

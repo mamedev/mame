@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include "video/ati_mach8.h"
 #include "video/pc_vga_ati.h"
 #include "machine/eepromser.h"
 
