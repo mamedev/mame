@@ -13,7 +13,7 @@
 #pragma once
 
 #include "isa.h"
-#include "video/pc_vga.h"
+#include "video/pc_vga_ati.h"
 #include "mach32.h"
 
 //**************************************************************************

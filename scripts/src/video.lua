@@ -835,6 +835,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/pc_vga_ati.h,VIDEOS["PC_VGA_ATI"] = true
+--------------------------------------------------
+
+if (VIDEOS["PC_VGA_ATI"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pc_vga_ati.cpp",
+		MAME_DIR .. "src/devices/video/pc_vga_ati.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/clgd542x.h,VIDEOS["PC_VGA_CIRRUS"] = true
 --------------------------------------------------
 

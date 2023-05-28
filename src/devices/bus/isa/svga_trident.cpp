@@ -13,7 +13,7 @@
 
 #include "emu.h"
 #include "svga_trident.h"
-#include "video/pc_vga.h"
+#include "video/pc_vga_trident.h"
 
 #include "screen.h"
 

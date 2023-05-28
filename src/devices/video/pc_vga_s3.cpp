@@ -5,7 +5,7 @@
 #include "pc_vga_s3.h"
 
 #define VERBOSE (LOG_GENERAL)
-#define LOG_OUTPUT_FUNC osd_printf_info
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 // TODO: remove this enum
