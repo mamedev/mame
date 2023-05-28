@@ -20,13 +20,17 @@
 class h8_sci_device : public device_t {
 public:
 	h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intc, int eri, int rxi, int txi, int tei)
+	template<typename T, typename U> h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu, U &&intc, int eri, int rxi, int txi, int tei)
 		: h8_sci_device(mconfig, tag, owner, 0)
 	{
-		set_info(intc, eri, rxi, txi, tei);
+		m_cpu.set_tag(std::forward<T>(cpu));
+		m_intc.set_tag(std::forward<U>(intc));
+		m_eri_int = eri;
+		m_rxi_int = rxi;
+		m_txi_int = txi;
+		m_tei_int = tei;
 	}
 
-	void set_info(const char *intc, int eri, int rxi, int txi, int tei);
 	void set_external_clock_period(const attotime &_period);
 
 	void smr_w(uint8_t data);
@@ -103,9 +107,8 @@ protected:
 	};
 
 	required_device<h8_device> m_cpu;
+	required_device<h8_intc_device> m_intc;
 	devcb_write_line m_tx_cb, m_clk_cb;
-	h8_intc_device *m_intc;
-	const char *m_intc_tag;
 	attotime m_external_clock_period, m_cur_sync_time;
 	double m_external_to_internal_ratio, m_internal_to_external_ratio;
 	emu_timer *m_sync_timer;

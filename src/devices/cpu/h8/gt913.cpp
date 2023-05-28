@@ -97,7 +97,7 @@ void gt913_device::map(address_map &map)
 
 void gt913_device::device_add_mconfig(machine_config &config)
 {
-	GT913_INTC(config, "intc");
+	GT913_INTC(config, m_intc, *this);
 
 	GT913_SOUND(config, m_sound, DERIVED_CLOCK(1, 1));
 	m_sound->set_device_rom_tag(m_rom);
@@ -111,13 +111,13 @@ void gt913_device::device_add_mconfig(machine_config &config)
 							else
 								m_intc->clear_interrupt(5);
 						});
-	GT913_IO_HLE(config, m_io_hle, "intc", 6, 7);
-	H8_SCI(config, m_sci[0], "intc", 8, 9, 10, 0);
-	H8_SCI(config, m_sci[1], "intc", 11, 12, 13, 0);
+	GT913_IO_HLE(config, m_io_hle, *this, m_intc, 6, 7);
+	H8_SCI(config, m_sci[0], *this, m_intc, 8, 9, 10, 0);
+	H8_SCI(config, m_sci[1], *this, m_intc, 11, 12, 13, 0);
 
-	H8_PORT(config, m_port[0], h8_device::PORT_1, 0x00, 0x00);
-	H8_PORT(config, m_port[1], h8_device::PORT_2, 0x00, 0x00);
-	H8_PORT(config, m_port[2], h8_device::PORT_3, 0x00, 0x00);
+	H8_PORT(config, m_port[0], *this, h8_device::PORT_1, 0x00, 0x00);
+	H8_PORT(config, m_port[1], *this, h8_device::PORT_2, 0x00, 0x00);
+	H8_PORT(config, m_port[2], *this, h8_device::PORT_3, 0x00, 0x00);
 }
 
 

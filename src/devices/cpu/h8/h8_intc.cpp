@@ -18,7 +18,7 @@ h8_intc_device::h8_intc_device(const machine_config &mconfig, const char *tag, d
 
 h8_intc_device::h8_intc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock), m_irq_vector_base(0), m_irq_vector_count(0), m_irq_vector_nmi(0),
-	m_cpu(*this, DEVICE_SELF_OWNER), m_nmi_input(false), m_irq_input(0), m_ier(0), m_isr(0), m_iscr(0), m_icr_filter(0), m_ipr_filter(0)
+	m_cpu(*this, finder_base::DUMMY_TAG), m_nmi_input(false), m_irq_input(0), m_ier(0), m_isr(0), m_iscr(0), m_icr_filter(0), m_ipr_filter(0)
 {
 }
 
@@ -199,16 +199,11 @@ void h8_intc_device::get_priority(int vect, int &icr_pri, int &ipr_pri) const
 
 
 gt913_intc_device::gt913_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	gt913_intc_device(mconfig, GT913_INTC, tag, owner, clock)
+	h8_intc_device(mconfig, GT913_INTC, tag, owner, clock)
 {
 	m_irq_vector_base = 4;
 	m_irq_vector_count = 1;
 	m_irq_vector_nmi = 3;
-}
-
-gt913_intc_device::gt913_intc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	h8_intc_device(mconfig, type, tag, owner, clock)
-{
 }
 
 void gt913_intc_device::device_reset()

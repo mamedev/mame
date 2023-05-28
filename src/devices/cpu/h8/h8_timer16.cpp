@@ -16,29 +16,16 @@ DEFINE_DEVICE_TYPE(H8S_TIMER16_CHANNEL, h8s_timer16_channel_device, "h8s_timer16
 h8_timer16_channel_device::h8_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8_timer16_channel_device(mconfig, H8_TIMER16_CHANNEL, tag, owner, clock)
 {
-	m_chain_tag = nullptr;
 }
 
 h8_timer16_channel_device::h8_timer16_channel_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	m_cpu(*this, "^^"), m_chained_timer(nullptr), m_intc(nullptr), m_intc_tag(nullptr), m_tier_mask(0), m_tgr_count(0), m_tbr_count(0), m_tgr_clearing(0), m_tcr(0), m_tier(0), m_ier(0), m_isr(0), m_clock_type(0),
+	m_cpu(*this, finder_base::DUMMY_TAG),
+	m_intc(*this, finder_base::DUMMY_TAG),
+	m_chained_timer(*this, finder_base::DUMMY_TAG),
+	m_tier_mask(0), m_tgr_count(0), m_tbr_count(0), m_tgr_clearing(0), m_tcr(0), m_tier(0), m_ier(0), m_isr(0), m_clock_type(0),
 	m_clock_divider(0), m_tcnt(0), m_last_clock_update(0), m_event_time(0), m_phase(0), m_counter_cycle(0), m_counter_incrementing(false), m_channel_active(false)
 {
-	m_chain_tag = nullptr;
-}
-
-void h8_timer16_channel_device::set_info(int tgr_count, int tbr_count, const char *intc, int irq_base)
-{
-	m_tgr_count = tgr_count;
-	m_tbr_count = tbr_count;
-	m_intc_tag = intc;
-
-	m_interrupt[0] = irq_base++;
-	m_interrupt[1] = irq_base++;
-	m_interrupt[2] = -1;
-	m_interrupt[3] = -1;
-	m_interrupt[4] = irq_base;
-	m_interrupt[5] = irq_base;
 }
 
 uint8_t h8_timer16_channel_device::tcr_r()
@@ -162,7 +149,6 @@ void h8_timer16_channel_device::tbr_w(offs_t offset, uint16_t data, uint16_t mem
 
 void h8_timer16_channel_device::device_start()
 {
-	m_intc = owner()->siblingdevice<h8_intc_device>(m_intc_tag);
 	m_channel_active = false;
 	device_reset();
 
@@ -315,25 +301,13 @@ void h8_timer16_channel_device::recalc_event(uint64_t cur_time)
 
 h8_timer16_device::h8_timer16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, H8_TIMER16, tag, owner, clock),
-	m_cpu(*this, DEVICE_SELF_OWNER)
+	m_cpu(*this, finder_base::DUMMY_TAG),
+	m_timer_channel(*this, "%u", 0)
 {
-}
-
-void h8_timer16_device::set_info(int count, uint8_t tstr)
-{
-	m_timer_count = count;
-	m_default_tstr = tstr;
 }
 
 void h8_timer16_device::device_start()
 {
-	memset(m_timer_channel, 0, sizeof(m_timer_channel));
-	for(int i=0; i<m_timer_count; i++) {
-		char tm[0x10];
-		snprintf(tm, 0x10, "%d", i);
-		m_timer_channel[i] = subdevice<h8_timer16_channel_device>(tm);
-	}
-
 	save_item(NAME(m_tstr));
 }
 
@@ -528,20 +502,6 @@ h8h_timer16_channel_device::~h8h_timer16_channel_device()
 {
 }
 
-void h8h_timer16_channel_device::set_info(int tgr_count, int tbr_count, const char *intc, int irq_base)
-{
-	m_tgr_count = tgr_count;
-	m_tbr_count = tbr_count;
-	m_intc_tag = intc;
-
-	m_interrupt[0] = irq_base++;
-	m_interrupt[1] = irq_base++;
-	m_interrupt[2] = -1;
-	m_interrupt[3] = -1;
-	m_interrupt[4] = irq_base;
-	m_interrupt[5] = irq_base;
-}
-
 void h8h_timer16_channel_device::tier_update()
 {
 	m_tier = m_tier | 0xf8;
@@ -624,36 +584,6 @@ h8s_timer16_channel_device::h8s_timer16_channel_device(const machine_config &mco
 
 h8s_timer16_channel_device::~h8s_timer16_channel_device()
 {
-}
-
-void h8s_timer16_channel_device::set_chain(const char *chain_tag)
-{
-	m_chain_tag = chain_tag;
-}
-
-void h8s_timer16_channel_device::set_info(int tgr_count, uint8_t tier_mask, const char *intc, int irq_base,
-										  int t0, int t1, int t2, int t3, int t4, int t5, int t6, int t7)
-{
-	m_tgr_count = tgr_count;
-	m_tbr_count = 0;
-	m_tier_mask = tier_mask;
-	m_intc_tag = intc;
-
-	m_interrupt[0] = irq_base++;
-	m_interrupt[1] = irq_base++;
-	m_interrupt[2] = tier_mask & 0x04 ? -1 : irq_base++;
-	m_interrupt[3] = tier_mask & 0x08 ? -1 : irq_base++;
-	m_interrupt[4] = irq_base;
-	m_interrupt[5] = tier_mask & 0x20 ? -1 : irq_base++;
-
-	m_count_types[0] = t0;
-	m_count_types[1] = t1;
-	m_count_types[2] = t2;
-	m_count_types[3] = t3;
-	m_count_types[4] = t4;
-	m_count_types[5] = t5;
-	m_count_types[6] = t6;
-	m_count_types[7] = t7;
 }
 
 void h8s_timer16_channel_device::tier_update()

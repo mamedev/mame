@@ -20,6 +20,11 @@
 class h8_intc_device : public device_t {
 public:
 	h8_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	template<typename T> h8_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu) :
+		h8_intc_device(mconfig, tag, owner)
+	{
+		m_cpu.set_tag(std::forward<T>(cpu));
+	}		
 
 	int interrupt_taken(int vector);
 	void internal_interrupt(int vector);
@@ -64,17 +69,26 @@ protected:
 class gt913_intc_device : public h8_intc_device {
 public:
 	gt913_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	template<typename T> gt913_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu) :
+		gt913_intc_device(mconfig, tag, owner)
+	{
+		m_cpu.set_tag(std::forward<T>(cpu));
+	}		
 
 	void clear_interrupt(int vector);
-protected:
-	gt913_intc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	virtual void device_reset() override;
 };
 
 class h8h_intc_device : public h8_intc_device {
 public:
 	h8h_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	template<typename T> h8h_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu) :
+		h8h_intc_device(mconfig, tag, owner)
+	{
+		m_cpu.set_tag(std::forward<T>(cpu));
+	}		
 
 	uint8_t isr_r();
 	void isr_w(uint8_t data);
@@ -104,6 +118,11 @@ protected:
 class h8s_intc_device : public h8h_intc_device {
 public:
 	h8s_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	template<typename T> h8s_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu) :
+		h8s_intc_device(mconfig, tag, owner)
+	{
+		m_cpu.set_tag(std::forward<T>(cpu));
+	}		
 
 	uint8_t ipr_r(offs_t offset);
 	void ipr_w(offs_t offset, uint8_t data);

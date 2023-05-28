@@ -19,7 +19,7 @@
 
 class h8_adc_device : public device_t {
 public:
-	void set_info(const char *intc_tag, int vect);
+	template<typename T, typename U> void set_info(T &&cpu, U &&intc, int vect) { m_cpu.set_tag(std::forward<T>(cpu)), m_intc.set_tag(std::forward<U>(intc)); m_intc_vector = vect; }
 
 	uint8_t addr8_r(offs_t offset);
 	uint16_t addr16_r(offs_t offset);
@@ -36,7 +36,7 @@ protected:
 	h8_adc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	required_device<h8_device> m_cpu;
-	h8_intc_device *m_intc;
+	required_device<h8_intc_device> m_intc;
 	address_space *m_io;
 	const char *m_intc_tag;
 	int m_intc_vector;
@@ -94,10 +94,10 @@ protected:
 class h8_adc_3337_device : public h8_adc_device {
 public:
 	h8_adc_3337_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	h8_adc_3337_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intc_tag, int vect)
+	template <typename T, typename U> h8_adc_3337_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu, U &&intc, int vect)
 		: h8_adc_3337_device(mconfig, tag, owner, 0)
 	{
-		set_info(intc_tag, vect);
+		set_info(cpu, intc, vect);
 	}
 
 protected:
@@ -108,10 +108,10 @@ protected:
 class h8_adc_3006_device : public h8_adc_device {
 public:
 	h8_adc_3006_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	h8_adc_3006_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intc_tag, int vect)
+	template <typename T, typename U> h8_adc_3006_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu, U &&intc, int vect)
 		: h8_adc_3006_device(mconfig, tag, owner, 0)
 	{
-		set_info(intc_tag, vect);
+		set_info(cpu, intc, vect);
 	}
 
 protected:
@@ -122,10 +122,10 @@ protected:
 class h8_adc_2245_device : public h8_adc_device {
 public:
 	h8_adc_2245_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	h8_adc_2245_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intc_tag, int vect)
+	template <typename T, typename U> h8_adc_2245_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu, U &&intc, int vect)
 		: h8_adc_2245_device(mconfig, tag, owner, 0)
 	{
-		set_info(intc_tag, vect);
+		set_info(cpu, intc, vect);
 	}
 
 protected:
@@ -136,10 +136,10 @@ protected:
 class h8_adc_2320_device : public h8_adc_device {
 public:
 	h8_adc_2320_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	h8_adc_2320_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intc_tag, int vect)
+	template <typename T, typename U> h8_adc_2320_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu, U &&intc, int vect)
 		: h8_adc_2320_device(mconfig, tag, owner, 0)
 	{
-		set_info(intc_tag, vect);
+		set_info(cpu, intc, vect);
 	}
 
 protected:
@@ -150,10 +150,10 @@ protected:
 class h8_adc_2357_device : public h8_adc_device {
 public:
 	h8_adc_2357_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	h8_adc_2357_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intc_tag, int vect)
+	template <typename T, typename U> h8_adc_2357_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu, U &&intc, int vect)
 		: h8_adc_2357_device(mconfig, tag, owner, 0)
 	{
-		set_info(intc_tag, vect);
+		set_info(cpu, intc, vect);
 	}
 
 protected:
@@ -164,10 +164,10 @@ protected:
 class h8_adc_2655_device : public h8_adc_device {
 public:
 	h8_adc_2655_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	h8_adc_2655_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intc_tag, int vect)
+	template <typename T, typename U> h8_adc_2655_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu, U &&intc, int vect)
 		: h8_adc_2655_device(mconfig, tag, owner, 0)
 	{
-		set_info(intc_tag, vect);
+		set_info(cpu, intc, vect);
 	}
 
 protected:

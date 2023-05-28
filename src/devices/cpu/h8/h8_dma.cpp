@@ -6,6 +6,7 @@ DEFINE_DEVICE_TYPE(H8_DMA_CHANNEL, h8_dma_channel_device, "h8_dma_channel", "H8 
 
 h8_dma_device::h8_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, H8_DMA, tag, owner, clock),
+	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_dmach0(*this, "0"),
 	m_dmach1(*this, "1")
 {
@@ -120,8 +121,8 @@ void h8_dma_device::dmabcr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 h8_dma_channel_device::h8_dma_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, H8_DMA_CHANNEL, tag, owner, clock),
-	m_dmac(*this, "^"),
-	m_cpu(*this, "^^"),
+	m_cpu(*this, finder_base::DUMMY_TAG),
+	m_dma(*this, finder_base::DUMMY_TAG),
 	m_intc(*this, finder_base::DUMMY_TAG)
 {
 }
@@ -535,7 +536,7 @@ void h8_dma_channel_device::count_done(int submodule)
 			throw emu_fatalerror("%s: DMA count done full address/block mode unimplemented.\n", tag());
 		else {
 			m_dte &= ~1;
-			m_dmac->clear_dte(m_state[0].m_id);
+			m_dma->clear_dte(m_state[0].m_id);
 			m_dtcr[0] &= ~0x80; // clear DTE (for H8H)
 			if(m_dtie & 1)
 				m_intc->internal_interrupt(m_irq_base + submodule);
@@ -551,7 +552,7 @@ void h8_dma_channel_device::count_done(int submodule)
 				m_state[submodule].m_source = m_mar[submodule];
 		} else {
 			m_dte &= ~(1 << submodule);
-			m_dmac->clear_dte(m_state[0].m_id + submodule);
+			m_dma->clear_dte(m_state[0].m_id + submodule);
 			m_dtcr[submodule] &= ~0x80; // clear DTE (for H8H)
 			if(m_dtie & (1 << submodule))
 				m_intc->internal_interrupt(m_irq_base + submodule);

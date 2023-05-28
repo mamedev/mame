@@ -44,6 +44,11 @@ enum {
 class h8_dma_device : public device_t {
 public:
 	h8_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	template<typename T> h8_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu) :
+		h8_dma_device(mconfig, tag, owner)
+	{
+		m_cpu.set_tag(std::forward<T>(cpu));
+	}
 
 	uint8_t dmawer_r();
 	void dmawer_w(uint8_t data);
@@ -60,6 +65,7 @@ public:
 	void set_input(int inputnum, int state);
 
 protected:
+	required_device<h8_device> m_cpu;
 	required_device<h8_dma_channel_device> m_dmach0, m_dmach1;
 
 	virtual void device_start() override;
@@ -89,8 +95,8 @@ public:
 	};
 
 	h8_dma_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	template <typename T> h8_dma_channel_device(const machine_config &mconfig, const char *tag, device_t *owner,
-			T &&intc_tag, int irq_base, int v0, int v1, int v2, int v3, int v4, int v5, int v6, int v7, int v8,
+	template<typename T, typename U, typename V> h8_dma_channel_device(const machine_config &mconfig, const char *tag, device_t *owner,
+		T &&cpu, U &&dma, V &&intc, int irq_base, int v0, int v1, int v2, int v3, int v4, int v5, int v6, int v7, int v8,
 			int v9 = h8_dma_channel_device::NONE,
 			int va = h8_dma_channel_device::NONE,
 			int vb = h8_dma_channel_device::NONE,
@@ -100,7 +106,9 @@ public:
 			int vf = h8_dma_channel_device::NONE)
 		: h8_dma_channel_device(mconfig, tag, owner, 0)
 	{
-		m_intc.set_tag(std::forward<T>(intc_tag));
+		m_cpu.set_tag(std::forward<T>(cpu));
+		m_dma.set_tag(std::forward<U>(dma));
+		m_intc.set_tag(std::forward<V>(intc));
 		set_info(irq_base, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, va, vb, vc, vd, ve, vf);
 	}
 	void set_info(int irq_base, int v0, int v1, int v2, int v3, int v4, int v5, int v6, int v7, int v8, int v9, int va, int vb, int vc, int vd, int ve, int vf);
@@ -140,8 +148,8 @@ public:
 	void count_last(int submodule);
 	void count_done(int submodule);
 protected:
-	required_device<h8_dma_device> m_dmac;
 	required_device<h8_device> m_cpu;
+	required_device<h8_dma_device> m_dma;
 	required_device<h8_intc_device> m_intc;
 	h8_dma_state m_state[2];
 	int m_irq_base;

@@ -17,18 +17,13 @@ DEFINE_DEVICE_TYPE(H8_ADC_2655, h8_adc_2655_device, "h8_adc_2655", "H8/2655 ADC"
 
 h8_adc_device::h8_adc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	m_cpu(*this, DEVICE_SELF_OWNER),
-	m_intc(nullptr), m_io(nullptr), m_intc_tag(nullptr), m_intc_vector(0), m_adcsr(0), m_adcr(0), m_register_mask(0), m_trigger(0), m_start_mode(0), m_start_channel(0),
+	m_cpu(*this, finder_base::DUMMY_TAG),
+	m_intc(*this, finder_base::DUMMY_TAG),
+	m_io(nullptr), m_intc_tag(nullptr), m_intc_vector(0), m_adcsr(0), m_adcr(0), m_register_mask(0), m_trigger(0), m_start_mode(0), m_start_channel(0),
 	m_end_channel(0), m_start_count(0), m_mode(0), m_channel(0), m_count(0), m_analog_powered(false), m_adtrg(false), m_next_event(0)
 {
 	m_suspend_on_interrupt = false;
 	m_analog_power_control = false;
-}
-
-void h8_adc_device::set_info(const char *_intc_tag, int _intc_vector)
-{
-	m_intc_tag = _intc_tag;
-	m_intc_vector = _intc_vector;
 }
 
 uint8_t h8_adc_device::addr8_r(offs_t offset)
@@ -101,7 +96,6 @@ void h8_adc_device::set_suspend(bool suspend)
 void h8_adc_device::device_start()
 {
 	m_io = &m_cpu->space(AS_IO);
-	m_intc = siblingdevice<h8_intc_device>(m_intc_tag);
 	save_item(NAME(m_addr));
 	save_item(NAME(m_buf));
 	save_item(NAME(m_adcsr));

@@ -46,17 +46,20 @@ public:
 protected:
 	required_device<h8h_intc_device> m_intc;
 	required_device<h8_adc_device> m_adc;
-	optional_device<h8_dma_device> m_dma;
-	optional_device<h8_dma_channel_device> m_dma0;
-	optional_device<h8_dma_channel_device> m_dma1;
-	optional_device<h8_dma_channel_device> m_dma2;
+	required_device<h8_dma_device> m_dma;
+	required_device<h8_dma_channel_device> m_dma0;
+	required_device<h8_dma_channel_device> m_dma1;
+	required_device<h8_dma_channel_device> m_dma2;
+	required_device<h8_dma_channel_device> m_dma3;
 	required_device<h8_port_device> m_port4;
+	required_device<h8_port_device> m_port5;
 	required_device<h8_port_device> m_port6;
 	required_device<h8_port_device> m_port7;
 	required_device<h8_port_device> m_port8;
 	required_device<h8_port_device> m_port9;
 	required_device<h8_port_device> m_porta;
 	required_device<h8_port_device> m_portb;
+	required_device<h8_port_device> m_portc;
 	required_device<h8_timer16_device> m_timer16;
 	required_device<h8h_timer16_channel_device> m_timer16_0;
 	required_device<h8h_timer16_channel_device> m_timer16_1;

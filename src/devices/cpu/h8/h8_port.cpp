@@ -11,13 +11,6 @@ h8_port_device::h8_port_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-void h8_port_device::set_info(int address, uint8_t default_ddr, uint8_t mask)
-{
-	m_address = address;
-	m_default_ddr = default_ddr;
-	m_mask = mask;
-}
-
 void h8_port_device::ddr_w(uint8_t data)
 {
 	//  logerror("ddr_w %02x\n", data);

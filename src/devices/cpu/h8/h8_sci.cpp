@@ -17,22 +17,14 @@ const char *const h8_sci_device::state_names[] = { "idle", "start", "bit", "pari
 
 h8_sci_device::h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, H8_SCI, tag, owner, clock),
-	m_cpu(*this, DEVICE_SELF_OWNER),
+	m_cpu(*this, finder_base::DUMMY_TAG),
+	m_intc(*this, finder_base::DUMMY_TAG),
 	m_tx_cb(*this),
-	m_clk_cb(*this), m_intc(nullptr), m_intc_tag(nullptr), m_external_to_internal_ratio(0), m_internal_to_external_ratio(0), m_sync_timer(nullptr), m_eri_int(0), m_rxi_int(0), m_txi_int(0), m_tei_int(0),
+	m_clk_cb(*this), m_external_to_internal_ratio(0), m_internal_to_external_ratio(0), m_sync_timer(nullptr), m_eri_int(0), m_rxi_int(0), m_txi_int(0), m_tei_int(0),
 	m_tx_state(0), m_rx_state(0), m_tx_bit(0), m_rx_bit(0), m_clock_state(0), m_tx_parity(0), m_rx_parity(0), m_ext_clock_counter(0), m_clock_mode(clock_mode_t::INTERNAL_ASYNC), m_clock_value(false), m_ext_clock_value(false), m_rx_value(false),
 	m_rdr(0), m_tdr(0), m_smr(0), m_scr(0), m_ssr(0), m_brr(0), m_rsr(0), m_tsr(0), m_clock_base(0), m_divider(0)
 {
 	m_external_clock_period = attotime::never;
-}
-
-void h8_sci_device::set_info(const char *intc_tag, int eri, int rxi, int txi, int tei)
-{
-	m_intc_tag = intc_tag;
-	m_eri_int = eri;
-	m_rxi_int = rxi;
-	m_txi_int = txi;
-	m_tei_int = tei;
 }
 
 void h8_sci_device::set_external_clock_period(const attotime &period)
@@ -256,7 +248,7 @@ void h8_sci_device::device_start()
 		m_internal_to_external_ratio = 1/m_external_to_internal_ratio;
 	}
 
-	m_intc = siblingdevice<h8_intc_device>(m_intc_tag);
+
 	save_item(NAME(m_rdr));
 	save_item(NAME(m_tdr));
 	save_item(NAME(m_smr));

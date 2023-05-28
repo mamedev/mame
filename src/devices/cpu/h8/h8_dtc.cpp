@@ -26,19 +26,14 @@ const int h8_dtc_device::vector_to_enable[92] = {
 
 h8_dtc_device::h8_dtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, H8_DTC, tag, owner, clock),
-	m_cpu(*this, DEVICE_SELF_OWNER)
+	m_cpu(*this, finder_base::DUMMY_TAG),
+	m_intc(*this, finder_base::DUMMY_TAG)
 {
-}
-
-void h8_dtc_device::set_info(const char *intc_tag, int irq)
-{
-	m_intc_tag = intc_tag;
-	m_irq = irq;
 }
 
 void h8_dtc_device::device_start()
 {
-	m_intc = siblingdevice<h8_intc_device>(m_intc_tag);
+	// TODO, probably need to kill the vectors
 }
 
 void h8_dtc_device::device_reset()

@@ -19,13 +19,14 @@
 class h8_port_device : public device_t {
 public:
 	h8_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	h8_port_device(const machine_config &mconfig, const char *tag, device_t *owner, int address, uint8_t default_ddr, uint8_t mask)
+	template<typename T> h8_port_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu, int address, uint8_t default_ddr, uint8_t mask)
 		: h8_port_device(mconfig, tag, owner, 0)
 	{
-		set_info(address, default_ddr, mask);
+		m_cpu.set_tag(std::forward<T>(cpu));
+		m_address = address;
+		m_default_ddr = default_ddr;
+		m_mask = mask;
 	}
-
-	void set_info(int address, uint8_t default_ddr, uint8_t mask);
 
 	void ddr_w(uint8_t data);
 	uint8_t ddr_r();
