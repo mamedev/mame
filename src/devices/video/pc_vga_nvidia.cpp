@@ -13,11 +13,12 @@ TODO:
 \- STB BIOS sets 640x481 after POST;
 \- ASUS BIOS sets 640x428 (?);
 - The "red screen" from VGA SENSE may really be a ping from monitor signal;
-- Verify that NV10 really uses this chip (seems to access more regs?)
+- Sequencer register $6 for lock/unlock of extended VGA;
 - I2C;
 - Interrupts;
 - RMA access;
 - PLL portion(s), understand how it chooses extended clocks;
+- Verify that NV10 really uses this chip (seems to access more regs?)
 - Video overlay (PVIDEO, NV10+);
 - VGA stack (NV40+);
 - TV encoder (NV17:NV20, NV30:G80);

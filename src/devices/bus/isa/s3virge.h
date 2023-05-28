@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include "video/pc_vga.h"
+#include "video/pc_vga_s3.h"
 
 // ======================> s3virge_vga_device
 

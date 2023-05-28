@@ -77,7 +77,7 @@
 #include "machine/idectrl.h"
 #include "machine/lpci.h"
 #include "machine/pckeybrd.h"
-#include "video/pc_vga.h"
+#include "video/pc_vga_s3.h"
 #include "video/voodoo_2.h"
 
 
