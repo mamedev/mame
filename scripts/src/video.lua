@@ -830,6 +830,16 @@ if (VIDEOS["PC_VGA"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/pc_vga.cpp",
 		MAME_DIR .. "src/devices/video/pc_vga.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/clgd542x.h,VIDEOS["PC_VGA_CIRRUS"] = true
+--------------------------------------------------
+
+if (VIDEOS["PC_VGA_CIRRUS"]~=null) then
+	files {
 		MAME_DIR .. "src/devices/video/clgd542x.cpp",
 		MAME_DIR .. "src/devices/video/clgd542x.h",
 	}
