@@ -847,6 +847,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/ibm8514a.h,VIDEOS["IBM8514A"] = true
+--------------------------------------------------
+
+if (VIDEOS["IBM8514A"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/ibm8514a.cpp",
+		MAME_DIR .. "src/devices/video/ibm8514a.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/ati_mach8.h,VIDEOS["ATI_MACH8"] = true
 --------------------------------------------------
 
