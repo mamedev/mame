@@ -5,10 +5,28 @@
 
 nVidia NV3/NV3T Riva 128
 
+TODO:
+- Windows 98 punts device detection by attempting to modify the (supposedly) PMC ID.
+\- Maybe the card is supposed to send an INTA trap on the write attempt?
+
+References:
+- https://envytools.readthedocs.io/en/latest/hw/mmio.html?highlight=mmio#nv3-g80-mmio-map
+
 **************************************************************************************************/
 
 #include "emu.h"
 #include "riva128.h"
+
+#define LOG_WARN      (1U << 1)
+#define LOG_TODO      (1U << 2) // log unimplemented registers
+
+#define VERBOSE (LOG_GENERAL | LOG_WARN | LOG_TODO)
+#define LOG_OUTPUT_FUNC osd_printf_info
+#include "logmacro.h"
+
+#define LOGWARN(...)            LOGMASKED(LOG_WARN, __VA_ARGS__)
+#define LOGTODO(...)            LOGMASKED(LOG_TODO, __VA_ARGS__)
+
 
 DEFINE_DEVICE_TYPE(RIVA128, riva128_device, "riva128", "SGS-Thompson/nVidia Riva 128 (NV3)")
 
@@ -20,17 +38,18 @@ riva128_device::riva128_device(const machine_config &mconfig, const char *tag, d
 	// device ID 0x12d2 SGS-Thompson/nVidia joint venture
 	// 0x0018 RIVA 128 (NV3)
 	// 0x0019 RIVA 128 ZX (NV3T)
-	set_ids(0x12d20018, 0x00, 0x030000, 0x00);
+	// TODO: STB uses 0x10b4xxxx, unknown for ASUS
+	set_ids_agp(0x12d20018, 0x00, 0x10921092);
 }
 
 ROM_START( riva128 )
 	ROM_REGION32_LE( 0x8000, "vga_rom", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "diamond", "Diamond Viper V330 1.62-CO 01/14/98" )
 	ROMX_LOAD( "diamond_v330_rev-e.vbi", 0x0000, 0x8000, CRC(68686ddc) SHA1(cd2e299acd79624c7d82ce3317004c96bd4e36f7), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "stb", "STB Velocity 128 1.82 12/17/97" )
-	ROMX_LOAD( "riva128_stb.vbi", 0x0000, 0x8000, CRC(80da0245) SHA1(894c855c6d676de0d04d396f7e93a0e6cb98a4b3), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 2, "asus", "ASUS AGP/3DP-V3000 1.51B 09/06/97" )
-	ROMX_LOAD( "riva128_asus.vbi", 0x0000, 0x8000, CRC(cc57586f) SHA1(5e6ec14c66ec38b21013ee6b7582f6b6a4586e2e), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 1, "asus", "ASUS AGP/3DP-V3000 1.51B 09/06/97" )
+	ROMX_LOAD( "riva128_asus.vbi", 0x0000, 0x8000, CRC(cc57586f) SHA1(5e6ec14c66ec38b21013ee6b7582f6b6a4586e2e), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "stb", "STB Velocity 128 AGP 1.82 12/17/97" )
+	ROMX_LOAD( "riva128_stb.vbi", 0x0000, 0x8000, CRC(80da0245) SHA1(894c855c6d676de0d04d396f7e93a0e6cb98a4b3), ROM_BIOS(2) )
 ROM_END
 
 const tiny_rom_entry *riva128_device::device_rom_region() const
@@ -59,6 +78,7 @@ void riva128_device::device_start()
 	add_map(128*1024*1024, M_MEM, FUNC(riva128_device::vram_aperture_map));
 	// indirect memory access I/Os (NV3 only)
 	add_map(0x100, M_IO, FUNC(riva128_device::indirect_io_map));
+	// TODO: Windows 98 expects an extra range mapped at 0x10000000-0x10007fff
 
 	add_rom((u8 *)m_vga_rom->base(), 0x8000);
 	expansion_rom_base = 0xc0000;
@@ -77,6 +97,7 @@ void riva128_device::device_reset()
 	status = 0x0000;
 
 	m_vga_legacy_enable = true;
+	m_main_scratchpad_id = 0x00030310;
 	remap_cb();
 }
 
@@ -106,7 +127,35 @@ void riva128_device::config_map(address_map &map)
 
 void riva128_device::mmio_map(address_map &map)
 {
-	
+	map(0x00000000, 0x00ffffff).rw(FUNC(riva128_device::unmap_log_r), FUNC(riva128_device::unmap_log_w));
+	map(0x00000000, 0x00000003).lrw32(
+		NAME([this] (offs_t offset) {
+			machine().debug_break();
+			LOGTODO("MMIO ID readback\n");
+			return m_main_scratchpad_id;
+			//return 0x00030310;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			COMBINE_DATA(&m_main_scratchpad_id);
+		})
+	);
+//	map(0x00000000, 0x00000fff) PMC card master control
+//	map(0x00001000, 0x00001fff) PBUS bus control
+//	map(0x00002000, 0x00003fff) PFIFO
+//	map(0x00007000, 0x00007***) PRMA real mode BAR Access
+//	map(0x00009000, 0x00009***) PTIMER
+//	map(0x000a0000, 0x000bffff) PRMFB legacy VGA memory
+//	map(0x000c0000, 0x000c****) PRMVIO VGA sequencer & VGA gfx regs (multiple on NV40+)
+//	map(0x00100000, 0x0010*fff) PFB memory interface
+//	map(0x00110000, 0x0011ffff) PROM ROM access window
+//	map(0x00120000, 0x0012ffff) PALT External memory access window
+//	map(0x00400000, 0x00400fff) PGRAPH 2d/3d graphics engine
+//	map(0x00401000, 0x00401***) PDMA system memory DMA engine (NV3/NV4 only)
+//	map(0x00600000, 0x00600***) PCRTC CRTC controls (on NV4+ only?)
+//	map(0x00601000, 0x0060****) PRMCIO VGA CRTC controls
+//	map(0x00680000, 0x0068****) PRAMDAC
+//	map(0x00681000, 0x00681***) VGA DAC registers
+//	map(0x00800000, 0x00******) PFIFO MMIO submission area
 }
 
 void riva128_device::vram_aperture_map(address_map &map)
@@ -118,6 +167,18 @@ void riva128_device::indirect_io_map(address_map &map)
 {
 	
 }
+
+u32 riva128_device::unmap_log_r(offs_t offset, u32 mem_mask)
+{
+	LOGTODO("MMIO Unemulated [%08x] & %08x R\n", offset * 4, mem_mask);
+	return 0;
+}
+
+void riva128_device::unmap_log_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	LOGTODO("MMIO Unemulated [%08x] %08x & %08x W\n", offset * 4, data, mem_mask);
+}
+
 
 // TODO: this should really be a subclass of VGA
 void riva128_device::legacy_memory_map(address_map &map)

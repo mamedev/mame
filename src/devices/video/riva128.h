@@ -45,7 +45,11 @@ private:
 	u32 vga_3d0_r(offs_t offset, uint32_t mem_mask = ~0);
 	void vga_3d0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
+	u32 unmap_log_r(offs_t offset, u32 mem_mask = ~0);
+	void unmap_log_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+
 	bool m_vga_legacy_enable = false;
+	u32 m_main_scratchpad_id = 0;
 };
 
 DECLARE_DEVICE_TYPE(RIVA128, riva128_device)

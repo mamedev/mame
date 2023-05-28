@@ -9,6 +9,10 @@ TODO:
 - Many blanks in the CRTC section;
 \- Untested beyond 16bpp modes;
 \- Regular VGA gfx modes don't draw text properly in some tests (common bug with other VGA archs);
+\- Diamond Viper BIOS don't report back the video card string at POST;
+\- STB BIOS sets 640x481 after POST;
+\- ASUS BIOS sets 640x428 (?);
+- The "red screen" from VGA SENSE may really be a ping from monitor signal;
 - Verify that NV10 really uses this chip (seems to access more regs?)
 - I2C;
 - Interrupts;
