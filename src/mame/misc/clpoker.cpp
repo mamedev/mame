@@ -40,6 +40,8 @@ There also are unpopulated locations that might fit a YM3812 and YM3014.
 #include "tilemap.h"
 
 
+namespace {
+
 class clpoker_state : public driver_device
 {
 public:
@@ -309,6 +311,8 @@ ROM_START( clpoker )
 	ROM_LOAD( "mach110-20jc.pl4",  0x00, 0x200,  NO_DUMP )
 	ROM_LOAD( "gal20v8a.pl5",      0x00, 0x157,  NO_DUMP )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1994, clpoker, 0, clpoker, clpoker, clpoker_state, empty_init, ROT0, "Chain Leisure", "Poker Genius", MACHINE_SUPPORTS_SAVE ) // Year taken from string in main CPU ROM

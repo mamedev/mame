@@ -10918,6 +10918,25 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="golgo13" supported="yes">
+		<!--
+		Origin: Redump
+		<rom name="Golgo 13 (Japan).bin" size="555483600" crc="dc016ec2" md5="9c12718d43129e23d525f7c24d55a5d0"/>
+		<rom name="Golgo 13 (Japan).cue" size="80" crc="90d6fe73" md5="41e1511f1b4a836a829a3d1472769932"/>
+		-->
+		<description>CD-i Golgo 13 (Japan)</description>
+		<year>1992</year>
+		<publisher>Japan Interactive Media</publisher>
+		<info name="serial" value="PCIM-00018" />
+		<info name="alt_title" value="CD-i ゴルゴ１３" />
+		<info name="cd_matrix" value="PCIM-00018" />
+		<part name="cdrom" interface="cdi_cdrom">
+			<diskarea name="cdrom">
+				<disk name="golgo 13 (1992)(japan interactive media)(jp)" sha1="c8767a7864e139e50af9f121c7f944285b5763f0"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="nijmegen">
 		<!--
 		Origin: Gaming Alexandria

@@ -285,10 +285,15 @@ MASTER BOARD
 #include "emupal.h"
 #include "screen.h"
 
+#define LOG_IC49_PIO_PB (1U << 1)
+#define LOG_IC48_PIO_PB (1U << 2)
+#define LOG_IC48_PIO_PA (1U << 3)
 
-#define LOG_IC49_PIO_PB 0
-#define LOG_IC48_PIO_PB 0
-#define LOG_IC48_PIO_PA 0
+#define VERBOSE (0)
+#include "logmacro.h"
+
+
+namespace {
 
 class cedar_magnet_state : public driver_device
 {
@@ -752,7 +757,7 @@ u8 cedar_magnet_state::ic48_pio_pa_r() // 0x20
 	// interrupt source stuff??
 	ret &= ~0x10;
 
-	if (LOG_IC48_PIO_PA) logerror("%s: ic48_pio_pa_r (returning %02x)\n", machine().describe_context(), ret);
+	LOGMASKED(LOG_IC48_PIO_PA, "%s: ic48_pio_pa_r (returning %02x)\n", machine().describe_context(), ret);
 	return ret;
 }
 
@@ -764,16 +769,16 @@ void cedar_magnet_state::ic48_pio_pa_w(u8 data) // 0x20
 	m_ic48_pio_pa_val = data;
 
 	// address 0x20 - pio ic48 port a
-	if (LOG_IC48_PIO_PA) logerror("%s: ic48_pio_pa_w %02x (memory banking etc.)\n", machine().describe_context(), data);
+	LOGMASKED(LOG_IC48_PIO_PA, "%s: ic48_pio_pa_w %02x (memory banking etc.)\n", machine().describe_context(), data);
 
-	if (LOG_IC48_PIO_PA) logerror("output bit 0x80 %d (unused)\n", (data >> 7)&1); // A7 -> 12 J4 unpopulated
-	if (LOG_IC48_PIO_PA) logerror("output bit 0x40 %d (bank)\n", (data >> 6)&1); // A6 -> 2 74HC10 3NAND IC19
-	if (LOG_IC48_PIO_PA) logerror("output bit 0x20 %d (bank)\n", (data >> 5)&1); // A5 -> 4 74HC10 3NAND IC19
-	if (LOG_IC48_PIO_PA) logerror("input  bit 0x10 %d (interrupt source related?)\n", (data >> 4)&1); // 10 in // A4 <- 9 74HC74 IC20 <- input from 18 74LS244 IC61
-	if (LOG_IC48_PIO_PA) logerror("input  bit 0x08 %d (COIN1)\n", (data >> 3)&1); // 08 in // A3 <- 4 74HC14P (inverter) IC4 <- EDGE 21 COIN1
-	if (LOG_IC48_PIO_PA) logerror("output bit 0x04 %d (plane0 CPU/bus related?)\n", (data >> 2)&1); // A2 -> 45 J6
-	if (LOG_IC48_PIO_PA) logerror("output bit 0x02 %d (plane0 CPU/bus related?)\n", (data >> 1)&1); // A1 -> 47 J6
-	if (LOG_IC48_PIO_PA) logerror("input  bit 0x01 %d (plane0 CPU/bus related?)\n", (data >> 0)&1); // A0 -> 49 J6
+	LOGMASKED(LOG_IC48_PIO_PA, "output bit 0x80 %d (unused)\n", (data >> 7)&1); // A7 -> 12 J4 unpopulated
+	LOGMASKED(LOG_IC48_PIO_PA, "output bit 0x40 %d (bank)\n", (data >> 6)&1); // A6 -> 2 74HC10 3NAND IC19
+	LOGMASKED(LOG_IC48_PIO_PA, "output bit 0x20 %d (bank)\n", (data >> 5)&1); // A5 -> 4 74HC10 3NAND IC19
+	LOGMASKED(LOG_IC48_PIO_PA, "input  bit 0x10 %d (interrupt source related?)\n", (data >> 4)&1); // 10 in // A4 <- 9 74HC74 IC20 <- input from 18 74LS244 IC61
+	LOGMASKED(LOG_IC48_PIO_PA, "input  bit 0x08 %d (COIN1)\n", (data >> 3)&1); // 08 in // A3 <- 4 74HC14P (inverter) IC4 <- EDGE 21 COIN1
+	LOGMASKED(LOG_IC48_PIO_PA, "output bit 0x04 %d (plane0 CPU/bus related?)\n", (data >> 2)&1); // A2 -> 45 J6
+	LOGMASKED(LOG_IC48_PIO_PA, "output bit 0x02 %d (plane0 CPU/bus related?)\n", (data >> 1)&1); // A1 -> 47 J6
+	LOGMASKED(LOG_IC48_PIO_PA, "input  bit 0x01 %d (plane0 CPU/bus related?)\n", (data >> 0)&1); // A0 -> 49 J6
 
 	int bankbit0 = (m_ic48_pio_pa_val & 0x60) >> 5;
 	m_bank0->set_bank(bankbit0);
@@ -793,7 +798,7 @@ u8 cedar_magnet_state::ic48_pio_pb_r() // 0x22
 	if (!m_cedsprite->is_running()) ret &= ~0x10;
 	if (!m_cedplane1->is_running()) ret &= ~0x01;
 
-	if (LOG_IC48_PIO_PB) logerror("%s: ic48_pio_pb_r (returning %02x)\n", machine().describe_context(), ret);
+	LOGMASKED(LOG_IC48_PIO_PB, "%s: ic48_pio_pb_r (returning %02x)\n", machine().describe_context(), ret);
 	return ret;
 }
 
@@ -804,17 +809,17 @@ void cedar_magnet_state::ic48_pio_pb_w(u8 data) // 0x22
 
 	m_ic48_pio_pb_val = data;
 
-	if (LOG_IC48_PIO_PB)  logerror("%s: ic48_pio_pb_w %02x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_IC48_PIO_PB, "%s: ic48_pio_pb_w %02x\n", machine().describe_context(), data);
 
 	// address 0x22 - pio ic48 port b
-	if (LOG_IC48_PIO_PB) logerror("input  bit 0x80 %d (COIN2)\n", (data >> 7)&1); // B7 <- 2 74HC14P (inverter) IC4 <- EDGE 22 COIN2
-	if (LOG_IC48_PIO_PB) logerror("output bit 0x40 (J6) (sprite CPU/bus related?) %d\n", (data >> 6)&1); // B6 -> 41 J6
-	if (LOG_IC48_PIO_PB) logerror("output bit 0x20 (J6) (sprite CPU/bus related?) %d\n", (data >> 5)&1); // B5 -> 43 J6
-	if (LOG_IC48_PIO_PB) logerror("input  bit 0x10 (J6) (sprite CPU/bus related?) %d\n", (data >> 4)&1); // B4 -> 44 J6
-	if (LOG_IC48_PIO_PB) logerror("output bit 0x08 (Q8) %d\n", (data >> 3)&1); // B3 -> Q8 transistor
-	if (LOG_IC48_PIO_PB) logerror("output bit 0x04 (J6) (plane1 CPU/bus related?) %d\n", (data >> 2)&1); // B2 -> 46 J6
-	if (LOG_IC48_PIO_PB) logerror("output bit 0x02 (J6) (plane1 CPU/bus related?) %d\n", (data >> 1)&1); // B1 -> 48 J6
-	if (LOG_IC48_PIO_PB) logerror("input  bit 0x01 (J6) (plane1 CPU/bus related?) %d\n", (data >> 0)&1); // B0 -> 50 J6
+	LOGMASKED(LOG_IC48_PIO_PB, "input  bit 0x80 %d (COIN2)\n", (data >> 7)&1); // B7 <- 2 74HC14P (inverter) IC4 <- EDGE 22 COIN2
+	LOGMASKED(LOG_IC48_PIO_PB, "output bit 0x40 (J6) (sprite CPU/bus related?) %d\n", (data >> 6)&1); // B6 -> 41 J6
+	LOGMASKED(LOG_IC48_PIO_PB, "output bit 0x20 (J6) (sprite CPU/bus related?) %d\n", (data >> 5)&1); // B5 -> 43 J6
+	LOGMASKED(LOG_IC48_PIO_PB, "input  bit 0x10 (J6) (sprite CPU/bus related?) %d\n", (data >> 4)&1); // B4 -> 44 J6
+	LOGMASKED(LOG_IC48_PIO_PB, "output bit 0x08 (Q8) %d\n", (data >> 3)&1); // B3 -> Q8 transistor
+	LOGMASKED(LOG_IC48_PIO_PB, "output bit 0x04 (J6) (plane1 CPU/bus related?) %d\n", (data >> 2)&1); // B2 -> 46 J6
+	LOGMASKED(LOG_IC48_PIO_PB, "output bit 0x02 (J6) (plane1 CPU/bus related?) %d\n", (data >> 1)&1); // B1 -> 48 J6
+	LOGMASKED(LOG_IC48_PIO_PB, "input  bit 0x01 (J6) (plane1 CPU/bus related?) %d\n", (data >> 0)&1); // B0 -> 50 J6
 
 	int plane1select = (m_ic48_pio_pb_val & 0x07) >> 0;
 	int spriteselect = (m_ic48_pio_pb_val & 0x70) >> 4;
@@ -836,7 +841,7 @@ u8 cedar_magnet_state::ic49_pio_pb_r() // 0x42
 
 	if (!m_cedsound->is_running()) ret &= ~0x10;
 
-	if (LOG_IC49_PIO_PB) logerror("%s: ic49_pio_pb_r (returning %02x)\n", machine().describe_context(), ret);
+	LOGMASKED(LOG_IC49_PIO_PB, "%s: ic49_pio_pb_r (returning %02x)\n", machine().describe_context(), ret);
 	return ret;
 }
 
@@ -849,15 +854,15 @@ void cedar_magnet_state::ic49_pio_pb_w(u8 data) // 0x42
 	//logerror("%s: ic49_pio_pb_w %02x\n", machine().describe_context(), data);
 
 	// address 0x42 - pio ic49 port b
-	if (LOG_IC49_PIO_PB) logerror("output bit 0x80 %d (Q9)\n", (data >> 7)&1); // B7 -> Q9 transistor
-	if (LOG_IC49_PIO_PB) logerror("output bit 0x40 %d (sound CPU bus related) (J3)\n", (data >> 6)&1); // B6 -> 9 J3
-	if (LOG_IC49_PIO_PB) logerror("output bit 0x20 %d (sound CPU bus related) (J3)\n", (data >> 5)&1); // B5 -> 8 J3
-	if (LOG_IC49_PIO_PB) logerror("input  bit 0x10 %d (sound CPU bus related) (J3)\n", (data >> 4)&1); // B4 -> 7 J3       // input?
-	if (LOG_IC49_PIO_PB) logerror("output bit 0x08 %d (J7)\n", (data >> 3)&1); // B3 -> 35 J7  bank bits
-	if (LOG_IC49_PIO_PB) logerror("output bit 0x04 %d (J7)\n", (data >> 2)&1); // B2 -> 36 J7  bank bits
+	LOGMASKED(LOG_IC49_PIO_PB, "output bit 0x80 %d (Q9)\n", (data >> 7)&1); // B7 -> Q9 transistor
+	LOGMASKED(LOG_IC49_PIO_PB, "output bit 0x40 %d (sound CPU bus related) (J3)\n", (data >> 6)&1); // B6 -> 9 J3
+	LOGMASKED(LOG_IC49_PIO_PB, "output bit 0x20 %d (sound CPU bus related) (J3)\n", (data >> 5)&1); // B5 -> 8 J3
+	LOGMASKED(LOG_IC49_PIO_PB, "input  bit 0x10 %d (sound CPU bus related) (J3)\n", (data >> 4)&1); // B4 -> 7 J3       // input?
+	LOGMASKED(LOG_IC49_PIO_PB, "output bit 0x08 %d (J7)\n", (data >> 3)&1); // B3 -> 35 J7  bank bits
+	LOGMASKED(LOG_IC49_PIO_PB, "output bit 0x04 %d (J7)\n", (data >> 2)&1); // B2 -> 36 J7  bank bits
 	// there is code to mask out both bottom bits here before load operations?
-	if (LOG_IC49_PIO_PB) logerror("output bit 0x02 %d (IC21)\n", (data >> 1)&1); // B1 -> 3 74HC04 IC21 (set before some SPRITE cpu operations, possibly halts the blitter?)
-	if (LOG_IC49_PIO_PB) logerror("output bit 0x01 (LED) %d\n", (data >> 0)&1); // B0 -> LED LD1
+	LOGMASKED(LOG_IC49_PIO_PB, "output bit 0x02 %d (IC21)\n", (data >> 1)&1); // B1 -> 3 74HC04 IC21 (set before some SPRITE cpu operations, possibly halts the blitter?)
+	LOGMASKED(LOG_IC49_PIO_PB, "output bit 0x01 (LED) %d\n", (data >> 0)&1); // B0 -> LED LD1
 
 
 
@@ -1155,6 +1160,9 @@ void cedar_magnet_state::kludge_protection()
 		if ((m_ram0[m_address2hack] == 0x3e) && (m_ram0[m_address2hack + 1] == 0xff)) m_ram0[m_address2hack] = 0xc9;
 	}
 }
+
+} // anonymous namespace
+
 
 GAME( 1987, cedmag,   0,      cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,  "EFO SA / Cedar", "Magnet System",                         MACHINE_IS_BIOS_ROOT )
 

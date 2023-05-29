@@ -55,6 +55,82 @@ c:index_of(v)
     value.
 
 
+.. _luareference-globals:
+
+Global objects
+--------------
+
+.. _luareference-globals-emu:
+
+Emulator interface
+~~~~~~~~~~~~~~~~~~
+
+The emulator interface ``emu`` provides access to core functionality.  Many
+classes are also available as properties of the emulator interface.
+
+Methods
+^^^^^^^
+
+emu.wait(duration, …)
+    Yields for the specified duration in terms of emulated time.  The duration
+    may be specified as an :ref:`attotime <luareference-core-attotime>` or a
+    number in seconds.  Any additional arguments are returned to the caller.
+    Returns a Boolean indicating whether the duration expired normally.
+
+    All outstanding calls to ``emu.wait`` will return ``false`` immediately if a
+    saved state is loaded or the emulation session ends.  Calling this function
+    from callbacks that are not run as coroutines will raise an error.
+emu.wait_next_update(…)
+    Yields until the next video/UI update.  Any arguments are returned to the
+    caller.  Calling this function from callbacks that are not run as coroutines
+    will raise an error.
+emu.wait_next_frame(…)
+    Yields until the next emulated frame completes.  Any arguments are returned
+    to the caller.  Calling this function from callbacks that are not run as
+    coroutines will raise an error.
+emu.add_machine_reset_notifier(callback)
+    Add a callback to receive notifications when the emulated system is reset.
+    Returns a :ref:`notifier subscription <luareference-core-notifiersub>`.
+emu.add_machine_stop_notifier(callback)
+    Add a callback to receive notifications when the emulated system is stopped.
+    Returns a :ref:`notifier subscription <luareference-core-notifiersub>`.
+emu.add_machine_pause_notifier(callback)
+    Add a callback to receive notifications when the emulated system is paused.
+    Returns a :ref:`notifier subscription <luareference-core-notifiersub>`.
+emu.add_machine_resume_notifier(callback)
+    Add a callback to receive notifications when the emulated system is resumed
+    after being paused.  Returns a
+    :ref:`notifier subscription <luareference-core-notifiersub>`.
+emu.add_machine_frame_notifier(callback)
+    Add a callback to receive notifications when an emulated frame completes.
+    Returns a :ref:`notifier subscription <luareference-core-notifiersub>`.
+emu.add_machine_pre_save_notifier(callback)
+    Add a callback to receive notification before the emulated system state is
+    saved.  Returns a
+    :ref:`notifier subscription <luareference-core-notifiersub>`.
+emu.add_machine_post_load_notifier(callback)
+    Add a callback to receive notification after the emulated system is restored
+    to a previously saved state.  Returns a
+    :ref:`notifier subscription <luareference-core-notifiersub>`.
+emu.print_error(message)
+    Print an error message.
+emu.print_warning(message)
+    Print a warning message.
+emu.print_info(message)
+    Print an informational message.
+emu.print_verbose(message)
+    Print a verbose diagnostic message (disabled by default).
+emu.print_debug(message)
+    Print a debug message (only enabled for debug builds by default).
+emu.lang_translate([context], message)
+    Look up a message with optional context in the current localised message
+    catalog.  Returns the message unchanged if no corresponding localised
+    message is found.
+emu.subst_env(string)
+    Substitute environment variables in a string.  The syntax is dependent on
+    the host operating system.
+
+
 .. _luareference-core:
 
 Core classes
@@ -563,6 +639,8 @@ ui.line_height (read-only)
 ui.menu_active (read-only)
     A Boolean indicating whether an interactive UI element is currently active.
     Examples include menus and slider controls.
+ui.ui_active (read/write)
+    A Boolean indicating whether UI control inputs are currently enabled.
 ui.single_step (read/write)
     A Boolean controlling whether the emulated system should be automatically
     paused when the next frame is drawn.  This property is automatically reset
@@ -852,6 +930,11 @@ device.debug (read-only)
     The :ref:`debugger interface <luareference-debug-devdebug>` to the device if
     it is a CPU device, or ``nil`` if it is not a CPU device or the debugger is
     not enabled.
+device.state[] (read-only)
+    The :ref:`state entries <luareference-dev-stateentry>` for devices that
+    expose the register state interface, indexed by symbol, or ``nil`` for other
+    devices.  The index operator and ``index_of`` methods have O(n) complexity;
+    all other supported operations have O(1) complexity.
 device.spaces[] (read-only)
     A table of the device’s :ref:`address spaces <luareference-mem-space>`,
     indexed by name.  Only valid for devices that implement the memory
@@ -1200,16 +1283,17 @@ Methods
 ^^^^^^^
 
 image:load(filename)
-    Loads the specified file as a media image.  Returns ``"pass"`` or
-    ``"fail"``.
+    Loads the specified file as a media image.  Returns ``nil`` if no error
+    or a string describing an error if an error occurred.
 image:load_software(name)
-    Loads a media image described in a software list.  Returns ``"pass"`` or
-    ``"fail"``.
+    Loads a media image described in a software list.  Returns ``nil`` if no
+    error or a string describing an error if an error occurred.
 image:unload()
     Unloads the mounted image.
 image:create(filename)
     Creates and mounts a media image file with the specified name.  Returns
-    ``"pass"`` or ``"fail"``.
+    ``nil`` if no error or a string describing an error if an error
+    occurred.
 image:display()
     Returns a “front panel display” string for the device, if supported.  This
     can be used to show status information, like the current head position or
@@ -1310,6 +1394,46 @@ slot.options[] (read-only)
     operations have O(1) complexity.
 slot.device (read-only)
     The underlying :ref:`device <luareference-dev-device>`.
+
+.. _luareference-dev-stateentry:
+
+Device state entry
+~~~~~~~~~~~~~~~~~~
+
+Wraps MAME’s ``device_state_entry`` class, which allows access to named
+registers exposed by a :ref:`device <luareference-dev-device>`.  Supports
+conversion to string for display.
+
+Instantiation
+^^^^^^^^^^^^^
+
+manager.machine.devices[tag].state[symbol]
+    Gets a state entry for a given device by symbol.
+
+Properties
+^^^^^^^^^^
+
+entry.value (read/write)
+    The numeric value of the state entry, as either an integer or floating-point
+    number.  Attempting to set the value of a read-only state entry raises an
+    error.
+entry.symbol (read-only)
+    The state entry’s symbolic name.
+entry.visible (read-only)
+    A Boolean indicating whether the state entry should be displayed in the
+    debugger register view.
+entry.writeable (read-only)
+    A Boolean indicating whether it is possible to modify the state entry’s
+    value.
+entry.is_float (read-only)
+    A Boolean indicating whether the state entry’s value is a floating-point
+    number.
+entry.datamask (read-only)
+    A bit mask of the valid bits of the value for integer state entries.
+entry.datasize (read-only)
+    The size of the underlying value in bytes for integer state entries.
+entry.max_length (read-only)
+    The maximum display string length for the state entry.
 
 .. _luareference-dev-imagefmt:
 
@@ -1550,7 +1674,8 @@ Pass-through handler
 Tracks a pass-through handler installed in an
 :ref:`address space <luareference-mem-space>`.  A memory pass-through handler
 receives notifications on accesses to a specified range of addresses, and can
-modify the data that is read or written if desired.
+modify the data that is read or written if desired.  Note that pass-through handler
+callbacks are not run as coroutines.
 
 Instantiation
 ^^^^^^^^^^^^^
@@ -2549,6 +2674,10 @@ manager.machine.uiinput
 Methods
 ^^^^^^^
 
+uiinput:reset()
+    Clears pending events and UI input states.  Should be called when leaving a
+    modal state where input is handled directly (e.g. configuring an input
+    combination).
 uiinput:find_mouse()
     Returns host system mouse pointer X position, Y position, button state, and
     the :ref:`render target <luareference-render-target>` it falls in.  The
@@ -3080,6 +3209,10 @@ emu.bitmap_argb32(source, [x0, y0, x1, y1])
     The source bitmap must be owned by the Lua script and must use the ARGB
     format.  Raises an error if coordinates are specified representing a
     rectangle not fully contained within the source bitmap’s clipping rectangle.
+emu.bitmap_argb32.load(data)
+    Creates an ARGB format bitmap from data in PNG, JPEG (JFIF/EXIF) or
+    Microsoft DIB (BMP) format.  Raises an error if the data invalid or not a
+    supported format.
 
 Methods
 ^^^^^^^
@@ -3520,7 +3653,8 @@ Layout file
 ~~~~~~~~~~~
 
 Wraps MAME’s ``layout_file`` class, representing the views loaded from a layout
-file for use by a render target.
+file for use by a render target.  Note that layout file callbacks are not run as
+coroutines.
 
 Instantiation
 ^^^^^^^^^^^^^
@@ -3564,7 +3698,8 @@ Layout view
 Wraps MAME’s ``layout_view`` class, representing a view that can be displayed in
 a render target.  Views are created from XML layout files, which may be loaded
 from external artwork, internal to MAME, or automatically generated based on the
-screens in the emulated system.
+screens in the emulated system.  Note that layout view callbacks are not run as
+coroutines.
 
 Instantiation
 ^^^^^^^^^^^^^
@@ -3643,7 +3778,8 @@ Layout view item
 
 Wraps MAME’s ``layout_view_item`` class, representing an item in a view.  An
 item is drawn as a rectangular textured surface.  The texture is supplied by an
-emulated screen or a layout element.
+emulated screen or a layout element.  Note that layout view item callbacks are
+not run as coroutines.
 
 Instantiation
 ^^^^^^^^^^^^^
@@ -3949,8 +4085,9 @@ emu.parsed_expression(symbols, string, [default_base])
     Creates an expression by parsing the supplied string, looking up symbols in
     the supplied :ref:`symbol table <luareference-debug-symtable>`.  If the
     default base for interpreting integer literals is not supplied, 16 is used
-    (hexadecimal).  Raises an error if the string contains syntax errors or uses
-    undefined symbols.
+    (hexadecimal).  Raises an :ref:`expression error
+    <luareference-debug-expressionerror>` if the string contains syntax errors
+    or uses undefined symbols.
 
 Methods
 ^^^^^^^
@@ -3960,13 +4097,14 @@ expression:set_default_base(base)
     positive integer.
 expression:parse(string)
     Parse a debugger expression string.  Replaces the current contents of the
-    expression if it is not empty.  Raises an error if the string contains
-    syntax errors or uses undefined symbols.  The previous content of the
-    expression is not preserved when attempting to parse an invalid expression
-    string.
+    expression if it is not empty.  Raises an :ref:`expression error
+    <luareference-debug-expressionerror>` if the string contains syntax errors
+    or uses undefined symbols.  The previous content of the expression is not
+    preserved when attempting to parse an invalid expression string.
 expression:execute()
     Evaluates the expression, returning an unsigned integer result.  Raises an
-    error if the expression cannot be evaluated (e.g. calling a function with an
+    :ref:`expression error <luareference-debug-expressionerror>` if the
+    expression cannot be evaluated (e.g. attempting to call a function with an
     invalid number of arguments).
 
 Properties
@@ -4220,3 +4358,22 @@ watchpoint.condition (read-only)
 watchpoint.action (read-only)
     An action the debugger will run when the watchpoint is hit and the condition
     evaluates to a non-zero value.  An empty string if no action was specified.
+
+.. _luareference-debug-expressionerror:
+
+Expression error
+~~~~~~~~~~~~~~~~
+
+Wraps MAME’s ``expression_error`` class, describing an error occurring while
+parsing or executing a debugger expression.  Raised on errors when using
+:ref:`parsed expressions <luareference-debug-expression>`.  Can be converted to
+a string to provide a description of the error.
+
+Properties
+^^^^^^^^^^
+
+err.code (read-only)
+    An implementation-dependent number representing the category of error.
+    Should not be displayed to the user.
+err.offset (read-only)
+    The offset within the expression string where the error was encountered.

@@ -38,13 +38,6 @@
 #include "emupal.h"
 #include "screen.h"
 
-constexpr auto DX7CLOCK    = 9'426'500;
-
-constexpr auto LCD_E  = 0x02;
-constexpr auto LCD_RW = 0x04;
-constexpr auto LCD_RS = 0x01;
-
-#define LOG_GENERAL (1U << 0)
 #define LOG_OPS     (1U << 1)
 #define LOG_EGS     (1U << 2)
 
@@ -52,6 +45,16 @@ constexpr auto LCD_RS = 0x01;
 #define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
+
+
+namespace {
+
+constexpr auto DX7CLOCK    = 9'426'500;
+
+constexpr auto LCD_E  = 0x02;
+constexpr auto LCD_RW = 0x04;
+constexpr auto LCD_RS = 0x01;
+
 
 class yamaha_dx7_state : public driver_device
 {
@@ -131,18 +134,18 @@ private:
  void yamaha_dx7_state::dx7_acept_w(offs_t address, u8 data)
 {
 	m_acept++;
-	LOGMASKED(LOG_GENERAL, "ACEPT reg:0x%x = 0x%x \n", address, data);
+	LOG("ACEPT reg:0x%x = 0x%x \n", address, data);
 	m_irq0 = 1;
 	m_maincpu->set_input_line(M6800_IRQ_LINE, CLEAR_LINE);
 }
 u8 yamaha_dx7_state::dx7_p1_r(offs_t)
 {
-	LOGMASKED(LOG_GENERAL, "reading PORT1\n");
+	LOG("reading PORT1\n");
 	return m_PORT1;
 }
 u8 yamaha_dx7_state::dx7_p2_r(offs_t)
 {
-	LOGMASKED(LOG_GENERAL, "reading PORT2\n");
+	LOG("reading PORT2\n");
 	u8 temp = 0; //P0 is WRITE! does the CPU re-reads its OWN data? can it?
 	if(m_irq0)
 	{
@@ -159,7 +162,7 @@ u8 yamaha_dx7_state::dx7_p2_r(offs_t)
 }
 void yamaha_dx7_state::dx7_p2_w(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "W PORT2 0x%x\n", data);
+	LOG("W PORT2 0x%x\n", data);
 	m_PORT2 = data;
 }
 
@@ -228,8 +231,6 @@ void yamaha_dx7_state::main_map(address_map &map)
 	//Y6 (0x3000) EGS
 	//Y7 (0x3800) NC
 
-	map(0x0000, 0x001f).m(m_maincpu, FUNC(m6801_cpu_device::m6801_io));
-	map(0x0080, 0x00ff).ram(); /* HR6303R built in RAM */
 	map(0x1000, 0x17ff).ram().share("ram1");/* 2kb RAM1 IC19 M5M118P (Voice Memory part1) */
 	map(0x1800, 0x1fff).ram().share("ram2");/* 2kb RAM2 IC20 M5M118P (Voice Memory part2) */
 	map(0x2000, 0x27ff).ram().share("ram3");/* 2kb RAM3 IC21 M5M118P (Working Area)       */
@@ -330,5 +331,8 @@ ROM_START(dx7)
 	ROM_REGION(0x0800, "subcpu", 0)
 	ROM_LOAD("hd6805s1p-a33.ic13", 0x0000, 0x800, CRC(ac1d84b3) SHA1(ee0ebb118dd0d282d7c195d3b246a0094b2cb6ad))
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1983, dx7, 0, 0, dx7, dx7, yamaha_dx7_state, empty_init, "Yamaha", "DX7 Digital Programmable Algorithm Synthesizer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

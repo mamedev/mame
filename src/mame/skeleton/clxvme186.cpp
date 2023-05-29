@@ -13,6 +13,9 @@
 #include "machine/m3002.h"
 #include "machine/z80scc.h"
 
+
+namespace {
+
 class clxvme186_state : public driver_device
 {
 public:
@@ -114,6 +117,8 @@ ROM_START(clxvme186)
 	ROM_LOAD16_BYTE("clxu53.bin", 0x0001, 0x4000, CRC(66bf7cc5) SHA1(cfe8df9260b565840249256a30631a34e931c886))
 	ROM_IGNORE(0x4000)
 ROM_END
+
+} // anonymous namespace
 
 
 COMP(1983, clxvme186, 0, 0, clxvme186, clxvme186, clxvme186_state, empty_init, "Colex", "Colex VME-80186", MACHINE_IS_SKELETON)

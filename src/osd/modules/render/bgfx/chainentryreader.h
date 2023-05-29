@@ -5,15 +5,15 @@
 //  chainentryreader.h - BGFX chain entry JSON reader
 //
 //============================================================
+#ifndef MAME_RENDER_BGFX_CHAINENTRYREADER_H
+#define MAME_RENDER_BGFX_CHAINENTRYREADER_H
 
 #pragma once
 
-#ifndef __DRAWBGFX_CHAIN_ENTRY_READER__
-#define __DRAWBGFX_CHAIN_ENTRY_READER__
+#include "statereader.h"
 
 #include <map>
 
-#include "statereader.h"
 
 class bgfx_chain_entry;
 class bgfx_slider;
@@ -23,10 +23,10 @@ class chain_manager;
 class chain_entry_reader : public state_reader
 {
 public:
-	static bgfx_chain_entry* read_from_value(const Value& value, std::string prefix, chain_manager& chains, std::map<std::string, bgfx_slider*>& sliders, std::map<std::string, bgfx_parameter*>& params, uint32_t screen_index);
+	static bgfx_chain_entry* read_from_value(const Value& value, const std::string &prefix, chain_manager& chains, std::map<std::string, bgfx_slider*>& sliders, std::map<std::string, bgfx_parameter*>& params, uint32_t screen_index);
 
 private:
-	static bool validate_parameters(const Value& value, std::string prefix);
+	static bool validate_parameters(const Value& value, const std::string &prefix);
 };
 
-#endif // __DRAWBGFX_CHAIN_ENTRY_READER__
+#endif // MAME_RENDER_BGFX_CHAINENTRYREADER_H

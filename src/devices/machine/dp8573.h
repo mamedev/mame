@@ -11,7 +11,9 @@
 
 #pragma once
 
-class dp8573_device : public device_t, public device_nvram_interface
+#include "dirtc.h"
+
+class dp8573_device : public device_t, public device_nvram_interface, public device_rtc_interface
 {
 public:
 	dp8573_device(const machine_config &mconfig, const char *tag, device_t *owner)
@@ -37,7 +39,11 @@ protected:
 	virtual bool nvram_read(util::read_stream &file) override;
 	virtual bool nvram_write(util::write_stream &file) override;
 
-	void sync_time();
+	// device_rtc_interface overrides
+	virtual bool rtc_feature_y2k() const override { return false; }
+	virtual bool rtc_feature_leap_year() const override { return true; }
+	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
+
 	void save_registers();
 	void set_interrupt(uint8_t mask);
 	void clear_interrupt(uint8_t mask);

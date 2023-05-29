@@ -14,10 +14,13 @@
 
 #include "options.h"
 
-#include <lua.hpp>
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
 
 #include <cassert>
 #include <system_error>
+#include <type_traits>
 
 
 
@@ -357,8 +360,6 @@ int sol_lua_push(sol::types<std::error_condition>, lua_State &L, std::error_cond
 
 // enums to automatically convert to strings
 int sol_lua_push(sol::types<map_handler_type>, lua_State *L, map_handler_type &&value);
-int sol_lua_push(sol::types<image_init_result>, lua_State *L, image_init_result &&value);
-int sol_lua_push(sol::types<image_verify_result>, lua_State *L, image_verify_result &&value);
 int sol_lua_push(sol::types<endianness_t>, lua_State *L, endianness_t &&value);
 
 
@@ -458,7 +459,10 @@ protected:
 			result = sol::stack::push(L, i.ix + 1);
 		else
 			result = T::push_key(L, i.it, i.ix);
-		result += sol::stack::push_reference(L, T::unwrap(i.it));
+		if constexpr (std::is_reference_v<decltype(T::unwrap(i.it))>)
+			result += sol::stack::push_reference(L, std::ref(T::unwrap(i.it)));
+		else
+			result += sol::stack::push_reference(L, T::unwrap(i.it));
 		++i;
 		return result;
 	}
@@ -479,9 +483,16 @@ public:
 		T &self(immutable_sequence_helper::get_self(L));
 		std::ptrdiff_t const index(sol::stack::unqualified_get<std::ptrdiff_t>(L, 2));
 		if ((0 >= index) || (self.items().size() < index))
+		{
 			return sol::stack::push(L, sol::lua_nil);
+		}
 		else
-			return sol::stack::push_reference(L, T::unwrap(std::next(self.items().begin(), index - 1)));
+		{
+			if constexpr (std::is_reference_v<decltype(T::unwrap(std::next(self.items().begin(), index - 1)))>)
+				return sol::stack::push_reference(L, std::ref(T::unwrap(std::next(self.items().begin(), index - 1))));
+			else
+				return sol::stack::push_reference(L, T::unwrap(std::next(self.items().begin(), index - 1)));
+		}
 	}
 
 	static int index_of(lua_State *L)
@@ -564,6 +575,32 @@ private:
 
 
 //-------------------------------------------------
+//  make_notifier_adder - make a function for
+//  subscribing to a notifier
+//-------------------------------------------------
+
+template <typename... T>
+auto lua_engine::make_notifier_adder(util::notifier<T...> &notifier, const char *desc)
+{
+	return
+		[this, &notifier, desc] (sol::protected_function cb)
+		{
+			return notifier.subscribe(
+					delegate<void (T...)>(
+						[this, desc, cbfunc = sol::protected_function(m_lua_state, cb)] (T... args)
+						{
+							auto status(invoke(cbfunc, args...));
+							if (!status.valid())
+							{
+								auto err(status.template get<sol::error>());
+								osd_printf_error("[LUA ERROR] error in %s callback: %s\n", desc, err.what());
+							}
+						}));
+		};
+}
+
+
+//-------------------------------------------------
 //  make_simple_callback_setter - make a callback
 //  setter for simple cases
 //-------------------------------------------------
@@ -572,7 +609,7 @@ template <typename R, typename T, typename D>
 auto lua_engine::make_simple_callback_setter(void (T::*setter)(delegate<R ()> &&), D &&dflt, const char *name, const char *desc)
 {
 	return
-		[setter, dflt, name, desc] (T &self, sol::object cb)
+		[this, setter, dflt, name, desc] (T &self, sol::object cb)
 		{
 			if (cb == sol::lua_nil)
 			{
@@ -581,26 +618,35 @@ auto lua_engine::make_simple_callback_setter(void (T::*setter)(delegate<R ()> &&
 			else if (cb.is<sol::protected_function>())
 			{
 				(self.*setter)(delegate<R ()>(
-							[dflt, desc, cbfunc = cb.as<sol::protected_function>()] () -> R
+							[dflt, desc, cbfunc = sol::protected_function(m_lua_state, cb)] () -> R
 							{
-								if constexpr (std::is_same_v<R, void>)
+								auto status(invoke_direct(cbfunc));
+								if (status.valid())
 								{
-									(void)dflt;
-									(void)desc;
-									invoke(cbfunc);
-								}
-								else
-								{
-									auto result(invoke(cbfunc).get<std::optional<R> >());
-									if (result)
+									if constexpr (std::is_same_v<R, void>)
 									{
-										return *result;
+										std::ignore = dflt;
 									}
 									else
 									{
-										osd_printf_error("[LUA ERROR] invalid return from %s callback\n", desc);
-										return dflt();
+										auto result(status.get<std::optional<R> >());
+										if (result)
+										{
+											return *result;
+										}
+										else
+										{
+											osd_printf_error("[LUA ERROR] invalid return from %s callback\n", desc);
+											return dflt();
+										}
 									}
+								}
+								else
+								{
+									auto err(status.get<sol::error>());
+									osd_printf_error("[LUA ERROR] error in %s callback: %s\n", desc, err.what());
+									if constexpr (!std::is_same_v<R, void>)
+										return dflt();
 								}
 							}));
 			}

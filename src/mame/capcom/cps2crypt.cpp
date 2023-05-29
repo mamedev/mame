@@ -664,17 +664,14 @@ void cps2_decrypt(running_machine &machine, uint16_t *rom, uint16_t *dec, int le
 	{
 		if ((i & 0xff) == 0)
 		{
-			char loadingMessage[256]; // for displaying with UI
-			sprintf(loadingMessage, "Decrypting %d%%", i*100/0x10000);
-			machine.ui().set_startup_text(loadingMessage, false);
+			auto loadingMessage = util::string_format("Decrypting %d%%", i*100/0x10000);
+			machine.ui().set_startup_text(loadingMessage.c_str(), false);
 		}
-
 
 		// pass the address through FN1
 		uint16_t const seed = feistel(i, fn1_groupA, fn1_groupB,
 				&sboxes1[0*4], &sboxes1[1*4], &sboxes1[2*4], &sboxes1[3*4],
 				key1[0], key1[1], key1[2], key1[3]);
-
 
 		// expand the result to 64-bit
 		uint32_t subkey[2];
@@ -697,7 +694,6 @@ void cps2_decrypt(running_machine &machine, uint16_t *rom, uint16_t *dec, int le
 		key2[2] ^= BIT(key2[2], 3) <<  4;
 		key2[2] ^= BIT(key2[2], 7) << 11;
 		key2[3] ^= BIT(key2[3], 1) <<  5;
-
 
 		// decrypt the opcodes
 		for (int a = i; a < length/2; a += 0x10000)

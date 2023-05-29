@@ -31,6 +31,8 @@ http://mamedev.emulab.it/haze/reference/sawatte/cartridge_example.jpg
 #include "softlist_dev.h"
 
 
+namespace {
+
 class sawatte_state : public driver_device
 {
 public:
@@ -245,6 +247,8 @@ void sawatte_state::sawatte(machine_config &config)
 
 ROM_START( sawatte )
 ROM_END
+
+} // anonymous namespace
 
 
 CONS( 1996?, sawatte, 0, 0, sawatte,  sawatte, sawatte_state, empty_init, "Sega", "Sawatte", MACHINE_IS_SKELETON )

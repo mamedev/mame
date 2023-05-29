@@ -10,7 +10,6 @@
 	"passes": [
 		{
 			"effect": "misc/blit",
-			"applytint": true,
 			"name": "Copy To Filtered Texture",
 			"input": [
 				{ "sampler": "s_tex", "texture": "screen" }

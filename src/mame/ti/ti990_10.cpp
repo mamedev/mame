@@ -78,6 +78,8 @@ TODO :
 #include "911_vdt.h"
 
 
+namespace {
+
 class ti990_10_state : public driver_device
 {
 public:
@@ -102,7 +104,7 @@ private:
 	WRITE_LINE_MEMBER( line_interrupt );
 	WRITE_LINE_MEMBER( tape_interrupt );
 	WRITE_LINE_MEMBER( set_int13 );
-	WRITE_LINE_MEMBER( ckon_ckof_callback );
+	[[maybe_unused]] WRITE_LINE_MEMBER( ckon_ckof_callback );
 	uint8_t panel_read(offs_t offset);
 	void panel_write(uint8_t data);
 
@@ -397,6 +399,9 @@ ROM_START(ti990_10)
 	ROM_REGION(vdt911_device::chr_region_len, vdt911_chr_region, ROMREGION_ERASEFF)
 
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS           INIT        COMPANY              FULLNAME                               FLAGS
 COMP( 1975, ti990_10, 0,      0,      ti990_10, 0,     ti990_10_state, empty_init, "Texas Instruments", "TI Model 990/10 Minicomputer System", MACHINE_NOT_WORKING )

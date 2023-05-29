@@ -39,6 +39,8 @@ Other input will either result in '!' message, or halt.
 #include "machine/terminal.h"
 
 
+namespace {
+
 class sacstate_state : public driver_device
 {
 public:
@@ -165,6 +167,9 @@ ROM_START( sacstate )
 	ROM_LOAD( "sacst7.bin", 0x0100, 0x0100, CRC(33971d8b) SHA1(9e0bbeef6a6a15107f270e8b285300284ee7f63f))
 	ROM_LOAD( "sacst8.bin", 0x0000, 0x0100, CRC(931252ef) SHA1(e06ea6947f432f0a4ce944de74978d929920fb53))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

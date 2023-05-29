@@ -68,8 +68,7 @@
 //  CONFIGURABLE LOGGING
 //**************************************************************************
 
-#define LOG_GENERAL (1U <<  0)
-#define LOG_SETUP   (1U <<  1)
+#define LOG_SETUP   (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_SETUP)
 //#define LOG_OUTPUT_FUNC printf
@@ -86,6 +85,9 @@
 #else
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
+
+
+namespace {
 
 class cpu20_state : public driver_device
 {
@@ -206,6 +208,9 @@ ROM_START(fccpu20sbc)   ROM_END
 #define rom_fccpu21yasbc    rom_fccpu20sbc
 #define rom_fccpu21bsbc     rom_fccpu20sbc
 #define rom_fccpu21ybsbc    rom_fccpu20sbc
+
+} // anonymous namespace
+
 
 /* Driver */
 /*    YEAR  NAME          PARENT      COMPAT MACHINE  INPUT  CLASS        INIT          COMPANY                 FULLNAME           FLAGS */

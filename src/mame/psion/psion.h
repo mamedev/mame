@@ -5,8 +5,8 @@
         Psion Organiser II series
 
 ****************************************************************************/
-#ifndef MAME_INCLUDES_PSION_H
-#define MAME_INCLUDES_PSION_H
+#ifndef MAME_PSION_PSION_H
+#define MAME_PSION_PSION_H
 
 #pragma once
 
@@ -123,4 +123,4 @@ private:
 	void psion1_mem(address_map &map);
 };
 
-#endif // MAME_INCLUDES_PSION_H
+#endif // MAME_PSION_PSION_H

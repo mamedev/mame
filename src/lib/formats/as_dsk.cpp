@@ -568,7 +568,7 @@ bool moof_format::load(util::random_read &io, uint32_t form_factor, const std::v
 		uint8_t fidx = off_flux ? r8(img, off_flux*512 + 8 + trkid) : 0xff;
 
 		if(fidx != 0xff)
-			load_flux_track(img, image, track, head, 0, fidx, off_trks);
+			load_flux_track(img, image, head, track, 0, fidx, off_trks);
 
 		else if(idx != 0xff) {
 			if(!load_bitstream_track(img, image, head, track, 0, idx, off_trks, false, false))

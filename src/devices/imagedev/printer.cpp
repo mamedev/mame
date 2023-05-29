@@ -68,7 +68,7 @@ void printer_image_device::output(uint8_t data)
     DEVICE_IMAGE_CREATE( printer )
 -------------------------------------------------*/
 
-image_init_result printer_image_device::call_create(int format_type, util::option_resolution *format_options)
+std::pair<std::error_condition, std::string> printer_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	return call_load();
 }
@@ -76,14 +76,14 @@ image_init_result printer_image_device::call_create(int format_type, util::optio
 /*-------------------------------------------------
     DEVICE_IMAGE_LOAD( printer )
 -------------------------------------------------*/
-image_init_result printer_image_device::call_load()
+std::pair<std::error_condition, std::string> printer_image_device::call_load()
 {
-	/* send notify that the printer is now online */
+	// send notify that the printer is now online
 	if (!m_online_cb.isnull())
 		m_online_cb(true);
 
-	/* we don't need to do anything special */
-	return image_init_result::PASS;
+	// we don't need to do anything special
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

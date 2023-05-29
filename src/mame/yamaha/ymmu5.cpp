@@ -18,6 +18,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class mu5_state : public driver_device
 {
 public:
@@ -257,5 +260,8 @@ ROM_START( mu5 )
 	ROM_REGION(261774, "screen", 0)
 	ROM_LOAD("mu5lcd.svg", 0, 261774, CRC(3cccbb88) SHA1(3db0b16f27b501ff8d8ac3fb631dd315571230d3))
 ROM_END
+
+} // anonymous namespace
+
 
 CONS(1994, mu5, 0, 0, mu5, mu5, mu5_state, empty_init, "Yamaha", "MU-5", MACHINE_NOT_WORKING )

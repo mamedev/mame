@@ -76,9 +76,8 @@
 #include "speaker.h"
 
 
-//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
-#define LOG_KEYBOARD  (1U <<  1)
-#define LOG_DEBUG     (1U <<  2)
+#define LOG_KEYBOARD  (1U << 1)
+#define LOG_DEBUG     (1U << 2)
 
 //#define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -87,6 +86,8 @@
 #define LOGKBD(...) LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
 #define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
 
+
+namespace {
 
 class hp95lx_state : public driver_device
 {
@@ -153,7 +154,7 @@ private:
 	void video_address_w(uint8_t data);
 	uint8_t video_register_r();
 	void video_register_w(uint8_t data);
-	void debug_w(offs_t offset, uint8_t data);
+	[[maybe_unused]] void debug_w(offs_t offset, uint8_t data);
 
 	void hp95lx_io(address_map &map);
 	void hp95lx_map(address_map &map);
@@ -771,6 +772,8 @@ ROM_START( hp95lx )
 
 	ROM_REGION(0x800,"gfx1", ROMREGION_ERASE00)
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  CLASS          INIT         COMPANY             FULLNAME    FLAGS

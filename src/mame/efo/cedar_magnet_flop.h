@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_MACHINE_CEDAR_MAGNET_FLOP_H
-#define MAME_MACHINE_CEDAR_MAGNET_FLOP_H
+#ifndef MAME_EFO_CEDAR_MAGNET_FLOP_H
+#define MAME_EFO_CEDAR_MAGNET_FLOP_H
 
 #pragma once
 
@@ -45,4 +45,4 @@ private:
 
 };
 
-#endif // MAME_MACHINE_CEDAR_MAGNET_FLOP_H
+#endif // MAME_EFO_CEDAR_MAGNET_FLOP_H

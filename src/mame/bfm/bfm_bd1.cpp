@@ -238,48 +238,27 @@ void bfm_bd1_device::blank(int data)
 	switch ( data & 0x03 )
 	{
 	case 0x00:  //blank all
-		for (int i = 0; i < 15; i++)
-		{
-			m_attrs[i] = AT_BLANK;
-		}
+		std::fill(std::begin(m_attrs), std::end(m_attrs), AT_BLANK);
 		break;
 
 	case 0x01:  // blank inside window
 		if (m_window_size > 0)
 		{
-			for (int i = m_window_start; i < m_window_end ; i++)
-			{
-				m_attrs[i] = AT_BLANK;
-			}
+			std::fill_n(m_attrs + m_window_start, m_window_size, AT_BLANK);
 		}
 		break;
 
 	case 0x02:  // blank outside window
 		if (m_window_size > 0)
 		{
-			if (m_window_start > 0)
-			{
-				for (int i = 0; i < m_window_start; i++)
-				{
-					m_attrs[i] = AT_BLANK;
-				}
-			}
+			std::fill_n(m_attrs, m_window_start, AT_BLANK);
 
-			if (m_window_end < 15 )
-			{
-				for (int i = m_window_end; i < 15- m_window_end ; i++)
-				{
-					m_attrs[i] = AT_BLANK;
-				}
-			}
+			std::fill_n(m_attrs + m_window_end, (16 - m_window_end), AT_BLANK);
 		}
 		break;
 
 	case 0x03:  // clear blanking
-		for (int i = 0; i < 15; i++)
-		{
-			m_attrs[i] = 0;
-		}
+		std::fill(std::begin(m_attrs), std::end(m_attrs), AT_NORMAL);
 		break;
 	}
 }
@@ -348,7 +327,7 @@ int bfm_bd1_device::write_char(int data)
 					if (m_window_size > 0)
 					{
 						std::fill_n(m_chars + m_window_start, m_window_size, 0);
-						std::fill_n(m_attrs + m_window_start, m_window_size, 0);
+						std::fill_n(m_attrs + m_window_start, m_window_size, AT_NORMAL);
 					}
 
 					break;
@@ -356,29 +335,17 @@ int bfm_bd1_device::write_char(int data)
 				case 0x02:  // clr outside window
 					if (m_window_size > 0)
 					{
-						if (m_window_start > 0)
-						{
-							for (int i = 0; i < m_window_start; i++)
-							{
-								memset(m_chars+i,0,i);
-								memset(m_attrs+i,0,i);
-							}
-						}
+						std::fill_n(m_chars, m_window_start, 0);
+						std::fill_n(m_attrs, m_window_start, 0);
 
-						if (m_window_end < 15)
-						{
-							for (int i = m_window_end; i < 15- m_window_end ; i++)
-							{
-								memset(m_chars+i,0,i);
-								memset(m_attrs+i,0,i);
-							}
-						}
+						std::fill_n(m_chars + m_window_end, (16 - m_window_end), 0);
+						std::fill_n(m_attrs + m_window_end, (16 - m_window_end), AT_NORMAL);
 					}
 					break;
 
 				case 0x03:  // clr entire display
 					std::fill(std::begin(m_chars), std::end(m_chars), 0);
-					std::fill(std::begin(m_attrs), std::end(m_attrs), 0);
+					std::fill(std::begin(m_attrs), std::end(m_attrs), AT_NORMAL);
 				}
 				break;
 

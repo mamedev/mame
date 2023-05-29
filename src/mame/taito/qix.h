@@ -6,8 +6,8 @@
     Taito Qix hardware
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_QIX_H
-#define MAME_INCLUDES_QIX_H
+#ifndef MAME_TAITO_QIX_H
+#define MAME_TAITO_QIX_H
 
 #pragma once
 
@@ -211,4 +211,4 @@ private:
 	required_memory_bank m_vidbank;
 };
 
-#endif // MAME_INCLUDES_QIX_H
+#endif // MAME_TAITO_QIX_H

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Robbbert, Vas Crabb
-#ifndef MAME_INCLUDES_ZORBA_H
-#define MAME_INCLUDES_ZORBA_H
+#ifndef MAME_SKELETON_ZORBA_H
+#define MAME_SKELETON_ZORBA_H
 
 #pragma once
 
@@ -128,4 +128,4 @@ private:
 	uint8_t m_term_data = 0U;
 };
 
-#endif // MAME_INCLUDES_ZORBA_H
+#endif // MAME_SKELETON_ZORBA_H

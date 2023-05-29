@@ -20,7 +20,7 @@
 #define LOG_LIVE    (1U << 12)  // Live states
 #define LOG_DONE    (1U << 13)  // Command done
 
-#define VERBOSE (LOG_GENERAL | LOG_WARN )
+#define VERBOSE (LOG_GENERAL | LOG_WARN)
 
 #include "logmacro.h"
 
@@ -57,6 +57,7 @@ DEFINE_DEVICE_TYPE(PC8477B,        pc8477b_device,        "pc8477b",        "Nat
 DEFINE_DEVICE_TYPE(WD37C65C,       wd37c65c_device,       "wd37c65c",       "Western Digital WD37C65C FDC")
 DEFINE_DEVICE_TYPE(MCS3201,        mcs3201_device,        "mcs3201",        "Motorola MCS3201 FDC")
 DEFINE_DEVICE_TYPE(TC8566AF,       tc8566af_device,       "tc8566af",       "Toshiba TC8566AF FDC")
+DEFINE_DEVICE_TYPE(HD63266F,       hd63266f_device,       "hd63266f",       "Hitachi HD63266F FDC")
 
 void upd765a_device::map(address_map &map)
 {
@@ -300,8 +301,7 @@ void upd765_family_device::soft_reset()
 		flopi[i].st0_filled = false;
 	}
 	clr_drive_busy();
-	data_irq = false;
-	other_irq = false;
+	irq = false;
 	internal_drq = false;
 	fifo_pos = 0;
 	command_pos = 0;
@@ -542,7 +542,10 @@ uint8_t upd765_family_device::fifo_r()
 {
 	uint8_t r = 0xff;
 	if(!machine().side_effects_disabled())
-		data_irq = false;
+	{
+		irq = false;
+		check_irq();
+	}
 	switch(main_phase) {
 	case PHASE_CMD:
 		if(machine().side_effects_disabled())
@@ -588,12 +591,12 @@ void upd765_family_device::fifo_w(uint8_t data)
 	if(!BIT(dor, 2))
 		LOGWARN("%s: fifo_w(%02x) in reset\n", machine().describe_context(), data);
 
-	data_irq = false;
+	irq = false;
+	check_irq();
+
 	switch(main_phase) {
 	case PHASE_CMD: {
 		command[command_pos++] = data;
-		other_irq = false;
-		check_irq();
 		int cmd = check_command();
 		if(cmd == C_INCOMPLETE)
 			break;
@@ -1507,8 +1510,6 @@ void upd765_family_device::execute_command(int cmd)
 		LOGCOMMAND("command sense interrupt status (fid=%d %02x %02x) (%s)\n", fid, result[0], result[1], machine().describe_context());
 		result_pos = 2;
 
-		other_irq = false;
-		check_irq();
 		break;
 	}
 
@@ -1592,12 +1593,9 @@ void upd765_family_device::command_end(floppy_info &fi, bool data_completion)
 {
 	LOGDONE("command done (%s) - %s\n", data_completion ? "data" : "seek", results());
 	fi.main_state = fi.sub_state = IDLE;
-	if(data_completion)
-		data_irq = true;
-	else {
-		other_irq = true;
+	irq = true;
+	if(!data_completion)
 		fi.st0_filled = true;
-	}
 	check_irq();
 }
 
@@ -2513,7 +2511,7 @@ void upd765_family_device::read_id_continue(floppy_info &fi)
 void upd765_family_device::check_irq()
 {
 	bool old_irq = cur_irq;
-	cur_irq = data_irq || other_irq || internal_drq;
+	cur_irq = irq || internal_drq;
 	cur_irq = cur_irq && (dor & 4) && (mode != mode_t::AT || (dor & 8));
 	if(cur_irq != old_irq) {
 		LOGTCIRQ("irq = %d\n", cur_irq);
@@ -2576,7 +2574,7 @@ TIMER_CALLBACK_MEMBER(upd765_family_device::run_drive_ready_polling)
 			if(!flopi[fid].st0_filled) {
 				flopi[fid].st0 = ST0_ABRT | fid;
 				flopi[fid].st0_filled = true;
-				other_irq = true;
+				irq = true;
 			}
 		}
 	}
@@ -3156,7 +3154,7 @@ void dp8473_device::soft_reset()
 	upd765_family_device::soft_reset();
 
 	// "interrupt is generated when ... Internal Ready signal changes state immediately after a hardware or software reset"
-	other_irq = true;
+	irq = true;
 }
 
 pc8477a_device::pc8477a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ps2_fdc_device(mconfig, PC8477A, tag, owner, clock)
@@ -3296,3 +3294,191 @@ void upd72067_device::auxcmd_w(uint8_t data)
 		break;
 	}
 }
+
+void upd72069_device::auxcmd_w(uint8_t data)
+{
+	switch(data) {
+	case 0x36: // reset
+		soft_reset();
+		break;
+	case 0x1e: // motor on, probably
+		for(unsigned i = 0; i < 4; i++)
+			if(flopi[i].dev)
+				flopi[i].dev->mon_w(!BIT(data, i + 4));
+		main_phase = PHASE_RESULT;
+		result[0] = ST0_UNK;
+		result_pos = 1;
+		break;
+	}
+}
+
+
+hd63266f_device::hd63266f_device(const machine_config& mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: upd765_family_device(mconfig, HD63266F, tag, owner, clock)
+	, inp_cb(*this)
+{
+	has_dor = false;
+}
+
+void hd63266f_device::device_start()
+{
+	upd765_family_device::device_start();
+	inp_cb.resolve();
+}
+
+void hd63266f_device::map(address_map &map)
+{
+	map(0x0, 0x0).rw(FUNC(hd63266f_device::msr_r), FUNC(hd63266f_device::abort_w));
+	map(0x1, 0x1).rw(FUNC(hd63266f_device::fifo_r), FUNC(hd63266f_device::fifo_w));
+	map(0x2, 0x2).r(FUNC(hd63266f_device::extstat_r));
+}
+
+void hd63266f_device::soft_reset()
+{
+	upd765_family_device::soft_reset();
+	delayed_command = 0;
+	motor_state = 0;
+	for(int i = 0; i < 4; i++)
+		if(flopi[i].dev) flopi[i].dev->mon_w(1);
+}
+
+void hd63266f_device::abort_w(u8 data)
+{
+	if(data == 0xff) {
+		soft_reset();
+		LOGCOMMAND("abort\n");
+	}
+}
+
+int hd63266f_device::check_command()
+{
+	switch(command[0]) {
+	case 0x0e:
+		return C_SLEEP;
+	case 0x0b:
+	case 0x2b:
+		return command_pos == 4 ? C_SPECIFY : C_INCOMPLETE;
+	case 0x4b:
+	case 0x6b:
+		return command_pos == 7 ? C_SPECIFY2 : C_INCOMPLETE;
+	}
+	return upd765_family_device::check_command();
+}
+
+void hd63266f_device::execute_command(int cmd)
+{
+	switch(cmd)
+	{
+	case C_SLEEP:
+		for(int i = 0; i < 4; i++) {
+			if(flopi[i].dev) flopi[i].dev->mon_w(1);
+		}
+		main_phase = PHASE_CMD;
+		motor_state = 0;
+		LOGCOMMAND("sleep\n");
+		break;
+	case C_SPECIFY2:
+		spec = (command[1] << 8) | command[2];
+		LOGCOMMAND("command specify2 %02x %02x: step_rate=%d ms, head_unload=%d ms, head_load=%d ms, non_dma=%s\n",
+				command[1], command[2], 16-(command[1]>>4), (command[1]&0x0f)<<4, command[2]&0xfe, ((command[2]&1)==1)? "true":"false");
+		main_phase = PHASE_CMD;
+		break;
+	case C_SENSE_DRIVE_STATUS:
+		upd765_family_device::execute_command(cmd);
+		if(inp_cb)
+			result[0] = (result[0] & ~ST3_TS) | (inp_cb() ? 0 : 8);
+		break;
+	default:
+		upd765_family_device::execute_command(cmd);
+		break;
+	}
+}
+
+u8 hd63266f_device::extstat_r()
+{
+	return (irq << 6) | motor_state;
+}
+
+// no documentation for motor control so borrow some of 82072
+void hd63266f_device::start_command(int cmd)
+{
+	// check if the command specifies a target drive
+	switch(cmd) {
+	case C_READ_TRACK:
+	case C_WRITE_DATA:
+	case C_READ_DATA:
+	case C_RECALIBRATE:
+	//case C_WRITE_DELETED_DATA:
+	case C_READ_ID:
+	//case C_READ_DELETED_DATA:
+	case C_FORMAT_TRACK:
+	case C_SEEK:
+		// start the motor
+		motor_control(command[1] & 0x3, true);
+		break;
+	default:
+		motor_on_counter = 0;
+		break;
+	}
+
+	// execute the command immediately if there's no motor on delay
+	if(motor_on_counter == 0) {
+		upd765_family_device::start_command(cmd);
+	} else
+		delayed_command = cmd;
+}
+
+void hd63266f_device::motor_control(int fid, bool start_motor)
+{
+	floppy_info &fi = flopi[fid];
+
+	if(start_motor) {
+		// if we are selecting a different drive, stop the motor on the previously selected drive
+		if(selected_drive != fid && flopi[selected_drive].dev && flopi[selected_drive].dev->mon_r() == 0)
+			flopi[selected_drive].dev->mon_w(1);
+
+		// start the motor on the selected drive
+		if(fi.dev && fi.dev->mon_r() == 1) {
+			LOGCOMMAND("motor_control: switching on motor for drive %d\n", fid);
+
+			// select the drive and enable the motor
+			set_ds(fid);
+			fi.dev->mon_w(0);
+			motor_on_counter = 3;
+			motor_state |= 1 << fid;
+		}
+	} else {
+		// motor off timer only applies to the selected drive
+		if(selected_drive != fid)
+			return;
+
+		logerror("motor_on_counter %d\n", motor_on_counter);
+		// decrement motor on counter
+		if(motor_on_counter)
+			motor_on_counter--;
+
+		// execute the command if the motor on counter has expired
+		if(motor_on_counter == 0 && main_phase == PHASE_CMD && delayed_command) {
+			upd765_family_device::start_command(delayed_command);
+
+			delayed_command = 0;
+
+			return;
+		}
+	}
+}
+
+void hd63266f_device::index_callback(floppy_image_device *floppy, int state)
+{
+	if(state) {
+		for(floppy_info &fi : flopi) {
+			if(fi.dev != floppy)
+				continue;
+
+			// update motor on/off counters and stop motor if necessary
+			motor_control(fi.id, false);
+		}
+	}
+	upd765_family_device::index_callback(floppy, state);
+}
+

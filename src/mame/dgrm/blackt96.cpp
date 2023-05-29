@@ -91,6 +91,8 @@ Bugs (all of these looks BTANBs):
 #include "tilemap.h"
 
 
+namespace {
+
 class blackt96_state : public driver_device
 {
 public:
@@ -562,6 +564,9 @@ ROM_START( blackt96 )
 	ROM_LOAD16_BYTE( "10", 0x00001, 0x08000, CRC(b78232a2) SHA1(36a4f01011faf64e46b73f0082ab04843ac8b0e2) )
 	ROM_CONTINUE(          0x00001, 0x08000 ) // first half is empty
 ROM_END
+
+} // anonymous namespace
+
 
 // I'm not really sure this needs MACHINE_IS_INCOMPLETE just because there are some original game bugs, it's quite typical of this type of Korean release
 GAME( 1996, blackt96, 0, blackt96, blackt96, blackt96_state, empty_init, ROT0, "D.G.R.M.", "Black Touch '96", MACHINE_IS_INCOMPLETE | MACHINE_SUPPORTS_SAVE )

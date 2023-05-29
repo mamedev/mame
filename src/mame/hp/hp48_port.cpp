@@ -45,7 +45,7 @@ void hp48_port_image_device::unfill_port()
 }
 
 
-image_init_result hp48_port_image_device::call_load()
+std::pair<std::error_condition, std::string> hp48_port_image_device::call_load()
 {
 	int size = length();
 	if (size == 0) size = m_max_size; /* default size */
@@ -54,8 +54,9 @@ image_init_result hp48_port_image_device::call_load()
 	/* check size */
 	if ((size < 32*1024) || (size > m_max_size) || (size & (size-1)))
 	{
-		logerror("hp48: image size for %s should be a power of two between %i and %i\n", tag(), 32*1024, m_max_size);
-		return image_init_result::FAIL;
+		return std::make_pair(
+				image_error::INVALIDLENGTH,
+				util::string_format("Image size must be a power of two between %i and %i", 32*1024, m_max_size));
 	}
 
 	m_port_size = size;
@@ -63,10 +64,10 @@ image_init_result hp48_port_image_device::call_load()
 	fill_port();
 	fread(m_port_data.get(), m_port_size);
 	m_hp48->decode_nibble(m_port_data.get(), m_port_data.get(), m_port_size);
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
-image_init_result hp48_port_image_device::call_create(int format_type, util::option_resolution *format_options)
+std::pair<std::error_condition, std::string> hp48_port_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	int size = m_max_size;
 	LOG("hp48_port_image create: size=%i\n", size);
@@ -74,16 +75,17 @@ image_init_result hp48_port_image_device::call_create(int format_type, util::opt
 
 	/* check size */
 	/* size must be a power of 2 between 32K and max_size */
-	if ( (size < 32*1024) || (size > m_max_size) || (size & (size-1)) )
+	if ((size < 32*1024) || (size > m_max_size) || (size & (size-1)))
 	{
-		logerror( "hp48: image size for %s should be a power of two between %i and %i\n", tag(), 32*1024, m_max_size );
-		return image_init_result::FAIL;
+		return std::make_pair(
+				image_error::INVALIDLENGTH,
+				util::string_format("Image size must be a power of two between %i and %i", 32*1024, m_max_size));
 	}
 
 	m_port_size = size;
 	m_port_write = true;
 	fill_port();
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void hp48_port_image_device::call_unload()

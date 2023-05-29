@@ -10,6 +10,9 @@
 #include "cpu/pace/pace.h"
 #include "machine/ins8250.h"
 
+
+namespace {
+
 class ns5652_state : public driver_device
 {
 public:
@@ -87,5 +90,8 @@ ROM_START(ns5652)
 	ROM_REGION(0x100, "ecprom", 0) // 256 bytes to be packed into top 128 words of RAM
 	ROM_LOAD("5930_001a.bin", 0x000, 0x100, NO_DUMP) // MM5203Q (256x8 organization)
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(19??, ns5652, 0, 0, ns5652, ns5652, ns5652_state, empty_init, "National Semiconductor", "unknown INS8900 Multibus card (980305652)", MACHINE_IS_SKELETON)

@@ -226,6 +226,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 #define CPU_CLOCK   XTAL(14'745'600)
 #define MACH_CLOCK  XTAL(50'000'000)      // 50.35
 #define COM_CLOCK   XTAL(20'000'000)
@@ -889,6 +891,8 @@ void coinmvga_state::init_colorama()
 void coinmvga_state::init_cmrltv75()
 {
 }
+
+} // anonymous namespace
 
 
 /*************************

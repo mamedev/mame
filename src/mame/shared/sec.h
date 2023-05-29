@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_MACHINE_SEC_H
-#define MAME_MACHINE_SEC_H
+#ifndef MAME_SHARED_SEC_H
+#define MAME_SHARED_SEC_H
 
 #pragma once
 
@@ -112,4 +112,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SEC, sec_device)
 
-#endif // MAME_MACHINE_SEC_H
+#endif // MAME_SHARED_SEC_H

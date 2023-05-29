@@ -40,6 +40,8 @@ TODO:
 #include "tilemap.h"
 
 
+namespace {
+
 class rmhaihai_state : public driver_device
 {
 public:
@@ -779,6 +781,8 @@ void rmhaihai_state::init_rmhaihai()
 		}
 	}
 }
+
+} // anonymous namespace
 
 
 GAME( 1985, rmhaihai,  0,        rmhaihai, rmhaihai, rmhaihai_state, init_rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai (Japan, newer)", MACHINE_SUPPORTS_SAVE ) // writes Homedata in NVRAM

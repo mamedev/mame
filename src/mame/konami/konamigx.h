@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Acho A. Tang, Phil Stroffolino, Olivier Galibert
-#ifndef MAME_INCLUDES_KONAMIGX_H
-#define MAME_INCLUDES_KONAMIGX_H
+#ifndef MAME_KONAMI_KONAMIGX_H
+#define MAME_KONAMI_KONAMIGX_H
 
 #pragma once
 
@@ -348,4 +348,4 @@ protected:
 #define GXSUB_5BPP      0x05    //  32 colors
 #define GXSUB_8BPP      0x08    // 256 colors
 
-#endif // MAME_INCLUDES_KONAMIGX_H
+#endif // MAME_KONAMI_KONAMIGX_H

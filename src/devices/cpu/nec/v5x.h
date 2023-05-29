@@ -237,7 +237,7 @@ public:
 	}
 	DECLARE_WRITE_LINE_MEMBER(hack_w);
 
-	template <unsigned Timer> auto out_handler() { return subdevice<pit8253_device>("tcu")->out_handler<Timer>(); }
+	template <unsigned Timer> auto tout_handler() { return subdevice<pit8253_device>("tcu")->out_handler<Timer>(); }
 
 protected:
 	v53_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);

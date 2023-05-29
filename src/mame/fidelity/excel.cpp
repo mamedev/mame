@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Berger, yoyo_chessboard
-/******************************************************************************
+/*******************************************************************************
 
 Fidelity Excellence series hardware
 (for Excel 68000, see eag68k.cpp)
@@ -14,7 +14,7 @@ TODO:
 - granits has a module slot, is it usable?
 - granits overlock + dynamic /2 cpu divider? (like SC12) instead of static /2 divider
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 Voice Excellence (model 6092)
 ----------------
@@ -115,7 +115,7 @@ VFD display, and some buttons for controlling the clock. IRQ frequency is double
 presumedly for using the blinking led as seconds counter. It only tracks player time,
 not of the opponent. And it obviously doesn't show chessmove coordinates either.
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 Designer 2000 (model 6102)
 ----------------
@@ -128,7 +128,7 @@ Designer 2100 (model 6103): exactly same, but running at 5MHz
 
 (Designer 1500 is on 80C50 hardware, same ROM as The Gambit, see sc6.cpp)
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -218,9 +218,9 @@ void excel_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // misc handlers
 
@@ -310,9 +310,9 @@ u8 excel_state::ttl_r(offs_t offset)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void excel_state::fexcel_map(address_map &map)
 {
@@ -331,9 +331,9 @@ void excel_state::fexcelb_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( fexcelb )
 	PORT_START("IN.0")
@@ -378,13 +378,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void excel_state::fexcel(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M65SC02(config, m_maincpu, 12_MHz_XTAL/4); // G65SC102P-3, 12.0M ceramic resonator
 	m_maincpu->set_addrmap(AS_PROGRAM, &excel_state::fexcel_map);
 
@@ -396,12 +396,12 @@ void excel_state::fexcel(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(100));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(2+4, 8);
 	m_display->set_segmask(0x3c, 0x7f);
 	config.set_default_layout(layout_fidel_ex);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
@@ -410,7 +410,7 @@ void excel_state::fexcel4(machine_config &config)
 {
 	fexcel(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	R65C02(config.replace(), m_maincpu, 4_MHz_XTAL); // R65C02P4
 	m_maincpu->set_addrmap(AS_PROGRAM, &excel_state::fexcel_map);
 }
@@ -419,7 +419,7 @@ void excel_state::fexcelb(machine_config &config)
 {
 	fexcel(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &excel_state::fexcelb_map);
 	config.set_default_layout(layout_fidel_exb);
 }
@@ -428,7 +428,7 @@ void excel_state::fexcelp(machine_config &config)
 {
 	fexcel(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	R65C02(config.replace(), m_maincpu, 5_MHz_XTAL); // R65C02P4
 	m_maincpu->set_addrmap(AS_PROGRAM, &excel_state::fexcelb_map);
 }
@@ -437,7 +437,7 @@ void excel_state::granits(machine_config &config)
 {
 	fexcelp(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_clock(8_MHz_XTAL/2); // R65C02P4
 }
 
@@ -445,7 +445,7 @@ void excel_state::fdes2100(machine_config &config)
 {
 	fexcel(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	M65C02(config.replace(), m_maincpu, 5_MHz_XTAL); // WDC 65C02
 	m_maincpu->set_addrmap(AS_PROGRAM, &excel_state::fexcelb_map);
 
@@ -456,7 +456,7 @@ void excel_state::fdes2000(machine_config &config)
 {
 	fdes2100(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	R65C02(config.replace(), m_maincpu, 3_MHz_XTAL); // RP65C02G
 	m_maincpu->set_addrmap(AS_PROGRAM, &excel_state::fexcelb_map);
 }
@@ -466,7 +466,7 @@ void excel_state::fexcelv(machine_config &config)
 	fexcelb(config);
 	config.set_default_layout(layout_fidel_exv);
 
-	/* sound hardware */
+	// sound hardware
 	S14001A(config, m_speech, 25000); // R/C circuit, around 25khz
 	m_speech->ext_read().set(FUNC(excel_state::speech_r));
 	m_speech->add_route(ALL_OUTPUTS, "speaker", 0.75);
@@ -480,9 +480,9 @@ void excel_state::fexceld(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( fexcel ) // model 6080(B), PCB label 510.1117A02
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -547,20 +547,20 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME       PARENT  CMP MACHINE   INPUT    STATE        INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1987, fexcel,    0,       0, fexcelb,  fexcelb, excel_state, empty_init, "Fidelity Electronics", "The Excellence (model 6080B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, fexcelv,   fexcel,  0, fexcelv,  fexcelv, excel_state, empty_init, "Fidelity Electronics", "Voice Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, fexceld,   fexcel,  0, fexceld,  fexcelb, excel_state, empty_init, "Fidelity Electronics", "Excel Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1985, fexcel12,  fexcel,  0, fexcel,   fexcel,  excel_state, empty_init, "Fidelity Electronics", "The Excellence (model EP12, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 1st version of The Excellence
-CONS( 1985, fexcel124, fexcel,  0, fexcel4,  fexcel,  excel_state, empty_init, "Fidelity Electronics", "The Excellence (model EP12, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1985, fexcela,   fexcel,  0, fexcel,   fexcel,  excel_state, empty_init, "Fidelity Electronics", "The Excellence (model 6080)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT    CLASS        INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1987, fexcel,    0,       0,      fexcelb,  fexcelb, excel_state, empty_init, "Fidelity Electronics", "The Excellence (model 6080B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1987, fexcelv,   fexcel,  0,      fexcelv,  fexcelv, excel_state, empty_init, "Fidelity Electronics", "Voice Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1987, fexceld,   fexcel,  0,      fexceld,  fexcelb, excel_state, empty_init, "Fidelity Electronics", "Excel Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, fexcel12,  fexcel,  0,      fexcel,   fexcel,  excel_state, empty_init, "Fidelity Electronics", "The Excellence (model EP12, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 1st version of The Excellence
+SYST( 1985, fexcel124, fexcel,  0,      fexcel4,  fexcel,  excel_state, empty_init, "Fidelity Electronics", "The Excellence (model EP12, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, fexcela,   fexcel,  0,      fexcel,   fexcel,  excel_state, empty_init, "Fidelity Electronics", "The Excellence (model 6080)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1986, fexcelp,   0,       0, fexcelp,  fexcel,  excel_state, empty_init, "Fidelity Electronics", "The Par Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, fexcelpb,  fexcelp, 0, fexcelp,  fexcel,  excel_state, empty_init, "Fidelity Electronics", "The Par Excellence (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, granits,   fexcelp, 0, granits,  fexcel,  excel_state, empty_init, "hack (RCS)", "Granit S", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, fdes2000,  fexcelp, 0, fdes2000, fdes,    excel_state, empty_init, "Fidelity Electronics", "Designer 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, fdes2100,  fexcelp, 0, fdes2100, fdes,    excel_state, empty_init, "Fidelity Electronics", "Designer 2100", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, fexcelp,   0,       0,      fexcelp,  fexcel,  excel_state, empty_init, "Fidelity Electronics", "The Par Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, fexcelpb,  fexcelp, 0,      fexcelp,  fexcel,  excel_state, empty_init, "Fidelity Electronics", "The Par Excellence (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, granits,   fexcelp, 0,      granits,  fexcel,  excel_state, empty_init, "hack (RCS)", "Granit S", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, fdes2000,  fexcelp, 0,      fdes2000, fdes,    excel_state, empty_init, "Fidelity Electronics", "Designer 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, fdes2100,  fexcelp, 0,      fdes2100, fdes,    excel_state, empty_init, "Fidelity Electronics", "Designer 2100", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

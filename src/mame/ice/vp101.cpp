@@ -109,6 +109,9 @@ Small outline design for easy kit retrofitting of existing cabinets.
 #define VERBOSE (0)
 #include "logmacro.h"
 
+
+namespace {
+
 class vp10x_state : public driver_device
 {
 public:
@@ -596,7 +599,7 @@ ROM_START(jnero)
 	ROM_REGION(0x80000, "pic", 0)       /* PIC18c422 program - read-protected, need dumped */
 	ROM_LOAD( "8722a-1206.bin", 0x000000, 0x80000, NO_DUMP )
 
-	DISK_REGION( "ata:0:hdd:image" )    /* ideally an IDENTIFY page from a real drive should be the IDTN metadata,
+	DISK_REGION( "ata:0:hdd" )    /* ideally an IDENTIFY page from a real drive should be the IDTN metadata,
 	                                       but even factory-new boardsets came with a variety of HDD makes and models */
 	DISK_IMAGE_READONLY("jn010108", 0, SHA1(5a27990478b65fca801c3a6518c519c5b4ca934d) )
 ROM_END
@@ -613,7 +616,7 @@ ROM_START(specfrce)
 	ROM_REGION(0x80000, "pic", 0)       /* PIC18c422 I/P program - read-protected, need dumped */
 	ROM_LOAD( "special_forces_et_u7_rev1.2.u7", 0x000000, 0x80000, NO_DUMP )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY("sf010200", 0, SHA1(33c35fd5e110ff06330e0f0313fcd75d5c64a090) )
 ROM_END
 
@@ -629,7 +632,7 @@ ROM_START(specfrceo)
 	ROM_REGION(0x80000, "pic", 0)       /* PIC18c422 I/P program - read-protected, need dumped */
 	ROM_LOAD( "special_forces_et_u7_rev1.2.u7", 0x000000, 0x80000, NO_DUMP )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY("sf010101", 0, SHA1(59b5e3d8e1d5537204233598830be2066aad0556) )
 ROM_END
 
@@ -640,7 +643,7 @@ ROM_START(zoofari)
 	ROM_REGION(0x80000, "pic", 0)       /* PIC18c422 program - read-protected, need dumped */
 	ROM_LOAD( "8777z-568.bin", 0x000000, 0x80000, NO_DUMP )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY("zoofari", 0, SHA1(8fb9cfb1ab2660f40b643fcd772243903bd69a6c) )
 ROM_END
 
@@ -651,9 +654,12 @@ ROM_START(rhnation)
 	ROM_REGION(0x80000, "pic", 0)       /* PIC18c242 program - read-protected, need dumped */
 	ROM_LOAD( "pic18c242-i-sp.u22", 0x000000, 0x80000, NO_DUMP )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY("rhn010104", 0, SHA1(5bc2e5817b29bf42ec483414242795fd76d749d9) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 2002,  specfrce,  0,          vp101,  specfrce, vp10x_state, empty_init, ROT0, "ICE/Play Mechanix",    "Special Forces Elite Training (v01.02.00)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2002,  specfrceo, specfrce,   vp101,  specfrce, vp10x_state, empty_init, ROT0, "ICE/Play Mechanix",    "Special Forces Elite Training (v01.01.01)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

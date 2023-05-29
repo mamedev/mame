@@ -285,12 +285,12 @@ uint8_t combatsc_state::busy_r()
 
 void combatsc_state::play_w(uint8_t data)
 {
-	m_upd7759->start_w(data & 2);
+	m_upd7759->start_w(!BIT(data, 1));
 }
 
 void combatsc_state::voice_reset_w(uint8_t data)
 {
-	m_upd7759->reset_w(data & 1);
+	m_upd7759->reset_w(BIT(data, 0));
 }
 
 void combatsc_state::portA_w(uint8_t data)
@@ -679,11 +679,11 @@ void combatscb_state::machine_reset()
 void combatsc_state::combatsc(machine_config &config)
 {
 	// basic machine hardware
-	HD6309(config, m_maincpu, 3000000*4);  // 3 MHz?
+	HD6309E(config, m_maincpu, 24_MHz_XTAL / 8);  // HD63C09E, 3 MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &combatsc_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(combatsc_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 3579545);   // 3.579545 MHz
+	Z80(config, m_audiocpu, 3579545);   // 3.579545 MHz??? (no such XTAL on board!)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &combatsc_state::sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(1200));
@@ -729,7 +729,7 @@ void combatsc_state::combatsc(machine_config &config)
 void combatscb_state::combatscb(machine_config &config)
 {
 	// basic machine hardware
-	HD6309(config, m_maincpu, 3000000*4);  // 3 MHz?
+	HD6309E(config, m_maincpu, 3000000);  // 3 MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &combatscb_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(combatsc_state::irq0_line_hold));
 

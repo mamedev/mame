@@ -180,13 +180,13 @@ Known Issues (MZ, 2019-05-10)
 #include "speaker.h"
 
 // Debugging
-#define LOG_WARN        (1U<<1)   // Warnings
-#define LOG_CONFIG      (1U<<2)   // Configuration
-#define LOG_READY       (1U<<3)
-#define LOG_INTERRUPTS  (1U<<4)
-#define LOG_CRU         (1U<<5)
-#define LOG_CRUREAD     (1U<<6)
-#define LOG_RESETLOAD   (1U<<7)
+#define LOG_WARN        (1U << 1)   // Warnings
+#define LOG_CONFIG      (1U << 2)   // Configuration
+#define LOG_READY       (1U << 3)
+#define LOG_INTERRUPTS  (1U << 4)
+#define LOG_CRU         (1U << 5)
+#define LOG_CRUREAD     (1U << 6)
+#define LOG_RESETLOAD   (1U << 7)
 
 #define VERBOSE ( LOG_CONFIG | LOG_WARN | LOG_RESETLOAD )
 

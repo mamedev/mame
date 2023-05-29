@@ -5,8 +5,8 @@
     Cinemat/Leland driver
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_LELAND_H
-#define MAME_INCLUDES_LELAND_H
+#ifndef MAME_CINEMATRONICS_LELAND_H
+#define MAME_CINEMATRONICS_LELAND_H
 
 #pragma once
 
@@ -323,4 +323,4 @@ private:
 #define SERIAL_TYPE_ENCRYPT     3
 #define SERIAL_TYPE_ENCRYPT_XOR 4
 
-#endif // MAME_INCLUDES_LELAND_H
+#endif // MAME_CINEMATRONICS_LELAND_H

@@ -421,7 +421,7 @@ while (0)
 template <typename BitmapType, typename FunctionClass>
 inline void gfx_element::drawgfx_core(BitmapType &dest, const rectangle &cliprect, u32 code, int flipx, int flipy, s32 destx, s32 desty, FunctionClass pixel_op)
 {
-	g_profiler.start(PROFILER_DRAWGFX);
+	auto profile = g_profiler.start(PROFILER_DRAWGFX);
 	do {
 		assert(dest.valid());
 		assert(dest.cliprect().contains(cliprect));
@@ -551,14 +551,13 @@ inline void gfx_element::drawgfx_core(BitmapType &dest, const rectangle &cliprec
 			}
 		}
 	} while (0);
-	g_profiler.stop();
 }
 
 
 template <typename BitmapType, typename PriorityType, typename FunctionClass>
 inline void gfx_element::drawgfx_core(BitmapType &dest, const rectangle &cliprect, u32 code, int flipx, int flipy, s32 destx, s32 desty, PriorityType &priority, FunctionClass pixel_op)
 {
-	g_profiler.start(PROFILER_DRAWGFX);
+	auto profile = g_profiler.start(PROFILER_DRAWGFX);
 	do {
 		assert(dest.valid());
 		assert(priority.valid());
@@ -695,7 +694,6 @@ inline void gfx_element::drawgfx_core(BitmapType &dest, const rectangle &cliprec
 			}
 		}
 	} while (0);
-	g_profiler.stop();
 }
 
 
@@ -724,7 +722,7 @@ inline void gfx_element::drawgfx_core(BitmapType &dest, const rectangle &cliprec
 template <typename BitmapType, typename FunctionClass>
 inline void gfx_element::drawgfxzoom_core(BitmapType &dest, const rectangle &cliprect, u32 code, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, FunctionClass pixel_op)
 {
-	g_profiler.start(PROFILER_DRAWGFX);
+	auto profile = g_profiler.start(PROFILER_DRAWGFX);
 	do {
 		assert(dest.valid());
 		assert(dest.cliprect().contains(cliprect));
@@ -830,14 +828,13 @@ inline void gfx_element::drawgfxzoom_core(BitmapType &dest, const rectangle &cli
 			}
 		}
 	} while (0);
-	g_profiler.stop();
 }
 
 
 template <typename BitmapType, typename PriorityType, typename FunctionClass>
 inline void gfx_element::drawgfxzoom_core(BitmapType &dest, const rectangle &cliprect, u32 code, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, PriorityType &priority, FunctionClass pixel_op)
 {
-	g_profiler.start(PROFILER_DRAWGFX);
+	auto profile = g_profiler.start(PROFILER_DRAWGFX);
 	do {
 		assert(dest.valid());
 		assert(priority.valid());
@@ -877,10 +874,7 @@ inline void gfx_element::drawgfxzoom_core(BitmapType &dest, const rectangle &cli
 		// compute final pixel in Y and exit if we are entirely clipped
 		s32 destendy = desty + dstheight - 1;
 		if (desty > cliprect.bottom() || destendy < cliprect.top())
-		{
-			g_profiler.stop();
 			return;
-		}
 
 		// apply top clip
 		s32 srcy = 0;
@@ -950,7 +944,6 @@ inline void gfx_element::drawgfxzoom_core(BitmapType &dest, const rectangle &cli
 			}
 		}
 	} while (0);
-	g_profiler.stop();
 }
 
 
@@ -975,7 +968,7 @@ inline void gfx_element::drawgfxzoom_core(BitmapType &dest, const rectangle &cli
 template <typename BitmapType, typename FunctionClass>
 inline void copybitmap_core(BitmapType &dest, const BitmapType &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect, FunctionClass pixel_op)
 {
-	g_profiler.start(PROFILER_COPYBITMAP);
+	auto profile = g_profiler.start(PROFILER_COPYBITMAP);
 	do {
 		assert(dest.valid());
 		assert(src.valid());
@@ -1108,14 +1101,13 @@ inline void copybitmap_core(BitmapType &dest, const BitmapType &src, int flipx, 
 			}
 		}
 	} while (0);
-	g_profiler.stop();
 }
 
 
 template <typename BitmapType, typename PriorityType, typename FunctionClass>
 inline void copybitmap_core(BitmapType &dest, const BitmapType &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect, PriorityType &priority, FunctionClass pixel_op)
 {
-	g_profiler.start(PROFILER_COPYBITMAP);
+	auto profile = g_profiler.start(PROFILER_COPYBITMAP);
 	do {
 		assert(dest.valid());
 		assert(src.valid());
@@ -1255,7 +1247,6 @@ inline void copybitmap_core(BitmapType &dest, const BitmapType &src, int flipx, 
 			}
 		}
 	} while (0);
-	g_profiler.stop();
 }
 
 
@@ -1283,7 +1274,7 @@ inline void copybitmap_core(BitmapType &dest, const BitmapType &src, int flipx, 
 template <typename BitmapType, typename FunctionClass>
 inline void copyrozbitmap_core(BitmapType &dest, const rectangle &cliprect, const BitmapType &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, FunctionClass pixel_op)
 {
-	g_profiler.start(PROFILER_COPYBITMAP);
+	auto profile = g_profiler.start(PROFILER_COPYBITMAP);
 
 	assert(dest.valid());
 	assert(dest.valid());
@@ -1293,10 +1284,7 @@ inline void copyrozbitmap_core(BitmapType &dest, const rectangle &cliprect, cons
 
 	// ignore empty/invalid cliprects
 	if (cliprect.empty())
-	{
-		g_profiler.stop();
 		return;
-	}
 
 	// compute fixed-point 16.16 size of the source bitmap
 	u32 srcfixwidth = src.width() << 16;
@@ -1537,14 +1525,13 @@ inline void copyrozbitmap_core(BitmapType &dest, const rectangle &cliprect, cons
 			}
 		}
 	}
-	g_profiler.stop();
 }
 
 
 template <typename BitmapType, typename PriorityType, typename FunctionClass>
 inline void copyrozbitmap_core(BitmapType &dest, const rectangle &cliprect, const BitmapType &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, PriorityType &priority, FunctionClass pixel_op)
 {
-	g_profiler.start(PROFILER_COPYBITMAP);
+	auto profile = g_profiler.start(PROFILER_COPYBITMAP);
 
 	assert(dest.valid());
 	assert(dest.valid());
@@ -1555,10 +1542,7 @@ inline void copyrozbitmap_core(BitmapType &dest, const rectangle &cliprect, cons
 
 	// ignore empty/invalid cliprects
 	if (cliprect.empty())
-	{
-		g_profiler.stop();
 		return;
-	}
 
 	// compute fixed-point 16.16 size of the source bitmap
 	u32 srcfixwidth = src.width() << 16;
@@ -1811,7 +1795,6 @@ inline void copyrozbitmap_core(BitmapType &dest, const rectangle &cliprect, cons
 			}
 		}
 	}
-	g_profiler.stop();
 }
 
 

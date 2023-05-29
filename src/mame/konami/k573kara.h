@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:windyfairy
-#ifndef MAME_MACHINE_K573KARA_H
-#define MAME_MACHINE_K573KARA_H
+#ifndef MAME_KONAMI_K573KARA_H
+#define MAME_KONAMI_K573KARA_H
 
 #pragma once
 
@@ -46,4 +46,4 @@ private:
 
 DECLARE_DEVICE_TYPE(KONAMI_573_KARAOKE_IO_BOARD, k573kara_device)
 
-#endif // MAME_MACHINE_K573KARA_H
+#endif // MAME_KONAMI_K573KARA_H

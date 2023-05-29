@@ -1,7 +1,7 @@
 // license:CC0-1.0
 // copyright-holders:Vas Crabb
-#ifndef MAME_AUDIO_NL_CHEEKYMS_H
-#define MAME_AUDIO_NL_CHEEKYMS_H
+#ifndef MAME_UNIVERSAL_NL_CHEEKYMS_H
+#define MAME_UNIVERSAL_NL_CHEEKYMS_H
 
 #pragma once
 
@@ -9,4 +9,4 @@
 
 NETLIST_EXTERNAL(cheekyms)
 
-#endif // MAME_AUDIO_NL_CHEEKYMS_H
+#endif // MAME_UNIVERSAL_NL_CHEEKYMS_H

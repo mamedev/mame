@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
 #include "test.h"
@@ -21,9 +21,9 @@ TEST_CASE("Settings", "")
 	settings.set("test/foo/bar/abvgd", "1389");
 
 	bx::FileWriter writer;
-	if (bx::open(&writer, filePath) )
+	if (bx::open(&writer, filePath, false, bx::ErrorIgnore{}) )
 	{
-		bx::write(&writer, settings);
+		bx::write(&writer, settings, bx::ErrorIgnore{});
 		bx::close(&writer);
 	}
 
@@ -37,9 +37,9 @@ TEST_CASE("Settings", "")
 	settings.clear();
 
 	bx::FileReader reader;
-	if (bx::open(&reader, filePath) )
+	if (bx::open(&reader, filePath, bx::ErrorIgnore{}) )
 	{
-		bx::read(&reader, settings);
+		bx::read(&reader, settings, bx::ErrorIgnore{});
 		bx::close(&reader);
 	}
 

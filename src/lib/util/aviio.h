@@ -112,7 +112,7 @@ public:
 	static error create(std::string const &filename, movie_info const &info, ptr &file);
 	virtual ~avi_file();
 
-	virtual void printf_chunks() = 0;
+	virtual void display_chunks() = 0;
 	static const char *error_string(error err);
 
 	virtual movie_info const &get_movie_info() const = 0;

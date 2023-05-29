@@ -402,15 +402,12 @@ DEVICE_IMAGE_LOAD_MEMBER( mtx_state::extrom_load )
 	uint32_t size = m_extrom->common_get_size("rom");
 
 	if (size > 0x80000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported rom size");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported ROM size (only 512K supported)");
 
 	m_extrom->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_extrom->common_load_rom(m_extrom->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /***************************************************************************
@@ -418,36 +415,24 @@ DEVICE_IMAGE_LOAD_MEMBER( mtx_state::extrom_load )
 ***************************************************************************/
 
 // this only works for some of the files, nothing which tries to load
-// more data from tape. todo: tapes which autorun after loading
+// more data from tape. TODO: tapes which autorun after loading
 SNAPSHOT_LOAD_MEMBER(mtx_state::snapshot_cb)
 {
 	uint64_t length = image.length();
 
 	if (length < 18)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "File too short");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "File too short (must be at least 18 bytes)");
 
 	if (length >= 0x10000 - 0x4000 + 18)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "File too long");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "File too long (must be at no more than 48K data)");
 
 	auto data = std::make_unique<uint8_t []>(length);
 	if (image.fread(data.get(), length) != length)
-	{
-		image.seterror(image_error::UNSPECIFIED, "Error reading file");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::UNSPECIFIED, "Error reading file");
 
 	// verify first byte
 	if (data[0] != 0xff)
-	{
-		image.seterror(image_error::INVALIDIMAGE, nullptr);
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDIMAGE, std::string());
 
 	// get tape name
 	char tape_name[16];
@@ -480,7 +465,7 @@ SNAPSHOT_LOAD_MEMBER(mtx_state::snapshot_cb)
 
 	logerror("snapshot name = '%s', system_size = 0x%04x, data_size = 0x%04x\n", tape_name, system_variables_size, data_size);
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /***************************************************************************
@@ -489,40 +474,34 @@ SNAPSHOT_LOAD_MEMBER(mtx_state::snapshot_cb)
 
 QUICKLOAD_LOAD_MEMBER(mtx_state::quickload_cb)
 {
-	uint64_t length = image.length();
+	uint64_t const length = image.length();
 
 	if (length < 4)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "File too short");
-		return image_init_result::FAIL;
-	}
-
-	if (length >= 0x10000 - 0x4000 + 4)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "File too long");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "File too short (must be at least 4 bytes)");
+	else if (length >= 0x10000 - 0x4000 + 4)
+		return std::make_pair(image_error::INVALIDLENGTH, "File too long (must be at no more than 48K data)");
 
 	auto data = std::make_unique<uint8_t []>(length);
 	if (image.fread(data.get(), length) != length)
+		return std::make_pair(image_error::UNSPECIFIED, "Error reading file");
+
+	uint16_t const code_base = pick_integer_le(data.get(), 0, 2);
+	uint16_t const code_length = pick_integer_le(data.get(), 2, 2);
+
+	if (length < (code_length + 4))
+		return std::make_pair(image_error::INVALIDIMAGE, "File too short for code length in header");
+
+	if (code_base < 0x4000)
 	{
-		image.seterror(image_error::UNSPECIFIED, "Error reading file");
-		return image_init_result::FAIL;
+		return std::make_pair(
+				image_error::INVALIDIMAGE,
+				util::string_format("Invalid code base 0x%04X (must be no less than 0x4000)", code_base));
 	}
-
-	uint16_t code_base = pick_integer_le(data.get(), 0, 2);
-	uint16_t code_length = pick_integer_le(data.get(), 2, 2);
-
-	if (length < code_length)
+	else if ((code_base + code_length) > 0x10000)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "File too short");
-		return image_init_result::FAIL;
-	}
-
-	if (code_base < 0x4000 || (code_base + code_length) >= 0x10000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Invalid code base and length");
-		return image_init_result::FAIL;
+		return std::make_pair(
+				image_error::INVALIDIMAGE,
+				util::string_format("Loading 0x%04X bytes of code at base 0x%04X would overflow RAM", code_length, code_base));
 	}
 
 	// reset memory map
@@ -535,7 +514,7 @@ QUICKLOAD_LOAD_MEMBER(mtx_state::quickload_cb)
 
 	m_maincpu->set_pc(code_base);
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /***************************************************************************

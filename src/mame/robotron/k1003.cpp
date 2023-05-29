@@ -32,6 +32,8 @@ TODO:
 #include "k1003.lh"
 
 
+namespace {
+
 class k1003_state : public driver_device
 {
 public:
@@ -57,7 +59,7 @@ private:
 	uint8_t m_disp_1 = 0U;
 	uint8_t m_disp_2 = 0U;
 	u8 m_digit = 0U;
-	uint8_t bit_to_dec(uint8_t val);
+	[[maybe_unused]] uint8_t bit_to_dec(uint8_t val);
 	void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<8> m_io_keyboard;
@@ -305,6 +307,9 @@ ROM_START( k1003 )
 	ROM_LOAD( "441.bin",  0x0d00, 0x0100, CRC(257df6a3) SHA1(65c0429b0e352434b7b661e63cacfe74ac1d1ac9) )
 	ROM_LOAD( "442.bin",  0x0e00, 0x0100, CRC(d037e0bb) SHA1(5ae8ad62673bd732a05232645c523206024f9afb) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

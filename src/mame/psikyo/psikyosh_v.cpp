@@ -32,14 +32,14 @@ Video Registers: at 0x305ffe0 for ps3 or 0x405ffe0 for ps5/ps5v2:
 0x04 -- ffffffff above continued.
 0x08 -- ffff0000 priority values for sprites, 4-bits per value
         0000ff00 unknown. always 20. number of addressable banks? boards are populated with 20.
-        000000f0 unknown. s1945ii/s1945iii/gunbird2/gnbarich/tgm2 sets to c. soldivid/daraku is 0. another bank select?
+        000000f0 unknown. s1945ii/s1945iii/gunbird2/gnbarich/tgm2/dragnblz/sbomber/mjgtaste sets to c. soldivid/daraku is 0. another bank select?
         0000000f is priority for per-line post-blending
 0x0c -- 3f3f3f3f unknown. A table of 4 6-bit values. usually 0f102038. tgm2 is 0a172838.
         c0c00000 unknown. unused?
         0000c000 is flipscreen (currently ignored). presumably flipy<<1|flipx.
         000000c0 is screen size select. 0 is 224 lines, c is 240 (see tgm2, not confirmed).
 0x10 -- ffff0000 is always 00aa
-        0000f000 number of banks for sprites (not confirmed). mjgtaste/tgm2/sbomberb/s1945ii is 3, gunbird2/s1945iii is 2, soldivid/daraku is b.
+        0000f000 number of banks for sprites (not confirmed). mjgtaste/tgm2/sbomber/s1945ii/dragnblz/gnbarich is 3, gunbird2/s1945iii is 2, soldivid/daraku is b.
         00000fff Controls gfx data bank available to be read by SH-2 for verification.
 0x14 -- ffffffff always 83ff000e
 0x18 -- ffffffff bank for tilemaps. As follows for the different tilemaps: 11223344. Bit 0x80 indicates use of line effects and the bank should be used to look up the tile-bank per line.
@@ -339,41 +339,41 @@ void psikyosh_state::draw_bglayerscroll(u8 const layer, bitmap_rgb32 &bitmap, co
 				cache_bitmap(tilemap_scanline, gfx, size, tilebank, alpha, last_bank);
 
 				/* zoomy and 'wibbly' effects - extract an entire row from tilemap */
-				g_profiler.start(PROFILER_USER2);
+				auto profile2 = g_profiler.start(PROFILER_USER2);
 				u32 tilemap_line[32 * 16];
 				u32 scr_line[64 * 8];
 				std::copy_n(&m_bg_bitmap.pix(tilemap_scanline, 0), 0x200, tilemap_line);
-				g_profiler.stop();
+				profile2.stop();
 
 				/* slow bit, needs optimising. apply scrollx and zoomx by assembling scanline from row */
-				g_profiler.start(PROFILER_USER3);
-				if (zoom)
 				{
-					u16 const step = m_bg_zoom[zoom];
-					int jj = (0x400 << 10) + (step * cliprect.left()); // ensure +ve for mod
-					for (int ii = cliprect.left(); ii <= cliprect.right(); ii++)
+					auto profile3 = g_profiler.start(PROFILER_USER3);
+					if (zoom)
 					{
-						scr_line[ii] = tilemap_line[((jj>>10) - scrollx) & 0x1ff];
-						jj += step;
+						u16 const step = m_bg_zoom[zoom];
+						int jj = (0x400 << 10) + (step * cliprect.left()); // ensure +ve for mod
+						for (int ii = cliprect.left(); ii <= cliprect.right(); ii++)
+						{
+							scr_line[ii] = tilemap_line[((jj>>10) - scrollx) & 0x1ff];
+							jj += step;
+						}
 					}
+					else
+					{
+						for (int ii = cliprect.left(); ii <= cliprect.right(); ii++)
+							scr_line[ii] = tilemap_line[(ii - scrollx + 0x400) & 0x1ff];
+					}
+					// stop profiling USER3
 				}
-				else
-				{
-					for (int ii = cliprect.left(); ii <= cliprect.right(); ii++)
-						scr_line[ii] = tilemap_line[(ii - scrollx + 0x400) & 0x1ff];
-				}
-				g_profiler.stop();
 
 				/* blend line into output */
-				g_profiler.start(PROFILER_USER4);
+				auto profile4 = g_profiler.start(PROFILER_USER4);
 				if (alpha == 0xff)
 					draw_scanline32_transpen(bitmap, cliprect.left(), scanline, scr_width, &scr_line[cliprect.left()]);
 				else if (alpha > 0)
 					draw_scanline32_alpha(bitmap, cliprect.left(), scanline, scr_width, &scr_line[cliprect.left()], alpha);
 				else if (alpha < 0)
 					draw_scanline32_argb(bitmap, cliprect.left(), scanline, scr_width, &scr_line[cliprect.left()]);
-
-				g_profiler.stop();
 			}
 		}
 
@@ -436,7 +436,7 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 	if (!zoomx || !zoomy)
 		return;
 
-	g_profiler.start(PROFILER_DRAWGFX);
+	auto profile = g_profiler.start(PROFILER_DRAWGFX);
 
 	assert(dest_bmp.bpp() == 32);
 
@@ -854,7 +854,6 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 			}
 		}
 	}
-	g_profiler.stop();
 }
 
 
@@ -1004,7 +1003,7 @@ void psikyosh_state::prelineblend(bitmap_rgb32 &bitmap, const rectangle &cliprec
 
 	assert(bitmap.bpp() == 32);
 
-	g_profiler.start(PROFILER_USER8);
+	auto profile8 = g_profiler.start(PROFILER_USER8);
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		u32 *dstline = &bitmap.pix(y);
@@ -1013,7 +1012,6 @@ void psikyosh_state::prelineblend(bitmap_rgb32 &bitmap, const rectangle &cliprec
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 			dstline[x] = linefill[y] >> 8;
 	}
-	g_profiler.stop();
 }
 
 
@@ -1028,7 +1026,7 @@ void psikyosh_state::postlineblend(bitmap_rgb32 &bitmap, const rectangle &clipre
 	if ((m_vidregs[2] & 0xf) != req_pri)
 		return;
 
-	g_profiler.start(PROFILER_USER8);
+	auto profile8 = g_profiler.start(PROFILER_USER8);
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		u32 *dstline = &bitmap.pix(y);
@@ -1044,7 +1042,6 @@ void psikyosh_state::postlineblend(bitmap_rgb32 &bitmap, const rectangle &clipre
 				dstline[x] = alpha_blend_r32(dstline[x], lineblend[y] >> 8, 2 * (lineblend[y] & 0x7f));
 		}
 	}
-	g_profiler.stop();
 }
 
 

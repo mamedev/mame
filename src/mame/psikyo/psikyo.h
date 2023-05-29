@@ -5,8 +5,8 @@
     Psikyo Games
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_PSIKYO_H
-#define MAME_INCLUDES_PSIKYO_H
+#ifndef MAME_PSIKYO_PSIKYO_H
+#define MAME_PSIKYO_PSIKYO_H
 
 #pragma once
 
@@ -167,4 +167,4 @@ private:
 	void sngkace_sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_PSIKYO_H
+#endif // MAME_PSIKYO_PSIKYO_H

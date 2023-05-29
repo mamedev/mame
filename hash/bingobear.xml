@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<!--
+
+Known modules:
+- Doctor Bingo Bear (70511)
+- Space Bingo Bear (70512, TESL 7-130C-1-F)
+
+Presumably unreleased:
+- Rock Star Bingo Bear (70514)
+- Monkgomery Monkey Safari (70513)
+- Monkgomery Monkey Clown (70515)
+
+-->
+
+<softwarelist name="bingobear" description="Bingo Bear modules">
+
+	<software name="space">
+		<description>Space Bingo Bear</description>
+		<year>1986</year>
+		<publisher>Hasbro / Tiger Electronics</publisher>
+		<info name="serial" value="70512"/>
+		<part name="cart" interface="bingobear">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cm62065.ic101" size="0x4000" crc="ad17a05d" sha1="ada0800c8157d41f03b59362c4d5d083a6703e99" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

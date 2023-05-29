@@ -5,6 +5,8 @@
 #include "spg2xx.h"
 
 
+namespace {
+
 class spg2xx_pdc_game_state : public spg2xx_game_state
 {
 public:
@@ -324,6 +326,9 @@ ROM_START( vjpp2 )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "29lv320at.u2", 0x000000, 0x400000, CRC(de2592eb) SHA1(9b537205808c502cf872e62f9701357ef8e28f3c) )
 ROM_END
+
+} // anonymous namespace
+
 
 // there were older models eg. PDC30 with fewer games, and some differences (eg "Jo Ma" instead of "Jo Ma 2")
 // "Jo Ma 2" shows "Licensed by Mitchell Corporation" (Mitchell made the original Puzzloop on which this style of game is based)  Videos of the original Jo Ma show it lacking this text.

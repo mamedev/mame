@@ -39,6 +39,8 @@ knightsb3:       OK.
 #include "speaker.h"
 
 
+namespace {
+
 #define CPS1_ROWSCROLL_OFFS  (0x20/2)    /* base of row scroll offsets in other RAM */
 #define CODE_SIZE            0x400000
 
@@ -1362,6 +1364,9 @@ ROM_START( sf2mdtb )
 	ROM_LOAD( "5.ic28", 0x00000, 0x20000, CRC(d5bee9cc) SHA1(e638cb5ce7a22c18b60296a7defe8b03418da56c) )
 	ROM_RELOAD(         0x10000, 0x20000 )
 ROM_END
+
+} // anonymous namespace
+
 
 // ************************************************************************* DRIVER MACROS
 

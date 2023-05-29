@@ -730,16 +730,26 @@ uint8_t x1_state::x1_fdc_r(offs_t offset)
 		case 0x0ffb:
 			return m_fdc->data_r();
 		case 0x0ffc:
-			logerror("FDC: read FM type\n");
+			if (!machine().side_effects_disabled())
+			{
+				logerror("FDC: read FM type\n");
+				m_fdc->dden_w(1);
+			}
 			return 0xff;
 		case 0x0ffd:
-			logerror("FDC: read MFM type\n");
+			if (!machine().side_effects_disabled())
+			{
+				logerror("FDC: read MFM type\n");
+				m_fdc->dden_w(0);
+			}
 			return 0xff;
 		case 0x0ffe:
-			logerror("FDC: read 1.6M type\n");
+			if (!machine().side_effects_disabled())
+				logerror("FDC: read 1.6M type\n");
 			return 0xff;
 		case 0x0fff:
-			logerror("FDC: switching between 500k/1M\n");
+			if (!machine().side_effects_disabled())
+				logerror("FDC: switching between 500k/1M\n");
 			return 0xff;
 	}
 
@@ -2096,6 +2106,8 @@ MACHINE_RESET_MEMBER(x1_state,x1)
 
 	m_ram_bank = 0;
 //  m_old_vpos = -1;
+
+	m_fdc->dden_w(0);
 }
 
 MACHINE_RESET_MEMBER(x1_state,x1turbo)
@@ -2203,7 +2215,7 @@ void x1_state::x1(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_x1);
 
-	MB8877(config, m_fdc, MAIN_CLOCK / 16);
+	MB8877(config, m_fdc, 16_MHz_XTAL / 16); // clocked by SED9421C0B
 	// TODO: guesswork, try to implicitly start the motor
 	m_fdc->hld_wr_callback().set(FUNC(x1_state::hdl_w));
 

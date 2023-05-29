@@ -76,6 +76,9 @@ Dumped by Uki
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class galpani3_state : public driver_device
 {
 public:
@@ -581,6 +584,8 @@ ROM_START( galpani3k ) /* Some game text in Korean, but no "For use in Korea" ty
 	ROM_REGION( 0x20000, "mcudata", 0 ) /* MCU Code? */
 	ROM_LOAD16_WORD_SWAP( "g3d0x0.134", 0x000000, 0x020000, CRC(4ace10f9) SHA1(d19e4540d535ce10d23cb0844be03a3239b3402e) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1995, galpani3,  0,        galpani3, galpani3, galpani3_state, empty_init, ROT90, "Kaneko", "Gals Panic 3 (Euro)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

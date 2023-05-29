@@ -1,13 +1,13 @@
 # MAME パッケージに対する英訳.
-# Copyright (C) 1997-2022 MAMEdev and contributors
+# Copyright (C) 1997-2023 MAMEdev and contributors
 # This file is distributed under the same license as the MAME package.
-# Automatically generated, 2022.
+# Automatically generated, 2023.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-16 02:30+1100\n"
+"POT-Creation-Date: 2023-02-18 05:29+1100\n"
 "PO-Revision-Date: 2016-02-23 01:39+0900\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: MAME Language Team\n"
@@ -31,201 +31,205 @@ msgstr ""
 #: src/frontend/mame/ui/ui.cpp:559
 msgid ""
 "This system requires media images to be mounted for the following device(s): "
-msgstr ""
+msgstr "このシステムは以下のデバイスでメディアイメージのマウントが必要です："
 
-#: src/frontend/mame/ui/ui.cpp:1254
+#: src/frontend/mame/ui/ui.cpp:1275
 #, c-format
 msgid ""
 "UI controls enabled\n"
 "Use %1$s to toggle"
 msgstr ""
+"UI コントロールが有効\n"
+"%1$s で切り替え"
 
-#: src/frontend/mame/ui/ui.cpp:1256
+#: src/frontend/mame/ui/ui.cpp:1277
 #, c-format
 msgid ""
 "UI controls disabled\n"
 "Use %1$s to toggle"
 msgstr ""
+"UI コントロールが無効\n"
+"%1$s で切り替え"
 
-#: src/frontend/mame/ui/ui.cpp:1465
+#: src/frontend/mame/ui/ui.cpp:1486
 msgid "Master Volume"
 msgstr "マスター音量"
 
-#: src/frontend/mame/ui/ui.cpp:1474
+#: src/frontend/mame/ui/ui.cpp:1495
 #, c-format
 msgid "%1$s Volume"
 msgstr "%1$sの音量"
 
-#: src/frontend/mame/ui/ui.cpp:1496
+#: src/frontend/mame/ui/ui.cpp:1517
 #, c-format
 msgid "Overclock CPU %1$s"
 msgstr "CPU %1$sのオーバークロック"
 
-#: src/frontend/mame/ui/ui.cpp:1504
+#: src/frontend/mame/ui/ui.cpp:1525
 #, c-format
 msgid "Overclock %1$s sound"
 msgstr "サウンド%1$sのオーバークロック"
 
-#: src/frontend/mame/ui/ui.cpp:1523
+#: src/frontend/mame/ui/ui.cpp:1544
 #, c-format
 msgid "%1$s Refresh Rate"
 msgstr "%1$sのリフレッシュレート"
 
-#: src/frontend/mame/ui/ui.cpp:1528
+#: src/frontend/mame/ui/ui.cpp:1549
 #, c-format
 msgid "%1$s Brightness"
 msgstr "%1$sの輝度"
 
-#: src/frontend/mame/ui/ui.cpp:1530
+#: src/frontend/mame/ui/ui.cpp:1551
 #, c-format
 msgid "%1$s Contrast"
 msgstr "%1$sのコントラスト"
 
-#: src/frontend/mame/ui/ui.cpp:1532
+#: src/frontend/mame/ui/ui.cpp:1553
 #, c-format
 msgid "%1$s Gamma"
 msgstr "%1$sのガンマ"
 
-#: src/frontend/mame/ui/ui.cpp:1536
+#: src/frontend/mame/ui/ui.cpp:1557
 #, c-format
 msgid "%1$s Horiz Stretch"
 msgstr "%1$s 横方向の拡大"
 
-#: src/frontend/mame/ui/ui.cpp:1538
+#: src/frontend/mame/ui/ui.cpp:1559
 #, c-format
 msgid "%1$s Horiz Position"
 msgstr "%1$s 横方向の位置"
 
-#: src/frontend/mame/ui/ui.cpp:1540
+#: src/frontend/mame/ui/ui.cpp:1561
 #, c-format
 msgid "%1$s Vert Stretch"
 msgstr "%1$s 縦方向の拡大"
 
-#: src/frontend/mame/ui/ui.cpp:1542
+#: src/frontend/mame/ui/ui.cpp:1563
 #, c-format
 msgid "%1$s Vert Position"
 msgstr "%1$s 縦方向の位置"
 
-#: src/frontend/mame/ui/ui.cpp:1558
+#: src/frontend/mame/ui/ui.cpp:1579
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Stretch"
 msgstr "レーザーディスク '%1$s' 横方向の拡大"
 
-#: src/frontend/mame/ui/ui.cpp:1561
+#: src/frontend/mame/ui/ui.cpp:1582
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Position"
 msgstr "レーザーディスク '%1$s' 横方向の位置"
 
-#: src/frontend/mame/ui/ui.cpp:1563
+#: src/frontend/mame/ui/ui.cpp:1584
 #, c-format
 msgid "Laserdisc '%1$s' Vert Stretch"
 msgstr "レーザーディスク '%1$s' 縦方向の拡大"
 
-#: src/frontend/mame/ui/ui.cpp:1566
+#: src/frontend/mame/ui/ui.cpp:1587
 #, c-format
 msgid "Laserdisc '%1$s' Vert Position"
 msgstr "レーザーディスク '%1$s' 縦方向の位置"
 
-#: src/frontend/mame/ui/ui.cpp:1576
+#: src/frontend/mame/ui/ui.cpp:1597
 msgid "Vector Flicker"
 msgstr "ベクターのちらつき"
 
-#: src/frontend/mame/ui/ui.cpp:1577
+#: src/frontend/mame/ui/ui.cpp:1598
 msgid "Beam Width Minimum"
 msgstr "ビーム幅（最小）"
 
-#: src/frontend/mame/ui/ui.cpp:1578
+#: src/frontend/mame/ui/ui.cpp:1599
 msgid "Beam Width Maximum"
 msgstr "ビーム幅（最大）"
 
-#: src/frontend/mame/ui/ui.cpp:1579
+#: src/frontend/mame/ui/ui.cpp:1600
 msgid "Beam Dot Size"
-msgstr ""
+msgstr "ビームドットサイズ"
 
-#: src/frontend/mame/ui/ui.cpp:1580
+#: src/frontend/mame/ui/ui.cpp:1601
 msgid "Beam Intensity Weight"
 msgstr "ビーム強度比重"
 
-#: src/frontend/mame/ui/ui.cpp:1593
+#: src/frontend/mame/ui/ui.cpp:1614
 #, c-format
 msgid "Crosshair Scale %1$s"
 msgstr "照準の大きさ %1$s"
 
-#: src/frontend/mame/ui/ui.cpp:1593 src/frontend/mame/ui/ui.cpp:1595
+#: src/frontend/mame/ui/ui.cpp:1614 src/frontend/mame/ui/ui.cpp:1616
 msgid "X"
 msgstr ""
 
-#: src/frontend/mame/ui/ui.cpp:1593 src/frontend/mame/ui/ui.cpp:1595
+#: src/frontend/mame/ui/ui.cpp:1614 src/frontend/mame/ui/ui.cpp:1616
 msgid "Y"
 msgstr ""
 
-#: src/frontend/mame/ui/ui.cpp:1595
+#: src/frontend/mame/ui/ui.cpp:1616
 #, c-format
 msgid "Crosshair Offset %1$s"
 msgstr "照準のオフセット %1$s"
 
-#: src/frontend/mame/ui/ui.cpp:1623
+#: src/frontend/mame/ui/ui.cpp:1644
 #, c-format
 msgid "%1$3ddB"
 msgstr ""
 
-#: src/frontend/mame/ui/ui.cpp:1666
+#: src/frontend/mame/ui/ui.cpp:1687
 #, c-format
 msgid "%1$d%%"
 msgstr ""
 
-#: src/frontend/mame/ui/ui.cpp:1681
+#: src/frontend/mame/ui/ui.cpp:1702
 #, c-format
 msgid "%1$3.0f%%"
 msgstr ""
 
-#: src/frontend/mame/ui/ui.cpp:1704 src/frontend/mame/ui/ui.cpp:1724
-#: src/frontend/mame/ui/ui.cpp:1743 src/frontend/mame/ui/ui.cpp:1761
-#: src/frontend/mame/ui/ui.cpp:1780 src/frontend/mame/ui/ui.cpp:1799
-#: src/frontend/mame/ui/ui.cpp:1818 src/frontend/mame/ui/ui.cpp:1837
-#: src/frontend/mame/ui/ui.cpp:1858 src/frontend/mame/ui/ui.cpp:1879
-#: src/frontend/mame/ui/ui.cpp:1900 src/frontend/mame/ui/ui.cpp:1921
+#: src/frontend/mame/ui/ui.cpp:1725 src/frontend/mame/ui/ui.cpp:1745
+#: src/frontend/mame/ui/ui.cpp:1764 src/frontend/mame/ui/ui.cpp:1782
+#: src/frontend/mame/ui/ui.cpp:1801 src/frontend/mame/ui/ui.cpp:1820
+#: src/frontend/mame/ui/ui.cpp:1839 src/frontend/mame/ui/ui.cpp:1858
+#: src/frontend/mame/ui/ui.cpp:1879 src/frontend/mame/ui/ui.cpp:1900
+#: src/frontend/mame/ui/ui.cpp:1921 src/frontend/mame/ui/ui.cpp:1942
 #, c-format
 msgid "%1$.3f"
 msgstr "%1$.3f"
 
-#: src/frontend/mame/ui/ui.cpp:1936 src/frontend/mame/ui/ui.cpp:1951
-#: src/frontend/mame/ui/ui.cpp:1966 src/frontend/mame/ui/ui.cpp:1981
-#: src/frontend/mame/ui/ui.cpp:1996
+#: src/frontend/mame/ui/ui.cpp:1957 src/frontend/mame/ui/ui.cpp:1972
+#: src/frontend/mame/ui/ui.cpp:1987 src/frontend/mame/ui/ui.cpp:2002
+#: src/frontend/mame/ui/ui.cpp:2017
 #, c-format
 msgid "%1$1.2f"
 msgstr "%1$1.2f"
 
-#: src/frontend/mame/ui/ui.cpp:2012
+#: src/frontend/mame/ui/ui.cpp:2033
 #, c-format
 msgid "Crosshair Scale X %1$1.3f"
 msgstr "照準の大きさ X %1$1.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2012
+#: src/frontend/mame/ui/ui.cpp:2033
 #, c-format
 msgid "Crosshair Scale Y %1$1.3f"
 msgstr "照準の大きさ Y %1$1.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2029
+#: src/frontend/mame/ui/ui.cpp:2050
 #, c-format
 msgid "Crosshair Offset X %1$1.3f"
 msgstr "照準のオフセット X %1$1.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2029
+#: src/frontend/mame/ui/ui.cpp:2050
 #, c-format
 msgid "Crosshair Offset Y %1$1.3f"
 msgstr "照準のオフセット Y %1$1.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2116
+#: src/frontend/mame/ui/ui.cpp:2137
 msgid "**Error saving ui.ini**"
 msgstr "*** ui.iniの保存エラー ***"
 
-#: src/frontend/mame/ui/ui.cpp:2175
+#: src/frontend/mame/ui/ui.cpp:2196
 #, c-format
 msgid "**Error saving %s.ini**"
 msgstr "*** %s.iniの保存エラー ***"
 
-#: src/frontend/mame/ui/ui.cpp:2179 src/frontend/mame/ui/miscmenu.cpp:773
+#: src/frontend/mame/ui/ui.cpp:2200 src/frontend/mame/ui/miscmenu.cpp:773
 msgid ""
 "\n"
 "    Settings saved    \n"
@@ -235,7 +239,7 @@ msgstr ""
 "    設定を保存しました    \n"
 "\n"
 
-#: src/frontend/mame/ui/selsoft.cpp:487 src/frontend/mame/ui/selgame.cpp:298
+#: src/frontend/mame/ui/selsoft.cpp:510 src/frontend/mame/ui/selgame.cpp:318
 #, c-format
 msgid ""
 "%s\n"
@@ -244,8 +248,8 @@ msgstr ""
 "「%s」を\n"
 "お気に入りに追加しました。"
 
-#: src/frontend/mame/ui/selsoft.cpp:492 src/frontend/mame/ui/selgame.cpp:303
-#: src/frontend/mame/ui/selgame.cpp:309
+#: src/frontend/mame/ui/selsoft.cpp:515 src/frontend/mame/ui/selgame.cpp:323
+#: src/frontend/mame/ui/selgame.cpp:329
 #, c-format
 msgid ""
 "%s\n"
@@ -254,42 +258,42 @@ msgstr ""
 "「%s」を\n"
 "お気に入りから削除しました。"
 
-#: src/frontend/mame/ui/selsoft.cpp:525
+#: src/frontend/mame/ui/selsoft.cpp:576
 msgid "[Start empty]"
-msgstr ""
+msgstr "［空のまま開始］"
 
-#: src/frontend/mame/ui/selsoft.cpp:525
+#: src/frontend/mame/ui/selsoft.cpp:576
 msgid "[Use file manager]"
-msgstr ""
+msgstr "［ファイルマネージャを使用］"
 
-#: src/frontend/mame/ui/selsoft.cpp:708
+#: src/frontend/mame/ui/selsoft.cpp:756
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d software packages )"
 msgstr "%1$s %2$s （ %3$d / %4$d ソフトウェアパッケージ ）"
 
-#: src/frontend/mame/ui/selsoft.cpp:709
+#: src/frontend/mame/ui/selsoft.cpp:757
 #, c-format
 msgid "%1$s - select software"
-msgstr ""
+msgstr "%1$s - ソフトウェアを選択"
 
-#: src/frontend/mame/ui/selsoft.cpp:714 src/frontend/mame/ui/selgame.cpp:1074
+#: src/frontend/mame/ui/selsoft.cpp:762 src/frontend/mame/ui/selgame.cpp:1092
 #, c-format
 msgid "%1$s: %2$s - Search: %3$s_"
-msgstr "%1$s：%2$s〜検索：%3$s_"
+msgstr "%1$s：%2$s - 検索：%3$s_"
 
-#: src/frontend/mame/ui/selsoft.cpp:716 src/frontend/mame/ui/selgame.cpp:1076
+#: src/frontend/mame/ui/selsoft.cpp:764 src/frontend/mame/ui/selgame.cpp:1094
 #, c-format
 msgid "Search: %1$s_"
 msgstr "検索：%1$s_"
 
-#: src/frontend/mame/ui/selsoft.cpp:723
+#: src/frontend/mame/ui/selsoft.cpp:771
 #, c-format
 msgid "Software list/item: %1$s:%2$s"
-msgstr ""
+msgstr "ソフトウェアリスト／アイテム： %1$s:%2$s"
 
-#: src/frontend/mame/ui/optsmenu.cpp:45 src/frontend/mame/ui/selgame.cpp:441
+#: src/frontend/mame/ui/optsmenu.cpp:45 src/frontend/mame/ui/selgame.cpp:462
 msgid "General Settings"
-msgstr ""
+msgstr "共通設定"
 
 #: src/frontend/mame/ui/optsmenu.cpp:77 src/frontend/mame/ui/sndmenu.cpp:30
 msgid "Sound Options"
@@ -297,7 +301,7 @@ msgstr "サウンド設定"
 
 #: src/frontend/mame/ui/optsmenu.cpp:80
 msgid "Input Assignments"
-msgstr ""
+msgstr "入力割り当て"
 
 #: src/frontend/mame/ui/optsmenu.cpp:83 src/frontend/mame/ui/miscmenu.cpp:888
 msgid "Plugins"
@@ -305,21 +309,21 @@ msgstr "プラグイン"
 
 #: src/frontend/mame/ui/optsmenu.cpp:85
 msgid "Input Devices"
-msgstr ""
+msgstr "入力デバイス"
 
 #: src/frontend/mame/ui/optsmenu.cpp:87
 msgid "Save Settings"
 msgstr "設定を保存する"
 
-#: src/frontend/mame/ui/optsmenu.cpp:185 src/frontend/mame/ui/optsmenu.cpp:227
+#: src/frontend/mame/ui/optsmenu.cpp:183 src/frontend/mame/ui/optsmenu.cpp:225
 msgid "System Filter"
-msgstr ""
+msgstr "システムフィルタ"
 
-#: src/frontend/mame/ui/optsmenu.cpp:197 src/frontend/mame/ui/custui.cpp:83
+#: src/frontend/mame/ui/optsmenu.cpp:195 src/frontend/mame/ui/custui.cpp:84
 msgid "Customize UI"
 msgstr "UIをカスタマイズする"
 
-#: src/frontend/mame/ui/optsmenu.cpp:198 src/frontend/mame/ui/dirmenu.cpp:535
+#: src/frontend/mame/ui/optsmenu.cpp:196 src/frontend/mame/ui/dirmenu.cpp:579
 msgid "Configure Folders"
 msgstr "フォルダ設定"
 
@@ -327,41 +331,41 @@ msgstr "フォルダ設定"
 msgid "Plugin Options"
 msgstr "プラグイン設定"
 
-#: src/frontend/mame/ui/filesel.cpp:221 src/frontend/mame/ui/swlist.cpp:89
-#: src/frontend/mame/ui/slotopt.cpp:221
+#: src/frontend/mame/ui/filesel.cpp:234 src/frontend/mame/ui/swlist.cpp:89
+#: src/frontend/mame/ui/slotopt.cpp:231
 msgid "[empty slot]"
-msgstr "〔空のスロット〕"
+msgstr "［空のスロット］"
 
-#: src/frontend/mame/ui/filesel.cpp:225
+#: src/frontend/mame/ui/filesel.cpp:238
 msgid "[create]"
-msgstr "〔作成〕"
+msgstr "［作成］"
 
-#: src/frontend/mame/ui/filesel.cpp:229 src/frontend/mame/ui/swlist.cpp:100
+#: src/frontend/mame/ui/filesel.cpp:242 src/frontend/mame/ui/swlist.cpp:100
 msgid "[software list]"
-msgstr "〔ソフトウェアリスト〕"
+msgstr "［ソフトウェアリスト］"
 
-#: src/frontend/mame/ui/filesel.cpp:285
+#: src/frontend/mame/ui/filesel.cpp:298
 #, c-format
 msgid "Error accessing %s"
 msgstr "%sのアクセスエラー"
 
-#: src/frontend/mame/ui/filesel.cpp:509
+#: src/frontend/mame/ui/filesel.cpp:519
 msgid "Select access mode"
 msgstr "アクセスモードの選択"
 
-#: src/frontend/mame/ui/filesel.cpp:510
+#: src/frontend/mame/ui/filesel.cpp:520
 msgid "Read-only"
 msgstr "読み取り専用"
 
-#: src/frontend/mame/ui/filesel.cpp:512
+#: src/frontend/mame/ui/filesel.cpp:522
 msgid "Read-write"
 msgstr "読み取り／書き込み"
 
-#: src/frontend/mame/ui/filesel.cpp:513
+#: src/frontend/mame/ui/filesel.cpp:523
 msgid "Read this image, write to another image"
 msgstr "このイメージから読み取り、別のイメージに書き込む"
 
-#: src/frontend/mame/ui/filesel.cpp:514
+#: src/frontend/mame/ui/filesel.cpp:524
 msgid "Read this image, write to diff"
 msgstr "このイメージから読み取り、差分（diff）に書き込む"
 
@@ -371,15 +375,15 @@ msgstr "その他の設定"
 
 #: src/frontend/mame/ui/submenu.cpp:34
 msgid "Skip imperfect emulation warnings"
-msgstr ""
+msgstr "不完全なエミュレーションについての警告をスキップ"
 
 #: src/frontend/mame/ui/submenu.cpp:35
 msgid "Re-select last system launched"
-msgstr ""
+msgstr "最後に実行したシステムを再選択"
 
 #: src/frontend/mame/ui/submenu.cpp:36
 msgid "Enlarge images in the right panel"
-msgstr "右パネルの画像を拡大する"
+msgstr "右パネルの画像を拡大"
 
 #: src/frontend/mame/ui/submenu.cpp:37
 msgid "Cheats"
@@ -391,11 +395,11 @@ msgstr "マウスポインタを表示"
 
 #: src/frontend/mame/ui/submenu.cpp:39
 msgid "Confirm quit from emulation"
-msgstr ""
+msgstr "エミュレーション終了時に確認"
 
 #: src/frontend/mame/ui/submenu.cpp:40
 msgid "Skip system information screen"
-msgstr ""
+msgstr "システム情報画面をスキップ"
 
 #: src/frontend/mame/ui/submenu.cpp:41
 msgid "Force 4:3 aspect for snapshot display"
@@ -403,15 +407,15 @@ msgstr "スナップショットの表示で4:3アスペクト比を強制"
 
 #: src/frontend/mame/ui/submenu.cpp:42
 msgid "Use image as background"
-msgstr "画像を背景に使用する"
+msgstr "画像を背景に使用"
 
 #: src/frontend/mame/ui/submenu.cpp:43
 msgid "Skip BIOS selection menu"
-msgstr "BIOS選択メニューをスキップする"
+msgstr "BIOS選択メニューをスキップ"
 
 #: src/frontend/mame/ui/submenu.cpp:44
 msgid "Skip software part selection menu"
-msgstr ""
+msgstr "ソフトウェアパーツ選択メニューをスキップ"
 
 #: src/frontend/mame/ui/submenu.cpp:45
 msgid "Info auto audit"
@@ -443,7 +447,7 @@ msgstr "スロットル"
 
 #: src/frontend/mame/ui/submenu.cpp:57
 msgid "Mute when unthrottled"
-msgstr ""
+msgstr "スロットル無効の時にミュート"
 
 #: src/frontend/mame/ui/submenu.cpp:58
 msgid "Sleep"
@@ -455,11 +459,11 @@ msgstr "速度"
 
 #: src/frontend/mame/ui/submenu.cpp:60
 msgid "Adjust speed to match refresh rate"
-msgstr ""
+msgstr "速度をリフレッシュレートに合わせる"
 
 #: src/frontend/mame/ui/submenu.cpp:61
 msgid "Low latency"
-msgstr ""
+msgstr "低遅延"
 
 #: src/frontend/mame/ui/submenu.cpp:63
 msgid "Rotation Options"
@@ -499,7 +503,7 @@ msgstr "アートワーク設定"
 
 #: src/frontend/mame/ui/submenu.cpp:73
 msgid "Zoom to screen area"
-msgstr ""
+msgstr "画面エリアに拡大"
 
 #: src/frontend/mame/ui/submenu.cpp:75
 msgid "State/Playback Options"
@@ -511,7 +515,7 @@ msgstr "自動セーブ／ロード"
 
 #: src/frontend/mame/ui/submenu.cpp:77
 msgid "Allow rewind"
-msgstr ""
+msgstr "巻き戻しを許可"
 
 #: src/frontend/mame/ui/submenu.cpp:78
 msgid "Rewind capacity"
@@ -519,7 +523,7 @@ msgstr "巻き戻し容量"
 
 #: src/frontend/mame/ui/submenu.cpp:79
 msgid "Bilinear filtering for snapshots"
-msgstr ""
+msgstr "スナップショットのバイリニアフィルタリング"
 
 #: src/frontend/mame/ui/submenu.cpp:80
 msgid "Burn-in"
@@ -574,145 +578,149 @@ msgid "Joystick saturation"
 msgstr "ジョイスティックサチュレーション"
 
 #: src/frontend/mame/ui/submenu.cpp:94
+msgid "Joystick threshold"
+msgstr "ジョイスティックしきい値"
+
+#: src/frontend/mame/ui/submenu.cpp:95
 msgid "Natural keyboard"
 msgstr "ナチュラルキーボード"
 
-#: src/frontend/mame/ui/submenu.cpp:95
-msgid "Allow contradictory joystick inputs"
-msgstr ""
-
 #: src/frontend/mame/ui/submenu.cpp:96
+msgid "Allow contradictory joystick inputs"
+msgstr "対称方向のジョイスティック入力を許可"
+
+#: src/frontend/mame/ui/submenu.cpp:97
 msgid "Coin impulse"
 msgstr "コインインパルス"
 
-#: src/frontend/mame/ui/submenu.cpp:102
-msgid "Input Device Options"
-msgstr ""
-
 #: src/frontend/mame/ui/submenu.cpp:103
+msgid "Input Device Options"
+msgstr "入力デバイス設定"
+
+#: src/frontend/mame/ui/submenu.cpp:104
 msgid "Lightgun Device Assignment"
 msgstr "光線銃デバイス割り当て"
 
-#: src/frontend/mame/ui/submenu.cpp:104
+#: src/frontend/mame/ui/submenu.cpp:105
 msgid "Trackball Device Assignment"
 msgstr "トラックボールデバイス割り当て"
 
-#: src/frontend/mame/ui/submenu.cpp:105
+#: src/frontend/mame/ui/submenu.cpp:106
 msgid "Pedal Device Assignment"
 msgstr "ペダルデバイス割り当て"
 
-#: src/frontend/mame/ui/submenu.cpp:106
+#: src/frontend/mame/ui/submenu.cpp:107
 msgid "AD Stick Device Assignment"
 msgstr "アナログスティックデバイス割り当て"
 
-#: src/frontend/mame/ui/submenu.cpp:107
+#: src/frontend/mame/ui/submenu.cpp:108
 msgid "Paddle Device Assignment"
 msgstr "パドルデバイス割り当て"
 
-#: src/frontend/mame/ui/submenu.cpp:108
+#: src/frontend/mame/ui/submenu.cpp:109
 msgid "Dial Device Assignment"
 msgstr "ダイヤルデバイス割り当て"
 
-#: src/frontend/mame/ui/submenu.cpp:109
+#: src/frontend/mame/ui/submenu.cpp:110
 msgid "Positional Device Assignment"
 msgstr "位置デバイス割り当て"
 
-#: src/frontend/mame/ui/submenu.cpp:110
+#: src/frontend/mame/ui/submenu.cpp:111
 msgid "Mouse Device Assignment"
 msgstr "マウスデバイス割り当て"
 
-#: src/frontend/mame/ui/submenu.cpp:112
-msgid "Keyboard Input Provider"
-msgstr ""
-
 #: src/frontend/mame/ui/submenu.cpp:113
-msgid "Mouse Input Provider"
-msgstr ""
+msgid "Keyboard Input Provider"
+msgstr "キーボード入力プロバイダ"
 
 #: src/frontend/mame/ui/submenu.cpp:114
-msgid "Lightgun Input Provider"
-msgstr ""
+msgid "Mouse Input Provider"
+msgstr "マウス入力プロバイダ"
 
 #: src/frontend/mame/ui/submenu.cpp:115
-msgid "Joystick Input Provider"
-msgstr ""
+msgid "Lightgun Input Provider"
+msgstr "光線銃入力プロバイダ"
 
-#: src/frontend/mame/ui/submenu.cpp:121 src/frontend/mame/ui/videoopt.cpp:42
+#: src/frontend/mame/ui/submenu.cpp:116
+msgid "Joystick Input Provider"
+msgstr "ジョイスティック入力プロバイダ"
+
+#: src/frontend/mame/ui/submenu.cpp:122 src/frontend/mame/ui/videoopt.cpp:42
 msgid "Video Options"
 msgstr "表示設定"
 
-#: src/frontend/mame/ui/submenu.cpp:122
+#: src/frontend/mame/ui/submenu.cpp:123
 msgid "Video Mode"
 msgstr "ビデオモード"
 
-#: src/frontend/mame/ui/submenu.cpp:123
+#: src/frontend/mame/ui/submenu.cpp:124
 msgid "Number Of Screens"
 msgstr "画面数"
 
-#: src/frontend/mame/ui/submenu.cpp:125
+#: src/frontend/mame/ui/submenu.cpp:126
 msgid "Triple Buffering"
 msgstr "トリプルバッファ"
 
-#: src/frontend/mame/ui/submenu.cpp:126
+#: src/frontend/mame/ui/submenu.cpp:127
 msgid "HLSL"
 msgstr "HLSL"
 
-#: src/frontend/mame/ui/submenu.cpp:128
+#: src/frontend/mame/ui/submenu.cpp:129
 msgid "GLSL"
 msgstr "GLSL"
 
-#: src/frontend/mame/ui/submenu.cpp:129
+#: src/frontend/mame/ui/submenu.cpp:130
 msgid "Bilinear Filtering"
 msgstr "バイリニアフィルタリング"
 
-#: src/frontend/mame/ui/submenu.cpp:130
+#: src/frontend/mame/ui/submenu.cpp:131
 msgid "Bitmap Prescaling"
 msgstr "ビットマッププレスケール"
 
-#: src/frontend/mame/ui/submenu.cpp:131
+#: src/frontend/mame/ui/submenu.cpp:132
 msgid "Window Mode"
 msgstr "ウィンドウモード"
 
-#: src/frontend/mame/ui/submenu.cpp:132
-msgid "Enforce Aspect Ratio"
-msgstr "アスペクト比を維持する"
-
 #: src/frontend/mame/ui/submenu.cpp:133
-msgid "Start Out Maximized"
-msgstr "開始時に最大化する"
+msgid "Enforce Aspect Ratio"
+msgstr "アスペクト比を維持"
 
 #: src/frontend/mame/ui/submenu.cpp:134
+msgid "Start Out Maximized"
+msgstr "開始時に最大化"
+
+#: src/frontend/mame/ui/submenu.cpp:135
 msgid "Synchronized Refresh"
 msgstr "リフレッシュを同期"
 
-#: src/frontend/mame/ui/submenu.cpp:135
+#: src/frontend/mame/ui/submenu.cpp:136
 msgid "Wait Vertical Sync"
 msgstr "V-Syncを待つ"
 
-#: src/frontend/mame/ui/menu.cpp:364 src/frontend/mame/ui/menu.cpp:722
+#: src/frontend/mame/ui/menu.cpp:372 src/frontend/mame/ui/menu.cpp:738
 #: src/frontend/mame/ui/videoopt.cpp:169
-#: src/frontend/mame/ui/inputtoggle.cpp:96 src/frontend/mame/ui/custui.cpp:480
-#: src/frontend/mame/ui/analogipt.cpp:478 plugins/cheatfind/init.lua:766
+#: src/frontend/mame/ui/inputtoggle.cpp:96 src/frontend/mame/ui/custui.cpp:488
+#: src/frontend/mame/ui/analogipt.cpp:527 plugins/cheatfind/init.lua:766
 #: plugins/cheatfind/init.lua:777 plugins/cheat/init.lua:679
 msgid "On"
 msgstr "オン"
 
-#: src/frontend/mame/ui/menu.cpp:364 src/frontend/mame/ui/menu.cpp:725
+#: src/frontend/mame/ui/menu.cpp:372 src/frontend/mame/ui/menu.cpp:741
 #: src/frontend/mame/ui/videoopt.cpp:185
-#: src/frontend/mame/ui/inputtoggle.cpp:91 src/frontend/mame/ui/custui.cpp:480
-#: src/frontend/mame/ui/analogipt.cpp:478 plugins/cheatfind/init.lua:763
+#: src/frontend/mame/ui/inputtoggle.cpp:91 src/frontend/mame/ui/custui.cpp:488
+#: src/frontend/mame/ui/analogipt.cpp:527 plugins/cheatfind/init.lua:763
 #: plugins/cheatfind/init.lua:774 plugins/cheat/init.lua:682
 #: plugins/cheat/init.lua:691
 msgid "Off"
 msgstr "オフ"
 
-#: src/frontend/mame/ui/menu.cpp:728
+#: src/frontend/mame/ui/menu.cpp:744
 msgid "Auto"
 msgstr "自動"
 
-#: src/frontend/mame/ui/menu.cpp:1233
+#: src/frontend/mame/ui/menu.cpp:1272
 #: src/frontend/mame/ui/simpleselgame.cpp:283
-#: src/frontend/mame/ui/selmenu.cpp:1248
+#: src/frontend/mame/ui/selmenu.cpp:1307
 msgid "Return to Previous Menu"
 msgstr "前のメニューに戻る"
 
@@ -720,23 +728,23 @@ msgstr "前のメニューに戻る"
 msgid "File Manager"
 msgstr "ファイルマネージャ"
 
-#: src/frontend/mame/ui/filemngr.cpp:140
+#: src/frontend/mame/ui/filemngr.cpp:152
 #: src/frontend/mame/ui/confswitch.cpp:119
-#: src/frontend/mame/ui/inputmap.cpp:580
+#: src/frontend/mame/ui/inputmap.cpp:581
 #: src/frontend/mame/ui/inputtoggle.cpp:75
-#: src/frontend/mame/ui/analogipt.cpp:363
+#: src/frontend/mame/ui/analogipt.cpp:412
 #, c-format
 msgid "[root%1$s]"
 msgstr ""
 
-#: src/frontend/mame/ui/filemngr.cpp:154
+#: src/frontend/mame/ui/filemngr.cpp:166
 #: src/frontend/mame/ui/confswitch.cpp:170 src/frontend/mame/ui/slotopt.cpp:204
 msgid "Reset System"
-msgstr ""
+msgstr "システムをリセット"
 
-#: src/frontend/mame/ui/filemngr.cpp:154
+#: src/frontend/mame/ui/filemngr.cpp:166
 msgid "Start System"
-msgstr ""
+msgstr "システムを開始"
 
 #: src/frontend/mame/ui/videoopt.cpp:60
 #, c-format
@@ -746,35 +754,35 @@ msgstr "画面 #%d"
 #: src/frontend/mame/ui/videoopt.cpp:103
 #, c-format
 msgid "Video Options: %1$s"
-msgstr ""
+msgstr "表示設定： %1$s"
 
 #: src/frontend/mame/ui/videoopt.cpp:161
 msgid "Zoom to Screen Area"
-msgstr ""
+msgstr "画面エリアに拡大"
 
 #: src/frontend/mame/ui/videoopt.cpp:173
 msgid "X Only"
-msgstr ""
+msgstr "X のみ"
 
 #: src/frontend/mame/ui/videoopt.cpp:177
 msgid "Y Only"
-msgstr ""
+msgstr "Y のみ"
 
 #: src/frontend/mame/ui/videoopt.cpp:181
 msgid "X or Y (Auto)"
-msgstr ""
+msgstr "X もしくは Y （自動）"
 
 #: src/frontend/mame/ui/videoopt.cpp:188
 msgid "Non-Integer Scaling"
-msgstr ""
+msgstr "非整数倍スケーリング"
 
 #: src/frontend/mame/ui/videoopt.cpp:191
 msgid "Maintain Aspect Ratio"
-msgstr ""
+msgstr "アスペクト比を維持"
 
 #: src/frontend/mame/ui/videoopt.cpp:205
 msgid "Cannot change options while recording!"
-msgstr ""
+msgstr "記録中は設定を変更できません！"
 
 #: src/frontend/mame/ui/info.cpp:41
 msgctxt "emulation-feature"
@@ -804,7 +812,7 @@ msgstr "サウンド"
 #: src/frontend/mame/ui/info.cpp:46
 msgctxt "emulation-feature"
 msgid "capture hardware"
-msgstr ""
+msgstr "キャプチャハードウェア"
 
 #: src/frontend/mame/ui/info.cpp:47
 msgctxt "emulation-feature"
@@ -834,7 +842,7 @@ msgstr "マウス"
 #: src/frontend/mame/ui/info.cpp:52
 msgctxt "emulation-feature"
 msgid "media"
-msgstr ""
+msgstr "メディア"
 
 #: src/frontend/mame/ui/info.cpp:53
 msgctxt "emulation-feature"
@@ -849,27 +857,27 @@ msgstr "プリンター"
 #: src/frontend/mame/ui/info.cpp:55
 msgctxt "emulation-feature"
 msgid "magnetic tape"
-msgstr ""
+msgstr "磁気テープ"
 
 #: src/frontend/mame/ui/info.cpp:56
 msgctxt "emulation-feature"
 msgid "punch tape"
-msgstr ""
+msgstr "パンチテープ"
 
 #: src/frontend/mame/ui/info.cpp:57
 msgctxt "emulation-feature"
 msgid "magnetic drum"
-msgstr ""
+msgstr "磁気ドラム"
 
 #: src/frontend/mame/ui/info.cpp:58
 msgctxt "emulation-feature"
 msgid "solid state storage"
-msgstr ""
+msgstr "ソリッドステートストレージ"
 
 #: src/frontend/mame/ui/info.cpp:59
 msgctxt "emulation-feature"
 msgid "communications"
-msgstr ""
+msgstr "通信機能"
 
 #: src/frontend/mame/ui/info.cpp:60
 msgctxt "emulation-feature"
@@ -886,6 +894,8 @@ msgid ""
 "One or more ROMs/disk images for this system are incorrect. The system may "
 "not run correctly.\n"
 msgstr ""
+"このシステム用の1つ以上のROM/ディスクイメージが正しくありません。このシステム"
+"は正しく動作しない可能性があります。\n"
 
 #: src/frontend/mame/ui/info.cpp:83
 msgid ""
@@ -900,6 +910,7 @@ msgid ""
 "One or more ROMs/disk images for this system have not been correctly "
 "dumped.\n"
 msgstr ""
+"このシステム用の1つ以上のROM/ディスクイメージが正しく吸い出されていません。\n"
 
 #: src/frontend/mame/ui/info.cpp:96
 msgid "Completely unemulated features: "
@@ -962,6 +973,10 @@ msgid ""
 "physical interaction or consist of mechanical devices. It is not possible to "
 "fully experience this system.\n"
 msgstr ""
+"\n"
+"このシステムの一部の要素は、実際の動作もしくは機械仕掛けのデバイスが必要なた"
+"め正確にエミュレートできません。このシステムを完全に体験することはできませ"
+"ん。\n"
 
 #: src/frontend/mame/ui/info.cpp:167
 #, c-format
@@ -1058,7 +1073,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:633
 msgid "Media Image Information"
-msgstr ""
+msgstr "メディアイメージ情報"
 
 #: src/frontend/mame/ui/info.cpp:681
 msgid "Not supported"
@@ -1070,11 +1085,11 @@ msgstr "部分的に対応"
 
 #: src/frontend/mame/ui/info.cpp:693
 msgid "[empty]"
-msgstr "〔空〕"
+msgstr "［空］"
 
 #: src/frontend/mame/ui/swlist.cpp:94
 msgid "[file manager]"
-msgstr "【ファイルマネージャ】"
+msgstr "［ファイルマネージャ］"
 
 #: src/frontend/mame/ui/swlist.cpp:275
 msgid "Switch Item Ordering"
@@ -1090,11 +1105,11 @@ msgstr "並び順を切り替え： 一覧は現在名前順"
 
 #: src/frontend/mame/ui/swlist.cpp:409
 msgid "[compatible lists]"
-msgstr "【互換リスト】"
+msgstr "［互換リスト］"
 
 #: src/frontend/mame/ui/filecreate.cpp:79
 msgid "File Already Exists - Override?"
-msgstr "ファイルが存在します－上書きしますか？"
+msgstr "ファイルが存在します - 上書きしますか？"
 
 #: src/frontend/mame/ui/filecreate.cpp:81 src/frontend/mame/ui/utils.cpp:1071
 msgid "No"
@@ -1104,34 +1119,34 @@ msgstr "いいえ"
 msgid "Yes"
 msgstr "はい"
 
-#: src/frontend/mame/ui/filecreate.cpp:168
+#: src/frontend/mame/ui/filecreate.cpp:189
 msgid "New Image Name:"
-msgstr "新しいイメージ名:"
+msgstr "新しいイメージ名："
 
-#: src/frontend/mame/ui/filecreate.cpp:174
+#: src/frontend/mame/ui/filecreate.cpp:196
 msgid "Image Format:"
-msgstr "イメージ形式:"
+msgstr "イメージ形式："
 
-#: src/frontend/mame/ui/filecreate.cpp:180
+#: src/frontend/mame/ui/filecreate.cpp:202
 msgid "Create"
 msgstr "作成"
 
-#: src/frontend/mame/ui/filecreate.cpp:208
+#: src/frontend/mame/ui/filecreate.cpp:230
 msgid "Please enter a file extension too"
 msgstr "ファイルの拡張子を入力してください"
 
-#: src/frontend/mame/ui/filecreate.cpp:268
+#: src/frontend/mame/ui/filecreate.cpp:295
 msgid "Select image format"
 msgstr "イメージ形式の選択"
 
-#: src/frontend/mame/ui/filecreate.cpp:327
+#: src/frontend/mame/ui/filecreate.cpp:354
 msgid "Select initial contents"
-msgstr ""
+msgstr "初期コンテンツ選択"
 
 #: src/frontend/mame/ui/keyboard.cpp:29
 msgctxt "menu-keyboard"
 msgid "Keyboard Selection"
-msgstr ""
+msgstr "キーボード選択"
 
 #: src/frontend/mame/ui/keyboard.cpp:46
 msgctxt "menu-keyboard"
@@ -1149,9 +1164,9 @@ msgid "Emulated"
 msgstr "エミュレート"
 
 #: src/frontend/mame/ui/keyboard.cpp:60 src/frontend/mame/ui/confswitch.cpp:117
-#: src/frontend/mame/ui/inputmap.cpp:578
+#: src/frontend/mame/ui/inputmap.cpp:579
 #: src/frontend/mame/ui/inputtoggle.cpp:73
-#: src/frontend/mame/ui/analogipt.cpp:361
+#: src/frontend/mame/ui/analogipt.cpp:410
 #, c-format
 msgid "%1$s [root%2$s]"
 msgstr ""
@@ -1171,17 +1186,17 @@ msgstr "無効"
 #: src/frontend/mame/ui/utils.cpp:63
 msgctxt "swlist-info"
 msgid "Alternate Title"
-msgstr ""
+msgstr "別名"
 
 #: src/frontend/mame/ui/utils.cpp:64
 msgctxt "swlist-info"
 msgid "Author"
-msgstr ""
+msgstr "作者"
 
 #: src/frontend/mame/ui/utils.cpp:65
 msgctxt "swlist-info"
 msgid "Barcode Number"
-msgstr ""
+msgstr "バーコードナンバー"
 
 #: src/frontend/mame/ui/utils.cpp:66
 msgctxt "swlist-info"
@@ -1191,12 +1206,12 @@ msgstr "開発元"
 #: src/frontend/mame/ui/utils.cpp:67
 msgctxt "swlist-info"
 msgid "Distributor"
-msgstr ""
+msgstr "配給元"
 
 #: src/frontend/mame/ui/utils.cpp:68
 msgctxt "swlist-info"
 msgid "Installation Instructions"
-msgstr ""
+msgstr "インストール手順"
 
 #: src/frontend/mame/ui/utils.cpp:69
 msgctxt "swlist-info"
@@ -1211,12 +1226,12 @@ msgstr ""
 #: src/frontend/mame/ui/utils.cpp:71
 msgctxt "swlist-info"
 msgid "Original Publisher"
-msgstr ""
+msgstr "オリジナルの発売元"
 
 #: src/frontend/mame/ui/utils.cpp:72
 msgctxt "swlist-info"
 msgid "Part Number"
-msgstr ""
+msgstr "パートナンバー"
 
 #: src/frontend/mame/ui/utils.cpp:73
 msgctxt "swlist-info"
@@ -1226,7 +1241,7 @@ msgstr ""
 #: src/frontend/mame/ui/utils.cpp:74
 msgctxt "swlist-info"
 msgid "Programmer"
-msgstr ""
+msgstr "プログラマ"
 
 #: src/frontend/mame/ui/utils.cpp:75
 msgctxt "swlist-info"
@@ -1236,12 +1251,12 @@ msgstr "発売日"
 #: src/frontend/mame/ui/utils.cpp:76
 msgctxt "swlist-info"
 msgid "Serial Number"
-msgstr ""
+msgstr "シリアルナンバー"
 
 #: src/frontend/mame/ui/utils.cpp:77
 msgctxt "swlist-info"
 msgid "Usage Instructions"
-msgstr ""
+msgstr "使用手順"
 
 #: src/frontend/mame/ui/utils.cpp:78
 msgctxt "swlist-info"
@@ -1406,17 +1421,17 @@ msgstr "開発元"
 #: src/frontend/mame/ui/utils.cpp:118
 msgctxt "software-filter"
 msgid "Distributor"
-msgstr ""
+msgstr "配給元"
 
 #: src/frontend/mame/ui/utils.cpp:119
 msgctxt "software-filter"
 msgid "Author"
-msgstr ""
+msgstr "作者"
 
 #: src/frontend/mame/ui/utils.cpp:120
 msgctxt "software-filter"
 msgid "Programmer"
-msgstr ""
+msgstr "プログラマ"
 
 #: src/frontend/mame/ui/utils.cpp:121
 msgctxt "software-filter"
@@ -1459,7 +1474,7 @@ msgstr "フィルタ"
 
 #: src/frontend/mame/ui/utils.cpp:292
 msgid "<set up filters>"
-msgstr "〔フィルタを設定する〕"
+msgstr "［フィルタを設定する］"
 
 #: src/frontend/mame/ui/utils.cpp:390
 msgid "Select Filters"
@@ -1484,11 +1499,11 @@ msgstr "［カテゴリINIファイルがありません］"
 
 #: src/frontend/mame/ui/utils.cpp:1021
 msgid "[no groups in INI file]"
-msgstr "［INIファイルにグループが見つかりません］"
+msgstr "［INIファイルにグループがありません］"
 
 #: src/frontend/mame/ui/utils.cpp:1056
 msgid "No category INI files found"
-msgstr "カテゴリINIファイルがありません"
+msgstr "カテゴリINIファイルが見つかりません"
 
 #: src/frontend/mame/ui/utils.cpp:1061
 msgid "File"
@@ -1508,18 +1523,18 @@ msgstr "クローンを含める"
 
 #: src/frontend/mame/ui/utils.cpp:1131
 msgid "Category File"
-msgstr ""
+msgstr "カテゴリファイル"
 
-#: src/frontend/mame/ui/utils.cpp:2030 src/frontend/mame/ui/inifile.cpp:301
+#: src/frontend/mame/ui/utils.cpp:2026 src/frontend/mame/ui/inifile.cpp:301
 msgctxt "swlist-info"
 msgid "Software list/item"
-msgstr ""
+msgstr "ソフトウェアリスト／アイテム"
 
-#: src/frontend/mame/ui/datmenu.cpp:88 src/frontend/mame/ui/selmenu.cpp:2685
+#: src/frontend/mame/ui/datmenu.cpp:88 src/frontend/mame/ui/selmenu.cpp:2752
 msgid "Software List Info"
-msgstr ""
+msgstr "ソフトウェアリスト情報"
 
-#: src/frontend/mame/ui/datmenu.cpp:316
+#: src/frontend/mame/ui/datmenu.cpp:307
 #, c-format
 msgid "Revision: %1$s"
 msgstr "リビジョン：%1$s"
@@ -1583,7 +1598,7 @@ msgstr "（ロック）"
 #: src/frontend/mame/ui/miscmenu.cpp:356 src/frontend/mame/ui/miscmenu.cpp:550
 msgctxt "menu-crosshair"
 msgid "[built-in]"
-msgstr ""
+msgstr "［組み込み］"
 
 #: src/frontend/mame/ui/miscmenu.cpp:397
 msgctxt "menu-crosshair"
@@ -1593,49 +1608,49 @@ msgstr "照準設定"
 #: src/frontend/mame/ui/miscmenu.cpp:465
 msgctxt "menu-crosshair"
 msgid "Never"
-msgstr ""
+msgstr "しない"
 
 #: src/frontend/mame/ui/miscmenu.cpp:466
 msgctxt "menu-crosshair"
 msgid "Always"
-msgstr ""
+msgstr "常に"
 
 #: src/frontend/mame/ui/miscmenu.cpp:467
 msgctxt "menu-crosshair"
 msgid "When moved"
-msgstr ""
+msgstr "移動時のみ"
 
 #: src/frontend/mame/ui/miscmenu.cpp:491
 #, c-format
 msgctxt "menu-crosshair"
 msgid "P%1$d Visibility"
-msgstr ""
+msgstr "%1$dP 視認性"
 
 #: src/frontend/mame/ui/miscmenu.cpp:549
 #, c-format
 msgctxt "menu-crosshair"
 msgid "P%1$d Crosshair"
-msgstr ""
+msgstr "%1$dP 照準"
 
 #: src/frontend/mame/ui/miscmenu.cpp:571
 msgctxt "menu-crosshair"
 msgid "Auto-Hide Delay"
-msgstr ""
+msgstr "自動的に隠すまで"
 
 #: src/frontend/mame/ui/miscmenu.cpp:572
 #, c-format
 msgctxt "menu-crosshair"
 msgid "%1$d s"
-msgstr ""
+msgstr "%1$d 秒"
 
 #: src/frontend/mame/ui/miscmenu.cpp:593
 msgid "Export Displayed List to File"
-msgstr ""
+msgstr "表示されているリストをファイルに出力"
 
 #: src/frontend/mame/ui/miscmenu.cpp:653
 #, c-format
 msgid "%s.xml saved in UI settings folder."
-msgstr ""
+msgstr "UI設定フォルダに %s.xml を保存しました。"
 
 #: src/frontend/mame/ui/miscmenu.cpp:679
 msgid "Name:             Description:\n"
@@ -1644,7 +1659,7 @@ msgstr "ROMセット：       名前：\n"
 #: src/frontend/mame/ui/miscmenu.cpp:690
 #, c-format
 msgid "%s.txt saved in UI settings folder."
-msgstr ""
+msgstr "UI設定フォルダに %s.txt を保存しました。"
 
 #: src/frontend/mame/ui/miscmenu.cpp:707
 msgid "Export list in XML format (like -listxml)"
@@ -1685,15 +1700,15 @@ msgstr "お気に入りから削除"
 
 #: src/frontend/mame/ui/miscmenu.cpp:838
 msgid "Save System Settings"
-msgstr ""
+msgstr "システム設定を保存"
 
-#: src/frontend/mame/ui/miscmenu.cpp:871 src/frontend/mame/ui/selmenu.cpp:2625
+#: src/frontend/mame/ui/miscmenu.cpp:871 src/frontend/mame/ui/selmenu.cpp:2698
 msgid " (default)"
 msgstr "（デフォルト）"
 
 #: src/frontend/mame/ui/miscmenu.cpp:948
 msgid "No plugins found"
-msgstr ""
+msgstr "プラグインが見つかりません"
 
 #: src/frontend/mame/ui/quitmenu.cpp:37
 #, c-format
@@ -1705,8 +1720,8 @@ msgid ""
 msgstr ""
 "終了しますか?\n"
 "\n"
-"%1$sで終了\n"
-"%2$sでエミュレーションに戻る"
+"%1$s で終了\n"
+"%2$s でエミュレーションに戻る"
 
 #: src/frontend/mame/ui/info_pty.cpp:22
 msgid "Pseudo Terminals"
@@ -1714,7 +1729,7 @@ msgstr "擬似ターミナル"
 
 #: src/frontend/mame/ui/info_pty.cpp:37
 msgid "[failed]"
-msgstr "【失敗】"
+msgstr "［失敗］"
 
 #: src/frontend/mame/ui/sliders.cpp:30
 msgid "Slider Controls"
@@ -1722,51 +1737,54 @@ msgstr "スライダ設定"
 
 #: src/frontend/mame/ui/state.cpp:220
 msgid "[no saved states found]"
-msgstr ""
+msgstr "［保存された状態が見つかりません］"
 
 #: src/frontend/mame/ui/state.cpp:225 plugins/cheatfind/init.lua:492
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: src/frontend/mame/ui/state.cpp:265
+#: src/frontend/mame/ui/state.cpp:262
 #, c-format
 msgid ""
 "Delete saved state %1$s?\n"
 "Press %2$s to delete\n"
 "Press %3$s to cancel"
 msgstr ""
+"保存された状態 %1$s を削除しますか？\n"
+"%2$s で削除\n"
+"%3$s でキャンセル"
 
-#: src/frontend/mame/ui/state.cpp:393
+#: src/frontend/mame/ui/state.cpp:388
 #, c-format
 msgid "Error removing saved state file %1$s"
-msgstr ""
+msgstr "保存された状態ファイル %1$s の削除でエラー"
 
-#: src/frontend/mame/ui/state.cpp:442
+#: src/frontend/mame/ui/state.cpp:450
 #, c-format
 msgid "Press %1$s to delete"
-msgstr ""
+msgstr "%1$s で削除"
 
-#: src/frontend/mame/ui/state.cpp:515
+#: src/frontend/mame/ui/state.cpp:521
 msgid "Load State"
 msgstr "状態をロード"
 
-#: src/frontend/mame/ui/state.cpp:515
+#: src/frontend/mame/ui/state.cpp:521
 msgid "Select state to load"
-msgstr ""
+msgstr "ロードする状態を選択"
 
-#: src/frontend/mame/ui/state.cpp:539
+#: src/frontend/mame/ui/state.cpp:545
 msgid "Save State"
 msgstr "状態をセーブ"
 
-#: src/frontend/mame/ui/state.cpp:539
+#: src/frontend/mame/ui/state.cpp:545
 msgid "Press a key or joystick button, or select state to overwrite"
-msgstr ""
+msgstr "キーまたはジョイスティックのボタンを押すか、上書きする状態を選択"
 
-#: src/frontend/mame/ui/confswitch.cpp:314
+#: src/frontend/mame/ui/confswitch.cpp:318
 msgid "DIP Switches"
 msgstr "DIPスイッチ"
 
-#: src/frontend/mame/ui/confswitch.cpp:508
+#: src/frontend/mame/ui/confswitch.cpp:521
 msgid "Machine Configuration"
 msgstr "マシン設定"
 
@@ -1781,7 +1799,7 @@ msgstr "%s [内部]"
 
 #: src/frontend/mame/ui/inputmap.cpp:29
 msgid "Input Assignments (general)"
-msgstr ""
+msgstr "入力割り当て （共通）"
 
 #: src/frontend/mame/ui/inputmap.cpp:39
 msgid "User Interface"
@@ -1790,7 +1808,7 @@ msgstr "ユーザーインターフェイス"
 #: src/frontend/mame/ui/inputmap.cpp:42
 #, c-format
 msgid "Player %1$d Controls"
-msgstr ""
+msgstr "%1$dプレイヤー コントロール"
 
 #: src/frontend/mame/ui/inputmap.cpp:45
 msgid "Other Controls"
@@ -1799,102 +1817,102 @@ msgstr "その他のコントロール"
 #: src/frontend/mame/ui/inputmap.cpp:58
 #, c-format
 msgid "Input Assignments (%1$s)"
-msgstr ""
+msgstr "入力割り当て （%1$s）"
 
 #: src/frontend/mame/ui/inputmap.cpp:152
 msgid "Input Assignments (this system)"
-msgstr ""
+msgstr "入力割り当て （このシステム）"
 
 #: src/frontend/mame/ui/inputmap.cpp:254
 msgid "[no assignable inputs are enabled]"
-msgstr ""
+msgstr "［有効な入力割り当てがありません］"
 
-#: src/frontend/mame/ui/inputmap.cpp:348
+#: src/frontend/mame/ui/inputmap.cpp:358
 msgid "Pressed"
-msgstr ""
+msgstr "押されました"
 
 #: src/frontend/mame/ui/inputmap.cpp:418
 msgid "Invalid combination entered"
-msgstr ""
-
-#: src/frontend/mame/ui/inputmap.cpp:563
-#, c-format
-msgctxt "input-name"
-msgid "%1$s Analog"
-msgstr ""
+msgstr "無効な組み合わせが入力されました"
 
 #: src/frontend/mame/ui/inputmap.cpp:564
 #, c-format
 msgctxt "input-name"
-msgid "%1$s Analog Inc"
-msgstr ""
+msgid "%1$s Analog"
+msgstr "%1$s アナログ"
 
 #: src/frontend/mame/ui/inputmap.cpp:565
 #, c-format
 msgctxt "input-name"
-msgid "%1$s Analog Dec"
-msgstr ""
+msgid "%1$s Analog Inc"
+msgstr "%1$s アナログ 増加"
 
-#: src/frontend/mame/ui/inputmap.cpp:607
+#: src/frontend/mame/ui/inputmap.cpp:566
 #, c-format
-msgid "Press %1$s to set\n"
-msgstr ""
+msgctxt "input-name"
+msgid "%1$s Analog Dec"
+msgstr "%1$s アナログ 減少"
 
 #: src/frontend/mame/ui/inputmap.cpp:608
 #, c-format
-msgid "Press %1$s to append\n"
-msgstr ""
+msgid "Press %1$s to set\n"
+msgstr "%1$s でセット\n"
 
 #: src/frontend/mame/ui/inputmap.cpp:609
 #, c-format
-msgid "Press %1$s to clear\n"
-msgstr ""
+msgid "Press %1$s to append\n"
+msgstr "%1$s で追加\n"
 
 #: src/frontend/mame/ui/inputmap.cpp:610
 #, c-format
-msgid "Press %1$s to restore default\n"
-msgstr ""
+msgid "Press %1$s to clear\n"
+msgstr "%1$s で消去\n"
 
-#: src/frontend/mame/ui/inputdevices.cpp:32
+#: src/frontend/mame/ui/inputmap.cpp:611
+#, c-format
+msgid "Press %1$s to restore default\n"
+msgstr "%1$s でデフォルトに戻す\n"
+
+#: src/frontend/mame/ui/inputdevices.cpp:33
 #, c-format
 msgctxt "menu-inputdev"
 msgid "%1$s (%2$s %3$d)"
 msgstr ""
 
-#: src/frontend/mame/ui/inputdevices.cpp:88
+#: src/frontend/mame/ui/inputdevices.cpp:116
 msgctxt "menu-inputdev"
 msgid "Copy Device ID"
-msgstr ""
+msgstr "デバイスIDをコピー"
 
-#: src/frontend/mame/ui/inputdevices.cpp:122
+#: src/frontend/mame/ui/inputdevices.cpp:148
 msgctxt "menu-inputdev"
 msgid "Copied device ID to clipboard"
-msgstr ""
+msgstr "デバイスIDをクリップボードにコピー"
 
-#: src/frontend/mame/ui/inputdevices.cpp:124
+#: src/frontend/mame/ui/inputdevices.cpp:150
 msgctxt "menu-inputdev"
 msgid "Error copying device ID to clipboard"
-msgstr ""
+msgstr "デバイスIDのクリップボードへのコピーでエラー"
 
-#: src/frontend/mame/ui/inputdevices.cpp:162
+#: src/frontend/mame/ui/inputdevices.cpp:189
 msgctxt "menu-inputdev"
 msgid "Input Devices"
-msgstr ""
+msgstr "入力デバイス"
 
-#: src/frontend/mame/ui/inputdevices.cpp:203
+#: src/frontend/mame/ui/inputdevices.cpp:230
 msgctxt "menu-inputdev"
 msgid "[no input devices are enabled]"
-msgstr ""
+msgstr "［有効な入力デバイスがありません］"
 
 #: src/frontend/mame/ui/inputtoggle.cpp:22
 msgctxt "menu-inputtoggle"
 msgid "Toggle Inputs"
-msgstr ""
+msgstr "トグル入力"
 
 #: src/frontend/mame/ui/inputtoggle.cpp:107
 msgctxt "menu-inputtoggle"
 msgid "[no toggle inputs are enabled]"
-msgstr ""
+msgstr "［有効なトグル入力がありません］"
 
 #: src/frontend/mame/ui/tapectrl.cpp:42
 msgid "Tape Control"
@@ -1948,32 +1966,32 @@ msgstr "入力設定"
 #: src/frontend/mame/ui/inputopts.cpp:97
 msgctxt "menu-inputopts"
 msgid "Input Assignments (this system)"
-msgstr ""
+msgstr "入力割り当て （このシステム）"
 
 #: src/frontend/mame/ui/inputopts.cpp:99
 msgctxt "menu-inputopts"
 msgid "Analog Input Adjustments"
-msgstr ""
+msgstr "アナログ入力調整"
 
 #: src/frontend/mame/ui/inputopts.cpp:101
 msgctxt "menu-inputopts"
 msgid "Keyboard Selection"
-msgstr ""
+msgstr "キーボード選択"
 
 #: src/frontend/mame/ui/inputopts.cpp:103
 msgctxt "menu-inputopts"
 msgid "Toggle Inputs"
-msgstr ""
+msgstr "トグル入力"
 
 #: src/frontend/mame/ui/inputopts.cpp:108
 msgctxt "menu-inputopts"
 msgid "Input Assignments (general)"
-msgstr ""
+msgstr "入力割り当て （共通）"
 
 #: src/frontend/mame/ui/inputopts.cpp:109
 msgctxt "menu-inputopts"
 msgid "Input Devices"
-msgstr ""
+msgstr "入力デバイス"
 
 #: src/frontend/mame/ui/imgcntrl.cpp:132
 msgid "Cannot save over directory"
@@ -1984,6 +2002,8 @@ msgid ""
 "The software selected is missing one or more required ROM or CHD images.\n"
 "Please acquire the correct files or select a different one."
 msgstr ""
+"選択したソフトウェアに必要な1つ以上のROMまたはCHDイメージが不足しています。\n"
+"正しいファイルを取得するか、別の物を選択してください。"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:151
 msgid ""
@@ -2002,11 +2022,11 @@ msgid "Configure Options"
 msgstr "オプションの設定"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:279
-#: src/frontend/mame/ui/selmenu.cpp:1248
+#: src/frontend/mame/ui/selmenu.cpp:1307
 msgid "Exit"
 msgstr "終了"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:304
+#: src/frontend/mame/ui/simpleselgame.cpp:313
 #, c-format
 msgid ""
 "No system ROMs found. Please check the rompath setting specified in the %1$s."
@@ -2015,78 +2035,83 @@ msgid ""
 "If this is your first time using %2$s, please see the %2$s.pdf file in the "
 "docs folder for information on setting up and using %2$s."
 msgstr ""
+"システムROMが見つかりません。%1$s.iniファイルで指定したrompath設定を確認して"
+"ください。\n"
+"\n"
+"もし %2$s の利用が初めてなら、%2$s の設定および使用方法についてdocsフォルダ"
+"の%2$s.pdfファイルの情報をご覧ください。"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:320
+#: src/frontend/mame/ui/simpleselgame.cpp:329
 #, c-format
 msgid "Type name or select: %1$s_"
 msgstr "名前を入力もしくは選択： %1$s_"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:322
+#: src/frontend/mame/ui/simpleselgame.cpp:331
 msgid "Type name or select: (random)"
 msgstr "名前を入力もしくは選択： （ランダム）"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:336
+#: src/frontend/mame/ui/simpleselgame.cpp:345
 #, c-format
 msgid "%1$-.100s"
 msgstr "%1$-.100s"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:339
+#: src/frontend/mame/ui/simpleselgame.cpp:348
 #, c-format
 msgid "%1$s, %2$-.100s"
 msgstr "%1$s、%2$-.100s"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:348
+#: src/frontend/mame/ui/simpleselgame.cpp:357
 #, c-format
 msgid "Driver: %1$s"
 msgstr "ドライバ：%1$s"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:364
-#: src/frontend/mame/ui/selmenu.cpp:690
+#: src/frontend/mame/ui/simpleselgame.cpp:373
+#: src/frontend/mame/ui/selmenu.cpp:735
 msgid "Overall: NOT WORKING"
 msgstr "概略：動作不可"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:366
-#: src/frontend/mame/ui/selmenu.cpp:692
+#: src/frontend/mame/ui/simpleselgame.cpp:375
+#: src/frontend/mame/ui/selmenu.cpp:737
 msgid "Overall: Unemulated Protection"
 msgstr "概略：プロテクトが未エミュレート"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:368
-#: src/frontend/mame/ui/selmenu.cpp:694
+#: src/frontend/mame/ui/simpleselgame.cpp:377
+#: src/frontend/mame/ui/selmenu.cpp:739
 msgid "Overall: Working"
 msgstr "概略：動作可"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:372
-#: src/frontend/mame/ui/selmenu.cpp:698
+#: src/frontend/mame/ui/simpleselgame.cpp:381
+#: src/frontend/mame/ui/selmenu.cpp:743
 msgid "Graphics: Unimplemented, "
 msgstr "グラフィック：未実装　"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:374
-#: src/frontend/mame/ui/selmenu.cpp:700
+#: src/frontend/mame/ui/simpleselgame.cpp:383
+#: src/frontend/mame/ui/selmenu.cpp:745
 msgid "Graphics: Imperfect, "
 msgstr "グラフィック：不完全　"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:376
-#: src/frontend/mame/ui/selmenu.cpp:702
+#: src/frontend/mame/ui/simpleselgame.cpp:385
+#: src/frontend/mame/ui/selmenu.cpp:747
 msgid "Graphics: OK, "
 msgstr "グラフィック：正常　"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:379
-#: src/frontend/mame/ui/selmenu.cpp:705
+#: src/frontend/mame/ui/simpleselgame.cpp:388
+#: src/frontend/mame/ui/selmenu.cpp:750
 msgid "Sound: None"
 msgstr "サウンド：なし"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:381
-#: src/frontend/mame/ui/selmenu.cpp:707
+#: src/frontend/mame/ui/simpleselgame.cpp:390
+#: src/frontend/mame/ui/selmenu.cpp:752
 msgid "Sound: Unimplemented"
 msgstr "サウンド：未実装"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:383
-#: src/frontend/mame/ui/selmenu.cpp:709
+#: src/frontend/mame/ui/simpleselgame.cpp:392
+#: src/frontend/mame/ui/selmenu.cpp:754
 msgid "Sound: Imperfect"
 msgstr "サウンド：不完全"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:385
-#: src/frontend/mame/ui/selmenu.cpp:711
+#: src/frontend/mame/ui/simpleselgame.cpp:394
+#: src/frontend/mame/ui/selmenu.cpp:756
 msgid "Sound: OK"
 msgstr "サウンド：正常"
 
@@ -2111,323 +2136,323 @@ msgstr "全てリセット"
 msgid "Reload All"
 msgstr "全て再読み込み"
 
-#: src/frontend/mame/ui/dirmenu.cpp:44
+#: src/frontend/mame/ui/dirmenu.cpp:40
 msgctxt "path-option"
 msgid "ROMs"
 msgstr "ROMファイル"
 
-#: src/frontend/mame/ui/dirmenu.cpp:45
+#: src/frontend/mame/ui/dirmenu.cpp:41
 msgctxt "path-option"
 msgid "Software Media"
 msgstr "ソフトウェア メディア"
 
-#: src/frontend/mame/ui/dirmenu.cpp:46
+#: src/frontend/mame/ui/dirmenu.cpp:42
 msgctxt "path-option"
 msgid "Sound Samples"
-msgstr ""
+msgstr "サウンドのサンプル"
 
-#: src/frontend/mame/ui/dirmenu.cpp:47
+#: src/frontend/mame/ui/dirmenu.cpp:43
 msgctxt "path-option"
 msgid "Artwork"
 msgstr "アートワークファイル"
 
-#: src/frontend/mame/ui/dirmenu.cpp:48
+#: src/frontend/mame/ui/dirmenu.cpp:44
 msgctxt "path-option"
 msgid "Crosshairs"
 msgstr "照準画像ファイル"
 
-#: src/frontend/mame/ui/dirmenu.cpp:49
+#: src/frontend/mame/ui/dirmenu.cpp:45
 msgctxt "path-option"
 msgid "Cheat Files"
 msgstr "チートファイル"
 
-#: src/frontend/mame/ui/dirmenu.cpp:50
+#: src/frontend/mame/ui/dirmenu.cpp:46
 msgctxt "path-option"
 msgid "Plugins"
-msgstr ""
+msgstr "プラグイン"
 
-#: src/frontend/mame/ui/dirmenu.cpp:51
+#: src/frontend/mame/ui/dirmenu.cpp:47
 msgctxt "path-option"
 msgid "UI Translations"
-msgstr ""
+msgstr "UI翻訳"
 
-#: src/frontend/mame/ui/dirmenu.cpp:52
+#: src/frontend/mame/ui/dirmenu.cpp:48
 msgctxt "path-option"
 msgid "Software Lists"
-msgstr ""
+msgstr "ソフトウェアリスト"
 
-#: src/frontend/mame/ui/dirmenu.cpp:53
+#: src/frontend/mame/ui/dirmenu.cpp:49
 msgctxt "path-option"
 msgid "INIs"
 msgstr "INIファイル"
 
-#: src/frontend/mame/ui/dirmenu.cpp:54
+#: src/frontend/mame/ui/dirmenu.cpp:50
 msgctxt "path-option"
 msgid "UI Settings"
-msgstr ""
+msgstr "UI設定"
 
-#: src/frontend/mame/ui/dirmenu.cpp:55
+#: src/frontend/mame/ui/dirmenu.cpp:51
 msgctxt "path-option"
 msgid "Plugin Data"
-msgstr ""
+msgstr "プラグインデータ"
 
-#: src/frontend/mame/ui/dirmenu.cpp:56
+#: src/frontend/mame/ui/dirmenu.cpp:52
 msgctxt "path-option"
 msgid "DATs"
 msgstr "DATファイル"
 
-#: src/frontend/mame/ui/dirmenu.cpp:57
+#: src/frontend/mame/ui/dirmenu.cpp:53
 msgctxt "path-option"
 msgid "Category INIs"
 msgstr "カテゴリ INI"
 
-#: src/frontend/mame/ui/dirmenu.cpp:58
+#: src/frontend/mame/ui/dirmenu.cpp:54
 msgctxt "path-option"
 msgid "Snapshots"
 msgstr "スクリーンショット"
 
-#: src/frontend/mame/ui/dirmenu.cpp:59
+#: src/frontend/mame/ui/dirmenu.cpp:55
 msgctxt "path-option"
 msgid "Icons"
 msgstr "アイコンファイル"
 
-#: src/frontend/mame/ui/dirmenu.cpp:60
+#: src/frontend/mame/ui/dirmenu.cpp:56
 msgctxt "path-option"
 msgid "Control Panels"
 msgstr "操作パネル画像"
 
-#: src/frontend/mame/ui/dirmenu.cpp:61
+#: src/frontend/mame/ui/dirmenu.cpp:57
 msgctxt "path-option"
 msgid "Cabinets"
 msgstr "筐体画像ファイル"
 
-#: src/frontend/mame/ui/dirmenu.cpp:62
+#: src/frontend/mame/ui/dirmenu.cpp:58
 msgctxt "path-option"
 msgid "Marquees"
 msgstr "マーキー画像"
 
-#: src/frontend/mame/ui/dirmenu.cpp:63
+#: src/frontend/mame/ui/dirmenu.cpp:59
 msgctxt "path-option"
 msgid "PCBs"
 msgstr "基板画像"
 
-#: src/frontend/mame/ui/dirmenu.cpp:64
+#: src/frontend/mame/ui/dirmenu.cpp:60
 msgctxt "path-option"
 msgid "Flyers"
 msgstr "フライヤー画像"
 
-#: src/frontend/mame/ui/dirmenu.cpp:65
+#: src/frontend/mame/ui/dirmenu.cpp:61
 msgctxt "path-option"
 msgid "Title Screens"
 msgstr "タイトル画像"
 
-#: src/frontend/mame/ui/dirmenu.cpp:66
+#: src/frontend/mame/ui/dirmenu.cpp:62
 msgctxt "path-option"
 msgid "Game Endings"
-msgstr ""
+msgstr "エンディング画像"
 
-#: src/frontend/mame/ui/dirmenu.cpp:67
+#: src/frontend/mame/ui/dirmenu.cpp:63
 msgctxt "path-option"
 msgid "Bosses"
 msgstr "ボス画像ファイル"
 
-#: src/frontend/mame/ui/dirmenu.cpp:68
+#: src/frontend/mame/ui/dirmenu.cpp:64
 msgctxt "path-option"
 msgid "Artwork Previews"
 msgstr "アートワークのプレビュー"
 
-#: src/frontend/mame/ui/dirmenu.cpp:69
+#: src/frontend/mame/ui/dirmenu.cpp:65
 msgctxt "path-option"
 msgid "Select"
-msgstr ""
+msgstr "選択画像"
 
-#: src/frontend/mame/ui/dirmenu.cpp:70
+#: src/frontend/mame/ui/dirmenu.cpp:66
 msgctxt "path-option"
 msgid "Game Over Screens"
-msgstr ""
+msgstr "ゲームオーバー画像"
 
-#: src/frontend/mame/ui/dirmenu.cpp:71
+#: src/frontend/mame/ui/dirmenu.cpp:67
 msgctxt "path-option"
 msgid "HowTo"
 msgstr "HOWTO"
 
-#: src/frontend/mame/ui/dirmenu.cpp:72
+#: src/frontend/mame/ui/dirmenu.cpp:68
 msgctxt "path-option"
 msgid "Logos"
 msgstr "ロゴ"
 
-#: src/frontend/mame/ui/dirmenu.cpp:73
+#: src/frontend/mame/ui/dirmenu.cpp:69
 msgctxt "path-option"
 msgid "Scores"
 msgstr "スコア"
 
-#: src/frontend/mame/ui/dirmenu.cpp:74
+#: src/frontend/mame/ui/dirmenu.cpp:70
 msgctxt "path-option"
 msgid "Versus"
 msgstr "バーサス"
 
-#: src/frontend/mame/ui/dirmenu.cpp:75
+#: src/frontend/mame/ui/dirmenu.cpp:71
 msgctxt "path-option"
 msgid "Covers"
 msgstr "カバー"
 
-#: src/frontend/mame/ui/dirmenu.cpp:105
+#: src/frontend/mame/ui/dirmenu.cpp:101
 #, c-format
 msgid "Remove %1$s Folder"
 msgstr "%1$sフォルダを削除"
 
-#: src/frontend/mame/ui/dirmenu.cpp:352
-#, c-format
-msgid "Change %1$s Folder - Search: %2$s_"
-msgstr "%1$sフォルダを変更　〜　検索：%2$s_"
-
-#: src/frontend/mame/ui/dirmenu.cpp:352
+#: src/frontend/mame/ui/dirmenu.cpp:357
 #, c-format
 msgid "Add %1$s Folder - Search: %2$s_"
-msgstr "%1$sフォルダを追加　〜　検索：%2$s_"
+msgstr "%1$sフォルダを追加 - 検索：%2$s_"
 
-#: src/frontend/mame/ui/dirmenu.cpp:363
+#: src/frontend/mame/ui/dirmenu.cpp:357
+#, c-format
+msgid "Change %1$s Folder - Search: %2$s_"
+msgstr "%1$sフォルダを変更 - 検索：%2$s_"
+
+#: src/frontend/mame/ui/dirmenu.cpp:368
 msgid "Press TAB to set"
 msgstr "TABキーを押して設定"
 
-#: src/frontend/mame/ui/dirmenu.cpp:431
+#: src/frontend/mame/ui/dirmenu.cpp:438
 #, c-format
 msgid "%1$s Folders"
 msgstr "%1$sフォルダ"
 
-#: src/frontend/mame/ui/dirmenu.cpp:431
+#: src/frontend/mame/ui/dirmenu.cpp:438
 #, c-format
 msgid "%1$s Folder"
 msgstr "%1$sフォルダ"
 
-#: src/frontend/mame/ui/dirmenu.cpp:494
-msgid "Change Folder"
-msgstr "フォルダを変更"
-
-#: src/frontend/mame/ui/dirmenu.cpp:494
+#: src/frontend/mame/ui/dirmenu.cpp:523
 msgid "Add Folder"
 msgstr "フォルダを追加"
 
-#: src/frontend/mame/ui/dirmenu.cpp:497
+#: src/frontend/mame/ui/dirmenu.cpp:525
 msgid "Remove Folder"
 msgstr "フォルダを削除"
 
-#: src/frontend/mame/ui/viewgfx.cpp:789 src/frontend/mame/ui/viewgfx.cpp:794
+#: src/frontend/mame/ui/dirmenu.cpp:530
+msgid "Change Folder"
+msgstr "フォルダを変更"
+
+#: src/frontend/mame/ui/viewgfx.cpp:790 src/frontend/mame/ui/viewgfx.cpp:795
 #, c-format
 msgctxt "gfxview"
 msgid "Zoom = 1/%1$d"
-msgstr ""
+msgstr "ズーム ＝ 1/%1$d"
 
-#: src/frontend/mame/ui/viewgfx.cpp:789 src/frontend/mame/ui/viewgfx.cpp:794
+#: src/frontend/mame/ui/viewgfx.cpp:790 src/frontend/mame/ui/viewgfx.cpp:795
 #, c-format
 msgctxt "gfxview"
 msgid "Zoom = %1$d"
-msgstr ""
+msgstr "ズーム ＝ %1$d"
 
-#: src/frontend/mame/ui/viewgfx.cpp:799
+#: src/frontend/mame/ui/viewgfx.cpp:800
 msgctxt "gfxview"
 msgid "Expand to fit"
-msgstr ""
+msgstr "フィットするように拡大"
 
-#: src/frontend/mame/ui/viewgfx.cpp:822
+#: src/frontend/mame/ui/viewgfx.cpp:823
 msgctxt "gfxview"
 msgid "All categories"
-msgstr ""
+msgstr "全カテゴリ"
 
-#: src/frontend/mame/ui/viewgfx.cpp:824 src/frontend/mame/ui/viewgfx.cpp:829
+#: src/frontend/mame/ui/viewgfx.cpp:825 src/frontend/mame/ui/viewgfx.cpp:830
 #, c-format
 msgctxt "gfxview"
 msgid "Category %1$d"
-msgstr ""
+msgstr "カテゴリ %1$d"
 
-#: src/frontend/mame/ui/viewgfx.cpp:926
+#: src/frontend/mame/ui/viewgfx.cpp:927
 #, c-format
 msgctxt "gfxview"
 msgid "[root%1$s]"
 msgstr ""
 
-#: src/frontend/mame/ui/viewgfx.cpp:926
+#: src/frontend/mame/ui/viewgfx.cpp:927
 #, c-format
 msgctxt "gfxview"
 msgid "[root%1$s] colors"
 msgstr "[root%1$s] 色"
 
-#: src/frontend/mame/ui/viewgfx.cpp:926
+#: src/frontend/mame/ui/viewgfx.cpp:927
 #, c-format
 msgctxt "gfxview"
 msgid "[root%1$s] pens"
 msgstr "[root%1$s] ペン"
 
-#: src/frontend/mame/ui/viewgfx.cpp:940
+#: src/frontend/mame/ui/viewgfx.cpp:941
 #, c-format
 msgctxt "gfxview"
 msgid " #%1$X → %2$X (A:%3$02X R:%4$02X G:%5$02X B:%6$02X)"
 msgstr ""
 
-#: src/frontend/mame/ui/viewgfx.cpp:947
+#: src/frontend/mame/ui/viewgfx.cpp:948
 #, c-format
 msgctxt "gfxview"
 msgid " #%1$X = %2$X (A:%3$02X R:%4$02X G:%5$02X B:%6$02X)"
 msgstr ""
 
-#: src/frontend/mame/ui/viewgfx.cpp:954
+#: src/frontend/mame/ui/viewgfx.cpp:955
 #, c-format
 msgctxt "gfxview"
 msgid " #%1$X (A:%2$02X R:%3$02X G:%4$02X B:%5$02X)"
 msgstr ""
 
-#: src/frontend/mame/ui/viewgfx.cpp:1134
+#: src/frontend/mame/ui/viewgfx.cpp:1135
 #, c-format
 msgctxt "gfxview"
 msgid "[root%1$s] %2$d/%3$d"
 msgstr ""
 
-#: src/frontend/mame/ui/viewgfx.cpp:1157
+#: src/frontend/mame/ui/viewgfx.cpp:1158
 #, c-format
 msgctxt "gfxview"
 msgid " #%1$X:%2$X (%3$d %4$d) = %5$X"
 msgstr ""
 
-#: src/frontend/mame/ui/viewgfx.cpp:1165
+#: src/frontend/mame/ui/viewgfx.cpp:1166
 #, c-format
 msgctxt "gfxview"
 msgid " %1$d×%2$d color %3$X/%4$X"
-msgstr ""
+msgstr " %1$d×%2$d 色 %3$X/%4$X"
 
-#: src/frontend/mame/ui/viewgfx.cpp:1305
+#: src/frontend/mame/ui/viewgfx.cpp:1306
 #, c-format
 msgctxt "gfxview"
 msgid "Tilemap %1$d/%2$d category %3$u"
-msgstr ""
+msgstr "タイルマップ %1$d/%2$d カテゴリ %3$u"
 
-#: src/frontend/mame/ui/viewgfx.cpp:1305
+#: src/frontend/mame/ui/viewgfx.cpp:1306
 #, c-format
 msgctxt "gfxview"
 msgid "Tilemap %1$d/%2$d "
-msgstr ""
+msgstr "タイルマップ %1$d/%2$d "
 
-#: src/frontend/mame/ui/viewgfx.cpp:1327
+#: src/frontend/mame/ui/viewgfx.cpp:1328
 #, c-format
 msgctxt "gfxview"
 msgid " (%1$u %2$u) = GFX%3$u #%4$X:%5$X"
 msgstr ""
 
-#: src/frontend/mame/ui/viewgfx.cpp:1334
+#: src/frontend/mame/ui/viewgfx.cpp:1335
 #, c-format
 msgctxt "gfxview"
 msgid " %1$d×%2$d origin (%3$d %4$d)"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:442
+#: src/frontend/mame/ui/selgame.cpp:463
 msgid "System Settings"
-msgstr ""
+msgstr "システム設定"
 
-#: src/frontend/mame/ui/selgame.cpp:1058
+#: src/frontend/mame/ui/selgame.cpp:1076
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d systems (%5$d BIOS) )"
 msgstr "%1$s %2$s ( %3$d / %4$d システム (%5$d BIOS) )"
 
-#: src/frontend/mame/ui/selgame.cpp:1086
+#: src/frontend/mame/ui/selgame.cpp:1104
 #, c-format
 msgid "System: %1$-.100s"
 msgstr "システム：%1$-.100s"
@@ -2436,41 +2461,43 @@ msgstr "システム：%1$-.100s"
 #, c-format
 msgctxt "menu-selector"
 msgid "%1$s - Search: %2$s_"
-msgstr "%1$s　〜　検索：%2$s_"
+msgstr "%1$s - 検索：%2$s_"
 
 #: src/frontend/mame/ui/selector.cpp:110
 msgctxt "menu-selector"
 msgid "[no matches]"
-msgstr ""
+msgstr "［不一致］"
 
 #: src/frontend/mame/ui/selector.cpp:123
 msgctxt "menu-selector"
 msgid "[no choices]"
-msgstr ""
+msgstr "［未選択］"
 
-#: src/frontend/mame/ui/selector.cpp:138
+#: src/frontend/mame/ui/selector.cpp:148
 #, c-format
 msgctxt "menu-selector"
 msgid "Double-click or press %1$s to select"
 msgstr "%1$sを押すかダブルクリックで選択してください"
 
-#: src/frontend/mame/ui/auditmenu.cpp:59
+#: src/frontend/mame/ui/auditmenu.cpp:60
 msgid "Audit Media"
-msgstr ""
+msgstr "メディアの検査"
 
-#: src/frontend/mame/ui/auditmenu.cpp:63
+#: src/frontend/mame/ui/auditmenu.cpp:64
 #, c-format
 msgid "Results will be saved to %1$s"
 msgstr "結果は%1$sに保存されます"
 
-#: src/frontend/mame/ui/auditmenu.cpp:101
+#: src/frontend/mame/ui/auditmenu.cpp:110
 #, c-format
 msgid ""
 "Auditing media for system %2$u of %3$u...\n"
 "%1$s"
 msgstr ""
+"システム %2$u／%3$u のメディアを検査中...\n"
+"%1$s"
 
-#: src/frontend/mame/ui/auditmenu.cpp:119
+#: src/frontend/mame/ui/auditmenu.cpp:128
 #, c-format
 msgid ""
 "Cancel audit?\n"
@@ -2478,21 +2505,25 @@ msgid ""
 "Press %1$s to cancel\n"
 "Press %2$s to continue"
 msgstr ""
+"検査を中止しますか？\n"
+"\n"
+"%1$s で中止\n"
+"%2$s で継続"
 
-#: src/frontend/mame/ui/auditmenu.cpp:139
+#: src/frontend/mame/ui/auditmenu.cpp:148
 #, c-format
 msgid "Audit media for %1$u systems marked unavailable"
-msgstr ""
+msgstr "存在しないに分類された%1$uシステムのメディアを検査します"
 
-#: src/frontend/mame/ui/auditmenu.cpp:140
+#: src/frontend/mame/ui/auditmenu.cpp:149
 #, c-format
 msgid "Audit media for all %1$u systems"
-msgstr ""
+msgstr "全%1$uシステムのメディアを検査します"
 
-#: src/frontend/mame/ui/auditmenu.cpp:157
+#: src/frontend/mame/ui/auditmenu.cpp:165
 #, c-format
 msgid "Press %1$s to cancel\n"
-msgstr ""
+msgstr "%1$s で中止\n"
 
 #: src/frontend/mame/ui/custui.cpp:54
 msgid "Show All"
@@ -2510,267 +2541,267 @@ msgstr "情報・画像を非表示にする"
 msgid "Hide Both"
 msgstr "両方を非表示にする"
 
-#: src/frontend/mame/ui/custui.cpp:143
+#: src/frontend/mame/ui/custui.cpp:144
 msgid "UI Language"
-msgstr ""
+msgstr "UI言語"
 
-#: src/frontend/mame/ui/custui.cpp:168 src/frontend/mame/ui/custui.cpp:221
+#: src/frontend/mame/ui/custui.cpp:169 src/frontend/mame/ui/custui.cpp:222
 msgid "System Names"
-msgstr ""
+msgstr "システム名"
 
-#: src/frontend/mame/ui/custui.cpp:194 src/frontend/mame/ui/custui.cpp:224
+#: src/frontend/mame/ui/custui.cpp:195 src/frontend/mame/ui/custui.cpp:225
 msgid "Show Side Panels"
 msgstr "サイドパネルを表示"
 
-#: src/frontend/mame/ui/custui.cpp:214
+#: src/frontend/mame/ui/custui.cpp:215
 msgid "Fonts"
 msgstr "フォント"
 
-#: src/frontend/mame/ui/custui.cpp:215
+#: src/frontend/mame/ui/custui.cpp:216
 msgid "Colors"
 msgstr "色"
 
-#: src/frontend/mame/ui/custui.cpp:218
+#: src/frontend/mame/ui/custui.cpp:219
 msgid "Language"
 msgstr "言語"
 
-#: src/frontend/mame/ui/custui.cpp:235 src/frontend/mame/ui/custui.cpp:279
+#: src/frontend/mame/ui/custui.cpp:236 src/frontend/mame/ui/custui.cpp:280
 msgid "[built-in]"
-msgstr ""
+msgstr "［組み込み］"
 
-#: src/frontend/mame/ui/custui.cpp:335
+#: src/frontend/mame/ui/custui.cpp:337
 msgid "UI Fonts"
 msgstr "UIフォント"
 
-#: src/frontend/mame/ui/custui.cpp:364
+#: src/frontend/mame/ui/custui.cpp:366
 msgid "default"
 msgstr "デフォルト"
 
-#: src/frontend/mame/ui/custui.cpp:459 src/frontend/mame/ui/custui.cpp:499
+#: src/frontend/mame/ui/custui.cpp:465 src/frontend/mame/ui/custui.cpp:507
 msgid "UI Font"
 msgstr "UIフォント"
 
-#: src/frontend/mame/ui/custui.cpp:504
+#: src/frontend/mame/ui/custui.cpp:512
 msgid "Bold"
 msgstr "太字"
 
-#: src/frontend/mame/ui/custui.cpp:505
+#: src/frontend/mame/ui/custui.cpp:513
 msgid "Italic"
 msgstr "イタリック"
 
-#: src/frontend/mame/ui/custui.cpp:510
+#: src/frontend/mame/ui/custui.cpp:518
 msgid "Lines"
 msgstr "行数"
 
-#: src/frontend/mame/ui/custui.cpp:515
+#: src/frontend/mame/ui/custui.cpp:523
 msgid "Infos text size"
 msgstr "情報のテキストサイズ"
 
-#: src/frontend/mame/ui/custui.cpp:530
+#: src/frontend/mame/ui/custui.cpp:547
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 msgstr ""
 "サンプルテキスト - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 
-#: src/frontend/mame/ui/custui.cpp:546
+#: src/frontend/mame/ui/custui.cpp:563
 msgid "UI Colors"
 msgstr "UIの色"
 
-#: src/frontend/mame/ui/custui.cpp:609
+#: src/frontend/mame/ui/custui.cpp:626
 msgctxt "color-option"
 msgid "Normal text"
 msgstr "通常のテキスト"
 
-#: src/frontend/mame/ui/custui.cpp:610
+#: src/frontend/mame/ui/custui.cpp:627
 msgctxt "color-option"
 msgid "Selected color"
 msgstr "選択色"
 
-#: src/frontend/mame/ui/custui.cpp:611
+#: src/frontend/mame/ui/custui.cpp:628
 msgctxt "color-option"
 msgid "Normal text background"
 msgstr "通常テキストの背景"
 
-#: src/frontend/mame/ui/custui.cpp:612
+#: src/frontend/mame/ui/custui.cpp:629
 msgctxt "color-option"
 msgid "Selected background color"
 msgstr "選択済テキストの背景"
 
-#: src/frontend/mame/ui/custui.cpp:613
+#: src/frontend/mame/ui/custui.cpp:630
 msgctxt "color-option"
 msgid "Subitem color"
 msgstr "サブ項目の色"
 
-#: src/frontend/mame/ui/custui.cpp:614
+#: src/frontend/mame/ui/custui.cpp:631
 msgctxt "color-option"
 msgid "Clone"
 msgstr "クローン"
 
-#: src/frontend/mame/ui/custui.cpp:615
+#: src/frontend/mame/ui/custui.cpp:632
 msgctxt "color-option"
 msgid "Border"
 msgstr "枠線"
 
-#: src/frontend/mame/ui/custui.cpp:616
+#: src/frontend/mame/ui/custui.cpp:633
 msgctxt "color-option"
 msgid "Background"
 msgstr "背景"
 
-#: src/frontend/mame/ui/custui.cpp:617
+#: src/frontend/mame/ui/custui.cpp:634
 msgctxt "color-option"
 msgid "DIP switch"
 msgstr "DIPスイッチ"
 
-#: src/frontend/mame/ui/custui.cpp:618
+#: src/frontend/mame/ui/custui.cpp:635
 msgctxt "color-option"
 msgid "Unavailable color"
 msgstr "動作不可の色"
 
-#: src/frontend/mame/ui/custui.cpp:619
+#: src/frontend/mame/ui/custui.cpp:636
 msgctxt "color-option"
 msgid "Slider color"
 msgstr "スライダの色"
 
-#: src/frontend/mame/ui/custui.cpp:620
+#: src/frontend/mame/ui/custui.cpp:637
 msgctxt "color-option"
 msgid "Graphics viewer background"
 msgstr "グラフィックビューアの背景"
 
-#: src/frontend/mame/ui/custui.cpp:621
+#: src/frontend/mame/ui/custui.cpp:638
 msgctxt "color-option"
 msgid "Mouse over color"
 msgstr "マウスオーバー時の色"
 
-#: src/frontend/mame/ui/custui.cpp:622
+#: src/frontend/mame/ui/custui.cpp:639
 msgctxt "color-option"
 msgid "Mouse over background color"
 msgstr "マウスオーバー時の背景色"
 
-#: src/frontend/mame/ui/custui.cpp:623
+#: src/frontend/mame/ui/custui.cpp:640
 msgctxt "color-option"
 msgid "Mouse down color"
 msgstr "マウスダウン時の色"
 
-#: src/frontend/mame/ui/custui.cpp:624
+#: src/frontend/mame/ui/custui.cpp:641
 msgctxt "color-option"
 msgid "Mouse down background color"
 msgstr "マウスダウン時の背景色"
 
-#: src/frontend/mame/ui/custui.cpp:628
+#: src/frontend/mame/ui/custui.cpp:645
 msgid "Restore default colors"
 msgstr "元の色に戻す"
 
-#: src/frontend/mame/ui/custui.cpp:640
+#: src/frontend/mame/ui/custui.cpp:666
 #, c-format
 msgid "Double-click or press %1$s to change color"
 msgstr "色を変更するには%1$sを押すかダブルクリックしてください"
 
-#: src/frontend/mame/ui/custui.cpp:648
+#: src/frontend/mame/ui/custui.cpp:674
 msgid "Menu Preview"
 msgstr "メニューのプレビュー"
 
-#: src/frontend/mame/ui/custui.cpp:662
+#: src/frontend/mame/ui/custui.cpp:681
 msgctxt "color-sample"
 msgid "Normal"
 msgstr "通常項目"
 
-#: src/frontend/mame/ui/custui.cpp:663
+#: src/frontend/mame/ui/custui.cpp:682
 msgctxt "color-sample"
 msgid "Subitem"
 msgstr "サブ項目"
 
-#: src/frontend/mame/ui/custui.cpp:664
+#: src/frontend/mame/ui/custui.cpp:683
 msgctxt "color-sample"
 msgid "Selected"
 msgstr "選択済の項目"
 
-#: src/frontend/mame/ui/custui.cpp:665
+#: src/frontend/mame/ui/custui.cpp:684
 msgctxt "color-sample"
 msgid "Mouse Over"
 msgstr "マウスオーバー"
 
-#: src/frontend/mame/ui/custui.cpp:666
+#: src/frontend/mame/ui/custui.cpp:685
 msgctxt "color-sample"
 msgid "Clone"
 msgstr "クローン"
 
-#: src/frontend/mame/ui/custui.cpp:881
+#: src/frontend/mame/ui/custui.cpp:901
 msgid "ARGB Settings"
 msgstr "ARGB設定"
 
-#: src/frontend/mame/ui/custui.cpp:886 src/frontend/mame/ui/custui.cpp:889
+#: src/frontend/mame/ui/custui.cpp:906 src/frontend/mame/ui/custui.cpp:909
 msgctxt "color-channel"
 msgid "Alpha"
 msgstr "アルファ"
 
-#: src/frontend/mame/ui/custui.cpp:894 src/frontend/mame/ui/custui.cpp:897
+#: src/frontend/mame/ui/custui.cpp:914 src/frontend/mame/ui/custui.cpp:917
 msgctxt "color-channel"
 msgid "Red"
 msgstr "赤"
 
-#: src/frontend/mame/ui/custui.cpp:902 src/frontend/mame/ui/custui.cpp:905
+#: src/frontend/mame/ui/custui.cpp:922 src/frontend/mame/ui/custui.cpp:925
 msgctxt "color-channel"
 msgid "Green"
 msgstr "緑"
 
-#: src/frontend/mame/ui/custui.cpp:910 src/frontend/mame/ui/custui.cpp:913
+#: src/frontend/mame/ui/custui.cpp:930 src/frontend/mame/ui/custui.cpp:933
 msgctxt "color-channel"
 msgid "Blue"
 msgstr "青"
 
-#: src/frontend/mame/ui/custui.cpp:916
+#: src/frontend/mame/ui/custui.cpp:936
 msgid "Choose from palette"
 msgstr "パレットから選ぶ"
 
-#: src/frontend/mame/ui/custui.cpp:931
+#: src/frontend/mame/ui/custui.cpp:959
 msgid "Color preview:"
 msgstr "色のプレビュー："
 
-#: src/frontend/mame/ui/custui.cpp:1029
+#: src/frontend/mame/ui/custui.cpp:1052
 msgctxt "color-preset"
 msgid "White"
 msgstr "白"
 
-#: src/frontend/mame/ui/custui.cpp:1030
+#: src/frontend/mame/ui/custui.cpp:1053
 msgctxt "color-preset"
 msgid "Silver"
 msgstr "銀色"
 
-#: src/frontend/mame/ui/custui.cpp:1031
+#: src/frontend/mame/ui/custui.cpp:1054
 msgctxt "color-preset"
 msgid "Gray"
 msgstr "灰色"
 
-#: src/frontend/mame/ui/custui.cpp:1032
+#: src/frontend/mame/ui/custui.cpp:1055
 msgctxt "color-preset"
 msgid "Black"
 msgstr "黒"
 
-#: src/frontend/mame/ui/custui.cpp:1033
+#: src/frontend/mame/ui/custui.cpp:1056
 msgctxt "color-preset"
 msgid "Red"
 msgstr "赤"
 
-#: src/frontend/mame/ui/custui.cpp:1034
+#: src/frontend/mame/ui/custui.cpp:1057
 msgctxt "color-preset"
 msgid "Orange"
 msgstr "オレンジ"
 
-#: src/frontend/mame/ui/custui.cpp:1035
+#: src/frontend/mame/ui/custui.cpp:1058
 msgctxt "color-preset"
 msgid "Yellow"
 msgstr "黄"
 
-#: src/frontend/mame/ui/custui.cpp:1036
+#: src/frontend/mame/ui/custui.cpp:1059
 msgctxt "color-preset"
 msgid "Green"
 msgstr "緑"
 
-#: src/frontend/mame/ui/custui.cpp:1037
+#: src/frontend/mame/ui/custui.cpp:1060
 msgctxt "color-preset"
 msgid "Blue"
 msgstr "青"
 
-#: src/frontend/mame/ui/custui.cpp:1038
+#: src/frontend/mame/ui/custui.cpp:1061
 msgctxt "color-preset"
 msgid "Violet"
 msgstr "紫"
@@ -2779,7 +2810,7 @@ msgstr "紫"
 #, c-format
 msgctxt "about-header"
 msgid "%1$s %2$s (%3$s%4$sP%5$s, debug)"
-msgstr ""
+msgstr "%1$s %2$s (%3$s%4$sP%5$s, デバッグ)"
 
 #: src/frontend/mame/ui/about.cpp:44
 #, c-format
@@ -2793,38 +2824,70 @@ msgctxt "about-header"
 msgid "Revision: %1$s"
 msgstr "リビジョン：%1$s"
 
-#: src/frontend/mame/ui/analogipt.cpp:60
+#: src/frontend/mame/ui/analogipt.cpp:27
+#, c-format
+msgctxt "menu-analoginput"
+msgid ""
+"Show/hide settings  \t\t%1$s\n"
+"Decrease value  \t\t%2$s\n"
+"Increase value  \t\t%3$s\n"
+"Restore default value  \t\t%4$s\n"
+"Previous device  \t\t%5$s\n"
+"Next device  \t\t%6$s\n"
+"Return to previous menu  \t\t%7$s"
+msgstr ""
+"設定の表示／非表示  \t\t%1$s\n"
+"値の減少  \t\t%2$s\n"
+"値の増加  \t\t%3$s\n"
+"初期値に戻す  \t\t%4$s\n"
+"前のデバイス  \t\t%5$s\n"
+"次のデバイス  \t\t%6$s\n"
+"前のメニューに戻る  \t\t%7$s"
+
+#: src/frontend/mame/ui/analogipt.cpp:82
+msgctxt "menu-analoginput"
 msgid "Analog Input Adjustments"
-msgstr ""
+msgstr "アナログ入力調整"
 
-#: src/frontend/mame/ui/analogipt.cpp:92
+#: src/frontend/mame/ui/analogipt.cpp:121
 #, c-format
-msgid "Press %s to show menu"
-msgstr ""
+msgctxt "menu-analoginput"
+msgid "Press %s to show settings"
+msgstr "%s で設定を表示"
 
-#: src/frontend/mame/ui/analogipt.cpp:372
+#: src/frontend/mame/ui/analogipt.cpp:245
+msgctxt "menu-analoginput"
+msgid "Analog Input Adjustments Help"
+msgstr "アナログ入力調整のヘルプ"
+
+#: src/frontend/mame/ui/analogipt.cpp:421
 #, c-format
+msgctxt "menu-analoginput"
 msgid "%1$s Increment/Decrement Speed"
-msgstr ""
+msgstr "%1$s 増加／減少 速度"
 
-#: src/frontend/mame/ui/analogipt.cpp:377
+#: src/frontend/mame/ui/analogipt.cpp:426
 #, c-format
+msgctxt "menu-analoginput"
 msgid "%1$s Auto-centering Speed"
-msgstr ""
+msgstr "%1$s 自動センタリング 速度"
 
-#: src/frontend/mame/ui/analogipt.cpp:382
+#: src/frontend/mame/ui/analogipt.cpp:431
 #, c-format
+msgctxt "menu-analoginput"
 msgid "%1$s Reverse"
-msgstr ""
+msgstr "%1$s 反転"
 
-#: src/frontend/mame/ui/analogipt.cpp:387
+#: src/frontend/mame/ui/analogipt.cpp:436
 #, c-format
+msgctxt "menu-analoginput"
 msgid "%1$s Sensitivity"
-msgstr ""
+msgstr "%1$s 感度"
 
-#: src/frontend/mame/ui/analogipt.cpp:402
+#: src/frontend/mame/ui/analogipt.cpp:451
+msgctxt "menu-analoginput"
 msgid "[no analog inputs are enabled]"
-msgstr ""
+msgstr "［アナログ入力がありません］"
 
 #: src/frontend/mame/ui/barcode.cpp:40
 msgid "Barcode Reader"
@@ -2870,12 +2933,12 @@ msgstr "システム情報"
 #: src/frontend/mame/ui/mainmenu.cpp:127
 msgctxt "menu-main"
 msgid "Warning Information"
-msgstr ""
+msgstr "警告情報"
 
 #: src/frontend/mame/ui/mainmenu.cpp:133
 msgctxt "menu-main"
 msgid "Media Image Information"
-msgstr ""
+msgstr "メディアイメージ情報"
 
 #: src/frontend/mame/ui/mainmenu.cpp:135
 msgctxt "menu-main"
@@ -2956,12 +3019,12 @@ msgstr "お気に入りから削除"
 #, c-format
 msgctxt "menu-main"
 msgid "About %1$s"
-msgstr ""
+msgstr "%1$s について"
 
 #: src/frontend/mame/ui/mainmenu.cpp:195
 msgctxt "menu-main"
 msgid "Start System"
-msgstr ""
+msgstr "システムを開始"
 
 #: src/frontend/mame/ui/mainmenu.cpp:199
 msgctxt "menu-main"
@@ -2971,510 +3034,518 @@ msgstr "新しいシステムを選択"
 #: src/frontend/mame/ui/mainmenu.cpp:200
 msgctxt "menu-main"
 msgid "Close Menu"
-msgstr ""
+msgstr "メニューを閉じる"
 
-#: src/frontend/mame/ui/selmenu.cpp:77
+#: src/frontend/mame/ui/selmenu.cpp:55
+msgid "Images"
+msgstr "画像"
+
+#: src/frontend/mame/ui/selmenu.cpp:56
+msgid "Info"
+msgstr "情報"
+
+#: src/frontend/mame/ui/selmenu.cpp:83
 msgctxt "selmenu-artwork"
 msgid "Snapshots"
 msgstr "スクリーンショット"
 
-#: src/frontend/mame/ui/selmenu.cpp:78
+#: src/frontend/mame/ui/selmenu.cpp:84
 msgctxt "selmenu-artwork"
 msgid "Cabinet"
 msgstr "筐体画像"
 
-#: src/frontend/mame/ui/selmenu.cpp:79
+#: src/frontend/mame/ui/selmenu.cpp:85
 msgctxt "selmenu-artwork"
 msgid "Control Panel"
 msgstr "操作パネル画像"
 
-#: src/frontend/mame/ui/selmenu.cpp:80
+#: src/frontend/mame/ui/selmenu.cpp:86
 msgctxt "selmenu-artwork"
 msgid "PCB"
 msgstr "基板画像"
 
-#: src/frontend/mame/ui/selmenu.cpp:81
+#: src/frontend/mame/ui/selmenu.cpp:87
 msgctxt "selmenu-artwork"
 msgid "Flyer"
 msgstr "フライヤー画像"
 
-#: src/frontend/mame/ui/selmenu.cpp:82
+#: src/frontend/mame/ui/selmenu.cpp:88
 msgctxt "selmenu-artwork"
 msgid "Title Screen"
 msgstr "タイトル画像"
 
-#: src/frontend/mame/ui/selmenu.cpp:83
+#: src/frontend/mame/ui/selmenu.cpp:89
 msgctxt "selmenu-artwork"
 msgid "Ending"
-msgstr ""
+msgstr "エンディング画像"
 
-#: src/frontend/mame/ui/selmenu.cpp:84
+#: src/frontend/mame/ui/selmenu.cpp:90
 msgctxt "selmenu-artwork"
 msgid "Artwork Preview"
 msgstr "アートワークのプレビュー"
 
-#: src/frontend/mame/ui/selmenu.cpp:85
+#: src/frontend/mame/ui/selmenu.cpp:91
 msgctxt "selmenu-artwork"
 msgid "Bosses"
 msgstr "ボス画像"
 
-#: src/frontend/mame/ui/selmenu.cpp:86
+#: src/frontend/mame/ui/selmenu.cpp:92
 msgctxt "selmenu-artwork"
 msgid "Logo"
 msgstr "ロゴ"
 
-#: src/frontend/mame/ui/selmenu.cpp:87
+#: src/frontend/mame/ui/selmenu.cpp:93
 msgctxt "selmenu-artwork"
 msgid "Versus"
 msgstr "バーサス"
 
-#: src/frontend/mame/ui/selmenu.cpp:88
+#: src/frontend/mame/ui/selmenu.cpp:94
 msgctxt "selmenu-artwork"
 msgid "Game Over"
 msgstr "ゲームオーバー"
 
-#: src/frontend/mame/ui/selmenu.cpp:89
+#: src/frontend/mame/ui/selmenu.cpp:95
 msgctxt "selmenu-artwork"
 msgid "HowTo"
 msgstr "HOWTO"
 
-#: src/frontend/mame/ui/selmenu.cpp:90
+#: src/frontend/mame/ui/selmenu.cpp:96
 msgctxt "selmenu-artwork"
 msgid "Scores"
 msgstr "スコア"
 
-#: src/frontend/mame/ui/selmenu.cpp:91
+#: src/frontend/mame/ui/selmenu.cpp:97
 msgctxt "selmenu-artwork"
 msgid "Select"
-msgstr ""
+msgstr "選択画像"
 
-#: src/frontend/mame/ui/selmenu.cpp:92
+#: src/frontend/mame/ui/selmenu.cpp:98
 msgctxt "selmenu-artwork"
 msgid "Marquee"
 msgstr "マーキー画像"
 
-#: src/frontend/mame/ui/selmenu.cpp:93
+#: src/frontend/mame/ui/selmenu.cpp:99
 msgctxt "selmenu-artwork"
 msgid "Covers"
 msgstr "カバー"
 
-#: src/frontend/mame/ui/selmenu.cpp:97
+#: src/frontend/mame/ui/selmenu.cpp:103
 msgid "Add or remove favorite"
 msgstr "お気に入りに追加または削除"
 
-#: src/frontend/mame/ui/selmenu.cpp:98
+#: src/frontend/mame/ui/selmenu.cpp:104
 msgid "Export displayed list to file"
 msgstr "表示されているリストをファイルに出力"
 
-#: src/frontend/mame/ui/selmenu.cpp:99
+#: src/frontend/mame/ui/selmenu.cpp:105
 msgid "Audit media"
-msgstr ""
+msgstr "メディアを検査"
 
-#: src/frontend/mame/ui/selmenu.cpp:100
+#: src/frontend/mame/ui/selmenu.cpp:106
 msgid "Show DATs view"
 msgstr "DATビューを表示"
 
-#: src/frontend/mame/ui/selmenu.cpp:260
+#: src/frontend/mame/ui/selmenu.cpp:268
 msgid "Select Software Package Part"
-msgstr ""
+msgstr "ソフトウェアパッケージを選択"
 
-#: src/frontend/mame/ui/selmenu.cpp:330
+#: src/frontend/mame/ui/selmenu.cpp:338
 msgid "Select System BIOS"
-msgstr ""
+msgstr "システムBIOSを選択"
 
-#: src/frontend/mame/ui/selmenu.cpp:644 src/frontend/mame/ui/selmenu.cpp:675
+#: src/frontend/mame/ui/selmenu.cpp:689 src/frontend/mame/ui/selmenu.cpp:720
 #, c-format
 msgid "%1$s, %2$s"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:648
+#: src/frontend/mame/ui/selmenu.cpp:693
 #, c-format
 msgid "Software is clone of: %1$s"
 msgstr "次のクローンのソフトウェア：%1$s"
 
-#: src/frontend/mame/ui/selmenu.cpp:650
+#: src/frontend/mame/ui/selmenu.cpp:695
 msgid "Software is parent"
 msgstr "親セットのソフトウェア"
 
-#: src/frontend/mame/ui/selmenu.cpp:655
+#: src/frontend/mame/ui/selmenu.cpp:700
 msgid "Supported: No"
 msgstr "対応状況：いいえ"
 
-#: src/frontend/mame/ui/selmenu.cpp:660
+#: src/frontend/mame/ui/selmenu.cpp:705
 msgid "Supported: Partial"
 msgstr "対応状況：部分的"
 
-#: src/frontend/mame/ui/selmenu.cpp:665
+#: src/frontend/mame/ui/selmenu.cpp:710
 msgid "Supported: Yes"
 msgstr "対応状況：はい"
 
-#: src/frontend/mame/ui/selmenu.cpp:681
+#: src/frontend/mame/ui/selmenu.cpp:726
 msgid "System is parent"
 msgstr "親セットのシステム"
 
-#: src/frontend/mame/ui/selmenu.cpp:683 src/frontend/mame/ui/selmenu.cpp:685
+#: src/frontend/mame/ui/selmenu.cpp:728 src/frontend/mame/ui/selmenu.cpp:730
 #, c-format
 msgid "System is clone of: %1$s"
 msgstr "次のクローンのシステム：%1$s"
 
-#: src/frontend/mame/ui/selmenu.cpp:721
+#: src/frontend/mame/ui/selmenu.cpp:766
 #, c-format
 msgid "%1$s %2$s"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2222
-msgid "Images"
-msgstr "画像"
-
-#: src/frontend/mame/ui/selmenu.cpp:2223
-msgid "Infos"
-msgstr "情報"
-
-#: src/frontend/mame/ui/selmenu.cpp:2538
+#: src/frontend/mame/ui/selmenu.cpp:2611
 msgid ""
 "Required ROM/disk images for the selected system are missing or incorrect. "
 "Please acquire the correct files or select a different system.\n"
 "\n"
 msgstr ""
+"選択したシステムに必要なROM／ディスクイメージが不足しているか正しくありませ"
+"ん。 正しいファイルを取得するか、別のシステムを選択してください。\n"
+"\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2554
+#: src/frontend/mame/ui/selmenu.cpp:2627
 msgid ""
 "Required ROM/disk images for the selected software are missing or incorrect. "
 "Please acquire the correct files or select a different software item.\n"
 "\n"
 msgstr ""
+"選択したソフトウェアに必要なROM／ディスクイメージが不足しているか正しくありま"
+"せん。 正しいファイルを取得するか、別のソフトウェアを選択してください。\n"
+"\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2570
+#: src/frontend/mame/ui/selmenu.cpp:2643
 msgid "incorrect checksum"
-msgstr ""
+msgstr "チェックサムが正しくありません"
 
-#: src/frontend/mame/ui/selmenu.cpp:2573
+#: src/frontend/mame/ui/selmenu.cpp:2646
 msgid "incorrect length"
-msgstr ""
+msgstr "長さが正しくありません"
 
-#: src/frontend/mame/ui/selmenu.cpp:2576
+#: src/frontend/mame/ui/selmenu.cpp:2649
 msgid "not found"
-msgstr ""
+msgstr "見つかりません"
 
-#: src/frontend/mame/ui/selmenu.cpp:2587
+#: src/frontend/mame/ui/selmenu.cpp:2660
 #, c-format
 msgid "%1$s (%2$s) - %3$s\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2589
+#: src/frontend/mame/ui/selmenu.cpp:2662
 #, c-format
 msgid "%1$s - %2$s\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2593
+#: src/frontend/mame/ui/selmenu.cpp:2666
 msgid "Press any key to continue."
 msgstr "進めるには、何かキーを押してください。"
 
-#: src/frontend/mame/ui/selmenu.cpp:2722
+#: src/frontend/mame/ui/selmenu.cpp:2789
 msgid "General Info"
 msgstr "一般情報"
 
-#: src/frontend/mame/ui/selmenu.cpp:2874
+#: src/frontend/mame/ui/selmenu.cpp:2935
 #, c-format
 msgid "Short Name\t%1$s\n"
-msgstr ""
+msgstr "短い名前\t%1$s\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2875
+#: src/frontend/mame/ui/selmenu.cpp:2936
 #, c-format
 msgid "Year\t%1$s\n"
 msgstr "年度\t%1$s\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2876
+#: src/frontend/mame/ui/selmenu.cpp:2937
 #, c-format
 msgid "Manufacturer\t%1$s\n"
 msgstr "製造元\t%1$s\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2883
+#: src/frontend/mame/ui/selmenu.cpp:2944
 #, c-format
 msgid "System is Clone of\t%1$s\n"
 msgstr "次のクローンのシステム\t%1$s\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2888
+#: src/frontend/mame/ui/selmenu.cpp:2949
 msgid "System is Parent\t\n"
 msgstr "親セットのシステム\t\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2892
+#: src/frontend/mame/ui/selmenu.cpp:2953
 msgid "Analog Controls\tYes\n"
 msgstr "アナログコントロール\tはい\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2894
+#: src/frontend/mame/ui/selmenu.cpp:2955
 msgid "Keyboard Inputs\tYes\n"
 msgstr "キーボード入力\tはい\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2897
+#: src/frontend/mame/ui/selmenu.cpp:2958
 msgid "Overall\tNOT WORKING\n"
 msgstr "概略\t動作不可\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2899
+#: src/frontend/mame/ui/selmenu.cpp:2960
 msgid "Overall\tUnemulated Protection\n"
 msgstr "概略\tプロテクトが未エミュレート\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2901
+#: src/frontend/mame/ui/selmenu.cpp:2962
 msgid "Overall\tWorking\n"
 msgstr "概略\t動作可\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2904
+#: src/frontend/mame/ui/selmenu.cpp:2965
 msgid "Graphics\tUnimplemented\n"
 msgstr "グラフィック\t未実装\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2906
+#: src/frontend/mame/ui/selmenu.cpp:2967
 msgid "Graphics\tWrong Colors\n"
 msgstr "グラフィック\t色の誤り\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2908
+#: src/frontend/mame/ui/selmenu.cpp:2969
 msgid "Graphics\tImperfect Colors\n"
 msgstr "グラフィック\t色が不完全\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2910
+#: src/frontend/mame/ui/selmenu.cpp:2971
 msgid "Graphics\tImperfect\n"
 msgstr "グラフィック\t不完全\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2912
+#: src/frontend/mame/ui/selmenu.cpp:2973
 msgid "Graphics\tOK\n"
 msgstr "グラフィック\t正常\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2915
+#: src/frontend/mame/ui/selmenu.cpp:2976
 msgid "Sound\tNone\n"
 msgstr "グラフィック\tなし\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2917
+#: src/frontend/mame/ui/selmenu.cpp:2978
 msgid "Sound\tUnimplemented\n"
 msgstr "サウンド\t未実装\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2919
+#: src/frontend/mame/ui/selmenu.cpp:2980
 msgid "Sound\tImperfect\n"
 msgstr "サウンド\t不完全\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2921
+#: src/frontend/mame/ui/selmenu.cpp:2982
 msgid "Sound\tOK\n"
 msgstr "サウンド\t正常\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2924
+#: src/frontend/mame/ui/selmenu.cpp:2985
 msgid "Capture\tUnimplemented\n"
-msgstr ""
+msgstr "キャプチャ\t未実装\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2926
+#: src/frontend/mame/ui/selmenu.cpp:2987
 msgid "Capture\tImperfect\n"
-msgstr ""
+msgstr "キャプチャ\t不完全\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2929
+#: src/frontend/mame/ui/selmenu.cpp:2990
 msgid "Camera\tUnimplemented\n"
 msgstr "カメラ\t未実装\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2931
+#: src/frontend/mame/ui/selmenu.cpp:2992
 msgid "Camera\tImperfect\n"
 msgstr "カメラ\t不完全\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2934
+#: src/frontend/mame/ui/selmenu.cpp:2995
 msgid "Microphone\tUnimplemented\n"
 msgstr "マクロフォン\t未実装\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2936
+#: src/frontend/mame/ui/selmenu.cpp:2997
 msgid "Microphone\tImperfect\n"
 msgstr "マクロフォン\t不完全\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2939
+#: src/frontend/mame/ui/selmenu.cpp:3000
 msgid "Controls\tUnimplemented\n"
 msgstr "コントロール\t未実装\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2941
+#: src/frontend/mame/ui/selmenu.cpp:3002
 msgid "Controls\tImperfect\n"
 msgstr "コントロール\t不完全\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2944
+#: src/frontend/mame/ui/selmenu.cpp:3005
 msgid "Keyboard\tUnimplemented\n"
 msgstr "キーボード\t未実装\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2946
+#: src/frontend/mame/ui/selmenu.cpp:3007
 msgid "Keyboard\tImperfect\n"
 msgstr "キーボード\t不完全\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2949
+#: src/frontend/mame/ui/selmenu.cpp:3010
 msgid "Mouse\tUnimplemented\n"
 msgstr "マウス\t未実装\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2951
+#: src/frontend/mame/ui/selmenu.cpp:3012
 msgid "Mouse\tImperfect\n"
 msgstr "マウス\t不完全\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2954
+#: src/frontend/mame/ui/selmenu.cpp:3015
 msgid "Media\tUnimplemented\n"
-msgstr ""
+msgstr "メディア\t未実装\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2956
+#: src/frontend/mame/ui/selmenu.cpp:3017
 msgid "Media\tImperfect\n"
-msgstr ""
+msgstr "メディア\t不完全\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2959
+#: src/frontend/mame/ui/selmenu.cpp:3020
 msgid "Disk\tUnimplemented\n"
 msgstr "ディスク\t未実装\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2961
+#: src/frontend/mame/ui/selmenu.cpp:3022
 msgid "Disk\tImperfect\n"
 msgstr "ディスク\t不完全\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2964
+#: src/frontend/mame/ui/selmenu.cpp:3025
 msgid "Printer\tUnimplemented\n"
 msgstr "プリンター\t未実装\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2966
+#: src/frontend/mame/ui/selmenu.cpp:3027
 msgid "Printer\tImperfect\n"
 msgstr "プリンター\t不完全\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2969
+#: src/frontend/mame/ui/selmenu.cpp:3030
 msgid "Mag. Tape\tUnimplemented\n"
 msgstr "磁気テープ\t未実装\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2971
+#: src/frontend/mame/ui/selmenu.cpp:3032
 msgid "Mag. Tape\tImperfect\n"
 msgstr "磁気テープ\t不完全\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2974
+#: src/frontend/mame/ui/selmenu.cpp:3035
 msgid "Punch Tape\tUnimplemented\n"
 msgstr "紙テープ\t未実装\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2976
+#: src/frontend/mame/ui/selmenu.cpp:3037
 msgid "Punch Tape\tImperfect\n"
 msgstr "紙テープ\t不完全\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2979
+#: src/frontend/mame/ui/selmenu.cpp:3040
 msgid "Mag. Drum\tUnimplemented\n"
 msgstr "磁気ドラム\t未実装\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2981
+#: src/frontend/mame/ui/selmenu.cpp:3042
 msgid "Mag. Drum\tImperfect\n"
 msgstr "磁気ドラム\t不完全\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2984
+#: src/frontend/mame/ui/selmenu.cpp:3045
 msgid "(EP)ROM\tUnimplemented\n"
-msgstr ""
+msgstr "(EP)ROM\t未実装\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2986
+#: src/frontend/mame/ui/selmenu.cpp:3047
 msgid "(EP)ROM\tImperfect\n"
-msgstr ""
+msgstr "(EP)ROM\t不完全\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2989
+#: src/frontend/mame/ui/selmenu.cpp:3050
 msgid "Communications\tUnimplemented\n"
-msgstr ""
+msgstr "通信\t未実装\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2991
+#: src/frontend/mame/ui/selmenu.cpp:3052
 msgid "Communications\tImperfect\n"
-msgstr ""
+msgstr "通信\t不完全\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2994
+#: src/frontend/mame/ui/selmenu.cpp:3055
 msgid "LAN\tUnimplemented\n"
 msgstr "ＬＡＮ\t未実装\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2996
+#: src/frontend/mame/ui/selmenu.cpp:3057
 msgid "LAN\tImperfect\n"
 msgstr "ＬＡＮ\t不完全\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2999
+#: src/frontend/mame/ui/selmenu.cpp:3060
 msgid "WAN\tUnimplemented\n"
 msgstr "ＷＡＮ\t未実装\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3001
+#: src/frontend/mame/ui/selmenu.cpp:3062
 msgid "WAN\tImperfect\n"
 msgstr "ＷＡＮ\t不完全\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3004
+#: src/frontend/mame/ui/selmenu.cpp:3065
 msgid "Timing\tUnimplemented\n"
 msgstr "タイミング\t未実装\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3006
+#: src/frontend/mame/ui/selmenu.cpp:3067
 msgid "Timing\tImperfect\n"
 msgstr "タイミング\t不完全\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3008
+#: src/frontend/mame/ui/selmenu.cpp:3069
 msgid "Mechanical System\tYes\n"
 msgstr "機械仕掛けのシステム\tはい\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3008
+#: src/frontend/mame/ui/selmenu.cpp:3069
 msgid "Mechanical System\tNo\n"
 msgstr "機械仕掛けのシステム\tいいえ\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3009
+#: src/frontend/mame/ui/selmenu.cpp:3070
 msgid "Requires Artwork\tYes\n"
 msgstr "アートワークが必要\tはい\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3009
+#: src/frontend/mame/ui/selmenu.cpp:3070
 msgid "Requires Artwork\tNo\n"
 msgstr "アートワークが必要\tいいえ\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3010
+#: src/frontend/mame/ui/selmenu.cpp:3071
 msgid "Requires Clickable Artwork\tYes\n"
 msgstr "クリック可のアートワークが必要\tはい\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3010
+#: src/frontend/mame/ui/selmenu.cpp:3071
 msgid "Requires Clickable Artwork\tNo\n"
 msgstr "クリック可のアートワークが必要\tいいえ\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3012
+#: src/frontend/mame/ui/selmenu.cpp:3073
 msgid "Support Cocktail\tNo\n"
 msgstr "カクテルモード対応\tいいえ\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3013
+#: src/frontend/mame/ui/selmenu.cpp:3074
 msgid "System is BIOS\tYes\n"
 msgstr "BIOSシステム\tはい\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3013
+#: src/frontend/mame/ui/selmenu.cpp:3074
 msgid "System is BIOS\tNo\n"
 msgstr "BIOSシステム\tいいえ\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3014
+#: src/frontend/mame/ui/selmenu.cpp:3075
 msgid "Support Save\tYes\n"
 msgstr "セーブ対応\tはい\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3014
+#: src/frontend/mame/ui/selmenu.cpp:3075
 msgid "Support Save\tNo\n"
 msgstr "セーブ対応\tいいえ\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3015
+#: src/frontend/mame/ui/selmenu.cpp:3076
 msgid "Screen Orientation\tVertical\n"
 msgstr "画面の向き\t縦\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3015
+#: src/frontend/mame/ui/selmenu.cpp:3076
 msgid "Screen Orientation\tHorizontal\n"
 msgstr "画面の向き\t横\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3025
+#: src/frontend/mame/ui/selmenu.cpp:3086
 msgid "Requires CHD\tYes\n"
 msgstr "CHDが必要\tはい\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3025
+#: src/frontend/mame/ui/selmenu.cpp:3086
 msgid "Requires CHD\tNo\n"
 msgstr "CHDが必要\tいいえ\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3038
+#: src/frontend/mame/ui/selmenu.cpp:3099
 msgid "Media Audit Result\tOK\n"
-msgstr ""
+msgstr "メディア検査結果\t正常\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3040
+#: src/frontend/mame/ui/selmenu.cpp:3101
 msgid "Media Audit Result\tBAD\n"
-msgstr ""
+msgstr "メディア検査結果\t異常\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3043
+#: src/frontend/mame/ui/selmenu.cpp:3104
 msgid "Samples Audit Result\tNone Needed\n"
-msgstr "サンプル検証結果\t不要\n"
+msgstr "サンプル検査結果\t不要\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3045
+#: src/frontend/mame/ui/selmenu.cpp:3106
 msgid "Samples Audit Result\tOK\n"
-msgstr "サンプル検証結果\t正常\n"
+msgstr "サンプル検査結果\t正常\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3047
+#: src/frontend/mame/ui/selmenu.cpp:3108
 msgid "Samples Audit Result\tBAD\n"
-msgstr "サンプル検証結果\t異常\n"
+msgstr "サンプル検査結果\t異常\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3051
+#: src/frontend/mame/ui/selmenu.cpp:3112
 msgid ""
 "Media Audit\tDisabled\n"
 "Samples Audit\tDisabled\n"
 msgstr ""
+"メディア検査\t無効\n"
+"サンプル検査\t無効\n"
 
 #: src/frontend/mame/ui/sndmenu.cpp:114 src/frontend/mame/ui/sndmenu.cpp:150
 msgid "Sample Rate"
@@ -3642,74 +3713,74 @@ msgstr "* スロット設定：\n"
 msgid "[None]\n"
 msgstr "[なし]\n"
 
-#: src/emu/render.cpp:1833
+#: src/emu/render.cpp:1834
 #, c-format
 msgctxt "view-name"
 msgid "Screen %1$u Standard (%2$u:%3$u)"
-msgstr ""
+msgstr "画面 %1$u 標準 (%2$u:%3$u)"
 
-#: src/emu/render.cpp:1859
+#: src/emu/render.cpp:1860
 #, c-format
 msgctxt "view-name"
 msgid "Screen %1$u Pixel Aspect (%2$u:%3$u)"
-msgstr ""
+msgstr "画面 %1$u ピクセルアスペクト (%2$u:%3$u)"
 
-#: src/emu/render.cpp:1881 src/emu/render.cpp:2016
+#: src/emu/render.cpp:1882 src/emu/render.cpp:2017
 msgctxt "view-name"
 msgid "Cocktail"
-msgstr ""
-
-#: src/emu/render.cpp:2001
-msgctxt "view-name"
-msgid "Left-to-Right"
-msgstr ""
+msgstr "カクテル"
 
 #: src/emu/render.cpp:2002
 msgctxt "view-name"
-msgid "Left-to-Right (Gapless)"
-msgstr ""
+msgid "Left-to-Right"
+msgstr "左から右"
 
 #: src/emu/render.cpp:2003
 msgctxt "view-name"
-msgid "Top-to-Bottom"
-msgstr ""
+msgid "Left-to-Right (Gapless)"
+msgstr "左から右（ギャップ無し）"
 
 #: src/emu/render.cpp:2004
 msgctxt "view-name"
-msgid "Top-to-Bottom (Gapless)"
-msgstr ""
+msgid "Top-to-Bottom"
+msgstr "上から下"
 
-#: src/emu/render.cpp:2055
+#: src/emu/render.cpp:2005
+msgctxt "view-name"
+msgid "Top-to-Bottom (Gapless)"
+msgstr "上から下（ギャップ無し）"
+
+#: src/emu/render.cpp:2056
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Left-to-Right, Top-to-Bottom"
-msgstr ""
+msgstr "%1$u×%2$u 左から右, 上から下"
 
-#: src/emu/render.cpp:2064
+#: src/emu/render.cpp:2065
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Left-to-Right, Top-to-Bottom (Gapless)"
-msgstr ""
+msgstr "%1$u×%2$u 左から右, 上から下（ギャップ無し）"
 
-#: src/emu/render.cpp:2073
+#: src/emu/render.cpp:2074
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Top-to-Bottom, Left-to-Right"
-msgstr ""
+msgstr "%1$u×%2$u 上から下, 左から右"
 
-#: src/emu/render.cpp:2082
+#: src/emu/render.cpp:2083
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Top-to-Bottom, Left-to-Right (Gapless)"
-msgstr ""
+msgstr "%1$u×%2$u 上から下, 左から右（ギャップ無し）"
 
-#: src/emu/ioport.cpp:333
+#: src/emu/ioport.cpp:271
 #, c-format
 msgctxt "input-name"
 msgid "P%1$u"
 msgstr "%1$uP"
 
-#: src/emu/ioport.cpp:2052
+#: src/emu/ioport.cpp:1991
 msgctxt "input-name"
 msgid "???"
 msgstr ""
@@ -4191,71 +4262,71 @@ msgstr "%p麻雀ラストチャンス"
 #, c-format
 msgctxt "input-name"
 msgid "%p Hanafuda A/1"
-msgstr ""
+msgstr "%p 花札 Ａ／１"
 
 #: src/emu/inpttype.ipp:90 src/emu/inpttype.ipp:208
 #, c-format
 msgctxt "input-name"
 msgid "%p Hanafuda B/2"
-msgstr ""
+msgstr "%p 花札 Ｂ／２"
 
 #: src/emu/inpttype.ipp:91 src/emu/inpttype.ipp:209
 #, c-format
 msgctxt "input-name"
 msgid "%p Hanafuda C/3"
-msgstr ""
+msgstr "%p 花札 Ｃ／３"
 
 #: src/emu/inpttype.ipp:92 src/emu/inpttype.ipp:210
 #, c-format
 msgctxt "input-name"
 msgid "%p Hanafuda D/4"
-msgstr ""
+msgstr "%p 花札 Ｄ／４"
 
 #: src/emu/inpttype.ipp:93 src/emu/inpttype.ipp:211
 #, c-format
 msgctxt "input-name"
 msgid "%p Hanafuda E/5"
-msgstr ""
+msgstr "%p 花札 Ｅ／５"
 
 #: src/emu/inpttype.ipp:94 src/emu/inpttype.ipp:212
 #, c-format
 msgctxt "input-name"
 msgid "%p Hanafuda F/6"
-msgstr ""
+msgstr "%p 花札 Ｆ／６"
 
 #: src/emu/inpttype.ipp:95 src/emu/inpttype.ipp:213
 #, c-format
 msgctxt "input-name"
 msgid "%p Hanafuda G/7"
-msgstr ""
+msgstr "%p 花札 Ｇ／７"
 
 #: src/emu/inpttype.ipp:96 src/emu/inpttype.ipp:214
 #, c-format
 msgctxt "input-name"
 msgid "%p Hanafuda H/8"
-msgstr ""
+msgstr "%p 花札 Ｈ／８"
 
 #: src/emu/inpttype.ipp:97 src/emu/inpttype.ipp:215
 #, c-format
 msgctxt "input-name"
 msgid "%p Hanafuda Yes"
-msgstr ""
+msgstr "%p 花札 はい"
 
 #: src/emu/inpttype.ipp:98 src/emu/inpttype.ipp:216
 #, c-format
 msgctxt "input-name"
 msgid "%p Hanafuda No"
-msgstr ""
+msgstr "%p 花札 いいえ"
 
 #: src/emu/inpttype.ipp:103
 msgctxt "input-name"
 msgid "Key In"
-msgstr ""
+msgstr "キーイン"
 
 #: src/emu/inpttype.ipp:104
 msgctxt "input-name"
 msgid "Key Out"
-msgstr ""
+msgstr "キーアウト"
 
 #: src/emu/inpttype.ipp:105 src/emu/inpttype.ipp:606
 msgctxt "input-name"
@@ -4265,112 +4336,112 @@ msgstr "サービス"
 #: src/emu/inpttype.ipp:106
 msgctxt "input-name"
 msgid "Book-Keeping"
-msgstr ""
+msgstr "ブックキーピング"
 
 #: src/emu/inpttype.ipp:107
 msgctxt "input-name"
 msgid "Door"
-msgstr ""
+msgstr "ドア"
 
 #: src/emu/inpttype.ipp:108
 msgctxt "input-name"
 msgid "Payout"
-msgstr ""
+msgstr "ペイアウト"
 
 #: src/emu/inpttype.ipp:109
 msgctxt "input-name"
 msgid "Bet"
-msgstr ""
+msgstr "ベット"
 
 #: src/emu/inpttype.ipp:110
 msgctxt "input-name"
 msgid "Deal"
-msgstr ""
+msgstr "ディール"
 
 #: src/emu/inpttype.ipp:111
 msgctxt "input-name"
 msgid "Stand"
-msgstr ""
+msgstr "スタンド"
 
 #: src/emu/inpttype.ipp:112
 msgctxt "input-name"
 msgid "Take Score"
-msgstr ""
+msgstr "テイクスコア"
 
 #: src/emu/inpttype.ipp:113
 msgctxt "input-name"
 msgid "Double Up"
-msgstr ""
+msgstr "ダブルアップ"
 
 #: src/emu/inpttype.ipp:114
 msgctxt "input-name"
 msgid "Half Gamble"
-msgstr ""
+msgstr "ハーフギャンブル"
 
 #: src/emu/inpttype.ipp:115
 msgctxt "input-name"
 msgid "High"
-msgstr ""
+msgstr "ハイ"
 
 #: src/emu/inpttype.ipp:116
 msgctxt "input-name"
 msgid "Low"
-msgstr ""
+msgstr "ロー"
 
 #: src/emu/inpttype.ipp:121
 msgctxt "input-name"
 msgid "Hold 1"
-msgstr ""
+msgstr "ホールド1"
 
 #: src/emu/inpttype.ipp:122
 msgctxt "input-name"
 msgid "Hold 2"
-msgstr ""
+msgstr "ホールド2"
 
 #: src/emu/inpttype.ipp:123
 msgctxt "input-name"
 msgid "Hold 3"
-msgstr ""
+msgstr "ホールド3"
 
 #: src/emu/inpttype.ipp:124
 msgctxt "input-name"
 msgid "Hold 4"
-msgstr ""
+msgstr "ホールド4"
 
 #: src/emu/inpttype.ipp:125
 msgctxt "input-name"
 msgid "Hold 5"
-msgstr ""
+msgstr "ホールド5"
 
 #: src/emu/inpttype.ipp:126
 msgctxt "input-name"
 msgid "Cancel"
-msgstr ""
+msgstr "キャンセル"
 
 #: src/emu/inpttype.ipp:131
 msgctxt "input-name"
 msgid "Stop Reel 1"
-msgstr ""
+msgstr "リール1を停止"
 
 #: src/emu/inpttype.ipp:132
 msgctxt "input-name"
 msgid "Stop Reel 2"
-msgstr ""
+msgstr "リール2を停止"
 
 #: src/emu/inpttype.ipp:133
 msgctxt "input-name"
 msgid "Stop Reel 3"
-msgstr ""
+msgstr "リール3を停止"
 
 #: src/emu/inpttype.ipp:134
 msgctxt "input-name"
 msgid "Stop Reel 4"
-msgstr ""
+msgstr "リール4を停止"
 
 #: src/emu/inpttype.ipp:135
 msgctxt "input-name"
 msgid "Stop All Reels"
-msgstr ""
+msgstr "全てのリールを停止"
 
 #: src/emu/inpttype.ipp:559
 msgctxt "input-name"
@@ -4474,8 +4545,8 @@ msgstr "コイン12"
 
 #: src/emu/inpttype.ipp:583
 msgctxt "input-name"
-msgid "Bill 1"
-msgstr ""
+msgid "Banknote 1"
+msgstr "紙幣1"
 
 #: src/emu/inpttype.ipp:588
 msgctxt "input-name"
@@ -4500,57 +4571,57 @@ msgstr "サービス4"
 #: src/emu/inpttype.ipp:596
 msgctxt "input-name"
 msgid "Tilt 1"
-msgstr ""
+msgstr "ティルト1"
 
 #: src/emu/inpttype.ipp:597
 msgctxt "input-name"
 msgid "Tilt 2"
-msgstr ""
+msgstr "ティルト2"
 
 #: src/emu/inpttype.ipp:598
 msgctxt "input-name"
 msgid "Tilt 3"
-msgstr ""
+msgstr "ティルト3"
 
 #: src/emu/inpttype.ipp:599
 msgctxt "input-name"
 msgid "Tilt 4"
-msgstr ""
+msgstr "ティルト4"
 
 #: src/emu/inpttype.ipp:604
 msgctxt "input-name"
 msgid "Power On"
-msgstr ""
+msgstr "パワーオン"
 
 #: src/emu/inpttype.ipp:605
 msgctxt "input-name"
 msgid "Power Off"
-msgstr ""
+msgstr "パワーオフ"
 
 #: src/emu/inpttype.ipp:607
 msgctxt "input-name"
 msgid "Tilt"
-msgstr ""
+msgstr "ティルト"
 
 #: src/emu/inpttype.ipp:608
 msgctxt "input-name"
 msgid "Door Interlock"
-msgstr ""
+msgstr "ドアインターロック"
 
 #: src/emu/inpttype.ipp:609
 msgctxt "input-name"
 msgid "Memory Reset"
-msgstr ""
+msgstr "メモリーリセット"
 
 #: src/emu/inpttype.ipp:610
 msgctxt "input-name"
 msgid "Volume Down"
-msgstr ""
+msgstr "ボリュームダウン"
 
 #: src/emu/inpttype.ipp:611
 msgctxt "input-name"
 msgid "Volume Up"
-msgstr ""
+msgstr "ボリュームアップ"
 
 #: src/emu/inpttype.ipp:616 src/emu/inpttype.ipp:617 src/emu/inpttype.ipp:618
 #: src/emu/inpttype.ipp:619 src/emu/inpttype.ipp:620 src/emu/inpttype.ipp:621
@@ -4582,552 +4653,552 @@ msgstr "%pペダル3"
 #: src/emu/inpttype.ipp:658
 msgctxt "input-name"
 msgid "Paddle"
-msgstr ""
+msgstr "パドル"
 
 #: src/emu/inpttype.ipp:659
 msgctxt "input-name"
 msgid "Paddle 2"
-msgstr ""
+msgstr "パドル2"
 
 #: src/emu/inpttype.ipp:660
 msgctxt "input-name"
 msgid "Paddle 3"
-msgstr ""
+msgstr "パドル3"
 
 #: src/emu/inpttype.ipp:661
 msgctxt "input-name"
 msgid "Paddle 4"
-msgstr ""
+msgstr "パドル4"
 
 #: src/emu/inpttype.ipp:662
 msgctxt "input-name"
 msgid "Paddle 5"
-msgstr ""
+msgstr "パドル5"
 
 #: src/emu/inpttype.ipp:663
 msgctxt "input-name"
 msgid "Paddle 6"
-msgstr ""
+msgstr "パドル6"
 
 #: src/emu/inpttype.ipp:664
 msgctxt "input-name"
 msgid "Paddle 7"
-msgstr ""
+msgstr "パドル7"
 
 #: src/emu/inpttype.ipp:665
 msgctxt "input-name"
 msgid "Paddle 8"
-msgstr ""
+msgstr "パドル8"
 
 #: src/emu/inpttype.ipp:666
 msgctxt "input-name"
 msgid "Paddle 9"
-msgstr ""
+msgstr "パドル9"
 
 #: src/emu/inpttype.ipp:667
 msgctxt "input-name"
 msgid "Paddle 10"
-msgstr ""
+msgstr "パドル10"
 
 #: src/emu/inpttype.ipp:672
 msgctxt "input-name"
 msgid "Paddle V"
-msgstr ""
+msgstr "パドルV"
 
 #: src/emu/inpttype.ipp:673
 msgctxt "input-name"
 msgid "Paddle V 2"
-msgstr ""
+msgstr "パドルV2"
 
 #: src/emu/inpttype.ipp:674
 msgctxt "input-name"
 msgid "Paddle V 3"
-msgstr ""
+msgstr "パドルV3"
 
 #: src/emu/inpttype.ipp:675
 msgctxt "input-name"
 msgid "Paddle V 4"
-msgstr ""
+msgstr "パドルV4"
 
 #: src/emu/inpttype.ipp:676
 msgctxt "input-name"
 msgid "Paddle V 5"
-msgstr ""
+msgstr "パドルV5"
 
 #: src/emu/inpttype.ipp:677
 msgctxt "input-name"
 msgid "Paddle V 6"
-msgstr ""
+msgstr "パドルV6"
 
 #: src/emu/inpttype.ipp:678
 msgctxt "input-name"
 msgid "Paddle V 7"
-msgstr ""
+msgstr "パドルV7"
 
 #: src/emu/inpttype.ipp:679
 msgctxt "input-name"
 msgid "Paddle V 8"
-msgstr ""
+msgstr "パドルV8"
 
 #: src/emu/inpttype.ipp:680
 msgctxt "input-name"
 msgid "Paddle V 9"
-msgstr ""
+msgstr "パドルV9"
 
 #: src/emu/inpttype.ipp:681
 msgctxt "input-name"
 msgid "Paddle V 10"
-msgstr ""
+msgstr "パドルV10"
 
 #: src/emu/inpttype.ipp:686
 msgctxt "input-name"
 msgid "Positional"
-msgstr ""
+msgstr "ポジショナル"
 
 #: src/emu/inpttype.ipp:687
 msgctxt "input-name"
 msgid "Positional 2"
-msgstr ""
+msgstr "ポジショナル2"
 
 #: src/emu/inpttype.ipp:688
 msgctxt "input-name"
 msgid "Positional 3"
-msgstr ""
+msgstr "ポジショナル3"
 
 #: src/emu/inpttype.ipp:689
 msgctxt "input-name"
 msgid "Positional 4"
-msgstr ""
+msgstr "ポジショナル4"
 
 #: src/emu/inpttype.ipp:690
 msgctxt "input-name"
 msgid "Positional 5"
-msgstr ""
+msgstr "ポジショナル5"
 
 #: src/emu/inpttype.ipp:691
 msgctxt "input-name"
 msgid "Positional 6"
-msgstr ""
+msgstr "ポジショナル6"
 
 #: src/emu/inpttype.ipp:692
 msgctxt "input-name"
 msgid "Positional 7"
-msgstr ""
+msgstr "ポジショナル7"
 
 #: src/emu/inpttype.ipp:693
 msgctxt "input-name"
 msgid "Positional 8"
-msgstr ""
+msgstr "ポジショナル8"
 
 #: src/emu/inpttype.ipp:694
 msgctxt "input-name"
 msgid "Positional 9"
-msgstr ""
+msgstr "ポジショナル9"
 
 #: src/emu/inpttype.ipp:695
 msgctxt "input-name"
 msgid "Positional 10"
-msgstr ""
+msgstr "ポジショナル10"
 
 #: src/emu/inpttype.ipp:700
 msgctxt "input-name"
 msgid "Positional V"
-msgstr ""
+msgstr "ポジショナルV"
 
 #: src/emu/inpttype.ipp:701
 msgctxt "input-name"
 msgid "Positional V 2"
-msgstr ""
+msgstr "ポジショナルV2"
 
 #: src/emu/inpttype.ipp:702
 msgctxt "input-name"
 msgid "Positional V 3"
-msgstr ""
+msgstr "ポジショナルV3"
 
 #: src/emu/inpttype.ipp:703
 msgctxt "input-name"
 msgid "Positional V 4"
-msgstr ""
+msgstr "ポジショナルV4"
 
 #: src/emu/inpttype.ipp:704
 msgctxt "input-name"
 msgid "Positional V 5"
-msgstr ""
+msgstr "ポジショナルV5"
 
 #: src/emu/inpttype.ipp:705
 msgctxt "input-name"
 msgid "Positional V 6"
-msgstr ""
+msgstr "ポジショナルV6"
 
 #: src/emu/inpttype.ipp:706
 msgctxt "input-name"
 msgid "Positional V 7"
-msgstr ""
+msgstr "ポジショナルV7"
 
 #: src/emu/inpttype.ipp:707
 msgctxt "input-name"
 msgid "Positional V 8"
-msgstr ""
+msgstr "ポジショナルV8"
 
 #: src/emu/inpttype.ipp:708
 msgctxt "input-name"
 msgid "Positional V 9"
-msgstr ""
+msgstr "ポジショナルV9"
 
 #: src/emu/inpttype.ipp:709
 msgctxt "input-name"
 msgid "Positional V 10"
-msgstr ""
+msgstr "ポジショナルV10"
 
 #: src/emu/inpttype.ipp:714
 msgctxt "input-name"
 msgid "Dial"
-msgstr ""
+msgstr "ダイアル"
 
 #: src/emu/inpttype.ipp:715
 msgctxt "input-name"
 msgid "Dial 2"
-msgstr ""
+msgstr "ダイアル2"
 
 #: src/emu/inpttype.ipp:716
 msgctxt "input-name"
 msgid "Dial 3"
-msgstr ""
+msgstr "ダイアル3"
 
 #: src/emu/inpttype.ipp:717
 msgctxt "input-name"
 msgid "Dial 4"
-msgstr ""
+msgstr "ダイアル4"
 
 #: src/emu/inpttype.ipp:718
 msgctxt "input-name"
 msgid "Dial 5"
-msgstr ""
+msgstr "ダイアル5"
 
 #: src/emu/inpttype.ipp:719
 msgctxt "input-name"
 msgid "Dial 6"
-msgstr ""
+msgstr "ダイアル6"
 
 #: src/emu/inpttype.ipp:720
 msgctxt "input-name"
 msgid "Dial 7"
-msgstr ""
+msgstr "ダイアル7"
 
 #: src/emu/inpttype.ipp:721
 msgctxt "input-name"
 msgid "Dial 8"
-msgstr ""
+msgstr "ダイアル8"
 
 #: src/emu/inpttype.ipp:722
 msgctxt "input-name"
 msgid "Dial 9"
-msgstr ""
+msgstr "ダイアル9"
 
 #: src/emu/inpttype.ipp:723
 msgctxt "input-name"
 msgid "Dial 10"
-msgstr ""
+msgstr "ダイアル10"
 
 #: src/emu/inpttype.ipp:728
 msgctxt "input-name"
 msgid "Dial V"
-msgstr ""
+msgstr "ダイアルV"
 
 #: src/emu/inpttype.ipp:729
 msgctxt "input-name"
 msgid "Dial V 2"
-msgstr ""
+msgstr "ダイアルV2"
 
 #: src/emu/inpttype.ipp:730
 msgctxt "input-name"
 msgid "Dial V 3"
-msgstr ""
+msgstr "ダイアルV3"
 
 #: src/emu/inpttype.ipp:731
 msgctxt "input-name"
 msgid "Dial V 4"
-msgstr ""
+msgstr "ダイアルV4"
 
 #: src/emu/inpttype.ipp:732
 msgctxt "input-name"
 msgid "Dial V 5"
-msgstr ""
+msgstr "ダイアルV5"
 
 #: src/emu/inpttype.ipp:733
 msgctxt "input-name"
 msgid "Dial V 6"
-msgstr ""
+msgstr "ダイアルV6"
 
 #: src/emu/inpttype.ipp:734
 msgctxt "input-name"
 msgid "Dial V 7"
-msgstr ""
+msgstr "ダイアルV7"
 
 #: src/emu/inpttype.ipp:735
 msgctxt "input-name"
 msgid "Dial V 8"
-msgstr ""
+msgstr "ダイアルV8"
 
 #: src/emu/inpttype.ipp:736
 msgctxt "input-name"
 msgid "Dial V 9"
-msgstr ""
+msgstr "ダイアルV9"
 
 #: src/emu/inpttype.ipp:737
 msgctxt "input-name"
 msgid "Dial V 10"
-msgstr ""
+msgstr "ダイアルV10"
 
 #: src/emu/inpttype.ipp:742
 msgctxt "input-name"
-msgid "Track X"
-msgstr ""
+msgid "Trackball X"
+msgstr "トラックボールX軸"
 
 #: src/emu/inpttype.ipp:743
 msgctxt "input-name"
-msgid "Track X 2"
-msgstr ""
+msgid "Trackball X 2"
+msgstr "トラックボールX軸2"
 
 #: src/emu/inpttype.ipp:744
 msgctxt "input-name"
-msgid "Track X 3"
-msgstr ""
+msgid "Trackball X 3"
+msgstr "トラックボールX軸3"
 
 #: src/emu/inpttype.ipp:745
 msgctxt "input-name"
-msgid "Track X 4"
-msgstr ""
+msgid "Trackball X 4"
+msgstr "トラックボールX軸4"
 
 #: src/emu/inpttype.ipp:746
 msgctxt "input-name"
-msgid "Track X 5"
-msgstr ""
+msgid "Trackball X 5"
+msgstr "トラックボールX軸5"
 
 #: src/emu/inpttype.ipp:747
 msgctxt "input-name"
-msgid "Track X 6"
-msgstr ""
+msgid "Trackball X 6"
+msgstr "トラックボールX軸6"
 
 #: src/emu/inpttype.ipp:748
 msgctxt "input-name"
-msgid "Track X 7"
-msgstr ""
+msgid "Trackball X 7"
+msgstr "トラックボールX軸7"
 
 #: src/emu/inpttype.ipp:749
 msgctxt "input-name"
-msgid "Track X 8"
-msgstr ""
+msgid "Trackball X 8"
+msgstr "トラックボールX軸8"
 
 #: src/emu/inpttype.ipp:750
 msgctxt "input-name"
-msgid "Track X 9"
-msgstr ""
+msgid "Trackball X 9"
+msgstr "トラックボールX軸9"
 
 #: src/emu/inpttype.ipp:751
 msgctxt "input-name"
-msgid "Track X 10"
-msgstr ""
+msgid "Trackball X 10"
+msgstr "トラックボールX軸10"
 
 #: src/emu/inpttype.ipp:756
 msgctxt "input-name"
-msgid "Track Y"
-msgstr ""
+msgid "Trackball Y"
+msgstr "トラックボールY軸"
 
 #: src/emu/inpttype.ipp:757
 msgctxt "input-name"
-msgid "Track Y 2"
-msgstr ""
+msgid "Trackball Y 2"
+msgstr "トラックボールY軸2"
 
 #: src/emu/inpttype.ipp:758
 msgctxt "input-name"
-msgid "Track Y 3"
-msgstr ""
+msgid "Trackball Y 3"
+msgstr "トラックボールY軸3"
 
 #: src/emu/inpttype.ipp:759
 msgctxt "input-name"
-msgid "Track Y 4"
-msgstr ""
+msgid "Trackball Y 4"
+msgstr "トラックボールY軸4"
 
 #: src/emu/inpttype.ipp:760
 msgctxt "input-name"
-msgid "Track Y 5"
-msgstr ""
+msgid "Trackball Y 5"
+msgstr "トラックボールY軸5"
 
 #: src/emu/inpttype.ipp:761
 msgctxt "input-name"
-msgid "Track Y 6"
-msgstr ""
+msgid "Trackball Y 6"
+msgstr "トラックボールY軸6"
 
 #: src/emu/inpttype.ipp:762
 msgctxt "input-name"
-msgid "Track Y 7"
-msgstr ""
+msgid "Trackball Y 7"
+msgstr "トラックボールY軸7"
 
 #: src/emu/inpttype.ipp:763
 msgctxt "input-name"
-msgid "Track Y 8"
-msgstr ""
+msgid "Trackball Y 8"
+msgstr "トラックボールY軸8"
 
 #: src/emu/inpttype.ipp:764
 msgctxt "input-name"
-msgid "Track Y 9"
-msgstr ""
+msgid "Trackball Y 9"
+msgstr "トラックボールY軸9"
 
 #: src/emu/inpttype.ipp:765
 msgctxt "input-name"
-msgid "Track Y 10"
-msgstr ""
+msgid "Trackball Y 10"
+msgstr "トラックボールY軸10"
 
 #: src/emu/inpttype.ipp:770
 msgctxt "input-name"
 msgid "AD Stick X"
-msgstr ""
+msgstr "アナログスティックX軸"
 
 #: src/emu/inpttype.ipp:771
 msgctxt "input-name"
 msgid "AD Stick X 2"
-msgstr ""
+msgstr "アナログスティックX軸2"
 
 #: src/emu/inpttype.ipp:772
 msgctxt "input-name"
 msgid "AD Stick X 3"
-msgstr ""
+msgstr "アナログスティックX軸3"
 
 #: src/emu/inpttype.ipp:773
 msgctxt "input-name"
 msgid "AD Stick X 4"
-msgstr ""
+msgstr "アナログスティックX軸4"
 
 #: src/emu/inpttype.ipp:774
 msgctxt "input-name"
 msgid "AD Stick X 5"
-msgstr ""
+msgstr "アナログスティックX軸5"
 
 #: src/emu/inpttype.ipp:775
 msgctxt "input-name"
 msgid "AD Stick X 6"
-msgstr ""
+msgstr "アナログスティックX軸6"
 
 #: src/emu/inpttype.ipp:776
 msgctxt "input-name"
 msgid "AD Stick X 7"
-msgstr ""
+msgstr "アナログスティックX軸7"
 
 #: src/emu/inpttype.ipp:777
 msgctxt "input-name"
 msgid "AD Stick X 8"
-msgstr ""
+msgstr "アナログスティックX軸8"
 
 #: src/emu/inpttype.ipp:778
 msgctxt "input-name"
 msgid "AD Stick X 9"
-msgstr ""
+msgstr "アナログスティックX軸9"
 
 #: src/emu/inpttype.ipp:779
 msgctxt "input-name"
 msgid "AD Stick X 10"
-msgstr ""
+msgstr "アナログスティックX軸10"
 
 #: src/emu/inpttype.ipp:784
 msgctxt "input-name"
 msgid "AD Stick Y"
-msgstr ""
+msgstr "アナログスティックY軸"
 
 #: src/emu/inpttype.ipp:785
 msgctxt "input-name"
 msgid "AD Stick Y 2"
-msgstr ""
+msgstr "アナログスティックY軸2"
 
 #: src/emu/inpttype.ipp:786
 msgctxt "input-name"
 msgid "AD Stick Y 3"
-msgstr ""
+msgstr "アナログスティックY軸3"
 
 #: src/emu/inpttype.ipp:787
 msgctxt "input-name"
 msgid "AD Stick Y 4"
-msgstr ""
+msgstr "アナログスティックY軸4"
 
 #: src/emu/inpttype.ipp:788
 msgctxt "input-name"
 msgid "AD Stick Y 5"
-msgstr ""
+msgstr "アナログスティックY軸5"
 
 #: src/emu/inpttype.ipp:789
 msgctxt "input-name"
 msgid "AD Stick Y 6"
-msgstr ""
+msgstr "アナログスティックY軸6"
 
 #: src/emu/inpttype.ipp:790
 msgctxt "input-name"
 msgid "AD Stick Y 7"
-msgstr ""
+msgstr "アナログスティックY軸7"
 
 #: src/emu/inpttype.ipp:791
 msgctxt "input-name"
 msgid "AD Stick Y 8"
-msgstr ""
+msgstr "アナログスティックY軸8"
 
 #: src/emu/inpttype.ipp:792
 msgctxt "input-name"
 msgid "AD Stick Y 9"
-msgstr ""
+msgstr "アナログスティックY軸9"
 
 #: src/emu/inpttype.ipp:793
 msgctxt "input-name"
 msgid "AD Stick Y 10"
-msgstr ""
+msgstr "アナログスティックY軸10"
 
 #: src/emu/inpttype.ipp:798
 msgctxt "input-name"
 msgid "AD Stick Z"
-msgstr ""
+msgstr "アナログスティックZ軸"
 
 #: src/emu/inpttype.ipp:799
 msgctxt "input-name"
 msgid "AD Stick Z 2"
-msgstr ""
+msgstr "アナログスティックZ軸2"
 
 #: src/emu/inpttype.ipp:800
 msgctxt "input-name"
 msgid "AD Stick Z 3"
-msgstr ""
+msgstr "アナログスティックZ軸3"
 
 #: src/emu/inpttype.ipp:801
 msgctxt "input-name"
 msgid "AD Stick Z 4"
-msgstr ""
+msgstr "アナログスティックZ軸4"
 
 #: src/emu/inpttype.ipp:802
 msgctxt "input-name"
 msgid "AD Stick Z 5"
-msgstr ""
+msgstr "アナログスティックZ軸5"
 
 #: src/emu/inpttype.ipp:803
 msgctxt "input-name"
 msgid "AD Stick Z 6"
-msgstr ""
+msgstr "アナログスティックZ軸6"
 
 #: src/emu/inpttype.ipp:804
 msgctxt "input-name"
 msgid "AD Stick Z 7"
-msgstr ""
+msgstr "アナログスティックZ軸7"
 
 #: src/emu/inpttype.ipp:805
 msgctxt "input-name"
 msgid "AD Stick Z 8"
-msgstr ""
+msgstr "アナログスティックZ軸8"
 
 #: src/emu/inpttype.ipp:806
 msgctxt "input-name"
 msgid "AD Stick Z 9"
-msgstr ""
+msgstr "アナログスティックZ軸9"
 
 #: src/emu/inpttype.ipp:807
 msgctxt "input-name"
 msgid "AD Stick Z 10"
-msgstr ""
+msgstr "アナログスティックZ軸10"
 
 #: src/emu/inpttype.ipp:812
 msgctxt "input-name"
@@ -5332,328 +5403,336 @@ msgstr "マウスY軸10"
 #: src/emu/inpttype.ipp:868
 msgctxt "input-name"
 msgid "Keypad"
-msgstr ""
+msgstr "キーパッド"
 
 #: src/emu/inpttype.ipp:869
 msgctxt "input-name"
 msgid "Keyboard"
-msgstr ""
+msgstr "キーボード"
 
 #: src/emu/inpttype.ipp:874
 msgctxt "input-name"
-msgid "On Screen Display"
-msgstr ""
+msgid "Show/Hide Menu"
+msgstr "メニューの表示／非表示"
 
 #: src/emu/inpttype.ipp:875
-msgctxt "input-name"
-msgid "Break in Debugger"
-msgstr ""
-
-#: src/emu/inpttype.ipp:876
-msgctxt "input-name"
-msgid "Config Menu"
-msgstr ""
-
-#: src/emu/inpttype.ipp:877
-msgctxt "input-name"
-msgid "Pause"
-msgstr ""
-
-#: src/emu/inpttype.ipp:878
-msgctxt "input-name"
-msgid "Pause - Single Step"
-msgstr ""
-
-#: src/emu/inpttype.ipp:879
-msgctxt "input-name"
-msgid "Rewind - Single Step"
-msgstr ""
-
-#: src/emu/inpttype.ipp:880
-msgctxt "input-name"
-msgid "Reset Machine"
-msgstr ""
-
-#: src/emu/inpttype.ipp:881
-msgctxt "input-name"
-msgid "Soft Reset"
-msgstr ""
-
-#: src/emu/inpttype.ipp:882
-msgctxt "input-name"
-msgid "Show Decoded Graphics"
-msgstr ""
-
-#: src/emu/inpttype.ipp:883
-msgctxt "input-name"
-msgid "Frameskip Dec"
-msgstr ""
-
-#: src/emu/inpttype.ipp:884
-msgctxt "input-name"
-msgid "Frameskip Inc"
-msgstr ""
-
-#: src/emu/inpttype.ipp:885
-msgctxt "input-name"
-msgid "Throttle"
-msgstr ""
-
-#: src/emu/inpttype.ipp:886
-msgctxt "input-name"
-msgid "Fast Forward"
-msgstr ""
-
-#: src/emu/inpttype.ipp:887
-msgctxt "input-name"
-msgid "Show FPS"
-msgstr ""
-
-#: src/emu/inpttype.ipp:888
-msgctxt "input-name"
-msgid "Save Snapshot"
-msgstr ""
-
-#: src/emu/inpttype.ipp:889
-msgctxt "input-name"
-msgid "Record MNG"
-msgstr ""
-
-#: src/emu/inpttype.ipp:890
-msgctxt "input-name"
-msgid "Record AVI"
-msgstr ""
-
-#: src/emu/inpttype.ipp:891
-msgctxt "input-name"
-msgid "Toggle Cheat"
-msgstr ""
-
-#: src/emu/inpttype.ipp:892
-msgctxt "input-name"
-msgid "UI Up"
-msgstr "UI上"
-
-#: src/emu/inpttype.ipp:893
-msgctxt "input-name"
-msgid "UI Down"
-msgstr "UI下"
-
-#: src/emu/inpttype.ipp:894
-msgctxt "input-name"
-msgid "UI Left"
-msgstr "UI左"
-
-#: src/emu/inpttype.ipp:895
-msgctxt "input-name"
-msgid "UI Right"
-msgstr "UI右"
-
-#: src/emu/inpttype.ipp:896
-msgctxt "input-name"
-msgid "UI Home"
-msgstr ""
-
-#: src/emu/inpttype.ipp:897
-msgctxt "input-name"
-msgid "UI End"
-msgstr ""
-
-#: src/emu/inpttype.ipp:898
-msgctxt "input-name"
-msgid "UI Page Up"
-msgstr ""
-
-#: src/emu/inpttype.ipp:899
-msgctxt "input-name"
-msgid "UI Page Down"
-msgstr ""
-
-#: src/emu/inpttype.ipp:900
-msgctxt "input-name"
-msgid "UI Focus Next"
-msgstr ""
-
-#: src/emu/inpttype.ipp:901
-msgctxt "input-name"
-msgid "UI Focus Previous"
-msgstr ""
-
-#: src/emu/inpttype.ipp:902
 msgctxt "input-name"
 msgid "UI Select"
 msgstr "UI選択"
 
-#: src/emu/inpttype.ipp:903
+#: src/emu/inpttype.ipp:876
+msgctxt "input-name"
+msgid "UI Back"
+msgstr "UI戻る"
+
+#: src/emu/inpttype.ipp:877
 msgctxt "input-name"
 msgid "UI Cancel"
 msgstr "UIキャンセル"
 
+#: src/emu/inpttype.ipp:878
+msgctxt "input-name"
+msgid "UI Clear"
+msgstr "UIクリア"
+
+#: src/emu/inpttype.ipp:879
+msgctxt "input-name"
+msgid "UI Help"
+msgstr "UIヘルプ"
+
+#: src/emu/inpttype.ipp:880
+msgctxt "input-name"
+msgid "UI Up"
+msgstr "UI上"
+
+#: src/emu/inpttype.ipp:881
+msgctxt "input-name"
+msgid "UI Down"
+msgstr "UI下"
+
+#: src/emu/inpttype.ipp:882
+msgctxt "input-name"
+msgid "UI Left"
+msgstr "UI左"
+
+#: src/emu/inpttype.ipp:883
+msgctxt "input-name"
+msgid "UI Right"
+msgstr "UI右"
+
+#: src/emu/inpttype.ipp:884
+msgctxt "input-name"
+msgid "UI Home"
+msgstr "UI一番上"
+
+#: src/emu/inpttype.ipp:885
+msgctxt "input-name"
+msgid "UI End"
+msgstr "UI一番下"
+
+#: src/emu/inpttype.ipp:886
+msgctxt "input-name"
+msgid "UI Page Up"
+msgstr "UIページ戻し"
+
+#: src/emu/inpttype.ipp:887
+msgctxt "input-name"
+msgid "UI Page Down"
+msgstr "UIページ送り"
+
+#: src/emu/inpttype.ipp:888
+msgctxt "input-name"
+msgid "UI Previous Group"
+msgstr "UI前のグループ"
+
+#: src/emu/inpttype.ipp:889
+msgctxt "input-name"
+msgid "UI Next Group"
+msgstr "UI次のグループ"
+
+#: src/emu/inpttype.ipp:890
+msgctxt "input-name"
+msgid "On Screen Display"
+msgstr "オンスクリーンディスプレイ"
+
+#: src/emu/inpttype.ipp:891
+msgctxt "input-name"
+msgid "Toggle UI Controls"
+msgstr "UIコントロール切り替え"
+
+#: src/emu/inpttype.ipp:892
+msgctxt "input-name"
+msgid "Break in Debugger"
+msgstr "デバッガーで停止"
+
+#: src/emu/inpttype.ipp:893
+msgctxt "input-name"
+msgid "Pause"
+msgstr "ポーズ"
+
+#: src/emu/inpttype.ipp:894
+msgctxt "input-name"
+msgid "Pause - Single Step"
+msgstr "ポーズ - シングルステップ"
+
+#: src/emu/inpttype.ipp:895
+msgctxt "input-name"
+msgid "Rewind - Single Step"
+msgstr "巻き戻し - シングルステップ"
+
+#: src/emu/inpttype.ipp:896
+msgctxt "input-name"
+msgid "Save State"
+msgstr "状態をセーブ"
+
+#: src/emu/inpttype.ipp:897
+msgctxt "input-name"
+msgid "Load State"
+msgstr "状態をロード"
+
+#: src/emu/inpttype.ipp:898
+msgctxt "input-name"
+msgid "Reset Machine"
+msgstr "マシンをリセット"
+
+#: src/emu/inpttype.ipp:899
+msgctxt "input-name"
+msgid "Soft Reset"
+msgstr "ソフトリセット"
+
+#: src/emu/inpttype.ipp:900
+msgctxt "input-name"
+msgid "Show Decoded Graphics"
+msgstr "デコード済みのグラフィックを表示"
+
+#: src/emu/inpttype.ipp:901
+msgctxt "input-name"
+msgid "Frameskip Dec"
+msgstr "フレームスキップ減少"
+
+#: src/emu/inpttype.ipp:902
+msgctxt "input-name"
+msgid "Frameskip Inc"
+msgstr "フレームスキップ増加"
+
+#: src/emu/inpttype.ipp:903
+msgctxt "input-name"
+msgid "Throttle"
+msgstr "スロットル"
+
 #: src/emu/inpttype.ipp:904
 msgctxt "input-name"
-msgid "UI Display Comment"
-msgstr ""
+msgid "Fast Forward"
+msgstr "早送り"
 
 #: src/emu/inpttype.ipp:905
 msgctxt "input-name"
-msgid "UI Clear"
-msgstr ""
+msgid "Show FPS"
+msgstr "FPSを表示"
 
 #: src/emu/inpttype.ipp:906
 msgctxt "input-name"
-msgid "UI Zoom In"
-msgstr ""
+msgid "Save Snapshot"
+msgstr "スナップショットを保存"
 
 #: src/emu/inpttype.ipp:907
 msgctxt "input-name"
-msgid "UI Zoom Out"
-msgstr ""
+msgid "Record MNG"
+msgstr "MNGを記録"
 
 #: src/emu/inpttype.ipp:908
 msgctxt "input-name"
-msgid "UI Default Zoom"
-msgstr ""
+msgid "Record AVI"
+msgstr "AVIを記録"
 
 #: src/emu/inpttype.ipp:909
 msgctxt "input-name"
-msgid "UI Previous Group"
-msgstr ""
+msgid "Toggle Cheat"
+msgstr "チート切り替え"
 
 #: src/emu/inpttype.ipp:910
 msgctxt "input-name"
-msgid "UI Next Group"
-msgstr ""
+msgid "UI Display Comment"
+msgstr "UIコメントを表示"
 
 #: src/emu/inpttype.ipp:911
 msgctxt "input-name"
-msgid "UI Rotate"
-msgstr ""
+msgid "UI Zoom In"
+msgstr "UIズームイン"
 
 #: src/emu/inpttype.ipp:912
 msgctxt "input-name"
-msgid "Show Profiler"
-msgstr ""
+msgid "UI Zoom Out"
+msgstr "UIズームアウト"
 
 #: src/emu/inpttype.ipp:913
 msgctxt "input-name"
-msgid "UI Toggle"
-msgstr ""
+msgid "UI Default Zoom"
+msgstr "UIデフォルトズーム"
 
 #: src/emu/inpttype.ipp:914
 msgctxt "input-name"
-msgid "UI Release Pointer"
-msgstr ""
+msgid "UI Rotate"
+msgstr "UI回転"
 
 #: src/emu/inpttype.ipp:915
 msgctxt "input-name"
-msgid "UI Paste Text"
-msgstr ""
+msgid "Show Profiler"
+msgstr "プロファイラを表示"
 
 #: src/emu/inpttype.ipp:916
 msgctxt "input-name"
-msgid "Save State"
-msgstr ""
+msgid "UI Release Pointer"
+msgstr "UIポインタを解放"
 
 #: src/emu/inpttype.ipp:917
 msgctxt "input-name"
-msgid "Load State"
-msgstr ""
+msgid "UI Paste Text"
+msgstr "UIテキストをペースト"
 
 #: src/emu/inpttype.ipp:918
 msgctxt "input-name"
 msgid "UI (First) Tape Start"
-msgstr ""
+msgstr "UI（最初）テープ開始"
 
 #: src/emu/inpttype.ipp:919
 msgctxt "input-name"
 msgid "UI (First) Tape Stop"
-msgstr ""
+msgstr "UI（最初）テープ停止"
 
 #: src/emu/inpttype.ipp:920
 msgctxt "input-name"
-msgid "UI External DAT View"
-msgstr ""
+msgid "UI Focus Next"
+msgstr "UI次にフォーカス"
 
 #: src/emu/inpttype.ipp:921
 msgctxt "input-name"
-msgid "UI Add/Remove favorite"
-msgstr ""
+msgid "UI Focus Previous"
+msgstr "UI前にフォーカス"
 
 #: src/emu/inpttype.ipp:922
 msgctxt "input-name"
-msgid "UI Export List"
-msgstr ""
+msgid "UI External DAT View"
+msgstr "UI外部DATビュー"
 
 #: src/emu/inpttype.ipp:923
 msgctxt "input-name"
-msgid "UI Audit Media"
-msgstr ""
+msgid "UI Add/Remove Favorite"
+msgstr "UI追加／削除お気に入り"
 
-#: src/osd/modules/input/input_windows.cpp:110
-#: src/osd/modules/input/input_sdlcommon.cpp:173
+#: src/emu/inpttype.ipp:924
+msgctxt "input-name"
+msgid "UI Export List"
+msgstr "UIリスト出力"
+
+#: src/emu/inpttype.ipp:925
+msgctxt "input-name"
+msgid "UI Audit Media"
+msgstr "UIメディア検査"
+
+#: src/osd/modules/input/input_windows.cpp:111 src/osd/sdl/osdsdl.cpp:339
 msgctxt "input-name"
 msgid "Toggle Fullscreen"
-msgstr ""
+msgstr "フルスクリーン切り替え"
 
-#: src/osd/modules/input/input_windows.cpp:116
+#: src/osd/modules/input/input_windows.cpp:117
 msgctxt "input-name"
 msgid "Take Rendered Snapshot"
-msgstr ""
+msgstr "描画されたスナップショットを撮る"
 
-#: src/osd/modules/input/input_windows.cpp:127
-#: src/osd/modules/input/input_sdlcommon.cpp:221
+#: src/osd/modules/input/input_windows.cpp:128 src/osd/sdl/osdsdl.cpp:388
 msgctxt "input-name"
 msgid "Record Rendered Video"
-msgstr ""
+msgstr "描画されたビデオを記録する"
 
-#: src/osd/modules/input/input_windows.cpp:143
+#: src/osd/modules/input/input_windows.cpp:144
 msgctxt "input-name"
 msgid "Toggle Post-Processing"
-msgstr ""
+msgstr "ポストプロセスの切り替え"
 
-#: src/osd/modules/input/input_sdlcommon.cpp:199
+#: src/osd/sdl/osdsdl.cpp:365
 msgctxt "input-name"
 msgid "Toggle Filter"
-msgstr ""
+msgstr "フィルタの切り替え"
 
-#: src/osd/modules/input/input_sdlcommon.cpp:205
+#: src/osd/sdl/osdsdl.cpp:371
 msgctxt "input-name"
 msgid "Decrease Prescaling"
-msgstr ""
+msgstr "プレスケール減少"
 
-#: src/osd/modules/input/input_sdlcommon.cpp:215
+#: src/osd/sdl/osdsdl.cpp:382
 msgctxt "input-name"
 msgid "Increase Prescaling"
-msgstr ""
+msgstr "プレスケール増加"
 
 #: plugins/hiscore/init.lua:85
 msgctxt "plugin-hiscore"
 msgid "When updated"
-msgstr ""
+msgstr "更新時"
 
 #: plugins/hiscore/init.lua:85
 msgctxt "plugin-hiscore"
 msgid "On exit"
-msgstr ""
+msgstr "終了時"
 
 #: plugins/hiscore/init.lua:86
 msgctxt "plugin-hiscore"
 msgid "Hiscore Support Options"
-msgstr ""
+msgstr "ハイスコアサポート設定"
 
 #: plugins/hiscore/init.lua:88
 msgctxt "plugin-hiscore"
 msgid "Save scores"
-msgstr ""
+msgstr "スコア保存"
 
 #: plugins/hiscore/init.lua:372
 msgctxt "plugin-hiscore"
 msgid "Hiscore Support"
-msgstr ""
+msgstr "ハイスコアサポート"
 
 #: plugins/cheatfind/init.lua:387
 msgid "Other: "
-msgstr ""
+msgstr "その他： "
 
 #: plugins/cheatfind/init.lua:388
 msgid "Save Cheat"
@@ -5686,11 +5765,11 @@ msgstr "タイプ"
 
 #: plugins/cheatfind/init.lua:411
 msgid "(empty)"
-msgstr ""
+msgstr "（空）"
 
 #: plugins/cheatfind/init.lua:427
 msgid "You can enter any type name"
-msgstr ""
+msgstr "任意の型名を入力できます"
 
 #: plugins/cheatfind/init.lua:436
 msgid "Save"
@@ -5698,7 +5777,7 @@ msgstr "保存"
 
 #: plugins/cheatfind/init.lua:444
 msgid "Type name is empty"
-msgstr ""
+msgstr "型名が空です"
 
 #: plugins/cheatfind/init.lua:468
 #, lua-format
@@ -5727,27 +5806,27 @@ msgstr "この変更は、\"新規に検索を開始\"が選択されている�
 
 #: plugins/cheatfind/init.lua:511
 msgid "Automatic"
-msgstr ""
+msgstr "自動"
 
 #: plugins/cheatfind/init.lua:511
 msgid "Manual"
-msgstr ""
+msgstr "手動"
 
 #: plugins/cheatfind/init.lua:512
 msgid "Pause Mode"
-msgstr ""
+msgstr "ポーズモード"
 
 #: plugins/cheatfind/init.lua:519
 msgid "Manually toggle pause when needed"
-msgstr ""
+msgstr "必要な時に手動でポーズを切り替え"
 
 #: plugins/cheatfind/init.lua:522
 msgid "Automatically toggle pause with on-screen menus"
-msgstr ""
+msgstr "オンスクリーンメニュー時に自動でポーズを切り替え"
 
 #: plugins/cheatfind/init.lua:543
 msgid "All slots cleared and current state saved to Slot 1"
-msgstr ""
+msgstr "全てのバッファを消去し、現在の状態をバッファ 1に保存しました"
 
 #: plugins/cheatfind/init.lua:555
 msgid "Start new search"
@@ -5756,12 +5835,12 @@ msgstr "新規に検索を開始"
 #: plugins/cheatfind/init.lua:566
 #, lua-format
 msgid "Memory state saved to Slot %d"
-msgstr ""
+msgstr "メモリの状態をバッファ %dに保存しました"
 
 #: plugins/cheatfind/init.lua:583
 #, lua-format
 msgid "Save current memory state to Slot %d"
-msgstr ""
+msgstr "現在のメモリの状態をバッファ %dに保存"
 
 #: plugins/cheatfind/init.lua:614
 #, lua-format
@@ -5771,27 +5850,27 @@ msgstr "%d個の一致が見つかりました"
 #: plugins/cheatfind/init.lua:623
 #, lua-format
 msgid "Perform Compare : Slot %d %s Slot %d"
-msgstr ""
+msgstr "比較を実行 : バッファ %d %s バッファ %d"
 
 #: plugins/cheatfind/init.lua:624
 #, lua-format
 msgid "Perform Compare  :  Slot %d %s Slot %d %s %d"
-msgstr ""
+msgstr "比較を実行  :  バッファ %d %s バッファ %d %s %d"
 
 #: plugins/cheatfind/init.lua:625
 #, lua-format
 msgid "Perform Compare  :  Slot %d BITWISE%s Slot %d"
-msgstr ""
+msgstr "比較を実行  :  バッファ %d BITWISE%s バッファ %d"
 
 #: plugins/cheatfind/init.lua:626
 #, lua-format
 msgid "Perform Compare  :  Slot %d %s %d"
-msgstr ""
+msgstr "比較を実行  :  バッファ %d %s %d"
 
 #: plugins/cheatfind/init.lua:667 plugins/cheatfind/init.lua:709
 #, lua-format
 msgid "Slot %d"
-msgstr ""
+msgstr "バッファ %d"
 
 #: plugins/cheatfind/init.lua:678
 msgid "Left less than right"
@@ -5839,7 +5918,7 @@ msgstr "値"
 
 #: plugins/cheatfind/init.lua:720
 msgid "Difference"
-msgstr ""
+msgstr "差"
 
 #: plugins/cheatfind/init.lua:725
 msgid "Any"
@@ -5851,36 +5930,40 @@ msgstr "データフォーマット"
 
 #: plugins/cheatfind/init.lua:737
 msgid "Slot 1 Value"
-msgstr ""
+msgstr "バッファ 1の値"
 
 #: plugins/cheatfind/init.lua:737
 msgid "Last Slot Value"
-msgstr ""
+msgstr "最後のバッファの値"
 
 #: plugins/cheatfind/init.lua:740
 msgid "Test/Write Poke Value"
-msgstr ""
+msgstr "テスト／書き込み 値を格納"
 
 #: plugins/cheatfind/init.lua:747
 msgid ""
 "Use this if you want to poke the Slot 1 value (eg. You started with "
 "something but lost it)"
 msgstr ""
+"バッファ 1の値を格納するにはこれを使用（例：何かと共に開始するがそれを失う場"
+"合）"
 
 #: plugins/cheatfind/init.lua:749
 msgid ""
 "Use this if you want to poke the Last Slot value (eg. You started without an "
 "item but finally got it)"
 msgstr ""
+"最後のバッファの値を格納するにはこれを使用（例：アイテムなしで開始するが最終"
+"的にそれを得る場合）"
 
 #: plugins/cheatfind/init.lua:751
 #, lua-format
 msgid "Use this if you want to poke %s"
-msgstr ""
+msgstr "%sを格納するにはこれを使用"
 
 #: plugins/cheatfind/init.lua:774
 msgid "Aligned only"
-msgstr ""
+msgstr "アライメント済みのみ"
 
 #: plugins/cheatfind/init.lua:791
 msgid "Undo last search -- #"
@@ -5897,7 +5980,7 @@ msgstr "全て"
 #: plugins/cheatfind/init.lua:907
 #, lua-format
 msgid "Test Cheat %08X_%02X"
-msgstr ""
+msgstr "チート %08X_%02X をテスト"
 
 #: plugins/cheatfind/init.lua:947
 msgid "Cheat engine not available"
@@ -5945,12 +6028,12 @@ msgstr "入力ポート名ファイルを%sに保存しました"
 msgid "Input ports"
 msgstr "入力ポート"
 
-#: plugins/autofire/init.lua:94
+#: plugins/autofire/init.lua:98
 msgctxt "plugin-autofire"
 msgid "Failed to load autofire menu"
-msgstr ""
+msgstr "連射メニューが読み込めません"
 
-#: plugins/autofire/init.lua:101
+#: plugins/autofire/init.lua:105
 msgctxt "plugin-autofire"
 msgid "Autofire"
 msgstr "連射"
@@ -5958,13 +6041,13 @@ msgstr "連射"
 #: plugins/autofire/autofire_menu.lua:74
 msgctxt "plugin-autofire"
 msgid "Autofire buttons"
-msgstr ""
+msgstr "連射ボタン"
 
 #: plugins/autofire/autofire_menu.lua:75
 #, lua-format
 msgctxt "plugin-autofire"
 msgid "Press %s to delete"
-msgstr ""
+msgstr "%s で削除"
 
 #: plugins/autofire/autofire_menu.lua:93
 #, lua-format
@@ -5976,64 +6059,64 @@ msgstr ""
 #, lua-format
 msgctxt "plugin-autofire"
 msgid "n/a [%g Hz]"
-msgstr ""
+msgstr "使用不可 [%g Hz]"
 
 #: plugins/autofire/autofire_menu.lua:103
 msgctxt "plugin-autofire"
 msgid "[no autofire buttons]"
-msgstr ""
+msgstr "［連射ボタンがありません］"
 
 #: plugins/autofire/autofire_menu.lua:109
 #: plugins/autofire/autofire_menu.lua:263
 msgctxt "plugin-autofire"
 msgid "Add autofire button"
-msgstr ""
+msgstr "連射ボタンを追加"
 
 #: plugins/autofire/autofire_menu.lua:150
 msgctxt "plugin-autofire"
 msgid "n/a"
-msgstr ""
+msgstr "使用不可"
 
 #: plugins/autofire/autofire_menu.lua:152
 #: plugins/autofire/autofire_menu.lua:154
 msgctxt "plugin-autofire"
 msgid "[not set]"
-msgstr ""
+msgstr "［未設定］"
 
 #: plugins/autofire/autofire_menu.lua:155
 msgctxt "plugin-autofire"
 msgid "Input"
-msgstr ""
+msgstr "入力"
 
 #: plugins/autofire/autofire_menu.lua:159
 msgctxt "plugin-autofire"
 msgid "Hotkey"
-msgstr ""
+msgstr "ホットキー"
 
 #: plugins/autofire/autofire_menu.lua:160
 msgctxt "plugin-autofire"
 msgid "On frames"
-msgstr ""
+msgstr "オンフレーム"
 
 #: plugins/autofire/autofire_menu.lua:161
 msgctxt "plugin-autofire"
 msgid "Off frames"
-msgstr ""
+msgstr "オフフレーム"
 
 #: plugins/autofire/autofire_menu.lua:200
 msgctxt "plugin-autofire"
 msgid "Number of frames button will be pressed"
-msgstr ""
+msgstr "ボタンが押されたフレーム数"
 
 #: plugins/autofire/autofire_menu.lua:213
 msgctxt "plugin-autofire"
 msgid "Number of frames button will be released"
-msgstr ""
+msgstr "ボタンが離されたフレーム数"
 
 #: plugins/autofire/autofire_menu.lua:230
 msgctxt "plugin-autofire"
 msgid "Edit autofire button"
-msgstr ""
+msgstr "連射ボタンを編集"
 
 #: plugins/autofire/autofire_menu.lua:238
 msgctxt "plugin-autofire"
@@ -6053,49 +6136,49 @@ msgstr "キャンセル"
 #: plugins/autofire/autofire_menu.lua:325
 msgctxt "plugin-autofire"
 msgid "Select an input for autofire"
-msgstr ""
+msgstr "連射のための入力を選択"
 
 #: plugins/timecode/init.lua:155
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Intro started at %s"
-msgstr ""
+msgstr "TIMECODE: イントロ %s から開始"
 
 #: plugins/timecode/init.lua:160
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Intro duration %s"
-msgstr ""
+msgstr "TIMECODE: イントロ間隔 %s"
 
 #: plugins/timecode/init.lua:165
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Gameplay started at %s"
-msgstr ""
+msgstr "TIMECODE: ゲームプレイ %s から開始"
 
 #: plugins/timecode/init.lua:170
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Gameplay duration %s"
-msgstr ""
+msgstr "TIMECODE: ゲームプレイ間隔 %s"
 
 #: plugins/timecode/init.lua:176
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Extra %d started at %s"
-msgstr ""
+msgstr "TIMECODE: 追加 %d %s から開始"
 
 #: plugins/timecode/init.lua:182
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Extra %d duration %s"
-msgstr ""
+msgstr "TIMECODE: 追加 %d 間隔 %s"
 
 #: plugins/timecode/init.lua:207
 #, lua-format
 msgctxt "plugin-timecode"
 msgid " %s%s%02d:%02d [paused] "
-msgstr ""
+msgstr " %s%s%02d:%02d [ポーズ中] "
 
 #: plugins/timecode/init.lua:207
 #, lua-format
@@ -6107,34 +6190,34 @@ msgstr ""
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TOTAL %02d:%02d "
-msgstr ""
+msgstr "トータル %02d:%02d "
 
 #: plugins/timecode/init.lua:323 plugins/timecode/init.lua:345
 msgctxt "plugin-timecode"
 msgid "Timecode Recorder"
-msgstr ""
+msgstr "タイムコードレコーダー"
 
 #: plugins/timecode/init.lua:326
 msgctxt "plugin-timecode"
 msgid "Assume 60 Hz"
-msgstr ""
+msgstr "60 Hzと仮定"
 
 #: plugins/timecode/init.lua:326
 msgctxt "plugins-timecode"
 msgid "Count emulated frames"
-msgstr ""
+msgstr "エミュレートフレームをカウント"
 
 #: plugins/timecode/init.lua:327
 msgctxt "plugin-timecode"
 msgid "Frame numbers"
-msgstr ""
+msgstr "フレーム数"
 
 #: plugins/timecode/init.lua:330
 msgctxt "plugin-timecode"
 msgid "Hotkey"
-msgstr ""
+msgstr "ホットキー"
 
-#: plugins/inputmacro/init.lua:135 plugins/inputmacro/inputmacro_menu.lua:560
+#: plugins/inputmacro/init.lua:135 plugins/inputmacro/inputmacro_menu.lua:562
 msgctxt "plugin-inputmacro"
 msgid "Input Macros"
 msgstr "入力マクロ"
@@ -6142,154 +6225,154 @@ msgstr "入力マクロ"
 #: plugins/inputmacro/inputmacro_menu.lua:31
 msgctxt "plugin-inputmacro"
 msgid "New macro"
-msgstr ""
+msgstr "新しいマクロ"
 
 #: plugins/inputmacro/inputmacro_menu.lua:35
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "New macro %d"
-msgstr ""
+msgstr "新しいマクロ %d"
 
 #: plugins/inputmacro/inputmacro_menu.lua:84
 msgctxt "plugin-inputmacro"
 msgid "Set Input"
-msgstr ""
+msgstr "入力を設定"
 
-#: plugins/inputmacro/inputmacro_menu.lua:350
+#: plugins/inputmacro/inputmacro_menu.lua:352
 msgctxt "plugin-inputmacro"
 msgid "Name"
-msgstr ""
+msgstr "名前"
 
-#: plugins/inputmacro/inputmacro_menu.lua:358
-#: plugins/inputmacro/inputmacro_menu.lua:400
+#: plugins/inputmacro/inputmacro_menu.lua:360
+#: plugins/inputmacro/inputmacro_menu.lua:402
 msgctxt "plugin-inputmacro"
 msgid "[not set]"
-msgstr ""
+msgstr "［未設定］"
 
-#: plugins/inputmacro/inputmacro_menu.lua:359
+#: plugins/inputmacro/inputmacro_menu.lua:361
 msgctxt "plugin-inputmacro"
 msgid "Activation combination"
-msgstr ""
+msgstr "アクティブ化の組み合わせ"
 
-#: plugins/inputmacro/inputmacro_menu.lua:362
+#: plugins/inputmacro/inputmacro_menu.lua:364
 msgctxt "plugin-inputmacro"
 msgid "Stop immediately"
-msgstr ""
+msgstr "すぐに停止"
 
-#: plugins/inputmacro/inputmacro_menu.lua:362
+#: plugins/inputmacro/inputmacro_menu.lua:364
 msgctxt "plugin-inputmacro"
 msgid "Complete macro"
-msgstr ""
+msgstr "マクロを完了"
 
-#: plugins/inputmacro/inputmacro_menu.lua:363
+#: plugins/inputmacro/inputmacro_menu.lua:365
 msgctxt "plugin-inputmacro"
 msgid "On release"
-msgstr ""
+msgstr "リリース時"
 
-#: plugins/inputmacro/inputmacro_menu.lua:369
+#: plugins/inputmacro/inputmacro_menu.lua:371
 msgctxt "plugin-inputmacro"
 msgid "Release"
-msgstr ""
+msgstr "リリース"
 
-#: plugins/inputmacro/inputmacro_menu.lua:372
+#: plugins/inputmacro/inputmacro_menu.lua:374
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Loop to step %d"
-msgstr ""
+msgstr "ステップ%dから繰り返す"
 
-#: plugins/inputmacro/inputmacro_menu.lua:377
+#: plugins/inputmacro/inputmacro_menu.lua:379
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Prolong step %d"
-msgstr ""
+msgstr "ステップ%dを延長"
 
-#: plugins/inputmacro/inputmacro_menu.lua:379
+#: plugins/inputmacro/inputmacro_menu.lua:381
 msgctxt "plugin-inputmacro"
 msgid "When held"
-msgstr ""
+msgstr "ホールド時"
 
-#: plugins/inputmacro/inputmacro_menu.lua:383
+#: plugins/inputmacro/inputmacro_menu.lua:385
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Step %d"
-msgstr ""
+msgstr "ステップ %d"
 
-#: plugins/inputmacro/inputmacro_menu.lua:384
+#: plugins/inputmacro/inputmacro_menu.lua:386
 msgctxt "plugin-inputmacro"
 msgid "Delay (frames)"
-msgstr ""
+msgstr "遅延（フレーム）"
 
-#: plugins/inputmacro/inputmacro_menu.lua:390
+#: plugins/inputmacro/inputmacro_menu.lua:392
 msgctxt "plugin-inputmacro"
 msgid "Duration (frames)"
-msgstr ""
+msgstr "間隔（フレーム）"
 
-#: plugins/inputmacro/inputmacro_menu.lua:398
+#: plugins/inputmacro/inputmacro_menu.lua:400
 msgctxt "plugin-inputmacro"
 msgid "n/a"
-msgstr ""
+msgstr "使用不可"
 
-#: plugins/inputmacro/inputmacro_menu.lua:402
+#: plugins/inputmacro/inputmacro_menu.lua:404
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Input %d"
-msgstr ""
+msgstr "入力 %d"
 
-#: plugins/inputmacro/inputmacro_menu.lua:407
+#: plugins/inputmacro/inputmacro_menu.lua:409
 msgctxt "plugin-inputmacro"
 msgid "Add input"
-msgstr ""
+msgstr "入力を追加"
 
-#: plugins/inputmacro/inputmacro_menu.lua:412
+#: plugins/inputmacro/inputmacro_menu.lua:414
 msgctxt "plugin-inputmacro"
 msgid "Delete step"
-msgstr ""
+msgstr "ステップを削除"
 
-#: plugins/inputmacro/inputmacro_menu.lua:428
+#: plugins/inputmacro/inputmacro_menu.lua:430
 msgctxt "plugin-inputmacro"
 msgid "Add step at position"
-msgstr ""
+msgstr "次の位置にステップを追加"
 
-#: plugins/inputmacro/inputmacro_menu.lua:474
+#: plugins/inputmacro/inputmacro_menu.lua:476
 msgctxt "plugin-inputmacro"
 msgid "Add Input Macro"
-msgstr ""
+msgstr "入力マクロを追加"
 
-#: plugins/inputmacro/inputmacro_menu.lua:481
+#: plugins/inputmacro/inputmacro_menu.lua:483
 msgctxt "plugin-inputmacro"
 msgid "Create"
 msgstr "作成"
 
-#: plugins/inputmacro/inputmacro_menu.lua:483
+#: plugins/inputmacro/inputmacro_menu.lua:485
 msgctxt "plugin-inputmacro"
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: plugins/inputmacro/inputmacro_menu.lua:499
+#: plugins/inputmacro/inputmacro_menu.lua:501
 msgctxt "plugin-inputmacro"
 msgid "Edit Input Macro"
-msgstr ""
+msgstr "入力マクロを編集"
 
-#: plugins/inputmacro/inputmacro_menu.lua:505
+#: plugins/inputmacro/inputmacro_menu.lua:507
 msgctxt "plugin-inputmacro"
 msgid "Done"
 msgstr "決定"
 
-#: plugins/inputmacro/inputmacro_menu.lua:561
+#: plugins/inputmacro/inputmacro_menu.lua:563
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Press %s to delete"
-msgstr ""
+msgstr "%sで削除"
 
-#: plugins/inputmacro/inputmacro_menu.lua:573
+#: plugins/inputmacro/inputmacro_menu.lua:575
 msgctxt "plugin-inputmacro"
 msgid "[no macros]"
-msgstr ""
+msgstr "［マクロがありません］"
 
-#: plugins/inputmacro/inputmacro_menu.lua:578
+#: plugins/inputmacro/inputmacro_menu.lua:580
 msgctxt "plugin-inputmacro"
 msgid "Add macro"
-msgstr ""
+msgstr "マクロを追加"
 
 #: plugins/timer/init.lua:27
 #, lua-format
@@ -6300,17 +6383,17 @@ msgstr ""
 #: plugins/timer/init.lua:32
 msgctxt "plugin-timer"
 msgid "Wall clock"
-msgstr ""
+msgstr "実時間"
 
 #: plugins/timer/init.lua:32
 msgctxt "plugin-timer"
 msgid "Emulated time"
-msgstr ""
+msgstr "エミュレートされた時間"
 
 #: plugins/timer/init.lua:37
 msgctxt "plugin-timer"
 msgid "Reference"
-msgstr ""
+msgstr "参考"
 
 #: plugins/timer/init.lua:39
 msgctxt "plugin-timer"
@@ -6339,7 +6422,7 @@ msgstr "ホットキーを設定するチートを選択"
 #: plugins/cheat/init.lua:623
 #, lua-format
 msgid "Press %s to clear hotkey"
-msgstr ""
+msgstr "%sを押してホットキーを消去"
 
 #: plugins/cheat/init.lua:651
 msgid "None"
@@ -6432,7 +6515,7 @@ msgstr ""
 "\n"
 "\n"
 "--- ドライバ情報 ---\n"
-"ドライバ: "
+"ドライバ： "
 
 #: plugins/data/data_messinfo.lua:24
 msgctxt "plugin-data"
@@ -6461,384 +6544,21 @@ msgctxt "plugin-commonui"
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: plugins/commonui/init.lua:197
+#: plugins/commonui/init.lua:199
 msgctxt "plugin-commonui"
 msgid "Invalid combination entered"
-msgstr ""
+msgstr "無効な組み合わせが入力されました"
 
-#: plugins/commonui/init.lua:203
+#: plugins/commonui/init.lua:205
 #, lua-format
 msgctxt "plugin-commonui"
 msgid ""
 "Enter combination or press %s to cancel\n"
 "%s"
 msgstr ""
-
-#, c-format
-#~ msgid "System: \"%1$s\" software list "
-#~ msgstr "システム：「%1$s」　ソフトウェアリスト"
-
-#~ msgid "Visible Delay"
-#~ msgstr "表示する長さ"
-
-#~ msgctxt "menu-main"
-#~ msgid "Return to Machine"
-#~ msgstr "マシンに戻る"
-
-#~ msgid "Software part selection:"
-#~ msgstr "選択中のソフトウェアパーツ："
-
-#~ msgid "BIOS selection:"
-#~ msgstr "BIOS選択："
-
-#~ msgid ""
-#~ "This driver requires images to be loaded in the following device(s): "
-#~ msgstr "このドライバは以下のデバイスでイメージの読み込みが必要です:"
-
-#~ msgid ""
-#~ "One or more ROMs/CHDs for this machine are incorrect. The machine may not "
-#~ "run correctly.\n"
-#~ msgstr ""
-#~ "このマシン用のROM/CHDが正しくありません。そのため正しく動作しない可能性が"
-#~ "あります。\n"
-
-#~ msgid ""
-#~ "One or more ROMs/CHDs for this machine have not been correctly dumped.\n"
-#~ msgstr ""
-#~ "このマシン用のROM/CHDは全て正しく吸い出されていません。\n"
-#~ "\n"
-
-#, c-format
-#~ msgid ""
-#~ "No machines found. Please check the rompath specified in the %1$s.ini "
-#~ "file.\n"
-#~ "\n"
-#~ "If this is your first time using %2$s, please see the config.txt file in "
-#~ "the docs directory for information on configuring %2$s."
-#~ msgstr ""
-#~ "マシンが見つかりません。%1$s.iniファイルで指定したrompathを確認してくださ"
-#~ "い。\n"
-#~ "\n"
-#~ "もし %2$s の利用が初めてなら、%2$s の設定方法についてdocsフォルダのconfig."
-#~ "txtファイルをご覧ください。"
-
-#~ msgid "General Inputs"
-#~ msgstr "共通の入力設定"
-
-#~ msgid "Select category:"
-#~ msgstr "カテゴリを選択："
-
-#~ msgid "Input (general)"
-#~ msgstr "入力（共通）"
-
-#~ msgid "Analog Controls"
-#~ msgstr "アナログ操作"
-
-#~ msgid "Image Information"
-#~ msgstr "イメージ情報"
-
-#~ msgid "Confirm quit from machines"
-#~ msgstr "マシン終了時に確認"
-
-#~ msgid "Skip information screen at startup"
-#~ msgstr "起動時に情報画面をスキップ"
-
-#~ msgid "Skip software parts selection menu"
-#~ msgstr "ソフトウェアパーツ選択メニューをスキップする"
-
-#~ msgid "Simultaneous contradictory"
-#~ msgstr "対称方向の同時入力"
-
-#, c-format
-#~ msgid ""
-#~ "Auditing ROMs for machine %2$u of %3$u...\n"
-#~ "%1$s"
-#~ msgstr ""
-#~ "マシン%2$u／%3$uのROMを検査中...\n"
-#~ "%1$s"
-
-#, c-format
-#~ msgid "Audit ROMs for %1$u machines marked unavailable"
-#~ msgstr "存在しないに分類された%1$uマシンのROMを検査します"
-
-#, c-format
-#~ msgid "Audit ROMs for all %1$u machines"
-#~ msgstr "全%1$uマシンのROMを検査します"
-
-#~ msgid "Input (this Machine)"
-#~ msgstr "入力（現在のマシン）"
-
-#~ msgid "ROM Audit Result\tOK\n"
-#~ msgstr "ROM検証結果\t正常\n"
-
-#~ msgid "ROM Audit Result\tBAD\n"
-#~ msgstr "ROM検証結果\t異常\n"
-
-#~ msgid ""
-#~ "ROM Audit \tDisabled\n"
-#~ "Samples Audit \tDisabled\n"
-#~ msgstr ""
-#~ "ROM検証\t無効\n"
-#~ "サンプル検証\t無効\n"
-
-#~ msgid "Device Mapping"
-#~ msgstr "デバイスマッピング"
-
-#, c-format
-#~ msgid "%s.xml saved under ui folder."
-#~ msgstr "%s.xmlをuiフォルダーに保存しました。"
-
-#, c-format
-#~ msgid "%s.txt saved under ui folder."
-#~ msgstr "%s.txtをuiフォルダーに保存しました。"
-
-#~ msgid "Custom UI Settings"
-#~ msgstr "カスタムUI設定"
-
-#~ msgid "Software Usage"
-#~ msgstr "ソフトウェアの使い方"
-
-#~ msgid "Usage"
-#~ msgstr "使い方"
-
-#~ msgctxt "path-option"
-#~ msgid "UI"
-#~ msgstr "UIファイル"
-
-#~ msgctxt "path-option"
-#~ msgid "Samples"
-#~ msgstr "サンプルファイル"
-
-#~ msgctxt "path-option"
-#~ msgid "Ends"
-#~ msgstr "終了画像"
-
-#~ msgctxt "path-option"
-#~ msgid "GameOver"
-#~ msgstr "ゲームオーバー"
-
-#~ msgctxt "selmenu-artwork"
-#~ msgid "Ends"
-#~ msgstr "終了画像"
-
-#~ msgctxt "selmenu-artwork"
-#~ msgid "Marquees"
-#~ msgstr "マーキー画像"
-
-#~ msgid "Select"
-#~ msgstr "選択"
-
-#~ msgid "View"
-#~ msgstr "ビュー"
-
-#~ msgid "Cropped"
-#~ msgstr "切り落とし"
-
-#~ msgid "Full"
-#~ msgstr "全体"
-
-#~ msgid "Select position to load from"
-#~ msgstr "セーブ元を選択"
-
-#~ msgid "Select position to save to"
-#~ msgstr "セーブ先を選択"
-
-#~ msgid "Keyboard Emulation Status"
-#~ msgstr "キーボードエミュレーションステータス"
-
-#~ msgid "Mode: PARTIAL Emulation"
-#~ msgstr "モード: 部分的エミュレーション"
-
-#~ msgid "UI:   Enabled"
-#~ msgstr "UI:   有効"
-
-#~ msgid "**Use ScrLock to toggle**"
-#~ msgstr "** ScrLockキーで切り替え **"
-
-#~ msgid "Mode: FULL Emulation"
-#~ msgstr "モード：完全エミュレーション"
-
-#~ msgid "UI:   Disabled"
-#~ msgstr "UI:   無効"
-
-#~ msgid "Autofire can't be enabled"
-#~ msgstr "連射機能は有効にできません"
-
-#~ msgid "Autofire Settings"
-#~ msgstr "連射設定"
-
-#~ msgid "Autofire Status"
-#~ msgstr "連射設定ステータス"
-
-#~ msgid "No buttons found on this machine!"
-#~ msgstr "このマシンにはボタンがありません！"
-
-#~ msgid "Autofire Delay"
-#~ msgstr "連射間隔"
-
-#~ msgid ""
-#~ "The selected software is missing one or more required files. Please "
-#~ "select a different software.\n"
-#~ "\n"
-#~ msgstr ""
-#~ "選択したソフトウェアに必要な1つ以上のファイルが不足しています。別のソフト"
-#~ "ウェアを選択してください。\n"
-#~ "\n"
-
-#~ msgid "Save machine configuration"
-#~ msgstr "マシン設定を保存する"
-
-#~ msgid "Configure machine:"
-#~ msgstr "マシン設定"
-
-#~ msgid ""
-#~ "The selected machine is missing one or more required ROM or CHD images. "
-#~ "Please select a different machine.\n"
-#~ "\n"
-#~ msgstr ""
-#~ "選択したマシンに必要な1つ以上のROMまたはCHDが不足しています。別のマシンを"
-#~ "選択してください。\n"
-#~ "\n"
-
-#~ msgid "Re-select last machine played"
-#~ msgstr "最後にプレイしたマシンを再選択"
-
-#~ msgid "Artwork Crop"
-#~ msgstr "アートワーク切り落とし"
-
-#~ msgid "Bilinear snapshot"
-#~ msgstr "スナップショットのバイリニア"
-
-#~ msgid ""
-#~ "The software selected is missing one or more required ROM or CHD images. "
-#~ "Please select a different one."
-#~ msgstr ""
-#~ "選択したソフトウェアに必要な1つ以上のROMまたはCHDが不足しています。別の物"
-#~ "を選択してください。"
-
-#~ msgid ""
-#~ "\n"
-#~ "Elements of this machine cannot be emulated as they requires physical "
-#~ "interaction or consist of mechanical devices. It is not possible to fully "
-#~ "experience this machine.\n"
-#~ msgstr ""
-#~ "\n"
-#~ "このマシンの一部の要素は、機械仕掛けのデバイスもしくは実際の動作が必要なた"
-#~ "めエミュレートできません。このマシンを完全に体験することはできません。\n"
-
-#~ msgid "Press button for hotkey or wait to clear"
-#~ msgstr "ホットキーにするボタンを押すか、放置して消去"
-
-#~ msgid "Data cleared and current state saved"
-#~ msgstr "データは消去され、現在の状態が保存されました"
-
-#~ msgid "Current state saved"
-#~ msgstr "現在の状態が保存されました"
-
-#~ msgid "Save current -- #"
-#~ msgstr "状態を保存 -- #"
-
-#~ msgid "Compare"
-#~ msgstr "比較"
-
-#~ msgid "Left operand"
-#~ msgstr "左オペランド"
-
-#~ msgid "Current"
-#~ msgstr "現在"
-
-#~ msgid "Operator"
-#~ msgstr "オペレータ"
-
-#~ msgid "Left less than right, value is difference"
-#~ msgstr "左が右より小さく、値が異なる"
-
-#~ msgid "Left greater than right, value is difference"
-#~ msgstr "左が右より大きく、値が異なる"
-
-#~ msgid "Left not equal to right, value is difference"
-#~ msgstr "左と右が一致せず、値が異なる"
-
-#~ msgid "Right operand"
-#~ msgstr "右オペランド"
-
-#~ msgid "Test cheat at addr %08X"
-#~ msgstr "アドレス%08Xでチートをテスト"
-
-#~ msgid "Roms Audit Pass\tOK\n"
-#~ msgstr "ROM検証結果\t正常\n"
-
-#~ msgid "Roms Audit Pass\tBAD\n"
-#~ msgstr "ROM検証結果\t異常\n"
-
-#~ msgid "Samples Audit Pass\tNone Needed\n"
-#~ msgstr "サンプル検証結果\t不要\n"
-
-#~ msgid "Samples Audit Pass\tOK\n"
-#~ msgstr "サンプル検証結果\t正常\n"
-
-#~ msgid "Samples Audit Pass\tBAD\n"
-#~ msgstr "サンプル検証結果\t異常\n"
-
-#~ msgid ""
-#~ "Roms Audit Pass\tDisabled\n"
-#~ "Samples Audit Pass\tDisabled\n"
-#~ msgstr ""
-#~ "ROM検証結果\t無効\n"
-#~ "サンプル検証結果\t無効\n"
-
-#~ msgid "Unimplemented"
-#~ msgstr "未実装"
-
-#~ msgid "Imperfect"
-#~ msgstr "不完全"
-
-#~ msgid "OK"
-#~ msgstr "正常"
-
-#~ msgid "Gfx: %s, Sound: %s"
-#~ msgstr "グラフィックス：%s　サウンド：%s"
-
-#~ msgid "Audit in progress..."
-#~ msgstr "検証中…"
-
-#~ msgid "Main filter"
-#~ msgstr "メインフィルタ"
-
-#~ msgid "Other filter"
-#~ msgstr "他のフィルタ"
-
-#~ msgid "^!Region"
-#~ msgstr "^!リージョン"
-
-#~ msgid "Region: %1$s -"
-#~ msgstr "リージョン：%1$s〜"
-
-#~ msgid ""
-#~ "\n"
-#~ "Certain elements of this machine cannot be emulated as it requires actual "
-#~ "physical interaction or consists of mechanical devices. It is not "
-#~ "possible to fully play this machine.\n"
-#~ msgstr ""
-#~ "\n"
-#~ "このマシンの一部の要素は、機械仕掛けのデバイスによる実際の動作が必要なため"
-#~ "エミュレートできません。そのため、このマシンを完全にプレイすることはできま"
-#~ "せん。\n"
-
-#~ msgid "No Infos Available"
-#~ msgstr "利用可能な情報はありません"
-
-#~ msgid "DATs info"
-#~ msgstr "DAT情報"
-
-#~ msgid "Save cancelled"
-#~ msgstr "セーブはキャンセルされました"
-
-#~ msgid "Load cancelled"
-#~ msgstr "ロードはキャンセルされました"
-
-#~ msgid "Save to position %s"
-#~ msgstr "%sにセーブしました"
-
-#~ msgid "Load from position %s"
-#~ msgstr "%sからロードしました"
+"組み合わせを入力するか、%sでキャンセル\n"
+"%s"
+
+#~ msgctxt "input-name"
+#~ msgid "UI Toggle"
+#~ msgstr "UI切り替え"

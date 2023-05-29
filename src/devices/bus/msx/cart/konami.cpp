@@ -30,12 +30,12 @@ void msx_cart_konami_device::device_reset()
 		m_rombank[i]->set_entry(i);
 }
 
-image_init_result msx_cart_konami_device::initialize_cartridge(std::string &message)
+std::error_condition msx_cart_konami_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
 	{
 		message = "msx_cart_konami_device: Required region 'rom' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	const u32 size = cart_rom_region()->bytes();
@@ -44,7 +44,7 @@ image_init_result msx_cart_konami_device::initialize_cartridge(std::string &mess
 	if (size > 256 * 0x2000 || size < 4 * 0x2000 || size != banks * 0x2000 || (~(banks - 1) % banks))
 	{
 		message = "msx_cart_konami_device: Region 'rom' has unsupported size.";
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 	}
 
 	m_bank_mask = banks - 1;
@@ -55,17 +55,17 @@ image_init_result msx_cart_konami_device::initialize_cartridge(std::string &mess
 	page(0)->install_read_bank(0x0000, 0x1fff, m_rombank[0]);
 	page(0)->install_read_bank(0x2000, 0x3fff, m_rombank[1]);
 	page(1)->install_read_bank(0x4000, 0x5fff, m_rombank[0]);
-	page(1)->install_write_handler(0x4000, 0x47ff, 0, 0x1000, 0, write8smo_delegate(*this, FUNC(msx_cart_konami_device::bank_w<0>)));
+	page(1)->install_write_handler(0x4000, 0x47ff, 0, 0x1000, 0, emu::rw_delegate(*this, FUNC(msx_cart_konami_device::bank_w<0>)));
 	page(1)->install_read_bank(0x6000, 0x7fff, m_rombank[1]);
-	page(1)->install_write_handler(0x6000, 0x67ff, 0, 0x1000, 0, write8smo_delegate(*this, FUNC(msx_cart_konami_device::bank_w<1>)));
+	page(1)->install_write_handler(0x6000, 0x67ff, 0, 0x1000, 0, emu::rw_delegate(*this, FUNC(msx_cart_konami_device::bank_w<1>)));
 	page(2)->install_read_bank(0x8000, 0x9fff, m_rombank[2]);
-	page(2)->install_write_handler(0x8000, 0x87ff, 0, 0x1000, 0, write8smo_delegate(*this, FUNC(msx_cart_konami_device::bank_w<2>)));
+	page(2)->install_write_handler(0x8000, 0x87ff, 0, 0x1000, 0, emu::rw_delegate(*this, FUNC(msx_cart_konami_device::bank_w<2>)));
 	page(2)->install_read_bank(0xa000, 0xbfff, m_rombank[3]);
-	page(2)->install_write_handler(0xa000, 0xa7ff, 0, 0x1000, 0, write8smo_delegate(*this, FUNC(msx_cart_konami_device::bank_w<3>)));
+	page(2)->install_write_handler(0xa000, 0xa7ff, 0, 0x1000, 0, emu::rw_delegate(*this, FUNC(msx_cart_konami_device::bank_w<3>)));
 	page(3)->install_read_bank(0xc000, 0xdfff, m_rombank[2]);
 	page(3)->install_read_bank(0xe000, 0xffff, m_rombank[3]);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 template <int Bank>
@@ -89,9 +89,9 @@ msx_cart_konami_scc_device::msx_cart_konami_scc_device(const machine_config &mco
 
 void msx_cart_konami_scc_device::device_add_mconfig(machine_config &config)
 {
-	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
-	SPEAKER(config, "mono").front_center();
-	K051649(config, m_k051649, XTAL(10'738'635)/3).add_route(ALL_OUTPUTS, "mono", 0.15);
+	K051649(config, m_k051649, DERIVED_CLOCK(1, 1));
+	if (parent_slot())
+		m_k051649->add_route(ALL_OUTPUTS, soundin(), 0.4);
 }
 
 void msx_cart_konami_scc_device::device_reset()
@@ -101,12 +101,12 @@ void msx_cart_konami_scc_device::device_reset()
 		m_rombank[i]->set_entry(i);
 }
 
-image_init_result msx_cart_konami_scc_device::initialize_cartridge(std::string &message)
+std::error_condition msx_cart_konami_scc_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
 	{
 		message = "msx_cart_konami_scc_device: Required region 'rom' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	const u32 size = cart_rom_region()->bytes();
@@ -115,7 +115,7 @@ image_init_result msx_cart_konami_scc_device::initialize_cartridge(std::string &
 	if (size > 256 * 0x2000 || size < 0x8000 || size != banks * 0x2000 || (~(banks - 1) % banks))
 	{
 		message = "msx_cart_konami_scc_device: Region 'rom' has unsupported size.";
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 	}
 
 	m_bank_mask = banks - 1;
@@ -126,29 +126,29 @@ image_init_result msx_cart_konami_scc_device::initialize_cartridge(std::string &
 	page(0)->install_read_bank(0x0000, 0x1fff, m_rombank[2]);
 	page(0)->install_read_bank(0x2000, 0x3fff, m_rombank[3]);
 	page(1)->install_read_bank(0x4000, 0x5fff, m_rombank[0]);
-	page(1)->install_write_handler(0x5000, 0x57ff, write8smo_delegate(*this, FUNC(msx_cart_konami_scc_device::bank_w<0>)));
+	page(1)->install_write_handler(0x5000, 0x57ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_scc_device::bank_w<0>)));
 	page(1)->install_read_bank(0x6000, 0x7fff, m_rombank[1]);
-	page(1)->install_write_handler(0x7000, 0x77ff, write8smo_delegate(*this, FUNC(msx_cart_konami_scc_device::bank_w<1>)));
+	page(1)->install_write_handler(0x7000, 0x77ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_scc_device::bank_w<1>)));
 	page(2)->install_view(0x8000, 0x9fff, m_scc_view);
 	m_scc_view[0].install_read_bank(0x8000, 0x9fff, m_rombank[2]);
-	m_scc_view[0].install_write_handler(0x9000, 0x97ff, write8smo_delegate(*this, FUNC(msx_cart_konami_scc_device::bank_w<2>)));
+	m_scc_view[0].install_write_handler(0x9000, 0x97ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_scc_device::bank_w<2>)));
 	m_scc_view[1].install_read_bank(0x8000, 0x9fff, m_rombank[2]);
-	m_scc_view[1].install_write_handler(0x9000, 0x97ff, write8smo_delegate(*this, FUNC(msx_cart_konami_scc_device::bank_w<2>)));
-	m_scc_view[1].install_read_handler(0x9800, 0x987f, 0, 0x0700, 0, read8sm_delegate(m_k051649, FUNC(k051649_device::k051649_waveform_r)));
-	m_scc_view[1].install_write_handler(0x9800, 0x987f, 0, 0x0700, 0, write8sm_delegate(m_k051649, FUNC(k051649_device::k051649_waveform_w)));
-	m_scc_view[1].install_write_handler(0x9880, 0x9889, 0, 0x0710, 0, write8sm_delegate(m_k051649, FUNC(k051649_device::k051649_frequency_w)));
-	m_scc_view[1].install_write_handler(0x988a, 0x988e, 0, 0x0710, 0, write8sm_delegate(m_k051649, FUNC(k051649_device::k051649_volume_w)));
-	m_scc_view[1].install_write_handler(0x988f, 0x988f, 0, 0x0710, 0, write8smo_delegate(m_k051649, FUNC(k051649_device::k051649_keyonoff_w)));
-	m_scc_view[1].install_read_handler(0x98c0, 0x98c0, 0, 0x071f, 0, read8smo_delegate(m_k051649, FUNC(k051649_device::k051649_test_r)));
-	m_scc_view[1].install_write_handler(0x98c0, 0x98c0, 0, 0x071f, 0, write8smo_delegate(m_k051649, FUNC(k051649_device::k051649_test_w)));
+	m_scc_view[1].install_write_handler(0x9000, 0x97ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_scc_device::bank_w<2>)));
+	m_scc_view[1].install_read_handler(0x9800, 0x987f, 0, 0x0700, 0, emu::rw_delegate(m_k051649, FUNC(k051649_device::k051649_waveform_r)));
+	m_scc_view[1].install_write_handler(0x9800, 0x987f, 0, 0x0700, 0, emu::rw_delegate(m_k051649, FUNC(k051649_device::k051649_waveform_w)));
+	m_scc_view[1].install_write_handler(0x9880, 0x9889, 0, 0x0710, 0, emu::rw_delegate(m_k051649, FUNC(k051649_device::k051649_frequency_w)));
+	m_scc_view[1].install_write_handler(0x988a, 0x988e, 0, 0x0710, 0, emu::rw_delegate(m_k051649, FUNC(k051649_device::k051649_volume_w)));
+	m_scc_view[1].install_write_handler(0x988f, 0x988f, 0, 0x0710, 0, emu::rw_delegate(m_k051649, FUNC(k051649_device::k051649_keyonoff_w)));
+	m_scc_view[1].install_read_handler(0x98c0, 0x98c0, 0, 0x071f, 0, emu::rw_delegate(m_k051649, FUNC(k051649_device::k051649_test_r)));
+	m_scc_view[1].install_write_handler(0x98c0, 0x98c0, 0, 0x071f, 0, emu::rw_delegate(m_k051649, FUNC(k051649_device::k051649_test_w)));
 	page(2)->install_read_bank(0x8000, 0x9fff, m_rombank[2]);
-	page(2)->install_write_handler(0x9000, 0x97ff, write8smo_delegate(*this, FUNC(msx_cart_konami_scc_device::bank_w<2>)));
+	page(2)->install_write_handler(0x9000, 0x97ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_scc_device::bank_w<2>)));
 	page(2)->install_read_bank(0xa000, 0xbfff, m_rombank[3]);
-	page(2)->install_write_handler(0xb000, 0xb7ff, write8smo_delegate(*this, FUNC(msx_cart_konami_scc_device::bank_w<3>)));
+	page(2)->install_write_handler(0xb000, 0xb7ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_scc_device::bank_w<3>)));
 	page(3)->install_read_bank(0xc000, 0xdfff, m_rombank[0]);
 	page(3)->install_read_bank(0xe000, 0xffff, m_rombank[1]);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 template <int Bank>
@@ -187,18 +187,18 @@ void msx_cart_gamemaster2_device::device_reset()
 	m_view2.select(0);
 }
 
-image_init_result msx_cart_gamemaster2_device::initialize_cartridge(std::string &message)
+std::error_condition msx_cart_gamemaster2_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
 	{
 		message = "msx_cart_gamemaster2_device: Required region 'rom' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	if (!cart_sram_region())
 	{
 		message = "msx_cart_gamemaster2_device: Required region 'sram' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	const u32 size = cart_rom_region()->bytes();
@@ -207,13 +207,13 @@ image_init_result msx_cart_gamemaster2_device::initialize_cartridge(std::string 
 	if (size != 0x20000)
 	{
 		message = "msx_cart_gamemaster2_device: Region 'rom' has unsupported size.";
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 	}
 
 	if (cart_sram_region()->bytes() != 0x2000)
 	{
 		message = "msx_cart_gamemaster2_device: Region 'sram' has unsupported size.";
-		return image_init_result::FAIL;
+		return image_error::BADSOFTWARE;
 	}
 
 	for (int i = 0; i < 3; i++)
@@ -226,24 +226,24 @@ image_init_result msx_cart_gamemaster2_device::initialize_cartridge(std::string 
 
 	page(1)->install_view(0x6000, 0x7fff, m_view0);
 	m_view0[0].install_read_bank(0x6000, 0x7fff, m_rombank[0]);
-	m_view0[0].install_write_handler(0x6000, 0x6fff, write8smo_delegate(*this, FUNC(msx_cart_gamemaster2_device::bank_w<0>)));
+	m_view0[0].install_write_handler(0x6000, 0x6fff, emu::rw_delegate(*this, FUNC(msx_cart_gamemaster2_device::bank_w<0>)));
 	m_view0[1].install_read_bank(0x6000, 0x6fff, 0x1000, m_rambank[0]);
-	m_view0[1].install_write_handler(0x6000, 0x6fff, write8smo_delegate(*this, FUNC(msx_cart_gamemaster2_device::bank_w<0>)));
+	m_view0[1].install_write_handler(0x6000, 0x6fff, emu::rw_delegate(*this, FUNC(msx_cart_gamemaster2_device::bank_w<0>)));
 
 	page(2)->install_view(0x8000, 0x9fff, m_view1);
 	m_view1[0].install_read_bank(0x8000, 0x9fff, m_rombank[1]);
-	m_view1[0].install_write_handler(0x8000, 0x8fff, write8smo_delegate(*this, FUNC(msx_cart_gamemaster2_device::bank_w<1>)));
+	m_view1[0].install_write_handler(0x8000, 0x8fff, emu::rw_delegate(*this, FUNC(msx_cart_gamemaster2_device::bank_w<1>)));
 	m_view1[1].install_read_bank(0x8000, 0x8fff, 0x1000, m_rambank[1]);
-	m_view1[1].install_write_handler(0x8000, 0x8fff, write8smo_delegate(*this, FUNC(msx_cart_gamemaster2_device::bank_w<1>)));
+	m_view1[1].install_write_handler(0x8000, 0x8fff, emu::rw_delegate(*this, FUNC(msx_cart_gamemaster2_device::bank_w<1>)));
 
 	page(2)->install_view(0xa000, 0xbfff, m_view2);
 	m_view2[0].install_read_bank(0xa000, 0xbfff, m_rombank[2]);
-	m_view2[0].install_write_handler(0xa000, 0xafff, write8smo_delegate(*this, FUNC(msx_cart_gamemaster2_device::bank_w<2>)));
+	m_view2[0].install_write_handler(0xa000, 0xafff, emu::rw_delegate(*this, FUNC(msx_cart_gamemaster2_device::bank_w<2>)));
 	m_view2[1].install_read_bank(0xa000, 0xafff, m_rambank[2]);
-	m_view2[1].install_write_handler(0xa000, 0xafff, write8smo_delegate(*this, FUNC(msx_cart_gamemaster2_device::bank_w<2>)));
+	m_view2[1].install_write_handler(0xa000, 0xafff, emu::rw_delegate(*this, FUNC(msx_cart_gamemaster2_device::bank_w<2>)));
 	m_view2[1].install_readwrite_bank(0xb000, 0xbfff, m_rambank[2]);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 template <int Bank>
@@ -272,30 +272,30 @@ msx_cart_synthesizer_device::msx_cart_synthesizer_device(const machine_config &m
 
 void msx_cart_synthesizer_device::device_add_mconfig(machine_config &config)
 {
-	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
-	SPEAKER(config, "speaker").front_center();
-	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
+	DAC_8BIT_R2R(config, m_dac, 0); // unknown DAC
+	if (parent_slot())
+		m_dac->add_route(ALL_OUTPUTS, soundin(), 0.3);
 }
 
-image_init_result msx_cart_synthesizer_device::initialize_cartridge(std::string &message)
+std::error_condition msx_cart_synthesizer_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
 	{
 		message = "msx_cart_synthesizer_device: Required region 'rom' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	if (cart_rom_region()->bytes() != 0x8000)
 	{
 		message = "msx_cart_synthesizer_device: Region 'rom' has unsupported size.";
-		return image_init_result::FAIL;
+		return image_error::BADSOFTWARE;
 	}
 
 	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
-	page(1)->install_write_handler(0x4000, 0x4000, 0, 0x3fef, 0, write8smo_delegate(m_dac, FUNC(dac_byte_interface::write)));
+	page(1)->install_write_handler(0x4000, 0x4000, 0, 0x3fef, 0, emu::rw_delegate(m_dac, FUNC(dac_byte_interface::write)));
 	page(2)->install_rom(0x8000, 0xbfff, cart_rom_region()->base() + 0x4000);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 
@@ -319,9 +319,9 @@ msx_cart_konami_sound_device::msx_cart_konami_sound_device(const machine_config 
 
 void msx_cart_konami_sound_device::device_add_mconfig(machine_config &config)
 {
-	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
-	SPEAKER(config, "mono").front_center();
-	K051649(config, m_k052539, XTAL(10'738'635)/3).add_route(ALL_OUTPUTS, "mono", 0.15);
+	K051649(config, m_k052539, DERIVED_CLOCK(1, 1));
+	if (parent_slot())
+		m_k052539->add_route(ALL_OUTPUTS, soundin(), 0.4);
 }
 
 void msx_cart_konami_sound_device::device_start()
@@ -343,7 +343,7 @@ void msx_cart_konami_sound_device::device_reset()
 	switch_bank<3>();
 }
 
-image_init_result msx_cart_konami_sound_device::initialize_cartridge(std::string &message)
+std::error_condition msx_cart_konami_sound_device::initialize_cartridge(std::string &message)
 {
 	for (int i = 0; i < 4; i++)
 	{
@@ -354,81 +354,81 @@ image_init_result msx_cart_konami_sound_device::initialize_cartridge(std::string
 
 	page(1)->install_view(0x4000, 0x5fff, m_view0);
 	m_view0[VIEW_READ].install_read_bank(0x4000, 0x5fff, m_rambank[0]);
-	m_view0[VIEW_READ].install_write_handler(0x5000, 0x57ff, write8smo_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<0>)));
+	m_view0[VIEW_READ].install_write_handler(0x5000, 0x57ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<0>)));
 	m_view0[VIEW_RAM].install_readwrite_bank(0x4000, 0x5fff, m_rambank[0]);
-	m_view0[VIEW_INVALID].install_write_handler(0x5000, 0x57ff, write8smo_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<0>)));
+	m_view0[VIEW_INVALID].install_write_handler(0x5000, 0x57ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<0>)));
 	m_view0[VIEW_INVALID | VIEW_RAM];
 
 	page(1)->install_view(0x6000, 0x7fff, m_view1);
 	m_view1[VIEW_READ].install_read_bank(0x6000, 0x7fff, m_rambank[1]);
-	m_view1[VIEW_READ].install_write_handler(0x7000, 0x77ff, write8smo_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<1>)));
+	m_view1[VIEW_READ].install_write_handler(0x7000, 0x77ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<1>)));
 	m_view1[VIEW_RAM].install_readwrite_bank(0x6000, 0x7fff, m_rambank[1]);
-	m_view1[VIEW_INVALID].install_write_handler(0x7000, 0x77ff, write8smo_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<1>)));
+	m_view1[VIEW_INVALID].install_write_handler(0x7000, 0x77ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<1>)));
 	m_view1[VIEW_INVALID | VIEW_RAM];
 
 	page(2)->install_view(0x8000, 0x9fff, m_view2);
 	m_view2[VIEW_READ].install_read_bank(0x8000, 0x9fff, m_rambank[2]);
-	m_view2[VIEW_READ].install_write_handler(0x9000, 0x97ff, write8smo_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<2>)));
+	m_view2[VIEW_READ].install_write_handler(0x9000, 0x97ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<2>)));
 	m_view2[VIEW_RAM].install_readwrite_bank(0x8000, 0x9fff, m_rambank[2]);
-	m_view2[VIEW_INVALID].install_write_handler(0x9000, 0x97ff, write8smo_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<2>)));
+	m_view2[VIEW_INVALID].install_write_handler(0x9000, 0x97ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<2>)));
 	m_view2[VIEW_INVALID | VIEW_RAM];
 	m_view2[VIEW_SCC | VIEW_READ].install_read_bank(0x8000, 0x9fff, m_rambank[2]);
-	m_view2[VIEW_SCC | VIEW_READ].install_write_handler(0x9000, 0x97ff, write8smo_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<2>)));
-	m_view2[VIEW_SCC | VIEW_READ].install_read_handler(0x9800, 0x987f, 0, 0x0700, 0, read8sm_delegate(m_k052539, FUNC(k051649_device::k051649_waveform_r)));
-	m_view2[VIEW_SCC | VIEW_READ].install_write_handler(0x9800, 0x987f, 0, 0x0700, 0, write8sm_delegate(m_k052539, FUNC(k051649_device::k051649_waveform_w)));
-	m_view2[VIEW_SCC | VIEW_READ].install_write_handler(0x9880, 0x9889, 0, 0x0710, 0, write8sm_delegate(m_k052539, FUNC(k051649_device::k051649_frequency_w)));
-	m_view2[VIEW_SCC | VIEW_READ].install_write_handler(0x988a, 0x988e, 0, 0x0710, 0, write8sm_delegate(m_k052539, FUNC(k051649_device::k051649_volume_w)));
-	m_view2[VIEW_SCC | VIEW_READ].install_write_handler(0x988f, 0x988f, 0, 0x0710, 0, write8smo_delegate(m_k052539, FUNC(k051649_device::k051649_keyonoff_w)));
-	m_view2[VIEW_SCC | VIEW_READ].install_read_handler(0x98c0, 0x98c0, 0, 0x071f, 0, read8smo_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
-	m_view2[VIEW_SCC | VIEW_READ].install_write_handler(0x98c0, 0x98c0, 0, 0x071f, 0, write8smo_delegate(m_k052539, FUNC(k051649_device::k051649_test_w)));
+	m_view2[VIEW_SCC | VIEW_READ].install_write_handler(0x9000, 0x97ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<2>)));
+	m_view2[VIEW_SCC | VIEW_READ].install_read_handler(0x9800, 0x987f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_waveform_r)));
+	m_view2[VIEW_SCC | VIEW_READ].install_write_handler(0x9800, 0x987f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_waveform_w)));
+	m_view2[VIEW_SCC | VIEW_READ].install_write_handler(0x9880, 0x9889, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_frequency_w)));
+	m_view2[VIEW_SCC | VIEW_READ].install_write_handler(0x988a, 0x988e, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_volume_w)));
+	m_view2[VIEW_SCC | VIEW_READ].install_write_handler(0x988f, 0x988f, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_keyonoff_w)));
+	m_view2[VIEW_SCC | VIEW_READ].install_read_handler(0x98c0, 0x98c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
+	m_view2[VIEW_SCC | VIEW_READ].install_write_handler(0x98c0, 0x98c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_w)));
 	m_view2[VIEW_SCC | VIEW_RAM].install_readwrite_bank(0x8000, 0x9fff, m_rambank[2]);
-	m_view2[VIEW_SCC | VIEW_RAM].install_read_handler(0x9800, 0x987f, 0, 0x0700, 0, read8sm_delegate(m_k052539, FUNC(k051649_device::k051649_waveform_r)));
-	m_view2[VIEW_SCC | VIEW_RAM].install_read_handler(0x98c0, 0x98c0, 0, 0x071f, 0, read8smo_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
-	m_view2[VIEW_SCC | VIEW_INVALID].install_write_handler(0x9000, 0x97ff, write8smo_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<2>)));
-	m_view2[VIEW_SCC | VIEW_INVALID].install_read_handler(0x9800, 0x987f, 0, 0x0700, 0, read8sm_delegate(m_k052539, FUNC(k051649_device::k051649_waveform_r)));
-	m_view2[VIEW_SCC | VIEW_INVALID].install_write_handler(0x9800, 0x987f, 0, 0x0700, 0, write8sm_delegate(m_k052539, FUNC(k051649_device::k051649_waveform_w)));
-	m_view2[VIEW_SCC | VIEW_INVALID].install_write_handler(0x9880, 0x9889, 0, 0x0710, 0, write8sm_delegate(m_k052539, FUNC(k051649_device::k051649_frequency_w)));
-	m_view2[VIEW_SCC | VIEW_INVALID].install_write_handler(0x988a, 0x988e, 0, 0x0710, 0, write8sm_delegate(m_k052539, FUNC(k051649_device::k051649_volume_w)));
-	m_view2[VIEW_SCC | VIEW_INVALID].install_write_handler(0x988f, 0x988f, 0, 0x0710, 0, write8smo_delegate(m_k052539, FUNC(k051649_device::k051649_keyonoff_w)));
-	m_view2[VIEW_SCC | VIEW_INVALID].install_read_handler(0x98c0, 0x98c0, 0, 0x071f, 0, read8smo_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
-	m_view2[VIEW_SCC | VIEW_INVALID].install_write_handler(0x98c0, 0x98c0, 0, 0x071f, 0, write8smo_delegate(m_k052539, FUNC(k051649_device::k051649_test_w)));
+	m_view2[VIEW_SCC | VIEW_RAM].install_read_handler(0x9800, 0x987f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_waveform_r)));
+	m_view2[VIEW_SCC | VIEW_RAM].install_read_handler(0x98c0, 0x98c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
+	m_view2[VIEW_SCC | VIEW_INVALID].install_write_handler(0x9000, 0x97ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<2>)));
+	m_view2[VIEW_SCC | VIEW_INVALID].install_read_handler(0x9800, 0x987f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_waveform_r)));
+	m_view2[VIEW_SCC | VIEW_INVALID].install_write_handler(0x9800, 0x987f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_waveform_w)));
+	m_view2[VIEW_SCC | VIEW_INVALID].install_write_handler(0x9880, 0x9889, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_frequency_w)));
+	m_view2[VIEW_SCC | VIEW_INVALID].install_write_handler(0x988a, 0x988e, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_volume_w)));
+	m_view2[VIEW_SCC | VIEW_INVALID].install_write_handler(0x988f, 0x988f, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_keyonoff_w)));
+	m_view2[VIEW_SCC | VIEW_INVALID].install_read_handler(0x98c0, 0x98c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
+	m_view2[VIEW_SCC | VIEW_INVALID].install_write_handler(0x98c0, 0x98c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_w)));
 	m_view2[VIEW_SCC | VIEW_INVALID | VIEW_RAM];
-	m_view2[VIEW_SCC | VIEW_INVALID | VIEW_RAM].install_read_handler(0x9800, 0x987f, 0, 0x0700, 0, read8sm_delegate(m_k052539, FUNC(k051649_device::k051649_waveform_r)));
-	m_view2[VIEW_SCC | VIEW_INVALID | VIEW_RAM].install_read_handler(0x98c0, 0x98c0, 0, 0x071f, 0, read8smo_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
+	m_view2[VIEW_SCC | VIEW_INVALID | VIEW_RAM].install_read_handler(0x9800, 0x987f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_waveform_r)));
+	m_view2[VIEW_SCC | VIEW_INVALID | VIEW_RAM].install_read_handler(0x98c0, 0x98c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
 
 	page(2)->install_view(0xa000, 0xbfff, m_view3);
 	m_view3[VIEW_READ].install_read_bank(0xa000, 0xbfff, m_rambank[3]);
-	m_view3[VIEW_READ].install_write_handler(0xb000, 0xb7ff, write8smo_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<3>)));
+	m_view3[VIEW_READ].install_write_handler(0xb000, 0xb7ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<3>)));
 	m_view3[VIEW_RAM].install_readwrite_bank(0xa000, 0xbfff, m_rambank[3]);
-	m_view3[VIEW_INVALID].install_write_handler(0xb000, 0xb7ff, write8smo_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<3>)));
+	m_view3[VIEW_INVALID].install_write_handler(0xb000, 0xb7ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<3>)));
 	m_view3[VIEW_INVALID | VIEW_RAM];
 	m_view3[VIEW_SCC | VIEW_READ].install_read_bank(0xa000, 0xbfff, m_rambank[3]);
-	m_view3[VIEW_SCC | VIEW_READ].install_write_handler(0xb000, 0xb7ff, write8smo_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<3>)));
-	m_view3[VIEW_SCC | VIEW_READ].install_read_handler(0xb800, 0xb89f, 0, 0x0700, 0, read8sm_delegate(m_k052539, FUNC(k051649_device::k052539_waveform_r)));
-	m_view3[VIEW_SCC | VIEW_READ].install_write_handler(0xb800, 0xb89f, 0, 0x0700, 0, write8sm_delegate(m_k052539, FUNC(k051649_device::k052539_waveform_w)));
-	m_view3[VIEW_SCC | VIEW_READ].install_write_handler(0xb8a0, 0xb8a9, 0, 0x0710, 0, write8sm_delegate(m_k052539, FUNC(k051649_device::k051649_frequency_w)));
-	m_view3[VIEW_SCC | VIEW_READ].install_write_handler(0xb8aa, 0xb8ae, 0, 0x0710, 0, write8sm_delegate(m_k052539, FUNC(k051649_device::k051649_volume_w)));
-	m_view3[VIEW_SCC | VIEW_READ].install_write_handler(0xb8af, 0xb8af, 0, 0x0710, 0, write8smo_delegate(m_k052539, FUNC(k051649_device::k051649_keyonoff_w)));
-	m_view3[VIEW_SCC | VIEW_READ].install_read_handler(0xb8c0, 0xb8c0, 0, 0x071f, 0, read8smo_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
-	m_view3[VIEW_SCC | VIEW_READ].install_write_handler(0xb8c0, 0xb8c0, 0, 0x071f, 0, write8smo_delegate(m_k052539, FUNC(k051649_device::k051649_test_w)));
+	m_view3[VIEW_SCC | VIEW_READ].install_write_handler(0xb000, 0xb7ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<3>)));
+	m_view3[VIEW_SCC | VIEW_READ].install_read_handler(0xb800, 0xb89f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k052539_waveform_r)));
+	m_view3[VIEW_SCC | VIEW_READ].install_write_handler(0xb800, 0xb89f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k052539_waveform_w)));
+	m_view3[VIEW_SCC | VIEW_READ].install_write_handler(0xb8a0, 0xb8a9, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_frequency_w)));
+	m_view3[VIEW_SCC | VIEW_READ].install_write_handler(0xb8aa, 0xb8ae, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_volume_w)));
+	m_view3[VIEW_SCC | VIEW_READ].install_write_handler(0xb8af, 0xb8af, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_keyonoff_w)));
+	m_view3[VIEW_SCC | VIEW_READ].install_read_handler(0xb8c0, 0xb8c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
+	m_view3[VIEW_SCC | VIEW_READ].install_write_handler(0xb8c0, 0xb8c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_w)));
 	m_view3[VIEW_SCC | VIEW_RAM].install_readwrite_bank(0xa000, 0xbfff, m_rambank[3]);
-	m_view3[VIEW_SCC | VIEW_RAM].install_read_handler(0xb800, 0xb89f, 0, 0x0700, 0, read8sm_delegate(m_k052539, FUNC(k051649_device::k052539_waveform_r)));
-	m_view3[VIEW_SCC | VIEW_RAM].install_read_handler(0xb8c0, 0xb8c0, 0, 0x071f, 0, read8smo_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
-	m_view3[VIEW_SCC | VIEW_INVALID].install_write_handler(0xb000, 0xb7ff, write8smo_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<3>)));
-	m_view3[VIEW_SCC | VIEW_INVALID].install_read_handler(0xb800, 0xb89f, 0, 0x0700, 0, read8sm_delegate(m_k052539, FUNC(k051649_device::k052539_waveform_r)));
-	m_view3[VIEW_SCC | VIEW_INVALID].install_write_handler(0xb800, 0xb89f, 0, 0x0700, 0, write8sm_delegate(m_k052539, FUNC(k051649_device::k052539_waveform_w)));
-	m_view3[VIEW_SCC | VIEW_INVALID].install_write_handler(0xb8a0, 0xb8a9, 0, 0x0710, 0, write8sm_delegate(m_k052539, FUNC(k051649_device::k051649_frequency_w)));
-	m_view3[VIEW_SCC | VIEW_INVALID].install_write_handler(0xb8aa, 0xb8ae, 0, 0x0710, 0, write8sm_delegate(m_k052539, FUNC(k051649_device::k051649_volume_w)));
-	m_view3[VIEW_SCC | VIEW_INVALID].install_write_handler(0xb8af, 0xb8af, 0, 0x0710, 0, write8smo_delegate(m_k052539, FUNC(k051649_device::k051649_keyonoff_w)));
-	m_view3[VIEW_SCC | VIEW_INVALID].install_read_handler(0xb8c0, 0xb8c0, 0, 0x071f, 0, read8smo_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
-	m_view3[VIEW_SCC | VIEW_INVALID].install_write_handler(0xb8c0, 0xb8c0, 0, 0x071f, 0, write8smo_delegate(m_k052539, FUNC(k051649_device::k051649_test_w)));
+	m_view3[VIEW_SCC | VIEW_RAM].install_read_handler(0xb800, 0xb89f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k052539_waveform_r)));
+	m_view3[VIEW_SCC | VIEW_RAM].install_read_handler(0xb8c0, 0xb8c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
+	m_view3[VIEW_SCC | VIEW_INVALID].install_write_handler(0xb000, 0xb7ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<3>)));
+	m_view3[VIEW_SCC | VIEW_INVALID].install_read_handler(0xb800, 0xb89f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k052539_waveform_r)));
+	m_view3[VIEW_SCC | VIEW_INVALID].install_write_handler(0xb800, 0xb89f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k052539_waveform_w)));
+	m_view3[VIEW_SCC | VIEW_INVALID].install_write_handler(0xb8a0, 0xb8a9, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_frequency_w)));
+	m_view3[VIEW_SCC | VIEW_INVALID].install_write_handler(0xb8aa, 0xb8ae, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_volume_w)));
+	m_view3[VIEW_SCC | VIEW_INVALID].install_write_handler(0xb8af, 0xb8af, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_keyonoff_w)));
+	m_view3[VIEW_SCC | VIEW_INVALID].install_read_handler(0xb8c0, 0xb8c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
+	m_view3[VIEW_SCC | VIEW_INVALID].install_write_handler(0xb8c0, 0xb8c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_w)));
 	m_view3[VIEW_SCC | VIEW_INVALID | VIEW_RAM];
-	m_view3[VIEW_SCC | VIEW_INVALID| VIEW_RAM].install_read_handler(0xb800, 0xb89f, 0, 0x0700, 0, read8sm_delegate(m_k052539, FUNC(k051649_device::k052539_waveform_r)));
-	m_view3[VIEW_SCC | VIEW_INVALID| VIEW_RAM].install_read_handler(0xb8c0, 0xb8c0, 0, 0x071f, 0, read8smo_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
+	m_view3[VIEW_SCC | VIEW_INVALID| VIEW_RAM].install_read_handler(0xb800, 0xb89f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k052539_waveform_r)));
+	m_view3[VIEW_SCC | VIEW_INVALID| VIEW_RAM].install_read_handler(0xb8c0, 0xb8c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
 
-	page(2)->install_write_handler(0xbffe, 0xbfff, write8smo_delegate(*this, FUNC(msx_cart_konami_sound_device::control_w)));
+	page(2)->install_write_handler(0xbffe, 0xbfff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::control_w)));
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void msx_cart_konami_sound_device::control_w(u8 data)
@@ -488,18 +488,18 @@ msx_cart_konami_sound_snatcher_device::msx_cart_konami_sound_snatcher_device(con
 {
 }
 
-image_init_result msx_cart_konami_sound_snatcher_device::initialize_cartridge(std::string &message)
+std::error_condition msx_cart_konami_sound_snatcher_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_ram_region())
 	{
 		message = "msx_cart_konami_sound_snatcher_device: Required region 'ram' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	if (cart_ram_region()->bytes() != 0x10000)
 	{
 		message = "msx_cart_konami_sound_snatcher_device: Region 'ram' has unsupported size.";
-		return image_init_result::FAIL;
+		return image_error::BADSOFTWARE;
 	}
 
 	return msx_cart_konami_sound_device::initialize_cartridge(message);
@@ -512,18 +512,18 @@ msx_cart_konami_sound_sdsnatcher_device::msx_cart_konami_sound_sdsnatcher_device
 {
 }
 
-image_init_result msx_cart_konami_sound_sdsnatcher_device::initialize_cartridge(std::string &message)
+std::error_condition msx_cart_konami_sound_sdsnatcher_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_ram_region())
 	{
 		message = "msx_cart_konami_sound_sdsnatcher_device: Required region 'ram' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	if (cart_ram_region()->bytes() != 0x10000)
 	{
 		message = "msx_cart_konami_sound_sdsnatcher_device: Region 'ram' has unsupported size.";
-		return image_init_result::FAIL;
+		return image_error::BADSOFTWARE;
 	}
 
 	return msx_cart_konami_sound_device::initialize_cartridge(message);
@@ -545,44 +545,43 @@ void msx_cart_keyboard_master_device::vlm_map(address_map &map)
 
 void msx_cart_keyboard_master_device::device_add_mconfig(machine_config &config)
 {
-	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
-	SPEAKER(config, "mono").front_center();
-	VLM5030(config, m_vlm5030, XTAL(3'579'545));
-	m_vlm5030->add_route(ALL_OUTPUTS, "mono", 0.40);
+	VLM5030(config, m_vlm5030, DERIVED_CLOCK(1, 1));
+	if (parent_slot())
+		m_vlm5030->add_route(ALL_OUTPUTS, soundin(), 1.0);
 	m_vlm5030->set_addrmap(0, &msx_cart_keyboard_master_device::vlm_map);
 }
 
 void msx_cart_keyboard_master_device::device_start()
 {
 	// Install IO read/write handlers
-	io_space().install_write_handler(0x00, 0x00, write8smo_delegate(*m_vlm5030, FUNC(vlm5030_device::data_w)));
-	io_space().install_write_handler(0x20, 0x20, write8smo_delegate(*this, FUNC(msx_cart_keyboard_master_device::io_20_w)));
-	io_space().install_read_handler(0x00, 0x00, read8smo_delegate(*this, FUNC(msx_cart_keyboard_master_device::io_00_r)));
+	io_space().install_write_handler(0x00, 0x00, emu::rw_delegate(*m_vlm5030, FUNC(vlm5030_device::data_w)));
+	io_space().install_write_handler(0x20, 0x20, emu::rw_delegate(*this, FUNC(msx_cart_keyboard_master_device::io_20_w)));
+	io_space().install_read_handler(0x00, 0x00, emu::rw_delegate(*this, FUNC(msx_cart_keyboard_master_device::io_00_r)));
 }
 
-image_init_result msx_cart_keyboard_master_device::initialize_cartridge(std::string &message)
+std::error_condition msx_cart_keyboard_master_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
 	{
 		message = "msx_cart_keyboard_master_device: Required region 'rom' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	if (!cart_vlm5030_region())
 	{
 		message = "msx_cart_keyboard_master_device: Required region 'vlm5030' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	if (cart_rom_region()->bytes() != 0x4000)
 	{
 		message = "msx_cart_keyboard_master_device: Region 'rom' has unsupported size.";
-		return image_init_result::FAIL;
+		return image_error::BADSOFTWARE;
 	}
 
 	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 uint8_t msx_cart_keyboard_master_device::read_vlm(offs_t offset)
@@ -620,12 +619,12 @@ void msx_cart_ec701_device::device_reset()
 	m_view.select(0);
 }
 
-image_init_result msx_cart_ec701_device::initialize_cartridge(std::string &message)
+std::error_condition msx_cart_ec701_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
 	{
 		message = "msx_cart_ec701_device: Required region 'rom' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	m_rombank->configure_entries(0, 24, cart_rom_region()->base() + 0x20000, 0x4000);
@@ -636,9 +635,9 @@ image_init_result msx_cart_ec701_device::initialize_cartridge(std::string &messa
 	m_view[2].nop_read(0x4000, 0x7fff);
 
 	page(2)->install_rom(0x8000, 0xbfff, cart_rom_region()->base() + 0x4000);
-	page(2)->install_write_handler(0xbff8, 0xbfff, write8smo_delegate(*this, FUNC(msx_cart_ec701_device::bank_w)));
+	page(2)->install_write_handler(0xbff8, 0xbfff, emu::rw_delegate(*this, FUNC(msx_cart_ec701_device::bank_w)));
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void msx_cart_ec701_device::bank_w(u8 data)

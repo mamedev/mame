@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MAME_MACHINE_NAOMIG1_H
-#define MAME_MACHINE_NAOMIG1_H
+#ifndef MAME_SEGA_NAOMIG1_H
+#define MAME_SEGA_NAOMIG1_H
 
 #pragma once
 
@@ -76,4 +76,4 @@ private:
 	void dma(void *dma_ptr, uint32_t main_adr, uint32_t size, bool to_mainram);
 };
 
-#endif // MAME_MACHINE_NAOMIG1_H
+#endif // MAME_SEGA_NAOMIG1_H

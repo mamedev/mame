@@ -11,7 +11,7 @@ NMI:
 	%PUSH_REGISTERS;
 	m_cc |= CC_I | CC_F;
 	set_ea(VECTOR_NMI);
-	standard_irq_callback(INPUT_LINE_NMI);
+	standard_irq_callback(INPUT_LINE_NMI, m_pc.w);
 	goto INTERRUPT_VECTOR;
 
 FIRQ:
@@ -32,7 +32,7 @@ FIRQ:
 	%PUSH_REGISTERS;
 	m_cc |= CC_I | CC_F;
 	set_ea(VECTOR_FIRQ);
-	standard_irq_callback(M6809_FIRQ_LINE);
+	standard_irq_callback(M6809_FIRQ_LINE, m_pc.w);
 	goto INTERRUPT_VECTOR;
 
 IRQ:
@@ -45,7 +45,7 @@ IRQ:
 	%PUSH_REGISTERS;
 	m_cc |= CC_I;
 	set_ea(VECTOR_IRQ);
-	standard_irq_callback(M6809_IRQ_LINE);
+	standard_irq_callback(M6809_IRQ_LINE, m_pc.w);
 	goto INTERRUPT_VECTOR;
 
 INTERRUPT_VECTOR:
@@ -612,9 +612,9 @@ CWAI:
 	// invoke standard interrupt callback for MAME core
 	switch (m_ea.w)
 	{
-		case VECTOR_NMI:    standard_irq_callback(INPUT_LINE_NMI); break;
-		case VECTOR_FIRQ:   standard_irq_callback(M6809_FIRQ_LINE); break;
-		case VECTOR_IRQ:    standard_irq_callback(M6809_IRQ_LINE); break;
+		case VECTOR_NMI:    standard_irq_callback(INPUT_LINE_NMI, m_pc.w); break;
+		case VECTOR_FIRQ:   standard_irq_callback(M6809_FIRQ_LINE, m_pc.w); break;
+		case VECTOR_IRQ:    standard_irq_callback(M6809_IRQ_LINE, m_pc.w); break;
 		default:            break;
 	}
 
@@ -670,7 +670,7 @@ SWI:
 	// doesn't use SOFTWARE_INTERRUPT label because SWI will
 	// inhibit IRQ/FIRQ
 	set_ea(VECTOR_SWI);
-	standard_irq_callback(M6809_SWI);
+	standard_irq_callback(M6809_SWI, m_pc.w);
 	m_cc |= CC_E;
 	set_regop16(m_s);
 	m_temp.w = entire_state_registers();
@@ -682,12 +682,12 @@ SWI:
 
 SWI2:
 	set_ea(VECTOR_SWI2);
-	standard_irq_callback(M6809_SWI);
+	standard_irq_callback(M6809_SWI, m_pc.w);
 	goto SOFTWARE_INTERRUPT;
 
 SWI3:
 	set_ea(VECTOR_SWI3);
-	standard_irq_callback(M6809_SWI);
+	standard_irq_callback(M6809_SWI, m_pc.w);
 	goto SOFTWARE_INTERRUPT;
 
 SOFTWARE_INTERRUPT:

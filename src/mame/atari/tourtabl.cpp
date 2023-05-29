@@ -18,6 +18,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class tourtabl_state : public driver_device
 {
 public:
@@ -201,6 +203,8 @@ ROM_START( tourtab2 )
 	ROM_LOAD( "030752.ab3", 0x1000, 0x0800, CRC(c92c49dc) SHA1(cafcf13e1b1087b477a667d1e785f5e2be187b0d) )
 	ROM_LOAD( "030753.ab4", 0x1800, 0x0800, CRC(3978b269) SHA1(4fa05c655bb74711eb99428f36df838ec70da699) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1978, tourtabl, 0,        tourtabl, tourtabl, tourtabl_state, empty_init, ROT0, "Atari", "Tournament Table (set 1)", MACHINE_SUPPORTS_SAVE )

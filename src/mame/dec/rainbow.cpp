@@ -358,6 +358,9 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 
 #include "rainbow.lh" // BEZEL - LAYOUT with LEDs for diag 1-7, keyboard 8-11 and floppy 20-23
 
+
+namespace {
+
 #define RD51_MAX_HEAD 8
 #define RD51_MAX_CYLINDER 1024
 #define RD51_SECTORS_PER_TRACK 17
@@ -671,7 +674,7 @@ protected:
 	void hdc_buffer_counter_reset();
 	void hdc_reset();
 
-	hard_disk_file *rainbow_hdc_file(int ref);
+	harddisk_image_device *rainbow_hdc_file(int ref);
 
 	uint8_t m_gdc_write_buffer[16]; // 16 x 8 bits for CPU, 8 x 16 for GDC
 	uint8_t m_gdc_color_map[32];
@@ -1193,7 +1196,7 @@ void rainbow_base_state::machine_reset()
 		m_hdc_drive_ready = true;
 		m_hdc_write_fault = false;
 
-		hard_disk_file *local_hard_disk;
+		harddisk_image_device *local_hard_disk;
 		local_hard_disk = rainbow_hdc_file(0); // one hard disk for now.
 
 		m_leds[0] = 0;
@@ -1662,7 +1665,7 @@ void rainbow_base_state::hdc_reset()
 
 // Return 'hard_disk_file' object for harddisk 1 (fixed).
 // < nullptr if geometry is insane or other errors occured >
-hard_disk_file *rainbow_base_state::rainbow_hdc_file(int drv)
+harddisk_image_device *rainbow_base_state::rainbow_hdc_file(int drv)
 {
 	m_hdc_drive_ready = false;
 
@@ -1680,8 +1683,7 @@ hard_disk_file *rainbow_base_state::rainbow_hdc_file(int drv)
 	if (!img->exists())
 		return nullptr;
 
-	hard_disk_file *file = img->get_hard_disk_file();
-	const auto &info = file->get_info();
+	const auto &info = img->get_info();
 
 	// MFM ALLOWS UP TO 17 SECTORS / TRACK.
 	// CYLINDERS: 151 (~ 5 MB) to 1024 (max. cylinders on WD1010 controller)
@@ -1690,7 +1692,7 @@ hard_disk_file *rainbow_base_state::rainbow_hdc_file(int drv)
 		((info.cylinders > 150) && (info.cylinders <= RD51_MAX_CYLINDER)))
 	{
 		m_hdc_drive_ready = true;
-		return file;  // HAS SANE GEOMETRY
+		return img;  // HAS SANE GEOMETRY
 	}
 	else
 	{
@@ -1741,7 +1743,7 @@ WRITE_LINE_MEMBER(rainbow_base_state::hdc_read_sector)
 			uint16_t cylinder = (m_hdc->read(0x04)) | (hi << 8);
 			uint8_t sector_number = m_hdc->read(0x03);
 
-			hard_disk_file *local_hard_disk = rainbow_hdc_file(0); // one hard disk for now.
+			harddisk_image_device *local_hard_disk = rainbow_hdc_file(0); // one hard disk for now.
 
 			if (local_hard_disk)
 			{
@@ -1839,7 +1841,7 @@ int rainbow_base_state::do_write_sector()
 	m_leds[0] = 0; // ON
 	switch_off_timer->adjust(attotime::from_msec(500));
 
-	hard_disk_file *local_hard_disk = rainbow_hdc_file(0); // one hard disk for now.
+	harddisk_image_device *local_hard_disk = rainbow_hdc_file(0); // one hard disk for now.
 
 	if (local_hard_disk)
 	{
@@ -3457,6 +3459,9 @@ ROM_START(rainbow190)
 	ROM_LOAD("23-090b1.mmi6308-ij.e13", 0x0000, 0x0100, CRC(cac3a7e3) SHA1(2d0468cda36fa287f705364c56dbf62f548d2e4c) ) // MMI 6308-IJ; Silkscreen stamp: "LM8413 // 090B1"; 256x8 Open Collector prom @E13, same prom is @E11 on 100-A
 ROM_END
 //----------------------------------------------------------------------------------------
+
+} // anonymous namespace
+
 
 /* Driver */
 

@@ -873,91 +873,91 @@ ROM_END
 ROM_START(raycris)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "raycris", 0, SHA1(9d255710c87c3286542d357820d828807cc6ca07))
 ROM_END
 
 ROM_START(raycrisj)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "raycrisj", 0, SHA1(015cb0e6c4421cc38809de28c4793b4491386aee))
 ROM_END
 
 ROM_START(gobyrc)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard2:image" )
+	DISK_REGION( "pccard:taitopccard2" )
 	DISK_IMAGE( "gobyrc", 0, SHA1(0bee1f495fc8b033fd56aad9260ae94abb35eb58))
 ROM_END
 
 ROM_START(rcdego)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "rcdego", 0, SHA1(9e177f2a3954cfea0c8c5a288e116324d10f5dd1))
 ROM_END
 
 ROM_START(chaoshea)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "chaosheat", 0, SHA1(c13b7d7025eee05f1f696d108801c7bafb3f1356))
 ROM_END
 
 ROM_START(chaosheaj)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "chaosheatj", 0, SHA1(2f211ac08675ea8ec33c7659a13951db94eaa627))
 ROM_END
 
 ROM_START(flipmaze)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "flipmaze", 0, SHA1(423b6c06f4f2d9a608ce20b61a3ac11687d22c40) )
 ROM_END
 
 ROM_START(spuzbobl)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard2:image" )
+	DISK_REGION( "pccard:taitopccard2" )
 	DISK_IMAGE( "spuzbobl", 0, SHA1(1b1c72fb7e5656021485fefaef8f2ba48e2b4ea8))
 ROM_END
 
 ROM_START(spuzboblj)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard2:image" )
+	DISK_REGION( "pccard:taitopccard2" )
 	DISK_IMAGE( "spuzbobj", 0, SHA1(dac433cf88543d2499bf797d7406b82ae4338726))
 ROM_END
 
 ROM_START(soutenry)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "soutenry", 0, SHA1(9204d0be833d29f37b8cd3fbdf09da69b622254b))
 ROM_END
 
 ROM_START(shanghss)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "shanghss", 0, SHA1(7964f71ec5c81d2120d83b63a82f97fbad5a8e6d))
 ROM_END
 
 ROM_START(sianniv)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "sianniv", 0, SHA1(1e08b813190a9e1baf29bc16884172d6c8da7ae3))
 ROM_END
 
 ROM_START(kollon)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "kollon", 0, SHA1(d8ea5b5b0ee99004b16ef89883e23de6c7ddd7ce))
 ROM_END
 
@@ -965,21 +965,21 @@ ROM_START(kollonc)
 	TAITOGNET_BIOS
 	ROM_DEFAULT_BIOS( "v2" )
 
-	DISK_REGION( "pccard:taitocf:image" )
+	DISK_REGION( "pccard:taitocf" )
 	DISK_IMAGE( "kollonc", 0, SHA1(ce62181659701cfb8f7c564870ab902be4d8e060)) /* Original Taito Compact Flash version */
 ROM_END
 
 ROM_START(shikigam)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "shikigam", 0, SHA1(fa49a0bc47f5cb7c30d7e49e2c3696b21bafb840))
 ROM_END
 
 ROM_START(shikigama)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "shikigama", 0, SHA1(a6fe194c86730963301be9710782ca4ac1bf3e8d))
 ROM_END
 
@@ -989,42 +989,42 @@ ROM_END
 ROM_START(otenamih)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "otenamih", 0, SHA1(b3babe3a1876c43745616ee1e7d87276ce7dad0b) )
 ROM_END
 
 ROM_START(psyvaria)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "psyvaria", 0,  SHA1(3c7fca5180356190a8bf94b22a847fdd2e6a4e13))
 ROM_END
 
 ROM_START(psyvarij)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "psyvarij", 0,  SHA1(b981a42a10069322b77f7a268beae1d409b4156d))
 ROM_END
 
 ROM_START(psyvarrv)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "psyvarrv", 0, SHA1(277c4f52502bcd7acc1889840962ec80d56465f3))
 ROM_END
 
 ROM_START(zooo)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "zooo", 0, SHA1(e275b3141b2bc49142990e6b497a5394a314a30b))
 ROM_END
 
 ROM_START(zokuoten)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "zokuoten", 0, SHA1(5ce13db00518f96af64935176c71ec68d2a51938))
 ROM_END
 
@@ -1032,7 +1032,7 @@ ROM_START(otenamhf)
 	TAITOGNET_BIOS
 	ROM_DEFAULT_BIOS( "v2" )
 
-	DISK_REGION( "pccard:taitocf:image" )
+	DISK_REGION( "pccard:taitocf" )
 	DISK_IMAGE( "otenamhf", 0, SHA1(5b15c33bf401e5546d78e905f538513d6ffcf562)) /* Original Taito Compact Flash version */
 ROM_END
 
@@ -1042,14 +1042,14 @@ ROM_END
 ROM_START(nightrai)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "nightrai", 0, SHA1(74d0458f851cbcf10453c5cc4c47bb4388244cdf))
 ROM_END
 
 ROM_START(otenki)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "otenki", 0, SHA1(7e745ca4c4570215f452fd09cdd56a42c39caeba))
 ROM_END
 
@@ -1059,21 +1059,21 @@ ROM_END
 ROM_START(usagi)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard2:image" )
+	DISK_REGION( "pccard:taitopccard2" )
 	DISK_IMAGE( "usagi", 0, SHA1(edf9dd271957f6cb06feed238ae21100514bef8e))
 ROM_END
 
 ROM_START(mahjngoh)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "mahjngoh", 0, SHA1(3ef1110d15582d7c0187438d7ad61765dd121cff))
 ROM_END
 
 ROM_START(shangtou)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "shanghaito", 0, SHA1(9901db5a9aae77e3af4157aa2c601eaab5b7ca85) )
 ROM_END
 
@@ -1083,7 +1083,7 @@ ROM_END
 ROM_START(xiistag)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "pccard:taitopccard1:image" )
+	DISK_REGION( "pccard:taitopccard1" )
 	DISK_IMAGE( "xiistag", 0, SHA1(586e37c8d926293b2bd928e5f0d693910cfb05a2))
 ROM_END
 

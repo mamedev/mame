@@ -8,8 +8,8 @@
  *
  */
 
-#ifndef MAME_MACHINE_APOLLO_KBD_H
-#define MAME_MACHINE_APOLLO_KBD_H
+#ifndef MAME_APOLLO_APOLLO_KBD_H
+#define MAME_APOLLO_APOLLO_KBD_H
 
 #pragma once
 
@@ -149,4 +149,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(APOLLO_KBD, apollo_kbd_device)
 
-#endif // MAME_MACHINE_APOLLO_KBD_H
+#endif // MAME_APOLLO_APOLLO_KBD_H

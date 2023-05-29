@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Martin Buchholz
 // thanks-to:James Wallace, Martin Buchholz, Juergen Oppermann, Volker Hann, Jan-Ole Christian
-#ifndef MAME_INCLUDES_POLYPLAY_H
-#define MAME_INCLUDES_POLYPLAY_H
+#ifndef MAME_DDR_POLYPLAY_H
+#define MAME_DDR_POLYPLAY_H
 
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
@@ -86,4 +86,4 @@ private:
 	output_finder<4> m_lamps;
 };
 
-#endif // MAME_INCLUDES_POLYPLAY_H
+#endif // MAME_DDR_POLYPLAY_H

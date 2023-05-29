@@ -29,6 +29,9 @@ TODO:
 #include "sound/spkrdev.h"
 #include "imagedev/cassette.h"
 
+
+namespace {
+
 class h01x_state : public driver_device
 {
 public:
@@ -599,6 +602,9 @@ ROM_START(h01jce)
 	ROM_REGION(0x4000, "exrom",0)
 	ROM_LOAD("hn4827128g_f0f9.bin",   0x0000, 0x4000, CRC(36bffec0) SHA1(5b4b24c54eba0a8b69f291ca656ea27a3685f42e))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

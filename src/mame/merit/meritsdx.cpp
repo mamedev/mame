@@ -25,6 +25,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class meritsdx_state : public driver_device
 {
 public:
@@ -79,6 +81,8 @@ ROM_START(scrpndx)
 	ROM_LOAD( "sc_3986_intr_palce22v10q-25.u81",  0x000, 0x2dd, CRC(2a33bc54) SHA1(ed40828154f6c75f2c0109f6df6bbaef0773f841) )
 	ROM_LOAD( "sc_3987_pc104_palce22v10q-25.u88", 0x2dd, 0x2dd, CRC(460aea86) SHA1(8ffbd42bfc90e356db7d618b376fab7fe761e216) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME(1996, scrpndx, 0, scrpndx, scrpndx, meritsdx_state, empty_init, ROT0, "Merit", "Scorpion DX", MACHINE_IS_SKELETON_MECHANICAL) // OCT 15 1996 -- ASM 15:30

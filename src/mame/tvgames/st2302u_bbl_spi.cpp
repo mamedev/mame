@@ -37,6 +37,9 @@
 #include "emupal.h"
 #include "speaker.h"
 
+
+namespace {
+
 class bbl380_state : public driver_device
 {
 public:
@@ -363,6 +366,9 @@ ROM_START(supreme)
 	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("25q32.bin", 0x000000, 0x400000, CRC(93072a3d) SHA1(9f8770839032922e64d5ddd8864441357623c45f))
 ROM_END
+
+} // anonymous namespace
+
 
 // older releases (primarily for Asian market?)
 

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_AUDIO_TIMEPLT_H
-#define MAME_AUDIO_TIMEPLT_H
+#ifndef MAME_SHARED_TIMEPLT_A_H
+#define MAME_SHARED_TIMEPLT_A_H
 
 #pragma once
 
@@ -59,4 +59,4 @@ protected:
 DECLARE_DEVICE_TYPE(TIMEPLT_AUDIO, timeplt_audio_device)
 DECLARE_DEVICE_TYPE(LOCOMOTN_AUDIO, locomotn_audio_device)
 
-#endif // MAME_AUDIO_TIMEPLT_H
+#endif // MAME_SHARED_TIMEPLT_A_H

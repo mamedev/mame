@@ -150,12 +150,12 @@ uint8_t twin16_state::upd_busy_r()
 
 void twin16_state::upd_reset_w(uint8_t data)
 {
-	m_upd7759->reset_w(data & 2);
+	m_upd7759->reset_w(BIT(data, 1));
 }
 
 void twin16_state::upd_start_w(uint8_t data)
 {
-	m_upd7759->start_w(data & 1);
+	m_upd7759->start_w(!BIT(data, 0));
 }
 
 /* Memory Maps */
@@ -634,6 +634,9 @@ void twin16_state::machine_reset()
 {
 	m_CPUA_register = 0;
 	m_CPUB_register = 0;
+
+	m_upd7759->reset_w(0);
+	m_upd7759->start_w(1);
 }
 
 void twin16_state::machine_start()

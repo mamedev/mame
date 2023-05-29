@@ -20,7 +20,6 @@
     *Muscle Ranking Spray Hitter
      Muscle Ranking Struck Out
      Neratte Don Don
-     Pikkari Chance
     *Run Run Puppy / らんらんぱぴぃ
      Soreike! Hanapuu
 
@@ -48,6 +47,9 @@
 #include "sound/ymz280b.h"
 #include "speaker.h"
 #include "screen.h"
+
+
+namespace {
 
 class gsan_state : public driver_device
 {
@@ -1098,7 +1100,7 @@ ROM_START( ddrkids )
 	ROM_REGION( 0x0f, "rtc", ROMREGION_ERASE00 )
 	ROM_LOAD( "nvram.u9", 0x00, 0x0f, CRC(96a2e20b) SHA1(e857d915b1ddcb34f4dfb63b1cd743a439776009) )
 
-	DISK_REGION( "ata:0:cfcard:image" )
+	DISK_REGION( "ata:0:cfcard" )
 	DISK_IMAGE( "gqan4_b-005", 0, SHA1(6f9b190e06607766dea348f22f536aa1eb1336b5) )
 ROM_END
 
@@ -1109,7 +1111,7 @@ ROM_START( musclhit )
 	ROM_REGION( 0x0f, "rtc", 0 )
 	ROM_LOAD( "nvram.u9", 0x00, 0x0f, CRC(17614a6a) SHA1(f4714659937e7dd3eedc18bbedc4b3000134df16) )
 
-	DISK_REGION( "ata:0:cfcard:image" )
+	DISK_REGION( "ata:0:cfcard" )
 	DISK_IMAGE( "gsan6_a-213", 0, SHA1(d9e7a350428d1621fc70e81561390c01837a94c0) )
 ROM_END
 
@@ -1120,9 +1122,11 @@ ROM_START( runpuppy )
 	ROM_REGION( 0x0f, "rtc", 0 )
 	ROM_LOAD( "nvram.u9", 0x00, 0x0f, CRC(907eb7d3) SHA1(bdbe3618a2c6dd3fb66f8e4c0226c5d827e38d67) )
 
-	DISK_REGION( "ata:0:cfcard:image" )
+	DISK_REGION( "ata:0:cfcard" )
 	DISK_IMAGE( "an10311003", 0, SHA1(5f972e29c201cdd6697f25140b37a11f02b605f5) )
 ROM_END
+
+} // anonymous namespace
 
 
 //**************************************************************************

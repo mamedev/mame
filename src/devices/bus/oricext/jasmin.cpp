@@ -31,10 +31,21 @@ INPUT_PORTS_START( jasmin )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Boot") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHANGED_MEMBER(DEVICE_SELF, oric_jasmin_device, boot_pressed, 0)
 INPUT_PORTS_END
 
-void oric_jasmin_device::map(address_map &map)
+void oric_jasmin_device::map_io(address_space_installer &space)
 {
-	map(0x3f4, 0x3f7).rw("fdc", FUNC(wd1770_device::read), FUNC(wd1770_device::write));
-	map(0x3f8, 0x3ff).w(m_fdlatch, FUNC(ls259_device::write_d0));
+	space.install_read_handler(0x3f4, 0x3f7, read8sm_delegate(m_fdc, FUNC(wd1770_device::read)));
+	space.install_write_handler(0x3f4, 0x3f7, write8sm_delegate(m_fdc, FUNC(wd1770_device::write)));
+
+	space.install_write_handler(0x3f8, 0x3ff, write8sm_delegate(m_fdlatch, FUNC(ls259_device::write_d0)));
+}
+
+void oric_jasmin_device::map_rom()
+{
+	(*view)[2].unmap_write(0xf800, 0xffff);
+	(*view)[2].install_rom(0xf800, 0xffff, m_jasmin_rom);
+
+	(*view)[3].unmap_readwrite(0xc000, 0xffff);
+	(*view)[3].install_rom(0xf800, 0xffff, m_jasmin_rom);
 }
 
 oric_jasmin_device::oric_jasmin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -54,7 +65,6 @@ oric_jasmin_device::~oric_jasmin_device()
 
 void oric_jasmin_device::device_start()
 {
-	cpu->space(AS_PROGRAM).install_device(0x0000, 0xffff, *this, &oric_jasmin_device::map);
 }
 
 const tiny_rom_entry *oric_jasmin_device::device_rom_region() const
@@ -91,37 +101,15 @@ ioport_constructor oric_jasmin_device::device_input_ports() const
 void oric_jasmin_device::remap()
 {
 	if(m_fdlatch->q3_r()) {
-		if(m_fdlatch->q2_r()) {
-			bank_c000_r->set_base(ram+0xc000);
-			bank_e000_r->set_base(ram+0xe000);
-			bank_f800_r->set_base(m_jasmin_rom.target());
-			bank_c000_w->set_base(ram+0xc000);
-			bank_e000_w->set_base(ram+0xe000);
-			bank_f800_w->set_base(junk_write);
-		} else {
-			bank_c000_r->set_base(junk_read);
-			bank_e000_r->set_base(junk_read);
-			bank_f800_r->set_base(m_jasmin_rom.target());
-			bank_c000_w->set_base(junk_write);
-			bank_e000_w->set_base(junk_write);
-			bank_f800_w->set_base(junk_write);
-		}
+		if(m_fdlatch->q2_r())
+			view->select(3);
+		else
+			view->select(2);
 	} else {
-		if(m_fdlatch->q2_r()) {
-			bank_c000_r->set_base(ram+0xc000);
-			bank_e000_r->set_base(ram+0xe000);
-			bank_f800_r->set_base(ram+0xf800);
-			bank_c000_w->set_base(ram+0xc000);
-			bank_e000_w->set_base(ram+0xe000);
-			bank_f800_w->set_base(ram+0xf800);
-		} else {
-			bank_c000_r->set_base(rom+0x0000);
-			bank_e000_r->set_base(rom+0x2000);
-			bank_f800_r->set_base(rom+0x3800);
-			bank_c000_w->set_base(junk_write);
-			bank_e000_w->set_base(junk_write);
-			bank_f800_w->set_base(junk_write);
-		}
+		if(m_fdlatch->q2_r())
+			view->select(1);
+		else
+			view->select(0);
 	}
 }
 
@@ -129,7 +117,8 @@ INPUT_CHANGED_MEMBER(oric_jasmin_device::boot_pressed)
 {
 	if(newval) {
 		m_fdlatch->write_bit(3, 1);
-		cpu->reset();
+		reset_w(1);
+		reset_w(0);
 	}
 }
 

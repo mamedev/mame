@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_XEROX820_H
-#define MAME_INCLUDES_XEROX820_H
+#ifndef MAME_XEROX_XEROX820_H
+#define MAME_XEROX_XEROX820_H
 
 #pragma once
 
@@ -186,4 +186,4 @@ protected:
 	required_device<scsi_port_device> m_sasibus;
 };
 
-#endif // MAME_INCLUDES_XEROX820_H
+#endif // MAME_XEROX_XEROX820_H

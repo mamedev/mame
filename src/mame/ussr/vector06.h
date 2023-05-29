@@ -5,8 +5,8 @@
  * includes/vector06.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_VECTOR06_H
-#define MAME_INCLUDES_VECTOR06_H
+#ifndef MAME_USSR_VECTOR06_H
+#define MAME_USSR_VECTOR06_H
 
 #pragma once
 
@@ -117,4 +117,4 @@ private:
 	bool m_romen = false;
 };
 
-#endif // MAME_INCLUDES_VECTOR06_H
+#endif // MAME_USSR_VECTOR06_H

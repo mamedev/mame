@@ -209,18 +209,13 @@
 #include "hyprdriv.lh"
 #include "sfrush.lh"
 
+#define LOG_WIDGET (1U << 1)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
 
 namespace {
-
-/*************************************
- *
- *  Debugging constants
- *
- *************************************/
-
-#define LOG_WIDGET          (0)
-
-
 
 /*************************************
  *
@@ -1053,16 +1048,14 @@ uint32_t seattle_state::widget_r(offs_t offset, uint32_t mem_mask)
 			break;
 	}
 
-	if (LOG_WIDGET)
-		logerror("Widget read (%02X) = %08X & %08X\n", offset*4, result, mem_mask);
+	LOGMASKED(LOG_WIDGET, "Widget read (%02X) = %08X & %08X\n", offset*4, result, mem_mask);
 	return result;
 }
 
 
 void seattle_state::widget_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	if (LOG_WIDGET)
-		logerror("Widget write (%02X) = %08X & %08X\n", offset*4, data, mem_mask);
+	LOGMASKED(LOG_WIDGET, "Widget write (%02X) = %08X & %08X\n", offset*4, data, mem_mask);
 
 	switch (offset)
 	{
@@ -2351,7 +2344,7 @@ ROM_START( wg3dh )
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version 1.3 (Guts: Oct 15 1996 16:57:13, Main: Oct 15 1996 17:36:39)
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // Hard Drive Version 1.3 (Guts: Oct 15 1996 16:57:13, Main: Oct 15 1996 17:36:39)
 	DISK_IMAGE( "wg3dh", 0, SHA1(4fc6f25d7f043d9bcf8743aa8df1d9be3cbc375b) ) // ST94420AG hard drive
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version L1.1
@@ -2366,7 +2359,7 @@ ROM_START( wg3dhfe ) // Original PCB board with PIC security chip labeled as  31
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 
 	// Disk caddy stickered:  3DHOCKEY FATALITY EDITION, another sticker stated:  PHX-HDsisk -0006    <-- Yes, it's "HDsisk" and not HDisk
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version ? (Guts: Feb 4 1997 17:08:22, Main: Mar 21 1997 12:15:39)
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // Hard Drive Version ? (Guts: Feb 4 1997 17:08:22, Main: Mar 21 1997 12:15:39)
 	DISK_IMAGE( "wg3dhfe", 0, SHA1(49b72e7e76036b119bfc8b9a0ef8b9acd346d0be) ) // ST94420AG hard drive
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version L1.1
@@ -2380,7 +2373,7 @@ ROM_START( mace )
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version 1.0B 6/10/97 (Guts 7/2/97, Main 7/2/97)
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // Hard Drive Version 1.0B 6/10/97 (Guts 7/2/97, Main 7/2/97)
 	DISK_IMAGE( "mace", 0, SHA1(96ec8d3ff5dd894e21aa81403bcdbeba44bb97ea) )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version L1.1, Labeled as Version 1.0
@@ -2397,7 +2390,7 @@ ROM_START( macea )
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version 1.0a (Guts 6/9/97, Main 5/12/97)
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // Hard Drive Version 1.0a (Guts 6/9/97, Main 5/12/97)
 	DISK_IMAGE( "macea", 0, BAD_DUMP SHA1(9bd4a60627915d71932cab24f89c48ea21f4c1cb) )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version L1.1
@@ -2428,7 +2421,7 @@ ROM_START( sfrush )
 	ROM_LOAD32_WORD( "sfrush.u53",  0x800000, 0x200000, CRC(71f8ddb0) SHA1(c24bef801f43bae68fda043c4356e8cf1298ca97) )
 	ROM_LOAD32_WORD( "sfrush.u49",  0x800002, 0x200000, CRC(dfb0a54c) SHA1(ed34f9485f7a7e5bb73bf5c6428b27548e12db12) )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version L1.06
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // Hard Drive Version L1.06
 	DISK_IMAGE( "sfrush", 0, SHA1(e2db0270a707fb2115207f988d5751081d6b4994) )
 
 	ROM_REGION( 0x2000, "serial_security_pic", ROMREGION_ERASEFF ) // security PIC (provides game ID code and serial number)
@@ -2451,7 +2444,7 @@ ROM_START( sfrushrk )
 	ROM_LOAD32_WORD( "audio.u53",  0x800000, 0x200000, CRC(51c89a14) SHA1(6bc62bcda224040a4596d795132874828011a038) )
 	ROM_LOAD32_WORD( "audio.u49",  0x800002, 0x200000, CRC(e6b684d3) SHA1(1f5bab7fae974cecc8756dd23e3c7aa2cf6e7dc7) )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version 1.2
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // Hard Drive Version 1.2
 	DISK_IMAGE( "sfrushrk", 0, SHA1(e763f26aca67ebc17fe8b8df4fba91d492cf7837) )
 
 	ROM_REGION( 0x2000, "serial_security_pic", ROMREGION_ERASEFF ) // security PIC (provides game ID code and serial number)
@@ -2474,7 +2467,7 @@ ROM_START( sfrushrkw )
 	ROM_LOAD32_WORD( "audio.u53",  0x800000, 0x200000, CRC(51c89a14) SHA1(6bc62bcda224040a4596d795132874828011a038) )
 	ROM_LOAD32_WORD( "audio.u49",  0x800002, 0x200000, CRC(e6b684d3) SHA1(1f5bab7fae974cecc8756dd23e3c7aa2cf6e7dc7) )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version 1.2
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // Hard Drive Version 1.2
 	DISK_IMAGE( "sfrushrk", 0, SHA1(e763f26aca67ebc17fe8b8df4fba91d492cf7837) )
 
 	ROM_REGION( 0x2000, "serial_security_pic", ROMREGION_ERASEFF ) // security PIC (provides game ID code and serial number)
@@ -2497,7 +2490,7 @@ ROM_START( sfrushrkwo )
 	ROM_LOAD32_WORD( "audio.u53",  0x800000, 0x200000, CRC(51c89a14) SHA1(6bc62bcda224040a4596d795132874828011a038) )
 	ROM_LOAD32_WORD( "audio.u49",  0x800002, 0x200000, CRC(e6b684d3) SHA1(1f5bab7fae974cecc8756dd23e3c7aa2cf6e7dc7) )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version 1.2
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // Hard Drive Version 1.2
 	DISK_IMAGE( "sfrushrk", 0, SHA1(e763f26aca67ebc17fe8b8df4fba91d492cf7837) )
 
 	ROM_REGION( 0x2000, "serial_security_pic", ROMREGION_ERASEFF ) // security PIC (provides game ID code and serial number)
@@ -2511,7 +2504,7 @@ ROM_START( calspeed )
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Release version 2.1a (4/17/98) (Guts 1.25 4/17/98, Main 4/17/98)
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // Release version 2.1a (4/17/98) (Guts 1.25 4/17/98, Main 4/17/98)
 	DISK_IMAGE( "calspeed", 0, SHA1(08d411c591d4b8bbdd6437ea80d01c4cec8516f8) )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version 1.02
@@ -2537,7 +2530,7 @@ ROM_START( calspeeda )
 	ROMX_LOAD("eprom @3 2.1a 3286", 0x000000, 0x100000, CRC(e7d8c88f) SHA1(06c11241ac439527b361826784aef4c58689892e), ROM_BIOS(3))
 
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Release version 1.0r8a (4/10/98) (Guts 4/10/98, Main 4/10/98)
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // Release version 1.0r8a (4/10/98) (Guts 4/10/98, Main 4/10/98)
 	DISK_IMAGE( "cs_10r8a", 0, SHA1(ba4e7589740e0647938c81c5082bb71d8826bad4) )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version 1.02
@@ -2551,7 +2544,7 @@ ROM_START( calspeedb )
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Release version 1.0r7a (3/4/98) (Guts 3/3/98, Main 1/19/98)
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // Release version 1.0r7a (3/4/98) (Guts 3/3/98, Main 1/19/98)
 	DISK_IMAGE( "calspeda", 0, SHA1(6b1c3a7530195ef7309b06a651b01c8b3ece92c6) )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version 1.02
@@ -2565,7 +2558,7 @@ ROM_START( vaportrx )
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Guts: Jul 2 1998 09:03:42  Main: Jul 18 1998 09:06:54
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // Guts: Jul 2 1998 09:03:42  Main: Jul 18 1998 09:06:54
 	DISK_IMAGE( "vaportrx", 0, SHA1(fe53ca7643d2ed2745086abb7f2243c69678cab1) )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version 1.02
@@ -2579,7 +2572,7 @@ ROM_START( vaportrxp )
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Guts: Apr 10 1998 11:03:14  Main: Apr 10 1998 11:27:44
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // Guts: Apr 10 1998 11:03:14  Main: Apr 10 1998 11:27:44
 	DISK_IMAGE( "vaportrp", 0, SHA1(6c86637c442ebd6994eee8c0ae0dce343c35dbe9) )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version 1.02
@@ -2596,7 +2589,7 @@ ROM_START( biofreak )
 	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) // Seattle System Boot ROM Version 0.1i Apr 14 1997  14:52:53
 	ROM_LOAD( "biofreak.u32", 0x000000, 0x80000, CRC(cefa00bb) SHA1(7e171610ede1e8a448fb8d175f9cb9e7d549de28) )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Build Date 12/11/97
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // Build Date 12/11/97
 	DISK_IMAGE( "biofreak", 0, SHA1(711241642f92ded8eaf20c418ea748989183fe10) )
 ROM_END
 
@@ -2618,7 +2611,7 @@ ROM_START( blitz )
 
 	BLITZ_BIOS
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version 1.21
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // Hard Drive Version 1.21
 	DISK_IMAGE( "blitz", 0, SHA1(9131c7888e89b3c172780156ed3fe1fe46f78b0a) )
 ROM_END
 
@@ -2632,7 +2625,7 @@ ROM_START( blitz99 )
 	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) // Boot Code Version 1.0
 	ROM_LOAD( "bltz9910.u32", 0x000000, 0x80000, CRC(777119b2) SHA1(40d255181c2f3a787919c339e83593fd506779a5) )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version 1.30
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // Hard Drive Version 1.30
 	DISK_IMAGE( "blitz99", 0, SHA1(19877e26ffce81dd525031e9e2b4f83ff982e2d9) )
 
 	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
@@ -2652,7 +2645,7 @@ ROM_START( blitz99a )
 	ROM_SYSTEM_BIOS( 1, "up130",       "Update to 1.30" )
 	ROMX_LOAD( "rev.-1.3.u33", 0x000000, 0x100000, CRC(0a0fde5a) SHA1(1edb671c66819f634a9f1daa35331a99b2bda01a), ROM_BIOS(1) )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version 1.30
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // Hard Drive Version 1.30
 	DISK_IMAGE( "blitz99a", 0, SHA1(43f834727ce01d7a63b482fc28cbf292477fc6f2) )
 
 	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
@@ -2669,7 +2662,7 @@ ROM_START( blitz2k )
 	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) // Boot Code Version 1.4
 	ROM_LOAD( "bltz2k14.u32", 0x000000, 0x80000, CRC(ac4f0051) SHA1(b8125c17370db7bfd9b783230b4ef3d5b22a2025) )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version 1.5
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // Hard Drive Version 1.5
 	DISK_IMAGE( "blitz2k", 0, SHA1(e89b7fbd4b4a9854d47ae97493e0afffbd1f69e7) )
 ROM_END
 
@@ -2683,7 +2676,7 @@ ROM_START( carnevil )
 	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) // Boot Rom Version 1.9
 	ROM_LOAD( "carnevil1_9.u32", 0x000000, 0x80000, CRC(82c07f2e) SHA1(fa51c58022ce251c53bad12fc6ffadb35adb8162) )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive v1.0.3  Diagnostics v3.4 / Feb 1 1999 16:00:07
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // Hard Drive v1.0.3  Diagnostics v3.4 / Feb 1 1999 16:00:07
 	DISK_IMAGE( "carnevil", 0, SHA1(5cffb0de63ad36eb01c5951bab04d3f8a9e23e16) )
 
 	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
@@ -2700,7 +2693,7 @@ ROM_START( carnevil1 )
 	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) // Boot Rom Version 1.9
 	ROM_LOAD( "carnevil1_9.u32", 0x000000, 0x80000, CRC(82c07f2e) SHA1(fa51c58022ce251c53bad12fc6ffadb35adb8162) )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive v1.0.1  Diagnostics v3.3 / Oct 20 1998 11:44:41
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // Hard Drive v1.0.1  Diagnostics v3.3 / Oct 20 1998 11:44:41
 	DISK_IMAGE( "carnevi1", 0, BAD_DUMP SHA1(94532727512280930a100fe473bf3a938fe2d44f) )
 
 	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
@@ -2729,7 +2722,7 @@ ROM_START( hyprdriv )
 	ROM_LOAD( "hyperdrive1.1.u32", 0x000000, 0x80000, CRC(3120991e) SHA1(8e47888a5a23c9d3c0d0c64497e1cfb4e46c2cd6) )  // Boot Rom Version 2. Doesn't work, maybe for older drive?
 	ROM_LOAD( "hyprdrve.u32", 0x000000, 0x80000, CRC(3e18cb80) SHA1(b18cc4253090ee1d65d72a7ec0c426ed08c4f238) )  // Boot Rom Version 9.
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Version 1.40  Oct 23 1998  15:16:00
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // Version 1.40  Oct 23 1998  15:16:00
 	DISK_IMAGE( "hyprdriv", 0, SHA1(8cfa343797575b32f46cc24150024be48963a03e) )
 ROM_END
 

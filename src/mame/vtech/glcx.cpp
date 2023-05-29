@@ -51,6 +51,9 @@ TMP47C241MG = TLCS-47 series 4-bit CPU with 2048x8 internal ROM
 #include "screen.h"
 #include "softlist_dev.h"
 
+
+namespace {
+
 class glcx_state : public driver_device
 {
 public:
@@ -126,6 +129,8 @@ ROM_START( gtbmcx )
 
 	// Cartridge "EUROPA" contains no ROM
 ROM_END
+
+} // anonymous namespace
 
 
 COMP( 1999, gl6600cx, 0, 0, glcx, glcx, glcx_state, empty_init, "VTech", "Genius Leader 6600 CX (Germany)", MACHINE_IS_SKELETON )

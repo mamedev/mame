@@ -67,12 +67,11 @@
 #include "m37710il.h"
 
 // verbose logging for peripherals, etc.
-#define LOG_GENERAL (1U << 0)
 #define LOG_PORTS (1U << 1)
-#define LOG_AD (1U << 2)
-#define LOG_UART (1U << 3)
+#define LOG_AD    (1U << 2)
+#define LOG_UART  (1U << 3)
 #define LOG_TIMER (1U << 4)
-#define LOG_INT (1U << 5)
+#define LOG_INT   (1U << 5)
 //#define VERBOSE (LOG_GENERAL | LOG_PORTS | LOG_AD | LOG_UART | LOG_TIMER | LOG_INT)
 #include "logmacro.h"
 
@@ -607,12 +606,12 @@ void m37710_cpu_device::set_port_dir(int p, uint8_t data)
 
 void m37710_cpu_device::da_reg_w(offs_t offset, uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "da_reg_w %x to %02X: D/A %d\n", data, (int)(offset * 2) + 0x1a, offset);
+	LOG("da_reg_w %x to %02X: D/A %d\n", data, (int)(offset * 2) + 0x1a, offset);
 }
 
 void m37710_cpu_device::pulse_output_w(offs_t offset, uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "pulse_output_w %x: Pulse output data register %d\n", data, offset);
+	LOG("pulse_output_w %x: Pulse output data register %d\n", data, offset);
 }
 
 uint8_t m37710_cpu_device::ad_control_r()
@@ -875,14 +874,14 @@ void m37710_cpu_device::timer_mode_w(offs_t offset, uint8_t data)
 
 uint8_t m37710_cpu_device::proc_mode_r(offs_t offset)
 {
-	LOGMASKED(LOG_GENERAL, "proc_mode_r: Processor mode = %x (PC=%x)\n", m_proc_mode, REG_PG | REG_PC);
+	LOG("proc_mode_r: Processor mode = %x (PC=%x)\n", m_proc_mode, REG_PG | REG_PC);
 
 	return m_proc_mode & 0xf7;
 }
 
 void m37710_cpu_device::proc_mode_w(uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "proc_mode_w %x: Processor mode = %x\n", data, m_proc_mode);
+	LOG("proc_mode_w %x: Processor mode = %x\n", data, m_proc_mode);
 
 	m_proc_mode = data;
 }
@@ -899,54 +898,54 @@ uint8_t m37710_cpu_device::watchdog_freq_r()
 
 void m37710_cpu_device::watchdog_freq_w(uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "watchdog_freq_w %x: Watchdog timer frequency = %x\n", data, m_watchdog_freq);
+	LOG("watchdog_freq_w %x: Watchdog timer frequency = %x\n", data, m_watchdog_freq);
 
 	m_watchdog_freq = data;
 }
 
 uint8_t m37710_cpu_device::waveform_mode_r()
 {
-	LOGMASKED(LOG_GENERAL, "waveform_mode_r: Waveform output mode (PC=%x)\n", REG_PG | REG_PC);
+	LOG("waveform_mode_r: Waveform output mode (PC=%x)\n", REG_PG | REG_PC);
 
 	return 0;
 }
 
 void m37710_cpu_device::waveform_mode_w(uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "waveform_mode_w %x: Waveform output mode\n", data);
+	LOG("waveform_mode_w %x: Waveform output mode\n", data);
 }
 
 uint8_t m37710_cpu_device::rto_control_r()
 {
-	LOGMASKED(LOG_GENERAL, "rto_control_r: Real-time output control = %x (PC=%x)\n", m_rto_control, REG_PG | REG_PC);
+	LOG("rto_control_r: Real-time output control = %x (PC=%x)\n", m_rto_control, REG_PG | REG_PC);
 
 	return m_rto_control;
 }
 
 void m37710_cpu_device::rto_control_w(uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "rto_control_w %x: Real-time output control = %x\n", data, m_rto_control);
+	LOG("rto_control_w %x: Real-time output control = %x\n", data, m_rto_control);
 
 	m_rto_control = data;
 }
 
 uint8_t m37710_cpu_device::dram_control_r()
 {
-	LOGMASKED(LOG_GENERAL, "dram_control_r: DRAM control = %x (PC=%x)\n", m_dram_control, REG_PG | REG_PC);
+	LOG("dram_control_r: DRAM control = %x (PC=%x)\n", m_dram_control, REG_PG | REG_PC);
 
 	return m_dram_control;
 }
 
 void m37710_cpu_device::dram_control_w(uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "dram_control_w %x: DRAM control = %x\n", data, m_dram_control);
+	LOG("dram_control_w %x: DRAM control = %x\n", data, m_dram_control);
 
 	m_dram_control = data;
 }
 
 void m37710_cpu_device::refresh_timer_w(uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL, "refresh_timer_w %x: Set refresh timer\n", data);
+	LOG("refresh_timer_w %x: Set refresh timer\n", data);
 }
 
 uint16_t m37710_cpu_device::dmac_control_r(offs_t offset, uint16_t mem_mask)
@@ -956,7 +955,7 @@ uint16_t m37710_cpu_device::dmac_control_r(offs_t offset, uint16_t mem_mask)
 
 void m37710_cpu_device::dmac_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	LOGMASKED(LOG_GENERAL, "dmac_control_w %04x & %04x: DMAC control = %04x\n", data, mem_mask, m_dmac_control);
+	LOG("dmac_control_w %04x & %04x: DMAC control = %04x\n", data, mem_mask, m_dmac_control);
 
 	m_dmac_control = (data & mem_mask) | (m_timer_reg[offset] & ~mem_mask);
 }
@@ -1076,7 +1075,7 @@ void m37710_cpu_device::m37710i_update_irqs()
 
 	if (wantedIRQ != -1)
 	{
-		standard_irq_callback(wantedIRQ);
+		standard_irq_callback(wantedIRQ, REG_PG | REG_PC);
 
 		// make sure we're running to service the interrupt
 		CPU_STOPPED &= ~STOP_LEVEL_WAI;

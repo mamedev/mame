@@ -1,0 +1,41 @@
+version: 0.0.1.{build}-test
+
+# Use default image unless needed
+#os:
+#- Windows Server 2012 R2
+
+shallow_clone: true
+
+environment:
+  matrix:
+  - LUA: "lua 5.1"
+  - LUA: "lua 5.2 --compat none"
+  - LUA: "lua 5.3 --compat none"
+  - LUA: "luajit 2.1"
+
+# Abuse this section so we can have a matrix with different Compiler versions
+configuration:
+  - mingw
+  - vs_32
+  - vs_64
+
+install:
+  - set PATH=%CD%\env\bin;C:\Python27\Scripts;C:\MinGW\bin;%PATH%
+  - pip install hererocks
+  - hererocks env --%LUA% --target %configuration% --luarocks latest
+
+before_build:
+# @todo
+- echo "Installing external deps"
+
+build_script:
+- luarocks make
+
+before_test:
+
+test_script:
+- echo "Testing..."
+- lua tests/test.lua
+
+after_test:
+# @todo

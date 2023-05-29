@@ -129,13 +129,13 @@
 #define SGCPU_TMS9901_TAG     "tms9901"
 
 // Debugging
-#define LOG_WARN        (1U<<1)   // Warnings
-#define LOG_ILLWRITE    (1U<<2)
-#define LOG_READY       (1U<<3)
-#define LOG_INTERRUPTS  (1U<<4)
-#define LOG_ADDRESS     (1U<<5)
-#define LOG_MEM         (1U<<6)
-#define LOG_MUX         (1U<<7)
+#define LOG_WARN        (1U << 1)   // Warnings
+#define LOG_ILLWRITE    (1U << 2)
+#define LOG_READY       (1U << 3)
+#define LOG_INTERRUPTS  (1U << 4)
+#define LOG_ADDRESS     (1U << 5)
+#define LOG_MEM         (1U << 6)
+#define LOG_MUX         (1U << 7)
 
 #define VERBOSE ( LOG_GENERAL | LOG_WARN )
 

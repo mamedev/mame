@@ -62,6 +62,9 @@
 #include "video/crt9007.h"
 #include "screen.h"
 
+
+namespace {
+
 class decmate2_state : public driver_device
 {
 public:
@@ -1002,6 +1005,9 @@ ROM_START(decmate3)
 
 	// TODO: add NO_DUMP entry for PAL (23-097K5)
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1982, decmate2, 0, 0, pc278, decmate2, decmate2_state, init_pc278, "Digital Equipment Corporation", "DECmate II (PC278)", MACHINE_IS_SKELETON)
 COMP(1984, decmate3, 0, 0, pc238, decmate2, decmate2_state, init_pc238, "Digital Equipment Corporation", "DECmate III (PC238)", MACHINE_IS_SKELETON)

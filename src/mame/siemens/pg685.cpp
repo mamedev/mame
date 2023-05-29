@@ -95,6 +95,9 @@ Memory:         54x 64KBit RAM, 18 empty sockets, 9 bit and 4 bit wire straps
 #include "video/mc6845.h"
 #include "screen.h"
 
+
+namespace {
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -593,6 +596,9 @@ ROM_START( pg685oua12 )
 	ROM_REGION( 0x4000, "chargen", 0 )
 	ROM_LOAD( "pg685_oua12_s79200-g39_a901-01.bin", 0x0000, 0x4000, CRC(fa722110) SHA1(b57ee67a77ff45a2544a2ae5203bc2199adfe023))
 ROM_END
+
+} // anonymous namespace
+
 
 //**************************************************************************
 //  ROM DEFINITIONS

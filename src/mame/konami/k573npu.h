@@ -4,8 +4,8 @@
  * Konami 573 Network PCB Unit
  *
  */
-#ifndef MAME_MACHINE_K573NPU_H
-#define MAME_MACHINE_K573NPU_H
+#ifndef MAME_KONAMI_K573NPU_H
+#define MAME_KONAMI_K573NPU_H
 
 #pragma once
 
@@ -24,4 +24,4 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
-#endif // MAME_MACHINE_K573NPU_H
+#endif // MAME_KONAMI_K573NPU_H

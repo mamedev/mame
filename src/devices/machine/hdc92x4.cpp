@@ -73,46 +73,46 @@
 #include "formats/imageutl.h"
 
 
-#define LOG_DETAIL      (1U<<1)     // More detail
-#define LOG_WARN        (1U<<2)     // Warning
+#define LOG_DETAIL       (1U << 1)     // More detail
+#define LOG_WARN         (1U << 2)     // Warning
 
 // Per-command debugging
-#define LOG_COMMAND      (1U<<3)
-#define LOG_SELECT       (1U<<4)
-#define LOG_STEP         (1U<<5)
-#define LOG_RESTORE      (1U<<6)
-#define LOG_SUBSTATES    (1U<<7)
-#define LOG_READ         (1U<<8)
-#define LOG_WRITE        (1U<<9)
-#define LOG_READREG      (1U<<10)
-#define LOG_SETREG       (1U<<11)
-#define LOG_SETPTR       (1U<<12)
-#define LOG_FORMAT       (1U<<13)
-#define LOG_READTRACK    (1U<<14)
+#define LOG_COMMAND      (1U << 3)
+#define LOG_SELECT       (1U << 4)
+#define LOG_STEP         (1U << 5)
+#define LOG_RESTORE      (1U << 6)
+#define LOG_SUBSTATES    (1U << 7)
+#define LOG_READ         (1U << 8)
+#define LOG_WRITE        (1U << 9)
+#define LOG_READREG      (1U << 10)
+#define LOG_SETREG       (1U << 11)
+#define LOG_SETPTR       (1U << 12)
+#define LOG_FORMAT       (1U << 13)
+#define LOG_READTRACK    (1U << 14)
 
 // Common states
-#define LOG_READID       (1U<<15)
-#define LOG_VERIFY       (1U<<16)
-#define LOG_TRANSFER     (1U<<17)
+#define LOG_READID       (1U << 15)
+#define LOG_VERIFY       (1U << 16)
+#define LOG_TRANSFER     (1U << 17)
 
 // Live states debugging
-#define LOG_LIVE         (1U<<18)
-#define LOG_SHIFT        (1U<<19)
-#define LOG_SYNC         (1U<<20)
+#define LOG_LIVE         (1U << 18)
+#define LOG_SHIFT        (1U << 19)
+#define LOG_SYNC         (1U << 20)
 
 // Misc debugging
-#define LOG_DELAY        (1U<<21)
-#define LOG_INT          (1U<<22)
-#define LOG_LINES        (1U<<23)
-#define LOG_INDEX        (1U<<24)
-#define LOG_DMA          (1U<<25)
-#define LOG_DONE         (1U<<26)
-#define LOG_FAIL         (1U<<27)
-#define LOG_AUXBUS       (1U<<28)
-#define LOG_HEADER       (1U<<29)
-#define LOG_GAPS         (1U<<30)
+#define LOG_DELAY        (1U << 21)
+#define LOG_INT          (1U << 22)
+#define LOG_LINES        (1U << 23)
+#define LOG_INDEX        (1U << 24)
+#define LOG_DMA          (1U << 25)
+#define LOG_DONE         (1U << 26)
+#define LOG_FAIL         (1U << 27)
+#define LOG_AUXBUS       (1U << 28)
+#define LOG_HEADER       (1U << 29)
+#define LOG_GAPS         (1U << 30)
 
-#define VERBOSE ( LOG_GENERAL | LOG_WARN )
+#define VERBOSE (LOG_GENERAL | LOG_WARN)
 
 #include "logmacro.h"
 

@@ -40,24 +40,25 @@ DEFINE_DEVICE_TYPE(TMS2300, tms2300_cpu_device, "tms2300", "Texas Instruments TM
 DEFINE_DEVICE_TYPE(TMS2370, tms2370_cpu_device, "tms2370", "Texas Instruments TMS2370") // high voltage version, 1 R pin removed for Vpp
 
 
-tms2100_cpu_device::tms2100_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	tms2100_cpu_device(mconfig, TMS2100, tag, owner, clock, 8 /* o pins */, 7 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 3 /* x width */, 4 /* stack levels */, 11 /* rom width */, address_map_constructor(FUNC(tms2100_cpu_device::rom_11bit), this), 7 /* ram width */, address_map_constructor(FUNC(tms2100_cpu_device::ram_7bit), this))
-{ }
-
 tms2100_cpu_device::tms2100_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map) :
 	tms1100_cpu_device(mconfig, type, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, stack_levels, rom_width, rom_map, ram_width, ram_map)
+{ }
+
+tms2100_cpu_device::tms2100_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	tms2100_cpu_device(mconfig, TMS2100, tag, owner, clock, 8 /* o pins */, 7 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 3 /* x width */, 4 /* stack levels */, 11 /* rom width */, address_map_constructor(FUNC(tms2100_cpu_device::rom_11bit), this), 7 /* ram width */, address_map_constructor(FUNC(tms2100_cpu_device::ram_7bit), this))
 { }
 
 tms2170_cpu_device::tms2170_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	tms2100_cpu_device(mconfig, TMS2170, tag, owner, clock, 8, 6, 6, 8, 3, 4, 11, address_map_constructor(FUNC(tms2170_cpu_device::rom_11bit), this), 7, address_map_constructor(FUNC(tms2170_cpu_device::ram_7bit), this))
 { }
 
-tms2300_cpu_device::tms2300_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	tms2300_cpu_device(mconfig, TMS2300, tag, owner, clock, 8, 15, 6, 8, 3, 4, 11, address_map_constructor(FUNC(tms2300_cpu_device::rom_11bit), this), 7, address_map_constructor(FUNC(tms2300_cpu_device::ram_7bit), this))
-{ }
 
 tms2300_cpu_device::tms2300_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map) :
 	tms2100_cpu_device(mconfig, type, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, stack_levels, rom_width, rom_map, ram_width, ram_map)
+{ }
+
+tms2300_cpu_device::tms2300_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	tms2300_cpu_device(mconfig, TMS2300, tag, owner, clock, 8, 15, 6, 8, 3, 4, 11, address_map_constructor(FUNC(tms2300_cpu_device::rom_11bit), this), 7, address_map_constructor(FUNC(tms2300_cpu_device::ram_7bit), this))
 { }
 
 tms2370_cpu_device::tms2370_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
@@ -69,8 +70,8 @@ tms2370_cpu_device::tms2370_cpu_device(const machine_config &mconfig, const char
 void tms2100_cpu_device::device_add_mconfig(machine_config &config)
 {
 	// microinstructions PLA, output PLA
-	PLA(config, "mpla", 8, 16, 26).set_format(pla_device::FMT::BERKELEY);
-	PLA(config, "opla", 5, 8, 32).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_mpla, 8, 16, 26).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_opla, 5, 8, 32).set_format(pla_device::FMT::BERKELEY);
 }
 
 
@@ -99,15 +100,15 @@ void tms2100_cpu_device::device_start()
 	m_int_pin = 0;
 	m_ec1_pin = 0;
 
-	m_pb_save = 0;
-	m_cb_save = 0;
-	m_a_save = 0;
-	m_ac2_save = 0;
-	m_x_save = 0;
-	m_y_save = 0;
-	m_s_save = 0;
-	m_sl_save = 0;
-	m_o_save = 0;
+	m_pb_stack = 0;
+	m_cb_stack = 0;
+	m_a_stack = 0;
+	m_ac2_stack = 0;
+	m_x_stack = 0;
+	m_y_stack = 0;
+	m_s_stack = 0;
+	m_sl_stack = 0;
+	m_o_stack = 0;
 
 	// register for savestates
 	save_item(NAME(m_ac2));
@@ -119,15 +120,15 @@ void tms2100_cpu_device::device_start()
 	save_item(NAME(m_int_pin));
 	save_item(NAME(m_ec1_pin));
 
-	save_item(NAME(m_pb_save));
-	save_item(NAME(m_cb_save));
-	save_item(NAME(m_a_save));
-	save_item(NAME(m_ac2_save));
-	save_item(NAME(m_x_save));
-	save_item(NAME(m_y_save));
-	save_item(NAME(m_s_save));
-	save_item(NAME(m_sl_save));
-	save_item(NAME(m_o_save));
+	save_item(NAME(m_pb_stack));
+	save_item(NAME(m_cb_stack));
+	save_item(NAME(m_a_stack));
+	save_item(NAME(m_ac2_stack));
+	save_item(NAME(m_x_stack));
+	save_item(NAME(m_y_stack));
+	save_item(NAME(m_s_stack));
+	save_item(NAME(m_sl_stack));
+	save_item(NAME(m_o_stack));
 
 	state_add(++m_state_count, "AC2", m_ac2).formatstr("%01X"); // 9
 }
@@ -214,15 +215,15 @@ void tms2100_cpu_device::read_opcode()
 		m_il = 0;
 
 		// restore registers
-		m_pb = m_pb_save;
-		m_cb = m_cb_save;
-		m_a = m_a_save;
-		m_ac2 = m_ac2_save;
-		m_x = m_x_save;
-		m_y = m_y_save;
-		m_status = m_s_save;
-		m_status_latch = m_sl_save;
-		write_o_reg(m_o_save);
+		m_pb = m_pb_stack;
+		m_cb = m_cb_stack;
+		m_a = m_a_stack;
+		m_ac2 = m_ac2_stack;
+		m_x = m_x_stack;
+		m_y = m_y_stack;
+		m_status = m_s_stack;
+		m_status_latch = m_sl_stack;
+		write_o_reg(m_o_stack);
 	}
 
 	// interrupt pending (blocked during jump opcodes)
@@ -243,18 +244,20 @@ void tms2100_cpu_device::read_opcode()
 
 void tms2100_cpu_device::interrupt()
 {
-	// save registers
-	m_pb_save = m_pb;
-	m_cb_save = m_cb;
-	m_a_save = m_a;
-	m_ac2_save = m_ac2;
-	m_x_save = m_x;
-	m_y_save = m_y;
-	m_s_save = m_status;
-	m_sl_save = m_status_latch;
-	m_o_save = m_o_index;
+	standard_irq_callback(0, m_rom_address);
 
-	// insert CALL to 0
+	// save registers
+	m_pb_stack = m_pb;
+	m_cb_stack = m_cb;
+	m_a_stack = m_a;
+	m_ac2_stack = m_ac2;
+	m_x_stack = m_x;
+	m_y_stack = m_y;
+	m_s_stack = m_status;
+	m_sl_stack = m_status_latch;
+	m_o_stack = m_o_index;
+
+	// insert CALL to 0 on page 0
 	m_opcode = 0xc0;
 	m_c4 = 0;
 	m_fixed = m_fixed_decode[m_opcode];
@@ -264,8 +267,6 @@ void tms2100_cpu_device::interrupt()
 	m_cb = 0;
 	m_status = 1;
 	m_il |= 1;
-
-	standard_irq_callback(0);
 }
 
 

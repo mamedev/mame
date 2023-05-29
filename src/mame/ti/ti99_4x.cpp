@@ -59,17 +59,20 @@
 #define TI99_SCREEN_TAG      "screen"
 
 // Debugging
-#define LOG_WARN        (1U<<1)   // Warnings
-#define LOG_CONFIG      (1U<<2)   // Configuration
-#define LOG_READY       (1U<<3)
-#define LOG_INTERRUPTS  (1U<<4)
-#define LOG_CRU         (1U<<5)
-#define LOG_CRUREAD     (1U<<6)
-#define LOG_RESETLOAD   (1U<<7)
+#define LOG_WARN        (1U << 1)   // Warnings
+#define LOG_CONFIG      (1U << 2)   // Configuration
+#define LOG_READY       (1U << 3)
+#define LOG_INTERRUPTS  (1U << 4)
+#define LOG_CRU         (1U << 5)
+#define LOG_CRUREAD     (1U << 6)
+#define LOG_RESETLOAD   (1U << 7)
 
 #define VERBOSE ( LOG_GENERAL | LOG_CONFIG | LOG_WARN | LOG_RESETLOAD )
 
 #include "logmacro.h"
+
+
+namespace {
 
 /*
     The console.
@@ -132,11 +135,11 @@ private:
 	// Connections from outside towards the CPU (callbacks)
 	DECLARE_WRITE_LINE_MEMBER( console_ready_dmux );
 	DECLARE_WRITE_LINE_MEMBER( console_ready_sound );
-	DECLARE_WRITE_LINE_MEMBER( console_ready_pbox );
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER( console_ready_pbox );
 	DECLARE_WRITE_LINE_MEMBER( console_ready_cart );
 	DECLARE_WRITE_LINE_MEMBER( console_ready_grom );
 	DECLARE_WRITE_LINE_MEMBER( console_reset );
-	DECLARE_WRITE_LINE_MEMBER( notconnected );
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER( notconnected );
 
 	// GROM clock
 	DECLARE_WRITE_LINE_MEMBER( gromclk_in );
@@ -1191,6 +1194,9 @@ ROM_START(ti99_4ev)
 	ROM_LOAD("994ev_grom1.u501", 0x2000, 0x1800, CRC(6885326d) SHA1(1a98de5ee886dce705de5cce11034a7be31aceac)) /* system GROM 1 */
 	ROM_LOAD("994a_grom2.u502", 0x4000, 0x1800, CRC(e0bb5341) SHA1(e255f0d65d69b927cecb8fcfac7a4c17d585ea96)) /* system GROM 2 */
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE        INPUT    CLASS          INIT        COMPANY              FULLNAME                            FLAGS
 COMP( 1979, ti99_4,   0,       0,      ti99_4_60hz,   ti99_4,  ti99_4x_state, empty_init, "Texas Instruments", "TI-99/4 Home Computer (US)",       MACHINE_SUPPORTS_SAVE)

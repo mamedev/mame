@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria, David Haywood
 // Video System Sprites
-#ifndef MAME_VIDEO_VSYSTEM_SPR_H
-#define MAME_VIDEO_VSYSTEM_SPR_H
+#ifndef MAME_VSYSTEM_VSYSTEM_SPR_H
+#define MAME_VSYSTEM_VSYSTEM_SPR_H
 
 #pragma once
 
@@ -77,4 +77,4 @@ private:
 
 DECLARE_DEVICE_TYPE(VSYSTEM_SPR, vsystem_spr_device)
 
-#endif // MAME_VIDEO_VSYSTEM_SPR_H
+#endif // MAME_VSYSTEM_VSYSTEM_SPR_H

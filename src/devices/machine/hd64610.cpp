@@ -19,7 +19,7 @@
 
 #include "coreutil.h"
 
-#define VERBOSE 1
+#define VERBOSE 0
 #include "logmacro.h"
 
 
@@ -228,7 +228,7 @@ void hd64610_device::rtc_clock_updated(int year, int month, int day, int day_of_
 	write_counter(REG_DAY, day);
 	write_counter(REG_MONTH, month);
 	write_counter(REG_YEAR, year);
-	m_regs[REG_DAY_OF_THE_WEEK] = day_of_week;
+	m_regs[REG_DAY_OF_THE_WEEK] = day_of_week - 1;
 
 	check_alarm();
 	set_irq_line();

@@ -13,13 +13,12 @@
 
 #include "slider.h"
 
-bgfx_slider_uniform::bgfx_slider_uniform(bgfx_uniform* uniform, std::vector<bgfx_slider*> sliders)
+#include <utility>
+
+bgfx_slider_uniform::bgfx_slider_uniform(bgfx_uniform* uniform, std::vector<bgfx_slider*> &&sliders)
 	: bgfx_entry_uniform(uniform)
+	, m_sliders(std::move(sliders))
 {
-	for (bgfx_slider* slider : sliders)
-	{
-		m_sliders.push_back(slider);
-	}
 }
 
 void bgfx_slider_uniform::bind()

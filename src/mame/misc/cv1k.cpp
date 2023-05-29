@@ -94,7 +94,7 @@ PCB CV1000-B / CV1000-D
 
   CPU: Hitachi 6417709S SH3 clocked at 102.4MHz (12.800MHz * 8)
 Sound: Yamaha YMZ770C-F clocked at 16.384MHz
-Other: Altera Cyclone EPIC12 FPGA
+Other: Altera Cyclone EP1C12 FPGA
        Altera EPM7032 (MAX 7000 Series) at U13
 
 OSC:
@@ -103,8 +103,8 @@ OSC:
  X3 16.384MHz (Yamaha YMZ770C-F clock)
 
 Memory:
- U6 (SDRAM)  MT46V16M16 ? 4 MBit x 16 x 4 banks, RAM (256 MBit)
- U7 (SDRAM)  MT46V16M16 ? 4 MBit x 16 x 4 banks, RAM (256 MBit)
+ U6 (SDRAM)  MT46V16M16 ? 4 MBit x 16 x 4 banks, DDR RAM (256 MBit)
+ U7 (SDRAM)  MT46V16M16 ? 4 MBit x 16 x 4 banks, DDR RAM (256 MBit)
  U1 (SDRAM)  MT48LC2M32 ? 512K x 32 x 4 banks, (64 MBit) for CV1000-B
  U1 (SDRAM)  IS42S32400 - 1024K x 32 x 4 banks, (128 MBit) for CV1000-D
 
@@ -138,13 +138,18 @@ Misc:
  D1-D6 (LED) Status LED's. D6 lights up at power on then shuts off, D2 indicates coinage.
 
 Note: * The Altera EPM7032 usually stamped / labeled with the Cave game ID number as listed above.
-      * Actual flash ROMs will vary by manufacturer but will be compatible with flash ROM listed.
+      * U4, U23, U24 flash ROMs will vary by manufacturer but will be compatible with flash ROM listed.
+      * The game logic does a manufacturer check on U2. K9F1G08U0M and two other device codes are allowed.
+        Trying to replace U2 with a flash ROM from another manufacturer does not work. Allowed devices are:
+        - Manufacturer ID: 0x98, ID code: 0x76
+        - Manufacturer ID: 0x98, ID code: 0x79
+        - Manufacturer ID: 0xEC, ID code: 0xF1  <- This is K9F1G08U0M
       * There are two known CV1000-B PCB revisions. The newer one has some minor hardware differences
         and uses an updated FPGA firmware, they are not compatible with eachother.
       * The CV1000-D revision PCB has double the RAM at U1, double the ROM at U4 and no battery.
         The CV1000-D is used for Dodonpachi Daifukkatsu and later games. Commonly referred to as SH3B PCB.
 
-Information by The Sheep, rtw, Ex-Cyber, BrianT & Guru
+Information by The Sheep, rtw, Ex-Cyber, BrianT, Guru & buffi
 
 ------------------------------------------------------
 
@@ -171,12 +176,11 @@ Touchscreen
 
 Remaining Video issues
  - mmpork startup screen flicker - the FOR USE IN JAPAN screen doesn't appear on the real PCB until after the graphics are fully loaded, it still displays 'please wait' until that point.
- - is the use of the 'scroll' registers 100% correct? (related to above?)
  - Sometimes the 'sprites' in mushisam lag by a frame vs the 'backgrounds' is this a timing problem, does the real game do it?
+ - End of Blit should send IRQ1. (one game has a valid irq routine that looks like it was used for profiling, but nothing depends on it)
 
-Blitter Timing
- - Correct slowdown emulation and flags (depends on blit mode, and speed of RAM) - could do with the recompiler or alt idle skips on the busy flag wait loops
- - End of Blit IRQ? (one game has a valid irq routine that looks like it was used for profiling, but nothing depends on it)
+Timing
+ - Correct CPU slowdown emulation and flags (and speed of RAM). Most slowdown seems due to SH-3 uncached RAM access wait states, which is not implemented.
 
 31/12/2021:
   Akai Katana and Dodonpachi Saidaioujou removed at the request of the
@@ -210,7 +214,6 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_ram(*this, "mainram"),
 		m_rombase(*this, "maincpu"),
-		m_blitrate(*this, "BLITRATE"),
 		m_eepromout(*this, "EEPROMOUT"),
 		m_idleramoffs(0),
 		m_idlepc(0)
@@ -247,7 +250,6 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	required_ioport m_blitrate;
 	required_ioport m_eepromout;
 
 	uint32_t m_idleramoffs;
@@ -266,8 +268,6 @@ private:
 
 uint32_t cv1k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m_blitter->set_delay_scale(m_blitrate->read());
-
 	m_blitter->draw_screen(bitmap,cliprect);
 	return 0;
 }
@@ -436,14 +436,6 @@ static INPUT_PORTS_START( cv1k_base )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", rtc9701_device, write_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", rtc9701_device, set_clock_line)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", rtc9701_device, set_cs_line)
-
-	PORT_START("BLITCFG") // the Blitter Delay code isn't threadsafe, DO NOT turn on by default
-	PORT_CONFNAME( 0x0001,  0x0000, "Use (unsafe) Blitter Delay (requires reset)" )
-	PORT_CONFSETTING(       0x0000, DEF_STR( No ) )
-	PORT_CONFSETTING(       0x0001, DEF_STR( Yes ) )
-
-	PORT_START("BLITRATE")
-	PORT_ADJUSTER(50, "Blitter Delay")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cv1k )
@@ -466,7 +458,6 @@ INPUT_PORTS_END
 void cv1k_state::machine_reset()
 {
 	m_blitter->set_rambase(reinterpret_cast<uint16_t *>(m_ram.target()));
-	m_blitter->set_is_unsafe(ioport("BLITCFG")->read());
 	m_blitter->install_handlers( 0x18000000, 0x18000057 );
 	m_blitter->reset();
 }
@@ -586,9 +577,9 @@ ROM_START( mushisamb )
 	ROM_LOAD16_WORD_SWAP("u24", 0x400000, 0x400000, CRC(e3d05c9f) SHA1(130c3d62317da1729c85bd178bd51500edd73ada) )
 ROM_END
 
-ROM_START( espgal2 ) // newer CV1000-B PCB revision, updated FPGA firmware, no changes in game code or data
+ROM_START( espgal2 )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "espgal2_u4", 0x000000, 0x200000, CRC(843608b8) SHA1(2f5fcd38e76df531a923cd9956104cef5185aaa9) ) // (2005/11/14 MASTER VER)
+	ROM_LOAD16_WORD_SWAP( "espgal2_u4", 0x000000, 0x200000, CRC(2cb37c03) SHA1(da438efc497f72aa345d2cdb0143d269e51576d3) ) // (2005/11/14.MASTER VER.)
 	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
@@ -599,9 +590,22 @@ ROM_START( espgal2 ) // newer CV1000-B PCB revision, updated FPGA firmware, no c
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(c76b1ec4) SHA1(b98a53d41a995d968e0432ed824b0b06d93dcea8) )
 ROM_END
 
-ROM_START( espgal2a )
+ROM_START( espgal2a ) // newer CV1000-B PCB revision, updated FPGA firmware, no changes in game code or data
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "espgal2a_u4", 0x000000, 0x200000, CRC(09c908bb) SHA1(7d6031fd3542b3e1d296ff218feb40502fd78694) ) // (2005/11/14 MASTER VER)
+	ROM_LOAD16_WORD_SWAP( "espgal2a_u4", 0x000000, 0x200000, CRC(843608b8) SHA1(2f5fcd38e76df531a923cd9956104cef5185aaa9) ) // (2005/11/14 MASTER VER)
+	ROM_RELOAD(0x200000,0x200000)
+
+	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
+	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(222f58c7) SHA1(d47a5085a1debd9cb8c61d88cd39e4f5036d1797) ) // (2005/11/14 MASTER VER)
+
+	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(b9a10c22) SHA1(4561f95c6018c9716077224bfe9660e61fb84681) )
+	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(c76b1ec4) SHA1(b98a53d41a995d968e0432ed824b0b06d93dcea8) )
+ROM_END
+
+ROM_START( espgal2b )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "espgal2b_u4", 0x000000, 0x200000, CRC(09c908bb) SHA1(7d6031fd3542b3e1d296ff218feb40502fd78694) ) // (2005/11/14 MASTER VER)
 	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
@@ -712,7 +716,7 @@ ROM_START( ibara )
 	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(55840976) SHA1(4982bdce84f9603adfed7a618f18bc80359ab81e) ) // not dumped, it is unknown if this revision really uses same U2 as ibarao
+	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(55840976) SHA1(4982bdce84f9603adfed7a618f18bc80359ab81e) ) // (2005/03/22 MASTER VER..)
 
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(ee5e585d) SHA1(7eeba4ee693060e927f8c46b16e39227c6a62392) )
@@ -1023,8 +1027,9 @@ GAME( 2006, ibarablk,   0,        cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT27
 GAME( 2006, ibarablka,  ibarablk, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Ibara Kuro Black Label (2006/02/06 MASTER VER.)",                               MACHINE_IMPERFECT_TIMING )
 
 // CA013  Espgaluda II
-GAME( 2005, espgal2,    0,        cv1k,   cv1k, cv1k_state, init_espgal2,  ROT270, "Cave (AMI license)",   "Espgaluda II (2005/11/14 MASTER VER, newer CV1000-B PCB)",                      MACHINE_IMPERFECT_TIMING )
-GAME( 2005, espgal2a,   espgal2,  cv1k,   cv1k, cv1k_state, init_espgal2,  ROT270, "Cave (AMI license)",   "Espgaluda II (2005/11/14 MASTER VER, original CV1000-B PCB)",                   MACHINE_IMPERFECT_TIMING )
+GAME( 2005, espgal2,    0,        cv1k,   cv1k, cv1k_state, init_espgal2,  ROT270, "Cave (AMI license)",   "Espgaluda II (2005/11/14.MASTER VER.)",                                         MACHINE_IMPERFECT_TIMING )
+GAME( 2005, espgal2a,   espgal2,  cv1k,   cv1k, cv1k_state, init_espgal2,  ROT270, "Cave (AMI license)",   "Espgaluda II (2005/11/14 MASTER VER, newer CV1000-B PCB)",                      MACHINE_IMPERFECT_TIMING )
+GAME( 2005, espgal2b,   espgal2,  cv1k,   cv1k, cv1k_state, init_espgal2,  ROT270, "Cave (AMI license)",   "Espgaluda II (2005/11/14 MASTER VER, original CV1000-B PCB)",                   MACHINE_IMPERFECT_TIMING )
 
 // CA???  Puzzle! Mushihime-Tama
 GAME( 2005, mushitam,   0,        cv1k,   cv1k, cv1k_state, init_mushitam, ROT0,   "Cave (AMI license)",   "Puzzle! Mushihime-Tama (2005/09/09.MASTER VER)",                                MACHINE_IMPERFECT_TIMING )

@@ -62,6 +62,8 @@ ToDo:
 #include "speaker.h"
 
 
+namespace {
+
 class sbc6510_state : public driver_device
 {
 public:
@@ -320,6 +322,9 @@ ROM_START( sbc6510 )
 
 	ROM_REGION( 0x2000, "eeprom", ROMREGION_ERASEFF )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

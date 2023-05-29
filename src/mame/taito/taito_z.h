@@ -5,8 +5,8 @@
     Taito Z system
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_TAITO_Z_H
-#define MAME_INCLUDES_TAITO_Z_H
+#ifndef MAME_TAITO_TAITO_Z_H
+#define MAME_TAITO_TAITO_Z_H
 
 #pragma once
 
@@ -312,4 +312,4 @@ private:
 	output_finder<2> m_recoil;
 };
 
-#endif // MAME_INCLUDES_TAITO_Z_H
+#endif // MAME_TAITO_TAITO_Z_H

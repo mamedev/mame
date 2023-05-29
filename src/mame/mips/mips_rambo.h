@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-#ifndef MAME_MACHINE_MIPS_RAMBO_H
-#define MAME_MACHINE_MIPS_RAMBO_H
+#ifndef MAME_MIPS_MIPS_RAMBO_H
+#define MAME_MIPS_MIPS_RAMBO_H
 
 #pragma once
 
@@ -144,4 +144,4 @@ private:
 
 DECLARE_DEVICE_TYPE(MIPS_RAMBO, mips_rambo_device)
 
-#endif // MAME_MACHINE_MIPS_RAMBO_H
+#endif // MAME_MIPS_MIPS_RAMBO_H

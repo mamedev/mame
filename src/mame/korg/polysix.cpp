@@ -12,6 +12,9 @@
 #include "machine/nvram.h"
 #include "machine/pit8253.h"
 
+
+namespace {
+
 class ps6_base_state : public driver_device
 {
 protected:
@@ -187,6 +190,9 @@ ROM_START(poly61)
 	ROM_SYSTEM_BIOS(1, "new", "Newer MCU")
 	ROMX_LOAD("d8049c-384.bin", 0x000, 0x800, CRC(bbc421b5) SHA1(be683cdce5cbf867c5b8a52802288c1296f5fbd1), ROM_BIOS(1))
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1980, polysix, 0, 0, polysix, polysix, polysix_state, empty_init, "Korg", "Polysix Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
 SYST(1982, poly61,  0, 0, poly61,  polysix, poly61_state,  empty_init, "Korg", "Poly-61 Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)

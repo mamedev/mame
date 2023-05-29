@@ -5,8 +5,8 @@
  * includes/ondra.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_ONDRA_H
-#define MAME_INCLUDES_ONDRA_H
+#ifndef MAME_TESLA_ONDRA_H
+#define MAME_TESLA_ONDRA_H
 
 #pragma once
 
@@ -62,4 +62,4 @@ private:
 	required_ioport_array<10> m_io_keyboard;
 };
 
-#endif // MAME_INCLUDES_ONDRA_H
+#endif // MAME_TESLA_ONDRA_H

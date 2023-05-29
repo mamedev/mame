@@ -5,8 +5,8 @@
     Atari I, Robot hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_IROBOT_H
-#define MAME_INCLUDES_IROBOT_H
+#ifndef MAME_ATARI_IROBOT_H
+#define MAME_ATARI_IROBOT_H
 
 #pragma once
 
@@ -127,4 +127,4 @@ private:
 	output_finder<2> m_leds;
 };
 
-#endif // MAME_INCLUDES_IROBOT_H
+#endif // MAME_ATARI_IROBOT_H

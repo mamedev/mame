@@ -9,14 +9,15 @@ SMSC FDC37C93x Plug and Play Compatible Ultra I/O Controller
 ***************************************************************************/
 
 #include "emu.h"
-#include "bus/isa/isa.h"
-#include "machine/ds128x.h"
 #include "machine/fdc37c93x.h"
 
-DEFINE_DEVICE_TYPE(FDC37C93X, fdc37c93x_device, "fdc37c93x", "SMSC FDC37C93X")
+#include "formats/naslite_dsk.h"
+#include "formats/pc_dsk.h"
 
-fdc37c93x_device::fdc37c93x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, FDC37C93X, tag, owner, clock)
+DEFINE_DEVICE_TYPE(FDC37C93X, fdc37c93x_device, "fdc37c93x", "SMSC FDC37C93X Super I/O")
+
+fdc37c93x_device::fdc37c93x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
 	, mode(OperatingMode::Run)
 	, config_key_step(0)
@@ -68,6 +69,13 @@ fdc37c93x_device::fdc37c93x_device(const machine_config &mconfig, const char *ta
 		enabled_logical[n] = false;
 	for (int n = 0; n < 4; n++)
 		dreq_mapping[n] = -1;
+}
+
+fdc37c93x_device::fdc37c93x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: fdc37c93x_device(mconfig, FDC37C93X, tag, owner, clock)
+{
+	m_device_id = 0x02;
+	m_device_rev = 0x01;
 }
 
 /*
@@ -901,10 +909,10 @@ uint16_t fdc37c93x_device::read_global_configuration_register(int index)
 		ret = logical_device;
 		break;
 	case 0x20:
-		ret = 2;
+		ret = m_device_id;
 		break;
 	case 0x21:
-		ret = 1;
+		ret = m_device_rev;
 		break;
 	}
 	logerror("Read global configuration register %02X = %02X\n", index, ret);
@@ -989,4 +997,15 @@ void fdc37c93x_device::device_start()
 
 void fdc37c93x_device::device_reset()
 {
+}
+
+// 'M707 is mostly same except no IDE ports and extra power management regs
+DEFINE_DEVICE_TYPE(FDC37M707, fdc37m707_device, "fdc37m707", "SMSC FDC37M707 Super I/O")
+
+
+fdc37m707_device::fdc37m707_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: fdc37c93x_device(mconfig, FDC37M707, tag, owner, clock)
+{
+	m_device_id = 0x42;
+	m_device_rev = 0x01;
 }

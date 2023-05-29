@@ -11,6 +11,9 @@
 //#include "cpu/m6502/m38881.h"
 #include "machine/nvram.h"
 
+
+namespace {
+
 class roland_sc88_state : public driver_device
 {
 public:
@@ -61,5 +64,8 @@ ROM_START(sc88vl)
 	ROM_LOAD("roland-r00788489-hn624316fbc27.ic4",  0x400000, 0x200000, NO_DUMP)
 	ROM_LOAD("roland-r00788490-hn624316fbc28.ic2",  0x600000, 0x200000, NO_DUMP)
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1995, sc88vl, 0, 0, sc88vl, sc88vl, roland_sc88_state, empty_init, "Roland", "SoundCanvas SC-88VL", MACHINE_IS_SKELETON)

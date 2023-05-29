@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder, Frode van der Meeren
-#ifndef MAME_INCLUDES_TIKI100_H
-#define MAME_INCLUDES_TIKI100_H
+#ifndef MAME_TIKI_TIKI100_H
+#define MAME_TIKI_TIKI100_H
 
 #pragma once
 
@@ -162,4 +162,4 @@ private:
 
 };
 
-#endif // MAME_INCLUDES_TIKI100_H
+#endif // MAME_TIKI_TIKI100_H

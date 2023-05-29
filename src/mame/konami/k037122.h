@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli, Acho A. Tang, R. Belmont
-#ifndef MAME_VIDEO_K037122_H
-#define MAME_VIDEO_K037122_H
+#ifndef MAME_KONAMI_K037122_H
+#define MAME_KONAMI_K037122_H
 #pragma once
 
 #include "tilemap.h"
@@ -50,4 +50,4 @@ private:
 
 DECLARE_DEVICE_TYPE(K037122, k037122_device)
 
-#endif // MAME_VIDEO_K037122_H
+#endif // MAME_KONAMI_K037122_H

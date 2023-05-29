@@ -128,6 +128,9 @@ Variants: T denotes an active 8.4" display, C a passive 9.5" color display. 3560
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 class at_state : public driver_device
 {
 public:
@@ -6001,6 +6004,8 @@ ROM_START( pg750eisa )
 	ROM_REGION32_LE(0x20000, "bios", 0)
 	ROM_LOAD( "pg_pg750_486_eisa.bin", 0x10000, 0x10000, CRC(2e6149a9) SHA1(9fcf29a6169efa1359c7c3eff09326dd3e4001dc))
 ROM_END
+
+} // anonymous namespace
 
 
 /***************************************************************************

@@ -76,6 +76,11 @@ Notes:
 #include "screen.h"
 #include "speaker.h"
 
+#define LOG_BLITTER (1U << 1)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
 
 namespace {
 
@@ -296,8 +301,6 @@ private:
 	void xymg_mem(address_map &map);
 };
 
-
-#define LOG_BLITTER 0
 
 /***************************************************************************
 
@@ -522,10 +525,8 @@ void igs011_state::igs011_blit_flags_w(offs_t offset, u16 data, u16 mem_mask)
 
 	COMBINE_DATA(&blitter.flags);
 
-#if LOG_BLITTER
-	logerror("%06x: blit x %03x, y %03x, w %03x, h %03x, gfx %03x%04x, depth %02x, pen %02x, flags %03x\n", m_maincpu->pc(),
-					blitter.x,blitter.y,blitter.w,blitter.h,blitter.gfx_hi,blitter.gfx_lo,blitter.depth,blitter.pen,blitter.flags);
-#endif
+	LOGMASKED(LOG_BLITTER, "%06x: blit x %03x, y %03x, w %03x, h %03x, gfx %03x%04x, depth %02x, pen %02x, flags %03x\n", m_maincpu->pc(),
+		blitter.x,blitter.y,blitter.w,blitter.h,blitter.gfx_hi,blitter.gfx_lo,blitter.depth,blitter.pen,blitter.flags);
 
 	u8 *dest     = m_layer[blitter.flags & 0x0007].get();
 	const bool opaque =  !(blitter.flags & 0x0008);

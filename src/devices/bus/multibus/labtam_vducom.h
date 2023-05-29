@@ -21,25 +21,20 @@
 #include "screen.h"
 
 
-class labtam_vducom_device
+class labtam_vducom_device_base
 	: public device_t
 	, public device_multibus_interface
 {
-public:
-	labtam_vducom_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
-
 protected:
-	// device_t overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	labtam_vducom_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
+
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-private:
 	void cpu_mem(address_map &map);
-	void cpu_pio(address_map &map);
+	virtual void cpu_pio(address_map &map);
 
 	void bus_mem_w(offs_t offset, u16 data, u16 mem_mask);
 	u16 bus_mem_r(offs_t offset, u16 mem_mask);
@@ -52,19 +47,21 @@ private:
 	u8 u15_r(offs_t offset) { return BIT(m_e4->read(), offset); }
 	void u7_w(offs_t offset, u8 data);
 
-	void palette_init(palette_device &palette);
-	MC6845_UPDATE_ROW(update_row);
+	u16 start() const { return m_start; }
+	u8 u7() const { return m_u7; }
+
+private:
+	u8 nvram_recall();
+	void nvram_store(u8 data);
 
 	required_device<i8086_cpu_device> m_cpu;
 	required_device<pic8259_device> m_pic;
 	required_device_array<am9513_device, 2> m_ctc;
 	required_device_array<z80sio_device, 2> m_com;
 	required_device_array<x2212_device, 2> m_nvram;
-	required_device<mc6845_device> m_crtc;
-	required_device<palette_device> m_palette;
-	required_device<screen_device> m_screen;
 
-	required_shared_ptr_array<u16, 2> m_ram;
+	required_device_array<rs232_port_device, 4> m_serial;
+
 	required_ioport m_e4;
 	memory_view m_mbus;
 
@@ -74,6 +71,40 @@ private:
 	bool m_installed;
 };
 
-DECLARE_DEVICE_TYPE(LABTAM_VDUCOM, labtam_vducom_device)
+class labtam_8086cpu_device : public labtam_vducom_device_base
+{
+public:
+	labtam_8086cpu_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
+class labtam_vducom_device : public labtam_vducom_device_base
+{
+public:
+	labtam_vducom_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	virtual void cpu_pio(address_map &map) override;
+
+private:
+	void palette_init(palette_device &palette);
+	MC6845_UPDATE_ROW(update_row);
+
+	required_device<mc6845_device> m_crtc;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+
+	required_shared_ptr_array<u16, 2> m_ram;
+};
+
+DECLARE_DEVICE_TYPE(LABTAM_8086CPU, labtam_8086cpu_device)
+DECLARE_DEVICE_TYPE(LABTAM_VDUCOM,  labtam_vducom_device)
 
 #endif // MAME_BUS_MULTIBUS_LABTAM_VDUCOM_H

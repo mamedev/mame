@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Ville Linde
-#ifndef MAME_INCLUDES_MODEL3_H
-#define MAME_INCLUDES_MODEL3_H
+#ifndef MAME_SEGA_MODEL3_H
+#define MAME_SEGA_MODEL3_H
 
 #pragma once
 
@@ -303,8 +303,8 @@ private:
 	std::unique_ptr<m3_triangle[]> m_tri_alpha_buffer;
 	int m_tri_buffer_ptr = 0;
 	int m_tri_alpha_buffer_ptr = 0;
-	int m_viewport_tri_index[4];
-	int m_viewport_tri_alpha_index[4];
+	int m_viewport_tri_index[4]{};
+	int m_viewport_tri_alpha_index[4]{};
 
 	uint32_t rtc72421_r(offs_t offset);
 	void rtc72421_w(offs_t offset, uint32_t data);
@@ -438,4 +438,4 @@ private:
 	void getbass_iocpu_io(address_map &map);
 };
 
-#endif // MAME_INCLUDES_MODEL3_H
+#endif // MAME_SEGA_MODEL3_H

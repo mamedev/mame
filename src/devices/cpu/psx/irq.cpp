@@ -11,24 +11,10 @@
 #include "psx.h"
 #include "irq.h"
 
-#include <cstdarg>
-
-#define VERBOSE_LEVEL ( 0 )
+#define VERBOSE ( 0 )
+#include "logmacro.h"
 
 #define PSX_IRQ_MASK ( 0x7fd )
-
-static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, const char *s_fmt, ... )
-{
-	if( VERBOSE_LEVEL >= n_level )
-	{
-		va_list v;
-		char buf[ 32768 ];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		device.logerror( "%s: %s", device.machine().describe_context(), buf );
-	}
-}
 
 DEFINE_DEVICE_TYPE(PSX_IRQ, psxirq_device, "psxirq", "Sony PSX IRQ")
 
@@ -61,7 +47,7 @@ void psxirq_device::device_start()
 
 void psxirq_device::set( uint32_t bitmask )
 {
-	verboselog( *this, 2, "psx_irq_set %08x\n", bitmask );
+	LOG( "%s: psx_irq_set %08x\n", machine().describe_context(), bitmask );
 	n_irqdata |= bitmask;
 	psx_irq_update();
 }
@@ -70,12 +56,12 @@ void psxirq_device::psx_irq_update( void )
 {
 	if( ( n_irqdata & n_irqmask ) != 0 )
 	{
-		verboselog( *this, 2, "psx irq assert\n" );
+		LOG( "%s: psx irq assert\n", machine().describe_context() );
 		m_irq_handler( ASSERT_LINE );
 	}
 	else
 	{
-		verboselog( *this, 2, "psx irq clear\n" );
+		LOG( "%s: psx irq clear\n", machine().describe_context() );
 		m_irq_handler( CLEAR_LINE );
 	}
 }
@@ -85,21 +71,21 @@ void psxirq_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 	switch( offset )
 	{
 	case 0x00:
-		verboselog( *this, 2, "psx irq data ( %08x, %08x ) %08x -> %08x\n", data, mem_mask, n_irqdata, ( n_irqdata & ~mem_mask ) | ( n_irqdata & n_irqmask & data ) );
+		LOG( "%s: psx irq data ( %08x, %08x ) %08x -> %08x\n", machine().describe_context(), data, mem_mask, n_irqdata, ( n_irqdata & ~mem_mask ) | ( n_irqdata & n_irqmask & data ) );
 		n_irqdata = ( n_irqdata & ~mem_mask ) | ( n_irqdata & n_irqmask & data );
 		psx_irq_update();
 		break;
 	case 0x01:
-		verboselog( *this, 2, "psx irq mask ( %08x, %08x ) %08x -> %08x\n", data, mem_mask, n_irqmask, ( n_irqmask & ~mem_mask ) | data );
+		LOG( "%s: psx irq mask ( %08x, %08x ) %08x -> %08x\n", machine().describe_context(), data, mem_mask, n_irqmask, ( n_irqmask & ~mem_mask ) | data );
 		n_irqmask = ( n_irqmask & ~mem_mask ) | data;
 		if( ( n_irqmask &~ PSX_IRQ_MASK ) != 0 )
 		{
-			verboselog( *this, 0, "psx_irq_w( %08x, %08x, %08x ) unknown irq\n", offset, data, mem_mask );
+			logerror( "%s: psx_irq_w( %08x, %08x, %08x ) unknown irq\n", machine().describe_context(), offset, data, mem_mask );
 		}
 		psx_irq_update();
 		break;
 	default:
-		verboselog( *this, 0, "psx_irq_w( %08x, %08x, %08x ) unknown register\n", offset, data, mem_mask );
+		logerror( "%s: psx_irq_w( %08x, %08x, %08x ) unknown register\n", machine().describe_context(), offset, data, mem_mask );
 		break;
 	}
 }
@@ -109,13 +95,13 @@ uint32_t psxirq_device::read(offs_t offset)
 	switch( offset )
 	{
 	case 0x00:
-		verboselog( *this, 1, "psx_irq_r irq data %08x\n", n_irqdata );
+		LOG( "%s: psx_irq_r irq data %08x\n", machine().describe_context(), n_irqdata );
 		return n_irqdata;
 	case 0x01:
-		verboselog( *this, 1, "psx_irq_r irq mask %08x\n", n_irqmask );
+		LOG( "%s: psx_irq_r irq mask %08x\n", machine().describe_context(), n_irqmask );
 		return n_irqmask;
 	default:
-		verboselog( *this, 0, "psx_irq_r unknown register %d\n", offset );
+		logerror( "%s: psx_irq_r unknown register %d\n", machine().describe_context(), offset );
 		break;
 	}
 	return 0;

@@ -5,8 +5,8 @@
     Super Dead Heat hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_SPDHEAT_H
-#define MAME_INCLUDES_SPDHEAT_H
+#ifndef MAME_TAITO_SPDHEAT_H
+#define MAME_TAITO_SPDHEAT_H
 
 #pragma once
 
@@ -100,4 +100,4 @@ private:
 	template<int which> uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-#endif // MAME_INCLUDES_SPDHEAT_H
+#endif // MAME_TAITO_SPDHEAT_H

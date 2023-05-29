@@ -12,6 +12,9 @@
     - ROM 00/01: original motherboard, 256K of RAM (banks 00/01/E0/E1 only), FPI chip manages fast/slow side
     - ROM 03: revised motherboard, 1M of RAM (banks 00/01/->0F/E0/E1), CYA chip replaces FPI
     - Expanded IIe: ROM 00/01 motherboard in a IIe case with a IIe keyboard rather than ADB
+    - "Mark Twain" prototype: ROM 3 hardware, SWIM1 instead of IWM, built-in floppy, integrated High-Speed SCSI Card
+      and internal SCSI HDD, 2 SIMM slots for RAM expansion instead of the proprietary memory slot of the previous IIgs.
+      Only 5 slots: slots 5 and 7 are missing (5 for the SuperDrive, 7 for the SCSI).
 
     Timing in terms of the 14M 14.3181818 MHz clock (1/2 of the 28.6363636 master clock):
     - 1 2.8 MHz 65816 cycle is 5 14M clocks.
@@ -27,7 +30,8 @@
 
     One video line is: 6 cycles of right border, 13 cycles of hblank, 6 cycles of left border, and 40 cycles of active video
 
-    640 + 96 + 96 = 832 (make borders each 38 pixels wider in A2 modes)
+    ((6*14)*2) + 560 = 728 (total for A2 modes)  htotal = 910 (65 * 14)
+    ((6*16)*2) + 640 = 832 (total for SHR)       htotal = 1040 (65 * 16)
 
     FF6ACF is speed test in ROM
     Diags:
@@ -54,10 +58,6 @@
 
 #include "apple2video.h"
 
-#define RUN_ADB_MICRO (0)       // use the ADB microcontroller for keyboard/mouse input
-#define ADB_HLE (0)             // connect the ADB microcontroller to the macadb.cpp ADB bit-serial keyboard+mouse
-#define LOG_ADB (0)             // log ADB activity in the old-style HLE simulation of the microcontroller and GLU
-
 #include "apple2common.h"
 // #include "machine/apple2host.h"
 #include "macadb.h"
@@ -70,7 +70,6 @@
 #include "cpu/g65816/g65816.h"
 #include "cpu/m6502/m5074x.h"
 #include "machine/bankdev.h"
-#include "machine/kb3600.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "machine/z80scc.h"
@@ -79,6 +78,7 @@
 
 #include "machine/applefdintf.h"
 #include "machine/iwm.h"
+#include "machine/swim1.h"
 
 #include "screen.h"
 #include "softlist_dev.h"
@@ -126,9 +126,7 @@ public:
 		  m_scantimer(*this, "scantimer"),
 		  m_acceltimer(*this, "acceltimer"),
 		  m_adbmicro(*this, "adbmicro"),
-#if ADB_HLE
 		  m_macadb(*this, "macadb"),
-#endif
 		  m_ram(*this, "ram"),
 		  m_rom(*this, "maincpu"),
 		  m_docram(*this, "docram"),
@@ -166,13 +164,8 @@ public:
 		  m_doc(*this, "doc"),
 		  m_iwm(*this, "fdc"),
 		  m_floppy(*this, "fdc:%d", 0U),
-		  m_kbd(*this, "Y%d", 0),
-		  m_kbspecial(*this, A2GS_KBD_SPEC_TAG),
-		  m_sysconfig(*this, "a2_config"),
-		  m_ay3600(*this, "ay3600"),
-		  m_kbdrom(*this, "keyboard"),
-		  m_adb_mousex(*this, "adb_mouse_x"),
-		  m_adb_mousey(*this, "adb_mouse_y")
+		  m_sysconfig(*this, "a2_config")
+
 	{
 		m_cur_floppy = nullptr;
 		m_devsel = 0;
@@ -181,6 +174,7 @@ public:
 
 	void apple2gs(machine_config &config);
 	void apple2gsr1(machine_config &config);
+	void apple2gsmt(machine_config &config);
 
 	void rom1_init() { m_is_rom3 = false; }
 	void rom3_init() { m_is_rom3 = true; }
@@ -194,9 +188,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<timer_device> m_scantimer, m_acceltimer;
 	required_device<m5074x_device> m_adbmicro;
-#if ADB_HLE
 	required_device<macadb_device> m_macadb;
-#endif
 	required_device<ram_device> m_ram;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_docram;
@@ -216,12 +208,7 @@ private:
 	required_device<es5503_device> m_doc;
 	required_device<applefdintf_device> m_iwm;
 	required_device_array<floppy_connector, 4> m_floppy;
-	optional_ioport_array<10> m_kbd;
-	optional_ioport m_kbspecial;
 	required_ioport m_sysconfig;
-	optional_device<ay3600_device> m_ay3600;
-	required_memory_region m_kbdrom;
-	optional_ioport m_adb_mousex, m_adb_mousey;
 
 	static constexpr int CNXX_UNCLAIMED = -1;
 	static constexpr int CNXX_INTROM = -2;
@@ -407,23 +394,13 @@ private:
 	u8 doc_adc_read();
 	u8 apple2gs_read_vector(offs_t offset);
 
-#if !RUN_ADB_MICRO
-	DECLARE_READ_LINE_MEMBER(ay3600_shift_r);
-	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
-	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
-	DECLARE_WRITE_LINE_MEMBER(ay3600_ako_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(ay3600_repeat);
-#endif
-
-	[[maybe_unused]] u8 keyglu_mcu_read(u8 offset);
-	[[maybe_unused]] void keyglu_mcu_write(u8 offset, u8 data);
-#if RUN_ADB_MICRO
+	u8 keyglu_mcu_read(u8 offset);
+	void keyglu_mcu_write(u8 offset, u8 data);
 	u8 keyglu_816_read(u8 offset);
 	void keyglu_816_write(u8 offset, u8 data);
 
 	u8 m_adb_p2_last, m_adb_p3_last;
 	int m_adb_reset_freeze = 0;
-#endif
 	void keyglu_regen_irqs();
 
 	u8 adbmicro_p0_in();
@@ -434,9 +411,7 @@ private:
 	void adbmicro_p1_out(u8 data);
 	void adbmicro_p2_out(u8 data);
 	void adbmicro_p3_out(u8 data);
-#if ADB_HLE
 	void set_adb_line(int linestate);
-#endif
 
 	offs_t dasm_trampoline(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 	void wdm_trampoline(offs_t offset, u8 data) { }; //m_a2host->wdm_w(space, offset, data); }
@@ -451,7 +426,6 @@ private:
 
 	bool m_romswitch = false;
 
-	bool m_page2 = false;
 	bool m_an0 = false, m_an1 = false, m_an2 = false, m_an3 = false;
 
 	bool m_vbl = false;
@@ -459,7 +433,6 @@ private:
 	int m_irqmask = 0;
 
 	bool m_intcxrom = false;
-	bool m_80store = false;
 	bool m_slotc3rom = false;
 	bool m_altzp = false;
 	bool m_ramrd = false, m_ramwrt = false;
@@ -468,7 +441,7 @@ private:
 	bool m_rombank = false;
 
 	u8 m_shadow = 0, m_speed = 0, m_textcol = 0;
-	u8 m_motors_active = 0, m_slotromsel = 0, m_intflag = 0, m_vgcint = 0, m_inten = 0, m_newvideo = 0;
+	u8 m_motors_active = 0, m_slotromsel = 0, m_intflag = 0, m_vgcint = 0, m_inten = 0;
 
 	bool m_last_speed = false;
 
@@ -499,52 +472,6 @@ private:
 	// clock/BRAM
 	u8 m_clkdata = 0, m_clock_control = 0;
 	u8 m_clock_frame = 0;
-
-	// ADB simulation
-	#if !RUN_ADB_MICRO
-	adbstate_t m_adb_state;
-	u8 m_adb_command = 0;
-	u8 m_adb_mode = 0;
-	u8 m_adb_kmstatus = 0;
-	u8 m_adb_pending_status = 0;
-	u8 m_adb_latent_result = 0;
-	s32 m_adb_command_length = 0;
-	s32 m_adb_command_pos = 0;
-	u8 m_adb_response_length = 0;
-	s32 m_adb_response_pos = 0;
-	u8 m_adb_command_bytes[8]{};
-	u8 m_adb_response_bytes[8]{};
-	u8 m_adb_memory[0x100]{};
-	int m_adb_address_keyboard = 0;
-	int m_adb_address_mouse = 0;
-
-	u16 m_lastchar = 0, m_strobe = 0;
-	u8 m_transchar = 0;
-	bool m_anykeydown = false;
-	int m_repeatdelay = 0;
-
-	u8 adb_read_datareg();
-	u8 adb_read_kmstatus();
-	u8 adb_read_memory(u32 address);
-	void adb_write_memory(u32 address, u8 data);
-	void adb_set_mode(u8 mode);
-	void adb_set_config(u8 b1, u8 b2, u8 b3);
-	void adb_post_response(const u8 *bytes, size_t length);
-	void adb_post_response_1(u8 b);
-	void adb_post_response_2(u8 b1, u8 b2);
-	void adb_post_response_3(u8 b1, u8 b2, u8 b3);
-	void adb_do_command();
-	void adb_write_datareg(u8 data);
-	void adb_write_kmstatus(u8 data);
-	u8 adb_read_mousedata();
-	s8 seven_bit_diff(u8 v1, u8 v2);
-	void adb_check_mouse();
-	#endif
-
-	u8 m_mouse_x;
-	u8 m_mouse_y;
-	s8 m_mouse_dx;
-	s8 m_mouse_dy;
 
 	void do_io(int offset);
 	u8 read_floatingbus();
@@ -734,581 +661,6 @@ u8 apple2gs_state::apple2gs_read_vector(offs_t offset)
 }
 
 /***************************************************************************
-    ADB MCU simulation
-***************************************************************************/
-#if !RUN_ADB_MICRO
-READ_LINE_MEMBER(apple2gs_state::ay3600_shift_r)
-{
-	// either shift key
-	if (m_kbspecial->read() & 0x06)
-	{
-		return ASSERT_LINE;
-	}
-
-	return CLEAR_LINE;
-}
-
-READ_LINE_MEMBER(apple2gs_state::ay3600_control_r)
-{
-	if (m_kbspecial->read() & 0x08)
-	{
-		return ASSERT_LINE;
-	}
-
-	return CLEAR_LINE;
-}
-
-WRITE_LINE_MEMBER(apple2gs_state::ay3600_data_ready_w)
-{
-	if (state == ASSERT_LINE)
-	{
-		u8 *decode = m_kbdrom->base();
-		u16 trans;
-
-		// if the user presses a valid key to start the driver from the info screen,
-		// we will see that key.  ignore keys in the first 25,000 cycles (in my tests,
-		// the unwanted key shows up at 17030 cycles)
-		if (m_sysconfig->read() & 0x01)
-		{ // bump the cycle count way up for a 16 Mhz ZipGS
-			if (m_maincpu->total_cycles() < 700000)
-			{
-				return;
-			}
-		}
-		else
-		{
-			if (m_maincpu->total_cycles() < 25000)
-			{
-				return;
-			}
-		}
-		m_lastchar = m_ay3600->b_r();
-
-		u8 special = m_kbspecial->read();
-
-		trans = m_lastchar & ~(0x1c0);  // clear the 3600's control/shift stuff
-		trans |= (m_lastchar & 0x100)>>2;   // bring the 0x100 bit down to the 0x40 place
-		trans <<= 2;                    // 4 entries per key
-		trans |= (special & 0x06) ? 0x00 : 0x01;    // shift is bit 1 (active low)
-		trans |= (special & 0x08) ? 0x00 : 0x02;    // control is bit 2 (active low)
-		trans |= (special & 0x01) ? 0x0000 : 0x0200;    // caps lock is bit 9 (active low)
-
-		// hack in keypad equals because we can't find it in the IIe keymap (Sather doesn't show it in the matrix, but it's clearly on real platinum IIes)
-		if (m_lastchar == 0x106)
-		{
-			m_transchar = '=';
-		}
-		else
-		{
-			m_transchar = decode[trans];
-		}
-		m_strobe = 0x80;
-
-//      printf("new char = %04x (%02x)\n", m_lastchar, m_transchar);
-
-		/* check for command-control-esc and command-control delete */
-		if ((special & 0x18) == 0x18)
-		{
-			if (m_transchar == 0x1b)
-			{
-				m_adb_pending_status |= 0x20;
-			}
-			else if (m_transchar == 0x7f)
-			{
-				m_adb_pending_status |= 0x10;
-			}
-			if (m_adb_pending_status && m_adb_state == ADBSTATE_IDLE)
-			{
-				adb_post_response_1(m_adb_pending_status);
-				m_adb_pending_status = 0;
-			}
-		}
-	}
-}
-
-WRITE_LINE_MEMBER(apple2gs_state::ay3600_ako_w)
-{
-	m_anykeydown = (state == ASSERT_LINE) ? true : false;
-
-	if (m_anykeydown)
-	{
-		m_repeatdelay = 10;
-	}
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::ay3600_repeat)
-{
-	// is the key still down?
-	if (m_anykeydown)
-	{
-		if (m_repeatdelay)
-		{
-			m_repeatdelay--;
-		}
-		else
-		{
-			m_strobe = 0x80;
-		}
-	}
-}
-#endif
-#if !RUN_ADB_MICRO
-u8 apple2gs_state::adb_read_memory(u32 address)
-{
-	if (address < std::size(m_adb_memory))
-		return m_adb_memory[address];
-	else
-		return 0x00;
-}
-
-void apple2gs_state::adb_write_memory(u32 address, u8 data)
-{
-	if (address < std::size(m_adb_memory))
-		m_adb_memory[address] = data;
-}
-
-void apple2gs_state::adb_set_mode(u8 mode)
-{
-	m_adb_mode = mode;
-}
-
-void apple2gs_state::adb_set_config(u8 b1, u8 b2, u8 b3)
-{
-	/* ignore for now */
-}
-
-void apple2gs_state::adb_post_response(const u8 *bytes, size_t length)
-{
-	assert(length < std::size(m_adb_response_bytes));
-	memcpy(m_adb_response_bytes, bytes, length);
-
-	m_adb_state = ADBSTATE_INRESPONSE;
-	m_adb_response_length = length;
-	m_adb_response_pos = 0;
-	m_adb_kmstatus |= 0x20;
-	if (m_adb_kmstatus & 0x10)
-		raise_irq(IRQS_ADB);
-}
-
-void apple2gs_state::adb_post_response_1(u8 b)
-{
-	adb_post_response(&b, 1);
-}
-
-void apple2gs_state::adb_post_response_2(u8 b1, u8 b2)
-{
-	u8 b[2];
-	b[0] = b1;
-	b[1] = b2;
-	adb_post_response(b, 2);
-}
-
-void apple2gs_state::adb_post_response_3(u8 b1, u8 b2, u8 b3)
-{
-	u8 b[3];
-	b[0] = b1;
-	b[1] = b2;
-	b[2] = b3;
-	adb_post_response(b, 3);
-}
-
-void apple2gs_state::adb_do_command()
-{
-	int device;
-	u32 address;
-	u8 val;
-
-	m_adb_state = ADBSTATE_IDLE;
-	if (LOG_ADB)
-		logerror("adb_do_command(): adb_command=0x%02x\n", m_adb_command);
-
-	switch(m_adb_command)
-	{
-		case 0x00:  /* ??? */
-			break;
-
-		case 0x01: /* abort */
-			break;
-
-		case 0x02: /* reset keyboard uC */
-			break;
-
-		case 0x03:  /* flush keyboard buffer */
-			break;
-
-		case 0x04:  /* set modes */
-			adb_set_mode(m_adb_mode | m_adb_command_bytes[0]);
-			break;
-
-		case 0x05:  /* clear modes */
-			adb_set_mode(m_adb_mode & ~m_adb_command_bytes[0]);
-			break;
-
-		case 0x06:  /* set config */
-			adb_set_config(m_adb_command_bytes[0], m_adb_command_bytes[1], m_adb_command_bytes[2]);
-			break;
-
-		case 0x07:  /* synchronize */
-			adb_set_mode(m_adb_command_bytes[0]);
-			adb_set_config(m_adb_command_bytes[1], m_adb_command_bytes[2], m_adb_command_bytes[3]);
-			break;
-
-		case 0x08:  /* write memory */
-			address = m_adb_command_bytes[0];
-			val = m_adb_command_bytes[1];
-			adb_write_memory(address, val);
-			break;
-
-		case 0x09:  /* read memory */
-			address = (m_adb_command_bytes[1] << 8) | m_adb_command_bytes[0];
-			adb_post_response_1(adb_read_memory(address));
-			break;
-
-		case 0x0a: /* read modes */
-			adb_post_response_1(m_adb_mode);
-			break;
-
-		case 0x0b: /* read config */
-			adb_post_response_3(0, 0, 0); /* ignored for now */
-			break;
-
-		case 0x0c: /* read adb error */
-			adb_post_response_1(0);
-			break;
-
-		case 0x0d:  /* get version */
-			adb_post_response_1(m_is_rom3 ? 0x06 : 0x05); /* rom0 0x04 */
-			break;
-
-		case 0x0e:  /* read available charsets */
-			adb_post_response_2(0x01, 0x00);
-			break;
-
-		case 0x0f:  /* read available layouts */
-			adb_post_response_2(0x01, 0x00);
-			break;
-
-		case 0x10: /* reset system */
-			break;
-
-		case 0x11: /* send adb keycode */
-			break;
-
-		case 0x12:  /* mystery command 0x12 - mouse key parameters */
-		case 0x13:  /* mystery command 0x13 - disk key parameters */
-			break;
-
-		case 0x40: /* reset adb */
-			break;
-
-		case 0x49: case 0x4a: case 0x4b: case 0x4c:
-		case 0x4d: case 0x4e: case 0x4f:
-			/* transmit adb bytes. first byte is adb device command */
-			break;
-
-
-		case 0x84:  // ACS demo disk #2 has a bug and writes this accidentally to $C026
-			break;
-
-		case 0xb0: case 0xb1: case 0xb2: case 0xb3:
-		case 0xb4: case 0xb5: case 0xb6: case 0xb7:
-		case 0xb8: case 0xb9: case 0xba: case 0xbb:
-		case 0xbc: case 0xbd: case 0xbe: case 0xbf:
-			/* send data to device */
-			device = m_adb_command & 0x0f;
-			if (device == m_adb_address_keyboard)
-			{
-			}
-			else if (device == m_adb_address_mouse)
-			{
-			}
-			break;
-
-		case 0xf2:
-			break;
-
-		default:
-			fatalerror("ADB command 0x%02x unimplemented\n", m_adb_command);
-	}
-}
-
-u8 apple2gs_state::adb_read_datareg()
-{
-	u8 result;
-
-	switch(m_adb_state)
-	{
-		case ADBSTATE_INRESPONSE:
-			result = m_adb_response_bytes[m_adb_response_pos++];
-			if (m_adb_response_pos >= m_adb_response_length)
-			{
-				m_adb_state = ADBSTATE_IDLE;
-				m_adb_latent_result = result;
-
-				m_adb_kmstatus &= ~0x20;
-				if (((m_adb_kmstatus & (m_adb_kmstatus >> 1)) & 0x54) == 0)
-					lower_irq(IRQS_ADB);
-			}
-			break;
-
-		default:
-			result = 0; //m_adb_latent_result & 0x7f;
-			break;
-	}
-
-	if (LOG_ADB)
-		logerror("adb_read_datareg(): result=0x%02x\n", result);
-
-	return result;
-}
-
-void apple2gs_state::adb_write_datareg(u8 data)
-{
-	if (LOG_ADB)
-		logerror("adb_write_datareg(): data=0x%02x\n", data);
-
-	switch(m_adb_state)
-	{
-		case ADBSTATE_IDLE:
-			m_adb_command = data;
-			m_adb_command_length = 0;
-			m_adb_command_pos = 0;
-
-//          printf("ADB command %02x\n", data);
-			switch(data)
-			{
-				case 0x00:  /* ??? */
-				case 0x01:  /* abort */
-				case 0x02:  /* reset keyboard uC */
-					/* do nothing for now */
-					break;
-
-				case 0x03:  /* flush keyboard buffer */
-					m_adb_command_length = 0;
-					break;
-
-				case 0x04:  /* set modes */
-				case 0x05:  /* clear modes */
-					m_adb_command_length = 1;
-					break;
-
-				case 0x06:  /* set config */
-					m_adb_command_length = 3;
-					break;
-
-				case 0x07:  /* synchronize */
-					if (m_is_rom3)
-						m_adb_command_length = 8;    // ROM 3 has 8 bytes: mode byte, 3 config bytes, kbd/mouse params, disk eject options
-					else
-						m_adb_command_length = 4;    // ROM 0/1 has 4 bytes sync
-					break;
-
-				case 0x08:  /* write memory */
-				case 0x09:  /* read memory */
-					m_adb_command_length = 2;
-					break;
-
-				case 0x0a:  /* read modes */
-				case 0x0b:  /* read config */
-				case 0x0c:  /* read adb error */
-				case 0x0d:  /* get version */
-				case 0x0e:  /* read available charsets */
-				case 0x0f:  /* read available layouts */
-					m_adb_command_length = 0;
-					m_adb_state = ADBSTATE_INCOMMAND;    /* HACK */
-					break;
-
-				case 0x10: /* reset system */
-					/* do nothing for now */
-					break;
-
-				case 0x11: /* send adb keycode */
-					m_adb_command_length = 1;
-					break;
-
-				case 0x12:  /* mystery command 0x12 - mouse key parameters? */
-				case 0x13:  /* mystery command 0x13 - disk eject parameters? */
-					m_adb_command_length = 2;
-					break;
-
-				case 0x40: /* reset ADB */
-					break;
-
-				/* 0x49 - 0x4f - transmit ADB bytes where length = command & 0xf - 6*/
-				case 0x49: case 0x4a: case 0x4b: case 0x4c:
-				case 0x4d: case 0x4e: case 0x4f:
-					m_adb_command_length = (m_adb_command & 0x0f) - 6;
-					break;
-
-				case 0x50:  /* enable SRQ device 0 */
-				case 0x51:  /* enable SRQ device 1 */
-				case 0x52:  /* enable SRQ device 2 */
-				case 0x53:  /* enable SRQ device 3 */
-					/* ignore for now */
-					break;
-
-				case 0x60:  /* flush adb buffer device 0 */
-				case 0x61:  /* flush adb buffer device 1 */
-				case 0x62:  /* flush adb buffer device 2 */
-				case 0x63:  /* flush adb buffer device 3 */
-					/* ignore for now */
-					break;
-
-				case 0x70:  /* disable SRQ device 0 */
-				case 0x71:  /* disable SRQ device 1 */
-				case 0x72:  /* disable SRQ device 2 */
-				case 0x73:  /* disable SRQ device 3 */
-					/* ignore for now */
-					break;
-
-				case 0x84:  // ACS demo disk #2 has a bug and writes this accidentally to $C026
-					break;
-
-				case 0xb0: case 0xb1: case 0xb2: case 0xb3:
-				case 0xb4: case 0xb5: case 0xb6: case 0xb7:
-				case 0xb8: case 0xb9: case 0xba: case 0xbb:
-				case 0xbc: case 0xbd: case 0xbe: case 0xbf:
-					/* send data to device */
-					m_adb_command_length = 2;
-					break;
-
-				case 0xe2:  // Jam Session sends this when starting a song
-					break;
-
-				case 0xf2:
-					adb_post_response_1(0x80);
-					break;
-
-				default:
-					fatalerror("ADB command 0x%02x unimplemented\n", data);
-			}
-
-			if (m_adb_command_length > 0)
-			{
-				m_adb_state = ADBSTATE_INCOMMAND;
-				if (LOG_ADB)
-					logerror("adb_write_datareg(): in command length %u\n", (unsigned) m_adb_command_length);
-			}
-			break;
-
-		case ADBSTATE_INCOMMAND:
-			assert(m_adb_command_pos < std::size(m_adb_command_bytes));
-//          printf("ADB param %02x\n", data);
-			m_adb_command_bytes[m_adb_command_pos++] = data;
-			break;
-
-		case ADBSTATE_INRESPONSE:
-			m_adb_state = ADBSTATE_IDLE;
-			break;
-	}
-
-	/* do command if necessary */
-	if ((m_adb_state == ADBSTATE_INCOMMAND) && (m_adb_command_pos >= m_adb_command_length))
-		adb_do_command();
-}
-
-// real rom 3 h/w reads 0x90 when idle, 0x98 when key pressed
-// current MAME reads back 0xb0 when idle
-u8 apple2gs_state::adb_read_kmstatus()
-{
-	return m_adb_kmstatus;
-}
-
-
-void apple2gs_state::adb_write_kmstatus(u8 data)
-{
-	m_adb_kmstatus &= ~0x54;
-	m_adb_kmstatus |= data & 0x54;
-
-	if (((m_adb_kmstatus & (m_adb_kmstatus >> 1)) & 0x54))
-		raise_irq(IRQS_ADB);
-	else
-		lower_irq(IRQS_ADB);
-}
-
-
-
-u8 apple2gs_state::adb_read_mousedata()
-{
-	u8 result = 0x00;
-	u8 absolute;
-	s8 delta;
-
-	if (m_adb_kmstatus & 0x80)   // mouse register full
-	{
-		if (m_adb_kmstatus & 0x02)   // H/V mouse data select
-		{
-			absolute = m_mouse_y;
-			delta = m_mouse_dy;
-			m_adb_kmstatus &= ~0x82;
-			if (((m_adb_kmstatus & (m_adb_kmstatus >> 1)) & 0x54) == 0)
-				lower_irq(IRQS_ADB);
-		}
-		else
-		{
-			absolute = m_mouse_x;
-			delta = m_mouse_dx;
-			m_adb_kmstatus |= 0x02;
-		}
-
-		if (delta > 63)
-			delta = 63;
-		else if (delta < -64)
-			delta = -64;
-
-		result = (absolute & 0x80) | (delta & 0x7F);
-	}
-	else
-	{
-		// no mouse axis data, so just return the button status.  used by some 3200 viewers.
-		result = m_adb_mousey->read() & 0x80;
-	}
-
-	return result;
-}
-
-
-s8 apple2gs_state::seven_bit_diff(u8 v1, u8 v2)
-{
-	v1 -= v2;
-	if (v1 & 0x40)
-		v1 |= 0x80;
-	else
-		v1 &= ~0x80;
-	return v1;
-}
-
-
-
-void apple2gs_state::adb_check_mouse()
-{
-	u8 new_mouse_x, new_mouse_y;
-
-	/* read mouse values */
-	if ((m_adb_kmstatus & 0x80) == 0x00)
-	{
-		new_mouse_x = m_adb_mousex->read();
-		new_mouse_y = m_adb_mousey->read();
-
-		if ((m_mouse_x != new_mouse_x) || (m_mouse_y != new_mouse_y))
-		{
-			m_mouse_dx = seven_bit_diff(new_mouse_x, m_mouse_x);
-			m_mouse_dy = seven_bit_diff(new_mouse_y, m_mouse_y);
-			m_mouse_x = new_mouse_x;
-			m_mouse_y = new_mouse_y;
-
-			m_adb_kmstatus |= 0x80;
-			m_adb_kmstatus &= ~0x02;
-			if (m_adb_kmstatus & 0x40)
-			{
-				raise_irq(IRQS_ADB);
-			}
-		}
-	}
-}
-#endif
-
-/***************************************************************************
     START/RESET
 ***************************************************************************/
 
@@ -1339,11 +691,9 @@ void apple2gs_state::machine_start()
 	m_b0_4000bank.select(0);
 	m_e0_4000bank.select(0);
 	m_inh_bank = 0;
-#if !RUN_ADB_MICRO
-	m_transchar = 0;
-	m_anykeydown = false;
-#endif
 	std::fill(std::begin(m_megaii_ram), std::end(m_megaii_ram), 0);
+
+	std::fill(std::begin(m_glu_regs), std::end(m_glu_regs), 0);
 
 	// setup speaker toggle volumes.  this should be done mathematically probably,
 	// but these ad-hoc values aren't too bad.
@@ -1366,25 +716,35 @@ void apple2gs_state::machine_start()
 	}
 
 	// setup video pointers
-	m_video->m_ram_ptr = m_megaii_ram;
-	m_video->m_aux_ptr = &m_megaii_ram[0x10000];
-	m_video->m_char_ptr = memregion("gfx1")->base();
-	m_video->m_char_size = memregion("gfx1")->bytes();
-	m_video->m_8bit_graphics = std::make_unique<bitmap_ind16>(560, 192);
+	m_video->set_ram_pointers(m_megaii_ram, &m_megaii_ram[0x10000]);
+	m_video->set_char_pointer(memregion("gfx1")->base(), memregion("gfx1")->bytes());
+	m_video->setup_GS_graphics();
 
 	m_textcol = 0xf2;
-	m_video->m_GSfg = (m_textcol >> 4) & 0xf;
-	m_video->m_GSbg = m_textcol & 0xf;
+	m_video->set_GS_foreground((m_textcol >> 4) & 0xf);
+	m_video->set_GS_background(m_textcol & 0xf);
 
 	m_inh_slot = -1;
 	m_cnxx_slot = CNXX_UNCLAIMED;
 
-	// install memory beyond 256K/1M
-	address_space& space = m_maincpu->space(AS_PROGRAM);
-	int ramsize = m_ram_size - 0x20000; // subtract 128K for banks 0 and 1, which are handled specially
 
-	// RAM sizes for both classes of machine no longer include the Mega II RAM
-	space.install_ram(0x020000, ramsize - 1 + 0x20000, m_ram_ptr + 0x020000);
+	// install memory beyond 256K
+	int ramsize = m_ram_size;
+	if (!m_is_rom3 && m_ram_size <= 1280 * 1024)
+	{
+		ramsize -= 0x40000; // subtract 256k for banks 0, 1, e0, e1
+	}
+	else if (m_is_rom3 || m_ram_size == 1024 * 1024 * 8)
+	{
+		ramsize -= 0x20000; // subtract 128K for banks 0 and 1, which are handled specially
+	}
+
+	if (ramsize)
+	{
+		address_space& space = m_maincpu->space(AS_PROGRAM);
+		// RAM sizes for both classes of machine no longer include the Mega II RAM
+		space.install_ram(0x020000, ramsize - 1 + 0x20000, m_ram_ptr + 0x020000);
+	}
 
 	// setup save states
 	save_item(NAME(m_speaker_state));
@@ -1395,7 +755,6 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_inh_slot));
 	save_item(NAME(m_inh_bank));
 	save_item(NAME(m_cnxx_slot));
-	save_item(NAME(m_page2));
 	save_item(NAME(m_romswitch));
 	save_item(NAME(m_an0));
 	save_item(NAME(m_an1));
@@ -1403,7 +762,6 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_an3));
 	save_item(NAME(m_intcxrom));
 	save_item(NAME(m_rombank));
-	save_item(NAME(m_80store));
 	save_item(NAME(m_slotc3rom));
 	save_item(NAME(m_altzp));
 	save_item(NAME(m_ramrd));
@@ -1442,36 +800,9 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_megaii_ram));
 	save_item(m_clkdata, "CLKDATA");
 	save_item(m_clock_control, "CLKCTRL");
-#if !RUN_ADB_MICRO
-	save_item(NAME(m_adb_memory));
-	save_item(NAME(m_adb_command_bytes));
-	save_item(NAME(m_adb_response_bytes));
-//  save_item(m_adb_state, "ADB/m_adb_state");
-	save_item(m_adb_command, "ADB/m_adb_command");
-	save_item(m_adb_mode, "ADB/m_adb_mode");
-	save_item(m_adb_kmstatus, "ADB/m_adb_kmstatus");
-	save_item(m_adb_pending_status, "ADB/m_adb_pending_status");
-	save_item(m_adb_latent_result, "ADB/m_adb_latent_result");
-	save_item(m_adb_command_length, "ADB/m_adb_command_length");
-	save_item(m_adb_command_pos, "ADB/m_adb_command_pos");
-	save_item(m_adb_response_length, "ADB/m_adb_response_length");
-	save_item(m_adb_response_pos, "ADB/m_adb_response_pos");
-	save_item(m_adb_address_keyboard, "ADB/m_adb_address_keyboard");
-	save_item(m_adb_address_mouse, "ADB/m_adb_address_mouse");
-	save_item(NAME(m_lastchar));
-	save_item(NAME(m_strobe));
-	save_item(NAME(m_transchar));
-	save_item(NAME(m_anykeydown));
-	save_item(NAME(m_repeatdelay));
-#else
 	save_item(NAME(m_adb_p2_last));
 	save_item(NAME(m_adb_p3_last));
 	save_item(NAME(m_adb_reset_freeze));
-#endif
-	save_item(m_mouse_x, "MX");
-	save_item(m_mouse_y, "MY");
-	save_item(m_mouse_dx, "MDX");
-	save_item(m_mouse_dy, "MDY");
 	save_item(NAME(m_accel_unlocked));
 	save_item(NAME(m_accel_stage));
 	save_item(NAME(m_accel_fast));
@@ -1482,21 +813,17 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_accel_temp_slowdown));
 	save_item(NAME(m_accel_speed));
 	save_item(NAME(m_motoroff_time));
-	save_item(NAME(m_newvideo));
 }
 
 void apple2gs_state::machine_reset()
 {
-	#if RUN_ADB_MICRO
 	m_adb_p2_last = m_adb_p3_last = 0;
 	m_adb_reset_freeze = 0;
-	#endif
-	m_page2 = false;
 	m_romswitch = false;
-	m_video->m_page2 = false;
-	m_video->m_GSborder = 0x02;
-	m_video->m_GSbg = 0x02;
-	m_video->m_GSfg = 0x0f;
+	m_video->page2_w(false);
+	m_video->set_GS_border(0x02);
+	m_video->set_GS_background(0x02);
+	m_video->set_GS_foreground(0x0f);
 	m_an0 = m_an1 = m_an2 = m_an3 = false;
 	m_gameio->an0_w(0);
 	m_gameio->an1_w(0);
@@ -1507,39 +834,14 @@ void apple2gs_state::machine_reset()
 	m_irqmask = 0;
 	m_intcxrom = false;
 	m_rombank = false;
-	m_80store = false;
-	m_video->m_80store = false;
+	m_video->a80store_w(false);
 	m_altzp = false;
 	m_ramrd = false;
 	m_ramwrt = false;
 	m_ioudis = true;
-	m_newvideo = 0x01;      // verified on ROM03 hardware
+	m_video->set_newvideo(0x01);      // verified on ROM03 hardware
 	m_clock_frame = 0;
-	m_mouse_x = 0x00;
-	m_mouse_y = 0x00;
-	m_mouse_dx = 0x00;
-	m_mouse_dy = 0x00;
-
 	m_slot_irq = false;
-
-	#if !RUN_ADB_MICRO
-	m_adb_state = ADBSTATE_IDLE;
-	m_adb_kmstatus = 0x00;
-	m_adb_command = 0;
-	m_adb_mode = 0;
-	m_adb_latent_result = 0;
-	m_adb_command_length = 0;
-	m_adb_command_pos = 0;
-	m_adb_response_length = 0;
-	m_adb_response_pos = 0;
-	memset(m_adb_command_bytes, 0, sizeof(m_adb_command_bytes));
-	memset(m_adb_response_bytes, 0, sizeof(m_adb_response_bytes));
-	memset(m_adb_memory, 0, sizeof(m_adb_memory));
-	m_adb_address_keyboard = 2;
-	m_adb_address_mouse = 3;
-	#endif
-
-	/* init time */
 	m_clkdata = 0;
 	m_clock_control =0;
 
@@ -1711,24 +1013,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 	int scanline = m_screen->vpos();
 	m_screen->update_partial(scanline);
 
-	if ((scanline % 8) == 0)
-	{
-		#if !RUN_ADB_MICRO
-		adb_check_mouse();
-
-		if (m_adb_state == ADBSTATE_IDLE && m_adb_pending_status)
-		{
-			adb_post_response_1(m_adb_pending_status);
-			m_adb_pending_status = 0;
-		}
-		#endif
-	}
-
 	/* check scanline interrupt bits if we're in super hi-res and the current scanline is within the active display area */
-	if ((m_video->m_newvideo & 0x80) && (scanline >= (BORDER_TOP-1)) && (scanline < (200+BORDER_TOP-1)))
+	if ((m_video->get_newvideo() & 0x80) && (scanline >= BORDER_TOP) && (scanline < (200+BORDER_TOP)))
 	{
 		u8 scb;
-		const int shrline = scanline - BORDER_TOP + 1;
+		const int shrline = scanline - BORDER_TOP;
 
 		if (shrline & 1)
 		{
@@ -1755,18 +1044,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 
 	if (scanline == (192+BORDER_TOP))
 	{
-#if ADB_HLE
 		m_macadb->adb_vblank();
-#endif
 		m_vbl = true;
 
-		// check for ctrl-reset
-#if !RUN_ADB_MICRO
-		if ((m_kbspecial->read() & 0x88) == 0x88)
-		{
-			m_maincpu->reset();
-		}
-#endif
 		// VBL interrupt
 		if ((m_inten & 0x08) && !(m_intflag & INTFLAG_VBL))
 		{
@@ -1775,7 +1055,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 		}
 
 		m_adbmicro->set_input_line(0, ASSERT_LINE);
-		m_video->m_sysconfig = 0;
 
 		m_clock_frame++;
 
@@ -1848,7 +1127,7 @@ void apple2gs_state::palette_init(palette_device &palette)
 			apple2gs_palette[(3*i)+1]*17,
 			apple2gs_palette[(3*i)+2]*17);
 
-		m_video->m_GSborder_colors[i] = rgb_t(apple2gs_palette[(3*i)]*17, apple2gs_palette[(3*i)+1]*17, apple2gs_palette[(3*i)+2]*17);
+		m_video->set_GS_border_color(i, rgb_t(apple2gs_palette[(3*i)]*17, apple2gs_palette[(3*i)+1]*17, apple2gs_palette[(3*i)+2]*17));
 	}
 }
 
@@ -1869,9 +1148,9 @@ void apple2gs_state::auxbank_update()
 	m_b0_0200bank.select(ramwr);
 	m_e0_0200bank.select(ramwr);
 
-	if (m_80store)
+	if (m_video->get_80store())
 	{
-		if (m_page2)
+		if (m_video->get_page2())
 		{
 			m_b0_0400bank.select(3);
 			m_e0_0400bank.select(3);
@@ -1891,9 +1170,9 @@ void apple2gs_state::auxbank_update()
 	m_b0_0800bank.select(ramwr);
 	m_e0_0800bank.select(ramwr);
 
-	if ((m_80store) && (m_video->m_hires))
+	if ((m_video->get_80store()) && (m_video->get_hires()))
 	{
-		if (m_page2)
+		if (m_video->get_page2())
 		{
 			m_b0_2000bank.select(3);
 			m_e0_2000bank.select(3);
@@ -2085,13 +1364,13 @@ void apple2gs_state::do_io(int offset)
 			break;
 
 		case 0x54:  // set page 1
-			m_page2 = false;
+			m_video->page2_w(false);
 			m_video->scr_w(0);
 			auxbank_update();
 			break;
 
 		case 0x55:  // set page 2
-			m_page2 = true;
+			m_video->page2_w(true);
 			m_video->scr_w(1);
 			auxbank_update();
 			break;
@@ -2229,47 +1508,21 @@ u8 apple2gs_state::c000_r(offs_t offset)
 
 	slow_cycle();
 	u8 uFloatingBus7 = read_floatingbus() & 0x7f;
-#if RUN_ADB_MICRO
 	u8 uKeyboard = keyglu_816_read(GLU_C000);
 	u8 uKeyboardC010 = keyglu_816_read(GLU_C010);
-#else
-	u8 uKeyboard = m_transchar | m_strobe;
-	u8 uKeyboardC010 = m_transchar;
-#endif
 
 	switch (offset)
 	{
-		case 0x00:  // keyboard latch
+		// keyboard latch
+		case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06:
+		case 0x07: case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d:
+		case 0x0e: case 0x0f:
 			return uKeyboard;
 
-		case 0x02:  // RAMRDOFF
-			m_ramrd = false;
-			auxbank_update();
-			break;
-
-		case 0x03:  // RAMRDON
-			m_ramrd = true;
-			auxbank_update();
-			break;
-
-		case 0x04:  // RAMWRTOFF
-			m_ramwrt = false;
-			auxbank_update();
-			break;
-
-		case 0x05:  // RAMWRTON
-			m_ramwrt = true;
-			auxbank_update();
-			break;
-
 		case 0x10:  // read any key down, reset keyboard strobe
-#if !RUN_ADB_MICRO
-			m_strobe = 0;
-			return uKeyboardC010 | (m_anykeydown ? 0x80 : 0x00);
-#else
 			keyglu_816_write(GLU_C010, 0);
-			return uKeyboardC010;
-#endif
+			return uKeyboardC010 | (uKeyboard & 0x7f);
+
 		case 0x11:  // read LCRAM2 (LC Dxxx bank)
 			return (uKeyboardC010 & 0x7f) | (m_lcram2 ? 0x80 : 0x00);
 
@@ -2292,35 +1545,35 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return (uKeyboardC010 & 0x7f) | (m_slotc3rom ? 0x80 : 0x00);
 
 		case 0x18:  // read 80STORE
-			return (uKeyboardC010 & 0x7f) | (m_80store ? 0x80 : 0x00);
+			return (uKeyboardC010 & 0x7f) | (m_video->get_80store() ? 0x80 : 0x00);
 
 		case 0x19:  // read VBLBAR
 			return (uKeyboardC010 & 0x7f) | (m_screen->vblank() ? 0x00 : 0x80);
 
 		case 0x1a:  // read TEXT
-			return (uKeyboardC010 & 0x7f) | (m_video->m_graphics ? 0x00 : 0x80);
+			return (uKeyboardC010 & 0x7f) | (m_video->get_graphics() ? 0x00 : 0x80);
 
 		case 0x1b:  // read MIXED
-			return (uKeyboardC010 & 0x7f) | (m_video->m_mix ? 0x80 : 0x00);
+			return (uKeyboardC010 & 0x7f) | (m_video->get_mix() ? 0x80 : 0x00);
 
 		case 0x1c:  // read PAGE2
-			return (uKeyboardC010 & 0x7f) | (m_page2 ? 0x80 : 0x00);
+			return (uKeyboardC010 & 0x7f) | (m_video->get_page2() ? 0x80 : 0x00);
 
 		case 0x1d:  // read HIRES
-			return (uKeyboardC010 & 0x7f) | (m_video->m_hires ? 0x80 : 0x00);
+			return (uKeyboardC010 & 0x7f) | (m_video->get_hires() ? 0x80 : 0x00);
 
 		case 0x1e:  // read ALTCHARSET
-			return (uKeyboardC010 & 0x7f) | (m_video->m_altcharset ? 0x80 : 0x00);
+			return (uKeyboardC010 & 0x7f) | (m_video->get_altcharset() ? 0x80 : 0x00);
 
 		case 0x1f:  // read 80COL
-			return (uKeyboardC010 & 0x7f) | (m_video->m_80col ? 0x80 : 0x00);
+			return (uKeyboardC010 & 0x7f) | (m_video->get_80col() ? 0x80 : 0x00);
 
 		case 0x22:  // TEXTCOL
 			return m_textcol;
 
 		case 0x23:  // VGCINT
 			return m_vgcint;
-#if RUN_ADB_MICRO
+
 		case 0x24:  // MOUSEDATA */
 			return keyglu_816_read(GLU_MOUSEX);
 
@@ -2332,77 +1585,9 @@ u8 apple2gs_state::c000_r(offs_t offset)
 
 		case 0x27:  // KMSTATUS
 			return keyglu_816_read(GLU_SYSSTAT);
-#else
-		case 0x24:  // MOUSEDATA */
-			return adb_read_mousedata();
-
-		case 0x25:  // KEYMODREG
-			ret = 0;
-			{
-				u8 temp = m_kbspecial->read();
-				if (temp & 1)   // capslock
-				{
-					ret |= 4;
-				}
-				if (temp & 6)   // shift
-				{
-					ret |= 1;
-				}
-				if (temp & 8)   // control
-				{
-					ret |= 2;
-				}
-				if (temp & 0x10)    // open apple/command
-				{
-					ret |= 0x80;
-				}
-				if (temp & 0x20)    // option
-				{
-					ret |= 0x40;
-				}
-				// keypad is a little rough right now
-				if (m_lastchar >= 0x28 && m_lastchar <= 0x2d)
-				{
-					ret |= 0x10;
-				}
-				else if (m_lastchar >= 0x32 && m_lastchar <= 0x37)
-				{
-					ret |= 0x10;
-				}
-				else if (m_lastchar >= 0x3c && m_lastchar <= 0x3f)
-				{
-					ret |= 0x10;
-				}
-				else if (m_lastchar >= 0x100 && m_lastchar <= 0x101)
-				{
-					ret |= 0x10;
-				}
-				else if ((m_lastchar >= 0x109 && m_lastchar <= 0x10a) || (m_lastchar == 0x106))
-				{
-					ret |= 0x10;
-				}
-			}
-			return ret;
-
-		case 0x26:  // DATAREG
-			return adb_read_datareg();
-
-		case 0x27:  // KMSTATUS
-			// hack to let one-second IRQs get through in Nucleus
-			if (m_vgcint & VGCINT_SECOND)
-				return 0;
-			// secondary hack for slot IRQs
-			if (m_slot_irq)
-			{
-				m_slot_irq = false;
-				return 0;
-			}
-
-			return adb_read_kmstatus();
-#endif
 
 		case 0x29:  // NEWVIDEO
-			return m_newvideo;
+			return m_video->get_newvideo();
 
 		case 0x2d:  // SLOTROMSEL
 			return m_slotromsel;
@@ -2433,7 +1618,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return m_clkdata;
 
 		case 0x34:  // BORDERCOL
-			return (m_clock_control & 0xf0) | (m_video->m_GSborder & 0xf);
+			return (m_clock_control & 0xf0) | (m_video->get_GS_border() & 0xf);
 
 		case 0x35:  // SHADOW
 			return m_shadow;
@@ -2494,7 +1679,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 
 		case 0x60: // button 3 on IIgs
 			return m_gameio->sw3_r() | uFloatingBus7;
-#if RUN_ADB_MICRO
+
 		case 0x61: // button 0 or Open Apple
 			// HACK/TODO: the 65816 loses a race to the microcontroller on reset
 			if (m_adb_reset_freeze > 0) m_adb_reset_freeze--;
@@ -2505,16 +1690,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 
 		case 0x63: // button 2 or SHIFT key
 			return m_gameio->sw2_r() | uFloatingBus7;
-#else
-		case 0x61:  // button 0 or Open Apple
-			return ((m_gameio->sw0_r() || (m_kbspecial->read() & 0x10)) ? 0x80 : 0) | uFloatingBus7;
 
-		case 0x62:  // button 1 or Option
-			return ((m_gameio->sw1_r() || (m_kbspecial->read() & 0x20)) ? 0x80 : 0) | uFloatingBus7;
-
-		case 0x63:  // button 2 or SHIFT key
-			return ((m_gameio->sw2_r() || (m_kbspecial->read() & 0x06)) ? 0x80 : 0) | uFloatingBus7;
-#endif
 		case 0x64:  // joy 1 X axis
 			if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
 			return ((machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0) | uFloatingBus7;
@@ -2533,7 +1709,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 
 		case 0x68: // STATEREG, synthesizes all the IIe state regs
 			return  (m_altzp ? 0x80 : 0x00) |
-					(m_page2 ? 0x40 : 0x00) |
+					(m_video->get_page2() ? 0x40 : 0x00) |
 					(m_ramrd ? 0x20 : 0x00) |
 					(m_ramwrt ? 0x10 : 0x00) |
 					(m_lcram ? 0x00 : 0x08) |
@@ -2631,14 +1807,12 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 	switch (offset)
 	{
 		case 0x00:  // 80STOREOFF
-			m_80store = false;
-			m_video->m_80store = false;
+			m_video->a80store_w(false);
 			auxbank_update();
 			break;
 
 		case 0x01:  // 80STOREON
-			m_80store = true;
-			m_video->m_80store = true;
+			m_video->a80store_w(true);
 			auxbank_update();
 			break;
 
@@ -2693,35 +1867,30 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			break;
 
 		case 0x0c:  // 80COLOFF
-			m_video->m_80col = false;
+			m_video->a80col_w(false);
 			break;
 
 		case 0x0d:  // 80COLON
-			m_video->m_80col = true;
+			m_video->a80col_w(true);
 			break;
 
 		case 0x0e:  // ALTCHARSETOFF
-			m_video->m_altcharset = false;
+			m_video->altcharset_w(false);
 			break;
 
 		case 0x0f:  // ALTCHARSETON
-			m_video->m_altcharset = true;
+			m_video->altcharset_w(true);
 			break;
 
 		case 0x10:  // clear keyboard latch
-		#if RUN_ADB_MICRO
 			keyglu_816_write(GLU_C010, data);
 			break;
-		#else
-			m_strobe = 0;
-			break;
-		#endif
 
 		case 0x20:
 			break;
 
 		case 0x21:  // MONOCHROME
-			m_video->m_monochrome = data;
+			m_video->set_GS_monochrome(data);
 			break;
 
 		case 0x22:  // TEXTCOL
@@ -2730,8 +1899,8 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 				m_screen->update_now();
 			}
 			m_textcol = data;
-			m_video->m_GSfg = (data >> 4) & 0xf;
-			m_video->m_GSbg = data & 0xf;
+			m_video->set_GS_foreground((data >> 4) & 0xf);
+			m_video->set_GS_background(data & 0xf);
 			break;
 
 		case 0x23:  // VGCINT
@@ -2756,26 +1925,23 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			//printf("%02x to VGCINT, now %02x\n", data, m_vgcint);
 			break;
 
-#if RUN_ADB_MICRO
 		case 0x26:  // DATAREG
+			// allow ADBuC sync if the Zip is on
+			if (m_accel_present)
+			{
+				m_accel_temp_slowdown = true;
+				m_acceltimer->adjust(attotime::from_msec(30));
+				accel_normal_speed();
+			}
 			keyglu_816_write(GLU_COMMAND, data);
 			break;
 
 		case 0x27:  // KMSTATUS
 			keyglu_816_write(GLU_SYSSTAT, data);
 			break;
-#else
-		case 0x26:  // DATAREG
-			adb_write_datareg(data);
-			break;
-
-		case 0x27:  // KMSTATUS
-			adb_write_kmstatus(data);
-			break;
-#endif
 
 		case 0x29:  // NEWVIDEO
-			m_video->m_newvideo = m_newvideo = data;
+			m_video->set_newvideo(data);
 			break;
 
 		case 0x2d:  // SLOTROMSEL
@@ -2821,12 +1987,12 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			break;
 
 		case 0x34:  // CLOCKCTL
-			if ((data & 0xf) != (m_video->m_GSborder & 0xf))
+			if ((data & 0xf) != (m_video->get_GS_border() & 0xf))
 			{
 				m_screen->update_now();
 			}
 			m_clock_control = data & 0x7f;
-			m_video->m_GSborder = data & 0xf;
+			m_video->set_GS_border(data & 0xf);
 			m_rtc->ce_w(BIT(data, 7) ^ 1);
 			if (data & 0x80)
 			{
@@ -2991,7 +2157,7 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 
 		case 0x68: // STATEREG
 			m_altzp = (data & 0x80);
-			m_page2 = (data & 0x40);
+			m_video->page2_w(data & 0x40);
 			m_ramrd = (data & 0x20);
 			m_ramwrt = (data & 0x10);
 			m_lcram = (data & 0x08) ? false : true;
@@ -3611,10 +2777,10 @@ u8 apple2gs_state::read_floatingbus()
 
 	// machine state switches
 	//
-	Hires    = (m_video->m_hires && m_video->m_graphics) ? 1 : 0;
-	Mixed    = m_video->m_mix ? 1 : 0;
-	Page2    = m_page2 ? 1 : 0;
-	_80Store = m_80store ? 1 : 0;
+	Hires    = (m_video->get_hires() && m_video->get_graphics()) ? 1 : 0;
+	Mixed    = m_video->get_mix() ? 1 : 0;
+	Page2    = m_video->get_page2() ? 1 : 0;
+	_80Store = m_video->get_80store() ? 1 : 0;
 
 	// calculate video parameters according to display standard
 	//
@@ -3748,7 +2914,7 @@ template void apple2gs_state::e1ram_w<0x4000>(offs_t offset, u8 data);
 u8 apple2gs_state::auxram0000_r(offs_t offset)
 {
 	slow_cycle();
-	if ((offset >= 0x2000) && (offset < 0xa000) && ((m_newvideo & 0xc0) != 0))
+	if ((offset >= 0x2000) && (offset < 0xa000) && ((m_video->get_newvideo() & 0xc0) != 0))
 	{
 		if (offset & 1)
 		{
@@ -3768,7 +2934,7 @@ void apple2gs_state::auxram0000_w(offs_t offset, u8 data)
 
 	slow_cycle();
 
-	if ((offset >= 0x2000) && (offset < 0xa000) && ((m_newvideo & 0xc0) != 0))
+	if ((offset >= 0x2000) && (offset < 0xa000) && ((m_video->get_newvideo() & 0xc0) != 0))
 	{
 		if (offset & 1)
 		{
@@ -3785,11 +2951,10 @@ void apple2gs_state::auxram0000_w(offs_t offset, u8 data)
 	if ((orig_addr >= 0x9e00) && (orig_addr <= 0x9fff))
 	{
 		int color = (orig_addr - 0x9e00) >> 1;
-
-		m_video->m_shr_palette[color] = rgb_t(
+		m_video->set_SHR_color(color, rgb_t(
 			((m_megaii_ram[0x19f00 + color] >> 0) & 0x0f) * 17,
 			((m_megaii_ram[0x15f00 + color] >> 4) & 0x0f) * 17,
-			((m_megaii_ram[0x15f00 + color] >> 0) & 0x0f) * 17);
+			((m_megaii_ram[0x15f00 + color] >> 0) & 0x0f) * 17));
 	}
 }
 
@@ -4193,7 +3358,12 @@ u8 apple2gs_state::adbmicro_p3_in()
 {
 	if (m_is_rom3)
 	{
-		return 0x00;    // TODO: 0x40 to remove Control Panel from the Control-Open Apple-Esc menu
+		// Check the jumper to remove the Control Panel from the Control-Open Apple-Esc CDA menu
+		if (m_sysconfig->read() & 0x08)
+		{
+			return 0x40;
+		}
+		return 0x00;
 	}
 	else
 	{
@@ -4212,12 +3382,11 @@ void apple2gs_state::adbmicro_p1_out(u8 data)
 
 void apple2gs_state::adbmicro_p2_out(u8 data)
 {
-	#if RUN_ADB_MICRO
 	if (!BIT(data, 5) && BIT(m_adb_p2_last, 5))
 	{
 		m_adb_reset_freeze = 2;
 		m_maincpu->reset();
-		m_video->m_newvideo = m_newvideo = 0x41;
+		m_video->set_newvideo(0x41);
 	}
 
 	if (!(data & 0x10))
@@ -4237,7 +3406,6 @@ void apple2gs_state::adbmicro_p2_out(u8 data)
 	}
 
 	m_adb_p2_last = data;
-	#endif
 }
 
 void apple2gs_state::adbmicro_p3_out(u8 data)
@@ -4245,24 +3413,20 @@ void apple2gs_state::adbmicro_p3_out(u8 data)
 	if (((data & 0x08) == 0x08) != m_adb_line)
 	{
 		m_adb_line = (data & 0x8) ? true : false;
-#if ADB_HLE
 		m_macadb->adb_linechange_w(!m_adb_line);
-#endif
 	}
 
-#if RUN_ADB_MICRO
 	if (m_adb_reset_freeze == 0)
 	{
 		m_adb_p3_last = data;
 	}
-#endif
 }
-#if ADB_HLE
+
 void apple2gs_state::set_adb_line(int linestate)
 {
 	m_adb_line = (linestate == CLEAR_LINE);
 }
-#endif
+
 u8 apple2gs_state::keyglu_mcu_read(u8 offset)
 {
 	u8 rv = m_glu_regs[offset];
@@ -4353,7 +3517,6 @@ void  apple2gs_state::keyglu_mcu_write(u8 offset, u8 data)
    C027 KMSTATUS  = GLU system status register
 */
 
-#if RUN_ADB_MICRO
 u8 apple2gs_state::keyglu_816_read(u8 offset)
 {
 	switch (offset)
@@ -4375,12 +3538,13 @@ u8 apple2gs_state::keyglu_816_read(u8 offset)
 		case GLU_MOUSEY:
 			if (!m_glu_mouse_read_stat)
 			{
-				m_glu_mouse_read_stat = 1;
-				m_glu_regs[GLU_KG_STATUS] &= ~KGS_MOUSEX_FULL;
-				m_glu_regs[GLU_SYSSTAT] &= ~GLU_STATUS_MOUSEIRQ;
-				keyglu_regen_irqs();
+				m_glu_mouse_read_stat = true;
 				return m_glu_regs[GLU_MOUSEX];
 			}
+			m_glu_mouse_read_stat = false;
+			m_glu_regs[GLU_KG_STATUS] &= ~KGS_MOUSEX_FULL;
+			m_glu_regs[GLU_SYSSTAT] &= ~GLU_STATUS_MOUSEIRQ;
+			keyglu_regen_irqs();
 			return m_glu_regs[GLU_MOUSEY];
 
 		case GLU_SYSSTAT:
@@ -4391,7 +3555,7 @@ u8 apple2gs_state::keyglu_816_read(u8 offset)
 				{
 					sysstat |= GLU_STATUS_CMDFULL;
 				}
-				if (m_glu_regs[GLU_KG_STATUS] & m_glu_mouse_read_stat)
+				if (m_glu_mouse_read_stat)
 				{
 					sysstat |= GLU_STATUS_MOUSEXY;
 				}
@@ -4454,11 +3618,9 @@ void apple2gs_state::keyglu_816_write(u8 offset, u8 data)
 			break;
 	}
 }
-#endif
 
 void apple2gs_state::keyglu_regen_irqs()
 {
-#if RUN_ADB_MICRO
 	bool bIRQ = false;
 
 	if ((m_glu_regs[GLU_KG_STATUS] & KGS_DATA_FULL) && (m_glu_regs[GLU_SYSSTAT] & GLU_STATUS_DATAIRQEN))
@@ -4478,7 +3640,6 @@ void apple2gs_state::keyglu_regen_irqs()
 	{
 		lower_irq(IRQS_ADB);
 	}
-#endif
 }
 
 WRITE_LINE_MEMBER(apple2gs_state::scc_irq_w)
@@ -4566,158 +3727,7 @@ void apple2gs_state::sel35_w(int sel35)
     INPUT PORTS
 ***************************************************************************/
 
-	/*
-	  Apple IIe platinum and IIgs upgrade key matrix
-
-	      | Y0  | Y1  | Y2  | Y3  | Y4  | Y5  | Y6  | Y7  | Y8  | Y9  |
-	      |     |     |     |     |     |     |     |     |     |     |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X0  | ESC |  1  |  2  |  3  |  4  |  6  |  5  |  7  |  8  |  9  |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X1  | TAB |  Q  |  W  |  E  |  R  |  Y  |  T  |  U  |  I  |  O  |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X2  |  A  |  D  |  S  |  H  |  F  |  G  |  J  |  K  | ;:  |  L  |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X3  |  Z  |  X  |  C  |  V  |  B  |  M  |  N  | ,<  | .>  |  /? |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X4  | KP/ |     | KP0 | KP1 | KP2 | KP3 | \|  | +=  |  0  | -_  |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X5  |     |KPEsc| KP4 | KP5 | KP6 | KP7 | `~  |  P  | [{  | ]}  |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X6  | KP* |     | KP8 | KP9 | KP. | KP+ |RETRN| UP  | SPC | '"  |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X7  |     |     |     | KP- |KPENT|     | DEL |DOWN |LEFT |RIGHT|
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	*/
-
 INPUT_PORTS_START( apple2gs )
-#if !RUN_ADB_MICRO
-	PORT_START("X0")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc")      PORT_CODE(KEYCODE_ESC)      PORT_CHAR(27)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)  PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)  PORT_CHAR('2') PORT_CHAR('@')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)  PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)  PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)  PORT_CHAR('6') PORT_CHAR('^')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)  PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)  PORT_CHAR('7') PORT_CHAR('&')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)  PORT_CHAR('8') PORT_CHAR('*')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)  PORT_CHAR('9') PORT_CHAR('(')
-
-	PORT_START("X1")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Tab")      PORT_CODE(KEYCODE_TAB)      PORT_CHAR(9)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)  PORT_CHAR('Q') PORT_CHAR('q')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)  PORT_CHAR('W') PORT_CHAR('w')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)  PORT_CHAR('E') PORT_CHAR('e')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)  PORT_CHAR('R') PORT_CHAR('r')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)  PORT_CHAR('Y') PORT_CHAR('y')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)  PORT_CHAR('T') PORT_CHAR('t')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)  PORT_CHAR('U') PORT_CHAR('u')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)  PORT_CHAR('I') PORT_CHAR('i')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)  PORT_CHAR('O') PORT_CHAR('o')
-
-	PORT_START("X2")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)  PORT_CHAR('A') PORT_CHAR('a')
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)  PORT_CHAR('D') PORT_CHAR('d')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)  PORT_CHAR('S') PORT_CHAR('s')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)  PORT_CHAR('H') PORT_CHAR('h')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)  PORT_CHAR('F') PORT_CHAR('f')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)  PORT_CHAR('G') PORT_CHAR('g')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)  PORT_CHAR('J') PORT_CHAR('j')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)  PORT_CHAR('K') PORT_CHAR('k')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';') PORT_CHAR(':')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)  PORT_CHAR('L') PORT_CHAR('l')
-
-	PORT_START("X3")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)  PORT_CHAR('Z') PORT_CHAR('z')
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)  PORT_CHAR('X') PORT_CHAR('x')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)  PORT_CHAR('C') PORT_CHAR('c')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)  PORT_CHAR('V') PORT_CHAR('v')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)  PORT_CHAR('B') PORT_CHAR('b')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)  PORT_CHAR('N') PORT_CHAR('n')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)  PORT_CHAR('M') PORT_CHAR('m')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)  PORT_CHAR(',') PORT_CHAR('<')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)   PORT_CHAR('.') PORT_CHAR('>')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)  PORT_CHAR('/') PORT_CHAR('?')
-
-	PORT_START("X4")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH_PAD)   PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD))
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0_PAD)   PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1_PAD)   PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD)   PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3_PAD)   PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR('\\') PORT_CHAR('|')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('=') PORT_CHAR('+')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)      PORT_CHAR('0') PORT_CHAR(')')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)  PORT_CHAR('-') PORT_CHAR('_')
-
-	PORT_START("X5")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad Esc") PORT_CODE(KEYCODE_NUMLOCK)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD)   PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5_PAD)   PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD)   PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7_PAD)   PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE)      PORT_CHAR('`') PORT_CHAR('~')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)  PORT_CHAR('P') PORT_CHAR('p')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('[') PORT_CHAR('{')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
-
-	PORT_START("X6")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ASTERISK)    PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD)       PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD)       PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL_PAD)     PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD)    PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Return")   PORT_CODE(KEYCODE_ENTER)    PORT_CHAR(13)
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_UP)        PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)  PORT_CHAR(' ')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)  PORT_CHAR('\'') PORT_CHAR('\"')
-
-	PORT_START("X7")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS_PAD) PORT_CHAR(UCHAR_MAMEKEY(EQUALS_PAD))
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD)   PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD)   PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Delete")   PORT_CODE(KEYCODE_BACKSPACE)PORT_CHAR(8)
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN)      PORT_CODE(KEYCODE_DOWN)     PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT)      PORT_CODE(KEYCODE_LEFT)     PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT)     PORT_CODE(KEYCODE_RIGHT)    PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
-
-	PORT_START("X8")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START(A2GS_KBD_SPEC_TAG)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Caps Lock")    PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Shift")   PORT_CODE(KEYCODE_LSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Shift")  PORT_CODE(KEYCODE_RSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control")      PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Open Apple")   PORT_CODE(KEYCODE_LALT)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Option")  PORT_CODE(KEYCODE_RALT)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
-
-	PORT_START("adb_mouse_x")
-	PORT_BIT( 0x7f, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Button 1")
-
-	PORT_START("adb_mouse_y")
-	PORT_BIT( 0x7f, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Button 0")
-#endif
-
 	PORT_START("a2_config")
 	PORT_CONFNAME(0x07, 0x00, "CPU type")
 	PORT_CONFSETTING(0x00, "Standard")
@@ -4725,6 +3735,15 @@ INPUT_PORTS_START( apple2gs )
 	PORT_CONFSETTING(0x03, "8 MHz ZipGS")
 	PORT_CONFSETTING(0x05, "12 MHz ZipGS")
 	PORT_CONFSETTING(0x07, "16 MHz ZipGS")
+INPUT_PORTS_END
+
+INPUT_PORTS_START( apple2gsrom3 )
+	PORT_INCLUDE( apple2gs )
+
+	PORT_MODIFY("a2_config")
+	PORT_CONFNAME(0x08, 0x00, "Disable CDA Control Panel")
+	PORT_CONFSETTING(0x00, DEF_STR(No))
+	PORT_CONFSETTING(0x08, DEF_STR(Yes))
 INPUT_PORTS_END
 
 void apple2gs_state::apple2gs(machine_config &config)
@@ -4753,33 +3772,9 @@ void apple2gs_state::apple2gs(machine_config &config)
 	m_adbmicro->read_p<3>().set(FUNC(apple2gs_state::adbmicro_p3_in));
 	m_adbmicro->write_p<3>().set(FUNC(apple2gs_state::adbmicro_p3_out));
 
-#if ADB_HLE
 	MACADB(config, m_macadb, A2GS_MASTER_CLOCK/8);
 	m_macadb->set_mcu_mode(true);
-	m_macadb->set_iigs_mode(true);
 	m_macadb->adb_data_callback().set(FUNC(apple2gs_state::set_adb_line));
-#endif
-
-#if !RUN_ADB_MICRO
-	/* keyboard controller */
-	AY3600(config, m_ay3600, 0);
-	m_ay3600->x0().set_ioport("X0");
-	m_ay3600->x1().set_ioport("X1");
-	m_ay3600->x2().set_ioport("X2");
-	m_ay3600->x3().set_ioport("X3");
-	m_ay3600->x4().set_ioport("X4");
-	m_ay3600->x5().set_ioport("X5");
-	m_ay3600->x6().set_ioport("X6");
-	m_ay3600->x7().set_ioport("X7");
-	m_ay3600->x8().set_ioport("X8");
-	m_ay3600->shift().set(FUNC(apple2gs_state::ay3600_shift_r));
-	m_ay3600->control().set(FUNC(apple2gs_state::ay3600_control_r));
-	m_ay3600->data_ready().set(FUNC(apple2gs_state::ay3600_data_ready_w));
-	m_ay3600->ako().set(FUNC(apple2gs_state::ay3600_ako_w));
-
-	/* repeat timer.  15 Hz from page 7-15 of "Understanding the Apple IIe" */
-	TIMER(config, "repttmr").configure_periodic(FUNC(apple2gs_state::ay3600_repeat), attotime::from_hz(15));
-#endif
 
 	RTC3430042(config, m_rtc, XTAL(32'768));
 
@@ -4891,6 +3886,22 @@ void apple2gs_state::apple2gsr1(machine_config &config)
 	m_adbmicro->write_p<3>().set(FUNC(apple2gs_state::adbmicro_p3_out));
 }
 
+void apple2gs_state::apple2gsmt(machine_config &config)
+{
+	apple2gs(config);
+
+	// SWIM1 344S0061 confirmed on two different Mark Twain boards, with 15.6672 MHz oscillator
+	SWIM1(config.replace(), m_iwm, 15.6672_MHz_XTAL);
+	m_iwm->phases_cb().set(FUNC(apple2gs_state::phases_w));
+	m_iwm->sel35_cb().set(FUNC(apple2gs_state::sel35_w));
+	m_iwm->devsel_cb().set(FUNC(apple2gs_state::devsel_w));
+
+	applefdintf_device::add_525(config, m_floppy[0]);
+	applefdintf_device::add_525(config, m_floppy[1]);
+	applefdintf_device::add_35_hd(config, m_floppy[2]);
+	applefdintf_device::add_35_hd(config, m_floppy[3]);
+}
+
 /***************************************************************************
 
   Game driver(s)
@@ -4904,16 +3915,12 @@ ROM_START(apple2gs)
 	ROM_REGION(0x1000,"gfx1",0)
 	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89)) /* need label/part number */
 
-	ROM_REGION(0x40000,"maincpu",0)
+	ROM_REGION(0x80000,"maincpu",0)
 	// 341-0728 is the MASK rom version while 341-0737 is the EPROM version - SAME data.
 	ROM_LOAD("341-0728", 0x00000, 0x20000, CRC(8d410067) SHA1(c0f4704233ead14cb8e1e8a68fbd7063c56afd27) ) /* 341-0728: IIgs ROM03 FC-FD */
 	// 341-0748 is the MASK rom version while 341-0749 is the EPROM version - SAME data.
 	ROM_LOAD("341-0748", 0x30000, 0x10000, CRC(18190283) SHA1(c70576869deec92ca82c78438b1d5c686eac7480) ) /* 341-0748: IIgs ROM03 FE-FF */
 	ROM_CONTINUE ( 0x20000, 0x10000) /* high address line is inverted on PCB? */
-
-	// temporary: use IIe enhanced keyboard decode ROM
-	ROM_REGION( 0x800, "keyboard", 0 )
-	ROM_LOAD( "341-0132-d.e12", 0x000, 0x800, CRC(c506efb9) SHA1(8e14e85c645187504ec9d162b3ea614a0c421d32) )
 ROM_END
 
 ROM_START(apple2gsr3p)
@@ -4923,13 +3930,9 @@ ROM_START(apple2gsr3p)
 	ROM_REGION(0x1000,"gfx1",0)
 	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89)) /* need label/part number */
 
-	ROM_REGION(0x40000,"maincpu",0)
+	ROM_REGION(0x80000,"maincpu",0)
 	ROM_LOAD("341-0728", 0x00000, 0x20000, CRC(8d410067) SHA1(c0f4704233ead14cb8e1e8a68fbd7063c56afd27) ) /* 341-0728: IIgs ROM03 prototype FC-FD - 28 pin MASK rom */
 	ROM_LOAD("341-0729", 0x20000, 0x20000, NO_DUMP) /* 341-0729: IIgs ROM03 prototype FE-FF */
-
-	// temporary: use IIe enhanced keyboard decode ROM
-	ROM_REGION( 0x800, "keyboard", 0 )
-	ROM_LOAD( "341-0132-d.e12", 0x000, 0x800, CRC(c506efb9) SHA1(8e14e85c645187504ec9d162b3ea614a0c421d32) )
 ROM_END
 
 ROM_START(apple2gsr1)
@@ -4939,12 +3942,8 @@ ROM_START(apple2gsr1)
 	ROM_REGION(0x1000,"gfx1",0)
 	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89)) /* need label/part number */
 
-	ROM_REGION(0x40000,"maincpu",0)
+	ROM_REGION(0x80000,"maincpu",0)
 	ROM_LOAD("342-0077-b", 0x20000, 0x20000, CRC(42f124b0) SHA1(e4fc7560b69d062cb2da5b1ffbe11cd1ca03cc37)) /* 342-0077-B: IIgs ROM01 */
-
-	// temporary: use IIe enhanced keyboard decode ROM
-	ROM_REGION( 0x800, "keyboard", 0 )
-	ROM_LOAD( "341-0132-d.e12", 0x000, 0x800, CRC(c506efb9) SHA1(8e14e85c645187504ec9d162b3ea614a0c421d32) )
 ROM_END
 
 ROM_START(apple2gsr0)
@@ -4954,12 +3953,8 @@ ROM_START(apple2gsr0)
 	ROM_REGION(0x1000,"gfx1",0)
 	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89))
 
-	ROM_REGION(0x40000,"maincpu",0)
+	ROM_REGION(0x80000,"maincpu",0)
 	ROM_LOAD("342-0077-a", 0x20000, 0x20000, CRC(dfbdd97b) SHA1(ff0c245dd0732ec4413a934fd80efc2defd8a8e3) ) /* 342-0077-A: IIgs ROM00 */
-
-	// temporary: use IIe enhanced keyboard decode ROM
-	ROM_REGION( 0x800, "keyboard", 0 )
-	ROM_LOAD( "341-0132-d.e12", 0x000, 0x800, CRC(c506efb9) SHA1(8e14e85c645187504ec9d162b3ea614a0c421d32) )
 ROM_END
 
 ROM_START(apple2gsr0p)  // 6/19/1986 Cortland prototype
@@ -4969,12 +3964,8 @@ ROM_START(apple2gsr0p)  // 6/19/1986 Cortland prototype
 	ROM_REGION(0x1000,"gfx1",0)
 	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89))
 
-	ROM_REGION(0x40000,"maincpu",0)
+	ROM_REGION(0x80000,"maincpu",0)
 	ROM_LOAD( "rombf.bin",    0x020000, 0x020000, CRC(ab04fedf) SHA1(977589a17553956d583a21020080a39dd396df5c) )
-
-	// temporary: use IIe enhanced keyboard decode ROM
-	ROM_REGION( 0x800, "keyboard", 0 )
-	ROM_LOAD( "341-0132-d.e12", 0x000, 0x800, CRC(c506efb9) SHA1(8e14e85c645187504ec9d162b3ea614a0c421d32) )
 ROM_END
 
 ROM_START(apple2gsr0p2)  // 3/10/1986 Cortland prototype, boots as "Apple //'ing - Alpha 2.0"
@@ -4984,21 +3975,42 @@ ROM_START(apple2gsr0p2)  // 3/10/1986 Cortland prototype, boots as "Apple //'ing
 	ROM_REGION(0x1000,"gfx1",0)
 	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89))
 
-	ROM_REGION(0x40000,"maincpu",0)
+	ROM_REGION(0x80000,"maincpu",0)
 	ROM_LOAD( "apple iigs alpha rom 2.0 19860310.bin", 0x020000, 0x020000, CRC(a47d275f) SHA1(c5836adcfc8be69c7351b84afa94c814e8d92b81) )
+ROM_END
 
-	// temporary: use IIe enhanced keyboard decode ROM
-	ROM_REGION( 0x800, "keyboard", 0 )
-	ROM_LOAD( "341-0132-d.e12", 0x000, 0x800, CRC(c506efb9) SHA1(8e14e85c645187504ec9d162b3ea614a0c421d32) )
+ROM_START(apple2gsmt)
+	// 50741 ADB MCU inside the IIgs system unit
+	ROM_REGION(0x1000, "adbmicro", 0)
+	ROM_LOAD( "341s0632-2.bin", 0x000000, 0x001000, CRC(e1c11fb0) SHA1(141d18c36a617ab9dce668445440d34354be0672) )
+
+	ROM_REGION(0x1000, "gfx1", 0)
+	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89))
+
+	ROM_REGION(0x80000, "maincpu", 0)
+	// The Mark Twain ROM is 512K, with address bit 16 inverted (same as ROM 3).
+	// The first 256K is filled with 64K of 0xF0, then 0xF1, 0xF2, and 0xF3.  I'm guessing this was meant to be
+	// a small ROM disk at $F00000, like the Mac Classic has.  The second 256K is the firmware we all know from
+	// the "System 6.0.1" source leak.
+	ROM_LOAD( "mtrom.bin", 0x040000, 0x040000, CRC(d75414c5) SHA1(7054915f5e5f9f3bb2cbecf6830d4f80793694a6) )
+	ROM_CONTINUE(0x10000, 0x10000)
+	ROM_CONTINUE(0x00000, 0x10000)
+	ROM_CONTINUE(0x30000, 0x10000)
+	ROM_CONTINUE(0x20000, 0x10000)
+
+	// The firmware for the built-in High-Speed SCSI Card
+	ROM_REGION(0x8000, "hsscsi", 0)
+	ROM_LOAD( "mtscsi.bin",   0x000000, 0x008000, CRC(7426c880) SHA1(1c16310e5c180701a05089d69c6e72e9dc7434f6) )
 ROM_END
 
 } // Anonymous namespace
 
 
 /*    YEAR  NAME            PARENT    COMPAT    MACHINE     INPUT     CLASS        INIT  COMPANY           FULLNAME */
-COMP( 1989, apple2gs,     0,        apple2, apple2gs,   apple2gs, apple2gs_state, rom3_init, "Apple Computer", "Apple IIgs (ROM03)", MACHINE_SUPPORTS_SAVE )
-COMP( 198?, apple2gsr3p,  apple2gs, 0,      apple2gs,   apple2gs, apple2gs_state, rom3_init, "Apple Computer", "Apple IIgs (ROM03 prototype)", MACHINE_NOT_WORKING )
+COMP( 1989, apple2gs,     0,        apple2, apple2gs,   apple2gsrom3, apple2gs_state, rom3_init, "Apple Computer", "Apple IIgs (ROM03)", MACHINE_SUPPORTS_SAVE )
+COMP( 198?, apple2gsr3p,  apple2gs, 0,      apple2gs,   apple2gsrom3, apple2gs_state, rom3_init, "Apple Computer", "Apple IIgs (ROM03 prototype)", MACHINE_NOT_WORKING )
 COMP( 1987, apple2gsr1,   apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, rom1_init, "Apple Computer", "Apple IIgs (ROM01)", MACHINE_SUPPORTS_SAVE )
 COMP( 1986, apple2gsr0,   apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, rom1_init, "Apple Computer", "Apple IIgs (ROM00)", MACHINE_SUPPORTS_SAVE )
 COMP( 1986, apple2gsr0p,  apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, rom1_init, "Apple Computer", "Apple IIgs (ROM00 prototype 6/19/1986)", MACHINE_SUPPORTS_SAVE )
 COMP( 1986, apple2gsr0p2, apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, rom1_init, "Apple Computer", "Apple IIgs (ROM00 prototype 3/10/1986)", MACHINE_SUPPORTS_SAVE )
+COMP( 1991, apple2gsmt,   apple2gs, 0,      apple2gsmt, apple2gsrom3, apple2gs_state, rom3_init, "Apple Computer", "Apple IIgs (1991 Mark Twain prototype)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

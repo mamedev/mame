@@ -6,8 +6,8 @@
  * Secure SerialFlash
  *
  */
-#ifndef MAME_MACHINE_ZS01_H
-#define MAME_MACHINE_ZS01_H
+#ifndef MAME_KONAMI_ZS01_H
+#define MAME_KONAMI_ZS01_H
 
 #pragma once
 
@@ -113,4 +113,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(ZS01, zs01_device)
 
-#endif // MAME_MACHINE_ZS01_H
+#endif // MAME_KONAMI_ZS01_H

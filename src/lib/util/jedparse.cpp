@@ -133,6 +133,7 @@ static void process_field(jed_data *data, const uint8_t *cursrc, const uint8_t *
 				case 'F':
 					cursrc++;
 					pinfo->explicit_numfuses = data->numfuses = suck_number(&cursrc);
+					if (LOG_PARSE) printf("QF\n  %lu\n", (unsigned long)data->numfuses);
 					break;
 			}
 			break;
@@ -162,7 +163,7 @@ static void process_field(jed_data *data, const uint8_t *cursrc, const uint8_t *
 				if (*cursrc == '0' || *cursrc == '1')
 				{
 					jed_set_fuse(data, curfuse, *cursrc - '0');
-					if (LOG_PARSE) printf("  fuse %u = %d\n", curfuse, 0);
+					if (LOG_PARSE) printf("  fuse %u = %d\n", curfuse, jed_get_fuse(data, curfuse));
 					if (curfuse >= data->numfuses)
 						data->numfuses = curfuse + 1;
 					curfuse++;
@@ -195,6 +196,7 @@ int jed_parse(util::random_read &src, jed_data *result)
 	jed_parse_info pinfo;
 	int i;
 	std::size_t actual;
+	std::error_condition err;
 
 	/* initialize the output and the intermediate info struct */
 	memset(result, 0, sizeof(*result));
@@ -204,8 +206,17 @@ int jed_parse(util::random_read &src, jed_data *result)
 	uint8_t ch;
 	do
 	{
-		if (src.read(&ch, 1, actual) || actual != 1)
+		err = src.read(&ch, 1, actual);
+		if (err)
+		{
+			if (LOG_PARSE) printf("Read error searching for JED start marker\n");
 			return JEDERR_INVALID_DATA;
+		}
+		else if (actual != 1)
+		{
+			if (LOG_PARSE) printf("End of file encountered while searching for JED start marker\n");
+			return JEDERR_INVALID_DATA;
+		}
 	}
 	while (ch != 0x02);
 
@@ -214,15 +225,27 @@ int jed_parse(util::random_read &src, jed_data *result)
 	uint16_t checksum = ch;
 	do
 	{
-		if (src.read(&ch, 1, actual) || actual != 1)
+		err = src.read(&ch, 1, actual);
+		if (err)
+		{
+			if (LOG_PARSE) printf("Read error searching for JED end marker\n");
 			return JEDERR_INVALID_DATA;
+		}
+		else if (actual != 1)
+		{
+			if (LOG_PARSE) printf("End of file encountered while searching for JED end marker\n");
+			return JEDERR_INVALID_DATA;
+		}
 		checksum += ch & 0x7f;
 
 		/* mark end of comment field */
 		if (ch == '*' && startpos == 0)
 		{
 			if (src.tell(startpos))
+			{
+				if (LOG_PARSE) printf("Error getting file position for end of design specification\n");
 				return JEDERR_INVALID_DATA;
+			}
 		}
 	}
 	while (ch != 0x03);
@@ -230,7 +253,10 @@ int jed_parse(util::random_read &src, jed_data *result)
 	/* the ETX becomes the real srcend */
 	uint64_t endpos;
 	if (src.tell(endpos))
+	{
+		if (LOG_PARSE) printf("Error getting file position for end JED data\n");
 		return JEDERR_INVALID_DATA;
+	}
 	endpos--;
 
 	/* see if there is a transmission checksum at the end */
@@ -239,15 +265,27 @@ int jed_parse(util::random_read &src, jed_data *result)
 	{
 		uint16_t dessum = (hexval(sumbuf[0]) << 12) | (hexval(sumbuf[1]) << 8) | (hexval(sumbuf[2]) << 4) | hexval(sumbuf[3] << 0);
 		if (dessum != 0 && dessum != checksum)
+		{
+			if (LOG_PARSE) printf("Bad transmission checksum %04X (expected %04X)\n", dessum, checksum);
 			return JEDERR_BAD_XMIT_SUM;
+		}
 	}
 
 	/* blast through the comment field */
-	if (startpos == 0 || src.seek(startpos, SEEK_SET))
-		return JEDERR_INVALID_DATA;
+	if (startpos != 0)
+	{
+		if (src.seek(startpos, SEEK_SET))
+		{
+			if (LOG_PARSE) printf("Error seeking start of JED data\n");
+			return JEDERR_INVALID_DATA;
+		}
+	}
 	auto srcdata = std::make_unique<uint8_t[]>(endpos - startpos);
 	if (src.read(&srcdata[0], endpos - startpos, actual) || actual != endpos - startpos)
+	{
+		if (LOG_PARSE) printf("Error reading JED data\n");
 		return JEDERR_INVALID_DATA;
+	}
 	const uint8_t *cursrc = &srcdata[0];
 	const uint8_t *const srcend = &srcdata[endpos - startpos];
 
@@ -290,7 +328,10 @@ int jed_parse(util::random_read &src, jed_data *result)
 	for (i = 0; i < (result->numfuses + 7) / 8; i++)
 		checksum += result->fusemap[i];
 	if (pinfo.checksum != 0 && checksum != pinfo.checksum)
+	{
+		if (LOG_PARSE) printf("Bad fuse checksum %04X (expected %04X)\n", pinfo.checksum, checksum);
 		return JEDERR_BAD_FUSE_SUM;
+	}
 
 	return JEDERR_NONE;
 }

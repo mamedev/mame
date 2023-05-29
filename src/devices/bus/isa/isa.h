@@ -250,12 +250,9 @@ DECLARE_DEVICE_TYPE(ISA8, isa8_device)
 class device_isa8_card_interface : public device_interface
 {
 	friend class isa8_device;
-	template <class ElementType> friend class simple_list;
 public:
 	// construction/destruction
 	virtual ~device_isa8_card_interface();
-
-	device_isa8_card_interface *next() const { return m_next; }
 
 	void set_isa_device();
 	// configuration access
@@ -274,9 +271,6 @@ public:
 
 	isa8_device  *m_isa;
 	device_t     *m_isa_dev;
-
-private:
-	device_isa8_card_interface *m_next;
 };
 
 class isa16_device;

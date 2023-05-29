@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
 
-#ifndef MAME_MACHINE_Z88_IMPEXP_H
-#define MAME_MACHINE_Z88_IMPEXP_H
+#ifndef MAME_ACORN_Z88_IMPEXP_H
+#define MAME_ACORN_Z88_IMPEXP_H
 
 #pragma once
 
@@ -28,15 +28,15 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_serial_interface overrides
+	// device_serial_interface implementation
 	virtual void tra_callback() override;
 	virtual void tra_complete() override;
 	virtual void rcv_complete() override;
 
-	// image-level overrides
-	virtual image_init_result call_load() override;
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
-	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
+	virtual std::pair<std::error_condition, std::string> call_create(int format_type, util::option_resolution *format_options) override;
 
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return true; }
@@ -68,4 +68,4 @@ private:
 
 DECLARE_DEVICE_TYPE(Z88_IMPEXP, z88_impexp_device)
 
-#endif // MAME_MACHINE_Z88_IMPEXP_H
+#endif // MAME_ACORN_Z88_IMPEXP_H

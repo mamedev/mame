@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Carlos A. Lozano
-#ifndef MAME_INCLUDES_TERRACRE_H
-#define MAME_INCLUDES_TERRACRE_H
+#ifndef MAME_NICHIBUTSU_TERRACRE_H
+#define MAME_NICHIBUTSU_TERRACRE_H
 
 #pragma once
 
@@ -102,4 +102,4 @@ private:
 	required_device<nb1412m2_device> m_prot;
 };
 
-#endif // MAME_INCLUDES_TERRACRE_H
+#endif // MAME_NICHIBUTSU_TERRACRE_H

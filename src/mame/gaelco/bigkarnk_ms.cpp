@@ -294,6 +294,8 @@ Sound Board 9/2
 #include "machine/bankdev.h"
 
 
+namespace {
+
 class bigkarnk_ms_state : public driver_device
 {
 public:
@@ -363,8 +365,6 @@ private:
 	tilemap_t *m_bg_tilemap2 = nullptr;
 	tilemap_t *m_bg_tilemap3 = nullptr;
 
-	uint16_t unknown_0x40000x_r();
-
 	DECLARE_WRITE_LINE_MEMBER(splash_msm5205_int);
 	void splash_adpcm_data_w(uint8_t data);
 	void splash_adpcm_control_w(uint8_t data);
@@ -372,11 +372,6 @@ private:
 
 	void descramble_16x16tiles(uint8_t* src, int len);
 };
-
-uint16_t bigkarnk_ms_state::unknown_0x40000x_r()
-{
-	return 0xffff;
-}
 
 TILE_GET_INFO_MEMBER(bigkarnk_ms_state::get_tile_info_tilemap1)
 {
@@ -837,5 +832,8 @@ ROM_START( bigkarnkm )
 	ROM_LOAD( "snd_9248_gal20v8-25lp.ic18", 0, 1, NO_DUMP )
 	ROM_LOAD( "snd_9348_gal16v8-25hb1.ic10", 0, 1, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1991, bigkarnkm,  bigkarnk,  bigkarnkm,  bigkarnkm,  bigkarnk_ms_state, init_bigkarnkm, ROT0, "Gaelco", "Big Karnak (Modular System)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

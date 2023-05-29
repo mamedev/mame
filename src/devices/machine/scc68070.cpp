@@ -25,15 +25,15 @@ TODO:
 #include "emu.h"
 #include "machine/scc68070.h"
 
-#define LOG_I2C         (1 << 0)
-#define LOG_UART        (1 << 1)
-#define LOG_TIMERS      (1 << 2)
-#define LOG_TIMERS_HF   (1 << 3)
-#define LOG_DMA         (1 << 4)
-#define LOG_MMU         (1 << 5)
-#define LOG_IRQS        (1 << 6)
-#define LOG_UNKNOWN     (1 << 7)
-#define LOG_MORE_UART   (1 << 8)
+#define LOG_I2C         (1U << 1)
+#define LOG_UART        (1U << 2)
+#define LOG_TIMERS      (1U << 3)
+#define LOG_TIMERS_HF   (1U << 4)
+#define LOG_DMA         (1U << 5)
+#define LOG_MMU         (1U << 6)
+#define LOG_IRQS        (1U << 7)
+#define LOG_UNKNOWN     (1U << 8)
+#define LOG_MORE_UART   (1U << 9)
 #define LOG_ALL         (LOG_I2C | LOG_UART | LOG_TIMERS | LOG_DMA | LOG_MMU | LOG_IRQS | LOG_UNKNOWN)
 
 #define VERBOSE         (0)
@@ -287,6 +287,8 @@ void scc68070_device::device_resolve_objects()
 
 void scc68070_device::device_start()
 {
+	reset_cb().append(*this, FUNC(scc68070_device::reset_peripherals));
+
 	scc68070_base_device::device_start();
 
 	save_item(NAME(m_ipl));
@@ -448,7 +450,7 @@ void scc68070_device::device_reset()
 	set_timer_callback(0);
 }
 
-void scc68070_device::m68k_reset_peripherals()
+WRITE_LINE_MEMBER(scc68070_device::reset_peripherals)
 {
 	m_lir = 0;
 

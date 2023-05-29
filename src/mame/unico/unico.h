@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-#ifndef MAME_INCLUDES_UNICO_H
-#define MAME_INCLUDES_UNICO_H
+#ifndef MAME_UNICO_UNICO_H
+#define MAME_UNICO_UNICO_H
 
 #pragma once
 
@@ -123,4 +123,4 @@ private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
 
-#endif // MAME_INCLUDES_UNICO_H
+#endif // MAME_UNICO_UNICO_H

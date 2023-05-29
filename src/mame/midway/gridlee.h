@@ -7,8 +7,8 @@
     driver by Aaron Giles
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_GRIDLEE_H
-#define MAME_INCLUDES_GRIDLEE_H
+#ifndef MAME_MIDWAY_GRIDLEE_H
+#define MAME_MIDWAY_GRIDLEE_H
 
 #pragma once
 
@@ -121,4 +121,4 @@ private:
 
 DECLARE_DEVICE_TYPE(GRIDLEE, gridlee_sound_device)
 
-#endif // MAME_INCLUDES_GRIDLEE_H
+#endif // MAME_MIDWAY_GRIDLEE_H

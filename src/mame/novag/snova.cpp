@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Berger, bataais
-/******************************************************************************
+/*******************************************************************************
 
 Novag Super Nova & related chess computers. I believe the series started with
 Primo. The chess engine is by David Kittinger.
@@ -12,9 +12,10 @@ TODO:
 - beeps are glitchy, as if interrupted for too long
 - nsnova serial port isn't working, MCU emulation problem?
 - nsnova unmapped reads from 0x33/0x34
+- is "Aquamarine / Super Nova" the same rom as nsnova and just a redesign?
 - is the 1st version of supremo(black plastic) the same ROM?
 
-===============================================================================
+================================================================================
 
 Novag Super Nova (model 904)
 ----------------------------
@@ -28,7 +29,7 @@ Hardware notes:
 
 Older versions had a bug in the opening moves, always playing B5 after D4.
 
-===============================================================================
+================================================================================
 
 Novag Supremo (model 881)
 -------------------------
@@ -43,7 +44,7 @@ Supremo also had a "limited edition" rerelease in 1990, plastic is fake-wood
 instead of black and backpanel sticker is gold, otherwise it's the same game.
 The model number is still 881, ROM is the same as the standard fake-wood version.
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -126,9 +127,9 @@ void snova_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // misc
 
@@ -207,9 +208,9 @@ void snova_state::p6_w(u8 data)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void snova_state::supremo_map(address_map &map)
 {
@@ -227,9 +228,9 @@ void snova_state::snova_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( snova )
 	PORT_START("IN.0")
@@ -277,13 +278,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void snova_state::snova(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD6303Y(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &snova_state::snova_map);
 	m_maincpu->in_p2_cb().set(FUNC(snova_state::p2_r));
@@ -295,7 +296,7 @@ void snova_state::snova(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(350));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_lcd_pwm).set_size(4, 10);
 	m_lcd_pwm->output_x().set(FUNC(snova_state::lcd_pwm_w));
 
@@ -307,11 +308,11 @@ void snova_state::snova(machine_config &config)
 	PWM_DISPLAY(config, m_led_pwm).set_size(2, 8);
 	config.set_default_layout(layout_novag_snova);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	/* rs232 (configure after video) */
+	// rs232 (configure after video)
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 }
 
@@ -319,7 +320,7 @@ void snova_state::supremo(machine_config &config)
 {
 	snova(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_clock(8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &snova_state::supremo_map);
 
@@ -330,9 +331,9 @@ void snova_state::supremo(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( nsnova ) // ID = N1.05
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -354,11 +355,11 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS        INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1990, nsnova,  0,      0,      snova,   snova,   snova_state, empty_init, "Novag", "Super Nova (Novag, v1.05)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, nsnova,  0,      0,      snova,   snova,   snova_state, empty_init, "Novag", "Super Nova (Novag, v1.05)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1988, supremo, 0,      0,      supremo, supremo, snova_state, empty_init, "Novag", "Supremo", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, supremo, 0,      0,      supremo, supremo, snova_state, empty_init, "Novag", "Supremo", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

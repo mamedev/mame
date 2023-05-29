@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_TRS80M2KB_H
-#define MAME_MACHINE_TRS80M2KB_H
+#ifndef MAME_TRS_TRS80M2KB_H
+#define MAME_TRS_TRS80M2KB_H
 
 #pragma once
 
@@ -80,4 +80,4 @@ DECLARE_DEVICE_TYPE(TRS80M2_KEYBOARD, trs80m2_keyboard_device)
 
 
 
-#endif // MAME_MACHINE_TRS80M2KB_H
+#endif // MAME_TRS_TRS80M2KB_H

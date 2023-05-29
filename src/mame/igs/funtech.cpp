@@ -34,6 +34,7 @@ and an unpopulated position for a YM2413 or UM3567
 #include "fts2in1.lh"
 
 
+namespace {
 
 class fun_tech_corp_state : public driver_device
 {
@@ -486,5 +487,8 @@ ROM_START( fts2in1 )
 	ROM_LOAD16_BYTE( "u29.bin", 0x00000, 0x20000, CRC(ed6a1e2f) SHA1(2c72e764c7c8091a8fa1dfc257a84d61e2da0e4b) )
 	ROM_LOAD16_BYTE( "u30.bin", 0x00001, 0x20000, CRC(d572bddc) SHA1(06499aeb47085a02af9eb4987ed987f9a3a397f7) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAMEL( 1993, fts2in1, 0, funtech, funtech, fun_tech_corp_state, empty_init, ROT0, "Fun Tech Corporation", "Super Two In One", MACHINE_SUPPORTS_SAVE, layout_fts2in1 )

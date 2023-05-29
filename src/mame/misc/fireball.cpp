@@ -9,8 +9,8 @@
     some pics here
     http://www.schausteller.de/anzeigenmarkt/euro-ball-66634.html
 
-    TODO
-    -NEVER sends store command to Eeprom so all change are lost
+    TODO:
+    - Never sends store command to EEPROM so all changes are lost
 
 ************************************************************************************/
 
@@ -24,22 +24,20 @@
 
 #include "fireball.lh"
 
+#define LOG_DISPLAY  (1U << 1)
+#define LOG_DISPLAY2 (1U << 2)
+#define LOG_INPUT    (1U << 3)
+#define LOG_AY8912   (1U << 4)
+#define LOG_P1       (1U << 5)
+#define LOG_P3       (1U << 6)
+#define LOG_OUTPUT   (1U << 7)
 
-/****************************
-*    LOG defines            *
-****************************/
+#define VERBOSE (0)
+#include "logmacro.h"
 
-#define LOG_DISPLAY 0
-#define LOG_DISPLAY2 0
-#define LOG_INPUT 0
-#define LOG_AY8912 0
-#define LOG_P1 0
-#define LOG_P3 0
-#define LOG_OUTPUT 0
 
-/****************************
-*    Clock defines          *
-****************************/
+namespace {
+
 #define CPU_CLK  XTAL(11'059'200)
 #define AY_CLK  XTAL(11'059'200)/8
 
@@ -58,6 +56,12 @@ public:
 	void fireball(machine_config &config);
 
 private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void fireball_map(address_map &map);
+	void fireball_io_map(address_map &map);
+
 	void io_00_w(uint8_t data);
 	uint8_t io_00_r();
 	void io_02_w(uint8_t data);
@@ -72,82 +76,72 @@ private:
 	void p3_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(int_0);
 
-	void fireball_io_map(address_map &map);
-	void fireball_map(address_map &map);
-
 	uint8_t m_p1_data = 0;
 	uint8_t m_p3_data = 0;
-	uint8_t int_timing = 0;
-	uint8_t int_data = 0;
-	uint8_t ay_data = 0;
-	uint8_t to_ay_data = 0;
+	uint8_t m_int_timing = 0;
+	uint8_t m_int_data = 0;
+	uint8_t m_ay_data = 0;
+	uint8_t m_to_ay_data = 0;
 	uint8_t m_display_data = 0;
-	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
+
 	required_device<i8031_device> m_maincpu;
 	required_device<ay8912_device> m_ay;
 	required_device<eeprom_serial_x24c44_device> m_eeprom;
 	output_finder<8> m_digits;
 };
 
+
 /****************************
 *    Read/Write Handlers    *
 ****************************/
 
-
 uint8_t fireball_state::io_00_r()
 {
-	uint8_t tmp=0;
-
-	tmp=ioport("X2-4")->read();
-
-	if (LOG_INPUT)
-		logerror("return %02X from 0x00\n",tmp);
+	uint8_t tmp = ioport("X2-4")->read();
+	LOGMASKED(LOG_INPUT, "return %02X from 0x00\n", tmp);
 	return tmp;
 }
 
 void fireball_state::io_00_w(uint8_t data)
 {
-	m_display_data= m_display_data&0x7f;
-	if (LOG_DISPLAY)
-		logerror("write to 0x00 IO %02X, m_display_data= %01X\n",data,m_display_data);
+	m_display_data = m_display_data & 0x7f;
+	LOGMASKED(LOG_DISPLAY, "write to 0x00 IO %02X, m_display_data= %01X\n", data, m_display_data);
 
-	switch (data&0x0f)
+	switch (data & 0x0f)
 	{
-		case 1: m_digits[2] = m_display_data;
-				break;
-		case 2: m_digits[1] = m_display_data;
-				break;
-		case 4: m_digits[4] = m_display_data;
-				break;
-		case 8: m_digits[3] = m_display_data;
-				break;
+		case 1:
+			m_digits[2] = m_display_data;
+			break;
+		case 2:
+			m_digits[1] = m_display_data;
+			break;
+		case 4:
+			m_digits[4] = m_display_data;
+			break;
+		case 8:
+			m_digits[3] = m_display_data;
+			break;
 	}
 
 
-	if (LOG_OUTPUT)
-		logerror("write to 0x00 IO (X11-X11A) %02X\n",data&0xf0);
+	LOGMASKED(LOG_OUTPUT, "write to 0x00 IO (X11-X11A) %02X\n", data & 0xf0);
 
 	output().set_value("Hopper1", BIT(data, 4));
 	output().set_value("Hopper2", BIT(data, 5));
 	output().set_value("Hopper3", BIT(data, 6));
 }
 
+
 uint8_t fireball_state::io_02_r()
 {
-	uint8_t tmp=0;
-
-	tmp=ioport("X6-8")->read();
-
-	if (LOG_INPUT)
-		logerror("return %02X from 0x02\n",tmp);
+	uint8_t tmp = ioport("X6-8")->read();
+	LOGMASKED(LOG_INPUT, "return %02X from 0x02\n", tmp);
 	return tmp;
 }
 
 void fireball_state::io_02_w(uint8_t data)
 {
-	if (LOG_OUTPUT)
-		logerror("write to 0x00 IO (X7-X9) %02X\n",data);
+	LOGMASKED(LOG_OUTPUT, "write to 0x00 IO (X7-X9) %02X\n", data);
 
 	output().set_value("GameOver", BIT(data, 0));
 	output().set_value("Title", BIT(data, 1));
@@ -159,133 +153,120 @@ void fireball_state::io_02_w(uint8_t data)
 	output().set_value("RV", BIT(data, 7));
 }
 
+
 uint8_t fireball_state::io_04_r()
-{   //contraves per mod prog
-	uint8_t tmp=0;
-
-	tmp=ioport("X10-12")->read();
-
-	if (LOG_INPUT)
-		logerror("return %02X from 0x04\n",tmp);
+{
+	uint8_t tmp = ioport("X10-12")->read();
+	LOGMASKED(LOG_INPUT, "return %02X from 0x04\n", tmp);
 	return tmp;
 }
 
 void fireball_state::io_04_w(uint8_t data)
-{//display data
-	if (LOG_DISPLAY)
-		logerror("display datat write %02X\n",data);
-	m_display_data=data;
+{
+	// display data
+	LOGMASKED(LOG_DISPLAY, "display data write %02X\n", data);
+	m_display_data = data;
 }
-
 
 
 uint8_t fireball_state::io_06_r()
 {
-	if (LOG_AY8912)
-		logerror("read from 0x06 IO\n");
+	LOGMASKED(LOG_AY8912, "read from 0x06 IO\n");
 
+	// bit 0 is unconnected
+	// bit 6 is used to detect if the unit is powered up - related to eeprom store?
 	return 0xbe;
-				//bit 0x01 is NC
-				//bit 0x40 is used to detect is the unit is powered up!!! related to eeprom store?
 }
 
 void fireball_state::io_06_w(uint8_t data)
 {
-	if (LOG_AY8912)
-		logerror("write to 0x06 data =%02X\n",data);
+	LOGMASKED(LOG_AY8912, "write to 0x06 data =%02X\n", data);
 
-	to_ay_data= data;
+	m_to_ay_data = data;
 
-	if (LOG_DISPLAY2)
-		logerror("On board display write %02X\n",uint8_t(~(data&0xff)));
+	LOGMASKED(LOG_DISPLAY2, "On board display write %02X\n", uint8_t(~(data & 0xff)));
 
-	m_digits[7] = uint8_t(~(data&0xff));
+	m_digits[7] = uint8_t(~(data & 0xff));
 }
 
 
 uint8_t fireball_state::p1_r()
 {
-	uint8_t tmp=0;
-	tmp=(m_p1_data&0xfe)|(m_eeprom->do_read());
-	if (LOG_P1)
-		logerror("readP1 port data %02X\n",tmp&0x01);
+	uint8_t tmp = (m_p1_data & 0xfe) | m_eeprom->do_read();
+	LOGMASKED(LOG_P1, "read P1 port data %02X\n", tmp & 0x01);
 	return tmp;
 }
 
 void fireball_state::p1_w(uint8_t data)
 {
-	//eeprom x24c44/ay8912/system stuff...
-	//bit0 goes to eeprom pin 3 and 4  (0x01) Data_in and Data_out
-	//bit1 goes to eeprom pin 1 (0x02)      CE Hi active
-	//bit2 goes to eeprom pin 2 (0x04)      SK Clock
-	//bit3 goes to dis/thr input of a ne555 that somehow reset the 8031...      TODO
-	//bit4 goes to ay8912 pin bc1   (0x10)
-	//bit5 goes to ay8912 pin bdir (0x20)
-	//bit6 goes to                                                              TODO
-	//bit7 goes to                                                              TODO
+	// X24C44 EEPROM / AY8912 / system stuff
+	// bit 0 goes to EEPROM pins 3/4, DI and DO
+	// bit 1 goes to EEPROM pin 1, CE, active high
+	// bit 2 goes to EEPROM pin 2, SK (clock)
+	// bit 3 goes to DIS/THR input of a NE555 that somehow resets the 8031 (TODO)
+	// bit 4 goes to AY8912 pin bc1
+	// bit 5 goes to AY8912 pin bdir
+	// bit 6, unknown
+	// bit 7, unknown
 
-	if (LOG_AY8912){
-		if(( data&0x30) !=  (m_p1_data&0x30)){
-			logerror("write ay8910 control bc1= %02X bdir= %02X\n",data&0x10, data&0x20);
-		}
-}
+	if ((data & 0x30) != (m_p1_data & 0x30))
+	{
+		LOGMASKED(LOG_AY8912, "write ay8910 control bc1= %02X bdir= %02X\n", BIT(data, 4), BIT(data, 5));
+	}
 
 	m_eeprom->di_write(data & 0x01);
 	m_eeprom->clk_write((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 	m_eeprom->cs_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 
-	if (LOG_P1){
-		if(( data&0xc8) !=  (m_p1_data&0xc8)){
-			logerror("Unknown P1 data changed, old data %02X, new data %02X\n",m_p1_data,data);
-		}
+	if ((data & 0xc8) != (m_p1_data & 0xc8))
+	{
+		LOGMASKED(LOG_P1, "Unknown P1 data changed, old data %02X, new data %02X\n", m_p1_data, data);
 	}
 
-	//AY 3-8912 data write/read
+	// AY-3-8912 data write/read
 
-	if (data & 0x20){   //bdir
-		//write to ay8912
-		if (LOG_AY8912)
-			logerror("write to 0x06 bdir=1\n");
-		if(data & 0x10){
-			//address_w
-			if (LOG_AY8912)
-				logerror("write to 0x06 bc1=1\n");
-			m_ay->address_w(to_ay_data);
-			if (LOG_AY8912)
-				logerror("AY8912 address latch write=%02X\n",to_ay_data);
-		}else{
-			//data_w
-			if (LOG_AY8912)
-				logerror("write to 0x06 bc1=0\n");
-			m_ay->data_w(to_ay_data);
-			if (LOG_AY8912)
-				logerror("AY8912 data write=%02X\n",to_ay_data);
+	if (BIT(data, 5)) // bdir
+	{
+		// write to ay8912
+		LOGMASKED(LOG_AY8912, "write to 0x06 bdir=1\n");
+		if (BIT(data, 4))
+		{
+			// address_w
+			LOGMASKED(LOG_AY8912, "write to 0x06 bc1=1\n");
+			m_ay->address_w(m_to_ay_data);
+			LOGMASKED(LOG_AY8912, "AY8912 address latch write=%02X\n", m_to_ay_data);
 		}
-	}else{
-		if (LOG_AY8912)
-			logerror("write to 0x06 bdir=0\n");
-		ay_data=m_ay->data_r();
+		else
+		{
+			// data_w
+			LOGMASKED(LOG_AY8912, "write to 0x06 bc1=0\n");
+			m_ay->data_w(m_to_ay_data);
+			LOGMASKED(LOG_AY8912, "AY8912 data write=%02X\n", m_to_ay_data);
+		}
+	}
+	else
+	{
+		LOGMASKED(LOG_AY8912, "write to 0x06 bdir=0\n");
+		m_ay_data = m_ay->data_r();
 	}
 
-	m_p1_data=data;
+	m_p1_data = data;
 }
 
 
 uint8_t fireball_state::p3_r()
 {
-	uint8_t ret = 0xfb | ((int_data&1)<<2);
-	if (LOG_P3)
-		logerror("read P3 port data = %02X\n",ret);
+	uint8_t ret = 0xfb | ((m_int_data & 1) << 2);
+	LOGMASKED(LOG_P3, "read P3 port data = %02X\n", ret);
 	return ret;
 }
 
 void fireball_state::p3_w(uint8_t data)
 {
-	if (LOG_P3)
-		logerror("write to P3 port data=%02X\n",data);
-
-	m_p3_data=data;
+	LOGMASKED(LOG_P3, "write to P3 port data=%02X\n", data);
+	m_p3_data = data;
 }
+
 
 /*************************
 * Memory Map Information *
@@ -298,19 +279,16 @@ void fireball_state::fireball_map(address_map &map)
 
 void fireball_state::fireball_io_map(address_map &map)
 {
-
 	map(0x00, 0x01).rw(FUNC(fireball_state::io_00_r), FUNC(fireball_state::io_00_w));
 	map(0x02, 0x03).rw(FUNC(fireball_state::io_02_r), FUNC(fireball_state::io_02_w));
 	map(0x04, 0x05).rw(FUNC(fireball_state::io_04_r), FUNC(fireball_state::io_04_w));
 	map(0x06, 0x07).rw(FUNC(fireball_state::io_06_r), FUNC(fireball_state::io_06_w));
-
 }
 
 
 /*************************
 *      Input Ports       *
 *************************/
-
 
 static INPUT_PORTS_START( fireball )
 
@@ -325,8 +303,8 @@ static INPUT_PORTS_START( fireball )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("800 Points")
 
 	PORT_START("X6-8")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("Empty Hopper A") //activeLow to fool the game code...
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("Empty Hopper B")//at least one hopper must be full
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("Empty Hopper A")  // active low to fool the game code -
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("Empty Hopper B") // at least one hopper must be full
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("Empty Hopper C")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -439,13 +417,19 @@ static INPUT_PORTS_START( fireball )
 
 INPUT_PORTS_END
 
+
 /******************************
-*   machine reset             *
+*   Initialization            *
 ******************************/
+
+void fireball_state::machine_start()
+{
+	m_digits.resolve();
+}
 
 void fireball_state::machine_reset()
 {
-	int_timing=1;
+	m_int_timing = 1;
 	m_digits[5] = 0x3f;
 	m_digits[6] = 0x3f;
 
@@ -463,39 +447,40 @@ void fireball_state::machine_reset()
 	output().set_value("RV", 0);
 }
 
+
 /*************************
 *   INT callback         *
 *************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER( fireball_state::int_0 )
+TIMER_DEVICE_CALLBACK_MEMBER(fireball_state::int_0)
 {
 	/* toggle the INT0 line on the CPU */
-	if (int_timing==1){
-		//logerror("INT set\n");
+	if (m_int_timing == 1)
+	{
 		m_maincpu->set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
-			int_data=1;
+		m_int_data = 1;
 	}
-	if (int_timing==2){
-		//logerror("INT clear\n");
+	if (m_int_timing == 2)
+	{
 		m_maincpu->set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
-		int_data=0;
+		m_int_data = 0;
 	}
-	if (int_timing==5){
-		int_timing=0;
+	if (m_int_timing == 5)
+	{
+		m_int_timing = 0;
 	}
-	int_timing++;
+	m_int_timing++;
 }
 
 
 /*************************
-*    Machine Drivers     *
+*    Machine Driver      *
 *************************/
-
 
 void fireball_state::fireball(machine_config &config)
 {
-	/* basic machine hardware */
-	I8031(config, m_maincpu, CPU_CLK); //
+	// basic machine hardware
+	I8031(config, m_maincpu, CPU_CLK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fireball_state::fireball_map);
 	m_maincpu->set_addrmap(AS_IO, &fireball_state::fireball_io_map);
 	m_maincpu->port_in_cb<1>().set(FUNC(fireball_state::p1_r));
@@ -503,22 +488,22 @@ void fireball_state::fireball(machine_config &config)
 	m_maincpu->port_in_cb<3>().set(FUNC(fireball_state::p3_r));
 	m_maincpu->port_out_cb<3>().set(FUNC(fireball_state::p3_w));
 
-	//9ms from scope reading 111Hz take care of this in the handler
+	// 9ms from scope reading 111Hz take care of this in the handler
 	TIMER(config, "int_0", 0).configure_periodic(FUNC(fireball_state::int_0), attotime::from_hz(555));
 
 	EEPROM_X24C44_16BIT(config, "eeprom");
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	AY8912(config, m_ay, AY_CLK).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	/* Video */
+	// video
 	config.set_default_layout(layout_fireball);
 }
 
 
 /*************************
-*        Rom Load        *
+*        ROM Load        *
 *************************/
 
 ROM_START(fireball)
@@ -526,11 +511,14 @@ ROM_START(fireball)
 	ROM_LOAD("euroball-89-07-13-c026.bin", 0x0000, 0x2000, CRC(cab3fc1c) SHA1(bcf0d17e26f2d9f5e20bda258728c989ea138702))
 
 	ROM_REGION16_BE( 0x20, "eeprom", 0 ) // default eeprom must have some specific value at 0x03 at least
-	ROM_LOAD( "fireball.nv", 0x0000, 0x020, CRC(1d0f5f0f) SHA1(8e68fcd8782f39ed3b1df6162db9be83cb3335e4) )  //default setting
+	ROM_LOAD( "fireball.nv", 0x0000, 0x020, CRC(1d0f5f0f) SHA1(8e68fcd8782f39ed3b1df6162db9be83cb3335e4) )  // default setting
 ROM_END
 
+} // anonymous namespace
+
+
 /*************************
-*      Game Drivers      *
+*      Game Driver       *
 *************************/
 //    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT        ROT   COMPANY  FULLNAME    FLAGS
-GAME( 1989, fireball, 0,      fireball, fireball, fireball_state, empty_init, ROT0, "Valco", "Fireball", MACHINE_MECHANICAL ) //1989 by rom name
+GAME( 1989, fireball, 0,      fireball, fireball, fireball_state, empty_init, ROT0, "Valco", "Fireball", MACHINE_MECHANICAL ) // 1989 by rom name

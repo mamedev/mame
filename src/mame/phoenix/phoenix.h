@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Richard Davies
-#ifndef MAME_INCLUDES_PHOENIX_H
-#define MAME_INCLUDES_PHOENIX_H
+#ifndef MAME_PHOENIX_PHOENIX_H
+#define MAME_PHOENIX_PHOENIX_H
 
 #pragma once
 
@@ -89,4 +89,4 @@ private:
 #define VBSTART                 (208)
 #define VBEND                   (0)
 
-#endif // MAME_INCLUDES_PHOENIX_H
+#endif // MAME_PHOENIX_PHOENIX_H

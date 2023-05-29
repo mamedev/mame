@@ -20,11 +20,11 @@ TODO: nearly everything
 
 #include "k056230.h"
 
-#define LOG_REG_READS   (1 << 1U)
-#define LOG_REG_WRITES  (1 << 2U)
-#define LOG_RAM_READS   (1 << 3U)
-#define LOG_RAM_WRITES  (1 << 4U)
-#define LOG_UNKNOWNS    (1 << 5U)
+#define LOG_REG_READS   (1U << 1)
+#define LOG_REG_WRITES  (1U << 2)
+#define LOG_RAM_READS   (1U << 3)
+#define LOG_RAM_WRITES  (1U << 4)
+#define LOG_UNKNOWNS    (1U << 5)
 #define LOG_ALL (LOG_REG_READS | LOG_REG_WRITES | LOG_RAM_READS | LOG_RAM_WRITES | LOG_UNKNOWNS)
 
 #define VERBOSE (0)

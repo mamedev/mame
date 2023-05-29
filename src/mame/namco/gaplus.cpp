@@ -773,6 +773,47 @@ ROM_START( gaplust ) /* Tecfri PCB */
 	ROM_LOAD( "pal10l8.8n", 0x0000, 0x002c, CRC(08e5b2fe) SHA1(1aa7fa1a61795703af84ae427d0d8588ef8c4c3f) )
 ROM_END
 
+ROM_START( gapluse ) /* Version 2 or 3 PCB - only ROMs 2, 3, 4, 6 & 8 were labeled GP7, all other ROMs & BPROMs labeled as GP2 */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for the MAIN CPU */
+	ROM_LOAD( "gp7_4.8d", 0xa000, 0x2000, CRC(d7faeafa) SHA1(39e5293099e5214a7c9d9fd25e61b979d8a67747) ) // "7" is meant for what region???
+	ROM_LOAD( "gp7_3.8c", 0xc000, 0x2000, CRC(6674c6b7) SHA1(287bd826119cdbe0f83827c42612580b5acde579) )
+	ROM_LOAD( "gp7_2.8b", 0xe000, 0x2000, CRC(12e47097) SHA1(acec140475147c7297c29f55451b11f33eb73bea) )
+
+	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the SUB CPU */
+	ROM_LOAD( "gp7_8.11d", 0xa000, 0x2000, CRC(f5e056d1) SHA1(bbed2056dc28dc2828e29987c16d89fb16e7059e) ) // == gp3-8b.11d
+	ROM_LOAD( "gp2_7.11c", 0xc000, 0x2000, CRC(0621f7df) SHA1(b86020f819fefb134cb57e203f7c90b1b29581c8) )
+	ROM_LOAD( "gp7_6.11b", 0xe000, 0x2000, CRC(c0b80680) SHA1(57a14eff70d9239d71feac9b51ebd511006f4ea4) )
+
+	ROM_REGION( 0x10000, "sub2", 0 ) /* 64k for the SOUND CPU */
+	ROM_LOAD( "gp2-1.4b", 0xe000, 0x2000, CRC(ed8aa206) SHA1(4e0a31d84cb7aca497485dbe0240009d58275765) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "gp2-5.8s", 0x0000, 0x2000, CRC(f3d19987) SHA1(a0107fa4659597ac42c875ab1c0deb845534268b) )    /* characters */
+	/* 0x2000-0x3fff  will be unpacked from 0x0000-0x1fff */
+
+	ROM_REGION( 0xc000, "gfx2", 0 )
+	ROM_LOAD( "gp2-11.11p", 0x0000, 0x2000, CRC(57740ff9) SHA1(16873e0ac5f975768d596d7d32af7571f4817f2b) )    /* objects */
+	ROM_LOAD( "gp2-10.11n", 0x2000, 0x2000, CRC(6cd8ce11) SHA1(fc346e98737c9fc20810e32d4c150ae4b4051979) )    /* objects */
+	ROM_LOAD( "gp2-12.11r", 0x4000, 0x2000, CRC(7316a1f1) SHA1(368e4541a5151e906a189712bc05192c2ceec8ae) )    /* objects */
+	ROM_LOAD( "gp2-9.11m",  0x6000, 0x2000, CRC(e6a9ae67) SHA1(99c1e67c3b216aa1b63f199e21c73cdedde80e1b) )    /* objects */
+	/* 0x8000-0x9fff  will be unpacked from 0x6000-0x7fff */
+	ROM_FILL(               0xa000, 0x2000, 0x00 )    // optional ROM, not used
+
+	ROM_REGION( 0x0800, "proms", 0 )
+	ROM_LOAD( "gp2-3.1p", 0x0000, 0x0100, CRC(a5091352) SHA1(dcd6dfbfbd5281ba0c7b7c189d6fde23617ed3e3) )    /* red palette ROM (4 bits) */
+	ROM_LOAD( "gp2-1.1n", 0x0100, 0x0100, CRC(8bc8022a) SHA1(c76f9d9b066e268621d41a703c5280261234709a) )    /* green palette ROM (4 bits) */
+	ROM_LOAD( "gp2-2.2n", 0x0200, 0x0100, CRC(8dabc20b) SHA1(64d7b333f529d3ba66aeefd380fd1cbf9ddf460d) )    /* blue palette ROM (4 bits) */
+	ROM_LOAD( "gp2-7.6s", 0x0300, 0x0100, CRC(2faa3e09) SHA1(781ffe9088476798409cb922350eff881590cf35) )    /* char color ROM */
+	ROM_LOAD( "gp2-6.6p", 0x0400, 0x0200, CRC(6f99c2da) SHA1(955dcef363870ee8e91edc73b9ea3ce489738aad) )    /* sprite color ROM (lower 4 bits) */
+	ROM_LOAD( "gp2-5.6n", 0x0600, 0x0200, CRC(c7d31657) SHA1(a93a5bc448dc127e1389d10a9cb06acadfe940cf) )    /* sprite color ROM (upper 4 bits) */
+
+	ROM_REGION( 0x0100, "namco", 0 ) /* sound prom */
+	ROM_LOAD( "gp2-4.3f", 0x0000, 0x0100, CRC(2d9fbdd8) SHA1(e6a23cd5ce3d3e76de3b70c8ab5a3c45b1147af4) )
+
+	ROM_REGION( 0x0100, "plds", 0 )
+	ROM_LOAD( "pal10l8.8n", 0x0000, 0x002c, CRC(08e5b2fe) SHA1(1aa7fa1a61795703af84ae427d0d8588ef8c4c3f) )
+ROM_END
+
 ROM_START( galaga3 ) /* Version 2 or 3 PCB */
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for the MAIN CPU */
 	ROM_LOAD( "gp3-4c.8d", 0xa000, 0x2000, CRC(10d7f64c) SHA1(e39f77af16016d28170e4ac1c2a784b0a7ec5454) )
@@ -897,7 +938,7 @@ ROM_START( galaga3b ) /* Version 2 or 3 PCB */
 ROM_END
 
 
-ROM_START( galaga3c ) /* Version (AKA Midway) 1 PCB */
+ROM_START( galaga3c ) /* Version 1 PCB (AKA Midway) */
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for the MAIN CPU */
 	ROM_LOAD( "gal3_9e.9e", 0xa000, 0x2000, CRC(f4845e7f) SHA1(7b1377254f594bea4a8ffc7e388d9106e0266b55) )
 	ROM_LOAD( "gal3_9d.9d", 0xc000, 0x2000, CRC(86fac687) SHA1(07f76af524dbb3e79de41ef4bf32e7380776d9f5) )
@@ -935,7 +976,7 @@ ROM_START( galaga3c ) /* Version (AKA Midway) 1 PCB */
 	ROM_LOAD( "gp2-4.3f", 0x0000, 0x0100, CRC(2d9fbdd8) SHA1(e6a23cd5ce3d3e76de3b70c8ab5a3c45b1147af4) )
 ROM_END
 
-ROM_START( galaga3m ) /* Version (AKA Midway) 1 PCB */
+ROM_START( galaga3m ) /* Version 1 PCB (AKA Midway) */
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for the MAIN CPU */
 	ROM_LOAD( "m1.9e", 0xa000, 0x2000, CRC(e392704e) SHA1(8eebd48dfe8491f491e844d4ad0964e25efb013b) )
 	ROM_LOAD( "m2.9d", 0xc000, 0x2000, CRC(86fac687) SHA1(07f76af524dbb3e79de41ef4bf32e7380776d9f5) )
@@ -987,14 +1028,15 @@ void gaplus_base_state::driver_init()
 
 
 /* These sets are on revision 2 or 3 PCBs AKA "Namco" PCBs */
-GAME( 1984, gaplus,   0,      gapluso, gapluso,  gapluso_state, driver_init,  ROT90, "Namco", "Gaplus (GP2 rev. B)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gaplusa,  gaplus, gapluso, gapluso,  gapluso_state, driver_init,  ROT90, "Namco", "Gaplus (GP2)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gaplus,   0,      gapluso, gapluso,  gapluso_state, driver_init, ROT90, "Namco", "Gaplus (GP2 rev. B)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gaplusa,  gaplus, gapluso, gapluso,  gapluso_state, driver_init, ROT90, "Namco", "Gaplus (GP2)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, gaplusd,  gaplus, gaplusd, gapluso,  gaplusd_state, driver_init, ROT90, "Namco", "Gaplus (GP2 rev D, alternate hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gapluse,  gaplus, gaplus,  gaplus,   gaplus_state,  driver_init, ROT90, "Namco", "Gaplus (GP7)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, galaga3,  gaplus, gaplus,  gaplus,   gaplus_state,  driver_init, ROT90, "Namco", "Galaga 3 (GP3 rev. D)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, galaga3a, gaplus, gaplus,  gaplus,   gaplus_state,  driver_init, ROT90, "Namco", "Galaga 3 (GP3 rev. C)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, galaga3b, gaplus, gaplus,  gaplus,   gaplus_state,  driver_init, ROT90, "Namco", "Galaga 3 (GP3)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-/* These sets are on older revision (AKA Midway) 1 PCBs */
+/* These sets are on the older revision 1 PCB (AKA Midway) */
 GAME( 1984, galaga3c, gaplus, gaplus,  galaga3a, gaplus_state,  driver_init, ROT90, "Namco", "Galaga 3 (set 4)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, galaga3m, gaplus, gaplus,  galaga3m, gaplus_state,  driver_init, ROT90, "Namco", "Galaga 3 (set 5)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 

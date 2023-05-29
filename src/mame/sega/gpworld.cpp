@@ -48,6 +48,8 @@ Dumping Notes:
 #include "speaker.h"
 
 
+namespace {
+
 class gpworld_state : public driver_device
 {
 public:
@@ -551,6 +553,8 @@ void gpworld_state::driver_start()
 	m_brake_gas = 0;
 	m_ldp_write_latch = m_ldp_read_latch = 0;
 }
+
+} // anonymous namespace
 
 
 /*    YEAR  NAME      PARENT   MACHINE  INPUT    STATE          INIT        MONITOR  COMPANY  FULLNAME     FLAGS) */

@@ -32,6 +32,9 @@ of a hard drive of up to 88MB.
 #include "machine/timer.h"
 #include "softlist_dev.h"
 
+
+namespace {
+
 class ampro_state : public driver_device
 {
 public:
@@ -44,10 +47,7 @@ public:
 		, m_dart(*this, "dart")
 		, m_ctc(*this, "ctc")
 		, m_fdc(*this, "fdc")
-		, m_floppy0(*this, "fdc:0")
-		, m_floppy1(*this, "fdc:1")
-		, m_floppy2(*this, "fdc:2")
-		, m_floppy3(*this, "fdc:3")
+		, m_floppy(*this, "fdc:%u", 0U)
 		, m_ncr(*this, "scsi:7:ncr")
 		, m_printer(*this, "printer")
 	{ }
@@ -76,10 +76,7 @@ private:
 	required_device<z80dart_device> m_dart;
 	required_device<z80ctc_device> m_ctc;
 	required_device<wd1772_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
+	required_device_array<floppy_connector, 4> m_floppy;
 	required_device<ncr5380_device> m_ncr;
 	required_device<centronics_device> m_printer;
 };
@@ -96,10 +93,9 @@ void ampro_state::port00_w(uint8_t data)
 	m_bank1->set_entry(BIT(~data, 6));
 	m_fdc->dden_w(BIT(data, 5));
 	floppy_image_device *floppy = nullptr;
-	if (BIT(data, 0)) floppy = m_floppy0->get_device();
-	if (BIT(data, 1)) floppy = m_floppy1->get_device();
-	if (BIT(data, 2)) floppy = m_floppy2->get_device();
-	if (BIT(data, 3)) floppy = m_floppy3->get_device();
+	for (int n = 0; n < 4; n++)
+		if (BIT(data, n))
+			floppy = m_floppy[n]->get_device();
 	m_fdc->set_floppy(floppy);
 	if (floppy)
 		floppy->ss_w(BIT(data, 4));
@@ -245,10 +241,8 @@ void ampro_state::ampro(machine_config &config)
 	//m_fdc->intrq_wr_callback().set(m_ctc, FUNC(z80ctc_device::trg3)); // only if JMP2-3 shorted
 	//m_fdc->drq_wr_callback().set(m_dart, FUNC(z80dart_device::ria_w)); // only if JMP7 shorted
 	m_fdc->ready_wr_callback().set(m_dart, FUNC(z80dart_device::dcdb_w)); // actually from the drive, and not used by the FDC at all
-	FLOPPY_CONNECTOR(config, "fdc:0", ampro_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", ampro_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:2", ampro_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:3", ampro_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	for (auto &floppy : m_floppy)
+		FLOPPY_CONNECTOR(config, floppy, ampro_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	SOFTWARE_LIST(config, "flop_list").set_original("ampro");
 
 	NSCSI_BUS(config, "scsi");
@@ -275,6 +269,9 @@ ROM_START( ampro )
 	ROM_SYSTEM_BIOS( 2, "scsi", "SCSI Boot")
 	ROMX_LOAD( "scsi", 0x0000, 0x1000, CRC(8eb20e5d) SHA1(0ab1ff65cf6d3c1a713a8ac5c1ee4c662ac3da0c), ROM_BIOS(2))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

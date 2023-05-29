@@ -15,7 +15,7 @@ license:CC0-1.0
 	<software name="1869_a" supported="no">
 		<!-- SPS (CAPS) release 1653 -->
 		<!-- TODO: clearly a German release, not Europe -->
-		<description>1869 - Erlebte Geschichte Teil I (Euro, AGA)</description>
+		<description>1869 - Erlebte Geschichte Teil I (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1992</year>
@@ -50,7 +50,7 @@ license:CC0-1.0
 
 	<software name="airbuc_a" supported="partial">
 		<!-- SPS (CAPS) release 2567 -->
-		<description>Air Bucks (Euro, v1.2)</description>
+		<description>Air Bucks (Europe, v1.2)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
@@ -76,7 +76,7 @@ Some animations seems too fast
 
 	<software name="aladdin" supported="no">
 		<!-- SPS (CAPS) release 420 -->
-		<description>Aladdin (Euro)</description>
+		<description>Aladdin (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -107,7 +107,7 @@ Boots to a purple and blue flickering screen, [FDC] dsksync
 
 	<software name="alfred_a" supported="no">
 		<!-- SPS (CAPS) release 623 -->
-		<description>Alfred Chicken (Euro, AGA)</description>
+		<description>Alfred Chicken (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
@@ -133,7 +133,7 @@ Not extensively tested
 
 	<software name="abred2_a" supported="no">
 		<!-- SPS (CAPS) release 44 -->
-		<description>Alien Breed II - The Horror Continues (Euro, AGA)</description>
+		<description>Alien Breed II - The Horror Continues (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
@@ -166,7 +166,7 @@ Offset [Lisa] GFX scroll during gameplay
 
 	<software name="abre3d" supported="no">
 		<!-- SPS (CAPS) release 624 -->
-		<description>Alien Breed 3D (Euro)</description>
+		<description>Alien Breed 3D (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1995</year>
@@ -193,7 +193,7 @@ Has wrong [Lisa] GFX window size for gameplay, and no side GFX frame
 
 	<software name="abre3d2" supported="no">
 		<!-- SPS (CAPS) release 280 -->
-		<description>Alien Breed 3D II - The Killing Grounds (Euro)</description>
+		<description>Alien Breed 3D II - The Killing Grounds (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1996</year>
@@ -233,7 +233,7 @@ Has wrong [Lisa] GFX window size for gameplay, and no side GFX frame
 
 	<software name="lemming3" supported="no">
 		<!-- SPS (CAPS) release 625 -->
-		<description>All New World of Lemmings (Euro)</description>
+		<description>All New World of Lemmings (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1995</year>
@@ -272,7 +272,7 @@ Has wrong [Lisa] GFX window size for gameplay, and no side GFX frame
 
 	<software name="banshee" supported="no">
 		<!-- SPS (CAPS) release 633 -->
-		<description>Banshee (Euro)</description>
+		<description>Banshee (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -309,7 +309,7 @@ Hangs after language selection, [FDC] copy protection
 
 	<software name="biing_a" supported="no">
 		<!-- SPS (CAPS) release 442 -->
-		<description>Biing! - Sex, Intrigen und Skalpelle (Ger, AGA)</description>
+		<description>Biing! - Sex, Intrigen und Skalpelle (Germany, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1995</year>
@@ -438,7 +438,7 @@ Returns to Workbench with a fatal error after the credits intro with a "Speicher
 
 	<software name="bloodn_a" supported="no">
 		<!-- SPS (CAPS) release 1667 -->
-		<description>BloodNet - A Cyberpunk Gothic (Euro, v1.00)</description>
+		<description>BloodNet - A Cyberpunk Gothic (Europe, v1.00)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1995</year>
@@ -523,7 +523,7 @@ Program Error #80000006 on intro screen after avater becomes vampire
 
 	<software name="bblow_a" supported="no">
 		<!-- SPS (CAPS) release 1322 -->
-		<description>Body Blows (Euro, AGA)</description>
+		<description>Body Blows (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -556,7 +556,7 @@ Runs too fast
 
 	<software name="bblowg_a" supported="no">
 		<!-- SPS (CAPS) release 440 -->
-		<description>Body Blows Galactic (Euro, AGA)</description>
+		<description>Body Blows Galactic (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -581,7 +581,7 @@ Guru Meditation
 
 	<software name="breathle" supported="partial">
 		<!-- SPS (CAPS) release 178 -->
-		<description>Breathless (Euro)</description>
+		<description>Breathless (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1996</year>
@@ -613,7 +613,7 @@ TODO: Copy protection code never changes on fails, verify if using video beam sy
 
 	<software name="brian_a" supported="no">
 		<!-- SPS (CAPS) release 843 -->
-		<description>Brian the Lion (Euro, AGA)</description>
+		<description>Brian the Lion (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -645,7 +645,7 @@ Corrupt tiles if you switch languages in language select menu
 
 	<software name="brutaldx" supported="no">
 		<!-- SPS (CAPS) release 1837 -->
-		<description>Brutal Football - Deluxe Edition (Euro)</description>
+		<description>Brutal Football - Deluxe Edition (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
@@ -677,7 +677,7 @@ Gameplay is too fast
 
 	<software name="bubble_a" supported="no">
 		<!-- SPS (CAPS) release 210 -->
-		<description>Bubble and Squeak (Euro, AGA)</description>
+		<description>Bubble and Squeak (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -705,7 +705,7 @@ Wrong pitch during gameplay
 
 	<software name="brubber" supported="no">
 		<!-- SPS (CAPS) release 2181 -->
-		<description>Burning Rubber (Euro)</description>
+		<description>Burning Rubber (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
@@ -742,7 +742,7 @@ Asks to disc swap with disc intro already in on boot, [FDC] dsksync
 
 	<software name="burnt_a" supported="yes">
 		<!-- SPS (CAPS) release 2213 -->
-		<description>Burntime (Euro, AGA)</description>
+		<description>Burntime (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
@@ -779,7 +779,7 @@ boot OK
 
 	<software name="burnt_ag" cloneof="burnt_a" supported="no">
 		<!-- SPS (CAPS) release 2348 -->
-		<description>Burntime (Ger, AGA)</description>
+		<description>Burntime (Germany, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
@@ -813,7 +813,7 @@ boot OK
 
 	<software name="captpuni" supported="no">
 		<!-- SPS (CAPS) release 1758 -->
-		<description>Capital Punishment (Euro, v1.0)</description>
+		<description>Capital Punishment (Europe, v1.0)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1996</year>
@@ -868,7 +868,7 @@ Fails during install uncompress phase, RAM:lha causes software failure #80000004
 
 	<software name="chaose_a" supported="no">
 		<!-- SPS (CAPS) release 1324 -->
-		<description>The Chaos Engine (Euro, AGA)</description>
+		<description>The Chaos Engine (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -893,7 +893,7 @@ Black screen, [FDC] copy protection
 
 	<software name="chaos2_a" supported="no">
 		<!-- SPS (CAPS) release 173 -->
-		<description>The Chaos Engine 2 (Euro, AGA)</description>
+		<description>The Chaos Engine 2 (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1996</year>
@@ -925,7 +925,7 @@ Boots to a red and white flickering screen, [FDC] dsksync
 	<software name="columb_a" supported="partial">
 		<!-- SPS (CAPS) release 448 -->
 		<!-- TODO: clearly a German release, not Europe -->
-		<description>Christoph Kolumbus (Euro, AGA)</description>
+		<description>Christoph Kolumbus (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -975,7 +975,7 @@ Not extensively tested (German language)
 
 	<software name="civilz_a" supported="no">
 		<!-- SPS (CAPS) release 1633 -->
-		<description>Civilization (Euro, AGA, v.855e.01)</description>
+		<description>Civilization (Europe, AGA, v.855e.01)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -1015,7 +1015,7 @@ Mongols encounter caused wrong colors and Guru Meditation (TODO: verify)
 
 	<software name="clockw_a" supported="no">
 		<!-- SPS (CAPS) release 1900 -->
-		<description>Clockwiser (Euro, AGA)</description>
+		<description>Clockwiser (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -1041,7 +1041,7 @@ Has [Lisa] GFX pitch garbage on gameplay
 
 	<software name="clueg_a" supported="partial">
 		<!-- SPS (CAPS) release 451 -->
-		<description>Der Clou! (Ger, AGA)</description>
+		<description>Der Clou! (Germany, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -1085,7 +1085,7 @@ Not extensively tested otherwise (German language)
 
 	<software name="dgen_a" supported="yes">
 		<!-- SPS (CAPS) release 457 -->
-		<description>D/Generation (Euro)</description>
+		<description>D/Generation (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
@@ -1110,7 +1110,7 @@ boot OK
 
 	<software name="dangst_a" supported="no">
 		<!-- SPS (CAPS) release 1020 -->
-		<description>Dangerous Streets (Euro, AGA)</description>
+		<description>Dangerous Streets (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
@@ -1144,7 +1144,7 @@ ATK test: OK
 
 	<software name="dennis_a" supported="no">
 		<!-- SPS (CAPS) release 1867 -->
-		<description>Dennis (Euro, AGA)</description>
+		<description>Dennis (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -1169,7 +1169,7 @@ Hangs after AmigaDOS loading, [FDC] dsksync
 
 	<software name="dennis_add" cloneof="dennis_a" supported="no">
 		<!-- SPS (CAPS) release 1093 -->
-		<description>Dennis (Euro, AGA, Desktop Dynamite Pack)</description>
+		<description>Dennis (Europe, AGA, Desktop Dynamite Pack)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -1191,7 +1191,7 @@ Hangs after AmigaDOS loading, [FDC] dsksync
 
 	<software name="diggers" supported="yes">
 		<!-- SPS (CAPS) release 1172 -->
-		<description>Diggers (Euro, 19930914)</description>
+		<description>Diggers (Europe, 19930914)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
@@ -1228,7 +1228,7 @@ boot OK
 
 	<software name="dreamw_a" supported="yes">
 		<!-- SPS (CAPS) release 1815 -->
-		<description>DreamWeb (Euro, AGA)</description>
+		<description>DreamWeb (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -1271,7 +1271,7 @@ boot OK (tested up to terminal use)
 
 	<software name="erbnerde" supported="no">
 		<!-- SPS (CAPS) release 476 -->
-		<description>Erben der Erde - Die große Suche (Ger)</description>
+		<description>Erben der Erde - Die große Suche (Germany)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1995</year>
@@ -1359,7 +1359,7 @@ VGA mode shows completely broken [Lisa] GFXs DDFSTRT and DDFSTOP
 
 	<software name="exiledd" supported="no">
 		<!-- SPS (CAPS) release 2763 -->
-		<description>Exile Discovery Disk A1200 (Euro)</description>
+		<description>Exile Discovery Disk A1200 (Europe)</description>
 		<!-- retail, addon -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1996</year>
@@ -1377,7 +1377,7 @@ Marked as not working because cannot be verified from exile_a
 
 	<software name="exile_a" supported="no">
 		<!-- SPS (CAPS) release 885 -->
-		<description>Exile (Euro, AGA)</description>
+		<description>Exile (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1995</year>
@@ -1403,7 +1403,7 @@ Expects a flag set to $3fe after disk swap, missing irq?
 
 	<software name="fatman_a" supported="no">
 		<!-- SPS (CAPS) release 480 -->
-		<description>Fatman - The Caped Consumer (Euro, AGA)</description>
+		<description>Fatman - The Caped Consumer (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -1441,7 +1441,7 @@ Doesn't show cursor on main menu [Lisa]
 
 	<software name="fears" supported="no">
 		<!-- SPS (CAPS) release 1288 -->
-		<description>Fears (Euro)</description>
+		<description>Fears (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1995</year>
@@ -1468,7 +1468,7 @@ Omake: hold port 1 button 1 during boot to show CPU, chipset and RAM detection
 
 	<software name="fbglory" supported="no">
 		<!-- SPS (CAPS) release 122 -->
-		<description>Football Glory (Euro)</description>
+		<description>Football Glory (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -1501,7 +1501,7 @@ Draws [Lisa] GFX pitch garbage during gameplay
 
 	<software name="gloom" supported="partial">
 		<!-- SPS (CAPS) release 124 -->
-		<description>Gloom (Euro)</description>
+		<description>Gloom (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1995</year>
@@ -1526,7 +1526,7 @@ Cutoff [Lisa] DDFSTOP portion on intermission screens
 
 	<software name="guardian" supported="no">
 		<!-- SPS (CAPS) release 835 -->
-		<description>Guardian (Euro)</description>
+		<description>Guardian (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -1551,7 +1551,7 @@ Hangs after disk swap with Data Disk (with [Lisa] GFX glitch), does [FDC] in-fli
 
 	<software name="gshp2k_a" supported="no">
 		<!-- SPS (CAPS) release 371 -->
-		<description>Gunship 2000 (Euro)</description>
+		<description>Gunship 2000 (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -1588,7 +1588,7 @@ Guru Meditation after changing the unit name
 
 	<software name="heimd2_a" supported="no">
 		<!-- SPS (CAPS) release 1166 -->
-		<description>Heimdall 2 - Into the Hall of Worlds (Euro, AGA)</description>
+		<description>Heimdall 2 - Into the Hall of Worlds (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -1643,7 +1643,7 @@ Black screen after AmigaDOS loading, [FDC] copy protection check (enables 68k tr
 
 	<software name="highseas" supported="yes">
 		<!-- SPS (CAPS) release 2108 -->
-		<description>High Seas Trader (Euro)</description>
+		<description>High Seas Trader (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1995</year>
@@ -1680,7 +1680,7 @@ boot OK
 
 	<software name="humans3" supported="no">
 		<!-- SPS (CAPS) release 2382 -->
-		<description>Humans III - Evolution - Lost in Time (Euro)</description>
+		<description>Humans III - Evolution - Lost in Time (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1996</year>
@@ -1718,7 +1718,7 @@ TODO: verify if it has horizontal stages
 
 	<software name="im2025_a" supported="no">
 		<!-- SPS (CAPS) release 1833 -->
-		<description>Impossible Mission 2025 - The Special Edition (Euro, AGA)</description>
+		<description>Impossible Mission 2025 - The Special Edition (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -1745,7 +1745,7 @@ Classic IM works ok
 
 	<software name="ishar2_a" supported="no">
 		<!-- SPS (CAPS) release 787 -->
-		<description>Ishar 2 - Messengers of Doom (Euro, AGA)</description>
+		<description>Ishar 2 - Messengers of Doom (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
@@ -1782,7 +1782,7 @@ Mouse cursor is uncontrollable, [joytest] reset counter
 
 	<software name="ishar3_a" supported="no">
 		<!-- SPS (CAPS) release 2245 -->
-		<description>Ishar III - The Seven Gates of Infinity (Euro, AGA)</description>
+		<description>Ishar III - The Seven Gates of Infinity (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -1843,7 +1843,7 @@ Mouse cursor is uncontrollable, [joytest] reset counter
 
 	<software name="jpond3_a" supported="no">
 		<!-- SPS (CAPS) release 688 -->
-		<description>James Pond³ - Operation Starfish (Euro, AGA)</description>
+		<description>James Pond³ - Operation Starfish (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -1876,7 +1876,7 @@ Status bar has wrong colors, [Copper]
 
 	<software name="jpond2_a" supported="no">
 		<!-- SPS (CAPS) release 1354 -->
-		<description>James Pond II - Codename RoboCod (Euro, AGA)</description>
+		<description>James Pond II - Codename RoboCod (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
@@ -1895,7 +1895,7 @@ Offset [Lisa] DDFSTRT screens
 
 	<software name="jstrik_a" supported="no">
 		<!-- SPS (CAPS) release 2581 -->
-		<description>Jungle Strike (Euro, AGA)</description>
+		<description>Jungle Strike (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -1929,7 +1929,7 @@ Gameplay looks way too fast
 
 	<software name="jpark_a" supported="no">
 		<!-- SPS (CAPS) release 836 -->
-		<description>Jurassic Park (Euro, AGA)</description>
+		<description>Jurassic Park (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
@@ -1966,7 +1966,7 @@ Black screen, [FDC] dsksync == $0000
 
 	<software name="koff3_a" supported="no">
 		<!-- SPS (CAPS) release 1854 -->
-		<description>Kick Off 3 (Euro, AGA)</description>
+		<description>Kick Off 3 (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -1992,7 +1992,7 @@ Doesn't show cursor on main menu
 
 	<software name="koff3e_a" supported="no">
 		<!-- SPS (CAPS) release 1896 -->
-		<description>Kick Off 3 - European Challenge (Euro, AGA, Soccer Stars '96)</description>
+		<description>Kick Off 3 - European Challenge (Europe, AGA, Soccer Stars '96)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -2023,7 +2023,7 @@ Black screen when selecting any game option, tests [CIA] for specific time range
 
 	<software name="legends" supported="no">
 		<!-- SPS (CAPS) release 1346 -->
-		<description>Legends (Euro)</description>
+		<description>Legends (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1996</year>
@@ -2073,7 +2073,7 @@ Disk swap GFX messages are barely decipherable due of [Lisa] GFX pitch
 
 	<software name="lionking" supported="no">
 		<!-- SPS (CAPS) release 527 -->
-		<description>The Lion King (Euro)</description>
+		<description>The Lion King (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1995</year>
@@ -2112,7 +2112,7 @@ Options menu text cuts off, draws transparent for bottom part
 
 	<software name="lrealm_a" supported="no">
 		<!-- SPS (CAPS) release 2445 -->
-		<description>Lords of the Realm (Euro)</description>
+		<description>Lords of the Realm (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -2149,7 +2149,7 @@ Crashes with black screen after few disk swaps
 
 	<software name="marvin" supported="no">
 		<!-- SPS (CAPS) release 1152 -->
-		<description>Marvin's Marvellous Adventure (Euro)</description>
+		<description>Marvin's Marvellous Adventure (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -2187,7 +2187,7 @@ Doesn't accept fire buttons on main menu
 
 	<software name="morph_a" supported="no">
 		<!-- SPS (CAPS) release 1070 -->
-		<description>Morph (Euro, AGA)</description>
+		<description>Morph (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
@@ -2212,7 +2212,7 @@ Doesn't draw gameplay screen, status bar is offset
 
 	<software name="naugt1_a" supported="no">
 		<!-- SPS (CAPS) release 1715 -->
-		<description>Naughty Ones (Euro, AGA)</description>
+		<description>Naughty Ones (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -2231,7 +2231,7 @@ Player [Lisa] GFX sprite is half corrupt when moving between rooms, leaves a stu
 
 	<software name="mansel_a" supported="partial">
 		<!-- SPS (CAPS) release 138 -->
-		<description>Nigel Mansell's World Championship (Euro, AGA)</description>
+		<description>Nigel Mansell's World Championship (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1992</year>
@@ -2256,7 +2256,7 @@ Sideway board textures doesn't display properly when they are zoomed out
 
 	<software name="otball_a" supported="no">
 		<!-- SPS (CAPS) release 2110 -->
-		<description>On The Ball League Edition (Euro, AGA)</description>
+		<description>On The Ball League Edition (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -2294,7 +2294,7 @@ TODO: untested after copy-protection
 
 	<software name="otbalw_a" supported="no">
 		<!-- SPS (CAPS) release 2595 -->
-		<description>On The Ball World Cup Edition (Euro, AGA)</description>
+		<description>On The Ball World Cup Edition (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -2338,7 +2338,7 @@ TODO: untested after copy-protection
 
 	<software name="oscar_a" supported="no">
 		<!-- SPS (CAPS) release 1095 -->
-		<description>Oscar (Euro, AGA, Desktop Dynamite)</description>
+		<description>Oscar (Europe, AGA, Desktop Dynamite)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
@@ -2369,7 +2369,7 @@ Black screen, [FDC] dsksync
 
 	<software name="overkill" supported="no">
 		<!-- SPS (CAPS) release 707 -->
-		<description>Overkill (Euro)</description>
+		<description>Overkill (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
@@ -2397,7 +2397,7 @@ Doesn't mask left-right edges properly during gameplay (bitplanes cuts off in a 
 
 	<software name="pgaeur_a" supported="no">
 		<!-- SPS (CAPS) release 2435 -->
-		<description>PGA European Tour (Euro, AGA)</description>
+		<description>PGA European Tour (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -2422,7 +2422,7 @@ Hangs after pressing one key on insert name screen
 
 	<software name="outlunch" supported="no">
 		<!-- SPS (CAPS) release 548 -->
-		<description>Pierre le Chef is... Out to Lunch (Euro)</description>
+		<description>Pierre le Chef is... Out to Lunch (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -2447,7 +2447,7 @@ Red screen when "Out to lunch is loading" displays, [FDC]
 
 	<software name="pbfant_a" supported="partial">
 		<!-- SPS (CAPS) release 47 -->
-		<description>Pinball Fantasies (Euro, AGA)</description>
+		<description>Pinball Fantasies (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
@@ -2520,7 +2520,7 @@ Red screen when "Out to lunch is loading" displays, [FDC]
 
 	<software name="pbillusn" supported="no">
 		<!-- SPS (CAPS) release 710 -->
-		<description>Pinball Illusions (Euro)</description>
+		<description>Pinball Illusions (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1995</year>
@@ -2559,7 +2559,7 @@ Doesn't draw left bumper during gameplay [Copper]?
 
 	<software name="pbmania" supported="yes">
 		<!-- SPS (CAPS) release 896 -->
-		<description>Pinball Mania (Euro)</description>
+		<description>Pinball Mania (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1995</year>
@@ -2590,7 +2590,7 @@ boot OK
 
 	<software name="pbmania1" cloneof="pbmania" supported="no">
 		<!-- SPS (CAPS) release 804 -->
-		<description>Pinball Mania (Euro, A1200 SW Package)</description>
+		<description>Pinball Mania (Europe, A1200 SW Package)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1995</year>
@@ -2618,7 +2618,7 @@ boot OK
 
 	<software name="pbprel_a" supported="no">
 		<!-- SPS (CAPS) release 2327 -->
-		<description>Pinball Prelude (Euro, AGA)</description>
+		<description>Pinball Prelude (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1996</year>
@@ -2658,7 +2658,7 @@ Text layer has last 4 chars with wrong violet color, i.e. last 3 digit of score 
 
 	<software name="pmang3_a" supported="no">
 		<!-- SPS (CAPS) release 2021 -->
-		<description>Premier Manager 3 (Euro, AGA)</description>
+		<description>Premier Manager 3 (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -2690,7 +2690,7 @@ Mouse cursor is uncontrollable, [joytest] reset counter
 	<software name="reuni_a" supported="partial">
 		<!-- SPS (CAPS) release 568 -->
 		<!-- TODO: clearly a German release, not Europe -->
-		<description>Reunion (Euro, AGA)</description>
+		<description>Reunion (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -2759,7 +2759,7 @@ Not extensively tested otherwise (German language)
 
 	<software name="rotr_a" supported="no">
 		<!-- SPS (CAPS) release 1763 -->
-		<description>Rise of the Robots (Euro, AGA)</description>
+		<description>Rise of the Robots (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -2850,7 +2850,7 @@ Red screen when SmartDos logo displays, [FDC]
 
 	<software name="roadkill" supported="no">
 		<!-- SPS (CAPS) release 1108 -->
-		<description>Roadkill (Euro)</description>
+		<description>Roadkill (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -2885,7 +2885,7 @@ Engine noise and collision bumps sounds ugly and extremely aliased, enables [Pau
 
 	<software name="robins_a" supported="no">
 		<!-- SPS (CAPS) release 1866 -->
-		<description>Robinson's Requiem (Euro, AGA, 19940824)</description>
+		<description>Robinson's Requiem (Europe, AGA, 19940824)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -2940,7 +2940,7 @@ Mouse cursor is uncontrollable, [joytest] reset counter
 
 	<software name="rydercup" supported="no">
 		<!-- SPS (CAPS) release 1617 -->
-		<description>Ryder Cup - Johnnie Walker (Euro)</description>
+		<description>Ryder Cup - Johnnie Walker (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -2973,7 +2973,7 @@ Works otherwise
 	<software name="russel_a" supported="partial">
 		<!-- SPS (CAPS) release 2215 -->
 		<!-- TODO: clearly a German release, not Europe -->
-		<description>Rüsselsheim (Euro, AGA)</description>
+		<description>Rüsselsheim (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -2998,7 +2998,7 @@ boot OK, not extensively tested (German language)
 
 	<software name="sabret_a" supported="no">
 		<!-- SPS (CAPS) release 1158 -->
-		<description>Sabre Team (Euro, AGA)</description>
+		<description>Sabre Team (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -3041,7 +3041,7 @@ black screen after selecting weapon
 
 	<software name="secnds_a" supported="no">
 		<!-- SPS (CAPS) release 1624 -->
-		<description>Second Samurai (Euro, AGA)</description>
+		<description>Second Samurai (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -3073,7 +3073,7 @@ Asks to disc swap with disc 1 already in after pressing fire on title screen, do
 
 	<software name="shadfg_a" supported="no">
 		<!-- SPS (CAPS) release 203 -->
-		<description>Shadow Fighter (Euro, AGA)</description>
+		<description>Shadow Fighter (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1995</year>
@@ -3111,7 +3111,7 @@ Wrong colors on title screen
 
 	<software name="shaqfu" supported="no">
 		<!-- SPS (CAPS) release 1761 -->
-		<description>Shaq Fu (Euro)</description>
+		<description>Shaq Fu (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1995</year>
@@ -3160,7 +3160,7 @@ Black screen, [FDC] DMA never finds the requested block
 
 	<software name="simcit2k" supported="no">
 		<!-- SPS (CAPS) release 890 -->
-		<description>Sim City 2000 (Euro)</description>
+		<description>Sim City 2000 (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -3191,7 +3191,7 @@ Black screen, [FDC] DMA never finds the requested block
 
 	<software name="simcit2kg" cloneof="simcit2k" supported="no">
 		<!-- SPS (CAPS) release 575 -->
-		<description>Sim City 2000 (Ger)</description>
+		<description>Sim City 2000 (Germany)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -3219,7 +3219,7 @@ Black screen, [FDC] DMA never finds the requested block
 
 	<software name="simlif_a" supported="partial">
 		<!-- SPS (CAPS) release 889 -->
-		<description>Sim Life (Euro, v1.00 19930620, AGA)</description>
+		<description>Sim Life (Europe, v1.00 19930620, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
@@ -3256,7 +3256,7 @@ Slightly offset [Lisa] DDFSTRT on gameplay
 
 	<software name="simliff_a" cloneof="simlif_a" supported="no">
 		<!-- SPS (CAPS) release 2380 -->
-		<description>Sim Life (Fra, v1.00 19930620, AGA)</description>
+		<description>Sim Life (France, v1.00 19930620, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
@@ -3290,7 +3290,7 @@ Slightly offset [Lisa] DDFSTRT on gameplay
 
 	<software name="simlifg_a" cloneof="simlif_a" supported="no">
 		<!-- SPS (CAPS) release 2587 -->
-		<description>Sim Life (Ger, v1.00 19930620, AGA)</description>
+		<description>Sim Life (Germany, v1.00 19930620, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
@@ -3324,7 +3324,7 @@ Slightly offset [Lisa] DDFSTRT on gameplay
 
 	<software name="simons_a" supported="yes">
 		<!-- SPS (CAPS) release 898 -->
-		<description>Simon the Sorcerer (Euro, AGA)</description>
+		<description>Simon the Sorcerer (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -3391,7 +3391,7 @@ boot OK
 
 	<software name="simonsf_a" cloneof="simons_a" supported="no">
 		<!-- SPS (CAPS) release 2692 -->
-		<description>Simon the Sorcerer (Fra, AGA)</description>
+		<description>Simon the Sorcerer (France, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -3455,7 +3455,7 @@ boot OK
 
 	<software name="simonsg_a" cloneof="simons_a" supported="no">
 		<!-- SPS (CAPS) release 726 -->
-		<description>Simon the Sorcerer (Ger, AGA)</description>
+		<description>Simon the Sorcerer (Germany, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -3520,7 +3520,7 @@ boot OK
 	<software name="6sense" supported="no">
 		<!-- SPS (CAPS) release 2560 -->
 		<!-- "English Disk release, No voices" according to README -->
-		<description>Sixth Sense Investigations (Euro)</description>
+		<description>Sixth Sense Investigations (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1998</year>
@@ -3596,7 +3596,7 @@ Very offset [Lisa] GFX gameplay
 
 	<software name="skelkrew" supported="no">
 		<!-- SPS (CAPS) release 725 -->
-		<description>Skeleton Krew (Euro, 19950112)</description>
+		<description>Skeleton Krew (Europe, 19950112)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1995</year>
@@ -3629,7 +3629,7 @@ ATK test: C:0 H:U Bad
 
 	<software name="slamtilt" supported="no">
 		<!-- SPS (CAPS) release 1151 -->
-		<description>Slam Tilt - The Pinball Game (Euro)</description>
+		<description>Slam Tilt - The Pinball Game (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1996</year>
@@ -3673,7 +3673,7 @@ On gameplay unthrottle emulation causes idle vertical scroll to be slower
 
 	<software name="sleepw_a" supported="no">
 		<!-- SPS (CAPS) release 577 -->
-		<description>Sleepwalker (Euro, AGA)</description>
+		<description>Sleepwalker (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
@@ -3710,7 +3710,7 @@ Asks to disc swap with disc 1 which is already in, [FDC] dsksync
 
 	<software name="sleepw_acr" cloneof="sleepw_a" supported="no">
 		<!-- SPS (CAPS) release 1880 -->
-		<description>Sleepwalker (Euro, AGA, Comic Relief)</description>
+		<description>Sleepwalker (Europe, AGA, Comic Relief)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
@@ -3744,7 +3744,7 @@ Asks to disc swap with disc 1 which is already in, [FDC] dsksync
 
 	<software name="sockid_a" supported="no">
 		<!-- SPS (CAPS) release 1150 -->
-		<description>Soccer Kid (Euro, AGA)</description>
+		<description>Soccer Kid (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
@@ -3789,7 +3789,7 @@ Wrong playfield-sprite priority when info box is smashed with ball
 
 	<software name="speris" supported="no">
 		<!-- SPS (CAPS) release 1337 -->
-		<description>The Speris Legacy (Euro)</description>
+		<description>The Speris Legacy (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1995</year>
@@ -3826,7 +3826,7 @@ Black screen after disk swap
 
 	<software name="starcr_a" supported="yes">
 		<!-- SPS (CAPS) release 2349 -->
-		<description>Star Crusader (Euro, AGA)</description>
+		<description>Star Crusader (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1996</year>
@@ -3899,7 +3899,7 @@ boot OK
 
 	<software name="strek25" supported="yes">
 		<!-- SPS (CAPS) release 1466 -->
-		<description>Star Trek - 25th Anniversary (Euro)</description>
+		<description>Star Trek - 25th Anniversary (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
@@ -3960,7 +3960,7 @@ boot OK
 
 	<software name="strek25f" cloneof="strek25" supported="no">
 		<!-- SPS (CAPS) release 1752 -->
-		<description>Star Trek - 25th Anniversary (Fra)</description>
+		<description>Star Trek - 25th Anniversary (France)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
@@ -4018,7 +4018,7 @@ boot OK
 
 	<software name="strek25g" cloneof="strek25" supported="no">
 		<!-- SPS (CAPS) release 1687 -->
-		<description>Star Trek - 25th Anniversary (Ger)</description>
+		<description>Star Trek - 25th Anniversary (Germany)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
@@ -4076,7 +4076,7 @@ boot OK
 
 	<software name="swar2050" supported="partial">
 		<!-- SPS (CAPS) release 146 -->
-		<description>Subwar 2050 (Euro)</description>
+		<description>Subwar 2050 (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1995</year>
@@ -4103,7 +4103,7 @@ Boot OK otherwise
 
 	<software name="slmang_a" supported="no">
 		<!-- SPS (CAPS) release 2363 -->
-		<description>Super League Manager (Euro, AGA)</description>
+		<description>Super League Manager (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1995</year>
@@ -4129,7 +4129,7 @@ Incorrect priority for mouse pointer arm, [Copper] disable?
 
 	<software name="stardust" supported="no">
 		<!-- SPS (CAPS) release 175 -->
-		<description>Super Stardust (Euro)</description>
+		<description>Super Stardust (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -4174,7 +4174,7 @@ Crashes after few seconds of gameplay
 
 	<software name="ssf2t" supported="no">
 		<!-- SPS (CAPS) release 735 -->
-		<description>Super Street Fighter II Turbo (Euro)</description>
+		<description>Super Street Fighter II Turbo (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1996</year>
@@ -4257,7 +4257,7 @@ Heavy [Lisa] GFX pitch corruption on gameplay
 
 	<software name="surfninj" supported="no">
 		<!-- SPS (CAPS) release 1291 -->
-		<description>Surf Ninjas (Euro)</description>
+		<description>Surf Ninjas (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -4284,7 +4284,7 @@ Player sprite colors gets glitchy on the leftmost side of the beach screen
 
 	<software name="testamnt" supported="partial">
 		<!-- SPS (CAPS) release 1162 -->
-		<description>Testament (Euro)</description>
+		<description>Testament (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1997</year>
@@ -4317,7 +4317,7 @@ Using game window modes not equal to 8 won't mask weapon? (verify)
 
 	<software name="themep_a" supported="no">
 		<!-- SPS (CAPS) release 153 -->
-		<description>Theme Park (Euro, AGA)</description>
+		<description>Theme Park (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -4355,7 +4355,7 @@ Works otherwise
 
 	<software name="topgr2_a" supported="partial">
 		<!-- SPS (CAPS) release 1858 -->
-		<description>Top Gear 2 (Euro, AGA)</description>
+		<description>Top Gear 2 (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -4381,7 +4381,7 @@ Has no player 2 status display in a 2 players game
 
 	<software name="totalc_a" supported="yes">
 		<!-- SPS (CAPS) release 1926 -->
-		<description>Total Carnage (Euro, AGA)</description>
+		<description>Total Carnage (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -4412,7 +4412,7 @@ boot OK
 
 	<software name="towrsoul" supported="no">
 		<!-- SPS (CAPS) release 2212 -->
-		<description>Tower of Souls (Euro)</description>
+		<description>Tower of Souls (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1995</year>
@@ -4457,7 +4457,7 @@ Cannot exit from inventory menu?
 
 	<software name="trolls_a" cloneof="trolls" supported="no">
 		<!-- SPS (CAPS) release 996 -->
-		<description>Trolls (Euro, AGA, alt)</description>
+		<description>Trolls (Europe, AGA, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
@@ -4484,7 +4484,7 @@ Doesn't read keyboard scancodes properly on copy-protection screen
 
 	<software name="trolls" supported="no">
 		<!-- SPS (CAPS) release 155 -->
-		<description>Trolls (Euro, AGA)</description>
+		<description>Trolls (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<year>1992</year>
 		<publisher>Flair Software</publisher>
@@ -4509,7 +4509,7 @@ Guru Meditation, [FDC] dsksync
 
 	<software name="turbojam" supported="no">
 		<!-- SPS (CAPS) release 2767 -->
-		<description>Turbo Jam (Euro, Prototype)</description>
+		<description>Turbo Jam (Europe, Prototype)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1995</year>
@@ -4542,7 +4542,7 @@ Has [Lisa] GFX pitch corruption during gameplay
 
 	<software name="ufo_a" supported="partial">
 		<!-- SPS (CAPS) release 157 -->
-		<description>UFO - Enemy Unknown (Euro, AGA)</description>
+		<description>UFO - Enemy Unknown (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -4580,7 +4580,7 @@ Cannot be installed to HDD, needs blank disk formatting
 
 	<software name="virocp_a" supported="no">
 		<!-- SPS (CAPS) release 1920 -->
-		<description>Virocop (Euro, AGA)</description>
+		<description>Virocop (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1995</year>
@@ -4612,7 +4612,7 @@ Cannot be installed to HDD, needs blank disk formatting
 
 	<software name="vkart" supported="no">
 		<!-- SPS (CAPS) release 1059 -->
-		<description>Virtual Karting (Euro)</description>
+		<description>Virtual Karting (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1995</year>
@@ -4639,7 +4639,7 @@ Gameplay has wrong pitch draw, uses [Lisa] FMODE=$400f BSCAN2 and SHRES
 
 	<software name="watchtow" supported="no">
 		<!-- SPS (CAPS) release 1071 -->
-		<description>Watchtower (Euro)</description>
+		<description>Watchtower (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1996</year>
@@ -4672,7 +4672,7 @@ Has severe [Lisa] GFX pitch corruption depending on current horizontal position 
 
 	<software name="wis_a" supported="no">
 		<!-- SPS (CAPS) release 1704 -->
-		<description>Wembley International Soccer (Euro, AGA)</description>
+		<description>Wembley International Soccer (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
@@ -4697,7 +4697,7 @@ Fatal errors in ipf_decode::generate_timings type 4
 
 	<software name="2wwar_a" supported="partial">
 		<!-- SPS (CAPS) release 1772 -->
-		<description>When Two Worlds War (Euro, v1.01, AGA)</description>
+		<description>When Two Worlds War (Europe, v1.01, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
@@ -4722,7 +4722,7 @@ boot OK, not extensively tested (German language)
 
 	<software name="whizz_a" supported="no">
 		<!-- SPS (CAPS) release 1315 -->
-		<description>Whizz (Euro, AGA)</description>
+		<description>Whizz (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1995</year>
@@ -4747,7 +4747,7 @@ Doesn't surpass the initial Whizz logo screen, [FDC] dsksync
 
 	<software name="whizza_a" cloneof="whizz_a" supported="no">
 		<!-- SPS (CAPS) release 803 -->
-		<description>Whizz (Euro, AGA, A1200 SW Package)</description>
+		<description>Whizz (Europe, AGA, A1200 SW Package)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1995</year>
@@ -4769,7 +4769,7 @@ Doesn't surpass the initial Whizz logo screen, [FDC] dsksync
 
 	<software name="wormsdc" supported="no">
 		<!-- SPS (CAPS) release 605 -->
-		<description>Worms - The Director's Cut (Euro)</description>
+		<description>Worms - The Director's Cut (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1996</year>
@@ -4801,7 +4801,7 @@ Has serious [Lisa] GFX scroll offsets and color issues on gameplay
 
 	<software name="xtracing" supported="no">
 		<!-- SPS (CAPS) release 164 -->
-		<description>XTreme Racing (Euro)</description>
+		<description>XTreme Racing (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
@@ -4834,7 +4834,7 @@ ATK test: OK
 
 	<software name="zool_a" supported="no">
 		<!-- SPS (CAPS) release 1675 -->
-		<description>Zool (Euro, AGA)</description>
+		<description>Zool (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
@@ -4858,7 +4858,7 @@ ATK test: OK
 
 	<software name="zool2_a" supported="no">
 		<!-- SPS (CAPS) release 415 -->
-		<description>Zool 2 (Euro, AGA)</description>
+		<description>Zool 2 (Europe, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
@@ -4883,7 +4883,7 @@ ATK test: OK
 
 	<software name="zool2_acc" cloneof="zool2_a" supported="no">
 		<!-- SPS (CAPS) release 2427 -->
-		<description>Zool 2 (Euro, AGA, Commodore Combat)</description>
+		<description>Zool 2 (Europe, AGA, Commodore Combat)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
@@ -4908,12 +4908,13 @@ ATK test: OK
 
 	<software name="pbfant_c1" cloneof="pbfant_a" supported="partial">
 		<!-- unprotected -->
-		<description>Pinball Fantasies (AGA, Cracked by PDY)</description>
+		<description>Pinball Fantasies (AGA, cracked)</description>
 		<year>1993</year>
 		<publisher>21st Century Entertainment</publisher>
 		<notes><![CDATA[
 [Lisa] GFX strip when ball goes down the drain.
 ]]></notes>
+		<info name="cracked" value="PDY" />
 		<info name="usage" value="Requires AGA, press mouse b1 to skip intro" />
 
 		<part name="flop1" interface="floppy_3_5">

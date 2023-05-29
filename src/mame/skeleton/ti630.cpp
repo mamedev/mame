@@ -40,6 +40,13 @@ It means we probably would have to emulate a modem device for it to treat commun
 #include "emupal.h"
 #include "screen.h"
 
+#define LOG_IO_PORTS (1U << 1)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
+
+namespace {
 
 class ti630_state : public driver_device
 {
@@ -70,8 +77,6 @@ private:
 	required_device<hd44780_device> m_lcdc;
 };
 
-#define LOG_IO_PORTS 0
-
 void ti630_state::i80c31_prg(address_map &map)
 {
 	map(0x0000, 0xffff).rom();
@@ -100,22 +105,18 @@ void ti630_state::machine_reset()
 uint8_t ti630_state::i80c31_p1_r()
 {
 	uint8_t value = 0;
-	if (LOG_IO_PORTS)
-		logerror("P1 read value:%02X\n", value);
-
+	LOGMASKED(LOG_IO_PORTS, "P1 read value:%02X\n", value);
 	return value;
 }
 
 void ti630_state::i80c31_p1_w(uint8_t data)
 {
-	if (LOG_IO_PORTS)
-		logerror("Write to P1: %02X\n", data);
+	LOGMASKED(LOG_IO_PORTS, "Write to P1: %02X\n", data);
 }
 
 void ti630_state::i80c31_p3_w(uint8_t data)
 {
-	if (LOG_IO_PORTS)
-		logerror("Write to P3: %02X\n", data);
+	LOGMASKED(LOG_IO_PORTS, "Write to P3: %02X\n", data);
 }
 
 void ti630_state::ti630_palette(palette_device &palette) const
@@ -169,6 +170,9 @@ ROM_START( ti630 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ti630.ci11",  0x00000, 0x10000, CRC(2602cbdc) SHA1(98266bea52a5893e0af0b5872eca0a0a1e0c5f9c) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME           FLAGS
 COMP( 1999, ti630, 0,      0,      ti630,   0,     ti630_state, init_ti630, "Intelbras", "TI630 telephone", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )

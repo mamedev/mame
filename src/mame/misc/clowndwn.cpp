@@ -15,6 +15,8 @@ can't find any info on this?
 #include "machine/6821pia.h"
 
 
+namespace {
+
 class clowndwn_state : public driver_device
 {
 public:
@@ -82,5 +84,8 @@ ROM_START( clowndwn )
 	ROM_LOAD( "clwnroll.z8", 0x0000, 0x1000, CRC(ec655745) SHA1(e38de904f30530f8971eb4a9d7796da345bf81ad) )
 	ROM_LOAD( "clwnroll.z9", 0x1000, 0x1000, CRC(aeef885e) SHA1(bc6805b638625a347e1288a927ce30e030afe9e3) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1987, clowndwn, 0, clowndwn, clowndwn, clowndwn_state, empty_init, ROT0, "Elwood Electronics", "Clown Roll Down (Elwood)", MACHINE_IS_SKELETON_MECHANICAL )

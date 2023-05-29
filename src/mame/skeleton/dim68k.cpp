@@ -10,19 +10,18 @@
         of the emulated systems, or you create any other format you wished.
 
         TODO:
-        - HLE serial keyboard
         - Graphics display (including colour and video_control options)
         - RTC (is this a thing?  the manual indicates it just uses the DUART's timers to track time)
         - Centronics printer
         - Video-high
         - Video-reset
-        - Game switches, paddles and timers (which work almost identically to the Apple II)
         - The plug-in boards
         - Emulator trap function
 
         DUART I/O port bits:
         INPUT:
         bit 0 = Centronics RDY
+        bit 4 = RS-232C DCD
 
         OUTPUT:
         all bits = Centronics data
@@ -48,17 +47,22 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "dim68k_kbd.h"
 #include "cpu/m68000/m68000.h"
 #include "imagedev/floppy.h"
 #include "machine/mc68681.h"
 #include "machine/upd765.h"
 #include "sound/spkrdev.h"
 #include "video/mc6845.h"
+#include "bus/pc_joy/pc_joy.h"
 #include "bus/rs232/rs232.h"
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+
+
+namespace {
 
 class dim68k_state : public driver_device
 {
@@ -70,6 +74,7 @@ public:
 		, m_speaker(*this, "speaker")
 		, m_fdc(*this, "fdc")
 		, m_floppy(*this, "fdc:%u", 0U)
+		, m_gamectrl(*this, "gamectrl")
 		, m_ram(*this, "ram")
 		, m_palette(*this, "palette")
 		, m_p_chargen(*this, "chargen")
@@ -82,13 +87,12 @@ public:
 private:
 	void dim68k_palette(palette_device &palette);
 	u16 dim68k_fdc_r();
-	u16 dim68k_game_switches_r();
+	u8 dim68k_game_switches_r(offs_t offset);
 	u16 dim68k_speaker_r();
 	u16 dim68k_banksw_r();
 	void dim68k_banksw_w(u16 data);
 	void dim68k_fdc_w(u16 data);
 	void dim68k_printer_strobe_w(u16 data);
-	void dim68k_reset_timers_w(u16 data);
 	void dim68k_speaker_w(u16 data);
 	void dim68k_video_control_w(u16 data);
 	void dim68k_video_high_w(u16 data);
@@ -110,6 +114,7 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<upd765a_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
+	required_device<pc_joy_device> m_gamectrl;
 	required_shared_ptr<uint16_t> m_ram;
 	required_device<palette_device> m_palette;
 	required_region_ptr<u8> m_p_chargen;
@@ -142,19 +147,22 @@ u16 dim68k_state::dim68k_fdc_r()
 	return 0;
 }
 
-u16 dim68k_state::dim68k_game_switches_r()
+u8 dim68k_state::dim68k_game_switches_r(offs_t offset)
 // Reading the game port switches
 // FFCC11 = switch 0; FFCC13 = switch 1, etc to switch 3
 // FFCC19 = paddle 0; FFCC1B = paddle 1, etc to paddle 3
 {
-	return 0xffff;
+	return BIT(m_gamectrl->joy_port_r(), offset ^ 4) ? 0 : 0x80;
 }
 
 u16 dim68k_state::dim68k_speaker_r()
 // Any read or write of this address will toggle the position of the speaker cone
 {
-	m_speaker_bit ^= 1;
-	m_speaker->level_w(m_speaker_bit);
+	if (!machine().side_effects_disabled())
+	{
+		m_speaker_bit ^= 1;
+		m_speaker->level_w(m_speaker_bit);
+	}
 	return 0;
 }
 
@@ -226,11 +234,6 @@ void dim68k_state::dim68k_video_reset_w(u16 data)
 {
 }
 
-void dim68k_state::dim68k_reset_timers_w(u16 data)
-// reset game port timer before reading paddles
-{
-}
-
 void dim68k_state::dim68k_printer_strobe_w(u16 data)
 // anything sent here will trigger a one-shot for a strobe pulse
 {
@@ -277,7 +280,8 @@ void dim68k_state::mem_map(address_map &map)
 #endif
 	map(0xffc400, 0xffc41f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff);
 	map(0xffc800, 0xffc801).rw(FUNC(dim68k_state::dim68k_speaker_r), FUNC(dim68k_state::dim68k_speaker_w));
-	map(0xffcc00, 0xffcc1f).rw(FUNC(dim68k_state::dim68k_game_switches_r), FUNC(dim68k_state::dim68k_reset_timers_w));
+	map(0xffcc00, 0xffcc00).w(m_gamectrl, FUNC(pc_joy_device::joy_port_w));
+	map(0xffcc10, 0xffcc1f).r(FUNC(dim68k_state::dim68k_game_switches_r)).umask16(0x00ff);
 	map(0xffd000, 0xffd003).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff); // NEC uPD765A
 	map(0xffd000, 0xffd000).lr8([this]() -> u8 { return m_fdc_irq; }, "free0");
 	map(0xffd004, 0xffd005).rw(FUNC(dim68k_state::dim68k_fdc_r), FUNC(dim68k_state::dim68k_fdc_w));
@@ -406,27 +410,16 @@ void dim68k_state::machine_start()
 	save_item(NAME(m_video_control));
 }
 
-static DEVICE_INPUT_DEFAULTS_START(keyboard)
-	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_300)
-	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_300)
-	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_8)
-	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_NONE)
-	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)
-DEVICE_INPUT_DEFAULTS_END
-
 void dim68k_state::dim68k(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(10'000'000));
+	M68000(config, m_maincpu, 14.318181_MHz_XTAL / 2); // part rated for 8 MHz; clock verified from manual
 	m_maincpu->set_addrmap(AS_PROGRAM, &dim68k_state::mem_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_raw(14.318181_MHz_XTAL, 896, 0, 640, 279, 0, 224);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 250-1);
 	PALETTE(config, m_palette, FUNC(dim68k_state::dim68k_palette), 16);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_dim68k);
 
@@ -435,27 +428,28 @@ void dim68k_state::dim68k(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	UPD765A(config, m_fdc, 4'000'000, true, true); // these options unknown
+	UPD765A(config, m_fdc, 16_MHz_XTAL / 4, true, true); // clocked through FDC9229BT; options unknown
 	FLOPPY_CONNECTOR(config, m_floppy[0], dim68k_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppy[1], dim68k_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
 	m_fdc->intrq_wr_callback().set(FUNC(dim68k_state::fdc_irq_w));
 
-	MC6845(config, m_crtc, 1790000);
+	MC6845(config, m_crtc, 14.318181_MHz_XTAL / 8);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(dim68k_state::crtc_update_row));
 
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
-	rs232_port_device &kbdport(RS232_PORT(config, "kbdport", default_rs232_devices, "keyboard"));
-	kbdport.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
-
 	SCN2681(config, m_duart, 3.6864_MHz_XTAL);
-	m_duart->a_tx_cb().set(kbdport, FUNC(rs232_port_device::write_txd));
-	m_duart->b_tx_cb().set(rs232, FUNC(rs232_port_device::write_txd));
 
-	kbdport.rxd_handler().set(m_duart, FUNC(scn2681_device::rx_a_w));
+	DIM68K_KEYBOARD(config, "keyboard").txd_callback().set(m_duart, FUNC(scn2681_device::rx_a_w));
+
+	PC_JOY(config, m_gamectrl);
+
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_duart, FUNC(scn2681_device::rx_b_w));
+	rs232.dcd_handler().set(m_duart, FUNC(scn2681_device::ip4_w));
+
+	m_duart->b_tx_cb().set(rs232, FUNC(rs232_port_device::write_txd));
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("dim68k");
@@ -492,7 +486,6 @@ ROM_START( dim68k )
 	ROM_REGION16_BE( 0x2000, "bootrom", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "mc103e.bin", 0x0001, 0x1000, CRC(4730c902) SHA1(5c4bb79ad22def721a22eb63dd05e0391c8082be))
 	ROM_LOAD16_BYTE( "mc104.bin",  0x0000, 0x1000, CRC(14b04575) SHA1(43e15d9ebe1c9c1bf1bcfc1be3899a49e6748200))
-	ROM_FILL(0x11dd, 1, 0x0d)   // TEMP: patch keyboard table so return is return
 
 	ROM_REGION( 0x1000, "chargen", ROMREGION_ERASEFF )
 	ROM_LOAD( "mc105e.bin", 0x0000, 0x1000, CRC(7a09daa8) SHA1(844bfa579293d7c3442fcbfa21bda75fff930394))
@@ -516,6 +509,9 @@ ROM_START( dim68k )
 	ROM_LOAD( "mc102.bin", 0x0000, 0x00fa, CRC(38e2abac) SHA1(0d7e730b46fc162764c69c51dea3bbe8337b1a7d))
 	ROM_LOAD( "mc101.bin", 0x0100, 0x00fa, CRC(caffb3a0) SHA1(36f5140b306565794c4d856e0c20589b8f2a37f4))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

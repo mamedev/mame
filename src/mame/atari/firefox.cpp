@@ -46,6 +46,8 @@ but requires a special level III player for proper control. Video: CAV. Audio: A
 #include "tilemap.h"
 
 
+namespace {
+
 class firefox_state : public driver_device
 {
 public:
@@ -802,6 +804,7 @@ ROM_START( firefoxa )
 	DISK_IMAGE_READONLY( "firefox", 0, SHA1(3c4be40f55b44d0352b64c0861b6d1b650451ce7) )
 ROM_END
 
+} // anonymous namespace
 
 
 /*************************************

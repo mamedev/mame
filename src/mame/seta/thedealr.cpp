@@ -40,6 +40,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class thedealr_state : public driver_device
 {
 public:
@@ -268,7 +270,7 @@ static INPUT_PORTS_START( thedealr )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5   ) // HL5 (hold 5)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HALF   ) // 1/2 (half gamble)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW    ) PORT_NAME("Small") // SML (small)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1      ) PORT_NAME("Reset") // RST (reset)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Attendant Reset") // RST (reset: clears tilt condition)
 
 	PORT_START("IOX1")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED        )
@@ -294,7 +296,7 @@ static INPUT_PORTS_START( thedealr )
 
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE3 ) PORT_NAME("MSN?") // !MSN
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE4 ) PORT_NAME("Attendant Clear?") // !ACL (reset jackpots, only if there are no credits)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MEMORY_RESET ) // !ACL (attendant clear? reset jackpots, only if there are no credits)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // A.P (attendant payout? clears credits, port 0 = ef)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT          ) // TLT (tilt)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM       ) // HOV (hopper?)
@@ -533,5 +535,8 @@ ROM_START( thedealr )
 	ROM_LOAD( "xb0-u65.u65", 0x000, 0x200, CRC(5969a133) SHA1(f92f17949c1974d779d31741afd137f9217af3b9) )
 	ROM_LOAD( "xb0-u68.u68", 0x200, 0x200, CRC(c0c54d43) SHA1(5ce352fb888c8e683014c73e6da00ec95f2ae572) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1988?, thedealr, 0, thedealr, thedealr, thedealr_state, empty_init, ROT0, "Visco Games", "The Dealer (Visco)", MACHINE_SUPPORTS_SAVE )

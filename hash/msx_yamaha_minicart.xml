@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="msx_yamaha_minicart" description="MSX Yamaha Mini Cartridges">
+
+<!--
+Known releases:
+FM Voicing Program II (Same as YRM502. Included with Yamaha CX5MII and Yamaha CX7M/128)
+*The Painter (YRG-01/YRG-01M)
+*Beginner's Lesson (Included with Yamaha YIS-604/128)
+
+No dump known for entries marked with a *
+-->
+
+	<software name="fmvp2">
+		<description>FM Voicing Program II</description>
+		<year>1985</year>
+		<publisher>Yamaha</publisher>
+		<info name="usage" value="From Basic type: CALL FMV or _FMV." />
+		<part name="cart" interface="msx_yamaha_minicart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="yrm502.rom" size="0x4000" crc="5412d5dc" sha1="30747a56f45389be76362f7fc55d673f1bff8312" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

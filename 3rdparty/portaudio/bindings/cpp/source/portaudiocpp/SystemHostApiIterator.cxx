@@ -2,58 +2,57 @@
 
 namespace portaudio
 {
-	// -----------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------
 
-	HostApi &System::HostApiIterator::operator*() const
-	{
-		return **ptr_;
-	}
+    HostApi &System::HostApiIterator::operator*() const
+    {
+        return **ptr_;
+    }
 
-	HostApi *System::HostApiIterator::operator->() const
-	{
-		return &**this;
-	}
+    HostApi *System::HostApiIterator::operator->() const
+    {
+        return &**this;
+    }
 
-	// -----------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------
 
-	System::HostApiIterator &System::HostApiIterator::operator++()
-	{
-		++ptr_;
-		return *this;
-	}
+    System::HostApiIterator &System::HostApiIterator::operator++()
+    {
+        ++ptr_;
+        return *this;
+    }
 
-	System::HostApiIterator System::HostApiIterator::operator++(int)
-	{
-		System::HostApiIterator prev = *this;
-		++*this;
-		return prev;
-	}
+    System::HostApiIterator System::HostApiIterator::operator++(int)
+    {
+        System::HostApiIterator prev = *this;
+        ++*this;
+        return prev;
+    }
 
-	System::HostApiIterator &System::HostApiIterator::operator--()
-	{
-		--ptr_;
-		return *this;
-	}
+    System::HostApiIterator &System::HostApiIterator::operator--()
+    {
+        --ptr_;
+        return *this;
+    }
 
-	System::HostApiIterator System::HostApiIterator::operator--(int)
-	{
-		System::HostApiIterator prev = *this;
-		--*this;
-		return prev;
-	}
+    System::HostApiIterator System::HostApiIterator::operator--(int)
+    {
+        System::HostApiIterator prev = *this;
+        --*this;
+        return prev;
+    }
 
-	// -----------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------
 
-	bool System::HostApiIterator::operator==(const System::HostApiIterator &rhs) const
-	{
-		return (ptr_ == rhs.ptr_);
-	}
+    bool System::HostApiIterator::operator==(const System::HostApiIterator &rhs) const
+    {
+        return (ptr_ == rhs.ptr_);
+    }
 
-	bool System::HostApiIterator::operator!=(const System::HostApiIterator &rhs) const
-	{
-		return !(*this == rhs);
-	}
+    bool System::HostApiIterator::operator!=(const System::HostApiIterator &rhs) const
+    {
+        return !(*this == rhs);
+    }
 
-	// -----------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------
 } // namespace portaudio
-

@@ -38,6 +38,8 @@
 #include "amico2k.lh"
 
 
+namespace {
+
 class amico2k_state : public driver_device
 {
 public:
@@ -245,6 +247,8 @@ ROM_START( amico2k )
 	ROM_LOAD( "prom.ic6",  0x000, 0x100, CRC(4005f760) SHA1(7edcd85feb5a576f6da1bbb723b3cf668cf3df45) )
 	ROM_LOAD( "prom.ic7",  0x100, 0x100, CRC(8785d864) SHA1(d169c3b5f5690664083030948db9f33571b08656) )
 ROM_END
+
+} // anonymous namespace
 
 
 /* Driver */

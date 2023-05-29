@@ -275,18 +275,18 @@
 #include "util/ioprocs.h"
 #include "util/ioprocsfilter.h"
 
-#define LOG_WARN          (1U<<1)   // Warnings
-#define LOG_CONFIG        (1U<<2)   // Configuration
-#define LOG_STEPS         (1U<<3)   // Steps
-#define LOG_STEPSDETAIL   (1U<<4)   // Steps, more detail
-#define LOG_SIGNALS       (1U<<5)   // Signals
-#define LOG_READ          (1U<<6)   // Read operations
-#define LOG_WRITE         (1U<<7)   // Write operations
-#define LOG_BITS          (1U<<8)   // Bit transfer
-#define LOG_TIMING        (1U<<9)   // Timing
+#define LOG_WARN          (1U << 1)   // Warnings
+#define LOG_CONFIG        (1U << 2)   // Configuration
+#define LOG_STEPS         (1U << 3)   // Steps
+#define LOG_STEPSDETAIL   (1U << 4)   // Steps, more detail
+#define LOG_SIGNALS       (1U << 5)   // Signals
+#define LOG_READ          (1U << 6)   // Read operations
+#define LOG_WRITE         (1U << 7)   // Write operations
+#define LOG_BITS          (1U << 8)   // Bit transfer
+#define LOG_TIMING        (1U << 9)   // Timing
 
 
-#define VERBOSE ( LOG_GENERAL | LOG_CONFIG | LOG_WARN )
+#define VERBOSE (LOG_GENERAL | LOG_CONFIG | LOG_WARN)
 
 #include "logmacro.h"
 
@@ -413,7 +413,7 @@ void mfm_harddisk_device::device_stop()
     because we need the number of cylinders, and for generic drives we get
     them from the CHD.
 */
-image_init_result mfm_harddisk_device::call_load()
+std::pair<std::error_condition, std::string> mfm_harddisk_device::call_load()
 {
 	std::error_condition err;
 
@@ -425,11 +425,10 @@ image_init_result mfm_harddisk_device::call_load()
 	else
 	{
 		auto io = util::random_read_write_fill(image_core_file(), 0xff);
-		if(!io) {
-			seterror(std::errc::not_enough_memory, nullptr);
-			return image_init_result::FAIL;
-		}
-		m_chd = new chd_file;
+		if (!io)
+			return std::make_pair(std::errc::not_enough_memory, std::string());
+
+		m_chd = new chd_file; // FIXME: this is never deleted
 		err = m_chd->open(std::move(io), true);
 	}
 
@@ -438,120 +437,111 @@ image_init_result mfm_harddisk_device::call_load()
 
 	m_format->set_tag(devtag);
 
-	if (!err)
+	if (err)
 	{
-		std::string metadata;
+		LOGMASKED(LOG_WARN, "Could not load CHD\n");
+		return std::make_pair(err, std::string());
+	}
 
-		if (m_chd==nullptr)
-		{
-			LOG("m_chd is null\n");
-			return image_init_result::FAIL;
-		}
+	if (!m_chd)
+	{
+		LOG("m_chd is null\n");
+		return std::make_pair(image_error::UNSPECIFIED, std::string());
+	}
 
-		// Read the hard disk metadata
-		std::error_condition state = m_chd->read_metadata(HARD_DISK_METADATA_TAG, 0, metadata);
-		if (state)
-		{
-			LOG("Failed to read CHD metadata\n");
-			return image_init_result::FAIL;
-		}
+	// Read the hard disk metadata
+	std::string metadata;
+	std::error_condition state = m_chd->read_metadata(HARD_DISK_METADATA_TAG, 0, metadata);
+	if (state)
+		return std::make_pair(state, "Failed to read CHD metadata");
 
-		LOGMASKED(LOG_CONFIG, "CHD metadata: %s\n", metadata.c_str());
+	LOGMASKED(LOG_CONFIG, "CHD metadata: %s\n", metadata.c_str());
 
-		// Parse the metadata
-		mfmhd_layout_params param;
-		param.encoding = m_encoding;
-		LOGMASKED(LOG_CONFIG, "Set encoding to %d\n", m_encoding);
+	// Parse the metadata
+	mfmhd_layout_params param;
+	param.encoding = m_encoding;
+	LOGMASKED(LOG_CONFIG, "Set encoding to %d\n", m_encoding);
 
-		if (sscanf(metadata.c_str(), HARD_DISK_METADATA_FORMAT, &param.cylinders, &param.heads, &param.sectors_per_track, &param.sector_size) != 4)
-		{
-			LOG("Invalid CHD metadata\n");
-			return image_init_result::FAIL;
-		}
+	if (sscanf(metadata.c_str(), HARD_DISK_METADATA_FORMAT, &param.cylinders, &param.heads, &param.sectors_per_track, &param.sector_size) != 4)
+		return std::make_pair(image_error::INVALIDIMAGE, "Invalid CHD metadata");
 
-		LOGMASKED(LOG_CONFIG, "CHD image has geometry cyl=%d, head=%d, sect=%d, size=%d\n", param.cylinders, param.heads, param.sectors_per_track, param.sector_size);
+	LOGMASKED(LOG_CONFIG, "CHD image has geometry cyl=%d, head=%d, sect=%d, size=%d\n", param.cylinders, param.heads, param.sectors_per_track, param.sector_size);
 
-		if (m_max_cylinders != 0 && (param.cylinders != m_max_cylinders || param.heads != m_max_heads))
-		{
-			throw emu_fatalerror("Image geometry does not fit this kind of hard drive: drive=(%d,%d), image=(%d,%d)", m_max_cylinders, m_max_heads, param.cylinders, param.heads);
-		}
+	if (m_max_cylinders != 0 && (param.cylinders != m_max_cylinders || param.heads != m_max_heads))
+	{
+		// TODO: does this really need to be a fatal error?
+		throw emu_fatalerror("Image geometry does not fit this kind of hard drive: drive=(%d,%d), image=(%d,%d)", m_max_cylinders, m_max_heads, param.cylinders, param.heads);
+	}
 
-		// MDM format specs
-		param.interleave = 0;
-		param.cylskew = 0;
-		param.headskew = 0;
-		param.write_precomp_cylinder = -1;
-		param.reduced_wcurr_cylinder = -1;
+	// MDM format specs
+	param.interleave = 0;
+	param.cylskew = 0;
+	param.headskew = 0;
+	param.write_precomp_cylinder = -1;
+	param.reduced_wcurr_cylinder = -1;
 
-		state = m_chd->read_metadata(MFM_HARD_DISK_METADATA_TAG, 0, metadata);
-		if (state)
-		{
-			LOGMASKED(LOG_WARN, "Failed to read CHD sector arrangement/recording specs, applying defaults\n");
-		}
-		else
-		{
-			sscanf(metadata.c_str(), MFMHD_REC_METADATA_FORMAT, &param.interleave, &param.cylskew, &param.headskew, &param.write_precomp_cylinder, &param.reduced_wcurr_cylinder);
-		}
+	state = m_chd->read_metadata(MFM_HARD_DISK_METADATA_TAG, 0, metadata);
+	if (state)
+		LOGMASKED(LOG_WARN, "Failed to read CHD sector arrangement/recording specs, applying defaults\n");
+	else
+		sscanf(metadata.c_str(), MFMHD_REC_METADATA_FORMAT, &param.interleave, &param.cylskew, &param.headskew, &param.write_precomp_cylinder, &param.reduced_wcurr_cylinder);
 
-		if (!param.sane_rec())
-		{
-			LOGMASKED(LOG_CONFIG, "Sector arrangement/recording specs have invalid values, applying defaults\n");
-			param.reset_rec();
-		}
-		else
-			LOGMASKED(LOG_CONFIG, "MFM HD rec specs: interleave=%d, cylskew=%d, headskew=%d, wpcom=%d, rwc=%d\n",
-				param.interleave, param.cylskew, param.headskew, param.write_precomp_cylinder, param.reduced_wcurr_cylinder);
-
-		state = m_chd->read_metadata(MFM_HARD_DISK_METADATA_TAG, 1, metadata);
-		if (state)
-		{
-			LOGMASKED(LOG_WARN, "Failed to read CHD track gap specs, applying defaults\n");
-		}
-		else
-		{
-			sscanf(metadata.c_str(), MFMHD_GAP_METADATA_FORMAT, &param.gap1, &param.gap2, &param.gap3, &param.sync, &param.headerlen, &param.ecctype);
-		}
-
-		if (!param.sane_gap())
-		{
-			LOGMASKED(LOG_CONFIG, "MFM HD gap specs have invalid values, applying defaults\n");
-			param.reset_gap();
-		}
-		else
-			LOGMASKED(LOG_CONFIG, "MFM HD gap specs: gap1=%d, gap2=%d, gap3=%d, sync=%d, headerlen=%d, ecctype=%d\n",
-				param.gap1, param.gap2, param.gap3, param.sync, param.headerlen, param.ecctype);
-
-		m_format->set_layout_params(param);
-
-		m_cache->init(this, m_trackimage_size, m_cachelines);
-
-		// Head timing
-		// We assume that the real times are 80% of the max times
-		// The single-step time includes the settle time, so does the max time
-		// From that we calculate the actual cylinder-by-cylinder time and the settle time
-
-		m_actual_cylinders = param.cylinders;
-
-		if (m_phys_cylinders == 0) m_phys_cylinders = m_actual_cylinders+1;
-		if (m_landing_zone == 0) m_landing_zone = m_phys_cylinders-1;
-
-		float realnext = (m_seeknext_time==0)? 10 : (m_seeknext_time * 0.8);
-		float realmax = (m_maxseek_time==0)? (m_actual_cylinders * 0.2) : (m_maxseek_time * 0.8);
-		float settle_us = ((m_actual_cylinders-1.0) * realnext - realmax) / (m_actual_cylinders-2.0) * 1000;
-		float step_us = realnext * 1000 - settle_us;
-		LOGMASKED(LOG_CONFIG, "Calculated settle time: %0.2f ms, step: %d us\n", settle_us/1000, (int)step_us);
-
-		m_settle_time = attotime::from_usec((int)settle_us);
-		m_step_time = attotime::from_usec((int)step_us);
-
-		m_current_cylinder = m_landing_zone;
+	if (!param.sane_rec())
+	{
+		LOGMASKED(LOG_CONFIG, "Sector arrangement/recording specs have invalid values, applying defaults\n");
+		param.reset_rec();
 	}
 	else
 	{
-		LOGMASKED(LOG_WARN, "Could not load CHD\n");
-		return image_init_result::FAIL;
+		LOGMASKED(LOG_CONFIG,
+				"MFM HD rec specs: interleave=%d, cylskew=%d, headskew=%d, wpcom=%d, rwc=%d\n",
+				param.interleave, param.cylskew, param.headskew, param.write_precomp_cylinder, param.reduced_wcurr_cylinder);
 	}
-	return image_init_result::PASS;
+
+	state = m_chd->read_metadata(MFM_HARD_DISK_METADATA_TAG, 1, metadata);
+	if (state)
+		LOGMASKED(LOG_WARN, "Failed to read CHD track gap specs, applying defaults\n");
+	else
+		sscanf(metadata.c_str(), MFMHD_GAP_METADATA_FORMAT, &param.gap1, &param.gap2, &param.gap3, &param.sync, &param.headerlen, &param.ecctype);
+
+	if (!param.sane_gap())
+	{
+		LOGMASKED(LOG_CONFIG, "MFM HD gap specs have invalid values, applying defaults\n");
+		param.reset_gap();
+	}
+	else
+	{
+		LOGMASKED(LOG_CONFIG,
+				"MFM HD gap specs: gap1=%d, gap2=%d, gap3=%d, sync=%d, headerlen=%d, ecctype=%d\n",
+				param.gap1, param.gap2, param.gap3, param.sync, param.headerlen, param.ecctype);
+	}
+
+	m_format->set_layout_params(param);
+
+	m_cache->init(this, m_trackimage_size, m_cachelines);
+
+	// Head timing
+	// We assume that the real times are 80% of the max times
+	// The single-step time includes the settle time, so does the max time
+	// From that we calculate the actual cylinder-by-cylinder time and the settle time
+
+	m_actual_cylinders = param.cylinders;
+
+	if (m_phys_cylinders == 0) m_phys_cylinders = m_actual_cylinders+1;
+	if (m_landing_zone == 0) m_landing_zone = m_phys_cylinders-1;
+
+	float realnext = (m_seeknext_time==0)? 10 : (m_seeknext_time * 0.8);
+	float realmax = (m_maxseek_time==0)? (m_actual_cylinders * 0.2) : (m_maxseek_time * 0.8);
+	float settle_us = ((m_actual_cylinders-1.0) * realnext - realmax) / (m_actual_cylinders-2.0) * 1000;
+	float step_us = realnext * 1000 - settle_us;
+	LOGMASKED(LOG_CONFIG, "Calculated settle time: %0.2f ms, step: %d us\n", settle_us/1000, (int)step_us);
+
+	m_settle_time = attotime::from_usec((int)settle_us);
+	m_step_time = attotime::from_usec((int)step_us);
+
+	m_current_cylinder = m_landing_zone;
+
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 const char *MFMHD_REC_METADATA_FORMAT = "IL:%d,CSKEW:%d,HSKEW:%d,WPCOM:%d,RWC:%d";

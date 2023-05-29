@@ -35,7 +35,7 @@
 
 #pragma once
 
-#include "imagedev/chd_cd.h"
+#include "imagedev/cdromimg.h"
 #include "sound/cdda.h"
 
 class cr511b_device : public device_t

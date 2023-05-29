@@ -59,6 +59,8 @@
 #include "imagedev/snapquik.h"
 
 
+namespace {
+
 #define MAIN_CLK    15974400
 
 #define RS232_TAG   "rs232"
@@ -429,7 +431,7 @@ QUICKLOAD_LOAD_MEMBER(qx10_state::quickload_cb)
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
 	if (image.length() >= 0xfd00)
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::INVALIDLENGTH, std::string());
 
 	/* The right RAM bank must be active */
 	m_membank = 0;
@@ -439,7 +441,7 @@ QUICKLOAD_LOAD_MEMBER(qx10_state::quickload_cb)
 	if ((prog_space.read_byte(0) != 0xc3) || (prog_space.read_byte(5) != 0xc3))
 	{
 		machine_reset();
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::UNSUPPORTED, std::string());
 	}
 
 	/* Load image to the TPA (Transient Program Area) */
@@ -448,7 +450,7 @@ QUICKLOAD_LOAD_MEMBER(qx10_state::quickload_cb)
 	{
 		uint8_t data;
 		if (image.fread( &data, 1) != 1)
-			return image_init_result::FAIL;
+			return std::make_pair(image_error::UNSPECIFIED, std::string());
 		prog_space.write_byte(i+0x100, data);
 	}
 
@@ -459,7 +461,7 @@ QUICKLOAD_LOAD_MEMBER(qx10_state::quickload_cb)
 	m_maincpu->set_state_int(Z80_SP, 256 * prog_space.read_byte(7) - 300);
 	m_maincpu->set_pc(0x100);       // start program
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /*
@@ -1074,6 +1076,9 @@ ROM_START( qx10 )
 //  ROM_LOAD( "qge.2e",   0x0000, 0x1000, BAD_DUMP CRC(eb31a2d5) SHA1(6dc581bf2854a07ae93b23b6dfc9c7abd3c0569e))
 	ROM_LOAD( "qga.2e",   0x0000, 0x1000, CRC(4120b128) SHA1(9b96f6d78cfd402f8aec7c063ffb70a21b78eff0))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

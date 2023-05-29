@@ -455,8 +455,8 @@ inline void asap_device::check_irqs()
 {
 	if (m_irq_state && m_iflag)
 	{
+		standard_irq_callback(ASAP_IRQ0, m_pc);
 		generate_exception(EXCEPTION_INTERRUPT);
-		standard_irq_callback(ASAP_IRQ0);
 	}
 }
 

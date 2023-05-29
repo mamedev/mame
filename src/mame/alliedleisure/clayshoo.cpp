@@ -23,6 +23,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class clayshoo_state : public driver_device
 {
 public:
@@ -364,6 +366,7 @@ ROM_START( clayshoo )
 	ROM_LOAD( "4",      0x4000, 0x0800, CRC(3da16196) SHA1(eb0c0cf0c8fc3db05ac0c469fb20fe92ae6f27ce) )
 ROM_END
 
+} // anonymous namespace
 
 
 /*************************************

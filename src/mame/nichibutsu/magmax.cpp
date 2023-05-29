@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
+
 /***************************************************************************
 
 MAGMAX
@@ -19,20 +20,321 @@ Stephh's notes (based on the game M68000 code and some tests) :
     if you have EXACTLY 10 credits after you pressed any START button
     (which means that you need to have 11 credits if you choose a 1 player game
     or 12 credits if you choose a 2 players game).
-    When activated, you are giving infinite lives (in fact 0x60 = 60 lives)
+    When activated, you are given infinite lives (in fact 0x60 = 60 lives)
     for both players, you can still lose parts of the ship but not the main ship.
     See code at 0x0001e6 (ships given at start) and 0x0044e6 (other stuff).
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "magmax.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/rescap.h"
+#include "sound/ay8910.h"
+#include "sound/flt_biquad.h"
+#include "sound/mixer.h"
+
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
 
+
+// configurable logging
+#define LOG_GAINCTRL       (1U << 1)
+
+//#define VERBOSE (LOG_GENERAL | LOG_GAINCTRL)
+
+#include "logmacro.h"
+
+#define LOGGAINCTRL(...)       LOGMASKED(LOG_GAINCTRL,       __VA_ARGS__)
+
+
+namespace {
+
+class magmax_state : public driver_device
+{
+public:
+	magmax_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_videoram(*this, "videoram")
+		, m_spriteram(*this, "spriteram")
+		, m_vreg(*this, "vreg")
+		, m_scroll_x(*this, "scroll_x")
+		, m_scroll_y(*this, "scroll_y")
+		, m_rom18b(*this, "user1")
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_ay(*this, "ay%u", 0U)
+		, m_aymixer(*this, "aymixer%u", 0U)
+		, m_ayfilter(*this, "ayfilter%u", 0U)
+		, m_soundlatch(*this, "soundlatch")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+	{ }
+
+	void magmax(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_vreg;
+	required_shared_ptr<uint16_t> m_scroll_x;
+	required_shared_ptr<uint16_t> m_scroll_y;
+	required_region_ptr<uint8_t> m_rom18b;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device_array<ay8910_device, 3> m_ay;
+	required_device_array<mixer_device, 3> m_aymixer;
+	required_device_array<filter_biquad_device, 4> m_ayfilter;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
+	uint8_t m_ls74_clr = 0;
+	uint8_t m_ls74_q = 0;
+	uint8_t m_gain_control = 0;
+	emu_timer *m_interrupt_timer = nullptr;
+	uint8_t m_flipscreen = 0;
+	std::unique_ptr<uint32_t[]> m_prom_tab;
+	bitmap_ind16 m_bitmap;
+
+	void cpu_irq_ack_w(uint16_t data);
+	uint8_t sound_r();
+	void vreg_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void ay8910_portb_0_w(uint8_t data);
+	void ay8910_porta_0_w(uint8_t data);
+
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(scanline_callback);
+
+	void main_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_map(address_map &map);
+};
+
+
+// video
+
+/***************************************************************************
+
+  Convert the color PROMs into a more useable format.
+
+  Mag Max has three 256x4 palette PROMs (one per gun), connected to the
+  RGB output this way:
+
+  bit 3 -- 220 ohm resistor  -- RED/GREEN/BLUE
+        -- 470 ohm resistor  -- RED/GREEN/BLUE
+        -- 1  kohm resistor  -- RED/GREEN/BLUE
+  bit 0 -- 2.2kohm resistor  -- RED/GREEN/BLUE
+
+***************************************************************************/
+void magmax_state::palette(palette_device &palette) const
+{
+	const uint8_t *color_prom = memregion("proms")->base();
+
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x100; i++)
+	{
+		int const r = pal4bit(color_prom[i + 0x000]);
+		int const g = pal4bit(color_prom[i + 0x100]);
+		int const b = pal4bit(color_prom[i + 0x200]);
+
+		palette.set_indirect_color(i, rgb_t(r, g, b));
+	}
+
+	// color_prom now points to the beginning of the lookup table
+	color_prom += 0x300;
+
+	// characters use colors 0-0x0f
+	for (int i = 0; i < 0x10; i++)
+		palette.set_pen_indirect(i, i);
+
+	// sprites use colors 0x10-0x1f, color 0x1f being transparent
+	for (int i = 0; i < 0x100; i++)
+	{
+		uint8_t const ctabentry = (color_prom[i] & 0x0f) | 0x10;
+		palette.set_pen_indirect(i + 0x10, ctabentry);
+	}
+
+	// background uses all colors (no lookup table)
+	for (int i = 0; i < 0x100; i++)
+		palette.set_pen_indirect(i + 0x110, i);
+
+}
+
+void magmax_state::video_start()
+{
+	uint8_t * prom14d = memregion("user2")->base();
+
+	// Set up save state
+	save_item(NAME(m_flipscreen));
+
+	m_prom_tab = std::make_unique<uint32_t[]>(256);
+
+	m_screen->register_screen_bitmap(m_bitmap);
+
+	// Allocate temporary bitmap
+	for (int i = 0; i < 256; i++)
+	{
+		int const v = (prom14d[i] << 4) + prom14d[i + 0x100];
+		m_prom_tab[i] = ((v & 0x1f) << 8) | ((v & 0x10) << 10) | ((v & 0xe0) >> 1); // convert data into more useful format
+	}
+}
+
+
+
+uint32_t magmax_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// bit 2 flip screen
+	m_flipscreen = *m_vreg & 0x04;
+
+	// copy the background graphics
+	if (*m_vreg & 0x40)     // background disable
+		bitmap.fill(0, cliprect);
+	else
+	{
+		uint32_t const scroll_h = (*m_scroll_x) & 0x3fff;
+		uint32_t const scroll_v = (*m_scroll_y) & 0xff;
+
+		// clear background-over-sprites bitmap
+		m_bitmap.fill(0);
+
+		for (int v = 2 * 8; v < 30 * 8; v++) // only for visible area
+		{
+			uint16_t line_data[256];
+
+			uint32_t const map_v_scr_100 = (scroll_v + v) & 0x100;
+			uint32_t rom18d_addr = ((scroll_v + v) & 0xf8) + (map_v_scr_100 << 5);
+			uint32_t rom15f_addr = (((scroll_v + v) & 0x07) << 2) + (map_v_scr_100 << 5);
+			uint32_t const map_v_scr_1fe_6 =((scroll_v + v) & 0x1fe) << 6;
+
+			pen_t pen_base = 0x110 + 0x20 + (map_v_scr_100 >> 1);
+
+			for (int h = 0; h < 0x100; h++)
+			{
+				uint32_t ls283 = scroll_h + h;
+
+				if (!map_v_scr_100)
+				{
+					if (h & 0x80)
+						ls283 = ls283 + (m_rom18b[map_v_scr_1fe_6 + (h ^ 0xff)] ^ 0xff);
+					else
+						ls283 = ls283 + m_rom18b[map_v_scr_1fe_6 + h] + 0xff01;
+				}
+
+				uint32_t const prom_data = m_prom_tab[(ls283 >> 6) & 0xff];
+
+				rom18d_addr &= 0x20f8;
+				rom18d_addr += (prom_data & 0x1f00) + ((ls283 & 0x38) >>3);
+
+				rom15f_addr &= 0x201c;
+				rom15f_addr += (m_rom18b[0x4000 + rom18d_addr]<<5) + ((ls283 & 0x6)>>1);
+				rom15f_addr += (prom_data & 0x4000);
+
+				uint32_t const graph_color = (prom_data & 0x0070);
+
+				uint32_t graph_data = m_rom18b[0x8000 + rom15f_addr];
+				if ((ls283 & 1))
+					graph_data >>= 4;
+				graph_data &= 0x0f;
+
+				line_data[h] = pen_base + graph_color + graph_data;
+
+				// priority: background over sprites
+				if (map_v_scr_100 && ((graph_data & 0x0c)==0x0c))
+					m_bitmap.pix(v, h) = line_data[h];
+			}
+
+			if (m_flipscreen)
+			{
+				uint16_t line_data_flip_x[256];
+				for (int i = 0; i < 256; i++)
+					line_data_flip_x[i] = line_data[255 - i];
+				draw_scanline16(bitmap, 0, 255 - v, 256, line_data_flip_x, nullptr);
+			}
+			else
+				draw_scanline16(bitmap, 0, v, 256, line_data, nullptr);
+		}
+	}
+
+	// draw the sprites
+	for (int offs = 0; offs < m_spriteram.bytes() / 2; offs += 4)
+	{
+		int sy = m_spriteram[offs] & 0xff;
+
+		if (sy)
+		{
+			int code = m_spriteram[offs + 1] & 0xff;
+			int const attr = m_spriteram[offs + 2] & 0xff;
+			int const color = (attr & 0xf0) >> 4;
+			int flipx = attr & 0x04;
+			int flipy = attr & 0x08;
+
+			int sx = (m_spriteram[offs + 3] & 0xff) - 0x80 + 0x100 * (attr & 0x01);
+			sy = 239 - sy;
+
+			if (m_flipscreen)
+			{
+				sx = 255 - 16 - sx;
+				sy = 239 - sy;
+				flipx = !flipx;
+				flipy = !flipy;
+			}
+
+			if (code & 0x80)    // sprite bankswitch
+				code += (*m_vreg & 0x30) * 0x8;
+
+			m_gfxdecode->gfx(1)->transmask(bitmap, cliprect,
+					code,
+					color,
+					flipx, flipy,
+					sx, sy,
+					m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 0x1f));
+		}
+	}
+
+	if (!(*m_vreg & 0x40))      // background disable
+		copybitmap_trans(bitmap, m_bitmap, m_flipscreen, m_flipscreen, 0, 0, cliprect, 0);
+
+	// draw the foreground characters
+	for (int offs = 32 * 32 - 1; offs >= 0; offs -= 1)
+	{
+		//int const page = (*m_vreg >> 3) & 0x1;
+		int const code = m_videoram[offs /*+ page*/] & 0xff;
+
+		if (code)
+		{
+			int sx = (offs % 32);
+			int sy = (offs / 32);
+
+			if (m_flipscreen)
+			{
+				sx = 31 - sx;
+				sy = 31 - sy;
+			}
+
+			m_gfxdecode->gfx(0)->transpen(bitmap, cliprect,
+					code,
+					0,
+					m_flipscreen, m_flipscreen,
+					8 * sx, 8 * sy, 0x0f);
+		}
+	}
+	return 0;
+}
+
+
+// machine
 
 void magmax_state::cpu_irq_ack_w(uint16_t data)
 {
@@ -41,15 +343,15 @@ void magmax_state::cpu_irq_ack_w(uint16_t data)
 
 uint8_t magmax_state::sound_r()
 {
-	return (m_soundlatch->read() << 1) | m_LS74_q;
+	return (m_soundlatch->read() << 1) | m_ls74_q;
 }
 
-void magmax_state::ay8910_portB_0_w(uint8_t data)
+void magmax_state::ay8910_portb_0_w(uint8_t data)
 {
 	// bit 0 is input to CLR line of the LS74
-	m_LS74_clr = data & 1;
-	if (m_LS74_clr == 0)
-		m_LS74_q = 0;
+	m_ls74_clr = data & 1;
+	if (m_ls74_clr == 0)
+		m_ls74_q = 0;
 }
 
 TIMER_CALLBACK_MEMBER(magmax_state::scanline_callback)
@@ -58,8 +360,8 @@ TIMER_CALLBACK_MEMBER(magmax_state::scanline_callback)
 
 	/* bit 0 goes hi whenever line V6 from video part goes lo->hi
 	   that is when scanline is 64 and 192 accordingly */
-	if (m_LS74_clr != 0)
-		m_LS74_q = 1;
+	if (m_ls74_clr != 0)
+		m_ls74_q = 1;
 
 	scanline += 128;
 	scanline &= 255;
@@ -73,28 +375,19 @@ void magmax_state::machine_start()
 	m_interrupt_timer = timer_alloc(FUNC(magmax_state::scanline_callback), this);
 
 	// Set up save state
-	save_item(NAME(m_sound_latch));
-	save_item(NAME(m_LS74_clr));
-	save_item(NAME(m_LS74_q));
+	save_item(NAME(m_ls74_clr));
+	save_item(NAME(m_ls74_q));
 	save_item(NAME(m_gain_control));
 }
 
 void magmax_state::machine_reset()
 {
 	m_interrupt_timer->adjust(m_screen->time_until_pos(64), 64);
-
-#if 0
-	{
-		int i;
-		for (i=0; i<9; i++)
-			logerror("SOUND Chan#%i name=%s\n", i, mixer_get_name(i) );
-	}
-#endif
 }
 
 
 
-void magmax_state::ay8910_portA_0_w(uint8_t data)
+void magmax_state::ay8910_porta_0_w(uint8_t data)
 {
 /*There are three AY8910 chips and four(!) separate amplifiers on the board
 * Each of AY channels is hardware mapped in following way:
@@ -145,15 +438,15 @@ bit3 - SOUND Chan#8 name=AY-3-8910 #2 Ch C
 
 	m_gain_control = data & 0x0f;
 
-	//  popmessage("gain_ctrl = %2x",data&0x0f);
+	LOGGAINCTRL("gain_ctrl = %2x", data & 0x0f);
 
 	const double mix_resistors[4] = { RES_K(1.0), RES_K(2.2), RES_K(10.0), RES_K(10.0) }; // R35, R33, R32, R34
 	for (int i = 0; i < 4; i++)
 	{
 		// RES_K(5) == (1.0 / ((1.0 / RES_K(10)) + (1.0 / RES_K(10)))) because of the optional extra 10k in parallel in each inverting amplifier circuit
 		// the total max number of output gain 'units' of all 4 inputs is 10 + 10/2.2 + 1 + 1 = 16.545454, so we divide the gain amount by this number so we don't clip
-		m_ayfilter[i]->set_output_gain(0, (-1.0 * ( ((m_gain_control & (1<<i)) ? RES_K(10) : RES_K(5)) / mix_resistors[i] )) / 16.545454);
-		//m_ayfilter[i]->set_output_gain(0, (m_gain_control & (1<<i)) ? 1.0 : 0.5);
+		m_ayfilter[i]->set_output_gain(0, (-1.0 * (((m_gain_control & (1 << i)) ? RES_K(10) : RES_K(5)) / mix_resistors[i] )) / 16.545454);
+		//m_ayfilter[i]->set_output_gain(0, (m_gain_control & (1 << i)) ? 1.0 : 0.5);
 	}
 }
 
@@ -283,17 +576,6 @@ static INPUT_PORTS_START( magmax )
 INPUT_PORTS_END
 
 
-static const gfx_layout charlayout =
-{
-	8, 8,   // 8*8 characters
-	256,    // 256 characters
-	4,  // 4 bits per pixel
-	{ 0, 1, 2, 3 },
-	{ 4, 0, 12, 8, 20, 16, 28, 24 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
 static const gfx_layout spritelayout =
 {
 	16, 16, // 16*16 characters
@@ -307,20 +589,21 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
+
 static GFXDECODE_START( gfx_magmax )
-	GFXDECODE_ENTRY( "chars", 0, charlayout,           0,  1 ) // no color codes
-	GFXDECODE_ENTRY( "sprites", 0, spritelayout,      1*16, 16 ) // 16 color codes
+	GFXDECODE_ENTRY( "chars",   0, gfx_8x8x4_packed_lsb,    0,  1 ) // no color codes
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout,         1*16, 16 ) // 16 color codes
 GFXDECODE_END
 
 
 void magmax_state::magmax(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, XTAL(16'000'000)/2);   // verified on PCB
+	M68000(config, m_maincpu, XTAL(16'000'000) / 2);   // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &magmax_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(magmax_state::irq1_line_assert));
 
-	Z80(config, m_audiocpu, XTAL(20'000'000)/8); // verified on PCB
+	Z80(config, m_audiocpu, XTAL(20'000'000) / 8); // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &magmax_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &magmax_state::sound_io_map);
 
@@ -354,19 +637,19 @@ void magmax_state::magmax(machine_config &config)
 	MIXER(config, m_aymixer[1]).add_route(0, m_ayfilter[2], 1.0);
 	MIXER(config, m_aymixer[2]).add_route(0, m_ayfilter[3], 1.0);
 
-	AY8910(config, m_ay[0], XTAL(20'000'000)/16); // @20G verified on PCB and schematics
-	m_ay[0]->port_a_write_callback().set(FUNC(magmax_state::ay8910_portA_0_w));
-	m_ay[0]->port_b_write_callback().set(FUNC(magmax_state::ay8910_portB_0_w));
+	AY8910(config, m_ay[0], XTAL(20'000'000) / 16); // @20G verified on PCB and schematics
+	m_ay[0]->port_a_write_callback().set(FUNC(magmax_state::ay8910_porta_0_w));
+	m_ay[0]->port_b_write_callback().set(FUNC(magmax_state::ay8910_portb_0_w));
 	m_ay[0]->add_route(0, m_ayfilter[0], 1.0);
 	m_ay[0]->add_route(1, m_aymixer[0], 1.0);
 	m_ay[0]->add_route(2, m_aymixer[0], 1.0);
 
-	AY8910(config, m_ay[1], XTAL(20'000'000)/16); // @18G verified on PCB and schematics
+	AY8910(config, m_ay[1], XTAL(20'000'000) / 16); // @18G verified on PCB and schematics
 	m_ay[1]->add_route(0, m_aymixer[0], 1.0);
 	m_ay[1]->add_route(1, m_aymixer[0], 1.0);
 	m_ay[1]->add_route(2, m_aymixer[1], 1.0);
 
-	AY8910(config, m_ay[2], XTAL(20'000'000)/16); // @16G verified on PCB and schematics
+	AY8910(config, m_ay[2], XTAL(20'000'000) / 16); // @16G verified on PCB and schematics
 	m_ay[2]->add_route(0, m_aymixer[1], 1.0);
 	m_ay[2]->add_route(1, m_aymixer[2], 1.0);
 	m_ay[2]->add_route(2, m_aymixer[2], 1.0);
@@ -473,6 +756,8 @@ ROM_START( magmaxa )
 	ROM_LOAD( "mag_g.2e",   0x0300, 0x0100, CRC(830be358) SHA1(f412587718040a783c4e6453619930c90daf385e) ) // sprites color lookup table
 	ROM_LOAD( "mag_f.13b",  0x0400, 0x0100, CRC(4a6f9a6d) SHA1(65f1e0bfacd1f354ece1b18598a551044c27c4d1) ) // state machine data used for video signals generation (not used in emulation)
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1985, magmax,  0,      magmax, magmax, magmax_state, empty_init, ROT0, "Nichibutsu", "Mag Max (set 1)", MACHINE_SUPPORTS_SAVE )

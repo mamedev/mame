@@ -26,7 +26,10 @@
       the 3D hardware is emulated.
 
     - Serial number data is at offset 0x201 in the BIOS.  Until the games are running
-      and displaying it I'm not going to meddle with it though.
+      and displaying it I'm not going to meddle with it though.  Some newer Namco SS22 games
+      have similar data there.
+      The only difference between motoxgov2a and motoxgov2a2, motoxgov1a and motoxgov1a2,
+      panicprkj and panicprkj2 is this data.
 
     - Improve GMEN hookups/comms.
 
@@ -35,9 +38,9 @@
       disable inputs because of this.
 
     - Super System 23 tests irqs in the post.  timecrs2v4a's code can
-    potentially test 7 sources, but only actually test 5.  With each
-    source there is code to clear the interrupt and code to raise it.
-    Levels 0 and 1 are not connected to anything according to the code.
+      potentially test 7 sources, but only actually test 5.  With each
+      source there is code to clear the interrupt and code to raise it.
+      Levels 0 and 1 are not connected to anything according to the code.
 
       VBlank (level 2):
         clear: ad00000a.h = 0
@@ -1070,39 +1073,45 @@ Notes:
       J106            - DC variable power output to feed-back motor
 
 
-Namco Gorgon-based games
-------------------------
+********************************************************************************************
 
-Rapid River, Final Furlong (both Namco, 1997)
+Namco System 22.5 GORgON-based games
+Hardware info by Guru
+---------------------
 
-These games run on hardware called "GORGON". It appears to have similar
-capabilities to System 23 but like Super System 22 has sprites also.
-(System 23 doesn't have sprites). The PCBs are about two times larger
-than System 23.
+Games on this system include....
+Rapid River   (Namco, 1997)
+Final Furlong (Namco, 1997)
 
-The system comprises Main PCB, ROM PCB and I/O PCB all located inside
-a metal box with 3 separate power supplies for 5V, 12V and 3.3V. Main
-input power is 115V.
-Rapid River is controlled by rotating a paddle (for thrust) and turning it
-sideways (moves left/right).
-The rotation action is done with a 5K potentiometer whereby the thrust
-is achieved by moving the pot from full left to full right continuously.
-The left/right turning movement is just another 5K potentiometer connected
-to the column of the paddle center shaft.
-There are also some buttons just for test mode, including SELECT, UP & DOWN
-The player's seat has movement controlled by a compressor and several
-potentiometers. On bootup, the system tests the seat movement and displays
-a warning if it's not working. Pressing START allows the game to continue
-and function normally without the seat movement.
+These games run on hardware called "GORgON". This is half-way hardware after Namco Super System 22 and
+before System 23. It has similar capabilities to System 23 but like Super System 22 it has sprites also, whereas
+System 23 is a full 3D system and doesn't have sprites. The PCBs are about two times larger than System 23.
 
-The other game on this system (Final Furlong) and is a horse racing game.
-To control the horse you rock it forwards and backwards continually (it's very tiring
-to play this game).
-This would activate possibly one or two 5K potentiometers inside the horse body.
-Just like a real horse you need to control the speed so your horse lasts the entire race.
-If you rock too much, a message on screen says 'Too Fast'. To steer the horse turn the
-head sideways using the reins. There would be another 5K potentiometer in the head
-to activate the turning direction.
+For Final Furlong (the first game on this system) the system comprises TWO Main PCBs each with ROM PCB on top.
+There are 2x GORgON AV PCBs plugged directly into each main board providing connectors for power, audio,
+video and comms with 3 separate power supplies for 5V, 12V and 3.3V all located inside a metal box. There is a
+separate external I/O PCB ASCA-1A. This connects to the filter board via RS485 using the USB connector.
+Main input power is 115VAC.
+Final Furlong is a horse racing game.
+To control the horse you rock it forwards and backwards continually (it's very tiring to play this game).
+This activates one 5K-ohm potentiometer inside the horse body. Essentially the pot just moves from one extreme
+to the other. Just like a real horse you need to control the speed so your horse lasts the entire race.
+If you rock too much, a message on screen says 'Too Fast'. To steer the horse turn the head sideways using the reins.
+There is another 5K-ohm potentiometer in the head to activate the turning direction. The head of the horse also has
+two buttons for left and right. This is used to select items and activate the whip. When riding the horse, pressing either
+button activates the whip (i.e. they both do the same thing). To select a different track or different horse turn the head.
+
+For Rapid River there is only one main board and ROM board (linking/networking machines is not possible). The I/O
+board is ASCA-2A and is different to the I/O board used with Final Furlong and plugs directly into the main board.
+This board has the same connectors as the Final Furlong GORgON AV PCB but also has an audio amp and a standard 8 pin
+JVS power connector. The I/O board is located inside the metal box. There are two flat cables on the I/O board joining
+it to the filter board which is bolted to the outside of the metal box.
+Rapid River is controlled by rotating a paddle (for thrust) and turning it sideways (moves left/right).
+The rotation action is done with a 5K-ohm potentiometer whereby the thrust is achieved by moving the pot from full left to
+full right continuously. The left/right turning movement is just another 5K-ohm potentiometer connected to the column of the paddle
+center shaft. There are also some buttons just for test mode, including SELECT, UP & DOWN. The player's seat has movement
+controlled by a compressor and several potentiometers. On bootup, the system tests the seat movement and displays a warning
+if it's not working. Pressing START allows the game to continue and function normally without the seat movement.
 
 
 Main PCB
@@ -1113,25 +1122,25 @@ Main PCB
 |                                   J4                       J5                         J6             |
 |                              |---------|           |---------| |------| |---------|                  |
 |         |---------| |------| |         |           |         | |C401  | |         |HM534251 HM534251 |
-| CXD1178Q|         | |C381  | |  C374   |  |------| |  C417   | |      | |  304    |HM534251 HM534251 |
+| CXD1178Q|         | |C381  | |  C374   |  |------| |  C417   | |      | |  C304   |HM534251 HM534251 |
 |         |  C404   | |      | |         |  |C435  | |         | |------| |         |HM534251 HM534251 |
 |         |         | |------| |         |  |      | |         | |------| |         |                  |
 |         |         |          |---------|  |------| |---------| |C400  | |---------|                  |
 |         |---------|     |---------|       |------|             |      | |---------|                  |
 |                         |         |       |C435  |    341256   |------| |         |HM534251 HM534251 |
-|                         |  C397   |       |      |             |------| |  304    |HM534251 HM534251 |
+|                         |  C397   |       |      |             |------| |  C304   |HM534251 HM534251 |
 |  341256 341256  341256  |         |       |------|    341256   |C401  | |         |HM534251 HM534251 |
 |  M5M51008       341256  |         |     |---------|            |      | |         |                  |
 |                         |---------|     |         | |------|   |------| |---------|                  |
 |  M5M51008       341256         |------| |  C403   | |C406  |   |------| |---------|                  |
 |ADM485              |---------| |C379  | |         | |      |   |C400  | |         |HM534251 HM534251 |
-|                    |         | |      | |         | |------|   |      | |  304    |HM534251 HM534251 |
+|                    |         | |      | |         | |------|   |      | |  C304   |HM534251 HM534251 |
 |    M5M51008        |  C300   | |------| |---------|            |------| |         |HM534251 HM534251 |
 |                    |         | LH540204  LH540204              |------| |         |                  |
 |    M5M51008        |         |341256                 |------|  |C401  | |---------|                  |
 |J1   HCPL0611       |---------|341256                 |C407  |  |      | |---------|                  |
 |         DS8921                  PST575  PST575       |      |  |------| |         |                  |
-|  DS8921                                              |------|  |------| |  304    |HM534251 HM534251 |
+|  DS8921                                              |------|  |------| |  C304   |HM534251 HM534251 |
 |                 M5M51008                                       |C400  | |         |HM534251 HM534251 |
 |       CY7C128             CY2291S                              |      | |         |                  |
 |         |------|M5M51008  14.31818MHz                          |------| |---------|                  |
@@ -1145,56 +1154,67 @@ Main PCB
 |      14.7456MHz          |      |               |--------|     |------|     |         | |NKK      |  |
 |PAL             |-----|   |------|    |------|                   D4516161    |  C413   | |NR4650   |  |
 |                |H8/  |               |C361  |                   D4516161    |         | |LQF-13B  |  |
-|                |3002 |               |      |LC321664                       |         | |         |  |
-|  J10           |-----|               |------|    J8                         |---------| |---------|  |
+|                |3002 |               |      |                               |         | |         |  |
+|  J10           |-----|      LC321664 |------|    J8                         |---------| |---------|  |
 |------------------------------------------------------------------------------------------------------|
 Notes:
-     NKK NR4650 - R4600-based 64bit RISC CPU (Main CPU, QFP208, clock input source = CY2291S)
-     H8/3002  - Hitachi H8/3002 HD6413002F17 (Sound CPU, QFP100, running at 14.7456MHz)
-     EPM7128  - Altera EPM7128 FPGA labelled 'GOR-M1' (PLCC84)
-     PAL      - PALCE16V8H stamped 'GOR-M3' (PLCC20)
-     HM534251 - Hitachi HM534251 256k x4 Dynamic Video RAM (SOJ28)
-     N341256  - NKK 32k x8 SRAM (SOJ28)
-     M5M5256  - Mitsubishi 32k x8 SRAM (SOP28)
+       NR4650 - NKK NR4650 R4600-based 64-bit RISC CPU (Main CPU, QFP208). Clock input source = CY2291S pin 10
+                R4650 master clock input on pin 185 is 33.3333MHz [66.6666/2; CY2291S output = 66.6666]
+      H8/3002 - Hitachi H8/3002 HD6413002F17 (Sound CPU, QFP100). Clock input 16.74115MHz. Clock source = ASC2061 MCLKOUT/2
+      EPM7128 - Altera EPM7128 CPLD labelled 'GOR-M1' (PLCC84). This chip controls *MANY* chip-enable and clock signals.
+          PAL - PALCE16V8H stamped 'GOR-M3' (PLCC20)
+     HM534251 - Hitachi HM534251 256kB x4 Dynamic Video RAM (SOJ28)
+      N341256 - NKK 32kB x8 SRAM (SOJ28)
+      M5M5256 - Mitsubishi 32kB x8 SRAM (SOP28)
      D4516161 - NEC uPD4516161AG5-A80 1M x16 (16MBit) SDRAM (SSOP50)
-     LC321664 - Sanyo 64k x16 EDO DRAM (SOJ40)
-     M5M51008 - Mitsubishi 128k x8 SRAM (SOP32)
-     CY7C128  - Cypress 2k x8 SRAM (SOJ28)
+     LC321664 - Sanyo 64kB x16 EDO DRAM (SOJ40)
+     M5M51008 - Mitsubishi 128kB x8 SRAM (SOP32)
+      CY7C128 - Cypress 2kB x8 SRAM (SOJ28)
      LH540204 - Sharp CMOS 4096 x 9 Asynchronous FIFO (PLCC32)
-     2061ASC-1- IC Designs 2061ASC-1 programmable clock generator (SOIC16)
-     DS8921   - Dallas Semiconductor DS8921 RS-422/423 Differential Line Driver and Receiver Pair (SOIC8)
+    2061ASC-1 - IC Designs 2061ASC-1 Programmable Clock Generator (SOIC16). XTAL input = 14.7456MHz
+                This chip uses some internal ROM tables and formulas and is programmed with several registers to generate 2 output clocks.
+                The measured values below can vary depending on the input clock frequency and accuracy tolerance.
+                Measured Outputs: VCLKOUT - 25.9282MHz, MCLKOUT - 33.4823MHz
+      CY2291S - General Purpose EPROM Programmable Clock Generator. Clock input 14.31818MHz
+                Full part number is CY2291SC-221. SC="Special Customer". This is custom-programmed at the factory per Namco specifications.
+                This chip uses some internal ROM tables to generate 6 output clocks. Not all of the outputs are actually used on the PCB.
+                The measured values below can vary depending on the input clock frequency and accuracy tolerance.
+                Measured Outputs: CPUCLK - 66.6666MHz, CLKB - 51.200MHz, CLKA - 20.000MHz , CLKF - none, CLKD - none, CLKC - 40.000MHz
+                The outputs CLKA/C/D/F are not connected.
+       DS8921 - Dallas Semiconductor DS8921 RS-422/423 Differential Line Driver and Receiver Pair (SOIC8)
      HCPL0611 - Fairchild HCPL0611 High Speed 10MBits/sec Logic Gate Optocoupler (SOIC8)
-     ADM485   - Analog Devices ADM485 5V Low Power EIA RS-485 Transceiver (SOIC8)
-     PST575   - System Reset IC (SOIC8)
-     CXD1178Q - Sony CXD1178Q 8-bit RGB 3-channel D/A converter (QFP48)
-     J1       - 64 pin connector for connection of I/O board
+       ADM485 - Analog Devices ADM485 5V Low Power EIA RS-485 Transceiver (SOIC8)
+                This is used for I/O PCB communication via H8/3002 signals PB0, P90 and P92.
+       PST575 - System Reset IC (SOIC8)
+     CXD1178Q - Sony CXD1178Q 8-bit RGB 3-channel D/A converter (QFP48). R,G,B Clock inputs 12.800MHz. Source clock is CY2291S CLKB [51.200/4]
+           J1 - 64 pin connector for connection of I/O board
      J4/J5/J6 \
-     J8/J9    / Custom NAMCO connectors for connection of MEM(M1) PCB
-     J10      - Custom NAMCO connector for MSPM(FR) PCB
+        J8/J9 / Custom NAMCO connectors for connection of MEM(M1) PCB
+          J10 - Custom NAMCO connector for MSPM(FR) PCB
 
 
      Namco Custom ICs
      ----------------
-     C300 (QFP160)
-     304  (x4, QFP120)
-     C352 (QFP100)
-     C361 (QFP120)
-     C374 (QFP160)
-     C379 (QFP64)
-     C381 (QFP144)
-     C397 (QFP160)
-     C399 (QFP160)
-     C400 (QFP100)
-     C401 (x4, QFP64)
-     C403 (QFP136)
-     C404 (QFP208)
-     C406 (QFP120)
-     C407 (QFP64)
-     C413 (QFP208)
-     C416 (QFP176)
-     C417 (QFP208)
-     C422 (QFP64)
-     C435 (x2, TQFP144)
+         C300 (QFP160) - Sprite-related functions
+     C304 (x4, QFP120) - Texture-related functions. Grouped with a C400 and C401 for each chip (4 sets).
+         C352 (QFP100) - 32-Voice 4-channel 8-bit PCM Sound. Clock input 25.9282MHz (source = 2061ASC-1 pin 9)
+         C361 (QFP120) - Text / Character Generator + HSync / VSync Generator
+         C374 (QFP160) - Sprite-related functions / Sprite Zoom
+          C379 (QFP64) - Sprite-related functions
+         C381 (QFP144) - Sprite-related functions
+         C397 (QFP160) - Sprite-related functions
+         C399 (QFP160) \ This chip ties all the texture outputs from C304, C400 & C401 together and probably does CPU <> 3D System Communication.
+     C400 (x4, QFP100) | Texture-related functions (these run burning hot then fail.... result = 3D objects all white and no textures ;-)
+      C401 (x4, QFP64) /
+         C403 (QFP136) - Polygon-related functions + FIFO data supply source
+         C404 (QFP208) - GAMMA, Palette, Pixel Mixer, 24-bit RGB output directly to CXD1178Q (8-bits per color)
+         C406 (QFP120) - Polygon-related functions
+          C407 (QFP64) - Polygon-related functions
+         C413 (QFP208) - Memory Controller
+         C416 (QFP176) - CPU <> CPU Communication (R4650 <> H8/3002)
+         C417 (QFP208) - Polygon Generator
+          C422 (QFP64) - RS422 Networking (Twin Cabinet) Communication Controller
+    C435 (x2, TQFP144) - Polygon-related functions
 
 
 Program ROM PCB
@@ -1210,7 +1230,7 @@ MSPM(FR) PCB 8699015200 (8699015100)
 |                    IC2   |
 |--------------------------|
 Notes:
-     J1 -  Connector to plug into Main PCB
+      J1 - Connector to plug into Main PCB
      IC1 \
      IC2 / Main Program  (Fujitsu 29F016 16MBit FlashROM, TSOP48)
      IC3 - Sound Program (Fujitsu 29F400T 4MBit FlashROM, TSOP48)
@@ -1222,6 +1242,7 @@ Notes:
      Rapid River    RD2 Ver.C
      Rapid River    RD3 Ver.C
      Final Furlong  FF2 Ver.A
+
 
 ROM PCB
 -------
@@ -1266,12 +1287,12 @@ MEM(M1) PCB
 |                    J4(MOTION)                          |
 |--------------------------------------------------------|
 Notes:
-     PAL1 - PALCE16V8H stamped 'SS22M1' (PLCC20)
-     PAL2 - PALCE20V8H stamped 'SS22M2' (PLCC32)
-     PAL3 - PALCE20V8H stamped 'SS22M2' (PLCC32)
-     KEYCUS - for Rapid River: MACH211 CPLD stamped 'KC012' (PLCC44)
-     KEYCUS - for Final Furlong: MACH211 CPLD stamped 'KC011' (PLCC44)
-     J1->J5 - Custom NAMCO connectors for joining ROM PCB to Main PCB
+        PAL1 - PALCE16V8H stamped 'SS22M1' (PLCC20)
+        PAL2 - PALCE20V8H stamped 'SS22M2' (PLCC32)
+        PAL3 - PALCE20V8H stamped 'SS22M2' (PLCC32)
+      KEYCUS - for Rapid River: MACH211 CPLD stamped 'KC012' (PLCC44)
+      KEYCUS - for Final Furlong: MACH211 CPLD stamped 'KC011' (PLCC44)
+      J1->J5 - Custom NAMCO connectors for joining ROM PCB to Main PCB
      JP1/JP2 \
      JP3/JP4 |
      JP5     | Jumpers to set ROM sizes (32M/64M)
@@ -1280,44 +1301,148 @@ Notes:
 
      ROMs
      ----
-          PT*  - Point ROMs, sizes configurable to either 16M or 32M (SOP44)
-          MT*  - Motion ROMs, sizes configurable to either 32M or 64M (SOP44)
-          CG*  - Texture ROMs, sizes configurable to either 32M or 64M (SOP44)
+           PT* - Point ROMs, sizes configurable to either 16M or 32M (SOP44)
+           MT* - Motion ROMs, sizes configurable to either 32M or 64M (SOP44)
+           CG* - Texture ROMs, sizes configurable to either 32M or 64M (SOP44)
           CCR* - Texture Tilemap ROMs, sizes fixed at 16M (SOP44)
           SPR* - Sprite ROMs, sizes configurable to either 32M or 64M (SOP44)
           WAVE*- Wave ROMs, sizes configurable to either 32M or 64M (SOP44)
 
-I/O PCB
--------
+
+I/O PCBs
+--------
+
+ASCA-1A PCB
+8662968202 (8662978202)
+|--------------------------------------------------------|
+|J105  J104  J103  J102                 J101             |
+|       NJM2904             |-------|                    |
+|                 ADM485    |ALTERA |                    |
+|       NJM2904             |EPM7064|                    |
+|                           |       |                    |
+|                |-------|  |-------|                    |
+|         |---|  |       |                               |
+|         IC13|  | C78   | SW2            LB1235  LB1233 |
+|         |---|  |       |  14.7460MHz       LB1235      |
+|             JP1|-------|                               |
+|         62256            PST592D                       |
+|   MB87078       J106                                   |
+|--------------------------------------------------------|
+Notes:
+     IC13 - Atmel AT29C020 2MBit EEPROM labelled 'ASC1IO-A' (PLCC32)
+      C78 - Namco Custom MCU, positively identified as a Hitachi H8/3334 (PLCC84)
+            Clock input 14.7460MHz
+  EPM7064 - Altera EPM7064LC68-15 CPLD, labelled 'ASCA DR0' (PLCC68)
+  PST592D - System Reset IC (SOIC4)
+    62256 - Hitachi HM62256 32kB x8-bit SRAM
+   ADM485 - Analog Devices +ADM485 5V Low Power EIA RS-485 Transceiver (SOIC8)
+  MB87078 - Fujitsu MB87078 Electronic Volume Control IC (SOIC24)
+  NJM2904 - New Japan Radio Co. NJM2904 Dual Operational Amplifier
+   LB1235 - Sanyo LB1235 65V 1.5A 4-channel Darlington Driver
+   LB1233 - Sanyo LB1233 Darlington Transistor Array with Built-in Current Limiting Resistors
+     J101 - 64 pin connector joining to ?
+     J102 - USB-A connector \  both tied together with common connections
+     J103 - USB-B connector /
+     J104 - Dual Red/White RCA Jacks (Twin Stereo Audio)
+     J105 - 9 pin connector
+     J106 - 12 pin connector
+      JP1 - 3 pin jumper labelled 'WE' and 'NC'. Default position is NC. This is used to write enable
+            the EEPROM for factory programming.
+      SW2 - DIP switch with 4 switches (default all off)
+
+This board is used with Final Furlong. This board connects to GORgON AV PCB
+
 
 V187 ASCA-2A PCB
 2477960102 (2477970102)
 |--------------------------------------------------------|
 |                   J105                                 |
 |                           |-------|        14.7456MHz  |
-|   J104                    |ALTERA |    ADM485   PST592 |
+|   J104                    |ALTERA |    ADM485   PST592D|
 |                           |EPM7064|     |-------|      |
 |                           |       |     |       |      |
 |                           |-------|     | C78   |      |
 |     LC78815                             |       |      |
 |                                         |-------|      |
 |     MB87078                              |---|         |
-| LA4705                                   |IC1| 62256   |
-|                                          |---|         |
+| LA4705                       LB1233      |IC1| 62256   |
+|                        LB1235            |---|         |
 |         J101                J102                       |
 |--------------------------------------------------------|
 Notes:
-     IC1  - Atmel AT29C020 2MBit EEPROM labelled 'ASCA1 I/O-A' (PLCC32)
-     C78  - Namco Custom MCU, positively identified as a Hitachi H8/3334 (PLCC84)
-     EPM7064 - Altera EPM7064LC68-15 PLD, labelled 'ASCA DR0' (PLCC68)
-     PST592 - System Reset IC (SOIC4)
-     ADM485 - Analog Devices +ADM485 5V Low Power EIA RS-485 Transceiver (SOIC8)
-     MB87078 - Fujitsu MB87078 Electronic Volume Control IC (SOIC24)
-     LC78815 - Sanyo LM78815 2-Channel 16-Bit D/A Converter (SOIC20)
-     J101 - 34 pin flat cable connector for filter board
-     J102 - 50 pin flat cable connector for filter board
-     J104 - 8 pin power connector (+5V, +12V, +3.3V)
-     J105 - 64 pin connector for connection of Main PCB
+     IC1 - Atmel AT29C020 2MBit EEPROM labelled 'ASCA1 I/O-A' (PLCC32)
+     C78 - Namco Custom MCU, positively identified as a Hitachi H8/3334 (PLCC84)
+           Clock input 14.7456MHz
+ EPM7064 - Altera EPM7064LC68-15 CPLD, labelled 'ASCA DR0' (PLCC68)
+ PST592D - System Reset IC (SOIC4)
+  ADM485 - Analog Devices +ADM485 5V Low Power EIA RS-485 Transceiver (SOIC8)
+   62256 - Hitachi HM62256 32kB x8-bit SRAM
+  LB1235 - Sanyo LB1235 65V 1.5A 4-channel Darlington Driver
+  LB1233 - Sanyo LB1233 Darlington Transistor Array with Built-in Current Limiting Resistors
+ MB87078 - Fujitsu MB87078 Electronic Volume Control IC (SOIC24)
+ LC78815 - Sanyo LC78815 2-Channel 16-Bit D/A Converter (SOIC20)
+  LA4705 - Sanyo LA4705 15W 2-channel Power Amplifier
+    J101 - 34 pin flat cable connector for filter board
+    J102 - 50 pin flat cable connector for filter board
+    J104 - 8 pin JVS power connector (+5V, +12V, +3.3V)
+    J105 - 64 pin connector for connection of Main PCB
+
+This board is used with Rapid River but also works with Final Furlong.
+
+
+Other Boards
+------------
+
+GORgON AV PCB
+8664960301 (8664970301)
+|------------------------------------|
+|J2   J3     J4        J5       J6   |
+|            BD-8                    |
+|  PC410  74AC244 NJM2100*           |
+|    74AC00  LC78815       NJM2100*  |
+|             J1    LC78815          |
+|------------------------------------|
+Notes: (* = these parts on bottom side of PCB)
+     J1 - 64 pin connector for connection to Main PCB
+     J2 - 10 pin connector
+     J3 - 15 pin HD15 DSUB connector
+     J4 - Dual Red/White RCA Jacks (Twin Stereo Audio)
+     J5 - USB-A connector
+     J6 - 6 pin power input connector (GND, GND, GND, 5V, 5V, 12V)
+   BD-8 - TDK ZBDS5101-8 Ferrite Bead SMD Array
+  PC410 - Sharp PC410 Photocoupler
+ 74AC00 - 74AC00 Quad 2-Input NAND Gate
+74AC244 - 74AC244 Octal Buffer/Line Driver with Tri-state Outputs
+NJM2100 - New Japan Radio Co. NJM2100 Dual Operational Amplifier
+LC78815 - Sanyo LC78815 2-Channel 16-Bit D/A Converter
+
+This board plugs into the mainboard used for Final Furlong and connects to ASCA-1A I/O PCB.
+
+
+V187 ASCA-2B PCB
+2477960201 (2477970201)
+|-----------------------------------------------|
+|                                               |
+|  J207      J204     J206       J205     J203  |
+|                                               |
+|                                               |
+|                                               |
+|          J202*                    J201*       |
+|-----------------------------------------------|
+Notes: (* = these parts on bottom side of PCB)
+      J201 - 34 pin flat cable connector for connection to ASCA-2A I/O PCB
+      J202 - 50 pin flat cable connector for connection to ASCA-2A I/O PCB
+      J203 - 9 pin connector. Pinout: 1 RED, 2 GREEN, 3 BLUE, 4 GND, 5 CSYNC, 6 SPK L+, 7 SPK R-, 8 SPK R+, 9 SPK L-
+      J204 - 15 pin connector. Pinout: 1 GND, 2 12V, 3 GND, 4 5K-POT, 5 5K-POT, 6 SELECT, 7 NC, 8 NC, 9 UP, 10 5V, 11 NC, 12 NC, 13 LAMP, 14 START, 15 DOWN
+             When wired to Final Furlong changes are: 11 RIGHT, 14 LEFT
+      J205 - 6 pin connector. Pinout: 1 SERVICE, 2 TEST, 3 COIN, 4 GND, 5 NC, 6 NC
+      J206 - 12 pin connector
+      J207 - 12 pin connector. Pinout: 1 SOL FR, 2 SOL FL, 3 SOL RR, 4 SOL RL, 5 12V, 6 NC, 7 5K POT RL, 8 GND, 9 5K POT FR, 10 5K POT FL, 11 5K POT RR, 12 5V
+             FR/FL/RR/RL means Front Left, Front Right, Rear Right, Rear Left. SOL means Solenoid.
+
+This is the filter board bolted to the outside of the metal box for Rapid River. It plugs into V187 ASCA-2A I/O PCB with 2 flat cables.
+It can also be used with Final Furlong when wired correctly.
+
 
 */
 
@@ -1339,6 +1464,8 @@ Notes:
 
 #include <cfloat>
 
+
+namespace {
 
 #define JVSCLOCK    (XTAL(14'745'600))
 
@@ -1805,13 +1932,12 @@ void namcos23_state::c435_state_set_projection_matrix_line(const uint16_t *param
 	//   line 2: 0 1 -(sy-b)/(sx/t) 0  0 -1 -(sy+b)/(sx/t) 0
 	//   line 3: 0 0 -1             c  0  0              0 sx/t
 
-	char buf[4096];
-	char *p = buf;
-	p += sprintf(p, "projection matrix line:");
+	std::ostringstream buf;
+	buf << "projection matrix line:";
 	for(int i=0; i<8; i++)
-		p += sprintf(p, " %f", f24_to_f32((param[2*i+1] << 16) | param[2*i+2]));
-	p += sprintf(p, "\n");
-	logerror(buf);
+		util::stream_format(buf, " %f", f24_to_f32((param[2*i+1] << 16) | param[2*i+2]));
+	buf << "\n";
+	logerror(std::move(buf).str());
 }
 
 void namcos23_state::c435_state_set(uint16_t type, const uint16_t *param)
@@ -1820,13 +1946,12 @@ void namcos23_state::c435_state_set(uint16_t type, const uint16_t *param)
 	case 0x0001: c435_state_set_interrupt(param); break;
 	case 0x00c8: c435_state_set_projection_matrix_line(param); break;
 	default: {
-		char buf[4096];
-		char *p = buf;
-		p += sprintf(buf, "WARNING: Unhandled state type %04x :", type);
+		std::ostringstream buf;
+		util::stream_format(buf, "WARNING: Unhandled state type %04x :", type);
 		for(int i=0; i<c435_get_state_entry_size(type); i++)
-			p += sprintf(p, " %04x", param[i]);
-		p += sprintf(p, "\n");
-		logerror(buf);
+			util::stream_format(buf, " %04x", param[i]);
+		buf << "\n";
+		logerror(std::move(buf).str());
 		break;
 	}
 	}
@@ -2067,13 +2192,12 @@ void namcos23_state::c435_pio_w(uint16_t data)
 	}
 
 	if(!known) {
-		char buf[4096];
-		char *p = buf;
-		p += sprintf(p, "c435 -");
+		std::ostringstream buf;
+		buf << "c435 -";
 		for(int i=0; i<m_c435_buffer_pos; i++)
-			p += sprintf(p, " %04x", m_c435_buffer[i]);
-		p += sprintf(p, "\n");
-		logerror(buf);
+			util::stream_format(buf, " %04x", m_c435_buffer[i]);
+		buf << "\n";
+		logerror(std::move(buf).str());
 	}
 
 	m_c435_buffer_pos = 0;
@@ -4061,7 +4185,7 @@ ROM_START( finfurl )
 	ROM_LOAD16_WORD_SWAP( "ff2vera.ic3",  0x000000, 0x080000, CRC(ab681078) SHA1(ec8367404458a54893ab6bea29c8a2ba3272b816) )
 
 	ROM_REGION( 0x40000, "iocpu", 0 )   /* I/O board HD643334 H8/3334 MCU code */
-	ROM_LOAD( "asca1_io-a.ic2", 0x000000, 0x040000, CRC(77cdf69a) SHA1(497af1059f85c07bea2dd0d303481623f6019dcf) )
+	ROM_LOAD( "asc1_io-a.ic13", 0x000000, 0x040000, CRC(77cdf69a) SHA1(497af1059f85c07bea2dd0d303481623f6019dcf) )
 
 	ROM_REGION32_BE( 0x800000, "data", 0 )  /* data */
 	ROM_LOAD16_BYTE( "ff2mtah.3j",   0x000000, 0x400000, CRC(161003cd) SHA1(04409333a4776b17700fc6d1aa06a39560132e03) )
@@ -4252,7 +4376,7 @@ ROM_END
 ROM_START( motoxgov1a )
 	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
 	ROM_LOAD16_BYTE( "mg1vera.ic2",  0x000000, 0x200000, CRC(5ba13d9e) SHA1(7f6484df644772f2478155c05844532f8abbd196) )
-	ROM_LOAD16_BYTE( "mg1vera.ic1",  0x000001, 0x200000, CRC(6b2bda52) SHA1(922ea739c8a62c7147126bf20ed3ffe8faec8842) )
+	ROM_LOAD16_BYTE( "mg1vera.ic1",  0x000001, 0x200000, CRC(193b463e) SHA1(f62eed49f7f8bf01b8b4deb1578ddee1d4a54ca3) )
 
 	ROM_REGION( 0x80000, "subcpu", 0 )  /* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "mg3vera.ic3",  0x000000, 0x080000, CRC(9e3d46a8) SHA1(9ffa5b91ea51cc0fb97def25ce47efa3441f3c6f) )
@@ -5453,6 +5577,8 @@ ROM_START( crszonev2a )
 	ROM_LOAD( "csz1ccrl.7m",  0x000000, 0x400000, CRC(1c20768d) SHA1(6cf4280e26f3625d6f750837bf344163e7e93c3d) )
 	ROM_LOAD( "csz1ccrh.7k",  0x000000, 0x200000, CRC(bc2fa03c) SHA1(e63d8e75494a383bf9a213edfa9c472a010f8efe) )
 ROM_END
+
+} // anonymous namespace
 
 
 /* Games */

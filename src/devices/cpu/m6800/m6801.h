@@ -207,7 +207,7 @@ protected:
 class hd6301_cpu_device : public m6801_cpu_device
 {
 protected:
-	hd6301_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	hd6301_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const m6800_cpu_device::op_func *insn, const uint8_t *cycles, address_map_constructor internal = address_map_constructor());
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
@@ -246,7 +246,6 @@ class hd6303r_cpu_device : public hd6301_cpu_device
 public:
 	hd6303r_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
-
 
 class hd6301x_cpu_device : public hd6301_cpu_device
 {

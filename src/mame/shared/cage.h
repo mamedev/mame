@@ -6,8 +6,8 @@
 
 ****************************************************************************/
 
-#ifndef MAME_AUDIO_CAGE_H
-#define MAME_AUDIO_CAGE_H
+#ifndef MAME_SHARED_CAGE_H
+#define MAME_SHARED_CAGE_H
 
 #pragma once
 
@@ -123,4 +123,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(ATARI_CAGE_SEATTLE, atari_cage_seattle_device)
 
-#endif // MAME_AUDIO_CAGE_H
+#endif // MAME_SHARED_CAGE_H

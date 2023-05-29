@@ -16,8 +16,6 @@ public:
 	template <typename T> void set_cpu(T &&maintag) { m_maincpu.set_tag(std::forward<T>(maintag)); }
 	auto port_r_callback() { return m_port_r_cb.bind(); }
 	void set_rambase(u16* rambase) { m_ram16 = rambase; }
-	void set_delay_scale(int delay_scale) { m_delay_scale = delay_scale; }
-	void set_is_unsafe(int is_unsafe) { m_is_unsafe = is_unsafe; }
 
 	inline u16 READ_NEXT_WORD(offs_t *addr);
 
@@ -36,8 +34,8 @@ public:
 
 	u16* m_ram16;
 	u32 m_gfx_addr;
-	u32 m_gfx_scroll_0_x, m_gfx_scroll_0_y;
-	u32 m_gfx_scroll_1_x, m_gfx_scroll_1_y;
+	u32 m_gfx_scroll_x, m_gfx_scroll_y;
+	u32 m_gfx_clip_x, m_gfx_clip_y;
 
 	int m_gfx_size;
 	std::unique_ptr<bitmap_rgb32> m_bitmaps;
@@ -47,17 +45,12 @@ public:
 	size_t m_main_ramsize; // type D has double the main ram
 	size_t m_main_rammask;
 
-	int m_is_unsafe;
-	int m_delay_scale;
-
 	void install_handlers(int addr1, int addr2);
 
-	// thread safe mode, with no delays & shadow ram copy
 	u32 blitter_r(offs_t offset, u32 mem_mask = ~0);
 	void blitter_w(address_space &space, offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 m_gfx_addr_shadowcopy;
-	u32 m_gfx_scroll_0_x_shadowcopy, m_gfx_scroll_0_y_shadowcopy;
-	u32 m_gfx_scroll_1_x_shadowcopy, m_gfx_scroll_1_y_shadowcopy;
+	u32 m_gfx_clip_x_shadowcopy, m_gfx_clip_y_shadowcopy;
 	std::unique_ptr<u16[]> m_ram16_copy;
 	inline void gfx_upload_shadow_copy(address_space &space, offs_t *addr);
 	inline void gfx_create_shadow_copy(address_space &space);
@@ -69,15 +62,15 @@ public:
 	u32 gfx_ready_r();
 	void gfx_exec_w(address_space &space, offs_t offset, u32 data, u32 mem_mask = ~0);
 
-	// for thread unsafe mode with blitter delays, no shadow copy of RAM
-	u32 blitter_r_unsafe(offs_t offset, u32 mem_mask = ~0);
-	void blitter_w_unsafe(address_space &space, offs_t offset, u32 data, u32 mem_mask = ~0);
-	u32 gfx_ready_r_unsafe();
-	void gfx_exec_w_unsafe(offs_t offset, u32 data, u32 mem_mask = ~0);
-	void gfx_exec_unsafe(void);
-	static void *blit_request_callback_unsafe(void *param, int threadid);
-
 protected:
+	// Number of bytes that are read each time Blitter fetches operations from SRAM.
+	static inline constexpr int OPERATION_CHUNK_SIZE_BYTES = 64;
+
+	// Approximate time it takes to fetch a chunk of operations.
+	// This is composed of the time that the Blitter holds the Bus Request (BREQ) signal
+	// of the SH-3, as well as the overhead between requests.
+	static inline constexpr int OPERATION_READ_CHUNK_INTERVAL_NS = 700;
+
 	// The firmware versions
 	enum {
 		// Used by ibara & mushisama
@@ -827,6 +820,27 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// Called when a Blitter operation does not cause any draws/uploads to be performed.
+	// If multiple draws in a row are performed outside of an active clipping area,
+	// the Blitter will be reading operations from SRAM in 64 byte chunks, but not
+	// actually performing any work.
+	// This will still be visible from the CPU as Blitter being busy, until the
+	// operation list has exited.
+	//
+	// TODO: Having 64 bytes of non-drawing operations in a row will only cause the Blitter
+	//   to idle if the operations are read from the same 64 byte chunk (and not split between two).
+	//   More proper handling of this would be to change the reads from SRAM to be done 64 bytes at the time
+	//   into a FIFO, but that's a fair amount of work.
+	void idle_blitter(u8 operation_size_bytes)
+	{
+		m_blit_idle_op_bytes += operation_size_bytes;
+		if (m_blit_idle_op_bytes >= OPERATION_CHUNK_SIZE_BYTES)
+		{
+			m_blit_idle_op_bytes -= OPERATION_CHUNK_SIZE_BYTES;
+			m_blit_delay_ns += OPERATION_READ_CHUNK_INTERVAL_NS;
+		}
+	}
+
 	TIMER_CALLBACK_MEMBER(blitter_delay_callback);
 
 	osd_work_queue *m_work_queue;
@@ -835,6 +849,8 @@ protected:
 	// blit timing
 	emu_timer *m_blitter_delay_timer;
 	int m_blitter_busy;
+	u64 m_blit_delay_ns;
+	u16 m_blit_idle_op_bytes;
 
 	// fpga firmware
 	std::vector<u8> m_firmware;
@@ -856,7 +872,6 @@ protected:
 	static u8 colrtable[0x20][0x40];
 	static u8 colrtable_rev[0x20][0x40];
 	static u8 colrtable_add[0x20][0x20];
-	static u64 blit_delay;
 
 	static const blitfunction f0_ti1_tr1_blit_funcs[64];
 	static const blitfunction f0_ti1_tr0_blit_funcs[64];

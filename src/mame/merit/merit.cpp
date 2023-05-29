@@ -78,6 +78,9 @@ Merit Riviera Notes - There are several known versions:
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define MASTER_CLOCK            (XTAL(10'000'000))
 #define CPU_CLOCK               (MASTER_CLOCK / 4)
 #define PIXEL_CLOCK             (MASTER_CLOCK / 1)
@@ -2647,6 +2650,9 @@ void merit_state::init_dtrvwz5()
 
 	m_decryption_key = 6;
 }
+
+} // anonymous namespace
+
 
 /* Gambling type games */
 

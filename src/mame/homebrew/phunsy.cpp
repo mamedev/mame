@@ -27,17 +27,22 @@ Rom banking (in U bank):
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/s2650/s2650.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "machine/keyboard.h"
 #include "sound/spkrdev.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+#define VERBOSE 1
+#include "logmacro.h"
 
-#define LOG 1
+
+namespace {
 
 class phunsy_state : public driver_device
 {
@@ -117,8 +122,7 @@ void phunsy_state::phunsy_data(address_map &map)
 
 void phunsy_state::phunsy_ctrl_w(uint8_t data)
 {
-	if (LOG)
-		logerror("%s: phunsy_ctrl_w %02x\n", machine().describe_context(), data);
+	LOG("%s: phunsy_ctrl_w %02x\n", machine().describe_context(), data);
 
 	// Q-bank
 	membank("bankq")->set_entry(data & 15);
@@ -133,8 +137,7 @@ void phunsy_state::phunsy_ctrl_w(uint8_t data)
 
 void phunsy_state::phunsy_data_w(uint8_t data)
 {
-	if (LOG)
-		logerror("%s: phunsy_data_w %02x\n", machine().describe_context(), data);
+	LOG("%s: phunsy_data_w %02x\n", machine().describe_context(), data);
 
 	m_data_out = data;
 
@@ -160,8 +163,7 @@ uint8_t phunsy_state::phunsy_data_r()
 {
 	uint8_t data = 0xff;
 
-	//if (LOG)
-		//logerror("%s: phunsy_data_r\n", machine().describe_context());
+	//LOG("%s: phunsy_data_r\n", machine().describe_context());
 
 	if ( m_data_out & 0x02 )
 	{
@@ -283,41 +285,34 @@ GFXDECODE_END
 // quickloads can start from various addresses, and the files have no header.
 QUICKLOAD_LOAD_MEMBER(phunsy_state::quickload_cb)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	uint16_t i;
-	uint16_t quick_addr = 0x1800;
-	std::vector<uint8_t> quick_data;
-	image_init_result result = image_init_result::FAIL;
-	int quick_length = image.length();
+	int const quick_length = image.length();
 	if (quick_length > 0x4000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "File too long");
-		image.message(" File too long");
-	}
-	else
-	{
-		quick_data.resize(quick_length);
-		membank("bankru")->set_entry(0); // point at ram
+		return std::make_pair(image_error::INVALIDLENGTH, "File too long (must be no larger than 16K)");
 
-		uint16_t exec_addr = quick_addr + 2;
+	std::vector<uint8_t> quick_data;
+	quick_data.resize(quick_length);
+	if (image.fread(&quick_data[0], quick_length) != quick_length)
+		return std::make_pair(image_error::UNSPECIFIED, "Cannot read the file");
 
-		for (i = 0; i < quick_length; i++)
-			space.write_byte(i+quick_addr, quick_data[i]);
+	constexpr uint16_t QUICK_ADDR = 0x1800;
+	constexpr uint16_t EXEC_ADDR = QUICK_ADDR + 2;
 
-		/* display a message about the loaded quickload */
-		image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
+	membank("bankru")->set_entry(0); // point at RAM
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	for (uint16_t i = 0; i < quick_length; i++)
+		space.write_byte(i + QUICK_ADDR, quick_data[i]);
 
-		// Start the quickload
-		m_maincpu->set_state_int(S2650_R0, exec_addr>>8);
-		m_maincpu->set_state_int(S2650_R1, 0x08);
-		m_maincpu->set_state_int(S2650_R2, 0xe0);
-		m_maincpu->set_state_int(S2650_R3, 0x83);
-		m_maincpu->set_state_int(S2650_PC, exec_addr);
+	// display a message about the loaded quickload
+	image.message(" Quickload: size=%04X : exec=%04X", quick_length, EXEC_ADDR);
 
-		result = image_init_result::PASS;
-	}
+	// Start the quickload
+	m_maincpu->set_state_int(S2650_R0, EXEC_ADDR >> 8);
+	m_maincpu->set_state_int(S2650_R1, 0x08);
+	m_maincpu->set_state_int(S2650_R2, 0xe0);
+	m_maincpu->set_state_int(S2650_R3, 0x83);
+	m_maincpu->set_state_int(S2650_PC, EXEC_ADDR);
 
-	return result;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void phunsy_state::init_phunsy()
@@ -396,6 +391,9 @@ ROM_START( phunsy )
 	/* 16 x 16KB RAM banks */
 	ROM_REGION( 0x40000, "ram_4000", ROMREGION_ERASEFF )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

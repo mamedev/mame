@@ -63,10 +63,10 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG_SETUP    (1U <<  1)
-#define LOG_READ     (1U <<  2)
-#define LOG_DISPLAY  (1U <<  3)
-#define LOG_KEYBOARD (1U <<  4)
+#define LOG_SETUP    (1U << 1)
+#define LOG_READ     (1U << 2)
+#define LOG_DISPLAY  (1U << 3)
+#define LOG_KEYBOARD (1U << 4)
 
 //#define VERBOSE (LOG_KEYBOARD)
 //#define LOG_OUTPUT_FUNC printf
@@ -82,6 +82,9 @@
 #else
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
+
+
+namespace {
 
 #define PIA1_TAG "pia1"
 #define PIA2_TAG "pia2"
@@ -922,6 +925,9 @@ ROM_START( mp68a ) // ROM image from http://elektronikforumet.com/forum/viewtopi
 	ROM_LOAD( "didacta.bin", 0x0800, 0x0200, CRC(aa05e1ce) SHA1(9ce8223efd274045b43ceca3529e037e16e99fdf) )
 	ROM_LOAD( "didactb.bin", 0x0a00, 0x0200, CRC(592898dc) SHA1(2962f4817712cae97f3ab37b088fc73e66535ff8) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT    CLASS          INIT        COMPANY               FULLNAME           FLAGS
 COMP( 1979, mp68a,   0,      0,      mp68a,   mp68a,   mp68a_state,   empty_init, "Didact AB",          "mp68a",           MACHINE_NO_SOUND_HW )

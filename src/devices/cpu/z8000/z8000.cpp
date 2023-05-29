@@ -252,7 +252,7 @@ uint16_t z8002_device::RDPORT_W(int mode, uint16_t addr)
 {
 	memory_access<16, 1, 0, ENDIANNESS_BIG>::specific &space = (mode == 0) ? m_io : m_sio;
 	if (BIT(addr, 0))
-		return swapendian_int16(space.read_word(addr & ~1, 0x00ff));
+		return swapendian_int16(space.read_word(addr & ~1, 0xffff));
 	else
 		return space.read_word(addr);
 }
@@ -268,7 +268,7 @@ void z8002_device::WRPORT_W(int mode, uint16_t addr, uint16_t value)
 {
 	memory_access<16, 1, 0, ENDIANNESS_BIG>::specific &space = (mode == 0) ? m_io : m_sio;
 	if (BIT(addr, 0))
-		space.write_word(addr & ~1, swapendian_int16(value), 0x00ff);
+		space.write_word(addr & ~1, swapendian_int16(value), 0xffff);
 	else
 		space.write_word(addr, value, 0xffff);
 }
@@ -393,7 +393,7 @@ void z8002_device::Interrupt()
 	else
 	if (m_irq_req & Z8000_SEGTRAP)
 	{
-		//standard_irq_callback(SEGT_LINE);
+		//standard_irq_callback(SEGT_LINE, m_pc);
 		m_irq_vec = m_iack_in[0](m_pc);
 
 		CHANGE_FCW(fcw | F_S_N | F_SEG_Z8001());/* switch to segmented (on Z8001) system mode */
@@ -408,7 +408,7 @@ void z8002_device::Interrupt()
 	else
 	if (m_irq_req & Z8000_NMI)
 	{
-		standard_irq_callback(NMI_LINE);
+		standard_irq_callback(NMI_LINE, m_pc);
 		m_irq_vec = m_iack_in[1](m_pc);
 		m_halt = false;
 
@@ -425,7 +425,7 @@ void z8002_device::Interrupt()
 	else
 	if ((m_irq_req & Z8000_NVI) && (m_fcw & F_NVIE))
 	{
-		standard_irq_callback(NVI_LINE);
+		standard_irq_callback(NVI_LINE, m_pc);
 		m_irq_vec = m_iack_in[2](m_pc);
 		m_halt = false;
 
@@ -441,7 +441,7 @@ void z8002_device::Interrupt()
 	else
 	if ((m_irq_req & Z8000_VI) && (m_fcw & F_VIE))
 	{
-		standard_irq_callback(VI_LINE);
+		standard_irq_callback(VI_LINE, m_pc);
 		m_irq_vec = m_iack_in[3](m_pc);
 		m_halt = false;
 

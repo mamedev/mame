@@ -241,6 +241,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 #define MASTER_CLOCK    XTAL(8'000'000)   /* from CPU Board */
 #define SECONDARY_CLOCK XTAL(6'000'000)   /* from GFX Board */
 
@@ -669,6 +671,8 @@ ROM_START( moviecrd )
 	ROM_LOAD16_BYTE( "v1.2_hi.gfx", 0x00000, 0x10000, CRC(0b62d1a8) SHA1(4156379cc000cbea997b1c21cebea9021fa697b2) )
 	ROM_LOAD16_BYTE( "v1.2_lo.gfx", 0x00001, 0x10000, CRC(70e8e9d5) SHA1(c026493b4bd302d389219ba564aafa42fca86491) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************

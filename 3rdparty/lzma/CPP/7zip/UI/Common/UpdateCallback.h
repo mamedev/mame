@@ -15,6 +15,18 @@
 
 #include "OpenArchive.h"
 
+struct CArcToDoStat
+{
+  CDirItemsStat2 NewData;
+  CDirItemsStat2 OldData;
+  CDirItemsStat2 DeleteData;
+
+  UInt64 Get_NumDataItems_Total() const
+  {
+    return NewData.Get_NumDataItems2() + OldData.Get_NumDataItems2();
+  }
+};
+
 #define INTERFACE_IUpdateCallbackUI(x) \
   virtual HRESULT WriteSfx(const wchar_t *name, UInt64 size) x; \
   virtual HRESULT SetTotal(UInt64 size) x; \
@@ -22,17 +34,24 @@
   virtual HRESULT SetRatioInfo(const UInt64 *inSize, const UInt64 *outSize) x; \
   virtual HRESULT CheckBreak() x; \
   /* virtual HRESULT Finalize() x; */ \
-  virtual HRESULT SetNumItems(UInt64 numItems) x; \
+  virtual HRESULT SetNumItems(const CArcToDoStat &stat) x; \
   virtual HRESULT GetStream(const wchar_t *name, bool isDir, bool isAnti, UInt32 mode) x; \
   virtual HRESULT OpenFileError(const FString &path, DWORD systemError) x; \
   virtual HRESULT ReadingFileError(const FString &path, DWORD systemError) x; \
   virtual HRESULT SetOperationResult(Int32 opRes) x; \
   virtual HRESULT ReportExtractResult(Int32 opRes, Int32 isEncrypted, const wchar_t *name) x; \
-  virtual HRESULT ReportUpdateOpeartion(UInt32 op, const wchar_t *name, bool isDir) x; \
+  virtual HRESULT ReportUpdateOperation(UInt32 op, const wchar_t *name, bool isDir) x; \
   /* virtual HRESULT SetPassword(const UString &password) x; */ \
   virtual HRESULT CryptoGetTextPassword2(Int32 *passwordIsDefined, BSTR *password) x; \
   virtual HRESULT CryptoGetTextPassword(BSTR *password) x; \
   virtual HRESULT ShowDeleteFile(const wchar_t *name, bool isDir) x; \
+
+  /*
+  virtual HRESULT ReportProp(UInt32 indexType, UInt32 index, PROPID propID, const PROPVARIANT *value) x; \
+  virtual HRESULT ReportRawProp(UInt32 indexType, UInt32 index, PROPID propID, const void *data, UInt32 dataSize, UInt32 propType) x; \
+  virtual HRESULT ReportFinished(UInt32 indexType, UInt32 index, Int32 opRes) x; \
+  */
+ 
   /* virtual HRESULT CloseProgress() { return S_OK; } */
 
 struct IUpdateCallbackUI
@@ -58,6 +77,7 @@ struct CKeyKeyValPair
 class CArchiveUpdateCallback:
   public IArchiveUpdateCallback2,
   public IArchiveUpdateCallbackFile,
+  // public IArchiveUpdateCallbackArcProp,
   public IArchiveExtractCallbackMessage,
   public IArchiveGetRawProps,
   public IArchiveGetRootProps,
@@ -75,9 +95,12 @@ class CArchiveUpdateCallback:
   UInt32 _hardIndex_From;
   UInt32 _hardIndex_To;
 
+  void UpdateProcessedItemStatus(unsigned dirIndex);
+
 public:
   MY_QUERYINTERFACE_BEGIN2(IArchiveUpdateCallback2)
     MY_QUERYINTERFACE_ENTRY(IArchiveUpdateCallbackFile)
+    // MY_QUERYINTERFACE_ENTRY(IArchiveUpdateCallbackArcProp)
     MY_QUERYINTERFACE_ENTRY(IArchiveExtractCallbackMessage)
     MY_QUERYINTERFACE_ENTRY(IArchiveGetRawProps)
     MY_QUERYINTERFACE_ENTRY(IArchiveGetRootProps)
@@ -92,6 +115,7 @@ public:
 
   INTERFACE_IArchiveUpdateCallback2(;)
   INTERFACE_IArchiveUpdateCallbackFile(;)
+  // INTERFACE_IArchiveUpdateCallbackArcProp(;)
   INTERFACE_IArchiveExtractCallbackMessage(;)
   INTERFACE_IArchiveGetRawProps(;)
   INTERFACE_IArchiveGetRootProps(;)
@@ -101,14 +125,16 @@ public:
 
   CRecordVector<UInt32> _openFiles_Indexes;
   FStringVector _openFiles_Paths;
+  // CRecordVector< CInFileStream* > _openFiles_Streams;
 
   bool AreAllFilesClosed() const { return _openFiles_Indexes.IsEmpty(); }
   virtual HRESULT InFileStream_On_Error(UINT_PTR val, DWORD error);
-  virtual void InFileStream_On_Destroy(UINT_PTR val);
+  virtual void InFileStream_On_Destroy(CInFileStream *stream, UINT_PTR val);
 
   CRecordVector<UInt64> VolumesSizes;
   FString VolName;
   FString VolExt;
+  UString ArcFileName; // without path prefix
 
   IUpdateCallbackUI *Callback;
 
@@ -120,8 +146,12 @@ public:
   const CObjectVector<CArcItem> *ArcItems;
   const CRecordVector<CUpdatePair2> *UpdatePairs;
   const UStringVector *NewNames;
+  int CommentIndex;
+  const UString *Comment;
 
+  bool PreserveATime;
   bool ShareForWrite;
+  bool StopAfterOpenError;
   bool StdInMode;
 
   bool KeepOriginalItemNames;
@@ -129,7 +159,20 @@ public:
   bool StoreHardLinks;
   bool StoreSymLinks;
 
+  bool StoreOwnerId;
+  bool StoreOwnerName;
+
+  /*
+  bool Need_ArcMTime_Report;
+  bool ArcMTime_WasReported;
+  CArcTime Reported_ArcMTime;
+  */
+  bool Need_LatestMTime;
+  bool LatestMTime_Defined;
+  CFiTime LatestMTime;
+
   Byte *ProcessedItemsStatuses;
+
 
 
   CArchiveUpdateCallback();
@@ -137,9 +180,9 @@ public:
   bool IsDir(const CUpdatePair2 &up) const
   {
     if (up.DirIndex >= 0)
-      return DirItems->Items[up.DirIndex].IsDir();
+      return DirItems->Items[(unsigned)up.DirIndex].IsDir();
     else if (up.ArcIndex >= 0)
-      return (*ArcItems)[up.ArcIndex].IsDir;
+      return (*ArcItems)[(unsigned)up.ArcIndex].IsDir;
     return false;
   }
 };

@@ -464,8 +464,9 @@ void ata_hle_device::read_buffer_empty()
 
 	m_status &= ~IDE_STATUS_DRQ;
 
-	if ((multi_word_dma_mode() >= 0) || (ultra_dma_mode() >= 0))
-		set_dmarq(CLEAR_LINE);
+	// Doesn't matter if we're in dma or not, when the buffer is empty
+	// there's no more request to be had
+	set_dmarq(CLEAR_LINE);
 
 	if (ultra_dma_mode() >= 0) {
 		m_buffer_empty_timer->enable(true);
@@ -481,8 +482,9 @@ void ata_hle_device::write_buffer_full()
 
 	m_status &= ~IDE_STATUS_DRQ;
 
-	if ((multi_word_dma_mode() >= 0) || (ultra_dma_mode() >= 0))
-		set_dmarq(CLEAR_LINE);
+	// Doesn't matter if we're in dma or not, when the buffer is full
+	// there's no more request to be had
+	set_dmarq(CLEAR_LINE);
 
 	process_buffer();
 }
@@ -583,10 +585,6 @@ uint16_t ata_hle_device::read_dma()
 
 uint16_t ata_hle_device::read_cs0(offs_t offset, uint16_t mem_mask)
 {
-	/* logit */
-//  if (offset != IDE_CS0_DATA_RW && offset != IDE_CS0_STATUS_R)
-		LOG(("%s:IDE cs0 read at %X, mem_mask=%X\n", machine().describe_context(), offset, mem_mask));
-
 	uint16_t result = 0xffff;
 
 	if (device_selected() || m_single_device)
@@ -694,6 +692,10 @@ uint16_t ata_hle_device::read_cs0(offs_t offset, uint16_t mem_mask)
 			}
 		}
 	}
+
+	/* logit */
+//  if (offset != IDE_CS0_DATA_RW && offset != IDE_CS0_STATUS_R)
+		LOG(("%s:IDE cs0 read %X at %X (err: %X), mem_mask=%X\n", machine().describe_context(), result, offset, m_error, mem_mask));
 
 	/* return the result */
 	return result;
@@ -890,6 +892,7 @@ void ata_hle_device::write_cs0(offs_t offset, uint16_t data, uint16_t mem_mask)
 				else if (device_selected() || m_command == IDE_COMMAND_DIAGNOSTIC)
 				{
 					m_command = data;
+					m_error = IDE_ERROR_NONE;
 
 					/* implicitly clear interrupts & dmarq here */
 					set_irq(CLEAR_LINE);

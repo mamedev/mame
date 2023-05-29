@@ -44,6 +44,9 @@ TODO: boot tests fail
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 #define HP9816_CHDIMX 8
 #define HP9816_CHDIMY 16
 #define HP9816_ROWX 80
@@ -146,9 +149,6 @@ private:
 	uint8_t m_videoram[0x4000];
 	uint8_t m_screenram[0x800];
 
-	uint16_t buserror_r();
-	void buserror_w(uint16_t data);
-
 	uint16_t hp9k_videoram_r(offs_t offset, uint16_t mem_mask = ~0);
 	void hp9k_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
@@ -161,7 +161,7 @@ private:
 	uint16_t leds_r(offs_t offset, uint16_t mem_mask = ~0);
 	void leds_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void kbd_put(uint8_t data);
+	[[maybe_unused]] void kbd_put(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -292,35 +292,22 @@ void hp9k_state::hp9k_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask
 	}
 }
 
-uint16_t hp9k_state::buserror_r()
-{
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-	return 0;
-}
-
-void hp9k_state::buserror_w(uint16_t data)
-{
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-}
-
 void hp9k_state::hp9k_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x000909).rom().region("bootrom", 0);
 	map(0x00090a, 0x00090d).rw(FUNC(hp9k_state::leds_r), FUNC(hp9k_state::leds_w));
 	map(0x00090e, 0x00ffff).rom().region("bootrom", 0x90e);
-	map(0x010000, 0x427fff).rw(FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
+	map(0x010000, 0x427fff).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
 	map(0x428000, 0x428fff).rw(FUNC(hp9k_state::keyboard_r), FUNC(hp9k_state::keyboard_w));
-	map(0x429000, 0x50ffff).rw(FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
+	map(0x429000, 0x50ffff).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
 	map(0x510000, 0x51ffff).rw(FUNC(hp9k_state::hp9k_videoram_r), FUNC(hp9k_state::hp9k_videoram_w));
-	map(0x520000, 0x52ffff).rw(FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
+	map(0x520000, 0x52ffff).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
 	map(0x530000, 0x53ffff).ram(); // graphic memory
-	map(0x540000, 0x5effff).rw(FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
+	map(0x540000, 0x5effff).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
 	map(0x5f0000, 0x5f3fff).rw(FUNC(hp9k_state::hp9k_prom_r), FUNC(hp9k_state::hp9k_prom_w));
-	//map(0x5f0000, 0x5f3fff).rw(FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
-	map(0x5f4000, 0xfbffff).rw(FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
+	//map(0x5f0000, 0x5f3fff).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
+	map(0x5f4000, 0xfbffff).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
 	map(0xFC0000, 0xffffff).ram(); // system ram
 }
 
@@ -429,6 +416,9 @@ ROM_START( hp9816 )
 	ROMX_LOAD( "rom30.bin", 0x0000, 0x10000, CRC(05c07e75) SHA1(3066a65e6137482041f9a77d09ee2289fe0974aa), ROM_BIOS(1) )
 
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

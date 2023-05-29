@@ -16,6 +16,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class vt520_state : public driver_device
 {
 public:
@@ -148,6 +150,9 @@ ROM_START( vt520 )
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "23-010ed-00.e20", 0x0000, 0x80000, CRC(2502cc22) SHA1(0437c3107412f69e09d050fef003f2a81d8a3163)) // "(C)DEC94 23-010ED-00 // 9739 D" dumped from a VT520-A4 model
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

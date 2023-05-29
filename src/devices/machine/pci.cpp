@@ -938,6 +938,38 @@ void pci_host_device::config_data_w(offs_t offset, uint32_t data, uint32_t mem_m
 		root_config_write((config_address >> 16) & 0xff, (config_address >> 8) & 0xff, config_address & 0xfc, data, mem_mask);
 }
 
+uint32_t pci_host_device::config_data_ex_r(offs_t offset, uint32_t mem_mask)
+{
+	// is this a Type 0 or Type 1 configuration address? (page 31, PCI 2.2 Specification)
+	if ((config_address & 3) == 0)
+	{
+		const int devnum = 31 - count_leading_zeros_32(config_address & 0xfffff800);
+		return root_config_read(0, devnum << 3, config_address & 0xfc, mem_mask);
+	}
+	else if ((config_address & 3) == 1)
+		return config_address & 0x80000000 ? root_config_read((config_address >> 16) & 0xff, (config_address >> 8) & 0xff, config_address & 0xfc, mem_mask) : 0xffffffff;
+
+	logerror("pci: configuration address format %d unsupported", config_address & 3);
+	return 0xffffffff;
+}
+
+void pci_host_device::config_data_ex_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	// is this a Type 0 or Type 1 configuration address? (page 31, PCI 2.2 Specification)
+	if ((config_address & 3) == 0)
+	{
+		const int devnum = 31 - count_leading_zeros_32(config_address & 0xfffff800);
+		root_config_write(0, devnum << 3, config_address & 0xfc, data, mem_mask);
+	}
+	else if ((config_address & 3) == 1)
+	{
+		if (config_address & 0x80000000)
+			root_config_write((config_address >> 16) & 0xff, (config_address >> 8) & 0xff, config_address & 0xfc, data, mem_mask);
+	}
+	else
+		logerror("pci: configuration address format %d unsupported", config_address & 3);
+}
+
 uint32_t pci_host_device::root_config_read(uint8_t bus, uint8_t device, uint16_t reg, uint32_t mem_mask)
 {
 	if(bus == 0x00)

@@ -60,14 +60,14 @@
 		{ "type": "intenum", "name": "ntsc",            "text": "Enable NTSC",                           "default":  0,       "max":   1,       "min": 0,       "step": 1,       "format": "%s",    "screen": "any", "strings": [ "Off", "On" ] },
 		{ "type": "float",   "name": "a_value",         "text": "NTSC A Value",                          "default":  0.50,    "max":   1.00,    "min": 0.00,    "step": 0.01,    "format": "%1.2f", "screen": "raster" },
 		{ "type": "float",   "name": "b_value",         "text": "NTSC B Value",                          "default":  0.50,    "max":   1.00,    "min": 0.00,    "step": 0.01,    "format": "%1.2f", "screen": "raster" },
-		{ "type": "float",   "name": "cc_value",        "text": "NTSC Color Carrier (Hz)",               "default":  3.57954, "max":   3.67954, "min": 3.47954, "step": 0.00001, "format": "%1.5f", "screen": "raster" },
-		{ "type": "float",   "name": "o_value",         "text": "NTSC Outgoing Phase Offset",            "default":  0.00,    "max":   1.00,    "min": 0.00,    "step": 0.01,    "format": "%1.2f", "screen": "raster" },
+		{ "type": "float",   "name": "cc_value",        "text": "NTSC Color Carrier (MHz)",              "default": 3.5795455,"max":   3.67954, "min": 3.47954, "step": 0.00001, "format": "%1.5f", "screen": "raster" },
+		{ "type": "float",   "name": "o_value",         "text": "NTSC Outgoing Phase Offset (radians)",  "default":  0.00,    "max":   3.14,    "min":-3.14,    "step": 0.01,    "format": "%1.2f", "screen": "raster" },
 		{ "type": "float",   "name": "p_value",         "text": "NTSC Incoming Phase Pixel Clock Scale", "default":  1.00,    "max":   2.00,    "min": 0.00,    "step": 0.01,    "format": "%1.2f", "screen": "raster" },
 		{ "type": "float",   "name": "scan_time",       "text": "NTSC Scanline Duration (uSec)",         "default": 52.60,    "max": 150.00,    "min": 1.00,    "step": 0.1,     "format": "%3.1f", "screen": "raster" },
-		{ "type": "float",   "name": "notch_width",     "text": "NTSC Color Notch Filter Width",         "default":  2.00,    "max":   4.00,    "min": 1.00,    "step": 0.01,    "format": "%1.2f", "screen": "raster" },
-		{ "type": "float",   "name": "y_freq_response", "text": "NTSC Y Signal Bandwidth (Hz)",          "default":  6.00,    "max":  21.00,    "min": 0.00,    "step": 0.01,    "format": "%2.2f", "screen": "raster" },
-		{ "type": "float",   "name": "i_freq_response", "text": "NTSC I Signal Bandwidth (Hz)",          "default":  1.20,    "max":  21.00,    "min": 0.00,    "step": 0.01,    "format": "%2.2f", "screen": "raster" },
-		{ "type": "float",   "name": "q_freq_response", "text": "NTSC Q Signal Bandwidth (Hz)",          "default":  0.60,    "max":  21.00,    "min": 0.00,    "step": 0.01,    "format": "%2.2f", "screen": "raster" },
+		{ "type": "float",   "name": "notch_width",     "text": "NTSC Color Notch Filter Width (MHz)",   "default":  2.00,    "max":   4.00,    "min": 1.00,    "step": 0.01,    "format": "%1.2f", "screen": "raster" },
+		{ "type": "float",   "name": "y_freq_response", "text": "NTSC Y Signal Bandwidth (MHz)",         "default":  6.00,    "max":  21.00,    "min": 0.00,    "step": 0.01,    "format": "%2.2f", "screen": "raster" },
+		{ "type": "float",   "name": "i_freq_response", "text": "NTSC I Signal Bandwidth (MHz)",         "default":  1.20,    "max":  21.00,    "min": 0.00,    "step": 0.01,    "format": "%2.2f", "screen": "raster" },
+		{ "type": "float",   "name": "q_freq_response", "text": "NTSC Q Signal Bandwidth (MHz)",         "default":  0.60,    "max":  21.00,    "min": 0.00,    "step": 0.01,    "format": "%2.2f", "screen": "raster" },
 		{ "type": "float",   "name": "jitter_offset",   "text": "NTSC Frame Jitter Offset",              "default":  0.00,    "max":   2.00,    "min": 0.00,    "step": 0.01,    "format": "%1.2f", "screen": "raster" },
 
 		{ "type": "color", "name": "red_ratios", "text": "Red Output from ",   "default": [ 1.00, 0.00, 0.00 ], "max": [ 2.00, 2.00, 2.00 ], "min": [ 0.00, 0.00, 0.00 ], "step": 0.01, "format": "%1.2f", "screen": "raster" },
@@ -93,7 +93,6 @@
 		{ "type": "float", "name": "scanline_bright_scale",  "text": "Scanline Brightness Scale",  "default": 2.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
 		{ "type": "float", "name": "scanline_bright_offset", "text": "Scanline Brightness Offset", "default": 1.50, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
 		{ "type": "float", "name": "scanline_jitter_amount", "text": "Scanline Jitter Amount",     "default": 0.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
-		{ "type": "float", "name": "scanline_variation",     "text": "Scanline Variation",         "default": 1.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
 
 		{ "type": "intenum", "name": "shadow_tile_mode", "text": "Shadow Mask Tile Mode",    "default":  0,               "max": 1,                "min": 0,                "step": 1,     "format": "%s",    "screen": "any", "strings": [ "Screen", "Source" ] },
 		{ "type": "float",   "name": "shadow_alpha",     "text": "Shadow Mask Amount",       "default": 0.50,             "max": 1.00,             "min": 0.00,             "step": 0.01,  "format": "%1.2f", "screen": "crt" },
@@ -204,7 +203,6 @@
 			"input": [
 				{ "sampler": "s_tex", "texture": "screen" }
 			],
-			"applytint": true,
 			"output": "ntsc"
 		},
 		{
@@ -349,7 +347,6 @@
 			"input": [
 				{ "sampler": "s_tex", "texture": "screen" }
 			],
-			"applytint": true,
 			"output": "guest"
 		},
 		{   "effect": "hlsl/color",

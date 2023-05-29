@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_INCLUDES_BOSCO_H
-#define MAME_INCLUDES_BOSCO_H
+#ifndef MAME_NAMCO_BOSCO_H
+#define MAME_NAMCO_BOSCO_H
 
 #pragma once
 
@@ -54,4 +54,4 @@ private:
 	void bosco_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_BOSCO_H
+#endif // MAME_NAMCO_BOSCO_H

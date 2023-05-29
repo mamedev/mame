@@ -46,16 +46,6 @@ static inline uint32_t get_UINT32BE(UINT32BE word)
 	return (word.bytes[0] << 24) | (word.bytes[1] << 16) | (word.bytes[2] << 8) | word.bytes[3];
 }
 
-#ifdef UNUSED_FUNCTION
-static inline void set_UINT32BE(UINT32BE *word, uint32_t data)
-{
-	word->bytes[0] = (data >> 24) & 0xff;
-	word->bytes[1] = (data >> 16) & 0xff;
-	word->bytes[2] = (data >> 8) & 0xff;
-	word->bytes[3] = data & 0xff;
-}
-#endif
-
 /* disk image header */
 struct disk_image_header
 {
@@ -162,24 +152,20 @@ int ti990_hdc_device::get_id_from_device( device_t *device )
 /*
     Initialize hard disk unit and open a hard disk image
 */
-DEVICE_IMAGE_LOAD_MEMBER( ti990_hdc_device::load_hd )
+std::error_condition ti990_hdc_device::load_hd(device_image_interface &image)
 {
 	int id = get_id_from_device( &image.device() );
 	hd_unit_t *d;
-	hard_disk_file  *hd_file;
 
 	d = &m_d[id];
-	d->img = &image;
+	d->img = downcast<harddisk_image_device *>(&image);
 
-	hd_file = dynamic_cast<harddisk_image_device *>(&image)->get_hard_disk_file();
-
-	if ( hd_file )
+	if ( d->img->exists() )
 	{
 		d->format = format_mame;
-		d->hd_handle = hd_file;
 
 		/* use standard hard disk image header. */
-		const auto &standard_header = d->hd_handle->get_info();
+		const auto &standard_header = d->img->get_info();
 
 		d->cylinders = standard_header.cylinders;
 		d->heads = standard_header.heads;
@@ -194,7 +180,6 @@ DEVICE_IMAGE_LOAD_MEMBER( ti990_hdc_device::load_hd )
 
 		/* set file descriptor */
 		d->format = format_old;
-		d->hd_handle = nullptr;
 
 		/* use custom image header. */
 		/* to convert old header-less images to this format, insert a 16-byte
@@ -206,7 +191,7 @@ DEVICE_IMAGE_LOAD_MEMBER( ti990_hdc_device::load_hd )
 			d->format = format_mame;    /* don't care */
 			d->wp = 1;
 			d->unsafe = 1;
-			return image_init_result::FAIL;
+			return image_error::UNSPECIFIED;
 		}
 
 		d->cylinders = get_UINT32BE(custom_header.cylinders);
@@ -218,10 +203,9 @@ DEVICE_IMAGE_LOAD_MEMBER( ti990_hdc_device::load_hd )
 	if (d->bytes_per_sector > MAX_SECTOR_SIZE)
 	{
 		d->format = format_mame;
-		d->hd_handle = nullptr;
 		d->wp = 1;
 		d->unsafe = 1;
-		return image_init_result::FAIL;
+		return image_error::INVALIDIMAGE;
 	}
 
 	/* tell whether the image is writable */
@@ -231,13 +215,13 @@ DEVICE_IMAGE_LOAD_MEMBER( ti990_hdc_device::load_hd )
 	/* set attention line */
 	m_w[0] |= (0x80 >> id);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 /*
     close a hard disk image
 */
-DEVICE_IMAGE_UNLOAD_MEMBER( ti990_hdc_device::unload_hd )
+void ti990_hdc_device::unload_hd(device_image_interface &image)
 {
 	int id = get_id_from_device(&image.device());
 	hd_unit_t *d;
@@ -245,7 +229,6 @@ DEVICE_IMAGE_UNLOAD_MEMBER( ti990_hdc_device::unload_hd )
 	d = &m_d[id];
 
 	d->format = format_mame;    /* don't care */
-	d->hd_handle = nullptr;
 	d->wp = 1;
 	d->unsafe = 1;
 
@@ -258,20 +241,7 @@ DEVICE_IMAGE_UNLOAD_MEMBER( ti990_hdc_device::unload_hd )
 */
 int ti990_hdc_device::is_unit_loaded(int unit)
 {
-	int reply = 0;
-
-	switch (m_d[unit].format)
-	{
-	case format_mame:
-		reply = (m_d[unit].hd_handle != nullptr);
-		break;
-
-	case format_old:
-		reply = (m_d[unit].img->exists() ? 1 : 0);
-		break;
-	}
-
-	return reply;
+	return m_d[unit].img->exists();
 }
 
 /*
@@ -363,7 +333,7 @@ int ti990_hdc_device::read_sector(int unit, unsigned int lba, void *buffer, unsi
 	switch (m_d[unit].format)
 	{
 	case format_mame:
-		bytes_read = m_d[unit].bytes_per_sector * m_d[unit].hd_handle->read(lba, buffer);
+		bytes_read = m_d[unit].bytes_per_sector * m_d[unit].img->read(lba, buffer);
 		if (bytes_read > bytes_to_read)
 			bytes_read = bytes_to_read;
 		break;
@@ -393,7 +363,7 @@ int ti990_hdc_device::write_sector(int unit, unsigned int lba, const void *buffe
 	switch (m_d[unit].format)
 	{
 	case format_mame:
-		bytes_written = m_d[unit].bytes_per_sector * m_d[unit].hd_handle->write(lba, buffer);
+		bytes_written = m_d[unit].bytes_per_sector * m_d[unit].img->write(lba, buffer);
 		if (bytes_written > bytes_to_write)
 			bytes_written = bytes_to_write;
 		break;
@@ -979,7 +949,6 @@ void ti990_hdc_device::device_start()
 	for (i=0; i<MAX_DISK_UNIT; i++)
 	{
 		m_d[i].format = format_mame;
-		m_d[i].hd_handle = nullptr;
 		m_d[i].wp = 1;
 		m_d[i].unsafe = 1;
 	}
@@ -987,10 +956,10 @@ void ti990_hdc_device::device_start()
 	m_w[7] = w7_idle;
 
 	/* get references to harddisk devices */
-	m_d[0].img = dynamic_cast<device_image_interface *>(subdevice("harddisk1"));
-	m_d[1].img = dynamic_cast<device_image_interface *>(subdevice("harddisk2"));
-	m_d[2].img = dynamic_cast<device_image_interface *>(subdevice("harddisk3"));
-	m_d[3].img = dynamic_cast<device_image_interface *>(subdevice("harddisk4"));
+	m_d[0].img = dynamic_cast<harddisk_image_device *>(subdevice("harddisk1"));
+	m_d[1].img = dynamic_cast<harddisk_image_device *>(subdevice("harddisk2"));
+	m_d[2].img = dynamic_cast<harddisk_image_device *>(subdevice("harddisk3"));
+	m_d[3].img = dynamic_cast<harddisk_image_device *>(subdevice("harddisk4"));
 
 	m_interrupt_callback.resolve_safe();
 

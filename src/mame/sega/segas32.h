@@ -5,8 +5,8 @@
     Sega System 32/Multi 32 hardware
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_SEGAS32_H
-#define MAME_INCLUDES_SEGAS32_H
+#ifndef MAME_SEGA_SEGAS32_H
+#define MAME_SEGA_SEGAS32_H
 
 #pragma once
 
@@ -394,4 +394,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(SEGA_S32_PCB, segas32_state)
 
-#endif // MAME_INCLUDES_SEGAS32_H
+#endif // MAME_SEGA_SEGAS32_H

@@ -48,6 +48,8 @@ Z nothing
 #include "bus/rs232/rs232.h"
 
 
+namespace {
+
 class hpz80unk_state : public driver_device
 {
 public:
@@ -225,6 +227,9 @@ ROM_START( hpz80unk )
 	ROM_LOAD( "u14",       0x7000, 0x0800, CRC(3410e682) SHA1(30d94c0c0b6478dab202a603edaccca943008e35) )
 	ROM_LOAD( "u16",       0x7800, 0x0800, CRC(c03fdcab) SHA1(1081d787085add489c6e2a1d450e1a5790d18885) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

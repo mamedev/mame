@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli,Acho A. Tang, R. Belmont
-#ifndef MAME_VIDEO_K007342_H
-#define MAME_VIDEO_K007342_H
+#ifndef MAME_KONAMI_K007342_H
+#define MAME_KONAMI_K007342_H
 
 #pragma once
 
@@ -63,4 +63,4 @@ DECLARE_DEVICE_TYPE(K007342, k007342_device)
 // function definition for a callback
 #define K007342_CALLBACK_MEMBER(_name)     void _name(int layer, int bank, int *code, int *color, int *flags)
 
-#endif // MAME_VIDEO_K007342_H
+#endif // MAME_KONAMI_K007342_H

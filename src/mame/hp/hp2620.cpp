@@ -18,6 +18,9 @@ Skeleton driver for HP-2620 series display terminals.
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class hp2620_state : public driver_device
 {
 public:
@@ -241,5 +244,8 @@ ROM_START( hp2622a )
 	ROM_REGION(0x2000, "chargen", 0)
 	ROM_LOAD( "1818-1489.xu311", 0x0000, 0x2000, CRC(9879b153) SHA1(fc1705d6de38eb6d3a67f1ae439e359e5124d028) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1982, hp2622a, 0, 0, hp2622, hp2622, hp2620_state, empty_init, "HP", "HP-2622A", MACHINE_NOT_WORKING)

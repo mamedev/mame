@@ -162,6 +162,9 @@
 #include "machine/sis950_smbus.h"
 //#include "machine/fdc37c93x.h"
 
+
+namespace {
+
 class sis630_state : public driver_device
 {
 public:
@@ -284,7 +287,7 @@ ROM_START(gamecstl)
 	ROM_LOAD( "prod19.rom",     0x040000, 0x040000, BAD_DUMP CRC(9262306c) SHA1(5cd805622ecb4d326591b5f2cf918fe5cb1bce8e) )
 	ROM_CONTINUE(               0x000000, 0x040000 )
 
-	DISK_REGION( "pci:00.1:ide1:0:hdd:image" )
+	DISK_REGION( "pci:00.1:ide1:0:hdd" )
 	DISK_IMAGE( "gamecstl", 0, SHA1(b431af3c42c48ba07972d77a3d24e60ee1e4359e) )
 ROM_END
 
@@ -293,9 +296,11 @@ ROM_START(gamecst2)
 	ROM_LOAD( "prod19.rom",     0x040000, 0x040000, BAD_DUMP CRC(9262306c) SHA1(5cd805622ecb4d326591b5f2cf918fe5cb1bce8e) )
 	ROM_CONTINUE(               0x000000, 0x040000 )
 
-	DISK_REGION( "pci:00.1:ide1:0:hdd:image" )
+	DISK_REGION( "pci:00.1:ide1:0:hdd" )
 	DISK_IMAGE( "gamecst2", 0, SHA1(14e1b311cb474801c7bdda3164a0c220fb102159) )
 ROM_END
+
+} // anonymous namespace
 
 
 COMP( 2000, shutms11, 0,      0,      sis630,  sis630, sis630_state, empty_init, "Shuttle", "MS11 PC", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

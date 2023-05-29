@@ -37,6 +37,9 @@
 #include "video/tms9928a.h"
 #include "screen.h"
 
+
+namespace {
+
 class triviaquiz_state : public driver_device
 {
 public:
@@ -199,6 +202,9 @@ ROM_START( triviaqz2 )
 	ROM_LOAD( "norway_pop-musikk_2.bin", 0x18000, 0x8000, CRC(253b626c) SHA1(8bddf3a710ef03b06dde2ff432fa723cdd9f0103) )
 	ROM_LOAD( "norway_historie_1.bin",   0x20000, 0x8000, CRC(b2fbce41) SHA1(9e94fc4efd03aff180a5bd94727f5be59647af52) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1985, triviaqz,         0, triviaquiz, triviaquiz, triviaquiz_state, empty_init, ROT0, "Intermatic Manufacturing", "Professor Trivia (set 1)",  MACHINE_NO_SOUND ) // or Trivia Video Quiz? Professor Trivia appears on more screens
 GAME( 1985, triviaqz2, triviaqz, triviaquiz, triviaquiz, triviaquiz_state, empty_init, ROT0, "Intermatic Manufacturing", "Professor Trivia (set 2)",  MACHINE_NO_SOUND )

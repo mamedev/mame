@@ -40,6 +40,9 @@ For BIOS CRC confirmation
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 class pv2000_state : public driver_device
 {
 public:
@@ -48,15 +51,20 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_cass(*this, "cassette"),
 		m_cart(*this, "cartslot"),
-		m_last_state(0)
+		m_keyboard(*this, "IN%u", 0U)
 	{ }
 
 	void pv2000(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<generic_slot_device> m_cart;
+	required_ioport_array<10> m_keyboard;
 	void cass_conf_w(uint8_t data);
 	void keys_w(uint8_t data);
 	uint8_t keys_hi_r();
@@ -65,12 +73,10 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(pv2000_vdp_interrupt);
 	uint8_t cass_in();
 	void cass_out(uint8_t data);
-	bool m_last_state;
+	bool m_last_state = false;
 	uint8_t m_key_pressed = 0;
 	uint8_t m_keyb_column = 0;
 	uint8_t m_cass_conf = 0;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	void pv2000_io_map(address_map &map);
 	void pv2000_map(address_map &map);
@@ -79,11 +85,11 @@ private:
 
 void pv2000_state::cass_conf_w(uint8_t data)
 {
-	logerror( "%s: cass_conf_w %02x\n", machine().describe_context(), data );
+	logerror("%s: cass_conf_w %02x\n", machine().describe_context(), data);
 
 	m_cass_conf = data & 0x0f;
 
-	if ( m_cass_conf & 0x01 )
+	if (m_cass_conf & 0x01)
 		m_cass->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 	else
 		m_cass->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
@@ -92,7 +98,7 @@ void pv2000_state::cass_conf_w(uint8_t data)
 
 void pv2000_state::keys_w(uint8_t data)
 {
-	logerror( "%s: keys_w %02x\n", machine().describe_context(), data );
+	logerror("%s: keys_w %02x\n", machine().describe_context(), data);
 
 	m_keyb_column = data & 0x0f;
 
@@ -103,9 +109,8 @@ void pv2000_state::keys_w(uint8_t data)
 uint8_t pv2000_state::keys_hi_r()
 {
 	uint8_t data = 0;
-	char kbdrow[6];
 
-	switch ( m_keyb_column )
+	switch (m_keyb_column)
 	{
 	case 0:
 	case 1:
@@ -116,8 +121,7 @@ uint8_t pv2000_state::keys_hi_r()
 	case 6:
 	case 7:
 	case 8:
-		sprintf(kbdrow,"IN%d",m_keyb_column);
-		data = ioport( kbdrow )->read() >> 4;
+		data = m_keyboard[m_keyb_column]->read() >> 4;
 	}
 
 	return data;
@@ -127,11 +131,10 @@ uint8_t pv2000_state::keys_hi_r()
 uint8_t pv2000_state::keys_lo_r()
 {
 	uint8_t data = 0;
-	char kbdrow[6];
 
-	logerror("%s: pv2000_keys_r\n", machine().describe_context() );
+	logerror("%s: pv2000_keys_r\n", machine().describe_context());
 
-	switch ( m_keyb_column )
+	switch (m_keyb_column)
 	{
 	case 0:
 	case 1:
@@ -143,8 +146,7 @@ uint8_t pv2000_state::keys_lo_r()
 	case 7:
 	case 8:
 	case 9:
-		sprintf(kbdrow,"IN%d",m_keyb_column);
-		data = ioport( kbdrow )->read() & 0x0f;
+		data = m_keyboard[m_keyb_column]->read() & 0x0f;
 	}
 
 	return 0xf0 | data;
@@ -153,7 +155,7 @@ uint8_t pv2000_state::keys_lo_r()
 
 uint8_t pv2000_state::keys_mod_r()
 {
-	return 0xf0 | ioport( "MOD" )->read();
+	return 0xf0 | ioport("MOD")->read();
 }
 
 uint8_t pv2000_state::cass_in()
@@ -173,7 +175,7 @@ void pv2000_state::cass_out(uint8_t data)
 	// it outputs 8-bit values here which are not the bytes in the file
 	// result is not readable
 
-	m_cass->output( BIT(data, 0) ? -1.0 : +1.0);
+	m_cass->output(BIT(data, 0) ? -1.0 : +1.0);
 }
 
 
@@ -312,11 +314,10 @@ static INPUT_PORTS_START( pv2000 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TAB) PORT_NAME("Func")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-
 INPUT_PORTS_END
 
 
-WRITE_LINE_MEMBER( pv2000_state::pv2000_vdp_interrupt )
+WRITE_LINE_MEMBER(pv2000_state::pv2000_vdp_interrupt)
 {
 	// only if it goes up
 	if (state && !m_last_state)
@@ -325,22 +326,20 @@ WRITE_LINE_MEMBER( pv2000_state::pv2000_vdp_interrupt )
 	m_last_state = state;
 
 	/* Check if irq triggering from keyboard presses is enabled */
-	if ( m_keyb_column == 0x0f )
+	if (m_keyb_column == 0x0f)
 	{
 		/* Check if a key is pressed */
-		uint8_t key_pressed;
+		uint8_t key_pressed = m_keyboard[0]->read()
+				| m_keyboard[1]->read()
+				| m_keyboard[2]->read()
+				| m_keyboard[3]->read()
+				| m_keyboard[4]->read()
+				| m_keyboard[5]->read()
+				| m_keyboard[6]->read()
+				| m_keyboard[7]->read()
+				| m_keyboard[8]->read();
 
-		key_pressed = ioport( "IN0" )->read()
-			| ioport( "IN1" )->read()
-			| ioport( "IN2" )->read()
-			| ioport( "IN3" )->read()
-			| ioport( "IN4" )->read()
-			| ioport( "IN5" )->read()
-			| ioport( "IN6" )->read()
-			| ioport( "IN7" )->read()
-			| ioport( "IN8" )->read();
-
-		if ( key_pressed && m_key_pressed != key_pressed )
+		if (key_pressed && m_key_pressed != key_pressed)
 			m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 
 		m_key_pressed = key_pressed;
@@ -367,20 +366,17 @@ void pv2000_state::machine_reset()
 	memset(&memregion("maincpu")->base()[0x7000], 0xff, 0x1000);    // initialize RAM
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( pv2000_state::cart_load )
+DEVICE_IMAGE_LOAD_MEMBER(pv2000_state::cart_load)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
 	if (size != 0x2000 && size != 0x4000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be 8K or 16K)");
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /* Machine Drivers */
@@ -421,6 +417,8 @@ ROM_START (pv2000)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "hn613128pc64.bin", 0x0000, 0x4000, CRC(8f31f297) SHA1(94b5f54dd7bce321e377fdaaf592acd3870cf621) )
 ROM_END
+
+} // anonymous namespace
 
 
 /* System Drivers */

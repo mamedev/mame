@@ -32,6 +32,8 @@
 #include "chsuper.lh"
 
 
+namespace {
+
 class chsuper_state : public driver_device
 {
 public:
@@ -541,6 +543,8 @@ void chsuper_state::init_chmpnum()
 
 	memcpy(rom,buffer.get(),0x100000);
 }
+
+} // anonymous namespace
 
 
 /*************************

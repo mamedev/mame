@@ -8,9 +8,9 @@ COMMON_OBJS = \
   $O\IntToString.obj \
   $O\NewHandler.obj \
   $O\MyString.obj \
+  $O\MyVector.obj \
   $O\StringConvert.obj \
   $O\StringToInt.obj \
-  $O\MyVector.obj \
   $O\Wildcard.obj \
 
 WIN_OBJS = \

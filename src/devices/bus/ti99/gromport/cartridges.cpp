@@ -20,17 +20,17 @@
 #include "corestr.h"
 #include "formats/rpk.h"
 
-#define LOG_WARN         (1U<<1)   // Warnings
-#define LOG_CONFIG       (1U<<2)   // Configuration
-#define LOG_CHANGE       (1U<<3)   // Cart change
-#define LOG_BANKSWITCH   (1U<<4)   // Bank switch operation
-#define LOG_CRU          (1U<<5)   // CRU access
-#define LOG_READ         (1U<<6)   // Read operation
-#define LOG_WRITE        (1U<<7)   // Write operation
-#define LOG_RPK          (1U<<8)   // RPK handler
-#define LOG_WARNW        (1U<<9)   // Warn when writing to cartridge space
+#define LOG_WARN         (1U << 1)   // Warnings
+#define LOG_CONFIG       (1U << 2)   // Configuration
+#define LOG_CHANGE       (1U << 3)   // Cart change
+#define LOG_BANKSWITCH   (1U << 4)   // Bank switch operation
+#define LOG_CRU          (1U << 5)   // CRU access
+#define LOG_READ         (1U << 6)   // Read operation
+#define LOG_WRITE        (1U << 7)   // Write operation
+#define LOG_RPK          (1U << 8)   // RPK handler
+#define LOG_WARNW        (1U << 9)   // Warn when writing to cartridge space
 
-#define VERBOSE ( LOG_GENERAL | LOG_WARN | LOG_CONFIG )
+#define VERBOSE (LOG_GENERAL | LOG_WARN | LOG_CONFIG)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(TI99_CART, bus::ti99::gromport::ti99_cartridge_device, "ti99cart", "TI-99 cartridge")
@@ -271,10 +271,9 @@ int ti99_cartridge_device::get_index_from_tagname()
 	return atoi(mytag+i+1)-1;
 }
 
-image_init_result ti99_cartridge_device::call_load()
+std::pair<std::error_condition, std::string> ti99_cartridge_device::call_load()
 {
 	// File name is in m_basename
-	// return true = error
 	LOGMASKED(LOG_CHANGE, "Loading %s in slot %s\n", basename());
 
 	if (loaded_through_softlist())
@@ -304,8 +303,7 @@ image_init_result ti99_cartridge_device::call_load()
 		{
 			LOGMASKED(LOG_WARN, "Failed to load cartridge '%s': %s\n", basename(), err.message().c_str());
 			m_rpk.reset();
-			m_err = image_error::INVALIDIMAGE;
-			return image_init_result::FAIL;
+			return std::make_pair(err, std::string());
 		}
 		m_pcbtype = m_rpk->get_type();
 	}
@@ -367,7 +365,7 @@ image_init_result ti99_cartridge_device::call_load()
 	m_pcb->set_tag(tag());
 	m_slot = get_index_from_tagname();
 	m_connector->insert(m_slot, this);
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void ti99_cartridge_device::call_unload()

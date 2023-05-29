@@ -1,6 +1,6 @@
 /*
  * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #include "bgfx_p.h"
@@ -306,11 +306,19 @@ namespace bgfx { namespace webgpu
 		{ wgpu::TextureFormat::Undefined,           wgpu::TextureFormat::Undefined        },  // ATCE
 		{ wgpu::TextureFormat::Undefined,           wgpu::TextureFormat::Undefined        },  // ATCI
 		{ wgpu::TextureFormat::Undefined,           wgpu::TextureFormat::Undefined        },  // ASTC4x4
+		{ wgpu::TextureFormat::Undefined,           wgpu::TextureFormat::Undefined        },  // ASTC5x4
 		{ wgpu::TextureFormat::Undefined,           wgpu::TextureFormat::Undefined        },  // ASTC5x5
+		{ wgpu::TextureFormat::Undefined,           wgpu::TextureFormat::Undefined        },  // ASTC6x5
 		{ wgpu::TextureFormat::Undefined,           wgpu::TextureFormat::Undefined        },  // ASTC6x6
 		{ wgpu::TextureFormat::Undefined,           wgpu::TextureFormat::Undefined        },  // ASTC8x5
 		{ wgpu::TextureFormat::Undefined,           wgpu::TextureFormat::Undefined        },  // ASTC8x6
+		{ wgpu::TextureFormat::Undefined,           wgpu::TextureFormat::Undefined        },  // ASTC8x8
 		{ wgpu::TextureFormat::Undefined,           wgpu::TextureFormat::Undefined        },  // ASTC10x5
+		{ wgpu::TextureFormat::Undefined,           wgpu::TextureFormat::Undefined        },  // ASTC10x6
+		{ wgpu::TextureFormat::Undefined,           wgpu::TextureFormat::Undefined        },  // ASTC10x8
+		{ wgpu::TextureFormat::Undefined,           wgpu::TextureFormat::Undefined        },  // ASTC10x10
+		{ wgpu::TextureFormat::Undefined,           wgpu::TextureFormat::Undefined        },  // ASTC12x10
+		{ wgpu::TextureFormat::Undefined,           wgpu::TextureFormat::Undefined        },  // ASTC12x12
 		{ wgpu::TextureFormat::Undefined,           wgpu::TextureFormat::Undefined        },  // Unknown
 		{ wgpu::TextureFormat::Undefined,           wgpu::TextureFormat::Undefined        },  // R1
 		{ wgpu::TextureFormat::Undefined,           wgpu::TextureFormat::Undefined        },  // A8
@@ -356,8 +364,11 @@ namespace bgfx { namespace webgpu
 		{ wgpu::TextureFormat::RGBA32Sint,          wgpu::TextureFormat::Undefined        },  // RGBA32I
 		{ wgpu::TextureFormat::RGBA32Uint,          wgpu::TextureFormat::Undefined        },  // RGBA32U
 		{ wgpu::TextureFormat::RGBA32Float,         wgpu::TextureFormat::Undefined        },  // RGBA32F
+		{ wgpu::TextureFormat::Undefined,           wgpu::TextureFormat::Undefined        },  // B5G6R5
 		{ wgpu::TextureFormat::Undefined,           wgpu::TextureFormat::Undefined        },  // R5G6B5
+		{ wgpu::TextureFormat::Undefined,           wgpu::TextureFormat::Undefined        },  // BGRA4
 		{ wgpu::TextureFormat::Undefined,           wgpu::TextureFormat::Undefined        },  // RGBA4
+		{ wgpu::TextureFormat::Undefined,           wgpu::TextureFormat::Undefined        },  // BGR5A1
 		{ wgpu::TextureFormat::Undefined,           wgpu::TextureFormat::Undefined        },  // RGB5A1
 		{ wgpu::TextureFormat::RGB10A2Unorm,        wgpu::TextureFormat::Undefined        },  // RGB10A2
 		{ wgpu::TextureFormat::RG11B10Ufloat,       wgpu::TextureFormat::Undefined        },  // RG11B10F
@@ -658,8 +669,11 @@ namespace bgfx { namespace webgpu
 			g_caps.formats[TextureFormat::PTC14 ] =
 			g_caps.formats[TextureFormat::PTC12A] =
 			g_caps.formats[TextureFormat::PTC14A] =
+			g_caps.formats[TextureFormat::B5G6R5] =
 			g_caps.formats[TextureFormat::R5G6B5] =
+			g_caps.formats[TextureFormat::BGRA4 ] =
 			g_caps.formats[TextureFormat::RGBA4 ] =
+			g_caps.formats[TextureFormat::BGR5A1] =
 			g_caps.formats[TextureFormat::RGB5A1] = BGFX_CAPS_FORMAT_TEXTURE_NONE;
 
 			g_caps.formats[TextureFormat::RGB9E5F] &= ~(BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER | BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER_MSAA);
@@ -2471,8 +2485,10 @@ namespace bgfx { namespace webgpu
 
 		bx::MemoryReader reader(_mem->data, _mem->size);
 
+		bx::ErrorAssert err;
+
 		uint32_t magic;
-		bx::read(&reader, magic);
+		bx::read(&reader, magic, &err);
 
 		wgpu::ShaderStage shaderStage;
 
@@ -2496,7 +2512,7 @@ namespace bgfx { namespace webgpu
 		m_stage = shaderStage;
 
 		uint32_t hashIn;
-		bx::read(&reader, hashIn);
+		bx::read(&reader, hashIn, &err);
 
 		uint32_t hashOut;
 
@@ -2506,11 +2522,11 @@ namespace bgfx { namespace webgpu
 		}
 		else
 		{
-			bx::read(&reader, hashOut);
+			bx::read(&reader, hashOut, &err);
 		}
 
 		uint16_t count;
-		bx::read(&reader, count);
+		bx::read(&reader, count, &err);
 
 		m_numPredefined = 0;
 		m_numUniforms = count;
@@ -2530,32 +2546,32 @@ namespace bgfx { namespace webgpu
 			for (uint32_t ii = 0; ii < count; ++ii)
 			{
 				uint8_t nameSize = 0;
-				bx::read(&reader, nameSize);
+				bx::read(&reader, nameSize, &err);
 
 				char name[256];
-				bx::read(&reader, &name, nameSize);
+				bx::read(&reader, &name, nameSize, &err);
 				name[nameSize] = '\0';
 
 				uint8_t type = 0;
-				bx::read(&reader, type);
+				bx::read(&reader, type, &err);
 
 				uint8_t num;
-				bx::read(&reader, num);
+				bx::read(&reader, num, &err);
 
 				uint16_t regIndex;
-				bx::read(&reader, regIndex);
+				bx::read(&reader, regIndex, &err);
 
 				uint16_t regCount;
-				bx::read(&reader, regCount);
+				bx::read(&reader, regCount, &err);
 
 				uint8_t texComponent;
-				bx::read(&reader, texComponent);
+				bx::read(&reader, texComponent, &err);
 
 				uint8_t texDimension;
-				bx::read(&reader, texDimension);
+				bx::read(&reader, texDimension, &err);
 
 				uint16_t texFormat = 0;
-				bx::read(&reader, texFormat);
+				bx::read(&reader, texFormat, &err);
 
 				const char* kind = "invalid";
 
@@ -2654,7 +2670,8 @@ namespace bgfx { namespace webgpu
 					m_samplers[m_numSamplers].visibility = shaderStage;
 					m_samplers[m_numSamplers].sampler.type = comparisonSampler
 						? wgpu::SamplerBindingType::Comparison
-						: wgpu::SamplerBindingType::Filtering;
+						: wgpu::SamplerBindingType::Filtering
+						;
 
 					m_numSamplers++;
 
@@ -2693,7 +2710,7 @@ namespace bgfx { namespace webgpu
 		}
 
 		uint32_t shaderSize;
-		bx::read(&reader, shaderSize);
+		bx::read(&reader, shaderSize, &err);
 
 		BX_TRACE("Shader body is at %lld size %u remaining %lld", reader.getPos(), shaderSize, reader.remaining());
 
@@ -2709,7 +2726,7 @@ namespace bgfx { namespace webgpu
 		BX_TRACE("First word %08" PRIx32, code[0]);
 
 		uint8_t numAttrs = 0;
-		bx::read(&reader, numAttrs);
+		bx::read(&reader, numAttrs, &err);
 
 		m_numAttrs = numAttrs;
 
@@ -2719,7 +2736,7 @@ namespace bgfx { namespace webgpu
 		for(uint8_t ii = 0; ii < numAttrs; ++ii)
 		{
 			uint16_t id;
-			bx::read(&reader, id);
+			bx::read(&reader, id, &err);
 
 			auto toString = [](Attrib::Enum attr)
 			{
@@ -2784,10 +2801,10 @@ namespace bgfx { namespace webgpu
 			return ((value + multiple - 1) / multiple) * multiple;
 		};
 
-		bx::read(&reader, m_size);
+		bx::read(&reader, m_size, &err);
 
 		const uint32_t align = kMinBufferOffsetAlignment;
-		m_gpuSize = (uint16_t) bx::strideAlign(m_size, align);
+		m_gpuSize = uint16_t(bx::strideAlign(m_size, align) );
 
 		BX_TRACE("shader size %d (used=%d) (prev=%d)", (int)m_size, (int)m_gpuSize, (int)bx::strideAlign(roundUp(m_size, 4), align));
 	}
@@ -3978,9 +3995,10 @@ namespace bgfx { namespace webgpu
 	{
 	}
 
-	uint32_t TimerQueryWgpu::begin(uint32_t _resultIdx)
+	uint32_t TimerQueryWgpu::begin(uint32_t _resultIdx, uint32_t _frameNum)
 	{
 		BX_UNUSED(_resultIdx);
+		BX_UNUSED(_frameNum);
 		return 0;
 	}
 
@@ -4838,6 +4856,7 @@ namespace bgfx { namespace webgpu
 		perfStats.numCompute    = statsKeyType[1];
 		perfStats.numBlit       = _render->m_numBlitItems;
 		perfStats.maxGpuLatency = maxGpuLatency;
+		perfStats.gpuFrameNum   = result.m_frameNum;
 		bx::memCopy(perfStats.numPrims, statsNumPrimsRendered, sizeof(perfStats.numPrims) );
 		perfStats.gpuMemoryMax  = -INT64_MAX;
 		perfStats.gpuMemoryUsed = -INT64_MAX;

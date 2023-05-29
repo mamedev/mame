@@ -690,8 +690,8 @@ ROM_END
 /-------------------------------------------------------------------*/
 
 ROM_START(spcpoker)
-	ROM_REGION(0x1000, "roms", 0) // the bad dump was hacked to make it work
-	ROM_LOAD( "spoker.bin",   0x0000, 0x0800, BAD_DUMP CRC(98918b19) SHA1(b1bb3f408dae9fc77d396894c3c4ef08bce8c345) )
+	ROM_REGION(0x1000, "roms", 0)
+	ROM_LOAD( "space_poker_16_jp.bin", 0x0000, 0x0800, CRC(8fc2bdf6) SHA1(48eeae7ef21adbb4801e339565e55a03db6de179) )
 	ROM_RELOAD(0x0800, 0x0800)
 ROM_END
 

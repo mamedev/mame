@@ -283,7 +283,6 @@
 		},
 		{
 			"effect": "crt-geom/phosphor_apply",
-			"applytint": true,
 			"name": "phosphor apply",
 			"uniforms": [
 				{ "uniform": "u_phosphor_power",    "slider": "phosphor_power" },

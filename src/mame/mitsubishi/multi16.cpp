@@ -43,6 +43,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class multi16_state : public driver_device
 {
 public:
@@ -192,6 +194,9 @@ ROM_START( multi16 )
 	ROM_REGION(0x20000, "kanji", 0)
 	ROM_LOAD("kanji.rom", 0x00000, 0x20000, NO_DUMP)
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

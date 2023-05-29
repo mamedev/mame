@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #include <memory.h>
@@ -375,8 +375,8 @@ void inputSetMouseLock(bool _lock)
 	if (s_input->m_mouse.m_lock != _lock)
 	{
 		s_input->m_mouse.m_lock = _lock;
-		entry::WindowHandle defaultWindow = { 0 };
-		entry::setMouseLock(defaultWindow, _lock);
+
+		entry::setMouseLock(entry::kDefaultWindowHandle, _lock);
 		if (_lock)
 		{
 			s_input->m_mouse.m_norm[0] = 0.0f;

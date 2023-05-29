@@ -13,6 +13,9 @@ http://www.standardchange.com/frequently-asked-questions
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 
+
+namespace {
+
 class scm_500_state : public driver_device
 {
 public:
@@ -92,6 +95,9 @@ ROM_START( scm_500 )
 	ROM_SYSTEM_BIOS( 4, "usa_307",   "USA 3.07" ) \
 	ROM_LOAD_BIOS( 4, "stndxgr_307", 0x00000, 0x10000, CRC(4d0d91c6) SHA1(85ff5d43ec331bcd4cde6aaf82f6143acc7e020c)  ) // USA 03.07 (could be 500E specific)
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1987, scm_500,  0,    scm_500, scm_500, scm_500_state, empty_init, ROT0, "Standard Change-Makers", "Standard Change-Makers System 500 / 500E", MACHINE_IS_SKELETON_MECHANICAL )
 // 1995 - 500E - same basic hw?

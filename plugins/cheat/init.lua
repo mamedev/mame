@@ -73,6 +73,8 @@ exports.author = { name = "Carl" }
 
 local cheat = exports
 
+local reset_subscription, stop_subscription, frame_subscription
+
 function cheat.set_folder(path)
 	cheat.path = path
 end
@@ -714,7 +716,7 @@ function cheat.startplugin()
 	local function menu_callback(index, event)
 		manager.machine:popmessage()
 		if hotkeymenu then
-			if event == "cancel" then
+			if event == "back" then
 				hotkeymenu = false
 				return true
 			else
@@ -809,7 +811,7 @@ function cheat.startplugin()
 				return menu_populate()
 			  end, _("Cheat"))
 
-	emu.register_start(function()
+	reset_subscription = emu.add_machine_reset_notifier(function ()
 		if not stop then
 			return
 		end
@@ -832,13 +834,13 @@ function cheat.startplugin()
 		end
 	end)
 
-	emu.register_stop(function()
+	stop_subscription = emu.add_machine_stop_notifier(function ()
 		stop = true
 		consolelog = nil
 		save_hotkeys()
 	end)
 
-	emu.register_frame(function()
+	frame_subscription = emu.add_machine_frame_notifier(function ()
 		if stop then
 			return
 		end

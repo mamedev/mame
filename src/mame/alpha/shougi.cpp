@@ -131,13 +131,8 @@ private:
 	int m_r = 0;
 };
 
-
 void shougi_state::machine_start()
 {
-	// zerofill
-	m_nmi_enabled = 0;
-	m_r = 0;
-
 	// register for savestates
 	save_item(NAME(m_nmi_enabled));
 	save_item(NAME(m_r));
@@ -247,6 +242,15 @@ WRITE_LINE_MEMBER(shougi_state::nmi_enable_w)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 		m_subcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	}
+}
+
+INTERRUPT_GEN_MEMBER(shougi_state::vblank_nmi)
+{
+	if (m_nmi_enabled)
+	{
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
 
@@ -363,16 +367,6 @@ INPUT_PORTS_END
   Machine Config
 
 ***************************************************************************/
-
-INTERRUPT_GEN_MEMBER(shougi_state::vblank_nmi)
-{
-	if (m_nmi_enabled)
-	{
-		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	}
-}
-
 
 void shougi_state::shougi(machine_config &config)
 {

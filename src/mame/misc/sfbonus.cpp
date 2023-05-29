@@ -285,6 +285,8 @@ MH86171 Color Palette RAMDAC
 #include "pirpok2.lh"
 
 
+namespace {
+
 class sfbonus_state : public driver_device
 {
 public:
@@ -5964,6 +5966,8 @@ void sfbonus_state::init_fbdeluxe()         { sfbonus_bitswap( 0x39, 1,2,7,6,5,4
 void sfbonus_state::init_fb3g()             { sfbonus_bitswap( 0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x25, 1,0,2,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 1,0,7,6,5,4,3,2, 0xec, 1,7,6,5,4,3,2,0, 0x24, 0,2,1,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
 void sfbonus_state::init_getrich()          { sfbonus_bitswap( 0x3c, 1,2,7,6,5,4,3,0, 0xea, 2,7,6,5,4,3,0,1, 0x23, 1,0,2,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 1,0,7,6,5,4,3,2, 0xec, 1,7,6,5,4,3,2,0, 0x24, 0,2,1,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5); }
 void sfbonus_state::init_mcircus()          { sfbonus_bitswap( 0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x21, 1,0,2,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 1,0,7,6,5,4,3,2, 0xe9, 1,7,6,5,4,3,2,0, 0x23, 0,2,1,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+
+} // anonymous namespace
 
 
 GAME( 2002, suprball,    0,        sfbonus, amcoe2_reels3, sfbonus_state, init_suprball,        ROT0,  "Amcoe", "Super Ball (Version 1.3)", MACHINE_SUPPORTS_SAVE )

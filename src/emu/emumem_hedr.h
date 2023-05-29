@@ -13,7 +13,7 @@
 template<int HighBits, int Width, int AddrShift> class handler_entry_read_dispatch : public handler_entry_read<Width, AddrShift>
 {
 public:
-	using uX = typename emu::detail::handler_entry_size<Width>::uX;
+	using uX = emu::detail::handler_entry_size_t<Width>;
 	using mapping = typename handler_entry_read<Width, AddrShift>::mapping;
 
 	handler_entry_read_dispatch(address_space *space, const handler_entry::range &init, handler_entry_read<Width, AddrShift> *handler);
@@ -22,6 +22,7 @@ public:
 	~handler_entry_read_dispatch();
 
 	uX read(offs_t offset, uX mem_mask) const override;
+	uX read_interruptible(offs_t offset, uX mem_mask) const override;
 	std::pair<uX, u16> read_flags(offs_t offset, uX mem_mask) const override;
 	u16 lookup_flags(offs_t offset, uX mem_mask) const override;
 	void *get_ptr(offs_t offset) const override;

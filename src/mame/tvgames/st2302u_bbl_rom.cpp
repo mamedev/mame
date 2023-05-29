@@ -7,6 +7,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class st22xx_bbl338_state : public driver_device
 {
 public:
@@ -376,6 +379,9 @@ ROM_START( dphh8213 )
 	ROM_LOAD( "mx29lv160cb.u1", 0x000000, 0x200000, CRC(c8e7e355) SHA1(726f28c2c9ab012a6842f9f30a0a71538741ba14) )
 	ROM_FILL( 0x00009f, 2, 0xea ) // NOP out SPI check
 ROM_END
+
+} // anonymous namespace
+
 
 // this is uses a higher resolution display than the common units, but not as high as the SunPlus based ones
 COMP( 201?, bbl338, 0,      0,      st22xx_bbl338, dphh8213, st22xx_bbl338_sim_state, empty_init, "BaoBaoLong", "Portable Game Player BBL-338 (BaoBaoLong, 48-in-1)", MACHINE_IS_SKELETON )

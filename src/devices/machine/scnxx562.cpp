@@ -87,7 +87,6 @@ DONE (x) (p=partly)         NMOS         CMOS
 /* Useful temporary debug printout format */
 // printf("TAG %s%s Data:%d\n", __PRETTY_FUNCTION__, owner()->tag(), data);
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_R       (1U << 1)
 #define LOG_TX      (1U << 2)
 #define LOG_RX      (1U << 3)

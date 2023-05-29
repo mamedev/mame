@@ -23,6 +23,9 @@ the PCB, which go so far as to include the standard 8224 clock generator.
 #include "video/tms9927.h"
 #include "screen.h"
 
+
+namespace {
+
 #define AMPEX_CH_WIDTH 7
 
 class ampex_state : public driver_device
@@ -398,5 +401,8 @@ ROM_START( dialog80 )
 	ROM_LOAD( "417129-010.u16",  0x0000, 0x0100, NO_DUMP )
 	ROM_LOAD( "417129-010.u87",  0x0100, 0x0100, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1980, dialog80, 0, 0, ampex, ampex, ampex_state, empty_init, "Ampex", "Dialogue 80", MACHINE_IS_SKELETON )

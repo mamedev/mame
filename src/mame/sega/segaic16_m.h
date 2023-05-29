@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_SEGAIC16_H
-#define MAME_MACHINE_SEGAIC16_H
+#ifndef MAME_SEGA_SEGAIC16_M_H
+#define MAME_SEGA_SEGAIC16_M_H
 
 #pragma once
 
@@ -113,4 +113,4 @@ DECLARE_DEVICE_TYPE(SEGA_315_5249_DIVIDER,       sega_315_5249_divider_device)
 DECLARE_DEVICE_TYPE(SEGA_315_5250_COMPARE_TIMER, sega_315_5250_compare_timer_device)
 
 
-#endif // MAME_MACHINE_SEGAIC16_H
+#endif // MAME_SEGA_SEGAIC16_M_H

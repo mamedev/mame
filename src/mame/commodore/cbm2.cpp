@@ -12,6 +12,8 @@
 
 #include "emu.h"
 
+#include "cbm_snqk.h"
+
 #include "bus/cbm2/exp.h"
 #include "bus/cbm2/user.h"
 #include "bus/ieee488/ieee488.h"
@@ -20,7 +22,7 @@
 #include "bus/vcs_ctrl/ctrl.h"
 #include "cpu/m6502/m6509.h"
 #include "cpu/i86/i86.h"
-#include "cbm_snqk.h"
+#include "imagedev/snapquik.h"
 #include "machine/6525tpi.h"
 #include "machine/ds75160a.h"
 #include "machine/ds75161a.h"
@@ -40,6 +42,9 @@
 #include "speaker.h"
 
 #include "utf8.h"
+
+
+namespace {
 
 #define PLA1_TAG        "u78"
 #define PLA2_TAG        "u88"
@@ -3064,6 +3069,7 @@ ROM_START( cbm720_se )
 	ROM_LOAD( "906114-05.u75", 0x00, 0xf5, CRC(ff6ba6b6) SHA1(45808c570eb2eda7091c51591b3dbd2db1ac646a) )
 ROM_END
 
+} // anonymous namespace
 
 
 //**************************************************************************

@@ -5,8 +5,8 @@
     Combat School
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_COMBATSC_H
-#define MAME_INCLUDES_COMBATSC_H
+#ifndef MAME_KONAMI_COMBATSC_H
+#define MAME_KONAMI_COMBATSC_H
 
 #pragma once
 
@@ -168,4 +168,4 @@ private:
 	void sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_COMBATSC_H
+#endif // MAME_KONAMI_COMBATSC_H

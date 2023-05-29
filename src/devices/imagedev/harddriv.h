@@ -11,9 +11,16 @@
 #ifndef MAME_DEVICES_IMAGEDEV_HARDDRIV_H
 #define MAME_DEVICES_IMAGEDEV_HARDDRIV_H
 
+#include "softlist_dev.h"
+
 #include "chd.h"
 #include "harddisk.h"
-#include "softlist_dev.h"
+
+#include <memory>
+#include <string>
+#include <system_error>
+#include <utility>
+
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -27,7 +34,7 @@ protected:
 	// construction/destruction
 	harddisk_image_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return true; }
 	virtual bool is_creatable() const noexcept override { return false; }
@@ -41,6 +48,9 @@ protected:
 class harddisk_image_device : public harddisk_image_base_device
 {
 public:
+	typedef device_delegate<std::error_condition (device_image_interface &)> load_delegate;
+	typedef device_delegate<void (device_image_interface &)> unload_delegate;
+
 	// construction/destruction
 	harddisk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intf)
 		: harddisk_image_device(mconfig, tag, owner, (uint32_t)0)
@@ -54,9 +64,9 @@ public:
 	template <typename... T> void set_device_unload(T &&... args) { m_device_image_unload.set(std::forward<T>(args)...); }
 	void set_interface(const char *interface) { m_interface = interface; }
 
-	// image-level overrides
-	virtual image_init_result call_load() override;
-	virtual image_init_result call_create(int create_format, util::option_resolution *create_args) override;
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_create(int create_format, util::option_resolution *create_args) override;
 	virtual void call_unload() override;
 
 	virtual bool image_is_chd_type() const noexcept override { return true; }
@@ -64,13 +74,20 @@ public:
 	virtual const char *file_extensions() const noexcept override { return "chd,hd,hdv,2mg,hdi"; }
 	virtual const util::option_guide &create_option_guide() const override;
 
-	// specific implementation
-	hard_disk_file *get_hard_disk_file() { return m_hard_disk_handle; }
+	const hard_disk_file::info &get_info() const;
+	bool read(uint32_t lbasector, void *buffer);
+	bool write(uint32_t lbasector, const void *buffer);
+
+	bool set_block_size(uint32_t blocksize);
+
+	std::error_condition get_inquiry_data(std::vector<uint8_t> &data) const;
+	std::error_condition get_cis_data(std::vector<uint8_t> &data) const;
+	std::error_condition get_disk_key_data(std::vector<uint8_t> &data) const;
 
 protected:
 	harddisk_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_stop() override;
@@ -78,12 +95,13 @@ protected:
 	// device_image_interface implementation
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	image_init_result internal_load_hd();
+	void setup_current_preset_image();
+	std::error_condition internal_load_hd();
 
 	chd_file        *m_chd;
-	chd_file        m_origchd;              /* handle to the original CHD */
-	chd_file        m_diffchd;              /* handle to the diff CHD */
-	hard_disk_file  *m_hard_disk_handle;
+	chd_file        m_origchd;              // handle to the original CHD
+	chd_file        m_diffchd;              // handle to the diff CHD
+	std::unique_ptr<hard_disk_file> m_hard_disk_handle;
 
 	load_delegate   m_device_image_load;
 	unload_delegate m_device_image_unload;

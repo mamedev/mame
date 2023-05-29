@@ -98,6 +98,10 @@ SOURCE=..\..\7zStream.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\7zTypes.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\7zVersion.h
 # End Source File
 # Begin Source File
@@ -130,6 +134,10 @@ SOURCE=..\..\LzFindMt.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\LzFindOpt.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\LzHash.h
 # End Source File
 # Begin Source File
@@ -159,10 +167,6 @@ SOURCE=..\..\Threads.c
 # Begin Source File
 
 SOURCE=..\..\Threads.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\Types.h
 # End Source File
 # End Target
 # End Project

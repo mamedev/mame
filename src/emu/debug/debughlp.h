@@ -21,6 +21,6 @@
 ***************************************************************************/
 
 // help management
-const char *debug_get_help(std::string_view tag);
+std::string_view debug_get_help(std::string_view tag);
 
 #endif // MAME_EMU_DEBUG_DEBUGHLP_H

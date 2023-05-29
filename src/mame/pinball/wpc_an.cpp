@@ -96,8 +96,13 @@ TODO: (wpc in general)
 
 #include "wpc_an.lh"
 
+#define LOG_WPC (1U << 1)
 
-#define LOG_WPC (1)
+#define VERBOSE (LOG_WPC)
+#include "logmacro.h"
+
+
+namespace {
 
 class wpc_an_state : public driver_device
 {
@@ -377,7 +382,7 @@ void wpc_an_state::ram_w(offs_t offset, uint8_t data)
 	if((!m_wpc->memprotect_active()) || ((offset & m_wpc->get_memprotect_mask()) != m_wpc->get_memprotect_mask()))
 		m_ram[offset] = data;
 	else
-		if(LOG_WPC) logerror("WPC: Memory protection violation at 0x%04x (mask=0x%04x)\n",offset,m_wpc->get_memprotect_mask());
+		LOGMASKED(LOG_WPC, "WPC: Memory protection violation at 0x%04x (mask=0x%04x)\n",offset,m_wpc->get_memprotect_mask());
 }
 
 void wpc_an_state::machine_start()
@@ -807,6 +812,9 @@ ROM_START(tfa_13)
 	ROM_REGION(0x180000, "sound1",ROMREGION_ERASE00)
 	ROM_REGION(0x8000, "fixed", ROMREGION_ERASE00)
 ROM_END
+
+} // anonymous namespace
+
 
 GAME(1990,  tfa_13,     0,      wpc_an,    wpc_an, wpc_an_state, init_wpc_an, ROT0, "Bally",     "WPC Test Fixture: Alphanumeric (1.3)",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  dd_p7,      dd_l2,  wpc_an_dd, wpc_an, wpc_an_state, init_wpc_an, ROT0, "Bally",     "Dr. Dude (PA-7 WPC)",                                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

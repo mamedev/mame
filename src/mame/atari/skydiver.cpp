@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Mike Balfour
+
 /***************************************************************************
 
     Atari Sky Diver hardware
@@ -89,16 +90,192 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "skydiver.h"
+
+#include "skydiver_a.h"
 
 #include "cpu/m6800/m6800.h"
+#include "machine/74259.h"
+#include "machine/watchdog.h"
 #include "sound/discrete.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "skydiver.lh"
 
 
+namespace {
+
+class skydiver_state : public driver_device
+{
+public:
+	skydiver_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_watchdog(*this, "watchdog"),
+		m_latch3(*this, "latch3"),
+		m_discrete(*this, "discrete"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_videoram(*this, "videoram")
+	{ }
+
+	void skydiver(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
+	required_device<f9334_device> m_latch3;
+	required_device<discrete_device> m_discrete;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	required_shared_ptr<uint8_t> m_videoram;
+
+	uint8_t m_nmion = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_width = 0;
+
+	DECLARE_WRITE_LINE_MEMBER(nmion_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	uint8_t wram_r(offs_t offset);
+	void wram_w(offs_t offset, uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(width_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_lockout_w);
+	void latch3_watchdog_w(offs_t offset, uint8_t data);
+
+	TILE_GET_INFO_MEMBER(get_tile_info);
+
+	void palette(palette_device &palette) const;
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	INTERRUPT_GEN_MEMBER(interrupt);
+	void program_map(address_map &map);
+};
+
+
+// video
+
+/***************************************************************************
+
+  Callbacks for the TileMap code
+
+***************************************************************************/
+
+TILE_GET_INFO_MEMBER(skydiver_state::get_tile_info)
+{
+	uint8_t const code = m_videoram[tile_index];
+	tileinfo.set(0, code & 0x3f, code >> 6, 0);
+}
+
+
+
+/*************************************
+ *
+ *  Video system start
+ *
+ *************************************/
+
+void skydiver_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(skydiver_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	save_item(NAME(m_nmion));
+	save_item(NAME(m_width));
+}
+
+
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
+
+void skydiver_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+
+uint8_t skydiver_state::wram_r(offs_t offset)
+{
+	return m_videoram[offset | 0x380];
+}
+
+void skydiver_state::wram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset | 0x0380] = data;
+}
+
+
+WRITE_LINE_MEMBER(skydiver_state::width_w)
+{
+	m_width = state;
+}
+
+
+WRITE_LINE_MEMBER(skydiver_state::coin_lockout_w)
+{
+	machine().bookkeeping().coin_lockout_global_w(!state);
+}
+
+
+void skydiver_state::latch3_watchdog_w(offs_t offset, uint8_t data)
+{
+	m_watchdog->watchdog_reset();
+	m_latch3->write_a0(offset);
+}
+
+
+/*************************************
+ *
+ *  Video update
+ *
+ *************************************/
+
+void skydiver_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	/* draw each one of our four motion objects, the two PLANE sprites
+	   can be drawn double width */
+	for (int pic = 3; pic >= 0; pic--)
+	{
+		int sx = 29 * 8 - m_videoram[pic + 0x0390];
+		int const sy = 30 * 8 - m_videoram[pic * 2 + 0x0398];
+		int charcode = m_videoram[pic * 2 + 0x0399];
+		int const xflip = charcode & 0x10;
+		int const yflip = charcode & 0x08;
+		int const wide = (~pic & 0x02) && m_width;
+		charcode = (charcode & 0x07) | ((charcode & 0x60) >> 2);
+		int const color = pic & 0x01;
+
+		if (wide)
+		{
+			sx -= 8;
+		}
+
+		m_gfxdecode->gfx(1)->zoom_transpen(bitmap, cliprect,
+			charcode, color,
+			xflip, yflip, sx, sy,
+			wide ? 0x20000 : 0x10000, 0x10000, 0);
+	}
+}
+
+
+uint32_t skydiver_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	draw_sprites(bitmap, cliprect);
+	return 0;
+}
 
 
 /*************************************
@@ -115,7 +292,7 @@ static constexpr unsigned colortable_source[] =
 	0x01, 0x02
 };
 
-void skydiver_state::skydiver_palette(palette_device &palette) const
+void skydiver_state::palette(palette_device &palette) const
 {
 	constexpr rgb_t colors[]{ rgb_t::black(), rgb_t::white(), rgb_t(0xa0, 0xa0, 0xa0) }; // black, white, grey
 	for (unsigned i = 0; i < std::size(colortable_source); i++)
@@ -125,6 +302,8 @@ void skydiver_state::skydiver_palette(palette_device &palette) const
 	}
 }
 
+
+// machine
 
 
 /*************************************
@@ -141,7 +320,7 @@ WRITE_LINE_MEMBER(skydiver_state::nmion_w)
 
 INTERRUPT_GEN_MEMBER(skydiver_state::interrupt)
 {
-	/* Convert range data to divide value and write to sound */
+	// Convert range data to divide value and write to sound
 	m_discrete->write(SKYDIVER_RANGE_DATA, (0x01 << (~m_videoram[0x394] & 0x07)) & 0xff);   // Range 0-2
 
 	m_discrete->write(SKYDIVER_RANGE3_EN,  m_videoram[0x394] & 0x08);       // Range 3 - note disable
@@ -160,12 +339,12 @@ INTERRUPT_GEN_MEMBER(skydiver_state::interrupt)
  *
  *************************************/
 
-void skydiver_state::skydiver_map(address_map &map)
+void skydiver_state::program_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x007f).mirror(0x4300).rw(FUNC(skydiver_state::wram_r), FUNC(skydiver_state::wram_w));
-	map(0x0080, 0x00ff).mirror(0x4000).ram();       /* RAM B1 */
-	map(0x0400, 0x07ff).mirror(0x4000).ram().w(FUNC(skydiver_state::videoram_w)).share("videoram");       /* RAMs K1,M1,P1,J1,N1,K/L1,L1,H/J1 */
+	map(0x0080, 0x00ff).mirror(0x4000).ram();       // RAM B1
+	map(0x0400, 0x07ff).mirror(0x4000).ram().w(FUNC(skydiver_state::videoram_w)).share(m_videoram);       // RAMs K1,M1,P1,J1,N1,K/L1,L1,H/J1
 	map(0x0800, 0x080f).mirror(0x47f0).w("latch1", FUNC(f9334_device::write_a0));
 	map(0x1000, 0x100f).mirror(0x47f0).w("latch2", FUNC(f9334_device::write_a0));
 	map(0x1800, 0x1800).mirror(0x47e0).portr("IN0");
@@ -210,13 +389,13 @@ static INPUT_PORTS_START( skydiver )
 
 	PORT_START("IN2")
 	PORT_BIT (0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )    /* Jump 1 */
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )    /* Chute 1 */
+	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )    // Jump 1
+	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )    // Chute 1
 
 	PORT_START("IN3")
 	PORT_BIT (0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) /* Jump 2 */
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) /* Chute 2 */
+	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) // Jump 2
+	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) // Chute 2
 
 	PORT_START("IN4")
 	PORT_BIT (0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -323,8 +502,8 @@ static const gfx_layout motion_layout =
 
 
 static GFXDECODE_START( gfx_skydiver )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0, 4 )
-	GFXDECODE_ENTRY( "gfx2", 0, motion_layout, 0, 4 )
+	GFXDECODE_ENTRY( "chars",   0, charlayout,    0, 4 )
+	GFXDECODE_ENTRY( "sprites", 0, motion_layout, 0, 4 )
 GFXDECODE_END
 
 
@@ -337,20 +516,20 @@ GFXDECODE_END
 
 void skydiver_state::skydiver(machine_config &config)
 {
-	/* basic machine hardware */
-	M6800(config, m_maincpu, 12.096_MHz_XTAL / 16);     /* ???? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &skydiver_state::skydiver_map);
+	// basic machine hardware
+	M6800(config, m_maincpu, 12.096_MHz_XTAL / 16);     // ????
+	m_maincpu->set_addrmap(AS_PROGRAM, &skydiver_state::program_map);
 	m_maincpu->set_periodic_int(FUNC(skydiver_state::interrupt), attotime::from_hz(5*60));
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 8);    // 128V clocks the same as VBLANK
 
 	f9334_device &latch1(F9334(config, "latch1")); // F12
-	latch1.q_out_cb<0>().set(FUNC(skydiver_state::lamp_s_w));
-	latch1.q_out_cb<1>().set(FUNC(skydiver_state::lamp_k_w));
-	latch1.q_out_cb<2>().set(FUNC(skydiver_state::start_lamp_1_w));
-	latch1.q_out_cb<3>().set(FUNC(skydiver_state::start_lamp_2_w));
-	latch1.q_out_cb<4>().set(FUNC(skydiver_state::lamp_y_w));
-	latch1.q_out_cb<5>().set(FUNC(skydiver_state::lamp_d_w));
+	latch1.q_out_cb<0>().set_output("lamps");
+	latch1.q_out_cb<1>().set_output("lampk");
+	latch1.q_out_cb<2>().set_output("led0"); // start lamp 1
+	latch1.q_out_cb<3>().set_output("led1"); // start lamp 2
+	latch1.q_out_cb<4>().set_output("lampy");
+	latch1.q_out_cb<5>().set_output("lampd");
 	latch1.q_out_cb<6>().set("discrete", FUNC(discrete_device::write_line<SKYDIVER_SOUND_EN>));
 
 	f9334_device &latch2(F9334(config, "latch2")); // H12
@@ -363,24 +542,24 @@ void skydiver_state::skydiver(machine_config &config)
 	latch2.q_out_cb<7>().set(FUNC(skydiver_state::width_w));
 
 	f9334_device &latch3(F9334(config, "latch3")); // A11
-	latch3.q_out_cb<1>().set(FUNC(skydiver_state::lamp_i_w));
-	latch3.q_out_cb<2>().set(FUNC(skydiver_state::lamp_v_w));
-	latch3.q_out_cb<3>().set(FUNC(skydiver_state::lamp_e_w));
-	latch3.q_out_cb<4>().set(FUNC(skydiver_state::lamp_r_w));
+	latch3.q_out_cb<1>().set_output("lampi");
+	latch3.q_out_cb<2>().set_output("lampv");
+	latch3.q_out_cb<3>().set_output("lampe");
+	latch3.q_out_cb<4>().set_output("lampr");
 	latch3.q_out_cb<5>().set("discrete", FUNC(discrete_device::write_line<SKYDIVER_OCT1_EN>));
 	latch3.q_out_cb<6>().set("discrete", FUNC(discrete_device::write_line<SKYDIVER_OCT2_EN>));
 	latch3.q_out_cb<7>().set("discrete", FUNC(discrete_device::write_line<SKYDIVER_NOISE_RST>));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 0, 224);
 	screen.set_screen_update(FUNC(skydiver_state::screen_update));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_skydiver);
-	PALETTE(config, m_palette, FUNC(skydiver_state::skydiver_palette), std::size(colortable_source));
+	PALETTE(config, m_palette, FUNC(skydiver_state::palette), std::size(colortable_source));
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	DISCRETE(config, m_discrete, skydiver_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -401,14 +580,15 @@ ROM_START( skydiver )
 	ROM_LOAD( "33165-02.d1", 0x3800, 0x0800, CRC(a1fc5504) SHA1(febaa78936de7703b708c0d1f350fe288e0a106b) )
 	ROM_LOAD( "33166-02.c1", 0x7800, 0x0800, CRC(3d26da2b) SHA1(e515d5c13814b9732a6ca109272500a60edc208a) )
 
-	ROM_REGION( 0x0400, "gfx1", 0 )
+	ROM_REGION( 0x0400, "chars", 0 )
 	ROM_LOAD( "33163-01.h5", 0x0000, 0x0400, CRC(5b9bb7c2) SHA1(319f45b6dff96739f73f2089361239da47042dcd) )
 
-	ROM_REGION( 0x0800, "gfx2", 0 )
+	ROM_REGION( 0x0800, "sprites", 0 )
 	ROM_LOAD( "33176-01.l5", 0x0000, 0x0400, CRC(6b082a01) SHA1(8facc94843ea041d205137056bd2035cf968125b) )
 	ROM_LOAD( "33177-01.k5", 0x0400, 0x0400, CRC(f5541af0) SHA1(0967269518b6eac3c4e9ddaee39303086476c580) )
 ROM_END
 
+} // anonymous namespace
 
 
 /*************************************

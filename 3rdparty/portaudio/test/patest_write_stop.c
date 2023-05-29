@@ -1,8 +1,8 @@
 /** @file patest_write_stop.c
-	@brief Play a few seconds of silence followed by a few cycles of a sine wave. Tests to make sure that pa_StopStream() completes playback in blocking I/O
-	@author Bjorn Roche of XO Audio (www.xoaudio.com)
-	@author Ross Bencina
-	@author Phil Burk
+    @brief Play a few seconds of silence followed by a few cycles of a sine wave. Tests to make sure that pa_StopStream() completes playback in blocking I/O
+    @author Bjorn Roche of XO Audio (www.xoaudio.com)
+    @author Ross Bencina
+    @author Phil Burk
 */
 /*
  * $Id$
@@ -32,13 +32,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -74,17 +74,17 @@ int main(void)
     const int   framesBy2  = FRAMES_PER_BUFFER >> 1;
     const float framesBy2f = (float) framesBy2 ;
 
-    
+
     printf( "PortAudio Test: output silence, followed by one buffer of a ramped sine wave. SR = %d, BufSize = %d\n",
             SAMPLE_RATE, FRAMES_PER_BUFFER);
-    
+
     /* initialise sinusoidal wavetable */
     for( i=0; i<TABLE_SIZE; i++ )
     {
         sine[i] = (float) sin( ((double)i/(double)TABLE_SIZE) * M_PI * 2. );
     }
 
-    
+
     err = Pa_Initialize();
     if( err != paNoError ) goto error;
 
@@ -125,15 +125,15 @@ int main(void)
     {
         err = Pa_WriteStream( stream, buffer, FRAMES_PER_BUFFER );
         if( err != paNoError ) goto error;
-    }   
+    }
     /* play a non-silent buffer once */
     for( j=0; j < FRAMES_PER_BUFFER; j++ )
     {
         float ramp = 1;
         if( j < framesBy2 )
-           ramp = j / framesBy2f;
+            ramp = j / framesBy2f;
         else
-           ramp = (FRAMES_PER_BUFFER - j) / framesBy2f ;
+            ramp = (FRAMES_PER_BUFFER - j) / framesBy2f ;
 
         buffer[j][0] = sine[left_phase] * ramp;  /* left */
         buffer[j][1] = sine[right_phase] * ramp;  /* right */
@@ -154,11 +154,11 @@ int main(void)
 
     Pa_Terminate();
     printf("Test finished.\n");
-    
+
     return err;
 error:
     Pa_Terminate();
-    fprintf( stderr, "An error occured while using the portaudio stream\n" );
+    fprintf( stderr, "An error occurred while using the portaudio stream\n" );
     fprintf( stderr, "Error number: %d\n", err );
     fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
     return err;

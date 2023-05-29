@@ -3,7 +3,7 @@ name: CI (macOS)
 on:
   push:
     paths:
-    - '.github/**'
+    - '.github/workflows/**'
     - '3rdparty/**'
     - 'scripts/**'
     - 'src/**'
@@ -11,7 +11,7 @@ on:
     - 'makefile'
   pull_request:
     paths:
-    - '.github/**'
+    - '.github/workflows/**'
     - '3rdparty/**'
     - 'scripts/**'
     - 'src/**'

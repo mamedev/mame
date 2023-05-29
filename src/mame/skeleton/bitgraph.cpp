@@ -30,7 +30,6 @@
     ROM 1.25 doesn't support mouse, setup mode, pixel data upload and autowrap.
 
     Missing/incorrect emulation:
-        Bidirectional keyboard interface (to drive LEDs and speaker).
         8035.
         EAROM.
         1.25 only -- clksync() is dummied out -- causes watchdog resets.
@@ -51,6 +50,7 @@
 #include "machine/com8116.h"
 #include "machine/er2055.h"
 #include "machine/i8243.h"
+#include "machine/keytronic_l2207.h"
 #include "machine/mc6854.h"
 #include "machine/ram.h"
 #include "sound/ay8910.h"
@@ -68,7 +68,6 @@
 #define ACIA2_TAG "acia2"
 #define ACIA3_TAG "acia3"
 #define RS232_H_TAG "rs232host"
-#define RS232_K_TAG "rs232kbd"
 #define RS232_D_TAG "rs232debug"
 #define RS232_M_TAG "rs232mouse"
 #define ADLC_TAG "adlc"
@@ -77,9 +76,8 @@
 #define EAROM_TAG "earom"
 
 
-//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
-#define LOG_PIA       (1U <<  1)
-#define LOG_DEBUG     (1U <<  2)
+#define LOG_PIA       (1U << 1)
+#define LOG_DEBUG     (1U << 2)
 
 //#define VERBOSE (LOG_DEBUG)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -111,8 +109,6 @@ public:
 		, m_centronics(*this, "centronics")
 		, m_screen(*this, "screen")
 	{ }
-
-	static constexpr feature_type imperfect_features() { return feature::KEYBOARD; }
 
 	void bitgrpha(machine_config &config);
 	void bitgrphb(machine_config &config);
@@ -217,15 +213,6 @@ void bitgraph_state::bitgraphb_mem(address_map &map)
 
 static INPUT_PORTS_START(bitgraph)
 INPUT_PORTS_END
-
-static DEVICE_INPUT_DEFAULTS_START( kbd_rs232_defaults )
-	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_300 )
-	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_300 )
-	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
-	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
-	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
-	DEVICE_INPUT_DEFAULTS( "FLOW_CONTROL", 0x01, 0x01 )
-DEVICE_INPUT_DEFAULTS_END
 
 
 uint8_t bitgraph_state::pia_r(offs_t offset)
@@ -507,15 +494,10 @@ void bitgraph_state::bg_motherboard(machine_config &config)
 	rs232h.cts_handler().set(m_acia0, FUNC(acia6850_device::write_cts));
 
 	ACIA6850(config, m_acia1, 0);
-	m_acia1->txd_handler().set(RS232_K_TAG, FUNC(rs232_port_device::write_txd));
-	m_acia1->rts_handler().set(RS232_K_TAG, FUNC(rs232_port_device::write_rts));
+	m_acia1->txd_handler().set("keyboard", FUNC(keytronic_l2207_device::ser_in_w));
 	m_acia1->irq_handler().set_inputline(m_maincpu, M68K_IRQ_1);
 
-	rs232_port_device &rs232k(RS232_PORT(config, RS232_K_TAG, default_rs232_devices, "keyboard"));
-	rs232k.rxd_handler().set(m_acia1, FUNC(acia6850_device::write_rxd));
-	rs232k.dcd_handler().set(m_acia1, FUNC(acia6850_device::write_dcd));
-	rs232k.cts_handler().set(m_acia1, FUNC(acia6850_device::write_cts));
-	rs232k.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(kbd_rs232_defaults));
+	KEYTRONIC_L2207(config, "keyboard").ser_out_callback().set(m_acia1, FUNC(acia6850_device::write_rxd));
 
 	ACIA6850(config, m_acia2, 0);
 	m_acia2->txd_handler().set(RS232_D_TAG, FUNC(rs232_port_device::write_txd));

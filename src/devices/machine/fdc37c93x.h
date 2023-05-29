@@ -7,24 +7,19 @@ fdc37c93x.h
 SMSC FDC37C93x Plug and Play Compatible Ultra I/O Controller
 
 ***************************************************************************/
-
 #ifndef MAME_MACHINE_FDC37C93X_H
 #define MAME_MACHINE_FDC37C93X_H
 
 #pragma once
 
-#include "machine/8042kbdc.h"
-// floppy disk controller
-#include "machine/upd765.h"
+#include "bus/isa/isa.h"
 #include "imagedev/floppy.h"
-#include "formats/pc_dsk.h"
-#include "formats/naslite_dsk.h"
-// parallel port
-#include "machine/pc_lpt.h"
-// serial port
+#include "machine/8042kbdc.h"
+#include "machine/ds128x.h"
 #include "machine/ins8250.h"
+#include "machine/pc_lpt.h"
+#include "machine/upd765.h"
 
-// make sure that pckeybrd.cpp 8042kbdc.cpp are present in project
 
 class fdc37c93x_device : public device_t, public device_isa16_card_interface
 {
@@ -104,6 +99,8 @@ public:
 	static void floppy_formats(format_registration &fr);
 
 protected:
+	fdc37c93x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -111,6 +108,9 @@ protected:
 	virtual uint8_t dack_r(int line) override;
 	virtual void dack_w(int line, uint8_t data) override;
 	virtual void eop_w(int state) override;
+
+	u8 m_device_id = 0;
+	u8 m_device_rev = 0;
 
 private:
 	// put your private members here
@@ -197,6 +197,15 @@ private:
 	uint16_t read_auxio_configuration_register(int index);
 };
 
+class fdc37m707_device : public fdc37c93x_device
+{
+public:
+	fdc37m707_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	~fdc37m707_device() {}
+};
+
 DECLARE_DEVICE_TYPE(FDC37C93X, fdc37c93x_device);
+DECLARE_DEVICE_TYPE(FDC37M707, fdc37m707_device);
+
 
 #endif // MAME_MACHINE_FDC37C93X_H

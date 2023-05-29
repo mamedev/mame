@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Robbbert, hap
-/***************************************************************************
+/*******************************************************************************
 
 2011-JUL-16 SLC1 skeleton driver [Robbbert]
 2011-DEC-29 Working [Robbbert]
@@ -53,7 +53,7 @@ TODO:
     - The handwritten schematics and prototype by Dr.Scheuschner show 4 extra
       keys (R, MEM, N, Y) and 8 7segs, but they aren't in the final version.
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -115,9 +115,9 @@ void slc1_state::machine_start()
 
 
 
-/***************************************************************************
+/*******************************************************************************
     I/O
-***************************************************************************/
+*******************************************************************************/
 
 void slc1_state::control_w(offs_t offset, u8 data)
 {
@@ -152,9 +152,9 @@ u8 slc1_state::input_r()
 
 
 
-/***************************************************************************
+/*******************************************************************************
     Address Maps
-***************************************************************************/
+*******************************************************************************/
 
 void slc1_state::mem_map(address_map &map)
 {
@@ -171,9 +171,9 @@ void slc1_state::io_map(address_map &map)
 
 
 
-/**************************************************************************
+/******************************************************************************
     Input Ports
-***************************************************************************/
+*******************************************************************************/
 
 INPUT_CHANGED_MEMBER(slc1_state::trigger_reset)
 {
@@ -205,32 +205,32 @@ INPUT_PORTS_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
     Machine Config
-***************************************************************************/
+*******************************************************************************/
 
 void slc1_state::slc1(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, 2500000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &slc1_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &slc1_state::io_map);
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(7, 8);
 	m_display->set_segmask(0x7b, 0xff);
 	config.set_default_layout(layout_slc1);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 
 
-/***************************************************************************
+/*******************************************************************************
     ROM Definitions
-***************************************************************************/
+*******************************************************************************/
 
 ROM_START(slc1)
 	ROM_REGION(0x1000, "maincpu", 0 )
@@ -244,9 +244,9 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
     Drivers
-***************************************************************************/
+*******************************************************************************/
 
-/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY               FULLNAME */
-COMP( 1989, slc1, 0,      0,      slc1,    slc1,  slc1_state, empty_init, "Dieter Scheuschner", "Schach- und Lerncomputer SLC 1", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1989, slc1, 0,      0,      slc1,    slc1,  slc1_state, empty_init, "Dieter Scheuschner", "Schach- und Lerncomputer SLC 1", MACHINE_SUPPORTS_SAVE )

@@ -716,6 +716,13 @@ private:
 			return delegate_builder<delegate_type_t<T> >(m_target, m_append, m_target.owner(), devcb_read::cast_reference<delegate_device_class_t<T> >(obj), std::forward<T>(func), name);
 		}
 
+		template <typename T>
+		std::enable_if_t<is_read_method<T>::value, delegate_builder<delegate_type_t<T> > > set(device_t &devbase, char const *tag, T &&func, char const *name)
+		{
+			set_used();
+			return delegate_builder<delegate_type_t<T> >(m_target, m_append, devbase, tag, std::forward<T>(func), name);
+		}
+
 		template <typename T, typename U, bool R>
 		std::enable_if_t<is_read_method<T>::value, delegate_builder<delegate_type_t<T> > > set(device_finder<U, R> &finder, T &&func, char const *name)
 		{
@@ -2055,6 +2062,7 @@ private:
 					{ if ((data ^ exor) & mask) devbase.logerror("%s: %s\n", devbase.machine().describe_context(), message); };
 		}
 	};
+
 	class binder
 	{
 	public:
@@ -2090,6 +2098,13 @@ private:
 		{
 			set_used();
 			return delegate_builder<delegate_type_t<T> >(m_target, m_append, m_target.owner(), devcb_write::cast_reference<delegate_device_class_t<T> >(obj), std::forward<T>(func), name);
+		}
+
+		template <typename T>
+		std::enable_if_t<is_write_method<T>::value, delegate_builder<delegate_type_t<T> > > set(device_t &devbase, char const *tag, T &&func, char const *name)
+		{
+			set_used();
+			return delegate_builder<delegate_type_t<T> >(m_target, m_append, devbase, tag, std::forward<T>(func), name);
 		}
 
 		template <typename T, typename U, bool R>

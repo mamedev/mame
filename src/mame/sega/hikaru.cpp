@@ -398,6 +398,8 @@ Notes:
 #include "screen.h"
 
 
+namespace {
+
 #define CPU_CLOCK (200000000)
 
 class hikaru_state : public driver_device
@@ -870,6 +872,8 @@ ROM_START( hikcheck )
 	// 315-5881 populated, have no 317-xxxx stamp, key is unknown.
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1" )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 2000, hikaru,    0,        hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega",            "Hikaru Bios", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT )

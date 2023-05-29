@@ -15,6 +15,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class if800_state : public driver_device
 {
 public:
@@ -118,6 +120,9 @@ ROM_START( if800 )
 	ROM_REGION16_LE( 0x2000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.rom", 0x0000, 0x2000, CRC(36212491) SHA1(6eaa8885e2dccb6dd86def6c0c9be1870cee957f))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

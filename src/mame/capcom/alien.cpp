@@ -75,6 +75,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define MASTER_CLOCK    XTAL(200'000'000)
 
 class alien_state : public driver_device
@@ -347,6 +350,9 @@ ROM_START( wontame )
 	DISK_REGION( "card" ) //compact flash
 	DISK_IMAGE( "wontame", 0, SHA1(eb4fe73d5f723b3af08d96c6d3061c9bbc7b2488) )
 ROM_END
+
+} // anonymous namespace
+
 
 // Custom
 GAME( 2005, alien,     0,        alien, alien, alien_state, empty_init,    ROT0, "Capcom",               "Alien: The Arcade Medal Edition", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

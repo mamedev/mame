@@ -49,6 +49,9 @@
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 
+
+namespace {
+
 class aceex2814_state : public driver_device
 {
 public:
@@ -96,6 +99,9 @@ ROM_START( aceex2814 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dm2814u16-194.bin", 0x00000, 0x10000, CRC(36dc423d) SHA1(0f350b7c533eb5270a72587ab3e050e5fe453006) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY              FULLNAME      FLAGS
 COMP( 1995, aceex2814, 0,      0,      aceex2814, aceex2814, aceex2814_state, empty_init, "Aceex Corporation", "Aceex 2814", MACHINE_IS_SKELETON )

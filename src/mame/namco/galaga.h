@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_INCLUDES_GALAGA_H
-#define MAME_INCLUDES_GALAGA_H
+#ifndef MAME_NAMCO_GALAGA_H
+#define MAME_NAMCO_GALAGA_H
 
 #pragma once
 
@@ -107,4 +107,4 @@ protected:
 DISCRETE_SOUND_EXTERN( galaga_discrete );
 DISCRETE_SOUND_EXTERN( bosco_discrete );
 
-#endif // MAME_INCLUDES_GALAGA_H
+#endif // MAME_NAMCO_GALAGA_H

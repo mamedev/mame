@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
 
-#ifndef MAME_INCLUDES_CDI_H
-#define MAME_INCLUDES_CDI_H
+#ifndef MAME_PHILIPS_CDI_H
+#define MAME_PHILIPS_CDI_H
 
 #include "machine/scc68070.h"
 #include "cdislavehle.h"
@@ -11,6 +11,7 @@
 #include "mcd212.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/m6805/m68hc05.h"
+#include "diserial.h"
 #include "screen.h"
 
 /*----------- driver state -----------*/
@@ -81,11 +82,12 @@ private:
 	required_device_array<dmadac_sound_device, 2> m_dmadac;
 };
 
-class quizard_state : public cdi_state
+class quizard_state : public cdi_state, public device_serial_interface
 {
 public:
 	quizard_state(const machine_config &mconfig, device_type type, const char *tag)
 		: cdi_state(mconfig, type, tag)
+		, device_serial_interface(mconfig, *this)
 		, m_mcu(*this, "mcu")
 		, m_inputs(*this, "P%u", 0U)
 	{ }
@@ -95,6 +97,9 @@ public:
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	virtual void tra_callback() override;
+	virtual void rcv_complete() override;
 
 	TIMER_CALLBACK_MEMBER(boot_press_tick);
 
@@ -106,8 +111,6 @@ private:
 	void mcu_p1_w(uint8_t data);
 	void mcu_p2_w(uint8_t data);
 	void mcu_p3_w(uint8_t data);
-	void mcu_tx(uint8_t data);
-	uint8_t mcu_rx();
 
 	void mcu_rx_from_cpu(uint8_t data);
 	void mcu_rtsn_from_cpu(int state);
@@ -117,10 +120,9 @@ private:
 	required_device<i8751_device> m_mcu;
 	required_ioport_array<3> m_inputs;
 
-	uint8_t m_mcu_rx_from_cpu = 0U;
-	bool m_mcu_initial_byte = false;
 	bool m_boot_press = false;
 	emu_timer *m_boot_timer = nullptr;
+	uint8_t m_mcu_p3 = 0x04;
 };
 
 // Quizard 2 language values:
@@ -128,4 +130,4 @@ private:
 // 0x001: French
 // 0x188: German
 
-#endif // MAME_INCLUDES_CDI_H
+#endif // MAME_PHILIPS_CDI_H

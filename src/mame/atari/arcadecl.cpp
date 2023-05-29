@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders: Aaron Giles
+
 /***************************************************************************
 
     Atari Arcade Classics hardware (prototypes)
@@ -69,18 +70,193 @@
 
 
 #include "emu.h"
-#include "arcadecl.h"
+
+#include "atarimo.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprompar.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
-#include "atarimo.h"
+
 #include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
 
 
-#define MASTER_CLOCK        XTAL(14'318'181)
+namespace {
 
+class sparkz_state : public driver_device
+{
+public:
+	sparkz_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_oki(*this, "oki")
+		, m_bitmap(*this, "bitmap")
+	{ }
+
+	void sparkz(machine_config &config);
+
+protected:
+	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<okim6295_device> m_oki;
+	required_shared_ptr<uint16_t> m_bitmap;
+
+private:
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_interrupt);
+	void scanline_int_ack_w(uint16_t data);
+	void latch_w(uint8_t data);
+	void main_map(address_map &map);
+};
+
+
+class arcadecl_state : public sparkz_state
+{
+public:
+	arcadecl_state(const machine_config &mconfig, device_type type, const char *tag)
+		: sparkz_state(mconfig, type, tag)
+		, m_mob(*this, "mob")
+	{ }
+
+	void arcadecl(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+
+private:
+	required_device<atari_motion_objects_device> m_mob;
+
+	static const atari_motion_objects_config s_mob_config;
+};
+
+
+// video
+
+/***************************************************************************
+
+    Note: this video hardware has some similarities to Shuuz & company
+    The sprite offset registers are stored to 3EFF80
+
+****************************************************************************/
+
+
+/*************************************
+ *
+ *  Video system start
+ *
+ *************************************/
+
+const atari_motion_objects_config arcadecl_state::s_mob_config =
+{
+	0,                  // index to which gfx system
+	1,                  // number of motion object banks
+	1,                  // are the entries linked?
+	0,                  // are the entries split?
+	0,                  // render in reverse order?
+	0,                  // render in swapped X/Y order?
+	0,                  // does the neighbor bit affect the next object?
+	0,                  // pixels per SLIP entry (0 for no-slip)
+	0,                  // pixel offset for SLIPs
+	0,                  // maximum number of links to visit/scanline (0=all)
+
+	0x100,              // base palette entry
+	0x100,              // maximum number of colors
+	0,                  // transparent pen index
+
+	{{ 0x00ff,0,0,0 }}, // mask for the link
+	{{ 0,0x7fff,0,0 }}, // mask for the code index
+	{{ 0,0,0x000f,0 }}, // mask for the color
+	{{ 0,0,0xff80,0 }}, // mask for the X position
+	{{ 0,0,0,0xff80 }}, // mask for the Y position
+	{{ 0,0,0,0x0070 }}, // mask for the width, in tiles*/
+	{{ 0,0,0,0x0007 }}, // mask for the height, in tiles
+	{{ 0,0x8000,0,0 }}, // mask for the horizontal flip
+	{{ 0 }},            // mask for the vertical flip
+	{{ 0 }},            // mask for the priority
+	{{ 0 }},            // mask for the neighbor
+	{{ 0 }},            // mask for absolute coordinates
+
+	{{ 0 }},            // mask for the special value
+	0                   // resulting value to indicate "special"
+};
+
+void arcadecl_state::video_start()
+{
+	m_mob->set_scroll(-12, 0x110);
+}
+
+
+
+/*************************************
+ *
+ *  Main refresh
+ *
+ *************************************/
+
+uint32_t arcadecl_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// start drawing
+	m_mob->draw_async(cliprect);
+
+	// draw the playfield
+	sparkz_state::screen_update(screen, bitmap, cliprect);
+
+	// draw and merge the MO
+	bitmap_ind16 &mobitmap = m_mob->bitmap();
+	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
+		for (int y = rect->top(); y <= rect->bottom(); y++)
+		{
+			uint16_t const *const mo = &mobitmap.pix(y);
+			uint16_t *const pf = &bitmap.pix(y);
+			for (int x = rect->left(); x <= rect->right(); x++)
+				if (mo[x] != 0xffff)
+				{
+					// not yet verified
+					pf[x] = mo[x];
+				}
+		}
+
+	return 0;
+}
+
+
+
+/*************************************
+ *
+ *  Bitmap rendering
+ *
+ *************************************/
+
+uint32_t sparkz_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// update any dirty scanlines
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+	{
+		const uint16_t *const src = &m_bitmap[256 * y];
+		uint16_t *const dst = &bitmap.pix(y);
+
+		// regenerate the line
+		for (int x = cliprect.left() & ~1; x <= cliprect.right(); x += 2)
+		{
+			int const bits = src[(x - 8) / 2];
+			dst[x + 0] = bits >> 8;
+			dst[x + 1] = bits & 0xff;
+		}
+	}
+
+	return 0;
+}
+
+
+// machine
 
 /*************************************
  *
@@ -90,7 +266,7 @@
 
 TIMER_DEVICE_CALLBACK_MEMBER(sparkz_state::scanline_interrupt)
 {
-	/* generate 32V signals */
+	// generate 32V signals
 	if ((param & 32) == 0)
 		m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 }
@@ -100,19 +276,6 @@ void sparkz_state::scanline_int_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 }
-
-
-
-/*************************************
- *
- *  Initialization
- *
- *************************************/
-
-void sparkz_state::machine_reset()
-{
-}
-
 
 
 /*************************************
@@ -144,7 +307,7 @@ void sparkz_state::latch_w(uint8_t data)
 void sparkz_state::main_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x200000, 0x21ffff).ram().share("bitmap");
+	map(0x200000, 0x21ffff).ram().share(m_bitmap);
 	map(0x3c0000, 0x3c07ff).rw("palette", FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0xff00).share("palette");
 	map(0x3e0000, 0x3e07ff).ram().share("mob");
 	map(0x3e0800, 0x3effbf).ram();
@@ -266,7 +429,7 @@ static INPUT_PORTS_START( sparkz )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x000c, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE2 )         /* not in "test mode" */
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE2 )         // not in "test mode"
 	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("TRACKX2")
@@ -291,7 +454,7 @@ INPUT_PORTS_END
  *************************************/
 
 static GFXDECODE_START( gfx_arcadecl )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,  256, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb, 256, 16 )
 GFXDECODE_END
 
 
@@ -304,7 +467,9 @@ GFXDECODE_END
 
 void sparkz_state::sparkz(machine_config &config)
 {
-	/* basic machine hardware */
+	static constexpr XTAL MASTER_CLOCK = 14.318181_MHz_XTAL;
+
+	// basic machine hardware
 	M68000(config, m_maincpu, MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sparkz_state::main_map);
 
@@ -314,7 +479,7 @@ void sparkz_state::sparkz(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	/* video hardware */
+	// video hardware
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_arcadecl);
 	palette_device &palette(PALETTE(config, "palette"));
 	palette.set_format(palette_device::IRGB_1555, 512);
@@ -322,17 +487,17 @@ void sparkz_state::sparkz(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	/* note: these parameters are from published specs, not derived */
-	/* the board uses an SOS-2 chip to generate video signals */
-	m_screen->set_raw(MASTER_CLOCK/2, 456, 0+12, 336+12, 262, 0, 240);
+	// note: these parameters are from published specs, not derived
+	// the board uses an SOS-2 chip to generate video signals
+	m_screen->set_raw(MASTER_CLOCK / 2, 456, 0+12, 336+12, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(sparkz_state::screen_update));
 	m_screen->set_palette("palette");
 	//m_screen->screen_vblank().set(FUNC(sparkz_state::video_int_write_line));
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki, MASTER_CLOCK/4/3, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.0);
+	OKIM6295(config, m_oki, MASTER_CLOCK / 4 / 3, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void arcadecl_state::arcadecl(machine_config &config)
@@ -375,6 +540,7 @@ ROM_START( sparkz )
 	ROM_LOAD( "sparkzsn",      0x00000, 0x80000, CRC(87097ce2) SHA1(dc4d199b5af692d111c087af3edc01e2ac0287a8) )
 ROM_END
 
+} // anonymous namespace
 
 
 /*************************************

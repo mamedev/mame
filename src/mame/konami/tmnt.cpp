@@ -288,10 +288,10 @@ uint8_t tmnt_state::tmnt_sres_r()
 void tmnt_state::tmnt_sres_w(uint8_t data)
 {
 	/* bit 1 resets the UPD7795C sound chip */
-	m_upd7759->reset_w(data & 2);
+	m_upd7759->reset_w(BIT(data, 1));
 
 	/* bit 2 plays the title music */
-	if (data & 0x04)
+	if (BIT(data, 2))
 	{
 		if (!m_samples->playing(0))
 			m_samples->start_raw(0, m_sampledata, 0x40000, 640000 / 32);
@@ -303,7 +303,7 @@ void tmnt_state::tmnt_sres_w(uint8_t data)
 
 void tmnt_state::tmnt_upd_start_w(uint8_t data)
 {
-	m_upd7759->start_w(data & 1);
+	m_upd7759->start_w(!BIT(data, 0));
 }
 
 uint8_t tmnt_state::tmnt_upd_busy_r()
@@ -2107,8 +2107,8 @@ MACHINE_RESET_MEMBER(tmnt_state,tmnt)
 	machine_reset();
 
 	/* the UPD7759 control flip-flops are cleared: /ST is 1, /RESET is 0 */
-	m_upd7759->start_w(0);
-	m_upd7759->reset_w(1);
+	m_upd7759->start_w(1);
+	m_upd7759->reset_w(0);
 }
 
 void tmnt_state::tmnt(machine_config &config)

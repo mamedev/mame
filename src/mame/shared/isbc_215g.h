@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-#ifndef MAME_MACHINE_ISBC_215G_H
-#define MAME_MACHINE_ISBC_215G_H
+#ifndef MAME_SHARED_ISBC_215G_H
+#define MAME_SHARED_ISBC_215G_H
 
 #pragma once
 
@@ -86,4 +86,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ISBC_215G, isbc_215g_device)
 
-#endif // MAME_MACHINE_ISBC_215G_H
+#endif // MAME_SHARED_ISBC_215G_H

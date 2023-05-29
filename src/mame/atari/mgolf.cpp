@@ -12,6 +12,9 @@
 #include "screen.h"
 #include "tilemap.h"
 
+
+namespace {
+
 class mgolf_state : public driver_device
 {
 public:
@@ -389,6 +392,8 @@ ROM_START( mgolf )
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "33756-01.m7", 0x0000, 0x0200, CRC(4cec9bf3) SHA1(6dd49f045fb53ae9f412639117b107faa93dfd99) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1978, mgolf, 0, mgolf, mgolf, mgolf_state, empty_init, ROT270, "Atari", "Mini Golf (Atari, prototype)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

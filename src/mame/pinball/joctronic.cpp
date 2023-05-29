@@ -27,6 +27,8 @@ TODO:
 #include "speaker.h"
 
 
+namespace {
+
 class joctronic_state : public driver_device
 {
 public:
@@ -47,7 +49,7 @@ public:
 
 private:
 	u8 csin_r(offs_t offset);
-	void control_port_w(offs_t offset, u8 data);
+	[[maybe_unused]] void control_port_w(offs_t offset, u8 data);
 	void display_1_w(offs_t offset, u8 data);
 	void display_2_w(offs_t offset, u8 data);
 	void display_3_w(offs_t offset, u8 data);
@@ -506,6 +508,8 @@ ROM_START(slalom03)
 	ROM_LOAD("2.bin", 0x0000, 0x8000, CRC(ac2d66ab) SHA1(6bdab76373c58ae176b0615c9e44f28d624fc43f))
 	ROM_LOAD("3.bin", 0x8000, 0x8000, CRC(79054b5f) SHA1(f0d704545735cdf7fd0431679c0809cdb1bbfa35))
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1986, jpinball, 0, joctronic, joctronic, joctronic_state, empty_init, ROT0, "Joctronic", "Pin Ball",        MACHINE_IS_SKELETON_MECHANICAL )

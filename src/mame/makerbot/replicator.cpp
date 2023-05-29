@@ -32,22 +32,25 @@
 #include "screen.h"
 #include "speaker.h"
 
-#define LOG_PORT_A      (1 << 1)
-#define LOG_PORT_B      (1 << 2)
-#define LOG_PORT_C      (1 << 3)
-#define LOG_PORT_D      (1 << 4)
-#define LOG_PORT_E      (1 << 5)
-#define LOG_PORT_F      (1 << 6)
-#define LOG_PORT_G      (1 << 7)
-#define LOG_PORT_H      (1 << 8)
-#define LOG_PORT_J      (1 << 9)
-#define LOG_PORT_K      (1 << 10)
-#define LOG_PORT_L      (1 << 11)
-#define LOG_LCD_CLK     (1 << 12)
-#define LOG_LCD_SHIFT   (1 << 13)
+#define LOG_PORT_A      (1U << 1)
+#define LOG_PORT_B      (1U << 2)
+#define LOG_PORT_C      (1U << 3)
+#define LOG_PORT_D      (1U << 4)
+#define LOG_PORT_E      (1U << 5)
+#define LOG_PORT_F      (1U << 6)
+#define LOG_PORT_G      (1U << 7)
+#define LOG_PORT_H      (1U << 8)
+#define LOG_PORT_J      (1U << 9)
+#define LOG_PORT_K      (1U << 10)
+#define LOG_PORT_L      (1U << 11)
+#define LOG_LCD_CLK     (1U << 12)
+#define LOG_LCD_SHIFT   (1U << 13)
 
 #define VERBOSE         (0)
 #include "logmacro.h"
+
+
+namespace {
 
 #define MASTER_CLOCK    16000000
 
@@ -819,6 +822,9 @@ ROM_START( replica1 )
 	/* on-die 4kbyte eeprom */
 	ROM_REGION( 0x1000, "eeprom", ROMREGION_ERASEFF )
 ROM_END
+
+} // anonymous namespace
+
 
 /*   YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY     FULLNAME */
 COMP(2012, replica1, 0,      0,      replicator, replicator, replicator_state, empty_init, "Makerbot", "Replicator 1 desktop 3d printer", MACHINE_NOT_WORKING)

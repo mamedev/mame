@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Yochizo, Takahiro Nogi
-#ifndef MAME_INCLUDES_SRMP2_H
-#define MAME_INCLUDES_SRMP2_H
+#ifndef MAME_SETA_SRMP2_H
+#define MAME_SETA_SRMP2_H
 
 #pragma once
 
@@ -12,21 +12,15 @@
 class srmp2_state : public driver_device
 {
 public:
-	struct iox_t
-	{
-		int reset = 0, ff_event,ff_1 = 0, protcheck[4]{}, protlatch[4]{};
-		uint8_t data = 0;
-		uint8_t mux = 0;
-		uint8_t ff = 0;
-	};
-
 	srmp2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_spritegen(*this, "spritegen"),
 		m_msm(*this, "msm"),
 		m_adpcm_rom(*this, "adpcm"),
-		m_mainbank(*this, "mainbank")
+		m_mainbank(*this, "mainbank"),
+		m_keys(*this, "KEY%u", 0U),
+		m_service(*this, "SERVICE")
 	{ }
 
 	void mjyuugi(machine_config &config);
@@ -35,11 +29,21 @@ public:
 	void srmp3(machine_config &config);
 
 private:
+	struct iox_t
+	{
+		int reset = 0, ff_event,ff_1 = 0, protcheck[4]{}, protlatch[4]{};
+		uint8_t data = 0;
+		uint8_t mux = 0;
+		uint8_t ff = 0;
+	};
+
 	required_device<cpu_device> m_maincpu;
 	required_device<x1_001_device> m_spritegen;
 	required_device<msm5205_device> m_msm;
 	required_region_ptr<uint8_t> m_adpcm_rom;
 	optional_memory_bank m_mainbank;
+	required_ioport_array<8> m_keys;
+	required_ioport m_service;
 
 	uint8_t m_color_bank = 0;
 	uint8_t m_gfx_bank = 0;
@@ -60,8 +64,8 @@ private:
 	// mjuugi
 	void mjyuugi_flags_w(uint16_t data);
 	void mjyuugi_adpcm_bank_w(uint16_t data);
-	uint8_t mjyuugi_irq2_ack_r();
-	uint8_t mjyuugi_irq4_ack_r();
+	uint8_t mjyuugi_irq2_ack_r(address_space &space);
+	uint8_t mjyuugi_irq4_ack_r(address_space &space);
 
 	// rmgoldyh
 	void rmgoldyh_rombank_w(uint8_t data);
@@ -99,4 +103,4 @@ private:
 	void srmp3_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_SRMP2_H
+#endif // MAME_SETA_SRMP2_H

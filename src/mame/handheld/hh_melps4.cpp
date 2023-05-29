@@ -1,27 +1,29 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Kevin Horton
-/***************************************************************************
+/*******************************************************************************
 
-Mitsubishi MELPS 4 MCU tabletops/handhelds or other simple devices,
-most of them are VFD electronic games/toys.
+Mitsubishi MELPS 4 MCU tabletops/handhelds or other simple devices, most of them
+are VFD electronic games/toys.
 
 TODO:
 - dump/add Gakken version of Frogger
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
 #include "cpu/melps4/m58846.h"
-#include "video/pwm.h"
 #include "sound/spkrdev.h"
+#include "video/pwm.h"
 
 #include "screen.h"
 #include "speaker.h"
 
 //#include "hh_melps4_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
+
+namespace {
 
 class hh_melps4_state : public driver_device
 {
@@ -47,10 +49,10 @@ protected:
 	optional_ioport_array<4> m_inputs; // max 4
 
 	// misc common
-	u16 m_inp_mux = 0;              // multiplexed inputs mask
+	u16 m_inp_mux = 0; // multiplexed inputs mask
 
-	u32 m_grid = 0;                 // VFD current row data
-	u32 m_plate = 0;                // VFD current column data
+	u32 m_grid = 0;    // VFD current row data
+	u32 m_plate = 0;   // VFD current column data
 
 	u8 read_inputs(int columns);
 };
@@ -72,11 +74,11 @@ void hh_melps4_state::machine_reset()
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Helper Functions
 
-***************************************************************************/
+*******************************************************************************/
 
 // generic input handlers
 
@@ -86,7 +88,7 @@ u8 hh_melps4_state::read_inputs(int columns)
 
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
-		if (m_inp_mux >> i & 1)
+		if (BIT(m_inp_mux, i))
 			ret |= m_inputs[i]->read();
 
 	return ret;
@@ -100,15 +102,13 @@ INPUT_CHANGED_MEMBER(hh_melps4_state::reset_button)
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
 
-***************************************************************************/
+*******************************************************************************/
 
-namespace {
-
-/***************************************************************************
+/*******************************************************************************
 
   Coleco Frogger (manufactured in Japan, licensed from Sega)
   * PCB label: Coleco Frogger Code No. 01-81543, KS-003282 Japan
@@ -122,7 +122,7 @@ namespace {
   * cyan/red/green VFD
   * color overlay: row 2(goal): blue, row 3-6: yellow, row 8-10(cars): red
 
-***************************************************************************/
+*******************************************************************************/
 
 class cfrogger_state : public hh_melps4_state
 {
@@ -182,7 +182,7 @@ u16 cfrogger_state::input_r()
 	return (m_inputs[2]->read() & 8) | (read_inputs(2) & 3);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( cfrogger )
 	PORT_START("IN.0") // F0 port K0,K1
@@ -201,6 +201,8 @@ static INPUT_PORTS_START( cfrogger )
 	PORT_START("RESET")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_melps4_state, reset_button, 0)
 INPUT_PORTS_END
+
+// config
 
 void cfrogger_state::cfrogger(machine_config &config)
 {
@@ -240,7 +242,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Gakken / Konami Jungler (manufactured in Japan)
   * PCB label: Konami Gakken GR503
@@ -248,7 +250,7 @@ ROM_END
   * cyan/red/green VFD Itron CP5143GLR SGA
   * color overlay: all yellow
 
-***************************************************************************/
+*******************************************************************************/
 
 class gjungler_state : public hh_melps4_state
 {
@@ -307,7 +309,7 @@ u16 gjungler_state::input_r()
 	return (m_inputs[2]->read() & 0xc) | (read_inputs(2) & 3);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gjungler )
 	PORT_START("IN.0") // G0 port K0,K1
@@ -327,6 +329,8 @@ static INPUT_PORTS_START( gjungler )
 	PORT_START("RESET")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_melps4_state, reset_button, 0)
 INPUT_PORTS_END
+
+// config
 
 void gjungler_state::gjungler(machine_config &config)
 {
@@ -367,13 +371,13 @@ ROM_END
 
 } // anonymous namespace
 
-/***************************************************************************
+/*******************************************************************************
 
   Game driver(s)
 
-***************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME      PARENT CMP MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1982, cfrogger, 0,      0, cfrogger, cfrogger, cfrogger_state, empty_init, "Coleco / Konami", "Frogger (Coleco)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1982, cfrogger, 0,      0,      cfrogger, cfrogger, cfrogger_state, empty_init, "Coleco / Konami", "Frogger (Coleco)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1982, gjungler, 0,      0, gjungler, gjungler, gjungler_state, empty_init, "Gakken / Konami", "Jungler (Gakken)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, gjungler, 0,      0,      gjungler, gjungler, gjungler_state, empty_init, "Gakken / Konami", "Jungler (Gakken)", MACHINE_SUPPORTS_SAVE )

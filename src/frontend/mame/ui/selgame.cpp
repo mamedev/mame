@@ -112,7 +112,6 @@ menu_select_game::menu_select_game(mame_ui_manager &mui, render_container &conta
 	set_right_image(moptions.system_right_image());
 
 	ui_globals::curdats_view = 0;
-	ui_globals::panels_status = moptions.hide_panels();
 	ui_globals::curdats_total = 1;
 }
 
@@ -126,12 +125,30 @@ menu_select_game::~menu_select_game()
 	ui().save_ui_options();
 }
 
+
+//-------------------------------------------------
+//  recompute metrics
+//-------------------------------------------------
+
+void menu_select_game::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu_select_launch::recompute_metrics(width, height, aspect);
+
+	m_icons.clear();
+
+	// configure the custom rendering
+	set_custom_space(3.0F * line_height() + 5.0F * tb_border(), 4.0F * line_height() + 3.0F * tb_border());
+}
+
+
 //-------------------------------------------------
 //  menu_activated
 //-------------------------------------------------
 
 void menu_select_game::menu_activated()
 {
+	menu_select_launch::menu_activated();
+
 	// if I have to load datfile, perform a hard reset
 	if (ui_globals::reset)
 	{
@@ -142,11 +159,6 @@ void menu_select_game::menu_activated()
 		ui_globals::reset = false;
 		machine().schedule_hard_reset();
 		stack_reset();
-		return;
-	}
-	else
-	{
-		menu_select_launch::menu_activated();
 	}
 }
 
@@ -172,7 +184,6 @@ void menu_select_game::menu_deactivated()
 	std::string const filter(m_persistent_data.filter_data().get_config_string());
 
 	ui_options &mopt = ui().options();
-	mopt.set_value(OPTION_HIDE_PANELS,        ui_globals::panels_status,   OPTION_PRIORITY_CMDLINE);
 	mopt.set_value(OPTION_LAST_USED_MACHINE,  last_driver,                 OPTION_PRIORITY_CMDLINE);
 	mopt.set_value(OPTION_LAST_USED_FILTER,   filter,                      OPTION_PRIORITY_CMDLINE);
 	mopt.set_value(OPTION_SYSTEM_RIGHT_PANEL, right_panel_config_string(), OPTION_PRIORITY_CMDLINE);
@@ -183,7 +194,7 @@ void menu_select_game::menu_deactivated()
 //  handle
 //-------------------------------------------------
 
-void menu_select_game::handle(event const *ev)
+bool menu_select_game::handle(event const *ev)
 {
 	if (!m_prev_selected && item_count() > 0)
 		m_prev_selected = item(0).ref();
@@ -196,38 +207,52 @@ void menu_select_game::handle(event const *ev)
 		const ui_software_info *software;
 		get_selection(software, system);
 		menu::stack_push<menu_select_software>(ui(), container(), *system);
-		return;
+		return false;
 	}
 
 	// FIXME: everything above here used to run before events were processed
 
 	// process the menu
+	bool changed = false;
 	if (ev)
 	{
 		if (dismiss_error())
 		{
 			// reset the error on any subsequent menu event
+			changed = true;
 		}
 		else switch (ev->iptkey)
 		{
 		case IPT_UI_UP:
 			if ((get_focus() == focused_menu::LEFT) && (machine_filter::FIRST < m_filter_highlight))
+			{
 				--m_filter_highlight;
+				changed = true;
+			}
 			break;
 
 		case IPT_UI_DOWN:
 			if ((get_focus() == focused_menu::LEFT) && (machine_filter::LAST > m_filter_highlight))
+			{
 				m_filter_highlight++;
+				changed = true;
+			}
 			break;
 
 		case IPT_UI_HOME:
 			if (get_focus() == focused_menu::LEFT)
+			{
 				m_filter_highlight = machine_filter::FIRST;
+				changed = true;
+			}
 			break;
 
 		case IPT_UI_END:
 			if (get_focus() == focused_menu::LEFT)
+			{
 				m_filter_highlight = machine_filter::LAST;
+				changed = true;
+			}
 			break;
 
 		case IPT_UI_EXPORT:
@@ -247,9 +272,9 @@ void menu_select_game::handle(event const *ev)
 					if (get_focus() == focused_menu::MAIN)
 					{
 						if (m_populated_favorites)
-							inkey_select_favorite(ev);
+							changed = inkey_select_favorite(ev);
 						else
-							inkey_select(ev);
+							changed = inkey_select(ev);
 					}
 					break;
 
@@ -281,16 +306,16 @@ void menu_select_game::handle(event const *ev)
 
 				case IPT_UI_LEFT:
 					if (right_panel() == RP_IMAGES)
-						previous_image_view(); // Images
+						changed = previous_image_view(); // Images
 					else if (right_panel() == RP_INFOS)
-						change_info_pane(-1); // Infos
+						changed = change_info_pane(-1); // Infos
 					break;
 
 				case IPT_UI_RIGHT:
 					if (right_panel() == RP_IMAGES)
-						next_image_view(); // Images
+						changed = next_image_view(); // Images
 					else if (right_panel() == RP_INFOS)
-						change_info_pane(1); // Infos
+						changed = change_info_pane(1); // Infos
 					break;
 
 				case IPT_UI_FAVORITES:
@@ -311,6 +336,7 @@ void menu_select_game::handle(event const *ev)
 								mfav.remove_favorite_system(driver);
 								machine().popmessage(_("%s\n removed from favorites list."), info.description);
 							}
+							changed = true;
 						}
 						else
 						{
@@ -332,13 +358,14 @@ void menu_select_game::handle(event const *ev)
 
 	// if we're in an error state, overlay an error message
 	draw_error_text();
+	return changed;
 }
 
 //-------------------------------------------------
 //  populate
 //-------------------------------------------------
 
-void menu_select_game::populate(float &customtop, float &custombottom)
+void menu_select_game::populate()
 {
 	for (auto &icon : m_icons) // TODO: why is this here?  maybe better on resize or setting change?
 		icon.second.texture.reset();
@@ -460,18 +487,11 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 		m_skip_main_items = 0;
 	}
 
-	// configure the custom rendering
-	customtop = 3.0f * ui().get_line_height() + 5.0f * ui().box_tb_border();
-	custombottom = 4.0f * ui().get_line_height() + 3.0f * ui().box_tb_border();
-
 	// reselect prior game launched, if any
 	if (old_item_selected != -1)
 	{
 		set_selected_index(old_item_selected);
-		if (ui_globals::visible_main_lines == 0)
-			top_line = (selected_index() != 0) ? selected_index() - 1 : 0;
-		else
-			top_line = selected_index() - (ui_globals::visible_main_lines / 2);
+		centre_selection();
 
 		if (reselect_last::software().empty())
 			reselect_last::reset();
@@ -602,7 +622,7 @@ void menu_select_game::force_game_select(mame_ui_manager &mui, render_container 
 //  handle select key event
 //-------------------------------------------------
 
-void menu_select_game::inkey_select(const event *menu_event)
+bool menu_select_game::inkey_select(const event *menu_event)
 {
 	auto const system = reinterpret_cast<ui_system_info const *>(menu_event->itemref);
 
@@ -614,13 +634,14 @@ void menu_select_game::inkey_select(const event *menu_event)
 				container(),
 				m_persistent_data.filter_data(),
 				[this] () { reset(reset_options::SELECT_FIRST); });
+		return false;
 	}
 	else if (uintptr_t(system) == CONF_MACHINE)
 	{
 		// special case for configure machine
 		if (m_prev_selected)
 			menu::stack_push<menu_machine_configure>(ui(), container(), *reinterpret_cast<const ui_system_info *>(m_prev_selected));
-		return;
+		return false;
 	}
 	else
 	{
@@ -634,7 +655,7 @@ void menu_select_game::inkey_select(const event *menu_event)
 			if (!swlistdev.get_info().empty())
 			{
 				menu::stack_push<menu_select_software>(ui(), container(), *system);
-				return;
+				return false;
 			}
 		}
 
@@ -647,11 +668,13 @@ void menu_select_game::inkey_select(const event *menu_event)
 		{
 			if (!select_bios(*system->driver, false))
 				launch_system(*system->driver);
+			return false;
 		}
 		else
 		{
 			// otherwise, display an error
 			set_error(reset_options::REMEMBER_REF, make_system_audit_fail_text(auditor, summary));
+			return true;
 		}
 	}
 }
@@ -660,7 +683,7 @@ void menu_select_game::inkey_select(const event *menu_event)
 //  handle select key event for favorites menu
 //-------------------------------------------------
 
-void menu_select_game::inkey_select_favorite(const event *menu_event)
+bool menu_select_game::inkey_select_favorite(const event *menu_event)
 {
 	ui_software_info *ui_swinfo = (ui_software_info *)menu_event->itemref;
 
@@ -672,6 +695,7 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 				container(),
 				m_persistent_data.filter_data(),
 				[this] () { reset(reset_options::SELECT_FIRST); });
+		return false;
 	}
 	else if ((uintptr_t)ui_swinfo == CONF_MACHINE)
 	{
@@ -690,7 +714,7 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 							reset(empty ? reset_options::SELECT_FIRST : reset_options::REMEMBER_REF);
 					});
 		}
-		return;
+		return false;
 	}
 	else if (ui_swinfo->startempty)
 	{
@@ -704,7 +728,7 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 			{
 				ui_system_info const &system(m_persistent_data.systems()[driver_list::find(ui_swinfo->driver->name)]);
 				menu::stack_push<menu_select_software>(ui(), container(), system);
-				return;
+				return false;
 			}
 		}
 
@@ -720,11 +744,13 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 				reselect_last::reselect(true);
 				launch_system(*ui_swinfo->driver);
 			}
+			return false;
 		}
 		else
 		{
 			// otherwise, display an error
 			set_error(reset_options::REMEMBER_REF, make_system_audit_fail_text(auditor, summary));
+			return true;
 		}
 	}
 	else
@@ -737,6 +763,7 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 		if (!audit_passed(sysaudit))
 		{
 			set_error(reset_options::REMEMBER_REF, make_system_audit_fail_text(auditor, sysaudit));
+			return true;
 		}
 		else
 		{
@@ -751,11 +778,13 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 				reselect_last::reselect(true);
 				if (!select_bios(*ui_swinfo, false) && !select_part(*swinfo, *ui_swinfo))
 					launch_system(drv.driver(), *ui_swinfo, ui_swinfo->part);
+				return false;
 			}
 			else
 			{
 				// otherwise, display an error
 				set_error(reset_options::REMEMBER_REF, make_software_audit_fail_text(auditor, swaudit));
+				return true;
 			}
 		}
 	}
@@ -775,34 +804,46 @@ bool menu_select_game::isfavorite() const
 //  change what's displayed in the info box
 //-------------------------------------------------
 
-void menu_select_game::change_info_pane(int delta)
+bool menu_select_game::change_info_pane(int delta)
 {
-	auto const cap_delta = [this, &delta] (uint8_t &current, uint8_t &total)
-	{
-		if ((0 > delta) && (-delta > current))
-			delta = -int(unsigned(current));
-		else if ((0 < delta) && ((current + unsigned(delta)) >= total))
-			delta = int(unsigned(total - current - 1));
-		if (delta)
-		{
-			current += delta;
-			m_topline_datsview = 0;
-		}
-	};
+	auto const cap_delta =
+			[this, &delta] (uint8_t &current, uint8_t &total) -> bool
+			{
+				if ((0 > delta) && (-delta > current))
+					delta = -int(unsigned(current));
+				else if ((0 < delta) && ((current + unsigned(delta)) >= total))
+					delta = int(unsigned(total - current - 1));
+				if (delta)
+				{
+					current += delta;
+					m_topline_datsview = 0;
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			};
 	ui_system_info const *sys;
 	ui_software_info const *soft;
 	get_selection(soft, sys);
 	if (!m_populated_favorites)
 	{
 		if (uintptr_t(sys) > m_skip_main_items)
-			cap_delta(ui_globals::curdats_view, ui_globals::curdats_total);
+			return cap_delta(ui_globals::curdats_view, ui_globals::curdats_total);
+		else
+			return false;
 	}
 	else if (uintptr_t(soft) > m_skip_main_items)
 	{
 		if (soft->startempty)
-			cap_delta(ui_globals::curdats_view, ui_globals::curdats_total);
+			return cap_delta(ui_globals::curdats_view, ui_globals::curdats_total);
 		else
-			cap_delta(ui_globals::cur_sw_dats_view, ui_globals::cur_sw_dats_total);
+			return cap_delta(ui_globals::cur_sw_dats_view, ui_globals::cur_sw_dats_total);
+	}
+	else
+	{
+		return false;
 	}
 }
 
@@ -938,6 +979,10 @@ render_texture *menu_select_game::get_icon_texture(int linenum, void *selectedre
 	return icon->second.bitmap.valid() ? icon->second.texture.get() : nullptr;
 }
 
+
+//-------------------------------------------------
+//  export displayed list
+//-------------------------------------------------
 
 void menu_select_game::inkey_export()
 {

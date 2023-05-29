@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Juergen Buchmueller
-#ifndef MAME_INCLUDES_LAZERCMD_H
-#define MAME_INCLUDES_LAZERCMD_H
+#ifndef MAME_MEADOWS_LAZERCMD_H
+#define MAME_MEADOWS_LAZERCMD_H
 
 #pragma once
 
@@ -94,4 +94,4 @@ private:
 	void medlanes_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_LAZERCMD_H
+#endif // MAME_MEADOWS_LAZERCMD_H

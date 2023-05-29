@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Mirko Buffoni
-#ifndef MAME_INCLUDES_MARIO_H
-#define MAME_INCLUDES_MARIO_H
+#ifndef MAME_NINTENDO_MARIO_H
+#define MAME_NINTENDO_MARIO_H
 
 #pragma once
 
@@ -157,4 +157,4 @@ private:
 	void masao_sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_MARIO_H
+#endif // MAME_NINTENDO_MARIO_H

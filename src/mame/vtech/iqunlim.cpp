@@ -62,10 +62,10 @@ A4 = MAX232
 #include "screen.h"
 #include "softlist_dev.h"
 
-#define LOG_CARD_A_READ     (1 << 1u)
-#define LOG_CARD_A_WRITE    (1 << 2u)
-#define LOG_CARD_B_READ     (1 << 3u)
-#define LOG_CARD_B_WRITE    (1 << 4u)
+#define LOG_CARD_A_READ     (1U << 1)
+#define LOG_CARD_A_WRITE    (1U << 2)
+#define LOG_CARD_B_READ     (1U << 3)
+#define LOG_CARD_B_WRITE    (1U << 4)
 #define LOG_ALL             (LOG_CARD_A_READ | LOG_CARD_A_WRITE | LOG_CARD_B_READ | LOG_CARD_B_WRITE)
 
 #define VERBOSE (LOG_ALL)
@@ -169,12 +169,12 @@ INPUT_PORTS_END
 
 DEVICE_IMAGE_LOAD_MEMBER(iqunlim_state::cart_load)
 {
-	uint32_t size = m_cart->common_get_size("rom");
+	uint32_t const size = m_cart->common_get_size("rom");
 
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_BIG);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

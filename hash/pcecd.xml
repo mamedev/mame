@@ -3,9 +3,14 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="pcecd" description="NEC PC-Engine / Turbografx 16 CD-ROMs">
+<softwarelist name="pcecd" description="NEC PC Engine / Turbografx-16 CD-ROMs">
 
 <!-- The JPN CHDs have all been converted from the 'PD PC-Engine V2' collection, dated 2007
+
+    TODO:
+    - Fix sharedfeat for Arcade Card (ACD) games, once that we split implementation from scdsys;
+    - Substitute dumps listed here with redump.org versions (below doesn't happen anymore as per 2023),
+      use redump URL entry to denote them under the notes field.
 
     Apparently many of these have extra data tracks appended on the end, so shouldn't be considered
     perfect 1:1 dumps.  Therefore, assuming better reads are made (maybe some already exist), these
@@ -30,10 +35,6 @@ license:CC0-1.0
     'read error' in MAME.  Is this some kind of protection on the original discs, or just errors in the way
     various PC software and/or emulators handle them?  There are multiple second audio offset issues with
     several games in MAME which could be related.
-
-    TODO:
-    - Fix sharedfeat for Arcade Card (ACD) games, once that we split implementation from scdsys;
-    - What [Imperfect] means in some sets? Is it an alias for baddump?
 
 -->
 
@@ -134,10 +135,16 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="draculax">
+	<software name="draculax" supported="partial">
 		<description>Akumajou Dracula X - Chi no Rondo (Japan)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+[redbook] skips first two seconds, offsets on repeats, Stage 5 outro Dracula lip sync is off
+[ADPCM] streaming cuts off when saving Maria
+Richter sprite becomes all blue in some specific sections (cfr. stage 1 mermaid area, stage 2' final section, stage 4' start), generally when water is present, timing?
+Stage 4 to 4' boss fight has ugly green background (btanb)
+]]></notes>
 		<info name="serial" value="KMCD3005"/>
 		<info name="release" value="19931029"/>
 		<info name="alt_title" value="悪魔城ドラキュラX 血の輪廻"/>
@@ -151,7 +158,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="alshark">
-		<description>Alshark [Imperfect] (Japan)</description>
+		<description>Alshark (Japan)</description>
 		<year>1994</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="JCCD4014"/>
@@ -182,10 +189,14 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="angels2">
-		<description>Angels II - Holy Night [prototype][backup] (Japan)</description>
+	<software name="angels2" supported="yes">
+		<description>Angelus 2 - Holy Night (Japan, prototype)</description>
 		<year>19??</year>
 		<publisher>NEC</publisher>
+		<notes><![CDATA[
+Early unfinished reel demo
+https://www.unseen64.net/2021/01/04/angelus2-holynight-pcengine-cancelled/
+]]></notes>
 		<info name="usage" value="CD-ROM² Super System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -452,6 +463,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="blodgear">
+		<!-- "- Aurail 2 - Scenario Blood Gear" at ending screen -->
 		<description>Blood Gear (Japan)</description>
 		<year>1994</year>
 		<publisher>Hudson</publisher>
@@ -459,6 +471,7 @@ license:CC0-1.0
 		<info name="release" value="19941028"/>
 		<info name="alt_title" value="ブラッド・ギア"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
+		<!-- ending screen developers: Westone, Red. Aoni-Production also credited, presumably for voice dubs -->
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -483,7 +496,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="panicbom">
-		<description>Bomberman Panic Bomber (Japan)</description>
+		<description>Bomberman - Panic Bomber (Japan)</description>
 		<year>1994</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="HCD4069"/>
@@ -866,10 +879,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="cosmfn4t">
+	<software name="cosmfn4t" supported="partial">
 		<description>Cosmic Fantasy IV - Ginga Shounen Densetsu Totsunyuu Hen (Japan)</description>
 		<year>1994</year>
 		<publisher>Nihon Telenet</publisher>
+		<notes><![CDATA[
+Intro shows several horizontal black/transparent strips over GFXs
+]]></notes>
 		<info name="serial" value="TJCD4038"/>
 		<info name="release" value="19940610"/>
 		<info name="alt_title" value="コズミックファンタジー4 ～銀河少年伝説～ -激闘篇-"/>
@@ -898,10 +914,14 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="crazyhos">
+	<software name="crazyhos" supported="partial">
 		<description>Crazy Hospital - Fushigi no Kuni no Tenshi (Japan)</description>
 		<year>1997</year>
 		<publisher>Asia Soft Lab</publisher>
+		<notes><![CDATA[
+[redbook] audio playback is offset during gameplay, uses a mixture of [SCSI] CD drive start/end mode commands ($40/$80)
+Goes silent on intro (btanb)
+]]></notes>
 		<info name="release" value="19970310"/>
 		<info name="alt_title" value="クレイジー・ホスピタル ふしぎの国の天使"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
@@ -1045,6 +1065,10 @@ license:CC0-1.0
 		<description>Dekoboko Densetsu - Hashire Wagamanma (Japan)</description>
 		<year>1990</year>
 		<publisher>Nihon Telenet</publisher>
+		<notes><![CDATA[
+During intro black stripes appears instead of being solid yellow as background color (btanb)
+Startup count goes 3-2-1 multiple times (btanb)
+]]></notes>
 		<info name="serial" value="TJCD0013"/>
 		<info name="release" value="19901102"/>
 		<info name="alt_title" value="デコボコ伝説 走るワガマンマー"/>
@@ -1073,10 +1097,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="devmag1">
+	<software name="devmag1" supported="no">
 		<description>Develo Magazine Volume I (Japan)</description>
 		<year>1996</year>
 		<publisher>Tokuma Shoten</publisher>
+		<notes><![CDATA[
+Unemulated interface for development
+]]></notes>
 		<info name="serial" value="TICD-6008"/>
 		<info name="release" value="19961226"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
@@ -1088,10 +1115,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="devstart">
+	<software name="devstart" supported="no">
 		<description>Develo Starter Kit - Assembler (Japan)</description>
 		<year>1996</year>
 		<publisher>Tokuma Shoten</publisher>
+		<notes><![CDATA[
+Unemulated interface for development
+]]></notes>
 		<info name="serial" value="TICD-6004"/>
 		<info name="release" value="19960301"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
@@ -1103,10 +1133,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="devbasic">
+	<software name="devbasic" supported="no">
 		<description>Develo Starter Kit - Basic (Japan)</description>
 		<year>1996</year>
 		<publisher>Tokuma Shoten</publisher>
+		<notes><![CDATA[
+Unemulated interface for development
+]]></notes>
 		<info name="serial" value="TICD-6007"/>
 		<info name="release" value="19960910"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
@@ -1134,10 +1167,15 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ddragon2">
+	<software name="ddragon2" supported="no">
 		<description>Double Dragon II - The Revenge (Japan)</description>
 		<year>1993</year>
 		<publisher>Naxat Soft</publisher>
+		<notes><![CDATA[
+Cannot access option menu, responds to run button by returning to main menu without GFX update
+Starting a game don't fully playback the voice sample
+Pre-stage number transitions are way too fast
+]]></notes>
 		<info name="serial" value="NXCD2010"/>
 		<info name="release" value="19930312"/>
 		<info name="alt_title" value="双載龍 ダブルドラゴンII"/>
@@ -1186,6 +1224,9 @@ license:CC0-1.0
 		<description>Downtown Nekketsu Monogatari (Japan)</description>
 		<year>1993</year>
 		<publisher>Naxat Soft</publisher>
+		<!-- TODO: Mednafen reports "with text speed set to fast, -->
+		<!-- quickly enter and exit store and listen to ADPCM playback for glitches" -->
+		<!-- cannot repro, potentially [SCSI] timing sensitive -->
 		<info name="serial" value="NXCD2015"/>
 		<info name="release" value="19931224"/>
 		<info name="alt_title" value="ダウンタウン熱血物語"/>
@@ -1294,10 +1335,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="dbz">
+	<software name="dbz" supported="partial">
 		<description>Dragon Ball Z - Idainaru Son Gokuu Densetsu (Japan)</description>
 		<year>1994</year>
 		<publisher>Bandai</publisher>
+		<notes><![CDATA[
+[ADPCM] streaming cuts off on intro
+]]></notes>
 		<info name="serial" value="BNCD4001"/>
 		<info name="release" value="19941111"/>
 		<info name="alt_title" value="ドラゴンボールZ偉大なる孫悟空伝説"/>
@@ -1346,6 +1390,9 @@ license:CC0-1.0
 		<description>Efera &amp; Jiliora - The Emblem from Darkness (Japan)</description>
 		<year>1991</year>
 		<publisher>Brain Gray</publisher>
+		<notes><![CDATA[
+Returns to intro when pressing Run button on title (player has to hold start in order to enter gameplay) (fixed)
+]]></notes>
 		<info name="serial" value="BRCD1002"/>
 		<info name="release" value="19911213"/>
 		<info name="alt_title" value="エフェラ アンド ジリオラ ジ・エンブレム フロム ダークネス"/>
@@ -1470,10 +1517,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="f1team">
+	<software name="f1team" supported="partial">
 		<description>F1 Team Simulation Project F (Japan)</description>
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
+		<notes><![CDATA[
+Loading is way too fast once you start a race
+]]></notes>
 		<info name="serial" value="TJCD2026"/>
 		<info name="release" value="19920904"/>
 		<info name="alt_title" value="F1チームシミュレーション PROJECT.F"/>
@@ -1549,10 +1599,14 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="faussete">
-		<description>Faussete Amour (Japan)</description>
+	<software name="faussete" supported="no">
+		<description>Fausseté Amour (Japan)</description>
 		<year>1993</year>
 		<publisher>Naxat Soft</publisher>
+		<notes><![CDATA[
+Heavy input lag in Stage 2 when water displays https://youtu.be/DPeKn56Sdek [raster timing]
+Cheat: Up, up, up, down, down, down, II, II, II, I, I, I during intro for "debug menu"
+]]></notes>
 		<info name="serial" value="NXCD2017"/>
 		<info name="release" value="19930326"/>
 		<info name="alt_title" value="フォーセットアムール"/>
@@ -1608,7 +1662,7 @@ license:CC0-1.0
 		<sharedfeat name="requirement" value="cdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="final zone ii (cd)(jpn)" sha1="7721a3c2347f847bf53a61b07bb5b0aa3d039ab0"/>
+				<disk name="final zone ii (cd)(jpn)" sha1="7721a3c2347f847bf53a61b07bb5b0aa3d039ab0" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1629,10 +1683,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="flashhid">
+	<software name="flashhid" supported="partial">
 		<description>Flash Hiders (Japan)</description>
 		<year>1993</year>
 		<publisher>Right Stuff</publisher>
+		<notes><![CDATA[
+Uses sound LFO FM
+]]></notes>
 		<info name="serial" value="RSCD3004"/>
 		<info name="release" value="19931219"/>
 		<info name="alt_title" value="フラッシュハイダース"/>
@@ -1691,10 +1748,14 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="fraycd">
+	<software name="fraycd" supported="partial">
 		<description>Fray CD Xak Gaiden (Japan)</description>
 		<year>1994</year>
 		<publisher>Micro Cabin</publisher>
+		<notes><![CDATA[
+First intro screen has wrong masking
+One line off for gameplay backgrounds
+]]></notes>
 		<info name="serial" value="MCCD4005"/>
 		<info name="release" value="19940330"/>
 		<info name="alt_title" value="フレイCD -サーク外伝-"/>
@@ -1787,10 +1848,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="yunahv">
+	<software name="yunahv" supported="no">
 		<description>Ginga Ojousama Densetsu Yuna HuVideo CD (Japan)</description>
 		<year>1995</year>
 		<publisher>Hudson</publisher>
+		<notes><![CDATA[
+Hangs on FMV playback (skippable thru Run button), [SCSI] timing sensitive
+]]></notes>
 		<info name="serial" value="HCD5078"/>
 		<info name="release" value="19950618"/>
 		<info name="alt_title" value="銀河お嬢様伝説ユナ HuVIDEO同梱再販版"/>
@@ -1851,10 +1915,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="genchohi">
+	<software name="genchohi" supported="partial">
 		<description>Aoki Ookami to Shiroki Mejika - Genchou Hishi (Japan)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
+		<notes><![CDATA[
+Unsupported [セーブくん] joypad slot peripheral
+]]></notes>
 		<info name="serial" value="KOCD3004"/>
 		<info name="release" value="19930930"/>
 		<info name="alt_title" value="蒼き狼と白き牝鹿 元朝秘史"/>
@@ -1883,7 +1950,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="garou2">
-		<description>Garou Densetsu II - Aratanaru Tatakai [Imperfect] (Japan)</description>
+		<description>Garou Densetsu II - Aratanaru Tatakai (Japan)</description>
 		<year>1994</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="HCD4060"/>
@@ -2265,10 +2332,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="hyperdyn">
+	<software name="hyperdyn" supported="partial">
 		<description>Hyper Dyne SideArms Special (Japan)</description>
 		<year>1989</year>
 		<publisher>NEC Avenue</publisher>
+		<notes><![CDATA[
+https://mametesters.org/view.php?id=8105 (verify)
+]]></notes>
 		<info name="serial" value="HACD9002"/>
 		<info name="release" value="19891215"/>
 		<info name="alt_title" value="サイドアームスペシャル"/>
@@ -2297,10 +2367,14 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="iganin">
+	<software name="iganin" supported="partial">
 		<description>Iga Ninden Gaou (Japan)</description>
 		<year>1993</year>
 		<publisher>Nichibutsu</publisher>
+		<notes><![CDATA[
+Cannot start a game, goes back to intro as soon as "press Run button" prompts (fixed)
+New game intro sports glitchy portraits
+]]></notes>
 		<info name="serial" value="NBCD3003"/>
 		<info name="release" value="19931210"/>
 		<info name="alt_title" value="伊賀忍伝 凱王"/>
@@ -2519,10 +2593,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="juuouki">
+	<software name="juuouki" supported="partial">
 		<description>Juuouki (Japan)</description>
 		<year>1989</year>
 		<publisher>NEC Avenue</publisher>
+		<notes><![CDATA[
+Uses Sound LFO FM
+]]></notes>
 		<info name="serial" value="HACD9001"/>
 		<info name="release" value="19890922"/>
 		<info name="alt_title" value="獣王記"/>
@@ -2567,10 +2644,14 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="algunos">
+	<software name="algunos" supported="partial">
 		<description>Kakutou Haou Densetsu Algunos (Japan)</description>
 		<year>1994</year>
 		<publisher>Intec</publisher>
+		<notes><![CDATA[
+Intro draws black lines instead of wave-y effect
+All tested stages don't draw playfield properly, timing?
+]]></notes>
 		<info name="serial" value="IGCD3007"/>
 		<info name="release" value="19940128"/>
 		<info name="alt_title" value="格闘覇王伝説アルガノス"/>
@@ -2615,10 +2696,15 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="xanadu">
+	<software name="xanadu" supported="no">
 		<description>Kaze no Densetsu Xanadu (Japan)</description>
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
+		<notes><![CDATA[
+Crashes by selecting anything
+Crashes if left idle on attract mode
+Doesn't survive a soft reset
+]]></notes>
 		<info name="serial" value="HECD4006"/>
 		<info name="release" value="19940218"/>
 		<info name="alt_title" value="風の伝説ザナドゥ"/>
@@ -2728,10 +2814,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="koseikib">
+	<software name="koseikib" supported="partial">
 		<description>KO Seiki Beast - Gaia Fukkatsu Kanketsu Hen (Japan)</description>
 		<year>1994</year>
 		<publisher>Pack-In-Video</publisher>
+		<notes><![CDATA[
+Intro goes silent [ADPCM]
+]]></notes>
 		<info name="serial" value="PVCD4011"/>
 		<info name="release" value="19940617"/>
 		<info name="alt_title" value="KO世紀ビースト三獣士 ガイア復活 完結編"/>
@@ -2744,10 +2833,14 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="gulliver">
+	<software name="gulliver" supported="no">
 		<description>Kuusou Kagaku Sekai Gulliver Boy (Japan)</description>
 		<year>1995</year>
 		<publisher>Hudson</publisher>
+		<notes><![CDATA[
+https://mametesters.org/view.php?id=7290
+Sets high transfer length (0xfc), stalls, [SCSI] timing sensitive
+]]></notes>
 		<info name="serial" value="HCD5076"/>
 		<info name="release" value="19950526"/>
 		<info name="alt_title" value="空想科学世界ガリバーボーイ"/>
@@ -2780,6 +2873,9 @@ license:CC0-1.0
 		<description>Lady Phantom (Japan)</description>
 		<year>1991</year>
 		<publisher>Laser Soft</publisher>
+		<notes><![CDATA[
+Hangs after first attack turn (shoot to the foe behind the tree) (fixed)
+]]></notes>
 		<info name="serial" value="TJCD1019"/>
 		<info name="release" value="19911129"/>
 		<info name="alt_title" value="レディファントム"/>
@@ -2970,10 +3066,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="lodoss">
+	<software name="lodoss" supported="partial">
 		<description>Lodoss Tousenki - Record of Lodoss War (Japan)</description>
 		<year>1992</year>
 		<publisher>Hudson</publisher>
+		<notes><![CDATA[
+https://mametesters.org/view.php?id=7291
+]]></notes>
 		<info name="serial" value="HCD2029"/>
 		<info name="release" value="19920717"/>
 		<info name="alt_title" value="ロードス島戦記"/>
@@ -3054,6 +3153,9 @@ license:CC0-1.0
 		<description>Choujikuu Yousai Macross 2036 (CD, SCD)(Japan)</description>
 		<year>1992</year>
 		<publisher>NCS</publisher>
+		<notes><![CDATA[
+https://mametesters.org/view.php?id=5995 (fixed)
+]]></notes>
 		<info name="serial" value="NSCD2007"/>
 		<info name="release" value="19920403"/>
 		<info name="alt_title" value="ロードオブウォーズ"/>
@@ -3082,10 +3184,15 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="madstlkr">
+	<software name="madstlkr" supported="partial">
 		<description>Mad Stalker - Full Metal Force (Japan)</description>
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
+		<notes><![CDATA[
+https://mametesters.org/view.php?id=7791 (fixed)
+Glitchy GFX text char during intro
+Verify [redbook] lip sync and repeat (uses track mode)
+]]></notes>
 		<info name="serial" value="HECD4009"/>
 		<info name="release" value="19940915"/>
 		<info name="alt_title" value="マッドストーカー フルメタルフォース"/>
@@ -3112,7 +3219,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="madoum">
-		<description>Madou Monogatari I - Honou no Sotsuenji [Imperfect] (Japan)</description>
+		<description>Madou Monogatari I - Honou no Sotsuenji (Japan)</description>
 		<year>1996</year>
 		<publisher>NEC Avenue</publisher>
 		<info name="serial" value="NAPR-1047"/>
@@ -3127,10 +3234,14 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="popful">
+	<software name="popful" supported="no">
 		<description>Magical Fantasy Adventure - Popful Mail (ACD, SCD)(Japan)</description>
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
+		<notes><![CDATA[
+https://mametesters.org/view.php?id=7292 [SCSI] timing sensitive
+Crashes on (skippable) new game intro, [SCSI] timing sensitive
+]]></notes>
 		<info name="serial" value="HECD4011"/>
 		<info name="release" value="19940812"/>
 		<info name="alt_title" value="ぽっぷるメイル"/>
@@ -3240,8 +3351,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="silkylipo" cloneof="silkylip">
-		<description>Mahou no Shoujo Silky Lip [ver 3.1 prototype][backup] (Japan)</description>
-		<year>19??</year>
+		<description>Mahou no Shoujo Silky Lip (Japan, prototype Test Wo. Ver 3.1)</description>
+		<year>1994</year>
+		<!-- mispelled as "Telnet Japan" on title screen -->
 		<publisher>Nihon Telenet</publisher>
 		<info name="alt_title" value="魔法の少女シルキーリップ"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
@@ -3254,8 +3366,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="silkylip">
-		<description>Mahou no Shoujo Silky Lip [ver 5.0 prototype][backup][alt] (Japan)</description>
-		<year>19??</year>
+		<description>Mahou no Shoujo Silky Lip (Japan, prototype v5.0)</description>
+		<year>1994</year>
+		<!-- mispelled as "Telnet Japan" on title screen -->
 		<publisher>Nihon Telenet</publisher>
 		<info name="alt_title" value="魔法の少女シルキーリップ"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
@@ -3475,10 +3588,14 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="conan">
+	<software name="conan" supported="no">
 		<description>Mirai Shonen Conan (Japan)</description>
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
+		<notes><![CDATA[
+Very unstable on FMVs (including skip with select button) [SCSI] timing sensitive (downclock CD read speed from 75 to 60 Hz)
+Crashes when "left option" is selected in main menu (with no save in [BRAM])
+]]></notes>
 		<info name="serial" value="TJCD-2022"/>
 		<info name="release" value="19920228"/>
 		<info name="alt_title" value="未来少年コナン"/>
@@ -3572,7 +3689,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="motteke">
-		<description>Motteke Tamago [Imperfect] (Japan)</description>
+		<description>Motteke Tamago (Japan)</description>
 		<year>1997</year>
 		<publisher>Naxat Soft</publisher>
 		<info name="serial" value="NXCD3022"/>
@@ -3652,7 +3769,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="neklegbb">
-		<description>Nekketsu Legend Baseball (Japan)</description>
+		<description>Nekketsu Legend Baseballer (Japan)</description>
 		<year>1995</year>
 		<publisher>Pack-In-Video</publisher>
 		<info name="serial" value="PVCD-5013"/>
@@ -3747,10 +3864,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="nobubufu">
+	<software name="nobubufu" supported="partial">
 		<description>Nobunaga no Yabou - Bushou Fuuunroku (Japan)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
+		<notes><![CDATA[
+Unsupported [セーブくん] joypad slot peripheral
+]]></notes>
 		<info name="serial" value="KOCD2001"/>
 		<info name="release" value="19930227"/>
 		<info name="alt_title" value="信長の野望 武将風雲録"/>
@@ -3763,10 +3883,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="nobuzenk">
+	<software name="nobuzenk" supported="partial">
 		<description>Nobunaga no Yabou - Zenkokuban (Japan)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
+		<notes><![CDATA[
+Unsupported [セーブくん] joypad slot peripheral
+]]></notes>
 		<info name="serial" value="KOCD3005"/>
 		<info name="release" value="19931211"/>
 		<info name="alt_title" value="信長の野望・全国版"/>
@@ -4153,6 +4276,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="priveyed">
+		<!-- Stylized "eye dol" in lowercase on box art and title screen -->
 		<description>Private eye dol (ACD, SCD)(Japan)</description>
 		<year>1995</year>
 		<publisher>NEC Home Electronics</publisher>
@@ -4171,7 +4295,7 @@ license:CC0-1.0
 	<software name="psycdet3">
 		<description>Psychic Detective Series Vol. III - Aya (Japan)</description>
 		<year>1992</year>
-		<publisher>DataWest</publisher>
+		<publisher>Data West</publisher>
 		<info name="serial" value="DWCD2003"/>
 		<info name="release" value="19921120"/>
 		<info name="alt_title" value="サイキック・ディテクティブ・シリーズ Vol.3 AYA"/>
@@ -4184,10 +4308,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="psycdet3d" cloneof="psycdet3">
+	<software name="psycdet3d" cloneof="psycdet3" supported="no">
 		<description>Psychic Detective Series Vol. III - Aya - Auto Demo (Japan)</description>
 		<year>1992</year>
-		<publisher>DataWest</publisher>
+		<publisher>Data West</publisher>
+		<notes><![CDATA[
+Hangs at 3 minutes mark (verify, [ADPCM] or [SCSI])
+]]></notes>
 		<info name="usage" value="CD-ROM² Super System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -4200,7 +4327,7 @@ license:CC0-1.0
 	<software name="psycdet4">
 		<description>Psychic Detective Series Vol. IV - Orgel (Japan)</description>
 		<year>1993</year>
-		<publisher>DataWest</publisher>
+		<publisher>Data West</publisher>
 		<info name="serial" value="DWCD3004"/>
 		<info name="release" value="19930806"/>
 		<info name="alt_title" value="サイキック・ディテクティブ・シリーズ Vol.4 オルゴール"/>
@@ -4488,7 +4615,7 @@ license:CC0-1.0
 	<software name="rayxan2">
 		<description>Rayxanber II (Japan)</description>
 		<year>1991</year>
-		<publisher>DataWest</publisher>
+		<publisher>Data West</publisher>
 		<info name="serial" value="DWCD1001"/>
 		<info name="release" value="19910607"/>
 		<info name="alt_title" value="ライザンバーII"/>
@@ -4504,7 +4631,7 @@ license:CC0-1.0
 	<software name="rayxan3">
 		<description>Rayxanber III (Japan)</description>
 		<year>1992</year>
-		<publisher>DataWest</publisher>
+		<publisher>Data West</publisher>
 		<info name="serial" value="DWCD2002"/>
 		<info name="release" value="19920626"/>
 		<info name="alt_title" value="ライザンバーII"/>
@@ -4533,10 +4660,14 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="rennybla">
+	<software name="rennybla" supported="no">
 		<description>Renny Blaster (Japan)</description>
 		<year>1995</year>
 		<publisher>NEC Avenue</publisher>
+		<notes><![CDATA[
+Hangs on technique screen after level select (assuming you pick them up in stages) [pce_ctrl] reads at vpos = 10
+[ADPCM] streaming cuts off on gameplay dialogues
+]]></notes>
 		<info name="serial" value="NAPR-1044"/>
 		<info name="release" value="19950623"/>
 		<info name="alt_title" value="レニーブラスター"/>
@@ -4818,10 +4949,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="sangoku3">
+	<software name="sangoku3" supported="partial">
 		<description>Sangokushi III (Japan)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
+		<notes><![CDATA[
+Unsupported [セーブくん] joypad slot peripheral
+]]></notes>
 		<info name="serial" value="KOCD3003"/>
 		<info name="release" value="19931001"/>
 		<info name="alt_title" value="三國志III"/>
@@ -4914,9 +5048,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="seiyamonp" cloneof="seiyamon">
-		<description>Seiya Monogatari - Anearth Fantasy Stories [debug version prototype] (Japan)</description>
-		<year>19??</year>
-		<publisher>NEC</publisher>
+		<description>Seiya Monogatari - Anearth Fantasy Stories (Japan, debug prototype)</description>
+		<year>1995</year>
+		<publisher>Hudson</publisher>
 		<info name="usage" value="CD-ROM² Super System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -4975,7 +5109,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="sexyidoy">
-		<description>Sexy Idol Mahjong - Yakyuuken no Uta [Imperfect] (Japan)</description>
+		<description>Sexy Idol Mahjong - Yakyuuken no Uta (Japan)</description>
 		<year>1995</year>
 		<publisher>Nichibutsu</publisher>
 		<info name="serial" value="NBCD4007"/>
@@ -5022,10 +5156,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="shangh3">
+	<software name="shangh3" supported="partial">
 		<description>Shanghai III - Dragon's Eye (Japan)</description>
 		<year>1992</year>
 		<publisher>ASK Kodansha</publisher>
+		<notes><![CDATA[
+Plays static sound on Dragon's Eye mode result video
+]]></notes>
 		<info name="serial" value="AKCD2002"/>
 		<info name="release" value="19921218"/>
 		<info name="alt_title" value="上海III ドラゴンズアイ"/>
@@ -5054,10 +5191,16 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="holmesj" cloneof="holmes">
+	<software name="holmesj" cloneof="holmes" supported="no">
 		<description>Sherlock Holmes no Tantei Kouza (Japan)</description>
 		<year>1991</year>
 		<publisher>Victor Entertainment</publisher>
+		<notes><![CDATA[
+https://mametesters.org/view.php?id=7293
+Sets high CD drive transfer length (0xfc) on FMVs, stalls, [SCSI] timing sensitive
+Abruptly stops [ADPCM] playback on title screen
+Offset [CRTC] screen
+]]></notes>
 		<info name="serial" value="JCCD1004"/>
 		<info name="release" value="19910726"/>
 		<info name="alt_title" value="シャーロックホームズの探偵講座"/>
@@ -5070,10 +5213,16 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="holmes2j" cloneof="holmes2">
+	<software name="holmes2j" cloneof="holmes2" supported="no">
 		<description>Sherlock Holmes no Tantei Kouza II (Japan)</description>
 		<year>1993</year>
 		<publisher>Victor Entertainment</publisher>
+		<notes><![CDATA[
+https://mametesters.org/view.php?id=7294
+Sets high CD drive transfer length (0xfc) on FMVs, stalls, [SCSI] timing sensitive
+Abruptly stops [ADPCM] playback on title screen
+Offset [CRTC] screen
+]]></notes>
 		<info name="serial" value="JCCD3012"/>
 		<info name="release" value="19930528"/>
 		<info name="alt_title" value="シャーロックホームズの探偵講座II"/>
@@ -5087,7 +5236,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="shiawase">
-		<description>Shiawase Usagi - Nureta Bishoujo Ichi Hajimete na no ni [Imperfect] (Japan)</description>
+		<description>Shiawase Usagi - Nureta Bishoujo Ichi Hajimete na no ni (Japan)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="CD-ROM² Super System Card required" />
@@ -5415,7 +5564,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="spcfzone">
-		<description>Space Fantasy Zone [prototype][backup] (CD, SCD)(Japan)</description>
+		<description>Space Fantasy Zone (CD, SCD)(Japan, prototype)</description>
 		<year>1991?</year>
 		<publisher>NEC Avenue</publisher>
 		<info name="serial" value="NAPR-1023?"/>
@@ -5429,10 +5578,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="spaceinv">
+	<software name="spaceinv" supported="no">
 		<description>Space Invaders - The Original Game (Japan)</description>
 		<year>1995</year>
 		<publisher>NEC Avenue</publisher>
+		<notes><![CDATA[
+Crashes with [redbook] static if attract mode opening isn't skipped
+]]></notes>
 		<info name="serial" value="NAPR-1050"/>
 		<info name="release" value="19950728"/>
 		<info name="alt_title" value="スペースインベーダー・ジ・オリジナルゲーム"/>
@@ -5462,7 +5614,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="spriggn2">
-		<description>Spriggan Mark II - Re Terraform Project [Imperfect] (Japan)</description>
+		<description>Spriggan Mark II - Re Terraform Project (Japan)</description>
 		<year>1992</year>
 		<publisher>Naxat Soft</publisher>
 		<info name="serial" value="NXCD2008"/>
@@ -5557,10 +5709,15 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="steamhea">
-		<description>Steam Heart's [Imperfect] (Japan)</description>
+	<software name="steamhea" supported="no">
+		<description>Steam Heart's (Japan)</description>
 		<year>1996</year>
 		<publisher>TGL</publisher>
+		<notes><![CDATA[
+Enables [ADPCM] half irqs, stops voice playback in the middle
+[redbook] doesn't playback during gameplay
+Eventually hangs requiring a transfer ready irq [SCSI] (untested)
+]]></notes>
 		<info name="serial" value="GLCD6002"/>
 		<info name="release" value="19960322"/>
 		<info name="alt_title" value="スチーム・ハーツ"/>
@@ -6193,10 +6350,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="proyakyu">
+	<software name="proyakyu" supported="partial">
 		<description>The Pro Yakyuu (Japan)</description>
 		<year>1990</year>
 		<publisher>Intec</publisher>
+		<notes><![CDATA[
+Verify sound mixing, [PSG] covers [ADPCM]
+]]></notes>
 		<info name="serial" value="IGCD0001"/>
 		<info name="release" value="19901005"/>
 		<info name="alt_title" value="ザ・プロ野球"/>
@@ -6258,7 +6418,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tokimeki">
-		<description>Tokimeki Memorial [Imperfect] (Japan, HRKM70414-1FAAT)</description>
+		<description>Tokimeki Memorial (Japan, HRKM70414-1FAAT)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="KMCD4007"/>
@@ -6276,7 +6436,7 @@ license:CC0-1.0
 	<!-- This is exactly the same as tokimeki ?!-->
 	<!--
 	<software name="tokimekia" cloneof="tokimeki">
-	    <description>Tokimeki Memorial {HRKM70414-1FABT} [Imperfect] (Japan)</description>
+	    <description>Tokimeki Memorial (Japan, HRKM70414-1FABT)</description>
 	    <year>1994</year>
 	    <publisher>Konami</publisher>
 	    <info name="serial" value="KMCD4007"/>
@@ -6391,10 +6551,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="traveler">
-		<description>Travelers! Densetsu wo ButtobaSe [Imperfect] (Japan)</description>
+	<software name="traveler" supported="partial">
+		<description>Travelers! Densetsu wo Buttobase (Japan)</description>
 		<year>1994</year>
 		<publisher>Victor Entertainment</publisher>
+		<notes><![CDATA[
+Cuts off [ADPCM] playback, enables half irq
+]]></notes>
 		<info name="serial" value="JCCD4015"/>
 		<info name="release" value="19941229"/>
 		<info name="alt_title" value="とらべらーず! 伝説をぶっとばせ"/>
@@ -6643,6 +6806,9 @@ license:CC0-1.0
 		<description>Where in the World is Carmen Sandiego? (Japan)</description>
 		<year>1990</year>
 		<publisher>Pack-In-Video</publisher>
+		<notes><![CDATA[
+Hangs or resets after giving yes to "Is it OK?" prompt (fixed)
+]]></notes>
 		<info name="serial" value="PVCD0001"/>
 		<info name="release" value="19900330"/>
 		<info name="alt_title" value="カルメンサンディエゴを追え! 世界編"/>
@@ -6894,10 +7060,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ys4">
+	<software name="ys4" supported="partial">
 		<description>Ys IV - The Dawn of Ys (Japan, HCD3051-4-1108-R1F)</description>
 		<year>1993</year>
 		<publisher>Hudson</publisher>
+		<notes><![CDATA[
+Cuts off [ADPCM] playbacks, uses half irq
+]]></notes>
 		<info name="serial" value="HCD3051"/>
 		<info name="release" value="19931222"/>
 		<info name="alt_title" value="イースIV"/>
@@ -6910,10 +7079,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ys4a" cloneof="ys4">
+	<software name="ys4a" cloneof="ys4" supported="partial">
 		<description>Ys IV - The Dawn of Ys (Japan, HCD3051-5-1116-R1P)</description>
 		<year>1993</year>
 		<publisher>Hudson</publisher>
+		<notes><![CDATA[
+Cuts off [ADPCM] playbacks, uses half irq
+]]></notes>
 		<info name="serial" value="HCD3051"/>
 		<info name="release" value="19931222"/>
 		<info name="alt_title" value="イースIV"/>
@@ -7006,11 +7178,14 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="4in1">
+	<software name="4in1" supported="partial">
 		<description>4 in 1 Super CD (USA)</description>
-		<!-- Press U R D L II at menu to access Bomberman -->
 		<year>1992</year>
 		<publisher>Hudson Soft / Red</publisher>
+		<notes><![CDATA[
+Stuck note in Gate of Thunder [SCSI] timing sensitive
+Omake: Press U R D L II at menu to access Bomberman
+]]></notes>
 		<info name="serial" value="TGXCD1026"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
@@ -7021,10 +7196,14 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="addfam">
+	<software name="addfam" supported="partial">
 		<description>The Addams Family (USA)</description>
 		<year>1991</year>
 		<publisher>ICOM Simulations</publisher>
+		<notes><![CDATA[
+https://mametesters.org/view.php?id=7261 check [ADPCM] irq ack (fixed)
+Abruptly stops [ADPCM] playback on title screen, when beating Uncle Fester (pre-mansion), probably others
+]]></notes>
 		<info name="serial" value="TGXCD1019"/>
 		<info name="usage" value="CD-ROM System Card required" />
 		<sharedfeat name="requirement" value="cdsys"/>
@@ -7077,10 +7256,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="campcali">
+	<software name="campcali" supported="no">
 		<description>Camp California (USA)</description>
 		<year>1993</year>
 		<publisher>ICOM Simulations</publisher>
+		<notes><![CDATA[
+https://mametesters.org/view.php?id=7262
+]]></notes>
 		<info name="serial" value="TGXCD1013"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
@@ -7164,7 +7346,7 @@ license:CC0-1.0
 	<software name="exile">
 		<description>Exile (USA)</description>
 		<year>1992</year>
-		<publisher>Telnet Japan</publisher>
+		<publisher>Telenet Japan</publisher>
 		<info name="serial" value="WTG990101"/>
 		<info name="usage" value="CD-ROM System Card required" />
 		<sharedfeat name="requirement" value="cdsys"/>
@@ -7178,7 +7360,7 @@ license:CC0-1.0
 	<software name="exile2">
 		<description>Exile II - Wicked Phenomenon (USA)</description>
 		<year>1993</year>
-		<publisher>Telnet Japan</publisher>
+		<publisher>Telenet Japan</publisher>
 		<info name="serial" value="WTG990102"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
@@ -7189,8 +7371,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="fssoldr">
-		<description>Fantasy Star Soldier [prototype] (USA)</description>
+	<software name="fssoldr" cloneof="starparo">
+		<description>Fantasy Star Soldier (USA, prototype)</description>
 		<year>199?</year>
 		<publisher>Inter State</publisher>
 		<info name="serial" value="N/A"/>
@@ -7217,16 +7399,19 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="fzone2">
+	<software name="fzone2" supported="no">
 		<description>Final Zone II (USA)</description>
 		<year>1990</year>
-		<publisher>Telnet Japan</publisher>
+		<publisher>Telenet Japan</publisher>
+		<notes><![CDATA[
+https://mametesters.org/view.php?id=7972 (fixed)
+]]></notes>
 		<info name="serial" value="TGXCD1008"/>
 		<info name="usage" value="CD-ROM System Card required" />
 		<sharedfeat name="requirement" value="cdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="final zone ii (cd)(usa)" sha1="a8846a72f5eb819c6e9b6947eaa21597446f2e85"/>
+				<disk name="final zone ii (cd)(usa)" sha1="a8846a72f5eb819c6e9b6947eaa21597446f2e85" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7288,10 +7473,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="itcame">
+	<software name="itcame" supported="no">
 		<description>It Came from the Desert (USA)</description>
 		<year>1992</year>
 		<publisher>Cinemaware</publisher>
+		<notes><![CDATA[
+Black screen after title screen and "day 1" appears [SCSI] timing sensitive
+]]></notes>
 		<info name="serial" value="TGXCD1010"/>
 		<info name="usage" value="CD-ROM System Card required" />
 		<sharedfeat name="requirement" value="cdsys"/>
@@ -7316,10 +7504,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="madden">
+	<software name="madden" supported="no">
 		<description>John Madden Duo CD Football (USA)</description>
 		<year>1993</year>
 		<publisher>Electronic Arts</publisher>
+		<notes><![CDATA[
+Crashes after first action, [SCSI] timing sensitive
+]]></notes>
 		<info name="serial" value="TGXCD1045"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
@@ -7333,13 +7524,13 @@ license:CC0-1.0
 	<software name="lstalert">
 		<description>Last Alert (USA)</description>
 		<year>1990</year>
-		<publisher>Telnet Japan</publisher>
+		<publisher>Telenet Japan</publisher>
 		<info name="serial" value="TGXCD1007"/>
 		<info name="usage" value="CD-ROM System Card required" />
 		<sharedfeat name="requirement" value="cdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="last alert (cd)(usa)" sha1="085ecab0e16b7e1f74843d14a4f8ffe36a63567d"/>
+				<disk name="last alert (cd)(usa)" sha1="085ecab0e16b7e1f74843d14a4f8ffe36a63567d" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7432,6 +7623,9 @@ license:CC0-1.0
 		<description>Prince of Persia (USA)</description>
 		<year>1992</year>
 		<publisher>Brøderbund</publisher>
+		<notes><![CDATA[
+https://mametesters.org/view.php?id=7727 (fixed)
+]]></notes>
 		<info name="serial" value="TGXCD1027"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
@@ -7442,10 +7636,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="riotzone">
+	<software name="riotzone" supported="partial">
 		<description>Riot Zone (USA)</description>
 		<year>1993</year>
 		<publisher>Westone</publisher>
+		<notes><![CDATA[
+https://mametesters.org/view.php?id=6993
+]]></notes>
 		<info name="serial" value="TGXCD1035"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
@@ -7484,10 +7681,16 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="holmes">
+	<software name="holmes" supported="no">
 		<description>Sherlock Holmes Consulting Detective (USA)</description>
 		<year>1991</year>
 		<publisher>Sleuth Publications</publisher>
+		<notes><![CDATA[
+https://mametesters.org/view.php?id=7293
+Sets high CD drive transfer length (0xfc) on FMVs, stalls, [SCSI] timing sensitive
+Abruptly stops [ADPCM] playback on title screen
+Offset [CRTC] screen
+]]></notes>
 		<info name="serial" value="TGXCD1011"/>
 		<info name="usage" value="CD-ROM System Card required" />
 		<sharedfeat name="requirement" value="cdsys"/>
@@ -7498,10 +7701,16 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="holmes2">
+	<software name="holmes2" supported="no">
 		<description>Sherlock Holmes Consulting Detective Volume II (CD, SCD)(USA)</description>
 		<year>1993</year>
 		<publisher>Sleuth Publications</publisher>
+		<notes><![CDATA[
+https://mametesters.org/view.php?id=7294
+Sets high CD drive transfer length (0xfc) on FMVs, stalls, [SCSI] timing sensitive
+Abruptly stops [ADPCM] playback on title screen
+Offset [CRTC] screen
+]]></notes>
 		<info name="serial" value="TGXCD1039"/>
 		<info name="usage" value="CD-ROM System Card required" />
 		<sharedfeat name="requirement" value="cdsys"/>
@@ -7585,7 +7794,7 @@ license:CC0-1.0
 	<software name="valis2">
 		<description>Valis II (USA)</description>
 		<year>1990</year>
-		<publisher>Telnet Japan</publisher>
+		<publisher>Telenet Japan</publisher>
 		<info name="serial" value="TGXCD1006"/>
 		<info name="usage" value="CD-ROM System Card required" />
 		<sharedfeat name="requirement" value="cdsys"/>
@@ -7599,7 +7808,7 @@ license:CC0-1.0
 	<software name="valis3">
 		<description>Valis III (USA)</description>
 		<year>1992</year>
-		<publisher>Telnet Japan</publisher>
+		<publisher>Telenet Japan</publisher>
 		<info name="serial" value="TGXCD1024"/>
 		<info name="usage" value="CD-ROM System Card required" />
 		<sharedfeat name="requirement" value="cdsys"/>
@@ -7714,11 +7923,13 @@ license:CC0-1.0
 	</software>
 
 
-	<!-- Game Express Titles - use different System Card -->
 	<software name="hilegfan" supported="no">
 		<description>Hi-Leg Fantasy (GECD)(Japan)</description>
 		<year>1994</year>
 		<publisher>Game Express</publisher>
+		<notes><![CDATA[
+[Game Express] title, using unemulated HW slot features
+]]></notes>
 		<info name="serial" value="GED-1011"/>
 		<info name="release" value="19940916"/>
 		<info name="usage" value="Game Express CD Card required" />
@@ -7734,6 +7945,9 @@ license:CC0-1.0
 		<description>AV Tanjou (GECD)(Japan)</description>
 		<year>1995</year>
 		<publisher>Game Express</publisher>
+		<notes><![CDATA[
+[Game Express] title, using unemulated HW slot features
+]]></notes>
 		<info name="serial" value="GED-1015"/>
 		<info name="usage" value="Game Express CD Card required" />
 		<sharedfeat name="requirement" value="pce:gecd"/>
@@ -7748,6 +7962,9 @@ license:CC0-1.0
 		<description>Bishoujo Janshi Idol Pai (GECD)(Japan)</description>
 		<year>1995</year>
 		<publisher>Game Express</publisher>
+		<notes><![CDATA[
+[Game Express] title, using unemulated HW slot features
+]]></notes>
 		<info name="serial" value="GED-1016"/>
 		<info name="release" value="19951110"/>
 		<info name="usage" value="Game Express CD Card required" />
@@ -7760,9 +7977,12 @@ license:CC0-1.0
 	</software>
 
 	<software name="pachinko" supported="no">
-		<description>CD Bishoujo Pachinko Kyuuma Yon Shimai [Imperfect] (Japan)(Jpn)</description>
+		<description>CD Bishoujo Pachinko Kyuuma Yon Shimai (Japan)(Jpn)</description>
 		<year>1995</year>
 		<publisher>Game Express</publisher>
+		<notes><![CDATA[
+[Game Express] title, using unemulated HW slot features
+]]></notes>
 		<info name="serial" value="GECD-1014"/>
 		<info name="release" value="19950105"/>
 		<info name="usage" value="Game Express CD Card required" />
@@ -7778,6 +7998,9 @@ license:CC0-1.0
 		<description>CD Hanafuda Bishoujo Fan Club (GECD)(Japan)</description>
 		<year>1994</year>
 		<publisher>Game Express</publisher>
+		<notes><![CDATA[
+[Game Express] title, using unemulated HW slot features
+]]></notes>
 		<info name="serial" value="GED-1013"/>
 		<info name="release" value="19941125"/>
 		<info name="usage" value="Game Express CD Card required" />
@@ -7793,6 +8016,9 @@ license:CC0-1.0
 		<description>CD Mahjong Bishoujo Chuushinha (GECD)(Japan)</description>
 		<year>1993</year>
 		<publisher>Game Express</publisher>
+		<notes><![CDATA[
+[Game Express] title, using unemulated HW slot features
+]]></notes>
 		<info name="serial" value="GECD-1010"/>
 		<info name="release" value="19930730"/>
 		<info name="usage" value="Game Express CD Card required" />
@@ -7808,6 +8034,9 @@ license:CC0-1.0
 		<description>CD Pachisuro Bishoujo Gambler (GECD)(Japan)</description>
 		<year>1994</year>
 		<publisher>Game Express</publisher>
+		<notes><![CDATA[
+[Game Express] title, using unemulated HW slot features
+]]></notes>
 		<info name="serial" value="GECD-1012"/>
 		<info name="release" value="19940729"/>
 		<info name="usage" value="Game Express CD Card required" />

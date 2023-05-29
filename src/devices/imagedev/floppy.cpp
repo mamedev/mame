@@ -220,11 +220,6 @@ floppy_connector::~floppy_connector()
 {
 }
 
-void floppy_connector::set_formats(std::function<void (format_registration &fr)> _formats)
-{
-	formats = _formats;
-}
-
 void floppy_connector::device_start()
 {
 }
@@ -277,7 +272,6 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 		m_flux_screen(*this, "flux")
 {
 	extension_list[0] = '\0';
-	m_err = image_error::INVALIDIMAGE;
 }
 
 //-------------------------------------------------
@@ -531,21 +525,17 @@ void floppy_image_device::device_reset()
 	cache_clear();
 }
 
-const floppy_image_format_t *floppy_image_device::identify(std::string_view filename)
+std::pair<std::error_condition, const floppy_image_format_t *> floppy_image_device::identify(std::string_view filename)
 {
 	util::core_file::ptr fd;
 	std::string revised_path;
 	std::error_condition err = util::zippath_fopen(filename, OPEN_FLAG_READ, fd, revised_path);
-	if(err) {
-		seterror(err, nullptr);
-		return nullptr;
-	}
+	if(err)
+		return{ err, nullptr };
 
 	auto io = util::random_read_fill(std::move(fd), 0xff);
-	if(!io) {
-		seterror(std::errc::not_enough_memory, nullptr);
-		return nullptr;
-	}
+	if(!io)
+		return{ std::errc::not_enough_memory, nullptr };
 
 	int best = 0;
 	const floppy_image_format_t *best_format = nullptr;
@@ -557,7 +547,7 @@ const floppy_image_format_t *floppy_image_device::identify(std::string_view file
 		}
 	}
 
-	return best_format;
+	return{ std::error_condition(), best_format };
 }
 
 void floppy_image_device::init_floppy_load(bool write_supported)
@@ -586,14 +576,12 @@ void floppy_image_device::init_floppy_load(bool write_supported)
 		dskchg = 1;
 }
 
-image_init_result floppy_image_device::call_load()
+std::pair<std::error_condition, std::string> floppy_image_device::call_load()
 {
 	check_for_file();
 	auto io = util::random_read_fill(image_core_file(), 0xff);
-	if(!io) {
-		seterror(std::errc::not_enough_memory, nullptr);
-		return image_init_result::FAIL;
-	}
+	if(!io)
+		return std::make_pair(std::errc::not_enough_memory, std::string());
 
 	int best = 0;
 	const floppy_image_format_t *best_format = nullptr;
@@ -607,16 +595,13 @@ image_init_result floppy_image_device::call_load()
 		}
 	}
 
-	if (!best_format) {
-		seterror(image_error::INVALIDIMAGE, "Unable to identify the image format");
-		return image_init_result::FAIL;
-	}
+	if (!best_format)
+		return std::make_pair(image_error::INVALIDIMAGE, "Unable to identify image file format");
 
 	image = std::make_unique<floppy_image>(tracks, sides, form_factor);
 	if (!best_format->load(*io, form_factor, variants, image.get())) {
-		seterror(image_error::UNSUPPORTED, "Incompatible image format or corrupted data");
 		image.reset();
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::INVALIDIMAGE, "Incompatible image file format or corrupted data");
 	}
 	output_format = is_readonly() ? nullptr : best_format;
 
@@ -625,11 +610,11 @@ image_init_result floppy_image_device::call_load()
 	init_floppy_load(output_format != nullptr);
 
 	if (!cur_load_cb.isnull())
-		return cur_load_cb(this);
+		cur_load_cb(this);
 
 	flux_image_prepare();
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void floppy_image_device::flux_image_prepare()
@@ -798,7 +783,7 @@ void floppy_image_device::call_unload()
 	set_ready(true);
 }
 
-image_init_result floppy_image_device::call_create(int format_type, util::option_resolution *format_options)
+std::pair<std::error_condition, std::string> floppy_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	image = std::make_unique<floppy_image>(tracks, sides, form_factor);
 	output_format = nullptr;
@@ -825,7 +810,7 @@ image_init_result floppy_image_device::call_create(int format_type, util::option
 
 	flux_image_prepare();
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void floppy_image_device::init_fs(const fs_info *fs, const fs::meta_data &meta)

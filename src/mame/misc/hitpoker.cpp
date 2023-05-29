@@ -53,6 +53,8 @@ Some debug tricks (let's test this CPU as more as possible):
 #include "speaker.h"
 
 
+namespace {
+
 class hitpoker_state : public driver_device
 {
 public:
@@ -405,5 +407,8 @@ ROM_START( hitpoker )
 	ROM_LOAD16_BYTE( "u44.bin",         0x80001, 0x40000, CRC(e23d5f30) SHA1(ca8855301528aa4eeff40cb820943b4268f8596e) ) // the 'adult images' are 8bpp
 	ROM_LOAD16_BYTE( "u45.bin",         0x80000, 0x40000, CRC(e65b3e52) SHA1(c0c1a360a4a1823bf71c0a4105ff41f4102862e8) ) //  the first part of these 2 is almost empty as the standard gfx are 4bpp
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1997, hitpoker, 0, hitpoker, hitpoker, hitpoker_state, init_hitpoker, ROT0, "Accept Ltd.", "Hit Poker (Bulgaria)", MACHINE_NOT_WORKING )

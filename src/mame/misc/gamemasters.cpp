@@ -18,6 +18,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class gamemasters_state : public driver_device
 {
 public:
@@ -148,6 +150,8 @@ ROM_START(gmsshoot)
 	ROM_REGION(0x2000, "maincpu", 0)
 	ROM_LOAD("sharp_shooter__u20_2764.bin", 0x0000, 0x2000, CRC(902bd63b) SHA1(606e9d1083677d7eb90ad3626a6340238a260253)) // M2764AFI
 ROM_END
+
+} // anonymous namespace
 
 
 GAME(1989, gmsshoot, 0, gmsshoot, gmsshoot, gamemasters_state, empty_init, ROT0, "GameMasters", "Sharpshooter (coin pusher)", MACHINE_IS_SKELETON_MECHANICAL) // flyer and PCB dated 1988, but program strings claim 1989 copyright

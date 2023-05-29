@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
+#include "netdev_module.h"
+
+#include "modules/osdmodule.h"
+
 #if defined(OSD_NET_USE_TAPTUN)
 
 #if defined(_WIN32)
@@ -16,8 +20,6 @@
 #include "emu.h"
 #include "dinetwork.h"
 #include "osdnet.h"
-#include "modules/osdmodule.h"
-#include "netdev_module.h"
 #include "unicode.h"
 
 #ifdef __linux__
@@ -32,6 +34,10 @@
 #define PRODUCT_TAP_WIN_COMPONENT_ID "tap0901"
 #endif
 
+namespace osd {
+
+namespace {
+
 // Ethernet minimum frame length
 static constexpr int ETHERNET_MIN_FRAME = 64;
 
@@ -44,7 +50,7 @@ public:
 	}
 	virtual ~taptun_module() { }
 
-	virtual int init(const osd_options &options);
+	virtual int init(osd_interface &osd, const osd_options &options);
 	virtual void exit();
 
 	virtual bool probe() { return true; }
@@ -287,16 +293,21 @@ static std::vector<std::wstring> get_tap_adapters()
 
 				// check if the ComponentId value indicates a TAP-Windows adapter
 				if (RegQueryValueExW(unit_key, L"ComponentId", NULL, &data_type, LPBYTE(component_id), &component_id_len) == ERROR_SUCCESS
-					&& data_type == REG_SZ
-					&& safe_string(component_id, component_id_len) == L"" PRODUCT_TAP_WIN_COMPONENT_ID)
+					&& data_type == REG_SZ)
 				{
-					WCHAR net_cfg_instance_id[MAX_PATH];
-					DWORD net_cfg_instance_id_len = sizeof(net_cfg_instance_id);
+					std::wstring const value(safe_string(component_id, component_id_len));
 
-					// add the adapter to the result
-					if (RegQueryValueExW(unit_key, L"NetCfgInstanceId", NULL, &data_type, LPBYTE(net_cfg_instance_id), &net_cfg_instance_id_len) == ERROR_SUCCESS
-						&& data_type == REG_SZ)
-						result.push_back(safe_string(net_cfg_instance_id, net_cfg_instance_id_len));
+					// some older versions may not set the "root\" prefix
+					if (value == L"root\\" PRODUCT_TAP_WIN_COMPONENT_ID || value == L"" PRODUCT_TAP_WIN_COMPONENT_ID)
+					{
+						WCHAR net_cfg_instance_id[MAX_PATH];
+						DWORD net_cfg_instance_id_len = sizeof(net_cfg_instance_id);
+
+						// add the adapter to the result
+						if (RegQueryValueExW(unit_key, L"NetCfgInstanceId", NULL, &data_type, LPBYTE(net_cfg_instance_id), &net_cfg_instance_id_len) == ERROR_SUCCESS
+							&& data_type == REG_SZ)
+							result.push_back(safe_string(net_cfg_instance_id, net_cfg_instance_id_len));
+					}
 				}
 
 				RegCloseKey(unit_key);
@@ -343,7 +354,7 @@ static CREATE_NETDEV(create_tap)
 	return dynamic_cast<osd_netdev *>(dev);
 }
 
-int taptun_module::init(const osd_options &options)
+int taptun_module::init(osd_interface &osd, const osd_options &options)
 {
 #if defined(_WIN32)
 	for (std::wstring &id : get_tap_adapters())
@@ -359,13 +370,16 @@ void taptun_module::exit()
 	clear_netdev();
 }
 
+} // anonymous namespace
+
+} // namespace osd
+
 
 #else
-	#include "modules/osdmodule.h"
-	#include "netdev_module.h"
 
-	MODULE_NOT_SUPPORTED(taptun_module, OSD_NETDEV_PROVIDER, "taptun")
+namespace osd { namespace { MODULE_NOT_SUPPORTED(taptun_module, OSD_NETDEV_PROVIDER, "taptun") } }
+
 #endif
 
 
-MODULE_DEFINITION(NETDEV_TAPTUN, taptun_module)
+MODULE_DEFINITION(NETDEV_TAPTUN, osd::taptun_module)

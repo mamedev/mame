@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-#ifndef MAME_MACHINE_M20_8086_H
-#define MAME_MACHINE_M20_8086_H
+#ifndef MAME_OLIVETTI_M20_8086_H
+#define MAME_OLIVETTI_M20_8086_H
 
 #include "cpu/i86/i86.h"
 #include "machine/pic8259.h"
@@ -51,4 +51,4 @@ private:
 
 DECLARE_DEVICE_TYPE(M20_8086, m20_8086_device)
 
-#endif // MAME_MACHINE_M20_8086_H
+#endif // MAME_OLIVETTI_M20_8086_H

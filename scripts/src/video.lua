@@ -57,6 +57,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/atirage.h,VIDEOS["ATIRAGE"] = true
+--------------------------------------------------
+
+if (VIDEOS["ATIRAGE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/atirage.cpp",
+		MAME_DIR .. "src/devices/video/atirage.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/bufsprite.h,VIDEOS["BUFSPRITE"] = true
 --------------------------------------------------
 
@@ -787,6 +799,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/mos8563.h,VIDEOS["MOS8563"] = true
+--------------------------------------------------
+
+if (VIDEOS["MOS8563"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/mos8563.cpp",
+		MAME_DIR .. "src/devices/video/mos8563.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/pc_vga.h,VIDEOS["PC_VGA"] = true
 --------------------------------------------------
 
@@ -882,6 +906,18 @@ if (VIDEOS["SAA5240"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/saa5240.cpp",
 		MAME_DIR .. "src/devices/video/saa5240.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/sn74s262.h,VIDEOS["SN74S262"] = true
+--------------------------------------------------
+
+if (VIDEOS["SN74S262"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/sn74s262.cpp",
+		MAME_DIR .. "src/devices/video/sn74s262.h",
 	}
 end
 
@@ -1454,5 +1490,17 @@ if (VIDEOS["X1_001"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/x1_001.cpp",
 		MAME_DIR .. "src/devices/video/x1_001.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/zr36110.h,VIDEOS["ZR36110"] = true
+--------------------------------------------------
+
+if (VIDEOS["ZR36110"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/zr36110.cpp",
+		MAME_DIR .. "src/devices/video/zr36110.h",
 	}
 end

@@ -41,6 +41,8 @@
 #include "digel804.lh"
 
 
+namespace {
+
 // port 40 read reads eprom socket pins 11-13, 15-19 (i.e. eprom pin D0 to pin D7)
 
 // port 40 write writes eprom socket pins 11-13, 15-19 (i.e. eprom pin D0 to pin D7)
@@ -791,6 +793,7 @@ ROM_START(ep804) // pcb v1.0; address mapper 804-1-2
 	ROM_LOAD("804-1-2.mmi_6330-in.d30", 0x0000, 0x0020, CRC(30dd4721) SHA1(e4b2f5756118be4c8ab56c708dc4f42469c7e51b)) // Address mapper prom, 82s23/mmi6330/tbp18sa030 equivalent 32x8 open collector
 ROM_END
 
+} // anonymous namespace
 
 
 /******************************************************************************

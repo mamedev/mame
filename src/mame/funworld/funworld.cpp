@@ -1,141 +1,151 @@
 // license:BSD-3-Clause
 // copyright-holders:Roberto Fresca, Grull Osgo, Andreas Naive, Peter Ferrie
-/****************************************************************************************
+/*********************************************************************************************
 
-  Fun World / TAB / Impera
+  Fun World / Amatic / TAB / Impera
   Series 7000 hardware.
 
   65C02/65SC02 + 2x 6821 PIAs + 6845 CRTC + AY-3-8910.
   From raw, to different ways of encryption. Even through custom CPUs.
 
-  Also from Amatic, CMC, Dino4 (encrypted), and Leopard 4.
+  Also from CMC, Dino4 (encrypted), and Leopard 4.
 
   Driver by Roberto Fresca.
   Based on a preliminary work of Curt Coder & Peter Trauner.
 
 
-*****************************************************************************************
+**********************************************************************************************
 
   Games running on this hardware:
 
-  * Jolly Card (German, set 1),                                    TAB Austria,        1985.
-  * Jolly Card (German, set 2),                                    TAB Austria,        1985.
-  * Jolly Card (3x3 deal),                                         TAB Austria,        1985.
-  * Jolly Card Professional 2.0 (MZS Tech),                        MZS Tech,           1993.
-  * Jolly Card Professional 2.0 (Spale Soft),                      Spale Soft,         2000.
-  * Jolly Card (Evona Electronic),                                 Evona Electronic    1998.
-  * Jolly Card (Croatian, set 1),                                  TAB Austria,        1985.
-  * Jolly Card (Croatian, set 2),                                  Soft Design,        1993.
-  * Super Joly 2000 - 3x,                                          M.P.                1985.
-  * Jolly Card (German, Fun World, bootleg),                       Inter Games,        1986.
-  * Jolly Card (Spanish, blue TAB board, encrypted),               TAB Austria,        1992.
-  * Jolly Card (Italian, different colors, set 1),                 bootleg,            1990.
-  * Jolly Card (Italian, different colors, set 2),                 bootleg,            1990.
-  * Jolly Card (Italian, bootleg, set 1),                          bootleg,            1990.
-  * Jolly Card (Italian, bootleg, set 2),                          bootleg,            1993.
-  * Jolly Card (Italian, bootleg, set 3),                          bootleg,            1990.
-  * Bonus Card (German),                                           Fun World,          1986.
-  * Bonus Card (German, ATG Electronic hack),                      Fun World,          1986.
-  * Big Deal (Hungarian, set 1),                                   Fun World,          1986.
-  * Big Deal (Hungarian, set 2),                                   Fun World,          1986.
-  * Cuore 1 (Italian, set 1),                                      C.M.C.,             1996.
-  * Cuore 1 (Italian, set 2),                                      C.M.C.,             1996.
-  * Cuore 1 (Italian, set 3),                                      C.M.C.,             1996.
-  * Cuore 1 (Italian, set 4),                                      C.M.C.,             1996.
-  * Cuore 1 (Italian, set 5),                                      C.M.C.,             1996.
-  * Elephant Family (Italian, new),                                C.M.C.,             1997.
-  * Elephant Family (Italian, old),                                C.M.C.,             1996.
-  * Pool 10 (Italian, set 1),                                      C.M.C.,             1996.
-  * Pool 10 (Italian, set 2),                                      C.M.C.,             1996.
-  * Pool 10 (Italian, set 3),                                      C.M.C.,             1996.
-  * Pool 10 (Italian, set 4),                                      C.M.C.,             1997.
-  * Pool 10 (Italian, set 5),                                      C.M.C.,             1996.
-  * Pool 10 (Italian, set 6),                                      C.M.C.,             1996.
-  * Pool 10 (Italian, set 7),                                      C.M.C.,             1997.
-  * Pool 10 (Italian, set 8),                                      C.M.C.,             1997.
-  * Pool 10 (Italian, set 9),                                      bootleg (R.B.),     1996.
-  * Pool 10 (Italian, set 10),                                     C.M.C.,             1997.
-  * New Biliard 98 (Pool 10 hack),                                 bootleg,            1998.
-  * Royal (Pool 10 hack),                                          unknown,            2001.
-  * Tortuga Family (Italian),                                      C.M.C.,             1997.
-  * Pot Game (Italian),                                            C.M.C.,             1996.
-  * Bottle 10 (Italian, set 1),                                    C.M.C.,             1996.
-  * Bottle 10 (Italian, set 2),                                    C.M.C.,             1996.
-  * Luna Park (set 1, dual program),                               unknown,            1998.
-  * Luna Park (set 2, dual program),                               unknown,            1998.
-  * Luna Park (set 3),                                             unknown,            1998.
-  * Crystal Colours (CMC hardware),                                J.C.D. srl,         1998.
-  * Royal Card (German, set 1),                                    TAB Austria,        1991.
-  * Royal Card (German, set 2),                                    TAB Austria,        1991.
-  * Royal Card (German/Polish, set 3),                             TAB Austria,        1991.
-  * Royal Card (German, set 4),                                    TAB Austria,        1991.
-  * Royal Card (German, set 5),                                    TAB Austria,        1991.
-  * Royal Card (German, set 6),                                    TAB Austria,        1991.
-  * Royal Card (German, set 7, CMC C1030 HW),                      bootleg,            1991.
-  * Royal Card (German, set 8),                                    TAB Austria,        1991.
-  * Royal Card (French),                                           TAB Austria,        1991.
-  * Royal Card v2.0 Professional,                                  Digital Dreams,     1993.
-  * Royal Card / Royal Jackpot (with a third draw)(encrypted),     TAB / Video Klein,  1991
-  * Witch Royal (Export version 2.1),                              Video Klein,        199?.
-  * Lucky Lady (3x3 deal),                                         TAB Austria,        1991.
-  * Lucky Lady (4x1 aces),                                         TAB Austria,        1991.
-  * Magic Card II (Bulgarian),                                     Impera,             1996.
-  * Magic Card II (Nov, Yugoslavian),                              Impera,             1996.
-  * Magic Card II (green TAB or Impera board),                     Impera,             1996.
-  * Magic Card II (blue TAB board, encrypted),                     Impera,             1996.
-  * Royal Vegas Joker Card (Slow deal),                            Fun World,          1993.
-  * Royal Vegas Joker Card (Fast deal),                            Soft Design,        1993.
-  * Royal Vegas Joker Card (Fast deal, english gfx),               Soft Design,        1993.
-  * Royal Vegas Joker Card (Fast deal, Mile),                      Mile,               1993.
-  * Jolly Joker (98bet, set 1).                                    Impera,             199?.
-  * Jolly Joker (98bet, set 2).                                    Impera,             199?.
-  * Jolly Joker (40bet, higher paytable),                          Impera,             1985.
-  * Jolly Joker (40bet, lower paytable),                           Impera,             1985.
-  * Jolly Joker (Apple Time),                                      Apple Time,         199?.
-  * Jolly Joker (original program, interleaved GFX, Impera logo),  Impera,             199?.
-  * Jolly Joker (original program, interleaved GFX, no logo),      Impera,             199?.
-  * Jolly Joker (Solid State module in suicide board).             Impera,             199?.
-  * Multi Win (Ver.0167, encrypted),                               Fun World,          1992.
-  * Multi Win (Ver.0091, encrypted),                               Fun World,          1991.
-  * Multi Win (EPM7032, encrypted),                                Amatic,             2001.
-  * Power Card (Ver 0263, encrypted),                              Fun World,          1993.
-  * Mega Card (Ver.0210, encrypted),                               Fun World,          1993.
-  * Joker Card 300 (Ver.A267BC, encrypted),                        Amatic Trading,     1993.
-  * Royal Card (Evona, Polish, encrypted),                         Evona Electronic,   1991.
-  * Saloon (French, encrypted),                                    unknown,            199?.
-  * Nevada (French, encrypted),                                    unknown,            199?.
-  * Jolly Card (Italian, blue TAB board, encrypted),               bootleg,            199?.
-  * Jolly Card (Italian, encrypted bootleg, set 1),                bootleg,            1990.
-  * Jolly Card (Italian, encrypted bootleg, set 2),                bootleg,            1993.
-  * Jolly Card (Italian, encrypted bootleg, set 3),                bootleg,            1993.
-  * Zabavni Karti (cyrillic, Bulgarian, encrypted),                bootleg,            1993.
-  * Pool 10 (Italian, Dino 4 hardware, encrypted),                 C.M.C.,             1997.
-  * Royal Card (Italian, Dino 4 hardware, encrypted),              unknown,            1998.
-  * China Town (Ver 1B, Dino4 HW),                                 unknown,            1998.
-  * Mongolfier New (Italian),                                      unknown,            199?.
-  * Soccer New (Italian),                                          unknown,            199?.
-  * Fun World Quiz (German),                                       Fun World,          198?.
-  * Fun World Quiz (German, 12-11-1990),                           Fun World,          1990.
-  * Fun World Quiz (German, 27-04-1990),                           Fun World,          1990.
-  * Novo Play Multi Card / Club Card,                              Admiral/Novomatic,  1986.
-  * Joker Card (Inter Games),                                      Inter Games,        1991.
-  * Unknown Fun World A7-11 game 1,                                Fun World,          1985.
-  * Unknown Fun World A7-11 game 2,                                Fun World,          1985.
-  * Unknown Fun World A0-1 game,                                   Fun World,          1991.
-  * Joker Card / Multi Card (Epoxy brick CPU),                     Fun World,          1991.
-  * Gratis Poker (V.204, set 1),                                   Mega Soft,          1995.
-  * Gratis Poker (V.204, set 2),                                   Mega Soft,          1995.
-  * Gkoulit (encrypted GFX),                                       JK Amusement,       1995.
-  * Reflex Cards (English, serial protected),                      TAB Austria,        1999.
-  * Club Card (ver. 1.1 English),                                  Impera / Mega Tech, 199?.
-  * Royal Card (stealth with NES multigame),                       bootleg,            1991.
-  * Royal Card (stealth with MSX multigame),                       bootleg,            1991.
+  * Jolly Card (German, set 1),                                    TAB Austria,          1985.
+  * Jolly Card (German, set 2),                                    TAB Austria,          1985.
+  * Jolly Card (3x3 deal),                                         TAB Austria,          1985.
+  * Jolly Card Professional 2.0 (MZS Tech),                        MZS Tech,             1993.
+  * Jolly Card Professional 2.0 (Spale Soft),                      Spale Soft,           2000.
+  * Jolly Card (Evona Electronic),                                 Evona Electronic      1998.
+  * Jolly Card (Croatian, set 1),                                  TAB Austria,          1985.
+  * Jolly Card (Croatian, set 2),                                  Soft Design,          1993.
+  * Super Joly 2000 - 3x,                                          M.P.                  1985.
+  * Jolly Card (German, Fun World, bootleg),                       Inter Games,          1986.
+  * Jolly Card (Spanish, blue TAB board, encrypted),               TAB Austria,          1992.
+  * Jolly Card (Italian, different colors, set 1),                 bootleg,              1990.
+  * Jolly Card (Italian, different colors, set 2),                 bootleg,              1990.
+  * Jolly Card (Italian, bootleg, set 1),                          bootleg,              1990.
+  * Jolly Card (Italian, bootleg, set 2),                          bootleg,              1993.
+  * Jolly Card (Italian, bootleg, set 3),                          bootleg,              1990.
+  * Jolly Game (V1, Otti Karl logo),                               bootleg,              1993.
+  * Bonus Card (German),                                           Fun World,            1986.
+  * Bonus Card (German, ATG Electronic hack),                      Fun World,            1986.
+  * Big Deal (Hungarian, set 1),                                   Fun World,            1986.
+  * Big Deal (Hungarian, set 2),                                   Fun World,            1986.
+  * Cuore 1 (Italian, set 1),                                      C.M.C.,               1996.
+  * Cuore 1 (Italian, set 2),                                      C.M.C.,               1996.
+  * Cuore 1 (Italian, set 3),                                      C.M.C.,               1996.
+  * Cuore 1 (Italian, set 4),                                      C.M.C.,               1996.
+  * Cuore 1 (Italian, set 5),                                      C.M.C.,               1996.
+  * Cuore 1 (Italian, set 6),                                      C.M.C.,               1996.
+  * Cuore 1 (Italian, set 7),                                      bootleg,              1996.
+  * Elephant Family (Italian, new),                                C.M.C.,               1997.
+  * Elephant Family (Italian, old),                                C.M.C.,               1996.
+  * Pool 10 (Italian, set 1),                                      C.M.C.,               1996.
+  * Pool 10 (Italian, set 2),                                      C.M.C.,               1996.
+  * Pool 10 (Italian, set 3),                                      C.M.C.,               1996.
+  * Pool 10 (Italian, set 4),                                      C.M.C.,               1997.
+  * Pool 10 (Italian, set 5),                                      C.M.C.,               1996.
+  * Pool 10 (Italian, set 6),                                      C.M.C.,               1996.
+  * Pool 10 (Italian, set 7),                                      C.M.C.,               1997.
+  * Pool 10 (Italian, set 8),                                      C.M.C.,               1997.
+  * Pool 10 (Italian, set 9),                                      bootleg (R.B.),       1996.
+  * Pool 10 (Italian, set 10),                                     C.M.C.,               1997.
+  * Magic 10 Nevada (bootleg of Pool 10),                          bootleg (Magic),      1997.
+  * New Biliard 98 (Pool 10 hack),                                 bootleg,              1998.
+  * Royal (Pool 10 hack),                                          unknown,              2001.
+  * Tortuga Family (Italian),                                      C.M.C.,               1997.
+  * Pot Game (Italian),                                            C.M.C.,               1996.
+  * Bottle 10 (Italian, set 1),                                    C.M.C.,               1996.
+  * Bottle 10 (Italian, set 2),                                    C.M.C.,               1996.
+  * Luna Park (set 1, dual program),                               unknown,              1998.
+  * Luna Park (set 2, dual program),                               unknown,              1998.
+  * Luna Park (set 3),                                             unknown,              1998.
+  * Crystal Colours (CMC hardware),                                J.C.D. srl,           1998.
+  * Royal Card (German, set 1),                                    TAB Austria,          1991.
+  * Royal Card (German, set 2),                                    TAB Austria,          1991.
+  * Royal Card (German/Polish, set 3),                             TAB Austria,          1991.
+  * Royal Card (German, set 4),                                    TAB Austria,          1991.
+  * Royal Card (German, set 5),                                    TAB Austria,          1991.
+  * Royal Card (German, set 6),                                    TAB Austria,          1991.
+  * Royal Card (German, set 7, CMC C1030 HW),                      bootleg,              1991.
+  * Royal Card (German, set 8),                                    TAB Austria,          1991.
+  * Royal Card (French),                                           TAB Austria,          1991.
+  * Royal Card v2.0 Professional,                                  Digital Dreams,       1993.
+  * Royal Card / Royal Jackpot (with a third draw)(encrypted),     TAB / Video Klein,    1991
+  * Witch Royal (Export version 2.1),                              Video Klein,          199?.
+  * Lucky Lady (3x3 deal),                                         TAB Austria,          1991.
+  * Lucky Lady (4x1 aces),                                         TAB Austria,          1991.
+  * Magic Card II (Bulgarian),                                     Impera,               1996.
+  * Magic Card II (Nov, Yugoslavian),                              Impera,               1996.
+  * Magic Card II (green TAB or Impera board),                     Impera,               1996.
+  * Magic Card II (blue TAB board, encrypted),                     Impera,               1996.
+  * Royal Vegas Joker Card (Slow deal),                            Fun World,            1993.
+  * Royal Vegas Joker Card (Fast deal),                            Soft Design,          1993.
+  * Royal Vegas Joker Card (Fast deal, english gfx),               Soft Design,          1993.
+  * Royal Vegas Joker Card (Fast deal, Mile),                      Mile,                 1993.
+  * Jolly Joker (98bet, set 1).                                    Impera,               199?.
+  * Jolly Joker (98bet, set 2).                                    Impera,               199?.
+  * Jolly Joker (40bet, higher paytable),                          Impera,               1985.
+  * Jolly Joker (40bet, lower paytable),                           Impera,               1985.
+  * Jolly Joker (Apple Time),                                      Apple Time,           199?.
+  * Jolly Joker (original program, interleaved GFX, Impera logo),  Impera,               199?.
+  * Jolly Joker (original program, interleaved GFX, no logo),      Impera,               199?.
+  * Jolly Joker (original program, interleaved GFX, Otti Karl logo, set 1), Impera,      199?.
+  * Jolly Joker (original program, interleaved GFX, Otti Karl logo, set 2), Impera,      199?.
+  * Jolly Joker (Solid State module in suicide board).             Impera,               199?.
+  * Multi Win (Ver.0167, encrypted),                               Fun World,            1992.
+  * Multi Win (Ver.0091, encrypted),                               Fun World,            1991.
+  * Multi Win (EPM7032, encrypted),                                Amatic,               2001.
+  * Power Card (Ver 0263, encrypted),                              Fun World,            1993.
+  * Mega Card (Ver.0210, encrypted),                               Fun World,            1993.
+  * Mega Card (Ver.0053, encrypted),                               Fun World,            1992.
+  * Joker Card 300 (Ver.A267BC, encrypted),                        Amatic Trading,       1993.
+  * Royal Card (Evona, Polish, encrypted),                         Evona Electronic,     1991.
+  * Saloon (French, encrypted),                                    unknown,              199?.
+  * Nevada (French, encrypted),                                    unknown,              199?.
+  * Jolly Card (Italian, blue TAB board, encrypted),               bootleg,              199?.
+  * Jolly Card (Italian, encrypted bootleg, set 1),                bootleg,              1990.
+  * Jolly Card (Italian, encrypted bootleg, set 2),                bootleg,              1993.
+  * Jolly Card (Italian, encrypted bootleg, set 3),                bootleg (Cleco),      1993.
+  * Zabavni Karti (Bulgarian, cyrillic, encrypted),                bootleg (Cleco),      1993.
+  * Pool 10 (Italian, Dino 4 hardware, encrypted),                 C.M.C.,               1997.
+  * Royal Card (Italian, Dino 4 hardware, encrypted),              unknown,              1998.
+  * China Town (Ver 1B, Dino4 HW),                                 unknown,              1998.
+  * Mongolfier New (Italian),                                      unknown,              199?.
+  * Soccer New (Italian),                                          unknown,              199?.
+  * Fun World Quiz (German),                                       Fun World,            198?.
+  * Fun World Quiz (German, 12-11-1990),                           Fun World,            1990.
+  * Fun World Quiz (German, 27-04-1990),                           Fun World,            1990.
+  * Novo Play Multi Card / Club Card,                              Admiral/Novomatic,    1986.
+  * Novo Play (V6.2H),                                             Intergames/Novomatic, 1991.
+  * Novo Play (V3.3H),                                             Intergames/Novomatic, 1991.
+  * Joker Card (Inter Games),                                      Inter Games,          1991.
+  * Unknown Fun World A7-11 game 1,                                Fun World,            1985.
+  * Unknown Fun World A7-11 game 2,                                Fun World,            1985.
+  * Unknown Fun World A0-1 game,                                   Fun World,            1991.
+  * Joker Card / Multi Card (Epoxy brick CPU),                     Fun World,            1991.
+  * Gratis Poker (V.204, set 1),                                   Mega Soft,            1995.
+  * Gratis Poker (V.204, set 2),                                   Mega Soft,            1995.
+  * Gkoulit (encrypted GFX),                                       JK Amusement,         1995.
+  * Reflex Cards (English, serial protected),                      TAB Austria,          1999.
+  * Club Card (ver. 1.1 English),                                  Impera / Mega Tech,   199?.
+  * Royal Card (stealth with NES multigame, set 1),                bootleg,              1991.
+  * Royal Card (stealth with NES multigame, set 2),                bootleg,              1991.
+  * Royal Card (stealth with MSX multigame),                       bootleg,              1991.
 
 
-  Supported games: 110
+  Supported games: 122
 
 
-*****************************************************************************************
+**********************************************************************************************
 
   The hardware is generally composed by:
 
@@ -675,7 +685,7 @@
   then toggle ON/OFF the function pressing CANCEL (ИЗЧИСТВАНЕ) button (key N).
 
 
-*****************************************************************************************
+**********************************************************************************************
 
   Memory Map (generic)
   --------------------
@@ -728,7 +738,7 @@
   chinatow:  0x7C  0x60  0x65  0x08  0x21  0x08  0x1F  0x1F  0x00  0x07  0x01  0x01  0x00  0x00  0x00  0x00  0x00  0x00.
 
 
-*****************************************************************************************
+**********************************************************************************************
 
 
   *** TO DO ***
@@ -741,7 +751,7 @@
   - Implement the MCU in monglfir and soccernw.
 
 
-****************************************************************************************/
+*********************************************************************************************/
 
 #include "emu.h"
 #include "funworld.h"
@@ -4524,6 +4534,31 @@ ROM_START( jolycdab )
 	ROM_LOAD( "82s147.bin", 0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
 ROM_END
 
+/*
+  Jolly Game (V1, Otti Karl logo)
+  Bootleg. 1993.
+
+  Color info in 2nd half of the Bipolar PROM.
+
+*/
+ROM_START( jolygame )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "jg_99.1.bin", 0x8000, 0x8000, CRC(4154478f) SHA1(050340d75aa9a4b93025eef3507a8cfe220c466b) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "3.bin", 0x0000, 0x8000, CRC(db147426) SHA1(f97f3fed13e2723a3b32eb146cd7c16b54088d61) )
+	ROM_LOAD( "2.bin", 0x8000, 0x8000, CRC(e7e7a0fd) SHA1(232190a0b2086e12ea3d77652ef98c9e107b3dc7) )
+
+	ROM_REGION( 0x0800, "ds1220", 0 )  // to analyze...
+	ROM_LOAD( "ds1220.bin", 0x0000, 0x0800, CRC(4364b423) SHA1(01c8d5e3003f4a9cc8ec446ddc18ff83353688df) )
+
+	ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM.
+	ROM_LOAD( "jolygame_nvram.bin", 0x0000, 0x0800, CRC(51213ede) SHA1(4da080e3b5ea8090609571883bbb04ea22774aa5) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "am27s29apc.bin", 0x0000, 0x0200, CRC(8992aa4d) SHA1(5a0649bff66e7cab1bcbadcdfc74c77a747cc58f) )
+ROM_END
+
 
 /******************************** Bonus Card based sets ************************************/
 
@@ -6204,7 +6239,7 @@ ROM_START( vegasslw )
 	ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
 	ROM_LOAD( "vegasslw_nvram.bin", 0x0000, 0x0800, CRC(1aa043e3) SHA1(c93d071effb2f2fe95e9dc751174c2c765595f74) )
 
-	ROM_REGION( 0x0200, "proms", 0 )    // PLD address the 2nd half
+	ROM_REGION( 0x0200, "proms", 0 )    // PLD addresses the 2nd half
 	ROM_LOAD( "jokercrd_prom.bin", 0x0000, 0x0200, CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
 ROM_END
 
@@ -6220,7 +6255,7 @@ ROM_START( vegasfst )
 	ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
 	ROM_LOAD( "vegasfst_nvram.bin", 0x0000, 0x0800, CRC(5034de7a) SHA1(ab2077a49d94676531c73ad8d8ce9548bbfa2b81) )
 
-	ROM_REGION( 0x0200, "proms", 0 )    // PLD address the 2nd half
+	ROM_REGION( 0x0200, "proms", 0 )    // PLD addresses the 2nd half
 	ROM_LOAD( "jokercrd_prom.bin", 0x0000, 0x0200, CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
 ROM_END
 
@@ -6236,7 +6271,7 @@ ROM_START( vegasfte )   // Royal Vegas Joker Card (fast deal, english gfx)
 	ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
 	ROM_LOAD( "vegasfte_nvram.bin", 0x0000, 0x0800, CRC(166c6055) SHA1(db2143a2a3adc92578bd3707391d2f5030cc6a6f) )
 
-	ROM_REGION( 0x0200, "proms", 0 )    // PLD address the 2nd half
+	ROM_REGION( 0x0200, "proms", 0 )    // PLD addresses the 2nd half
 	ROM_LOAD( "jokercrd_prom.bin", 0x0000, 0x0200, CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
 ROM_END
 
@@ -6504,7 +6539,7 @@ ROM_START( jolyjokro )
 
 	ROM_REGION( 0x10000, "gfxpool", 0 )
 	ROM_LOAD( "impera2.bin", 0x0000, 0x10000, CRC(aa86dba6) SHA1(fe189dde83bd855f4a0b34b20c161a9addc15017) )
-	ROM_CONTINUE(            0x0000, 0x10000)   // discarding 1nd empty half (0000-ffff)
+	ROM_CONTINUE(            0x0000, 0x10000)   // discarding 1st empty half (0000-ffff)
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_FILL(              0x0000, 0x10000, 0xff)   // deinterleaved GFX data will be placed here
@@ -6512,7 +6547,7 @@ ROM_START( jolyjokro )
 	ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
 	ROM_LOAD( "jolyjokro_nvram.bin", 0x0000, 0x0800, CRC(1f69e567) SHA1(86695ca6f9f93c6badd092410611d8061edf8efa) )
 
-	ROM_REGION( 0x0200, "proms", 0 )    // PLD address the 2nd half
+	ROM_REGION( 0x0200, "proms", 0 )    // PLD addresses the 2nd half
 	ROM_LOAD( "1_impera_color_ii.bin", 0x0000, 0x0200, CRC(9d62f9f5) SHA1(68300c25c7eaa13a3fdbf91ab0711d0bc530543d) )
 ROM_END
 
@@ -6522,7 +6557,7 @@ ROM_START( jolyjokrp )
 
 	ROM_REGION( 0x10000, "gfxpool", 0 )
 	ROM_LOAD( "9c_1ff1.bin", 0x00000, 0x10000, CRC(4b8f0821) SHA1(0821eed07f5e98b66d87a3079756dad72ffe9665) )
-	ROM_CONTINUE(            0x00000, 0x10000)  // discarding 1nd half (0000-ffff), but has some data. leftover?
+	ROM_CONTINUE(            0x00000, 0x10000)  // discarding 1st half (0000-ffff), but has some data. leftover?
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_FILL(              0x0000, 0x10000, 0xff)   // deinterleaved GFX data will be placed here
@@ -6530,9 +6565,63 @@ ROM_START( jolyjokrp )
 	ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
 	ROM_LOAD( "jolyjokrp_nvram.bin", 0x0000, 0x0800, CRC(c8706e75) SHA1(421420b1ee82615faf290d1204342cdde776ffaf) )
 
-	ROM_REGION( 0x0200, "proms", 0 )    // PLD address the 2nd half
+	ROM_REGION( 0x0200, "proms", 0 )    // PLD addresses the 2nd half
 	ROM_LOAD( "impera_color_ii.bin", 0x0000, 0x0200, CRC(9d62f9f5) SHA1(68300c25c7eaa13a3fdbf91ab0711d0bc530543d) )
 ROM_END
+
+/*
+  Jolly Joker (Otti Karl logo)
+  Original Impera program.
+
+  Both sets have graphics ROMs data interleaved
+  inside the second half of a 16bit 27C210 EPROM.
+  The second set has full garbage in the first half.
+
+  The PLD (PAL16L8) was bruteforced.
+
+*/
+ROM_START( jolyjokrs )  // Jolly Joker (Otti Karl logo, set 1)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "jolly_joker_standard_09.90.bin", 0x0000, 0x10000, CRC(3cad9fcf) SHA1(09f23ae8c04e6b461e17a8b3978fe44566ffc3aa) )
+
+	ROM_REGION( 0x10000, "gfxpool", 0 )
+	ROM_LOAD( "02.bin", 0x0000, 0x10000, CRC(dedf3bcc) SHA1(d534005ada564aae08c02422cdb405599489aa0a) )
+	ROM_CONTINUE(       0x0000, 0x10000)   // discarding 1st empty half (0000-ffff)
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_FILL(              0x0000, 0x10000, 0xff)   // deinterleaved GFX data will be placed here
+
+	ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
+	ROM_LOAD( "jolyjokrs_nvram.bin", 0x0000, 0x0800, CRC(1f69e567) SHA1(86695ca6f9f93c6badd092410611d8061edf8efa) )
+
+	ROM_REGION( 0x0200, "proms", 0 )    // PLD addresses the 2nd half
+	ROM_LOAD( "63s481n.bin", 0x0000, 0x0200, CRC(9d62f9f5) SHA1(68300c25c7eaa13a3fdbf91ab0711d0bc530543d) )
+
+	ROM_REGION( 0x0200, "plds", 0 )    // identical to jolyjokrt one
+	ROM_LOAD( "jolyjokrs_pal16l8.bin",  0x0000, 0x0117, CRC(b235c40b) SHA1(69611fe15f54220efcdbce9efb3e2738242af692) )
+ROM_END
+
+ROM_START( jolyjokrt )  // Jolly Joker (Otti Karl logo, set 2)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c512.bin", 0x0000, 0x10000, CRC(3cad9fcf) SHA1(09f23ae8c04e6b461e17a8b3978fe44566ffc3aa) )
+
+	ROM_REGION( 0x10000, "gfxpool", 0 )
+	ROM_LOAD( "d27c210.bin", 0x0000, 0x10000, CRC(132e4747) SHA1(255976f672dd7cf755e198617f7d895f7b888ae7) )
+	ROM_CONTINUE(            0x0000, 0x10000)   // discarding 1st half (0000-ffff) full of garbage
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_FILL(              0x0000, 0x10000, 0xff)   // deinterleaved GFX data will be placed here
+
+	ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
+	ROM_LOAD( "jolyjokrt_nvram.bin", 0x0000, 0x0800, CRC(1f69e567) SHA1(86695ca6f9f93c6badd092410611d8061edf8efa) )
+
+	ROM_REGION( 0x0200, "proms", 0 )    // PLD addresses the 2nd half
+	ROM_LOAD( "am27s29.bin", 0x0000, 0x0200, CRC(9d62f9f5) SHA1(68300c25c7eaa13a3fdbf91ab0711d0bc530543d) )
+
+	ROM_REGION( 0x0200, "plds", 0 )    // identical to jolyjokrs one
+	ROM_LOAD( "jolyjokrt_pal16l8.bin",  0x0000, 0x0117, CRC(b235c40b) SHA1(69611fe15f54220efcdbce9efb3e2738242af692) )
+ROM_END
+
 
 /*
   Jolly Joker
@@ -6999,6 +7088,38 @@ ROM_START( megacard )
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "megacard_pal16l8.bin",  0x0000, 0x0117, CRC(3159a548) SHA1(ad904fa35b78570e44323469967803e34ef4bc0c) )
+ROM_END
+
+/*
+
+  Mega Card (MC3).
+  Ver. 0053.
+  Fun World, 1992.
+
+  Poker game with encrypted CPU: F - 10/03/1992.
+
+*/
+
+ROM_START( megacarda )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "megamc3_0057-f-1.ic37",  0x8000, 0x8000, CRC(ca3becc0) SHA1(04dd8cebc53241d35eab842766b59e0f0e091b86) )  // just the 2nd half
+	ROM_LOAD( "megamc3_0057-f-2.ic41",  0x0000, 0x8000, CRC(91add9f8) SHA1(b0fe9015fe4760de73f2ee00c89a16c19340a884) )  // just the 2nd half
+
+	ROM_REGION( 0x0300, "die_65sc02", 0 )   // from the 65SC02 die inside of the custom CPU, version 0210.
+	ROM_LOAD( "gteu65decoderom.bin",   0x0000, 0x02f1, CRC(089af0c6) SHA1(0f46a73a7859a694a07ebe74d476fae80e57e329) )
+
+	ROM_REGION( 0x0800, "decode", 0 )   // from the CY7C291A inside of the custom CPU, version 0210.
+	ROM_LOAD( "megacard_cy7291a.bin",  0x0000, 0x0800, CRC(596f01ac) SHA1(a8606a1dd385fbb46b1a96f11a759fa6580803d8) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "mega_zg2.ic11",   0x0000, 0x8000, CRC(0993d380) SHA1(e5e2386948fba2fb6b79339af27bd1d0f1e198ca) )
+	ROM_LOAD( "mega_zg1.ic10",   0x8000, 0x8000, CRC(de2e2dd0) SHA1(17962d84838f39de41bc7a41d399fd18cd0bd5b7) )
+
+	ROM_REGION( 0x0200, "proms", 0 )  // original BP has bit 1 = 0 along the dump. the device is damaged. rest of bits match the parent dump.
+	ROM_LOAD( "n82s147an.ic3",  0x0000, 0x0200, CRC(136245f3) SHA1(715309982fcafbce88b08237ca46acec31273938) )
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "megacarda_pal16l8.bin",  0x0000, 0x0117, CRC(fcda7872) SHA1(60acdb968e6229a8f71c2e29d22e132906a65bd5) )  // cracked.
 ROM_END
 
 
@@ -7507,8 +7628,47 @@ ROM_START( novoplay )   // Similar to Royal Vegas Joker Card
 	ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
 	ROM_LOAD( "novoplay_nvram.bin", 0x0000, 0x0800, CRC(92019972) SHA1(e6d1e231cd2ce27e718ed9482dbe9ddc8612eb67) )
 
-	ROM_REGION( 0x0200, "proms", 0 )    // PLD address the 2nd half
+	ROM_REGION( 0x0200, "proms", 0 )    // PLD addresses the 2nd half
 	ROM_LOAD( "np1_27s29.bin", 0x0000, 0x0200, CRC(8992aa4d) SHA1(5a0649bff66e7cab1bcbadcdfc74c77a747cc58f) )
+ROM_END
+
+/*
+  Novo Play 6.2H
+*/
+ROM_START( novoplaya )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "np_62h.bin", 0x8000, 0x8000, CRC(5b00faf0) SHA1(9144fef9c445f32cb681d7b935ead2032b40fb05) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "np4-ch2_9250.bin", 0x0000, 0x8000, CRC(7223471c) SHA1(785c6af6cf7e06978bc178a5c1c6b21f9db58a88) )
+	ROM_LOAD( "np4-ch1_9250.bin", 0x8000, 0x8000, CRC(c57bac23) SHA1(5b329ece7a0682b8ef5f9a13abb0312f7c885339) )
+
+//  ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
+//  ROM_LOAD( "novoplaya_nvram.bin", 0x0000, 0x0800, CRC(92019972) SHA1(e6d1e231cd2ce27e718ed9482dbe9ddc8612eb67) )
+
+	ROM_REGION( 0x0200, "proms", 0 )    // PLD addresses the 2nd half
+	ROM_LOAD( "n82s147an.bin", 0x0000, 0x0200, CRC(8992aa4d) SHA1(5a0649bff66e7cab1bcbadcdfc74c77a747cc58f) )
+ROM_END
+
+/*
+  Novo Play 3.3H
+*/
+ROM_START( novoplayb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "np33.bin", 0x8000, 0x8000, CRC(a4c09120) SHA1(faa40920e84dab13a792f73aacf60ad3855d68ea) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "np4-ch2_9250.bin", 0x0000, 0x8000, CRC(7223471c) SHA1(785c6af6cf7e06978bc178a5c1c6b21f9db58a88) )
+	ROM_LOAD( "np4-ch1_9250.bin", 0x8000, 0x8000, CRC(c57bac23) SHA1(5b329ece7a0682b8ef5f9a13abb0312f7c885339) )
+
+	ROM_REGION( 0x0800, "ds1220", 0 )    // Dallas DS1220 to analize.
+	ROM_LOAD( "ds1220.bin", 0x0000, 0x0800, CRC(f6c65329) SHA1(b64ca34661b9690aa9b69a20a7f6683954bbe76a) )
+
+//  ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
+//  ROM_LOAD( "novoplayb_nvram.bin", 0x0000, 0x0800, CRC(92019972) SHA1(e6d1e231cd2ce27e718ed9482dbe9ddc8612eb67) )
+
+	ROM_REGION( 0x0200, "proms", 0 )    // PLD addresses the 2nd half
+	ROM_LOAD( "am27s29.bin", 0x0000, 0x0200, CRC(8992aa4d) SHA1(5a0649bff66e7cab1bcbadcdfc74c77a747cc58f) )
 ROM_END
 
 
@@ -8673,6 +8833,7 @@ GAMEL( 1990, jolycdie,   jollycrd, cuoreuno, jolycdib,  funworld_state, empty_in
 GAMEL( 1990, jolycdif,   jollycrd, cuoreuno, jolycdib,  funworld_state, empty_init,    ROT0, "bootleg",           "Jolly Card (Italian, bootleg, set 1)",            0,                       layout_jollycrd ) // italian, CPLD. doesn't need nvram init.
 GAMEL( 1993, jolycdig,   jollycrd, cuoreuno, jolycdib,  funworld_state, init_jolycdig, ROT0, "bootleg",           "Jolly Card (Italian, bootleg, set 2)",            0,                       layout_jollycrd ) // italian, CPLD. needs nvram.
 GAMEL( 1990, jolycdih,   jollycrd, cuoreuno, jolycdib,  funworld_state, empty_init,    ROT0, "bootleg",           "Jolly Card (Italian, bootleg, set 3)",            0,                       layout_jollycrd )
+GAMEL( 1993, jolygame,   jollycrd, fw2ndpal, funworld,  funworld_state, empty_init,    ROT0, "bootleg",           "Jolly Game (V1, Otti Karl logo)",                 0,                       layout_jollycrd )
 
 // Bonus Card based...
 GAMEL( 1986, bonuscrd,   0,        fw2ndpal, bonuscrd,  funworld_state, empty_init,    ROT0, "Fun World",         "Bonus Card (German)",                             MACHINE_IMPERFECT_COLORS, layout_bonuscrd ) // use fw1stpal machine for green background
@@ -8751,6 +8912,8 @@ GAMEL( 199?, jolyjokrb2, jolyjokr, fw1stpal, funworld,  funworld_state, empty_in
 GAMEL( 199?, jolyjokrc,  jolyjokr, fw1stpal, funworld,  funworld_state, empty_init,    ROT0, "Apple Time",        "Jolly Joker (Apple Time)",                        MACHINE_NOT_WORKING,     layout_jollycrd )  // bad program ROM...
 GAMEL( 199?, jolyjokro,  jolyjokr, fw2ndpal, funworld,  funworld_state, init_impera16, ROT0, "Impera",            "Jolly Joker (original program, interleaved GFX, Impera logo)",  0,         layout_jollycrd )
 GAMEL( 199?, jolyjokrp,  jolyjokr, fw2ndpal, funworld,  funworld_state, init_impera16, ROT0, "Impera",            "Jolly Joker (original program, interleaved GFX, no logo)",      0,         layout_jollycrd )
+GAMEL( 199?, jolyjokrs,  jolyjokr, fw2ndpal, funworld,  funworld_state, init_impera16, ROT0, "Impera",            "Jolly Joker (original program, interleaved GFX, Otti Karl logo, set 1)", 0, layout_jollycrd )
+GAMEL( 199?, jolyjokrt,  jolyjokr, fw2ndpal, funworld,  funworld_state, init_impera16, ROT0, "Impera",            "Jolly Joker (original program, interleaved GFX, Otti Karl logo, set 2)", 0, layout_jollycrd )
 GAMEL( 199?, jolyjokrm,  jolyjokr, fw1stpal, funworld,  funworld_state, empty_init,    ROT0, "Impera",            "Jolly Joker (Solid State module in suicide board)", 0,                     layout_jollycrd )
 
 // Encrypted games...
@@ -8759,6 +8922,7 @@ GAME(  1991, multiwina,  multiwin, multiwina,funworld,  multiwina_state,empty_in
 GAME(  2001, multiwinb,  multiwin, fw2ndpal, funworld,  funworld_state, empty_init,    ROT0, "Amatic",            "Multi Win (EPM7032, encrypted)",                  MACHINE_NOT_WORKING ) // daughterboard with R65C02 + Altera EPM7032.
 GAME(  1993, powercrd,   0,        multiwina,funworld,  multiwina_state,empty_init,    ROT0, "Fun World",         "Power Card (Ver 0263, encrypted)",                0 ) // clone of Bonus Card.
 GAME(  1993, megacard,   0,        multiwina,funworld,  multiwina_state,empty_init,    ROT0, "Fun World",         "Mega Card (Ver.0210, encrypted)",                 0 )
+GAME(  1993, megacarda,  megacard, multiwina,funworld,  multiwina_state,empty_init,    ROT0, "Fun World",         "Mega Card (Ver.0053, encrypted)",                 0 )
 GAME(  1993, jokercrd,   0,        jokercrd, funworld,  jokercrd_state, empty_init,    ROT0, "Amatic Trading",    "Joker Card 300 (Ver.A267BC, encrypted)",          0 )
 GAME(  1991, royalcrdf,  royalcrd, royalcrdf,royalcrdf, royalcrdf_state,driver_init,   ROT0, "Evona Electronic",  "Royal Card (Evona, Polish, encrypted)",           0 )
 GAME(  198?, saloon,     0,        saloon,   saloon,    funworld_state, init_saloon,   ROT0, "<unknown>",         "Saloon (French, encrypted)",                      0 )
@@ -8769,7 +8933,7 @@ GAMEL( 199?, jolycdit,   jollycrd, cuoreuno, jolycdit,  funworld_state, init_tab
 GAMEL( 1990, jolycdib,   jollycrd, cuoreuno, jolycdib,  funworld_state, init_tabblue,  ROT0, "bootleg",           "Jolly Card (Italian, encrypted bootleg, set 1)",  0,                       layout_jollycrd ) // not a real TAB blue PCB
 GAMEL( 1993, jolycdic,   jollycrd, cuoreuno, jolycdic,  funworld_state, init_tabblue,  ROT0, "bootleg",           "Jolly Card (Italian, encrypted bootleg, set 2)",  0,                       layout_jollycrd ) // not a real TAB blue PCB
 GAMEL( 1993, jolycdii,   jollycrd, cuoreuno, jolycdib,  funworld_state, init_tabblue,  ROT0, "bootleg (Cleco)",   "Jolly Card (Italian, encrypted bootleg, set 3)",  0,                       layout_jollycrd ) // Cleco bootleg PCB
-GAMEL( 1993, jolycdcy,   jollycrd, cuoreuno, jolycdcy,  funworld_state, init_tabblue,  ROT0, "bootleg (Cleco)",   "Zabavni Karti (Bulgarian, encrypted)",            0,                       layout_jollycrd )
+GAMEL( 1993, jolycdcy,   jollycrd, cuoreuno, jolycdcy,  funworld_state, init_tabblue,  ROT0, "bootleg (Cleco)",   "Zabavni Karti (Bulgarian, cyrillic, encrypted)",  0,                       layout_jollycrd ) // Cleco bootleg PCB
 
 // Dino 4 encrypted hardware...
 GAMEL( 1997, pool10e,    pool10,   cuoreuno, cuoreuno,  funworld_state, init_dino4,    ROT0, "C.M.C.",            "Pool 10 (Italian, Dino 4 hardware, encrypted)",   0,                       layout_jollycrd )
@@ -8786,7 +8950,9 @@ GAME(  1990, funquiza,   0,        funquiz,  funquiza,  funworld_state, empty_in
 GAME(  1990, funquizb,   0,        funquiz,  funquiza,  funworld_state, empty_init,    ROT0, "Fun World",         "Fun World Quiz (German, 27-04-1990)",             0 )
 
 // Other games...
-GAMEL( 1986, novoplay,   0,        fw2ndpal,   novoplay,  funworld_state,   empty_init,   ROT0, "Admiral/Novomatic",  "Novo Play Multi Card / Club Card",            0,                       layout_novoplay )
+GAMEL( 1986, novoplay,   0,        fw2ndpal,   novoplay,  funworld_state,   empty_init,   ROT0, "Admiral/Novomatic",     "Novo Play Multi Card / Club Card",         0,                       layout_novoplay )
+GAMEL( 1991, novoplaya,  novoplay, fw2ndpal,   novoplay,  funworld_state,   empty_init,   ROT0, "Intergames/Novomatic",  "Novo Play (V6.2H)",                        MACHINE_NOT_WORKING,     layout_novoplay )
+GAMEL( 1991, novoplayb,  novoplay, fw2ndpal,   novoplay,  funworld_state,   empty_init,   ROT0, "Intergames/Novomatic",  "Novo Play (V3.3H)",                        MACHINE_NOT_WORKING,     layout_novoplay )
 GAME(  1991, intrgmes,   0,        intrgmes,   intrgmes,  intergames_state, empty_init,   ROT0, "Inter Games",        "Joker Card (Inter Games)",                    0 )
 GAMEL( 1985, fw_a7_11,   0,        fw_brick_2, fw_brick1, funworld_state,   empty_init,   ROT0, "Fun World",          "unknown Fun World A7-11 game 1",              MACHINE_NOT_WORKING,     layout_jollycrd )
 GAMEL( 1985, fw_a7_11a,  fw_a7_11, fw_brick_2, fw_brick1, funworld_state,   empty_init,   ROT0, "Fun World",          "unknown Fun World A7-11 game 2",              MACHINE_NOT_WORKING,     layout_jollycrd )

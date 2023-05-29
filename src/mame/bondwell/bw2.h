@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_BW2_H
-#define MAME_INCLUDES_BW2_H
+#ifndef MAME_BONDWELL_BW2_H
+#define MAME_BONDWELL_BW2_H
 
 #pragma once
 
@@ -98,4 +98,4 @@ public:
 	void lcdc_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_BW2_H
+#endif // MAME_BONDWELL_BW2_H

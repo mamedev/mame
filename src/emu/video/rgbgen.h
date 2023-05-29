@@ -151,16 +151,21 @@ public:
 
 	inline void shl(const rgbaint_t& shift)
 	{
-		m_a <<= shift.m_a;
-		m_r <<= shift.m_r;
-		m_g <<= shift.m_g;
-		m_b <<= shift.m_b;
+		m_a = (u32(shift.m_a) > 31) ? 0 : (m_a << shift.m_a);
+		m_r = (u32(shift.m_r) > 31) ? 0 : (m_r << shift.m_r);
+		m_g = (u32(shift.m_g) > 31) ? 0 : (m_g << shift.m_g);
+		m_b = (u32(shift.m_b) > 31) ? 0 : (m_b << shift.m_b);
 	}
 
 	inline void shl_imm(const u8 shift)
 	{
 		if (shift == 0)
 			return;
+		if (shift > 31)
+		{
+			zero();
+			return;
+		}
 
 		m_a <<= shift;
 		m_r <<= shift;
@@ -170,16 +175,21 @@ public:
 
 	inline void shr(const rgbaint_t& shift)
 	{
-		m_a = s32(u32(m_a) >> shift.m_a);
-		m_r = s32(u32(m_r) >> shift.m_r);
-		m_g = s32(u32(m_g) >> shift.m_g);
-		m_b = s32(u32(m_b) >> shift.m_b);
+		m_a = (u32(shift.m_a) > 31) ? 0 : s32(u32(m_a) >> shift.m_a);
+		m_r = (u32(shift.m_r) > 31) ? 0 : s32(u32(m_r) >> shift.m_r);
+		m_g = (u32(shift.m_g) > 31) ? 0 : s32(u32(m_g) >> shift.m_g);
+		m_b = (u32(shift.m_b) > 31) ? 0 : s32(u32(m_b) >> shift.m_b);
 	}
 
 	inline void shr_imm(const u8 shift)
 	{
 		if (shift == 0)
 			return;
+		if (shift > 31)
+		{
+			zero();
+			return;
+		}
 
 		m_a = s32(u32(m_a) >> shift);
 		m_r = s32(u32(m_r) >> shift);
@@ -189,43 +199,19 @@ public:
 
 	inline void sra(const rgbaint_t& shift)
 	{
-		m_a >>= shift.m_a;
-		if (m_a & (1 << (31 - shift.m_a)))
-			m_a |= ~0 << (32 - shift.m_a);
-
-		m_r >>= shift.m_r;
-		if (m_r & (1 << (31 - shift.m_r)))
-			m_r |= ~0 << (32 - shift.m_r);
-
-		m_g >>= shift.m_g;
-		if (m_g & (1 << (31 - shift.m_g)))
-			m_g |= ~0 << (32 - shift.m_g);
-
-		m_b >>= shift.m_b;
-		if (m_b & (1 << (31 - shift.m_b)))
-			m_b |= ~0 << (32 - shift.m_b);
+		m_a >>= (u32(shift.m_a) > 31) ? 31 : shift.m_a;
+		m_r >>= (u32(shift.m_r) > 31) ? 31 : shift.m_r;
+		m_g >>= (u32(shift.m_g) > 31) ? 31 : shift.m_g;
+		m_b >>= (u32(shift.m_b) > 31) ? 31 : shift.m_b;
 	}
 
 	inline void sra_imm(const u8 shift)
 	{
-		const u32 high_bit = 1 << (31 - shift);
-		const u32 high_mask = ~0 << (32 - shift);
-
-		m_a >>= shift;
-		if (m_a & high_bit)
-			m_a |= high_mask;
-
-		m_r >>= shift;
-		if (m_r & high_bit)
-			m_r |= high_mask;
-
-		m_g >>= shift;
-		if (m_g & high_bit)
-			m_g |= high_mask;
-
-		m_b >>= shift;
-		if (m_b & high_bit)
-			m_b |= high_mask;
+		const u8 s = std::min<u8>(shift, 31);
+		m_a >>= s;
+		m_r >>= s;
+		m_g >>= s;
+		m_b >>= s;
 	}
 
 	void or_reg(const rgbaint_t& color) { or_imm_rgba(color.m_a, color.m_r, color.m_g, color.m_b); }

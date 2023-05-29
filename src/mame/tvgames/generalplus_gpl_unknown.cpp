@@ -33,6 +33,8 @@
 #include "logmacro.h"
 
 
+namespace {
+
 class generalplus_gpl_unknown_state : public driver_device
 {
 public:
@@ -617,6 +619,8 @@ ROM_START( taturtf )
 	ROM_REGION16_BE( 0x800000, "spi", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "tinyarcadeturtlefighter_25q32bst16_684016.bin", 0x000000, 0x400000, CRC(8e046f2d) SHA1(e48492cf953f22a47fa2b88a8f96a1e459b8c487) )
 ROM_END
+
+} // anonymous namespace
 
 
 // The 'Micro Arcade' units are credit card sized handheld devices

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Chris Hardy
-#ifndef MAME_INCLUDES_WARPWARP_H
-#define MAME_INCLUDES_WARPWARP_H
+#ifndef MAME_NAMCO_WARPWARP_H
+#define MAME_NAMCO_WARPWARP_H
 
 #pragma once
 
@@ -126,4 +126,4 @@ private:
 	void warpwarp_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_WARPWARP_H
+#endif // MAME_NAMCO_WARPWARP_H

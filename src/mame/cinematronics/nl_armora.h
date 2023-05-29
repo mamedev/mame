@@ -1,10 +1,10 @@
 // license:CC0-1.0
 // copyright-holders:Aaron Giles
-#ifndef MAME_AUDIO_NL_ARMORA_H
-#define MAME_AUDIO_NL_ARMORA_H
+#ifndef MAME_CINEMATRONICS_NL_ARMORA_H
+#define MAME_CINEMATRONICS_NL_ARMORA_H
 
 #pragma once
 
 NETLIST_EXTERNAL(armora)
 
-#endif // MAME_AUDIO_NL_ARMORA_H
+#endif // MAME_CINEMATRONICS_NL_ARMORA_H

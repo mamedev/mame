@@ -43,6 +43,8 @@
 #include "apricotp.lh"
 
 
+namespace {
+
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
@@ -130,11 +132,11 @@ private:
 	void mem_w(offs_t offset, uint16_t data);
 	uint8_t prtr_snd_r();
 	void pint_clr_w(uint8_t data);
-	void ls_w(uint8_t data);
+	[[maybe_unused]] void ls_w(uint8_t data);
 	void contrast_w(uint8_t data);
 	void palette_w(uint8_t data);
 	void video_w(uint16_t data);
-	void lat_w(offs_t offset, uint8_t data);
+	[[maybe_unused]] void lat_w(offs_t offset, uint8_t data);
 
 	void lat_ls259_w(offs_t offset, int state);
 
@@ -675,6 +677,7 @@ ROM_START( fp )
 	ROM_LOAD( "pal3 pal12l6.ic77", 0x000, 0x100, NO_DUMP ) // ?
 ROM_END
 
+} // anonymous namespace
 
 
 //**************************************************************************

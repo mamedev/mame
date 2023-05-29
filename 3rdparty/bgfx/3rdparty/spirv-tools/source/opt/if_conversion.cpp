@@ -160,6 +160,11 @@ bool IfConversion::CheckBlock(BasicBlock* block, DominatorAnalysis* dominators,
   BasicBlock* inc1 = context()->get_instr_block(preds[1]);
   if (dominators->Dominates(block, inc1)) return false;
 
+  if (inc0 == inc1) {
+    // If the predecessor blocks are the same, then there is only 1 value for
+    // the OpPhi.  Other transformation should be able to simplify that.
+    return false;
+  }
   // All phis will have the same common dominator, so cache the result
   // for this block. If there is no common dominator, then we cannot transform
   // any phi in this basic block.
@@ -169,6 +174,8 @@ bool IfConversion::CheckBlock(BasicBlock* block, DominatorAnalysis* dominators,
   if (branch->opcode() != SpvOpBranchConditional) return false;
   auto merge = (*common)->GetMergeInst();
   if (!merge || merge->opcode() != SpvOpSelectionMerge) return false;
+  if (merge->GetSingleWordInOperand(1) == SpvSelectionControlDontFlattenMask)
+    return false;
   if ((*common)->MergeBlockIdIfAny() != block->id()) return false;
 
   return true;

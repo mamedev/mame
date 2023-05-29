@@ -180,9 +180,8 @@ void bosco_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 {
 	uint8_t *spriteram = m_spriteram;
 	uint8_t *spriteram_2 = m_spriteram2;
-	int offs;
 
-	for (offs = 0;offs < m_spriteram_size;offs += 2)
+	for (int offs = 0;offs < m_spriteram_size;offs += 2)
 	{
 		int sx = spriteram[offs + 1] - 2;
 		int sy = 240 - spriteram_2[offs];
@@ -204,9 +203,7 @@ void bosco_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 void bosco_state::draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip)
 {
-	int offs;
-
-	for (offs = 4; offs < 0x10;offs++)
+	for (int offs = 4; offs < 0x10;offs++)
 	{
 		int x = m_bosco_radarx[offs] + ((~m_bosco_radarattr[offs] & 0x01) << 8) - 2;
 		int y = 251 - m_bosco_radary[offs];

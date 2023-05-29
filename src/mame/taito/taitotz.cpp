@@ -180,6 +180,13 @@ Notes:
 #include "video/poly.h"
 #include "screen.h"
 
+#define LOG_PPC_TO_TLCS_COMMANDS (1U << 1)
+#define LOG_TLCS_TO_PPC_COMMANDS (1U << 2)
+
+#define VERBOSE (LOG_PPC_TO_TLCS_COMMANDS | LOG_TLCS_TO_PPC_COMMANDS)
+#include "logmacro.h"
+
+
 /*
     Interesting mem areas
 
@@ -511,10 +518,6 @@ Notes:
 
 namespace {
 
-#define LOG_PPC_TO_TLCS_COMMANDS        1
-#define LOG_TLCS_TO_PPC_COMMANDS        1
-
-#define LOG_DISPLAY_LIST                0
 #define ENABLE_LIGHTING                 1
 
 #define PPC_TLCS_COMM_TRIGGER           12345
@@ -1945,7 +1948,6 @@ void taitotz_state::ppc_common_w(offs_t offset, uint64_t data, uint64_t mem_mask
 
 	if (offset == 0x7ff)
 	{
-#if LOG_PPC_TO_TLCS_COMMANDS
 		if (m_io_share_ram[0xfff] != 0x0000 &&
 			m_io_share_ram[0xfff] != 0x1010 &&
 			m_io_share_ram[0xfff] != 0x1020 &&
@@ -1956,12 +1958,12 @@ void taitotz_state::ppc_common_w(offs_t offset, uint64_t data, uint64_t mem_mask
 			m_io_share_ram[0xfff] != 0x4002 &&
 			m_io_share_ram[0xfff] != 0x4003)
 		{
-			printf("PPC -> TLCS cmd %04X\n", m_io_share_ram[0xfff]);
+			LOGMASKED(LOG_PPC_TO_TLCS_COMMANDS, "PPC -> TLCS cmd %04X\n", m_io_share_ram[0xfff]);
 		}
 
 		if (m_io_share_ram[0xfff] == 0x4000)
 		{
-			printf("   %04X %04X %04X %04X %04X %04X %04X %04X %04X %04X\n",
+			LOGMASKED(LOG_PPC_TO_TLCS_COMMANDS, "   %04X %04X %04X %04X %04X %04X %04X %04X %04X %04X\n",
 					m_io_share_ram[0x1c34/2],
 					m_io_share_ram[0x1c36/2],
 					m_io_share_ram[0x1c38/2],
@@ -1973,7 +1975,7 @@ void taitotz_state::ppc_common_w(offs_t offset, uint64_t data, uint64_t mem_mask
 					m_io_share_ram[0x1c24/2],
 					m_io_share_ram[0x1c26/2]
 					);
-			printf("   %04X %04X %04X %04X %04X %04X %04X %04X %04X %04X\n",
+			LOGMASKED(LOG_PPC_TO_TLCS_COMMANDS, "   %04X %04X %04X %04X %04X %04X %04X %04X %04X %04X\n",
 					m_io_share_ram[0x1c28/2],
 					m_io_share_ram[0x1c2a/2],
 					m_io_share_ram[0x1c1c/2],
@@ -1990,11 +1992,9 @@ void taitotz_state::ppc_common_w(offs_t offset, uint64_t data, uint64_t mem_mask
 		/*
 		if (m_io_share_ram[0xfff] == 0x1010)
 		{
-		    printf("PPC -> TLCS cmd 1010:   %04X %04X %04X %04X\n", m_io_share_ram[0x1a02/2], m_io_share_ram[0x1a04/2], m_io_share_ram[0x1a06/2], m_io_share_ram[0x1a08/2]);
+		    LOGMASKED(LOG_PPC_TO_TLCS_COMMANDS, "PPC -> TLCS cmd 1010:   %04X %04X %04X %04X\n", m_io_share_ram[0x1a02/2], m_io_share_ram[0x1a04/2], m_io_share_ram[0x1a06/2], m_io_share_ram[0x1a08/2]);
 		}
 		*/
-
-#endif
 
 
 		// hacky way to handle some commands for now
@@ -2119,16 +2119,14 @@ void taitotz_state::tlcs_common_w(offs_t offset, uint8_t data)
 
 	if (offset == 0x1ffd)
 	{
-#if LOG_TLCS_TO_PPC_COMMANDS
 		if (m_io_share_ram[0xffe] != 0xd000 &&
 			m_io_share_ram[0xffe] != 0x1011 &&
 			m_io_share_ram[0xffe] != 0x1012 &&
 			m_io_share_ram[0xffe] != 0x1022)
 		{
-			printf("TLCS -> PPC cmd %04X\n", m_io_share_ram[0xffe]);
-			//printf("0x40080104 = %08X\n", (uint32_t)(m_work_ram[0x80104/8]));
+			LOGMASKED(LOG_TLCS_TO_PPC_COMMANDS, "TLCS -> PPC cmd %04X\n", m_io_share_ram[0xffe]);
+			//LOGMASKED(LOG_TLCS_TO_PPC_COMMANDS, "0x40080104 = %08X\n", (uint32_t)(m_work_ram[0x80104/8]));
 		}
-#endif
 
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 		m_iocpu->set_input_line(TLCS900_INT0, CLEAR_LINE);
@@ -2833,7 +2831,7 @@ ROM_START( taitotz )
 	ROM_REGION16_LE( 0x40000, "io_cpu", ROMREGION_ERASE00 )
 	ROM_REGION( 0x10000, "sound_cpu", ROMREGION_ERASE00 ) /* Internal ROM :( */
 	ROM_REGION( 0x500, "plds", ROMREGION_ERASE00 )
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 ROM_END
 
 /*
@@ -2870,7 +2868,7 @@ ROM_START( landhigh )
 	ROM_LOAD( "e82-02.ic45", 0x117, 0x2dd, CRC(f581cff5) SHA1(468e0e6a3828f2dcda35c6d523154510f9c99db7) )
 	ROM_LOAD( "e68-06.ic24", 0x3f4, 0x100, NO_DUMP )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE( "landhigh", 0, SHA1(7cea4ea5c3899e6ac774a4eb12821f44541d9c9c) )
 ROM_END
 
@@ -2890,7 +2888,7 @@ ROM_START( landhigha )
 	ROM_LOAD( "e82-02.ic45", 0x117, 0x2dd, CRC(f581cff5) SHA1(468e0e6a3828f2dcda35c6d523154510f9c99db7) )
 	ROM_LOAD( "e68-06.ic24", 0x3f4, 0x100, NO_DUMP )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE( "landhigha", 0, SHA1(830ff12671a977a4c243491b68444f8ca69d0819) )
 ROM_END
 
@@ -2905,7 +2903,7 @@ ROM_START( batlgear )
 	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE( "batlgear", 0, SHA1(eab283839ad3e0a3e6be11f6482570db334eacca) )
 ROM_END
 
@@ -2920,7 +2918,7 @@ ROM_START( batlgr2 )
 	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE( "bg2_204j", 0, SHA1(7ac100fba39ae0b93980c0af2f0212a731106912) )
 ROM_END
 
@@ -2935,7 +2933,7 @@ ROM_START( batlgr2a )
 	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE( "bg2_201j", 0, SHA1(542d12682bd0f95143368578461c6a4fcc492fcc) )
 ROM_END
 
@@ -2959,7 +2957,7 @@ ROM_START( pwrshovl )
 	ROM_REGION( 0x20000, "oki2", 0 )
 	ROM_LOAD( "e74-08.ic8", 0x000000, 0x020000, CRC(ca5baccc) SHA1(4594b7a6232b912d698fff053f7e3f51d8e1bfb6) ) // located on the I/O PCB
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE( "pwrshovl", 0, SHA1(360f63b39f645851c513b4644fb40601b9ba1412) )
 ROM_END
 
@@ -2983,7 +2981,7 @@ ROM_START( pwrshovla )
 	ROM_REGION( 0x20000, "oki2", 0 )
 	ROM_LOAD( "e74-08.ic8", 0x000000, 0x020000, CRC(ca5baccc) SHA1(4594b7a6232b912d698fff053f7e3f51d8e1bfb6) ) // located on the I/O PCB
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE( "power shovel ver.2.07j", 0, SHA1(05410d4b4972262ef93400b02f21dd17d10b1c5e) )
 ROM_END
 
@@ -2998,7 +2996,7 @@ ROM_START( raizpin )
 	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE( "raizpin", 0, SHA1(883ebcda03026df31da1cdb95af521e100c171ed) )
 ROM_END
 
@@ -3013,7 +3011,7 @@ ROM_START( raizpinj )
 	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE( "raizin ping pong ver 2.01j", 0, SHA1(eddc803c2507d19f0a3e3cc217bb22a565c04f3e) )
 ROM_END
 
@@ -3028,7 +3026,7 @@ ROM_START( styphp )
 	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE( "styphp", 0, SHA1(c232d3460e37523346132544b8e23a5f9b447150) )
 ROM_END
 
@@ -3049,7 +3047,7 @@ ROM_START( dendego3 )
 	ROM_REGION( 0x20000, "oki1", 0 )
 	ROM_LOAD( "e74-07.ic6", 0x000000, 0x020000, CRC(ca5baccc) SHA1(4594b7a6232b912d698fff053f7e3f51d8e1bfb6) ) // located on the I/O PCB
 
-	DISK_REGION( "ata:0:hdd:image" ) // Fujitsu MPF3102AT
+	DISK_REGION( "ata:0:hdd" ) // Fujitsu MPF3102AT
 	DISK_IMAGE( "ddg3", 0, SHA1(468d699e02ef0a0242de4e7038613cc5d0545591) )
 ROM_END
 

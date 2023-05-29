@@ -66,8 +66,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	uint8_t ram_r(offs_t offset);
 	void ram_w(offs_t offset, uint8_t data);
 	uint8_t speaker_toggle_r();
@@ -102,11 +100,8 @@ void superga2_state::machine_start()
 	save_item(NAME(m_speaker_state));
 
 	// setup video pointers
-	m_video->m_ram_ptr = m_ram_ptr;
-	m_video->m_aux_ptr = m_ram_ptr;
-	m_video->m_char_ptr = memregion("gfx1")->base();
-	m_video->m_char_size = memregion("gfx1")->bytes();
-	m_video->m_sysconfig = 0;
+	m_video->set_ram_pointers(m_ram_ptr, m_ram_ptr);
+	m_video->set_char_pointer(nullptr, 0);  // no text modes on this machine
 }
 
 void superga2_state::machine_reset()
@@ -114,17 +109,6 @@ void superga2_state::machine_reset()
 	uint8_t *user1 = memregion("maincpu")->base();
 
 	memcpy(&m_ram_ptr[0x1100], user1, 0x8000);
-}
-
-/***************************************************************************
-    VIDEO
-***************************************************************************/
-
-uint32_t superga2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_video->hgr_update(screen, bitmap, cliprect, 0, 191);
-
-	return 0;
 }
 
 /***************************************************************************
@@ -224,7 +208,7 @@ void superga2_state::superga2(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(1021800*14, (65*7)*2, 0, (40*7)*2, 262, 0, 192);
-	m_screen->set_screen_update(FUNC(superga2_state::screen_update));
+	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::II, false, false>)));
 	m_screen->set_palette(m_video);
 
 	/* sound hardware */
@@ -233,10 +217,11 @@ void superga2_state::superga2(machine_config &config)
 
 	/* soft switches */
 	F9334(config, m_softlatch);
-	m_softlatch->q_out_cb<0>().set(m_video, FUNC(a2_video_device::txt_w));
-	m_softlatch->q_out_cb<1>().set(m_video, FUNC(a2_video_device::mix_w));
 	m_softlatch->q_out_cb<2>().set(m_video, FUNC(a2_video_device::scr_w));
-	m_softlatch->q_out_cb<3>().set(m_video, FUNC(a2_video_device::res_w));
+	// these don't cause mode changes
+	// m_softlatch->q_out_cb<0>().set(m_video, FUNC(a2_video_device::txt_w));
+	// m_softlatch->q_out_cb<1>().set(m_video, FUNC(a2_video_device::mix_w));
+	// m_softlatch->q_out_cb<3>().set(m_video, FUNC(a2_video_device::res_w));
 
 	RAM(config, RAM_TAG).set_default_size("48K").set_default_value(0x00);
 }
@@ -248,8 +233,6 @@ void superga2_state::superga2(machine_config &config)
 ***************************************************************************/
 
 ROM_START(kuzmich)
-	ROM_REGION(0x0800,"gfx1",0)
-	ROM_FILL(0, 0x800, 0)
 	ROM_REGION(0x8000,"maincpu",0)
 	ROM_LOAD("ke.bin", 0x0000, 0x8000, CRC(102d246b) SHA1(492dcdf0cc31190a97057a69010e2c9c23b6e59d))
 ROM_END

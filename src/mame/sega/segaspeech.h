@@ -5,8 +5,8 @@
     Sega speech board
 
 *************************************************************************/
-#ifndef MAME_AUDIO_SEGASPEECH_H
-#define MAME_AUDIO_SEGASPEECH_H
+#ifndef MAME_SEGA_SEGASPEECH_H
+#define MAME_SEGA_SEGASPEECH_H
 
 #pragma once
 
@@ -56,4 +56,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SEGA_SPEECH_BOARD, sega_speech_device)
 
-#endif // MAME_AUDIO_SEGASPEECH_H
+#endif // MAME_SEGA_SEGASPEECH_H

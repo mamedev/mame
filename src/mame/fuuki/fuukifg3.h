@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Paul Priest, David Haywood, Luca Elia
-#ifndef MAME_INCLUDES_FUUKIFG3_H
-#define MAME_INCLUDES_FUUKIFG3_H
+#ifndef MAME_FUUKI_FUUKIFG3_H
+#define MAME_FUUKI_FUUKIFG3_H
 
 #pragma once
 
@@ -105,4 +105,4 @@ private:
 	emu_timer   *m_raster_interrupt_timer = nullptr;
 };
 
-#endif // MAME_INCLUDES_FUUKIFG3_H
+#endif // MAME_FUUKI_FUUKIFG3_H

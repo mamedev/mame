@@ -42,6 +42,8 @@
 #include "screen.h"
 
 
+namespace {
+
 #define SCREEN_TAG "screen"
 
 class tekxp330_state : public driver_device
@@ -125,6 +127,9 @@ ROM_START( tekxp330 )
 	/* TekXpress XP300 Boot ROM V1.0  Thu Feb 6 14:50:16 PST 1992 */
 	ROM_LOAD32_DWORD( "xp300.bin", 0x000000, 0x200000, CRC(9a324588) SHA1(a6e10275f8215f446be91128bab4c643693da653) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* System Drivers */
 

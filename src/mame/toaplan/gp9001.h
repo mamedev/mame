@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Quench, David Haywood
 /* GP9001 Video Controller */
-#ifndef MAME_VIDEO_GP9001_H
-#define MAME_VIDEO_GP9001_H
+#ifndef MAME_TOAPLAN_GP9001_H
+#define MAME_TOAPLAN_GP9001_H
 
 #pragma once
 
@@ -151,4 +151,4 @@ private:
 
 DECLARE_DEVICE_TYPE(GP9001_VDP, gp9001vdp_device)
 
-#endif // MAME_VIDEO_GP9001_H
+#endif // MAME_TOAPLAN_GP9001_H

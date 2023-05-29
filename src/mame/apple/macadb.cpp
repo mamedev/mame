@@ -9,9 +9,9 @@
 #include "emu.h"
 #include "macadb.h"
 
-#define LOG_TALK_LISTEN     (1 << 1U)
-#define LOG_STATE           (1 << 2U)
-#define LOG_LINESTATE       (1 << 3U)
+#define LOG_TALK_LISTEN     (1U << 1)
+#define LOG_STATE           (1U << 2)
+#define LOG_LINESTATE       (1U << 3)
 #define VERBOSE             (0)
 #include "logmacro.h"
 
@@ -89,7 +89,7 @@ static INPUT_PORTS_START( macadb )
 	PORT_START("MOUSE2") /* Mouse - Y AXIS */
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
 
-	/* This handles the standard (not Extended) Apple ADB keyboard, which is similar to the IIgs keyboard */
+	/* This handles most of the Apple Extended ADB keyboard.  F12 defaults to the RESET/POWER key, but real F12 is avaiable to be mapped too. */
 	PORT_START("KEY0")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)             PORT_CHAR('a') PORT_CHAR('A')
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)             PORT_CHAR('s') PORT_CHAR('S')
@@ -171,7 +171,7 @@ static INPUT_PORTS_START( macadb )
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x44
 	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD)          PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD)) // 0x45
 	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x46
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad Clear") PORT_CODE(/*KEYCODE_NUMLOCK*/KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK))    // 0x47
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad Clear") PORT_CODE(KEYCODE_NUMLOCK) PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK))     // 0x47
 	PORT_BIT(0x0700, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x48, 49, 4a
 	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH_PAD)         PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD)) // 0x4b
 	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD)         PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD)) // 0x4c
@@ -181,7 +181,7 @@ static INPUT_PORTS_START( macadb )
 
 	PORT_START("KEY5")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x50
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(/*CODE_OTHER*/KEYCODE_NUMLOCK) PORT_CHAR(UCHAR_MAMEKEY(EQUALS_PAD)) // 0x51
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS_PAD)        PORT_CHAR(UCHAR_MAMEKEY(EQUALS_PAD)) // 0x51
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0_PAD)             PORT_CHAR(UCHAR_MAMEKEY(0_PAD)) // 0x52
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1_PAD)             PORT_CHAR(UCHAR_MAMEKEY(1_PAD)) // 0x53
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD)             PORT_CHAR(UCHAR_MAMEKEY(2_PAD)) // 0x54
@@ -195,6 +195,38 @@ static INPUT_PORTS_START( macadb )
 	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD)             PORT_CHAR(UCHAR_MAMEKEY(9_PAD)) // 0x5c
 	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset / Power")           PORT_CODE(KEYCODE_F12)          // 0x5d (converted to 0x7f7f)
 	PORT_BIT(0xc000, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("KEY6")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F5)          PORT_CHAR(UCHAR_MAMEKEY(F5))  // 60
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F6)          PORT_CHAR(UCHAR_MAMEKEY(F6))  // 61
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F7)          PORT_CHAR(UCHAR_MAMEKEY(F7))  // 62
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F3)          PORT_CHAR(UCHAR_MAMEKEY(F3))  // 63
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F8)          PORT_CHAR(UCHAR_MAMEKEY(F8))  // 64
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F9)          PORT_CHAR(UCHAR_MAMEKEY(F9))  // 65
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F11)         PORT_CHAR(UCHAR_MAMEKEY(F11)) // 67
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F13)         PORT_CHAR(UCHAR_MAMEKEY(F13)) // 69
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F14)         PORT_CHAR(UCHAR_MAMEKEY(F14)) // 6b
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F10)         PORT_CHAR(UCHAR_MAMEKEY(F10)) // 6d
+	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F12)         PORT_CHAR(UCHAR_MAMEKEY(F12)) // 6f
+
+	PORT_START("KEY7")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F15)         PORT_CHAR(UCHAR_MAMEKEY(F15))     // 71
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_INSERT) PORT_NAME("Insert/Help") PORT_CHAR(UCHAR_MAMEKEY(INSERT))  // 72
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_HOME)        PORT_CHAR(UCHAR_MAMEKEY(HOME))    // 73
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_PGUP)        PORT_CHAR(UCHAR_MAMEKEY(PGUP))    // 74
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL)         PORT_CHAR(UCHAR_MAMEKEY(DEL)) // 75
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F4)          PORT_CHAR(UCHAR_MAMEKEY(F4))  // 76
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_END)         PORT_CHAR(UCHAR_MAMEKEY(END)) // 77
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F2)          PORT_CHAR(UCHAR_MAMEKEY(F2))  // 78
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_PGDN)        PORT_CHAR(UCHAR_MAMEKEY(PGDN)) // 79
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F1)          PORT_CHAR(UCHAR_MAMEKEY(F1))  // 7a
+	PORT_BIT(0xf800, IP_ACTIVE_HIGH, IPT_UNUSED)    // 7b-7f are unused
 INPUT_PORTS_END
 
 macadb_device::macadb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -207,7 +239,9 @@ macadb_device::macadb_device(const machine_config &mconfig, const char *tag, dev
 		write_via_data(*this),
 		write_adb_data(*this),
 		write_adb_irq(*this),
-		m_bIsMCUMode(true)
+		m_bIsMCUMode(true),
+		m_last_kbd{0, 0},
+		m_last_mouse{0, 0}
 {
 }
 
@@ -263,6 +297,10 @@ void macadb_device::device_start()
 	save_item(NAME(m_adb_currentkeys));
 	save_item(NAME(m_adb_modifiers));
 	save_item(NAME(m_adb_linein));
+	save_item(NAME(m_last_kbd));
+	save_item(NAME(m_last_mouse));
+	save_item(NAME(m_mouse_handler));
+	save_item(NAME(m_keyboard_handler));
 }
 
 WRITE_LINE_MEMBER(macadb_device::adb_data_w)
@@ -294,7 +332,7 @@ int macadb_device::adb_pollkbd(int update)
 	codes[0] = codes[1] = 0xff; // key up
 	report = result = 0;
 
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		int keybuf = m_keys[i]->read();
 
@@ -441,8 +479,8 @@ int macadb_device::adb_pollmouse()
 	}
 
 	NewButton = m_mouse0->read() & 0x01;
-	NewX = m_mouse2->read();
-	NewY = m_mouse1->read();
+	NewX = m_mouse1->read();
+	NewY = m_mouse2->read();
 
 	if ((NewX != m_adb_lastmousex) || (NewY != m_adb_lastmousey) || (NewButton != m_adb_lastbutton))
 	{
@@ -457,8 +495,8 @@ void macadb_device::adb_accummouse( uint8_t *MouseX, uint8_t *MouseY )
 	int MouseCountX = 0, MouseCountY = 0;
 	int NewX, NewY;
 
-	NewX = m_mouse2->read();
-	NewY = m_mouse1->read();
+	NewX = m_mouse1->read();
+	NewY = m_mouse2->read();
 
 //  printf("pollmouse: X %d Y %d\n", NewX, NewY);
 
@@ -580,14 +618,30 @@ void macadb_device::adb_talk()
 							}
 							//printf("X %x Y %x\n", mouseX, mouseY);
 							m_adb_buffer[0] = (m_adb_lastbutton & 0x01) ? 0x00 : 0x80;
-							m_adb_buffer[0] |= mouseX & 0x7f;
-							m_adb_buffer[1] = mouseY & 0x7f;
-							m_adb_datasize = 2;
+							m_adb_buffer[0] |= mouseY & 0x7f;
+							m_adb_buffer[1] = (mouseX & 0x7f) | 0x80;
+
+							if ((m_adb_buffer[0] != m_last_mouse[0]) || (m_adb_buffer[1] != m_last_mouse[1]))
+							{
+								m_adb_datasize = 2;
+								m_last_mouse[0] = m_adb_buffer[0];
+								m_last_mouse[1] = m_adb_buffer[1];
+							}
+							else
+							{
+								m_adb_datasize = 0;
+
+								if ((adb_pollkbd(0)) && (m_keyboard_handler & 0x20))
+								{
+									LOGMASKED(LOG_TALK_LISTEN, "Keyboard requesting service\n");
+									m_adb_srqflag = true;
+								}
+							}
 							break;
 
 						// get ID/handler
 						case 3:
-							m_adb_buffer[0] = 0x60 | (m_adb_mouseaddr&0xf); // SRQ enable, no exceptional event
+							m_adb_buffer[0] = m_mouse_handler;
 							m_adb_buffer[1] = 0x01; // handler 1
 							m_adb_datasize = 2;
 
@@ -597,15 +651,9 @@ void macadb_device::adb_talk()
 						default:
 							break;
 					}
-
-					if ((adb_pollkbd(0)) && (!m_bIsIIGSMode))
-					{
-						m_adb_srqflag = true;
-					}
 				}
 				else if (addr == m_adb_keybaddr)
 				{
-					int kbd_has_data = 1;
 					LOGMASKED(LOG_TALK_LISTEN, "Talking to keyboard, register %x\n", reg);
 
 					switch (reg)
@@ -618,47 +666,45 @@ void macadb_device::adb_talk()
 							}
 							else
 							{
-								kbd_has_data = this->adb_pollkbd(1);
+								adb_pollkbd(1);
 							}
 
-/*                            if (m_adb_currentkeys[0] != 0xff)
-                            {
-                                printf("Keys[0] = %02x\n", m_adb_currentkeys[0]);
-                            }
-                            if (m_adb_currentkeys[1] != 0xff)
-                            {
-                                printf("Keys[1] = %02x\n", m_adb_currentkeys[1]);
-                            }*/
-
-							if(kbd_has_data)
+							if (m_adb_keybuf_start == m_adb_keybuf_end)
 							{
-								if (m_adb_keybuf_start == m_adb_keybuf_end)
-								{
-	//                              printf("%s: buffer empty\n", __func__);
-									m_adb_buffer[0] = 0xff;
-									m_adb_buffer[1] = 0xff;
-								}
-								else
-								{
-									m_adb_buffer[1] = m_adb_keybuf[m_adb_keybuf_start];
-									m_adb_keybuf_start = (m_adb_keybuf_start+1) % kADBKeyBufSize;
-									if(m_adb_keybuf_start != m_adb_keybuf_end)
-									{
-										m_adb_buffer[0] = m_adb_keybuf[m_adb_keybuf_start];
-										m_adb_keybuf_start = (m_adb_keybuf_start+1) % kADBKeyBufSize;
-									}
-									else
-									{
-										m_adb_buffer[0] = 0xff;
-									}
-								}
-								m_adb_datasize = 2;
+//                              printf("%s: buffer empty\n", __func__);
+								m_adb_buffer[0] = 0xff;
+								m_adb_buffer[1] = 0xff;
 							}
 							else
 							{
-								m_adb_buffer[0] = 0xff;
-								m_adb_buffer[1] = 0xff;
+								m_adb_buffer[1] = m_adb_keybuf[m_adb_keybuf_start];
+								m_adb_keybuf_start = (m_adb_keybuf_start+1) % kADBKeyBufSize;
+								if(m_adb_keybuf_start != m_adb_keybuf_end)
+								{
+									m_adb_buffer[0] = m_adb_keybuf[m_adb_keybuf_start];
+									m_adb_keybuf_start = (m_adb_keybuf_start+1) % kADBKeyBufSize;
+								}
+								else
+								{
+									m_adb_buffer[0] = 0xff;
+								}
+							}
+
+							if ((m_adb_buffer[0] != m_last_kbd[0]) || (m_adb_buffer[1] != m_last_kbd[1]))
+							{
 								m_adb_datasize = 2;
+								m_last_kbd[0] = m_adb_buffer[0];
+								m_last_kbd[1] = m_adb_buffer[1];
+							}
+							else
+							{
+								m_adb_datasize = 0;
+
+								if ((adb_pollmouse()) && (m_mouse_handler & 0x20))
+								{
+									LOGMASKED(LOG_TALK_LISTEN, "Mouse requesting service\n");
+									m_adb_srqflag = true;
+								}
 							}
 							break;
 
@@ -674,7 +720,7 @@ void macadb_device::adb_talk()
 
 						// get ID/handler
 						case 3:
-							m_adb_buffer[0] = 0x60 | (m_adb_keybaddr&0xf);  // SRQ enable, no exceptional event
+							m_adb_buffer[0] = m_keyboard_handler;
 							m_adb_buffer[1] = 0x01; // handler 1
 							m_adb_datasize = 2;
 
@@ -684,17 +730,13 @@ void macadb_device::adb_talk()
 						default:
 							break;
 					}
-
-					if ((adb_pollmouse()) && (!m_bIsIIGSMode))
-					{
-						m_adb_srqflag = true;
-					}
 				}
 				else
 				{
 					LOGMASKED(LOG_TALK_LISTEN, "ADB: talking to unconnected device %d (K %d M %d)\n", addr, m_adb_keybaddr, m_adb_mouseaddr);
 					m_adb_buffer[0] = m_adb_buffer[1] = 0;
 					m_adb_datasize = 0;
+					m_adb_srqflag = true;
 				}
 				break;
 		}
@@ -704,24 +746,49 @@ void macadb_device::adb_talk()
 	else
 	{
 		LOGMASKED(LOG_TALK_LISTEN, "Got LISTEN data %02x %02x for device %x reg %x\n", m_adb_command, m_adb_buffer[1], m_adb_listenaddr, m_adb_listenreg);
-
 		m_adb_direction = 0;
 
 		if (m_adb_listenaddr == m_adb_mouseaddr)
 		{
-			if ((m_adb_listenreg == 3) && (m_adb_command > 0) && (m_adb_command < 16))
+			if (m_adb_listenreg == 3)
 			{
-				LOGMASKED(LOG_TALK_LISTEN, "MOUSE: moving to address %x\n", m_adb_command);
-				m_adb_mouseaddr = m_adb_command&0x0f;
-				m_adb_mouse_initialized = 1;
+				switch (m_adb_buffer[1])
+				{
+					case 0x00:  // unconditional set handler & address to value
+						LOGMASKED(LOG_TALK_LISTEN, "MOUSE: moving to address & setting handler bits to %02x\n", m_adb_command);
+						m_mouse_handler = m_adb_command & 0x7f;
+						m_adb_mouseaddr = m_adb_command & 0x0f;
+						break;
+
+					case 0xfe:  // unconditional address change
+						LOGMASKED(LOG_TALK_LISTEN, "MOUSE: moving to address %x\n", m_adb_command);
+						m_adb_mouseaddr = m_adb_command & 0x0f;
+						m_mouse_handler &= 0xf0;
+						m_mouse_handler |= m_adb_mouseaddr;
+						m_adb_mouse_initialized = 1;
+						break;
+				}
 			}
 		}
 		else if (m_adb_listenaddr == m_adb_keybaddr)
 		{
-			if ((m_adb_listenreg == 3) && (m_adb_command > 0) && (m_adb_command < 16))
+			if (m_adb_listenreg == 3)
 			{
-				LOGMASKED(LOG_TALK_LISTEN, "KEYBOARD: moving to address %x\n", m_adb_command);
-				m_adb_keybaddr = m_adb_command&0x0f;
+				switch (m_adb_buffer[1])
+				{
+				case 0x00: // unconditional set handler & address to value
+					LOGMASKED(LOG_TALK_LISTEN, "KEYBOARD: moving to address & setting handler bits to %02x\n", m_adb_command);
+					m_keyboard_handler = m_adb_command & 0x7f;
+					m_adb_keybaddr = m_adb_command & 0x0f;
+					break;
+
+				case 0xfe: // unconditional address change
+					LOGMASKED(LOG_TALK_LISTEN, "KEYBOARD: moving to address %x\n", m_adb_command);
+					m_adb_keybaddr = m_adb_command & 0x0f;
+					m_keyboard_handler &= 0xf0;
+					m_keyboard_handler |= m_adb_keybaddr;
+					break;
+				}
 			}
 		}
 	}
@@ -1018,15 +1085,17 @@ void macadb_device::device_reset()
 
 	// mouse
 	m_adb_mouseaddr = 3;
+	m_mouse_handler = 0x23;
 	m_adb_lastmousex = m_adb_lastmousey = m_adb_lastbutton = 0;
 	m_adb_mouse_initialized = 0;
 
 	// keyboard
 	m_adb_keybaddr = 2;
+	m_keyboard_handler = 0x22;
 	m_adb_keybinitialized = 0;
 	m_adb_currentkeys[0] = m_adb_currentkeys[1] = 0xff;
 	m_adb_modifiers = 0xff;
-	for (i=0; i<7; i++)
+	for (i=0; i<9; i++)
 	{
 		m_key_matrix[i] = 0;
 	}
@@ -1163,41 +1232,43 @@ WRITE_LINE_MEMBER(macadb_device::adb_linechange_w)
 				m_adb_srqflag = false;
 				adb_talk();
 
-				if (!m_adb_srqflag)
+				if (m_adb_srqflag)
 				{
-					set_adb_line(ASSERT_LINE);
+					set_adb_line(CLEAR_LINE);
+					m_adb_linestate = LST_SRQNODATA;
+					m_adb_timer->adjust(attotime::from_ticks(adb_srq, adb_timebase)); // SRQ time
 				}
 				else
 				{
-					set_adb_line(CLEAR_LINE);
-				}
+					set_adb_line(ASSERT_LINE);
 
-				if (m_adb_datasize > 0)
-				{
-					LOGMASKED(LOG_TALK_LISTEN, "Device has %d bytes of data:\n", m_adb_datasize);
-					for (int i = 0; i < m_adb_datasize; i++)
+					if (m_adb_datasize > 0)
 					{
-						LOGMASKED(LOG_TALK_LISTEN, "  %02x", m_adb_buffer[i]);
+						LOGMASKED(LOG_TALK_LISTEN, "Device has %d bytes of data:\n", m_adb_datasize);
+						for (int i = 0; i < m_adb_datasize; i++)
+						{
+							LOGMASKED(LOG_TALK_LISTEN, "  %02x", m_adb_buffer[i]);
+						}
+						LOGMASKED(LOG_TALK_LISTEN, "\n");
+						m_adb_linestate = LST_TSTOPSTART; // T1t
+						m_adb_timer->adjust(attotime::from_ticks(324 / 4, adb_timebase));
+						m_adb_stream_ptr = 0;
 					}
-					LOGMASKED(LOG_TALK_LISTEN, "\n");
-					m_adb_linestate = LST_TSTOPSTART;   // T1t
-					m_adb_timer->adjust(attotime::from_ticks(324/4, adb_timebase));
-					m_adb_stream_ptr = 0;
-				}
-				else if (m_adb_direction)   // if direction is set, we LISTENed to a valid device
-				{
-					m_adb_linestate = LST_WAITT1T;
-				}
-				else    // no valid device targetted, time out
-				{
-					if (m_adb_srqflag)
+					else if (m_adb_direction)   // if direction is set, we LISTENed to a valid device
 					{
-						m_adb_linestate = LST_SRQNODATA;
-						m_adb_timer->adjust(attotime::from_ticks(adb_srq, adb_timebase));   // SRQ time
+						m_adb_linestate = LST_WAITT1T;
 					}
-					else
+					else    // no valid device targetted, time out
 					{
-						m_adb_linestate = LST_IDLE;
+						if (m_adb_srqflag)
+						{
+							m_adb_linestate = LST_SRQNODATA;
+							m_adb_timer->adjust(attotime::from_ticks(adb_srq, adb_timebase));   // SRQ time
+						}
+						else
+						{
+							m_adb_linestate = LST_IDLE;
+						}
 					}
 				}
 			}

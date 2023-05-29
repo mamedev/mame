@@ -41,6 +41,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
@@ -841,27 +843,27 @@ QUICKLOAD_LOAD_MEMBER(einstein_state::quickload_cb)
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
 	if (image.length() >= 0xfd00)
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::INVALIDLENGTH, std::string());
 
-	/* disable rom */
+	// disable ROM
 	m_rom_enabled = 0;
 	m_bank1->set_entry(m_rom_enabled);
 
-	/* load image */
-	uint16_t quickload_size = image.length();
+	// load image
+	uint16_t const quickload_size = image.length();
 	for (uint16_t i = 0; i < quickload_size; i++)
 	{
 		uint8_t data;
 
 		if (image.fread(&data, 1) != 1)
-			return image_init_result::FAIL;
+			return std::make_pair(image_error::UNSPECIFIED, std::string());
 		prog_space.write_byte(i + 0x100, data);
 	}
 
-	/* start program */
+	// start program
 	m_maincpu->set_pc(0x100);
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -1060,6 +1062,8 @@ ROM_START( einst256 )
 	/* i008 */
 	ROM_LOAD("mos21.i008", 0x0000, 0x4000, CRC(d1bb5efc) SHA1(9168df70af6746c88748049d1b9d119a29e605de) )
 ROM_END
+
+} // anonymous namespace
 
 
 /***************************************************************************

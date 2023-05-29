@@ -86,6 +86,9 @@ Stephh's notes (based on the game TMS9995 code and some tests) :
 #include "video/tms9928a.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define USE_MSM 0
 #define NUM_PLUNGER_REPEATS    50
 
@@ -389,7 +392,9 @@ ROM_START( pachifev )
 
 	ROM_REGION( 0x4000, "adpcm", 0 )
 	ROM_LOAD( "ic66.10",   0x0000, 0x2000, CRC(217c573e) SHA1(6fb90865d1d81f5ea00fa7916d0ccb6756ef5ce5) )
-
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1983, pachifev,  0,       pachifev,  pachifev, pachifev_state, empty_init, ROT270, "Sanki Denshi Kogyo", "Pachifever", MACHINE_IMPERFECT_SOUND )

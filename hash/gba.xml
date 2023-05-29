@@ -48,6 +48,19 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- A physical release was planned, but cancelled. Older revisions also exist -->
+	<software name="apotris">
+		<description>Apotris (v3.4.5)</description>
+		<year>2023</year>
+		<publisher>akouzoukos</publisher>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_sram" />
+			<dataarea name="rom" size="4194304">
+				<rom name="apotris.bin" size="4194304" crc="55ae4312" sha1="fb7142bcc30f71f187cc51b7fcbc5a3958374c6c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="007night">
 		<description>007 - NightFire (Europe, USA)</description>
 		<year>2003</year>
@@ -684,6 +697,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="aerope" cloneof="aero">
+		<description>Aero the Acro-Bat - Rascal Rival Revenge (Europe, prototype earlier)</description>
+		<year>2001?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="1030244">
+				<rom name="aero the acro-bat - rascal rival revenge (europe) (earlier).bin" size="1030244" crc="beed50f0" sha1="68c0a00275c7135ca1a116ccced1ecede75819b8"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aero">
 		<description>Aero the Acro-Bat - Rascal Rival Revenge (Europe)</description>
 		<year>2002</year>
@@ -751,8 +775,25 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="agecart">
-		<description>Aging Cartridge (World, rev. 1)</description>
+	<software name="agecart1">
+		<description>AGB Aging Cartridge (World, version 1.0)</description>
+		<year>2001</year>
+		<publisher>Nintendo</publisher>
+		<info name="alt_title" value="AGB LCD用 カートリッジ"/>
+		<info name="serial" value="AGB-TCHK-0"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-01" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
+			<feature name="slot" value="gba_eeprom_4k" />
+			<dataarea name="rom" size="2097152">
+				<rom name="agb checker_tchk-0.gba" size="2097152" crc="bf553530" sha1="2445bf11a5f905695b00011d77d18c99e754b633"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="agecart7">
+		<description>AGB Aging Cartridge (World, version 7.0)</description>
 		<year>2002</year>
 		<publisher>Nintendo</publisher>
 		<info name="alt_title" value="エージングカートリッジ"/>
@@ -763,6 +804,21 @@ license:CC0-1.0
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="2097152">
 				<rom name="agb-tchk-1.u1" size="2097152" crc="bbb6a960" sha1="c67e0a5e26ea5eba2bc11c99d003027a96e44060"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="agecart9">
+		<description>AGB Aging Cartridge (World, version 9.0)</description>
+		<year>2004?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-01" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
+			<feature name="slot" value="gba_eeprom_4k" />
+			<dataarea name="rom" size="2097152">
+				<rom name="agb_checker_tchk30.gba" size="2097152" crc="2e69686d" sha1="03d3a486482b61128872519fd755d0c072c12d93"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3014,6 +3070,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="command2">
+		<description>Commandos 2 (USA, prototype, 20021128)</description>
+		<year>2002</year>
+		<publisher>Toyonaka Studios</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="2644724">
+				<rom name="commandos 2 (prototype).gba" size="2644724" crc="dd58aecd" sha1="3750e5704ae5ee240c273a68d36001f36348bb48"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dialhex">
 		<description>bit Generations - Dialhex (Japan)</description>
 		<year>2006</year>
@@ -4836,6 +4903,18 @@ license:CC0-1.0
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="casper (usa) (en,fr,es).bin" size="4194304" crc="9f905e60" sha1="75392d01815d807f8fbd6846469d5d535a6aeeda"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chokkanp" cloneof="polarium">
+		<description>Chokkan Hitofude Advance (Japan, prototype)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<info name="alt_title" value="直感ヒトフデADVANCE"/>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="chokkan hitofude advance (japan, prototype).gba" size="1048576" crc="9542e247" sha1="24b4be7f296fce5eae93d969eb02831951f00b7b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6729,6 +6808,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="darkeden">
+		<description>Dark Eden (demo)</description>
+		<year>2002</year>
+		<publisher>Rival Dreams</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="1361276">
+				<rom name="dark eden (demo).bin" size="1361276" crc="9cf479d2" sha1="df70db3a44117af3c744388aa17819ed8017e1d2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dariusr">
 		<description>Darius R (Japan)</description>
 		<year>2002</year>
@@ -7015,6 +7105,19 @@ license:CC0-1.0
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="demon driver - time to burn rubber (usa).bin" size="4194304" crc="9374af5e" sha1="9dfe428843a22363ad8cc8ea0f818e439ef62f39"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Pitch demo for a GBA port. -->
+	<software name="demonscrest">
+		<!-- The patch doesn't seem to be needed in MAME, but on other emulators, you have to patch 0x122384 with 0xc046c046. -->
+		<description>Demon's Crest (prototype)</description>
+		<year>2002?</year>
+		<publisher>Rival Dreams</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="1407220">
+				<rom name="demon's crest (prototype).gba" size="1407220" crc="134be954" sha1="0bb9824a77da4406f202c3234b4a5cbb77a43316"/>
 			</dataarea>
 		</part>
 	</software>
@@ -17554,6 +17657,19 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- Game crashes with Fatal error: 0800b2a4: Gb Undefined Thumb instruction: b2a9 error -->
+	<software name="kofex2up" cloneof="kofex2" supported="no">
+		<description>The King of Fighters EX2 - Howling Blood (USA, prototype, 20030403)</description>
+		<year>2003</year>
+		<publisher>Marvelous Entertainment</publisher>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_eeprom_4k" />
+			<dataarea name="rom" size="8388608">
+				<rom name="king of fighters ex2, the - howling blood (usa, prototype, 20030403).gba" size="8388608" crc="7704ff39" sha1="b859122c1813a5ec9fb565dcca815a9f0a52bf18"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kinghrts">
 		<description>Kingdom Hearts - Chain of Memories (Europe)</description>
 		<year>2005</year>
@@ -20279,6 +20395,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- This is a later build of the game than the retail release, with a different title screen and an options screen; does not say "Licensed by Nintendo" on boot. -->
+	<software name="manicminl">
+		<description>Manic Miner (Europe, 20030307)</description>
+		<year>2003</year>
+		<publisher>Jester Interactive</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="7562196">
+				<rom name="manic miner (europe, later) (en,fr,de,es,it).bin" size="7562196" crc="fb3d52bd" sha1="44576581ef231d2befb369800769ffee7e45f0e7"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="marchpen">
 		<description>March of the Penguins (Europe)</description>
 		<year>2006</year>
@@ -20524,6 +20652,18 @@ license:CC0-1.0
 			<feature name="slot" value="gba_flash" />
 			<dataarea name="rom" size="4194304">
 				<rom name="mario kart advance (japan).bin" size="4194304" crc="30e99fcd" sha1="88ffde363b05264a99a4d5ada0c80a00196a94d7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mariokrtxxl">
+		<description>Mario Kart XXL (demo, 20040417)</description>
+		<year>2004</year>
+		<publisher>Denaris Entertainment Software</publisher>
+		<info name="alt_title" value="Mario Kart Demo V1.0"/>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="mario kart xxl (demo, 20040417).bin" size="4194304" crc="e3075601" sha1="ba1e75f780c41e737922f090dcb17526f1fd7a01"/>
 			</dataarea>
 		</part>
 	</software>
@@ -25215,6 +25355,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- Game does not work in MAME, it freezes on the bios screen. -->
+	<software name="paradroid" supported="no">
+		<description>Paradroid (Europe, prototype, 20030320)</description>
+		<year>2003</year>
+		<publisher>Jester Interactive</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="3716024">
+				<rom name="paradroid (prototype 20030320).bin" size="3716024" crc="0420d6ff" sha1="8cc61ed69ba2c3f6d8d546ce78b116e18c876bcb"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pawclwdc">
 		<description>Paws &amp; Claws - Best Friends - Dogs &amp; Cats (USA)</description>
 		<year>2007</year>
@@ -25297,7 +25449,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-<!-- This was the last development build, released by the programmer, James Boulton. It was never completed due to lack of publisher interest. -->
+	<!-- This was the last development build, released by the programmer, James Boulton. It was never completed due to lack of publisher interest. -->
 	<software name="perplexd" supported="partial">
 		<description>Perplexus Diodomin (prototype)</description>
 		<year>2002</year>
@@ -27790,6 +27942,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- Game crashes immediately after loading, inputs become unresponsive. -->
+	<software name="quake" supported="no">
+		<description>Quake (demo)</description>
+		<year>2003</year>
+		<publisher>Bobbee Tec</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="33554432">
+				<rom name="quake (demo).gba" size="33554432" crc="10e16dd4" sha1="91da59c27f06beb7d5ee1531300a0d1b7e4bfde2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="qwakd" cloneof="qwak">
 		<description>Qwak (Europe, demo)</description>
 		<year>2007</year>
@@ -27809,6 +27973,17 @@ license:CC0-1.0
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
 				<rom name="qwak (europe) (en,fr,de,es,it) (unl).bin" size="8388608" crc="9027917f" sha1="a5f5dde3d0d3f58f8903e44461e17a7001591649"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="r3ddemo">
+		<description>R3D-Demo V1 (Europe, demo)</description>
+		<year>2004</year>
+		<publisher>Denaris Entertainment Software</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="3-r3d_demo_v1.gba" size="8388608" crc="3e7f9100" sha1="48261a7984808f573a1b07be647c02b941af6247"/>
 			</dataarea>
 		</part>
 	</software>
@@ -27885,6 +28060,18 @@ license:CC0-1.0
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="racing gears advance (usa).bin" size="8388608" crc="bf648e5c" sha1="3f053865f9a687a75927172cd281390b2560201c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="racinggaup">
+		<description>Racing Gears Advance (USA, prototype, 20030922)</description>
+		<year>2003</year>
+		<publisher>Pier 3 Entertainment</publisher>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_eeprom_4k" />
+			<dataarea name="rom" size="16777216">
+				<rom name="racing gears advance (usa, prototype, 20030922).gba" size="16777216" crc="86a05f93" sha1="d258526ce1dcfbed51b745a762f148c9bea01154"/>
 			</dataarea>
 		</part>
 	</software>
@@ -29770,6 +29957,18 @@ license:CC0-1.0
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="16777216">
 				<rom name="sd gundam ggeneration advance (japan).bin" size="16777216" crc="7daf215c" sha1="7dd42beaacbd24cb832745a18e57cefda4a76827"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="seaboy">
+		<description>Sea Boy (demo)</description>
+		<year>2003</year>
+		<publisher>Rival Dreams</publisher>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_eeprom_4k" />
+			<dataarea name="rom" size="1658376">
+				<rom name="sea boy (demo).bin" size="1658376" crc="c822b1bc" sha1="5a00075f187d294ee7e1e711172d28a76046ba53"/>
 			</dataarea>
 		</part>
 	</software>
@@ -32916,6 +33115,18 @@ license:CC0-1.0
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="star wars trilogy - apprentice of the force (usa) (en,fr,es).bin" size="8388608" crc="714a0d3a" sha1="b6c09b9f5588ff81aeb4bd5ed886933993f4575f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swtrilgyup" cloneof="swtrilgy" supported="no">
+		<description>Star Wars Trilogy - Apprentice of the Force (USA, prototype)</description>
+		<year>2004</year>
+		<publisher>Ubisoft</publisher>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_eeprom_4k" />
+			<dataarea name="rom" size="8388608">
+				<rom name="star wars trilogy - apprentice of the force (usa, prototype).gba" size="8388608" crc="b5d61c72" sha1="ddf8edaa7436fd5a7282867369f294d6907f9a52"/>
 			</dataarea>
 		</part>
 	</software>
@@ -36809,6 +37020,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="ultmusclp">
+		<description>Ultimate Muscle - The Kinnikuman Legacy - The Path of the Superhero (USA, prototype, 20030429)</description>
+		<year>2003</year>
+		<publisher>Bandai</publisher>
+			<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_eeprom_4k" />
+			<dataarea name="rom" size="16777216">
+				<rom name="ultimate muscle - the kinnikuman legacy - the path of the superhero (usa, prototype).bin" size="16777216" crc="65e2295b" sha1="314fe99854c8c3ab8786b633f4a20afba835d696"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ultpuzzl">
 		<description>Ultimate Puzzle Games (USA)</description>
 		<year>2005</year>
@@ -37015,6 +37238,41 @@ license:CC0-1.0
 			<feature name="slot" value="gba_flash_512" />
 			<dataarea name="rom" size="33554432">
 				<rom name="urbz, the - sims in the city (japan).bin" size="33554432" crc="bbccc2fd" sha1="7af0ab8a437616befafddd7c0ea87c8dfb80c6cd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uridiump1">
+		<description>Uridium Advance (Europe, prototype, 20030307)</description>
+		<year>2003</year>
+		<publisher>Jester Interactive</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="uridium advance (prototype 20030307).bin" size="4194304" crc="7e617c46" sha1="13415d7845d4c4589cfbee1fd755202841aeba08"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Game does not work in MAME, it freezes on the bios screen. -->
+	<software name="uridiump2" supported="no">
+		<description>Uridium Advance (Europe, prototype, 20020911)</description>
+		<year>2003</year>
+		<publisher>Jester Interactive</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="3397356">
+				<rom name="uridium advance (prototype 20020911).bin" size="3397356" crc="aefa2250" sha1="40a3ba147fe8d75f12a8b0e41865cec0f9d06c3e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Game does not work in MAME, it freezes on the bios screen. -->
+	<software name="uridpara" supported="no">
+		<description>Uridium Advance and Paradroid 2 in 1 (Europe, prototype, 20030430)</description>
+		<year>2003</year>
+		<publisher>Jester Interactive</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="7906272">
+				<rom name="uridium paradroid (prototype).gba" size="7906272" crc="18fb99b1" sha1="d4e9c438b82c96cbc0459c46d04bed1f0d10fde2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -41409,6 +41667,20 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- Unreleased, software shows errors when saving bookmarks, but they work fine. -->
+	<software name="holybibl">
+		<description>The Holy Bible - World English Bible (USA, prototype)</description>
+		<year>2006</year>
+		<publisher>Crave Entertainment</publisher>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_eeprom_64k" />
+			<dataarea name="rom" size="33554432">
+				<rom name="holy bible, the - world english bible (usa) (prototype).gba" size="33554432" crc="b8fda4f5" sha1="e2dd02ded617f7002ca887639cf91b9cac8cd745"/>
+			</dataarea>
+		</part>
+	</software>
+
 
 	<software name="mp3playr">
 		<description>Nintendo MP3 Player (Europe)</description>

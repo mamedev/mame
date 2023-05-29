@@ -20,17 +20,17 @@
 DEFINE_DEVICE_TYPE(CS8900A, cs8900a_device, "cs8900a", "CS8900A Crystal LAN 10Base-T Ethernet MAC")
 
 /* warn illegal behaviour */
-#define CS8900_DEBUG_WARN_REG (1 << 1U)     /* warn about invalid register accesses */
-#define CS8900_DEBUG_WARN_RXTX (1 << 2U)    /* warn about invalid rx or tx conditions */
+#define CS8900_DEBUG_WARN_REG (1U << 1)     /* warn about invalid register accesses */
+#define CS8900_DEBUG_WARN_RXTX (1U << 2)    /* warn about invalid rx or tx conditions */
 
-#define CS8900_DEBUG (1 << 3U)              /* enable to see port reads */
-#define CS8900_DEBUG_INIT (1 << 4U)
-#define CS8900_DEBUG_LOAD (1 << 5U)         /* enable to see port reads */
-#define CS8900_DEBUG_STORE (1 << 6U)        /* enable to see port writes */
-#define CS8900_DEBUG_REGISTERS (1 << 7U)    /* enable to see CS8900a register I/O */
-#define CS8900_DEBUG_RXTX_STATE (1 << 8U)   /* enable to see tranceiver state changes */
-#define CS8900_DEBUG_RXTX_DATA (1 << 9U)    /* enable to see data in/out flow */
-#define CS8900_DEBUG_FRAMES (1 << 10U)      /* enable to see arch frame send/recv */
+#define CS8900_DEBUG (1U << 3)              /* enable to see port reads */
+#define CS8900_DEBUG_INIT (1U << 4)
+#define CS8900_DEBUG_LOAD (1U << 5)         /* enable to see port reads */
+#define CS8900_DEBUG_STORE (1U << 6)        /* enable to see port writes */
+#define CS8900_DEBUG_REGISTERS (1U << 7)    /* enable to see CS8900a register I/O */
+#define CS8900_DEBUG_RXTX_STATE (1U << 8)   /* enable to see tranceiver state changes */
+#define CS8900_DEBUG_RXTX_DATA (1U << 9)    /* enable to see data in/out flow */
+#define CS8900_DEBUG_FRAMES (1U << 10)      /* enable to see arch frame send/recv */
 
 /** #define CS8900_DEBUG_IGNORE_RXEVENT 1 **/ /* enable to ignore RXEVENT in DEBUG_REGISTERS */
 #define VERBOSE 0

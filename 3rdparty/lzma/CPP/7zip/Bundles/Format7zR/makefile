@@ -7,6 +7,7 @@ COMMON_OBJS = \
   $O\CRC.obj \
   $O\CrcReg.obj \
   $O\IntToString.obj \
+  $O\LzFindPrepare.obj \
   $O\NewHandler.obj \
   $O\MyString.obj \
   $O\StringConvert.obj \
@@ -102,12 +103,16 @@ C_OBJS = \
   $O\LzFind.obj \
   $O\LzFindMt.obj \
   $O\Lzma2Dec.obj \
+  $O\Lzma2DecMt.obj \
   $O\Lzma2Enc.obj \
   $O\LzmaDec.obj \
   $O\LzmaEnc.obj \
   $O\MtCoder.obj \
+  $O\MtDec.obj \
   $O\Threads.obj \
 
 !include "../../Crc.mak"
+!include "../../LzFindOpt.mak"
+!include "../../LzmaDec.mak"
 
 !include "../../7zip.mak"

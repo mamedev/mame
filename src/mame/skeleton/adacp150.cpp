@@ -23,6 +23,9 @@
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class adacp150_state : public driver_device
 {
 public:
@@ -225,5 +228,8 @@ ROM_START(adacp150p)
 	ROM_LOAD("pa_2436__rev-4.52.u11", 0x0000, 0x8000, CRC(a381674c) SHA1(1d3cb4ca3ead40da67a353efe7553ea953fa929d)) // Intel D27C256
 	ROM_LOAD("pa_2437__rev-4.52.u22", 0x8000, 0x4000, CRC(eb468ad0) SHA1(881a90a6aa89d7e289d7adbec46d007a8cfa5351)) // Intel D27C128
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1989, adacp150p, 0, 0, adacp150, adacp150, adacp150_state, empty_init, "Adacom", "CP-150 Plus", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

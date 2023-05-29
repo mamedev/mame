@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina, Angelo Salese, hap, David Haywood
 
-#ifndef MAME_VIDEO_AIRRAID_DEV_H
-#define MAME_VIDEO_AIRRAID_DEV_H
+#ifndef MAME_SEIBU_AIRRAID_DEV_H
+#define MAME_SEIBU_AIRRAID_DEV_H
 
 #pragma once
 
@@ -71,4 +71,4 @@ private:
 	uint32_t screen_update_airraid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-#endif // MAME_VIDEO_AIRRAID_DEV_H
+#endif // MAME_SEIBU_AIRRAID_DEV_H

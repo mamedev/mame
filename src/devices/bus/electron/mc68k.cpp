@@ -84,7 +84,7 @@ void electron_mc68k_device::device_add_mconfig(machine_config &config)
 {
 	M68000(config, m_maincpu, 10_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &electron_mc68k_device::mem_map);
-	m_maincpu->disable_interrupt_mixer();
+	m_maincpu->set_interrupt_mixer(false);
 
 	INPUT_MERGER_ANY_HIGH(config, "irq_ipl0").output_handler().set_inputline(m_maincpu, M68K_IRQ_IPL0);
 	INPUT_MERGER_ANY_HIGH(config, "irq_ipl1").output_handler().set_inputline(m_maincpu, M68K_IRQ_IPL1);

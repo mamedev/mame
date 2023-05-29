@@ -173,7 +173,7 @@ void s1410_device::device_add_mconfig(machine_config &config)
 	z8400a.set_addrmap(AS_IO, &s1410_device::s1410_io);
 	z8400a.set_disable();
 
-	HARDDISK(config, "image");
+	HARDDISK(config, m_image).set_interface("scsi_hdd");
 }
 
 
@@ -187,7 +187,8 @@ void s1410_device::device_add_mconfig(machine_config &config)
 //-------------------------------------------------
 
 s1410_device::s1410_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: scsihd_device(mconfig, S1410, tag, owner, clock)
+	: scsihd_device(mconfig, S1410, tag, owner, clock),
+	  m_image(*this, "image")
 {
 }
 
@@ -248,14 +249,14 @@ void s1410_device::ExecCommand()
 
 		logerror("S1410: FORMAT TRACK at LBA %x for %x blocks\n", m_lba, m_blocks);
 
-		if ((m_disk) && (m_blocks))
+		if (m_image->exists() && m_blocks)
 		{
 			std::vector<uint8_t> data(m_sector_bytes);
 			memset(&data[0], 0xc6, m_sector_bytes);
 
 			while (m_blocks > 0)
 			{
-				if (!m_disk->write(m_lba, &data[0]))
+				if (!m_image->write(m_lba, &data[0]))
 				{
 					logerror("S1410: HD write error!\n");
 				}

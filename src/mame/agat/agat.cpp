@@ -92,6 +92,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 #define A7_CPU_TAG "maincpu"
 #define A7_SPEAKER_TAG "speaker"
 #define A7_CASSETTE_TAG "tape"
@@ -1363,6 +1365,9 @@ ROM_START( agat9 )
 	ROM_REGION(0x0800,"gfx1",0)
 	ROM_LOAD( "agathe9.fnt", 0x0000, 0x0800, CRC(8c55c984) SHA1(5a5a202000576b88b4ae2e180dd2d1b9b337b594))
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME  FLAGS
 COMP( 1983, agat7, apple2, 0,      agat7,   agat7, agat7_state, empty_init, "Agat",  "Agat-7", MACHINE_IMPERFECT_GRAPHICS)

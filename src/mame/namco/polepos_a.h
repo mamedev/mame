@@ -1,5 +1,5 @@
-#ifndef MAME_AUDIO_POLEPOS_H
-#define MAME_AUDIO_POLEPOS_H
+#ifndef MAME_NAMCO_POLEPOS_A_H
+#define MAME_NAMCO_POLEPOS_A_H
 
 #pragma once
 
@@ -54,4 +54,4 @@ DECLARE_DEVICE_TYPE(POLEPOS_SOUND, polepos_sound_device)
 
 DISCRETE_SOUND_EXTERN( polepos_discrete );
 
-#endif // MAME_AUDIO_POLEPOS_H
+#endif // MAME_NAMCO_POLEPOS_A_H

@@ -4,10 +4,10 @@
 #include "psxcd.h"
 #include "debugger.h"
 
-#define LOG_CMD  (1 << 1)
-#define LOG_MISC (1 << 2)
+#define LOG_CMD  (1U << 1)
+#define LOG_MISC (1U << 2)
 
-#define VERBOSE ( 0 )
+#define VERBOSE (0)
 #include "logmacro.h"
 
 enum cdrom_events
@@ -186,11 +186,11 @@ void psxcd_device::device_reset()
 	curpos.w = 0;
 }
 
-image_init_result psxcd_device::call_load()
+std::pair<std::error_condition, std::string> psxcd_device::call_load()
 {
-	image_init_result ret = cdrom_image_device::call_load();
+	auto ret = cdrom_image_device::call_load();
 	open = true;
-	if (ret == image_init_result::PASS)
+	if (!ret.first)
 		add_system_event(EVENT_CHANGE_DISK, m_sysclock, nullptr); // 1 sec to spin up the disk
 	return ret;
 }

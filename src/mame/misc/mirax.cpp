@@ -110,6 +110,8 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "speaker.h"
 
 
+namespace {
+
 class mirax_state : public driver_device
 {
 public:
@@ -585,6 +587,9 @@ void mirax_state::init_mirax()
 	for (int i = 0x8000; i < 0xc000; i++)
 		ROM[bitswap<16>(i, 15,14,13,12,11,10,9, 5,7,6,8, 4,3,2,1,0)] = (bitswap<8>(DATA[i], 1, 3, 7, 0, 5, 6, 4, 2) ^ 0xff);
 }
+
+} // anonymous namespace
+
 
 GAME( 1985, mirax,    0,        mirax,    mirax,  mirax_state, init_mirax, ROT90, "Current Technologies", "Mirax (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, miraxa,   mirax,    mirax,    miraxa, mirax_state, init_mirax, ROT90, "Current Technologies", "Mirax (set 2)", MACHINE_SUPPORTS_SAVE )

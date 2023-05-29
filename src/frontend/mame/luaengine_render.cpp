@@ -16,6 +16,9 @@
 
 #include "render.h"
 #include "rendlay.h"
+#include "rendutil.h"
+
+#include "ioprocs.h"
 
 #include <algorithm>
 #include <atomic>
@@ -733,7 +736,38 @@ void lua_engine::initialize_render(sol::table &emu)
 
 	bitmap_helper<bitmap_yuy16>::make_type<bitmap16_t>(emu, "bitmap_yuy16");
 	bitmap_helper<bitmap_rgb32>::make_type<bitmap32_t>(emu, "bitmap_rgb32");
-	bitmap_helper<bitmap_argb32>::make_type<bitmap32_t>(emu, "bitmap_argb32");
+
+	// ARGB32 bitmaps get extra functionality
+	auto bitmap_argb32_type = bitmap_helper<bitmap_argb32>::make_type<bitmap32_t>(emu, "bitmap_argb32");
+	bitmap_argb32_type.set_function("load",
+			[] (sol::this_state s, std::string_view data)
+			{
+				auto stream(util::ram_read(data.data(), data.size()));
+				if (!stream)
+					luaL_error(s, "Error allocating stream wrapper");
+				auto b = std::make_shared<bitmap_helper<bitmap_argb32> >(s, 0, 0, 0, 0);
+				switch (render_detect_image(*stream))
+				{
+				case RENDUTIL_IMGFORMAT_PNG:
+					render_load_png(*b, *stream);
+					if (!b->valid())
+						luaL_error(s, "Invalid or unsupported PNG data");
+					break;
+				case RENDUTIL_IMGFORMAT_JPEG:
+					render_load_jpeg(*b, *stream);
+					if (!b->valid())
+						luaL_error(s, "Invalid or unsupported PNG data");
+					break;
+				case RENDUTIL_IMGFORMAT_MSDIB:
+					render_load_msdib(*b, *stream);
+					if (!b->valid())
+						luaL_error(s, "Invalid or unsupported Microsoft DIB data");
+					break;
+				default:
+					luaL_error(s, "Unsupported bitmap data format");
+				}
+				return b;
+			});
 
 	auto render_texture_type = emu.new_usertype<render_texture_helper>("render_texture", sol::no_constructor);
 	render_texture_type.set_function("free", &render_texture_helper::free);
@@ -747,19 +781,19 @@ void lua_engine::initialize_render(sol::table &emu)
 				&layout_view::set_prepare_items_callback,
 				nullptr,
 				"set_prepare_items_callback",
-				nullptr);
+				"prepare items");
 	layout_view_type["set_preload_callback"] =
 		make_simple_callback_setter<void>(
 				&layout_view::set_preload_callback,
 				nullptr,
 				"set_preload_callback",
-				nullptr);
+				"preload");
 	layout_view_type["set_recomputed_callback"] =
 		make_simple_callback_setter<void>(
 				&layout_view::set_recomputed_callback,
 				nullptr,
 				"set_recomputed_callback",
-				nullptr);
+				"recomputed");
 	layout_view_type["items"] = sol::property([] (layout_view &v) { return layout_view_items(v); });
 	layout_view_type["name"] = sol::property(&layout_view::name);
 	layout_view_type["unqualified_name"] = sol::property(&layout_view::unqualified_name);
@@ -857,7 +891,7 @@ void lua_engine::initialize_render(sol::table &emu)
 				&layout_file::set_resolve_tags_callback,
 				nullptr,
 				"set_resolve_tags_callback",
-				nullptr);
+				"resolve tags");
 	layout_file_type["device"] = sol::property(&layout_file::device);
 	layout_file_type["views"] = sol::property([] (layout_file &f) { return layout_file_views(f); });
 

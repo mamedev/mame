@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese, Pierpaolo Prazzoli
-#ifndef MAME_INCLUDES_SPEEDATK_H
-#define MAME_INCLUDES_SPEEDATK_H
+#ifndef MAME_SETA_SPEEDATK_H
+#define MAME_SETA_SPEEDATK_H
 
 #pragma once
 
@@ -61,4 +61,4 @@ private:
 	void speedatk_mem(address_map &map);
 };
 
-#endif // MAME_INCLUDES_SPEEDATK_H
+#endif // MAME_SETA_SPEEDATK_H

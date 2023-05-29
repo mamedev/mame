@@ -22,6 +22,9 @@
 #include "thayers.lh"
 
 
+namespace {
+
+
 #define LOG 0
 
 struct ssi263_t
@@ -861,6 +864,9 @@ ROM_START( thayersa )
 	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "thayers", 0, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Game Drivers */
 

@@ -5,8 +5,8 @@
     Atari Batman hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_BATMAN_H
-#define MAME_INCLUDES_BATMAN_H
+#ifndef MAME_ATARI_BATMAN_H
+#define MAME_ATARI_BATMAN_H
 
 #pragma once
 
@@ -55,4 +55,4 @@ private:
 	static const atari_motion_objects_config s_mob_config;
 };
 
-#endif // MAME_INCLUDES_BATMAN_H
+#endif // MAME_ATARI_BATMAN_H

@@ -193,10 +193,11 @@ void kc82_device::mmu_w(offs_t offset, u8 data)
 //  physical addresses
 //-------------------------------------------------
 
-bool kc82_device::memory_translate(int spacenum, int intention, offs_t &address)
+bool kc82_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
 	if (spacenum == AS_PROGRAM || spacenum == AS_OPCODES)
 		address = (address + m_mmu_base[(address & 0xfc00) >> 10]) & 0xfffff;
+	target_space = &space(spacenum);
 	return true;
 }
 

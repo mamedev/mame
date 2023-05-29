@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Kevin Horton, Sean Riddle
-/******************************************************************************
+/*******************************************************************************
 
 Entex Select-A-Game Machine, handheld game console.
 Technically, the main unit is the peripheral(buttons, display, speaker, power),
@@ -21,7 +21,7 @@ orientation can be rotated in the video options. By default, the "visitor" side
 is at the bottom. This is how most of the games are played, Space Invader 2 is
 an exception.
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -91,19 +91,16 @@ void sag_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Cartridge Init
-******************************************************************************/
+*******************************************************************************/
 
 DEVICE_IMAGE_LOAD_MEMBER(sag_state::cart_load)
 {
 	u32 size = m_cart->common_get_size("rom");
 
 	if (size != 0x1000 && size != 0x1100 && size != 0x2000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Invalid ROM file size");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Invalid ROM file size (must be 4096, 4352 or 8192 bytes)");
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
@@ -113,10 +110,7 @@ DEVICE_IMAGE_LOAD_MEMBER(sag_state::cart_load)
 	{
 		// TMS1670 MCU
 		if (!image.loaded_through_softlist())
-		{
-			image.seterror(image_error::INVALIDIMAGE, "Can only load TMS1670 type through softwarelist");
-			return image_init_result::FAIL;
-		}
+			return std::make_pair(image_error::UNSUPPORTED, "Can only load TMS1670 type through software list");
 
 		memcpy(memregion("tms1k_cpu")->base(), m_cart->get_rom_base(), size);
 		m_tms1k_cpu->set_clock(375000); // approximation - RC osc. R=47K, C=47pF
@@ -124,18 +118,14 @@ DEVICE_IMAGE_LOAD_MEMBER(sag_state::cart_load)
 		// init PLAs
 		size = image.get_software_region_length("rom:mpla");
 		if (size != 867)
-		{
-			image.seterror(image_error::INVALIDIMAGE, "Invalid MPLA file size");
-			return image_init_result::FAIL;
-		}
+			return std::make_pair(image_error::BADSOFTWARE, "Invalid MPLA data area size (must be 867 bytes)");
+
 		memcpy(memregion("tms1k_cpu:mpla")->base(), image.get_software_region("rom:mpla"), size);
 
 		size = image.get_software_region_length("rom:opla");
 		if (size != 557)
-		{
-			image.seterror(image_error::INVALIDIMAGE, "Invalid OPLA file size");
-			return image_init_result::FAIL;
-		}
+			return std::make_pair(image_error::BADSOFTWARE, "Invalid OPLA data area size (must be 557 bytes)");
+
 		memcpy(memregion("tms1k_cpu:opla")->base(), image.get_software_region("rom:opla"), size);
 
 		subdevice<pla_device>("tms1k_cpu:mpla")->reinit();
@@ -154,14 +144,14 @@ DEVICE_IMAGE_LOAD_MEMBER(sag_state::cart_load)
 		m_hmcs40_cpu->set_clock(450000); // from main PCB
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // main unit
 
@@ -249,9 +239,9 @@ u8 sag_state::tms1k_read_k()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( sag ) // P1 = Visitor (left side), P2 = Home (right side)
 	PORT_START("IN.0")
@@ -297,13 +287,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void sag_state::sag(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD38800(config, m_hmcs40_cpu, 0);
 	m_hmcs40_cpu->write_r<0>().set(FUNC(sag_state::hmcs40_write_r));
 	m_hmcs40_cpu->write_r<1>().set(FUNC(sag_state::hmcs40_write_r));
@@ -317,16 +307,16 @@ void sag_state::sag(machine_config &config)
 	m_tms1k_cpu->write_r().set(FUNC(sag_state::tms1k_write_r));
 	m_tms1k_cpu->write_o().set(FUNC(sag_state::tms1k_write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8+6, 14);
 	m_display->set_segmask(0x3f00, 0x7f);
 	config.set_default_layout(layout_sag);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	/* cartridge */
+	// cartridge
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "sag_cart");
 	m_cart->set_must_be_loaded(true);
 	m_cart->set_device_load(FUNC(sag_state::cart_load));
@@ -336,9 +326,9 @@ void sag_state::sag(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( sag )
 	// nothing here yet, ROM is on the cartridge
@@ -352,9 +342,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME  PARENT CMP MACHINE INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1981, sag,  0,      0, sag,    sag,   sag_state, empty_init, "Entex", "Select-A-Game Machine", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1981, sag,  0,      0,      sag,     sag,   sag_state, empty_init, "Entex", "Select-A-Game Machine", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

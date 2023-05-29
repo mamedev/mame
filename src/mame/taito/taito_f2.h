@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Graves, Bryan McPhail, Brad Oliver, Andrew Prime, Brian Troha, Nicola Salmoria
-#ifndef MAME_INCLUDES_TAITO_F2_H
-#define MAME_INCLUDES_TAITO_F2_H
+#ifndef MAME_TAITO_TAITO_F2_H
+#define MAME_TAITO_TAITO_F2_H
 
 #pragma once
 
@@ -287,4 +287,4 @@ protected:
 	void yuyugogo_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_TAITO_F2_H
+#endif // MAME_TAITO_TAITO_F2_H

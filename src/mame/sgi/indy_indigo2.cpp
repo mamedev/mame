@@ -80,6 +80,9 @@
 
 #include "logmacro.h"
 
+
+namespace {
+
 class ip24_state : public driver_device
 {
 public:
@@ -104,8 +107,8 @@ public:
 	{
 	}
 
-	void ip24_base(machine_config &config);
-	void ip24(machine_config &config);
+	void ip24_base(machine_config &config, uint32_t system_clock);
+	void ip24(machine_config &config, uint32_t system_clock);
 	void indy_5015(machine_config &config);
 	void indy_4613(machine_config &config);
 	void indy_4610(machine_config &config);
@@ -326,9 +329,9 @@ void ip24_state::scsi_devices(device_slot_interface &device)
 	//device.set_option_machine_config("cdrom", cdrom_config);
 }
 
-void ip24_state::ip24_base(machine_config &config)
+void ip24_state::ip24_base(machine_config &config, uint32_t system_clock)
 {
-	SGI_MC(config, m_mem_ctrl, m_maincpu, m_eeprom);
+	SGI_MC(config, m_mem_ctrl, m_maincpu, m_eeprom, system_clock);
 	m_mem_ctrl->int_dma_done_cb().set(m_ioc2, FUNC(ioc2_device::mc_dma_done_w));
 	m_mem_ctrl->eisa_present().set_constant(1);
 
@@ -384,9 +387,9 @@ void ip24_state::ip24_base(machine_config &config)
 	SOFTWARE_LIST(config, "sgi_mips_hdd").set_original("sgi_mips_hdd");
 }
 
-void ip24_state::ip24(machine_config &config)
+void ip24_state::ip24(machine_config &config, uint32_t system_clock)
 {
-	ip24_base(config);
+	ip24_base(config, system_clock);
 
 	m_hpc3->set_addrmap(hpc3_device::AS_PIO6, &ip24_state::pio6_map);
 
@@ -405,9 +408,10 @@ void ip24_state::ip24(machine_config &config)
 
 void ip24_state::indy_5015(machine_config &config)
 {
-	ip24(config);
-
-	R5000BE(config, m_maincpu, 75'000'000);
+	constexpr uint32_t system_clock = 50'000'000;
+	ip24(config, system_clock);
+	R5000BE(config, m_maincpu, 3 * system_clock);
+	m_maincpu->set_system_clock(system_clock);
 	m_maincpu->set_icache_size(0x8000);
 	m_maincpu->set_dcache_size(0x8000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip24_map);
@@ -415,9 +419,10 @@ void ip24_state::indy_5015(machine_config &config)
 
 void ip24_state::indy_4613(machine_config &config)
 {
-	ip24(config);
-
-	R4600BE(config, m_maincpu, 66'666'666);
+	constexpr uint32_t system_clock = 66'666'666;
+	ip24(config, system_clock);
+	R4600BE(config, m_maincpu, 2 * system_clock);
+	m_maincpu->set_system_clock(system_clock);
 	m_maincpu->set_icache_size(0x4000);
 	m_maincpu->set_dcache_size(0x4000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip24_map);
@@ -425,9 +430,10 @@ void ip24_state::indy_4613(machine_config &config)
 
 void ip24_state::indy_4610(machine_config &config)
 {
-	ip24(config);
-
-	R4600BE(config, m_maincpu, 50'000'000);
+	constexpr uint32_t system_clock = 50'000'000;
+	ip24(config, system_clock);
+	R4600BE(config, m_maincpu, 2 * system_clock);
+	m_maincpu->set_system_clock(system_clock);
 	m_maincpu->set_icache_size(0x4000);
 	m_maincpu->set_dcache_size(0x4000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip24_map);
@@ -442,12 +448,14 @@ void ip22_state::wd33c93_2(device_t *device)
 
 void ip22_state::indigo2_4415(machine_config &config)
 {
-	R4400BE(config, m_maincpu, 75'000'000);
+	constexpr uint32_t system_clock = 50'000'000;
+	R4400BE(config, m_maincpu, 3 * system_clock);
+	m_maincpu->set_system_clock(system_clock);
 	m_maincpu->set_icache_size(0x4000);
 	m_maincpu->set_dcache_size(0x4000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip22_state::ip22_map);
 
-	ip24_base(config);
+	ip24_base(config, system_clock);
 
 	NSCSI_BUS(config, "scsibus2", 0);
 	NSCSI_CONNECTOR(config, "scsibus2:0").option_set("wd33c93", WD33C93B)
@@ -539,6 +547,9 @@ ROM_START( indigo2_4415 )
 	ROM_SYSTEM_BIOS( 1, "b4", "Version 5.1.2 Rev B4 R4X00 Dec 9, 1993" ) \
 	ROMX_LOAD( "ip22prom.070-1367-002.bin", 0x000000, 0x080000, CRC(ae5ecd08) SHA1(422568ae95282ee23b2fe123267f9b915a1dc3dc), ROM_GROUPDWORD | ROM_BIOS(1) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME          PARENT     COMPAT  MACHINE       INPUT CLASS       INIT        COMPANY                 FULLNAME                   FLAGS
 COMP( 1993, indy_4610,    0,         0,      indy_4610,    ip24, ip24_state, empty_init, "Silicon Graphics Inc", "Indy (R4600, 100MHz)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_MICROPHONE )

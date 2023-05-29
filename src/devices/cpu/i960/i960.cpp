@@ -1110,14 +1110,16 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				m_icount--;
 				t1 = get_1_ri(opcode);
 				t2 = get_2_ri(opcode);
-				set_ri(opcode, t2>>t1);
+				set_ri(opcode, t1 >= 32 ? 0 : t2>>t1);
 				break;
 
 			case 0xa: // shrdi
 				m_icount--;
 				t1 = get_1_ri(opcode);
 				t2 = get_2_ri(opcode);
-				if(((int32_t)t2) < 0) {
+				if(t1 >= 32)
+					set_ri(opcode, 0);
+				else if(((int32_t)t2) < 0) {
 					if(t2 & ((1<<t1)-1))
 						set_ri(opcode, (((int32_t)t2)>>t1)+1);
 					else
@@ -1130,14 +1132,17 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				m_icount--;
 				t1 = get_1_ri(opcode);
 				t2 = get_2_ri(opcode);
-				set_ri(opcode, ((int32_t)t2)>>t1);
+				if(t1 >= 32)
+					set_ri(opcode, (int32_t)t2 < 0 ? -1 : 0);
+				else
+					set_ri(opcode, ((int32_t)t2)>>t1);
 				break;
 
 			case 0xc: // shlo
 				m_icount--;
 				t1 = get_1_ri(opcode);
 				t2 = get_2_ri(opcode);
-				set_ri(opcode, t2<<t1);
+				set_ri(opcode, t1 >= 32 ? 0 : t2<<t1);
 				break;
 
 			case 0xd: // rotate
@@ -1152,7 +1157,7 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				m_icount--;
 				t1 = get_1_ri(opcode);
 				t2 = get_2_ri(opcode);
-				set_ri(opcode, t2<<t1);
+				set_ri(opcode, (t2 & 0x80000000) | (t1 >= 32 ? 0 : (t2<<t1) & 0x7fffffff)); // sign is preserved
 				break;
 
 			default:
@@ -2263,7 +2268,7 @@ void i960_cpu_device::execute_set_input(int irqline, int state)
 		}
 
 		// and ack it to the core now that it's queued
-		standard_irq_callback(irqline);
+		standard_irq_callback(irqline, m_IP);
 	}
 }
 

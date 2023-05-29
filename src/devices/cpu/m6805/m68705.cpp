@@ -20,11 +20,10 @@
  * Configurable logging
  ****************************************************************************/
 
-#define LOG_GENERAL (1U <<  0)
-#define LOG_INT     (1U <<  1)
-#define LOG_IOPORT  (1U <<  2)
-#define LOG_TIMER   (1U <<  3)
-#define LOG_EPROM   (1U <<  4)
+#define LOG_INT     (1U << 1)
+#define LOG_IOPORT  (1U << 2)
+#define LOG_TIMER   (1U << 3)
+#define LOG_EPROM   (1U << 4)
 
 //#define VERBOSE (LOG_GENERAL | LOG_IOPORT | LOG_TIMER | LOG_EPROM)
 //#define LOG_OUTPUT_FUNC printf
@@ -568,11 +567,11 @@ void m6805_hmos_device::interrupt()
 				pushbyte<false>(m_cc);
 			}
 			SEI;
-			standard_irq_callback(0);
 
 			if (BIT(m_pending_interrupts, M6805_IRQ_LINE))
 			{
 				LOGINT("servicing /INT interrupt\n");
+				standard_irq_callback(0, m_pc.w.l);
 				m_pending_interrupts &= ~(1 << M6805_IRQ_LINE);
 				if (m_params.m_addr_width > 13)
 					rm16<true>(M6805_VECTOR_INT, m_pc);
@@ -582,6 +581,7 @@ void m6805_hmos_device::interrupt()
 			else if (BIT(m_pending_interrupts, M6805_INT_TIMER))
 			{
 				LOGINT("servicing timer/counter interrupt\n");
+				standard_irq_callback(1, m_pc.w.l);
 				if (m_params.m_addr_width > 13)
 					rm16<true>(M6805_VECTOR_TIMER, m_pc);
 				else

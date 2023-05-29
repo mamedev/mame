@@ -6,8 +6,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_VICTOR9K_KB_H
-#define MAME_MACHINE_VICTOR9K_KB_H
+#ifndef MAME_ACT_VICTOR9K_KB_H
+#define MAME_ACT_VICTOR9K_KB_H
 
 
 #pragma once
@@ -66,4 +66,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(VICTOR9K_KEYBOARD, victor_9000_keyboard_device)
 
-#endif // MAME_MACHINE_VICTOR9K_KB_H
+#endif // MAME_ACT_VICTOR9K_KB_H

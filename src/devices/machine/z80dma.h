@@ -83,7 +83,7 @@ private:
 	void interrupt_check();
 	void trigger_interrupt(int level);
 	void do_read();
-	int do_write();
+	void do_write();
 	void do_transfer_write();
 	void do_search();
 

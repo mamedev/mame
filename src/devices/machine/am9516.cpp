@@ -24,7 +24,6 @@
 #include "emu.h"
 #include "am9516.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_REGR    (1U << 1)
 #define LOG_REGW    (1U << 2)
 #define LOG_COMMAND (1U << 3)
@@ -967,7 +966,7 @@ void am9516_device::channel::chain()
 
 	status &= ~(S_CA | S_NAC);
 
-	if (cmh & CMH_SR)
+	if ((status & S_HRQ) || (cmh & CMH_SR))
 		run->adjust(attotime::zero);
 }
 

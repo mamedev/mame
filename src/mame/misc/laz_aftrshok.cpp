@@ -36,6 +36,8 @@ Spin to Win runs on the same hardware.
 #include "speaker.h"
 
 
+namespace {
+
 class aftrshok_state : public driver_device
 {
 public:
@@ -249,6 +251,8 @@ ROM_START( aftrshoka )
 	ROM_LOAD( "aftrshok.u26", 0x10000, 0x10000, CRC(d2b55dc1) SHA1(2684bfc65628a550fcbaa6726b5dab488e7ede5a) )
 	ROM_LOAD( "aftrshok.u25", 0x20000, 0x10000, CRC(d5d1c606) SHA1(ad72a00c211ee7f5bc0772d6f469d59047131095) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 19??, aftrshok,  0,        aftrshok, aftrshok, aftrshok_state, empty_init, ROT0, "Lazer-Tron", "Aftershock (Lazer-Tron, set 1)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )

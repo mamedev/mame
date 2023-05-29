@@ -22,6 +22,9 @@ Skeleton driver for Visual 102 display terminal.
 
 #include "v102_kbd.h"
 
+
+namespace {
+
 class v102_state : public driver_device
 {
 public:
@@ -181,5 +184,8 @@ ROM_START( v102 )
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD( "260-001.u50", 0x0000, 0x1000, CRC(732f5b99) SHA1(d105bf9f3ed41109d7181bcf0223bb280afe3f0a) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1984, v102, 0, 0, v102, v102, v102_state, empty_init, "Visual Technology", "Visual 102", MACHINE_IS_SKELETON )

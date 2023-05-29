@@ -35,6 +35,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 /*************************************
  *
  *  Defines
@@ -1549,7 +1552,7 @@ ROM_START( rotr )
 	ROM_REGION(0x8000, "nvram", 0) /* Default NVRAM */
 	ROM_LOAD( "rotr.nv", 0x0000, 0x8000, CRC(62543517) SHA1(a4bf3431cdab956839bb155c4a8c140d30e5c7ec) )
 
-	DISK_REGION( "scsibus:0:harddisk:image" )
+	DISK_REGION( "scsibus:0:harddisk" )
 	DISK_IMAGE( "rotr", 0, SHA1(d67d7feb52d8c7ba1d2a190a40d97e84871f2d80) )
 ROM_END
 
@@ -1565,7 +1568,7 @@ ROM_START( rotra )
 	ROM_REGION(0x8000, "nvram", 0) /* Default NVRAM */
 	ROM_LOAD( "rotr.nv", 0x0000, 0x8000, CRC(62543517) SHA1(a4bf3431cdab956839bb155c4a8c140d30e5c7ec) )
 
-	DISK_REGION( "scsibus:0:harddisk:image" )
+	DISK_REGION( "scsibus:0:harddisk" )
 	DISK_IMAGE( "rotra", 0, SHA1(570d402e5e9bba123edf7dfa9db7a0e6bdb23823) )
 ROM_END
 
@@ -1602,6 +1605,9 @@ ROM_START( fbcrazy )
 	DISK_REGION( "scsibus:3:cdrom" )
 	DISK_IMAGE_READONLY( "95100303", 0, SHA1(9ba47c96de27ec2bea9c6624d78d309b67705406)  )
 ROM_END
+
+} // anonymous namespace
+
 
 /*************************************
  *

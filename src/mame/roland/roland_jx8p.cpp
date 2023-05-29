@@ -19,6 +19,9 @@
 #include "machine/rescap.h"
 #include "machine/upd7001.h"
 
+
+namespace {
+
 class roland_jx8p_state : public driver_device
 {
 public:
@@ -57,8 +60,6 @@ void roland_jx8p_state::leds_w(u8 data)
 
 void roland_jx8p_state::jx8p_assigner_map(address_map &map)
 {
-	map(0x0000, 0x001f).m(m_assignercpu, FUNC(hd6303r_cpu_device::m6801_io));
-	map(0x0080, 0x00ff).ram(); // internal RAM
 	map(0x2000, 0x3fff).rw("cartslot", FUNC(generic_slot_device::read_ram), FUNC(generic_slot_device::write_ram));
 	map(0x4000, 0x4007).mirror(0x1ff8).r(FUNC(roland_jx8p_state::switches_r));
 	map(0x6000, 0x6000).mirror(0x1fff).w(FUNC(roland_jx8p_state::leds_w));
@@ -69,8 +70,6 @@ void roland_jx8p_state::jx8p_assigner_map(address_map &map)
 
 void roland_jx8p_state::superjx_assigner_map(address_map &map)
 {
-	map(0x0000, 0x001f).m(m_assignercpu, FUNC(hd6303r_cpu_device::m6801_io));
-	map(0x0080, 0x00ff).ram(); // internal RAM
 	map(0x1000, 0x17ff).mirror(0x800).rw("keyscan", FUNC(mb63h149_device::read), FUNC(mb63h149_device::write));
 	map(0x2000, 0x3fff).rw("cartslot", FUNC(generic_slot_device::read_ram), FUNC(generic_slot_device::write_ram));
 	map(0x4000, 0x4007).mirror(0xff8).r(FUNC(roland_jx8p_state::switches_r));
@@ -438,6 +437,9 @@ ROM_START(mks70)
 	ROM_REGION(0x4000, "upper:program", 0) // no change between 1.03 and 1.06
 	ROM_LOAD("c-v103.ic1", 0x0000, 0x4000, CRC(4808729c) SHA1(0adcfa405d6f5be7c4c32ffa5b2e224c66e72f74))
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1985, jx8p,  0,    0, jx8p,  jx8p,  roland_jx8p_state, empty_init, "Roland", "JX-8P Polyphonic Synthesizer (Ver. 3.x)", MACHINE_IS_SKELETON)
 SYST(1985, jx8po, jx8p, 0, jx8po, jx8p,  roland_jx8p_state, empty_init, "Roland", "JX-8P Polyphonic Synthesizer (Ver. 2.x)", MACHINE_IS_SKELETON)

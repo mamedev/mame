@@ -30,10 +30,6 @@ constexpr u32 CMDFLAG_NONE                  = 0x0000;
 constexpr u32 CMDFLAG_KEEP_QUOTES           = 0x0001;
 constexpr u32 CMDFLAG_CUSTOM_HELP           = 0x0002;
 
-// parameter separator macros
-#define CMDPARAM_SEPARATOR                  "\0"
-#define CMDPARAM_TERMINATOR                 "\0\0"
-
 
 
 /***************************************************************************
@@ -88,10 +84,10 @@ public:
 	void            process_source_file();
 
 	// console management
-	void vprintf(util::format_argument_pack<std::ostream> const &args);
-	void vprintf(util::format_argument_pack<std::ostream> &&args);
-	void vprintf_wrap(int wrapcol, util::format_argument_pack<std::ostream> const &args);
-	void vprintf_wrap(int wrapcol, util::format_argument_pack<std::ostream> &&args);
+	void vprintf(util::format_argument_pack<char> const &args);
+	void vprintf(util::format_argument_pack<char> &&args);
+	void vprintf_wrap(int wrapcol, util::format_argument_pack<char> const &args);
+	void vprintf_wrap(int wrapcol, util::format_argument_pack<char> &&args);
 	text_buffer &get_console_textbuf() const { return *m_console_textbuf; }
 
 	// errorlog management

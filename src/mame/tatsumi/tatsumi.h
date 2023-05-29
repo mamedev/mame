@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, Angelo Salese
-#ifndef MAME_INCLUDES_TATSUMI_H
-#define MAME_INCLUDES_TATSUMI_H
+#ifndef MAME_TATSUMI_TATSUMI_H
+#define MAME_TATSUMI_TATSUMI_H
 
 #pragma once
 
@@ -262,4 +262,4 @@ private:
 	void apply_highlight_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &highlight_bitmap);
 };
 
-#endif // MAME_INCLUDES_TATSUMI_H
+#endif // MAME_TATSUMI_TATSUMI_H

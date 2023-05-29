@@ -24,7 +24,9 @@
 //  DEBUGGING
 //**************************************************************************
 
-#define LOG_SLIDER                  0
+#define LOG_SLIDER (1U << 1)
+#define VERBOSE (0)
+#include "logmacro.h"
 
 
 
@@ -192,8 +194,10 @@ uint32_t laserdisc_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 		screen.container().empty();
 
 		// add the video texture
-		if (m_videoenable)
-			screen.container().add_quad(0.0f, 0.0f, 1.0f, 1.0f, rgb_t(0xff,0xff,0xff,0xff), m_videotex, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
+		rgb_t videocolor = 0xffffffff; // Fully visible, white
+		if (!m_videoenable)
+			videocolor = 0xff000000; // Blank the texture's RGB of the texture
+		screen.container().add_quad(0.0f, 0.0f, 1.0f, 1.0f, videocolor, m_videotex, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
 
 		// add the overlay
 		if (m_overenable && overbitmap.valid())
@@ -472,8 +476,7 @@ void laserdisc_device::set_slider_speed(int32_t tracks_per_vsync)
 		m_attospertrack = -(vsyncperiod / -tracks_per_vsync).as_attoseconds();
 	}
 
-	if (LOG_SLIDER)
-		printf("Slider speed = %d\n", tracks_per_vsync);
+	LOGMASKED(LOG_SLIDER, "Slider speed = %d\n", tracks_per_vsync);
 }
 
 
@@ -489,8 +492,7 @@ void laserdisc_device::advance_slider(int32_t numtracks)
 
 	// then update the track position
 	add_and_clamp_track(numtracks);
-	if (LOG_SLIDER)
-		printf("Advance by %d\n", numtracks);
+	LOGMASKED(LOG_SLIDER, "Advance by %d\n", numtracks);
 }
 
 

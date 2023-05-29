@@ -6,8 +6,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_TANDY2KB_H
-#define MAME_MACHINE_TANDY2KB_H
+#ifndef MAME_TRS_TANDY2KB_H
+#define MAME_TRS_TANDY2KB_H
 
 #pragma once
 
@@ -79,4 +79,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(TANDY2K_KEYBOARD, tandy2k_keyboard_device)
 
-#endif // MAME_MACHINE_TANDY2KB_H
+#endif // MAME_TRS_TANDY2KB_H

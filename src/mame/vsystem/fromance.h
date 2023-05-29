@@ -8,8 +8,8 @@
     and Bryan McPhail, Nicola Salmoria, Aaron Giles
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_FROMANCE_H
-#define MAME_INCLUDES_FROMANCE_H
+#ifndef MAME_VSYSTEM_FROMANCE_H
+#define MAME_VSYSTEM_FROMANCE_H
 
 #pragma once
 
@@ -122,4 +122,4 @@ private:
 	void nekkyoku_sub_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_FROMANCE_H
+#endif // MAME_VSYSTEM_FROMANCE_H

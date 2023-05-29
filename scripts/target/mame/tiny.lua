@@ -41,7 +41,7 @@ SOUNDS["HC55516"] = true
 SOUNDS["OKIM6295"] = true
 SOUNDS["SAMPLES"] = true
 SOUNDS["TMS5220"] = true
-SOUNDS["VOTRAX"] = true
+SOUNDS["VOTRAX_SC01"] = true
 SOUNDS["YM2151"] = true
 SOUNDS["YM3812"] = true
 

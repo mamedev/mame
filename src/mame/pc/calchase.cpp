@@ -721,7 +721,7 @@ ROM_START( calchase )
 	ROM_REGION( 0x800, "nvram", 0 )
 	ROM_LOAD( "ds1220y_nv.bin", 0x000, 0x800, CRC(7912c070) SHA1(b4c55c7ca76bcd8dad1c4b50297233349ae02ed3) )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE_READONLY( "calchase", 0,BAD_DUMP SHA1(6ae51a9b3f31cf4166322328a98c0235b0874eb3) )
 ROM_END
 
@@ -736,7 +736,7 @@ ROM_START( hostinv )
 	ROM_REGION( 0x800, "nvram", ROMREGION_ERASEFF )
 	ROM_LOAD( "ds1220y_hostinv.bin", 0x000, 0x800, NO_DUMP )
 
-	DISK_REGION( "ide:0:cdrom:image" )
+	DISK_REGION( "ide:0:cdrom" )
 	DISK_IMAGE_READONLY( "hostinv", 0, SHA1(3cb86c62e80be98a717172b717f7276a0e5f6830) )
 ROM_END
 
@@ -751,7 +751,7 @@ ROM_START( eggsplc )
 	ROM_REGION( 0x800, "nvram", ROMREGION_ERASEFF )
 	ROM_LOAD( "ds1220y_eggsplc.bin", 0x000, 0x800, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE_READONLY( "eggsplc", 0, SHA1(fa38dd6b0d25cde644f68cf639768f137c607eb5) )
 ROM_END
 

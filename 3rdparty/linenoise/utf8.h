@@ -8,14 +8,15 @@ extern "C" {
 /**
  * UTF-8 utility functions
  *
- * (c) 2010-2016 Steve Bennett <steveb@workware.net.au>
+ * (c) 2010-2019 Steve Bennett <steveb@workware.net.au>
  *
- * See LICENCE for licence details.
+ * See utf8.c for licence details.
  */
-#define USE_UTF8
 
 #ifndef USE_UTF8
 #include <ctype.h>
+
+#define MAX_UTF8_LEN 1
 
 /* No utf-8 support. 1 byte = 1 char */
 #define utf8_strlen(S, B) ((B) < 0 ? (int)strlen(S) : (B))
@@ -26,6 +27,9 @@ extern "C" {
  #define utf8_width(C) 1
 
 #else
+
+#define MAX_UTF8_LEN 4
+
 /**
  * Converts the given unicode codepoint (0 - 0x1fffff) to utf-8
  * and stores the result at 'p'.

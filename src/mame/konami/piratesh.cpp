@@ -48,6 +48,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class piratesh_state : public driver_device
 {
 public:
@@ -682,6 +684,9 @@ ROM_START( piratesh )
 //  ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
 //  ROM_LOAD( "piratesh.nv", 0x0000, 0x080, CRC(28df2269) SHA1(3f071c97662745a199f96964e2e79f795bd5a391) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    year  name        parent    machine   input     state           init
 GAME( 1995, piratesh,   0,        piratesh, piratesh, piratesh_state, empty_init, ROT90,  "Konami", "Pirate Ship (ver UAA)", MACHINE_IMPERFECT_GRAPHICS )

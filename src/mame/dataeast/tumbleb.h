@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood,Bryan McPhail
-#ifndef MAME_INCLUDES_TUMBLEB_H
-#define MAME_INCLUDES_TUMBLEB_H
+#ifndef MAME_DATAEAST_TUMBLEB_H
+#define MAME_DATAEAST_TUMBLEB_H
 
 #pragma once
 
@@ -212,4 +212,4 @@ private:
 	uint8_t m_pic_data;
 };
 
-#endif // MAME_INCLUDES_TUMBLEB_H
+#endif // MAME_DATAEAST_TUMBLEB_H

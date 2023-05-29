@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
-#ifndef MAME_AUDIO_VICDUAL_H
-#define MAME_AUDIO_VICDUAL_H
+#ifndef MAME_SEGA_VICDUAL_A_H
+#define MAME_SEGA_VICDUAL_A_H
 
 #pragma once
 
@@ -46,4 +46,4 @@ public:
 DECLARE_DEVICE_TYPE(BORDERLINE_AUDIO, borderline_audio_device)
 DECLARE_DEVICE_TYPE(FROGS_AUDIO, frogs_audio_device)
 
-#endif // MAME_AUDIO_VICDUAL_H
+#endif // MAME_SEGA_VICDUAL_A_H

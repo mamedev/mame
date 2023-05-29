@@ -52,6 +52,9 @@ main PCB (marked 9101):
 #include "sound/ymopl.h"
 #include "video/mc6845.h"
 
+
+namespace {
+
 class changyu_state : public driver_device
 {
 public:
@@ -242,6 +245,9 @@ ROM_START( changyu2 ) // 999 ROM999 II BY HUANGYEH string
 	ROM_LOAD( "9a", 0x000, 0x104, NO_DUMP )
 	ROM_LOAD( "9b", 0x200, 0x104, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1989, changyu,  0, changyu,  changyu, changyu_state, empty_init, ROT0, "Chang Yu Electronic", "unknown Chang Yu Electronic gambling game 1", MACHINE_IS_SKELETON ) // Wing Co. in GFX1, year taken from start of maincpu ROM
 GAME( 19??, changyu2, 0, changyu2, changyu, changyu_state, empty_init, ROT0, "Chang Yu Electronic", "unknown Chang Yu Electronic gambling game 2", MACHINE_IS_SKELETON ) // Wing Co. in GFX1

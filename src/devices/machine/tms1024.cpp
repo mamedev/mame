@@ -13,6 +13,8 @@
 #include "emu.h"
 #include "machine/tms1024.h"
 
+#define VERBOSE 0
+#include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(TMS1024, tms1024_device, "tms1024", "TMS1024 I/O Expander")
 DEFINE_DEVICE_TYPE(TMS1025, tms1025_device, "tms1025", "TMS1025 I/O Expander")
@@ -76,7 +78,10 @@ u8 tms1024_device::read_h()
 	{
 		// read selected port data
 		if (m_s != 0)
+		{
 			m_h = (m_read_port[m_s-1])((offs_t)(m_s-1)) & 0xf;
+			LOG("%s: Read %d%d%d%d from P%d\n", machine().describe_context(), BIT(m_h, 3), BIT(m_h, 2), BIT(m_h, 1), BIT(m_h, 0), m_s);
+		}
 
 		// high-impedance otherwise
 	}
@@ -98,11 +103,15 @@ void tms1024_device::write_std(int state)
 	if (m_ms && !state && m_std)
 	{
 		if (m_s != 0)
+		{
+			LOG("%s: Write %d%d%d%d to P%d\n", machine().describe_context(), BIT(m_h, 3), BIT(m_h, 2), BIT(m_h, 1), BIT(m_h, 0), m_s);
 			(m_write_port[m_s-1])((offs_t)(m_s-1), m_h);
+		}
 
 		else
 		{
 			// reset all ports
+			LOG("%s: Reset all ports\n", machine().describe_context());
 			for (int i = PORT1; i <= PORT7; i++)
 				(m_write_port[i])(offs_t(i), 0);
 		}

@@ -160,14 +160,10 @@
 #include "machine/clock.h"
 #include "machine/timekpr.h"
 
-#define LOG_SETUP   (1U <<  1)
-
-//#define VERBOSE (LOG_GENERAL | LOG_SETUP)
-//#define LOG_OUTPUT_STREAM std::cout
-
+#define VERBOSE (0) // (LOG_GENERAL)
+//#define LOG_OUTPUT_STREAM osd_printf_info
 #include "logmacro.h"
 
-#define LOGSETUP(...) LOGMASKED(LOG_SETUP,   __VA_ARGS__)
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -188,6 +184,9 @@ serial communications are strictly asynchronous. The MVME162LX hardware supports
 The vector is modified based upon the interrupt source within the Z85230. Interrupt request levels are
 programmed via the MCchip. The Z85230s are interfaced as DTE (data terminal equipment) with EIA-232-D
 signal levels. The four serial ports are routed to four RJ45 telephone connectors on the MVME162LX front panel.*/
+
+
+namespace {
 
 /* This gives prompt at the RS232 terminal device (9600) */
 #define BAUDGEN_CLOCK 10_MHz_XTAL // Not verified nor seen on the PCB:s
@@ -328,6 +327,9 @@ ROM_START (mvme162)
 	ROMX_LOAD("162bug_2.3.bin", 0x800000, 0x80000, CRC (301f52a8) SHA1 (ffc77561dce26a70020452baef76f4eb9dc14543), ROM_BIOS(3))
 	ROMX_LOAD("vxworks_5.1.1_162lx-223.bin", 0xa00000, 0x20000, CRC (b40b39ac) SHA1 (fbc7f7e05ff276fe4570daeadcc5c08fc11f1a2b), ROM_BIOS(3))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 //    YEAR  NAME     PARENT  COMPAT   MACHINE  INPUT     CLASS          INIT        COMPANY       FULLNAME    FLAGS

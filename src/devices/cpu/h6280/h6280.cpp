@@ -413,14 +413,14 @@ inline void h6280_device::check_and_take_irq_lines()
 		if ( m_irq_state[0] != CLEAR_LINE &&
 				!(m_irq_mask & 0x2) )
 		{
+			standard_irq_callback(0, PCW);
 			do_interrupt(H6280_IRQ1_VEC);
-			standard_irq_callback(0);
 		} else
 		if ( m_irq_state[1] != CLEAR_LINE &&
 				!(m_irq_mask & 0x1) )
 		{
+			standard_irq_callback(1, PCW);
 			do_interrupt(H6280_IRQ2_VEC);
-			standard_irq_callback(1);
 		}
 	}
 }
@@ -2606,8 +2606,9 @@ void h6280_device::psg_w(offs_t offset, uint8_t data)
 	m_psg->c6280_w(offset, data);
 }
 
-bool h6280_device::memory_translate(int spacenum, int intention, offs_t &address)
+bool h6280_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
+	target_space = &space(spacenum);
 	if (spacenum == AS_PROGRAM)
 		address = translated(address);
 

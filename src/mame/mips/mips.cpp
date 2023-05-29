@@ -218,7 +218,7 @@
 
 // i/o devices (rx3230)
 #include "machine/timekpr.h"
-#include "machine/ncr5390.h"
+#include "machine/ncr53c90.h"
 #include "mips_rambo.h"
 
 // busses and connectors
@@ -244,7 +244,6 @@
 
 #include "debugger.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_MMU     (1U << 1)
 #define LOG_IOCB    (1U << 2)
 
@@ -1031,8 +1030,8 @@ void rx3230_state::rx3230(machine_config &config)
 	m_rambo->parity_out().set_inputline(m_cpu, INPUT_LINE_IRQ5);
 	//m_rambo->buzzer_out().set(m_buzzer, FUNC(speaker_sound_device::level_w));
 	m_rambo->set_ram(m_ram);
-	m_rambo->dma_r<0>().set("scsi:7:ncr53c94", FUNC(ncr53c94_device::dma16_r));
-	m_rambo->dma_w<0>().set("scsi:7:ncr53c94", FUNC(ncr53c94_device::dma16_w));
+	m_rambo->dma_r<0>().set("scsi:7:ncr53c94", FUNC(ncr53c94_device::dma16_swap_r));
+	m_rambo->dma_w<0>().set("scsi:7:ncr53c94", FUNC(ncr53c94_device::dma16_swap_w));
 
 	// scsi bus and devices
 	NSCSI_BUS(config, m_scsibus);

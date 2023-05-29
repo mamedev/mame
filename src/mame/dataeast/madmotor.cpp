@@ -31,6 +31,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class madmotor_state : public driver_device
 {
 public:
@@ -348,6 +350,8 @@ void madmotor_state::init_madmotor()
 		rom[i] = (rom[i] & 0x7e) | ((rom[i] & 0x01) << 7) | ((rom[i] & 0x80) >> 7);
 	}
 }
+
+} // anonymous namespace
 
 
 	/* The title screen is undated, but it's (c) 1989 Data East at 0xefa0 */

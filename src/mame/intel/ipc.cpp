@@ -46,6 +46,8 @@
 #include "bus/rs232/rs232.h"
 
 
+namespace {
+
 class ipc_state : public driver_device
 {
 public:
@@ -141,6 +143,9 @@ ROM_START( ipc )
 	ROM_LOAD( "ipc_v1.3_104584-001.u82", 0x0000, 0x1000, CRC(0889394f) SHA1(b7525baf1884a7d67402dea4b5566016a9861ef2) )
 	ROM_LOAD( "ipc_f8_v1.3.bin", 0x1000, 0x0800, NO_DUMP )   // rom name unknown
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

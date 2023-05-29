@@ -40,6 +40,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define MAIN_CLOCK XTAL(8'000'000)
 
 class mz3500_state : public driver_device
@@ -863,5 +866,8 @@ ROM_START( mz3500 )
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_ERASE00 )
 	ROM_LOAD( "mz-3500_cg-rom_2-b_m5l2764k.bin", 0x000000, 0x002000, CRC(29f2f80a) SHA1(64b307cd9de5a3327e3ec9f3d0d6b3485706f436) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 198?, mz3500, 0, 0, mz3500, mz3500, mz3500_state, empty_init, "Sharp", "MZ-3500", MACHINE_IS_SKELETON )

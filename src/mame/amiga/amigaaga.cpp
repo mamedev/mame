@@ -27,16 +27,10 @@ TODO:
 #include "emu.h"
 #include "amiga.h"
 
+#define LOG_SPRITE_DMA (1U << 1)
 
-
-/*************************************
- *
- *  Debugging
- *
- *************************************/
-
-#define LOG_SPRITE_DMA      0
-
+#define VERBOSE (0)
+#include "logmacro.h"
 
 
 /*************************************
@@ -121,7 +115,7 @@ void amiga_state::aga_fetch_sprite_data(int scanline, int sprite)
 			m_aga_sprdatb[sprite][0] = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
 			m_aga_sprite_fetched_words = 1;
-			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: data=%04X-%04X\n", scanline, sprite, m_aga_sprdata[sprite][0], m_aga_sprdatb[sprite][0]);
+			LOGMASKED(LOG_SPRITE_DMA, "%3d:sprite %d fetch: data=%04X-%04X\n", scanline, sprite, m_aga_sprdata[sprite][0], m_aga_sprdatb[sprite][0]);
 			break;
 		case 1:
 		case 2:
@@ -132,7 +126,7 @@ void amiga_state::aga_fetch_sprite_data(int scanline, int sprite)
 			m_aga_sprdatb[sprite][1] = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
 			m_aga_sprite_fetched_words = 2;
-			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: data=%04X-%04X %04X-%04X\n", scanline, sprite, m_aga_sprdata[sprite][0], m_aga_sprdatb[sprite][0], m_aga_sprdata[sprite][1], m_aga_sprdatb[sprite][1] );
+			LOGMASKED(LOG_SPRITE_DMA, "%3d:sprite %d fetch: data=%04X-%04X %04X-%04X\n", scanline, sprite, m_aga_sprdata[sprite][0], m_aga_sprdatb[sprite][0], m_aga_sprdata[sprite][1], m_aga_sprdatb[sprite][1] );
 			break;
 		case 3:
 			m_aga_sprdata[sprite][0] = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
@@ -148,7 +142,7 @@ void amiga_state::aga_fetch_sprite_data(int scanline, int sprite)
 			m_aga_sprdatb[sprite][3] = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
 			m_aga_sprite_fetched_words = 4;
-			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: data=%04X-%04X %04X-%04X %04X-%04X %04X-%04X\n",
+			LOGMASKED(LOG_SPRITE_DMA, "%3d:sprite %d fetch: data=%04X-%04X %04X-%04X %04X-%04X %04X-%04X\n",
 										scanline, sprite,
 										m_aga_sprdata[sprite][0], m_aga_sprdatb[sprite][0],
 										m_aga_sprdata[sprite][1], m_aga_sprdatb[sprite][1],
@@ -191,7 +185,7 @@ void amiga_state::aga_update_sprite_dma(int scanline)
 			// (it enables sprite 0 only, and +8 for the vstop values)
 			CUSTOM_REG(REG_SPR0CTL + 4 * num) = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + spr_fmode_inc);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) += 2 * spr_fmode_inc;
-			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: pos=%04X ctl=%04X\n", scanline, num, CUSTOM_REG(REG_SPR0POS + 4 * num), CUSTOM_REG(REG_SPR0CTL + 4 * num));
+			LOGMASKED(LOG_SPRITE_DMA, "%3d:sprite %d fetch: pos=%04X ctl=%04X\n", scanline, num, CUSTOM_REG(REG_SPR0POS + 4 * num), CUSTOM_REG(REG_SPR0CTL + 4 * num));
 		}
 
 		u16 spr0ctl = CUSTOM_REG(REG_SPR0CTL + 4 * num);
@@ -209,7 +203,7 @@ void amiga_state::aga_update_sprite_dma(int scanline)
 		if (scanline == vstart)
 		{
 			m_sprite_comparitor_enable_mask |= 1 << num;
-			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d comparitor enable\n", scanline, num);
+			LOGMASKED(LOG_SPRITE_DMA, "%3d:sprite %d comparitor enable\n", scanline, num);
 		}
 
 		/* if we hit vstop, disable the comparitor and trigger a reload for the next scanline */
@@ -220,7 +214,7 @@ void amiga_state::aga_update_sprite_dma(int scanline)
 			m_sprite_dma_reload_mask |= 1 << num;
 			CUSTOM_REG(REG_SPR0DATA + 4 * num) = 0;     /* just a guess */
 			CUSTOM_REG(REG_SPR0DATB + 4 * num) = 0;
-			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d comparitor disable, prepare for reload\n", scanline, num);
+			LOGMASKED(LOG_SPRITE_DMA, "%3d:sprite %d comparitor disable, prepare for reload\n", scanline, num);
 		}
 
 		/* fetch data if this sprite is enabled */

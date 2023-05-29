@@ -1204,5 +1204,45 @@ function db_bu_null.test()
 
 end
 
+--------------------------------------
+-- Functions added 2016-11-xx 0.9.4 --
+--------------------------------------
+
+r094 = lunit_TestCase("Functions added 0.9.4")
+
+function r094.setup()
+  r094.db = assert( sqlite3.open_memory() )
+  r094.filename = "/tmp/__lua-sqlite3-20161112163049." .. os.time()
+  r094.db_fn = assert_userdata( sqlite3.open(r094.filename) )
+end
+
+function r094.teardown()
+  assert_number( r094.db:close() )
+  assert_number( r094.db_fn:close() )
+end
+
+function r094.test_db_filename()
+
+  assert_nil( r094.db:db_filename("frob") )
+  assert_equal( '', r094.db:db_filename("main") )
+
+  assert_nil( r094.db_fn:db_filename("frob") )
+  assert_equal( r094.filename, r094.db_fn:db_filename("main") )
+
+  -- from Wolfgang Oertl
+  local db_ptr = assert_userdata( r094.db:get_ptr() )
+  local db2    = assert_userdata( sqlite3.open_ptr(db_ptr) )
+  -- do something via connection 1
+  r094.db:exec("CREATE TABLE test1(a, b)")
+  r094.db:exec("INSERT INTO test1 VALUES(1, 2)")
+  -- see result via connection 2
+  for a, b in db2:urows("SELECT * FROM test1 ORDER BY a") do
+        assert_equal(a, 1)
+        assert_equal(b, 2)
+  end
+  assert_number( db2:close() )
+
+end
+
 lunit.main()
 

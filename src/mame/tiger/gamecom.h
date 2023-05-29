@@ -9,8 +9,8 @@
  * Driver by Wilbert Pol
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_GAMECOM_H
-#define MAME_INCLUDES_GAMECOM_H
+#ifndef MAME_TIGER_GAMECOM_H
+#define MAME_TIGER_GAMECOM_H
 
 #pragma once
 
@@ -237,8 +237,11 @@ public:
 
 	void init_gamecom();
 
-private:
+protected:
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
+private:
 	uint8_t gamecom_internal_r(offs_t offset);
 	uint8_t gamecom_pio_r(offs_t offset);
 	void gamecom_internal_w(offs_t offset, uint8_t data);
@@ -255,6 +258,12 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart2_load );
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void gamecom_mem_map(address_map &map);
+
+	void gamecom_set_mmu(uint8_t mmu, uint8_t data);
+	void handle_stylus_press(int column);
+	void recompute_lcd_params();
+	void handle_input_press(uint16_t mux_data);
+	std::pair<std::error_condition, std::string> common_load(device_image_interface &image, generic_slot_device *slot);
 
 	uint8_t *m_p_ram = nullptr;
 	uint8_t *m_cart_ptr = nullptr;
@@ -275,13 +284,7 @@ private:
 	GAMECOM_TIMER m_timer[2];
 	gamecom_sound_t m_sound;
 	bitmap_ind16 m_bitmap;
-	void gamecom_set_mmu(uint8_t mmu, uint8_t data);
-	void handle_stylus_press(int column);
-	void recompute_lcd_params();
-	void handle_input_press(uint16_t mux_data);
-	image_init_result common_load(device_image_interface &image, generic_slot_device *slot);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_shared_ptr<uint8_t> m_p_nvram;
 	required_device<sm8500_cpu_device> m_maincpu;
@@ -303,4 +306,4 @@ private:
 	required_ioport_array<13> m_io_grid;
 };
 
-#endif // MAME_INCLUDES_GAMECOM_H
+#endif // MAME_TIGER_GAMECOM_H

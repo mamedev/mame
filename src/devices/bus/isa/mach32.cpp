@@ -169,7 +169,14 @@ uint16_t mach32_device::offset()
 
 uint32_t mach32_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	ati_vga_device::screen_update(screen,bitmap,cliprect);
+	ati_vga_device::screen_update(screen, bitmap, cliprect);
+	draw_hw_cursor(screen, bitmap, cliprect);
+
+	return 0;
+}
+
+uint32_t mach32_device::draw_hw_cursor(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
 	uint8_t depth = get_video_depth();
 
 	if(!m_cursor_enable)
@@ -355,4 +362,34 @@ void mach64_device::device_start()
 void mach64_device::device_reset()
 {
 	mach32_device::device_reset();
+}
+
+void mach64_device::set_color(u8 index, u32 color)
+{
+	// update the palette device so we can see in the F4 viewer what the Rage is doing
+	set_pen_color(index, (color>>16) & 0xff, (color>>8) & 0xff, color & 0xff);
+}
+
+u32 mach64_device::framebuffer_r(offs_t offset, u32 mem_mask)
+{
+	const u32 *target = (u32 *)&vga.memory[offset<<2];
+	return *target;
+}
+
+void mach64_device::framebuffer_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA((u32*)&vga.memory[offset<<2]);
+}
+
+u32 mach64_device::framebuffer_be_r(offs_t offset, u32 mem_mask)
+{
+	const u32 *target = (u32 *)&vga.memory[offset<<2];
+	return swapendian_int32(*target);
+}
+
+void mach64_device::framebuffer_be_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	data = swapendian_int32(data);
+	mem_mask = swapendian_int32(mem_mask);
+	COMBINE_DATA((u32*)&vga.memory[offset<<2]);
 }

@@ -1,6 +1,6 @@
 --
--- Copyright 2010-2021 Branimir Karadzic. All rights reserved.
--- License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+-- Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+-- License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
 --
 
 function filesexist(_srcPath, _dstPath, _files)
@@ -46,7 +46,6 @@ function bgfxProjectBase(_kind, _defines)
 
 		links {
 			"bimg",
-			"bx",
 		}
 
 		configuration { "vs20* or mingw*" }
@@ -95,15 +94,12 @@ function bgfxProjectBase(_kind, _defines)
 
 	includedirs {
 		path.join(BGFX_DIR, "3rdparty"),
-		path.join(BX_DIR,   "include"),
 		path.join(BIMG_DIR, "include"),
 	}
 
 	defines (_defines)
 
-	links {
-		"bx",
-	}
+	using_bx()
 
 	if _OPTIONS["with-glfw"] then
 		defines {
@@ -111,14 +107,16 @@ function bgfxProjectBase(_kind, _defines)
 		}
 	end
 
-	configuration { "Debug" }
-		defines {
-			"BGFX_CONFIG_DEBUG=1",
+	configuration { "linux-*" }
+		includedirs {
+			path.join(BGFX_DIR, "3rdparty/directx-headers/include/directx"),
+			path.join(BGFX_DIR, "3rdparty/directx-headers/include"),
+			path.join(BGFX_DIR, "3rdparty/directx-headers/include/wsl/stubs"),
 		}
 
 	configuration { "vs* or mingw*", "not durango" }
 		includedirs {
-			path.join(BGFX_DIR, "3rdparty/dxsdk/include"),
+			path.join(BGFX_DIR, "3rdparty/directx-headers/include/directx"),
 		}
 
 	configuration { "android*" }
@@ -142,8 +140,9 @@ function bgfxProjectBase(_kind, _defines)
 		buildoptions { "-x objective-c++" }  -- additional build option for osx
 		linkoptions {
 			"-framework Cocoa",
-			"-framework QuartzCore",
+			"-framework IOKit",
 			"-framework OpenGL",
+			"-framework QuartzCore",
 			"-weak_framework Metal",
 			"-weak_framework MetalKit",
 		}

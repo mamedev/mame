@@ -60,6 +60,8 @@ PAGE SEL bit in PORT0 set to 1:
 #include "screen.h"
 
 
+namespace {
+
 class ts803_state : public driver_device
 {
 public:
@@ -482,6 +484,7 @@ ROM_START( ts803h )
 	ROM_LOAD( "803h_vid.a119", 0x0000, 0x0800, CRC(d5ce2814) SHA1(ce527479464757223dffac384a85ab74b174952c) )
 ROM_END
 
+} // anonymous namespace
 
 
 //   YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME  FLAGS

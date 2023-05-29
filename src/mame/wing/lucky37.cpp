@@ -52,13 +52,17 @@
 
 #include "emu.h"
 
-#include "cpu/z80/z80.h"
 #include "cpu/z180/hd647180x.h"
+#include "cpu/z80/z80.h"
 #include "machine/mb8421.h"
 #include "machine/nvram.h"
 #include "sound/okim6295.h"
+
 #include "screen.h"
 #include "speaker.h"
+
+
+namespace {
 
 class lucky37_state : public driver_device
 {
@@ -248,6 +252,8 @@ ROM_START( bingo75 )    // runs on wing 8802-c board
 	ROM_LOAD( "82s129.4k", 0x0500, 0x0100, CRC(0a9e160d) SHA1(d2377850aa344b027a974ef116bb1aee852d61d8) )
 	ROM_LOAD( "82s129.5f", 0x0600, 0x0100, CRC(83c3ec8f) SHA1(4a6452ef73061a446e6a8ceb9d077bc71cc8e2b2) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 199?, lucky21,  0, lucky37, lucky37,  lucky37_state, empty_init, ROT0, "Wing Co., Ltd.", "Lucky 21",   MACHINE_IS_SKELETON )

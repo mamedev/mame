@@ -55,6 +55,7 @@
 		{ "name": "XBR_LV1_COEFFICIENT", "type": "vec4", "values": [  0.5, 0.0, 0.0, 0.0 ] },
 		{ "name": "XBR_LV2_COEFFICIENT", "type": "vec4", "values": [  2.0, 0.0, 0.0, 0.0 ] },
 		{ "name": "XBR_RES",             "type": "vec4", "values": [  2.0, 0.0, 0.0, 0.0 ] },
-		{ "name": "u_tex_size0",         "type": "vec4", "values": [  1.0, 1.0, 0.0, 0.0 ] }
+		{ "name": "u_tex_size0",         "type": "vec4", "values": [  1.0, 1.0, 0.0, 0.0 ] },
+		{ "name": "u_inv_view_dims",     "type": "vec4", "values": [  1.0, 1.0, 0.0, 0.0 ] }
 	]
 }

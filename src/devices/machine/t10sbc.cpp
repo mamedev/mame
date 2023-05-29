@@ -20,15 +20,14 @@ void t10sbc::t10_reset()
 	m_blocks = 0;
 	m_sector_bytes = 512;
 
-	m_disk = m_image->get_hard_disk_file();
-	if (!m_disk)
+	if (!m_image->exists())
 	{
 		m_device->logerror("T10SBC %s: no HD found!\n", m_image->owner()->tag());
 	}
 	else
 	{
 		// get hard disk sector size from CHD metadata
-		m_sector_bytes = m_disk->get_info().sectorbytes;
+		m_sector_bytes = m_image->get_info().sectorbytes;
 	}
 }
 
@@ -141,7 +140,7 @@ void t10sbc::ExecCommand()
 void t10sbc::ReadData( uint8_t *data, int dataLength )
 {
 	// if we're a drive without a disk, return all zeroes
-	if (!m_disk)
+	if (!m_image->exists())
 	{
 		memset(data, 0, dataLength);
 		return;
@@ -272,12 +271,12 @@ void t10sbc::ReadData( uint8_t *data, int dataLength )
 	case T10SBC_CMD_READ_6:
 	case T10SBC_CMD_READ_10:
 	case T10SBC_CMD_READ_12:
-		if ((m_disk) && (m_blocks))
+		if (m_image->exists() && (m_blocks))
 		{
 			m_device->logerror("T10SBC: Reading %d bytes from HD\n", dataLength);
 			while (dataLength > 0)
 			{
-				if (!m_disk->read(m_lba,  data))
+				if (!m_image->read(m_lba,  data))
 				{
 					m_device->logerror("T10SBC: HD read error!\n");
 				}
@@ -302,7 +301,7 @@ void t10sbc::ReadData( uint8_t *data, int dataLength )
 
 void t10sbc::WriteData( uint8_t *data, int dataLength )
 {
-	if (!m_disk)
+	if (!m_image->exists())
 	{
 		return;
 	}
@@ -314,12 +313,12 @@ void t10sbc::WriteData( uint8_t *data, int dataLength )
 
 	case T10SBC_CMD_WRITE_6:
 	case T10SBC_CMD_WRITE_10:
-		if ((m_disk) && (m_blocks))
+		if (m_image->exists() && (m_blocks))
 		{
 			m_device->logerror("T10SBC: Writing %d bytes to HD\n", dataLength);
 			while (dataLength > 0)
 			{
-				if (!m_disk->write(m_lba, data))
+				if (!m_image->write(m_lba, data))
 				{
 					m_device->logerror("T10SBC: HD write error!\n");
 				}
@@ -337,19 +336,9 @@ void t10sbc::WriteData( uint8_t *data, int dataLength )
 	}
 }
 
-void t10sbc::GetDevice( void **_disk )
-{
-	*(hard_disk_file **)_disk = m_disk;
-}
-
-void t10sbc::SetDevice( void *_disk )
-{
-	m_disk = (hard_disk_file *)_disk;
-}
-
 void t10sbc::GetFormatPage( format_page_t *page )
 {
-	const auto &info = m_disk->get_info();
+	const auto &info = m_image->get_info();
 
 	memset(page, 0, sizeof(format_page_t));
 	page->m_page_code = 0x03;
@@ -363,7 +352,7 @@ void t10sbc::GetFormatPage( format_page_t *page )
 
 void t10sbc::GetGeometryPage( geometry_page_t *page )
 {
-	const auto &info = m_disk->get_info();
+	const auto &info = m_image->get_info();
 
 	memset(page, 0, sizeof(geometry_page_t));
 	page->m_page_code = 0x04;
@@ -378,7 +367,7 @@ void t10sbc::GetGeometryPage( geometry_page_t *page )
 
 void t10sbc::ReadCapacity( uint8_t *data )
 {
-	const auto &info = m_disk->get_info();
+	const auto &info = m_image->get_info();
 
 	// get # of sectors
 	uint32_t temp = info.cylinders * info.heads * info.sectors - 1;

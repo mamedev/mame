@@ -101,6 +101,8 @@ Note
 #include "tilemap.h"
 
 
+namespace {
+
 class spool99_state : public driver_device
 {
 public:
@@ -473,6 +475,7 @@ void spool99_state::init_spool99()
 	memcpy(m_main, ROM, 0x100);
 }
 
+} // anonymous namespace
 
 
 GAME( 1998, spool99,    0,        spool99,    spool99, spool99_state, init_spool99, ROT0, "Electronic Projects", "Super Pool 99 (Version 0.36)", MACHINE_SUPPORTS_SAVE )

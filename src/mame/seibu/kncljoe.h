@@ -6,8 +6,8 @@
 
 *************************************************************************/
 
-#ifndef MAME_INCLUDES_KNCLJOE_H
-#define MAME_INCLUDES_KNCLJOE_H
+#ifndef MAME_SEIBU_KNCLJOE_H
+#define MAME_SEIBU_KNCLJOE_H
 
 #pragma once
 
@@ -85,4 +85,4 @@ private:
 	void sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_KNCLJOE_H
+#endif // MAME_SEIBU_KNCLJOE_H

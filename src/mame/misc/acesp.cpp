@@ -32,6 +32,9 @@
 
 #include "ace_sp_dmd.lh"
 
+
+namespace {
+
 class ace_sp_state : public driver_device
 {
 public:
@@ -3970,6 +3973,9 @@ void ace_sp_state::init_ace_cr()
 void ace_sp_state::init_ace_sp()
 {
 }
+
+} // anonymous namespace
+
 
 GAME( 199?, sp_cbowl,     0,        ace_sp, ace_sp, ace_sp_state, init_ace_sp, ROT0, "Ace", "Cash Bowl (Ace) (sp.ACE) (set 1)",MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 199?, sp_cbowla,    sp_cbowl, ace_sp, ace_sp, ace_sp_state, init_ace_sp, ROT0, "Ace", "Cash Bowl (Ace) (sp.ACE) (set 2)",MACHINE_IS_SKELETON_MECHANICAL )

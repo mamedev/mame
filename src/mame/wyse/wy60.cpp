@@ -2,12 +2,16 @@
 // copyright-holders:AJR
 /***********************************************************************************************************************************
 
-    Skeleton driver for Wyse WY-60 terminal.
+    Preliminary driver for Wyse WY-60 terminal.
+
+    If the terminal starts up without valid EEPROM data, it will just display the error code "E" on a mostly blank screen. At this
+    point, holding down the Set Up or Select key will cause the EEPROM to be initialized.
 
 ***********************************************************************************************************************************/
 
 #include "emu.h"
 #include "bus/rs232/rs232.h"
+#include "bus/wysekbd/wysekbd.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/i2cmem.h"
 #include "machine/scn_pci.h"
@@ -22,6 +26,7 @@ public:
 	wy60_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_eeprom(*this, "eeprom")
+		, m_keyboard(*this, "keyboard")
 		, m_pvtc(*this, "pvtc")
 		, m_sio(*this, "sio")
 		, m_charram(*this, "charram")
@@ -30,6 +35,8 @@ public:
 		, m_internal_view(*this, "8051_internal")
 		, m_char_addr(0)
 		, m_is_132(false)
+		, m_cur_attr(0)
+		, m_last_row_attr(0)
 	{
 	}
 
@@ -41,6 +48,7 @@ protected:
 
 private:
 	SCN2672_DRAW_CHARACTER_MEMBER(draw_character);
+	DECLARE_WRITE_LINE_MEMBER(mbc_attr_clock_w);
 	u8 mbc_char_r(offs_t offset);
 	u8 mbc_attr_r(offs_t offset);
 
@@ -58,6 +66,7 @@ private:
 	void row_buffer_map(address_map &map);
 
 	required_device<i2cmem_device> m_eeprom;
+	required_device<wyse_keyboard_port_device> m_keyboard;
 	required_device<scn2672_device> m_pvtc;
 	required_device<scn2661b_device> m_sio;
 	required_shared_ptr<u8> m_charram;
@@ -67,6 +76,8 @@ private:
 
 	u16 m_char_addr;
 	bool m_is_132;
+	u8 m_cur_attr;
+	u8 m_last_row_attr;
 };
 
 
@@ -74,20 +85,62 @@ void wy60_state::machine_start()
 {
 	save_item(NAME(m_char_addr));
 	save_item(NAME(m_is_132));
+	save_item(NAME(m_cur_attr));
+	save_item(NAME(m_last_row_attr));
 }
 
 SCN2672_DRAW_CHARACTER_MEMBER(wy60_state::draw_character)
 {
-	const int char_width = m_is_132 ? 9 : 10;
-
-	// TODO: attributes
-	const u16 char_addr = u16(m_charram[0x0001] & 0x60) << 6 | u16(charcode & 0x7f) << 4 | linecount;
-	u8 dots = m_fontram[char_addr];
-	for (int i = 0; i < char_width; i++)
+	// TODO: line attributes
+	const u8 screen_attr = m_charram[0x0002];
+	if (!BIT(screen_attr, 4))
 	{
-		bitmap.pix(y, x++) = BIT(dots, 7) ? rgb_t::white() : rgb_t::black();
+		if ((charcode & 0xe0) == 0x80)
+		{
+			// Set nonhidden display attribute and blank the character
+			// (90 = blink, 88 = reverse, 84 = underline, 82 = dim, 81 = blank, 80 = normal)
+			m_cur_attr = charcode & 0x1f;
+			attrcode = 0x01;
+		}
+		else
+		{
+			if (x == 0)
+				m_cur_attr = m_last_row_attr;
+			attrcode = (m_cur_attr & 0x1c) << 1 | (m_cur_attr & 0x03);
+		}
+	}
+
+	u8 dots = 0;
+	if (!BIT(attrcode, 5) || !blink)
+	{
+		if (BIT(attrcode, 3) && ul)
+			dots = 0xff;
+		else if (!BIT(attrcode, 0))
+		{
+			const u16 char_addr = u16(attrcode & 0xc0) << 5 | u16(charcode & 0x7f) << 4 | linecount;
+			dots = m_fontram[char_addr];
+		}
+		if (BIT(attrcode, 4))
+			dots = ~dots;
+	}
+
+	const bool cur = cursor && (!BIT(screen_attr, 5) || blink) && (!BIT(screen_attr, 7) || ul);
+	if (cur)
+		dots = ~dots;
+
+	const rgb_t fg = (BIT(attrcode, 1) && !cur) ? rgb_t(0xc0, 0xc0, 0xc0) : rgb_t::white();
+	for (int i = 0; i < 7; i++)
+	{
+		bitmap.pix(y, x++) = BIT(dots, 7) ? fg : rgb_t::black();
 		dots <<= 1;
 	}
+	std::fill_n(&bitmap.pix(y, x), m_is_132 ? 2 : 3, BIT(dots, 7) ? fg : rgb_t::black());
+}
+
+WRITE_LINE_MEMBER(wy60_state::mbc_attr_clock_w)
+{
+	if (state)
+		m_last_row_attr = m_cur_attr;
 }
 
 u8 wy60_state::mbc_char_r(offs_t offset)
@@ -144,15 +197,15 @@ void wy60_state::p1_w(u8 data)
 	m_eeprom->write_scl(BIT(data, 2));
 	m_eeprom->write_sda(BIT(data, 1));
 
+	m_keyboard->cmd_w(!BIT(data, 5));
+
 	// TODO: P1.3 -> AUX DSR
-	// TODO: P1.5 -> KEYBOARD CMD
 }
 
 u8 wy60_state::p1_r()
 {
 	// TODO: P1.4 <- AUX DTR
-	// TODO: P1.6 <- KEYBOARD DATA
-	return (m_eeprom->read_sda() << 1) | 0xfd;
+	return (m_eeprom->read_sda() << 1) | (m_keyboard->data_r() ? 0 : 0x40) | 0xad;
 }
 
 WRITE_LINE_MEMBER(wy60_state::ea_w)
@@ -201,6 +254,8 @@ void wy60_state::wy60(machine_config &config)
 
 	I2C_X2404P(config, m_eeprom);
 
+	WYSE_KEYBOARD(config, m_keyboard, wy60_keyboards, "ascii");
+
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(26.58_MHz_XTAL, 1000, 0, 800 + 20, 443, 0, 416 + 16); // 26.580 kHz horizontal
 	//screen.set_raw(39.71_MHz_XTAL, 1494, 0, 1188 + 18, 443, 0, 416 + 16);
@@ -214,6 +269,7 @@ void wy60_state::wy60(machine_config &config)
 	m_pvtc->set_display_callback(FUNC(wy60_state::draw_character));
 	m_pvtc->intr_callback().set_inputline("maincpu", MCS51_T0_LINE);
 	m_pvtc->breq_callback().set_inputline("maincpu", MCS51_INT0_LINE);
+	m_pvtc->mbc_callback().set(FUNC(wy60_state::mbc_attr_clock_w));
 	m_pvtc->mbc_char_callback().set(FUNC(wy60_state::mbc_char_r));
 	m_pvtc->mbc_attr_callback().set(FUNC(wy60_state::mbc_attr_r));
 
@@ -223,7 +279,7 @@ void wy60_state::wy60(machine_config &config)
 	m_sio->dtr_handler().set("modem", FUNC(rs232_port_device::write_dtr));
 	m_sio->rts_handler().set("modem", FUNC(rs232_port_device::write_rts));
 
-	rs232_port_device &modem(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
+	rs232_port_device &modem(RS232_PORT(config, "modem", default_rs232_devices, "loopback"));
 	modem.rxd_handler().set(m_sio, FUNC(scn2661b_device::rxd_w));
 	modem.cts_handler().set(m_sio, FUNC(scn2661b_device::cts_w));
 	modem.dcd_handler().set(m_sio, FUNC(scn2661b_device::dcd_w));
@@ -269,5 +325,5 @@ void wy60_state::driver_start()
 
 } // anonymous namespace
 
-COMP(1986, wy60,  0,    0, wy60, wy60, wy60_state, empty_init, "Wyse Technology", "WY-60 (RBFNG2)", MACHINE_IS_SKELETON)
-COMP(1986, wy60a, wy60, 0, wy60, wy60, wy60_state, empty_init, "Wyse Technology", "WY-60 (RBFNB0)", MACHINE_IS_SKELETON)
+COMP(1986, wy60,  0,    0, wy60, wy60, wy60_state, empty_init, "Wyse Technology", "WY-60 (RBFNG2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1986, wy60a, wy60, 0, wy60, wy60, wy60_state, empty_init, "Wyse Technology", "WY-60 (RBFNB0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

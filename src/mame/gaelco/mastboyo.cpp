@@ -19,6 +19,8 @@
 #include "tilemap.h"
 
 
+namespace {
+
 class mastboyo_state : public driver_device
 {
 public:
@@ -335,6 +337,9 @@ ROM_START( mastboyoc ) // PCB marked 'MMV-1 FABRICADO POR GAELCO'
 	ROM_LOAD( "h_82s129.ic39", 0x100, 0x100, CRC(8e965fc3) SHA1(b52c8e505438937c7a5d3e1393d54f0ad0425e78) )
 	ROM_LOAD( "l_82s129.ic40", 0x000, 0x100, CRC(4d061216) SHA1(1abf9320da75a3fd23c6bdbcc4088d18e133c4e5) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1987, mastboyo,  0,        mastboyo, mastboyo, mastboyo_state, empty_init, ROT0, "Gaelco (Covielsa license)",    "Master Boy (1987, Z80 hardware, Covielsa, set 1)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1987, mastboyoa, mastboyo, mastboyo, mastboyo, mastboyo_state, empty_init, ROT0, "Gaelco (Covielsa license)",    "Master Boy (1987, Z80 hardware, Covielsa, set 2)",    MACHINE_SUPPORTS_SAVE )

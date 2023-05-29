@@ -334,14 +334,20 @@
 #include "screen.h"
 #include "speaker.h"
 
+#define LOG_DEBUG_STATES   (1U << 1)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
+#define LOG_GFX_RAM_WRITES (0)
+#define LOG_DRAW_COMMANDS  (0)
+
+namespace {
+
 #define GFXFIFO_IN_VERBOSE          0
 #define GFXFIFO_OUT_VERBOSE         0
 #define M2SFIFO_VERBOSE             0
 #define S2MFIFO_VERBOSE             0
-
-#define LOG_DEBUG_STATES            0
-#define LOG_GFX_RAM_WRITES          0
-#define LOG_DRAW_COMMANDS           0
 
 #define ENABLE_BILINEAR             1
 
@@ -1414,12 +1420,10 @@ void cobra_state::main_fifo_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 
 	if (m_main_debug_state_wc >= 2)
 	{
-#if LOG_DEBUG_STATES
 		if (m_main_debug_state != 0)
 		{
-			printf("MAIN: debug state %02X\n", m_main_debug_state);
+			LOGMASKED(LOG_DEBUG_STATES, "MAIN: debug state %02X\n", m_main_debug_state);
 		}
-#endif
 
 		if (m_main_debug_state == 0x6b)
 		{
@@ -1673,12 +1677,10 @@ void cobra_state::sub_debug_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 	if (m_sub_debug_state_wc >= 2)
 	{
-#if LOG_DEBUG_STATES
 		if (m_sub_debug_state != 0)
 		{
-			printf("SUB: debug state %02X\n", m_sub_debug_state);
+			LOGMASKED(LOG_DEBUG_STATES, "SUB: debug state %02X\n", m_sub_debug_state);
 		}
-#endif
 
 		m_sub_debug_state = 0;
 		m_sub_debug_state_wc = 0;
@@ -2169,10 +2171,7 @@ void cobra_renderer::gfx_fifo_exec()
 					vp_center_x = 256.0f;
 				}
 
-#if LOG_DRAW_COMMANDS
-				printf("--- Draw command %08X %08X ---\n", w1, w2);
-#endif
-
+				if (LOG_DRAW_COMMANDS) cobra->logerror("--- Draw command %08X %08X ---\n", w1, w2);
 
 				// extract vertex data
 				for (int i=0; i < units; i++)
@@ -2223,41 +2222,38 @@ void cobra_renderer::gfx_fifo_exec()
 					vert[i].p[POLY_B] = b * 255.0f;
 					vert[i].p[POLY_A] = a * 255.0f;
 
-
-#if LOG_DRAW_COMMANDS
 					if (w2 & 0x40000000)
 					{
-						printf("    ?: %08X\n", (uint32_t)in[0]);
+						if (LOG_DRAW_COMMANDS) cobra->logerror("    ?: %08X\n", (uint32_t)in[0]);
 					}
 					if (w2 & 0x20000000)
 					{
-						printf("    ?: %08X\n", (uint32_t)in[1]);
+						if (LOG_DRAW_COMMANDS) cobra->logerror("    ?: %08X\n", (uint32_t)in[1]);
 					}
 
-					printf("    x: %f\n", x);
-					printf("    y: %f\n", y);
-					printf("    ?: %08X\n", (uint32_t)in[2]);
-					printf("    z: %f\n", z);
+					if (LOG_DRAW_COMMANDS) cobra->logerror("    x: %f\n", x);
+					if (LOG_DRAW_COMMANDS) cobra->logerror("    y: %f\n", y);
+					if (LOG_DRAW_COMMANDS) cobra->logerror("    ?: %08X\n", (uint32_t)in[2]);
+					if (LOG_DRAW_COMMANDS) cobra->logerror("    z: %f\n", z);
 
 					if (w2 & 0x00200000)
 					{
-						printf("    w: %f\n", w);
-						printf("    u: %f\n", vert[i].p[POLY_U]);
-						printf("    v: %f\n", vert[i].p[POLY_V]);
+						if (LOG_DRAW_COMMANDS) cobra->logerror("    w: %f\n", w);
+						if (LOG_DRAW_COMMANDS) cobra->logerror("    u: %f\n", vert[i].p[POLY_U]);
+						if (LOG_DRAW_COMMANDS) cobra->logerror("    v: %f\n", vert[i].p[POLY_V]);
 					}
 
-					printf("    a: %f\n", a);
-					printf("    r: %f\n", r);
-					printf("    g: %f\n", g);
-					printf("    b: %f\n", b);
+					if (LOG_DRAW_COMMANDS) cobra->logerror("    a: %f\n", a);
+					if (LOG_DRAW_COMMANDS) cobra->logerror("    r: %f\n", r);
+					if (LOG_DRAW_COMMANDS) cobra->logerror("    g: %f\n", g);
+					if (LOG_DRAW_COMMANDS) cobra->logerror("    b: %f\n", b);
 
 					if (w2 & 0x00000001)
 					{
-						printf("    ?: %08X\n", (uint32_t)in[3]);
+						if (LOG_DRAW_COMMANDS) cobra->logerror("    ?: %08X\n", (uint32_t)in[3]);
 					}
 
-					printf("\n");
-#endif
+					if (LOG_DRAW_COMMANDS) cobra->logerror("\n");
 				}
 
 
@@ -2498,12 +2494,10 @@ void cobra_renderer::gfx_fifo_exec()
 
 				gfx_write_gram(reg, mask, w2);
 
-#if LOG_GFX_RAM_WRITES
 				if (reg != 0x118 && reg != 0x114 && reg != 0x11c)
 				{
-					printf("gfxfifo_exec: ram write %05X (mask %08X): %08X (%f)\n", reg, mask, w2, u2f(w2));
+					if (LOG_GFX_RAM_WRITES) cobra->logerror("gfxfifo_exec: ram write %05X (mask %08X): %08X (%f)\n", reg, mask, w2, u2f(w2));
 				}
-#endif
 
 				cobra->m_gfx_re_status = RE_STATUS_IDLE;
 				break;
@@ -2867,12 +2861,10 @@ void cobra_state::gfx_debug_state_w(offs_t offset, uint64_t data, uint64_t mem_m
 
 	if (m_gfx_debug_state_wc >= 2)
 	{
-#if LOG_DEBUG_STATES
 		if (m_gfx_debug_state != 0)
 		{
-			printf("GFX: debug state %02X\n", m_gfx_debug_state);
+			LOGMASKED(LOG_DEBUG_STATES, "GFX: debug state %02X\n", m_gfx_debug_state);
 		}
-#endif
 
 		m_gfx_debug_state = 0;
 		m_gfx_debug_state_wc = 0;
@@ -3261,7 +3253,7 @@ ROM_START(bujutsu)
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)
 	ROM_LOAD( "m48t58-70pc1.17l", 0x000000, 0x002000, NO_DUMP )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "645c04", 0, SHA1(c0aabe69f6eb4e4cf748d606ae50674297af6a04) )
 ROM_END
 
@@ -3278,9 +3270,12 @@ ROM_START(racjamdx)
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)
 	ROM_LOAD( "m48t58-70pc1.17l", 0x000000, 0x002000, NO_DUMP )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "676a04", 0, SHA1(8e89d3e5099e871b99fccba13adaa3cf8a6b71f0) )
 ROM_END
+
+} // anonymous namespace
+
 
 /*************************************************************************/
 

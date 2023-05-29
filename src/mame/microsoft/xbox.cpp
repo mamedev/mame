@@ -22,6 +22,8 @@
 #include "bitmap.h"
 
 
+namespace {
+
 #define CPU_DIV 64
 
 class xbox_state : public xbox_base_state
@@ -192,13 +194,13 @@ ROM_START( xbox )
 	ROM_LOAD( "mcpx_1_1.bin", 0x200, 0x200, CRC(94ce376b) SHA1(6c875f17f773aaec51eb434068bb6c657c4343c0) )
 
 	ROM_REGION32_LE( 0x100000, "bios", 0)
-	ROM_SYSTEM_BIOS(0, "bios0", "Chihiro Bios 4134 1024k") \
+	ROM_SYSTEM_BIOS(0, "bios0", "XBOX BIOS 4134 1024k") \
 	ROM_LOAD_BIOS(0, "4134_1024k.bin", 0x000000, 0x100000, CRC(49d8055a) SHA1(d46cef771a63dc8024fe36d7ab5b959087ac999f)) \
-	ROM_SYSTEM_BIOS(1, "bios1", "Chihiro Bios 3944 1024k") \
+	ROM_SYSTEM_BIOS(1, "bios1", "XBOX BIOS 3944 1024k") \
 	ROM_LOAD_BIOS(1, "3944_1024k.bin", 0x000000, 0x100000, CRC(32a9ecb6) SHA1(67054fc88bda94e33e86f1b19be60efec0724fb6)) \
-	ROM_SYSTEM_BIOS(2, "bios2", "Chihiro Bios 4034 1024k") \
+	ROM_SYSTEM_BIOS(2, "bios2", "XBOX BIOS 4034 1024k") \
 	ROM_LOAD_BIOS(2, "4034_1024k.bin", 0x000000, 0x100000, CRC(0d6fc88f) SHA1(ab676b712204fb1728bf89f9cd541a8f5a64ab97)) \
-	ROM_SYSTEM_BIOS(3, "bios3", "Chihiro Bios 4817 1024k") \
+	ROM_SYSTEM_BIOS(3, "bios3", "XBOX BIOS 4817 1024k") \
 	ROM_LOAD_BIOS(3, "4817_1024k.bin", 0x000000, 0x100000, CRC(3f30863a) SHA1(dc955bd4d3ca71e01214a49e5d0aba615270c03c))
 	ROM_COPY( "mcpx", 0, 0x3fe00, 0x200)
 	ROM_COPY( "mcpx", 0, 0x7fe00, 0x200)
@@ -212,6 +214,8 @@ ROM_START( xbox )
 	ROM_LOAD( "xbox-5713.bin", 0x080000, 0x040000, CRC(58fd8173) SHA1(8b7ccc4648ccd78cdb7b65cfca09621eaf2d4238) )
 	ROM_LOAD( "5838_256k.bin", 0x0C0000, 0x040000, CRC(5be2413d) SHA1(b9489e883c650b5e5fe2f83a32237dbf74f0e9f1) )
 ROM_END
+
+} // anonymous namespace
 
 
 CONS( 2001, xbox, 0, 0, xbox,  xbox, xbox_state, empty_init, "Microsoft", "XBOX", MACHINE_IS_SKELETON )

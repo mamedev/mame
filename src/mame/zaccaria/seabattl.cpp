@@ -43,6 +43,8 @@ the sound board should be fully discrete.
 #include "seabattl.lh"
 
 
+namespace {
+
 class seabattl_state : public driver_device
 {
 public:
@@ -551,6 +553,8 @@ ROM_START( seabattla ) // this was a very different looking PCB (bootleg called 
 	ROM_REGION( 0x0800, "gfx3", 0 )
 	ROM_LOAD( "seawawe.ic9",      0x0000, 0x0800, CRC(7e356dc5) SHA1(71d34fa39ff0b7d0fa6d32ba2b9dc0006a03d1bb) ) // identical to above set
 ROM_END
+
+} // anonymous namespace
 
 
 GAMEL(1980, seabattl,  0,        seabattl, seabattl, seabattl_state, empty_init, ROT0, "Zaccaria", "Sea Battle (set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND, layout_seabattl )

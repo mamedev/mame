@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_APPLE3_H
-#define MAME_INCLUDES_APPLE3_H
+#ifndef MAME_APPLE_APPLE3_H
+#define MAME_APPLE_APPLE3_H
 
 #pragma once
 
@@ -170,4 +170,4 @@ private:
 	int m_inh_state = 0;
 };
 
-#endif // MAME_INCLUDES_APPLE3_H
+#endif // MAME_APPLE_APPLE3_H

@@ -35,6 +35,9 @@
 #include "cpu/z80/z80.h"
 #include "zapcomputer.lh"
 
+
+namespace {
+
 class zapcomp_state : public driver_device
 {
 public:
@@ -174,6 +177,9 @@ ROM_START( zapcomp )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD("zap.rom", 0x0000, 0x0400, CRC(3f4416e9) SHA1(d6493707bfba1a1e1e551f8144194afa5bda3316) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY                               FULLNAME                            FLAGS
 COMP( 1981, zapcomp, 0,      0,      zapcomp, zapcomp, zapcomp_state, empty_init, "Steve Ciarcia / BYTE / McGRAW-HILL", "ZAP - Z80 Applications Processor", MACHINE_NO_SOUND_HW )

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_KYOCERA_H
-#define MAME_INCLUDES_KYOCERA_H
+#ifndef MAME_KYOCERA_KYOCERA_H
+#define MAME_KYOCERA_KYOCERA_H
 
 #pragma once
 
@@ -264,4 +264,4 @@ private:
 	void tandy200_mem(address_map &map);
 };
 
-#endif // MAME_INCLUDES_KYOCERA_H
+#endif // MAME_KYOCERA_KYOCERA_H

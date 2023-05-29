@@ -172,7 +172,7 @@ In order from top to bottom they are....
 The 2 boxes join together via the Base Board upper connector and Media Board lower connector.
 
 The Microsoft-manufactured XBox board is the lowest board. It's mostly the same as the V1 XBox retail
-board with the exception that it has 128MB of RAM and a NVidia MCPX X2 chip. The retail XBox board has a
+board with the exception that it has 128MB of RAM and a nVidia MCPX X2 chip. The retail XBox board has a
 MCPX X3 chip. The board was probably released to Sega very early in development and the chip was updated
 in the mass-produced retail version.
 
@@ -447,9 +447,11 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 
 #include <functional>
 
-#define LOG_PCI
-//#define LOG_BASEBOARD
-//#define VERBOSE_MSG
+#define LOG_BASEBOARD (1U << 1)
+#define LOG_EXTRA     (1U << 2)
+
+#define VERBOSE (0)
+#include "logmacro.h"
 
 /*
  * Class declaration for jvs_master
@@ -687,7 +689,8 @@ void chihiro_state::jamtable_disasm(address_space &space, uint32_t address, uint
 {
 	debugger_console &con = machine().debugger().console();
 	offs_t addr = (offs_t)address;
-	if (!space.device().memory().translate(space.spacenum(), TRANSLATE_READ_DEBUG, addr))
+	address_space *tspace;
+	if (!space.device().memory().translate(space.spacenum(), device_memory_interface::TR_READ, addr, tspace))
 	{
 		con.printf("Address is unmapped.\n");
 		return;
@@ -696,30 +699,26 @@ void chihiro_state::jamtable_disasm(address_space &space, uint32_t address, uint
 	{
 		offs_t base = addr;
 
-		uint32_t opcode = space.read_byte(addr);
+		uint32_t opcode = tspace->read_byte(addr);
 		addr++;
-		uint32_t op1 = space.read_dword_unaligned(addr);
+		uint32_t op1 = tspace->read_dword_unaligned(addr);
 		addr += 4;
-		uint32_t op2 = space.read_dword_unaligned(addr);
+		uint32_t op2 = tspace->read_dword_unaligned(addr);
 		addr += 4;
 
-		char sop1[16];
-		char sop2[16];
-		char pcrel[16];
+		std::string sop1;
+		std::string pcrel;
 		if (opcode == 0xe1)
 		{
 			opcode = op2 & 255;
 			op2 = op1;
-			//op1=edi;
-			sprintf(sop2, "%08X", op2);
-			sprintf(sop1, "ACC");
-			sprintf(pcrel, "PC+ACC");
+			sop1 = "ACC";
+			pcrel = "PC+ACC";
 		}
 		else
 		{
-			sprintf(sop2, "%08X", op2);
-			sprintf(sop1, "%08X", op1);
-			sprintf(pcrel, "%08X", base + 9 + op1);
+			sop1 = util::string_format("%08X", op1);
+			pcrel = util::string_format("%08X", base + 9 + op1);
 		}
 		con.printf("%08X ", base);
 		// dl=instr ebx=par1 eax=par2
@@ -736,33 +735,33 @@ void chihiro_state::jamtable_disasm(address_space &space, uint32_t address, uint
 			// | | Reserved | Bus Number | Device Number | Function Number | Register Number |0|0|
 			// +-+----------+------------+---------------+-----------------+-----------------+-+-+
 			// 31 - Enable bit
-			con.printf("POKEPCI PCICONF[%s]=%s\n", sop2, sop1);
+			con.printf("POKEPCI PCICONF[%08X]=%s\n", op2, sop1);
 			break;
 		case 0x02:
-			con.printf("OUTB    PORT[%s]=%s\n", sop2, sop1);
+			con.printf("OUTB    PORT[%08X]=%s\n", op2, sop1);
 			break;
 		case 0x03:
-			con.printf("POKE    MEM[%s]=%s\n", sop2, sop1);
+			con.printf("POKE    MEM[%08X]=%s\n", op2, sop1);
 			break;
 		case 0x04:
-			con.printf("BNE     IF ACC != %s THEN PC=%s\n", sop2, pcrel);
+			con.printf("BNE     IF ACC != %08X THEN PC=%s\n", op2, pcrel);
 			break;
 		case 0x05:
 			// out cf8,op2
 			// in acc,cfc
-			con.printf("PEEKPCI ACC=PCICONF[%s]\n", sop2);
+			con.printf("PEEKPCI ACC=PCICONF[%08X]\n", op2);
 			break;
 		case 0x06:
-			con.printf("AND/OR  ACC=(ACC & %s) | %s\n", sop2, sop1);
+			con.printf("AND/OR  ACC=(ACC & %08X) | %s\n", op2, sop1);
 			break;
 		case 0x07:
 			con.printf("BRA     PC=%s\n", pcrel);
 			break;
 		case 0x08:
-			con.printf("INB     ACC=PORT[%s]\n", sop2);
+			con.printf("INB     ACC=PORT[%08X]\n", op2);
 			break;
 		case 0x09:
-			con.printf("PEEK    ACC=MEM[%s]\n", sop2);
+			con.printf("PEEK    ACC=MEM[%08X]\n", op2);
 			break;
 		case 0xee:
 			con.printf("END\n");
@@ -927,9 +926,7 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 {
 	int sense;
 
-#ifdef VERBOSE_MSG
-	printf("Control request to an2131qc: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
-#endif
+	LOGMASKED(LOG_EXTRA, "Control request to an2131qc: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
 	if (endpoint != 0)
 		return -1;
 	// default valuse for data stage
@@ -1037,9 +1034,7 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 		// data sent by the host contains first a byte with value 0 that is ignored, then a byte specifying the number of packets that follow, then the data for each packet
 		// the data for each packet contains first a byte with value 0, then the sync byte (0xe0) then all the other bytes of the packet ending with the checksum byte
 		// broadcast packets must have a destination node address of value 0xff
-#ifdef VERBOSE_MSG
-		printf(" Jvs packets data of %d bytes\n\r", setup->wIndex);
-#endif
+		LOGMASKED(LOG_EXTRA, " Jvs packets data of %d bytes\n\r", setup->wIndex);
 		endpoints[endpoint].buffer[0] = 0;
 		if (jvs.buffer_out_used == 0)
 		{
@@ -1082,9 +1077,7 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 
 int ohci_hlean2131qc_device::handle_bulk_pid(int endpoint, int pid, uint8_t *buffer, int size)
 {
-#ifdef VERBOSE_MSG
-	printf("Bulk request to an2131qc: %x %d %x\n\r", endpoint, pid, size);
-#endif
+	LOGMASKED(LOG_EXTRA, "Bulk request to an2131qc: %x %d %x\n\r", endpoint, pid, size);
 	if (((endpoint == 1) || (endpoint == 2)) && (pid == InPid))
 	{
 		if (size > endpoints[endpoint].remain)
@@ -1105,19 +1098,15 @@ int ohci_hlean2131qc_device::handle_bulk_pid(int endpoint, int pid, uint8_t *buf
 	{
 		if (size > endpoints[4].remain)
 			size = endpoints[4].remain;
-#ifdef VERBOSE_MSG
 		for (int n = 0; n < size; n++)
-			printf(" %02x", buffer[n]);
-#endif
+			LOGMASKED(LOG_EXTRA, " %02x", buffer[n]);
 		if (size > 0) {
 			memcpy(endpoints[4].position, buffer, size);
 			endpoints[4].position = endpoints[4].position + size;
 			endpoints[4].remain = endpoints[4].remain - size;
 			if (endpoints[4].remain == 0)
 			{
-#ifdef VERBOSE_MSG
-				printf("\n\r");
-#endif
+				LOGMASKED(LOG_EXTRA, "\n\r");
 				// extract packets
 				process_jvs_packet();
 			}
@@ -1247,9 +1236,7 @@ void ohci_hlean2131sc_device::initialize()
 
 int ohci_hlean2131sc_device::handle_nonstandard_request(int endpoint, USBSetupPacket *setup)
 {
-#ifdef VERBOSE_MSG
-	printf("Control request to an2131sc: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
-#endif
+	LOGMASKED(LOG_EXTRA, "Control request to an2131sc: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
 	if (endpoint != 0)
 		return -1;
 	// default valuse for data stage
@@ -1418,9 +1405,7 @@ int ohci_hlean2131sc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 
 int ohci_hlean2131sc_device::handle_bulk_pid(int endpoint, int pid, uint8_t *buffer, int size)
 {
-#ifdef VERBOSE_MSG
-	printf("Bulk request to an2131sc: %x %d %x\n\r", endpoint, pid, size);
-#endif
+	LOGMASKED(LOG_EXTRA, "Bulk request to an2131sc: %x %d %x\n\r", endpoint, pid, size);
 	if (((endpoint == 1) || (endpoint == 2)) && (pid == InPid))
 	{
 		if (size > endpoints[endpoint].remain)
@@ -1478,9 +1463,7 @@ int ohci_hlean2131sc_device::handle_bulk_pid(int endpoint, int pid, uint8_t *buf
 void ohci_hlean2131sc_device::process_packet()
 {
 	uint8_t result = 0;
-#ifdef VERBOSE_MSG
-		printf("%02X %02X %02X %02X\n\r", packet[0], packet[1], packet[2], packet[3]);
-#endif
+	LOGMASKED(LOG_EXTRA, "%02X %02X %02X %02X\n\r", packet[0], packet[1], packet[2], packet[3]);
 	if (packet[0] == 0xff) // 00 00 7f
 		result = 2;
 	else if (packet[0] == 0x81) // 30 7f 4e
@@ -1678,12 +1661,12 @@ void chihiro_state::baseboard_ide_event(int type, uint8_t *read_buffer, uint8_t 
 
 	if ((type != 3) || ((write_buffer[0] == 0) && (write_buffer[1] == 0)))
 		return;
-#ifdef LOG_BASEBOARD
-	logerror("Baseboard sector command:\n");
+
+	LOGMASKED(LOG_BASEBOARD, "Baseboard sector command:\n");
 	for (int a = 0; a < 32; a++)
-		logerror(" %02X", write_buffer[a]);
-	logerror("\n");
-#endif
+		LOGMASKED(LOG_BASEBOARD, " %02X", write_buffer[a]);
+	LOGMASKED(LOG_BASEBOARD, "\n");
+
 	// response
 	// second word 8001 (8000+counter), first word=first word of written data (command ?), second dword ?
 	read_buffer[0] = write_buffer[0];

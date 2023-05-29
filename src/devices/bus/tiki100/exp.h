@@ -16,6 +16,9 @@
 
 #include "machine/z80daisy.h"
 
+#include <functional>
+#include <vector>
+
 
 
 //**************************************************************************
@@ -33,11 +36,8 @@ class tiki100_bus_slot_device;
 class device_tiki100bus_card_interface : public device_interface
 {
 	friend class tiki100_bus_device;
-	template <class ElementType> friend class simple_list;
 
 public:
-	device_tiki100bus_card_interface *next() const { return m_next; }
-
 	// memory access
 	virtual uint8_t mrq_r(offs_t offset, uint8_t data, bool &mdis) { mdis = 1; return data; }
 	virtual void mrq_w(offs_t offset, uint8_t data) { }
@@ -62,9 +62,6 @@ protected:
 	tiki100_bus_device *m_bus;
 	tiki100_bus_slot_device *m_slot;
 	int m_busak;
-
-private:
-	device_tiki100bus_card_interface *m_next;
 };
 
 
@@ -92,10 +89,10 @@ public:
 	template <typename T> void set_bus(T &&tag) { m_bus.set_tag(std::forward<T>(tag)); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
-	// device_z80daisy_interface overrides
+	// device_z80daisy_interface implementation
 	virtual int z80daisy_irq_state() override { return get_card_device() ? m_card->z80daisy_irq_state() : 0; }
 	virtual int z80daisy_irq_ack() override { return get_card_device() ? m_card->z80daisy_irq_ack() : 0; }
 	virtual void z80daisy_irq_reti() override { if (get_card_device()) m_card->z80daisy_irq_reti(); }
@@ -118,7 +115,7 @@ class tiki100_bus_device : public device_t
 public:
 	// construction/destruction
 	tiki100_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~tiki100_bus_device() { m_device_list.detach_all(); }
+	~tiki100_bus_device();
 
 	auto irq_wr_callback() { return m_irq_cb.bind(); }
 	auto nmi_wr_callback() { return m_nmi_cb.bind(); }
@@ -145,17 +142,19 @@ public:
 	void exin_mrq_w(offs_t offset, uint8_t data) { m_out_mrq_cb(offset, data); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 private:
+	using card_vector = std::vector<std::reference_wrapper<device_tiki100bus_card_interface> >;
+
 	devcb_write_line   m_irq_cb;
 	devcb_write_line   m_nmi_cb;
 	devcb_write_line   m_busrq_cb;
 	devcb_read8        m_in_mrq_cb;
 	devcb_write8       m_out_mrq_cb;
 
-	simple_list<device_tiki100bus_card_interface> m_device_list;
+	card_vector m_device_list;
 };
 
 

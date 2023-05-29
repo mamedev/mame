@@ -28,6 +28,8 @@
 #include <algorithm>
 
 
+namespace {
+
 class ecoinf3_state : public driver_device
 {
 public:
@@ -848,6 +850,7 @@ void ecoinf3_state::init_ecoinf3_swap()
 
 }
 
+} // anonymous namespace
 
 
 // another hw type (similar to stuff in ecoinf2.c) (watchdog on port 58?)

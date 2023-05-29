@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_INCLUDES_FITFIGHT_H
-#define MAME_INCLUDES_FITFIGHT_H
+#ifndef MAME_NIX_FITFIGHT_H
+#define MAME_NIX_FITFIGHT_H
 
 #pragma once
 
@@ -92,4 +92,4 @@ private:
 	required_device<palette_device> m_palette;
 };
 
-#endif // MAME_INCLUDES_FITFIGHT_H
+#endif // MAME_NIX_FITFIGHT_H

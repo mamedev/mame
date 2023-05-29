@@ -49,6 +49,8 @@ Limit for help/undo (matta):
 #include "speaker.h"
 
 
+namespace {
+
 constexpr uint8_t TILE_WIDTH = 6;
 
 
@@ -448,5 +450,8 @@ ROM_START( othello )
 	ROM_LOAD( "6.ic41",   0x2000, 0x2000, CRC(467a731f) SHA1(af80e854522e53fb1b9af7945b2c803a654c6f65))
 	ROM_LOAD( "7.ic42",   0x4000, 0x2000, CRC(a76705f7) SHA1(b7d2a65d65d065732ddd0b3b738749369b382b48))
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1984, othello, 0, othello, othello, othello_state, empty_init, ROT0, "Success", "Othello (version 3.0)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

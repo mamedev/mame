@@ -12,17 +12,18 @@ Introduction
 ------------
 
 To show the :ref:`main menu <menus-main>` while running an emulated system in
-MAME, press the **Config Menu** key or button (**Tab** by default).  If the
-emulated system has keyboard inputs, you may need to press the **UI Toggle** key
-or button (**Scroll Lock**, or **Forward Delete** on macOS, by default) to
-enable user interface controls first.  You can dismiss a menu by pressing the
-**UI Cancel** key or button (**Escape** by default).  Dismissing a menu will
-return to its parent menu, or to the running system in the case of the main
-menu.
+MAME, press the **Show/Hide Menu** key or button (**Tab** by default).  If the
+emulated system has keyboard inputs, you may need to press the
+**Toggle UI Controls** key or button (**Scroll Lock**, or **Forward Delete** on
+macOS, by default) to enable user interface controls first.  You can dismiss a
+menu by pressing the **UI Back** key or button (**Escape** by default).
+Dismissing a menu will return to its parent menu, or to the running system in
+the case of the main menu.
 
-You can hide a menu and return to the running system by pressing the **Config
-Menu** key or button.  Pressing the **Config Menu** key or button again will
-jump back to the same menu.  This is useful when testing changes to settings.
+You can hide a menu and return to the running system by pressing the
+**Show/Hide Menu** key or button.  Pressing the **Show/Hide Menu** key or button
+again will jump back to the same menu.  This is useful when testing changes to
+settings.
 
 Emulated system inputs are ignored while menus are displayed.  You can still
 pause or resume the running system while most menus are displayed by pressing
@@ -43,17 +44,17 @@ For more information on navigating menus, :ref:`see the relevant section
 Main menu
 ---------
 
-The main menu is shown when you press the **Config Menu** key or button while
+The main menu is shown when you press the **Show/Hide Menu** key or button while
 running an emulated system or while the system information screen is displayed.
 It provides access to menus used to change settings, control various features,
 and show information about the running system and MAME itself.
 
-If you press the **Config Menu** key or button to show the main menu while the
-system information screen is displayed, the emulated system will not start until
-the main menu is dismissed (either by selecting **Start System**, pressing the
-**UI Cancel** key or button, or pressing the **Config Menu** key or button).
-This can be useful for mounting media images or changing DIP switches and
-machine configuration settings before the emulated system starts.
+If you press the **Show/Hide Menu** key or button to show the main menu while
+the system information screen is displayed, the emulated system will not start
+until the main menu is dismissed (either by selecting **Start System**, pressing
+the **UI Back** key or button, or pressing the **Show/Hide Menu** key or
+button).  This can be useful for mounting media images or changing DIP switches
+and machine configuration settings before the emulated system starts.
 
 Input Settings
     Shows the :ref:`Input Settings <menus-inputopts>` menu, where you can assign
@@ -127,13 +128,13 @@ Cheat
 Plugin Options
     Shows the Plugin Options menu, where you can access settings for enabled
     plugins.  This item is not shown if no plugins are enabled, or if the main
-    menu is shown before the emulated system starts (by pressing the Config Menu
-    key/button while the system information screen is displayed).
+    menu is shown before the emulated system starts (by pressing the Show/Hide
+    Menu key/button while the system information screen is displayed).
 External DAT View
     Shows the info viewer, which displays information loaded from various
     external support files.  This item is not shown if the :ref:`data plugin
     <plugins-data>` is not enabled, or if the main menu is shown before the
-    emulated system starts (by pressing the Config Menu key/button while the
+    emulated system starts (by pressing the Show/Hide Menu key/button while the
     system information screen is displayed).
 Add To Favorites/Remove From Favorites
     Adds the running system to the favourites list, or removes it if it’s
@@ -144,13 +145,13 @@ About MAME
 Select New System
     Shows the system selection menu, where you can select a system to start a
     new emulation session.  This item is not shown if the main menu is shown
-    before the emulated system starts (by pressing the Config Menu key/button
+    before the emulated system starts (by pressing the Show/Hide Menu key/button
     while the system information screen is displayed).
 Close Menu/Start System
     Closes the main menu, returning control of the running system.  Shows
     **Start System** if the main menu is shown before the emulated system
-    starts (by pressing the Config Menu key/button while the system information
-    screen is displayed).
+    starts (by pressing the Show/Hide Menu key/button while the system
+    information screen is displayed).
 
 
 .. _menus-inputopts:

@@ -17,6 +17,8 @@ Possibly related to ADP hardware? The HD63484 video board is definitely absent h
 #include "sound/ay8910.h"
 #include "speaker.h"
 
+namespace {
+
 class stellafr_state : public driver_device
 {
 public:
@@ -120,6 +122,8 @@ ROM_START( st_vulkn )
 	ROM_LOAD16_BYTE( "vulkan_f1_1.bin", 0x00000, 0x010000, CRC(06109bd5) SHA1(78f6b0cb3ae5873350fd50af8990fa38454c1183) )
 	ROM_LOAD16_BYTE( "vulkan_f1_2.bin", 0x00001, 0x010000, CRC(951baf42) SHA1(1346043155ba85926b2bf9eef8136b377953abe1) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME(199?,  st_ohla,   0,  stellafr,  stellafr, stellafr_state, empty_init, ROT0, "Stella", "Oh La La (Stella)",    MACHINE_IS_SKELETON_MECHANICAL )

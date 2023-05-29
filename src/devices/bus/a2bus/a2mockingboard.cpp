@@ -181,7 +181,7 @@ void a2bus_mockingboard_device::device_add_mconfig(machine_config &config)
 	AY8913(config, m_ay2, 1022727);
 	m_ay2->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 
-	VOTRAX_SC01(config, m_sc01, 1022727);
+	VOTRAX_SC01A(config, m_sc01, 1022727);
 	m_sc01->ar_callback().set(m_via1, FUNC(via6522_device::write_cb1));
 	m_sc01->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_sc01->add_route(ALL_OUTPUTS, "rspeaker", 1.0);

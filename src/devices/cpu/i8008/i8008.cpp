@@ -275,7 +275,7 @@ void i8008_device::take_interrupt()
 		m_HALT = 0;
 	}
 	// For now only support one byte operation to be executed
-	execute_one(standard_irq_callback(0));
+	execute_one(standard_irq_callback(0, m_PC.d));
 }
 
 inline void i8008_device::execute_one(int opcode)

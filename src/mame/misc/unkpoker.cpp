@@ -38,6 +38,9 @@ TODO: stuck if it isn't immediately coined up at boot.
 #include "emupal.h"
 #include "speaker.h"
 
+
+namespace {
+
 class unkpoker_state : public driver_device
 {
 public:
@@ -178,5 +181,8 @@ ROM_START( unkpoker )
 	ROM_LOAD( "cd.3b", 0x0000, 0x0800, CRC(e3997d7d) SHA1(6c595c70afedc7aef024215d153fe31b418adc25) )
 	ROM_LOAD( "cd.3c", 0x0800, 0x0800, CRC(b61adb76) SHA1(9805593fc6d9b01e4a63bfc35e5442c4c547c103) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME(1980?, unkpoker, 0, unkpoker, unkpoker, unkpoker_state, empty_init, ROT0, "<unknown>", "unknown 1980 poker game", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE)

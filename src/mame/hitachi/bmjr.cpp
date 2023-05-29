@@ -24,6 +24,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class bmjr_state : public driver_device
 {
 public:
@@ -392,6 +394,9 @@ ROM_START( bmjr )
 	ROM_REGION( 0x800, "chargen", 0 )
 	ROM_LOAD( "font.rom", 0x0000, 0x0800, BAD_DUMP CRC(258c6fd7) SHA1(d7c7dd57d6fc3b3d44f14c32182717a48e24587f)) //taken from a JP emulator
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

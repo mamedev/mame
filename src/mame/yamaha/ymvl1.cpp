@@ -33,7 +33,7 @@
 
 
 #include "emu.h"
-#include "machine/tmp68301.h"
+#include "cpu/m68000/tmp68301.h"
 #include "video/t6963c.h"
 
 namespace {

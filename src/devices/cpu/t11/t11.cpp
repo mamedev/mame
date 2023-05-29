@@ -241,7 +241,7 @@ void t11_device::t11_check_irqs()
 	if (irq->priority > (PSW & 0340))
 	{
 		// call the callback
-		standard_irq_callback(m_cp_state & 15);
+		standard_irq_callback(m_cp_state & 15, PC);
 
 		// T11 encodes the interrupt level on DAL<12:8>
 		uint8_t iaddr = bitswap<4>(~m_cp_state & 15, 0, 1, 2, 3);

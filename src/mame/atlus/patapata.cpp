@@ -29,6 +29,8 @@ maybe close to jalmah.cpp?
 #include "tilemap.h"
 
 
+namespace {
+
 class patapata_state : public driver_device
 {
 public:
@@ -329,6 +331,9 @@ ROM_START( patapata )
 	ROM_LOAD( "n82s131n.u119", 0x000, 0x200, CRC(33f63fc8) SHA1(24c4a1a7c06e546571c77c7dc7bd87c57aa088d7) )
 	ROM_LOAD( "n82s135n.u137", 0x000, 0x100, CRC(cb90eedc) SHA1(6577cb1999a90b9209b150cbedde11de9ac30018) )
 ROM_END
+
+} // anonymous namespace
+
 
 // cabinet shows Atlus logo, though there's no copyright on the title screen and PCB is NTC / NMK
 GAME( 1993, patapata, 0, patapata, patapata, patapata_state, empty_init, ROT0,  "Atlus", "Pata Pata Panic", MACHINE_SUPPORTS_SAVE )

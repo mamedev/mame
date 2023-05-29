@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Mike Balfour
-#ifndef MAME_AUDIO_REDALERT_H
-#define MAME_AUDIO_REDALERT_H
+#ifndef MAME_IREM_REDALERT_A_H
+#define MAME_IREM_REDALERT_A_H
 
 #pragma once
 
@@ -124,4 +124,4 @@ private:
 	uint8_t m_ay8910_latch_2 = 0;
 };
 
-#endif // MAME_AUDIO_REDALERT_H
+#endif // MAME_IREM_REDALERT_A_H

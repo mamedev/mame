@@ -10,9 +10,8 @@
 #include "cpu/tms32010/tms32010.h"
 #include "twincobr.h"
 
-
-#define LOG_DSP_CALLS 0
-#define LOG(x) do { if (LOG_DSP_CALLS) logerror x; } while (0)
+#define VERBOSE (0)
+#include "logmacro.h"
 
 
 WRITE_LINE_MEMBER(twincobr_state::twincobr_vblank_irq)
@@ -35,7 +34,7 @@ void twincobr_state::twincobr_dsp_addrsel_w(u16 data)
 	m_main_ram_seg = ((data & 0xe000) << 3);
 	m_dsp_addr_w   = ((data & 0x1fff) << 1);
 
-	LOG(("DSP PC:%04x IO write %04x (%08x) at port 0\n",m_dsp->pcbase(),data,m_main_ram_seg + m_dsp_addr_w));
+	LOG("DSP PC:%04x IO write %04x (%08x) at port 0\n",m_dsp->pcbase(),data,m_main_ram_seg + m_dsp_addr_w);
 }
 
 u16 twincobr_state::twincobr_dsp_r()
@@ -52,7 +51,7 @@ u16 twincobr_state::twincobr_dsp_r()
 					break;}
 	default:        logerror("DSP PC:%04x Warning !!! IO reading from %08x (port 1)\n",m_dsp->pcbase(),m_main_ram_seg + m_dsp_addr_w); break;
 	}
-	LOG(("DSP PC:%04x IO read %04x at %08x (port 1)\n",m_dsp->pcbase(),input_data,m_main_ram_seg + m_dsp_addr_w));
+	LOG("DSP PC:%04x IO read %04x at %08x (port 1)\n",m_dsp->pcbase(),input_data,m_main_ram_seg + m_dsp_addr_w);
 	return input_data;
 }
 
@@ -70,7 +69,7 @@ void twincobr_state::twincobr_dsp_w(u16 data)
 					break;}
 	default:        logerror("DSP PC:%04x Warning !!! IO writing to %08x (port 1)\n",m_dsp->pcbase(),m_main_ram_seg + m_dsp_addr_w); break;
 	}
-	LOG(("DSP PC:%04x IO write %04x at %08x (port 1)\n",m_dsp->pcbase(),data,m_main_ram_seg + m_dsp_addr_w));
+	LOG("DSP PC:%04x IO write %04x at %08x (port 1)\n",m_dsp->pcbase(),data,m_main_ram_seg + m_dsp_addr_w);
 }
 
 void twincobr_state::wardner_dsp_addrsel_w(u16 data)
@@ -85,7 +84,7 @@ void twincobr_state::wardner_dsp_addrsel_w(u16 data)
 
 	if (m_main_ram_seg == 0x6000) m_main_ram_seg = 0x7000;
 
-	LOG(("DSP PC:%04x IO write %04x (%08x) at port 0\n",m_dsp->pcbase(),data,m_main_ram_seg + m_dsp_addr_w));
+	LOG("DSP PC:%04x IO write %04x (%08x) at port 0\n",m_dsp->pcbase(),data,m_main_ram_seg + m_dsp_addr_w);
 }
 
 u16 twincobr_state::wardner_dsp_r()
@@ -103,7 +102,7 @@ u16 twincobr_state::wardner_dsp_r()
 					break;}
 	default:        logerror("DSP PC:%04x Warning !!! IO reading from %08x (port 1)\n",m_dsp->pcbase(),m_main_ram_seg + m_dsp_addr_w); break;
 	}
-	LOG(("DSP PC:%04x IO read %04x at %08x (port 1)\n",m_dsp->pcbase(),input_data,m_main_ram_seg + m_dsp_addr_w));
+	LOG("DSP PC:%04x IO read %04x at %08x (port 1)\n",m_dsp->pcbase(),input_data,m_main_ram_seg + m_dsp_addr_w);
 	return input_data;
 }
 
@@ -122,7 +121,7 @@ void twincobr_state::wardner_dsp_w(u16 data)
 					break;}
 	default:        logerror("DSP PC:%04x Warning !!! IO writing to %08x (port 1)\n",m_dsp->pcbase(),m_main_ram_seg + m_dsp_addr_w); break;
 	}
-	LOG(("DSP PC:%04x IO write %04x at %08x (port 1)\n",m_dsp->pcbase(),data,m_main_ram_seg + m_dsp_addr_w));
+	LOG("DSP PC:%04x IO write %04x at %08x (port 1)\n",m_dsp->pcbase(),data,m_main_ram_seg + m_dsp_addr_w);
 }
 
 void twincobr_state::twincobr_dsp_bio_w(u16 data)
@@ -132,7 +131,7 @@ void twincobr_state::twincobr_dsp_bio_w(u16 data)
 	/*              Actually only DSP data bit 15 controls this */
 	/* data 0x0000  means set DSP BIO line active and disable */
 	/*              communication to main processor*/
-	LOG(("DSP PC:%04x IO write %04x at port 3\n",m_dsp->pcbase(),data));
+	LOG("DSP PC:%04x IO write %04x at port 3\n",m_dsp->pcbase(),data);
 	if (data & 0x8000)
 	{
 		m_dsp_bio = CLEAR_LINE;
@@ -141,7 +140,7 @@ void twincobr_state::twincobr_dsp_bio_w(u16 data)
 	{
 		if (m_dsp_execute)
 		{
-			LOG(("Turning the main CPU on\n"));
+			LOG("Turning the main CPU on\n");
 			m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 			m_dsp_execute = 0;
 		}
@@ -156,7 +155,7 @@ u16 twincobr_state::fsharkbt_dsp_r()
 	/* Port is read three times during startup. First and last data */
 	/*   read must equal, but second data read must be different */
 	m_fsharkbt_8741 += 1;
-	LOG(("DSP PC:%04x IO read %04x from 8741 MCU (port 2)\n",m_dsp->pcbase(),(m_fsharkbt_8741 & 0x08)));
+	LOG("DSP PC:%04x IO read %04x from 8741 MCU (port 2)\n",m_dsp->pcbase(),(m_fsharkbt_8741 & 0x08));
 	return (m_fsharkbt_8741 & 1);
 }
 
@@ -186,7 +185,7 @@ WRITE_LINE_MEMBER(twincobr_state::dsp_int_w)
 	if (state)
 	{
 		// assert the INT line to the DSP
-		LOG(("Turning DSP on and main CPU off\n"));
+		LOG("Turning DSP on and main CPU off\n");
 		m_dsp->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 		m_dsp->set_input_line(0, ASSERT_LINE); // TMS32010 INT
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -194,7 +193,7 @@ WRITE_LINE_MEMBER(twincobr_state::dsp_int_w)
 	else
 	{
 		// inhibit the INT line to the DSP
-		LOG(("Turning DSP off\n"));
+		LOG("Turning DSP off\n");
 		m_dsp->set_input_line(0, CLEAR_LINE); // TMS32010 INT
 		m_dsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}

@@ -69,6 +69,9 @@
 #include "netlist/devices/net_lib.h"
 #include "video/fixfreq.h"
 
+
+namespace {
+
 // copied by Pong, not accurate for this driver!
 // start
 #define MASTER_CLOCK    7159000
@@ -434,6 +437,8 @@ ROM_START( srdchamp )
 	ROM_LOAD( "cs222_mr37.12f",    0x000, 0x100, CRC(85573385) SHA1(db1feef3525247926316743f54e626e0c3da3f2b) )
 	ROM_LOAD( "cs222_mr38.11j",    0x000, 0x100, CRC(fb775d23) SHA1(8dd3fca4d08c235c0999bd3623127331eed004d9) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1977, fisco400, 0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Cisco/Fisco 400 [TTL]",    MACHINE_IS_SKELETON )

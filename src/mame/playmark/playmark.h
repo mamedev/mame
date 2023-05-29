@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria, Pierpaolo Prazzoli, Quench
-#ifndef MAME_INCLUDES_PLAYMARK_H
-#define MAME_INCLUDES_PLAYMARK_H
+#ifndef MAME_PLAYMARK_PLAYMARK_H
+#define MAME_PLAYMARK_PLAYMARK_H
 
 #pragma once
 
@@ -190,4 +190,4 @@ private:
 	void wbeachvl_base(machine_config &config);
 };
 
-#endif // MAME_INCLUDES_PLAYMARK_H
+#endif // MAME_PLAYMARK_PLAYMARK_H

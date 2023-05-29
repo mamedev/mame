@@ -181,11 +181,7 @@ void arm7_disassembler::WriteBranchAddress( std::ostream &stream, uint32_t pc, u
 	{
 		opcode |= 2;
 	}
-	opcode &= 0x03fffffe;
-	if( opcode & 0x02000000 )
-	{
-		opcode |= 0xfc000000; /* sign-extend */
-	}
+	opcode = util::sext( opcode, 26 );
 	pc += 8+opcode;
 	util::stream_format( stream, "0x%08X", pc );
 } /* WriteBranchAddress */
@@ -1362,11 +1358,7 @@ u32 arm7_disassembler::thumb_disasm(std::ostream &stream, uint32_t pc, uint16_t 
 		}
 		else
 		{
-			offs = ( opcode & THUMB_BRANCH_OFFS ) << 1;
-			if( offs & 0x00000800 )
-			{
-				offs |= 0xfffff800;
-			}
+			offs = util::sext( ( opcode & THUMB_BRANCH_OFFS ) << 1, 12 );
 			stream << "B";
 			WritePadding(stream, start_position);
 			util::stream_format( stream, "0x%08X", uint32_t(pc + 4 + offs));
@@ -1380,11 +1372,7 @@ u32 arm7_disassembler::thumb_disasm(std::ostream &stream, uint32_t pc, uint16_t 
 		}
 		else
 		{
-			addr = ( opcode & THUMB_BLOP_OFFS ) << 12;
-			if( addr & ( 1 << 22 ) )
-			{
-				addr |= 0xff800000;
-			}
+			addr = util::sext( ( opcode & THUMB_BLOP_OFFS ) << 12, 23 );
 			util::stream_format( stream, "BL (HI) 0x%X", addr );
 			dasmflags = STEP_OVER;
 		}

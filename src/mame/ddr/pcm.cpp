@@ -68,6 +68,8 @@ ToDo:
 #include "speaker.h"
 
 
+namespace {
+
 class pcm_state : public driver_device
 {
 public:
@@ -372,6 +374,9 @@ ROM_START( pcm )
 	ROM_REGION(0x0800, "chargen",0)
 	ROM_LOAD( "charrom.d113", 0x0000, 0x0800, CRC(5684b3c3) SHA1(418054aa70a0fd120611e32059eb2051d3b82b5a))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

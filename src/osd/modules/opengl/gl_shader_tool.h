@@ -17,10 +17,14 @@
  *  GL_ARB_fragment_shader
  *
  */
+#ifndef MAME_OSD_OPENGL_GL_SHADER_TOOL_H
+#define MAME_OSD_OPENGL_GL_SHADER_TOOL_H
 
+#pragma once
 
-#ifndef _GL_SHADER_TOOL_
-#define _GL_SHADER_TOOL_
+#include "osd_opengl.h"
+
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,13 +40,9 @@ extern "C" {
  *
  */
 
-#include <stdint.h>
-
 #ifndef GL_GLEXT_PROTOTYPES
 #define GL_GLEXT_PROTOTYPES 1
 #endif
-
-#include "osd_opengl.h"
 
 #if defined(SDLMAME_MACOSX)
 
@@ -54,80 +54,6 @@ extern "C" {
 #endif
 
 #endif
-
-typedef void * (APIENTRYP PFNGLGETPROCADDRESSOS)(const char *procName);
-
-/**
- * YOU HAVE TO CALL THIS FUNCTION ONCE !
- * @return 0 - ok .. all shader ARB functions loaded
- *         otherwise !=0
- */
-int gl_shader_loadExtention(osd_gl_context *gl_ctx);
-
-enum GLSLCheckMode {
-		CHECK_QUIET,         /* just return 0, if no error, otherwise the GL error code, no stderr output */
-		CHECK_VERBOSE,       /* same as CHECK_QUIET, but in the case of an error, use stderr to be verbose */
-		CHECK_ALWAYS_VERBOSE /* always print out all information available */
-};
-
-#define GL_CHECK_ERROR_VERBOSE() gl_check_error(CHECK_ALWAYS_VERBOSE,__FILE__,__LINE__)
-#define GL_CHECK_ERROR_NORMAL() gl_check_error(CHECK_VERBOSE,__FILE__,__LINE__)
-#define GL_CHECK_ERROR_QUIET() gl_check_error(CHECK_QUIET,__FILE__,__LINE__)
-#define GL_CHECK_ERROR(m) gl_check_error(m,__FILE__,__LINE__)
-
-#define GL_SHADER_CHECK_ERROR_VERBOSE(o,q) gl_shader_check_error(o,q,CHECK_ALWAYS_VERBOSE,__FILE__,__LINE__)
-#define GL_SHADER_CHECK_ERROR_NORMAL(o,q) gl_shader_check_error(o,q,CHECK_VERBOSE,__FILE__,__LINE__)
-#define GL_SHADER_CHECK_ERROR_QUIET(o,q) gl_shader_check_error(o,q,CHECK_QUIET,__FILE__,__LINE__)
-#define GL_SHADER_CHECK_ERROR(o,q,m) gl_shader_check_error(o,q,m,__FILE__,__LINE__)
-
-#ifdef GL_SHADER_TOOL_DEBUG
-	#define GL_SHADER_CHECK(o,q) GL_SHADER_CHECK_ERROR_VERBOSE(o,q)
-	#define GL_CHECK() GL_CHECK_ERROR_VERBOSE()
-#else
-	#define GL_SHADER_CHECK(o,q) GL_SHADER_CHECK_ERROR_NORMAL(o,q)
-	#define GL_CHECK() GL_CHECK_ERROR_NORMAL()
-#endif
-
-int gl_check_error(GLSLCheckMode m, const char *file, const int line);
-
-int gl_texture_check_size(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height,
-							GLint border, GLenum format, GLenum type,
-				GLsizei *avail_width, GLsizei *avail_height,
-				int verbose);
-
-int gl_round_to_pow2(int v);
-
-/**
- * @param obj_query Can be either GL_OBJECT_TYPE_ARB, GL_OBJECT_DELETE_STATUS_ARB, GL_OBJECT_COMPILE_STATUS_ARB,
- *                                GL_OBJECT_LINK_STATUS_ARB, GL_OBJECT_VALIDATE_STATUS_ARB
- *                  Should be used after the referring action, i.e. GL_OBJECT_DELETE_STATUS_ARB after a
- *              glDeleteObjectARB call, etc.
- */
-int gl_shader_check_error(GLhandleARB obj, GLenum obj_query, GLSLCheckMode m, const char *file, const int line);
-
-int gl_compile_shader_file  ( GLhandleARB *shader, GLenum type, const char * shader_file, int verbose );
-int gl_compile_shader_source( GLhandleARB *shader, GLenum type, const char * shader_source, int verbose );
-
-/**
- * you can pass either a valid shader_file, or a precompiled vertex_shader,
- * this is true for both, vertex and fragment shaders.
- */
-int gl_compile_shader_files( GLhandleARB *program, GLhandleARB *vertex_shader, GLhandleARB *fragment_shader,
-								const char * vertex_shader_file,
-								const char * fragment_shader_file,
-					int verbose
-							);
-
-/**
- * you can pass either a valid shader_file, or a precompiled vertex_shader,
- * this is true for both, vertex and fragment shaders.
- */
-int gl_compile_shader_sources( GLhandleARB *program, GLhandleARB *vertex_shader, GLhandleARB *fragment_shader,
-								const GLcharARB * vertex_shader_source,
-								const GLcharARB * fragment_shader_source
-								);
-
-int gl_delete_shader( GLhandleARB *program, GLhandleARB *vertex_shader, GLhandleARB *fragment_shader );
 
 #if defined(SDLMAME_MACOSX)
 #ifndef GL_ARB_shader_objects
@@ -158,32 +84,118 @@ typedef void (APIENTRYP PFNGLUNIFORM3IVARBPROC) (GLint location, GLsizei count, 
 typedef void (APIENTRYP PFNGLUNIFORM4IVARBPROC) (GLint location, GLsizei count, const GLint *value);
 #endif
 
-extern PFNGLGETOBJECTPARAMETERIVARBPROC pfn_glGetObjectParameterivARB;
-extern PFNGLGETINFOLOGARBPROC pfn_glGetInfoLogARB;
-extern PFNGLDELETEOBJECTARBPROC pfn_glDeleteObjectARB;
-extern PFNGLCREATESHADEROBJECTARBPROC pfn_glCreateShaderObjectARB;
-extern PFNGLSHADERSOURCEARBPROC pfn_glShaderSourceARB;
-extern PFNGLCOMPILESHADERARBPROC pfn_glCompileShaderARB;
-extern PFNGLCREATEPROGRAMOBJECTARBPROC pfn_glCreateProgramObjectARB;
-extern PFNGLATTACHOBJECTARBPROC pfn_glAttachObjectARB;
-extern PFNGLLINKPROGRAMARBPROC pfn_glLinkProgramARB;
-extern PFNGLVALIDATEPROGRAMARBPROC pfn_glValidateProgramARB;
-extern PFNGLUSEPROGRAMOBJECTARBPROC pfn_glUseProgramObjectARB;
-extern PFNGLGETUNIFORMLOCATIONARBPROC pfn_glGetUniformLocationARB;
-extern PFNGLUNIFORM1FARBPROC pfn_glUniform1fARB;
-extern PFNGLUNIFORM1IARBPROC pfn_glUniform1iARB;
-extern PFNGLUNIFORM1FVARBPROC pfn_glUniform1fvARB;
-extern PFNGLUNIFORM2FVARBPROC pfn_glUniform2fvARB;
-extern PFNGLUNIFORM3FVARBPROC pfn_glUniform3fvARB;
-extern PFNGLUNIFORM4FVARBPROC pfn_glUniform4fvARB;
-extern PFNGLUNIFORM1IVARBPROC pfn_glUniform1ivARB;
-extern PFNGLUNIFORM2IVARBPROC pfn_glUniform2ivARB;
-extern PFNGLUNIFORM3IVARBPROC pfn_glUniform3ivARB;
-extern PFNGLUNIFORM4IVARBPROC pfn_glUniform4ivARB;
-
+typedef void * (APIENTRYP PFNGLGETPROCADDRESSOS)(const char *procName);
 
 #ifdef __cplusplus
 }
 #endif
 
+class gl_shader_tool
+{
+public:
+	gl_shader_tool(
+#if defined(USE_DISPATCH_GL)
+			osd_gl_dispatch *gld
 #endif
+			);
+
+	PFNGLGETOBJECTPARAMETERIVARBPROC pfn_glGetObjectParameterivARB;
+	PFNGLGETINFOLOGARBPROC pfn_glGetInfoLogARB;
+	PFNGLDELETEOBJECTARBPROC pfn_glDeleteObjectARB;
+	PFNGLCREATESHADEROBJECTARBPROC pfn_glCreateShaderObjectARB;
+	PFNGLSHADERSOURCEARBPROC pfn_glShaderSourceARB;
+	PFNGLCOMPILESHADERARBPROC pfn_glCompileShaderARB;
+	PFNGLCREATEPROGRAMOBJECTARBPROC pfn_glCreateProgramObjectARB;
+	PFNGLATTACHOBJECTARBPROC pfn_glAttachObjectARB;
+	PFNGLLINKPROGRAMARBPROC pfn_glLinkProgramARB;
+	PFNGLVALIDATEPROGRAMARBPROC pfn_glValidateProgramARB;
+	PFNGLUSEPROGRAMOBJECTARBPROC pfn_glUseProgramObjectARB;
+	PFNGLGETUNIFORMLOCATIONARBPROC pfn_glGetUniformLocationARB;
+	PFNGLUNIFORM1FARBPROC pfn_glUniform1fARB;
+	PFNGLUNIFORM1IARBPROC pfn_glUniform1iARB;
+	PFNGLUNIFORM1FVARBPROC pfn_glUniform1fvARB;
+	PFNGLUNIFORM2FVARBPROC pfn_glUniform2fvARB;
+	PFNGLUNIFORM3FVARBPROC pfn_glUniform3fvARB;
+	PFNGLUNIFORM4FVARBPROC pfn_glUniform4fvARB;
+	PFNGLUNIFORM1IVARBPROC pfn_glUniform1ivARB;
+	PFNGLUNIFORM2IVARBPROC pfn_glUniform2ivARB;
+	PFNGLUNIFORM3IVARBPROC pfn_glUniform3ivARB;
+	PFNGLUNIFORM4IVARBPROC pfn_glUniform4ivARB;
+
+	/**
+	 * YOU HAVE TO CALL THIS FUNCTION ONCE !
+	 * @return true - ok .. all shader ARB functions loaded
+	 *         otherwise false
+	 */
+	bool load_extension(osd_gl_context &gl_ctx);
+
+	int texture_check_size(
+			GLenum target,
+			GLint level,
+			GLint internalFormat,
+			GLsizei width,
+			GLsizei height,
+			GLint border,
+			GLenum format,
+			GLenum type,
+			GLsizei *avail_width,
+			GLsizei *avail_height,
+			bool verbose);
+
+protected:
+	int compile_file(GLhandleARB *shader, GLenum type, const char *shader_file, bool verbose);
+	int compile_source(GLhandleARB *shader, GLenum type, const char *shader_source, bool verbose);
+
+	/**
+	 * you can pass either a valid shader_file, or a precompiled vertex_shader,
+	 * this is true for both, vertex and fragment shaders.
+	 */
+	int compile_files(
+			GLhandleARB *program,
+			GLhandleARB *vertex_shader,
+			GLhandleARB *fragment_shader,
+			const char *vertex_shader_file,
+			const char *fragment_shader_file,
+			bool verbose);
+
+	/**
+	 * you can pass either a valid shader_file, or a precompiled vertex_shader,
+	 * this is true for both, vertex and fragment shaders.
+	 */
+	int compile_sources(
+			GLhandleARB *program,
+			GLhandleARB *vertex_shader,
+			GLhandleARB *fragment_shader,
+			const GLcharARB *vertex_shader_source,
+			const GLcharARB *fragment_shader_source);
+
+	int delete_shader(GLhandleARB *program, GLhandleARB *vertex_shader, GLhandleARB *fragment_shader);
+
+#if defined(USE_DISPATCH_GL)
+	osd_gl_dispatch *const gl_dispatch; // name is magic, can't be changed
+#endif
+
+private:
+	enum GLSLCheckMode
+	{
+		CHECK_QUIET,         // just return 0, if no error, otherwise the GL error code, no stderr output
+		CHECK_VERBOSE,       // same as CHECK_QUIET, but in the case of an error, use stderr to be verbose
+		CHECK_ALWAYS_VERBOSE // always print out all information available
+	};
+
+	int check_error(GLSLCheckMode m, const char *file, const int line);
+
+	/**
+	 * @param obj_query Can be either GL_OBJECT_TYPE_ARB, GL_OBJECT_DELETE_STATUS_ARB, GL_OBJECT_COMPILE_STATUS_ARB,
+	 *                                GL_OBJECT_LINK_STATUS_ARB, GL_OBJECT_VALIDATE_STATUS_ARB
+	 *                  Should be used after the referring action, i.e. GL_OBJECT_DELETE_STATUS_ARB after a
+	 *              glDeleteObjectARB call, etc.
+	 */
+	int check_error(GLhandleARB obj, GLenum obj_query, GLSLCheckMode m, const char *file, const int line);
+
+	int delete_shader_tool(GLhandleARB *program, GLhandleARB *vertex_shader, GLhandleARB *fragment_shader, bool externalcall);
+};
+
+int gl_round_to_pow2(int v);
+
+#endif // MAME_OSD_OPENGL_GL_SHADER_TOOL_H

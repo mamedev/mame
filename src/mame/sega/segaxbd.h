@@ -5,8 +5,8 @@
     Sega X-Board hardware
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_SEGAXBD_H
-#define MAME_INCLUDES_SEGAXBD_H
+#ifndef MAME_SEGA_SEGAXBD_H
+#define MAME_SEGA_SEGAXBD_H
 
 #pragma once
 
@@ -241,4 +241,4 @@ private:
 	uint8_t m_commram_bank = 0;
 };
 
-#endif // MAME_INCLUDES_SEGAXBD_H
+#endif // MAME_SEGA_SEGAXBD_H

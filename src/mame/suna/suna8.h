@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-#ifndef MAME_INCLUDES_SUNA8_H
-#define MAME_INCLUDES_SUNA8_H
+#ifndef MAME_SUNA_SUNA8_H
+#define MAME_SUNA_SUNA8_H
 
 #pragma once
 
@@ -220,4 +220,4 @@ private:
 	int m_numsamples = 0;
 };
 
-#endif // MAME_INCLUDES_SUNA8_H
+#endif // MAME_SUNA_SUNA8_H

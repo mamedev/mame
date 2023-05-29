@@ -225,6 +225,8 @@ NOTE: 10MHz XTAL verified for Joker Poker, Super Mini-Boy is stated as 12.4725MH
 #include "miniboy7.lh"
 
 
+namespace {
+
 #define MASTER_CLOCK    XTAL(12'472'500)    /* 12.4725 MHz */
 
 
@@ -830,6 +832,8 @@ ROM_START( bejpoker ) /* MVX-001-02 PCB */
 	ROM_LOAD( "j1.7e",    0x0000, 0x0100, CRC(a89e1d80) SHA1(f3f4842729df1fc379a7281edcceb67c4e9558b4) ) /* TBP24S10 BPROM (same data as BPROM from Super Mini-Boy) */
 	ROM_LOAD( "jdx.10f",  0x0100, 0x0100, CRC(2dd8d3ce) SHA1(6e3d67f9c5ccc210963e02e32fceee4859d8e651) ) /* 63S141 BPROM */
 ROM_END
+
+} // anonymous namespace
 
 
 /***********************************

@@ -1,9 +1,10 @@
 /*
- *  Copyright 2011-2021 Branimir Karadzic. All rights reserved.
- *  License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ *  Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ *  License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
 #include "allocator.cpp"
+#include "bounds.cpp"
 #include "bx.cpp"
 #include "commandline.cpp"
 #include "crtnone.cpp"

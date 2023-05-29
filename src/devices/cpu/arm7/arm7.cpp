@@ -37,15 +37,15 @@ TODO:
 #include "arm7core.h"   //include arm7 core
 #include "arm7help.h"
 
-#define LOG_MMU             (1 << 0)
-#define LOG_DSP             (1 << 1)
-#define LOG_COPRO_READS     (1 << 2)
-#define LOG_COPRO_WRITES    (1 << 3)
-#define LOG_COPRO_UNKNOWN   (1 << 4)
-#define LOG_COPRO_RESERVED  (1 << 5)
-#define LOG_TLB             (1 << 6)
-#define LOG_TLB_MISS        (1 << 7)
-#define LOG_PREFETCH        (1 << 8)
+#define LOG_MMU             (1U << 1)
+#define LOG_DSP             (1U << 2)
+#define LOG_COPRO_READS     (1U << 3)
+#define LOG_COPRO_WRITES    (1U << 4)
+#define LOG_COPRO_UNKNOWN   (1U << 5)
+#define LOG_COPRO_RESERVED  (1U << 6)
+#define LOG_TLB             (1U << 7)
+#define LOG_TLB_MISS        (1U << 8)
+#define LOG_PREFETCH        (1U << 9)
 
 #define VERBOSE             (0) // (LOG_COPRO_READS | LOG_COPRO_WRITES | LOG_COPRO_UNKNOWN | LOG_COPRO_RESERVED)
 #include "logmacro.h"
@@ -863,12 +863,12 @@ bool arm7_cpu_device::translate_vaddr_to_paddr(offs_t &vaddr, const int flags)
 
 void arm7_cpu_device::translate_insn_command(const std::vector<std::string_view> &params)
 {
-	translate_command(params, TRANSLATE_FETCH);
+	translate_command(params, TR_FETCH);
 }
 
 void arm7_cpu_device::translate_data_command(const std::vector<std::string_view> &params)
 {
-	translate_command(params, TRANSLATE_READ);
+	translate_command(params, TR_READ);
 }
 
 void arm7_cpu_device::translate_command(const std::vector<std::string_view> &params, int intention)
@@ -880,21 +880,21 @@ void arm7_cpu_device::translate_command(const std::vector<std::string_view> &par
 	vaddr &= 0xffffffff;
 
 	offs_t paddr = (offs_t)vaddr;
-	bool can_translate = memory_translate(AS_PROGRAM, intention, paddr);
+	address_space *space = nullptr;
+	bool can_translate = memory_translate(AS_PROGRAM, intention, paddr, space);
 	if (can_translate)
-		machine().debugger().console().printf("%s vaddr %08x => phys %08x\n", intention == TRANSLATE_FETCH ? "instruction" : "data", (uint32_t)vaddr, paddr);
+		machine().debugger().console().printf("%s vaddr %08x => phys %08x\n", intention == TR_FETCH ? "instruction" : "data", (uint32_t)vaddr, paddr);
 	else
-		machine().debugger().console().printf("%s vaddr %08x => unmapped\n", intention == TRANSLATE_FETCH ? "instruction" : "data");
+		machine().debugger().console().printf("%s vaddr %08x => unmapped\n", intention == TR_FETCH ? "instruction" : "data");
 }
 
-bool arm7_cpu_device::memory_translate(int spacenum, int intention, offs_t &address)
+bool arm7_cpu_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
+	target_space = &space(spacenum);
 	/* only applies to the program address space and only does something if the MMU's enabled */
 	if (spacenum == AS_PROGRAM && (m_control & COPRO_CTRL_MMU_EN))
 	{
-		int intention_type = intention & TRANSLATE_TYPE_MASK;
-
-		const int flags = (intention_type & TRANSLATE_FETCH) ? ARM7_TLB_ABORT_P : ARM7_TLB_ABORT_D;
+		const int flags = intention == TR_FETCH ? ARM7_TLB_ABORT_P : ARM7_TLB_ABORT_D;
 		if (address < 0x2000000)
 			address += m_pid_offset;
 

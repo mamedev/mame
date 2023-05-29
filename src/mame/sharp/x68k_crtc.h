@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald,Carl
 
-#ifndef MAME_VIDEO_X68K_CRTC_H
-#define MAME_VIDEO_X68K_CRTC_H
+#ifndef MAME_SHARP_X68K_CRTC_H
+#define MAME_SHARP_X68K_CRTC_H
 
 class x68k_crtc_device : public device_t, public device_video_interface
 {
@@ -49,8 +49,6 @@ public:
 	u16 vend() const { return m_vend; }
 	u16 visible_height() const { return m_visible_height; }
 	u16 visible_width() const { return m_visible_width; }
-	u16 hshift() const { return m_hshift; }
-	u16 vshift() const { return m_vshift; }
 
 protected:
 	// base constructor
@@ -104,8 +102,6 @@ private:
 	u16 m_width;
 	u16 m_visible_height;
 	u16 m_visible_width;
-	u16 m_hshift;
-	u16 m_vshift;
 	//u16 m_video_width;  // horizontal total (in pixels)
 	//u16 m_video_height; // vertical total
 	bool m_interlace;  // 1024 vertical resolution is interlaced
@@ -135,4 +131,4 @@ public:
 DECLARE_DEVICE_TYPE(VINAS, vinas_device)
 DECLARE_DEVICE_TYPE(VICON, vicon_device)
 
-#endif // MAME_VIDEO_X68K_CRTC_H
+#endif // MAME_SHARP_X68K_CRTC_H

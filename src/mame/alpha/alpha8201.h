@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_ALPHA8201_H
-#define MAME_MACHINE_ALPHA8201_H
+#ifndef MAME_ALPHA_ALPHA8201_H
+#define MAME_ALPHA_ALPHA8201_H
 
 #include "cpu/hmcs40/hmcs40.h"
 
@@ -51,4 +51,4 @@ private:
 DECLARE_DEVICE_TYPE(ALPHA_8201, alpha_8201_device)
 
 
-#endif // MAME_MACHINE_ALPHA8201_H
+#endif // MAME_ALPHA_ALPHA8201_H

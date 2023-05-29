@@ -104,26 +104,27 @@ int osd_get_num_processors(bool heavy_mt)
 struct work_thread_info
 {
 	work_thread_info(uint32_t aid, osd_work_queue &aqueue)
-	: queue(aqueue)
-	, handle(nullptr)
-	, wakeevent(true, false)  // manual reset, not signalled
-	, id(aid)
+		: queue(aqueue)
+		, handle(nullptr)
+		, wakeevent(true, false)  // manual reset, not signalled
+		, id(aid)
 #if KEEP_STATISTICS
-	, itemsdone(0)
-	, actruntime(0)
-	, runtime(0)
-	, spintime(0)
-	, waittime(0)
+		, itemsdone(0)
+		, actruntime(0)
+		, runtime(0)
+		, spintime(0)
+		, waittime(0)
 #endif
 	{
 	}
+
 	osd_work_queue &    queue;          // pointer back to the queue
 	std::thread *       handle;         // handle to the thread
 	osd_event           wakeevent;      // wake event for the thread
-	uint32_t              id;
+	uint32_t            id;
 
 #if KEEP_STATISTICS
-	int32_t               itemsdone;
+	int32_t             itemsdone;
 	osd_ticks_t         actruntime;
 	osd_ticks_t         runtime;
 	osd_ticks_t         spintime;
@@ -135,21 +136,21 @@ struct work_thread_info
 struct osd_work_queue
 {
 	osd_work_queue()
-	: list(nullptr)
-	, tailptr(nullptr)
-	, free(nullptr)
-	, items(0)
-	, livethreads(0)
-	, waiting(0)
-	, exiting(0)
-	, threads(0)
-	, flags(0)
-	, doneevent(true, true)     // manual reset, signalled
+		: list(nullptr)
+		, tailptr(nullptr)
+		, free(nullptr)
+		, items(0)
+		, livethreads(0)
+		, waiting(0)
+		, exiting(0)
+		, threads(0)
+		, flags(0)
+		, doneevent(true, true)     // manual reset, signalled
 #if KEEP_STATISTICS
-	, itemsqueued(0)
-	, setevents(0)
-	, extraitems(0)
-	, spinloops(0)
+		, itemsqueued(0)
+		, setevents(0)
+		, extraitems(0)
+		, spinloops(0)
 #endif
 	{
 	}
@@ -179,14 +180,14 @@ struct osd_work_queue
 struct osd_work_item
 {
 	osd_work_item(osd_work_queue &aqueue)
-	: next(nullptr)
-	, queue(aqueue)
-	, callback(nullptr)
-	, param(nullptr)
-	, result(nullptr)
-	, event(nullptr)                // manual reset, not signalled
-	, flags(0)
-	, done(false)
+		: next(nullptr)
+		, queue(aqueue)
+		, callback(nullptr)
+		, param(nullptr)
+		, result(nullptr)
+		, event(nullptr)                // manual reset, not signalled
+		, flags(0)
+		, done(false)
 	{
 	}
 
@@ -196,7 +197,7 @@ struct osd_work_item
 	void *              param;          // callback parameter
 	void *              result;         // callback result
 	osd_event *         event;          // event signalled when complete
-	uint32_t              flags;          // creation flags
+	uint32_t            flags;          // creation flags
 	std::atomic<int32_t>  done;           // is the item done?
 };
 
@@ -211,7 +212,7 @@ int osd_num_processors = 0;
 //============================================================
 
 static int effective_num_processors(bool heavy_mt);
-static void * worker_thread_entry(void *param);
+static void *worker_thread_entry(void *param);
 static void worker_thread_process(osd_work_queue *queue, work_thread_info *thread);
 static bool queue_has_list_items(osd_work_queue *queue);
 

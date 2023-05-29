@@ -1,11 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_MACHINE_NAMCO68_H
-#define MAME_MACHINE_NAMCO68_H
+#ifndef MAME_NAMCO_NAMCO68_H
+#define MAME_NAMCO_NAMCO68_H
 
 #pragma once
 
-#include "machine/bankdev.h"
 #include "cpu/m6502/m3745x.h"
 
 DECLARE_DEVICE_TYPE(NAMCOC68, namcoc68_device)
@@ -96,4 +95,4 @@ private:
 	uint8_t m_player_mux;
 };
 
-#endif // MAME_MACHINE_NAMCO68_H
+#endif // MAME_NAMCO_NAMCO68_H

@@ -15,6 +15,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class vt320_state : public driver_device
 {
 public:
@@ -132,6 +134,9 @@ ROM_START( vt330 )
 	ROM_SYSTEM_BIOS( 0, "vt330", "VT330" )
 	ROMX_LOAD( "23-236e6", 0x0000, 0x8000, CRC(38379339) SHA1(394e8511581abc796c8c612149eff280146b0ac8), ROM_BIOS(0) ) // 27256 EPROM
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

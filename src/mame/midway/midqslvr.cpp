@@ -1,8 +1,34 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/***************************************************************************
+/**************************************************************************************************
 
 Midway Quicksilver II/Graphite skeleton driver
+
+TODO (BIOS):
+- Accesses missing keyboard and RTC areas, needs to fix up Super I/O type;
+- Currently used SMBus device EEPROM is incompatible with the BIOS used here, it expects a 4 to byte [0x02] (= SDRAM), there's no real code path for currently used DDR SDRAM setting.
+Eventually will throw a "SPD device data missing or inconclusive."
+- Several hang points before VGA drawing text, pinpoint them all;
+- Detects a Pentium II at 700 MHz (?)
+
+TODO:
+- Fix HDD BAD_DUMPs ("primary master hard disk fail" in shutms11):
+\- hydro -chs 392,255,63
+\- offrthnd -chs 784,255,63
+  NB: arctthnd just returns a more canonical -chs 16383,16,63,
+  the other two hydrthnd dumps -chs 6256,16,63
+- In pcipc hydrthnd101b/hydrthnd100d draws some basic debug strings thru
+  VGA then throws 6 short beeps "peripheral problem", does extensive checks
+  with COM1 $3f8-$3ff, implying that is failing for Diego I/O.
+- In pcipc/shutms11 arctthnd keeps repeating arpl calls, is the dump ok?
+- In pcipc/shutms11 ultarctc Windows 2000 bootstrap BSoDs with a
+INACCESSIBLE_BOOT_DEVICE;
+- ultarctcup cdrom has several tools inside for debugging the custom HW;
+- It's unclear about how the ultarctcup update really works by reading the
+  notes below: it picks up an Arctic Thunder disk and updates it?
+  On incompatible HW? Investigate once we get there.
+
+===================================================================================================
 
 Hardware configurations:
 
@@ -14,7 +40,8 @@ All of the games communicate with their I/O boards serially.
 
 Quicksilver II hardware:
 - Main CPU: Intel Celeron (Pentium II) 333/366MHz
-- Motherboard: Intel SE440BX-2
+- Motherboard: Intel SE440BX-2 "4S4EB2X0.86A.0017.P10"
+https://theretroweb.com/motherboards/s/intel-se440bx-2-seattle-2
 - RAM: 64MB PC100-222-620 non-ecc
 - Sound: Integrated YMF740G
 - Networking: SMC EZ Card 10 / SMC1208T (probably 10ec:8029 1113:1208)
@@ -243,468 +270,213 @@ Notes:
     U25: 74HC367D Hex Buffer/Line Driver
     Y2: Crystal/XTAL 16.000 MHz
 
-***************************************************************************/
+**************************************************************************************************/
 
 
 #include "emu.h"
-
-#include "pcshare.h"
-
 #include "cpu/i386/i386.h"
-#include "machine/lpci.h"
-#include "machine/pckeybrd.h"
-#include "machine/idectrl.h"
-#include "video/pc_vga.h"
-
+#include "machine/pci.h"
+#include "machine/pci-ide.h"
+#include "machine/pci-smbus.h"
+#include "machine/i82443bx_host.h"
+#include "machine/i82371eb_isa.h"
+#include "machine/i82371eb_ide.h"
+#include "machine/i82371eb_acpi.h"
+#include "machine/i82371eb_usb.h"
+#include "video/virge_pci.h"
+#include "bus/isa/isa_cards.h"
+//#include "bus/rs232/hlemouse.h"
+//#include "bus/rs232/null_modem.h"
+//#include "bus/rs232/rs232.h"
+//#include "bus/rs232/sun_kbd.h"
+//#include "bus/rs232/terminal.h"
+#include "machine/fdc37c93x.h"
+#include "video/voodoo_pci.h"
 
 namespace {
 
-class midqslvr_state : public pcat_base_state
+#define PCI_J4D2_ID "pci:0d.0"
+#define PCI_J4D1_ID "pci:0e.0"
+#define PCI_J4C1_ID "pci:0f.0"
+#define PCI_J4B1_ID "pci:10.0"
+// J4E1
+#define PCI_AGP_ID "pci:01.0:00.0"
+
+class midway_quicksilver2_state : public driver_device
 {
 public:
-	midqslvr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pcat_base_state(mconfig, type, tag)
+	midway_quicksilver2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_voodoo2(*this, PCI_AGP_ID)
 	{
 	}
 
 	void midqslvr(machine_config &config);
-	void graphite(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 private:
-	std::unique_ptr<uint32_t[]> m_bios_ram;
-	std::unique_ptr<uint32_t[]> m_bios_ext1_ram;
-	std::unique_ptr<uint32_t[]> m_bios_ext2_ram;
-	std::unique_ptr<uint32_t[]> m_bios_ext3_ram;
-	std::unique_ptr<uint32_t[]> m_bios_ext4_ram;
-	std::unique_ptr<uint32_t[]> m_isa_ram1;
-	std::unique_ptr<uint32_t[]> m_isa_ram2;
-	uint8_t m_mtxc_config_reg[256];
-	uint8_t m_piix4_config_reg[4][256];
+	required_device<pentium2_device> m_maincpu;
+	// optional for debugging ...
+	optional_device<voodoo_2_pci_device> m_voodoo2;
 
-	void isa_ram1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void isa_ram2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-
-	void bios_ext1_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void bios_ext2_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void bios_ext3_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void bios_ext4_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-
-	void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void intel82439tx_init();
-	void midqslvr_io(address_map &map);
 	void midqslvr_map(address_map &map);
 
-	uint8_t mtxc_config_r(int function, int reg);
-	void mtxc_config_w(int function, int reg, uint8_t data);
-	uint32_t intel82439tx_pci_r(int function, int reg, uint32_t mem_mask);
-	void intel82439tx_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
-	uint8_t piix4_config_r(int function, int reg);
-	void piix4_config_w(int function, int reg, uint8_t data);
-	uint32_t intel82371ab_pci_r(int function, int reg, uint32_t mem_mask);
-	void intel82371ab_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
+	static void superio_config(device_t *device);
+};
+
+class midway_graphite_state : public driver_device
+{
+public:
+	midway_graphite_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
+
+	void graphite(machine_config &config);
+
+private:
+	required_device<pentium3_device> m_maincpu;
+
+	void graphite_map(address_map &map);
 };
 
 
-// Intel 82439TX System Controller (MTXC)
 
-uint8_t midqslvr_state::mtxc_config_r(int function, int reg)
+void midway_quicksilver2_state::midqslvr_map(address_map &map)
 {
-//  osd_printf_debug("MTXC: read %d, %02X\n", function, reg);
-
-	if((reg & 0xfc) == 0 && function == 0) // return vendor ID
-		return (0x71008086 >> (reg & 3)*8) & 0xff;
-
-	return m_mtxc_config_reg[reg];
+	map.unmap_value_high();
 }
 
-void midqslvr_state::mtxc_config_w(int function, int reg, uint8_t data)
+static void isa_internal_devices(device_slot_interface &device)
 {
-	printf("MTXC: write %d, %02X, %02X\n",  function, reg, data);
-
-	/*
-	memory banking with North Bridge:
-	0x59 (PAM0) xxxx ---- BIOS area 0xf0000-0xfffff
-	            ---- xxxx Reserved
-	0x5a (PAM1) xxxx ---- ISA add-on BIOS 0xc4000 - 0xc7fff
-	            ---- xxxx ISA add-on BIOS 0xc0000 - 0xc3fff
-	0x5b (PAM2) xxxx ---- ISA add-on BIOS 0xcc000 - 0xcffff
-	            ---- xxxx ISA add-on BIOS 0xc8000 - 0xcbfff
-	0x5c (PAM3) xxxx ---- ISA add-on BIOS 0xd4000 - 0xd7fff
-	            ---- xxxx ISA add-on BIOS 0xd0000 - 0xd3fff
-	0x5d (PAM4) xxxx ---- ISA add-on BIOS 0xdc000 - 0xdffff
-	            ---- xxxx ISA add-on BIOS 0xd8000 - 0xdbfff
-	0x5e (PAM5) xxxx ---- BIOS extension 0xe4000 - 0xe7fff
-	            ---- xxxx BIOS extension 0xe0000 - 0xe3fff
-	0x5f (PAM6) xxxx ---- BIOS extension 0xec000 - 0xeffff
-	            ---- xxxx BIOS extension 0xe8000 - 0xebfff
-
-	3210 -> 3 = reserved, 2 = Cache Enable, 1 = Write Enable, 0 = Read Enable
-	*/
-
-	switch(reg)
-	{
-		case 0x59: // PAM0
-		{
-			if (data & 0x10)        // enable RAM access to region 0xf0000 - 0xfffff
-				membank("bios_bank")->set_base(m_bios_ram.get());
-			else                    // disable RAM access (reads go to BIOS ROM)
-				membank("bios_bank")->set_base(memregion("bios")->base() + 0x70000);
-			break;
-		}
-		case 0x5a: // PAM1
-		{
-			if (data & 0x1)
-				membank("video_bank1")->set_base(m_isa_ram1.get());
-			else
-				membank("video_bank1")->set_base(memregion("video_bios")->base() + 0);
-
-			if (data & 0x10)
-				membank("video_bank2")->set_base(m_isa_ram2.get());
-			else
-				membank("video_bank2")->set_base(memregion("video_bios")->base() + 0x4000);
-
-			break;
-		}
-		case 0x5e: // PAM5
-		{
-			if (data & 0x1)
-				membank("bios_ext1")->set_base(m_bios_ext1_ram.get());
-			else
-				membank("bios_ext1")->set_base(memregion("bios")->base() + 0x60000);
-
-			if (data & 0x10)
-				membank("bios_ext2")->set_base(m_bios_ext2_ram.get());
-			else
-				membank("bios_ext2")->set_base(memregion("bios")->base() + 0x64000);
-
-			break;
-		}
-		case 0x5f: // PAM6
-		{
-			if (data & 0x1)
-				membank("bios_ext3")->set_base(m_bios_ext3_ram.get());
-			else
-				membank("bios_ext3")->set_base(memregion("bios")->base() + 0x68000);
-
-			if (data & 0x10)
-				membank("bios_ext4")->set_base(m_bios_ext4_ram.get());
-			else
-				membank("bios_ext4")->set_base(memregion("bios")->base() + 0x6c000);
-
-			break;
-		}
-	}
-
-	m_mtxc_config_reg[reg] = data;
+	device.option_add("fdc37m707", FDC37M707);
 }
 
-void midqslvr_state::intel82439tx_init()
+void midway_quicksilver2_state::superio_config(device_t *device)
 {
-	m_mtxc_config_reg[0x60] = 0x02;
-	m_mtxc_config_reg[0x61] = 0x02;
-	m_mtxc_config_reg[0x62] = 0x02;
-	m_mtxc_config_reg[0x63] = 0x02;
-	m_mtxc_config_reg[0x64] = 0x02;
-	m_mtxc_config_reg[0x65] = 0x02;
+	fdc37m707_device &fdc = *downcast<fdc37m707_device *>(device);
+	fdc.set_sysopt_pin(0);
+	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
+	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
+	fdc.irq1().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
+	fdc.irq8().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
+#if 0
+	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
+	fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
+#endif
 }
 
-uint32_t midqslvr_state::intel82439tx_pci_r(int function, int reg, uint32_t mem_mask)
+void midway_quicksilver2_state::midqslvr(machine_config &config)
 {
-	uint32_t r = 0;
-	if (ACCESSING_BITS_24_31)
-	{
-		r |= mtxc_config_r(function, reg + 3) << 24;
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		r |= mtxc_config_r(function, reg + 2) << 16;
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		r |= mtxc_config_r(function, reg + 1) << 8;
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		r |= mtxc_config_r(function, reg + 0) << 0;
-	}
-	return r;
+	PENTIUM2(config, m_maincpu, 100'000'000); // Celeron, downclocked for debugging
+	m_maincpu->set_addrmap(AS_PROGRAM, &midway_quicksilver2_state::midqslvr_map);
+	//m_maincpu->set_addrmap(AS_IO, &midway_quicksilver2_state::midqslvr_io);
+	m_maincpu->set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
+	m_maincpu->smiact().set("pci:00.0", FUNC(i82443bx_host_device::smi_act_w));
+
+	PCI_ROOT(config, "pci", 0);
+	I82443BX_HOST(config, "pci:00.0", 0, "maincpu", 64*1024*1024);
+	I82443BX_BRIDGE(config, "pci:01.0", 0 ); //"pci:01.0:00.0");
+	//I82443BX_AGP   (config, "pci:01.0:00.0");
+
+	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, m_maincpu));
+	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
+	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
+
+	i82371eb_ide_device &ide(I82371EB_IDE(config, "pci:07.1", 0, m_maincpu));
+	ide.irq_pri().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq14_w));
+	ide.irq_sec().set("pci:07.0", FUNC(i82371eb_isa_device::pc_mirq0_w));
+
+	I82371EB_USB (config, "pci:07.2", 0);
+	I82371EB_ACPI(config, "pci:07.3", 0);
+	LPC_ACPI     (config, "pci:07.3:acpi", 0);
+	SMBUS        (config, "pci:07.3:smbus", 0);
+
+	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37m707", true).set_option_machine_config("fdc37m707", superio_config);
+	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+
+	// YMF740G goes thru "pci:0c.0"
+	// Expansion slots, mapping SVGA for debugging
+	// TODO: all untested, check clock
+	// TODO: confirm Voodoo going in AGP slot
+	#if 1
+	VOODOO_2_PCI(config, m_voodoo2, 0, m_maincpu, "screen"); // "pci:0d.0" J4D2
+	m_voodoo2->set_fbmem(2);
+	m_voodoo2->set_tmumem(4, 4);
+	m_voodoo2->set_status_cycles(1000);
+
+	// TODO: fix legacy raw setup here
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57);
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640 - 1, 0, 480 - 1);
+	screen.set_screen_update(PCI_AGP_ID, FUNC(voodoo_2_pci_device::screen_update));
+	#endif
+	// "pci:0d.0" J4D2
+	// "pci:0e.0" J4D1
+	VIRGE_PCI(config, "pci:0e.0", 0); // J4C1
 }
 
-void midqslvr_state::intel82439tx_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
-{
-	if (ACCESSING_BITS_24_31)
-	{
-		mtxc_config_w(function, reg + 3, (data >> 24) & 0xff);
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		mtxc_config_w(function, reg + 2, (data >> 16) & 0xff);
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		mtxc_config_w(function, reg + 1, (data >> 8) & 0xff);
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		mtxc_config_w(function, reg + 0, (data >> 0) & 0xff);
-	}
-}
+// Graphite runs on incompatible HW, consider splitting if things starts to get hairy ...
 
-// Intel 82371AB PCI-to-ISA / IDE bridge (PIIX4)
-
-uint8_t midqslvr_state::piix4_config_r(int function, int reg)
-{
-	function &= 3;
-
-	if((reg & 0xfc) == 0) // return vendor ID
-		return (((0x71108086 | (function & 3) << 16) >> (reg & 3)*8) & 0xff);
-
-	if(reg == 0xe)
-	{
-		const uint8_t header_type_val[4] = { 0x80, 0x00, 0x00, 0x00 };
-		return header_type_val[function];
-	}
-
-	if((reg & 0xfc) == 0x8)
-	{
-		/* TODO: reg 8 indicates Revision ID */
-		const uint32_t class_code_val[4] = { 0x06010000, 0x01018000, 0x0c030000, 0x06800000 };
-
-		return (((class_code_val[function]) >> (reg & 3)*8) & 0xff);
-	}
-
-	printf("%08x PIIX4: read %d, %02X\n", m_maincpu->pc(), function, reg);
-
-	return m_piix4_config_reg[function][reg];
-}
-
-void midqslvr_state::piix4_config_w(int function, int reg, uint8_t data)
-{
-	printf("PIIX4: write %d, %02X, %02X\n", function, reg, data);
-
-	function &= 3;
-
-	m_piix4_config_reg[function][reg] = data;
-}
-
-uint32_t midqslvr_state::intel82371ab_pci_r(int function, int reg, uint32_t mem_mask)
-{
-	uint32_t r = 0;
-	if (ACCESSING_BITS_24_31)
-	{
-		r |= piix4_config_r(function, reg + 3) << 24;
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		r |= piix4_config_r(function, reg + 2) << 16;
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		r |= piix4_config_r(function, reg + 1) << 8;
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		r |= piix4_config_r(function, reg + 0) << 0;
-	}
-	return r;
-}
-
-void midqslvr_state::intel82371ab_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
-{
-	if (ACCESSING_BITS_24_31)
-	{
-		piix4_config_w(function, reg + 3, (data >> 24) & 0xff);
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		piix4_config_w(function, reg + 2, (data >> 16) & 0xff);
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		piix4_config_w(function, reg + 1, (data >> 8) & 0xff);
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		piix4_config_w(function, reg + 0, (data >> 0) & 0xff);
-	}
-}
-
-
-void midqslvr_state::isa_ram1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if (m_mtxc_config_reg[0x5a] & 0x2)      // write to RAM if this region is write-enabled
-	{
-		COMBINE_DATA(m_isa_ram1.get() + offset);
-	}
-}
-
-void midqslvr_state::isa_ram2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if (m_mtxc_config_reg[0x5a] & 0x2)      // write to RAM if this region is write-enabled
-	{
-		COMBINE_DATA(m_isa_ram2.get() + offset);
-	}
-}
-
-void midqslvr_state::bios_ext1_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if (m_mtxc_config_reg[0x5e] & 0x2)      // write to RAM if this region is write-enabled
-	{
-		COMBINE_DATA(m_bios_ext1_ram.get() + offset);
-	}
-}
-
-
-void midqslvr_state::bios_ext2_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if (m_mtxc_config_reg[0x5e] & 0x20)     // write to RAM if this region is write-enabled
-	{
-		COMBINE_DATA(m_bios_ext2_ram.get() + offset);
-	}
-}
-
-
-void midqslvr_state::bios_ext3_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if (m_mtxc_config_reg[0x5f] & 0x2)      // write to RAM if this region is write-enabled
-	{
-		COMBINE_DATA(m_bios_ext3_ram.get() + offset);
-	}
-}
-
-
-void midqslvr_state::bios_ext4_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if (m_mtxc_config_reg[0x5f] & 0x20)     // write to RAM if this region is write-enabled
-	{
-		COMBINE_DATA(m_bios_ext4_ram.get() + offset);
-	}
-}
-
-
-void midqslvr_state::bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if (m_mtxc_config_reg[0x59] & 0x20)     // write to RAM if this region is write-enabled
-	{
-		COMBINE_DATA(m_bios_ram.get() + offset);
-	}
-}
-
-void midqslvr_state::midqslvr_map(address_map &map)
+void midway_graphite_state::graphite_map(address_map &map)
 {
 	map(0x00000000, 0x0009ffff).ram();
-	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
-	map(0x000c0000, 0x000c3fff).bankr("video_bank1").w(FUNC(midqslvr_state::isa_ram1_w));
-	map(0x000c4000, 0x000c7fff).bankr("video_bank2").w(FUNC(midqslvr_state::isa_ram2_w));
-	map(0x000e0000, 0x000e3fff).bankr("bios_ext1").w(FUNC(midqslvr_state::bios_ext1_ram_w));
-	map(0x000e4000, 0x000e7fff).bankr("bios_ext2").w(FUNC(midqslvr_state::bios_ext2_ram_w));
-	map(0x000e8000, 0x000ebfff).bankr("bios_ext3").w(FUNC(midqslvr_state::bios_ext3_ram_w));
-	map(0x000ec000, 0x000effff).bankr("bios_ext4").w(FUNC(midqslvr_state::bios_ext4_ram_w));
-	map(0x000f0000, 0x000fffff).bankr("bios_bank").w(FUNC(midqslvr_state::bios_ram_w));
-	map(0x00100000, 0x01ffffff).ram();
-	map(0xfff80000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
+//  map(0x000a0000, 0x000bffff).ram();
+	map(0x000e0000, 0x000fffff).rom().region("bios", 0x20000);
+	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);
 }
 
-void midqslvr_state::midqslvr_io(address_map &map)
+void midway_graphite_state::graphite(machine_config &config)
 {
-	pcat32_io_common(map);
-	map(0x00e8, 0x00ef).noprw();
+	PENTIUM3(config, m_maincpu, 100'000'000); // downclocked for debugging
+	m_maincpu->set_addrmap(AS_PROGRAM, &midway_graphite_state::graphite_map);
 
-	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_device::cs0_r), FUNC(ide_controller_device::cs0_w));
-	map(0x03b0, 0x03bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
-	map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
-	map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
-	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_device::cs1_r), FUNC(ide_controller_device::cs1_w));
-
-	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
-}
-
-void midqslvr_state::machine_start()
-{
-	m_bios_ram = std::make_unique<uint32_t[]>(0x10000/4);
-	m_bios_ext1_ram = std::make_unique<uint32_t[]>(0x4000/4);
-	m_bios_ext2_ram = std::make_unique<uint32_t[]>(0x4000/4);
-	m_bios_ext3_ram = std::make_unique<uint32_t[]>(0x4000/4);
-	m_bios_ext4_ram = std::make_unique<uint32_t[]>(0x4000/4);
-	m_isa_ram1 = std::make_unique<uint32_t[]>(0x4000/4);
-	m_isa_ram2 = std::make_unique<uint32_t[]>(0x4000/4);
-	intel82439tx_init();
-
-}
-
-void midqslvr_state::machine_reset()
-{
-	membank("bios_bank")->set_base(memregion("bios")->base() + 0x70000);
-	membank("bios_ext1")->set_base(memregion("bios")->base() + 0x60000);
-	membank("bios_ext2")->set_base(memregion("bios")->base() + 0x64000);
-	membank("bios_ext3")->set_base(memregion("bios")->base() + 0x68000);
-	membank("bios_ext4")->set_base(memregion("bios")->base() + 0x6c000);
-	membank("video_bank1")->set_base(memregion("video_bios")->base() + 0);
-	membank("video_bank2")->set_base(memregion("video_bios")->base() + 0x4000);
-}
-
-void midqslvr_state::midqslvr(machine_config &config)
-{
-	PENTIUM2(config, m_maincpu, 333000000); //Verified this Celeron to be Pentium II based.
-	m_maincpu->set_addrmap(AS_PROGRAM, &midqslvr_state::midqslvr_map);
-	m_maincpu->set_addrmap(AS_IO, &midqslvr_state::midqslvr_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
-
-	pcat_common(config);
-
-	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
-	pcibus.set_device( 0, FUNC(midqslvr_state::intel82439tx_pci_r), FUNC(midqslvr_state::intel82439tx_pci_w));
-	pcibus.set_device(31, FUNC(midqslvr_state::intel82371ab_pci_r), FUNC(midqslvr_state::intel82371ab_pci_w));
-
-	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
-	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
-
-	/* video hardware */
-	pcvideo_vga(config);
-}
-
-void midqslvr_state::graphite(machine_config &config) //Todo: The entire Pro133A chipset :).
-{
-	PENTIUM3(config, m_maincpu, 733000000); //Verified
-	m_maincpu->set_addrmap(AS_PROGRAM, &midqslvr_state::midqslvr_map);
-	m_maincpu->set_addrmap(AS_IO, &midqslvr_state::midqslvr_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
-
-	pcat_common(config);
-
-	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
-	pcibus.set_device( 0, FUNC(midqslvr_state::intel82439tx_pci_r), FUNC(midqslvr_state::intel82439tx_pci_w));
-	pcibus.set_device(31, FUNC(midqslvr_state::intel82371ab_pci_r), FUNC(midqslvr_state::intel82371ab_pci_w));
-
-	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
-	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
-
-	/* video hardware */
-	pcvideo_vga(config);
+	PCI_ROOT(config, "pci", 0);
+	// ...
 }
 
 
 ROM_START( hydrthnd )
-	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_REGION32_LE(0x80000, "pci:07.0", 0)
 	ROM_LOAD( "lh28f004sct.u8b1", 0x000000, 0x080000, CRC(ab04a343) SHA1(ba77933400fe470f45ab187bc0d315922caadb12) )
-
-	ROM_REGION( 0x8000, "video_bios", ROMREGION_ERASEFF ) // TODO: Voodoo 2 has no bios, to be removed once the driver is updated not to look for this region
-//  ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
-//  ROM_CONTINUE(                                 0x0001, 0x4000 )
 
 	ROM_REGION( 0x2000, "iocpu", 0 )   /* Diego board CY7C63513 MCU code */
 	ROM_LOAD( "diego.u8", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
 
-	DISK_REGION( "ide:0:hdd:image" )
-	DISK_IMAGE( "hydro", 0,  SHA1(d481d178782943c066b41764628a419cd55f676d) )
+	DISK_REGION( "pci:07.1:ide1:0:hdd" )
+	DISK_IMAGE( "hydro", 0,  BAD_DUMP SHA1(d481d178782943c066b41764628a419cd55f676d) )
+ROM_END
+
+ROM_START( hydrthnd101b )
+	ROM_REGION32_LE(0x80000, "pci:07.0", 0)
+	ROM_LOAD( "lh28f004sct.u8b1", 0x000000, 0x080000, CRC(ab04a343) SHA1(ba77933400fe470f45ab187bc0d315922caadb12) )
+
+	ROM_REGION( 0x2000, "iocpu", 0 )   /* Diego board CY7C63513 MCU code */
+	ROM_LOAD( "diego.u8", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
+
+	DISK_REGION( "pci:07.1:ide1:0:hdd" )
+	DISK_IMAGE( "hydro_101b", 0,  SHA1(182a7966c40676031c92dbfbd1b8e594a505a930) )
+ROM_END
+
+ROM_START( hydrthnd100d )
+	ROM_REGION32_LE(0x80000, "pci:07.0", 0)
+	ROM_LOAD( "lh28f004sct.u8b1", 0x000000, 0x080000, CRC(ab04a343) SHA1(ba77933400fe470f45ab187bc0d315922caadb12) )
+
+	ROM_REGION( 0x2000, "iocpu", 0 )   /* Diego board CY7C63513 MCU code */
+	ROM_LOAD( "diego.u8", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
+
+	DISK_REGION( "pci:07.1:ide1:0:hdd" )
+	DISK_IMAGE( "hydro_100d", 0,  SHA1(5462f7197b3c510b791093e938a614e706aaed4a) )
 ROM_END
 
 ROM_START( offrthnd )
-	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_REGION32_LE(0x80000, "pci:07.0", 0)
 	ROM_LOAD( "lh28f004sct.u8b1", 0x000000, 0x080000, CRC(ab04a343) SHA1(ba77933400fe470f45ab187bc0d315922caadb12) )
 
 	ROM_REGION( 0x8000, "video_bios", ROMREGION_ERASEFF ) // TODO: Voodoo 2 has no bios, to be removed once the driver is updated not to look for this region
@@ -714,13 +486,13 @@ ROM_START( offrthnd )
 	ROM_REGION( 0x2000, "iocpu", 0 )   /* Magicbus board CY7C63513 MCU code */
 	ROM_LOAD( "magicbus.u18", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
 
-	DISK_REGION( "ide:0:hdd:image" )
-	DISK_IMAGE( "offrthnd", 0, SHA1(d88f1c5b75361a1e310565a8a5a09c674a4a1a22) )
+	DISK_REGION( "pci:07.1:ide1:0:hdd" )
+	DISK_IMAGE( "offrthnd", 0, BAD_DUMP SHA1(d88f1c5b75361a1e310565a8a5a09c674a4a1a22) )
 ROM_END
 
 ROM_START( arctthnd )
-	ROM_REGION32_LE(0x80000, "bios", ROMREGION_ERASEFF)
-	ROM_LOAD( "m29f002bt.u6", 0x040000, 0x040000, CRC(012c9290) SHA1(cdee6f19d5e5ea5bb1dd6a5ec397ac70b3452790) )
+	ROM_REGION32_LE(0x40000, "bios", ROMREGION_ERASEFF)
+	ROM_LOAD( "m29f002bt.u6", 0x000000, 0x040000, CRC(012c9290) SHA1(cdee6f19d5e5ea5bb1dd6a5ec397ac70b3452790) )
 
 	ROM_REGION( 0x8000, "video_bios", ROMREGION_ERASEFF ) // TODO: Voodoo 2 has no bios, to be removed once the driver is updated not to look for this region
 //  ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
@@ -729,13 +501,13 @@ ROM_START( arctthnd )
 	ROM_REGION( 0x2000, "iocpu", 0 )   /* Substitute board 87C552 MCU code */
 	ROM_LOAD( "87c552.bin", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "pci:07.1:ide1:0:hdd" )
 	DISK_IMAGE( "arctthnd", 0,  SHA1(f4373e57c3f453ac09c735b5d8d99ff811416a23) )
 ROM_END
 
 ROM_START( ultarctc )
-	ROM_REGION32_LE(0x80000, "bios", ROMREGION_ERASEFF)
-	ROM_LOAD( "m29f002bt.u6", 0x040000, 0x040000, CRC(012c9290) SHA1(cdee6f19d5e5ea5bb1dd6a5ec397ac70b3452790) )
+	ROM_REGION32_LE(0x40000, "bios", ROMREGION_ERASEFF)
+	ROM_LOAD( "m29f002bt.u6", 0x000000, 0x040000, CRC(012c9290) SHA1(cdee6f19d5e5ea5bb1dd6a5ec397ac70b3452790) )
 
 	ROM_REGION( 0x8000, "video_bios", ROMREGION_ERASEFF ) // TODO: Voodoo 2 has no bios, to be removed once the driver is updated not to look for this region
 //  ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
@@ -744,7 +516,7 @@ ROM_START( ultarctc )
 	ROM_REGION( 0x2000, "iocpu", 0 )   /* Substitute board 87C552 MCU code */
 	ROM_LOAD( "87c552.bin", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "pci:07.1:ide1:0:hdd" )
 	DISK_IMAGE( "uarctict", 0, SHA1(8557a1d7ae8dc41c879350cb1c228f4c27a0dd09) )
 ROM_END
 
@@ -752,8 +524,8 @@ ROM_END
 Ultimate Arctic Thunder requires a dongle to work. If the dongle isn't detected both during and after installation,
 the game will revert back to normal Arctic Thunder. */
 ROM_START( ultarctcup )
-	ROM_REGION32_LE(0x80000, "bios", ROMREGION_ERASEFF)
-	ROM_LOAD( "m29f002bt.u6", 0x040000, 0x040000, CRC(012c9290) SHA1(cdee6f19d5e5ea5bb1dd6a5ec397ac70b3452790) )
+	ROM_REGION32_LE(0x40000, "bios", ROMREGION_ERASEFF)
+	ROM_LOAD( "m29f002bt.u6", 0x000000, 0x040000, CRC(012c9290) SHA1(cdee6f19d5e5ea5bb1dd6a5ec397ac70b3452790) )
 
 	ROM_REGION( 0x8000, "video_bios", ROMREGION_ERASEFF ) // TODO: Voodoo 2 has no bios, to be removed once the driver is updated not to look for this region
 //  ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
@@ -762,11 +534,12 @@ ROM_START( ultarctcup )
 	ROM_REGION( 0x2000, "iocpu", 0 )   /* Substitute board 87C552 MCU code */
 	ROM_LOAD( "87c552.bin", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "pci:07.1:ide1:0:hdd" )
 	DISK_IMAGE( "uarctict", 0, SHA1(8557a1d7ae8dc41c879350cb1c228f4c27a0dd09) )
 
+	// TODO: eventually needs mountable option
 	DISK_REGION( "cd" )
-	DISK_IMAGE( "040503_1309", 0, SHA1(453adb81e204b0580ad02c2d98f68525757ec2a1) )
+	DISK_IMAGE_READONLY( "040503_1309", 0, SHA1(453adb81e204b0580ad02c2d98f68525757ec2a1) )
 // sourced from these
 //    ROM_LOAD( "040503_1309.CUE", 0x0000, 0x000004d, CRC(4a9e2de5) SHA1(04d3d90ad4b235c0ac4606557e16a1410d018fa9) )
 //    ROM_LOAD( "040503_1309.BIN", 0x0000, 0x6bd9960, CRC(48a63422) SHA1(9d1cacf07526c5bddf4205c667a9010802f74859) )
@@ -777,11 +550,13 @@ ROM_END
 
 
 // there are almost certainly multiple versions of these; updates were offered on floppy disk.  The version numbers for the existing CHDs are unknown.
-GAME(1999, hydrthnd,    0,        midqslvr, 0, midqslvr_state, empty_init, ROT0, "Midway Games", "Hydro Thunder", MACHINE_IS_SKELETON)
+GAME(1999, hydrthnd,    0,        midqslvr, 0, midway_quicksilver2_state, empty_init, ROT0, "Midway Games", "Hydro Thunder", MACHINE_IS_SKELETON)
+GAME(1999, hydrthnd101b,hydrthnd, midqslvr, 0, midway_quicksilver2_state, empty_init, ROT0, "Midway Games", "Hydro Thunder (v1.01b)", MACHINE_IS_SKELETON)
+GAME(1999, hydrthnd100d,hydrthnd, midqslvr, 0, midway_quicksilver2_state, empty_init, ROT0, "Midway Games", "Hydro Thunder (v1.00d)", MACHINE_IS_SKELETON)
 
-GAME(2000, offrthnd,    0,        midqslvr, 0, midqslvr_state, empty_init, ROT0, "Midway Games", "Offroad Thunder", MACHINE_IS_SKELETON)
+GAME(2000, offrthnd,    0,        midqslvr, 0, midway_quicksilver2_state, empty_init, ROT0, "Midway Games", "Offroad Thunder", MACHINE_IS_SKELETON)
 
-GAME(2001, arctthnd,    0,        graphite, 0, midqslvr_state, empty_init, ROT0, "Midway Games", "Arctic Thunder (v1.002)", MACHINE_IS_SKELETON)
+GAME(2001, arctthnd,    0,        graphite, 0, midway_graphite_state, empty_init, ROT0, "Midway Games", "Arctic Thunder (v1.002)", MACHINE_IS_SKELETON)
 
-GAME(2001, ultarctc,    0,        graphite, 0, midqslvr_state, empty_init, ROT0, "Midway Games", "Ultimate Arctic Thunder", MACHINE_IS_SKELETON)
-GAME(2004, ultarctcup,  ultarctc, graphite, 0, midqslvr_state, empty_init, ROT0, "Midway Games", "Ultimate Arctic Thunder Update CD ver 1.950 (5/3/04)", MACHINE_IS_SKELETON)
+GAME(2001, ultarctc,    0,        graphite, 0, midway_graphite_state, empty_init, ROT0, "Midway Games", "Ultimate Arctic Thunder", MACHINE_IS_SKELETON)
+GAME(2004, ultarctcup,  ultarctc, graphite, 0, midway_graphite_state, empty_init, ROT0, "Midway Games", "Ultimate Arctic Thunder Update CD ver 1.950 (5/3/04)", MACHINE_IS_SKELETON)

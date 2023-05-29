@@ -114,7 +114,19 @@ private:
 
 	u8 timer_r(offs_t offset);
 	void timer_w(offs_t offset, u8 data);
+	void step_motor(int which);
 	template <int N> TIMER_CALLBACK_MEMBER(timer_interrupt);
+	u8 step_counter_r(offs_t offset);
+	void step_counter_w(offs_t offset, u8 data);
+	u8 phase_counter_r();
+	void phase_counter_w(u8 data);
+	u8 smcon_r(offs_t offset);
+	void smcon_w(offs_t offset, u8 data);
+	TIMER_CALLBACK_MEMBER(timer_x_interrupt);
+	u16 get_timer_x() const;
+	void set_timer_x(u16 count);
+	u8 timer_x_r(offs_t offset);
+	void timer_x_w(offs_t offset, u8 data);
 
 	void internal_map(address_map &map);
 
@@ -127,6 +139,7 @@ private:
 
 	emu_timer *m_ad_timer;
 	emu_timer *m_timer[3];
+	emu_timer *m_timer_x;
 
 	u8 m_port_latch[4];
 	u8 m_port_direction[4];
@@ -137,6 +150,11 @@ private:
 	u8 m_ad_register;
 	u8 m_prescaler_reload[3];
 	u8 m_timer_reload[3];
+	u8 m_step_counter[2];
+	u8 m_phase_counter;
+	u8 m_smcon[2];
+	u16 m_tx_count;
+	u16 m_tx_reload;
 	u8 m_interrupt_control[3];
 };
 

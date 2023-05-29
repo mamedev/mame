@@ -21,6 +21,9 @@ not sure what the actual inputs / outputs would be on this, maybe just track pos
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 
+
+namespace {
+
 class ice_tbd_state : public driver_device
 {
 public:
@@ -84,6 +87,8 @@ ROM_START( ice_tbd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "turbo-dr.ive", 0x0000, 0x4000, CRC(d7c79ac4) SHA1(a01d93411e604e36a3ced58063f2ab81e431b82a) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1988, ice_tbd, 0, ice_tbd, ice_tbd, ice_tbd_state, empty_init, ROT0, "Innovative Creations in Entertainment", "Turbo Drive (ICE)", MACHINE_IS_SKELETON_MECHANICAL )

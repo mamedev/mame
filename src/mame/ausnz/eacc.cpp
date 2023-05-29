@@ -56,6 +56,8 @@
 #include "machine/nvram.h"
 
 
+namespace {
+
 class eacc_state : public driver_device
 {
 public:
@@ -292,6 +294,8 @@ ROM_START(eacc)
 	ROM_REGION(0x0800, "maincpu", 0)
 	ROM_LOAD("eacc.bin", 0x0000, 0x0800, CRC(287a63c0) SHA1(f61b397d33ea40e5742e34d5f5468572125e8b39) )
 ROM_END
+
+} // anonymous namespace
 
 
 /******************************************************************************

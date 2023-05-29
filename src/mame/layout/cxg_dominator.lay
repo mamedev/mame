@@ -528,9 +528,24 @@ license:CC0-1.0
 		<disk state="0"><color red="0.41" green="0.43" blue="0.4" /></disk>
 		<disk state="1"><color red="0.31" green="0.32" blue="0.3" /></disk>
 	</element>
+
 	<element name="butgr" defstate="0">
-		<rect state="0"><color red="0.41" green="0.43" blue="0.4" /></rect>
-		<rect state="1"><color red="0.31" green="0.32" blue="0.3" /></rect>
+		<rect state="0">
+			<bounds x="0" y="0" width="1" height="2" />
+			<color red="0.41" green="0.43" blue="0.4" />
+		</rect>
+		<rect state="1">
+			<bounds x="0" y="0" width="1" height="2" />
+			<color red="0.31" green="0.32" blue="0.3" />
+		</rect>
+		<disk state="0">
+			<bounds x="0" y="0" width="2" height="2" />
+			<color red="0.41" green="0.43" blue="0.4" />
+		</disk>
+		<disk state="1">
+			<bounds x="0" y="0" width="2" height="2" />
+			<color red="0.31" green="0.32" blue="0.3" />
+		</disk>
 	</element>
 
 	<element name="text_l1a"><text string="NEW" align="2"><color red="1" green="1" blue="1" /></text></element>
@@ -582,7 +597,7 @@ license:CC0-1.0
 		<element ref="text_r3"><bounds x="95.5" y="69.0" width="17" height="1.6" /></element>
 		<element ref="text_r4"><bounds x="95.5" y="73.5" width="17" height="1.6" /></element>
 
-		<element ref="text_r5"><bounds x="95.5" y="82.1" width="13.4" height="1.6" /></element>
+		<element ref="text_r5"><bounds x="95.5" y="82.1" width="13" height="1.6" /></element>
 		<element ref="text_r6"><bounds x="109.7" y="82.1" width="5" height="1.6" /></element>
 
 		<element ref="text_r7"><bounds x="95.5" y="86.85" width="9.4" height="1.6" /></element>
@@ -624,14 +639,10 @@ license:CC0-1.0
 		<element ref="butgd" inputtag="IN.1" inputmask="0x20"><bounds x="113" y="64.0" width="3" height="3" /></element>
 		<element ref="butgd" inputtag="IN.1" inputmask="0x10"><bounds x="113" y="68.5" width="3" height="3" /></element>
 
-		<element ref="butgd" inputtag="IN.1" inputmask="0x80"><bounds x="107.5" y="30.5" width="3" height="3" /></element>
-		<element ref="butgr" inputtag="IN.1" inputmask="0x80"><bounds x="107.5" y="32.0" width="3" height="1.5" /></element>
-		<element ref="butgd" inputtag="IN.1" inputmask="0x01"><bounds x="113" y="73.0" width="3" height="3" /></element>
-		<element ref="butgr" inputtag="IN.1" inputmask="0x01"><bounds x="113" y="73.0" width="1.5" height="3" /></element>
-		<element ref="butgd" inputtag="IN.0" inputmask="0x02"><bounds x="105.3" y="79" width="3" height="3" /></element>
-		<element ref="butgr" inputtag="IN.0" inputmask="0x02"><bounds x="106.8" y="79" width="1.5" height="3" /></element>
-		<element ref="butgd" inputtag="IN.0" inputmask="0x01"><bounds x="109.7" y="79" width="3" height="3" /></element>
-		<element ref="butgr" inputtag="IN.0" inputmask="0x01"><bounds x="109.7" y="79" width="1.5" height="3" /></element>
+		<element ref="butgr" inputtag="IN.1" inputmask="0x80"><bounds x="107.5" y="30.5" width="3" height="3" /><orientation rotate="270" /></element>
+		<element ref="butgr" inputtag="IN.1" inputmask="0x01"><bounds x="113" y="73.0" width="3" height="3" /></element>
+		<element ref="butgr" inputtag="IN.0" inputmask="0x02"><bounds x="105.3" y="79" width="3" height="3" /><orientation rotate="180" /></element>
+		<element ref="butgr" inputtag="IN.0" inputmask="0x01"><bounds x="109.7" y="79" width="3" height="3" /></element>
 
 		<element ref="white"><bounds x="95" y="2.5" width="22.5" height="32.25" /><color alpha="0.08" /></element>
 	</group>

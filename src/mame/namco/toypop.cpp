@@ -38,6 +38,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 #define MASTER_CLOCK XTAL(6'144'000)
 
 class namcos16_state : public driver_device
@@ -805,6 +807,9 @@ ROM_START( toypop )
 	ROM_REGION( 0x0100, "namco", 0 )
 	ROM_LOAD( "tp1-6.3d", 0x0000, 0x0100, CRC(16a9166a) SHA1(847cbaf7c88616576c410177e066ae1d792ac0ba) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1983, liblrabl, 0,     liblrabl, liblrabl, namcos16_state, empty_init, ROT0,   "Namco", "Libble Rabble", 0 )
 GAME( 1986, toypop,   0,     toypop,   toypop,   namcos16_state, empty_init, ROT180, "Namco", "Toypop",        0 )

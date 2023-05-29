@@ -18,6 +18,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class tek4107a_state : public driver_device
 {
 public:
@@ -370,6 +372,9 @@ ROM_START( tek4109a )
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "160-3087 v1.0.u855", 0x0000, 0x1000, CRC(97479528) SHA1(e9e15f1f64b3b6bd139accd51950bae71fdc2193) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* System Drivers */
 

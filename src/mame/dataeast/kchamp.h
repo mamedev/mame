@@ -5,8 +5,8 @@
     Karate Champ
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_KCHAMP_H
-#define MAME_INCLUDES_KCHAMP_H
+#ifndef MAME_DATAEAST_KCHAMP_H
+#define MAME_DATAEAST_KCHAMP_H
 
 #pragma once
 
@@ -104,4 +104,4 @@ private:
 	void kchampvs_sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_KCHAMP_H
+#endif // MAME_DATAEAST_KCHAMP_H

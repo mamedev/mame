@@ -33,5 +33,5 @@ void main()
   sum +=sample_screen(v_texCoord+vec2(-7.0*onex,0.0))*vec3_splat(v_lpcoeffs2.w);
   sum +=sample_screen(v_texCoord+vec2( 7.0*onex,0.0))*vec3_splat(v_lpcoeffs2.w);
 
-  gl_FragColor = vec4( sum, 1.0 );
+  gl_FragColor = vec4( sum, texture2D(s_screen, v_texCoord).a );
 }

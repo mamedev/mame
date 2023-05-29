@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nathan Woods
-#ifndef MAME_INCLUDES_ATOM_H
-#define MAME_INCLUDES_ATOM_H
+#ifndef MAME_ACORN_ATOM_H
+#define MAME_ACORN_ATOM_H
 
 #pragma once
 
@@ -100,7 +100,7 @@ protected:
 	static void floppy_formats(format_registration &fr);
 	DECLARE_WRITE_LINE_MEMBER(cassette_output_tick);
 
-	image_init_result load_cart(device_image_interface &image, generic_slot_device &slot);
+	std::pair<std::error_condition, std::string> load_cart(device_image_interface &image, generic_slot_device &slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) { return load_cart(image, *m_cart); }
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	void atom_mem(address_map &map);
@@ -143,4 +143,4 @@ private:
 	void atomeb_mem(address_map &map);
 };
 
-#endif // MAME_INCLUDES_ATOM_H
+#endif // MAME_ACORN_ATOM_H

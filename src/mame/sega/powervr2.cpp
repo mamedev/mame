@@ -999,7 +999,7 @@ void powervr2_device::softreset_w(offs_t offset, uint32_t data, uint32_t mem_mas
 void powervr2_device::startrender_w(address_space &space, uint32_t data)
 {
 	dc_state *state = machine().driver_data<dc_state>();
-	g_profiler.start(PROFILER_USER1);
+	auto profile = g_profiler.start(PROFILER_USER1);
 
 	LOGTACMD("Start render, region=%08x, params=%08x\n", region_base, param_base);
 
@@ -1465,6 +1465,7 @@ uint32_t powervr2_device::ta_list_init_r()
 void powervr2_device::ta_list_init_w(uint32_t data)
 {
 	if(data & 0x80000000) {
+		auto profile = g_profiler.start(PROFILER_USER2);
 		tafifo_pos=0;
 		tafifo_mask=7;
 		tafifo_vertexwords=8;
@@ -1521,8 +1522,6 @@ void powervr2_device::ta_list_init_w(uint32_t data)
 		for (int group = 0; group < DISPLAY_LIST_COUNT; group++) {
 			grab[grabsel].groups[group].strips_size=0;
 		}
-
-		g_profiler.stop();
 	}
 }
 
@@ -2498,6 +2497,11 @@ inline void powervr2_device::render_span(bitmap_rgb32 &bitmap, texinfo *ti,
 	float dy;
 	int yy0, yy1;
 
+	// demofist, chocomk (hardlocks with -drc, MT#8088)
+	// TODO: should throw an error?
+	if (std::isnan(y0) || std::isnan(y1))
+		return;
+
 	if(y1 <= 0)
 		return;
 	if(y1 > 480)
@@ -3355,7 +3359,8 @@ void powervr2_device::pvr_accumulationbuffer_to_framebuffer(address_space &space
 		break;
 
 		case 0x02:
-			printf("pvr_accumulationbuffer_to_framebuffer buffer to tile at %d,%d - unsupported pack mode %02x (4444 ARGB)\n",x,y,packmode);
+			// TODO: demofist character select
+			//printf("pvr_accumulationbuffer_to_framebuffer buffer to tile at %d,%d - unsupported pack mode %02x (4444 ARGB)\n",x,y,packmode);
 			break;
 
 		case 0x03: // 1555 ARGB 16 bit

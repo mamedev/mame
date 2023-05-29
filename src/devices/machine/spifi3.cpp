@@ -7,7 +7,7 @@
  * References:
  * - https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/apbus/spifireg.h
  * - https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/apbus/spifi.c
- * - https://github.com/mamedev/mame/blob/master/src/devices/machine/ncr5390.cpp
+ * - https://github.com/mamedev/mame/blob/master/src/devices/machine/ncr53c90.cpp
  *
  * TODO:
  *  - NetBSD compatibility
@@ -22,13 +22,12 @@
 #include "emu.h"
 #include "spifi3.h"
 
-#define LOG_GENERAL (1U << 0)
-#define LOG_STATE (1U << 1)
+#define LOG_STATE     (1U << 1)
 #define LOG_INTERRUPT (1U << 2)
-#define LOG_DATA (1U << 3)
-#define LOG_REGISTER (1U << 4)
-#define LOG_CMD (1U << 5)
-#define LOG_AUTO (1U << 6)
+#define LOG_DATA      (1U << 3)
+#define LOG_REGISTER  (1U << 4)
+#define LOG_CMD       (1U << 5)
+#define LOG_AUTO      (1U << 6)
 
 #define SPIFI3_DEBUG (LOG_GENERAL | LOG_REGISTER | LOG_INTERRUPT | LOG_AUTO)
 #define SPIFI3_TRACE (SPIFI3_DEBUG | LOG_STATE | LOG_CMD)

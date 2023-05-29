@@ -1,14 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
-#ifndef MAME_INCLUDES_FMTOWNS_H
-#define MAME_INCLUDES_FMTOWNS_H
+#ifndef MAME_FUJITSU_FMTOWNS_H
+#define MAME_FUJITSU_FMTOWNS_H
 
 #pragma once
 
 #include "fmt_icmem.h"
 
 #include "cpu/i386/i386.h"
-#include "imagedev/chd_cd.h"
+#include "imagedev/cdromimg.h"
 #include "imagedev/floppy.h"
 #include "machine/fm_scsi.h"
 #include "machine/i8251.h"
@@ -433,4 +433,4 @@ protected:
 	virtual void driver_start() override;
 };
 
-#endif // MAME_INCLUDES_FMTOWNS_H
+#endif // MAME_FUJITSU_FMTOWNS_H

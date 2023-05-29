@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Mike Coates
-#ifndef MAME_INCLUDES_SNOWBROS_H
-#define MAME_INCLUDES_SNOWBROS_H
+#ifndef MAME_KANEKO_SNOWBROS_H
+#define MAME_KANEKO_SNOWBROS_H
 
 #pragma once
 
@@ -125,4 +125,4 @@ private:
 	void yutnori_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_SNOWBROS_H
+#endif // MAME_KANEKO_SNOWBROS_H

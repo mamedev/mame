@@ -10,10 +10,13 @@
 
 #include "emu.h"
 #include "emuopts.h"
-#include "drivenum.h"
-#include "softlist_dev.h"
-#include "hashfile.h"
 
+#include "drivenum.h"
+#include "hashfile.h"
+#include "main.h"
+#include "softlist_dev.h"
+
+// lib/util
 #include "corestr.h"
 #include "path.h"
 
@@ -157,8 +160,9 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_UI_ACTIVE,                                  "0",         core_options::option_type::BOOLEAN,    "enable user interface on top of emulated keyboard (if present)" },
 	{ OPTION_OFFSCREEN_RELOAD ";reload",                 "0",         core_options::option_type::BOOLEAN,    "convert lightgun button 2 into offscreen reload" },
 	{ OPTION_JOYSTICK_MAP ";joymap",                     "auto",      core_options::option_type::STRING,     "explicit joystick map, or auto to auto-select" },
-	{ OPTION_JOYSTICK_DEADZONE ";joy_deadzone;jdz(0.00-1)",      "0.3",       core_options::option_type::FLOAT,      "center deadzone range for joystick where change is ignored (0.0 center, 1.0 end)" },
-	{ OPTION_JOYSTICK_SATURATION ";joy_saturation;jsat(0.00-1)", "0.85",      core_options::option_type::FLOAT,      "end of axis saturation range for joystick where change is ignored (0.0 center, 1.0 end)" },
+	{ OPTION_JOYSTICK_DEADZONE ";joy_deadzone;jdz(0.00-1)",       "0.15", core_options::option_type::FLOAT,  "center deadzone range for joystick where change is ignored (0.0 center, 1.0 end)" },
+	{ OPTION_JOYSTICK_SATURATION ";joy_saturation;jsat(0.00-1)",  "0.85", core_options::option_type::FLOAT,  "end of axis saturation range for joystick where change is ignored (0.0 center, 1.0 end)" },
+	{ OPTION_JOYSTICK_THRESHOLD ";joy_threshold;jthresh(0.00-1)", "0.3",  core_options::option_type::FLOAT,  "threshold for joystick to be considered active as a switch (0.0 center, 1.0 end)" },
 	{ OPTION_NATURAL_KEYBOARD ";nat",                    "0",         core_options::option_type::BOOLEAN,    "specifies whether to use a natural keyboard or not" },
 	{ OPTION_JOYSTICK_CONTRADICTORY ";joy_contradictory","0",         core_options::option_type::BOOLEAN,    "enable contradictory direction digital joystick input at the same time" },
 	{ OPTION_COIN_IMPULSE,                               "0",         core_options::option_type::INTEGER,    "set coin impulse time (n<0 disable impulse, n==0 obey driver, 0<n set time n)" },
@@ -1081,8 +1085,9 @@ image_option &emu_options::image_option(const std::string &device_name)
 void emu_options::command_argument_processed()
 {
 	// some command line arguments require that the system name be set, so we can get slot options
+	// FIXME: having this here is a massively leaky abstraction
 	if (command_arguments().size() == 1 && !core_iswildstr(command_arguments()[0]) &&
-		(command() == "listdevices" || (command() == "listslots") || (command() == "listmedia") || (command() == "listsoftware")))
+		(command() == "listdevices" || (command() == "listslots") || (command() == "listbios") || (command() == "listmedia") || (command() == "listsoftware")))
 	{
 		set_system_name(command_arguments()[0]);
 	}

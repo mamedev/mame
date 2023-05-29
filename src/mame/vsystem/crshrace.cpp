@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+
 /***************************************************************************
 
 Crash Race       (c) 1993 Video System Co.
@@ -130,16 +131,228 @@ Dip locations verified with Service Mode.
 ***************************************************************************/
 
 #include "emu.h"
-#include "crshrace.h"
+
+#include "vsystem_spr.h"
 
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/ymopn.h"
+#include "video/bufsprite.h"
+#include "video/k053936.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
+
+// configurable logging
+#define LOG_GFXCTRL (1U << 1)
+
+//#define VERBOSE (LOG_GENERAL | LOG_GFXCTRL)
+
+#include "logmacro.h"
+
+#define LOGGFXCTRL(...) LOGMASKED(LOG_GFXCTRL, __VA_ARGS__)
+
+
+namespace {
 
 #define CRSHRACE_3P_HACK    0
 
+
+class crshrace_state : public driver_device
+{
+public:
+	crshrace_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_videoram(*this, "videoram.%u", 0U),
+		m_z80bank(*this, "bank1"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_spr(*this, "vsystem_spr"),
+		m_k053936(*this, "k053936"),
+		m_spriteram(*this, "spriteram.%u", 0U),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch")
+	{ }
+
+	void crshrace(machine_config &config);
+
+	void init_crshrace2();
+	void init_crshrace();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	// memory pointers
+	required_shared_ptr_array<uint16_t, 2> m_videoram;
+
+	required_memory_bank m_z80bank;
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_audiocpu;
+	required_device<vsystem_spr_device> m_spr;
+	required_device<k053936_device> m_k053936;
+	required_device_array<buffered_spriteram16_device, 2> m_spriteram;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+
+	// video-related
+	tilemap_t *m_tilemap[2]{};
+	uint8_t m_roz_bank = 0U;
+	uint8_t m_gfxctrl = 0U;
+	uint8_t m_flipscreen = 0U;
+
+	uint32_t tile_callback(uint32_t code);
+	void sh_bankswitch_w(uint8_t data);
+	template <uint8_t Which> void videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { COMBINE_DATA(&m_videoram[Which][offset]); m_tilemap[Which]->mark_tile_dirty(offset); }
+	void roz_bank_w(offs_t offset, uint8_t data);
+	void gfxctrl_w(offs_t offset, uint8_t data);
+	TILE_GET_INFO_MEMBER(get_fgtile_info);
+	TILE_GET_INFO_MEMBER(get_bgtile_info);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_bg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void main_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_map(address_map &map);
+
+	[[maybe_unused]] void patch_code(uint16_t offset);
+};
+
+
+// video
+
+/***************************************************************************
+
+  Callbacks for the TileMap code
+
+***************************************************************************/
+
+TILE_GET_INFO_MEMBER(crshrace_state::get_fgtile_info)
+{
+	int const code = m_videoram[0][tile_index];
+
+	tileinfo.set(1, (code & 0xfff) + (m_roz_bank << 12), code >> 12, 0);
+}
+
+TILE_GET_INFO_MEMBER(crshrace_state::get_bgtile_info)
+{
+	int const code = m_videoram[1][tile_index];
+
+	tileinfo.set(0, code, 0, 0);
+}
+
+
+/***************************************************************************
+
+  Start the video hardware emulation.
+
+***************************************************************************/
+
+
+uint32_t crshrace_state::tile_callback(uint32_t code)
+{
+	return m_spriteram[1]->buffer()[code&0x7fff];
+}
+
+
+void crshrace_state::video_start()
+{
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(crshrace_state::get_fgtile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(crshrace_state::get_bgtile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+
+	m_tilemap[0]->set_transparent_pen(0x0f);
+	m_tilemap[1]->set_transparent_pen(0xff);
+
+}
+
+
+/***************************************************************************
+
+  Memory handlers
+
+***************************************************************************/
+
+
+void crshrace_state::roz_bank_w(offs_t offset, uint8_t data)
+{
+	if (m_roz_bank != data)
+	{
+		m_roz_bank = data;
+		m_tilemap[0]->mark_all_dirty();
+	}
+}
+
+
+void crshrace_state::gfxctrl_w(offs_t offset, uint8_t data)
+{
+	m_gfxctrl = data;
+	m_flipscreen = data & 0x20;
+}
+
+
+/***************************************************************************
+
+  Display refresh
+
+***************************************************************************/
+
+void crshrace_state::draw_bg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
+}
+
+
+void crshrace_state::draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_k053936->zoom_draw(screen, bitmap, cliprect, m_tilemap[0], 0, 0, 1);
+}
+
+
+uint32_t crshrace_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	if (m_gfxctrl & 0x04)   // display disable?
+	{
+		bitmap.fill(m_palette->black_pen(), cliprect);
+		return 0;
+	}
+
+	bitmap.fill(0x1ff, cliprect);
+
+
+
+	switch (m_gfxctrl & 0xfb)
+	{
+		case 0x00:  // high score screen
+			m_spr->draw_sprites(m_spriteram[0]->buffer(), 0x2000, screen, bitmap, cliprect);
+			draw_bg(screen, bitmap, cliprect);
+			draw_fg(screen, bitmap, cliprect);
+			break;
+		case 0x01:
+		case 0x02:
+			draw_bg(screen, bitmap, cliprect);
+			draw_fg(screen, bitmap, cliprect);
+			m_spr->draw_sprites(m_spriteram[0]->buffer(), 0x2000, screen, bitmap, cliprect);
+			break;
+		default:
+			LOGGFXCTRL("gfxctrl = %02x", m_gfxctrl);
+			break;
+	}
+	return 0;
+}
+
+
+// machine
 
 void crshrace_state::sh_bankswitch_w(uint8_t data)
 {
@@ -381,14 +594,14 @@ void crshrace_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-void crshrace_state::crshrace(machine_config &config)
+void crshrace_state::crshrace(machine_config &config) // TODO: PCB sports 32 MHz and 24 MHz XTALs. Derive from those and verify dividers.
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 16000000);    // 16 MHz ???
+	M68000(config, m_maincpu, 16'000'000);    // 16 MHz ???
 	m_maincpu->set_addrmap(AS_PROGRAM, &crshrace_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(crshrace_state::irq1_line_hold));
 
-	Z80(config, m_audiocpu, 4000000);   // 4 MHz ???
+	Z80(config, m_audiocpu, 4'000'000);   // 4 MHz ???
 	m_audiocpu->set_addrmap(AS_PROGRAM, &crshrace_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &crshrace_state::sound_io_map);
 
@@ -425,7 +638,7 @@ void crshrace_state::crshrace(machine_config &config)
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_soundlatch->set_separate_acknowledge(true);
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8'000'000));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "lspeaker", 0.25);
 	ymsnd.add_route(0, "rspeaker", 0.25);
@@ -436,101 +649,101 @@ void crshrace_state::crshrace(machine_config &config)
 
 ROM_START( crshrace )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
-	ROM_LOAD16_WORD_SWAP( "1.ic10",            0x000000, 0x80000, CRC(21e34fb7) SHA1(be47b4a9bce2d6ce0a127dffe032c61547b2a3c0) )
+	ROM_LOAD16_WORD_SWAP( "1.ic10", 0x000000, 0x80000, CRC(21e34fb7) SHA1(be47b4a9bce2d6ce0a127dffe032c61547b2a3c0) )
 
 	ROM_REGION16_BE( 0x100000, "user1", 0 )  // extra ROM
-	ROM_LOAD16_WORD_SWAP( "w21.ic14",          0x000000, 0x100000, CRC(a5df7325) SHA1(614095a086164af5b5e73245744411187d81deec) )
+	ROM_LOAD16_WORD_SWAP( "w21.ic14", 0x000000, 0x100000, CRC(a5df7325) SHA1(614095a086164af5b5e73245744411187d81deec) )
 
 	ROM_REGION16_BE( 0x100000, "user2", 0 )  // extra ROM
-	ROM_LOAD16_WORD_SWAP( "w22.ic13",          0x000000, 0x100000, CRC(fc9d666d) SHA1(45aafcce82b668f93e51b5e4d092b1d0077e5192) )
+	ROM_LOAD16_WORD_SWAP( "w22.ic13", 0x000000, 0x100000, CRC(fc9d666d) SHA1(45aafcce82b668f93e51b5e4d092b1d0077e5192) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )    // 64k for the audio CPU + banks
-	ROM_LOAD( "2.ic58",            0x00000, 0x20000, CRC(e70a900f) SHA1(edfe5df2dab5a7dccebe1a6f978144bcd516ab03) )
+	ROM_REGION( 0x20000, "audiocpu", 0 )
+	ROM_LOAD( "2.ic58", 0x00000, 0x20000, CRC(e70a900f) SHA1(edfe5df2dab5a7dccebe1a6f978144bcd516ab03) )
 
 	ROM_REGION( 0x100000, "chars", 0 )
-	ROM_LOAD( "h895.ic50",         0x000000, 0x100000, CRC(36ad93c3) SHA1(f68f229dd1a1f8bfd3b8f73b6627f5f00f809d34) )
+	ROM_LOAD( "h895.ic50", 0x000000, 0x100000, CRC(36ad93c3) SHA1(f68f229dd1a1f8bfd3b8f73b6627f5f00f809d34) )
 
 	ROM_REGION( 0x400000, "tiles", 0 )
-	ROM_LOAD( "w18.rom-a",          0x000000, 0x100000, CRC(b15df90d) SHA1(56e38e6c40a02553b6b8c5282aa8f16b20779ebf) )
-	ROM_LOAD( "w19.rom-b",          0x100000, 0x100000, CRC(28326b93) SHA1(997e9b250b984b012ce1d165add59c741fb18171) )
-	ROM_LOAD( "w20.rom-c",          0x200000, 0x100000, CRC(d4056ad1) SHA1(4b45b14aa0766d7aef72f060e1cd28d67690d5fe) )
+	ROM_LOAD( "w18.rom-a", 0x000000, 0x100000, CRC(b15df90d) SHA1(56e38e6c40a02553b6b8c5282aa8f16b20779ebf) )
+	ROM_LOAD( "w19.rom-b", 0x100000, 0x100000, CRC(28326b93) SHA1(997e9b250b984b012ce1d165add59c741fb18171) )
+	ROM_LOAD( "w20.rom-c", 0x200000, 0x100000, CRC(d4056ad1) SHA1(4b45b14aa0766d7aef72f060e1cd28d67690d5fe) )
 	// 300000-3fffff empty
 
 	ROM_REGION( 0x400000, "sprites", 0 )
-	ROM_LOAD( "h897.ic29",         0x000000, 0x200000, CRC(e3230128) SHA1(758c65f113481cf25bf0359deecd6736a7c9ee7e) )
-	ROM_LOAD( "h896.ic75",         0x200000, 0x200000, CRC(fff60233) SHA1(56b4b708883a80761dc5f9184780477d72b80351) )
+	ROM_LOAD( "h897.ic29", 0x000000, 0x200000, CRC(e3230128) SHA1(758c65f113481cf25bf0359deecd6736a7c9ee7e) )
+	ROM_LOAD( "h896.ic75", 0x200000, 0x200000, CRC(fff60233) SHA1(56b4b708883a80761dc5f9184780477d72b80351) )
 
-	ROM_REGION( 0x100000, "ymsnd:adpcmb", 0 ) // sound samples
-	ROM_LOAD( "h894.ic73",         0x000000, 0x100000, CRC(d53300c1) SHA1(4c3ff7d3156791cb960c28845a5f1906605bce55) )
+	ROM_REGION( 0x100000, "ymsnd:adpcmb", 0 )
+	ROM_LOAD( "h894.ic73", 0x000000, 0x100000, CRC(d53300c1) SHA1(4c3ff7d3156791cb960c28845a5f1906605bce55) )
 
-	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) // sound samples
-	ROM_LOAD( "h893.ic69",         0x000000, 0x100000, CRC(32513b63) SHA1(c4ede4aaa2611cedb53d47448422a1926acf3052) )
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )
+	ROM_LOAD( "h893.ic69", 0x000000, 0x100000, CRC(32513b63) SHA1(c4ede4aaa2611cedb53d47448422a1926acf3052) )
 ROM_END
 
 ROM_START( crshrace2 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
-	ROM_LOAD16_WORD_SWAP( "01.ic10",  0x000000, 0x80000, CRC(b284aacd) SHA1(f0ef279cdec30eb32e8aa8cdd51e289b70f2d6f5) )
+	ROM_LOAD16_WORD_SWAP( "01.ic10", 0x000000, 0x80000, CRC(b284aacd) SHA1(f0ef279cdec30eb32e8aa8cdd51e289b70f2d6f5) )
 
 	ROM_REGION16_BE( 0x100000, "user1", 0 )  // extra ROM
-	ROM_LOAD16_WORD_SWAP( "w21.ic14",          0x000000, 0x100000, CRC(a5df7325) SHA1(614095a086164af5b5e73245744411187d81deec) )
+	ROM_LOAD16_WORD_SWAP( "w21.ic14", 0x000000, 0x100000, CRC(a5df7325) SHA1(614095a086164af5b5e73245744411187d81deec) )
 
 	ROM_REGION16_BE( 0x100000, "user2", 0 )  // extra ROM
-	ROM_LOAD16_WORD_SWAP( "w22.ic13",          0x000000, 0x100000, CRC(fc9d666d) SHA1(45aafcce82b668f93e51b5e4d092b1d0077e5192) )
+	ROM_LOAD16_WORD_SWAP( "w22.ic13", 0x000000, 0x100000, CRC(fc9d666d) SHA1(45aafcce82b668f93e51b5e4d092b1d0077e5192) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )    // 64k for the audio CPU + banks
-	ROM_LOAD( "2.ic58",            0x00000, 0x20000, CRC(e70a900f) SHA1(edfe5df2dab5a7dccebe1a6f978144bcd516ab03) )
+	ROM_REGION( 0x20000, "audiocpu", 0 )
+	ROM_LOAD( "2.ic58", 0x00000, 0x20000, CRC(e70a900f) SHA1(edfe5df2dab5a7dccebe1a6f978144bcd516ab03) )
 
 	ROM_REGION( 0x100000, "chars", 0 )
-	ROM_LOAD( "h895.ic50",         0x000000, 0x100000, CRC(36ad93c3) SHA1(f68f229dd1a1f8bfd3b8f73b6627f5f00f809d34) )
+	ROM_LOAD( "h895.ic50", 0x000000, 0x100000, CRC(36ad93c3) SHA1(f68f229dd1a1f8bfd3b8f73b6627f5f00f809d34) )
 
 	ROM_REGION( 0x400000, "tiles", 0 )
-	ROM_LOAD( "w18.rom-a",          0x000000, 0x100000, CRC(b15df90d) SHA1(56e38e6c40a02553b6b8c5282aa8f16b20779ebf) )
-	ROM_LOAD( "w19.rom-b",          0x100000, 0x100000, CRC(28326b93) SHA1(997e9b250b984b012ce1d165add59c741fb18171) )
-	ROM_LOAD( "w20.rom-c",          0x200000, 0x100000, CRC(d4056ad1) SHA1(4b45b14aa0766d7aef72f060e1cd28d67690d5fe) )
+	ROM_LOAD( "w18.rom-a", 0x000000, 0x100000, CRC(b15df90d) SHA1(56e38e6c40a02553b6b8c5282aa8f16b20779ebf) )
+	ROM_LOAD( "w19.rom-b", 0x100000, 0x100000, CRC(28326b93) SHA1(997e9b250b984b012ce1d165add59c741fb18171) )
+	ROM_LOAD( "w20.rom-c", 0x200000, 0x100000, CRC(d4056ad1) SHA1(4b45b14aa0766d7aef72f060e1cd28d67690d5fe) )
 	// 300000-3fffff empty
 
 	ROM_REGION( 0x400000, "sprites", 0 )
-	ROM_LOAD( "h897.ic29",         0x000000, 0x200000, CRC(e3230128) SHA1(758c65f113481cf25bf0359deecd6736a7c9ee7e) )
-	ROM_LOAD( "h896.ic75",         0x200000, 0x200000, CRC(fff60233) SHA1(56b4b708883a80761dc5f9184780477d72b80351) )
+	ROM_LOAD( "h897.ic29", 0x000000, 0x200000, CRC(e3230128) SHA1(758c65f113481cf25bf0359deecd6736a7c9ee7e) )
+	ROM_LOAD( "h896.ic75", 0x200000, 0x200000, CRC(fff60233) SHA1(56b4b708883a80761dc5f9184780477d72b80351) )
 
-	ROM_REGION( 0x100000, "ymsnd:adpcmb", 0 ) // sound samples
-	ROM_LOAD( "h894.ic73",         0x000000, 0x100000, CRC(d53300c1) SHA1(4c3ff7d3156791cb960c28845a5f1906605bce55) )
+	ROM_REGION( 0x100000, "ymsnd:adpcmb", 0 )
+	ROM_LOAD( "h894.ic73", 0x000000, 0x100000, CRC(d53300c1) SHA1(4c3ff7d3156791cb960c28845a5f1906605bce55) )
 
-	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) // sound samples
-	ROM_LOAD( "h893.ic69",         0x000000, 0x100000, CRC(32513b63) SHA1(c4ede4aaa2611cedb53d47448422a1926acf3052) )
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )
+	ROM_LOAD( "h893.ic69", 0x000000, 0x100000, CRC(32513b63) SHA1(c4ede4aaa2611cedb53d47448422a1926acf3052) )
 ROM_END
 
 ROM_START( crshrace2a )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
-	ROM_LOAD16_WORD_SWAP( "01.ic10",  0x000000, 0x80000, CRC(b284aacd) SHA1(f0ef279cdec30eb32e8aa8cdd51e289b70f2d6f5) )
+	ROM_LOAD16_WORD_SWAP( "01.ic10", 0x000000, 0x80000, CRC(b284aacd) SHA1(f0ef279cdec30eb32e8aa8cdd51e289b70f2d6f5) )
 
 	ROM_REGION16_BE( 0x100000, "user1", 0 )  // extra ROM
-	ROM_LOAD16_WORD_SWAP( "w21.ic14",          0x000000, 0x100000, CRC(a5df7325) SHA1(614095a086164af5b5e73245744411187d81deec) )
+	ROM_LOAD16_WORD_SWAP( "w21.ic14", 0x000000, 0x100000, CRC(a5df7325) SHA1(614095a086164af5b5e73245744411187d81deec) )
 
 	ROM_REGION16_BE( 0x100000, "user2", 0 )  // extra ROM
-	ROM_LOAD16_WORD_SWAP( "w22.ic13",          0x000000, 0x100000, CRC(fc9d666d) SHA1(45aafcce82b668f93e51b5e4d092b1d0077e5192) )
+	ROM_LOAD16_WORD_SWAP( "w22.ic13", 0x000000, 0x100000, CRC(fc9d666d) SHA1(45aafcce82b668f93e51b5e4d092b1d0077e5192) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )    // 64k for the audio CPU + banks
-	ROM_LOAD( "2.ic58",            0x00000, 0x20000, CRC(7ef4f9dc) SHA1(cf9cc1cf16349b0b930f4572194b7ed3828c3bd8) ) // sldh
+	ROM_REGION( 0x20000, "audiocpu", 0 )
+	ROM_LOAD( "2.ic58", 0x00000, 0x20000, CRC(7ef4f9dc) SHA1(cf9cc1cf16349b0b930f4572194b7ed3828c3bd8) ) // sldh
 
 	ROM_REGION( 0x100000, "chars", 0 )
-	ROM_LOAD( "h895.ic50",         0x000000, 0x100000, CRC(36ad93c3) SHA1(f68f229dd1a1f8bfd3b8f73b6627f5f00f809d34) )
+	ROM_LOAD( "h895.ic50", 0x000000, 0x100000, CRC(36ad93c3) SHA1(f68f229dd1a1f8bfd3b8f73b6627f5f00f809d34) )
 
 	ROM_REGION( 0x400000, "tiles", 0 ) // on a riser board
-	ROM_LOAD( "w18.rom-a",          0x000000, 0x100000, CRC(b15df90d) SHA1(56e38e6c40a02553b6b8c5282aa8f16b20779ebf) )
-	ROM_LOAD( "w19.rom-b",          0x100000, 0x100000, CRC(28326b93) SHA1(997e9b250b984b012ce1d165add59c741fb18171) )
-	ROM_LOAD( "w20.rom-c",          0x200000, 0x100000, CRC(d4056ad1) SHA1(4b45b14aa0766d7aef72f060e1cd28d67690d5fe) )
+	ROM_LOAD( "w18.rom-a", 0x000000, 0x100000, CRC(b15df90d) SHA1(56e38e6c40a02553b6b8c5282aa8f16b20779ebf) )
+	ROM_LOAD( "w19.rom-b", 0x100000, 0x100000, CRC(28326b93) SHA1(997e9b250b984b012ce1d165add59c741fb18171) )
+	ROM_LOAD( "w20.rom-c", 0x200000, 0x100000, CRC(d4056ad1) SHA1(4b45b14aa0766d7aef72f060e1cd28d67690d5fe) )
 	// 300000-3fffff empty
 
 	ROM_REGION( 0x400000, "sprites", 0 )
-	ROM_LOAD( "h897.ic29",         0x000000, 0x200000, CRC(e3230128) SHA1(758c65f113481cf25bf0359deecd6736a7c9ee7e) )
-	ROM_LOAD( "h896.ic75",         0x200000, 0x200000, CRC(fff60233) SHA1(56b4b708883a80761dc5f9184780477d72b80351) )
+	ROM_LOAD( "h897.ic29", 0x000000, 0x200000, CRC(e3230128) SHA1(758c65f113481cf25bf0359deecd6736a7c9ee7e) )
+	ROM_LOAD( "h896.ic75", 0x200000, 0x200000, CRC(fff60233) SHA1(56b4b708883a80761dc5f9184780477d72b80351) )
 
-	ROM_REGION( 0x100000, "ymsnd:adpcmb", 0 ) // sound samples
-	ROM_LOAD( "h894.ic73",         0x000000, 0x100000, CRC(d53300c1) SHA1(4c3ff7d3156791cb960c28845a5f1906605bce55) )
+	ROM_REGION( 0x100000, "ymsnd:adpcmb", 0 )
+	ROM_LOAD( "h894.ic73", 0x000000, 0x100000, CRC(d53300c1) SHA1(4c3ff7d3156791cb960c28845a5f1906605bce55) )
 
-	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) // sound samples
-	ROM_LOAD( "h893.ic69",         0x000000, 0x100000, CRC(32513b63) SHA1(c4ede4aaa2611cedb53d47448422a1926acf3052) )
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )
+	ROM_LOAD( "h893.ic69", 0x000000, 0x100000, CRC(32513b63) SHA1(c4ede4aaa2611cedb53d47448422a1926acf3052) )
 ROM_END
 
 
@@ -538,9 +751,9 @@ void crshrace_state::patch_code(uint16_t offset)
 {
 	// A hack which shows 3 player mode in code which is disabled
 	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
-	RAM[(offset + 0)/2] = 0x4e71;
-	RAM[(offset + 2)/2] = 0x4e71;
-	RAM[(offset + 4)/2] = 0x4e71;
+	RAM[(offset + 0) / 2] = 0x4e71;
+	RAM[(offset + 2) / 2] = 0x4e71;
+	RAM[(offset + 4) / 2] = 0x4e71;
 }
 
 
@@ -557,6 +770,8 @@ void crshrace_state::init_crshrace2()
 	patch_code(0x003796);
 #endif
 }
+
+} // anonymous namespace
 
 
 GAME( 1993, crshrace,   0,        crshrace, crshrace,  crshrace_state, init_crshrace,  ROT270, "Video System Co.", "Lethal Crash Race / Bakuretsu Crash Race (set 1)",                      MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

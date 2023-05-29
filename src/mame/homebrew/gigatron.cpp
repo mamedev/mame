@@ -17,6 +17,9 @@
 
 #include "gigatron.lh"
 
+
+namespace {
+
 #define MAIN_CLOCK 6250000
 #define VSYNC      0x80
 #define HSYNC      0x40
@@ -253,5 +256,8 @@ ROM_START( gigatron )
 	ROM_SYSTEM_BIOS(4, "v1", "Gigatron ROM v1")
 	ROMX_LOAD( "gigrom1.rom",  0x0000, 0x20000, CRC(8ea5a2af) SHA1(e5758d5cc467c3476bd8f992fd45dfcdf06d0430),ROM_BIOS(4))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(2018, gigatron, 0, 0, gigatron, gigatron, gigatron_state, empty_init, "Marcel van Kervinck / Walter Belgers", "Gigatron TTL Microcomputer", MACHINE_SUPPORTS_SAVE)

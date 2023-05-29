@@ -1,13 +1,23 @@
 // license:BSD-3-Clause
 // copyright-holders:Samuele Zannoli
 #include "emu.h"
-#include "video/poly.h"
 #include "bitmap.h"
 #include "xbox_nv2a.h"
 #include <bitset>
 #include <cfloat>
 
-//#define LOG_NV2A
+#define LOG_NV2A_VERBOSE (1U << 1)
+
+#ifdef LOG_NV2A
+#define VERBOSE (LOG_GENERAL)
+#else
+#define VERBOSE (0)
+#endif
+
+#define LOG_OUTPUT_FUNC machine().logerror
+#include "logmacro.h"
+
+
 #define DEBUG_CHECKS // enable for debugging
 
 char const *const vertex_program_disassembler::srctypes[] = { "??", "Rn", "Vn", "Cn" };
@@ -2502,7 +2512,25 @@ void nv2a_renderer::compute_supersample_factors(float &horizontal, float &vertic
 
 void nv2a_renderer::convert_vertices(vertex_nv *source, nv2avertex_t *destination)
 {
-	vertex_nv vert;
+/*
+    FIXME: GCC 13.1 errored this without the static on "vert".  I believe this is a real bug, but I don't
+    know enough about what this code is doing to be confident.
+
+    In member function ‘void vertex_program_simulator::set_data(vertex_nv*, vertex_nv*)’,
+    inlined from ‘void vertex_program_simulator::process(int, vertex_nv*, vertex_nv*, int)’ at ../../../../../src/mame/shared/xbox_nv2a.cpp:643:10,
+    inlined from ‘void nv2a_renderer::convert_vertices(vertex_nv*, nv2avertex_t*)’ at ../../../../../src/mame/shared/xbox_nv2a.cpp:2546:29:
+../../../../../src/mame/shared/xbox_nv2a.cpp:449:16: error: storing the address of local variable ‘vert’ in ‘*&this_144(D)->vertexprogram.exec.vertex_program_simulator::output’ [-Werror=dangling-pointer=]
+  449 |         output = out;
+      |         ~~~~~~~^~~~~
+../../../../../src/mame/shared/xbox_nv2a.cpp: In member function ‘void nv2a_renderer::convert_vertices(vertex_nv*, nv2avertex_t*)’:
+../../../../../src/mame/shared/xbox_nv2a.cpp:2504:19: note: ‘vert’ declared here
+ 2522 |         vertex_nv vert;
+      |                   ^~~~
+../../../../../src/mame/shared/xbox_nv2a.cpp:2502:82: note: ‘this’ declared here
+ 2502 | void nv2a_renderer::convert_vertices(vertex_nv *source, nv2avertex_t *destination)
+      |                                                                                  ^
+*/
+	static vertex_nv vert;
 	int u;
 	float v[4];
 	double c;
@@ -2693,9 +2721,7 @@ void nv2a_renderer::clear_render_target(int what, uint32_t value)
 				return;
 			}
 		}
-#ifdef LOG_NV2A
-	printf("clearscreen\n\r");
-#endif
+	LOG("clearscreen\n\r");
 }
 
 void nv2a_renderer::clear_depth_buffer(int what, uint32_t value)
@@ -3119,9 +3145,7 @@ int nv2a_renderer::execute_method(address_space &space, uint32_t chanel, uint32_
 
 	data = space.read_dword(address);
 	channel[chanel][subchannel].object.method[method / 4] = data;
-#ifdef LOG_NV2A
-	//printf("A:%08X CH=%02d SCH=%02d MTHD:%08X D:%08X\n\r",address,chanel,subchannel,maddress,data);
-#endif
+	LOGMASKED(LOG_NV2A_VERBOSE, "A:%08X CH=%02d SCH=%02d MTHD:%08X D:%08X\n\r", address, chanel, subchannel, method, data);
 	if (channel[chanel][subchannel].object.objclass == 0x97)
 		return execute_method_3d(space, chanel, subchannel, method, address, data, countlen);
 	if (channel[chanel][subchannel].object.objclass == 0x39) // 0180
@@ -3181,9 +3205,7 @@ int nv2a_renderer::execute_method_3d(address_space& space, uint32_t chanel, uint
 
 		offset = data & 0xffffff;
 		count = (data >> 24) & 0xff;
-#ifdef LOG_NV2A
-		printf("vertex %d %d\n\r", offset, count);
-#endif
+		LOG("vertex %d %d\n\r", offset, count);
 		for (n = 0; n <= count; n++) {
 			read_vertices_0x1810(space, vertex_first, n + offset, 1);
 			assemble_primitive(vertex_first, 1);
@@ -3527,17 +3549,13 @@ int nv2a_renderer::execute_method_3d(address_space& space, uint32_t chanel, uint
 		pitch_rendertarget=data & 0xffff;
 		pitch_depthbuffer=(data >> 16) & 0xffff;
 		compute_size_rendertarget(chanel, subchannel);
-#ifdef LOG_NV2A
-		printf("Pitch color %04X zbuffer %04X\n\r", pitch_rendertarget, pitch_depthbuffer);
-#endif
+		LOG("Pitch color %04X zbuffer %04X\n\r", pitch_rendertarget, pitch_depthbuffer);
 		countlen--;
 	}
 	if (maddress == 0x0100) {
 		countlen--;
 		if (data != 0) {
-#ifdef LOG_NV2A
-			machine().logerror("Software method %04x\n", data);
-#endif
+			LOG("Software method %04x\n", data);
 			pgraph[0x704 / 4] = 0x100 | (chanel << 20) | (subchannel << 16);
 			pgraph[0x708 / 4] = data;
 			pgraph[0x100 / 4] |= 1;
@@ -3575,17 +3593,13 @@ int nv2a_renderer::execute_method_3d(address_space& space, uint32_t chanel, uint
 		old_rendertarget = rendertarget;
 		// To see it with the image watch extension: @mem(0x000002d2263af060, UINT8, 4, 640, 480, 2560)
 		rendertarget = (uint32_t *)direct_access_ptr(data);
-#ifdef LOG_NV2A
-		printf("Render target at %08X\n\r", data);
-#endif
+		LOG("Render target at %08X\n\r", data);
 		countlen--;
 	}
 	if (maddress == 0x0214) {
 		// zbuffer offset ?
 		depthbuffer = (uint32_t *)direct_access_ptr(data);
-#ifdef LOG_NV2A
-		printf("Depth buffer at %08X\n\r",data);
-#endif
+		LOG("Depth buffer at %08X\n\r",data);
 		if ((data == 0) || (data > 0x7ffffffc))
 			depth_write_enabled = false;
 		else if (channel[chanel][subchannel].object.method[0x035c / 4] != 0)
@@ -3830,10 +3844,8 @@ int nv2a_renderer::execute_method_3d(address_space& space, uint32_t chanel, uint
 		*(uint32_t *)(&matrix.translate[maddress]) = data;
 		// set corresponding vertex shader constant too
 		vertexprogram.exec.c_constant[59].iv(maddress, data); // constant -37
-#ifdef LOG_NV2A
 		if (maddress == 3)
-			machine().logerror("viewport translate = {%f %f %f %f}\n", matrix.translate[0], matrix.translate[1], matrix.translate[2], matrix.translate[3]);
-#endif
+			LOG("viewport translate = {%f %f %f %f}\n", matrix.translate[0], matrix.translate[1], matrix.translate[2], matrix.translate[3]);
 		countlen--;
 	}
 	// viewport scale
@@ -3842,10 +3854,8 @@ int nv2a_renderer::execute_method_3d(address_space& space, uint32_t chanel, uint
 		*(uint32_t *)(&matrix.scale[maddress]) = data;
 		// set corresponding vertex shader constant too
 		vertexprogram.exec.c_constant[58].iv(maddress, data); // constant -38
-#ifdef LOG_NV2A
 		if (maddress == 3)
-			machine().logerror("viewport scale = {%f %f %f %f}\n", matrix.scale[0], matrix.scale[1], matrix.scale[2], matrix.scale[3]);
-#endif
+			LOG("viewport scale = {%f %f %f %f}\n", matrix.scale[0], matrix.scale[1], matrix.scale[2], matrix.scale[3]);
 		countlen--;
 	}
 	// Vertex program (shader)
@@ -3906,15 +3916,13 @@ int nv2a_renderer::execute_method_3d(address_space& space, uint32_t chanel, uint
 			machine().logerror("Need to increase size of vertexprogram.parameter to %d\n\r", vertexprogram.upload_parameter_index);
 		vertexprogram.upload_parameter_component++;
 		if (vertexprogram.upload_parameter_component >= 4) {
-#ifdef LOG_NV2A
 			if ((vertexprogram.upload_parameter_index == 58) || (vertexprogram.upload_parameter_index == 59))
-				machine().logerror("vp constant %d (%s) = {%f %f %f %f}\n", vertexprogram.upload_parameter_index,
+				LOG("vp constant %d (%s) = {%f %f %f %f}\n", vertexprogram.upload_parameter_index,
 					vertexprogram.upload_parameter_index == 58 ? "viewport scale" : "viewport translate",
 					vertexprogram.exec.c_constant[vertexprogram.upload_parameter_index].fv[0],
 					vertexprogram.exec.c_constant[vertexprogram.upload_parameter_index].fv[1],
 					vertexprogram.exec.c_constant[vertexprogram.upload_parameter_index].fv[2],
 					vertexprogram.exec.c_constant[vertexprogram.upload_parameter_index].fv[3]);
-#endif
 			vertexprogram.upload_parameter_component = 0;
 			vertexprogram.upload_parameter_index++;
 		}
@@ -4055,9 +4063,7 @@ int nv2a_renderer::execute_method_3d(address_space& space, uint32_t chanel, uint
 int nv2a_renderer::execute_method_m2mf(address_space &space, uint32_t chanel, uint32_t subchannel, uint32_t method, uint32_t address, uint32_t data, int &countlen)
 {
 	if (method == 0x0180) {
-#ifdef LOG_NV2A
-		machine().logerror("m2mf method 0180 notify\n");
-#endif
+		LOG("m2mf method 0180 notify\n");
 		geforce_read_dma_object(data, dma_offset[10], dma_size[10]);
 	}
 	return 0;
@@ -4066,15 +4072,11 @@ int nv2a_renderer::execute_method_m2mf(address_space &space, uint32_t chanel, ui
 int nv2a_renderer::execute_method_surf2d(address_space &space, uint32_t chanel, uint32_t subchannel, uint32_t method, uint32_t address, uint32_t data, int &countlen)
 {
 	if (method == 0x0184) {
-#ifdef LOG_NV2A
-		machine().logerror("surf2d method 0184 source\n");
-#endif
+		LOG("surf2d method 0184 source\n");
 		geforce_read_dma_object(data, dma_offset[11], dma_size[11]);
 	}
 	if (method == 0x0188) {
-#ifdef LOG_NV2A
-		machine().logerror("surf2d method 0188 destination\n");
-#endif
+		LOG("surf2d method 0188 destination\n");
 		geforce_read_dma_object(data, dma_offset[12], dma_size[12]);
 	}
 	if (method == 0x0300) {
@@ -4096,14 +4098,10 @@ int nv2a_renderer::execute_method_surf2d(address_space &space, uint32_t chanel, 
 int nv2a_renderer::execute_method_blit(address_space &space, uint32_t chanel, uint32_t subchannel, uint32_t method, uint32_t address, uint32_t data, int &countlen)
 {
 	if (method == 0x019c) {
-#ifdef LOG_NV2A
-		machine().logerror("blit method 019c surface objecct handle %d\n", data); // set to 0x11
-#endif
+		LOG("blit method 019c surface objecct handle %d\n", data); // set to 0x11
 	}
 	if (method == 0x02fc) {
-#ifdef LOG_NV2A
-		machine().logerror("blit method 02fc operation %d\n", data); // 3 is copy from source to destination
-#endif
+		LOG("blit method 02fc operation %d\n", data); // 3 is copy from source to destination
 		bitblit.op = data;
 	}
 	if (method == 0x0300) {
@@ -4767,9 +4765,7 @@ void nv2a_renderer::combiner_compute_alpha_outputs(int id, int stage_number)
 
 WRITE_LINE_MEMBER(nv2a_renderer::vblank_callback)
 {
-/*#ifdef LOG_NV2A
-    printf("vblank_callback\n\r");
-#endif*/
+	LOGMASKED(LOG_NV2A_VERBOSE, "vblank_callback\n\r");
 	if ((state != 0) && (puller_waiting == 1)) {
 		puller_waiting = 0;
 		puller_timer_work(0);
@@ -4824,15 +4820,11 @@ void nv2a_renderer::geforce_assign_object(address_space &space, uint32_t chanel,
 
 	handle = space.read_dword(address);
 	offset = geforce_object_offset(handle);
-#ifdef LOG_NV2A
-	machine().logerror("  assign to subchannel %d object at %d in ramin", subchannel, offset);
-#endif
+	LOG("  assign to subchannel %d object at %d in ramin", subchannel, offset);
 	channel[chanel][subchannel].object.offset = offset;
 	data = ramin[offset / 4];
 	objclass = data & 0xff;
-#ifdef LOG_NV2A
-	machine().logerror(" class %03X\n", objclass);
-#endif
+	LOG(" class %03X\n", objclass);
 	channel[chanel][subchannel].object.objclass = objclass;
 }
 
@@ -4858,13 +4850,9 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 			switch (cmdtype)
 			{
 			case COMMAND::JUMP:
-	#ifdef LOG_NV2A
-				machine().logerror("jump dmaget %08X", *dmaget);
-	#endif
+				LOG("jump dmaget %08X", *dmaget);
 				*dmaget = cmd & 0xfffffffc;
-	#ifdef LOG_NV2A
-				machine().logerror(" -> %08X\n\r", *dmaget);
-	#endif
+				LOG(" -> %08X\n\r", *dmaget);
 				break;
 			case COMMAND::INCREASING:
 				method = cmd & (2047 << 2); // if method >= 0x100 send it to assigned object
@@ -4875,9 +4863,7 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 					*dmaget += 4;
 				}
 				else {
-	#ifdef LOG_NV2A
-					machine().logerror("  subch. %d method %04x count %d\n", subch, method, count);
-	#endif
+					LOG("  subch. %d method %04x count %d\n", subch, method, count);
 					ret = 0;
 					while (count > 0) {
 						countlen = 1;
@@ -4904,9 +4890,7 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 					*dmaget += 4;
 				}
 				else {
-	#ifdef LOG_NV2A
-					machine().logerror("  subch. %d method %04x count %d\n", subch, method, count);
-	#endif
+					LOG("  subch. %d method %04x count %d\n", subch, method, count);
 					while (count > 0) {
 						countlen = count;
 						ret = execute_method(*space, chanel, subch, method, *dmaget, countlen);
@@ -4925,9 +4909,7 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 					*dmaget += 4;
 				}
 				else {
-	#ifdef LOG_NV2A
-					machine().logerror("  subch. %d method %04x count %d\n", subch, method, count);
-	#endif
+					LOG("  subch. %d method %04x count %d\n", subch, method, count);
 					while (count > 0) {
 						countlen = count;
 						ret = execute_method(*space, chanel, subch, method, *dmaget, countlen);
@@ -5062,9 +5044,7 @@ void nv2a_renderer::geforce_w(address_space &space, offs_t offset, uint32_t data
 			update_int = true;
 		if (e == 0x800 / 4) {
 			displayedtarget = (uint32_t *)direct_access_ptr(pcrtc[e]);
-#ifdef LOG_NV2A
-			printf("crtc buffer %08X\n\r", data);
-#endif
+			LOG("crtc buffer %08X\n\r", data);
 		}
 		//machine().logerror("NV_2A: write PCRTC[%06X]=%08X\n",offset*4-0x00600000,data & mem_mask);
 	}

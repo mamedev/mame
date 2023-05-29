@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_VIDEO_ATARIMO_H
-#define MAME_VIDEO_ATARIMO_H
+#ifndef MAME_ATARI_ATARIMO_H
+#define MAME_ATARI_ATARIMO_H
 
 #include "video/sprite.h"
 
@@ -220,4 +220,4 @@ private:
 };
 
 
-#endif // MAME_VIDEO_ATARIMO_H
+#endif // MAME_ATARI_ATARIMO_H

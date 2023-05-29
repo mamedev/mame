@@ -43,7 +43,6 @@
 
 #include <cmath>
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_LINES   (1U << 1)
 #define LOG_CRU     (1U << 2)
 #define LOG_DETAIL  (1U << 3)
@@ -54,7 +53,6 @@
 #define VERBOSE (LOG_ERROR)
 #include "logmacro.h"
 
-#define LOGGENERAL(...)     LOGMASKED(LOG_GENERAL, __VA_ARGS__)
 #define LOGLINES(...)       LOGMASKED(LOG_LINES, __VA_ARGS__)
 #define LOGCRU(...)         LOGMASKED(LOG_CRU, __VA_ARGS__)
 #define LOGDETAIL(...)      LOGMASKED(LOG_DETAIL, __VA_ARGS__)

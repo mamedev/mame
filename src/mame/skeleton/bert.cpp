@@ -20,6 +20,9 @@
 #include "cpu/z8/z8.h"
 #include "machine/ram.h"
 
+
+namespace {
+
 class bert_state : public driver_device
 {
 public:
@@ -117,5 +120,8 @@ ROM_START(bert)
 	ROM_REGION(0x1000, "eprom", 0)
 	ROM_LOAD("bert.bin", 0x0000, 0x1000, CRC(52ece0e7) SHA1(d39cc9b6248547cfa8fd49d43532abf9399348a5))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1987, bert, 0, 0, bert, bert, bert_state, empty_init, "VGS Verlagsgesellschaft", "BERT", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

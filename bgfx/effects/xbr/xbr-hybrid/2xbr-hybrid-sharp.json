@@ -29,7 +29,8 @@
 	"vertex": "chains/xbr/xbr-hybrid/vs_2xbr-hybrid-sharp",
 	"fragment": "chains/xbr/xbr-hybrid/fs_2xbr-hybrid-sharp",
 	"uniforms": [
-		{ "name": "decal",         "type": "int",  "values": [ 1.0 ] },
-		{ "name": "u_tex_size0",   "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] }
+		{ "name": "decal",           "type": "int",  "values": [ 1.0 ] },
+		{ "name": "u_tex_size0",     "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
+		{ "name": "u_inv_view_dims", "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] }
 	]
 }

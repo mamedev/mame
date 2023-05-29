@@ -72,6 +72,8 @@ D.9B         [f99cac4b] /
 #include "tilemap.h"
 
 
+namespace {
+
 class panicr_state : public driver_device
 {
 public:
@@ -808,6 +810,8 @@ void panicr_state::init_panicr()
 	m_tempbitmap_1->fill(0, m_tempbitmap_clip);
 
 }
+
+} // anonymous namespace
 
 
 GAME( 1986, panicr,  0,      panicr,  panicr, panicr_state, init_panicr, ROT270, "Seibu Kaihatsu (Taito license)", "Panic Road (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

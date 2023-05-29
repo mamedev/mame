@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
-#ifndef MAME_INCLUDES_NEMESIS_H
-#define MAME_INCLUDES_NEMESIS_H
+#ifndef MAME_KONAMI_NEMESIS_H
+#define MAME_KONAMI_NEMESIS_H
 
 #pragma once
 
@@ -182,4 +182,4 @@ private:
 	void bubsys_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_NEMESIS_H
+#endif // MAME_KONAMI_NEMESIS_H

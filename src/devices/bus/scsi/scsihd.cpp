@@ -33,3 +33,8 @@ void scsihd_device::device_add_mconfig(machine_config &config)
 {
 	HARDDISK(config, "image", "scsi_hdd");
 }
+
+bool scsihd_device::exists() const
+{
+	return m_image->exists();
+}

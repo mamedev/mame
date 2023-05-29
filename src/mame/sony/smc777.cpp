@@ -20,19 +20,23 @@
 **************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
+#include "imagedev/snapquik.h"
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
+#include "softlist_dev.h"
 #include "sound/beep.h"
 #include "sound/sn76496.h"
 #include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
-#include "softlist_dev.h"
-#include "imagedev/snapquik.h"
 #include "speaker.h"
 
+
+namespace {
 
 #define MASTER_CLOCK 4.028_MHz_XTAL
 
@@ -62,8 +66,7 @@ public:
 		, m_screen(*this, "screen")
 		, m_crtc(*this, "crtc")
 		, m_fdc(*this, "fdc")
-		, m_floppy0(*this, "fdc:0")
-		, m_floppy1(*this, "fdc:1")
+		, m_floppy(*this, "fdc:%u", 0U)
 		, m_beeper(*this, "beeper")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
@@ -121,8 +124,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<mc6845_device> m_crtc;
 	required_device<mb8876_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<beep_device> m_beeper;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -409,7 +411,7 @@ QUICKLOAD_LOAD_MEMBER(smc777_state::quickload_cb)
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
 	if (image.length() >= 0xfd00)
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::INVALIDLENGTH, std::string());
 
 	/* The right RAM bank must be active */
 
@@ -417,7 +419,7 @@ QUICKLOAD_LOAD_MEMBER(smc777_state::quickload_cb)
 	if ((prog_space.read_byte(0) != 0xc3) || (prog_space.read_byte(5) != 0xc3))
 	{
 		machine_reset();
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::UNSUPPORTED, std::string());
 	}
 
 	/* Load image to the TPA (Transient Program Area) */
@@ -426,7 +428,7 @@ QUICKLOAD_LOAD_MEMBER(smc777_state::quickload_cb)
 	{
 		uint8_t data;
 		if (image.fread( &data, 1) != 1)
-			return image_init_result::FAIL;
+			return std::make_pair(image_error::UNSPECIFIED, std::string());
 		prog_space.write_byte(i+0x100, data);
 	}
 
@@ -437,7 +439,7 @@ QUICKLOAD_LOAD_MEMBER(smc777_state::quickload_cb)
 	m_maincpu->set_state_int(Z80_SP, 256 * prog_space.read_byte(7) - 300);
 	m_maincpu->set_pc(0x100);       // start program
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 uint8_t smc777_state::fdc_r(offs_t offset)
@@ -468,7 +470,7 @@ void smc777_state::fdc1_select_w(uint8_t data)
 	// x--- ---- SIDE1: [SMC-70] side select
 	// ---- --x- EXDS: [SMC-70] external drive select (0=internal, 1=external)
 	// ---- ---x DS01: select floppy drive
-	floppy = (data & 1 ? m_floppy1 : m_floppy0)->get_device();
+	floppy = m_floppy[data & 1]->get_device();
 
 	m_fdc->set_floppy(floppy);
 
@@ -1132,8 +1134,8 @@ void smc777_state::smc777(machine_config &config)
 	m_fdc->drq_wr_callback().set(FUNC(smc777_state::fdc_drq_w));
 
 	// does it really support 16 of them?
-	FLOPPY_CONNECTOR(config, "fdc:0", smc777_floppies, "ssdd", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", smc777_floppies, "ssdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], smc777_floppies, "ssdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], smc777_floppies, "ssdd", floppy_image_device::default_mfm_floppy_formats);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("smc777");
 	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(smc777_state::quickload_cb));
@@ -1161,6 +1163,9 @@ ROM_START( smc777 )
 	ROM_REGION( 0x400, "mcu", ROMREGION_ERASEFF )
 	ROM_LOAD( "m5l8041a-077p.bin", 0x000, 0x400, NO_DUMP ) // 8041 keyboard mcu, needs decapping
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

@@ -224,7 +224,7 @@ void ddragon3_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 				}
 			}
 		}
-	source+=8;
+		source+=8;
 	}
 }
 

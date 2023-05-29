@@ -1153,9 +1153,9 @@ void segas16b_state::upd7759_control_w(uint8_t data)
 	int size = memregion("soundcpu")->bytes() - 0x10000;
 	if (size > 0)
 	{
-		// it is important to write in this order: if the /START line goes low
+		// it is important to write in this order: if the /MD line goes low
 		// at the same time /RESET goes low, no sample should be started
-		m_upd7759->start_w(BIT(data, 7));
+		m_upd7759->md_w(BIT(~data, 7));
 		m_upd7759->reset_w(BIT(data, 6));
 
 		// banking depends on the ROM board
@@ -1280,6 +1280,7 @@ void segas16b_state::machine_reset()
 	m_hwc_input_value = 0;
 	m_mj_input_num = 0;
 	m_mj_last_val = 0;
+
 	// if we have a hard-coded mapping configuration, set it now
 	if (m_i8751_initial_config != nullptr)
 		m_mapper->configure_explicit(m_i8751_initial_config);
@@ -1727,7 +1728,6 @@ void dfjail_state::dfjail_map(address_map &map)
 	map(0xc42000, 0xc42001).portr("DSW1");
 	map(0xc42002, 0xc42003).portr("DSW2");
 	map(0xc43000, 0xc43001).nopw();
-
 }
 
 void segas16b_state::map_fpointbla(address_map &map)
@@ -3463,6 +3463,66 @@ static INPUT_PORTS_START( wb3 )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( wfishing ) // dips taken from test mode
+	PORT_START("SERVICE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("UNUSED")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED ) // TODO: 'rod upper' and 'rod lower' are read here. TODO: Where are 'handle left' and 'handle right'?
+
+	PORT_START("P2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME(    0x0f, 0x0f, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPSETTING(       0x07, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(       0x08, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(       0x09, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(       0x0f, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(       0x00, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(       0x06, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(       0x0e, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(       0x0d, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(       0x0c, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(       0x0b, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(       0x0a, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(       0x05, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(       0x04, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(       0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(       0x02, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(       0x01, "Test Play" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW1:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW1:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW1:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW1:8" )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME(    0x01, 0x01, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(       0x01, DEF_STR( On ) )
+	PORT_DIPSETTING(       0x00, DEF_STR( Off ) )
+	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW2:2" )
+	PORT_DIPNAME(    0x04, 0x04, "Advertise Coin Indication" ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(       0x04, "100-400 Yen" )
+	PORT_DIPSETTING(       0x00, "Coin" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "SW2:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW2:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW2:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW2:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( wrestwar )
 	PORT_INCLUDE( system16b_generic )
 
@@ -3945,13 +4005,14 @@ void segas16b_state::system16b(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-#if USE_NL
-	YM2151(config, m_ym2151, MASTER_CLOCK_8MHz/2)
-		.add_route(0, "netlist", 0.43, 0)
-		.add_route(1, "netlist", 0.43, 1);
+	YM2151(config, m_ym2151, MASTER_CLOCK_8MHz/2);
+
 	UPD7759(config, m_upd7759);
-	m_upd7759->md_w(0);
 	m_upd7759->drq().set(FUNC(segas16b_state::upd7759_generate_nmi));
+
+#if USE_NL
+	m_ym2151->add_route(0, "netlist", 0.43, 0);
+	m_ym2151->add_route(1, "netlist", 0.43, 1);
 	m_upd7759->add_route(0, "netlist", 0.48, 2);
 
 	NETLIST_SOUND(config, "netlist", 48000)
@@ -3969,11 +4030,7 @@ void segas16b_state::system16b(machine_config &config)
 
 	NETLIST_STREAM_OUTPUT(config, "netlist:cout0", 0, "OUT").set_mult_offset(1.0 / 0.2, 0.0);
 #else
-	YM2151(config, m_ym2151, MASTER_CLOCK_8MHz/2).add_route(ALL_OUTPUTS, "mono", 0.43);
-
-	UPD7759(config, m_upd7759);
-	m_upd7759->md_w(0);
-	m_upd7759->drq().set(FUNC(segas16b_state::upd7759_generate_nmi));
+	m_ym2151->add_route(ALL_OUTPUTS, "mono", 0.43);
 	m_upd7759->add_route(ALL_OUTPUTS, "mono", 0.48);
 #endif
 }
@@ -9060,6 +9117,46 @@ ROM_START( tturfu )
 ROM_END
 
 
+//  Wanpaku Fishing (わんぱく　フィッシング), Sega System 16B
+//  CPU: 68000
+//  ROM Board type: ?
+//  Sega ID# for ROM board: 834-12991
+//
+ROM_START( wfishing ) // labels were faded out, so double-checking with another PCB would be useful. First release was Dec. 1993 so this is probably a later revision
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "epr-195xx.a2", 0x000000, 0x40000, CRC(c7ca1142) SHA1(7624e8767fb345c6df5344ac0f99705ca14f3040) ) // 11xxxxxxxxxxxxxxxx = 0x00
+	ROM_LOAD16_BYTE( "epr-195xx.a1", 0x000001, 0x40000, CRC(8c0a2c16) SHA1(93e330450c8742e93010634e08814be5b67761d5) ) // 11xxxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0xc0000, "gfx1", ROMREGION_ERASE00 ) // tiles
+	ROM_LOAD( "epr-19528.b11", 0x00000, 0x20000, CRC(3250c00b) SHA1(cc2c495b53ddc7aada54766e268252f1e9292191) )
+	ROM_LOAD( "epr-19529.b12", 0x40000, 0x20000, CRC(c15a8ad8) SHA1(fe6186ae23d3318a38228eec99f485202b98dc72) )
+	ROM_LOAD( "epr-19530.b13", 0x80000, 0x20000, CRC(a9a76148) SHA1(5de35d5a0c9bc80f219fd8de82b03826b3ec5dff) )
+
+	ROM_REGION16_BE( 0x200000, "sprites", 0 ) // sprites
+	ROM_LOAD16_BYTE( "epr-19520.b1", 0x000001, 0x20000, CRC(dc7caeeb) SHA1(6c829cc024e70b19fe46dff113e09f3a894f3f39) )
+	ROM_CONTINUE(                    0x100001, 0x20000 )
+	ROM_LOAD16_BYTE( "epr-19523.b4", 0x000000, 0x20000, CRC(dd53c53a) SHA1(d5ed6d6aaac4fe236aa21dd67ec4bce8d76611ac) )
+	ROM_CONTINUE(                    0x100000, 0x20000 )
+	ROM_LOAD16_BYTE( "epr-19521.b2", 0x040001, 0x20000, CRC(d02a3099) SHA1(fbad332ae62df0adfaad64cbc1da506440cf30da) )
+	ROM_CONTINUE(                    0x140001, 0x20000 )
+	ROM_LOAD16_BYTE( "epr-19524.b5", 0x040000, 0x20000, CRC(31676e5b) SHA1(70f32ef5be3b8a33bd63f74c1d8a268a44fd4c80) )
+	ROM_CONTINUE(                    0x140000, 0x20000 )
+	ROM_LOAD16_BYTE( "epr-19522.b3", 0x080001, 0x20000, CRC(4c533a86) SHA1(ce191318b1a08518794feb652de568d5b43adb17) )
+	ROM_CONTINUE(                    0x180001, 0x20000 )
+	ROM_LOAD16_BYTE( "epr-19525.b6", 0x080000, 0x20000, CRC(3666ace1) SHA1(35d07a0f4023312bcd2ee40e3dd66761c9cdca35) )
+	ROM_CONTINUE(                    0x180000, 0x20000 )
+	ROM_LOAD16_BYTE( "epr-19526.b7", 0x0c0001, 0x20000, CRC(7501ee10) SHA1(ffac978b49c6c2495fc176360e897f67dfc0195e) )
+	ROM_CONTINUE(                    0x1c0001, 0x20000 )
+	ROM_LOAD16_BYTE( "epr-19527.b8", 0x0c0000, 0x20000, CRC(6b7c41c2) SHA1(746f1b1ff03f656a980c019cb9424ed278b31128) )
+	ROM_CONTINUE(                    0x1c0000, 0x20000 )
+
+	ROM_REGION( 0x90000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "epr-19519.a13", 0x00000, 0x08000, CRC(568fd995) SHA1(dee62590270bc4932dbf6d23e2a85b108c015212) )
+	ROM_LOAD( "epr-19517.a11", 0x10000, 0x40000, CRC(3066e87e) SHA1(dfc35b58a9a595994ba9a03fd41f1b0e6a4c71e1) )
+	ROM_LOAD( "epr-19518.a12", 0x50000, 0x40000, CRC(e482166b) SHA1(862c5e6ad7f7eb4165840f0e49b174b6bd7af0ef) )
+ROM_END
+
+
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
@@ -9945,6 +10042,8 @@ GAME( 1988, wb3,        0,        system16b_i8751,       wb3,      segas16b_stat
 GAME( 1988, wb34,       wb3,      system16b_fd1094,      wb3,      segas16b_state, init_generic_5704,       ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 4, Japan, System 16B) (FD1094 317-0087)", 0 )
 GAME( 1988, wb33,       wb3,      system16b_fd1094,      wb3,      segas16b_state, init_generic_5704,       ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 3, World, System 16B) (FD1094 317-0089)", 0 )
 GAME( 1988, wb32,       wb3,      system16b_fd1094,      wb3,      segas16b_state, init_generic_5358,       ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 2, Japan, System 16B) (FD1094 317-0085)", 0 )
+
+GAME( 1996, wfishing,   0,        system16b_5797,        wfishing, segas16b_state, init_generic_5797,       ROT0,   "Sega", "Wanpaku Fishing", MACHINE_NOT_WORKING ) // needs correct controls
 
 GAME( 1989, wrestwar,   0,        system16b_i8751,       wrestwar, segas16b_state, init_generic_5704,       ROT270, "Sega", "Wrestle War (set 3, World) (8751 317-0103)", 0 )
 GAME( 1989, wrestwar2,  wrestwar, system16b_fd1094,      wrestwar, segas16b_state, init_generic_5704,       ROT270, "Sega", "Wrestle War (set 2, World) (FD1094 317-0102)", 0 )

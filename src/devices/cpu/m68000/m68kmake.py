@@ -254,7 +254,7 @@ class Info:
         f.write("// Generated source, edits will be lost.  Run m68kmake.py instead\n")
         f.write("\n")
         f.write("#include \"emu.h\"\n")
-        f.write("#include \"m68000.h\"\n")
+        f.write("#include \"m68kmusashi.h\"\n")
         f.write("\n")
         for h in self.opcode_handlers:
             f.write('void m68000_musashi_device::%s()\n{\n%s}\n' % (h.function_name, h.body))

@@ -5,8 +5,8 @@
         entry level graphics in the Indigo and IRIS Crimson.
 */
 
-#ifndef MAME_VIDEO_LIGHT_H
-#define MAME_VIDEO_LIGHT_H
+#ifndef MAME_SGI_LIGHT_H
+#define MAME_SGI_LIGHT_H
 
 #pragma once
 
@@ -72,4 +72,4 @@ private:
 DECLARE_DEVICE_TYPE(LIGHT_VIDEO, light_video_device)
 
 
-#endif // MAME_VIDEO_LIGHT_H
+#endif // MAME_SGI_LIGHT_H

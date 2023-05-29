@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Barry Rodewald
-/* Sega MegaTech
+/* Sega Mega-Tech
 
-About MegaTech:
+About Mega-Tech:
 
 Megatech games are identical to their Genesis/SMS equivalents, however the Megatech cartridges contain
 a BIOS ROM with the game instructions.  The last part number of the BIOS ROM is the cart/game ID code.
@@ -45,21 +45,21 @@ Altered Beast              171-5782    837-6963-01       610-0239-01         MPR
 Space Harrier II           171-5782    837-6963-02       610-0239-02         MPR-11934      (834200)      EPR-12368-02   (27256)   n/a
 Super Thunder Blade                                      610-0239-03
 Great Golf                                               610-0239-04
-Afterburner                                              610-0239-05
+Great Soccer                                             610-0239-05
 Out Run                    171-5783    837-6963-06       610-0239-06         MPR-11078      (Mask)        EPR-12368-06   (27256)   n/a
 Alien Syndrome             171-5783    837-6963-07       610-0239-07         MPR-11194      (232011)      EPR-12368-07   (27256)   n/a
 Shinobi                                                  610-0239-08
 Fantasy Zone                                             610-0239-09
-Afterburner                171-5784    837-6963-10       610-0239-10         315-5235       (custom)      MPR-11271-T    (834000)  EPR-12368-10 (27256)
+After Burner               171-5784    837-6963-10       610-0239-10         315-5235       (custom)      MPR-11271-T    (834000)  EPR-12368-10 (27256)
 Great Football             171-5783    837-6963-19       610-0239-19         MPR-10576F     (831000)      EPR-12368-19   (27256)   n/a
 World Championship Soccer  171-5782    837-6963-21       610-0239-21         MPR-12607B     (uPD23C4000)  EPR-12368-21   (27256)   n/a
 Tetris                     171-5834    837-6963-22       610-0239-22         MPR-12356F     (831000)      MPR-12357F     (831000)  EPR-12368-22 (27256)
-Ghouls & Ghosts            171-5869A   -                 610-0239-23         MPR-12605      (40 pins)     MPR-12606      (40 pins) EPR-12368-23 (27256)
+Ghouls'n Ghosts            171-5869A   -                 610-0239-23         MPR-12605      (40 pins)     MPR-12606      (40 pins) EPR-12368-23 (27256)
 Super Hang On              171-5782    837-6963-24       610-0239-24         MPR-12640      (234000)      EPR-12368-24   (27256)   n/a
 Forgotten Worlds           171-5782    837-6963-26       610-0239-26         MPR-12672-H    (Mask)        EPR-12368-26   (27256)   n/a
 The Revenge Of Shinobi     171-5782    837-6963-28       610-0239-28         MPR-12675 S44  (uPD23C4000)  EPR-12368-28   (27C256)  n/a
 Arnold Palmer Tour Golf    171-5782    837-6963-31       610-0239-31         MPR-12645F     (834200A)     EPR-12368-31   (27256)   n/a
-Super Real Basket Ball     171-5782    837-6963-32       610-0239-32         MPR-12904F     (838200A)     EPR-12368-32   (27256)   n/a
+Super Real Basketball      171-5782    837-6963-32       610-0239-32         MPR-12904F     (838200A)     EPR-12368-32   (27256)   n/a
 Tommy Lasorda Baseball     171-5782    837-6963-35       610-0239-35         MPR-12706F     (834200A)     EPR-12368-35   (27256)   n/a
 ESWAT                      171-5782    837-6963-38       610-0239-38         MPR-13192-H    (uPD23C4000)  EPR-12368-38   (27256)   n/a
 Moonwalker                 171-5782    837-6963-40       610-0239-40         MPR-13285A S61 (uPD23C4000)  EPR-12368-40   (27256)   n/a
@@ -72,7 +72,7 @@ Spider-Man                 171-5782    837-6963-54       610-0239-54         MPR
 California Games           171-5834    837-6963-55-01    610-0239-55         EPR-14494      (27C020)      EPR-14495      (27C020)  EPR-12368-55 (27C256)
 Mario Lemeux Hockey        171-5782    837-6963-59       610-0239-59         MPR-14376-H    (234000)      EPR-12368-59   (27256)   n/a
 Turbo Outrun               171-5782    837-6963-61       610-0239-61         MPR-14674      (uPD23C4000)  EPR-12368-61   (27256)   n/a
-Sonic Hedgehog 2           171-6215A   837-6963-62       610-0239-62         MPR-15000A-F   (838200)      EPR-12368-62   (27256)   n/a
+Sonic The Hedgehog 2       171-6215A   837-6963-62       610-0239-62         MPR-15000A-F   (838200)      EPR-12368-62   (27256)   n/a
 
 */
 #include "emu.h"
@@ -146,7 +146,7 @@ private:
 	uint8_t sms_ioport_dd_r();
 	void mt_sms_standard_rom_bank_w(address_space &space, offs_t offset, uint8_t data);
 
-	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, int gameno);
+	std::pair<std::error_condition, std::string> load_cart(device_image_interface &image, generic_slot_device *slot, int gameno);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart1 ) { return load_cart(image, m_cart1, 0); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart2 ) { return load_cart(image, m_cart2, 1); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart3 ) { return load_cart(image, m_cart3, 2); }
@@ -722,7 +722,7 @@ void mtech_state::megatech(machine_config &config)
 	io2.in_porte_cb().set(FUNC(mtech_state::bios_porte_r));
 	io2.out_porte_cb().set(FUNC(mtech_state::bios_porte_w));
 
-	config.set_default_layout(layout_dualhovu);
+	config.set_default_layout(layout_dualhuov);
 
 	screen_device &screen(*subdevice<screen_device>("megadriv"));
 	screen.set_raw(XTAL(10'738'635)/2,
@@ -749,21 +749,21 @@ void mtech_state::megatech(machine_config &config)
 }
 
 
-image_init_result mtech_state::load_cart(device_image_interface &image, generic_slot_device *slot, int gameno)
+std::pair<std::error_condition, std::string> mtech_state::load_cart(device_image_interface &image, generic_slot_device *slot, int gameno)
 {
 	uint8_t *ROM;
 	const char  *pcb_name;
 	uint32_t size = slot->common_get_size("rom");
 
 	if (!image.loaded_through_softlist())
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::UNSUPPORTED, "Cartridges must be loaded from the software list");
 
 	slot->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	ROM = slot->get_rom_base();
 	memcpy(ROM, image.get_software_region("rom"), size);
 
 	if ((pcb_name = image.get_feature("pcb_type")) == nullptr)
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::BADSOFTWARE, "Software item is missing 'pcb_type' feature");
 	else
 	{
 		if (!strcmp("genesis", pcb_name))
@@ -777,10 +777,14 @@ image_init_result mtech_state::load_cart(device_image_interface &image, generic_
 			m_cart_is_genesis[gameno] = 0;
 		}
 		else
-			osd_printf_debug("cart%d is invalid\n", gameno + 1);
+		{
+			return std::make_pair(
+					image_error::BADSOFTWARE,
+					util::string_format("Software item has invalid 'pcb_type' feature '%s' (must be 'genesis' or 'sms')", pcb_name));
+		}
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 #define MEGATECH_CARTSLOT(_tag, _load) \
@@ -815,7 +819,7 @@ void mtech_state::megatech_fixedslot(machine_config &config)
 }
 
 
-/* MegaTech Games - Genesis & sms! Games with a timer */
+/* Mega-Tech Games (Mega Drive/Genesis and Master System games with a timer) */
 
 #define MEGATECH_BIOS \
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF ) \
@@ -948,8 +952,8 @@ ROM_END
 
 
 
-/* Game 10 - Afterburner (SMS) */
-ROM_START( mt_aftrb ) /* Afterburner */
+/* Game 10 - After Burner (SMS) */
+ROM_START( mt_aftrb ) /* After Burner */
 	MEGATECH_BIOS
 
 	ROM_REGION16_BE( 0x400000, "mt_slot1:cart", ROMREGION_ERASE00 )
@@ -1033,8 +1037,8 @@ ROM_START( mt_tetri ) /* Tetris */
 ROM_END
 
 
-/* Game 23 - Ghouls and Ghosts (Genesis) */
-ROM_START( mt_gng ) /* Ghouls and Ghosts */
+/* Game 23 - Ghouls'n Ghosts (Genesis) */
+ROM_START( mt_gng ) /* Ghouls'n Ghosts */
 	MEGATECH_BIOS
 
 	ROM_REGION16_BE( 0x400000, "mt_slot1:cart", ROMREGION_ERASE00 )
@@ -1193,8 +1197,8 @@ ROM_START( mt_smgp ) /* Super Monaco Grand Prix */
 ROM_END
 
 
-/* Game 40 - Moon Walker */
-ROM_START( mt_mwalk ) /* Moon Walker */
+/* Game 40 - Moonwalker */
+ROM_START( mt_mwalk ) /* Moonwalker */
 	MEGATECH_BIOS
 
 	ROM_REGION16_BE( 0x400000, "mt_slot1:cart", ROMREGION_ERASE00 )
@@ -1205,8 +1209,8 @@ ROM_START( mt_mwalk ) /* Moon Walker */
 ROM_END
 
 
-/* Game 41 - Crackdown */
-ROM_START( mt_crack ) /* Crackdown */
+/* Game 41 - Crack Down */
+ROM_START( mt_crack ) /* Crack Down */
 	MEGATECH_BIOS
 
 	ROM_REGION16_BE( 0x400000, "mt_slot1:cart", ROMREGION_ERASE00 )
@@ -1303,7 +1307,7 @@ ROM_START( mt_sonic ) /* Sonic The Hedgehog */
 ROM_END
 
 
-ROM_START( mt_sonia ) /* Sonic (alt)*/
+ROM_START( mt_sonia ) /* Sonic The Hedgehog (alt)*/
 	MEGATECH_BIOS
 
 	ROM_REGION16_BE( 0x400000, "mt_slot1:cart", ROMREGION_ERASE00 )
@@ -1330,8 +1334,8 @@ ROM_START( mt_fshrk ) /* Fire Shark */
 ROM_END
 
 
-/* Game 54 - Spiderman */
-ROM_START( mt_spman ) /* Spiderman */
+/* Game 54 - Spider-Man */
+ROM_START( mt_spman ) /* Spider-Man */
 	MEGATECH_BIOS
 
 	ROM_REGION16_BE( 0x400000, "mt_slot1:cart", ROMREGION_ERASE00 )
@@ -1510,6 +1514,6 @@ The labels are noticeably different than expected.  Be careful if thinking of ob
 - Double Dragon (SMS)
 - Kung Fu Kid (SMS)
 - Quackshot Starring Donald Duck (GEN)
-- Wonderboy (SMS)
+- Wonder Boy (SMS)
 
 more? */

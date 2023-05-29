@@ -94,9 +94,17 @@
 #include "screen.h"
 #include "tilemap.h"
 
-#define LOG_TLCS_TO_PPC_COMMANDS        0
-#define LOG_PPC_TO_TLCS_COMMANDS        0
-#define LOG_DISPLAY_LIST                    0
+#define LOG_TLCS_TO_PPC_COMMANDS (1U << 1)
+#define LOG_PPC_TO_TLCS_COMMANDS (1U << 2)
+#define LOG_DISPLAY_LIST         (1U << 3)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
+
+namespace {
+
+#define FATAL_UNKNOWN_CALLS (0)
 
 class taitopjc_state : public driver_device
 {
@@ -155,7 +163,7 @@ private:
 	uint32_t videochip_r(offs_t address);
 	void videochip_w(offs_t address, uint32_t data);
 	void video_exit();
-	void print_display_list();
+	[[maybe_unused]] void print_display_list();
 	TILE_GET_INFO_MEMBER(tile_get_info);
 	TILEMAP_MAPPER_MEMBER(tile_scan_layer0);
 	TILEMAP_MAPPER_MEMBER(tile_scan_layer1);
@@ -410,12 +418,10 @@ void taitopjc_state::ppc_common_w(offs_t offset, uint64_t data, uint64_t mem_mas
 
 	if (offset == 0x7ff && ACCESSING_BITS_48_63)
 	{
-#if LOG_PPC_TO_TLCS_COMMANDS
 		if (m_io_share_ram[0xfff] != 0x0000)
 		{
-			printf("PPC -> TLCS cmd %04X\n", m_io_share_ram[0xfff]);
+			LOGMASKED(LOG_PPC_TO_TLCS_COMMANDS, "PPC -> TLCS cmd %04X\n", m_io_share_ram[0xfff]);
 		}
-#endif
 
 		m_iocpu->set_input_line(TLCS900_INT6, ASSERT_LINE);
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
@@ -449,7 +455,7 @@ void taitopjc_state::print_display_list()
 	uint16_t cmd = m_dsp_ram[0xffe];
 	if (cmd == 0x5245)
 	{
-		printf("DSP command RE\n");
+		logerror("DSP command RE\n");
 		bool end = false;
 		do
 		{
@@ -461,7 +467,7 @@ void taitopjc_state::print_display_list()
 				for (int i=0; i < count; i++)
 				{
 					uint16_t s = m_dsp_ram[ptr++];
-					printf("   %04X -> [%04X]\n", s, d);
+					logerror("   %04X -> [%04X]\n", s, d);
 					d++;
 				}
 			}
@@ -474,33 +480,34 @@ void taitopjc_state::print_display_list()
 				switch (w)
 				{
 					case 0x406d:
-						printf("   Call %04X [%04X %04X]\n", w, m_dsp_ram[ptr], m_dsp_ram[ptr+1]);
+						logerror("   Call %04X [%04X %04X]\n", w, m_dsp_ram[ptr], m_dsp_ram[ptr+1]);
 						ptr += 2;
 						break;
 					case 0x40cd:
-						printf("   Call %04X [%04X %04X]\n", w, m_dsp_ram[ptr], m_dsp_ram[ptr+1]);
+						logerror("   Call %04X [%04X %04X]\n", w, m_dsp_ram[ptr], m_dsp_ram[ptr+1]);
 						ptr += 2;
 						break;
 					case 0x40ac:
-						printf("   Call %04X [%04X %04X %04X %04X %04X %04X %04X %04X]\n", w, m_dsp_ram[ptr], m_dsp_ram[ptr+1], m_dsp_ram[ptr+2], m_dsp_ram[ptr+3], m_dsp_ram[ptr+4], m_dsp_ram[ptr+5], m_dsp_ram[ptr+6], m_dsp_ram[ptr+7]);
+						logerror("   Call %04X [%04X %04X %04X %04X %04X %04X %04X %04X]\n", w, m_dsp_ram[ptr], m_dsp_ram[ptr+1], m_dsp_ram[ptr+2], m_dsp_ram[ptr+3], m_dsp_ram[ptr+4], m_dsp_ram[ptr+5], m_dsp_ram[ptr+6], m_dsp_ram[ptr+7]);
 						ptr += 8;
 						break;
 					case 0x4774:
-						printf("   Call %04X [%04X %04X %04X]\n", w, m_dsp_ram[ptr], m_dsp_ram[ptr+1], m_dsp_ram[ptr+2]);
+						logerror("   Call %04X [%04X %04X %04X]\n", w, m_dsp_ram[ptr], m_dsp_ram[ptr+1], m_dsp_ram[ptr+2]);
 						ptr += 3;
 						break;
 					case 0x47d9:
-						printf("   Call %04X [%04X %04X %04X %04X %04X %04X %04X %04X]\n", w, m_dsp_ram[ptr], m_dsp_ram[ptr+1], m_dsp_ram[ptr+2], m_dsp_ram[ptr+3], m_dsp_ram[ptr+4], m_dsp_ram[ptr+5], m_dsp_ram[ptr+6], m_dsp_ram[ptr+7]);
+						logerror("   Call %04X [%04X %04X %04X %04X %04X %04X %04X %04X]\n", w, m_dsp_ram[ptr], m_dsp_ram[ptr+1], m_dsp_ram[ptr+2], m_dsp_ram[ptr+3], m_dsp_ram[ptr+4], m_dsp_ram[ptr+5], m_dsp_ram[ptr+6], m_dsp_ram[ptr+7]);
 						ptr += 8;
 						break;
 					default:
 					{
-						printf("Unknown call %04X\n", w);
+						logerror("Unknown call %04X\n", w);
 						for (int i=0; i < 10; i++)
 						{
-							printf("%04X\n", m_dsp_ram[ptr++]);
+							logerror("%04X\n", m_dsp_ram[ptr++]);
 						}
-						fatalerror("Unknown call %04X\n", w);
+						if (FATAL_UNKNOWN_CALLS)
+							fatalerror("Unknown call %04X\n", w);
 						break;
 					}
 				}
@@ -510,7 +517,7 @@ void taitopjc_state::print_display_list()
 	else
 	{
 		if (cmd != 0)
-			printf("DSP command %04X\n", cmd);
+			logerror("DSP command %04X\n", cmd);
 		return;
 	}
 }
@@ -534,7 +541,7 @@ void taitopjc_state::dsp_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 		}
 		#endif
 
-#if LOG_DISPLAY_LIST
+#if (VERBOSE & LOG_DISPLAY_LIST)
 		print_display_list();
 #endif
 	}
@@ -606,13 +613,11 @@ void taitopjc_state::tlcs_common_w(offs_t offset, uint8_t data)
 
 	if (offset == 0x1ffd)
 	{
-#if LOG_TLCS_TO_PPC_COMMANDS
 		if (m_io_share_ram[0xffe] != 0xd000 &&
 			m_io_share_ram[0xffe] != 0x7000)
 		{
-			printf("TLCS -> PPC cmd %04X\n", m_io_share_ram[0xffe]);
+			LOGMASKED(LOG_TLCS_TO_PPC_COMMANDS, "TLCS -> PPC cmd %04X\n", m_io_share_ram[0xffe]);
 		}
-#endif
 
 		if (m_io_share_ram[0xffe] == 0xd000)
 			m_iocpu->set_input_line(TLCS900_INT1, CLEAR_LINE);
@@ -937,5 +942,8 @@ ROM_START( optiger )
 	ROM_LOAD( "e63-07_palce16v8h-10-4.ic43", 0x622, 0x117, CRC(eb77b03f) SHA1(567f92a4fd1fa919d5e9047ee15c058bf40855fb) )
 	ROM_LOAD( "e63-08_palce16v8h-15-4.ic49", 0x739, 0x117, CRC(c305c56d) SHA1(49592fa43c548ac6b08951d03677a3f23e9c8de8) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1998, optiger, 0, taitopjc, taitopjc, taitopjc_state, init_optiger, ROT0, "Taito", "Operation Tiger (Ver 2.14 O)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )

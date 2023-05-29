@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_VT100_KBD_H
-#define MAME_MACHINE_VT100_KBD_H
+#ifndef MAME_SHARED_VT100_KBD_H
+#define MAME_SHARED_VT100_KBD_H
 
 #pragma once
 
@@ -94,4 +94,4 @@ private:
 DECLARE_DEVICE_TYPE(VT100_KEYBOARD, vt100_keyboard_device)
 DECLARE_DEVICE_TYPE(MS7002, ms7002_device)
 
-#endif // MAME_MACHINE_VT100_KBD_H
+#endif // MAME_SHARED_VT100_KBD_H

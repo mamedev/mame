@@ -29,6 +29,8 @@ protected:
 	virtual void ReadData( uint8_t *data, int dataLength ) override;
 
 private:
+	required_device<harddisk_image_device> m_image;
+
 	void s1410_io(address_map &map);
 	void s1410_mem(address_map &map);
 };

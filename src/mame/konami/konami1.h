@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MAME_MACHINE_KONAMI1_H
-#define MAME_MACHINE_KONAMI1_H
+#ifndef MAME_KONAMI_KONAMI1_H
+#define MAME_KONAMI_KONAMI1_H
 
 #pragma once
 
@@ -42,4 +42,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(KONAMI1, konami1_device)
 
-#endif // MAME_MACHINE_KONAMI1_H
+#endif // MAME_KONAMI_KONAMI1_H

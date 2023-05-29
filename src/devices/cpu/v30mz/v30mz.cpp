@@ -1343,7 +1343,7 @@ void v30mz_cpu_device::interrupt(int int_num)
 
 	if (int_num == -1)
 	{
-		standard_irq_callback(0);
+		standard_irq_callback(0, pc());
 		int_num = m_vector_func();
 
 		m_irq_state = CLEAR_LINE;

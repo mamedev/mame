@@ -5,8 +5,8 @@
  * includes/vectrex.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_VECTREX_H
-#define MAME_INCLUDES_VECTREX_H
+#ifndef MAME_MILTONBRADLEY_VECTREX_H
+#define MAME_MILTONBRADLEY_VECTREX_H
 
 #pragma once
 
@@ -189,4 +189,4 @@ private:
 	required_ioport m_io_coin;
 };
 
-#endif // MAME_INCLUDES_VECTREX_H
+#endif // MAME_MILTONBRADLEY_VECTREX_H

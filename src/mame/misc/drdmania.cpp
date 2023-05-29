@@ -61,6 +61,9 @@
 #include "emupal.h"
 #include "speaker.h"
 
+
+namespace {
+
 class drdmania_state : public driver_device
 {
 public:
@@ -222,5 +225,8 @@ void drdmania_state::init_drdmania()
 
 	ROM[0x8e00] ^= 0x02; // wrong, different bit flipped?
 }
+
+} // anonymous namespace
+
 
 GAME(1994, drdmania, 0, drdmania, drdmania, drdmania_state, init_drdmania, ROT0, "Sleic", "Dardomania (v2.1)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )

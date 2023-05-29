@@ -5,8 +5,8 @@
   Nintendo Donkey Kong hardware
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_DKONG_H
-#define MAME_INCLUDES_DKONG_H
+#ifndef MAME_NINTENDO_DKONG_H
+#define MAME_NINTENDO_DKONG_H
 
 #pragma once
 
@@ -133,8 +133,8 @@ public:
 	void ddk_braze(machine_config &config);
 	void dk3_braze(machine_config &config);
 	void strtheat(machine_config &config);
-	void spclforc(machine_config &config);
 	void s2650(machine_config &config);
+	void spclforc(machine_config &config);
 	void dkongjr(machine_config &config);
 	void radarscp1(machine_config &config);
 	void drktnjr(machine_config &config);
@@ -333,11 +333,12 @@ private:
 	void dkongjr_sound_io_map(address_map &map);
 	void epos_readport(address_map &map);
 	void radarscp1_sound_io_map(address_map &map);
-	void s2650_data_map(address_map &map);
-	void s2650_io_map(address_map &map);
-	void s2650_map(address_map &map);
 
-private:
+	void s2650_map(address_map &map);
+	void s2650_io_map(address_map &map);
+	void s2650_data_map(address_map &map);
+	void spclforc_data_map(address_map &map);
+
 	// video/dkong.c
 	void radarscp_step(int line_cnt);
 	void radarscp_scanline(int scanline);
@@ -346,4 +347,4 @@ private:
 	void radarscp_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-#endif // MAME_INCLUDES_DKONG_H
+#endif // MAME_NINTENDO_DKONG_H

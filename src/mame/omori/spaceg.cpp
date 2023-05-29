@@ -173,6 +173,8 @@ Notes:
 #include "speaker.h"
 
 
+namespace {
+
 /*************************************
  *
  *  Driver data
@@ -575,6 +577,8 @@ ROM_START( spaceg )
 	ROM_LOAD( "74s288.6a", 0x0000, 0x0020, CRC(ae1f4acd) SHA1(1d502b61db73cf6a4ac3d235455a5c464f12652a) )
 	ROM_LOAD( "74s288.6b", 0x0020, 0x0020, CRC(ae1f4acd) SHA1(1d502b61db73cf6a4ac3d235455a5c464f12652a) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************************

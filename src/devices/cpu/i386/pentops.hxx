@@ -7,6 +7,11 @@ extern flag float64_is_nan( float64 a ); // since its not defined in softfloat.h
 
 void i386_device::MMXPROLOG()
 {
+	if (m_cr[0] & 0xc)
+	{
+		i386_trap(FAULT_NM, 0, 0);
+		return;
+	}
 	//m_x87_sw &= ~(X87_SW_TOP_MASK << X87_SW_TOP_SHIFT); // top = 0
 	m_x87_tw = 0; // tag word = 0
 }
@@ -106,7 +111,7 @@ void i386_device::pentium_rsm()
 {
 	if(!m_smm)
 	{
-		logerror("i386: Invalid RSM outside SMM at %08X\n", m_pc - 1);
+		LOGMASKED(LOG_INVALID_OPCODE, "i386: Invalid RSM outside SMM at %08X\n", m_pc - 1);
 		i386_trap(6, 0, 0);
 		return;
 	}
@@ -1006,7 +1011,7 @@ void i386_device::i386_cyrix_special()     // Opcode 0x0f 3a-3d
 
 void i386_device::i386_cyrix_unknown()     // Opcode 0x0f 74
 {
-	logerror("Unemulated 0x0f 0x74 opcode called\n");
+	LOGMASKED(LOG_UNEMULATED, "Unemulated 0x0f 0x74 opcode called\n");
 
 	CYCLES(1);
 }
@@ -1907,6 +1912,11 @@ void i386_device::mmx_paddd_r64_rm64()  // Opcode 0f fe
 
 void i386_device::mmx_emms() // Opcode 0f 77
 {
+	if (m_cr[0] & 0xc)
+	{
+		i386_trap(FAULT_NM, 0, 0);
+		return;
+	}
 	m_x87_tw = 0xffff; // tag word = 0xffff
 	// TODO
 	CYCLES(1);     // TODO: correct cycle count
@@ -2781,7 +2791,7 @@ void i386_device::sse_group_0fae()  // Opcode 0f ae
 {
 	uint8_t modm = FETCH();
 	if( modm == 0xf8 ) {
-		logerror("Unemulated SFENCE opcode called\n");
+		LOGMASKED(LOG_UNEMULATED, "Unemulated SFENCE opcode called\n");
 		CYCLES(1); // sfence instruction
 	} else if( modm == 0xf0 ) {
 		CYCLES(1); // mfence instruction
@@ -2791,12 +2801,76 @@ void i386_device::sse_group_0fae()  // Opcode 0f ae
 		uint32_t ea;
 		switch ( (modm & 0x38) >> 3 )
 		{
+			case 0: // fxsave
+			{
+				u8 atag = 0;
+				ea = GetEA(modm, 1);
+				WRITE16(ea + 0, m_x87_cw);
+				WRITE16(ea + 2, m_x87_sw);
+				for(int i = 0; i < 8; i++)
+					if((m_x87_tw & (3 << i)) != 3) atag |= 1 << i;
+				WRITE16(ea + 4, atag);
+				WRITE16(ea + 6, m_x87_opcode);
+				WRITE32(ea + 8, m_x87_inst_ptr);
+				WRITE32(ea + 12, m_x87_cs);
+				WRITE32(ea + 16, m_x87_data_ptr);
+				WRITE32(ea + 20, m_x87_ds);
+				WRITE32(ea + 24, m_mxcsr);
+				WRITE32(ea + 28, 0); // mxcsr_mask
+				for(int i = 0; i < 8; i++)
+				{
+					WRITE64(ea + i*16 + 32, m_x87_reg[i].low);
+					WRITE64(ea + i*16 + 40, m_x87_reg[i].high);
+				}
+				for(int i = 0; i < 8; i++)
+				{
+					WRITE64(ea + i*16 + 160, m_sse_reg[i].q[0]);
+					WRITE64(ea + i*16 + 168, m_sse_reg[i].q[1]);
+				}
+				break;
+			}
+			case 1:
+			{
+				u8 atag;
+				ea = GetEA(modm, 0);
+				x87_write_cw(READ16(ea));
+				m_x87_sw = READ16(ea + 2);
+				atag = READ8(ea + 4);
+				m_x87_opcode = READ16(ea + 6);
+				m_x87_inst_ptr = READ32(ea + 8);
+				m_x87_cs = READ16(ea + 12);
+				m_x87_data_ptr = READ32(ea + 16);
+				m_x87_ds = READ16(ea + 20);
+				m_mxcsr = READ32(ea + 24);
+				// mxcsr_mask
+				for(int i = 0; i < 8; i++)
+				{
+					int tag;
+					m_x87_reg[i].low = READ64(ea + i*16 + 32);
+					m_x87_reg[i].high = READ16(ea + i*16 + 40);
+					if(!(atag & (1 << i)))
+						tag = X87_TW_EMPTY;
+					if(floatx80_is_zero(m_x87_reg[i]))
+						tag = X87_TW_ZERO;
+					else if(floatx80_is_inf(m_x87_reg[i]) || floatx80_is_nan(m_x87_reg[i]))
+						tag = X87_TW_SPECIAL;
+					else
+						tag = X87_TW_VALID;
+					x87_set_tag(i, tag);
+				}
+				for(int i = 0; i < 8; i++)
+				{
+					m_sse_reg[i].q[0] = READ64(ea + i*16 + 160);
+					m_sse_reg[i].q[1] = READ64(ea + i*16 + 168);
+				}
+				break;
+			}
 			case 2: // ldmxcsr m32
 				ea = GetEA(modm, 0);
 				m_mxcsr = READ32(ea);
 				break;
 			case 3: // stmxcsr m32
-				ea = GetEA(modm, 0);
+				ea = GetEA(modm, 1);
 				WRITE32(ea, m_mxcsr);
 				break;
 			case 7: // clflush m8

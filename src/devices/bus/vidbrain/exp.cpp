@@ -105,29 +105,29 @@ void videobrain_expansion_slot_device::device_start()
 //  call_load -
 //-------------------------------------------------
 
-image_init_result videobrain_expansion_slot_device::call_load()
+std::pair<std::error_condition, std::string> videobrain_expansion_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		size_t size;
-
 		if (!loaded_through_softlist())
 		{
-			size = length();
+			size_t const romsize = length();
 
-			fread(m_cart->videobrain_rom_pointer(machine(), size), size);
+			fread(m_cart->videobrain_rom_pointer(machine(), romsize), romsize);
 		}
 		else
 		{
-			size = get_software_region_length("rom");
-			if (size) memcpy(m_cart->videobrain_rom_pointer(machine(), size), get_software_region("rom"), size);
+			size_t const romsize = get_software_region_length("rom");
+			if (romsize)
+				memcpy(m_cart->videobrain_rom_pointer(machine(), romsize), get_software_region("rom"), romsize);
 
-			size = get_software_region_length("ram");
-			if (size) memset(m_cart->videobrain_ram_pointer(machine(), size), 0, size);
+			size_t const ramsize = get_software_region_length("ram");
+			if (ramsize)
+				memset(m_cart->videobrain_ram_pointer(machine(), ramsize), 0, ramsize);
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

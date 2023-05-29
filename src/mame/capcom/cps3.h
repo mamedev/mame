@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Andreas Naive, Tomasz Slanina, ElSemi
-#ifndef MAME_INCLUDES_CPS3_H
-#define MAME_INCLUDES_CPS3_H
+#ifndef MAME_CAPCOM_CPS3_H
+#define MAME_CAPCOM_CPS3_H
 
 #pragma once
 
@@ -193,4 +193,4 @@ private:
 	void decrypted_opcodes_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_CPS3_H
+#endif // MAME_CAPCOM_CPS3_H

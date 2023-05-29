@@ -507,8 +507,8 @@ void m6800_cpu_device::check_irq_lines()
 
 			if (!(CC & 0x10))
 			{
+				standard_irq_callback(M6800_IRQ_LINE, m_pc.w.l);
 				enter_interrupt("take IRQ1\n", 0xfff8);
-				standard_irq_callback(M6800_IRQ_LINE);
 			}
 		}
 		else

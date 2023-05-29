@@ -19,6 +19,8 @@ FK-1
 #include "screen.h"
 
 
+namespace {
+
 class fk1_state : public driver_device
 {
 public:
@@ -485,6 +487,9 @@ ROM_START( fk1 )
 	ROM_SYSTEM_BIOS( 1, "diag", "Diag BIOS" )
 	ROMX_LOAD( "fk1-diag.u65", 0x0000, 0x0800, CRC(e0660ae1) SHA1(6ad609049b28f27126af0a8a6224362351073dee), ROM_BIOS(1))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

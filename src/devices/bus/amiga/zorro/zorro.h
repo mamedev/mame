@@ -143,6 +143,10 @@
 
 #pragma once
 
+#include <functional>
+#include <utility>
+#include <vector>
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -299,18 +303,21 @@ protected:
 
 	// device-level overrides
 	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
+	using card_vector = std::vector<std::reference_wrapper<device_zorro2_card_interface> >;
+
 	devcb_write_line m_eint1_handler;
 	devcb_write_line m_eint4_handler;
 	devcb_write_line m_eint5_handler;
 	devcb_write_line m_eint7_handler;
 
-	simple_list<device_zorro2_card_interface> m_dev;
+	card_vector m_dev;
 
 	// the device which is currently configuring
-	device_zorro2_card_interface *m_autoconfig_device;
+	uint8_t m_autoconfig_device;
 };
 
 // device type definition
@@ -363,9 +370,6 @@ class device_zorro2_card_interface : public device_zorro_card_interface
 public:
 	// construction/destruction
 	virtual ~device_zorro2_card_interface();
-
-	device_zorro2_card_interface *next() const { return m_next; }
-	device_zorro2_card_interface *m_next;
 
 protected:
 	device_zorro2_card_interface(const machine_config &mconfig, device_t &device);

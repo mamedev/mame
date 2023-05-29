@@ -99,6 +99,8 @@ TODO (socrates):
 #include "speaker.h"
 
 
+namespace {
+
 class socrates_state : public driver_device
 {
 public:
@@ -1649,6 +1651,9 @@ ROM_START( vpainter )
 	ROM_REGION(0x2000, "speechint", ROMREGION_ERASE00) // doesn't exist? on vpainter, presumably reads as all zeroes
 	ROM_REGION(0x10000, "speechext", ROMREGION_ERASE00) // doesn't exist? on vpainter, presumably reads as all zeroes
 ROM_END
+
+} // anonymous namespace
+
 
 /******************************************************************************
  Drivers

@@ -1184,6 +1184,27 @@ ROM_START(zankor)
 	ROM_LOAD("zan_ic6.128", 0x8000, 0x4000, CRC(13a5b8d4) SHA1(d8c976b3f5e9c7cded0922feefa1531c59432515))
 ROM_END
 
+ROM_START(zankor2i)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD ( "zan_ic1.764", 0x0000, 0x0800, CRC(e7ba5acf) SHA1(48b64921dd8a22c2483162db571512cad8cbb072))
+	ROM_CONTINUE(0x2000, 0x0800)
+	ROM_CONTINUE(0x4000, 0x0800)
+	ROM_CONTINUE(0x6000, 0x0800)
+	ROM_LOAD ( "zan_ic2.764", 0x0800, 0x0800, CRC(5804ff10) SHA1(fc3c4acb183c5c3e0a6504583c78f25a7a322cce))
+	ROM_CONTINUE(0x2800, 0x0800)
+	ROM_CONTINUE(0x1000, 0x0800)
+	ROM_CONTINUE(0x3000, 0x0800)
+
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("zan_1e.764", 0xa000, 0x2000, CRC(3d2c53d2) SHA1(2de4a56f50752a97af0acfed816eae83b36cf7af))
+	ROM_LOAD("zan_1f.128", 0xc000, 0x4000, CRC(74fcadc9) SHA1(efd6fc99d7a3ed8e59fbbafbee161af6fb527028))
+
+	ROM_REGION(0x10000, "cpu3", 0)
+	ROM_LOAD("zan_ic4.128", 0x0000, 0x4000, CRC(f34a2aaa) SHA1(5e415874f68586aa30dba9fff0dc8990c636cecd))
+	ROM_LOAD("zan_ic5.128", 0x4000, 0x4000, CRC(bf61aab0) SHA1(939266696d0562f255f0fa5068280fe6a4cf8267))
+	ROM_LOAD("zan_ic6.128", 0x8000, 0x4000, CRC(13a5b8d4) SHA1(d8c976b3f5e9c7cded0922feefa1531c59432515))
+ROM_END
+
 } // anonymous namespace
 
 // 1B1170 sound (IMDB), 1B1370 (schematics)
@@ -1227,7 +1248,8 @@ GAME(1986,  bbeltzaci,  bbeltzac, zac_2,  zac_2, zac_2_state, empty_init, ROT0, 
 GAME(1986,  bbeltzacg,  bbeltzac, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Black Belt (Zaccaria, German speech)",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1986,  bbeltzacf,  bbeltzac, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Black Belt (Zaccaria, French speech)",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1986,  mexico,     0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Mexico 86 (German speech)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1986,  zankor,     0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Zankor (Italian speech)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  zankor,     0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Zankor (TMS5200 Italian speech)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  zankor2i,   zankor,   zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Zankor (TMS5220 Italian speech)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1987,  spookyp,    0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Spooky",                                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1987,  spookyi,    spookyp,  zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Spooky (Italian speech)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1987,  strsphnx,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Star's Phoenix (Italian speech)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

@@ -136,22 +136,241 @@ reference(xexexj) : https://www.youtube.com/watch?v=TegjBEvvGxI
 ***************************************************************************/
 
 #include "emu.h"
-#include "xexex.h"
+
+#include "k053246_k053247_k055673.h"
+#include "k053250.h"
+#include "k053251.h"
+#include "k054156_k054157_k056832.h"
+#include "k054338.h"
 #include "konamipt.h"
+#include "konami_helper.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/k053252.h"
+#include "machine/k054321.h"
+#include "machine/timer.h"
 #include "sound/flt_vol.h"
 #include "sound/k054539.h"
 #include "sound/ymopm.h"
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 #define XE_DEBUG      0
 #define XE_SKIPIDLE   1
 #define XE_DMADELAY   attotime::from_usec(256)
+
+class xexex_state : public driver_device
+{
+public:
+	xexex_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_workram(*this, "workram")
+		, m_spriteram(*this, "spriteram")
+		, m_z80bank(*this, "z80bank")
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_k054539(*this, "k054539")
+		, m_filter_l(*this, "filter%u_l", 1)
+		, m_filter_r(*this, "filter%u_r", 1)
+		, m_k056832(*this, "k056832")
+		, m_k053246(*this, "k053246")
+		, m_k053250(*this, "k053250")
+		, m_k053251(*this, "k053251")
+		, m_k053252(*this, "k053252")
+		, m_k054338(*this, "k054338")
+		, m_palette(*this, "palette")
+		, m_screen(*this, "screen")
+		, m_k054321(*this, "k054321")
+	{
+	}
+
+	void xexex(machine_config &config);
+
+	void init_xexex();
+
+private:
+	/* memory pointers */
+	required_shared_ptr<uint16_t> m_workram;
+	required_shared_ptr<uint16_t> m_spriteram;
+
+	/* memory regions */
+	required_memory_bank m_z80bank;
+
+	/* video-related */
+	int        m_layer_colorbase[4]{};
+	int        m_sprite_colorbase = 0;
+	int        m_layerpri[4]{};
+	int        m_cur_alpha = 0;
+
+	/* misc */
+	uint16_t     m_cur_control2 = 0;
+	int32_t      m_strip_0x1a = 0;
+	int        m_suspension_active = 0;
+	int        m_resume_trigger = 0;
+	emu_timer  *m_dmadelay_timer = nullptr;
+	int        m_frame = 0;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<k054539_device> m_k054539;
+	required_device_array<filter_volume_device, 2> m_filter_l;
+	required_device_array<filter_volume_device, 2> m_filter_r;
+	required_device<k056832_device> m_k056832;
+	required_device<k053247_device> m_k053246;
+	required_device<k053250_device> m_k053250;
+	required_device<k053251_device> m_k053251;
+	required_device<k053252_device> m_k053252;
+	required_device<k054338_device> m_k054338;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+	required_device<k054321_device> m_k054321;
+
+	uint16_t spriteram_mirror_r(offs_t offset);
+	void spriteram_mirror_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t xexex_waitskip_r();
+	uint16_t control2_r();
+	void control2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sound_irq_w(uint16_t data);
+	void sound_bankswitch_w(uint8_t data);
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	uint32_t screen_update_xexex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(dmaend_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(xexex_interrupt);
+	void xexex_postload();
+	void xexex_objdma(int limiter);
+	void parse_control2();
+	K056832_CB_MEMBER(tile_callback);
+	K053246_CB_MEMBER(sprite_callback);
+	K054539_CB_MEMBER(ym_set_mixing);
+
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
+};
+
+
+K053246_CB_MEMBER(xexex_state::sprite_callback)
+{
+	// Xexex doesn't seem to use bit8 and 9 as effect selectors so this should be safe.
+	// (pdrawgfx() still needs change to fix Elaine's end-game graphics)
+	int pri = (*color & 0x3e0) >> 4;
+
+	if (pri <= m_layerpri[3])
+		*priority_mask = 0;
+	else if (pri > m_layerpri[3] && pri <= m_layerpri[2])
+		*priority_mask = 0xff00;
+	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
+		*priority_mask = 0xff00 | 0xf0f0;
+	else if (pri > m_layerpri[1] && pri <= m_layerpri[0])
+		*priority_mask = 0xff00 | 0xf0f0 | 0xcccc;
+	else
+		*priority_mask = 0xff00 | 0xf0f0 | 0xcccc | 0xaaaa;
+
+	*color = m_sprite_colorbase | (*color & 0x001f);
+}
+
+K056832_CB_MEMBER(xexex_state::tile_callback)
+{
+	/*
+	    Color format
+	    xxxx ---- Color
+	    ---- -x-- Alpha blend enable
+	    ---- --x- Used, Unknown
+	    Everything else : unknown
+	*/
+	*priority = *color & 1; // alpha flag
+	*color = m_layer_colorbase[layer] | (*color >> 2 & 0x0f);
+}
+
+void xexex_state::video_start()
+{
+	assert(m_screen->format() == BITMAP_FORMAT_RGB32);
+
+	m_cur_alpha = 0;
+
+	// Xexex has relative plane offsets of -2,2,4,6 vs. -2,0,2,3 in MW and GX.
+	m_k056832->set_layer_offs(0, -2, 16);
+	m_k056832->set_layer_offs(1,  2, 16);
+	m_k056832->set_layer_offs(2,  4, 16);
+	m_k056832->set_layer_offs(3,  6, 16);
+}
+
+uint32_t xexex_state::screen_update_xexex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	static const int K053251_CI[4] = { k053251_device::CI1, k053251_device::CI2, k053251_device::CI3, k053251_device::CI4 };
+	int layer[4];
+	int bg_colorbase, new_colorbase, plane, alpha;
+
+	m_sprite_colorbase = m_k053251->get_palette_index(k053251_device::CI0);
+	bg_colorbase = m_k053251->get_palette_index(k053251_device::CI1);
+	m_layer_colorbase[0] = 0x70;
+
+	for (plane = 1; plane < 4; plane++)
+	{
+		new_colorbase = m_k053251->get_palette_index(K053251_CI[plane]);
+		if (m_layer_colorbase[plane] != new_colorbase)
+		{
+			m_layer_colorbase[plane] = new_colorbase;
+			m_k056832->mark_plane_dirty( plane);
+		}
+	}
+
+	layer[0] = 1;
+	m_layerpri[0] = m_k053251->get_priority(k053251_device::CI2);
+	layer[1] = 2;
+	m_layerpri[1] = m_k053251->get_priority(k053251_device::CI3);
+	layer[2] = 3;
+	m_layerpri[2] = m_k053251->get_priority(k053251_device::CI4);
+	layer[3] = -1;
+	m_layerpri[3] = m_k053251->get_priority(k053251_device::CI1);
+
+	konami_sortlayers4(layer, m_layerpri);
+
+	m_k054338->update_all_shadows(0, *m_palette);
+	m_k054338->fill_solid_bg(bitmap, cliprect);
+
+	screen.priority().fill(0, cliprect);
+
+	for (plane = 0; plane < 4; plane++)
+	{
+		if (layer[plane] < 0)
+		{
+			m_k053250->draw(bitmap, cliprect, bg_colorbase, 0, screen.priority(), 1 << plane);
+		}
+		else if (!m_cur_alpha || layer[plane] != 1)
+		{
+			m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[plane], TILEMAP_DRAW_ALL_CATEGORIES, 1 << plane);
+		}
+		else
+		{
+			m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[plane], TILEMAP_DRAW_CATEGORY(0), 1 << plane);
+		}
+	}
+
+	m_k053246->k053247_sprites_draw( bitmap, cliprect);
+
+	if (m_cur_alpha)
+	{
+		alpha = m_k054338->set_alpha_level(1);
+
+		if (alpha > 0)
+		{
+			m_k056832->tilemap_draw(screen, bitmap, cliprect, 1, TILEMAP_DRAW_ALPHA(alpha) | TILEMAP_DRAW_CATEGORY(1), 0);
+		}
+	}
+
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, TILEMAP_DRAW_ALL_CATEGORIES, 0);
+	return 0;
+}
 
 #if 0 // (for reference; do not remove)
 
@@ -680,6 +899,8 @@ void xexex_state::init_xexex()
 		m_strip_0x1a = 1;
 	}
 }
+
+} // anonymous namespace
 
 GAME( 1991, xexex,  0,     xexex, xexex, xexex_state, init_xexex, ROT0, "Konami", "Xexex (ver EAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, orius,  xexex, xexex, xexex, xexex_state, init_xexex, ROT0, "Konami", "Orius (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

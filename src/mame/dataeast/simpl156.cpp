@@ -153,10 +153,6 @@ INPUT_PORTS_END
 
 void simpl156_state::eeprom_w(u32 data)
 {
-	//int okibank;
-
-	//okibank = data & 0x07;
-
 	m_okimusic->set_rom_bank(data & 0x7);
 
 	m_eeprom->clk_write(BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE);
@@ -209,13 +205,20 @@ void simpl156_state::rowscroll_w(offs_t offset, u32 data, u32 mem_mask)
 	COMBINE_DATA(&m_rowscroll[Layer][offset]);
 }
 
-/* Memory Map controled by PALs */
+/* Memory Map controlled by PALs */
+
+void simpl156_state::base_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x07ffff).rom(); // rom (32-bit)
+	map(0x200000, 0x200003).portr("IN0");
+	map(0x201000, 0x201fff).ram().share("systemram").mirror(0x002000); // work ram (32-bit)
+}
 
 /* Joe and Mac Returns */
 void simpl156_state::joemacr_map(address_map &map)
 {
-	map.unmap_value_high();
-	map(0x000000, 0x07ffff).rom();
+	base_map(map);
 	map(0x100000, 0x107fff).rw(FUNC(simpl156_state::mainram_r), FUNC(simpl156_state::mainram_w)).share("mainram"); // main ram
 	map(0x110000, 0x111fff).rw(FUNC(simpl156_state::spriteram_r), FUNC(simpl156_state::spriteram_w));
 	map(0x120000, 0x120fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
@@ -229,18 +232,13 @@ void simpl156_state::joemacr_map(address_map &map)
 	map(0x170000, 0x170003).readonly().nopw(); // ?
 	map(0x180000, 0x180000).rw("okisfx", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x1c0000, 0x1c0000).rw(m_okimusic, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x200000, 0x200003).portr("IN0");
-	map(0x201000, 0x201fff).ram().share("systemram"); // work ram (32-bit)
 }
 
 
 /* Chain Reaction */
 void simpl156_state::chainrec_map(address_map &map)
 {
-	map.unmap_value_high();
-	map(0x000000, 0x07ffff).rom(); // rom (32-bit)
-	map(0x200000, 0x200003).portr("IN0");
-	map(0x201000, 0x201fff).ram().share("systemram"); // work ram (32-bit)
+	base_map(map);
 	map(0x3c0000, 0x3c0000).rw(m_okimusic, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x400000, 0x407fff).rw(FUNC(simpl156_state::mainram_r), FUNC(simpl156_state::mainram_w)).share("mainram"); // main ram?
 	map(0x410000, 0x411fff).rw(FUNC(simpl156_state::spriteram_r), FUNC(simpl156_state::spriteram_w));
@@ -260,10 +258,7 @@ void simpl156_state::chainrec_map(address_map &map)
 /* Magical Drop */
 void simpl156_state::magdrop_map(address_map &map)
 {
-	map.unmap_value_high();
-	map(0x000000, 0x07ffff).rom();
-	map(0x200000, 0x200003).portr("IN0");
-	map(0x201000, 0x201fff).ram().share("systemram"); // work ram (32-bit)
+	base_map(map);
 	map(0x340000, 0x340000).rw(m_okimusic, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x380000, 0x387fff).rw(FUNC(simpl156_state::mainram_r), FUNC(simpl156_state::mainram_w)).share("mainram"); // main ram?
 	map(0x390000, 0x391fff).rw(FUNC(simpl156_state::spriteram_r), FUNC(simpl156_state::spriteram_w));
@@ -283,10 +278,7 @@ void simpl156_state::magdrop_map(address_map &map)
 /* Magical Drop Plus 1 */
 void simpl156_state::magdropp_map(address_map &map)
 {
-	map.unmap_value_high();
-	map(0x000000, 0x07ffff).rom();
-	map(0x200000, 0x200003).portr("IN0");
-	map(0x201000, 0x201fff).ram().share("systemram"); // work ram (32-bit)
+	base_map(map);
 	map(0x4c0000, 0x4c0000).rw(m_okimusic, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x680000, 0x687fff).rw(FUNC(simpl156_state::mainram_r), FUNC(simpl156_state::mainram_w)).share("mainram"); // main ram?
 	map(0x690000, 0x691fff).rw(FUNC(simpl156_state::spriteram_r), FUNC(simpl156_state::spriteram_w));
@@ -306,8 +298,7 @@ void simpl156_state::magdropp_map(address_map &map)
 /* Mitchell MT5601-0 PCB (prtytime, charlien, osman) */
 void simpl156_state::mitchell156_map(address_map &map)
 {
-	map.unmap_value_high();
-	map(0x000000, 0x07ffff).rom();
+	base_map(map);
 	map(0x100000, 0x100000).rw("okisfx", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140000).rw(m_okimusic, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x180000, 0x187fff).rw(FUNC(simpl156_state::mainram_r), FUNC(simpl156_state::mainram_w)).share("mainram"); // main ram
@@ -321,8 +312,6 @@ void simpl156_state::mitchell156_map(address_map &map)
 	map(0x1e0000, 0x1e1fff).rw(FUNC(simpl156_state::rowscroll_r<0>), FUNC(simpl156_state::rowscroll_w<0>));
 	map(0x1e4000, 0x1e5fff).rw(FUNC(simpl156_state::rowscroll_r<1>), FUNC(simpl156_state::rowscroll_w<1>));
 	map(0x1f0000, 0x1f0003).readonly().nopw(); // ?
-	map(0x200000, 0x200003).portr("IN0");
-	map(0x201000, 0x201fff).ram().share("systemram"); // work ram (32-bit)
 }
 
 
@@ -1045,7 +1034,7 @@ void simpl156_state::init_simpl156()
 	deco156_decrypt(machine());
 }
 
-/* Everything seems more stable if we run the CPU speed x4 and use Idle skips.. maybe it has an internal multipler? */
+/* Everything seems more stable if we run the CPU speed x4 and use Idle skips.. maybe it has an internal multiplier? */
 u32 simpl156_state::joemacr_speedup_r()
 {
 	if (m_maincpu->pc() == 0x284)
@@ -1056,7 +1045,7 @@ u32 simpl156_state::joemacr_speedup_r()
 
 void simpl156_state::init_joemacr()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201018, 0x020101b, read32smo_delegate(*this, FUNC(simpl156_state::joemacr_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201018, 0x020101b, 0, 0x2000, 0, emu::rw_delegate(*this, FUNC(simpl156_state::joemacr_speedup_r)));
 	init_simpl156();
 }
 
@@ -1069,7 +1058,7 @@ u32 simpl156_state::chainrec_speedup_r()
 
 void simpl156_state::init_chainrec()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201018, 0x020101b, read32smo_delegate(*this, FUNC(simpl156_state::chainrec_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201018, 0x020101b, 0, 0x2000, 0, emu::rw_delegate(*this, FUNC(simpl156_state::chainrec_speedup_r)));
 	init_simpl156();
 }
 
@@ -1082,7 +1071,7 @@ u32 simpl156_state::prtytime_speedup_r()
 
 void simpl156_state::init_prtytime()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201ae0, 0x0201ae3, read32smo_delegate(*this, FUNC(simpl156_state::prtytime_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201ae0, 0x0201ae3, 0, 0x2000, 0, emu::rw_delegate(*this, FUNC(simpl156_state::prtytime_speedup_r)));
 	init_simpl156();
 }
 
@@ -1096,7 +1085,7 @@ u32 simpl156_state::charlien_speedup_r()
 
 void simpl156_state::init_charlien()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201010, 0x0201013, read32smo_delegate(*this, FUNC(simpl156_state::charlien_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201010, 0x0201013, 0, 0x2000, 0, emu::rw_delegate(*this, FUNC(simpl156_state::charlien_speedup_r)));
 	init_simpl156();
 }
 
@@ -1109,7 +1098,7 @@ u32 simpl156_state::osman_speedup_r()
 
 void simpl156_state::init_osman()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201010, 0x0201013, read32smo_delegate(*this, FUNC(simpl156_state::osman_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201010, 0x0201013, 0, 0x2000, 0, emu::rw_delegate(*this, FUNC(simpl156_state::osman_speedup_r)));
 	init_simpl156();
 
 }

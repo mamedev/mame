@@ -5,8 +5,8 @@
      Microprose Games 3D hardware
 
 *************************************************************************/
-#ifndef MAME_AUDIO_MICRO3D_H
-#define MAME_AUDIO_MICRO3D_H
+#ifndef MAME_MISC_MICRO3D_A_H
+#define MAME_MISC_MICRO3D_A_H
 
 #pragma once
 
@@ -75,4 +75,4 @@ private:
 
 DECLARE_DEVICE_TYPE(MICRO3D_SOUND, micro3d_sound_device)
 
-#endif // MAME_AUDIO_MICRO3D_H
+#endif // MAME_MISC_MICRO3D_A_H

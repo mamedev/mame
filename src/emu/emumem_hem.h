@@ -12,12 +12,13 @@
 template<int Width, int AddrShift> class handler_entry_read_memory : public handler_entry_read_address<Width, AddrShift>
 {
 public:
-	using uX = typename emu::detail::handler_entry_size<Width>::uX;
+	using uX = emu::detail::handler_entry_size_t<Width>;
 
 	handler_entry_read_memory(address_space *space, u16 flags, void *base) : handler_entry_read_address<Width, AddrShift>(space, flags), m_base(reinterpret_cast<uX *>(base)) {}
 	~handler_entry_read_memory() = default;
 
 	uX read(offs_t offset, uX mem_mask) const override;
+	uX read_interruptible(offs_t offset, uX mem_mask) const override;
 	std::pair<uX, u16> read_flags(offs_t offset, uX mem_mask) const override;
 	u16 lookup_flags(offs_t offset, uX mem_mask) const override;
 	void *get_ptr(offs_t offset) const override;
@@ -31,12 +32,13 @@ private:
 template<int Width, int AddrShift> class handler_entry_write_memory : public handler_entry_write_address<Width, AddrShift>
 {
 public:
-	using uX = typename emu::detail::handler_entry_size<Width>::uX;
+	using uX = emu::detail::handler_entry_size_t<Width>;
 
 	handler_entry_write_memory(address_space *space, u16 flags, void *base) : handler_entry_write_address<Width, AddrShift>(space, flags), m_base(reinterpret_cast<uX *>(base)) {}
 	~handler_entry_write_memory() = default;
 
 	void write(offs_t offset, uX data, uX mem_mask) const override;
+	void write_interruptible(offs_t offset, uX data, uX mem_mask) const override;
 	u16 write_flags(offs_t offset, uX data, uX mem_mask) const override;
 	u16 lookup_flags(offs_t offset, uX mem_mask) const override;
 	void *get_ptr(offs_t offset) const override;
@@ -55,12 +57,13 @@ private:
 template<int Width, int AddrShift> class handler_entry_read_memory_bank : public handler_entry_read_address<Width, AddrShift>
 {
 public:
-	using uX = typename emu::detail::handler_entry_size<Width>::uX;
+	using uX = emu::detail::handler_entry_size_t<Width>;
 
 	handler_entry_read_memory_bank(address_space *space, u16 flags, memory_bank &bank) : handler_entry_read_address<Width, AddrShift>(space, flags), m_bank(bank) {}
 	~handler_entry_read_memory_bank() = default;
 
 	uX read(offs_t offset, uX mem_mask) const override;
+	uX read_interruptible(offs_t offset, uX mem_mask) const override;
 	std::pair<uX, u16> read_flags(offs_t offset, uX mem_mask) const override;
 	u16 lookup_flags(offs_t offset, uX mem_mask) const override;
 	void *get_ptr(offs_t offset) const override;
@@ -74,12 +77,13 @@ private:
 template<int Width, int AddrShift> class handler_entry_write_memory_bank : public handler_entry_write_address<Width, AddrShift>
 {
 public:
-	using uX = typename emu::detail::handler_entry_size<Width>::uX;
+	using uX = emu::detail::handler_entry_size_t<Width>;
 
 	handler_entry_write_memory_bank(address_space *space, u16 flags, memory_bank &bank) : handler_entry_write_address<Width, AddrShift>(space, flags), m_bank(bank) {}
 	~handler_entry_write_memory_bank() = default;
 
 	void write(offs_t offset, uX data, uX mem_mask) const override;
+	void write_interruptible(offs_t offset, uX data, uX mem_mask) const override;
 	u16 write_flags(offs_t offset, uX data, uX mem_mask) const override;
 	u16 lookup_flags(offs_t offset, uX mem_mask) const override;
 	void *get_ptr(offs_t offset) const override;

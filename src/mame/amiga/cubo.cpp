@@ -318,10 +318,12 @@ routines :
 
 #include "emu.h"
 #include "amiga.h"
-#include "imagedev/chd_cd.h"
+#include "imagedev/cdromimg.h"
 #include "machine/microtch.h"
 #include "speaker.h"
 
+
+namespace {
 
 /* set to 0 to use control panel with only buttons (as in quiz games) - joy is default in dispenser setup */
 #define MGPREM11_USE_JOY    1
@@ -335,7 +337,7 @@ public:
 		: amiga_state(mconfig, type, tag)
 		, m_player_ports(*this, {"P1", "P2"})
 		, m_microtouch(*this, "microtouch")
-		, m_cdda(*this, "cdda")
+		, m_akiko(*this, "akiko")
 	{ }
 
 	void handle_joystick_cia(uint8_t pra, uint8_t dra);
@@ -372,7 +374,7 @@ protected:
 
 private:
 	required_device<microtouch_device> m_microtouch;
-	required_device<cdda_device> m_cdda;
+	required_device<akiko_device> m_akiko;
 
 	typedef void (cubo_state::*input_hack_func)();
 	input_hack_func m_input_hack{};
@@ -412,7 +414,7 @@ WRITE_LINE_MEMBER( cubo_state::akiko_int_w )
 void cubo_state::akiko_cia_0_port_a_write(uint8_t data)
 {
 	/* bit 0 = cd audio mute */
-	m_cdda->set_output_gain( 0, ( data & 1 ) ? 0.0 : 1.0 );
+	m_akiko->set_mute(data & 1);
 
 	/* bit 1 = Power Led on Amiga */
 	m_power_led = BIT(~data, 1);
@@ -436,7 +438,7 @@ void cubo_state::cubo_mem(address_map &map)
 	map(0x800000, 0x800003).portr("DIPSW1");
 	map(0x800010, 0x800013).portr("DIPSW2");
 	map(0xa80000, 0xb7ffff).noprw();
-	map(0xb80000, 0xb8003f).rw("akiko", FUNC(akiko_device::read), FUNC(akiko_device::write));
+	map(0xb80000, 0xb8003f).rw(m_akiko, FUNC(akiko_device::read), FUNC(akiko_device::write));
 	map(0xbf0000, 0xbfffff).rw(FUNC(cubo_state::cia_r), FUNC(cubo_state::gayle_cia_w));
 	map(0xc00000, 0xdfffff).m(m_chipset, FUNC(address_map_bank_device::amap32));
 	map(0xe00000, 0xe7ffff).rom().region("kickstart", 0x80000);
@@ -1080,13 +1082,13 @@ void cubo_state::cubo(machine_config &config)
 
 	I2C_24C08(config, "i2cmem", 0); // AT24C08N
 
-	akiko_device &akiko(AKIKO(config, "akiko", 0));
-	akiko.mem_r_callback().set(FUNC(amiga_state::chip_ram_r));
-	akiko.mem_w_callback().set(FUNC(amiga_state::chip_ram_w));
-	akiko.int_callback().set(FUNC(cubo_state::akiko_int_w));
-	akiko.scl_callback().set("i2cmem", FUNC(i2cmem_device::write_scl));
-	akiko.sda_r_callback().set("i2cmem", FUNC(i2cmem_device::read_sda));
-	akiko.sda_w_callback().set("i2cmem", FUNC(i2cmem_device::write_sda));
+	AKIKO(config, m_akiko, 0);
+	m_akiko->mem_r_callback().set(FUNC(amiga_state::chip_ram_r));
+	m_akiko->mem_w_callback().set(FUNC(amiga_state::chip_ram_w));
+	m_akiko->int_callback().set(FUNC(cubo_state::akiko_int_w));
+	m_akiko->scl_callback().set("i2cmem", FUNC(i2cmem_device::write_scl));
+	m_akiko->sda_r_callback().set("i2cmem", FUNC(i2cmem_device::read_sda));
+	m_akiko->sda_w_callback().set("i2cmem", FUNC(i2cmem_device::write_sda));
 
 	// video hardware
 	pal_video(config);
@@ -1107,10 +1109,6 @@ void cubo_state::cubo(machine_config &config)
 	m_paula->mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
 	m_paula->int_cb().set(FUNC(amiga_state::paula_int_w));
 
-	CDDA(config, m_cdda);
-	m_cdda->add_route(0, "lspeaker", 0.50);
-	m_cdda->add_route(1, "rspeaker", 0.50);
-
 	/* cia */
 	// these are setup differently on other amiga drivers (needed for floppy to work) which is correct / why?
 	MOS8520(config, m_cia_0, amiga_state::CLK_E_PAL);
@@ -1122,8 +1120,6 @@ void cubo_state::cubo(machine_config &config)
 	m_cia_1->irq_wr_callback().set(FUNC(amiga_state::cia_1_irq));
 
 	MICROTOUCH(config, m_microtouch, 9600).stx().set(FUNC(cubo_state::rs232_rx_w));
-
-	CDROM(config, "cd32_cdrom").set_interface("cd32_cdrom");
 
 	/* fdc */
 	AMIGA_FDC(config, m_fdc, amiga_state::CLK_7M_PAL);
@@ -1161,77 +1157,77 @@ void cubo_state::init_cubo()
 ROM_START( cndypuzl )
 	CD32_BIOS
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "akiko" )
 	DISK_IMAGE_READONLY( "cndypuzl", 0, BAD_DUMP SHA1(5f41ed3521b3e05d233ac1245b78cb0b118b2b90) )
 ROM_END
 
 ROM_START( haremchl )
 	CD32_BIOS
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "akiko" )
 	DISK_IMAGE_READONLY( "haremchl", 0, BAD_DUMP SHA1(abbab347c0d7c5eef0465d0eee770754a452e874) )
 ROM_END
 
 ROM_START( lsrquiz )
 	CD32_BIOS
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "akiko" )
 	DISK_IMAGE_READONLY( "lsrquiz", 0, BAD_DUMP SHA1(41fb6cd0c9d36bd77e9c3db69d36801edc791e96) )
 ROM_END
 
 ROM_START( lsrquiz2i )
 	CD32_BIOS
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "akiko" )
 	DISK_IMAGE_READONLY( "lsrquiz2", 0, BAD_DUMP SHA1(78e261df1c548fa492e6cf37a9469640bb8816bf) )
 ROM_END
 
 ROM_START( lsrquizg )
 	CD32_BIOS
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "akiko" )
 	DISK_IMAGE_READONLY( "laserquizgreek2pro", 0, BAD_DUMP SHA1(8538915b4a0078f19197a5562e37ed3e6d0429a4) )
 ROM_END
 
 ROM_START( mgprem11 )
 	CD32_BIOS
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "akiko" )
 	DISK_IMAGE_READONLY( "mgprem11", 0, BAD_DUMP SHA1(7808db33d5949f6c86d12b32bc388c12377e7038) )
 ROM_END
 
 ROM_START( lasstixx )
 	CD32_BIOS
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "akiko" )
 	DISK_IMAGE_READONLY( "lasstixx", 0, BAD_DUMP SHA1(b8f6138e1f1840c193e786c56dab03c512f3e21f) )
 ROM_END
 
 ROM_START( mgnumber )
 	CD32_BIOS
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "akiko" )
 	DISK_IMAGE_READONLY( "magicnumber", 0, BAD_DUMP SHA1(60e1fadc42694742d19cc0ac2b6e99e9e33faa3d) )
 ROM_END
 
 ROM_START( odeontw )
 	CD32_BIOS
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "akiko" )
 	DISK_IMAGE_READONLY( "twister32_17_3", 0, BAD_DUMP SHA1(a40ec484708e22059f7186415283084ebf01323e) ) // has its audio cut a little, worth to mark as redump needed
 ROM_END
 
 ROM_START( odeontw2 )
 	CD32_BIOS
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "akiko" )
 	DISK_IMAGE_READONLY( "odeontw2", 0, BAD_DUMP SHA1(f39e09f35b65a6ae9f1eba4a22f970626b7d3b71) )
 ROM_END
 
 ROM_START( eldoralg )
 	CD32_BIOS
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "akiko" )
 	DISK_IMAGE_READONLY( "eldorado", 0, BAD_DUMP SHA1(bc1617c2e3438b729421c1d8b1bf88840b12f030) )
 ROM_END
 
@@ -1363,6 +1359,8 @@ void cubo_state::init_mgprem11()
 	init_cubo();
 	m_input_hack = &cubo_state::mgprem11_input_hack;
 }
+
+} // anonymous namespace
 
 
 GAME( 1993, cubo,      0,    cubo, cubo,     cubo_state, init_cubo,     ROT0, "Commodore",     "Cubo BIOS",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IS_BIOS_ROOT )

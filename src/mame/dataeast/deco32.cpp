@@ -1271,10 +1271,7 @@ void dragngun_state::dragngun_init_common()
 	{
 		u8 *ROM = memregion("dvi")->base();
 
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"video.dvi");
-		fp=fopen(filename, "w+b");
+		auto fp = fopen("video.dvi", "w+b");
 		if (fp)
 		{
 			fwrite(ROM, 0xc00000, 1, fp);

@@ -191,19 +191,22 @@
 
 #include "speaker.h"
 
-#define LOG_WARN    (1U<<1)
-#define LOG_CRU     (1U<<4)
-#define LOG_CRUKEY  (1U<<5)
-#define LOG_READ     (1U<<6)
-#define LOG_READG    (1U<<7)
-#define LOG_WRITE    (1U<<8)
-#define LOG_CONFIG   (1U<<9)
-#define LOG_PFM      (1U<<10)
+#define LOG_WARN     (1U << 1)
+#define LOG_CRU      (1U << 2)
+#define LOG_CRUKEY   (1U << 3)
+#define LOG_READ     (1U << 4)
+#define LOG_READG    (1U << 5)
+#define LOG_WRITE    (1U << 6)
+#define LOG_CONFIG   (1U << 7)
+#define LOG_PFM      (1U << 8)
 
 // Minimum log should be settings and warnings
 #define VERBOSE ( LOG_GENERAL | LOG_CONFIG | LOG_WARN )
 
 #include "logmacro.h"
+
+
+namespace {
 
 #define GENEVE_SRAM_TAG  "sram"
 #define GENEVE_SRAMX_TAG "sramexp"
@@ -941,7 +944,7 @@ WRITE_LINE_MEMBER( geneve_state::joystick_select )
 WRITE_LINE_MEMBER( geneve_state::keyboard_reset )
 {
 	if (state==CLEAR_LINE)
-		LOGMASKED(LOG_GENERAL, "Keyboard reset (line not connected)\n");
+		LOG("Keyboard reset (line not connected)\n");
 }
 
 /*
@@ -1266,6 +1269,9 @@ ROM_START(genmod)
 	ROM_SYSTEM_BIOS(1, "2.00", "Geneve Mod Boot ROM 2.00 (2021)")
 	ROMX_LOAD("gnmbt200.bin", 0x0000, 0x4000, CRC(0a66c714) SHA1(139ed03d365b21123295cd99c73736ee424dbb74), ROM_BIOS(1))
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE      INPUT   CLASS         INIT         COMPANY  FULLNAME       FLAGS
 COMP( 1987, geneve, 0,      0,      geneve,      geneve, geneve_state, init_geneve, "Myarc", "Geneve 9640", MACHINE_SUPPORTS_SAVE)

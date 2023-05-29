@@ -28,9 +28,9 @@ uniform vec4 rasterbloom;
 
 uniform vec4 blurwidth;
 
-vec3 texblur(vec2 c)
+vec4 texblur(vec2 c)
 {
-  vec3 col = pow(texture2D(blur_texture,c).rgb, vec3_splat(CRTgamma.x));
+  vec4 col = pow(texture2D(blur_texture,c), vec4(vec3_splat(CRTgamma.x),1.0));
   // taper the blur texture outside its border with a gaussian
   float w = blurwidth.x / 320.0;
   c = min(c, vec2_splat(1.0)-c) * aspect.xy * vec2_splat(1.0/w);
@@ -38,7 +38,7 @@ vec3 texblur(vec2 c)
   // approximation of erf gives smooth step
   // (convolution of gaussian with step)
   c = (step(0.0,c)-vec2_splat(0.5)) * sqrt(vec2_splat(1.0)-e2c) * (vec2_splat(1.0) + vec2_splat(0.1749)*e2c) + vec2_splat(0.5);
-  return col * vec3_splat( c.x * c.y );
+  return col * vec4_splat( c.x * c.y );
 }
 
 void main()
@@ -125,16 +125,16 @@ void main()
   weights_prev=weights_prev+scanlineWeights(uv_ratio.y+1.0, col_prev)/3.0;
   weights_next=weights_next+scanlineWeights(uv_ratio.y-1.0, col_next)/3.0;
 #endif
-  vec3 mul_res  = (col * weights + col_prev * weights_prev + col_next * weights_next).rgb;
+  vec4 mul_res  = col * weights + col_prev * weights_prev + col_next * weights_next;
 
   // halation and corners
-  vec3 blur = texblur(xy0);
+  vec4 blur = texblur(xy0);
   // include factor of rbloom:
   // (probably imperceptible) brightness reduction when raster grows
-  mul_res = mix(mul_res, blur, halation.x) * vec3_splat(cval*rbloom);
+  mul_res = mix(mul_res, blur, halation.x) * vec4_splat(cval*rbloom);
 
   // Shadow mask
-  vec3 cout = apply_shadow_mask(v_texCoord.xy, mul_res);
+  vec3 cout = apply_shadow_mask(v_texCoord.xy, mul_res.rgb);
 
   // Convert the image gamma for display on our output device.
   cout = linear_to_output(cout);

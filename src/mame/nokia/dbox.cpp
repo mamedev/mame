@@ -412,17 +412,15 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-//#define LOG_GENERAL (1U <<  0) // Already defined in logmacro.h
-#define LOG_SETUP   (1U <<  1)
-#define LOG_DISPLAY (1U <<  2)
-#define LOG_FLASH   (1U <<  3)
+#define LOG_SETUP   (1U << 1)
+#define LOG_DISPLAY (1U << 2)
+#define LOG_FLASH   (1U << 3)
 
 #define VERBOSE  (LOG_FLASH)
 #define LOG_OUTPUT_FUNC printf
 
 #include "logmacro.h"
 
-//#define LOG(...)        LOGMASKED(LOG_GENERAL, __VA_ARGS__) // Already defined in logmacro.h
 #define LOGSETUP(...)   LOGMASKED(LOG_SETUP,   __VA_ARGS__)
 #define LOGDISPLAY(...) LOGMASKED(LOG_DISPLAY, __VA_ARGS__)
 #define LOGFLASH(...)  LOGMASKED(LOG_FLASH,   __VA_ARGS__)
@@ -432,6 +430,9 @@
 #else
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
+
+
+namespace {
 
 #define LOCALFLASH 0 //  1 = local flash rom implementation 0 = intelflash_device
 
@@ -657,5 +658,8 @@ ROM_START( dbox )
 	ROM_SYSTEM_BIOS(2, "nbc106.bin", "Nokia Bootloader CI v1.06")
 	ROMX_LOAD( "bootci106.bin", 0x000000, 0x020000, BAD_DUMP CRC(641762a9) SHA1(7c5233390cc66d3ddf4c730a3418ccfba1dc2905), ROM_BIOS(2) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1996, dbox, 0, 0, dbox, dbox, dbox_state, init_dbox, "Nokia Multimedia", "D-box 1, Kirsch gruppe", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

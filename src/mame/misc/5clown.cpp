@@ -465,6 +465,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 #define MASTER_CLOCK    XTAL(10'000'000)
 
 
@@ -1214,6 +1216,8 @@ void _5clown_state::init_fclown()
 		}
 	}
 }
+
+} // anonymous namespace
 
 
 /*************************

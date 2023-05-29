@@ -5,8 +5,8 @@
     Cinemat/Leland driver
 
 *************************************************************************/
-#ifndef MAME_AUDIO_LELAND_H
-#define MAME_AUDIO_LELAND_H
+#ifndef MAME_CINEMATRONICS_LELAND_A_H
+#define MAME_CINEMATRONICS_LELAND_A_H
 
 #pragma once
 
@@ -129,4 +129,4 @@ DECLARE_DEVICE_TYPE(REDLINE_80186, redline_80186_sound_device)
 DECLARE_DEVICE_TYPE(ATAXX_80186, ataxx_80186_sound_device)
 DECLARE_DEVICE_TYPE(WSF_80186, wsf_80186_sound_device)
 
-#endif // MAME_AUDIO_LELAND_H
+#endif // MAME_CINEMATRONICS_LELAND_A_H

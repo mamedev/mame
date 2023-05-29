@@ -38,6 +38,8 @@ TODO:
 #include "speaker.h"
 
 
+namespace {
+
 #define MASTER_CLOCK    XTAL(19'968'000)
 
 class nightgal_state : public driver_device
@@ -1321,6 +1323,9 @@ void nightgal_state::init_ngalsumr()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6001, 0x6001, read8smo_delegate(*this, FUNC(nightgal_state::ngalsumr_prot_value_r)));
 	// 0x6003 some kind of f/f state
 }
+
+} // anonymous namespace
+
 
 /* Type 1 HW */
 GAME( 1984, nightgal, 0,        royalqn,  sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Night Gal (Japan 840920 AG 1-00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

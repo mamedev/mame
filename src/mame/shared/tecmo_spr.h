@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /* Tecmo Sprites */
-#ifndef MAME_VIDEO_TECMO_SPR_H
-#define MAME_VIDEO_TECMO_SPR_H
+#ifndef MAME_SHARED_TECMO_SPR_H
+#define MAME_SHARED_TECMO_SPR_H
 
 #pragma once
 
@@ -37,4 +37,4 @@ protected:
 DECLARE_DEVICE_TYPE(TECMO_SPRITE, tecmo_spr_device)
 
 
-#endif // MAME_VIDEO_TECMO_SPR_H
+#endif // MAME_SHARED_TECMO_SPR_H

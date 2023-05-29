@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_INCLUDES_BFM_AD5_H
-#define MAME_INCLUDES_BFM_AD5_H
+#ifndef MAME_BFM_BFM_AD5_H
+#define MAME_BFM_BFM_AD5_H
 
 #pragma once
 
@@ -30,4 +30,4 @@ private:
 
 INPUT_PORTS_EXTERN( bfm_ad5 );
 
-#endif // MAME_INCLUDES_BFM_AD5_H
+#endif // MAME_BFM_BFM_AD5_H

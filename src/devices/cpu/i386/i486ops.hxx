@@ -7,7 +7,7 @@ void i386_device::i486_cpuid()             // Opcode 0x0F A2
 	if (m_cpuid_id0 == 0)
 	{
 		// this 486 doesn't support the CPUID instruction
-		logerror("CPUID not supported at %08x!\n", m_eip);
+		LOGMASKED(LOG_MSR, "CPUID not supported at %08x!\n", m_eip);
 		i386_trap(6, 0, 0);
 	}
 	else
@@ -324,7 +324,7 @@ void i386_device::i486_group0F01_16()      // Opcode 0x0f 01
 					FAULT(FAULT_GP,0)
 				if(modrm >= 0xc0)
 				{
-					logerror("i486: invlpg with modrm %02X\n", modrm);
+					LOGMASKED(LOG_PM_FAULT_UD, "i486: invlpg with modrm %02X\n", modrm);
 					FAULT(FAULT_UD,0)
 				}
 				ea = GetEA(modrm,-1);
@@ -442,7 +442,7 @@ void i386_device::i486_group0F01_32()      // Opcode 0x0f 01
 					FAULT(FAULT_GP,0)
 				if(modrm >= 0xc0)
 				{
-					logerror("i486: invlpg with modrm %02X\n", modrm);
+					LOGMASKED(LOG_PM_FAULT_UD, "i486: invlpg with modrm %02X\n", modrm);
 					FAULT(FAULT_UD,0)
 				}
 				ea = GetEA(modrm,-1);
@@ -528,7 +528,7 @@ void i386_device::i486_mov_cr_r32()        // Opcode 0x0f 22
 			break;
 		case 4: CYCLES(1); break; // TODO
 		default:
-			logerror("i386: mov_cr_r32 CR%d!\n", cr);
+			LOGMASKED(LOG_INVALID_OPCODE, "i386: mov_cr_r32 CR%d!\n", cr);
 			return;
 	}
 	m_cr[cr] = data;
@@ -536,5 +536,10 @@ void i386_device::i486_mov_cr_r32()        // Opcode 0x0f 22
 
 void i386_device::i486_wait()
 {
+	if ((m_cr[0] & 0xa) == 0xa)
+	{
+		i386_trap(FAULT_NM, 0, 0);
+		return;
+	}
 	x87_mf_fault();
 }

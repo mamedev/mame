@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-#ifndef MAME_MACHINE_DMAC_0266_H
-#define MAME_MACHINE_DMAC_0266_H
+#ifndef MAME_SONY_DMAC_0266_H
+#define MAME_SONY_DMAC_0266_H
 
 #pragma once
 
@@ -77,4 +77,4 @@ private:
 
 DECLARE_DEVICE_TYPE(DMAC_0266, dmac_0266_device)
 
-#endif // MAME_MACHINE_DMAC_0266_H
+#endif // MAME_SONY_DMAC_0266_H

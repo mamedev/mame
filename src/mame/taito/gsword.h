@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Steve Ellenoff,Jarek Parchanski
-#ifndef MAME_INCLUDES_GSWORD_H
-#define MAME_INCLUDES_GSWORD_H
+#ifndef MAME_TAITO_GSWORD_H
+#define MAME_TAITO_GSWORD_H
 
 #pragma once
 
@@ -171,4 +171,4 @@ private:
 	u8      m_mcu2_p1;
 };
 
-#endif // MAME_INCLUDES_GSWORD_H
+#endif // MAME_TAITO_GSWORD_H

@@ -8,8 +8,8 @@
     (based on ng_memcard.h)
 
 *********************************************************************/
-#ifndef MAME_MACHINE_PGM2_MEMCARD_H
-#define MAME_MACHINE_PGM2_MEMCARD_H
+#ifndef MAME_IGS_PGM2_MEMCARD_H
+#define MAME_IGS_PGM2_MEMCARD_H
 
 #pragma once
 
@@ -32,12 +32,9 @@ public:
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "pg2,bin,mem"; }
 
-	virtual image_init_result call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
-	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
-
-	// device-level overrides
-	virtual void device_start() override;
+	virtual std::pair<std::error_condition, std::string> call_create(int format_type, util::option_resolution *format_options) override;
 
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
@@ -49,7 +46,11 @@ public:
 
 	/* returns the index of the current memory card, or -1 if none */
 	int present() { return is_loaded() ? 0 : -1; }
+
 private:
+	// device_t implementation
+	virtual void device_start() override;
+
 	u8 m_memcard_data[0x100];
 	u8 m_protection_data[4];
 	u8 m_security_data[4];
@@ -61,4 +62,4 @@ private:
 DECLARE_DEVICE_TYPE(PGM2_MEMCARD, pgm2_memcard_device)
 
 
-#endif // MAME_MACHINE_PGM2_MEMCARD_H
+#endif // MAME_IGS_PGM2_MEMCARD_H

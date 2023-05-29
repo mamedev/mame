@@ -14,10 +14,14 @@
 
 #include "ioprocs.h"
 
+#include "osdcore.h" // osd_printf_*
+
 #include <cstring>
 
 #define MV_CPC      "MV - CPC"
 #define EXTENDED    "EXTENDED"
+
+#define SPOT_DUPLICATES 0
 
 struct dskdsk_tag
 {
@@ -220,13 +224,14 @@ FLOPPY_CONSTRUCT( dsk_dsk_construct )
 	}
 
 	floppy_image_read(floppy, header, 0, 0x100);
-#ifdef SPOT_DUPLICATES
-	// this allow to spot .dsk files with same data and different headers, making easier to debug softlists.
-	uint32_t temp_size = floppy_image_size(floppy);
-	uint8_t tmp_copy[temp_size - 0x100];
-	floppy_image_read(floppy,tmp_copy,0x100,temp_size - 0x100);
-	printf("CRC16: %d\n", ccitt_crc16(0xffff, tmp_copy, temp_size - 0x100));
-#endif
+	if(SPOT_DUPLICATES)
+	{
+		// this allow to spot .dsk files with same data and different headers, making easier to debug softlists.
+		uint32_t temp_size = floppy_image_size(floppy);
+		auto tmp_copy = std::make_unique<uint8_t[]>(temp_size - 0x100);
+		floppy_image_read(floppy,tmp_copy.get(),0x100,temp_size - 0x100);
+		printf("CRC16: %d\n", ccitt_crc16(0xffff, tmp_copy.get(), temp_size - 0x100));
+	}
 
 	tag = (struct dskdsk_tag *) floppy_create_tag(floppy, sizeof(struct dskdsk_tag));
 	if (!tag)

@@ -17,6 +17,9 @@
 #include "video/mc6845.h"
 #include "screen.h"
 
+
+namespace {
+
 class falcots_state : public driver_device
 {
 public:
@@ -452,6 +455,9 @@ ROM_START(ts2624)
 	ROM_LOAD("prom.13d",   0x20, 0x20, NO_DUMP) // 74S288 or equivalent
 	ROM_LOAD("prom.12f",   0x20, 0x20, NO_DUMP) // 74S288 or equivalent
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1980, ts1,    0, 0, ts1,    ts1,    falcots_state, empty_init, "Falco Data Products", "TS-1 (v2.13.0)", MACHINE_IS_SKELETON)
 COMP(1982, ts2624, 0, 0, ts2624, ts2624, falcots_state, empty_init, "Falco Data Products", "TS-2624", MACHINE_IS_SKELETON)

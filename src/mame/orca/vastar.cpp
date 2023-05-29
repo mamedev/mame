@@ -106,6 +106,7 @@ Vsync : 60.58hz
 #include "emu.h"
 
 #include "orca40c.h"
+#include "vastar_viddev.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
@@ -165,42 +166,16 @@ class vastar_state : public vastar_common_state
 public:
 	vastar_state(const machine_config &mconfig, device_type type, const char *tag) :
 		vastar_common_state(mconfig, type, tag),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_bgvideoram(*this, "bg%uvideoram", 1U),
-		m_fgvideoram(*this, "fgvideoram"),
-		m_sprite_priority(*this, "sprite_priority")
+		m_vasvid(*this, "vasvid")
 	{ }
 
 	void vastar(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 
 private:
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-
-	required_shared_ptr_array<uint8_t, 2> m_bgvideoram;
-	required_shared_ptr<uint8_t> m_fgvideoram;
-	required_shared_ptr<uint8_t> m_sprite_priority;
-
-	// these are pointers into m_fgvideoram
-	uint8_t* m_bg_scroll[2]{};
-	uint8_t* m_spriteram[3]{};
-
-	tilemap_t *m_fg_tilemap = nullptr;
-	tilemap_t *m_bg_tilemap[2]{};
-
-	void fgvideoram_w(offs_t offset, uint8_t data);
-	template <uint8_t Which> void bgvideoram_w(offs_t offset, uint8_t data);
-
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_bg_tile_info);
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<vastar_video_device> m_vasvid;
 
 	void main_map(address_map &map);
 };
@@ -219,189 +194,6 @@ private:
 };
 
 
-// video
-
-/***************************************************************************
-
-  Callbacks for the TileMap code
-
-***************************************************************************/
-
-TILE_GET_INFO_MEMBER(vastar_state::get_fg_tile_info)
-{
-	int const code = m_fgvideoram[tile_index + 0x800] | (m_fgvideoram[tile_index + 0x400] << 8);
-	int const color = m_fgvideoram[tile_index];
-	int const fxy = (code & 0xc00) >> 10; // maybe, based on the other layers
-	tileinfo.set(0,
-			code,
-			color & 0x3f,
-			TILE_FLIPXY(fxy));
-}
-
-template <uint8_t Which>
-TILE_GET_INFO_MEMBER(vastar_state::get_bg_tile_info)
-{
-	int const code = m_bgvideoram[Which][tile_index + 0x800] | (m_bgvideoram[Which][tile_index] << 8);
-	int const color = m_bgvideoram[Which][tile_index + 0xc00];
-	int fxy = (code & 0xc00) >> 10;
-	tileinfo.set(4 - Which,
-			code,
-			color & 0x3f,
-			TILE_FLIPXY(fxy));
-}
-
-
-/***************************************************************************
-
-  Start the video hardware emulation.
-
-***************************************************************************/
-
-void vastar_state::video_start()
-{
-	m_fg_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(vastar_state::get_fg_tile_info)),  TILEMAP_SCAN_ROWS, 8,8, 32,32);
-	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(vastar_state::get_bg_tile_info<0>)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
-	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(vastar_state::get_bg_tile_info<1>)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
-
-	m_fg_tilemap->set_transparent_pen(0);
-	m_bg_tilemap[0]->set_transparent_pen(0);
-	m_bg_tilemap[1]->set_transparent_pen(0);
-
-	m_bg_tilemap[0]->set_scroll_cols(32);
-	m_bg_tilemap[1]->set_scroll_cols(32);
-}
-
-
-/***************************************************************************
-
-  Memory handlers
-
-***************************************************************************/
-
-void vastar_state::fgvideoram_w(offs_t offset, uint8_t data)
-{
-	m_fgvideoram[offset] = data;
-	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
-}
-
-template <uint8_t Which>
-void vastar_state::bgvideoram_w(offs_t offset, uint8_t data)
-{
-	m_bgvideoram[Which][offset] = data;
-	m_bg_tilemap[Which]->mark_tile_dirty(offset & 0x3ff);
-}
-
-
-/***************************************************************************
-
-  Display refresh
-
-***************************************************************************/
-
-// I wouldn't rule out the possibility of there being 2 sprite chips due to
-// "offs & 0x20" being used to select the tile bank.
-//
-// for Planet Probe more cases appear correct if we draw the list in reverse
-// order, but it's also possible we should be drawing 2 swapped lists in
-// forward order instead
-void vastar_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-//  for (int offs = 0; offs < 0x40; offs += 2)
-	for (int offs = 0x40 - 2; offs >= 0; offs -= 2)
-	{
-		int const code = ((m_spriteram[2][offs] & 0xfc) >> 2) + ((m_spriteram[1][offs] & 0x01) << 6)
-						+ ((offs & 0x20) << 2);
-
-		int const sx = m_spriteram[2][offs + 1];
-		int sy = m_spriteram[0][offs];
-		int const color = m_spriteram[0][offs + 1] & 0x3f;
-		int flipx = m_spriteram[2][offs] & 0x02;
-		int flipy = m_spriteram[2][offs] & 0x01;
-
-		if (flip_screen())
-		{
-			flipx = !flipx;
-			flipy = !flipy;
-		}
-
-		if (m_spriteram[1][offs] & 0x08)   // double width
-		{
-			if (!flip_screen())
-				sy = 224 - sy;
-
-			m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
-					code / 2,
-					color,
-					flipx, flipy,
-					sx, sy, 0);
-			// redraw with wraparound
-			m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
-					code / 2,
-					color,
-					flipx, flipy,
-					sx, sy + 256, 0);
-		}
-		else
-		{
-			if (!flip_screen())
-				sy = 240 - sy;
-
-			m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
-					code,
-					color,
-					flipx, flipy,
-					sx, sy, 0);
-		}
-	}
-}
-
-uint32_t vastar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	for (int i = 0;i < 32;i++)
-	{
-		m_bg_tilemap[0]->set_scrolly(i, m_bg_scroll[0][i]);
-		m_bg_tilemap[1]->set_scrolly(i, m_bg_scroll[1][i]);
-	}
-
-	switch (*m_sprite_priority)
-	{
-	case 0:
-		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		draw_sprites(bitmap, cliprect);
-		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
-		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-		break;
-
-	case 1: // ?? planet probe
-		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
-		draw_sprites(bitmap, cliprect);
-		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-		break;
-
-	case 2:
-		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		draw_sprites(bitmap, cliprect);
-		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
-		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
-		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-		break;
-
-	case 3:
-		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
-		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-		draw_sprites(bitmap, cliprect);
-		break;
-
-	default:
-		LOGPRIORITY("Unimplemented priority %X\n", *m_sprite_priority);
-		break;
-	}
-	return 0;
-}
-
-
 // machine
 
 void vastar_common_state::machine_start()
@@ -411,13 +203,6 @@ void vastar_common_state::machine_start()
 
 void vastar_state::machine_reset()
 {
-	m_sprite_priority[0] = 0;
-
-	m_spriteram[0] = m_fgvideoram + 0x000;
-	m_bg_scroll[0] = m_fgvideoram + 0x3c0;
-	m_bg_scroll[1] = m_fgvideoram + 0x3e0;
-	m_spriteram[1] = m_fgvideoram + 0x400;
-	m_spriteram[2] = m_fgvideoram + 0x800;
 }
 
 WRITE_LINE_MEMBER(vastar_common_state::nmi_mask_w)
@@ -425,14 +210,13 @@ WRITE_LINE_MEMBER(vastar_common_state::nmi_mask_w)
 	m_nmi_mask = state;
 }
 
-
 void vastar_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x8fff).ram().w(FUNC(vastar_state::bgvideoram_w<1>)).share(m_bgvideoram[1]).mirror(0x2000);
-	map(0x9000, 0x9fff).ram().w(FUNC(vastar_state::bgvideoram_w<0>)).share(m_bgvideoram[0]).mirror(0x2000);
-	map(0xc000, 0xc000).writeonly().share(m_sprite_priority);   // sprite / BG priority
-	map(0xc400, 0xcfff).ram().w(FUNC(vastar_state::fgvideoram_w)).share(m_fgvideoram); // fg videoram + sprites
+	map(0x8000, 0x8fff).ram().w(m_vasvid, FUNC(vastar_video_device::bgvideoram_w<1>)).share("bg1videoram").mirror(0x2000);
+	map(0x9000, 0x9fff).ram().w(m_vasvid, FUNC(vastar_video_device::bgvideoram_w<0>)).share("bg0videoram").mirror(0x2000);
+	map(0xc000, 0xc000).w(m_vasvid, FUNC(vastar_video_device::priority_w));
+	map(0xc400, 0xcfff).ram().w(m_vasvid, FUNC(vastar_video_device::fgvideoram_w)).share("fgvideoram");
 	map(0xe000, 0xe000).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w));
 	map(0xf000, 0xf7ff).ram().share(m_sharedram);
 }
@@ -659,52 +443,6 @@ static INPUT_PORTS_START( pprobe )
 	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ) )
 INPUT_PORTS_END
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	2,
-	{ 0, 4 },
-	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	16*8
-};
-
-static const gfx_layout spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	2,
-	{ 0, 4 },
-	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3,
-			16*8+0, 16*8+1, 16*8+2, 16*8+3, 24*8+0, 24*8+1, 24*8+2, 24*8+3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8 },
-	64*8
-};
-
-static const gfx_layout spritelayoutdw =
-{
-	16,32,
-	RGN_FRAC(1,1),
-	2,
-	{ 0, 4 },
-	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3,
-			16*8+0, 16*8+1, 16*8+2, 16*8+3, 24*8+0, 24*8+1, 24*8+2, 24*8+3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8,
-			64*8, 65*8, 66*8, 67*8, 68*8, 69*8, 70*8, 71*8,
-			96*8, 97*8, 98*8, 99*8, 100*8, 101*8, 102*8, 103*8 },
-	128*8
-};
-
-static GFXDECODE_START( gfx_vastar )
-	GFXDECODE_ENTRY( "fgtiles",  0, charlayout,     0, 64 )
-	GFXDECODE_ENTRY( "sprites",  0, spritelayout,   0, 64 )
-	GFXDECODE_ENTRY( "sprites",  0, spritelayoutdw, 0, 64 )
-	GFXDECODE_ENTRY( "bgtiles0", 0, charlayout,     0, 64 )
-	GFXDECODE_ENTRY( "bgtiles1", 0, charlayout,     0, 64 )
-GFXDECODE_END
 
 
 INTERRUPT_GEN_MEMBER(vastar_common_state::vblank_irq)
@@ -749,7 +487,7 @@ void vastar_state::vastar(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(vastar_state::vblank_irq));
 
 	ls259_device &mainlatch(*subdevice<ls259_device>("mainlatch"));
-	mainlatch.q_out_cb<1>().set(FUNC(vastar_state::flip_screen_set));
+	mainlatch.q_out_cb<1>().set(m_vasvid, FUNC(vastar_video_device::flipscreen_w));
 
 	// video hardware
 	screen_device& screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -757,11 +495,15 @@ void vastar_state::vastar(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(vastar_state::screen_update));
-	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vastar);
-	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
+	VASTAR_VIDEO_DEVICE(config, m_vasvid, 0);
+	m_vasvid->set_screen("screen");
+	m_vasvid->set_bg_bases(0x800, 0x000, 0xc00);
+	m_vasvid->set_fg_bases(0x800, 0x400, 0x000);
+	m_vasvid->set_other_bases(0x000, 0x400, 0x800, 0x3c0, 0x3e0);
+	m_vasvid->set_bg0ram_tag("bg0videoram");
+	m_vasvid->set_bg1ram_tag("bg1videoram");
+	m_vasvid->set_fgram_tag("fgvideoram");
 }
 
 void dogfightp_state::dogfightp(machine_config &config)
@@ -815,12 +557,12 @@ ROM_START( vastar )
 	ROM_REGION( 0x2000, "bgtiles1", 0 )
 	ROM_LOAD( "c_s4.rom",     0x0000, 0x2000, CRC(c9fbbfc9) SHA1(7c6ace0e2eae8420a31d9054ad5dd94924273d5f) )
 
-	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_REGION( 0x0300, "vasvid:proms", 0 )
 	ROM_LOAD( "tbp24s10.6p",  0x0000, 0x0100, CRC(a712d73a) SHA1(a65fa5928431d8631fb04e01ad0a0d2de849bf1d) )    // red component
 	ROM_LOAD( "tbp24s10.6s",  0x0100, 0x0100, CRC(0a7d48ec) SHA1(400e0b271c241712e7b7502e96e4f8a609e078e1) )    // green component
 	ROM_LOAD( "tbp24s10.6m",  0x0200, 0x0100, CRC(4c3db907) SHA1(03bcbc4763dcf49f4a06f499042e36183aa8b762) )    // blue component
 
-	ROM_REGION( 0x0100, "unkprom", 0 )
+	ROM_REGION( 0x0100, "vasvid:unkprom", 0 )
 	ROM_LOAD( "tbp24s10.8n",  0x0000, 0x0100, CRC(b5297a3b) SHA1(a5a512f86097b7d892f6d11e8492e8a379c07f60) )    // ????
 ROM_END
 
@@ -852,12 +594,12 @@ ROM_START( vastar2 )
 	ROM_REGION( 0x2000, "bgtiles1", 0 )
 	ROM_LOAD( "c_s4.rom",     0x0000, 0x2000, CRC(c9fbbfc9) SHA1(7c6ace0e2eae8420a31d9054ad5dd94924273d5f) )
 
-	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_REGION( 0x0300, "vasvid:proms", 0 )
 	ROM_LOAD( "tbp24s10.6p",  0x0000, 0x0100, CRC(a712d73a) SHA1(a65fa5928431d8631fb04e01ad0a0d2de849bf1d) )    // red component
 	ROM_LOAD( "tbp24s10.6s",  0x0100, 0x0100, CRC(0a7d48ec) SHA1(400e0b271c241712e7b7502e96e4f8a609e078e1) )    // green component
 	ROM_LOAD( "tbp24s10.6m",  0x0200, 0x0100, CRC(4c3db907) SHA1(03bcbc4763dcf49f4a06f499042e36183aa8b762) )    // blue component
 
-	ROM_REGION( 0x0100, "unkprom", 0 )
+	ROM_REGION( 0x0100, "vasvid:unkprom", 0 )
 	ROM_LOAD( "tbp24s10.8n",  0x0000, 0x0100, CRC(b5297a3b) SHA1(a5a512f86097b7d892f6d11e8492e8a379c07f60) )    // ????
 ROM_END
 
@@ -895,12 +637,12 @@ ROM_START( vastar3 )
 	ROM_REGION( 0x2000, "bgtiles1", 0 )
 	ROM_LOAD( "c_s4.rom",     0x0000, 0x2000, CRC(c9fbbfc9) SHA1(7c6ace0e2eae8420a31d9054ad5dd94924273d5f) )
 
-	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_REGION( 0x0300, "vasvid:proms", 0 )
 	ROM_LOAD( "tbp24s10.6p",  0x0000, 0x0100, CRC(a712d73a) SHA1(a65fa5928431d8631fb04e01ad0a0d2de849bf1d) )    // red component
 	ROM_LOAD( "tbp24s10.6s",  0x0100, 0x0100, CRC(0a7d48ec) SHA1(400e0b271c241712e7b7502e96e4f8a609e078e1) )    // green component
 	ROM_LOAD( "tbp24s10.6m",  0x0200, 0x0100, CRC(4c3db907) SHA1(03bcbc4763dcf49f4a06f499042e36183aa8b762) )    // blue component
 
-	ROM_REGION( 0x0100, "unkprom", 0 )
+	ROM_REGION( 0x0100, "vasvid:unkprom", 0 )
 	ROM_LOAD( "tbp24s10.8n",  0x0000, 0x0100, CRC(b5297a3b) SHA1(a5a512f86097b7d892f6d11e8492e8a379c07f60) )    // ????
 ROM_END
 
@@ -932,12 +674,12 @@ ROM_START( vastar4 ) // minimal changes (2 bytes) from parent set
 	ROM_REGION( 0x2000, "bgtiles1", 0 )
 	ROM_LOAD( "c_s4.rom",     0x0000, 0x2000, CRC(c9fbbfc9) SHA1(7c6ace0e2eae8420a31d9054ad5dd94924273d5f) )
 
-	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_REGION( 0x0300, "vasvid:proms", 0 )
 	ROM_LOAD( "tbp24s10.6p",  0x0000, 0x0100, CRC(a712d73a) SHA1(a65fa5928431d8631fb04e01ad0a0d2de849bf1d) )    // red component
 	ROM_LOAD( "tbp24s10.6s",  0x0100, 0x0100, CRC(0a7d48ec) SHA1(400e0b271c241712e7b7502e96e4f8a609e078e1) )    // green component
 	ROM_LOAD( "tbp24s10.6m",  0x0200, 0x0100, CRC(4c3db907) SHA1(03bcbc4763dcf49f4a06f499042e36183aa8b762) )    // blue component
 
-	ROM_REGION( 0x0100, "unkprom", 0 )
+	ROM_REGION( 0x0100, "vasvid:unkprom", 0 )
 	ROM_LOAD( "tbp24s10.8n",  0x0000, 0x0100, CRC(b5297a3b) SHA1(a5a512f86097b7d892f6d11e8492e8a379c07f60) )    // ????
 ROM_END
 
@@ -987,12 +729,12 @@ ROM_START( pprobe )
 	ROM_REGION( 0x2000, "bgtiles1", 0 )
 	ROM_LOAD( "pb7.bin",  0x0000, 0x2000, CRC(439978f7) SHA1(ba80dd919a9bb6f8c516d4eb794c02ae0f0dea00) )
 
-	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_REGION( 0x0300, "vasvid:proms", 0 )
 	ROM_LOAD( "n82s129.3",   0x0000, 0x0100, CRC(dfb6b97c) SHA1(e35eda4f3022e661b021b952c53054d96481fb49) )
 	ROM_LOAD( "n82s129.1",   0x0100, 0x0100, CRC(3cc696a2) SHA1(0a1407c19c63ee0f02c3e8b95b0c199b9aec3ce5) )
 	ROM_LOAD( "dm74s287.2",  0x0200, 0x0100, CRC(64fea033) SHA1(19bbb325f71cb17ea069958b3c246fa908f0008e) )
 
-	ROM_REGION( 0x0100, "unkprom", 0 )
+	ROM_REGION( 0x0100, "vasvid:unkprom", 0 )
 	ROM_LOAD( "mmi6301-1.bin",  0x0000, 0x0100, CRC(b5297a3b) SHA1(a5a512f86097b7d892f6d11e8492e8a379c07f60) )  // ???? == vastar - tbp24s10.8n
 ROM_END
 

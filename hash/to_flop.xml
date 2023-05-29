@@ -47,7 +47,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="6809langa" cloneof="6809lang">
-		<description>6809 Language Module (Hacked?)</description>
+		<description>6809 Language Module (hacked?)</description>
 		<year>1988</year>
 		<publisher>&lt;hack? (HMEL)&gt;</publisher>
 
@@ -116,7 +116,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 <!--
     <software name="amigatob" cloneof="amigato">
-        <description>Amiga-TO (Unknown Version, Bad)</description>
+        <description>Amiga-TO (unknown version, bad)</description>
         <year>200?</year>
         <publisher>Prehis-To - ContacThoms</publisher>
 
@@ -177,7 +177,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="applicrta" cloneof="applicrt">
-		<description>Applicartouche (v1.2, SAP Format)</description>
+		<description>Applicartouche (v1.2, SAP format)</description>
 		<year>1989</year>
 		<publisher>Micromedia Systemes</publisher>
 
@@ -238,7 +238,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="asmexta" cloneof="asmext">
-		<description>AsmExt (Alt)</description>
+		<description>AsmExt (alt)</description>
 		<year>2000</year>
 		<publisher>Prehis-To</publisher>
 
@@ -275,7 +275,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="initb128a" cloneof="initb128">
-		<description>Auto-Initiation BASIC 128 + D.O.S. BASIC 1.0 (SAP Format)</description>
+		<description>Auto-Initiation BASIC 128 + D.O.S. BASIC 1.0 (SAP format)</description>
 		<year>1985</year>
 		<publisher>Thomson</publisher>
 		<info name="alt_title" value="Initiation au BASIC 128"/>
@@ -288,7 +288,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="initb128b" cloneof="initb128">
-		<description>Auto-Initiation BASIC 128 + D.O.S. BASIC 1.0 (SAP Format, Alt)</description>
+		<description>Auto-Initiation BASIC 128 + D.O.S. BASIC 1.0 (SAP format, alt)</description>
 		<year>1985</year>
 		<publisher>Thomson</publisher>
 		<info name="alt_title" value="Initiation au BASIC 128"/>
@@ -313,7 +313,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="backupraa" cloneof="backupra">
-		<description>Backup Rapide (SAP Format)</description>
+		<description>Backup Rapide (SAP format)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -350,7 +350,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="budgetfa" cloneof="budgetf">
-		<description>Budget Familial (SAP Format)</description>
+		<description>Budget Familial (SAP format)</description>
 		<year>1984</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -386,7 +386,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cartoonma" cloneof="cartoonm">
-		<description>Cartoon Maker (Alt)</description>
+		<description>Cartoon Maker (alt)</description>
 		<year>1985</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -398,7 +398,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cartoonmb" cloneof="cartoonm">
-		<description>Cartoon Maker (SAP Format)</description>
+		<description>Cartoon Maker (SAP format)</description>
 		<year>1985</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -471,7 +471,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="composura" cloneof="composur">
-		<description>Le Composeur+ (v3.2) (SAP Format)</description>
+		<description>Le Composeur+ (v3.2) (SAP format)</description>
 		<year>198?</year>
 		<publisher>Infogrames</publisher>
 
@@ -519,7 +519,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="contrto8a" cloneof="contrto8">
-		<description>Controle TO8 (Alt)</description>
+		<description>Controle TO8 (alt)</description>
 		<year>198?</year>
 		<publisher>Cofadel Service</publisher>
 
@@ -544,7 +544,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="controlpa" cloneof="controlp">
-		<description>Control Plus (SAP Format)</description>
+		<description>Control Plus (SAP format)</description>
 		<year>1987</year>
 		<publisher>Cofadel Service</publisher>
 		<info name="alt_title" value="Control TO9+" />
@@ -605,7 +605,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cuisinfra" cloneof="cuisinfr">
-		<description>La Cuisine Francaise (SAP Format)</description>
+		<description>La Cuisine Francaise (SAP format)</description>
 		<year>1985</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -642,7 +642,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="dctransa" cloneof="dctrans">
-		<description>DCTransferts (No Menu)</description>
+		<description>DCTransferts (no menu)</description>
 		<year>2005?</year>
 		<publisher>Daniel Coulom</publisher>
 
@@ -702,7 +702,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="dos720a" cloneof="dos720">
-		<description>DOS720 (SAP Format)</description>
+		<description>DOS720 (SAP format)</description>
 		<year>1989</year>
 		<publisher>BC 109 Soft</publisher>
 
@@ -746,7 +746,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<!-- can also be found in mo5_flop.xml -->
 	<!-- contains 2 duplicates of parent set -->
 	<software name="dumproma" cloneof="dumprom">
-		<description>Dump rom UC, controleur, cartouche (640K Disk)</description>
+		<description>Dump rom UC, controleur, cartouche (640K disk)</description>
 		<year>2008</year>
 		<publisher>DCsoft</publisher>
 
@@ -782,7 +782,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="emptydska" cloneof="emptydsk">
-		<description>Empty Disk (Alt)</description>
+		<description>Empty Disk (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -806,7 +806,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="enigmaa" cloneof="enigma">
-		<description>Enigma (v2.0, Alt)</description>
+		<description>Enigma (v2.0, alt)</description>
 		<year>1995</year>
 		<publisher>Alexandre Pukall</publisher>
 
@@ -860,7 +860,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="gestiona" cloneof="gestion" supported="no">
-		<description>Gestion FIL (640K Disk)</description>
+		<description>Gestion FIL (640K disk)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -896,7 +896,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="graffitia" cloneof="graffiti">
-		<description>Graffiti (SAP Format)</description>
+		<description>Graffiti (SAP format)</description>
 		<year>198?</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -908,7 +908,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="graffitib" cloneof="graffiti">
-		<description>Graffiti (SAP Format, Alt)</description>
+		<description>Graffiti (SAP format, alt)</description>
 		<year>198?</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -932,7 +932,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="grphiquea" cloneof="grphique">
-		<description>Graphique (SAP Format)</description>
+		<description>Graphique (SAP format)</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -956,7 +956,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="hpcolora" cloneof="hpcolor">
-		<description>HPCOLOR (Alt)</description>
+		<description>HPCOLOR (alt)</description>
 		<year>2001</year>
 		<publisher>Prehis-To</publisher>
 
@@ -968,7 +968,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="hpdriver" supported="no">
-		<description>hpdriver (Bad)</description>
+		<description>hpdriver (bad)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -993,7 +993,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="initb512a" cloneof="initb512">
-		<description>Initiation au BASIC 512 + Multidos (Alt)</description>
+		<description>Initiation au BASIC 512 + Multidos (alt)</description>
 		<year>1986</year>
 		<publisher>Thomson</publisher>
 		<info name="usage" value="Can be booted with BASIC 512 or BASIC 1.0"/>
@@ -1006,7 +1006,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="initb512b" cloneof="initb512">
-		<description>Initiation au BASIC 512 + Multidos (SAP Format)</description>
+		<description>Initiation au BASIC 512 + Multidos (SAP format)</description>
 		<year>1986</year>
 		<publisher>Thomson</publisher>
 		<info name="usage" value="Can be booted with BASIC 512 or BASIC 1.0"/>
@@ -1019,7 +1019,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="initb512c" cloneof="initb512">
-		<description>Initiation au BASIC 512 + Multidos (SAP Format, Alt)</description>
+		<description>Initiation au BASIC 512 + Multidos (SAP format, alt)</description>
 		<year>1986</year>
 		<publisher>Thomson</publisher>
 		<info name="usage" value="Can be booted with BASIC 512 or BASIC 1.0"/>
@@ -1032,7 +1032,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="initb512d" cloneof="initb512">
-		<description>Initiation au BASIC 512 + Multidos (SAP Format, Alt 2)</description>
+		<description>Initiation au BASIC 512 + Multidos (SAP format, alt 2)</description>
 		<year>1986</year>
 		<publisher>Thomson</publisher>
 		<info name="usage" value="Can be booted with BASIC 512 or BASIC 1.0"/>
@@ -1057,7 +1057,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="initto9a" cloneof="initto9">
-		<description>Auto-Initiation TO9 (SAP Format)</description>
+		<description>Auto-Initiation TO9 (SAP format)</description>
 		<year>1985</year>
 		<publisher>Thomson</publisher>
 
@@ -1100,7 +1100,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="journvota" cloneof="journvot">
-		<description>Le Journal de Votre Naissance (Alt Disk 1)</description>
+		<description>Le Journal de Votre Naissance (alt Disk 1)</description>
 		<year>1999</year>
 		<publisher>Emmanuel Boulanger</publisher>
 
@@ -1151,7 +1151,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="jrnalista" cloneof="jrnalist">
-		<description>Le Journaliste (SAP Format)</description>
+		<description>Le Journaliste (SAP format)</description>
 		<year>1988</year>
 		<publisher>Cedic/Nathan</publisher>
 		<info name="usage" value="Press 4 key and load file &quot;JOURNAL&quot;"/>
@@ -1221,7 +1221,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="logode">
-		<description>LOGO-TO7 DOS Disk (Ger)</description>
+		<description>LOGO-TO7 DOS Disk (Germany)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -1245,7 +1245,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="micrserva" cloneof="micrserv">
-		<description>Micro Serveur (v1.20, SAP Format)</description>
+		<description>Micro Serveur (v1.20, SAP format)</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -1270,7 +1270,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="multplana" cloneof="multplan">
-		<description>Microsoft Multiplan (v1.07, SAP Format)</description>
+		<description>Microsoft Multiplan (v1.07, SAP format)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 		<info name="usage" value="Press E key to load the program"/>
@@ -1283,7 +1283,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="multplanb" cloneof="multplan">
-		<description>Microsoft Multiplan (v1.07, SAP Format, Alt)</description>
+		<description>Microsoft Multiplan (v1.07, SAP format, alt)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 		<info name="usage" value="Press E key to load the program"/>
@@ -1320,7 +1320,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="mserveura" cloneof="mserveur">
-		<description>MSERVEUR (SAP Format)</description>
+		<description>MSERVEUR (SAP format)</description>
 		<year>198?</year>
 		<publisher>Mictel</publisher>
 
@@ -1345,7 +1345,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="multidosa" cloneof="multidos">
-		<description>Multidos (v1.0, Alt)</description>
+		<description>Multidos (v1.0, alt)</description>
 		<year>1986</year>
 		<publisher>Thomson</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
@@ -1438,7 +1438,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="paragrpha" cloneof="paragrph">
-		<description>Paragraphe (v2.0, Alt)</description>
+		<description>Paragraphe (v2.0, alt)</description>
 		<year>1985?</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 		<info name="usage" value="Press 4 key and load file &quot;PARAGRAP&quot;"/>
@@ -1451,7 +1451,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="paragrphb" cloneof="paragrph">
-		<description>Paragraphe (v2.0, Alt 2)</description>
+		<description>Paragraphe (v2.0, alt 2)</description>
 		<year>1985?</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 		<info name="usage" value="Press 4 key and load file &quot;PARAGRAP&quot;"/>
@@ -1476,7 +1476,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="parolea" cloneof="parole">
-		<description>Parole (SAP Format)</description>
+		<description>Parole (SAP format)</description>
 		<year>1985</year>
 		<publisher>Cedic/Nathan</publisher>
 
@@ -1512,7 +1512,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="pedigreea" cloneof="pedigree">
-		<description>Pedigree (v2.0, Alt)</description>
+		<description>Pedigree (v2.0, alt)</description>
 		<year>1997</year>
 		<publisher>Bledor-Soft</publisher>
 
@@ -1586,7 +1586,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="praxitela" cloneof="praxitel">
-		<description>Praxitele (Alt)</description>
+		<description>Praxitele (alt)</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL) - Thomson</publisher>
 
@@ -1670,7 +1670,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="sauveroma" cloneof="sauverom">
-		<description>Sauvegarde ROM TO8 + TO9 (SAP Format)</description>
+		<description>Sauvegarde ROM TO8 + TO9 (SAP format)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -1853,7 +1853,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="sosa" cloneof="sos">
-		<description>SOS (SAP Format)</description>
+		<description>SOS (SAP format)</description>
 		<year>1985</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -1890,7 +1890,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 <!--
     <software name="speedywa" cloneof="speedyw">
-        <description>Speedy Wonder (SAP Format, Bad)</description>
+        <description>Speedy Wonder (SAP format, bad)</description>
         <year>1986</year>
         <publisher>Minipuce</publisher>
 
@@ -1915,7 +1915,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="statistqa" cloneof="statistq">
-		<description>Statistiques (SAP Format)</description>
+		<description>Statistiques (SAP format)</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -1940,7 +1940,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="studioa" cloneof="studio">
-		<description>Studio (SAP Format)</description>
+		<description>Studio (SAP format)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL) - Thomson</publisher>
 		<info name="usage" value="Press 4 key and load file &quot;STUDIO&quot;"/>
@@ -1984,7 +1984,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="sysppma" cloneof="sysppm">
-		<description>Systeme P.P.M. (v8.0, SAP Format)</description>
+		<description>Systeme P.P.M. (v8.0, SAP format)</description>
 		<year>2002</year>
 		<publisher>Bledor-Soft</publisher>
 
@@ -2015,7 +2015,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="sysppmb" cloneof="sysppm" supported="no">
-		<description>Systeme P.P.M. (v8.0, 640K Disks)</description>
+		<description>Systeme P.P.M. (v8.0, 640K disks)</description>
 		<year>2002</year>
 		<publisher>Bledor-Soft</publisher>
 
@@ -2078,7 +2078,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="sysppm68" cloneof="sysppm" supported="partial">
-		<description>Systeme P.P.M. (v6.8, Missing Disk 1)</description>
+		<description>Systeme P.P.M. (v6.8, missing Disk 1)</description>
 		<year>2000</year>
 		<publisher>Bledor-Soft</publisher>
 
@@ -2227,7 +2227,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 <!--
     <software name="tosnapa" cloneof="tosnap" supported="partial">
-        <description>TO-SNAP &amp; Demo (v1.1, Bad)</description>
+        <description>TO-SNAP &amp; Demo (v1.1, bad)</description>
         <year>1992</year>
         <publisher>HMEL</publisher>
         <info name="usage" value="To load TO-SNAP, Press 4 key and load file &quot;TO-SNAP&quot;"/>
@@ -2265,7 +2265,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="to7dbasa" cloneof="to7dbas">
-		<description>TO7 Disk BASIC (v1.2, Alt)</description>
+		<description>TO7 Disk BASIC (v1.2, alt)</description>
 		<year>1985</year>
 		<publisher>Microsoft</publisher>
 
@@ -2310,7 +2310,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="to9pappsa" cloneof="to9papps">
-		<description>TO9+ Applications (SAP Format)</description>
+		<description>TO9+ Applications (SAP format)</description>
 		<year>1986</year>
 		<publisher>Thomson</publisher>
 
@@ -2329,7 +2329,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="to9pappsb" cloneof="to9papps">
-		<description>TO9+ Applications (SAP Format, Alt Disk 1)</description>
+		<description>TO9+ Applications (SAP format, alt Disk 1)</description>
 		<year>1986</year>
 		<publisher>Thomson</publisher>
 
@@ -2379,7 +2379,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="to9pinita" cloneof="to9pinit">
-		<description>TO9+ Initiations (SAP Format)</description>
+		<description>TO9+ Initiations (SAP format)</description>
 		<year>1986</year>
 		<publisher>Thomson</publisher>
 
@@ -2398,7 +2398,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="to9pinitb" cloneof="to9pinit" supported="no">
-		<description>TO9+ Initiations (640K Disk)</description>
+		<description>TO9+ Initiations (640K disk)</description>
 		<year>1986</year>
 		<publisher>Thomson</publisher>
 
@@ -2422,7 +2422,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="traceura" cloneof="traceur">
-		<description>Le Traceur (Alt)</description>
+		<description>Le Traceur (alt)</description>
 		<year>1991</year>
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
@@ -2446,7 +2446,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="typo7a" cloneof="typo7">
-		<description>Typo-7 (Alt)</description>
+		<description>Typo-7 (alt)</description>
 		<year>1988</year>
 		<publisher>Cedic/Nathan</publisher>
 
@@ -2459,7 +2459,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- how to get it running? -->
 	<software name="pascal" supported="no">
-		<description>UCSD Pascal (Bad?)</description>
+		<description>UCSD Pascal (bad?)</description>
 		<year>198?</year>
 		<publisher>UCSD</publisher>
 		<info name="usage" value="Press 4 key and load file &quot;PASCAL&quot;"/>
@@ -2743,7 +2743,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="edilhista" cloneof="edilhist">
-		<description>Collection Histore-Geographie 1 (SAP Format)</description>
+		<description>Collection Histore-Geographie 1 (SAP format)</description>
 		<year>1986</year>
 		<publisher>Edition Informatique Logiciel (EDIL)</publisher>
 
@@ -2946,7 +2946,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="action1a" cloneof="action1">
-		<description>Action Volume 1 (SAP Format)</description>
+		<description>Action Volume 1 (SAP format)</description>
 		<year>1989</year>
 		<publisher>Microids</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
@@ -2995,7 +2995,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="athletesa" cloneof="athletes">
-		<description>Les Athletes (Alt)</description>
+		<description>Les Athletes (alt)</description>
 		<year>198?</year>
 		<publisher>Infogrames</publisher>
 
@@ -3007,7 +3007,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="athletesb" cloneof="athletes">
-		<description>Les Athletes (Alt 2)</description>
+		<description>Les Athletes (alt 2)</description>
 		<year>198?</year>
 		<publisher>Infogrames</publisher>
 
@@ -3019,7 +3019,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="athletesc" cloneof="athletes">
-		<description>Les Athletes (SAP Format)</description>
+		<description>Les Athletes (SAP format)</description>
 		<year>198?</year>
 		<publisher>Infogrames</publisher>
 
@@ -3031,7 +3031,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="athletesd" cloneof="athletes">
-		<description>Les Athletes (SAP Format, Alt)</description>
+		<description>Les Athletes (SAP format, alt)</description>
 		<year>198?</year>
 		<publisher>Infogrames</publisher>
 
@@ -3043,7 +3043,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="athletese" cloneof="athletes">
-		<description>Les Athletes (SAP Format, Alt 2)</description>
+		<description>Les Athletes (SAP format, alt 2)</description>
 		<year>198?</year>
 		<publisher>Infogrames</publisher>
 
@@ -3055,7 +3055,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="athletesf" cloneof="athletes">
-		<description>Les Athletes (SAP Format, Alt 3)</description>
+		<description>Les Athletes (SAP format, alt 3)</description>
 		<year>198?</year>
 		<publisher>Infogrames</publisher>
 
@@ -3086,7 +3086,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="athlete2a" cloneof="athlete2">
-		<description>Les Athletes no.2 - 1ere Partie (SAP Format)</description>
+		<description>Les Athletes no.2 - 1ere Partie (SAP format)</description>
 		<year>198?</year>
 		<publisher>Infogrames</publisher>
 
@@ -3105,7 +3105,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="athlete2b" cloneof="athlete2">
-		<description>Les Athletes no.2 - 1ere Partie (SAP Format, Alt)</description>
+		<description>Les Athletes no.2 - 1ere Partie (SAP format, alt)</description>
 		<year>198?</year>
 		<publisher>Infogrames</publisher>
 
@@ -3124,7 +3124,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="athlete2c" cloneof="athlete2">
-		<description>Les Athletes no.2 - 1ere Partie (SAP Format, Alt 2)</description>
+		<description>Les Athletes no.2 - 1ere Partie (SAP format, alt 2)</description>
 		<year>198?</year>
 		<publisher>Infogrames</publisher>
 
@@ -3162,7 +3162,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="aventursa" cloneof="aventurs">
-		<description>Les Aventuriers - 1ere Partie (SAP Format)</description>
+		<description>Les Aventuriers - 1ere Partie (SAP format)</description>
 		<year>1988</year>
 		<publisher>Infogrames</publisher>
 
@@ -3213,7 +3213,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="bda" cloneof="bd">
-		<description>Les B.D. (Alt)</description>
+		<description>Les B.D. (alt)</description>
 		<year>1988</year>
 		<publisher>Infogrames</publisher>
 		<info name="alt_title" value="Les Bandes Dessinees"/>
@@ -3245,7 +3245,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="bdb" cloneof="bd">
-		<description>Les B.D. (SAP Format)</description>
+		<description>Les B.D. (SAP format)</description>
 		<year>1988</year>
 		<publisher>Infogrames</publisher>
 		<info name="alt_title" value="Les Bandes Dessinees"/>
@@ -3277,7 +3277,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="bdc" cloneof="bd">
-		<description>Les B.D. (SAP Format, Alt Disk 1)</description>
+		<description>Les B.D. (SAP format, alt Disk 1)</description>
 		<year>1988</year>
 		<publisher>Infogrames</publisher>
 		<info name="alt_title" value="Les Bandes Dessinees"/>
@@ -3309,7 +3309,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="bdd" cloneof="bd">
-		<description>Les B.D. (640K Disks)</description>
+		<description>Les B.D. (640K disks)</description>
 		<year>1988</year>
 		<publisher>Infogrames</publisher>
 		<info name="alt_title" value="Les Bandes Dessinees"/>
@@ -3363,7 +3363,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="bactmgta" cloneof="bactmgt">
-		<description>Bactron &amp; MGT (Alt)</description>
+		<description>Bactron &amp; MGT (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
@@ -3377,7 +3377,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="bactmgtb" cloneof="bactmgt">
-		<description>Bactron &amp; MGT (SAP Format)</description>
+		<description>Bactron &amp; MGT (SAP format)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
@@ -3390,7 +3390,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="bloodbiva" cloneof="bloodbiv">
-		<description>Captain Blood &amp; Bivouac (SAP Format)</description>
+		<description>Captain Blood &amp; Bivouac (SAP format)</description>
 		<year>198?</year>
 		<publisher>Infogrames</publisher>
 
@@ -3409,7 +3409,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="bloodmut" supported="partial">
-		<description>Captain Blood &amp; Les Mutants (Missing Disk 2?)</description>
+		<description>Captain Blood &amp; Les Mutants (missing Disk 2?)</description>
 		<year>198?</year>
 		<publisher>Infogrames</publisher>
 
@@ -3421,7 +3421,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="bloodmuta" cloneof="bloodmut" supported="partial">
-		<description>Captain Blood &amp; Les Mutants (SAP Format, Missing Disk 2?)</description>
+		<description>Captain Blood &amp; Les Mutants (SAP format, missing Disk 2?)</description>
 		<year>198?</year>
 		<publisher>Infogrames</publisher>
 
@@ -3476,7 +3476,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="chevaliea" cloneof="chevalie">
-		<description>Les Chevaliers (SAP Format)</description>
+		<description>Les Chevaliers (SAP format)</description>
 		<year>1988</year>
 		<publisher>Infogrames</publisher>
 
@@ -3488,7 +3488,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="chevalieb" cloneof="chevalie">
-		<description>Les Chevaliers (SAP Format, Alt)</description>
+		<description>Les Chevaliers (SAP format, alt)</description>
 		<year>1988</year>
 		<publisher>Infogrames</publisher>
 
@@ -3500,7 +3500,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="chevaliec" cloneof="chevalie">
-		<description>Les Chevaliers (SAP Format, Alt 2)</description>
+		<description>Les Chevaliers (SAP format, alt 2)</description>
 		<year>1988</year>
 		<publisher>Infogrames</publisher>
 
@@ -3524,7 +3524,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="classiq1a" cloneof="classiq1">
-		<description>Classiques Volume 1 (SAP Format)</description>
+		<description>Classiques Volume 1 (SAP format)</description>
 		<year>1987</year>
 		<publisher>Titus Software</publisher>
 
@@ -3590,7 +3590,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="coffcada" cloneof="coffcad">
-		<description>Coffret Cadeau (SAP Format)</description>
+		<description>Coffret Cadeau (SAP format)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -3603,7 +3603,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 <!--
     <software name="coffcadb" cloneof="coffcad">
-        <description>Coffret Cadeau (SAP Format, Bad)</description>
+        <description>Coffret Cadeau (SAP format, bad)</description>
         <year>1986</year>
         <publisher>France Image Logiciel (FIL)</publisher>
 
@@ -3628,7 +3628,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="coktel1a" cloneof="coktel1">
-		<description>Coktel Vision Compilation 1 (Hacked Menu 1)</description>
+		<description>Coktel Vision Compilation 1 (hacked menu 1)</description>
 		<year>198?</year>
 		<publisher>&lt;hack&gt;</publisher>
 
@@ -3640,7 +3640,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="coktel1b" cloneof="coktel1">
-		<description>Coktel Vision Compilation 1 (Hacked Menu 2)</description>
+		<description>Coktel Vision Compilation 1 (hacked menu 2)</description>
 		<year>198?</year>
 		<publisher>&lt;hack&gt;</publisher>
 
@@ -3652,7 +3652,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="coktel1c" cloneof="coktel1">
-		<description>Coktel Vision Compilation 1 (Hacked Menu 3)</description>
+		<description>Coktel Vision Compilation 1 (hacked menu 3)</description>
 		<year>198?</year>
 		<publisher>&lt;hack&gt;</publisher>
 
@@ -3676,7 +3676,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="coktel2a" cloneof="coktel2">
-		<description>Coktel Vision Compilation 2 (SAP Format)</description>
+		<description>Coktel Vision Compilation 2 (SAP format)</description>
 		<year>198?</year>
 		<publisher>Coktel Vision</publisher>
 
@@ -3689,7 +3689,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 <!--
     <software name="coktel2b" cloneof="coktel2">
-        <description>Coktel Vision Compilation 2 (SAP Format, Bad)</description>
+        <description>Coktel Vision Compilation 2 (SAP format, bad)</description>
         <year>198?</year>
         <publisher>Coktel Vision</publisher>
 
@@ -3714,7 +3714,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="coktel3a" cloneof="coktel3">
-		<description>Coktel Vision Compilation 3 (SAP Format)</description>
+		<description>Coktel Vision Compilation 3 (SAP format)</description>
 		<year>198?</year>
 		<publisher>Coktel Vision</publisher>
 
@@ -3727,7 +3727,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 <!--
     <software name="coktel3b" cloneof="coktel3">
-        <description>Coktel Vision Compilation 3 (SAP Format, Bad)</description>
+        <description>Coktel Vision Compilation 3 (SAP format, bad)</description>
         <year>198?</year>
         <publisher>Coktel Vision</publisher>
 
@@ -3892,7 +3892,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="afpafrana" cloneof="afpafran">
-		<description>Francais - AFPA Auvergne (Alt)</description>
+		<description>Francais - AFPA Auvergne (alt)</description>
 		<year>198?</year>
 		<publisher>CFPA</publisher>
 
@@ -3917,7 +3917,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="futurista" cloneof="futurist">
-		<description>Les Futuristes (Alt)</description>
+		<description>Les Futuristes (alt)</description>
 		<year>1988</year>
 		<publisher>Infogrames</publisher>
 		<info name="alt_title" value="Science Fiction"/>
@@ -3930,7 +3930,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="futuristb" cloneof="futurist">
-		<description>Les Futuristes (SAP Format)</description>
+		<description>Les Futuristes (SAP format)</description>
 		<year>1988</year>
 		<publisher>Infogrames</publisher>
 		<info name="alt_title" value="Science Fiction"/>
@@ -3943,7 +3943,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="futuristc" cloneof="futurist" supported="no">
-		<description>Les Futuristes (640K Disk)</description>
+		<description>Les Futuristes (640K disk)</description>
 		<year>1988</year>
 		<publisher>Infogrames</publisher>
 		<info name="alt_title" value="Science Fiction"/>
@@ -4013,7 +4013,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="greatcola" cloneof="greatcol">
-		<description>The Greatest Collection (SAP Format)</description>
+		<description>The Greatest Collection (SAP format)</description>
 		<year>1987</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -4033,7 +4033,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 <!--
     <software name="greatcolb" cloneof="greatcol">
-        <description>The Greatest Collection (SAP Format, Bad)</description>
+        <description>The Greatest Collection (SAP format, bad)</description>
         <year>1987</year>
         <publisher>Free Game Blot</publisher>
 
@@ -4076,7 +4076,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- all disks have blank second halves -->
 	<software name="greates2a" cloneof="greates2">
-		<description>The Greatest Collection II (640K Disks)</description>
+		<description>The Greatest Collection II (640K disks)</description>
 		<year>1990</year>
 		<publisher>Novtech</publisher>
 
@@ -4129,7 +4129,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="hitsgrema" cloneof="hitsgrem" supported="partial">
-		<description>Les Hits de Gremlin (640K Disks)</description>
+		<description>Les Hits de Gremlin (640K disks)</description>
 		<year>1986</year>
 		<publisher>SFMI Micromania</publisher>
 
@@ -4161,7 +4161,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- second half blank -->
 	<software name="hitsloria" cloneof="hitslori">
-		<description>Les Hits de Loriciels 1 (640K Disk)</description>
+		<description>Les Hits de Loriciels 1 (640K disk)</description>
 		<year>198?</year>
 		<publisher>Loriciels</publisher>
 
@@ -4272,7 +4272,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="jeuxbasa" cloneof="jeuxbas">
-		<description>Jeux BASIC TO (640K Disk)</description>
+		<description>Jeux BASIC TO (640K disk)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -4285,7 +4285,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- todo - split! -->
 	<software name="jeuxbasb" cloneof="jeuxbas">
-		<description>Jeux BASIC TO (640K, Alt)</description>
+		<description>Jeux BASIC TO (640K, alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -4357,7 +4357,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="jeusybexa" cloneof="jeusybex">
-		<description>Jeux sur TO7 et MO5 (Alt)</description>
+		<description>Jeux sur TO7 et MO5 (alt)</description>
 		<year>1986</year>
 		<publisher>Sybex</publisher>
 
@@ -4405,7 +4405,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="jeuxto91a" cloneof="jeuxto91">
-		<description>Jeux TO9 (Carte du Ciel + Super Tennis) (SAP Format)</description>
+		<description>Jeux TO9 (Carte du Ciel + Super Tennis) (SAP format)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -4441,7 +4441,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="kidkita" cloneof="kidkit">
-		<description>Kidkit (SAP Format)</description>
+		<description>Kidkit (SAP format)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
 
@@ -4453,7 +4453,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="kidkitb" cloneof="kidkit">
-		<description>Kidkit (Hacked Menu)</description>
+		<description>Kidkit (hacked menu)</description>
 		<year>1986</year>
 		<publisher>&lt;hack&gt;</publisher>
 
@@ -4477,7 +4477,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="lanceura" cloneof="lanceur">
-		<description>Lanceur Disk Games Compilation (SAP Format)</description>
+		<description>Lanceur Disk Games Compilation (SAP format)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -4489,7 +4489,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="lanceurb" cloneof="lanceur">
-		<description>Lanceur Disk Games Compilation (No Menu, Non-Bootable)</description>
+		<description>Lanceur Disk Games Compilation (no menu, non-bootable)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -4513,7 +4513,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="macapolia" cloneof="macapoli">
-		<description>Macadam Bumper &amp; Politik Poker (SAP Format)</description>
+		<description>Macadam Bumper &amp; Politik Poker (SAP format)</description>
 		<year>198?</year>
 		<publisher>Infogrames</publisher>
 
@@ -4525,7 +4525,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="magcube">
-		<description>Magic Cube (Cracked)</description>
+		<description>Magic Cube (cracked)</description>
 		<year>1987</year>
 		<publisher>&lt;bootleg (Zouzou)&gt;</publisher>
 
@@ -4549,7 +4549,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="mallettea" cloneof="mallette">
-		<description>Mallette de Jeu Thomson (SAP Format)</description>
+		<description>Mallette de Jeu Thomson (SAP format)</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -4561,7 +4561,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="malletteb" cloneof="mallette">
-		<description>Mallette de Jeu Thomson (SAP Format, Alt)</description>
+		<description>Mallette de Jeu Thomson (SAP format, alt)</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -4573,7 +4573,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="megasoft" supported="partial">
-		<description>Megasofts (640K Disks)</description>
+		<description>Megasofts (640K disks)</description>
 		<year>1989</year>
 		<publisher>Infogrames</publisher>
 
@@ -4659,7 +4659,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="lori1988a" cloneof="lori1988" supported="no">
-		<description>MGT - Sapiens - Mach 3 (640K Disk)</description>
+		<description>MGT - Sapiens - Mach 3 (640K disk)</description>
 		<year>1988</year>
 		<publisher>Loriciels</publisher>
 
@@ -4707,7 +4707,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="succesa" cloneof="succes">
-		<description>Pack Succes (SAP Format)</description>
+		<description>Pack Succes (SAP format)</description>
 		<year>1987</year>
 		<publisher>Cable</publisher>
 
@@ -4750,7 +4750,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="privesa" cloneof="prives">
-		<description>Les Prives (Alt)</description>
+		<description>Les Prives (alt)</description>
 		<year>1988</year>
 		<publisher>Infogrames</publisher>
 
@@ -4769,7 +4769,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="privesb" cloneof="prives">
-		<description>Les Prives (SAP Format)</description>
+		<description>Les Prives (SAP format)</description>
 		<year>1988</year>
 		<publisher>Infogrames</publisher>
 
@@ -4788,7 +4788,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="privesc" cloneof="prives" supported="no">
-		<description>Les Prives (640K Disk)</description>
+		<description>Les Prives (640K disk)</description>
 		<year>1988</year>
 		<publisher>Infogrames</publisher>
 
@@ -4862,7 +4862,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="simhitsa" cloneof="simhits" supported="no">
-		<description>Simulation Hits (640K Disk)</description>
+		<description>Simulation Hits (640K disk)</description>
 		<year>1989</year>
 		<publisher>Loriciels</publisher>
 
@@ -4895,7 +4895,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="simpacka" cloneof="simpack">
-		<description>Simulation Pack (SAP Format)</description>
+		<description>Simulation Pack (SAP format)</description>
 		<year>1988</year>
 		<publisher>Microids</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
@@ -4909,7 +4909,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="simpackb" cloneof="simpack" supported="no">
-		<description>Simulation Pack (640K Disk)</description>
+		<description>Simulation Pack (640K disk)</description>
 		<year>1988</year>
 		<publisher>Microids</publisher>
 
@@ -4938,7 +4938,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="stars1a" cloneof="stars1" supported="no">
-		<description>Stars Volume 1 (640K Disk)</description>
+		<description>Stars Volume 1 (640K disk)</description>
 		<year>1989</year>
 		<publisher>Infogrames</publisher>
 
@@ -4969,7 +4969,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="superhita" cloneof="superhit" supported="partial">
-		<description>Les Super Hits de Thomson (640K Disk)</description>
+		<description>Les Super Hits de Thomson (640K disk)</description>
 		<year>1986</year>
 		<publisher>SFMI Micromania</publisher>
 
@@ -5002,7 +5002,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- selection menu only says "Tetris", but title screen says "Tetris II" -->
 	<software name="tet2sokoa" cloneof="tet2soko" supported="no">
-		<description>Tetris II &amp; Sokoban (640K Disk)</description>
+		<description>Tetris II &amp; Sokoban (640K disk)</description>
 		<year>19??</year>
 		<publisher>John Breaker?</publisher>
 
@@ -5123,7 +5123,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="m_game9a" cloneof="m_game9">
-		<description>Unknown Games Compilation Disk 9 (Alt)</description>
+		<description>Unknown Games Compilation Disk 9 (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
@@ -5173,7 +5173,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="unkinfoa" cloneof="unkinfo">
-		<description>Unknown Infogrames Pack (SAP Format)</description>
+		<description>Unknown Infogrames Pack (SAP format)</description>
 		<year>198?</year>
 		<publisher>Infogrames</publisher>
 
@@ -5197,7 +5197,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="unktitusa" cloneof="unktitus">
-		<description>Unknown Titus Compilation (Alt)</description>
+		<description>Unknown Titus Compilation (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -5453,7 +5453,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="teogame1a" cloneof="teogame1">
-		<description>Teo-Games no.1 (SAP Format)</description>
+		<description>Teo-Games no.1 (SAP format)</description>
 		<year>1991</year>
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
@@ -5484,7 +5484,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="teogame2a" cloneof="teogame2">
-		<description>Teo-Games no.2 (SAP Format)</description>
+		<description>Teo-Games no.2 (SAP format)</description>
 		<year>1991</year>
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
@@ -5503,7 +5503,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="teogame2b" cloneof="teogame2" supported="no">
-		<description>Teo-Games no.2 (640K Disk)</description>
+		<description>Teo-Games no.2 (640K disk)</description>
 		<year>1991</year>
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
@@ -5534,7 +5534,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="teogame3a" cloneof="teogame3">
-		<description>Teo-Games no.3 (SAP Format)</description>
+		<description>Teo-Games no.3 (SAP format)</description>
 		<year>1991</year>
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
@@ -5553,7 +5553,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="teogame3b" cloneof="teogame3">
-		<description>Teo-Games no.3 (640K Disk)</description>
+		<description>Teo-Games no.3 (640K disk)</description>
 		<year>1991</year>
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
@@ -5577,7 +5577,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="teogame4a" cloneof="teogame4">
-		<description>Teo-Games no.4 (SAP Format)</description>
+		<description>Teo-Games no.4 (SAP format)</description>
 		<year>1991</year>
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
@@ -5620,7 +5620,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="teogame5a" cloneof="teogame5">
-		<description>Teo-Games no.5 (Disk 1 SAP Format)</description>
+		<description>Teo-Games no.5 (Disk 1 SAP format)</description>
 		<year>1991</year>
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
@@ -5682,7 +5682,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="teogame6a" cloneof="teogame6">
-		<description>Teo-Games no.6 (Disk 1 SAP Format)</description>
+		<description>Teo-Games no.6 (Disk 1 SAP format)</description>
 		<year>1991</year>
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
@@ -5714,7 +5714,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- teodriv3 disk 2 with a bootloader -->
 	<software name="tdrvdemo" cloneof="teodriv3">
-		<description>TEODRIVE Demos - Mots Croises + Anima 3D (From Teo-Drive no.3)</description>
+		<description>TEODRIVE Demos - Mots Croises + Anima 3D (from Teo-Drive no.3)</description>
 		<year>1991</year>
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
@@ -5897,7 +5897,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- second half blank -->
 	<software name="aquaa" cloneof="aqua">
-		<description>Aqua (640K Disk)</description>
+		<description>Aqua (640K disk)</description>
 		<year>2014</year>
 		<publisher>Defcard</publisher>
 
@@ -5945,7 +5945,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="bloodruna" cloneof="bloodrun">
-		<description>Bloody Run (SAP Format)</description>
+		<description>Bloody Run (SAP format)</description>
 		<year>2014</year>
 		<publisher>Puls</publisher>
 
@@ -5969,7 +5969,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="bluecubea" cloneof="bluecube">
-		<description>Blue Cube (SAP Format)</description>
+		<description>Blue Cube (SAP format)</description>
 		<year>1997</year>
 		<publisher>Prehis-To</publisher>
 
@@ -6005,7 +6005,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="bonne13a" cloneof="bonne13">
-		<description>Bonne et Heureuse Annee 2013 (SAP Format)</description>
+		<description>Bonne et Heureuse Annee 2013 (SAP format)</description>
 		<year>2013</year>
 		<publisher>Puls</publisher>
 
@@ -6048,7 +6048,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="chinesea" cloneof="chinese">
-		<description>Chinese Stack (SAP Format)</description>
+		<description>Chinese Stack (SAP format)</description>
 		<year>2004</year>
 		<publisher>Puls</publisher>
 
@@ -6067,7 +6067,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="chineseb" cloneof="chinese" supported="no">
-		<description>Chinese Stack (640K Disk)</description>
+		<description>Chinese Stack (640K disk)</description>
 		<year>2004</year>
 		<publisher>Puls</publisher>
 
@@ -6091,7 +6091,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="coppera" cloneof="copper">
-		<description>Copper (SAP Format)</description>
+		<description>Copper (SAP format)</description>
 		<year>1991</year>
 		<publisher>Laurent Hiriart</publisher>
 
@@ -6139,7 +6139,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="elvisliva" cloneof="elvisliv">
-		<description>Elvis Lives! (Alt)</description>
+		<description>Elvis Lives! (alt)</description>
 		<year>2013</year>
 		<publisher>Puls</publisher>
 
@@ -6151,7 +6151,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="elvislivb" cloneof="elvisliv">
-		<description>Elvis Lives! (SAP Format)</description>
+		<description>Elvis Lives! (SAP format)</description>
 		<year>2013</year>
 		<publisher>Puls</publisher>
 
@@ -6163,7 +6163,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="elvislivc" cloneof="elvisliv">
-		<description>Elvis Lives! (SAP Format, Alt)</description>
+		<description>Elvis Lives! (SAP format, alt)</description>
 		<year>2013</year>
 		<publisher>Puls</publisher>
 
@@ -6175,7 +6175,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="elvislivd" cloneof="elvisliv">
-		<description>Elvis Lives! (SAP Format, Alt 2)</description>
+		<description>Elvis Lives! (SAP format, alt 2)</description>
 		<year>2013</year>
 		<publisher>Puls</publisher>
 
@@ -6199,7 +6199,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="exscrolla" cloneof="exscroll">
-		<description>Exemples pour Scrolls (v1.0, Non-Bootable)</description>
+		<description>Exemples pour Scrolls (v1.0, non-bootable)</description>
 		<year>19??</year>
 		<publisher>Piloux</publisher>
 
@@ -6242,7 +6242,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="hcldemoa" cloneof="hcldemo">
-		<description>HCL Megademo (SAP Format)</description>
+		<description>HCL Megademo (SAP format)</description>
 		<year>1990</year>
 		<publisher>HCL</publisher>
 
@@ -6254,7 +6254,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="hcldemob" cloneof="hcldemo" supported="partial"> <!-- black screen after a few parts -->
-		<description>HCL Megademo (2 Disks, Bad?)</description>
+		<description>HCL Megademo (2 disks, bad?)</description>
 		<year>1990</year>
 		<publisher>HCL</publisher>
 
@@ -6297,7 +6297,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="jailhousa" cloneof="jailhous">
-		<description>Jailhouse Blues (SAP Format)</description>
+		<description>Jailhouse Blues (SAP format)</description>
 		<year>2013</year>
 		<publisher>Puls</publisher>
 
@@ -6328,7 +6328,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="lotusa" cloneof="lotus" supported="no">
-		<description>Lotus Esprit Turbo Challenge (640K Disk)</description>
+		<description>Lotus Esprit Turbo Challenge (640K disk)</description>
 		<year>19??</year>
 		<publisher>BC 109 Soft</publisher>
 
@@ -6352,7 +6352,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cccdemoa" cloneof="cccdemo">
-		<description>Mega Demo no.1 (SAP Format)</description>
+		<description>Mega Demo no.1 (SAP format)</description>
 		<year>1988</year>
 		<publisher>Carca Cracking Compagny</publisher>
 
@@ -6383,7 +6383,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="megara" cloneof="megar" supported="no">
-		<description>Megar Demo #1 - Ruiz (640K Disk)</description>
+		<description>Megar Demo #1 - Ruiz (640K disk)</description>
 		<year>2007</year>
 		<publisher>Megar</publisher>
 
@@ -6408,7 +6408,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- this image released in 2016, unsure of any differences -->
 	<software name="nyancata" cloneof="nyancat">
-		<description>Nyan Cat (SAP Format, Newer?)</description>
+		<description>Nyan Cat (SAP format, Newer?)</description>
 		<year>2011</year>
 		<publisher>OliverP</publisher>
 
@@ -6420,7 +6420,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="olbb">
-		<description>Oh la belle bleue!</description>
+		<description>Oh La Belle Bleue!</description>
 		<year>2011</year>
 		<publisher>Puls</publisher>
 
@@ -6432,7 +6432,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="olbba" cloneof="olbb">
-		<description>Oh la belle bleue! (SAP Format)</description>
+		<description>Oh La Belle Bleue! (SAP format)</description>
 		<year>2011</year>
 		<publisher>Puls</publisher>
 
@@ -6468,7 +6468,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="pimitva" cloneof="pimitv">
-		<description>PiMiTV (SAP Format)</description>
+		<description>PiMiTV (SAP format)</description>
 		<year>2014</year>
 		<publisher>Puls</publisher>
 
@@ -6492,7 +6492,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="rockforta" cloneof="rockfort">
-		<description>Rock Fort (SAP Format)</description>
+		<description>Rock Fort (SAP format)</description>
 		<year>2013</year>
 		<publisher>Puls</publisher>
 
@@ -6504,7 +6504,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="skyrim" supported="no">
-		<description>Skyrim (to8)</description>
+		<description>Skyrim (TO8)</description>
 		<year>2012</year>
 		<publisher>Samuel Devulder</publisher>
 
@@ -6523,7 +6523,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="skyrima" cloneof="skyrim" supported="no">
-		<description>Skyrim (to7)</description>
+		<description>Skyrim (TO7)</description>
 		<year>2012</year>
 		<publisher>Samuel Devulder</publisher>
 
@@ -6535,7 +6535,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="skyrimb" cloneof="skyrim" supported="no">
-		<description>Skyrim (to8, 640K Disk)</description>
+		<description>Skyrim (TO8, 640K disk)</description>
 		<year>2012</year>
 		<publisher>Samuel Devulder</publisher>
 
@@ -6573,7 +6573,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- second half blank -->
 	<software name="smiteaoka" cloneof="smiteaok">
-		<description>Smite - Ao Kuang (640K Disk)</description>
+		<description>Smite - Ao Kuang (640K disk)</description>
 		<year>2015</year>
 		<publisher>Defcard</publisher>
 
@@ -6598,7 +6598,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- second half blank -->
 	<software name="smitefena" cloneof="smitefen">
-		<description>Smite - Fenrir (640K Disk)</description>
+		<description>Smite - Fenrir (640K disk)</description>
 		<year>2014</year>
 		<publisher>Defcard</publisher>
 
@@ -6665,7 +6665,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="spacproja" cloneof="spacproj">
-		<description>Space Project (SAP Format)</description>
+		<description>Space Project (SAP format)</description>
 		<year>2007</year>
 		<publisher>Puls</publisher>
 
@@ -6720,7 +6720,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="spacprojb" cloneof="spacproj" supported="no">
-		<description>Space Project (640K Disks)</description>
+		<description>Space Project (640K disks)</description>
 		<year>2007</year>
 		<publisher>Puls</publisher>
 
@@ -6751,7 +6751,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="spacprojc" cloneof="spacproj" supported="no">
-		<description>Space Project (1280K Disks)</description>
+		<description>Space Project (1280K disks)</description>
 		<year>2007</year>
 		<publisher>Puls</publisher>
 
@@ -6789,7 +6789,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="sorceryda" cloneof="sorceryd" supported="no">
-		<description>Sorcery Demo (640K Disk)</description>
+		<description>Sorcery Demo (640K disk)</description>
 		<year>19??</year>
 		<publisher>Thomtest</publisher>
 
@@ -6815,7 +6815,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- can also be found in mo5_flop.xml -->
 	<software name="thomcata" cloneof="thomcat">
-		<description>THOM-CAT (SAP Format)</description>
+		<description>THOM-CAT (SAP format)</description>
 		<year>2015</year>
 		<publisher>Puls</publisher>
 
@@ -6839,7 +6839,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="tvchaplna" cloneof="tvchapln">
-		<description>Thomson Video - Charlie Chaplin (SAP Format)</description>
+		<description>Thomson Video - Charlie Chaplin (SAP format)</description>
 		<year>2004</year>
 		<publisher>Yoann Riou</publisher>
 
@@ -6863,7 +6863,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="tveuropaa" cloneof="tveuropa">
-		<description>Thomson Video - Europa (SAP Format)</description>
+		<description>Thomson Video - Europa (SAP format)</description>
 		<year>2004</year>
 		<publisher>Yoann Riou</publisher>
 
@@ -6899,7 +6899,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="topopopa" cloneof="topopop">
-		<description>TopOPop (SAP Format)</description>
+		<description>TopOPop (SAP format)</description>
 		<year>2014</year>
 		<publisher>Puls</publisher>
 
@@ -6951,7 +6951,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="truc216ia" cloneof="truc216i">
-		<description>TruC216i (tele) (SAP Format)</description>
+		<description>TruC216i (tele) (SAP format)</description>
 		<year>2010</year>
 		<publisher>Puls</publisher>
 
@@ -6970,7 +6970,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="truc216ib" cloneof="truc216i" supported="no">
-		<description>TruC216i (tele) (640K Disk)</description>
+		<description>TruC216i (tele) (640K disk)</description>
 		<year>2010</year>
 		<publisher>Puls</publisher>
 
@@ -7001,7 +7001,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="truc216iea" cloneof="truc216i">
-		<description>TruC216i (emul) (SAP Format)</description>
+		<description>TruC216i (emul) (SAP format)</description>
 		<year>2010</year>
 		<publisher>Puls</publisher>
 
@@ -7020,7 +7020,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="truc216ieb" cloneof="truc216i" supported="no">
-		<description>TruC216i (emul) (640K Disk)</description>
+		<description>TruC216i (emul) (640K disk)</description>
 		<year>2010</year>
 		<publisher>Puls</publisher>
 
@@ -7051,7 +7051,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="truc40a" cloneof="truc40">
-		<description>TruC40 (tele) (SAP Format)</description>
+		<description>TruC40 (tele) (SAP format)</description>
 		<year>2010</year>
 		<publisher>Puls</publisher>
 
@@ -7070,7 +7070,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="truc40b" cloneof="truc40" supported="no">
-		<description>TruC40 (tele) (640K Disk)</description>
+		<description>TruC40 (tele) (640K disk)</description>
 		<year>2010</year>
 		<publisher>Puls</publisher>
 
@@ -7101,7 +7101,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="truc40ea" cloneof="truc40">
-		<description>TruC40 (emul) (SAP Format)</description>
+		<description>TruC40 (emul) (SAP format)</description>
 		<year>2010</year>
 		<publisher>Puls</publisher>
 
@@ -7120,7 +7120,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="truc40eb" cloneof="truc40" supported="no">
-		<description>TruC40 (emul) (640K Disk)</description>
+		<description>TruC40 (emul) (640K disk)</description>
 		<year>2010</year>
 		<publisher>Puls</publisher>
 
@@ -7151,7 +7151,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="truc70a" cloneof="truc70">
-		<description>TruC70 (SAP Format)</description>
+		<description>TruC70 (SAP format)</description>
 		<year>2010</year>
 		<publisher>Puls</publisher>
 
@@ -7170,7 +7170,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="truc70b" cloneof="truc70" supported="no">
-		<description>TruC70 (640K Disk)</description>
+		<description>TruC70 (640K disk)</description>
 		<year>2010</year>
 		<publisher>Puls</publisher>
 
@@ -7201,7 +7201,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="truc80ia" cloneof="truc80i">
-		<description>TruC80i (SAP Format)</description>
+		<description>TruC80i (SAP format)</description>
 		<year>2010</year>
 		<publisher>Puls</publisher>
 
@@ -7220,7 +7220,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="truc80ib" cloneof="truc80i" supported="no">
-		<description>TruC80i (640K Disk)</description>
+		<description>TruC80i (640K disk)</description>
 		<year>2010</year>
 		<publisher>Puls</publisher>
 
@@ -7256,7 +7256,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="wrbpa" cloneof="wrbp">
-		<description>When Rings Become Pumpkins (SAP Format)</description>
+		<description>When Rings Become Pumpkins (SAP format)</description>
 		<year>2014</year>
 		<publisher>Puls</publisher>
 
@@ -7299,7 +7299,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="ascinew1a" cloneof="ascinew1">
-		<description>ASCINEWS no.1 (SAP Format)</description>
+		<description>ASCINEWS no.1 (SAP format)</description>
 		<year>1992</year>
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
@@ -7318,7 +7318,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="ascinew1b" cloneof="ascinew1" supported="no">
-		<description>ASCINEWS no.1 (640K Disk)</description>
+		<description>ASCINEWS no.1 (640K disk)</description>
 		<year>1992</year>
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
@@ -7342,7 +7342,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="ascinew2a" cloneof="ascinew2">
-		<description>ASCINEWS no.2 (SAP Format)</description>
+		<description>ASCINEWS no.2 (SAP format)</description>
 		<year>1992</year>
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
@@ -7371,7 +7371,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="ascinew3a" cloneof="ascinew3">
-		<description>ASCINEWS no.3 (SAP Format)</description>
+		<description>ASCINEWS no.3 (SAP format)</description>
 		<year>1993</year>
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
@@ -7390,7 +7390,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="ascinew3b" cloneof="ascinew3" supported="no">
-		<description>ASCINEWS no.3 (640K Disk)</description>
+		<description>ASCINEWS no.3 (640K disk)</description>
 		<year>1993</year>
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
@@ -7419,7 +7419,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="ascinew4a" cloneof="ascinew4">
-		<description>ASCINEWS no.4 (SAP Format)</description>
+		<description>ASCINEWS no.4 (SAP format)</description>
 		<year>1993</year>
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
@@ -7438,7 +7438,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="ascinew4b" cloneof="ascinew4" supported="no">
-		<description>ASCINEWS no.4 (640K Disk)</description>
+		<description>ASCINEWS no.4 (640K disk)</description>
 		<year>1993</year>
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
@@ -7467,7 +7467,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="ascinew5a" cloneof="ascinew5">
-		<description>ASCINEWS no.5 (SAP Format)</description>
+		<description>ASCINEWS no.5 (SAP format)</description>
 		<year>1993</year>
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
@@ -7486,7 +7486,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="ascinew5b" cloneof="ascinew5" supported="no">
-		<description>ASCINEWS no.5 (640K Disk)</description>
+		<description>ASCINEWS no.5 (640K disk)</description>
 		<year>1993</year>
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
@@ -7515,7 +7515,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="ascinew6a" cloneof="ascinew6">
-		<description>ASCINEWS no.6 (SAP Format)</description>
+		<description>ASCINEWS no.6 (SAP format)</description>
 		<year>1993</year>
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
@@ -7534,7 +7534,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="ascinew6b" cloneof="ascinew6" supported="no">
-		<description>ASCINEWS no.6 (640K Disk)</description>
+		<description>ASCINEWS no.6 (640K disk)</description>
 		<year>1993</year>
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
@@ -7563,7 +7563,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="ascinew7a" cloneof="ascinew7">
-		<description>ASCINEWS no.7 (SAP Format)</description>
+		<description>ASCINEWS no.7 (SAP format)</description>
 		<year>1994</year>
 		<publisher>Association des Correspondants Thomsonistes (A.C.T.)</publisher>
 
@@ -7582,7 +7582,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="ascinew7b" cloneof="ascinew7" supported="no">
-		<description>ASCINEWS no.7 (640K Disk)</description>
+		<description>ASCINEWS no.7 (640K disk)</description>
 		<year>1994</year>
 		<publisher>Association des Correspondants Thomsonistes (A.C.T.)</publisher>
 
@@ -7611,7 +7611,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="ascinew8a" cloneof="ascinew8">
-		<description>ASCINEWS no.8 (SAP Format)</description>
+		<description>ASCINEWS no.8 (SAP format)</description>
 		<year>1994</year>
 		<publisher>Association des Correspondants Thomsonistes (A.C.T.)</publisher>
 
@@ -7630,7 +7630,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="ascinew8b" cloneof="ascinew8" supported="no">
-		<description>ASCINEWS no.8 (640K Disk)</description>
+		<description>ASCINEWS no.8 (640K disk)</description>
 		<year>1994</year>
 		<publisher>Association des Correspondants Thomsonistes (A.C.T.)</publisher>
 
@@ -7659,7 +7659,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="ascinew9a" cloneof="ascinew9">
-		<description>ASCINEWS no.9 (SAP Format)</description>
+		<description>ASCINEWS no.9 (SAP format)</description>
 		<year>1995</year>
 		<publisher>Association des Correspondants Thomsonistes (A.C.T.)</publisher>
 
@@ -7678,7 +7678,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="ascinew9b" cloneof="ascinew9" supported="no">
-		<description>ASCINEWS no.9 (640K Disk)</description>
+		<description>ASCINEWS no.9 (640K disk)</description>
 		<year>1995</year>
 		<publisher>Association des Correspondants Thomsonistes (A.C.T.)</publisher>
 
@@ -7707,7 +7707,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="ascinw10a" cloneof="ascinw10">
-		<description>ASCINEWS no.10 (SAP Format)</description>
+		<description>ASCINEWS no.10 (SAP format)</description>
 		<year>1995</year>
 		<publisher>Association des Correspondants Thomsonistes (A.C.T.)</publisher>
 
@@ -7726,7 +7726,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="ascinw10b" cloneof="ascinw10" supported="no">
-		<description>ASCINEWS no.10 (640K Disk)</description>
+		<description>ASCINEWS no.10 (640K disk)</description>
 		<year>1995</year>
 		<publisher>Association des Correspondants Thomsonistes (A.C.T.)</publisher>
 
@@ -7807,7 +7807,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="icdvmag1a" cloneof="icdvmag1">
-		<description>ICDV Magazine no.1 (SAP Format)</description>
+		<description>ICDV Magazine no.1 (SAP format)</description>
 		<year>1991</year>
 		<publisher>ICDV</publisher>
 
@@ -7831,7 +7831,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="icdvmag2a" cloneof="icdvmag2">
-		<description>ICDV Magazine no.2 (SAP Format)</description>
+		<description>ICDV Magazine no.2 (SAP format)</description>
 		<year>1991</year>
 		<publisher>ICDV</publisher>
 
@@ -7855,7 +7855,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="icdvmag3a" cloneof="icdvmag3">
-		<description>ICDV Magazine no.3 (SAP Format)</description>
+		<description>ICDV Magazine no.3 (SAP format)</description>
 		<year>1991</year>
 		<publisher>ICDV</publisher>
 
@@ -7879,7 +7879,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="icdvmag4a" cloneof="icdvmag4">
-		<description>ICDV Magazine no.4 (SAP Format)</description>
+		<description>ICDV Magazine no.4 (SAP format)</description>
 		<year>1991</year>
 		<publisher>ICDV</publisher>
 
@@ -7922,7 +7922,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="teodriv1a" cloneof="teodriv1">
-		<description>Teo-Drive no.1 (SAP Format)</description>
+		<description>Teo-Drive no.1 (SAP format)</description>
 		<year>1991</year>
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
@@ -7953,7 +7953,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="teodriv2a" cloneof="teodriv2">
-		<description>Teo-Drive no.2 (SAP Format)</description>
+		<description>Teo-Drive no.2 (SAP format)</description>
 		<year>1991</year>
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
@@ -7972,7 +7972,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="teodriv2b" cloneof="teodriv2" supported="no">
-		<description>Teo-Drive no.2 (640K Disk)</description>
+		<description>Teo-Drive no.2 (640K disk)</description>
 		<year>1991</year>
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
@@ -8003,7 +8003,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="teodriv3a" cloneof="teodriv3">
-		<description>Teo-Drive no.3 (SAP Format)</description>
+		<description>Teo-Drive no.3 (SAP format)</description>
 		<year>1991</year>
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
@@ -8022,7 +8022,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="teodriv3b" cloneof="teodriv3" supported="no">
-		<description>Teo-Drive no.3 (640K Disk)</description>
+		<description>Teo-Drive no.3 (640K disk)</description>
 		<year>1991</year>
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
@@ -8053,7 +8053,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="teodriv4a" cloneof="teodriv4">
-		<description>Teo-Drive no.4 (SAP Format)</description>
+		<description>Teo-Drive no.4 (SAP format)</description>
 		<year>1991</year>
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
@@ -8072,7 +8072,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="teodriv4b" cloneof="teodriv4" supported="no">
-		<description>Teo-Drive no.4 (640K Disk)</description>
+		<description>Teo-Drive no.4 (640K disk)</description>
 		<year>1991</year>
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
@@ -8103,7 +8103,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="teodriv5a" cloneof="teodriv5">
-		<description>Teo-Drive no.5 (SAP Format)</description>
+		<description>Teo-Drive no.5 (SAP format)</description>
 		<year>1991</year>
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
@@ -8122,7 +8122,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="teodriv5b" cloneof="teodriv5" supported="no">
-		<description>Teo-Drive no.5 (640K Disk)</description>
+		<description>Teo-Drive no.5 (640K disk)</description>
 		<year>1991</year>
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
@@ -8165,7 +8165,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="teodriv6a" cloneof="teodriv6">
-		<description>Teo-Drive no.6 (Disk 1 SAP Format)</description>
+		<description>Teo-Drive no.6 (Disk 1 SAP format)</description>
 		<year>1991</year>
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
@@ -8249,7 +8249,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="docjeuxa" cloneof="docjeux">
-		<description>Doc Jeux (Alt)</description>
+		<description>Doc Jeux (alt)</description>
 		<year>1997?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -8287,7 +8287,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="actimat5a" cloneof="actimat5">
-		<description>Acti-Math 5e (640K Disk)</description>
+		<description>Acti-Math 5e (640K disk)</description>
 		<year>1987</year>
 		<publisher>Armand Colin</publisher>
 
@@ -8407,7 +8407,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="appcompa" cloneof="appcomp">
-		<description>Apprends-moi a Compter (SAP Format)</description>
+		<description>Apprends-moi a Compter (SAP format)</description>
 		<year>1987</year>
 		<publisher>Cedic/Nathan</publisher>
 
@@ -8431,7 +8431,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="applirea" cloneof="applire">
-		<description>Apprends-moi a Lire (SAP Format)</description>
+		<description>Apprends-moi a Lire (SAP format)</description>
 		<year>1988</year>
 		<publisher>Cedic/Nathan</publisher>
 
@@ -8481,7 +8481,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="bossem3a" cloneof="bossem3">
-		<description>La Bosse des Maths 3e (SAP Format)</description>
+		<description>La Bosse des Maths 3e (SAP format)</description>
 		<year>1987</year>
 		<publisher>Coktel Vision</publisher>
 
@@ -8683,7 +8683,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="etmamm2a" cloneof="etmamm2">
-		<description>Encyclopaedia Thomsonis - Mammiferes Vol. 2 - Canides 1 (Alt Disk 1)</description>
+		<description>Encyclopaedia Thomsonis - Mammiferes Vol. 2 - Canides 1 (alt Disk 1)</description>
 		<year>1999</year>
 		<publisher>Bledor-Soft - Serveur87</publisher>
 
@@ -8721,7 +8721,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="etmamm3a" cloneof="etmamm3">
-		<description>Encyclopaedia Thomsonis - Mammiferes vol.3 - Special Loup (Alt)</description>
+		<description>Encyclopaedia Thomsonis - Mammiferes vol.3 - Special Loup (alt)</description>
 		<year>2000</year>
 		<publisher>Bledor-Soft - Serveur87</publisher>
 
@@ -8947,7 +8947,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="gutentaga" cloneof="gutentag">
-		<description>Guten Tag! - Deutsche Grammatik - Erste Stufe (SAP Format)</description>
+		<description>Guten Tag! - Deutsche Grammatik - Erste Stufe (SAP format)</description>
 		<year>1988</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -9295,7 +9295,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 <!--
     <software name="mbacmatha" cloneof="mbacmath" supported="no">
-        <description>Microbac Maths (Bad)</description>
+        <description>Microbac Maths (bad)</description>
         <year>19??</year>
         <publisher>&lt;unknown&gt;</publisher>
 
@@ -9333,7 +9333,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="motscrosa" cloneof="motscros">
-		<description>Mots Croises Magiques (SAP Format)</description>
+		<description>Mots Croises Magiques (SAP format)</description>
 		<year>1986</year>
 		<publisher>Cedic/Nathan</publisher>
 
@@ -9369,7 +9369,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="ecrire1a" cloneof="ecrire1">
-		<description>Ortho Graphie - Ecrire sans Fautes Volume 1 (SAP Format)</description>
+		<description>Ortho Graphie - Ecrire sans Fautes Volume 1 (SAP format)</description>
 		<year>1987</year>
 		<publisher>Cedic/Nathan</publisher>
 
@@ -9539,7 +9539,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="1000borna" cloneof="1000born">
-		<description>1000 Bornes (SAP Format)</description>
+		<description>1000 Bornes (SAP format)</description>
 		<year>1985</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -9576,7 +9576,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="20kavantmo6" cloneof="20kavant">
-		<description>20000 Avant J.C. (Includes MO6 Version)</description>
+		<description>20000 Avant J.C. (includes MO6 version)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -9589,7 +9589,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="20kavantmo6a" cloneof="20kavant">
-		<description>20000 Avant J.C. (Includes MO6 Version, Alt)</description>
+		<description>20000 Avant J.C. (includes MO6 version, alt)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -9602,7 +9602,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="20kavantmo6b" cloneof="20kavant">
-		<description>20000 Avant J.C. (Includes MO6 Version, SAP Format)</description>
+		<description>20000 Avant J.C. (includes MO6 version, SAP format)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -9639,7 +9639,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="5emeaxea" cloneof="5emeaxe">
-		<description>Le 5eme Axe (SAP Format)</description>
+		<description>Le 5eme Axe (SAP format)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
@@ -9676,7 +9676,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="veracruza" cloneof="veracruz">
-		<description>L'Affaire Vera Cruz (SAP Format)</description>
+		<description>L'Affaire Vera Cruz (SAP format)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
 
@@ -9700,7 +9700,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="aigleora" cloneof="aigleor">
-		<description>L'Aigle d'Or (Alt)</description>
+		<description>L'Aigle d'Or (alt)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
 
@@ -9712,7 +9712,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="aigleorb" cloneof="aigleor">
-		<description>L'Aigle d'Or (Alt 2)</description>
+		<description>L'Aigle d'Or (alt 2)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
 
@@ -9724,7 +9724,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="aigleorc" cloneof="aigleor">
-		<description>L'Aigle d'Or (SAP Format)</description>
+		<description>L'Aigle d'Or (SAP format)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
 
@@ -9736,7 +9736,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="aigleord" cloneof="aigleor">
-		<description>L'Aigle d'Or (SAP Format, Alt)</description>
+		<description>L'Aigle d'Or (SAP format, alt)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
 
@@ -9761,7 +9761,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="airatta" cloneof="airatt">
-		<description>Air Attack (SAP Format)</description>
+		<description>Air Attack (SAP format)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
@@ -9786,7 +9786,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="alienatra" cloneof="alienatr">
-		<description>Alienator (Alt)</description>
+		<description>Alienator (alt)</description>
 		<year>1989</year>
 		<publisher>Ubisoft</publisher>
 
@@ -9798,7 +9798,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="alienatrb" cloneof="alienatr">
-		<description>Alienator (SAP Format)</description>
+		<description>Alienator (SAP format)</description>
 		<year>1989</year>
 		<publisher>Ubisoft</publisher>
 
@@ -9822,7 +9822,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="americaa" cloneof="america">
-		<description>America's Cup (SAP Format)</description>
+		<description>America's Cup (SAP format)</description>
 		<year>1986</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -9858,7 +9858,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="aquanauta" cloneof="aquanaut">
-		<description>Aquanaute (SAP Format)</description>
+		<description>Aquanaute (SAP format)</description>
 		<year>1988</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -9894,7 +9894,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="astrixraa" cloneof="astrixra">
-		<description>Asterix chez Rahazade (Cracked, Thomsoft)</description>
+		<description>Asterix chez Rahazade (cracked, Thomsoft)</description>
 		<year>1987</year>
 		<publisher>&lt;bootleg (Thomsoft)</publisher>
 
@@ -9906,7 +9906,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="astrixrab" cloneof="astrixra">
-		<description>Asterix chez Rahazade (Cracked?, dcmoto)</description>
+		<description>Asterix chez Rahazade (cracked?, dcmoto)</description>
 		<year>1987</year>
 		<publisher>&lt;bootleg? (dcmoto.free.fr)&gt;</publisher>
 
@@ -9918,7 +9918,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="astrixrac" cloneof="astrixra">
-		<description>Asterix chez Rahazade (Cracked?, dcmoto, 640K Disk)</description>
+		<description>Asterix chez Rahazade (cracked?, dcmoto, 640K disk)</description>
 		<year>1987</year>
 		<publisher>&lt;bootleg? (dcmoto.free.fr)&gt;</publisher>
 
@@ -9956,7 +9956,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="astrixpoa" cloneof="astrixpo">
-		<description>Asterix et la Potion Magique (SAP Format)</description>
+		<description>Asterix et la Potion Magique (SAP format)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -9980,7 +9980,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="atomika" cloneof="atomik">
-		<description>Atomik (SAP Format)</description>
+		<description>Atomik (SAP format)</description>
 		<year>1988</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -10016,7 +10016,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="auxoriga" cloneof="auxorig">
-		<description>Aux Origines de la Vie (SAP Format)</description>
+		<description>Aux Origines de la Vie (SAP format)</description>
 		<year>1988</year>
 		<publisher>Carraz Editions</publisher>
 
@@ -10040,7 +10040,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="avengera" cloneof="avenger">
-		<description>Avenger (SAP Format)</description>
+		<description>Avenger (SAP format)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -10052,7 +10052,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="avengerb" cloneof="avenger">
-		<description>Avenger (SAP Format, Alt)</description>
+		<description>Avenger (SAP format, alt)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -10076,7 +10076,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="baghchala" cloneof="baghchal">
-		<description>Le Bagh Chal (SAP Format)</description>
+		<description>Le Bagh Chal (SAP format)</description>
 		<year>1985</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -10124,7 +10124,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="bivouaca" cloneof="bivouac">
-		<description>Bivouac (SAP Format)</description>
+		<description>Bivouac (SAP format)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 
@@ -10148,7 +10148,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="bivouacc" cloneof="bivouac">
-		<description>Bivouac (Compilation Les Athletes no.2) (SAP Format)</description>
+		<description>Bivouac (Compilation Les Athletes no.2) (SAP format)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 
@@ -10196,7 +10196,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="bluewar2a" cloneof="bluewar2">
-		<description>Blue War 2 (SAP Format)</description>
+		<description>Blue War 2 (SAP format)</description>
 		<year>198?</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -10220,7 +10220,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="bluberrya" cloneof="bluberry">
-		<description>Blueberry (SAP Format)</description>
+		<description>Blueberry (SAP format)</description>
 		<year>1987</year>
 		<publisher>Coktel Vision</publisher>
 
@@ -10233,7 +10233,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 <!--
     <software name="bluberryb" cloneof="bluberry">
-        <description>Blueberry (SAP Format, Bad)</description>
+        <description>Blueberry (SAP format, bad)</description>
         <year>1987</year>
         <publisher>Coktel Vision</publisher>
 
@@ -10258,7 +10258,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="moranecha" cloneof="moranech">
-		<description>Bob Morane - Chevalerie 1 (SAP Format)</description>
+		<description>Bob Morane - Chevalerie 1 (SAP format)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 
@@ -10270,7 +10270,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="moranechb" cloneof="moranech">
-		<description>Bob Morane - Chevalerie 1 (Cracked)</description>
+		<description>Bob Morane - Chevalerie 1 (cracked)</description>
 		<year>1987</year>
 		<publisher>&lt;bootleg (Shubert)&gt;</publisher>
 
@@ -10283,7 +10283,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 <!--
     <software name="moranechc" cloneof="moranech">
-        <description>Bob Morane - Chevalerie 1 (SAP Format, Bad)</description>
+        <description>Bob Morane - Chevalerie 1 (SAP format, bad)</description>
         <year>1987</year>
         <publisher>Infogrames</publisher>
 
@@ -10308,7 +10308,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="moranejua" cloneof="moraneju">
-		<description>Bob Morane - Jungle 1 (SAP Format)</description>
+		<description>Bob Morane - Jungle 1 (SAP format)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 
@@ -10321,7 +10321,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 <!--
     <software name="moranejub" cloneof="moraneju">
-        <description>Bob Morane - Jungle 1 (SAP Format, Bad)</description>
+        <description>Bob Morane - Jungle 1 (SAP format, bad)</description>
         <year>1987</year>
         <publisher>Infogrames</publisher>
 
@@ -10346,7 +10346,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="moranesfa" cloneof="moranesf">
-		<description>Bob Morane - Science Fiction 1 (SAP Format)</description>
+		<description>Bob Morane - Science Fiction 1 (SAP format)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 
@@ -10358,7 +10358,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="moranesfb" cloneof="moranesf">
-		<description>Bob Morane - Science Fiction 1 (SAP Format, Alt)</description>
+		<description>Bob Morane - Science Fiction 1 (SAP format, alt)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 
@@ -10371,7 +10371,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 <!--
     <software name="moranesfc" cloneof="moranesf">
-        <description>Bob Morane - Science Fiction 1 (SAP Format, Bad)</description>
+        <description>Bob Morane - Science Fiction 1 (SAP format, bad)</description>
         <year>1987</year>
         <publisher>Infogrames</publisher>
 
@@ -10404,7 +10404,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="bobwinnra" cloneof="bobwinnr">
-		<description>Bob Winner (SAP Format)</description>
+		<description>Bob Winner (SAP format)</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
@@ -10424,7 +10424,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="bobwinnrb" cloneof="bobwinnr" supported="no">
-		<description>Bob Winner (640K Disk)</description>
+		<description>Bob Winner (640K disk)</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
@@ -10449,7 +10449,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="boboa" cloneof="bobo">
-		<description>Bobo (Alt)</description>
+		<description>Bobo (alt)</description>
 		<year>1988</year>
 		<publisher>Infogrames</publisher>
 
@@ -10461,7 +10461,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="bobob" cloneof="bobo">
-		<description>Bobo (SAP Format)</description>
+		<description>Bobo (SAP format)</description>
 		<year>1988</year>
 		<publisher>Infogrames</publisher>
 
@@ -10509,7 +10509,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="bugsbusta" cloneof="bugsbust">
-		<description>Bugs Buster (SAP Format)</description>
+		<description>Bugs Buster (SAP format)</description>
 		<year>198?</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -10593,7 +10593,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="challenga" cloneof="challeng">
-		<description>Challenge - Simulation d'Entreprise (Alt)</description>
+		<description>Challenge - Simulation d'Entreprise (alt)</description>
 		<year>1988</year>
 		<publisher>Coktel Vision</publisher>
 
@@ -10605,7 +10605,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="challengb" cloneof="challeng">
-		<description>Challenge - Simulation d'Entreprise (SAP Format)</description>
+		<description>Challenge - Simulation d'Entreprise (SAP format)</description>
 		<year>1988</year>
 		<publisher>Coktel Vision</publisher>
 
@@ -10648,7 +10648,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="chevalia" cloneof="chevali">
-		<description>Les Chevaliers de l'An Mil (SAP Format)</description>
+		<description>Les Chevaliers de l'An Mil (SAP format)</description>
 		<year>1989</year>
 		<publisher>Ubisoft</publisher>
 
@@ -10667,7 +10667,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="chevalib" cloneof="chevali" supported="no">
-		<description>Les Chevaliers de l'An Mil (640K Disk)</description>
+		<description>Les Chevaliers de l'An Mil (640K disk)</description>
 		<year>1989</year>
 		<publisher>Ubisoft</publisher>
 
@@ -10718,7 +10718,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cobraa" cloneof="cobra">
-		<description>Cobra (Cracked)</description>
+		<description>Cobra (cracked)</description>
 		<year>1987</year>
 		<publisher>&lt;bootleg (Albert Tleri)&gt;</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
@@ -10732,7 +10732,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 <!--
     <software name="cobrab" cloneof="cobra">
-        <description>Cobra (SAP Format, Bad)</description>
+        <description>Cobra (SAP format, bad)</description>
         <year>1987</year>
         <publisher>Loriciels</publisher>
         <info name="usage" value="Load with Microsoft BASIC 1.0"/>
@@ -10759,7 +10759,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="coliseuma" cloneof="coliseum">
-		<description>Coliseum (Alt)</description>
+		<description>Coliseum (alt)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
 
@@ -10783,7 +10783,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="colorica" cloneof="coloric">
-		<description>Coloric (SAP Format)</description>
+		<description>Coloric (SAP format)</description>
 		<year>1984</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -10831,7 +10831,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="crazycara" cloneof="crazycar">
-		<description>Crazy Cars (Alt)</description>
+		<description>Crazy Cars (alt)</description>
 		<year>1987</year>
 		<publisher>Titus Software</publisher>
 
@@ -10856,7 +10856,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="crepuscumo6" cloneof="crepuscu">
-		<description>Le Crepuscule du Naja (Includes MO6 Version)</description>
+		<description>Le Crepuscule du Naja (includes MO6 version)</description>
 		<year>198?</year>
 		<publisher>Chip</publisher>
 
@@ -10869,7 +10869,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="crepuscumo6a" cloneof="crepuscu">
-		<description>Le Crepuscule du Naja (Includes MO6 Version, Alt)</description>
+		<description>Le Crepuscule du Naja (includes MO6 version, alt)</description>
 		<year>198?</year>
 		<publisher>Chip</publisher>
 
@@ -10882,7 +10882,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="crepuscumo6b" cloneof="crepuscu">
-		<description>Le Crepuscule du Naja (Includes MO6 Version, SAP Format)</description>
+		<description>Le Crepuscule du Naja (includes MO6 version, SAP format)</description>
 		<year>198?</year>
 		<publisher>Chip</publisher>
 
@@ -10930,7 +10930,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cyrusecha" cloneof="cyrusech">
-		<description>Cyrus Echecs (SAP Format)</description>
+		<description>Cyrus Echecs (SAP format)</description>
 		<year>1984</year>
 		<publisher>Intelligent Software</publisher>
 
@@ -10954,7 +10954,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="deftarota" cloneof="deftarot">
-		<description>Defi au Tarot (Hacked)</description>
+		<description>Defi au Tarot (hacked)</description>
 		<year>1988</year>
 		<publisher>&lt;hack?&gt;</publisher>
 
@@ -10966,7 +10966,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="deftarotb" cloneof="deftarot">
-		<description>Defi au Tarot (Hacked, SAP Format)</description>
+		<description>Defi au Tarot (hacked, SAP format)</description>
 		<year>1988</year>
 		<publisher>&lt;hack?&gt;</publisher>
 
@@ -11014,7 +11014,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="domcamila" cloneof="domcamil">
-		<description>Dom Camillo (SAP Format)</description>
+		<description>Dom Camillo (SAP format)</description>
 		<year>1987</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -11050,7 +11050,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="coloradoa" cloneof="colorado">
-		<description>Duel au Colorado (SAP Format)</description>
+		<description>Duel au Colorado (SAP format)</description>
 		<year>1986</year>
 		<publisher>Chip</publisher>
 
@@ -11062,7 +11062,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="coloradob" cloneof="colorado">
-		<description>Duel au Colorado (Cracked)</description>
+		<description>Duel au Colorado (cracked)</description>
 		<year>1986</year>
 		<publisher>&lt;bootleg (The Crapaud Musulman)&gt;</publisher>
 
@@ -11075,7 +11075,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- second half blank -->
 	<software name="coloradoc" cloneof="colorado">
-		<description>Duel au Colorado (640K Disk)</description>
+		<description>Duel au Colorado (640K disk)</description>
 		<year>1986</year>
 		<publisher>Chip</publisher>
 
@@ -11100,7 +11100,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="echoflipa" cloneof="echoflip">
-		<description>Echo-Flipper (SAP Format)</description>
+		<description>Echo-Flipper (SAP format)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
 
@@ -11148,7 +11148,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="enduroa" cloneof="enduro">
-		<description>Enduro Racer (SAP Format)</description>
+		<description>Enduro Racer (SAP format)</description>
 		<year>1988</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -11172,7 +11172,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="entropiea" cloneof="entropie">
-		<description>Entropie (SAP Format)</description>
+		<description>Entropie (SAP format)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 
@@ -11184,7 +11184,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="erebus">
-		<description>Erebus (Cracked)</description>
+		<description>Erebus (cracked)</description>
 		<year>1986</year>
 		<publisher>&lt;bootleg (Shubert)&gt;</publisher>
 
@@ -11197,7 +11197,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 <!--
     <software name="erebusa" cloneof="erebus">
-        <description>Erebus (Bad)</description>
+        <description>Erebus (bad)</description>
         <year>1986</year>
         <publisher>EH Services</publisher>
 
@@ -11222,7 +11222,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="f15eaglea" cloneof="f15eagle">
-		<description>F-15 Strike Eagle (Alt)</description>
+		<description>F-15 Strike Eagle (alt)</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -11234,7 +11234,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="f15eagleb" cloneof="f15eagle">
-		<description>F-15 Strike Eagle (Modified Loading Screen)</description>
+		<description>F-15 Strike Eagle (modified loading screen)</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -11283,7 +11283,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="foxa" cloneof="fox">
-		<description>Fox (SAP Format)</description>
+		<description>Fox (SAP format)</description>
 		<year>1985</year>
 		<publisher>Shift-Edition</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
@@ -11344,7 +11344,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="artillaca" cloneof="artillac">
-		<description>La Geste d'Artillac (Alt)</description>
+		<description>La Geste d'Artillac (alt)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
 
@@ -11356,7 +11356,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="artillacb" cloneof="artillac">
-		<description>La Geste d'Artillac (Cracked)</description>
+		<description>La Geste d'Artillac (cracked)</description>
 		<year>1985</year>
 		<publisher>&lt;bootleg (Shubert Enterprise)&gt;</publisher>
 
@@ -11418,7 +11418,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="histheata" cloneof="histheat">
-		<description>Histoire de Theatre (Alt)</description>
+		<description>Histoire de Theatre (alt)</description>
 		<year>1985</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -11430,7 +11430,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="histheatb" cloneof="histheat">
-		<description>Histoire de Theatre (SAP Format)</description>
+		<description>Histoire de Theatre (SAP format)</description>
 		<year>1985</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -11490,7 +11490,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="marellesa" cloneof="marelles">
-		<description>Le Jeu des Marelles (Alt)</description>
+		<description>Le Jeu des Marelles (alt)</description>
 		<year>198?</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -11502,7 +11502,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="marellesb" cloneof="marelles">
-		<description>Le Jeu des Marelles (SAP Format)</description>
+		<description>Le Jeu des Marelles (SAP format)</description>
 		<year>198?</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -11550,7 +11550,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="guinnessa" cloneof="guinness">
-		<description>Jeu Guinness des Records (SAP Format)</description>
+		<description>Jeu Guinness des Records (SAP format)</description>
 		<year>198?</year>
 		<publisher>Ediciel</publisher>
 
@@ -11586,7 +11586,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="jumpsurva" cloneof="jumpsurv">
-		<description>Jump for Survival (SAP Format)</description>
+		<description>Jump for Survival (SAP format)</description>
 		<year>198?</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -11622,7 +11622,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="jungheroa" cloneof="junghero">
-		<description>Jungle Hero (Alt)</description>
+		<description>Jungle Hero (alt)</description>
 		<year>198?</year>
 		<publisher>SoftBook</publisher>
 
@@ -11646,7 +11646,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="kya">
-		<description>K.Y.A. - Keep Yourself Alive (Cracked)</description>
+		<description>K.Y.A. - Keep Yourself Alive (cracked)</description>
 		<year>1988</year>
 		<publisher>&lt;bootleg (Thomsoft)&gt;</publisher>
 
@@ -11695,7 +11695,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- second half blank -->
 	<software name="torkaha" cloneof="torkah">
-		<description>Le Labyrinthe de Torkah (640K Disk)</description>
+		<description>Le Labyrinthe de Torkah (640K disk)</description>
 		<year>2015</year>
 		<publisher>Defcard</publisher>
 
@@ -11719,7 +11719,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="lasvegasa" cloneof="lasvegas">
-		<description>Las Vegas (Alt)</description>
+		<description>Las Vegas (alt)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
 
@@ -11731,7 +11731,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="lasvegasb" cloneof="lasvegas">
-		<description>Las Vegas (SAP Format)</description>
+		<description>Las Vegas (SAP format)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
 
@@ -11755,7 +11755,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="legendea" cloneof="legende">
-		<description>Legende (Alt)</description>
+		<description>Legende (alt)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -11786,7 +11786,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="lemmingsa" cloneof="lemmings">
-		<description>Lemmings (SAP Format)</description>
+		<description>Lemmings (SAP format)</description>
 		<year>2006</year>
 		<publisher>YRprod</publisher>
 
@@ -11805,7 +11805,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="lemmingsb" cloneof="lemmings" supported="no">
-		<description>Lemmings (640K Disk)</description>
+		<description>Lemmings (640K disk)</description>
 		<year>2006</year>
 		<publisher>YRprod</publisher>
 
@@ -11829,7 +11829,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="lotoa" cloneof="loto">
-		<description>Loto (SAP Format)</description>
+		<description>Loto (SAP format)</description>
 		<year>1985</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -11865,7 +11865,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="macadama" cloneof="macadam">
-		<description>Macadam Bumper (SAP Format)</description>
+		<description>Macadam Bumper (SAP format)</description>
 		<year>1989</year>
 		<publisher>ERE Informatique</publisher>
 
@@ -11889,7 +11889,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="mach3a" cloneof="mach3">
-		<description>Mach 3 (SAP Format)</description>
+		<description>Mach 3 (SAP format)</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
 
@@ -11951,7 +11951,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="mandragoa" cloneof="mandrago">
-		<description>Mandragore (SAP Format)</description>
+		<description>Mandragore (SAP format)</description>
 		<year>1984</year>
 		<publisher>Infogrames</publisher>
 
@@ -11975,7 +11975,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="marchomba" cloneof="marchomb">
-		<description>Marche a l'Ombre (SAP Format)</description>
+		<description>Marche a l'Ombre (SAP format)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 
@@ -11987,7 +11987,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="marchombb" cloneof="marchomb">
-		<description>Marche a l'Ombre (SAP Format, Alt)</description>
+		<description>Marche a l'Ombre (SAP format, alt)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 
@@ -12011,7 +12011,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="marqjauna" cloneof="marqjaun">
-		<description>La Marque Jaune (SAP Format)</description>
+		<description>La Marque Jaune (SAP format)</description>
 		<year>1988</year>
 		<publisher>Cobrasoft</publisher>
 
@@ -12035,7 +12035,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="mascottea" cloneof="mascotte">
-		<description>La Mascotte (Cracked)</description>
+		<description>La Mascotte (cracked)</description>
 		<year>1988</year>
 		<publisher>&lt;bootleg (The Crapaud Musulman)&gt;</publisher>
 
@@ -12059,7 +12059,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="masquea" cloneof="masque">
-		<description>Masque (SAP Format)</description>
+		<description>Masque (SAP format)</description>
 		<year>1989</year>
 		<publisher>Ubisoft</publisher>
 
@@ -12095,7 +12095,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="maxiboura" cloneof="maxibour">
-		<description>Maxi Bourse International (SAP Format)</description>
+		<description>Maxi Bourse International (SAP format)</description>
 		<year>1988</year>
 		<publisher>Cobrasoft</publisher>
 
@@ -12108,7 +12108,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 <!--
     <software name="maxibourb" cloneof="maxibour">
-        <description>Maxi Bourse International (SAP Format, Bad)</description>
+        <description>Maxi Bourse International (SAP format, bad)</description>
         <year>1988</year>
         <publisher>Cobrasoft</publisher>
 
@@ -12157,7 +12157,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="megawatta" cloneof="megawatt">
-		<description>Megawatt (SAP Format)</description>
+		<description>Megawatt (SAP format)</description>
 		<year>1987</year>
 		<publisher>SoftBook</publisher>
 
@@ -12170,7 +12170,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 <!--
     <software name="megawattb" cloneof="megawatt">
-        <description>Megawatt (SAP Format, Bad)</description>
+        <description>Megawatt (SAP format, bad)</description>
         <year>1987</year>
         <publisher>SoftBook</publisher>
 
@@ -12196,7 +12196,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="menacarcmo6" cloneof="menacarc">
-		<description>Menace sur l'Arctique (Includes MO6 Version)</description>
+		<description>Menace sur l'Arctique (includes MO6 version)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -12209,7 +12209,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="menacarcmo6a" cloneof="menacarc">
-		<description>Menace sur l'Arctique (Includes MO6 Version, Alt)</description>
+		<description>Menace sur l'Arctique (includes MO6 version, alt)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -12222,7 +12222,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="menacarcmo6b" cloneof="menacarc">
-		<description>Menace sur l'Arctique (Includes MO6 Version, SAP Format)</description>
+		<description>Menace sur l'Arctique (includes MO6 version, SAP format)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -12246,7 +12246,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="meurtsera" cloneof="meurtser">
-		<description>Meurtres en Serie (Alt)</description>
+		<description>Meurtres en Serie (alt)</description>
 		<year>1987</year>
 		<publisher>Cobrasoft</publisher>
 
@@ -12258,7 +12258,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="meurtserb" cloneof="meurtser">
-		<description>Meurtres en Serie (SAP Format)</description>
+		<description>Meurtres en Serie (SAP format)</description>
 		<year>1987</year>
 		<publisher>Cobrasoft</publisher>
 
@@ -12270,7 +12270,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="meurtserc" cloneof="meurtser">
-		<description>Meurtres en Serie (SAP Format, Alt)</description>
+		<description>Meurtres en Serie (SAP format, alt)</description>
 		<year>1987</year>
 		<publisher>Cobrasoft</publisher>
 
@@ -12294,7 +12294,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="meurtatla" cloneof="meurtatl">
-		<description>Meurtres sur l'Atlantique (SAP Format)</description>
+		<description>Meurtres sur l'Atlantique (SAP format)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
 
@@ -12306,7 +12306,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="meurtatlb" cloneof="meurtatl">
-		<description>Meurtres sur l'Atlantique (Includes Test)</description>
+		<description>Meurtres sur l'Atlantique (includes test)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
 
@@ -12330,7 +12330,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="mewiloa" cloneof="mewilo">
-		<description>Mewilo (SAP Format)</description>
+		<description>Mewilo (SAP format)</description>
 		<year>1987</year>
 		<publisher>Coktel Vision</publisher>
 
@@ -12354,7 +12354,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="scrabblea" cloneof="scrabble">
-		<description>Micro-Scrabble (Alt)</description>
+		<description>Micro-Scrabble (alt)</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -12366,7 +12366,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="scrabbleb" cloneof="scrabble">
-		<description>Micro-Scrabble (SAP Format)</description>
+		<description>Micro-Scrabble (SAP format)</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -12378,7 +12378,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="scrabblec" cloneof="scrabble">
-		<description>Micro-Scrabble (Cracked?)</description>
+		<description>Micro-Scrabble (cracked?)</description>
 		<year>1985</year>
 		<publisher>&lt;bootleg? (Pustulman)&gt;</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
@@ -12403,7 +12403,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="missiona" cloneof="mission">
-		<description>Mission (Cracked)</description>
+		<description>Mission (cracked)</description>
 		<year>1987</year>
 		<publisher>&lt;bootleg (Adolf Hitler)&gt;</publisher>
 
@@ -12439,7 +12439,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="misstresa" cloneof="misstres">
-		<description>Mission Tres Speciale (SAP Format)</description>
+		<description>Mission Tres Speciale (SAP format)</description>
 		<year>1985</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -12475,7 +12475,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="monopolca" cloneof="monopolc">
-		<description>Monopolic (SAP Format)</description>
+		<description>Monopolic (SAP format)</description>
 		<year>198?</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -12499,7 +12499,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="monopolya" cloneof="monopoly">
-		<description>Monopoly (SAP Format)</description>
+		<description>Monopoly (SAP format)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -12512,7 +12512,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 <!--
     <software name="monopolyb" cloneof="monopoly">
-        <description>Monopoly (SAP Format, Bad)</description>
+        <description>Monopoly (SAP format, bad)</description>
         <year>1986</year>
         <publisher>France Image Logiciel (FIL)</publisher>
 
@@ -12549,7 +12549,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="mysparisa" cloneof="mysparis">
-		<description>Le Mystere de Paris (Alt)</description>
+		<description>Le Mystere de Paris (alt)</description>
 		<year>1988</year>
 		<publisher>Coktel Vision</publisher>
 
@@ -12562,7 +12562,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 <!--
     <software name="mysparisb" cloneof="mysparis">
-        <description>Le Mystere de Paris (Bad)</description>
+        <description>Le Mystere de Paris (bad)</description>
         <year>1988</year>
         <publisher>Coktel Vision</publisher>
 
@@ -12587,7 +12587,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="nuittempa" cloneof="nuittemp">
-		<description>La Nuit des Templiers (SAP Format)</description>
+		<description>La Nuit des Templiers (SAP format)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -12599,7 +12599,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="nuittempb" cloneof="nuittemp">
-		<description>La Nuit des Templiers (SAP Format, Alt)</description>
+		<description>La Nuit des Templiers (SAP format, alt)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -12623,7 +12623,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="okcowboya" cloneof="okcowboy">
-		<description>OK Cowboy (SAP Format)</description>
+		<description>OK Cowboy (SAP format)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 
@@ -12635,7 +12635,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="okcowboyb" cloneof="okcowboy">
-		<description>OK Cowboy (SAP Format, Alt)</description>
+		<description>OK Cowboy (SAP format, alt)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 
@@ -12659,7 +12659,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="oxphara" cloneof="oxphar">
-		<description>Oxphar (SAP Format)</description>
+		<description>Oxphar (SAP format)</description>
 		<year>1987</year>
 		<publisher>ERE Informatique</publisher>
 
@@ -12671,7 +12671,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="oxpharb" cloneof="oxphar">
-		<description>Oxphar (SAP Format, Alt)</description>
+		<description>Oxphar (SAP format, alt)</description>
 		<year>1987</year>
 		<publisher>ERE Informatique</publisher>
 
@@ -12695,7 +12695,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="paniquea" cloneof="panique">
-		<description>Panique Atomique chez Novasprites (Cracked)</description>
+		<description>Panique Atomique chez Novasprites (cracked)</description>
 		<year>1985</year>
 		<publisher>&lt;bootleg (Snark Software)&gt;</publisher>
 
@@ -12707,7 +12707,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="paniqueb" cloneof="panique">
-		<description>Panique Atomique chez Novasprites (Cracked, Alt)</description>
+		<description>Panique Atomique chez Novasprites (cracked, alt)</description>
 		<year>1985</year>
 		<publisher>&lt;bootleg (Snark Software)&gt;</publisher>
 
@@ -12743,7 +12743,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="passvnt2a" cloneof="passvnt2">
-		<description>Les Passagers du Vent - Partie 2 (SAP Format)</description>
+		<description>Les Passagers du Vent - Partie 2 (SAP format)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 
@@ -12780,7 +12780,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="pocka" cloneof="pock">
-		<description>Pock (SAP Format)</description>
+		<description>Pock (SAP format)</description>
 		<year>1992</year>
 		<publisher>Laurent Hiriart</publisher>
 
@@ -12840,7 +12840,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="prohibita" cloneof="prohibit">
-		<description>Prohibition (Alt)</description>
+		<description>Prohibition (alt)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 
@@ -12852,7 +12852,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="prohibitb" cloneof="prohibit">
-		<description>Prohibition (SAP Format)</description>
+		<description>Prohibition (SAP format)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 
@@ -12865,7 +12865,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 <!--
     <software name="prohibitc" cloneof="prohibit">
-        <description>Prohibition (SAP Format, Bad)</description>
+        <description>Prohibition (SAP format, bad)</description>
         <year>1987</year>
         <publisher>Infogrames</publisher>
 
@@ -12890,7 +12890,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="pulsar2a" cloneof="pulsar2">
-		<description>Pulsar II (SAP Format)</description>
+		<description>Pulsar II (SAP format)</description>
 		<year>1984</year>
 		<publisher>Loriciels</publisher>
 
@@ -12917,7 +12917,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="quada" cloneof="quad">
-		<description>Quad (Alt)</description>
+		<description>Quad (alt)</description>
 		<year>1987</year>
 		<publisher>Microids</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
@@ -12931,7 +12931,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="quadb" cloneof="quad">
-		<description>Quad (SAP Format)</description>
+		<description>Quad (SAP format)</description>
 		<year>1987</year>
 		<publisher>Microids</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
@@ -12956,7 +12956,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="manchea" cloneof="manche">
-		<description>Raid sur la Manche (SAP Format)</description>
+		<description>Raid sur la Manche (SAP format)</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -12980,7 +12980,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="renegade">
-		<description>Renegade (Cracked)</description>
+		<description>Renegade (cracked)</description>
 		<year>1988</year>
 		<publisher>&lt;bootleg (TGR-Krakeur)&gt;</publisher>
 
@@ -12992,7 +12992,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="renegadea" cloneof="renegade">
-		<description>Renegade (Cracked, Alt)</description>
+		<description>Renegade (cracked, alt)</description>
 		<year>1988</year>
 		<publisher>&lt;bootleg (TGR-Krakeur)&gt;</publisher>
 
@@ -13005,7 +13005,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 <!--
     <software name="renegadeb" cloneof="renegade">
-        <description>Renegade (Bad)</description>
+        <description>Renegade (bad)</description>
         <year>1988</year>
         <publisher>France Image Logiciel (FIL)</publisher>
 
@@ -13030,7 +13030,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="reussitea" cloneof="reussite">
-		<description>Reussites (SAP Format)</description>
+		<description>Reussites (SAP format)</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -13042,7 +13042,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="reussiteb" cloneof="reussite">
-		<description>Reussites (Includes Docs)</description>
+		<description>Reussites (includes docs)</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -13066,7 +13066,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="ripouxa" cloneof="ripoux">
-		<description>Les Ripoux (SAP Format)</description>
+		<description>Les Ripoux (SAP format)</description>
 		<year>1987</year>
 		<publisher>Cobrasoft</publisher>
 
@@ -13079,7 +13079,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 <!--
     <software name="ripouxb" cloneof="ripoux">
-        <description>Les Ripoux (SAP Format, Bad)</description>
+        <description>Les Ripoux (SAP format, bad)</description>
         <year>1987</year>
         <publisher>Cobrasoft</publisher>
 
@@ -13116,7 +13116,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="roadkilla" cloneof="roadkill">
-		<description>Road Killer (Cracked)</description>
+		<description>Road Killer (cracked)</description>
 		<year>1987</year>
 		<publisher>&lt;bootleg (Thomsoft)&gt;</publisher>
 
@@ -13140,7 +13140,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="crusoea" cloneof="crusoe">
-		<description>Robinson Crusoe (Alt)</description>
+		<description>Robinson Crusoe (alt)</description>
 		<year>1987</year>
 		<publisher>Coktel Vision</publisher>
 
@@ -13152,7 +13152,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="crusoeb" cloneof="crusoe">
-		<description>Robinson Crusoe (SAP Format)</description>
+		<description>Robinson Crusoe (SAP format)</description>
 		<year>1987</year>
 		<publisher>Coktel Vision</publisher>
 
@@ -13188,7 +13188,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="romulusa" cloneof="romulus">
-		<description>Romulus - Rome et Moi (Alt)</description>
+		<description>Romulus - Rome et Moi (alt)</description>
 		<year>198?</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -13200,7 +13200,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="romulusb" cloneof="romulus">
-		<description>Romulus - Rome et Moi (SAP Format)</description>
+		<description>Romulus - Rome et Moi (SAP format)</description>
 		<year>198?</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -13236,7 +13236,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="saphir">
-		<description>Saphir (Trained +5)</description>
+		<description>Saphir (trained +5)</description>
 		<year>1986</year>
 		<publisher>&lt;bootleg (Prehis-To)&gt;</publisher>
 
@@ -13249,7 +13249,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 <!--
     <software name="saphira" cloneof="saphir">
-        <description>Saphir (Bad)</description>
+        <description>Saphir (bad)</description>
         <year>1986</year>
         <publisher>Infogrames</publisher>
 
@@ -13274,7 +13274,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="sapiensa" cloneof="sapiens">
-		<description>Sapiens (SAP Format)</description>
+		<description>Sapiens (SAP format)</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
 
@@ -13286,7 +13286,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="sapiensb" cloneof="sapiens">
-		<description>Sapiens (SAP Format, Alt)</description>
+		<description>Sapiens (SAP format, alt)</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
 
@@ -13310,7 +13310,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="scalextra" cloneof="scalextr">
-		<description>Scalextric (SAP Format)</description>
+		<description>Scalextric (SAP format)</description>
 		<year>1987</year>
 		<publisher>Leisure Genius</publisher>
 
@@ -13341,7 +13341,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="sectnoira" cloneof="sectnoir">
-		<description>La Secte Noire (640K Disk)</description>
+		<description>La Secte Noire (640K disk)</description>
 		<year>2014</year>
 		<publisher>Retrocoding Production</publisher>
 
@@ -13377,7 +13377,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="sservicea" cloneof="sservice">
-		<description>Silent Service (Alt)</description>
+		<description>Silent Service (alt)</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -13401,7 +13401,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="slapfigha" cloneof="slapfigh">
-		<description>Slap Fight (SAP Format)</description>
+		<description>Slap Fight (SAP format)</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -13413,7 +13413,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="slapfighb" cloneof="slapfigh">
-		<description>Slap Fight (SAP Format, Alt)</description>
+		<description>Slap Fight (SAP format, alt)</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -13425,7 +13425,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="slapfighc" cloneof="slapfigh">
-		<description>Slap Fight (SAP Format, Alt 2)</description>
+		<description>Slap Fight (SAP format, alt 2)</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -13438,7 +13438,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 <!--
     <software name="slapfighd" cloneof="slapfigh">
-        <description>Slap Fight (SAP Format, Bad)</description>
+        <description>Slap Fight (SAP format, bad)</description>
         <year>1987</year>
         <publisher>France Image Logiciel (FIL)</publisher>
 
@@ -13475,7 +13475,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="soliela" cloneof="soliel">
-		<description>Le Soliel et ses Planetes (SAP Format)</description>
+		<description>Le Soliel et ses Planetes (SAP format)</description>
 		<year>1987</year>
 		<publisher>Cedic/Nathan</publisher>
 
@@ -13499,7 +13499,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="sorcerya" cloneof="sorcery">
-		<description>Sorcery (SAP Format)</description>
+		<description>Sorcery (SAP format)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -13512,7 +13512,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 <!--
     <software name="sorceryb" cloneof="sorcery">
-        <description>Sorcery (SAP Format, Bad)</description>
+        <description>Sorcery (SAP format, bad)</description>
         <year>1986</year>
         <publisher>France Image Logiciel (FIL)</publisher>
 
@@ -13573,7 +13573,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="spaceraca" cloneof="spacerac">
-		<description>Space Racer (SAP Format)</description>
+		<description>Space Racer (SAP format)</description>
 		<year>1988</year>
 		<publisher>Loriciels</publisher>
 
@@ -13585,7 +13585,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="spaceracb" cloneof="spacerac">
-		<description>Space Racer (SAP Format, Alt)</description>
+		<description>Space Racer (SAP format, alt)</description>
 		<year>1988</year>
 		<publisher>Loriciels</publisher>
 
@@ -13598,7 +13598,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 <!--
     <software name="spaceracc" cloneof="spacerac">
-        <description>Space Racer (SAP Format, Bad)</description>
+        <description>Space Racer (SAP format, bad)</description>
         <year>1988</year>
         <publisher>Loriciels</publisher>
 
@@ -13636,7 +13636,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 <!--
     <software name="spacetuna" cloneof="spacetun">
-        <description>Space Tunnel (Bad)</description>
+        <description>Space Tunnel (bad)</description>
         <year>1987</year>
         <publisher>SoftBook</publisher>
 
@@ -13674,7 +13674,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="spindizza" cloneof="spindizz">
-		<description>Spindizzy (SAP Format)</description>
+		<description>Spindizzy (SAP format)</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
@@ -13737,7 +13737,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="stonezona" cloneof="stonezon">
-		<description>Stone Zone (Cracked)</description>
+		<description>Stone Zone (cracked)</description>
 		<year>198?</year>
 		<publisher>&lt;bootleg (Shubert)&gt;</publisher>
 
@@ -13761,7 +13761,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="sandroida" cloneof="sandroid">
-		<description>Super Androides (Alt)</description>
+		<description>Super Androides (alt)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
 
@@ -13800,7 +13800,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<!-- second half blank -->
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="superskia" cloneof="superski">
-		<description>Super Ski (640K Disk)</description>
+		<description>Super Ski (640K disk)</description>
 		<year>1987</year>
 		<publisher>Microids</publisher>
 
@@ -13836,7 +13836,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="tnta" cloneof="tnt">
-		<description>T.N.T. (Cracked)</description>
+		<description>T.N.T. (cracked)</description>
 		<year>1986</year>
 		<publisher>&lt;bootleg (G.A.D.J.O)&gt;</publisher>
 
@@ -13861,7 +13861,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="talismanmo6" cloneof="talisman">
-		<description>Le Talisman d'Osiris (Includes MO6 Version)</description>
+		<description>Le Talisman d'Osiris (includes MO6 version)</description>
 		<year>1986</year>
 		<publisher>Chip</publisher>
 
@@ -13874,7 +13874,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="talismanmo6a" cloneof="talisman">
-		<description>Le Talisman d'Osiris (Includes MO6 Version, Non-Bootable)</description>
+		<description>Le Talisman d'Osiris (includes MO6 version, non-bootable)</description>
 		<year>1986</year>
 		<publisher>Chip</publisher>
 
@@ -13898,7 +13898,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="temphist">
-		<description>Le Temps d'Une Historie</description>
+		<description>Le Temps d'une Histoire</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 
@@ -13910,7 +13910,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="temphista" cloneof="temphist">
-		<description>Le Temps d'Une Historie (SAP Format)</description>
+		<description>Le Temps d'une Histoire (SAP format)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 
@@ -13922,7 +13922,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="temphistb" cloneof="temphist">
-		<description>Le Temps d'Une Historie (SAP Format, Alt)</description>
+		<description>Le Temps d'une Histoire (SAP format, alt)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 
@@ -13958,7 +13958,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="tetrisyra" cloneof="tetrisyr">
-		<description>Tetris (YRprod) (Alt)</description>
+		<description>Tetris (YRprod) (alt)</description>
 		<year>2005</year>
 		<publisher>YRprod</publisher>
 
@@ -13970,7 +13970,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="tetrisyrb" cloneof="tetrisyr">
-		<description>Tetris (YRprod) (SAP Format)</description>
+		<description>Tetris (YRprod) (SAP format)</description>
 		<year>2005</year>
 		<publisher>YRprod</publisher>
 
@@ -13982,7 +13982,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="tetrisyrc" cloneof="tetrisyr">
-		<description>Tetris (YRprod) (SAP Format, Alt)</description>
+		<description>Tetris (YRprod) (SAP format, alt)</description>
 		<year>2005</year>
 		<publisher>YRprod</publisher>
 
@@ -14050,7 +14050,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="karaokea" cloneof="karaoke">
-		<description>TO-Karaoke (SAP Format)</description>
+		<description>TO-Karaoke (SAP format)</description>
 		<year>2002</year>
 		<publisher>Bledor-Soft</publisher>
 
@@ -14106,7 +14106,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 <!--
     <software name="topguna" cloneof="topgun">
-        <description>Top Gun (Bad)</description>
+        <description>Top Gun (bad)</description>
         <year>1988</year>
         <publisher>France Image Logiciel (FIL)</publisher>
 
@@ -14131,7 +14131,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="toutshusa" cloneof="toutshus">
-		<description>Tout Schuss (SAP Format)</description>
+		<description>Tout Schuss (SAP format)</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -14158,7 +14158,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="traitbzza" cloneof="traitbzz">
-		<description>Traitement Bzzz (SAP Format)</description>
+		<description>Traitement Bzzz (SAP format)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -14195,7 +14195,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="tresbaska" cloneof="tresbask">
-		<description>Le Tresor des Baskerville (Alt)</description>
+		<description>Le Tresor des Baskerville (alt)</description>
 		<year>198?</year>
 		<publisher>Chip</publisher>
 
@@ -14219,7 +14219,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="trespira" cloneof="trespir">
-		<description>Le Tresor du Pirate (SAP Format)</description>
+		<description>Le Tresor du Pirate (SAP format)</description>
 		<year>1984</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -14231,7 +14231,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="trespirb" cloneof="trespir">
-		<description>Le Tresor du Pirate (SAP Format, Alt)</description>
+		<description>Le Tresor du Pirate (SAP format, alt)</description>
 		<year>1984</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -14269,7 +14269,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- no title screen -->
 	<software name="triple7a" cloneof="triple7">
-		<description>Triple Seven (Older?)</description>
+		<description>Triple Seven (older?)</description>
 		<year>2005</year>
 		<publisher>YRprod</publisher>
 
@@ -14281,7 +14281,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="triple7b" cloneof="triple7">
-		<description>Triple Seven (Older?, SAP Format)</description>
+		<description>Triple Seven (older?, SAP format)</description>
 		<year>2005</year>
 		<publisher>YRprod</publisher>
 
@@ -14305,7 +14305,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="trivialpa" cloneof="trivialp">
-		<description>Trivial Pursuit (SAP Format)</description>
+		<description>Trivial Pursuit (SAP format)</description>
 		<year>198?</year>
 		<publisher>Ubisoft</publisher>
 
@@ -14348,7 +14348,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="turbocupa" cloneof="turbocup">
-		<description>Turbo Cup (Cracked)</description>
+		<description>Turbo Cup (cracked)</description>
 		<year>1988</year>
 		<publisher>&lt;bootleg (The Crapaud Musulman)&gt;</publisher>
 
@@ -14360,7 +14360,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="turbocupb" cloneof="turbocup" supported="no">
-		<description>Turbo Cup (640K Disk)</description>
+		<description>Turbo Cup (640K disk)</description>
 		<year>1988</year>
 		<publisher>Loriciels</publisher>
 
@@ -14373,7 +14373,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 <!--
     <software name="turbocupc" cloneof="turbocup" supported="no">
-        <description>Turbo Cup (SAP Format, Bad)</description>
+        <description>Turbo Cup (SAP format, bad)</description>
         <year>1988</year>
         <publisher>Loriciels</publisher>
 
@@ -14386,7 +14386,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 -->
 
 	<software name="turlogh">
-		<description>Turlogh de Penroth (Cracked)</description>
+		<description>Turlogh de Penroth (cracked)</description>
 		<year>1988</year>
 		<publisher>&lt;bootleg (Adolf Hitler)&gt;</publisher>
 
@@ -14398,7 +14398,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="turlogha" cloneof="turlogh">
-		<description>Turlogh de Penroth (Cracked) (SAP Format)</description>
+		<description>Turlogh de Penroth (cracked) (SAP format)</description>
 		<year>1988</year>
 		<publisher>&lt;bootleg (Adolf Hitler)&gt;</publisher>
 
@@ -14422,7 +14422,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="affairora" cloneof="affairor">
-		<description>Une Affaire en Or (SAP Format)</description>
+		<description>Une Affaire en Or (SAP format)</description>
 		<year>198?</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -14458,7 +14458,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="vampirea" cloneof="vampire">
-		<description>Vampire (SAP Format)</description>
+		<description>Vampire (SAP format)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
 
@@ -14483,7 +14483,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 <!--
     <software name="mortdinoa" cloneof="mortdino">
-        <description>Vie et Mort des Dinosaures (Bad)</description>
+        <description>Vie et Mort des Dinosaures (bad)</description>
         <year>1986</year>
         <publisher>Infogrames</publisher>
 
@@ -14532,7 +14532,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="volsoloa" cloneof="volsolo">
-		<description>Vol Solo (Alt)</description>
+		<description>Vol Solo (alt)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -14544,7 +14544,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="volsolob" cloneof="volsolo">
-		<description>Vol Solo (SAP Format)</description>
+		<description>Vol Solo (SAP format)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -14556,7 +14556,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="volsoloc" cloneof="volsolo">
-		<description>Vol Solo (SAP Format, Alt)</description>
+		<description>Vol Solo (SAP format, alt)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -14568,7 +14568,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="volsolod" cloneof="volsolo">
-		<description>Vol Solo (SAP Format, Alt 2)</description>
+		<description>Vol Solo (SAP format, alt 2)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -14592,7 +14592,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="wargamea" cloneof="wargame">
-		<description>Wargame (SAP Format)</description>
+		<description>Wargame (SAP format)</description>
 		<year>1985</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -14616,7 +14616,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="waytigera" cloneof="waytiger">
-		<description>The Way of the Tiger (SAP Format)</description>
+		<description>The Way of the Tiger (SAP format)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -14629,7 +14629,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 <!--
     <software name="waytigerb" cloneof="waytiger">
-        <description>The Way of the Tiger (SAP Format, Bad)</description>
+        <description>The Way of the Tiger (SAP format, bad)</description>
         <year>1986</year>
         <publisher>France Image Logiciel (FIL)</publisher>
 
@@ -14654,7 +14654,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="wizballa" cloneof="wizball">
-		<description>Wizball (SAP Format)</description>
+		<description>Wizball (SAP format)</description>
 		<year>1988</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -14666,7 +14666,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="wizballb" cloneof="wizball">
-		<description>Wizball (SAP Format, Alt)</description>
+		<description>Wizball (SAP format, alt)</description>
 		<year>1988</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -14680,7 +14680,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 <!-- Misc. Disks -->
 
 	<software name="exempl1" supported="no">
-		<description>exempl1 (Bad?)</description>
+		<description>exempl1 (bad?)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -14693,7 +14693,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 <!--
     <software name="getmenu0">
-        <description>getmenu0 (Bad)</description>
+        <description>getmenu0 (bad)</description>
         <year>19??</year>
         <publisher>&lt;unknown&gt;</publisher>
 

@@ -6,20 +6,20 @@
 
     Digital Synthesizer
 
-    TODO:
-    - Currently seems to hang while processing the serial ports (midi). Our
-      uPD7810 core is lacking the externally clocked serial mode.
-
 ***************************************************************************/
 
 #include "emu.h"
+
+#include "bus/midi/midiinport.h"
+#include "bus/midi/midioutport.h"
 #include "cpu/upd7810/upd7811.h"
 #include "machine/clock.h"
 #include "video/hd44780.h"
+
 #include "emupal.h"
 #include "screen.h"
 
-#define VERBOSE 1
+//#define VERBOSE 1
 #include "logmacro.h"
 
 #include "cz101.lh"
@@ -41,7 +41,8 @@ public:
 		m_keys(*this, "kc%u", 0),
 		m_leds(*this, "led_%u", 0U),
 		m_port_b(0),
-		m_port_c(0)
+		m_port_c(0),
+		m_midi_rx(1)
 	{ }
 
 	void cz101(machine_config &config);
@@ -54,11 +55,6 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	required_device<upd7810_device> m_maincpu;
-	required_device<hd44780_device> m_hd44780;
-	required_ioport_array<16> m_keys;
-	output_finder<32> m_leds;
-
 	void maincpu_map(address_map &map);
 
 	void port_b_w(uint8_t data);
@@ -69,9 +65,19 @@ private:
 	void led_3_w(uint8_t data);
 	void led_4_w(uint8_t data);
 	uint8_t keys_r();
+	void sound_w(uint8_t data);
+
+	required_device<upd7810_device> m_maincpu;
+	required_device<hd44780_device> m_hd44780;
+	required_ioport_array<16> m_keys;
+	output_finder<32> m_leds;
 
 	uint8_t m_port_b;
 	uint8_t m_port_c;
+	uint8_t m_midi_rx;
+
+	uint8_t m_sound_data[2];
+	uint8_t m_sound_data_pos;
 };
 
 
@@ -89,6 +95,7 @@ void cz101_state::maincpu_map(address_map &map)
 	map(0xa800, 0xafff).w(FUNC(cz101_state::led_2_w));
 	map(0xb000, 0xb7ff).w(FUNC(cz101_state::led_1_w));
 	map(0xb800, 0xbfff).r(FUNC(cz101_state::keys_r));
+	map(0xc000, 0xfeff).w(FUNC(cz101_state::sound_w));
 }
 
 
@@ -238,10 +245,13 @@ static INPUT_PORTS_START( cz101 )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LINE SELECT")
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RING")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("NOISE")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("TUNE \xe2\x96\xbd") // ▽
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("TUNE \xe2\x96\xb3") // △
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"TUNE \u9661") // ▽
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"TUNE \u9651") // △
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("APO ON/OFF")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("AN1")
+	PORT_BIT(0xff, 0x7f, IPT_PADDLE) PORT_NAME("Pitch Wheel") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x00, 0xff)
 INPUT_PORTS_END
 
 
@@ -252,8 +262,8 @@ INPUT_PORTS_END
 void cz101_state::cz101_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148)); // background
-	palette.set_pen_color(1, rgb_t( 92,  83,  88)); // lcd pixel on
-	palette.set_pen_color(2, rgb_t(131, 136, 139)); // lcd pixel off
+	palette.set_pen_color(1, rgb_t( 92,  83,  88)); // LCD pixel on
+	palette.set_pen_color(2, rgb_t(131, 136, 139)); // LCD pixel off
 }
 
 HD44780_PIXEL_UPDATE( cz101_state::lcd_pixel_update )
@@ -319,7 +329,20 @@ uint8_t cz101_state::keys_r()
 	return m_keys[m_port_b & 0x0f]->read();
 }
 
-// 7-------  nmi output
+void cz101_state::sound_w(uint8_t data)
+{
+	if (m_sound_data_pos >= 2)
+	{
+		logerror("sound reg write: %02x %02x %02x\n", m_sound_data[0], m_sound_data[1], data);
+		m_sound_data_pos = 0;
+	}
+	else
+	{
+		m_sound_data[m_sound_data_pos++] = data;
+	}
+}
+
+// 7-------  power switch input (also connected to /NMI)
 // -6------  music lsi write enable
 // --5-----  music lsi chip select
 // ---4----  music lsi irq input
@@ -358,10 +381,15 @@ void cz101_state::machine_start()
 	// register for save states
 	save_item(NAME(m_port_b));
 	save_item(NAME(m_port_c));
+	save_item(NAME(m_midi_rx));
+	save_item(NAME(m_sound_data));
+	save_item(NAME(m_sound_data_pos));
 }
 
 void cz101_state::machine_reset()
 {
+	m_sound_data[0] = m_sound_data[1] = 0;
+	m_sound_data_pos = 0;
 }
 
 
@@ -375,17 +403,26 @@ void cz101_state::cz101(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cz101_state::maincpu_map);
 	m_maincpu->pa_in_cb().set(m_hd44780, FUNC(hd44780_device::db_r));
 	m_maincpu->pa_out_cb().set(m_hd44780, FUNC(hd44780_device::db_w));
+	m_maincpu->pb_in_cb().set_constant(0x80); // TODO: power switch
 	m_maincpu->pb_out_cb().set(FUNC(cz101_state::port_b_w));
 	m_maincpu->pc_out_cb().set(FUNC(cz101_state::port_c_w));
+	m_maincpu->an1_func().set_ioport("AN1");
 	m_maincpu->set_pc_pullups(0x03);
 
-	CLOCK(config, "midi_clock", 2_MHz_XTAL)/*.signal_handler().set(m_maincpu, FUNC(upd7810_device::sck_w))*/; // not supported yet
+	CLOCK(config, "midi_clock", 2_MHz_XTAL).signal_handler().set(m_maincpu, FUNC(upd7810_device::sck_w));
+
+	midi_port_device& mdin(MIDI_PORT(config, "mdin", midiin_slot, "midiin"));
+	mdin.rxd_handler().set([this] (int state) { m_midi_rx = state; });
+	m_maincpu->rxd_func().set([this] () { return m_midi_rx; });
+
+	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
+	m_maincpu->txd_func().set("mdout", FUNC(midi_port_device::write_txd));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(6*16+1, 19);
+	screen.set_size(6*16 + 1, 19);
 	screen.set_visarea_full();
 	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
 	screen.set_palette("palette");
@@ -394,6 +431,7 @@ void cz101_state::cz101(machine_config &config)
 
 	HD44780(config, m_hd44780, 0);
 	m_hd44780->set_lcd_size(2, 16);
+	m_hd44780->set_function_set_at_any_time();
 	m_hd44780->set_pixel_update_cb(FUNC(cz101_state::lcd_pixel_update));
 
 	config.set_default_layout(layout_cz101);

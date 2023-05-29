@@ -5,8 +5,8 @@
     Lady Frog
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_LADYFROG_H
-#define MAME_INCLUDES_LADYFROG_H
+#ifndef MAME_MISC_LADYFROG_H
+#define MAME_MISC_LADYFROG_H
 
 #pragma once
 
@@ -94,4 +94,4 @@ private:
 	void ladyfrog_sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_LADYFROG_H
+#endif // MAME_MISC_LADYFROG_H

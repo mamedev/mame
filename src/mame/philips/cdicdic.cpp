@@ -28,15 +28,15 @@ TODO:
 #include "romload.h"
 #include "sound/cdda.h"
 
-#define LOG_DECODES     (1 << 1)
-#define LOG_SAMPLES     (1 << 2)
-#define LOG_COMMANDS    (1 << 3)
-#define LOG_SECTORS     (1 << 4)
-#define LOG_IRQS        (1 << 5)
-#define LOG_READS       (1 << 6)
-#define LOG_WRITES      (1 << 7)
-#define LOG_UNKNOWNS    (1 << 8)
-#define LOG_RAM         (1 << 9)
+#define LOG_DECODES     (1U << 1)
+#define LOG_SAMPLES     (1U << 2)
+#define LOG_COMMANDS    (1U << 3)
+#define LOG_SECTORS     (1U << 4)
+#define LOG_IRQS        (1U << 5)
+#define LOG_READS       (1U << 6)
+#define LOG_WRITES      (1U << 7)
+#define LOG_UNKNOWNS    (1U << 8)
+#define LOG_RAM         (1U << 9)
 #define LOG_ALL         (LOG_DECODES | LOG_SAMPLES | LOG_COMMANDS | LOG_SECTORS | LOG_IRQS | LOG_READS | LOG_WRITES | LOG_UNKNOWNS | LOG_RAM)
 
 #define VERBOSE         (0)
@@ -931,7 +931,7 @@ void cdicdic_device::process_disc_sector()
 	LOGMASKED(LOG_SECTORS, "Disc sector, current LBA: %08x, MSF: %02x %02x %02x\n", real_lba, mins_bcd, secs_bcd, frac_bcd);
 
 	uint8_t buffer[2560] = { 0 };
-	m_cd->read_data(m_curr_lba, buffer, cdrom_file::CD_TRACK_RAW_DONTCARE);
+	m_cdrom->read_data(m_curr_lba, buffer, cdrom_file::CD_TRACK_RAW_DONTCARE);
 
 	// Detect (badly) if we're dealing with a byteswapped loose-bin image
 	if (buffer[0] == 0xff && buffer[1] == 0x00)
@@ -1022,7 +1022,7 @@ void cdicdic_device::process_disc_sector()
 	if (m_disc_mode == DISC_TOC)
 	{
 		uint8_t *toc_buffer = buffer;
-		const cdrom_file::toc &toc = m_cd->get_toc();
+		const cdrom_file::toc &toc = m_cdrom->get_toc();
 		uint32_t entry_count = 0;
 
 		// Determine total frame count for data, and total audio track count
@@ -1473,7 +1473,7 @@ cdicdic_device::cdicdic_device(const machine_config &mconfig, const char *tag, d
 	, m_memory_space(*this, ":maincpu", AS_PROGRAM)
 	, m_dmadac(*this, ":dac%u", 1U)
 	, m_scc(*this, ":maincpu")
-	, m_cdrom_dev(*this, ":cdrom")
+	, m_cdrom(*this, ":cdrom")
 	, m_clock2(clock)
 {
 }
@@ -1563,17 +1563,6 @@ void cdicdic_device::device_reset()
 	m_audio_format_sectors = 0;
 	m_decoding_audio_map = false;
 	m_decode_addr = 0;
-
-	if (m_cdrom_dev)
-	{
-		// Console case (has CDROM device)
-		m_cd = m_cdrom_dev->get_cdrom_file();
-	}
-	else
-	{
-		// Arcade case
-		m_cd = new cdrom_file(machine().rom_load().get_disk_handle(":cdrom"));
-	}
 
 	m_audio_timer->adjust(attotime::from_hz(75), 0, attotime::from_hz(75));
 	m_sector_timer->adjust(attotime::from_hz(75), 0, attotime::from_hz(75));

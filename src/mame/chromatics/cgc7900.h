@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_CGC7900_H
-#define MAME_INCLUDES_CGC7900_H
+#ifndef MAME_CHROMATICS_CGC7900_H
+#define MAME_CHROMATICS_CGC7900_H
 
 #pragma once
 
@@ -127,4 +127,4 @@ private:
 	void irq_encoder(int pin, int state);
 };
 
-#endif
+#endif // MAME_CHROMATICS_CGC7900_H

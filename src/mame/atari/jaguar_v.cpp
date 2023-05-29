@@ -148,14 +148,19 @@
 #include "jaguar.h"
 #include "jagblit.h"
 
+#define LOG_BLITS           (1U << 1)
+#define LOG_BAD_BLITS       (1U << 2)
+#define LOG_BLITTER_STATS   (1U << 3)
+#define LOG_BLITTER_WRITE   (1U << 4)
+#define LOG_UNHANDLED_BLITS (1U << 5)
+#define LOG_OBJECTS         (1U << 6)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
 
 #define ENABLE_BORDERS      0
 
-#define LOG_BLITS           0
-#define LOG_BAD_BLITS       0
-#define LOG_BLITTER_STATS   0
-#define LOG_BLITTER_WRITE   0
-#define LOG_UNHANDLED_BLITS 0
 // use the new version in jag_blitter.cpp/.h if 0
 #define USE_LEGACY_BLITTER  1
 
@@ -453,7 +458,7 @@ void jaguar_state::blitter_run()
 	uint32_t a1flags = m_blitter_regs[A1_FLAGS] & STATIC_FLAGS_MASK;
 	uint32_t a2flags = m_blitter_regs[A2_FLAGS] & STATIC_FLAGS_MASK;
 
-	g_profiler.start(PROFILER_USER1);
+	auto profile = g_profiler.start(PROFILER_USER1);
 
 	if (a1flags == a2flags)
 	{
@@ -504,42 +509,45 @@ void jaguar_state::blitter_run()
 		return;
 	}
 
-if (LOG_BLITTER_STATS)
-{
-static uint32_t blitter_stats[1000][4];
-static uint64_t blitter_pixels[1000];
-static int blitter_count = 0;
-static int reps = 0;
-int i;
-for (i = 0; i < blitter_count; i++)
-	if (blitter_stats[i][0] == (m_blitter_regs[B_CMD] & STATIC_COMMAND_MASK) &&
-		blitter_stats[i][1] == (m_blitter_regs[A1_FLAGS] & STATIC_FLAGS_MASK) &&
-		blitter_stats[i][2] == (m_blitter_regs[A2_FLAGS] & STATIC_FLAGS_MASK))
-		break;
-if (i == blitter_count)
-{
-	blitter_stats[i][0] = m_blitter_regs[B_CMD] & STATIC_COMMAND_MASK;
-	blitter_stats[i][1] = m_blitter_regs[A1_FLAGS] & STATIC_FLAGS_MASK;
-	blitter_stats[i][2] = m_blitter_regs[A2_FLAGS] & STATIC_FLAGS_MASK;
-	blitter_stats[i][3] = 0;
-	blitter_pixels[i] = 0;
-	blitter_count++;
-}
-blitter_stats[i][3]++;
-blitter_pixels[i] += (m_blitter_regs[B_COUNT] & 0xffff) * (m_blitter_regs[B_COUNT] >> 16);
-if (++reps % 100 == 99)
-{
-	osd_printf_debug("---\nBlitter stats:\n");
-	for (i = 0; i < blitter_count; i++)
-		osd_printf_debug("  CMD=%08X A1=%08X A2=%08X %6d times, %016X pixels\n",
-				blitter_stats[i][0], blitter_stats[i][1], blitter_stats[i][2],
-				blitter_stats[i][3], blitter_pixels[i]);
-	osd_printf_debug("---\n");
-}
-}
+	/* debug logging */
+	{
+		static uint32_t blitter_stats[1000][4];
+		static uint64_t blitter_pixels[1000];
+		static int blitter_count = 0;
+		static int reps = 0;
+		int i;
+		for (i = 0; i < blitter_count; i++)
+		{
+			if (blitter_stats[i][0] == (m_blitter_regs[B_CMD] & STATIC_COMMAND_MASK) &&
+				blitter_stats[i][1] == (m_blitter_regs[A1_FLAGS] & STATIC_FLAGS_MASK) &&
+				blitter_stats[i][2] == (m_blitter_regs[A2_FLAGS] & STATIC_FLAGS_MASK))
+				break;
+		}
+		if (i == blitter_count)
+		{
+			blitter_stats[i][0] = m_blitter_regs[B_CMD] & STATIC_COMMAND_MASK;
+			blitter_stats[i][1] = m_blitter_regs[A1_FLAGS] & STATIC_FLAGS_MASK;
+			blitter_stats[i][2] = m_blitter_regs[A2_FLAGS] & STATIC_FLAGS_MASK;
+			blitter_stats[i][3] = 0;
+			blitter_pixels[i] = 0;
+			blitter_count++;
+		}
+		blitter_stats[i][3]++;
+		blitter_pixels[i] += (m_blitter_regs[B_COUNT] & 0xffff) * (m_blitter_regs[B_COUNT] >> 16);
+		if (++reps % 100 == 99)
+		{
+			LOGMASKED(LOG_BLITTER_STATS, "---\nBlitter stats:\n");
+			for (i = 0; i < blitter_count; i++)
+			{
+				LOGMASKED(LOG_BLITTER_STATS, "  CMD=%08X A1=%08X A2=%08X %6d times, %016X pixels\n",
+						blitter_stats[i][0], blitter_stats[i][1], blitter_stats[i][2],
+						blitter_stats[i][3], blitter_pixels[i]);
+			}
+			LOGMASKED(LOG_BLITTER_STATS, "---\n");
+		}
+	}
 
 	generic_blitter(m_blitter_regs[B_CMD], m_blitter_regs[A1_FLAGS], m_blitter_regs[A2_FLAGS]);
-	g_profiler.stop();
 }
 
 uint32_t jaguar_state::blitter_r(offs_t offset, uint32_t mem_mask)
@@ -573,8 +581,7 @@ void jaguar_state::blitter_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		blitter_run();
 	}
 
-	if (LOG_BLITTER_WRITE)
-		logerror("%s:Blitter write register @ F022%02X = %08X\n", machine().describe_context(), offset * 4, data);
+	LOGMASKED(LOG_BLITTER_WRITE, "%s:Blitter write register @ F022%02X = %08X\n", machine().describe_context(), offset * 4, data);
 #else
 	m_blitter->iobus_w(offset, data, mem_mask);
 #endif

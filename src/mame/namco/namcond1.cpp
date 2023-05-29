@@ -206,7 +206,7 @@ Some logic, resistors/caps/transistors, some connectors etc.
 
 
 // configurable logging
-#define LOG_CUSKEY     (1U <<  1)
+#define LOG_CUSKEY     (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_CUSKEY)
 
@@ -452,7 +452,7 @@ uint16_t namcond1_state::mcu_pa_read()
 	return 0xff;
 }
 
-void namcond1_state::mcu_pa_write(uint16 data)
+void namcond1_state::mcu_pa_write(uint16_t data)
 {
 	m_p8 = data;
 }

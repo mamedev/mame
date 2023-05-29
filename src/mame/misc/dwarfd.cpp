@@ -305,6 +305,9 @@ uPC1352C @ N3
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class dwarfd_state : public driver_device
 {
 public:
@@ -993,6 +996,9 @@ void dwarfd_state::init_qc()
 	memregion("maincpu")->base()[0x59b4] = 0x00;
 
 }
+
+} // anonymous namespace
+
 
 //    YEAR  NAME      PARENT     MACHINE   INPUT     STATE         INIT    ORENTATION,         COMPANY           FULLNAME            FLAGS
 GAME( 1979, pokeresp,  0,        pokeresp, dwarfd,   dwarfd_state, init_dwarfd, ROT0, "Electro-Sport", "Poker (Electro-Sport)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

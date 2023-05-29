@@ -808,7 +808,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="amoudan2">
-		<description>America Oudan Ultra Quiz Part 2 (Japan, Rev 1)</description>
+		<description>America Oudan Ultra Quiz Part 2 (Japan, rev 1)</description>
 		<year>1991</year>
 		<publisher>Tomy</publisher>
 		<info name="serial" value="DMG-AUJ" />
@@ -1268,7 +1268,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="asteroidp">
+	<software name="asteroidp" cloneof="asteroid">
 		<description>Asteroids (prototype)</description>
 		<year>1991</year>
 		<publisher>Accolade</publisher>
@@ -2570,7 +2570,7 @@ license:CC0-1.0
 
 	<software name="bokujom" cloneof="harvmoon">
 		<!-- Also released via the Nintendo Power service in 2000-08 -->
-		<description>Bokujou Monogatari GB (Japan, Rev 1)</description>
+		<description>Bokujou Monogatari GB (Japan, rev 1)</description>
 		<year>1997</year>
 		<publisher>Victor Interactive Software</publisher>
 		<info name="serial" value="DMG-AYWJ-JPN" />
@@ -2621,7 +2621,7 @@ license:CC0-1.0
 
 	<software name="bokujomnp" cloneof="harvmoon">
 		<!-- Planned for physical release? -->
-		<description>Bokujou Monogatari GB (Japan, NP)</description>
+		<description>Bokujou Monogatari GB (Japan, Nintendo Power service)</description>
 		<year>1997</year>
 		<publisher>Victor Interactive Software</publisher>
 		<info name="serial" value="DMG-BYWJ-JPN?" />
@@ -2936,7 +2936,7 @@ license:CC0-1.0
 
 	<software name="boxxle">
 		<!-- European release is a relabeled USA version -->
-		<description>Boxxle (Europe, USA, Rev 1)</description>
+		<description>Boxxle (Europe, USA, rev 1)</description>
 		<year>1990</year>
 		<publisher>FCI</publisher>
 		<info name="serial" value="DMG-SO-UKV, DMG-SO-USA" />
@@ -3238,7 +3238,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bugsbcol">
-		<description>Bugs Bunny Collection (Japan, Rev 1)</description>
+		<description>Bugs Bunny Collection (Japan, rev 1)</description>
 		<year>1997</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="DMG-AWBJ-JPN" />
@@ -3480,7 +3480,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="caesarsu" cloneof="caesars">
-		<description>Caesars Palace (USA, Rev 1)</description>
+		<description>Caesars Palace (USA, rev 1)</description>
 		<year>1991</year>
 		<publisher>Arcadia Systems</publisher>
 		<info name="serial" value="DMG-CE-USA-1" />
@@ -3941,7 +3941,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="chessmstu" cloneof="chessmst">
-		<description>The Chessmaster (USA, Rev 1)</description>
+		<description>The Chessmaster (USA, rev 1)</description>
 		<year>1991</year>
 		<publisher>Hi Tech Expressions</publisher>
 		<info name="serial" value="DMG-EM-USA?" />
@@ -5113,7 +5113,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="dinobred">
-		<description>Dino Breeder (Japan, Rev 1)</description>
+		<description>Dino Breeder (Japan, rev 1)</description>
 		<year>1997</year>
 		<publisher>J-Wing</publisher>
 		<info name="serial" value="DMG-AWDJ-JPN-1" />
@@ -5214,7 +5214,7 @@ license:CC0-1.0
 
 	<software name="dkong">
 		<!-- Also released via the Nintendo Power service in 2000-03 -->
-		<description>Donkey Kong (World, Rev 1)</description>
+		<description>Donkey Kong (World, rev 1)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-QDA, DMG-QD-ESP-1, DMG-QD-EUR, DMG-QD-FRG, DMG-QD-NOE, DMG-QD-SCN, DMG-QD-USA" />
@@ -5327,7 +5327,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="dkland3">
-		<description>Donkey Kong Land III (Australia, Europe, USA, Rev 1)</description>
+		<description>Donkey Kong Land III (Australia, Europe, USA, rev 1)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AD3E-USA, DMG-AD3P-AUS, DMG-AD3P-EUR" />
@@ -5773,7 +5773,7 @@ license:CC0-1.0
 
 	<software name="drmario">
 		<!-- Also released via the Nintendo Power service in 2000-03 -->
-		<description>Dr. Mario (World, Rev 1)</description>
+		<description>Dr. Mario (World, rev 1)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-VUA, DMG-VU-EUR, DMG-VU-ITA, DMG-VU-UKV, DMG-VU-USA" />
@@ -6195,7 +6195,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="dxbakeno">
-		<description>DX Bakenou Z (Japan, Rev 1)</description>
+		<description>DX Bakenou Z (Japan, rev 1)</description>
 		<year>1992</year>
 		<publisher>Asmik Ace</publisher>
 		<info name="serial" value="DMG-DZJ" />
@@ -6367,7 +6367,7 @@ license:CC0-1.0
 
 	<software name="f1race" supported="partial">
 		<!-- Also released via the Nintendo Power service in 2000-03 -->
-		<description>F-1 Race (World, Rev 1)</description>
+		<description>F-1 Race (World, rev 1)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-F1A, DMG-F1-EUR, DMG-F1-NOE, DMG-F1-USA" />
@@ -6763,7 +6763,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="fifa98">
-		<description>FIFA Road to the World Cup '98 (Europe, Rev 1)</description>
+		<description>FIFA Road to the World Cup '98 (Europe, rev 1)</description>
 		<year>1997</year>
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-A8SP-EUU" />
@@ -7322,7 +7322,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="gwatchu" cloneof="gwatch">
-		<description>Game &amp; Watch Gallery (USA, Rev 1)</description>
+		<description>Game &amp; Watch Gallery (USA, rev 1)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AGAE-USA" />
@@ -7692,7 +7692,7 @@ license:CC0-1.0
 	<software name="gargoyle">
 		<!-- European release is a relabeled USA version -->
 		<!-- Unreleased in USA? -->
-		<description>Gargoyle's Quest - Ghosts'n Goblins (Europe, Rev 1)</description>
+		<description>Gargoyle's Quest - Ghosts'n Goblins (Europe, rev 1)</description>
 		<year>1990</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="DMG-RA-NOE-1" />
@@ -8591,7 +8591,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="gbsyoji">
-		<description>Goukaku Boy Series - Gakken - Yojijukugo 288 (Japan, Rev 1)</description>
+		<description>Goukaku Boy Series - Gakken - Yojijukugo 288 (Japan, rev 1)</description>
 		<year>1998</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-AY3J-JPN" />
@@ -8888,7 +8888,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="gbsasob">
-		<description>Goukaku Boy Series - Shikakui Atama o Maruku Suru - Suuji de Asobou Sansuu Hen (Japan, Rev 1)</description>
+		<description>Goukaku Boy Series - Shikakui Atama o Maruku Suru - Suuji de Asobou Sansuu Hen (Japan, rev 1)</description>
 		<year>1998</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-AM5J-JPN" />
@@ -9608,7 +9608,7 @@ license:CC0-1.0
 
 	<software name="kirbyj" cloneof="kirby">
 		<!-- Also released via the Nintendo Power service in 2000-03 -->
-		<description>Hoshi no Kirby (Japan, Rev 1)</description>
+		<description>Hoshi no Kirby (Japan, rev 1)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-KYJ" />
@@ -9841,7 +9841,7 @@ license:CC0-1.0
 
 	<software name="hyperlod">
 		<!-- Region code "A" -->
-		<description>Hyper Lode Runner (World, Rev 1)</description>
+		<description>Hyper Lode Runner (World, rev 1)</description>
 		<year>1989</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-HLA, DMG-HL-UKV, DMG-HL-USA" />
@@ -10588,7 +10588,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="jetsons">
-		<description>The Jetsons - Robot Panic (USA, Rev 1)</description>
+		<description>The Jetsons - Robot Panic (USA, rev 1)</description>
 		<year>1992</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="DMG-JS-USA?" />
@@ -11164,7 +11164,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="kaseki">
-		<description>Kaseki Sousei Reborn (Japan, Rev 1)</description>
+		<description>Kaseki Sousei Reborn (Japan, rev 1)</description>
 		<year>1998</year>
 		<publisher>Starfish</publisher>
 		<info name="serial" value="DMG-AKRJ-JPN?" />
@@ -11551,7 +11551,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="kininko">
-		<description>Kinin Koumaroku Oni (Japan, Rev 1)</description>
+		<description>Kinin Koumaroku Oni (Japan, rev 1)</description>
 		<year>1990</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="DMG-ONJ?" />
@@ -12044,7 +12044,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="konchuhk">
-		<description>Konchuu Hakase (Japan, Rev 1)</description>
+		<description>Konchuu Hakase (Japan, rev 1)</description>
 		<year>1998</year>
 		<publisher>J-Wing</publisher>
 		<info name="serial" value="DMG-AKJJ-JPN" />
@@ -12404,7 +12404,7 @@ license:CC0-1.0
 
 	<software name="zeldalnk">
 		<!-- Region code "E" (USA) -->
-		<description>The Legend of Zelda - Link's Awakening (Europe, USA, Rev 2)</description>
+		<description>The Legend of Zelda - Link's Awakening (Europe, USA, rev 2)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ZL-USA-1, DMG-ZL-EUR" />
@@ -12420,7 +12420,7 @@ license:CC0-1.0
 
 	<software name="zeldalnka" cloneof="zeldalnk">
 		<!-- Region code "E" (USA) -->
-		<description>The Legend of Zelda - Link's Awakening (Canada, Europe, USA, Rev 1)</description>
+		<description>The Legend of Zelda - Link's Awakening (Canada, Europe, USA, rev 1)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ZL-UKV, DMG-ZL-ESP-1, DMG-ZL-CAN" />
@@ -12520,7 +12520,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="lemmings">
-		<description>Lemmings (Europe, Rev 1)</description>
+		<description>Lemmings (Europe, rev 1)</description>
 		<year>1993</year>
 		<publisher>Ocean</publisher>
 		<info name="serial" value="DMG-L8-NOE" />
@@ -13133,7 +13133,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="saga" cloneof="ffantleg">
-		<description>Makai Toushi Sa-Ga (Japan, Rev 1)</description>
+		<description>Makai Toushi Sa-Ga (Japan, rev 1)</description>
 		<year>1989</year>
 		<publisher>Square</publisher>
 		<info name="serial" value="DMG-SAJ" />
@@ -13517,7 +13517,7 @@ license:CC0-1.0
 
 	<software name="medakabu">
 		<!-- Notes: Also released by NP in 2000-03 -->
-		<description>Medarot - Kabuto Version (Japan, Rev 1)</description>
+		<description>Medarot - Kabuto Version (Japan, rev 1)</description>
 		<year>1997</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-AMXJ-JPN" />
@@ -13567,7 +13567,7 @@ license:CC0-1.0
 
 	<software name="medakuwa">
 		<!-- Notes: Also released by NP in 2000-03 -->
-		<description>Medarot - Kuwagata Version (Japan, Rev 1)</description>
+		<description>Medarot - Kuwagata Version (Japan, rev 1)</description>
 		<year>1997</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-AMYJ-JPN" />
@@ -14076,7 +14076,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mickey5a" cloneof="mickeymw">
-		<description>Mickey Mouse V (Japan, Rev 1)</description>
+		<description>Mickey Mouse V (Japan, rev 1)</description>
 		<year>1993</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="DMG-I5J?" />
@@ -15737,7 +15737,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="nbajamtej" cloneof="nbajamte">
-		<description>NBA Jam - Tournament Edition (Japan)</description>
+		<description>NBA Jam T.E. - Tournament Edition (Japan)</description>
 		<year>1995</year>
 		<publisher>Acclaim Japan</publisher>
 		<info name="serial" value="DMG-AJTJ-JPN" />
@@ -15752,7 +15752,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="nbajamte">
-		<description>NBA Jam - Tournament Edition (Europe, USA)</description>
+		<description>NBA Jam T.E. - Tournament Edition (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-AJTE-USA, DMG-AJTP-EUR" />
@@ -15981,7 +15981,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="samspir">
-		<description>Nettou Samurai Spirits (China, Japan, Rev 1)</description>
+		<description>Nettou Samurai Spirits (China, Japan, rev 1)</description>
 		<year>1994</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-406 CHN, DMG-X4J" />
@@ -16076,7 +16076,7 @@ license:CC0-1.0
 
 	<software name="toshinj" cloneof="toshin">
 		<!-- Notes: Also released by NP in 2000-03 -->
-		<description>Nettou Toushinden (Japan, Rev 1)</description>
+		<description>Nettou Toushinden (Japan, rev 1)</description>
 		<year>1996</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-ATDJ-JPN" />
@@ -16128,7 +16128,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="wh2ja" cloneof="wh2">
-		<description>Nettou World Heroes 2 Jet (Japan, Rev 1)</description>
+		<description>Nettou World Heroes 2 Jet (Japan, rev 1)</description>
 		<year>1995</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-AWJJ-JPN?" />
@@ -17040,7 +17040,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="pacintim">
-		<description>Pac-In-Time (Europe, Rev 1)</description>
+		<description>Pac-In-Time (Europe, rev 1)</description>
 		<year>1995</year>
 		<publisher>Namco</publisher>
 		<info name="serial" value="DMG-APTP-?" />
@@ -18351,7 +18351,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="pokepika" cloneof="pokeyell">
-		<description>Pocket Monsters - Pikachu (Japan, Rev 3)</description>
+		<description>Pocket Monsters - Pikachu (Japan, rev 3)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APSJ-JPN" />
@@ -18375,7 +18375,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="pokepikaa" cloneof="pokeyell">
-		<description>Pocket Monsters - Pikachu (Japan, Rev 2)</description>
+		<description>Pocket Monsters - Pikachu (Japan, rev 2)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APSJ-JPN" />
@@ -18399,7 +18399,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="pokepikab" cloneof="pokeyell">
-		<description>Pocket Monsters - Pikachu (Japan, Rev 1)</description>
+		<description>Pocket Monsters - Pikachu (Japan, rev 1)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APSJ-JPN" />
@@ -18447,7 +18447,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="pokeaka" cloneof="pokered">
-		<description>Pocket Monsters Aka (Japan, Rev 1)</description>
+		<description>Pocket Monsters Aka (Japan, rev 1)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APAJ-JPN (G743404)" />
@@ -18513,7 +18513,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="pokemido">
-		<description>Pocket Monsters Midori (Japan, Rev 1)</description>
+		<description>Pocket Monsters Midori (Japan, rev 1)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APBJ-JPN (G743412)" />
@@ -18557,7 +18557,7 @@ license:CC0-1.0
 	<software name="poktpuyo">
 		<!-- NP only -->
 		<!-- Planned for physical release? -->
-		<description>Pocket Puyo Puyo Tsuu (Japan, Rev 1, NP)</description>
+		<description>Pocket Puyo Puyo Tsuu (Japan, rev 1, Nintendo Power service)</description>
 		<year>1996</year>
 		<publisher>Compile</publisher>
 		<info name="serial" value="DMG-APYJ-JPN?" />
@@ -19053,7 +19053,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="popeye2ja" cloneof="popeye2">
-		<description>Popeye 2 (Japan, Rev 1)</description>
+		<description>Popeye 2 (Japan, rev 1)</description>
 		<year>1991</year>
 		<publisher>Sigma</publisher>
 		<info name="serial" value="DMG-PGJ" />
@@ -19124,7 +19124,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="powermisj" cloneof="powermis">
-		<description>Power Mission (Japan, Rev 1)</description>
+		<description>Power Mission (Japan, rev 1)</description>
 		<year>1990</year>
 		<publisher>Vap</publisher>
 		<info name="serial" value="DMG-XCA" />
@@ -19170,7 +19170,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="powerpro">
-		<description>Power Pro GB (Japan, Rev 1)</description>
+		<description>Power Pro GB (Japan, rev 1)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-APWJ-JPN (RK144-J1)" />
@@ -19534,7 +19534,7 @@ license:CC0-1.0
 	<software name="purikura">
 		<!-- NP only -->
 		<!-- Planned for physical release? -->
-		<description>Purikura Pocket - Fukanzen Joshikousei Manual (Japan, Rev 1, NP)</description>
+		<description>Purikura Pocket - Fukanzen Joshikousei Manual (Japan, rev 1, Nintendo Power service)</description>
 		<year>1997</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="DMG-APPJ-JPN?" />
@@ -19608,7 +19608,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="puyopuyo">
-		<description>Puyo Puyo (Japan, Rev 1)</description>
+		<description>Puyo Puyo (Japan, rev 1)</description>
 		<year>1994</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="DMG-QQJ" />
@@ -20502,7 +20502,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="robocop">
-		<description>RoboCop (Europe, USA, Rev 1)</description>
+		<description>RoboCop (Europe, USA, rev 1)</description>
 		<year>1990</year>
 		<publisher>Ocean</publisher>
 		<info name="serial" value="DMG-CP-FAH, DMG-CP-NOE, DMG-CP-USA" />
@@ -20760,7 +20760,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mvpbb">
-		<description>Roger Clemens' MVP Baseball (USA, Rev 1)</description>
+		<description>Roger Clemens' MVP Baseball (USA, rev 1)</description>
 		<year>1992</year>
 		<publisher>LJN</publisher>
 		<info name="serial" value="DMG-VM-USA?" />
@@ -20860,7 +20860,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="saga2" cloneof="ffantlg2">
-		<description>Sa-Ga 2 - Hihou Densetsu (Japan, Rev 1)</description>
+		<description>Sa-Ga 2 - Hihou Densetsu (Japan, rev 1)</description>
 		<year>1990</year>
 		<publisher>Square</publisher>
 		<info name="serial" value="DMG-S2J" />
@@ -21083,7 +21083,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="sanrioup">
-		<description>Sanrio Uranai Party (Japan, Rev 1)</description>
+		<description>Sanrio Uranai Party (Japan, rev 1)</description>
 		<year>1997</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-AG7J-JPN" />
@@ -21748,7 +21748,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="shogisai">
-		<description>Shougi Saikyou (Japan, Rev 1)</description>
+		<description>Shougi Saikyou (Japan, rev 1)</description>
 		<year>1994</year>
 		<publisher>Magical Company</publisher>
 		<info name="serial" value="DMG-AMSJ-JPN" />
@@ -21986,7 +21986,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="smurfs">
-		<description>The Smurfs (Europe, USA, Rev 1)</description>
+		<description>The Smurfs (Europe, USA, rev 1)</description>
 		<year>1994</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="DMG-UF-FAH-1, DMG-UF-NOE-1, DMG-UF-USA)" />
@@ -22932,7 +22932,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="starwars">
-		<description>Star Wars (Europe, USA, Rev 1)</description>
+		<description>Star Wars (Europe, USA, rev 1)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-WS-EUR, DMG-WS-USA-1" />
@@ -23056,7 +23056,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="sf2">
-		<description>Street Fighter II (Europe, USA, Rev 1)</description>
+		<description>Street Fighter II (Europe, USA, rev 1)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ASFE-USA, DMG-ASFE-USA-1, DMG-ASFP-EUR, DMG-ASFP-NOE" />
@@ -23528,7 +23528,7 @@ license:CC0-1.0
 
 	<software name="sml">
 		<!-- Also released via the Nintendo Power service in 2000-03 -->
-		<description>Super Mario Land (World, Rev 1)</description>
+		<description>Super Mario Land (World, rev 1)</description>
 		<year>1989</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-101 CHN, DMG-MLA, DMG-ML-CAN, DMG-ML-ESP-1, DMG-ML-FAH, DMG-ML-ITA, DMG-ML-NOE, DMG-ML-UKV, DMG-ML-USA, DMG-ML-USA-1" />
@@ -23567,7 +23567,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="sml2">
-		<description>Super Mario Land 2 - 6 Golden Coins (Australia, China, Europe, USA, Rev 2)</description>
+		<description>Super Mario Land 2 - 6 Golden Coins (Australia, China, Europe, USA, rev 2)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-401 CHN, DMG-MQ-AUS, DMG-MQ-EUR, DMG-MQ-UKV, DMG-MQ-USA, DMG-MQ-USA-1" />
@@ -23592,7 +23592,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="sml2a" cloneof="sml2">
-		<description>Super Mario Land 2 - 6 Golden Coins (Europe, USA, Rev 1)</description>
+		<description>Super Mario Land 2 - 6 Golden Coins (Europe, USA, rev 1)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-MQ-USA, DMG-MQ-ESP-1" />
@@ -23635,7 +23635,7 @@ license:CC0-1.0
 
 	<software name="sml2j" cloneof="sml2">
 		<!-- Also released via the Nintendo Power service in 2000-03 -->
-		<description>Super Mario Land 2 - 6-tsu no Kinka (Japan, Rev 2)</description>
+		<description>Super Mario Land 2 - 6-tsu no Kinka (Japan, rev 2)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-L6J" />
@@ -23659,7 +23659,7 @@ license:CC0-1.0
 
 	<software name="sml2ja" cloneof="sml2">
 		<!-- Also released via the Nintendo Power service in 2000-03 -->
-		<description>Super Mario Land 2 - 6-tsu no Kinka (Japan, Rev 1)</description>
+		<description>Super Mario Land 2 - 6-tsu no Kinka (Japan, rev 1)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-L6J" />
@@ -24471,7 +24471,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tmnt3a" cloneof="tmnt3">
-		<description>Teenage Mutant Hero Turtles III - Radical Rescue (Europe, Rev 1)</description>
+		<description>Teenage Mutant Hero Turtles III - Radical Rescue (Europe, rev 1)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-K8-UKV?" />
@@ -24745,7 +24745,7 @@ license:CC0-1.0
 
 	<software name="tetris">
 		<!-- Also released via the Nintendo Power service in 2000-09 -->
-		<description>Tetris (World, Rev 1)</description>
+		<description>Tetris (World, rev 1)</description>
 		<year>1989</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-104 CHN, DMG-TRA, DMG-TR-AUS, DMG-TR-CAN, DMG-TR-ESP, DMG-TR-ESP-1, DMG-TR-EUR, DMG-TR-HKG, DMG-TR-NOE, DMG-TR-SCN-1, DMG-TR-UKV, DMG-TR-USA" />
@@ -24778,7 +24778,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tetris2">
-		<description>Tetris 2 (Europe, Rev 1)</description>
+		<description>Tetris 2 (Europe, rev 1)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -24837,7 +24837,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tetrisat">
-		<description>Tetris Attack (Europe, USA, Rev 1)</description>
+		<description>Tetris Attack (Europe, USA, rev 1)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AYLE-USA, DMG-AYLP-EUR" />
@@ -25446,7 +25446,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="toystoryu" cloneof="toystory">
-		<description>Disney's Toy Story (USA, Rev 1)</description>
+		<description>Disney's Toy Story (USA, rev 1)</description>
 		<year>1996</year>
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="DMG-AQHE-USA" />
@@ -27146,7 +27146,7 @@ license:CC0-1.0
 
 	<software name="yakuman">
 		<!-- Also released via the Nintendo Power service in 2000-03 -->
-		<description>Yakuman (Japan, Rev 1)</description>
+		<description>Yakuman (Japan, rev 1)</description>
 		<year>1989</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-MJJ" />
@@ -27420,7 +27420,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="zeldalnkj" cloneof="zeldalnk">
-		<description>Zelda no Densetsu - Yume o Miru Shima (China, Japan, Rev 1)</description>
+		<description>Zelda no Densetsu - Yume o Miru Shima (China, Japan, rev 1)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ZLJ, DMG-407 CHN" />
@@ -28123,7 +28123,7 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 
 	<!-- unemulated M64282FP processing features, uses unemulated printer -->
 	<software name="pockcam" cloneof="gboycam" supported="partial">
-		<description>Pocket Camera (Japan, Rev 1)</description>
+		<description>Pocket Camera (Japan, rev 1)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="MGB-006" />

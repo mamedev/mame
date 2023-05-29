@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_BINGOCT_H
-#define MAME_MACHINE_BINGOCT_H
+#ifndef MAME_SEGA_BINGOCT_H
+#define MAME_SEGA_BINGOCT_H
 
 #pragma once
 
@@ -58,4 +58,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(BINGOCT, bingoct_device)
 
-#endif // MAME_MACHINE_BINGOCT_H
+#endif // MAME_SEGA_BINGOCT_H

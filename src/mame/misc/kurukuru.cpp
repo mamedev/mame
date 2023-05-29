@@ -393,6 +393,9 @@
 #include "video/v9938.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define UNICODE_10YEN   "\xC2\xA5" "10"
 #define UNICODE_100YEN  "\xC2\xA5" "100"
 
@@ -956,6 +959,8 @@ ROM_START( ppj )
 	ROM_LOAD( "pal16l8a_no23.ic12",    0x0400, 0x0104, CRC(8a7fbbe0) SHA1(aab8d6b77d46cf2d8620861af1f7c039b6dcda99) )
 	ROM_LOAD( "pal12l6a_7908b-4.ic32", 0x0600, 0x0034, CRC(bddf925e) SHA1(861cf5966444d0c0392241e5cfa08db475fb439a) )  // identical to kurukuru...
 ROM_END
+
+} // anonymous namespace
 
 
 /***************************************************************************

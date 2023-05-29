@@ -223,7 +223,8 @@ public:
 		}
 
 		// sort array
-		std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t> >(std::locale());
+		std::locale const lcl;
+		std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t> >(lcl);
 		auto const compare_names =
 				[&coll] (std::string const &x, std::string const &y) -> bool
 				{
@@ -420,7 +421,7 @@ menu_select_software::~menu_select_software()
 //  handle
 //-------------------------------------------------
 
-void menu_select_software::handle(event const *ev)
+bool menu_select_software::handle(event const *ev)
 {
 	if (m_prev_selected == nullptr && item_count() > 0)
 		m_prev_selected = item(0).ref();
@@ -428,30 +429,33 @@ void menu_select_software::handle(event const *ev)
 	// FIXME: everything above here used run before events were processed
 
 	// process the menu
+	bool changed = false;
 	if (ev)
 	{
 		if (dismiss_error())
 		{
 			// reset the error on any subsequent menu event
+			changed = true;
 		}
 		else switch (ev->iptkey)
 		{
 		case IPT_UI_SELECT:
 			if ((get_focus() == focused_menu::MAIN) && ev->itemref)
-				inkey_select(ev);
+				changed = inkey_select(ev);
 			break;
 
 		case IPT_UI_LEFT:
 			if (right_panel() == RP_IMAGES)
 			{
 				// Images
-				previous_image_view();
+				changed = previous_image_view();
 			}
 			else if (right_panel() == RP_INFOS && ui_globals::cur_sw_dats_view > 0)
 			{
 				// Infos
 				ui_globals::cur_sw_dats_view--;
 				m_topline_datsview = 0;
+				changed = true;
 			}
 			break;
 
@@ -459,34 +463,47 @@ void menu_select_software::handle(event const *ev)
 			if (right_panel() == RP_IMAGES)
 			{
 				// Images
-				next_image_view();
+				changed = next_image_view();
 			}
 			else if (right_panel() == RP_INFOS && ui_globals::cur_sw_dats_view < (ui_globals::cur_sw_dats_total - 1))
 			{
 				// Infos
 				ui_globals::cur_sw_dats_view++;
 				m_topline_datsview = 0;
+				changed = true;
 			}
 			break;
 
 		case IPT_UI_UP:
 			if ((get_focus() == focused_menu::LEFT) && (software_filter::FIRST < m_filter_highlight))
+			{
 				--m_filter_highlight;
+				changed = true;
+			}
 			break;
 
 		case IPT_UI_DOWN:
 			if ((get_focus() == focused_menu::LEFT) && (software_filter::LAST > m_filter_highlight))
+			{
 				++m_filter_highlight;
+				changed = true;
+			}
 			break;
 
 		case IPT_UI_HOME:
 			if (get_focus() == focused_menu::LEFT)
+			{
 				m_filter_highlight = software_filter::FIRST;
+				changed = true;
+			}
 			break;
 
 		case IPT_UI_END:
 			if (get_focus() == focused_menu::LEFT)
+			{
 				m_filter_highlight = software_filter::LAST;
+				changed = true;
+			}
 			break;
 
 		case IPT_UI_DATS:
@@ -509,12 +526,12 @@ void menu_select_software::handle(event const *ev)
 							mfav.add_favorite_software(*swinfo);
 							machine().popmessage(_("%s\n added to favorites list."), swinfo->longname);
 						}
-
 						else
 						{
 							machine().popmessage(_("%s\n removed from favorites list."), swinfo->longname);
 							mfav.remove_favorite_software(*swinfo);
 						}
+						changed = true;
 					}
 				}
 			}
@@ -523,6 +540,19 @@ void menu_select_software::handle(event const *ev)
 
 	// if we're in an error state, overlay an error message
 	draw_error_text();
+	return changed;
+}
+
+//-------------------------------------------------
+//  recompute_metrics
+//-------------------------------------------------
+
+void menu_select_software::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu_select_launch::recompute_metrics(width, height, aspect);
+
+	// configure the custom rendering
+	set_custom_space(4.0F * line_height() + 5.0F * tb_border(), 4.0F * line_height() + 4.0F * tb_border());
 }
 
 //-------------------------------------------------
@@ -545,7 +575,7 @@ void menu_select_software::menu_deactivated()
 //  populate
 //-------------------------------------------------
 
-void menu_select_software::populate(float &customtop, float &custombottom)
+void menu_select_software::populate()
 {
 	for (auto &icon : m_data->icons()) // TODO: why is this here?  maybe better on resize or setting change?
 		icon.second.texture.reset();
@@ -605,15 +635,12 @@ void menu_select_software::populate(float &customtop, float &custombottom)
 				m_displaylist[curitem].get().parentname.empty() ? 0 : FLAG_INVERT, (void *)&m_displaylist[curitem].get());
 	}
 
-	// configure the custom rendering
 	m_skip_main_items = 0;
-	customtop = 4.0f * ui().get_line_height() + 5.0f * ui().box_tb_border();
-	custombottom = 4.0f * ui().get_line_height() + 4.0f * ui().box_tb_border();
 
 	if (old_software != -1)
 	{
 		set_selected_index(old_software);
-		top_line = selected_index() - (ui_globals::visible_sw_lines / 2);
+		centre_selection();
 	}
 
 	reselect_last::reset();
@@ -624,7 +651,7 @@ void menu_select_software::populate(float &customtop, float &custombottom)
 //  handle select key event
 //-------------------------------------------------
 
-void menu_select_software::inkey_select(const event *menu_event)
+bool menu_select_software::inkey_select(const event *menu_event)
 {
 	ui_software_info *ui_swinfo = (ui_software_info *)menu_event->itemref;
 	driver_enumerator drivlist(machine().options(), *ui_swinfo->driver);
@@ -636,6 +663,7 @@ void menu_select_software::inkey_select(const event *menu_event)
 	if (!audit_passed(sysaudit))
 	{
 		set_error(reset_options::REMEMBER_REF, make_system_audit_fail_text(auditor, sysaudit));
+		return true;
 	}
 	else if (ui_swinfo->startempty == 1)
 	{
@@ -644,6 +672,7 @@ void menu_select_software::inkey_select(const event *menu_event)
 			reselect_last::reselect(true);
 			launch_system(*ui_swinfo->driver, *ui_swinfo);
 		}
+		return false;
 	}
 	else
 	{
@@ -659,11 +688,13 @@ void menu_select_software::inkey_select(const event *menu_event)
 				reselect_last::reselect(true);
 				launch_system(drivlist.driver(), *ui_swinfo);
 			}
+			return false;
 		}
 		else
 		{
 			// otherwise, display an error
 			set_error(reset_options::REMEMBER_REF, make_software_audit_fail_text(auditor, swaudit));
+			return true;
 		}
 	}
 }

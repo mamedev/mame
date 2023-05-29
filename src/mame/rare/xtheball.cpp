@@ -20,6 +20,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class xtheball_state : public driver_device
 {
 public:
@@ -354,6 +356,7 @@ ROM_START( xtheball )
 	ROM_LOAD16_BYTE( "xtb-2h.ic11", 0x200001, 0x80000, CRC(50c27558) SHA1(ecfb7d918868d35a8cde45f7d04fdfc3ffc06328) )
 ROM_END
 
+} // anonymous namespace
 
 
 /*************************************

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco, hap
 // thanks-to:Sean Riddle
-/******************************************************************************
+/*******************************************************************************
 
 Applied Concepts Boris Diplomat
 
@@ -11,11 +11,11 @@ Hardware notes:
 - 8-digit 7seg led panel
 
 Two versions exist, a blue one(seen with SC80265P) and a brown one(seen with
-either MCU). The one emulated here is from a brown version with the SC80265P.
-Motorola SC80265P is a 3870 clone, it's assumed that the program is the same
-as SL90259.
+either SC80265P or SL90259). The one emulated here is from a brown version with
+the SC80265P. Motorola SC80265P is a 3870 clone, it's assumed that the program
+is the same as SL90259.
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 #include "cpu/f8/f8.h"
@@ -85,9 +85,9 @@ void borisdpl_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // F3870 ports
 
@@ -122,9 +122,9 @@ u8 borisdpl_state::input_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void borisdpl_state::main_map(address_map &map)
 {
@@ -141,9 +141,9 @@ void borisdpl_state::main_io(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( borisdpl )
 	PORT_START("IN.0")
@@ -176,13 +176,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void borisdpl_state::borisdpl(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	F8(config, m_maincpu, 3000000/2); // frequency approximated from video reference
 	m_maincpu->set_addrmap(AS_PROGRAM, &borisdpl_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &borisdpl_state::main_io);
@@ -196,7 +196,7 @@ void borisdpl_state::borisdpl(machine_config &config)
 	psu.read_b().set(FUNC(borisdpl_state::ram_address_r));
 	psu.write_b().set(FUNC(borisdpl_state::ram_address_w));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8, 7);
 	m_display->set_segmask(0xff, 0x7f);
 	config.set_default_layout(layout_aci_borisdpl);
@@ -204,9 +204,9 @@ void borisdpl_state::borisdpl(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( borisdpl )
 	ROM_REGION( 0x0800, "maincpu", 0 )
@@ -217,9 +217,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME      PARENT CMP MACHINE   INPUT     STATE           INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1979, borisdpl, 0,      0, borisdpl, borisdpl, borisdpl_state, empty_init, "Applied Concepts", "Boris Diplomat", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1979, borisdpl, 0,      0,      borisdpl, borisdpl, borisdpl_state, empty_init, "Applied Concepts", "Boris Diplomat", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

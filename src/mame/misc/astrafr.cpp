@@ -16,6 +16,7 @@ Platform also used by Lowen? (at least some of their sets use the same address l
 #include "machine/68340.h"
 
 
+namespace {
 
 class astrafr_state : public driver_device
 {
@@ -2163,6 +2164,9 @@ void astrafr_state::init_astradec_sml_dual()
 	astra_addresslines( (uint16_t*)memregion( "maincpu" )->base(), memregion( "maincpu" )->bytes(), 1 );
 	astra_addresslines( (uint16_t*)memregion( "slavecpu" )->base(), memregion( "slavecpu" )->bytes(), 1 );
 }
+
+} // anonymous namespace
+
 
 // Single games?
 GAME( 200?, as_srb,    0,        astra_single,        astrafr, astrafr_state, empty_init,         ROT0, "Astra", "Super Ring a Bell (Astra, V004)"       , MACHINE_IS_SKELETON_MECHANICAL)

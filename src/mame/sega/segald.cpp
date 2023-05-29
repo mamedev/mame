@@ -25,6 +25,9 @@ Todo:
 #include "emupal.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define SCHEMATIC_CLOCK (20000000)
 
 class segald_state : public driver_device
@@ -604,6 +607,8 @@ void segald_state::init_astron()
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0x8000], 0x4000);
 }
+
+} // anonymous namespace
 
 
 //    YEAR, NAME,     PARENT,  MACHINE,INPUT,  STATE,        INIT,   MONITOR,COMPANY,FULLNAME,FLAGS

@@ -45,9 +45,9 @@
 
 
 // configurable logging
-#define LOG_MISC     (1U <<  1)
-#define LOG_SOUND    (1U <<  2)
-#define LOG_PB       (1U <<  3)
+#define LOG_MISC     (1U << 1)
+#define LOG_SOUND    (1U << 2)
+#define LOG_PB       (1U << 3)
 
 //#define VERBOSE (LOG_GENERAL | LOG_MISC | LOG_SOUND | LOG_PB)
 

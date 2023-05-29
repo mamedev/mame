@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_FP6000_KBD_H
-#define MAME_MACHINE_FP6000_KBD_H
+#ifndef MAME_CASIO_FP6000_KBD_H
+#define MAME_CASIO_FP6000_KBD_H
 
 #pragma once
 
@@ -62,4 +62,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(FP6000_KBD, fp6000_kbd_device)
 
-#endif // MAME_MACHINE_FP6000_KBD_H
+#endif // MAME_CASIO_FP6000_KBD_H

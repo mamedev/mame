@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #include "bgfx_p.h"
@@ -108,7 +108,7 @@ namespace bgfx { namespace gl
 		return context;
 	}
 
-	void GlContext::create(uint32_t /*_width*/, uint32_t /*_height*/)
+	void GlContext::create(uint32_t /*_width*/, uint32_t /*_height*/, uint32_t /*_flags*/)
 	{
 		m_opengl32dll = bx::dlopen("opengl32.dll");
 		BGFX_FATAL(NULL != m_opengl32dll, Fatal::UnableToInitialize, "Failed to load opengl32.dll.");
@@ -201,7 +201,7 @@ namespace bgfx { namespace gl
 					WGL_ALPHA_BITS_ARB,     8,
 					WGL_COLOR_BITS_ARB,     32,
 					WGL_DEPTH_BITS_ARB,     24,
-					WGL_STENCIL_BITS_ARB,   0,
+					WGL_STENCIL_BITS_ARB,   8,
 
 					WGL_PIXEL_TYPE_ARB,     WGL_TYPE_RGBA_ARB,
 					WGL_SAMPLES_ARB,        0,

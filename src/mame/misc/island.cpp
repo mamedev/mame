@@ -16,6 +16,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class island_state : public driver_device
 {
 public:
@@ -76,6 +78,8 @@ ROM_START(isld_vortex)
 	ROM_REGION(0x80000, "oki", 0)
 	ROM_LOAD("vortex.u29", 0x00000, 0x80000, CRC(2b0cc5c7) SHA1(ca9426351cec304b29a47ca66da12080269eb6e3))
 ROM_END
+
+} // anonymous namespace
 
 
 GAME(1995, isld_vortex, 0, vortex, vortex, island_state, empty_init, ROT0, "Island Design", "Vortex (Island Design)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL)

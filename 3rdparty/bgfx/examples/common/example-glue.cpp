@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #include "imgui/imgui.h"
@@ -35,9 +35,9 @@ struct SampleData
 		m_values[m_offset] = value;
 		m_offset = (m_offset+1) % kNumSamples;
 
-		float min =  bx::kFloatMax;
-		float max = -bx::kFloatMax;
-		float avg =  0.0f;
+		float min = bx::max<float>();
+		float max = bx::min<float>();
+		float avg = 0.0f;
 
 		for (uint32_t ii = 0; ii < kNumSamples; ++ii)
 		{
@@ -81,11 +81,11 @@ static bool bar(float _width, float _maxWidth, float _height, const ImVec4& _col
 
 	bool itemHovered = false;
 
-	ImGui::Button("", ImVec2(_width, _height) );
+	ImGui::Button("##", ImVec2(_width, _height) );
 	itemHovered |= ImGui::IsItemHovered();
 
 	ImGui::SameLine();
-	ImGui::InvisibleButton("", ImVec2(bx::max(1.0f, _maxWidth-_width), _height) );
+	ImGui::InvisibleButton("##", ImVec2(bx::max(1.0f, _maxWidth-_width), _height) );
 	itemHovered |= ImGui::IsItemHovered();
 
 	ImGui::PopStyleVar(2);

@@ -1,5 +1,74 @@
 # Linenoise
 
+## What's different in this fork?
+
+- Win32 console
+- full utf8 support (what about utf8 on windows)
+- insert control characters
+- now with multiline
+
+## How do I include linenoise line editing support in my application?
+
+From the Makefile:
+
+  linenoise-ship.c simplifies delivery of linenoise support
+
+  simple copy linenoise-ship.c to linenoise.c in your application, and also linenoise.h
+
+  * If you want win32 support, also copy linenoise-win32.c
+  * If you never want to support utf-8, you can omit utf8.h and utf8.c
+
+To enable utf-8 support, define USE_UTF8
+
+## Where do I get it?
+
+Get it here: [https://github.com/msteveb/linenoise](https://github.com/msteveb/linenoise)
+
+## Key bindings
+
+This version supports the following key bindings:
+
+    ctrl-j, Enter     Return the current line as the result
+    ctrl-a, Home      Go to the start of the line
+    ctrl-e, End       Go to the end of the line
+    ctrl-u            Delete to beginning of line
+    ctrl-k            Delete to end of line
+    ctrl-y            Insert previously deleted chars at cursor
+    ctrl-l            Clear screen
+    ctrl-c            Quit
+    ctrl-z            Exit to background (Unix only)
+    ctrl-h, Backspace Delete char to left of cursor
+    ctrl-d            With empty line -  return
+    ctrl-d, Del       Delete char to right of cursor
+    meta-b            Move word left
+    meta-f            Move word right
+    ctrl-w            Delete word to left
+    ctrl-t            Transpose char and cursor and char to left of cursor, then move right
+    ctrl-v            Insert next char as control character
+    ctrl-b, Left      Move one char left
+    ctrl-f, Right     Move one char right
+    ctrl-p, Up        Move to previous history line
+    ctrl-n, Down      Move to next history line
+    Page-Up           Move to start of history
+    Page-Down         Move to end of history
+    Tab               Tab complete
+    ctrl-r            Begin reverse incremental search
+
+In reverse incremental search:
+
+    Normal char       Add char to incremental search word
+    ctrl-h, Backspace Remove last char from incremental search word
+    ctrl-p, Up        Move to previous match
+    ctrl-n, Down      Move to next match
+    ctrl-g, ctrl-c    Return to normal mode with empty line
+    Any other key     Return to normal mode with the current line and process the key
+
+--------------------------------------------------------
+
+## Original README below
+
+Can a line editing library be 20k lines of code?
+
 A minimal, zero-config, BSD licensed, readline replacement.
 
 News: linenoise now includes minimal completion support, thanks to Pieter Noordhuis (@pnoordhuis).

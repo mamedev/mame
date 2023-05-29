@@ -140,6 +140,9 @@ better notes (complete chip lists) for each board still needed
 #include "namcos21_3d.h"
 #include "emupal.h"
 
+
+namespace {
+
 class gal3_state : public driver_device
 {
 public:
@@ -902,6 +905,9 @@ ROM_START( gal3 )
 	DISK_REGION( "laserdisc2" )
 	DISK_IMAGE_READONLY( "gal3_ld2", 0, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
+
 
 /*     YEAR  NAME     PARENT  MACHINE  INPUT  CLASS       INIT        MONITOR  COMPANY  FULLNAME                                    FLAGS */
 GAMEL( 1992, gal3,    0,      gal3,    gal3,  gal3_state, empty_init, ROT0,    "Namco", "Galaxian 3 - Theater 6 : Project Dragoon", MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_dualhsxs )

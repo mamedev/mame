@@ -1,7 +1,7 @@
 // license:LGPL-2.1+
 // copyright-holders:David Haywood, Angelo Salese, Olivier Galibert, Mariusz Wojcieszek, R. Belmont
-#ifndef MAME_INCLUDES_SATURN_H
-#define MAME_INCLUDES_SATURN_H
+#ifndef MAME_SEGA_SATURN_H
+#define MAME_SEGA_SATURN_H
 
 #pragma once
 
@@ -456,4 +456,4 @@ protected:
 
 extern gfx_decode_entry const gfx_stv[];
 
-#endif // MAME_INCLUDES_SATURN_H
+#endif // MAME_SEGA_SATURN_H

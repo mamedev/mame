@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_INCLUDES_TECMO_H
-#define MAME_INCLUDES_TECMO_H
+#ifndef MAME_TECMO_TECMO_H
+#define MAME_TECMO_TECMO_H
 
 #pragma once
 
@@ -109,4 +109,4 @@ private:
 	void backfirt_sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_TECMO_H
+#endif // MAME_TECMO_TECMO_H

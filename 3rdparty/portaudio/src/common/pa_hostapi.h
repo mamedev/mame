@@ -29,20 +29,20 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
 /** @file
  @ingroup common_src
 
- @brief Interfaces and representation structures used by pa_front.c 
+ @brief Interfaces and representation structures used by pa_front.c
  to manage and communicate with host API implementations.
 */
 
@@ -51,12 +51,12 @@
 /**
 The PA_NO_* host API macros are now deprecated in favor of PA_USE_* macros.
 PA_USE_* indicates whether a particular host API will be initialized by PortAudio.
-An undefined or 0 value indicates that the host API will not be used. A value of 1 
-indicates that the host API will be used. PA_USE_* macros should be left undefined 
+An undefined or 0 value indicates that the host API will not be used. A value of 1
+indicates that the host API will be used. PA_USE_* macros should be left undefined
 or defined to either 0 or 1.
 
 The code below ensures that PA_USE_* macros are always defined and have value
-0 or 1. Undefined symbols are defaulted to 0. Symbols that are neither 0 nor 1 
+0 or 1. Undefined symbols are defaulted to 0. Symbols that are neither 0 nor 1
 are defaulted to 1.
 */
 
@@ -65,7 +65,7 @@ are defaulted to 1.
 #elif (PA_USE_SKELETON != 0) && (PA_USE_SKELETON != 1)
 #undef PA_USE_SKELETON
 #define PA_USE_SKELETON 1
-#endif 
+#endif
 
 #if defined(PA_NO_ASIO) || defined(PA_NO_DS) || defined(PA_NO_WMME) || defined(PA_NO_WASAPI) || defined(PA_NO_WDMKS)
 #error "Portaudio: PA_NO_<APINAME> is no longer supported, please remove definition and use PA_USE_<APINAME> instead"
@@ -76,35 +76,35 @@ are defaulted to 1.
 #elif (PA_USE_ASIO != 0) && (PA_USE_ASIO != 1)
 #undef PA_USE_ASIO
 #define PA_USE_ASIO 1
-#endif 
+#endif
 
 #ifndef PA_USE_DS
 #define PA_USE_DS 0
 #elif (PA_USE_DS != 0) && (PA_USE_DS != 1)
 #undef PA_USE_DS
 #define PA_USE_DS 1
-#endif 
+#endif
 
 #ifndef PA_USE_WMME
 #define PA_USE_WMME 0
 #elif (PA_USE_WMME != 0) && (PA_USE_WMME != 1)
 #undef PA_USE_WMME
 #define PA_USE_WMME 1
-#endif 
+#endif
 
 #ifndef PA_USE_WASAPI
 #define PA_USE_WASAPI 0
 #elif (PA_USE_WASAPI != 0) && (PA_USE_WASAPI != 1)
 #undef PA_USE_WASAPI
 #define PA_USE_WASAPI 1
-#endif 
+#endif
 
 #ifndef PA_USE_WDMKS
 #define PA_USE_WDMKS 0
 #elif (PA_USE_WDMKS != 0) && (PA_USE_WDMKS != 1)
 #undef PA_USE_WDMKS
 #define PA_USE_WDMKS 1
-#endif 
+#endif
 
 /* Set default values for Unix based APIs. */
 #if defined(PA_NO_OSS) || defined(PA_NO_ALSA) || defined(PA_NO_JACK) || defined(PA_NO_COREAUDIO) || defined(PA_NO_SGI) || defined(PA_NO_ASIHPI)
@@ -116,42 +116,42 @@ are defaulted to 1.
 #elif (PA_USE_OSS != 0) && (PA_USE_OSS != 1)
 #undef PA_USE_OSS
 #define PA_USE_OSS 1
-#endif 
+#endif
 
 #ifndef PA_USE_ALSA
 #define PA_USE_ALSA 0
 #elif (PA_USE_ALSA != 0) && (PA_USE_ALSA != 1)
 #undef PA_USE_ALSA
 #define PA_USE_ALSA 1
-#endif 
+#endif
 
 #ifndef PA_USE_JACK
 #define PA_USE_JACK 0
 #elif (PA_USE_JACK != 0) && (PA_USE_JACK != 1)
 #undef PA_USE_JACK
 #define PA_USE_JACK 1
-#endif 
+#endif
 
 #ifndef PA_USE_SGI
 #define PA_USE_SGI 0
 #elif (PA_USE_SGI != 0) && (PA_USE_SGI != 1)
 #undef PA_USE_SGI
 #define PA_USE_SGI 1
-#endif 
+#endif
 
 #ifndef PA_USE_COREAUDIO
 #define PA_USE_COREAUDIO 0
 #elif (PA_USE_COREAUDIO != 0) && (PA_USE_COREAUDIO != 1)
 #undef PA_USE_COREAUDIO
 #define PA_USE_COREAUDIO 1
-#endif 
+#endif
 
 #ifndef PA_USE_ASIHPI
 #define PA_USE_ASIHPI 0
 #elif (PA_USE_ASIHPI != 0) && (PA_USE_ASIHPI != 1)
 #undef PA_USE_ASIHPI
 #define PA_USE_ASIHPI 1
-#endif 
+#endif
 
 #ifdef __cplusplus
 extern "C"
@@ -216,13 +216,13 @@ typedef struct PaUtilHostApiRepresentation {
         The inputParameters and outputParameters pointers should not be saved
         as they will not remain valid after OpenStream is called.
 
-        
+
         The following guarantees are made about parameters to (*OpenStream)():
 
             [NOTE: the following list up to *END PA FRONT VALIDATIONS* should be
                 kept in sync with the one for ValidateOpenStreamParameters and
                 Pa_OpenStream in pa_front.c]
-                
+
             PaHostApiRepresentation *hostApi
                 - is valid for this implementation
 
@@ -233,7 +233,7 @@ typedef struct PaUtilHostApiRepresentation {
 
             - if inputParameters & outputParmeters are both valid, that
                 inputParameters->device & outputParmeters->device  both use the same host api
- 
+
             PaDeviceIndex inputParameters->device
                 - is within range (0 to Pa_CountDevices-1) Or:
                 - is paUseHostApiSpecificDeviceSpecification and
@@ -243,30 +243,30 @@ typedef struct PaUtilHostApiRepresentation {
             int inputParameters->numChannels
                 - if inputParameters->device is not paUseHostApiSpecificDeviceSpecification, numInputChannels is > 0
                 - upper bound is NOT validated against device capabilities
- 
+
             PaSampleFormat inputParameters->sampleFormat
                 - is one of the sample formats defined in portaudio.h
 
             void *inputParameters->hostApiSpecificStreamInfo
                 - if supplied its hostApi field matches the input device's host Api
- 
+
             PaDeviceIndex outputParmeters->device
                 - is within range (0 to Pa_CountDevices-1)
- 
+
             int outputParmeters->numChannels
                 - if inputDevice is valid, numInputChannels is > 0
                 - upper bound is NOT validated against device capabilities
- 
+
             PaSampleFormat outputParmeters->sampleFormat
                 - is one of the sample formats defined in portaudio.h
-        
+
             void *outputParmeters->hostApiSpecificStreamInfo
                 - if supplied its hostApi field matches the output device's host Api
- 
+
             double sampleRate
                 - is not an 'absurd' rate (less than 1000. or greater than 384000.)
                 - sampleRate is NOT validated against device capabilities
- 
+
             PaStreamFlags streamFlags
                 - unused platform neutral flags are zero
                 - paNeverDropInput is only used for full-duplex callback streams
@@ -278,7 +278,7 @@ typedef struct PaUtilHostApiRepresentation {
         The following validations MUST be performed by (*OpenStream)():
 
             - check that input device can support numInputChannels
-            
+
             - check that input device can support inputSampleFormat, or that
                 we have the capability to convert from outputSampleFormat to
                 a native format
@@ -287,7 +287,7 @@ typedef struct PaUtilHostApiRepresentation {
                 or return an error if no inputStreamInfo is expected
 
             - check that output device can support numOutputChannels
-            
+
             - check that output device can support outputSampleFormat, or that
                 we have the capability to convert from outputSampleFormat to
                 a native format
@@ -327,11 +327,11 @@ typedef struct PaUtilHostApiRepresentation {
 
 /** Prototype for the initialization function which must be implemented by every
  host API.
- 
- This function should only return an error other than paNoError if it encounters 
- an unexpected and fatal error (memory allocation error for example). In general, 
- there may be conditions under which it returns a NULL interface pointer and also 
- returns paNoError. For example, if the ASIO implementation detects that ASIO is 
+
+ This function should only return an error other than paNoError if it encounters
+ an unexpected and fatal error (memory allocation error for example). In general,
+ there may be conditions under which it returns a NULL interface pointer and also
+ returns paNoError. For example, if the ASIO implementation detects that ASIO is
  not installed, it should return a NULL interface, and paNoError.
 
  @see paHostApiInitializers
@@ -341,11 +341,11 @@ typedef PaError PaUtilHostApiInitializer( PaUtilHostApiRepresentation**, PaHostA
 
 /** paHostApiInitializers is a NULL-terminated array of host API initialization
  functions. These functions are called by pa_front.c to initialize the host APIs
- when the client calls Pa_Initialize(). 
- 
+ when the client calls Pa_Initialize().
+
  The initialization functions are invoked in order.
 
- The first successfully initialized host API that has a default input *or* output 
+ The first successfully initialized host API that has a default input *or* output
  device is used as the default PortAudio host API. This is based on the logic that
  there is only one default host API, and it must contain the default input and output
  devices (if defined).

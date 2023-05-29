@@ -23,6 +23,8 @@
 #include <cinttypes>
 
 
+namespace osd {
+
 namespace {
 
 //-------------------------------------------------------------------------
@@ -475,6 +477,7 @@ static const std::map<std::string, const gdb_register_map &> gdb_register_maps =
 	{ "m68020pmmu", gdb_register_map_m68020pmmu },
 	{ "m68000",     gdb_register_map_m68000 },
 	{ "z80",        gdb_register_map_z80 },
+	{ "z84c015",    gdb_register_map_z80 },
 	{ "m6502",      gdb_register_map_m6502 },
 	{ "rp2a03",     gdb_register_map_m6502 },
 	{ "m6809",      gdb_register_map_m6809 },
@@ -516,7 +519,7 @@ public:
 
 	virtual ~debug_gdbstub() { }
 
-	virtual int init(const osd_options &options) override;
+	virtual int init(osd_interface &osd, const osd_options &options) override;
 	virtual void exit() override;
 
 	virtual void init_debugger(running_machine &machine) override;
@@ -630,7 +633,7 @@ private:
 };
 
 //-------------------------------------------------------------------------
-int debug_gdbstub::init(const osd_options &options)
+int debug_gdbstub::init(osd_interface &osd, const osd_options &options)
 {
 	m_debugger_port = options.debugger_port();
 	return 0;
@@ -961,7 +964,8 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_m(const char *buf)
 		return REPLY_ENN;
 
 	offs_t offset = address;
-	if ( !m_memory->translate(m_address_space->spacenum(), TRANSLATE_READ_DEBUG, offset) )
+	address_space *tspace;
+	if ( !m_memory->translate(m_address_space->spacenum(), device_memory_interface::TR_READ, offset, tspace) )
 		return REPLY_ENN;
 
 	// Disable side effects while reading memory.
@@ -971,7 +975,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_m(const char *buf)
 	reply.reserve(length * 2);
 	for ( int i = 0; i < length; i++ )
 	{
-		uint8_t value = m_address_space->read_byte(offset + i);
+		uint8_t value = tspace->read_byte(offset + i);
 		reply += string_format("%02x", value);
 	}
 	send_reply(reply.c_str());
@@ -1006,7 +1010,8 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_M(const char *buf)
 		return REPLY_ENN;
 
 	offs_t offset = address;
-	if ( !m_memory->translate(m_address_space->spacenum(), TRANSLATE_READ_DEBUG, offset) )
+	address_space *tspace;
+	if ( !m_memory->translate(m_address_space->spacenum(), device_memory_interface::TR_READ, offset, tspace) )
 		return REPLY_ENN;
 
 	std::vector<uint8_t> data;
@@ -1014,7 +1019,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_M(const char *buf)
 		return REPLY_ENN;
 
 	for ( int i = 0; i < length; i++ )
-		m_address_space->write_byte(offset + i, data[i]);
+		tspace->write_byte(offset + i, data[i]);
 
 	return REPLY_OK;
 }
@@ -1218,9 +1223,10 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_z(const char *buf)
 
 	// watchpoints
 	offs_t offset = address;
+	address_space *tspace;
 	if ( type == 2 || type == 3 || type == 4 )
 	{
-		if ( !m_memory->translate(m_address_space->spacenum(), TRANSLATE_READ_DEBUG, offset) )
+		if ( !m_memory->translate(m_address_space->spacenum(), device_memory_interface::TR_READ, offset, tspace) )
 			return REPLY_ENN;
 		m_address_map.erase(offset);
 	}
@@ -1259,9 +1265,10 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_Z(const char *buf)
 
 	// watchpoints
 	offs_t offset = address;
+	address_space *tspace;
 	if ( type == 2 || type == 3 || type == 4 )
 	{
-		if ( !m_memory->translate(m_address_space->spacenum(), TRANSLATE_READ_DEBUG, offset) )
+		if ( !m_memory->translate(m_address_space->spacenum(), device_memory_interface::TR_READ, offset, tspace) )
 			return REPLY_ENN;
 		m_address_map[offset] = address;
 	}
@@ -1495,5 +1502,7 @@ void debug_gdbstub::handle_character(char ch)
 
 } // anonymous namespace
 
+} // namespace osd
+
 //-------------------------------------------------------------------------
-MODULE_DEFINITION(DEBUG_GDBSTUB, debug_gdbstub)
+MODULE_DEFINITION(DEBUG_GDBSTUB, osd::debug_gdbstub)

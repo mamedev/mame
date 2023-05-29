@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:bataais
-/******************************************************************************
+/*******************************************************************************
 
 Fidelity Eldorado Chess Challenger (model 6119)
 
@@ -13,7 +13,7 @@ Hardware notes:
 The chess engine is by Ron Nelson. The hardware was made by CXG for Fidelity,
 as seen on the PCB and also confirmed by Ron Nelson.
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -79,9 +79,9 @@ void eldorado_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void eldorado_state::update_display()
 {
@@ -138,9 +138,9 @@ u8 eldorado_state::input_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( eldorado )
 	PORT_START("IN.0")
@@ -156,13 +156,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void eldorado_state::eldorado(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	I8049(config, m_maincpu, 6_MHz_XTAL);
 	m_maincpu->p1_in_cb().set(FUNC(eldorado_state::input_r));
 	m_maincpu->p2_out_cb().set(FUNC(eldorado_state::control_w));
@@ -174,20 +174,20 @@ void eldorado_state::eldorado(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(2, 8);
 	config.set_default_layout(layout_fidel_eldorado);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( feldo )
 	ROM_REGION( 0x0800, "maincpu", 0 )
@@ -198,9 +198,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME    PARENT   COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1990, feldo,  0,       0,      eldorado, eldorado, eldorado_state, empty_init, "Fidelity Electronics / CXG Systems", "Eldorado Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1990, feldo, 0,      0,      eldorado, eldorado, eldorado_state, empty_init, "Fidelity Electronics / CXG Systems", "Eldorado Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

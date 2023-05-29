@@ -52,6 +52,9 @@ I dumped it with this configuration. In case I'll redump it desoldering pin 16 f
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
+
 class egghunt_state : public driver_device
 {
 public:
@@ -461,6 +464,9 @@ void egghunt_state::egghunt(machine_config &config)
 
 	OKIM6295(config, m_oki, 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
 }
+
+} // anonymous namespace
+
 
 ROM_START( egghunt )
 	ROM_REGION( 0x20000, "maincpu", 0 )

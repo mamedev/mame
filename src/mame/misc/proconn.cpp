@@ -41,6 +41,8 @@
 #include "proconn.lh"
 
 
+namespace {
+
 class proconn_state : public driver_device
 {
 public:
@@ -143,8 +145,8 @@ private:
 	int m_meter = 0;
 	virtual void machine_reset() override;
 	void meter_w(uint8_t data);
-	void serial_transmit(offs_t offset, uint16_t data);
-	uint16_t serial_receive(offs_t offset);
+	[[maybe_unused]] void serial_transmit(offs_t offset, uint16_t data);
+	[[maybe_unused]] uint16_t serial_receive(offs_t offset);
 };
 
 void proconn_state::proconn_map(address_map &map)
@@ -1232,6 +1234,9 @@ ROM_END
 void proconn_state::init_proconn()
 {
 }
+
+} // anonymous namespace
+
 
 GAME( 199?, pr_lday,    0,          proconn,    proconn,     proconn_state, init_proconn, ROT0, "Project", "'L' Of A Day (Project) (Cash set) (PROCONN)",MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_ldaya,   pr_lday,    proconn,    proconn,     proconn_state, init_proconn, ROT0, "Project", "'L' Of A Day (Project) (Token set) (PROCONN)",MACHINE_IS_SKELETON_MECHANICAL )

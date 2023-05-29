@@ -664,14 +664,762 @@ d23f=input port 1 value
 ***************************************************************************/
 
 #include "emu.h"
-#include "tnzs.h"
-#include "taitoipt.h"
 
+#include "taitoipt.h"
+#include "tnzs_video.h"
+
+#include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/upd4701.h"
+#include "sound/dac.h"
+#include "sound/samples.h"
 #include "sound/ymopm.h"
 #include "sound/ymopn.h"
-#include "screen.h"
+
 #include "speaker.h"
+
+//#define VERBOSE 1
+#include "logmacro.h"
+
+
+namespace {
+
+class insectx_state : public tnzs_video_state_base
+{
+public:
+	insectx_state(const machine_config &mconfig, device_type type, const char *tag)
+		: tnzs_video_state_base(mconfig, type, tag)
+		, m_subcpu(*this, "sub")
+		, m_subbank(*this, "subbank")
+		, m_ramromview(*this, "ramrom")
+	{ }
+
+	void insectx(machine_config &config) ATTR_COLD;
+
+protected:
+	void tnzs_base(machine_config &config) ATTR_COLD;
+
+	virtual void machine_start() override ATTR_COLD;
+
+	void ramrom_bankswitch_w(uint8_t data);
+
+	void prompal_main_map(address_map &map) ATTR_COLD;
+	void rampal_main_map(address_map &map) ATTR_COLD;
+
+	void base_sub_map(address_map &map) ATTR_COLD;
+
+	// devices
+	required_device<cpu_device> m_subcpu;
+	required_memory_bank m_subbank;
+
+private:
+	void insectx_bankswitch1_w(uint8_t data);
+
+	void insectx_sub_map(address_map &map) ATTR_COLD;
+
+	memory_view m_ramromview;
+};
+
+
+class tnzs_mcu_state : public insectx_state
+{
+public:
+	tnzs_mcu_state(const machine_config &mconfig, device_type type, const char *tag)
+		: insectx_state(mconfig, type, tag)
+		, m_mcu(*this, "mcu")
+		, m_in0(*this, "IN0")
+		, m_in1(*this, "IN1")
+		, m_in2(*this, "IN2")
+		, m_input_select(0)
+	{ }
+
+	void tnzs(machine_config &config) ATTR_COLD;
+	void extrmatn(machine_config &config) ATTR_COLD;
+
+protected:
+	void tnzs_bankswitch1_w(uint8_t data);
+	uint8_t mcu_port1_r();
+	template <bool LockoutLevel> void mcu_port2_w(uint8_t data);
+	uint8_t mcu_r(offs_t offset);
+	void mcu_w(offs_t offset, uint8_t data);
+
+	template <bool LockoutLevel> void tnzs_mcu(machine_config &config) ATTR_COLD;
+
+	void tnzs_sub_map(address_map &map) ATTR_COLD;
+
+	required_device<upi41_cpu_device> m_mcu;
+
+	required_ioport m_in0;
+	required_ioport m_in1;
+	required_ioport m_in2;
+
+	uint8_t  m_input_select;
+};
+
+
+class plumppop_state : public tnzs_mcu_state
+{
+public:
+	plumppop_state(const machine_config &mconfig, device_type type, const char *tag)
+		: tnzs_mcu_state(mconfig, type, tag)
+		, m_upd4701(*this, "upd4701")
+	{
+	}
+
+	void plumppop(machine_config &config) ATTR_COLD;
+
+protected:
+	void plumppop_bankswitch1_w(uint8_t data);
+
+	void plumppop_sub_map(address_map &map) ATTR_COLD;
+
+	required_device<upd4701_device> m_upd4701;
+};
+
+
+class arknoid2_state : public plumppop_state
+{
+public:
+	arknoid2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: plumppop_state(mconfig, type, tag)
+		, m_coin1(*this, "COIN1")
+		, m_coin2(*this, "COIN2")
+	{ }
+
+	void arknoid2(machine_config &config) ATTR_COLD;
+
+private:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	void arknoid2_bankswitch1_w(uint8_t data);
+
+	uint8_t mcu_r(offs_t offset);
+	void mcu_w(offs_t offset, uint8_t data);
+	INTERRUPT_GEN_MEMBER(mcu_interrupt);
+
+	void arknoid2_sub_map(address_map &map) ATTR_COLD;
+
+	void mcu_reset();
+	void mcu_handle_coins(int coin);
+
+	required_ioport m_coin1;
+	required_ioport m_coin2;
+
+	int      m_mcu_initializing = 0;
+	int      m_mcu_coinage_init = 0;
+	int      m_mcu_command = 0;
+	int      m_mcu_readcredits = 0;
+	int      m_mcu_reportcoin = 0;
+	int      m_insertcoin = 0;
+	uint8_t  m_mcu_coinage[4]{};
+	uint8_t  m_mcu_coins_a = 0;
+	uint8_t  m_mcu_coins_b = 0;
+	uint8_t  m_mcu_credits = 0;
+};
+
+
+class kageki_state : public insectx_state
+{
+public:
+	kageki_state(const machine_config &mconfig, device_type type, const char *tag)
+		: insectx_state(mconfig, type, tag)
+		, m_samples(*this, "samples")
+		, m_dswa(*this, "DSWA")
+		, m_dswb(*this, "DSWB")
+		, m_csport_sel(0)
+	{ }
+
+	void kageki(machine_config &config) ATTR_COLD;
+
+	void init_kageki() ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	static constexpr unsigned MAX_SAMPLES = 0x2f;
+
+	void kageki_bankswitch1_w(uint8_t data);
+
+	uint8_t csport_r();
+	void csport_w(uint8_t data);
+
+	SAMPLES_START_CB_MEMBER(init_samples);
+
+	void kageki_sub_map(address_map &map) ATTR_COLD;
+
+	required_device<samples_device> m_samples;
+
+	required_ioport m_dswa;
+	required_ioport m_dswb;
+
+	// sound-related
+	std::unique_ptr<int16_t[]>    m_sampledata[MAX_SAMPLES];
+	int      m_samplesize[MAX_SAMPLES]{};
+
+	int      m_csport_sel;
+};
+
+
+class jpopnics_state : public insectx_state
+{
+public:
+	jpopnics_state(const machine_config &mconfig, device_type type, const char *tag)
+		: insectx_state(mconfig, type, tag)
+		, m_upd4701(*this, "upd4701")
+	{ }
+
+	void jpopnics(machine_config &config) ATTR_COLD;
+
+private:
+	void subbankswitch_w(uint8_t data);
+
+	void jpopnics_main_map(address_map &map) ATTR_COLD;
+	void jpopnics_sub_map(address_map &map) ATTR_COLD;
+
+	required_device<upd4701_device> m_upd4701;
+};
+
+
+class tnzsb_state : public insectx_state
+{
+public:
+	tnzsb_state(const machine_config &mconfig, device_type type, const char *tag)
+		: insectx_state(mconfig, type, tag)
+		, m_audiocpu(*this, "audiocpu")
+		, m_soundlatch(*this, "soundlatch")
+	{ }
+
+	void tnzsb(machine_config &config) ATTR_COLD;
+
+protected:
+	DECLARE_WRITE_LINE_MEMBER(ym2203_irqhandler);
+
+	void sound_command_w(uint8_t data);
+
+	void tnzsb_bankswitch1_w(uint8_t data);
+
+	void tnzsb_base_sub_map(address_map &map) ATTR_COLD;
+	void tnzsb_sub_map(address_map &map) ATTR_COLD;
+	void tnzsb_cpu2_map(address_map &map) ATTR_COLD;
+	void tnzsb_io_map(address_map &map) ATTR_COLD;
+
+	required_device<cpu_device> m_audiocpu;
+	required_device<generic_latch_8_device> m_soundlatch;
+};
+
+
+class kabukiz_state : public tnzsb_state
+{
+public:
+	kabukiz_state(const machine_config &mconfig, device_type type, const char *tag)
+		: tnzsb_state(mconfig, type, tag)
+		, m_audiobank(*this, "audiobank")
+	{ }
+
+	void kabukiz(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	void sound_bank_w(uint8_t data);
+
+	void kabukiz_cpu2_map(address_map &map) ATTR_COLD;
+	void kabukiz_sub_map(address_map &map) ATTR_COLD;
+
+	required_memory_bank m_audiobank;
+};
+
+
+/***************************************************************************
+
+  Functions to emulate general aspects of the machine (RAM, ROM, interrupts,
+  I/O ports)
+
+  The I8742 MCU takes care of handling the coin inputs and the tilt switch.
+  To simulate this, we read the status in the interrupt handler for the main
+  CPU and update the counters appropriately. We also must take care of
+  handling the coin/credit settings ourselves.
+
+***************************************************************************/
+
+uint8_t tnzs_mcu_state::mcu_r(offs_t offset)
+{
+	uint8_t data = m_mcu->upi41_master_r(offset & 1);
+	m_subcpu->yield();
+
+//  logerror("%s: read %02x from mcu $c00%01x\n", m_maincpu->pcbase(), data, offset);
+
+	return data;
+}
+
+void tnzs_mcu_state::mcu_w(offs_t offset, uint8_t data)
+{
+//  logerror("%s: write %02x to mcu $c00%01x\n", m_maincpu->pcbase(), data, offset);
+
+	m_mcu->upi41_master_w(offset & 1, data);
+}
+
+uint8_t tnzs_mcu_state::mcu_port1_r()
+{
+	int data = 0;
+
+	switch (m_input_select)
+	{
+		case 0x0a:  data = m_in2->read(); break;
+		case 0x0c:  data = m_in0->read(); break;
+		case 0x0d:  data = m_in1->read(); break;
+		default:    data = 0xff; break;
+	}
+
+//  logerror("%s:  Read %02x from port 1\n", m_maincpu->pcbase(), data);
+
+	return data;
+}
+
+template <bool LockoutLevel>
+void tnzs_mcu_state::mcu_port2_w(uint8_t data)
+{
+	machine().bookkeeping().coin_lockout_w(0, (data & 0x40) ? LockoutLevel : !LockoutLevel);
+	machine().bookkeeping().coin_lockout_w(1, (data & 0x80) ? LockoutLevel : !LockoutLevel);
+	machine().bookkeeping().coin_counter_w(0, (~data & 0x10));
+	machine().bookkeeping().coin_counter_w(1, (~data & 0x20));
+
+	m_input_select = data & 0xf;
+}
+
+template void tnzs_mcu_state::mcu_port2_w<false>(uint8_t);
+template void tnzs_mcu_state::mcu_port2_w<true>(uint8_t);
+
+void arknoid2_state::mcu_reset()
+{
+	m_mcu_initializing = 3;
+	m_mcu_coinage_init = 0;
+	m_mcu_coinage[0] = 1;
+	m_mcu_coinage[1] = 1;
+	m_mcu_coinage[2] = 1;
+	m_mcu_coinage[3] = 1;
+	m_mcu_coins_a = 0;
+	m_mcu_coins_b = 0;
+	m_mcu_credits = 0;
+	m_mcu_reportcoin = 0;
+	m_mcu_command = 0;
+}
+
+void arknoid2_state::mcu_handle_coins(int coin)
+{
+	/* The coin inputs and coin counters are managed by the i8742 mcu. */
+	/* Here we simulate it. */
+	/* Credits are limited to 9, so more coins should be rejected */
+	/* Coin/Play settings must also be taken into consideration */
+
+	if (coin & 0x08)    /* tilt */
+		m_mcu_reportcoin = coin;
+	else if (coin && coin != m_insertcoin)
+	{
+		if (coin & 0x01)    /* coin A */
+		{
+//          logerror("Coin dropped into slot A\n");
+			machine().bookkeeping().coin_counter_w(0,1); machine().bookkeeping().coin_counter_w(0,0); /* Count slot A */
+			m_mcu_coins_a++;
+			if (m_mcu_coins_a >= m_mcu_coinage[0])
+			{
+				m_mcu_coins_a -= m_mcu_coinage[0];
+				m_mcu_credits += m_mcu_coinage[1];
+				if (m_mcu_credits >= 9)
+				{
+					m_mcu_credits = 9;
+					machine().bookkeeping().coin_lockout_global_w(1); /* Lock all coin slots */
+				}
+				else
+				{
+					machine().bookkeeping().coin_lockout_global_w(0); /* Unlock all coin slots */
+				}
+			}
+		}
+
+		if (coin & 0x02)    /* coin B */
+		{
+//          logerror("Coin dropped into slot B\n");
+			machine().bookkeeping().coin_counter_w(1,1); machine().bookkeeping().coin_counter_w(1,0); /* Count slot B */
+			m_mcu_coins_b++;
+			if (m_mcu_coins_b >= m_mcu_coinage[2])
+			{
+				m_mcu_coins_b -= m_mcu_coinage[2];
+				m_mcu_credits += m_mcu_coinage[3];
+				if (m_mcu_credits >= 9)
+				{
+					m_mcu_credits = 9;
+					machine().bookkeeping().coin_lockout_global_w(1); /* Lock all coin slots */
+				}
+				else
+				{
+					machine().bookkeeping().coin_lockout_global_w(0); /* Unlock all coin slots */
+				}
+			}
+		}
+
+		if (coin & 0x04)    /* service */
+		{
+//          logerror("Coin dropped into service slot C\n");
+			m_mcu_credits++;
+		}
+
+		m_mcu_reportcoin = coin;
+	}
+	else
+	{
+		if (m_mcu_credits < 9)
+			machine().bookkeeping().coin_lockout_global_w(0); /* Unlock all coin slots */
+
+		m_mcu_reportcoin = 0;
+	}
+	m_insertcoin = coin;
+}
+
+/*********************************
+
+TNZS sync bug kludge
+
+In all TNZS versions there is code like this:
+
+0C5E: ld   ($EF10),a
+0C61: ld   a,($EF10)
+0C64: inc  a
+0C65: ret  nz
+0C66: jr   $0C61
+
+which is sometimes executed by the main cpu when it writes to shared RAM a
+command for the second CPU. The intended purpose of the code is to wait an
+acknowledge from the sub CPU: the sub CPU writes FF to the same location
+after reading the command.
+
+However the above code is wrong. The "ret nz" instruction means that the
+loop will be exited only when the contents of $EF10 are *NOT* $FF!!
+On the real board, this casues little harm: the main CPU will just write
+the command, read it back and, since it's not $FF, return immediately. There
+is a chance that the command might go lost, but this will cause no major
+harm, the worse that can happen is that the background tune will not change.
+
+In MAME, however, since CPU interleaving is not perfect, it can happen that
+the main CPU ends its timeslice after writing to EF10 but before reading it
+back. In the meantime, the sub CPU will run, read the command and write FF
+there - therefore causing the main CPU to enter an endless loop.
+
+Unlike the usual sync problems in MAME, which can be fixed by increasing the
+interleave factor, in this case increasing it will actually INCREASE the
+chance of entering the endless loop - because it will increase the chances of
+the main CPU ending its timeslice at the wrong moment.
+
+So what we do here is catch writes by the main CPU to the RAM location, and
+process them using a timer, in order to
+a) force a resync of the two CPUs
+b) make sure the main CPU will be the first one to run after the location is
+   changed
+
+Since the answer from the sub CPU is ignored, we don't even need to boost
+interleave.
+
+*********************************/
+
+/*
+TIMER_CALLBACK_MEMBER(insectx_state::kludge_callback)
+{
+    tnzs_sharedram[0x0f10] = param;
+}
+
+void insectx_state::tnzs_sync_kludge_w(uint8_t data)
+{
+    machine().scheduler().synchronize(timer_expired_delegate(FUNC(insectx_state::kludge_callback),this), data);
+}
+*/
+
+uint8_t arknoid2_state::mcu_r(offs_t offset)
+{
+	static const char mcu_startup[] = "\x55\xaa\x5a";
+
+	//logerror("%s: read mcu %04x\n", m_maincpu->pc(), 0xc000 + offset);
+
+	if (offset == 0)
+	{
+		/* if the mcu has just been reset, return startup code */
+		if (m_mcu_initializing)
+		{
+			m_mcu_initializing--;
+			return mcu_startup[2 - m_mcu_initializing];
+		}
+
+		switch (m_mcu_command)
+		{
+			case 0x41:
+				return m_mcu_credits;
+
+			case 0xc1:
+				/* Read the credit counter or the inputs */
+				if (m_mcu_readcredits == 0)
+				{
+					m_mcu_readcredits = 1;
+					if (m_mcu_reportcoin & 0x08)
+					{
+						m_mcu_initializing = 3;
+						return 0xee;    /* tilt */
+					}
+					else return m_mcu_credits;
+				}
+				else return m_in0->read();  /* buttons */
+
+			default:
+				logerror("error, unknown mcu command\n");
+				/* should not happen */
+				return 0xff;
+		}
+	}
+	else
+	{
+		/*
+		status bits:
+		0 = mcu is ready to send data (read from c000)
+		1 = mcu has read data (from c000)
+		2 = unused
+		3 = unused
+		4-7 = coin code
+		      0 = nothing
+		      1,2,3 = coin switch pressed
+		      e = tilt
+		*/
+		if (m_mcu_reportcoin & 0x08) return 0xe1;   /* tilt */
+		if (m_mcu_reportcoin & 0x01) return 0x11;   /* coin 1 (will trigger "coin inserted" sound) */
+		if (m_mcu_reportcoin & 0x02) return 0x21;   /* coin 2 (will trigger "coin inserted" sound) */
+		if (m_mcu_reportcoin & 0x04) return 0x31;   /* coin 3 (will trigger "coin inserted" sound) */
+		return 0x01;
+	}
+}
+
+void arknoid2_state::mcu_w(offs_t offset, uint8_t data)
+{
+	if (offset == 0)
+	{
+		//logerror("%s: write %02x to mcu %04x\n", m_maincpu->pc(), data, 0xc000 + offset);
+		if (m_mcu_command == 0x41)
+		{
+			m_mcu_credits = (m_mcu_credits + data) & 0xff;
+		}
+	}
+	else
+	{
+		/*
+		0xc1: read number of credits, then buttons
+		0x54+0x41: add value to number of credits
+		0x15: sub 1 credit (when "Continue Play" only)
+		0x84: coin 1 lockout (issued only in test mode)
+		0x88: coin 2 lockout (issued only in test mode)
+		0x80: release coin lockout (issued only in test mode)
+		during initialization, a sequence of 4 bytes sets coin/credit settings
+		*/
+		//logerror("%s: write %02x to mcu %04x\n", m_maincpu->pc(), data, 0xc000 + offset);
+
+		if (m_mcu_initializing)
+		{
+			/* set up coin/credit settings */
+			m_mcu_coinage[m_mcu_coinage_init++] = data;
+			if (m_mcu_coinage_init == 4)
+				m_mcu_coinage_init = 0; /* must not happen */
+		}
+
+		if (data == 0xc1)
+			m_mcu_readcredits = 0;  /* reset input port number */
+
+		if (data == 0x15)
+		{
+			m_mcu_credits = (m_mcu_credits - 1) & 0xff;
+			if (m_mcu_credits == 0xff)
+				m_mcu_credits = 0;
+		}
+		m_mcu_command = data;
+	}
+}
+
+INTERRUPT_GEN_MEMBER(arknoid2_state::mcu_interrupt)
+{
+	int coin = ((m_coin1->read() & 1) << 0);
+	coin |= ((m_coin2->read() & 1) << 1);
+	coin |= ((m_in2->read() & 3) << 2);
+	coin ^= 0x0c;
+	mcu_handle_coins(coin);
+
+	device.execute().set_input_line(0, HOLD_LINE);
+}
+
+void arknoid2_state::machine_reset()
+{
+	plumppop_state::machine_reset();
+
+	// initialize the MCU simulation
+	mcu_reset();
+
+	m_mcu_readcredits = 0;
+	m_insertcoin = 0;
+}
+
+void kageki_state::machine_reset()
+{
+	insectx_state::machine_reset();
+
+	m_csport_sel = 0;
+}
+
+void insectx_state::machine_start()
+{
+	tnzs_video_state_base::machine_start();
+
+	uint8_t *const sub = memregion("sub")->base();
+	m_subbank->configure_entries(0, 4, &sub[0x08000], 0x2000);
+	m_subbank->set_entry(0);
+
+	m_ramromview.select(2);
+}
+
+void arknoid2_state::machine_start()
+{
+	plumppop_state::machine_start();
+
+	save_item(NAME(m_mcu_readcredits));
+	save_item(NAME(m_insertcoin));
+	save_item(NAME(m_mcu_initializing));
+	save_item(NAME(m_mcu_coinage_init));
+	save_item(NAME(m_mcu_coinage));
+	save_item(NAME(m_mcu_coins_a));
+	save_item(NAME(m_mcu_coins_b));
+	save_item(NAME(m_mcu_credits));
+	save_item(NAME(m_mcu_reportcoin));
+	save_item(NAME(m_mcu_command));
+
+	// kludge to make device work with active-high coin inputs
+	m_upd4701->left_w(0);
+	m_upd4701->middle_w(0);
+}
+
+void kageki_state::machine_start()
+{
+	insectx_state::machine_start();
+
+	save_item(NAME(m_csport_sel));
+}
+
+void kabukiz_state::machine_start()
+{
+	tnzsb_state::machine_start();
+
+	uint8_t *sound = memregion("audiocpu")->base();
+	m_audiobank->configure_entries(0, 8, &sound[0x00000], 0x4000);
+}
+
+void insectx_state::ramrom_bankswitch_w(uint8_t data)
+{
+//  logerror("%s: writing %02x to bankswitch\n", m_maincpu->pc(),data);
+
+	// bit 4 resets the second CPU
+	m_subcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 4) ? CLEAR_LINE : ASSERT_LINE);
+
+	// bits 0-2 select RAM/ROM bank
+	m_ramromview.select(data & 0x07);
+}
+
+void arknoid2_state::arknoid2_bankswitch1_w(uint8_t data)
+{
+	// bits 0-1 select ROM bank
+	m_subbank->set_entry(data & 0x03);
+
+	if (BIT(data, 2))
+		mcu_reset();
+
+	// never actually written by arknoid2 (though code exists to do it)
+	m_upd4701->resetx_w(BIT(data, 5));
+	m_upd4701->resety_w(BIT(data, 5));
+}
+
+void insectx_state::insectx_bankswitch1_w(uint8_t data)
+{
+	// bits 0-1 select ROM bank
+	m_subbank->set_entry(data & 0x03);
+
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 2));
+	machine().bookkeeping().coin_lockout_w(1, BIT(~data, 3));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 4));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 5));
+}
+
+void tnzsb_state::tnzsb_bankswitch1_w(uint8_t data)
+{
+	// bits 0-1 select ROM bank
+	m_subbank->set_entry(data & 0x03);
+
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 4));
+	machine().bookkeeping().coin_lockout_w(1, BIT(~data, 5));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 2));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 3));
+}
+
+void kageki_state::kageki_bankswitch1_w(uint8_t data)
+{
+	// bits 0-1 select ROM bank
+	m_subbank->set_entry(data & 0x03);
+
+	machine().bookkeeping().coin_lockout_global_w(BIT(~data, 5));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 2));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 3));
+}
+
+void tnzs_mcu_state::tnzs_bankswitch1_w(uint8_t data)
+{
+	// bits 0-1 select ROM bank
+	m_subbank->set_entry(data & 0x03);
+
+	if (BIT(data, 2))
+		m_mcu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+}
+
+void plumppop_state::plumppop_bankswitch1_w(uint8_t data)
+{
+	tnzs_bankswitch1_w(data);
+
+	// written only at startup by plumppop?
+	m_upd4701->resetx_w(BIT(data, 5));
+	m_upd4701->resety_w(BIT(data, 5));
+}
+
+void jpopnics_state::subbankswitch_w(uint8_t data)
+{
+	// bits 0-1 select ROM bank
+	m_subbank->set_entry(data & 0x03);
+
+	// written once at startup
+	m_upd4701->resetx_w(BIT(data, 5));
+	m_upd4701->resety_w(BIT(data, 5));
+}
+
+void tnzsb_state::sound_command_w(uint8_t data)
+{
+	m_soundlatch->write(data);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+}
+
+// handler called by the 2203 emulator when the internal timers cause an IRQ
+WRITE_LINE_MEMBER(tnzsb_state::ym2203_irqhandler)
+{
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void kabukiz_state::sound_bank_w(uint8_t data)
+{
+	// to avoid the write when the sound chip is initialized
+	if (data != 0xff)
+		m_audiobank->set_entry(data & 0x07);
+}
 
 
 SAMPLES_START_CB_MEMBER(kageki_state::init_samples)
@@ -737,8 +1485,6 @@ uint8_t kageki_state::csport_r()
 
 void kageki_state::csport_w(uint8_t data)
 {
-	char mess[80];
-
 	if (data > 0x3f)
 	{
 		// read dipsw port
@@ -750,60 +1496,60 @@ void kageki_state::csport_w(uint8_t data)
 		{
 			// play samples
 			m_samples->start_raw(0, m_sampledata[data].get(), m_samplesize[data], 7000);
-			sprintf(mess, "VOICE:%02X PLAY", data);
+			LOG("VOICE:%02X PLAY", data);
 		}
 		else
 		{
 			// stop samples
 			m_samples->stop(0);
-			sprintf(mess, "VOICE:%02X STOP", data);
+			LOG("VOICE:%02X STOP", data);
 		}
-	//  popmessage(mess);
 	}
 }
 
-void tnzs_base_state::main_map(address_map &map)
+void insectx_state::prompal_main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).m(m_mainbank, FUNC(address_map_bank_device::amap8));
-	map(0xc000, 0xcfff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecodelow_r8), FUNC(x1_001_device::spritecodelow_w8));
-	map(0xd000, 0xdfff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecodehigh_r8), FUNC(x1_001_device::spritecodehigh_w8));
-	map(0xe000, 0xefff).ram().share("share1");
-	map(0xf000, 0xf2ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r8), FUNC(x1_001_device::spriteylow_w8));
-	map(0xf300, 0xf303).mirror(0xfc).w(m_spritegen, FUNC(x1_001_device::spritectrl_w8));  /* control registers (0x80 mirror used by Arkanoid 2) */
-	map(0xf400, 0xf400).w(m_spritegen, FUNC(x1_001_device::spritebgflag_w8));   /* enable / disable background transparency */
-	map(0xf600, 0xf600).nopr().w(FUNC(tnzs_base_state::ramrom_bankswitch_w));
+	map(0x8000, 0xbfff).view(m_ramromview);
+	for (int i = 0; 2 > i; ++i)
+		m_ramromview[i](0x8000, 0xbfff).ram(); // instead of the first two banks of ROM being repeated redundantly the hardware maps RAM here
+	for (int i = 2; 8 > i; ++i)
+		m_ramromview[i](0x8000, 0xbfff).rom().region("maincpu", 0x4000 * i);
+	map(0xc000, 0xcfff).rw(m_spritegen, FUNC(x1_001_device::spritecodelow_r8), FUNC(x1_001_device::spritecodelow_w8));
+	map(0xd000, 0xdfff).rw(m_spritegen, FUNC(x1_001_device::spritecodehigh_r8), FUNC(x1_001_device::spritecodehigh_w8));
+	map(0xe000, 0xefff).ram().share("share1"); // WORK RAM (shared by the 2 Z80's)
+	map(0xf000, 0xf2ff).rw(m_spritegen, FUNC(x1_001_device::spriteylow_r8), FUNC(x1_001_device::spriteylow_w8));
+	map(0xf300, 0xf303).mirror(0xfc).w(m_spritegen, FUNC(x1_001_device::spritectrl_w8));  // control registers (0x80 mirror used by Arkanoid 2)
+	map(0xf400, 0xf400).w(m_spritegen, FUNC(x1_001_device::spritebgflag_w8));             // enable / disable background transparency
+	map(0xf600, 0xf600).nopr().w(FUNC(insectx_state::ramrom_bankswitch_w));
+
+	// arknoid2, extrmatn, plumppop and drtoppel have PROMs instead of RAM
+	// drtoppel and kabukiz write here anyway!
+	map(0xf800, 0xfbff).nopw();
+}
+
+
+/***************************************************************************
+
+  The New Zealand Story doesn't have a color PROM. It uses 1024 bytes of RAM
+  to dynamically create the palette. Each couple of bytes defines one
+  color (15 bits per pixel; the top bit of the second byte is unused).
+  Since the graphics use 4 bitplanes, hence 16 colors, this makes for 32
+  different color codes.
+
+***************************************************************************/
+
+void insectx_state::rampal_main_map(address_map &map)
+{
+	prompal_main_map(map);
+
 	map(0xf800, 0xfbff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 }
 
-void extrmatn_state::prompal_main_map(address_map &map)
-{
-	main_map(map);
-	/* arknoid2, extrmatn, plumppop and drtoppel have PROMs instead of RAM */
-	/* drtoppel writes here anyway! (maybe leftover from tests during development) */
-	map(0xf800, 0xfbff).nopw();
-}
-
-void tnzsb_state::tnzsb_main_map(address_map &map)
+void insectx_state::base_sub_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).m(m_mainbank, FUNC(address_map_bank_device::amap8));
-	map(0xc000, 0xcfff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecodelow_r8), FUNC(x1_001_device::spritecodelow_w8));
-	map(0xd000, 0xdfff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecodehigh_r8), FUNC(x1_001_device::spritecodehigh_w8));
-	map(0xe000, 0xefff).ram().share("share1");
-	map(0xf000, 0xf2ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r8), FUNC(x1_001_device::spriteylow_w8));
-	map(0xf300, 0xf303).mirror(0xfc).w(m_spritegen, FUNC(x1_001_device::spritectrl_w8)); /* control registers (0x80 mirror used by Arkanoid 2) */
-	map(0xf400, 0xf400).w(m_spritegen, FUNC(x1_001_device::spritebgflag_w8));   /* enable / disable background transparency */
-	map(0xf600, 0xf600).w(FUNC(tnzsb_state::ramrom_bankswitch_w));
-	/* kabukiz still writes here but it's not used (it's palette RAM in type1 map) */
-	map(0xf800, 0xfbff).nopw();
-}
-
-void tnzs_base_state::base_sub_map(address_map &map)
-{
-	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x9fff).bankr("subbank");
-	map(0xa000, 0xa000).w(FUNC(tnzs_base_state::bankswitch1_w));
+	map(0x8000, 0x9fff).bankr(m_subbank);
 	map(0xb000, 0xb001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xd000, 0xdfff).ram();
 	map(0xe000, 0xefff).ram().share("share1");
@@ -812,22 +1558,33 @@ void tnzs_base_state::base_sub_map(address_map &map)
 void tnzs_mcu_state::tnzs_sub_map(address_map &map)
 {
 	base_sub_map(map);
-	map(0xc000, 0xc001).rw(FUNC(tnzs_mcu_state::mcu_r), FUNC(tnzs_mcu_state::mcu_w));   /* not present in insectx */
-	map(0xa000, 0xa000).w(FUNC(tnzs_mcu_state::bankswitch1_w));
-	map(0xf000, 0xf003).r(FUNC(tnzs_mcu_state::analog_r)); /* paddles in arkanoid2/plumppop. The ports are */
-											   /* read but not used by the other games, and are not read at */
-											   /* all by insectx. */
+
+	map(0xa000, 0xa000).w(FUNC(tnzs_mcu_state::tnzs_bankswitch1_w));
+	map(0xc000, 0xc001).rw(FUNC(tnzs_mcu_state::mcu_r), FUNC(tnzs_mcu_state::mcu_w));
+	map(0xf000, 0xf003).nopr(); // paddles in arkanoid2/plumppop. The ports are read but not used by the other games, and are not read at all by insectx.
+}
+
+void plumppop_state::plumppop_sub_map(address_map &map)
+{
+	tnzs_sub_map(map);
+
+	map(0xa000, 0xa000).w(FUNC(plumppop_state::plumppop_bankswitch1_w));
+	map(0xf000, 0xf003).r(m_upd4701, FUNC(upd4701_device::read_xy));
 }
 
 void arknoid2_state::arknoid2_sub_map(address_map &map)
 {
-	tnzs_sub_map(map);
+	plumppop_sub_map(map);
+
+	map(0xa000, 0xa000).w(FUNC(arknoid2_state::arknoid2_bankswitch1_w));
 	map(0xc000, 0xc001).rw(FUNC(arknoid2_state::mcu_r), FUNC(arknoid2_state::mcu_w));
 }
 
 void kageki_state::kageki_sub_map(address_map &map)
 {
 	base_sub_map(map);
+
+	map(0xa000, 0xa000).w(FUNC(kageki_state::kageki_bankswitch1_w));
 	map(0xc000, 0xc000).portr("IN0");
 	map(0xc001, 0xc001).portr("IN1");
 	map(0xc002, 0xc002).portr("IN2");
@@ -836,18 +1593,20 @@ void kageki_state::kageki_sub_map(address_map &map)
 void insectx_state::insectx_sub_map(address_map &map)
 {
 	base_sub_map(map);
+
+	map(0xa000, 0xa000).w(FUNC(insectx_state::insectx_bankswitch1_w));
 	map(0xc000, 0xc000).portr("IN0");
 	map(0xc001, 0xc001).portr("IN1");
 	map(0xc002, 0xc002).portr("IN2");
 }
 
-/* the later board is different, it has a third CPU (and of course no mcu) */
+// the later board is different, it has a third CPU (and of course no MCU)
 
 void tnzsb_state::tnzsb_base_sub_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x9fff).bankr("subbank");
-	map(0xa000, 0xa000).w(FUNC(tnzsb_state::bankswitch1_w));
+	map(0x8000, 0x9fff).bankr(m_subbank);
+	map(0xa000, 0xa000).w(FUNC(tnzsb_state::tnzsb_bankswitch1_w));
 	map(0xb002, 0xb002).portr("DSWA");
 	map(0xb003, 0xb003).portr("DSWB");
 	map(0xb004, 0xb004).w(FUNC(tnzsb_state::sound_command_w));
@@ -861,12 +1620,14 @@ void tnzsb_state::tnzsb_base_sub_map(address_map &map)
 void tnzsb_state::tnzsb_sub_map(address_map &map)
 {
 	tnzsb_base_sub_map(map);
+
 	map(0xf000, 0xf3ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 }
 
 void kabukiz_state::kabukiz_sub_map(address_map &map)
 {
 	tnzsb_base_sub_map(map);
+
 	map(0xf800, 0xfbff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 }
 
@@ -879,7 +1640,7 @@ void tnzsb_state::tnzsb_cpu2_map(address_map &map)
 void kabukiz_state::kabukiz_cpu2_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("audiobank");
+	map(0x8000, 0xbfff).bankr(m_audiobank);
 	map(0xe000, 0xffff).ram();
 }
 
@@ -892,22 +1653,15 @@ void tnzsb_state::tnzsb_io_map(address_map &map)
 
 void jpopnics_state::jpopnics_main_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).m(m_mainbank, FUNC(address_map_bank_device::amap8));
-	map(0xc000, 0xcfff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecodelow_r8), FUNC(x1_001_device::spritecodelow_w8));
-	map(0xd000, 0xdfff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecodehigh_r8), FUNC(x1_001_device::spritecodehigh_w8));
-	map(0xe000, 0xefff).ram().share("share1"); /* WORK RAM (shared by the 2 z80's) */
-	map(0xf000, 0xf2ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r8), FUNC(x1_001_device::spriteylow_w8));
-	map(0xf300, 0xf303).mirror(0xfc).w(m_spritegen, FUNC(x1_001_device::spritectrl_w8)); /* control registers (0x80 mirror used by Arkanoid 2) */
-	map(0xf400, 0xf400).w(m_spritegen, FUNC(x1_001_device::spritebgflag_w8));   /* enable / disable background transparency */
-	map(0xf600, 0xf600).nopr().w(FUNC(jpopnics_state::ramrom_bankswitch_w));
-	map(0xf800, 0xffff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	prompal_main_map(map);
+
+	map(0xf800, 0xffff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette"); // larger palette
 }
 
 void jpopnics_state::jpopnics_sub_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x9fff).bankr("subbank");
+	map(0x8000, 0x9fff).bankr(m_subbank);
 
 	map(0xa000, 0xa000).w(FUNC(jpopnics_state::subbankswitch_w));
 	map(0xb000, 0xb001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
@@ -920,18 +1674,6 @@ void jpopnics_state::jpopnics_sub_map(address_map &map)
 	map(0xe000, 0xefff).ram().share("share1");
 
 	map(0xf000, 0xf003).r(m_upd4701, FUNC(upd4701_device::read_xy));
-}
-
-/* RAM/ROM bank that maps at 0x8000-0xbfff on maincpu */
-void tnzs_base_state::mainbank_map(address_map &map)
-{
-	map(0x00000, 0x07fff).ram(); // instead of the first two banks of ROM being repeated redundantly the hardware maps RAM here
-	map(0x08000, 0x1ffff).rom().region(":maincpu", 0x8000);
-}
-
-void tnzs_base_state::tnzs_mainbank(machine_config &config)
-{
-	ADDRESS_MAP_BANK(config, "mainbank").set_map(&tnzs_base_state::mainbank_map).set_options(ENDIANNESS_LITTLE, 8, 17, 0x4000);
 }
 
 
@@ -1550,18 +2292,16 @@ static GFXDECODE_START( gfx_insectx )
 	GFXDECODE_ENTRY( "gfx1", 0, insectx_charlayout, 0, 32 )
 GFXDECODE_END
 
-void tnzs_base_state::tnzs_base(machine_config &config)
+void insectx_state::tnzs_base(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(12'000'000)/2);       /* 6.0 MHz ??? - Main board Crystal is 12MHz, verified on insectx, kageki, tnzsb */
-	m_maincpu->set_addrmap(AS_PROGRAM, &tnzs_base_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(tnzs_base_state::irq0_line_hold));
+	m_maincpu->set_addrmap(AS_PROGRAM, &insectx_state::rampal_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(insectx_state::irq0_line_hold));
 
 	Z80(config, m_subcpu, XTAL(12'000'000)/2);        /* 6.0 MHz ??? - Main board Crystal is 12MHz, verified on insectx, kageki, tnzsb */
-	m_subcpu->set_addrmap(AS_PROGRAM, &tnzs_base_state::base_sub_map);
-	m_subcpu->set_vblank_int("screen", FUNC(tnzs_base_state::irq0_line_hold));
-
-	tnzs_mainbank(config);
+	m_subcpu->set_addrmap(AS_PROGRAM, &insectx_state::base_sub_map);
+	m_subcpu->set_vblank_int("screen", FUNC(insectx_state::irq0_line_hold));
 
 	config.set_perfect_quantum(m_maincpu);
 
@@ -1575,8 +2315,8 @@ void tnzs_base_state::tnzs_base(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(tnzs_base_state::screen_update_tnzs));
-	m_screen->screen_vblank().set(FUNC(tnzs_base_state::screen_vblank_tnzs));
+	m_screen->set_screen_update(FUNC(insectx_state::screen_update_tnzs));
+	m_screen->screen_vblank().set(FUNC(insectx_state::screen_vblank_tnzs));
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 512);
@@ -1585,13 +2325,15 @@ void tnzs_base_state::tnzs_base(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 }
 
-void tnzs_mcu_state::tnzs(machine_config &config)
+template <bool LockoutLevel>
+void tnzs_mcu_state::tnzs_mcu(machine_config &config)
 {
 	tnzs_base(config);
+
 	I8742(config, m_mcu, 12000000/2);  /* 400KHz ??? - Main board Crystal is 12MHz */
 	m_mcu->p1_in_cb().set(FUNC(tnzs_mcu_state::mcu_port1_r));
 	m_mcu->p2_in_cb().set_ioport("IN2");
-	m_mcu->p2_out_cb().set(FUNC(tnzs_mcu_state::mcu_port2_w));
+	m_mcu->p2_out_cb().set(FUNC(tnzs_mcu_state::mcu_port2_w<LockoutLevel>));
 	m_mcu->t0_in_cb().set_ioport("COIN1");
 	m_mcu->t1_in_cb().set_ioport("COIN2");
 
@@ -1608,23 +2350,30 @@ void tnzs_mcu_state::tnzs(machine_config &config)
 	ymsnd.add_route(ALL_OUTPUTS, "speaker", 0.3);
 }
 
-void extrmatn_state::extrmatn(machine_config &config)
+void tnzs_mcu_state::tnzs(machine_config &config)
 {
-	tnzs(config);
+	tnzs_mcu<true>(config);
+}
 
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &extrmatn_state::prompal_main_map);
+void tnzs_mcu_state::extrmatn(machine_config &config)
+{
+	tnzs_mcu<false>(config);
 
-	/* video hardware */
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &tnzs_mcu_state::prompal_main_map);
+
+	// video hardware
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 
-	m_palette->set_init(FUNC(extrmatn_state::prompalette));
+	m_palette->set_init(FUNC(tnzs_mcu_state::prompalette));
 }
 
-void extrmatn_state::plumppop(machine_config &config)
+void plumppop_state::plumppop(machine_config &config)
 {
 	extrmatn(config);
+
+	m_subcpu->set_addrmap(AS_PROGRAM, &plumppop_state::plumppop_sub_map);
 
 	UPD4701A(config, m_upd4701);
 	m_upd4701->set_portx_tag("AN1");
@@ -1635,11 +2384,11 @@ void arknoid2_state::arknoid2(machine_config &config)
 {
 	plumppop(config);
 
-	/* basic machine hardware */
 	m_maincpu->set_vblank_int("screen", FUNC(arknoid2_state::mcu_interrupt));
+
 	m_subcpu->set_addrmap(AS_PROGRAM, &arknoid2_state::arknoid2_sub_map);
 
-	subdevice<cpu_device>("mcu")->set_disable();
+	m_mcu->set_disable();
 }
 
 void insectx_state::insectx(machine_config &config)
@@ -1686,7 +2435,7 @@ void tnzsb_state::tnzsb(machine_config &config)
 	tnzs_base(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &tnzsb_state::tnzsb_main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tnzsb_state::prompal_main_map);
 	m_subcpu->set_addrmap(AS_PROGRAM, &tnzsb_state::tnzsb_sub_map);
 
 	Z80(config, m_audiocpu, XTAL(12'000'000)/2); /* verified on pcb */
@@ -1783,7 +2532,7 @@ ROM_START( plumppop )
 	ROM_LOAD( "a98-13.15f", 0x0000, 0x200, CRC(7cde2da5) SHA1(0cccfc35fb716ebb4cffa85c75681f33ca80a56e) )   /* hi bytes, AM27S29 or compatible like MB7124 */
 	ROM_LOAD( "a98-12.17f", 0x0200, 0x200, CRC(90dc9da7) SHA1(f719dead7f4597e5ee6f1103599505b98cb58299) )   /* lo bytes, AM27S29 or compatible like MB7124 */
 
-	ROM_REGION( 0x10000, "pal", 0 ) /* pals on plumppop are the same set as arkanoid2/extrmatn/drtoppel/chukataio/etc with the exception of d9? */
+	ROM_REGION( 0x10000, "pal", 0 ) /* PALs on plumppop are the same set as arkanoid2/extrmatn/drtoppel/chukataio/etc with the exception of d9? */
 	ROM_LOAD( "b06-10-1.pal16l8a.d9.jed", 0x00000, 0x01000, NO_DUMP)
 	ROM_LOAD( "b06-11.pal16l8a.d6.jed", 0x01000, 0x01000, NO_DUMP)
 	ROM_LOAD( "b06-12.pal16l8a.c3.jed", 0x02000, 0x01000, NO_DUMP)
@@ -2930,42 +3679,44 @@ ROM_START( insectxbl )
 	ROM_LOAD16_BYTE( "ic215", 0xc0001, 0x20000, CRC(ff1dee9e) SHA1(3ef91f8188ae400880c03ba8d1fc039c8920d6c0) )
 ROM_END
 
+} // anonymous namespace
+
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    CLASS,          INIT,       MONITOR,COMPANY,             FULLNAME,            FLAGS
-GAME( 1987, plumppop,  0,        plumppop, plumppop, extrmatn_state, empty_init, ROT0,   "Taito Corporation", "Plump Pop (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, plumppop,  0,        plumppop, plumppop, plumppop_state, empty_init, ROT0,   "Taito Corporation", "Plump Pop (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, jpopnics,  0,        jpopnics, jpopnics, jpopnics_state, empty_init, ROT0,   "Nics",              "Jumping Pop (Nics, Korean hack of Plump Pop)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, extrmatn,  0,        extrmatn, extrmatn, extrmatn_state, empty_init, ROT270, "Taito Corporation Japan",                         "Extermination (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, extrmatnu, extrmatn, extrmatn, extrmatn, extrmatn_state, empty_init, ROT270, "Taito (World Games license)",                     "Extermination (US, World Games)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, extrmatnur,extrmatn, extrmatn, extrmatn, extrmatn_state, empty_init, ROT270, "Taito America Corporation (Romstar license)",     "Extermination (US, Romstar)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, extrmatnj, extrmatn, extrmatn, extrmatn, extrmatn_state, empty_init, ROT270, "Taito Corporation",                               "Extermination (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, extrmatn,  0,        extrmatn, extrmatn, tnzs_mcu_state, empty_init, ROT270, "Taito Corporation Japan",                         "Extermination (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, extrmatnu, extrmatn, extrmatn, extrmatn, tnzs_mcu_state, empty_init, ROT270, "Taito (World Games license)",                     "Extermination (US, World Games)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, extrmatnur,extrmatn, extrmatn, extrmatn, tnzs_mcu_state, empty_init, ROT270, "Taito America Corporation (Romstar license)",     "Extermination (US, Romstar)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, extrmatnj, extrmatn, extrmatn, extrmatn, tnzs_mcu_state, empty_init, ROT270, "Taito Corporation",                               "Extermination (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1987, arknoid2,  0,        arknoid2, arknoid2, arknoid2_state, empty_init, ROT270, "Taito Corporation Japan",                     "Arkanoid - Revenge of DOH (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, arknoid2u, arknoid2, arknoid2, arknid2u, arknoid2_state, empty_init, ROT270, "Taito America Corporation (Romstar license)", "Arkanoid - Revenge of DOH (US)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1987, arknoid2j, arknoid2, arknoid2, arknid2u, arknoid2_state, empty_init, ROT270, "Taito Corporation",                           "Arkanoid - Revenge of DOH (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, arknoid2b, arknoid2, arknoid2, arknid2u, arknoid2_state, empty_init, ROT270, "bootleg",                                     "Arkanoid - Revenge of DOH (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, drtoppel,  0,        extrmatn, drtoppel, extrmatn_state, empty_init, ROT90,  "Kaneko / Taito Corporation Japan",   "Dr. Toppel's Adventure (World)", MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
-GAME( 1987, drtoppelu, drtoppel, extrmatn, drtopplu, extrmatn_state, empty_init, ROT90,  "Kaneko / Taito America Corporation", "Dr. Toppel's Adventure (US)",    MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
-GAME( 1987, drtoppelj, drtoppel, extrmatn, drtopplu, extrmatn_state, empty_init, ROT90,  "Kaneko / Taito Corporation",         "Dr. Toppel's Tankentai (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, drtoppel,  0,        extrmatn, drtoppel, tnzs_mcu_state, empty_init, ROT90,  "Kaneko / Taito Corporation Japan",   "Dr. Toppel's Adventure (World)", MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
+GAME( 1987, drtoppelu, drtoppel, extrmatn, drtopplu, tnzs_mcu_state, empty_init, ROT90,  "Kaneko / Taito America Corporation", "Dr. Toppel's Adventure (US)",    MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
+GAME( 1987, drtoppelj, drtoppel, extrmatn, drtopplu, tnzs_mcu_state, empty_init, ROT90,  "Kaneko / Taito Corporation",         "Dr. Toppel's Tankentai (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1988, kageki,    0,        kageki,   kageki,   kageki_state,   empty_init, ROT90,  "Kaneko / Taito Corporation",                           "Kageki (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kagekiu,   kageki,   kageki,   kagekiu,  kageki_state,   empty_init, ROT90,  "Kaneko / Taito America Corporation (Romstar license)", "Kageki (US)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kagekij,   kageki,   kageki,   kagekij,  kageki_state,   empty_init, ROT90,  "Kaneko / Taito Corporation",                           "Kageki (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, kagekih,   kageki,   kageki,   kageki,   kageki_state,   empty_init, ROT90,  "hack",                                                 "Kageki (hack)",  MACHINE_SUPPORTS_SAVE ) // date is hacked at least, might also be a Japan set hacked to show english
 
-GAME( 1988, chukatai,  0,        tnzs,     chukatai, tnzs_state,     empty_init, ROT0,   "Taito Corporation Japan",   "Chuka Taisen (World) (P0-028-A PCB)", MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
-GAME( 1988, chukataiu, chukatai, tnzs,     chukatau, tnzs_state,     empty_init, ROT0,   "Taito America Corporation", "Chuka Taisen (US) (P0-028-A PCB)",    MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
-GAME( 1988, chukataij, chukatai, tnzs,     chukatau, tnzs_state,     empty_init, ROT0,   "Taito Corporation",         "Chuka Taisen (Japan) (P0-028-A PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, chukataija,chukatai, extrmatn, chukatau, extrmatn_state, empty_init, ROT0,   "Taito Corporation",         "Chuka Taisen (Japan) (P0-025-A PCB)", MACHINE_SUPPORTS_SAVE ) /* Higher ROM ID# but older PCB stock */
+GAME( 1988, chukatai,  0,        tnzs,     chukatai, tnzs_mcu_state, empty_init, ROT0,   "Taito Corporation Japan",   "Chuka Taisen (World) (P0-028-A PCB)", MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
+GAME( 1988, chukataiu, chukatai, tnzs,     chukatau, tnzs_mcu_state, empty_init, ROT0,   "Taito America Corporation", "Chuka Taisen (US) (P0-028-A PCB)",    MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
+GAME( 1988, chukataij, chukatai, tnzs,     chukatau, tnzs_mcu_state, empty_init, ROT0,   "Taito Corporation",         "Chuka Taisen (Japan) (P0-028-A PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, chukataija,chukatai, extrmatn, chukatau, tnzs_mcu_state, empty_init, ROT0,   "Taito Corporation",         "Chuka Taisen (Japan) (P0-025-A PCB)", MACHINE_SUPPORTS_SAVE ) /* Higher ROM ID# but older PCB stock */
 
 GAME( 1988, tnzs,      0,        tnzsb,    tnzs,     tnzsb_state,    empty_init, ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, new version) (P0-043A PCB)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, tnzsj,     tnzs,     tnzsb,    tnzsj,    tnzsb_state,    empty_init, ROT0,   "Taito Corporation",         "The NewZealand Story (Japan, new version) (P0-043A PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tnzso,     tnzs,     tnzs,     tnzsop,   tnzs_state,     empty_init, ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, old version) (P0-041A PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tnzsjo,    tnzs,     tnzs,     tnzsjo,   tnzs_state,     empty_init, ROT0,   "Taito Corporation",         "The NewZealand Story (Japan, old version) (P0-041A PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tnzsuo,    tnzs,     tnzs,     tnzsjo,   tnzs_state,     empty_init, ROT0,   "Taito America Corporation", "The NewZealand Story (US, old version) (P0-041A PCB)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tnzsoa,    tnzs,     tnzs,     tnzsop,   tnzs_state,     empty_init, ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, unknown version) (P0-041A PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tnzsop,    tnzs,     tnzs,     tnzsop,   tnzs_state,     empty_init, ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, prototype) (P0-041-1 PCB)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzso,     tnzs,     tnzs,     tnzsop,   tnzs_mcu_state, empty_init, ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, old version) (P0-041A PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzsjo,    tnzs,     tnzs,     tnzsjo,   tnzs_mcu_state, empty_init, ROT0,   "Taito Corporation",         "The NewZealand Story (Japan, old version) (P0-041A PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzsuo,    tnzs,     tnzs,     tnzsjo,   tnzs_mcu_state, empty_init, ROT0,   "Taito America Corporation", "The NewZealand Story (US, old version) (P0-041A PCB)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzsoa,    tnzs,     tnzs,     tnzsop,   tnzs_mcu_state, empty_init, ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, unknown version) (P0-041A PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzsop,    tnzs,     tnzs,     tnzsop,   tnzs_mcu_state, empty_init, ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, prototype) (P0-041-1 PCB)",  MACHINE_SUPPORTS_SAVE )
 
 GAME( 1988, kabukiz,   0,        kabukiz,  kabukiz,  kabukiz_state,  empty_init, ROT0,   "Kaneko / Taito Corporation Japan", "Kabuki-Z (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kabukizj,  kabukiz,  kabukiz,  kabukizj, kabukiz_state,  empty_init, ROT0,   "Kaneko / Taito Corporation",       "Kabuki-Z (Japan)", MACHINE_SUPPORTS_SAVE )

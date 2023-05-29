@@ -894,21 +894,21 @@ template <int Width> void ns32000_device<Width>::execute_run()
 		{
 			if (m_nmi_line)
 			{
-				// service interrupt
-				interrupt(NMI, m_pc);
-
 				// notify the debugger
 				if (machine().debug_enabled())
-					debug()->interrupt_hook(INPUT_LINE_NMI);
+					debug()->interrupt_hook(INPUT_LINE_NMI, m_pc);
+
+				// service interrupt
+				interrupt(NMI, m_pc);
 			}
 			else if (m_int_line && (m_psr & PSR_I))
 			{
-				// service interrupt
-				interrupt(NVI, m_pc);
-
 				// notify the debugger
 				if (machine().debug_enabled())
-					debug()->interrupt_hook(INPUT_LINE_IRQ0);
+					debug()->interrupt_hook(INPUT_LINE_IRQ0, m_pc);
+
+				// service interrupt
+				interrupt(NVI, m_pc);
 			}
 
 			// update trace pending
@@ -3502,9 +3502,10 @@ template <int Width> device_memory_interface::space_config_vector ns32000_device
 	};
 }
 
-template <int Width> bool ns32000_device<Width>::memory_translate(int spacenum, int intention, offs_t &address)
+template <int Width> bool ns32000_device<Width>::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
-	return !m_mmu || m_mmu->translate(space(spacenum), spacenum, address, m_psr & PSR_U, intention & TRANSLATE_WRITE, false, intention & TRANSLATE_DEBUG_MASK) == ns32000_mmu_interface::COMPLETE;
+	target_space = &space(spacenum);
+	return !m_mmu || m_mmu->translate(space(spacenum), spacenum, address, m_psr & PSR_U, intention == TR_WRITE, false, true) == ns32000_mmu_interface::COMPLETE;
 }
 
 template <int Width> std::unique_ptr<util::disasm_interface> ns32000_device<Width>::create_disassembler()

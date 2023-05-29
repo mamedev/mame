@@ -116,6 +116,9 @@
 #include "netlist/devices/net_lib.h"
 #include "video/fixfreq.h"
 
+
+namespace {
+
 // copied by Pong, not accurate for this driver!
 // start
 #define MASTER_CLOCK    7159000
@@ -266,6 +269,7 @@ ROM_START( monacogpa )
 	ROM_LOAD( "prm40.ic21",      0x0000, 0x0020, CRC(87d12d57) SHA1(54682ce464449a3084cba29a82ff80288c87ad36) )
 ROM_END
 
+} // anonymous namespace
 
 
 GAME( 1980, monacogp,  0,         monacogp, 0, monacogp_state, empty_init, ROT0, "Sega", "Monaco GP (set 1) [TTL]", MACHINE_IS_SKELETON )

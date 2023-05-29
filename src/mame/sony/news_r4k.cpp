@@ -131,6 +131,8 @@ namespace {
 class news_r4k_state : public driver_device
 {
 public:
+	static constexpr feature_type unemulated_features() { return feature::GRAPHICS; }
+
 	news_r4k_state(machine_config const &mconfig, device_type type, char const *tag) :
 		driver_device(mconfig, type, tag),
 		m_cpu(*this, "cpu"),
@@ -671,12 +673,12 @@ void news_r4k_state::cpu_map_main_memory(address_map &map)
 				   {
 					   if (data == 0x10001)
 					   {
-						   LOGMASKED(LOG_GENERAL, "Enabling RAM map shift!\n");
+						   LOG("Enabling RAM map shift!\n");
 						   m_ram_map_shift = true;
 					   }
 					   else
 					   {
-						   LOGMASKED(LOG_GENERAL, "Disabling RAM map shift!\n");
+						   LOG("Disabling RAM map shift!\n");
 						   m_ram_map_shift = false;
 					   }
 				   }));
@@ -767,7 +769,7 @@ uint8_t news_r4k_state::ram_r(offs_t offset)
 	}
 	else
 	{
-		LOGMASKED(LOG_GENERAL, "Unmapped RAM read attempted at offset 0x%x\n", offset);
+		LOG("Unmapped RAM read attempted at offset 0x%x\n", offset);
 	}
 	return result;
 }
@@ -790,7 +792,7 @@ void news_r4k_state::ram_w(offs_t offset, uint8_t data)
 	}
 	else
 	{
-		LOGMASKED(LOG_GENERAL, "Unmapped RAM write attempted at offset 0x%x (data: 0x%x)\n", offset, data);
+		LOG("Unmapped RAM write attempted at offset 0x%x (data: 0x%x)\n", offset, data);
 	}
 }
 
@@ -1253,4 +1255,4 @@ ROM_END
 
 // Machine definitions
 //   YEAR  NAME      P  CM MACHINE   INPUT    CLASS           INIT        COMPANY FULLNAME                      FLAGS
-COMP(1994, nws5000x, 0, 0, nws5000x, nws5000, news_r4k_state, empty_init, "Sony", "NET WORK STATION NWS-5000X", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+COMP(1994, nws5000x, 0, 0, nws5000x, nws5000, news_r4k_state, empty_init, "Sony", "NET WORK STATION NWS-5000X", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND)

@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Peter Trauner
-#ifndef MAME_AUDIO_ARCADIA_H
-#define MAME_AUDIO_ARCADIA_H
+#ifndef MAME_ARCADIA_ARCADIA_A_H
+#define MAME_ARCADIA_ARCADIA_A_H
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -34,4 +34,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(ARCADIA_SOUND, arcadia_sound_device)
 
-#endif // MAME_AUDIO_ARCADIA_H
+#endif // MAME_ARCADIA_ARCADIA_A_H

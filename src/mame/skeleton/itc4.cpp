@@ -14,6 +14,8 @@
 #include "machine/z80ctc.h"
 
 
+namespace {
+
 class itc4_state : public driver_device
 {
 public:
@@ -96,5 +98,8 @@ ROM_START(itc4)
 	ROM_CONTINUE(0x3800, 0x0800)
 	ROM_CONTINUE(0x3000, 0x0800)
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1988, itc4, 0, 0, itc4, itc4, itc4_state, empty_init, "Oxford Instruments", "ITC-4 Intelligent Temperature Controller (Version 2.04)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

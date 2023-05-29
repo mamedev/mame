@@ -8,6 +8,9 @@
 #include "bus/centronics/ctronics.h"
 #include "bus/msx/ctrl/ctrl.h"
 #include "bus/msx/slot/cartridge.h"
+#include "bus/msx/cart/cartridge.h"
+#include "bus/msx/minicart/minicart.h"
+#include "bus/msx/module/module.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "machine/buffer.h"
@@ -46,7 +49,7 @@ private:
 class msx_state : public driver_device
 {
 protected:
-	msx_state(const machine_config &mconfig, device_type type, const char *tag);
+	msx_state(const machine_config &mconfig, device_type type, const char *tag, XTAL main_xtal, int cpu_xtal_divider);
 
 	enum ay8910_type
 	{
@@ -65,8 +68,8 @@ protected:
 		VDP_TMS9929A
 	};
 
-	void msx_base(ay8910_type ay8910_type, machine_config &config, XTAL xtal, int cpu_divider);
-	void msx1(vdp_type vdp_type, ay8910_type ay8910_type, machine_config &config);
+	void msx_base(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
+	void msx1(vdp_type vdp_type, ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
 	void msx1_add_softlists(machine_config &config);
 
 	// configuration helpers
@@ -147,6 +150,11 @@ protected:
 	{
 		return add_cartridge_slot<N>(config, prim, false, 0);
 	}
+	template <int N>
+	auto &add_cartridge_slot(machine_config &config, u8 prim, XTAL xtal)
+	{
+		return add_cartridge_slot<N>(config, prim, false, 0, xtal);
+	}
 	virtual void driver_start() override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -172,7 +180,7 @@ protected:
 	required_device<z80_device> m_maincpu;
 	optional_device<cassette_image_device> m_cassette;
 	required_device<ay8910_device> m_ay8910;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_device<i8255_device> m_ppi;
 	optional_device<tms9928a_device> m_tms9928a;
 	optional_device<input_buffer_device> m_cent_status_in;
@@ -186,7 +194,6 @@ protected:
 	required_device<msx_general_purpose_port_device> m_gen_port1;
 	required_device<msx_general_purpose_port_device> m_gen_port2;
 	required_ioport_array<11> m_io_key;
-	output_finder<2> m_leds;
 	msx_hw_def m_hw_def;
 	// This is here until more direct rom dumps from kanji font roms become available.
 	bool m_kanji_fsa1fx = false;
@@ -234,13 +241,17 @@ protected:
 	u8 m_secondary_slot[4];
 	u8 m_port_c_old;
 	u8 m_keylatch;
+	output_finder<> m_caps_led;
+	output_finder<> m_code_led;
+	const XTAL m_main_xtal;
+	const int m_cpu_xtal_divider;
 
 private:
 	// configuration helpers
 	template <typename T, typename U>
-	auto &add_base_slot(machine_config &config, T &&type, U &&tag, u8 prim, bool expanded, u8 sec, u8 page, u8 numpages)
+	auto &add_base_slot(machine_config &config, T &&type, U &&tag, u8 prim, bool expanded, u8 sec, u8 page, u8 numpages, u32 clock = 0)
 	{
-		auto &device(std::forward<T>(type)(config, std::forward<U>(tag), 0U));
+		auto &device(std::forward<T>(type)(config, std::forward<U>(tag), clock));
 		device.set_memory_space(m_maincpu, AS_PROGRAM);
 		device.set_io_space(m_maincpu, AS_IO);
 		device.set_maincpu(m_maincpu);
@@ -285,15 +296,21 @@ private:
 		return device;
 	}
 	template <int N, typename T, typename U, typename V>
-	auto &add_cartridge_slot(machine_config &config, T &&type, U &&tag, u8 prim, bool expanded, u8 sec, V &&intf, const char *deft)
+	auto &add_cartridge_slot(machine_config &config, T &&type, U &&tag, u8 prim, bool expanded, u8 sec, V &&intf, const char *deft, u32 clock)
 	{
-		auto &device = add_base_slot(config, std::forward<T>(type), std::forward<U>(tag), prim, expanded, sec, 0, 4);
+		auto &device = add_base_slot(config, std::forward<T>(type), std::forward<U>(tag), prim, expanded, sec, 0, 4, clock);
 		device.option_reset();
-		intf(device);
+		intf(device, expanded);
 		device.set_default_option(deft);
 		device.set_fixed(false);
 		device.irq_handler().set(m_mainirq, FUNC(input_merger_device::in_w<N>));
+		device.add_route(ALL_OUTPUTS, m_speaker, 1.0);
 		return device;
+	}
+	template <int N, typename T, typename U, typename V>
+	auto &add_cartridge_slot(machine_config &config, T &&type, U &&tag, u8 prim, bool expanded, u8 sec, V &&intf, const char *deft)
+	{
+		return add_cartridge_slot<N>(config, std::forward<T>(type), std::forward<U>(tag), prim, expanded, sec, std::forward<V>(intf), deft, (m_main_xtal / m_cpu_xtal_divider).value());
 	}
 	template <int N>
 	auto &add_cartridge_slot(machine_config &config, u8 prim, bool expanded, u8 sec)
@@ -303,7 +320,7 @@ private:
 		};
 		static_assert(N >= 1 && N <= 4, "Invalid cartridge slot number");
 		m_hw_def.has_cartslot(true);
-		return add_cartridge_slot<N>(config, MSX_SLOT_CARTRIDGE, tags[N-1], prim, expanded, sec, msx_cart, nullptr);
+		return add_cartridge_slot<N>(config, MSX_SLOT_CARTRIDGE, tags[N-1], prim, expanded, sec, msx_cart, nullptr, (m_main_xtal / m_cpu_xtal_divider).value());
 	}
 };
 
@@ -311,8 +328,8 @@ private:
 class msx2_base_state : public msx_state
 {
 protected:
-	msx2_base_state(const machine_config &mconfig, device_type type, const char *tag)
-		: msx_state(mconfig, type, tag)
+	msx2_base_state(const machine_config &mconfig, device_type type, const char *tag, XTAL main_xtal, int cpu_xtal_divider)
+		: msx_state(mconfig, type, tag, main_xtal, cpu_xtal_divider)
 		, m_v9938(*this, "v9938")
 		, m_v9958(*this, "v9958")
 		, m_rtc(*this, "rtc")
@@ -322,13 +339,13 @@ protected:
 
 	virtual void machine_start() override;
 
-	void msx2_base(ay8910_type ay8910_type, machine_config &config);
-	void msx2(ay8910_type ay8910_type, machine_config &config);
-	void msx2_pal(ay8910_type ay8910_type, machine_config &config);
-	void msx2plus_base(ay8910_type ay8910_type, machine_config &config);
-	void msx2plus(ay8910_type ay8910_type, machine_config &config);
-	void msx2plus_pal(ay8910_type ay8910_type, machine_config &config);
-	void turbor(ay8910_type ay8910_type, machine_config &config);
+	void msx2_base(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
+	void msx2(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
+	void msx2_pal(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
+	void msx2plus_base(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
+	void msx2plus(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
+	void msx2plus_pal(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
+	void turbor(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
 	void msx2_add_softlists(machine_config &config);
 	void msx2plus_add_softlists(machine_config &config);
 	void turbor_add_softlists(machine_config &config);

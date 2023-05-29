@@ -10,11 +10,10 @@
 
 #define DUMP_VRAM 0
 
-#define LOG_GENERAL  (1 << 0)
-#define LOG_REGISTER (1 << 1)
-#define LOG_FIFO     (1 << 2)
-#define LOG_CMDEXEC  (1 << 3)
-#define LOG_DRAW     (1 << 4)
+#define LOG_REGISTER (1U << 1)
+#define LOG_FIFO     (1U << 2)
+#define LOG_CMDEXEC  (1U << 3)
+#define LOG_DRAW     (1U << 4)
 // #define VERBOSE      (LOG_GENERAL | LOG_REGISTER | LOG_FIFO | LOG_CMDEXEC | LOG_DRAW)
 // #define LOG_OUTPUT_STREAM std::cout
 

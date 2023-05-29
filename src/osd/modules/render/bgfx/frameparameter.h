@@ -6,22 +6,20 @@
 //
 //============================================================
 
+#ifndef MAME_RENDER_BGFX_FRAMEPARAMETER_H
+#define MAME_RENDER_BGFX_FRAMEPARAMETER_H
+
 #pragma once
 
-#ifndef __DRAWBGFX_FRAME_PARAMETER__
-#define __DRAWBGFX_FRAME_PARAMETER__
-
-#include <bgfx/bgfx.h>
-
-#include <string>
-
 #include "parameter.h"
+
+#include <cstdint>
+#include <string>
 
 class bgfx_frame_parameter : public bgfx_parameter
 {
 public:
-	bgfx_frame_parameter(std::string name, parameter_type type, uint32_t period);
-	virtual ~bgfx_frame_parameter() { }
+	bgfx_frame_parameter(std::string &&name, parameter_type type, uint32_t period);
 
 	virtual float value() override;
 	virtual void tick(double delta) override;
@@ -31,4 +29,4 @@ private:
 	uint32_t    m_period;
 };
 
-#endif // __DRAWBGFX_FRAME_PARAMETER__
+#endif // MAME_RENDER_BGFX_FRAMEPARAMETER_H

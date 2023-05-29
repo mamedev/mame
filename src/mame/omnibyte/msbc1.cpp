@@ -55,6 +55,9 @@ Notes:
 #include "machine/68230pit.h"
 #include "machine/z80sio.h"
 
+
+namespace {
+
 #define MC68000R12_TAG  "u50"
 #define MK68564_0_TAG   "u14"
 #define MK68564_1_TAG   "u15"
@@ -130,6 +133,9 @@ ROM_START( msbc1 )
 	ROM_LOAD( "p31.0.u61", 0x000, 0x100, NO_DUMP )
 	ROM_LOAD( "p32.0.u76", 0x000, 0x100, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

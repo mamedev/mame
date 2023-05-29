@@ -11,6 +11,9 @@
 #include "machine/nvram.h"
 #include "machine/pit8253.h"
 
+
+namespace {
+
 class kawai_sx240_state : public driver_device
 {
 public:
@@ -134,5 +137,8 @@ ROM_START(sx240)
 	// From Tauntek package: "New Slave EPROM is only required for saving patches or sequences via sysex"
 	ROM_LOAD("sx240slv.i38", 0x0000, 0x2000, CRC(c6bc6439) SHA1(4d51d8c5a198ff139956cb0b07225448357d17ef))
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1984, sx240, 0, 0, sx240, sx240, kawai_sx240_state, empty_init, "Kawai Musical Instrument Manufacturing", "SX-240 8-Voice Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)

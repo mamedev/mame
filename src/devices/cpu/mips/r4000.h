@@ -322,7 +322,7 @@ protected:
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
-	virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
@@ -378,7 +378,7 @@ protected:
 
 	// address and memory handling
 	enum translate_result : unsigned { ERROR, MISS, UNCACHED, CACHED };
-	translate_result translate(int intention, u64 &address);
+	translate_result translate(int intention, bool debug, u64 &address);
 	void address_error(int intention, u64 const address);
 
 	template <typename T> void accessors(T &m);

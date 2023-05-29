@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
-#ifndef MAME_MACHINE_NAMCO50_H
-#define MAME_MACHINE_NAMCO50_H
+#ifndef MAME_NAMCO_NAMCO50_H
+#define MAME_NAMCO_NAMCO50_H
 
 #pragma once
 
@@ -44,4 +44,4 @@ private:
 
 DECLARE_DEVICE_TYPE(NAMCO_50XX, namco_50xx_device)
 
-#endif // MAME_MACHINE_NAMCO50_H
+#endif // MAME_NAMCO_NAMCO50_H

@@ -36,6 +36,7 @@
 
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "utf8.h"
@@ -43,6 +44,8 @@
 #include "formats/oric_dsk.h"
 #include "formats/oric_tap.h"
 
+
+namespace {
 
 class oric_state : public driver_device
 {
@@ -68,14 +71,10 @@ public:
 		, m_via(*this, "via6522")
 		, m_ram(*this, "ram")
 		, m_rom(*this, "maincpu")
-		, m_bank_c000_r(*this, "bank_c000_r")
-		, m_bank_e000_r(*this, "bank_e000_r")
-		, m_bank_f800_r(*this, "bank_f800_r")
-		, m_bank_c000_w(*this, "bank_c000_w")
-		, m_bank_e000_w(*this, "bank_e000_w")
-		, m_bank_f800_w(*this, "bank_f800_w")
+		, m_c000_view(*this, "c000")
 		, m_config(*this, "CONFIG")
 		, m_kbd_row(*this, "ROW%u", 0U)
+		, m_ext(*this, "ext")
 		, m_tape_timer(nullptr)
 	{ }
 
@@ -95,9 +94,11 @@ public:
 	uint32_t screen_update_oric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
-	void oric(machine_config &config, bool add_ext = true);
+	void oric_common(machine_config &config);
+	void oric(machine_config &config);
 	void prav8d(machine_config &config);
 	void oric_mem(address_map &map);
+
 protected:
 	required_device<m6502_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -108,14 +109,10 @@ protected:
 	required_device<via6522_device> m_via;
 	required_shared_ptr<uint8_t> m_ram;
 	optional_memory_region m_rom;
-	required_memory_bank m_bank_c000_r;
-	optional_memory_bank m_bank_e000_r;
-	optional_memory_bank m_bank_f800_r;
-	required_memory_bank m_bank_c000_w;
-	optional_memory_bank m_bank_e000_w;
-	optional_memory_bank m_bank_f800_w;
+	memory_view m_c000_view;
 	required_ioport m_config;
 	required_ioport_array<8> m_kbd_row;
+	optional_device<oricext_connector> m_ext;
 
 	emu_timer *m_tape_timer;
 
@@ -143,7 +140,8 @@ public:
 		m_hyperbas(*this, "hyperbas"),
 		m_telmon24(*this, "telmon24"),
 		m_joy1(*this, "JOY1"),
-		m_joy2(*this, "JOY2")
+		m_joy2(*this, "JOY2"),
+		m_floppies(*this, "fdc:%d", 0U)
 	{ }
 
 	void via2_a_w(uint8_t data);
@@ -183,14 +181,13 @@ protected:
 	required_ioport m_joy1;
 	required_ioport m_joy2;
 
-	floppy_image_device *m_floppies[4];
+	required_device_array<floppy_connector, 4> m_floppies;
+
 	uint8_t m_port_314;
 	uint8_t m_via2_a, m_via2_b;
 	bool m_via2_ca2, m_via2_cb2, m_via2_irq;
 	bool m_acia_irq;
 	bool m_fdc_irq, m_fdc_drq, m_fdc_hld;
-
-	uint8_t m_junk_read[0x4000], m_junk_write[0x4000];
 
 	virtual void update_irq() override;
 	void remap();
@@ -202,11 +199,13 @@ protected:
 /* Ram is 64K, with 16K hidden by the rom.  The 300-3ff is also hidden by the i/o */
 void oric_state::oric_mem(address_map &map)
 {
-	map(0x0000, 0xffff).ram().share("ram");
+	map(0x0000, 0xffff).ram().share(m_ram);
 	map(0x0300, 0x030f).m(m_via, FUNC(via6522_device::map)).mirror(0xf0);
-	map(0xc000, 0xdfff).bankr("bank_c000_r").bankw("bank_c000_w");
-	map(0xe000, 0xf7ff).bankr("bank_e000_r").bankw("bank_e000_w");
-	map(0xf800, 0xffff).bankr("bank_f800_r").bankw("bank_f800_w");
+	map(0xc000, 0xffff).view(m_c000_view);
+	m_c000_view[0](0xc000, 0xffff).rom().region(m_rom, 0);
+	m_c000_view[0](0xc000, 0xffff).unmapw();
+	m_c000_view[1]; // Ram range, ensure it exists
+	m_c000_view[2]; // FDC rom range, ensure it exists
 }
 
 /*
@@ -221,7 +220,24 @@ void telestrat_state::telestrat_mem(address_map &map)
 	map(0x0318, 0x0318).r(FUNC(telestrat_state::port_318_r));
 	map(0x031c, 0x031f).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x0320, 0x032f).m(m_via2, FUNC(via6522_device::map));
-	map(0xc000, 0xffff).bankr("bank_c000_r").bankw("bank_c000_w");
+
+	// Theoretically, these are cartridges.  There's no real point to
+	// making them configurable, when only 4 existed and there are 7
+	// slots.
+
+	map(0xc000, 0xffff).view(m_c000_view);
+	m_c000_view[0]; // Ram range, ensure it exists
+	m_c000_view[1](0xc000, 0xffff).unmaprw(); // Nothing in that slot
+	m_c000_view[2](0xc000, 0xffff).unmaprw(); // Nothing in that slot
+	m_c000_view[3](0xc000, 0xffff).unmaprw(); // Nothing in that slot
+	m_c000_view[4](0xc000, 0xffff).rom().region(m_telmatic, 0);
+	m_c000_view[4](0xc000, 0xffff).unmapw();
+	m_c000_view[5](0xc000, 0xffff).rom().region(m_teleass, 0);
+	m_c000_view[5](0xc000, 0xffff).unmapw();
+	m_c000_view[6](0xc000, 0xffff).rom().region(m_hyperbas, 0);
+	m_c000_view[6](0xc000, 0xffff).unmapw();
+	m_c000_view[7](0xc000, 0xffff).rom().region(m_telmon24, 0);
+	m_c000_view[7](0xc000, 0xffff).unmapw();
 }
 
 uint32_t oric_state::screen_update_oric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -277,12 +293,12 @@ uint32_t oric_state::screen_update_oric(screen_device &screen, bitmap_rgb32 &bit
 			uint32_t c_fgcol = fgcol;
 			uint32_t c_bgcol = bgcol;
 
-			//    inverse video
+			// inverse video
 			if(ch & 0x80) {
 				c_bgcol = c_bgcol ^ 0xffffff;
 				c_fgcol = c_fgcol ^ 0xffffff;
 			}
-			//    blink
+			// blink
 			if((lattr & LATTR_BLINK) && blink_state)
 				c_fgcol = c_bgcol;
 
@@ -402,7 +418,7 @@ void oric_state::machine_start_common()
 	m_via_irq = false;
 	m_ext_irq = false;
 
-	if (!m_tape_timer)
+	if(!m_tape_timer)
 		m_tape_timer = timer_alloc(FUNC(oric_state::update_tape), this);
 
 	save_item(NAME(m_blink_counter));
@@ -419,30 +435,25 @@ void oric_state::machine_start_common()
 void oric_state::machine_start()
 {
 	machine_start_common();
-	m_bank_c000_r->set_base(m_rom->base());
-	m_bank_e000_r->set_base(m_rom->base() + 0x2000);
-	m_bank_f800_r->set_base(m_rom->base() + 0x3800);
+
+	m_c000_view.select(0);
+	m_ext->set_view(m_c000_view);
+	m_ext->map_io(m_maincpu->space(AS_PROGRAM));
+	m_ext->map_rom();
 }
 
 void oric_state::machine_reset()
 {
+	m_ram[0xe000] = 0x42; // Microdisc needs a non-fully-zero high ram
+
 	m_tape_timer->adjust(attotime::from_hz(4800), 0, attotime::from_hz(4800));
 }
 
 void telestrat_state::machine_start()
 {
 	machine_start_common();
-	for(u8 i=0; i<4; i++)
-	{
-		char name[32];
-		sprintf(name, "fdc:%d", i);
-		m_floppies[i] = subdevice<floppy_connector>(name)->get_device();
-	}
 	m_fdc_irq = m_fdc_drq = m_fdc_hld = false;
 	m_acia_irq = false;
-
-	memset(m_junk_read, 0x00, sizeof(m_junk_read));
-	memset(m_junk_write, 0x00, sizeof(m_junk_write));
 
 	save_item(NAME(m_port_314));
 	save_item(NAME(m_via2_a));
@@ -461,7 +472,7 @@ void telestrat_state::machine_reset()
 	m_tape_timer->adjust(attotime::from_hz(4800), 0, attotime::from_hz(4800));
 	m_port_314 = 0x00;
 	m_via2_a = 0xff;
-	remap();
+	m_c000_view.select(7);
 }
 
 void telestrat_state::update_irq()
@@ -477,7 +488,7 @@ void telestrat_state::update_irq()
 void telestrat_state::via2_a_w(uint8_t data)
 {
 	m_via2_a = data;
-	remap();
+	m_c000_view.select(data & 7);
 }
 
 void telestrat_state::via2_b_w(uint8_t data)
@@ -511,7 +522,7 @@ WRITE_LINE_MEMBER(telestrat_state::via2_irq_w)
 void telestrat_state::port_314_w(u8 data)
 {
 	m_port_314 = data;
-	floppy_image_device *floppy = m_floppies[(m_port_314 >> 5) & 3];
+	floppy_image_device *floppy = m_floppies[(m_port_314 >> 5) & 3]->get_device();
 	m_fdc->set_floppy(floppy);
 	m_fdc->dden_w(m_port_314 & P_DDEN);
 	if(floppy) {
@@ -553,43 +564,6 @@ WRITE_LINE_MEMBER(telestrat_state::fdc_hld_w)
 {
 	m_fdc_hld = state;
 }
-
-void telestrat_state::remap()
-{
-	// Theorically, these are cartridges.  There's no real point to
-	// making them configurable, when only 4 existed and there are 7
-	// slots.
-
-	switch(m_via2_a & 7) {
-	case 0:
-		m_bank_c000_r->set_base(m_ram+0xc000);
-		m_bank_c000_w->set_base(m_ram+0xc000);
-		break;
-	case 1:
-	case 2:
-	case 3:
-		m_bank_c000_r->set_base(m_junk_read);
-		m_bank_c000_w->set_base(m_junk_write);
-		break;
-	case 4:
-		m_bank_c000_r->set_base(m_telmatic->base());
-		m_bank_c000_w->set_base(m_junk_write);
-		break;
-	case 5:
-		m_bank_c000_r->set_base(m_teleass->base());
-		m_bank_c000_w->set_base(m_junk_write);
-		break;
-	case 6:
-		m_bank_c000_r->set_base(m_hyperbas->base());
-		m_bank_c000_w->set_base(m_junk_write);
-		break;
-	case 7:
-		m_bank_c000_r->set_base(m_telmon24->base());
-		m_bank_c000_w->set_base(m_junk_write);
-		break;
-	}
-}
-
 
 
 static INPUT_PORTS_START(oric)
@@ -808,7 +782,7 @@ static INPUT_PORTS_START(telstrat)
 INPUT_PORTS_END
 
 
-void oric_state::oric(machine_config &config, bool add_ext) // this variable not used
+void oric_state::oric_common(machine_config &config)
 {
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 12_MHz_XTAL / 12);
@@ -845,6 +819,8 @@ void oric_state::oric(machine_config &config, bool add_ext) // this variable not
 	m_cassette->set_formats(oric_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("oric1_cass");
+	SOFTWARE_LIST(config, "oric1_cass").set_original("oric1_cass");
 
 	/* via */
 	MOS6522(config, m_via, 12_MHz_XTAL / 12);
@@ -853,14 +829,21 @@ void oric_state::oric(machine_config &config, bool add_ext) // this variable not
 	m_via->ca2_handler().set(FUNC(oric_state::via_ca2_w));
 	m_via->cb2_handler().set(FUNC(oric_state::via_cb2_w));
 	m_via->irq_handler().set(FUNC(oric_state::via_irq_w));
+}
+
+void oric_state::oric(machine_config &config)
+{
+	oric_common(config);
 
 	/* extension port */
-	ORICEXT_CONNECTOR(config, "ext", oricext_intf, nullptr, "maincpu").irq_callback().set(FUNC(oric_state::ext_irq_w));
+	ORICEXT_CONNECTOR(config, m_ext, oricext_intf, nullptr);
+	m_ext->irq_callback().set(FUNC(oric_state::ext_irq_w));
+	m_ext->reset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET);
 }
 
 void oric_state::prav8d(machine_config &config)
 {
-	oric(config, true);
+	oric(config);
 }
 
 void telestrat_state::floppy_formats(format_registration &fr)
@@ -876,7 +859,7 @@ static void telestrat_floppies(device_slot_interface &device)
 
 void telestrat_state::telstrat(machine_config &config)
 {
-	oric(config, false);
+	oric(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &telestrat_state::telestrat_mem);
 
 	/* acia */
@@ -997,6 +980,8 @@ ROM_START(prav8dd)
 //  ROM_LOAD_OPTIONAL( "8ddoslo.rom", 0x014000, 0x0100, CRC(0c82f636) SHA1(b29d151a0dfa3c7cd50439b51d0a8f95559bc2b6) )
 //  ROM_LOAD_OPTIONAL( "8ddoshi.rom", 0x014100, 0x0200, CRC(66309641) SHA1(9c2e82b3c4d385ade6215fcb89f8b92e6fd2bf4b) )
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS            INIT        COMPANY      FULLNAME                 FLAGS

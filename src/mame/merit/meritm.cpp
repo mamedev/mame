@@ -190,6 +190,8 @@ Not all regional versions are available for each Megatouch series
 #include "speaker.h"
 
 
+namespace {
+
 class meritm_state : public driver_device
 {
 public:
@@ -267,8 +269,8 @@ private:
 	void switch_banks(  );
 	int touch_coord_transform(int *touch_x, int *touch_y);
 	uint8_t binary_to_BCD(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(vdp0_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(vdp1_interrupt);
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(vdp0_interrupt);
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(vdp1_interrupt);
 	void crt250_crt258_io_map(address_map &map);
 	void crt250_io_map(address_map &map);
 	void crt250_map(address_map &map);
@@ -2433,6 +2435,9 @@ void meritm_state::init_megat3te()
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfff8, 0xffff, read8sm_delegate(*this, FUNC(meritm_state::ds1644_r)), write8sm_delegate(*this, FUNC(meritm_state::ds1644_w)));
 }
+
+} // anonymous namespace
+
 
 /* CRT-250 */
 GAME( 1987, americna,  0,        crt250, americna,  meritm_state, empty_init, ROT0, "Merit", "Americana (9131-01)", MACHINE_IMPERFECT_GRAPHICS )

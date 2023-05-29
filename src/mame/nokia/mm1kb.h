@@ -5,8 +5,8 @@
     Nokia MikroMikko 1 keyboard emulation
 
 *********************************************************************/
-#ifndef MAME_MACHINE_MM1KB_H
-#define MAME_MACHINE_MM1KB_H
+#ifndef MAME_NOKIA_MM1KB_H
+#define MAME_NOKIA_MM1KB_H
 
 #pragma once
 
@@ -78,4 +78,4 @@ DECLARE_DEVICE_TYPE(MM1_KEYBOARD, mm1_keyboard_device)
 
 
 
-#endif // MAME_MACHINE_MM1KB_H
+#endif // MAME_NOKIA_MM1KB_H

@@ -23,6 +23,8 @@ game details unknown
 #include "piggypas.lh"
 
 
+namespace {
+
 class piggypas_state : public driver_device
 {
 public:
@@ -43,7 +45,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void ctrl_w(uint8_t data);
-	void mcs51_tx_callback(uint8_t data);
+	void port3_w(uint8_t data);
 	void led_strobe_w(uint8_t data);
 	void lcd_latch_w(uint8_t data);
 	void lcd_control_w(uint8_t data);
@@ -69,6 +71,8 @@ void piggypas_state::output_digits()
 	m_digits[1] = bitswap<8>((m_digit_latch >> 8) & 0xff, 7,6,4,3,2,1,0,5) & 0x7f;
 	m_digits[2] = bitswap<8>((m_digit_latch >> 16) & 0xff, 7,6,4,3,2,1,0,5) & 0x7f;
 	m_digits[3] = bitswap<8>((m_digit_latch >> 24) & 0xff, 7,6,4,3,2,1,0,5) & 0x7f;
+
+	m_digit_latch = 0;
 }
 
 void piggypas_state::ctrl_w(uint8_t data)
@@ -81,9 +85,15 @@ void piggypas_state::ctrl_w(uint8_t data)
 	m_ctrl = data;
 }
 
-void piggypas_state::mcs51_tx_callback(uint8_t data)
+void piggypas_state::port3_w(uint8_t data)
 {
-	m_digit_latch = (m_digit_latch >> 8) | (u32(data) << 24);
+	if (!BIT(data, 1))
+	{
+		m_digit_latch >>= 1;
+
+		if (BIT(data, 0))
+			m_digit_latch |= (1U << 31);
+	}
 }
 
 void piggypas_state::led_strobe_w(uint8_t data)
@@ -195,7 +205,7 @@ void piggypas_state::piggypas(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &piggypas_state::piggypas_io);
 	m_maincpu->port_out_cb<1>().set(FUNC(piggypas_state::led_strobe_w));
 	m_maincpu->port_in_cb<3>().set_ioport("IN2");
-	m_maincpu->serial_tx_cb().set(FUNC(piggypas_state::mcs51_tx_callback));
+	m_maincpu->port_out_cb<3>().set(FUNC(piggypas_state::port3_w));
 //  m_maincpu->set_vblank_int("screen", FUNC(piggypas_state::irq0_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // DS1220AD
@@ -233,7 +243,6 @@ void piggypas_state::fidlstix(machine_config &config)
 	piggypas(config);
 
 	m_maincpu->set_addrmap(AS_IO, &piggypas_state::fidlstix_io);
-	m_maincpu->serial_tx_cb().set_nop();
 	m_maincpu->port_in_cb<1>().set(m_hd44780, FUNC(hd44780_device::db_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(piggypas_state::lcd_latch_w));
 	m_maincpu->port_out_cb<3>().set(FUNC(piggypas_state::lcd_control_w));
@@ -367,6 +376,7 @@ ROM_START( 3lilpigs )
 	ROM_LOAD( "3-pigs.u14", 0x00000, 0x40000, CRC(62eb76e2) SHA1(c4cad241dedf2c290f9bf80038415fe39b3ce17d) )
 ROM_END
 
+} // anonymous namespace
 
 
 // COPYRIGHT (c) 1990, 1991, 1992, DOYLE & ASSOC., INC.   VERSION 04.40

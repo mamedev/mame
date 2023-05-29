@@ -8,8 +8,8 @@
 
 ****************************************************************************/
 
-#ifndef MAME_MACHINE_PCE220_SER_H
-#define MAME_MACHINE_PCE220_SER_H
+#ifndef MAME_SHARP_PCE220_SER_H
+#define MAME_SHARP_PCE220_SER_H
 
 #pragma once
 
@@ -28,10 +28,10 @@ public:
 	pce220_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~pce220_serial_device();
 
-	// image-level overrides
-	virtual image_init_result call_load() override;
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
-	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
+	virtual std::pair<std::error_condition, std::string> call_create(int format_type, util::option_resolution *format_options) override;
 
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return true; }
@@ -56,7 +56,7 @@ protected:
 	int calc_parity(uint8_t data);
 	int get_next_state();
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -65,27 +65,22 @@ protected:
 
 private:
 	// internal device state
-	emu_timer*  m_send_timer = nullptr;       // timer for send data
-	emu_timer*  m_receive_timer = nullptr;    // timer for receive data
-	uint8_t     m_state = 0;            // transfer status
-	uint32_t    m_bytes_count = 0;      // number of bytes transferred
-	uint8_t     m_current_byte = 0;     // byte in transfer
-	uint8_t     m_enabled = 0;          // enable/disable
+	emu_timer*  m_send_timer;           // timer for send data
+	emu_timer*  m_receive_timer;        // timer for receive data
+	uint8_t     m_state;                // transfer status
+	uint32_t    m_bytes_count;          // number of bytes transferred
+	uint8_t     m_current_byte;         // byte in transfer
+	uint8_t     m_enabled;              // enable/disable
 
-	uint8_t     m_busy = 0;             // CTS
-	uint8_t     m_dout = 0;             // DTR
-	uint8_t     m_xout = 0;             // TXD
-	uint8_t     m_xin = 0;              // RXD
-	uint8_t     m_din = 0;              // DSR
-	uint8_t     m_ack = 0;              // RTS
+	uint8_t     m_busy;                 // CTS
+	uint8_t     m_dout;                 // DTR
+	uint8_t     m_xout;                 // TXD
+	uint8_t     m_xin;                  // RXD
+	uint8_t     m_din;                  // DSR
+	uint8_t     m_ack;                  // RTS
 };
 
 // device type definition
 DECLARE_DEVICE_TYPE(PCE220SERIAL, pce220_serial_device)
 
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-#define PCE220SERIAL_TAG        "serial"
-
-#endif // MAME_MACHINE_PCE220_SER_H
+#endif // MAME_SHARP_PCE220_SER_H

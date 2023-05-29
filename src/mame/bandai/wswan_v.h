@@ -11,8 +11,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_VIDEO_WSWAN_H
-#define MAME_VIDEO_WSWAN_H
+#ifndef MAME_BANDAI_WSWAN_V_H
+#define MAME_BANDAI_WSWAN_V_H
 
 #pragma once
 
@@ -134,4 +134,4 @@ protected:
 DECLARE_DEVICE_TYPE(WSWAN_VIDEO, wswan_video_device)
 
 
-#endif // MAME_VIDEO_WSWAN_H
+#endif // MAME_BANDAI_WSWAN_V_H

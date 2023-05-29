@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Kevin Horton
-/******************************************************************************
+/*******************************************************************************
 
 Parker Brothers Starting Lineup Talking Baseball
 
@@ -26,7 +26,7 @@ TODO:
   until it responds. The keypad reading routine is at $1A5D, it gets skipped for several
   seconds at a time. Once in-game, everything is fine though. BTANB or different cause?
 
-*******************************************************************************
+********************************************************************************
 
 Field positions (used when substituting):
 
@@ -101,12 +101,14 @@ Substitutes:
 #28: Fernando Valenzuela, P
 #27: Todd Worrell, P
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/mcs51/mcs51.h"
-#include "video/pwm.h"
 #include "sound/dac.h"
+#include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -161,9 +163,9 @@ void talkingbb_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void talkingbb_state::bank_w(u8 data)
 {
@@ -219,9 +221,9 @@ u8 talkingbb_state::switch_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void talkingbb_state::main_map(address_map &map)
 {
@@ -237,9 +239,9 @@ void talkingbb_state::main_io(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 /* keypad layout:        **** P1 = Batter ****  |  **** P2 = Pitcher ****
                                                 |
@@ -305,13 +307,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void talkingbb_state::talkingbb(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	I80C31(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &talkingbb_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &talkingbb_state::main_io);
@@ -319,11 +321,11 @@ void talkingbb_state::talkingbb(machine_config &config)
 	m_maincpu->port_out_cb<3>().set(FUNC(talkingbb_state::bank_w));
 	m_maincpu->port_in_cb<3>().set(FUNC(talkingbb_state::switch_r));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 3);
 	config.set_default_layout(layout_talkingbb);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
@@ -347,5 +349,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME        PARENT CMP MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1988, talkingbb,  0,      0, talkingbb, talkingbb, talkingbb_state, empty_init, "Parker Brothers", "Starting Lineup Talking Baseball", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1988, talkingbb,  0,      0,      talkingbb, talkingbb, talkingbb_state, empty_init, "Parker Brothers", "Starting Lineup Talking Baseball", MACHINE_SUPPORTS_SAVE )

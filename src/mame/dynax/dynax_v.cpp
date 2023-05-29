@@ -46,7 +46,7 @@ void dynax_state::sprtmtch_palette(palette_device &palette) const
 }
 
 // x xB0123 xG0123 xR0123
-void dynax_state::janyuki_palette(palette_device &palette) const
+void jantouki_state::janyuki_palette(palette_device &palette) const
 {
 	uint8_t const *const color_prom = memregion("proms")->base();
 	if (!color_prom)
@@ -98,7 +98,7 @@ void dynax_state::dynax_blit_dest_w(uint8_t data)
 	LOG("D=%02X ", data);
 }
 
-void dynax_state::dynax_blit2_dest_w(uint8_t data)
+void jantouki_state::dynax_blit2_dest_w(uint8_t data)
 {
 	m_blit2_dest = data;
 	LOG("D'=%02X ", data);
@@ -113,7 +113,7 @@ void dynax_state::tenkai_blit_dest_w(uint8_t data)
 mjelctrn:   7 d e -> 1 - 4 8
 mjembase:   b d e -> - 2 4 8
 */
-void dynax_state::mjembase_blit_dest_w(uint8_t data)
+void dynax_adpcm_state::mjembase_blit_dest_w(uint8_t data)
 {
 	dynax_blit_dest_w(bitswap<8>(data, 7, 6, 5, 4, 2, 3, 1, 0));
 }
@@ -145,7 +145,7 @@ void dynax_state::tenkai_blit_palette01_w(uint8_t data)
 
 
 /* Layers 4&5 Palettes (Low Bits) */
-void dynax_state::dynax_blit_palette45_w(uint8_t data)
+void jantouki_state::dynax_blit_palette45_w(uint8_t data)
 {
 	if (m_layer_layout == LAYOUT_HNORIDUR)
 		m_blit2_palettes = (m_blit2_palettes & 0x00ff) | ((data & 0x0f) << 12) | ((data & 0xf0) << 4);
@@ -171,14 +171,14 @@ void dynax_state::tenkai_blit_palette23_w(uint8_t data)
 	LOG("P23=%02X ", data);
 }
 
-void dynax_state::mjembase_blit_palette23_w(uint8_t data)
+void dynax_adpcm_state::mjembase_blit_palette23_w(uint8_t data)
 {
 	dynax_blit_palette23_w(bitswap<8>(data, 3, 2, 1, 0, 7, 6, 5, 4));
 }
 
 
 /* Layer 6&7 Palettes (Low Bits) */
-void dynax_state::dynax_blit_palette67_w(uint8_t data)
+void jantouki_state::dynax_blit_palette67_w(uint8_t data)
 {
 	if (m_layer_layout == LAYOUT_HNORIDUR)
 		m_blit2_palettes = (m_blit2_palettes & 0xff00) | ((data & 0x0f) << 4) | ((data & 0xf0) >> 4);
@@ -195,13 +195,13 @@ WRITE_LINE_MEMBER(dynax_state::blit_palbank_w)
 	LOG("PB=%d ", state);
 }
 
-WRITE_LINE_MEMBER(dynax_state::blit2_palbank_w)
+WRITE_LINE_MEMBER(jantouki_state::blit2_palbank_w)
 {
 	m_blit2_palbank = state;
 	LOG("PB'=%d ", state);
 }
 
-void dynax_state::hnoridur_palbank_w(uint8_t data)
+void dynax_adpcm_state::hnoridur_palbank_w(uint8_t data)
 {
 	m_palbank = data & 0x0f;
 	m_blit_palbank = data; // ???
@@ -245,7 +245,7 @@ void dynax_state::dynax_layer_enable_w(uint8_t data)
 	LOG("E=%02X ", data);
 }
 
-void dynax_state::jantouki_layer_enable_w(offs_t offset, uint8_t data)
+void jantouki_state::jantouki_layer_enable_w(offs_t offset, uint8_t data)
 {
 	int mask = 1 << (7 - offset);
 	m_layer_enable = (m_layer_enable & ~mask) | ((data & 1) ? mask : 0);
@@ -283,7 +283,7 @@ void dynax_state::dynax_blit_romregion_w(uint8_t data)
 	LOG("GFX%X ", data + 1);
 }
 
-void dynax_state::dynax_blit2_romregion_w(uint8_t data)
+void jantouki_state::dynax_blit2_romregion_w(uint8_t data)
 {
 	if (data + 1 < 8)
 		m_blitter2->set_rom_bank(data);
@@ -291,7 +291,7 @@ void dynax_state::dynax_blit2_romregion_w(uint8_t data)
 }
 
 
-void dynax_state::hanamai_blit_pixel_w(offs_t offset, uint8_t data)
+void dynax_adpcm_state::hanamai_blit_pixel_w(offs_t offset, uint8_t data)
 {
 	if (m_flipscreen)
 		offset ^= 0xffff;
@@ -308,7 +308,7 @@ void dynax_state::hanamai_blit_pixel_w(offs_t offset, uint8_t data)
 	}
 }
 
-void dynax_state::cdracula_blit_pixel_w(offs_t offset, uint8_t data)
+void cdracula_state::cdracula_blit_pixel_w(offs_t offset, uint8_t data)
 {
 	if (m_flipscreen)
 		offset ^= 0xffff;
@@ -355,7 +355,7 @@ void dynax_state::drgpunch_blit_pixel_w(offs_t offset, uint8_t data)
 }
 
 // two blitters/screens
-void dynax_state::jantouki_blit_pixel_w(offs_t offset, uint8_t data)
+void jantouki_state::jantouki_blit_pixel_w(offs_t offset, uint8_t data)
 {
 	if (m_flipscreen)
 		offset ^= 0xffff;
@@ -369,7 +369,7 @@ void dynax_state::jantouki_blit_pixel_w(offs_t offset, uint8_t data)
 	}
 }
 
-void dynax_state::jantouki_blit2_pixel_w(offs_t offset, uint8_t data)
+void jantouki_state::jantouki_blit2_pixel_w(offs_t offset, uint8_t data)
 {
 	if (m_flipscreen)
 		offset ^= 0xffff;
@@ -405,12 +405,12 @@ void dynax_state::dynax_blit_scrolly_w(uint8_t data)
 	m_blit_scroll_y = data;
 }
 
-void dynax_state::dynax_blit2_scrollx_w(uint8_t data)
+void jantouki_state::dynax_blit2_scrollx_w(uint8_t data)
 {
 	m_blit2_scroll_x = data;
 }
 
-void dynax_state::dynax_blit2_scrolly_w(uint8_t data)
+void jantouki_state::dynax_blit2_scrolly_w(uint8_t data)
 {
 	m_blit2_scroll_y = data;
 }
@@ -445,11 +445,8 @@ static const int priority_mjembase[8] = { 0x0231, 0x2031, 0x0321, 0x3021, 0x2301
 void dynax_state::dynax_common_reset()
 {
 	m_blit_dest = -1;
-	m_blit2_dest = -1;
 	m_blit_palbank = 0;
-	m_blit2_palbank = 0;
 	m_blit_palettes = 0;
-	m_blit2_palettes = 0;
 	m_layer_enable = -1;
 	m_blit_backpen = 0;
 
@@ -459,19 +456,14 @@ void dynax_state::dynax_common_reset()
 	m_hnoridur_layer_half2 = 0;
 
 	m_blit_scroll_x = 0;
-	m_blit2_scroll_x = 0;
 	m_blit_scroll_y = 0;
-	m_blit2_scroll_y = 0;
 	m_hanamai_layer_half = 0;
 	m_flipscreen = 0;
 	m_hanamai_priority = 0;
 
 	save_item(NAME(m_blit_dest));
-	save_item(NAME(m_blit2_dest));
 	save_item(NAME(m_blit_palbank));
-	save_item(NAME(m_blit2_palbank));
 	save_item(NAME(m_blit_palettes));
-	save_item(NAME(m_blit2_palettes));
 	save_item(NAME(m_layer_enable));
 	save_item(NAME(m_blit_backpen));
 	save_item(NAME(m_extra_scroll_x));
@@ -479,15 +471,13 @@ void dynax_state::dynax_common_reset()
 	save_item(NAME(m_hnoridur_layer_half2));
 
 	save_item(NAME(m_blit_scroll_x));
-	save_item(NAME(m_blit2_scroll_x));
 	save_item(NAME(m_blit_scroll_y));
-	save_item(NAME(m_blit2_scroll_y));
 	save_item(NAME(m_hanamai_layer_half));
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_hanamai_priority));
 }
 
-VIDEO_START_MEMBER(dynax_state,hanamai)
+VIDEO_START_MEMBER(dynax_state, hanamai)
 {
 	m_pixmap[0][0] = std::make_unique<uint8_t[]>(256 * 256);
 	m_pixmap[0][1] = std::make_unique<uint8_t[]>(256 * 256);
@@ -511,7 +501,7 @@ VIDEO_START_MEMBER(dynax_state,hanamai)
 	save_pointer(NAME(m_pixmap[3][1]), 256 * 256);
 }
 
-VIDEO_START_MEMBER(dynax_state,hnoridur)
+VIDEO_START_MEMBER(dynax_state, hnoridur)
 {
 	m_pixmap[0][0] = std::make_unique<uint8_t[]>(256 * 256);
 	m_pixmap[0][1] = std::make_unique<uint8_t[]>(256 * 256);
@@ -537,13 +527,13 @@ VIDEO_START_MEMBER(dynax_state,hnoridur)
 	save_pointer(NAME(m_pixmap[3][1]), 256 * 256);
 }
 
-VIDEO_START_MEMBER(dynax_state,mcnpshnt)
+VIDEO_START_MEMBER(dynax_adpcm_state, mcnpshnt)
 {
 	VIDEO_START_CALL_MEMBER(hnoridur);
 	m_priority_table = priority_mcnpshnt;
 }
 
-VIDEO_START_MEMBER(dynax_state,sprtmtch)
+VIDEO_START_MEMBER(dynax_state, sprtmtch)
 {
 	m_pixmap[0][0] = std::make_unique<uint8_t[]>(256 * 256);
 	m_pixmap[0][1] = std::make_unique<uint8_t[]>(256 * 256);
@@ -563,7 +553,7 @@ VIDEO_START_MEMBER(dynax_state,sprtmtch)
 	save_pointer(NAME(m_pixmap[2][1]), 256 * 256);
 }
 
-VIDEO_START_MEMBER(dynax_state,jantouki)
+VIDEO_START_MEMBER(jantouki_state, jantouki)
 {
 	m_pixmap[0][0] = std::make_unique<uint8_t[]>(256 * 256);
 	m_pixmap[0][1] = std::make_unique<uint8_t[]>(256 * 256);
@@ -585,6 +575,20 @@ VIDEO_START_MEMBER(dynax_state,jantouki)
 	dynax_common_reset();
 	m_layer_layout = LAYOUT_JANTOUKI;
 
+	m_blit2_dest = -1;
+	m_blit2_palbank = 0;
+	m_blit2_palettes = 0;
+
+	m_blit2_scroll_x = 0;
+	m_blit2_scroll_y = 0;
+
+	save_item(NAME(m_blit2_dest));
+	save_item(NAME(m_blit2_palbank));
+	save_item(NAME(m_blit2_palettes));
+
+	save_item(NAME(m_blit2_scroll_x));
+	save_item(NAME(m_blit2_scroll_y));
+
 	save_pointer(NAME(m_pixmap[0][0]), 256 * 256);
 	save_pointer(NAME(m_pixmap[0][1]), 256 * 256);
 	save_pointer(NAME(m_pixmap[1][0]), 256 * 256);
@@ -603,7 +607,7 @@ VIDEO_START_MEMBER(dynax_state,jantouki)
 	save_pointer(NAME(m_pixmap[7][1]), 256 * 256);
 }
 
-VIDEO_START_MEMBER(dynax_state,mjdialq2)
+VIDEO_START_MEMBER(dynax_state, mjdialq2)
 {
 	m_pixmap[0][0] = std::make_unique<uint8_t[]>(256 * 256);
 	m_pixmap[1][0] = std::make_unique<uint8_t[]>(256 * 256);
@@ -615,21 +619,21 @@ VIDEO_START_MEMBER(dynax_state,mjdialq2)
 	save_pointer(NAME(m_pixmap[1][0]), 256 * 256);
 }
 
-VIDEO_START_MEMBER(dynax_state,mjelctrn)
+VIDEO_START_MEMBER(dynax_state, mjelctrn)
 {
 	VIDEO_START_CALL_MEMBER(hnoridur);
 
 	m_priority_table = priority_mjelctrn;
 }
 
-VIDEO_START_MEMBER(dynax_state,mjembase)
+VIDEO_START_MEMBER(dynax_adpcm_state, mjembase)
 {
 	VIDEO_START_CALL_MEMBER(hnoridur);
 
 	m_priority_table = priority_mjembase;
 }
 
-VIDEO_START_MEMBER(dynax_state,neruton)
+VIDEO_START_MEMBER(dynax_adpcm_state, neruton)
 {
 	VIDEO_START_CALL_MEMBER(hnoridur);
 
@@ -706,7 +710,7 @@ void dynax_state::hanamai_copylayer(bitmap_ind16 &bitmap, const rectangle &clipr
 }
 
 
-void dynax_state::jantouki_copylayer( bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int y )
+void jantouki_state::jantouki_copylayer(bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int y)
 {
 	int color, scrollx, scrolly, palettes, palbank;
 
@@ -828,7 +832,7 @@ void dynax_state::mjdialq2_copylayer( bitmap_ind16 &bitmap, const rectangle &cli
 	}
 }
 
-void dynax_state::hanamai_priority_w(uint8_t data)
+void dynax_adpcm_state::hanamai_priority_w(uint8_t data)
 {
 	m_hanamai_priority = data;
 }
@@ -843,7 +847,7 @@ mjembase:   priority: 00 08 10 18 20 28; enable: 1,2,4
 Convert to:
 mjelctrn:   priority: 00 20 10 40 30 50; enable: 1,2,8
 */
-void dynax_state::mjembase_priority_w(uint8_t data)
+void dynax_adpcm_state::mjembase_priority_w(uint8_t data)
 {
 	m_hanamai_priority = bitswap<8>(data, 6, 5, 4, 3, 2, 7, 1, 0);
 }
@@ -1016,7 +1020,7 @@ uint32_t dynax_state::screen_update_sprtmtch(screen_device &screen, bitmap_ind16
 	return 0;
 }
 
-uint32_t dynax_state::screen_update_jantouki_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t jantouki_state::screen_update_jantouki_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = m_layer_enable;
 
@@ -1034,7 +1038,7 @@ uint32_t dynax_state::screen_update_jantouki_bottom(screen_device &screen, bitma
 	return 0;
 }
 
-uint32_t dynax_state::screen_update_jantouki_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t jantouki_state::screen_update_jantouki_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = m_layer_enable;
 
@@ -1071,7 +1075,7 @@ uint32_t dynax_state::screen_update_mjdialq2(screen_device &screen, bitmap_ind16
 }
 
 
-uint32_t dynax_state::screen_update_cdracula(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cdracula_state::screen_update_cdracula(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = ~m_layer_enable;
 

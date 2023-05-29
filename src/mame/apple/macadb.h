@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
-#ifndef MAME_MACHINE_MACADB_H
-#define MAME_MACHINE_MACADB_H
+#ifndef MAME_APPLE_MACADB_H
+#define MAME_APPLE_MACADB_H
 
 #pragma once
 
@@ -20,10 +20,6 @@ public:
 	macadb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_mcu_mode(bool bMCUMode) { m_bIsMCUMode = bMCUMode; }
-	// TODO: the IIgs microcontroller programs hate how we generate SRQs, and they already
-	// do round-robin polling so no data will be missed.  This lets us turn off SRQs for that case.
-	// We should see if we can make them happier, or just work on LLE ADB devices...
-	void set_iigs_mode(bool bIIGSMode) { m_bIsIIGSMode = bIIGSMode; }
 
 	auto via_clock_callback() { return write_via_clock.bind(); }
 	auto via_data_callback() { return write_via_data.bind(); }
@@ -31,7 +27,7 @@ public:
 	auto adb_irq_callback() { return write_adb_irq.bind(); }
 
 	required_ioport m_mouse0, m_mouse1, m_mouse2;
-	required_ioport_array<6> m_keys;
+	required_ioport_array<8> m_keys;
 	devcb_write_line write_via_clock, write_via_data, write_adb_data, write_adb_irq;
 
 	DECLARE_WRITE_LINE_MEMBER(adb_data_w);
@@ -48,21 +44,22 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	bool m_bIsMCUMode, m_bIsIIGSMode;
+	bool m_bIsMCUMode;
 
 	uint64_t m_last_adb_time;
 
 	emu_timer *m_adb_timer;
 
 	/* keyboard matrix to detect transition */
-	int m_key_matrix[7];
+	u16 m_key_matrix[9];
 
 	// ADB HLE state
-	int32_t m_adb_state, m_adb_waiting_cmd, m_adb_datasize, m_adb_buffer[257];
+	int32_t m_adb_state, m_adb_waiting_cmd, m_adb_datasize;
 	int32_t m_adb_command, m_adb_send, m_adb_timer_ticks, m_adb_extclock, m_adb_direction;
 	int32_t m_adb_listenreg, m_adb_listenaddr, m_adb_last_talk, m_adb_srq_switch;
 	int32_t m_adb_stream_ptr;
 	int32_t m_adb_linestate;
+	u8 m_adb_buffer[257], m_last_kbd[2], m_last_mouse[2], m_keyboard_handler, m_mouse_handler;
 	bool  m_adb_srqflag;
 	int m_adb_linein;
 
@@ -92,4 +89,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(MACADB, macadb_device)
 
-#endif // MAME_MACHINE_MACADB_H
+#endif // MAME_APPLE_MACADB_H

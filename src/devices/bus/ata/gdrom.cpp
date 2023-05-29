@@ -8,18 +8,25 @@
 
 #include "emu.h"
 #include "gdrom.h"
+#include "coreutil.h"
+
+#include <iostream>
 
 #define LOG_WARN    (1U << 1)
 #define LOG_CMD     (1U << 2)
-#define LOG_XFER    (1U << 3)
+#define LOG_CMD_RAW (1U << 3) // bare command IDs (temp until all commands are in)
+#define LOG_XFER    (1U << 4)
+#define LOG_TOC     (1U << 5) // TOC frame offsets
 
-#define VERBOSE (LOG_WARN | LOG_CMD)
+#define VERBOSE (LOG_GENERAL | LOG_WARN | LOG_CMD | LOG_TOC)
 //#define LOG_OUTPUT_STREAM std::cout
 #include "logmacro.h"
 
 #define LOGWARN(...)      LOGMASKED(LOG_WARN, __VA_ARGS__)
 #define LOGCMD(...)       LOGMASKED(LOG_CMD, __VA_ARGS__)
+#define LOGCMDRAW(...)    LOGMASKED(LOG_CMD_RAW, __VA_ARGS__)
 #define LOGXFER(...)      LOGMASKED(LOG_XFER, __VA_ARGS__)
+#define LOGTOC(...)       LOGMASKED(LOG_TOC, __VA_ARGS__)
 
 #define GDROM_BUSY_STATE    0x00
 #define GDROM_PAUSE_STATE   0x01
@@ -32,6 +39,8 @@
 #define GDROM_RETRY_STATE   0x08
 #define GDROM_ERROR_STATE   0x09
 
+// CD status readback/subchannel Q
+#define LIVE_REQ_STAT 0
 
 /*
  Officially not documented security-related packet commands:
@@ -169,28 +178,200 @@ void gdrom_device::device_reset()
 
 void gdrom_device::ExecCommand()
 {
+	LOGCMDRAW("%02x\n", command[0]);
 	switch ( command[0] )
 	{
-		case 0x11: // REQ_MODE
+		case 0x00:
+			// TEST_UNIT
+			// TODO: verify if t10mmc use is enough
+			// loopchk returns OK in Packet cmnd (0201)
+			t10mmc::ExecCommand();
+			break;
+
+		case 0x10:
+		{
+			transferOffset = command[2];
+			u8 allocation_length = SCSILengthFromUINT8( &command[ 4 ] );
+			// any game that enables [redbook]
+			LOGCMD("REQ_STAT 10h offset %02x length %02x\n", transferOffset, allocation_length);
+
+			if (transferOffset || allocation_length != 0xa)
+				throw emu_fatalerror("GDROM: REQ_STAT with unsupported offset %02x length %02x", transferOffset, allocation_length);
+
 			m_phase = SCSI_PHASE_DATAIN;
 			m_status_code = SCSI_STATUS_CODE_GOOD;
-			LOGCMD("REQ_MODE %02x %02x %02x %02x %02x %02x\n",
-				command[0], command[1],
-				command[2], command[3],
-				command[4], command[5]
-			);
+			m_transfer_length = allocation_length;
+			break;
+		}
+
+		case 0x11:
+			LOGCMD("REQ_MODE 11h %02x %02x\n", command[2], command[4]);
+			m_phase = SCSI_PHASE_DATAIN;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
+
 //          if (SCSILengthFromUINT8( &command[ 4 ] ) < 32) return -1;
 			transferOffset = command[2];
 			m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
+			if (transferOffset & 1)
+				throw emu_fatalerror("GDROM: REQ_MODE with odd offset %02x %02x", transferOffset, m_transfer_length);
 			break;
 
 		case 0x12: // SET_MODE
+			LOGCMD("SET_MODE 12h %02x %02x\n", command[2], command[4]);
+
 			m_phase = SCSI_PHASE_DATAOUT;
 			m_status_code = SCSI_STATUS_CODE_GOOD;
 			//transferOffset = command[2];
 			m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
-			LOGCMD("SET_MODE %02x %02x\n", command[2], command[4]);
+			if (command[2])
+				throw emu_fatalerror("GDROM: SET_MODE with offset %02x %02x", transferOffset, m_transfer_length);
+
+			if (m_transfer_length > 0xa)
+			{
+				LOGWARN("SET_MODE attempt to write on read only regs %02x\n", command[4]);
+				m_transfer_length = 0xa;
+			}
 			break;
+
+		case 0x14:
+		{
+			if (!m_image->exists())
+			{
+				m_phase = SCSI_PHASE_STATUS;
+				m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
+				m_transfer_length = 0;
+				break;
+			}
+
+			// TODO: it's supposed to write a single and a double density TOC request
+			//if (command[1])
+			//  throw emu_fatalerror("Double density unsupported");
+			u16 allocation_length = SCSILengthFromUINT16( &command[ 3 ] );
+			LOGCMD("READ_TOC 14h %02x %02x %d\n",
+				command[1], command[2], allocation_length
+			);
+
+			if (allocation_length != 408)
+				throw emu_fatalerror("TOC with allocation length != 408 (%d)", allocation_length);
+
+			if (m_cdda != nullptr)
+			{
+				m_cdda->stop_audio();
+				m_sector_number = (m_sector_number & 0xf0) | GDROM_STANDBY_STATE;
+			}
+
+			m_phase = SCSI_PHASE_DATAIN;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
+			m_transfer_length = allocation_length;
+			break;
+		}
+
+		// accessed for audio CDs
+		// TODO: needed for Mil CD support
+		case 0x15:
+		{
+			m_phase = SCSI_PHASE_DATAIN;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
+			m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
+			LOGCMD("REQ_SES 15h %02x %02x\n", command[2], m_transfer_length);
+			break;
+		}
+
+		case 0x20: // CD_PLAY
+		{
+			if (!m_image->exists())
+			{
+				m_phase = SCSI_PHASE_STATUS;
+				m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
+				m_transfer_length = 0;
+				break;
+			}
+
+			const u32 start_offs = (command[2]<<16 | command[3]<<8 | command[4]);
+			const u32 end_offs = (command[8]<<16 | command[9]<<8 | command[10]);
+			//(command[8] % 75) + ((command[7] * 75) % (60*75)) + (command[6] * (75*60)) - m_lba;
+
+			const u8 play_mode = command[1] & 7;
+
+			auto trk = m_image->get_track(start_offs);
+			const u8 repeat = command[6] & 0xf;
+			LOGCMD("CD_PLAY 20h track %d FAD %d blocks %d type %02x repeat %01x\n"
+				, trk + 1
+				, start_offs
+				, end_offs - start_offs
+				, play_mode
+				, repeat
+			);
+
+			if (play_mode == 7 && m_audio_sense == SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_PAUSED)
+			{
+				m_cdda->pause_audio(0);
+				m_audio_sense = SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_IN_PROGRESS;
+				LOGCMD("\tPlayback resume\n");
+				m_sector_number = (m_sector_number & 0xf0) | GDROM_PLAY_STATE;
+			}
+			else if (m_image->get_track_type(trk) == cdrom_file::CD_TRACK_AUDIO && end_offs > start_offs)
+			{
+				// TODO: check end > start assertion
+				m_cd_status.cdda_fad = start_offs - 150;
+				m_cd_status.cdda_blocks = (end_offs - start_offs);
+
+				m_cdda->start_audio(m_cd_status.cdda_fad, m_cd_status.cdda_blocks);
+				m_audio_sense = SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_IN_PROGRESS;
+				m_cd_status.repeat_current = 0;
+				m_cd_status.repeat_count = repeat;
+				m_sector_number = (m_sector_number & 0xf0) | GDROM_PLAY_STATE;
+
+				LOGCMD("\tPlayback started\n");
+			}
+			else
+			{
+				LOGWARN("track is NOT audio!\n");
+				set_sense(SCSI_SENSE_KEY_ILLEGAL_REQUEST, SCSI_SENSE_ASC_ASCQ_ILLEGAL_MODE_FOR_THIS_TRACK);
+				// TODO: unconfirmed state
+				m_sector_number = (m_sector_number & 0xf0) | GDROM_ERROR_STATE;
+				return;
+			}
+
+			m_phase = SCSI_PHASE_STATUS;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
+			m_transfer_length = 0;
+			break;
+		}
+
+		case 0x21:
+		{
+			if (!m_image->exists())
+			{
+				m_phase = SCSI_PHASE_STATUS;
+				m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
+				m_transfer_length = 0;
+				break;
+			}
+
+			const u32 start_seek = (command[2]<<16 | command[3]<<8 | command[4]);
+			const u8 seek_mode = command[1] & 0xf;
+			LOGCMD("CD_SEEK 21h FAD %d type %02x\n", start_seek + 150, seek_mode);
+			switch(seek_mode)
+			{
+				// TODO: implement SEEK & standby
+				// 1 FAD seek
+				// 2 MSF seek
+				// 3 stop audio, go to Home FAD
+				case 4:
+					// 4 pause audio
+					LOGCMD("\tPlayback paused\n");
+					m_cdda->pause_audio(1);
+					m_audio_sense = SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_PAUSED;
+					m_sector_number = (m_sector_number & 0xf0) | GDROM_PAUSE_STATE;
+					break;
+			}
+
+			m_phase = SCSI_PHASE_STATUS;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
+			m_transfer_length = 0;
+			break;
+		}
 
 		case 0x30: // CD_READ
 			if (command[1] & 1)
@@ -204,9 +385,11 @@ void gdrom_device::ExecCommand()
 				m_blocks = command[8]<<16 | command[9]<<8 | command[10];
 
 				read_type = (command[1] >> 1) & 7;
-				data_select = (command[1]>>4) & 0xf;
+				data_select = (command[1] >> 4) & 0xf;
+				//m_status |= IDE_STATUS_DSC;
 
-				if (read_type != 2) // mode 1
+				// TODO: any other value is a non-Mode 1 attempt basically
+				if (read_type != 0 && read_type != 2)
 				{
 					throw emu_fatalerror("GDROM: Unhandled read_type %d", read_type);
 				}
@@ -216,9 +399,10 @@ void gdrom_device::ExecCommand()
 					throw emu_fatalerror("GDROM: Unhandled data_select %d", data_select);
 				}
 
-				LOGCMD("CD_READ %02x %02x\n", command[2], command[4]);
-				LOGCMD("   LBA %x for %d blocks (%d bytes, read type %d, data select %d)\n",
-					m_lba, m_blocks,
+				// LBA 45000 is start of double density GD-ROM
+				LOGCMD("CD_READ 30h %02x %02x\n", command[2], command[4]);
+				LOGCMD("   LBA %d (%x) for %d blocks (%d bytes, read type %d, data select %d)\n",
+					m_lba + 150, m_lba, m_blocks,
 					m_blocks * m_sector_bytes, read_type, data_select
 				);
 
@@ -235,6 +419,8 @@ void gdrom_device::ExecCommand()
 				if (m_cdda != nullptr)
 				{
 					m_cdda->stop_audio();
+					m_audio_sense = SCSI_SENSE_ASC_ASCQ_NO_SENSE;
+					m_sector_number = (m_sector_number & 0xf0) | GDROM_STANDBY_STATE;
 				}
 
 				m_phase = SCSI_PHASE_DATAIN;
@@ -243,54 +429,32 @@ void gdrom_device::ExecCommand()
 			}
 			break;
 
-		// READ TOC (GD-ROM ver.)
-		case 0x14:
+		case 0x40:
 		{
-			if (m_cdrom == nullptr)
-			{
-				m_phase = SCSI_PHASE_STATUS;
-				m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
-				m_transfer_length = 0;
-				break;
-			}
+			m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
+			//LOGCMD("CD_SCD 40h %02x %d\n", command[1] & 0xf, m_transfer_length);
 
-			// TODO: is this correct?
-			int start_trk = command[2];
-			int end_trk = m_cdrom->get_last_track();
-			int length;
-			int allocation_length = SCSILengthFromUINT16( &command[ 3 ] );
-
-			if( start_trk == 0 )
+			switch(command[1] & 0xf)
 			{
-				start_trk = 1;
+				case 0x00:
+					m_phase = SCSI_PHASE_DATAIN;
+					m_status_code = SCSI_STATUS_CODE_GOOD;
+					m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
+					break;
+				case 0x01:
+					m_phase = SCSI_PHASE_DATAIN;
+					m_status_code = SCSI_STATUS_CODE_GOOD;
+					m_transfer_length = 0xe;
+					break;
+				default:
+					LOGWARN("command 0x40: unhandled subchannel request\n");
+					break;
 			}
-			if( start_trk == 0xaa )
-			{
-				end_trk = start_trk;
-			}
-
-			length = 4 + ( 8 * ( ( end_trk - start_trk ) + 1 ) );
-			if( length > allocation_length )
-			{
-				length = allocation_length;
-			}
-			else if( length < 4 )
-			{
-				length = 4;
-			}
-
-			if (m_cdda != nullptr)
-			{
-				m_cdda->stop_audio();
-			}
-
-			m_phase = SCSI_PHASE_DATAIN;
-			m_status_code = SCSI_STATUS_CODE_GOOD;
-			m_transfer_length = length;
 			break;
 		}
 
-		case 0x70:  // security check, return no data, always followed by cmd 0x71, command[1] parameter can be 0x1f or 0x9f
+		// security check, return no data, always followed by cmd 0x71, command[1] parameter can be 0x1f or 0x9f
+		case 0x70:
 			m_phase = SCSI_PHASE_STATUS;
 			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = 0;
@@ -302,22 +466,16 @@ void gdrom_device::ExecCommand()
 			m_transfer_length = sizeof(GDROM_Cmd71_Reply);
 			break;
 
-		case 0x40:
-			if(command[1] & 0xf)
-			{
-				m_phase = SCSI_PHASE_DATAIN;
-				m_status_code = SCSI_STATUS_CODE_GOOD;
-				m_transfer_length = 0xe;
-			}
-			else
-			{
-				LOGWARN("command 0x40: unhandled subchannel request\n");
-			}
-			break;
+		// case 0x22: CD_SCAN
+		// case 0x31: CD_READ2
+		// case 0x13: REQ_ERROR
+		// case 0x16: CD_OPEN [Tray]
+
+		// case 0x08: ??? loopchk uses it in one of the Packet cmnd tests
+		//            (check for unsupported command?)
 
 		default:
-			t10mmc::ExecCommand();
-			break;
+			throw emu_fatalerror("GDROM: unhandled command %02x", command[0]);
 	}
 }
 
@@ -332,20 +490,159 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 
 	switch ( command[0] )
 	{
+		case 0x10: // REQ_STAT
+		{
+			data[0] = m_sector_number & 0xf; // CD status
+			data[1] = (m_sector_number & 0xf0) | (m_cd_status.repeat_current & 0xf);
+			auto fad = m_cdda->get_audio_lba();
+			auto trk = m_image->get_track(fad);
+			data[2] = m_image->get_adr_control(trk - 1);
+			data[3] = trk;
+			// TODO: index
+			data[4] = 1;
+			// FAD, in binary format
+			data[5] = (fad >> 16) & 0xff;
+			data[6] = (fad >> 8) & 0xff;
+			data[7] = fad & 0xff;
+			// Max Read Error Retry Times
+			data[8] = 0;
+			// <reserved>
+			data[9] = 0;
+			if (LIVE_REQ_STAT)
+			{
+				popmessage("REQ_STAT STATUS %02x track %d index %d adr %02x fad %06d"
+					, m_sector_number
+					, data[3]
+					, data[4]
+					, data[2]
+					, fad
+				);
+			}
+			break;
+		}
+
 		case 0x11: // REQ_MODE
-			LOGCMD("REQ_MODE dataLength %d\n", dataLength);
+			//LOGCMD("REQ_MODE dataLength %d\n", dataLength);
 			memcpy(data, &GDROM_Cmd11_Reply[transferOffset], (dataLength >= 32-transferOffset) ? 32-transferOffset : dataLength);
+			// TODO: reading this while playing a redbook likely hardwires CD speed to 75 Hz
+			//data[1] = 0x01;
 			break;
 
+		case 0x13: // REQ_ERROR
+			// cfr. Appendix I for possible error types
+			data[0] = 0xf0; // fixed?
+			data[1] = 0;
+			data[2] = 6; // Sense Key
+			data[3] = 0;
+			// 4-7 "specific command details" (?) or FAD
+			data[4] = 0;
+			data[5] = 0;
+			data[6] = 0;
+			data[7] = 0;
+			data[8] = 0x29; // ASC
+			data[9] = 0; // ASCQ
+			break;
+
+		case 0x14: // READ TOC (GD-ROM ver.)
+			/*
+			    Track numbers are problematic here: 0 = lead-in, 0xaa = lead-out.
+			    That makes sense in terms of how real-world CDs are referred to, but
+			    our internal routines for tracks use "0" as track 1.  That probably
+			    should be fixed...
+			*/
+			LOGCMD("READ_TOC format %d time %d\n",
+				command[2] & 0xf, (command[1] >> 1) & 1
+			);
+			switch (command[2] & 0x0f)
+			{
+				case 0:     // normal
+				{
+					int start_trk = 1;
+					int end_trk = m_image->get_last_track();
+					int len = 408;
+					//int in_len;
+					int dptr = 0;
+					uint32_t tstart;
+
+					// Non-standard, doesn't want in_len readback
+					//dptr = 0;
+					//data[dptr++] = (len>>8) & 0xff;
+					//data[dptr++] = (len & 0xff);
+
+					// pre-fill with 0xffs, audio CD player counts number of tracks by checking the
+					// first EOF it encounters (and don't care about the 396-407 dataset below)
+					memset(data, 0xff, len);
+					dptr = 0;
+					LOGTOC("TOC: Start track %d end track %d\n", start_trk, end_trk);
+					for (i = start_trk; i <= end_trk; i++)
+					{
+						u8 adr = m_image->get_adr_control(i - 1) | 1;
+						data[dptr++] = adr;
+
+						tstart = m_image->get_track_start(i - 1) + 150;
+						//if ((command[1]&2)>>1)
+						//  tstart = cdrom_file::lba_to_msf(tstart);
+						data[dptr++] = (tstart>>16) & 0xff;
+						data[dptr++] = (tstart>>8) & 0xff;
+						data[dptr++] = (tstart & 0xff);
+						LOGTOC("\t%d: FAD %d %02x\n", i, tstart, adr);
+					}
+
+					dptr = 396;
+					data[dptr++] = m_image->get_adr_control(0) | 1;
+					data[dptr++] = start_trk;
+					data[dptr++] = 0;
+					data[dptr++] = 0;
+					data[dptr++] = m_image->get_adr_control(end_trk) | 1;
+					data[dptr++] = end_trk;
+					data[dptr++] = 0;
+					data[dptr++] = 0;
+					const u32 tend = m_image->get_track_start(0xaa) + 150;
+					//if ((command[1]&2)>>1)
+					//  tstart = cdrom_file::lba_to_msf(tstart);
+					data[dptr++] = m_image->get_adr_control(0xaa) | 1;
+					data[dptr++] = (tend>>16) & 0xff;
+					data[dptr++] = (tend>>8) & 0xff;
+					data[dptr++] = (tend & 0xff);
+					LOGTOC("\t0xaa: FAD %d\n", tstart);
+					break;
+				}
+				default:
+					LOGWARN("Unhandled READ_TOC format %d\n", command[2]&0xf);
+					break;
+			}
+			break;
+
+		case 0x15:
+		{
+			// REQ_SES
+			data[0] = m_sector_number & 0xf; // CD status, stripped by type?
+			data[1] = 0; // <reserved>, zeroed
+			data[2] = 1; // number of sessions
+
+			const u8 session_num = command[2] & 0xff;
+			u32 fad;
+			if (session_num == 0)
+				fad = m_image->get_track_start(0xaa) + 150;
+			else
+				fad = m_image->get_track_start(0) + 150;
+			LOGTOC("SESSION %d: %06d\n", session_num, fad);
+			data[3] = (fad >> 16) & 0xff;
+			data[4] = (fad >> 8) & 0xff;
+			data[5] = fad & 0xff;
+			break;
+		}
+
 		case 0x30: // CD_READ
-			LOGCMD("CD_READ read %x dataLength,\n", dataLength);
-			if ((m_cdrom) && (m_blocks))
+			LOGXFER("CD_READ read %x dataLength,\n", dataLength);
+			if ((m_image->exists()) && (m_blocks))
 			{
 				while (dataLength > 0)
 				{
-					if (!m_cdrom->read_data(m_lba, tmp_buffer, cdrom_file::CD_TRACK_MODE1))
+					if (!m_image->read_data(m_lba, tmp_buffer, cdrom_file::CD_TRACK_MODE1))
 					{
 						LOGWARN("CD read error!\n");
+						return;
 					}
 
 					LOGXFER("True LBA: %d, buffer half: %d\n", m_lba, m_cur_subblock * m_sector_bytes);
@@ -368,82 +665,71 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 			}
 			break;
 
-		case 0x14: // READ TOC (GD-ROM ver.)
-			/*
-			    Track numbers are problematic here: 0 = lead-in, 0xaa = lead-out.
-			    That makes sense in terms of how real-world CDs are referred to, but
-			    our internal routines for tracks use "0" as track 1.  That probably
-			    should be fixed...
-			*/
-			LOGCMD("READ TOC format = %d time=%d\n",
-				command[2] & 0xf, (command[1] >> 1) & 1
-			);
+		case 0x40: // Get Subchannel status
 			switch (command[2] & 0x0f)
 			{
-				case 0:     // normal
+				case 0: // Subcode P-W
 				{
-					int start_trk;
-					int end_trk;
-					int len;
-					int in_len;
-					int dptr;
-					uint32_t tstart;
-
-					start_trk = command[2];
-					if( start_trk == 0 )
+					data[0] = 0; // Reserved
+					data[1] = m_audio_sense;
+					data[2] = 0;
+					data[3] = m_transfer_length; // header size
+					auto fad = m_cdda->get_audio_lba();
+					if (!m_image->read_subcode( fad, &data[4 + m_transfer_length]))
 					{
-						start_trk = 1;
-					}
+						// attempt to provide Q channel
+						// TODO: audio CD player definitely reads here but never updates GFXs?
+						u8 subqbuf[12]{};
+						const u32 msf_abs = cdrom_file::lba_to_msf_alt( fad );
+						const auto trk = m_image->get_track( fad );
+						const u32 msf_rel = cdrom_file::lba_to_msf_alt( fad - m_image->get_track_start( trk ) );
 
-					end_trk = m_cdrom->get_last_track();
-					len = (end_trk * 8) + 2;
+						subqbuf[0] = 0x01 | ((m_image->get_track_type(m_image->get_track(trk + 1)) == cdrom_file::CD_TRACK_AUDIO) ? 0x00 : 0x40);
+						subqbuf[1] = dec_2_bcd(trk + 1);
+						subqbuf[2] = 1;
+						subqbuf[3] = dec_2_bcd((msf_rel >> 16) & 0xff);
+						subqbuf[4] = dec_2_bcd((msf_rel >> 8) & 0xff);
+						subqbuf[5] = dec_2_bcd((msf_rel >> 0) & 0xff);
+						subqbuf[6] = 0;
+						subqbuf[7] = dec_2_bcd((msf_abs >> 16) & 0xff);
+						subqbuf[8] = dec_2_bcd((msf_abs >> 8) & 0xff);
+						subqbuf[9] = dec_2_bcd((msf_abs >> 0) & 0xff);
+						subqbuf[10] = 0xff; //machine().rand(); // CRC
+						subqbuf[11] = 0xff; //machine().rand();
 
-					// the returned TOC DATA LENGTH must be the full amount,
-					// regardless of how much we're able to pass back due to in_len
-					dptr = 0;
-					data[dptr++] = (len>>8) & 0xff;
-					data[dptr++] = (len & 0xff);
-					data[dptr++] = 1;
-					data[dptr++] = end_trk;
-
-					if( start_trk == 0xaa )
-					{
-						end_trk = 0xaa;
-					}
-
-					in_len = command[3]<<8 | command[4];
-
-					for (i = start_trk; i <= end_trk; i++)
-					{
-						int cdrom_track = i;
-						if( cdrom_track != 0xaa )
+						if (LIVE_REQ_STAT)
 						{
-							cdrom_track--;
+							popmessage("Qchan STATUS %02x TRACK %d ABS %02x:%02x:%02x REL %02x:%02x:%02x"
+								, subqbuf[0]
+								, subqbuf[1]
+								, subqbuf[7], subqbuf[8], subqbuf[9]
+								, subqbuf[3], subqbuf[4], subqbuf[5]
+							);
 						}
 
-						if( dptr >= in_len )
-						{
-							break;
-						}
-
-						data[dptr++] = 0;
-						data[dptr++] = m_cdrom->get_adr_control(cdrom_track);
-						data[dptr++] = i;
-						data[dptr++] = 0;
-
-						tstart = m_cdrom->get_track_start(cdrom_track);
-						if ((command[1]&2)>>1)
-							tstart = cdrom_file::lba_to_msf(tstart);
-						data[dptr++] = (tstart>>24) & 0xff;
-						data[dptr++] = (tstart>>16) & 0xff;
-						data[dptr++] = (tstart>>8) & 0xff;
-						data[dptr++] = (tstart & 0xff);
+						for (int i = 0; i < m_transfer_length - 4; i++)
+							data[i + 4] = BIT(subqbuf[i >> 3], 7 - (i & 7)) ? 0x40 : 0x00;
 					}
 
 					break;
 				}
-				default:
-					LOGWARN("Unhandled READ TOC format %d\n", command[2]&0xf);
+				case 1: // Subcode Q
+					// TODO: unread by audio CD player (?)
+					LOGWARN("CD_SCD: unhandled Subcode Q path\n");
+					data[0] = 0; // Reserved
+					data[1] = m_audio_sense;
+					data[2] = 0;
+					data[3] = m_transfer_length; // header size
+					data[4] = 0; // ADR
+					data[5] = 1; // Track Number
+					data[6] = 1; // index #1
+					data[7] = 0; // ?
+					data[8] = 0; // ?
+					data[9] = 0; // elapsed FAD
+					data[0xa] = 0; // <reserved>, zeroed
+					data[0xb] = 0; // FAD >> 16
+					data[0xc] = 0; // FAD >> 8
+					data[0xd] = 0x96; // FAD >> 0
 					break;
 			}
 			break;
@@ -451,25 +737,8 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 		case 0x71:
 			LOGCMD("SYS_REQ_SECU\n");
 			memcpy(data, &GDROM_Cmd71_Reply[0], sizeof(GDROM_Cmd71_Reply));
-			if (is_real_gdrom_disc)
+			if (m_image->is_gd())
 				data[10] = 0x1f; // needed by dimm board firmware
-			break;
-
-		case 0x40: // Get Subchannel status
-			data[0] = 0; // Reserved
-			data[1] = 0x15; // Audio Playback status (todo)
-			data[2] = 0;
-			data[3] = 0x0e; // header size
-			data[4] = 0; // ?
-			data[5] = 1; // Track Number
-			data[6] = 1; // gap #1
-			data[7] = 0; // ?
-			data[8] = 0; // ?
-			data[9] = 0; // ?
-			data[0xa] = 0; // ?
-			data[0xb] = 0; // FAD >> 16
-			data[0xc] = 0; // FAD >> 8
-			data[0xd] = 0x96; // FAD >> 0
 			break;
 
 		default:
@@ -488,6 +757,22 @@ void gdrom_device::WriteData( uint8_t *data, int dataLength )
 	{
 		case 0x12: // SET_MODE
 			memcpy(&GDROM_Cmd11_Reply[transferOffset], data, (dataLength >= 32-transferOffset) ? 32-transferOffset : dataLength);
+			if (data[2] != 0 && data[2] != 7)
+				throw emu_fatalerror("GDROM: Unsupported CD speed setting %02x\n", data[2]);
+			// ---- -000 Max speed (x12)
+			// ---- -xxx [x1 (75 Hz), x2, x4, x6, x8, x10, x12]
+			LOGCMD("\tCD speed: %02x\n", data[2]);
+			// Standby Time:
+			// - 0 = no standby
+			// any other value = number of seconds for pause -> standby transition
+			LOGCMD("\tStandby Time: %02x%02x\n", data[4], data[5]);
+
+			LOGCMD("\tRead Continous: %s\n",    BIT(data[6], 5) ? "enable" : "disable");
+			LOGCMD("\tECC: %s\n",               BIT(data[6], 4) ? "enable" : "disable");
+			LOGCMD("\tRead Retry: %s\n",        BIT(data[6], 3) ? "enable" : "disable");
+			LOGCMD("\tForm 2 Read Retry: %s\n", BIT(data[6], 0) ? "enable" : "disable");
+
+			LOGCMD("\tRead Retry Times %d\n", data[9]);
 			break;
 
 		default:
@@ -496,22 +781,11 @@ void gdrom_device::WriteData( uint8_t *data, int dataLength )
 	}
 }
 
-void gdrom_device::SetDevice(void *device)
-{
-	t10mmc::SetDevice(device);
-
-	// try to find if the mounted chd is from an actual gd-rom disc
-	if (m_cdrom)
-		if (m_cdrom->get_toc().flags & cdrom_file::CD_FLAG_GDROM)
-			is_real_gdrom_disc = true;
-}
-
 // device type definition
-DEFINE_DEVICE_TYPE(GDROM, gdrom_device, "gdrom", "GD-ROM")
+DEFINE_DEVICE_TYPE(ATAPI_GDROM, gdrom_device, "gdrom", "GD-ROM")
 
 gdrom_device::gdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	atapi_cdrom_device(mconfig, GDROM, tag, owner, clock),
-	is_real_gdrom_disc(false)
+	atapi_cdrom_device(mconfig, ATAPI_GDROM, tag, owner, clock)
 {
 }
 
@@ -528,31 +802,33 @@ void gdrom_device::device_start()
 
 	m_identify_buffer[0] = 0x8600; // ATAPI device, cmd set 6 compliant, DRQ within 3 ms of PACKET command
 
-	m_identify_buffer[23] = ('S' << 8) | 'E';
-	m_identify_buffer[24] = (' ' << 8) | ' ';
-	m_identify_buffer[25] = (' ' << 8) | ' ';
-	m_identify_buffer[26] = (' ' << 8) | ' ';
+	// non-standard identify returns
+	// TODO: should be centralized in command 11h
+	// loopchk: identify device Maker test (0104) PC=c04694a
+	// Was 23
+	int dptr = 8;
+	m_identify_buffer[dptr++] = 'S' | ('E' << 8);
+	m_identify_buffer[dptr++] = ' ' | (' ' << 8);
+	m_identify_buffer[dptr++] = ' ' | (' ' << 8);
+	m_identify_buffer[dptr++] = ' ' | (' ' << 8);
 
-	m_identify_buffer[27] = ('C' << 8) | 'D';
-	m_identify_buffer[28] = ('-' << 8) | 'R';
-	m_identify_buffer[29] = ('O' << 8) | 'M';
-	m_identify_buffer[30] = (' ' << 8) | 'D';
-	m_identify_buffer[31] = ('R' << 8) | 'I';
-	m_identify_buffer[32] = ('V' << 8) | 'E';
-	m_identify_buffer[33] = (' ' << 8) | ' ';
-	m_identify_buffer[34] = (' ' << 8) | ' ';
-	m_identify_buffer[35] = ('6' << 8) | '.';
-	m_identify_buffer[36] = ('4' << 8) | '2';
-	m_identify_buffer[37] = (' ' << 8) | ' ';
-	m_identify_buffer[38] = (' ' << 8) | ' ';
-	m_identify_buffer[39] = (' ' << 8) | ' ';
-	m_identify_buffer[40] = (' ' << 8) | ' ';
-	m_identify_buffer[41] = (' ' << 8) | ' ';
-	m_identify_buffer[42] = (' ' << 8) | ' ';
-	m_identify_buffer[43] = (' ' << 8) | ' ';
-	m_identify_buffer[44] = (' ' << 8) | ' ';
-	m_identify_buffer[45] = (' ' << 8) | ' ';
-	m_identify_buffer[46] = (' ' << 8) | ' ';
+	// loopchk: identify device Model test (0104) PC=c046acc
+	// Was 27
+	dptr = 16;
+	m_identify_buffer[dptr++] = 'C' | ('D' << 8);
+	m_identify_buffer[dptr++] = '-' | ('R' << 8);
+	m_identify_buffer[dptr++] = 'O' | ('M' << 8);
+	m_identify_buffer[dptr++] = ' ' | ('D' << 8);
+	m_identify_buffer[dptr++] = 'R' | ('I' << 8);
+	m_identify_buffer[dptr++] = 'V' | ('E' << 8);
+	m_identify_buffer[dptr++] = ' ' | (' ' << 8);
+	m_identify_buffer[dptr++] = ' ' | (' ' << 8);
+	// TODO: versioning is unchecked by loopchk
+	m_identify_buffer[dptr++] = '6' | ('.' << 8);
+	m_identify_buffer[dptr++] = '4' | ('2' << 8);
+	// FIXME: doc mentions a "System Date" readback
+	for (; dptr < 47; dptr ++)
+		m_identify_buffer[dptr] = ' ' | (' ' << 8);
 
 	m_identify_buffer[49] = 0x0400; // IORDY may be disabled
 
@@ -564,14 +840,57 @@ void gdrom_device::process_buffer()
 {
 	atapi_hle_device::process_buffer();
 	// HACK: find out when this should be updated
-	m_sector_number = 0x80 | GDROM_PAUSE_STATE;
+	// TODO: upper byte is CD type detection
+	// 0000 CD-DA
+	// 0001 CD-ROM
+	// 0010 CD-ROM XA / CD Extra
+	// 0011 CD-I
+	// 1000 GD-ROM
+	const u8 cd_type = m_image->is_gd() ? 0x80 : 0x00;
+	m_sector_number = cd_type | (m_image->exists() ? m_sector_number & 0xf : GDROM_NODISC_STATE);
 }
 
 void gdrom_device::signature()
 {
 	atapi_hle_device::signature();
 
+	const u8 cd_type = m_image->is_gd() ? 0x80 : 0x00;
+
 	// naomi dimm board firmware needs the upper nibble to be 8 at the beginning
-	if (is_real_gdrom_disc)
-		m_sector_number = 0x81;
+	m_sector_number = cd_type | (m_image->exists() ? m_sector_number & 0xf : GDROM_NODISC_STATE);
+}
+
+//bool gdrom_device::set_features()
+//{
+	// TODO: DSC, likely tested by Check-GD programs
+//  m_status |= IDE_STATUS_DSC;
+//  return atapi_cdrom_device::set_features();
+//}
+
+WRITE_LINE_MEMBER(gdrom_device::cdda_end_mark_cb)
+{
+	if (state != ASSERT_LINE)
+		return;
+
+	m_cd_status.repeat_current ++;
+	m_cd_status.repeat_current &= 0xf;
+	LOG("end marker %d %d\n", m_cd_status.repeat_current, m_cd_status.repeat_count);
+
+	// repeat_count = 0xf: infinite, not unlike Saturn CD Block
+	// - ggx sound test track #20 (opening) is a good testing scenario.
+	// - audio cd player don't care about this:
+	//   it manually handle repeat modes depending on GD state alone.
+	if (m_cd_status.repeat_current > m_cd_status.repeat_count)
+	{
+		m_cdda->pause_audio(1);
+		m_audio_sense = SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_SUCCESSFULLY_COMPLETED;
+		LOG("\tCompleted\n");
+		m_sector_number = (m_sector_number & 0xf0) | GDROM_PAUSE_STATE;
+	}
+	else
+	{
+		m_cdda->start_audio(m_cd_status.cdda_fad, m_cd_status.cdda_blocks);
+		LOG("\tRestart playback\n");
+		m_sector_number = (m_sector_number & 0xf0) | GDROM_PLAY_STATE;
+	}
 }

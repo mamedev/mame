@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_MACHINE_NAMCOIO_H
-#define MAME_MACHINE_NAMCOIO_H
+#ifndef MAME_NAMCO_NAMCOIO_H
+#define MAME_NAMCO_NAMCOIO_H
 
 
 /***************************************************************************
@@ -89,4 +89,4 @@ DECLARE_DEVICE_TYPE(NAMCO_56XX, namco56xx_device)
 DECLARE_DEVICE_TYPE(NAMCO_58XX, namco58xx_device)
 DECLARE_DEVICE_TYPE(NAMCO_59XX, namco59xx_device)
 
-#endif // MAME_MACHINE_NAMCOIO_H
+#endif // MAME_NAMCO_NAMCOIO_H

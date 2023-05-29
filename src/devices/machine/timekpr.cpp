@@ -18,7 +18,6 @@
 #include "machine/timekpr.h"
 #include "machine/timehelp.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_TICKS   (1U << 1)
 
 #define VERBOSE (0)
@@ -31,6 +30,7 @@ DEFINE_DEVICE_TYPE(M48T37,  m48t37_device,  "m48t37",  "M48T37 Timekeeper")
 DEFINE_DEVICE_TYPE(M48T58,  m48t58_device,  "m48t58",  "M48T58 Timekeeper")
 DEFINE_DEVICE_TYPE(MK48T08, mk48t08_device, "mk48t08", "MK48T08 Timekeeper")
 DEFINE_DEVICE_TYPE(MK48T12, mk48t12_device, "mk48t12", "MK48T12 Timekeeper")
+DEFINE_DEVICE_TYPE(DS1643,  ds1643_device,  "ds1643",  "DS1643 Nonvolatile Timekeeping RAM")
 
 
 /***************************************************************************
@@ -48,12 +48,12 @@ DEFINE_DEVICE_TYPE(MK48T12, mk48t12_device, "mk48t12", "MK48T12 Timekeeper")
 
 #define CONTROL_W (0x80)
 #define CONTROL_R (0x40)
-#define CONTROL_S (0x20) /* not emulated */
-#define CONTROL_CALIBRATION (0x1f) /* not emulated */
+#define CONTROL_S (0x20) /* not emulated - unused on DS1643 */
+#define CONTROL_CALIBRATION (0x1f) /* not emulated - unused on DS1643 */
 
 #define SECONDS_ST (0x80)
 
-#define DAY_FT (0x40) /* M48T37 - not emulated */
+#define DAY_FT (0x40) /* M48T37/DS1643 - not emulated */
 #define DAY_CEB (0x20) /* M48T35/M48T58 */
 #define DAY_CB (0x10) /* M48T35/M48T58 */
 
@@ -91,6 +91,7 @@ inline int counter_from_ram(u8 const *data, s32 offset, u8 unmap = 0)
 timekeeper_device::timekeeper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 size)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
+	, device_rtc_interface(mconfig, *this)
 	, m_reset_cb(*this)
 	, m_irq_cb(*this)
 	, m_default_data(*this, DEVICE_SELF)
@@ -162,6 +163,11 @@ m48t58_device::m48t58_device(const machine_config &mconfig, const char *tag, dev
 	m_offset_flags = -1;
 }
 
+m48t58_device::m48t58_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: timekeeper_device(mconfig, type, tag, owner, clock, 0x2000)
+{
+}
+
 mk48t08_device::mk48t08_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: timekeeper_device(mconfig, MK48T08, tag, owner, clock, 0x2000)
 {
@@ -193,6 +199,11 @@ mk48t12_device::mk48t12_device(const machine_config &mconfig, const char *tag, d
 	m_offset_century = -1;
 }
 
+ds1643_device::ds1643_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: m48t58_device(mconfig, DS1643, tag, owner, clock)
+{
+}
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -200,19 +211,7 @@ mk48t12_device::mk48t12_device(const machine_config &mconfig, const char *tag, d
 
 void timekeeper_device::device_start()
 {
-	system_time systime;
-
-	machine().base_datetime(systime);
-
 	m_control = 0;
-	m_seconds = time_helper::make_bcd(systime.local_time.second);
-	m_minutes = time_helper::make_bcd(systime.local_time.minute);
-	m_hours = time_helper::make_bcd(systime.local_time.hour);
-	m_day = time_helper::make_bcd(systime.local_time.weekday + 1);
-	m_date = time_helper::make_bcd(systime.local_time.mday);
-	m_month = time_helper::make_bcd(systime.local_time.month + 1);
-	m_year = time_helper::make_bcd(systime.local_time.year % 100);
-	m_century = time_helper::make_bcd(systime.local_time.year / 100);
 	m_data.resize(m_size);
 
 	save_item(NAME(m_control));
@@ -242,6 +241,18 @@ void timekeeper_device::device_start()
 
 void timekeeper_device::device_reset()
 {
+}
+
+void timekeeper_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
+{
+	m_seconds = time_helper::make_bcd(second);
+	m_minutes = time_helper::make_bcd(minute);
+	m_hours = time_helper::make_bcd(hour);
+	m_day = time_helper::make_bcd(day_of_week);
+	m_date = time_helper::make_bcd(day);
+	m_month = time_helper::make_bcd(month);
+	m_year = time_helper::make_bcd(year % 100);
+	m_century = time_helper::make_bcd(year / 100);
 }
 
 void timekeeper_device::counters_to_ram()
@@ -368,7 +379,7 @@ void timekeeper_device::watchdog_write(u8 data)
 
 void timekeeper_device::write(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "timekeeper_device::write: %04x = %02x\n", offset, data);
+	LOG("timekeeper_device::write: %04x = %02x\n", offset, data);
 	if (offset == m_offset_control)
 	{
 		if ((m_control & CONTROL_W) != 0 &&
@@ -428,7 +439,7 @@ u8 timekeeper_device::read(offs_t offset)
 		m_reset_cb(CLEAR_LINE);
 		m_irq_cb(CLEAR_LINE);
 	}
-	LOGMASKED(LOG_GENERAL, "timekeeper_device::read: %04x (%02x)\n", offset, result);
+	LOG("timekeeper_device::read: %04x (%02x)\n", offset, result);
 	return result;
 }
 

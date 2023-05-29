@@ -55,20 +55,21 @@
 #include "bus/nscsi/hd.h"
 #include "bus/nscsi/cd.h"
 #include "bus/rs232/rs232.h"
-#include "bus/sgikbd/sgikbd.h"
 #include "bus/rs232/hlemouse.h"
+#include "kbd.h"
 
 // video and audio
 #include "sgi_gr1.h"
 
 #include "4dpi.lh"
 
-#define LOG_GENERAL (1U << 0)
-
 #define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
 #include "softlist.h"
+
+
+namespace {
 
 class pi4d2x_state : public driver_device
 {
@@ -709,7 +710,7 @@ void pi4d2x_state::common(machine_config &config)
 
 	// duart 0 (keyboard/mouse)
 	SCN2681(config, m_duart[0], 3.6864_MHz_XTAL); // SCN2681AC1N24
-	sgi_keyboard_port_device &keyboard_port(SGIKBD_PORT(config, "keyboard_port", default_sgi_keyboard_devices, "hlekbd"));
+	sgi_kbd_port_device &keyboard_port(SGI_KBD_PORT(config, "keyboard_port", default_sgi_kbd_devices, "keyboard"));
 	rs232_port_device &mouse_port(RS232_PORT(config, "mouse_port",
 		[](device_slot_interface &device)
 		{
@@ -719,7 +720,7 @@ void pi4d2x_state::common(machine_config &config)
 
 	// duart 0 outputs
 	m_duart[0]->irq_cb().set(FUNC(pi4d2x_state::lio_interrupt<LIO_D0>)).invert();
-	m_duart[0]->a_tx_cb().set(keyboard_port, FUNC(sgi_keyboard_port_device::write_txd));
+	m_duart[0]->a_tx_cb().set(keyboard_port, FUNC(sgi_kbd_port_device::write_txd));
 	m_duart[0]->b_tx_cb().set(mouse_port, FUNC(rs232_port_device::write_txd));
 
 	// duart 0 inputs
@@ -840,8 +841,8 @@ void pi4d3x_state::common(machine_config &config)
 	m_duart[0]->out_int_callback().set(duart_int, FUNC(input_merger_device::in_w<0>));
 
 	// keyboard
-	sgi_keyboard_port_device &keyboard_port(SGIKBD_PORT(config, "keyboard_port", default_sgi_keyboard_devices, "hlekbd"));
-	m_duart[0]->out_txdb_callback().set(keyboard_port, FUNC(sgi_keyboard_port_device::write_txd));
+	sgi_kbd_port_device &keyboard_port(SGI_KBD_PORT(config, "keyboard_port", default_sgi_kbd_devices, "keyboard"));
+	m_duart[0]->out_txdb_callback().set(keyboard_port, FUNC(sgi_kbd_port_device::write_txd));
 	keyboard_port.rxd_handler().set(m_duart[0], FUNC(z80scc_device::rxb_w));
 
 	// mouse
@@ -1042,6 +1043,9 @@ ROM_START(4d35)
 	ROM_SYSTEM_BIOS(2, "4.0a", "SGI Version 4.0 Rev A IP12,  Aug 22, 1991")
 	ROMX_LOAD("ip12prom.070-8045-002.u61", 0x000000, 0x040000, CRC(fe999bae) SHA1(eb054c365a6e018be3b9ae44169c0ffc6447c6f0), ROM_BIOS(2))
 ROM_END
+
+} // anonymous namespace
+
 
 //   YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY                 FULLNAME                FLAGS
 COMP(1988, 4d20, 0,      0,      pi4d20,  0,     pi4d2x_state, initialize, "Silicon Graphics Inc", "Personal IRIS 4D/20",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

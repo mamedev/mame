@@ -57,6 +57,8 @@ ToDO:
 #include "instruct.lh"
 
 
+namespace {
+
 class instruct_state : public driver_device
 {
 public:
@@ -350,83 +352,59 @@ void instruct_state::machine_start()
 
 QUICKLOAD_LOAD_MEMBER(instruct_state::quickload_cb)
 {
-	uint16_t i, exec_addr, quick_length, read_;
-	image_init_result result = image_init_result::FAIL;
-
-	quick_length = image.length();
+	int const quick_length = image.length();
 	if (quick_length < 0x0100)
+		return std::make_pair(image_error::INVALIDLENGTH, "File too short (must be at least 256 bytes)");
+	else if (quick_length > 0x8000)
+		return std::make_pair(image_error::INVALIDLENGTH, "File too long (must be no more than 32K)");
+
+	std::vector<uint8_t> quick_data(quick_length);
+	uint16_t read_ = image.fread(&quick_data[0], quick_length);
+	if (read_ != quick_length)
+		return std::make_pair(image_error::UNSPECIFIED, "Cannot read file");
+	else if (quick_data[0] != 0xc5)
+		return std::make_pair(image_error::INVALIDIMAGE, "Invalid header");
+
+	uint16_t const exec_addr = quick_data[1] * 256 + quick_data[2];
+	if (exec_addr >= quick_length)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "File too short");
-		image.message(" File too short");
-	}
-	else
-	if (quick_length > 0x8000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "File too long");
-		image.message(" File too long");
-	}
-	else
-	{
-		std::vector<uint8_t> quick_data(quick_length);
-		read_ = image.fread( &quick_data[0], quick_length);
-		if (read_ != quick_length)
-		{
-			image.seterror(image_error::INVALIDIMAGE, "Cannot read the file");
-			image.message(" Cannot read the file");
-		}
-		else if (quick_data[0] != 0xc5)
-		{
-			image.seterror(image_error::INVALIDIMAGE, "Invalid header");
-			image.message(" Invalid header");
-		}
-		else
-		{
-			exec_addr = quick_data[1] * 256 + quick_data[2];
-
-			if (exec_addr >= quick_length)
-			{
-				image.seterror(image_error::INVALIDIMAGE, "Exec address beyond end of file");
-				image.message(" Exec address beyond end of file");
-			}
-			else
-			{
-				// load to 0000-0FFE (standard ram + extra)
-				read_ = 0xfff;
-				if (quick_length < 0xfff)
-					read_ = quick_length;
-				m_p_ram[0] = 0x1f;  // add jump for RST key
-				for (i = 1; i < read_; i++)
-					m_p_ram[i] = quick_data[i];
-
-				// load to 1780-17BF (spare ram inside 2656)
-				read_ = 0x17c0;
-				if (quick_length < 0x17c0)
-					read_ = quick_length;
-				if (quick_length > 0x1780)
-					for (i = 0x1780; i < read_; i++)
-						m_p_smiram[i-0x1780] = quick_data[i];
-
-				// put start address into PC so it can be debugged
-				m_p_smiram[0x68] = m_p_ram[1];
-				m_p_smiram[0x69] = m_p_ram[2];
-
-				// load to 2000-7FFF (optional extra ram)
-				if (quick_length > 0x2000)
-					for (i = 0x2000; i < quick_length; i++)
-						m_p_extram[i-0x2000] = quick_data[i];
-
-				/* display a message about the loaded quickload */
-				image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
-
-				// Start the quickload - JP exec_addr
-				m_maincpu->set_state_int(S2650_PC, 0);
-
-				result = image_init_result::PASS;
-			}
-		}
+		return std::make_pair(
+				image_error::INVALIDIMAGE,
+				util::string_format("Exec address %04X beyond end of file %04X", exec_addr, quick_length));
 	}
 
-	return result;
+	// load to 0000-0FFE (standard ram + extra)
+	read_ = std::min<uint16_t>(quick_length, 0xfff);
+	m_p_ram[0] = 0x1f;  // add jump for RST key
+	for (uint16_t i = 1; i < read_; i++)
+		m_p_ram[i] = quick_data[i];
+
+	// load to 1780-17BF (spare ram inside 2656)
+	if (quick_length > 0x1780)
+	{
+		read_ = std::min<uint16_t>(quick_length, 0x17c0);
+		for (uint16_t i = 0x1780; i < read_; i++)
+			m_p_smiram[i-0x1780] = quick_data[i];
+	}
+
+	// put start address into PC so it can be debugged
+	m_p_smiram[0x68] = m_p_ram[1];
+	m_p_smiram[0x69] = m_p_ram[2];
+
+	// load to 2000-7FFF (optional extra RAM)
+	if (quick_length > 0x2000)
+	{
+		for (uint16_t i = 0x2000; i < quick_length; i++)
+			m_p_extram[i-0x2000] = quick_data[i];
+	}
+
+	// display a message about the loaded quickload
+	image.message(" Quickload: size=%04X : exec=%04X", quick_length, exec_addr);
+
+	// Start the quickload - JP exec_addr
+	m_maincpu->set_state_int(S2650_PC, 0);
+
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void instruct_state::instruct(machine_config &config)
@@ -467,6 +445,9 @@ ROM_START( instruct )
 	ROM_LOAD( "82s123.33",    0x0000, 0x0020, CRC(b7aecef0) SHA1(b39fb35e8b6ab67b31f8f310fd5d56304bcd4123) )
 	ROM_LOAD( "82s103.20",    0x0020, 0x8000, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

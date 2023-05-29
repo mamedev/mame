@@ -50,6 +50,9 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
+
+namespace {
+
 #define MAIN_CLOCK 15.9744_MHz_XTAL
 
 class fp1100_state : public driver_device
@@ -709,6 +712,9 @@ ROM_START( fp1100 )
 	ROM_LOAD( "sub2.rom", 0x1000, 0x1000, CRC(359f007e) SHA1(0188d5a7b859075cb156ee55318611bd004128d7))
 	ROM_LOAD( "sub3.rom", 0x2000, 0xf80, BAD_DUMP CRC(fb2b577a) SHA1(a9ae6b03e06ea2f5db30dfd51ebf5aede01d9672))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

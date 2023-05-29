@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Juergen Buchmueller, David Haywood
-#ifndef MAME_INCLUDES_DECOCASS_H
-#define MAME_INCLUDES_DECOCASS_H
+#ifndef MAME_DATAEAST_DECOCASS_H
+#define MAME_DATAEAST_DECOCASS_H
 
 #pragma once
 
@@ -472,4 +472,4 @@ private:
 	uint32_t m_address;
 };
 
-#endif // MAME_INCLUDES_DECOCASS_H
+#endif // MAME_DATAEAST_DECOCASS_H

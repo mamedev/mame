@@ -34,7 +34,10 @@ enum class image_error : int
 	INTERNAL = 1,
 	UNSUPPORTED,
 	INVALIDIMAGE,
+	INVALIDLENGTH,
 	ALREADYOPEN,
+	NOSOFTWARE,
+	BADSOFTWARE,
 	UNSPECIFIED
 };
 
@@ -61,37 +64,20 @@ private:
 };
 
 
-enum class image_init_result { PASS, FAIL };
-enum class image_verify_result { PASS, FAIL };
-
-//**************************************************************************
-//  MACROS
-//**************************************************************************
-
-#define DEVICE_IMAGE_LOAD_MEMBER(_name)             image_init_result _name(device_image_interface &image)
-#define DECLARE_DEVICE_IMAGE_LOAD_MEMBER(_name)     DEVICE_IMAGE_LOAD_MEMBER(_name)
-
-#define DEVICE_IMAGE_UNLOAD_MEMBER(_name)           void _name(device_image_interface &image)
-#define DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(_name)   DEVICE_IMAGE_UNLOAD_MEMBER(_name)
-
-
 // ======================> device_image_interface
 
 // class representing interface-specific live image
 class device_image_interface : public device_interface
 {
 public:
-	typedef device_delegate<image_init_result (device_image_interface &)> load_delegate;
-	typedef device_delegate<void (device_image_interface &)> unload_delegate;
-
 	typedef std::vector<std::unique_ptr<image_device_format>> formatlist_type;
 
 	// construction/destruction
 	device_image_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_image_interface();
 
-	virtual image_init_result call_load() { return image_init_result::PASS; }
-	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) { return image_init_result::PASS; }
+	virtual std::pair<std::error_condition, std::string> call_load() { return std::make_pair(std::error_condition(), std::string()); }
+	virtual std::pair<std::error_condition, std::string> call_create(int format_type, util::option_resolution *format_options) { return std::make_pair(std::error_condition(), std::string()); }
 	virtual void call_unload() { }
 	virtual std::string call_display() { return std::string(); }
 	virtual u32 unhashed_header_length() const noexcept { return 0; }
@@ -108,13 +94,19 @@ public:
 	virtual const char *image_type_name() const noexcept = 0;
 	virtual const char *image_brief_type_name() const noexcept = 0;
 
+	// Set block device image regions for arcade systems
+	void add_region(std::string name, bool is_default = false);
+	bool has_preset_images() const;
+	bool has_preset_images_selection() const;
+	std::vector<std::string> preset_images_list() const;
+	int current_preset_image_id() const;
+	void switch_preset_image(int id);
+	chd_file *current_preset_image_chd() const;
+	void check_preset_images();
+
 	const image_device_format *device_get_indexed_creatable_format(int index) const noexcept { return (index < m_formatlist.size()) ? m_formatlist.at(index).get() : nullptr;  }
 	const image_device_format *device_get_named_creatable_format(std::string_view format_name) const noexcept;
 	const util::option_guide &device_get_creation_option_guide() const { return create_option_guide(); }
-
-	std::string_view error();
-	void seterror(std::error_condition err, const char *message = nullptr);
-	void message(const char *format, ...) ATTR_PRINTF(2,3);
 
 	bool exists() const noexcept { return !m_image_name.empty(); }
 
@@ -128,6 +120,7 @@ public:
 	bool is_open() const noexcept { return bool(m_file); }
 	util::core_file &image_core_file() const noexcept { assert(is_open()); return *m_file; }
 	bool is_readonly() const noexcept { return m_readonly; }
+	u32 sequence_counter() const { return m_sequence_counter; } // Increments on media load/unload/etc
 
 	// image file I/O wrappers
 	// TODO: move away from using these and let implementations use the I/O interface directly
@@ -190,7 +183,7 @@ public:
 	u8 *get_software_region(std::string_view tag);
 	u32 get_software_region_length(std::string_view tag);
 	const char *get_feature(std::string_view feature_name) const;
-	bool load_software_region(std::string_view tag, std::unique_ptr<u8[]> &ptr);
+	std::error_condition load_software_region(std::string_view tag, std::unique_ptr<u8[]> &ptr);
 
 	u32 crc();
 	util::hash_collection& hash() { return m_hash; }
@@ -206,16 +199,16 @@ public:
 	const formatlist_type &formatlist() const { return m_formatlist; }
 
 	// loads an image file
-	image_init_result load(std::string_view path);
+	std::pair<std::error_condition, std::string> load(std::string_view path);
 
 	// loads a softlist item by name
-	image_init_result load_software(std::string_view software_identifier);
+	std::pair<std::error_condition, std::string> load_software(std::string_view software_identifier);
 
-	image_init_result finish_load();
+	std::pair<std::error_condition, std::string> finish_load();
 	void unload();
-	image_init_result create(std::string_view path, const image_device_format *create_format, util::option_resolution *create_args);
-	image_init_result create(std::string_view path);
-	bool load_software(software_list_device &swlist, std::string_view swname, const rom_entry *entry);
+	std::pair<std::error_condition, std::string> create(std::string_view path, const image_device_format *create_format, util::option_resolution *create_args);
+	std::pair<std::error_condition, std::string> create(std::string_view path);
+	std::error_condition load_software(software_list_device &swlist, std::string_view swname, const rom_entry *entry);
 	std::error_condition reopen_for_write(std::string_view path);
 
 	void set_user_loadable(bool user_loadable) noexcept { m_user_loadable = user_loadable; }
@@ -231,32 +224,27 @@ protected:
 	virtual void interface_config_complete() override;
 
 	virtual const software_list_loader &get_software_list_loader() const;
-	virtual const bool use_software_list_file_extension_for_filetype() const { return false; }
+	virtual bool use_software_list_file_extension_for_filetype() const noexcept { return false; }
 
-	image_init_result load_internal(std::string_view path, bool is_create, int create_format, util::option_resolution *create_args);
+	std::pair<std::error_condition, std::string> load_internal(std::string_view path, bool is_create, int create_format, util::option_resolution *create_args);
 	std::error_condition load_image_by_path(u32 open_flags, std::string_view path);
-	void clear();
-	bool is_loaded() const { return m_file != nullptr; }
+	void clear() noexcept;
+	bool is_loaded() const noexcept { return m_file != nullptr; }
 
 	void set_image_filename(std::string_view filename);
-
-	void clear_error() noexcept;
+	void set_image_tag();
 
 	void check_for_file() const { if (!m_file) throw emu_fatalerror("%s(%s): Illegal operation on unmounted image", device().shortname(), device().tag()); }
 
 	void make_readonly() noexcept { m_readonly = true; }
 
-	bool image_checkhash();
+	std::error_condition image_checkhash();
 
 	const software_part *find_software_item(std::string_view identifier, bool restrict_to_interface, software_list_device **device = nullptr) const;
 	std::string software_get_default_slot(std::string_view default_card_slot) const;
 
 	void add_format(std::unique_ptr<image_device_format> &&format);
 	void add_format(std::string &&name, std::string &&description, std::string &&extensions, std::string &&optspec);
-
-	// error related info
-	std::error_condition m_err;
-	std::string m_err_message;
 
 private:
 	// variables that are only non-zero when an image is mounted
@@ -267,6 +255,11 @@ private:
 	std::string m_basename_noext;
 	std::string m_filetype;
 
+	// preset images regions
+	std::vector<std::string> m_possible_preset_regions;
+	std::vector<chd_file *> m_preset_images;
+	int m_default_region, m_current_region;
+
 	// Software information
 	std::string m_full_software_name;
 	const software_part *m_software_part_ptr;
@@ -274,7 +267,7 @@ private:
 
 	std::vector<u32> determine_open_plan(bool is_create);
 	void update_names();
-	bool load_software_part(std::string_view identifier);
+	std::error_condition load_software_part(std::string_view identifier);
 
 	bool init_phase() const;
 	static std::error_condition run_hash(util::random_read &file, u32 skip_bytes, util::hash_collection &hashes, const char *types);
@@ -290,6 +283,7 @@ private:
 	std::string m_working_directory;
 
 	// flags
+	u32 m_sequence_counter;
 	bool m_readonly;
 	bool m_created;
 

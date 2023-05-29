@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Zsolt Vasvari
-#ifndef MAME_INCLUDES_THEPIT_H
-#define MAME_INCLUDES_THEPIT_H
+#ifndef MAME_THEPIT_THEPIT_H
+#define MAME_THEPIT_THEPIT_H
 
 #pragma once
 
@@ -106,4 +106,4 @@ private:
 	void theportr_main_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_THEPIT_H
+#endif // MAME_THEPIT_THEPIT_H

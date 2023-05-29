@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_E22_KBD_H
-#define MAME_MACHINE_E22_KBD_H
+#ifndef MAME_TAB_E22_KBD_H
+#define MAME_TAB_E22_KBD_H
 
 #pragma once
 
@@ -59,4 +59,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(E22_KBD_HLE, e22_kbd_hle_device)
 
-#endif // MAME_MACHINE_E22_KBD_H
+#endif // MAME_TAB_E22_KBD_H

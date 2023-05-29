@@ -12,7 +12,8 @@
 
 #pragma once
 
-#include <condition_variable>
+#include "notifier.h"
+
 #include <functional>
 #include <map>
 #include <memory>
@@ -21,6 +22,7 @@
 #include <tuple>
 #include <vector>
 
+#define SOL_USING_CXX_LUA 1
 #ifdef MAME_DEBUG
 #define SOL_ALL_SAFETIES_ON 1
 #else
@@ -57,9 +59,8 @@ public:
 	std::pair<bool, std::optional<long> > menu_callback(const std::string &menu, int index, const std::string &event);
 
 	void set_machine(running_machine *machine);
-	std::vector<std::string> &get_menu() { return m_menu; }
+	std::vector<std::string> const &get_menu() { return m_menu; }
 	void attach_notifiers();
-	void on_frame_done();
 	void on_sound_update();
 	void on_periodic();
 	bool on_missing_mandatory_image(const std::string &instance_name);
@@ -123,23 +124,34 @@ public:
 	sol::state_view &sol() const { return *m_sol_state; }
 
 	template <typename Func, typename... Params>
-	static std::decay_t<std::invoke_result_t<Func, Params...> > invoke(Func &&func, Params&&... args)
+	sol::protected_function_result invoke(Func &&func, Params&&... args)
 	{
-		g_profiler.start(PROFILER_LUA);
-		try
-		{
-			auto result = func(std::forward<Params>(args)...);
-			g_profiler.stop();
-			return result;
-		}
-		catch (...)
-		{
-			g_profiler.stop();
-			throw;
-		}
+		auto profile = g_profiler.start(PROFILER_LUA);
+
+		sol::thread th = sol::thread::create(m_lua_state);
+		sol::coroutine cr(th.state(), std::forward<Func>(func));
+		return cr(std::forward<Params>(args)...);
+	}
+
+	template <typename Func, typename... Params>
+	static auto invoke_direct(Func &&func, Params&&... args)
+	{
+		auto profile = g_profiler.start(PROFILER_LUA);
+		return func(std::forward<Params>(args)...);
 	}
 
 private:
+	struct notifiers
+	{
+		util::notifier<> on_reset;
+		util::notifier<> on_stop;
+		util::notifier<> on_pause;
+		util::notifier<> on_resume;
+		util::notifier<> on_frame;
+		util::notifier<> on_presave;
+		util::notifier<> on_postload;
+	};
+
 	template <typename T, size_t Size> class enum_parser;
 
 	class buffer_helper;
@@ -151,24 +163,6 @@ private:
 	class symbol_table_wrapper;
 	class expression_wrapper;
 
-	struct save_item {
-		void *base;
-		unsigned int size;
-		unsigned int count;
-		unsigned int valcount;
-		unsigned int blockcount;
-		unsigned int stride;
-	};
-
-	struct context
-	{
-		context() { busy = false; yield = false; }
-		std::string result;
-		std::condition_variable sync;
-		bool busy;
-		bool yield;
-	};
-
 	// internal state
 	lua_State *m_lua_state;
 	std::unique_ptr<sol::state_view> m_sol_state;
@@ -176,19 +170,33 @@ private:
 
 	std::vector<std::string> m_menu;
 
+	emu_timer *m_timer;
+
+	// machine event notifiers
+	std::optional<notifiers> m_notifiers;
+
+	// deferred coroutines
+	std::vector<std::pair<attotime, int> > m_waiting_tasks;
+	std::vector<int> m_update_tasks;
+	std::vector<int> m_frame_tasks;
+
+	template <typename... T>
+	auto make_notifier_adder(util::notifier<T...> &notifier, const char *desc);
 	template <typename R, typename T, typename D>
 	auto make_simple_callback_setter(void (T::*setter)(delegate<R ()> &&), D &&dflt, const char *name, const char *desc);
 
 	running_machine &machine() const { return *m_machine; }
 
 	void on_machine_prestart();
-	void on_machine_start();
+	void on_machine_reset();
 	void on_machine_stop();
 	void on_machine_pause();
 	void on_machine_resume();
 	void on_machine_frame();
+	void on_machine_presave();
+	void on_machine_postload();
 
-	void resume(int nparam);
+	void resume(s32 param);
 	void register_function(sol::function func, const char *id);
 	template <typename T> size_t enumerate_functions(const char *id, T &&callback);
 	bool execute_function(const char *id);

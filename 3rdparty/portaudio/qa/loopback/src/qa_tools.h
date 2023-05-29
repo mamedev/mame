@@ -26,13 +26,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -43,32 +43,32 @@ extern int g_testsPassed;
 extern int g_testsFailed;
 
 #define QA_ASSERT_TRUE( message, flag ) \
-	if( !(flag) ) \
-	{ \
-		printf( "%s:%d - ERROR - %s\n", __FILE__, __LINE__, message ); \
-		g_testsFailed++; \
-		goto error; \
-	} \
-	else g_testsPassed++;
+    if( !(flag) ) \
+    { \
+        printf( "%s:%d - ERROR - %s\n", __FILE__, __LINE__, message ); \
+        g_testsFailed++; \
+        goto error; \
+    } \
+    else g_testsPassed++;
 
 
 #define QA_ASSERT_EQUALS( message, expected, actual ) \
-	if( ((expected) != (actual)) ) \
-	{ \
-		printf( "%s:%d - ERROR - %s, expected %d, got %d\n", __FILE__, __LINE__, message, expected, actual ); \
-		g_testsFailed++; \
-		goto error; \
-	} \
-	else g_testsPassed++;
+    if( ((expected) != (actual)) ) \
+    { \
+        printf( "%s:%d - ERROR - %s, expected %d, got %d\n", __FILE__, __LINE__, message, expected, actual ); \
+        g_testsFailed++; \
+        goto error; \
+    } \
+    else g_testsPassed++;
 
 #define QA_ASSERT_CLOSE( message, expected, actual, tolerance ) \
-	if (fabs((expected)-(actual))>(tolerance)) \
-	{ \
-		printf( "%s:%d - ERROR - %s, expected %f, got %f, tol=%f\n", __FILE__, __LINE__, message, ((double)(expected)), ((double)(actual)), ((double)(tolerance)) ); \
-		g_testsFailed++; \
-		goto error; \
-	} \
-	else g_testsPassed++;
+    if (fabs((expected)-(actual))>(tolerance)) \
+    { \
+        printf( "%s:%d - ERROR - %s, expected %f, got %f, tol=%f\n", __FILE__, __LINE__, message, ((double)(expected)), ((double)(actual)), ((double)(tolerance)) ); \
+        g_testsFailed++; \
+        goto error; \
+    } \
+    else g_testsPassed++;
 
 #define QA_ASSERT_CLOSE_INT( message, expected, actual, tolerance ) \
     if (abs((expected)-(actual))>(tolerance)) \

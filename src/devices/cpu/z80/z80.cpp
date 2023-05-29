@@ -340,7 +340,7 @@ static const uint8_t cc_ex[0x100] = {
 } while (0)
 
 // T Memory Address
-#define MTM ((m_cc_op == nullptr ? 4 : m_cc_op[0])-1)
+#define MTM (m_mtm_cycles)
 
 #define EXEC(prefix,opcode) do { \
 	unsigned op = opcode; \
@@ -463,7 +463,7 @@ inline void z80_device::out(uint16_t port, uint8_t value)
  ***************************************************************/
 uint8_t z80_device::rm(uint16_t addr)
 {
-	u8 res = m_data.read_byte(addr);
+	u8 res = m_data.read_byte(translate_memory_address(addr));
 	T(MTM);
 	return res;
 }
@@ -491,7 +491,7 @@ void z80_device::wm(uint16_t addr, uint8_t value)
 {
 	// As we don't count changes between read and write, simply adjust to the end of requested.
 	if(m_icount_executing != MTM) T(m_icount_executing - MTM);
-	m_data.write_byte(addr, value);
+	m_data.write_byte(translate_memory_address(addr), value);
 	T(MTM);
 }
 
@@ -528,7 +528,7 @@ uint8_t z80_device::rop()
 {
 	// Use leftovers from previous instruction. Mainly to support recursive EXEC(.., rop())
 	if(m_icount_executing) T(m_icount_executing);
-	uint8_t res = m_opcodes.read_byte(PCD);
+	uint8_t res = m_opcodes.read_byte(translate_memory_address(PCD));
 	T(execute_min_cycles());
 	m_refresh_cb((m_i << 8) | (m_r2 & 0x80) | (m_r & 0x7f), 0x00, 0xff);
 	T(execute_min_cycles());
@@ -546,7 +546,7 @@ uint8_t z80_device::rop()
  ***************************************************************/
 uint8_t z80_device::arg()
 {
-	u8 res = m_args.read_byte(PCD);
+	u8 res = m_args.read_byte(translate_memory_address(PCD));
 	T(MTM);
 	PC++;
 
@@ -2048,7 +2048,7 @@ OP(xycb,ff) { A = set(7, rm_reg(m_ea)); wm(m_ea, A); } /* SET  7,A=(XY+o)  */
 
 OP(illegal,1) {
 	logerror("Z80 ill. opcode $%02x $%02x ($%04x)\n",
-			m_opcodes.read_byte((PCD-1)&0xffff), m_opcodes.read_byte(PCD), PCD-1);
+			m_opcodes.read_byte(translate_memory_address((PCD-1)&0xffff)), m_opcodes.read_byte(translate_memory_address(PCD)), PCD-1);
 }
 
 /**********************************************************
@@ -2636,7 +2636,7 @@ OP(fd,ff) { illegal_1(); op_ff();                            } /* DB   FD       
 OP(illegal,2)
 {
 	logerror("Z80 ill. opcode $ed $%02x\n",
-			m_opcodes.read_byte((PCD-1)&0xffff));
+			m_opcodes.read_byte(translate_memory_address((PCD-1)&0xffff)));
 }
 
 /**********************************************************
@@ -3259,7 +3259,7 @@ void z80_device::take_interrupt()
 
 	// fetch the IRQ vector
 	device_z80daisy_interface *intf = daisy_get_irq_device();
-	int irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback_member(*this, 0);
+	int irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback(0, m_pc.w.l);
 	LOG(("Z80 single int. irq_vector $%02x\n", irq_vector));
 
 	/* 'interrupt latency' cycles */
@@ -3814,6 +3814,12 @@ void z80_device::z80_set_cycle_tables(const uint8_t *op, const uint8_t *cb, cons
 }
 
 
+void z80_device::set_mtm_cycles(uint8_t mtm_cycles)
+{
+	m_mtm_cycles = mtm_cycles;
+}
+
+
 z80_device::z80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	z80_device(mconfig, Z80, tag, owner, clock)
 {
@@ -3828,7 +3834,8 @@ z80_device::z80_device(const machine_config &mconfig, device_type type, const ch
 	m_irqack_cb(*this),
 	m_refresh_cb(*this),
 	m_nomreq_cb(*this),
-	m_halt_cb(*this)
+	m_halt_cb(*this),
+	m_mtm_cycles(3)
 {
 }
 

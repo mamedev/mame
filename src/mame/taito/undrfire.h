@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, David Graves
-#ifndef MAME_INCLUDES_UNDRFIRE_H
-#define MAME_INCLUDES_UNDRFIRE_H
+#ifndef MAME_TAITO_UNDRFIRE_H
+#define MAME_TAITO_UNDRFIRE_H
 
 #pragma once
 
@@ -96,4 +96,4 @@ private:
 	void undrfire_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_UNDRFIRE_H
+#endif // MAME_TAITO_UNDRFIRE_H

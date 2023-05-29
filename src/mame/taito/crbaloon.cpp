@@ -17,6 +17,12 @@
 #include "machine/watchdog.h"
 #include "screen.h"
 
+#define LOG_PC3092 (1U << 1)
+#define LOG_PC3259 (1U << 2)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
 
 /*************************************
  *
@@ -40,9 +46,6 @@
  *
  *************************************/
 
-#define LOG_PC3092      0
-
-
 void crbaloon_state::pc3092_reset(void)
 {
 	/* nothing yet */
@@ -59,7 +62,7 @@ void crbaloon_state::pc3092_w(offs_t offset, uint8_t data)
 {
 	m_pc3092_data[offset] = data & 0x0f;
 
-	if (LOG_PC3092) logerror("%04X:  write PC3092 #%d = 0x%02x\n", m_maincpu->pc(), offset, m_pc3092_data[offset]);
+	LOGMASKED(LOG_PC3092, "%04X:  write PC3092 #%d = 0x%02x\n", m_maincpu->pc(), offset, m_pc3092_data[offset]);
 
 	pc3092_update();
 }
@@ -75,7 +78,7 @@ CUSTOM_INPUT_MEMBER(crbaloon_state::pc3092_r)
 	else
 		ret = 0x00;
 
-	if (LOG_PC3092) logerror("%s:  read  PC3092 = 0x%02x\n", machine().describe_context(), ret);
+	LOGMASKED(LOG_PC3092, "%s:  read  PC3092 = 0x%02x\n", machine().describe_context(), ret);
 
 	return ret;
 }
@@ -101,8 +104,6 @@ CUSTOM_INPUT_MEMBER(crbaloon_state::pc3092_r)
  *  Outputs: pins 17-20 - D24-D27 of I/O bus
  *
  *************************************/
-
-#define LOG_PC3259      0
 
 
 void crbaloon_state::pc3259_update(void)
@@ -139,7 +140,7 @@ uint8_t crbaloon_state::pc3259_r(offs_t offset)
 		break;
 	}
 
-	if (LOG_PC3259) logerror("%04X:  read PC3259 #%d = 0x%02x\n", m_maincpu->pc(), reg, ret);
+	LOGMASKED(LOG_PC3259, "%04X:  read PC3259 #%d = 0x%02x\n", m_maincpu->pc(), reg, ret);
 
 	return ret | (ioport("DSW1")->read() & 0xf0);
 }

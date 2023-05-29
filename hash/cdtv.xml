@@ -128,7 +128,7 @@ TODO:
 	-->
 
 	<software name="17bit" supported="no">
-		<description>17 Bit - Collection for Amiga CDTV (Euro)</description>
+		<description>17 Bit - Collection for Amiga CDTV (Europe)</description>
 		<year>1993</year>
 		<publisher>Almathera</publisher>
 		<notes><![CDATA[
@@ -157,7 +157,7 @@ cd32: black screen
 	</software>
 
 	<software name="17bitcon" supported="no">
-		<description>17 Bit - Continuation Disc (Euro)</description>
+		<description>17 Bit - Continuation Disc (Europe)</description>
 		<year>1993</year>
 		<publisher>Almathera</publisher>
 		<notes><![CDATA[
@@ -232,7 +232,7 @@ cd32: cuts off GFX display to the far right
 	</software>
 
 	<software name="advmisysa" cloneof="advmisys" supported="no">
-		<description>Advanced Military Systems (Euro)</description>
+		<description>Advanced Military Systems (Europe)</description>
 		<year>1991</year>
 		<publisher>Dominion Software &amp; Design</publisher>
 		<notes><![CDATA[
@@ -755,7 +755,7 @@ cd32: Cubulus boot OK
 	</software>
 
 	<software name="defcrown" supported="no">
-		<description>Defender of the Crown CDTV (Euro)</description>
+		<description>Defender of the Crown CDTV (Europe)</description>
 		<year>1991</year>
 		<publisher>CDTV Publishing</publisher>
 		<notes><![CDATA[
@@ -1184,7 +1184,7 @@ cd32: FMVs has audio-video desyncs (shows periodic black frames, audio is too fa
 
 	<!-- Insight Dinosaurs v1.0 -->
 	<software name="insidino" supported="no">
-		<description>Insight: Dinosaurs (Euro, v1.0)</description>
+		<description>Insight: Dinosaurs (Europe, v1.0)</description>
 		<year>1994</year>
 		<publisher>Optonica</publisher>
 		<notes><![CDATA[
@@ -1267,7 +1267,7 @@ cd32: boot OK
 	</software>
 
 	<software name="lemmings" supported="no">
-		<description>Lemmings (Euro)</description>
+		<description>Lemmings (Europe)</description>
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
 		<notes><![CDATA[
@@ -1289,7 +1289,7 @@ cd32: lemmings boot OK, B button isn't recognized on Lemmings/Planetside demo in
 
 	<!-- Log!cal -->
 	<software name="logical" supported="no">
-		<description>Log!cal (Euro)</description>
+		<description>Log!cal (Europe)</description>
 		<!-- title screen and build date says '91, multiple sources claims being '92 for CDTV -->
 		<year>1992</year>
 		<publisher>Rainbow Arts</publisher>
@@ -1550,7 +1550,7 @@ cd32: hangs on acknowledge ending credits (i.e. when you die and have to start o
 	<software name="cdtvdemo" supported="no">
 		<!-- Point of sale demo discs -->
 		<!-- Disc 1 is an early video for unreleased Planetside -->
-		<description>CDTV Demo Disc (Euro)</description>
+		<description>CDTV Demo Disc (Europe)</description>
 		<year>1991</year>
 		<!-- TODO: arguably may be published by both companies -->
 		<publisher>Commodore</publisher>
@@ -1697,7 +1697,7 @@ cd32: Shiftrix boot OK
 	</software>
 
 	<software name="simcity" supported="no">
-		<description>Sim City (Euro, Multi5)</description>
+		<description>Sim City (Europe, Multi5)</description>
 		<year>1991</year>
 		<publisher>Infogrames</publisher>
 		<notes><![CDATA[
@@ -1807,7 +1807,7 @@ cd32: boot OK
 
 	<software name="teamyank" supported="no">
 		<!-- https://hol.abime.net/1325 -->
-		<description>Team Yankee (Euro)</description>
+		<description>Team Yankee (Europe)</description>
 		<year>1992</year>
 		<publisher>Empire</publisher>
 		<notes><![CDATA[
@@ -1967,7 +1967,7 @@ cd32: has serious sprite position issues (offset on demo, draws garbage from tim
 	<!-- Demo Collection for Amiga CDTV, The -->
 	<software name="democdtv" supported="no">
 		<!-- bootable version of Ten On Ten disc #4 -->
-		<description>The Demo Collection for Amiga CDTV (Euro, Black Disc)</description>
+		<description>The Demo Collection for Amiga CDTV (Europe, Black Disc)</description>
 		<year>1992</year>
 		<publisher>Almathera</publisher>
 		<notes><![CDATA[
@@ -2025,7 +2025,7 @@ cd32: boot OK
 
 	<!-- Hutchinson Encyclopedia, The - PAL Version -->
 	<software name="hutchins" supported="no">
-		<description>The Hutchinson Encyclopedia (Euro)</description>
+		<description>The Hutchinson Encyclopedia (Europe)</description>
 		<year>1991</year>
 		<publisher>Attica Cybernetics</publisher>
 		<notes><![CDATA[
@@ -2314,7 +2314,7 @@ cd32: bottom GFX section for "World" icon screens have offset text (starts from 
 
 	<software name="trivcdtv" supported="no">
 		<!-- v1.0a E02PAL printed on title screen -->
-		<description>Trivial Pursuit - The CDTV Edition (Euro, v1.0a)</description>
+		<description>Trivial Pursuit - The CDTV Edition (Europe, v1.0a)</description>
 		<year>1992</year>
 		<publisher>Domark</publisher>
 		<notes><![CDATA[
@@ -2630,7 +2630,7 @@ cd32: hangs at ReadySoft logo
 	<!-- Xenon2Megablast -->
 	<software name="xenon2" supported="no">
 		<!-- Also has "wnazennjn" language option, which is a pseudo-Polish joke -->
-		<description>Xenon 2 - Megablast (Euro)</description>
+		<description>Xenon 2 - Megablast (Europe)</description>
 		<year>1992</year>
 		<publisher>Image Works</publisher>
 		<notes><![CDATA[
@@ -2670,7 +2670,7 @@ cd32: boot OK
 	<!-- Collection of ten discs -->
 	<!-- TODO: More likely AmigaCD rather than CDTV? -->
 	<software name="10on10" supported="no">
-		<description>Ten on Ten Compilation (Euro)</description>
+		<description>Ten on Ten Compilation (Europe)</description>
 		<year>1995</year>
 		<publisher>Almathera</publisher>
 		<notes><![CDATA[
