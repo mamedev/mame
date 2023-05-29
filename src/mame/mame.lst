@@ -18637,6 +18637,7 @@ gmaster                         // Hartung Gamemaster
 
 @source:handheld/hh_cop400.cpp
 bshipg                          // Milton Bradley
+comparca                        // Tandy Corporation
 copspa                          // National Semiconductor
 ctstein                         // Castle Toy
 einvaderc                       // Entex

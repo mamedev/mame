@@ -137,7 +137,6 @@ private:
 	void update_display();
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
-	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	u16 input_r();
 };
 
@@ -166,12 +165,6 @@ void cfrogger_state::grid_w(u16 data)
 	// D0-D11: vfd grid
 	m_grid = data;
 	update_display();
-}
-
-WRITE_LINE_MEMBER(cfrogger_state::speaker_w)
-{
-	// T: speaker out
-	m_speaker->level_w(state);
 }
 
 u16 cfrogger_state::input_r()
@@ -213,7 +206,7 @@ void cfrogger_state::cfrogger(machine_config &config)
 	m_maincpu->write_f().set(FUNC(cfrogger_state::plate_w));
 	m_maincpu->write_g().set(FUNC(cfrogger_state::plate_w));
 	m_maincpu->write_d().set(FUNC(cfrogger_state::grid_w));
-	m_maincpu->write_t().set(FUNC(cfrogger_state::speaker_w));
+	m_maincpu->write_t().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
@@ -265,7 +258,6 @@ private:
 	void update_display();
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
-	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	u16 input_r();
 };
 
@@ -294,12 +286,6 @@ void gjungler_state::grid_w(u16 data)
 	// D0-D11: vfd grid
 	m_grid = data;
 	update_display();
-}
-
-WRITE_LINE_MEMBER(gjungler_state::speaker_w)
-{
-	// T: speaker out
-	m_speaker->level_w(state);
 }
 
 u16 gjungler_state::input_r()
@@ -342,7 +328,7 @@ void gjungler_state::gjungler(machine_config &config)
 	m_maincpu->write_g().set(FUNC(gjungler_state::plate_w));
 	m_maincpu->write_u().set(FUNC(gjungler_state::plate_w));
 	m_maincpu->write_d().set(FUNC(gjungler_state::grid_w));
-	m_maincpu->write_t().set(FUNC(gjungler_state::speaker_w));
+	m_maincpu->write_t().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
