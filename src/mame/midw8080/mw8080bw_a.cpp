@@ -351,9 +351,9 @@ discrete_op_amp_osc_info const invaders_missle_op_amp_osc =
 	RES_M(2.2),                         // R19
 	RES_M(1),                           // R16
 	RES_M(4.7),                         // R14
-	RES_M(3.3),                         // R13, RES_M(2.2) on Taito PCB
+	RES_M(3.3),                         // R13
 	0,                                  // no r8
-	CAP_P(330),                         // C58
+	CAP_P(330),                         // C10, CAP_P(300) on Taito PCB C58 (but it seems to different as real with the output sound)
 	12,                                 // vP
 };
 
@@ -3242,7 +3242,7 @@ static const discrete_op_amp_osc_info invaders_invader_hit_osc =
 	0,              // no r6
 	0,              // no r7
 	0,              // no r8
-	CAP_U(0.1),     // C16
+	CAP_U(0.22),    // C16, CAP_U(0.1) on Midway PCB C21
 	12,             // vP
 };
 
