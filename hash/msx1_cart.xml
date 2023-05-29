@@ -17999,41 +17999,41 @@ legacy FM implementations cannot find it.
 
 <!-- Homebrew / Doujin software -->
 
-	<software name="qbios">
-		<description>QBIOS (v1.2)</description>
+	<software name="qbiqs">
+		<description>QBIQS (v1.2)</description>
 		<year>2010</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="Z80ST"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="0"/>
 			<dataarea name="rom" size="0xc000">
-				<rom name="qbios - z80st (2010) [v1.2].rom" size="0xc000" crc="11d4e90e" sha1="680be3a41a605ff95a4f5a8d6d1b79714439e1ae" />
+				<rom name="qbiqs - z80st (2010) [v1.2].rom" size="0xc000" crc="11d4e90e" sha1="680be3a41a605ff95a4f5a8d6d1b79714439e1ae" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="qbios11" cloneof="qbios">
-		<description>QBIOS (v1.1)</description>
+	<software name="qbiqs11" cloneof="qbiqs">
+		<description>QBIQS (v1.1)</description>
 		<year>2010</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="Z80ST"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="0"/>
 			<dataarea name="rom" size="0xc000">
-				<rom name="qbios - z80st (2010) [v1.1].rom" size="0xc000" crc="c1b8c64f" sha1="4921e9ed9455e56371fb14481f1963957b1caeb1" />
+				<rom name="qbiqs - z80st (2010) [v1.1].rom" size="0xc000" crc="c1b8c64f" sha1="4921e9ed9455e56371fb14481f1963957b1caeb1" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="qbios10" cloneof="qbios">
-		<description>QBIOS (v1.0)</description>
+	<software name="qbiqs10" cloneof="qbiqs">
+		<description>QBIQS (v1.0)</description>
 		<year>2010</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="Z80ST"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="0"/>
 			<dataarea name="rom" size="0xc000">
-				<rom name="qbios - z80st (2010) [v1.0].rom" size="0xc000" crc="9fb89044" sha1="a7a2a867f7e90458f3e8614e8c227da944a6092c" />
+				<rom name="qbiqs - z80st (2010) [v1.0].rom" size="0xc000" crc="9fb89044" sha1="a7a2a867f7e90458f3e8614e8c227da944a6092c" />
 			</dataarea>
 		</part>
 	</software>
