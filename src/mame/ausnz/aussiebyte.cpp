@@ -408,7 +408,7 @@ QUICKLOAD_LOAD_MEMBER(aussiebyte_state::quickload_cb)
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
 	if (image.length() >= 0xfd00)
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::INVALIDLENGTH, std::string());
 
 	/* RAM must be banked in */
 	m_port15 = true;    // disable boot rom
@@ -420,7 +420,7 @@ QUICKLOAD_LOAD_MEMBER(aussiebyte_state::quickload_cb)
 	if ((prog_space.read_byte(0) != 0xc3) || (prog_space.read_byte(5) != 0xc3))
 	{
 		machine_reset();
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::UNSUPPORTED, std::string());
 	}
 
 	/* Load image to the TPA (Transient Program Area) */
@@ -429,7 +429,7 @@ QUICKLOAD_LOAD_MEMBER(aussiebyte_state::quickload_cb)
 	{
 		u8 data;
 		if (image.fread( &data, 1) != 1)
-			return image_init_result::FAIL;
+			return std::make_pair(image_error::UNSPECIFIED, std::string());
 		prog_space.write_byte(i+0x100, data);
 	}
 
@@ -440,7 +440,7 @@ QUICKLOAD_LOAD_MEMBER(aussiebyte_state::quickload_cb)
 	m_maincpu->set_state_int(Z80_SP, 256 * prog_space.read_byte(7) - 0x400);
 	m_maincpu->set_pc(0x100);                // start program
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /***********************************************************
@@ -517,7 +517,7 @@ void aussiebyte_state::aussiebyte(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
-	VOTRAX_SC01(config, m_votrax, 720000); // 720kHz? needs verify
+	VOTRAX_SC01A(config, m_votrax, 720000); // 720kHz? needs verify
 	m_votrax->ar_callback().set([this] (bool state) { m_port28 = state ? 0 : 1; });
 	m_votrax->add_route(ALL_OUTPUTS, "mono", 1.00);
 

@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_3DOM2_H
-#define MAME_MACHINE_3DOM2_H
+#ifndef MAME_KONAMI_3DOM2_H
+#define MAME_KONAMI_3DOM2_H
 
 #pragma once
 
@@ -726,4 +726,4 @@ DECLARE_DEVICE_TYPE(M2_CTRLPORT, m2_ctrlport_device)
 DECLARE_DEVICE_TYPE(M2_MPEG, m2_mpeg_device)
 DECLARE_DEVICE_TYPE(M2_CDE, m2_cde_device)
 
-#endif // MAME_MACHINE_3DOM2_H
+#endif // MAME_KONAMI_3DOM2_H

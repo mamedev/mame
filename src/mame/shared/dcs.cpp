@@ -156,13 +156,14 @@
 #include "dcs.h"
 #include "speaker.h"
 
+#define LOG_DCS_TRANSFERS           (1U << 1)
+#define LOG_DCS_IO                  (1U << 2)
 
-#define LOG_DCS_TRANSFERS           (0)
-#define LOG_DCS_IO                  (0)
-#define LOG_BUFFER_FILLING          (0)
+#define VERBOSE (LOG_GENERAL)
+#include "logmacro.h"
+
 
 #define ENABLE_HLE_TRANSFERS        (1)
-
 
 
 /*************************************
@@ -540,8 +541,7 @@ void dcs_audio_device::dcs_boot()
 
 TIMER_CALLBACK_MEMBER( dcs_audio_device::dcs_reset )
 {
-	if (LOG_DCS_IO)
-		logerror("dcs_reset\n");
+	LOGMASKED(LOG_DCS_IO, "dcs_reset\n");
 
 	/* reset the memory banking */
 	switch (m_rev)
@@ -880,7 +880,7 @@ void dcs2_audio_device::device_start()
 		if (m_ram_map)
 			m_ram_map->set_bank(0);
 		m_data_bank->configure_entries(0, m_sounddata_banks, m_sounddata, soundbank_words * 2);
-		logerror("device_start: audio ram banks: %x size: %x\n", m_sounddata_banks, soundbank_words);
+		LOG("device_start: audio ram banks: %x size: %x\n", m_sounddata_banks, soundbank_words);
 	}
 
 
@@ -1234,7 +1234,7 @@ uint16_t dcs_audio_device::dsio_r(offs_t offset)
 		dsio.channelbits ^= 0x0010;
 		result = (result & ~0x0010) | dsio.channelbits;
 	}
-	if (LOG_DCS_IO && offset != 2) logerror("%s dsio_r 0x%x = %04x\n", machine().describe_context(), offset, result);
+	if (offset != 2) LOGMASKED(LOG_DCS_IO, "%s dsio_r 0x%x = %04x\n", machine().describe_context(), offset, result);
 	return result;
 }
 
@@ -1263,7 +1263,7 @@ void dcs_audio_device::dsio_w(offs_t offset, uint16_t data)
 			m_data_bank->set_entry(DSIO_DM_PG % m_sounddata_banks);
 			break;
 	}
-	if (LOG_DCS_IO) logerror("%s dsio_w 0x%x = %04x\n", machine().describe_context(), offset, data);
+	LOGMASKED(LOG_DCS_IO, "%s dsio_w 0x%x = %04x\n", machine().describe_context(), offset, data);
 }
 
 
@@ -1310,7 +1310,7 @@ uint16_t dcs_audio_device::denver_r(offs_t offset)
 		// SDRC Revision
 		result = 0x0003;
 	}
-	if (LOG_DCS_IO && offset != 0x2) logerror("%s denver_r %s 0x%x = %04x\n", machine().describe_context(), denver_regname[offset], offset, result);
+	if (offset != 0x2) LOGMASKED(LOG_DCS_IO, "%s denver_r %s 0x%x = %04x\n", machine().describe_context(), denver_regname[offset], offset, result);
 
 	return result;
 }
@@ -1347,7 +1347,7 @@ void dcs_audio_device::denver_w(offs_t offset, uint16_t data)
 			}
 			// Disable timer after DENV_RES_TFS
 			if (!m_timer_ignore && DENV_RES_TFS && DENV_MUTE) {
-				logerror("%s denver_w: Disabling timer\n", machine().describe_context());
+				LOG("%s denver_w: Disabling timer\n", machine().describe_context());
 				m_timer_ignore = true;
 			}
 			break;
@@ -1363,7 +1363,7 @@ void dcs_audio_device::denver_w(offs_t offset, uint16_t data)
 				m_fifo_reset_w(1);
 			break;
 	}
-	if (LOG_DCS_IO && offset != 0x2) logerror("%s denver_w %s 0x%x = %04x\n", machine().describe_context(), denver_regname[offset], offset, data);
+	if (offset != 0x2) LOGMASKED(LOG_DCS_IO, "%s denver_w %s 0x%x = %04x\n", machine().describe_context(), denver_regname[offset], offset, data);
 }
 
 
@@ -1376,8 +1376,7 @@ void dcs_audio_device::denver_w(offs_t offset, uint16_t data)
 
 void dcs_audio_device::dsio_idma_addr_w(uint32_t data)
 {
-	if (LOG_DCS_TRANSFERS)
-		logerror("%s IDMA_addr = %04X\n", machine().describe_context(), data);
+	LOGMASKED(LOG_DCS_TRANSFERS, "%s IDMA_addr = %04X\n", machine().describe_context(), data);
 	downcast<adsp2181_device *>(m_cpu)->idma_addr_w(data);
 	if (data == 0)
 		m_dsio.start_on_next_write = 2;
@@ -1392,19 +1391,19 @@ void dcs_audio_device::dsio_idma_data_w(offs_t offset, uint32_t data, uint32_t m
 		m_ram_map->set_bank(0);
 	if (ACCESSING_BITS_0_15)
 	{
-		if (LOG_DCS_TRANSFERS && !(downcast<adsp2181_device *>(m_cpu)->idma_addr_r() & 0x00ff))
-			logerror("%s IDMA_data_w(%04X) = %04X\n", machine().describe_context(), downcast<adsp2181_device *>(m_cpu)->idma_addr_r(), data & 0xffff);
+		if (!(downcast<adsp2181_device *>(m_cpu)->idma_addr_r() & 0x00ff))
+			LOGMASKED(LOG_DCS_TRANSFERS, "%s IDMA_data_w(%04X) = %04X\n", machine().describe_context(), downcast<adsp2181_device *>(m_cpu)->idma_addr_r(), data & 0xffff);
 		downcast<adsp2181_device *>(m_cpu)->idma_data_w(data & 0xffff);
 	}
 	if (ACCESSING_BITS_16_31)
 	{
-		if (LOG_DCS_TRANSFERS && !(downcast<adsp2181_device *>(m_cpu)->idma_addr_r() & 0x00ff))
-			logerror("%s IDMA_data_w(%04X) = %04X\n", machine().describe_context(), downcast<adsp2181_device *>(m_cpu)->idma_addr_r(), data >> 16);
+		if (!(downcast<adsp2181_device *>(m_cpu)->idma_addr_r() & 0x00ff))
+			LOGMASKED(LOG_DCS_TRANSFERS, "%s IDMA_data_w(%04X) = %04X\n", machine().describe_context(), downcast<adsp2181_device *>(m_cpu)->idma_addr_r(), data >> 16);
 		downcast<adsp2181_device *>(m_cpu)->idma_data_w(data >> 16);
 	}
 	if (dsio.start_on_next_write && --dsio.start_on_next_write == 0)
 	{
-		logerror("%s: Starting DSIO CPU\n", machine().describe_context());
+		LOG("%s: Starting DSIO CPU\n", machine().describe_context());
 		m_cpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	}
 	// Restore internal/external mapping
@@ -1422,8 +1421,7 @@ uint32_t dcs_audio_device::dsio_idma_data_r()
 	result = downcast<adsp2181_device *>(m_cpu)->idma_data_r();
 	// Restore internal/external mapping
 	m_ram_map->set_bank(m_dmovlay_val);
-	if (LOG_DCS_TRANSFERS)
-		logerror("%s IDMA_data_r(%04X) = %04X\n", machine().describe_context(), downcast<adsp2181_device *>(m_cpu)->idma_addr_r(), result);
+	LOGMASKED(LOG_DCS_TRANSFERS, "%s IDMA_data_r(%04X) = %04X\n", machine().describe_context(), downcast<adsp2181_device *>(m_cpu)->idma_addr_r(), result);
 	return result;
 }
 
@@ -1436,19 +1434,17 @@ void dcs_audio_device::dmovlay_remap_memory()
 	} else {
 		m_ram_map->set_bank(1);
 	}
-	if (LOG_DCS_IO) {
-		if (m_dmovlay_val==0)
-			logerror("%s dmovlay_remap_memory: Switching to internal data ram location dmovlay=%i\n", machine().describe_context(), m_dmovlay_val);
-		else
-			logerror("%s dmovlay_remap_memory: Switching to external data ram location dmovlay=%i\n", machine().describe_context(), m_dmovlay_val);
-	}
+	if (m_dmovlay_val==0)
+		LOGMASKED(LOG_DCS_IO, "%s dmovlay_remap_memory: Switching to internal data ram location dmovlay=%i\n", machine().describe_context(), m_dmovlay_val);
+	else
+		LOGMASKED(LOG_DCS_IO, "%s dmovlay_remap_memory: Switching to external data ram location dmovlay=%i\n", machine().describe_context(), m_dmovlay_val);
 }
 
 void dcs_audio_device::dmovlay_callback(uint32_t data)
 {
 	// Do some checking first
 	if (data < 0 || data > 1) {
-		logerror("dmovlay_callback: Error! dmovlay called with value = %X\n", data);
+		LOG("dmovlay_callback: Error! dmovlay called with value = %X\n", data);
 	} else {
 		m_dmovlay_val = data;
 		dmovlay_remap_memory();
@@ -1491,7 +1487,7 @@ void dcs_audio_device::reset_w(int state)
 	/* going low halts the CPU */
 	if (!state)
 	{
-		//      logerror("%s: DCS reset = %d\n", machine().describe_context(), state);
+		//      LOG("%s: DCS reset = %d\n", machine().describe_context(), state);
 
 		/* just run through the init code again */
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(dcs_audio_device::dcs_reset),this));
@@ -1535,8 +1531,7 @@ uint16_t dcs_audio_device::fifo_input_r()
 
 void dcs_audio_device::dcs_delayed_data_w(uint16_t data)
 {
-	if (LOG_DCS_IO)
-		logerror("%s:dcs_data_w(%04X)\n", machine().describe_context(), data);
+	LOGMASKED(LOG_DCS_IO, "%s:dcs_data_w(%04X)\n", machine().describe_context(), data);
 
 	/* boost the interleave temporarily */
 	machine().scheduler().add_quantum(attotime::from_nsec(500), attotime::from_usec(5));
@@ -1582,8 +1577,7 @@ void dcs_audio_device::input_latch_ack_w(uint16_t data)
 	SET_INPUT_EMPTY();
 	m_cpu->set_input_line(ADSP2105_IRQ2, CLEAR_LINE);
 
-	if (LOG_DCS_IO)
-		logerror("%s input_latch_ack_w\n", machine().describe_context());
+	LOGMASKED(LOG_DCS_IO, "%s input_latch_ack_w\n", machine().describe_context());
 }
 
 
@@ -1592,8 +1586,7 @@ uint16_t dcs_audio_device::input_latch_r()
 	if (m_auto_ack)
 		input_latch_ack_w(0);
 
-	if (LOG_DCS_IO)
-		logerror("%s input_latch_r(%04X)\n", machine().describe_context(), m_input_data);
+	LOGMASKED(LOG_DCS_IO, "%s input_latch_r(%04X)\n", machine().describe_context(), m_input_data);
 	return m_input_data;
 }
 
@@ -1601,8 +1594,7 @@ uint32_t dcs_audio_device::input_latch32_r()
 {
 	if (m_auto_ack)
 		input_latch_ack_w(0);
-	if (LOG_DCS_IO)
-		logerror("%s input_latch32_r(%04X)\n", machine().describe_context(), m_input_data);
+	LOGMASKED(LOG_DCS_IO, "%s input_latch32_r(%04X)\n", machine().describe_context(), m_input_data);
 	return m_input_data << 8;
 }
 
@@ -1622,8 +1614,7 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::latch_delayed_w )
 void dcs_audio_device::output_latch_w(uint16_t data)
 {
 	m_pre_output_data = data;
-	if (LOG_DCS_IO)
-		logerror("%s output_latch_w(%04X) (empty=%d)\n", machine().describe_context(), data, IS_OUTPUT_EMPTY());
+	LOGMASKED(LOG_DCS_IO, "%s output_latch_w(%04X) (empty=%d)\n", machine().describe_context(), data, IS_OUTPUT_EMPTY());
 
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(dcs_audio_device::latch_delayed_w),this), data>>8);
 }
@@ -1631,8 +1622,7 @@ void dcs_audio_device::output_latch_w(uint16_t data)
 void dcs_audio_device::output_latch32_w(uint32_t data)
 {
 	m_pre_output_data = data >> 8;
-	if (LOG_DCS_IO)
-		logerror("%s output_latch32_w(%04X) (empty=%d)\n", machine().describe_context(), data>>8, IS_OUTPUT_EMPTY());
+	LOGMASKED(LOG_DCS_IO, "%s output_latch32_w(%04X) (empty=%d)\n", machine().describe_context(), data>>8, IS_OUTPUT_EMPTY());
 
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(dcs_audio_device::latch_delayed_w),this), data>>8);
 }
@@ -1652,8 +1642,7 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::delayed_ack_w_callback )
 
 void dcs_audio_device::ack_w()
 {
-	if (LOG_DCS_IO)
-		logerror("%s:ack_w\n", machine().describe_context());
+	LOGMASKED(LOG_DCS_IO, "%s:ack_w\n", machine().describe_context());
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(dcs_audio_device::delayed_ack_w_callback),this));
 }
 
@@ -1670,8 +1659,7 @@ uint16_t dcs_audio_device::data_r()
 	if (m_auto_ack)
 		delayed_ack_w();
 
-	if (LOG_DCS_IO)
-		logerror("%s:dcs_data_r(%04X)\n", machine().describe_context(), m_output_data);
+	LOGMASKED(LOG_DCS_IO, "%s:dcs_data_r(%04X)\n", machine().describe_context(), m_output_data);
 	return m_output_data;
 }
 
@@ -1683,8 +1671,7 @@ uint16_t dcs_audio_device::data_r()
 
 TIMER_CALLBACK_MEMBER( dcs_audio_device::output_control_delayed_w )
 {
-	//if (LOG_DCS_IO)
-	//  logerror("output_control = %04X\n", param);
+	//LOGMASKED(LOG_DCS_IO, "output_control = %04X\n", param);
 	m_output_control = param;
 	m_output_control_cycles = 0;
 }
@@ -1692,16 +1679,14 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::output_control_delayed_w )
 
 void dcs_audio_device::output_control_w(uint16_t data)
 {
-	if (LOG_DCS_IO)
-		logerror("%s output_control_w = %04X\n", machine().describe_context(), data);
+	LOGMASKED(LOG_DCS_IO, "%s output_control_w = %04X\n", machine().describe_context(), data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(dcs_audio_device::output_control_delayed_w),this), data);
 }
 
 
 uint16_t dcs_audio_device::output_control_r()
 {
-	if (LOG_DCS_IO)
-		logerror("%s output_control_r = %04X\n", machine().describe_context(), m_output_control);
+	LOGMASKED(LOG_DCS_IO, "%s output_control_r = %04X\n", machine().describe_context(), m_output_control);
 	m_output_control_cycles = m_cpu->total_cycles();
 	return m_output_control;
 }
@@ -1709,8 +1694,7 @@ uint16_t dcs_audio_device::output_control_r()
 
 int dcs_audio_device::data2_r()
 {
-	if (LOG_DCS_IO)
-		logerror("%s: dcs:data2_r = %04X\n", machine().describe_context(), m_output_control);
+	LOGMASKED(LOG_DCS_IO, "%s: dcs:data2_r = %04X\n", machine().describe_context(), m_output_control);
 
 	return m_output_control;
 }
@@ -1801,8 +1785,7 @@ void dcs_audio_device::reset_timer()
 			m_program->read_dword(0x1b) == 0x0C0020 &&      /* DIS SEC_REG */
 			m_program->read_dword(0x1c) == 0x0A001F)            /* RTI */
 		{
-			if (LOG_DCS_IO)
-				logerror("reset_timer: Disabled timer %llu\n", m_timer_start_cycles);
+			LOGMASKED(LOG_DCS_IO, "reset_timer: Disabled timer %llu\n", m_timer_start_cycles);
 			m_timer_ignore = true;
 		} else if (m_rev == REV_DSIO &&
 			m_program->read_dword(0x30) == 0x0c0030 &&      /* ENA SEC_REG */
@@ -1811,8 +1794,7 @@ void dcs_audio_device::reset_timer()
 			m_program->read_dword(0x33) == 0x0C0020 &&      /* DIS SEC_REG */
 			m_program->read_dword(0x34) == 0x0A001F)            /* RTI */
 		{
-			if (LOG_DCS_IO)
-				logerror("reset_timer: Disabled timer %llu\n", m_timer_start_cycles);
+			LOGMASKED(LOG_DCS_IO, "reset_timer: Disabled timer %llu\n", m_timer_start_cycles);
 			m_timer_ignore = true;
 		}
 	}
@@ -1827,13 +1809,13 @@ WRITE_LINE_MEMBER(dcs_audio_device::timer_enable_callback)
 {
 	if (state)
 	{
-		//logerror("Timer enabled @ %d cycles/int, or %f Hz\n", m_timer_scale * (m_timer_period + 1), 1.0 / m_cpu->cycles_to_attotime(m_timer_scale * (m_timer_period + 1)).as_double());
+		//LOG("Timer enabled @ %d cycles/int, or %f Hz\n", m_timer_scale * (m_timer_period + 1), 1.0 / m_cpu->cycles_to_attotime(m_timer_scale * (m_timer_period + 1)).as_double());
 		m_timer_enable = state;
 		reset_timer();
 	}
 	else
 	{
-		//logerror("Timer disabled\n");
+		//LOG("Timer disabled\n");
 		// Update the timer so the start count is correct the next time the timer is enabled
 		update_timer_count();
 		m_timer_enable = state;
@@ -1894,8 +1876,7 @@ uint16_t dcs_audio_device::adsp_control_r(offs_t offset)
 			result = m_control_regs[offset];
 			break;
 	}
-	if (LOG_DCS_IO)
-		logerror("%s adsp_control_r(%06x) = %04X\n", machine().describe_context(), offset + 0x3fe0, result);
+	LOGMASKED(LOG_DCS_IO, "%s adsp_control_r(%06x) = %04X\n", machine().describe_context(), offset + 0x3fe0, result);
 	return result;
 }
 
@@ -1910,7 +1891,7 @@ void dcs_audio_device:: adsp_control_w(offs_t offset, uint16_t data)
 			/* bit 9 forces a reset (not on 2181) */
 			if ((data & 0x0200) && !(m_rev == REV_DSIO || m_rev == REV_DENV))
 			{
-				logerror("%s Rebooting DCS due to SYSCONTROL write = %04X\n", machine().describe_context(), data);
+				LOG("%s Rebooting DCS due to SYSCONTROL write = %04X\n", machine().describe_context(), data);
 				m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 				dcs_boot();
 				m_control_regs[SYSCONTROL_REG] = 0;
@@ -1931,8 +1912,7 @@ void dcs_audio_device:: adsp_control_w(offs_t offset, uint16_t data)
 					// Start the SPORT0 timer
 					// SPORT0 is used as a 1kHz timer
 					m_sport0_timer->adjust(attotime::from_usec(10), 0, attotime::from_hz(1000));
-					if (LOG_DCS_IO)
-						logerror("adsp_control_w: Setting SPORT0 freqency to 1kHz\n");
+					LOGMASKED(LOG_DCS_IO, "adsp_control_w: Setting SPORT0 freqency to 1kHz\n");
 				}
 				else
 				{
@@ -1953,9 +1933,9 @@ void dcs_audio_device:: adsp_control_w(offs_t offset, uint16_t data)
 
 		case S1_CONTROL_REG:
 			if (((data >> 4) & 3) == 2)
-				logerror("DCS: Oh no!, the data is compressed with u-law encoding\n");
+				LOG("DCS: Oh no!, the data is compressed with u-law encoding\n");
 			if (((data >> 4) & 3) == 3)
-				logerror("DCS: Oh no!, the data is compressed with A-law encoding\n");
+				LOG("DCS: Oh no!, the data is compressed with A-law encoding\n");
 			break;
 
 		case TIMER_SCALE_REG:
@@ -1987,8 +1967,7 @@ void dcs_audio_device:: adsp_control_w(offs_t offset, uint16_t data)
 				dsio_idma_addr_w(data);
 			break;
 	}
-	if (LOG_DCS_IO)
-		logerror("%s adsp_control_w(%06x) = %04X\n", machine().describe_context(), offset + 0x3fe0, data);
+	LOGMASKED(LOG_DCS_IO, "%s adsp_control_w(%06x) = %04X\n", machine().describe_context(), offset + 0x3fe0, data);
 }
 
 
@@ -2000,8 +1979,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::dcs_irq )
 {
 	/* get the index register */
 	int reg = m_cpu->state_int(ADSP2100_I0 + m_ireg);
-	if (LOG_DCS_IO)
-		logerror("dcs_irq: m_ireg: %x m_size: %x m_incs: %x m_channels: %d m_ireg_base: %x reg: %06x\n", m_ireg, m_size, m_incs, m_channels, m_ireg_base, reg);
+	LOGMASKED(LOG_DCS_IO, "dcs_irq: m_ireg: %x m_size: %x m_incs: %x m_channels: %d m_ireg_base: %x reg: %06x\n", m_ireg, m_size, m_incs, m_channels, m_ireg_base, reg);
 
 	/* copy the current data into the buffer */
 	{
@@ -2028,20 +2006,17 @@ TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::dcs_irq )
 		reg = m_ireg_base;
 
 		/* generate the (internal, thats why the pulse) irq */
-		if (LOG_DCS_IO)
-			logerror("dcs_irq: Genrating interrupt\n");
+		LOGMASKED(LOG_DCS_IO, "dcs_irq: Generating interrupt\n");
 		m_cpu->pulse_input_line(ADSP2105_IRQ1, m_cpu->minimum_quantum_time());
 	}
 
 	/* store it */
 	m_cpu->set_state_int(ADSP2100_I0 + m_ireg, reg);
-	if (LOG_DCS_IO)
-		logerror("dcs_irq end: m_size: %x m_incs: %x m_channels: %d m_ireg_base: %x reg: %06x\n", m_size, m_incs, m_channels, m_ireg_base, reg);
+	LOGMASKED(LOG_DCS_IO, "dcs_irq end: m_size: %x m_incs: %x m_channels: %d m_ireg_base: %x reg: %06x\n", m_size, m_incs, m_channels, m_ireg_base, reg);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::sport0_irq )
 {
-
 	/* this latches internally, so we just pulse */
 	/* note that there is non-interrupt code that reads/modifies/writes the output_control */
 	/* register; if we don't interlock it, we will eventually lose sound (see CarnEvil) */
@@ -2074,8 +2049,7 @@ void dcs_audio_device::recompute_sample_rate()
 
 	dmadac_set_frequency(&m_dmadac[0], m_channels, sample_period.as_hz());
 	dmadac_enable(&m_dmadac[0], m_channels, 1);
-	if (LOG_DCS_IO)
-		logerror("recompute_sample_rate: Channels: %d Freq: %e Size: 0x%x m_incs: 0x%x\n", m_channels, sample_period.as_hz(), m_size, m_incs);
+	LOGMASKED(LOG_DCS_IO, "recompute_sample_rate: Channels: %d Freq: %e Size: 0x%x m_incs: 0x%x\n", m_channels, sample_period.as_hz(), m_size, m_incs);
 
 	/* fire off a timer which will hit every half-buffer */
 	if (m_incs)
@@ -2089,7 +2063,7 @@ void dcs_audio_device::sound_tx_callback(offs_t offset, uint32_t data)
 {
 	/* check if it's for SPORT1 */
 	if (offset != 1) {
-		logerror("sound_tx_callback: No code for offset %x\n", offset);
+		LOG("sound_tx_callback: No code for offset %x\n", offset);
 		return;
 	}
 
@@ -2125,14 +2099,13 @@ void dcs_audio_device::sound_tx_callback(offs_t offset, uint32_t data)
 			/* save it as it is now */
 			m_ireg_base = source;
 
-			if (LOG_DCS_IO)
-				logerror("sound_tx_callback: m_ireg_base: %x m_size: %x m_incs: %x \n", m_ireg_base, m_size, m_incs);
+			LOGMASKED(LOG_DCS_IO, "sound_tx_callback: m_ireg_base: %x m_size: %x m_incs: %x \n", m_ireg_base, m_size, m_incs);
 			/* recompute the sample rate and timer */
 			recompute_sample_rate();
 			return;
 		}
 		else
-			logerror( "ADSP SPORT1: trying to transmit and autobuffer not enabled!\n" );
+			LOG("ADSP SPORT1: trying to transmit and autobuffer not enabled!\n");
 	}
 
 	/* if we get there, something went wrong. Disable playing */
@@ -2253,8 +2226,7 @@ int dcs_audio_device::preprocess_stage_1(uint16_t data)
 			/* look for command 0x001a to transfer chunks of data */
 			if (data == 0x001a)
 			{
-				if (LOG_DCS_TRANSFERS)
-					logerror("%s:DCS Transfer command %04X\n", machine().describe_context(), data);
+				LOGMASKED(LOG_DCS_TRANSFERS, "%s:DCS Transfer command %04X\n", machine().describe_context(), data);
 				transfer.state++;
 				if (transfer.hle_enabled)
 					return 1;
@@ -2263,16 +2235,14 @@ int dcs_audio_device::preprocess_stage_1(uint16_t data)
 			/* look for command 0x002a to start booting the uploaded program */
 			else if (data == 0x002a)
 			{
-				if (LOG_DCS_TRANSFERS)
-					logerror("%s:DCS State change %04X\n", machine().describe_context(), data);
+				LOGMASKED(LOG_DCS_TRANSFERS, "%s:DCS State change %04X\n", machine().describe_context(), data);
 				transfer.dcs_state = 1;
 			}
 
 			/* anything else is ignored */
 			else
 			{
-				if (LOG_DCS_TRANSFERS)
-					logerror("Command: %04X\n", data);
+				LOGMASKED(LOG_DCS_TRANSFERS, "Command: %04X\n", data);
 			}
 			break;
 
@@ -2280,8 +2250,7 @@ int dcs_audio_device::preprocess_stage_1(uint16_t data)
 			/* first word is the start address */
 			transfer.start = data;
 			transfer.state++;
-			if (LOG_DCS_TRANSFERS)
-				logerror("Start address = %04X\n", transfer.start);
+			LOGMASKED(LOG_DCS_TRANSFERS, "Start address = %04X\n", transfer.start);
 			if (transfer.hle_enabled)
 				return 1;
 			break;
@@ -2290,8 +2259,7 @@ int dcs_audio_device::preprocess_stage_1(uint16_t data)
 			/* second word is the stop address */
 			transfer.stop = data;
 			transfer.state++;
-			if (LOG_DCS_TRANSFERS)
-				logerror("Stop address = %04X\n", transfer.stop);
+			LOGMASKED(LOG_DCS_TRANSFERS, "Stop address = %04X\n", transfer.stop);
 			if (transfer.hle_enabled)
 				return 1;
 			break;
@@ -2303,7 +2271,7 @@ int dcs_audio_device::preprocess_stage_1(uint16_t data)
 			/* transfer type 2 = SRAM bank 1 */
 			transfer.type = data;
 			transfer.state++;
-			if (LOG_DCS_TRANSFERS) logerror("Transfer type = %04X\n", transfer.type);
+			LOGMASKED(LOG_DCS_TRANSFERS, "Transfer type = %04X\n", transfer.type);
 
 			/* at this point, we can compute how many words to expect for the transfer */
 			transfer.writes_left = transfer.stop - transfer.start + 1;
@@ -2337,7 +2305,7 @@ int dcs_audio_device::preprocess_stage_1(uint16_t data)
 			/* if we're out, stop the transfer */
 			if (--transfer.writes_left == 0)
 			{
-				if (LOG_DCS_TRANSFERS) logerror("Transfer done, sum = %04X\n", transfer.sum);
+				LOGMASKED(LOG_DCS_TRANSFERS, "Transfer done, sum = %04X\n", transfer.sum);
 				transfer.state = 0;
 			}
 
@@ -2389,8 +2357,7 @@ int dcs_audio_device::preprocess_stage_2(uint16_t data)
 			/* look for command 0x55d0 or 0x55d1 to transfer chunks of data */
 			if (data == 0x55d0 || data == 0x55d1)
 			{
-				if (LOG_DCS_TRANSFERS)
-					logerror("%s:DCS Transfer command %04X\n", machine().describe_context(), data);
+				LOGMASKED(LOG_DCS_TRANSFERS, "%s:DCS Transfer command %04X\n", machine().describe_context(), data);
 				transfer.state++;
 				if (transfer.hle_enabled)
 					return 1;
@@ -2399,8 +2366,7 @@ int dcs_audio_device::preprocess_stage_2(uint16_t data)
 			/* anything else is ignored */
 			else
 			{
-				if (LOG_DCS_TRANSFERS)
-					logerror("%s:Command: %04X\n", machine().describe_context(), data);
+				LOGMASKED(LOG_DCS_TRANSFERS, "%s:Command: %04X\n", machine().describe_context(), data);
 			}
 			break;
 
@@ -2416,8 +2382,7 @@ int dcs_audio_device::preprocess_stage_2(uint16_t data)
 			/* second word is the lower bits of the start address */
 			transfer.start |= data;
 			transfer.state++;
-			if (LOG_DCS_TRANSFERS)
-				logerror("Start address = %08X\n", transfer.start);
+			LOGMASKED(LOG_DCS_TRANSFERS, "Start address = %08X\n", transfer.start);
 			if (transfer.hle_enabled)
 				return 1;
 			break;
@@ -2434,8 +2399,7 @@ int dcs_audio_device::preprocess_stage_2(uint16_t data)
 			/* fourth word is the lower bits of the stop address */
 			transfer.stop |= data;
 			transfer.state++;
-			if (LOG_DCS_TRANSFERS)
-				logerror("Stop address = %08X\n", transfer.stop);
+			LOGMASKED(LOG_DCS_TRANSFERS, "Stop address = %08X\n", transfer.stop);
 
 			/* at this point, we can compute how many words to expect for the transfer */
 			transfer.writes_left = transfer.stop - transfer.start + 1;
@@ -2456,8 +2420,7 @@ int dcs_audio_device::preprocess_stage_2(uint16_t data)
 			/* if we're out, stop the transfer */
 			if (--transfer.writes_left == 0)
 			{
-				if (LOG_DCS_TRANSFERS)
-					logerror("Transfer done, sum = %04X\n", transfer.sum);
+				LOGMASKED(LOG_DCS_TRANSFERS, "Transfer done, sum = %04X\n", transfer.sum);
 				transfer.state = 0;
 			}
 

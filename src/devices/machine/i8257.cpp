@@ -9,7 +9,6 @@
 #include "emu.h"
 #include "i8257.h"
 
-//#define LOG_GENERAL (1U << 0) //defined in logmacro.h already
 #define LOG_SETUP     (1U << 1)
 #define LOG_TFR       (1U << 2)
 
@@ -541,7 +540,7 @@ void i8257_device::write(offs_t offset, uint8_t data)
 		switch (offset & 0x01)
 		{
 		case REGISTER_ADDRESS:
-			LOGSETUP(" * Register Address <- %02x\n", data);
+			LOGSETUP(" * Channel %d Register Address <- %02x\n", channel, data);
 			if (m_msb)
 			{
 				m_channel[channel].m_address = (data << 8) | (m_channel[channel].m_address & 0xff);
@@ -557,7 +556,7 @@ void i8257_device::write(offs_t offset, uint8_t data)
 			break;
 
 		case REGISTER_WORD_COUNT:
-			LOGSETUP(" * Register Word Count <- %02x\n", data);
+			LOGSETUP(" * Channel %d Register Word Count <- %02x\n", channel, data);
 			if (m_msb)
 			{
 				m_channel[channel].m_count = ((data & 0x3f) << 8) | (m_channel[channel].m_count & 0xff);

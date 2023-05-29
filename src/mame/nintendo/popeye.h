@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:smf, Nicola Salmoria, Couriersud
 // thanks-to: Marc Lafontaine
-#ifndef MAME_INCLUDES_POPEYE_H
-#define MAME_INCLUDES_POPEYE_H
+#ifndef MAME_NINTENDO_POPEYE_H
+#define MAME_NINTENDO_POPEYE_H
 
 #pragma once
 
@@ -158,4 +158,4 @@ protected:
 	virtual void maincpu_program_map(address_map &map) override;
 };
 
-#endif // MAME_INCLUDES_POPEYE_H
+#endif // MAME_NINTENDO_POPEYE_H

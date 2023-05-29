@@ -22,6 +22,8 @@ Notes:
 #include "speaker.h"
 
 
+namespace {
+
 class cosmicg_state : public driver_device
 {
 public:
@@ -433,6 +435,8 @@ void cosmicg_state::init_cosmicg()
 		rom[offs] = normal;
 	}
 }
+
+} // anonymous namespace
 
 
 GAME( 1979, cosmicg,  0,       cosmicg, cosmicg, cosmicg_state, init_cosmicg, ROT270, "Universal", "Cosmic Guerilla", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

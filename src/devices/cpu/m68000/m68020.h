@@ -78,7 +78,7 @@ public:
 	virtual u32 execute_min_cycles() const noexcept override { return 2; }
 	virtual u32 execute_max_cycles() const noexcept override { return 158; }
 
-	virtual bool memory_translate(int space, int intention, offs_t &address) override;
+	virtual bool memory_translate(int space, int intention, offs_t &address, address_space *&target_space) override;
 
 	// device-level overrides
 	virtual void device_start() override;

@@ -15,6 +15,7 @@ Keyboard: P8035L CPU, undumped 2716 labelled "358_2758", XTAL marked "4608-300-1
 ************************************************************************************************************************************/
 
 #include "emu.h"
+#include "altos2_kbd.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
@@ -26,6 +27,9 @@ Keyboard: P8035L CPU, undumped 2716 labelled "358_2758", XTAL marked "4608-300-1
 //#include "video/crt9021.h"
 #include "screen.h"
 #include "speaker.h"
+
+
+namespace {
 
 class altos2_state : public driver_device
 {
@@ -151,10 +155,13 @@ void altos2_state::altos2(machine_config &config)
 
 	z80dart_device &dart1(Z80DART(config, "dart1", 8_MHz_XTAL / 2));
 	dart1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	dart1.out_txdb_callback().set("keyboard", FUNC(altos2_keyboard_device::rxd_w));
 
 	z80dart_device &dart2(Z80DART(config, "dart2", 8_MHz_XTAL / 2)); // channel B not used for communications
 	dart2.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	dart2.out_dtrb_callback().set(m_novram, FUNC(x2210_device::store)).invert(); // FIXME: no inverter should be needed
+
+	ALTOS2_KEYBOARD(config, "keyboard").txd_callback().set("dart1", FUNC(z80dart_device::rxb_w));
 
 	X2210(config, m_novram);
 
@@ -178,9 +185,9 @@ ROM_START( altos2 )
 
 	ROM_REGION( 0x2000, "chargen", 0 )
 	ROM_LOAD( "us_v1.1_14410.u34", 0x0000, 0x2000, CRC(0ebb78bf) SHA1(96a1f7d34ff35037cbbc93049c0e2b9c9f11f1db) )
-
-	ROM_REGION( 0x0800, "keyboard", 0 )
-	ROM_LOAD( "358_7258", 0x0000, 0x0800, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1983, altos2, 0, 0, altos2, altos2, altos2_state, empty_init, "Altos Computer Systems", "Altos II Terminal", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)

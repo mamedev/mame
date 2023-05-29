@@ -10,7 +10,6 @@
 #pragma once
 
 #include "osdepend.h"
-#include "modules/osdmodule.h"
 
 #include <memory>
 
@@ -24,7 +23,8 @@
 class midi_module
 {
 public:
-	virtual ~midi_module() { }
+	virtual ~midi_module() = default;
+
 	// specific routines
 
 	virtual std::unique_ptr<osd_midi_device> create_midi_device() = 0;

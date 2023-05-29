@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, ElSemi
 
-#ifndef MAME_MACHINE_IGS025_H
-#define MAME_MACHINE_IGS025_H
+#ifndef MAME_IGS_IGS025_H
+#define MAME_IGS_IGS025_H
 
 #pragma once
 
@@ -56,4 +56,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(IGS025, igs025_device)
 
-#endif // MAME_MACHINE_IGS025_H
+#endif // MAME_IGS_IGS025_H

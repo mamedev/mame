@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder, Olivier Galibert
-#ifndef MAME_MACHINE_ATARISTB_H
-#define MAME_MACHINE_ATARISTB_H
+#ifndef MAME_ATARI_ATARISTB_H
+#define MAME_ATARI_ATARISTB_H
 
 #pragma once
 
@@ -87,4 +87,4 @@ private:
 // device type declaration
 DECLARE_DEVICE_TYPE(ST_BLITTER, st_blitter_device)
 
-#endif // MAME_MACHINE_ATARISTB_H
+#endif // MAME_ATARI_ATARISTB_H

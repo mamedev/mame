@@ -5,8 +5,8 @@
     Sega Zaxxon hardware
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_ZAXXON_H
-#define MAME_INCLUDES_ZAXXON_H
+#ifndef MAME_SEGA_ZAXXON_H
+#define MAME_SEGA_ZAXXON_H
 
 #pragma once
 
@@ -138,4 +138,4 @@ private:
 	void zaxxon_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_ZAXXON_H
+#endif // MAME_SEGA_ZAXXON_H

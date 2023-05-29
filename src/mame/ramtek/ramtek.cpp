@@ -43,6 +43,9 @@
 #include "netlist/devices/net_lib.h"
 #include "video/fixfreq.h"
 
+
+namespace {
+
 // copied from Pong, not accurate for this driver!
 // start
 #define MASTER_CLOCK    7159000
@@ -240,6 +243,9 @@ ROM_START( trivia )
 	ROM_LOAD( "550549-4.d4",    0x0000, 0x0100, CRC(6dbc83e9) SHA1(8a4f211cb12e5a5244d213c20a4e2df6288abcab) )
 	ROM_LOAD( "550548.e3",      0x0000, 0x0020, CRC(2b7c6a5e) SHA1(943cc3901c651bfe5bf11a40c27801952731b6de) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1973, vollyrmt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Volly (Ramtek) [TTL]",    MACHINE_IS_SKELETON )
 GAME( 1973, hockyrmt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Hockey (Ramtek) [TTL]",   MACHINE_IS_SKELETON )

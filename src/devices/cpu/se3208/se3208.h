@@ -69,6 +69,10 @@ private:
 
 	int m_icount;
 
+	inline void CLRFLAG(uint32_t f) { m_SR&=~f; }
+	inline void SETFLAG(uint32_t f) { m_SR|=f; }
+	inline bool TESTFLAG(uint32_t f) const { return m_SR&f; }
+
 	inline uint8_t SE3208_Read8(uint32_t addr);
 	inline uint16_t SE3208_Read16(uint32_t addr);
 	inline uint32_t SE3208_Read32(uint32_t addr);

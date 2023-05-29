@@ -188,6 +188,9 @@
 #include "machine/68340.h"
 #include "speaker.h"
 
+
+namespace {
+
 class pluto5_state : public driver_device
 {
 public:
@@ -929,6 +932,9 @@ void pluto5_state::init_hb()
 	}
 	#endif
 }
+
+} // anonymous namespace
+
 
 GAME( 2003, hb_junglet, 0,         pluto5, pluto5, pluto5_state, init_hb, ROT0, "Sega", "Jungle Treasures", MACHINE_IS_SKELETON_MECHANICAL )
 

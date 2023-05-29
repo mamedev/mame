@@ -147,25 +147,21 @@ static const char *scv_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-image_init_result scv_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> scv_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint8_t *ROM;
-		uint32_t len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
-		bool has_ram = loaded_through_softlist() && get_software_region("ram");
+		uint32_t const len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
+		bool const has_ram = loaded_through_softlist() && get_software_region("ram");
 
 		if (len > 0x20000)
-		{
-			seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-			return image_init_result::FAIL;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be no more than 128K)");
 
 		m_cart->rom_alloc(len);
 		if (has_ram)
 			m_cart->ram_alloc(get_software_region_length("ram"));
 
-		ROM = m_cart->get_rom_base();
+		uint8_t *const ROM = m_cart->get_rom_base();
 
 		if (!loaded_through_softlist())
 			fread(ROM, len);
@@ -189,11 +185,9 @@ image_init_result scv_cart_slot_device::call_load()
 			m_type = SCV_128K_RAM;
 
 		//printf("Type: %s\n", scv_get_slot(m_type));
-
-		return image_init_result::PASS;
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

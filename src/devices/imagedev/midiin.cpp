@@ -49,16 +49,16 @@ INPUT_PORTS_END
 -------------------------------------------------*/
 
 midiin_device::midiin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MIDIIN, tag, owner, clock),
-		device_image_interface(mconfig, *this),
-		device_serial_interface(mconfig, *this),
-		m_midi(),
-		m_config(*this, "CFG"),
-		m_timer(nullptr),
-		m_input_cb(*this),
-		m_xmit_read(0),
-		m_xmit_write(0),
-		m_tx_busy(false)
+	: device_t(mconfig, MIDIIN, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
+	, device_serial_interface(mconfig, *this)
+	, m_midi()
+	, m_config(*this, "CFG")
+	, m_timer(nullptr)
+	, m_input_cb(*this)
+	, m_xmit_read(0)
+	, m_xmit_write(0)
+	, m_tx_busy(false)
 {
 }
 
@@ -165,22 +165,22 @@ TIMER_CALLBACK_MEMBER(midiin_device::midi_update)
     call_load
 -------------------------------------------------*/
 
-image_init_result midiin_device::call_load()
+std::pair<std::error_condition, std::string> midiin_device::call_load()
 {
 	// attempt to load if it's a real file
-	m_err = load_image_by_path(OPEN_FLAG_READ, filename());
-	if (!m_err)
+	std::error_condition err = load_image_by_path(OPEN_FLAG_READ, filename());
+	if (!err)
 	{
 		// if the parsing succeeds, schedule the start to happen at least
 		// 10 seconds after starting to allow the keyboards to initialize
 		// TODO: this should perhaps be a driver-configurable parameter?
-		if (m_sequence.parse(image_core_file(), length()))
+		err = m_sequence.parse(image_core_file(), length());
+		if (!err)
 		{
 			m_sequence_start = std::max(machine().time(), attotime(10, 0));
 			m_timer->adjust(attotime::zero);
-			return image_init_result::PASS;
 		}
-		return image_init_result::FAIL;
+		return std::make_pair(err, std::string());
 	}
 	else
 	{
@@ -189,11 +189,11 @@ image_init_result midiin_device::call_load()
 		if (!m_midi->open_input(filename()))
 		{
 			m_midi.reset();
-			return image_init_result::FAIL;
+			return std::make_pair(image_error::UNSPECIFIED, std::string());
 		}
 
 		m_timer->adjust(attotime::from_hz(1500), 0, attotime::from_hz(1500));
-		return image_init_result::PASS;
+		return std::make_pair(std::error_condition(), std::string());
 	}
 }
 
@@ -460,7 +460,7 @@ midiin_device::midi_event &midiin_device::midi_sequence::event_at(u32 tick)
 //  parse - parse a MIDI sequence from a buffer
 //-------------------------------------------------
 
-bool midiin_device::midi_sequence::parse(util::random_read &stream, u32 length)
+std::error_condition midiin_device::midi_sequence::parse(util::random_read &stream, u32 length)
 {
 	// start with an empty list of events
 	m_list.clear();
@@ -497,14 +497,14 @@ bool midiin_device::midi_sequence::parse(util::random_read &stream, u32 length)
 			}
 		}
 		m_iterator = m_list.begin();
-		return true;
+		return std::error_condition();
 	}
 	catch (midi_parser::error &err)
 	{
 		osd_printf_error("MIDI file error: %s\n", err.description());
 		m_list.clear();
 		m_iterator = m_list.begin();
-		return false;
+		return image_error::UNSPECIFIED;
 	}
 }
 

@@ -8,8 +8,8 @@
 
 *************************************************************************/
 
-#ifndef MAME_MACHINE_ATARIXGA_H
-#define MAME_MACHINE_ATARIXGA_H
+#ifndef MAME_ATARI_ATARIXGA_H
+#define MAME_ATARI_ATARIXGA_H
 
 DECLARE_DEVICE_TYPE(ATARI_136094_0072, atari_136094_0072_device)
 DECLARE_DEVICE_TYPE(ATARI_136095_0072, atari_136095_0072_device)
@@ -108,4 +108,4 @@ private:
 };
 
 
-#endif // MAME_MACHINE_ATARIXGA_H
+#endif // MAME_ATARI_ATARIXGA_H

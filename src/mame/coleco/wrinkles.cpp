@@ -1,16 +1,28 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-/******************************************************************************
+/*******************************************************************************
 
-Coleco Talking Wrinkles, a plushie dog handpuppet toy
+Talking Wrinkles (model 6006), a dog hand puppet
 
-Hardware is a P80C31BH @ 11MHz and a 32KB ROM, RAM is in the MCU.
-It also has a cartridge slot, but no known cartridges were released.
-The speech technology is by Electronic Speech Systems.
+Published by Lakeside (a Coleco subsidiary at that time, after Coleco purchased
+Leisure Dynamics in 1985). Programming by Stephen Beck. The speech technology is
+by Electronic Speech Systems. The plushie itself is licensed from Ganz Bros.
+
+Hardware notes:
+
+PCB 1:
+- PCB label: REV 4.1 DIGITAL, 201239C, (C) COLECO 1986
+- P80C31BH, 11MHz XTAL
+- 32KB EPROM
+- cartridge slot (no known cartridges were released)
+
+PCB 2:
+- PCB label: ANALOG REV 6.2, 201238D, (C) COLECO 1986
+- button, motion sensor, microphone
 
 Known sensors:
 - 0x02: bellybutton, literally a button
-- 0x04: detect violent motion (Wrinkles will cry)
+- 0x04: detect violent motion (drop Wrinkles and he will cry)
 - 0x10: detect light motion
 - 0x40: detect open mouth (use as handpuppet to make it 'talk')
 - 0x80: detect magnet in mouth (the toy came with a 'bone' that has a magnet in it)
@@ -19,7 +31,7 @@ TODO:
 - where is the microphone? or are they the same inputs as the motion sensors?
 - power-on by pressing button
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -49,9 +61,9 @@ private:
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void wrinkles_state::main_map(address_map &map)
 {
@@ -61,15 +73,15 @@ void wrinkles_state::main_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( wrinkles )
 	PORT_START("INPUTS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("Tickle Button")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_5) PORT_NAME("Shake Sensor")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_5) PORT_NAME("Impact Sensor")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("Motion Sensor")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -79,28 +91,28 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void wrinkles_state::wrinkles(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	I80C31(config, m_maincpu, 11_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &wrinkles_state::main_map);
 	m_maincpu->port_in_cb<1>().set_ioport("INPUTS");
 	m_maincpu->port_out_cb<3>().set("dac", FUNC(dac_8bit_r2r_device::write));
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( wrinkles )
 	ROM_REGION( 0x8000, "maincpu", 0 )
@@ -111,9 +123,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME       PARENT CMP MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1986, wrinkles,  0,      0, wrinkles, wrinkles, wrinkles_state, empty_init, "Coleco / Ganz", "Talking Wrinkles", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1986, wrinkles,  0,      0,      wrinkles, wrinkles, wrinkles_state, empty_init, "Lakeside / Coleco / Ganz Bros", "Talking Wrinkles", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )

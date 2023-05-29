@@ -415,11 +415,9 @@ WRITE_LINE_MEMBER( scsihle_device::input_sel )
 		// only one line active.
 		if (scsibus_driveno(m_input_data) == scsiID)
 		{
-			void *hdfile = nullptr;
 			// Check to see if device had image file mounted, if not, do not set busy,
 			// and stay busfree.
-			GetDevice(&hdfile);
-			if (hdfile != nullptr)
+			if (exists())
 			{
 				if (!state)
 				{
@@ -494,7 +492,7 @@ WRITE_LINE_MEMBER( scsihle_device::input_ack )
 
 				if (IS_COMMAND(SCSI_CMD_FORMAT_UNIT))
 				{
-					// If we have the first byte, then cancel the dataout timout
+					// If we have the first byte, then cancel the dataout timeout
 					if (data_idx == 1)
 						dataout_timer->adjust(attotime::never);
 

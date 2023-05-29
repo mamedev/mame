@@ -19,6 +19,9 @@
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class freeway_state : public driver_device
 {
 public:
@@ -191,6 +194,8 @@ ROM_START(freewaya)
 	ROM_REGION(0x21ee, "nvram", 0)
 	ROM_LOAD("ram_m48t08_431", 0x0000, 0x21ee, CRC(e8fe8d9c) SHA1(bf93ead6ae0f03a646b4952cb999cf0dbc58d223)) // weird size, check when emulation is more mature
 ROM_END
+
+} // anonymous namespace
 
 
 GAME(1999, freeway,        0, freeway, freeway, freeway_state, empty_init, ROT0, "NVC Electronica", "FreeWay (V5.12)", MACHINE_IS_SKELETON)

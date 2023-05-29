@@ -167,6 +167,9 @@ JC-301-00  W11 9510K7059    23C16000        U85
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class jchan_state : public driver_device
 {
 public:
@@ -752,6 +755,8 @@ void jchan_state::init_jchan()
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x403ffe, 0x403fff, write16s_delegate(*this, FUNC(jchan_state::main2sub_cmd_w)));
 	m_subcpu->space(AS_PROGRAM).install_write_handler(0x400000, 0x400001, write16s_delegate(*this, FUNC(jchan_state::sub2main_cmd_w)));
 }
+
+} // anonymous namespace
 
 
 /* game drivers */

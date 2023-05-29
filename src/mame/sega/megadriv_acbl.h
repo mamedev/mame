@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_INCLUDES_MEGADRIV_ACBL_H
-#define MAME_INCLUDES_MEGADRIV_ACBL_H
+#ifndef MAME_SEGA_MEGADRIV_ACBL_H
+#define MAME_SEGA_MEGADRIV_ACBL_H
 
 #include "megadriv.h"
 
@@ -87,4 +87,4 @@ private:
 	void ssf2mdb_68k_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_MEGADRIV_ACBL_H
+#endif // MAME_SEGA_MEGADRIV_ACBL_H

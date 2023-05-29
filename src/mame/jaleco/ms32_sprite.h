@@ -4,8 +4,8 @@
     Jaleco Megasystem 32 sprite hardware
 */
 
-#ifndef MAME_VIDEO_MS32_SPRITE_H
-#define MAME_VIDEO_MS32_SPRITE_H
+#ifndef MAME_JALECO_MS32_SPRITE_H
+#define MAME_JALECO_MS32_SPRITE_H
 
 #pragma once
 
@@ -91,4 +91,4 @@ private:
 
 DECLARE_DEVICE_TYPE(JALECO_MEGASYSTEM32_SPRITE, ms32_sprite_device)
 
-#endif  // MAME_VIDEO_MS32_SPRITE_H
+#endif  // MAME_JALECO_MS32_SPRITE_H

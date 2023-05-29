@@ -109,6 +109,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class jrpacman_state : public pacman_state
 {
 public:
@@ -421,6 +423,7 @@ void jrpacman_state::init_jrpacman()
 			RAM[A++] ^= table[i].value;
 }
 
+} // anonymous namespace
 
 
 /*************************************

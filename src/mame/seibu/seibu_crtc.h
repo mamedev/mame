@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_VIDEO_SEIBU_CRTC_H
-#define MAME_VIDEO_SEIBU_CRTC_H
+#ifndef MAME_SEIBU_SEIBU_CRTC_H
+#define MAME_SEIBU_SEIBU_CRTC_H
 
 #pragma once
 
@@ -69,4 +69,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(SEIBU_CRTC, seibu_crtc_device)
 
-#endif // MAME_VIDEO_SEIBU_CRTC_H
+#endif // MAME_SEIBU_SEIBU_CRTC_H

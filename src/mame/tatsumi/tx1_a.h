@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_AUDIO_TX1_H
-#define MAME_AUDIO_TX1_H
+#ifndef MAME_TATSUMI_TX1_A_H
+#define MAME_TATSUMI_TX1_A_H
 
 #pragma once
 
@@ -192,4 +192,4 @@ DECLARE_DEVICE_TYPE(TX1J_SOUND, tx1j_sound_device)
 DECLARE_DEVICE_TYPE(BUGGYBOY_SOUND, buggyboy_sound_device)
 DECLARE_DEVICE_TYPE(BUGGYBOYJR_SOUND, buggyboyjr_sound_device)
 
-#endif // MAME_AUDIO_TX1_H
+#endif // MAME_TATSUMI_TX1_A_H

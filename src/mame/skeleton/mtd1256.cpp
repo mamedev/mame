@@ -18,6 +18,9 @@
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class mtd1256_state : public driver_device
 {
 public:
@@ -150,5 +153,8 @@ ROM_START(mtd1256)
 	ROM_REGION(0x10000, "program", 0)
 	ROM_LOAD("cieenres.b_26-11-92.u7", 0x00000, 0x10000, CRC(a507effd) SHA1(46b3399c0c26c6952a5582c79c14663515e3e180))
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1992, mtd1256, 0, 0, mtd1256, mtd1256, mtd1256_state, empty_init, "Geonica", "Meteodata 1256", MACHINE_IS_SKELETON)

@@ -1254,7 +1254,7 @@ void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, uint16_t curline )
 {
 	bool blurring = m_options.read_safe(0) & 0x01;
 
-	g_profiler.start(PROFILER_VIDEO);
+	auto profile = g_profiler.start(PROFILER_VIDEO);
 
 	cache_background();
 
@@ -1282,10 +1282,7 @@ void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, uint16_t curline )
 		struct SNES_SCANLINE *below = &m_scanlines[SNES_SUBSCREEN];
 #if SNES_LAYER_DEBUG
 		if (dbg_video(curline))
-		{
-			g_profiler.stop();
 			return;
-		}
 
 		/* Toggle drawing of SNES_SUBSCREEN or SNES_MAINSCREEN */
 		if (m_debug_options.draw_subscreen)
@@ -1357,8 +1354,6 @@ void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, uint16_t curline )
 			}
 		}
 	}
-
-	g_profiler.stop();
 }
 
 uint16_t snes_ppu_device::pixel(uint16_t x, SNES_SCANLINE *above, SNES_SCANLINE *below, uint8_t *window_above, uint8_t *window_below)

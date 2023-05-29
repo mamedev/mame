@@ -6,39 +6,42 @@
 
     Empty shim for systems not supporting midi / portmidi
 
-*******************************************************************c********/
+***************************************************************************/
 
-#include "osdcore.h"
-#include "modules/osdmodule.h"
 #include "midi_module.h"
 
-class none_module : public osd_module, public midi_module
-{
-public:
+#include "modules/osdmodule.h"
+#include "osdcore.h"
 
-	none_module() : osd_module(OSD_MIDI_PROVIDER, "pm"), midi_module()
-	{
-	}
-	virtual ~none_module() { }
+#include <memory>
 
-	virtual int init(const osd_options &options) override;
-	virtual void exit() override;
 
-	virtual std::unique_ptr<osd_midi_device> create_midi_device() override;
-	virtual void list_midi_devices() override;
-};
+namespace osd {
 
+namespace {
 
 class osd_midi_device_none : public osd_midi_device
 {
 public:
-	virtual ~osd_midi_device_none() { }
-	virtual bool open_input(const char *devname) override;
-	virtual bool open_output(const char *devname) override;
-	virtual void close() override;
-	virtual bool poll() override;
-	virtual int read(uint8_t *pOut) override;
-	virtual void write(uint8_t data) override;
+	virtual bool open_input(const char *devname) override { return false; }
+	virtual bool open_output(const char *devname) override { return false; }
+	virtual void close() override { }
+	virtual bool poll() override { return false; }
+	virtual int read(uint8_t *pOut) override { return 0; }
+	virtual void write(uint8_t data) override { }
+};
+
+
+class none_module : public osd_module, public midi_module
+{
+public:
+	none_module() : osd_module(OSD_MIDI_PROVIDER, "none"), midi_module() { }
+
+	virtual int init(osd_interface &osd, const osd_options &options) override { return 0; }
+	virtual void exit() override { }
+
+	virtual std::unique_ptr<osd_midi_device> create_midi_device() override;
+	virtual void list_midi_devices() override;
 };
 
 std::unique_ptr<osd_midi_device> none_module::create_midi_device()
@@ -46,47 +49,14 @@ std::unique_ptr<osd_midi_device> none_module::create_midi_device()
 	return std::make_unique<osd_midi_device_none>();
 }
 
-
-int none_module::init(const osd_options &options)
-{
-	return 0;
-}
-
-void none_module::exit()
-{
-}
-
 void none_module::list_midi_devices()
 {
-	osd_printf_warning("\nMIDI is not supported in this build\n");
+	osd_printf_warning("\nMIDI is not supported in this configuration\n");
 }
 
-bool osd_midi_device_none::open_input(const char *devname)
-{
-	return false;
-}
+} // anonymous namespace
 
-bool osd_midi_device_none::open_output(const char *devname)
-{
-	return false;
-}
+} // namespace osd
 
-void osd_midi_device_none::close()
-{
-}
 
-bool osd_midi_device_none::poll()
-{
-	return false;
-}
-
-int osd_midi_device_none::read(uint8_t *pOut)
-{
-	return 0;
-}
-
-void osd_midi_device_none::write(uint8_t data)
-{
-}
-
-MODULE_DEFINITION(MIDI_NONE, none_module)
+MODULE_DEFINITION(MIDI_NONE, osd::none_module)

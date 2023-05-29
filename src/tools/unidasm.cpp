@@ -76,6 +76,7 @@ using util::BIT;
 #include "cpu/i960/i960dis.h"
 #include "cpu/ibm1800/ibm1800d.h"
 #include "cpu/ie15/ie15dasm.h"
+#include "cpu/interdata16/dasm16.h"
 #include "cpu/jaguar/jagdasm.h"
 #include "cpu/ks0164/ks0164d.h"
 #include "cpu/lc57/lc57d.h"
@@ -117,6 +118,7 @@ using util::BIT;
 #include "cpu/mips/mips3dsm.h"
 #include "cpu/mips/mips1dsm.h"
 #include "cpu/mk1/mk1dasm.h"
+#include "cpu/mn1400/mn1400d.h"
 #include "cpu/mn1610/mn1610d.h"
 #include "cpu/mn1880/mn1880d.h"
 #include "cpu/mn10200/mn102dis.h"
@@ -484,6 +486,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "ibm1130",         be, -1, []() -> util::disasm_interface * { return new ibm1130_disassembler; } },
 	{ "ibm1800",         be, -1, []() -> util::disasm_interface * { return new ibm1800_disassembler; } },
 	{ "ie15",            le,  0, []() -> util::disasm_interface * { return new ie15_disassembler; } },
+	{ "interdata16",     be,  0, []() -> util::disasm_interface * { return new interdata16_disassembler; } },
 	{ "jaguardsp",       be,  0, []() -> util::disasm_interface * { return new jaguar_disassembler(jaguar_disassembler::variant::DSP); } },
 	{ "jaguargpu",       be,  0, []() -> util::disasm_interface * { return new jaguar_disassembler(jaguar_disassembler::variant::GPU); } },
 	{ "konami",          be,  0, []() -> util::disasm_interface * { return new konami_disassembler; } },
@@ -534,6 +537,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "mm76",            le,  0, []() -> util::disasm_interface * { return new mm76_disassembler; } },
 	{ "mm78",            le,  0, []() -> util::disasm_interface * { return new mm78_disassembler; } },
 	{ "mn10200",         le,  0, []() -> util::disasm_interface * { return new mn10200_disassembler; } },
+	{ "mn1400",          le,  0, []() -> util::disasm_interface * { return new mn1400_disassembler; } },
 	{ "mn1610",          be, -1, []() -> util::disasm_interface * { return new mn1610_disassembler; } },
 	{ "mn1613",          be, -1, []() -> util::disasm_interface * { return new mn1613_disassembler; } },
 	{ "mn1860",          be,  0, []() -> util::disasm_interface * { return new mn1860_disassembler; } },
@@ -571,7 +575,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "sab80c515",       le,  0, []() -> util::disasm_interface * { return new sab80c515_disassembler; } },
 	{ "saturn",          le,  0, []() -> util::disasm_interface * { return new saturn_disassembler(&saturn_unidasm); } },
 	{ "sc61860",         le,  0, []() -> util::disasm_interface * { return new sc61860_disassembler; } },
-	{ "scmp",            le,  0, []() -> util::disasm_interface * { return new scmp_disassembler; } },
+	{ "scmp",            be,  0, []() -> util::disasm_interface * { return new scmp_disassembler; } },
 	{ "score7",          le,  0, []() -> util::disasm_interface * { return new score7_disassembler; } },
 	{ "scudsp",          be, -2, []() -> util::disasm_interface * { return new scudsp_disassembler; } },
 	{ "se3208",          le,  0, []() -> util::disasm_interface * { return new se3208_disassembler; } },
@@ -587,6 +591,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "sm590",           le,  0, []() -> util::disasm_interface * { return new sm590_disassembler; } },
 	{ "sm5a",            le,  0, []() -> util::disasm_interface * { return new sm5a_disassembler; } },
 	{ "sm8500",          le,  0, []() -> util::disasm_interface * { return new sm8500_disassembler; } },
+	{ "smc1102",         le,  0, []() -> util::disasm_interface * { return new smc1102_disassembler; } },
 	{ "sparclite",       be,  0, []() -> util::disasm_interface * { return new sparc_disassembler(nullptr, sparc_disassembler::sparclite); } },
 	{ "sparcv7",         be,  0, []() -> util::disasm_interface * { return new sparc_disassembler(nullptr, sparc_disassembler::v7); } },
 	{ "sparcv8",         be,  0, []() -> util::disasm_interface * { return new sparc_disassembler(nullptr, sparc_disassembler::v8); } },

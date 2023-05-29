@@ -106,6 +106,9 @@ SPR800E on the Solite Spirits PCB silkscreened  PROMAT  SPR800E  ES928
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
+
 #define MASTER_CLOCK    XTAL(16'000'000)
 
 
@@ -828,6 +831,8 @@ ROM_START( flagrall )
 	ROM_LOAD( "10_u102.bin", 0x00000, 0x80000, CRC(b1fd3279) SHA1(4a75581e13d43bef441ce81eae518c2f6bc1d5f8) )
 	ROM_LOAD( "9_u103.bin",  0x80000, 0x80000, CRC(01e6d654) SHA1(821d61a5b16f5cb76e2a805c8504db1ef38c3a48) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 2000, 1945kiii,  0,        k3,       k3,       k3_state, empty_init, ROT270, "Oriental Soft", "1945k III (newer, OPCX2 PCB)", MACHINE_SUPPORTS_SAVE )

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol,Stefan Jokisch
-#ifndef MAME_VIDEO_VIDEO_TIA_H
-#define MAME_VIDEO_VIDEO_TIA_H
+#ifndef MAME_ATARI_TIA_H
+#define MAME_ATARI_TIA_H
 
 #pragma once
 
@@ -242,4 +242,4 @@ protected:
 DECLARE_DEVICE_TYPE(TIA_PAL_VIDEO, tia_pal_video_device)
 DECLARE_DEVICE_TYPE(TIA_NTSC_VIDEO, tia_ntsc_video_device)
 
-#endif // MAME_VIDEO_TIA_H
+#endif // MAME_ATARI_TIA_H

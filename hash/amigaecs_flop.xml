@@ -14,7 +14,7 @@ license:CC0-1.0
 
 	<software name="cmang2up" supported="no">
 		<!-- SPS (CAPS) release 1997 -->
-		<description>Championship Manager 2 - Including Special Season 96/97 Updates (Euro, v1.57)</description>
+		<description>Championship Manager 2 - Including Special Season 96/97 Updates (Europe, v1.57)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1997</year>
@@ -41,7 +41,7 @@ Throws a "please insert disk 4" error while creating a disk 4
 
 	<software name="coala" supported="no">
 		<!-- SPS (CAPS) release 242 -->
-		<description>COALA (Euro)</description>
+		<description>COALA (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, ECS,AGA, PAL) -->
 		<year>1995</year>
@@ -78,7 +78,7 @@ Crashing into land draws missing polygons for heli (a1200), [Blitter] lines?
 
 	<software name="epic" supported="no">
 		<!-- SPS (CAPS) release 1820 -->
-		<description>Epic (Euro, A600 HD)</description>
+		<description>Epic (Europe, A600 HD)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1992</year>
@@ -111,7 +111,7 @@ Does not draw status bars for throttle etc. during gameplay
 
 	<software name="f1wce" supported="no">
 		<!-- SPS (CAPS) release 2061 -->
-		<description>F1 World Championship Edition (Euro)</description>
+		<description>F1 World Championship Edition (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1995</year>
@@ -129,7 +129,7 @@ Flashing "IO Error: 4; Disk May Be Corrupt" at initial boot, [FDC] dsksync
 
 	<software name="fatman" supported="partial">
 		<!-- SPS (CAPS) release 943 -->
-		<description>Fatman - The Caped Consumer (Euro)</description>
+		<description>Fatman - The Caped Consumer (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1994</year>
@@ -167,7 +167,7 @@ Doesn't show cursor on main menu [Lisa]
 
 	<software name="gloomdx" supported="no">
 		<!-- SPS (CAPS) release 1330 -->
-		<description>Gloom Deluxe (Euro)</description>
+		<description>Gloom Deluxe (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, ECS,AGA, PAL) -->
 		<year>1996</year>
@@ -198,7 +198,7 @@ Unemulated I-Glasses support
 
 	<software name="his1418" supported="no">
 		<!-- SPS (CAPS) release 1569 -->
-		<description>Historyline - 1914-1918 (Euro)</description>
+		<description>Historyline - 1914-1918 (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1993</year>
@@ -253,7 +253,7 @@ No mouse cursor on gameplay (a500p, a600), single long vertical line on (a1200)
 
 	<software name="his1418f" cloneof="his1418" supported="no">
 		<!-- SPS (CAPS) release 2700 -->
-		<description>Historyline - 1914-1918 (Fra)</description>
+		<description>Historyline - 1914-1918 (France)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1993</year>
@@ -305,7 +305,7 @@ No mouse cursor on gameplay (a500p, a600), single long vertical line on (a1200)
 
 	<software name="his1418g" cloneof="his1418" supported="no">
 		<!-- SPS (CAPS) release 336 -->
-		<description>Historyline - 1914-1918 (Ger)</description>
+		<description>Historyline - 1914-1918 (Germany)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1993</year>
@@ -357,7 +357,7 @@ No mouse cursor on gameplay (a500p, a600), single long vertical line on (a1200)
 
 	<software name="ishar3" supported="no">
 		<!-- SPS (CAPS) release 2749 -->
-		<description>Ishar III - The Seven Gates of Infinity (Euro)</description>
+		<description>Ishar III - The Seven Gates of Infinity (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1994</year>
@@ -400,7 +400,7 @@ Mouse cursor is uncontrollable, [joytest] reset counter
 
 	<software name="ishar3f" cloneof="ishar3" supported="no">
 		<!-- SPS (CAPS) release 2664 -->
-		<description>Ishar III - The Seven Gates of Infinity (Fra, Equipe Speciale)</description>
+		<description>Ishar III - The Seven Gates of Infinity (France, Equipe Speciale)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1994</year>
@@ -446,7 +446,7 @@ Mouse cursor is uncontrollable, [joytest] reset counter
 
 	<software name="mandoubl" supported="partial">
 		<!-- SPS (CAPS) release 1851 -->
-		<description>Manchester United - The Double (Euro)</description>
+		<description>Manchester United - The Double (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1995</year>
@@ -473,7 +473,7 @@ May draw a garbage line on gameplay (emu unthrottled?), [Denise] sprite
 
 	<software name="produzen" supported="partial">
 		<!-- SPS (CAPS) release 558 -->
-		<description>Der Produzent - Die Welt des Films (Ger)</description>
+		<description>Der Produzent - Die Welt des Films (Germany)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1996</year>
@@ -518,7 +518,7 @@ Not extensively tested (German language)
 
 	<software name="rallyc" supported="no">
 		<!-- SPS (CAPS) release 2357 -->
-		<description>Rally Championships (Euro)</description>
+		<description>Rally Championships (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1994</year>
@@ -557,7 +557,7 @@ Stalls at now loading screen
 
 	<software name="reunion" supported="partial">
 		<!-- SPS (CAPS) release 569 -->
-		<description>Reunion (Ger)</description>
+		<description>Reunion (Germany)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1994</year>
@@ -606,7 +606,7 @@ boot OK, not extensively tested (German language)
 
 	<software name="rotr" supported="no">
 		<!-- SPS (CAPS) release 1365 -->
-		<description>Rise of the Robots (Euro)</description>
+		<description>Rise of the Robots (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1994</year>
@@ -681,7 +681,7 @@ Empty stripes on player sprite when it hits left edge of screen, [Denise] DDFSTR
 <!-- From EAB: Silly Putty was the title for the A600 pack-in release, while it was titles Putty for standalone release -->
 	<software name="silputty" supported="no">
 		<!-- SPS (CAPS) release 1336 -->
-		<description>Silly Putty (Euro)</description>
+		<description>Silly Putty (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1992</year>
@@ -712,7 +712,7 @@ Black screen, [FDC] dsksync
 
 	<software name="snapper" supported="yes">
 		<!-- SPS (CAPS) release 2534 -->
-		<description>Snapperazzi (Euro)</description>
+		<description>Snapperazzi (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1993</year>
@@ -738,7 +738,7 @@ boot OK
 
 	<software name="trivlle" supported="no">
 		<!-- SPS (CAPS) release 1841 -->
-		<description>Trivial Pursuit - The Language Laboratory Edition (Euro, A600 HD)</description>
+		<description>Trivial Pursuit - The Language Laboratory Edition (Europe, A600 HD)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1992</year>
@@ -764,7 +764,7 @@ boot OK (a1200)
 
 	<software name="turbotrx" supported="no">
 		<!-- SPS (CAPS) release 156 -->
-		<description>Turbo Trax (Euro)</description>
+		<description>Turbo Trax (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1995</year>
@@ -797,7 +797,7 @@ Unemulated link option
 
 	<software name="whizz" supported="no">
 		<!-- SPS (CAPS) release 409 -->
-		<description>Whizz (Euro)</description>
+		<description>Whizz (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1995</year>

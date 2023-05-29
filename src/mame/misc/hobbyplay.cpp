@@ -33,6 +33,9 @@ various TTL chips
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 
+
+namespace {
+
 class hobbyplay_state : public driver_device
 {
 public:
@@ -100,5 +103,8 @@ ROM_START( unkhpslt )
 	ROM_REGION(0x800, "maincpu", 0)
 	ROM_LOAD( "hobby_play_661.bin", 0x0000, 0x0800, CRC(e721d720) SHA1(23d84d2013f1ec42b1bcf6983ee28093071d4b8e) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 198?, unkhpslt, 0, hobbyplay, hobbyplay, hobbyplay_state, empty_init, ROT0, "Hobby Play", "unknown Hobby Play slot machine", MACHINE_IS_SKELETON_MECHANICAL )

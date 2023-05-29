@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_INCLUDES_COCO3_H
-#define MAME_INCLUDES_COCO3_H
+#ifndef MAME_TRS_COCO3_H
+#define MAME_TRS_COCO3_H
 
 #pragma once
 
@@ -63,4 +63,4 @@ private:
 	required_ioport m_screen_config;
 };
 
-#endif // MAME_INCLUDES_COCO3_H
+#endif // MAME_TRS_COCO3_H

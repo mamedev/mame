@@ -1,6 +1,6 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
 // 
-// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
@@ -120,6 +120,11 @@ TEST(BigInteger, LeftShift) {
     EXPECT_TRUE(BIGINTEGER_LITERAL("4537899042132549697536") == a);
     a <<= 99;
     EXPECT_TRUE(BIGINTEGER_LITERAL("2876235222267216943024851750785644982682875244576768") == a);
+
+    a = 1;
+    a <<= 64; // a.count_ != 1
+    a <<= 256; // interShift == 0
+    EXPECT_TRUE(BIGINTEGER_LITERAL("2135987035920910082395021706169552114602704522356652769947041607822219725780640550022962086936576") == a);
 }
 
 TEST(BigInteger, Compare) {

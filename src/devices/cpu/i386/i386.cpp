@@ -28,6 +28,21 @@
 #include "debug/debugcpu.h"
 #include "debug/express.h"
 
+#define LOG_MSR             (1U << 1)
+#define LOG_INVALID_OPCODE  (1U << 2)
+#define LOG_LIMIT_CHECK     (1U << 3)
+#define LOG_UNEMULATED      (1U << 4)
+#define LOG_PM_EVENTS       (1U << 5)
+#define LOG_PM_FAULT_GP     (1U << 6)
+#define LOG_PM_FAULT_SS     (1U << 7)
+#define LOG_PM_FAULT_NP     (1U << 8)
+#define LOG_PM_FAULT_TS     (1U << 9)
+#define LOG_PM_FAULT_DF     (1U << 10)
+#define LOG_PM_FAULT_UD     (1U << 11)
+
+//#define VERBOSE (LOG_PM_FAULT_GP)
+#include "logmacro.h"
+
 /* seems to be defined on mingw-gcc */
 #undef i386
 
@@ -167,17 +182,17 @@ uint32_t i386_device::i386_translate(int segment, uint32_t ip, int rwn)
 	return m_sreg[segment].base + ip;
 }
 
-vtlb_entry i386_device::get_permissions(uint32_t pte, int wp)
+device_vtlb_interface::vtlb_entry i386_device::get_permissions(uint32_t pte, int wp)
 {
-	vtlb_entry ret = VTLB_READ_ALLOWED | ((pte & 4) ? VTLB_USER_READ_ALLOWED : 0);
+	vtlb_entry ret = READ_ALLOWED | ((pte & 4) ? USER_READ_ALLOWED : 0);
 	if (!wp)
-		ret |= VTLB_WRITE_ALLOWED;
+		ret |= WRITE_ALLOWED;
 	if (pte & 2)
-		ret |= VTLB_WRITE_ALLOWED | ((pte & 4) ? VTLB_USER_WRITE_ALLOWED : 0);
+		ret |= WRITE_ALLOWED | ((pte & 4) ? USER_WRITE_ALLOWED : 0);
 	return ret;
 }
 
-bool i386_device::i386_translate_address(int intention, offs_t *address, vtlb_entry *entry)
+bool i386_device::i386_translate_address(int intention, bool debug, offs_t *address, vtlb_entry *entry)
 {
 	uint32_t a = *address;
 	uint32_t pdbr = m_cr[3] & 0xfffff000;
@@ -185,9 +200,8 @@ bool i386_device::i386_translate_address(int intention, offs_t *address, vtlb_en
 	uint32_t table = (a >> 12) & 0x3ff;
 	vtlb_entry perm = 0;
 	bool ret;
-	bool user = (intention & TRANSLATE_USER_MASK) ? true : false;
-	bool write = (intention & TRANSLATE_WRITE) ? true : false;
-	bool debug = (intention & TRANSLATE_DEBUG_MASK) ? true : false;
+	bool user = (intention & TR_USER) ? true : false;
+	bool write = (intention & TR_WRITE) ? true : false;
 
 	if (!(m_cr[0] & 0x80000000))
 	{
@@ -208,14 +222,14 @@ bool i386_device::i386_translate_address(int intention, offs_t *address, vtlb_en
 				return true;
 			}
 			perm = get_permissions(page_dir, WP);
-			if (write && (!(perm & VTLB_WRITE_ALLOWED) || (user && !(perm & VTLB_USER_WRITE_ALLOWED))))
+			if (write && (!(perm & WRITE_ALLOWED) || (user && !(perm & USER_WRITE_ALLOWED))))
 				ret = false;
-			else if (user && !(perm & VTLB_USER_READ_ALLOWED))
+			else if (user && !(perm & USER_READ_ALLOWED))
 				ret = false;
 			else
 			{
 				if (write)
-					perm |= VTLB_FLAG_DIRTY;
+					perm |= FLAG_DIRTY;
 				if (!(page_dir & 0x40) && write)
 					m_program->write_dword(pdbr + directory * 4, page_dir | 0x60);
 				else if (!(page_dir & 0x20))
@@ -237,14 +251,14 @@ bool i386_device::i386_translate_address(int intention, offs_t *address, vtlb_en
 					return true;
 				}
 				perm = get_permissions(page_entry, WP);
-				if (write && (!(perm & VTLB_WRITE_ALLOWED) || (user && !(perm & VTLB_USER_WRITE_ALLOWED))))
+				if (write && (!(perm & WRITE_ALLOWED) || (user && !(perm & USER_WRITE_ALLOWED))))
 					ret = false;
-				else if (user && !(perm & VTLB_USER_READ_ALLOWED))
+				else if (user && !(perm & USER_READ_ALLOWED))
 					ret = false;
 				else
 				{
 					if (write)
-						perm |= VTLB_FLAG_DIRTY;
+						perm |= FLAG_DIRTY;
 					if (!(page_dir & 0x20))
 						m_program->write_dword(pdbr + directory * 4, page_dir | 0x20);
 					if (!(page_entry & 0x40) && write)
@@ -275,19 +289,19 @@ bool i386_device::translate_address(int pl, int type, uint32_t *address, uint32_
 	const vtlb_entry *table = vtlb_table();
 	uint32_t index = *address >> 12;
 	vtlb_entry entry = table[index];
-	if (type == TRANSLATE_FETCH)
-		type = TRANSLATE_READ;
+	if (type == TR_FETCH)
+		type = TR_READ;
 	if (pl == 3)
-		type |= TRANSLATE_USER_MASK;
+		type |= TR_USER;
 #ifdef TEST_TLB
 	uint32_t test_addr = *address;
 #endif
 
-	if (!(entry & VTLB_FLAG_VALID) || ((type & TRANSLATE_WRITE) && !(entry & VTLB_FLAG_DIRTY)))
+	if (!(entry & FLAG_VALID) || ((type & TR_WRITE) && !(entry & FLAG_DIRTY)))
 	{
-		if (!i386_translate_address(type, address, &entry))
+		if (!i386_translate_address(type, false, address, &entry))
 		{
-			*error = ((type & TRANSLATE_WRITE) ? 2 : 0) | ((m_CPL == 3) ? 4 : 0);
+			*error = ((type & TR_WRITE) ? 2 : 0) | ((m_CPL == 3) ? 4 : 0);
 			if (entry)
 				*error |= 1;
 			return false;
@@ -297,12 +311,12 @@ bool i386_device::translate_address(int pl, int type, uint32_t *address, uint32_
 	}
 	if (!(entry & (1 << type)))
 	{
-		*error = ((type & TRANSLATE_WRITE) ? 2 : 0) | ((m_CPL == 3) ? 4 : 0) | 1;
+		*error = ((type & TR_WRITE) ? 2 : 0) | ((m_CPL == 3) ? 4 : 0) | 1;
 		return false;
 	}
 	*address = (entry & 0xfffff000) | (*address & 0xfff);
 #ifdef TEST_TLB
-	int test_ret = i386_translate_address(type | TRANSLATE_DEBUG_MASK, &test_addr, nullptr);
+	int test_ret = i386_translate_address(type, true, &test_addr, nullptr);
 	if (!test_ret || (test_addr != *address))
 		logerror("TLB-PTE mismatch! %06X %06X %06x\n", *address, test_addr, m_pc);
 #endif
@@ -328,7 +342,7 @@ uint8_t i386_device::FETCH()
 	uint8_t value;
 	uint32_t address = m_pc, error;
 
-	if(!translate_address(m_CPL,TRANSLATE_FETCH,&address,&error))
+	if(!translate_address(m_CPL,TR_FETCH,&address,&error))
 		PF_THROW(error);
 
 	value = mem_pr8(address & m_a20_mask);
@@ -349,7 +363,7 @@ uint16_t i386_device::FETCH16()
 		value = (FETCH() << 0);
 		value |= (FETCH() << 8);
 	} else {
-		if(!translate_address(m_CPL,TRANSLATE_FETCH,&address,&error))
+		if(!translate_address(m_CPL,TR_FETCH,&address,&error))
 			PF_THROW(error);
 		address &= m_a20_mask;
 		value = mem_pr16(address);
@@ -369,7 +383,7 @@ uint32_t i386_device::FETCH32()
 		value |= (FETCH() << 16);
 		value |= (FETCH() << 24);
 	} else {
-		if(!translate_address(m_CPL,TRANSLATE_FETCH,&address,&error))
+		if(!translate_address(m_CPL,TR_FETCH,&address,&error))
 			PF_THROW(error);
 
 		address &= m_a20_mask;
@@ -384,7 +398,7 @@ uint8_t i386_device::READ8PL(uint32_t ea, uint8_t privilege)
 {
 	uint32_t address = ea, error;
 
-	if(!translate_address(privilege,TRANSLATE_READ,&address,&error))
+	if(!translate_address(privilege,TR_READ,&address,&error))
 		PF_THROW(error);
 
 	address &= m_a20_mask;
@@ -401,7 +415,7 @@ uint16_t i386_device::READ16PL(uint32_t ea, uint8_t privilege)
 	case 0:
 	case 2:
 	default:
-		if(!translate_address(privilege,TRANSLATE_READ,&address,&error))
+		if(!translate_address(privilege,TR_READ,&address,&error))
 			PF_THROW(error);
 
 		address &= m_a20_mask;
@@ -409,7 +423,7 @@ uint16_t i386_device::READ16PL(uint32_t ea, uint8_t privilege)
 		break;
 
 	case 1:
-		if(!translate_address(privilege,TRANSLATE_READ,&address,&error))
+		if(!translate_address(privilege,TR_READ,&address,&error))
 			PF_THROW(error);
 
 		address &= m_a20_mask;
@@ -434,7 +448,7 @@ uint32_t i386_device::READ32PL(uint32_t ea, uint8_t privilege)
 	{
 	case 0:
 	default:
-		if(!translate_address(privilege,TRANSLATE_READ,&address,&error))
+		if(!translate_address(privilege,TR_READ,&address,&error))
 			PF_THROW(error);
 
 		address &= m_a20_mask;
@@ -442,7 +456,7 @@ uint32_t i386_device::READ32PL(uint32_t ea, uint8_t privilege)
 		break;
 
 	case 1:
-		if(!translate_address(privilege,TRANSLATE_READ,&address,&error))
+		if(!translate_address(privilege,TR_READ,&address,&error))
 			PF_THROW(error);
 
 		address &= m_a20_mask;
@@ -459,7 +473,7 @@ uint32_t i386_device::READ32PL(uint32_t ea, uint8_t privilege)
 		value = READ8PL(ea, privilege);
 
 		address = ea + 1;
-		if(!translate_address(privilege,TRANSLATE_READ,&address,&error))
+		if(!translate_address(privilege,TR_READ,&address,&error))
 			PF_THROW(error);
 
 		address &= m_a20_mask;
@@ -484,7 +498,7 @@ uint64_t i386_device::READ64PL(uint32_t ea, uint8_t privilege)
 		break;
 
 	case 1:
-		if(!translate_address(privilege,TRANSLATE_READ,&address,&error))
+		if(!translate_address(privilege,TR_READ,&address,&error))
 			PF_THROW(error);
 
 		address &= m_a20_mask;
@@ -504,7 +518,7 @@ uint64_t i386_device::READ64PL(uint32_t ea, uint8_t privilege)
 		value |= uint64_t(READ32PL(ea + 1, privilege)) << 8;
 
 		address = ea + 5;
-		if(!translate_address(privilege,TRANSLATE_READ,&address,&error))
+		if(!translate_address(privilege,TR_READ,&address,&error))
 			PF_THROW(error);
 
 		address &= m_a20_mask;
@@ -522,7 +536,7 @@ uint16_t i386sx_device::READ16PL(uint32_t ea, uint8_t privilege)
 
 	if (WORD_ALIGNED(ea))
 	{
-		if(!translate_address(privilege,TRANSLATE_READ,&address,&error))
+		if(!translate_address(privilege,TR_READ,&address,&error))
 			PF_THROW(error);
 
 		address &= m_a20_mask;
@@ -582,14 +596,14 @@ uint64_t i386sx_device::READ64PL(uint32_t ea, uint8_t privilege)
 void i386_device::WRITE_TEST(uint32_t ea)
 {
 	uint32_t address = ea, error;
-	if(!translate_address(m_CPL,TRANSLATE_WRITE,&address,&error))
+	if(!translate_address(m_CPL,TR_WRITE,&address,&error))
 		PF_THROW(error);
 }
 
 void i386_device::WRITE8PL(uint32_t ea, uint8_t privilege, uint8_t value)
 {
 	uint32_t address = ea, error;
-	if(!translate_address(privilege,TRANSLATE_WRITE,&address,&error))
+	if(!translate_address(privilege,TR_WRITE,&address,&error))
 		PF_THROW(error);
 
 	address &= m_a20_mask;
@@ -604,7 +618,7 @@ void i386_device::WRITE16PL(uint32_t ea, uint8_t privilege, uint16_t value)
 	{
 	case 0:
 	case 2:
-		if(!translate_address(privilege,TRANSLATE_WRITE,&address,&error))
+		if(!translate_address(privilege,TR_WRITE,&address,&error))
 			PF_THROW(error);
 
 		address &= m_a20_mask;
@@ -612,7 +626,7 @@ void i386_device::WRITE16PL(uint32_t ea, uint8_t privilege, uint16_t value)
 		break;
 
 	case 1:
-		if(!translate_address(privilege,TRANSLATE_WRITE,&address,&error))
+		if(!translate_address(privilege,TR_WRITE,&address,&error))
 			PF_THROW(error);
 
 		address &= m_a20_mask;
@@ -633,7 +647,7 @@ void i386_device::WRITE32PL(uint32_t ea, uint8_t privilege, uint32_t value)
 	switch(ea & 3)
 	{
 	case 0:
-		if(!translate_address(privilege,TRANSLATE_WRITE,&address,&error))
+		if(!translate_address(privilege,TR_WRITE,&address,&error))
 			PF_THROW(error);
 
 		address &= m_a20_mask;
@@ -641,7 +655,7 @@ void i386_device::WRITE32PL(uint32_t ea, uint8_t privilege, uint32_t value)
 		break;
 
 	case 1:
-		if(!translate_address(privilege,TRANSLATE_WRITE,&address,&error))
+		if(!translate_address(privilege,TR_WRITE,&address,&error))
 			PF_THROW(error);
 
 		address &= m_a20_mask;
@@ -658,7 +672,7 @@ void i386_device::WRITE32PL(uint32_t ea, uint8_t privilege, uint32_t value)
 		WRITE8PL(ea, privilege, value & 0xff);
 
 		address = ea + 1;
-		if(!translate_address(privilege,TRANSLATE_WRITE,&address,&error))
+		if(!translate_address(privilege,TR_WRITE,&address,&error))
 			PF_THROW(error);
 
 		address &= m_a20_mask;
@@ -679,7 +693,7 @@ void i386_device::WRITE64PL(uint32_t ea, uint8_t privilege, uint64_t value)
 		break;
 
 	case 1:
-		if(!translate_address(privilege,TRANSLATE_WRITE,&address,&error))
+		if(!translate_address(privilege,TR_WRITE,&address,&error))
 			PF_THROW(error);
 
 		address &= m_a20_mask;
@@ -699,7 +713,7 @@ void i386_device::WRITE64PL(uint32_t ea, uint8_t privilege, uint64_t value)
 		WRITE32PL(ea + 1, privilege, (value >> 8) & 0xffffffff);
 
 		address = ea + 5;
-		if(!translate_address(privilege,TRANSLATE_WRITE,&address,&error))
+		if(!translate_address(privilege,TR_WRITE,&address,&error))
 			PF_THROW(error);
 
 		address &= m_a20_mask;
@@ -714,7 +728,7 @@ void i386sx_device::WRITE16PL(uint32_t ea, uint8_t privilege, uint16_t value)
 
 	if (WORD_ALIGNED(ea))
 	{
-		if(!translate_address(privilege,TRANSLATE_WRITE,&address,&error))
+		if(!translate_address(privilege,TR_WRITE,&address,&error))
 			PF_THROW(error);
 
 		address &= m_a20_mask;
@@ -1529,7 +1543,7 @@ void i386_device::i386_check_irq_line()
 	if ( (m_irq_state) && m_IF )
 	{
 		m_cycles -= 2;
-		i386_trap(standard_irq_callback(0), 1, 0);
+		i386_trap(standard_irq_callback(0, m_pc), 1, 0);
 	}
 }
 
@@ -1553,7 +1567,7 @@ void i386_device::build_cycle_table()
 void i386_device::report_invalid_opcode()
 {
 #ifndef DEBUG_MISSING_OPCODE
-	logerror("i386: Invalid opcode %02X at %08X %s\n", m_opcode, m_pc - 1, m_lock ? "with lock" : "");
+	LOGMASKED(LOG_INVALID_OPCODE, "i386: Invalid opcode %02X at %08X %s\n", m_opcode, m_pc - 1, m_lock ? "with lock" : "");
 #else
 	logerror("Invalid opcode");
 	for (int a = 0; a < m_opcode_bytes_length; a++)
@@ -1568,7 +1582,7 @@ void i386_device::report_invalid_opcode()
 void i386_device::report_invalid_modrm(const char* opcode, uint8_t modrm)
 {
 #ifndef DEBUG_MISSING_OPCODE
-	logerror("i386: Invalid %s modrm %01X at %08X\n", opcode, modrm, m_pc - 2);
+	LOGMASKED(LOG_INVALID_OPCODE, "i386: Invalid %s modrm %01X at %08X\n", opcode, modrm, m_pc - 2);
 #else
 	logerror("Invalid %s modrm %01X", opcode, modrm);
 	for (int a = 0; a < m_opcode_bytes_length; a++)
@@ -1728,7 +1742,7 @@ uint8_t i386_device::read8_debug(uint32_t ea, uint8_t *data)
 {
 	uint32_t address = ea;
 
-	if(!i386_translate_address(TRANSLATE_DEBUG_MASK,&address,nullptr))
+	if(!i386_translate_address(TR_READ, true, &address,nullptr))
 		return 0;
 
 	address &= m_a20_mask;
@@ -1863,7 +1877,7 @@ uint64_t i386_device::debug_virttophys(int params, const uint64_t *param)
 {
 	uint32_t result = param[0];
 
-	if(!i386_translate_address(TRANSLATE_DEBUG_MASK,&result,nullptr))
+	if(!i386_translate_address(TR_READ,true,&result,nullptr))
 		return 0;
 	return result;
 }
@@ -2017,6 +2031,16 @@ void i386_device::i386_common_init()
 	save_item(NAME(m_nmi_latched));
 	save_item(NAME(m_smbase));
 	save_item(NAME(m_lock));
+
+	save_item(NAME(m_x87_cw));
+	save_item(NAME(m_x87_tw));
+	save_item(NAME(m_x87_sw));
+	save_item(NAME(m_x87_cs));
+	save_item(NAME(m_x87_ds));
+	save_item(NAME(m_x87_inst_ptr));
+	save_item(NAME(m_x87_data_ptr));
+	save_item(NAME(m_x87_opcode));
+
 	machine().save().register_postload(save_prepost_delegate(FUNC(i386_device::i386_postload), this));
 
 	m_smiact.resolve_safe();
@@ -2133,14 +2157,14 @@ void i386_device::register_state_i386_x87()
 	state_add( X87_CTRL,   "x87_CW", m_x87_cw).formatstr("%04X");
 	state_add( X87_STATUS, "x87_SW", m_x87_sw).formatstr("%04X");
 	state_add( X87_TAG,    "x87_TAG", m_x87_tw).formatstr("%04X");
-	state_add( X87_ST0,    "ST0", m_debugger_temp ).formatstr("%15s");
-	state_add( X87_ST1,    "ST1", m_debugger_temp ).formatstr("%15s");
-	state_add( X87_ST2,    "ST2", m_debugger_temp ).formatstr("%15s");
-	state_add( X87_ST3,    "ST3", m_debugger_temp ).formatstr("%15s");
-	state_add( X87_ST4,    "ST4", m_debugger_temp ).formatstr("%15s");
-	state_add( X87_ST5,    "ST5", m_debugger_temp ).formatstr("%15s");
-	state_add( X87_ST6,    "ST6", m_debugger_temp ).formatstr("%15s");
-	state_add( X87_ST7,    "ST7", m_debugger_temp ).formatstr("%15s");
+	state_add( X87_ST0,    "ST0", m_debugger_temp ).callexport().formatstr("%15s");
+	state_add( X87_ST1,    "ST1", m_debugger_temp ).callexport().formatstr("%15s");
+	state_add( X87_ST2,    "ST2", m_debugger_temp ).callexport().formatstr("%15s");
+	state_add( X87_ST3,    "ST3", m_debugger_temp ).callexport().formatstr("%15s");
+	state_add( X87_ST4,    "ST4", m_debugger_temp ).callexport().formatstr("%15s");
+	state_add( X87_ST5,    "ST5", m_debugger_temp ).callexport().formatstr("%15s");
+	state_add( X87_ST6,    "ST6", m_debugger_temp ).callexport().formatstr("%15s");
+	state_add( X87_ST7,    "ST7", m_debugger_temp ).callexport().formatstr("%15s");
 }
 
 void i386_device::register_state_i386_x87_xmm()
@@ -2196,6 +2220,30 @@ void i386_device::state_export(const device_state_entry &entry)
 	{
 		case I386_IP:
 			m_debugger_temp = m_eip & 0xffff;
+			break;
+		case X87_ST0:
+			m_debugger_temp = floatx80_to_float64(ST(0));
+			break;
+		case X87_ST1:
+			m_debugger_temp = floatx80_to_float64(ST(1));
+			break;
+		case X87_ST2:
+			m_debugger_temp = floatx80_to_float64(ST(2));
+			break;
+		case X87_ST3:
+			m_debugger_temp = floatx80_to_float64(ST(3));
+			break;
+		case X87_ST4:
+			m_debugger_temp = floatx80_to_float64(ST(4));
+			break;
+		case X87_ST5:
+			m_debugger_temp = floatx80_to_float64(ST(5));
+			break;
+		case X87_ST6:
+			m_debugger_temp = floatx80_to_float64(ST(6));
+			break;
+		case X87_ST7:
+			m_debugger_temp = floatx80_to_float64(ST(7));
 			break;
 	}
 }
@@ -2756,10 +2804,10 @@ void i386_device::execute_run()
 				{
 					uint32_t phys_addr = 0;
 					uint32_t error;
-					phys_addr = (m_cr[0] & (1 << 31)) ? translate_address(m_CPL, TRANSLATE_FETCH, &m_dr[i], &error) : m_dr[i];
+					phys_addr = (m_cr[0] & (1 << 31)) ? translate_address(m_CPL, TR_FETCH, &m_dr[i], &error) : m_dr[i];
 					if(breakpoint_length != 0) // Not one byte in length? logerror it, I have no idea how this works on real processors.
 					{
-						logerror("i386: Breakpoint length not 1 byte on an instruction breakpoint\n");
+						LOGMASKED(LOG_INVALID_OPCODE, "i386: Breakpoint length not 1 byte on an instruction breakpoint\n");
 					}
 					if(m_pc == phys_addr)
 					{
@@ -2823,11 +2871,12 @@ void i386_device::execute_run()
 
 /*************************************************************************/
 
-bool i386_device::memory_translate(int spacenum, int intention, offs_t &address)
+bool i386_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
+	target_space = &space(spacenum);
 	bool ret = true;
 	if(spacenum == AS_PROGRAM)
-		ret = i386_translate_address(intention, &address, nullptr);
+		ret = i386_translate_address(intention, true, &address, nullptr);
 	address &= m_a20_mask;
 	return ret;
 }
@@ -2844,20 +2893,20 @@ std::unique_ptr<util::disasm_interface> i386_device::create_disassembler()
 
 void i386_device::opcode_cpuid()
 {
-	logerror("CPUID called with unsupported EAX=%08x at %08x!\n", REG32(EAX), m_eip);
+	LOGMASKED(LOG_MSR, "CPUID called with unsupported EAX=%08x at %08x!\n", REG32(EAX), m_eip);
 }
 
 uint64_t i386_device::opcode_rdmsr(bool &valid_msr)
 {
 	valid_msr = false;
-	logerror("RDMSR called with unsupported ECX=%08x at %08x!\n", REG32(ECX), m_eip);
+	LOGMASKED(LOG_MSR, "RDMSR called with unsupported ECX=%08x at %08x!\n", REG32(ECX), m_eip);
 	return -1;
 }
 
 void i386_device::opcode_wrmsr(uint64_t data, bool &valid_msr)
 {
 	valid_msr = false;
-	logerror("WRMSR called with unsupported ECX=%08x (%08x%08x) at %08x!\n", REG32(ECX), (uint32_t)(data >> 32), (uint32_t)data, m_eip);
+	LOGMASKED(LOG_MSR, "WRMSR called with unsupported ECX=%08x (%08x%08x) at %08x!\n", REG32(ECX), (uint32_t)(data >> 32), (uint32_t)data, m_eip);
 }
 
 /*****************************************************************************/
@@ -3352,7 +3401,7 @@ void pentium3_device::opcode_cpuid()
 			// (upper 32-bits part is in EAX=1 EAX return)
 			// NB: if this is triggered from an Arcade system then there's a very good chance
 			// that is trying to tie the serial as a form of copy protection cfr. gamecstl
-			logerror("CPUID with EAX=00000003 (Pentium III PSN?) at %08x!\n", m_eip);
+			LOGMASKED(LOG_MSR, "CPUID with EAX=00000003 (Pentium III PSN?) at %08x!\n", m_eip);
 			REG32(EAX) = 0x00000000;
 			REG32(EBX) = 0x00000000;
 			REG32(ECX) = 0x01234567;

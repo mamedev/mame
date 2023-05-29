@@ -98,16 +98,21 @@ the Neogeo Pocket.
 
 
 #include "emu.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "cpu/tlcs900/tmp95c061.h"
 #include "cpu/z80/z80.h"
 #include "sound/t6w28.h"
 #include "sound/dac.h"
+
 #include "k1ge.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+
+
+namespace {
 
 enum flash_state
 {
@@ -126,8 +131,8 @@ enum flash_state
 class ngp_state : public driver_device, public device_nvram_interface
 {
 public:
-	ngp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ngp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		device_nvram_interface(mconfig, *this),
 		m_maincpu(*this, "maincpu"),
 		m_z80(*this, "soundcpu"),
@@ -139,17 +144,7 @@ public:
 		m_k1ge(*this, "k1ge"),
 		m_io_controls(*this, "Controls"),
 		m_io_power(*this, "Power")
-		{
-			m_flash_chip[0].present = 0;
-			m_flash_chip[0].state = F_READ;
-			m_flash_chip[0].data = nullptr;
-
-			m_flash_chip[1].present = 0;
-			m_flash_chip[1].state = F_READ;
-			m_flash_chip[1].data = nullptr;
-
-			m_nvram_loaded = false;
-		}
+	{ }
 
 	void ngp_common(machine_config &config);
 	void ngp(machine_config &config);
@@ -157,23 +152,24 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(power_callback);
 
-private:
-
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	uint8_t m_io_reg[0x40];
-	uint8_t m_old_to3;
-	emu_timer* m_seconds_timer;
+private:
+
+	uint8_t m_io_reg[0x40] = { };
+	uint8_t m_old_to3 = 0;
+	emu_timer* m_seconds_timer = nullptr;
 
 	struct {
-		int       present;
-		uint8_t   manufacturer_id;
-		uint8_t   device_id;
-		uint8_t   *data;
-		uint8_t   org_data[16];
-		int       state;
-		uint8_t   command[2];
+		int       present = 0;
+		uint8_t   manufacturer_id = 0;
+		uint8_t   device_id = 0;
+		uint8_t   *data = nullptr;
+		uint8_t   org_data[16] = { };
+		int       state = F_READ;
+		uint8_t   command[2] = { };
 	} m_flash_chip[2];
 
 	required_device<tmp95c061_device> m_maincpu;
@@ -200,7 +196,7 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(ngp_vblank_pin_w);
 	DECLARE_WRITE_LINE_MEMBER(ngp_hblank_pin_w);
-	void  ngp_tlcs900_porta(offs_t offset, uint8_t data);
+	void ngp_tlcs900_porta(offs_t offset, uint8_t data);
 	uint32_t screen_update_ngp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(ngp_seconds_callback);
 
@@ -211,7 +207,7 @@ private:
 	void z80_io(address_map &map);
 	void z80_mem(address_map &map);
 
-	bool m_nvram_loaded;
+	bool m_nvram_loaded = false;
 	required_ioport m_io_controls;
 	required_ioport m_io_power;
 
@@ -265,7 +261,7 @@ uint8_t ngp_state::ngp_io_r(offs_t offset)
 		break;
 	case 0x31:
 		data = m_io_power->read() & 0x01;
-		/* Sub-batttery OK */
+		/* Sub-battery OK */
 		data |= 0x02;
 		break;
 	}
@@ -611,7 +607,7 @@ INPUT_CHANGED_MEMBER(ngp_state::power_callback)
 {
 	if (m_io_reg[0x33] & 0x04)
 	{
-		m_maincpu->set_input_line(TLCS900_NMI, (m_io_power->read() & 0x01 ) ? CLEAR_LINE : ASSERT_LINE);
+		m_maincpu->set_input_line(TLCS900_NMI, (m_io_power->read() & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -752,11 +748,8 @@ DEVICE_IMAGE_LOAD_MEMBER(ngp_state::load_ngp_cart)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
-	if (size != 0x8000 && size != 0x80000 && size != 0x100000 && size != 0x200000 && size != 0x400000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-		return image_init_result::FAIL;
-	}
+	if (size != 0x8000 && size != 0x8'0000 && size != 0x10'0000 && size != 0x20'0000 && size != 0x40'0000)
+		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be 32K, 512K, 1M, 2M or 4M)");
 
 	// alloc 0x400000 ROM to simplify mapping in the address map
 	m_cart->rom_alloc(0x400000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
@@ -791,7 +784,7 @@ DEVICE_IMAGE_LOAD_MEMBER(ngp_state::load_ngp_cart)
 		m_flash_chip[1].state = F_READ;
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -835,6 +828,7 @@ void ngp_state::ngp_common(machine_config &config)
 	m_maincpu->set_am8_16(1);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ngp_state::ngp_mem);
 	m_maincpu->porta_write().set(FUNC(ngp_state::ngp_tlcs900_porta));
+	m_maincpu->an_read<0>().set_constant(0x3ff); // main battery power
 
 	z80_device &soundcpu(Z80(config, "soundcpu", 6.144_MHz_XTAL/2));
 	soundcpu.set_addrmap(AS_PROGRAM, &ngp_state::z80_mem);
@@ -906,6 +900,8 @@ ROM_START(ngpc)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("ngpcbios.rom", 0x0000, 0x10000, CRC(6eeb6f40) SHA1(edc13192054a59be49c6d55f83b70e2510968e86))
 ROM_END
+
+} // anonymous namespace
 
 
 //   YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE      INIT        COMPANY  FULLNAME               FLAGS

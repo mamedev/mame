@@ -6,8 +6,8 @@
 /* */
 
 
-#ifndef MAME_MACHINE_INDER_VID_H
-#define MAME_MACHINE_INDER_VID_H
+#ifndef MAME_SHARED_INDER_VID_H
+#define MAME_SHARED_INDER_VID_H
 
 #pragma once
 
@@ -34,6 +34,7 @@ public:
 
 	void megaphx_tms_map(address_map &map);
 	void ramdac_map(address_map &map);
+
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
@@ -53,4 +54,4 @@ private:
 	int m_bpp_mode;
 };
 
-#endif // MAME_MACHINE_INDER_VID_H
+#endif // MAME_SHARED_INDER_VID_H

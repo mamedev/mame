@@ -31,6 +31,8 @@ TODO:
 #include "tilemap.h"
 
 
+namespace {
+
 class cswat_state : public driver_device
 {
 public:
@@ -306,6 +308,8 @@ ROM_START( cswat )
 	ROM_REGION( 0x0001, "proms", 0 ) // color prom
 	ROM_LOAD( "cs2-1.1p",  0x0000, 0x0001, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1984, cswat, 0, cswat, cswat, cswat_state, empty_init, ROT0, "Namco", "Cosmoswat", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )

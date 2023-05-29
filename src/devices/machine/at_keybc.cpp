@@ -90,7 +90,6 @@
 #include "emu.h"
 #include "at_keybc.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_COMMAND (1U << 1)
 #define LOG_STATUS  (1U << 2)
 

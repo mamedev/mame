@@ -2036,7 +2036,7 @@ ROM_START( wargods ) /* Boot EPROM Version 1.0, Game Type: 452 (11/07/1996) */
 	ROM_REGION32_LE( 0x1000000, "user1", 0 )
 	ROM_LOAD( "u41.rom", 0x000000, 0x20000, CRC(398c54cc) SHA1(6c4b5d6ec5c844dcbf181f9d86a9196a088ed2db) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE( "wargods_11-07-1996", 0, SHA1(7585bc65b1038589cb59d3e7c56e08ca9d7015b8) ) // HDD had a label of 10-09-1996, but the game reports
 																						  // a version of 11-07-1996, so it was probably upgraded
 																						  // in the field.
@@ -2051,7 +2051,7 @@ ROM_START( wargodsa ) /* Boot EPROM Version 1.0, Game Type: 452 (08/15/1996) */
 	ROM_REGION32_LE( 0x1000000, "user1", 0 )
 	ROM_LOAD( "u41.rom", 0x000000, 0x20000, CRC(398c54cc) SHA1(6c4b5d6ec5c844dcbf181f9d86a9196a088ed2db) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE( "wargods_08-15-1996", 0, SHA1(5dee00be40c315fbb1d6e3994dae8e498ab87fb2) )
 
 	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
@@ -2065,7 +2065,7 @@ ROM_START( wargodsb ) /* Boot EPROM Version 1.0, Game Type: 452 (12/11/1995) */
 	ROM_REGION32_LE( 0x1000000, "user1", 0 )
 	ROM_LOAD( "u41.rom", 0x000000, 0x20000, CRC(398c54cc) SHA1(6c4b5d6ec5c844dcbf181f9d86a9196a088ed2db) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE( "wargods_12-11-1995", 0, SHA1(141063f95867fdcc4b15c844e510696604a70c6a) )
 
 	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)

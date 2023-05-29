@@ -2295,7 +2295,7 @@ ROM_START(torchh)
 	ROM_REGION(0x4000, "vsm", 0) /* system speech PHROM */
 	ROM_LOAD("phrom_us.bin", 0x0000, 0x4000, CRC(bf4b3b64) SHA1(66876702d1d95eecc034d20f25047f893a27cde5))
 
-	DISK_REGION("1mhzbus:torchhd:sasi:0:s1410:image")
+	DISK_REGION("1mhzbus:torchhd:sasi:0:s1410")
 	DISK_IMAGE("torch_utilities", 0, BAD_DUMP SHA1(33a5f169bd91b9c6049e8bd0b237429c091fddd0)) /* NEC D5126 contains Standard and Hard Disc Utilities, not known what was factory installed */
 ROM_END
 

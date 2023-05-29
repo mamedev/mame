@@ -782,7 +782,7 @@ void nycaptor_state::nycaptor(machine_config &config)
 	ay2.add_route(ALL_OUTPUTS, "speaker", 0.15);
 
 	MSM5232(config, m_msm, 2000000);
-	m_msm->set_capacitors(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6); /* 0.65 (???) uF capacitors (match the sample, not verified) */
+	m_msm->set_capacitors(1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6); /* 1 uF capacitors (match the sample, not verified, standard) */
 	m_msm->add_route(0, "speaker", 1.0);   // pin 28  2'-1
 	m_msm->add_route(1, "speaker", 1.0);   // pin 29  4'-1
 	m_msm->add_route(2, "speaker", 1.0);   // pin 30  8'-1
@@ -849,7 +849,7 @@ void nycaptor_state::cyclshtg(machine_config &config)
 	ay2.add_route(ALL_OUTPUTS, "speaker", 0.15);
 
 	MSM5232(config, m_msm, 2000000);
-	m_msm->set_capacitors(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6); /* 0.65 (???) uF capacitors (match the sample, not verified) */
+	m_msm->set_capacitors(1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6); /* 1 uF capacitors (match the sample, not verified, standard) */
 	m_msm->add_route(0, "speaker", 1.0);   // pin 28  2'-1
 	m_msm->add_route(1, "speaker", 1.0);   // pin 29  4'-1
 	m_msm->add_route(2, "speaker", 1.0);   // pin 30  8'-1
@@ -913,7 +913,7 @@ void nycaptor_state::bronx(machine_config &config)
 	ay2.add_route(ALL_OUTPUTS, "speaker", 0.15);
 
 	MSM5232(config, m_msm, 2000000);
-	m_msm->set_capacitors(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6); /* 0.65 (???) uF capacitors (match the sample, not verified) */
+	m_msm->set_capacitors(1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6); /* 1 uF capacitors (match the sample, not verified, standard) */
 	m_msm->add_route(0, "speaker", 1.0);   // pin 28  2'-1
 	m_msm->add_route(1, "speaker", 1.0);   // pin 29  4'-1
 	m_msm->add_route(2, "speaker", 1.0);   // pin 30  8'-1

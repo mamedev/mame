@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_SGI_H
-#define MAME_MACHINE_SGI_H
+#ifndef MAME_SGI_SGI_H
+#define MAME_SGI_SGI_H
 
 #pragma once
 
@@ -19,8 +19,8 @@ class sgi_mc_device : public device_t
 {
 public:
 	template <typename T, typename U>
-	sgi_mc_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&eeprom_tag)
-		: sgi_mc_device(mconfig, tag, owner, (uint32_t)0)
+	sgi_mc_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&eeprom_tag, uint32_t clock)
+		: sgi_mc_device(mconfig, tag, owner, clock)
 	{
 		m_maincpu.set_tag(std::forward<T>(cpu_tag));
 		m_eeprom.set_tag(std::forward<U>(eeprom_tag));
@@ -54,7 +54,6 @@ private:
 
 	uint32_t dma_translate(uint32_t address);
 	TIMER_CALLBACK_MEMBER(perform_dma);
-	TIMER_CALLBACK_MEMBER(rpss_tick);
 
 	uint32_t get_line_count() { return m_dma_size >> 16; }
 	uint32_t get_line_width() { return (uint16_t)m_dma_size; }
@@ -62,6 +61,8 @@ private:
 	int16_t get_stride() { return (int16_t)m_dma_stride; }
 	uint32_t get_zoom_count() { return (m_dma_count >> 16) & 0x3ff; }
 	uint32_t get_byte_count() { return (uint16_t)m_dma_count; }
+
+	void update_count();
 
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -71,8 +72,9 @@ private:
 
 	address_space *m_space;
 
-	emu_timer *m_rpss_timer;
 	emu_timer *m_dma_timer;
+
+	attotime m_last_update_time;
 
 	uint32_t m_cpu_control[2];
 	uint32_t m_watchdog;
@@ -109,12 +111,9 @@ private:
 	uint32_t m_dma_run;
 	uint32_t m_eeprom_ctrl;
 	uint32_t m_semaphore[16];
-	int m_rpss_divide_counter;
-	int m_rpss_divide_count;
-	uint8_t m_rpss_increment;
 };
 
 DECLARE_DEVICE_TYPE(SGI_MC, sgi_mc_device)
 
 
-#endif // MAME_MACHINE_SGI_H
+#endif // MAME_SGI_SGI_H

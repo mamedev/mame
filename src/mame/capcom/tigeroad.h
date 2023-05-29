@@ -23,11 +23,11 @@ public:
 	tigeroad_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
 		, m_palette(*this, "palette")
 		, m_has_coinlock(true)
 		, m_spriteram(*this, "spriteram")
 		, m_videoram(*this, "videoram")
-		, m_audiocpu(*this, "audiocpu")
 		, m_msm(*this, "msm")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_spritegen(*this, "spritegen")
@@ -41,6 +41,7 @@ public:
 
 protected:
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	required_device<palette_device> m_palette;
 
 	void soundcmd_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -55,7 +56,6 @@ protected:
 private:
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_shared_ptr<u16> m_videoram;
-	required_device<cpu_device> m_audiocpu;
 	optional_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<tigeroad_spr_device> m_spritegen;

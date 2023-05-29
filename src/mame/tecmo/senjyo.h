@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Mirko Buffoni
-#ifndef MAME_INCLUDES_SENJYO_H
-#define MAME_INCLUDES_SENJYO_H
+#ifndef MAME_TECMO_SENJYO_H
+#define MAME_TECMO_SENJYO_H
 
 #pragma once
 
@@ -137,4 +137,4 @@ private:
 };
 
 
-#endif // MAME_INCLUDES_SENJYO_H
+#endif // MAME_TECMO_SENJYO_H

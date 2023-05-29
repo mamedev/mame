@@ -30,9 +30,9 @@ To do:
 
 
 // configurable logging
-#define LOG_SCROLL     (1U <<  1)
-#define LOG_SOUND      (1U <<  2)
-#define LOG_E0XX       (1U <<  3)
+#define LOG_SCROLL     (1U << 1)
+#define LOG_SOUND      (1U << 2)
+#define LOG_E0XX       (1U << 3)
 
 //#define VERBOSE (LOG_GENERAL | LOG_SCROLL | LOG_SOUND | LOG_E0XX)
 

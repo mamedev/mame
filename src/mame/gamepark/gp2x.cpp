@@ -26,6 +26,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class gp2x_state : public driver_device
 {
 public:
@@ -378,6 +380,9 @@ void gp2x_state::gp2x(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 }
+
+} // anonymous namespace
+
 
 ROM_START(gp2x)
 	ROM_REGION( 0x600000, "maincpu", 0 )    // contents of NAND flash

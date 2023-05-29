@@ -794,12 +794,13 @@ void m68000_musashi_device::m68k_cause_bus_error()
 	m_run_mode = RUN_MODE_BERR_AERR_RESET;
 }
 
-bool m68000_musashi_device::memory_translate(int space, int intention, offs_t &address)
+bool m68000_musashi_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
+	target_space = &space(spacenum);
 	/* only applies to the program address space and only does something if the MMU's enabled */
 	{
 		/* 68040 needs to call the MMU even when disabled so transparent translation works */
-		if ((space == AS_PROGRAM) && ((m_pmmu_enabled) || (CPU_TYPE_IS_040_PLUS())))
+		if ((spacenum == AS_PROGRAM) && ((m_pmmu_enabled) || (CPU_TYPE_IS_040_PLUS())))
 		{
 			// FIXME: m_mmu_tmp_sr will be overwritten in pmmu_translate_addr_with_fc
 			u16 temp_mmu_tmp_sr = m_mmu_tmp_sr;
@@ -1692,7 +1693,7 @@ void m68000_musashi_device::set_buserror_details(u32 fault_addr, u8 rw, u8 fc, b
 	m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
 }
 
-u16 m68000_musashi_device::get_fc()
+u16 m68000_musashi_device::get_fc() const noexcept
 {
 	return m_mmu_tmp_fc;
 }
@@ -2206,11 +2207,11 @@ void m68000_musashi_device::m68ki_exception_interrupt(u32 int_level)
 
 	/* Inform the device than an interrupt is taken */
 	if(m_interrupt_mixer)
-		standard_irq_callback(int_level);
+		standard_irq_callback(int_level, m_pc);
 	else
 		for(int i=0; i<3; i++)
 			if(int_level & (1<<i))
-				standard_irq_callback(i);
+				standard_irq_callback(i, m_pc);
 
 	/* Acknowledge the interrupt by reading the cpu space. */
 	/* We require the handlers for autovector to return the correct
@@ -2262,9 +2263,7 @@ m68000_musashi_device::m68000_musashi_device(const machine_config &mconfig, cons
 	: m68000_base_device(mconfig, type, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, internal_map),
 		m_oprogram_config("decrypted_opcodes", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, internal_map),
-		m_cpu_space_config("cpu_space", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, address_map_constructor(FUNC(m68000_musashi_device::default_autovectors_map), this)),
-		m_cmpild_instr_callback(*this),
-		m_rte_instr_callback(*this)
+		m_cpu_space_config("cpu_space", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, address_map_constructor(FUNC(m68000_musashi_device::default_autovectors_map), this))
 {
 	clear_all();
 }
@@ -2275,9 +2274,7 @@ m68000_musashi_device::m68000_musashi_device(const machine_config &mconfig, cons
 	: m68000_base_device(mconfig, type, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_BIG, prg_data_width, prg_address_bits),
 		m_oprogram_config("decrypted_opcodes", ENDIANNESS_BIG, prg_data_width, prg_address_bits),
-		m_cpu_space_config("cpu_space", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, address_map_constructor(FUNC(m68000_musashi_device::default_autovectors_map), this)),
-		m_cmpild_instr_callback(*this),
-		m_rte_instr_callback(*this)
+		m_cpu_space_config("cpu_space", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, address_map_constructor(FUNC(m68000_musashi_device::default_autovectors_map), this))
 {
 	clear_all();
 }
@@ -2403,9 +2400,6 @@ void m68000_musashi_device::clear_all()
 void m68000_musashi_device::device_start()
 {
 	m_reset_cb.resolve_safe();
-	m_cmpild_instr_callback.resolve();
-	m_rte_instr_callback.resolve();
-	m_tas_write_callback.resolve();
 }
 
 void m68000_musashi_device::device_stop()

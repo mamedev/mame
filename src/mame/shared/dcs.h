@@ -6,8 +6,8 @@
 
 ****************************************************************************/
 
-#ifndef MAME_AUDIO_DCS_H
-#define MAME_AUDIO_DCS_H
+#ifndef MAME_SHARED_DCS_H
+#define MAME_SHARED_DCS_H
 
 #pragma once
 
@@ -417,4 +417,4 @@ DECLARE_DEVICE_TYPE(DCS2_AUDIO_DENVER_5CH, dcs2_audio_denver_5ch_device)
 
 DECLARE_DEVICE_TYPE(DCS2_AUDIO_DENVER_2CH, dcs2_audio_denver_2ch_device)
 
-#endif // MAME_AUDIO_DCS_H
+#endif // MAME_SHARED_DCS_H

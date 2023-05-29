@@ -30,42 +30,30 @@ struct machine_flags
 {
 	enum type : u32
 	{
-		MASK_ORIENTATION    = 0x00000007,
-		MASK_TYPE           = 0x00000038,
+		MASK_ORIENTATION    = 0x0000'0007,
 
-		FLIP_X              = 0x00000001,
-		FLIP_Y              = 0x00000002,
-		SWAP_XY             = 0x00000004,
-		ROT0                = 0x00000000,
+		FLIP_X              = 0x0000'0001,
+		FLIP_Y              = 0x0000'0002,
+		SWAP_XY             = 0x0000'0004,
+		ROT0                = 0x0000'0000,
 		ROT90               = FLIP_X | SWAP_XY,
 		ROT180              = FLIP_X | FLIP_Y,
 		ROT270              = FLIP_Y | SWAP_XY,
 
-		TYPE_ARCADE         = 0x00000008,   // coin-operated machine for public use
-		TYPE_CONSOLE        = 0x00000010,   // console system
-		TYPE_COMPUTER       = 0x00000018,   // any kind of computer including home computers, minis, calculators, ...
-		TYPE_OTHER          = 0x00000038,   // any other emulated system (e.g. clock, satellite receiver, ...)
-
-		NOT_WORKING         = 0x00000040,
-		SUPPORTS_SAVE       = 0x00000080,   // system supports save states
-		NO_COCKTAIL         = 0x00000100,   // screen flip support is missing
-		IS_BIOS_ROOT        = 0x00000200,   // this driver entry is a BIOS root
-		REQUIRES_ARTWORK    = 0x00000400,   // requires external artwork for key game elements
-		CLICKABLE_ARTWORK   = 0x00000800,   // artwork is clickable and requires mouse cursor
-		UNOFFICIAL          = 0x00001000,   // unofficial hardware modification
-		NO_SOUND_HW         = 0x00002000,   // system has no sound output
-		MECHANICAL          = 0x00004000,   // contains mechanical parts (pinball, redemption games, ...)
-		IS_INCOMPLETE       = 0x00008000    // official system with blatantly incomplete hardware/software
+		NOT_WORKING         = 0x0000'0040,
+		SUPPORTS_SAVE       = 0x0000'0080,  // system supports save states
+		NO_COCKTAIL         = 0x0000'0100,  // screen flip support is missing
+		IS_BIOS_ROOT        = 0x0000'0200,  // this driver entry is a BIOS root
+		REQUIRES_ARTWORK    = 0x0000'0400,  // requires external artwork for key game elements
+		CLICKABLE_ARTWORK   = 0x0000'0800,  // artwork is clickable and requires mouse cursor
+		UNOFFICIAL          = 0x0000'1000,  // unofficial hardware modification
+		NO_SOUND_HW         = 0x0000'2000,  // system has no sound output
+		MECHANICAL          = 0x0000'4000,  // contains mechanical parts (pinball, redemption games, ...)
+		IS_INCOMPLETE       = 0x0000'8000   // official system with blatantly incomplete hardware/software
 	};
 };
 
 DECLARE_ENUM_BITWISE_OPERATORS(machine_flags::type);
-
-
-constexpr u64 MACHINE_TYPE_ARCADE               = machine_flags::TYPE_ARCADE;
-constexpr u64 MACHINE_TYPE_CONSOLE              = machine_flags::TYPE_CONSOLE;
-constexpr u64 MACHINE_TYPE_COMPUTER             = machine_flags::TYPE_COMPUTER;
-constexpr u64 MACHINE_TYPE_OTHER                = machine_flags::TYPE_OTHER;
 
 
 /// \addtogroup machinedef
@@ -204,11 +192,9 @@ driver_device_creator< \
 /// \addtogroup machinedef
 /// \{
 
-/// \brief Define a "game" system
+/// \brief Define a system
 ///
-/// Use this macro to define most systems intended for public use,
-/// including arcade games, gambling machines, vending machines, and
-/// information kiosks.  Must be used in the global namespace.
+/// Must be used in the global namespace.
 ///
 /// Creates an appropriately named and populated #game_driver structure
 /// describing the system.
@@ -252,7 +238,7 @@ driver_device_creator< \
 ///   unemulated and imperfectly emulated feature flags that apply to
 ///   all systems implemented using the class in the class itself to
 ///   avoid repetition.
-/// \sa GAMEL CONS COMP SYST
+/// \sa GAMEL SYST
 #define GAME(YEAR, NAME, PARENT, MACHINE, INPUT, CLASS, INIT, MONITOR, COMPANY, FULLNAME, FLAGS) \
 GAME_DRIVER_TRAITS(NAME, FULLNAME)                                      \
 extern game_driver const GAME_NAME(NAME)                                \
@@ -267,18 +253,18 @@ extern game_driver const GAME_NAME(NAME)                                \
 	ROM_NAME(NAME),                                                     \
 	nullptr,                                                            \
 	nullptr,                                                            \
-	machine_flags::type(u32((MONITOR) | (FLAGS) | MACHINE_TYPE_ARCADE)),\
+	machine_flags::type(u32((MONITOR) | (FLAGS))),                      \
 	#NAME                                                               \
 };
 
 
-/// \brief Define a "game" system with an additional internal layout
+/// \brief Define a system with an additional internal layout
 ///
 /// Equivalent to the #GAME macro, but with the additional ability to
-/// supply system-specific internal artwork layout data.  Views from the
+/// supply a system-specific internal artwork layout.  Views from the
 /// system-specific layout are available in addition to any views from
-/// layout data specified in the machine configuration.  Must be used in
-/// the global namespace.
+/// layouts specified in the machine configuration.  Must be used in the
+/// global namespace.
 ///
 /// Creates an appropriately named and populated #game_driver structure
 /// describing the system.
@@ -324,7 +310,7 @@ extern game_driver const GAME_NAME(NAME)                                \
 ///   avoid repetition.
 /// \param LAYOUT An #internal_layout structure providing additional
 ///   internal artwork for the system.
-/// \sa GAME CONS COMP SYST
+/// \sa GAME SYST
 #define GAMEL(YEAR, NAME, PARENT, MACHINE, INPUT, CLASS, INIT, MONITOR, COMPANY, FULLNAME, FLAGS, LAYOUT) \
 GAME_DRIVER_TRAITS(NAME, FULLNAME)                                      \
 extern game_driver const GAME_NAME(NAME)                                \
@@ -339,15 +325,15 @@ extern game_driver const GAME_NAME(NAME)                                \
 	ROM_NAME(NAME),                                                     \
 	nullptr,                                                            \
 	&LAYOUT,                                                            \
-	machine_flags::type(u32((MONITOR) | (FLAGS) | MACHINE_TYPE_ARCADE)),\
+	machine_flags::type(u32((MONITOR) | (FLAGS))),                      \
 	#NAME                                                               \
 };
 
 
-/// \brief Define a "console" system
+/// \brief Define a system with software compatibility grouping
 ///
-/// Use this macro to define appliance-like entertainment systems
-/// designed for domestic use.  Must be used in the global namespace.
+/// Equivalent to the #GAME macro, but allows software-compatible
+/// systems to be grouped.
 ///
 /// Creates an appropriately named and populated #game_driver structure
 /// describing the system.
@@ -390,156 +376,31 @@ extern game_driver const GAME_NAME(NAME)                                \
 ///   unemulated and imperfectly emulated feature flags that apply to
 ///   all systems implemented using the class in the class itself to
 ///   avoid repetition.  Screen orientation flags may be included here.
-/// \sa GAME GAMEL COMP SYST
-#define CONS(YEAR, NAME, PARENT, COMPAT, MACHINE, INPUT, CLASS, INIT, COMPANY, FULLNAME, FLAGS) \
-GAME_DRIVER_TRAITS(NAME, FULLNAME)                                      \
-extern game_driver const GAME_NAME(NAME)                                \
-{                                                                       \
-	GAME_DRIVER_TYPE(NAME, CLASS, FLAGS),                               \
-	#PARENT,                                                            \
-	#YEAR,                                                              \
-	COMPANY,                                                            \
-	[] (machine_config &config, device_t &owner) { downcast<CLASS &>(owner).MACHINE(config); }, \
-	INPUT_PORTS_NAME(INPUT),                                            \
-	[] (device_t &owner) { downcast<CLASS &>(owner).INIT(); },          \
-	ROM_NAME(NAME),                                                     \
-	#COMPAT,                                                            \
-	nullptr,                                                            \
-	machine_flags::type(u32(ROT0 | (FLAGS) | MACHINE_TYPE_CONSOLE)),    \
-	#NAME                                                               \
-};
-
-
-/// \brief Define a "computer" system
-///
-/// Use this macro to define computer-like systems.  Must be used in the
-/// global namespace.
-///
-/// Creates an appropriately named and populated #game_driver structure
-/// describing the system.
-/// \param YEAR The year that the system was first made available.  Must
-///   be a token containing only the digits zero to nine, question mark
-///   and plus sign.
-/// \param NAME The short name of the system, used for identification,
-///   and in filesystem paths for assets and data.  Must be a token no
-///   longer than sixteen characters, containing only ASCII lowercase
-///   letters, digits and underscores.  Must be globally unique across
-///   systems and devices.
-/// \param PARENT Short name of the parent or BIOS system if applicable,
-///   or a single digit zero otherwise.
-/// \param COMPAT Short name of a system that this system is compatible
-///   with if applicable, or a single digit zero otherwise.
-/// \param MACHINE Function used to buid machine configuration for the
-///   system.  Must be a public member function of the system device
-///   class (\p CLASS argument), returning void and taking a reference
-///   to a #machine_config object as a parameter.
-/// \param INPUT Input port definitions for the root device of the
-///   system, usually defined using #INPUT_PORTS_START and associated
-///   macros.
-/// \param CLASS Class to instantiate as the root device of the system.
-///   Must be an implementation of #driver_device.
-/// \param INIT Initialisation function called after all child devices
-///   have started, but before the driver start functions are called.
-///   Often used for tasks like decrypting ROMs.  Must be a public
-///   member function of the system device class (\p CLASS argument),
-///   returning void and accepting no parameters.  The function
-///   #driver_device::empty_init is supplied for systems that don't need
-///   to perform additional tasks.
-/// \param COMPANY Name of the developer or distributor of the system.
-///   Must be a string.
-/// \param FULLNAME Display name for the system.  Must be a string, and
-///   must be globally unique across systems and devices.
-/// \param FLAGS Bitwise combination of emulation status flags for the
-///   system, in addition to flags supplied by the system device class
-///   (see #device_t::unemulated_features and
-///   #device_t::imperfect_features).  It is advisable to supply
-///   unemulated and imperfectly emulated feature flags that apply to
-///   all systems implemented using the class in the class itself to
-///   avoid repetition.  Screen orientation flags may be included here.
-/// \sa GAME GAMEL CONS SYST
-#define COMP(YEAR, NAME, PARENT, COMPAT, MACHINE, INPUT, CLASS, INIT, COMPANY, FULLNAME, FLAGS) \
-GAME_DRIVER_TRAITS(NAME, FULLNAME)                                      \
-extern game_driver const GAME_NAME(NAME)                                \
-{                                                                       \
-	GAME_DRIVER_TYPE(NAME, CLASS, FLAGS),                               \
-	#PARENT,                                                            \
-	#YEAR,                                                              \
-	COMPANY,                                                            \
-	[] (machine_config &config, device_t &owner) { downcast<CLASS &>(owner).MACHINE(config); }, \
-	INPUT_PORTS_NAME(INPUT),                                            \
-	[] (device_t &owner) { downcast<CLASS &>(owner).INIT(); },          \
-	ROM_NAME(NAME),                                                     \
-	#COMPAT,                                                            \
-	nullptr,                                                            \
-	machine_flags::type(u32(ROT0 | (FLAGS) | MACHINE_TYPE_COMPUTER)),   \
-	#NAME                                                               \
-};
-
-
-/// \brief Define a generic system
-///
-/// Use this macro to define miscellaneous systems that don't fall into
-/// one of the other categories.  Must be used in the global namespace.
-///
-/// Creates an appropriately named and populated #game_driver structure
-/// describing the system.
-/// \param YEAR The year that the system was first made available.  Must
-///   be a token containing only the digits zero to nine, question mark
-///   and plus sign.
-/// \param NAME The short name of the system, used for identification,
-///   and in filesystem paths for assets and data.  Must be a token no
-///   longer than sixteen characters, containing only ASCII lowercase
-///   letters, digits and underscores.  Must be globally unique across
-///   systems and devices.
-/// \param PARENT Short name of the parent or BIOS system if applicable,
-///   or a single digit zero otherwise.
-/// \param COMPAT Short name of a system that this system is compatible
-///   with if applicable, or a single digit zero otherwise.
-/// \param MACHINE Function used to buid machine configuration for the
-///   system.  Must be a public member function of the system device
-///   class (\p CLASS argument), returning void and taking a reference
-///   to a #machine_config object as a parameter.
-/// \param INPUT Input port definitions for the root device of the
-///   system, usually defined using #INPUT_PORTS_START and associated
-///   macros.
-/// \param CLASS Class to instantiate as the root device of the system.
-///   Must be an implementation of #driver_device.
-/// \param INIT Initialisation function called after all child devices
-///   have started, but before the driver start functions are called.
-///   Often used for tasks like decrypting ROMs.  Must be a public
-///   member function of the system device class (\p CLASS argument),
-///   returning void and accepting no parameters.  The function
-///   #driver_device::empty_init is supplied for systems that don't need
-///   to perform additional tasks.
-/// \param COMPANY Name of the developer or distributor of the system.
-///   Must be a string.
-/// \param FULLNAME Display name for the system.  Must be a string, and
-///   must be globally unique across systems and devices.
-/// \param FLAGS Bitwise combination of emulation status flags for the
-///   system, in addition to flags supplied by the system device class
-///   (see #device_t::unemulated_features and
-///   #device_t::imperfect_features).  It is advisable to supply
-///   unemulated and imperfectly emulated feature flags that apply to
-///   all systems implemented using the class in the class itself to
-///   avoid repetition.  Screen orientation flags may be included here.
-/// \sa GAME GAMEL CONS COMP
+/// \sa GAME GAMEL
 #define SYST(YEAR, NAME, PARENT, COMPAT, MACHINE, INPUT, CLASS, INIT, COMPANY, FULLNAME, FLAGS) \
-GAME_DRIVER_TRAITS(NAME, FULLNAME)                                      \
-extern game_driver const GAME_NAME(NAME)                                \
-{                                                                       \
-	GAME_DRIVER_TYPE(NAME, CLASS, FLAGS),                               \
-	#PARENT,                                                            \
-	#YEAR,                                                              \
-	COMPANY,                                                            \
-	[] (machine_config &config, device_t &owner) { downcast<CLASS &>(owner).MACHINE(config); }, \
-	INPUT_PORTS_NAME(INPUT),                                            \
-	[] (device_t &owner) { downcast<CLASS &>(owner).INIT(); },          \
-	ROM_NAME(NAME),                                                     \
-	#COMPAT,                                                            \
-	nullptr,                                                            \
-	machine_flags::type(u32(ROT0 | (FLAGS) | MACHINE_TYPE_OTHER)),      \
-	#NAME                                                               \
-};
+		GAME_DRIVER_TRAITS(NAME, FULLNAME)                                      \
+		extern game_driver const GAME_NAME(NAME)                                \
+		{                                                                       \
+			GAME_DRIVER_TYPE(NAME, CLASS, FLAGS),                               \
+			#PARENT,                                                            \
+			#YEAR,                                                              \
+			COMPANY,                                                            \
+			[] (machine_config &config, device_t &owner) { downcast<CLASS &>(owner).MACHINE(config); }, \
+			INPUT_PORTS_NAME(INPUT),                                            \
+			[] (device_t &owner) { downcast<CLASS &>(owner).INIT(); },          \
+			ROM_NAME(NAME),                                                     \
+			#COMPAT,                                                            \
+			nullptr,                                                            \
+			machine_flags::type(u32(ROT0 | (FLAGS))),                           \
+			#NAME                                                               \
+		};
+
+
+#define CONS(YEAR, NAME, PARENT, COMPAT, MACHINE, INPUT, CLASS, INIT, COMPANY, FULLNAME, FLAGS) \
+		SYST(YEAR, NAME, PARENT, COMPAT, MACHINE, INPUT, CLASS, INIT, COMPANY, FULLNAME, FLAGS)
+
+#define COMP(YEAR, NAME, PARENT, COMPAT, MACHINE, INPUT, CLASS, INIT, COMPANY, FULLNAME, FLAGS) \
+		SYST(YEAR, NAME, PARENT, COMPAT, MACHINE, INPUT, CLASS, INIT, COMPANY, FULLNAME, FLAGS)
 
 /// \}
 

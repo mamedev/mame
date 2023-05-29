@@ -5,8 +5,8 @@
     M72 audio interface
 
 ****************************************************************************/
-#ifndef MAME_AUDIO_M72_H
-#define MAME_AUDIO_M72_H
+#ifndef MAME_IREM_M72_A_H
+#define MAME_IREM_M72_A_H
 
 #pragma once
 
@@ -44,4 +44,4 @@ private:
 
 DECLARE_DEVICE_TYPE(IREM_M72_AUDIO, m72_audio_device)
 
-#endif // MAME_AUDIO_M72_H
+#endif // MAME_IREM_M72_A_H

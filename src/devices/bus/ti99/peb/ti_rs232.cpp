@@ -105,17 +105,17 @@
 #include "emu.h"
 #include "ti_rs232.h"
 
-#define LOG_WARN        (1U<<1)    // Warnings
-#define LOG_CONFIG      (1U<<2)
-#define LOG_LINES       (1U<<3)
-#define LOG_SETTING     (1U<<4)
-#define LOG_STATE       (1U<<5)
-#define LOG_MAP         (1U<<6)
-#define LOG_IN          (1U<<7)
-#define LOG_OUT         (1U<<8)
-#define LOG_ILA         (1U<<9)
+#define LOG_WARN        (1U << 1)    // Warnings
+#define LOG_CONFIG      (1U << 2)
+#define LOG_LINES       (1U << 3)
+#define LOG_SETTING     (1U << 4)
+#define LOG_STATE       (1U << 5)
+#define LOG_MAP         (1U << 6)
+#define LOG_IN          (1U << 7)
+#define LOG_OUT         (1U << 8)
+#define LOG_ILA         (1U << 9)
 
-#define VERBOSE ( LOG_CONFIG | LOG_WARN )
+#define VERBOSE (LOG_CONFIG | LOG_WARN)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(TI99_RS232,     bus::ti99::peb::ti_rs232_pio_device,      "ti99_rs232",           "TI-99 RS232/PIO interface")
@@ -186,14 +186,14 @@ ti_pio_attached_device::ti_pio_attached_device(const machine_config &mconfig, co
 /*
     Initialize rs232 unit and open image
 */
-image_init_result ti_rs232_attached_device::call_load()
+std::pair<std::error_condition, std::string> ti_rs232_attached_device::call_load()
 {
 	m_uart->set_clock(true);
 
 	// The following line may cause trouble in the init phase
 	// card->incoming_dtr(devnumber, (m_file!=nullptr)? ASSERT_LINE : CLEAR_LINE);
 
-	return image_init_result::PASS;  // OK
+	return std::make_pair(std::error_condition(), std::string());  // OK
 }
 
 void ti_rs232_attached_device::call_unload()
@@ -204,7 +204,7 @@ void ti_rs232_attached_device::call_unload()
 /*
     Initialize pio unit and open image
 */
-image_init_result ti_pio_attached_device::call_load()
+std::pair<std::error_condition, std::string> ti_pio_attached_device::call_load()
 {
 	ti_rs232_pio_device* card = static_cast<ti_rs232_pio_device*>(owner());
 
@@ -218,7 +218,7 @@ image_init_result ti_pio_attached_device::call_load()
 	else
 		card->m_pio_handshakein = true;
 
-	return image_init_result::PASS;  // OK
+	return std::make_pair(std::error_condition(), std::string());  // OK
 }
 
 /*

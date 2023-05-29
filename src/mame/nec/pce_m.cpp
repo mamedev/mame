@@ -1,82 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Charles MacDonald, Wilbert Pol, Angelo Salese
-/************************************************************
+/**************************************************************************************************
 
-PC Engine CD HW notes:
+PC Engine legacy middle ground file, to be removed ...
 
-TODO:
-- Dragon Ball Z: ADPCM dies after the first upload;
-- Dragon Slayer - The Legend of Heroes: black screen;
-- Mirai Shonen Conan: dies at new game selection;
-- Snatcher: black screen after Konami logo, tries set up CD-DA
-            while transferring data?
-- Steam Heart's: needs transfer ready irq to get past the
-                 gameplay hang, don't know exactly when it should fire
-- Steam Heart's: bad ADPCM irq, dialogue is cutted due of it;
-
-=============================================================
-
-CD Interface Register 0x00 - CDC status
-x--- ---- busy signal
--x-- ---- request signal
----x ---- cd signal
----- x--- i/o signal
-
-CD Interface Register 0x03 - BRAM lock / CD status
--x-- ---- acknowledge signal
---x- ---- done signal
----x ---- bram signal
----- x--- ADPCM 2
----- -x-- ADPCM 1
----- --x- CDDA left/right speaker select
-
-CD Interface Register 0x05 - CD-DA Volume low 8-bit port
-
-CD Interface Register 0x06 - CD-DA Volume high 8-bit port
-
-CD Interface Register 0x07 - BRAM unlock / CD status
-x--- ---- Enables BRAM
-
-CD Interface Register 0x0c - ADPCM status
-x--- ---- ADPCM is reading data
----- x--- ADPCM playback (0) stopped (1) currently playing
----- -x-- pending ADPCM data write
----- ---x ADPCM playback (1) stopped (0) currently playing
-
-CD Interface Register 0x0d - ADPCM address control
-x--- ---- ADPCM reset
--x-- ---- ADPCM play
---x- ---- ADPCM repeat
----x ---- ADPCM set length
----- x--- ADPCM set read address
----- --xx ADPCM set write address
-(note: some games reads bit 5 and wants it to be low otherwise they hangs, surely NOT an ADPCM repeat flag read because it doesn't make sense)
-
-CD Interface Register 0x0e - ADPCM playback rate
-
-CD Interface Register 0x0f - ADPCM fade in/out register
----- xxxx command setting:
-0x00 ADPCM/CD-DA Fade-in
-0x01 CD-DA fade-in
-0x08 CD-DA fade-out (short) ADPCM fade-in
-0x09 CD-DA fade-out (long)
-0x0a ADPCM fade-out (long)
-0x0c CD-DA fade-out (short) ADPCM fade-in
-0x0d CD-DA fade-out (short)
-0x0e ADPCM fade-out (short)
-
-*************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/h6280/h6280.h"
 #include "pce.h"
-
-
-/* joystick related data*/
-
-#define JOY_CLOCK   0x01
-#define JOY_RESET   0x02
-
 
 
 void pce_state::init_pce()
@@ -119,7 +51,6 @@ void pce_state::machine_reset()
 	}
 }
 
-/* todo: how many input ports does the PCE have? */
 void pce_state::controller_w(u8 data)
 {
 	m_port_ctrl->sel_w(BIT(data, 0));

@@ -8,7 +8,7 @@
 #include <propkey.h>
 #endif
 
-#include <FunctionDiscoveryKeys_devpkey.h>
+#include <functiondiscoverykeys_devpkey.h>
 
 // FMTID_FD = {904b03a2-471d-423c-a584-f3483238a146}
 DEFINE_GUID(FMTID_FD, 0x904b03a2, 0x471d, 0x423c, 0xa5, 0x84, 0xf3, 0x48, 0x32, 0x38, 0xa1, 0x46);

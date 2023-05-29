@@ -49,7 +49,6 @@ P0-145-1                2002    Trophy Hunting - Bear & Moose (test)    Sammy
 
 TODO:
 
-- Proper emulation of the TMP68301 CPU, in a core file.
 - Proper emulation of the ColdFire CPU, in a core file.
 - improvements to Flip screen / Zooming support. (Flip Screen is often done with 'negative zoom value')
 - Fix some graphics imperfections (e.g. color depth selection, "tilemap" sprites) [all done? - NS]
@@ -2271,22 +2270,10 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(seta2_state::seta2_interrupt)
-{
-	/* VBlank is connected to INT0 (external interrupts pin 0) */
-	downcast<tmp68301_device &>(*m_maincpu).external_interrupt_0();
-}
-
-INTERRUPT_GEN_MEMBER(seta2_state::samshoot_interrupt)
-{
-	downcast<tmp68301_device &>(*m_maincpu).external_interrupt_2();   // to do: hook up x1-10 interrupts
-}
-
 void seta2_state::seta2(machine_config &config)
 {
 	TMP68301(config, m_maincpu, XTAL(50'000'000)/3);   // Verified on some PCBs
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::mj4simai_map);
-	m_maincpu->set_vblank_int("screen", FUNC(seta2_state::seta2_interrupt));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -2298,6 +2285,7 @@ void seta2_state::seta2(machine_config &config)
 	m_screen->set_visarea(0x00, 0x180-1, 0x00, 0xf0-1);
 	m_screen->set_screen_update(FUNC(seta2_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(seta2_state::screen_vblank));
+	m_screen->screen_vblank().append_inputline(m_maincpu, 0);
 	m_screen->set_palette(m_palette);
 	//m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
 
@@ -2333,8 +2321,8 @@ void seta2_state::gundamex(machine_config &config)
 	seta2_32m(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::gundamex_map);
 
-	downcast<tmp68301_device &>(*m_maincpu).in_parallel_callback().set(FUNC(seta2_state::gundamex_eeprom_r));
-	downcast<tmp68301_device &>(*m_maincpu).out_parallel_callback().set(FUNC(seta2_state::gundamex_eeprom_w));
+	downcast<tmp68301_device &>(*m_maincpu).parallel_r_cb().set(FUNC(seta2_state::gundamex_eeprom_r));
+	downcast<tmp68301_device &>(*m_maincpu).parallel_w_cb().set(FUNC(seta2_state::gundamex_eeprom_w));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -2413,7 +2401,7 @@ void seta2_state::reelquak(machine_config &config)
 	seta2(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::reelquak_map);
 
-	downcast<tmp68301_device &>(*m_maincpu).out_parallel_callback().set(FUNC(seta2_state::reelquak_leds_w));
+	downcast<tmp68301_device &>(*m_maincpu).parallel_w_cb().set(FUNC(seta2_state::reelquak_leds_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	TICKET_DISPENSER(config, m_dispenser, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
@@ -2426,9 +2414,9 @@ void seta2_state::samshoot(machine_config &config)
 {
 	seta2(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::samshoot_map);
-	m_maincpu->set_periodic_int(FUNC(seta2_state::samshoot_interrupt), attotime::from_hz(60));
+	m_maincpu->set_periodic_int(FUNC(seta2_state::irq2_line_hold), attotime::from_hz(60));
 
-	downcast<tmp68301_device &>(*m_maincpu).in_parallel_callback().set_ioport("DSW2");
+	downcast<tmp68301_device &>(*m_maincpu).parallel_w_cb().set_ioport("DSW2");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -2457,7 +2445,7 @@ void seta2_state::telpacfl(machine_config &config)
 	seta2(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::telpacfl_map);
 
-	downcast<tmp68301_device &>(*m_maincpu).in_parallel_callback().set_ioport("KNOB");
+	downcast<tmp68301_device &>(*m_maincpu).parallel_r_cb().set_ioport("KNOB");
 
 	EEPROM_93C46_16BIT(config, "eeprom"); // not hooked up, seems unused
 
@@ -2562,7 +2550,6 @@ void seta2_state::namcostr(machine_config &config)
 {
 	TMP68301(config, m_maincpu, XTAL(50'000'000)/3);   // !! TMP68301 !!
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::namcostr_map);
-	m_maincpu->set_vblank_int("screen", FUNC(seta2_state::seta2_interrupt));
 	// does this have a ticket dispenser?
 
 	// video hardware
@@ -2573,6 +2560,7 @@ void seta2_state::namcostr(machine_config &config)
 	m_screen->set_visarea(0x40, 0x1c0-1, 0x00, 0xf0-1);
 	m_screen->set_screen_update(FUNC(seta2_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(seta2_state::screen_vblank));
+	m_screen->screen_vblank().append_inputline(m_maincpu, 0);
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_seta2);

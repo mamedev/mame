@@ -149,13 +149,13 @@ Demo/Shareware: "Green", "Aldo II Adventure", "Phylox", "Draw Poker", "Space Min
 	<!-- Windows 95 -->
 	<!-- 486 class with 8MB RAM and 256 colors -->
 	<!-- has some game demos on disc -->
-	<!-- TODO: Unreadable install strings -->
-	<!-- TODO: black screen/hangs when launching a demo play in 640x480 resolution (ibm8514_cmd_w with invalid BitBLT params) -->
-	<software name="a10cuba" supported="partial">
+	<software name="a10cuba" supported="no">
 		<description>A-10 Cuba!</description>
 		<year>1996</year>
 		<publisher>Activision / Parsoft Interactive</publisher>
-
+		<notes><![CDATA[
+black screen/hangs when launching a demo play in 640x480 resolution, [8514] ibm8514_cmd_w with invalid BitBLT params
+]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="a-10 cuba (1996)(activision)" sha1="a9bc7e3b7306c46acf33b93ae168862d18734245" />
@@ -163,7 +163,7 @@ Demo/Shareware: "Green", "Aldo II Adventure", "Phylox", "Draw Poker", "Space Min
 		</part>
 	</software>
 
-	<software name="a10cubam" cloneof="a10cuba" supported="partial">
+	<software name="a10cubam" cloneof="a10cuba" supported="no">
 		<description>A-10 Cuba! (Megamedia Megaten Pack)</description>
 		<year>1997</year>
 		<publisher>Megamedia / Parsoft Interactive</publisher>
@@ -187,6 +187,24 @@ Demo/Shareware: "Green", "Aldo II Adventure", "Phylox", "Draw Poker", "Space Min
 			</diskarea>
 		</part>
 	</software>
+
+	<software name="actuasoc">
+		<description>Actua Soccer (OEM v1.29)</description>
+		<year>1996</year>
+		<publisher>Gremlin</publisher>
+		<notes><![CDATA[
+Black colored OEM CD with no id whatsoever
+]]></notes>
+		<info name="language" value="English/French/German/Spanish/Norwegian/Portuguese" />
+		<info name="region" value="Europe" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="sw6lfull" sha1="362044da3185e971785f2c99250bbeb6617797c2"/>
+			</diskarea>
+		</part>
+	</software>
+
 
 	<!-- Direct X 3.0 -->
 	<software name="acmidway2">
@@ -297,6 +315,19 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		</part>
 	</software>
 
+	<software name="advdudan" supported="yes">
+		<description>The Adventures of Down Under Dan (v1.1)</description>
+		<year>1995</year>
+		<publisher>Guildsoft Games</publisher>
+
+		<info name="developer" value="PowerVision"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="adventures_of_down_under_dan,_the_(1995)(guildsoft)" sha1="d76706ca2e75df32d0e508b3b14217ae96c69c3c"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS / Windows 3.1 -->
 	<!-- TODO: cannot setup emm386.exe for this in any way or form, might be a bug? -->
 	<software name="aeurope" supported="no">
@@ -388,12 +419,37 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		</part>
 	</software>
 
+	<!-- Source: http://redump.org/disc/35406/ -->
+	<!-- <rom name="Alien Carnage (Europe).cue" size="111" crc="96edaefe" sha1="8dd29ce05d4847d3985afc315ca9605a05334594"/> -->
+	<!-- <rom name="Alien Carnage (Europe).bin" size="4581696" crc="e95dc8f7" sha1="385197d55051c18edf5fd31b17c13ac5b38c8141"/> -->
+	<software name="aliencrn">
+		<description>Alien Carnage (Europe)</description>
+		<year>1995</year>
+		<publisher>Kixx XL</publisher>
+		<info name="developer" value="Interactive Binary Illusions / SubZero Software" />
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<info name="region" value="ver acs 1.0" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Alien Carnage (Europe)" sha1="f42252a8619061cb9ff5a18353cab55c92621ed0" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS -->
 	<!-- TODO: weird fade in/out effects at every transition (inverted?) -->
-	<software name="aliencrn">
-		<description>Halloween Harry - Alien Carnage</description>
-		<year>1994</year>
-		<publisher>Multi Media International / Apogee / Interactive Binary Illusions / Sub Zer0</publisher>
+	<software name="aliencrn_nl" cloneof="aliencrn">
+		<description>Alien Carnage (Netherlands)</description>
+		<year>1995</year>
+		<publisher>WizardWorks</publisher>
+		<info name="developer" value="Interactive Binary Illusions / SubZero Software" />
+		<info name="distributor" value="Multi Media International" />
+		<info name="language" value="English" />
+		<info name="region" value="Netherlands" />
+		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -418,13 +474,41 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		Mastered by AMI American Multimedia, Inc.
 		GCR-102-0062 G2 960914
 		-->
-		<description>Alien Incident (Eng, Fre, Ger, Fin) (v1.30)</description>
+		<description>Alien Incident (Europe, v1.30)</description>
 		<year>1996</year>
 		<publisher>Gametek</publisher>
+		<notes><![CDATA[
+Finnish language is only available in the installation setup
+]]></notes>
+		<info name="developer" value="Housemarquee" />
+		<info name="language" value="English/French/German/Finnish" />
+		<info name="region" value="Europe" />
+		<info name="version" value="v1.30" />
+		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="gcr-102-0062" sha1="183949d162064c38a21d6a143a815af6760233fb" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/38012/ -->
+	<!-- <rom name="Alien Incident (Europe).cue" size="112" crc="f267a88f" sha1="e06ec1e791caa5802318e99ded8d6dbacef57776"/> -->
+	<!-- <rom name="Alien Incident (Europe).bin" size="144321072" crc="0ff91e31" sha1="703c55257727e910b34993bd799a5074e7eb0e7d"/> -->
+	<software name="alieninca" cloneof="alieninc">
+		<description>Alien Incident (Europe, v1.01)</description>
+		<year>1996</year>
+		<publisher>Gametek</publisher>
+		<info name="developer" value="Housemarquee" />
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<info name="version" value="v1.01" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Alien Incident (Europe)" sha1="2c2571ab9a6c71cf578338b4cc991d922abd5ad3" />
 			</diskarea>
 		</part>
 	</software>
@@ -492,6 +576,415 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		</part>
 	</software>
 
+	<!-- Source: http://redump.org/disc/44295/ -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,Es,It) (Rev 1).cue" size="2511" crc="c2230d87" sha1="0f357469055785973490f53c3cdd8c0af0fe0bf0"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,Es,It) (Rev 1) (Track 01).bin" size="7458192" crc="327b2929" sha1="8a418c7fe7435e7dba720e23c589ac5e9ecb692d"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,Es,It) (Rev 1) (Track 02).bin" size="14438928" crc="6360f292" sha1="b6c58902f0066e3f13dca9a29ffb0bbec268533d"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,Es,It) (Rev 1) (Track 03).bin" size="13531056" crc="df71af7d" sha1="64f131d76119104ce9b03a697acd6ff08269142c"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,Es,It) (Rev 1) (Track 04).bin" size="22515696" crc="299dd2bc" sha1="c0fe94a5b3c25df2a0a31ef5b5f7058d7c715f60"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,Es,It) (Rev 1) (Track 05).bin" size="18359712" crc="60b18269" sha1="8c778a5be51248305151237897e8a4c70ef4f64d"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,Es,It) (Rev 1) (Track 06).bin" size="40868352" crc="77ca8c72" sha1="ad6ad0f921e1ba7124310bd2514ac48bf0fa392d"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,Es,It) (Rev 1) (Track 07).bin" size="21603120" crc="c6a82c1c" sha1="a51ac414f230ac27aa498c98d4cdd21f0000ed58"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,Es,It) (Rev 1) (Track 08).bin" size="5922336" crc="d839b0d7" sha1="6c0925b7f87e42423394eddba5048d23b9138c6e15"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,Es,It) (Rev 1) (Track 09).bin" size="15760752" crc="12552159" sha1="fa1711dab467e373305504a37d9ee0f7d7b8cbd3"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,Es,It) (Rev 1) (Track 10).bin" size="14620032" crc="cf818427" sha1="ba556cbd3a2f667faa6b09472f9fc5ac663201d7"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,Es,It) (Rev 1) (Track 11).bin" size="35261184" crc="dc270e13" sha1="a627a14461f664225bed575289b8a69adfc17b32"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,Es,It) (Rev 1) (Track 12).bin" size="4332384" crc="ba4173db" sha1="1568542fcf00297a4f199e9ca22988f3951b2ed2"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,Es,It) (Rev 1) (Track 13).bin" size="1874544" crc="557fc170" sha1="549838b6a1332a0a522556044d4cb2f6e5479313"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,Es,It) (Rev 1) (Track 14).bin" size="1500576" crc="a421d76c" sha1="7d2da8ff01ed923f60b70e2869b16af3d2c56001"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,Es,It) (Rev 1) (Track 15).bin" size="30242016" crc="a75b92e7" sha1="bbd2feccade51470ba29ebecf36e3d48d8a93343"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,Es,It) (Rev 1) (Track 16).bin" size="17414208" crc="c97defd6" sha1="a008f47f778e122a249fbc1261b2af6ed7d6c3b8"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,Es,It) (Rev 1) (Track 17).bin" size="37954224" crc="6ed1f1ff" sha1="e6b0e09b0a5dcfbe371fbc4224e1250b3e6f3ca1"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,Es,It) (Rev 1) (Track 18).bin" size="19949664" crc="06caa07a" sha1="2271b13449c46b1d82778b747c2835cee9e0682e"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,Es,It) (Rev 1) (Track 19).bin" size="31486224" crc="3861431e" sha1="0c67b00217cbe3e5e7169053b6ff8454ac85c4a3"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,Es,It) (Rev 1) (Track 20).bin" size="7954464" crc="011c68cd" sha1="88f0f7f8f65903223760270e3963b86478d7e77c"/> -->
+	<software name="aitd">
+		<description>Alone in the Dark (Europe, rev. 1)</description>
+		<year>1993</year>
+		<publisher>Infogrames</publisher>
+		<info name="developer" value="Infogrames" />
+		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="Windows 95" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Alone in the Dark (Europe) (En,Fr,De,Es,It) (Rev 1)" sha1="2d6af2d12690f06ebdcf5d6babcf1a53522bc58e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/42050/ -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,It).cue" size="1932" crc="1c420131" sha1="e963b979e7a8657302bbe80425cfeacd7ef9f10c"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,It) (Track 01).bin" size="7408800" crc="0ab76b26" sha1="48603110c0898df03d5deb761310260184bbfdd5"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,It) (Track 02).bin" size="14441280" crc="94dc58f4" sha1="0a4a3a9731e02657eb060d822931b7b00fd407e8"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,It) (Track 03).bin" size="13535760" crc="ee421d88" sha1="e733fcbab82401d76971c0d822b973c7967cda49"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,It) (Track 04).bin" size="22520400" crc="7f9db381" sha1="b6a54b40c666f9d05132cd85d076f81385fbdd1b"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,It) (Track 05).bin" size="18639120" crc="1743bb02" sha1="aa4b4924d37e8b52bcdcb46995cd57ecacb7c127"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,It) (Track 06).bin" size="40877760" crc="1fbdaeaa" sha1="79e2f2be8bb61c5877b8015c2522ca7ea755ddd8"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,It) (Track 07).bin" size="21603120" crc="1a7bfe38" sha1="e8503a7d45aa92be48e5b3a90369b07ec1a2e432"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,It) (Track 08).bin" size="5927040" crc="eb0109a6" sha1="898a93a04620102b1b1dbacbed19bb29ee08f331"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,It) (Track 09).bin" size="15770160" crc="079e9fd7" sha1="1e14d28458dba9a6337c7a9150d634a38dc7944c"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,It) (Track 10).bin" size="14629440" crc="7a5c1a76" sha1="f3007172ba894eb675894c054507924d0686c45b"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,It) (Track 11).bin" size="35268240" crc="8268e00a" sha1="c76f7bfac5a296b873a1c5734d23b67f8702a2c8"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,It) (Track 12).bin" size="4339440" crc="1bd0fc15" sha1="e936a3527ec1dd37df589eb82bd882fdb7fafd99"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,It) (Track 13).bin" size="1881600" crc="a2744038" sha1="9280e56b23fed25d950ead57fd04381d9f630431"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,It) (Track 14).bin" size="1505280" crc="9e0febec" sha1="b8c24b23ed087925bf64a1b43c032bd2ea841abf"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,It) (Track 15).bin" size="30246720" crc="f3e876c4" sha1="6a109d781a1399407e4ab207b1301273a74e532b"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,It) (Track 16).bin" size="17416560" crc="250f7ad9" sha1="3cb47859cc015e6cdd1245ecee2c870d0ddb8bdc"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (En,Fr,De,It) (Track 17).bin" size="37961280" crc="f735d80a" sha1="dc690a3f409a7be899266eca630bdb0e0d22955b"/> -->
+	<software name="aitda" cloneof="aitd">
+		<description>Alone in the Dark (Europe)</description>
+		<year>1993</year>
+		<publisher>Infogrames</publisher>
+		<notes><![CDATA[
+Original 1993 release without speech
+]]></notes>
+		<info name="developer" value="Infogrames" />
+		<info name="language" value="English/French/German/Italian" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="Windows 95" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Alone in the Dark (Europe) (En,Fr,De,It)" sha1="ee49e92e021b6feb2fbe7780a3a307e18cc7fd52" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/34738/ -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (PC Power).cue" size="2691" crc="4fd73aed" sha1="b0e3a3f3df2259fd5113a0dc727e770469527c5c"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (PC Power) (Track 01).bin" size="55377840" crc="a7ca0be7" sha1="900632cdd186ffe271f26c4cd70a5769597a4423"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (PC Power) (Track 02).bin" size="14112000" crc="85fce09f" sha1="cfda367d3cc1fbcd80b5eea1bbd39ffb7bf49e94"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (PC Power) (Track 03).bin" size="13928544" crc="9e5d7732" sha1="e4e1b3993cda186fdc2f7656e2da88d30f791917"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (PC Power) (Track 04).bin" size="22837920" crc="8d3b6dae" sha1="708de7aff5d064b894d89c892a8ecae165f850f3"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (PC Power) (Track 05).bin" size="18717216" crc="3dd35dbe" sha1="a3fb75ac71328b8bbfebb96b8179a9cd5ea2edd9"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (PC Power) (Track 06).bin" size="41242320" crc="8c5b6e88" sha1="a6d5c377b826bc5363bff31479577eafc2d4501c"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (PC Power) (Track 07).bin" size="21944160" crc="69f67339" sha1="757725fab794f5ca4005fb84768ce35bb0d07a69"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (PC Power) (Track 08).bin" size="6272784" crc="7e47556a" sha1="9d6a2b633748c84534cbd465c99943606a6f25d8"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (PC Power) (Track 09).bin" size="16134720" crc="cd7be7a0" sha1="f2aeaa70aa5c3a47ecd01d361ebcd6fa6efd00ec"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (PC Power) (Track 10).bin" size="14970480" crc="b24e778a" sha1="ee97c667006d7a24edef14f42f9eb19aecd1a269"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (PC Power) (Track 11).bin" size="35616336" crc="df419c25" sha1="d085a58b59cd404dff7b1afc1cb18cf669a8194c"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (PC Power) (Track 12).bin" size="4696944" crc="6347eb2b" sha1="51b206ceab0c64323c75e917827e5a2eddc50c67"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (PC Power) (Track 13).bin" size="2222640" crc="ae29e3a4" sha1="daa3f35fc391c1200b5ba19932993fe3972c4aad"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (PC Power) (Track 14).bin" size="1858080" crc="8ebb6ef9" sha1="a22a13c2fbf8d1f25ece128f9c7a86bad96cba44"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (PC Power) (Track 15).bin" size="30611280" crc="bc93783a" sha1="44780016ca982a9d2a23b6c310b90cad76ae29be"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (PC Power) (Track 16).bin" size="17769360" crc="a4346c68" sha1="e2c47a3ba0902471dc5f621834d1bd8042d43264"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (PC Power) (Track 17).bin" size="38325840" crc="d96624ed" sha1="f9a60dc7e952fa762c293091ea9be41b940b93da"/> -->
+	<software name="aitdb" cloneof="aitd">
+		<description>Alone in the Dark (Europe, Pay as You Play version, PC Power)</description>
+		<year>1994</year>
+		<publisher>Infogrames</publisher>
+		<notes><![CDATA[
+- Bundled with "PC Power" magazine.
+- Trial version, unlockable with protection code.
+- Includes DOS and Windows installation setup.
+]]></notes>
+		<info name="developer" value="Infogrames" />
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Alone in the Dark (Europe) (Pay as You Play Version) (PC Power)" sha1="a67bdbf781d5f8b763a3e562e45f5f4b8fe31b4a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/35033/ -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (CD-ROM User).cue" size="2719" crc="293b14f9" sha1="0bbf80c8ffe6e9d4a32b482f78adeacda2e009f2"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (CD-ROM User) (Track 01).bin" size="55342560" crc="22a031e8" sha1="413ae507edcaa5a2e111ea9372cd36fc7a865d03"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (CD-ROM User) (Track 02).bin" size="14267232" crc="471e8948" sha1="4d2fafdae4dabb3a321c305b169af7c411c01d97"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (CD-ROM User) (Track 03).bin" size="13531056" crc="6ce20377" sha1="1c1c01cedeb17ab80d9a43aade871dde4c4abf29"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (CD-ROM User) (Track 04).bin" size="22515696" crc="261a4533" sha1="d3814637d1415e91aeff489258d078bd370c6f37"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (CD-ROM User) (Track 05).bin" size="18359712" crc="8a556554" sha1="c2551bc70fe07b2434c3e7d6ac7b855425e93e7a"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (CD-ROM User) (Track 06).bin" size="40868352" crc="261c7431" sha1="c7dd83897cfc8332d67d99479278a1fe5de1f329"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (CD-ROM User) (Track 07).bin" size="21603120" crc="8776ae88" sha1="60c8affa294277f02e2eebae0615218c8676bf62"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (CD-ROM User) (Track 08).bin" size="5922336" crc="904c6479" sha1="5c58d85d2d2d6ac6df59e49ba8c47fe356b083ee"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (CD-ROM User) (Track 09).bin" size="15760752" crc="9b87e373" sha1="7c88f2a0e5f0ea1a8f4d0229dc875dca19f5b8f8"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (CD-ROM User) (Track 10).bin" size="14620032" crc="5e70ef9a" sha1="f4731bf3abea14dab8ea836b13b174ee64335614"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (CD-ROM User) (Track 11).bin" size="35261184" crc="eea017fa" sha1="7f0b2e4851e2963d5facbea6e64561f917b4dbf4"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (CD-ROM User) (Track 12).bin" size="4332384" crc="057ff1f9" sha1="32a620d913d10874b614b9e2b515527f37d2bd59"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (CD-ROM User) (Track 13).bin" size="1874544" crc="34b2a52f" sha1="3e7e8857deb39d7e888b3477fe9e994ed4b17489"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (CD-ROM User) (Track 14).bin" size="1500576" crc="b5fe6db7" sha1="baba32ac1f48df4e0c34377778d826e15507bbc0"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (CD-ROM User) (Track 15).bin" size="30242016" crc="1c43039c" sha1="e09267371efaa3f6adcef78f11eace9d5f930208"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (CD-ROM User) (Track 16).bin" size="17414208" crc="5ef97459" sha1="dabdb83bde2aac1a83c59d0fcde0f5e07547f514"/> -->
+	<!-- <rom name="Alone in the Dark (Europe) (Pay as You Play Version) (CD-ROM User) (Track 17).bin" size="37949520" crc="e474c911" sha1="eca4c195e40191fed090ef061eaa2972515ac4a9"/> -->
+	<software name="aitdc" cloneof="aitd">
+		<description>Alone in the Dark (Europe, Pay as You Play version, CD-ROM User)</description>
+		<year>1994</year>
+		<publisher>Infogrames</publisher>
+		<notes><![CDATA[
+- Bundled with "CD-ROM User" magazine.
+- Trial version, unlockable with protection code.
+- Includes DOS and Windows installation setup.
+]]></notes>
+		<info name="developer" value="Infogrames" />
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Alone in the Dark (Europe) (Pay as You Play Version) (CD-ROM User)" sha1="f7cc8fcee13bf7af5ff1cc297d9713a672e77328" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/66099/ -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It).cue" size="8825" crc="5198d729" sha1="54809427ac60e81bdf910b8effa1043f293b0e4e"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 01).bin" size="18745440" crc="52cb3e96" sha1="a77fb21b4c928074103945b7466d8196b96f2d8f"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 02).bin" size="11722368" crc="0238348c" sha1="89eaa300d736c56bef07b029e2100e4f041bfd04"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 03).bin" size="20450640" crc="7ab19bda" sha1="a31b7f97fdd65b659f75bac1775dde44d06e5eb2"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 04).bin" size="18578448" crc="22acc702" sha1="8160ff6676107f2617b3d35598279786e0a587cf"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 05).bin" size="17769360" crc="98592e06" sha1="3c24632e1bee681ea440f0ae19b013210239c502"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 06).bin" size="13601616" crc="816f1475" sha1="4bb581d427e573a7a6b64140188b703ed4c03419"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 07).bin" size="12587904" crc="4cf14b10" sha1="3857be97637fd288ee3a4aa73f52a2b6b154574d"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 08).bin" size="15621984" crc="3441e39e" sha1="2894a85fb2da95ad8e6fc8d293e5a3e6f2329647"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 09).bin" size="21306768" crc="98b4eae7" sha1="077f879189e2f7869d015f67da6139d1c350f01b"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 10).bin" size="5752992" crc="158725eb" sha1="89477d83103beb67e5f2a0d769ae6bdc7250f548"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 11).bin" size="3255168" crc="92dc381e" sha1="ff56f1e866b84d4784ff7be9eff7f3643f5d8b3b"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 12).bin" size="4139520" crc="4248bb93" sha1="84abad9c0805e50f053e6362bc6c512656bf1689"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 13).bin" size="18780720" crc="2c03f316" sha1="c627a6cdc28cb5f572c5b5d5bb167492a6635b26"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 14).bin" size="7168896" crc="57fc7ef7" sha1="75db26d04d4d9cd27ceb17cad073861004bdf9bf"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 15).bin" size="4200672" crc="bd684f5b" sha1="fdd672555b94b270c748bed61c3b1887b7bec78e"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 16).bin" size="13876800" crc="aca2d112" sha1="3ba33f65ae3087f3d4dd55dc0419053e9f00a7d6"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 17).bin" size="18985344" crc="dc03f403" sha1="4ec9ee95ac480bd6f70fe838914265bd69642499"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 18).bin" size="19138224" crc="f276dd7d" sha1="86b1a746f94d5683a6f861a3fbc6e4a9fb625e43"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 19).bin" size="14246064" crc="e757a0c3" sha1="5617b2756349dbfa45a1034de4b5727e499d9287"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 20).bin" size="14321328" crc="3db4b623" sha1="dc2d58cfef2323fdd2e984aab53ae51a135c7233"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 21).bin" size="18759552" crc="d527655a" sha1="26190669fcb39b9ff5b545bb8ff7a7bbec62044d"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 22).bin" size="31747296" crc="e6a2e672" sha1="ebf6c935451645605c07fa9dfd456ef0cf8396db"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 23).bin" size="1161888" crc="0e5fb0d3" sha1="6c26717064faf5b126d0b52eedba6df5001598ba"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 24).bin" size="8008560" crc="a77e492f" sha1="639a4ed45062d62c6119ddfc20be16345e2fa77a"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 25).bin" size="8213184" crc="c497f2f9" sha1="cea9feb2c43256ae91be77b101b660d216e0d0aa"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 26).bin" size="5233200" crc="6b52c961" sha1="f75f1b3239de90900f99baba92922de0c19e28c1"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 27).bin" size="9584400" crc="6db3b93d" sha1="d4dbe3d0df636fddf3398c7bf3f0e096205dacdc"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 28).bin" size="2655408" crc="c927f479" sha1="61c35c5afee34a47206c184d693a74374256503c"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 29).bin" size="5360208" crc="4a14931a" sha1="817d700512a1f871e06f30b04ce53e315ea459bd"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 30).bin" size="1157184" crc="b48d94d4" sha1="5340e4715cffe08fb88c16e1ccea3eb96b4c84d6"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 31).bin" size="8199072" crc="c37aca2c" sha1="74eb14f461243ae8df0489ea17fe4b78af6142c6"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 32).bin" size="6978384" crc="eb8a8cde" sha1="77ce9e2fec4c9a91e96c28a8db3000a1ef1b5f77"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 33).bin" size="2274384" crc="b86521ec" sha1="1a3eccf0bf15f47e2c2b1e8a76b610112804a376"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 34).bin" size="4974480" crc="4fd309ab" sha1="085c70c8cd0602428dd909953026224a2e3144fb"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 35).bin" size="5303760" crc="8e367f8a" sha1="363986b930ba80c33c300f691e3fd325c8231dad"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 36).bin" size="5296704" crc="b6a4e93e" sha1="8bcb95b0d21b2c6d5508246026889e4c844af2df"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 37).bin" size="6507984" crc="1b2e7a37" sha1="4402299d6b873ac6c903f298c3a4d2e2e65b1dab"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 38).bin" size="1745184" crc="b5c0058f" sha1="56ebef1720b64f9b2f27e0def26a724acf6170b5"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 39).bin" size="4953312" crc="77d4ff64" sha1="27ec0235afcb57a1cb6b0031dee6952ec95d6d5f"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 40).bin" size="2130912" crc="81fdf49f" sha1="a790a6d0e531340b9082465698b0a075043c2e60"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 41).bin" size="6475056" crc="1d0d4205" sha1="488f7b825d3ff20beeaabd352d90aca29db2ced5"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 42).bin" size="6818448" crc="9f30363d" sha1="473a9735aa8b3a2778cfe493859a46e73ed0022d"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 43).bin" size="6759648" crc="bc5af49b" sha1="75cdc64ea7d4727863f6c41b8a56649fa9e92d66"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 44).bin" size="2347296" crc="dbc52cf8" sha1="669e9c7971bc9f4aa4be6b6db43624e5c104ecba"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 45).bin" size="6841968" crc="d5bc054a" sha1="fe8b3019750dd1a64560f4b1974607132780dd36"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 46).bin" size="4228896" crc="e856630a" sha1="622786731a26135542501350845685d30eecc775"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 47).bin" size="7077168" crc="9cdfd49a" sha1="35bbb5fa565b35dbc4e3b523fb28c738d431a191"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 48).bin" size="5005056" crc="ecbb35ee" sha1="8bebc4569adf613122b77c7020e26a68b22308fc"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 49).bin" size="7437024" crc="e1ff0dbb" sha1="7b7fda99db37bae854c0597c9e42882b1645b4ee"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 50).bin" size="5275536" crc="54041b0a" sha1="88287bca04c0ce07dece0525d275b2b911cd7e99"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 51).bin" size="7519344" crc="7a40d47a" sha1="0f04a328f7d879fc8bf8eb8367d990b743c9271e"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 52).bin" size="2297904" crc="10fa6895" sha1="4c3ea80405fce171a8241e1298bed797b6b7a981"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 53).bin" size="7199472" crc="fe0a1f54" sha1="291e05b62a6eea388aa36890880ece7e8d125fb3"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 54).bin" size="2850624" crc="11078631" sha1="42a85dd99b6dcf8fe528e8494d600c872802c0ef"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 55).bin" size="5792976" crc="cc4fd569" sha1="3c2db72233412647cc477af558321a9aaff8cef8"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 56).bin" size="3694992" crc="78c67992" sha1="e9fc0f3944b3c722a41164b0a1ca72d2d7264aee"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 57).bin" size="7307664" crc="e0297a70" sha1="bd790bdca7929a48b812cee0aef144b60868f6f8"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 58).bin" size="2121504" crc="383b672d" sha1="fe7959213e35671b51ab861a3ab689c022e88b03"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 59).bin" size="1775760" crc="657f8ace" sha1="b85ebef4db60f194a6cccb5a6010d45629b4398a"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 60).bin" size="7822752" crc="5140fca6" sha1="fadd60b429f6f657363364cba98a6e620f1bfbae"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 61).bin" size="7695744" crc="aa5d5af7" sha1="ca8cfdea7bfd99e3fadf2c3ee55750ff5bc1ae65"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 62).bin" size="4842768" crc="92672958" sha1="e2e6f33e1a08bb589fcb2467c12bdf032d1f7cad"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It) (Track 63).bin" size="3643248" crc="00f76968" sha1="3756ca8a3a212001c0196d35376e230c170fef32"/> -->
+	<software name="aitd2">
+		<description>Alone in the Dark 2 (Europe)</description>
+		<year>1994</year>
+		<publisher>Infogrames</publisher>
+		<notes><![CDATA[
+Includes DOS and Windows installation setup.
+]]></notes>
+		<info name="developer" value="Infogrames" />
+		<info name="language" value="English/French/German/Spanish/Italian" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Alone in the Dark 2 (Europe) (En,Fr,De,Es,It)" sha1="546e39d75dd5ace9325bc1903272ce38ebd7e7c3" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/1707/ -->
+	<!-- <rom name="Alone in the Dark 2 (Europe).cue" size="7754" crc="f2404a3f" sha1="c78e26d45b2df3f40666c453b9033a1209905c08"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 01).bin" size="19326384" crc="9889a245" sha1="ead412398493ff9cd4eceb20b7940892551fdfce"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 02).bin" size="11722368" crc="e371ce9d" sha1="a2cfbbbc2dbadbde5566c2902b111a12a35e3622"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 03).bin" size="20450640" crc="1af68018" sha1="c8a3a2ad4c012a15d2eeec8b31542a4fce315b5f"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 04).bin" size="18578448" crc="1746dd4d" sha1="73abfa85a57556c807564c3b3c200d7e3075ce11"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 05).bin" size="17769360" crc="9cca1cc8" sha1="99ae3cfecc62fa9de8c0b2b5498a6d62ecdeccc2"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 06).bin" size="13601616" crc="1e958b3f" sha1="5d151ea9522fe4879e1649f06c443bb91c3cf46c"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 07).bin" size="12587904" crc="90b13c22" sha1="312f6f01629edb58184f0afb0ae95982999e2461"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 08).bin" size="15621984" crc="e22ce394" sha1="014ea541349f098cdb1460088389186613bedd90"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 09).bin" size="21306768" crc="429f8820" sha1="a0e6fed7cc3a5e3df43f6049c6ad578db6981762"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 10).bin" size="5752992" crc="a016ba04" sha1="eaee6db203a6d11f6493c72cb23465175215b71c"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 11).bin" size="3255168" crc="b1662d60" sha1="1d4ec68c6d3542828759f5c2257e61d04945da46"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 12).bin" size="4139520" crc="77ac4f3d" sha1="a0c60e260203e6db3956a9a6f99824f6f56fa073"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 13).bin" size="18780720" crc="2b82c9ca" sha1="78a8e55e1860030db01f413c2a025aa8b36ede3a"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 14).bin" size="7168896" crc="8fa444c8" sha1="c460321856e99614cf3ed811e00962567b6cc1cb"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 15).bin" size="4200672" crc="c9772dc2" sha1="224c9a30b708fda60489a4296d5fdb6fc757f8a5"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 16).bin" size="13876800" crc="3f0b8980" sha1="81ef62a91429dd4c4982e3c0f532cff54153a6a9"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 17).bin" size="18985344" crc="6c668458" sha1="8c762e242bdca8b2118895e79e956407a4f8857a"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 18).bin" size="19138224" crc="e04db54d" sha1="26aeaebcdd8208571bc388bfb9fb8dcaaab9794b"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 19).bin" size="14246064" crc="068a4301" sha1="040272c00fecfdf4a3e4ee9866d20177d3df68d8"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 20).bin" size="14321328" crc="de34465c" sha1="374bbb9820d83074e135c0415005dbd8908af99d"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 21).bin" size="18759552" crc="cd343a2f" sha1="f23b80298d654be29d6fd41ace7900db64a5d78b"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 22).bin" size="31747296" crc="d09cb6e0" sha1="51da7574404838388591a6b66990eb17cee6275d"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 23).bin" size="1161888" crc="f90f4a16" sha1="506bbc7db271524bf677fd0774ce6d1cd6f7db50"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 24).bin" size="8008560" crc="fb02cb66" sha1="9137b1f0108e9e5340bf88f580f55c626fb2e601"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 25).bin" size="8213184" crc="1461a692" sha1="cc472b709ccda9d226af3c2ccbc9b492b7b643f1"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 26).bin" size="5233200" crc="4d6d032d" sha1="63fd89a37491d72105f0d26a4a1f16b0045ca0c7"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 27).bin" size="9584400" crc="dacb7072" sha1="b62110de1169f971fbb1db394139e0c7262cfc39"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 28).bin" size="2655408" crc="deacac1c" sha1="3c94811e5bfdb785561da3b110909e1e13444057"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 29).bin" size="5360208" crc="f572269e" sha1="33a767c25f92d90110970a48d27e05e980484985"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 30).bin" size="1157184" crc="d908d65a" sha1="8a2a9891e4967d889fe934320c71ef08ede24122"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 31).bin" size="8199072" crc="3cced48f" sha1="c6c69db4e83053fc63e78b6479fd821e7374633b"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 32).bin" size="6978384" crc="47c0e5da" sha1="f4b5f53c27c66757703044ba32136ee22fac216f"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 33).bin" size="2274384" crc="91522bee" sha1="589ade40e09c9acc22ccd04d7118de25948e35bd"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 34).bin" size="4974480" crc="d0095493" sha1="31bd0840dd9b666886e36f60256abed63da7ceea"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 35).bin" size="5303760" crc="357a86bb" sha1="1c16ded04780458b6002a1cd6f8dbb2f7389534a"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 36).bin" size="5296704" crc="dd5607ad" sha1="55cd585733ef6abf75ef85434246d54dc924d6d8"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 37).bin" size="6507984" crc="e7363145" sha1="449ccdc85e9ff2792cdaeabe9868c2d9c50bbeda"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 38).bin" size="1745184" crc="a15f28ce" sha1="7a8524e1f891100735ec5b295eb96a9ac605a605"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 39).bin" size="4953312" crc="f1127b38" sha1="a69c21d1475a2fe1355557234bc6122fafa574af"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 40).bin" size="2130912" crc="50645257" sha1="fea9f9ac4d9b250dcbeedb6da8168ea09a4fb0f5"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 41).bin" size="6475056" crc="a92ac363" sha1="d06587564cef80374c4730fd95d2939b73ad7c5d"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 42).bin" size="6818448" crc="805a759d" sha1="ae20653b837c3b1ab7deb25932174c656810c3c3"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 43).bin" size="6759648" crc="ff4bd80b" sha1="094478dc123fff687c1a064df2552a74184ed92e"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 44).bin" size="2347296" crc="9fd1c01d" sha1="521593b6ebe04cc607506987cb7396da979c7102"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 45).bin" size="6841968" crc="3db1f669" sha1="55cca132a85bc3135ad9670e3e4e35738fda10c9"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 46).bin" size="4228896" crc="3365a477" sha1="3a9fb477e0b29f22557d4815c9e57cc3635ea0e4"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 47).bin" size="7077168" crc="bf5152f2" sha1="8c6117f925dd992bedea8d5771e43d2198b41fc2"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 48).bin" size="5005056" crc="87dd19cb" sha1="6fab0105eb316c4b98258bde2ff3a9e3d8efd717"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 49).bin" size="7437024" crc="f9054535" sha1="fca9bafe104b52d9b55e88925c8d60409c5eb174"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 50).bin" size="5275536" crc="754f6614" sha1="933eab1aec07daabdd2a74cd33ae2d59aece3f44"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 51).bin" size="7519344" crc="6c5c5f0f" sha1="3a6d19cbbe127796e31c721ea3ba70c76b060a5f"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 52).bin" size="2297904" crc="f2680224" sha1="3e42a07b1c4f980af6fdb3ff5cb3624e95672e12"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 53).bin" size="7199472" crc="7f90810e" sha1="eec8d7c001572c170ad952a52d90c8f9880cbc5a"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 54).bin" size="2850624" crc="3dce8250" sha1="e593fb593e961476528d2349ae4c8c285635f7e5"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 55).bin" size="5792976" crc="0d588d0f" sha1="45506cc232f674e8af2098be185d07b0247c2eaf"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 56).bin" size="3694992" crc="40b62434" sha1="f96e97ac431e61f5d10ac7162916a6820e81352c"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 57).bin" size="7307664" crc="c2f76180" sha1="82b140f3e0f53d3cf97bb5e8b463db0e6830b025"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 58).bin" size="2121504" crc="7dec90c0" sha1="a7d2fe5be24b0fbabfbf8e48accb9e7b95ebb875"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 59).bin" size="1775760" crc="4837af15" sha1="d9a33a9d946719565000b07fdc613cb22a2b8c88"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 60).bin" size="7822752" crc="41b4e92f" sha1="39a3092698b15ea22d0a3c4a9e4858fc3ae19bbc"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 61).bin" size="7695744" crc="a7a6dc32" sha1="b9a8d8efe36d03b1aae734d24311f9765cc30f5d"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 62).bin" size="4842768" crc="5b608f7d" sha1="ad301941d9659d69f35fe4996a2a655da41940f2"/> -->
+	<!-- <rom name="Alone in the Dark 2 (Europe) (Track 63).bin" size="3643248" crc="6617d4dc" sha1="7d12f0cb84c749f70df16723b5d7413b618861c6"/> -->
+	<software name="aitd2a" cloneof="aitd2">
+		<description>Alone in the Dark 2 (Europe, English only)</description>
+		<year>1994</year>
+		<publisher>Infogrames</publisher>
+		<notes><![CDATA[
+Includes DOS and Windows installation setup.
+]]></notes>
+		<info name="developer" value="Infogrames" />
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Alone in the Dark 2 (Europe)" sha1="74917c1f04d3f8fbb322c50215ec112d3058300f" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/46002/ -->
+	<!-- rom name="Alone in the Dark 2 (France).cue" size="7877" crc="13e54733" sha1="157378ab6f6e795a11e8826db6995635e2343780"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 01).bin" size="18924192" crc="b44395f0" sha1="2ad76a175e582bc739f44a482d07bba8868ca74f"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 02).bin" size="11727072" crc="1a2a1efb" sha1="aaefe020498b82dbfef85d1f24a9eee31db4244d"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 03).bin" size="20450640" crc="8f1d65ad" sha1="564ed5befbfa0cbf2303a1bcef2fa342502e2233"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 04).bin" size="18578448" crc="5b34460a" sha1="c887c4bc495228bc8ba15492619093b1f6483bea"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 05).bin" size="17769360" crc="107e5296" sha1="21d97a0dcabf5c226004d0020fd22e285742c856"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 06).bin" size="13601616" crc="88782bbc" sha1="9fabddb55ab94606703afb37674ee443c5f9431d"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 07).bin" size="12587904" crc="ffeba659" sha1="454261fe58f9e562b5f7b4d0724ef9d7af84475a"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 08).bin" size="15621984" crc="0b690b8e" sha1="b53b551284e45f5f3d0435a33771415c25e24f02"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 09).bin" size="21306768" crc="f0713a8c" sha1="b788c8481347d751dafe334445141561cd3b9fb3"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 10).bin" size="5752992" crc="d1233329" sha1="f4340ff9f638fa8d8523359a54276fbb918651ec"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 11).bin" size="3255168" crc="87c707e6" sha1="e170fa0d80834fff6087207e0504f450ed65723f"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 12).bin" size="4139520" crc="b26a8c02" sha1="8c4e91801df75806084fd49a9c665e45bacdb00f"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 13).bin" size="18780720" crc="abe36c5b" sha1="93d92a5b00af003f1271b1120c8399e44b20326b"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 14).bin" size="7168896" crc="25de6759" sha1="5e161883d680ad9df9a0f027b9ba11b46095b9f0"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 15).bin" size="4200672" crc="1c5157a0" sha1="7dcaf809c1530e4418c5263670f801d358566fe0"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 16).bin" size="13876800" crc="f9b14903" sha1="61a6bdaf9d1d5201dd3a207fd9772d425b292434"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 17).bin" size="18985344" crc="a8bb3b39" sha1="888443383a36ccccf7680166e95bde569998980f"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 18).bin" size="19138224" crc="ba353028" sha1="00caa75c29085dd24574c4e7d3059d8b8ae0d3be"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 19).bin" size="14246064" crc="ca544140" sha1="21bbcf132649e4598cb8b755f085ff81fde6ffaf"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 20).bin" size="14321328" crc="5ecd5a81" sha1="75b9ac5a9e3580bb2aa97be3b41261b08be5e505"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 21).bin" size="18759552" crc="1218c967" sha1="53b8d8f4d3ad14b9579d280b48a8516a22c6b609"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 22).bin" size="31747296" crc="989e577b" sha1="cf77ca515f70cfba35301079e274fc31ad199a8b"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 23).bin" size="1128960" crc="585671c7" sha1="7c0af750befba3783a57f09115d40aac8f27e19b"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 24).bin" size="4659312" crc="08892692" sha1="9a53956fc612d06ad5e9fa78d9a303402778c1b3"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 25).bin" size="5331984" crc="5186df34" sha1="a47196e5f7e81e2302fcae0248e1b45bacf6b980"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 26).bin" size="2869440" crc="3a1ed903" sha1="df96c2738a3d9d65cbae2698d4ff61437607ee32"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 27).bin" size="4459392" crc="f62b6781" sha1="8acb5e68b7a4d0887f82c50c4ca1d6c24663b83e"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 28).bin" size="3424512" crc="7bb7e612" sha1="d085180d64e735828627a1deba49531c5d4670b7"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 29).bin" size="2947056" crc="df55b81f" sha1="0a43d3c08c16029e861b74866b314a3bc2ff97f9"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 30).bin" size="2020368" crc="7d8c5bfb" sha1="303ac791598a2fb5e1cac85fe7e033fd8ead03a3"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 31).bin" size="6009360" crc="b16c7da8" sha1="3d017d3a973da25e0b7d87d745566d04dfdb87ea"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 32).bin" size="5661264" crc="6f3be56c" sha1="705a9d54ea51cf2d70dbde30e18015d356eb411b"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 33).bin" size="2232048" crc="0ffd1498" sha1="0ac89de592c1ad51a59195a889ac3a86069dbb81"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 34).bin" size="4776912" crc="150485c9" sha1="588b3a523ca1af5c658d99f534333a0a42210298"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 35).bin" size="5176752" crc="33387eb7" sha1="fc8f393f1a22e3099bfd70121f081a06475877e7"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 36).bin" size="4918032" crc="764e5dff" sha1="2d0ebbe1bf17e1d4bdd1ab61e408b95f20f38b10"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 37).bin" size="4859232" crc="92c4ba5e" sha1="87490de64429acccda29dd96f112fc2786f28510"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 38).bin" size="1865136" crc="c1a7602c" sha1="4681589157aad8cc520f650ace157894736ce5d1"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 39).bin" size="3372768" crc="dd295036" sha1="672c8f8f764fb447b544037e3d3ccc6e83ad976c"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 40).bin" size="1535856" crc="12f7cd24" sha1="05aa8fe8543eb26bbc4562c73b06b5d14a23cabd"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 41).bin" size="4892160" crc="8ee790c0" sha1="a9ae3fc7bd34e3e3943eb5c7c0998f03106f67ff"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 42).bin" size="6131664" crc="4faaee9e" sha1="6d38f6463a707d89ca689f1b253ec3a98e5f36f8"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 43).bin" size="4294752" crc="ad03ec96" sha1="4bce22b218fdc53a915c69794aff1fc037781a28"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 44).bin" size="1453536" crc="aa8d7e40" sha1="7c6730718778d5f61988fcf6f07e84ed7f819255"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 45).bin" size="5195568" crc="3f5feb55" sha1="f5bc7fd2d9bc587b73162e2d86589f269caa050f"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 46).bin" size="3316320" crc="b0bfd52b" sha1="7d92dfb52be76e3519892d421562e005de87a166"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 47).bin" size="4743984" crc="bf737eeb" sha1="04efb07603d472fe19553df267c74f0976679c06"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 48).bin" size="3443328" crc="4a59179a" sha1="27ad4a50727339e178806a4c051e2392e183dd16"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 49).bin" size="5108544" crc="2f005a51" sha1="639632017a7c89750371521b079d5731cb89a3bb"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 50).bin" size="3175200" crc="845b9671" sha1="f910c5c1f2ecfadc111bcbe2bb4ce68bf85d65a2"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 51).bin" size="6230448" crc="0d95efb6" sha1="a8bc92bc3e9d44e21ad08d672dca10cca29dc2e2"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 52).bin" size="2333184" crc="d60078ba" sha1="cc38189bd25634e00a74713d3c13cf038d81958a"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 53).bin" size="6162240" crc="72e48392" sha1="71d43fc3f7f28a7cd89ca12a6c59ee21054b649d"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 54).bin" size="2994096" crc="4cc97492" sha1="1afcc6ccb64bdf2ecd283a8281dfab1a32db10bd"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 55).bin" size="5411952" crc="5c098a24" sha1="bc4c2f9b5a06e8dd85cb780906ea7ad75aeb068c"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 56).bin" size="1462944" crc="b701db8d" sha1="3e595da9a05094a49e30dcbf28bb6a10400fef6e"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 57).bin" size="4083072" crc="e206dd67" sha1="86b68d0f5081f9c84a6ff658cc8f52a9920c48c9"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 58).bin" size="2072112" crc="c4576636" sha1="b622fbb9cf70b19a9821084838e96baebb997d69"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 59).bin" size="1655808" crc="39ff9db6" sha1="f9537837a1e29b400a95a4473d6435afad4bcc9a"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 60).bin" size="4362960" crc="fa91398a" sha1="88059656098684d6d695c811e2816d801ef2e333"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 61).bin" size="6157536" crc="c2dbaa01" sha1="ea38dbf39f81a2ad8d896d0db851fcdc91846018"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 62).bin" size="6783168" crc="9d2801f9" sha1="e722e4dffc61aecd2fd69d4c454f10fbe548f77c"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 63).bin" size="2789472" crc="001b64b4" sha1="3ddf7bc1b17da3787c2b3db51fd76a78797ef3e1"/> -->
+	<!-- <rom name="Alone in the Dark 2 (France) (Track 64).bin" size="2279088" crc="c80b10d9" sha1="5ffd3c657eff025e4a3ebff380e7d61898a8ee0f"/> -->
+	<software name="aitd2_fr" cloneof="aitd2">
+		<description>Alone in the Dark 2 (France)</description>
+		<year>1994</year>
+		<publisher>Infogrames</publisher>
+		<notes><![CDATA[
+Includes DOS and Windows installation setup.
+]]></notes>
+		<info name="developer" value="Infogrames" />
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Alone in the Dark 2 (France)" sha1="2ddde837124b3825c908f3e2f8b95ed8622e6cfc" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS -->
 	<!-- Requires 570KB of conventional memory -->
 	<software name="amazonge">
@@ -533,6 +1026,24 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 			</diskarea>
 		</part>
 	</software>
+
+	<!-- DOS (recommended), Windows 95 -->
+	<software name="archdyn" supported="no">
+		<!-- 24/10/1996 RE -->
+		<description>Archimedean Dynasty (v1.115)</description>
+		<year>1996</year>
+		<publisher>Blue Byte</publisher>
+		<notes><![CDATA[
+[SB16] No sound after title screen, hangs on every video (bypass by pressing mouse left button)
+Cannot read sound configuration from Windows 95
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ad" sha1="95040b06a50373ef052c37261ca6b91d42fa5af7"/>
+			</diskarea>
+		</part>
+	</software>
+
 
 	<!-- OS/2 -->
 	<software name="apak_os2">
@@ -777,9 +1288,11 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 	<!-- GT Interactive as a standalone release, and as part of "Arcade Favorites CD-Rom 5 Pak. -->
 	<!-- Game can be run straight from the CD." -->
 	<software name="bad_dudescd">
-		<description>Bad Dudes (1995 CD release)</description>
+		<description>Bad Dudes (Arcade Favorites CD-ROM 5 Pak release)</description>
 		<year>1995</year>
 		<publisher>GT Interactive</publisher>
+		<info name="language" value="English" />
+		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -817,11 +1330,14 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 	</software>
 
 	<!-- Windows 95 -->
-	<!-- TODO: uses High Color -->
-	<software name="banzaib" supported="partial">
+	<!-- Pentium class 90 MHz -->
+	<software name="banzaib" supported="no">
 		<description>Banzai Bug</description>
 		<year>1996</year>
 		<publisher>Multi Media International</publisher>
+		<notes><![CDATA[
+Runs in 16-bit High Color, has [8514] bugs
+]]></notes>
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -904,6 +1420,25 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		<part name="cdrom2" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="battle isle 3 - shadow of the empire (1995)(blue byte)(disc 2 of 2)" sha1="587eba131db7eb9652025d8810b303a6e9382d26" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95 -->
+	<!-- 486DX33 -->
+	<!-- Runs off CD, no install -->
+	<software name="bnbhvs" supported="no">
+		<description>Beavis and Butthead - Virtual Stupidity</description>
+		<year>1995</year>
+		<publisher>Viacom New Media</publisher>
+		<notes><![CDATA[
+Randomly crashes with main sprites going out of screen (verify)
+Some samples have audio crackling [SB16]
+]]></notes>
+		<!-- label: B&B_vs -->
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="beavis_and_butthead_-_virtual_stupidity_(1995)(viacom_new_media)" sha1="0c5169899f8ccc5e02df1bebc7e814d6945aa915"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1229,9 +1764,11 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 	<!-- DOS -->
 	<!-- TODO: 384k of EMS memory? -->
 	<software name="bsdracula" supported="partial">
-		<description>Bram Stoker's Dracula (Multi 5)</description>
+		<description>Bram Stoker's Dracula (Europe)</description>
 		<year>1995</year>
 		<publisher>Psygnosis</publisher>
+		<!-- Multi 5 language support -->
+		<info name="language" value="English/German/French/Italian/Spanish" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1241,15 +1778,37 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 	</software>
 
 	<!-- DOS -->
-	<!-- Multi 5 language support -->
 	<software name="bssky">
-		<description>Beneath a Steel Sky (Multi 5)</description>
+		<description>Beneath a Steel Sky (Europe)</description>
 		<year>1995</year>
-		<publisher>Virgin / Revolution</publisher>
+		<publisher>Virgin</publisher>
+		<info name="developer" value="Revolution Software" />
+		<!-- Multi 5 language support -->
+		<info name="language" value="English/French/German/Italian/Spanish" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="beneath a steel sky (1995)(virgin)" sha1="061062ebca97d2e4c46918901419eeed98a6cbf7" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/28957/ -->
+	<!-- <rom name="Beneath a Steel Sky (USA) (En,Fr,De,Es,It,Pt,Sv) (Rerelease).cue" size="149" crc="0e6b8ae8" sha1="8537afb7db13897ea0050a346dfe1c3ee8efde3b"/> -->
+	<!-- <rom name="Beneath a Steel Sky (USA) (En,Fr,De,Es,It,Pt,Sv) (Rerelease).bin" size="85546944" crc="7d1f33bf" sha1="0a38e8c7b6d8f968c8f0a66e88d49385f4a1dd2a"/> -->
+	<software name="bssky_us" cloneof="bssky">
+		<description>Beneath a Steel Sky (USA, Slash release)</description>
+		<year>1996</year>
+		<publisher>Slash</publisher>
+		<info name="developer" value="Revolution Software" />
+		<info name="language" value="English/French/German/Italian/Portuguese/Spanish/Swedish" />
+		<info name="region" value="USA" />
+		<info name="version" value="v0.0372" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Beneath a Steel Sky (USA) (En,Fr,De,Es,It,Pt,Sv) (Rerelease)" sha1="c95f573726cf073cceef0d5b6467c0b6ed211ed1" />
 			</diskarea>
 		</part>
 	</software>
@@ -1557,6 +2116,25 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 			</diskarea>
 		</part>
 	</software>
+
+	<!-- Windows 3.1 / 95 (WinG) -->
+	<!-- Suggested minimum resolution 800x600 -->
+	<software name="civ2" supported="partial">
+		<description>Sid Meier's Civilization II (Europe)</description>
+		<year>1996</year>
+		<publisher>MicroProse</publisher>
+		<notes><![CDATA[
+Offset [CDDA] audio, does not stop when exiting game (including getting to Windows shutdown screen)
+]]></notes>
+		<info name="language" value="English/German/French" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="civilization2pc" sha1="253fba35b28c7a8d121365383ad46873ade921ac"/>
+			</diskarea>
+		</part>
+	</software>
+
 
 	<software name="civilwar">
 		<description>The Civil War</description>
@@ -1976,6 +2554,47 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		</part>
 	</software>
 
+	<!-- Source: http://redump.org/disc/7455/ -->
+	<!-- <rom name="Jungle Strike &amp; Desert Strike (Europe).cue" size="127" crc="0fe06781" sha1="92e7f629fa95fa2adb50fe316416f40b2190977e"/> -->
+	<!-- <rom name="Jungle Strike &amp; Desert Strike (Europe).bin" size="300816096" crc="6679aae1" sha1="eeb65e9632f79795be82f92b6c329b773103c2ee"/> -->
+	<software name="dstrjstr">
+		<description>Desert Strike &amp; Jungle Strike (Europe)</description>
+		<year>1995</year>
+		<publisher>Gremlin Interactive</publisher>
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Jungle Strike &amp; Desert Strike (Europe)" sha1="cd3cc99dfeab63ac20eaa0ff4237b7754d033a3b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS 6.0 / Windows 95 -->
+	<!-- Pentium class 90 MHz -->
+	<!-- DirectDraw 2 -->
+	<!-- Polish version known to exist -->
+	<software name="dd2" supported="no">
+		<description>Destruction Derby 2 (Europe)</description>
+		<year>1996</year>
+		<publisher>Psygnosis</publisher>
+		<notes><![CDATA[
+Doesn't have brake lights for default car (rookie) at least
+Main menu shows a 3d backface that shouldn't be there during rotation transitions on submenu selections
+Offset [CDDA] audio, does not stop when exiting game (including getting to Windows shutdown screen)
+Unplayable without a Pentium CPU class
+Unemulated optional [Matrox Mystique] GPU
+https://www.pcgamingwiki.com/wiki/Destruction_Derby_2
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="dd2_pc" sha1="934d21c1172848110c3198463f5a5261175263a3"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS -->
 	<!-- TODO: selecting SB16 hangs on the sound test -->
 	<software name="detritus" supported="partial">
@@ -1986,6 +2605,42 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="detritus - the daemon's quest (1996)(manyk)" sha1="b9dc8d31ddedf4e6c189f4481ecc40b2784d29de" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95 / NT 4.0 -->
+	<!-- Pentium class 60 MHz -->
+	<software name="diablo" supported="partial">
+		<description>Diablo (v1.00)</description>
+		<year>1996</year>
+		<publisher>Blizzard Entertainment</publisher>
+		<notes><![CDATA[
+Reports extremely irrealistic [cdrom] speeds in "Test Your PC" in setup menu
+Untested (and likely unsupported) Spawned Diablo and multi player mode
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="diablo" sha1="c9d7819a9a9b3fe0927c89a9d9d220b0b7307300" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/10119/ -->
+	<!-- <rom name="Dig, The (USA) (Alt).cue" size="86" crc="70a55b7e" sha1="e250f19c0560de1afa1c890cb236da16875d343f"/> -->
+	<!-- <rom name="Dig, The (USA) (Alt).bin" size="761203632" crc="7a6762e5" sha1="a5a98e2a2111aef6023a6e3d6a062d989c7f22c6"/> -->
+	<software name="thedig">
+		<description>The Dig (USA)</description>
+		<year>1995</year>
+		<publisher>LucasArts</publisher>
+		<info name="developer" value="LucasArts" />
+		<info name="region" value="USA" />
+		<info name="version" value="v1.0" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dig, The (USA) (Alt)" sha1="c4087004a4716ab167c5dc9d8556b8a985b3846a" />
 			</diskarea>
 		</part>
 	</software>
@@ -2033,6 +2688,22 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 	</software>
 
 	<!-- DOS -->
+	<software name="duke3d" supported="partial">
+		<description>Duke Nukem 3D (shareware v1.1)</description>
+		<year>1996</year>
+		<publisher>FormGen</publisher>
+		<notes><![CDATA[
+Duke Nukem 3d: untested multiplayer options
+Terminal Velocity: incompatible with Windows 95 (verify), has unsupported options for [CH Flight Pro], [Joy/Throt]
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="3d_realms_-_duke_nukem_3d_(shareware_version)" sha1="60ac890bd8269b2dbaed687bff45aa009b48cab3" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS -->
 	<software name="dungkrem">
 		<description>Dungeons of Kremlin (English, Russia)</description>
 		<year>1995</year>
@@ -2055,6 +2726,101 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="dunkle schatten 1 &amp; 2 (1996)(bmi)(de)[compilation]" sha1="fa3a2584edc1ca152e3d352a5a7ed8ab740a2c67" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/5880/ -->
+	<!-- <rom name="Ecstatica (Europe) (En,Fr,De).cue" size="95" crc="d6fe9e0f" sha1="71104571e9d57292d7e45edacb0ad37181c48a3f"/> -->
+	<!-- <rom name="Ecstatica (Europe) (En,Fr,De).bin" size="76056624" crc="a224e5b2" sha1="3e3c9414371c70f58edd9ed78d50d0af7517fb59"/> -->
+	<software name="ecstatica">
+		<description>Ecstatica (Europe)</description>
+		<year>1994</year>
+		<publisher>Psygnosis</publisher>
+		<info name="developer" value="Andrew Spencer Studios" />
+		<info name="language" value="English/French/German" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Ecstatica (Europe) (En,Fr,De)" sha1="23a1690fa7d93b00b774a10f44e39293acc2d1d8" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/29282/ -->
+	<!-- <rom name="Ecstatica (Europe) (En,Fr,De) (Alt).cue" size="124" crc="ff3ed7c1" sha1="33585a3f140ba63716982ed74a799771a9718a27"/> -->
+	<!-- <rom name="Ecstatica (Europe) (En,Fr,De) (Alt).bin" size="76409424" crc="efe73db1" sha1="9773a85f821c4ffe3085bfa2e99713ad54554bf4"/> -->
+	<software name="ecstaticaa" cloneof="ecstatica">
+		<description>Ecstatica (Europe, Argentum Collection release)</description>
+		<year>1995</year>
+		<publisher>Psygnosis</publisher>
+		<info name="developer" value="Andrew Spencer Studios" />
+		<info name="language" value="English/French/German" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Ecstatica (Europe) (En,Fr,De) (Alt)" sha1="c2d8f6caf4ece6a2003754b964f210b13423945d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/40711/ -->
+	<!-- <rom name="Ecstatica (Europe).cue" size="107" crc="e235bf90" sha1="7cab865a753a901dd88d38196f81b99572201bd8"/> -->
+	<!-- <rom name="Ecstatica (Europe).bin" size="163071216" crc="977c5750" sha1="cec3628ec6ac083a1bae81a746508aa52e2b046d"/> -->
+	<software name="ecstaticab" cloneof="ecstatica">
+		<description>Ecstatica (Europe, English only)</description>
+		<year>1994</year>
+		<publisher>Psygnosis</publisher>
+		<info name="developer" value="Andrew Spencer Studios" />
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Ecstatica (Europe)" sha1="78e72c028320f4e7093991c07b0bd0d12d45ac8f" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/44349/ -->
+	<!-- <rom name="Ecstatica II (Germany).cue" size="111" crc="72babfd0" sha1="84fd919cfbf37a6c2b05c56c30ca3947b10dc22f"/> -->
+	<!-- <rom name="Ecstatica II (Germany).bin" size="726036528" crc="a2b0d681" sha1="22ba1668737ed624fb4f6e7bf33502f313697366"/> -->
+	<software name="ecstatic2">
+		<description>Ecstatica II (Germany)</description>
+		<year>1997</year>
+		<publisher>Psygnosis</publisher>
+		<info name="developer" value="Andrew Spencer Studios" />
+		<info name="language" value="German" />
+		<info name="region" value="Germany" />
+		<sharedfeat name="platform" value="Windows 95" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Ecstatica II (Germany)" sha1="b65fcff8a53f3b0a72907dd4f0115328ae7deb07" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/31008/ -->
+	<!-- <rom name="Ecstatica II (Germany) (Rerelease).cue" size="100" crc="8ae1c02b" sha1="0ae8414de5743ad6ee74a3306cddb9de60d9a22c"/> -->
+	<!-- <rom name="Ecstatica II (Germany) (Rerelease).bin" size="737923536" crc="0895fae6" sha1="ff39112b3133876bc9f3ac6f266f62eb80681cb9"/> -->
+	<software name="ecstatic2a_de" cloneof="ecstatic2">
+		<description>Ecstatica II (Germany, Mega 3 Pak Volume 1 release)</description>
+		<year>1997</year>
+		<publisher>Psygnosis</publisher>
+		<info name="developer" value="Andrew Spencer Studios" />
+		<info name="language" value="German" />
+		<info name="region" value="Germany" />
+		<sharedfeat name="platform" value="Windows 95" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Ecstatica II (Germany) (Rerelease)" sha1="228ccad352d42f318f4b1dcfb00f67c13c0c504a" />
 			</diskarea>
 		</part>
 	</software>
@@ -2097,6 +2863,53 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		</part>
 	</software>
 
+	<!-- Source: http://redump.org/disc/43127/ -->
+	<!-- <rom name="Epic Pinball (Europe) (v2.1).cue" size="117" crc="6063ef53" sha1="471f5a29e4f1d13332ae6b5bc0403fcab47bbc78"/> -->
+	<!-- <rom name="Epic Pinball (Europe) (v2.1).bin" size="21290304" crc="fc809d8a" sha1="ce9a7f03bcf834d96dd747b72147945a336578a4"/> -->
+	<software name="epicpinb">
+		<description>Epic Pinball (Europe, Romware release)</description>
+		<year>1994</year>
+		<publisher>Epic Megagames</publisher>
+		<notes><![CDATA[
+Includes 13 tables
+]]></notes>
+		<info name="developer" value="Epic Megagames" />
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<info name="version" value="2.1" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Epic Pinball (Europe) (v2.1)" sha1="40b39fefca47ce13f1037dfd9b7c72d55b6e668d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/43549/ -->
+	<!-- <rom name="Epic Pinball (USA) (Rerelease) (19970206).cue" size="130" crc="2d2e97b7" sha1="30aa7ffbe9c8415742ef97eae018f094d9a5a0c2"/> -->
+	<!-- <rom name="Epic Pinball (USA) (Rerelease) (19970206).bin" size="44017680" crc="37efa6a4" sha1="31bb2132dd3fb0e61d784b9692a4143495f4e769"/> -->
+	<software name="epicpinbus" cloneof="epicpinb">
+		<description>Epic Pinball (USA, mail order release)</description>
+		<year>1997</year>
+		<publisher>Epic Megagames</publisher>
+		<notes><![CDATA[
+Includes 13 tables
+Shareware: "Fire Fight v1.1", "Jazz Jackrabbit: Turtle Terror and Holiday Hare", "One Must Fall 2097 v2.0", "Tyrian v2.0"
+]]></notes>
+		<info name="developer" value="Epic Megagames" />
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<info name="version" value="2.1" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Epic Pinball (USA) (Rerelease) (19970206)" sha1="0842e7966aa883434b4eac8567f7b38bb6772965" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS -->
 	<software name="ericurdy">
 		<description>Eric the Unready</description>
@@ -2125,17 +2938,330 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		</part>
 	</software>
 
+	<!-- Source: http://redump.org/disc/16162/ -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (Europe) (En,Fr,De).cue" size="120" crc="d91e22eb" sha1="7bd294539b73687dc29f52f1aada01c8285d9404"/> -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (Europe) (En,Fr,De).bin" size="580003200" crc="759a56ff" sha1="6c8fc483f302be8be3149e528a5c06bc98d80301"/> -->
+	<software name="kyrandia">
+		<description>Fables &amp; Fiends - Book One: The Legend of Kyrandia (Europe)</description>
+		<year>1992</year>
+		<publisher>Virgin Games</publisher>
+		<info name="developer" value="Westwood Studios" />
+		<info name="language" value="English/French/German" />
+		<info name="region" value="Europe" />
+		<info name="version" value="3.7" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Legend of Kyrandia, The - Book One (Europe) (En,Fr,De)" sha1="1d1e2eeb684815e0a591340477f586c0f5283cc2" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/38201/ -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (Europe) (En,Fr,De) (Alt).cue" size="126" crc="da589d22" sha1="65b86b295c3068d23e5b86108cffd4272d26d730"/> -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (Europe) (En,Fr,De) (Alt).bin" size="580356000" crc="ce343c04" sha1="d9e2c9a102d76e8a227a2ef704acff120be283ea"/> -->
+	<software name="kyrandiaa" cloneof="kyrandia">
+		<description>Fables &amp; Fiends - Book One: The Legend of Kyrandia (Europe, Westwood 10th Anniversary release)</description>
+		<year>1995</year>
+		<publisher>Virgin Games</publisher>
+		<info name="developer" value="Westwood Studios" />
+		<info name="language" value="English/French/German" />
+		<info name="region" value="Europe" />
+		<info name="version" value="1.1" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Legend of Kyrandia, The - Book One (Europe) (En,Fr,De) (Alt)" sha1="f44778ff877042e5ee6953ed5578c47c01a56be1" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/72015/ -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (Europe) (Hit Squad).cue" size="121" crc="1fdd165e" sha1="64f9e331bdde917e96166695d872aa07a2000e04"/> -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (Europe) (Hit Squad).bin" size="50462160" crc="10c8f72e" sha1="8962d7ff48d1c97966707bfb7424bae53955343a"/> -->
+	<software name="kyrandiab" cloneof="kyrandia">
+		<description>Fables &amp; Fiends - Book One: The Legend of Kyrandia (Europe, The Hit Squad release)</description>
+		<year>1995</year>
+		<publisher>The Hit Squad</publisher>
+		<notes><![CDATA[
+This release doesn't have audio speech.
+]]></notes>
+		<info name="developer" value="Westwood Studios" />
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<info name="version" value="1.3" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Legend of Kyrandia, The - Book One (Europe) (Hit Squad)" sha1="b3e6b632c220f8577b444284db4bf85620bc51ea" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/71060/ -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (Spain) (Hit Squad).cue" size="143" crc="997c7eea" sha1="a749a97349364234f109d035536b84713bd21858"/> -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (Spain) (Hit Squad).bin" size="7074816" crc="5fa678eb" sha1="94765e8d8d6eb54c1433cf6b64332a251dbf3ef8"/> -->
+	<software name="kyrandia_sp" cloneof="kyrandia">
+		<description>Fables &amp; Fiends - Book One: The Legend of Kyrandia (Spain, Golden Line-Arcadia release)</description>
+		<year>1993</year>
+		<publisher>The Hit Squad</publisher>
+		<notes><![CDATA[
+This release doesn't have audio speech.
+]]></notes>
+		<info name="developer" value="Westwood Studios" />
+		<info name="language" value="Spanish" />
+		<info name="region" value="Spain" />
+		<info name="version" value="2.2" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Legend of Kyrandia, The - Book One (Spain) (Hit Squad)" sha1="ab7f808d0935b3eb3ffa0c2c91ea8f61f58dcc63" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/87644/ -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (Denmark) (Alt).cue" size="116" crc="d5b6fe46" sha1="bdecd03de4e303b828dc8c98e43655d548dec810"/> -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (Denmark) (Alt).bin" size="16910880" crc="96c67627" sha1="16de0f17d793558d70bf3fbda0278841be8d3bec"/> -->
+	<software name="kyrandia_dk" cloneof="kyrandia">
+		<description>Fables &amp; Fiends - Book One: The Legend of Kyrandia (Denmark, Euro Power Pack release)</description>
+		<year>1995</year>
+		<publisher>The Hit Squad</publisher>
+		<notes><![CDATA[
+This release doesn't have audio speech.
+]]></notes>
+		<info name="developer" value="Westwood Studios" />
+		<info name="language" value="English" />
+		<info name="region" value="Denmark" />
+		<info name="version" value="1.3" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Legend of Kyrandia, The - Book One (Denmark) (Alt)" sha1="cfa61e159e51221deb71b5459b06a4d3dd16af59" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/76433/ -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (Netherlands) (Hit Squad).cue" size="126" crc="c2cebecf" sha1="d115d851ebdae1ddcd5be16b460a6548a064c379"/> -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (Netherlands) (Hit Squad).bin" size="51402960" crc="fc0301dc" sha1="ff80adb8c6a9ed5f01db36554ed8409c7782500f"/> -->
+	<software name="kyrandia_nl" cloneof="kyrandia">
+		<description>Fables &amp; Fiends - Book One: The Legend of Kyrandia (Netherlands, The Hit Squad release)</description>
+		<year>1995</year>
+		<publisher>The Hit Squad</publisher>
+		<notes><![CDATA[
+This release doesn't have audio speech.
+]]></notes>
+		<info name="developer" value="Westwood Studios" />
+		<info name="language" value="English" />
+		<info name="region" value="Netherlands" />
+		<info name="version" value="1.3" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Legend of Kyrandia, The - Book One (Netherlands) (Hit Squad)" sha1="37a7e8427fd59a21c349e568910d60769d81171d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/65309/ -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (USA) (En,Fr,De).cue" size="140" crc="75b4dbd1" sha1="41f36b91415c9327c0c22192b14724744a36d3d0"/> -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (USA) (En,Fr,De).bin" size="586057248" crc="4663b299" sha1="f9a75162811f4ee23ded4301ac8ef4a0e97b3298"/> -->
+	<software name="kyrandia_us" cloneof="kyrandia">
+		<description>Fables &amp; Fiends - Book One: The Legend of Kyrandia (USA)</description>
+		<year>1993</year>
+		<publisher>Virgin Games</publisher>
+		<info name="developer" value="Westwood Studios" />
+		<info name="language" value="English/French/German" />
+		<info name="region" value="USA" />
+		<info name="version" value="3.7" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Legend of Kyrandia, The - Book One (USA) (En,Fr,De)" sha1="b2d660758f7d610f8daf373f6e1e8a12c329bf35" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/50564/ -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (USA) (En,Fr,De) (Rerelease).cue" size="129" crc="bfe546a9" sha1="cb8a576ae5a49e91141e19e54857e07e842c2960"/> -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (USA) (En,Fr,De) (Rerelease).bin" size="577397184" crc="e34cac0d" sha1="f02564cd47d17e0a66bad9d0031ef2c056610554"/> -->
+	<software name="kyrandiaa_us" cloneof="kyrandia">
+		<description>Fables &amp; Fiends - Book One: The Legend of Kyrandia (USA, Slash release)</description>
+		<year>1997</year>
+		<publisher>Slash</publisher>
+		<info name="developer" value="Westwood Studios" />
+		<info name="language" value="English/French/German" />
+		<info name="region" value="USA" />
+		<info name="version" value="3.7" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Legend of Kyrandia, The - Book One (USA) (En,Fr,De) (Rerelease)" sha1="751fce222049e7a6c4ba6d40efe1c57bee466d2e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/61197/ -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (Asia) (En,Fr,De).cue" size="141" crc="bfda0c62" sha1="11c5d472025100a829363eddd64a39d033fc0aed"/> -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (Asia) (En,Fr,De).bin" size="629411664" crc="307b8278" sha1="d4234cc483e7070139bd8a7781b1a76e6236602e"/> -->
+	<software name="kyrandia_as" cloneof="kyrandia">
+		<description>Fables &amp; Fiends - Book One: The Legend of Kyrandia (Asia)</description>
+		<year>1993</year>
+		<publisher>Asia-CD</publisher>
+		<info name="developer" value="Westwood Studios" />
+		<info name="language" value="English/French/German" />
+		<info name="region" value="Asia" />
+		<info name="version" value="3.7" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Legend of Kyrandia, The - Book One (Asia) (En,Fr,De)" sha1="882c5955baf18918984fb210708a122854ad3b9a" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS -->
 	<!-- requires 600k of free memory -->
-	<!-- has manual copy protection -->
+	<!-- has no manual copy protection -->
 	<software name="f1gp">
-		<description>Formula One Grand Prix</description>
+		<description>Formula One Grand Prix (Europe)</description>
 		<year>1996</year>
 		<publisher>Microprose</publisher>
+		<info name="developer" value="MicroProse" />
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<info name="version" value="1.05" />
+		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="formula one grand prix (1996)(microprose)" sha1="1ef7e2d077ce28578efcbbe9fd6e2b4c197cd6eb" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- <rom name="Formula One Grand Prix (Netherlands) (Crucial).cue" size="127" crc="77360ee0" sha1="e8505065bb4fe14e0c648c937a95d1b0fdf924f3"/> -->
+	<!-- <rom name="Formula One Grand Prix (Netherlands) (Crucial).bin" size="73876320" crc="c7089d8a" sha1="3fa9454e3a053f48d8736d22f39fe9aeaa94b4cb"/> -->
+	<software name="f1gp_nl" cloneof="f1gp">
+		<description>Formula One Grand Prix (Netherlands)</description>
+		<year>1999</year>
+		<publisher>Crucial Entertainment</publisher>
+		<info name="copy_protection" value="Manual required" />
+		<info name="developer" value="MicroProse" />
+		<info name="language" value="English" />
+		<info name="region" value="Netherlands" />
+		<info name="version" value="1.05" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Formula One Grand Prix (Netherlands) (Crucial)" sha1="03b22b58db9eb73171cd4ed3f342ddc2303aad1b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/62578/ -->
+	<!-- <rom name="First Samurai (Europe).cue" size="111" crc="8167e362" sha1="1d688277f3e8443fd804264bc6a6c4bf2b3fa4c9"/> -->
+	<!-- <rom name="First Samurai (Europe).bin" size="112910112" crc="51e88f85" sha1="929e983574ac52f9856552889b311a41ce005c14"/> -->
+	<software name="1samurai">
+		<description>First Samurai (Europe)</description>
+		<year>1994</year>
+		<publisher>Ubi Soft</publisher>
+		<info name="copy_protection" value="Requires Game Access Code at installation setup" />
+		<info name="developer" value="Vivid Image" />
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="First Samurai (Europe)" sha1="76b1f801623df6c2d0e5bc7d00ea619e24aa75c3" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/71267/ -->
+	<!-- <rom name="Flight of the Amazon Queen (Europe) (En,It).cue" size="109" crc="5e8474f8" sha1="68a991ada01834068146886b8d6b2542e7ca2a55"/> -->
+	<!-- <rom name="Flight of the Amazon Queen (Europe) (En,It).bin" size="443196768" crc="c9cf791c" sha1="97dcd74ff7be51f5676f3e1eb5233e6644eab8f9"/> -->
+	<software name="flamazon">
+		<description>Flight of the Amazon Queen (Europe)</description>
+		<year>1995</year>
+		<publisher>Renegade Software</publisher>
+		<info name="developer" value="Interactive Binary Illusions" />
+		<info name="language" value="English/Italian" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Flight of the Amazon Queen (Europe) (En,It)" sha1="727ccb7582fffa698f7a382b89615bec258a37ae" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/70771/ -->
+	<!-- <rom name="Flight of the Amazon Queen (Europe) (En,It) (Rerelease).cue" size="121" crc="a9b91ac5" sha1="1826d020a9d7ad4b2cc02ad886d2938b86b71d22"/> -->
+	<!-- <rom name="Flight of the Amazon Queen (Europe) (En,It) (Rerelease).bin" size="443530752" crc="2433fa88" sha1="d0de4ff83f4331114138a2ba39802bae76f4f5e4"/> -->
+	<software name="flamazona" cloneof="flamazon">
+		<description>Flight of the Amazon Queen (Europe, re-release)</description>
+		<year>1995</year>
+		<publisher>Renegade Software</publisher>
+		<info name="developer" value="Interactive Binary Illusions" />
+		<info name="language" value="English/Italian" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Flight of the Amazon Queen (Europe) (En,It) (Rerelease)" sha1="c9fa0e30ad083ae9af43f3f8ecf28991212a659a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/48851/ -->
+	<!-- <rom name="Flight of the Amazon Queen (Europe) (Fr,De).cue" size="109" crc="78151e68" sha1="5905e2a0a294090b8e2a7403227bd8edecdd5d73"/> -->
+	<!-- <rom name="Flight of the Amazon Queen (Europe) (Fr,De).bin" size="466554480" crc="0290d014" sha1="2ba6c4a5348948095366ac1ed073dfec31744955"/> -->
+	<software name="flamazonb" cloneof="flamazon">
+		<description>Flight of the Amazon Queen (Europe, alt)</description>
+		<year>1995</year>
+		<publisher>Renegade Software</publisher>
+		<info name="developer" value="Interactive Binary Illusions" />
+		<info name="language" value="French/German" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Flight of the Amazon Queen (Europe) (Fr,De)" sha1="e90f68a406dc93d846d0d104d062052dd00dd93d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/14723/ -->
+	<!-- <rom name="Flight of the Amazon Queen (USA).cue" size="98" crc="21446a5b" sha1="8ff34f4f33005f1330a882d46671f2450fbbeb10"/> -->
+	<!-- <rom name="Flight of the Amazon Queen (USA).bin" size="223416480" crc="2caa8fd6" sha1="0d580a1f0a4d9c433e99838955245c57533786d9"/> -->
+	<software name="flamazon_us" cloneof="flamazon">
+		<description>Flight of the Amazon Queen (USA)</description>
+		<year>1995</year>
+		<publisher>Renegade Software</publisher>
+		<info name="developer" value="Interactive Binary Illusions" />
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Flight of the Amazon Queen (USA)" sha1="d5574d406c16fb2d8e982604f23a0dcaa7ee5b8f" />
 			</diskarea>
 		</part>
 	</software>
@@ -2225,6 +3351,111 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		</part>
 	</software>
 
+	<!-- Source: http://redump.org/disc/63327/ -->
+	<!-- <rom name="Gobliiins (Italy) (En,Fr,De,Es,It).cue" size="238" crc="52c186e0" sha1="61eceed7d05957fdb3abd271f7a071edda51057f"/> -->
+	<!-- <rom name="Gobliiins (Italy) (En,Fr,De,Es,It) (Track 1).bin" size="21454944" crc="1bdb016b" sha1="550554365c94351a62a9709666cac1ce266b8fb0"/> -->
+	<!-- <rom name="Gobliiins (Italy) (En,Fr,De,Es,It) (Track 2).bin" size="348815712" crc="24eba63b" sha1="19878ee0af4a397d4b6d777c1e9f9eb0ba3587e1"/> -->
+	<software name="goblins">
+		<description>Gobliiins (Italy, Collezione Cd-Rom)</description>
+		<year>1998</year>
+		<publisher>C.T.O.</publisher>
+		<notes><![CDATA[
+Playable demos: "Gobliins 2", "Goblins 3", "Inca", "Lost", "Ween"
+]]></notes>
+		<info name="developer" value="Coktel Vision / M.D.O." />
+		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="region" value="Italy" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Gobliiins (Italy) (En,Fr,De,Es,It)" sha1="20e6a259f4d5525d52a869aec6da4778b9135566" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/24310/ -->
+	<!-- <rom name="Gobliiins (USA).cue" size="223" crc="74097022" sha1="2931b38dafde5fdcffe67791112744b99c501810"/> -->
+	<!-- <rom name="Gobliiins (USA) (Track 1).bin" size="4148928" crc="887f483f" sha1="e341136c39b3c7a8e6d2d7e11cc7a5054e056cea"/> -->
+	<!-- <rom name="Gobliiins (USA) (Track 2).bin" size="348462912" crc="de1fc015" sha1="f3b309544ff964486ba3ba91526d69c24ad8e531"/> -->
+	<software name="goblins_us" cloneof="goblins">
+		<description>Gobliiins (USA, Sierra Originals release)</description>
+		<year>1995</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Coktel Vision / M.D.O." />
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<info name="version" value="1.000 10.05.93" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Gobliiins (USA)" sha1="dca4f53106ee6a5c2f094ddc0a5067ec06dd31ed" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/31093/ -->
+	<!-- <rom name="Goblins 3 (Europe) (En,Fr,De,Es).cue" size="257" crc="8168e10c" sha1="96f83b9291cd6b6bffb7438cd236dd586b11eeb9"/> -->
+	<!-- <rom name="Goblins 3 (Europe) (En,Fr,De,Es) (Track 1).bin" size="334146288" crc="d0aa5e5c" sha1="f5179b95e2890d39a803d222ac2b5a41626aa8e1"/> -->
+	<!-- <rom name="Goblins 3 (Europe) (En,Fr,De,Es) (Track 2).bin" size="316797936" crc="b4e39ffb" sha1="fc74cd87acd06787ff02b2decadac53f836c061d"/> -->
+	<software name="goblins3">
+		<description>Goblins 3 (Europe, Sierra Originals release)</description>
+		<year>1993</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Coktel Vision" />
+		<info name="language" value="English/French/German/Spanish" />
+		<info name="region" value="Europe" />
+		<info name="version" value="1.02" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Goblins 3 (Europe) (En,Fr,De,Es)" sha1="e791e74efea12222e993b4f29fffce1965822b9c" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/64379/ -->
+	<!-- <rom name="Goblins 3 (Italy) (Rerelease).cue" size="228" crc="bbcbd5d5" sha1="d53de60ef1c162193ccd8981d99aa13f85a9e48c"/> -->
+	<!-- <rom name="Goblins 3 (Italy) (Rerelease) (Track 1).bin" size="342267744" crc="11a5dc00" sha1="5e61284a81bb17479f60a3a8874a4a903e1a05cb"/> -->
+	<!-- <rom name="Goblins 3 (Italy) (Rerelease) (Track 2).bin" size="316266384" crc="58dda3f6" sha1="fae2ef63fb12de79164214ff241d454e388533ec"/> -->
+	<software name="goblins3it" cloneof="goblins3">
+		<description>Goblins 3 (Italy, Collezione Cd-Rom)</description>
+		<year>1997</year>
+		<publisher>C.T.O.</publisher>
+		<info name="developer" value="Coktel Vision" />
+		<info name="language" value="Italian" />
+		<info name="region" value="Italy" />
+		<info name="version" value="1.02" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Goblins 3 (Italy) (Rerelease)" sha1="46dcc872b728539c928d51aabd27633e424977f0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/32176/ -->
+	<!-- <rom name="Gods (Europe).cue" size="79" crc="9b30cf7f" sha1="98851f3f83b7a63da62a2e46588ea43339e3488f"/> -->
+	<!-- <rom name="Gods (Europe).bin" size="17131968" crc="f62d1d00" sha1="b1ceed7e27bd0efcd43498077bf675519399f34b"/> -->
+	<software name="gods">
+		<description>Gods (Europe)</description>
+		<year>1999</year>
+		<publisher>Crucial Entertainment</publisher>
+		<info name="developer" value="The Bitmap Brothers" />
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="Windows 95" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Gods (Europe)" sha1="d6eb85be4d0f49e6ec6bc16b310b512b297cc0da" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Windows 3.1 / Windows 95 -->
 	<!-- 256 colors minimum -->
 	<!-- TODO: gfx issues -->
@@ -2257,9 +3488,11 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 	<!-- Originally released on two 5.25" floppies. Reprinted on CD by GT Interactive as a standalone release, -->
 	<!-- and as part of "Arcade Favorites CD-Rom 5 Pak. Game can be run straight from the CD." -->
 	<software name="heavybarrelcd">
-		<description>Heavy Barrel (1995 CD release)</description>
+		<description>Heavy Barrel (Arcade Favorites CD-ROM 5 Pak release)</description>
 		<year>1995</year>
 		<publisher>GT Interactive</publisher>
+		<info name="language" value="English" />
+		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2428,6 +3661,86 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		</part>
 	</software>
 
+	<!-- Source: http://redump.org/disc/42627/ -->
+	<!-- <rom name="Humans, The (Europe) (En,Fr,De,Es,It).cue" size="126" crc="06c1de50" sha1="d3952c4240fbb945aeb917773d532819ff3a3e49"/> -->
+	<!-- <rom name="Humans, The (Europe) (En,Fr,De,Es,It).bin" size="17477712" crc="07e1b667" sha1="dfbc9df976c4e6d762d6b641ea5ade20fba98feb"/> -->
+	<software name="humans">
+		<description>The Humans (Europe)</description>
+		<year>1993</year>
+		<publisher>GameTek</publisher>
+		<info name="developer" value="Imagitec Design" />
+		<info name="language" value="English/French/German/Spanish/Italian" />
+		<info name="region" value="Europe" />
+		<info name="version" value="0.2 4/10/93" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Humans, The (Europe) (En,Fr,De,Es,It)" sha1="eb442ad703800a643e8e3e6481f7f651c30f2fed" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/61934/ -->
+	<!-- <rom name="Humans, The (USA).cue" size="106" crc="af4ec0d5" sha1="0dcc6353bbcbdbe48e24034833b9fbbe7185f359"/> -->
+	<!-- <rom name="Humans, The (USA).bin" size="7940352" crc="678bb91e" sha1="8460c560b67c084a39dad898979d32221aebf547"/> -->
+	<software name="humans_us" cloneof="humans">
+		<description>The Humans (USA)</description>
+		<year>1993</year>
+		<publisher>GameTek</publisher>
+		<info name="developer" value="Imagitec Design" />
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<info name="version" value="0.01" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Humans, The (USA)" sha1="39cc0d7ff27b7b467768579a1341e92e24a24b93" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/31324/ -->
+	<!-- <rom name="Humans 1 and 2 (Europe) (En,Fr,De,Es,It) (OEM).cue" size="135" crc="4f4abaee" sha1="fe000862c84528ebe411f6f7bed7217d63073fd1"/> -->
+	<!-- <rom name="Humans 1 and 2 (Europe) (En,Fr,De,Es,It) (OEM).bin" size="17482416" crc="4027dd8e" sha1="b1b8e9180c4ec4d61ca728951d43c20b1d8681d0"/> -->
+	<software name="humans12">
+		<description>Humans 1 and 2 (Europe, OEM)</description>
+		<year>1993</year>
+		<publisher>GameTek</publisher>
+		<info name="developer" value="Imagitec Design" />
+		<info name="language" value="English/French/German/Spanish/Italian" />
+		<info name="region" value="Europe" />
+		<info name="version" value="0.2 4/10/93" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Humans 1 and 2 (Europe) (En,Fr,De,Es,It) (OEM)" sha1="8db38e6429216415c79bfa1757a3847b1e4e8c54" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/31325/ -->
+	<!-- <rom name="Humans 1 and 2 (Europe) (En,Fr,De,Es,It) (Rerelease).cue" size="141" crc="84326e1c" sha1="67c822ee63b56476b787fd27a5130894de1e8e54"/> -->
+	<!-- <rom name="Humans 1 and 2 (Europe) (En,Fr,De,Es,It) (Rerelease).bin" size="17510640" crc="67b00cd9" sha1="70965deb2b046e775f8dd6e24de573f27a37ce50"/> -->
+	<software name="humans12a" cloneof="humans12">
+		<description>Humans 1 and 2 (Europe, re-release)</description>
+		<year>1993</year>
+		<publisher>GameTek</publisher>
+		<info name="developer" value="Imagitec Design" />
+		<info name="language" value="English/French/German/Spanish/Italian" />
+		<info name="region" value="Europe" />
+		<info name="version" value="0.2 4/10/93" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Humans 1 and 2 (Europe) (En,Fr,De,Es,It) (Rerelease)" sha1="78117340601a859927ee88f3c5afc4539e78e6a6" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Source: http://redump.org/disc/28673/ -->
 	<!-- Source: http://redump.org/disc/28675/ -->
 	<!-- <rom name="id Anthology (USA) (Disc 1) (Vintage).cue" size="103" crc="f25a3f47" sha1="c4c9b803f8896960d5e622b71f1ea37202824675"/> -->
@@ -2492,8 +3805,9 @@ CD-ROM 2: "DOOM II: Hell on Earth", "Final DOOM", "Master Levels for DOOM II", "
 CD-ROM 3: "Quake"
 CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenstein 3D"
 ]]></notes>
-		<info name="usage" value="DOS" />
+		<info name="language" value="English" />
 		<info name="region" value="USA" />
+		<sharedfeat name="platform" value="Windows 95" />
 
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2523,13 +3837,33 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 		    FM 16942 (CD-C95-1063-0/IN0002)
 		    IFPI 3V17
 		-->
-		<description>Ignition (US)</description>
+		<description>Ignition (USA)</description>
 		<year>1997</year>
 		<publisher>Interplay</publisher>
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="cd-c95-1063-0" sha1="48bad304857689acb3fc7fcc9e22c2c7e9d8b45f" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/33041/ -->
+	<!-- <rom name="Indiana Jones and the Last Crusade (Europe).cue" size="109" crc="195bcfbe" sha1="3fe901bc50e352f88cba2ba95a13538f3b0f0d65"/> -->
+	<!-- <rom name="Indiana Jones and the Last Crusade (Europe).bin" size="5971728" crc="cca596a8" sha1="1f67b78097788df88e885f49396fdd813e3f14c8"/> -->
+	<software name="indy3">
+		<description>Indiana Jones and the Last Crusade (Europe)</description>
+		<year>1997</year>
+		<publisher>Lucasfilm Games</publisher>
+		<info name="developer" value="Lucasfilm Games" />
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<info name="version" value="IBM 256 Color 2.0 5/3/90" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Indiana Jones and the Last Crusade (Europe)" sha1="dcb4caa38e32a99f4efc66740b53233fbee3ac19" />
 			</diskarea>
 		</part>
 	</software>
@@ -2558,6 +3892,29 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 		</part>
 	</software>
 
+	<software name="jagdead" supported="no">
+		<description>Jagged Alliance: Deadly Games (v1.00)</description>
+		<year>1996</year>
+		<!-- Virgin Interactive for Europe -->
+		<publisher>Sir-Tech</publisher>
+		<notes><![CDATA[
+Has no [SB16] voices/SFXs in-game
+Nemesis demo untested
+Untested multiplayer options
+]]></notes>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jagged_alliance_deadly_games_(sir-tech_software)(version_1.0)(master_cd)" sha1="084200cf87bc3f3f6d4bff4d9b5e5d9da9975aff"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jagged_alliance_deadly_games_(sir-tech_software)(version_1.0)(multiplayer_cd)" sha1="8e4b601266c597a4dfe4b261c773b07dab4bc5bf"/>
+			</diskarea>
+		</part>
+	</software>
+
+
 	<!-- Windows 95 -->
 	<!-- Pentium class 60 MHz minimum -->
 	<software name="jakebrstj" supported="no">
@@ -2584,6 +3941,64 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="jaxis" sha1="749981bb810b64df141c752daf5b47a64ec0acc9" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/16381/ -->
+	<!-- <rom name="Jazz Jackrabbit (Europe) (Rerelease) (19970206).cue" size="136" crc="ca92a488" sha1="f2dbc8a8b9c348b9eed08893bea134d5e509de4b"/> -->
+	<!-- <rom name="Jazz Jackrabbit (Europe) (Rerelease) (19970206).bin" size="66956736" crc="9c484fe1" sha1="3ac7413643dba737c2040572b45e932338ce9cb8"/> -->
+	<software name="jazz">
+		<description>Jazz Jackrabbit (Europe, re-release)</description>
+		<year>1997</year>
+		<publisher>Project Two Interactive</publisher>
+		<info name="developer" value="Epic MegaGames" />
+		<info name="region" value="Europe" />
+		<info name="version" value="1.3" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Jazz Jackrabbit (Europe) (Rerelease) (19970206)" sha1="109347c392d40a67c3712f0be258810b44e29783" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/40259/ -->
+	<!-- <rom name="Jazz Jackrabbit (Europe) (v1.3).cue" size="97" crc="987ee42c" sha1="ba2d3fb863baae372a130a2ba7862566665dcf51"/> -->
+	<!-- <rom name="Jazz Jackrabbit (Europe) (v1.3).bin" size="35515200" crc="e18f2c8c" sha1="b85532eac09143d4f5d4eee44d4570f8c9766bc4"/> -->
+	<software name="jazz_a" cloneof="jazz">
+		<description>Jazz Jackrabbit (Europe)</description>
+		<year>1995</year>
+		<publisher>ROMWARE</publisher>
+		<info name="developer" value="Epic MegaGames" />
+		<info name="region" value="Europe" />
+		<info name="version" value="1.3" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Jazz Jackrabbit (Europe) (v1.3)" sha1="6c95e96055f9e5d780c259858e0e4e21052cd430" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/10255/ -->
+	<!-- <rom name="Jazz Jackrabbit 2 (Europe) (En,Fr,De,Es,It,Nl).cue" size="135" crc="35715469" sha1="58cb72bf0006a9a816d35ced39a6696f3cc9a372"/> -->
+	<!-- <rom name="Jazz Jackrabbit 2 (Europe) (En,Fr,De,Es,It,Nl).bin" size="71599584" crc="41548653" sha1="d1da13be06a767c10fcf48a391444628dda512af"/> -->
+	<software name="jazz2">
+		<description>Jazz Jackrabbit 2 (Europe)</description>
+		<year>1998</year>
+		<publisher>Project Two Interactive</publisher>
+		<info name="developer" value="Epic MegaGames / Orange Games" />
+		<info name="language" value="English/Dutch/French/German/Italian/Spanish" />
+		<info name="region" value="Europe" />
+		<info name="version" value="1.20" />
+		<sharedfeat name="platform" value="Windows 95" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Jazz Jackrabbit 2 (Europe) (En,Fr,De,Es,It,Nl)" sha1="d65c7fad030b5862b8ba94962bb0d16a5c3ea241" />
 			</diskarea>
 		</part>
 	</software>
@@ -2673,13 +4088,75 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 	<!-- Originally released on PC Booter 5.25" floppies. Reprinted on CD by GT Interactive as a standalone release, -->
 	<!-- and as part of "Arcade Favorites CD-Rom 5 Pak. Game can be run straight from the CD." -->
 	<software name="karnovcd">
-		<description>Karnov (1995 CD release)</description>
+		<description>Karnov (Arcade Favorites CD-ROM 5 Pak release)</description>
 		<year>1995</year>
 		<publisher>GT Interactive</publisher>
+		<info name="language" value="English" />
+		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="karnov_cd" sha1="6fb90bf33a608b855b917c8dfe94c900b10c47a9" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/10656/ -->
+	<!-- <rom name="Leisure Suit Larry in the Land of the Lounge Lizards (USA).cue" size="124" crc="092aacb4" sha1="345a4540374012d87ccadd51f3d5ee8e1f7da6e4"/> -->
+	<!-- <rom name="Leisure Suit Larry in the Land of the Lounge Lizards (USA).bin" size="4939200" crc="49472021" sha1="575d3c81abe35e524107422d66060af3e5e6aaaf"/> -->
+	<software name="larry">
+		<description>Leisure Suit Larry in the Land of the Lounge Lizards (USA, SierraOriginals release)</description>
+		<year>1995</year>
+		<publisher>Sierra On-line</publisher>
+		<info name="copy_protection" value="Manual required" />
+		<info name="developer" value="Sierra On-line" />
+		<info name="region" value="USA" />
+		<info name="version" value="1.000 September 19, 1995" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Leisure Suit Larry in the Land of the Lounge Lizards (USA)" sha1="5f1ca791067c47357e35aa105ad9b1da5b34f38f" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/35308/ -->
+	<!-- <rom name="Leisure Suit Larry's Greatest Hits and Misses! (Europe) (Rerelease).cue" size="133" crc="2ca22882" sha1="a84676dc1f556ef15d84fd6ff425e7a1d92134f2"/> -->
+	<!-- <rom name="Leisure Suit Larry's Greatest Hits and Misses! (Europe) (Rerelease).bin" size="218935920" crc="b1d7bfc4" sha1="a87b3f32510ef1dfa196b901fcdf2667fdc87934"/> -->
+	<software name="larryghm">
+		<description>Leisure Suit Larry's Greatest Hits and Misses! (Europe, re-release)</description>
+		<year>1994</year>
+		<publisher>Sierra On-line</publisher>
+		<info name="copy_protection" value="Some games require manual" />
+		<info name="developer" value="Sierra On-line" />
+		<info name="region" value="Europe" />
+		<info name="version" value="1.000 - 12/07/94" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Leisure Suit Larry's Greatest Hits and Misses (Europe) (Rerelease)" sha1="219e3894f77fecf94a48fcda1afabe1afeed2f50" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/10242/ -->
+	<!-- <rom name="Leisure Suit Larry's Greatest Hits and Misses! (USA).cue" size="118" crc="94c086ce" sha1="45b88ec424ad8015affb5f28ce372490360fb124"/> -->
+	<!-- <rom name="Leisure Suit Larry's Greatest Hits and Misses! (USA).bin" size="180285504" crc="32880885" sha1="be23e0b34d9cf9bc28368036f9fcad4b327e2bbd"/> -->
+	<software name="larryghm_us" cloneof="larryghm">
+		<description>Leisure Suit Larry's Greatest Hits and Misses! (USA)</description>
+		<year>1994</year>
+		<publisher>Sierra On-line</publisher>
+		<info name="copy_protection" value="Some games require manual" />
+		<info name="developer" value="Sierra On-line" />
+		<info name="region" value="USA" />
+		<info name="version" value="1.000 - 12/07/94" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Leisure Suit Larry's Greatest Hits and Misses (USA)" sha1="5bda619a06ff852f9f2586c4fbba591aa681d9b6" />
 			</diskarea>
 		</part>
 	</software>
@@ -2698,6 +4175,110 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 		<part name="cdrom2" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="buichi terasawa's takeru - letter of the law (1996)(sunsoft)(disc 2 of 2)[chapter 3]" sha1="ed0568d749cda155717289ab29d48013a9dfe9b5" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/88946/ -->
+	<!-- <rom name="Links - The Challenge of Golf (USA).cue" size="124" crc="7ec080cd" sha1="a81bc6af4c76e9d22e897be1554dd9fbcfd81d5d"/> -->
+	<!-- <rom name="Links - The Challenge of Golf (USA).bin" size="15645504" crc="04e0aa4f" sha1="06d91f9815fef3b166bde5feeea3a01ab801acd9"/> -->
+	<software name="links">
+		<description>Links - The Challenge of Golf (USA)</description>
+		<year>1995</year>
+		<publisher>Softkey</publisher>
+		<info name="developer" value="Access Software" />
+		<info name="region" value="USA" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Links - The Challenge of Golf (USA)" sha1="9c445b7b5e848486f70e57a7e5f2b06b13baa54e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95 -->
+	<!-- Pentium class 100 MHz -->
+	<!-- US version known to exist as "The Adventures of Lomax" -->
+	<software name="lomax" supported="no">
+		<description>Lomax (Europe)</description>
+		<year>1997</year>
+		<publisher>Psygnosis</publisher>
+		<notes><![CDATA[
+Glitchy icons in 256 color mode for setup menu and for PS1 icons on password screen [8514]
+Serious color issues if run windowed on 256 color mode (color works if set to full screen)
+Offset [CDDA] audio
+https://www.pcgamingwiki.com/wiki/The_Adventures_of_Lomax
+]]></notes>
+		<!-- Multi 5 language support -->
+		<info name="language" value="English/German/French/Italian/Spanish" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="lomax" sha1="d2a24858266e0d906d93d3027bfc89634c125556"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/70315 -->
+	<!-- <rom name="Loom (USA).cue" size="190" crc="638d550f" sha1="d4e869c826b1c696d0ccf9a7af26257a70dd50c2"/> -->
+	<!-- <rom name="Loom (USA) (Track 1).bin" size="52233216" crc="9b6dcb37" sha1="4beac526c9a9de1540863d45515016b78b8eb800"/> -->
+	<!-- <rom name="Loom (USA) (Track 2).bin" size="579102384" crc="215c7a30" sha1="b8ce5da68f1839986c70d8057f802bcb400e8262"/> -->
+	<software name="loom">
+		<description>Loom (USA)</description>
+		<year>1992</year>
+		<publisher>LucasArts</publisher>
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<info name="version" value="CD version (42) (1.0) 10 February 1992" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_id" value="Game Disk"/>
+			<diskarea name="cdrom">
+				<disk name="Loom (USA)" sha1="8177bebadf8625bee31bc3ff68647cbbd97ac63a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/67761 -->
+	<!-- <rom name="Loom (USA) (Alt).cue" size="202" crc="99942344" sha1="9f98633e3c45edbb8390fec620c3a836be80d271"/> -->
+	<!-- <rom name="Loom (USA) (Alt) (Track 1).bin" size="52237920" crc="5cba4c4d" sha1="ae77995a38b1dd946185bc2c966d5bd8f3a2507b"/> -->
+	<!-- <rom name="Loom (USA) (Alt) (Track 2).bin" size="579097680" crc="7b7098fe" sha1="e52aa20225d2fdcc8a7441808ade70258f088eeb"/> -->
+	<software name="loom_a" cloneof="loom">
+		<description>Loom (USA, alt)</description>
+		<year>1992</year>
+		<publisher>LucasArts</publisher>
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<info name="version" value="CD version (42) (1.0) 10 February 1992" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_id" value="Game Disk"/>
+			<diskarea name="cdrom">
+				<disk name="Loom (USA) (Alt)" sha1="569755da87b8538f3a22b4ee472582ba2908011b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/36037 -->
+	<!-- <rom name="Loom (USA) (Alt 2).cue" size="229" crc="b6ea840e" sha1="8702015d980be62e1642fafab7961a8b8b670975"/> -->
+	<!-- <rom name="Loom (USA) (Alt 2) (Track 1).bin" size="52567200" crc="77decfeb" sha1="0e6c2b92b087cbf6ce4c4c863346f727aa20b832"/> -->
+	<!-- <rom name="Loom (USA) (Alt 2) (Track 2).bin" size="579116496" crc="7e8466af" sha1="b298303d7b9d45a272d27c9d489df9e4777c2e37"/> -->
+	<software name="loom_b" cloneof="loom">
+		<description>Loom (USA, alt 2)</description>
+		<year>1992</year>
+		<publisher>LucasArts</publisher>
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<info name="version" value="CD version (42) (1.0) 10 February 1992" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_id" value="Game Disk"/>
+			<diskarea name="cdrom">
+				<disk name="Loom (USA) (Alt 2)" sha1="9c77052f5fe433fec9f345d2406f370962ba70e7" />
 			</diskarea>
 		</part>
 	</software>
@@ -2748,6 +4329,53 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 		</part>
 	</software>
 
+	<!-- Source: http://redump.org/disc/94155/ -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 01).bin" size="145261872" crc="91cbf5b6" sha1="e5a90874005999494028ad10276f9fbc074e7848"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 02).bin" size="21619584" crc="c779c5d8" sha1="6bd56e351245e19122eab656ee6fb211082f479e"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 03).bin" size="21904176" crc="b946d1e1" sha1="94f9b55e5a19ce8ae0eb511636bfa6b14476d8b3"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 04).bin" size="21838320" crc="88effc58" sha1="9ec61dde9ef8705f007e1c96e27284c27983c4b1"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 05).bin" size="20394192" crc="bed864fe" sha1="d98d0c3cba3d69d062087bc475cdcef3b2f61741"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 06).bin" size="22482768" crc="d0dfb720" sha1="432290cbcee12d09d9d1c81bd178df8458b56229"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 07).bin" size="2196768" crc="8834718f" sha1="24a119a9564daea9549eb354bb8d2dc8d02c5dc0"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 08).bin" size="12336240" crc="3fa67412" sha1="3a526158338f70a121f3c7fdad11a99935471a0b"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 09).bin" size="24531360" crc="b3294034" sha1="6f3b2215cc51236a2d5d6aa280e615ec8f874148"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 10).bin" size="21880656" crc="ecafe27c" sha1="fb58a9110b1d66d43f11847a906e3b100bb10b4b"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 11).bin" size="16520448" crc="172288ff" sha1="22ef8a14afddac8eb71ff123607082030a57aeb1"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 12).bin" size="24489024" crc="bcadc8ae" sha1="8d099ac4ac7cf50c4d60f7e3930e56d3c65aa167"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 13).bin" size="21694848" crc="42948762" sha1="40847b2f0f96d4f4498fde640d7af0f817ce4f8d"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 14).bin" size="3248112" crc="526cd2cd" sha1="27b140f6e29d54dbb1408186525ee9293170da43"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 15).bin" size="27944112" crc="6e57326e" sha1="731af3abc2703e8cfefab639eb1a0f5569fd4a39"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 16).bin" size="26262432" crc="cf1b8965" sha1="062d3d04790c31cce0b2e3e4e1b3db5c6cfff282"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 17).bin" size="39158448" crc="52bd0037" sha1="89d3c8f10f58b4fe09816dfd0dfb921b4fdad7b2"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 18).bin" size="28593264" crc="20faa4c2" sha1="d35de091587318a97a3ead4c496086f9d9ddeb3e"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 19).bin" size="27864144" crc="a54a10f6" sha1="78714a5833e0182e6e3dee85c82f48358206272f"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 20).bin" size="3243408" crc="0978cb81" sha1="50a12f3bb113a2fc33e497b80864b064d086654f"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 21).bin" size="2972928" crc="74a60e03" sha1="5454c643f1e189b276780e30ba678da479c299ad"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 22).bin" size="23741088" crc="1bb08b0e" sha1="23a797a734caa4fda8452189683493caad9b9d99"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 23).bin" size="25133472" crc="413c8f39" sha1="9c32335f91c702b2006494d03bda03e70b995a46"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 24).bin" size="21574896" crc="64070bcf" sha1="b79c2486712f99cf8e568fcbcf6f2f7e7eea9e82"/> -->
+	<!-- <rom name="Monkey Island Madness (USA) (Track 25).bin" size="26168352" crc="d553d5ee" sha1="527440e98545093e903d083c92687d0ce8f50621"/> -->
+	<software name="monkeymd">
+		<description>Monkey Island Madness (USA)</description>
+		<year>1997</year>
+		<publisher>LucasArts</publisher>
+		<notes><![CDATA[
+The Secret of Monkey Island (CD-ROM version 2.3b)
+Monkey Island 2: LeChuck's Revenge (v1.0 11/21/91)
+The Curse of Monkey Island (Windows 95 demo version)
+]]></notes>
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Monkey Island Madness (USA)" sha1="2749dffef8844ef0edffb206a7d127b9fe3d34fb" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95J -->
 	<software name="moon" supported="no">
 		<description>Moon (Japan)</description>
 		<year>1998</year>
@@ -2774,6 +4402,24 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 		</part>
 	</software>
 
+	<!-- Windows 3.1 -->
+	<!-- 386DX 33 MHz -->
+	<!-- Later "Masterpiece Edition" known to exist (has 3rd tab for help on status bar) -->
+	<software name="myst" supported="yes">
+		<description>Myst (v1.0.3)</description>
+		<year>1995</year>
+		<publisher>Brøderbund</publisher>
+		<notes><![CDATA[
+https://www.pcgamingwiki.com/wiki/Myst
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="myst" sha1="de9e11e5b52753229d64a6940a9de866aaf26791"/>
+			</diskarea>
+		</part>
+	</software>
+
+
 	<!-- Source: redump.org/disc/31951/ -->
 	<!-- <rom name="Network Q RAC Rally (USA).cue" size="91" crc="4d252589" sha1="c22a126dfeb6e46c88a4098e6c9aeb0089c1c945"/> -->
 	<!-- <rom name="Network Q RAC Rally (USA).bin" size="14824656" crc="2d2a7c4f" sha1="e6b1be6d3a9cb276d4909c97befc938af11cf67f"/> -->
@@ -2781,9 +4427,33 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 		<description>Network Q RAC Rally (USA)</description>
 		<year>1996</year>
 		<publisher>Europress Software</publisher>
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Network Q RAC Rally (USA)" sha1="953ab84ace809f851ba536bf66df86618c9add29" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/68521/ -->
+	<!-- <rom name="Network Q RAC Rally (France) (Rerelease).cue" size="106" crc="d917c0ad" sha1="438c564cdb23556654d84ae756815e9410fb3a66"/> -->
+	<!-- <rom name="Network Q RAC Rally (France) (Rerelease).bin" size="35691600" crc="e6cdd65a" sha1="05b10adbb10e25da7830bc0ee3b921fabf0b6956"/> -->
+	<software name="qracrally_fr" cloneof="qracrally">
+		<description>Network Q RAC Rally (France)</description>
+		<year>1999</year>
+		<publisher>Pointsoft</publisher>
+		<notes><![CDATA[
+Edition: Les Grands Jeux: Collection "10 ans de jeux vidéo"
+]]></notes>
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<sharedfeat name="platform" value="Windows 95" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Network Q RAC Rally (France) (Rerelease)" sha1="10420a8b0fe1e5571b345a2b07c557ef9b0fc089" />
 			</diskarea>
 		</part>
 	</software>
@@ -2856,15 +4526,72 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 		</part>
 	</software>
 
+	<!-- Source: http://redump.org/disc/55644/ -->
+	<!-- <rom name="PC Rally (Europe).cue" size="83" crc="68337a5a" sha1="392015c4513ca65df2db4c40802a88cd9d78d031"/> -->
+	<!-- <rom name="PC Rally (Europe).bin" size="69939072" crc="fc93705d" sha1="f71c6543381bb75269efd202a324f2b1628e411f"/> -->
+	<software name="pcrally">
+		<description>PC Rally (Europe)</description>
+		<year>1997</year>
+		<publisher>Golden Zone</publisher>
+		<info name="developer" value="Digital Dreams Multimedia" />
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="Windows 95" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="PC Rally (Europe)" sha1="118b16f5d128b4f521e214e64710d06c07d69977" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/31339/ -->
+	<!-- <rom name="Pipe Mania + Volfied (Europe).cue" size="118" crc="ee9643cc" sha1="b23b28f62a745d801f191ae534ebf6245316730d"/> -->
+	<!-- <rom name="Pipe Mania + Volfied (Europe).bin" size="10760400" crc="16f45ce9" sha1="7037ce9956460b0af7cd027cb01bbb26634f6fe6"/> -->
+	<software name="pipevolf">
+		<description>Pipe Mania + Volfied (Europe, 2 Game Pack release)</description>
+		<year>1996</year>
+		<publisher>Empire Interactive</publisher>
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Pipe Mania and Volfied (Europe)" sha1="26212549f0c3c432862885f907dea17e0f6fc39c" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/16271/ -->
+	<!-- <rom name="Pipe Mania + Volfied (Netherlands).cue" size="100" crc="ae628bd4" sha1="0080b8c2fc66c19196cd6449105f8a5795411d02"/> -->
+	<!-- <rom name="Pipe Mania + Volfied (Netherlands).bin" size="11113200" crc="c191275a" sha1="7669e39d106952c0fbb8526ffeb0481e32e967ff"/> -->
+	<software name="pipevolf_nl" cloneof="pipevolf">
+		<description>Pipe Mania + Volfied (Netherlands)</description>
+		<year>1996</year>
+		<publisher>Multi Media International</publisher>
+		<info name="language" value="English" />
+		<info name="region" value="Netherlands" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Pipe Mania and Volfied (Netherlands)" sha1="bcaa399213f391edf71c04578b0149b9f3711cb1" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS -->
 	<!-- Created from an ISO. size="6352896" crc="DCEEEB82" sha1="EA7BE8CB7E91FB97C590D23AEDFA371DC98CF5C0" -->
 	<!-- Originally released on 3.5" and 5.25" floppies. Reprinted on CD by GT Interactive and included in -->
 	<!-- "Arcade Favorites CD-Rom 5 Pak." Game can be run straight from the CD or installed to a hard drive. -->
 	<software name="pipemaniacd">
-		<description>Pipe Mania (1995 CD release)</description>
+		<description>Pipe Mania (Arcade Favorites CD-ROM 5 Pak release)</description>
 		<year>1995</year>
 		<publisher>GT Interactive</publisher>
 		<info name="alt_title" value="Pipe Dream" />
+		<info name="language" value="English" />
+		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2873,9 +4600,8 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 		</part>
 	</software>
 
-	<!-- Windows 3.x -->
-	<!-- TODO: 256 colors shifting issue, sound is too slow? -->
-	<software name="plumber" supported="partial">
+	<!-- Windows 3.x  / 95 -->
+	<software name="plumber" supported="yes">
 		<description>Plumbers don't Wear Ties</description>
 		<year>1993</year>
 		<publisher>Kirin Entertainment</publisher>
@@ -2888,6 +4614,8 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 	</software>
 
 	<!-- Windows 95 -->
+	<!-- TODO: checkout full name -->
+	<!-- Should be Yuugen Gaisha Poipon Kensetsu (有)ポイポン建設 -->
 	<software name="poipon">
 		<description>PoiPon (Japan)</description>
 		<year>1997</year>
@@ -2914,6 +4642,262 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 		</part>
 	</software>
 
+	<!-- Source: http://redump.org/disc/51015/ -->
+	<!-- <rom name="Prince of Persia 2 - The Shadow and the Flame (USA) (Rerelease).cue" size="129" crc="6a96607c" sha1="96c178aed7684b4de25fb697b541e740c029cf4a"/> -->
+	<!-- <rom name="Prince of Persia 2 - The Shadow and the Flame (USA) (Rerelease).bin" size="526351728" crc="a95c014f" sha1="e5628b682914802ed00f8a5925f98b983f7da262"/> -->
+	<software name="ppersia2">
+		<description>Prince of Persia 2 - The Shadow and the Flame (USA)</description>
+		<year>1998</year>
+		<publisher>Red Orb Entertainment</publisher>
+		<notes><![CDATA[
+Prince of Persia 2 - The Shadow and the Flame
+Playable demos:
+Journeyman Project 3, The: Legacy of Time
+Riven: The Sequel to Myst
+Warlords III: Darklords Rising
+]]></notes>
+		<info name="copy_protection" value="Manual required" />
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<info name="version" value="2.0 September 30, 1998" />
+		<sharedfeat name="platform" value="Windows 95" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Prince of Persia 2 - The Shadow and the Flame (USA) (Rerelease)" sha1="1fb551690b318cc60b492d4d2c6ab83ea3e83238" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/81345/ -->
+	<!-- <rom name="Prince of Persia 2 - The Shadow and the Flame (France) (Rerelease).cue" size="132" crc="b0b8f94a" sha1="21a82ea5ef5eb6a724bfb2cd29c9e04e56c86862"/> -->
+	<!-- <rom name="Prince of Persia 2 - The Shadow and the Flame (France) (Rerelease).bin" size="160890912" crc="59f5f958" sha1="ce36105abae6cf4510d4ad5f0854cafbe6e2be15"/> -->
+	<software name="ppersia2fr" cloneof="ppersia2">
+		<description>Prince of Persia 2 - The Shadow and the Flame (France)</description>
+		<year>1999</year>
+		<publisher>Pointsoft</publisher>
+		<notes><![CDATA[
+Edition: Les Grands Jeux: Collection "10 ans de jeux vidéo"
+Playable Demo: Prince of Persia 3D
+]]></notes>
+		<info name="copy_protection" value="Manual required" />
+		<info name="language" value="English" />
+		<info name="region" value="France" />
+		<info name="version" value="1.0" />
+		<sharedfeat name="platform" value="Windows 95" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Prince of Persia 2 - The Shadow and the Flame (France) (Rerelease)" sha1="59c3a46126ff4c92a63047c9c2afacec9fb769ad" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/38188/ -->
+	<!-- <rom name="Prince of Persia CD Collection (Europe).cue" size="128" crc="ea03a55b" sha1="6e17fb43447b03c8c21de18108e82c0bfd859b16"/> -->
+	<!-- <rom name="Prince of Persia CD Collection (Europe).bin" size="34040496" crc="76bfac79" sha1="86babf223c0a6f56b58f82779e69f50b2d500ab4"/> -->
+	<software name="ppersia">
+		<description>Prince of Persia CD Collection (Europe)</description>
+		<year>1995</year>
+		<publisher>Brøderbund Software</publisher>
+		<notes><![CDATA[
+Prince of Persia (v1.3)
+Prince of Persia 2 - The Shadow and the Flame (v1.0)
+]]></notes>
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Prince of Persia CD Collection (Europe)" sha1="970a9bd9e8be6ec9795ea74dee65f721551ac0f1" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/45632/ -->
+	<!-- <rom name="Prince of Persia CD Collection (USA).cue" size="125" crc="e4db0968" sha1="02e58809ad60e310cc304db623ed00568bdd48e6"/> -->
+	<!-- <rom name="Prince of Persia CD Collection (USA).bin" size="33682992" crc="4bec8cc0" sha1="ebcb97b72dec16a8302ae788bcf849061ce31f0d"/> -->
+	<software name="ppersiau" cloneof="ppersia">
+		<description>Prince of Persia CD Collection (USA)</description>
+		<year>1995</year>
+		<publisher>Brøderbund Software</publisher>
+		<notes><![CDATA[
+Prince of Persia (v1.3)
+Prince of Persia 2 - The Shadow and the Flame (v1.0)
+]]></notes>
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Prince of Persia CD Collection (USA)" sha1="f608bd49af44e218755c232a1663a74410a67e13" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/31228/ -->
+	<!-- <rom name="Prince of Persia Collection - Limited Edition (Europe).cue" size="120" crc="7b2015e8" sha1="f1f14c3ab626fe65ed2437da24eb46a893e95d52"/> -->
+	<!-- <rom name="Prince of Persia Collection - Limited Edition (Europe).bin" size="730724064" crc="f87436ff" sha1="119959df5abe7fca7aee61769548469bc7a2381f"/> -->
+	<software name="ppersiale">
+		<description>Prince of Persia Collection: Limited Edition (Europe)</description>
+		<year>1999</year>
+		<publisher>Red Orb Entertainment</publisher>
+		<notes><![CDATA[
+Prince of Persia (v1.4)
+Prince of Persia 2 - The Shadow and the Flame (v1.1)
+Extras:
+The Making of Prince of Persia 3D
+Manual / User's Guide (PDF, 28 pages) (English)
+Playable Demos:
+The Journeyman Project 3: Legacy of Time
+Riven: The Sequel to Myst
+Warlords III: Darklords Rising
+]]></notes>
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<info name="version" value="1.0 September 11, 1998" />
+		<sharedfeat name="platform" value="Windows 95" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Prince of Persia Collection - Limited Edition (Europe)" sha1="878acef14a973ef7e988457bfec8bf46d13b7ffb" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/31619/ -->
+	<!-- <rom name="Prince of Persia Collection - Limited Edition (Europe) (Alt).cue" size="149" crc="12f45fc9" sha1="d4e3a8dd49c0f505a3a1b5453f55b849f92aa54c"/> -->
+	<!-- <rom name="Prince of Persia Collection - Limited Edition (Europe) (Alt).bin" size="731076864" crc="7aefb11e" sha1="bb84db27e5bceccc0041558f3a1157c77f9e8edd"/> -->
+	<software name="ppersialea" cloneof="ppersiale">
+		<description>Prince of Persia Collection: Limited Edition (Europe, alt)</description>
+		<year>1999</year>
+		<publisher>Red Orb Entertainment</publisher>
+		<notes><![CDATA[
+Prince of Persia (v1.4)
+Prince of Persia 2 - The Shadow and the Flame (v1.1)
+Extras:
+The Making of Prince of Persia 3D
+Manual / User's Guide (PDF, 28 pages) (English)
+Playable Demos:
+The Journeyman Project 3: Legacy of Time
+Riven: The Sequel to Myst
+Warlords III: Darklords Rising
+]]></notes>
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<info name="version" value="1.0 September 11, 1998" />
+		<sharedfeat name="platform" value="Windows 95" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Prince of Persia Collection - Limited Edition (Europe) (Alt)" sha1="182794044998b3fe675c88e49e6fc5ae8da73c4d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/9664/ -->
+	<!-- <rom name="Prince of Persia Collection - Limited Edition (USA).cue" size="117" crc="64ec00ff" sha1="e59aaab8e3da4384cc7d1b24035325b9f4aed1ed"/> -->
+	<!-- <rom name="Prince of Persia Collection - Limited Edition (USA).bin" size="723065952" crc="8030340e" sha1="1625c3d448f432afb06ff96b334278f2b930f942"/> -->
+	<software name="ppersiale_us" cloneof="ppersiale">
+		<description>Prince of Persia Collection: Limited Edition (USA)</description>
+		<year>1999</year>
+		<publisher>Red Orb Entertainment</publisher>
+		<notes><![CDATA[
+Prince of Persia (v1.4)
+Prince of Persia 2 - The Shadow and the Flame (v1.1)
+Playable demos:
+The Journeyman Project 3: Legacy of Time
+Riven: The Sequel to Myst
+Warlords III: Darklords Rising
+Videos:
+The Making of Prince of Persia 3D
+]]></notes>
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<info name="version" value="1.0 September 11, 1998" />
+		<sharedfeat name="platform" value="Windows 95" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Prince of Persia Collection - Limited Edition (USA)" sha1="96a8f1963484af003ce0bd6a964862fdf903cd8b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/9664/ -->
+	<!-- <rom name="Prince of Persia Collection - Limited Edition (Netherlands) (Rerelease).cue" size="137" crc="46432aff" sha1="0fcc71c67522362a55b52140ad7df88782af366d"/> -->
+	<!-- <rom name="Prince of Persia Collection - Limited Edition (Netherlands) (Rerelease).bin" size="733320672" crc="010ab920" sha1="91de6c8bcf4489a3b1e610a2fc4bab7af007eae3"/> -->
+	<software name="ppersiale_nl" cloneof="ppersiale">
+		<description>Prince of Persia Collection: Limited Edition (Netherlands)</description>
+		<year>1999</year>
+		<publisher>Red Orb Entertainment</publisher>
+		<notes><![CDATA[
+Prince of Persia (v1.4)
+Prince of Persia 2 - The Shadow and the Flame (v1.1)
+Extras:
+The Making of Prince of Persia 3D
+Playable demos:
+The Journeyman Project 3: Legacy of Time
+Riven: The Sequel to Myst
+Warlords III: Darklords Rising
+]]></notes>
+		<info name="language" value="English" />
+		<info name="region" value="Netherlands" />
+		<info name="version" value="1.0 September 11, 1998" />
+		<sharedfeat name="platform" value="Windows 95" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Prince of Persia Collection - Limited Edition (Netherlands) (Rerelease)" sha1="d36627f993f53deb01907aeddbeb0791f0a5dac8" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/10116/ -->
+	<!-- <rom name="Prince of Persia Collection - Limited Edition (Brazil).cue" size="120" crc="85690e68" sha1="dd3383110fc7bb22c2e460429c111b6302d26e57"/> -->
+	<!-- <rom name="Prince of Persia Collection - Limited Edition (Brazil).bin" size="722470896" crc="3a246980" sha1="c662dcdd6b10e73bce65e7344fd989f55ed347f3"/> -->
+	<software name="ppersiale_br" cloneof="ppersiale">
+		<description>Prince of Persia Collection: Limited Edition (Brazil, Senha Pôster Ano 1 № 1)</description>
+		<year>1999</year>
+		<publisher>Senha Pôster</publisher>
+		<notes><![CDATA[
+Prince of Persia (v1.4)
+Prince of Persia 2 - The Shadow and the Flame (v1.1)
+Extras:
+The Making of Prince of Persia 3D
+Playable demos:
+The Journeyman Project 3: Legacy of Time
+Riven: The Sequel to Myst
+Warlords III: Darklords Rising
+]]></notes>
+		<info name="language" value="English" />
+		<info name="region" value="Brazil" />
+		<info name="version" value="1.0 September 11, 1998" />
+		<sharedfeat name="platform" value="Windows 95" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Prince of Persia Collection - Limited Edition (Brazil)" sha1="4c9f759058b9b7575188c85b37847351eb18211e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 3.1J / 95J -->
+	<!-- English prototype known to exist -->
+	<software name="prinmak2">
+		<description>Princess Maker 2 (Japan)</description>
+		<year>1995</year>
+		<publisher>Gainax</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="princess_maker_2_(win31)" sha1="5f7d1af8f9f4c9841893c50c48d765d66a84013d"/>
+			</diskarea>
+		</part>
+	</software>
+
+
 	<software name="prototyp">
 		<description>Prototype</description>
 		<year>1995</year>
@@ -2923,6 +4907,122 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 			<feature name="disk_label" value="Prototype" />
 			<diskarea name="cdrom">
 				<disk name="prototyp" sha1="0cdfabab37e5e9b219b3c8a381c937ae52749bb1" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/46033/ -->
+	<!-- <rom name="Pyrotechnica (USA) (En,Fr,De,Es,It).cue" size="101" crc="66f532f4" sha1="a6e988af3416d060bb4ad5418b10410bbcf38747"/> -->
+	<!-- <rom name="Pyrotechnica (USA) (En,Fr,De,Es,It).bin" size="17757600" crc="6678223a" sha1="6b620bf34a60404ad562d3a87fade3fe7f799653"/> -->
+	<software name="pyrotech">
+		<description>Pyrotechnica (USA)</description>
+		<year>1995</year>
+		<publisher>Psygnosis</publisher>
+		<info name="developer" value="Psygnosis"/>
+		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="region" value="USA" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Pyrotechnica (USA) (En,Fr,De,Es,It)" sha1="7529b4b0701b9cbd8756181b4a4806d9b100d9bb" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS 5.0 / Windows 95/98 -->
+	<!-- Pentium class 75 MHz -->
+	<software name="quake" supported="partial">
+		<description>Quake (shareware v1.01)</description>
+		<year>1996</year>
+		<publisher>id Software</publisher>
+		<notes><![CDATA[
+Untested multiplayer options
+Looks too dark on s3_764 (verify)
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="quake" sha1="b32fa2c83512819f3c36d052d591cc2f26a0fdeb" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/3568/ -->
+	<!-- <rom name="Raptor - Call of the Shadows (USA, Europe).cue" size="131" crc="f4cd062c" sha1="d4a9b0d4b56d20efa5e86244725e9417f1fdd6a5"/> -->
+	<!-- <rom name="Raptor - Call of the Shadows (USA, Europe).bin" size="14283696" crc="c39a3def" sha1="808b476eafd7a2f50afe563096f464d221e68198"/> -->
+	<software name="raptor">
+		<description>Raptor: Call of the Shadows (Europe, USA)</description>
+		<year>1995</year>
+		<publisher>Apogee</publisher>
+		<info name="developer" value="Cygnus Software" />
+		<info name="language" value="English" />
+		<info name="region" value="Europe/USA" />
+		<info name="version" value="V1.2" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Raptor - Call of the Shadows (USA, Europe)" sha1="6f175c25df380aa5d7a4cb3d41450e774a4dc5c2" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/19959/ -->
+	<!-- <rom name="Raptor - Call of the Shadows (USA) (Rerelease).cue" size="135" crc="6f425bf4" sha1="e9444e33910d0aa0e29cd0bf1155bd7ea671af15"/> -->
+	<!-- <rom name="Raptor - Call of the Shadows (USA) (Rerelease).bin" size="14641200" crc="7ad7b04a" sha1="9d0743c722cfa1828baea654a2110c313b41a0a6"/> -->
+	<software name="raptor_us" cloneof="raptor">
+		<description>Raptor: Call of the Shadows (USA)</description>
+		<year>1995</year>
+		<publisher>Apogee</publisher>
+		<info name="developer" value="Cygnus Software" />
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<info name="version" value="V1.2" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Raptor - Call of the Shadows (USA) (Rerelease)" sha1="b4abcaeee40bc1ae53546985aa00670b0e9af0f2" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/42935/ -->
+	<!-- <rom name="Raptor - Call of the Shadows (Germany).cue" size="127" crc="1869eaf6" sha1="7f7285ff2321afb10f7cc63cd01a33a1920a26fc"/> -->
+	<!-- <rom name="Raptor - Call of the Shadows (Germany).bin" size="54157152" crc="b56255d0" sha1="e19b4aba1fe2f6b8532c7940ed375d8d7f2b0d7f"/> -->
+	<software name="raptor_de" cloneof="raptor">
+		<description>Raptor: Call of the Shadows (Germany)</description>
+		<year>1994</year>
+		<publisher>Apogee</publisher>
+		<info name="developer" value="Cygnus Software" />
+		<info name="language" value="English" />
+		<info name="region" value="Germany" />
+		<info name="version" value="V1.1" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Raptor - Call of the Shadows (Germany)" sha1="23f263f2d7af71e2e7b947cf44cdb4e379303729" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/29454/ -->
+	<!-- <rom name="Raptor - Call of the Shadows (Netherlands).cue" size="108" crc="8f23b55a" sha1="ad6f9de6b999fde3f806a9f0fd4cb40cea2460a5"/> -->
+	<!-- <rom name="Raptor - Call of the Shadows (Netherlands).bin" size="14286048" crc="b3a4efa2" sha1="ceca7743fb02ff8f93cb48efec523c1d3234e8fb"/> -->
+	<software name="raptor_nl" cloneof="raptor">
+		<description>Raptor: Call of the Shadows (Netherlands)</description>
+		<year>1995</year>
+		<publisher>Apogee</publisher>
+		<info name="developer" value="Cygnus Software" />
+		<info name="language" value="English" />
+		<info name="region" value="Netherlands" />
+		<info name="version" value="V1.2" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Raptor - Call of the Shadows (Netherlands)" sha1="fef49aee7a9d7c742072dcba197049bce62b03d7" />
 			</diskarea>
 		</part>
 	</software>
@@ -3032,6 +5132,24 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 		</part>
 	</software>
 
+	<!-- Windows 95 / 98 -->
+	<!-- Pentium class 75 MHz -->
+	<software name="roadrashi" supported="no">
+		<description>Road Rash (Italy)</description>
+		<year>1996</year>
+		<publisher>Electronic Arts</publisher>
+		<notes><![CDATA[
+On 486 has popup and sometimes punts to Windows with no exception (verify)
+Sound mixing uses [8514] 16bpp
+https://www.pcgamingwiki.com/wiki/Road_Rash
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="roadrash" sha1="8029d895fda77b46fa9ca3b34a52dd5cb2a72fad" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="sasuberi">
 		<description>Saru Suberi (Japan)</description>
 		<year>1997</year>
@@ -3072,7 +5190,25 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 		</part>
 	</software>
 
-	<!-- Windows 95 & Macintosh -->
+	<!-- MS-DOS 6.0 / Windows 3.1 -->
+	<!-- Windows 95 not officially supported but seems to work fine -->
+	<!-- 486 33 MHz -->
+	<software name="shangmom" supported="partial">
+		<description>Shanghai: Great Moments</description>
+		<year>1995</year>
+		<publisher>Activision</publisher>
+		<notes><![CDATA[
+Install screen has wrong [8514] header text
+Bit of desync when Rosalind Chao starts talking at beginning of an attract cycle (verify)
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="shanghai" sha1="1d3cd20e23a94c6d5568687da3fc56579e2b6a26" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95 / Macintosh -->
 	<software name="silicon" supported="partial">
 		<description>Silicon Scream (Japan)</description>
 		<year>1995</year>
@@ -3104,7 +5240,7 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 	<!-- Pentium class 133 MHz -->
 	<!-- Direct X 5 -->
 	<software name="silkroad">
-		<description>Silkroad Hoshi no Shima no Monogatari</description>
+		<description>Silkroad Hoshi no Shima no Monogatari (Japan)</description>
 		<year>1998</year>
 		<publisher>Anjin / Sprite</publisher>
 		<info name="alt_title" value="シルクロード 星の島の物語" />
@@ -3112,6 +5248,73 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="silkroad" sha1="e1b532b3acaf6dfb16d7165e6cbebbf92e98ee49" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95 -->
+	<software name="simcity" supported="partial">
+		<description>SimCity Classic (v2.0)</description>
+		<year>1995</year>
+		<publisher>Maxis</publisher>
+		<notes><![CDATA[
+Minor [8514] issues, cfr. other entries
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="sc_classic" sha1="0e76c55926803a3fb9c6de9650902965d025847e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS -->
+	<software name="simcit2k" supported="yes">
+		<!-- unknown version, v1.01 but on CD-ROM?  -->
+		<description>SimCity 2000</description>
+		<year>1994</year>
+		<publisher>Maxis</publisher>
+		<notes><![CDATA[
+Seemingly incompatible with Windows 95, tries to read from floppy if launched from desktop, rebooting as DOS will detect just first 1MB from install (verify)
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="simcity_2000_dos" sha1="a8c90e9cb27d3bb8e265bfc96cd31f4e9a04a034"/>
+			</diskarea>
+		</part>
+	</software>
+
+
+	<!-- Source: http://redump.org/disc/80024/ -->
+	<!-- <rom name="Simon the Sorcerer (USA).cue" size="90" crc="d2cfbefe" sha1="eafd4929c6c3e53a7a8a77f5a05dea10157aa224"/> -->
+	<!-- <rom name="Simon the Sorcerer (USA).bin" size="209269200" crc="db6ee4ac" sha1="1982a6578857b8218680eba69f6cced9c97cbae1"/> -->
+	<software name="simon">
+		<description>Simon the Sorcerer (USA)</description>
+		<year>1994</year>
+		<publisher>Infocom</publisher>
+		<info name="developer" value="Adventuresoft" />
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<info name="version" value="1.00" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Simon the Sorcerer (USA)" sha1="61508e2be53c61afaa289570907e5aee024bae8c" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 3.1 / 3.11 / 95 -->
+	<!-- 486 66 MHz -->
+	<!-- SVGA 256 colors -->
+	<software name="slamdtyp" supported="yes">
+		<description>Slam Dunk Typing</description>
+		<year>1997</year>
+		<publisher>Creative Wonders</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="slamdunktyping" sha1="0a1fa31c6d9d2a3bf7cfb6bc24e870d7c666a9f6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3129,9 +5332,89 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 		</part>
 	</software>
 
-	<!-- Windows 3.1 -->
-	<!-- TODO: gfx shift issue on 256 color mode -->
-	<software name="spaceinv" supported="partial">
+	<!-- Windows 3.1/95/NT 3.51/NT 4.0 -->
+	<!-- A separate Macintosh version known to exist -->
+	<software name="skulcrck" supported="partial">
+		<!-- 7/23/96 -->
+		<description>Skull Cracker (Windows)</description>
+		<year>1996</year>
+		<publisher>GTE Entertainment</publisher>
+		<notes><![CDATA[
+Optional [pc_joy] 4-button joystick, work around by mapping b3 and b4 to player 2 side
+]]></notes>
+		<info name="developer" value="Cyberflix"/>
+		<info name="usage" value="ALT pauses the game (including title screen and videos)"/>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="skull cracker (1996)(gte)" sha1="a15057c0648695daf6939220c3fd285be3fb1d91" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95 -->
+	<!-- Pentium class 75 MHz -->
+	<!-- DirectX 3.0 -->
+	<software name="sk" supported="partial">
+		<description>Sonic &amp; Knuckles Collection</description>
+		<year>1997</year>
+		<publisher>Sega / Expert Software</publisher>
+		<notes><![CDATA[
+Not extensively tested for the high requirements
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="sonic_and_knuckles_collection" sha1="09c2d79046710745bc122b3b326ef572af988b3e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/40419/ -->
+	<!-- <rom name="Soccer Kid (Europe) (En,Fr,De,Es,It).cue" size="2535" crc="8e424b0b" sha1="47801608d139353ae36194b3b43216011a03e008"/> -->
+	<!-- <rom name="Soccer Kid (Europe) (En,Fr,De,Es,It) (Track 01).bin" size="49688352" crc="048a873a" sha1="c921154078aecca3e84cc06a77243abc37e0c738"/> -->
+	<!-- <rom name="Soccer Kid (Europe) (En,Fr,De,Es,It) (Track 02).bin" size="47846736" crc="6e6d9d3b" sha1="876687486bc8966bc7517486e99d2479fa793b74"/> -->
+	<!-- <rom name="Soccer Kid (Europe) (En,Fr,De,Es,It) (Track 03).bin" size="32384688" crc="7b5eabb4" sha1="761470f820a2a30396ee291c04255815497a8ad9"/> -->
+	<!-- <rom name="Soccer Kid (Europe) (En,Fr,De,Es,It) (Track 04).bin" size="32048352" crc="7687790e" sha1="9d164737281d1d6889eeb167e790fad99daab86f"/> -->
+	<!-- <rom name="Soccer Kid (Europe) (En,Fr,De,Es,It) (Track 05).bin" size="34746096" crc="4e56e5b5" sha1="902a06c4e52c6c2f36f9f1cd9aa95e4b7f8bced8"/> -->
+	<!-- <rom name="Soccer Kid (Europe) (En,Fr,De,Es,It) (Track 06).bin" size="18841872" crc="57c138ce" sha1="9456d1cc75aa8e8f39c2264a7bc24c4a106ce448"/> -->
+	<!-- <rom name="Soccer Kid (Europe) (En,Fr,De,Es,It) (Track 07).bin" size="28367472" crc="297fc209" sha1="b5e5e3d363d0a7582a085c1828b7447c29095df2"/> -->
+	<!-- <rom name="Soccer Kid (Europe) (En,Fr,De,Es,It) (Track 08).bin" size="31966032" crc="4bda0e56" sha1="a926ca98e515ded82f39fbc873a4a451b822cc36"/> -->
+	<!-- <rom name="Soccer Kid (Europe) (En,Fr,De,Es,It) (Track 09).bin" size="32281200" crc="0826d9b4" sha1="a79d64fb5731e40f5847519ca56eb1e9a961b442"/> -->
+	<!-- <rom name="Soccer Kid (Europe) (En,Fr,De,Es,It) (Track 10).bin" size="17465952" crc="4ca57065" sha1="255b8cb098a7eddccb62907f044029e8af685e8d"/> -->
+	<!-- <rom name="Soccer Kid (Europe) (En,Fr,De,Es,It) (Track 11).bin" size="32071872" crc="37f21d96" sha1="a011aaf169c2b48073a346951f59df247c9a19c7"/> -->
+	<!-- <rom name="Soccer Kid (Europe) (En,Fr,De,Es,It) (Track 12).bin" size="32071872" crc="86d5c44a" sha1="80dcbfc5e2059bf9193a4a1359b7d39c88513835"/> -->
+	<!-- <rom name="Soccer Kid (Europe) (En,Fr,De,Es,It) (Track 13).bin" size="32177712" crc="a255fb6e" sha1="ee97ba1ccd98a347132d3919a009ecca2a3d70f4"/> -->
+	<!-- <rom name="Soccer Kid (Europe) (En,Fr,De,Es,It) (Track 14).bin" size="22228752" crc="f4c9f91d" sha1="113726c60717747d6b31c1f447d7fca4702d4d0d"/> -->
+	<!-- <rom name="Soccer Kid (Europe) (En,Fr,De,Es,It) (Track 15).bin" size="32175360" crc="a5b0535d" sha1="5ced948e4b0e08cf3b9a453315097ff21d66b998"/> -->
+	<!-- <rom name="Soccer Kid (Europe) (En,Fr,De,Es,It) (Track 16).bin" size="26779872" crc="b8ec3d02" sha1="6a8b99743b46d86a0a50bfec81ae410efa3ff2a5"/> -->
+	<!-- <rom name="Soccer Kid (Europe) (En,Fr,De,Es,It) (Track 17).bin" size="21593712" crc="f16dce8c" sha1="654ba870d8b952044a83024670a52f693dd5a4da"/> -->
+	<!-- <rom name="Soccer Kid (Europe) (En,Fr,De,Es,It) (Track 18).bin" size="32495232" crc="07e41bfe" sha1="5f0826f968e730f5830c92162077d08fbe4da915"/> -->
+	<!-- <rom name="Soccer Kid (Europe) (En,Fr,De,Es,It) (Track 19).bin" size="32071872" crc="9e499074" sha1="0daad72a8460445461ea2d0742510351963c2c97"/> -->
+	<!-- <rom name="Soccer Kid (Europe) (En,Fr,De,Es,It) (Track 20).bin" size="32271792" crc="66130420" sha1="6eae28ea74a9961ce160ba2835ee906d06fec115"/> -->
+	<!-- <rom name="Soccer Kid (Europe) (En,Fr,De,Es,It) (Track 21).bin" size="20109600" crc="292fabb7" sha1="dc4ea0e3de42db0517fc123614bc22077497fd29"/> -->
+	<!-- <rom name="Soccer Kid (Europe) (En,Fr,De,Es,It) (Track 22).bin" size="10692192" crc="1dc968e5" sha1="62df5ef013c42fc6dd333dc23f289bc054eccea0"/> -->
+	<!-- <rom name="Soccer Kid (Europe) (En,Fr,De,Es,It) (Track 23).bin" size="20711712" crc="c8a57086" sha1="5f27950055d94cd104cfae242383244e8dd4de73"/> -->
+	<software name="soccerkd">
+		<description>Soccer Kid (Europe)</description>
+		<year>1994</year>
+		<publisher>Krisalis</publisher>
+		<notes><![CDATA[
+Includes DOS and Windows installation setup.
+]]></notes>
+		<info name="developer" value="Krisalis" />
+		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Soccer Kid (Europe) (En,Fr,De,Es,It)" sha1="eb7a0e21e42688b43e6b6821e381c03a03548e54" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 3.1 / 95 -->
+	<software name="spaceinv" supported="yes">
 		<description>Space Invaders for Windows</description>
 		<year>1997</year>
 		<publisher>Wiz / Taito</publisher>
@@ -3155,6 +5438,23 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 		</part>
 	</software>
 
+	<!-- Windows 3.1 / 95 -->
+	<!-- Runs off CD, no install -->
+	<software name="strmrisk" supported="partial">
+		<description>Sturmtruppen: Risiken? (Italy)</description>
+		<year>1997</year>
+		<publisher>G&amp;T Multimedia</publisher>
+		<notes><![CDATA[
+Draws video without colors if run thru autorun in Win95, works if st_95.exe is manually executed and from movie player, [SVGA] palette desync?
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="sturmtruppen_risiken" sha1="e8b4884c95df5101beee68dbc5b45c92ddc08c3e"/>
+			</diskarea>
+		</part>
+	</software>
+
+
 	<!-- Source: redump.org/disc/31189/ -->
 	<!-- <rom name="Supaplex (Europe).cue" size="83" crc="f269e8fe" sha1="69b054d67351fe37d5ad3c640ce0c74f416ae8ee"/> -->
 	<!-- <rom name="Supaplex (Europe).bin" size="13199424" crc="403367aa" sha1="7ee29b80716176fdd8aa587a300dd137448d6a0d"/> -->
@@ -3174,13 +5474,46 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 	<!-- Originally released on one PC Booter 5.25" floppy disk. Reprinted on CD by GT Interactive as a -->
 	<!-- standalone release, and as part of "Arcade Favorites CD-Rom 5 Pak. Game can be run straight from the CD." -->
 	<software name="tagteamcd">
-		<description>Tag Team Wrestling (1995 CD release)</description>
+		<description>Tag Team Wrestling (Arcade Favorites CD-ROM 5 Pak release)</description>
 		<year>1995</year>
 		<publisher>GT Interactive</publisher>
+		<info name="language" value="English" />
+		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="tagteam_cd" sha1="33eaebcca48c8a4382dc3ac87e346e393f47b2d8" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/34461/ -->
+	<!-- <rom name="10 Game CD ROM (Europe).cue" size="112" crc="1d4f23a1" sha1="5eeee536fd8a8a2f146c5ac99c01610497875122"/> -->
+	<!-- <rom name="10 Game CD ROM (Europe).bin" size="9066960" crc="fdba9775" sha1="b96b29c2bcfcae073c07eb52f24b8eb7d6d2a208"/> -->
+	<software name="telstar10">
+		<description>Telstar 10 CD ROM Box Set</description>
+		<year>1993</year>
+		<publisher>Telstar Fun &amp; Games</publisher>
+		<notes><![CDATA[
+Battlestorm
+The Blues Brothers
+The Blues Brothers: Jukebox Adventure
+Crazy Cars III
+Fire & Forget II
+Prehistorik
+Prehistorik 2
+Super Cauldron
+Titan
+Titus the Fox: To Marrakech and Back
+]]></notes>
+		<info name="alt_title" value="10 Game CD ROM" />
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="10 Game CD ROM (Europe)" sha1="1bfe41e2d2b59c8aa640b52ef5ee2aa38e62282d" />
 			</diskarea>
 		</part>
 	</software>
@@ -3238,6 +5571,26 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="rampage" sha1="cb91ee2e34e3b7391169079d6787c75712b1d97f" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95 -->
+	<!-- Pentium class 90 MHz -->
+	<!-- DirectX 3.0 (VESA 2.0)  -->
+	<software name="tplay98" supported="no">
+		<description>Triple Play '98</description>
+		<year>1997</year>
+		<publisher>Electronic Arts</publisher>
+		<notes><![CDATA[
+Has serious [8514] issues on main menu
+Has serious geometry issues during gameplay
+[SB16] has clicking noises thru the DAC
+Unemulated optional [Gravis Gamepad], [Gravis Gamepad Pro], [Gravis Grip 4-player adapter]
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ea-tripleplay98-win95" sha1="304492fab8e65add0ae3516633fcbd4ed7755902"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3314,10 +5667,13 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 
 	<!-- Windows 95/98/ME/XP and Mac OS supported -->
 	<!-- Requires 256 colors minimum otherwise they crashes at boot -->
-	<software name="v16imagine">
+	<software name="v16imagine" supported="partial">
 		<description>Viper -V16- Imagine (International)</description>
 		<year>2001</year>
 		<publisher>Sogna / Hobibox Europe</publisher>
+		<notes><![CDATA[
+Has [8514] icon glitch
+]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="GX" sha1="5de4abf4a883a56ec389bb255d176b5a39a63420" />
@@ -3325,13 +5681,55 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 		</part>
 	</software>
 
-	<software name="v16rise">
+	<software name="v16rise" supported="partial">
 		<description>Viper -V16- RISE (International)</description>
 		<year>2001</year>
 		<publisher>Sogna / Hobibox Europe</publisher>
+		<notes><![CDATA[
+Has [8514] icon glitch
+]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="GX4" sha1="a600a961b5127d3a5ee368c20d9f54e6ede23b81" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95 -->
+	<!-- Pentium class 90 MHz -->
+	<software name="vf" supported="no">
+		<!-- alias for Virtua Fighter Remix -->
+		<description>Virtua Fighter PC</description>
+		<year>1996</year>
+		<publisher>Sega / Expert Software</publisher>
+		<notes><![CDATA[
+Unsupported [NV1] video card
+Does not recognize [pc_joy] joystick in
+Offset [CDDA] audio
+https://www.pcgamingwiki.com/wiki/Virtua_Fighter_PC
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="virtua_fighter_pc" sha1="bfba831a59114475082953ff189b957e8ca1ca96"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/35166/ -->
+	<!-- <rom name="Where in Space Is Carmen Sandiego (USA) (Deluxe Edition).cue" size="145" crc="fa8af9cf" sha1="bed8b58da81ae157f76cf5626e2a818194118a8c"/> -->
+	<!-- <rom name="Where in Space Is Carmen Sandiego (USA) (Deluxe Edition).bin" size="7070112" crc="6045e7a1" sha1="c7c4d75b9db6b7d09bd3743997e98d431c3affa7"/> -->
+	<software name="carmnspc">
+		<description>Where in Space is Carmen Sandiego? (USA, Deluxe Edition)</description>
+		<year>1996</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<info name="version" value="v1.1" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Where in Space Is Carmen Sandiego (USA) (Deluxe Edition)" sha1="72999bcaaa96b970010855e18c6c400742e88d34" />
 			</diskarea>
 		</part>
 	</software>
@@ -3346,6 +5744,26 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="who shot johnny rock [DOS IT]" sha1="eb68c0469a43bd16d412180dc0022cb260a31773" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/2888/ -->
+	<!-- <rom name="Wrath of the Demon (USA).cue" size="90" crc="0d833f61" sha1="1e7b9d5efb813a0bce13407eb1a7db57e51fd05a"/> -->
+	<!-- <rom name="Wrath of the Demon (USA).bin" size="6453888" crc="a98a6604" sha1="0db14b73805c4e120744d8dfb5c4f5d42d28b300"/> -->
+	<software name="wrathdem">
+		<description>Wrath of the Demon (USA)</description>
+		<year>1992</year>
+		<publisher>ReadySoft</publisher>
+		<info name="developer" value="Abstrax" />
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<info name="version" value="V1.02 CD-ROM" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Wrath of the Demon (USA)" sha1="60bf39c525e4be184bbb4658cf8c84679f26b516" />
 			</diskarea>
 		</part>
 	</software>
@@ -3414,10 +5832,16 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 		</part>
 	</software>
 
-	<software name="zyclunt" supported="no">
+	<!-- DOS -->
+	<!-- Crashes in Windows 95 -->
+	<software name="zyclunt" supported="partial">
 		<description>Zyclunt</description>
 		<year>1995</year>
 		<publisher>Phantagram</publisher>
+		<notes><![CDATA[
+No [soundblaster] BGMs no matter the setting set in CONFIG.EXE
+Shows Phantagram logo with bottom red strip (DOS 6.22)
+]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="zyclunt" sha1="cc6e69cdd5bdda70361778c3515571114a97b662" />
@@ -3425,6 +5849,67 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 		</part>
 	</software>
 
+	<!--                                         -->
+	<!--               Applications              -->
+	<!--                                         -->
+
+	<!-- Windows 95 -->
+	<software name="cdraw6" supported="no">
+		<description>Corel DRAW! 6</description>
+		<year>1995</year>
+		<publisher>Corel Corporation</publisher>
+		<notes><![CDATA[
+Install screen blanks out the background in several places [8514]
+Don't display icons in help, font master, probably others [8514]
+Draw: forgets fill colors on canvas when moving or zooming, leaves trails when moving toolkit panes, curves don't seem very accurate [8514]
+Draw: cannot color fill a bezier shape (verify)
+Photo Paint: cannot fill shapes, has artifacts with drawing [8514]
+Other stuff untested
+]]></notes>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="corel_draw_6_cd1" sha1="db1f485ff98d9e80bd3c0d4b61945c7f6290ae1f" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="corel_draw_6_cd2" sha1="bcee744ad708dcf1b25c56a6e5b0be1709d1389b" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="corel_draw_6_cd3" sha1="cccb1d014ed22aa60ae1af9f43f979e630c0f3a0" />
+			</diskarea>
+		</part>
+		<part name="cdrom4" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="corel_draw_6_cd4" sha1="7e88e8537ee0587554e60a77aeb4b2ecaad62f71" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!--                                         -->
+	<!--                Multimedia               -->
+	<!--                                         -->
+
+	<!-- DOS 5.0+, Windows 3.1+ -->
+	<software name="uffvmus" supported="no">
+		<description>Uffizi Virtual Museums</description>
+		<year>1995</year>
+		<!-- also on credited on disk: -->
+		<!-- "Scala" (for photographs) -->
+		<!-- "Le Scienze" (text?) -->
+		<publisher>Opera Multimedia</publisher>
+		<notes><![CDATA[
+Crashes on Windows 95 with Mtb30run general protection fault
+Has setup menu glitch with text [8514]
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="uffizi_e1_09" sha1="5121f95753bdf9ffdc5e564259d153088953ac67" />
+			</diskarea>
+		</part>
+	</software>
 
 	<!--                                         -->
 	<!-- Drivers / Utilities / Operating Systems -->
@@ -3933,6 +6418,36 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 		</part>
 	</software>
 
+	<!-- <rom name="Sound Blaster 16 CD.cue" size="475" crc="dd9e3752" sha1="bbf49ed1b322ba873a9befcf42d72e86368c76e0"/> -->
+	<!-- <rom name="Sound Blaster 16 CD.bin" size="310741536" crc="295cb2d2" sha1="f09805b982a17b756626e9702d8e2b8f6da68e60"/> -->
+	<software name="sb16cd">
+		<description>Sound Blaster 16 CD</description>
+		<year>1996</year>
+		<publisher>Creative Labs</publisher>
+		<notes><![CDATA[
+CD-ROM includes those Creative's audio tools:
+Creative CD v2.03
+Creative MIDI v2.03
+Creative Mixer
+Creative Remote v2.03
+Creative Wave v2.03
+TextAssist Dictionary v1.30
+Singing Text
+Soundo'LE v3.11
+Text Reader
+Texto'LE v1.2
+Wave Studio v3.12
+]]></notes>
+		<info name="language" value="Dutch/English/French/German/Italian/Spanish" />
+		<sharedfeat name="platform" value="Windows 3.x/Windows 95" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Sound Blaster 16 CD" sha1="7e91bd013f18a9a9d5b5459280e3a075b49309f6" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- OS/2 -->
 	<software name="ssuite_os2">
 		<description>Lotus SmartSuite for OS/2 Warp 4</description>
@@ -4169,5 +6684,7 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 			</diskarea>
 		</part>
 	</software>
+
+
 
 </softwarelist>

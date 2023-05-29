@@ -59,6 +59,8 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "speaker.h"
 
 
+namespace {
+
 class dambustr_state : public galaxold_state
 {
 public:
@@ -375,6 +377,8 @@ ROM_START( dambustruk )
 	ROM_REGION( 0x0020, "unk_prom", 0 ) //timing?
 	ROM_LOAD( "mi-7603-5.ic3", 0x0000, 0x0020, CRC(e2a54c47) SHA1(1e08f8e3d0ae0efb2d178ab11ec2bddaeb6d7478) ) /* near DB1 - DB4 */
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1981, dambustr,   0,        dambustr, dambustr,   dambustr_state, init_dambustr, ROT90, "South West Research", "Dambusters (US, set 1)", 0 )

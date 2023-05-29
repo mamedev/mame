@@ -20,6 +20,8 @@
 
 #define FDC9266_TAG "u43"
 
+namespace {
+
 class tim011_state : public driver_device
 {
 public:
@@ -202,6 +204,8 @@ ROM_START( tim011 )
 	ROM_REGION( 0x1000, "keyboard", ROMREGION_ERASEFF )
 	ROM_LOAD( "keyb_tim011.bin", 0x0000, 0x1000, CRC(a99c40a6) SHA1(d6d505271d91df4e079ec3c0a4abbe75ae9d649b))
 ROM_END
+
+} // Anonymous namespace
 
 /* Driver */
 

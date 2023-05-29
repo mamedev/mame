@@ -19,13 +19,13 @@
 #include "emu.h"
 #include "992board.h"
 
-#define LOG_WARN        (1U<<1)   // Warnings
-#define LOG_CRU         (1U<<2)   // CRU logging
-#define LOG_CASSETTE    (1U<<3)   // Cassette logging
-#define LOG_HEXBUS      (1U<<4)   // Hexbus logging
-#define LOG_BANK        (1U<<5)   // Change ROM banks
-#define LOG_KEYBOARD    (1U<<6)   // Keyboard operation
-#define LOG_EXPRAM      (1U<<7)   // Expansion RAM
+#define LOG_WARN        (1U << 1)   // Warnings
+#define LOG_CRU         (1U << 2)   // CRU logging
+#define LOG_CASSETTE    (1U << 3)   // Cassette logging
+#define LOG_HEXBUS      (1U << 4)   // Hexbus logging
+#define LOG_BANK        (1U << 5)   // Change ROM banks
+#define LOG_KEYBOARD    (1U << 6)   // Keyboard operation
+#define LOG_EXPRAM      (1U << 7)   // Expansion RAM
 
 #define VERBOSE (LOG_GENERAL | LOG_WARN)
 
@@ -161,24 +161,11 @@ video992_32_device::video992_32_device(const machine_config &mconfig, const char
 	m_beol = 0x7f;
 }
 
-std::string video992_device::tts(attotime t)
-{
-	char buf[256];
-	const char *sign = "";
-	if (t.seconds() < 0) {
-		t = attotime::zero - t;
-		sign = "-";
-	}
-	int nsec = t.attoseconds() / ATTOSECONDS_PER_NANOSECOND;
-	sprintf(buf, "%s%04d.%03d,%03d,%03d", sign, int(t.seconds()), nsec / 1000000, (nsec / 1000) % 1000, nsec % 1000);
-	return buf;
-}
-
 TIMER_CALLBACK_MEMBER(video992_device::hold_cpu)
 {
 	int raw_vpos = screen().vpos();
 
-	// logerror("release time: %s, diff: %s\n", tts(machine().time()), tts(machine().time()-m_hold_time));
+	LOG("release time: %s, diff: %s\n", machine().time().to_string(), (machine().time()-m_hold_time).to_string());
 	// We're holding the CPU; release it until the next start
 	m_hold_cb(CLEAR_LINE);
 	m_free_timer->adjust(screen().time_until_pos((raw_vpos+1) % screen().height(), HORZ_DISPLAY_START));
@@ -188,7 +175,7 @@ TIMER_CALLBACK_MEMBER(video992_device::free_cpu)
 {
 	int raw_vpos = screen().vpos();
 
-	// logerror("hold time: %s\n", tts(machine().time()));
+	LOG("hold time: %s\n", machine().time().to_string());
 	if (m_videna)
 	{
 		// Hold the CPU
@@ -207,7 +194,7 @@ TIMER_CALLBACK_MEMBER(video992_device::free_cpu)
 
 	int linelength = 0;
 
-	// logerror("draw line %d\n", vpos);
+	LOG("draw line %d\n", vpos);
 	// Get control byte
 	uint8_t control = m_mem_read_cb(0xef00);
 	bool text_white = BIT(control, 2);
@@ -277,7 +264,7 @@ TIMER_CALLBACK_MEMBER(video992_device::free_cpu)
 	}
 
 	// +1 for the minimum hold time
-	// logerror("line length: %d\n", linelength);
+	LOG("line length: %d\n", linelength);
 	m_hold_timer->adjust(screen().time_until_pos(raw_vpos, HORZ_DISPLAY_START + linelength * 8 + 1));
 }
 

@@ -161,21 +161,10 @@
 #include "machine/clock.h"
 #include "machine/timekpr.h"
 
-#define LOG_GENERAL 0x01
-#define LOG_SETUP   0x02
-#define LOG_PRINTF  0x04
+#define VERBOSE (0) // (LOG_GENERAL)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+#include "logmacro.h"
 
-#define VERBOSE 0 // (LOG_PRINTF | LOG_SETUP  | LOG_GENERAL)
-
-#define LOGMASK(mask, ...)   do { if (VERBOSE & mask) logerror(__VA_ARGS__); } while (0)
-#define LOGLEVEL(mask, level, ...) do { if ((VERBOSE & mask) >= level) logerror(__VA_ARGS__); } while (0)
-
-#define LOG(...)      LOGMASK(LOG_GENERAL, __VA_ARGS__)
-#define LOGSETUP(...) LOGMASK(LOG_SETUP,   __VA_ARGS__)
-
-#if VERBOSE & LOG_PRINTF
-#define logerror printf
-#endif
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -183,7 +172,10 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
-/* from documentataion: http://www.m88k.com/Docs/147/147aih.pdf but crystal and divider not known */
+
+namespace {
+
+/* from documentation: http://www.m88k.com/Docs/147/147aih.pdf but crystal and divider not known */
 #define BAUDGEN_CLOCK 5_MHz_XTAL
 #define SCC_CLOCK (BAUDGEN_CLOCK) /* This gives prompt at the RS232 terminal device (9600) */
 
@@ -715,6 +707,9 @@ ROM_START (mvme147)
  */
 
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY     FULLNAME    FLAGS

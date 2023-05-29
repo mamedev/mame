@@ -1,6 +1,6 @@
 /*
  * Copyright 2013-2014 Dario Manesku. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #include <string>
@@ -1157,6 +1157,8 @@ public:
 		bgfx::Init init;
 		init.type     = args.m_type;
 		init.vendorId = args.m_pciId;
+		init.platformData.nwh  = entry::getNativeWindowHandle(entry::kDefaultWindowHandle);
+		init.platformData.ndt  = entry::getNativeDisplayHandle();
 		init.resolution.width  = m_viewState.m_width;
 		init.resolution.height = m_viewState.m_height;
 		init.resolution.reset  = m_reset;
@@ -2326,7 +2328,7 @@ public:
 
 				// Compute split distances.
 				const uint8_t maxNumSplits = 4;
-				BX_ASSERT(maxNumSplits >= settings.m_numSplits, "Error! Max num splits.");
+				BX_ASSERT(maxNumSplits >= m_settings.m_numSplits, "Error! Max num splits.");
 
 				float splitSlices[maxNumSplits*2];
 				splitFrustum(splitSlices

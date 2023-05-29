@@ -104,6 +104,9 @@ TODO: Volleyball...
  *
  */
 
+
+namespace {
+
 static const int NS_PER_CLOCK_PONG  = static_cast<int>((double) netlist::config::INTERNAL_RES::value / (double) 7159000 + 0.5);
 static const int MASTER_CLOCK_PONG  = static_cast<int>((double) netlist::config::INTERNAL_RES::value / (double) NS_PER_CLOCK_PONG + 0.5);
 
@@ -688,6 +691,9 @@ ROM_START( consolet ) // dummy to satisfy game entry
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 */
+
+} // anonymous namespace
+
 
 GAME(  1972, pong,      0, pong,     pong,      pong_state,     empty_init, ROT0,  "Atari", "Pong (Rev E) [TTL]", MACHINE_SUPPORTS_SAVE)
 GAME(  1973, pongd,     0, pongd,    pongd,     pong_state,     empty_init, ROT0,  "Atari", "Pong Doubles [TTL]", MACHINE_SUPPORTS_SAVE)

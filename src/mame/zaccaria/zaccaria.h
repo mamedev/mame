@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_INCLUDES_ZACCARIA_H
-#define MAME_INCLUDES_ZACCARIA_H
+#ifndef MAME_ZACCARIA_ZACCARIA_H
+#define MAME_ZACCARIA_ZACCARIA_H
 
 #pragma once
 
@@ -70,4 +70,4 @@ private:
 	uint8_t m_nmi_mask = 0;
 };
 
-#endif // MAME_INCLUDES_ZACCARIA_H
+#endif // MAME_ZACCARIA_ZACCARIA_H

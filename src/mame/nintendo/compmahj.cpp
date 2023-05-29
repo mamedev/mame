@@ -38,6 +38,9 @@ linking 2 Computer Mahjongs together, using MJ 8002 link cable.
 #include "emu.h"
 #include "cpu/lh5801/lh5801.h"
 
+
+namespace {
+
 class compmahj_state : public driver_device
 {
 public:
@@ -88,6 +91,9 @@ ROM_START( compmahj )
 	ROM_REGION( 0x2000, "maincpu", 0)
 	ROM_LOAD( "mj-02", 0x0000, 0x2000, CRC(56d51944) SHA1(5923d72753642314f1e64bd30a6bd69da3985ce9) )
 ROM_END
+
+} // anonymous namespace
+
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY     FULLNAME                     FLAGS */
 CONS( 1983, compmahj, 0,      0,      compmahj, compmahj, compmahj_state, empty_init, "Nintendo", "Computer Mah-jong Yakuman", MACHINE_IS_SKELETON )

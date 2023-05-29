@@ -24,6 +24,9 @@ TODO: figure out keycodes (are they translated externally?)
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class sk101bl_state : public driver_device
 {
 public:
@@ -49,7 +52,6 @@ private:
 	void scan_load_w(u8 data);
 	u8 scan_shift_r();
 	void lcd_control_w(u8 data);
-	void serial_tx_w(u8 data) { logerror("Serial TX: %02X\n", data); }
 
 	void prog_map(address_map &map);
 	void ext_map(address_map &map);
@@ -160,7 +162,6 @@ void sk101bl_state::sk101bl(machine_config &config)
 	m_maincpu->port_in_cb<1>().set(FUNC(sk101bl_state::p1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(sk101bl_state::p1_w));
 	m_maincpu->port_out_cb<3>().set("alarm", FUNC(speaker_sound_device::level_w)).bit(3);
-	m_maincpu->serial_tx_cb().set(FUNC(sk101bl_state::serial_tx_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(50);
@@ -182,5 +183,8 @@ ROM_START(sk101bl)
 	ROM_REGION(0x8000, "program", 0)
 	ROM_LOAD("sk_101_5.0_1ca2.ic7", 0x0000, 0x8000, CRC(f7903ca5) SHA1(66648cc1622c1241cdbd443af706750acbb93502)) // 27256-25
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1988, sk101bl, 0, 0, sk101bl, sk101bl, sk101bl_state, empty_init, "Reuters", "Model SK 101 BL", MACHINE_NOT_WORKING)

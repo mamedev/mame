@@ -63,7 +63,7 @@ Gaelco Football
 PCB:
 GAELCO
 REF. 020201
-Same PCB as above ATV Track, exept for HD6417750 SH4 CPUs was used intead of HD6417750S.
+Same PCB as above ATV Track, except for HD6417750 SH4 CPUs was used instead of HD6417750S.
 
 */
 
@@ -107,6 +107,8 @@ TODO:
 #include "screen.h"
 
 
+namespace {
+
 //#define SPECIALMODE 1 // Alternate code path
 
 class atvtrack_state : public driver_device
@@ -135,7 +137,7 @@ protected:
 	virtual void video_start() override;
 	u32 screen_update_atvtrack(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline u32 decode64_32(offs_t offset64, u64 data, u64 mem_mask, offs_t &offset32);
-	void logbinary(u32 data,int high,int low);
+	[[maybe_unused]] void logbinary(u32 data, int high, int low);
 
 	memory_region *m_nandregion = nullptr;
 	int m_nandcommand[4]{}, m_nandoffset[4]{}, m_nandaddressstep = 0, m_nandaddress[4]{};
@@ -174,7 +176,7 @@ private:
 	void smashdrv_main_port(address_map &map);
 };
 
-void atvtrack_state::logbinary(u32 data,int high=31,int low=0)
+void atvtrack_state::logbinary(u32 data, int high=31, int low=0)
 {
 	u32 s;
 	int z;
@@ -415,7 +417,7 @@ void atvtrack_state::ioport_w(offs_t offset, u64 data)
 				m_slaverun = true;
 		}
 //      logerror("SH4 16bit i/o port write ");
-//      logbinary((u32)data,15,0);
+//      logbinary((u32)data, 15, 0);
 //      logerror("\n");
 	}
 #ifdef SPECIALMODE
@@ -730,6 +732,9 @@ ROM_START( smashdrvb ) // UK Version: 3.3, Version 3D: 1.9, Checksum: 707C
 	ROM_LOAD32_WORD("sdrc.ic20",    0x02000000, 0x01000000, CRC(c9021dd7) SHA1(1d08aab433614810af858a0fc5d7f03c7b782237) )
 	// ic21 unpopulated
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 2002, atvtrack,  0,        atvtrack, atvtrack, atvtrack_state, empty_init, ROT0, "Gaelco",           "ATV Track (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2002, atvtracka, atvtrack, atvtrack, atvtrack, atvtrack_state, empty_init, ROT0, "Gaelco",           "ATV Track (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

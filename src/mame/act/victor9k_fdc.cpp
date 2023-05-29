@@ -120,21 +120,10 @@ const tiny_rom_entry *victor_9000_fdc_device::device_rom_region() const
 }
 
 
-void victor_9000_fdc_device::add_floppy_drive(machine_config &config, const char *_tag)
-{
-	floppy_connector &connector(FLOPPY_CONNECTOR(config, _tag, 0));
-	connector.option_add("525ssqd", FLOPPY_525_SSQD); // Tandon TM100-3 with custom electronics
-	connector.option_add("525qd", FLOPPY_525_QD); // Tandon TM100-4 with custom electronics
-	connector.set_default_option("525qd");
-	connector.set_formats(floppy_formats);
-}
-
-image_init_result victor_9000_fdc_device::load0_cb(floppy_image_device *device)
+void victor_9000_fdc_device::load0_cb(floppy_image_device *device)
 {
 	// DOOR OPEN 0
 	m_via4->write_ca1(0);
-
-	return image_init_result::PASS;
 }
 
 void victor_9000_fdc_device::unload0_cb(floppy_image_device *device)
@@ -143,12 +132,10 @@ void victor_9000_fdc_device::unload0_cb(floppy_image_device *device)
 	m_via4->write_ca1(1);
 }
 
-image_init_result victor_9000_fdc_device::load1_cb(floppy_image_device *device)
+void victor_9000_fdc_device::load1_cb(floppy_image_device *device)
 {
 	// DOOR OPEN 1
 	m_via4->write_cb1(0);
-
-	return image_init_result::PASS;
 }
 
 void victor_9000_fdc_device::unload1_cb(floppy_image_device *device)
@@ -199,8 +186,14 @@ void victor_9000_fdc_device::device_add_mconfig(machine_config &config)
 	m_via6->cb2_handler().set(FUNC(victor_9000_fdc_device::erase_w));
 	m_via6->irq_handler().set(FUNC(victor_9000_fdc_device::via6_irq_w));
 
-	add_floppy_drive(config, I8048_TAG":0");
-	add_floppy_drive(config, I8048_TAG":1");
+	for (auto &connector : m_floppy)
+	{
+		FLOPPY_CONNECTOR(config, connector);
+		connector->option_add("525ssqd", FLOPPY_525_SSQD); // Tandon TM100-3 with custom electronics
+		connector->option_add("525qd", FLOPPY_525_QD); // Tandon TM100-4 with custom electronics
+		connector->set_default_option("525qd");
+		connector->set_formats(floppy_formats);
+	}
 }
 
 
@@ -221,23 +214,16 @@ victor_9000_fdc_device::victor_9000_fdc_device(const machine_config &mconfig, co
 	m_via4(*this, M6522_4_TAG),
 	m_via5(*this, M6522_5_TAG),
 	m_via6(*this, M6522_6_TAG),
-	m_floppy0(*this, I8048_TAG":0"),
-	m_floppy1(*this, I8048_TAG":1"),
+	m_floppy(*this, I8048_TAG":%u", 0U),
 	m_gcr_rom(*this, "gcr"),
 	m_leds(*this, "led%u", 0U),
-	m_da(0),
-	m_da0(0),
-	m_da1(0),
-	m_start0(1),
-	m_stop0(1),
-	m_start1(1),
-	m_stop1(1),
-	m_sel0(0),
-	m_sel1(0),
-	m_tach0(0),
-	m_tach1(0),
-	m_rdy0(0),
-	m_rdy1(0),
+	m_data(0),
+	m_da{0, 0},
+	m_start{1, 1},
+	m_stop{1, 1},
+	m_sel{0, 0},
+	m_tach{0, 0},
+	m_rdy{0, 0},
 	m_scp_rdy0(0),
 	m_scp_rdy1(0),
 	m_via_rdy0(1),
@@ -246,10 +232,8 @@ victor_9000_fdc_device::victor_9000_fdc_device(const machine_config &mconfig, co
 	m_scp_l1ms(0),
 	m_via_l0ms(0),
 	m_via_l1ms(0),
-	m_st0(0),
-	m_st1(0),
-	m_stp0(0),
-	m_stp1(0),
+	m_st{0, 0},
+	m_stp{0, 0},
 	m_drive(0),
 	m_side(0),
 	m_via4_irq(CLEAR_LINE),
@@ -278,23 +262,17 @@ void victor_9000_fdc_device::device_start()
 
 	// allocate timer
 	t_gen = timer_alloc(FUNC(victor_9000_fdc_device::gen_tick), this);
-	t_tach0 = timer_alloc(FUNC(victor_9000_fdc_device::tach0_tick), this);
-	t_tach1 = timer_alloc(FUNC(victor_9000_fdc_device::tach1_tick), this);
+	t_tach[0] = timer_alloc(FUNC(victor_9000_fdc_device::tach0_tick), this);
+	t_tach[1] = timer_alloc(FUNC(victor_9000_fdc_device::tach1_tick), this);
 
 	// state saving
+	save_item(NAME(m_data));
 	save_item(NAME(m_da));
-	save_item(NAME(m_da0));
-	save_item(NAME(m_da1));
-	save_item(NAME(m_start0));
-	save_item(NAME(m_stop0));
-	save_item(NAME(m_start1));
-	save_item(NAME(m_stop1));
-	save_item(NAME(m_sel0));
-	save_item(NAME(m_sel1));
-	save_item(NAME(m_tach0));
-	save_item(NAME(m_tach1));
-	save_item(NAME(m_rdy0));
-	save_item(NAME(m_rdy1));
+	save_item(NAME(m_start));
+	save_item(NAME(m_stop));
+	save_item(NAME(m_sel));
+	save_item(NAME(m_tach));
+	save_item(NAME(m_rdy));
 	save_item(NAME(m_scp_rdy0));
 	save_item(NAME(m_scp_rdy1));
 	save_item(NAME(m_via_rdy0));
@@ -303,10 +281,8 @@ void victor_9000_fdc_device::device_start()
 	save_item(NAME(m_scp_l1ms));
 	save_item(NAME(m_via_l0ms));
 	save_item(NAME(m_via_l1ms));
-	save_item(NAME(m_st0));
-	save_item(NAME(m_st1));
-	save_item(NAME(m_stp0));
-	save_item(NAME(m_stp1));
+	save_item(NAME(m_st));
+	save_item(NAME(m_stp));
 	save_item(NAME(m_drive));
 	save_item(NAME(m_side));
 	save_item(NAME(m_drw));
@@ -331,16 +307,16 @@ void victor_9000_fdc_device::device_reset()
 	m_via6->reset();
 
 	// set floppy callbacks
-	if (m_floppy0->get_device())
+	if (m_floppy[0]->get_device())
 	{
-		m_floppy0->get_device()->setup_load_cb(floppy_image_device::load_cb(&victor_9000_fdc_device::load0_cb, this));
-		m_floppy0->get_device()->setup_unload_cb(floppy_image_device::unload_cb(&victor_9000_fdc_device::unload0_cb, this));
+		m_floppy[0]->get_device()->setup_load_cb(floppy_image_device::load_cb(&victor_9000_fdc_device::load0_cb, this));
+		m_floppy[0]->get_device()->setup_unload_cb(floppy_image_device::unload_cb(&victor_9000_fdc_device::unload0_cb, this));
 	}
 
-	if (m_floppy1->get_device())
+	if (m_floppy[1]->get_device())
 	{
-		m_floppy1->get_device()->setup_load_cb(floppy_image_device::load_cb(&victor_9000_fdc_device::load1_cb, this));
-		m_floppy1->get_device()->setup_unload_cb(floppy_image_device::unload_cb(&victor_9000_fdc_device::unload1_cb, this));
+		m_floppy[1]->get_device()->setup_load_cb(floppy_image_device::load_cb(&victor_9000_fdc_device::load1_cb, this));
+		m_floppy[1]->get_device()->setup_unload_cb(floppy_image_device::unload_cb(&victor_9000_fdc_device::unload1_cb, this));
 	}
 }
 
@@ -357,14 +333,14 @@ TIMER_CALLBACK_MEMBER(victor_9000_fdc_device::gen_tick)
 
 TIMER_CALLBACK_MEMBER(victor_9000_fdc_device::tach0_tick)
 {
-	m_tach0 = !m_tach0;
-	LOGSCP("%s TACH0 %u\n", machine().time().as_string(), m_tach0);
+	m_tach[0] = !m_tach[0];
+	LOGSCP("%s TACH0 %u\n", machine().time().as_string(), m_tach[0]);
 }
 
 TIMER_CALLBACK_MEMBER(victor_9000_fdc_device::tach1_tick)
 {
-	m_tach1 = !m_tach1;
-	LOGSCP("%s TACH1 %u\n", machine().time().as_string(), m_tach1);
+	m_tach[1] = !m_tach[1];
+	LOGSCP("%s TACH1 %u\n", machine().time().as_string(), m_tach[1]);
 }
 
 
@@ -475,48 +451,48 @@ void victor_9000_fdc_device::floppy_p2_w(uint8_t data)
 	bool sync = false;
 
 	int start0 = BIT(data, 0);
-	if (m_start0 != start0) sync = true;
+	if (m_start[0] != start0) sync = true;
 
 	int stop0 = BIT(data, 1);
-	if (m_stop0 != stop0) sync = true;
+	if (m_stop[0] != stop0) sync = true;
 
 	int start1 = BIT(data, 2);
-	if (m_start1 != start1) sync = true;
+	if (m_start[1] != start1) sync = true;
 
 	int stop1 = BIT(data, 3);
-	if (m_stop1 != stop1) sync = true;
+	if (m_stop[1] != stop1) sync = true;
 
 	int sel0 = BIT(data, 5);
-	if (m_sel0 != sel0) sync = true;
+	if (m_sel[0] != sel0) sync = true;
 
 	int sel1 = BIT(data, 4);
-	if (m_sel1 != sel1) sync = true;
+	if (m_sel[1] != sel1) sync = true;
 
 	m_scp_rdy0 = BIT(data, 6);
 	m_scp_rdy1 = BIT(data, 7);
 	update_rdy();
 
-	LOGSCP("%s %s START0/STOP0/SEL0/RDY0 %u/%u/%u/%u START1/STOP1/SEL1/RDY1 %u/%u/%u/%u\n", machine().time().as_string(), machine().describe_context(), start0, stop0, sel0, m_rdy0, start1, stop1, sel1, m_rdy1);
+	LOGSCP("%s %s START0/STOP0/SEL0/RDY0 %u/%u/%u/%u START1/STOP1/SEL1/RDY1 %u/%u/%u/%u\n", machine().time().as_string(), machine().describe_context(), start0, stop0, sel0, m_rdy[0], start1, stop1, sel1, m_rdy[1]);
 
 	if (sync)
 	{
 		live_sync();
 
-		m_start0 = start0;
-		m_stop0 = stop0;
-		m_sel0 = sel0;
-		update_spindle_motor(m_floppy0->get_device(), t_tach0, m_start0, m_stop0, m_sel0, m_da0);
-		update_rpm(m_floppy0->get_device(), t_tach0, m_sel0, m_da0);
+		m_start[0] = start0;
+		m_stop[0] = stop0;
+		m_sel[0] = sel0;
+		update_spindle_motor(m_floppy[0]->get_device(), t_tach[0], m_start[0], m_stop[0], m_sel[0], m_da[0]);
+		update_rpm(m_floppy[0]->get_device(), t_tach[0], m_sel[0], m_da[0]);
 
-		m_start1 = start1;
-		m_stop1 = stop1;
-		m_sel1 = sel1;
-		update_spindle_motor(m_floppy1->get_device(), t_tach1, m_start1, m_stop1, m_sel1, m_da1);
-		update_rpm(m_floppy1->get_device(), t_tach1, m_sel1, m_da1);
+		m_start[1] = start1;
+		m_stop[1] = stop1;
+		m_sel[1] = sel1;
+		update_spindle_motor(m_floppy[1]->get_device(), t_tach[1], m_start[1], m_stop[1], m_sel[1], m_da[1]);
+		update_rpm(m_floppy[1]->get_device(), t_tach[1], m_sel[1], m_da[1]);
 
 		checkpoint();
 
-		if ((m_floppy0->get_device() && !m_floppy0->get_device()->mon_r()) || (m_floppy1->get_device() && !m_floppy1->get_device()->mon_r()))
+		if ((m_floppy[0]->get_device() && !m_floppy[0]->get_device()->mon_r()) || (m_floppy[1]->get_device() && !m_floppy[1]->get_device()->mon_r()))
 		{
 			if(cur_live.state == IDLE)
 			{
@@ -539,8 +515,8 @@ void victor_9000_fdc_device::floppy_p2_w(uint8_t data)
 
 READ_LINE_MEMBER(victor_9000_fdc_device::tach0_r)
 {
-	LOGSCP("%s %s Read TACH0 %u\n", machine().time().as_string(), machine().describe_context(), m_tach0);
-	return m_tach0;
+	LOGSCP("%s %s Read TACH0 %u\n", machine().time().as_string(), machine().describe_context(), m_tach[0]);
+	return m_tach[0];
 }
 
 
@@ -550,8 +526,8 @@ READ_LINE_MEMBER(victor_9000_fdc_device::tach0_r)
 
 READ_LINE_MEMBER(victor_9000_fdc_device::tach1_r)
 {
-	LOGSCP("%s %s Read TACH1 %u\n", machine().time().as_string(), machine().describe_context(), m_tach1);
-	return m_tach1;
+	LOGSCP("%s %s Read TACH1 %u\n", machine().time().as_string(), machine().describe_context(), m_tach[1]);
+	return m_tach[1];
 }
 
 
@@ -608,7 +584,7 @@ void victor_9000_fdc_device::update_rpm(floppy_image_device *floppy, emu_timer *
 #ifdef USE_SCP
 	if (sel)
 	{
-		da = m_da;
+		da = m_data;
 
 		float tach = rpm[da] / 60.0 * SPINDLE_RATIO * MOTOR_POLES;
 
@@ -625,8 +601,8 @@ void victor_9000_fdc_device::update_rpm(floppy_image_device *floppy, emu_timer *
 
 void victor_9000_fdc_device::update_rdy()
 {
-	m_via5->write_ca2((m_via_rdy0 && m_via_rdy1) ? m_rdy0 : m_scp_rdy0);
-	m_via5->write_cb2((m_via_rdy0 && m_via_rdy1) ? m_rdy1 : m_scp_rdy1);
+	m_via5->write_ca2((m_via_rdy0 && m_via_rdy1) ? m_rdy[0] : m_scp_rdy0);
+	m_via5->write_cb2((m_via_rdy0 && m_via_rdy1) ? m_rdy[1] : m_scp_rdy1);
 }
 
 
@@ -636,12 +612,12 @@ void victor_9000_fdc_device::update_rdy()
 
 void victor_9000_fdc_device::da_w(uint8_t data)
 {
-	LOGSCP("%s %s DA %02x SEL0 %u SEL1 %u\n", machine().time().as_string(), machine().describe_context(), data, m_sel0, m_sel1);
+	LOGSCP("%s %s DA %02x SEL0 %u SEL1 %u\n", machine().time().as_string(), machine().describe_context(), data, m_sel[0], m_sel[1]);
 
 	live_sync();
-	m_da = data;
-	if (m_floppy0->get_device()) update_rpm(m_floppy0->get_device(), t_tach0, m_sel0, m_da0);
-	if (m_floppy1->get_device()) update_rpm(m_floppy1->get_device(), t_tach1, m_sel1, m_da1);
+	m_data = data;
+	if (m_floppy[0]->get_device()) update_rpm(m_floppy[0]->get_device(), t_tach[0], m_sel[0], m_da[0]);
+	if (m_floppy[1]->get_device()) update_rpm(m_floppy[1]->get_device(), t_tach[1], m_sel[1], m_da[1]);
 	checkpoint();
 	live_run();
 }
@@ -687,12 +663,12 @@ void victor_9000_fdc_device::via4_pa_w(uint8_t data)
 
 #ifndef USE_SCP
 	// HACK to bypass SCP
-	if (m_floppy0->get_device())
+	if (m_floppy[0]->get_device())
 	{
-		m_floppy0->get_device()->mon_w((m_via_l0ms == 0xf) ? 1 : 0);
-		m_floppy0->get_device()->set_rpm(victor9k_format::get_rpm(m_side, m_floppy0->get_device()->get_cyl()));
+		m_floppy[0]->get_device()->mon_w((m_via_l0ms == 0xf) ? 1 : 0);
+		m_floppy[0]->get_device()->set_rpm(victor9k_format::get_rpm(m_side, m_floppy[0]->get_device()->get_cyl()));
 	}
-	m_rdy0 = (m_via_l0ms == 0xf) ? 0 : 1;
+	m_rdy[0] = (m_via_l0ms == 0xf) ? 0 : 1;
 	update_rdy();
 #endif
 
@@ -700,11 +676,11 @@ void victor_9000_fdc_device::via4_pa_w(uint8_t data)
 
 	LOGVIA("%s %s L0MS %01x ST0 %01x\n", machine().time().as_string(), machine().describe_context(), m_via_l0ms, st0);
 
-	if (m_st0 != st0)
+	if (m_st[0] != st0)
 	{
 		live_sync();
-		if (m_floppy0->get_device()) update_stepper_motor(m_floppy0->get_device(), m_stp0, st0, m_st0);
-		m_st0 = st0;
+		if (m_floppy[0]->get_device()) update_stepper_motor(m_floppy[0]->get_device(), m_stp[0], st0, m_st[0]);
+		m_st[0] = st0;
 		checkpoint();
 		live_run();
 	}
@@ -751,12 +727,12 @@ void victor_9000_fdc_device::via4_pb_w(uint8_t data)
 
 #ifndef USE_SCP
 	// HACK to bypass SCP
-	if (m_floppy1->get_device())
+	if (m_floppy[1]->get_device())
 	{
-		m_floppy1->get_device()->mon_w((m_via_l1ms == 0xf) ? 1 : 0);
-		m_floppy1->get_device()->set_rpm(victor9k_format::get_rpm(m_side, m_floppy1->get_device()->get_cyl()));
+		m_floppy[1]->get_device()->mon_w((m_via_l1ms == 0xf) ? 1 : 0);
+		m_floppy[1]->get_device()->set_rpm(victor9k_format::get_rpm(m_side, m_floppy[1]->get_device()->get_cyl()));
 	}
-	m_rdy1 = (m_via_l1ms == 0xf) ? 0 : 1;
+	m_rdy[1] = (m_via_l1ms == 0xf) ? 0 : 1;
 	update_rdy();
 #endif
 
@@ -764,11 +740,11 @@ void victor_9000_fdc_device::via4_pb_w(uint8_t data)
 
 	LOGVIA("%s %s L1MS %01x ST1 %01x\n", machine().time().as_string(), machine().describe_context(), m_via_l1ms, st1);
 
-	if (m_st1 != st1)
+	if (m_st[1] != st1)
 	{
 		live_sync();
-		if (m_floppy1->get_device()) update_stepper_motor(m_floppy1->get_device(), m_stp1, st1, m_st1);
-		m_st1 = st1;
+		if (m_floppy[1]->get_device()) update_stepper_motor(m_floppy[1]->get_device(), m_stp[1], st1, m_st[1]);
+		m_st[1] = st1;
 		checkpoint();
 		live_run();
 	}
@@ -869,18 +845,18 @@ uint8_t victor_9000_fdc_device::via6_pa_r()
 
 	*/
 
-	LOGVIA("%s %s TRK0D0 %u TRK0D1 %u SYNC %u\n", machine().time().as_string(), machine().describe_context(), m_floppy0->get_device() ? m_floppy0->get_device()->trk00_r() : 0, m_floppy1->get_device() ? m_floppy1->get_device()->trk00_r() : 0, checkpoint_live.sync);
+	LOGVIA("%s %s TRK0D0 %u TRK0D1 %u SYNC %u\n", machine().time().as_string(), machine().describe_context(), m_floppy[0]->get_device() ? m_floppy[0]->get_device()->trk00_r() : 0, m_floppy[1]->get_device() ? m_floppy[1]->get_device()->trk00_r() : 0, checkpoint_live.sync);
 
 	uint8_t data = 0;
 
 	// track 0 drive A sense
-	data |= (m_floppy0->get_device() ? m_floppy0->get_device()->trk00_r() : 0) << 1;
+	data |= (m_floppy[0]->get_device() ? m_floppy[0]->get_device()->trk00_r() : 0) << 1;
 
 	// track 0 drive B sense
-	data |= (m_floppy1->get_device() ? m_floppy1->get_device()->trk00_r() : 0) << 3;
+	data |= (m_floppy[1]->get_device() ? m_floppy[1]->get_device()->trk00_r() : 0) << 3;
 
 	// write protect sense
-	data |= (m_drive ? (m_floppy1->get_device() ? m_floppy1->get_device()->wpt_r() : 0) : (m_floppy0->get_device() ? m_floppy0->get_device()->wpt_r() : 0)) << 6;
+	data |= (m_drive ? (m_floppy[1]->get_device() ? m_floppy[1]->get_device()->wpt_r() : 0) : (m_floppy[0]->get_device() ? m_floppy[0]->get_device()->wpt_r() : 0)) << 6;
 
 	// disk sync detect
 	data |= checkpoint_live.sync << 7;
@@ -929,10 +905,10 @@ void victor_9000_fdc_device::via6_pa_w(uint8_t data)
 
 		m_side = side;
 		cur_live.side = side;
-		if (m_floppy0->get_device())
-			m_floppy0->get_device()->ss_w(side);
-		if (m_floppy1->get_device())
-			m_floppy1->get_device()->ss_w(side);
+		if (m_floppy[0]->get_device())
+			m_floppy[0]->get_device()->ss_w(side);
+		if (m_floppy[1]->get_device())
+			m_floppy[1]->get_device()->ss_w(side);
 
 		m_drive = drive;
 		cur_live.drive = drive;
@@ -964,16 +940,16 @@ uint8_t victor_9000_fdc_device::via6_pb_r()
 	uint8_t data = 0;
 
 	// motor speed status, drive A
-	data |= (m_via_rdy0 && m_via_rdy1) ? m_rdy0 : m_scp_rdy0;
+	data |= (m_via_rdy0 && m_via_rdy1) ? m_rdy[0] : m_scp_rdy0;
 
 	// motor speed status, drive B
-	data |= ((m_via_rdy0 && m_via_rdy1) ? m_rdy1 : m_scp_rdy1) << 1;
+	data |= ((m_via_rdy0 && m_via_rdy1) ? m_rdy[1] : m_scp_rdy1) << 1;
 
 	// door B sense
-	data |= ((m_floppy1->get_device() && m_floppy1->get_device()->exists()) ? 0 : 1) << 3;
+	data |= ((m_floppy[1]->get_device() && m_floppy[1]->get_device()->exists()) ? 0 : 1) << 3;
 
 	// door A sense
-	data |= ((m_floppy0->get_device() && m_floppy0->get_device()->exists()) ? 0 : 1) << 4;
+	data |= ((m_floppy[0]->get_device() && m_floppy[0]->get_device()->exists()) ? 0 : 1) << 4;
 
 	// single/double sided jumper
 	data |= (2U << 5);
@@ -1010,12 +986,12 @@ void victor_9000_fdc_device::via6_pb_w(uint8_t data)
 
 	// stepper enable A
 	int stp0 = BIT(data, 6);
-	if (m_stp0 != stp0)
+	if (m_stp[0] != stp0)
 		sync = true;
 
 	// stepper enable B
 	int stp1 = BIT(data, 7);
-	if (m_stp1 != stp1)
+	if (m_stp[1] != stp1)
 		sync = true;
 	m_via6->write_cb1(stp1);
 
@@ -1023,13 +999,13 @@ void victor_9000_fdc_device::via6_pb_w(uint8_t data)
 	{
 		live_sync();
 
-		m_stp0 = stp0;
-		if (m_floppy0->get_device())
-			update_stepper_motor(m_floppy0->get_device(), m_stp0, m_st0, m_st0);
+		m_stp[0] = stp0;
+		if (m_floppy[0]->get_device())
+			update_stepper_motor(m_floppy[0]->get_device(), m_stp[0], m_st[0], m_st[0]);
 
-		m_stp1 = stp1;
-		if (m_floppy1->get_device())
-			update_stepper_motor(m_floppy1->get_device(), m_stp1, m_st1, m_st1);
+		m_stp[1] = stp1;
+		if (m_floppy[1]->get_device())
+			update_stepper_motor(m_floppy[1]->get_device(), m_stp[1], m_st[1], m_st[1]);
 
 		LOGVIA("%s %s STP0 %u STP1 %u\n", machine().time().as_string(), machine().describe_context(), stp0, stp1);
 
@@ -1097,7 +1073,7 @@ void victor_9000_fdc_device::cs7_w(offs_t offset, uint8_t data)
 
 floppy_image_device* victor_9000_fdc_device::get_floppy()
 {
-	return m_drive ? m_floppy1->get_device() : m_floppy0->get_device();
+	return m_floppy[m_drive ? 1 : 0]->get_device();
 }
 
 void victor_9000_fdc_device::live_start()

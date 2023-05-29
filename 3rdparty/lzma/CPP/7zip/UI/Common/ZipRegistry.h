@@ -6,7 +6,19 @@
 #include "../../../Common/MyTypes.h"
 #include "../../../Common/MyString.h"
 
+#include "../../Common/MethodProps.h"
+
 #include "ExtractMode.h"
+
+/*
+CBoolPair::Def in writing functions means:
+  if (  CBoolPair::Def ), we write CBoolPair::Val
+  if ( !CBoolPair::Def )
+  {
+    in NCompression functions we delete registry value
+    in another functions we do nothing
+  }
+*/
 
 namespace NExtract
 {
@@ -35,6 +47,36 @@ namespace NExtract
 
 namespace NCompression
 {
+  struct CMemUse
+  {
+    // UString Str;
+    bool IsDefined;
+    bool IsPercent;
+    UInt64 Val;
+
+    CMemUse():
+      IsDefined(false),
+      IsPercent(false),
+      Val(0)
+      {}
+
+    void Clear()
+    {
+      // Str.Empty();
+      IsDefined = false;
+      IsPercent = false;
+      Val = 0;
+    }
+
+    UInt64 GetBytes(UInt64 ramSize) const
+    {
+      if (!IsPercent)
+        return Val;
+      return Calc_From_Val_Percents(ramSize, Val);
+    }
+    void Parse(const UString &s);
+  };
+
   struct CFormatOptions
   {
     UInt32 Level;
@@ -43,19 +85,47 @@ namespace NCompression
     UInt32 BlockLogSize;
     UInt32 NumThreads;
     
+    UInt32 TimePrec;
+    CBoolPair MTime;
+    CBoolPair ATime;
+    CBoolPair CTime;
+    CBoolPair SetArcMTime;
+
     CSysString FormatID;
     UString Method;
     UString Options;
     UString EncryptionMethod;
+    UString MemUse;
+
+    void Reset_TimePrec()
+    {
+      TimePrec = (UInt32)(Int32)-1;
+    }
+
+    bool IsSet_TimePrec() const
+    {
+      return TimePrec != (UInt32)(Int32)-1;
+    }
+
+
+    void Reset_BlockLogSize()
+    {
+      BlockLogSize = (UInt32)(Int32)-1;
+    }
 
     void ResetForLevelChange()
     {
-      BlockLogSize = NumThreads = Level = Dictionary = Order = UInt32(-1);
+      BlockLogSize = NumThreads = Level = Dictionary = Order = (UInt32)(Int32)-1;
       Method.Empty();
       // Options.Empty();
       // EncryptionMethod.Empty();
     }
-    CFormatOptions() { ResetForLevelChange(); }
+    CFormatOptions()
+    {
+      // TimePrec = 0;
+      Reset_TimePrec();
+      ResetForLevelChange();
+    }
   };
 
   struct CInfo
@@ -72,6 +142,8 @@ namespace NCompression
     CBoolPair AltStreams;
     CBoolPair HardLinks;
     CBoolPair SymLinks;
+
+    CBoolPair PreserveATime;
 
     void Save() const;
     void Load();
@@ -114,9 +186,18 @@ struct CContextMenuInfo
   CBoolPair Cascaded;
   CBoolPair MenuIcons;
   CBoolPair ElimDup;
-
+  
   bool Flags_Def;
   UInt32 Flags;
+  UInt32 WriteZone;
+
+  /*
+  CContextMenuInfo():
+      Flags_Def(0),
+      WriteZone((UInt32)(Int32)-1),
+      Flags((UInt32)(Int32)-1)
+      {}
+  */
 
   void Save() const;
   void Load();

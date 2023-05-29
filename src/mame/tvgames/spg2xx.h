@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz, David Haywood
-#ifndef MAME_INCLUDES_SPG2XX_H
-#define MAME_INCLUDES_SPG2XX_H
+#ifndef MAME_TVGAMES_SPG2XX_H
+#define MAME_TVGAMES_SPG2XX_H
 
 #pragma once
 
@@ -358,4 +358,4 @@ private:
 
 
 
-#endif // MAME_INCLUDES_SPG2XX_H
+#endif // MAME_TVGAMES_SPG2XX_H

@@ -33,6 +33,9 @@ No known manual or schematic of the video board.
 #include "bus/rs232/rs232.h"
 //#include "machine/ay31015.h"
 
+
+namespace {
+
 #define I8255A_1_TAG    "ppi8255_1"
 #define I8255A_2_TAG    "ppi8255_2"
 #define I8251A_TAG      "usart"
@@ -59,7 +62,7 @@ public:
 	void isbc8010(machine_config &config);
 
 private:
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	[[maybe_unused]] uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER( usart_clock_tick );
 
@@ -277,6 +280,9 @@ ROM_END
 
 #define rom_isbc8010a rom_isbc8010
 #define rom_isbc8010b rom_isbc8010
+
+} // anonymous namespace
+
 
 /*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     CLASS           INIT        COMPANY  FULLNAME       FLAGS */
 COMP( 1975, isbc8010,  0,        0,      isbc8010,  isbc8010, isbc8010_state, empty_init, "Intel", "iSBC 80/10",  MACHINE_NO_SOUND_HW )

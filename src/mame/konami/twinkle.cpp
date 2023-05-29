@@ -282,6 +282,9 @@ Notes:
 
 #include "bmiidx.lh"
 
+
+namespace {
+
 class twinkle_state : public driver_device
 {
 public:
@@ -1353,7 +1356,7 @@ ROM_START( bmiidx )
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "gq863a04", 0, SHA1(25359f0eaff3749a6194a6b9d93f6aec67d94819) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "863hdda01", 0, SHA1(0b8dbf1c9caf4abf965dbc6e1a8e6329d48b1c90) )
 ROM_END
 
@@ -1369,7 +1372,7 @@ ROM_START( bmiidxa )
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "gq863a04", 0, SHA1(25359f0eaff3749a6194a6b9d93f6aec67d94819) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "863hdda01", 0, SHA1(0b8dbf1c9caf4abf965dbc6e1a8e6329d48b1c90) )
 ROM_END
 
@@ -1385,7 +1388,7 @@ ROM_START( bmiidx2 )
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "gc985a04", 0, SHA1(4306417f61eb1ea92894d288cdb7c385eb4610f2) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "985hdda01", 0, SHA1(a5b9ec9a5afa38f36af529d3aea5355ea7d022ca) )
 ROM_END
 
@@ -1401,7 +1404,7 @@ ROM_START( bmiidx3 )
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "gc992-jaa04", 0, SHA1(66d0b9ac793ff3fdddd0aa2aa5f2809d0c295944) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "992hdda01", 0, SHA1(c3936ae9368b23a3a6a876b668cac67a4c9d1287) )
 ROM_END
 
@@ -1417,7 +1420,7 @@ ROM_START( bmiidx3b )
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "gc992-jaa04", 0, SHA1(66d0b9ac793ff3fdddd0aa2aa5f2809d0c295944) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "992hdda01", 0, SHA1(c3936ae9368b23a3a6a876b668cac67a4c9d1287) )
 ROM_END
 
@@ -1433,7 +1436,7 @@ ROM_START( bmiidx3a )
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "gc992-jaa04", 0, SHA1(66d0b9ac793ff3fdddd0aa2aa5f2809d0c295944) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "992hdda01", 0, SHA1(c3936ae9368b23a3a6a876b668cac67a4c9d1287) )
 ROM_END
 
@@ -1449,7 +1452,7 @@ ROM_START( bmiidx4 )
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "a03jaa02", 0, SHA1(d6f01d666e8de285a02215f7ef987073e2b25019) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "a03jaa03", 0, SHA1(a9814c60d2ed98b8c4f6e11ea762518a1712e7b5) )
 ROM_END
 
@@ -1465,7 +1468,7 @@ ROM_START( bmiidx5 )
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "a17jaa02", 0, SHA1(cc24a4c3f5e7c77dbeee7db94c0cc8a330e2b51b) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "a17jaa03", 0, SHA1(f8c9b1af4ad15bb9cc37f0d234949a4342f1ca34) )
 ROM_END
 
@@ -1481,7 +1484,7 @@ ROM_START( bmiidx6 )
 	DISK_REGION( "cdrom1" ) // DVD
 	DISK_IMAGE_READONLY( "b4ujaa02", 0, SHA1(70c85f6df6f21b96c02e4eefc224593edcaf9e63) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "b4ujaa03", 0, SHA1(cfcbdfab157a864cbd4ac83247be5d62218f5b72) )
 ROM_END
 
@@ -1497,7 +1500,7 @@ ROM_START( bmiidx6a )
 	DISK_REGION( "cdrom1" ) // DVD
 	DISK_IMAGE_READONLY( "b4ujaa02", 0, SHA1(70c85f6df6f21b96c02e4eefc224593edcaf9e63) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "b4ujaa03", 0, SHA1(cfcbdfab157a864cbd4ac83247be5d62218f5b72) )
 ROM_END
 
@@ -1513,7 +1516,7 @@ ROM_START( bmiidx7 )
 	DISK_REGION( "cdrom1" ) // DVD
 	DISK_IMAGE_READONLY( "b44jaa02", 0, SHA1(a45726d99025f4d824ec143ef92957c76c08a13a) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "b44jaa03", 0, SHA1(1adb8e4874e26e8ccd9822e6f9dd12f6e6f8af05) )
 ROM_END
 
@@ -1529,7 +1532,7 @@ ROM_START( bmiidx7a )
 	DISK_REGION( "cdrom1" ) // DVD
 	DISK_IMAGE_READONLY( "b44jaa02", 0, SHA1(a45726d99025f4d824ec143ef92957c76c08a13a) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "b44jaa03", 0, SHA1(1adb8e4874e26e8ccd9822e6f9dd12f6e6f8af05) )
 ROM_END
 
@@ -1545,7 +1548,7 @@ ROM_START( bmiidx8 )
 	DISK_REGION( "cdrom1" ) // DVD
 	DISK_IMAGE_READONLY( "c44jaa02", 0, SHA1(f4c454a6360c507a122888d5bc3311eed5ce083b) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "c44jaa03", 0, SHA1(14df5039a4f5a648f1a2d12a35c16f56d0f9cd28) )
 ROM_END
 
@@ -1561,7 +1564,7 @@ ROM_START( bmiidxc )
 	DISK_REGION( "cdrom1" ) // video CD, same as bmiidx
 	DISK_IMAGE_READONLY( "gq863a04", 0, SHA1(25359f0eaff3749a6194a6b9d93f6aec67d94819) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "863hdda01", 0, SHA1(0b8dbf1c9caf4abf965dbc6e1a8e6329d48b1c90) )
 ROM_END
 
@@ -1577,7 +1580,7 @@ ROM_START( bmiidxca )
 	DISK_REGION( "cdrom1" ) // video CD, same as bmiidx
 	DISK_IMAGE_READONLY( "gq863a04", 0, SHA1(25359f0eaff3749a6194a6b9d93f6aec67d94819) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "863hdda01", 0, SHA1(0b8dbf1c9caf4abf965dbc6e1a8e6329d48b1c90) )
 ROM_END
 
@@ -1593,7 +1596,7 @@ ROM_START( bmiidxs )
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "gc983a04", 0, SHA1(73454f2acb5a1e6b9e21140eb7b93a4827072d63) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "983hdda01", 0, SHA1(bcbbf55acf8bebc5773ffc5769420a0129f4da57) )
 ROM_END
 
@@ -1609,7 +1612,7 @@ ROM_START( bmiidxsa )
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "gc983a04", 0, SHA1(73454f2acb5a1e6b9e21140eb7b93a4827072d63) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "983hdda01", 0, SHA1(bcbbf55acf8bebc5773ffc5769420a0129f4da57) )
 ROM_END
 
@@ -1625,9 +1628,12 @@ ROM_START( bmiidxc2 )
 	DISK_REGION( "cdrom1" ) // video CD, same as bmiidxs
 	DISK_IMAGE_READONLY( "gc983a04", 0, SHA1(73454f2acb5a1e6b9e21140eb7b93a4827072d63) )
 
-	DISK_REGION( "ata:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE_READONLY( "983hdda01", 0, SHA1(bcbbf55acf8bebc5773ffc5769420a0129f4da57) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAMEL( 1999, gq863,    0,       twinkle,  twinkle,  twinkle_state, empty_init, ROT0, "Konami", "Twinkle System", MACHINE_IS_BIOS_ROOT, layout_bmiidx )
 

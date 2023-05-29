@@ -98,7 +98,7 @@ class slmulti_device : public mbc_ram_device_base<mbc_dual_uniform_device_base>
 public:
 	slmulti_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	virtual image_init_result load(std::string &message) override ATTR_COLD;
+	virtual std::error_condition load(std::string &message) override ATTR_COLD;
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -185,13 +185,13 @@ slmulti_device::slmulti_device(
 }
 
 
-image_init_result slmulti_device::load(std::string &message)
+std::error_condition slmulti_device::load(std::string &message)
 {
 	// set up ROM and RAM
 	set_bank_bits_rom(10);
 	set_bank_bits_ram(4);
 	if (!check_rom(message) || !check_ram(message))
-		return image_init_result::FAIL;
+		return image_error::BADSOFTWARE;
 	cart_space()->install_view(0xa000, 0xbfff, m_view_ram);
 	install_rom();
 	install_ram(m_view_ram[0]);
@@ -199,13 +199,13 @@ image_init_result slmulti_device::load(std::string &message)
 	// install memory mapping control handlers
 	cart_space()->install_write_handler(
 			0x0000, 0x1fff,
-			write8smo_delegate(*this, FUNC(slmulti_device::enable_ram)));
+			emu::rw_delegate(*this, FUNC(slmulti_device::enable_ram)));
 	cart_space()->install_write_handler(
 			0x2000, 0x3fff,
-			write8smo_delegate(*this, FUNC(slmulti_device::bank_switch_rom_fine)));
+			emu::rw_delegate(*this, FUNC(slmulti_device::bank_switch_rom_fine)));
 	cart_space()->install_write_handler(
 			0x4000, 0x5fff,
-			write8smo_delegate(*this, FUNC(slmulti_device::bank_switch_ram)));
+			emu::rw_delegate(*this, FUNC(slmulti_device::bank_switch_ram)));
 
 	// configuration mode and MBC5 mode partially overlay the normal handlers
 	cart_space()->install_view(
@@ -215,21 +215,21 @@ image_init_result slmulti_device::load(std::string &message)
 	// this is for MBC5 games
 	m_view_ctrl[0].install_write_handler(
 			0x3000, 0x3fff,
-			write8smo_delegate(*this, FUNC(slmulti_device::bank_switch_rom_coarse)));
+			emu::rw_delegate(*this, FUNC(slmulti_device::bank_switch_rom_coarse)));
 
 	// install configuration handlers over the top
 	m_view_ctrl[1].install_write_handler(
 			0x5000, 0x5fff,
-			write8smo_delegate(*this, FUNC(slmulti_device::set_config_cmd)));
+			emu::rw_delegate(*this, FUNC(slmulti_device::set_config_cmd)));
 	m_view_ctrl[1].install_write_handler(
 			0x7000, 0x7fff,
-			write8smo_delegate(*this, FUNC(slmulti_device::do_config_cmd)));
+			emu::rw_delegate(*this, FUNC(slmulti_device::do_config_cmd)));
 
 	// do this here - the menu program apparently does a system reset to get into DMG mode
 	m_view_ctrl.select(1);
 
 	// all good
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

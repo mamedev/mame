@@ -6,9 +6,9 @@
 //
 //============================================================
 
-#include <bgfx/bgfx.h>
-
 #include "depthreader.h"
+
+#include <bgfx/bgfx.h>
 
 const depth_reader::string_to_enum depth_reader::FUNCTION_NAMES[depth_reader::FUNCTION_COUNT] = {
 	{ "never",      BGFX_STATE_DEPTH_TEST_NEVER },
@@ -21,12 +21,12 @@ const depth_reader::string_to_enum depth_reader::FUNCTION_NAMES[depth_reader::FU
 	{ "always",     BGFX_STATE_DEPTH_TEST_ALWAYS }
 };
 
-uint64_t depth_reader::read_from_value(const Value& value, std::string prefix)
+uint64_t depth_reader::read_from_value(const Value& value, const std::string &prefix)
 {
 	uint64_t write_enable = 0;
 	if (value.HasMember("writeenable"))
 	{
-		if (!READER_CHECK(value["writeenable"].IsBool(), (prefix + "Value 'writeenable' must be a boolean\n").c_str())) return 0;
+		if (!READER_CHECK(value["writeenable"].IsBool(), "%sValue 'writeenable' must be a boolean\n", prefix)) return 0;
 		write_enable = value["writeenable"].GetBool() ? BGFX_STATE_WRITE_Z : 0;
 	}
 

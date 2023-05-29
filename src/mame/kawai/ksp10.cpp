@@ -9,6 +9,9 @@
 #include "emu.h"
 #include "cpu/tlcs900/tmp96c141.h"
 
+
+namespace {
+
 class kawai_ksp10_state : public driver_device
 {
 public:
@@ -50,5 +53,8 @@ ROM_START(ksp10)
 	ROM_REGION16_LE(0x40000, "samples", 0)
 	ROM_LOAD("u21_hp042a_e7dp_mbm27c2048.bin", 0x00000, 0x40000, CRC(e21b1141) SHA1(181c2beed18da2efa2f0e45cb3233adf6b932127))
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(199?, ksp10, 0, 0, ksp10, ksp10, kawai_ksp10_state, empty_init, "Kawai Musical Instruments Manufacturing", "KSP10 Digital Piano", MACHINE_IS_SKELETON)

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_HX20_H
-#define MAME_INCLUDES_HX20_H
+#ifndef MAME_EPSON_HX20_H
+#define MAME_EPSON_HX20_H
 
 #pragma once
 
@@ -124,4 +124,4 @@ private:
 	void cm6127_mem(address_map &map);
 };
 
-#endif // MAME_INCLUDES_HX20_H
+#endif // MAME_EPSON_HX20_H

@@ -33,6 +33,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class gaminator_state : public driver_device
 {
 public:
@@ -1281,6 +1283,7 @@ void gaminator_state::init_gaminator()
 {
 }
 
+} // anonymous namespace
 
 
 #define GAME_FLAGS MACHINE_NOT_WORKING|MACHINE_NO_SOUND

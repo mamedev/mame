@@ -30,6 +30,9 @@ At the moment it simply outputs all the speech strings, one after the other, the
 #include "sound/dac.h"
 #include "speaker.h"
 
+
+namespace {
+
 class instantm_state : public driver_device
 {
 public:
@@ -152,6 +155,8 @@ ROM_START( instantm )
 	ROM_REGION( 0x10000, "subcpu", 0 )
 	ROM_LOAD( "speechus10.u20", 0x00000, 0x10000, CRC(1797bcee) SHA1(c6fb7fbe8592dfae3ba44b49b5ce447206515b77) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 199?, instantm, 0, instantm, instantm, instantm_state, empty_init, ROT0, "Capcom / Polaroid", "Polaroid Instant Memories", MACHINE_IS_SKELETON_MECHANICAL )

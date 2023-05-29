@@ -13,6 +13,7 @@
 #include "bitmap.h"
 #include "cdrom.h"
 #include "corefile.h"
+#include "coretmpl.h"
 #include "hashing.h"
 #include "md5.h"
 #include "path.h"
@@ -69,10 +70,12 @@ const int MODE_GDI = 2;
 #define COMMAND_CREATE_RAW "createraw"
 #define COMMAND_CREATE_HD "createhd"
 #define COMMAND_CREATE_CD "createcd"
+#define COMMAND_CREATE_DVD "createdvd"
 #define COMMAND_CREATE_LD "createld"
 #define COMMAND_EXTRACT_RAW "extractraw"
 #define COMMAND_EXTRACT_HD "extracthd"
 #define COMMAND_EXTRACT_CD "extractcd"
+#define COMMAND_EXTRACT_DVD "extractdvd"
 #define COMMAND_EXTRACT_LD "extractld"
 #define COMMAND_COPY "copy"
 #define COMMAND_ADD_METADATA "addmeta"
@@ -123,10 +126,12 @@ static void do_verify(parameters_map &params);
 static void do_create_raw(parameters_map &params);
 static void do_create_hd(parameters_map &params);
 static void do_create_cd(parameters_map &params);
+static void do_create_dvd(parameters_map &params);
 static void do_create_ld(parameters_map &params);
 static void do_copy(parameters_map &params);
 static void do_extract_raw(parameters_map &params);
 static void do_extract_cd(parameters_map &params);
+static void do_extract_dvd(parameters_map &params);
 static void do_extract_ld(parameters_map &params);
 static void do_add_metadata(parameters_map &params);
 static void do_del_metadata(parameters_map &params);
@@ -517,8 +522,8 @@ public:
 				uint32_t samples = (uint64_t(m_info.rate) * uint64_t(effframe + 1) * uint64_t(1000000) + m_info.fps_times_1million - 1) / uint64_t(m_info.fps_times_1million) - first_sample;
 
 				// loop over channels and read the samples
-				int channels = unsigned((std::min<std::size_t>)(m_info.channels, std::size(m_audio)));
-				int16_t *samplesptr[std::size(m_audio)];
+				int channels = unsigned(std::min<std::size_t>(m_info.channels, std::size(m_audio)));
+				EQUIVALENT_ARRAY(m_audio, int16_t *) samplesptr;
 				for (int chnum = 0; chnum < channels; chnum++)
 				{
 					// read the sound samples
@@ -698,6 +703,16 @@ static const command_description s_commands[] =
 			OPTION_NUMPROCESSORS
 		}
 	},
+	{ COMMAND_CREATE_DVD, do_create_dvd, ": create a DVD CHD from the input file",
+		{
+			REQUIRED OPTION_OUTPUT,
+			OPTION_OUTPUT_PARENT,
+			OPTION_OUTPUT_FORCE,
+			REQUIRED OPTION_INPUT,
+			OPTION_COMPRESSION,
+			OPTION_NUMPROCESSORS
+		}
+	},
 
 	{ COMMAND_CREATE_LD, do_create_ld, ": create a laserdisc CHD from the input file",
 		{
@@ -740,6 +755,16 @@ static const command_description s_commands[] =
 	},
 
 	{ COMMAND_EXTRACT_CD, do_extract_cd, ": extract CD file from a CHD input file",
+		{
+			REQUIRED OPTION_OUTPUT,
+			OPTION_OUTPUT_BIN,
+			OPTION_OUTPUT_FORCE,
+			REQUIRED OPTION_INPUT,
+			OPTION_INPUT_PARENT,
+		}
+	},
+
+	{ COMMAND_EXTRACT_DVD, do_extract_dvd, ": extract DVD file from a CHD input file",
 		{
 			REQUIRED OPTION_OUTPUT,
 			OPTION_OUTPUT_BIN,
@@ -2064,6 +2089,88 @@ static void do_create_cd(parameters_map &params)
 
 
 //-------------------------------------------------
+//  do_create_dvd - create a new compressed dvd
+//  image from a raw file
+//-------------------------------------------------
+
+static void do_create_dvd(parameters_map &params)
+{
+	// process input file
+	util::core_file::ptr input_file;
+	auto input_file_str = params.find(OPTION_INPUT);
+	if (input_file_str != params.end())
+	{
+		std::error_condition const filerr = util::core_file::open(*input_file_str->second, OPEN_FLAG_READ, input_file);
+		if (filerr)
+			report_error(1, "Unable to open file (%s): %s", *input_file_str->second, filerr.message());
+	}
+
+	// process output CHD
+	chd_file output_parent;
+	std::string *output_chd_str = parse_output_chd_parameters(params, output_parent);
+
+	// process input start/end
+	uint64_t filesize = 0;
+	input_file->length(filesize); // FIXME: check error return
+
+	// process compression
+	chd_codec_type compression[4];
+	memcpy(compression, s_default_hd_compression, sizeof(compression)); // No reason to be different than HD for compression
+	if (!input_file)
+		compression[0] = compression[1] = compression[2] = compression[3] = CHD_CODEC_NONE;
+	parse_compression(params, compression);
+
+	// process numprocessors
+	parse_numprocessors(params);
+
+	// validate the size
+	if (filesize % 2048 != 0)
+		report_error(1, "Data size is not divisible by 2048");
+
+	uint32_t totalsectors = filesize / 2048;
+
+	// print some info
+	printf("Output CHD:   %s\n", output_chd_str->c_str());
+	if (output_parent.opened())
+		printf("Parent CHD:   %s\n", params.find(OPTION_OUTPUT_PARENT)->second->c_str());
+	printf("Input file:   %s\n", input_file_str->second->c_str());
+	printf("Compression:  %s\n", compression_string(compression).c_str());
+	printf("Logical size: %s\n", big_int_string(uint64_t(totalsectors) * 2048).c_str());
+
+	// catch errors so we can close & delete the output file
+	try
+	{
+		// create the new dvd
+		std::unique_ptr<chd_file_compressor> chd;
+		chd.reset(new chd_rawfile_compressor(*input_file, 0, filesize));
+		std::error_condition err;
+		if (output_parent.opened())
+			err = chd->create(output_chd_str->c_str(), uint64_t(totalsectors) * 2048, 2048, compression, output_parent);
+		else
+			err = chd->create(output_chd_str->c_str(), uint64_t(totalsectors) * 2048, 2048, 2048, compression);
+		if (err)
+			report_error(1, "Error creating CHD file (%s): %s", output_chd_str, err.message());
+
+		// add the standard dvd type tag
+		err = chd->write_metadata(DVD_METADATA_TAG, 0, "");
+		if (err)
+			report_error(1, "Error adding dvd metadata: %s", err.message());
+
+		// compress it generically
+		compress_common(*chd);
+	}
+	catch (...)
+	{
+		// delete the output file
+		auto output_chd_str = params.find(OPTION_OUTPUT);
+		if (output_chd_str != params.end())
+			osd_file::remove(*output_chd_str->second);
+		throw;
+	}
+}
+
+
+//-------------------------------------------------
 //  do_create_ld - create a new A/V file from an
 //  input AVI file and metadata
 //-------------------------------------------------
@@ -2428,8 +2535,7 @@ static void do_extract_cd(parameters_map &params)
 	int chop = default_name.find_last_of('.');
 	if (chop != -1)
 		default_name.erase(chop, default_name.size());
-	char basename[128];
-	strncpy(basename, default_name.c_str(), 127);
+	std::string basename = default_name;
 	default_name.append(".bin");
 	std::string *output_bin_file_str;
 	if (output_bin_file_fnd == params.end())
@@ -2526,17 +2632,15 @@ static void do_extract_cd(parameters_map &params)
 		std::vector<uint8_t> buffer;
 		for (int tracknum = 0; tracknum < toc.numtrks; tracknum++)
 		{
-			std::string trackbin_name(basename);
+			std::string trackbin_name = basename;
 
 			if (mode == MODE_GDI)
 			{
-				char temp[11];
-				sprintf(temp, "%02d", tracknum+1);
-				trackbin_name.append(temp);
+				trackbin_name += util::string_format("%02d", tracknum+1);
 				if (toc.tracks[tracknum].trktype == cdrom_file::CD_TRACK_AUDIO)
-					trackbin_name.append(".raw");
+					trackbin_name += ".raw";
 				else
-					trackbin_name.append(".bin");
+					trackbin_name += ".bin";
 
 				output_bin_file.reset();
 
@@ -2631,6 +2735,87 @@ static void do_extract_cd(parameters_map &params)
 		throw;
 	}
 }
+
+
+//-------------------------------------------------
+//  do_extract_dvd - extract a DVD image from a
+//  CHD image, currently identical to extractraw
+//-------------------------------------------------
+
+static void do_extract_dvd(parameters_map &params)
+{
+	// parse out input files
+	chd_file input_parent_chd;
+	chd_file input_chd;
+	parse_input_chd_parameters(params, input_chd, input_parent_chd);
+
+	// parse out input start/end
+	uint64_t input_start;
+	uint64_t input_end;
+	parse_input_start_end(params, input_chd.logical_bytes(), input_chd.hunk_bytes(), input_chd.hunk_bytes(), input_start, input_end);
+
+	// verify output file doesn't exist
+	auto output_file_str = params.find(OPTION_OUTPUT);
+	if (output_file_str != params.end())
+		check_existing_output_file(params, output_file_str->second->c_str());
+
+	// print some info
+	printf("Output File:  %s\n", output_file_str->second->c_str());
+	printf("Input CHD:    %s\n", params.find(OPTION_INPUT)->second->c_str());
+	if (input_start != 0 || input_end != input_chd.logical_bytes())
+	{
+		printf("Input start:  %s\n", big_int_string(input_start).c_str());
+		printf("Input length: %s\n", big_int_string(input_end - input_start).c_str());
+	}
+
+	// catch errors so we can close & delete the output file
+	util::core_file::ptr output_file;
+	try
+	{
+		// process output file
+		std::error_condition const filerr = util::core_file::open(*output_file_str->second, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_file);
+		if (filerr)
+			report_error(1, "Unable to open file (%s): %s", *output_file_str->second, filerr.message());
+
+		// copy all data
+		std::vector<uint8_t> buffer((TEMP_BUFFER_SIZE / input_chd.hunk_bytes()) * input_chd.hunk_bytes());
+		for (uint64_t offset = input_start; offset < input_end; )
+		{
+			progress(false, "Extracting, %.1f%% complete... \r", 100.0 * double(offset - input_start) / double(input_end - input_start));
+
+			// determine how much to read
+			uint32_t bytes_to_read = (std::min<uint64_t>)(buffer.size(), input_end - offset);
+			std::error_condition err = input_chd.read_bytes(offset, &buffer[0], bytes_to_read);
+			if (err)
+				report_error(1, "Error reading CHD file (%s): %s", *params.find(OPTION_INPUT)->second, err.message());
+
+			// write to the output
+			size_t count;
+			std::error_condition const writerr = output_file->write(&buffer[0], bytes_to_read, count);
+			if (writerr || (count != bytes_to_read))
+				report_error(1, "Error writing to file; check disk space (%s)", *output_file_str->second);
+
+			// advance
+			offset += bytes_to_read;
+		}
+
+		// finish up
+		output_file.reset();
+		printf("Extraction complete                                    \n");
+	}
+	catch (...)
+	{
+		// delete the output file
+		if (output_file != nullptr)
+		{
+			output_file.reset();
+			osd_file::remove(*output_file_str->second);
+		}
+		throw;
+	}
+}
+
+
 
 
 //-------------------------------------------------

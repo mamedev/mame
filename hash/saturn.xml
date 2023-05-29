@@ -29129,7 +29129,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying NBA Jam Tournament Edition (T-8102G)... -->
 	<software name="nbajamtej" cloneof="nbajamte" supported="no">
-		<description>NBA Jam - Tournament Edition (Japan)</description>
+		<description>NBA Jam T.E. - Tournament Edition (Japan)</description>
 		<year>1995</year>
 		<publisher>Acclaim Japan</publisher>
 		<info name="serial" value="T-8102G"/>
@@ -32413,7 +32413,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying NBA Jam Tournament Edition (E)... -->
 	<software name="nbajamte" supported="no">
-		<description>NBA Jam - Tournament Edition (Euro)</description>
+		<description>NBA Jam T.E. - Tournament Edition (Europe)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8102H-50"/>
@@ -36693,7 +36693,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying nbajamte... -->
 	<software name="nbajamteu" cloneof="nbajamte" supported="no">
-		<description>NBA Jam - Tournament Edition (USA)</description>
+		<description>NBA Jam T.E. - Tournament Edition (USA)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8102H"/>

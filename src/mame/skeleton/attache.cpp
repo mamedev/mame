@@ -88,6 +88,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class attache_state : public driver_device
 {
 public:
@@ -142,7 +144,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(hreq_w);
 	DECLARE_WRITE_LINE_MEMBER(eop_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_dack_w);
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(fdc_dack_w);
 
 protected:
 	// PIO port B operation select
@@ -275,7 +277,7 @@ private:
 
 	virtual void machine_reset() override;
 
-	void attache816_io(address_map &map);
+	[[maybe_unused]] void attache816_io(address_map &map);
 	void attache_x86_io(address_map &map);
 	void attache_x86_map(address_map &map);
 
@@ -1340,6 +1342,9 @@ ROM_START( attache816 )
 	ROM_LOAD16_BYTE("u9.bin",  0x0001, 0x1000, CRC(cc4cd938) SHA1(6a1d316628641f9b4de5c8c46f9430ef5bd6120f) )
 
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME        PARENT   COMPAT  MACHINE     INPUT    CLASS             INIT        COMPANY   FULLNAME               FLAGS
 COMP( 1982, attache,    0,       0,      attache,    attache, attache_state,    empty_init, "Otrona", "Attach\xC3\xA9",      MACHINE_IMPERFECT_GRAPHICS )

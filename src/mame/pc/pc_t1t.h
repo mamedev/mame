@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#ifndef MAME_VIDEO_PC_T1T_H
-#define MAME_VIDEO_PC_T1T_H
+#ifndef MAME_PC_PC_T1T_H
+#define MAME_PC_PC_T1T_H
 
 #pragma once
 
@@ -151,4 +151,4 @@ private:
 
 DECLARE_DEVICE_TYPE(PCVIDEO_PCJR, pcvideo_pcjr_device)
 
-#endif // MAME_VIDEO_PC_T1T_H
+#endif // MAME_PC_PC_T1T_H

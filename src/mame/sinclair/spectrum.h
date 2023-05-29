@@ -94,8 +94,8 @@ protected:
 	virtual void spectrum_128_update_memory() { }
 	virtual void ts2068_update_memory() { }
 
-	TIMER_CALLBACK_MEMBER(irq_on);
-	TIMER_CALLBACK_MEMBER(irq_off);
+	virtual TIMER_CALLBACK_MEMBER(irq_on);
+	virtual TIMER_CALLBACK_MEMBER(irq_off);
 	TIMER_CALLBACK_MEMBER(finish_screen_update);
 
 	emu_timer *m_irq_on_timer;

@@ -5,8 +5,8 @@
     Sega 16-bit common hardware
 
 ***************************************************************************/
-#ifndef MAME_VIDEO_SEGAIC16_H
-#define MAME_VIDEO_SEGAIC16_H
+#ifndef MAME_SEGA_SEGAIC16_H
+#define MAME_SEGA_SEGAIC16_H
 
 #pragma once
 
@@ -69,12 +69,9 @@ public:
 	static constexpr unsigned TILEMAP_TEXT       = 2;
 
 
-
 	/* rotation systems */
 	static constexpr unsigned MAX_ROTATE         = 1;
-
 	static constexpr unsigned ROTATE_YBOARD      = 0;
-
 
 
 	struct tilemap_callback_info
@@ -187,4 +184,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SEGAIC16VID, segaic16_video_device)
 
-#endif // MAME_VIDEO_SEGAIC16_H
+#endif // MAME_SEGA_SEGAIC16_H

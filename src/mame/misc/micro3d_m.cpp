@@ -39,20 +39,10 @@ WRITE_LINE_MEMBER(micro3d_state::duart_irq_handler)
 
 WRITE_LINE_MEMBER(micro3d_state::duart_txb)
 {
-	m_m68681_tx0 = state;
-	m_audiocpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);
-	// TODO: next line should be behind a timer callback which lasts one audiocpu clock cycle
-	m_audiocpu->set_input_line(MCS51_RX_LINE, CLEAR_LINE);
-}
-
-uint8_t micro3d_state::data_to_i8031()
-{
-	return m_m68681_tx0;
-}
-
-void micro3d_state::data_from_i8031(uint8_t data)
-{
-	m_duart->rx_b_w(data);
+	if (state)
+		m_sound_port_latch[3] |= 1;
+	else
+		m_sound_port_latch[3] &= ~1;
 }
 
 /*
@@ -463,8 +453,10 @@ void micro3d_state::micro3d_sound_p1_w(uint8_t data)
 
 void micro3d_state::micro3d_sound_p3_w(uint8_t data)
 {
-	m_sound_port_latch[3] = data;
+	// preserve RXD input
+	m_sound_port_latch[3] = (m_sound_port_latch[3] & 1) | (data & ~1);
 
+	m_duart->rx_b_w(BIT(data, 1));
 	m_upd7759->set_rom_bank(BIT(data, 2));
 	m_upd7759->reset_w(!BIT(data, 4));
 }

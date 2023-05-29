@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_MACHINE_GENERALPLUS_GPL16250_H
-#define MAME_MACHINE_GENERALPLUS_GPL16250_H
+#ifndef MAME_TVGAMES_GENERALPLUS_GPL16250_M_H
+#define MAME_TVGAMES_GENERALPLUS_GPL16250_M_H
 
 #pragma once
 
@@ -39,4 +39,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(FULL_MEMORY, full_memory_device)
 
-#endif  // MAME_MACHINE_GENERALPLUS_GPL16250_H
+#endif  // MAME_TVGAMES_GENERALPLUS_GPL16250_M_H

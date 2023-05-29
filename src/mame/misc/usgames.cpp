@@ -164,7 +164,7 @@ void usgames_state::lamps2_w(uint8_t data)
 void usgames_state::usgames_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("nvram");
-	map(0x2000, 0x2000).portr("DSW");
+	map(0x2000, 0x2000).portr("INPUTS2");
 	map(0x2010, 0x2010).portr("INPUTS");
 	map(0x2020, 0x2020).w(FUNC(usgames_state::lamps1_w));
 	map(0x2030, 0x2030).w(FUNC(usgames_state::lamps2_w));
@@ -185,7 +185,7 @@ void usgames_state::usg185_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("nvram");
 	map(0x2000, 0x2001).w("aysnd", FUNC(ay8912_device::address_data_w));
-	map(0x2400, 0x2400).portr("DSW");
+	map(0x2400, 0x2400).portr("INPUTS2");
 	map(0x2410, 0x2410).portr("INPUTS");
 	map(0x2420, 0x2420).w(FUNC(usgames_state::lamps1_w));
 	map(0x2430, 0x2430).w(FUNC(usgames_state::lamps2_w));
@@ -216,7 +216,7 @@ static INPUT_PORTS_START( usg32 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW")
+	PORT_START("INPUTS2")
 	PORT_DIPNAME( 0x01, 0x01, "Service Keyboard Attached?" )    // Not actually a DIP, when keyboard is plugged in, this goes low
 	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
@@ -224,12 +224,8 @@ static INPUT_PORTS_START( usg32 )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Play") PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Cancel") PORT_CODE(KEYCODE_M)
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -293,7 +289,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( usg83 )
 	PORT_INCLUDE( usg32 )
 
-	PORT_MODIFY("DSW")
+	PORT_MODIFY("INPUTS2")
 	PORT_DIPNAME( 0x04, 0x04, "Test_Switch" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -334,7 +330,7 @@ void usgames_state::usg32(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	AY8912(config, "aysnd", 2000000).add_route(ALL_OUTPUTS, "mono", 0.30);
+	AY8912(config, "aysnd", 18_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "mono", 0.30); // divider not verified
 }
 
 void usgames_state::usg185(machine_config &config)
@@ -460,6 +456,21 @@ ROM_START( usgames ) // Version 25.4x
 ROM_END
 
 
+ROM_START( usg251 ) // Version 25.1 - all ROMs dumped matched the printed checksum
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "bb_rom0.251_4e36_u12.u12", 0x08000, 0x08000, CRC(b9c6e9c6) SHA1(a8772bc8bd167b97ff6d31e810eb5189978389ce) ) // labeled as: (C) USG '86-'91  BB_ROM0.251  4E36  U12
+	// for the banked region
+	ROM_LOAD( "gamerom_1-a_e9fd_u18.u18", 0x10000, 0x10000, CRC(8feabf59) SHA1(cd18e17018a78d66634abd0bcf919b48dcd65702) ) // labeled as: (C) USG '86-'91  GAMEROM 1-A  E9FD  U18
+	ROM_LOAD( "gamerom_2-a_c61a_u28.u28", 0x20000, 0x10000, CRC(eb225ef4) SHA1(16eb165def8cf80743b766d71a8a95251d15fa03) ) // labeled as: (C) USG '86-'91  GAMEROM 2-A  C61A  U28
+	ROM_LOAD( "gamerom_3-a_24ba_u35.u35", 0x30000, 0x10000, CRC(9542295b) SHA1(56dd7b8fd581779656cb71cc42dbb9f77fb303f4) ) // labeled as: (C) USG '86-'91  GAMEROM 3-A  24BA  U35
+	ROM_LOAD( "gamerom_4-a_447e_u36.u36", 0x40000, 0x10000, CRC(b6d007be) SHA1(ec2afe983fd925d9f4602f47ddadd117bcc74972) ) // labeled as: (C) USG '86-'91  GAMEROM 4-A  447E  U36
+
+	ROM_REGION( 0x208, "plds", ROMREGION_ERASEFF )
+	ROM_LOAD( "bb_sec2.u19",  0x000, 0x104, NO_DUMP ) // protected - PAL16L8
+	ROM_LOAD( "bb_sec1.u46",  0x104, 0x104, NO_DUMP ) // surface scratched & protected - controls how ROMs are loaded to prevent ROM swaps / upgrades?
+ROM_END
+
+
 ROM_START( usg211c ) // Version 21.1C - all ROMs dumped matched the printed checksum
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "sdrom0c.211_4e17_u12.u12", 0x08000, 0x08000, CRC(54986073) SHA1(9196e527a73d551df482e87ee3e8d95332528304) ) // labeled as: (C) USG '86-'91  SDROM0C.211  4E71  U12
@@ -470,7 +481,7 @@ ROM_START( usg211c ) // Version 21.1C - all ROMs dumped matched the printed chec
 	ROM_LOAD( "gamerom_4-a_447e_u36.u36", 0x40000, 0x10000, CRC(b6d007be) SHA1(ec2afe983fd925d9f4602f47ddadd117bcc74972) ) // labeled as: (C) USG '86-'91  GAMEROM 4-A  447E  U36
 
 	ROM_REGION( 0x208, "plds", ROMREGION_ERASEFF )
-	ROM_LOAD( "pal16l8.u19",  0x000, 0x104, NO_DUMP ) // protected
+	ROM_LOAD( "bb_sec2.u19",  0x000, 0x104, NO_DUMP ) // protected
 	ROM_LOAD( "bb_sec1.u46",  0x104, 0x104, NO_DUMP ) // surface scratched & protected - controls how ROMs are loaded to prevent ROM swaps / upgrades?
 ROM_END
 
@@ -509,12 +520,13 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1987, usg32,    0,        usg32,  usg32, usgames_state, empty_init, ROT0, "U.S. Games", "Super Duper Casino (California V3.2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, superten, 0,        usg32,  usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Super Ten V8.3",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1988, usg83x,   superten, usg32,  usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Super Ten V8.3X",                      MACHINE_SUPPORTS_SAVE ) // "Experimental" version??
-GAME( 1988, usg82,    superten, usg32,  usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Super Ten V8.2" ,                      MACHINE_SUPPORTS_SAVE )
-GAME( 1992, usgames,  0,        usg185, usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Games V25.4X",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1991, usg211c,  usgames,  usg185, usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Games V21.1C",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1991, usg187c,  usgames,  usg185, usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Games V18.7C",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1990, usg185,   usgames,  usg185, usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Games V18.5",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1989, usg182,   usgames,  usg185, usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Games V18.2",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1987, usg32,    0,        usg32,  usg32, usgames_state, empty_init, ROT0, "U.S. Games, Inc.", "Super Duper Casino (California V3.2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, superten, 0,        usg32,  usg83, usgames_state, empty_init, ROT0, "U.S. Games, Inc.", "Super Ten V8.3",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1988, usg83x,   superten, usg32,  usg83, usgames_state, empty_init, ROT0, "U.S. Games, Inc.", "Super Ten V8.3X",                      MACHINE_SUPPORTS_SAVE ) // "Experimental" version??
+GAME( 1988, usg82,    superten, usg32,  usg83, usgames_state, empty_init, ROT0, "U.S. Games, Inc.", "Super Ten V8.2" ,                      MACHINE_SUPPORTS_SAVE )
+GAME( 1992, usgames,  0,        usg185, usg83, usgames_state, empty_init, ROT0, "U.S. Games, Inc.", "Games V25.4X",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1991, usg251,   usgames,  usg185, usg83, usgames_state, empty_init, ROT0, "U.S. Games, Inc.", "Games V25.1",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1991, usg211c,  usgames,  usg185, usg83, usgames_state, empty_init, ROT0, "U.S. Games, Inc.", "Games V21.1C",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1991, usg187c,  usgames,  usg185, usg83, usgames_state, empty_init, ROT0, "U.S. Games, Inc.", "Games V18.7C",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1990, usg185,   usgames,  usg185, usg83, usgames_state, empty_init, ROT0, "U.S. Games, Inc.", "Games V18.5",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, usg182,   usgames,  usg185, usg83, usgames_state, empty_init, ROT0, "U.S. Games, Inc.", "Games V18.2",                          MACHINE_SUPPORTS_SAVE )

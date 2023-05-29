@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_MIKRO80_H
-#define MAME_INCLUDES_MIKRO80_H
+#ifndef MAME_USSR_MIKRO80_H
+#define MAME_USSR_MIKRO80_H
 
 #pragma once
 
@@ -72,4 +72,4 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
-#endif // MAME_INCLUDES_MIKRO80_H
+#endif // MAME_USSR_MIKRO80_H

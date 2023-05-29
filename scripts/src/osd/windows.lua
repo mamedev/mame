@@ -24,7 +24,7 @@ function maintargetosdoptions(_target,_subtarget)
 
 	if _OPTIONS["USE_SDL"] == "1" then
 		links {
-			"SDL.dll",
+			"SDL2.dll",
 		}
 	end
 
@@ -132,19 +132,16 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/render/d3d/d3dhlsl.h",
 		MAME_DIR .. "src/osd/modules/render/drawd3d.cpp",
 		MAME_DIR .. "src/osd/modules/render/drawd3d.h",
-		MAME_DIR .. "src/osd/modules/render/drawgdi.cpp",
-		MAME_DIR .. "src/osd/modules/render/drawgdi.h",
-		MAME_DIR .. "src/osd/modules/render/drawnone.cpp",
-		MAME_DIR .. "src/osd/modules/render/drawnone.h",
 		MAME_DIR .. "src/osd/windows/video.cpp",
 		MAME_DIR .. "src/osd/windows/video.h",
 		MAME_DIR .. "src/osd/windows/window.cpp",
 		MAME_DIR .. "src/osd/windows/window.h",
 		MAME_DIR .. "src/osd/modules/osdwindow.cpp",
 		MAME_DIR .. "src/osd/modules/osdwindow.h",
-		MAME_DIR .. "src/osd/windows/winmenu.cpp",
 		MAME_DIR .. "src/osd/windows/winmain.cpp",
 		MAME_DIR .. "src/osd/windows/winmain.h",
+		MAME_DIR .. "src/osd/windows/winopts.cpp",
+		MAME_DIR .. "src/osd/windows/winopts.h",
 		MAME_DIR .. "src/osd/osdepend.h",
 		MAME_DIR .. "src/osd/modules/debugger/win/consolewininfo.cpp",
 		MAME_DIR .. "src/osd/modules/debugger/win/consolewininfo.h",

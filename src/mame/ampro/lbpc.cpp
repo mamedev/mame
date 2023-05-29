@@ -33,6 +33,9 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
+
+namespace {
+
 class lbpc_state : public driver_device
 {
 public:
@@ -410,6 +413,8 @@ ROM_START(lbpc)
 	// "Firmware Version 1.0H  03/08/89"
 	ROM_LOAD("lbpc-bio.rom", 0x0000, 0x8000, CRC(47bddf8b) SHA1(8a04fe34502f9f3bfe1e233762bbd5bbdd1c455d))
 ROM_END
+
+} // anonymous namespace
 
 
 COMP(1989, lbpc, 0, 0, lbpc, lbpc, lbpc_state, empty_init, "Ampro Computers", "Little Board/PC", MACHINE_NOT_WORKING)

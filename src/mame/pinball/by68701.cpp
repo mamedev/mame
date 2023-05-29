@@ -17,6 +17,9 @@ ToDo:
 #include "emu.h"
 #include "cpu/m6800/m6801.h"
 
+
+namespace {
+
 class by68701_state : public driver_device
 {
 public:
@@ -144,6 +147,8 @@ ROM_START(eballdlxp4)
 	ROM_RELOAD(0xe800, 0x0800)
 	ROM_LOAD("838-16_5.532", 0xf000, 0x1000, CRC(63d92025) SHA1(2f8e8435326a39064b99b9971b0d8944586571fb))
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1981, flashgdnp1, flashgdn, by68701, by68701, by68701_state, init_by68701, ROT0, "Bally", "Flash Gordon (prototype rev. 1)",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

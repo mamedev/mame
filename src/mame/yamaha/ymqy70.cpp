@@ -12,6 +12,9 @@
 
 #include "speaker.h"
 
+
+namespace {
+
 static INPUT_PORTS_START(qy70)
 	PORT_START("SWA")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Record")    PORT_CODE(KEYCODE_Z)
@@ -207,5 +210,8 @@ ROM_START(qy70)
 	ROM_LOAD("t6963c_0101.bin", 0x000, 0x400, CRC(547d118b) SHA1(0dd3e3acd3d47e6ece644c98c390fc86587373e9))
 	// This t6963c_0101 internal CG ROM is similar to lm24014w_0101.bin which may be used as a replacement
 ROM_END
+
+} // anonymous namespace
+
 
 CONS(1997, qy70, 0, 0, qy70, qy70, qy70_state, empty_init, "Yamaha", "QY70 Music Sequencer", MACHINE_NOT_WORKING)

@@ -35,6 +35,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 // System clock definitions, from the MB-6890 servce manual, p.48:
 
 #define MASTER_CLOCK ( 32.256_MHz_XTAL )   // Master clock crystal (X1) frequency, 32.256 MHz.  "fx" in the manual.
@@ -84,6 +87,7 @@ public:
 		, m_ym2203(*this, "ym2203")
 		, m_acia(*this, "acia")
 		, m_palette(*this, "palette")
+		, m_rom_view(*this, "rom")
 		, m_banka(*this, "banka")
 		, m_bankc(*this, "bankc")
 		, m_banke(*this, "banke")
@@ -110,8 +114,8 @@ private:
 	void vres_reg_w(u8 data);
 	uint8_t vram_r(offs_t offset);
 	void vram_w(offs_t offset, u8 data);
-	uint8_t psg_latch_r();
-	void psg_latch_w(u8 data);
+	[[maybe_unused]] uint8_t psg_latch_r();
+	[[maybe_unused]] void psg_latch_w(u8 data);
 	uint8_t vram_attr_r();
 	void vram_attr_w(u8 data);
 	uint8_t beep_r();
@@ -130,8 +134,8 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
-	uint8_t ym2203_r();
-	void ym2203_w(u8 data);
+	[[maybe_unused]] uint8_t ym2203_r();
+	[[maybe_unused]] void ym2203_w(u8 data);
 
 	u8 m_hres_reg = 0U;
 	u8 m_crtc_vreg[0x100]{};
@@ -154,7 +158,6 @@ private:
 	virtual void machine_start() override;
 	void m6845_change_clock(u8 setting);
 	u8 m_crtc_index = 0U;
-	std::unique_ptr<u8[]> m_extram;
 	std::unique_ptr<u8[]> m_vram;
 	std::unique_ptr<u8[]> m_aram;
 	u8 m_firq_mask = 0U;
@@ -169,11 +172,13 @@ private:
 	optional_device<ym2203_device> m_ym2203;
 	required_device<acia6850_device> m_acia;
 	required_device<palette_device> m_palette;
-	required_memory_bank m_banka;
-	required_memory_bank m_bankc;
-	required_memory_bank m_banke;
-	required_memory_bank m_bankf;
-	required_memory_bank m_bankg;
+	memory_view m_rom_view;
+	//memory_view m_bank4;
+	memory_view m_banka;
+	memory_view m_bankc;
+	memory_view m_banke;
+	memory_view m_bankf;
+	memory_view m_bankg;
 	required_ioport_array<4> m_io_keyboard;
 };
 
@@ -366,7 +371,7 @@ void bml3_state::bml3_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).ram();
 	map(0x0400, 0x43ff).rw(FUNC(bml3_state::vram_r), FUNC(bml3_state::vram_w));
-	map(0x4400, 0x9fff).ram();
+	map(0x4400, 0x7fff).ram();
 	map(0xff40, 0xff46).noprw(); // lots of unknown reads and writes
 	map(0xffc0, 0xffc3).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xffc4, 0xffc5).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
@@ -401,13 +406,25 @@ void bml3_state::bml3_mem(address_map &map)
 //  map(0xffe8, 0xffe8) bank register
 //  map(0xffe9, 0xffe9) IG mode register
 //  map(0xffea, 0xffea) IG enable register
-	map(0xa000, 0xfeff).lw8(NAME([this] (offs_t offset, u8 data) { m_extram[offset] = data; }));
-	map(0xfff0, 0xffff).lw8(NAME([this] (offs_t offset, u8 data) { m_extram[offset+0x5ff0] = data; }));
-	map(0xa000, 0xbfff).bankr("banka");
-	map(0xc000, 0xdfff).bankr("bankc");
-	map(0xe000, 0xefff).bankr("banke");
-	map(0xf000, 0xfeff).bankr("bankf");
-	map(0xfff0, 0xffff).bankr("bankg");
+	map(0x8000, 0xffff).view(m_rom_view);
+	m_rom_view[0](0xa000, 0xfeff).rom().region("maincpu", 0xa000);
+	m_rom_view[0](0xfff0, 0xffff).rom().region("maincpu", 0xfff0);
+	map(0x8000, 0x9fff).ram();
+	map(0xa000, 0xbfff).view(m_banka);
+	m_banka[0](0xa000, 0xbfff).readonly().share("rama");
+	map(0xa000, 0xbfff).writeonly().share("rama");
+	map(0xc000, 0xdfff).view(m_bankc);
+	m_bankc[0](0xc000, 0xdfff).readonly().share("ramc");
+	map(0xc000, 0xdfff).writeonly().share("ramc");
+	map(0xe000, 0xefff).view(m_banke);
+	m_banke[0](0xe000, 0xefff).readonly().share("rame");
+	map(0xe000, 0xefff).writeonly().share("rame");
+	map(0xf000, 0xfeff).view(m_bankf);
+	m_bankf[0](0xf000, 0xfeff).readonly().share("ramf");
+	map(0xf000, 0xfeff).writeonly().share("ramf");
+	map(0xfff0, 0xffff).view(m_bankg);
+	m_bankg[0](0xfff0, 0xffff).readonly().share("ramg");
+	map(0xfff0, 0xffff).writeonly().share("ramg");
 
 #if 0
 	map(0xff00, 0xff00).rw(FUNC(bml3_state::ym2203_r), FUNC(bml3_state::ym2203_w));
@@ -742,11 +759,12 @@ INTERRUPT_GEN_MEMBER(bml3_state::timer_firq)
 
 void bml3_state::machine_start()
 {
-	m_extram = make_unique_clear<u8[]>(0x6000);
 	m_vram = make_unique_clear<u8[]>(0x4000);
 	m_aram = make_unique_clear<u8[]>(0x4000);
 
-	save_pointer(NAME(m_extram), 0x6000);
+	m_bml3bus->map_exrom(m_rom_view[0]);
+	m_bml3bus->map_io(m_maincpu->space(AS_PROGRAM));
+
 	save_pointer(NAME(m_vram), 0x4000);
 	save_pointer(NAME(m_aram), 0x4000);
 
@@ -771,29 +789,17 @@ void bml3_state::machine_start()
 	save_item(NAME(m_firq_mask));
 	save_item(NAME(m_firq_status));
 	save_item(NAME(m_nmi));
-
-	u8 *r = m_extram.get();
-	u8 *m = memregion("maincpu")->base();
-	m_banka->configure_entry(0, &m[0xa000]);
-	m_banka->configure_entry(1, r);
-	m_bankc->configure_entry(0, &m[0xc000]);
-	m_bankc->configure_entry(1, r+0x2000);
-	m_banke->configure_entry(0, &m[0xe000]);
-	m_banke->configure_entry(1, r+0x4000);
-	m_bankf->configure_entry(0, &m[0xf000]);
-	m_bankf->configure_entry(1, r+0x5000);
-	m_bankg->configure_entry(0, &m[0xfff0]);
-	m_bankg->configure_entry(1, r+0x5ff0);
 }
 
 void bml3_state::machine_reset()
 {
 	/* defaults */
-	m_banka->set_entry(0);
-	m_bankc->set_entry(0);
-	m_banke->set_entry(0);
-	m_bankf->set_entry(0);
-	m_bankg->set_entry(0);
+	m_rom_view.select(0);
+	m_banka.disable();
+	m_bankc.disable();
+	m_banke.disable();
+	m_bankf.disable();
+	m_bankg.disable();
 
 	m_firq_mask = -1; // disable firq
 	m_psg_latch = 0;
@@ -832,17 +838,39 @@ void bml3_state::piaA_w(uint8_t data)
 	*/
 	logerror("Check banking PIA A -> %02x\n",data);
 
-	if(!BIT(data, 1))
-		m_banka->set_entry(BIT(data, 6));
+	if (!BIT(data, 1))
+	{
+		if (BIT(data, 6))
+			m_banka.select(0);
+		else
+			m_banka.disable();
+	}
 
-	if(!BIT(data, 2))
-		m_bankc->set_entry(BIT(data, 7));
+	if (!BIT(data, 2))
+	{
+		if (BIT(data, 7))
+			m_bankc.select(0);
+		else
+			m_bankc.disable();
+	}
 
-	if(!BIT(data, 3))
-		m_banke->set_entry(BIT(data, 7));
+	if (!BIT(data, 3))
+	{
+		if (BIT(data, 7))
+			m_banke.select(0);
+		else
+			m_banke.disable();
+	}
 
-	m_bankf->set_entry(BIT(data, 0));
-	m_bankg->set_entry(BIT(data, 1));
+	if (BIT(data, 0))
+		m_bankf.select(0);
+	else
+		m_bankf.disable();
+
+	if (BIT(data, 1))
+		m_bankg.select(0);
+	else
+		m_bankg.disable();
 }
 
 WRITE_LINE_MEMBER( bml3_state::acia_rts_w )
@@ -932,7 +960,6 @@ void bml3_state::bml3_common(machine_config &config)
 
 	/* slot devices */
 	BML3BUS(config, m_bml3bus, 0);
-	m_bml3bus->set_space(m_maincpu, AS_PROGRAM);
 	m_bml3bus->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_bml3bus->irq_callback().set_inputline(m_maincpu, M6809_IRQ_LINE);
 	m_bml3bus->firq_callback().set_inputline(m_maincpu, M6809_FIRQ_LINE);
@@ -1023,6 +1050,9 @@ ROM_START( bml3mk5 )
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD("font.rom", 0x0000, 0x1000, BAD_DUMP CRC(0b6f2f10) SHA1(dc411b447ca414e94843636d8b5f910c954581fb) ) // handcrafted
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

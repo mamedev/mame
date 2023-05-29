@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Raphael Nabet
-#ifndef MAME_VIDEO_911_VDT_H
-#define MAME_VIDEO_911_VDT_H
+#ifndef MAME_TI_911_VDT_H
+#define MAME_TI_911_VDT_H
 
 #pragma once
 
@@ -112,4 +112,4 @@ private:
 
 DECLARE_DEVICE_TYPE(VDT911, vdt911_device)
 
-#endif // MAME_VIDEO_911_VDT_H
+#endif // MAME_TI_911_VDT_H

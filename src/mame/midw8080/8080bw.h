@@ -6,8 +6,8 @@
     8080-based black and white hardware
 
 ****************************************************************************/
-#ifndef MAME_INCLUDES_8080BW_H
-#define MAME_INCLUDES_8080BW_H
+#ifndef MAME_MIDW8080_8080BW_H
+#define MAME_MIDW8080_8080BW_H
 
 #pragma once
 
@@ -652,4 +652,4 @@ private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
 
-#endif // MAME_INCLUDES_8080BW_H
+#endif // MAME_MIDW8080_8080BW_H

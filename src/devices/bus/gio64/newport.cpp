@@ -37,14 +37,14 @@
 #include "emu.h"
 #include "newport.h"
 
-#define LOG_UNKNOWN     (1 << 0)
-#define LOG_VC2         (1 << 1)
-#define LOG_CMAP        (1 << 2)
-#define LOG_XMAP        (1 << 4)
-#define LOG_REX3        (1 << 6)
-#define LOG_RAMDAC      (1 << 7)
-#define LOG_COMMANDS    (1 << 8)
-#define LOG_REJECTS     (1 << 9)
+#define LOG_UNKNOWN     (1U << 1)
+#define LOG_VC2         (1U << 2)
+#define LOG_CMAP        (1U << 3)
+#define LOG_XMAP        (1U << 4)
+#define LOG_REX3        (1U << 5)
+#define LOG_RAMDAC      (1U << 6)
+#define LOG_COMMANDS    (1U << 7)
+#define LOG_REJECTS     (1U << 8)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_VC2 | LOG_CMAP | LOG_XMAP | LOG_REX3 | LOG_RAMDAC | LOG_COMMANDS | LOG_REJECTS)
 
 #define VERBOSE         (0)
@@ -2701,20 +2701,33 @@ uint32_t newport_base_device::get_rgb_color(int16_t x, int16_t y)
 
 uint8_t newport_base_device::get_octant(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t dx, int32_t dy)
 {
-	if (x1 < x2)
-	{
-		if (y2 < y1)
-			return (dx > dy) ? 0 : 1;
-		else
-			return (dx > dy) ? 7 : 6;
-	}
-	else
-	{
-		if (y2 < y1)
-			return (dx > dy) ? 3 : 2;
-		else
-			return (dx > dy) ? 4 : 5;
-	}
+	uint8_t octant = 0;
+
+	// Octant format: {MSB, 2nd, LSB} = {XMAJOR, XDEC, YDEC}
+	// Mapping of hardware octant to peseudocode octant in manual
+	// | Pseudocode | hardware |  hardware(dec) |
+	// |     1      | 3'b101   |       5        |
+	// |     2      | 3'b001   |       1        |
+	// |     3      | 3'b011   |       3        |
+	// |     4      | 3'b111   |       7        |
+	// |     5      | 3'b110   |       6        |
+	// |     6      | 3'b010   |       2        |
+	// |     7      | 3'b000   |       0        |
+	// |     8      | 3'b100   |       4        |
+
+	/* YDEC */
+	if (y1 > y2)
+		octant |= (1 << 0); // Bit 0
+
+	/* XDEC */
+	if (x1 > x2)
+		octant |= (1 << 1); // Bit 1
+
+	/* XMAJOR */
+	if (dx > dy)
+		octant |= (1 << 2); // Bit 2
+
+	return octant;
 }
 
 void newport_base_device::do_setup(void)
@@ -2725,39 +2738,13 @@ void newport_base_device::do_setup(void)
 	const int32_t y2 = util::sext(m_rex3.m_y_end >> 7, 20);
 	const int32_t dx = abs(x1 - x2);
 	const int32_t dy = abs(y1 - y2);
-	const uint8_t adrmode = (m_rex3.m_draw_mode0 >> 2) & 7;
 
-	if (adrmode >= 0 && adrmode <= 1)
-	{
-		/* quadrant for block or span */
-		uint8_t quadrant = 0;
-		/* This is purely guessed */
-		if (x1 > x2)
-		{
-			if (y1 > y2)
-				quadrant = 3;
-			else
-				quadrant = 2;
-		}
-		else
-		{
-			if (y1 > y2)
-				quadrant = 1;
-			else
-				quadrant = 0;
-		}
-		m_rex3.m_bres_octant_inc1 &= ~(0x7 << 24);
-		m_rex3.m_bres_octant_inc1 |= quadrant << 24;
-	}
-	else if (adrmode >= 2 && adrmode <= 4)
-	{
-		uint8_t octant;
-		/* octant for line */
-		/* FIXME: error terms and Bresenham terms */
-		octant = get_octant(x1, y1, x2, y2, dx, dy);
-		m_rex3.m_bres_octant_inc1 &= ~(0x7 << 24);
-		m_rex3.m_bres_octant_inc1 |= octant << 24;
-	}
+	/* octant for line and block, span */
+	const uint8_t octant = get_octant(x1, y1, x2, y2, dx, dy);
+	m_rex3.m_bres_octant_inc1 &= ~(0x7 << 24);
+	m_rex3.m_bres_octant_inc1 |= (uint32_t)octant << 24;
+	/* FIXME: error terms (incr1, incr2) and Bresenham terms (d) */
+	LOGMASKED(LOG_REX3, "do_setup: octant = %d, x1 = %d, y1 = %d, x2 = %d, y2 = %d, dx = %d, dy = %d\n", octant, x1, y1, x2, y2, dx, dy);
 }
 
 void newport_base_device::do_fline(uint32_t color)
@@ -2792,14 +2779,14 @@ void newport_base_device::do_fline(uint32_t color)
 
 	static const bresenham_octant_info_t s_bresenham_infos[8] =
 	{
-		{  1,  1,  0,  1,  0 },
-		{  0,  1,  1,  1,  1 },
-		{  0, -1,  1,  1,  1 },
-		{ -1, -1,  0,  1,  0 },
-		{ -1, -1,  0, -1,  0 },
-		{  0, -1, -1, -1,  1 },
-		{  0,  1, -1, -1,  1 },
-		{  1,  1,  0, -1,  0 }
+		{  0,  1, -1, -1,  1 }, // Pseudo 7
+		{  0,  1,  1,  1,  1 }, // Pseudo 2
+		{  0, -1, -1, -1,  1 }, // Pseudo 6
+		{  0, -1,  1,  1,  1 }, // Pseudo 3
+		{  1,  1,  0, -1,  0 }, // Pseudo 8
+		{  1,  1,  0,  1,  0 }, // Pseudo 1
+		{ -1, -1,  0, -1,  0 }, // Pseudo 5
+		{ -1, -1,  0,  1,  0 }  // Pseudo 4
 	};
 
 	const uint8_t octant = (m_rex3.m_bres_octant_inc1 >> 24) & 0x7;
@@ -2818,10 +2805,10 @@ void newport_base_device::do_fline(uint32_t color)
 
 	switch (octant)
 	{
-	case 0:
+	case 5: // Pseudo 1
 		// Nothing special needed
 		break;
-	case 1:
+	case 1: // Pseudo 2
 	{
 		const int16_t temp_fract = x1_fract;
 		x1_fract = y1_fract;
@@ -2831,7 +2818,7 @@ void newport_base_device::do_fline(uint32_t color)
 		dy = temp_d;
 		break;
 	}
-	case 2:
+	case 3: // Pseudo 3
 	{
 		const int16_t temp_fract = 0x10 - x1_fract;
 		x1_fract = y1_fract;
@@ -2841,14 +2828,14 @@ void newport_base_device::do_fline(uint32_t color)
 		dy = temp_d;
 		break;
 	}
-	case 3:
+	case 7: // Pseudo 4
 		x1_fract = 0x10 - x1_fract;
 		break;
-	case 4:
+	case 6: // Pseudo 5
 		x1_fract = 0x10 - x1_fract;
 		y1_fract = 0x10 - y1_fract;
 		break;
-	case 5:
+	case 2: // Pseudo 6
 	{
 		const int16_t temp_fract = 0x10 - x1_fract;
 		x1_fract = 0x10 - y1_fract;
@@ -2858,7 +2845,7 @@ void newport_base_device::do_fline(uint32_t color)
 		dy = temp_d;
 		break;
 	}
-	case 6:
+	case 0: // Pseudo 7
 	{
 		const int16_t temp_fract = 0x10 - y1_fract;
 		y1_fract = x1_fract;
@@ -2868,7 +2855,7 @@ void newport_base_device::do_fline(uint32_t color)
 		dy = temp_d;
 		break;
 	}
-	case 7:
+	case 4: // Pseudo 8
 		y1_fract = 0x10 - y1_fract;
 		break;
 	}
@@ -2983,14 +2970,14 @@ void newport_base_device::do_iline(uint32_t color)
 
 	static const bresenham_octant_info_t s_bresenham_infos[8] =
 	{
-		{  1,  1,  0,  1, 0 },
-		{  0,  1,  1,  1, 1 },
-		{  0, -1,  1,  1, 1 },
-		{ -1, -1,  0,  1, 0 },
-		{ -1, -1,  0, -1, 0 },
-		{  0, -1, -1, -1, 1 },
-		{  0,  1, -1, -1, 1 },
-		{  1,  1,  0, -1, 0 }
+		{  0,  1, -1, -1,  1 }, // Pseudo 7
+		{  0,  1,  1,  1,  1 }, // Pseudo 2
+		{  0, -1, -1, -1,  1 }, // Pseudo 6
+		{  0, -1,  1,  1,  1 }, // Pseudo 3
+		{  1,  1,  0, -1,  0 }, // Pseudo 8
+		{  1,  1,  0,  1,  0 }, // Pseudo 1
+		{ -1, -1,  0, -1,  0 }, // Pseudo 5
+		{ -1, -1,  0,  1,  0 }  // Pseudo 4
 	};
 
 	const uint8_t octant = (m_rex3.m_bres_octant_inc1 >> 24) & 0x7;
@@ -3092,7 +3079,6 @@ void newport_base_device::do_iline(uint32_t color)
 
 uint32_t newport_base_device::do_pixel_read()
 {
-	m_rex3.m_bres_octant_inc1 = 0;
 	const int16_t src_x = m_rex3.m_x_start_i + m_rex3.m_x_window - 0x1000;
 	const int16_t src_y = m_rex3.m_y_start_i + m_rex3.m_y_window - 0x1000;
 	uint32_t ret = 0;
@@ -3342,8 +3328,9 @@ void newport_base_device::do_rex3_command()
 	int16_t end_x = m_rex3.m_x_end_i;
 	int16_t end_y = m_rex3.m_y_end_i;
 	int16_t dx = 1, dy = 1;
+	int8_t octant;
 
-	LOGMASKED(LOG_COMMANDS, "REX3 Command: %08x|%08x - %s %s\n", mode0, mode1, s_opcode_str[mode0 & 3], s_adrmode_str[(mode0 >> 2) & 7]);
+	LOGMASKED(LOG_COMMANDS, "REX3 Command: %08x|%08x - %s %s %s\n", mode0, mode1, s_opcode_str[mode0 & 3], s_adrmode_str[(mode0 >> 2) & 7], BIT(mode0, 5) ? "Setup" : "NoSetup");
 
 	const uint8_t opcode = mode0 & 3;
 	const uint8_t adrmode = (mode0 >> 2) & 7;
@@ -3353,31 +3340,18 @@ void newport_base_device::do_rex3_command()
 		case 0: // NoOp
 			break;
 		case 1: // Read
+			if (BIT(mode0, 5))
+				do_setup();
+			// Our do_pixel_word_read does not use octant, but seems like hardware is still updating it
 			m_rex3.m_host_dataport = do_pixel_word_read();
 			break;
 		case 2: // Draw
 			if (BIT(mode0, 5))
 				do_setup();
+			octant = (m_rex3.m_bres_octant_inc1 >> 24) & 0x7;
+			dx = BIT(octant, 1) ? -1 : 1;
+			dy = BIT(octant, 0) ? -1 : 1;
 
-			switch ((m_rex3.m_bres_octant_inc1 >> 24) & 0x3)
-			{
-				case 0:
-					dx = 1;
-					dy = 1;
-					break;
-				case 1:
-					dx = 1;
-					dy = -1;
-					break;
-				case 2:
-					dx = -1;
-					dy = 1;
-					break;
-				case 3:
-					dx = -1;
-					dy = -1;
-					break;
-			}
 			switch (adrmode)
 			{
 				case 0: // Span
@@ -3547,6 +3521,12 @@ void newport_base_device::do_rex3_command()
 			{
 				const bool stop_on_x = BIT(mode0, 8);
 				const bool stop_on_y = BIT(mode0, 9);
+
+				if (BIT(mode0, 5))
+					do_setup();
+				octant = (m_rex3.m_bres_octant_inc1 >> 24) & 0x7;
+				dx = BIT(octant, 1) ? -1 : 1;
+				dy = BIT(octant, 0) ? -1 : 1;
 
 				end_x += dx;
 				end_y += dy;

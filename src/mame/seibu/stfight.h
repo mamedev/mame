@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Mark McDougall
-#ifndef MAME_INCLUDES_STFIGHT_H
-#define MAME_INCLUDES_STFIGHT_H
+#ifndef MAME_SEIBU_STFIGHT_H
+#define MAME_SEIBU_STFIGHT_H
 
 #pragma once
 
@@ -105,4 +105,4 @@ private:
 	emu_timer   *m_int1_timer = nullptr;
 };
 
-#endif // MAME_INCLUDES_STFIGHT_H
+#endif // MAME_SEIBU_STFIGHT_H

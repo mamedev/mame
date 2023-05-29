@@ -3,11 +3,11 @@ name: Rebuild BGFX shaders
 on:
   push:
     paths:
-    - '.github/**'
+    - '.github/workflows/**'
     - 'src/osd/modules/render/bgfx/shaders/**'
   pull_request:
     paths:
-    - '.github/**'
+    - '.github/workflows/**'
     - 'src/osd/modules/render/bgfx/shaders/**'
 
 permissions:

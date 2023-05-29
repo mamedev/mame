@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_HAL2_H
-#define MAME_MACHINE_HAL2_H
+#ifndef MAME_SGI_HAL2_H
+#define MAME_SGI_HAL2_H
 
 #pragma once
 
@@ -109,4 +109,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(SGI_HAL2, hal2_device)
 
-#endif // MAME_MACHINE_HAL2_H
+#endif // MAME_SGI_HAL2_H

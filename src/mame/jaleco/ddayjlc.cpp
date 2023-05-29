@@ -69,6 +69,8 @@ $842f = lives
 #include "tilemap.h"
 
 
+namespace {
+
 class ddayjlc_state : public driver_device
 {
 public:
@@ -731,6 +733,9 @@ void ddayjlc_state::init_ddayjlc()
 	membank("bank1")->configure_entries(0, 3, memregion("user1")->base(), 0x4000);
 	membank("bank1")->set_entry(0);
 }
+
+} // anonymous namespace
+
 
 GAME( 1984, ddayjlc,  0,       ddayjlc, ddayjlc, ddayjlc_state, init_ddayjlc, ROT90, "Jaleco", "D-Day (Jaleco set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, ddayjlca, ddayjlc, ddayjlc, ddayjlc, ddayjlc_state, init_ddayjlc, ROT90, "Jaleco", "D-Day (Jaleco set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

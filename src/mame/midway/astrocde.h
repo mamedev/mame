@@ -5,8 +5,8 @@
     Bally Astrocade-based hardware
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_ASTROCDE_H
-#define MAME_INCLUDES_ASTROCDE_H
+#ifndef MAME_MIDWAY_ASTROCDE_H
+#define MAME_MIDWAY_ASTROCDE_H
 
 #pragma once
 
@@ -192,13 +192,15 @@ public:
 	{ }
 
 	void seawolf2(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
 private:
 	void sound_1_w(uint8_t data);
 	void sound_2_w(uint8_t data);
 
 	void port_map_discrete(address_map &map);
-
-	virtual void machine_start() override;
 
 	required_device<samples_device> m_samples;
 	uint8_t m_port_1_last = 0U;
@@ -215,6 +217,10 @@ public:
 
 	void ebases(machine_config &config);
 	DECLARE_CUSTOM_INPUT_MEMBER(trackball_r);
+
+protected:
+	virtual void machine_start() override;
+
 private:
 	void trackball_select_w(uint8_t data);
 	void coin_w(uint8_t data);
@@ -223,6 +229,7 @@ private:
 	void port_map_ebases(address_map &map);
 
 	required_ioport_array<4> m_trackball;
+	uint8_t m_trackball_last = 0U;
 };
 
 class demndrgn_state : public astrocde_state
@@ -230,18 +237,24 @@ class demndrgn_state : public astrocde_state
 public:
 	demndrgn_state(const machine_config &mconfig, device_type type, const char *tag)
 		: astrocde_state(mconfig, type, tag)
-		, m_joystick(*this, {"MOVEX", "MOVEY"})
+		, m_trackball(*this, {"MOVEX", "MOVEY"})
 	{ }
 
 	void demndrgn(machine_config &config);
-	DECLARE_CUSTOM_INPUT_MEMBER(joystick_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(trackball_r);
+
+protected:
+	virtual void machine_start() override;
+
 private:
 	DECLARE_WRITE_LINE_MEMBER(input_select_w);
 	void sound_w(uint8_t data);
+	void trackball_reset_w(uint8_t data);
 
 	void port_map_16col_pattern_demndrgn(address_map &map);
 
-	required_ioport_array<2> m_joystick;
+	required_ioport_array<2> m_trackball;
+	uint8_t m_trackball_last = 0U;
 };
 
 class tenpindx_state : public astrocde_state
@@ -269,4 +282,4 @@ private:
 	output_finder<19> m_lamps;
 };
 
-#endif // MAME_INCLUDES_ASTROCDE_H
+#endif // MAME_MIDWAY_ASTROCDE_H

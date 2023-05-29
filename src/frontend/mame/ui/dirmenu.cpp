@@ -9,11 +9,10 @@
 *********************************************************************/
 
 #include "emu.h"
+#include "ui/dirmenu.h"
 
 #include "ui/ui.h"
-#include "ui/dirmenu.h"
 #include "ui/utils.h"
-#include "ui/optsmenu.h"
 
 #include "emuopts.h"
 #include "fileio.h"
@@ -82,8 +81,8 @@ public:
 	menu_remove_folder(mame_ui_manager &mui, render_container &container, int ref);
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle(event const *ev) override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 
 	std::string  m_searchpath;
 	int const    m_ref;
@@ -115,7 +114,7 @@ menu_remove_folder::menu_remove_folder(mame_ui_manager &mui, render_container &c
 //  handle
 //-------------------------------------------------
 
-void menu_remove_folder::handle(event const *ev)
+bool menu_remove_folder::handle(event const *ev)
 {
 	// process the menu
 	if (ev && ev->itemref && ev->iptkey == IPT_UI_SELECT)
@@ -132,20 +131,20 @@ void menu_remove_folder::handle(event const *ev)
 		if (ui().options().exists(f_folders[m_ref].option))
 			ui().options().set_value(f_folders[m_ref].option, tmppath, OPTION_PRIORITY_CMDLINE);
 		else if (machine().options().value(f_folders[m_ref].option) != tmppath)
-		{
 			machine().options().set_value(f_folders[m_ref].option, tmppath, OPTION_PRIORITY_CMDLINE);
-		}
 
 		reset_parent(reset_options::REMEMBER_REF);
 		stack_pop();
 	}
+
+	return false;
 }
 
 //-------------------------------------------------
 //  populate menu
 //-------------------------------------------------
 
-void menu_remove_folder::populate(float &customtop, float &custombottom)
+void menu_remove_folder::populate()
 {
 	int folders_count = 0;
 	for (auto & elem : m_folders)
@@ -165,13 +164,14 @@ public:
 	menu_add_change_folder(mame_ui_manager &mui, render_container &container, int ref, bool multipath);
 
 protected:
+	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
-	virtual bool custom_ui_cancel() override { return !m_search.empty(); }
+	virtual bool custom_ui_back() override { return !m_search.empty(); }
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle(event const *ev) override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 
 	void update_search();
 
@@ -210,93 +210,99 @@ menu_add_change_folder::menu_add_change_folder(mame_ui_manager &mui, render_cont
 //  handle
 //-------------------------------------------------
 
-void menu_add_change_folder::handle(event const *ev)
+bool menu_add_change_folder::handle(event const *ev)
 {
-	// process the menu
-	if (ev && ev->itemref)
-	{
-		if (ev->iptkey == IPT_UI_SELECT)
-		{
-			assert(ev->item);
-			menu_item const &pitem = *ev->item;
+	if (!ev || !ev->itemref)
+		return false;
 
-			// go up to the parent path
-			if (pitem.text() == "..")
+	if (ev->iptkey == IPT_UI_SELECT)
+	{
+		assert(ev->item);
+		menu_item const &pitem = *ev->item;
+
+		// go up to the parent path
+		if (pitem.text() == "..")
+		{
+			size_t const first_sep = m_current_path.find_first_of(PATH_SEPARATOR[0]);
+			size_t const last_sep = m_current_path.find_last_of(PATH_SEPARATOR[0]);
+			m_current_path.erase(last_sep + ((first_sep == last_sep) ? 1 : 0));
+		}
+		else
+		{
+			// if isn't a drive, appends the directory
+			if (pitem.subtext() != "[DRIVE]")
+				util::path_append(m_current_path, pitem.text());
+			else
+				m_current_path = pitem.text();
+		}
+
+		// reset the char buffer also in this case
+		m_search.clear();
+		reset(reset_options::SELECT_FIRST);
+	}
+	else if (ev->iptkey == IPT_UI_PASTE)
+	{
+		if (paste_text(m_search, uchar_is_printable))
+		{
+			update_search();
+			return true;
+		}
+	}
+	else if (ev->iptkey == IPT_SPECIAL)
+	{
+		if (ev->unichar == 0x09)
+		{
+			// Tab key, save current path
+			std::string error_string;
+			if (!m_multipath)
 			{
-				size_t const first_sep = m_current_path.find_first_of(PATH_SEPARATOR[0]);
-				size_t const last_sep = m_current_path.find_last_of(PATH_SEPARATOR[0]);
-				m_current_path.erase(last_sep + ((first_sep == last_sep) ? 1 : 0));
+				if (ui().options().exists(f_folders[m_ref].option))
+					ui().options().set_value(f_folders[m_ref].option, m_current_path, OPTION_PRIORITY_CMDLINE);
+				else if (machine().options().value(f_folders[m_ref].option) != m_current_path)
+					machine().options().set_value(f_folders[m_ref].option, m_current_path, OPTION_PRIORITY_CMDLINE);
 			}
 			else
 			{
-				// if isn't a drive, appends the directory
-				if (pitem.subtext() != "[DRIVE]")
-					util::path_append(m_current_path, pitem.text());
-				else
-					m_current_path = pitem.text();
-			}
-
-			// reset the char buffer also in this case
-			m_search.clear();
-			reset(reset_options::SELECT_FIRST);
-		}
-		else if (ev->iptkey == IPT_UI_PASTE)
-		{
-			if (paste_text(m_search, uchar_is_printable))
-				update_search();
-		}
-		else if (ev->iptkey == IPT_SPECIAL)
-		{
-			if (ev->unichar == 0x09)
-			{
-				// Tab key, save current path
-				std::string error_string;
-				if (!m_multipath)
+				m_folders.push_back(m_current_path);
+				std::string tmppath;
+				for (int x = 0; x < m_folders.size(); ++x)
 				{
-					if (ui().options().exists(f_folders[m_ref].option))
-						ui().options().set_value(f_folders[m_ref].option, m_current_path, OPTION_PRIORITY_CMDLINE);
-					else if (machine().options().value(f_folders[m_ref].option) != m_current_path)
-						machine().options().set_value(f_folders[m_ref].option, m_current_path, OPTION_PRIORITY_CMDLINE);
-				}
-				else
-				{
-					m_folders.push_back(m_current_path);
-					std::string tmppath;
-					for (int x = 0; x < m_folders.size(); ++x)
-					{
-						tmppath.append(m_folders[x]);
-						if (x != m_folders.size() - 1)
-							tmppath.append(";");
-					}
-
-					if (ui().options().exists(f_folders[m_ref].option))
-						ui().options().set_value(f_folders[m_ref].option, tmppath, OPTION_PRIORITY_CMDLINE);
-					else if (machine().options().value(f_folders[m_ref].option) != tmppath)
-						machine().options().set_value(f_folders[m_ref].option, tmppath, OPTION_PRIORITY_CMDLINE);
+					tmppath.append(m_folders[x]);
+					if (x != m_folders.size() - 1)
+						tmppath.append(";");
 				}
 
-				reset_parent(reset_options::SELECT_FIRST);
-				stack_pop();
+				if (ui().options().exists(f_folders[m_ref].option))
+					ui().options().set_value(f_folders[m_ref].option, tmppath, OPTION_PRIORITY_CMDLINE);
+				else if (machine().options().value(f_folders[m_ref].option) != tmppath)
+					machine().options().set_value(f_folders[m_ref].option, tmppath, OPTION_PRIORITY_CMDLINE);
 			}
-			else if (input_character(m_search, ev->unichar, uchar_is_printable))
-			{
-				// if it's any other key and we're not maxed out, update
-				update_search();
-			}
+
+			reset_parent(reset_options::SELECT_FIRST);
+			stack_pop();
 		}
-		else if (ev->iptkey == IPT_UI_CANCEL)
+		else if (input_character(m_search, ev->unichar, uchar_is_printable))
 		{
-			// reset the char buffer also in this case
-			m_search.clear();
+			// if it's any other key and we're not maxed out, update
+			update_search();
+			return true;
 		}
 	}
+	else if (ev->iptkey == IPT_UI_CANCEL)
+	{
+		// reset the char buffer also in this case
+		m_search.clear();
+		return true;
+	}
+
+	return false;
 }
 
 //-------------------------------------------------
 //  populate
 //-------------------------------------------------
 
-void menu_add_change_folder::populate(float &customtop, float &custombottom)
+void menu_add_change_folder::populate()
 {
 	int folders_count = 0;
 
@@ -315,7 +321,8 @@ void menu_add_change_folder::populate(float &customtop, float &custombottom)
 	}
 
 	// sort
-	std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t> >(std::locale());
+	std::locale const lcl;
+	std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t> >(lcl);
 	std::sort(
 			dirnames.begin(),
 			dirnames.end(),
@@ -331,10 +338,18 @@ void menu_add_change_folder::populate(float &customtop, float &custombottom)
 		item_append(name, "[DIR]", 0, (void *)(uintptr_t)++folders_count);
 
 	item_append(menu_item_type::SEPARATOR);
+}
+
+//-------------------------------------------------
+//  recompute metrics
+//-------------------------------------------------
+
+void menu_add_change_folder::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
 
 	// configure the custom rendering
-	customtop = 2.0f * ui().get_line_height() + 3.0f * ui().box_tb_border();
-	custombottom = 1.0f * ui().get_line_height() + 3.0f * ui().box_tb_border();
+	set_custom_space(2.0f * line_height() + 3.0f * tb_border(), 1.0f * line_height() + 3.0f * tb_border());
 }
 
 //-------------------------------------------------
@@ -351,17 +366,17 @@ void menu_add_change_folder::custom_render(void *selectedref, float top, float b
 			m_current_path };
 	draw_text_box(
 			std::begin(toptext), std::end(toptext),
-			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
+			origx1, origx2, origy1 - top, origy1 - tb_border(),
 			text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
-			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
+			ui().colors().text_color(), UI_GREEN_COLOR);
 
 	// bottom text
 	char const *const bottomtext[] = { _("Press TAB to set") };
 	draw_text_box(
 			std::begin(bottomtext), std::end(bottomtext),
-			origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
+			origx1, origx2, origy2 + tb_border(), origy2 + bottom,
 			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
-			ui().colors().text_color(), ui().colors().background_color(), 1.0f);
+			ui().colors().text_color(), ui().colors().background_color());
 }
 
 //-------------------------------------------------
@@ -431,6 +446,7 @@ public:
 	}
 
 protected:
+	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
@@ -440,8 +456,8 @@ private:
 		REMOVE,
 	};
 
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle(event const *ev) override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 
 	bool is_multipath(std::string_view folder) const;
 
@@ -470,9 +486,8 @@ bool menu_display_actual::is_multipath(std::string_view folder) const
 //  handle
 //-------------------------------------------------
 
-void menu_display_actual::handle(event const *ev)
+bool menu_display_actual::handle(event const *ev)
 {
-	// process the menu
 	if (ev && ev->itemref && ev->iptkey == IPT_UI_SELECT)
 	{
 		switch ((uintptr_t)ev->itemref)
@@ -486,13 +501,15 @@ void menu_display_actual::handle(event const *ev)
 			break;
 		}
 	}
+
+	return false;
 }
 
 //-------------------------------------------------
 //  populate
 //-------------------------------------------------
 
-void menu_display_actual::populate(float &customtop, float &custombottom)
+void menu_display_actual::populate()
 {
 	auto const &folder = f_folders[m_ref];
 	auto option = ui().options().get_entry(folder.option);
@@ -522,7 +539,18 @@ void menu_display_actual::populate(float &customtop, float &custombottom)
 
 	item_append(menu_item_type::SEPARATOR);
 
-	customtop = (m_folders.size() + 1) * ui().get_line_height() + 6.0f * ui().box_tb_border();
+	set_custom_space((m_folders.size() + 1) * line_height() + 6.0f * tb_border(), 0.0f);
+}
+
+//-------------------------------------------------
+//  recompute metrics
+//-------------------------------------------------
+
+void menu_display_actual::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
+
+	set_custom_space((m_folders.size() + 1) * line_height() + 6.0f * tb_border(), 0.0f);
 }
 
 //-------------------------------------------------
@@ -531,17 +559,16 @@ void menu_display_actual::populate(float &customtop, float &custombottom)
 
 void menu_display_actual::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	float const lineheight(ui().get_line_height());
 	float const maxwidth(draw_text_box(
 			std::begin(m_folders), std::end(m_folders),
-			origx1, origx2, origy1 - (3.0f * ui().box_tb_border()) - (m_folders.size() * lineheight), origy1 - ui().box_tb_border(),
+			origx1, origx2, origy1 - (3.0f * tb_border()) - (m_folders.size() * line_height()), origy1 - tb_border(),
 			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
-			ui().colors().text_color(), ui().colors().background_color(), 1.0f));
+			ui().colors().text_color(), ui().colors().background_color()));
 	draw_text_box(
 			std::begin(m_heading), std::end(m_heading),
-			0.5f * (1.0f - maxwidth), 0.5f * (1.0f + maxwidth), origy1 - top, origy1 - top + lineheight + (2.0f * ui().box_tb_border()),
+			0.5f * (1.0f - maxwidth), 0.5f * (1.0f + maxwidth), origy1 - top, origy1 - top + line_height() + (2.0f * tb_border()),
 			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
-			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
+			ui().colors().text_color(), UI_GREEN_COLOR);
 }
 
 } // anonymous namespace
@@ -569,18 +596,19 @@ menu_directory::~menu_directory()
 //  handle
 //-------------------------------------------------
 
-void menu_directory::handle(event const *ev)
+bool menu_directory::handle(event const *ev)
 {
-	// process the menu
 	if (ev && ev->itemref && ev->iptkey == IPT_UI_SELECT)
 		menu::stack_push<menu_display_actual>(ui(), container(), selected_index());
+
+	return false;
 }
 
 //-------------------------------------------------
 //  populate
 //-------------------------------------------------
 
-void menu_directory::populate(float &customtop, float &custombottom)
+void menu_directory::populate()
 {
 	for (auto & elem : f_folders)
 		item_append(_("path-option", elem.name), 0, this); // need a non-null reference pointer - value is immaterial

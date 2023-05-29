@@ -163,6 +163,8 @@ DIPSW-2
 #include "speaker.h"
 
 
+namespace {
+
 class sfkick_state : public driver_device
 {
 public:
@@ -510,6 +512,8 @@ ROM_START( spinkick )
 	ROM_REGION(0x10000,  "soundcpu", 0)
 	ROM_LOAD( "spinkick.r1", 0x00000, 0x8000, CRC(2f5e3b7a) SHA1(d2ff566b415ab10c0681fa1eb221a56e3c137ecf) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1988, sfkick,   0,      sfkick, sfkick, sfkick_state, empty_init, ROT90, "Haesung/HJ Corp", "Super Free Kick (set 1)", MACHINE_SUPPORTS_SAVE )

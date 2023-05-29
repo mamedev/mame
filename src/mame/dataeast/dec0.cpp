@@ -5,35 +5,12 @@
 
   Data East 16 bit games - Bryan McPhail, mish@tendril.co.uk
 
-  This file contains drivers for:
-
-    * Heavy Barrel                            (USA set)
-    * Heavy Barrel                            (World set)
-    * Bad Dudes vs. Dragonninja               (USA set)
-    * Dragonninja                             (Japanese version of above)
-    * Birdie Try                              (Japanese set)
-    * Robocop                                 (World bootleg rom set)
-    * Robocop                                 (World rev 3)
-    * Robocop                                 (USA rev 1)
-    * Robocop                                 (USA rev 0)
-    * Hippodrome                              (USA set)
-    * Fighting Fantasy                        (Japanese version of above)
-    * Secret Agent                            (World rev 3)
-    * Secret Agent                            (Japan rev 2)
-    * Sly Spy                                 (USA rev 3)
-    * Sly Spy                                 (USA rev 2)
-    * Midnight Resistance                     (World set)
-    * Midnight Resistance                     (USA set)
-    * Midnight Resistance                     (Japanese set)
-    * Boulder Dash                            (World set)
-    * Bandit                                  (USA set)
-
     Heavy Barrel, Bad Dudes, Robocop, Birdie Try & Hippodrome use the 'MEC-M1'
 motherboard and varying game boards.  Sly Spy, Midnight Resistance and
 Boulder Dash use the same graphics chips but are different pcbs.
 
     Bandit (USA) is almost certainly a field test prototype, the software runs
-    on a Heavy Barrel board including the original Heavy Barrel MCU (which is effectively
+    on a Heavy Barrel board with the original Heavy Barrel MCU (which is effectively
     not used).  There is also Japanese version known to run on a DE-0321-1 top board.
 
     There are Secret Agent (bootleg) and Robocop (bootleg) sets to add.
@@ -540,34 +517,34 @@ void dec0_state::dec0_tb_map(address_map &map)
 	map(0x300019, 0x300019).w("tb1", FUNC(upd4701_device::reset_y_w));
 }
 
-void dec0_state::robocop_map(address_map &map)
+void robocop_state::main_map(address_map &map)
 {
 	dec0_map(map);
 	map(0x180000, 0x180fff).rw("dem01", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w)).umask16(0x00ff);
 }
 
-void dec0_state::robocop_sub_map(address_map &map)
+void robocop_state::sub_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
 	map(0x1f0000, 0x1f1fff).ram();                                 /* Main ram */
 	map(0x1f2000, 0x1f27ff).rw("dem01", FUNC(mb8421_device::right_r), FUNC(mb8421_device::right_w));  /* Shared ram */
 }
 
-void dec0_state::hippodrm_map(address_map &map)
+void hippodrm_state::main_map(address_map &map)
 {
 	dec0_map(map);
-	map(0x180000, 0x18003f).rw(FUNC(dec0_state::hippodrm_68000_share_r), FUNC(dec0_state::hippodrm_68000_share_w));
-	map(0xffc800, 0xffcfff).w(FUNC(dec0_state::sprite_mirror_w));
+	map(0x180000, 0x18003f).rw(FUNC(hippodrm_state::sharedram_r), FUNC(hippodrm_state::sharedram_w));
+	map(0xffc800, 0xffcfff).w(FUNC(hippodrm_state::sprite_mirror_w));
 }
 
-void dec0_state::hippodrm_sub_map(address_map &map)
+void hippodrm_state::sub_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
-	map(0x180000, 0x18001f).ram().share("hippodrm_shared");
+	map(0x180000, 0x18001f).ram().share(m_sharedram);
 	map(0x1a0000, 0x1a0007).w(m_tilegen[2], FUNC(deco_bac06_device::pf_control0_8bit_packed_w));
 	map(0x1a0010, 0x1a001f).w(m_tilegen[2], FUNC(deco_bac06_device::pf_control1_8bit_swap_w));
 	map(0x1a1000, 0x1a17ff).rw(m_tilegen[2], FUNC(deco_bac06_device::pf_data_8bit_swap_r), FUNC(deco_bac06_device::pf_data_8bit_swap_w));
-	map(0x1d0000, 0x1d00ff).rw(FUNC(dec0_state::hippodrm_prot_r), FUNC(dec0_state::hippodrm_prot_w));
+	map(0x1d0000, 0x1d00ff).rw(FUNC(hippodrm_state::prot_r), FUNC(hippodrm_state::prot_w));
 	map(0x1f0000, 0x1f1fff).ram(); /* Main ram */
 }
 
@@ -591,7 +568,7 @@ uint16_t dec0_state::slyspy_controls_r(offs_t offset)
 }
 
 // TODO: this can be a timer access, maybe video counter returns (and used as RNG in both games)
-uint16_t dec0_state::slyspy_protection_r(offs_t offset)
+uint16_t slyspy_state::prot_r(offs_t offset)
 {
 	switch (offset<<1)
 	{
@@ -644,54 +621,54 @@ uint16_t dec0_state::slyspy_protection_r(offs_t offset)
 
 */
 
-void dec0_state::slyspy_state_w(uint16_t data)
+void slyspy_state::prot_state_w(uint16_t data)
 {
-	m_slyspy_state = 0;
-	m_pfprotect->set_bank(m_slyspy_state);
+	m_prot_state = 0;
+	m_pfview.select(m_prot_state);
 }
 
-uint16_t dec0_state::slyspy_state_r()
+uint16_t slyspy_state::prot_state_r()
 {
-	m_slyspy_state = (m_slyspy_state + 1) % 4;
-	m_pfprotect->set_bank(m_slyspy_state);
+	if (!machine().side_effects_disabled())
+	{
+		m_prot_state = (m_prot_state + 1) % 4;
+		m_pfview.select(m_prot_state);
+	}
 
 	return 0; /* Value doesn't mater */
 }
 
 
-void dec0_state::slyspy_protection_map(address_map &map)
-{
-	map(0x04000, 0x04001).mirror(0x30000).r(FUNC(dec0_state::slyspy_state_r)).nopw();
-	map(0x0a000, 0x0a001).mirror(0x30000).w(FUNC(dec0_state::slyspy_state_w));
-	// Default state (called by Traps 1, 3, 4, 7, C)
-	map(0x00000, 0x00007).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control_0_w));
-	map(0x00010, 0x00017).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control_1_w));
-	map(0x02000, 0x0207f).w(m_tilegen[1], FUNC(deco_bac06_device::pf_colscroll_w));
-	map(0x02400, 0x027ff).w(m_tilegen[1], FUNC(deco_bac06_device::pf_rowscroll_w));
-	map(0x06000, 0x07fff).w(m_tilegen[1], FUNC(deco_bac06_device::pf_data_w));
-	map(0x08000, 0x08007).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control_0_w));
-	map(0x08010, 0x08017).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control_1_w));
-	map(0x0c000, 0x0c07f).w(m_tilegen[0], FUNC(deco_bac06_device::pf_colscroll_w));
-	map(0x0c400, 0x0c7ff).w(m_tilegen[0], FUNC(deco_bac06_device::pf_rowscroll_w));
-	map(0x0e000, 0x0ffff).w(m_tilegen[0], FUNC(deco_bac06_device::pf_data_w));
-	// State 1 (Called by Trap 9)
-	map(0x18000, 0x19fff).w(m_tilegen[0], FUNC(deco_bac06_device::pf_data_w));
-	map(0x1c000, 0x1dfff).w(m_tilegen[1], FUNC(deco_bac06_device::pf_data_w));
-	// State 2 (Called by Trap A)
-	map(0x20000, 0x21fff).w(m_tilegen[1], FUNC(deco_bac06_device::pf_data_w));
-	map(0x22000, 0x23fff).w(m_tilegen[0], FUNC(deco_bac06_device::pf_data_w));
-	map(0x2e000, 0x2ffff).w(m_tilegen[0], FUNC(deco_bac06_device::pf_data_w));
-	// State 3 (Called by Trap B)
-	map(0x30000, 0x31fff).w(m_tilegen[0], FUNC(deco_bac06_device::pf_data_w));
-	map(0x38000, 0x39fff).w(m_tilegen[1], FUNC(deco_bac06_device::pf_data_w));
-}
-
-void dec0_state::slyspy_map(address_map &map)
+void slyspy_state::main_map(address_map &map)
 {
 	map(0x000000, 0x05ffff).rom();
 
 	/* The location of pf1 & pf2 can change in the 240000 - 24ffff region according to protection */
-	map(0x240000, 0x24ffff).m(m_pfprotect, FUNC(address_map_bank_device::amap16));
+
+	map(0x244000, 0x244001).r(FUNC(slyspy_state::prot_state_r)).nopw();
+	map(0x24a000, 0x24a001).w(FUNC(slyspy_state::prot_state_w));
+	map(0x240000, 0x24ffff).view(m_pfview);
+	// Default state (called by Traps 1, 3, 4, 7, C)
+	m_pfview[0](0x240000, 0x240007).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control_0_w));
+	m_pfview[0](0x240010, 0x240017).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control_1_w));
+	m_pfview[0](0x242000, 0x24207f).w(m_tilegen[1], FUNC(deco_bac06_device::pf_colscroll_w));
+	m_pfview[0](0x242400, 0x2427ff).w(m_tilegen[1], FUNC(deco_bac06_device::pf_rowscroll_w));
+	m_pfview[0](0x246000, 0x247fff).w(m_tilegen[1], FUNC(deco_bac06_device::pf_data_w));
+	m_pfview[0](0x248000, 0x248007).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control_0_w));
+	m_pfview[0](0x248010, 0x248017).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control_1_w));
+	m_pfview[0](0x24c000, 0x24c07f).w(m_tilegen[0], FUNC(deco_bac06_device::pf_colscroll_w));
+	m_pfview[0](0x24c400, 0x24c7ff).w(m_tilegen[0], FUNC(deco_bac06_device::pf_rowscroll_w));
+	m_pfview[0](0x24e000, 0x24ffff).w(m_tilegen[0], FUNC(deco_bac06_device::pf_data_w));
+	// State 1 (Called by Trap 9)
+	m_pfview[1](0x248000, 0x249fff).w(m_tilegen[0], FUNC(deco_bac06_device::pf_data_w));
+	m_pfview[1](0x24c000, 0x24dfff).w(m_tilegen[1], FUNC(deco_bac06_device::pf_data_w));
+	// State 2 (Called by Trap A)
+	m_pfview[2](0x240000, 0x241fff).w(m_tilegen[1], FUNC(deco_bac06_device::pf_data_w));
+	m_pfview[2](0x242000, 0x243fff).w(m_tilegen[0], FUNC(deco_bac06_device::pf_data_w));
+	m_pfview[2](0x24e000, 0x24ffff).w(m_tilegen[0], FUNC(deco_bac06_device::pf_data_w));
+	// State 3 (Called by Trap B)
+	m_pfview[3](0x240000, 0x241fff).w(m_tilegen[0], FUNC(deco_bac06_device::pf_data_w));
+	m_pfview[3](0x248000, 0x249fff).w(m_tilegen[1], FUNC(deco_bac06_device::pf_data_w));
 
 	/* Pf3 is unaffected by protection */
 	map(0x300000, 0x300007).w(m_tilegen[2], FUNC(deco_bac06_device::pf_control_0_w));
@@ -704,9 +681,9 @@ void dec0_state::slyspy_map(address_map &map)
 	map(0x308000, 0x3087ff).ram().share("spriteram");   /* Sprites */
 	map(0x310000, 0x3107ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x314001, 0x314001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x314002, 0x314003).w(FUNC(dec0_state::priority_w));
-	map(0x314008, 0x31400f).r(FUNC(dec0_state::slyspy_controls_r));
-	map(0x31c000, 0x31c00f).r(FUNC(dec0_state::slyspy_protection_r)).nopw();
+	map(0x314002, 0x314003).w(FUNC(slyspy_state::priority_w));
+	map(0x314008, 0x31400f).r(FUNC(slyspy_state::slyspy_controls_r));
+	map(0x31c000, 0x31c00f).r(FUNC(slyspy_state::prot_r)).nopw();
 }
 
 
@@ -766,59 +743,61 @@ void dec0_state::dec0_s_map(address_map &map)
 }
 
 /* Physical memory map (21 bits) */
-void dec0_state::slyspy_s_map(address_map &map)
+void slyspy_state::sound_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
-	map(0x080000, 0x0fffff).m(m_sndprotect, FUNC(address_map_bank_device::amap8));
+	map(0x0a0000, 0x0a0001).r(FUNC(slyspy_state::sound_prot_state_r)); /* Protection counter */
+	map(0x0d0000, 0x0d0001).r(FUNC(slyspy_state::sound_prot_state_reset_r));
+	map(0x080000, 0x0fffff).view(m_sndview);
+	// state 0
+	m_sndview[0](0x090000, 0x090001).w("ym2", FUNC(ym3812_device::write));
+	m_sndview[0](0x0b0000, 0x0b0001).w("ym1", FUNC(ym2203_device::write));
+	m_sndview[0](0x0e0000, 0x0e0001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	m_sndview[0](0x0f0000, 0x0f0001).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	// state 1
+	m_sndview[1](0x090000, 0x090001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	m_sndview[1](0x0c0000, 0x0c0001).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	m_sndview[1](0x0e0000, 0x0e0001).w("ym1", FUNC(ym2203_device::write));
+	m_sndview[1](0x0f0000, 0x0f0001).w("ym2", FUNC(ym3812_device::write));
+	// state 2
+	m_sndview[2](0x090000, 0x090001).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	m_sndview[2](0x0b0000, 0x0b0001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	m_sndview[2](0x0c0000, 0x0c0001).w("ym1", FUNC(ym2203_device::write));
+	m_sndview[2](0x0f0000, 0x0f0001).w("ym2", FUNC(ym3812_device::write));
+	// state 3
+	m_sndview[3](0x090000, 0x090001).w("ym2", FUNC(ym3812_device::write));
+	m_sndview[3](0x0c0000, 0x0c0001).w("ym1", FUNC(ym2203_device::write));
+	m_sndview[3](0x0e0000, 0x0e0001).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	m_sndview[3](0x0f0000, 0x0f0001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x1f0000, 0x1f1fff).ram();
 }
 
 // Sly Spy sound state protection machine emulation
 // similar to the video state machine
 // current bank is at 0x1f0045, incremented by 1 then here is read
-uint8_t dec0_state::slyspy_sound_state_r()
+uint8_t slyspy_state::sound_prot_state_r()
 {
-	m_slyspy_sound_state ++;
-	m_slyspy_sound_state &= 3;
-	m_sndprotect->set_bank(m_slyspy_sound_state);
+	if (!machine().side_effects_disabled())
+	{
+		m_sound_prot_state++;
+		m_sound_prot_state &= 3;
+		m_sndview.select(m_sound_prot_state);
+	}
 
 	// returned value doesn't matter
 	return 0xff;
 }
 
-uint8_t dec0_state::slyspy_sound_state_reset_r()
+uint8_t slyspy_state::sound_prot_state_reset_r()
 {
-	m_slyspy_sound_state = 0;
-	m_sndprotect->set_bank(m_slyspy_sound_state);
+	if (!machine().side_effects_disabled())
+	{
+		m_sound_prot_state = 0;
+		m_sndview.select(m_sound_prot_state);
+	}
 
 	// returned value doesn't matter
 	return 0xff;
-}
-
-void dec0_state::slyspy_sound_protection_map(address_map &map)
-{
-	map(0x020000, 0x020001).mirror(0x180000).r(FUNC(dec0_state::slyspy_sound_state_r)); /* Protection counter */
-	map(0x050000, 0x050001).mirror(0x180000).r(FUNC(dec0_state::slyspy_sound_state_reset_r));
-	// state 0
-	map(0x010000, 0x010001).w("ym2", FUNC(ym3812_device::write));
-	map(0x030000, 0x030001).w("ym1", FUNC(ym2203_device::write));
-	map(0x060000, 0x060001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x070000, 0x070001).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	// state 1
-	map(0x090000, 0x090001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x0c0000, 0x0c0001).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x0e0000, 0x0e0001).w("ym1", FUNC(ym2203_device::write));
-	map(0x0f0000, 0x0f0001).w("ym2", FUNC(ym3812_device::write));
-	// state 2
-	map(0x110000, 0x110001).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x130000, 0x130001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x140000, 0x140001).w("ym1", FUNC(ym2203_device::write));
-	map(0x170000, 0x170001).w("ym2", FUNC(ym3812_device::write));
-	// state 3
-	map(0x190000, 0x190001).w("ym2", FUNC(ym3812_device::write));
-	map(0x1c0000, 0x1c0001).w("ym1", FUNC(ym2203_device::write));
-	map(0x1e0000, 0x1e0001).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x1f0000, 0x1f0001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
 
@@ -1854,7 +1833,7 @@ void dec0_state::dec0(machine_config &config)
 	ym1.add_route(1, "mono", 0.81);
 	ym1.add_route(2, "mono", 0.81);
 	ym1.add_route(3, "mono", 0.32);
-	ym1.irq_handler().set_inputline(m_audiocpu, 0); // Schematics show both ym2203 and ym3812 can trigger IRQ, but Bandit is only game to program 2203 to do so
+	ym1.irq_handler().set_inputline(m_audiocpu, 0); // Schematics show both ym2203 and ym3812 can trigger IRQ, but Bandit is the only game to program 2203 to do so
 
 	ym3812_device &ym2(YM3812(config, "ym2", XTAL(12'000'000) / 4));
 	ym2.irq_handler().set_inputline(m_audiocpu, 0);
@@ -2174,14 +2153,14 @@ void dec0_state::birdtry(machine_config &config)
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_birdtry));
 }
 
-void dec0_state::robocop(machine_config &config)
+void robocop_state::robocop(machine_config &config)
 {
 	dec0(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &dec0_state::robocop_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &robocop_state::main_map);
 
 	H6280(config, m_subcpu, XTAL(21'477'272) / 16);
-	m_subcpu->set_addrmap(AS_PROGRAM, &dec0_state::robocop_sub_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &robocop_state::sub_map);
 	m_subcpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	mb8421_device &dem01(MB8421(config, "dem01"));
@@ -2191,8 +2170,8 @@ void dec0_state::robocop(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(3000));  /* Interleave between HuC6280 & 68000 */
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(dec0_state::screen_update_robocop));
-	m_spritegen->set_colpri_callback(FUNC(dec0_state::robocop_colpri_cb));
+	m_screen->set_screen_update(FUNC(robocop_state::screen_update_robocop));
+	m_spritegen->set_colpri_callback(FUNC(robocop_state::robocop_colpri_cb));
 }
 
 void dec0_state::robocopb(machine_config &config)
@@ -2204,20 +2183,20 @@ void dec0_state::robocopb(machine_config &config)
 	m_spritegen->set_colpri_callback(FUNC(dec0_state::robocop_colpri_cb));
 }
 
-void dec0_state::hippodrm(machine_config &config)
+void hippodrm_state::hippodrm(machine_config &config)
 {
 	dec0(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &dec0_state::hippodrm_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hippodrm_state::main_map);
 
 	H6280(config, m_subcpu, XTAL(21'477'272) / 16);
-	m_subcpu->set_addrmap(AS_PROGRAM, &dec0_state::hippodrm_sub_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &hippodrm_state::sub_map);
 	m_subcpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	config.set_maximum_quantum(attotime::from_hz(300));   /* Interleave between H6280 & 68000 */
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(dec0_state::screen_update_robocop));
+	m_screen->set_screen_update(FUNC(hippodrm_state::screen_update_robocop));
 	m_screen->screen_vblank().set_inputline(m_subcpu, 1); /* VBL */
 }
 
@@ -2228,7 +2207,7 @@ void dec0_state::ffantasybl(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dec0_state::ffantasybl_map);
 
 //  H6280(config, m_subcpu, XTAL(21'477'272) / 16);
-//  m_subcpu->set_addrmap(AS_PROGRAM, &dec0_state::hippodrm_sub_map);
+//  m_subcpu->set_addrmap(AS_PROGRAM, &dec0_state::sub_map);
 //  m_subcpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 //  config.set_maximum_quantum(attotime::from_hz(300));   /* Interleave between H6280 & 68000 */
@@ -2237,40 +2216,36 @@ void dec0_state::ffantasybl(machine_config &config)
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_robocop));
 }
 
-MACHINE_RESET_MEMBER(dec0_state,slyspy)
+void slyspy_state::machine_reset()
 {
 	// set initial memory map
-	m_slyspy_state = 0;
-	m_pfprotect->set_bank(m_slyspy_state);
-	m_slyspy_sound_state = 0;
-	m_sndprotect->set_bank(m_slyspy_sound_state);
+	m_prot_state = 0;
+	m_pfview.select(m_prot_state);
+	m_sound_prot_state = 0;
+	m_sndview.select(m_sound_prot_state);
+	m_sndview.select(m_sound_prot_state);
 }
 
-void dec0_state::slyspy(machine_config &config)
+void slyspy_state::slyspy(machine_config &config)
 {
 	dec1(config);
 
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(20'000'000)/2); /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &dec0_state::slyspy_map);
-	m_maincpu->set_vblank_int("screen", FUNC(dec0_state::irq6_line_hold)); /* VBL, apparently it auto-acks */
+	m_maincpu->set_addrmap(AS_PROGRAM, &slyspy_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(slyspy_state::irq6_line_hold)); /* VBL, apparently it auto-acks */
 
 	// TODO: both games doesn't like /3 here, MT #06740
 	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(12'000'000)/2/2)); /* verified on pcb (6Mhz is XIN on pin 10 of H6280) */
-	audiocpu.set_addrmap(AS_PROGRAM, &dec0_state::slyspy_s_map);
+	audiocpu.set_addrmap(AS_PROGRAM, &slyspy_state::sound_map);
 	audiocpu.add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
-	ADDRESS_MAP_BANK(config, "pfprotect").set_map(&dec0_state::slyspy_protection_map).set_options(ENDIANNESS_BIG, 16, 18, 0x10000);
-	ADDRESS_MAP_BANK(config, "sndprotect").set_map(&dec0_state::slyspy_sound_protection_map).set_options(ENDIANNESS_LITTLE, 8, 21, 0x80000);
-
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(dec0_state,slyspy)
+	MCFG_VIDEO_START_OVERRIDE(slyspy_state,slyspy)
 
-	m_tilegen[1]->set_tile_callback(FUNC(dec0_state::baddudes_tile_cb));
+	m_tilegen[1]->set_tile_callback(FUNC(slyspy_state::baddudes_tile_cb));
 
-	m_screen->set_screen_update(FUNC(dec0_state::screen_update_slyspy));
-
-	MCFG_MACHINE_RESET_OVERRIDE(dec0_state,slyspy)
+	m_screen->set_screen_update(FUNC(slyspy_state::screen_update));
 }
 
 void dec0_state::midres(machine_config &config)
@@ -4305,35 +4280,35 @@ uint16_t dec0_state::ffantasybl_242024_r()
 /******************************************************************************/
 
 //    YEAR, NAME,       PARENT,   MACHINE,    INPUT,      STATE/DEVICE,   INIT,        MONITOR,COMPANY,                 FULLNAME,            FLAGS
-GAME( 1987, hbarrel,    0,        hbarrel,    hbarrel,    dec0_state, init_hbarrel,    ROT270, "Data East Corporation", "Heavy Barrel (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, hbarrelu,   hbarrel,  hbarrel,    hbarrel,    dec0_state, init_hbarrel,    ROT270, "Data East USA",         "Heavy Barrel (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, baddudes,   0,        baddudes,   baddudes,   dec0_state, init_hbarrel,    ROT0,   "Data East USA",         "Bad Dudes vs. Dragonninja (US revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, drgninja,   baddudes, baddudes,   drgninja,   dec0_state, init_hbarrel,    ROT0,   "Data East Corporation", "Dragonninja (Japan revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, birdtry,    0,        birdtry,    birdtry,    dec0_state, init_hbarrel,    ROT270, "Data East Corporation", "Birdie Try (Japan revision 2, revision 1 MCU)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, birdtrya,   birdtry,  birdtry,    birdtry,    dec0_state, init_hbarrel,    ROT270, "Data East Corporation", "Birdie Try (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, birdtryb,   birdtry,  birdtry,    birdtry,    dec0_state, init_hbarrel,    ROT270, "Data East Corporation", "Birdie Try (Japan revision S)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, robocop,    0,        robocop,    robocop,    dec0_state, empty_init,      ROT0,   "Data East Corporation", "Robocop (World revision 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, robocopw,   robocop,  robocop,    robocop,    dec0_state, empty_init,      ROT0,   "Data East Corporation", "Robocop (World revision 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, robocopj,   robocop,  robocop,    robocop,    dec0_state, empty_init,      ROT0,   "Data East Corporation", "Robocop (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, robocopu,   robocop,  robocop,    robocop,    dec0_state, empty_init,      ROT0,   "Data East USA",         "Robocop (US revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, robocopu0,  robocop,  robocop,    robocop,    dec0_state, empty_init,      ROT0,   "Data East USA",         "Robocop (US revision 0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bandit,     0,        bandit,     bandit,     dec0_state, init_hbarrel,    ROT90,  "Data East USA",         "Bandit (US)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, hippodrm,   0,        hippodrm,   hippodrm,   dec0_state, init_hippodrm,   ROT0,   "Data East USA",         "Hippodrome (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ffantasy,   hippodrm, hippodrm,   ffantasy,   dec0_state, init_hippodrm,   ROT0,   "Data East Corporation", "Fighting Fantasy (Japan revision 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ffantasyj,  hippodrm, hippodrm,   ffantasy,   dec0_state, init_hippodrm,   ROT0,   "Data East Corporation", "Fighting Fantasy (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ffantasya,  hippodrm, hippodrm,   ffantasy,   dec0_state, init_hippodrm,   ROT0,   "Data East Corporation", "Fighting Fantasy (Japan)", MACHINE_SUPPORTS_SAVE ) // presumably rev 1
-GAME( 1989, ffantasyb,  hippodrm, hippodrm,   ffantasy,   dec0_state, init_hippodrm,   ROT0,   "Data East Corporation", "Fighting Fantasy (Japan revision ?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, secretag,   0,        slyspy,     slyspy,     dec0_state, init_slyspy,     ROT0,   "Data East Corporation", "Secret Agent (World revision 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, secretagj,  secretag, slyspy,     slyspy,     dec0_state, init_slyspy,     ROT0,   "Data East Corporation", "Secret Agent (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, slyspy,     secretag, slyspy,     slyspy,     dec0_state, init_slyspy,     ROT0,   "Data East USA",         "Sly Spy (US revision 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, slyspy3,    secretag, slyspy,     slyspy,     dec0_state, init_slyspy,     ROT0,   "Data East USA",         "Sly Spy (US revision 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, slyspy2,    secretag, slyspy,     slyspy,     dec0_state, init_slyspy,     ROT0,   "Data East USA",         "Sly Spy (US revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, midres,     0,        midres,     midres,     dec0_state, empty_init,      ROT0,   "Data East Corporation", "Midnight Resistance (World, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, midres2,    midres,   midres,     midres2,    dec0_state, empty_init,      ROT0,   "Data East Corporation", "Midnight Resistance (World, set 2)", MACHINE_SUPPORTS_SAVE ) // uses button 3 for rotating, later rev?
-GAME( 1989, midresu,    midres,   midres,     midres,     dec0_state, empty_init,      ROT0,   "Data East USA",         "Midnight Resistance (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, midresj,    midres,   midres,     midres,     dec0_state, empty_init,      ROT0,   "Data East Corporation", "Midnight Resistance (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, bouldash,   0,        slyspy,     bouldash,   dec0_state, init_slyspy,     ROT0,   "Data East Corporation (licensed from First Star)", "Boulder Dash / Boulder Dash Part 2 (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, bouldashj,  bouldash, slyspy,     bouldash,   dec0_state, init_slyspy,     ROT0,   "Data East Corporation (licensed from First Star)", "Boulder Dash / Boulder Dash Part 2 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hbarrel,    0,        hbarrel,    hbarrel,    dec0_state,     init_hbarrel,    ROT270, "Data East Corporation", "Heavy Barrel (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hbarrelu,   hbarrel,  hbarrel,    hbarrel,    dec0_state,     init_hbarrel,    ROT270, "Data East USA",         "Heavy Barrel (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, baddudes,   0,        baddudes,   baddudes,   dec0_state,     init_hbarrel,    ROT0,   "Data East USA",         "Bad Dudes vs. Dragonninja (US revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, drgninja,   baddudes, baddudes,   drgninja,   dec0_state,     init_hbarrel,    ROT0,   "Data East Corporation", "Dragonninja (Japan revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, birdtry,    0,        birdtry,    birdtry,    dec0_state,     init_hbarrel,    ROT270, "Data East Corporation", "Birdie Try (Japan revision 2, revision 1 MCU)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, birdtrya,   birdtry,  birdtry,    birdtry,    dec0_state,     init_hbarrel,    ROT270, "Data East Corporation", "Birdie Try (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, birdtryb,   birdtry,  birdtry,    birdtry,    dec0_state,     init_hbarrel,    ROT270, "Data East Corporation", "Birdie Try (Japan revision S)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, robocop,    0,        robocop,    robocop,    robocop_state,  empty_init,      ROT0,   "Data East Corporation", "Robocop (World revision 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, robocopw,   robocop,  robocop,    robocop,    robocop_state,  empty_init,      ROT0,   "Data East Corporation", "Robocop (World revision 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, robocopj,   robocop,  robocop,    robocop,    robocop_state,  empty_init,      ROT0,   "Data East Corporation", "Robocop (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, robocopu,   robocop,  robocop,    robocop,    robocop_state,  empty_init,      ROT0,   "Data East USA",         "Robocop (US revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, robocopu0,  robocop,  robocop,    robocop,    robocop_state,  empty_init,      ROT0,   "Data East USA",         "Robocop (US revision 0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bandit,     0,        bandit,     bandit,     dec0_state,     init_hbarrel,    ROT90,  "Data East USA",         "Bandit (US)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, hippodrm,   0,        hippodrm,   hippodrm,   hippodrm_state, init_hippodrm,   ROT0,   "Data East USA",         "Hippodrome (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ffantasy,   hippodrm, hippodrm,   ffantasy,   hippodrm_state, init_hippodrm,   ROT0,   "Data East Corporation", "Fighting Fantasy (Japan revision 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ffantasyj,  hippodrm, hippodrm,   ffantasy,   hippodrm_state, init_hippodrm,   ROT0,   "Data East Corporation", "Fighting Fantasy (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ffantasya,  hippodrm, hippodrm,   ffantasy,   hippodrm_state, init_hippodrm,   ROT0,   "Data East Corporation", "Fighting Fantasy (Japan)", MACHINE_SUPPORTS_SAVE ) // presumably rev 1
+GAME( 1989, ffantasyb,  hippodrm, hippodrm,   ffantasy,   hippodrm_state, init_hippodrm,   ROT0,   "Data East Corporation", "Fighting Fantasy (Japan revision ?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, secretag,   0,        slyspy,     slyspy,     slyspy_state,   init_slyspy,     ROT0,   "Data East Corporation", "Secret Agent (World revision 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, secretagj,  secretag, slyspy,     slyspy,     slyspy_state,   init_slyspy,     ROT0,   "Data East Corporation", "Secret Agent (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, slyspy,     secretag, slyspy,     slyspy,     slyspy_state,   init_slyspy,     ROT0,   "Data East USA",         "Sly Spy (US revision 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, slyspy3,    secretag, slyspy,     slyspy,     slyspy_state,   init_slyspy,     ROT0,   "Data East USA",         "Sly Spy (US revision 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, slyspy2,    secretag, slyspy,     slyspy,     slyspy_state,   init_slyspy,     ROT0,   "Data East USA",         "Sly Spy (US revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, midres,     0,        midres,     midres,     dec0_state,     empty_init,      ROT0,   "Data East Corporation", "Midnight Resistance (World, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, midres2,    midres,   midres,     midres2,    dec0_state,     empty_init,      ROT0,   "Data East Corporation", "Midnight Resistance (World, set 2)", MACHINE_SUPPORTS_SAVE ) // uses button 3 for rotating, later rev?
+GAME( 1989, midresu,    midres,   midres,     midres,     dec0_state,     empty_init,      ROT0,   "Data East USA",         "Midnight Resistance (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, midresj,    midres,   midres,     midres,     dec0_state,     empty_init,      ROT0,   "Data East Corporation", "Midnight Resistance (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, bouldash,   0,        slyspy,     bouldash,   slyspy_state,   init_slyspy,     ROT0,   "Data East Corporation (licensed from First Star)", "Boulder Dash / Boulder Dash Part 2 (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, bouldashj,  bouldash, slyspy,     bouldash,   slyspy_state,   init_slyspy,     ROT0,   "Data East Corporation (licensed from First Star)", "Boulder Dash / Boulder Dash Part 2 (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // bootlegs
 

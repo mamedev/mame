@@ -4,7 +4,7 @@
 
   TMS1000 family - TMS0980, TMS1980
 
-TMS0980
+TMS0980 die notes:
 - 144x4bit RAM array at the bottom-left (128+16, set up as 8x18x4)
 - 2048x9bit ROM array at the bottom-left
 - main instructions PLAs at the top half, to the right of the midline
@@ -32,12 +32,12 @@ DEFINE_DEVICE_TYPE(TMS0980, tms0980_cpu_device, "tms0980", "Texas Instruments TM
 DEFINE_DEVICE_TYPE(TMS1980, tms1980_cpu_device, "tms1980", "Texas Instruments TMS1980") // 28-pin DIP, 7 O pins, 10 R pins, high voltage
 
 
-tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	tms0980_cpu_device(mconfig, TMS0980, tag, owner, clock, 8 /* o pins */, 9 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 1 /* stack levels */, 11 /* rom width */, address_map_constructor(FUNC(tms0980_cpu_device::rom_11bit), this), 8 /* ram width */, address_map_constructor(FUNC(tms0980_cpu_device::ram_144x4), this))
-{ }
-
 tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map) :
 	tms0970_cpu_device(mconfig, type, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, stack_levels, rom_width, rom_map, ram_width, ram_map)
+{ }
+
+tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	tms0980_cpu_device(mconfig, TMS0980, tag, owner, clock, 8 /* o pins */, 9 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 1 /* stack levels */, 11 /* rom width */, address_map_constructor(FUNC(tms0980_cpu_device::rom_11bit), this), 8 /* ram width */, address_map_constructor(FUNC(tms0980_cpu_device::ram_144x4), this))
 { }
 
 tms1980_cpu_device::tms1980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
@@ -57,18 +57,18 @@ void tms0980_cpu_device::ram_144x4(address_map &map)
 void tms0980_cpu_device::device_add_mconfig(machine_config &config)
 {
 	// main opcodes PLA, microinstructions PLA, output PLA, segment PLA
-	PLA(config, "ipla", 9, 22, 24).set_format(pla_device::FMT::BERKELEY);
-	PLA(config, "mpla", 6, 20, 64).set_format(pla_device::FMT::BERKELEY);
-	PLA(config, "opla", 4, 8, 16).set_format(pla_device::FMT::BERKELEY);
-	PLA(config, "spla", 3, 8, 8).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_ipla, 9, 22, 24).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_mpla, 6, 20, 64).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_opla, 4, 8, 16).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_spla, 3, 8, 8).set_format(pla_device::FMT::BERKELEY);
 }
 
 void tms1980_cpu_device::device_add_mconfig(machine_config &config)
 {
 	// main opcodes PLA, microinstructions PLA, output PLA
-	PLA(config, "ipla", 9, 22, 24).set_format(pla_device::FMT::BERKELEY);
-	PLA(config, "mpla", 6, 22, 64).set_format(pla_device::FMT::BERKELEY);
-	PLA(config, "opla", 5, 7, 32).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_ipla, 9, 22, 24).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_mpla, 6, 22, 64).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_opla, 5, 7, 32).set_format(pla_device::FMT::BERKELEY);
 }
 
 
@@ -80,40 +80,6 @@ std::unique_ptr<util::disasm_interface> tms0980_cpu_device::create_disassembler(
 
 
 // device_reset
-u32 tms0980_cpu_device::decode_fixed(u16 op)
-{
-	u32 decode = 0;
-	u32 mask = m_ipla->read(op);
-
-	// 1 line per PLA row, no OR-mask
-	const u32 id[15] = { F_LDP, F_SBL, F_OFF, F_RBIT, F_SAL, F_XDA, F_REAC, F_SETR, F_RETN, F_SBIT, F_TDO, F_COMX8, F_COMX, F_LDX, F_SEAC };
-
-	for (int bit = 0; bit < 15; bit++)
-		if (mask & (0x80 << bit))
-			decode |= id[bit];
-
-	return decode;
-}
-
-u32 tms0980_cpu_device::decode_micro(u8 sel)
-{
-	u32 decode = 0;
-	sel = bitswap<8>(sel,7,6,0,1,2,3,4,5); // lines are reversed
-	u32 mask = m_mpla->read(sel);
-	mask ^= 0x43fc3; // invert active-negative
-
-	// M_RSTR is specific to TMS02x0/TMS1980, it redirects to F_RSTR
-	// M_UNK1 is specific to TMS0270, unknown/unused yet and apparently not connected on every TMS0270
-	//                   _______  ______                                _____  _____  _____  _____  ______  _____  ______  _____                            _____
-	const u32 md[22] = { M_NDMTP, M_DMTP, M_AUTY, M_AUTA, M_CKM, M_SSE, M_CKP, M_YTP, M_MTP, M_ATN, M_NATN, M_MTN, M_15TN, M_CKN, M_NE, M_C8, M_SSS, M_CME, M_CIN, M_STO, M_RSTR, M_UNK1 };
-
-	for (int bit = 0; bit < 22 && bit < m_mpla->outputs(); bit++)
-		if (mask & (1 << bit))
-			decode |= md[bit];
-
-	return decode;
-}
-
 void tms0980_cpu_device::device_reset()
 {
 	// common reset
@@ -121,7 +87,7 @@ void tms0980_cpu_device::device_reset()
 
 	// pre-decode instructionset
 	m_fixed_decode.resize(0x200);
-	memset(&m_fixed_decode[0], 0, 0x200*sizeof(u32));
+	memset(&m_fixed_decode[0], 0, 0x200*sizeof(u64));
 	m_micro_decode.resize(0x200);
 	memset(&m_micro_decode[0], 0, 0x200*sizeof(u32));
 
@@ -145,6 +111,40 @@ void tms0980_cpu_device::device_reset()
 
 	for (int op = 0; op < 0x40; op++)
 		m_micro_direct[op] = m_decode_micro.isnull() ? decode_micro(op) : m_decode_micro(op + 0x200);
+}
+
+u32 tms0980_cpu_device::decode_fixed(offs_t offset)
+{
+	u32 decode = 0;
+	u32 mask = m_ipla->read(offset);
+
+	// 1 line per PLA row, no OR-mask
+	const u32 id[15] = { F_LDP, F_SBL, F_OFF, F_RBIT, F_SAL, F_XDA, F_REAC, F_SETR, F_RETN, F_SBIT, F_TDO, F_COMX8, F_COMX, F_LDX, F_SEAC };
+
+	for (int bit = 0; bit < 15; bit++)
+		if (mask & (0x80 << bit))
+			decode |= id[bit];
+
+	return decode;
+}
+
+u32 tms0980_cpu_device::decode_micro(offs_t offset)
+{
+	u32 decode = 0;
+	offset = bitswap<6>(offset,0,1,2,3,4,5); // lines are reversed
+	u32 mask = m_mpla->read(offset);
+	mask ^= 0x43fc3; // invert active-negative
+
+	// M_RSTR is specific to TMS02x0/TMS1980, it redirects to F_RSTR
+	// M_UNK1 is specific to TMS0270, unknown/unused yet and apparently not connected on every TMS0270
+	//                   _______  ______                                _____  _____  _____  _____  ______  _____  ______  _____                            _____
+	const u32 md[22] = { M_NDMTP, M_DMTP, M_AUTY, M_AUTA, M_CKM, M_SSE, M_CKP, M_YTP, M_MTP, M_ATN, M_NATN, M_MTN, M_15TN, M_CKN, M_NE, M_C8, M_SSS, M_CME, M_CIN, M_STO, M_RSTR, M_UNK1 };
+
+	for (int bit = 0; bit < 22 && bit < m_mpla->outputs(); bit++)
+		if (mask & (1 << bit))
+			decode |= md[bit];
+
+	return decode;
 }
 
 

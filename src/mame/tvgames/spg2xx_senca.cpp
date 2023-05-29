@@ -7,6 +7,8 @@
 #include "spg2xx.h"
 
 
+namespace {
+
 class zon32bit_state : public spg2xx_game_state
 {
 public:
@@ -1035,6 +1037,7 @@ void denver_200in1_state::init_m521neo()
 	rom[0x43c30 + (0x6000000 / 2)] = 0xf165; // boot main bank
 }
 
+} // anonymous namespace
 
 
 // Box advertises this as '40 Games Included' but the cartridge, which was glued directly to the PCB, not removable, is a 41-in-1.  Maybe some versions exist with a 40 game selection.

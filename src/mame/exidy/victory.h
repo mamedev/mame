@@ -5,8 +5,8 @@
     Victory system
 
 ****************************************************************************/
-#ifndef MAME_INCLUDES_VICTORY_H
-#define MAME_INCLUDES_VICTORY_H
+#ifndef MAME_EXIDY_VICTORY_H
+#define MAME_EXIDY_VICTORY_H
 
 #pragma once
 
@@ -110,4 +110,4 @@ private:
 	emu_timer *m_bgcoll_irq_timer = nullptr;
 };
 
-#endif // MAME_INCLUDES_VICTORY_H
+#endif // MAME_EXIDY_VICTORY_H

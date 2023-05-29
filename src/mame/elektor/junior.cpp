@@ -44,6 +44,8 @@ To Do:
 #include "junior.lh"
 
 
+namespace {
+
 class junior_state : public driver_device
 {
 public:
@@ -223,6 +225,9 @@ ROM_START( junior )
 	ROM_SYSTEM_BIOS( 2, "2732", "Just monitor (2732)" )
 	ROMX_LOAD( "junior27321a.ic2", 0x0000, 0x0400, CRC(e22f24cc) SHA1(a6edb52a9eea5e99624c128065e748e5a3fb2e4c), ROM_BIOS(2))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

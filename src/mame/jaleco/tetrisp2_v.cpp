@@ -34,7 +34,6 @@ To Do:
 
 #include "emu.h"
 #include "tetrisp2.h"
-#include "screen.h"
 
 
 WRITE_LINE_MEMBER(tetrisp2_state::flipscreen_w)
@@ -126,8 +125,8 @@ void rocknms_state::rocknms_sub_priority_w(offs_t offset, u16 data, u16 mem_mask
 
 TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_bg)
 {
-	u16 code_hi = m_vram_bg[ 2 * tile_index + 0];
-	u16 code_lo = m_vram_bg[ 2 * tile_index + 1];
+	u16 code_hi = m_vram_bg[2 * tile_index + 0];
+	u16 code_lo = m_vram_bg[2 * tile_index + 1];
 	tileinfo.set(0,
 			code_hi,
 			code_lo & 0xf,
@@ -146,8 +145,8 @@ void tetrisp2_state::tetrisp2_vram_bg_w(offs_t offset, u16 data, u16 mem_mask)
 
 TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_fg)
 {
-	u16 code_hi = m_vram_fg[ 2 * tile_index + 0];
-	u16 code_lo = m_vram_fg[ 2 * tile_index + 1];
+	u16 code_hi = m_vram_fg[2 * tile_index + 0];
+	u16 code_lo = m_vram_fg[2 * tile_index + 1];
 	tileinfo.set(2,
 			code_hi,
 			code_lo & 0xf,
@@ -156,7 +155,13 @@ TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_fg)
 
 void tetrisp2_state::tetrisp2_vram_fg_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA(&m_vram_fg[offset]);
+	// VJ and Stepping Stage write to the upper byte here to display ASCII text,
+	// other usages in those games outside of ASCII text write a full 16-bit value.
+	if (mem_mask == 0xff00)
+		m_vram_fg[offset] = data & 0x00ff;
+	else
+		m_vram_fg[offset] = data;
+
 	m_tilemap_fg->mark_tile_dirty(offset/2);
 }
 
@@ -350,8 +355,9 @@ static void tetrisp2_draw_sprites(BitmapClass &bitmap, bitmap_ind8 &bitmap_pri, 
 		if (disable || !xzoom || !yzoom)
 			continue;
 
+		u32 primask = 0;
+		if (priority_ram)
 		{
-			u32 primask = 0;
 			if (priority_ram[(pri | 0x0a00 | 0x1500) / 2] & 0x38) primask |= 1 << 0;
 			if (priority_ram[(pri | 0x0a00 | 0x1400) / 2] & 0x38) primask |= 1 << 1;
 			if (priority_ram[(pri | 0x0a00 | 0x1100) / 2] & 0x38) primask |= 1 << 2;
@@ -360,17 +366,15 @@ static void tetrisp2_draw_sprites(BitmapClass &bitmap, bitmap_ind8 &bitmap_pri, 
 			if (priority_ram[(pri | 0x0a00 | 0x0400) / 2] & 0x38) primask |= 1 << 5;
 			if (priority_ram[(pri | 0x0a00 | 0x0100) / 2] & 0x38) primask |= 1 << 6;
 			if (priority_ram[(pri | 0x0a00 | 0x0000) / 2] & 0x38) primask |= 1 << 7;
-
-			chip->prio_zoom_transpen(bitmap,cliprect,
-					code,
-					color,
-					flipx, flipy,
-					sx,sy,
-					tx, ty, xsize, ysize,
-					xzoom, yzoom, bitmap_pri,primask, 0);
-
 		}
 
+		chip->prio_zoom_transpen(bitmap,cliprect,
+				code,
+				color,
+				flipx, flipy,
+				sx,sy,
+				tx, ty, xsize, ysize,
+				xzoom, yzoom, bitmap_pri,primask, 0);
 
 	}   /* end sprite loop */
 }
@@ -638,25 +642,10 @@ u32 rocknms_state::screen_update_rocknms_right(screen_device &screen, bitmap_rgb
 
 ***************************************************************************/
 
-// Temporary hack for stpestag: unaltered ASCII bytes are written in the most significant byte
-// of code_hi, one of the CPUs probably reads them and writes the actual tile codes somewhere.
-TILE_GET_INFO_MEMBER(stepstag_state::stepstag_get_tile_info_fg)
-{
-	u16 const code_hi = m_vram_fg[ 2 * tile_index ] >> 8;
-	u16 const code_lo = m_vram_fg[ 2 * tile_index ] & 0xf;
-	//logerror("tile_idx[$%2x]=$%3x, palette=$%2x\n", tile_index, code_hi, code_lo);////
-	if (m_vram_fg[2 * tile_index + 1] != 0)
-		logerror("VRAM ASCII Haut-Mot Non-Zero!!!\n");/////////
-	tileinfo.set(2,
-			code_hi,
-			code_lo,
-			0);
-}
-
 VIDEO_START_MEMBER(stepstag_state,stepstag)
 {
 	m_tilemap_bg = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(stepstag_state::get_tile_info_bg)), TILEMAP_SCAN_ROWS, 16,16, NX_0,NY_0);
-	m_tilemap_fg = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(stepstag_state::stepstag_get_tile_info_fg)), TILEMAP_SCAN_ROWS, 8,8, NX_1,NY_1);
+	m_tilemap_fg = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(stepstag_state::get_tile_info_fg)), TILEMAP_SCAN_ROWS, 8,8, NX_1,NY_1);
 	m_tilemap_rot = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(stepstag_state::get_tile_info_rot)), TILEMAP_SCAN_ROWS, 16,16, NX_0*2,NY_0*2);
 	m_tilemap_bg->set_transparent_pen(0);
 	m_tilemap_fg->set_transparent_pen(0);
@@ -672,54 +661,32 @@ u32 stepstag_state::screen_update_stepstag_left(screen_device &screen, bitmap_rg
 	screen.priority().fill(0);
 
 	tetrisp2_draw_sprites(
-			bitmap, screen.priority(), cliprect, m_priority.get(),
-			m_spriteram1, m_spriteram1.bytes(), m_vj_sprite_l);
+			bitmap, screen.priority(), cliprect, nullptr,
+			m_spriteram1_data.get(), 0x400, m_vj_sprite_l);
 
 	return 0;
 }
 
 u32 stepstag_state::screen_update_stepstag_mid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	// Text sprites on the middle screen might only be displayed when the service switch is toggled.
+	// There's a relay with the RGBS wires main PCB going into it that seems to click based on the service switch.
+
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0);
 
 	tetrisp2_draw_sprites(
-			bitmap, screen.priority(), cliprect, m_priority.get(),
-			m_spriteram2, m_spriteram2.bytes(), m_vj_sprite_m);
+			bitmap, screen.priority(), cliprect, nullptr,
+			m_spriteram2_data.get(), 0x400, m_vj_sprite_m);
 
-//  m_tilemap_rot->draw(screen, bitmap, cliprect, 0, 1 << 1);
-//  m_tilemap_bg->draw(screen, bitmap, cliprect, 0, 1 << 0);
-	m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
+	m_tilemap_bg->set_scrollx(0, (((m_scroll_bg[0] + 0x0014) + m_scroll_bg[2]) & 0xffff));
+	m_tilemap_bg->set_scrolly(0, (((m_scroll_bg[3] + 0x0000) + m_scroll_bg[5]) & 0xffff));
 
-	return 0;
-}
+	m_tilemap_fg->set_scrollx(0, m_scroll_fg[2]);
+	m_tilemap_fg->set_scrolly(0, m_scroll_fg[5]);
 
-u32 stepstag_state::screen_update_stepstag_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(0, cliprect);
-	screen.priority().fill(0);
-
-	tetrisp2_draw_sprites(
-			bitmap, screen.priority(), cliprect, m_priority.get(),
-			m_spriteram3, m_spriteram3.bytes(), m_vj_sprite_r);
-
-	return 0;
-}
-
-u32 stepstag_state::screen_update_stepstag_main(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	/* Black background color */
-	bitmap.fill(0, cliprect);
-	screen.priority().fill(0);
-
-	m_tilemap_bg->set_scrollx(0, (((m_scroll_bg[ 0 ] + 0x0014) + m_scroll_bg[ 2 ] ) & 0xffff));
-	m_tilemap_bg->set_scrolly(0, (((m_scroll_bg[ 3 ] + 0x0000) + m_scroll_bg[ 5 ] ) & 0xffff));
-
-	m_tilemap_fg->set_scrollx(0, m_scroll_fg[ 2 ]);
-	m_tilemap_fg->set_scrolly(0, m_scroll_fg[ 5 ]);
-
-	m_tilemap_rot->set_scrollx(0, (m_rotregs[ 0 ] - m_rot_ofsx));
-	m_tilemap_rot->set_scrolly(0, (m_rotregs[ 2 ] - m_rot_ofsy));
+	m_tilemap_rot->set_scrollx(0, (m_rotregs[0] - m_rot_ofsx));
+	m_tilemap_rot->set_scrolly(0, (m_rotregs[2] - m_rot_ofsy));
 
 	int asc_pri = 0, scr_pri = 0, rot_pri = 0;
 
@@ -766,28 +733,35 @@ u32 stepstag_state::screen_update_stepstag_main(screen_device &screen, bitmap_in
 	return 0;
 }
 
+u32 stepstag_state::screen_update_stepstag_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(0, cliprect);
+	screen.priority().fill(0);
+
+	tetrisp2_draw_sprites(
+			bitmap, screen.priority(), cliprect, nullptr,
+			m_spriteram3_data.get(), 0x400, m_vj_sprite_r);
+
+	return 0;
+}
+
 // Stepping Stage encodes palette as YUV422.
 // Convert them on the fly
 void stepstag_state::convert_yuv422_to_rgb888(palette_device *paldev, u16 *palram, u32 offset)
 {
-	u8 u =  palram[offset/4*4+0] & 0xff;
-	u8 y1 = palram[offset/4*4+1] & 0xff;
-	u8 v =  palram[offset/4*4+2] & 0xff;
-	//u8 y2 = palram[offset/4*4+3] & 0xff;
-	double bf = y1+1.772*(u - 128);
-	double gf = y1-0.334*(u - 128) - 0.714 * (v - 128);
-	double rf = y1+1.772*(v - 128);
-	// clamp to 0-255 range
-	rf = std::min(rf,255.0);
-	rf = std::max(rf,0.0);
-	gf = std::min(gf,255.0);
-	gf = std::max(gf,0.0);
-	bf = std::min(bf,255.0);
-	bf = std::max(bf,0.0);
+	u8 const u =  palram[offset/4*4 + 0] & 0xff;
+	u8 const y1 = palram[offset/4*4 + 1] & 0xff;
+	u8 const v =  palram[offset/4*4 + 2] & 0xff;
+	//u8 const y2 = palram[offset/4*4 + 3] & 0xff;
 
-	u8 r = (u8)rf;
-	u8 g = (u8)gf;
-	u8 b = (u8)bf;
+	double const bf = y1 + (1.772 * (u - 128));
+	double const gf = y1 - (0.334 * (u - 128)) - (0.714 * (v - 128));
+	double const rf = y1 + (1.402 * (v - 128));
+
+	// clamp to 0-255 range
+	u8 const r = u8(std::clamp(rf, 0.0, 255.0));
+	u8 const g = u8(std::clamp(gf, 0.0, 255.0));
+	u8 const b = u8(std::clamp(bf, 0.0, 255.0));
 
 	paldev->set_pen_color(offset/4, r, g, b);
 }
@@ -808,4 +782,107 @@ void stepstag_state::stepstag_palette_right_w(offs_t offset, u16 data, u16 mem_m
 {
 	COMBINE_DATA(&m_vj_paletteram_r[offset]);
 	convert_yuv422_to_rgb888(m_vj_palette_r,m_vj_paletteram_r,offset);
+}
+
+u32 stepstag_state::screen_update_vjdash_main(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// Black background color
+	bitmap.fill(0, cliprect);
+	screen.priority().fill(0);
+
+	m_tilemap_bg->set_scrollx(0, (((m_scroll_bg[0] + 0x0014) + m_scroll_bg[2]) & 0xffff));
+	m_tilemap_bg->set_scrolly(0, (((m_scroll_bg[3] + 0x0000) + m_scroll_bg[5]) & 0xffff));
+
+	m_tilemap_fg->set_scrollx(0, m_scroll_fg[2]);
+	m_tilemap_fg->set_scrolly(0, m_scroll_fg[5]);
+
+	m_tilemap_rot->set_scrollx(0, (m_rotregs[0] - m_rot_ofsx));
+	m_tilemap_rot->set_scrolly(0, (m_rotregs[2] - m_rot_ofsy));
+
+	int asc_pri = 0, scr_pri = 0, rot_pri = 0;
+
+	if ((m_priority[0x2b00 / 2] & 0x00ff) == 0x0034)
+		asc_pri++;
+	else
+		rot_pri++;
+
+	if ((m_priority[0x2e00 / 2] & 0x00ff) == 0x0034)
+		asc_pri++;
+	else
+		scr_pri++;
+
+	if ((m_priority[0x3a00 / 2] & 0x00ff) == 0x000c)
+		scr_pri++;
+	else
+		rot_pri++;
+
+	if (rot_pri == 0)
+		m_tilemap_rot->draw(screen, bitmap, cliprect, 0, 1 << 1);
+	else if (scr_pri == 0)
+		m_tilemap_bg->draw(screen, bitmap, cliprect, 0, 1 << 0);
+	else if (asc_pri == 0)
+		m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
+
+	if (rot_pri == 1)
+		m_tilemap_rot->draw(screen, bitmap, cliprect, 0, 1 << 1);
+	else if (scr_pri == 1)
+		m_tilemap_bg->draw(screen, bitmap, cliprect, 0, 1 << 0);
+	else if (asc_pri == 1)
+		m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
+
+	if (rot_pri == 2)
+		m_tilemap_rot->draw(screen, bitmap, cliprect, 0, 1 << 1);
+	else if (scr_pri == 2)
+		m_tilemap_bg->draw(screen, bitmap, cliprect, 0, 1 << 0);
+	else if (asc_pri == 2)
+		m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
+
+	tetrisp2_draw_sprites(
+			bitmap, screen.priority(), cliprect, m_priority.get(),
+			m_spriteram, m_spriteram.bytes(), m_sprite);
+
+	return 0;
+}
+
+u32 stepstag_state::screen_update_vjdash_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(0, cliprect);
+	screen.priority().fill(0);
+
+	tetrisp2_draw_sprites(
+			bitmap, screen.priority(), cliprect, nullptr,
+			m_spriteram1_data.get(), 0x400, m_vj_sprite_l);
+
+	return 0;
+}
+
+u32 stepstag_state::screen_update_vjdash_mid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(0, cliprect);
+	screen.priority().fill(0);
+
+	tetrisp2_draw_sprites(
+			bitmap, screen.priority(), cliprect, nullptr,
+			m_spriteram2_data.get(), 0x400, m_vj_sprite_m);
+
+	return 0;
+}
+
+u32 stepstag_state::screen_update_vjdash_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(0, cliprect);
+	screen.priority().fill(0);
+
+	tetrisp2_draw_sprites(
+			bitmap, screen.priority(), cliprect, nullptr,
+			m_spriteram3_data.get(), 0x400, m_vj_sprite_r);
+
+	return 0;
+}
+
+u32 stepstag_state::screen_update_nop(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(0, cliprect);
+	screen.priority().fill(0);
+	return 0;
 }

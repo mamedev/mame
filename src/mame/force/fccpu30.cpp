@@ -209,11 +209,10 @@
 #include "machine/clock.h"
 //#include "machine/timekpr.h"
 
-//#define LOG_GENERAL (1U <<  0)
-#define LOG_SETUP   (1U <<  1)
-#define LOG_READ    (1U <<  2)
-#define LOG_INT     (1U <<  3)
-#define LOG_INIT    (1U <<  4)
+#define LOG_SETUP   (1U << 1)
+#define LOG_READ    (1U << 2)
+#define LOG_INT     (1U << 3)
+#define LOG_INIT    (1U << 4)
 
 //#define VERBOSE (LOG_GENERAL | LOG_SETUP)
 //#define LOG_OUTPUT_FUNC printf
@@ -230,6 +229,9 @@
 #else
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
+
+
+namespace {
 
 #define DUSCC_CLOCK XTAL(14'745'600) /* Verified */
 
@@ -1038,6 +1040,9 @@ void fga002_device::check_interrupts()()
 void cpu30_state::fga_irq_callback(int)(01)
 void fga002_device::check_interrupts()()
  */
+
+ } // anonymous namespace
+
 
 /* Driver */
 /*    YEAR  NAME            PARENT   COMPAT  MACHINE        INPUT  CLASS        INIT             COMPANY                 FULLNAME                  FLAGS */

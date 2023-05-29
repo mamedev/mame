@@ -12,6 +12,9 @@
 #include "formats/pc_dsk.h"
 #include "formats/naslite_dsk.h"
 
+
+namespace {
+
 class lb186_state : public driver_device
 {
 public:
@@ -164,5 +167,8 @@ ROM_START( lb186 )
 	ROMX_LOAD("a75523.rom", 0x0000, 0x2000, CRC(2d22e826) SHA1(e366e489f580b440131ad5212722391b60af90cd), ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD("a75524.rom", 0x0001, 0x2000, CRC(9c9b249c) SHA1(e988e92d9fa6fe66f89ef748021e9a0501d2807e), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1985, lb186, 0, 0, lb186, 0, lb186_state, empty_init, "Ampro Computers", "Little Board/186", MACHINE_NO_SOUND_HW )

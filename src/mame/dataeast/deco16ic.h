@@ -8,8 +8,8 @@
     Data East IC 55 / 56 / 74 / 141
 
 **************************************************************************/
-#ifndef MAME_VIDEO_DECO16IC_H
-#define MAME_VIDEO_DECO16IC_H
+#ifndef MAME_DATAEAST_DECO16IC_H
+#define MAME_DATAEAST_DECO16IC_H
 
 #pragma once
 
@@ -173,4 +173,4 @@ DECLARE_DEVICE_TYPE(DECO16IC, deco16ic_device)
 // function definition for a callback
 #define DECO16IC_BANK_CB_MEMBER(_name)     int _name(int bank)
 
-#endif // MAME_VIDEO_DECO16IC_H
+#endif // MAME_DATAEAST_DECO16IC_H

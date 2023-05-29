@@ -121,7 +121,7 @@ ROM_START( gogostrk )
 	ROM_REGION32_LE( 0x40000, "bios", 0 )
 	ROM_LOAD( "39sf020a.rom1", 0x000000, 0x040000, CRC(236d4d95) SHA1(50579acddc93c05d5f8e17ad3669a29d2dc49965) )
 
-	DISK_REGION( "ide:0:hdd:image" )    // 128 MB CF Card
+	DISK_REGION( "ide:0:hdd" )    // 128 MB CF Card
 	DISK_IMAGE( "ggs-5-2-07", 0,SHA1(f214fd39ec8ac02f008823f4b179ea6c6835e1b8) )
 ROM_END
 

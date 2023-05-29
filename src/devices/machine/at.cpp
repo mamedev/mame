@@ -13,7 +13,9 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
-#define LOG_PORT80  0
+#define LOG_PORT80  (1U << 1)
+#define VERBOSE (0)
+#include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(AT_MB, at_mb_device, "at_mb", "PC/AT Motherboard")
 
@@ -232,10 +234,9 @@ void at_mb_device::page8_w(offs_t offset, uint8_t data)
 {
 	m_at_pages[offset % 0x10] = data;
 
-	if (LOG_PORT80 && (offset == 0))
+	if (offset == 0)
 	{
-		logerror(" at_page8_w(): Port 80h <== 0x%02x (PC=0x%08x)\n", data,
-							(unsigned) m_maincpu->pc());
+		LOGMASKED(LOG_PORT80, " at_page8_w(): Port 80h <== 0x%02x (PC=0x%08x)\n", data, m_maincpu->pc());
 	}
 
 	switch(offset % 8)

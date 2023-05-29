@@ -24,7 +24,7 @@ public:
 	virtual const char *extensions() const override;
 
 protected:
-	virtual void build_sector_description(const format &d, uint8_t *sectdata, desc_s *sectors, int track, int head) const override;
+	virtual int get_image_offset(const format &f, int head, int track) const override;
 
 private:
 	static const format formats[];

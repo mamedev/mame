@@ -6,8 +6,8 @@
 
 ****************************************************************************/
 
-#ifndef MAME_INCLUDES_SWTPC09_H
-#define MAME_INCLUDES_SWTPC09_H
+#ifndef MAME_SWTPC_SWTPC09_H
+#define MAME_SWTPC_SWTPC09_H
 
 #pragma once
 
@@ -237,4 +237,4 @@ private:
 	void m6844_hdc_dma_transfer(uint8_t channel);
 };
 
-#endif // MAME_INCLUDES_SWTPC09_H
+#endif // MAME_SWTPC_SWTPC09_H

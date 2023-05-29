@@ -10,6 +10,9 @@
 #include "cpu/mc68hc11/mc68hc11.h"
 #include "machine/timekpr.h"
 
+
+namespace {
+
 class slsstars_state : public driver_device
 {
 public:
@@ -56,6 +59,8 @@ ROM_START(slsstars)
 	ROM_REGION(0x8000, "program", 0)
 	ROM_LOAD("superstars-eprom.u2", 0x0000, 0x8000, CRC(59d26dda) SHA1(4ce5fa5b7f317bdada889f66dbf5a106b1907b30))
 ROM_END
+
+} // anonymous namespace
 
 
 SYST(199?, slsstars, 0, 0, slsstars, slsstars, slsstars_state, empty_init, "Sound Leisure", "SuperStars (CD jukebox)", MACHINE_IS_SKELETON_MECHANICAL)

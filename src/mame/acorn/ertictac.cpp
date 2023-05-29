@@ -31,6 +31,8 @@ PCB has a single OSC at 24MHz
 #include "screen.h"
 
 
+namespace {
+
 class ertictac_state : public driver_device
 {
 public:
@@ -344,6 +346,9 @@ ROM_START( poizone )
 	ROM_LOAD32_BYTE( "p_son23.bin", 0x140002, 0x10000, CRC(e9c118b2) SHA1(110d9a204e701b9b54d89f027f8892c3f3a819c7) )
 	ROM_LOAD32_BYTE( "p_son24.bin", 0x140003, 0x10000, CRC(a09d7f55) SHA1(e0d562c655c16034b40db93de801b98b7948beb2) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1990, ertictac,         0, ertictac, ertictac, ertictac_state, init_ertictac, ROT0, "Sisteme", "Erotictac/Tactic",          MACHINE_IMPERFECT_SOUND)
 GAME( 1990, ertictaca, ertictac, ertictac, ertictac, ertictac_state, init_ertictac, ROT0, "Sisteme", "Erotictac/Tactic (ver 01)", MACHINE_IMPERFECT_SOUND)

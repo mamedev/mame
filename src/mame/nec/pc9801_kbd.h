@@ -5,8 +5,8 @@
     PC-9801 Keyboard simulation
 
 ***************************************************************************/
-#ifndef MAME_MACHINE_PC9801_KBD_H
-#define MAME_MACHINE_PC9801_KBD_H
+#ifndef MAME_NEC_PC9801_KBD_H
+#define MAME_NEC_PC9801_KBD_H
 
 #pragma once
 
@@ -61,4 +61,4 @@ DECLARE_DEVICE_TYPE(PC9801_KBD, pc9801_kbd_device)
 
 
 
-#endif // MAME_MACHINE_PC9801_KBD_H
+#endif // MAME_NEC_PC9801_KBD_H

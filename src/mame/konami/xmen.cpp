@@ -49,9 +49,9 @@ likewise a 2 screen game.
 
 
 // configurable logging
-#define LOG_EEPROMW     (1U <<  1)
-#define LOG_SOUNDIRQ    (1U <<  2)
-#define LOG_OKI         (1U <<  3)
+#define LOG_EEPROMW     (1U << 1)
+#define LOG_SOUNDIRQ    (1U << 2)
+#define LOG_OKI         (1U << 3)
 
 //#define VERBOSE (LOG_GENERAL | LOG_EEPROMW | LOG_SOUNDIRQ | LOG_OKI)
 

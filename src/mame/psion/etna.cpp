@@ -13,10 +13,10 @@
 
 #include "etna.h"
 
-#define LOG_READS       (1 << 0)
-#define LOG_WRITES      (1 << 1)
-#define LOG_UNKNOWNS    (1 << 2)
-#define LOG_PROM        (1 << 3)
+#define LOG_READS       (1U << 1)
+#define LOG_WRITES      (1U << 2)
+#define LOG_UNKNOWNS    (1U << 3)
+#define LOG_PROM        (1U << 4)
 #define LOG_ALL         (LOG_READS | LOG_WRITES | LOG_UNKNOWNS | LOG_PROM)
 
 #define VERBOSE         (0)

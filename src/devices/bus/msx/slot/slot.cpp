@@ -25,6 +25,13 @@ msx_internal_slot_interface::msx_internal_slot_interface(const machine_config &m
 	(void)mconfig;
 }
 
+void msx_internal_slot_interface::configure_subslot(msx_internal_slot_interface &subslot)
+{
+	subslot.m_mem_space.set_tag(m_mem_space);
+	subslot.m_io_space.set_tag(m_io_space);
+	subslot.m_maincpu.set_tag(m_maincpu);
+}
+
 void msx_internal_slot_interface::install(memory_view::memory_view_entry *page0, memory_view::memory_view_entry *page1, memory_view::memory_view_entry *page2, memory_view::memory_view_entry *page3)
 {
 	m_page[0] = page0;

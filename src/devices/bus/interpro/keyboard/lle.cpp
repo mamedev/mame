@@ -148,7 +148,6 @@
 #include "speaker.h"
 #include "machine/keyboard.ipp"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_RXTX    (1U << 1)
 #define LOG_PORT    (1U << 2)
 

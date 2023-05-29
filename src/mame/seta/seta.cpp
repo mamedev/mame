@@ -2652,6 +2652,11 @@ void setaroul_state::setaroul_map(address_map &map)
                         Extreme Downhill / Sokonuke
 ***************************************************************************/
 
+// TODO: open bus for unmapped I/O areas?
+// extdwnhl wants to read non-zero at POST for watchdog (?) otherwise will mangle RAM boundaries
+// and fails booting.
+// It also perform a blantantly invalid access during ending, expecting anything that isn't a 0xffff
+// to skip it. (A0=0x20434f56, https://mametesters.org/view.php?id=8614)
 void seta_state::extdwnhl_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -2664,6 +2669,7 @@ void seta_state::extdwnhl_map(address_map &map)
 	map(0x400004, 0x400005).portr("COINS");              // Coins
 	map(0x400008, 0x40000b).r(FUNC(seta_state::seta_dsw_r));                // DSW
 	map(0x40000c, 0x40000d).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));    // Watchdog (extdwnhl (R) & sokonuke (W) MUST RETURN $FFFF)
+	map(0x434f56, 0x434f57).lr16(NAME([]() { return 0; }));
 	map(0x500001, 0x500001).w(FUNC(seta_state::seta_coin_counter_w));       // Coin Counter (no lockout)
 	map(0x500003, 0x500003).w(FUNC(seta_state::seta_vregs_w));              // Video Registers
 	map(0x500004, 0x500007).noprw();                             // IRQ Ack  (extdwnhl (R) & sokonuke (W))
@@ -3259,7 +3265,18 @@ void pairlove_state::machine_start()
                             Crazy Fight
 ***************************************************************************/
 
-void seta_state::crazyfgt_map(address_map &map)
+void crazyfgt_state::coin_counter_w(u8 data)
+{
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+}
+
+void crazyfgt_state::outputs_w(u8 data)
+{
+	// TODO: lower bits also used (for palette banking effect???)
+	m_eeprom->data_w(!BIT(data, 5));
+}
+
+void crazyfgt_state::crazyfgt_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x400000, 0x40ffff).ram();
@@ -3267,8 +3284,9 @@ void seta_state::crazyfgt_map(address_map &map)
 	map(0x610002, 0x610003).portr("UNK");
 	map(0x610004, 0x610005).portr("INPUT");
 	map(0x610006, 0x610007).nopw();
-	map(0x620000, 0x620003).nopw();    // protection
-	map(0x630000, 0x630003).r(FUNC(seta_state::seta_dsw_r));
+	map(0x620001, 0x620001).w(FUNC(crazyfgt_state::coin_counter_w));
+	map(0x620003, 0x620003).w(FUNC(crazyfgt_state::outputs_w));
+	map(0x630000, 0x630003).r(FUNC(crazyfgt_state::seta_dsw_r));
 	map(0x640400, 0x640fff).writeonly().share("paletteram1");    // Palette
 	map(0x650000, 0x650003).w("ymsnd", FUNC(ym3812_device::write)).umask16(0x00ff);
 	map(0x658001, 0x658001).w("oki", FUNC(okim6295_device::write));
@@ -7126,7 +7144,7 @@ static INPUT_PORTS_START( crazyfgt )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM )  // protection
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", ds2430a_device, data_r)
 
 	PORT_START("UNK") //? - $610002.w
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -7139,12 +7157,12 @@ static INPUT_PORTS_START( crazyfgt )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("INPUT") //Player - $610004.w
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("top-center")    PORT_CODE(KEYCODE_5_PAD)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("bottom-center") PORT_CODE(KEYCODE_2_PAD)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("top-left")      PORT_CODE(KEYCODE_4_PAD)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("bottom-left")   PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("top-right")     PORT_CODE(KEYCODE_6_PAD)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("bottom-right")  PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Button 2 (top center)")    PORT_CODE(KEYCODE_5_PAD) // JAMMA parts side pin 20
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Button 5 (bottom center)") PORT_CODE(KEYCODE_2_PAD) // JAMMA parts side pin 21
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Button 1 (top left)")      PORT_CODE(KEYCODE_4_PAD) // JAMMA parts side pin 18
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Button 4 (bottom left)")   PORT_CODE(KEYCODE_1_PAD) // JAMMA parts side pin 19
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Button 3 (top right)")     PORT_CODE(KEYCODE_6_PAD) // JAMMA parts side pin 22
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Button 6 (bottom right)")  PORT_CODE(KEYCODE_3_PAD) // JAMMA parts side pin 23
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SERVICE1 ) // ticket
 
@@ -9833,15 +9851,17 @@ void pairlove_state::pairlove(machine_config &config)
                                 Crazy Fight
 ***************************************************************************/
 
-void seta_state::crazyfgt(machine_config &config)
+void crazyfgt_state::crazyfgt(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::crazyfgt_map);
-	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq1_line_hold));
+	m_maincpu->set_addrmap(AS_PROGRAM, &crazyfgt_state::crazyfgt_map);
+	m_maincpu->set_vblank_int("screen", FUNC(crazyfgt_state::irq1_line_hold));
+
+	DS2430A(config, m_eeprom);
 
 	X1_001(config, m_spritegen, 16_MHz_XTAL, m_palette, gfx_sprites);
-	m_spritegen->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	m_spritegen->set_gfxbank_callback(FUNC(crazyfgt_state::setac_gfxbank_callback));
 	// position kludges
 	m_spritegen->set_fg_xoffsets(0, 0); // wrong (empty background column in title screen, but aligned sprites in screen select)
 	m_spritegen->set_fg_yoffsets(-0x12, 0x0e);
@@ -9853,14 +9873,14 @@ void seta_state::crazyfgt(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 48*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_screen_update(FUNC(crazyfgt_state::screen_update_seta));
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_blandia_layer1).set_xoffsets(0, -2);
 	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_blandia_layer2).set_xoffsets(0, -2);
 	m_layers[1]->set_screen(m_screen);
-	PALETTE(config, m_palette, FUNC(seta_state::gundhara_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep (seta_state,but have only 4 palettes)
+	PALETTE(config, m_palette, FUNC(crazyfgt_state::gundhara_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep (seta_state,but have only 4 palettes)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -11877,6 +11897,9 @@ ROM_START( crazyfgt )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* OKI samples */
 	ROM_LOAD( "rom.u85",  0x00000, 0x40000, CRC(7b95d0bb) SHA1(f16dfd639eed6856e3ab93704caef592a07ba367) )
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(3b5ea5d2) SHA1(bbaad9a879834d1510f20321b97de558d9759ec7) BAD_DUMP ) // handcrafted to pass protection check
 ROM_END
 
 ROM_START( jockeyc )
@@ -12396,16 +12419,6 @@ void seta_state::init_wiggie()
 	}
 }
 
-void seta_state::init_crazyfgt()
-{
-	u16 *RAM = (u16 *) memregion("maincpu")->base();
-
-	// protection check at boot
-	RAM[0x1078/2] = 0x4e71;
-
-	// fixed priorities?
-}
-
 void jockeyc_state::init_inttoote()
 {
 	// code patches due to unemulated protection (to be removed...)
@@ -12540,4 +12553,4 @@ GAME( 1995, zombraid,  0,        zombraid,  zombraid,  zombraid_state, init_zomb
 GAME( 1995, zombraidp, zombraid, zombraid,  zombraid,  zombraid_state, init_zombraid,  ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US, prototype PCB)", MACHINE_NO_COCKTAIL ) // actual code is same as the released version
 GAME( 1995, zombraidpj,zombraid, zombraid,  zombraid,  zombraid_state, init_zombraid,  ROT0,   "Sammy Industries Co.,Ltd.", "Zombie Raid (9/28/95, Japan, prototype PCB)", MACHINE_NO_COCKTAIL ) // just 3 bytes different from above
 
-GAME( 1996, crazyfgt,  0,        crazyfgt,  crazyfgt,  seta_state,     init_crazyfgt,  ROT0,   "Subsino",                   "Crazy Fight", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, crazyfgt,  0,        crazyfgt,  crazyfgt,  crazyfgt_state, empty_init,     ROT0,   "Subsino",                   "Crazy Fight", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

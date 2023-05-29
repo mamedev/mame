@@ -167,7 +167,7 @@ uint8_t bfm_dm01_device::mux_r()
 
 void bfm_dm01_device::mux_w(uint8_t data)
 {
-	g_profiler.start(PROFILER_USER2);
+	auto profile = g_profiler.start(PROFILER_USER2);
 
 	if (m_xcounter < BYTES_PER_ROW)
 	{
@@ -203,8 +203,6 @@ void bfm_dm01_device::mux_w(uint8_t data)
 			}
 		}
 	}
-
-	g_profiler.stop();
 }
 
 ///////////////////////////////////////////////////////////////////////////

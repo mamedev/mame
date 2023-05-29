@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Steve Ellenoff, Pierpaolo Prazzoli, Angelo Salese
-#ifndef MAME_INCLUDES_PORTRAIT_H
-#define MAME_INCLUDES_PORTRAIT_H
+#ifndef MAME_OLYMPIA_PORTRAIT_H
+#define MAME_OLYMPIA_PORTRAIT_H
 
 #pragma once
 
@@ -67,4 +67,4 @@ private:
 	tilemap_t *m_background = nullptr;
 };
 
-#endif // MAME_INCLUDES_PORTRAIT_H
+#endif // MAME_OLYMPIA_PORTRAIT_H

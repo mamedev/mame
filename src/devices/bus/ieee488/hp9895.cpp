@@ -56,6 +56,7 @@
 
 #include "emu.h"
 #include "hp9895.h"
+#include "formats/fs_hp98x5.h"
 #include "formats/hpi_dsk.h"
 
 #define LOG_LEVEL0      (0x1U << 1)
@@ -861,6 +862,8 @@ static void hp9895_floppies(device_slot_interface &device)
 static void hp9895_floppy_formats(format_registration &fr)
 {
 	fr.add(FLOPPY_HPI_FORMAT);
+	fr.add(fs::HP9825);
+	fr.add(fs::HP9845);
 };
 
 const tiny_rom_entry *hp9895_device::device_rom_region() const

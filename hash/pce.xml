@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="pce" description="NEC PC-Engine cartridges">
+<softwarelist name="pce" description="NEC PC Engine HuCards">
 	<software name="1943kai">
 		<description>1943 Kai</description>
 		<year>1991</year>
@@ -375,10 +375,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="bombmn94">
+	<software name="bombmn94" supported="partial">
 		<description>Bomberman '94</description>
 		<year>1993</year>
 		<publisher>Hudson</publisher>
+		<notes><![CDATA[
+https://mametesters.org/view.php?id=6849
+]]></notes>
 		<info name="serial" value="HC93065"/>
 		<info name="release" value="19931210"/>
 		<info name="alt_title" value="ボンバーマン'94"/>
@@ -498,10 +501,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="cadash">
+	<software name="cadash" supported="partial">
 		<description>Cadash</description>
 		<year>1991</year>
 		<publisher>Taito</publisher>
+		<notes><![CDATA[
+https://mametesters.org/view.php?id=5193
+]]></notes>
 		<info name="serial" value="TP02015"/>
 		<info name="release" value="19910118"/>
 		<info name="alt_title" value="カダッシュ"/>
@@ -656,6 +662,9 @@ license:CC0-1.0
 		<description>Cross Wiber - Cyber Combat Police</description>
 		<year>1990</year>
 		<publisher>Face</publisher>
+		<notes><![CDATA[
+https://mametesters.org/view.php?id=7384 (fixed)
+]]></notes>
 		<info name="serial" value="FA02-008"/>
 		<info name="release" value="19901221"/>
 		<info name="alt_title" value="クロスワイバー CYBER-COMBAT-POLICE"/>
@@ -1233,10 +1242,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="fireprow">
+	<software name="fireprow" supported="partial">
 		<description>Fire Pro Wrestling - Combination Tag</description>
 		<year>1989</year>
 		<publisher>Human</publisher>
+		<notes><![CDATA[
+https://mametesters.org/view.php?id=7288 Sound LFO FM
+]]></notes>
 		<info name="serial" value="HM89001"/>
 		<info name="release" value="19890622"/>
 		<info name="alt_title" value="ファイヤープロレスリング コンビネーションタッグ"/>
@@ -1510,10 +1522,14 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="haniisky">
+	<software name="haniisky" supported="partial">
 		<description>Hanii in the Sky</description>
 		<year>1989</year>
 		<publisher>Face</publisher>
+		<notes><![CDATA[
+https://mametesters.org/view.php?id=7289 Uses sound LFO FM
+Verify sound mixing (stage 1 BGM starts with a left-right effect)
+]]></notes>
 		<info name="serial" value="FA64-0001"/>
 		<info name="release" value="19890301"/>
 		<info name="alt_title" value="はにい いんざ すかい"/>
@@ -3818,10 +3834,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="shingen">
+	<software name="shingen" supported="no">
 		<description>Takeda Shingen</description>
 		<year>1989</year>
 		<publisher>Aicom</publisher>
+		<notes><![CDATA[
+https://mametesters.org/view.php?id=6707 [pad]
+]]></notes>
 		<info name="serial" value="AC89002"/>
 		<info name="release" value="19890728"/>
 		<info name="alt_title" value="武田信玄"/>
@@ -3832,10 +3851,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="shingen1" cloneof="shingen">
+	<software name="shingen1" cloneof="shingen" supported="no">
 		<description>Takeda Shingen (alt)</description>
 		<year>1989</year>
 		<publisher>Aicom</publisher>
+		<notes><![CDATA[
+https://mametesters.org/view.php?id=6707 [pad]
+]]></notes>
 		<info name="serial" value="AC89002"/>
 		<info name="release" value="19890728"/>
 		<info name="alt_title" value="武田信玄"/>
@@ -3930,6 +3952,9 @@ license:CC0-1.0
 		<description>Thunder Blade</description>
 		<year>1990</year>
 		<publisher>NEC Avenue</publisher>
+		<notes><![CDATA[
+https://mametesters.org/view.php?id=8585 (fixed)
+]]></notes>
 		<info name="serial" value="NAPH-1015"/>
 		<info name="release" value="19901207"/>
 		<info name="alt_title" value="サンダーブレード"/>
@@ -4277,10 +4302,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wonderm">
+	<software name="wonderm" supported="partial">
 		<description>Wonder Momo</description>
 		<year>1989</year>
 		<publisher>Namcot</publisher>
+		<notes><![CDATA[
+https://mametesters.org/view.php?id=6597
+]]></notes>
 		<info name="serial" value="NC64001"/>
 		<info name="release" value="19890421"/>
 		<info name="alt_title" value="ワンダーモモ"/>

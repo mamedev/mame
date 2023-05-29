@@ -39,11 +39,11 @@ disasmwin_info::disasmwin_info(debugger_windows_interface &debugger) :
 	update_caption();
 
 	// recompute the children once to get the maxwidth
-	disasmwin_info::recompute_children();
+	recompute_children();
 
 	// position the window and recompute children again
-	SetWindowPos(window(), HWND_TOP, 100, 100, maxwidth(), 200, SWP_SHOWWINDOW);
-	disasmwin_info::recompute_children();
+	debugger.stagger_window(window(), maxwidth(), 200);
+	recompute_children();
 
 	// mark the edit box as the default focus and set it
 	editwin_info::set_default_focus();

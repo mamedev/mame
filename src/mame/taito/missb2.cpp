@@ -26,6 +26,8 @@ written, so it may be normal behaviour.
 #include "speaker.h"
 
 
+namespace {
+
 class missb2_state : public bublbobl_state
 {
 public:
@@ -606,6 +608,9 @@ void missb2_state::init_missb2()
 	configure_banks();
 	m_video_enable = 0;
 }
+
+} // anonymous namespace
+
 
 /* Game Drivers */
 

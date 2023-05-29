@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_PC1401_H
-#define MAME_INCLUDES_PC1401_H
+#ifndef MAME_SHARP_PC1401_H
+#define MAME_SHARP_PC1401_H
 
 #include "pocketc.h"
 
@@ -63,4 +63,4 @@ private:
 	static const char* const s_e[5];
 };
 
-#endif // MAME_INCLUDES_PC1401_H
+#endif // MAME_SHARP_PC1401_H

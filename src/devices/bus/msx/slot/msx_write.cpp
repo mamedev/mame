@@ -51,8 +51,8 @@ void msx_slot_msx_write_device::device_start()
 
 	page(1)->install_view(0x4000, 0x7fff, m_view1);
 	m_view1[0].install_read_bank(0x4000, 0x7fff, m_rombank[0]);
-	m_view1[0].install_write_handler(0x6fff, 0x6fff, write8smo_delegate(*this, FUNC(msx_slot_msx_write_device::bank_w<0>)));
-	m_view1[0].install_write_handler(0x7fff, 0x7fff, write8smo_delegate(*this, FUNC(msx_slot_msx_write_device::bank_w<1>)));
+	m_view1[0].install_write_handler(0x6fff, 0x6fff, emu::rw_delegate(*this, FUNC(msx_slot_msx_write_device::bank_w<0>)));
+	m_view1[0].install_write_handler(0x7fff, 0x7fff, emu::rw_delegate(*this, FUNC(msx_slot_msx_write_device::bank_w<1>)));
 	m_view1[1];
 
 	page(2)->install_view(0x8000, 0xbfff, m_view2);

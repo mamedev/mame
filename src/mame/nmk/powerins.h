@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-#ifndef MAME_INCLUDES_POWERINS_H
-#define MAME_INCLUDES_POWERINS_H
+#ifndef MAME_NMK_POWERINS_H
+#define MAME_NMK_POWERINS_H
 
 #include "nmk16.h"
 #include "nmk16spr.h"
@@ -44,4 +44,4 @@ private:
 	void powerinsb_sound_io_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_POWERINS_H
+#endif // MAME_NMK_POWERINS_H

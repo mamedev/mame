@@ -51,8 +51,8 @@ struct CFileInStream : public ISeekInStream
 {
 	CFileInStream() noexcept
 	{
-		Read = [] (void *pp, void *buf, size_t *size) { return reinterpret_cast<CFileInStream *>(pp)->read(buf, *size); };
-		Seek = [] (void *pp, Int64 *pos, ESzSeek origin) { return reinterpret_cast<CFileInStream *>(pp)->seek(*pos, origin); };
+		Read = &CFileInStream::read_static;
+		Seek = &CFileInStream::seek_static;
 	}
 
 	random_read::ptr    file;
@@ -109,6 +109,16 @@ private:
 		pos = currfpos;
 		return SZ_OK;
 	}
+
+	static SRes read_static(ISeekInStream const *pp, void *buf, size_t *size) noexcept
+	{
+		return static_cast<CFileInStream *>(const_cast<ISeekInStream *>(pp))->read(buf, *size);
+	}
+
+	static SRes seek_static(ISeekInStream const *pp, Int64 *pos, ESzSeek origin) noexcept
+	{
+		return static_cast<CFileInStream *>(const_cast<ISeekInStream *>(pp))->seek(*pos, origin);
+	}
 };
 
 
@@ -128,7 +138,7 @@ public:
 	virtual ~m7z_file_impl()
 	{
 		if (m_out_buffer)
-			IAlloc_Free(&m_alloc_imp, m_out_buffer);
+			ISzAlloc_Free(&m_alloc_imp, m_out_buffer);
 		if (m_inited)
 			SzArEx_Free(&m_db, &m_alloc_imp);
 	}
@@ -230,7 +240,7 @@ private:
 	std::vector<char>                       m_utf8_buf;
 
 	CFileInStream                           m_archive_stream;
-	CLookToRead                             m_look_stream;
+	CLookToRead2                            m_look_stream;
 	CSzArEx                                 m_db;
 	ISzAlloc                                m_alloc_imp;
 	ISzAlloc                                m_alloc_temp_imp;
@@ -240,6 +250,7 @@ private:
 	UInt32                                  m_block_index;
 	Byte *                                  m_out_buffer;
 	std::size_t                             m_out_buffer_size;
+	Byte                                    m_look_stream_buf[65'536];
 };
 
 
@@ -314,9 +325,11 @@ m7z_file_impl::m7z_file_impl(std::string &&filename) noexcept
 	m_alloc_temp_imp.Alloc = &SzAllocTemp;
 	m_alloc_temp_imp.Free = &SzFreeTemp;
 
-	LookToRead_CreateVTable(&m_look_stream, False);
+	LookToRead2_CreateVTable(&m_look_stream, False);
 	m_look_stream.realStream = &m_archive_stream;
-	LookToRead_Init(&m_look_stream);
+	m_look_stream.buf = m_look_stream_buf;
+	m_look_stream.bufSize = std::size(m_look_stream_buf);
+	LookToRead2_Init(&m_look_stream);
 }
 
 
@@ -362,7 +375,7 @@ std::error_condition m7z_file_impl::initialize() noexcept
 
 	SzArEx_Init(&m_db);
 	m_inited = true;
-	SRes const res = SzArEx_Open(&m_db, &m_look_stream.s, &m_alloc_imp, &m_alloc_temp_imp);
+	SRes const res = SzArEx_Open(&m_db, &m_look_stream.vt, &m_alloc_imp, &m_alloc_temp_imp);
 	if (res != SZ_OK)
 	{
 		osd_printf_error("un7z: error opening %s as 7z archive (%d)\n", m_filename, int(res));
@@ -458,7 +471,7 @@ std::error_condition m7z_file_impl::decompress(void *buffer, std::size_t length)
 	std::size_t offset(0);
 	std::size_t out_size_processed(0);
 	SRes const res = SzArEx_Extract(
-			&m_db, &m_look_stream.s, m_curr_file_idx,           // requested file
+			&m_db, &m_look_stream.vt, m_curr_file_idx,          // requested file
 			&m_block_index, &m_out_buffer, &m_out_buffer_size,  // solid block caching
 			&offset, &out_size_processed,                       // data size/offset
 			&m_alloc_imp, &m_alloc_temp_imp);                   // allocator helpers

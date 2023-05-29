@@ -14,7 +14,7 @@
 #include "emu.h"
 #include "ins8154.h"
 
-#define LOG_BITS   (1U <<  1)
+#define LOG_BITS   (1U << 1)
 //#define VERBOSE (LOG_BITS) // (LOG_GENERAL|LOG_BITS)
 #include "logmacro.h"
 

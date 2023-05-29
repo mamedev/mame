@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Dan Boris, Mirko Buffoni
+// copyright-holders: Dan Boris, Mirko Buffoni
+
 /***************************************************************************
 
     Atari Cloak & Dagger hardware
@@ -111,22 +112,276 @@
     TODO:
 
     - is bitmap drawing in service mode correct?
-    - real cpu speeds (pokey speeds verified with comparison to recording)
+    - real CPU speeds (Pokey speeds verified with comparison to recording)
     - custom write
 
 */
 
 #include "emu.h"
-#include "cloak.h"
 
 #include "cpu/m6502/m6502.h"
-#include "sound/pokey.h"
 #include "machine/74259.h"
 #include "machine/nvram.h"
 #include "machine/rescap.h"
 #include "machine/watchdog.h"
-#include "speaker.h"
+#include "sound/pokey.h"
+#include "video/resnet.h"
 
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
+#include "tilemap.h"
+
+
+namespace {
+
+class cloak_state : public driver_device
+{
+public:
+	cloak_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_slave(*this, "slave"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_bitmap_videoram(*this, "bitmap_videoram%u", 1U, 256U * 256U, ENDIANNESS_LITTLE)
+	{ }
+
+	void cloak(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_slave;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	memory_share_array_creator<uint8_t, 2> m_bitmap_videoram;
+	std::unique_ptr<uint16_t[]> m_palette_ram;
+
+	uint8_t m_nvram_enabled = 0;
+	uint8_t m_bitmap_videoram_selected = 0;
+	uint8_t m_bitmap_videoram_address_x = 0;
+	uint8_t m_bitmap_videoram_address_y = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+
+	template <uint8_t Which> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
+	void custom_w(uint8_t data);
+	void irq_reset_0_w(uint8_t data);
+	void irq_reset_1_w(uint8_t data);
+	void nvram_enable_w(uint8_t data);
+	void paletteram_w(offs_t offset, uint8_t data);
+	void clearbmp_w(uint8_t data);
+	uint8_t graph_processor_r(offs_t offset);
+	void graph_processor_w(offs_t offset, uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	void adjust_xy(int offset);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void set_pen(int i);
+	void draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void master_map(address_map &map);
+	void slave_map(address_map &map);
+};
+
+
+// video
+
+/***************************************************************************
+
+  CLOAK & DAGGER uses RAM to dynamically
+  create the palette. The resolution is 9 bit (3 bits per gun). The palette
+  contains 64 entries, but it is accessed through a memory windows 128 bytes
+  long: writing to the first 64 bytes sets the MSB of the red component to 0,
+  while writing to the last 64 bytes sets it to 1.
+
+  Colors 0-15  Character mapped graphics
+  Colors 16-31 Bitmapped graphics (2 palettes selected by 128H)
+  Colors 32-47 Sprites
+  Colors 48-63 not used
+
+  These are the exact resistor values from the schematics:
+
+  bit 8 -- diode |< -- pullup 1 kohm -- 2.2 kohm resistor -- pulldown 100 pf -- RED
+        -- diode |< -- pullup 1 kohm -- 4.7 kohm resistor -- pulldown 100 pf -- RED
+        -- diode |< -- pullup 1 kohm -- 10  kohm resistor -- pulldown 100 pf -- RED
+        -- diode |< -- pullup 1 kohm -- 2.2 kohm resistor -- pulldown 100 pf -- GREEN
+        -- diode |< -- pullup 1 kohm -- 4.7 kohm resistor -- pulldown 100 pf -- GREEN
+        -- diode |< -- pullup 1 kohm -- 10  kohm resistor -- pulldown 100 pf -- GREEN
+        -- diode |< -- pullup 1 kohm -- 2.2 kohm resistor -- pulldown 100 pf -- BLUE
+        -- diode |< -- pullup 1 kohm -- 4.7 kohm resistor -- pulldown 100 pf -- BLUE
+  bit 0 -- diode |< -- pullup 1 kohm -- 10  kohm resistor -- pulldown 100 pf -- BLUE
+
+***************************************************************************/
+
+void cloak_state::paletteram_w(offs_t offset, uint8_t data)
+{
+	m_palette_ram[offset & 0x3f] = ((offset & 0x40) << 2) | data;
+	set_pen(offset & 0x3f);
+}
+
+
+void cloak_state::set_pen(int i)
+{
+	static const int resistances[3] = { 10000, 4700, 2200 };
+	double weights[3];
+
+	// compute the color output resistor weights
+	compute_resistor_weights(0, 255, -1.0,
+								3, resistances, weights, 0, 1000,
+								0, nullptr, nullptr, 0, 0,
+								0, nullptr, nullptr, 0, 0);
+
+	int bit0, bit1, bit2;
+
+	// red component
+	bit0 = (~m_palette_ram[i] >> 6) & 0x01;
+	bit1 = (~m_palette_ram[i] >> 7) & 0x01;
+	bit2 = (~m_palette_ram[i] >> 8) & 0x01;
+	int const r = combine_weights(weights, bit0, bit1, bit2);
+
+	// green component
+	bit0 = (~m_palette_ram[i] >> 3) & 0x01;
+	bit1 = (~m_palette_ram[i] >> 4) & 0x01;
+	bit2 = (~m_palette_ram[i] >> 5) & 0x01;
+	int const g = combine_weights(weights, bit0, bit1, bit2);
+
+	// blue component
+	bit0 = (~m_palette_ram[i] >> 0) & 0x01;
+	bit1 = (~m_palette_ram[i] >> 1) & 0x01;
+	bit2 = (~m_palette_ram[i] >> 2) & 0x01;
+	int const b = combine_weights(weights, bit0, bit1, bit2);
+
+	m_palette->set_pen_color(i, rgb_t(r, g, b));
+}
+
+void cloak_state::clearbmp_w(uint8_t data)
+{
+//  m_screen->update_now();
+	m_screen->update_partial(m_screen->vpos());
+
+	m_bitmap_videoram_selected = data & 0x01;
+
+	if (data & 0x02)    // clear
+		memset(m_bitmap_videoram[m_bitmap_videoram_selected], 0, 256*256);
+}
+
+void cloak_state::adjust_xy(int offset)
+{
+	switch (offset)
+	{
+		case 0x00:  m_bitmap_videoram_address_x--; m_bitmap_videoram_address_y++; break;
+		case 0x01:  m_bitmap_videoram_address_y--; break;
+		case 0x02:  m_bitmap_videoram_address_x--; break;
+		case 0x04:  m_bitmap_videoram_address_x++; m_bitmap_videoram_address_y++; break;
+		case 0x05:  m_bitmap_videoram_address_y++; break;
+		case 0x06:  m_bitmap_videoram_address_x++; break;
+	}
+}
+
+uint8_t cloak_state::graph_processor_r(offs_t offset)
+{
+	uint8_t const ret = m_bitmap_videoram[!m_bitmap_videoram_selected][(m_bitmap_videoram_address_y << 8) | m_bitmap_videoram_address_x];
+
+	adjust_xy(offset);
+
+	return ret;
+}
+
+void cloak_state::graph_processor_w(offs_t offset, uint8_t data)
+{
+	switch (offset)
+	{
+		case 0x03: m_bitmap_videoram_address_x = data; break;
+		case 0x07: m_bitmap_videoram_address_y = data; break;
+		default:
+			m_bitmap_videoram[m_bitmap_videoram_selected][(m_bitmap_videoram_address_y << 8) | m_bitmap_videoram_address_x] = data & 0x0f;
+
+			adjust_xy(offset);
+			break;
+	}
+}
+
+void cloak_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+TILE_GET_INFO_MEMBER(cloak_state::get_bg_tile_info)
+{
+	int const code = m_videoram[tile_index];
+
+	tileinfo.set(0, code, 0, 0);
+}
+
+void cloak_state::video_start()
+{
+	constexpr uint8_t NUM_PENS = 0x40;
+
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cloak_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	m_palette_ram = std::make_unique<uint16_t[]>(NUM_PENS);
+
+	save_item(NAME(m_bitmap_videoram_address_x));
+	save_item(NAME(m_bitmap_videoram_address_y));
+	save_item(NAME(m_bitmap_videoram_selected));
+	save_pointer(NAME(m_palette_ram), NUM_PENS);
+	// save_item(NAME(m_nvram_enabled));
+}
+
+void cloak_state::draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
+		{
+			pen_t const pen = m_bitmap_videoram[!m_bitmap_videoram_selected][(y << 8) | x] & 0x07;
+
+			if (pen)
+				bitmap.pix(y, (x - 6) & 0xff) = 0x10 | ((x & 0x80) >> 4) | pen;
+		}
+}
+
+void cloak_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int offs = (0x100 / 4) - 1; offs >= 0; offs--)
+	{
+		int const code = m_spriteram[offs + 64] & 0x7f;
+		int flipx = m_spriteram[offs + 64] & 0x80;
+		int flipy = 0;
+		int sx = m_spriteram[offs + 192];
+		int sy = 240 - m_spriteram[offs];
+
+		if (flip_screen())
+		{
+			sx -= 9;
+			sy = 240 - sy;
+			flipx = !flipx;
+			flipy = !flipy;
+		}
+
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, code, 0, flipx, flipy, sx, sy, 0);
+	}
+}
+
+uint32_t cloak_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_bitmap(bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
+	return 0;
+}
+
+
+// machine
 
 /*************************************
  *
@@ -134,33 +389,29 @@
  *
  *************************************/
 
-WRITE_LINE_MEMBER(cloak_state::coin_counter_l_w)
+template <uint8_t Which>
+WRITE_LINE_MEMBER(cloak_state::coin_counter_w)
 {
-	machine().bookkeeping().coin_counter_w(0, state);
+	machine().bookkeeping().coin_counter_w(Which, state);
 }
 
-WRITE_LINE_MEMBER(cloak_state::coin_counter_r_w)
-{
-	machine().bookkeeping().coin_counter_w(1, state);
-}
-
-void cloak_state::cloak_custom_w(uint8_t data)
+void cloak_state::custom_w(uint8_t data)
 {
 }
 
-void cloak_state::cloak_irq_reset_0_w(uint8_t data)
+void cloak_state::irq_reset_0_w(uint8_t data)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-void cloak_state::cloak_irq_reset_1_w(uint8_t data)
+void cloak_state::irq_reset_1_w(uint8_t data)
 {
 	m_slave->set_input_line(0, CLEAR_LINE);
 }
 
-void cloak_state::cloak_nvram_enable_w(uint8_t data)
+void cloak_state::nvram_enable_w(uint8_t data)
 {
-	m_nvram_enabled = data & 0x01;
+	m_nvram_enabled = data & 0x01; // TODO: set but never used?
 }
 
 
@@ -174,22 +425,22 @@ void cloak_state::cloak_nvram_enable_w(uint8_t data)
 void cloak_state::master_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram();
-	map(0x0400, 0x07ff).ram().w(FUNC(cloak_state::cloak_videoram_w)).share("videoram");
-	map(0x0800, 0x0fff).ram().share("share1");
-	map(0x1000, 0x100f).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));       /* DSW0 also */
-	map(0x1800, 0x180f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));       /* DSW1 also */
+	map(0x0400, 0x07ff).ram().w(FUNC(cloak_state::videoram_w)).share(m_videoram);
+	map(0x0800, 0x0fff).ram().share("shared_ram");
+	map(0x1000, 0x100f).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));       // DSW0 also
+	map(0x1800, 0x180f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));       // DSW1 also
 	map(0x2000, 0x2000).portr("P1");
 	map(0x2200, 0x2200).portr("P2");
 	map(0x2400, 0x2400).portr("SYSTEM");
-	map(0x2600, 0x2600).w(FUNC(cloak_state::cloak_custom_w));
+	map(0x2600, 0x2600).w(FUNC(cloak_state::custom_w));
 	map(0x2800, 0x29ff).ram().share("nvram");
 	map(0x2f00, 0x2fff).noprw();
-	map(0x3000, 0x30ff).ram().share("spriteram");
-	map(0x3200, 0x327f).w(FUNC(cloak_state::cloak_paletteram_w));
+	map(0x3000, 0x30ff).ram().share(m_spriteram);
+	map(0x3200, 0x327f).w(FUNC(cloak_state::paletteram_w));
 	map(0x3800, 0x3807).w("outlatch", FUNC(ls259_device::write_d7));
 	map(0x3a00, 0x3a00).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x3c00, 0x3c00).w(FUNC(cloak_state::cloak_irq_reset_0_w));
-	map(0x3e00, 0x3e00).w(FUNC(cloak_state::cloak_nvram_enable_w));
+	map(0x3c00, 0x3c00).w(FUNC(cloak_state::irq_reset_0_w));
+	map(0x3e00, 0x3e00).w(FUNC(cloak_state::nvram_enable_w));
 	map(0x4000, 0xffff).rom();
 }
 
@@ -205,10 +456,10 @@ void cloak_state::slave_map(address_map &map)
 	map(0x0000, 0x0007).ram();
 	map(0x0008, 0x000f).rw(FUNC(cloak_state::graph_processor_r), FUNC(cloak_state::graph_processor_w));
 	map(0x0010, 0x07ff).ram();
-	map(0x0800, 0x0fff).ram().share("share1");
-	map(0x1000, 0x1000).w(FUNC(cloak_state::cloak_irq_reset_1_w));
-	map(0x1200, 0x1200).w(FUNC(cloak_state::cloak_clearbmp_w));
-	map(0x1400, 0x1400).w(FUNC(cloak_state::cloak_custom_w));
+	map(0x0800, 0x0fff).ram().share("shared_ram");
+	map(0x1000, 0x1000).w(FUNC(cloak_state::irq_reset_1_w));
+	map(0x1200, 0x1200).w(FUNC(cloak_state::clearbmp_w));
+	map(0x1400, 0x1400).w(FUNC(cloak_state::custom_w));
 	map(0x2000, 0xffff).rom();
 }
 
@@ -303,8 +554,8 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_cloak )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0,  1 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,  32,  1 )
+	GFXDECODE_ENTRY( "chars",   0, charlayout,     0,  1 )
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout,  32,  1 )
 GFXDECODE_END
 
 
@@ -316,12 +567,12 @@ GFXDECODE_END
 
 void cloak_state::cloak(machine_config &config)
 {
-	/* basic machine hardware */
-	M6502(config, m_maincpu, 1000000);     /* 1 MHz ???? */
+	// basic machine hardware
+	M6502(config, m_maincpu, 1'000'000);     // 1 MHz ????
 	m_maincpu->set_addrmap(AS_PROGRAM, &cloak_state::master_map);
 	m_maincpu->set_periodic_int(FUNC(cloak_state::irq0_line_hold), attotime::from_hz(4*60));
 
-	M6502(config, m_slave, 1250000);       /* 1.25 MHz ???? */
+	M6502(config, m_slave, 1'250'000);       // 1.25 MHz ????
 	m_slave->set_addrmap(AS_PROGRAM, &cloak_state::slave_map);
 	m_slave->set_periodic_int(FUNC(cloak_state::irq0_line_hold), attotime::from_hz(2*60));
 
@@ -330,37 +581,37 @@ void cloak_state::cloak(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	ls259_device &outlatch(LS259(config, "outlatch")); // 10B
-	outlatch.q_out_cb<0>().set(FUNC(cloak_state::coin_counter_r_w));
-	outlatch.q_out_cb<1>().set(FUNC(cloak_state::coin_counter_l_w));
-	outlatch.q_out_cb<3>().set(FUNC(cloak_state::cocktail_w));
+	outlatch.q_out_cb<0>().set(FUNC(cloak_state::coin_counter_w<1>)); // right
+	outlatch.q_out_cb<1>().set(FUNC(cloak_state::coin_counter_w<0>)); // left
+	outlatch.q_out_cb<3>().set(FUNC(cloak_state::flip_screen_set));
 	outlatch.q_out_cb<5>().set_nop();   // ???
 	outlatch.q_out_cb<6>().set_output("led1").invert(); // START LED 2
 	outlatch.q_out_cb<7>().set_output("led0").invert(); // START LED 1
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 3*8, 32*8-1);
-	m_screen->set_screen_update(FUNC(cloak_state::screen_update_cloak));
+	m_screen->set_screen_update(FUNC(cloak_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cloak);
 	PALETTE(config, m_palette).set_entries(64);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	/* more low pass filters ==> DISCRETE processing */
-	pokey_device &pokey1(POKEY(config, "pokey1", XTAL(10'000'000)/8));      /* Accurate to recording */
+	// more low pass filters ==> DISCRETE processing
+	pokey_device &pokey1(POKEY(config, "pokey1", XTAL(10'000'000) / 8));      // Accurate to recording
 	pokey1.allpot_r().set_ioport("START");
 	pokey1.set_output_opamp_low_pass(RES_K(1), CAP_U(0.047), 5.0);
 	pokey1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	pokey_device &pokey2(POKEY(config, "pokey2", XTAL(10'000'000)/8));      /* Accurate to recording */
+	pokey_device &pokey2(POKEY(config, "pokey2", XTAL(10'000'000) / 8));      // Accurate to recording
 	pokey2.allpot_r().set_ioport("DSW");
 	pokey2.set_output_opamp_low_pass(RES_K(1), CAP_U(0.022), 5.0);
 	pokey2.add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -390,16 +641,16 @@ ROM_START( cloak )
 	ROM_LOAD( "136023-514.bin",      0xc000, 0x2000, CRC(6f8c7991) SHA1(bd6f838b224abed78fbdb7da17baa892289fc2f2) )
 	ROM_LOAD( "136023-515.bin",      0xe000, 0x2000, CRC(835438a0) SHA1(27f320b74e7bdb29d4bc505432c96284f482cacc) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "chars", 0 )
 	ROM_LOAD( "136023-105.bin",      0x0000, 0x1000, CRC(ee443909) SHA1(802c5839be9e9e33c75ca7318043ecdb7b82f721) )
 	ROM_LOAD( "136023-106.bin",      0x1000, 0x1000, CRC(d708b132) SHA1(d57acdcfb7b3de65f0162bdc041efff4c7eeff18) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_REGION( 0x2000, "sprites", 0 )
 	ROM_LOAD( "136023-107.bin",      0x0000, 0x1000, CRC(c42c84a4) SHA1(6f241e772f8b46c8d3acad2e967f1ab530886b11) )
 	ROM_LOAD( "136023-108.bin",      0x1000, 0x1000, CRC(4fe13d58) SHA1(b21a32b2ff5363ab35fd1438344a04deb4077dbc) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "136023-116.3n",  0x000, 0x100, CRC(ef2668e5) SHA1(442df346a40b1e20d599ed9877c699e00ab518ba) ) /* 82S129 Vertical timing PROM */
+	ROM_LOAD( "136023-116.3n",  0x000, 0x100, CRC(ef2668e5) SHA1(442df346a40b1e20d599ed9877c699e00ab518ba) ) // 82S129 Vertical timing PROM
 ROM_END
 
 
@@ -419,16 +670,16 @@ ROM_START( cloaksp )
 	ROM_LOAD( "136023-514.bin",      0xc000, 0x2000, CRC(6f8c7991) SHA1(bd6f838b224abed78fbdb7da17baa892289fc2f2) )
 	ROM_LOAD( "136023-515.bin",      0xe000, 0x2000, CRC(835438a0) SHA1(27f320b74e7bdb29d4bc505432c96284f482cacc) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "chars", 0 )
 	ROM_LOAD( "136023-105.bin",      0x0000, 0x1000, CRC(ee443909) SHA1(802c5839be9e9e33c75ca7318043ecdb7b82f721) )
 	ROM_LOAD( "136023-106.bin",      0x1000, 0x1000, CRC(d708b132) SHA1(d57acdcfb7b3de65f0162bdc041efff4c7eeff18) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_REGION( 0x2000, "sprites", 0 )
 	ROM_LOAD( "136023-107.bin",      0x0000, 0x1000, CRC(c42c84a4) SHA1(6f241e772f8b46c8d3acad2e967f1ab530886b11) )
 	ROM_LOAD( "136023-108.bin",      0x1000, 0x1000, CRC(4fe13d58) SHA1(b21a32b2ff5363ab35fd1438344a04deb4077dbc) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "136023-116.3n",  0x000, 0x100, CRC(ef2668e5) SHA1(442df346a40b1e20d599ed9877c699e00ab518ba) ) /* 82S129 Vertical timing PROM */
+	ROM_LOAD( "136023-116.3n",  0x000, 0x100, CRC(ef2668e5) SHA1(442df346a40b1e20d599ed9877c699e00ab518ba) ) // 82S129 Vertical timing PROM
 ROM_END
 
 
@@ -448,16 +699,16 @@ ROM_START( cloakfr )
 	ROM_LOAD( "136023-514.bin",      0xc000, 0x2000, CRC(6f8c7991) SHA1(bd6f838b224abed78fbdb7da17baa892289fc2f2) )
 	ROM_LOAD( "136023-515.bin",      0xe000, 0x2000, CRC(835438a0) SHA1(27f320b74e7bdb29d4bc505432c96284f482cacc) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "chars", 0 )
 	ROM_LOAD( "136023-105.bin",      0x0000, 0x1000, CRC(ee443909) SHA1(802c5839be9e9e33c75ca7318043ecdb7b82f721) )
 	ROM_LOAD( "136023-106.bin",      0x1000, 0x1000, CRC(d708b132) SHA1(d57acdcfb7b3de65f0162bdc041efff4c7eeff18) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_REGION( 0x2000, "sprites", 0 )
 	ROM_LOAD( "136023-107.bin",      0x0000, 0x1000, CRC(c42c84a4) SHA1(6f241e772f8b46c8d3acad2e967f1ab530886b11) )
 	ROM_LOAD( "136023-108.bin",      0x1000, 0x1000, CRC(4fe13d58) SHA1(b21a32b2ff5363ab35fd1438344a04deb4077dbc) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "136023-116.3n",  0x000, 0x100, CRC(ef2668e5) SHA1(442df346a40b1e20d599ed9877c699e00ab518ba) ) /* 82S129 Vertical timing PROM */
+	ROM_LOAD( "136023-116.3n",  0x000, 0x100, CRC(ef2668e5) SHA1(442df346a40b1e20d599ed9877c699e00ab518ba) ) // 82S129 Vertical timing PROM
 ROM_END
 
 
@@ -477,16 +728,16 @@ ROM_START( cloakgr )
 	ROM_LOAD( "136023-514.bin",      0xc000, 0x2000, CRC(6f8c7991) SHA1(bd6f838b224abed78fbdb7da17baa892289fc2f2) )
 	ROM_LOAD( "136023-515.bin",      0xe000, 0x2000, CRC(835438a0) SHA1(27f320b74e7bdb29d4bc505432c96284f482cacc) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "chars", 0 )
 	ROM_LOAD( "136023-105.bin",      0x0000, 0x1000, CRC(ee443909) SHA1(802c5839be9e9e33c75ca7318043ecdb7b82f721) )
 	ROM_LOAD( "136023-106.bin",      0x1000, 0x1000, CRC(d708b132) SHA1(d57acdcfb7b3de65f0162bdc041efff4c7eeff18) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_REGION( 0x2000, "sprites", 0 )
 	ROM_LOAD( "136023-107.bin",      0x0000, 0x1000, CRC(c42c84a4) SHA1(6f241e772f8b46c8d3acad2e967f1ab530886b11) )
 	ROM_LOAD( "136023-108.bin",      0x1000, 0x1000, CRC(4fe13d58) SHA1(b21a32b2ff5363ab35fd1438344a04deb4077dbc) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "136023-116.3n",  0x000, 0x100, CRC(ef2668e5) SHA1(442df346a40b1e20d599ed9877c699e00ab518ba) ) /* 82S129 Vertical timing PROM */
+	ROM_LOAD( "136023-116.3n",  0x000, 0x100, CRC(ef2668e5) SHA1(442df346a40b1e20d599ed9877c699e00ab518ba) ) // 82S129 Vertical timing PROM
 ROM_END
 
 
@@ -506,16 +757,16 @@ ROM_START( agentx4 )
 	ROM_LOAD( "136414-023.bin",      0xc000, 0x2000, CRC(cadf9ab0) SHA1(d5c4c86124033f21e065e5cd9cf7a1b31d3c11a6) )
 	ROM_LOAD( "136415-023.bin",      0xe000, 0x2000, CRC(f5024961) SHA1(99a8b02932b497588a011fe051465407531f8a0f) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "chars", 0 )
 	ROM_LOAD( "136105-023.bin",      0x0000, 0x1000, CRC(ee443909) SHA1(802c5839be9e9e33c75ca7318043ecdb7b82f721) )
 	ROM_LOAD( "136106-023.bin",      0x1000, 0x1000, CRC(d708b132) SHA1(d57acdcfb7b3de65f0162bdc041efff4c7eeff18) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_REGION( 0x2000, "sprites", 0 )
 	ROM_LOAD( "136107-023.bin",      0x0000, 0x1000, CRC(c42c84a4) SHA1(6f241e772f8b46c8d3acad2e967f1ab530886b11) )
 	ROM_LOAD( "136108-023.bin",      0x1000, 0x1000, CRC(4fe13d58) SHA1(b21a32b2ff5363ab35fd1438344a04deb4077dbc) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "136023-116.3n",  0x000, 0x100, CRC(ef2668e5) SHA1(442df346a40b1e20d599ed9877c699e00ab518ba) ) /* 82S129 Vertical timing PROM */
+	ROM_LOAD( "136023-116.3n",  0x000, 0x100, CRC(ef2668e5) SHA1(442df346a40b1e20d599ed9877c699e00ab518ba) ) // 82S129 Vertical timing PROM
 ROM_END
 
 
@@ -535,16 +786,16 @@ ROM_START( agentx3 )
 	ROM_LOAD( "136314-023.bin",      0xc000, 0x2000, CRC(3138a3b2) SHA1(553f247a72fce176d80db7e4c7624cdb73c8c078) )
 	ROM_LOAD( "136315-023.bin",      0xe000, 0x2000, CRC(d12f5523) SHA1(53a7e4e360bd8c21c0e9bf408b6dd231f4fe025c) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "chars", 0 )
 	ROM_LOAD( "136105-023.bin",      0x0000, 0x1000, CRC(ee443909) SHA1(802c5839be9e9e33c75ca7318043ecdb7b82f721) )
 	ROM_LOAD( "136106-023.bin",      0x1000, 0x1000, CRC(d708b132) SHA1(d57acdcfb7b3de65f0162bdc041efff4c7eeff18) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_REGION( 0x2000, "sprites", 0 )
 	ROM_LOAD( "136107-023.bin",      0x0000, 0x1000, CRC(c42c84a4) SHA1(6f241e772f8b46c8d3acad2e967f1ab530886b11) )
 	ROM_LOAD( "136108-023.bin",      0x1000, 0x1000, CRC(4fe13d58) SHA1(b21a32b2ff5363ab35fd1438344a04deb4077dbc) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "136023-116.3n",  0x000, 0x100, CRC(ef2668e5) SHA1(442df346a40b1e20d599ed9877c699e00ab518ba) ) /* 82S129 Vertical timing PROM */
+	ROM_LOAD( "136023-116.3n",  0x000, 0x100, CRC(ef2668e5) SHA1(442df346a40b1e20d599ed9877c699e00ab518ba) ) // 82S129 Vertical timing PROM
 ROM_END
 
 
@@ -564,16 +815,16 @@ ROM_START( agentx2 )
 	ROM_LOAD( "136214-023.bin",      0xc000, 0x2000, CRC(dba311ec) SHA1(a825f013211e6eaac4c18a589b38a416dc633954) )
 	ROM_LOAD( "136215-023.bin",      0xe000, 0x2000, CRC(dc20c185) SHA1(5a1d3e65e543fe295c2f179f8b5c2193065af581) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "chars", 0 )
 	ROM_LOAD( "136105-023.bin",      0x0000, 0x1000, CRC(ee443909) SHA1(802c5839be9e9e33c75ca7318043ecdb7b82f721) )
 	ROM_LOAD( "136106-023.bin",      0x1000, 0x1000, CRC(d708b132) SHA1(d57acdcfb7b3de65f0162bdc041efff4c7eeff18) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_REGION( 0x2000, "sprites", 0 )
 	ROM_LOAD( "136107-023.bin",      0x0000, 0x1000, CRC(c42c84a4) SHA1(6f241e772f8b46c8d3acad2e967f1ab530886b11) )
 	ROM_LOAD( "136108-023.bin",      0x1000, 0x1000, CRC(4fe13d58) SHA1(b21a32b2ff5363ab35fd1438344a04deb4077dbc) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "136023-116.3n",  0x000, 0x100, CRC(ef2668e5) SHA1(442df346a40b1e20d599ed9877c699e00ab518ba) ) /* 82S129 Vertical timing PROM */
+	ROM_LOAD( "136023-116.3n",  0x000, 0x100, CRC(ef2668e5) SHA1(442df346a40b1e20d599ed9877c699e00ab518ba) ) // 82S129 Vertical timing PROM
 ROM_END
 
 
@@ -593,18 +844,19 @@ ROM_START( agentx1 )
 	ROM_LOAD( "136114-023.bin",      0xc000, 0x2000, CRC(7c7c905d) SHA1(eb417c5e80f1a3169c1385d7c843a3defa584b6e) )
 	ROM_LOAD( "136115-023.bin",      0xe000, 0x2000, CRC(7f36710c) SHA1(6d412f22e723999c641dde18a47c8d90d2ed07a3) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "chars", 0 )
 	ROM_LOAD( "136105-023.bin",      0x0000, 0x1000, CRC(ee443909) SHA1(802c5839be9e9e33c75ca7318043ecdb7b82f721) )
 	ROM_LOAD( "136106-023.bin",      0x1000, 0x1000, CRC(d708b132) SHA1(d57acdcfb7b3de65f0162bdc041efff4c7eeff18) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_REGION( 0x2000, "sprites", 0 )
 	ROM_LOAD( "136107-023.bin",      0x0000, 0x1000, CRC(c42c84a4) SHA1(6f241e772f8b46c8d3acad2e967f1ab530886b11) )
 	ROM_LOAD( "136108-023.bin",      0x1000, 0x1000, CRC(4fe13d58) SHA1(b21a32b2ff5363ab35fd1438344a04deb4077dbc) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "136023-116.3n",  0x000, 0x100, CRC(ef2668e5) SHA1(442df346a40b1e20d599ed9877c699e00ab518ba) ) /* 82S129 Vertical timing PROM */
+	ROM_LOAD( "136023-116.3n",  0x000, 0x100, CRC(ef2668e5) SHA1(442df346a40b1e20d599ed9877c699e00ab518ba) ) // 82S129 Vertical timing PROM
 ROM_END
 
+} // anonymous namespace
 
 
 /*************************************

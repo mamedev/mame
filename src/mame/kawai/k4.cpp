@@ -10,6 +10,9 @@
 #include "cpu/upd78k/upd78k3.h"
 //#include "machine/nvram.h"
 
+
+namespace {
+
 class kawai_k4_state : public driver_device
 {
 public:
@@ -75,6 +78,9 @@ ROM_START(k4r)
 	ROM_LOAD("d942_p203-m8dw.u39", 0x080000, 0x80000, NO_DUMP) // TC534000P
 	ROM_LOAD("d943_p204-m8dw.u38", 0x100000, 0x80000, NO_DUMP) // TC534000P
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1989, k4,  0,  0, k4, k4, kawai_k4_state, empty_init, "Kawai Musical Instrument Manufacturing", "K4 16-bit Digital Synthesizer",         MACHINE_IS_SKELETON)
 SYST(1989, k4r, k4, 0, k4, k4, kawai_k4_state, empty_init, "Kawai Musical Instrument Manufacturing", "K4r 16-bit Digital Synthesizer Module", MACHINE_IS_SKELETON)

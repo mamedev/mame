@@ -122,15 +122,15 @@
 #include "emu.h"
 #include "tn_ide.h"
 
-#define LOG_WARN       (1U<<1)
-#define LOG_CRU        (1U<<2)
-#define LOG_RTC        (1U<<3)
-#define LOG_XRAM       (1U<<4)
-#define LOG_SRAM       (1U<<5)
-#define LOG_ATA        (1U<<6)
-#define LOG_SRAMH      (1U<<7)
+#define LOG_WARN       (1U << 1)
+#define LOG_CRU        (1U << 2)
+#define LOG_RTC        (1U << 3)
+#define LOG_XRAM       (1U << 4)
+#define LOG_SRAM       (1U << 5)
+#define LOG_ATA        (1U << 6)
+#define LOG_SRAMH      (1U << 7)
 
-#define VERBOSE ( LOG_GENERAL | LOG_WARN )
+#define VERBOSE (LOG_GENERAL | LOG_WARN)
 
 #include "logmacro.h"
 

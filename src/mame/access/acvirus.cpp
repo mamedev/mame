@@ -40,12 +40,12 @@
     and banks 8-14 seem to contain factory default settings. There are flash
     programming routines at the beginning of banks 7 and 15, and two at the
     end of bank 6. Not sure why there are so many, and not all are
-    identical, so there's probably additional bank swithing logic to match.
+    identical, so there's probably additional bank switching logic to match.
     All display a charming "DO NOT TOUCH ME" message while programming. :)
 
     The same bank switching also seems to affect external memory, but I'm
     not sure how the smaller SRAM is mapped. Some external memory locations
-    are used for other tasks, like communicatng with the DSP.
+    are used for other tasks, like communicating with the DSP.
 
     The initial DSP program and data upload routine is at 0x1FAA. After
     setting up the bus, it churns out all the 24-bit words in banks 3-6
@@ -66,6 +66,9 @@
 #include "cpu/mcs51/mcs51.h"
 #include "machine/intelfsh.h"
 #include "speaker.h"
+
+
+namespace {
 
 class acvirus_state : public driver_device
 {
@@ -147,6 +150,9 @@ ROM_START( viruscl )
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD( "virus_cl_061_release.bin", 0x000000, 0x080000, CRC(a202e443) SHA1(33d5f4ebbacc817ab1e5dd572e8dc755f6c5e253) )
 ROM_END
+
+} // anonymous namespace
+
 
 CONS( 1997, virusa,     0, 0, virus, virus, acvirus_state, empty_init, "Access", "Virus A", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
 CONS( 1999, virusb,     0, 0, virus, virus, acvirus_state, empty_init, "Access", "Virus B (Ver. T)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

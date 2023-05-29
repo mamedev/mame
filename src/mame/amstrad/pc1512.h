@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_PC1512_H
-#define MAME_INCLUDES_PC1512_H
+#ifndef MAME_AMSTRAD_PC1512_H
+#define MAME_AMSTRAD_PC1512_H
 
 #pragma once
 
@@ -237,4 +237,4 @@ public:
 	void pc1640_mem(address_map &map);
 };
 
-#endif // MAME_INCLUDES_PC1512_H
+#endif // MAME_AMSTRAD_PC1512_H

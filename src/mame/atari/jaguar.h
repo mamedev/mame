@@ -14,7 +14,8 @@
 #include "imagedev/snapquik.h"
 #include "jag_blitter.h"
 #include "cdrom.h"
-#include "imagedev/chd_cd.h"
+#include "bus/generic/slot.h"
+#include "imagedev/cdromimg.h"
 #include "screen.h"
 #include "emupal.h"
 
@@ -271,7 +272,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( dsp_cpu_int );
 	DECLARE_WRITE_LINE_MEMBER( external_int );
 
-	image_init_result quickload_cb(device_image_interface &image);
+	std::pair<std::error_condition, std::string> quickload_cb(snapshot_image_device &image);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 	void cpu_space_map(address_map &map);
 	void dsp_map(address_map &map);
@@ -310,9 +311,9 @@ private:
 
 	/* from jagobj.cpp */
 	void jagobj_init();
-	uint32_t *process_bitmap(uint16_t *scanline, uint32_t *objdata, int vc, bool logit);
-	uint32_t *process_scaled_bitmap(uint16_t *scanline, uint32_t *objdata, int vc, bool logit);
-	uint32_t *process_branch(uint32_t *objdata, int vc, bool logit);
+	uint32_t *process_bitmap(uint16_t *scanline, uint32_t *objdata, int vc);
+	uint32_t *process_scaled_bitmap(uint16_t *scanline, uint32_t *objdata, int vc);
+	uint32_t *process_branch(uint32_t *objdata, int vc);
 	void process_object_list(int vc, uint16_t *_scanline);
 	void bitmap_4_draw(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos, uint8_t flags, int32_t dxpos, uint16_t *clutbase);
 	void bitmap_4_0(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos, uint16_t *clutbase);
@@ -404,7 +405,4 @@ private:
 	uint32_t m_butch_cmd_response[0x102]{};
 	uint8_t m_butch_cmd_index = 0U;
 	uint8_t m_butch_cmd_size = 0U;
-
-	cdrom_file  *m_cd_file = nullptr;
-	//const cdrom_toc*    m_toc = nullptr;
 };

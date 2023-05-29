@@ -80,6 +80,8 @@ Dumped by Chack'n
 #include "speaker.h"
 
 
+namespace {
+
 class cyclemb_state : public driver_device
 {
 public:
@@ -1156,6 +1158,8 @@ void cyclemb_state::init_skydest()
 
 	m_use_dial = false;
 }
+
+} // anonymous namespace
 
 
 //    year  name      parent  machine   input    class          init          rot   company              fullname                 flags

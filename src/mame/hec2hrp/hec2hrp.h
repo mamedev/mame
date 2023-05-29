@@ -4,8 +4,8 @@
 //////   HECTOR HEADER FILE /////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
 
-#ifndef MAME_INCLUDES_HEC2HRP_H
-#define MAME_INCLUDES_HEC2HRP_H
+#ifndef MAME_HEC2HRP_HEC2HRP_H
+#define MAME_HEC2HRP_HEC2HRP_H
 
 #pragma once
 
@@ -210,4 +210,4 @@ private:
 	optional_device_array<floppy_connector, 2> m_upd_connector;
 };
 
-#endif // MAME_INCLUDES_HEC2HRP_H
+#endif // MAME_HEC2HRP_HEC2HRP_H

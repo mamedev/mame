@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder, Mike Naberezny
-#ifndef MAME_INCLUDES_SOFTBOX_H
-#define MAME_INCLUDES_SOFTBOX_H
+#ifndef MAME_SKELETON_SOFTBOX_H
+#define MAME_SKELETON_SOFTBOX_H
 
 #pragma once
 
@@ -67,4 +67,4 @@ private:
 	output_finder<3> m_leds;
 };
 
-#endif
+#endif // MAME_SKELETON_SOFTBOX_H

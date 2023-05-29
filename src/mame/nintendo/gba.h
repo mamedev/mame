@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont,Ryan Holtz
 
-#ifndef MAME_INCLUDES_GBA_H
-#define MAME_INCLUDES_GBA_H
+#ifndef MAME_NINTENDO_GBA_H
+#define MAME_NINTENDO_GBA_H
 
 #include "sound/gb.h"
 #include "machine/intelfsh.h"
@@ -125,4 +125,4 @@ protected:
 };
 
 
-#endif
+#endif // MAME_NINTENDO_GBA_H

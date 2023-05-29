@@ -20,6 +20,9 @@
 #include "cpu/powerpc/ppc.h"
 #include "screen.h"
 
+
+namespace {
+
 class ncd_ppc_state : public driver_device
 {
 public:
@@ -100,6 +103,9 @@ ROM_START( explorapro )
 	ROM_REGION(0x40000, "maincpu", 0)
 	ROM_LOAD( "explora__v2.7.6_bm.u37", 0x000000, 0x040000, CRC(038fb1dc) SHA1(036836359f59e70d5bebc50d69083bbe020ddf98) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE       INPUT    CLASS          INIT               COMPANY                 FULLNAME           FLAGS
 COMP( 1995, explorapro, 0,      0,   explorapro, explorapro, ncd_ppc_state,  empty_init,   "Network Computing Devices", "NCD Explora Pro XQ", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

@@ -44,7 +44,6 @@ Notes:
 
     TODO:
 
-    - rewrite the mcs51.c serial I/O to replace this horrible, horrible hack
     - dip switches
 
 */
@@ -119,9 +118,8 @@ void wangpc_keyboard_device::device_add_mconfig(machine_config &config)
 	m_maincpu->port_in_cb<1>().set(FUNC(wangpc_keyboard_device::kb_p1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(wangpc_keyboard_device::kb_p1_w));
 	m_maincpu->port_out_cb<2>().set(FUNC(wangpc_keyboard_device::kb_p2_w));
+	m_maincpu->port_in_cb<3>().set(FUNC(wangpc_keyboard_device::kb_p3_r));
 	m_maincpu->port_out_cb<3>().set(FUNC(wangpc_keyboard_device::kb_p3_w));
-	m_maincpu->serial_tx_cb().set(FUNC(wangpc_keyboard_device::mcs51_tx_callback));
-	m_maincpu->serial_rx_cb().set(FUNC(wangpc_keyboard_device::mcs51_rx_callback));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -369,7 +367,6 @@ ioport_constructor wangpc_keyboard_device::device_input_ports() const
 
 wangpc_keyboard_device::wangpc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, WANGPC_KEYBOARD, tag, owner, clock),
-	device_serial_interface(mconfig, *this),
 	m_maincpu(*this, I8051_TAG),
 	m_y(*this, "Y%u", 0),
 	m_txd_handler(*this),
@@ -389,11 +386,6 @@ void wangpc_keyboard_device::device_start()
 	m_txd_handler.resolve_safe();
 	m_leds.resolve();
 
-	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_2);
-
-	set_rcv_rate(62500);
-	//set_tra_rate(62500);
-
 	save_item(NAME(m_keylatch));
 	save_item(NAME(m_rxd));
 }
@@ -405,60 +397,7 @@ void wangpc_keyboard_device::device_start()
 
 void wangpc_keyboard_device::device_reset()
 {
-	receive_register_reset();
-	transmit_register_reset();
-
 	m_txd_handler(1);
-}
-
-
-//-------------------------------------------------
-//  tra_callback -
-//-------------------------------------------------
-
-void wangpc_keyboard_device::tra_callback()
-{
-	int bit = transmit_register_get_data_bit();
-
-	if (LOG) logerror("KB '%s' Transmit Bit %u\n", tag(), bit);
-
-	m_txd_handler(transmit_register_get_data_bit());
-}
-
-
-//-------------------------------------------------
-//  tra_complete -
-//-------------------------------------------------
-
-void wangpc_keyboard_device::tra_complete()
-{
-}
-
-
-//-------------------------------------------------
-//  rcv_callback -
-//-------------------------------------------------
-
-void wangpc_keyboard_device::rcv_callback()
-{
-	if (LOG) logerror("KB '%s' Receive Bit %u\n", tag(), m_rxd);
-
-	receive_register_update_bit(m_rxd);
-}
-
-
-//-------------------------------------------------
-//  rcv_complete -
-//-------------------------------------------------
-
-void wangpc_keyboard_device::rcv_complete()
-{
-	receive_register_extract();
-
-	if (LOG) logerror("KB '%s' Receive Data %02x\n", tag(), get_received_char());
-
-	m_maincpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);
-	m_maincpu->set_input_line(MCS51_RX_LINE, CLEAR_LINE);
 }
 
 
@@ -469,38 +408,6 @@ void wangpc_keyboard_device::rcv_complete()
 WRITE_LINE_MEMBER(wangpc_keyboard_device::write_rxd)
 {
 	m_rxd = state;
-
-	device_serial_interface::rx_w(state);
-}
-
-
-//-------------------------------------------------
-//  mcs51_rx_callback -
-//-------------------------------------------------
-
-uint8_t wangpc_keyboard_device::mcs51_rx_callback()
-{
-	if (LOG) logerror("KB '%s' CPU Receive Data %02x\n", tag(), get_received_char());
-
-	return get_received_char();
-}
-
-
-//-------------------------------------------------
-//  mcs51_tx_callback -
-//-------------------------------------------------
-
-void wangpc_keyboard_device::mcs51_tx_callback(uint8_t data)
-{
-	if (LOG) logerror("KB '%s' CPU Transmit Data %02x\n", tag(), data);
-
-	transmit_register_setup(data);
-
-	// HACK bang the bits out immediately
-	while (!is_transmit_register_empty())
-	{
-		m_txd_handler(transmit_register_get_data_bit());
-	}
 }
 
 
@@ -572,6 +479,16 @@ void wangpc_keyboard_device::kb_p2_w(uint8_t data)
 
 
 //-------------------------------------------------
+//  kb_p3_r -
+//-------------------------------------------------
+
+uint8_t wangpc_keyboard_device::kb_p3_r()
+{
+	return m_rxd;
+}
+
+
+//-------------------------------------------------
 //  kb_p3_w -
 //-------------------------------------------------
 
@@ -593,4 +510,5 @@ void wangpc_keyboard_device::kb_p3_w(uint8_t data)
 	*/
 
 	//if (LOG) logerror("P3 %02x\n", data);
+	m_txd_handler(BIT(data, 1));
 }

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail,David Haywood
-#ifndef MAME_VIDEO_DECKARN_H
-#define MAME_VIDEO_DECKARN_H
+#ifndef MAME_DATAEAST_DECKARN_H
+#define MAME_DATAEAST_DECKARN_H
 
 #pragma once
 
@@ -29,4 +29,4 @@ private:
 
 DECLARE_DEVICE_TYPE(DECO_KARNOVSPRITES, deco_karnovsprites_device)
 
-#endif // MAME_VIDEO_DECKARN_H
+#endif // MAME_DATAEAST_DECKARN_H

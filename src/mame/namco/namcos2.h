@@ -7,8 +7,8 @@
   Common functions & declarations for the Namco System 2 driver
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_NAMCOS2_H
-#define MAME_INCLUDES_NAMCOS2_H
+#ifndef MAME_NAMCO_NAMCOS2_H
+#define MAME_NAMCO_NAMCOS2_H
 
 #pragma once
 
@@ -311,4 +311,4 @@ private:
 #define NAMCOS2_C148_SERIRQ     6       /* 0x1cc000 */
 #define NAMCOS2_C148_VBLANKIRQ  7       /* 0x1ce000 */
 
-#endif // MAME_INCLUDES_NAMCOS2_H
+#endif // MAME_NAMCO_NAMCOS2_H

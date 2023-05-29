@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_SEGABILL_H
-#define MAME_MACHINE_SEGABILL_H
+#ifndef MAME_SEGA_SEGABILL_H
+#define MAME_SEGA_SEGABILL_H
 
 #pragma once
 
@@ -55,4 +55,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(SEGA_BILLBOARD, sega_billboard_device)
 
-#endif // MAME_MACHINE_SEGABILL_H
+#endif // MAME_SEGA_SEGABILL_H

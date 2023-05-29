@@ -114,6 +114,8 @@ Eproms are 27512,27010,274001
 #include "speaker.h"
 
 
+namespace {
+
 class multigam_state : public driver_device
 {
 public:
@@ -1402,6 +1404,9 @@ void multigam_state::init_multigmt()
 
 	multigam_switch_prg_rom(0x01);
 }
+
+} // anonymous namespace
+
 
 GAME( 1992, multigam, 0,        multigam, multigam, multigam_state, init_multigam, ROT0, "<unknown>", "Multi Game (set 1)", 0 )
 GAME( 1992, multigmb, multigam, multigam, multigam, multigam_state, init_multigam, ROT0, "<unknown>", "Multi Game (set 2)", 0 )

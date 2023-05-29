@@ -136,6 +136,9 @@ The serial interface card is z80 based and marked DIABLO-1300-V24
 #include "emu.h"
 #include "cpu/diablo/diablo1300.h"
 
+
+namespace {
+
 class diablo1300_state : public driver_device
 {
 public:
@@ -201,6 +204,9 @@ ROM_START( diablo )
 	ROM_LOAD( "55wp92ch.bin",  0x0000, 0x200,   CRC(58ba7913) SHA1(968e87318b49ad05a66a8148e9048bfbeba2a97f) ) // Dumped 82S115 using Arduino
 
 ROM_END
+
+} // anonymous namespace
+
 
 //   YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY               FULLNAME
 COMP(1976, diablo, 0,      0,      diablo1300, diablo1300, diablo1300_state, empty_init, "Diablo Systems Inc", "Diablo HyType II Series 1300 CPU", MACHINE_IS_SKELETON)

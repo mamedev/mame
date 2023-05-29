@@ -9,28 +9,34 @@
 //============================================================
 
 #include "sound_module.h"
+
 #include "modules/osdmodule.h"
 
 #if (defined(OSD_SDL) || defined(USE_SDL_SOUND))
 
-// standard sdl header
-#include <SDL2/SDL.h>
-
-// MAME headers
-#include "emuopts.h"
+#include "modules/lib/osdobj_common.h"
 #include "osdcore.h"
 
-#include "../../sdl/osdsdl.h"
+// standard sdl header
+#include <SDL2/SDL.h>
 
 #include <algorithm>
 #include <fstream>
 #include <memory>
 
+
+namespace osd {
+
+namespace {
+
 //============================================================
 //  DEBUGGING
 //============================================================
 
-#define LOG_SOUND       0
+#define LOG_SOUND           0
+
+#define SDLMAME_SOUND_LOG   "sound.log"
+
 
 //============================================================
 //  CLASS
@@ -41,18 +47,24 @@ class sound_sdl : public osd_module, public sound_module
 public:
 
 	// number of samples per SDL callback
-	static const int SDL_XFER_SAMPLES = 512;
+	static inline constexpr int SDL_XFER_SAMPLES = 512;
 
 	sound_sdl() :
 		osd_module(OSD_SOUND_PROVIDER, "sdl"), sound_module(),
+		sample_rate(0),
+		sdl_xfer_samples(SDL_XFER_SAMPLES),
 		stream_in_initialized(0),
-		attenuation(0), buf_locked(0), stream_buffer(nullptr), stream_buffer_size(0), buffer_underflows(0), buffer_overflows(0)
-{
-		sdl_xfer_samples = SDL_XFER_SAMPLES;
+		attenuation(0),
+		buf_locked(0),
+		stream_buffer(nullptr),
+		stream_buffer_size(0),
+		buffer_underflows(0),
+		buffer_overflows(0)
+	{
 	}
 	virtual ~sound_sdl() { }
 
-	virtual int init(const osd_options &options) override;
+	virtual int init(osd_interface &osd, const osd_options &options) override;
 	virtual void exit() override;
 
 	// sound_module
@@ -86,6 +98,7 @@ private:
 	int sdl_create_buffers();
 	void sdl_destroy_buffers();
 
+	int sample_rate;
 	int sdl_xfer_samples;
 	int stream_in_initialized;
 	int attenuation;
@@ -239,9 +252,8 @@ void sound_sdl::copy_sample_data(bool is_throttled, const int16_t *data, int byt
 void sound_sdl::update_audio_stream(bool is_throttled, const int16_t *buffer, int samples_this_frame)
 {
 	// if nothing to do, don't do it
-	if (sample_rate() == 0 || !stream_buffer)
+	if (sample_rate == 0 || !stream_buffer)
 		return;
-
 
 	if (!stream_in_initialized)
 	{
@@ -330,7 +342,7 @@ void sound_sdl::sdl_callback(void *userdata, Uint8 *stream, int len)
 //  sound_sdl::init
 //============================================================
 
-int sound_sdl::init(const osd_options &options)
+int sound_sdl::init(osd_interface &osd, const osd_options &options)
 {
 	int         n_channels = 2;
 	int         audio_latency;
@@ -340,7 +352,8 @@ int sound_sdl::init(const osd_options &options)
 		sound_log = std::make_unique<std::ofstream>(SDLMAME_SOUND_LOG);
 
 	// skip if sound disabled
-	if (sample_rate() != 0)
+	sample_rate = options.sample_rate();
+	if (sample_rate != 0)
 	{
 		if (SDL_InitSubSystem(SDL_INIT_AUDIO))
 		{
@@ -356,7 +369,7 @@ int sound_sdl::init(const osd_options &options)
 		stream_in_initialized = 0;
 
 		// set up the audio specs
-		aspec.freq = sample_rate();
+		aspec.freq = sample_rate;
 		aspec.format = AUDIO_S16SYS;    // keep endian independent
 		aspec.channels = n_channels;
 		aspec.samples = sdl_xfer_samples;
@@ -372,10 +385,10 @@ int sound_sdl::init(const osd_options &options)
 		sdl_xfer_samples = obtained.samples;
 
 		// pin audio latency
-		audio_latency = std::clamp(m_audio_latency, 1, MAX_AUDIO_LATENCY);
+		audio_latency = std::clamp(options.audio_latency(), 1, MAX_AUDIO_LATENCY);
 
 		// compute the buffer sizes
-		stream_buffer_size = (sample_rate() * 2 * sizeof(int16_t) * (2 + audio_latency)) / 30;
+		stream_buffer_size = (sample_rate * 2 * sizeof(int16_t) * (2 + audio_latency)) / 30;
 		stream_buffer_size = (stream_buffer_size / 1024) * 1024;
 		if (stream_buffer_size < 1024)
 			stream_buffer_size = 1024;
@@ -409,7 +422,7 @@ int sound_sdl::init(const osd_options &options)
 void sound_sdl::exit()
 {
 	// if nothing to do, don't do it
-	if (sample_rate() == 0)
+	if (sample_rate == 0)
 		return;
 
 	osd_printf_verbose("sdl_kill: closing audio\n");
@@ -456,10 +469,15 @@ void sound_sdl::sdl_destroy_buffers()
 	stream_buffer.reset();
 }
 
+} // anonymous namespace
+
+} // namespace osd
 
 
-#else /* SDLMAME_UNIX */
-	MODULE_NOT_SUPPORTED(sound_sdl, OSD_SOUND_PROVIDER, "sdl")
+#else // (defined(OSD_SDL) || defined(USE_SDL_SOUND))
+
+namespace osd { namespace { MODULE_NOT_SUPPORTED(sound_sdl, OSD_SOUND_PROVIDER, "sdl") } }
+
 #endif
 
-MODULE_DEFINITION(SOUND_SDL, sound_sdl)
+MODULE_DEFINITION(SOUND_SDL, osd::sound_sdl)

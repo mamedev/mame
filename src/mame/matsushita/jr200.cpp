@@ -68,6 +68,8 @@ TODO:
 #include "utf8.h"
 
 
+namespace {
+
 class jr200_state : public driver_device
 {
 public:
@@ -651,6 +653,9 @@ ROM_START( jr200u )
 	ROM_REGION( 0x0800, "gfx_rom", ROMREGION_ERASEFF )
 	ROM_LOAD( "char.rom", 0x0000, 0x0800, CRC(cb641624) SHA1(6fe890757ebc65bbde67227f9c7c490d8edd84f2) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

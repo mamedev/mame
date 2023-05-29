@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail,Ernesto Corvi,Andrew Prime,Zsolt Vasvari
 // thanks-to:Fuzz
-#ifndef MAME_VIDEO_NEOGEO_SPR_H
-#define MAME_VIDEO_NEOGEO_SPR_H
+#ifndef MAME_NEOGEO_NEOGEO_SPR_H
+#define MAME_NEOGEO_NEOGEO_SPR_H
 
 #pragma once
 
@@ -143,4 +143,4 @@ public:
 
 DECLARE_DEVICE_TYPE(NEOGEO_SPRITE_MIDAS, neosprite_midas_device)
 
-#endif // MAME_VIDEO_NEOGEO_SPR_H
+#endif // MAME_NEOGEO_NEOGEO_SPR_H

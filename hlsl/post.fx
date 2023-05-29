@@ -206,14 +206,12 @@ float4 ps_main(PS_INPUT Input) : COLOR
 
 	// Color
 	float4 BaseColor = tex2D(DiffuseSampler, BaseCoord);
-	BaseColor.a = 1.0;
 
 	// clip border
 	if (BaseCoord.x < 0.0 || BaseCoord.y < 0.0 ||
 		BaseCoord.x > 1.0 || BaseCoord.y > 1.0)
 	{
-		// we don't use the clip function, because we don't clear the render target before
-		return float4(0.0, 0.0, 0.0, 1.0);
+		return float4(0.0f, 0.0f, 0.0f, 1.0f);
 	}
 
 	// Color Compression (may not affect bloom)

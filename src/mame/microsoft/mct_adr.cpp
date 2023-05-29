@@ -103,7 +103,11 @@ void mct_adr_device::map(address_map &map)
 				m_dma_reg[reg] = data;
 
 				if ((reg == REG_ENABLE) && (data & DMA_ENABLE))
+				{
 					LOG("dma started address 0x%08x count %d\n", translate_address(m_dma_reg[(0 << 2) + REG_ADDRESS]), m_dma_reg[(0 << 2) + REG_COUNT]);
+					if (!m_dma_check->enabled())
+						m_dma_check->adjust(attotime::zero);
+				}
 			}, "dma_reg_w");
 	map(0x200, 0x207).lr32(NAME([this] () { return m_dma_interrupt_source; }));
 	map(0x208, 0x20f).lr32([] () { return 0; }, "error_type");

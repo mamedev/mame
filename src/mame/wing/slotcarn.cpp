@@ -26,6 +26,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 #define MASTER_CLOCK            (XTAL(10'000'000))
 #define CPU_CLOCK               (MASTER_CLOCK / 4)
 #define PIXEL_CLOCK             (MASTER_CLOCK / 1)
@@ -695,6 +697,8 @@ ROM_START( spielbud )
 	ROM_REGION( 0x4000, "gfx2", 0 )
 	ROM_LOAD( "spielbud.09", 0x0000, 0x2000, CRC(d88c72f2) SHA1(bb015685f4c2cc7723c24880c11cb6d31f71e73f) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*********************************************

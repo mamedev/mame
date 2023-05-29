@@ -95,28 +95,23 @@ TIMER_CALLBACK_MEMBER(z88cart_slot_device::close_flap)
     call load
 -------------------------------------------------*/
 
-image_init_result z88cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> z88cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint8_t *cart_base = m_cart->get_cart_base();
+		uint8_t *const cart_base = m_cart->get_cart_base();
+		if (!cart_base)
+			return std::make_pair(image_error::INTERNAL, std::string());
 
-		if (cart_base != nullptr)
+		if (!loaded_through_softlist())
 		{
-			if (!loaded_through_softlist())
-			{
-				offs_t read_length = length();
-				fread(cart_base + (m_cart->get_cart_size() - read_length), read_length);
-			}
-			else
-			{
-				offs_t read_length = get_software_region_length("rom");
-				memcpy(cart_base + (m_cart->get_cart_size() - read_length), get_software_region("rom"), read_length);
-			}
+			offs_t read_length = length();
+			fread(cart_base + (m_cart->get_cart_size() - read_length), read_length);
 		}
 		else
 		{
-			return image_init_result::FAIL;
+			offs_t read_length = get_software_region_length("rom");
+			memcpy(cart_base + (m_cart->get_cart_size() - read_length), get_software_region("rom"), read_length);
 		}
 	}
 
@@ -126,7 +121,7 @@ image_init_result z88cart_slot_device::call_load()
 	// setup the timer to close the flap
 	m_flp_timer->adjust(CLOSE_FLAP_TIME);
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

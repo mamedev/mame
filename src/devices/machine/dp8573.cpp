@@ -10,8 +10,7 @@
 #include "machine/dp8573.h"
 #include "machine/timehelp.h"
 
-#define LOG_GENERAL (1 << 0)
-#define LOG_TICKS   (1 << 1)
+#define LOG_TICKS   (1U << 1)
 #define LOG_ALL     (LOG_GENERAL | LOG_TICKS)
 
 #define VERBOSE (0)
@@ -23,6 +22,7 @@ DEFINE_DEVICE_TYPE(DP8573, dp8573_device, "dp8573", "DP8573 Real-Time Clock")
 dp8573_device::dp8573_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DP8573, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
+	, device_rtc_interface(mconfig, *this)
 	, m_intr_cb(*this)
 	, m_mfo_cb(*this)
 {
@@ -42,27 +42,23 @@ void dp8573_device::device_start()
 	m_mfo_cb.resolve_safe();
 
 	memset(m_ram, 0, 32);
-	sync_time();
 
 	m_tscr = 0;
 
 	m_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
 }
 
-void dp8573_device::sync_time()
+void dp8573_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
 {
-	system_time systime;
-	machine().base_datetime(systime);
-
 	m_millis = 0;
 	m_ram[REG_HUNDREDTH] = 0;
-	m_ram[REG_SECOND] = time_helper::make_bcd(systime.utc_time.second);
-	m_ram[REG_MINUTE] = time_helper::make_bcd(systime.utc_time.minute);
-	m_ram[REG_HOUR] = time_helper::make_bcd(systime.utc_time.hour);
-	m_ram[REG_DAY] = time_helper::make_bcd(systime.utc_time.mday);
-	m_ram[REG_MONTH] = time_helper::make_bcd(systime.utc_time.month + 1);
-	m_ram[REG_YEAR] = time_helper::make_bcd(systime.utc_time.year % 100);
-	m_ram[REG_DAYOFWEEK] = time_helper::make_bcd(systime.utc_time.weekday + 1);
+	m_ram[REG_SECOND] = time_helper::make_bcd(second);
+	m_ram[REG_MINUTE] = time_helper::make_bcd(minute);
+	m_ram[REG_HOUR] = time_helper::make_bcd(hour);
+	m_ram[REG_DAY] = time_helper::make_bcd(day);
+	m_ram[REG_MONTH] = time_helper::make_bcd(month);
+	m_ram[REG_YEAR] = time_helper::make_bcd(year);
+	m_ram[REG_DAYOFWEEK] = time_helper::make_bcd(day_of_week);
 
 	m_pfr = 0;
 
@@ -220,7 +216,7 @@ void dp8573_device::clear_interrupt(uint8_t mask)
 
 void dp8573_device::write(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_GENERAL, "%s: DP8573 - Register Write: %02x = %02x\n", machine().describe_context(), offset, data);
+	LOG("%s: DP8573 - Register Write: %02x = %02x\n", machine().describe_context(), offset, data);
 
 	switch (offset)
 	{
@@ -336,14 +332,13 @@ u8 dp8573_device::read(offs_t offset)
 		}
 	}
 
-	LOGMASKED(LOG_GENERAL, "%s: DP8573 - Register Read: %02x = %02x\n", machine().describe_context(), offset, ret);
+	LOG("%s: DP8573 - Register Read: %02x = %02x\n", machine().describe_context(), offset, ret);
 	return ret;
 }
 
 void dp8573_device::nvram_default()
 {
 	memset(m_ram, 0, 32);
-	sync_time();
 }
 
 bool dp8573_device::nvram_read(util::read_stream &file)
@@ -352,7 +347,6 @@ bool dp8573_device::nvram_read(util::read_stream &file)
 	if (file.read(m_ram, 32, actual) || actual != 32)
 		return false;
 
-	sync_time();
 	return true;
 }
 

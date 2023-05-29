@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_AUDIO_CMI01A_H
-#define MAME_AUDIO_CMI01A_H
+#ifndef MAME_FAIRLIGHT_CMI01A_H
+#define MAME_FAIRLIGHT_CMI01A_H
 
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
@@ -188,4 +188,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(CMI01A_CHANNEL_CARD, cmi01a_device)
 
-#endif // MAME_AUDIO_CMI01A_H
+#endif // MAME_FAIRLIGHT_CMI01A_H

@@ -1,16 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
-/**********************************************************************
+/*******************************************************************************
 
 Hegener + Glaser Mephisto Sensors Board, for modular chesscomputers
 - Modular
 - Muenchen
 - Exclusive
 
-This device can also apply to non-modular boards if I/O is similar
-Bavaria board is not emulated here, additional handlers for it are in the driver.
+This device can also apply to non-modular boards if I/O is similar Bavaria board
+is not emulated here, additional handlers for it are in the driver.
 
-*********************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 #include "mmboard.h"

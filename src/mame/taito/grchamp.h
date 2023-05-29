@@ -5,8 +5,8 @@
     Taito Grand Champ hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_GRCHAMP_H
-#define MAME_INCLUDES_GRCHAMP_H
+#ifndef MAME_TAITO_GRCHAMP_H
+#define MAME_TAITO_GRCHAMP_H
 
 #pragma once
 
@@ -147,4 +147,4 @@ private:
 
 DISCRETE_SOUND_EXTERN( grchamp_discrete );
 
-#endif // MAME_INCLUDES_GRCHAMP_H
+#endif // MAME_TAITO_GRCHAMP_H

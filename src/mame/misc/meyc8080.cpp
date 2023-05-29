@@ -67,6 +67,8 @@
 #include "meybjack.lh"
 
 
+namespace {
+
 class meyc8080_state : public driver_device
 {
 public:
@@ -725,6 +727,8 @@ ROM_START( casbjack )
 	ROM_LOAD( "k3", 0x2800, 0x0800, CRC(9cd6b843) SHA1(fb9c5c5ba96ebb75dc42e7c891d6da2a8a1ea6c1) )
 	ROM_LOAD( "k2", 0x3000, 0x0800, CRC(5f82eafa) SHA1(4f5a4dc773ceae9a69ec532166047867db4ddadf) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************************

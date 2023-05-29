@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap, Sandro Ronco
 // thanks-to:Berger
-/******************************************************************************
+/*******************************************************************************
 
 Fidelity Phantom (model 6100)
 
@@ -43,7 +43,7 @@ BTANB:
   or not displayed at all. (This may seem like a minor bug in the game, but it
   actually makes it more difficult to write a MAME UCI plugin for this driver.)
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -207,9 +207,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(chessterp_state::nmi_timer)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Motor Sim
-******************************************************************************/
+*******************************************************************************/
 
 void phantom_state::init_motors()
 {
@@ -309,9 +309,9 @@ void phantom_state::update_pieces_position(int state)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void phantom_state::update_lcd(u8 select)
 {
@@ -489,9 +489,9 @@ u8 phantom_state::vmotor_ff_clear_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void phantom_state::main_map(address_map &map)
 {
@@ -516,9 +516,9 @@ void chessterp_state::main_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( phantom )
 	PORT_START("IN.0")
@@ -547,14 +547,14 @@ static INPUT_PORTS_START( cphantom )
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("Move / No/Stop")
 
 	PORT_START("IN.1") // motion sensor is inverted here, eg. hold down key to pretend noone's there
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F1) PORT_NAME("Motion Sensor")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_NAME("Motion Sensor")
 INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void phantom_state::phantom(machine_config &config)
 {
@@ -602,9 +602,9 @@ void chessterp_state::cphantom(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( fphantom ) // model 6100, PCB label 510.1128A01
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -627,11 +627,11 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME       PARENT CMP MACHINE   INPUT     STATE            INIT          COMPANY, FULLNAME, FLAGS
-CONS( 1988, fphantom,  0,     0,  phantom,  phantom,  phantom_state,   init_phantom, "Fidelity Electronics", "Phantom (Fidelity)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_MECHANICAL )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS            INIT          COMPANY, FULLNAME, FLAGS
+SYST( 1988, fphantom, 0,      0,      phantom,  phantom,  phantom_state,   init_phantom, "Fidelity Electronics", "Phantom (Fidelity)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_MECHANICAL )
 
-CONS( 1991, cphantom,  0,     0,  cphantom, cphantom, chessterp_state, init_phantom, "Fidelity Electronics", "Chesster Phantom (model 6126)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_MECHANICAL )
+SYST( 1991, cphantom, 0,      0,      cphantom, cphantom, chessterp_state, init_phantom, "Fidelity Electronics", "Chesster Phantom (model 6126)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_MECHANICAL )

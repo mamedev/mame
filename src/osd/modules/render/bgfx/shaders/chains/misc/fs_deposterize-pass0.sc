@@ -20,7 +20,7 @@ uniform vec4 DIFF_THRESH1;
 
 vec3 df3(vec3 c1, vec3 c2)
 {
-      return abs(c1 - c2);
+	return abs(c1 - c2);
 }
 
 bvec3 le3(vec3 A, vec3 B, vec3 param)

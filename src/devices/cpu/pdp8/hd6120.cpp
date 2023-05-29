@@ -1289,7 +1289,7 @@ void hd6120_device::execute_run()
 
 		case minor_state::INTGNT_1:
 			m_ac = m_temp & 07777;
-			(void)standard_irq_callback(INTREQ_LINE);
+			(void)standard_irq_callback(INTREQ_LINE, m_if << 12 | m_pc);
 			m_intgnt = true;
 			m_intgnt_callback(0);
 			m_flags &= 6;
@@ -1307,7 +1307,7 @@ void hd6120_device::execute_run()
 			m_ac = m_temp & 07777;
 			debugger_privilege_hook();
 			if (BIT(m_pnlflgs, 2))
-				(void)standard_irq_callback(CPREQ_LINE);
+				(void)standard_irq_callback(CPREQ_LINE, m_if << 12 | m_pc);
 			if (m_intgnt)
 				m_intgnt_callback(1);
 			m_if |= 010;

@@ -30,8 +30,8 @@
 
 ****************************************************************************/
 
-#ifndef MAME_INCLUDES_POLY_H
-#define MAME_INCLUDES_POLY_H
+#ifndef MAME_AUSNZ_POLY_H
+#define MAME_AUSNZ_POLY_H
 
 #pragma once
 
@@ -184,4 +184,4 @@ private:
 	floppy_image_device *m_current_floppy;
 };
 
-#endif // MAME_INCLUDES_POLY_H
+#endif // MAME_AUSNZ_POLY_H

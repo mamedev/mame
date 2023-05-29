@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Lukasz Markowski
-#ifndef MAME_INCLUDES_DM7000_H
-#define MAME_INCLUDES_DM7000_H
+#ifndef MAME_SKELETON_DM7000_H
+#define MAME_SKELETON_DM7000_H
 
 #pragma once
 
@@ -95,4 +95,4 @@ private:
 #define DCRSTB045_DISP_MODE         0x154       /* Display Mode Register */
 #define DCRSTB045_FRAME_BUFR_BASE   0x179       /* Frame Buffers Base Address Register */
 
-#endif // MAME_INCLUDES_DM7000_H
+#endif // MAME_SKELETON_DM7000_H

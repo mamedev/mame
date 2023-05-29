@@ -71,7 +71,7 @@
 
 #include <algorithm>
 
-#define LOG_INT (1 << 1U)
+#define LOG_INT (1U << 1)
 //#define VERBOSE (LOG_INT)
 #include "logmacro.h"
 

@@ -23,6 +23,8 @@ It appears that unused bits in port 03 are to operate the discrete sound channel
 #include "screen.h"
 
 
+namespace {
+
 class dorachan_state : public driver_device
 {
 public:
@@ -271,6 +273,7 @@ ROM_START( dorachan )
 	ROM_LOAD( "d14.rom",    0x0000, 0x0400, CRC(c0d3ee84) SHA1(f2207c685ce8d5144a373c28f11d2cebf9518b65) )
 ROM_END
 
+} // anonymous namespace
 
 
 /*************************************

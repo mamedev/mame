@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco, hap
-/******************************************************************************
+/*******************************************************************************
 
 VEB Mikroelektronik "Karl Marx" Erfurt Chess-Master (aka Schachcomputer CM)
 - Chess-Master (G-5003-500) (10*U505 roms)
@@ -26,7 +26,7 @@ TODO:
   minor so it seems to boot fine if you take 064/065 from chessmst, but will
   probably have some problems.
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -97,9 +97,9 @@ void chessmst_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void chessmst_state::update_leds()
 {
@@ -151,9 +151,9 @@ void chessmst_state::pio2_port_b_w(u8 data)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void chessmst_state::chessmst_mem(address_map &map)
 {
@@ -174,9 +174,9 @@ void chessmst_state::chessmst_io(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 INPUT_CHANGED_MEMBER(chessmst_state::halt_button)
 {
@@ -213,9 +213,9 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 static const z80_daisy_config chessmst_daisy_chain[] =
 {
@@ -267,9 +267,9 @@ void chessmst_state::chessmsta(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( chessmst )
 	ROM_REGION( 0x2800, "maincpu", 0 )
@@ -295,10 +295,10 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
 //    YEAR  NAME        PARENT    COMPAT  MACHINE    INPUT     CLASS           INIT        COMPANY                                     FULLNAME                FLAGS
-CONS( 1984, chessmst,   0,        0,      chessmst,  chessmst, chessmst_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Chess-Master (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1984, chessmsta,  chessmst, 0,      chessmsta, chessmst, chessmst_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Chess-Master (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1984, chessmst,   0,        0,      chessmst,  chessmst, chessmst_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Chess-Master (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1984, chessmsta,  chessmst, 0,      chessmsta, chessmst, chessmst_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Chess-Master (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )

@@ -26,7 +26,8 @@
 
 // ======================> abc77_device
 
-class abc77_device :  public device_t, public abc_keyboard_interface
+class abc77_device : public device_t,
+					 public abc_keyboard_interface
 {
 public:
 	// construction/destruction
@@ -48,11 +49,9 @@ protected:
 
 	// abc_keyboard_interface overrides
 	virtual void txd_w(int state) override;
+	virtual void reset_w(int state) override;
 
 private:
-	void serial_output(int state);
-	void key_down(int state);
-
 	TIMER_CALLBACK_MEMBER(serial_clock);
 	TIMER_CALLBACK_MEMBER(reset_tick);
 
@@ -62,11 +61,8 @@ private:
 	required_ioport_array<12> m_x;
 	required_ioport m_dsw;
 
-	int m_txd;                      // transmit data
 	int m_keylatch;                 // keyboard row latch
-	int m_keydown;                  // key down
 	int m_clock;                    // transmit clock
-	int m_hys;                      // hysteresis
 	int m_stb;                      // strobe
 	uint8_t m_j3;
 
@@ -76,16 +72,16 @@ private:
 
 	uint8_t p1_r();
 	void p2_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( t1_r );
-	DECLARE_WRITE_LINE_MEMBER( prog_w );
-	void j3_w(uint8_t data);
+	DECLARE_READ_LINE_MEMBER( t1_r ) { return m_clock; }
+	DECLARE_WRITE_LINE_MEMBER( prog_w ) { m_stb = state; }
+	void j3_w(uint8_t data) { m_j3 = data; }
 
 	void abc77_io(address_map &map);
 	void abc77_map(address_map &map);
 };
 
 
-class abc55_device :  public abc77_device
+class abc55_device : public abc77_device
 {
 public:
 	// construction/destruction

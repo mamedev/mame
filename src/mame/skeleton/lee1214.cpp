@@ -13,6 +13,9 @@
 //#include "video/mc6845.h"
 //#include "screen.h"
 
+
+namespace {
+
 class lee1214_state : public driver_device
 {
 public:
@@ -31,7 +34,7 @@ private:
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	[[maybe_unused]] u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<cpu_device> m_maincpu;
 };
@@ -82,5 +85,8 @@ ROM_START(lee1214d) // X1 = 12 MHz, X2 = 41.028 MHz, X3 = 24.823 MHz, X5 = 5.933
 	ROM_REGION(0x0800, "eeprom", 0)
 	ROM_LOAD("13300001_u19_2816.bin", 0x0000, 0x0800, CRC(30411ecd) SHA1(8755a1e0a36fe96d438bf2ee35cb0917fbc97e52))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1985, lee1214d, 0, 0, lee1214, lee1214, lee1214_state, empty_init, "Lee Data", "1214D Display Terminal", MACHINE_IS_SKELETON)

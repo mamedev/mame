@@ -7,8 +7,8 @@
 
 **************************************************************************/
 
-#ifndef MAME_VIDEO_MIDTUNIT_H
-#define MAME_VIDEO_MIDTUNIT_H
+#ifndef MAME_MIDWAY_MIDTUNIT_V_H
+#define MAME_MIDWAY_MIDTUNIT_V_H
 
 #pragma once
 
@@ -234,4 +234,4 @@ DECLARE_DEVICE_TYPE(MIDTUNIT_VIDEO, midtunit_video_device)
 DECLARE_DEVICE_TYPE(MIDWUNIT_VIDEO, midwunit_video_device)
 DECLARE_DEVICE_TYPE(MIDXUNIT_VIDEO, midxunit_video_device)
 
-#endif // MAME_VIDEO_MIDTUNIT_H
+#endif // MAME_MIDWAY_MIDTUNIT_V_H

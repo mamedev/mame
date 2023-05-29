@@ -47,6 +47,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class bowltry_state : public driver_device
 {
 public:
@@ -191,6 +194,8 @@ ROM_START( bowltry )
 	ROM_REGION( 0x400000, "tt5665", 0 ) // sound
 	ROM_LOAD( "u24_v1.00.u24", 0x000000, 0x400000, CRC(4e082d58) SHA1(d2eb58bc3d8ade2ea556960013d580f0fb952090) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 200?, bowltry, 0, bowltry, bowltry, bowltry_state, empty_init, ROT0, "Atlus", "Bowling Try!", MACHINE_IS_SKELETON_MECHANICAL )

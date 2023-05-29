@@ -169,6 +169,9 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/clock.h"
 
+
+namespace {
+
 class mzr8105_state : public driver_device
 {
 public:
@@ -230,6 +233,9 @@ ROM_START (mzr8105)
 	ROM_LOAD16_BYTE ("mzros9lb.bin", 0x000001, 0x2000, CRC (7c6a354d) SHA1 (2721eb649c8046dbcb517a36a97dc0816cd133f2))
 	ROM_LOAD16_BYTE ("mzros9hb.bin", 0x000000, 0x2000, CRC (d18e69a6) SHA1 (a00b68f4d649bcc09a29361f8692e52be12b3792))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME         FLAGS

@@ -5,8 +5,8 @@
  * includes/poly88.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_POLY88_H
-#define MAME_INCLUDES_POLY88_H
+#ifndef MAME_POLY88_POLY88_H
+#define MAME_POLY88_POLY88_H
 
 #pragma once
 
@@ -85,4 +85,4 @@ private:
 	bool m_onboard_disable = false;
 };
 
-#endif // MAME_INCLUDES_POLY88_H
+#endif // MAME_POLY88_POLY88_H

@@ -1,14 +1,23 @@
 // license:BSD-3-Clause
-// copyright-holders:Ryan Holtz
+// copyright-holders:Ryan Holtz, W. M. Martinez
 //-----------------------------------------------------------------------------
 // Color-Convolution Effect
 //-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+// Macros
+//-----------------------------------------------------------------------------
+
+#define LUT_TEXTURE_WIDTH 4096.0f
+#define LUT_SIZE 64.0f
+#define LUT_SCALE float2(1.0f / LUT_TEXTURE_WIDTH, 1.0f / LUT_SIZE)
 
 //-----------------------------------------------------------------------------
 // Sampler Definitions
 //-----------------------------------------------------------------------------
 
 texture Diffuse;
+texture LutTexture;
 
 sampler DiffuseSampler = sampler_state
 {
@@ -20,6 +29,35 @@ sampler DiffuseSampler = sampler_state
 	AddressV = CLAMP;
 	AddressW = CLAMP;
 };
+
+sampler2D LutSampler = sampler_state
+{
+	Texture = <LutTexture>;
+	MinFilter = LINEAR;
+	MagFilter = LINEAR;
+	MipFilter = LINEAR;
+	AddressU = CLAMP;
+	AddressV = CLAMP;
+	AddressW = CLAMP;
+};
+
+//-----------------------------------------------------------------------------
+// Utilities
+//-----------------------------------------------------------------------------
+
+float3 apply_lut(float3 color)
+{
+	// NOTE: Do not change the order of parameters here.
+	float3 lutcoord = float3((color.rg * (LUT_SIZE - 1.0f) + 0.5f) *
+		LUT_SCALE, color.b * (LUT_SIZE - 1.0f));
+	float shift = floor(lutcoord.z);
+
+	lutcoord.x += shift * LUT_SCALE.y;
+	color.rgb = lerp(tex2D(LutSampler, lutcoord.xy).rgb, tex2D(LutSampler,
+		float2(lutcoord.x + LUT_SCALE.y, lutcoord.y)).rgb,
+		lutcoord.z - shift);
+	return color;
+}
 
 //-----------------------------------------------------------------------------
 // Vertex Definitions
@@ -52,6 +90,7 @@ struct PS_INPUT
 
 uniform float2 ScreenDims;
 uniform float2 SourceDims;
+uniform float3 PrimTint = float3(1.0f, 1.0f, 1.0f);
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
@@ -67,6 +106,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.TexCoord += 0.5f / SourceDims; // half texel offset correction (DX9)
 
 	Output.Color = Input.Color;
+	Output.Color.rgb *= PrimTint;
 
 	return Output;
 }
@@ -81,10 +121,14 @@ uniform float3 BluRatios = float3(0.0f, 0.0f, 1.0f);
 uniform float3 Offset = float3(0.0f, 0.0f, 0.0f);
 uniform float3 Scale = float3(1.0f, 1.0f, 1.0f);
 uniform float Saturation = 1.0f;
+uniform bool LutEnable;
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float4 BaseTexel = tex2D(DiffuseSampler, Input.TexCoord);
+
+	if (LutEnable)
+		BaseTexel.rgb = apply_lut(BaseTexel.rgb);
 
 	float3 OutRGB = BaseTexel.rgb;
 
@@ -102,7 +146,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float3 OutChroma = OutTexel - OutLuma;
 	float3 Saturated = OutLuma + OutChroma * Saturation;
 
-	return float4(Saturated, BaseTexel.a);
+	return float4(Saturated * Input.Color.rgb, BaseTexel.a);
 }
 
 //-----------------------------------------------------------------------------

@@ -627,7 +627,7 @@ int emu_file::puts(std::string_view s)
 //  vfprintf - vfprintf to a text file
 //-------------------------------------------------
 
-int emu_file::vprintf(util::format_argument_pack<std::ostream> const &args)
+int emu_file::vprintf(util::format_argument_pack<char> const &args)
 {
 	// write the data if we can
 	return m_file ? m_file->vprintf(args) : 0;

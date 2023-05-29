@@ -55,6 +55,8 @@ To Do:
 #include "emma2.lh"
 
 
+namespace {
+
 class emma2_state : public driver_device
 {
 public:
@@ -224,6 +226,8 @@ ROM_START( emma2 )
 	ROM_LOAD( "se118a_90-97", 0x0000, 0x0800, CRC(32d36938) SHA1(910fd1c18c7deae83933c7c4f397103a35bf574a) ) // 0x9000
 	ROM_LOAD( "se116a_d8-dd_fe-ff", 0x0800, 0x0800, CRC(ef0f1513) SHA1(46089ba0402828b4204812a04134b313d9be0f93) ) // 0xd800
 ROM_END
+
+} // anonymous namespace
 
 
 /* Driver */

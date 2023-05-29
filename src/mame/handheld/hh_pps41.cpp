@@ -1,14 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Sean Riddle, Kevin Horton
-/***************************************************************************
+/*******************************************************************************
 
 Rockwell PPS-4/1 MCU series handhelds
 
 ROM source notes when dumped from another title, but confident it's the same:
 - memoquiz: Mattel Mind Boggler
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -16,9 +16,9 @@ ROM source notes when dumped from another title, but confident it's the same:
 #include "cpu/pps41/mm76.h"
 #include "cpu/pps41/mm78.h"
 #include "cpu/pps41/mm78la.h"
-#include "video/pwm.h"
 #include "sound/beep.h"
 #include "sound/spkrdev.h"
+#include "video/pwm.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -38,6 +38,8 @@ ROM source notes when dumped from another title, but confident it's the same:
 
 //#include "hh_pps41_test.lh" // common test-layout - use external artwork
 
+
+namespace {
 
 class hh_pps41_state : public driver_device
 {
@@ -90,11 +92,11 @@ void hh_pps41_state::machine_start()
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Helper Functions
 
-***************************************************************************/
+*******************************************************************************/
 
 // generic input handlers
 
@@ -104,7 +106,7 @@ u8 hh_pps41_state::read_inputs(int columns)
 
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
-		if (m_inp_mux >> i & 1)
+		if (BIT(m_inp_mux, i))
 			ret |= m_inputs[i]->read();
 
 	return ret;
@@ -118,15 +120,13 @@ INPUT_CHANGED_MEMBER(hh_pps41_state::reset_button)
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
 
-***************************************************************************/
+*******************************************************************************/
 
-namespace {
-
-/***************************************************************************
+/*******************************************************************************
 
   Fonas Tri-1
   * PCB label: CASSIA CA010-F
@@ -140,7 +140,7 @@ namespace {
   Cassia was Eric White/Ken Cohen's company, later named CXG, known for
   their chess computers.
 
-***************************************************************************/
+*******************************************************************************/
 
 class ftri1_state : public hh_pps41_state
 {
@@ -181,7 +181,7 @@ void ftri1_state::write_r(u16 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ftri1 )
 	PORT_START("IN.0")
@@ -199,6 +199,8 @@ static INPUT_PORTS_START( ftri1 )
 	PORT_START("RESET")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_pps41_state, reset_button, 0) PORT_CODE(KEYCODE_F1) PORT_NAME("Game Reset")
 INPUT_PORTS_END
+
+// config
 
 void ftri1_state::ftri1(machine_config &config)
 {
@@ -230,7 +232,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Invicta Electronic Master Mind
   * MM75 MCU (label MM75 A7525-11, die label A7525)
@@ -244,7 +246,7 @@ ROM_END
   Master Mind unit says (C) 1977, but this electronic handheld version came
   out in 1979. Or maybe there's an older revision.
 
-***************************************************************************/
+*******************************************************************************/
 
 class mastmind_state : public hh_pps41_state
 {
@@ -298,7 +300,7 @@ u8 mastmind_state::read_p()
 	return ~read_inputs(4);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( mastmind )
 	PORT_START("IN.0") // DIO0
@@ -325,6 +327,8 @@ static INPUT_PORTS_START( mastmind )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
 INPUT_PORTS_END
+
+// config
 
 void mastmind_state::mastmind(machine_config &config)
 {
@@ -378,7 +382,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Kmart Dunk 'n Sunk (manufactured in Hong Kong)
   * MM76EL MCU (label GE-E 1V2280, die label B8617)
@@ -392,7 +396,7 @@ ROM_END
   - USA(1): Dunk 'n Sunk, published by Kmart
   - USA(2): Electronic Basketball / Submarine Warfare, published by U.S. Games
 
-***************************************************************************/
+*******************************************************************************/
 
 class dunksunk_state : public hh_pps41_state
 {
@@ -445,7 +449,7 @@ void dunksunk_state::write_r(u16 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( dunksunk )
 	PORT_START("IN.0") // PI
@@ -469,6 +473,8 @@ static INPUT_PORTS_START( dunksunk )
 	PORT_CONFSETTING(    0x01, "Basketball" )
 	PORT_CONFSETTING(    0x00, "Submarine Chase" )
 INPUT_PORTS_END
+
+// config
 
 void dunksunk_state::dunksunk(machine_config &config)
 {
@@ -504,7 +510,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   M.E.M. Belgium Memoquiz
   * PCB label: MEMOQUIZ MO3
@@ -520,7 +526,7 @@ ROM_END
   - UK: Memoquiz, published by Polymark
   - USA: Mind Boggler (model 2626), published by Mattel
 
-***************************************************************************/
+*******************************************************************************/
 
 class memoquiz_state : public hh_pps41_state
 {
@@ -579,7 +585,7 @@ u8 memoquiz_state::read_p()
 	return ~read_inputs(4);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( memoquiz )
 	PORT_START("IN.0") // DIO0
@@ -613,6 +619,8 @@ static INPUT_PORTS_START( memoquiz )
 	PORT_CONFSETTING(    0x00, "5" )
 INPUT_PORTS_END
 
+// config
+
 void memoquiz_state::memoquiz(machine_config &config)
 {
 	// basic machine hardware
@@ -644,7 +652,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Mattel Football 2 (model 1050)
   * PCB label: MATTEL, 1050-4369D
@@ -653,7 +661,7 @@ ROM_END
 
   Through its production run, it was released as "Football 2" and "Football II".
 
-***************************************************************************/
+*******************************************************************************/
 
 class mfootb2_state : public hh_pps41_state
 {
@@ -700,7 +708,7 @@ void mfootb2_state::write_spk(u8 data)
 	m_speaker->level_w(data);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( mfootb2 )
 	PORT_START("IN.0") // PI
@@ -718,6 +726,8 @@ static INPUT_PORTS_START( mfootb2 )
 	PORT_CONFSETTING(     0x000, "1" ) // PRO 1
 	PORT_CONFSETTING(     0x400, "2" ) // PRO 2
 INPUT_PORTS_END
+
+// config
 
 void mfootb2_state::mfootb2(machine_config &config)
 {
@@ -758,7 +768,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Mattel Brain Baffler (model 1080)
   * PCB label: OLYMPOS KOREA, CM04-D102-001 REV D
@@ -767,7 +777,7 @@ ROM_END
 
   It includes 8 word games, most of them are meant for 2 players.
 
-***************************************************************************/
+*******************************************************************************/
 
 class brainbaf_state : public hh_pps41_state
 {
@@ -820,7 +830,7 @@ void brainbaf_state::write_spk(u8 data)
 	m_speaker->level_w(data);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( brainbaf )
 	PORT_START("IN.0") // DIO0
@@ -884,6 +894,8 @@ static INPUT_PORTS_START( brainbaf )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F10) PORT_NAME("Score")
 INPUT_PORTS_END
 
+// config
+
 void brainbaf_state::brainbaf(machine_config &config)
 {
 	// basic machine hardware
@@ -920,7 +932,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Mattel Horoscope Computer (model 1081)
   * PCB label: DET. CM05-D102-001 REV D
@@ -930,7 +942,7 @@ ROM_END
   This is not a toy, but a fortune forecast. Date format is mm-dd-yy, it is
   valid only from June 1 1979 until December 31 1987.
 
-***************************************************************************/
+*******************************************************************************/
 
 class horocomp_state : public hh_pps41_state
 {
@@ -986,7 +998,7 @@ void horocomp_state::write_spk(u8 data)
 	m_speaker->level_w(data);
 }
 
-// config
+// inputs
 
 /* physical button layout and labels are like this:
 
@@ -1062,6 +1074,8 @@ static INPUT_PORTS_START( horocomp )
 	PORT_CONFSETTING(    0x00, "P" ) // personal
 INPUT_PORTS_END
 
+// config
+
 void horocomp_state::horocomp(machine_config &config)
 {
 	// basic machine hardware
@@ -1098,7 +1112,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Mattel World Championship Football (model 3202)
   * MM78 MCU (MM78L pinout) (label MM78 A78C6-12, die label A78C6)
@@ -1108,7 +1122,7 @@ ROM_END
   It was patented under US4422639. Like the Baseball counterpart (mwcbaseb in
   hh_hmcs40.cpp), this handheld is a complex game.
 
-***************************************************************************/
+*******************************************************************************/
 
 class mwcfootb_state : public hh_pps41_state
 {
@@ -1195,7 +1209,7 @@ void mwcfootb_state::sub_write_r(u16 data)
 	update_display();
 }
 
-// config
+// inputs
 
 /* physical button layout and labels are like this:
 
@@ -1245,6 +1259,8 @@ static INPUT_PORTS_START( mwcfootb ) // P1 = left/home, P2 = right/visitor
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_16WAY PORT_NAME("P1 Down/3")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_16WAY PORT_NAME("P1 Up/1")
 INPUT_PORTS_END
+
+// config
 
 void mwcfootb_state::mwcfootb(machine_config &config)
 {
@@ -1297,7 +1313,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Selchow & Righter Scrabble Sensor
   * MM76EL MCU (label B8610-11, die label B8610)
@@ -1306,7 +1322,7 @@ ROM_END
   The game concept is similar to Mastermind. Enter a word (or press AUTO.)
   to start the game, then try to guess it.
 
-***************************************************************************/
+*******************************************************************************/
 
 class scrabsen_state : public hh_pps41_state
 {
@@ -1364,7 +1380,7 @@ u8 scrabsen_state::read_p()
 	return ~read_inputs(5);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( scrabsen )
 	PORT_START("IN.0") // DIO0
@@ -1418,6 +1434,8 @@ static INPUT_PORTS_START( scrabsen )
 	PORT_CONFSETTING(    0x00, "2" ) // double
 INPUT_PORTS_END
 
+// config
+
 void scrabsen_state::scrabsen(machine_config &config)
 {
 	// basic machine hardware
@@ -1450,7 +1468,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Selchow & Righter Reader's Digest Q&A
   * MM76EL MCU (label MM76EL B8654-11, die label B8654)
@@ -1459,7 +1477,7 @@ ROM_END
   The game requires question books. The player inputs a 3-digit code and
   answers 20 multiple-choice questions from the page.
 
-***************************************************************************/
+*******************************************************************************/
 
 class rdqa_state : public hh_pps41_state
 {
@@ -1517,7 +1535,7 @@ u8 rdqa_state::read_p()
 	return ~read_inputs(4);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( rdqa )
 	PORT_START("IN.0") // DIO0
@@ -1554,6 +1572,8 @@ static INPUT_PORTS_START( rdqa )
 	PORT_CONFSETTING(    0x00, "2" ) // double
 INPUT_PORTS_END
 
+// config
+
 void rdqa_state::rdqa(machine_config &config)
 {
 	// basic machine hardware
@@ -1589,29 +1609,29 @@ ROM_END
 
 } // anonymous namespace
 
-/***************************************************************************
+/*******************************************************************************
 
   Game driver(s)
 
-***************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME       PARENT  CMP MACHINE    INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1979, ftri1,     0,       0, ftri1,     ftri1,    ftri1_state,    empty_init, "Fonas", "Tri-1 (Fonas)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1979, ftri1,     0,       0,      ftri1,     ftri1,    ftri1_state,    empty_init, "Fonas", "Tri-1 (Fonas)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1979, mastmind,  0,       0, mastmind,  mastmind, mastmind_state, empty_init, "Invicta", "Electronic Master Mind (Invicta)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-CONS( 1979, smastmind, 0,       0, smastmind, mastmind, mastmind_state, empty_init, "Invicta", "Super-Sonic Electronic Master Mind", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, mastmind,  0,       0,      mastmind,  mastmind, mastmind_state, empty_init, "Invicta", "Electronic Master Mind (Invicta)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1979, smastmind, 0,       0,      smastmind, mastmind, mastmind_state, empty_init, "Invicta", "Super-Sonic Electronic Master Mind", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1979, dunksunk,  0,       0, dunksunk,  dunksunk, dunksunk_state, empty_init, "Kmart", "Dunk 'n Sunk", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, dunksunk,  0,       0,      dunksunk,  dunksunk, dunksunk_state, empty_init, "Kmart Corporation", "Dunk 'n Sunk", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1978, memoquiz,  0,       0, memoquiz,  memoquiz, memoquiz_state, empty_init, "M.E.M. Belgium", "Memoquiz", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1978, memoquiz,  0,       0,      memoquiz,  memoquiz, memoquiz_state, empty_init, "M.E.M. Belgium", "Memoquiz", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-CONS( 1978, mfootb2,   0,       0, mfootb2,   mfootb2,  mfootb2_state,  empty_init, "Mattel Electronics", "Football 2 (Mattel)", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, brainbaf,  0,       0, brainbaf,  brainbaf, brainbaf_state, empty_init, "Mattel Electronics", "Brain Baffler", MACHINE_SUPPORTS_SAVE )
-COMP( 1979, horocomp,  0,       0, horocomp,  horocomp, horocomp_state, empty_init, "Mattel Electronics", "Horoscope Computer", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, mwcfootb,  0,       0, mwcfootb,  mwcfootb, mwcfootb_state, empty_init, "Mattel Electronics", "World Championship Football", MACHINE_SUPPORTS_SAVE )
+SYST( 1978, mfootb2,   0,       0,      mfootb2,   mfootb2,  mfootb2_state,  empty_init, "Mattel Electronics", "Football 2 (Mattel)", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, brainbaf,  0,       0,      brainbaf,  brainbaf, brainbaf_state, empty_init, "Mattel Electronics", "Brain Baffler", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, horocomp,  0,       0,      horocomp,  horocomp, horocomp_state, empty_init, "Mattel Electronics", "Horoscope Computer", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, mwcfootb,  0,       0,      mwcfootb,  mwcfootb, mwcfootb_state, empty_init, "Mattel Electronics", "World Championship Football", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1978, scrabsen,  0,       0, scrabsen,  scrabsen, scrabsen_state, empty_init, "Selchow & Righter", "Scrabble Sensor - Electronic Word Game", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, rdqa,      0,       0, rdqa,      rdqa,     rdqa_state,     empty_init, "Selchow & Righter", "Reader's Digest Q&A - Computer Question & Answer Game", MACHINE_SUPPORTS_SAVE ) // ***
+SYST( 1978, scrabsen,  0,       0,      scrabsen,  scrabsen, scrabsen_state, empty_init, "Selchow & Righter", "Scrabble Sensor: Electronic Word Game", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, rdqa,      0,       0,      rdqa,      rdqa,     rdqa_state,     empty_init, "Selchow & Righter", "Reader's Digest Q&A: Computer Question & Answer Game", MACHINE_SUPPORTS_SAVE ) // ***
 
 // ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
 // with other, unemulatable, things eg. game board/pieces, book, playing cards, pen & paper, etc.

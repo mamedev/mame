@@ -24,10 +24,11 @@
 	"vertex": "chains/hlsl/vs_chroma",
 	"fragment": "chains/hlsl/fs_chroma",
 	"uniforms": [
-		{ "name": "s_tex",      "type": "int",  "values": [ 0.0 ] },
-		{ "name": "u_y_gain",   "type": "vec4", "values": [ 0.2124, 0.7011, 0.0866, 0.0 ] },
-		{ "name": "u_chroma_a", "type": "vec4", "values": [ 0.630, 0.340, 0.0, 0.0 ] },
-		{ "name": "u_chroma_b", "type": "vec4", "values": [ 0.310, 0.595, 0.0, 0.0 ] },
-		{ "name": "u_chroma_c", "type": "vec4", "values": [ 0.155, 0.070, 0.0, 0.0 ] }
+		{ "name": "s_tex",           "type": "int",  "values": [ 0.0 ] },
+		{ "name": "u_y_gain",        "type": "vec4", "values": [ 0.2124, 0.7011, 0.0866, 0.0 ] },
+		{ "name": "u_chroma_a",      "type": "vec4", "values": [ 0.630,  0.340,  0.0,    0.0 ] },
+		{ "name": "u_chroma_b",      "type": "vec4", "values": [ 0.310,  0.595,  0.0,    0.0 ] },
+		{ "name": "u_chroma_c",      "type": "vec4", "values": [ 0.155,  0.070,  0.0,    0.0 ] },
+		{ "name": "u_inv_view_dims", "type": "vec4", "values": [ 1.0,    1.0,    0.0,    0.0 ] }
 	]
 }

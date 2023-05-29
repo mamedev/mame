@@ -29,6 +29,8 @@ Dip Locations added according to Service Mode
 #include "tilemap.h"
 
 
+namespace {
+
 class bestleag_state : public driver_device
 {
 public:
@@ -472,6 +474,9 @@ ROM_START( bestleaw )
 	ROM_LOAD( "gal16v8-25hb1.u58",     0x0800, 0x0117, NO_DUMP ) /* Protected */
 	ROM_LOAD( "palce20v8h-15pc-4.u38", 0x1000, 0x0157, NO_DUMP ) /* Protected */
 ROM_END
+
+} // anonymous namespace
+
 
 /* GAME drivers */
 

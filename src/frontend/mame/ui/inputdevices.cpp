@@ -27,6 +27,7 @@ public:
 	menu_input_device(mame_ui_manager &mui, render_container &container, input_device &device)
 		: menu(mui, container)
 		, m_device(device)
+		, m_have_analog(false)
 	{
 		set_heading(
 				util::string_format(_("menu-inputdev", "%1$s (%2$s %3$d)"),
@@ -36,37 +37,64 @@ public:
 	}
 
 protected:
+	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override
+	{
+		menu::recompute_metrics(width, height, aspect);
+
+		set_custom_space(0.0F, (line_height() * (m_have_analog ? 2.0F : 1.0F)) + (tb_border() * 3.0F));
+	}
+
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override
 	{
 		if (selectedref)
 		{
+			// get the complete token for the highlighted input
 			input_device_item &input = *reinterpret_cast<input_device_item *>(selectedref);
+			input_code code = input.code();
+			if (!machine().input().device_class(m_device.devclass()).multi())
+				code.set_device_index(0);
+			std::string const token = machine().input().code_to_token(code);
+
+			// measure the name of the token string
+			float const tokenwidth = (std::min)(get_string_width(token) + (gutter_width() * 2.0F), 1.0F);
+			float const boxwidth = (std::max)(tokenwidth, x2 - x);
+			rgb_t const fgcolor(ui().colors().text_color());
+
+			// draw the outer box
+			ui().draw_outlined_box(
+					container(),
+					(1.0F - boxwidth) * 0.5F, y2 + tb_border(),
+					(1.0F + boxwidth) * 0.5F, y2 + bottom,
+					ui().colors().background_color());
+
+			// show the token
+			draw_text_normal(
+					token,
+					(1.0F - boxwidth) * 0.5F, y2 + (tb_border() * 2.0F), boxwidth,
+					text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE,
+					fgcolor);
+
+			// first show the token
 			switch (input.itemclass())
 			{
 			case ITEM_CLASS_ABSOLUTE:
 			case ITEM_CLASS_RELATIVE:
 				{
-					// draw the outer box
-					ui().draw_outlined_box(container(), x, y2 + ui().box_tb_border(), x2, y2 + bottom, ui().colors().background_color());
-
 					// draw the indicator
-					rgb_t const fgcolor(ui().colors().text_color());
-					float const border = ui().box_lr_border() * machine().render().ui_aspect(&container());
-					float const lineheight = ui().get_line_height();
-					float const indleft = x + border;
-					float const indright = x2 - border;
-					float const indtop = y2 + (ui().box_tb_border() * 2.0F) + (lineheight * 0.2F);
-					float const indbottom = y2 + (ui().box_tb_border() * 2.0F) + (lineheight * 0.8F);
+					float const indleft = x + gutter_width();
+					float const indright = x2 - gutter_width();
+					float const indtop = y2 + (tb_border() * 2.0F) + (line_height() * 1.2F);
+					float const indbottom = y2 + (tb_border() * 2.0F) + (line_height() * 1.8F);
 					float const indcentre = (x + x2) * 0.5F;
 					s32 const value = (input.itemclass() == ITEM_CLASS_ABSOLUTE) ? input.read_as_absolute(ITEM_MODIFIER_NONE) : input.read_as_relative(ITEM_MODIFIER_NONE);
 					if (0 < value)
 					{
-						float const fillright = indcentre + (float(value) / float(osd::INPUT_ABSOLUTE_MAX) * (indright - indcentre));
+						float const fillright = indcentre + (float(value) / float(osd::input_device::ABSOLUTE_MAX) * (indright - indcentre));
 						container().add_rect(indcentre, indtop, (std::min)(fillright, indright), indbottom, fgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 					}
 					else if (0 > value)
 					{
-						float const fillleft = indcentre - (float(value) / float(osd::INPUT_ABSOLUTE_MIN) * (indcentre - indleft));
+						float const fillleft = indcentre - (float(value) / float(osd::input_device::ABSOLUTE_MIN) * (indcentre - indleft));
 						container().add_rect((std::max)(fillleft, indleft), indtop, indcentre, indbottom, fgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 					}
 					container().add_line(indleft, indtop, indright, indtop, UI_LINE_WIDTH, fgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
@@ -83,12 +111,11 @@ protected:
 	}
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override
+	virtual void populate() override
 	{
 		item_append(_("menu-inputdev", "Copy Device ID"), 0U, nullptr);
 		item_append(menu_item_type::SEPARATOR);
 
-		bool haveanalog = false;
 		for (input_item_id itemid = ITEM_ID_FIRST_VALID; m_device.maxitem() >= itemid; ++itemid)
 		{
 			input_device_item *const input = m_device.item(itemid);
@@ -98,7 +125,7 @@ private:
 				{
 				case ITEM_CLASS_ABSOLUTE:
 				case ITEM_CLASS_RELATIVE:
-					haveanalog = true;
+					m_have_analog = true;
 					break;
 				default:
 					break;
@@ -109,11 +136,10 @@ private:
 
 		item_append(menu_item_type::SEPARATOR);
 
-		if (haveanalog)
-			custombottom = ui().get_line_height() + (ui().box_tb_border() * 3.0F);
+		set_custom_space(0.0F, (line_height() * (m_have_analog ? 2.0F : 1.0F)) + (tb_border() * 3.0F));
 	}
 
-	virtual void handle(event const *ev) override
+	virtual bool handle(event const *ev) override
 	{
 		// FIXME: hacky, depending on first item being "copy ID", but need a better model for item reference values
 		if (ev && ev->item && (IPT_UI_SELECT == ev->iptkey) && (&item(0) == ev->item))
@@ -124,15 +150,23 @@ private:
 				machine().popmessage(_("menu-inputdev", "Error copying device ID to clipboard"));
 		}
 
+		bool updated = false;
 		for (int i = 0; item_count() > i; ++i)
 		{
 			void *const ref(item(i).ref());
 			if (ref)
 			{
 				input_device_item &input = *reinterpret_cast<input_device_item *>(ref);
-				item(i).set_subtext(format_value(input));
+				std::string value(format_value(input));
+				if (item(i).subtext() != value)
+				{
+					item(i).set_subtext(std::move(value));
+					updated = true;
+				}
 			}
 		}
+
+		return updated;
 	}
 
 	static std::string format_value(input_device_item &input)
@@ -150,6 +184,7 @@ private:
 	}
 
 	input_device &m_device;
+	bool m_have_analog;
 };
 
 } // anonymous namespace
@@ -168,7 +203,7 @@ menu_input_devices::~menu_input_devices()
 }
 
 
-void menu_input_devices::populate(float &customtop, float &custombottom)
+void menu_input_devices::populate()
 {
 	// iterate input device classes and devices within each class
 	bool found = false;
@@ -206,68 +241,70 @@ void menu_input_devices::populate(float &customtop, float &custombottom)
 }
 
 
-void menu_input_devices::handle(event const *ev)
+bool menu_input_devices::handle(event const *ev)
 {
-	if (ev && ev->itemref)
-	{
-		input_device &dev = *reinterpret_cast<input_device *>(ev->itemref);
-		switch (ev->iptkey)
-		{
-		case IPT_UI_SELECT:
-			stack_push<menu_input_device>(ui(), container(), dev);
-			break;
+	if (!ev || !ev->itemref)
+		return false;
 
-		case IPT_UI_PREV_GROUP:
+	input_device &dev = *reinterpret_cast<input_device *>(ev->itemref);
+	switch (ev->iptkey)
+	{
+	case IPT_UI_SELECT:
+		stack_push<menu_input_device>(ui(), container(), dev);
+		break;
+
+	case IPT_UI_PREV_GROUP:
+		{
+			auto group = dev.devclass();
+			bool found_break = false;
+			int target = 0;
+			for (auto i = selected_index(); 0 < i--; )
 			{
-				auto group = dev.devclass();
-				bool found_break = false;
-				int target = 0;
-				for (auto i = selected_index(); 0 < i--; )
+				input_device *const candidate = reinterpret_cast<input_device *>(item(i).ref());
+				if (candidate)
 				{
-					input_device *const candidate = reinterpret_cast<input_device *>(item(i).ref());
-					if (candidate)
+					if (candidate->devclass() == group)
 					{
-						if (candidate->devclass() == group)
-						{
-							target = i;
-						}
-						else if (!found_break)
-						{
-							group = candidate->devclass();
-							found_break = true;
-							target = i;
-						}
-						else
-						{
-							set_selected_index(target);
-							break;
-						}
+						target = i;
 					}
-					if (!i && found_break)
+					else if (!found_break)
+					{
+						group = candidate->devclass();
+						found_break = true;
+						target = i;
+					}
+					else
 					{
 						set_selected_index(target);
-						break;
+						return true;
 					}
 				}
-			}
-			break;
-
-		case IPT_UI_NEXT_GROUP:
-			{
-				auto const group = dev.devclass();
-				for (auto i = selected_index(); item_count() > ++i; )
+				if (!i && found_break)
 				{
-					input_device *const candidate = reinterpret_cast<input_device *>(item(i).ref());
-					if (candidate && (candidate->devclass() != group))
-					{
-						set_selected_index(i);
-						break;
-					}
+					set_selected_index(target);
+					return true;
 				}
 			}
-			break;
 		}
+		break;
+
+	case IPT_UI_NEXT_GROUP:
+		{
+			auto const group = dev.devclass();
+			for (auto i = selected_index(); item_count() > ++i; )
+			{
+				input_device *const candidate = reinterpret_cast<input_device *>(item(i).ref());
+				if (candidate && (candidate->devclass() != group))
+				{
+					set_selected_index(i);
+					return true;
+				}
+			}
+		}
+		break;
 	}
+
+	return false;
 }
 
 } // namespace ui

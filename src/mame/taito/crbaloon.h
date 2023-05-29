@@ -5,8 +5,8 @@
 Crazy Ballooon
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_CRBALOON_H
-#define MAME_INCLUDES_CRBALOON_H
+#ifndef MAME_TAITO_CRBALOON_H
+#define MAME_TAITO_CRBALOON_H
 
 #pragma once
 
@@ -80,4 +80,4 @@ private:
 	void main_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_CRBALOON_H
+#endif // MAME_TAITO_CRBALOON_H

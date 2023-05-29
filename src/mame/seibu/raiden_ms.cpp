@@ -209,6 +209,8 @@ _|_  74LS86PC  74LS299N |RD4B3  | 74LS153PC|V||  _|_  74LS86PC  74LS299N |RD4A3 
 #include "tilemap.h"
 
 
+namespace {
+
 class raiden_ms_state : public driver_device
 {
 public:
@@ -781,5 +783,8 @@ ROM_START( raidenm )
 	ROM_LOAD( "msraid_6-1-8086-1_645c_gal16v8.u33", 0x000, 0x117, NO_DUMP )
 	ROM_LOAD( "msraid_6-1-8086-1_645d_gal16v8.u27", 0x000, 0x117, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1990, raidenm,  raiden,  raidenm,  raidenm,  raiden_ms_state, init_raidenm, ROT270, "bootleg (Gaelco / Ervisa)", "Raiden (Modular System)", MACHINE_NOT_WORKING )

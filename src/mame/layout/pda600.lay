@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="contrast">   <text string="-/+">      <color red="0" green="0" blue="0" /> </text> </element>
+	<element name="add_page">   <text string="ADD">      <color red="0" green="0" blue="0" /> </text> </element>
+	<element name="calculator"> <text string="CALC">     <color red="0" green="0" blue="0" /> </text> </element>
+	<element name="desk">       <text string="DESK">     <color red="0" green="0" blue="0" /> </text> </element>
+	<element name="delete">     <text string="DEL">      <color red="0" green="0" blue="0" /> </text> </element>
+	<element name="previous">   <text string="&lt;&lt;"> <color red="0" green="0" blue="0" /> </text> </element>
+	<element name="next">       <text string="&gt;&gt;"> <color red="0" green="0" blue="0" /> </text> </element>
+	<element name="addresses">  <text string="ADDR">     <color red="0" green="0" blue="0" /> </text> </element>
+	<element name="diary">      <text string="DIARY">    <color red="0" green="0" blue="0" /> </text> </element>
+	<element name="todo">       <text string="TODO">     <color red="0" green="0" blue="0" /> </text> </element>
+	<element name="notes">      <text string="NOTES">    <color red="0" green="0" blue="0" /> </text> </element>
+	<element name="conversion"> <text string="CONV">     <color red="0" green="0" blue="0" /> </text> </element>
+	<element name="amstrad">    <text string="Amstrad">  <color red="0" green="0" blue="0" /> </text> </element>
+	<element name="ring">
+		<rect>  <color red="1" green="1" blue="1" /> <bounds x="0.00" y="0.00" width="1.00" height="1.00" /> </rect>
+		<disk>  <color red="0" green="0" blue="0" /> <bounds x="0.00" y="0.05" width="0.25" height="0.90" /> </disk>
+		<rect>  <color red="0" green="0" blue="0" /> <bounds x="0.00" y="0.20" width="1.00" height="0.60" /> </rect>
+		<rect>  <color red="1" green="1" blue="1" /> <bounds x="0.08" y="0.29" width="0.92" height="0.42" /> </rect>
+		<rect>  <color red="0" green="0" blue="0" /> <bounds x="0.93" y="0.29" width="0.07" height="0.21" /> </rect>
+	</element>
+	<element name="rect">
+		<rect>  <color red="0" green="0" blue="0" /> <bounds x="0.00" y="0.00" width="1.00" height="1.00" /> </rect>
+		<rect>  <color red="1" green="1" blue="1" /> <bounds x="0.04" y="0.04" width="0.92" height="0.92" /> </rect>
+	</element>
+	<element name="background"> <rect>  <color red="0.59" green="0.63" blue="0.47" /> </rect> </element>
+	<element name="overlay">    <rect>  <color red="0.91" green="0.92" blue="0.82" /> </rect> </element>
+
+	<view name="Internal Layout">
+		<bounds left="0" top="0" right="316" bottom="428" />
+		<screen index="0"> <bounds x="0" y="0" width="316" height="428" /> </screen>
+		<collection name="Screen overlay" visible="yes">
+			<element ref="overlay" blend="multiply"> <bounds x="38" y="54"  width="240" height="320" /> </element>
+		</collection>
+
+		<element ref="background" blend="multiply"> <bounds x="0"   y="0"   width="38"  height="428" /> </element>
+		<element ref="background" blend="multiply"> <bounds x="278" y="0"   width="38"  height="428" /> </element>
+		<element ref="background" blend="multiply"> <bounds x="38"  y="0"   width="240" height="54"  /> </element>
+		<element ref="background" blend="multiply"> <bounds x="38"  y="374" width="240" height="54"  /> </element>
+		<element ref="background" blend="multiply"> <bounds x="0"   y="54"  width="30"  height="320" /> </element>
+
+		<element ref="ring" blend="multiply">  <bounds x="13"  y="106" width="25" height="10" /> </element>
+		<element ref="ring" blend="multiply">  <bounds x="13"  y="134" width="25" height="10" /> </element>
+		<element ref="ring" blend="multiply">  <bounds x="13"  y="159" width="25" height="10" /> </element>
+		<element ref="ring" blend="multiply">  <bounds x="13"  y="264" width="25" height="10" /> </element>
+		<element ref="ring" blend="multiply">  <bounds x="13"  y="292" width="25" height="10" /> </element>
+		<element ref="ring" blend="multiply">  <bounds x="13"  y="317" width="25" height="10" /> </element>
+
+		<element ref="rect" blend="multiply">  <bounds x="39"  y="20"  width="28" height="26" /> </element>
+		<element ref="contrast">               <bounds x="42"  y="22"  width="22" height="22" /> </element>
+		<element ref="rect" blend="multiply">  <bounds x="74"  y="20"  width="28" height="26" /> </element>
+		<element ref="add_page">               <bounds x="77"  y="22"  width="22" height="22" /> </element>
+		<element ref="rect" blend="multiply">  <bounds x="109" y="20"  width="28" height="26" /> </element>
+		<element ref="calculator">             <bounds x="112" y="22"  width="22" height="22" /> </element>
+		<element ref="rect" blend="multiply">  <bounds x="144" y="20"  width="28" height="26" /> </element>
+		<element ref="desk">                   <bounds x="147" y="22"  width="22" height="22" /> </element>
+		<element ref="rect" blend="multiply">  <bounds x="179" y="20"  width="28" height="26" /> </element>
+		<element ref="delete">                 <bounds x="182" y="22"  width="22" height="22" /> </element>
+		<element ref="rect" blend="multiply">  <bounds x="215" y="20"  width="28" height="26" /> </element>
+		<element ref="previous">               <bounds x="218" y="22"  width="22" height="22" /> </element>
+		<element ref="rect" blend="multiply">  <bounds x="249" y="20"  width="28" height="26" /> </element>
+		<element ref="next">                   <bounds x="252" y="19"  width="22" height="26" /> </element>
+
+		<element ref="rect" blend="multiply">  <bounds x="282" y="71"  width="23" height="58" /> </element>
+		<element ref="addresses">              <bounds x="285" y="79"  width="17" height="42" /> <orientation rotate="270" /> </element>
+		<element ref="rect" blend="multiply">  <bounds x="282" y="131" width="23" height="58" /> </element>
+		<element ref="diary">                  <bounds x="285" y="139" width="17" height="42" /> <orientation rotate="270" /> </element>
+		<element ref="rect" blend="multiply">  <bounds x="282" y="191" width="23" height="58" /> </element>
+		<element ref="todo">                   <bounds x="285" y="199" width="17" height="42" /> <orientation rotate="270" /> </element>
+		<element ref="rect" blend="multiply">  <bounds x="282" y="251" width="23" height="58" /> </element>
+		<element ref="notes">                  <bounds x="285" y="259" width="17" height="42" /> <orientation rotate="270" /> </element>
+		<element ref="rect" blend="multiply">  <bounds x="282" y="311" width="23" height="58" /> </element>
+		<element ref="conversion">             <bounds x="285" y="319" width="17" height="42" /> <orientation rotate="270" /> </element>
+
+		<element ref="amstrad">                <bounds x="0"   y="385" width="316" height="25"/> </element>
+	</view>
+</mamelayout>

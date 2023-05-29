@@ -16,6 +16,8 @@
 #include "screen.h"
 
 
+namespace {
+
 #define MAX_POINTS 2048
 
 class galaxygame_state : public driver_device
@@ -464,5 +466,8 @@ void galaxygame_state::init_galaxygame()
 	main.write_word(6, 000167); /* JMP 0500*/
 	main.write_word(8, 000500 - 10);
 }
+
+} // anonymous namespace
+
 
 GAME(1971, galgame, 0, galaxygame, galaxygame, galaxygame_state, init_galaxygame, ROT270, "Computer Recreations, Inc", "Galaxy Game", MACHINE_NO_SOUND_HW )

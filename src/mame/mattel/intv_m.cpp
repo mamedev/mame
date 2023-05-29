@@ -585,13 +585,6 @@ void intv_state::machine_start()
 	// intvkbd
 	if (m_is_keybd)
 	{
-		for (int i = 0; i < 10; i++)
-		{
-			char str[5];
-			sprintf(str, "ROW%X", uint8_t(i));
-			m_intv_keyboard[i] = ioport(str);
-		}
-
 		save_item(NAME(m_intvkbd_text_blanked));
 		save_item(NAME(m_intvkbd_keyboard_col));
 		save_item(NAME(m_tape_int_pending));

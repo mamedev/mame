@@ -125,9 +125,8 @@
 #include "bus/x68k/x68k_neptunex.h"
 #include "bus/x68k/x68k_scsiext.h"
 #include "bus/x68k/x68k_midi.h"
-#include "bus/scsi/scsi.h"
-#include "bus/scsi/scsihd.h"
-#include "bus/scsi/scsicd.h"
+#include "bus/nscsi/hd.h"
+#include "bus/nscsi/cd.h"
 
 #include "softlist.h"
 #include "speaker.h"
@@ -137,9 +136,9 @@
 
 #include "x68000.lh"
 
-#define LOG_FDC (1 << 1)
-#define LOG_SYS (1 << 2)
-#define LOG_IRQ (1 << 3)
+#define LOG_FDC (1U << 1)
+#define LOG_SYS (1U << 2)
+#define LOG_IRQ (1U << 3)
 //#define VERBOSE (LOG_FDC | LOG_SYS | LOG_IRQ)
 #include "logmacro.h"
 
@@ -706,13 +705,19 @@ TIMER_CALLBACK_MEMBER(x68k_state::bus_error)
 
 void x68k_state::set_bus_error(uint32_t address, bool rw, uint16_t mem_mask)
 {
-	if(m_bus_error)
-		return;
-	else if(!m_maincpu->executing())
+	LOGMASKED(LOG_SYS, "%s: Bus error: Unused RAM access [%08x]\n", machine().describe_context(), address);
+	if(!m_maincpu->executing())
 	{
 		m_hd63450->bec_w(0, hd63450_device::ERR_BUS);
 		return;
 	}
+	if(m_maincpu->type() == M68000) {
+		downcast<m68000_device *>(m_maincpu.target())->trigger_bus_error();
+		return;
+	}
+
+	if(m_bus_error)
+		return;
 	if(!ACCESSING_BITS_8_15)
 		address++;
 	m_bus_error = true;
@@ -722,7 +727,6 @@ void x68k_state::set_bus_error(uint32_t address, bool rw, uint16_t mem_mask)
 	cpuptr->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 	cpuptr->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	m_bus_error_timer->adjust(cpuptr->cycles_to_attotime(16)); // let rmw cycles complete
-	LOGMASKED(LOG_SYS, "%s: Bus error: Unused RAM access [%08x]\n", machine().describe_context(), address);
 }
 
 uint16_t x68k_state::rom0_r(offs_t offset, uint16_t mem_mask)
@@ -975,9 +979,10 @@ WRITE_LINE_MEMBER(x68ksupr_state::scsi_irq)
 	}
 }
 
-WRITE_LINE_MEMBER(x68ksupr_state::scsi_drq)
+void x68ksupr_state::scsi_unknown_w(uint8_t data)
 {
-	// TODO
+	// Documentation claims SSTS register is read-only, but x68030 boot code writes #$05 to this address anyway.
+	// Is this an undocumented MB89352 feature, an ASIC register, an original code bug or a bad dump?
 }
 
 void x68k_state::x68k_base_map(address_map &map)
@@ -1031,7 +1036,7 @@ void x68ksupr_state::x68kxvi_map(address_map &map)
 	map(0xe82200, 0xe823ff).rw(m_pcgpalette, FUNC(palette_device::read16), FUNC(palette_device::write16)).share("pcgpalette");
 	map(0xe92001, 0xe92001).rw(m_okim6258, FUNC(okim6258_device::status_r), FUNC(okim6258_device::ctrl_w));
 	map(0xe92003, 0xe92003).rw(m_okim6258, FUNC(okim6258_device::status_r), FUNC(okim6258_device::data_w));
-	map(0xe96020, 0xe9603f).rw(m_scsictrl, FUNC(mb89352_device::mb89352_r), FUNC(mb89352_device::mb89352_w)).umask16(0x00ff);
+	map(0xe96020, 0xe9603f).m(m_scsictrl, FUNC(mb89352_device::map)).umask16(0x00ff);
 	map(0xea0000, 0xea1fff).rw(FUNC(x68ksupr_state::exp_r), FUNC(x68ksupr_state::exp_w));  // external SCSI ROM and controller
 	map(0xeafa80, 0xeafa89).rw(FUNC(x68ksupr_state::areaset_r), FUNC(x68ksupr_state::enh_areaset_w));
 	map(0xfc0000, 0xfdffff).rom();  // internal SCSI ROM
@@ -1046,7 +1051,8 @@ void x68030_state::x68030_map(address_map &map)
 //  map(0xe8c000, 0xe8dfff).rw(FUNC(x68k_state::x68k_printer_r), FUNC(x68k_state::x68k_printer_w));
 	map(0xe92000, 0xe92003).r(m_okim6258, FUNC(okim6258_device::status_r)).umask32(0x00ff00ff).w(FUNC(x68030_state::adpcm_w)).umask32(0x00ff00ff);
 
-	map(0xe96020, 0xe9603f).rw(m_scsictrl, FUNC(mb89352_device::mb89352_r), FUNC(mb89352_device::mb89352_w)).umask32(0x00ff00ff);
+	map(0xe96020, 0xe9603f).m(m_scsictrl, FUNC(mb89352_device::map)).umask32(0x00ff00ff);
+	map(0xe9602d, 0xe9602d).w(FUNC(x68030_state::scsi_unknown_w));
 	map(0xea0000, 0xea1fff).noprw();//.rw(FUNC(x68030_state::exp_r), FUNC(x68030_state::exp_w));  // external SCSI ROM and controller
 	map(0xeafa80, 0xeafa8b).rw(FUNC(x68030_state::areaset_r), FUNC(x68030_state::enh_areaset_w));
 	map(0xfc0000, 0xfdffff).rom();  // internal SCSI ROM
@@ -1082,10 +1088,9 @@ void x68k_state::floppy_load_unload(bool load, floppy_image_device *dev)
 	}
 }
 
-image_init_result x68k_state::floppy_load(floppy_image_device *dev)
+void x68k_state::floppy_load(floppy_image_device *dev)
 {
 	floppy_load_unload(true, dev);
-	return image_init_result::PASS;
 }
 
 void x68k_state::floppy_unload(floppy_image_device *dev)
@@ -1357,23 +1362,36 @@ void x68k_state::x68000(machine_config &config)
 	X68KHDC(config, "x68k_hdc", 0);
 }
 
+static void scsi_devices(device_slot_interface &device)
+{
+	device.option_add("harddisk", NSCSI_HARDDISK);
+	device.option_add("cdrom", NSCSI_CDROM);
+}
+
 void x68ksupr_state::x68ksupr_base(machine_config &config)
 {
 	x68000_base(config);
 
-	scsi_port_device &scsi(SCSI_PORT(config, "scsi"));
-	scsi.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
-	scsi.set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));
-	scsi.set_slot_device(3, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_2));
-	scsi.set_slot_device(4, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_3));
-	scsi.set_slot_device(5, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_4));
-	scsi.set_slot_device(6, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_5));
-	scsi.set_slot_device(7, "cdrom", SCSICD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_6));
+	NSCSI_BUS(config, "scsi");
+	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("spc", MB89352).machine_config(
+		[this](device_t *device)
+		{
+			mb89352_device &spc = downcast<mb89352_device &>(*device);
 
-	MB89352A(config, m_scsictrl, 40_MHz_XTAL / 8);
-	m_scsictrl->set_scsi_port("scsi");
-	m_scsictrl->irq_cb().set(FUNC(x68ksupr_state::scsi_irq));
-	m_scsictrl->drq_cb().set(FUNC(x68ksupr_state::scsi_drq));
+			spc.set_clock(40_MHz_XTAL / 8);
+			spc.out_irq_callback().set(*this, FUNC(x68ksupr_state::scsi_irq));
+			spc.out_dreq_callback().set(m_hd63450, FUNC(hd63450_device::drq1_w));
+		});
+
+	m_hd63450->dma_read<1>().set("scsi:7:spc", FUNC(mb89352_device::dma_r));
+	m_hd63450->dma_write<1>().set("scsi:7:spc", FUNC(mb89352_device::dma_w));
 
 	VICON(config, m_crtc, 38.86363_MHz_XTAL);
 	m_crtc->set_clock_69m(69.55199_MHz_XTAL);
@@ -1407,7 +1425,7 @@ void x68030_state::x68030(machine_config &config)
 
 	m_hd63450->set_clock(50_MHz_XTAL / 4);
 	m_scc->set_clock(20_MHz_XTAL / 4);
-	m_scsictrl->set_clock(20_MHz_XTAL / 4);
+	//m_scsictrl->set_clock(20_MHz_XTAL / 4);
 
 	m_crtc->set_clock_50m(50.35_MHz_XTAL);
 }

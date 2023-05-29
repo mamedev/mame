@@ -88,6 +88,8 @@
 #include "amusco.lh"
 
 
+namespace {
+
 #define MASTER_CLOCK        22.1184_MHz_XTAL     /* confirmed */
 #define SECOND_CLOCK        15_MHz_XTAL          /* confirmed */
 
@@ -645,6 +647,9 @@ ROM_START( draw88pkr )
 	ROM_LOAD( "u36.bin",  0x4000, 0x4000, CRC(57d42a97) SHA1(b53b6419a48ecd111faf87fd6e480d82861fe512) )
 	ROM_LOAD( "u37.bin",  0x8000, 0x4000, CRC(6e23b9f2) SHA1(6916828d84d1ecb44dc454e6786f97801a8550c7) )
 ROM_END
+
+} // anonymous namespace
+
 
 /*************************
 *      Game Drivers      *

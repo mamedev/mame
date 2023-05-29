@@ -93,9 +93,6 @@ E1 Prog ROM 42 DEMON/DIAMOND (CX2615)
 
 ***************************************************************************/
 
-// the new RIOT does not work with the SuperCharger
-// for example "mame a2600 scharger -cass offifrog" fails to load after playing the tape
-
 #include "emu.h"
 
 
@@ -114,13 +111,7 @@ E1 Prog ROM 42 DEMON/DIAMOND (CX2615)
 #include "speaker.h"
 #include "tia.h"
 
-#define USE_NEW_RIOT 0
-
-#if USE_NEW_RIOT
 #include "machine/mos6530n.h"
-#else
-#include "machine/6532riot.h"
-#endif
 
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
@@ -164,11 +155,7 @@ protected:
 	required_shared_ptr<uint8_t> m_riot_ram;
 	required_device<tia_video_device> m_tia;
 	required_device<m6507_device> m_maincpu;
-#if USE_NEW_RIOT
 	required_device<mos6532_new_device> m_riot;
-#else
-	required_device<riot6532_device> m_riot;
-#endif
 	required_device<vcs_control_port_device> m_joy1;
 	required_device<vcs_control_port_device> m_joy2;
 	required_device<screen_device> m_screen;
@@ -277,11 +264,7 @@ void a2600_base_state::a2600_mem(address_map &map) // 6507 has 13-bit address sp
 {
 	map(0x0000, 0x007f).mirror(0x0f00).rw(m_tia, FUNC(tia_video_device::read), FUNC(tia_video_device::write));
 	map(0x0080, 0x00ff).mirror(0x0d00).ram().share("riot_ram");
-#if USE_NEW_RIOT
 	map(0x0280, 0x029f).mirror(0x0d00).m("riot", FUNC(mos6532_new_device::io_map));
-#else
-	map(0x0280, 0x029f).mirror(0x0d00).rw("riot", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
-#endif
 }
 
 void a2600_pop_state::memory_map(address_map &map) // 6507 has 13-bit address space, 0x0000 - 0x1fff
@@ -636,21 +619,12 @@ void a2600_base_state::a2600_base_ntsc(machine_config &config)
 	TIA(config, "tia", m_xtal/114).add_route(ALL_OUTPUTS, "mono", 0.90);
 
 	/* devices */
-#if USE_NEW_RIOT
 	MOS6532_NEW(config, m_riot, m_xtal / 3);
 	m_riot->pa_rd_callback().set(FUNC(a2600_state::switch_A_r));
 	m_riot->pa_wr_callback().set(FUNC(a2600_state::switch_A_w));
 	m_riot->pb_rd_callback().set_ioport("SWB");
 	m_riot->pb_wr_callback().set(FUNC(a2600_state::switch_B_w));
 	m_riot->irq_wr_callback().set(FUNC(a2600_state::irq_callback));
-#else
-	RIOT6532(config, m_riot, m_xtal / 3);
-	m_riot->in_pa_callback().set(FUNC(a2600_state::switch_A_r));
-	m_riot->out_pa_callback().set(FUNC(a2600_state::switch_A_w));
-	m_riot->in_pb_callback().set_ioport("SWB");
-	m_riot->out_pb_callback().set(FUNC(a2600_state::switch_B_w));
-	m_riot->irq_callback().set(FUNC(a2600_state::irq_callback));
-#endif
 
 	VCS_CONTROL_PORT(config, m_joy1, vcs_control_port_devices, "joy");
 	VCS_CONTROL_PORT(config, m_joy2, vcs_control_port_devices, "joy");
@@ -678,21 +652,12 @@ void a2600_base_state::a2600_base_pal(machine_config &config)
 	TIA(config, "tia", m_xtal/114).add_route(ALL_OUTPUTS, "mono", 0.90);
 
 	/* devices */
-#if USE_NEW_RIOT
 	MOS6532_NEW(config, m_riot, m_xtal / 3);
 	m_riot->pa_rd_callback().set(FUNC(a2600_state::switch_A_r));
 	m_riot->pa_wr_callback().set(FUNC(a2600_state::switch_A_w));
 	m_riot->pb_rd_callback().set_ioport("SWB");
 	m_riot->pb_wr_callback().set(FUNC(a2600_state::switch_B_w));
 	m_riot->irq_wr_callback().set(FUNC(a2600_state::irq_callback));
-#else
-	RIOT6532(config, m_riot, m_xtal / 3);
-	m_riot->in_pa_callback().set(FUNC(a2600_state::switch_A_r));
-	m_riot->out_pa_callback().set(FUNC(a2600_state::switch_A_w));
-	m_riot->in_pb_callback().set_ioport("SWB");
-	m_riot->out_pb_callback().set(FUNC(a2600_state::switch_B_w));
-	m_riot->irq_callback().set(FUNC(a2600_state::irq_callback));
-#endif
 
 	VCS_CONTROL_PORT(config, m_joy1, vcs_control_port_devices, "joy");
 	VCS_CONTROL_PORT(config, m_joy2, vcs_control_port_devices, "joy");

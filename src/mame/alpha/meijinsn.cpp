@@ -11,7 +11,7 @@ and old alpha shougi hardware (framebuffer).
 There's probably no upright cabinet, only cocktail table (controls in 2p mode are inverted).
 
 TODO:
-- not sure if protection simulation is right, there is a problem on the selection screen,
+- protection simulation isn't right, there is a problem on the selection screen,
   it's usually not possible to choose tsume shogi (3 difficulty levels)
 
 Buttons:
@@ -215,7 +215,7 @@ void meijinsn_state::sound_io_map(address_map &map)
 	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x01, 0x01).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x02, 0x02).w("soundlatch", FUNC(generic_latch_8_device::clear_w));
-	map(0x04, 0x04).w("dac", FUNC(dac_8bit_r2r_device::write));
+	map(0x04, 0x04).w("dac", FUNC(dac_6bit_r2r_device::write));
 	map(0x06, 0x06).nopw();
 }
 
@@ -357,14 +357,14 @@ void meijinsn_state::machine_reset()
 void meijinsn_state::meijinsn(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 8000000);
+	M68000(config, m_maincpu, 16_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &meijinsn_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(meijinsn_state::interrupt), "screen", 0, 1);
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 4000000));
+	z80_device &audiocpu(Z80(config, "audiocpu", 16_MHz_XTAL / 4));
 	audiocpu.set_addrmap(AS_PROGRAM, &meijinsn_state::sound_map);
 	audiocpu.set_addrmap(AS_IO, &meijinsn_state::sound_io_map);
-	audiocpu.set_periodic_int(FUNC(meijinsn_state::irq0_line_hold), attotime::from_hz(160*60));
+	audiocpu.set_periodic_int(FUNC(meijinsn_state::irq0_line_hold), attotime::from_hz(16_MHz_XTAL / 0x800));
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
@@ -382,12 +382,12 @@ void meijinsn_state::meijinsn(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 2000000));
+	ay8910_device &aysnd(AY8910(config, "aysnd", 16_MHz_XTAL / 8));
 	aysnd.port_a_read_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
 	aysnd.port_b_write_callback().set_nop(); // ?
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "mono", 1.0);
+	DAC_6BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
@@ -448,5 +448,5 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1986, meijinsn,  0,        meijinsn, meijinsn, meijinsn_state, empty_init, ROT0, "SNK", "Meijinsen (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, meijinsna, meijinsn, meijinsn, meijinsn, meijinsn_state, empty_init, ROT0, "SNK", "Meijinsen (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, meijinsn,  0,        meijinsn, meijinsn, meijinsn_state, empty_init, ROT0, "SNK", "Meijinsen (set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, meijinsna, meijinsn, meijinsn, meijinsn, meijinsn_state, empty_init, ROT0, "SNK", "Meijinsen (set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )

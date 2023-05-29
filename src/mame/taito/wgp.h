@@ -5,8 +5,8 @@
     World Grand Prix
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_WGP_H
-#define MAME_INCLUDES_WGP_H
+#ifndef MAME_TAITO_WGP_H
+#define MAME_TAITO_WGP_H
 
 #pragma once
 
@@ -121,4 +121,4 @@ private:
 	optional_ioport m_fake;
 };
 
-#endif // MAME_INCLUDES_WGP_H
+#endif // MAME_TAITO_WGP_H

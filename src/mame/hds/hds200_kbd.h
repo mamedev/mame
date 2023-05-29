@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_HDS200_KBD_H
-#define MAME_MACHINE_HDS200_KBD_H
+#ifndef MAME_HDS_HDS200_KBD_H
+#define MAME_HDS_HDS200_KBD_H
 
 #pragma once
 
@@ -63,4 +63,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(HDS200_KBD_HLE, hds200_kbd_hle_device)
 
-#endif // MAME_MACHINE_HDS200_KBD_H
+#endif // MAME_HDS_HDS200_KBD_H

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#ifndef MAME_AUDIO_WSWAN_H
-#define MAME_AUDIO_WSWAN_H
+#ifndef MAME_SHARED_WSWAN_H
+#define MAME_SHARED_WSWAN_H
 
 #pragma once
 
@@ -83,4 +83,4 @@ private:
 
 DECLARE_DEVICE_TYPE(WSWAN_SND, wswan_sound_device)
 
-#endif // MAME_AUDIO_WSWAN_H
+#endif // MAME_SHARED_WSWAN_H

@@ -44,6 +44,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class hunter2_state : public driver_device
 {
 public:
@@ -498,6 +500,9 @@ ROM_START( hunter2 )
 	ROMX_LOAD( "tr032kx8mrom0.ic50", 0x0000, 0x8000, CRC(694d252c) SHA1(b11dbf24faf648596d92b1823e25a8e4fb7f542c), ROM_BIOS(0) )
 	ROMX_LOAD( "tr032kx8mrom1.ic51", 0x8000, 0x8000, CRC(82901642) SHA1(d84f2bbd2e9e052bd161a313c240a67918f774ad), ROM_BIOS(0) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

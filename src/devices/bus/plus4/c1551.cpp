@@ -340,7 +340,6 @@ void c1551_device::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &c1551_device::c1551_mem);
 	m_maincpu->read_callback().set(FUNC(c1551_device::port_r));
 	m_maincpu->write_callback().set(FUNC(c1551_device::port_w));
-	//config.set_perfect_quantum(m_maincpu); FIXME: not safe in a slot device - add barriers
 
 	PLS100(config, m_pla);
 

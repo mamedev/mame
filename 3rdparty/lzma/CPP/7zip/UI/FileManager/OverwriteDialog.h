@@ -20,7 +20,7 @@ namespace NOverwriteDialog
     
     void SetTime(const FILETIME *t)
     {
-      if (t == 0)
+      if (!t)
         TimeIsDefined = false;
       else
       {
@@ -28,15 +28,19 @@ namespace NOverwriteDialog
         Time = *t;
       }
     }
+
+    void SetSize(UInt64 size)
+    {
+      SizeIsDefined = true;
+      Size = size;
+    }
+
     void SetSize(const UInt64 *size)
     {
-      if (size == 0)
+      if (!size)
         SizeIsDefined = false;
       else
-      {
-        SizeIsDefined = true;
-        Size = *size;
-      }
+        SetSize(*size);
     }
   };
 }
@@ -51,6 +55,12 @@ class COverwriteDialog: public NWindows::NControl::CModalDialog
   void ReduceString(UString &s);
 
 public:
+  bool ShowExtraButtons;
+  bool DefaultButton_is_NO;
+
+
+  COverwriteDialog(): ShowExtraButtons(true), DefaultButton_is_NO(false) {}
+
   INT_PTR Create(HWND parent = 0)
   {
     BIG_DIALOG_SIZE(280, 200);

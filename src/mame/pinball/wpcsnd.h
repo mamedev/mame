@@ -6,8 +6,8 @@
  *  Created on: 4/10/2013
  */
 
-#ifndef MAME_AUDIO_WPCSND_H
-#define MAME_AUDIO_WPCSND_H
+#ifndef MAME_PINBALL_WPCSND_H
+#define MAME_PINBALL_WPCSND_H
 
 #pragma once
 
@@ -66,4 +66,4 @@ private:
 
 DECLARE_DEVICE_TYPE(WPCSND, wpcsnd_device)
 
-#endif // MAME_AUDIO_WPCSND_H
+#endif // MAME_PINBALL_WPCSND_H

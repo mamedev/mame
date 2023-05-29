@@ -56,8 +56,8 @@ public:
 	void clear_row(offs_t offset, u64 data = 0) { sync(); m_rowdata[offset] = 0; m_rowsel &= ~(u64(1) << offset); }
 
 	// directly handle element current brightness
-	double read_element_bri(u8 y, u8 x) { return m_bri[y][x]; }
-	void write_element_bri(u8 y, u8 x, double b) { m_bri[y][x] = b; }
+	double read_element_bri(u8 y, u8 x) { sync(); return m_bri[y][x]; }
+	void write_element_bri(u8 y, u8 x, double b) { sync(); m_bri[y][x] = b; }
 	bool element_on(u8 y, u8 x) { return (read_element_bri(y, x) > m_levels[m_level_min]); }
 	bool row_on(u8 y) { return element_on(y, m_width); }
 

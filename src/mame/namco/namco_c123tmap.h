@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_VIDEO_NAMCO_C123TMAP_H
-#define MAME_VIDEO_NAMCO_C123TMAP_H
+#ifndef MAME_NAMCO_NAMCO_C123TMAP_H
+#define MAME_NAMCO_NAMCO_C123TMAP_H
 
 #pragma once
 
@@ -82,5 +82,5 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(NAMCO_C123TMAP, namco_c123tmap_device)
 
-#endif // MAME_VIDEO_NAMCO_C123TMAP_H
+#endif // MAME_NAMCO_NAMCO_C123TMAP_H
 

@@ -11,8 +11,8 @@
 
 *************************************************************************/
 
-#ifndef MAME_INCLUDES_SLAPSTIC_H
-#define MAME_INCLUDES_SLAPSTIC_H
+#ifndef MAME_ATARI_SLAPSTIC_H
+#define MAME_ATARI_SLAPSTIC_H
 
 #pragma once
 
@@ -290,4 +290,4 @@ private:
 	void commit_bank();
 };
 
-#endif // MAME_INCLUDES_SLAPSTIC_H
+#endif // MAME_ATARI_SLAPSTIC_H

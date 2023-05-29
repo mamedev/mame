@@ -207,9 +207,11 @@ TODO:
 #include "v4psi.lh"
 #include "v4strike.lh"
 
+#define VERBOSE (0)
+#include "logmacro.h"
+
 
 #define VIDEO_MASTER_CLOCK          XTAL(10'000'000)
-
 
 namespace {
 
@@ -548,7 +550,7 @@ uint8_t mpu4vid_state::pia_ic5_porta_track_r()
 	We invert the X and Y data at source due to the use of Schmitt triggers in the interface, which
 	clean up the pulses and flip the active phase.*/
 
-	LOG(("%s: IC5 PIA Read of Port A (AUX1)\n",machine().describe_context()));
+	LOG("%s: IC5 PIA Read of Port A (AUX1)\n",machine().describe_context());
 
 
 	uint8_t data = m_aux1_port->read();

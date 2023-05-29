@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Roberto Fresca, Peter Ferrie
-#ifndef MAME_INCLUDES_FUNWORLD_H
-#define MAME_INCLUDES_FUNWORLD_H
+#ifndef MAME_FUNWORLD_FUNWORLD_H
+#define MAME_FUNWORLD_FUNWORLD_H
 
 #pragma once
 
@@ -206,4 +206,4 @@ private:
 	bool m_crtc_selected;
 };
 
-#endif // MAME_INCLUDES_FUNWORLD_H
+#endif // MAME_FUNWORLD_FUNWORLD_H

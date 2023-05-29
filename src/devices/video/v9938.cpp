@@ -38,17 +38,17 @@ todo:
 #include "emu.h"
 #include "v9938.h"
 
-#define LOG_WARN     (1U<<1)
-#define LOG_INT      (1U<<2)
-#define LOG_STATUS   (1U<<3)
-#define LOG_REGWRITE (1U<<4)
-#define LOG_COMMAND  (1U<<5)
-#define LOG_MODE     (1U<<6)
-#define LOG_NOTIMP   (1U<<7)
-#define LOG_DETAIL   (1U<<8)
+#define LOG_WARN     (1U << 1)
+#define LOG_INT      (1U << 2)
+#define LOG_STATUS   (1U << 3)
+#define LOG_REGWRITE (1U << 4)
+#define LOG_COMMAND  (1U << 5)
+#define LOG_MODE     (1U << 6)
+#define LOG_NOTIMP   (1U << 7)
+#define LOG_DETAIL   (1U << 8)
 
 // Minimum log should be warnings
-#define VERBOSE (LOG_GENERAL | LOG_WARN )
+#define VERBOSE (LOG_GENERAL | LOG_WARN)
 
 #include "logmacro.h"
 

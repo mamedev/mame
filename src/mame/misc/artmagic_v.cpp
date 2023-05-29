@@ -184,7 +184,7 @@ void artmagic_state::execute_blit()
 }
 #endif
 
-	g_profiler.start(PROFILER_VIDEO);
+	auto profile = g_profiler.start(PROFILER_VIDEO);
 
 	last = 0;
 	sy = y;
@@ -288,8 +288,6 @@ void artmagic_state::execute_blit()
 		}
 		offset += w/4;
 	}
-
-	g_profiler.stop();
 
 #if (!INSTANT_BLIT)
 	m_blitter_busy_until = machine.time() + attotime::from_nsec(w*h*20);

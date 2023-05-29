@@ -6,7 +6,7 @@
 
 using namespace NUpdateArchive;
 
-static const char *kUpdateActionSetCollision = "Internal collision in update action set";
+static const char * const kUpdateActionSetCollision = "Internal collision in update action set";
 
 void UpdateProduce(
     const CRecordVector<CUpdatePair> &updatePairs,
@@ -28,7 +28,7 @@ void UpdateProduce(
     {
       case NPairAction::kIgnore:
         if (pair.ArcIndex >= 0 && callback)
-          callback->ShowDeleteFile(pair.ArcIndex);
+          callback->ShowDeleteFile((unsigned)pair.ArcIndex);
         continue;
 
       case NPairAction::kCopy:
@@ -43,7 +43,7 @@ void UpdateProduce(
                 1) no such alt stream in Disk
                 2) there is Host file in disk
             */
-            if (updatePairs[pair.HostIndex].DirIndex >= 0)
+            if (updatePairs[(unsigned)pair.HostIndex].DirIndex >= 0)
               continue;
           }
         }
@@ -62,6 +62,8 @@ void UpdateProduce(
         up2.UseArcProps = (pair.ArcIndex >= 0);
         break;
     }
+
+    up2.IsSameTime = ((unsigned)pair.State == NUpdateArchive::NPairState::kSameFiles);
 
     operationChain.Add(up2);
   }

@@ -48,7 +48,8 @@
 	"vertex": "chains/xbr/xbr-mlv4-multipass/vs_xbr-mlv4-pass1",
 	"fragment": "chains/xbr/xbr-mlv4-multipass/fs_xbr-mlv4-pass1",
 	"uniforms": [
-		{ "name": "decal",       "type": "int",  "values": [  1.0 ] },
-		{ "name": "u_tex_size0", "type": "vec4", "values": [  1.0, 1.0, 0.0, 0.0 ] }
+		{ "name": "decal",           "type": "int",  "values": [ 1.0 ] },
+		{ "name": "u_tex_size0",     "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
+		{ "name": "u_inv_view_dims", "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] }
 	]
 }

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-#ifndef MAME_INCLUDES_CISCHEAT_H
-#define MAME_INCLUDES_CISCHEAT_H
+#ifndef MAME_JALECO_CISCHEAT_H
+#define MAME_JALECO_CISCHEAT_H
 
 #pragma once
 
@@ -223,6 +223,7 @@ public:
 	template <int N> DECLARE_READ_LINE_MEMBER(motor_busy_r);
 	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(motor_pos_r);
 	void init_captflag();
+	void init_vscaptfl();
 
 private:
 	void motor_command_right_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -251,4 +252,4 @@ private:
 	uint16_t m_motor_pos[2];
 };
 
-#endif
+#endif // MAME_JALECO_CISCHEAT_H

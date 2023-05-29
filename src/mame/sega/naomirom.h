@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MAME_MACHINE_NAOMIROM_H
-#define MAME_MACHINE_NAOMIROM_H
+#ifndef MAME_SEGA_NAOMIROM_H
+#define MAME_SEGA_NAOMIROM_H
 
 #include "naomibd.h"
 
@@ -32,4 +32,4 @@ private:
 
 DECLARE_DEVICE_TYPE(NAOMI_ROM_BOARD, naomi_rom_board)
 
-#endif // MAME_MACHINE_NAOMIROM_H
+#endif // MAME_SEGA_NAOMIROM_H

@@ -19,6 +19,8 @@ I've not had a chance to wire up the board yet, but it might be possible to writ
 #include "screen.h"
 
 
+namespace {
+
 class intrscti_state : public driver_device
 {
 public:
@@ -248,5 +250,8 @@ void intrscti_state::init_intrscti()
 		m_vram[i+0x400] = 0xff;
 	}
 }
+
+} // anonymous namespace
+
 
 GAME( 19??, intrscti, 0, intrscti, intrscti, intrscti_state, init_intrscti, ROT0, "<unknown>", "Intersecti", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )

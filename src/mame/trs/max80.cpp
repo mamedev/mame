@@ -82,6 +82,9 @@ Status: Beeps every so often. Unable to read the disk.
 
 #include "utf8.h"
 
+
+namespace {
+
 class max80_state : public driver_device
 {
 public:
@@ -115,7 +118,7 @@ protected:
 
 private:
 	static void floppy_formats(format_registration &fr);
-	u8 keyboard_r(offs_t offset);
+	[[maybe_unused]] u8 keyboard_r(offs_t offset);
 	void beep_w(offs_t offset, u8 data);
 	void mode_w(offs_t offset, u8 data);
 	void drive_w(offs_t offset, u8 data);
@@ -506,6 +509,9 @@ ROM_START(max80)
 	ROM_REGION(0x0200, "maincpu",0)
 	ROM_LOAD("max80.e12", 0x0000, 0x0200, CRC(cf316f25) SHA1(78663711c6100a67ef18382284565feda2bbbf77) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     CLASS          INIT             COMPANY          FULLNAME               FLAGS
 COMP( 1982, max80,    0,        trs80l2,  max80,    max80,    max80_state, empty_init,    "Lobo Systems",      "MAX-80",        MACHINE_NOT_WORKING ) //| MACHINE_SUPPORTS_SAVE )

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi
-#ifndef MAME_INCLUDES_NAMCOS1_H
-#define MAME_INCLUDES_NAMCOS1_H
+#ifndef MAME_NAMCO_NAMCOS1_H
+#define MAME_NAMCO_NAMCOS1_H
 
 #pragma once
 
@@ -156,4 +156,4 @@ private:
 	void virtual_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_NAMCOS1_H
+#endif // MAME_NAMCO_NAMCOS1_H

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia, David Haywood
-#ifndef MAME_VIDEO_KANEKO_SPR_H
-#define MAME_VIDEO_KANEKO_SPR_H
+#ifndef MAME_KANEKO_KANEKO_SPR_H
+#define MAME_KANEKO_KANEKO_SPR_H
 
 #pragma once
 
@@ -151,4 +151,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(KANEKO_KC002_SPRITE, kaneko_kc002_sprite_device)
 
-#endif // MAME_VIDEO_KANEKO_SPR_H
+#endif // MAME_KANEKO_KANEKO_SPR_H

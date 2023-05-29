@@ -19,6 +19,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class paso1600_state : public driver_device
 {
 public:
@@ -332,11 +334,13 @@ ROM_START( paso1600 )
 	ROM_REGION(0x2000,"pcg", ROMREGION_ERASE00)
 
 	ROM_REGION( 0x800, "chargen", ROMREGION_ERASEFF )
-	ROM_LOAD( "font.rom", 0x0000, 0x0800, BAD_DUMP CRC(a91c45a9) SHA1(a472adf791b9bac3dfa6437662e1a9e94a88b412)) //stolen from pasopia7
+	ROM_LOAD( "5t_2716.bin", 0x0000, 0x0800, BAD_DUMP CRC(b5693720) SHA1(d25327dfaa40b0f4144698e3bad43125fd8e46d0)) //stolen from pasopia - label and location unknown
 
 	ROM_REGION16_LE( 0x20000, "kanji", ROMREGION_ERASEFF )
 	ROM_LOAD( "kanji.rom", 0x0000, 0x20000, NO_DUMP)
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY    FULLNAME        FLAGS

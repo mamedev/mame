@@ -8,6 +8,8 @@
   Encrypted CPU (based on a Z80)
   plus 2x 8255 + YM3014 + YM3812 hardware.
 
+  Close to Amatic 8000-1 hardware.
+
 
   Driver by Roberto Fresca.
 
@@ -18,6 +20,16 @@
 
   * Super Card (encrypted),    Fun World, 1992.
   * Fruit Star (encrypted),    Fun World, 1992.
+
+
+***********************************************************************************
+
+  To boot into the game...
+
+  1) Let the initial test ends.
+  2) Turn ON Service Key (key 9). The screen will show "Elektronik Defekt 5".
+  3) Turn ON Personal A key (key 0).
+  4) Turn OFF Personal A key.
 
 
 ***********************************************************************************
@@ -159,13 +171,23 @@
 
   NOTE: The 74LS374 could be replaced by a 74HCT373.
 
+  TODO:
+  - merge with misc/amaticmg.cpp. Hardware is almost identical and software has
+    definitely a common origin.
+  - supercrd stops with 'ELEKTRONIK DEFEKT 5'. Problem with the decryption or missing
+    something in the emulation?
+  - fruitstr glitches after boot test and then resets itself. Problem with the decryption
+    or missing something in the emulation?
+
 ***********************************************************************************/
+
 
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
+#include "sound/ymopl.h"
 #include "video/mc6845.h"
 #include "video/resnet.h"
 
@@ -173,6 +195,16 @@
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
+
+
+// configurable logging
+#define LOG_UNKOPCODES     (1U << 1)
+
+//#define VERBOSE (LOG_GENERAL | LOG_UNKOPCODES)
+
+#include "logmacro.h"
+
+#define LOGUNKOPCODES(...)     LOGMASKED(LOG_UNKOPCODES,     __VA_ARGS__)
 
 
 namespace {
@@ -184,7 +216,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes"),
+		m_rombank(*this, "rombank"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode")
 	{ }
@@ -195,22 +227,27 @@ public:
 	void init_supercrd();
 
 protected:
+	virtual void machine_start() override;
 	virtual void video_start() override;
 
 private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
-	required_shared_ptr<uint8_t> m_decrypted_opcodes;
+	required_memory_bank m_rombank;
 	tilemap_t *m_bg_tilemap = nullptr;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
+	uint8_t m_decode_table[0x04][0x08][0x08];
+
+	uint8_t decrypted_opcodes_r(offs_t offset);
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void prg_map(address_map &map);
+	void io_map(address_map &map);
 	void decrypted_opcodes_map(address_map &map);
 };
 
@@ -241,13 +278,13 @@ void supercrd_state::palette(palette_device &palette) const
 		bit2 = BIT(color_prom[i], 2);
 		int const r = combine_weights(weights_r, bit0, bit1, bit2);
 
-		// blue component */
+		// blue component
 		bit0 = BIT(color_prom[i], 3);
 		bit1 = BIT(color_prom[i], 4);
 		bit2 = BIT(color_prom[i], 5);
 		int const b = combine_weights(weights_b, bit0, bit1, bit2);
 
-		// green component */
+		// green component
 		bit0 = BIT(color_prom[i], 6);
 		bit1 = BIT(color_prom[i], 7);
 		int const g = combine_weights(weights_g, bit0, bit1);
@@ -288,7 +325,7 @@ TILE_GET_INFO_MEMBER(supercrd_state::get_bg_tile_info)
 
 void supercrd_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supercrd_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 4, 8, 96, 29);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supercrd_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 4, 8, 96, 31);
 }
 
 
@@ -299,23 +336,51 @@ uint32_t supercrd_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 }
 
 
+uint8_t supercrd_state::decrypted_opcodes_r(offs_t offset)
+{
+	uint8_t const data = m_maincpu->space(AS_PROGRAM).read_byte(offset);
+	uint8_t const row = bitswap<3>(data, 7, 6, 4);
+	uint8_t const xor_v = data & 0x07;
+
+	if (((m_decode_table[offset & 0x03][row][xor_v]) == 0x00) && (data != 0xc5) && (data != 0xcd) && (data != 0xe5) && (data != 0xed))
+		LOGUNKOPCODES("at %08x check opcode: %02x\n", offset, data);
+	return data ^ m_decode_table[offset & 0x03][row][xor_v];
+}
+
+
+void supercrd_state::machine_start()
+{
+	m_rombank->configure_entries(0, 2, memregion("maincpu")->base() + 0x8000, 0x4000); // TODO: should be more than just 2, at least for supercrd, but for now games don't run enough to reach them
+}
+
+
 /*****************************
 *   Memory map information   *
 *****************************/
 
 void supercrd_state::prg_map(address_map &map)
 {
-	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xcfff).ram().w(FUNC(supercrd_state::videoram_w)).share(m_videoram); // wrong
-	map(0xd000, 0xdfff).ram().w(FUNC(supercrd_state::colorram_w)).share(m_colorram); // wrong
-//  map(0x0000, 0x0000).ram().share("nvram");
-//  map(0xe000, 0xe000).w("crtc", FUNC(mc6845_device::address_w));
-//  map(0xe001, 0xe001).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram();
+	map(0xa000, 0xafff).ram().w(FUNC(supercrd_state::videoram_w)).share(m_videoram);
+	map(0xb000, 0xbfff).ram().w(FUNC(supercrd_state::colorram_w)).share(m_colorram);
+	map(0xc000, 0xffff).bankr(m_rombank);
+}
+
+void supercrd_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x20, 0x23).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x40, 0x41).w("ymsnd", FUNC(ym3812_device::write));
+	map(0x60, 0x60).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x61, 0x61).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0xc0, 0xc0).lw8(NAME([this] (uint8_t data) { m_rombank->set_entry(data); })); // TODO: mask this
 }
 
 void supercrd_state::decrypted_opcodes_map(address_map &map)
 {
-	map(0x0000, 0xbfff).rom().share(m_decrypted_opcodes);
+	map(0x0000, 0xffff).r(FUNC(supercrd_state::decrypted_opcodes_r));
 }
 
 
@@ -325,80 +390,68 @@ void supercrd_state::decrypted_opcodes_map(address_map &map)
 
 static INPUT_PORTS_START( supercrd )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("IN0-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2) PORT_NAME("IN0-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("IN0-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("IN0-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5) PORT_NAME("IN0-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6) PORT_NAME("IN0-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7) PORT_NAME("IN0-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8) PORT_NAME("IN0-8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_1) PORT_NAME("IN0-1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_2) PORT_NAME("IN0-2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_3) PORT_NAME("IN0-3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_4) PORT_NAME("IN0-4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_F) PORT_NAME("IN0-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_U) PORT_NAME("IN0-6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_7) PORT_NAME("IN0-7")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q) PORT_NAME("IN1-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("IN1-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E) PORT_NAME("IN1-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R) PORT_NAME("IN1-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("IN1-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y) PORT_NAME("IN1-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U) PORT_NAME("IN1-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("IN1-8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_O) PORT_NAME("IN1-2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_R) PORT_NAME("IN1-4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_T) PORT_NAME("IN1-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_Y) PORT_NAME("IN1-6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_0) PORT_NAME("Service A (Personal A)") PORT_TOGGLE  // Service/Personal A key - Bookkeeping
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_I) PORT_NAME("IN1-8")
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("IN2-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("IN2-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("IN2-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F) PORT_NAME("IN2-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G) PORT_NAME("IN2-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("IN2-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J) PORT_NAME("IN2-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K) PORT_NAME("IN2-8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_A) PORT_NAME("IN2-1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_S) PORT_NAME("IN2-2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )                 PORT_NAME("Remote Credits")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9) PORT_NAME("Service Key") PORT_TOGGLE  // Sw Elektronik Defekt 5
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_G) PORT_NAME("IN2-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_H) PORT_NAME("IN2-6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_J) PORT_NAME("IN2-7")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_K) PORT_NAME("IN2-8")
 
 	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z) PORT_NAME("IN3-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("IN3-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C) PORT_NAME("IN3-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V) PORT_NAME("IN3-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B) PORT_NAME("IN3-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N) PORT_NAME("IN3-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M) PORT_NAME("IN3-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L) PORT_NAME("IN3-8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_Z) PORT_NAME("IN3-1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_X) PORT_NAME("IN3-2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_C) PORT_NAME("IN3-3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_V) PORT_NAME("IN3-4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_B) PORT_NAME("IN3-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_N) PORT_NAME("IN3-6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_M) PORT_NAME("IN3-7")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_L) PORT_NAME("IN3-8")
 
-	PORT_START("IN4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("IN4-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("IN4-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("IN4-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("IN4-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("IN4-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("IN4-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("IN4-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("IN4-8")
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("SW1")
+	PORT_DIPNAME( 0x01, 0x01, "Personal A Settings" )
+	PORT_DIPSETTING(    0x01, "Brief" )                 // Remote A, Abgeschrieben A.
+	PORT_DIPSETTING(    0x00, "Complete" )              // Remote A, Gewechselt A, Abgeschrieben A, Nachgefuellt A.
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x04, "10 credits" )
+	PORT_DIPSETTING(    0x00, "5 credits" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x08, "10 credits" )
+	PORT_DIPSETTING(    0x00, "5 credits" )
+	PORT_DIPNAME( 0x10, 0x10, "Remote Value" )
+	PORT_DIPSETTING(    0x10, "100 Credits / Pulse" )
+	PORT_DIPSETTING(    0x00, "50 Credits / Pulse" )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE )  PORT_CODE(KEYCODE_8) PORT_NAME("Remote Credits (Service)")
 INPUT_PORTS_END
 
 
@@ -441,36 +494,45 @@ void supercrd_state::supercrd(machine_config &config)
 	static constexpr XTAL MASTER_CLOCK = XTAL(16'000'000);
 
 	// basic machine hardware
-	Z80(config, m_maincpu, MASTER_CLOCK / 8);    // 2MHz, guess
+	Z80(config, m_maincpu, MASTER_CLOCK / 4);    // 4MHz, guess
 	m_maincpu->set_addrmap(AS_PROGRAM, &supercrd_state::prg_map);
+	m_maincpu->set_addrmap(AS_IO, &supercrd_state::io_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &supercrd_state::decrypted_opcodes_map);
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-//  I8255(config, "ppi8255_0", 0);
-//  I8255(config, "ppi8255_1", 0);
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.in_pa_callback().set_ioport("IN0");
+	ppi0.in_pb_callback().set_ioport("IN1");
+	ppi0.in_pc_callback().set_ioport("IN2");
+
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	//ppi1.out_pa_callback().set(FUNC(supercrd_state::out_a_w));
+	ppi1.in_pb_callback().set_ioport("SW1");
+	//ppi1.out_pc_callback().set(FUNC(supercrd_state::out_c_w));
 
 	// video hardware
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size((124+1)*4, (30+1)*8);               // Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1)
+	screen.set_size((124+1)*4, (30+1)*8);          // Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1)
 	screen.set_visarea(0*4, 96*4-1, 0*8, 29*8-1);  // Taken from MC6845 init, registers 01 & 06
 	screen.set_screen_update(FUNC(supercrd_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_supercrd);
 	PALETTE(config, "palette", FUNC(supercrd_state::palette), 0x200);
 
-//  mc6845_device &crtc(MC6845(config, "crtc",  MASTER_CLOCK / 8));
-//  crtc.set_screen("screen");
-//  crtc.set_show_border_area(false);
-//  crtc.set_char_width(4);
+	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK / 8));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(4);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);  // no NMI mask?
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-//  .add_route(ALL_OUTPUTS, "mono", 0.75);
+	YM3812(config, "ymsnd", MASTER_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 0.5);  // Y3014B DAC
 }
 
 
@@ -482,7 +544,7 @@ ROM_START( supercrd )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "supca_417_ce1.ic37", 0x00000, 0x08000, CRC(b67f7d38) SHA1(eaf8f24d476185d4744858afcbf0005362f49cab) )
 	ROM_CONTINUE(                   0x00000, 0x08000 )
-	ROM_LOAD( "supca_417_ce2.ic51", 0x08000, 0x08000, CRC(36415f73) SHA1(9881b88991f034d79260502289432a7318aa1647) )    // wrong
+	ROM_LOAD( "supca_417_ce2.ic51", 0x08000, 0x08000, CRC(36415f73) SHA1(9881b88991f034d79260502289432a7318aa1647) )
 	ROM_IGNORE(                     0x8000)
 
 	ROM_REGION( 0x20000, "gfxtemp", 0 )
@@ -516,10 +578,10 @@ ROM_END
 
 */
 ROM_START( fruitstr )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "fruitstar_t10s-i-1.ic37", 0x0000, 0x8000, CRC(cd458e9f) SHA1(3fdf59360704ae1550c108c59907067fc7c8424c) ) // 1st half: empty; 2nd half: program (1st half)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "fruitstar_t10s-i-1.ic37", 0x0000, 0x8000, CRC(cd458e9f) SHA1(3fdf59360704ae1550c108c59907067fc7c8424c) )  // 1st half: empty; 2nd half: program (1st half)
 	ROM_CONTINUE(                        0x0000, 0x8000)
-	ROM_LOAD( "fruitstar_t10s-i-2.ic51", 0x8000, 0x8000, CRC(4536976b) SHA1(9a0ef6245e5aedfdb690df4c6d7a32ebf1b22590) ) // 1st half: program (2nd half); 2nd half: empty
+	ROM_LOAD( "fruitstar_t10s-i-2.ic51", 0x8000, 0x8000, CRC(4536976b) SHA1(9a0ef6245e5aedfdb690df4c6d7a32ebf1b22590) )  // 1st half: program (2nd half); 2nd half: empty
 	ROM_IGNORE(                                  0x8000)
 
 	ROM_REGION( 0x20000, "gfxtemp", 0 )
@@ -537,169 +599,146 @@ ROM_END
 
 
 /*
-Preliminary encryption observations:
-- only opcodes seem to be encrypted;
-- there seem to be 4 XOR tables selected by bits 0 and 1 of the address;
-- within a table the XOR seems to be chosen depending on bits 0, 1, 2, 3, 4, 6, 7 of the data. Only bit 5 isn't considered;
-- XOR values seem to only affect bits 0, 1, 4 and 6;
-- the games use different XOR tables;
-- code is mostly the same for both games up to 0x96e, then they start differing significantly;
-- it seems the encryption concept is the same or really similar to ladylinrb,c,d,e in igs/goldstar.cpp.
+  Encryption observations:
+
+  - only opcodes are encrypted;
+  - there are 4 XOR tables selected by bits 0 and 1 of the address;
+  - within a table the XOR is chosen depending on bits 0, 1, 2, 4, 6, 7 of the data. Only bit 3 and 5 aren't considered;
+  - XOR values only affect bits 0, 1, 4 and 6;
+  - the games use different XOR tables;
+  - code is mostly the same for both games up to 0x96e, then they start differing significantly;
+  - the encryption concept is the same as ladylinrb,c,d,e in igs/goldstar.cpp;
+  - compare to suprstar in misc/amaticmg.cpp for confirmed correctly decrypted code.
+
 */
 
-void supercrd_state::init_supercrd() // TODO: decrypt
+void supercrd_state::init_supercrd() // TODO: check unknown opcodes
 {
 	uint8_t unkn = 0x00;
 
-	static const uint8_t xor_table_00[0x08][0x08] =
+	uint8_t xor_table[0x04][0x08][0x08] =
 	{
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x0x and 0x2x
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x1x and 0x3x
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x4x and 0x6x
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x5x and 0x7x
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x8x and 0xax
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x9x and 0xbx
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0xcx and 0xex
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0xdx and 0xfx
-	};
-
-	static const uint8_t xor_table_01[0x08][0x08] =
-	{
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x0x and 0x2x
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x1x and 0x3x
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x4x and 0x6x
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x5x and 0x7x
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x8x and 0xax
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x9x and 0xbx
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0xcx and 0xex
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0xdx and 0xfx
-	};
-
-	static const uint8_t xor_table_02[0x08][0x08] =
-	{
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x0x and 0x2x
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x1x and 0x3x
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x4x and 0x6x
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x5x and 0x7x
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x8x and 0xax
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x9x and 0xbx
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0xcx and 0xex
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0xdx and 0xfx
-	};
-
-	static const uint8_t xor_table_03[0x08][0x08] =
-	{
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x0x and 0x2x
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x1x and 0x3x
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x4x and 0x6x
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x5x and 0x7x
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x8x and 0xax
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x9x and 0xbx
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0xcx and 0xex
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0xdx and 0xfx
-	};
-
-	const uint8_t *rom = memregion("maincpu")->base();
-	uint32_t const len = memregion("maincpu")->bytes();
-
-	for (int i = 0; i < len; i++)
-	{
-		uint8_t x = rom[i];
-
-		uint8_t const row = (BIT(x, 4) +  (BIT(x, 6) << 1) + (BIT(x, 7) << 2));
-
-		uint8_t const xor_v = x & 0x07;
-
-		switch (i & 0x03)
 		{
-			case 0x00: x ^= xor_table_00[row][xor_v]; break;
-			case 0x01: x ^= xor_table_01[row][xor_v]; break;
-			case 0x02: x ^= xor_table_02[row][xor_v]; break;
-			case 0x03: x ^= xor_table_03[row][xor_v]; break;
+			{ 0x13, 0x11, 0x01, 0x11, 0x02, 0x50, 0x51, 0x43 }, // 0x0x and 0x2x
+			{ 0x11, 0x52, 0x50, 0x43, 0x10, 0x43, unkn, 0x02 }, // 0x1x and 0x3x
+			{ 0x51, 0x13, 0x02, 0x12, 0x43, 0x00, unkn, 0x51 }, // 0x4x and 0x6x
+			{ 0x50, 0x53, 0x13, 0x00, 0x51, 0x12, 0x02, 0x11 }, // 0x5x and 0x7x
+			{ 0x12, 0x02, 0x40, 0x51, 0x03, 0x50, unkn, 0x12 }, // 0x8x and 0xax
+			{ 0x50, 0x01, 0x53, 0x50, 0x43, 0x43, unkn, 0x00 }, // 0x9x and 0xbx
+			{ unkn, 0x41, 0x43, 0x52, 0x42, 0x00, unkn, unkn }, // 0xcx and 0xex
+			{ 0x43, 0x02, unkn, 0x02, unkn, 0x43, 0x10, 0x43 }  // 0xdx and 0xfx
+		},
+		{
+			{ 0x13, 0x10, 0x02, 0x40, 0x50, 0x43, 0x11, 0x51 }, // 0x0x and 0x2x
+			{ 0x43, 0x41, 0x43, 0x53, 0x50, 0x00, 0x51, 0x01 }, // 0x1x and 0x3x
+			{ 0x52, 0x51, 0x00, 0x40, 0x40, 0x00, 0x52, 0x40 }, // 0x4x and 0x6x
+			{ 0x52, 0x50, 0x13, 0x01, 0x52, 0x02, 0x03, 0x52 }, // 0x5x and 0x7x
+			{ 0x43, unkn, 0x50, 0x41, 0x12, 0x51, 0x11, unkn }, // 0x8x and 0xax
+			{ 0x43, 0x00, 0x01, 0x42, unkn, unkn, 0x40, unkn }, // 0x9x and 0xbx
+			{ unkn, unkn, unkn, 0x52, unkn, 0x00, 0x53, 0x01 }, // 0xcx and 0xex
+			{ 0x51, 0x10, 0x12, 0x41, 0x50, 0x00, 0x50, 0x50 }  // 0xdx and 0xfx
+		},
+		{
+			{ 0x43, 0x51, 0x01, 0x13, 0x51, 0x42, unkn, 0x01 }, // 0x0x and 0x2x
+			{ 0x50, 0x43, 0x13, 0x11, unkn, 0x42, 0x12, 0x01 }, // 0x1x and 0x3x
+			{ 0x53, 0x10, 0x11, 0x52, 0x51, 0x00, 0x10, 0x13 }, // 0x4x and 0x6x
+			{ 0x42, 0x13, 0x13, 0x53, 0x40, 0x52, 0x10, 0x52 }, // 0x5x and 0x7x
+			{ 0x40, 0x43, 0x51, 0x51, 0x51, 0x01, unkn, 0x00 }, // 0x8x and 0xax
+			{ unkn, 0x01, 0x43, 0x02, unkn, 0x53, unkn, unkn }, // 0x9x and 0xbx
+			{ 0x01, 0x02, unkn, 0x50, 0x51, 0x00, 0x51, 0x10 }, // 0xcx and 0xex
+			{ 0x42, unkn, unkn, unkn, 0x00, 0x41, unkn, 0x01 }  // 0xdx and 0xfx
+		},
+		{
+			{ 0x42, 0x00, 0x43, 0x53, 0x03, 0x53, 0x00, 0x11 }, // 0x0x and 0x2x
+			{ 0x13, 0x02, 0x12, 0x11, 0x41, 0x02, 0x50, 0x53 }, // 0x1x and 0x3x
+			{ 0x00, 0x12, 0x52, 0x12, 0x03, 0x00, 0x43, 0x43 }, // 0x4x and 0x6x
+			{ 0x42, 0x40, 0x11, 0x01, 0x41, 0x02, 0x02, 0x43 }, // 0x5x and 0x7x
+			{ unkn, 0x12, 0x50, 0x43, 0x13, unkn, unkn, 0x02 }, // 0x8x and 0xax
+			{ 0x51, 0x01, 0x10, 0x02, 0x52, unkn, 0x43, unkn }, // 0x9x and 0xbx
+			{ 0x02, 0x02, unkn, 0x10, unkn, 0x00, 0x10, 0x40 }, // 0xcx and 0xex
+			{ 0x01, 0x01, 0x53, 0x50, 0x41, unkn, 0x12, 0x03 }  // 0xdx and 0xfx
 		}
+	};
 
-		m_decrypted_opcodes[i] = x;
+	for (int j = 0; j < 0x04; j++)
+	{
+		for (int i = 0; i < 0x100; i++)
+		{
+			uint8_t const row = bitswap<3>(i, 7, 6, 4);
+			uint8_t const xor_v = i & 0x07;
+			if ((i & 0x28) == 0)
+				LOGUNKOPCODES("table: %01x encop: %02x; decop: %02x\n", j, i, i ^ xor_table[j][row][xor_v]);
+		}
 	}
+
+	std::copy(&xor_table[0][0][0], &xor_table[0][0][0] + 0x04 * 0x08 * 0x08, &m_decode_table[0][0][0]);
 }
 
-void supercrd_state::init_fruitstr() // TODO: decrypt
+void supercrd_state::init_fruitstr() // TODO: check unknown opcodes
 {
 	uint8_t unkn = 0x00;
 
-	static const uint8_t xor_table_00[0x08][0x08] =
+	uint8_t xor_table[0x04][0x08][0x08] =
 	{
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x0x and 0x2x
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x1x and 0x3x
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x4x and 0x6x
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x5x and 0x7x
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x8x and 0xax
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x9x and 0xbx
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0xcx and 0xex
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0xdx and 0xfx
-	};
-
-	static const uint8_t xor_table_01[0x08][0x08] =
-	{
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x0x and 0x2x
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x1x and 0x3x
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x4x and 0x6x
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x5x and 0x7x
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x8x and 0xax
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x9x and 0xbx
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0xcx and 0xex
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0xdx and 0xfx
-	};
-
-	static const uint8_t xor_table_02[0x08][0x08] =
-	{
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x0x and 0x2x
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x1x and 0x3x
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x4x and 0x6x
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x5x and 0x7x
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x8x and 0xax
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x9x and 0xbx
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0xcx and 0xex
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0xdx and 0xfx
-	};
-
-	static const uint8_t xor_table_03[0x08][0x08] =
-	{
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x0x and 0x2x
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x1x and 0x3x
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x4x and 0x6x
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x5x and 0x7x
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x8x and 0xax
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x9x and 0xbx
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0xcx and 0xex
-		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0xdx and 0xfx
-	};
-
-	const uint8_t *rom = memregion("maincpu")->base();
-	uint32_t const len = memregion("maincpu")->bytes();
-
-	for (int i = 0; i < len; i++)
-	{
-		uint8_t x = rom[i];
-
-		uint8_t const row = (BIT(x, 4) +  (BIT(x, 6) << 1) + (BIT(x, 7) << 2));
-
-		uint8_t const xor_v = x & 0x07;
-
-		switch (i & 0x03)
 		{
-			case 0x00: x ^= xor_table_00[row][xor_v]; break;
-			case 0x01: x ^= xor_table_01[row][xor_v]; break;
-			case 0x02: x ^= xor_table_02[row][xor_v]; break;
-			case 0x03: x ^= xor_table_03[row][xor_v]; break;
+			{ 0x40, 0x52, 0x53, 0x11, 0x40, 0x02, 0x10, 0x40 }, // 0x0x and 0x2x
+			{ 0x11, 0x00, 0x02, 0x43, 0x40, 0x10, 0x02, 0x40 }, // 0x1x and 0x3x
+			{ 0x40, 0x03, 0x10, 0x02, 0x02, 0x00, 0x40, 0x43 }, // 0x4x and 0x6x
+			{ 0x52, 0x12, 0x41, 0x50, 0x02, 0x00, 0x43, 0x40 }, // 0x5x and 0x7x
+			{ 0x03, unkn, 0x12, 0x42, 0x51, 0x53, unkn, 0x01 }, // 0x8x and 0xax
+			{ 0x43, 0x52, 0x50, 0x01, unkn, unkn, 0x00, unkn }, // 0x9x and 0xbx
+			{ 0x11, 0x13, 0x53, 0x50, 0x02, 0x00, 0x41, unkn }, // 0xcx and 0xex
+			{ 0x50, 0x50, 0x12, unkn, unkn, 0x41, 0x43, 0x40 }  // 0xdx and 0xfx
+		},
+		{
+			{ 0x42, 0x11, 0x41, 0x51, 0x51, 0x12, 0x10, 0x03 }, // 0x0x and 0x2x
+			{ 0x40, 0x12, 0x13, 0x01, 0x42, 0x10, 0x51, 0x03 }, // 0x1x and 0x3x
+			{ 0x01, 0x41, 0x11, 0x41, 0x42, 0x00, 0x41, 0x01 }, // 0x4x and 0x6x
+			{ 0x10, 0x40, 0x41, 0x02, 0x41, 0x11, 0x02, 0x00 }, // 0x5x and 0x7x
+			{ 0x12, 0x41, 0x50, 0x42, 0x00, unkn, unkn, 0x03 }, // 0x8x and 0xax
+			{ 0x11, 0x40, 0x02, unkn, 0x52, 0x43, 0x00, 0x40 }, // 0x9x and 0xbx
+			{ 0x51, 0x52, unkn, unkn, 0x51, 0x00, 0x40, 0x50 }, // 0xcx and 0xex
+			{ 0x13, unkn, 0x10, 0x00, 0x40, 0x01, 0x51, 0x02 }  // 0xdx and 0xfx
+		},
+		{
+			{ unkn, 0x12, 0x50, 0x41, 0x53, 0x11, 0x03, 0x51 }, // 0x0x and 0x2x
+			{ 0x11, 0x40, 0x10, 0x01, 0x01, 0x11, 0x42, 0x01 }, // 0x1x and 0x3x
+			{ 0x00, 0x51, unkn, 0x40, 0x03, 0x00, 0x02, 0x50 }, // 0x4x and 0x6x
+			{ 0x03, 0x51, 0x43, 0x03, 0x01, 0x53, 0x10, 0x50 }, // 0x5x and 0x7x
+			{ 0x51, 0x40, 0x51, 0x02, 0x02, 0x52, 0x40, 0x13 }, // 0x8x and 0xax
+			{ unkn, unkn, 0x02, 0x41, 0x42, 0x51, unkn, 0x13 }, // 0x9x and 0xbx
+			{ 0x51, 0x52, 0x02, 0x00, unkn, 0x00, 0x53, 0x13 }, // 0xcx and 0xex
+			{ 0x53, 0x13, 0x50, 0x41, 0x53, 0x42, 0x40, 0x02 }  // 0xdx and 0xfx
+		},
+		{
+			{ 0x41, 0x13, 0x13, 0x13, 0x42, 0x42, 0x10, 0x01 }, // 0x0x and 0x2x
+			{ 0x52, 0x12, 0x13, 0x53, 0x41, 0x10, 0x02, 0x41 }, // 0x1x and 0x3x
+			{ 0x11, 0x13, 0x11, 0x50, 0x40, 0x00, 0x53, 0x10 }, // 0x4x and 0x6x
+			{ 0x52, 0x01, 0x11, 0x53, 0x10, 0x01, 0x41, 0x50 }, // 0x5x and 0x7x
+			{ 0x03, 0x01, 0x52, 0x02, 0x42, 0x10, 0x52, unkn }, // 0x8x and 0xax
+			{ 0x01, 0x01, 0x52, 0x40, 0x11, 0x01, unkn, unkn }, // 0x9x and 0xbx
+			{ 0x53, 0x43, 0x13, 0x51, unkn, 0x00, 0x51, 0x12 }, // 0xcx and 0xex
+			{ 0x13, 0x03, 0x10, 0x12, 0x52, 0x03, 0x51, unkn }  // 0xdx and 0xfx
 		}
+	};
 
-		m_decrypted_opcodes[i] = x;
+	for (int j = 0; j < 0x04; j++)
+	{
+		for (int i = 0; i < 0x100; i++)
+		{
+			uint8_t const row = bitswap<3>(i, 7, 6, 4);
+			uint8_t const xor_v = i & 0x07;
+			if ((i & 0x28) == 0)
+				LOGUNKOPCODES("table: %01x encop: %02x; decop: %02x\n", j, i, i ^ xor_table[j][row][xor_v]);
+		}
 	}
+
+	std::copy(&xor_table[0][0][0], &xor_table[0][0][0] + 0x04 * 0x08 * 0x08, &m_decode_table[0][0][0]);
 }
 
 } // anonymous namespace
 
 
 //    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT           ROT   COMPANY      FULLNAME                  FLAGS
-GAME( 1992, supercrd, 0,      supercrd, supercrd, supercrd_state, init_supercrd, ROT0, "Fun World", "Super Card (encrypted)", MACHINE_IS_SKELETON )
-GAME( 1992, fruitstr, 0,      supercrd, supercrd, supercrd_state, init_fruitstr, ROT0, "Fun World", "Fruit Star (encrypted)", MACHINE_IS_SKELETON )
+GAME( 1992, supercrd, 0,      supercrd, supercrd, supercrd_state, init_supercrd, ROT0, "Fun World", "Super Card (encrypted)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
+GAME( 1992, fruitstr, 0,      supercrd, supercrd, supercrd_state, init_fruitstr, ROT0, "Fun World", "Fruit Star (encrypted)", MACHINE_NOT_WORKING )

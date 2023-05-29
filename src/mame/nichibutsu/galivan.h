@@ -5,8 +5,8 @@
     Galivan - Cosmo Police
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_GALIVAN_H
-#define MAME_INCLUDES_GALIVAN_H
+#ifndef MAME_NICHIBUTSU_GALIVAN_H
+#define MAME_NICHIBUTSU_GALIVAN_H
 
 #pragma once
 
@@ -131,4 +131,4 @@ private:
 	void dangarj_io_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_GALIVAN_H
+#endif // MAME_NICHIBUTSU_GALIVAN_H

@@ -131,6 +131,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 static INPUT_PORTS_START( mu80 )
 	PORT_START("P7")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Enter")     PORT_CODE(KEYCODE_ENTER)
@@ -380,5 +382,8 @@ ROM_START( mu80 )
 	ROM_LOAD( "xq089b0-824.bin", 0x1600000, 0x200000, CRC(0adbf203) SHA1(ecc4c1cfb123d12bc3dad092c31bddc707bb4d07))
 	ROM_LOAD( "xq090b0-825.bin", 0x0e00000, 0x200000, CRC(34c422b3) SHA1(14073c41fbdf4faa9da9c83dafe4dc2d6b01b53b))
 ROM_END
+
+} // anonymous namespace
+
 
 CONS( 1994, mu80, 0, 0, mu80, mu80, mu80_state, empty_init, "Yamaha", "MU80", MACHINE_NOT_WORKING )

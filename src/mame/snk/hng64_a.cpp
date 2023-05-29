@@ -89,10 +89,8 @@ void hng64_state::hng64_soundram_w(offs_t offset, uint32_t data, uint32_t mem_ma
 		if (offset==0x7ffff)
 		{
 			logerror("dumping sound program in m_soundram\n");
-			FILE *fp;
-			char filename[256];
-			sprintf(filename,"soundram_%s", machine().system().name);
-			fp=fopen(filename, "w+b");
+			auto filename = "soundram_" + std::string(machine().system().name);
+			auto fp = fopen(filename.c_str(), "w+b");
 			if (fp)
 			{
 				fwrite((uint8_t*)m_soundram.get(), 0x80000*4, 1, fp);
@@ -281,11 +279,11 @@ void hng64_state::sound_comms_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			/* correct? */
 			m_audiocpu->set_input_line(5, CLEAR_LINE);
 			//if(data)
-			//  printf("IRQ ACK %02x?\n",data);
+			//  logerror("IRQ ACK %02x?\n",data);
 			return;
 	}
 
-	//printf("SOUND W %02x %04x\n",offset*2,data);
+	//logerror("SOUND W %02x %04x\n",offset*2,data);
 }
 
 uint16_t hng64_state::sound_comms_r(offs_t offset)
@@ -297,7 +295,7 @@ uint16_t hng64_state::sound_comms_r(offs_t offset)
 		case 0x06:
 			return main_latch[1];
 	}
-	//printf("SOUND R %02x\n",offset*2);
+	//logerror("SOUND R %02x\n",offset*2);
 
 	return 0;
 }
@@ -375,7 +373,7 @@ WRITE_LINE_MEMBER(hng64_state::tcu_tm2_cb)
 	if(i > 7)
 		i = 7;
 
-	//printf("trigger %02x %d\n",i,state);
+	//logerror("trigger %02x %d\n",i,state);
 
 	//if(machine().input().code_pressed_once(KEYCODE_C))
 	{
@@ -397,9 +395,9 @@ void hng64_state::hng64_audio(machine_config &config)
 	m_audiocpu->in_memr_cb().set(FUNC(hng64_state::dma_memr_cb));
 	m_audiocpu->out_iow_cb<3>().set(FUNC(hng64_state::dma_iow3_cb));
 
-	m_audiocpu->out_handler<0>().set(FUNC(hng64_state::tcu_tm0_cb));
-	m_audiocpu->out_handler<1>().set(FUNC(hng64_state::tcu_tm1_cb));
-	m_audiocpu->out_handler<2>().set(FUNC(hng64_state::tcu_tm2_cb));
+	m_audiocpu->tout_handler<0>().set(FUNC(hng64_state::tcu_tm0_cb));
+	m_audiocpu->tout_handler<1>().set(FUNC(hng64_state::tcu_tm1_cb));
+	m_audiocpu->tout_handler<2>().set(FUNC(hng64_state::tcu_tm2_cb));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

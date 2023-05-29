@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:hap, Charles MacDonald
+// copyright-holders:hap
+// thanks-to:Charles MacDonald
 /**********************************************************************
 
     Sega 315-5296 I/O chip
@@ -32,7 +33,7 @@ DEFINE_DEVICE_TYPE(SEGA_315_5296, sega_315_5296_device, "315_5296", "Sega 315-52
 //  sega_315_5296_device - constructor
 //-------------------------------------------------
 
-sega_315_5296_device::sega_315_5296_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sega_315_5296_device::sega_315_5296_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, SEGA_315_5296, tag, owner, clock),
 	m_in_port_cb(*this),
 	m_out_port_cb(*this),
@@ -81,7 +82,7 @@ void sega_315_5296_device::device_reset()
 
 //-------------------------------------------------
 
-uint8_t sega_315_5296_device::read(offs_t offset)
+u8 sega_315_5296_device::read(offs_t offset)
 {
 	offset &= 0x3f;
 
@@ -122,7 +123,7 @@ uint8_t sega_315_5296_device::read(offs_t offset)
 }
 
 
-void sega_315_5296_device::write(offs_t offset, uint8_t data)
+void sega_315_5296_device::write(offs_t offset, u8 data)
 {
 	offset &= 0x3f;
 

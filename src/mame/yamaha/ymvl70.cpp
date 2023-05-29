@@ -14,6 +14,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 static INPUT_PORTS_START( vl70 )
 	PORT_START("B0")
 	PORT_BIT(0x83, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -87,8 +89,8 @@ private:
 	u8 cur_ic32;
 
 	u16 adc_zero_r();
-	u16 adc_ar_r();
-	u16 adc_al_r();
+	[[maybe_unused]] u16 adc_ar_r();
+	[[maybe_unused]] u16 adc_al_r();
 	u16 adc_midisw_r();
 	u16 adc_battery_r();
 	u16 adc_breath_r();
@@ -264,5 +266,8 @@ ROM_START( vl70 )
 	ROM_REGION( 0x200000, "vl70cpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "vl70m_v111_27c160.bin", 0x000000, 0x200000, CRC(efdba9f0) SHA1(cfa9fb7d2a991e4752393c9677e4ddcbe10866c7) )
 ROM_END
+
+} // anonymous namespace
+
 
 CONS( 1996, vl70, 0, 0, vl70,  vl70, vl70_state, empty_init, "Yamaha", "VL70-m", MACHINE_NOT_WORKING )

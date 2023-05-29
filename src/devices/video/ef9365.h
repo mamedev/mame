@@ -4,7 +4,7 @@
 
     ef9365.h
 
-    Thomson EF9365/EF9366 video controller
+    Thomson EF9365/EF9366/EF9367 video controller
 
 *********************************************************************/
 
@@ -35,6 +35,7 @@ public:
 	static constexpr int DISPLAY_MODE_512x256    = 0x02;
 	static constexpr int DISPLAY_MODE_128x128    = 0x03;
 	static constexpr int DISPLAY_MODE_64x64      = 0x04;
+	static constexpr int DISPLAY_MODE_1024x512   = 0x05;
 
 	// construction/destruction
 	ef9365_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

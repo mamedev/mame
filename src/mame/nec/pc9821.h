@@ -6,8 +6,8 @@
  *
  ******************************************/
 
-#ifndef MAME_INCLUDES_PC9821_H
-#define MAME_INCLUDES_PC9821_H
+#ifndef MAME_NEC_PC9821_H
+#define MAME_NEC_PC9821_H
 
 #pragma once
 
@@ -194,4 +194,4 @@ public:
 };
 
 
-#endif // MAME_INCLUDES_PC9821_H
+#endif // MAME_NEC_PC9821_H

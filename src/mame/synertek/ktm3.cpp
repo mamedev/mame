@@ -22,6 +22,9 @@
 #include "machine/mos6551.h"
 #include "screen.h"
 
+
+namespace {
+
 class ktm3_state : public driver_device
 {
 public:
@@ -294,5 +297,8 @@ ROM_START(ktm3)
 	ROM_REGION(0x800, "chargen", 0)
 	ROM_LOAD("02-0061-a.bin", 0x000, 0x800, CRC(9739e2ac) SHA1(672059b7618afb6c19632663d58a854ea9ec2401))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1980, ktm3, 0, 0, ktm3, ktm3, ktm3_state, empty_init, "Synertek Systems", "KTM-3", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

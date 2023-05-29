@@ -42,10 +42,10 @@ The Grid         v1.2   10/18/2000
 
 #include "crusnexo.lh"
 
-#define LOG_FIREWIRE    (1 << 1)
-#define LOG_DISK        (1 << 2)
-#define LOG_DISK_JR     (1 << 3)
-#define LOG_UNKNOWN     (1 << 4)
+#define LOG_FIREWIRE    (1U << 1)
+#define LOG_DISK        (1U << 2)
+#define LOG_DISK_JR     (1U << 3)
+#define LOG_UNKNOWN     (1U << 4)
 
 #define VERBOSE (LOG_FIREWIRE)
 #include "logmacro.h"

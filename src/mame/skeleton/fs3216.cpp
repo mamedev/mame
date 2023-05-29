@@ -23,6 +23,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class fs3216_state : public driver_device
 {
 public:
@@ -560,5 +562,8 @@ ROM_START(fs3216)
 	ROM_REGION(0x400, "wd1001_prom", 0) // N82S181N (address decoding?)
 	ROM_LOAD("u26_ap2002r4f_b3ae6f8966230689d34c82b3c9d817ac.bin", 0x000, 0x400, CRC(fcd31bff) SHA1(ae34c6eb6659dc992896b388be1badfab0fd7971))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1982, fs3216, 0, 0, fs3216, fs3216, fs3216_state, empty_init, "Fortune Systems", "Fortune 32:16", MACHINE_IS_SKELETON)

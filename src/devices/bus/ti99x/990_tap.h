@@ -30,7 +30,7 @@ public:
 	auto int_cb() { return m_int_line.bind(); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 

@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_AUDIO_NICHISND_H
-#define MAME_AUDIO_NICHISND_H
+#ifndef MAME_NICHIBUTSU_NICHISND_H
+#define MAME_NICHIBUTSU_NICHISND_H
 
 #pragma once
 
@@ -63,4 +63,4 @@ DECLARE_DEVICE_TYPE(NICHISND, nichisnd_device)
 //**************************************************************************
 
 
-#endif // MAME_MACHINE_NICHISND_H
+#endif // MAME_NICHIBUTSU_NICHISND_H

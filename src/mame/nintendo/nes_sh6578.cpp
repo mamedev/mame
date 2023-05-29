@@ -22,13 +22,16 @@
 #include "machine/bankdev.h"
 #include "machine/timer.h"
 
-#define LOG_DMA       (1U << 2)
-#define LOG_PPU       (1U << 1)
+#define LOG_DMA       (1U << 1)
+#define LOG_PPU       (1U << 2)
 
 //#define VERBOSE             (LOG_PPU)
 #define VERBOSE             (0)
 
 #include "logmacro.h"
+
+
+namespace {
 
 class nes_sh6578_state : public driver_device
 {
@@ -704,6 +707,9 @@ ROM_START( dancmix3 )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "e28f008sa.u5", 0x00000, 0x100000, CRC(faf6480c) SHA1(68bf79910e091443aecc7bf256cd5378a04c550e) )
 ROM_END
+
+} // anonymous namespace
+
 
 CONS( 200?, maxx5in1,  0, 0,  nes_sh6578, nes_sh6578, nes_sh6578_state,  init_nes_sh6578, "Senario / JungleTac", "Vs Maxx 5-in-1 Casino / Senario Card & Casino Games", 0 ) // advertised on box as 'With Solitaire" (was there an even older version without it?)
 

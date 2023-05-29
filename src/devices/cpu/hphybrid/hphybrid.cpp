@@ -1318,7 +1318,7 @@ void hp_hybrid_cpu_device::check_for_interrupts()
 		return;
 	}
 
-	standard_irq_callback(irqline);
+	standard_irq_callback(irqline , add_mae(AEC_CASE_A , m_reg_P));
 
 	// Get interrupt vector in low byte (level is available on PA3)
 	uint8_t vector = !m_int_func.isnull() ? m_int_func(BIT(m_flags , HPHYBRID_IRH_BIT) ? 1 : 0) : 0xff;

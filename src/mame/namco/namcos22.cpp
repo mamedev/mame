@@ -24,6 +24,7 @@ TODO:
 - where is the steering wheel motor torque output for dirtdash? Answer: The data comes from the Serial Port on
   the MOTHER PCB at J2 Pin 7 /TXD
 - tokyowar garbage tile at right edge in attract mode. It's part of the cabinet link message, maybe BTANB?
+- ridgera2 title screen scrolls horizontally on some video footage, C139 related?
 - texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures
 - improve vertex lighting (is it phong shading?)
 - global offset is wrong in non-super22 testmode video test
@@ -52,7 +53,7 @@ TODO:
 - alpha blended sprite/poly with priority over alpha blended text doesn't work right
 - ss22 poly/sprite alpha is probably more limited than currently emulated, not supporting stacked layers
   + airco22 attract mode, see-through plane looks weird (they probably meant to just darken it)
-  + cybrcycc game over screen has a weird glitch
+  + cybrcycc game over screen has a weird glitch during fade (see the "E" of "GAME")
 
 BTANB:
 - ridgerac suspension bridge, cables appearing through the guardrail (worse on MAME, see poly position in TODO?),
@@ -5425,7 +5426,7 @@ ROM_START( alpines )
 	ROM_LOAD( "af1wavea.2l",  0x000000, 0x400000, CRC(28cca494) SHA1(4ff87ab85fd17bf8dbee5b03d99cc5c31dd6349a) )
 ROM_END
 
-ROM_START( alpinesa ) // only 4 different DWORDs at 0x700, watchpoint does not trigger there
+ROM_START( alpinesa ) // only 4 different DWORDs at 0x700, it's either a serial number, or a log from when Namco serviced the cabinet
 	ROM_REGION( 0x800000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_BYTE( "af2ver-a_ll.ic2", 0x000003, 0x200000, CRC(d8025e98) SHA1(e1c08557e70d632bf1e99356d6c6f76b5f407b8f) )
 	ROM_LOAD32_BYTE( "af2ver-a_lm.ic3", 0x000002, 0x200000, CRC(5f805d51) SHA1(b7fa9028deeaf1c549e9c2d6099925a0d0ad1598) )
@@ -6247,7 +6248,7 @@ GAME( 1993, ridgeraca,  ridgerac, namcos22,  ridgera,   namcos22_state,  init_ri
 GAME( 1993, ridgeracb,  ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgerac,  ROT0, "Namco", "Ridge Racer (US, RR3 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1994-01-17, reports as "-Foreign B-" RR3 means USA?
 GAME( 1993, ridgeracc,  ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgerac,  ROT0, "Namco", "Ridge Racer (US, RR3)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-28, purportedly 3 Screen version, reports as "-Foreign B-"
 GAME( 1993, ridgeracj,  ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgerac,  ROT0, "Namco", "Ridge Racer (Japan, RR1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-07
-GAME( 1993, ridgeracf,  ridgerac, namcos22,  ridgeracf, namcos22_state,  init_ridgerac,  ROT0, "Namco", "Ridge Racer Full Scale (World, RRF2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 1993-12-13, very different version, incomplete dump.
+GAME( 1993, ridgeracf,  0,        namcos22,  ridgeracf, namcos22_state,  init_ridgerac,  ROT0, "Namco", "Ridge Racer Full Scale (World, RRF2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 1993-12-13, very different version, incomplete dump.
 GAME( 1994, ridgera2,   0,        namcos22,  ridgera2,  namcos22_state,  init_ridgera2,  ROT0, "Namco", "Ridge Racer 2 (World, RRS2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-21 - NOT labeled "B" but based off Japan Rev.B
 GAME( 1994, ridgera2j,  ridgera2, namcos22,  ridgera2,  namcos22_state,  init_ridgera2,  ROT0, "Namco", "Ridge Racer 2 (Japan, RRS1 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-21
 GAME( 1994, ridgera2ja, ridgera2, namcos22,  ridgera2,  namcos22_state,  init_ridgera2,  ROT0, "Namco", "Ridge Racer 2 (Japan, RRS1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-13

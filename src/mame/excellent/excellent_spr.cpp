@@ -187,15 +187,6 @@ void excellent_spr_device::aquarium_draw_sprites(screen_device &screen, bitmap_i
 			}
 		}
 	}
-
-#if 0
-	if (rotate)
-	{
-		char buf[80];
-		sprintf(buf, "sprite rotate offs %04x ?", rotate);
-		popmessage(buf);
-	}
-#endif
 }
 
 void excellent_spr_device::gcpinbal_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs)
@@ -269,12 +260,4 @@ void excellent_spr_device::gcpinbal_draw_sprites(screen_device &screen, bitmap_i
 			}
 		}
 	}
-#if 0
-	if (rotate)
-	{
-		char buf[80];
-		sprintf(buf, "sprite rotate offs %04x ?", rotate);
-		popmessage(buf);
-	}
-#endif
 }

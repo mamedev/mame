@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_PROF180X_H
-#define MAME_INCLUDES_PROF180X_H
+#ifndef MAME_CONITEC_PROF180X_H
+#define MAME_CONITEC_PROF180X_H
 
 #pragma once
 
@@ -58,4 +58,4 @@ private:
 	void prof180x_mem(address_map &map);
 };
 
-#endif // MAME_INCLUDES_PROF180X_H
+#endif // MAME_CONITEC_PROF180X_H

@@ -35,11 +35,11 @@ public:
 protected:
 	h8_adc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	required_device<h8_device> cpu;
-	h8_intc_device *intc;
-	address_space *io;
-	const char *intc_tag;
-	int intc_vector;
+	required_device<h8_device> m_cpu;
+	h8_intc_device *m_intc;
+	address_space *m_io;
+	const char *m_intc_tag;
+	int m_intc_vector;
 
 	enum {
 		T_SOFT  = 1<<0,
@@ -65,14 +65,14 @@ protected:
 		COUNTED = 64
 	};
 
-	uint16_t addr[8], buf[2];
-	uint8_t adcsr, adcr;
-	int register_mask;
-	int trigger, start_mode, start_channel, end_channel, start_count;
-	bool suspend_on_interrupt, analog_power_control;
-	int mode, channel, count;
-	bool analog_powered, adtrg;
-	uint64_t next_event;
+	uint16_t m_addr[8], m_buf[2];
+	uint8_t m_adcsr, m_adcr;
+	int m_register_mask;
+	int m_trigger, m_start_mode, m_start_channel, m_end_channel, m_start_count;
+	bool m_suspend_on_interrupt, m_analog_power_control;
+	int m_mode, m_channel, m_count;
+	bool m_analog_powered, m_adtrg;
+	uint64_t m_next_event;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

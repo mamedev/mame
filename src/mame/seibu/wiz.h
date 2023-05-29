@@ -5,8 +5,8 @@
   Seibu Stinger/Wiz hardware
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_WIZ_H
-#define MAME_INCLUDES_WIZ_H
+#ifndef MAME_SEIBU_WIZ_H
+#define MAME_SEIBU_WIZ_H
 
 #pragma once
 
@@ -102,4 +102,4 @@ private:
 	void wiz_main_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_WIZ_H
+#endif // MAME_SEIBU_WIZ_H

@@ -75,6 +75,7 @@ To Do:
 #include "tilemap.h"
 
 
+namespace {
 
 /*************************************
  *
@@ -809,6 +810,8 @@ ROM_START( hvyunitu )
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "b73_09.2p",  0x000000, 0x080000, CRC(537c647f) SHA1(941c0f4e251bc68e53d62e70b033a3a6c145bb7e) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************************

@@ -27,8 +27,9 @@ public:
 	void set_start_delay(uint32_t data) { m_start_delay = data; }
 
 protected:
-	virtual TIMER_CALLBACK_MEMBER(internal_start_w) = 0;
+	virtual TIMER_CALLBACK_MEMBER(internal_start_w);
 	virtual TIMER_CALLBACK_MEMBER(internal_reset_w);
+	virtual TIMER_CALLBACK_MEMBER(internal_port_w);
 
 	enum
 	{
@@ -59,8 +60,8 @@ protected:
 	// chip modes
 	enum
 	{
-		MODE_STAND_ALONE,
-		MODE_SLAVE
+		MODE_SLAVE,
+		MODE_STAND_ALONE
 	};
 
 	upd775x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -77,8 +78,6 @@ protected:
 
 	void update_adpcm(int data);
 	virtual void advance_state();
-
-	TIMER_CALLBACK_MEMBER(sync_port_write);
 
 	// internal state
 	sound_stream  *m_channel;                   // stream channel for playback
@@ -138,9 +137,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual TIMER_CALLBACK_MEMBER(internal_start_w) override;
-	virtual TIMER_CALLBACK_MEMBER(internal_reset_w) override;
-
 	TIMER_CALLBACK_MEMBER(drq_update);
 
 	void internal_md_w(int state);
@@ -158,8 +154,6 @@ protected:
 	upd7756_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_reset() override;
-
-	virtual TIMER_CALLBACK_MEMBER(internal_start_w) override;
 };
 
 DECLARE_DEVICE_TYPE(UPD7759, upd7759_device)

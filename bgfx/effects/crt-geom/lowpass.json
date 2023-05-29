@@ -20,9 +20,10 @@
 	"vertex": "chains/crt-geom/vs_lowpass",
 	"fragment": "chains/crt-geom/fs_lowpass",
 	"uniforms": [
-		{ "name": "u_tex_size0",     "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
+		{ "name": "u_tex_size0",     "type": "vec4", "values": [   1.0, 1.0, 0.0, 0.0 ] },
 		{ "name": "u_lowpass_cutoff","type": "vec4", "values": [ 200.0, 0.0, 0.0, 0.0 ] },
 		{ "name": "u_lowpass_width", "type": "vec4", "values": [  80.0, 0.0, 0.0, 0.0 ] },
-		{ "name": "s_screen",        "type": "int",  "values": [ 0 ] }
+		{ "name": "s_screen",        "type": "int",  "values": [   0 ] },
+		{ "name": "u_inv_view_dims", "type": "vec4", "values": [   1.0, 1.0, 0.0, 0.0 ] }
 	]
 }

@@ -94,7 +94,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(pegasus_firq_clr);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(pegasus_firq);
-	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, const char *reg_tag);
+	std::pair<std::error_condition, std::string> load_cart(device_image_interface &image, generic_slot_device *slot, const char *reg_tag);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp00_load) { return load_cart(image, m_exp_00, "0000"); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp01_load) { return load_cart(image, m_exp_01, "1000"); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp02_load) { return load_cart(image, m_exp_02, "2000"); }
@@ -416,16 +416,13 @@ void pegasus_state::pegasus_decrypt_rom(u8 *ROM)
 	}
 }
 
-image_init_result pegasus_state::load_cart(device_image_interface &image, generic_slot_device *slot, const char *reg_tag)
+std::pair<std::error_condition, std::string> pegasus_state::load_cart(device_image_interface &image, generic_slot_device *slot, const char *reg_tag)
 {
 	u32 size = slot->common_get_size(reg_tag);
 	bool any_socket = false;
 
 	if (size > 0x1000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be no larger than 4K)");
 
 	if (image.loaded_through_softlist() && size == 0)
 	{
@@ -436,21 +433,21 @@ image_init_result pegasus_state::load_cart(device_image_interface &image, generi
 
 		if (size == 0)
 		{
-			std::string errmsg = string_format(
+			// FIXME: multi-line message may not be displayed properly
+			return std::make_pair(
+					image_error::INVALIDIMAGE,
 					"Attempted to load a file that does not work in this socket.\n"
 					"Please check \"Usage\" field in the software list for the correct socket(s) to use.");
-			image.seterror(image_error::INVALIDIMAGE, errmsg.c_str());
-			return image_init_result::FAIL;
 		}
 	}
 
-	slot->rom_alloc(0x1000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE); // we alloc 0x1000 also for smaller roms!
+	slot->rom_alloc(0x1000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE); // we alloc 0x1000 also for smaller ROMs!
 	slot->common_load_rom(slot->get_rom_base(), size, any_socket ? "rom" : reg_tag);
 
 	// raw images have to be decrypted (in particular the ones from softlist)
 	pegasus_decrypt_rom(slot->get_rom_base());
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void pegasus_state::machine_start()

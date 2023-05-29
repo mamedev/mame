@@ -3,7 +3,6 @@
 #include "emu.h"
 #include "nscsi_bus.h"
 
-#define LOG_GENERAL     (1U << 0)
 #define LOG_UNSUPPORTED (1U << 1)
 #define LOG_STATE       (1U << 2)
 #define LOG_CONTROL     (1U << 3)

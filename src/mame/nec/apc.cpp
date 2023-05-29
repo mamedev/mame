@@ -69,6 +69,9 @@
 #include "speaker.h"
 //#include "sound/ay8910.h"
 
+
+namespace {
+
 #define MAIN_CLOCK XTAL(5'000'000)
 
 class apc_state : public driver_device
@@ -998,5 +1001,8 @@ void apc_state::init_apc()
 {
 	// ...
 }
+
+} // anonymous namespace
+
 
 COMP( 1982, apc, 0, 0, apc, apc, apc_state, init_apc, "NEC", "APC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

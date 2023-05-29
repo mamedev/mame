@@ -33,6 +33,9 @@ ToDo:
 #include "machine/i8279.h"
 #include "sdk86.lh"
 
+
+namespace {
+
 class sdk86_state : public driver_device
 {
 public:
@@ -248,6 +251,9 @@ ROM_START( sdk86 )
 	ROM_LOAD( "0037_101994-001.a26", 0x0800, 0x0400, CRC(d6f33d30) SHA1(41e794bf202266fa57516403e6a80ebbf6c95fdc)) /* Label: "iD3625A 0037 // 8142 // 101994-001" */
 	ROM_LOAD( "0038_101995-001.a29", 0x0C00, 0x0400, CRC(3d2c18bc) SHA1(5e1935cd07fef26b2cf3d8fa7612fe0d8e678c06)) /* Label: "iD3625A 0038 // 8142 // 101995-001" */
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

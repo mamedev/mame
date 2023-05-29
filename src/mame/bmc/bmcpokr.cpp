@@ -28,6 +28,9 @@ Other:  BMC B816140 (CPLD)
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
+
 class bmcpokr_state : public driver_device
 {
 public:
@@ -946,6 +949,9 @@ ROM_START( mjmaglmp )
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "ja-a-901.u6", 0x00000, 0x40000, CRC(25f36d00) SHA1(c182348340ca67ad69d1a67c58b47d6371a725c9) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1999, bmcpokr,  0, bmcpokr,  bmcpokr,  bmcpokr_state, empty_init, ROT0, "BMC", "Dongfang Shenlong",             MACHINE_SUPPORTS_SAVE )
 GAME( 2000, mjmaglmp, 0, mjmaglmp, mjmaglmp, bmcpokr_state, empty_init, ROT0, "BMC", "Mahjong Magic Lamp (v. JAA02)", MACHINE_SUPPORTS_SAVE )

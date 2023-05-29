@@ -45,13 +45,12 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-//#define LOG_GENERAL (1U <<  0)
-#define LOG_SETUP   (1U <<  1)
-#define LOG_SCAN    (1U <<  2)
-#define LOG_BANK    (1U <<  3)
-#define LOG_SCREEN  (1U <<  4)
-#define LOG_READ    (1U <<  5)
-#define LOG_CS      (1U <<  6)
+#define LOG_SETUP   (1U << 1)
+#define LOG_SCAN    (1U << 2)
+#define LOG_BANK    (1U << 3)
+#define LOG_SCREEN  (1U << 4)
+#define LOG_READ    (1U << 5)
+#define LOG_CS      (1U << 6)
 
 //#define VERBOSE (LOG_READ | LOG_GENERAL | LOG_SETUP | LOG_BANK)
 //#define LOG_OUTPUT_FUNC printf
@@ -127,6 +126,9 @@
  *
  *   Both rev1 and rev2 has a matrix keyboard PCB with a 74LS145 connected to J402 (PIA2)
  */
+
+
+ namespace {
 
 /* Esselte 100 driver class */
 class e100_state : public driver_device
@@ -609,6 +611,9 @@ ROM_START( e100 )
 	ROM_REGION(0x0800, "chargen",0)
 	ROM_LOAD( "e100u506.bin", 0x0000, 0x0800, CRC(fff9f288) SHA1(2dfb3eb551fe1ef67da328f61ef51ae8d1abdfb8) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY      FULLNAME       FLAGS
 COMP( 1982, e100, 0,      0,      e100,    e100,  e100_state, empty_init, "Didact AB", "Esselte 100", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)

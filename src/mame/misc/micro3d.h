@@ -5,8 +5,8 @@
      Microprose Games 3D hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_MICRO3D_H
-#define MAME_INCLUDES_MICRO3D_H
+#ifndef MAME_MISC_MICRO3D_H
+#define MAME_MISC_MICRO3D_H
 
 #pragma once
 
@@ -177,8 +177,6 @@ private:
 	INTERRUPT_GEN_MEMBER(micro3d_vblank);
 	TIMER_CALLBACK_MEMBER(mac_done_callback);
 	void micro3d_upd7759_w(uint8_t data);
-	void data_from_i8031(uint8_t data);
-	uint8_t data_to_i8031();
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	uint8_t duart_input_r();
 	void duart_output_w(uint8_t data);
@@ -206,4 +204,4 @@ private:
 	required_device<scn2651_device> m_vgb_uart;
 };
 
-#endif // MAME_INCLUDES_MICRO3D_H
+#endif // MAME_MISC_MICRO3D_H

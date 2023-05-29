@@ -79,8 +79,8 @@
 
 #include "enmirage.lh"
 
-#define LOG_ADC_READ        (1U <<  1)
-#define LOG_FILTER_WRITE    (1U <<  2)
+#define LOG_ADC_READ        (1U << 1)
+#define LOG_FILTER_WRITE    (1U << 2)
 #define VERBOSE (0)
 //#define VERBOSE (LOG_ADC_READ)
 //#define VERBOSE (LOG_ADC_READ|LOG_FILTER_WRITE)
@@ -89,6 +89,9 @@
 
 #define LOGADCREAD(...)     LOGMASKED(LOG_ADC_READ, __VA_ARGS__)
 #define LOGFILTERWRITE(...) LOGMASKED(LOG_FILTER_WRITE, __VA_ARGS__)
+
+
+namespace {
 
 #define PITCH_TAG "pitch"
 #define MOD_TAG "mod"
@@ -434,5 +437,8 @@ void enmirage_state::init_mirage()
 		m_fdc->set_floppy(floppy);
 	}
 }
+
+} // anonymous namespace
+
 
 CONS(1984, enmirage, 0, 0, mirage, mirage, enmirage_state, init_mirage, "Ensoniq", "Mirage DMS-8", MACHINE_NOT_WORKING)

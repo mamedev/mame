@@ -2,6 +2,13 @@
 
 #include "StdAfx.h"
 
+#ifndef _WIN32
+#include <limits.h>
+#include <unistd.h>
+#include "../Common/StringConvert.h"
+#include "FileDir.h"
+#endif
+
 #include "FileName.h"
 
 #ifndef _UNICODE
@@ -58,7 +65,32 @@ void NormalizeDirPathPrefix(UString &dirPath)
     dirPath.Add_PathSepar();
 }
 
-#define IS_LETTER_CHAR(c) ((c) >= 'a' && (c) <= 'z' || (c) >= 'A' && (c) <= 'Z')
+#ifdef _WIN32
+
+#ifndef USE_UNICODE_FSTRING
+#ifdef WIN_LONG_PATH
+static void NormalizeDirSeparators(UString &s)
+{
+  const unsigned len = s.Len();
+  for (unsigned i = 0; i < len; i++)
+    if (s[i] == '/')
+      s.ReplaceOneCharAtPos(i, WCHAR_PATH_SEPARATOR);
+}
+#endif
+#endif
+
+void NormalizeDirSeparators(FString &s)
+{
+  const unsigned len = s.Len();
+  for (unsigned i = 0; i < len; i++)
+    if (s[i] == '/')
+      s.ReplaceOneCharAtPos(i, FCHAR_PATH_SEPARATOR);
+}
+
+#endif
+
+
+#define IS_LETTER_CHAR(c) (((c) >= 'a' && (c) <= 'z') || ((c) >= 'A' && (c) <= 'Z'))
 
 bool IsDrivePath(const wchar_t *s) throw() { return IS_LETTER_CHAR(s[0]) && s[1] == ':' && IS_SEPAR(s[2]); }
 
@@ -87,8 +119,10 @@ bool IsAltPathPrefix(CFSTR s) throw()
 
 #if defined(_WIN32) && !defined(UNDER_CE)
 
-const wchar_t *kSuperPathPrefix = L"\\\\?\\";
-static const wchar_t *kSuperUncPrefix = L"\\\\?\\UNC\\";
+const char * const kSuperPathPrefix = "\\\\?\\";
+#ifdef WIN_LONG_PATH
+static const char * const kSuperUncPrefix = "\\\\?\\UNC\\";
+#endif
 
 #define IS_DEVICE_PATH(s)          (IS_SEPAR((s)[0]) && IS_SEPAR((s)[1]) && (s)[2] == '.' && IS_SEPAR((s)[3]))
 #define IS_SUPER_PREFIX(s)         (IS_SEPAR((s)[0]) && IS_SEPAR((s)[1]) && (s)[2] == '?' && IS_SEPAR((s)[3]))
@@ -109,7 +143,7 @@ bool IsDevicePath(CFSTR s) throw()
   /*
   // actually we don't know the way to open device file in WinCE.
   unsigned len = MyStringLen(s);
-  if (len < 5 || len > 5 || memcmp(s, FTEXT("DSK"), 3 * sizeof(FChar)) != 0)
+  if (len < 5 || len > 5 || !IsString1PrefixedByString2(s, "DSK"))
     return false;
   if (s[4] != ':')
     return false;
@@ -123,7 +157,7 @@ bool IsDevicePath(CFSTR s) throw()
   unsigned len = MyStringLen(s);
   if (len == 6 && s[5] == ':')
     return true;
-  if (len < 18 || len > 22 || memcmp(s + kDevicePathPrefixSize, FTEXT("PhysicalDrive"), 13 * sizeof(FChar)) != 0)
+  if (len < 18 || len > 22 || !IsString1PrefixedByString2(s + kDevicePathPrefixSize, "PhysicalDrive"))
     return false;
   for (unsigned i = 17; i < len; i++)
     if (s[i] < '0' || s[i] > '9')
@@ -160,7 +194,7 @@ unsigned GetNetworkServerPrefixSize(CFSTR s) throw()
   int pos = FindSepar(s + prefixSize);
   if (pos < 0)
     return 0;
-  return prefixSize + pos + 1;
+  return prefixSize + (unsigned)(pos + 1);
 }
 
 bool IsNetworkShareRootPath(CFSTR s) throw()
@@ -191,14 +225,12 @@ bool IsSuperPath(CFSTR s) throw() { return IS_SUPER_PREFIX(s); }
 bool IsSuperOrDevicePath(CFSTR s) throw() { return IS_SUPER_OR_DEVICE_PATH(s); }
 #endif // USE_UNICODE_FSTRING
 
-/*
-bool IsDrivePath_SuperAllowed(CFSTR s)
+bool IsDrivePath_SuperAllowed(CFSTR s) throw()
 {
   if (IsSuperPath(s))
     s += kSuperPathPrefixSize;
   return IsDrivePath(s);
 }
-*/
 
 bool IsDriveRootPath_SuperAllowed(CFSTR s) throw()
 {
@@ -212,7 +244,7 @@ bool IsAbsolutePath(const wchar_t *s) throw()
   return IS_SEPAR(s[0]) || IsDrivePath2(s);
 }
 
-int FindAltStreamColon(CFSTR path)
+int FindAltStreamColon(CFSTR path) throw()
 {
   unsigned i = 0;
   if (IsDrivePath2(path))
@@ -226,7 +258,7 @@ int FindAltStreamColon(CFSTR path)
     if (c == ':')
     {
       if (colonPos < 0)
-        colonPos = i;
+        colonPos = (int)i;
       continue;
     }
     if (IS_SEPAR(c))
@@ -274,7 +306,7 @@ static unsigned GetRootPrefixSize_Of_SuperPath(CFSTR s)
   return kSuperPathPrefixSize + pos + 1;
 }
 
-unsigned GetRootPrefixSize(CFSTR s)
+unsigned GetRootPrefixSize(CFSTR s) throw()
 {
   if (IS_DEVICE_PATH(s))
     return kDevicePathPrefixSize;
@@ -285,7 +317,7 @@ unsigned GetRootPrefixSize(CFSTR s)
 
 #endif // USE_UNICODE_FSTRING
 
-static unsigned GetRootPrefixSize_Of_NetworkPath(const wchar_t *s)
+static unsigned GetRootPrefixSize_Of_NetworkPath(const wchar_t *s) throw()
 {
   // Network path: we look "server\path\" as root prefix
   int pos = FindSepar(s);
@@ -294,10 +326,10 @@ static unsigned GetRootPrefixSize_Of_NetworkPath(const wchar_t *s)
   int pos2 = FindSepar(s + (unsigned)pos + 1);
   if (pos2 < 0)
     return 0;
-  return pos + pos2 + 2;
+  return (unsigned)(pos + pos2 + 2);
 }
 
-static unsigned GetRootPrefixSize_Of_SimplePath(const wchar_t *s)
+static unsigned GetRootPrefixSize_Of_SimplePath(const wchar_t *s) throw()
 {
   if (IsDrivePath(s))
     return kDrivePrefixSize;
@@ -309,7 +341,7 @@ static unsigned GetRootPrefixSize_Of_SimplePath(const wchar_t *s)
   return (size == 0) ? 0 : 2 + size;
 }
 
-static unsigned GetRootPrefixSize_Of_SuperPath(const wchar_t *s)
+static unsigned GetRootPrefixSize_Of_SuperPath(const wchar_t *s) throw()
 {
   if (IS_UNC_WITH_SLASH(s + kSuperPathPrefixSize))
   {
@@ -320,7 +352,7 @@ static unsigned GetRootPrefixSize_Of_SuperPath(const wchar_t *s)
   int pos = FindSepar(s + kSuperPathPrefixSize);
   if (pos < 0)
     return 0;
-  return kSuperPathPrefixSize + pos + 1;
+  return kSuperPathPrefixSize + (unsigned)(pos + 1);
 }
 
 unsigned GetRootPrefixSize(const wchar_t *s) throw()
@@ -334,12 +366,13 @@ unsigned GetRootPrefixSize(const wchar_t *s) throw()
 
 #else // _WIN32
 
-bool IsAbsolutePath(const wchar_t *s) { return IS_SEPAR(s[0]); }
+bool IsAbsolutePath(const wchar_t *s) throw() { return IS_SEPAR(s[0]); }
 
 #ifndef USE_UNICODE_FSTRING
-unsigned GetRootPrefixSize(CFSTR s) { return IS_SEPAR(s[0]) ? 1 : 0; }
+unsigned GetRootPrefixSize(CFSTR s) throw();
+unsigned GetRootPrefixSize(CFSTR s) throw() { return IS_SEPAR(s[0]) ? 1 : 0; }
 #endif
-unsigned GetRootPrefixSize(const wchar_t *s) { return IS_SEPAR(s[0]) ? 1 : 0; }
+unsigned GetRootPrefixSize(const wchar_t *s) throw() { return IS_SEPAR(s[0]) ? 1 : 0; }
 
 #endif // _WIN32
 
@@ -349,6 +382,9 @@ unsigned GetRootPrefixSize(const wchar_t *s) { return IS_SEPAR(s[0]) ? 1 : 0; }
 static bool GetCurDir(UString &path)
 {
   path.Empty();
+
+  #ifdef _WIN32
+
   DWORD needLength;
   #ifndef _UNICODE
   if (!g_IsNT)
@@ -367,6 +403,16 @@ static bool GetCurDir(UString &path)
     path = s;
   }
   return (needLength > 0 && needLength <= MAX_PATH);
+
+  #else
+
+  FString s;
+  if (!NDir::GetCurrentDir(s))
+    return false;
+  path = GetUnicodeString(s);
+  return true;
+
+  #endif
 }
 
 static bool ResolveDotsFolders(UString &s)
@@ -390,7 +436,7 @@ static bool ResolveDotsFolders(UString &s)
         {
           if (i == 0)
             return false;
-          int k = i - 2;
+          int k = (int)i - 2;
           i += 2;
           
           for (;; k--)
@@ -409,8 +455,8 @@ static bool ResolveDotsFolders(UString &s)
           
           if (k >= 0)
           {
-            num = i - k;
-            i = k;
+            num = i - (unsigned)k;
+            i = (unsigned)k;
           }
           else
           {
@@ -530,6 +576,7 @@ int GetUseSuperPathType(CFSTR s) throw()
 }
 
 
+
 /*
    returns false in two cases:
      - if GetCurDir was used, and GetCurDir returned error.
@@ -539,7 +586,6 @@ int GetUseSuperPathType(CFSTR s) throw()
    for \**** , and if GetCurDir is not drive (c:\), res is empty
    for absolute paths, returns true, res is Super path.
 */
-
 
 static bool GetSuperPathBase(CFSTR s, UString &res)
 {
@@ -628,7 +674,7 @@ static bool GetSuperPathBase(CFSTR s, UString &res)
 
   unsigned fixedSizeStart = 0;
   unsigned fixedSize = 0;
-  const wchar_t *superMarker = NULL;
+  const char *superMarker = NULL;
   if (IsSuperPath(curDir))
   {
     fixedSize = GetRootPrefixSize_Of_SuperPath(curDir);
@@ -683,7 +729,7 @@ static bool GetSuperPathBase(CFSTR s, UString &res)
      true            false             *          use Super path
      true            true             true        don't use any path, we already used mainPath
      true            true             false       use main path as Super Path, we don't try mainMath
-                                                  That case is possible now if GetCurDir returns unknow
+                                                  That case is possible now if GetCurDir returns unknown
                                                   type of path (not drive and not network)
 
   We can change that code if we want to try mainPath, if GetSuperPathBase returns error,
@@ -704,6 +750,8 @@ bool GetSuperPath(CFSTR path, UString &superPath, bool onlyIfNew)
         return false;
       superPath = fs2us(path);
     }
+    
+    NormalizeDirSeparators(superPath);
     return true;
   }
   return false;
@@ -714,6 +762,10 @@ bool GetSuperPaths(CFSTR s1, CFSTR s2, UString &d1, UString &d2, bool onlyIfNew)
   if (!GetSuperPathBase(s1, d1) ||
       !GetSuperPathBase(s2, d2))
     return false;
+ 
+  NormalizeDirSeparators(d1);
+  NormalizeDirSeparators(d2);
+
   if (d1.IsEmpty() && d2.IsEmpty() && onlyIfNew)
     return false;
   if (d1.IsEmpty()) d1 = fs2us(s1);

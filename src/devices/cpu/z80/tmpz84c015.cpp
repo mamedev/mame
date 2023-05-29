@@ -17,7 +17,7 @@
 
 DEFINE_DEVICE_TYPE(TMPZ84C015, tmpz84c015_device, "tmpz84c015", "Toshiba TMPZ84C015")
 
-void tmpz84c015_device::internal_io_map(address_map &map)
+void tmpz84c015_device::internal_io_map(address_map &map) const
 {
 	map(0x10, 0x13).mirror(0xff00).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x18, 0x1b).mirror(0xff00).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
@@ -27,10 +27,14 @@ void tmpz84c015_device::internal_io_map(address_map &map)
 	map(0xf4, 0xf4).mirror(0xff00).w(FUNC(tmpz84c015_device::irq_priority_w));
 }
 
-
 tmpz84c015_device::tmpz84c015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	z80_device(mconfig, TMPZ84C015, tag, owner, clock),
-	m_io_space_config( "io", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(tmpz84c015_device::internal_io_map), this)),
+	tmpz84c015_device(mconfig, TMPZ84C015, tag, owner, clock, address_map_constructor(FUNC(tmpz84c015_device::internal_io_map), this))
+{
+}
+
+tmpz84c015_device::tmpz84c015_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor io_map) :
+	z80_device(mconfig, type, tag, owner, clock),
+	m_io_space_config( "io", ENDIANNESS_LITTLE, 8, 16, 0, io_map),
 	m_ctc(*this, "tmpz84c015_ctc"),
 	m_sio(*this, "tmpz84c015_sio"),
 	m_pio(*this, "tmpz84c015_pio"),

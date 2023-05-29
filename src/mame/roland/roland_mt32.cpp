@@ -168,6 +168,9 @@ Notes: (All IC's listed for completeness)
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 static INPUT_PORTS_START( mt32 )
 	PORT_START("SC0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("1") PORT_CODE(KEYCODE_1)
@@ -445,6 +448,9 @@ ROM_START( cm32l )
 	ROM_REGION( 0x8000, "boss", 0 )
 	ROM_LOAD(        "r15179917.ic19.bin",           0,   0x8000, CRC(236c87a6) SHA1(e1c03905c46e962d1deb15eeed92eb61b42bba4a) ) // shared with RA-50 and others
 ROM_END
+
+} // anonymous namespace
+
 
 CONS( 1987, mt32,  0, 0, mt32, mt32, mt32_state, empty_init, "Roland", "MT-32",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 CONS( 1989, cm32l, 0, 0, mt32, mt32, mt32_state, empty_init, "Roland", "CM-32L", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

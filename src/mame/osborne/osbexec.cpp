@@ -27,6 +27,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 #define MAIN_CLOCK  XTAL(23'961'600)
 
 #define MODEM_PORT_TAG "modem"
@@ -616,6 +618,9 @@ ROM_START( osbexec )
 	ROM_REGION(0x2000, "maincpu", 0)
 	ROM_LOAD( "execv12.ud18", 0x0000, 0x2000, CRC(70798c2f) SHA1(2145a72da563bed1d6d455c77e48cc011a5f1153) )    /* Checksum C6B2 */
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY    FULLNAME     FLAGS
 COMP( 1982, osbexec, 0,      0,      osbexec, osbexec, osbexec_state, init_osbexec, "Osborne", "Executive", MACHINE_NOT_WORKING )

@@ -53,15 +53,14 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-//#define LOG_GENERAL (1U <<  0)
-#define LOG_SETUP   (1U <<  1)
-#define LOG_SCAN    (1U <<  2)
-#define LOG_BANK    (1U <<  3)
-#define LOG_SCREEN  (1U <<  4)
-#define LOG_READ    (1U <<  5)
-#define LOG_CS      (1U <<  6)
-#define LOG_PLA     (1U <<  7)
-#define LOG_PROM    (1U <<  8)
+#define LOG_SETUP   (1U << 1)
+#define LOG_SCAN    (1U << 2)
+#define LOG_BANK    (1U << 3)
+#define LOG_SCREEN  (1U << 4)
+#define LOG_READ    (1U << 5)
+#define LOG_CS      (1U << 6)
+#define LOG_PLA     (1U << 7)
+#define LOG_PROM    (1U << 8)
 
 //#define VERBOSE (LOG_READ | LOG_GENERAL | LOG_SETUP | LOG_PLA | LOG_BANK)
 //#define LOG_OUTPUT_FUNC printf
@@ -81,6 +80,9 @@
 #else
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
+
+
+namespace {
 
 #define PIA1_TAG "pia1"
 #define PIA2_TAG "pia2"
@@ -813,6 +815,9 @@ ROM_START( can09 ) /* The bigger black computer CAN v1 */
 	ROM_REGION(0x10000, "roms", 0)
 	ROM_LOAD( "ic14-vdu42.bin", 0x0000, 0x2000, CRC(67fc3c8c) SHA1(1474d6259646798377ef4ce7e43d3c8d73858344) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY            FULLNAME            FLAGS
 COMP( 1984, can09,  0,      0,      can09,   can09,  can09_state,  empty_init, "Candela Data AB", "Candela CAN09 v1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_GRAPHICS)

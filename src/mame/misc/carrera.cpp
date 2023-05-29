@@ -53,6 +53,9 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define MASTER_CLOCK    XTAL(22'118'400)
 
 
@@ -375,6 +378,9 @@ ROM_START( bsebman )
 	ROM_REGION( 0x20, "proms", 0 )
 	ROM_LOAD( "am27s19.ic39", 0x00, 0x20, CRC(af16359f) SHA1(1ff5c9d7807e52be09c0ded56fb68a47e41b3fcf) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 19??, carrera, 0,       carrera, carrera, carrera_state, empty_init, ROT0, "BS Electronics", "Carrera (Version 6.7)",   MACHINE_SUPPORTS_SAVE )
 GAME( 19??, bsebman, carrera, carrera, carrera, carrera_state, empty_init, ROT0, "BS Electronics", "Bomberman (Version 6.6)", MACHINE_SUPPORTS_SAVE )

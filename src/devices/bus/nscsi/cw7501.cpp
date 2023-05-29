@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "bus/nscsi/cw7501.h"
-#include "machine/ncr5390.h"
+#include "machine/ncr53c90.h"
 
 DEFINE_DEVICE_TYPE(CW7501, cw7501_device, "cw7501", "Panasonic CW-7501 CD-R")
 DEFINE_DEVICE_TYPE(CDR4210, cdr4210_device, "cdr4210", "Creative Technology Blaster CD-R 4210")

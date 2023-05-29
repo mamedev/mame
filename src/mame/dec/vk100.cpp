@@ -140,6 +140,8 @@ state machine and sees if the GO bit ever finishes and goes back to 0
 #include "vk100.lh"
 
 
+namespace {
+
 // named timer IDs
 #define TID_I8251_RX 1
 #define TID_I8251_TX 2
@@ -184,7 +186,8 @@ public:
 		m_hardcopy_led(*this, "hardcopy_led"),
 		m_l1_led(*this, "l1_led"),
 		m_l2_led(*this, "l2_led"),
-		m_vg_timer(nullptr)
+		m_vg_timer(nullptr),
+		m_col_array(*this, "COL%X", 0U)
 		//m_i8251_rx_timer(nullptr),
 		//m_i8251_tx_timer(nullptr),
 		//m_i8251_sync_timer(nullptr)
@@ -217,7 +220,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
 	DECLARE_WRITE_LINE_MEMBER(i8251_rxrdy_int);
 	DECLARE_WRITE_LINE_MEMBER(i8251_txrdy_int);
-	DECLARE_WRITE_LINE_MEMBER(i8251_rts);
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(i8251_rts);
 	uint8_t vram_read();
 	uint8_t vram_attr_read();
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -271,7 +274,7 @@ private:
 	uint8_t m_vgGO; // activated on next SYNC pulse after EXEC
 	uint8_t m_ACTS;
 	uint8_t m_ADSR;
-	ioport_port* m_col_array[16];
+	required_ioport_array<16> m_col_array;
 };
 
 // vram access functions:
@@ -959,13 +962,6 @@ void vk100_state::machine_start()
 	m_vgGO = 0;
 	m_ACTS = 1;
 	m_ADSR = 1;
-	char kbdcol[8];
-	// look up all 16 tags 'the slow way' but only once on reset
-	for (int i = 0; i < 16; i++)
-	{
-		sprintf(kbdcol,"COL%X", i);
-		m_col_array[i] = ioport(kbdcol);
-	}
 
 	m_vg_timer = timer_alloc(FUNC(vk100_state::execute_vg), this);
 	// TODO: figure out the best way to bring up the i8251 timers
@@ -1269,6 +1265,9 @@ ROM_START( vk100 )
 	 */
 	ROM_LOAD( "wb8014_297a1.74s288.pr6.ic89", 0x0000, 0x0020, CRC(e2f7c566) SHA1(a4c3dc5d07667141ad799168a862cb3c489b4934)) // label verified from nigwil's and andy's board
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

@@ -414,8 +414,6 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	TIMER_CALLBACK_MEMBER(clear_bus_error);
-
 private:
 	uint16_t mem_r(offs_t offset, uint16_t mem_mask);
 	void mem_w(offs_t offset, uint16_t data, uint16_t mem_mask);
@@ -423,8 +421,6 @@ private:
 	void mmu_w(offs_t offset, uint16_t data);
 	uint16_t ram_r(offs_t offset, uint16_t mem_mask);
 	void ram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-	uint16_t trap_r(offs_t offset, uint16_t mem_mask);
-	void trap_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	void spkr_w(offs_t offset, uint16_t data);
 
 	uint8_t floppy_id_r();
@@ -438,8 +434,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(irq_5);
 	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(irq_6);
 	DECLARE_WRITE_LINE_MEMBER(irq_7);
-
-	emu_timer *m_bus_error_timer = nullptr;
 
 	void hp_ipc_mem_inner_base(address_map &map);
 	void hp_ipc_mem_inner_9807a(address_map &map);
@@ -473,32 +467,7 @@ private:
 	{
 		return (m_mmu[(m_maincpu->get_fc() >> 1) & 3] + offset) & 0x3FFFFF;
 	}
-
-	void set_bus_error(uint32_t address, bool write, uint16_t mem_mask);
-	bool m_bus_error = false;
 };
-
-
-TIMER_CALLBACK_MEMBER(hp_ipc_state::clear_bus_error)
-{
-	m_bus_error = false;
-}
-
-void hp_ipc_state::set_bus_error(uint32_t address, bool rw, uint16_t mem_mask)
-{
-	if (m_bus_error)
-	{
-		return;
-	}
-	if (!ACCESSING_BITS_8_15)
-	{
-		address++;
-	}
-	m_bus_error = true;
-	m_maincpu->set_buserror_details(address, rw, m_maincpu->get_fc());
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-	m_bus_error_timer->adjust(m_maincpu->cycles_to_attotime(16)); // let rmw cycles complete
-}
 
 void hp_ipc_state::hp_ipc_mem_outer(address_map &map)
 {
@@ -508,7 +477,7 @@ void hp_ipc_state::hp_ipc_mem_outer(address_map &map)
 void hp_ipc_state::hp_ipc_mem_inner_base(address_map &map)
 {
 // bus error handler
-	map(0x0000000, 0x1FFFFFF).rw(FUNC(hp_ipc_state::trap_r), FUNC(hp_ipc_state::trap_w));
+	map(0x0000000, 0x1FFFFFF).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
 
 // user mode
 	map(0x1000000, 0x17FFFFF).rw(FUNC(hp_ipc_state::ram_r), FUNC(hp_ipc_state::ram_w));
@@ -588,18 +557,6 @@ void hp_ipc_state::mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	m_bankdev->write16(offset, data, mem_mask);
 }
 
-uint16_t hp_ipc_state::trap_r(offs_t offset, uint16_t mem_mask)
-{
-	if (!machine().side_effects_disabled()) set_bus_error((offset << 1) & 0xFFFFFF, true, mem_mask);
-
-	return 0xffff;
-}
-
-void hp_ipc_state::trap_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	if (!machine().side_effects_disabled()) set_bus_error((offset << 1) & 0xFFFFFF, false, mem_mask);
-}
-
 void hp_ipc_state::spkr_w(offs_t offset, uint16_t data)
 {
 	m_spkr->cs_w(!BIT(data , 0));
@@ -614,7 +571,8 @@ uint16_t hp_ipc_state::ram_r(offs_t offset, uint16_t mem_mask)
 
 	if (ram_address < m_lowest_ram_addr)
 	{
-		if (!machine().side_effects_disabled()) set_bus_error((offset << 1) + 0x800000, 0, mem_mask);
+		if (!machine().side_effects_disabled())
+			m_maincpu->trigger_bus_error();
 	}
 	else if (ram_address < 0x3c0000)
 	{
@@ -631,7 +589,7 @@ void hp_ipc_state::ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 	if (ram_address < m_lowest_ram_addr)
 	{
-		if (!machine().side_effects_disabled()) set_bus_error((offset << 1) + 0x800000, 1, mem_mask);
+		m_maincpu->trigger_bus_error();
 	}
 	else if (ram_address < 0x3c0000)
 	{
@@ -736,9 +694,6 @@ WRITE_LINE_MEMBER(hp_ipc_state::irq_7)
 
 void hp_ipc_state::machine_start()
 {
-	m_bus_error_timer = timer_alloc(FUNC(hp_ipc_state::clear_bus_error), this);
-	m_bus_error = false;
-
 	m_bankdev->set_bank(1);
 
 	m_lowest_ram_addr = 0x3c0000 - (m_ram->size() >> 1);

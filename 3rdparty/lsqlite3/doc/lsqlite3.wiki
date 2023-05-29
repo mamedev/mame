@@ -18,6 +18,7 @@
         <li><a href="#sqlite3_lversion">sqlite3.lversion</a></li>
 		<li><a href="#sqlite3_open">sqlite3.open</a></li>
         <li><a href="#sqlite3_open_memory">sqlite3.open_memory</a></li>
+        <li><a href="#sqlite3_open_ptr">sqlite3.open_ptr</a></li>
         <li><a href="#sqlite3_backup_init">sqlite3.backup_init</a></li>
 		<li><a href="#sqlite3_temp_directory">sqlite3.temp_directory</a></li>
 		<li><a href="#sqlite3_version">sqlite3.version</a></li>
@@ -31,6 +32,7 @@
 		<li><a href="#db_changes">db:changes</a></li>
 		<li><a href="#db_close">db:close</a></li>
 		<li><a href="#db_close_vm">db:close_vm</a></li>
+        <li><a href="#db_get_ptr">db:get_ptr</a></li>
         <li><a href="#db_commit_hook">db:commit_hook</a></li>
 		<li><a href="#db_create_aggregate">db:create_aggregate</a></li>
 		<li><a href="#db_create_collation">db:create_collation</a></li>
@@ -38,7 +40,8 @@
 		<li><a href="#db_errcode">db:errcode</a></li>
 		<li><a href="#db_errmsg">db:errmsg</a></li>
 		<li><a href="#db_exec">db:exec</a></li>
-		<li><a href="#db_interrupt">db:interrupt</a></li>
+        <li><a href="#db_interrupt">db:interrupt</a></li>
+        <li><a href="#db_db_filename">db:db_filename</a></li>
 		<li><a href="#db_isopen">db:isopen</a></li>
 		<li><a href="#db_last_insert_rowid">db:last_insert_rowid</a></li>
 		<li><a href="#db_load_extension">db:load_extension</a></li>
@@ -129,8 +132,18 @@
 <h1><a name="overview">OVERVIEW</a></h1>
 <p><strong>LuaSQLite 3</strong> is a thin wrapper around the public domain SQLite3
 database engine.</p>
-<p>The <code>lsqlite3</code> module supports the creation and manipulation of 
-SQLite3 databases. After a <code>sqlite3 = require('lsqlite3')</code> the exported 
+<p>There are two modules, identical except that one links SQLite3 dynamically, the other 
+statically.</p>
+<p>The module <code>lsqlite3</code> links SQLite3 dynamically. 
+To use this module you need the SQLite3 library (DLL or .so).
+You can get it from <a href="http://www.sqlite.org/">http://www.sqlite.org/</a>
+</p>
+<p>The module <code>lsqlite3complete</code> links SQLite3 statically.
+The SQLite3 amalgamation source code is included in 
+the LuaSQLite 3 distribution.</p>
+<p>Both modules support the creation and manipulation of 
+SQLite3 databases. After a <code>sqlite3 = require('lsqlite3')</code> 
+(or <code>sqlite3 = require('lsqlite3complete')</code>) the exported 
 functions are called with prefix <code>sqlite3</code>. However, most sqlite3 
 functions are called via an object-oriented interface to either 
 database or SQL statement objects; see below for details.</p>
@@ -138,7 +151,9 @@ database or SQL statement objects; see below for details.</p>
 works, it just describes the Lua binding and the available functions.
 For more information about the SQL features supported by SQLite3 and
 details about the syntax of SQL statements and queries, please see the
-<strong>SQLite3 documentation</strong> <a href="http://www.sqlite.org/">http://www.sqlite.org/</a>. Using some of the
+<strong>SQLite3 documentation</strong> 
+<a href="http://www.sqlite.org/">http://www.sqlite.org/</a>. 
+Using some of the
 advanced features (how to use callbacks, for instance) will require 
 some familiarity with the SQLite3 API.</p>
 <p>
@@ -147,15 +162,18 @@ some familiarity with the SQLite3 API.</p>
 <h1><a name="download">DOWNLOAD</a></h1>
 <p><strong>LuaSQLite 3</strong> source code can be downloaded from its 
 Fossil (<a href="http://lua.sqlite.org/">http://lua.sqlite.org/</a>) page.</p>
-<p>You will also need to build or obtain an SQLite3 loadable library 
-(DLL or .so). See <a href="http://www.sqlite.org/">http://www.sqlite.org/</a> for obtaining SQLite3 
+<p>For <code>lsqlite3</code> (but not for <code>lsqlite3complete</code>) you will also need to 
+build or obtain an SQLite3 loadable library (DLL or .so). 
+See <a href="http://www.sqlite.org/">http://www.sqlite.org/</a> for obtaining SQLite3 
 source code or downloading a binary SQLite3 library.</p>
 <p>
 </p>
 <hr />
 <h1><a name="installation">INSTALLATION</a></h1>
 <p>Luarocks (<a href="http://luarocks.org/">http://luarocks.org/</a>) is the preferred mechanism 
-to build and install <code>lsqlite3</code>; it assumes an SQLite3 library is already installed.</p>
+to build and install <code>lsqlite3</code> or <code>lsqlite3complete</code>; for 
+<code>lsqlite3</code> it assumes an SQLite3 library is already installed. For 
+<code>lsqlite3complete</code> no SQLite3 library is needed.</p>
 <p>
 </p>
 <hr />
@@ -171,7 +189,7 @@ an enhanced version of Michael Roth's <code>lunit</code> called <code>lunitx</co
 tests were also derived from Michael's <strong>lua-sqlite3</strong> module, and more unit tests 
 added by Doug Currie. Get <code>lunitx</code> using Luarocks.</p>
 <p>The distribution also contains some functional tests by Tiago.</p>
-<p>This version of <code>lsqlite3</code> was tested with SQLite 3.11.0 and 3.15.0.</p>
+<p>This version of <code>lsqlite3</code> was tested with SQLite 3.11.0 and 3.15.1.</p>
 <p>
 </p>
 <hr />
@@ -225,7 +243,14 @@ and an error message. (In-memory databases are volatile as they are
 never stored on disk.)</p>
 <p>
 </p>
-
+<h2><a name="sqlite3_open_ptr">sqlite3.open_ptr</a></h2>
+<pre>
+        sqlite3.open_ptr(db_ptr)</pre>
+<p>Opens the SQLite database corresponding to the light userdata <code>db_ptr</code> and returns 
+its handle as userdata. Use <a href="#db_get_ptr"><code>db:get_ptr</code></a> to get 
+a <code>db_ptr</code> for an open database.</p>
+<p>
+</p>
 <h2><a name="sqlite3_backup_init">sqlite3.backup_init</a></h2>
 <pre>
         sqlite3.backup_init(target_db, target_name, source_db, source_name)</pre>
@@ -323,6 +348,16 @@ have been finalized before this function is called. The function returns
 <p>Finalizes all statements that have not been explicitly finalized. If
 <code>temponly</code> is true, only internal, temporary statements are finalized.
 This function returns nothing.</p>
+<p>
+</p>
+<h2><a name="db_get_ptr">db:get_ptr</a></h2>
+<pre>
+        db:get_ptr()</pre>
+<p>Returns a lightuserdata corresponding to the open <code>db</code>. Use with 
+<a href="#sqlite3_open_ptr"><code>sqlite3.open_ptr</code></a> to pass a database connection
+between threads. (When using lsqlite3 in a multithreaded environment, each thread has a separate 
+Lua environment; full userdata structures can't be passed from one thread to another, but this 
+is possible with lightuserdata.)</p>
 <p>
 </p>
 <h2><a name="db_commit_hook">db:commit_hook</a></h2>
@@ -497,6 +532,17 @@ all subsequent SQL statements are skipped and <code>db:exec()</code> returns
         db:interrupt()</pre>
 <p>This function causes any pending database operation to abort and return
 at the next opportunity. This function returns nothing.</p>
+<p>
+</p>
+<h2><a name="db_db_filename">db:db_filename</a></h2>
+<pre>
+        db:db_filename(name)</pre>
+<p>This function returns the filename associated with database <code>name</code> of connection 
+<code>db</code>. The <code>name</code> may be "main" for the main database file, or 
+the name specified after the AS keyword in an ATTACH statement for an attached database. 
+If there is no attached database <code>name</code> on the database connection <code>db</code>, 
+then no value is returned; if database <code>name</code> is a temporary or in-memory database, 
+then an empty string is returned.</p>
 <p>
 </p>
 <h2><a name="db_isopen">db:isopen</a></h2>

@@ -5,8 +5,8 @@
     Sega System 16B hardware
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_SEGAS16B_H
-#define MAME_INCLUDES_SEGAS16B_H
+#ifndef MAME_SEGA_SEGAS16B_H
+#define MAME_SEGA_SEGAS16B_H
 
 #pragma once
 
@@ -332,4 +332,4 @@ private:
 	required_ioport     m_steer;
 };
 
-#endif // MAME_INCLUDES_SEGAS16B_H
+#endif // MAME_SEGA_SEGAS16B_H

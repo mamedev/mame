@@ -104,15 +104,15 @@ public:
 
 	auto out_flp_callback() { return m_out_flp_cb.bind(); }
 
-	// image-level overrides
-	virtual image_init_result call_load() override;
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *image_interface() const noexcept override { return "z88_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "epr,bin"; }
 
-	// slot interface overrides
+	// device_slot_interface implementation
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
@@ -122,7 +122,7 @@ public:
 	uint8_t* get_cart_base();
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 	TIMER_CALLBACK_MEMBER(close_flap);

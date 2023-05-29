@@ -1,13 +1,12 @@
 // license:BSD-3-Clause
-// copyright-holders:Ville Linde, Angelo Salese
+// copyright-holders:Ville Linde, Angelo Salese, AJR
 /*
    Motorola MC68HC11 emulator
 
    Written by Ville Linde & Angelo Salese
 
 TODO:
-- Interrupts handling is really bare-bones, just to make Hit Poker happy;
-- Timers are really sketchy as per now, only TOC1 is emulated so far;
+- Timers are really sketchy as per now;
 - Complete opcodes hook-up;
 - Emulate the MC68HC12 (same as HC11 with a bunch of new opcodes);
 
@@ -16,6 +15,11 @@ TODO:
 #include "emu.h"
 #include "mc68hc11.h"
 #include "hc11dasm.h"
+
+#define LOG_IRQ (1U << 1)
+
+#define VERBOSE (0)
+#include "logmacro.h"
 
 enum
 {
@@ -57,6 +61,7 @@ mc68hc11_cpu_device::mc68hc11_cpu_device(const machine_config &mconfig, device_t
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this, (config_mask & 0xf9) != 0)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, address_map_constructor(FUNC(mc68hc11_cpu_device::internal_map), this))
+	, m_irq_asserted(false)
 	, m_port_input_cb(*this)
 	, m_port_output_cb(*this)
 	, m_analog_cb(*this)
@@ -331,6 +336,9 @@ uint8_t mc68hc11_cpu_device::tmsk1_r()
 
 void mc68hc11_cpu_device::tmsk1_w(uint8_t data)
 {
+	for (int i = 0; i < 5; i++)
+		if (BIT(m_tflg1 & (m_tmsk1 ^ data), 7 - i))
+			set_irq_state(0x0b + i, BIT(data, 7 - i));
 	m_tmsk1 = data;
 }
 
@@ -341,6 +349,9 @@ uint8_t mc68hc11_cpu_device::tflg1_r()
 
 void mc68hc11_cpu_device::tflg1_w(uint8_t data)
 {
+	for (int i = 0; i < 5; i++)
+		if (BIT(m_tflg1 & data, 7 - i))
+			set_irq_state(0x0b + i, false);
 	m_tflg1 &= ~data;
 }
 
@@ -351,6 +362,10 @@ uint8_t mc68hc11_cpu_device::tflg2_r()
 
 void mc68hc11_cpu_device::tflg2_w(uint8_t data)
 {
+	if (BIT(m_tflg2 & data, 7))
+		set_irq_state(0x10, false);
+	if (BIT(m_tflg2 & data, 6))
+		set_irq_state(0x07, false);
 	m_tflg2 &= ~data;
 }
 
@@ -361,6 +376,11 @@ uint8_t mc68hc11_cpu_device::tmsk2_r()
 
 void mc68hc11_cpu_device::tmsk2_w(uint8_t data)
 {
+	if (BIT(m_tflg2 & (m_tmsk2 ^ data), 7))
+		set_irq_state(0x10, BIT(data, 7));
+	if (BIT(m_tflg2 & (m_tmsk2 ^ data), 6))
+		set_irq_state(0x07, BIT(data, 6));
+
 	// TODO: prescaler bits are time-protected
 	m_tmsk2 = data;
 }
@@ -893,6 +913,7 @@ void mc68hc11_cpu_device::device_start()
 	save_item(NAME(m_ad_channel));
 	save_item(NAME(m_init));
 	save_item(NAME(m_irq_state));
+	save_item(NAME(m_irq_asserted));
 	save_item(NAME(m_wait_state));
 	save_item(NAME(m_stop_state));
 	save_item(NAME(m_tctl1));
@@ -922,7 +943,7 @@ void mc68hc11_cpu_device::device_start()
 	m_ppc = 0;
 	m_adctl = 0;
 	m_ad_channel = 0;
-	std::fill(std::begin(m_irq_state), std::end(m_irq_state), CLEAR_LINE);
+	m_irq_state = 0;
 	m_init = 0;
 	m_init2 = 0;
 	m_option = 0;
@@ -992,8 +1013,7 @@ void mc68hc11_cpu_device::device_reset()
 		}
 	}
 
-	m_pc = READ16(0xfffe); // TODO: vectors differ in bootstrap and special test modes
-	m_wait_state = 0;
+	m_wait_state = 1;
 	m_stop_state = 0;
 	m_ccr = CC_X | CC_I | CC_S;
 	init_w(m_init_value);
@@ -1007,6 +1027,9 @@ void mc68hc11_cpu_device::device_reset()
 	m_tflg2 = 0;
 	m_tmsk2 = 3; // timer prescale
 	m_pactl = 0;
+	m_irq_state = 0x80000000 | (m_irq_state & 0x04000000);
+	if (m_irq_asserted)
+		set_irq_state(0x06, true);
 	m_frc_base = m_reset_time = total_cycles();
 	std::fill(std::begin(m_port_dir), std::end(m_port_dir), 0x00);
 }
@@ -1056,54 +1079,44 @@ void mc68hc11f1_device::device_reset()
 	m_option = 0x00;
 }
 
-/*
-IRQ table vectors:
-0xffd6: SCI
-0xffd8: SPI
-0xffda: Pulse Accumulator Input Edge
-0xffdc: Pulse Accumulator Overflow
-0xffde: Timer Overflow
-0xffe0: Timer Output Capture 5
-0xffe2: Timer Output Capture 4
-0xffe4: Timer Output Capture 3
-0xffe6: Timer Output Capture 2
-0xffe8: Timer Output Capture 1
-0xffea: Timer Input Capture 3
-0xffec: Timer Input Capture 2
-0xffee: Timer Input Capture 1
-0xfff0: Real Time Int
-0xfff2: IRQ
-0xfff4: XIRQ
-0xfff6: SWI (Trap IRQ)
-0xfff8: Illegal Opcode (NMI)
-0xfffa: CO-Processor Fail
-0xfffc: Clock Monitor
-0xfffe: RESET
-*/
+static const char *const s_irq_names[32] =
+{
+	"RESET",            // vectored from $FFFE,FF
+	"Clock Monitor",    // vectored from $FFFC,FD
+	"COP Failure",      // vectored from $FFFA,FB
+	"Illegal Opcode",   // vectored from $FFF8,F9
+	"SWI",              // vectored from $FFF6,F7
+	"XIRQ",             // vectored from $FFF4,F5
+	"IRQ",              // vectored from $FFF2,F3
+	"RTI",              // vectored from $FFF0,F1
+	"IC1",              // vectored from $FFEE,EF
+	"IC2",              // vectored from $FFEC,ED
+	"IC3",              // vectored from $FFEA,EB
+	"OC1",              // vectored from $FFE8,E9
+	"OC2",              // vectored from $FFE6,E7
+	"OC3",              // vectored from $FFE4,E5
+	"OC4",              // vectored from $FFE2,E3
+	"OC5",              // vectored from $FFE0,E1
+	"Timer Overflow",   // vectored from $FFDE,DF
+	"PAOV",             // vectored from $FFDC,DD
+	"PAI",              // vectored from $FFDA,DB
+	"SPI",              // vectored from $FFD8,D9
+	"SCI",              // vectored from $FFD6,F7
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved"
+};
 
 void mc68hc11_cpu_device::check_irq_lines()
 {
-	if( m_irq_state[MC68HC11_IRQ_LINE]!=CLEAR_LINE && (!(m_ccr & CC_I)) )
-	{
-		uint16_t pc_vector;
-
-		if(m_wait_state == 0)
-		{
-			PUSH16(m_pc);
-			PUSH16(m_iy);
-			PUSH16(m_ix);
-			PUSH8(REG_A);
-			PUSH8(REG_B);
-			PUSH8(m_ccr);
-		}
-		pc_vector = READ16(0xfff2);
-		SET_PC(pc_vector);
-		m_ccr |= CC_I; //irq taken, mask the flag
-		if(m_wait_state == 1) { m_wait_state = 2; }
-		if(m_stop_state == 1) { m_stop_state = 2; }
-		standard_irq_callback(MC68HC11_IRQ_LINE);
-	}
-
 	/* check timers here */
 	{
 		int divider = div_tab[m_tmsk2 & 3];
@@ -1115,27 +1128,39 @@ void mc68hc11_cpu_device::check_irq_lines()
 			if ((((cur_time - m_reset_time) ^ (m_frc_base - m_reset_time)) >> ((m_pactl & 3) + 13)) > 0)
 			{
 				m_tflg2 |= 0x40;
-				m_irq_state[MC68HC11_RTI_LINE] = ASSERT_LINE;
+				if (BIT(m_tmsk2, 6))
+					set_irq_state(0x07, true);
 			}
 
-			for (uint32_t i = 0; i < add; i++)
+			for (int i = 0; i < 5; i++)
 			{
-				m_tcnt++;
-				if (m_tcnt == m_toc[0])
+				if (add >= uint16_t(m_toc[i] - m_tcnt))
 				{
-					m_tflg1 |= 0x80;
-					m_irq_state[MC68HC11_TOC1_LINE] = ASSERT_LINE;
+					m_tflg1 |= 0x80 >> i;
+					if (BIT(m_tmsk1, 7 - i))
+						set_irq_state(0x0b + i, true);
 				}
-				if (m_tcnt == 0)
-					m_tflg2 |= 0x80;
 			}
+
+			if (add >= 0x10000 - m_tcnt)
+			{
+				m_tflg2 |= 0x80;
+				if (BIT(m_tmsk2, 7))
+					set_irq_state(0x10, true);
+			}
+
+			m_tcnt += add;
 			m_frc_base = cur_time;
 		}
 	}
 
-	if( m_irq_state[MC68HC11_RTI_LINE]!=CLEAR_LINE && (!(m_ccr & CC_I)) && m_tmsk2 & 0x40)
+	uint32_t irq_state = m_irq_state;
+	if (m_ccr & CC_X)
+		irq_state &= ~0x04000000; // mask XIRQ out
+	if (irq_state != 0 && (!(m_ccr & CC_I) || (irq_state >= 0x04000000)))
 	{
-		uint16_t pc_vector;
+		int level = count_leading_zeros_32(irq_state); // TODO: respect HPRIO setting
+		standard_irq_callback(level, m_pc);
 
 		if(m_wait_state == 0)
 		{
@@ -1146,44 +1171,48 @@ void mc68hc11_cpu_device::check_irq_lines()
 			PUSH8(REG_B);
 			PUSH8(m_ccr);
 		}
-		pc_vector = READ16(0xfff0);
+		// TODO: vectors differ in bootstrap and special test modes
+		uint16_t pc_vector = READ16(0xfffe - level * 2);
 		SET_PC(pc_vector);
 		m_ccr |= CC_I; //irq taken, mask the flag
-		if(m_wait_state == 1) { m_wait_state = 2; }
+		if (level < 0x06)
+			m_ccr |= CC_X;
+		if(m_wait_state == 1) { m_wait_state = 0; }
 		if(m_stop_state == 1) { m_stop_state = 2; }
-		standard_irq_callback(MC68HC11_RTI_LINE);
-		m_irq_state[MC68HC11_RTI_LINE] = CLEAR_LINE; // auto-ack irq
+		if (level < 0x05 || (level == 0x06 && BIT(m_option, 5)))
+			set_irq_state(level, false); // auto-ack edge-triggered IRQ
 	}
+}
 
-	if( m_irq_state[MC68HC11_TOC1_LINE]!=CLEAR_LINE && (!(m_ccr & CC_I)) && m_tmsk1 & 0x80)
-	{
-		uint16_t pc_vector;
-
-		if(m_wait_state == 0)
-		{
-			PUSH16(m_pc);
-			PUSH16(m_iy);
-			PUSH16(m_ix);
-			PUSH8(REG_A);
-			PUSH8(REG_B);
-			PUSH8(m_ccr);
-		}
-		pc_vector = READ16(0xffe8);
-		SET_PC(pc_vector);
-		m_ccr |= CC_I; //irq taken, mask the flag
-		if(m_wait_state == 1) { m_wait_state = 2; }
-		if(m_stop_state == 1) { m_stop_state = 2; }
-		standard_irq_callback(MC68HC11_TOC1_LINE);
-		m_irq_state[MC68HC11_TOC1_LINE] = CLEAR_LINE; // auto-ack irq
-	}
-
+void mc68hc11_cpu_device::set_irq_state(uint8_t irqn, bool state)
+{
+	LOGMASKED(LOG_IRQ, "%s: %s interrupt %s\n", machine().describe_context(), s_irq_names[irqn], state ? "requested" : "cleared");
+	if (state)
+		m_irq_state |= 0x80000000 >> irqn;
+	else
+		m_irq_state &= ~(0x80000000 >> irqn);
 }
 
 void mc68hc11_cpu_device::execute_set_input(int inputnum, int state)
 {
-	m_irq_state[inputnum] = state;
-	if (state == CLEAR_LINE) return;
-	check_irq_lines();
+	switch (inputnum)
+	{
+	case MC68HC11_IRQ_LINE:
+		if (!m_irq_asserted && state != CLEAR_LINE)
+			set_irq_state(0x06, true);
+		else if (m_irq_asserted && state == CLEAR_LINE && !BIT(m_option, 5))
+			set_irq_state(0x06, false);
+		m_irq_asserted = state != CLEAR_LINE;
+		break;
+
+	case MC68HC11_XIRQ_LINE:
+		set_irq_state(0x05, state != CLEAR_LINE);
+		break;
+
+	default:
+		logerror("Unknown input %d = %d\n", inputnum, state);
+		break;
+	}
 }
 
 void mc68hc11_cpu_device::execute_run()

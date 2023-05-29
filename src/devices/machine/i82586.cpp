@@ -33,7 +33,6 @@
 #include "i82586.h"
 #include "hashing.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_FRAMES  (1U << 1)
 #define LOG_FILTER  (1U << 2)
 #define LOG_CONFIG  (1U << 3)

@@ -28,11 +28,10 @@ determines both the COP watchdog timeout and the real-time interrupt rate
  * Configurable logging
  ****************************************************************************/
 
-#define LOG_GENERAL (1U <<  0)
-#define LOG_INT     (1U <<  1)
-#define LOG_IOPORT  (1U <<  2)
-#define LOG_TIMER   (1U <<  3)
-#define LOG_COP     (1U <<  4)
+#define LOG_INT     (1U << 1)
+#define LOG_IOPORT  (1U << 2)
+#define LOG_TIMER   (1U << 3)
+#define LOG_COP     (1U << 4)
 
 //#define VERBOSE (LOG_GENERAL | LOG_INT | LOG_IOPORT | LOG_TIMER | LOG_COP)
 //#define LOG_OUTPUT_FUNC printf
@@ -605,11 +604,11 @@ void m68hc05_device::interrupt()
 			pushbyte<false>(m_cc);
 		}
 		SEI;
-		standard_irq_callback(0);
 
 		if (m_pending_interrupts & M68HC05_INT_IRQ)
 		{
 			LOGINT("servicing external interrupt\n");
+			standard_irq_callback(0, m_pc.w.l);
 			m_irq_latch = 0;
 			m_pending_interrupts &= ~M68HC05_INT_IRQ;
 			if (m_params.m_addr_width > 13)
@@ -620,6 +619,7 @@ void m68hc05_device::interrupt()
 		else if (m_pending_interrupts & M68HC05_INT_TIMER)
 		{
 			LOGINT("servicing timer interrupt\n");
+			standard_irq_callback(1, m_pc.w.l);
 			if (m_params.m_addr_width > 13)
 				rm16<true>(M68HC05_VECTOR_TIMER & m_params.m_vector_mask, m_pc);
 			else

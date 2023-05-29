@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-#ifndef MAME_MACHINE_MCT_ADR_H
-#define MAME_MACHINE_MCT_ADR_H
+#ifndef MAME_MICROSOFT_MCT_ADR_H
+#define MAME_MICROSOFT_MCT_ADR_H
 
 #pragma once
 
@@ -41,7 +41,7 @@ protected:
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
-	//virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
+	//virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
 	u32 dma_r(offs_t offset, u32 mem_mask);
 	void dma_w(offs_t offset, u32 data, u32 mem_mask);
@@ -161,4 +161,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(MCT_ADR, mct_adr_device)
 
-#endif // MAME_MACHINE_MCT_ADR_H
+#endif // MAME_MICROSOFT_MCT_ADR_H

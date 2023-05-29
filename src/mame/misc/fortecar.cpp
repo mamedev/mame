@@ -337,6 +337,8 @@
 #include "fortecrd.lh"
 
 
+namespace {
+
 #define MASTER_CLOCK    XTAL(12'000'000)
 #define CPU_CLOCK       (MASTER_CLOCK/4)
 #define CRTC_CLOCK      (MASTER_CLOCK/8)
@@ -795,6 +797,8 @@ ROM_START( fortecrde )
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "forte_card_82s147.u47", 0x0000, 0x0200, CRC(7e631818) SHA1(ac08b0de30260278af3a1c5dee5810d4304cb9ca) )
 ROM_END
+
+} // anonymous namespace
 
 
 /***********************************

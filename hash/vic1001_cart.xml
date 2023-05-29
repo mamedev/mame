@@ -775,7 +775,7 @@ B-2007 : Innovative Computing
 		</part>
 	</software>
 
-	<software name="capflag" supported="partial">
+	<software name="capflag" supported="no">
 		<description>Capture the Flag (NTSC)</description>
 		<year>1983</year>
 		<publisher>Sirius</publisher>
@@ -788,7 +788,7 @@ B-2007 : Innovative Computing
 		</part>
 	</software>
 
-	<software name="capflag1" cloneof="capflag" supported="partial">
+	<software name="capflag1" cloneof="capflag" supported="no">
 		<description>Capture the Flag (NTSC-M)</description>
 		<!-- Requires 6560-101 (NTSC-M) video timing. -->
 		<year>1983</year>
@@ -1429,7 +1429,7 @@ B-2007 : Innovative Computing
 		</part>
 	</software>
 
-	<software name="frogman">
+	<software name="frogman" supported="no">
 		<description>Frogman</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2059,7 +2059,7 @@ B-2007 : Innovative Computing
 		</part>
 	</software>
 
-	<software name="moneywar">
+	<software name="moneywar" supported="no">
 		<description>Money Wars (NTSC)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
@@ -2072,7 +2072,7 @@ B-2007 : Innovative Computing
 		</part>
 	</software>
 
-	<software name="moneywar1" cloneof="moneywar">
+	<software name="moneywar1" cloneof="moneywar" supported="no">
 		<description>Money Wars (NTSC, Alt)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
@@ -2087,7 +2087,7 @@ B-2007 : Innovative Computing
 		</part>
 	</software>
 
-	<software name="moneywar2" cloneof="moneywar">
+	<software name="moneywar2" cloneof="moneywar" supported="no">
 		<description>Money Wars (NTSC, Alt 2)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
@@ -2703,7 +2703,7 @@ B-2007 : Innovative Computing
 		</part>
 	</software>
 
-	<software name="scram20">
+	<software name="scram20" supported="no">
 		<description>Scram 20</description>
 		<year>1983</year>
 		<publisher>Nalin Sharma</publisher>
@@ -3684,7 +3684,7 @@ B-2007 : Innovative Computing
 		</part>
 	</software>
 
-	<software name="vicdiag">
+	<software name="vicdiag" supported="no">
 		<description>VIC 20 Diagnostic Cartridge (NTSC)</description>
 		<year>1980</year>
 		<publisher>Commodore</publisher>
@@ -3696,7 +3696,7 @@ B-2007 : Innovative Computing
 		</part>
 	</software>
 
-	<software name="vicdiagp" cloneof="vicdiag">
+	<software name="vicdiagp" cloneof="vicdiag" supported="no">
 		<description>VIC 20 Diagnostic Cartridge (PAL)</description>
 		<year>1980</year>
 		<publisher>Commodore</publisher>

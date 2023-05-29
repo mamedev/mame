@@ -213,6 +213,8 @@
 #include "machine/sda2006.h"
 
 
+namespace {
+
 #define MASTER_CLOCK    XTAL(10'816'000)
 #define SOUND_CLOCK     XTAL( 2'950'000)
 
@@ -469,5 +471,8 @@ ROM_START( nightmare )
 	ROM_REGION( 0x40, "eeprom", 0 )
 	ROM_LOAD( "eeprom", 0x00, 0x40, CRC(7824e1f8) SHA1(2ccac62b4e8abcb2b3d66fa4025947fea184664e) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1982, nightmare, 0,        nightmare, nightmare,   nightmare_state,   empty_init, ROT90, "E.F.O.", "Night Mare (Spain)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

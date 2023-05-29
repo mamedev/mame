@@ -33,6 +33,8 @@ Then press W to save. To load, press L. If it says r at the end, it indicates a 
 #include "pro80.lh"
 
 
+namespace {
+
 class pro80_state : public driver_device
 {
 public:
@@ -209,6 +211,9 @@ ROM_START( pro80 )
 	// This rom dump is taken out of manual for this machine
 	ROM_LOAD( "pro80.bin", 0x0000, 0x0400, CRC(1bf6e0a5) SHA1(eb45816337e08ed8c30b589fc24960dc98b94db2))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

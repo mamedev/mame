@@ -3,15 +3,16 @@
 
 [![Join the chat at https://gitter.im/mamedev/mame](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mamedev/mame?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-Build status:
+Continuous integration build status:
 
-| OS/Compiler   | Status        | 
-| ------------- |:-------------:| 
-| Linux/GCC and clang | ![CI (Linux)](https://github.com/mamedev/mame/workflows/CI%20(Linux)/badge.svg) |
-| Windows/MinGW GCC | ![CI (Windows)](https://github.com/mamedev/mame/workflows/CI%20(Windows)/badge.svg) |
-| macOS/clang | ![CI (macOS)](https://github.com/mamedev/mame/workflows/CI%20(macOS)/badge.svg) |
-| UI Translations | ![Compile UI translations](https://github.com/mamedev/mame/workflows/Compile%20UI%20translations/badge.svg) |
-| Documentation | ![Build documentation](https://github.com/mamedev/mame/workflows/Build%20documentation/badge.svg) |
+| OS/Compiler                 | Status        |
+| --------------------------- |:-------------:|
+| Linux/clang and GCC         | ![CI (Linux)](https://github.com/mamedev/mame/workflows/CI%20(Linux)/badge.svg) |
+| Windows/MinGW GCC and clang | ![CI (Windows)](https://github.com/mamedev/mame/workflows/CI%20(Windows)/badge.svg) |
+| macOS/clang                 | ![CI (macOS)](https://github.com/mamedev/mame/workflows/CI%20(macOS)/badge.svg) |
+| UI Translations             | ![Compile UI translations](https://github.com/mamedev/mame/workflows/Compile%20UI%20translations/badge.svg) |
+| Documentation               | ![Build documentation](https://github.com/mamedev/mame/workflows/Build%20documentation/badge.svg) |
+| BGFX Shaders                | ![Rebuild BGFX shaders](https://github.com/mamedev/mame/workflows/Rebuild%20BGFX%20shaders/badge.svg) |
 
 Static analysis status for entire build (except for third-party parts of project):
 
@@ -33,27 +34,21 @@ If you're on a UNIX-like system (including Linux and macOS), it could be as easy
 make
 ```
 
-for a MAME build,
+for a full build,
 
 ```
-make SUBTARGET=arcade
+make SUBTARGET=tiny
 ```
 
-for an arcade-only build, or
-
-```
-make SUBTARGET=mess
-```
-
-for a MESS build.
+for a build including a small subset of supported systems.
 
 See the [Compiling MAME](http://docs.mamedev.org/initialsetup/compilingmame.html) page on our documentation site for more information, including prerequisites for macOS and popular Linux distributions.
 
-For recent versions of macOS you need to install [Xcode](https://developer.apple.com/xcode/) including command-line tools and [SDL 2.0](https://www.libsdl.org/download-2.0.php).
+For recent versions of macOS you need to install [Xcode](https://developer.apple.com/xcode/) including command-line tools and [SDL 2.0](https://github.com/libsdl-org/SDL/releases/latest).
 
-For Windows users, we provide a ready-made [build environment](http://mamedev.org/tools/) based on MinGW-w64.
+For Windows users, we provide a ready-made [build environment](http://www.mamedev.org/tools/) based on MinGW-w64.
 
-Visual Studio builds are also possible, but you still need [build environment](http://mamedev.org/tools/) based on MinGW-w64.
+Visual Studio builds are also possible, but you still need [build environment](http://www.mamedev.org/tools/) based on MinGW-w64.
 In order to generate solution and project files just run:
 
 ```
@@ -69,7 +64,7 @@ make vs2019 MSBUILD=1
 Where can I find out more?
 =============
 
-* [Official MAME Development Team Site](https://mamedev.org/) (includes binary downloads, wiki, forums, and more)
+* [Official MAME Development Team Site](https://www.mamedev.org/) (includes binary downloads, wiki, forums, and more)
 * [Official MESS Wiki](http://mess.redump.net/)
 * [MAME Testers](https://mametesters.org/) (official bug tracker for MAME and MESS)
 

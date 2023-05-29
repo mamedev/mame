@@ -3,9 +3,11 @@
 #ifndef __WINDOWS_HANDLE_H
 #define __WINDOWS_HANDLE_H
 
+#include "../Common/MyTypes.h"
+
 namespace NWindows {
 
-class CHandle
+class CHandle  MY_UNCOPYABLE
 {
 protected:
   HANDLE _handle;

@@ -43,6 +43,8 @@ DAC               -26.6860Mhz
 #include "speaker.h"
 
 
+namespace {
+
 class _2mindril_state : public taito_f3_state
 {
 public:
@@ -408,6 +410,9 @@ void _2mindril_state::init_drill()
 	m_game = TMDRILL;
 	tile_decode();
 }
+
+} // anonymous namespace
+
 
 //    YEAR  NAME      PARENT  MACHINE  INPUT  CLASS            INIT        ROT   COMPANY                      FULLNAME                                   FLAGS
 GAME( 1993, 2mindril, 0,      drill,   drill, _2mindril_state, init_drill, ROT0, "Taito America Corporation", "Two Minute Drill (Ver 2.93A 1994/02/16)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_MECHANICAL)

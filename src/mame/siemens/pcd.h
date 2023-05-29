@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-#ifndef MAME_VIDEO_PCD_H
-#define MAME_VIDEO_PCD_H
+#ifndef MAME_SIEMENS_PCD_H
+#define MAME_SIEMENS_PCD_H
 
 #pragma once
 
@@ -9,8 +9,6 @@
 #include "machine/timer.h"
 #include "video/scn2674.h"
 #include "emupal.h"
-
-#include "diserial.h"
 
 
 class pcdx_video_device : public device_t, public device_gfx_interface
@@ -78,12 +76,12 @@ private:
 	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
 };
 
-class pcx_video_device : public pcdx_video_device,
-							public device_serial_interface
+class pcx_video_device : public pcdx_video_device
 {
 public:
 	pcx_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	auto txd_handler() { return m_txd_handler.bind(); }
+	void rx_w(int state);
 
 	virtual void map(address_map &map) override;
 	uint8_t term_r(offs_t offset);
@@ -103,18 +101,15 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	void tra_callback() override;
-	void rcv_complete() override;
-
 private:
 	required_device<scn2672_device> m_crtc;
 
 	required_region_ptr<uint8_t> m_charrom;
 	devcb_write_line m_txd_handler;
-	uint8_t m_term_key, m_term_char, m_term_stat, m_p1;
+	uint8_t m_term_key, m_term_char, m_term_stat, m_p1, m_p3;
 
-	uint8_t rx_callback();
-	void tx_callback(uint8_t data);
+	uint8_t p3_r();
+	void p3_w(uint8_t data);
 
 	SCN2672_DRAW_CHARACTER_MEMBER(display_pixels);
 };
@@ -122,4 +117,4 @@ private:
 DECLARE_DEVICE_TYPE(PCD_VIDEO, pcd_video_device)
 DECLARE_DEVICE_TYPE(PCX_VIDEO, pcx_video_device)
 
-#endif // MAME_VIDEO_PCD_H
+#endif // MAME_SIEMENS_PCD_H

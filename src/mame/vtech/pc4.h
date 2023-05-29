@@ -5,8 +5,8 @@
         VTech Laser PC4
 
 ****************************************************************************/
-#ifndef MAME_INCLUDES_PC4_H
-#define MAME_INCLUDES_PC4_H
+#ifndef MAME_VTECH_PC4_H
+#define MAME_VTECH_PC4_H
 
 #pragma once
 
@@ -81,4 +81,4 @@ private:
 	ioport_port *io_port[8];
 };
 
-#endif // MAME_INCLUDES_PC4_H
+#endif // MAME_VTECH_PC4_H

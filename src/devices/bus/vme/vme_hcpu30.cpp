@@ -32,16 +32,12 @@
 #include "emu.h"
 #include "vme_hcpu30.h"
 
-//#define LOG_GENERAL (1U <<  0)
-#define LOG_SETUP   (1U <<  1)
-#define LOG_INT     (1U <<  2)
+#define LOG_INT     (1U << 1)
 
-//#define VERBOSE (LOG_GENERAL | LOG_SETUP | LOG_INT)
+#define VERBOSE (0) // (LOG_GENERAL | LOG_INT)
 //#define LOG_OUTPUT_FUNC printf
-
 #include "logmacro.h"
 
-#define LOGSETUP(...) LOGMASKED(LOG_SETUP, __VA_ARGS__)
 #define LOGINT(...)   LOGMASKED(LOG_INT,   __VA_ARGS__)
 
 
@@ -175,7 +171,7 @@ void vme_hcpu30_card_device::device_add_mconfig(machine_config &config)
 	M68020(config, m_maincpu, 16670000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vme_hcpu30_card_device::hcpu30_mem);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &vme_hcpu30_card_device::cpu_space_map);
-	m_maincpu->disable_interrupt_mixer();
+	m_maincpu->set_interrupt_mixer(false);
 
 	// FIXME: functional test expects dtr->dcd, rts->cts connections on both ports and tx->rx connection on port B
 	DUSCC68562(config, m_dusccterm, DUSCC_CLOCK);

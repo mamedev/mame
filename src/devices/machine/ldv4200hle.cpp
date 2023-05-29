@@ -32,15 +32,15 @@
 #include "ldv4200hle.h"
 
 
-#define LOG_COMMAND_BYTES       (1 << 1U)
-#define LOG_COMMANDS            (1 << 2U)
-#define LOG_COMMAND_BUFFERS     (1 << 3U)
-#define LOG_REPLIES             (1 << 4U)
-#define LOG_REPLY_BYTES         (1 << 5U)
-#define LOG_SEARCHES            (1 << 6U)
-#define LOG_STOPS               (1 << 7U)
-#define LOG_SQUELCHES           (1 << 8U)
-#define LOG_FRAMES              (1 << 9U)
+#define LOG_COMMAND_BYTES       (1U << 1)
+#define LOG_COMMANDS            (1U << 2)
+#define LOG_COMMAND_BUFFERS     (1U << 3)
+#define LOG_REPLIES             (1U << 4)
+#define LOG_REPLY_BYTES         (1U << 5)
+#define LOG_SEARCHES            (1U << 6)
+#define LOG_STOPS               (1U << 7)
+#define LOG_SQUELCHES           (1U << 8)
+#define LOG_FRAMES              (1U << 9)
 #define LOG_ALL                 (LOG_COMMAND_BYTES | LOG_COMMANDS | LOG_COMMAND_BUFFERS | LOG_REPLY_BYTES | LOG_SEARCHES | LOG_STOPS | LOG_SQUELCHES | LOG_FRAMES)
 
 #define VERBOSE (0)
@@ -801,7 +801,7 @@ TIMER_CALLBACK_MEMBER(pioneer_ldv4200hle_device::process_vbi_data)
 				int32_t old_delta = (int32_t)m_mark_frame - (int32_t)old_frame;
 				int32_t curr_delta = (int32_t)m_mark_frame - (int32_t)m_curr_frame;
 				LOGMASKED(LOG_STOPS, "%s: Stop Mark is currently %d, old frame is %d, current frame is %d, old delta %d, curr delta %d\n", machine().describe_context(), m_mark_frame, old_frame, m_curr_frame, old_delta, curr_delta);
-				if (curr_delta == 0 || std::signbit(old_delta) != std::signbit(curr_delta))
+				if (curr_delta == 0 || (old_delta < 0) != (curr_delta < 0))
 				{
 					m_mark_frame = ~uint32_t(0);
 					if (is_cav_disc())
@@ -919,7 +919,7 @@ int32_t pioneer_ldv4200hle_device::player_update(const vbi_metadata &vbi, int fi
 			int32_t jump_frame = (int32_t)m_curr_frame + elapsed_tracks;
 			int32_t curr_delta = (int32_t)m_mark_frame - (int32_t)m_curr_frame;
 			int32_t next_delta = (int32_t)m_mark_frame - (int32_t)jump_frame;
-			if (std::signbit(curr_delta) != std::signbit(next_delta))
+			if ((curr_delta < 0) != (next_delta < 0))
 			{
 				elapsed_tracks = curr_delta;
 			}

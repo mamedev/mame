@@ -9,6 +9,9 @@
 #include "emu.h"
 #include "cpu/h8/h83002.h"
 
+
+namespace {
+
 class boss_sx700_state : public driver_device
 {
 public:
@@ -74,6 +77,9 @@ ROM_START(gx700)
 	ROM_SYSTEM_BIOS(1, "v109", "v1.09 WATERDRAGON")
 	ROMX_LOAD("gx-700_1_0_9.ic20", 0x00000, 0x40000, CRC(e38b3eeb) SHA1(8ce0563b70d37103acafe1578706ec1c32419e34), ROM_BIOS(1)) // M27C2001-10F1
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1996, sx700, 0, 0, sx700, sx700, boss_sx700_state, empty_init, "Roland", "Boss SX-700 Studio Effects Processor", MACHINE_IS_SKELETON)
 SYST(1996, gx700, 0, 0, gx700, sx700, boss_sx700_state, empty_init, "Roland", "Boss GX-700 Guitar Effects Processor", MACHINE_IS_SKELETON)

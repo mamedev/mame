@@ -17,8 +17,8 @@
 
 *******************************************************************************/
 
-#ifndef MAME_INCLUDES_VSMILE_H
-#define MAME_INCLUDES_VSMILE_H
+#ifndef MAME_VTECH_VSMILE_H
+#define MAME_VTECH_VSMILE_H
 
 #include "bus/vsmile/vsmile_ctrl.h"
 #include "bus/vsmile/vsmile_slot.h"
@@ -181,4 +181,4 @@ private:
 	uint16_t m_mode = 0;
 };
 
-#endif // MAME_INCLUDES_VSMILE_H
+#endif // MAME_VTECH_VSMILE_H

@@ -206,9 +206,6 @@ void yamaha_dx9_state::palette_init(palette_device &palette)
  */
 void yamaha_dx9_state::mem_map(address_map &map)
 {
-	// Internal CPU registers.
-	map(0x0000, 0x001f).m(m_maincpu, FUNC(hd6303r_cpu_device::m6801_io));
-
 	map(0x0020, 0x0020).r(FUNC(yamaha_dx9_state::key_switch_scan_driver_r));
 
 	map(0x0022, 0x0022).r(m_adc, FUNC(m58990_device::data_r));
@@ -220,9 +217,6 @@ void yamaha_dx9_state::mem_map(address_map &map)
 	map(0x0028, 0x0029).rw("lcdc", FUNC(hd44780_device::read), FUNC(hd44780_device::write));
 	// LED.
 	map(0x002b, 0x002c).w(FUNC(yamaha_dx9_state::led_w));
-
-	// Internal RAM.
-	map(0x0040, 0x00ff).ram();
 
 	// External RAM.
 	// 2 * 2kb RAM1 IC19 M5M118P.

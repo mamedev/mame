@@ -5,8 +5,8 @@
  *  FM-7 header file
  *
  */
-#ifndef MAME_INCLUDES_FM7_H
-#define MAME_INCLUDES_FM7_H
+#ifndef MAME_FUJITSU_FM7_H
+#define MAME_FUJITSU_FM7_H
 
 #pragma once
 
@@ -422,4 +422,4 @@ private:
 	required_device<cpu_device> m_x86;
 };
 
-#endif // MAME_INCLUDES_FM7_H
+#endif // MAME_FUJITSU_FM7_H

@@ -26,6 +26,9 @@ Exidy discrete hardware games
 #include "netlist/devices/net_lib.h"
 #include "video/fixfreq.h"
 
+
+namespace {
+
 // copied by Pong, not accurate for this driver!
 // start
 #define MASTER_CLOCK    7159000
@@ -254,7 +257,7 @@ ROM_START( deathrac )
 	ROM_LOAD( "6331-31.a11", 0x0000, 0x0020, CRC(f304a1fb) SHA1(0f029274bb99723ebcc271d761e1500ca50b2738) )
 	ROM_LOAD( "6331-32.c12", 0x0000, 0x0020, CRC(f8dbd779) SHA1(55bdaf9eb1ba6185e20512c4874ebb625861508e) )
 	ROM_LOAD( "6331-33.p14", 0x0000, 0x0020, CRC(2e83bf80) SHA1(02fcc1e879c06759a21ef4f004fe7aa790814112) )
-	// Note: Image for 36 has all zeros in the second half, which is unused.
+	// Note: Image for 36 has all zeros in the second half, which is unused. This is verified correct from a real board.
 	// Other roms in this series (34,35) all have duplicate content in the second half
 	ROM_LOAD( "6331-36.e7",  0x0000, 0x0020, CRC(bb743b79) SHA1(8eb73782bcea7dbba7b75db32307e562248691bb) )
 	ROM_LOAD( "6331-35.g7",  0x0000, 0x0020, CRC(5ed8cdd2) SHA1(d193d819ad634c43d648ce49073799b4df6dfd2f) )
@@ -272,6 +275,10 @@ ROM_START( deathrac )
 ROM_END
 
 #define rom_rhunting rom_deathrac
+
+} // anonymous namespace
+
+
 GAME( 1977, attckexd,  0,        attack,   0, exidyttl_state, empty_init, ROT0, "Exidy", "Attack (set 1) [TTL]",    MACHINE_IS_SKELETON )
 GAME( 1977, attckexd2, attckexd, attack,   0, exidyttl_state, empty_init, ROT0, "Exidy", "Attack (set 2) [TTL]",    MACHINE_IS_SKELETON )
 GAME( 1976, deathrac,  0,        deathrac, 0, exidyttl_state, empty_init, ROT0, "Exidy", "Death Race [TTL]",        MACHINE_IS_SKELETON )

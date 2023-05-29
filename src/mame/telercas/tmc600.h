@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef MAME_INCLUDES_TMC600_H
-#define MAME_INCLUDES_TMC600_H
+#ifndef MAME_TELERCAS_TMC600_H
+#define MAME_TELERCAS_TMC600_H
 
 #include "cpu/cosmac/cosmac.h"
 #include "imagedev/cassette.h"
@@ -97,4 +97,4 @@ private:
 	void tmc600_map(address_map &map);
 };
 
-#endif
+#endif // MAME_TELERCAS_TMC600_H

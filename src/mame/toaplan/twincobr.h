@@ -4,8 +4,8 @@
         Twincobr/Flying Shark/Wardner  game hardware from 1986-1987
         -----------------------------------------------------------
 ****************************************************************************/
-#ifndef MAME_INCLUDES_TWINCOBR_H
-#define MAME_INCLUDES_TWINCOBR_H
+#ifndef MAME_TOAPLAN_TWINCOBR_H
+#define MAME_TOAPLAN_TWINCOBR_H
 
 #pragma once
 
@@ -153,4 +153,4 @@ protected:
 	void sound_program_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_TWINCOBR_H
+#endif // MAME_TOAPLAN_TWINCOBR_H

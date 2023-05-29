@@ -154,17 +154,6 @@ static inline floatx80 floatx80_abs(floatx80 fx)
 	return fx;
 }
 
-static inline double fx80_to_double(floatx80 fx)
-{
-	uint64_t d = floatx80_to_float64(fx);
-	return *(double*)&d;
-}
-
-static inline floatx80 double_to_fx80(double in)
-{
-	return float64_to_floatx80(*(uint64_t*)&in);
-}
-
 DEFINE_DEVICE_TYPE(I8087, i8087_device, "i8087", "Intel 8087")
 
 i8087_device::i8087_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
@@ -2265,10 +2254,8 @@ void i8087_device::f2xm1(u8 modrm)
 	}
 	else
 	{
-		// TODO: Inaccurate
-		double x = fx80_to_double(ST(0));
-		double res = pow(2.0, x) - 1;
-		result = double_to_fx80(res);
+		extern floatx80 f2xm1(floatx80 a);
+		result = f2xm1(ST(0));
 	}
 
 	if (check_exceptions())
@@ -2291,7 +2278,6 @@ void i8087_device::fyl2x(u8 modrm)
 	else
 	{
 		floatx80 x = ST(0);
-		floatx80 y = ST(1);
 
 		if (x.high & 0x8000)
 		{
@@ -2300,10 +2286,8 @@ void i8087_device::fyl2x(u8 modrm)
 		}
 		else
 		{
-			// TODO: Inaccurate
-			double d64 = fx80_to_double(x);
-			double l2x = log(d64)/log(2.0);
-			result = floatx80_mul(double_to_fx80(l2x), y);
+			extern floatx80 fyl2x(floatx80 a, floatx80 b);
+			result = fyl2x(ST(0), ST(1));
 		}
 	}
 
@@ -2327,13 +2311,8 @@ void i8087_device::fyl2xp1(u8 modrm)
 	}
 	else
 	{
-		floatx80 x = ST(0);
-		floatx80 y = ST(1);
-
-		// TODO: Inaccurate
-		double d64 = fx80_to_double(x);
-		double l2x1 = log(d64 + 1.0)/log(2.0);
-		result = floatx80_mul(double_to_fx80(l2x1), y);
+		extern floatx80 fyl2xp1(floatx80 a, floatx80 b);
+		result = fyl2xp1(ST(0), ST(1));
 	}
 
 	if (check_exceptions())
@@ -2394,16 +2373,14 @@ void i8087_device::fpatan(u8 modrm)
 {
 	floatx80 result;
 
-	if (X87_IS_ST_EMPTY(0))
+	if (X87_IS_ST_EMPTY(0) || X87_IS_ST_EMPTY(1))
 	{
 		set_stack_underflow();
 		result = fx80_inan;
 	}
 	else
 	{
-		// TODO: Inaccurate
-		double val = atan2(fx80_to_double(ST(1)) , fx80_to_double(ST(0)));
-		result = double_to_fx80(val);
+		result = floatx80_fpatan(ST(0), ST(1));
 	}
 
 	if (check_exceptions())
@@ -2461,7 +2438,7 @@ void i8087_device::fcos(u8 modrm)
 	{
 		result = ST(0);
 
-#if 0 // TODO: Function produces bad values
+#if 1 // TODO: Function produces bad values
 		if (floatx80_fcos(result) != -1)
 			m_sw &= ~X87_SW_C2;
 		else
@@ -2501,7 +2478,7 @@ void i8087_device::fsincos(u8 modrm)
 
 		s_result = c_result = ST(0);
 
-#if 0 // TODO: Function produces bad values
+#if 1 // TODO: Function produces bad values
 		if (sf_fsincos(s_result, &s_result, &c_result) != -1)
 			m_sw &= ~X87_SW_C2;
 		else

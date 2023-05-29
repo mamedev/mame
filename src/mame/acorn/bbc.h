@@ -7,8 +7,8 @@
  * Driver by Gordon Jefferyes <mess_bbc@romvault.com>
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_BBC_H
-#define MAME_INCLUDES_BBC_H
+#ifndef MAME_ACORN_BBC_H
+#define MAME_ACORN_BBC_H
 
 #pragma once
 
@@ -463,4 +463,4 @@ protected:
 };
 
 
-#endif // MAME_INCLUDES_BBC_H
+#endif // MAME_ACORN_BBC_H

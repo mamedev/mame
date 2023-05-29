@@ -5,8 +5,8 @@
  * includes/intv.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_INTV_H
-#define MAME_INCLUDES_INTV_H
+#ifndef MAME_MATTEL_INTV_H
+#define MAME_MATTEL_INTV_H
 
 #pragma once
 
@@ -47,7 +47,8 @@ public:
 		m_region_keyboard(*this, "keyboard"),
 		m_io_test(*this, "TEST"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_intv_keyboard(*this, "ROW%X", 0U)
 	{ }
 
 	void intvkbd(machine_config &config);
@@ -145,7 +146,7 @@ private:
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	ioport_port *m_intv_keyboard[10];
+	optional_ioport_array<10> m_intv_keyboard;
 };
 
-#endif // MAME_INCLUDES_INTV_H
+#endif // MAME_MATTEL_INTV_H

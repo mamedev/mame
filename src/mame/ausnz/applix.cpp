@@ -70,34 +70,15 @@ public:
 		, m_centronics(*this, "centronics")
 		, m_cent_data_out(*this, "cent_data_out")
 		, m_fdc(*this, "fdc")
-		, m_floppy0(*this, "fdc:0")
-		, m_floppy1(*this, "fdc:1")
+		, m_floppy(*this, "fdc:%u", 0U)
 		, m_ldac(*this, "ldac")
 		, m_rdac(*this, "rdac")
 		, m_cass(*this, "cassette")
 		, m_io_dsw(*this, "DSW")
 		, m_io_fdc(*this, "FDC")
 		, m_io_k0f(*this, "K0f")
-		, m_io_k300(*this, "K30_0")
-		, m_io_k301(*this, "K30_1")
-		, m_io_k310(*this, "K31_0")
-		, m_io_k311(*this, "K31_1")
-		, m_io_k320(*this, "K32_0")
-		, m_io_k321(*this, "K32_1")
-		, m_io_k330(*this, "K33_0")
-		, m_io_k331(*this, "K33_1")
-		, m_io_k340(*this, "K34_0")
-		, m_io_k341(*this, "K34_1")
-		, m_io_k350(*this, "K35_0")
-		, m_io_k351(*this, "K35_1")
-		, m_io_k360(*this, "K36_0")
-		, m_io_k361(*this, "K36_1")
-		, m_io_k370(*this, "K37_0")
-		, m_io_k371(*this, "K37_1")
-		, m_io_k380(*this, "K38_0")
-		, m_io_k390(*this, "K39_0")
-		, m_io_k3a0(*this, "K3a_0")
-		, m_io_k3b0(*this, "K3b_0")
+		, m_io_k3x0(*this, "K3%x_0", 0U)
+		, m_io_k3x1(*this, "K3%x_1", 0U)
 		, m_io_k0b(*this, "K0b")
 		, m_expansion(*this, "expansion")
 		, m_palette(*this, "palette")
@@ -184,34 +165,15 @@ private:
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
 	required_device<wd1772_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<dac_byte_interface> m_ldac;
 	required_device<dac_byte_interface> m_rdac;
 	required_device<cassette_image_device> m_cass;
 	required_ioport m_io_dsw;
 	required_ioport m_io_fdc;
 	required_ioport m_io_k0f;
-	required_ioport m_io_k300;
-	required_ioport m_io_k301;
-	required_ioport m_io_k310;
-	required_ioport m_io_k311;
-	required_ioport m_io_k320;
-	required_ioport m_io_k321;
-	required_ioport m_io_k330;
-	required_ioport m_io_k331;
-	required_ioport m_io_k340;
-	required_ioport m_io_k341;
-	required_ioport m_io_k350;
-	required_ioport m_io_k351;
-	required_ioport m_io_k360;
-	required_ioport m_io_k361;
-	required_ioport m_io_k370;
-	required_ioport m_io_k371;
-	required_ioport m_io_k380;
-	required_ioport m_io_k390;
-	required_ioport m_io_k3a0;
-	required_ioport m_io_k3b0;
+	required_ioport_array<12> m_io_k3x0;
+	required_ioport_array<8> m_io_k3x1;
 	required_ioport m_io_k0b;
 	required_shared_ptr<u16> m_expansion;
 
@@ -370,8 +332,8 @@ void applix_state::port08_w(u8 data)
 	membank("bank1")->set_entry(BIT(data, 6));
 
 	floppy_image_device *floppy = nullptr;
-	if (BIT(data, 2)) floppy = m_floppy0->get_device();
-	if (BIT(data, 3)) floppy = m_floppy1->get_device();
+	if (BIT(data, 2)) floppy = m_floppy[0]->get_device();
+	if (BIT(data, 3)) floppy = m_floppy[1]->get_device();
 
 	m_fdc->set_floppy(floppy);
 
@@ -943,8 +905,8 @@ void applix_state::applix(machine_config &config)
 	m_cass->add_route(ALL_OUTPUTS, "lspeaker", 0.10);
 
 	WD1772(config, m_fdc, 16_MHz_XTAL / 2); //connected to Z80H clock pin
-	FLOPPY_CONNECTOR(config, "fdc:0", applix_floppies, "35dd", applix_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", applix_floppies, "35dd", applix_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], applix_floppies, "35dd", applix_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], applix_floppies, "35dd", applix_state::floppy_formats).enable_sound(true);
 	TIMER(config, "applix_c").configure_periodic(FUNC(applix_state::cass_timer), attotime::from_hz(100000));
 
 	scc8530_device &scc(SCC8530N(config, "scc", 30_MHz_XTAL / 8));
@@ -1048,41 +1010,13 @@ void applix_state::internal_data_write(offs_t offset, u8 data)
 		case 0x0f:
 			m_p1_data = m_io_k0f->read();
 			break;
-		case 0x30:
-			m_p1_data = m_io_k300->read();
-			break;
-		case 0x31:
-			m_p1_data = m_io_k310->read();
-			break;
-		case 0x32:
-			m_p1_data = m_io_k320->read();
-			break;
-		case 0x33:
-			m_p1_data = m_io_k330->read();
-			break;
-		case 0x34:
-			m_p1_data = m_io_k340->read();
-			break;
-		case 0x35:
-			m_p1_data = m_io_k350->read();
-			break;
-		case 0x36:
-			m_p1_data = m_io_k360->read();
+		case 0x30: case 0x31: case 0x32: case 0x33:
+		case 0x34: case 0x35: case 0x36:
+		case 0x38: case 0x39: case 0x3a: case 0x3b:
+			m_p1_data = m_io_k3x0[m_p1 - 0x30]->read();
 			break;
 		case 0x37:
-			m_p1_data = m_io_k370->read() | (m_io_k360->read() & 0x01);
-			break;
-		case 0x38:
-			m_p1_data = m_io_k380->read();
-			break;
-		case 0x39:
-			m_p1_data = m_io_k390->read();
-			break;
-		case 0x3a:
-			m_p1_data = m_io_k3a0->read();
-			break;
-		case 0x3b:
-			m_p1_data = m_io_k3b0->read();
+			m_p1_data = m_io_k3x0[7]->read() | (m_io_k3x0[6]->read() & 0x01);
 			break;
 		}
 	}
@@ -1095,29 +1029,9 @@ void applix_state::internal_data_write(offs_t offset, u8 data)
 		case 0x0b:
 			m_p1_data = m_io_k0b->read();
 			break;
-		case 0x30:
-			m_p1_data = m_io_k301->read();
-			break;
-		case 0x31:
-			m_p1_data = m_io_k311->read();
-			break;
-		case 0x32:
-			m_p1_data = m_io_k321->read();
-			break;
-		case 0x33:
-			m_p1_data = m_io_k331->read();
-			break;
-		case 0x34:
-			m_p1_data = m_io_k341->read();
-			break;
-		case 0x35:
-			m_p1_data = m_io_k351->read();
-			break;
-		case 0x36:
-			m_p1_data = m_io_k361->read();
-			break;
-		case 0x37:
-			m_p1_data = m_io_k371->read();
+		case 0x30: case 0x31: case 0x32: case 0x33:
+		case 0x34: case 0x35: case 0x36: case 0x37:
+			m_p1_data = m_io_k3x1[m_p1 - 0x30]->read();
 			break;
 		case 0x38:
 			m_p1_data = 0xff;

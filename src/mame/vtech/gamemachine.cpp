@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Sean Riddle, Couriersud
-/******************************************************************************
+/*******************************************************************************
 
 VTech Game Machine tabletop/handheld
 It's an electronic game machine + calculator.
@@ -54,7 +54,7 @@ Handheld VFD version (Code Hunter, Grand Prix, Sub Hunt, Blackjack):
 BTANB:
 - gamemach: some digit segments get stuck after crashing in the GP game
 
-===============================================================================
+================================================================================
 
 Tabletop version notes:
 
@@ -90,7 +90,7 @@ Grand Prix:
   [RET] [Go ] [   ] [   ] [   ] [   ] [   ] [Up ] [Up ] [Up ]
   [Brk] [Gas] [   ] [   ] [   ] [   ] [   ] [Dwn] [Dwn] [Dwn]
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -119,7 +119,7 @@ public:
 		m_psu(*this, "psu"),
 		m_display(*this, "display"),
 		m_speaker(*this, "speaker"),
-		m_snd_nl_pin(*this, "snd_nl:p%02u", 8U),
+		m_sound_nl(*this, "sound_nl:p%02u", 8U),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
@@ -135,7 +135,7 @@ private:
 	required_device<f38t56_device> m_psu;
 	required_device<pwm_display_device> m_display;
 	optional_device<speaker_sound_device> m_speaker;
-	optional_device_array<netlist_mame_logic_input_device, 8> m_snd_nl_pin;
+	optional_device_array<netlist_mame_logic_input_device, 8> m_sound_nl;
 	required_ioport_array<2> m_inputs;
 
 	void main_map(address_map &map);
@@ -165,9 +165,9 @@ void gm_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void gm_state::update_display()
 {
@@ -226,7 +226,7 @@ void gm_state::discrete_w(u8 data)
 
 	// P40-P47: 555 to speaker (see nl_gamemachine.cpp)
 	for (int i = 0; i < 8; i++)
-		m_snd_nl_pin[i]->write_line(BIT(~data, i));
+		m_sound_nl[i]->write_line(BIT(~data, i));
 }
 
 u8 gm_state::sound_r()
@@ -236,9 +236,9 @@ u8 gm_state::sound_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void gm_state::main_map(address_map &map)
 {
@@ -255,9 +255,9 @@ void gm_state::main_io(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( gamemach )
 	PORT_START("IN.0")
@@ -321,9 +321,9 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void gm_state::v4in1eg(machine_config &config)
 {
@@ -359,24 +359,25 @@ void gm_state::gamemach(machine_config &config)
 	config.set_default_layout(layout_gamemach);
 
 	// sound hardware
-	NETLIST_SOUND(config, "snd_nl", 48000).set_source(NETLIST_NAME(gamemachine)).add_route(ALL_OUTPUTS, "mono", 1.0);
-	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "SPK1.2").set_mult_offset(-10000.0 / 32768.0, 10000.0 * 3.75 / 32768.0);
+	config.device_remove("speaker");
+	NETLIST_SOUND(config, "sound_nl", 48000).set_source(NETLIST_NAME(gamemachine)).add_route(ALL_OUTPUTS, "mono", 1.0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "SPK1.2").set_mult_offset(-10000.0 / 32768.0, 10000.0 * 3.75 / 32768.0);
 
-	NETLIST_LOGIC_INPUT(config, "snd_nl:p08", "P08.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "snd_nl:p09", "P09.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "snd_nl:p10", "P10.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "snd_nl:p11", "P11.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "snd_nl:p12", "P12.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "snd_nl:p13", "P13.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "snd_nl:p14", "P14.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "snd_nl:p15", "P15.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:p08", "P08.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:p09", "P09.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:p10", "P10.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:p11", "P11.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:p12", "P12.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:p13", "P13.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:p14", "P14.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:p15", "P15.IN", 0);
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( gamemach )
 	ROM_REGION( 0x0800, "maincpu", 0 )
@@ -392,11 +393,11 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME      PARENT CMP MACHINE   INPUT     CLASS     INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1978, gamemach, 0,      0, gamemach, gamemach, gm_state, empty_init, "VTech / Waddingtons", "The Game Machine", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS     INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1978, gamemach, 0,      0,      gamemach, gamemach, gm_state, empty_init, "VTech / Waddingtons", "The Game Machine", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-CONS( 1979, v4in1eg,  0,      0, v4in1eg,  v4in1eg,  gm_state, empty_init, "VTech", "4 in 1 Electronic Games (VTech)", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, v4in1eg,  0,      0,      v4in1eg,  v4in1eg,  gm_state, empty_init, "VTech", "4 in 1 Electronic Games (VTech)", MACHINE_SUPPORTS_SAVE )

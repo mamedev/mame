@@ -27,17 +27,6 @@ TsConf: https://github.com/tslabs/zx-evo/blob/master/pentevo/docs/TSconf/tsconf_
 FAQ-RUS: https://forum.tslabs.info/viewtopic.php?f=35&t=157
     ROM: https://github.com/tslabs/zx-evo/blob/master/pentevo/rom/bin/ts-bios.rom (validated on: 2021-12-14)
 
-HowTo:
-# Create SD image "wc.img"
-# Copy WC files from archive https://github.com/tslabs/zx-evo/blob/master/pentevo/soft/WC/wc.zip
-# Tech Demos (currently *.spg only): http://prods.tslabs.info/index.php?t=4
-$ chdman createhd -i wc.img -o wc.chd -c none
-$ mame tsconf -hard wc.chd
-# BIOS Setup loads on fresh setup (return to BIOS: RShift+F3)
-# Change "Reset To: BD boot.$c"
-# Reset (F3)
-# Enable keyboard: MAME Setup (Tab) > Keyboard Mode > AT Keyboard: Enabled
-
 TODO:
 - Ram cache
 - VDos
@@ -49,13 +38,14 @@ TODO:
 #include "emu.h"
 #include "tsconf.h"
 
+#include "bus/spectrum/zxbus.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "speaker.h"
 
 TILE_GET_INFO_MEMBER(tsconf_state::get_tile_info_txt)
 {
-	u8 *m_row_location = &m_ram->pointer()[(m_regs[V_PAGE] << 14) + (tile_index / tilemap.cols() * 256)];
+	u8 *m_row_location = &m_ram->pointer()[get_vpage_offset() + (tile_index / tilemap.cols() * 256)];
 	u8 col = tile_index % tilemap.cols();
 	u8 symbol = m_row_location[col];
 	tileinfo.set(TM_TS_CHAR, symbol, 0, 0);
@@ -92,7 +82,7 @@ void tsconf_state::tsconf_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0000).mirror(0x7ffd).w(FUNC(tsconf_state::tsconf_port_7ffd_w));
-	map(0x001f, 0x001f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::status_r), FUNC(beta_disk_device::command_w));
+	map(0x001f, 0x001f).mirror(0xff00).r(FUNC(tsconf_state::tsconf_port_xx1f_r)).w(m_beta, FUNC(beta_disk_device::command_w));
 	map(0x003f, 0x003f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w));
 	map(0x0057, 0x0057).mirror(0xff00).rw(FUNC(tsconf_state::tsconf_port_57_zctr_r), FUNC(tsconf_state::tsconf_port_57_zctr_w)); // spi config
 	map(0x0077, 0x0077).mirror(0xff00).rw(FUNC(tsconf_state::tsconf_port_77_zctr_r), FUNC(tsconf_state::tsconf_port_77_zctr_w)); // spi data
@@ -101,10 +91,15 @@ void tsconf_state::tsconf_io(address_map &map)
 	map(0x00fe, 0x00fe).select(0xff00).rw(FUNC(tsconf_state::spectrum_ula_r), FUNC(tsconf_state::tsconf_ula_w));
 	map(0x00ff, 0x00ff).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::state_r), FUNC(beta_disk_device::param_w));
 	map(0x00af, 0x00af).select(0xff00).rw(FUNC(tsconf_state::tsconf_port_xxaf_r), FUNC(tsconf_state::tsconf_port_xxaf_w));
+	map(0xfadf, 0xfadf).lr8(NAME([this]() { return 0x80 | (m_io_mouse[2]->read() & 0x07); }));
+	map(0xfbdf, 0xfbdf).lr8(NAME([this]() { return  m_io_mouse[0]->read(); }));
+	map(0xffdf, 0xffdf).lr8(NAME([this]() { return ~m_io_mouse[1]->read(); }));
 	map(0x8ff7, 0x8ff7).select(0x7000).w(FUNC(tsconf_state::tsconf_port_f7_w)); // 3:bff7 5:dff7 6:eff7
 	map(0xbff7, 0xbff7).r(FUNC(tsconf_state::tsconf_port_f7_r));
-	map(0x8000, 0x8000).mirror(0x3ffd).w("ay8912", FUNC(ay8910_device::data_w));
-	map(0xc000, 0xc000).mirror(0x3ffd).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
+	map(0x00fb, 0x00fb).mirror(0xff00).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0x8000, 0x8000).mirror(0x3ffd).lw8(NAME([this](u8 data) { return m_ay[m_ay_selected]->data_w(data); }));
+	map(0xc000, 0xc000).mirror(0x3ffd).lr8(NAME([this]() { return m_ay[m_ay_selected]->data_r(); }))
+		.w(FUNC(tsconf_state::tsconf_ay_address_w));
 }
 
 void tsconf_state::tsconf_switch(address_map &map)
@@ -177,7 +172,7 @@ void tsconf_state::video_start()
 	m_ts_tilemap[TM_TILES1]->set_transparent_pen(0);
 
 	m_frame_irq_timer = timer_alloc(FUNC(tsconf_state::irq_frame), this);
-	m_line_irq_timer = timer_alloc(FUNC(tsconf_state::irq_scanline), this);
+	m_scanline_irq_timer = timer_alloc(FUNC(tsconf_state::irq_scanline), this);
 }
 
 void tsconf_state::machine_start()
@@ -196,6 +191,10 @@ void tsconf_state::machine_start()
 
 void tsconf_state::machine_reset()
 {
+	m_frame_irq_timer->adjust(attotime::never);
+	m_scanline_irq_timer->adjust(attotime::never);
+	m_int_mask = 0;
+
 	m_bank0_rom.select(0);
 
 	m_glukrs->disable();
@@ -228,6 +227,7 @@ void tsconf_state::machine_reset()
 
 	m_zctl_cs = 1;
 	m_zctl_di = 0xff;
+	m_ay_selected = 0;
 
 	tsconf_update_bank0();
 	tsconf_update_video_mode();
@@ -235,6 +235,26 @@ void tsconf_state::machine_reset()
 	m_keyboard->write(0xff);
 	while (m_keyboard->read() != 0) { /* invalidate buffer */ }
 }
+
+INPUT_PORTS_START( tsconf )
+	PORT_INCLUDE( spec_plus )
+
+	PORT_START("mouse_input1")
+	PORT_BIT(0xff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(30)
+
+	PORT_START("mouse_input2")
+	PORT_BIT(0xff, 0, IPT_MOUSE_Y) PORT_SENSITIVITY(30)
+
+	PORT_START("mouse_input3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Left mouse button") PORT_CODE(MOUSECODE_BUTTON1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Right mouse button") PORT_CODE(MOUSECODE_BUTTON2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Middle mouse button") PORT_CODE(MOUSECODE_BUTTON3)
+
+	PORT_START("MOD_AY")
+	PORT_CONFNAME(0x01, 0x00, "AY MOD")
+	PORT_CONFSETTING(0x00, "Single")
+	PORT_CONFSETTING(0x01, "TurboSound")
+INPUT_PORTS_END
 
 void tsconf_state::tsconf(machine_config &config)
 {
@@ -247,8 +267,14 @@ void tsconf_state::tsconf(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tsconf_state::tsconf_mem);
 	m_maincpu->set_addrmap(AS_IO, &tsconf_state::tsconf_io);
 	m_maincpu->set_addrmap(AS_OPCODES, &tsconf_state::tsconf_switch);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(tsconf_state::irq_vector));
 
 	m_maincpu->set_vblank_int("screen", FUNC(tsconf_state::tsconf_vblank_interrupt));
+
+	zxbus_device &zxbus(ZXBUS(config, "zxbus", 0));
+	zxbus.set_iospace("maincpu", AS_IO);
+	ZXBUS_SLOT(config, "zxbus1", 0, "zxbus", zxbus_cards, nullptr);
+	//ZXBUS_SLOT(config, "zxbus2", 0, "zxbus", zxbus_cards, nullptr);
 
 	m_ram->set_default_size("4096K");
 
@@ -269,11 +295,21 @@ void tsconf_state::tsconf(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YM2149(config.replace(), "ay8912", 14_MHz_XTAL / 8)
+	config.device_remove("ay8912");
+	YM2149(config, m_ay[0], 14_MHz_XTAL / 8)
 		.add_route(0, "lspeaker", 0.50)
 		.add_route(1, "lspeaker", 0.25)
 		.add_route(1, "rspeaker", 0.25)
 		.add_route(2, "rspeaker", 0.50);
+	YM2149(config, m_ay[1], 14_MHz_XTAL / 8)
+		.add_route(0, "lspeaker", 0.50)
+		.add_route(1, "lspeaker", 0.25)
+		.add_route(1, "rspeaker", 0.25)
+		.add_route(2, "rspeaker", 0.50);
+
+	CENTRONICS(config, m_centronics, centronics_devices, "covox");
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	PALETTE(config, "palette", FUNC(tsconf_state::tsconf_palette), 256);
 	m_screen->set_raw(14_MHz_XTAL / 2, 448, with_hblank(0), 448, 320, with_vblank(0), 320);
@@ -293,4 +329,4 @@ ROM_START(tsconf)
 ROM_END
 
 //    YEAR  NAME    PARENT      COMPAT  MACHINE     INPUT       CLASS           INIT        COMPANY             FULLNAME                            FLAGS
-COMP( 2011, tsconf, spec128,    0,      tsconf,     spec_plus,  tsconf_state,   empty_init, "NedoPC, TS-Labs",  "ZX Evolution: TS-Configuration",   0)
+COMP( 2011, tsconf, spec128,    0,      tsconf,     tsconf,     tsconf_state,   empty_init, "NedoPC, TS-Labs",  "ZX Evolution: TS-Configuration",   0)

@@ -9,8 +9,8 @@
     04/05/2008 Created by Miodrag Milanovic
 
 *********************************************************************/
-#ifndef MAME_SINCLAIR_BETA_H
-#define MAME_SINCLAIR_BETA_H
+#ifndef MAME_SINCLAIR_BETA_M_H
+#define MAME_SINCLAIR_BETA_M_H
 
 #pragma once
 
@@ -52,10 +52,7 @@ private:
 	uint8_t m_betadisk_active;
 
 	required_device<kr1818vg93_device> m_wd179x;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
+	required_device_array<floppy_connector, 4> m_floppy;
 	void fdc_hld_w(int state);
 	void motors_control();
 	u8 m_control;
@@ -67,4 +64,4 @@ private:
 DECLARE_DEVICE_TYPE(BETA_DISK, beta_disk_device)
 
 
-#endif // MAME_SINCLAIR_BETA_H
+#endif // MAME_SINCLAIR_BETA_M_H

@@ -5,7 +5,7 @@
 #include "emumem_hep.h"
 #include "emumem_het.h"
 
-template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_tap<Width, AddrShift>::read(offs_t offset, uX mem_mask) const
+template<int Width, int AddrShift> emu::detail::handler_entry_size_t<Width> handler_entry_read_tap<Width, AddrShift>::read(offs_t offset, uX mem_mask) const
 {
 	this->ref();
 
@@ -16,7 +16,18 @@ template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Widt
 	return data;
 }
 
-template<int Width, int AddrShift> std::pair<typename emu::detail::handler_entry_size<Width>::uX, u16> handler_entry_read_tap<Width, AddrShift>::read_flags(offs_t offset, uX mem_mask) const
+template<int Width, int AddrShift> emu::detail::handler_entry_size_t<Width> handler_entry_read_tap<Width, AddrShift>::read_interruptible(offs_t offset, uX mem_mask) const
+{
+	this->ref();
+
+	uX data = this->m_next->read_interruptible(offset, mem_mask);
+	m_tap(offset, data, mem_mask);
+
+	this->unref();
+	return data;
+}
+
+template<int Width, int AddrShift> std::pair<emu::detail::handler_entry_size_t<Width>, u16> handler_entry_read_tap<Width, AddrShift>::read_flags(offs_t offset, uX mem_mask) const
 {
 	this->ref();
 
@@ -49,6 +60,16 @@ template<int Width, int AddrShift> void handler_entry_write_tap<Width, AddrShift
 
 	m_tap(offset, data, mem_mask);
 	this->m_next->write(offset, data, mem_mask);
+
+	this->unref();
+}
+
+template<int Width, int AddrShift> void handler_entry_write_tap<Width, AddrShift>::write_interruptible(offs_t offset, uX data, uX mem_mask) const
+{
+	this->ref();
+
+	m_tap(offset, data, mem_mask);
+	this->m_next->write_interruptible(offset, data, mem_mask);
 
 	this->unref();
 }

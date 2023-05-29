@@ -5,8 +5,8 @@
     D-Day
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_DDAY_H
-#define MAME_INCLUDES_DDAY_H
+#ifndef MAME_OLYMPIA_DDAY_H
+#define MAME_OLYMPIA_DDAY_H
 
 #pragma once
 
@@ -84,4 +84,4 @@ private:
 	void dday_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_DDAY_H
+#endif // MAME_OLYMPIA_DDAY_H

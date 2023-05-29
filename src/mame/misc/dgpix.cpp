@@ -166,6 +166,8 @@ Notes:
 #include "speaker.h"
 
 
+namespace {
+
 class dgpix_state : public driver_device
 {
 public:
@@ -717,6 +719,9 @@ void dgpix_state::init_fmaniac3()
 {
 	m_flash_roms = 2;
 }
+
+} // anonymous namespace
+
 
 GAME( 1999, elfin,    0,      dgpix, dgpix, dgpix_state, init_elfin,    ROT0, "dgPIX Entertainment Inc.", "Elfin",                             MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1999, jumpjump, 0,      dgpix, dgpix, dgpix_state, init_jumpjump, ROT0, "dgPIX Entertainment Inc.", "Jump Jump",                         MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

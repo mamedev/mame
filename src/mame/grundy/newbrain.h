@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_NEWBRAIN_H
-#define MAME_INCLUDES_NEWBRAIN_H
+#ifndef MAME_GRUNDY_NEWBRAIN_H
+#define MAME_GRUNDY_NEWBRAIN_H
 
 #pragma once
 
@@ -142,4 +142,4 @@ private:
 	emu_timer *m_clkint_timer = nullptr;
 };
 
-#endif
+#endif // MAME_GRUNDY_NEWBRAIN_H

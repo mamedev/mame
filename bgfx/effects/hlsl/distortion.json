@@ -38,6 +38,7 @@
 		{ "name": "u_round_corner",     "type": "vec4", "values": [ 0.20, 0.0, 0.0, 0.0 ] },
 		{ "name": "u_smooth_border",    "type": "vec4", "values": [ 0.05, 0.0, 0.0, 0.0 ] },
 		{ "name": "u_vignetting",       "type": "vec4", "values": [ 0.20, 0.0, 0.0, 0.0 ] },
-		{ "name": "u_reflection",       "type": "vec4", "values": [ 0.30, 0.0, 0.0, 0.0 ] }
+		{ "name": "u_reflection",       "type": "vec4", "values": [ 0.30, 0.0, 0.0, 0.0 ] },
+		{ "name": "u_inv_view_dims",    "type": "vec4", "values": [ 1.0,  1.0, 0.0, 0.0 ] }
 	]
 }

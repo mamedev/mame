@@ -248,7 +248,7 @@ end
 
 local function handle_edit_menu(index, event, buttons)
 	local section, adjusted_index = menu_section(index)
-	if ((section == MENU_SECTIONS.FOOTER) and (event == 'select')) or (event == 'cancel') then
+	if ((section == MENU_SECTIONS.FOOTER) and (event == 'select')) or (event == 'back') then
 		configure_menu_active = false
 		table.remove(menu_stack)
 		return true
@@ -285,7 +285,7 @@ end
 
 local function handle_add_menu(index, event, buttons)
 	local section, adjusted_index = menu_section(index)
-	if ((section == MENU_SECTIONS.FOOTER) and (event == 'select')) or (event == 'cancel') then
+	if ((section == MENU_SECTIONS.FOOTER) and (event == 'select')) or (event == 'back') then
 		configure_menu_active = false
 		table.remove(menu_stack)
 		if is_button_complete(current_button) and (event == 'select') then

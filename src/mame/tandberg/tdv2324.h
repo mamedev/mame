@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder,Jonathan Gevaryahu
-#ifndef MAME_INCLUDES_TDV2324_H
-#define MAME_INCLUDES_TDV2324_H
+#ifndef MAME_TANDBERG_TDV2324_H
+#define MAME_TANDBERG_TDV2324_H
 
 #pragma once
 
@@ -89,4 +89,4 @@ private:
 };
 
 
-#endif
+#endif // MAME_TANDBERG_TDV2324_H

@@ -14,6 +14,9 @@
 // According to http://nerdlypleasures.blogspot.com/2014/04/the-original-8-bit-ide-interface.html
 // the IBM PS/2 Model 25-286 and Model 30-286 use a customised version of the XTA (8-bit IDE) harddisk interface
 
+
+namespace {
+
 class ps2_state : public driver_device
 {
 public:
@@ -290,6 +293,9 @@ ROM_START( i8580111 )
 	ROM_LOAD16_BYTE( "15f6637.bin", 0x00000, 0x10000, CRC(76c36d1a) SHA1(c68d52a2e5fbd303225ebb006f91869b29ef700a))
 	ROM_LOAD16_BYTE( "15f6639.bin", 0x00001, 0x10000, CRC(82cf0f7d) SHA1(13bb39225757b89749af70e881af0228673dbe0c))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1990, i8530h31, 0,        ibm5170, ps2m30286, 0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 8530-H31 (Model 30/286)", MACHINE_NOT_WORKING )
 COMP( 1988, i8530286, i8530h31, 0,       ps2m30286, 0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 Model 30-286", MACHINE_NOT_WORKING )

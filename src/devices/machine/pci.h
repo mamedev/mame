@@ -249,6 +249,8 @@ protected:
 	void config_address_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t config_data_r(offs_t offset, uint32_t mem_mask = ~0);
 	void config_data_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t config_data_ex_r(offs_t offset, uint32_t mem_mask = ~0);
+	void config_data_ex_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

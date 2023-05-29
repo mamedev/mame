@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Roberto Fresca
-#ifndef MAME_INCLUDES_LUCKY74_H
-#define MAME_INCLUDES_LUCKY74_H
+#ifndef MAME_WING_LUCKY74_H
+#define MAME_WING_LUCKY74_H
 
 #pragma once
 
@@ -75,4 +75,4 @@ private:
 	output_finder<12> m_lamps;
 };
 
-#endif // MAME_INCLUDES_LUCKY74_H
+#endif // MAME_WING_LUCKY74_H

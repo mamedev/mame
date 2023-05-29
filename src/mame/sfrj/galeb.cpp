@@ -68,6 +68,8 @@ ToDo:
 #include "sound/dac.h"
 #include "emupal.h"
 
+namespace {
+
 class galeb_state : public driver_device
 {
 public:
@@ -351,6 +353,8 @@ ROM_START( galeb )
 	ROM_REGION(0x0800, "chargen",0)
 	ROM_LOAD ("chrgen.bin",  0x0000, 0x0800, CRC(409a800e) SHA1(0efe429dd6c0568032636e691d9865a623afeb55) )
 ROM_END
+
+} // Anonymous namespace
 
 /* Driver */
 

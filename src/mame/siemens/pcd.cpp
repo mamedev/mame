@@ -529,7 +529,6 @@ void pcd_state::pcd(machine_config &config)
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->irq().set(m_pic1, FUNC(pic8259_device::ir7_w));
 	m_rtc->set_binary(true);
-	m_rtc->set_binary_year(true);
 	m_rtc->set_epoch(1900);
 	m_rtc->set_24hrs(true);
 

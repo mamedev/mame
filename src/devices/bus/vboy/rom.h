@@ -18,7 +18,7 @@ public:
 	vboy_flat_rom_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 	// device_vboy_cart_interface implementation
-	virtual image_init_result load() override ATTR_COLD;
+	virtual std::error_condition load() override ATTR_COLD;
 
 protected:
 	vboy_flat_rom_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
@@ -34,7 +34,7 @@ public:
 	vboy_flat_rom_sram_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 	// device_vboy_cart_interface implementation
-	virtual image_init_result load() override ATTR_COLD;
+	virtual std::error_condition load() override ATTR_COLD;
 	virtual void unload() override ATTR_COLD;
 };
 

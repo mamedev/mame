@@ -50,9 +50,9 @@
 //  LOGGING
 //**************************************************************************
 
-#define LOG_CONF      (1 << 1U)
-#define LOG_KEYBOARD  (1 << 2U)
-#define LOG_DISPLAY   (1 << 3U)
+#define LOG_CONF      (1U << 1)
+#define LOG_KEYBOARD  (1U << 2)
+#define LOG_DISPLAY   (1U << 3)
 
 //#define VERBOSE (LOG_CONF|LOG_DISPLAY|LOG_KEYBOARD)
 //#define LOG_OUTPUT_STREAM std::cout

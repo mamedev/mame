@@ -6,8 +6,8 @@
  *
  ***********************************************/
 
-#ifndef MAME_INCLUDES_BUNGO_H
-#define MAME_INCLUDES_BUNGO_H
+#ifndef MAME_NEC_BUNGO_H
+#define MAME_NEC_BUNGO_H
 
 #pragma once
 
@@ -42,4 +42,4 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
-#endif // MAME_INCLUDES_BUNGO_H
+#endif // MAME_NEC_BUNGO_H

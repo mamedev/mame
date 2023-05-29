@@ -5,8 +5,8 @@
     8080-based black and white sound hardware
 
 ****************************************************************************/
-#ifndef MAME_AUDIO_8080BW_H
-#define MAME_AUDIO_8080BW_H
+#ifndef MAME_MIDW8080_8080BW_A_H
+#define MAME_MIDW8080_8080BW_A_H
 
 #pragma once
 
@@ -42,4 +42,4 @@ private:
 
 DECLARE_DEVICE_TYPE(CANE_AUDIO, cane_audio_device)
 
-#endif // MAME_AUDIO_8080BW_H
+#endif // MAME_MIDW8080_8080BW_A_H

@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_PRIMO_H
-#define MAME_INCLUDES_PRIMO_H
+#ifndef MAME_MICROKEY_PRIMO_H
+#define MAME_MICROKEY_PRIMO_H
 
 #pragma once
 
@@ -95,4 +95,4 @@ private:
 };
 
 
-#endif // MAME_INCLUDES_PRIMO_H
+#endif // MAME_MICROKEY_PRIMO_H

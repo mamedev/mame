@@ -29,8 +29,11 @@
 #include "cpu/sh/sh4.h"
 #include "sound/aica.h"
 
-// TODO: fine grain this value
-#define ATAPI_CYCLES_PER_SECTOR (5000)
+// 12x disc drive * 75 Hz = 0,00(1) secs per sector, very optimistic
+// Estimate Sega benchmarks:
+// - 14.4 MBytes/sec for system/texture/G2 external area,
+// - 11.3 for AICA RAM (likely bus contention with audio CPU)
+#define ATAPI_SINGLE_XFER_TIME (1111)
 
 #define LOG_WARN    (1U << 1)
 #define LOG_XFER    (1U << 2) // log ATAPI transfers
@@ -56,15 +59,22 @@ TIMER_CALLBACK_MEMBER(dc_cons_state::atapi_xfer_end )
 {
 	uint8_t sector_buffer[ 4096 ];
 
-	atapi_timer->adjust(attotime::never);
+	assert(atapi_xferlen >= 0);
 
-	LOGXFER("atapi_xfer_end atapi_xferlen = %d\n", atapi_xferlen );
+	if (atapi_xferlen == 0)
+	{
+		LOGXFER("atapi_xfer_end\n");
+		atapi_timer->adjust(attotime::never);
+		g1bus_regs[SB_GDST] = 0;
+		dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_GDROM;
+		dc_update_interrupt_status();
+		m_ata->write_dmack(0);
+		return;
+	}
 
 	m_ata->write_dmack(1);
-	atapi_xfercomplete = 0;
 
-	// TODO: dispatch transfers one step at a time instead of the full block
-	while (atapi_xferlen > 0 )
+	//while (atapi_xferlen > 0 )
 	{
 		struct sh4_ddt_dma ddtdata;
 
@@ -76,7 +86,6 @@ TIMER_CALLBACK_MEMBER(dc_cons_state::atapi_xfer_end )
 			sector_buffer[ (i*2)+1 ] = d >> 8;
 		}
 
-		atapi_xferlen -= 2048;
 		atapi_xfercomplete += 2048;
 
 		// perform the DMA
@@ -92,14 +101,16 @@ TIMER_CALLBACK_MEMBER(dc_cons_state::atapi_xfer_end )
 		);
 		m_maincpu->sh4_dma_ddt(&ddtdata);
 
+		atapi_xferlen -= 2048;
 		atapi_xferbase += 2048;
 	}
 
+	// TODO: understand when this should go off
+	// (would otherwise cause REQ ERRORs in gdrom_device with current hookup)
 	m_ata->write_dmack(0);
 
-	g1bus_regs[SB_GDST] = 0;
-	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_GDROM;
-	dc_update_interrupt_status();
+	// set the next transfer, or a transfer end event.
+	atapi_timer->adjust(attotime::from_usec(ATAPI_SINGLE_XFER_TIME), atapi_xferlen);
 }
 
 void dc_cons_state::dreamcast_atapi_init()
@@ -177,10 +188,8 @@ void dc_cons_state::dc_mess_g1_ctrl_w(offs_t offset, uint32_t data, uint32_t mem
 				}
 
 				atapi_xferbase = g1bus_regs[SB_GDSTAR];
-				//atapi_timer->adjust(m_maincpu->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))));
-				/* 12x * 75 Hz = 0,00(1) secs per sector */
-				/* TODO: make DMA to be single step */
-				atapi_timer->adjust(attotime::from_usec(1111*atapi_xferlen/2048));
+				atapi_xfercomplete = 0;
+				atapi_timer->adjust(attotime::from_usec(ATAPI_SINGLE_XFER_TIME), atapi_xferlen);
 //              atapi_regs[ATAPI_REG_SAMTAG] = GDROM_PAUSE_STATE | 0x80;
 			}
 			break;

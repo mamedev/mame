@@ -9,11 +9,11 @@
 #include "emu.h"
 #include "machine/upc82c711.h"
 
-#define LOG_CFG (1 << 0)
-#define LOG_FDC (1 << 1)
-#define LOG_IDE (1 << 2)
-#define LOG_LPT (1 << 3)
-#define LOG_SER (1 << 4)
+#define LOG_CFG (1U << 1)
+#define LOG_FDC (1U << 2)
+#define LOG_IDE (1U << 3)
+#define LOG_LPT (1U << 4)
+#define LOG_SER (1U << 5)
 
 #define VERBOSE (0)
 

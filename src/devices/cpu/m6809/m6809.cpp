@@ -22,6 +22,10 @@
 
     History:
 
+January 2023 tlindner:
+    Add 6809 undocumented opcodes as described here:
+    https://github.com/hoglet67/6809Decoder/wiki/Undocumented-6809-Behaviours
+
 July 2016 ErikGav:
     Unify with 6309 pairs and quads (A+B=D, E+F=W, D+W=Q)
 
@@ -113,7 +117,9 @@ March 2013 NPW:
 //  PARAMETERS
 //**************************************************************************
 
-#define LOG_INTERRUPTS  0
+#define LOG_INTERRUPTS (1U << 1)
+#define VERBOSE (0)
+#include "logmacro.h"
 
 // turn off 'unreferenced label' errors
 #if defined(__GNUC__)
@@ -214,6 +220,7 @@ void m6809_base_device::device_start()
 	save_item(NAME(m_addressing_mode));
 	save_item(NAME(m_reg));
 	save_item(NAME(m_cond));
+	save_item(NAME(m_free_run));
 
 	// set our instruction counter
 	set_icountptr(m_icount);
@@ -233,14 +240,14 @@ void m6809_base_device::device_reset()
 	m_firq_line = false;
 	m_irq_line = false;
 	m_lds_encountered = false;
+	m_free_run = false;
 
 	m_dp = 0x00;        // reset direct page register
 
 	m_cc |= CC_I;       // IRQ disabled
 	m_cc |= CC_F;       // FIRQ disabled
 
-	m_pc.b.h = space(AS_PROGRAM).read_byte(VECTOR_RESET_FFFE + 0);
-	m_pc.b.l = space(AS_PROGRAM).read_byte(VECTOR_RESET_FFFE + 1);
+	set_ea(VECTOR_RESET_FFFE);
 
 	// reset sub-instruction state
 	reset_state();
@@ -449,8 +456,7 @@ uint32_t m6809_base_device::execute_input_lines() const noexcept
 
 void m6809_base_device::execute_set_input(int inputnum, int state)
 {
-	if (LOG_INTERRUPTS)
-		logerror("%s: inputnum=%s state=%d totalcycles=%d\n", machine().describe_context(), inputnum_string(inputnum), state, (int) attotime_to_clocks(machine().time()));
+	LOGMASKED(LOG_INTERRUPTS, "%s: inputnum=%s state=%d totalcycles=%d\n", machine().describe_context(), inputnum_string(inputnum), state, attotime_to_clocks(machine().time()));
 
 	switch(inputnum)
 	{

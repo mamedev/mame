@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco, hap
 // thanks-to:yoyo_chessboard
-/******************************************************************************
+/*******************************************************************************
 
 Mephisto Academy
 
@@ -18,7 +18,7 @@ Since the program is on an external module, it appears it was meant to be
 a modular chesscomputer. However, no extra modules were sold separately.
 Module PCB is the same as Super Mondial II College, label HGS 10 116 05.
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -64,9 +64,9 @@ private:
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void academy_state::led_w(u8 data)
 {
@@ -84,9 +84,9 @@ u8 academy_state::input_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void academy_state::main_map(address_map &map)
 {
@@ -102,9 +102,9 @@ void academy_state::main_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( academy )
 	PORT_START("KEY")
@@ -123,13 +123,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void academy_state::academy(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M65C02(config, m_maincpu, 4.9152_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &academy_state::main_map);
 
@@ -144,16 +144,16 @@ void academy_state::academy(machine_config &config)
 	MEPHISTO_SENSORS_BOARD(config, "board"); // internal
 	MEPHISTO_DISPLAY_MODULE2(config, "display"); // internal
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_led_pwm).set_size(4, 4);
 	config.set_default_layout(layout_mephisto_academy);
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( academy )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -177,11 +177,11 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
     Drivers
-***************************************************************************/
+*******************************************************************************/
 
-/*    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY             FULLNAME                      FLAGS */
-CONS( 1989, academy,   0,       0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, academyg,  academy, 0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (German, 06-03-89)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, academyga, academy, 0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (German, 04-10-88)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1989, academy,   0,       0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, academyg,  academy, 0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (German, 06-03-89)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, academyga, academy, 0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (German, 04-10-88)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

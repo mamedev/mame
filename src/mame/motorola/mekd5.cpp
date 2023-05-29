@@ -89,6 +89,9 @@ FS 0 to F
 #include "render.h"
 #include "mekd5.lh"
 
+
+namespace {
+
 #define XTAL_MEKD5 3.579545_MHz_XTAL
 
 class mekd5_state : public driver_device
@@ -507,6 +510,9 @@ ROM_START(mekd5)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("d5bug.rom", 0xf000, 0x0800, CRC(67c00a2c) SHA1(ae321dbca0baf4b67d62bfec77266d9132b973bf))
 ROM_END
+
+} // anonymous namespace
+
 
 /***************************************************************************
 

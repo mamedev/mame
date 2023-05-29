@@ -583,27 +583,37 @@ static INPUT_PORTS_START( tripool )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW1:!5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW1:!6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW1:!7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:!8" )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!5")
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x10, "5" )
+	PORT_DIPNAME( 0x20, 0x00, "Bonus Life (Game A)" )   PORT_DIPLOCATION("SW1:!6")
+	PORT_DIPSETTING(    0x00, "Every 100" )
+	PORT_DIPSETTING(    0x20, "Every 200" )
+	PORT_DIPNAME( 0x40, 0x00, "Bonus Life (Game B)" )   PORT_DIPLOCATION("SW1:!7")
+	PORT_DIPSETTING(    0x00, "100, 200, Every 150" )
+	PORT_DIPSETTING(    0x40, "Every 200" )
+	PORT_DIPNAME( 0x80, 0x00, "Bonus Life (Game C)" )   PORT_DIPLOCATION("SW1:!8")
+	PORT_DIPSETTING(    0x00, "20, 50, Every 50" )
+	PORT_DIPSETTING(    0x80, "50, 100, Every 100" )
 
 	PORT_START("DSW2")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x00, "SW2:!1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "SW2:!2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW2:!3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW2:!4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW2:!5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW2:!6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW2:!7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW2:!8" )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:!1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x00, "SW2:!2" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x00, "SW2:!3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x00, "SW2:!4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x00, "SW2:!5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "SW2:!6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "SW2:!7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW2:!8" )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME ("Select Game 1")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME ("Select Game 2")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME ("Select Game 3")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Button A") // Straight Pool
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Button B") // Nine Ball
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Button C") // Snooker
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -618,15 +628,22 @@ static INPUT_PORTS_START( tripool )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_8WAY PORT_COCKTAIL
 
+	// 5 cue ball spin buttons, positioned in a "+" pattern
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // not needed?
-	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Button Center")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Button Up")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P1 Button Down")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 Button Right")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Button Left")
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL  // not needed?
-	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_COCKTAIL PORT_NAME("P2 Button Center")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Button Up")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_COCKTAIL PORT_NAME("P2 Button Down")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_COCKTAIL PORT_NAME("P2 Button Right")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Button Left")
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1614,6 +1631,7 @@ void jack_state::init_striv()
  *
  *************************************/
 
+//    YEAR  NAME       PARENT    MACHINE   INPUT     CLASS       INIT           SCREEN  COMPANY, FULLNAME, FLAGS
 GAME( 1982, jack,      0,        jack,     jack,     jack_state, init_jack,     ROT90,  "Hara Industries (Cinematronics license)", "Jack the Giantkiller (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, jack2,     jack,     jack,     jack2,    jack_state, init_jack,     ROT90,  "Hara Industries (Cinematronics license)", "Jack the Giantkiller (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, jack3,     jack,     jack,     jack3,    jack_state, init_jack,     ROT90,  "Hara Industries (Cinematronics license)", "Jack the Giantkiller (set 3)", MACHINE_SUPPORTS_SAVE )
@@ -1622,8 +1640,8 @@ GAME( 1982, zzyzzyxx,  0,        jack,     zzyzzyxx, jack_state, init_zzyzzyxx, 
 GAME( 1982, zzyzzyxx2, zzyzzyxx, jack,     zzyzzyxx, jack_state, init_zzyzzyxx, ROT90,  "Cinematronics / Advanced Microcomputer Systems", "Zzyzzyxx (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, brix,      zzyzzyxx, jack,     zzyzzyxx, jack_state, init_zzyzzyxx, ROT90,  "Cinematronics / Advanced Microcomputer Systems", "Brix", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, freeze,    0,        jack,     freeze,   jack_state, init_jack,     ROT90,  "Cinematronics", "Freeze", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1981, tripool,   0,        jack,     tripool,  jack_state, init_jack,     ROT90,  "Noma (Casino Tech license)", "Tri-Pool (Casino Tech)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, tripoola,  tripool,  jack,     tripool,  jack_state, init_jack,     ROT90,  "Noma (Costal Games license)", "Tri-Pool (Costal Games)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, tripool,   0,        jack,     tripool,  jack_state, init_jack,     ROT90,  "Noma (Casino Tech license)", "Tri-Pool: 3-In-One (Casino Tech)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, tripoola,  tripool,  jack,     tripool,  jack_state, init_jack,     ROT90,  "Noma (Coastal Games license)", "Tri-Pool: 3-In-One (Coastal Games)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, sucasino,  0,        jack,     sucasino, jack_state, init_jack,     ROT90,  "Data Amusement", "Super Casino", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, striv,     0,        striv,    striv,    jack_state, init_striv,    ROT270, "Nova du Canada", "Super Triv (English questions)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, strivf,    striv,    striv,    striv,    jack_state, init_striv,    ROT270, "Nova du Canada", "Super Triv (French questions)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Hara Industries PCB

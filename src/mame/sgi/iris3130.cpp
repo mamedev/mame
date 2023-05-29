@@ -46,9 +46,9 @@
 
 #include <vector>
 
-#define LOG_RTC             (1 << 0)
-#define LOG_INVALID_SEGMENT (1 << 1)
-#define LOG_OTHER           (1 << 2)
+#define LOG_RTC             (1U << 1)
+#define LOG_INVALID_SEGMENT (1U << 2)
+#define LOG_OTHER           (1U << 3)
 
 #define VERBOSE     (0)
 
@@ -224,9 +224,9 @@ QUICKLOAD_LOAD_MEMBER(iris3000_state::load_romboard)
 	if (image.length() == 0 || image.fread(&m_file_data[0], image.length()) != image.length())
 	{
 		m_file_data.clear();
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::UNSPECIFIED, std::string());
 	}
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /***************************************************************************

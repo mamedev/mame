@@ -10,8 +10,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_CONCEPT_H
-#define MAME_INCLUDES_CONCEPT_H
+#ifndef MAME_CONCEPT_CONCEPT_H
+#define MAME_CONCEPT_CONCEPT_H
 
 #include "cpu/m68000/m68000.h"
 #include "machine/6522via.h"
@@ -41,7 +41,7 @@ public:
 		m_videoram(*this,"videoram")
 	{ }
 
-	void concept(machine_config &config);
+	void corvus_concept(machine_config &config);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -76,4 +76,4 @@ private:
 	void concept_memmap(address_map &map);
 };
 
-#endif // MAME_INCLUDES_CONCEPT_H
+#endif // MAME_CONCEPT_CONCEPT_H

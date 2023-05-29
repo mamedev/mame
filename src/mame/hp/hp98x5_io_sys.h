@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_HP98X5_IO_SYS_H
-#define MAME_MACHINE_HP98X5_IO_SYS_H
+#ifndef MAME_HP_HP98X5_IO_SYS_H
+#define MAME_HP_HP98X5_IO_SYS_H
 
 #pragma once
 
@@ -64,4 +64,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(HP98X5_IO_SYS, hp98x5_io_sys_device)
 
-#endif // MAME_MACHINE_HP98X5_IO_SYS_H
+#endif // MAME_HP_HP98X5_IO_SYS_H

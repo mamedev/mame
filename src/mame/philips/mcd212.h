@@ -21,8 +21,8 @@ TODO:
 
 *******************************************************************************/
 
-#ifndef MAME_VIDEO_MCD212_H
-#define MAME_VIDEO_MCD212_H
+#ifndef MAME_PHILIPS_MCD212_H
+#define MAME_PHILIPS_MCD212_H
 
 #pragma once
 
@@ -275,4 +275,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(MCD212, mcd212_device)
 
-#endif // MAME_VIDEO_MCD212_H
+#endif // MAME_PHILIPS_MCD212_H

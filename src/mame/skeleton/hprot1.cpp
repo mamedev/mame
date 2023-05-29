@@ -63,6 +63,14 @@ Infinite loop is reached at address 0x7699
 #include "screen.h"
 #include "speaker.h"
 
+#define LOG_IO_PORTS (1U << 1)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
+
+namespace {
+
 class hprot1_state : public driver_device
 {
 public:
@@ -93,8 +101,6 @@ private:
 	required_device<i80c31_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
 };
-
-#define LOG_IO_PORTS 0
 
 void hprot1_state::i80c31_prg(address_map &map)
 {
@@ -201,14 +207,13 @@ void hprot1_state::machine_reset()
 
 void hprot1_state::henry_p1_w(uint8_t data)
 {
-	if (LOG_IO_PORTS && data != 0xFF && data != 0xEF)
-		logerror("Write to P1: %02X\n", data);
+	if (data != 0xFF && data != 0xEF)
+		LOGMASKED(LOG_IO_PORTS, "Write to P1: %02X\n", data);
 }
 
 void hprot1_state::henry_p3_w(uint8_t data)
 {
-	if (LOG_IO_PORTS)
-		logerror("Write to P3: %02X\n", data);
+	LOGMASKED(LOG_IO_PORTS, "Write to P3: %02X\n", data);
 }
 
 void hprot1_state::hprot1_palette(palette_device &palette) const
@@ -323,6 +328,9 @@ ROM_START( hprot2r6 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "hprot_card2_rev6.u2",  0x00000, 0x10000, CRC(791f2425) SHA1(70af8911a27921cac6d98a5cd07602a7f59c2848) )
 ROM_END
+
+} // anonymous namespace
+
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS         INIT         COMPANY  FULLNAME                       FLAGS */
 COMP( 2002, hprot1,   0,      0,      hprot1,   hprot1,   hprot1_state, init_hprot1, "HENRY", "Henry Prot I v19 (REV.1)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)

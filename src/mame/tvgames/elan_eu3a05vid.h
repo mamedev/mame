@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_VIDEO_ELAN_EU3A05VID_H
-#define MAME_VIDEO_ELAN_EU3A05VID_H
+#ifndef MAME_TVGAMES_ELAN_EU3A05VID_H
+#define MAME_TVGAMES_ELAN_EU3A05VID_H
 
 #include "elan_eu3a05commonvid.h"
 #include "cpu/m6502/m6502.h"
@@ -95,4 +95,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ELAN_EU3A05_VID, elan_eu3a05vid_device)
 
-#endif // MAME_VIDEO_ELAN_EU3A05VID_H
+#endif // MAME_TVGAMES_ELAN_EU3A05VID_H

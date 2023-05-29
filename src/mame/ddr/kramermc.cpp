@@ -62,6 +62,9 @@ drops every second character.
 #include "sound/spkrdev.h"
 #include "speaker.h"
 
+
+namespace {
+
 class kramermc_state : public driver_device
 {
 public:
@@ -281,6 +284,9 @@ ROM_START( kramermc )
 	ROM_REGION(0x0800, "chargen",0)
 	ROM_LOAD ("chargen.kmc",  0x0000, 0x0800, CRC(1ba52f9f) SHA1(71bbad90dd427d0132c871a4d3848ab3d4d84b8a) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

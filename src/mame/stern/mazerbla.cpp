@@ -51,6 +51,8 @@ VSB-2000 - sound/speech/subcpu board (Voice and Sound Board)
 CRF-1001 - RF Filter board for video/audio output
  - this same board is shared with cliff hanger (cliffhgr.c)
 
+UIB-1000 - coin inputs, start/fire buttons and gun ADCs (Vin(-) and Vref/2 are calibrated by potentiometers)
+
 Versions:
 ======
 Mazer blazer's zpu-2000 roms are known to exist in at least the following versions:
@@ -106,8 +108,10 @@ video z80
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/adc0804.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
+#include "machine/rescap.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
 #include "video/mb_vcu.h"
@@ -115,6 +119,9 @@ video z80
 #include "screen.h"
 #include "speaker.h"
 
+
+
+namespace {
 
 #define MASTER_CLOCK XTAL(4'000'000)
 #define SOUND_CLOCK XTAL(14'318'181)
@@ -130,6 +137,8 @@ public:
 		, m_vcu(*this,"vcu")
 		, m_screen(*this, "screen")
 		, m_soundlatch(*this, "soundlatch")
+		, m_uib_adc(*this, "adc%u", 0U)
+		, m_digital_inputs(*this, { "ZPU", "DSW0", "DSW1", "DSW2", "DSW3", "BUTTONS" })
 		, m_leds(*this, "led%u", 0U)
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
@@ -184,6 +193,8 @@ private:
 	required_device<mb_vcu_device> m_vcu;
 	required_device<screen_device> m_screen;
 	optional_device<generic_latch_8_device> m_soundlatch;
+	optional_device_array<adc0804_device, 4> m_uib_adc;
+	required_ioport_array<6> m_digital_inputs;
 	output_finder<3> m_leds;
 	output_finder<2> m_lamps;
 
@@ -386,17 +397,24 @@ Vertical movement of gun is Strobe 9, Bits 0-7.
 void mazerbla_state::zpu_bcd_decoder_w(uint8_t data)
 {
 	/* bcd decoder used a input select (a mux) for reads from port 0x62 */
-	m_bcd_7445 = data & 0xf;
+	if (m_bcd_7445 != (data & 0xf))
+	{
+		if (m_bcd_7445 >= 6 && m_bcd_7445 < 10 && m_uib_adc[m_bcd_7445 - 6].found())
+			m_uib_adc[m_bcd_7445 - 6]->wr_w(1);
+		m_bcd_7445 = data & 0xf;
+		if (m_bcd_7445 >= 6 && m_bcd_7445 < 10 && m_uib_adc[m_bcd_7445 - 6].found())
+			m_uib_adc[m_bcd_7445 - 6]->wr_w(0);
+	}
 }
 
 uint8_t mazerbla_state::zpu_inputs_r()
 {
-	static const char *const strobenames[] = { "ZPU", "DSW0", "DSW1", "DSW2", "DSW3", "BUTTONS", "STICK0_X", "STICK0_Y",
-												"STICK1_X", "STICK1_Y", "UNUSED", "UNUSED", "UNUSED", "UNUSED", "UNUSED", "UNUSED" };
+	uint8_t ret = 0xff;
 
-	uint8_t ret = 0;
-
-	ret = ioport(strobenames[m_bcd_7445])->read();
+	if (m_bcd_7445 < 6)
+		ret = m_digital_inputs[m_bcd_7445]->read();
+	else if (m_bcd_7445 < 10 && m_uib_adc[m_bcd_7445 - 6].found())
+		ret = m_uib_adc[m_bcd_7445 - 6]->read();
 
 	return ret;
 }
@@ -700,15 +718,6 @@ static INPUT_PORTS_START( mazerbla )
 
 	PORT_START("STICK0_Y")  /* Strobe 7: vertical movement of gun */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_PLAYER(1)
-
-	PORT_START("STICK1_X")  /* Strobe 8: horizontal movement of gun */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("STICK1_Y")  /* Strobe 9: vertical movement of gun */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("UNUSED")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mazerblaa )
@@ -886,9 +895,6 @@ static INPUT_PORTS_START( greatgun )
 	PORT_START("STICK1_Y")  /* Strobe 9: vertical movement of gun */
 	// for whatever reason this should be inverted?
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_MINMAX(0x00, 0xff) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_INVERT PORT_KEYDELTA(7) PORT_PLAYER(2)
-
-	PORT_START("UNUSED")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 /*************************************
@@ -950,8 +956,6 @@ void mazerbla_state::machine_start()
 
 void mazerbla_state::machine_reset()
 {
-	int i;
-
 	m_zpu_int_vector = 0xff;
 
 	m_gfx_rom_bank = 0xff;
@@ -966,11 +970,13 @@ void mazerbla_state::machine_reset()
 		m_soundlatch->acknowledge_w();
 	}
 
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		m_ls670_0[i] = 0;
 		m_ls670_1[i] = 0;
 	}
+
+	zpu_bcd_decoder_w(0);
 }
 
 void mazerbla_state::mazerbla(machine_config &config)
@@ -994,6 +1000,11 @@ void mazerbla_state::mazerbla(machine_config &config)
     but handled differently for now
     */
 	sub2.set_vblank_int("screen", FUNC(mazerbla_state::irq0_line_hold));
+
+	for (int i = 0; i < 2; i++)
+		ADC0804(config, m_uib_adc[i], RES_R(10), CAP_P(150)).set_rd_mode(adc0804_device::RD_GROUNDED);
+	m_uib_adc[0]->vin_callback().set_ioport("STICK0_X");
+	m_uib_adc[1]->vin_callback().set_ioport("STICK0_Y");
 
 	/* synchronization forced on the fly */
 	MB_VCU(config, m_vcu, SOUND_CLOCK/4);
@@ -1037,6 +1048,13 @@ void mazerbla_state::greatgun(machine_config &config)
     but handled differently for now
     */
 	sub2.set_vblank_int("screen", FUNC(mazerbla_state::irq0_line_hold));
+
+	for (int i = 0; i < 4; i++)
+		ADC0804(config, m_uib_adc[i], RES_R(10), CAP_P(150)).set_rd_mode(adc0804_device::RD_GROUNDED);
+	m_uib_adc[0]->vin_callback().set_ioport("STICK0_X");
+	m_uib_adc[1]->vin_callback().set_ioport("STICK0_Y");
+	m_uib_adc[2]->vin_callback().set_ioport("STICK1_X");
+	m_uib_adc[3]->vin_callback().set_ioport("STICK1_Y");
 
 	MB_VCU(config, m_vcu, SOUND_CLOCK/4);
 	m_vcu->set_cpu_tag("sub2");
@@ -1202,6 +1220,9 @@ void mazerbla_state::init_greatgun()
 	rom[0x037f] = 0;
 	rom[0x0380] = 0;
 }
+
+} // anonymous namespace
+
 
 GAME( 1983, mazerbla,  0,        mazerbla,  mazerbla, mazerbla_state, init_mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, mazerblaa, mazerbla, mazerbla,  mazerblaa,mazerbla_state, init_mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // newer?

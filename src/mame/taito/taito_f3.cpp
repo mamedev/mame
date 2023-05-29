@@ -128,7 +128,6 @@ void taito_f3_state::sound_bankswitch_w(offs_t offset, u32 data, u32 mem_mask)
 		/* Banks are 0x20000 bytes each, divide by two to get data16
 		pointer rather than byte pointer */
 		m_taito_en->set_bank(1, idx);
-
 	}
 	else
 	{

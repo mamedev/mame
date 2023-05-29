@@ -3,7 +3,7 @@
 /***********************************************************************************************************
 
 
- PC-Engine & Turbografx-16 cart emulation
+ PC-Engine & Turbografx-16 HuCard emulation
 
 
  ***********************************************************************************************************/
@@ -18,11 +18,11 @@
 //  pce_rom_device - constructor
 //-------------------------------------------------
 
-DEFINE_DEVICE_TYPE(PCE_ROM_STD,      pce_rom_device,      "pce_rom",      "PCE/TG16 Carts")
-DEFINE_DEVICE_TYPE(PCE_ROM_CDSYS3,   pce_cdsys3_device,   "pce_cdsys3",   "PCE/TG16 CD-System Cart v3.00")
-DEFINE_DEVICE_TYPE(PCE_ROM_POPULOUS, pce_populous_device, "pce_populous", "PCE Populous Cart")
-DEFINE_DEVICE_TYPE(PCE_ROM_SF2,      pce_sf2_device,      "pce_sf2",      "PCE Street Fighter 2 CE Cart")
-DEFINE_DEVICE_TYPE(PCE_ROM_TENNOKOE, pce_tennokoe_device, "pce_tennokoe", "PCE Tennokoe Bank Cart")
+DEFINE_DEVICE_TYPE(PCE_ROM_STD,      pce_rom_device,      "pce_rom",      "PCE/TG16 HuCards")
+DEFINE_DEVICE_TYPE(PCE_ROM_CDSYS3,   pce_cdsys3_device,   "pce_cdsys3",   "PCE/TG16 CD-System HuCard v3.00")
+DEFINE_DEVICE_TYPE(PCE_ROM_POPULOUS, pce_populous_device, "pce_populous", "PCE Populous HuCard")
+DEFINE_DEVICE_TYPE(PCE_ROM_SF2,      pce_sf2_device,      "pce_sf2",      "PCE Street Fighter 2 CE HuCard")
+DEFINE_DEVICE_TYPE(PCE_ROM_TENNOKOE, pce_tennokoe_device, "pce_tennokoe", "PCE Tennokoe Bank HuCard")
 
 
 pce_rom_device::pce_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)

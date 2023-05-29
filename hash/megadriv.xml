@@ -5520,7 +5520,7 @@ Unsupported [Menacer] peripheral
 
 <!-- Only USA is confirmed -->
 	<software name="nbajamte" supported="no">
-		<description>NBA Jam Tournament Edition (World)</description>
+		<description>NBA Jam T.E. - Tournament Edition (World)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<notes><![CDATA[
@@ -21381,7 +21381,7 @@ No [EEPROM] save
 	</software>
 
 	<software name="nbajamtef" cloneof="nbajamte" supported="no">
-		<description>NBA Jam Tournament Edition (World, 2002 fix release)</description>
+		<description>NBA Jam T.E. - Tournament Edition (World, 2002 fix release)</description>
 		<year>2002?</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<notes><![CDATA[

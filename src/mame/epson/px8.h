@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Curt Coder,Dirk Best
-#ifndef MAME_INCLUDES_PX8_H
-#define MAME_INCLUDES_PX8_H
+#ifndef MAME_EPSON_PX8_H
+#define MAME_EPSON_PX8_H
 
 #pragma once
 
@@ -91,4 +91,4 @@ private:
 	void px8_slave_mem(address_map &map);
 };
 
-#endif
+#endif // MAME_EPSON_PX8_H

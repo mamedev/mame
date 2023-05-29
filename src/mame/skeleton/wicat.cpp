@@ -28,6 +28,7 @@ Wicat - various systems.
 #include "machine/am9517a.h"
 #include "machine/im6402.h"
 #include "machine/input_merger.h"
+#include "machine/keytronic_l2207.h"
 #include "machine/mm58174.h"
 #include "machine/scn_pci.h"
 #include "machine/wd_fdc.h"
@@ -38,6 +39,9 @@ Wicat - various systems.
 #include "softlist_dev.h"
 
 #include "wicat.lh"
+
+
+namespace {
 
 class wicat_state : public driver_device
 {
@@ -53,9 +57,8 @@ public:
 		m_videoirq(*this, "videoirq"),
 		m_crtc(*this, "video"),
 		m_videodma(*this, "videodma"),
-		m_videouart0(*this, "videouart0"),
-		m_videouart1(*this, "videouart1"),
-		m_videouart(*this, "videouart"),
+		m_videouart(*this, "videouart%u", 0U),
+		m_kbduart(*this, "kbduart"),
 		m_videosram(*this, "vsram"),
 		m_palette(*this, "palette"),
 		m_chargen(*this, "g2char"),
@@ -68,7 +71,6 @@ public:
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void driver_start() override;
 
 	void main_mem(address_map &map);
 	void video_io(address_map &map);
@@ -76,15 +78,6 @@ private:
 	void wd1000_io(address_map &map);
 	void wd1000_mem(address_map &map);
 
-	TIMER_CALLBACK_MEMBER(poll_kb);
-	TIMER_CALLBACK_MEMBER(kb_serial_tick);
-
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return 0; }
-
-	void send_key(uint8_t val);
-
-	uint16_t invalid_r(offs_t offset);
-	void invalid_w(offs_t offset, uint16_t data);
 	uint16_t memmap_r();
 	void memmap_w(uint16_t data);
 	DECLARE_WRITE_LINE_MEMBER(adir_w);
@@ -93,8 +86,8 @@ private:
 	void via_b_w(uint8_t data);
 	void videosram_store_w(uint8_t data);
 	void videosram_recall_w(uint8_t data);
-	uint8_t video_timer_r(offs_t offset);
-	void video_timer_w(offs_t offset, uint8_t data);
+	uint8_t video_uart_status_r();
+	uint8_t video_kbduart_r();
 	uint8_t vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint8_t data);
 	uint8_t video_status_r();
@@ -118,23 +111,16 @@ private:
 	required_device<input_merger_device> m_videoirq;
 	required_device<i8275_device> m_crtc;
 	required_device<am9517a_device> m_videodma;
-	required_device<scn2651_device> m_videouart0;
-	required_device<scn2651_device> m_videouart1;
-	required_device<im6402_device> m_videouart;
+	required_device_array<scn2651_device, 2> m_videouart;
+	required_device<im6402_device> m_kbduart;
 	required_device<x2210_device> m_videosram;
 	required_device<palette_device> m_palette;
 	required_memory_region m_chargen;
 	required_device<fd1795_device> m_fdc;
 
-	emu_timer* m_kb_timer;
-	emu_timer* m_kb_serial_timer;
-
 	uint8_t m_portA;
 	uint8_t m_portB;
 	bool m_crtc_irq;
-	uint16_t m_kb_data;
-	uint8_t m_kb_bit;
-	uint32_t m_kb_keys[8];
 };
 
 
@@ -145,7 +131,7 @@ void wicat_state::main_mem(address_map &map)
 	map(0x000000, 0x001fff).rom().region("c2", 0x0000);
 	map(0x020000, 0x1fffff).ram();
 	map(0x200000, 0x2fffff).ram();
-	map(0x300000, 0xdfffff).rw(FUNC(wicat_state::invalid_r), FUNC(wicat_state::invalid_w));
+	map(0x300000, 0xdfffff).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
 	map(0xeff800, 0xeffbff).ram();  // memory mapping SRAM, used during boot sequence for storing various data (TODO)
 	map(0xeffc00, 0xeffc01).rw(FUNC(wicat_state::memmap_r), FUNC(wicat_state::memmap_w));
 	map(0xf00000, 0xf00007).rw(m_uart[0], FUNC(scn2661c_device::read), FUNC(scn2661c_device::write)).umask16(0xff00);  // UARTs
@@ -161,7 +147,7 @@ void wicat_state::main_mem(address_map &map)
 	map(0xf000d0, 0xf000d0).w("ledlatch", FUNC(ls259_device::write_nibble_d3));
 	map(0xf00180, 0xf0018f).rw(FUNC(wicat_state::hdc_r), FUNC(wicat_state::hdc_w));  // WD1000
 	map(0xf00190, 0xf0019f).rw(FUNC(wicat_state::fdc_r), FUNC(wicat_state::fdc_w));  // FD1795
-	map(0xf00f00, 0xf00fff).rw(FUNC(wicat_state::invalid_r), FUNC(wicat_state::invalid_w));
+	map(0xf00f00, 0xf00fff).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
 }
 
 void wicat_state::video_mem(address_map &map)
@@ -173,9 +159,10 @@ void wicat_state::video_mem(address_map &map)
 void wicat_state::video_io(address_map &map)
 {
 	// these are largely wild guesses...
-	map(0x0000, 0x0003).rw(FUNC(wicat_state::video_timer_r), FUNC(wicat_state::video_timer_w)).umask16(0xff00);  // some sort of timer?
-	map(0x0100, 0x0107).rw(m_videouart0, FUNC(scn2651_device::read), FUNC(scn2651_device::write)).umask16(0xff00);  // INS2651 UART #1
-	map(0x0200, 0x0207).rw(m_videouart1, FUNC(scn2651_device::read), FUNC(scn2651_device::write)).umask16(0xff00);  // INS2651 UART #2
+	map(0x0000, 0x0000).r(FUNC(wicat_state::video_uart_status_r));
+	map(0x0002, 0x0002).r(FUNC(wicat_state::video_kbduart_r)).w(m_kbduart, FUNC(im6402_device::write));
+	map(0x0100, 0x0107).rw(m_videouart[0], FUNC(scn2651_device::read), FUNC(scn2651_device::write)).umask16(0xff00);  // INS2651 UART #1
+	map(0x0200, 0x0207).rw(m_videouart[1], FUNC(scn2651_device::read), FUNC(scn2651_device::write)).umask16(0xff00);  // INS2651 UART #2
 	map(0x0304, 0x0304).r(FUNC(wicat_state::video_status_r));
 	map(0x0400, 0x047f).rw(m_videosram, FUNC(x2210_device::read), FUNC(x2210_device::write)).umask16(0xff00);  // XD2210  4-bit NOVRAM
 	map(0x0500, 0x0500).w(FUNC(wicat_state::videosram_recall_w));
@@ -205,78 +192,11 @@ void wicat_state::wd1000_io(address_map &map)
 
 /* Input ports */
 static INPUT_PORTS_START( wicat )
-	PORT_START("kb0")
-	PORT_BIT(0x00000080,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB) PORT_CHAR(7)
-	PORT_BIT(0x00000100,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
-	PORT_BIT(0x00002000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Retrn") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
-
-	PORT_START("kb1")
-	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
-	PORT_BIT(0x00010000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
-	PORT_BIT(0x00020000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CHAR('1')
-	PORT_BIT(0x00040000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2) PORT_CHAR('2')
-	PORT_BIT(0x00080000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3) PORT_CHAR('3')
-	PORT_BIT(0x00100000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4) PORT_CHAR('4')
-	PORT_BIT(0x00200000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5) PORT_CHAR('5')
-	PORT_BIT(0x00400000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6) PORT_CHAR('6')
-	PORT_BIT(0x00800000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7) PORT_CHAR('7')
-	PORT_BIT(0x01000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
-	PORT_BIT(0x02000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9) PORT_CHAR('9')
-
-	PORT_START("kb2")
-	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("@") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('@')
-
-	PORT_START("kb3")
-	PORT_BIT(0x00000002,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A) PORT_CHAR('A')
-	PORT_BIT(0x00000004,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B) PORT_CHAR('B')
-	PORT_BIT(0x00000008,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C) PORT_CHAR('C')
-	PORT_BIT(0x00000010,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D) PORT_CHAR('D')
-	PORT_BIT(0x00000020,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E) PORT_CHAR('E')
-	PORT_BIT(0x00000040,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F) PORT_CHAR('F')
-	PORT_BIT(0x00000080,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G) PORT_CHAR('G')
-	PORT_BIT(0x00000100,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H) PORT_CHAR('H')
-	PORT_BIT(0x00000200,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I) PORT_CHAR('I')
-	PORT_BIT(0x00000400,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J) PORT_CHAR('J')
-	PORT_BIT(0x00000800,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K) PORT_CHAR('K')
-	PORT_BIT(0x00001000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L) PORT_CHAR('L')
-	PORT_BIT(0x00002000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M) PORT_CHAR('M')
-	PORT_BIT(0x00004000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N) PORT_CHAR('N')
-	PORT_BIT(0x00008000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O) PORT_CHAR('O')
-	PORT_BIT(0x00010000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P) PORT_CHAR('P')
-	PORT_BIT(0x00020000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
-	PORT_BIT(0x00040000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CHAR('R')
-	PORT_BIT(0x00080000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S) PORT_CHAR('S')
-	PORT_BIT(0x00100000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_T) PORT_CHAR('T')
-	PORT_BIT(0x00200000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U) PORT_CHAR('U')
-	PORT_BIT(0x00400000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V) PORT_CHAR('V')
-	PORT_BIT(0x00800000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W) PORT_CHAR('W')
-	PORT_BIT(0x01000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X) PORT_CHAR('X')
-	PORT_BIT(0x02000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
-	PORT_BIT(0x04000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
-	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Unknown (7F)") PORT_CODE(KEYCODE_F4)
-
-	PORT_START("kb4")
-
-	PORT_START("kb5")
-	PORT_BIT(0x00000400,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Unknown (AA)") PORT_CODE(KEYCODE_F2)
-	PORT_BIT(0x00010000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Unknown (B0)") PORT_CODE(KEYCODE_F3)
-
-	PORT_START("kb6")
-
-	PORT_START("kb7")
-	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Set-up (FE)") PORT_CODE(KEYCODE_F1)
-
 INPUT_PORTS_END
 
 static void wicat_floppies(device_slot_interface &device)
 {
 	device.option_add("525qd", FLOPPY_525_QD);
-}
-
-void wicat_state::driver_start()
-{
-	m_kb_timer = timer_alloc(FUNC(wicat_state::poll_kb), this);
-	m_kb_serial_timer = timer_alloc(FUNC(wicat_state::kb_serial_tick), this);
 }
 
 void wicat_state::machine_start()
@@ -286,67 +206,19 @@ void wicat_state::machine_start()
 void wicat_state::machine_reset()
 {
 	// on the terminal board /DCD on both INS2651s are tied to GND
-	m_videouart0->dcd_w(0);
-	m_videouart1->dcd_w(0);
+	m_videouart[0]->dcd_w(0);
+	m_videouart[1]->dcd_w(0);
 	for (int i = 0; i < 6; i++)
 		m_uart[i]->dcd_w(0);
 
 	// initialise im6402 (terminal board)
-	m_videouart->cls1_w(1);
-	m_videouart->cls2_w(1);
-	m_videouart->pi_w(1);
-	m_videouart->sbs_w(0);
-	m_videouart->crl_w(1);
+	m_kbduart->cls1_w(1);
+	m_kbduart->cls2_w(1);
+	m_kbduart->pi_w(1);
+	m_kbduart->sbs_w(0);
+	m_kbduart->crl_w(1);
 
-	m_kb_timer->adjust(attotime::zero,0,attotime::from_msec(50));
 	m_crtc_irq = false;
-	for(auto & elem : m_kb_keys)
-		elem = 0;
-}
-
-TIMER_CALLBACK_MEMBER(wicat_state::kb_serial_tick)
-{
-	m_videouart->write_rri((m_kb_data >> (m_kb_bit)) & 0x01);
-	m_kb_bit++;
-	if(m_kb_bit > 10)
-	{
-		m_kb_serial_timer->reset();
-	}
-}
-
-TIMER_CALLBACK_MEMBER(wicat_state::poll_kb)
-{
-	uint8_t line;
-	uint8_t val = 0;
-	uint8_t x;
-	uint32_t data;
-	char kbtag[8];
-
-	for(line=0;line<8;line++)
-	{
-		sprintf(kbtag,"kb%i",line);
-		data = ioport(kbtag)->read();
-		for(x=0;x<32;x++)
-		{
-			if((data & (1<<x)) && !(m_kb_keys[line] & (1<<x)))
-			{
-				send_key(val);
-				m_kb_keys[line] |= (1 << x);
-				return;
-			}
-			m_kb_keys[line] &= ~(1 << x);
-			val++;
-		}
-	}
-}
-
-void wicat_state::send_key(uint8_t val)
-{
-	// based on settings in the terminal NOVRAM, the keyboard is using 1200 baud, 7 bits, 2 stop bits
-	logerror("Sending key %i\n",val);
-	m_kb_data = 0x0001 | (val << 2);
-	m_kb_bit = 0;
-	m_kb_serial_timer->adjust(attotime::zero,0,attotime::from_hz(1200));
 }
 
 WRITE_LINE_MEMBER(wicat_state::adir_w)
@@ -369,27 +241,6 @@ void wicat_state::via_b_w(uint8_t data)
 {
 	m_portB = data;
 	logerror("VIA: write %02x to port B\n",data);
-}
-
-uint16_t wicat_state::invalid_r(offs_t offset)
-{
-	if(!machine().side_effects_disabled())
-	{
-		m_maincpu->set_buserror_details(0x300000+offset*2-2,true,m_maincpu->get_fc());
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-	}
-	return 0xff;
-}
-
-void wicat_state::invalid_w(offs_t offset, uint16_t data)
-{
-	if(!machine().side_effects_disabled())
-	{
-		m_maincpu->set_buserror_details(0x300000+offset*2-2,false,m_maincpu->get_fc());
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-	}
 }
 
 // TODO
@@ -558,29 +409,19 @@ void wicat_state::videosram_recall_w(uint8_t data)
 	}
 }
 
-uint8_t wicat_state::video_timer_r(offs_t offset)
+uint8_t wicat_state::video_uart_status_r()
 {
-	uint8_t ret = 0x00;
-
-	if(offset == 0x00)
-		return (m_videouart->dr_r() << 4) | (m_videouart->tbre_r() && m_videoctrl->q6_r() ? 0x08 : 0x00);
-	if(offset == 0x01)
-	{
-		if (!machine().side_effects_disabled())
-		{
-			m_videouart->drr_w(1);
-			m_videouart->drr_w(0);
-		}
-		return m_videouart->read();
-	}
-	return ret;
+	return (m_kbduart->dr_r() << 4) | (m_kbduart->tbre_r() && m_videoctrl->q6_r() ? 0x08 : 0x00);
 }
 
-void wicat_state::video_timer_w(offs_t offset, uint8_t data)
+uint8_t wicat_state::video_kbduart_r()
 {
-	logerror("I/O port 0x%04x write %02x\n",offset,data);
-	if(offset == 0x01)
-		m_videouart->write(data);
+	if (!machine().side_effects_disabled())
+	{
+		m_kbduart->drr_w(1);
+		m_kbduart->drr_w(0);
+	}
+	return m_kbduart->read();
 }
 
 uint8_t wicat_state::video_status_r()
@@ -615,12 +456,12 @@ WRITE_LINE_MEMBER(wicat_state::crtc_irq_clear_w)
 
 I8275_DRAW_CHARACTER_MEMBER(wicat_state::wicat_display_pixels)
 {
-	uint8_t romdata = vsp ? 0 : m_chargen->base()[(charcode << 4) | linecount];
+	uint16_t romdata = lten ? 0x3ff : vsp ? 0 : m_chargen->base()[(charcode << 4) | linecount];
 	pen_t const *const pen = m_palette->pens();
 
 	for (int i = 0; i < 10; i++)
 	{
-		int color = ((romdata & 0xc0) != 0) ^ rvv;
+		int color = ((romdata & 0x300) != 0) ^ rvv;
 
 		bitmap.pix(y, x + i) = pen[color];
 		romdata <<= 1;
@@ -632,7 +473,7 @@ void wicat_state::wicat(machine_config &config)
 	M68000(config, m_maincpu, 8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &wicat_state::main_mem);
 
-	MOS6522(config, m_via, 8_MHz_XTAL);
+	MOS6522(config, m_via, 8_MHz_XTAL / 10); // divider guessed
 	m_via->writepa_handler().set(FUNC(wicat_state::via_a_w));
 	m_via->writepb_handler().set(FUNC(wicat_state::via_b_w));
 	m_via->irq_handler().set_inputline(m_maincpu, M68K_IRQ_1);
@@ -641,10 +482,10 @@ void wicat_state::wicat(machine_config &config)
 
 	// internal terminal
 	SCN2661C(config, m_uart[0], 5.0688_MHz_XTAL);  // connected to terminal board
-	m_uart[0]->txd_handler().set(m_videouart0, FUNC(scn2651_device::rxd_w));
+	m_uart[0]->txd_handler().set(m_videouart[0], FUNC(scn2651_device::rxd_w));
 	m_uart[0]->rxrdy_handler().set_inputline(m_maincpu, M68K_IRQ_2);
-	m_uart[0]->rts_handler().set(m_videouart0, FUNC(scn2651_device::cts_w));
-	m_uart[0]->dtr_handler().set(m_videouart0, FUNC(scn2651_device::dsr_w));
+	m_uart[0]->rts_handler().set(m_videouart[0], FUNC(scn2651_device::cts_w));
+	m_uart[0]->dtr_handler().set(m_videouart[0], FUNC(scn2651_device::dsr_w));
 
 	// RS232C ports (x5)
 	const char *serial_names[5] = { "serial1", "serial2", "serial3", "serial4", "serial5" };
@@ -696,7 +537,7 @@ void wicat_state::wicat(machine_config &config)
 	m_videoctrl->q_out_cb<7>().set("dmairq", FUNC(input_merger_device::in_w<1>));
 	// Q1-Q5 are all used but unknown
 
-	AM9517A(config, m_videodma, 8_MHz_XTAL);  // clock is a bit of guess
+	AM9517A(config, m_videodma, 8_MHz_XTAL / 2);  // AMD AM9517-4PC
 	m_videodma->out_hreq_callback().set(FUNC(wicat_state::dma_hrq_w));
 	m_videodma->out_eop_callback().set("dmairq", FUNC(input_merger_device::in_w<0>));
 	m_videodma->in_memr_callback().set(FUNC(wicat_state::vram_r));
@@ -705,25 +546,28 @@ void wicat_state::wicat(machine_config &config)
 
 	INPUT_MERGER_ALL_HIGH(config, "dmairq").output_handler().set_inputline(m_videocpu, z8002_device::NMI_LINE);
 
-	IM6402(config, m_videouart, 0);
-	m_videouart->set_rrc(0);
-	m_videouart->set_trc(1200);
-	m_videouart->dr_callback().set(m_videoirq, FUNC(input_merger_device::in_w<2>));
-	m_videouart->tbre_callback().set("tbreirq", FUNC(input_merger_device::in_w<0>));
+	IM6402(config, m_kbduart, 0); // IM6402-1IPL
+	m_kbduart->set_rrc(5068800 / 1056); // 74LS393 output?
+	m_kbduart->set_trc(5068800 / 1056);
+	m_kbduart->tro_callback().set("keyboard", FUNC(keytronic_l2207_device::ser_in_w));
+	m_kbduart->dr_callback().set(m_videoirq, FUNC(input_merger_device::in_w<2>));
+	m_kbduart->tbre_callback().set("tbreirq", FUNC(input_merger_device::in_w<0>));
+
+	KEYTRONIC_L2207(config, "keyboard").ser_out_callback().set(m_kbduart, FUNC(im6402_device::rri_w));
 
 	INPUT_MERGER_ALL_HIGH(config, "tbreirq").output_handler().set(m_videoirq, FUNC(input_merger_device::in_w<3>));
 
-	// terminal (2x INS2651, 1x IM6042 - one of these is for the keyboard, another communicates with the main board, the third is unknown)
-	SCN2651(config, m_videouart0, 5.0688_MHz_XTAL);
-	m_videouart0->txd_handler().set(m_uart[0], FUNC(scn2651_device::rxd_w));
-	m_videouart0->rxrdy_handler().set(m_videoirq, FUNC(input_merger_device::in_w<0>));
-	m_videouart0->rts_handler().set(m_uart[0], FUNC(scn2651_device::cts_w));
-	m_videouart0->dtr_handler().set(m_uart[0], FUNC(scn2651_device::dsr_w));
+	// terminal (2x INS2651, 1x IM6402 - one of these is for the keyboard, another communicates with the main board, the third is unknown)
+	SCN2651(config, m_videouart[0], 5.0688_MHz_XTAL);
+	m_videouart[0]->txd_handler().set(m_uart[0], FUNC(scn2651_device::rxd_w));
+	m_videouart[0]->rxrdy_handler().set(m_videoirq, FUNC(input_merger_device::in_w<0>));
+	m_videouart[0]->rts_handler().set(m_uart[0], FUNC(scn2651_device::cts_w));
+	m_videouart[0]->dtr_handler().set(m_uart[0], FUNC(scn2651_device::dsr_w));
 
-	SCN2651(config, m_videouart1, 5.0688_MHz_XTAL);
-	//m_videouart1->set_rxc(19200);
-	//m_videouart1->set_txc(19200);
-	m_videouart1->rxrdy_handler().set(m_videoirq, FUNC(input_merger_device::in_w<4>));
+	SCN2651(config, m_videouart[1], 5.0688_MHz_XTAL);
+	//m_videouart[1]->set_rxc(19200);
+	//m_videouart[1]->set_txc(19200);
+	m_videouart[1]->rxrdy_handler().set(m_videoirq, FUNC(input_merger_device::in_w<4>));
 
 	X2210(config, "vsram");  // XD2210
 
@@ -841,8 +685,10 @@ ROM_START( wicat )
 	ROM_LOAD       ("wd3.u95",    0x01000, 0x0800, CRC(80bb0617) SHA1(ac0f3194fcbef77532571baa3fec78b3010528bf) )  // "Fast IO select" bytes
 ROM_END
 
+} // anonymous namespace
+
 
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY               FULLNAME            FLAGS
-COMP( 1982, wicat, 0,      0,      wicat,   wicat, wicat_state, empty_init, "Millennium Systems", "Wicat System 150", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1982, wicat, 0,      0,      wicat,   wicat, wicat_state, empty_init, "Millennium Systems", "Wicat System 150", MACHINE_NOT_WORKING )

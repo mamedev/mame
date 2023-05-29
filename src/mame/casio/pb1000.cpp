@@ -39,6 +39,8 @@
 #include "utf8.h"
 
 
+namespace {
+
 class pb1000_state : public driver_device
 {
 public:
@@ -552,6 +554,9 @@ ROM_START( ai1000 )
 	ROM_REGION( 0x0800, "hd44352", 0 )
 	ROM_LOAD( "charset.bin", 0x0000, 0x0800, CRC(7f144716) SHA1(a02f1ecc6dc0ac55b94f00931d8f5cb6b9ffb7b4))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

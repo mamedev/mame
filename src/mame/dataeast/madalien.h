@@ -7,8 +7,8 @@
     Original driver by Norbert Kehrer (February 2004)
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_MADALIEN_H
-#define MAME_INCLUDES_MADALIEN_H
+#ifndef MAME_DATAEAST_MADALIEN_H
+#define MAME_DATAEAST_MADALIEN_H
 
 #pragma once
 
@@ -109,4 +109,4 @@ DISCRETE_SOUND_EXTERN( madalien_discrete );
 #define MADALIEN_8910_PORTA         NODE_01
 #define MADALIEN_8910_PORTB         NODE_02
 
-#endif // MAME_INCLUDES_MADALIEN_H
+#endif // MAME_DATAEAST_MADALIEN_H

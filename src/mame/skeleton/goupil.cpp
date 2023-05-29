@@ -40,6 +40,9 @@
 
 #include "logmacro.h"
 
+
+namespace {
+
 #define MAIN_CLOCK           4_MHz_XTAL
 #define VIDEO_CLOCK          MAIN_CLOCK / 8     /* 1.75 Mhz */
 #define CPU_CLOCK            MAIN_CLOCK / 4     /* 1 Mhz */
@@ -634,6 +637,9 @@ ROM_START( goupilg2 )
 	ROM_LOAD( "smt_goupil_g2_charset_24x80.bin", 0x0000, 0x0800, CRC(f0f83b99) SHA1(75a7730aec30280ee4ccf3dcaf587eea4f861196) )
 
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

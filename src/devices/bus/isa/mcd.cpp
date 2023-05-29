@@ -29,6 +29,7 @@ void mcd_isa_device::device_add_mconfig(machine_config &config)
 	CDDA(config, m_cdda);
 	m_cdda->add_route(0, "lheadphone", 1.0);
 	m_cdda->add_route(1, "rheadphone", 1.0);
+	m_cdda->set_cdrom_tag(*this);
 }
 
 //-------------------------------------------------
@@ -84,7 +85,6 @@ bool mcd_isa_device::read_sector(bool first)
 		if(m_cdrom_handle->get_track_type(m_cdrom_handle->get_track(lba)) == cdrom_file::CD_TRACK_AUDIO)
 		{
 			m_cdda->stop_audio();
-			m_cdda->set_cdrom(m_cdrom_handle);
 			m_cdda->start_audio(lba, m_readcount);
 			return true;
 		}

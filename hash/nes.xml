@@ -3734,7 +3734,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="btoadsj" cloneof="btoads">
+<!-- Same issue as US release -->
+	<software name="btoadsj" cloneof="btoads" supported="no">
 		<description>Battletoads (Japan)</description>
 		<year>1991</year>
 		<publisher>Masaya</publisher>
@@ -3754,7 +3755,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="btoadsu" cloneof="btoads">
+<!-- Game hangs at start of level 3 (turbo tunnel). Sprite 0 hit issue? -->
+	<software name="btoadsu" cloneof="btoads" supported="no">
 		<description>Battletoads (USA)</description>
 		<year>1991</year>
 		<publisher>Tradewest</publisher>
@@ -3779,8 +3781,9 @@ license:CC0-1.0
 		</part>
 	</software>
 
+<!-- Same issue as US release -->
 <!-- glitches on NTSC -->
-	<software name="btoads" supported="partial">
+	<software name="btoads" supported="no">
 		<description>Battletoads (Europe)</description>
 		<year>1993</year>
 		<publisher>Tradewest</publisher>
@@ -14277,7 +14280,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="gauntunl">
-		<description>Gauntlet (USA, Unlicensed)</description>
+		<description>Gauntlet (USA, unlicensed)</description>
 		<year>1988</year>
 		<publisher>Tengen</publisher>
 		<part name="cart" interface="nes_cart">
@@ -26032,7 +26035,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="monstpok">
-		<description>Monster In My Pocket (Europe)</description>
+		<description>Monster in my Pocket (Europe)</description>
 		<year>1992</year>
 		<publisher>Palcom</publisher>
 		<info name="serial" value="NES-1Y-(NOE/UKV)"/>
@@ -26050,7 +26053,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="monstpoku" cloneof="monstpok">
-		<description>Monster In My Pocket (USA)</description>
+		<description>Monster in my Pocket (USA)</description>
 		<year>1992</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NES-1Y-USA"/>
@@ -30385,7 +30388,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="rbibba" cloneof="rbibb">
-		<description>R.B.I. Baseball (USA, Unlicensed)</description>
+		<description>R.B.I. Baseball (USA, unlicensed)</description>
 		<year>1988</year>
 		<publisher>Tengen</publisher>
 		<info name="serial" value="NES-RS-USA"/>
@@ -44793,7 +44796,7 @@ We should eventually add it to MAME as a separate driver with a NES CPU and a GB
 
 <!-- from cah4e3 -->
 	<software name="kbtrans">
-		<description>Keyboard Transformer (Rus)</description>
+		<description>Keyboard Transformer (Russia)</description>
 		<year>1994</year>
 		<publisher>Unreal World Group</publisher>
 		<part name="cart" interface="nes_cart">
@@ -44810,7 +44813,7 @@ We should eventually add it to MAME as a separate driver with a NES CPU and a GB
 
 <!-- from maxzhuo88 -->
 	<software name="fpbas33">
-		<description>FP BASIC V3.3 (Chi?)</description>
+		<description>FP BASIC V3.3 (China?)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -44926,12 +44929,13 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<info name="alt_title" value="アバドックス"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
-			<feature name="pcb" value="NES-SLROM" />
+			<feature name="pcb_model" value="HVC-SLROM-03" />
+			<feature name="mmc1_type" value="MMC1B2" />
 			<dataarea name="chr" size="131072">
-				<rom name="abadox (japan).chr" size="131072" crc="f1569df0" sha1="623c95592c972c3c569f8195951684c904aa5c6c" offset="00000" />
+				<rom name="nat-a3-0 chr" size="131072" crc="f1569df0" sha1="623c95592c972c3c569f8195951684c904aa5c6c" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="abadox (japan).prg" size="131072" crc="e675ba2a" sha1="566a4484df0dd2a0a19553d93d24c29f26113942" offset="00000" />
+				<rom name="nat-a3-0 prg" size="131072" crc="e675ba2a" sha1="566a4484df0dd2a0a19553d93d24c29f26113942" />
 			</dataarea>
 		</part>
 	</software>
@@ -45008,7 +45012,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="magickdmup" cloneof="magickdm">
-		<description>Disney's Adventures In The Magic Kingdom (USA, prototype)</description>
+		<description>Disney's Adventures in the Magic Kingdom (USA, prototype)</description>
 		<year>1992</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="nes_cart">
@@ -45024,7 +45028,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="magickdmupo" cloneof="magickdm">
-		<description>Disney's Adventures In The Magic Kingdom (USA, prototype earlier)</description>
+		<description>Disney's Adventures in the Magic Kingdom (USA, prototype earlier)</description>
 		<year>1992</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="nes_cart">
@@ -47478,7 +47482,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="futebol">
-		<description>Futebol (Bra)</description>
+		<description>Futebol (Brazil)</description>
 		<year>199?</year>
 		<publisher>Milmar</publisher>
 		<part name="cart" interface="nes_cart">
@@ -47708,12 +47712,13 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="alt_title" value="ゴッドスレイヤー はるか天空のソナタ"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
+			<feature name="pcb_model" value="HVC-TKROM-02" />
+			<feature name="mmc3_type" value="MMC3B" />
 			<dataarea name="chr" size="131072">
-				<rom name="god slayer - haruka tenkuu no sonata (japan).chr" size="131072" crc="da0003d7" sha1="01d49e3450077acfa29c21679951e13d93577344" offset="00000" />
+				<rom name="sfx-g0-0 chr" size="131072" crc="da0003d7" sha1="01d49e3450077acfa29c21679951e13d93577344" />
 			</dataarea>
 			<dataarea name="prg" size="262144">
-				<rom name="god slayer - haruka tenkuu no sonata (japan).prg" size="262144" crc="c17ae2dc" sha1="3da15f3afe11a5266708d60a589b791ae2884e61" offset="00000" />
+				<rom name="sfx-g0-0 prg" size="262144" crc="c17ae2dc" sha1="3da15f3afe11a5266708d60a589b791ae2884e61" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
@@ -48967,10 +48972,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="alt_title" value="グナム危機一髪危機一発 エンパイアシティ1931"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="uxrom" />
-			<feature name="pcb" value="NES-UNROM" />
+			<feature name="pcb_model" value="HVC-UNROM-03" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
-				<rom name="magnum kiki ippatsu - empire city - 1931 (japan).prg" size="131072" crc="8e7abdfc" sha1="c8d644b58d442651748ad81b5552c5e890c10a58" offset="00000" />
+				<rom name="tfs-mg-0 prg" size="131072" crc="8e7abdfc" sha1="c8d644b58d442651748ad81b5552c5e890c10a58" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -51002,7 +51007,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="sscoutp" cloneof="sscout">
-		<description>Secret Scout In The Temple of Demise (USA, prototype)</description>
+		<description>Secret Scout in the Temple of Demise (USA, prototype)</description>
 		<year>1991</year>
 		<publisher>Color Dreams</publisher>
 		<part name="cart" interface="nes_cart">
@@ -56003,7 +56008,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="balloonms" cloneof="balloonm">
-		<description>Balloon Monster (Spa)</description>
+		<description>Balloon Monster (Spain)</description>
 		<year>1992</year>
 		<publisher>Gluk Video</publisher>
 		<info name="serial" value="CN-05"/>
@@ -56042,7 +56047,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="wargulf">
-		<description>War in the Gulf (Spa, Bra)</description>
+		<description>War in the Gulf (Spain, Brazil)</description>
 		<year>1991</year>
 		<publisher>Gluk Video / CCE</publisher>
 		<info name="serial" value="CN-07"/>
@@ -56060,7 +56065,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="bookyman">
-		<description>Booky Man (Spa)</description>
+		<description>Booky Man (Spain)</description>
 		<year>1991</year>
 		<publisher>Gluk Video</publisher>
 		<info name="serial" value="CN-08"/>
@@ -56097,7 +56102,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="cosmocops" cloneof="cosmocop">
-		<description>Cosmos Cop (Spa)</description>
+		<description>Cosmos Cop (Spain)</description>
 		<year>1991</year>
 		<publisher>Gluk Video</publisher>
 		<info name="serial" value="CN-09"/>
@@ -56190,7 +56195,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 -->
 
 	<software name="destroyr">
-		<description>Destroyer (Spa)</description>
+		<description>Destroyer (Spain)</description>
 		<year>1992</year>
 		<publisher>Gluk Video</publisher>
 		<info name="serial" value="CN-13"/>
@@ -56226,7 +56231,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="gobenny">
-		<description>Go! Benny! (Spa)</description>
+		<description>Go! Benny! (Spain)</description>
 		<year>1992</year>
 		<publisher>Gluk Video</publisher>
 		<info name="serial" value="CN-14"/>
@@ -56279,7 +56284,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="tanks" cloneof="tank">
-		<description>Tank (Spa)</description>
+		<description>Tank (Spain)</description>
 		<year>1992</year>
 		<publisher>Gluk Video</publisher>
 		<info name="alt_title" value="Tanque (on the cart label)"/>
@@ -56314,7 +56319,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="skateboy">
-		<description>Skate Boy (Spa)</description>
+		<description>Skate Boy (Spain)</description>
 		<year>1992</year>
 		<publisher>Gluk Video</publisher>
 		<info name="serial" value="CN-18"/>
@@ -64893,6 +64898,27 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+<!-- Cart dumped with Chris Covell's TapeDump, needs to be redumped for verification. -->
+<!-- Header from original dump has been stripped. Board info is unknown, and has been copied from parent US set. -->
+<!-- The game crashes upon reaching Stage 3, like all other versions in MAME due to emulation problems, but works fine in other emulators. -->
+<!-- The game is NTSC, is hacked to skip Stage 2 so it works on clone consoles, and has been partially translated to Brazilian Portuguese. -->
+	<software name="btoadsbrc" cloneof="btoads" supported="no">
+		<description>Battletoads (Brazil, Conector pirate)</description>
+		<year>1991</year>
+		<publisher>Conector</publisher>
+		<info name="alt_title" value="Sapos Guerreiros"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="axrom" />
+			<feature name="bus_conflict" value="no" />
+			<dataarea name="prg" size="262144">
+				<rom name="battletoads [conector - br].prg" size="262144" crc="147504bb" sha1="b45b65590c74de89b14a7401c3cc83afb7ae6d59" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="beatnbox">
 		<description>Beat n Box (Kor)</description>
 		<year>19??</year>
@@ -65605,7 +65631,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- was this ever released on real carts? -->
 	<software name="famikan">
-		<description>Famikan (Japan, unl)</description>
+		<description>Famikan (Japan, unlicensed)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -66780,7 +66806,7 @@ We don't include these hacks because they were not burned into real carts nor so
 <!-- nointro -->
 <!-- Also verified on a Spanish cart by Gluk Video -->
 	<software name="seadream">
-		<description>Sea of Dreamland (Asia, Spa)</description>
+		<description>Sea of Dreamland (Asia, Spain)</description>
 		<year>1992</year>
 		<publisher>Mega Soft / Gluk Video</publisher>
 		<info name="alt_title" value="La Gran Aventura Submarina (Spa Box)"/>
@@ -67393,7 +67419,7 @@ We don't include these hacks because they were not burned into real carts nor so
 	</software>
 
 	<software name="gluk" cloneof="thundwar">
-		<description>Gluk The Thunder Warrior (Spa)</description>
+		<description>Gluk The Thunder Warrior (Spain)</description>
 		<year>19??</year>
 		<publisher>Gluk Video</publisher>
 		<part name="cart" interface="nes_cart">
@@ -69374,7 +69400,7 @@ All musics were removed in this game.
 	</software>
 
 	<software name="sangrybr" supported="no">
-		<description>Super Angry Birds (Unl)</description>
+		<description>Super Angry Birds (unlicensed)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -73401,7 +73427,7 @@ they are marked as fully working.
 Also notice that VRAM, WRAM & mirror are probably incorrect for some of these sets, at the moment... -->
 
 	<software name="liko3in1">
-		<description>LIKO Study Cartridge 3 in 1 (Rus)</description>
+		<description>LIKO Study Cartridge 3 in 1 (Russia)</description>
 		<year>1996?</year>
 		<publisher>Bu Bu Gao Electronics Co.</publisher>
 		<info name="alt_title" value="LIKO Обучающий Картридж"/>
@@ -73422,7 +73448,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="edu26">
-		<description>Education Computer 26 in 1 (Rus)</description>
+		<description>Education Computer 26 in 1 (Russia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -73775,7 +73801,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="mc_7in1r">
-		<description>7 in 1 Russian Study Cartridge (Rus)</description>
+		<description>7 in 1 Russian Study Cartridge (Russia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -75425,7 +75451,7 @@ Other
 	</software>
 
 	<software name="cvetni" supported="partial">
-		<description>Cvetnie Linii (Rus)</description>
+		<description>Cvetnie Linii (Russia)</description>
 		<year>19??</year>
 		<publisher>BBG</publisher>
 		<part name="cart" interface="nes_cart">
@@ -75460,7 +75486,7 @@ Other
 	</software>
 
 	<software name="mathc1">
-		<description>Mathematics 1 Class (Rus)</description>
+		<description>Mathematics 1 Class (Russia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="Математика 1 Класс (Комплекс программ-тренажёров 'Нитас')"/>
@@ -75478,7 +75504,7 @@ Other
 	</software>
 
 	<software name="mathc1a" cloneof="mathc1">
-		<description>Mathematics 1 Class (Rus, Early)</description>
+		<description>Mathematics 1 Class (Russia, early)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="Математика 1 Класс (Комплекс программ-тренажёров 'Нитас')"/>
@@ -75496,7 +75522,7 @@ Other
 	</software>
 
 	<software name="mathc2">
-		<description>Mathematics 2 Class (Rus)</description>
+		<description>Mathematics 2 Class (Russia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="Математика 2 Класс (Комплекс программ-тренажёров 'Нитас')"/>
@@ -75514,7 +75540,7 @@ Other
 	</software>
 
 	<software name="mathc2a" cloneof="mathc2">
-		<description>Mathematics 2 Class (Rus, Early)</description>
+		<description>Mathematics 2 Class (Russia, early)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="Математика 2 Класс (Комплекс программ-тренажёров 'Нитас')"/>
@@ -75532,7 +75558,7 @@ Other
 	</software>
 
 	<software name="math2x2">
-		<description>Mathematics 2 x 2 = (Rus, Early)</description>
+		<description>Mathematics 2 x 2 = (Russia, early)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="Математика 2х2= (Комплекс программ-тренажёров 'Нитас')"/>
@@ -75550,7 +75576,7 @@ Other
 	</software>
 
 	<software name="russian5">
-		<description>Russian Language 5 Class (Rus)</description>
+		<description>Russian Language 5 Class (Russia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="Русский Язык 5 Класс"/>
@@ -75568,7 +75594,7 @@ Other
 	</software>
 
 	<software name="tvtest">
-		<description>Super TV Test ver. 4.12 (Rus)</description>
+		<description>Super TV Test ver. 4.12 (Russia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -77820,7 +77846,7 @@ Other
 	</software>
 
 	<software name="scontra2r" cloneof="probot">
-		<description>Super Contra II (Rus, Contra pirate)</description>
+		<description>Super Contra II (Russia, Contra pirate)</description>
 		<year>19??</year>
 		<publisher>Mars</publisher>
 		<part name="cart" interface="nes_cart">
@@ -78448,7 +78474,7 @@ We include them here as reference if they should coincide with later revisions o
 	</software>
 
 	<software name="balonfgtgc" cloneof="balonfgt">
-		<description>Balloon Fight (Japan, ripped from GC Animal Crossing)</description>
+		<description>Balloon Fight (Japan, ripped from GameCube "Animal Crossing")</description>
 		<year>2002</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
@@ -78465,7 +78491,7 @@ We include them here as reference if they should coincide with later revisions o
 	</software>
 
 	<software name="cluclugc" cloneof="cluclu">
-		<description>Clu Clu Land (Japan, ripped from GC Animal Crossing)</description>
+		<description>Clu Clu Land (Japan, ripped from GameCube "Animal Crossing")</description>
 		<year>2002</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
@@ -78482,7 +78508,7 @@ We include them here as reference if they should coincide with later revisions o
 	</software>
 
 	<software name="dkonggc" cloneof="dkong">
-		<description>Donkey Kong (Japan, ripped from GC Animal Crossing)</description>
+		<description>Donkey Kong (Japan, ripped from GameCube "Animal Crossing")</description>
 		<year>2002</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
@@ -78499,7 +78525,7 @@ We include them here as reference if they should coincide with later revisions o
 	</software>
 
 	<software name="dkongjrmgc" cloneof="dkongjrm">
-		<description>Donkey Kong Jr. no Sansuu Asobi (Japan, ripped from GC Animal Crossing)</description>
+		<description>Donkey Kong Jr. no Sansuu Asobi (Japan, ripped from GameCube "Animal Crossing")</description>
 		<year>2002</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
@@ -78516,7 +78542,7 @@ We include them here as reference if they should coincide with later revisions o
 	</software>
 
 	<software name="golfgcj" cloneof="golf">
-		<description>Golf (Japan, ripped from GC Animal Crossing)</description>
+		<description>Golf (Japan, ripped from GameCube "Animal Crossing")</description>
 		<year>2002</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
@@ -78533,7 +78559,7 @@ We include them here as reference if they should coincide with later revisions o
 	</software>
 
 	<software name="gomokunrgc" cloneof="gomokunr">
-		<description>Gomoku Narabe Renju (Japan, ripped from GC Animal Crossing)</description>
+		<description>Gomoku Narabe Renju (Japan, ripped from GameCube "Animal Crossing")</description>
 		<year>2002</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
@@ -78550,7 +78576,7 @@ We include them here as reference if they should coincide with later revisions o
 	</software>
 
 	<software name="mahjonggc" cloneof="mahjong">
-		<description>Mahjong (Japan, ripped from GC Animal Crossing)</description>
+		<description>Mahjong (Japan, ripped from GameCube "Animal Crossing")</description>
 		<year>2002</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
@@ -78567,7 +78593,7 @@ We include them here as reference if they should coincide with later revisions o
 	</software>
 
 	<software name="pinballgcj" cloneof="pinball">
-		<description>Pinball (Japan, ripped from GC Animal Crossing)</description>
+		<description>Pinball (Japan, ripped from GameCube "Animal Crossing")</description>
 		<year>2002</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
@@ -78584,7 +78610,7 @@ We include them here as reference if they should coincide with later revisions o
 	</software>
 
 	<software name="tennisgc" cloneof="tennis">
-		<description>Tennis (Japan, ripped from GC Animal Crossing)</description>
+		<description>Tennis (Japan, ripped from GameCube "Animal Crossing")</description>
 		<year>2002</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
@@ -78601,7 +78627,7 @@ We include them here as reference if they should coincide with later revisions o
 	</software>
 
 	<software name="baseballgc" cloneof="baseball">
-		<description>Baseball (ripped from GC Animal Crossing)</description>
+		<description>Baseball (ripped from GameCube "Animal Crossing")</description>
 		<year>2002</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
@@ -78619,7 +78645,7 @@ We include them here as reference if they should coincide with later revisions o
 	</software>
 
 	<software name="dkongjrgc" cloneof="dkongjr">
-		<description>Donkey Kong Jr. (ripped from GC Animal Crossing)</description>
+		<description>Donkey Kong Jr. (ripped from GameCube "Animal Crossing")</description>
 		<year>2002</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
@@ -78636,7 +78662,7 @@ We include them here as reference if they should coincide with later revisions o
 	</software>
 
 	<software name="excitbikgc" cloneof="excitbik">
-		<description>Excitebike (ripped from GC Animal Crossing)</description>
+		<description>Excitebike (ripped from GameCube "Animal Crossing")</description>
 		<year>2002</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
@@ -78654,7 +78680,7 @@ We include them here as reference if they should coincide with later revisions o
 	</software>
 
 	<software name="zeldagca" cloneof="zelda">
-		<description>The Legend of Zelda (ripped from GC Animal Crossing)</description>
+		<description>The Legend of Zelda (ripped from GameCube "Animal Crossing")</description>
 		<year>2002</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
@@ -78670,7 +78696,7 @@ We include them here as reference if they should coincide with later revisions o
 	</software>
 
 	<software name="mariogc" cloneof="mario">
-		<description>Mario Bros. (ripped from GC Animal Crossing)</description>
+		<description>Mario Bros. (ripped from GameCube "Animal Crossing")</description>
 		<year>2002</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
@@ -78687,7 +78713,7 @@ We include them here as reference if they should coincide with later revisions o
 	</software>
 
 	<software name="pinballgc" cloneof="pinball">
-		<description>Pinball (ripped from GC Animal Crossing)</description>
+		<description>Pinball (ripped from GameCube "Animal Crossing")</description>
 		<year>2002</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
@@ -78705,7 +78731,7 @@ We include them here as reference if they should coincide with later revisions o
 	</software>
 
 	<software name="golfgc" cloneof="golf">
-		<description>Golf (Europe, ripped from GC Animal Crossing)</description>
+		<description>Golf (Europe, ripped from GameCube "Animal Crossing")</description>
 		<year>2002</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
@@ -78723,7 +78749,7 @@ We include them here as reference if they should coincide with later revisions o
 	</software>
 
 	<software name="zeldagc" cloneof="zelda">
-		<description>The Legend of Zelda (ripped from GC Zelda)</description>
+		<description>The Legend of Zelda (ripped from GameCube "The Legend of Zelda: Collector's Edition")</description>
 		<year>2002</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
@@ -78739,7 +78765,7 @@ We include them here as reference if they should coincide with later revisions o
 	</software>
 
 	<software name="zelda2gc" cloneof="zelda2">
-		<description>Zelda II - The Adventure of Link (ripped from GC Zelda)</description>
+		<description>Zelda II - The Adventure of Link (ripped from GameCube "Zelda")</description>
 		<year>2002</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">

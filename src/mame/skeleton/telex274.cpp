@@ -97,6 +97,9 @@
 #include "machine/z80sio.h"
 //#include "machine/wd_fdc.h"
 
+
+namespace {
+
 class telex274_state : public driver_device
 {
 public:
@@ -175,5 +178,8 @@ ROM_START(telex274)
 	ROM_LOAD16_BYTE("203982-053_even.u2", 0x0000, 0x4000, CRC(56914ba9) SHA1(7a2a9e16491a024b4109c8589a2277d65536e629))
 	ROM_LOAD16_BYTE("203981-053_odd.u1", 0x0001, 0x4000, CRC(04a9e2cf) SHA1(58255d6275b76aecd8b81d2ea23ca69167caf232))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1986, telex274, 0, 0, telex274, telex274, telex274_state, empty_init, "Telex Computer Products", "Telex 274-61C Sixteen Station Control Unit", MACHINE_IS_SKELETON)

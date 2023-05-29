@@ -8,8 +8,8 @@
 
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_NES_H
-#define MAME_INCLUDES_NES_H
+#ifndef MAME_NINTENDO_NES_H
+#define MAME_NINTENDO_NES_H
 
 #pragma once
 
@@ -114,4 +114,4 @@ private:
 	memory_bank_array_creator<4> m_prg_bank;
 };
 
-#endif // MAME_INCLUDES_NES_H
+#endif // MAME_NINTENDO_NES_H

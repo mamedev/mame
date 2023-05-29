@@ -106,14 +106,12 @@ TIMER_CALLBACK_MEMBER(huc6261_device::update_events)
 	{
 		if ( m_pixel_clock == 0 )
 		{
-			g_profiler.start( PROFILER_VIDEO );
+			auto profile = g_profiler.start( PROFILER_VIDEO );
 			/* Get next pixel information */
 			m_pixel_data_a = m_huc6270_a->next_pixel();
 			m_pixel_data_b = m_huc6270_b->next_pixel();
 			apply_pal_offs(&m_pixel_data_a);
 			apply_pal_offs(&m_pixel_data_b);
-
-			g_profiler.stop();
 		}
 
 		bitmap_line[ h ] = yuv2rgb( m_palette[ m_pixel_data_a ] );
@@ -295,14 +293,14 @@ void huc6261_device::write(offs_t offset, uint16_t data)
 			break;
 
 		case 0x01:
-			logerror("huc6261: writing 0x%04x to register 0x%02x\n", data, m_register );
+			//logerror("huc6261: writing 0x%04x to register 0x%02x\n", data, m_register );
 			switch( m_register )
 			{
 				/* Control register */
 				// -x-- ---- ---- ---- Enable HuC6271: 0 - disabled, 1 - enabled
 				// --x- ---- ---- ---- Enable HuC6272 BG3: 0 - disabled, 1 - enabled
 				// ---x ---- ---- ---- Enable HuC6272 BG2: 0 - disabled, 1 - enabled
-				// ---- x--- ---- ---- Enable Huc6272 BG1: 0 - disabled, 1 - enabled
+				// ---- x--- ---- ---- Enable HuC6272 BG1: 0 - disabled, 1 - enabled
 				// ---- -x-- ---- ---- Enable HuC6272 BG0: 0 - disabled, 1 - enabled
 				// ---- --x- ---- ---- Enable HuC6270 SPR: 0 - disabled, 1 - enabled
 				// ---- ---x ---- ---- Enable HuC6270 BG: 0 - disabled, 1 - enabled

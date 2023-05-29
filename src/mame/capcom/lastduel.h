@@ -5,8 +5,8 @@
     Last Duel
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_LASTDUEL_H
-#define MAME_INCLUDES_LASTDUEL_H
+#ifndef MAME_CAPCOM_LASTDUEL_H
+#define MAME_CAPCOM_LASTDUEL_H
 
 #pragma once
 
@@ -86,4 +86,4 @@ private:
 	void sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_LASTDUEL_H
+#endif // MAME_CAPCOM_LASTDUEL_H

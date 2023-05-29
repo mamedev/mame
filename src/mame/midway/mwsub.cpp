@@ -18,6 +18,8 @@ TODO:
 #include "submar.lh"
 
 
+namespace {
+
 class submar_state : public driver_device
 {
 public:
@@ -251,6 +253,8 @@ ROM_START( submar )
 	ROM_LOAD( "sub.a1", 0x0000, 0x0800, CRC(bcef5db4) SHA1(8ae5099672fbdb7bcdc617e1f8cbc5435fbb738a) )
 	ROM_LOAD( "sub.a2", 0x0800, 0x0800, CRC(f5780dd0) SHA1(f775dd6f64a730a2fb6c9baf5787698434150bc5) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAMEL( 1979, submar, 0, submar, submar, submar_state, empty_init, ROT0, "Midway", "Submarine (Midway)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL, layout_submar )

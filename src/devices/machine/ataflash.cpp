@@ -20,9 +20,9 @@ void ata_flash_pccard_device::device_reset()
 {
 	ide_hdd_device::device_reset();
 
-	if (m_disk)
+	if (m_image->exists())
 	{
-		m_disk->get_cis_data(m_cis);
+		m_image->get_cis_data(m_cis);
 	}
 	m_cis.resize(512, 0xff);
 
@@ -135,7 +135,7 @@ void taito_pccard1_device::device_reset()
 {
 	ata_flash_pccard_device::device_reset();
 
-	if (m_disk && !m_disk->get_disk_key_data(m_key) && m_key.size() == 5)
+	if (m_image->exists() && !m_image->get_disk_key_data(m_key) && m_key.size() == 5)
 	{
 		m_locked = 0x1ff;
 	}
@@ -224,7 +224,7 @@ void taito_pccard2_device::device_reset()
 {
 	ata_flash_pccard_device::device_reset();
 
-	if (m_disk && !m_disk->get_disk_key_data(m_key) && m_key.size() == 5)
+	if (m_image->exists() && !m_image->get_disk_key_data(m_key) && m_key.size() == 5)
 	{
 		m_locked = true;
 	}
@@ -321,7 +321,7 @@ void taito_compact_flash_device::device_reset()
 {
 	ata_flash_pccard_device::device_reset();
 
-	if (m_disk && !m_disk->get_disk_key_data(m_key) && m_key.size() == 5)
+	if (m_image->exists() && !m_image->get_disk_key_data(m_key) && m_key.size() == 5)
 	{
 		m_locked = true;
 	}

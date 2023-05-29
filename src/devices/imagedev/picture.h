@@ -29,8 +29,8 @@ public:
 	picture_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~picture_image_device();
 
-	// image-level overrides
-	virtual image_init_result call_load() override;
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 	virtual bool is_readable()  const noexcept override { return true; }
@@ -44,7 +44,7 @@ public:
 	const bitmap_argb32 &get_bitmap() { return m_picture; }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 private:

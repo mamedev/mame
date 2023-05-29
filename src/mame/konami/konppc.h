@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde
-#ifndef MAME_MACHINE_KONPPC_H
-#define MAME_MACHINE_KONPPC_H
+#ifndef MAME_KONAMI_KONPPC_H
+#define MAME_KONAMI_KONPPC_H
 
 #pragma once
 
@@ -109,4 +109,4 @@ private:
 DECLARE_DEVICE_TYPE(KONPPC, konppc_device)
 
 
-#endif // MAME_MACHINE_KONPPC_H
+#endif // MAME_KONAMI_KONPPC_H

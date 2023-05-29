@@ -5,8 +5,8 @@
  * includes/arcadia.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_ARCADIA_H
-#define MAME_INCLUDES_ARCADIA_H
+#ifndef MAME_ARCADIA_ARCADIA_H
+#define MAME_ARCADIA_ARCADIA_H
 
 #pragma once
 
@@ -137,4 +137,4 @@ private:
 	void draw_sprites();
 };
 
-#endif // MAME_INCLUDES_ARCADIA_H
+#endif // MAME_ARCADIA_ARCADIA_H

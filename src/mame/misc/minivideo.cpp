@@ -31,6 +31,9 @@
 #include "cpu/h8/h83002.h"
 #include "screen.h"
 
+
+namespace {
+
 class minivideo_state : public driver_device
 {
 public:
@@ -140,6 +143,8 @@ ROM_START( fiches12 )
 	ROM_LOAD( "lf2.u15", 0x080000, 0x80000, CRC(4194751d) SHA1(a774000a39a87207212da3ef6acc96443d152315) )
 	ROM_LOAD( "lf3.u16", 0x100000, 0x80000, CRC(539e3ae3) SHA1(e23d7e2c914682688dae60f3485d13e822af6736) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1995?, fiches,        0, minivideo, minivideo, minivideo_state, empty_init, ROT0, "Minivideo", "Les Fiches (ver 1.3)", MACHINE_IS_SKELETON )

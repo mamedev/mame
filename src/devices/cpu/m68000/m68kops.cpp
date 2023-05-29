@@ -1,7 +1,7 @@
 // Generated source, edits will be lost.  Run m68kmake.py instead
 
 #include "emu.h"
-#include "m68000.h"
+#include "m68kmusashi.h"
 
 void m68000_musashi_device::xa000_1010_071234fc()
 {
@@ -11400,9 +11400,6 @@ void m68000_musashi_device::x0c80_cmpi_l_071234fc()
 	u32 src = OPER_I_32();
 	u32 dst = DY();
 	u32 res = dst - src;
-
-	if (!m_cmpild_instr_callback.isnull())
-		(m_cmpild_instr_callback)(m_ir & 7, src);
 
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = MASK_OUT_ABOVE_32(res);
@@ -25439,7 +25436,7 @@ void m68000_musashi_device::xf548_ptest_l_4()
 {
 	if(m_has_pmmu)
 	{
-		logerror("68040: unhandled PTEST\n");
+		//logerror("68040: unhandled PTEST\n");
 	}
 	else
 	{
@@ -25452,7 +25449,6 @@ void m68000_musashi_device::x4e70_reset_071234fc()
 {
 	if(m_s_flag) {
 		m_reset_cb(1);
-		m68k_reset_peripherals();
 		m_icount -= m_cyc_reset;
 		m_reset_cb(0);
 	} else {
@@ -26509,8 +26505,6 @@ void m68000_musashi_device::x4e73_rte_l_0()
 		u32 new_sr;
 		u32 new_pc;
 
-		if (!m_rte_instr_callback.isnull())
-			(m_rte_instr_callback)(1);
 		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 
 		new_sr = m68ki_pull_16();
@@ -26533,8 +26527,6 @@ void m68000_musashi_device::x4e73_rte_l_71()
 		u32 new_pc;
 		u32 format_word;
 
-		if (!m_rte_instr_callback.isnull())
-			(m_rte_instr_callback)(1);
 		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 
 		format_word = m68ki_read_16(REG_A()[7]+6) >> 12;
@@ -26590,8 +26582,6 @@ void m68000_musashi_device::x4e73_rte_l_234fc()
 		u32 new_pc;
 		u32 format_word;
 
-		if (!m_rte_instr_callback.isnull())
-			(m_rte_instr_callback)(1);
 		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 
 	rte_loop:
@@ -30166,15 +30156,7 @@ void m68000_musashi_device::x4ad0_tas_b_ai_071234fc()
 	m_v_flag = VFLAG_CLEAR;
 	m_c_flag = CFLAG_CLEAR;
 
-	/* On the 68000 and 68010, the TAS instruction uses a unique bus cycle that may have
-	   side effects (e.g. delaying DMA) or may fail to write back at all depending on the
-	   bus implementation.
-	   In particular, the Genesis/Megadrive games Gargoyles and Ex-Mutants need the TAS
-	   to fail to write back in order to function properly. */
-	if (CPU_TYPE_IS_010_LESS() && !m_tas_write_callback.isnull())
-		(m_tas_write_callback)(ea, dst | 0x80);
-	else
-		m68ki_write_8(ea, dst | 0x80);
+	m68ki_write_8(ea, dst | 0x80);
 
 
 }
@@ -30188,15 +30170,7 @@ void m68000_musashi_device::x4ad8_tas_b_pi_071234fc()
 	m_v_flag = VFLAG_CLEAR;
 	m_c_flag = CFLAG_CLEAR;
 
-	/* On the 68000 and 68010, the TAS instruction uses a unique bus cycle that may have
-	   side effects (e.g. delaying DMA) or may fail to write back at all depending on the
-	   bus implementation.
-	   In particular, the Genesis/Megadrive games Gargoyles and Ex-Mutants need the TAS
-	   to fail to write back in order to function properly. */
-	if (CPU_TYPE_IS_010_LESS() && !m_tas_write_callback.isnull())
-		(m_tas_write_callback)(ea, dst | 0x80);
-	else
-		m68ki_write_8(ea, dst | 0x80);
+	m68ki_write_8(ea, dst | 0x80);
 
 
 }
@@ -30210,15 +30184,7 @@ void m68000_musashi_device::x4adf_tas_b_pi7_071234fc()
 	m_v_flag = VFLAG_CLEAR;
 	m_c_flag = CFLAG_CLEAR;
 
-	/* On the 68000 and 68010, the TAS instruction uses a unique bus cycle that may have
-	   side effects (e.g. delaying DMA) or may fail to write back at all depending on the
-	   bus implementation.
-	   In particular, the Genesis/Megadrive games Gargoyles and Ex-Mutants need the TAS
-	   to fail to write back in order to function properly. */
-	if (CPU_TYPE_IS_010_LESS() && !m_tas_write_callback.isnull())
-		(m_tas_write_callback)(ea, dst | 0x80);
-	else
-		m68ki_write_8(ea, dst | 0x80);
+	m68ki_write_8(ea, dst | 0x80);
 
 
 }
@@ -30232,15 +30198,7 @@ void m68000_musashi_device::x4ae0_tas_b_pd_071234fc()
 	m_v_flag = VFLAG_CLEAR;
 	m_c_flag = CFLAG_CLEAR;
 
-	/* On the 68000 and 68010, the TAS instruction uses a unique bus cycle that may have
-	   side effects (e.g. delaying DMA) or may fail to write back at all depending on the
-	   bus implementation.
-	   In particular, the Genesis/Megadrive games Gargoyles and Ex-Mutants need the TAS
-	   to fail to write back in order to function properly. */
-	if (CPU_TYPE_IS_010_LESS() && !m_tas_write_callback.isnull())
-		(m_tas_write_callback)(ea, dst | 0x80);
-	else
-		m68ki_write_8(ea, dst | 0x80);
+	m68ki_write_8(ea, dst | 0x80);
 
 
 }
@@ -30254,15 +30212,7 @@ void m68000_musashi_device::x4ae7_tas_b_pd7_071234fc()
 	m_v_flag = VFLAG_CLEAR;
 	m_c_flag = CFLAG_CLEAR;
 
-	/* On the 68000 and 68010, the TAS instruction uses a unique bus cycle that may have
-	   side effects (e.g. delaying DMA) or may fail to write back at all depending on the
-	   bus implementation.
-	   In particular, the Genesis/Megadrive games Gargoyles and Ex-Mutants need the TAS
-	   to fail to write back in order to function properly. */
-	if (CPU_TYPE_IS_010_LESS() && !m_tas_write_callback.isnull())
-		(m_tas_write_callback)(ea, dst | 0x80);
-	else
-		m68ki_write_8(ea, dst | 0x80);
+	m68ki_write_8(ea, dst | 0x80);
 
 
 }
@@ -30276,15 +30226,7 @@ void m68000_musashi_device::x4ae8_tas_b_di_071234fc()
 	m_v_flag = VFLAG_CLEAR;
 	m_c_flag = CFLAG_CLEAR;
 
-	/* On the 68000 and 68010, the TAS instruction uses a unique bus cycle that may have
-	   side effects (e.g. delaying DMA) or may fail to write back at all depending on the
-	   bus implementation.
-	   In particular, the Genesis/Megadrive games Gargoyles and Ex-Mutants need the TAS
-	   to fail to write back in order to function properly. */
-	if (CPU_TYPE_IS_010_LESS() && !m_tas_write_callback.isnull())
-		(m_tas_write_callback)(ea, dst | 0x80);
-	else
-		m68ki_write_8(ea, dst | 0x80);
+	m68ki_write_8(ea, dst | 0x80);
 
 
 }
@@ -30298,15 +30240,7 @@ void m68000_musashi_device::x4af0_tas_b_ix_071234fc()
 	m_v_flag = VFLAG_CLEAR;
 	m_c_flag = CFLAG_CLEAR;
 
-	/* On the 68000 and 68010, the TAS instruction uses a unique bus cycle that may have
-	   side effects (e.g. delaying DMA) or may fail to write back at all depending on the
-	   bus implementation.
-	   In particular, the Genesis/Megadrive games Gargoyles and Ex-Mutants need the TAS
-	   to fail to write back in order to function properly. */
-	if (CPU_TYPE_IS_010_LESS() && !m_tas_write_callback.isnull())
-		(m_tas_write_callback)(ea, dst | 0x80);
-	else
-		m68ki_write_8(ea, dst | 0x80);
+	m68ki_write_8(ea, dst | 0x80);
 
 
 }
@@ -30320,15 +30254,7 @@ void m68000_musashi_device::x4af8_tas_b_aw_071234fc()
 	m_v_flag = VFLAG_CLEAR;
 	m_c_flag = CFLAG_CLEAR;
 
-	/* On the 68000 and 68010, the TAS instruction uses a unique bus cycle that may have
-	   side effects (e.g. delaying DMA) or may fail to write back at all depending on the
-	   bus implementation.
-	   In particular, the Genesis/Megadrive games Gargoyles and Ex-Mutants need the TAS
-	   to fail to write back in order to function properly. */
-	if (CPU_TYPE_IS_010_LESS() && !m_tas_write_callback.isnull())
-		(m_tas_write_callback)(ea, dst | 0x80);
-	else
-		m68ki_write_8(ea, dst | 0x80);
+	m68ki_write_8(ea, dst | 0x80);
 
 
 }
@@ -30342,15 +30268,7 @@ void m68000_musashi_device::x4af9_tas_b_al_071234fc()
 	m_v_flag = VFLAG_CLEAR;
 	m_c_flag = CFLAG_CLEAR;
 
-	/* On the 68000 and 68010, the TAS instruction uses a unique bus cycle that may have
-	   side effects (e.g. delaying DMA) or may fail to write back at all depending on the
-	   bus implementation.
-	   In particular, the Genesis/Megadrive games Gargoyles and Ex-Mutants need the TAS
-	   to fail to write back in order to function properly. */
-	if (CPU_TYPE_IS_010_LESS() && !m_tas_write_callback.isnull())
-		(m_tas_write_callback)(ea, dst | 0x80);
-	else
-		m68ki_write_8(ea, dst | 0x80);
+	m68ki_write_8(ea, dst | 0x80);
 
 
 }
@@ -31267,8 +31185,7 @@ void m68000_musashi_device::xf400_cinv_l_4()
 }
 void m68000_musashi_device::xf420_cpush_l_4()
 {
-	logerror("%s at %08x: called unimplemented instruction %04x (cpush)\n",
-					tag(), m_ppc, m_ir);
+	//logerror("%s at %08x: called unimplemented instruction %04x (cpush)\n", tag(), m_ppc, m_ir);
 
 
 }

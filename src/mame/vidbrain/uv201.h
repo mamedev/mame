@@ -51,8 +51,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_VIDEO_UV201_H
-#define MAME_VIDEO_UV201_H
+#ifndef MAME_VIDBRAIN_UV201_H
+#define MAME_VIDBRAIN_UV201_H
 
 #pragma once
 
@@ -126,4 +126,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(UV201, uv201_device)
 
-#endif // MAME_VIDEO_UV201_H
+#endif // MAME_VIDBRAIN_UV201_H

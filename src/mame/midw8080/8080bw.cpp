@@ -4530,6 +4530,16 @@ ROM_START( spceking )
 	ROM_LOAD( "spcekng4",     0x1800, 0x0800, CRC(54170ada) SHA1(1e8b3774355ec0d448f04805a917f4c1fe64bceb) )
 ROM_END
 
+ROM_START( spcebttl ) // Three PCB stack (U-1109 + 29-22-2 + 29-22-1), almost exact duplicates of Taito PCBs.
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1", 0x0000, 0x0400, CRC(86bb8cb6) SHA1(a75648e7f2446c756d86624b15d387d25ce47b66) )
+	ROM_LOAD( "2", 0x0400, 0x0400, CRC(febe6d1a) SHA1(e1c3a24b4fa5862107ada1f9d7249466e8c3f06a) )
+	ROM_LOAD( "3", 0x0800, 0x0400, CRC(e11ef4ae) SHA1(26f21297cfff1e9922ea20283c5e8eb6a54e8359) )
+	ROM_LOAD( "4", 0x1400, 0x0400, CRC(1293b826) SHA1(165cd5d08a19eadbe954145b12807f10df9e691a) )
+	ROM_LOAD( "5", 0x1800, 0x0400, CRC(3c89b4d5) SHA1(cf0622a9dcdadc5769546fe807a0f168cc6e18dc) )
+	ROM_LOAD( "6", 0x1c00, 0x0400, CRC(e154f4e5) SHA1(eeda4cbae72e0753965cbb99dfbfa927c6a372d1) )
+ROM_END
+
 ROM_START( spcewars )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sanritsu.1",   0x0000, 0x0400, CRC(ca331679) SHA1(5c362c3d1c721d293bcddbef4033533769c8f0e0) )
@@ -5934,6 +5944,7 @@ GAMEL(1978, invadernc,   invaders, invaders,  sicv,      sisv_state,     empty_i
 GAMEL(1978, spcewars,    invaders, spcewars,  spcewars,  _8080bw_state,  empty_init,    ROT270, "Taito / Sanritsu",                   "Space War (Sanritsu)",                                            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invaders ) // Unclassified, licensed or bootleg?
 GAME( 1979, spcewarla,   invaders, spcewarla, spcewars,  _8080bw_state,  empty_init,    ROT270, "bootleg (Leisure and Allied)",       "Space War (Leisure and Allied)",                                  MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // unclassified, licensed or bootleg?
 GAMEL(1978, spceking,    invaders, invaders,  sicv,      sisv_state,     empty_init,    ROT270, "Taito / Leijac Corporation",         "Space King",                                                      MACHINE_SUPPORTS_SAVE, layout_invaders ) // Unclassified, licensed or bootleg?
+GAME( 1978, spcebttl,    invaders, invaders,  sitv,      sisv_state,     empty_init,    ROT270, "bootleg",                            "Space Battle (Space Invaders bootleg)",                           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAMEL(1979, cosmicmo,    invaders, cosmicmo,  cosmicmo,  _8080bw_state,  empty_init,    ROT270, "bootleg (Universal)",                "Cosmic Monsters (version II)",                                    MACHINE_SUPPORTS_SAVE, layout_cosmicm ) // Taito sued, and as settlement they were allowed to sell Universal's Galaxy Wars
 GAMEL(1979, cosmicm2,    invaders, cosmicmo,  cosmicmo,  _8080bw_state,  empty_init,    ROT270, "bootleg (Universal)",                "Cosmic Monsters 2",                                               MACHINE_SUPPORTS_SAVE, layout_cosmicm ) // "
 GAMEL(1980?,sinvzen,     invaders, invaders,  sinvzen,   invaders_state, empty_init,    ROT270, "Taito / Zenitone-Microsec Ltd.",     "Super Invaders (Zenitone-Microsec)",                              MACHINE_SUPPORTS_SAVE, layout_invaders ) // Unclassified, licensed or bootleg?
@@ -6011,14 +6022,14 @@ GAME( 1980, polarisb,    polaris,  polaris,   polaris,   _8080bw_state,  empty_i
 GAME( 1980, polariso,    polaris,  polaris,   polaris,   _8080bw_state,  empty_init,    ROT270, "Taito",                              "Polaris (original version)",                                      MACHINE_SUPPORTS_SAVE )
 GAME( 1981, polarisbr,   polaris,  polaris,   polaris,   _8080bw_state,  empty_init,    ROT270, "Taito do Brasil",                    "Polaris (Brazil)",                                                MACHINE_SUPPORTS_SAVE )
 
-GAME( 1980, ballbomb,    0,        ballbomb,  ballbomb,  _8080bw_state,  empty_init,    ROT270, "Taito",                              "Balloon Bomber",                                                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )  // Missing clouds
+GAME( 1980, ballbomb,    0,        ballbomb,  ballbomb,  _8080bw_state,  empty_init,    ROT270, "Taito",                              "Balloon Bomber",                                                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // Missing clouds
 
 GAME( 1980, indianbt,    0,        indianbt,  indianbt,  _8080bw_state,  empty_init,    ROT270, "Taito",                              "Indian Battle",                                                   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1983, indianbtbr,  indianbt, indianbtbr,indianbtbr,_8080bw_state,  empty_init,    ROT270, "Taito do Brasil",                    "Indian Battle (Brazil)",                                          MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1980, steelwkr,    0,        steelwkr,  steelwkr,  _8080bw_state,  empty_init,    ROT0  , "Taito",                              "Steel Worker",                                                    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1980, steelwkr,    0,        steelwkr,  steelwkr,  _8080bw_state,  empty_init,    ROT0,   "Taito",                              "Steel Worker",                                                    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAMEL(1980?,galactic,    0,        invaders,  galactic,  invaders_state, empty_init,    ROT270, "Taito do Brasil",                    "Galactica - Batalha Espacial",                                    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_galactic )
+GAMEL(1980?,galactic,    0,        invaders,  galactic,  invaders_state, empty_init,    ROT270, "Taito do Brasil",                    "Galactica - Batalha Espacial",                                    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_galactic ) // Modified version of Taito Spacian, on Space Invaders hardware
 GAMEL(1980?,spacmiss,    galactic, invaders,  galactic,  invaders_state, empty_init,    ROT270, "bootleg?",                           "Space Missile - Space Fighting Game",                             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_galactic )
 
 // Misc. manufacturers

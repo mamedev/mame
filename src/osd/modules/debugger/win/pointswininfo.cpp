@@ -48,11 +48,9 @@ pointswin_info::pointswin_info(debugger_windows_interface &debugger) :
 	// clamp the min/max size
 	set_maxwidth(bounds.right - bounds.left);
 
-	// position the window at the bottom-right
-	SetWindowPos(window(), HWND_TOP, 100, 100, bounds.right - bounds.left, bounds.bottom - bounds.top, SWP_SHOWWINDOW);
-
-	// recompute the children
-	debugwin_info::recompute_children();
+	// position the window and recompute children
+	debugger.stagger_window(window(), bounds.right - bounds.left, bounds.bottom - bounds.top);
+	recompute_children();
 }
 
 

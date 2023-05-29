@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
-#ifndef MAME_INCLUDES_PREHISLE_H
-#define MAME_INCLUDES_PREHISLE_H
+#ifndef MAME_SNK_PREHISLE_H
+#define MAME_SNK_PREHISLE_H
 
 #pragma once
 
@@ -77,4 +77,4 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 };
 
-#endif // MAME_INCLUDES_PREHISLE_H
+#endif // MAME_SNK_PREHISLE_H

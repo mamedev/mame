@@ -42,6 +42,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class facit4440_state : public driver_device
 {
 public:
@@ -315,5 +318,8 @@ ROM_START(facit4440)
 	ROM_REGION(0x0800, "scanprom", 0)
 	ROM_LOAD("rom2.bin", 0x0000, 0x0800, CRC(9e1a190c) SHA1(fb08ee806f1056bcdfb5b08ea85995e1d3d01298))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1984, facit4440, 0, 0, facit4440, facit4440, facit4440_state, empty_init, "Facit", "4440 Twist (30M-F1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)

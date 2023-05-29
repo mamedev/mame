@@ -227,7 +227,7 @@ void xt_hdc_device::device_reset()
 	m_error = 0;
 }
 
-hard_disk_file *xt_hdc_device::pc_hdc_file(int id)
+harddisk_image_device *xt_hdc_device::pc_hdc_file(int id)
 {
 	harddisk_image_device *img = nullptr;
 	switch (id)
@@ -245,7 +245,7 @@ hard_disk_file *xt_hdc_device::pc_hdc_file(int id)
 	if (!img->exists())
 		return nullptr;
 
-	return img->get_hard_disk_file();
+	return img;
 }
 
 void xt_hdc_device::pc_hdc_result(bool set_error_info)
@@ -291,7 +291,7 @@ bool xt_hdc_device::no_dma()
 
 int xt_hdc_device::get_lbasector()
 {
-	hard_disk_file *file = pc_hdc_file(m_drv);
+	harddisk_image_device *file = pc_hdc_file(m_drv);
 	const auto &info = file->get_info();
 
 	int lbasector = m_cylinder[m_drv];
@@ -314,7 +314,7 @@ int xt_hdc_device::get_lbasector()
 
 int xt_hdc_device::dack_r()
 {
-	hard_disk_file *file = pc_hdc_file(m_drv);
+	harddisk_image_device *file = pc_hdc_file(m_drv);
 	if (!file)
 		return 0;
 	const auto &info = file->get_info();
@@ -387,7 +387,7 @@ int xt_hdc_device::dack_rs()
 
 void xt_hdc_device::dack_w(int data)
 {
-	hard_disk_file *file = pc_hdc_file(m_drv);
+	harddisk_image_device *file = pc_hdc_file(m_drv);
 	if (!file)
 		return;
 	const auto &info = file->get_info();
@@ -455,7 +455,7 @@ void xt_hdc_device::execute_read()
 	if (m_sector_cnt[m_drv] == 0)
 		size = 256 * 512;
 
-	hard_disk_file *disk = pc_hdc_file(m_drv);
+	harddisk_image_device *disk = pc_hdc_file(m_drv);
 	if (!disk)
 		return;
 
@@ -504,7 +504,7 @@ void xt_hdc_device::execute_write()
 	if (m_sector_cnt[m_drv] == 0)
 		size = 256 * 512;
 
-	hard_disk_file *disk = pc_hdc_file(m_drv);
+	harddisk_image_device *disk = pc_hdc_file(m_drv);
 	if (!disk)
 		return;
 

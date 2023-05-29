@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Achim, bataais, Berger
-/***************************************************************************
+/*******************************************************************************
 
 Saitek Simultano, it is related to Saitek Stratos, see stratos.cpp
 But it's not similar enough to be a subdriver of it.
@@ -25,7 +25,7 @@ TODO:
 - verify that egr(1) does not work on real chesscomputer
 - is cc2150 the same rom contents as the first simultano?
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -124,9 +124,9 @@ void simultano_state::machine_reset()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // soft power on/off
 
@@ -219,9 +219,9 @@ void simultano_state::control_w(u8 data)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void simultano_state::cc2150_map(address_map &map)
 {
@@ -248,9 +248,9 @@ void simultano_state::simultano_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( simultano )
 	PORT_START("IN.0")
@@ -312,13 +312,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void simultano_state::cc2150(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	R65C02(config, m_maincpu, 3_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &simultano_state::cc2150_map);
 	m_maincpu->set_periodic_int(FUNC(simultano_state::irq0_line_hold), attotime::from_hz(91.6)); // measured
@@ -330,7 +330,7 @@ void simultano_state::cc2150(machine_config &config)
 	m_board->set_delay(attotime::from_msec(350));
 	m_board->set_nvram_enable(true);
 
-	/* video hardware */
+	// video hardware
 	SED1502(config, m_lcd, 32768).write_segs().set(FUNC(simultano_state::lcd_output_w));
 	PWM_DISPLAY(config, m_lcd_pwm).set_size(16, 34);
 	m_lcd_pwm->set_refresh(attotime::from_hz(30));
@@ -344,7 +344,7 @@ void simultano_state::cc2150(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(2+2, 8);
 	config.set_default_layout(layout_saitek_simultano);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
@@ -353,21 +353,21 @@ void simultano_state::simultano(machine_config &config)
 {
 	cc2150(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	M65C02(config.replace(), m_maincpu, 5_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &simultano_state::simultano_map);
 	m_maincpu->set_periodic_int(FUNC(simultano_state::irq0_line_hold), attotime::from_hz(76)); // approximation
 
-	/* extension rom */
+	// extension rom
 	GENERIC_SOCKET(config, "extrom", generic_plain_slot, "saitek_egr");
 	SOFTWARE_LIST(config, "cart_list").set_original("saitek_egr").set_filter("egr2");
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( simultano )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -400,11 +400,11 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-/*    YEAR  NAME        PARENT    CMP MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS */
-CONS( 1989, simultano,  0,         0, simultano, simultano, simultano_state, empty_init, "Saitek", "Kasparov Simultano (ver. C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, simultanoa, simultano, 0, simultano, simultano, simultano_state, empty_init, "Saitek", "Kasparov Simultano (ver. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, cc2150,     simultano, 0, cc2150,    cc2150,    simultano_state, empty_init, "Saitek / Tandy Corporation", "Chess Champion 2150", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME        PARENT     COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1989, simultano,  0,         0,      simultano, simultano, simultano_state, empty_init, "Saitek", "Kasparov Simultano (ver. C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, simultanoa, simultano, 0,      simultano, simultano, simultano_state, empty_init, "Saitek", "Kasparov Simultano (ver. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, cc2150,     simultano, 0,      cc2150,    cc2150,    simultano_state, empty_init, "Saitek / Tandy Corporation", "Chess Champion 2150", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

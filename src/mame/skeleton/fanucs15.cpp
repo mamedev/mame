@@ -309,6 +309,9 @@
 #include "cpu/m68000/m68020.h"
 #include "cpu/i86/i286.h"
 
+
+namespace {
+
 class fanucs15_state : public driver_device
 {
 public:
@@ -430,6 +433,9 @@ ROM_START( fanucs15 )
 	ROM_LOAD16_BYTE( "pmc_high.a2",  0x000000, 0x020000, CRC(7b8f9a96) SHA1(08d828b612c45bb3f2f7a56df418cd8e34731bf4) )
 	ROM_LOAD16_BYTE( "pmc_low.a1",   0x000001, 0x020000, CRC(3ab261f8) SHA1(20b7eef96deb91a3a867f9ac4165b0c188fbcff3) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME     FLAGS

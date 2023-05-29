@@ -13,6 +13,9 @@ Skeleton driver for Relisys TR-175 II color terminal.
 #include "video/scn2674.h"
 #include "screen.h"
 
+
+namespace {
+
 class tr175_state : public driver_device
 {
 public:
@@ -126,5 +129,8 @@ ROM_START( tr175 )
 	ROM_LOAD16_BYTE( "v6.05.u50", 0x00001, 0x10000, CRC(5a33b6b3) SHA1(d673f50dd88f8a154ddaabe34cfcc9ab91435a4c) )
 	ROM_LOAD16_BYTE( "v6.05.u45", 0x00000, 0x10000, CRC(e220befe) SHA1(8402280577e6de4b85843222bbd6b06a3f625b3b) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1982, tr175, 0, 0, tr175, tr175, tr175_state, empty_init, "Relisys", "TR-175 II", MACHINE_IS_SKELETON )

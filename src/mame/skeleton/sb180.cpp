@@ -13,6 +13,9 @@
 #include "machine/upd765.h"
 #include "bus/rs232/rs232.h"
 
+
+namespace {
+
 #define FDC9266_TAG "u24"
 
 class sb180_state : public driver_device
@@ -117,6 +120,9 @@ ROM_START( sb180 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "monitor.bin", 0x0000, 0x2000, CRC(49640012) SHA1(ea571dc7476430e31b74bd1ab7a577e9013ad0bd))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

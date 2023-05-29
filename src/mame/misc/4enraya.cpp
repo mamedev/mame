@@ -860,6 +860,19 @@ ROM_START( strker )
 	ROM_CONTINUE(         0x10000, 0x2000 )
 ROM_END
 
+ROM_START( bowlgum ) // VIDEOGUM/TV MADE IN SPAIN PCB, all ROM labels handwritten
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "copy.ic52",   0x0000, 0x8000, CRC(42d70078) SHA1(bc37bfb7e50547250df020872f935c8ab9c3ff9a) )
+
+	ROM_REGION( 0x18000, "chars", 0 )
+	ROM_LOAD( "bb.ic19",   0x02000, 0x6000, CRC(cdf78197) SHA1(1aaad919f506ea42345d9d1ee789b19f1fef41a7) )
+	ROM_CONTINUE(          0x00000, 0x2000 )
+	ROM_LOAD( "bg.ic18",   0x0a000, 0x6000, CRC(b7ab5c2e) SHA1(efe281bbabaef834d3c00ef504503d4c91e2c925) )
+	ROM_CONTINUE(          0x08000, 0x2000 )
+	ROM_LOAD( "br.ic17",   0x12000, 0x6000, CRC(b87bc6e9) SHA1(1fb29a933b7683965db9d76640dc4fe2651ae19e) ) // 00xxxxxxxxxxxxx = 0x00
+	ROM_CONTINUE(          0x10000, 0x2000 )
+ROM_END
+
 /*
   Unknown 'Pac-Man' gambling game.
 */
@@ -1043,6 +1056,7 @@ GAME( 1990, 4enrayaa,  4enraya, _4enraya, 4enraya,  _4enraya_state,  empty_init,
 GAME( 1992?, tourpgum, 0,       tourpgum, tourpgum, unk_gambl_state, empty_init, ROT0, u8"Paradise Automatique / TourVisión", u8"unknown Paradise Automatique / TourVisión bowling themed poker game with gum prizes (France)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992?, chicgum,  0,       chicgum,  tourpgum, unk_gambl_state, empty_init, ROT0, "<unknown>", "Chic Gum Video", MACHINE_SUPPORTS_SAVE )
 GAME( 1992?, strker,   0,       chicgum,  tourpgum, unk_gambl_state, empty_init, ROT0, "<unknown>", "Striker", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 'RAM NO GOOD', if bypassed it resets after coining up
+GAME( 1992?, bowlgum,  0,       chicgum,  tourpgum, unk_gambl_state, empty_init, ROT0, "<unknown>", "Bowling Gum", MACHINE_SUPPORTS_SAVE )
 
 GAME( 199?, unkpacg,   0,       unkpacg,  unkpacg,  unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 1)",   MACHINE_SUPPORTS_SAVE )
 GAME( 199?, unkpacgb,  unkpacg, unkpacg,  unkpacg,  unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 2)",   MACHINE_SUPPORTS_SAVE )

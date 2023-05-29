@@ -129,6 +129,9 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
+
+namespace {
+
 class kron180_state : public driver_device
 {
 public:
@@ -314,6 +317,9 @@ ROM_START (kron180)
 	ROM_REGION(0x1000, "chargen",0) /* TODO: This character rom is taken from ibmjr rom set and will be replaced */
 	ROM_LOAD( "cga.chr", 0x0000, 0x1000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 //     YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY     FULLNAME      FLAGS

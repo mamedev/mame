@@ -541,21 +541,20 @@ void menu_game_info::populate_text(std::optional<text_layout> &layout, float &wi
 	if (!layout || (layout->width() != width))
 	{
 		rgb_t const color = ui().colors().text_color();
-		layout.emplace(ui().create_layout(container(), width));
+		layout.emplace(create_layout(width));
 		layout->add_text(ui().machine_info().game_info_string(), color);
 		lines = layout->lines();
 	}
 	width = layout->actual_width();
 }
 
-void menu_game_info::populate(float &customtop, float &custombottom)
+void menu_game_info::populate()
 {
 }
 
-void menu_game_info::handle(event const *ev)
+bool menu_game_info::handle(event const *ev)
 {
-	if (ev)
-		handle_key(ev->iptkey);
+	return ev && handle_key(ev->iptkey);
 }
 
 
@@ -606,21 +605,20 @@ void menu_warn_info::populate_text(std::optional<text_layout> &layout, float &wi
 		}
 
 		rgb_t const color(ui().colors().text_color());
-		layout.emplace(ui().create_layout(container(), width));
+		layout.emplace(create_layout(width));
 		layout->add_text(std::move(buf).str(), color);
 		lines = layout->lines();
 	}
 	width = layout->actual_width();
 }
 
-void menu_warn_info::populate(float &customtop, float &custombottom)
+void menu_warn_info::populate()
 {
 }
 
-void menu_warn_info::handle(event const *ev)
+bool menu_warn_info::handle(event const *ev)
 {
-	if (ev)
-		handle_key(ev->iptkey);
+	return ev && handle_key(ev->iptkey);
 }
 
 
@@ -642,14 +640,15 @@ void menu_image_info::menu_activated()
 	reset(reset_options::REMEMBER_POSITION);
 }
 
-void menu_image_info::populate(float &customtop, float &custombottom)
+void menu_image_info::populate()
 {
 	for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
 		image_info(&image);
 }
 
-void menu_image_info::handle(event const *ev)
+bool menu_image_info::handle(event const *ev)
 {
+	return false;
 }
 
 
@@ -660,6 +659,9 @@ void menu_image_info::handle(event const *ev)
 
 void menu_image_info::image_info(device_image_interface *image)
 {
+	if (!image->user_loadable())
+		return;
+
 	if (image->exists())
 	{
 		// display device type and filename

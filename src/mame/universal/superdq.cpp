@@ -29,6 +29,8 @@
 #include "tilemap.h"
 
 
+namespace {
+
 #define MASTER_CLOCK    20000000
 
 
@@ -412,6 +414,7 @@ ROM_START( superdqa )       /* short scenes, alternate */
 	DISK_IMAGE_READONLY( "superdq", 0, NO_DUMP )
 ROM_END
 
+} // anonymous namespace
 
 
 /*************************************

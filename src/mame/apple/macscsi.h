@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:AJR
 
-#ifndef MAME_MACHINE_MACSCSI_H
-#define MAME_MACHINE_MACSCSI_H
+#ifndef MAME_APPLE_MACSCSI_H
+#define MAME_APPLE_MACSCSI_H
 
 #pragma once
 
@@ -67,4 +67,4 @@ private:
 // device type declaration
 DECLARE_DEVICE_TYPE(MAC_SCSI_HELPER, mac_scsi_helper_device)
 
-#endif // MAME_MACHINE_MACSCSI_H
+#endif // MAME_APPLE_MACSCSI_H

@@ -508,7 +508,7 @@ license:CC0-1.0
 	</element>
 	<element name="text_l10a">
 		<rect><color red="0.17" green="0.15" blue="0.15" /></rect>
-		<text string=" FORWARD"><color red="0.81" green="0.8" blue="0.79" /></text>
+		<text string=" FORWARD "><color red="0.81" green="0.8" blue="0.79" /></text>
 	</element>
 	<element name="text_l11">
 		<rect><color red="0.17" green="0.15" blue="0.15" /></rect>
@@ -516,7 +516,7 @@ license:CC0-1.0
 	</element>
 	<element name="text_l11a">
 		<rect><color red="0.17" green="0.15" blue="0.15" /></rect>
-		<text string=" TAKE BACK"><color red="0.81" green="0.8" blue="0.79" /></text> <!-- actually 2 lines of text -->
+		<text string=" TAKE BACK "><color red="0.81" green="0.8" blue="0.79" /></text> <!-- actually 2 lines of text -->
 	</element>
 	<element name="text_l12">
 		<rect><color red="0.17" green="0.15" blue="0.15" /></rect>
@@ -541,11 +541,11 @@ license:CC0-1.0
 	</element>
 	<element name="text_l15">
 		<rect><color red="0.7" green="0.2" blue="0.05" /></rect>
-		<text string=" NEW GAME"><color red="0.81" green="0.8" blue="0.79" /></text> <!-- actually 2 lines of text -->
+		<text string=" NEW GAME "><color red="0.81" green="0.8" blue="0.79" /></text> <!-- actually 2 lines of text -->
 	</element>
 	<element name="text_l15a">
 		<rect><color red="0.7" green="0.2" blue="0.05" /></rect>
-		<text string=" CL. BOARD"><color red="0.81" green="0.8" blue="0.79" /></text> <!-- actually "CLEAR BOARD", 2 lines of text -->
+		<text string=" CL. BOARD "><color red="0.81" green="0.8" blue="0.79" /></text> <!-- actually "CLEAR BOARD", 2 lines of text -->
 	</element>
 	<element name="text_l16">
 		<rect><color red="0.7" green="0.2" blue="0.05" /></rect>

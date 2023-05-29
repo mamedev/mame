@@ -71,6 +71,8 @@
 #include "rx01.h"
 
 
+namespace {
+
 class vax11_state : public driver_device
 {
 public:
@@ -171,8 +173,10 @@ ROM_START( vax785 )
 	ROMX_LOAD( "23-237f1-00.e69", 0xd000, 0x0400, CRC(2bf8cf0b) SHA1(6db79c5392b265e38b5b8b386528d7c138d995e9), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1))
 	ROMX_LOAD( "23-238f1-00.e85", 0xd001, 0x0400, CRC(ff569f71) SHA1(05985396047fb4639959000a1abe50d2f184deaa), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1))
 	ROMX_LOAD( "23-239f1-00.e73", 0xd001, 0x0400, CRC(cec7abe3) SHA1(8b8b52bd46340c58efa5adef3f306e0cdcb77520), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1))
-
 ROM_END
+
+} // anonymous namespace
+
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT        COMPANY                          FULLNAME      FLAGS */
 COMP( 1984, vax785, 0,      0,      vax11,   vax11, vax11_state, empty_init, "Digital Equipment Corporation", "VAX-11/785", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

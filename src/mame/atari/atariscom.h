@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_ATARISCOM_H
-#define MAME_MACHINE_ATARISCOM_H
+#ifndef MAME_ATARI_ATARISCOM_H
+#define MAME_ATARI_ATARISCOM_H
 
 #pragma once
 
@@ -86,4 +86,4 @@ private:
 };
 
 
-#endif // MAME_MACHINE_ATARISCOM_H
+#endif // MAME_ATARI_ATARISCOM_H

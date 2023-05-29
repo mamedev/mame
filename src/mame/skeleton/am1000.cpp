@@ -16,6 +16,9 @@
 //#include "machine/com8116.h"
 //#include "machine/msm5832.h"
 
+
+namespace {
+
 class am1000_state : public driver_device
 {
 public:
@@ -115,6 +118,8 @@ ROM_START(am1000)
 	ROM_REGION(0x800, "subprom", 0)
 	ROM_LOAD("169-05_b00.u162", 0x000, 0x800, CRC(e0f8bb40) SHA1(ac2531994eb90447d320401948af07723e51c8f9))
 ROM_END
+
+} // anonymous namespace
 
 
 COMP(1988, am1000, 0, 0, am1000, am1000, am1000_state, empty_init, "Alpha Micro", "AM-1000", MACHINE_IS_SKELETON)

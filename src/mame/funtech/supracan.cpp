@@ -87,6 +87,27 @@ DEBUG TRICKS:
 #include "speaker.h"
 #include "tilemap.h"
 
+#define LOG_UNKNOWNS    (1U << 1)
+#define LOG_DMA         (1U << 2)
+#define LOG_SPRDMA      (1U << 3)
+#define LOG_SPRITES     (1U << 4)
+#define LOG_TILEMAP0    (1U << 5)
+#define LOG_TILEMAP1    (1U << 6)
+#define LOG_TILEMAP2    (1U << 7)
+#define LOG_ROZ         (1U << 8)
+#define LOG_HFVIDEO     (1U << 9)
+#define LOG_IRQS        (1U << 10)
+#define LOG_SOUND       (1U << 11)
+#define LOG_HFUNKNOWNS  (1U << 12)
+#define LOG_68K_SOUND   (1U << 13)
+#define LOG_CONTROLS    (1U << 14)
+#define LOG_VIDEO       (LOG_SPRDMA | LOG_SPRITES | LOG_TILEMAP0 | LOG_TILEMAP1 | LOG_TILEMAP2 | LOG_ROZ)
+#define LOG_ALL         (LOG_UNKNOWNS | LOG_HFUNKNOWNS | LOG_DMA | LOG_VIDEO | LOG_HFVIDEO | LOG_IRQS | LOG_SOUND | LOG_68K_SOUND | LOG_CONTROLS)
+#define LOG_DEFAULT     (LOG_ALL & ~(LOG_HFVIDEO | LOG_HFUNKNOWNS))
+
+#define VERBOSE         (LOG_UNKNOWNS | LOG_SOUND | LOG_DMA)
+#include "logmacro.h"
+
 
 namespace {
 
@@ -96,27 +117,6 @@ namespace {
 
 #define DEBUG_PRIORITY          (0)
 #define DEBUG_PRIORITY_INDEX    (0) // 0-3
-
-#define LOG_UNKNOWNS    (1 << 0)
-#define LOG_DMA         (1 << 1)
-#define LOG_SPRDMA      (1 << 2)
-#define LOG_SPRITES     (1 << 3)
-#define LOG_TILEMAP0    (1 << 4)
-#define LOG_TILEMAP1    (1 << 5)
-#define LOG_TILEMAP2    (1 << 6)
-#define LOG_ROZ         (1 << 7)
-#define LOG_HFVIDEO     (1 << 8)
-#define LOG_IRQS        (1 << 9)
-#define LOG_SOUND       (1 << 10)
-#define LOG_HFUNKNOWNS  (1 << 11)
-#define LOG_68K_SOUND   (1 << 12)
-#define LOG_CONTROLS    (1 << 13)
-#define LOG_VIDEO       (LOG_SPRDMA | LOG_SPRITES | LOG_TILEMAP0 | LOG_TILEMAP1 | LOG_TILEMAP2 | LOG_ROZ)
-#define LOG_ALL         (LOG_UNKNOWNS | LOG_HFUNKNOWNS | LOG_DMA | LOG_VIDEO | LOG_HFVIDEO | LOG_IRQS | LOG_SOUND | LOG_68K_SOUND | LOG_CONTROLS)
-#define LOG_DEFAULT     (LOG_ALL & ~(LOG_HFVIDEO | LOG_HFUNKNOWNS))
-
-#define VERBOSE         (LOG_UNKNOWNS | LOG_SOUND | LOG_DMA)
-#include "logmacro.h"
 
 class supracan_state : public driver_device
 {
@@ -1920,16 +1920,13 @@ DEVICE_IMAGE_LOAD_MEMBER(supracan_state::cart_load)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
-	if (size > 0x400000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-		return image_init_result::FAIL;
-	}
+	if (size > 0x40'0000)
+		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be no larger than 4M)");
 
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_BIG);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

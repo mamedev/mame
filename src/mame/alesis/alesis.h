@@ -6,8 +6,8 @@
 
 ****************************************************************************/
 
-#ifndef MAME_INCLUDES_ALESIS_H
-#define MAME_INCLUDES_ALESIS_H
+#ifndef MAME_ALESIS_ALESIS_H
+#define MAME_ALESIS_ALESIS_H
 
 #pragma once
 
@@ -231,4 +231,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(ALESIS_DM3AG, alesis_dm3ag_device)
 
-#endif  // MAME_INCLUDES_ALESIS_H
+#endif  // MAME_ALESIS_ALESIS_H

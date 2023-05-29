@@ -5,8 +5,8 @@
     Sega G-80 raster hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_SEGAG80R_H
-#define MAME_INCLUDES_SEGAG80R_H
+#ifndef MAME_SEGA_SEGAG80R_H
+#define MAME_SEGA_SEGAG80R_H
 
 #pragma once
 
@@ -225,4 +225,4 @@ DECLARE_DEVICE_TYPE(SEGA005, sega005_sound_device)
 #define G80_BACKGROUND_PIGNEWT      3
 #define G80_BACKGROUND_SINDBADM     4
 
-#endif // MAME_INCLUDES_SEGAG80R_H
+#endif // MAME_SEGA_SEGAG80R_H

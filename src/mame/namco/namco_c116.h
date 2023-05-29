@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Alex W. Jackson
-#ifndef MAME_VIDEO_NAMCO_C116_H
-#define MAME_VIDEO_NAMCO_C116_H
+#ifndef MAME_NAMCO_NAMCO_C116_H
+#define MAME_NAMCO_NAMCO_C116_H
 
 #pragma once
 
@@ -48,4 +48,4 @@ private:
 
 DECLARE_DEVICE_TYPE(NAMCO_C116, namco_c116_device)
 
-#endif // MAME_VIDEO_NAMCO_C116_H
+#endif // MAME_NAMCO_NAMCO_C116_H

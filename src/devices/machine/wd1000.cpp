@@ -238,7 +238,7 @@ void wd1000_device::end_command()
 
 int wd1000_device::get_lbasector()
 {
-	hard_disk_file *file = m_drives[drive()]->get_hard_disk_file();
+	harddisk_image_device *file = m_drives[drive()];
 	const auto &info = file->get_info();
 	int lbasector;
 
@@ -573,7 +573,7 @@ void wd1000_device::cmd_restore()
 // so it is not necessary to guard that case in these functions.
 void wd1000_device::cmd_read_sector()
 {
-	hard_disk_file *file = m_drives[drive()]->get_hard_disk_file();
+	harddisk_image_device *file = m_drives[drive()];
 	uint8_t dma = BIT(m_command, 3);
 
 	file->read(get_lbasector(), m_buffer);
@@ -594,7 +594,7 @@ void wd1000_device::cmd_read_sector()
 
 void wd1000_device::cmd_write_sector()
 {
-	hard_disk_file *file = m_drives[drive()]->get_hard_disk_file();
+	harddisk_image_device *file = m_drives[drive()];
 
 	if (m_buffer_index != sector_bytes())
 	{
@@ -608,7 +608,7 @@ void wd1000_device::cmd_write_sector()
 
 void wd1000_device::cmd_format_sector()
 {
-	hard_disk_file *file = m_drives[drive()]->get_hard_disk_file();
+	harddisk_image_device *file = m_drives[drive()];
 	uint8_t buffer[512];
 
 	// The m_buffer appears to be loaded with an interleave table which is

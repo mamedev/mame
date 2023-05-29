@@ -1,5 +1,5 @@
 // PpmdDecoder.cpp
-// 2009-03-11 : Igor Pavlov : Public domain
+// 2020-07-03 : Igor Pavlov : Public domain
 
 #include "StdAfx.h"
 
@@ -13,13 +13,13 @@
 namespace NCompress {
 namespace NPpmd {
 
-static const UInt32 kBufSize = (1 << 20);
+static const UInt32 kBufSize = (1 << 16);
 
 enum
 {
   kStatus_NeedInit,
   kStatus_Normal,
-  kStatus_Finished,
+  kStatus_Finished_With_Mark,
   kStatus_Error
 };
 
@@ -35,7 +35,8 @@ STDMETHODIMP CDecoder::SetDecoderProperties2(const Byte *props, UInt32 size)
     return E_INVALIDARG;
   _order = props[0];
   UInt32 memSize = GetUi32(props + 1);
-  if (_order < PPMD7_MIN_ORDER ||
+  if (
+      // _order < PPMD7_MIN_ORDER ||
       _order > PPMD7_MAX_ORDER ||
       memSize < PPMD7_MIN_MEM_SIZE ||
       memSize > PPMD7_MAX_MEM_SIZE)
@@ -47,23 +48,36 @@ STDMETHODIMP CDecoder::SetDecoderProperties2(const Byte *props, UInt32 size)
   return S_OK;
 }
 
+#define _rangeDec _ppmd.rc.dec
+
+#define CHECK_EXTRA_ERROR \
+    if (_inStream.Extra) { \
+      _status = kStatus_Error; \
+      return (_res = (_inStream.Res != SZ_OK ? _inStream.Res: S_FALSE)); }
+
+
 HRESULT CDecoder::CodeSpec(Byte *memStream, UInt32 size)
 {
+  if (_res != S_OK)
+    return _res;
+  
   switch (_status)
   {
-    case kStatus_Finished: return S_OK;
+    case kStatus_Finished_With_Mark: return S_OK;
     case kStatus_Error: return S_FALSE;
     case kStatus_NeedInit:
       _inStream.Init();
       if (!Ppmd7z_RangeDec_Init(&_rangeDec))
       {
         _status = kStatus_Error;
-        return S_FALSE;
+        return (_res = S_FALSE);
       }
+      CHECK_EXTRA_ERROR
       _status = kStatus_Normal;
       Ppmd7_Init(&_ppmd, _order);
       break;
   }
+  
   if (_outSizeDefined)
   {
     const UInt64 rem = _outSize - _processedSize;
@@ -71,29 +85,54 @@ HRESULT CDecoder::CodeSpec(Byte *memStream, UInt32 size)
       size = (UInt32)rem;
   }
 
-  UInt32 i;
   int sym = 0;
-  for (i = 0; i != size; i++)
   {
-    sym = Ppmd7_DecodeSymbol(&_ppmd, &_rangeDec.p);
-    if (_inStream.Extra || sym < 0)
-      break;
-    memStream[i] = (Byte)sym;
+    Byte *buf = memStream;
+    const Byte *lim = buf + size;
+    for (; buf != lim; buf++)
+    {
+      sym = Ppmd7z_DecodeSymbol(&_ppmd);
+      if (_inStream.Extra || sym < 0)
+        break;
+      *buf = (Byte)sym;
+    }
+    /*
+    buf = Ppmd7z_DecodeSymbols(&_ppmd, buf, lim);
+    sym = _ppmd.LastSymbol;
+    */
+    _processedSize += (size_t)(buf - memStream);
   }
 
-  _processedSize += i;
-  if (_inStream.Extra)
+  CHECK_EXTRA_ERROR
+  
+  if (sym >= 0)
+  {
+    if (!FinishStream
+        || !_outSizeDefined
+        || _outSize != _processedSize
+        || _rangeDec.Code == 0)
+      return S_OK;
+    /*
+    // We can decode additional End Marker here:
+    sym = Ppmd7z_DecodeSymbol(&_ppmd);
+    CHECK_EXTRA_ERROR
+    */
+  }
+
+  if (sym != PPMD7_SYM_END || _rangeDec.Code != 0)
   {
     _status = kStatus_Error;
-    return _inStream.Res;
+    return (_res = S_FALSE);
   }
-  if (sym < 0)
-    _status = (sym < -1) ? kStatus_Error : kStatus_Finished;
+  
+  _status = kStatus_Finished_With_Mark;
   return S_OK;
 }
 
+
+
 STDMETHODIMP CDecoder::Code(ISequentialInStream *inStream, ISequentialOutStream *outStream,
-    const UInt64 * /* inSize */, const UInt64 *outSize, ICompressProgressInfo *progress)
+    const UInt64 *inSize, const UInt64 *outSize, ICompressProgressInfo *progress)
 {
   if (!_outBuf)
   {
@@ -112,17 +151,22 @@ STDMETHODIMP CDecoder::Code(ISequentialInStream *inStream, ISequentialOutStream 
     size_t processed = (size_t)(_processedSize - startPos);
     RINOK(WriteStream(outStream, _outBuf, processed));
     RINOK(res);
-    if (_status == kStatus_Finished)
+    if (_status == kStatus_Finished_With_Mark)
       break;
     if (progress)
     {
-      UInt64 inSize = _inStream.GetProcessed();
-      RINOK(progress->SetRatioInfo(&inSize, &_processedSize));
+      const UInt64 inProcessed = _inStream.GetProcessed();
+      RINOK(progress->SetRatioInfo(&inProcessed, &_processedSize));
     }
   }
   while (!_outSizeDefined || _processedSize < _outSize);
+
+  if (FinishStream && inSize && *inSize != _inStream.GetProcessed())
+    return S_FALSE;
+
   return S_OK;
 }
+
 
 STDMETHODIMP CDecoder::SetOutStreamSize(const UInt64 *outSize)
 {
@@ -131,6 +175,19 @@ STDMETHODIMP CDecoder::SetOutStreamSize(const UInt64 *outSize)
     _outSize = *outSize;
   _processedSize = 0;
   _status = kStatus_NeedInit;
+  _res = SZ_OK;
+  return S_OK;
+}
+
+STDMETHODIMP CDecoder::SetFinishMode(UInt32 finishMode)
+{
+  FinishStream = (finishMode != 0);
+  return S_OK;
+}
+
+STDMETHODIMP CDecoder::GetInStreamProcessedSize(UInt64 *value)
+{
+  *value = _inStream.GetProcessed();
   return S_OK;
 }
 

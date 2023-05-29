@@ -69,7 +69,7 @@ class gbck003_device : public flat_ram_device_base<mbc_dual_uniform_device_base>
 public:
 	gbck003_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	virtual image_init_result load(std::string &message) override ATTR_COLD;
+	virtual std::error_condition load(std::string &message) override ATTR_COLD;
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -113,35 +113,35 @@ gbck003_device::gbck003_device(
 }
 
 
-image_init_result gbck003_device::load(std::string &message)
+std::error_condition gbck003_device::load(std::string &message)
 {
 	// set up ROM/RAM
 	set_bank_bits_rom(9);
 	if (!check_rom(message))
-		return image_init_result::FAIL;
+		return image_error::BADSOFTWARE;
 	install_rom();
 	install_ram();
 
 	// install bank switch handlers
 	cart_space()->install_write_handler(
 			0x2000, 0x3fff,
-			write8smo_delegate(*this, FUNC(gbck003_device::bank_switch_inner)));
+			emu::rw_delegate(*this, FUNC(gbck003_device::bank_switch_inner)));
 	cart_space()->install_write_handler(
 			0x7b00, 0x7b00,
-			write8smo_delegate(*this, FUNC(gbck003_device::bank_switch_outer)));
+			emu::rw_delegate(*this, FUNC(gbck003_device::bank_switch_outer)));
 	cart_space()->install_write_handler(
 			0x7b01, 0x7b01,
-			write8smo_delegate(*this, FUNC(gbck003_device::bank_set_mux)));
+			emu::rw_delegate(*this, FUNC(gbck003_device::bank_set_mux)));
 	cart_space()->install_write_handler(
 			0x7b02, 0x7b02,
-			write8smo_delegate(*this, FUNC(gbck003_device::exit_config_mode)));
+			emu::rw_delegate(*this, FUNC(gbck003_device::exit_config_mode)));
 
 	// set initial power-on state
 	set_bank_rom_low(0);
 	set_bank_rom_high(1);
 
 	// all good
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

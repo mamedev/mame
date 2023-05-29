@@ -5,8 +5,8 @@
     Atari Blasteroids hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_BLSTROID_H
-#define MAME_INCLUDES_BLSTROID_H
+#ifndef MAME_ATARI_BLSTROID_H
+#define MAME_ATARI_BLSTROID_H
 
 #pragma once
 
@@ -59,4 +59,4 @@ private:
 	bool m_scanline_int_state = false;
 };
 
-#endif // MAME_INCLUDES_BLSTROID_H
+#endif // MAME_ATARI_BLSTROID_H

@@ -55,6 +55,8 @@ To Do:
 #include <algorithm>
 
 
+namespace {
+
 class sbrain_state : public driver_device
 {
 public:
@@ -802,6 +804,9 @@ ROM_START( sagafoxf80 )
 	ROM_REGION( 0x0800, "oam", 0 ) // software protection module?
 	ROM_LOAD("oam120.bin", 0x0000, 0x0800, CRC(880a8e36) SHA1(c6bee88a294090f039161fe20ce36a4ada3b10d3))
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME        PARENT  COMPAT MACHINE   INPUT   CLASS         INIT        COMPANY                                FULLNAME                            FLAGS
 COMP( 1981, sbrain,     0,      0,     sbrain,   sbrain, sbrain_state, empty_init, "Intertec Data Systems",               "SuperBrain Video Computer System", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

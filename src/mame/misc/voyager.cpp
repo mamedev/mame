@@ -11,7 +11,7 @@ All of these games run Linux.
 
 Motherboard is FIC AZIIEA with AMD Duron processor of unknown speed
 Chipset: VIA KT133a with VT8363A Northbridge and VT82C686B Southbridge
-Video: Jaton 3DForce2MX-32, based on Nvidia GeForce 2MX chipset w/32 MB of VRAM
+Video: Jaton 3DForce2MX-32, based on nVidia GeForce 2MX chipset w/32 MB of VRAM
 I/O: JAMMA adapter board connects to parallel port, VGA out, audio out.
     Labelled "MEGAJAMMA 101 REV A2" for the stand-up Voyager
 
@@ -525,7 +525,7 @@ ROM_START( voyager )
 
 	ROM_REGION( 0x800, "nvram", ROMREGION_ERASE00 )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE_READONLY( "voyager", 0, SHA1(8b94f2420f6abb40148e4ba6eed8819d8e85dbde))
 ROM_END
 
@@ -540,7 +540,7 @@ ROM_START( voyagers )
 
 	ROM_REGION( 0x800, "nvram", ROMREGION_ERASE00 )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE_READONLY( "voyagers", 0, SHA1(839527eee24272e5ad59b871975feadfdfc07a9a))
 ROM_END
 
@@ -554,7 +554,7 @@ ROM_START( policet2 )
 
 	ROM_REGION( 0x800, "nvram", ROMREGION_ERASE00 )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE_READONLY( "pt2", 0, SHA1(11d29548c685f12bc9bc1db7791957cd5e62db10))
 ROM_END
 

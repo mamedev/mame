@@ -1,7 +1,7 @@
 -- vim: syntax=lua
 -- bgfx interface
 
-version(115)
+version(118)
 
 typedef "bool"
 typedef "char"
@@ -219,7 +219,7 @@ flag.Debug { bits = 32 }
 	           --- It's useful when profiling to quickly assess bottleneck between CPU and GPU.
 	.Stats     --- Enable statistics display.
 	.Text      --- Enable debug text display.
-	.Profiler  --- Enable profiler.
+	.Profiler  --- Enable profiler. This causes per-view statistics to be collected, available through `bgfx::Stats::ViewStats`. This is unrelated to the profiler functions in `bgfx::CallbackI`.
 	()
 
 flag.BufferComputeFormat { bits = 16, shift = 0, range = 4, base = 1 }
@@ -343,19 +343,20 @@ flag.ResetMsaa { bits = 32, shift = 4, range = 3, base = 1 }
 	()
 
 flag.Reset { bits = 32 }
-	.None             ( 0) --- No reset flags.
-	.Fullscreen       ( 1) --- Not supported yet.
-	.Vsync            ( 8) --- Enable V-Sync.
-	.Maxanisotropy    ( 9) --- Turn on/off max anisotropy.
-	.Capture          (10) --- Begin screen capture.
-	.FlushAfterRender (14) --- Flush rendering after submitting to GPU.
-	.FlipAfterRender  (15) --- This flag specifies where flip occurs. Default behaviour is that flip occurs
-	                       --- before rendering new frame. This flag only has effect when `BGFX_CONFIG_MULTITHREADED=0`.
-	.SrgbBackbuffer   (16) --- Enable sRGB backbuffer.
-	.Hdr10            (17) --- Enable HDR10 rendering.
-	.Hidpi            (18) --- Enable HiDPI rendering.
-	.DepthClamp       (19) --- Enable depth clamp.
-	.Suspend          (20) --- Suspend rendering.
+	.None                     ( 0) --- No reset flags.
+	.Fullscreen               ( 1) --- Not supported yet.
+	.Vsync                    ( 8) --- Enable V-Sync.
+	.Maxanisotropy            ( 9) --- Turn on/off max anisotropy.
+	.Capture                  (10) --- Begin screen capture.
+	.FlushAfterRender         (14) --- Flush rendering after submitting to GPU.
+	.FlipAfterRender          (15) --- This flag specifies where flip occurs. Default behaviour is that flip occurs
+	                               --- before rendering new frame. This flag only has effect when `BGFX_CONFIG_MULTITHREADED=0`.
+	.SrgbBackbuffer           (16) --- Enable sRGB backbuffer.
+	.Hdr10                    (17) --- Enable HDR10 rendering.
+	.Hidpi                    (18) --- Enable HiDPI rendering.
+	.DepthClamp               (19) --- Enable depth clamp.
+	.Suspend                  (20) --- Suspend rendering.
+	.TransparentBackbuffer    (21) --- Transparent backbuffer. Availability depends on: `BGFX_CAPS_TRANSPARENT_BACKBUFFER`.
 	()
 
 flag.ResetFullscreen { bits = 32, shift = 0, range = 1, base = 1 }
@@ -383,6 +384,7 @@ flag.Caps { bits = 64, base = 1, name = "Caps" }
 	.Texture_2dArray        --- 2D texture array is supported.
 	.Texture_3d             --- 3D textures are supported.
 	.TextureBlit            --- Texture blit is supported.
+	.TransparentBackbuffer  --- Transparent back buffer supported.
 	.TextureCompareReserved
 	.TextureCompareLequal   --- Texture compare less equal mode is supported.
 	.TextureCubeArray       --- Cubemap texture array is supported.
@@ -392,6 +394,7 @@ flag.Caps { bits = 64, base = 1, name = "Caps" }
 	.VertexAttribUint10     --- Vertex attribute 10_10_10_2 is supported.
 	.VertexId               --- Rendering with VertexID only is supported.
 	.ViewportLayerArray     --- Viewport layer is available in vertex shader.
+	.DrawIndirectCount      --- Draw indirect with indirect count is supported.
 	.TextureCompareAll      --- All texture compare modes are supported.
 	 { "TextureCompareReserved", "TextureCompareLequal" }
 	()
@@ -425,8 +428,11 @@ flag.PciId { bits = 16 , const }
 	.None                (0x0000) --- Autoselect adapter.
 	.SoftwareRasterizer  (0x0001) --- Software rasterizer.
 	.Amd                 (0x1002) --- AMD adapter.
+	.Apple               (0x106b) --- Apple adapter.
 	.Intel               (0x8086) --- Intel adapter.
 	.Nvidia              (0x10de) --- nVidia adapter.
+	.Microsoft           (0x1414) --- Microsoft adapter.
+	.Arm                 (0x13b5) --- ARM adapter.
 	()
 
 flag.CubeMap { bits = 8, const }
@@ -517,33 +523,41 @@ enum.AttribType { comment = "Attribute types:" }
 ---
 --- @attention Availability depends on Caps (see: formats).
 enum.TextureFormat { comment = "Texture formats:" }
-	.BC1      --- DXT1 R5G6B5A1
-	.BC2      --- DXT3 R5G6B5A4
-	.BC3      --- DXT5 R5G6B5A8
-	.BC4      --- LATC1/ATI1 R8
-	.BC5      --- LATC2/ATI2 RG8
-	.BC6H     --- BC6H RGB16F
-	.BC7      --- BC7 RGB 4-7 bits per color channel, 0-8 bits alpha
-	.ETC1     --- ETC1 RGB8
-	.ETC2     --- ETC2 RGB8
-	.ETC2A    --- ETC2 RGBA8
-	.ETC2A1   --- ETC2 RGB8A1
-	.PTC12    --- PVRTC1 RGB 2BPP
-	.PTC14    --- PVRTC1 RGB 4BPP
-	.PTC12A   --- PVRTC1 RGBA 2BPP
-	.PTC14A   --- PVRTC1 RGBA 4BPP
-	.PTC22    --- PVRTC2 RGBA 2BPP
-	.PTC24    --- PVRTC2 RGBA 4BPP
-	.ATC      --- ATC RGB 4BPP
-	.ATCE     --- ATCE RGBA 8 BPP explicit alpha
-	.ATCI     --- ATCI RGBA 8 BPP interpolated alpha
-	.ASTC4x4  --- ASTC 4x4 8.0 BPP
-	.ASTC5x5  --- ASTC 5x5 5.12 BPP
-	.ASTC6x6  --- ASTC 6x6 3.56 BPP
-	.ASTC8x5  --- ASTC 8x5 3.20 BPP
-	.ASTC8x6  --- ASTC 8x6 2.67 BPP
-	.ASTC10x5 --- ASTC 10x5 2.56 BPP
-	.Unknown  --- Compressed formats above.
+	.BC1       --- DXT1 R5G6B5A1
+	.BC2       --- DXT3 R5G6B5A4
+	.BC3       --- DXT5 R5G6B5A8
+	.BC4       --- LATC1/ATI1 R8
+	.BC5       --- LATC2/ATI2 RG8
+	.BC6H      --- BC6H RGB16F
+	.BC7       --- BC7 RGB 4-7 bits per color channel, 0-8 bits alpha
+	.ETC1      --- ETC1 RGB8
+	.ETC2      --- ETC2 RGB8
+	.ETC2A     --- ETC2 RGBA8
+	.ETC2A1    --- ETC2 RGB8A1
+	.PTC12     --- PVRTC1 RGB 2BPP
+	.PTC14     --- PVRTC1 RGB 4BPP
+	.PTC12A    --- PVRTC1 RGBA 2BPP
+	.PTC14A    --- PVRTC1 RGBA 4BPP
+	.PTC22     --- PVRTC2 RGBA 2BPP
+	.PTC24     --- PVRTC2 RGBA 4BPP
+	.ATC       --- ATC RGB 4BPP
+	.ATCE      --- ATCE RGBA 8 BPP explicit alpha
+	.ATCI      --- ATCI RGBA 8 BPP interpolated alpha
+	.ASTC4x4   --- ASTC 4x4 8.0 BPP
+	.ASTC5x4   --- ASTC 5x4 6.40 BPP
+	.ASTC5x5   --- ASTC 5x5 5.12 BPP
+	.ASTC6x5   --- ASTC 6x5 4.27 BPP
+	.ASTC6x6   --- ASTC 6x6 3.56 BPP
+	.ASTC8x5   --- ASTC 8x5 3.20 BPP
+	.ASTC8x6   --- ASTC 8x6 2.67 BPP
+	.ASTC8x8   --- ASTC 8x8 2.00 BPP
+	.ASTC10x5  --- ASTC 10x5 2.56 BPP
+	.ASTC10x6  --- ASTC 10x6 2.13 BPP
+	.ASTC10x8  --- ASTC 10x8 1.60 BPP
+	.ASTC10x10 --- ASTC 10x10 1.28 BPP
+	.ASTC12x10 --- ASTC 12x10 1.07 BPP
+	.ASTC12x12 --- ASTC 12x12 0.89 BPP
+	.Unknown   --- Compressed formats above.
 	.R1
 	.A8
 	.R8
@@ -588,8 +602,11 @@ enum.TextureFormat { comment = "Texture formats:" }
 	.RGBA32I
 	.RGBA32U
 	.RGBA32F
+	.B5G6R5
 	.R5G6B5
+	.BGRA4
 	.RGBA4
+	.BGR5A1
 	.RGB5A1
 	.RGB10A2
 	.RG11B10F
@@ -757,12 +774,13 @@ struct.InternalData
 --- Platform data.
 struct.PlatformData { ctor }
 	.ndt          "void*" --- Native display type (*nix specific).
-	.nwh          "void*" --- Native window handle. If `NULL` bgfx will create headless
-	                      --- context/device if renderer API supports it.
-	.context      "void*" --- GL context, or D3D device. If `NULL`, bgfx will create context/device.
+	.nwh          "void*" --- Native window handle. If `NULL`, bgfx will create a headless
+	                      --- context/device, provided the rendering API supports it.
+	.context      "void*" --- GL context, D3D device, or Vulkan device. If `NULL`, bgfx
+						  --- will create context/device.
 	.backBuffer   "void*" --- GL back-buffer, or D3D render target view. If `NULL` bgfx will
 	                      --- create back-buffer color surface.
-	.backBufferDS "void*" --- Backbuffer depth/stencil. If `NULL` bgfx will create back-buffer
+	.backBufferDS "void*" --- Backbuffer depth/stencil. If `NULL`, bgfx will create a back-buffer
 	                      --- depth/stencil surface.
 
 --- Backbuffer resolution and reset parameters.
@@ -787,18 +805,20 @@ struct.Init { ctor }
 	                                      --- a default rendering backend will be selected appropriate to the platform.
 	                                      --- See: `bgfx::RendererType`
 
-	.vendorId       "uint16_t"            --- Vendor PCI id. If set to `BGFX_PCI_ID_NONE` it will select the first
-	                                      --- device.
+	.vendorId       "uint16_t"            --- Vendor PCI ID. If set to `BGFX_PCI_ID_NONE`, discrete and integrated
+	                                      --- GPUs will be prioritised.
 	                                      ---   - `BGFX_PCI_ID_NONE` - Autoselect adapter.
 	                                      ---   - `BGFX_PCI_ID_SOFTWARE_RASTERIZER` - Software rasterizer.
 	                                      ---   - `BGFX_PCI_ID_AMD` - AMD adapter.
+	                                      ---   - `BGFX_PCI_ID_APPLE` - Apple adapter.
 	                                      ---   - `BGFX_PCI_ID_INTEL` - Intel adapter.
-	                                      ---   - `BGFX_PCI_ID_NVIDIA` - nVidia adapter.
+	                                      ---   - `BGFX_PCI_ID_NVIDIA` - NVIDIA adapter.
+	                                      ---   - `BGFX_PCI_ID_MICROSOFT` - Microsoft adapter.
 
-	.deviceId       "uint16_t"            --- Device id. If set to 0 it will select first device, or device with
-	                                      --- matching id.
+	.deviceId       "uint16_t"            --- Device ID. If set to 0 it will select first device, or device with
+	                                      --- matching ID.
 	.capabilities   "uint64_t"            --- Capabilities initialization mask (default: UINT64_MAX).
-	.debug          "bool"                --- Enable device for debuging.
+	.debug          "bool"                --- Enable device for debugging.
 	.profile        "bool"                --- Enable device for profiling.
 	.platformData   "PlatformData"        --- Platform data.
 	.resolution     "Resolution"          --- Backbuffer resolution and reset parameters. See: `bgfx::Resolution`.
@@ -898,6 +918,7 @@ struct.ViewStats
 	.cpuTimeEnd     "int64_t"   --- CPU (submit) end time.
 	.gpuTimeBegin   "int64_t"   --- GPU begin time.
 	.gpuTimeEnd     "int64_t"   --- GPU end time.
+	.gpuFrameNum    "uint32_t"  --- Frame which generated gpuTimeBegin, gpuTimeEnd.
 
 --- Encoder stats.
 struct.EncoderStats
@@ -925,6 +946,7 @@ struct.Stats
 	.numCompute              "uint32_t"      --- Number of compute calls submitted.
 	.numBlit                 "uint32_t"      --- Number of blit calls submitted.
 	.maxGpuLatency           "uint32_t"      --- GPU driver latency.
+	.gpuFrameNum             "uint32_t"      --- Frame which generated gpuTimeBegin, gpuTimeEnd.
 
 	.numDynamicIndexBuffers  "uint16_t"      --- Number of used dynamic index buffers.
 	.numDynamicVertexBuffers "uint16_t"      --- Number of used dynamic vertex buffers.
@@ -1135,7 +1157,7 @@ func.initCtor { cfunc }
 	"void"
 	.init "Init*"
 
---- Initialize bgfx library.
+--- Initialize the bgfx library.
 func.init { cfunc }
 	"bool"               --- `true` if initialization was successful.
 	.init "const Init &" --- Initialization parameters. See: `bgfx::Init` for more info.
@@ -1146,8 +1168,8 @@ func.shutdown
 
 --- Reset graphic settings and back-buffer size.
 ---
---- @attention This call doesn't actually change window size, it just
----   resizes back-buffer. Windowing code has to change window size.
+--- @attention This call doesn’t change the window size, it just resizes
+---   the back-buffer. Your windowing code controls the window size.
 ---
 func.reset
 	"void"
@@ -1164,7 +1186,7 @@ func.reset
 	                                 ---   - `BGFX_RESET_FLIP_AFTER_RENDER` - This flag  specifies where flip
 	                                 ---     occurs. Default behaviour is that flip occurs before rendering new
 	                                 ---     frame. This flag only has effect when `BGFX_CONFIG_MULTITHREADED=0`.
-	                                 ---   - `BGFX_RESET_SRGB_BACKBUFFER` - Enable sRGB backbuffer.
+	                                 ---   - `BGFX_RESET_SRGB_BACKBUFFER` - Enable sRGB back-buffer.
 	.format "TextureFormat::Enum"    --- Texture format. See: `TextureFormat::Enum`.
 	 { default = "TextureFormat::Count" }
 
@@ -1380,7 +1402,7 @@ func.createDynamicIndexBuffer
 	                                  ---   - `BGFX_BUFFER_INDEX32` - Buffer is using 32-bit indices. This flag has effect only on
 	                                  ---       index buffers.
 
---- Create dynamic index buffer and initialized it.
+--- Create a dynamic index buffer and initialize it.
 func.createDynamicIndexBuffer { cname = "create_dynamic_index_buffer_mem" }
 	"DynamicIndexBufferHandle"        --- Dynamic index buffer handle.
 	.mem   "const Memory*"            --- Index buffer data.
@@ -1480,8 +1502,8 @@ func.getAvailInstanceDataBuffer
 ---
 func.allocTransientIndexBuffer
 	"void"
-	.tib     "TransientIndexBuffer*" { out } --- TransientIndexBuffer structure is filled and is valid
-	                                         --- for the duration of frame, and it can be reused for multiple draw
+	.tib     "TransientIndexBuffer*" { out } --- TransientIndexBuffer structure will be filled, and will be valid
+	                                         --- for the duration of frame, and can be reused for multiple draw
 	                                         --- calls.
 	.num     "uint32_t"                      --- Number of indices to allocate.
 	.index32 "bool"                          --- Set to `true` if input indices will be 32-bit.
@@ -1490,8 +1512,8 @@ func.allocTransientIndexBuffer
 --- Allocate transient vertex buffer.
 func.allocTransientVertexBuffer
 	"void"
-	.tvb    "TransientVertexBuffer*" { out } --- TransientVertexBuffer structure is filled and is valid
-	                                         --- for the duration of frame, and it can be reused for multiple draw
+	.tvb    "TransientVertexBuffer*" { out } --- TransientVertexBuffer structure will be filled, and will be valid
+	                                         --- for the duration of frame, and can be reused for multiple draw
 	                                         --- calls.
 	.num    "uint32_t"                       --- Number of vertices to allocate.
 	.layout "const VertexLayout &"           --- Vertex layout.
@@ -1502,13 +1524,13 @@ func.allocTransientVertexBuffer
 ---
 func.allocTransientBuffers
 	"bool"
-	.tvb         "TransientVertexBuffer*" { out } --- TransientVertexBuffer structure is filled and is valid
-	                                              --- for the duration of frame, and it can be reused for multiple draw
+	.tvb         "TransientVertexBuffer*" { out } --- TransientVertexBuffer structure will be filled, and will be valid
+	                                              --- for the duration of frame, and can be reused for multiple draw
 	                                              --- calls.
 	.layout      "const VertexLayout &"           --- Vertex layout.
 	.numVertices "uint32_t"                       --- Number of vertices to allocate.
-	.tib         "TransientIndexBuffer*" { out }  --- TransientIndexBuffer structure is filled and is valid
-	                                              --- for the duration of frame, and it can be reused for multiple draw
+	.tib         "TransientIndexBuffer*" { out }  --- TransientIndexBuffer structure will be filled, and will be valid
+	                                              --- for the duration of frame, and can be reused for multiple draw
 	                                              --- calls.
 	.numIndices  "uint32_t"                       --- Number of indices to allocate.
 	.index32 "bool"                               --- Set to `true` if input indices will be 32-bit.
@@ -1517,8 +1539,8 @@ func.allocTransientBuffers
 --- Allocate instance data buffer.
 func.allocInstanceDataBuffer
 	"void"
-	.idb    "InstanceDataBuffer*" { out } --- InstanceDataBuffer structure is filled and is valid
-	                                      --- for duration of frame, and it can be reused for multiple draw
+	.idb    "InstanceDataBuffer*" { out } --- InstanceDataBuffer structure will be filled, and will be valid
+	                                      --- for duration of frame, and can be reused for multiple draw
 	                                      --- calls.
 	.num    "uint32_t"                    --- Number of instances.
 	.stride "uint16_t"                    --- Instance stride. Must be multiple of 16.
@@ -1591,7 +1613,7 @@ func.destroy { cname = "destroy_program" }
 
 --- Validate texture parameters.
 func.isTextureValid
-	"bool"                           --- True if texture can be successfully created.
+	"bool"                           --- True if a texture with the same parameters can be created.
 	.depth     "uint16_t"            --- Depth dimension of volume texture.
 	.cubeMap   "bool"                --- Indicates that texture contains cubemap.
 	.numLayers "uint16_t"            --- Number of layers in texture array.
@@ -1600,7 +1622,7 @@ func.isTextureValid
 
 --- Validate frame buffer parameters.
 func.isFrameBufferValid
-	"bool"                              --- True if frame buffer can be successfully created.
+	"bool"                              --- True if a frame buffer with the same parameters can be created.
 	.num            "uint8_t"           --- Number of attachments.
 	.attachment     "const Attachment*" --- Attachment texture info. See: `bgfx::Attachment`.
 
@@ -1650,7 +1672,7 @@ func.createTexture2D
 	 { default = NULL }                        --- `_mem` is NULL content of the texture is uninitialized. When `_numLayers` is more than
 	                                           --- 1, expected memory layout is texture and all mips together for each array element.
 
---- Create texture with size based on backbuffer ratio. Texture will maintain ratio
+--- Create texture with size based on back-buffer ratio. Texture will maintain ratio
 --- if back buffer resolution changes.
 func.createTexture2D { cname = "create_texture_2d_scaled" }
 	"TextureHandle"                            --- Texture handle.
@@ -1827,7 +1849,7 @@ func.createFrameBuffer
 	                                    --- - `BGFX_SAMPLER_[MIN/MAG/MIP]_[POINT/ANISOTROPIC]` - Point or anisotropic
 	                                    ---   sampling.
 
---- Create frame buffer with size based on backbuffer ratio. Frame buffer will maintain ratio
+--- Create frame buffer with size based on back-buffer ratio. Frame buffer will maintain ratio
 --- if back buffer resolution changes.
 func.createFrameBuffer { cname = "create_frame_buffer_scaled" }
 	"FrameBufferHandle"                 --- Frame buffer handle.
@@ -2032,8 +2054,8 @@ func.setViewClear
 	 { default = 0 }
 
 --- Set view clear flags with different clear color for each
---- frame buffer texture. Must use `bgfx::setPaletteColor` to setup clear color
---- palette.
+--- frame buffer texture. `bgfx::setPaletteColor` must be used to set up a
+--- clear color palette.
 func.setViewClear { cname = "set_view_clear_mrt" }
 	"void"
 	.id      "ViewId"   --- View id.
@@ -2081,8 +2103,8 @@ func.setViewFrameBuffer
 	                            --- frame buffer handle will draw primitives from this view into
 	                            --- default back buffer.
 
---- Set view view and projection matrices, all draw primitives in this
---- view will use these matrices.
+--- Set view's view matrix and projection matrix,
+--- all draw primitives in this view will use these two matrices.
 func.setViewTransform
 	"void"
 	.id   "ViewId"      --- View id.
@@ -2124,7 +2146,7 @@ func.Encoder.setMarker
 --- Set render states for draw primitive.
 ---
 --- @remarks
----   1. To setup more complex states use:
+---   1. To set up more complex states use:
 ---      `BGFX_STATE_ALPHA_REF(_ref)`,
 ---      `BGFX_STATE_POINT_SIZE(_size)`,
 ---      `BGFX_STATE_BLEND_FUNC(_src, _dst)`,
@@ -2202,7 +2224,7 @@ func.Encoder.setTransform { cname = "set_transform_cached" }
 
 --- Reserve matrices in internal matrix cache.
 ---
---- @attention Pointer returned can be modifed until `bgfx::frame` is called.
+--- @attention Pointer returned can be modified until `bgfx::frame` is called.
 ---
 func.Encoder.allocTransform
 	"uint32_t"                      --- Index in matrix cache.
@@ -2331,7 +2353,7 @@ func.Encoder.setVertexBuffer { cname = "set_transient_vertex_buffer_with_layout"
 	                                             --- of vertex buffer will be used.
 	 { default = "BGFX_INVALID_HANDLE" }
 
---- Set number of vertices for auto generated vertices use in conjuction
+--- Set number of vertices for auto generated vertices use in conjunction
 --- with gl_VertexID.
 ---
 --- @attention Availability depends on: `BGFX_CAPS_VERTEX_ID`.
@@ -2376,7 +2398,7 @@ func.Encoder.setInstanceDataBuffer { cname = "set_instance_data_from_dynamic_ver
 	.startVertex "uint32_t"                  --- First instance data.
 	.num         "uint32_t"                  --- Number of data instances.
 
---- Set number of instances for auto generated instances use in conjuction
+--- Set number of instances for auto generated instances use in conjunction
 --- with gl_InstanceID.
 ---
 --- @attention Availability depends on: `BGFX_CAPS_VERTEX_ID`.
@@ -2433,6 +2455,9 @@ func.Encoder.submit { cname = "submit_occlusion_query" }
 
 --- Submit primitive for rendering with index and instance data info from
 --- indirect buffer.
+---
+--- @attention Availability depends on: `BGFX_CAPS_DRAW_INDIRECT`.
+---
 func.Encoder.submit { cname = "submit_indirect" }
 	"void"
 	.id             "ViewId"               --- View id.
@@ -2440,12 +2465,34 @@ func.Encoder.submit { cname = "submit_indirect" }
 	.indirectHandle "IndirectBufferHandle" --- Indirect buffer.
 	.start          "uint16_t"             --- First element in indirect buffer.
 	 { default = 0 }
-	.num            "uint16_t"             --- Number of dispatches.
+	.num            "uint16_t"             --- Number of draws.
 	 { default = 1 }
 	.depth          "uint32_t"             --- Depth for sorting.
 	 { default = 0 }
 	.flags          "uint8_t"              --- Discard or preserve states. See `BGFX_DISCARD_*`.
 	 { default = "BGFX_DISCARD_ALL" }
+
+--- Submit primitive for rendering with index and instance data info and
+--- draw count from indirect buffers.
+---
+--- @attention Availability depends on: `BGFX_CAPS_DRAW_INDIRECT_COUNT`.
+---
+func.Encoder.submit { cname = "submit_indirect_count" }
+	"void"
+	.id             "ViewId"               --- View id.
+	.program        "ProgramHandle"        --- Program.
+	.indirectHandle "IndirectBufferHandle" --- Indirect buffer.
+	.start          "uint16_t"             --- First element in indirect buffer.
+	.numHandle      "IndexBufferHandle"    --- Buffer for number of draws. Must be
+	                                       ---   created with `BGFX_BUFFER_INDEX32` and `BGFX_BUFFER_DRAW_INDIRECT`.
+	.numIndex       "uint32_t"             --- Element in number buffer.
+	{ default = 0 }
+	.numMax         "uint16_t"             --- Max number of draws.
+	{ default = UINT16_MAX }
+	.depth          "uint32_t"             --- Depth for sorting.
+	{ default = 0 }
+	.flags          "uint8_t"              --- Discard or preserve states. See `BGFX_DISCARD_*`.
+	{ default = "BGFX_DISCARD_ALL" }
 
 --- Set compute index buffer.
 func.Encoder.setBuffer { cname = "set_compute_index_buffer" }
@@ -2677,7 +2724,7 @@ func.setMarker
 --- Set render states for draw primitive.
 ---
 --- @remarks
----   1. To setup more complex states use:
+---   1. To set up more complex states use:
 ---      `BGFX_STATE_ALPHA_REF(_ref)`,
 ---      `BGFX_STATE_POINT_SIZE(_size)`,
 ---      `BGFX_STATE_BLEND_FUNC(_src, _dst)`,
@@ -2755,7 +2802,7 @@ func.setTransform { cname = "set_transform_cached" }
 
 --- Reserve matrices in internal matrix cache.
 ---
---- @attention Pointer returned can be modifed until `bgfx::frame` is called.
+--- @attention Pointer returned can be modified until `bgfx::frame` is called.
 ---
 func.allocTransform
 	"uint32_t"                      --- Index in matrix cache.
@@ -2886,7 +2933,7 @@ func.setVertexBuffer { cname = "set_transient_vertex_buffer_with_layout" }
 	                                            --- of vertex buffer will be used.
 	 { default = "BGFX_INVALID_HANDLE" }
 
---- Set number of vertices for auto generated vertices use in conjuction
+--- Set number of vertices for auto generated vertices use in conjunction
 --- with gl_VertexID.
 ---
 --- @attention Availability depends on: `BGFX_CAPS_VERTEX_ID`.
@@ -2931,7 +2978,7 @@ func.setInstanceDataBuffer { cname = "set_instance_data_from_dynamic_vertex_buff
 	.startVertex "uint32_t"                  --- First instance data.
 	.num         "uint32_t"                  --- Number of data instances.
 
---- Set number of instances for auto generated instances use in conjuction
+--- Set number of instances for auto generated instances use in conjunction
 --- with gl_InstanceID.
 ---
 --- @attention Availability depends on: `BGFX_CAPS_VERTEX_ID`.
@@ -2986,6 +3033,9 @@ func.submit { cname = "submit_occlusion_query" }
 
 --- Submit primitive for rendering with index and instance data info from
 --- indirect buffer.
+---
+--- @attention Availability depends on: `BGFX_CAPS_DRAW_INDIRECT`.
+---
 func.submit { cname = "submit_indirect" }
 	"void"
 	.id             "ViewId"               --- View id.
@@ -2993,11 +3043,33 @@ func.submit { cname = "submit_indirect" }
 	.indirectHandle "IndirectBufferHandle" --- Indirect buffer.
 	.start          "uint16_t"             --- First element in indirect buffer.
 	{ default = 0 }
-	.num            "uint16_t"             --- Number of dispatches.
+	.num            "uint16_t"             --- Number of draws.
 	{ default = 1 }
 	.depth          "uint32_t"             --- Depth for sorting.
 	{ default = 0 }
-	.flags "uint8_t"                       --- Which states to discard for next draw. See `BGFX_DISCARD_*`.
+	.flags          "uint8_t"              --- Which states to discard for next draw. See `BGFX_DISCARD_*`.
+	{ default = "BGFX_DISCARD_ALL" }
+
+--- Submit primitive for rendering with index and instance data info and
+--- draw count from indirect buffers.
+---
+--- @attention Availability depends on: `BGFX_CAPS_DRAW_INDIRECT_COUNT`.
+---
+func.submit { cname = "submit_indirect_count" }
+	"void"
+	.id             "ViewId"               --- View id.
+	.program        "ProgramHandle"        --- Program.
+	.indirectHandle "IndirectBufferHandle" --- Indirect buffer.
+	.start          "uint16_t"             --- First element in indirect buffer.
+	.numHandle      "IndexBufferHandle"    --- Buffer for number of draws. Must be
+	                                       ---   created with `BGFX_BUFFER_INDEX32` and `BGFX_BUFFER_DRAW_INDIRECT`.
+	.numIndex       "uint32_t"             --- Element in number buffer.
+	{ default = 0 }
+	.numMax         "uint16_t"             --- Max number of draws.
+	{ default = UINT16_MAX }
+	.depth          "uint32_t"             --- Depth for sorting.
+	{ default = 0 }
+	.flags          "uint8_t"              --- Which states to discard for next draw. See `BGFX_DISCARD_*`.
 	{ default = "BGFX_DISCARD_ALL" }
 
 --- Set compute index buffer.

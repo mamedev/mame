@@ -16,6 +16,9 @@
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "softlist_dev.h"
 
+
+namespace {
+
 class genpc_state : public driver_device
 {
 public:
@@ -307,6 +310,9 @@ ROM_END
 #define rom_pcega    rom_pc
 
 #define rom_pcvga    rom_pc
+
+} // anonymous namespace
+
 
 /***************************************************************************
 

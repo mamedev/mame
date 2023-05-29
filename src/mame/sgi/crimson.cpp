@@ -18,11 +18,14 @@
 #include "machine/nvram.h"
 #include "machine/pit8253.h"
 
-#define LOG_UNKNOWN     (1 << 0)
+#define LOG_UNKNOWN     (1U << 1)
 #define LOG_ALL         (LOG_UNKNOWN)
 
 #define VERBOSE         (0)
 #include "logmacro.h"
+
+
+namespace {
 
 class crimson_state : public driver_device
 {
@@ -116,6 +119,9 @@ ROM_START( crimson )
 	ROM_REGION64_BE( 0x80000, "user1", 0 )
 	ROMX_LOAD( "ip17prom.070-081x-005.bin", 0x000000, 0x080000, CRC(d62e8c8e) SHA1(b335213ecfd02ca3185b6ba1874a8b76f908c68b), ROM_GROUPDWORD )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY                 FULLNAME                               FLAGS
 COMP( 1992, crimson,  0,      0,      crimson,  crimson, crimson_state, empty_init, "Silicon Graphics Inc", "Crimson (R4000, 100MHz, Ver. 4.0.3)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

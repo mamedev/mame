@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:AJR
 
-#ifndef MAME_MACHINE_EUROPC_KBD_H
-#define MAME_MACHINE_EUROPC_KBD_H
+#ifndef MAME_PC_EUROPC_KBD_H
+#define MAME_PC_EUROPC_KBD_H
 
 #pragma once
 
@@ -67,4 +67,4 @@ private:
 // device type declarations
 DECLARE_DEVICE_TYPE(EUROPC_KEYBOARD, europc_keyboard_device)
 
-#endif // MAME_MACHINE_EUROPC_KBD_H
+#endif // MAME_PC_EUROPC_KBD_H

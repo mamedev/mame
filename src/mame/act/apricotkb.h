@@ -6,8 +6,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_APRICOTKB_H
-#define MAME_MACHINE_APRICOTKB_H
+#ifndef MAME_ACT_APRICOTKB_H
+#define MAME_ACT_APRICOTKB_H
 
 #pragma once
 
@@ -72,4 +72,4 @@ DECLARE_DEVICE_TYPE(APRICOT_KEYBOARD, apricot_keyboard_device)
 
 
 
-#endif // MAME_MACHINE_APRICOTKB_H
+#endif // MAME_ACT_APRICOTKB_H

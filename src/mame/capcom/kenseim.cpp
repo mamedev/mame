@@ -146,6 +146,9 @@ GND | 20
 #include "cps1.h"
 #include "kenseim.lh"
 
+
+namespace {
+
 class kenseim_state : public cps_state
 {
 public:
@@ -706,6 +709,8 @@ void kenseim_state::init_kenseim()
 	m_molea.resolve();
 	m_moleb.resolve();
 }
+
+} // anonymous namespace
 
 
 // 1994.04.18 is from extra PCB rom, Siguma or Sigma? (Siguma is in the ROM)

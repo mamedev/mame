@@ -107,6 +107,10 @@
 #define COP0_TagLo              28
 #define COP0_TagHi              29
 #define COP0_ErrorPC            30
+#define COP0_R4650_IBase        0
+#define COP0_R4650_IBound       1
+#define COP0_R4650_DBase        2
+#define COP0_R4650_DBound       3
 
 /* Status register bits */
 #define SR_IE                   0x00000001

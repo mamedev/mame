@@ -9,12 +9,11 @@
 #include "emu.h"
 #include "wd1010.h"
 
-//#define LOG_GENERAL (1U <<  0)
-#define LOG_CMD     (1U <<  1)
-#define LOG_INT     (1U <<  2)
-#define LOG_SEEK    (1U <<  3)
-#define LOG_REGS    (1U <<  4)
-#define LOG_DATA    (1U <<  5)
+#define LOG_CMD     (1U << 1)
+#define LOG_INT     (1U << 2)
+#define LOG_SEEK    (1U << 3)
+#define LOG_REGS    (1U << 4)
+#define LOG_DATA    (1U << 5)
 
 #define VERBOSE  (LOG_CMD | LOG_INT | LOG_SEEK | LOG_REGS | LOG_DATA)
 //#define LOG_OUTPUT_STREAM std::cout
@@ -305,7 +304,7 @@ void wd1010_device::end_command()
 
 int wd1010_device::get_lbasector()
 {
-	hard_disk_file *file = m_drives[drive()].drive->get_hard_disk_file();
+	harddisk_image_device *file = m_drives[drive()].drive;
 	const auto &info = file->get_info();
 	int lbasector;
 
@@ -537,7 +536,7 @@ void wd1010_device::cmd_read_sector()
 		}
 	}
 
-	hard_disk_file *file = m_drives[drive()].drive->get_hard_disk_file();
+	harddisk_image_device *file = m_drives[drive()].drive;
 	const auto &info = file->get_info();
 
 	// verify that we can read
@@ -605,7 +604,7 @@ void wd1010_device::cmd_write_sector()
 		return;
 	}
 
-	hard_disk_file *file = m_drives[drive()].drive->get_hard_disk_file();
+	harddisk_image_device *file = m_drives[drive()].drive;
 	uint8_t buffer[512];
 
 	set_bdrq(0);

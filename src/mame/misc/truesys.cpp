@@ -63,6 +63,7 @@ void truesys_state::main_map(address_map &map)
 	map(0x00909300, 0x00909303).noprw(); // byte-wide peripheral (SPI?)
 	map(0x00909304, 0x00909307).noprw();
 	map(0x00909308, 0x0090930b).nopw(); // byte-wide peripheral control?
+	map(0x01000000, 0x01000fff).ram();
 }
 
 

@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_MACHINE_XAVIX_MATH_H
-#define MAME_MACHINE_XAVIX_MATH_H
+#ifndef MAME_TVGAMES_XAVIX_MATH_H
+#define MAME_TVGAMES_XAVIX_MATH_H
 
 class xavix_math_device : public device_t
 {
@@ -31,4 +31,4 @@ private:
 
 DECLARE_DEVICE_TYPE(XAVIX_MATH, xavix_math_device)
 
-#endif // MAME_MACHINE_XAVIX_MATH_H
+#endif // MAME_TVGAMES_XAVIX_MATH_H

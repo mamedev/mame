@@ -166,12 +166,20 @@ Notes:
 #include "emu.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/mips/mips1.h"
+#include "cpu/mips/ps2vu.h"
+#include "cpu/mips/ps2vif1.h"
 //#include "cpu/h8/h83664.h"
 //#include "machine/ds2430.h"
+#include "machine/ps2dma.h"
+#include "machine/ps2intc.h"
+#include "machine/ps2sif.h"
 #include "machine/timekpr.h"
+#include "video/ps2gs.h"
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
 
 class kpython_state : public driver_device
 {
@@ -179,7 +187,14 @@ public:
 	kpython_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_dmac(*this, "dmac")
+		, m_intc(*this, "intc")
+		, m_sif(*this, "sif")
+		, m_gs(*this, "gs")
+		, m_vu0(*this, "vu0")
+		, m_vu1(*this, "vu1")
 		, m_m48t58(*this, "m48t58")
+		, m_ram(*this, "ram")
 	{ }
 
 	void kpython(machine_config &config);
@@ -190,8 +205,15 @@ private:
 	void ps2_map(address_map &map);
 
 	// devices
-	required_device<mips3_device> m_maincpu;
+	required_device<r5900_device> m_maincpu;
+	required_device<ps2_dmac_device> m_dmac;
+	required_device<ps2_intc_device> m_intc;
+	required_device<ps2_sif_device> m_sif;
+	required_device<ps2_gs_device> m_gs;
+	required_device<sonyvu0_device> m_vu0;
+	required_device<sonyvu1_device> m_vu1;
 	required_device<m48t58_device> m_m48t58;
+	required_shared_ptr<uint64_t> m_ram;
 
 	// driver_device overrides
 	virtual void video_start() override;
@@ -209,7 +231,7 @@ uint32_t kpython_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 void kpython_state::ps2_map(address_map &map)
 {
-	map(0x00000000, 0x01ffffff).ram(); // 32 MB RAM in consumer PS2s, do these have more?
+	map(0x00000000, 0x01ffffff).ram().share(m_ram); // 32 MB RAM in consumer PS2s, do these have more?
 	map(0x1fc00000, 0x1fdfffff).rom().region("bios", 0);
 }
 
@@ -218,10 +240,19 @@ INPUT_PORTS_END
 
 void kpython_state::kpython(machine_config &config)
 {
-	R5000LE(config, m_maincpu, 294000000); // imported from namcops2.c driver
+	R5900BE(config, m_maincpu, 294'912'000, m_vu0);
+	m_maincpu->set_force_no_drc(true);
 	m_maincpu->set_icache_size(16384);
 	m_maincpu->set_dcache_size(16384);
 	m_maincpu->set_addrmap(AS_PROGRAM, &kpython_state::ps2_map);
+
+	SONYPS2_VU0(config, m_vu0, 294'912'000, m_vu1);
+	SONYPS2_VU1(config, m_vu1, 294'912'000, m_gs);
+
+	SONYPS2_INTC(config, m_intc, m_maincpu);
+	SONYPS2_GS(config, m_gs, 294912000/2, m_intc, m_vu1);
+	SONYPS2_DMAC(config, m_dmac, 294912000/2, m_maincpu, m_ram, m_sif, m_gs, m_vu1);
+	SONYPS2_SIF(config, m_sif, m_intc);
 
 	//H83664(config, m_io_mcu, 14000000); // from filter board
 
@@ -239,8 +270,8 @@ void kpython_state::kpython(machine_config &config)
 }
 
 #define KPYTHON_BIOS  \
-		ROM_REGION32_LE(0x200000, "bios", 0) \
-		ROM_LOAD( "b22a01.u42", 0x000000, 0x080000, CRC(98de405e) SHA1(4bc268a996825c1bdf6ae277d331fe7bdc0cc00c) ) \
+		ROM_REGION64_BE(0x200000, "bios", 0) \
+		ROM_LOAD16_WORD_SWAP( "b22a01.u42", 0x000000, 0x080000, CRC(98de405e) SHA1(4bc268a996825c1bdf6ae277d331fe7bdc0cc00c) ) \
 		ROM_REGION(0x8000, "io_mcu", 0) \
 		ROM_LOAD( "hd64f3664", 0x0000, 0x8000, NO_DUMP ) // Internal ROM not dumped
 
@@ -250,7 +281,7 @@ ROM_START( kpython )
 	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
 	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 ROM_END
 
 ROM_START( dogstdx )
@@ -265,7 +296,7 @@ ROM_START( dogstdx )
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)
 	// Not dumped
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE_READONLY( "dogstdx", 0, SHA1(e44a5f535d2a925cd907bdfd5b8e98e61899b4fc) ) // No picture of media available; used romset name
 ROM_END
 
@@ -282,7 +313,7 @@ ROM_START( wswe )
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)
 	ROM_LOAD( "m48t58y.u48",       0x000000, 0x002000, CRC(d4181cb5) SHA1(c5560d1ac043bfe2527fac3fb1989fa8fc53cf8a) )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE_READONLY( "c18jaa03", 0, SHA1(b47190aa38f1f3a499b817758e3f29fac54391bd) )
 ROM_END
 
@@ -299,7 +330,7 @@ ROM_START( wswe2k3 )
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)
 	ROM_LOAD( "m48t58y.u48",       0x000000, 0x002000, CRC(76068de0) SHA1(5f75b88ad04871fb3799fe904658c87524bad94f) )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE_READONLY( "c27jaa03", 0, SHA1(9b2aa900711d88cf5effb3ba6be18726ea006ac4) )
 ROM_END
 
@@ -318,7 +349,7 @@ ROM_START( pesta )
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     // M48T58 Timekeeper NVRAM
 	ROM_LOAD( "m48t58y.u48", 0x0000, 0x2000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	// Konami 128MB Compact Flash PN.0000124371
 	DISK_IMAGE_READONLY( "pes_c18_ea_a03", 0, SHA1(4fe2f0f8e11ac709881e754755d44de5dd8d9fa8) )
 ROM_END
@@ -335,9 +366,11 @@ ROM_START( popn9 )
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     // M48T58 Timekeeper NVRAM
 	ROM_LOAD( "m48t58y.u48",       0x000000, 0x2000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE_READONLY( "c00jab", 0, BAD_DUMP SHA1(3763aaded9b45388a664edd84a3f7f8ff4101be4) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME(2002, kpython,          0,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "Konami Python BIOS",                            MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT)

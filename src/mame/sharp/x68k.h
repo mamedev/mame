@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_X68K_H
-#define MAME_INCLUDES_X68K_H
+#ifndef MAME_SHARP_X68K_H
+#define MAME_SHARP_X68K_H
 
 #pragma once
 
@@ -23,7 +23,7 @@
 #include "machine/8530scc.h"
 #include "machine/hd63450.h"
 #include "machine/i8255.h"
-#include "machine/mb89352.h"
+#include "machine/mb87030.h"
 #include "machine/mc68901.h"
 #include "machine/ram.h"
 #include "machine/rp5c15.h"
@@ -129,7 +129,7 @@ protected:
 	bitmap_ind16 m_special;
 
 	void floppy_load_unload(bool load, floppy_image_device *dev);
-	image_init_result floppy_load(floppy_image_device *dev);
+	void floppy_load(floppy_image_device *dev);
 	void floppy_unload(floppy_image_device *dev);
 	static void floppy_formats(format_registration &fr);
 
@@ -166,10 +166,8 @@ protected:
 		int gfxlayer_pri[4]{};  // block displayed for each priority level
 		int tile8_dirty[1024]{};
 		int tile16_dirty[256]{};
-		int bg_visible_height = 0;
-		int bg_visible_width = 0;
-		int bg_hshift = 0;
-		int bg_vshift = 0;
+		int bg_hstart = 0;
+		int bg_vstart = 0;
 		int bg_hvres = 0;  // bits 0,1 = H-Res, bits 2,3 = V-Res, bit 4 = L/H Freq (0=15.98kHz, 1=31.5kHz)
 	} m_video;
 	struct
@@ -309,7 +307,7 @@ class x68ksupr_state : public x68k_state
 public:
 	x68ksupr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: x68k_state(mconfig, type, tag)
-		, m_scsictrl(*this, "mb89352")
+		, m_scsictrl(*this, "scsi:7:spc")
 	{
 	}
 
@@ -321,7 +319,7 @@ public:
 
 protected:
 	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
-	DECLARE_WRITE_LINE_MEMBER(scsi_drq);
+	void scsi_unknown_w(uint8_t data);
 
 	required_device<mb89352_device> m_scsictrl;
 
@@ -344,4 +342,4 @@ protected:
 	void x68030_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_X68K_H
+#endif // MAME_SHARP_X68K_H

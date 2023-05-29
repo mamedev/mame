@@ -48,7 +48,7 @@ Both games run on Konami's PWB351024A PCB
 
 
 // configurable logging
-#define LOG_SHBANK     (1U <<  1)
+#define LOG_SHBANK     (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_SHBANK)
 
@@ -61,7 +61,7 @@ namespace {
 
 class base_state : public driver_device
 {
-public:
+protected:
 	base_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
@@ -73,10 +73,6 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
-	void devstors(machine_config &config);
-	void mainevt(machine_config &config);
-
-protected:
 	virtual void machine_start() override;
 
 	// devices
@@ -109,6 +105,9 @@ public:
 	{ }
 
 	void mainevt(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
 
 private:
 	// devices
@@ -301,15 +300,15 @@ uint8_t mainevt_state::sh_busy_r()
 
 void mainevt_state::sh_irqcontrol_w(uint8_t data)
 {
-	m_upd7759->reset_w(data & 2);
-	m_upd7759->start_w(data & 1);
+	m_upd7759->reset_w(BIT(data, 1));
+	m_upd7759->start_w(!BIT(data, 0));
 
-	m_sound_irq_mask = data & 4;
+	m_sound_irq_mask = BIT(data, 2);
 }
 
 void devstors_state::sh_irqcontrol_w(uint8_t data)
 {
-	m_sound_irq_mask = data & 4;
+	m_sound_irq_mask = BIT(data, 2);
 }
 
 void mainevt_state::sh_bankswitch_w(uint8_t data)
@@ -599,6 +598,11 @@ void base_state::machine_start()
 	m_rombank->configure_entries(0, 4, memregion("maincpu")->base(), 0x2000);
 
 	save_item(NAME(m_sound_irq_mask));
+}
+
+void mainevt_state::machine_reset()
+{
+	sh_irqcontrol_w(0);
 }
 
 void devstors_state::machine_start()

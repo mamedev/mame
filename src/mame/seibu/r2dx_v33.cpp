@@ -75,6 +75,8 @@ Then it puts settings at 0x9e08 and 0x9e0a (bp 91acb)
 #include "speaker.h"
 
 
+namespace {
+
 class r2dx_v33_state : public raiden2_state
 {
 public:
@@ -109,11 +111,11 @@ private:
 	u16 cos_r();
 
 	void tile_bank_w(u8 data);
-	u16 rdx_v33_unknown_r();
-	void mcu_xval_w(u16 data);
-	void mcu_yval_w(u16 data);
-	void mcu_table_w(offs_t offset, u16 data);
-	void mcu_table2_w(offs_t offset, u16 data);
+	[[maybe_unused]] u16 rdx_v33_unknown_r();
+	[[maybe_unused]] void mcu_xval_w(u16 data);
+	[[maybe_unused]] void mcu_yval_w(u16 data);
+	[[maybe_unused]] void mcu_table_w(offs_t offset, u16 data);
+	[[maybe_unused]] void mcu_table2_w(offs_t offset, u16 data);
 	void mcu_prog_w(u16 data);
 	void mcu_prog_w2(u16 data);
 	void mcu_prog_offs_w(u16 data);
@@ -1070,6 +1072,9 @@ ROM_START( zerotm2k ) /* V33 SYSTEM TYPE_C VER2 hardware, uses SEI333 (AKA COPX-
 	ROM_REGION( 0x100000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "szy-01.u099", 0x00000, 0x40000,  CRC(48be32b1) SHA1(969d2191a3c46871ee8bf93088b3cecce3eccf0c) ) /* PCB silkscreened PCM, Same as other Zero Team sets */
 ROM_END
+
+} // anonymous namespace
+
 
 // newer PCB, with V33 CPU and COPD3 protection, but weak sound hardware. - was marked as Raiden DX New in the rom dump, but boots as Raiden 2 New version, the rom contains both
 // is there a switching method? for now I've split it into 2 sets with different EEPROM, the game checks that on startup and runs different code depending on what it finds

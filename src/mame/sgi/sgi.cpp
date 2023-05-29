@@ -11,15 +11,15 @@
 #include "emu.h"
 #include "sgi.h"
 
-#define LOG_UNKNOWN     (1 << 0)
-#define LOG_READS       (1 << 1)
-#define LOG_WRITES      (1 << 2)
-#define LOG_RPSS        (1 << 3)
-#define LOG_WATCHDOG    (1 << 4)
-#define LOG_MEMCFG      (1 << 5)
-#define LOG_MEMCFG_EXT  (1 << 6)
-#define LOG_EEPROM      (1 << 7)
-#define LOG_DMA         (1 << 8)
+#define LOG_UNKNOWN     (1U << 1)
+#define LOG_READS       (1U << 2)
+#define LOG_WRITES      (1U << 3)
+#define LOG_RPSS        (1U << 4)
+#define LOG_WATCHDOG    (1U << 5)
+#define LOG_MEMCFG      (1U << 6)
+#define LOG_MEMCFG_EXT  (1U << 7)
+#define LOG_EEPROM      (1U << 8)
+#define LOG_DMA         (1U << 9)
 #define LOG_DEFAULT     (LOG_READS | LOG_WRITES | LOG_RPSS | LOG_WATCHDOG | LOG_UNKNOWN)
 
 #define VERBOSE         (0)
@@ -33,8 +33,8 @@ sgi_mc_device::sgi_mc_device(const machine_config &mconfig, const char *tag, dev
 	, m_eeprom(*this, finder_base::DUMMY_TAG)
 	, m_int_dma_done_cb(*this)
 	, m_eisa_present(*this)
-	, m_rpss_timer(nullptr)
 	, m_dma_timer(nullptr)
+	, m_last_update_time(attotime::zero)
 	, m_watchdog(0)
 	, m_sys_id(0)
 	, m_rpss_divider(0)
@@ -65,9 +65,6 @@ sgi_mc_device::sgi_mc_device(const machine_config &mconfig, const char *tag, dev
 	, m_dma_count(0)
 	, m_dma_run(0)
 	, m_eeprom_ctrl(0)
-	, m_rpss_divide_counter(0)
-	, m_rpss_divide_count(0)
-	, m_rpss_increment(0)
 {
 }
 
@@ -86,12 +83,10 @@ void sgi_mc_device::device_start()
 	m_sys_id = 0x03; // rev. C MC
 	m_sys_id |= m_eisa_present() << 4;
 
-	m_rpss_timer = timer_alloc(FUNC(sgi_mc_device::rpss_tick), this);
-	m_rpss_timer->adjust(attotime::never);
-
 	m_dma_timer = timer_alloc(FUNC(sgi_mc_device::perform_dma), this);
 	m_dma_timer->adjust(attotime::never);
 
+	save_item(NAME(m_last_update_time));
 	save_item(NAME(m_cpu_control));
 	save_item(NAME(m_watchdog));
 	save_item(NAME(m_sys_id));
@@ -127,9 +122,6 @@ void sgi_mc_device::device_start()
 	save_item(NAME(m_dma_run));
 	save_item(NAME(m_eeprom_ctrl));
 	save_item(NAME(m_semaphore));
-	save_item(NAME(m_rpss_divide_counter));
-	save_item(NAME(m_rpss_divide_count));
-	save_item(NAME(m_rpss_increment));
 }
 
 void sgi_mc_device::device_reset()
@@ -173,10 +165,6 @@ void sgi_mc_device::device_reset()
 	m_dma_run = 0;
 	m_eeprom_ctrl = 0;
 	memset(m_semaphore, 0, sizeof(uint32_t) * 16);
-	m_rpss_timer->adjust(attotime::from_hz(10000000), 0, attotime::from_hz(10000000));
-	m_rpss_divide_counter = 4;
-	m_rpss_divide_count = 4;
-	m_rpss_increment = 1;
 
 	m_space = &m_maincpu->space(AS_PROGRAM);
 }
@@ -311,6 +299,18 @@ TIMER_CALLBACK_MEMBER(sgi_mc_device::perform_dma)
 	}
 }
 
+void sgi_mc_device::update_count()
+{
+	const uint32_t divide = (m_rpss_divider & 0xff) + 1;
+	const uint32_t increment = (m_rpss_divider >> 8) & 0xff;
+	const uint32_t freq = clock() / divide;
+	const attotime elapsed = machine().scheduler().time() - m_last_update_time;
+	/* Quantise elapsed to the clock frequency */
+	const auto ticks = elapsed.as_ticks(freq);
+	m_last_update_time += attotime::from_ticks(ticks, freq);
+	m_rpss_counter += uint32_t(ticks * increment);
+}
+
 uint32_t sgi_mc_device::read(offs_t offset, uint32_t mem_mask)
 {
 	switch (offset & ~1)
@@ -424,7 +424,8 @@ uint32_t sgi_mc_device::read(offs_t offset, uint32_t mem_mask)
 		LOGMASKED(LOG_READS | LOG_DMA, "%s: DMA TLB Entry 3 Low Read: %08x & %08x\n", machine().describe_context(), m_dma_tlb_entry_lo[3], mem_mask);
 		return m_dma_tlb_entry_lo[3];
 	case 0x1000/4:
-		LOGMASKED(LOG_RPSS, "%s: RPSS 100ns Counter Read: %08x & %08x\n", machine().describe_context(), m_rpss_counter, mem_mask);
+		LOGMASKED(LOG_RPSS, "%s: RPSS Counter Read: %08x & %08x\n", machine().describe_context(), m_rpss_counter, mem_mask);
+		update_count();
 		return m_rpss_counter;
 	case 0x2000/4:
 	case 0x2008/4:
@@ -505,10 +506,8 @@ void sgi_mc_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 		break;
 	case 0x0028/4:
 		LOGMASKED(LOG_RPSS, "%s: RPSS Divider Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		update_count();
 		m_rpss_divider = data;
-		m_rpss_divide_count = (int)(m_rpss_divider & 0xff);
-		m_rpss_divide_counter = m_rpss_divide_count;
-		m_rpss_increment = (m_rpss_divider >> 8) & 0xff;
 		break;
 	case 0x0030/4:
 		LOGMASKED(LOG_WRITES, "%s: R4000 EEPROM Write: CS:%d, SCK:%d, SO:%d\n", machine().describe_context(),
@@ -718,15 +717,5 @@ void sgi_mc_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 	default:
 		LOGMASKED(LOG_WRITES | LOG_UNKNOWN, "%s: Unmapped MC write: %08x: %08x & %08x\n", machine().describe_context(), 0x1fa00000 + offset*4, data, mem_mask);
 		break;
-	}
-}
-
-TIMER_CALLBACK_MEMBER(sgi_mc_device::rpss_tick)
-{
-	m_rpss_divide_counter--;
-	if (m_rpss_divide_counter < 0)
-	{
-		m_rpss_divide_counter = m_rpss_divide_count;
-		m_rpss_counter += m_rpss_increment;
 	}
 }

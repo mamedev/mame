@@ -36,6 +36,8 @@
 #include "tilemap.h"
 
 
+namespace {
+
 class limenko_state : public driver_device
 {
 public:
@@ -1123,6 +1125,9 @@ void limenko_state::init_spotty()
 	save_item(NAME(m_audiocpu_p1));
 	save_item(NAME(m_audiocpu_p3));
 }
+
+} // anonymous namespace
+
 
 GAME(2000, dynabomb, 0,      limenko, sb2003,   limenko_state, init_dynabomb, ROT0, "Limenko",    "Dynamite Bomber (Korea, Rev 1.5)",   MACHINE_SUPPORTS_SAVE)
 GAME(2000, legendoh, 0,      limenko, legendoh, limenko_state, init_legendoh, ROT0, "Limenko",    "Legend of Heroes",                   MACHINE_SUPPORTS_SAVE)

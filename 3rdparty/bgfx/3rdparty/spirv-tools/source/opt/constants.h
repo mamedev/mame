@@ -163,6 +163,21 @@ class ScalarConstant : public Constant {
     return is_zero;
   }
 
+  uint32_t GetU32BitValue() const {
+    // Relies on unsigned values smaller than 32-bit being zero extended.  See
+    // section 2.2.1 of the SPIR-V spec.
+    assert(words().size() == 1);
+    return words()[0];
+  }
+
+  uint64_t GetU64BitValue() const {
+    // Relies on unsigned values smaller than 64-bit being zero extended.  See
+    // section 2.2.1 of the SPIR-V spec.
+    assert(words().size() == 2);
+    return static_cast<uint64_t>(words()[1]) << 32 |
+           static_cast<uint64_t>(words()[0]);
+  }
+
  protected:
   ScalarConstant(const Type* ty, const std::vector<uint32_t>& w)
       : Constant(ty), words_(w) {}
@@ -189,23 +204,8 @@ class IntConstant : public ScalarConstant {
     return words()[0];
   }
 
-  uint32_t GetU32BitValue() const {
-    // Relies on unsigned values smaller than 32-bit being zero extended.  See
-    // section 2.2.1 of the SPIR-V spec.
-    assert(words().size() == 1);
-    return words()[0];
-  }
-
   int64_t GetS64BitValue() const {
     // Relies on unsigned values smaller than 64-bit being sign extended.  See
-    // section 2.2.1 of the SPIR-V spec.
-    assert(words().size() == 2);
-    return static_cast<uint64_t>(words()[1]) << 32 |
-           static_cast<uint64_t>(words()[0]);
-  }
-
-  uint64_t GetU64BitValue() const {
-    // Relies on unsigned values smaller than 64-bit being zero extended.  See
     // section 2.2.1 of the SPIR-V spec.
     assert(words().size() == 2);
     return static_cast<uint64_t>(words()[1]) << 32 |
@@ -541,7 +541,7 @@ class ConstantManager {
   // instruction at the end of the current module's types section.
   //
   // |type_id| is an optional argument for disambiguating equivalent types. If
-  // |type_id| is specified, the contant returned will have that type id.
+  // |type_id| is specified, the constant returned will have that type id.
   Instruction* GetDefiningInstruction(const Constant* c, uint32_t type_id = 0,
                                       Module::inst_iterator* pos = nullptr);
 
@@ -637,7 +637,16 @@ class ConstantManager {
   }
 
   // Returns the id of a 32-bit floating point constant with value |val|.
-  uint32_t GetFloatConst(float val);
+  uint32_t GetFloatConstId(float val);
+
+  // Returns a 32-bit float constant with the given value.
+  const Constant* GetFloatConst(float val);
+
+  // Returns the id of a 64-bit floating point constant with value |val|.
+  uint32_t GetDoubleConstId(double val);
+
+  // Returns a 64-bit float constant with the given value.
+  const Constant* GetDoubleConst(double val);
 
   // Returns the id of a 32-bit signed integer constant with value |val|.
   uint32_t GetSIntConst(int32_t val);

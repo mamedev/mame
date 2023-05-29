@@ -49,7 +49,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual void m68k_reset_peripherals() override;
+	DECLARE_WRITE_LINE_MEMBER(reset_peripherals);
 
 private:
 	required_device<mc68340_serial_module_device> m_serial;

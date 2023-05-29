@@ -64,6 +64,8 @@ ToDo:
 #include "cpu/m6805/m68hc05.h"
 
 
+namespace {
+
 class m6805evs_state : public driver_device
 {
 public:
@@ -75,7 +77,7 @@ public:
 	void m6805evs(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	[[maybe_unused]] void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	virtual void machine_reset() override;
@@ -112,6 +114,8 @@ ROM_START(m6805evs)
 	ROM_REGION(0x2000, "mcu", 0)
 	ROM_LOAD( "mc68hc705p9cp.bin", 0x0000, 0x2000, NO_DUMP)
 ROM_END
+
+} // anonymous namespace
 
 
 /***************************************************************************

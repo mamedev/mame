@@ -154,6 +154,12 @@ uint8_t pc88va_state::opn_portb_r()
 	return BIT(m_mouse_port->read(), 4, 2) | 0xfc;
 }
 
+void pc88va_state::opn_portb_w(u8 data)
+{
+	m_mouse_port->pin_6_w(BIT(data, 0));
+	m_mouse_port->pin_7_w(BIT(data, 1));
+}
+
 void pc88va_state::rtc_w(offs_t offset, u8 data)
 {
 	m_rtc->c0_w((data & 1) >> 0);
@@ -1182,6 +1188,7 @@ void pc88va_state::pc88va(machine_config &config)
 	m_opna->irq_handler().set(FUNC(pc88va_state::int4_irq_w));
 	m_opna->port_a_read_callback().set(FUNC(pc88va_state::opn_porta_r));
 	m_opna->port_b_read_callback().set(FUNC(pc88va_state::opn_portb_r));
+	m_opna->port_b_write_callback().set(FUNC(pc88va_state::opn_portb_w));
 	// TODO: per-channel mixing is unconfirmed
 	m_opna->add_route(0, m_lspeaker, 0.25);
 	m_opna->add_route(0, m_rspeaker, 0.25);

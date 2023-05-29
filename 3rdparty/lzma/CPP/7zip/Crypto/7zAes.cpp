@@ -2,9 +2,11 @@
 
 #include "StdAfx.h"
 
+#include "../../../C/CpuArch.h"
 #include "../../../C/Sha256.h"
 
 #include "../../Common/ComTry.h"
+#include "../../Common/MyBuffer2.h"
 
 #ifndef _7ZIP_ST
 #include "../../Windows/Synchronization.h"
@@ -48,31 +50,65 @@ void CKeyInfo::CalcKey()
   }
   else
   {
-    size_t bufSize = 8 + SaltSize + Password.Size();
-    CObjArray<Byte> buf(bufSize);
+    const unsigned kUnrPow = 6;
+    const UInt32 numUnroll = (UInt32)1 << (NumCyclesPower <= kUnrPow ? (unsigned)NumCyclesPower : kUnrPow);
+
+    const size_t bufSize = 8 + SaltSize + Password.Size();
+    const size_t unrollSize = bufSize * numUnroll;
+
+    // MY_ALIGN (16)
+    // CSha256 sha;
+    CAlignedBuffer sha(sizeof(CSha256) + unrollSize + bufSize * 2);
+    Byte *buf = sha + sizeof(CSha256);
+
     memcpy(buf, Salt, SaltSize);
     memcpy(buf + SaltSize, Password, Password.Size());
+    memset(buf + bufSize - 8, 0, 8);
     
-    CSha256 sha;
-    Sha256_Init(&sha);
+    Sha256_Init((CSha256 *)(void *)(Byte *)sha);
     
-    Byte *ctr = buf + SaltSize + Password.Size();
-    
-    for (unsigned i = 0; i < 8; i++)
-      ctr[i] = 0;
-    
+    {
+      {
+        Byte *dest = buf;
+        for (UInt32 i = 1; i < numUnroll; i++)
+        {
+          dest += bufSize;
+          memcpy(dest, buf, bufSize);
+        }
+      }
+
+      const UInt32 numRounds = (UInt32)1 << NumCyclesPower;
+      UInt32 r = 0;
+      do
+      {
+        Byte *dest = buf + bufSize - 8;
+        UInt32 i = r;
+        r += numUnroll;
+        do
+        {
+          SetUi32(dest, i); i++; dest += bufSize;
+          // SetUi32(dest, i); i++; dest += bufSize;
+        }
+        while (i < r);
+        Sha256_Update((CSha256 *)(void *)(Byte *)sha, buf, unrollSize);
+      }
+      while (r < numRounds);
+    }
+    /*
     UInt64 numRounds = (UInt64)1 << NumCyclesPower;
 
     do
     {
-      Sha256_Update(&sha, buf, bufSize);
+      Sha256_Update((CSha256 *)(Byte *)sha, buf, bufSize);
       for (unsigned i = 0; i < 8; i++)
         if (++(ctr[i]) != 0)
           break;
     }
     while (--numRounds != 0);
+    */
 
-    Sha256_Final(&sha, Key);
+    Sha256_Final((CSha256 *)(void *)(Byte *)sha, Key);
+    memset(sha, 0, sha.Size());
   }
 }
 
@@ -164,8 +200,8 @@ STDMETHODIMP CEncoder::ResetInitVector()
 {
   for (unsigned i = 0; i < sizeof(_iv); i++)
     _iv[i] = 0;
-  _ivSize = 8;
-  g_RandomGenerator.Generate(_iv, _ivSize);
+  _ivSize = 16;
+  MY_RAND_GEN(_iv, _ivSize);
   return S_OK;
 }
 
@@ -250,6 +286,7 @@ STDMETHODIMP CBaseCoder::CryptoSetPassword(const Byte *data, UInt32 size)
 {
   COM_TRY_BEGIN
   
+  _key.Password.Wipe();
   _key.Password.CopyFrom(data, (size_t)size);
   return S_OK;
   

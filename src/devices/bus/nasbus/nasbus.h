@@ -92,6 +92,9 @@
 
 #pragma once
 
+#include <functional>
+#include <vector>
+
 
 
 //**************************************************************************
@@ -125,7 +128,7 @@ public:
 protected:
 	nasbus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 private:
@@ -156,17 +159,19 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ram_disable_w );
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
+	using card_vector = std::vector<std::reference_wrapper<device_nasbus_card_interface> >;
+
 	required_address_space m_program;
 	required_address_space m_io;
 
-	simple_list<device_nasbus_card_interface> m_dev;
-
 	devcb_write_line m_ram_disable_handler;
+
+	card_vector m_dev;
 };
 
 // device type definition
@@ -176,14 +181,11 @@ DECLARE_DEVICE_TYPE(NASBUS, nasbus_device)
 
 class device_nasbus_card_interface : public device_interface
 {
-	template <class ElementType> friend class simple_list;
 public:
 	// construction/destruction
 	virtual ~device_nasbus_card_interface();
 
 	void set_nasbus_device(nasbus_device &nasbus);
-
-	device_nasbus_card_interface *next() const { return m_next; }
 
 protected:
 	device_nasbus_card_interface(const machine_config &mconfig, device_t &device);
@@ -197,8 +199,6 @@ protected:
 
 private:
 	nasbus_device *m_nasbus;
-
-	device_nasbus_card_interface *m_next;
 };
 
 // include here so drivers don't need to

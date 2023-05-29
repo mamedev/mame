@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_MIKROMIK_H
-#define MAME_INCLUDES_MIKROMIK_H
+#ifndef MAME_NOKIA_MIKROMIK_H
+#define MAME_NOKIA_MIKROMIK_H
 
 #pragma once
 
@@ -52,8 +52,7 @@ public:
 		m_mpsc(*this, UPD7201_TAG),
 		m_hgdc(*this, UPD7220_TAG),
 		m_palette(*this, "palette"),
-		m_floppy0(*this, UPD765_TAG ":0:525qd"),
-		m_floppy1(*this, UPD765_TAG ":1:525qd"),
+		m_floppy(*this, UPD765_TAG ":%u:525qd", 0U),
 		m_rs232a(*this, RS232_A_TAG),
 		m_rs232b(*this, RS232_B_TAG),
 		m_rs232c(*this, RS232_C_TAG),
@@ -89,8 +88,7 @@ private:
 	required_device<upd7201_device> m_mpsc;
 	required_device<upd7220_device> m_hgdc;
 	required_device<palette_device> m_palette;
-	required_device<floppy_image_device> m_floppy0;
-	required_device<floppy_image_device> m_floppy1;
+	required_device_array<floppy_image_device, 2> m_floppy;
 	required_device<rs232_port_device> m_rs232a;
 	required_device<rs232_port_device> m_rs232b;
 	required_device<rs232_port_device> m_rs232c;
@@ -152,4 +150,4 @@ private:
 	void mm1_upd7220_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_MIKROMIK_H
+#endif // MAME_NOKIA_MIKROMIK_H

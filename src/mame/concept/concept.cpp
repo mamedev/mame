@@ -62,7 +62,7 @@ void concept_state::concept_memmap(address_map &map)
 }
 
 
-static INPUT_PORTS_START( concept )
+static INPUT_PORTS_START( corvus_concept )
 
 	PORT_START("KEY0")  /* port 0: keys 0x00 through 0x0f */
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(right)") PORT_CODE(KEYCODE_RIGHT)
@@ -213,7 +213,7 @@ void concept_a2_cards(device_slot_interface &device)
 }
 
 
-void concept_state::concept(machine_config &config)
+void concept_state::corvus_concept(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16.364_MHz_XTAL / 2);
@@ -320,5 +320,5 @@ ROM_START( concept )
 	ROM_LOAD16_BYTE( "mb20l.bin",    0x000001, 0x001000, CRC(b4b59de9) SHA1(3e8b8b5950b5359203c054f94af1fc5b8f0495b9) )
 ROM_END
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY           FULLNAME */
-COMP( 1982, concept, 0,      0,      concept, concept, concept_state, empty_init, "Corvus Systems", "Concept" , 0 )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE         INPUT           CLASS          INIT        COMPANY           FULLNAME */
+COMP( 1982, concept, 0,      0,      corvus_concept, corvus_concept, concept_state, empty_init, "Corvus Systems", "Concept" , 0 )

@@ -2,8 +2,8 @@
 // copyright-holders:Olivier Galibert
 #pragma once
 
-#ifndef MAME_INCLUDES_NEXT_H
-#define MAME_INCLUDES_NEXT_H
+#ifndef MAME_NEXT_NEXT_H
+#define MAME_NEXT_NEXT_H
 
 #include "cpu/m68000/m68030.h"
 #include "cpu/m68000/m68040.h"
@@ -13,10 +13,10 @@
 #include "machine/8530scc.h"
 #include "nextkbd.h"
 #include "machine/upd765.h"
-#include "machine/ncr5390.h"
+#include "machine/ncr53c90.h"
 #include "machine/mb8795.h"
 #include "nextmo.h"
-#include "imagedev/chd_cd.h"
+#include "imagedev/cdromimg.h"
 #include "imagedev/harddriv.h"
 
 class next_state : public driver_device
@@ -29,7 +29,7 @@ public:
 			scc(*this, "scc"),
 			keyboard(*this, "keyboard"),
 			scsibus(*this, "scsibus"),
-			scsi(*this, "scsibus:7:ncr5390"),
+			scsi(*this, "scsibus:7:ncr53c90"),
 			net(*this, "net"),
 			mo(*this, "mo"),
 			fdc(*this, "fdc"),
@@ -68,7 +68,7 @@ private:
 	required_device<scc8530_legacy_device> scc;
 	required_device<nextkbd_device> keyboard;
 	required_device<nscsi_bus_device> scsibus;
-	required_device<ncr5390_device> scsi;
+	required_device<ncr53c90_device> scsi;
 	required_device<mb8795_device> net;
 	optional_device<nextmo_device> mo; // cube only
 	optional_device<n82077aa_device> fdc; // 040 only
@@ -146,7 +146,7 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
-	void ncr5390(device_t *device);
+	void ncr53c90(device_t *device);
 	void next_0b_m_mem(address_map &map);
 	void next_0b_m_mo_mem(address_map &map);
 	void next_0b_m_nofdc_mem(address_map &map);
@@ -209,7 +209,7 @@ private:
 
 	void irq_set(int id, bool raise);
 	void irq_check();
-	const char *dma_name(int slot);
+	std::string dma_name(int slot);
 	void dma_do_ctrl_w(int slot, uint8_t data);
 	void dma_drq_w(int slot, bool state);
 	void dma_read(int slot, uint8_t &val, bool &eof, bool &err);
@@ -219,4 +219,4 @@ private:
 	void dma_end(int slot);
 };
 
-#endif
+#endif // MAME_NEXT_NEXT_H

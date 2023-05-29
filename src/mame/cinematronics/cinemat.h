@@ -5,8 +5,8 @@
     Cinematronics vector hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_CINEMAT_H
-#define MAME_INCLUDES_CINEMAT_H
+#ifndef MAME_CINEMATRONICS_CINEMAT_H
+#define MAME_CINEMATRONICS_CINEMAT_H
 
 #pragma once
 
@@ -230,4 +230,4 @@ private:
 	int m_qb3_lasty = 0;
 };
 
-#endif // MAME_INCLUDES_CINEMAT_H
+#endif // MAME_CINEMATRONICS_CINEMAT_H

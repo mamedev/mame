@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Philip Bennett
-#ifndef MAME_AUDIO_TAITOSND_H
-#define MAME_AUDIO_TAITOSND_H
+#ifndef MAME_SHARED_TAITOSND_H
+#define MAME_SHARED_TAITOSND_H
 
 
 //**************************************************************************
@@ -61,4 +61,4 @@ DECLARE_DEVICE_TYPE(TC0140SYT, tc0140syt_device)
 DECLARE_DEVICE_TYPE(PC060HA, pc060ha_device)
 
 
-#endif // MAME_AUDIO_TAITOSND_H
+#endif // MAME_SHARED_TAITOSND_H

@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_PC1512KB_H
-#define MAME_MACHINE_PC1512KB_H
+#ifndef MAME_AMSTRAD_PC1512KB_H
+#define MAME_AMSTRAD_PC1512KB_H
 
 #pragma once
 
@@ -94,4 +94,4 @@ private:
 DECLARE_DEVICE_TYPE(PC1512_KEYBOARD, pc1512_keyboard_device)
 
 
-#endif // MAME_MACHINE_PC1512KB_H
+#endif // MAME_AMSTRAD_PC1512KB_H

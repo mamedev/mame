@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli, Luca Elia
-#ifndef MAME_VIDEO_IGS017_IGS031_H
-#define MAME_VIDEO_IGS017_IGS031_H
+#ifndef MAME_IGS_IGS017_IGS031_H
+#define MAME_IGS_IGS017_IGS031_H
 
 #pragma once
 
@@ -97,4 +97,4 @@ private:
 
 DECLARE_DEVICE_TYPE(IGS017_IGS031, igs017_igs031_device)
 
-#endif // MAME_VIDEO_IGS017_IGS031_H
+#endif // MAME_IGS_IGS017_IGS031_H

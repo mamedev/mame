@@ -10,6 +10,9 @@
 #include "cpu/i8085/i8085.h"
 #include "machine/i8155.h"
 
+
+namespace {
+
 class telex277d_state : public driver_device
 {
 public:
@@ -68,5 +71,8 @@ ROM_START(telex277d) // D8085A, P8155. bank of 8 dips between these 2 chips. Xta
 	ROM_REGION(0x0400, "chargen", 0)
 	ROM_LOAD("15181_font.bin", 0x0000, 0x0400, CRC(2a7abd0b) SHA1(4456723c59307671dd0615723e6439f6532df531))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1979, telex277d, 0, 0, telex277d, telex277d, telex277d_state, empty_init, "Telex Computer Products", "Telex 277-D Display Terminal (Model 2)", MACHINE_IS_SKELETON)

@@ -88,7 +88,7 @@ offs_t rw5000_common_disassembler::common_disasm(const u8 *lut_opmap, std::ostre
 		param = 1 << param;
 
 	// TDIN 0 is 4
-	if (instr == em_TDIN && param == 0)
+	if (instr == mTDIN && param == 0)
 		param = 4;
 
 	// disassemble it
@@ -97,17 +97,17 @@ offs_t rw5000_common_disassembler::common_disasm(const u8 *lut_opmap, std::ostre
 	if (bits > 0)
 	{
 		// exceptions for opcodes with 2 params
-		if (instr >= em_EXC0 && instr <= em_EXCM)
+		if (instr >= mEXC0 && instr <= mEXCM)
 		{
 			switch (instr)
 			{
-				case em_EXC0: util::stream_format(stream, "%d,0", param); break;
-				case em_EXCP: util::stream_format(stream, "%d,+1", param); break;
-				case em_EXCM: util::stream_format(stream, "%d,-1", param); break;
+				case mEXC0: util::stream_format(stream, "%d,0", param); break;
+				case mEXCP: util::stream_format(stream, "%d,+1", param); break;
+				case mEXCM: util::stream_format(stream, "%d,-1", param); break;
 				default: break;
 			}
 		}
-		else if (instr == em_ADD)
+		else if (instr == mADD)
 		{
 			if (param & 1)
 				flags |= STEP_COND;
@@ -120,14 +120,14 @@ offs_t rw5000_common_disassembler::common_disasm(const u8 *lut_opmap, std::ostre
 				default: break;
 			}
 		}
-		else if (instr >= em_LB0 && instr <= em_LB11)
+		else if (instr >= mLB0 && instr <= mLB11)
 		{
-			int param2 = (instr == em_LB0) ? 0 : (6 + instr - em_LB0);
+			int param2 = (instr == mLB0) ? 0 : (6 + instr - mLB0);
 			util::stream_format(stream, "%d,%d", param, param2);
 		}
-		else if (instr == em_TRA0 || instr == em_TRA1)
+		else if (instr == mTRA0 || instr == mTRA1)
 		{
-			int param2 = (instr == em_TRA1) ? 1 : 0;
+			int param2 = (instr == mTRA1) ? 1 : 0;
 			util::stream_format(stream, "%d,$%02X", param2, param);
 		}
 		else
@@ -142,26 +142,26 @@ offs_t rw5000_common_disassembler::common_disasm(const u8 *lut_opmap, std::ostre
 
 const u8 a5000_disassembler::a5000_opmap[0x100] =
 {
-/*  0        1        2        3        4        5        6        7        8        9        A        B        C        D        E        F  */
-	em_NOP,  em_TC,   0,       em_TKB,  em_TDIN, em_TDIN, em_TDIN, em_TDIN, em_TM,   em_TM,   em_TM,   em_TM,   0,       0,       0,       0,       // 0
-	em_SM,   em_SM,   em_SM,   em_SM,   em_RSM,  em_RSM,  em_RSM,  em_RSM,  em_RET,  em_RET,  em_RET,  em_RET,  0,       0,       0,       0,       // 1
-	em_LB7,  em_LB7,  em_LB7,  em_LB7,  em_LB10, em_LB10, em_LB10, em_LB10, em_LB9,  em_LB9,  em_LB9,  em_LB9,  em_LB8,  em_LB8,  em_LB8,  em_LB8,  // 2
-	em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   0,       em_RSC,  0,       em_SC,   em_LB0,  em_LB0,  em_LB0,  em_LB0,  // 3
+//  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F
+	mNOP,  mTC,   0,     mTKB,  mTDIN, mTDIN, mTDIN, mTDIN, mTM,   mTM,   mTM,   mTM,   0,     0,     0,     0,     // 0
+	mSM,   mSM,   mSM,   mSM,   mRSM,  mRSM,  mRSM,  mRSM,  mRET,  mRET,  mRET,  mRET,  0,     0,     0,     0,     // 1
+	mLB7,  mLB7,  mLB7,  mLB7,  mLB10, mLB10, mLB10, mLB10, mLB9,  mLB9,  mLB9,  mLB9,  mLB8,  mLB8,  mLB8,  mLB8,  // 2
+	mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   0,     mRSC,  0,     mSC,   mLB0,  mLB0,  mLB0,  mLB0,  // 3
 
-	em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  // 4
-	em_LDA,  em_LDA,  em_LDA,  em_LDA,  em_EXCP, em_EXCP, em_EXCP, em_EXCP, em_EXC0, em_EXC0, em_EXC0, em_EXC0, em_EXCM, em_EXCM, em_EXCM, em_EXCM, // 5
-	em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_READ, // 6
-	em_ADD,  em_ADD,  em_ADD,  em_ADD,  em_KSEG, 0,       em_MTD,  em_ATB,  em_COMP, em_COMP, em_COMP, em_COMP, em_TAM,  em_TAM,  em_TAM,  em_TAM,  // 7
+	mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  // 4
+	mLDA,  mLDA,  mLDA,  mLDA,  mEXCP, mEXCP, mEXCP, mEXCP, mEXC0, mEXC0, mEXC0, mEXC0, mEXCM, mEXCM, mEXCM, mEXCM, // 5
+	mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mREAD, // 6
+	mADD,  mADD,  mADD,  mADD,  mKSEG, 0,     mMTD,  mATB,  mCOMP, mCOMP, mCOMP, mCOMP, mTAM,  mTAM,  mTAM,  mTAM,  // 7
 
-	em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, // 8
-	em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, // 9
-	em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, // A
-	em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, // B
+	mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, // 8
+	mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, // 9
+	mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, // A
+	mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, // B
 
-	em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, // C
-	em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, // D
-	em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, // E
-	em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, // F
+	mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, // C
+	mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, // D
+	mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, // E
+	mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, // F
 };
 
 offs_t a5000_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
@@ -174,26 +174,26 @@ offs_t a5000_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 
 const u8 a5500_disassembler::a5500_opmap[0x100] =
 {
-/*  0        1        2        3        4        5        6        7        8        9        A        B        C        D        E        F  */
-	em_NOP,  em_TC,   0,       em_TKB,  em_TDIN, em_TDIN, em_TDIN, em_TDIN, em_TM,   em_TM,   em_TM,   em_TM,   em_SC,   em_RSC,  0,       0,       // 0
-	em_SM,   em_SM,   em_SM,   em_SM,   em_RSM,  em_RSM,  em_RSM,  em_RSM,  em_RET,  em_RET,  em_RET,  em_RET,  em_LB11, em_LB11, em_LB11, em_LB11, // 1
-	em_LB7,  em_LB7,  em_LB7,  em_LB7,  em_LB10, em_LB10, em_LB10, em_LB10, em_LB9,  em_LB9,  em_LB9,  em_LB9,  em_LB8,  em_LB8,  em_LB8,  em_LB8,  // 2
-	em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_LB0,  em_LB0,  em_LB0,  em_LB0,  // 3
+//  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F
+	mNOP,  mTC,   0,     mTKB,  mTDIN, mTDIN, mTDIN, mTDIN, mTM,   mTM,   mTM,   mTM,   mSC,   mRSC,  0,     0,     // 0
+	mSM,   mSM,   mSM,   mSM,   mRSM,  mRSM,  mRSM,  mRSM,  mRET,  mRET,  mRET,  mRET,  mLB11, mLB11, mLB11, mLB11, // 1
+	mLB7,  mLB7,  mLB7,  mLB7,  mLB10, mLB10, mLB10, mLB10, mLB9,  mLB9,  mLB9,  mLB9,  mLB8,  mLB8,  mLB8,  mLB8,  // 2
+	mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mLB0,  mLB0,  mLB0,  mLB0,  // 3
 
-	em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  // 4
-	em_LDA,  em_LDA,  em_LDA,  em_LDA,  em_EXCP, em_EXCP, em_EXCP, em_EXCP, em_EXC0, em_EXC0, em_EXC0, em_EXC0, em_EXCM, em_EXCM, em_EXCM, em_EXCM, // 5
-	em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_READ, // 6
-	em_ADD,  em_ADD,  em_ADD,  em_ADD,  em_KSEG, 0,       em_MTD,  em_ATB,  em_COMP, em_COMP, em_COMP, em_COMP, em_TAM,  em_TAM,  em_TAM,  em_TAM,  // 7
+	mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  // 4
+	mLDA,  mLDA,  mLDA,  mLDA,  mEXCP, mEXCP, mEXCP, mEXCP, mEXC0, mEXC0, mEXC0, mEXC0, mEXCM, mEXCM, mEXCM, mEXCM, // 5
+	mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mREAD, // 6
+	mADD,  mADD,  mADD,  mADD,  mKSEG, 0,     mMTD,  mATB,  mCOMP, mCOMP, mCOMP, mCOMP, mTAM,  mTAM,  mTAM,  mTAM,  // 7
 
-	em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, // 8
-	em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, // 9
-	em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, // A
-	em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, // B
+	mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, // 8
+	mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, // 9
+	mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, // A
+	mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, // B
 
-	em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, // C
-	em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, // D
-	em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, // E
-	em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, // F
+	mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, // C
+	mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, // D
+	mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, // E
+	mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, // F
 };
 
 offs_t a5500_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
@@ -206,26 +206,26 @@ offs_t a5500_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 
 const u8 b5000_disassembler::b5000_opmap[0x100] =
 {
-/*  0        1        2        3        4        5        6        7        8        9        A        B        C        D        E        F  */
-	em_NOP,  em_TC,   em_TKB,  em_TKBS, em_TDIN, em_TDIN, em_TDIN, em_TDIN, em_TM,   em_TM,   em_TM,   em_TM,   0,       0,       0,       0,       // 0
-	em_SM,   em_SM,   em_SM,   em_SM,   em_RSM,  em_RSM,  em_RSM,  em_RSM,  em_RET,  em_RET,  em_RET,  em_RET,  0,       0,       0,       0,       // 1
-	em_LB7,  em_LB7,  em_LB7,  em_LB7,  em_LB10, em_LB10, em_LB10, em_LB10, em_LB9,  em_LB9,  em_LB9,  em_LB9,  em_LB8,  em_LB8,  em_LB8,  em_LB8,  // 2
-	em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   0,       em_RSC,  0,       em_SC,   em_LB0,  em_LB0,  em_LB0,  em_LB0,  // 3
+//  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F
+	mNOP,  mTC,   mTKB,  mTKBS, mTDIN, mTDIN, mTDIN, mTDIN, mTM,   mTM,   mTM,   mTM,   0,     0,     0,     0,     // 0
+	mSM,   mSM,   mSM,   mSM,   mRSM,  mRSM,  mRSM,  mRSM,  mRET,  mRET,  mRET,  mRET,  0,     0,     0,     0,     // 1
+	mLB7,  mLB7,  mLB7,  mLB7,  mLB10, mLB10, mLB10, mLB10, mLB9,  mLB9,  mLB9,  mLB9,  mLB8,  mLB8,  mLB8,  mLB8,  // 2
+	mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   0,     mRSC,  0,     mSC,   mLB0,  mLB0,  mLB0,  mLB0,  // 3
 
-	em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  // 4
-	em_LDA,  em_LDA,  em_LDA,  em_LDA,  em_EXCP, em_EXCP, em_EXCP, em_EXCP, em_EXC0, em_EXC0, em_EXC0, em_EXC0, em_EXCM, em_EXCM, em_EXCM, em_EXCM, // 5
-	em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_READ, // 6
-	em_ADD,  em_ADD,  em_ADD,  em_ADD,  em_KSEG, 0,       0,       em_ATB,  em_COMP, em_COMP, em_COMP, em_COMP, em_TAM,  em_TAM,  em_TAM,  em_TAM,  // 7
+	mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  // 4
+	mLDA,  mLDA,  mLDA,  mLDA,  mEXCP, mEXCP, mEXCP, mEXCP, mEXC0, mEXC0, mEXC0, mEXC0, mEXCM, mEXCM, mEXCM, mEXCM, // 5
+	mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mREAD, // 6
+	mADD,  mADD,  mADD,  mADD,  mKSEG, 0,     0,     mATB,  mCOMP, mCOMP, mCOMP, mCOMP, mTAM,  mTAM,  mTAM,  mTAM,  // 7
 
-	em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, // 8
-	em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, // 9
-	em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, // A
-	em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, // B
+	mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, // 8
+	mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, // 9
+	mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, // A
+	mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, // B
 
-	em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, // C
-	em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, // D
-	em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, // E
-	em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, // F
+	mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, // C
+	mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, // D
+	mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, // E
+	mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, // F
 };
 
 offs_t b5000_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
@@ -238,26 +238,26 @@ offs_t b5000_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 
 const u8 b5500_disassembler::b5500_opmap[0x100] =
 {
-/*  0        1        2        3        4        5        6        7        8        9        A        B        C        D        E        F  */
-	em_NOP,  em_TC,   em_TKB,  em_TKBS, em_TDIN, em_TDIN, em_TDIN, em_TDIN, em_TM,   em_TM,   em_TM,   em_TM,   em_SC,   em_RSC,  0,       0,       // 0
-	em_SM,   em_SM,   em_SM,   em_SM,   em_RSM,  em_RSM,  em_RSM,  em_RSM,  em_RET,  em_RET,  em_RET,  em_RET,  em_LB11, em_LB11, em_LB11, em_LB11, // 1
-	em_LB7,  em_LB7,  em_LB7,  em_LB7,  em_LB10, em_LB10, em_LB10, em_LB10, em_LB9,  em_LB9,  em_LB9,  em_LB9,  em_LB8,  em_LB8,  em_LB8,  em_LB8,  // 2
-	em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_LB0,  em_LB0,  em_LB0,  em_LB0,  // 3
+//  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F
+	mNOP,  mTC,   mTKB,  mTKBS, mTDIN, mTDIN, mTDIN, mTDIN, mTM,   mTM,   mTM,   mTM,   mSC,   mRSC,  0,     0,     // 0
+	mSM,   mSM,   mSM,   mSM,   mRSM,  mRSM,  mRSM,  mRSM,  mRET,  mRET,  mRET,  mRET,  mLB11, mLB11, mLB11, mLB11, // 1
+	mLB7,  mLB7,  mLB7,  mLB7,  mLB10, mLB10, mLB10, mLB10, mLB9,  mLB9,  mLB9,  mLB9,  mLB8,  mLB8,  mLB8,  mLB8,  // 2
+	mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mLB0,  mLB0,  mLB0,  mLB0,  // 3
 
-	em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  // 4
-	em_LDA,  em_LDA,  em_LDA,  em_LDA,  em_EXCP, em_EXCP, em_EXCP, em_EXCP, em_EXC0, em_EXC0, em_EXC0, em_EXC0, em_EXCM, em_EXCM, em_EXCM, em_EXCM, // 5
-	em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_READ, // 6
-	em_ADD,  em_ADD,  em_ADD,  em_ADD,  em_KSEG, 0,       0,       em_ATB,  em_COMP, em_COMP, em_COMP, em_COMP, em_TAM,  em_TAM,  em_TAM,  em_TAM,  // 7
+	mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  // 4
+	mLDA,  mLDA,  mLDA,  mLDA,  mEXCP, mEXCP, mEXCP, mEXCP, mEXC0, mEXC0, mEXC0, mEXC0, mEXCM, mEXCM, mEXCM, mEXCM, // 5
+	mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mREAD, // 6
+	mADD,  mADD,  mADD,  mADD,  mKSEG, 0,     0,     mATB,  mCOMP, mCOMP, mCOMP, mCOMP, mTAM,  mTAM,  mTAM,  mTAM,  // 7
 
-	em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, // 8
-	em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, // 9
-	em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, // A
-	em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, // B
+	mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, // 8
+	mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, // 9
+	mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, // A
+	mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, // B
 
-	em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, // C
-	em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, // D
-	em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, // E
-	em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, // F
+	mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, // C
+	mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, // D
+	mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, // E
+	mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, // F
 };
 
 offs_t b5500_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
@@ -270,26 +270,26 @@ offs_t b5500_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 
 const u8 b6000_disassembler::b6000_opmap[0x100] =
 {
-/*  0        1        2        3        4        5        6        7        8        9        A        B        C        D        E        F  */
-	em_NOP,  em_TC,   em_TKB,  em_TKBS, em_TDIN, em_TDIN, em_TDIN, em_TDIN, em_TM,   em_TM,   em_TM,   em_TM,   0,       0,       0,       0,       // 0
-	em_SM,   em_SM,   em_SM,   em_SM,   em_RSM,  em_RSM,  em_RSM,  em_RSM,  em_RET,  em_RET,  em_RET,  em_RET,  0,       0,       0,       0,       // 1
-	em_LB7,  em_LB7,  em_LB7,  em_LB7,  em_LB10, em_LB10, em_LB10, em_LB10, em_LB9,  em_LB9,  em_LB9,  em_LB9,  em_LB8,  em_LB8,  em_LB8,  em_LB8,  // 2
-	em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   0,       em_RSC,  0,       em_SC,   em_LB0,  em_LB0,  em_LB0,  em_LB0,  // 3
+//  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F
+	mNOP,  mTC,   mTKB,  mTKBS, mTDIN, mTDIN, mTDIN, mTDIN, mTM,   mTM,   mTM,   mTM,   0,     0,     0,     0,     // 0
+	mSM,   mSM,   mSM,   mSM,   mRSM,  mRSM,  mRSM,  mRSM,  mRET,  mRET,  mRET,  mRET,  0,     0,     0,     0,     // 1
+	mLB7,  mLB7,  mLB7,  mLB7,  mLB10, mLB10, mLB10, mLB10, mLB9,  mLB9,  mLB9,  mLB9,  mLB8,  mLB8,  mLB8,  mLB8,  // 2
+	mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   0,     mRSC,  0,     mSC,   mLB0,  mLB0,  mLB0,  mLB0,  // 3
 
-	em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  // 4
-	em_LDA,  em_LDA,  em_LDA,  em_LDA,  em_EXCP, em_EXCP, em_EXCP, em_EXCP, em_EXC0, em_EXC0, em_EXC0, em_EXC0, em_EXCM, em_EXCM, em_EXCM, em_EXCM, // 5
-	em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_READ, // 6
-	em_ADD,  em_ADD,  em_ADD,  em_ADD,  em_KSEG, 0,       em_ATBZ, em_ATB,  em_COMP, em_COMP, em_COMP, em_COMP, em_TAM,  em_TAM,  em_TAM,  em_TAM,  // 7
+	mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  // 4
+	mLDA,  mLDA,  mLDA,  mLDA,  mEXCP, mEXCP, mEXCP, mEXCP, mEXC0, mEXC0, mEXC0, mEXC0, mEXCM, mEXCM, mEXCM, mEXCM, // 5
+	mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mREAD, // 6
+	mADD,  mADD,  mADD,  mADD,  mKSEG, 0,     mATBZ, mATB,  mCOMP, mCOMP, mCOMP, mCOMP, mTAM,  mTAM,  mTAM,  mTAM,  // 7
 
-	em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, // 8
-	em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, // 9
-	em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, // A
-	em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, // B
+	mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, // 8
+	mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, // 9
+	mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, // A
+	mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, // B
 
-	em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, // C
-	em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, // D
-	em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, // E
-	em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, // F
+	mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, // C
+	mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, // D
+	mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, // E
+	mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, // F
 };
 
 offs_t b6000_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
@@ -302,26 +302,26 @@ offs_t b6000_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 
 const u8 b6100_disassembler::b6100_opmap[0x100] =
 {
-/*  0        1        2        3        4        5        6        7        8        9        A        B        C        D        E        F  */
-	em_NOP,  em_TC,   em_TKB,  em_TKBS, em_TDIN, em_TDIN, em_TDIN, em_TDIN, em_TM,   em_TM,   em_TM,   em_TM,   em_SC,   em_RSC,  0,       0,       // 0
-	em_SM,   em_SM,   em_SM,   em_SM,   em_RSM,  em_RSM,  em_RSM,  em_RSM,  em_RET,  em_RET,  em_RET,  em_RET,  em_LB11, em_LB11, em_LB11, em_LB11, // 1
-	em_LB7,  em_LB7,  em_LB7,  em_LB7,  em_LB10, em_LB10, em_LB10, em_LB10, em_LB9,  em_LB9,  em_LB9,  em_LB9,  em_LB8,  em_LB8,  em_LB8,  em_LB8,  // 2
-	em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_LB0,  em_LB0,  em_LB0,  em_LB0,  // 3
+//  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F
+	mNOP,  mTC,   mTKB,  mTKBS, mTDIN, mTDIN, mTDIN, mTDIN, mTM,   mTM,   mTM,   mTM,   mSC,   mRSC,  0,     0,     // 0
+	mSM,   mSM,   mSM,   mSM,   mRSM,  mRSM,  mRSM,  mRSM,  mRET,  mRET,  mRET,  mRET,  mLB11, mLB11, mLB11, mLB11, // 1
+	mLB7,  mLB7,  mLB7,  mLB7,  mLB10, mLB10, mLB10, mLB10, mLB9,  mLB9,  mLB9,  mLB9,  mLB8,  mLB8,  mLB8,  mLB8,  // 2
+	mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mLB0,  mLB0,  mLB0,  mLB0,  // 3
 
-	em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  // 4
-	em_LDA,  em_LDA,  em_LDA,  em_LDA,  em_EXCP, em_EXCP, em_EXCP, em_EXCP, em_EXC0, em_EXC0, em_EXC0, em_EXC0, em_EXCM, em_EXCM, em_EXCM, em_EXCM, // 5
-	em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_READ, // 6
-	em_ADD,  em_ADD,  em_ADD,  em_ADD,  em_KSEG, 0,       em_ATBZ, em_ATB,  em_COMP, em_COMP, em_COMP, em_COMP, em_TAM,  em_TAM,  em_TAM,  em_TAM,  // 7
+	mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  // 4
+	mLDA,  mLDA,  mLDA,  mLDA,  mEXCP, mEXCP, mEXCP, mEXCP, mEXC0, mEXC0, mEXC0, mEXC0, mEXCM, mEXCM, mEXCM, mEXCM, // 5
+	mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mREAD, // 6
+	mADD,  mADD,  mADD,  mADD,  mKSEG, 0,     mATBZ, mATB,  mCOMP, mCOMP, mCOMP, mCOMP, mTAM,  mTAM,  mTAM,  mTAM,  // 7
 
-	em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, // 8
-	em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, // 9
-	em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, // A
-	em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, // B
+	mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, // 8
+	mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, // 9
+	mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, // A
+	mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, mTRA0, // B
 
-	em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, // C
-	em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, // D
-	em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, // E
-	em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, // F
+	mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, // C
+	mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, // D
+	mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, // E
+	mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, mTRA1, // F
 };
 
 offs_t b6100_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)

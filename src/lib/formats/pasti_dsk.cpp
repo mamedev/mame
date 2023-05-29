@@ -161,7 +161,7 @@ bool pasti_format::load(util::random_read &io, uint32_t form_factor, const std::
 		}
 	}
 
-	image->set_variant(floppy_image::DSDD);
+	image->set_form_variant(floppy_image::FF_35, heads > 1 ? floppy_image::DSDD : floppy_image::SSDD);
 	return true;
 }
 

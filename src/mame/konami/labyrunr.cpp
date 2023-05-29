@@ -451,7 +451,7 @@ void labyrunr_state::machine_start()
 void labyrunr_state::labyrunr(machine_config &config)
 {
 	// basic machine hardware
-	HD6309(config, m_maincpu, 3000000 * 4);      // 24MHz / 8?
+	HD6309E(config, m_maincpu, 24_MHz_XTAL / 8); // HD63C09EP
 	m_maincpu->set_addrmap(AS_PROGRAM, &labyrunr_state::prg_map);
 	m_maincpu->set_periodic_int(FUNC(labyrunr_state::timer_interrupt), attotime::from_hz(4 * 60));
 

@@ -35,6 +35,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define MAIN_CLOCK XTAL(21'477'272)
 #define SOUND_CLOCK XTAL(4'000'000)
 
@@ -307,6 +310,9 @@ ROM_START( ldquiz4 )
 	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "ldquiz4", 0, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1991, shabdama, 0,   nichild, nichild, nichild_state, empty_init, ROT0, "Nichibutsu", "LD Mahjong #4 Shabon-Dama (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1992, ldquiz4,  0,   nichild, nichild, nichild_state, empty_init, ROT0, "Nichibutsu", "LD Quiz dai 4-dan - Kotaetamon Gachi! (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

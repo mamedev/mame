@@ -57,6 +57,8 @@ Cassette:
 #include "speaker.h"
 
 
+namespace {
+
 class mfabfz_state : public driver_device
 {
 public:
@@ -309,6 +311,9 @@ ROM_START( mfabfz85 )
 	ROM_SYSTEM_BIOS (4, "32k_dtp", "MAT32K dtp" ) // 2400, 7N2, txd-invert
 	ROMX_LOAD( "mfa_mat85_sp1_ed_kpl_dtp_terminal.bin", 0x0000, 0x8000, CRC(ed432c19) SHA1(31cbc06d276dbb201d50967f4ddba26a42560753), ROM_BIOS(4) )
 ROM_END
+
+} // anonymous namespace
+
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   CLASS,        INIT        COMPANY                         FULLNAME                               FLAGS */
 COMP( 1979, mfabfz,   0,      0,      mfabfz,   mfabfz, mfabfz_state, empty_init, "Berufsfoerdungszentrum Essen", "Mikrocomputer fuer Ausbildung",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

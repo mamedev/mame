@@ -23,6 +23,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class unistar_state : public driver_device
 {
 public:
@@ -235,6 +237,9 @@ ROM_START( unistar )
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "280014a.u1",  0x0000, 0x0800, CRC(a9e1b5b2) SHA1(6f5b597ee1417f1108ac5957b005a927acb5314a))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

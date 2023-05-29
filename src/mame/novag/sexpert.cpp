@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Berger
-/******************************************************************************
+/*******************************************************************************
 
 Novag Super Expert (model 878/886/887/902) / Novag Super Forte
 
@@ -34,7 +34,7 @@ TODO:
   not as accurate, and the program doesn't enable extended mode (in other words,
   it always runs in W65C02 emulation mode)
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -187,9 +187,9 @@ void sforte_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // LCD
 
@@ -319,9 +319,9 @@ void sforte_state::lcd_data_w(u8 data)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void sexpert_state::sexpert_map(address_map &map)
 {
@@ -351,20 +351,20 @@ void sforte_state::sforte_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( sexpert )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Go")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("Take Back / Analyze Games")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("->")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("Right")
 
 	PORT_START("IN.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Set Level")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Flip Display / Time Control")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_NAME("<-")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_NAME("Left")
 
 	PORT_START("IN.2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_NAME("Hint / Next Best")
@@ -413,13 +413,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void sexpert_state::sexpert(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M65C02(config, m_maincpu, 10_MHz_XTAL/2); // or 12_MHz_XTAL/2, also seen with R65C02
 	m_maincpu->set_addrmap(AS_PROGRAM, &sexpert_state::sexpert_map);
 
@@ -434,7 +434,7 @@ void sexpert_state::sexpert(machine_config &config)
 	m_board->set_delay(attotime::from_msec(200));
 	m_board->set_nvram_enable(true);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60); // arbitrary
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
@@ -452,12 +452,12 @@ void sexpert_state::sexpert(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(8, 8);
 	config.set_default_layout(layout_novag_sexpert);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 32.768_kHz_XTAL/32); // 1024Hz
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	/* uart (configure after video) */
+	// uart (configure after video)
 	MOS6551(config, m_acia).set_xtal(1.8432_MHz_XTAL); // R65C51P2 - RTS to CTS, DCD to GND
 	m_acia->irq_handler().set_inputline("maincpu", m65c02_device::NMI_LINE);
 	m_acia->rts_handler().set("acia", FUNC(mos6551_device::write_cts));
@@ -479,7 +479,7 @@ void sforte_state::sforte(machine_config &config)
 {
 	sexpert(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &sforte_state::sforte_map);
 	subdevice<clock_device>("irq_clock")->set_pulse_width(attotime::from_usec(10)); // measured between 8us and 12us (unstable)
 
@@ -496,9 +496,9 @@ void sforte_state::sforteb(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( sexperta ) // from model 886
 	ROM_REGION( 0x18000, "maincpu", 0 )
@@ -596,22 +596,22 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME       PARENT   CMP MACHINE   INPUT     STATE          INIT          COMPANY, FULLNAME, FLAGS
-CONS( 1988, sexperta,  0,        0, sexpert,  sexpert,  sexpert_state, init_sexpert, "Novag", "Super Expert (version A, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 886
-CONS( 1987, sexperta1, sexperta, 0, sexpert,  sexpert,  sexpert_state, init_sexpert, "Novag", "Super Expert (version A, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 878
-CONS( 1987, sexperta2, sexperta, 0, sexpert,  sexpert,  sexpert_state, init_sexpert, "Novag", "Super Expert (version A, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 878
-CONS( 1988, sexpertb,  sexperta, 0, sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag", "Super Expert (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 887
-CONS( 1990, sexpertc,  sexperta, 0, sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag", "Super Expert (version C, v3.6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, sexpertc1, sexperta, 0, sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag", "Super Expert (version C, v3.0)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 902
-CONS( 1990, sexpertc2, sexperta, 0, sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag", "Super Expert (version C, v1.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     CLASS          INIT          COMPANY, FULLNAME, FLAGS
+SYST( 1988, sexperta,  0,        0,      sexpert,  sexpert,  sexpert_state, init_sexpert, "Novag", "Super Expert (version A, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 886
+SYST( 1987, sexperta1, sexperta, 0,      sexpert,  sexpert,  sexpert_state, init_sexpert, "Novag", "Super Expert (version A, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 878
+SYST( 1987, sexperta2, sexperta, 0,      sexpert,  sexpert,  sexpert_state, init_sexpert, "Novag", "Super Expert (version A, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 878
+SYST( 1988, sexpertb,  sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag", "Super Expert (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 887
+SYST( 1990, sexpertc,  sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag", "Super Expert (version C, v3.6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, sexpertc1, sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag", "Super Expert (version C, v3.0)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 902
+SYST( 1990, sexpertc2, sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag", "Super Expert (version C, v1.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1987, sfortea,   0,        0, sforte,   sexpert,  sforte_state,  init_sexpert, "Novag", "Super Forte (version A, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, sfortea1,  sfortea,  0, sforte,   sexpert,  sforte_state,  init_sexpert, "Novag", "Super Forte (version A, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, sfortea2,  sfortea,  0, sforte,   sexpert,  sforte_state,  init_sexpert, "Novag", "Super Forte (version A, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, sforteb,   sfortea,  0, sforteb,  sexpertb, sforte_state,  init_sexpert, "Novag", "Super Forte (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, sfortec,   sfortea,  0, sforteb,  sexpertb, sforte_state,  init_sexpert, "Novag", "Super Forte (version C, v3.6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, sfortec1,  sfortea,  0, sforteb,  sexpertb, sforte_state,  init_sexpert, "Novag", "Super Forte (version C, v1.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1987, sfortea,   0,        0,      sforte,   sexpert,  sforte_state,  init_sexpert, "Novag", "Super Forte (version A, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1987, sfortea1,  sfortea,  0,      sforte,   sexpert,  sforte_state,  init_sexpert, "Novag", "Super Forte (version A, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1987, sfortea2,  sfortea,  0,      sforte,   sexpert,  sforte_state,  init_sexpert, "Novag", "Super Forte (version A, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, sforteb,   sfortea,  0,      sforteb,  sexpertb, sforte_state,  init_sexpert, "Novag", "Super Forte (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, sfortec,   sfortea,  0,      sforteb,  sexpertb, sforte_state,  init_sexpert, "Novag", "Super Forte (version C, v3.6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, sfortec1,  sfortea,  0,      sforteb,  sexpertb, sforte_state,  init_sexpert, "Novag", "Super Forte (version C, v1.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

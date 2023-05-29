@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="tg16" description="NEC Turbografx 16 cartridges">
+<softwarelist name="tg16" description="NEC Turbografx-16 HuCards">
 	<software name="aeroblst">
 		<description>Aero Blasters</description>
 		<year>1990</year>

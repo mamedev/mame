@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_MACHINE_CEDAR_MAGNET_PLANE_H
-#define MAME_MACHINE_CEDAR_MAGNET_PLANE_H
+#ifndef MAME_EFO_CEDAR_MAGNET_PLANE_H
+#define MAME_EFO_CEDAR_MAGNET_PLANE_H
 
 #pragma once
 
@@ -57,4 +57,4 @@ private:
 	void pio1_pb_w(u8 data);
 };
 
-#endif // MAME_MACHINE_CEDAR_MAGNET_PLANE_H
+#endif // MAME_EFO_CEDAR_MAGNET_PLANE_H

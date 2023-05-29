@@ -27,8 +27,8 @@ protected:
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
 
-	inline void r32_w(int reg, uint32_t val) { R[reg & 7] = val; R[(reg & 7) | 8] = val >> 16; }
-	inline uint32_t r32_r(int reg) const { return R[reg & 7] | (R[(reg & 7) | 8] << 16); }
+	inline void r32_w(int reg, uint32_t val) { m_R[reg & 7] = val; m_R[(reg & 7) | 8] = val >> 16; }
+	inline uint32_t r32_r(int reg) const { return m_R[reg & 7] | (m_R[(reg & 7) | 8] << 16); }
 
 #define O(o) void o ## _full(); void o ## _partial()
 

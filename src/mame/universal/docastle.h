@@ -5,8 +5,8 @@
   Mr. Do's Castle hardware
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_DOCASTLE_H
-#define MAME_INCLUDES_DOCASTLE_H
+#ifndef MAME_UNIVERSAL_DOCASTLE_H
+#define MAME_UNIVERSAL_DOCASTLE_H
 
 #pragma once
 
@@ -100,4 +100,4 @@ private:
 	void idsoccer_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_DOCASTLE_H
+#endif // MAME_UNIVERSAL_DOCASTLE_H

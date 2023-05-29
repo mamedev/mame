@@ -6049,7 +6049,7 @@ more investigation needed...
 
 <!-- Does this really exist? It is questioned... -->
 	<software name="basload3">
-		<description>Super Bases Loaded 3 - License to Steal (USA, Rev. A)</description>
+		<description>Super Bases Loaded 3 - License to Steal (USA, rev. A)</description>
 		<year>1995</year>
 		<publisher>Jaleco</publisher>
 		<info name="release" value="199502xx" />
@@ -9230,7 +9230,7 @@ more investigation needed...
 
 	<software name="bofj" cloneof="bof">
 		<!-- Notes: Also re-released through Nintendo Power -->
-		<description>Breath of Fire - Ryuu no Senshi (Japan, Rev. A)</description>
+		<description>Breath of Fire - Ryuu no Senshi (Japan, rev. A)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="SHVC-BF" />
@@ -9442,7 +9442,7 @@ more investigation needed...
 	</software>
 
 	<software name="bsxsore" supported="partial">
-		<description>BS-X - Sore wa Namae o Nusumareta Machi no Monogatari (Japan, Rev. AB)</description>
+		<description>BS-X - Sore wa Namae o Nusumareta Machi no Monogatari (Japan, rev. AB)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-ZBSJ-JPN" />
@@ -9554,7 +9554,7 @@ more investigation needed...
 	</software>
 
 	<software name="bullvsblu" cloneof="bullvsbl">
-		<description>Bulls vs Blazers and the NBA Playoffs (USA, Rev. A)</description>
+		<description>Bulls vs Blazers and the NBA Playoffs (USA, rev. A)</description>
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="SNS-BU-USA-1" />
@@ -10120,7 +10120,7 @@ more investigation needed...
 		</part>
 	</software>
 
-	<software name="chavez"> <!-- todo : cloneof Riddick Bowe Boxing? -->
+	<software name="chavez" cloneof="riddick">
 		<description>Chavez (USA)</description>
 		<year>1994</year>
 		<publisher>ASC Games</publisher>
@@ -10144,7 +10144,7 @@ more investigation needed...
 		</part>
 	</software>
 
-	<software name="chavez2"> <!-- todo : cloneof Boxing Legends of the Ring? -->
+	<software name="chavez2" cloneof="boxinglg">
 		<description>Chavez II (USA)</description>
 		<year>1994</year>
 		<publisher>American Softworks</publisher>
@@ -11048,7 +11048,7 @@ more investigation needed...
 	</software>
 
 	<software name="srobot3">
-		<description>Dai-3-ji Super Robot Taisen (Japan, Rev. B)</description>
+		<description>Dai-3-ji Super Robot Taisen (Japan, rev. B)</description>
 		<year>1993</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="SHVC-RT" />
@@ -11527,7 +11527,7 @@ more investigation needed...
 	</software>
 
 	<software name="derbyjoc">
-		<description>Derby Jockey - Kishu Ou e no Michi (Japan, Rev. A)</description>
+		<description>Derby Jockey - Kishu Ou e no Michi (Japan, rev. A)</description>
 		<year>1994</year>
 		<publisher>Asmik</publisher>
 		<info name="serial" value="SHVC-JQ" />
@@ -11662,7 +11662,7 @@ more investigation needed...
 	</software>
 
 	<software name="dstall3a" cloneof="dstall3">
-		<description>Derby Stallion III (Japan, Rev. B)</description>
+		<description>Derby Stallion III (Japan, rev. B)</description>
 		<year>1995</year>
 		<publisher>ASCII Entertainment</publisher>
 		<info name="serial" value="SHVC-AD3J-JPN-2" />
@@ -11691,7 +11691,7 @@ more investigation needed...
 	</software>
 
 	<software name="dstall3">
-		<description>Derby Stallion III (Japan, Rev. D)</description>
+		<description>Derby Stallion III (Japan, rev. D)</description>
 		<year>1995</year>
 		<publisher>ASCII Entertainment</publisher>
 		<info name="serial" value="SHVC-AD3J-JPN-2" />
@@ -11919,7 +11919,7 @@ more investigation needed...
 	</software>
 
 	<software name="dkongcua" cloneof="dkongc">
-		<description>Donkey Kong Country (USA, Rev. A)</description>
+		<description>Donkey Kong Country (USA, rev. A)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SNS-8X-USA" />
@@ -11946,7 +11946,7 @@ more investigation needed...
 	</software>
 
 	<software name="dkongcu" cloneof="dkongc">
-		<description>Donkey Kong Country (USA, Rev. B)</description>
+		<description>Donkey Kong Country (USA, rev. B)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SNS-8X-USA, SNS-8X-USA-1 (PCMS)" />
@@ -11986,7 +11986,7 @@ more investigation needed...
 	</software>
 
 	<software name="dkongc2">
-		<description>Donkey Kong Country 2 - Diddy's Kong Quest (Europe, Rev. A)</description>
+		<description>Donkey Kong Country 2 - Diddy's Kong Quest (Europe, rev. A)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SNSP-ADNP-FAH" />
@@ -12012,7 +12012,7 @@ more investigation needed...
 	</software>
 
 	<software name="dkongc2g" cloneof="dkongc2">
-		<description>Donkey Kong Country 2 - Diddy's Kong Quest (Germany, Rev. A)</description>
+		<description>Donkey Kong Country 2 - Diddy's Kong Quest (Germany, rev. A)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SNSP-ADNP-EUR" />
@@ -13573,7 +13573,7 @@ more investigation needed...
 	</software>
 
 	<software name="fghthist">
-		<description>Fighter's History (USA, Rev. A)</description>
+		<description>Fighter's History (USA, rev. A)</description>
 		<year>1994</year>
 		<publisher>Data East</publisher>
 		<info name="serial" value="SNS-YH-USA" />
@@ -13648,7 +13648,7 @@ more investigation needed...
 	</software>
 
 	<software name="ffant2">
-		<description>Final Fantasy II (USA, Rev. A)</description>
+		<description>Final Fantasy II (USA, rev. A)</description>
 		<year>1991</year>
 		<publisher>Square</publisher>
 		<info name="serial" value="SNS-F4-USA" />
@@ -13727,7 +13727,7 @@ more investigation needed...
 	</software>
 
 	<software name="ffant4j" cloneof="ffant2">
-		<description>Final Fantasy IV (Japan, Rev. A)</description>
+		<description>Final Fantasy IV (Japan, rev. A)</description>
 		<year>1991</year>
 		<publisher>Square</publisher>
 		<info name="serial" value="SHVC-F4" />
@@ -14633,7 +14633,7 @@ more investigation needed...
 	</software>
 
 	<software name="ggoemon" cloneof="mystninj">
-		<description>Ganbare Goemon - Yuki Hime Kyuushutsu Emaki (Japan, Rev. B)</description>
+		<description>Ganbare Goemon - Yuki Hime Kyuushutsu Emaki (Japan, rev. B)</description>
 		<year>1991</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="SHVC-GG" />
@@ -15879,7 +15879,7 @@ more investigation needed...
 	</software>
 
 	<software name="illtimeg" cloneof="illtime">
-		<description>Illusion of Time (Germany, Rev. A)</description>
+		<description>Illusion of Time (Germany, rev. A)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SNSP-JG-NOE/SFRG" />
@@ -16046,7 +16046,7 @@ more investigation needed...
 	</software>
 
 	<software name="intsensb">
-		<description>International Sensible Soccer - World Champions Limited Edition (Europe, Rev. A)</description>
+		<description>International Sensible Soccer - World Champions Limited Edition (Europe, rev. A)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
 		<info name="serial" value="SNSP-8S-UKV-1" />
@@ -16298,7 +16298,7 @@ more investigation needed...
 	</software>
 
 	<software name="jlprime">
-		<description>J.League Soccer Prime Goal (Japan, Rev. A)</description>
+		<description>J.League Soccer Prime Goal (Japan, rev. A)</description>
 		<year>1993</year>
 		<publisher>Namco</publisher>
 		<info name="serial" value="SHVC-JE" />
@@ -16710,7 +16710,7 @@ more investigation needed...
 	</software>
 
 	<software name="powyak96">
-		<description>Jikkyou Powerful Pro Yakyuu '96 - Kaimaku Ban (Japan, Rev. A)</description>
+		<description>Jikkyou Powerful Pro Yakyuu '96 - Kaimaku Ban (Japan, rev. A)</description>
 		<year>1996</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="SHVC-A57J-JPN" />
@@ -16765,7 +16765,7 @@ more investigation needed...
 	</software>
 
 	<software name="jikksocr">
-		<description>Jikkyou World Soccer - Perfect Eleven (Japan, Rev. A)</description>
+		<description>Jikkyou World Soccer - Perfect Eleven (Japan, rev. A)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="SHVC-3U" />
@@ -17053,7 +17053,7 @@ more investigation needed...
 	</software>
 
 	<software name="jparku" cloneof="jpark">
-		<description>Jurassic Park (USA, Rev. A)</description>
+		<description>Jurassic Park (USA, rev. A)</description>
 		<year>1993</year>
 		<publisher>Ocean</publisher>
 		<info name="serial" value="SNS-J8-USA" />
@@ -17821,7 +17821,7 @@ more investigation needed...
 	</software>
 
 	<software name="krustyfhu" cloneof="krustyfh"> <!-- doesn't work on snes-ntsc, works on snespal -->
-		<description>Krusty's Super Fun House (USA, Rev. A)</description>
+		<description>Krusty's Super Fun House (USA, rev. A)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="SNS-FH-USA" />
@@ -19279,7 +19279,7 @@ more investigation needed...
 	</software>
 
 	<software name="mickeym1" cloneof="mickeymq">
-		<description>Mickey no Magical Adventure (Japan, Rev. A)</description>
+		<description>Mickey no Magical Adventure (Japan, rev. A)</description>
 		<year>1992</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="SHVC-MI" />
@@ -19582,7 +19582,7 @@ more investigation needed...
 	</software>
 
 	<software name="monopoly">
-		<description>Monopoly (USA, Rev. A)</description>
+		<description>Monopoly (USA, rev. A)</description>
 		<year>1992</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="SNS-ML-USA" />
@@ -19707,7 +19707,7 @@ more investigation needed...
 	</software>
 
 	<software name="mk2">
-		<description>Mortal Kombat II (Europe, Rev. A)</description>
+		<description>Mortal Kombat II (Europe, rev. A)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="SNSP-28-EUR" />
@@ -19996,7 +19996,7 @@ more investigation needed...
 	</software>
 
 	<software name="nbajamte">
-		<description>NBA Jam - Tournament Edition (Europe)</description>
+		<description>NBA Jam T.E. - Tournament Edition (Europe)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="SNSP-AJTP-EUR" />
@@ -20152,7 +20152,7 @@ more investigation needed...
 	</software>
 
 	<software name="n3dgaugua" cloneof="n3dgaugu">
-		<description>New 3D Golf Simulation - Harukanaru Augusta (Japan, Rev. 0A)</description>
+		<description>New 3D Golf Simulation - Harukanaru Augusta (Japan, rev. 0A)</description>
 		<year>1991</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="serial" value="SHVC-GA" />
@@ -20179,7 +20179,7 @@ more investigation needed...
 	</software>
 
 	<software name="n3dgaugu">
-		<description>New 3D Golf Simulation - Harukanaru Augusta (Japan, Rev. B)</description>
+		<description>New 3D Golf Simulation - Harukanaru Augusta (Japan, rev. B)</description>
 		<year>1991</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="serial" value="SHVC-GA" />
@@ -20405,7 +20405,7 @@ more investigation needed...
 	</software>
 
 	<software name="nhl97">
-		<description>NHL '97 (Europe, Rev. A)</description>
+		<description>NHL '97 (Europe, rev. A)</description>
 		<year>1996</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="SNSP-AH7P-EUR" />
@@ -20703,7 +20703,7 @@ more investigation needed...
 	</software>
 
 	<software name="nobuhao">
-		<description>Nobunaga no Yabou - Haouden (Japan, Rev. A)</description>
+		<description>Nobunaga no Yabou - Haouden (Japan, rev. A)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="SHVC-NK" />
@@ -21230,7 +21230,7 @@ more investigation needed...
 	</software>
 
 	<software name="parlmini">
-		<description>Parlor! Mini - Pachinko Jikki Simulation Game (Japan, Rev. A)</description>
+		<description>Parlor! Mini - Pachinko Jikki Simulation Game (Japan, rev. A)</description>
 		<year>1996</year>
 		<publisher>Nihon Telenet</publisher>
 		<info name="serial" value="SHVC-AQAJ-JPN and SHVC-AQAJ-JPN-1" />
@@ -22846,7 +22846,7 @@ more investigation needed...
 	</software>
 
 	<software name="romsaga">
-		<description>Romancing Sa-Ga (Japan, Rev. A)</description>
+		<description>Romancing Sa-Ga (Japan, rev. A)</description>
 		<year>1992</year>
 		<publisher>Square</publisher>
 		<info name="serial" value="SHVC-RS" />
@@ -22956,7 +22956,7 @@ more investigation needed...
 	</software>
 
 	<software name="romsaga3">
-		<description>Romancing Sa-Ga 3 (Japan, Rev. A)</description>
+		<description>Romancing Sa-Ga 3 (Japan, rev. A)</description>
 		<year>1995</year>
 		<publisher>Square</publisher>
 		<info name="serial" value="SHVC-AL3J-JPN" />
@@ -23997,7 +23997,7 @@ more investigation needed...
 	</software>
 
 	<software name="shinmtif">
-		<description>Shin Megami Tensei if... (Japan, Rev. A)</description>
+		<description>Shin Megami Tensei if... (Japan, rev. A)</description>
 		<year>1994</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="SHVC-AMXJ-JPN-1" />
@@ -24052,7 +24052,7 @@ more investigation needed...
 	</software>
 
 	<software name="shinmt2">
-		<description>Shin Megami Tensei II (Japan, Rev. B)</description>
+		<description>Shin Megami Tensei II (Japan, rev. B)</description>
 		<year>1994</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="SHVC-ZE-2" />
@@ -24473,7 +24473,7 @@ more investigation needed...
 	</software>
 
 	<software name="simearthj" cloneof="simearth">
-		<description>SimEarth - The Living Planet (Japan, Rev. A)</description>
+		<description>SimEarth - The Living Planet (Japan, rev. A)</description>
 		<year>1991</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="SHVC-SE" />
@@ -25085,7 +25085,7 @@ more investigation needed...
 	</software>
 
 	<software name="starfox" cloneof="starwing">
-		<description>Star Fox (USA, Rev. B)</description>
+		<description>Star Fox (USA, rev. B)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SNS-FO-USA" />
@@ -25187,7 +25187,7 @@ more investigation needed...
 	</software>
 
 	<software name="starwing">
-		<description>Starwing (Europe, Rev. A)</description>
+		<description>Starwing (Europe, rev. A)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SNSP-FO-FAH" />
@@ -25429,7 +25429,7 @@ more investigation needed...
 	</software>
 
 	<software name="sf2t">
-		<description>Street Fighter II Turbo - Hyper Fighting (Europe, Rev. A)</description>
+		<description>Street Fighter II Turbo - Hyper Fighting (Europe, rev. A)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="SNSP-TI-NOE" />
@@ -26275,7 +26275,7 @@ more investigation needed...
 	</software>
 
 	<software name="dkongcj" cloneof="dkongc">
-		<description>Super Donkey Kong (Japan, Rev. A)</description>
+		<description>Super Donkey Kong (Japan, rev. A)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-8X / G728314" />
@@ -26359,7 +26359,7 @@ more investigation needed...
 	</software>
 
 	<software name="dkongc2j" cloneof="dkongc2">
-		<description>Super Donkey Kong 2 - Dixie &amp; Diddy (Japan, Rev. A)</description>
+		<description>Super Donkey Kong 2 - Dixie &amp; Diddy (Japan, rev. A)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-ADNJ-JPN / G740814, SHVC-ADNJ-JPN-1 / G743669" />
@@ -26387,7 +26387,7 @@ more investigation needed...
 	</software>
 
 	<software name="dkongc2j1" cloneof="dkongc2">
-		<description>Super Donkey Kong 2 - Dixie &amp; Diddy (Japan, Rev. A, alt)</description>
+		<description>Super Donkey Kong 2 - Dixie &amp; Diddy (Japan, rev. A, alt)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-ADNJ-JPN-1 / G743669" />
@@ -26444,7 +26444,7 @@ more investigation needed...
 	</software>
 
 	<software name="dkongc3j" cloneof="dkongc3">
-		<description>Super Donkey Kong 3 - Nazo no Krems-tou (Japan, Rev. A)</description>
+		<description>Super Donkey Kong 3 - Nazo no Krems-tou (Japan, rev. A)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-A3CJ-JPN" />
@@ -26723,7 +26723,7 @@ more investigation needed...
 	</software>
 
 	<software name="sfamist4">
-		<description>Super Famista 4 (Japan, Rev. A)</description>
+		<description>Super Famista 4 (Japan, rev. A)</description>
 		<year>1995</year>
 		<publisher>Namco</publisher>
 		<info name="serial" value="SHVC-AF4J-JPN" />
@@ -27116,7 +27116,7 @@ more investigation needed...
 	</software>
 
 	<software name="sgboy">
-		<description>Super Game Boy (World, Rev. B)</description>
+		<description>Super Game Boy (World, rev. B)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SNSP-A-SG(FAH), SNS-A-SG, SHVC-SGB" /> <!-- Notes: respectively EU, US, JP -->
@@ -27404,7 +27404,7 @@ more investigation needed...
 	</software>
 
 	<software name="sjinsei">
-		<description>Super Jinsei Game (Japan, Rev. A)</description>
+		<description>Super Jinsei Game (Japan, rev. A)</description>
 		<year>1994</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="SHVC-LG" />
@@ -27719,7 +27719,7 @@ more investigation needed...
 	</software>
 
 	<software name="supermjtd" cloneof="supermjt">
-		<description>Super Mahjong Taikai (Japan, Rev. A)</description>
+		<description>Super Mahjong Taikai (Japan, rev. A)</description>
 		<year>1992</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="SHVC-IQ" />
@@ -27964,7 +27964,7 @@ more investigation needed...
 
 	<software name="smkart">
 		<!-- Revision A, with DSP firmware update -->
-		<description>Super Mario Kart (Europe, Rev. A)</description>
+		<description>Super Mario Kart (Europe, rev. A)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SNSP-MK-EUR" />
@@ -28027,7 +28027,7 @@ more investigation needed...
 
 	<software name="smkartj" cloneof="smkart">
 		<!-- Revision A, with DSP firmware update -->
-		<description>Super Mario Kart (Japan, Rev. A)</description>
+		<description>Super Mario Kart (Japan, rev. A)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-MK" />
@@ -28165,7 +28165,7 @@ more investigation needed...
 	</software>
 
 	<software name="smw">
-		<description>Super Mario World (Europe, Rev. A)</description>
+		<description>Super Mario World (Europe, rev. A)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SNSP-MW-FAH, SNSP-MW-FAH-1, SNSP-MW-NOE, SNSP-MW-NOE-1" />
@@ -28297,7 +28297,7 @@ more investigation needed...
 	</software>
 
 	<software name="smw2u" cloneof="smw2">
-		<description>Super Mario World 2 - Yoshi's Island (USA, HK, Rev. A)</description>
+		<description>Super Mario World 2 - Yoshi's Island (USA, Hong Kong, rev. A)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SNS-YI-USA, SNSN-YI-HKG" />
@@ -28503,7 +28503,7 @@ more investigation needed...
 	</software>
 
 	<software name="smomo3a" cloneof="smomo3">
-		<description>Super Momotarou Dentetsu III (Japan, Rev. A)</description>
+		<description>Super Momotarou Dentetsu III (Japan, rev. A)</description>
 		<year>1994</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="SHVC-AMDJ-JPN" />
@@ -28530,7 +28530,7 @@ more investigation needed...
 	</software>
 
 	<software name="smomo3">
-		<description>Super Momotarou Dentetsu III (Japan, Rev. B)</description>
+		<description>Super Momotarou Dentetsu III (Japan, rev. B)</description>
 		<year>1994</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="SHVC-AMDJ-JPN" />
@@ -28871,7 +28871,7 @@ more investigation needed...
 	</software>
 
 	<software name="spinbalu" cloneof="spinbal">
-		<description>Super Pinball - Behind the Mask (USA, Rev. A)</description>
+		<description>Super Pinball - Behind the Mask (USA, rev. A)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SNS-XP-USA-2" />
@@ -29093,7 +29093,7 @@ more investigation needed...
 	</software>
 
 	<software name="spuyopa" cloneof="spuyop">
-		<description>Super Puyo Puyo (Japan, Rev. A)</description>
+		<description>Super Puyo Puyo (Japan, rev. A)</description>
 		<year>1993</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="SHVC-PQ" />
@@ -29115,7 +29115,7 @@ more investigation needed...
 	</software>
 
 	<software name="spuyop">
-		<description>Super Puyo Puyo (Japan, Rev. B)</description>
+		<description>Super Puyo Puyo (Japan, rev. B)</description>
 		<year>1993</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="SHVC-PQ" />
@@ -29304,7 +29304,7 @@ more investigation needed...
 	</software>
 
 	<software name="sangoku2" cloneof="roman3k2">
-		<description>Super Sangokushi II (Japan, Rev. A)</description>
+		<description>Super Sangokushi II (Japan, rev. A)</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="SHVC-XL / SHVC-XL-1" />
@@ -29494,7 +29494,7 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="jediu" cloneof="jedi">
-		<description>Super Star Wars - Return of the Jedi (USA, Rev. A)</description>
+		<description>Super Star Wars - Return of the Jedi (USA, rev. A)</description>
 		<year>1994</year>
 		<publisher>JVC</publisher>
 		<info name="serial" value="SNS-ARJE-USA" />
@@ -29515,7 +29515,7 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="esb">
-		<description>Super Star Wars - The Empire Strikes Back (Europe, Rev. A)</description>
+		<description>Super Star Wars - The Empire Strikes Back (Europe, rev. A)</description>
 		<year>1993</year>
 		<publisher>JVC</publisher>
 		<info name="serial" value="SNSP-E5-EUR" />
@@ -29577,7 +29577,7 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="starwars">
-		<description>Super Star Wars (Europe, Rev. A)</description>
+		<description>Super Star Wars (Europe, rev. A)</description>
 		<year>1992</year>
 		<publisher>JVC</publisher>
 		<info name="serial" value="SNSP-V4-EUR" />
@@ -29617,7 +29617,7 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="starwarsu" cloneof="starwars">
-		<description>Super Star Wars (USA, Rev. A)</description>
+		<description>Super Star Wars (USA, rev. A)</description>
 		<year>1992</year>
 		<publisher>JVC</publisher>
 		<info name="serial" value="SNS-V4-USA-1 (PCMS), SNS-V4-USA-2 (ESRB: Everyone)" />
@@ -29745,7 +29745,7 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="stennis">
-		<description>Super Tennis (Europe, Rev. A)</description>
+		<description>Super Tennis (Europe, rev. A)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SNSP-ST-NOE" />
@@ -29948,7 +29948,7 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="superuno">
-		<description>Super Uno (Japan, Rev. A)</description>
+		<description>Super Uno (Japan, rev. A)</description>
 		<year>1993</year>
 		<publisher>Tomy</publisher>
 		<info name="serial" value="SHVC-UN" />
@@ -30380,7 +30380,7 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="tazmaniau" cloneof="tazmania">
-		<description>Taz-Mania (USA, Rev. A)</description>
+		<description>Taz-Mania (USA, rev. A)</description>
 		<year>1993</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="SNS-TZ-USA" />
@@ -30481,7 +30481,7 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="tecmonbaj" cloneof="tecmonba">
-		<description>Tecmo Super NBA Basketball (Japan, Rev. A)</description>
+		<description>Tecmo Super NBA Basketball (Japan, rev. A)</description>
 		<year>1992</year>
 		<publisher>Tecmo</publisher>
 		<info name="serial" value="SHVC-NA" />
@@ -30689,7 +30689,7 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="teikets2" cloneof="pto2">
-		<description>Teitoku no Ketsudan II (Japan, Rev. A)</description>
+		<description>Teitoku no Ketsudan II (Japan, rev. A)</description>
 		<year>1995</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="SHVC-ATEJ-JPN" />
@@ -31148,7 +31148,7 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="ttoonadv" cloneof="ttoonbbl">
-		<description>Tiny Toon Adventures (Japan, Rev. A)</description>
+		<description>Tiny Toon Adventures (Japan, rev. A)</description>
 		<year>1992</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="SHVC-TA" />
@@ -31210,7 +31210,7 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="tokimeki">
-		<description>Tokimeki Memorial - Densetsu no Ki no Shita de (Japan, Rev. A)</description>
+		<description>Tokimeki Memorial - Densetsu no Ki no Shita de (Japan, rev. A)</description>
 		<year>1996</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="SHVC-AM8J-JPN" />
@@ -31373,7 +31373,7 @@ Alternate board (XL-1)
 
 	<software name="torneko">
 		<!-- Notes: Also re-released through Nintendo Power -->
-		<description>Torneko no Daibouken - Fushigi no Dungeon (Japan, Rev. A)</description>
+		<description>Torneko no Daibouken - Fushigi no Dungeon (Japan, rev. A)</description>
 		<year>1993</year>
 		<publisher>Chunsoft</publisher>
 		<info name="serial" value="SHVC-TQ" />
@@ -32413,7 +32413,7 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="winpost">
-		<description>Winning Post (Japan, Rev. A)</description>
+		<description>Winning Post (Japan, rev. A)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="SHVC-WJ" />
@@ -33272,7 +33272,7 @@ Alternate board (XL-1)
 
 	<software name="zelda3ja" cloneof="zelda3">
 		<!-- Notes: Also re-released through Nintendo Power -->
-		<description>Zelda no Densetsu - Kamigami no Triforce (Japan, Rev. A)</description>
+		<description>Zelda no Densetsu - Kamigami no Triforce (Japan, rev. A)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-ZL" />
@@ -33300,7 +33300,7 @@ Alternate board (XL-1)
 
 	<software name="zelda3j" cloneof="zelda3">
 		<!-- Notes: Also re-released through Nintendo Power -->
-		<description>Zelda no Densetsu - Kamigami no Triforce (Japan, Rev. B)</description>
+		<description>Zelda no Densetsu - Kamigami no Triforce (Japan, rev. B)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-ZL" />
@@ -33447,7 +33447,7 @@ Alternate board (XL-1)
 
 	<software name="deathretu" cloneof="deathret">
 		<!-- single cartridge source: byuu -->
-		<description>The Death and Return of Superman (USA, Rev. A)</description>
+		<description>The Death and Return of Superman (USA, rev. A)</description>
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="M/SNS-9D-LTN" />
@@ -33469,7 +33469,7 @@ Alternate board (XL-1)
 
 	<software name="dkongc">
 		<!-- single cartridge source: Badablek -->
-		<description>Donkey Kong Country (Europe, Rev. A)</description>
+		<description>Donkey Kong Country (Europe, rev. A)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SNSP-ADNP-FAH" />
@@ -33495,7 +33495,7 @@ Alternate board (XL-1)
 
 	<software name="doraemon">
 		<!-- single cartridge source: ototo -->
-		<description>Doraemon - Nobita to Yousei no Kuni (Japan, Rev. A)</description>
+		<description>Doraemon - Nobita to Yousei no Kuni (Japan, rev. A)</description>
 		<year>1993</year>
 		<publisher>Epoch</publisher>
 		<info name="serial" value="SHVC-DR" />
@@ -33517,7 +33517,7 @@ Alternate board (XL-1)
 
 	<software name="estpolisa" cloneof="lufia">
 		<!-- single cartridge source: eyedunno -->
-		<description>Estpolis Denki (Japan, Rev. A)</description>
+		<description>Estpolis Denki (Japan, rev. A)</description>
 		<year>1993</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="SHVC-ES" />
@@ -33588,7 +33588,7 @@ Alternate board (XL-1)
 
 	<software name="garou" cloneof="fatfury">
 		<!-- single cartridge source: Yakushi~Kabuto -->
-		<description>Garou Densetsu - Shukumei no Tatakai (Japan, Rev. A)</description>
+		<description>Garou Densetsu - Shukumei no Tatakai (Japan, rev. A)</description>
 		<year>1992</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="SHVC-GN" />
@@ -33614,7 +33614,7 @@ Alternate board (XL-1)
 
 	<software name="granhist">
 		<!-- single cartridge source: bigfred -->
-		<description>Granhistoria - Genshi Sekaiki (Japan, Rev. A)</description>
+		<description>Granhistoria - Genshi Sekaiki (Japan, rev. A)</description>
 		<year>1995</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="SHVC-AIRJ-JPN" />
@@ -33642,7 +33642,7 @@ Alternate board (XL-1)
 
 	<software name="hakprogl" cloneof="extrainn">
 		<!-- single cartridge source: Yakushi~Kabuto -->
-		<description>Hakunetsu Pro Yakyuu - Ganba League (Japan, Rev. A)</description>
+		<description>Hakunetsu Pro Yakyuu - Ganba League (Japan, rev. A)</description>
 		<year>1991</year>
 		<publisher>Epic / Sony Records</publisher>
 		<info name="serial" value="SHVC-GL (ESPG38)" />
@@ -33669,7 +33669,7 @@ Alternate board (XL-1)
 
 	<software name="haoutryu">
 		<!-- single cartridge source: Yakushi~Kabuto -->
-		<description>Haou Taikei Ryuu Knight - Lord of Paladin (Japan, Rev. A)</description>
+		<description>Haou Taikei Ryuu Knight - Lord of Paladin (Japan, rev. A)</description>
 		<year>1994</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SHVC-UR" />
@@ -33699,7 +33699,7 @@ Alternate board (XL-1)
 
 	<software name="kirbysd" cloneof="kirbyfun">
 		<!-- single cartridge source: The Dumper (supplier: Y~K) -->
-		<description>Hoshi no Kirby - Super Deluxe (Japan, Rev. B)</description>
+		<description>Hoshi no Kirby - Super Deluxe (Japan, rev. B)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-AKFJ-JPN / G744105" />
@@ -33747,7 +33747,7 @@ Alternate board (XL-1)
 
 	<software name="jlexct94" cloneof="sshotout">
 		<!-- single cartridge source: Yakushi~Kabuto -->
-		<description>J.League Excite Stage '94 (Japan, Rev. A)</description>
+		<description>J.League Excite Stage '94 (Japan, rev. A)</description>
 		<year>1994</year>
 		<publisher>Epoch</publisher>
 		<info name="serial" value="SHVC-JL" />
@@ -33777,7 +33777,7 @@ Alternate board (XL-1)
 
 	<software name="powyak2a" cloneof="powyak2">
 		<!-- single cartridge source: Yakushi~Kabuto -->
-		<description>Jikkyou Powerful Pro Yakyuu 2 (Japan, Rev. A)</description>
+		<description>Jikkyou Powerful Pro Yakyuu 2 (Japan, rev. A)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="SHVC-AP2J-JPN" />
@@ -33910,7 +33910,7 @@ Alternate board (XL-1)
 
 	<software name="kengriff">
 		<!-- single cartridge source: byuu -->
-		<description>Ken Griffey Jr. Presents Major League Baseball (USA, Rev. A)</description>
+		<description>Ken Griffey Jr. Presents Major League Baseball (USA, rev. A)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SNS-JR-USA" />
@@ -33938,7 +33938,7 @@ Alternate board (XL-1)
 
 	<software name="larrynix" cloneof="tnnbass">
 		<!-- single cartridge source: Yakushi~Kabuto -->
-		<description>Larry Nixon's Super Bass Fishing (Japan, Rev. A)</description>
+		<description>Larry Nixon's Super Bass Fishing (Japan, rev. A)</description>
 		<year>1994</year>
 		<publisher>King Records</publisher>
 		<info name="serial" value="SHVC-QJ (KIS-4)" />
@@ -33969,7 +33969,7 @@ Alternate board (XL-1)
 
 	<software name="mickeymq">
 		<!-- single cartridge source: badablek -->
-		<description>The Magical Quest Starring Mickey Mouse (Europe, Rev. A)</description>
+		<description>The Magical Quest Starring Mickey Mouse (Europe, rev. A)</description>
 		<year>1992</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="SNSP-MI-FAH" />
@@ -34030,7 +34030,7 @@ Alternate board (XL-1)
 
 	<software name="haruaug3" supported="partial">
 		<!-- single cartridge source: The Dumper (supplier: Y~K) -->
-		<description>Masters New - Harukanaru Augusta 3 (Japan, Rev. A)</description>
+		<description>Masters New - Harukanaru Augusta 3 (Japan, rev. A)</description>
 		<year>1993</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="serial" value="SHVC-AO3J-JPN" />
@@ -34080,7 +34080,7 @@ Alternate board (XL-1)
 		<!-- single cartridge source: Badablek -->
 		<!-- Notes: this cartridge contains the version 1.1 of the rom and an overlay 32k patch which upgrades it to version 1.2
 		            we don't know if there is a revision which consists of the version 1.1 rom only, without the patch -->
-		<description>Mortal Kombat (Europe, Rev. A)</description>
+		<description>Mortal Kombat (Europe, rev. A)</description>
 		<year>1993</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="SNSP-KX-UKV" />
@@ -34107,7 +34107,7 @@ Alternate board (XL-1)
 
 	<software name="nhl97ua" cloneof="nhl97">
 		<!-- single cartridge source: badinsults -->
-		<description>NHL '97 (USA, Rev. A)</description>
+		<description>NHL '97 (USA, rev. A)</description>
 		<year>1996</year>
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="M/SNS-AH7E-USA" />
@@ -34163,7 +34163,7 @@ Alternate board (XL-1)
 
 	<software name="mjkiwame">
 		<!-- single cartridge source: badinsults -->
-		<description>Pro Mahjong Kiwame (Japan, Rev. A)</description>
+		<description>Pro Mahjong Kiwame (Japan, rev. A)</description>
 		<year>1993</year>
 		<publisher>Athena</publisher>
 		<info name="serial" value="SHVC-ZZ" />
@@ -34186,7 +34186,7 @@ Alternate board (XL-1)
 
 	<software name="mvpbb">
 		<!-- single cartridge source: FitzRoy -->
-		<description>Roger Clemens' MVP Baseball (USA, Rev. A)</description>
+		<description>Roger Clemens' MVP Baseball (USA, rev. A)</description>
 		<year>1992</year>
 		<publisher>LJN</publisher>
 		<info name="serial" value="SNS-VP-USA" />
@@ -34207,7 +34207,7 @@ Alternate board (XL-1)
 
 	<software name="manaf" cloneof="mana">
 		<!-- single cartridge source: badablek -->
-		<description>Secret of Mana (France, Rev. A)</description>
+		<description>Secret of Mana (France, rev. A)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SNSP-K2-FRA/SFRA" />
@@ -34234,7 +34234,7 @@ Alternate board (XL-1)
 
 	<software name="shangban">
 		<!-- single cartridge source: Yakushi~Kabuto -->
-		<description>Shanghai - Banri no Choujou (Japan, Rev. A)</description>
+		<description>Shanghai - Banri no Choujou (Japan, rev. A)</description>
 		<year>1995</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="SHVC-A4SJ-JPN" />
@@ -34257,7 +34257,7 @@ Alternate board (XL-1)
 	<software name="shinmomo">
 		<!-- single cartridge source: bigfred -->
 		<!-- Notes: Also re-released through Nintendo Power -->
-		<description>Shin Momotarou Densetsu (Japan, Rev. A)</description>
+		<description>Shin Momotarou Densetsu (Japan, rev. A)</description>
 		<year>1992</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="SHVC-M5-1" />
@@ -34285,7 +34285,7 @@ Alternate board (XL-1)
 
 	<software name="sf2tu" cloneof="sf2t">
 		<!-- single cartridge source: nitro322 -->
-		<description>Street Fighter II Turbo - Hyper Fighting (USA, Rev. A)</description>
+		<description>Street Fighter II Turbo - Hyper Fighting (USA, rev. A)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="SNS-TI-USA" />
@@ -34309,7 +34309,7 @@ Alternate board (XL-1)
 
 	<software name="sracer">
 		<!-- single cartridge source: Tori -->
-		<description>Street Racer (Europe, Rev. A)</description>
+		<description>Street Racer (Europe, rev. A)</description>
 		<year>1994</year>
 		<publisher>Ubi Soft</publisher>
 		<info name="serial" value="SNSP-ASRP-EUR" />
@@ -34329,7 +34329,7 @@ Alternate board (XL-1)
 
 	<software name="fireprws">
 		<!-- single cartridge source: Yakushi~Kabuto -->
-		<description>Super Fire Pro Wrestling Special (Japan, Rev. A)</description>
+		<description>Super Fire Pro Wrestling Special (Japan, rev. A)</description>
 		<year>1994</year>
 		<publisher>Human Entertainment</publisher>
 		<info name="serial" value="SHVC-AP4J-JPN" />
@@ -34357,7 +34357,7 @@ Alternate board (XL-1)
 
 	<software name="sjinsei2">
 		<!-- single cartridge source: badinsults -->
-		<description>Super Jinsei Game 2 (Japan, Rev. B)</description>
+		<description>Super Jinsei Game 2 (Japan, rev. B)</description>
 		<year>1995</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="SHVC-AL2J-JPN" />
@@ -34385,7 +34385,7 @@ Alternate board (XL-1)
 
 	<software name="superkyo">
 		<!-- single cartridge source: JohnDie -->
-		<description>Super Kyoutei (Japan, Rev. A)</description>
+		<description>Super Kyoutei (Japan, rev. A)</description>
 		<year>1995</year>
 		<publisher>Nichibutsu</publisher>
 		<info name="serial" value="SHVC-AKYJ-JPN" />
@@ -34415,7 +34415,7 @@ Alternate board (XL-1)
 
 	<software name="supermj2">
 		<!-- single cartridge source: Yakushi~Kabuto -->
-		<description>Super Mahjong 2 - Honkaku 4-nin Uchi! (Japan, Rev. A)</description>
+		<description>Super Mahjong 2 - Honkaku 4-nin Uchi! (Japan, rev. A)</description>
 		<year>1993</year>
 		<publisher>I'Max</publisher>
 		<info name="serial" value="SHVC-2A" />
@@ -34443,7 +34443,7 @@ Alternate board (XL-1)
 
 	<software name="supermjta" cloneof="supermjt">
 		<!-- single cartridge source: Yakushi~Kabuto -->
-		<description>Super Mahjong Taikai (Japan, Rev. D)</description>
+		<description>Super Mahjong Taikai (Japan, rev. D)</description>
 		<year>1992</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="SHVC-IQ" />
@@ -34471,7 +34471,7 @@ Alternate board (XL-1)
 
 	<software name="nobubufu" cloneof="nobuldrk">
 		<!-- single cartridge source: Yakushi~Kabuto -->
-		<description>Super Nobunaga no Yabou - Bushou Fuuunroku (Japan, Rev. A)</description>
+		<description>Super Nobunaga no Yabou - Bushou Fuuunroku (Japan, rev. A)</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="SHVC-IZ" />
@@ -34499,7 +34499,7 @@ Alternate board (XL-1)
 
 	<software name="sshogi">
 		<!-- single cartridge source: badinsults -->
-		<description>Super Shougi (Japan, Rev. A)</description>
+		<description>Super Shougi (Japan, rev. A)</description>
 		<year>1992</year>
 		<publisher>I'Max</publisher>
 		<info name="serial" value="SHVC-SD" />
@@ -34527,7 +34527,7 @@ Alternate board (XL-1)
 
 	<software name="stetris2">
 		<!-- single cartridge source: Yakushi~Kabuto -->
-		<description>Super Tetris 2 + Bombliss (Japan, Rev. A)</description>
+		<description>Super Tetris 2 + Bombliss (Japan, rev. A)</description>
 		<year>1992</year>
 		<publisher>Bullet-Proof Software</publisher>
 		<info name="serial" value="SHVC-T2" />
@@ -34555,7 +34555,7 @@ Alternate board (XL-1)
 
 	<software name="swordwl2">
 		<!-- single cartridge source: bigfred -->
-		<description>Sword World SFC 2 - Inishie no Kyojin Densetsu (Japan, Rev. A)</description>
+		<description>Sword World SFC 2 - Inishie no Kyojin Densetsu (Japan, rev. A)</description>
 		<year>1994</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="serial" value="SHVC-7M" />
@@ -34624,7 +34624,7 @@ Alternate board (XL-1)
 
 	<software name="wwfroyal">
 		<!-- single cartridge source: RedScorpion -->
-		<description>WWF Royal Rumble (Europe, Rev. A)</description>
+		<description>WWF Royal Rumble (Europe, rev. A)</description>
 		<year>1993</year>
 		<publisher>LJN</publisher>
 		<info name="serial" value="SNSP-WU-FAH-1" />
@@ -34663,7 +34663,7 @@ Alternate board (XL-1)
 
 	<software name="yokoms">
 		<!-- single cartridge source: Yakushi~Kabuto -->
-		<description>Yokoyama Mitsuteru Sangokushi (Japan, Rev. A)</description>
+		<description>Yokoyama Mitsuteru Sangokushi (Japan, rev. A)</description>
 		<year>1992</year>
 		<publisher>Angel</publisher>
 		<info name="serial" value="SHVC-3G" />
@@ -35227,7 +35227,7 @@ List of unclassified roms
 	</software>
 
 	<software name="airmanag" cloneof="aerobiz">
-		<description>Air Management - Oozora ni Kakeru (Japan, Rev. A)</description>
+		<description>Air Management - Oozora ni Kakeru (Japan, rev. A)</description>
 		<year>1992</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="SHVC-AL" />
@@ -35244,7 +35244,7 @@ List of unclassified roms
 	</software>
 
 	<software name="ajmajonmnp" cloneof="ajmajonm">
-		<description>Akagawa Jirou Majo-tachi no Nemuri (Japan, Rev. A, NP)</description>
+		<description>Akagawa Jirou Majo-tachi no Nemuri (Japan, rev. A, Nintendo Power service)</description>
 		<year>1995</year>
 		<publisher>Pack-In-Video</publisher>
 		<info name="serial" value="SHVC-AAMJ" />
@@ -36264,7 +36264,7 @@ List of unclassified roms
 	</software>
 
 	<software name="battlety">
-		<description>Battle Tycoon - Flash Hiders SFX (Japan, Rev. A)</description>
+		<description>Battle Tycoon - Flash Hiders SFX (Japan, rev. A)</description>
 		<year>1995</year>
 		<publisher>Right Stuff</publisher>
 		<info name="serial" value="SHVC-AFHJ-JPN" />
@@ -36640,7 +36640,7 @@ List of unclassified roms
 	</software>
 
 	<software name="suchipai">
-		<description>Bishoujo Janshi Suchie-Pai (Japan, Rev. A)</description>
+		<description>Bishoujo Janshi Suchie-Pai (Japan, rev. A)</description>
 		<year>1993</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="SHVC-JS" />
@@ -36845,7 +36845,7 @@ List of unclassified roms
 	</software>
 
 	<software name="bokujom" cloneof="harvmoon">
-		<description>Bokujou Monogatari (Japan, Rev. A)</description>
+		<description>Bokujou Monogatari (Japan, rev. A)</description>
 		<year>1996</year>
 		<publisher>Pack-In-Video</publisher>
 		<info name="serial" value="SHVC-AYWJ-JPN" />
@@ -37077,7 +37077,7 @@ List of unclassified roms
 	</software>
 
 	<software name="bof2jnp" cloneof="bof2">
-		<description>Breath of Fire II (Japan, Rev. A, NP)</description>
+		<description>Breath of Fire II (Japan, rev. A, Nintendo Power service)</description>
 		<year>1994</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="SHVC-AF2J-JPN" />
@@ -37195,7 +37195,7 @@ List of unclassified roms
 	</software>
 
 	<software name="bullvsbl">
-		<description>Bulls vs Blazers and the NBA Playoffs (Europe, Rev. A)</description>
+		<description>Bulls vs Blazers and the NBA Playoffs (Europe, rev. A)</description>
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="snes_cart">
@@ -37533,7 +37533,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="chavezp" cloneof="chavez">
+	<software name="chavezp" cloneof="riddick">
 		<description>Chavez (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>ASC Games</publisher>
@@ -37964,7 +37964,7 @@ List of unclassified roms
 	</software>
 
 	<software name="columns">
-		<description>Columns (Japan, NP)</description>
+		<description>Columns (Japan, Nintendo Power service)</description>
 		<year>1999</year>
 		<publisher>Media Factory</publisher>
 		<info name="serial" value="SHVC-BCLJ-JPN" />
@@ -38278,7 +38278,7 @@ List of unclassified roms
 	</software>
 
 	<software name="srobot3a" cloneof="srobot3">
-		<description>Dai-3-ji Super Robot Taisen (Japan, Rev. A)</description>
+		<description>Dai-3-ji Super Robot Taisen (Japan, rev. A)</description>
 		<year>1993</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="SHVC-RT" />
@@ -38314,7 +38314,7 @@ List of unclassified roms
 	</software>
 
 	<software name="srobot4">
-		<description>Dai-4-ji Super Robot Taisen (Japan, Rev. A)</description>
+		<description>Dai-4-ji Super Robot Taisen (Japan, rev. A)</description>
 		<year>1995</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="SHVC-AR4J-JPN" />
@@ -38332,7 +38332,7 @@ List of unclassified roms
 	</software>
 
 	<software name="daibakjznp" cloneof="daibakjz">
-		<description>Daibakushou Jinsei Gekijou - Zukkoke Salaryman Hen (Japan, Rev. A, NP)</description>
+		<description>Daibakushou Jinsei Gekijou - Zukkoke Salaryman Hen (Japan, rev. A, Nintendo Power service)</description>
 		<year>1995</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="SHVC-AZSJ-JPN" />
@@ -38349,7 +38349,7 @@ List of unclassified roms
 	</software>
 
 	<software name="daimonog">
-		<description>Daikaijuu Monogatari (Japan, Rev. A)</description>
+		<description>Daikaijuu Monogatari (Japan, rev. A)</description>
 		<year>1994</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="SHVC-ADKJ-JPN" />
@@ -38647,7 +38647,7 @@ List of unclassified roms
 	</software>
 
 	<software name="ogrebatlnp" cloneof="ogrebatl">
-		<description>Densetsu no Ogre Battle - The March of the Black Queen (Japan, NP)</description>
+		<description>Densetsu no Ogre Battle - The March of the Black Queen (Japan, Nintendo Power service)</description>
 		<year>1993</year>
 		<publisher>Quest</publisher>
 		<part name="cart" interface="snes_cart">
@@ -38713,7 +38713,7 @@ List of unclassified roms
 	</software>
 
 	<software name="dstall98">
-		<description>Derby Stallion 98 (Japan, NP)</description>
+		<description>Derby Stallion 98 (Japan, Nintendo Power service)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BDBJ-JPN" />
@@ -38730,7 +38730,7 @@ List of unclassified roms
 	</software>
 
 	<software name="dstall3b" cloneof="dstall3">
-		<description>Derby Stallion III (Japan, Rev. A)</description>
+		<description>Derby Stallion III (Japan, rev. A)</description>
 		<year>1995</year>
 		<publisher>ASCII Entertainment</publisher>
 		<info name="serial" value="SHVC-AD3J-JPN" />
@@ -38965,7 +38965,7 @@ List of unclassified roms
 	</software>
 
 	<software name="dokap321">
-		<description>Dokapon 3-2-1 - Arashi o Yobu Yuujou (Japan, Rev. A)</description>
+		<description>Dokapon 3-2-1 - Arashi o Yobu Yuujou (Japan, rev. A)</description>
 		<year>1994</year>
 		<publisher>Asmik</publisher>
 		<info name="serial" value="SHVC-AIXJ-JPN" />
@@ -39087,7 +39087,7 @@ List of unclassified roms
 	</software>
 
 	<software name="dkongc2u" cloneof="dkongc2">
-		<description>Donkey Kong Country 2 - Diddy's Kong Quest (USA, Rev. A)</description>
+		<description>Donkey Kong Country 2 - Diddy's Kong Quest (USA, rev. A)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<info name="release" value="199512xx" />
@@ -39228,7 +39228,7 @@ List of unclassified roms
 	</software>
 
 	<software name="dokyuse2">
-		<description>Doukyuusei 2 (Japan, NP)</description>
+		<description>Doukyuusei 2 (Japan, Nintendo Power service)</description>
 		<year>1997</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="SHVC-A88J-JPN" />
@@ -39306,7 +39306,7 @@ List of unclassified roms
 	</software>
 
 	<software name="drmario">
-		<description>Dr. Mario (Japan, NP)</description>
+		<description>Dr. Mario (Japan, Nintendo Power service)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BDMJ-JPN" />
@@ -39419,7 +39419,7 @@ List of unclassified roms
 	</software>
 
 	<software name="dbzbuto2j" cloneof="dbzbuto2">
-		<description>Dragon Ball Z - Super Butouden 2 (Japan, Rev. A)</description>
+		<description>Dragon Ball Z - Super Butouden 2 (Japan, rev. A)</description>
 		<year>1993</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SHVC-EF" />
@@ -39462,7 +39462,7 @@ List of unclassified roms
 	</software>
 
 	<software name="dbzsaiya">
-		<description>Dragon Ball Z - Super Saiya Densetsu (Japan, Rev. A)</description>
+		<description>Dragon Ball Z - Super Saiya Densetsu (Japan, rev. A)</description>
 		<year>1992</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SHVC-DB" />
@@ -39491,7 +39491,7 @@ List of unclassified roms
 	</software>
 
 	<software name="dslayednp" cloneof="dslayed">
-		<description>Dragon Slayer - Eiyuu Densetsu (Japan, Rev. A, NP)</description>
+		<description>Dragon Slayer - Eiyuu Densetsu (Japan, rev. A, Nintendo Power service)</description>
 		<year>1992?</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="snes_cart">
@@ -39768,7 +39768,7 @@ List of unclassified roms
 	</software>
 
 	<software name="dmasterj" cloneof="dmaster">
-		<description>Dungeon Master (Japan, Rev. A)</description>
+		<description>Dungeon Master (Japan, rev. A)</description>
 		<year>1991</year>
 		<publisher>Victor Musical Industries</publisher>
 		<info name="serial" value="SHVC-V2" />
@@ -40517,7 +40517,7 @@ List of unclassified roms
 	</software>
 
 	<software name="famibunk">
-		<description>Famicom Bunko - Hajimari no Mori (Japan, NP)</description>
+		<description>Famicom Bunko - Hajimari no Mori (Japan, Nintendo Power service)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BTAJ-JPN" />
@@ -40534,7 +40534,7 @@ List of unclassified roms
 	</software>
 
 	<software name="famitc2a" cloneof="famitc2">
-		<description>Famicom Tantei Club Part II - Ushiro ni Tatsu Shoujo (Japan, NP)</description>
+		<description>Famicom Tantei Club Part II - Ushiro ni Tatsu Shoujo (Japan, Nintendo Power service)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BTCJ-JPN" />
@@ -40551,7 +40551,7 @@ List of unclassified roms
 	</software>
 
 	<software name="famitc2">
-		<description>Famicom Tantei Club Part II - Ushiro ni Tatsu Shoujo (Japan, Rev. A, NP)</description>
+		<description>Famicom Tantei Club Part II - Ushiro ni Tatsu Shoujo (Japan, rev. A, Nintendo Power service)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BTCJ-JPN" />
@@ -40580,7 +40580,7 @@ List of unclassified roms
 	</software>
 
 	<software name="famfeud">
-		<description>Family Feud (USA, Rev. A)</description>
+		<description>Family Feud (USA, rev. A)</description>
 		<year>1993</year>
 		<publisher>GameTek</publisher>
 		<info name="release" value="199310xx" />
@@ -40827,7 +40827,7 @@ List of unclassified roms
 	</software>
 
 	<software name="ffantmq" cloneof="mquest">
-		<description>Final Fantasy - Mystic Quest (USA, Rev. A)</description>
+		<description>Final Fantasy - Mystic Quest (USA, rev. A)</description>
 		<year>1992</year>
 		<publisher>Square</publisher>
 		<info name="release" value="199210xx" />
@@ -40842,7 +40842,7 @@ List of unclassified roms
 	</software>
 
 	<software name="ffant3">
-		<description>Final Fantasy III (USA, Rev. A)</description>
+		<description>Final Fantasy III (USA, rev. A)</description>
 		<year>1994</year>
 		<publisher>Square</publisher>
 		<info name="release" value="199410xx" />
@@ -40989,7 +40989,7 @@ List of unclassified roms
 
 	<software name="firembmn">
 		<!-- Notes: Also re-released through Nintendo Power -->
-		<description>Fire Emblem - Monshou no Nazo (Japan, Rev. A)</description>
+		<description>Fire Emblem - Monshou no Nazo (Japan, rev. A)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-EM" /> <!-- NP cart: SHVC-MMSA-JPN-1 -->
@@ -41023,7 +41023,7 @@ List of unclassified roms
 	</software>
 
 	<software name="firembthnp" cloneof="firembth">
-		<description>Fire Emblem - Thracia 776 (Japan, NP)</description>
+		<description>Fire Emblem - Thracia 776 (Japan, Nintendo Power service)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BFRJ-JPN" />
@@ -41040,7 +41040,7 @@ List of unclassified roms
 	</software>
 
 	<software name="firembth">
-		<description>Fire Emblem - Thracia 776 (Japan, Rev. A, NP)</description>
+		<description>Fire Emblem - Thracia 776 (Japan, rev. A, Nintendo Power service)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BFRJ-JPN" />
@@ -41491,7 +41491,7 @@ List of unclassified roms
 	</software>
 
 	<software name="frontmis">
-		<description>Front Mission (Japan, Rev. A)</description>
+		<description>Front Mission (Japan, rev. A)</description>
 		<year>1995</year>
 		<publisher>Square</publisher>
 		<info name="serial" value="SHVC-AGCJ-JPN" />
@@ -41636,7 +41636,7 @@ List of unclassified roms
 	</software>
 
 	<software name="fushidn2">
-		<description>Fushigi no Dungeon 2 - Fuurai no Shiren (Japan, Rev. A, NP)</description>
+		<description>Fushigi no Dungeon 2 - Fuurai no Shiren (Japan, rev. A, Nintendo Power service)</description>
 		<year>1995?</year>
 		<publisher>Chunsoft?</publisher>
 		<part name="cart" interface="snes_cart">
@@ -41797,7 +41797,7 @@ List of unclassified roms
 	</software>
 
 	<software name="ggoemon3">
-		<description>Ganbare Goemon 3 - Shishi Juurokubee no Karakuri Manjigatame (Japan, Rev. B)</description>
+		<description>Ganbare Goemon 3 - Shishi Juurokubee no Karakuri Manjigatame (Japan, rev. B)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="SHVC-2U" />
@@ -41824,7 +41824,7 @@ List of unclassified roms
 	</software>
 
 	<software name="ggoemkir">
-		<description>Ganbare Goemon Kirakira Douchuu - Boku ga Dancer ni Natta Wake (Japan, Rev. B, NP)</description>
+		<description>Ganbare Goemon Kirakira Douchuu - Boku ga Dancer ni Natta Wake (Japan, rev. B, Nintendo Power service)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="SHVC-A4GJ-JPN" />
@@ -41842,7 +41842,7 @@ List of unclassified roms
 	</software>
 
 	<software name="ggoemkira" cloneof="ggoemkir">
-		<description>Ganbare Goemon Kirakira Douchuu - Boku ga Dancer ni Natta Wake (Japan, Rev. A)</description>
+		<description>Ganbare Goemon Kirakira Douchuu - Boku ga Dancer ni Natta Wake (Japan, rev. A)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="SHVC-A4GJ-JPN" />
@@ -41937,7 +41937,7 @@ List of unclassified roms
 	</software>
 
 	<software name="garou2" cloneof="fatfury2">
-		<description>Garou Densetsu 2 - Aratanaru Tatakai (Japan, Rev. A)</description>
+		<description>Garou Densetsu 2 - Aratanaru Tatakai (Japan, rev. A)</description>
 		<year>1993</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="SHVC-DJ" />
@@ -41952,7 +41952,7 @@ List of unclassified roms
 	</software>
 
 	<software name="gdleen">
-		<description>Gdleen (Japan, Rev. A)</description>
+		<description>Gdleen (Japan, rev. A)</description>
 		<year>1991</year>
 		<publisher>Seta</publisher>
 		<info name="serial" value="SHVC-GD" />
@@ -42031,7 +42031,7 @@ List of unclassified roms
 	</software>
 
 	<software name="genjryod">
-		<description>Genjuu Ryodan (Japan, NP)</description>
+		<description>Genjuu Ryodan (Japan, Nintendo Power service)</description>
 		<year>1998</year>
 		<publisher>Axela</publisher>
 		<info name="serial" value="SHVC-BGJJ-JPN" />
@@ -42084,7 +42084,7 @@ List of unclassified roms
 	</software>
 
 	<software name="georgekou" cloneof="georgeko">
-		<description>George Foreman's KO Boxing (USA, Rev. A)</description>
+		<description>George Foreman's KO Boxing (USA, rev. A)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="release" value="199209xx" />
@@ -42182,7 +42182,7 @@ List of unclassified roms
 	</software>
 
 	<software name="gindamap">
-		<description>Gindama Oyakata no Pachinko Hisshouhou (Japan, Rev. A)</description>
+		<description>Gindama Oyakata no Pachinko Hisshouhou (Japan, rev. A)</description>
 		<year>1995</year>
 		<publisher>Sammy Entertainment</publisher>
 		<info name="serial" value="SHVC-AJPJ-JPN" />
@@ -42249,7 +42249,7 @@ List of unclassified roms
 	</software>
 
 	<software name="gogododg">
-		<description>Go! Go! Dodge League (Japan, Rev. A)</description>
+		<description>Go! Go! Dodge League (Japan, rev. A)</description>
 		<year>1993</year>
 		<publisher>Pack-In-Video</publisher>
 		<info name="serial" value="SHVC-R5" />
@@ -43830,7 +43830,7 @@ List of unclassified roms
 	</software>
 
 	<software name="kirbysda" cloneof="kirbyfun">
-		<description>Hoshi no Kirby - Super Deluxe (Japan, Rev. A)</description>
+		<description>Hoshi no Kirby - Super Deluxe (Japan, rev. A)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-AKFJ-JPN / G744105" />
@@ -44592,7 +44592,7 @@ List of unclassified roms
 	</software>
 
 	<software name="itouhata">
-		<description>Itou Hatasu Rokudan no Shougi Doujou (Japan, Rev. A)</description>
+		<description>Itou Hatasu Rokudan no Shougi Doujou (Japan, rev. A)</description>
 		<year>1994</year>
 		<publisher>ASK Kodansha</publisher>
 		<info name="serial" value="SHVC-Q2" />
@@ -44668,7 +44668,7 @@ List of unclassified roms
 	</software>
 
 	<software name="jlexct96">
-		<description>J.League Excite Stage '96 (Japan, Rev. A)</description>
+		<description>J.League Excite Stage '96 (Japan, rev. A)</description>
 		<year>1996</year>
 		<publisher>Epoch</publisher>
 		<info name="serial" value="SHVC-AE3J-JPN" />
@@ -45011,7 +45011,7 @@ List of unclassified roms
 	</software>
 
 	<software name="powyak2">
-		<description>Jikkyou Powerful Pro Yakyuu 2 (Japan, Rev. B)</description>
+		<description>Jikkyou Powerful Pro Yakyuu 2 (Japan, rev. B)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="SHVC-AP2J-JPN" />
@@ -45029,7 +45029,7 @@ List of unclassified roms
 	</software>
 
 	<software name="powyk397">
-		<description>Jikkyou Powerful Pro Yakyuu 3 - '97 Haru (Japan, Rev. A)</description>
+		<description>Jikkyou Powerful Pro Yakyuu 3 - '97 Haru (Japan, rev. A)</description>
 		<year>1997</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="SHVC-AQ7J-JPN" />
@@ -45047,7 +45047,7 @@ List of unclassified roms
 	</software>
 
 	<software name="jikkscr2">
-		<description>Jikkyou World Soccer 2 - Fighting Eleven (Japan, Rev. A, NP)</description>
+		<description>Jikkyou World Soccer 2 - Fighting Eleven (Japan, rev. A, Nintendo Power service)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="SHVC-AWJJ-JPN" />
@@ -45450,7 +45450,7 @@ List of unclassified roms
 	</software>
 
 	<software name="madden93u" cloneof="madden93">
-		<description>John Madden Football '93 (USA, Rev. A)</description>
+		<description>John Madden Football '93 (USA, rev. A)</description>
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="release" value="199211xx" />
@@ -45847,7 +45847,7 @@ List of unclassified roms
 	</software>
 
 	<software name="rummenigs" cloneof="keeganpm">
-		<description>K.H. Rummenigge's Player Manager (Germany, Demo 20 Weeks)</description>
+		<description>K.H. Rummenigge's Player Manager (Germany, Demo 20 Week Manager)</description>
 		<year>1993</year>
 		<publisher>Imagineer</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -45862,7 +45862,7 @@ List of unclassified roms
 	</software>
 
 	<software name="rummenigso" cloneof="keeganpm">
-		<description>K.H. Rummenigge's Player Manager (Germany, Demo 10 Weeks)</description>
+		<description>K.H. Rummenigge's Player Manager (Germany, Demo 10 Week Manager)</description>
 		<year>1993</year>
 		<publisher>Imagineer</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -46105,7 +46105,7 @@ List of unclassified roms
 	</software>
 
 	<software name="keiba8s">
-		<description>Keiba Eight Special (Japan, Rev. A)</description>
+		<description>Keiba Eight Special (Japan, rev. A)</description>
 		<year>1993</year>
 		<publisher>Misawa Entertainment</publisher>
 		<info name="serial" value="SHVC-8K" />
@@ -46508,7 +46508,7 @@ List of unclassified roms
 	</software>
 
 	<software name="kinstu" cloneof="kinst">
-		<description>Killer Instinct (USA, Rev. A)</description>
+		<description>Killer Instinct (USA, rev. A)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<info name="release" value="199508xx" />
@@ -47020,7 +47020,7 @@ List of unclassified roms
 	</software>
 
 	<software name="krustyfh">
-		<description>Krusty's Super Fun House (Europe, Rev. A)</description>
+		<description>Krusty's Super Fun House (Europe, rev. A)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -47275,7 +47275,7 @@ List of unclassified roms
 	</software>
 
 	<software name="langriss">
-		<description>Der Langrisser (Japan, Rev. A)</description>
+		<description>Der Langrisser (Japan, rev. A)</description>
 		<year>1995</year>
 		<publisher>Masaya</publisher>
 		<info name="serial" value="SHVC-ALGJ-JPN" />
@@ -47546,7 +47546,7 @@ List of unclassified roms
 	</software>
 
 	<software name="lemmingsu" cloneof="lemmings">
-		<description>Lemmings (USA, Rev. A)</description>
+		<description>Lemmings (USA, rev. A)</description>
 		<year>1992</year>
 		<publisher>Sunsoft</publisher>
 		<info name="release" value="199203xx" />
@@ -47847,7 +47847,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="lordmona">
-		<description>Lord Monarch (Japan, Rev. A, NP)</description>
+		<description>Lord Monarch (Japan, rev. A, Nintendo Power service)</description>
 		<year>1992</year>
 		<publisher>Epoch</publisher>
 		<info name="serial" value="SHVC-LM" />
@@ -48308,7 +48308,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="mickeymqg" cloneof="mickeymq">
-		<description>The Magical Quest Starring Mickey Mouse (Germany, Rev. A)</description>
+		<description>The Magical Quest Starring Mickey Mouse (Germany, rev. A)</description>
 		<year>1992</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
@@ -48441,7 +48441,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="mjtaika2">
-		<description>Mahjong Taikai II (Japan, Rev. A)</description>
+		<description>Mahjong Taikai II (Japan, rev. A)</description>
 		<year>1994</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="SHVC-AIQJ-JPN" />
@@ -48490,7 +48490,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="majtnseia" cloneof="majtnsei">
-		<description>Majin Tensei (Japan, Rev. A)</description>
+		<description>Majin Tensei (Japan, rev. A)</description>
 		<year>1994</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="SHVC-ZM" />
@@ -48508,7 +48508,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="majtnsei">
-		<description>Majin Tensei (Japan, Rev. B)</description>
+		<description>Majin Tensei (Japan, rev. B)</description>
 		<year>1994</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="SHVC-ZM" />
@@ -49172,7 +49172,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="megamnxu" cloneof="megamnx">
-		<description>Mega Man X (USA, Rev. A)</description>
+		<description>Mega Man X (USA, rev. A)</description>
 		<year>1994</year>
 		<publisher>Capcom</publisher>
 		<info name="release" value="199401xx" />
@@ -49354,7 +49354,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="msladerg">
-		<description>Metal Slader Glory - Director's Cut (Japan, NP)</description>
+		<description>Metal Slader Glory - Director's Cut (Japan, Nintendo Power service)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BMSJ-JPN" />
@@ -49964,7 +49964,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="mk2u" cloneof="mk2">
-		<description>Mortal Kombat II (USA, Rev. A)</description>
+		<description>Mortal Kombat II (USA, rev. A)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="SNS-28-USA" />
@@ -50481,7 +50481,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="nbajam">
-		<description>NBA Jam (Europe, Rev. A)</description>
+		<description>NBA Jam (Europe, rev. A)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -50508,7 +50508,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="nbajamu" cloneof="nbajam">
-		<description>NBA Jam (USA, Rev. A)</description>
+		<description>NBA Jam (USA, rev. A)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="release" value="199403xx" />
@@ -50534,7 +50534,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="nbajamtej" cloneof="nbajamte">
-		<description>NBA Jam - Tournament Edition (Japan)</description>
+		<description>NBA Jam T.E. - Tournament Edition (Japan)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="SHVC-AJTJ-JPN" />
@@ -50551,7 +50551,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="nbajamteup" cloneof="nbajamte">
-		<description>NBA Jam - Tournament Edition (USA, prototype)</description>
+		<description>NBA Jam T.E. - Tournament Edition (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -50563,7 +50563,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="nbajamteu" cloneof="nbajamte">
-		<description>NBA Jam - Tournament Edition (USA)</description>
+		<description>NBA Jam T.E. - Tournament Edition (USA)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="release" value="199502xx" />
@@ -50742,7 +50742,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="ncaabask" cloneof="wlbasket">
-		<description>NCAA Basketball (USA, Rev. A)</description>
+		<description>NCAA Basketball (USA, rev. A)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<info name="release" value="199210xx" />
@@ -51232,7 +51232,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="mansell">
-		<description>Nigel Mansell's World Championship Racing (Europe, Rev. A)</description>
+		<description>Nigel Mansell's World Championship Racing (Europe, rev. A)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SNSP-M8-FAH" />
@@ -51619,7 +51619,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="oekakil">
-		<description>Oekaki Logic (Japan, NP)</description>
+		<description>Oekaki Logic (Japan, Nintendo Power service)</description>
 		<year>1999</year>
 		<publisher>Bunkasha Games</publisher>
 		<info name="serial" value="SHVC-BORJ-JPN" />
@@ -51636,7 +51636,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="oekakil2">
-		<description>Oekaki Logic 2 (Japan, NP)</description>
+		<description>Oekaki Logic 2 (Japan, Nintendo Power service)</description>
 		<year>1999</year>
 		<publisher>Bunkasha Games</publisher>
 		<info name="serial" value="SHVC-BOSJ-JPN" />
@@ -52597,7 +52597,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="pga96u" cloneof="pga96">
-		<description>PGA Tour 96 (USA, Rev. A)</description>
+		<description>PGA Tour 96 (USA, rev. A)</description>
 		<year>1996</year>
 		<publisher>Black Pearl</publisher>
 		<info name="release" value="199601xx" />
@@ -52661,7 +52661,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="pgau" cloneof="pga">
-		<description>PGA Tour Golf (USA, Rev. A)</description>
+		<description>PGA Tour Golf (USA, rev. A)</description>
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="release" value="199203xx" />
@@ -52783,7 +52783,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="picrosv1">
-		<description>Picross NP Vol. 1 (Japan, Rev. A, NP)</description>
+		<description>Picross NP Vol. 1 (Japan, rev. A, Nintendo Power service)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BPIJ-JPN" />
@@ -52800,7 +52800,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="picrosv1a" cloneof="picrosv1">
-		<description>Picross NP Vol. 1 (Japan, NP)</description>
+		<description>Picross NP Vol. 1 (Japan, Nintendo Power service)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BPIJ-JPN" />
@@ -52817,7 +52817,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="picrosv2a" cloneof="picrosv2">
-		<description>Picross NP Vol. 2 (Japan, NP)</description>
+		<description>Picross NP Vol. 2 (Japan, Nintendo Power service)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BP2J-JPN" />
@@ -52834,7 +52834,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="picrosv2">
-		<description>Picross NP Vol. 2 (Japan, Rev. A, NP)</description>
+		<description>Picross NP Vol. 2 (Japan, rev. A, Nintendo Power service)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BP2J-JPN" />
@@ -52851,7 +52851,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="picrosv3">
-		<description>Picross NP Vol. 3 (Japan, NP)</description>
+		<description>Picross NP Vol. 3 (Japan, Nintendo Power service)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BP3J-JPN" />
@@ -52868,7 +52868,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="picrosv4">
-		<description>Picross NP Vol. 4 (Japan, Rev. A, NP)</description>
+		<description>Picross NP Vol. 4 (Japan, rev. A, Nintendo Power service)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BP4J-JPN" />
@@ -52885,7 +52885,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="picrosv4a" cloneof="picrosv4">
-		<description>Picross NP Vol. 4 (Japan, NP)</description>
+		<description>Picross NP Vol. 4 (Japan, Nintendo Power service)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BP4J-JPN" />
@@ -52902,7 +52902,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="picrosv5">
-		<description>Picross NP Vol. 5 (Japan, NP)</description>
+		<description>Picross NP Vol. 5 (Japan, Nintendo Power service)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BP5J-JPN" />
@@ -52919,7 +52919,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="picrosv6">
-		<description>Picross NP Vol. 6 (Japan, NP)</description>
+		<description>Picross NP Vol. 6 (Japan, Nintendo Power service)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BP6J-JPN" />
@@ -52936,7 +52936,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="picrosv7">
-		<description>Picross NP Vol. 7 (Japan, NP)</description>
+		<description>Picross NP Vol. 7 (Japan, Nintendo Power service)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BP7J-JPN" />
@@ -52953,7 +52953,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="picrosv8">
-		<description>Picross NP Vol. 8 (Japan, NP)</description>
+		<description>Picross NP Vol. 8 (Japan, Nintendo Power service)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BP8J-JPN" />
@@ -53621,7 +53621,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="powerlod">
-		<description>Power Lode Runner (Japan, NP)</description>
+		<description>Power Lode Runner (Japan, Nintendo Power service)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BPLJ-JPN" />
@@ -53884,7 +53884,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="mjkiwam2">
-		<description>Pro Mahjong Kiwame II (Japan, Rev. A)</description>
+		<description>Pro Mahjong Kiwame II (Japan, rev. A)</description>
 		<year>1994</year>
 		<publisher>Athena</publisher>
 		<info name="serial" value="SHVC-K9" />
@@ -54790,7 +54790,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="ringkake">
-		<description>Ring ni Kakero (Japan, NP)</description>
+		<description>Ring ni Kakero (Japan, Nintendo Power service)</description>
 		<year>1998</year>
 		<publisher>NCS</publisher>
 		<info name="serial" value="SHVC-ARKJ-JPN" />
@@ -54983,7 +54983,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 
 	<software name="rockmnx" cloneof="megamnx">
 		<!-- Notes: Also re-released through Nintendo Power -->
-		<description>Rockman X (Japan, Rev. A)</description>
+		<description>Rockman X (Japan, rev. A)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="SHVC-RX" />
@@ -55185,7 +55185,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="ryukoken" cloneof="aof">
-		<description>Ryuuko no Ken (Japan, Rev. A)</description>
+		<description>Ryuuko no Ken (Japan, rev. A)</description>
 		<year>1993</year>
 		<publisher>KAC</publisher>
 		<info name="serial" value="SHVC-RW" />
@@ -55340,7 +55340,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="sangoku3h" cloneof="roman3k3">
-		<description>Sangokushi III (HK)</description>
+		<description>Sangokushi III (Hong Kong)</description>
 		<year>1993?</year>
 		<publisher>Koei?</publisher>
 		<part name="cart" interface="snes_cart">
@@ -55354,7 +55354,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="sangoku3" cloneof="roman3k3">
-		<description>Sangokushi III (Japan, Rev. A)</description>
+		<description>Sangokushi III (Japan, rev. A)</description>
 		<year>1992</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="SHVC-S3" />
@@ -55371,7 +55371,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="sangoku4" cloneof="roman3k4">
-		<description>Sangokushi IV (Japan, Rev. A)</description>
+		<description>Sangokushi IV (Japan, rev. A)</description>
 		<year>1994</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="SHVC-AS4J-JPN" />
@@ -55468,7 +55468,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="kgundam">
-		<description>SD Gundam Gaiden - Knight Gundam Monogatari - Ooinaru Isan (Japan, Rev. A)</description>
+		<description>SD Gundam Gaiden - Knight Gundam Monogatari - Ooinaru Isan (Japan, rev. A)</description>
 		<year>1991</year>
 		<publisher>Angel</publisher>
 		<info name="serial" value="SHVC-KG" />
@@ -55557,7 +55557,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="mana">
-		<description>Secret of Mana (Europe, Rev. A)</description>
+		<description>Secret of Mana (Europe, rev. A)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -56070,7 +56070,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 
 	<software name="shinmt">
 		<!-- Notes: Also re-released through Nintendo Power -->
-		<description>Shin Megami Tensei (Japan, Rev. A)</description>
+		<description>Shin Megami Tensei (Japan, rev. A)</description>
 		<year>1992</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="SHVC-ME" />
@@ -56088,7 +56088,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 
 <!-- Can we consider this board confirmed? -->
 	<software name="shinmt2a" cloneof="shinmt2">
-		<description>Shin Megami Tensei II (Japan, Rev. A)</description>
+		<description>Shin Megami Tensei II (Japan, rev. A)</description>
 		<year>1994</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="SHVC-ZE-1" />
@@ -56403,7 +56403,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 
 <!-- Can we consider this board confirmed? -->
 	<software name="shodanek">
-		<description>Shodai Nekketsu Kouha Kunio-kun (Japan, Rev. A)</description>
+		<description>Shodai Nekketsu Kouha Kunio-kun (Japan, rev. A)</description>
 		<year>1992</year>
 		<publisher>Technos Japan</publisher>
 		<info name="serial" value="SHVC-KN" />
@@ -57558,7 +57558,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="speedyu" cloneof="speedy">
-		<description>Speedy Gonzales in Los Gatos Bandidos (USA, Rev. A)</description>
+		<description>Speedy Gonzales in Los Gatos Bandidos (USA, rev. A)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="release" value="199508xx" />
@@ -58623,7 +58623,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="sbtanku" cloneof="sbtank">
-		<description>Garry Kitchen's Super Battletank - War in the Gulf (USA, Rev. A)</description>
+		<description>Garry Kitchen's Super Battletank - War in the Gulf (USA, rev. A)</description>
 		<year>1992</year>
 		<publisher>Absolute Entertainment</publisher>
 		<info name="release" value="199206xx" />
@@ -58781,7 +58781,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="sblkbas3">
-		<description>Super Black Bass 3 (Japan, Rev. A)</description>
+		<description>Super Black Bass 3 (Japan, rev. A)</description>
 		<year>1995</year>
 		<publisher>Starfish</publisher>
 		<info name="serial" value="SHVA-A3SJ" />
@@ -58950,7 +58950,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="sbbros" cloneof="spang">
-		<description>Super Buster Bros. (USA, Rev. A)</description>
+		<description>Super Buster Bros. (USA, rev. A)</description>
 		<year>1992</year>
 		<publisher>Capcom</publisher>
 		<info name="release" value="199210xx" />
@@ -58988,7 +58988,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="scaesarsj" cloneof="scaesars">
-		<description>Super Casino - Caesars Palace (Japan, Rev. A)</description>
+		<description>Super Casino - Caesars Palace (Japan, rev. A)</description>
 		<year>1993</year>
 		<publisher>Coconuts Japan Entertainment</publisher>
 		<info name="serial" value="SHVC-KH" />
@@ -59149,7 +59149,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="suprcopa" cloneof="tonymeol">
-		<description>Super Copa (Brazil)</description>
+		<description>Super Copa (Brazil, Mexico)</description>
 		<year>1994</year>
 		<publisher>American Softworks Company</publisher>
 		<part name="cart" interface="snes_cart">
@@ -59161,7 +59161,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="daikokai" cloneof="unchartd">
-		<description>Super Daikoukai Jidai (Japan, Rev. A, NP)</description>
+		<description>Super Daikoukai Jidai (Japan, rev. A, Nintendo Power service)</description>
 		<year>1992</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="SHVC-QK" />
@@ -59392,7 +59392,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="famiwars">
-		<description>Super Famicom Wars (Japan, NP)</description>
+		<description>Super Famicom Wars (Japan, Nintendo Power service)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BFWJ-JPN" />
@@ -59409,7 +59409,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="famigela">
-		<description>Super Family Gelaende (Japan, NP)</description>
+		<description>Super Family Gelaende (Japan, Nintendo Power service)</description>
 		<year>1998</year>
 		<publisher>Namco</publisher>
 		<info name="serial" value="SHVC-A25J-JPN" />
@@ -59475,7 +59475,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="fireprw3">
-		<description>Super Fire Pro Wrestling III - Final Bout (Japan, Rev. A)</description>
+		<description>Super Fire Pro Wrestling III - Final Bout (Japan, rev. A)</description>
 		<year>1993</year>
 		<publisher>Human Entertainment</publisher>
 		<info name="serial" value="SHVC-F3" />
@@ -59686,7 +59686,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="sgodzilj" cloneof="sgodzil">
-		<description>Chou Godzilla - Super Godzilla (Japan, Rev. A)</description>
+		<description>Chou Godzilla - Super Godzilla (Japan, rev. A)</description>
 		<year>1993</year>
 		<publisher>Toho</publisher>
 		<info name="serial" value="SHVC-7G" />
@@ -60026,7 +60026,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="sjinsei3">
-		<description>Super Jinsei Game 3 (Japan, Rev. A)</description>
+		<description>Super Jinsei Game 3 (Japan, rev. A)</description>
 		<year>1996</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="SHVC-A3XJ-JPN" />
@@ -60206,7 +60206,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="supermjtc" cloneof="supermjt">
-		<description>Super Mahjong Taikai (Japan, Rev. B)</description>
+		<description>Super Mahjong Taikai (Japan, rev. B)</description>
 		<year>1992</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="SHVC-IQ" />
@@ -60223,7 +60223,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="supermjtb" cloneof="supermjt">
-		<description>Super Mahjong Taikai (Japan, Rev. C)</description>
+		<description>Super Mahjong Taikai (Japan, rev. C)</description>
 		<year>1992</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="SHVC-IQ" />
@@ -60240,7 +60240,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="supermjt">
-		<description>Super Mahjong Taikai (Japan, Rev. E)</description>
+		<description>Super Mahjong Taikai (Japan, rev. E)</description>
 		<year>1992</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="SHVC-IQ" />
@@ -60257,7 +60257,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="smw2ja" cloneof="smw2">
-		<description>Super Mario - Yossy Island (Japan, Rev. A)</description>
+		<description>Super Mario - Yossy Island (Japan, rev. A)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-YI" />
@@ -60276,7 +60276,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="smw2j" cloneof="smw2">
-		<description>Super Mario - Yossy Island (Japan, Rev. B)</description>
+		<description>Super Mario - Yossy Island (Japan, rev. B)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-YI" />
@@ -60311,7 +60311,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 
 	<software name="smcoll" cloneof="smas">
 		<!-- Notes: Also re-released through Nintendo Power -->
-		<description>Super Mario Collection (Japan, Rev. A)</description>
+		<description>Super Mario Collection (Japan, rev. A)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-4M" />
@@ -60329,7 +60329,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="smw2">
-		<description>Super Mario World 2 - Yoshi's Island (Europe, Rev. A)</description>
+		<description>Super Mario World 2 - Yoshi's Island (Europe, rev. A)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -60694,7 +60694,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="spleagu2">
-		<description>Super Power League 2 (Japan, Rev. A)</description>
+		<description>Super Power League 2 (Japan, rev. A)</description>
 		<year>1994</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="SHVC-Z4" />
@@ -60740,7 +60740,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="suppunchj" cloneof="suppunch">
-		<description>Super Punch-Out!! (Japan, NP)</description>
+		<description>Super Punch-Out!! (Japan, Nintendo Power service)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-4Q" />
@@ -61149,7 +61149,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="jedi">
-		<description>Super Star Wars - Return of the Jedi (Europe, Rev. A)</description>
+		<description>Super Star Wars - Return of the Jedi (Europe, rev. A)</description>
 		<year>1994</year>
 		<publisher>JVC</publisher>
 		<part name="cart" interface="snes_cart">
@@ -61212,7 +61212,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="esbu" cloneof="esb">
-		<description>Super Star Wars - The Empire Strikes Back (USA, Rev. A)</description>
+		<description>Super Star Wars - The Empire Strikes Back (USA, rev. A)</description>
 		<year>1993</year>
 		<publisher>JVC</publisher>
 		<info name="release" value="199310xx" />
@@ -61859,7 +61859,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="tactogrea" cloneof="tactogre">
-		<description>Tactics Ogre - Let Us Cling Together (Japan, Rev. A)</description>
+		<description>Tactics Ogre - Let Us Cling Together (Japan, rev. A)</description>
 		<year>1995</year>
 		<publisher>Quest</publisher>
 		<info name="serial" value="SHVC-AO7J-JPN" />
@@ -61876,7 +61876,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="tactogre">
-		<description>Tactics Ogre - Let Us Cling Together (Japan, Rev. B)</description>
+		<description>Tactics Ogre - Let Us Cling Together (Japan, rev. B)</description>
 		<year>1995</year>
 		<publisher>Quest</publisher>
 		<info name="serial" value="SHVC-AO7J-JPN" />
@@ -62053,7 +62053,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="tamatown">
-		<description>Tamagotchi Town (Japan, NP)</description>
+		<description>Tamagotchi Town (Japan, Nintendo Power service)</description>
 		<year>1999</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SHVC-BTTJ-JPN" />
@@ -62394,7 +62394,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="teiketsu" cloneof="pto">
-		<description>Teitoku no Ketsudan (Japan, Rev. A)</description>
+		<description>Teitoku no Ketsudan (Japan, rev. A)</description>
 		<year>1992</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="SHVC-TK" />
@@ -62573,7 +62573,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="terranigg" cloneof="terranig">
-		<description>Terranigma (Germany, Rev. A)</description>
+		<description>Terranigma (Germany, rev. A)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -62616,7 +62616,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="tetris2u" cloneof="tetris2">
-		<description>Tetris 2 (USA, Rev. A)</description>
+		<description>Tetris 2 (USA, rev. A)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<info name="release" value="199408xx" />
@@ -63029,7 +63029,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="ttoonwak">
-		<description>Tiny Toon Adventures - Wild &amp; Wacky Sports (Europe, Rev. A)</description>
+		<description>Tiny Toon Adventures - Wild &amp; Wacky Sports (Europe, rev. A)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -64253,7 +64253,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="uminushi">
-		<description>Umi no Nushi Tsuri (Japan, Rev. A)</description>
+		<description>Umi no Nushi Tsuri (Japan, rev. A)</description>
 		<year>1996</year>
 		<publisher>Pack-In-Video</publisher>
 		<info name="serial" value="SHVC-A6UJ-JPN" />
@@ -64388,7 +64388,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="usaiceh" cloneof="prohocky">
-		<description>USA Ice Hockey (Japan, Rev. A)</description>
+		<description>USA Ice Hockey (Japan, rev. A)</description>
 		<year>1993</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="SHVC-UI" />
@@ -65179,7 +65179,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="winpst96">
-		<description>Winning Post 2 - Program '96 (Japan, Rev. A)</description>
+		<description>Winning Post 2 - Program '96 (Japan, rev. A)</description>
 		<year>1996</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="SHVC-AW9J-JPN" />
@@ -65251,7 +65251,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="wizardg4">
-		<description>Wizardry Gaiden IV - Taima no Kodou (Japan, Rev. A)</description>
+		<description>Wizardry Gaiden IV - Taima no Kodou (Japan, rev. A)</description>
 		<year>1996</year>
 		<publisher>ASCII Entertainment</publisher>
 		<info name="serial" value="SHVC-AE4J-JPN" />
@@ -65285,7 +65285,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="wizardry">
-		<description>Wizardry I-II-III - Story of Llylgamyn (Japan, NP)</description>
+		<description>Wizardry I-II-III - Story of Llylgamyn (Japan, Nintendo Power service)</description>
 		<year>1999</year>
 		<publisher>Media Factory</publisher>
 		<info name="serial" value="SHVC-BWZJ-JPN" />
@@ -66060,7 +66060,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="yokozuna">
-		<description>Yokozuna Monogatari (Japan, Rev. A)</description>
+		<description>Yokozuna Monogatari (Japan, rev. A)</description>
 		<year>1994</year>
 		<publisher>KSS</publisher>
 		<info name="serial" value="SHVC-5U" />
@@ -66464,7 +66464,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="zero">
-		<description>Zero the Kamikaze Squirrel (Europe, Rev. A)</description>
+		<description>Zero the Kamikaze Squirrel (Europe, rev. A)</description>
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
 		<part name="cart" interface="snes_cart">
@@ -66625,7 +66625,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="zottomj">
-		<description>Zootto Mahjong! (Japan, NP)</description>
+		<description>Zootto Mahjong! (Japan, Nintendo Power service)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BZMJ-JPN" />
@@ -66809,7 +66809,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="sgboyju" cloneof="sgboy">
-		<description>Super Game Boy (Japan, USA, Rev. A)</description>
+		<description>Super Game Boy (Japan, USA, rev. A)</description>
 		<year>199?</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -66833,7 +66833,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="npmenua" cloneof="npmenu">
-		<description>Nintendo Power Menu Program (Japan, NP)</description>
+		<description>Nintendo Power Menu Program (Japan, Nintendo Power service)</description>
 		<year>199?</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -66845,7 +66845,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="npmenu">
-		<description>Nintendo Power Menu Program (Japan, Rev. A, NP)</description>
+		<description>Nintendo Power Menu Program (Japan, rev. A, Nintendo Power service)</description>
 		<year>199?</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">

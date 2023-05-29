@@ -16,6 +16,9 @@
 #include "imagedev/harddriv.h"
 #include "bus/rs232/rs232.h"
 
+
+namespace {
+
 class altos8600_state : public driver_device
 {
 public:
@@ -135,8 +138,8 @@ void altos8600_state::machine_start()
 	save_item(NAME(m_sechi));
 	save_item(NAME(m_sector));
 
-	if(m_hdd->get_hard_disk_file())
-		m_geom = &m_hdd->get_hard_disk_file()->get_info();
+	if(m_hdd->exists())
+		m_geom = &m_hdd->get_info();
 	else
 		m_geom = nullptr;
 }
@@ -151,8 +154,8 @@ void altos8600_state::machine_reset()
 	m_nmistat = false;
 	m_cylhi = m_sechi = false;
 	m_stat = 0;
-	if(m_hdd->get_hard_disk_file())
-		m_geom = &m_hdd->get_hard_disk_file()->get_info();
+	if(m_hdd->exists())
+		m_geom = &m_hdd->get_info();
 	else
 		m_geom = nullptr;
 }
@@ -198,7 +201,7 @@ u8 altos8600_state::read_sector()
 		secoff -= 3;
 	}
 	if(!secoff)
-		m_hdd->get_hard_disk_file()->read(m_lba, m_sector);
+		m_hdd->read(m_lba, m_sector);
 	if(secoff >= 511)
 	{
 		m_dmac->drq1_w(CLEAR_LINE);
@@ -220,7 +223,7 @@ bool altos8600_state::write_sector(u8 data)
 	{
 		m_stat &= ~1;
 		m_stat |= 2;
-		m_hdd->get_hard_disk_file()->write(m_lba, m_sector);
+		m_hdd->write(m_lba, m_sector);
 		m_dmac->drq1_w(CLEAR_LINE);
 		m_pic[1]->ir0_w(ASSERT_LINE);
 		return true;
@@ -809,5 +812,8 @@ ROM_START(altos8600)
 	ROMX_LOAD("11753_1.5_lo.bin", 0x0000, 0x1000, CRC(dfa7bf0e) SHA1(6628fd7c579423b51d2642aeaa7fc0405a989252), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD("11753_1.5_hi.bin", 0x0001, 0x1000, CRC(9b5e812c) SHA1(c2ef24859edd48d2096db47e16855c9bc01dae75), ROM_SKIP(1) | ROM_BIOS(0))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1981, altos8600, 0, 0, altos8600, 0, altos8600_state, empty_init, "Altos Computer Systems", "ACS8600", MACHINE_NO_SOUND_HW)

@@ -27,6 +27,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class flashbeats_state : public driver_device
 {
 public:
@@ -48,7 +51,7 @@ public:
 	void main_scsp_map(address_map &map);
 	void scsp_mem(address_map &map);
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	[[maybe_unused]] uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
 	virtual void machine_reset() override;
@@ -189,6 +192,9 @@ ROM_START( flsbeats )
 	ROM_LOAD( "mpr-21607_n32_9852k7021.ic24", 0x1800000, 0x400000, CRC(f3dd07c6) SHA1(aa9d056e8ff5d2282917a09c42711062b8df989a) )
 	ROM_LOAD( "mpr-21608_n33_9852k7022.ic25", 0x1c00000, 0x400000, CRC(be4db836) SHA1(93d4cbb3bb299e3cf1dda105670e3923751c28ad) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME     PARENT   MACHINE       INPUT       CLASS              INIT     MONITOR   COMPANY  FULLNAME      FLAGS
 GAME( 1998, flsbeats, 0,    flashbeats,   flashbeats, flashbeats_state,  empty_init, ROT0,    "Sega", "Flash Beats", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

@@ -92,6 +92,9 @@ CHIP #  POSITION   TYPE
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
+
 #define MASTER_CLOCK XTAL(18'432'000)
 
 class flower_state : public driver_device
@@ -619,6 +622,8 @@ ROM_START( flowerj ) /* Sega/Alpha version.  Sega game number 834-5998 */
 	ROM_LOAD( "82s123.k7",  0x0400, 0x0020, CRC(ea9c65e4) SHA1(1bdd77a7f3ef5f8ec4dbb9524498c0c4a356f089) )
 	ROM_LOAD( "82s129.a1",  0x0420, 0x0100, CRC(c8dad3fc) SHA1(8e852efac70223d02e45b20ed8a12e38c5010a78) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1986, flower,  0,      flower, flower, flower_state, empty_init, ROT0, "Clarue (Komax license)",                   "Flower (US)",    MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NO_COCKTAIL )
