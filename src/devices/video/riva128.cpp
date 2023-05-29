@@ -21,7 +21,7 @@ References:
 #define LOG_TODO      (1U << 2) // log unimplemented registers
 
 #define VERBOSE (LOG_GENERAL | LOG_WARN | LOG_TODO)
-#define LOG_OUTPUT_FUNC osd_printf_info
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGWARN(...)            LOGMASKED(LOG_WARN, __VA_ARGS__)

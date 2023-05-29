@@ -39,7 +39,7 @@ References:
 #define LOG_CRTC      (1U << 3)
 
 #define VERBOSE (LOG_GENERAL | LOG_WARN | LOG_CRTC)
-#define LOG_OUTPUT_FUNC osd_printf_info
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGWARN(...)            LOGMASKED(LOG_WARN, __VA_ARGS__)

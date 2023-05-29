@@ -50,7 +50,7 @@
 #define LOG_DSW       (1U << 3) // Input sense at $3c2
 
 #define VERBOSE (LOG_GENERAL | LOG_WARN | LOG_DSW)
-#define LOG_OUTPUT_FUNC osd_printf_info
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGWARN(...)           LOGMASKED(LOG_WARN, __VA_ARGS__)
