@@ -24,7 +24,7 @@
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "sound/ymz280b.h"
-#include "video/pc_vga.h"
+#include "video/pc_xga.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -100,7 +100,7 @@ void konmedal020_state::gs471(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
-	screen.set_screen_update(m_vga, FUNC(vga_device::screen_update));
+	screen.set_screen_update(m_vga, FUNC(svga_device::screen_update));
 	screen.screen_vblank().set_inputline(m_maincpu, M68K_IRQ_3);
 
 	OTI111(config, m_vga, 0);

@@ -479,10 +479,6 @@ ROM_START( offrthnd )
 	ROM_REGION32_LE(0x80000, "pci:07.0", 0)
 	ROM_LOAD( "lh28f004sct.u8b1", 0x000000, 0x080000, CRC(ab04a343) SHA1(ba77933400fe470f45ab187bc0d315922caadb12) )
 
-	ROM_REGION( 0x8000, "video_bios", ROMREGION_ERASEFF ) // TODO: Voodoo 2 has no bios, to be removed once the driver is updated not to look for this region
-//  ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
-//  ROM_CONTINUE(                                 0x0001, 0x4000 )
-
 	ROM_REGION( 0x2000, "iocpu", 0 )   /* Magicbus board CY7C63513 MCU code */
 	ROM_LOAD( "magicbus.u18", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
 
@@ -494,10 +490,6 @@ ROM_START( arctthnd )
 	ROM_REGION32_LE(0x40000, "bios", ROMREGION_ERASEFF)
 	ROM_LOAD( "m29f002bt.u6", 0x000000, 0x040000, CRC(012c9290) SHA1(cdee6f19d5e5ea5bb1dd6a5ec397ac70b3452790) )
 
-	ROM_REGION( 0x8000, "video_bios", ROMREGION_ERASEFF ) // TODO: Voodoo 2 has no bios, to be removed once the driver is updated not to look for this region
-//  ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
-//  ROM_CONTINUE(                                 0x0001, 0x4000 )
-
 	ROM_REGION( 0x2000, "iocpu", 0 )   /* Substitute board 87C552 MCU code */
 	ROM_LOAD( "87c552.bin", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
 
@@ -508,10 +500,6 @@ ROM_END
 ROM_START( ultarctc )
 	ROM_REGION32_LE(0x40000, "bios", ROMREGION_ERASEFF)
 	ROM_LOAD( "m29f002bt.u6", 0x000000, 0x040000, CRC(012c9290) SHA1(cdee6f19d5e5ea5bb1dd6a5ec397ac70b3452790) )
-
-	ROM_REGION( 0x8000, "video_bios", ROMREGION_ERASEFF ) // TODO: Voodoo 2 has no bios, to be removed once the driver is updated not to look for this region
-//  ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
-//  ROM_CONTINUE(                                 0x0001, 0x4000 )
 
 	ROM_REGION( 0x2000, "iocpu", 0 )   /* Substitute board 87C552 MCU code */
 	ROM_LOAD( "87c552.bin", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
@@ -526,10 +514,6 @@ the game will revert back to normal Arctic Thunder. */
 ROM_START( ultarctcup )
 	ROM_REGION32_LE(0x40000, "bios", ROMREGION_ERASEFF)
 	ROM_LOAD( "m29f002bt.u6", 0x000000, 0x040000, CRC(012c9290) SHA1(cdee6f19d5e5ea5bb1dd6a5ec397ac70b3452790) )
-
-	ROM_REGION( 0x8000, "video_bios", ROMREGION_ERASEFF ) // TODO: Voodoo 2 has no bios, to be removed once the driver is updated not to look for this region
-//  ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
-//  ROM_CONTINUE(                                 0x0001, 0x4000 )
 
 	ROM_REGION( 0x2000, "iocpu", 0 )   /* Substitute board 87C552 MCU code */
 	ROM_LOAD( "87c552.bin", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM

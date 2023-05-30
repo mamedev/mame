@@ -13,8 +13,9 @@
 #pragma once
 
 #include "isa.h"
-#include "video/pc_vga.h"
-#include "mach32.h"
+#include "video/pc_vga_ati.h"
+#include "video/ati_mach8.h"
+#include "video/ati_mach32.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
