@@ -10,7 +10,7 @@
         · Dell Optiplex 390.
         · Dell Optiplex 580.
         · Microtel w/ASRock N68C-GS FX AM3+ motherboard.
-    - Video GeForce GT730.
+    - Video GeForce GT730 (GF108).
       * Other supported setups are:
         · nVidia 8400GS (256MB+).
         · nVidia 7300GS.
@@ -146,6 +146,6 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(2013, doodlejmp,    0, rawthrillspc, rawthrillspc, rawthrillspc_state, empty_init, ROT0, "ICE / Raw Thrills (Lima Sky licensed)",      "Doodle Jump Arcade (v1.16)",       MACHINE_IS_SKELETON)
+GAME(2013, doodlejmp,    0, rawthrillspc, rawthrillspc, rawthrillspc_state, empty_init, ROT0, "ICE / Raw Thrills (Lima Sky license)",      "Doodle Jump Arcade (v1.16)",       MACHINE_IS_SKELETON)
 GAME(2004, fnf,          0, rawthrillspc, rawthrillspc, rawthrillspc_state, empty_init, ROT0, "Raw Thrills",                                "The Fast And The Furious (v3.06)", MACHINE_IS_SKELETON)
-GAME(2008, guitarheroac, 0, rawthrillspc, rawthrillspc, rawthrillspc_state, empty_init, ROT0, "Raw Thrills (Activision / Konami licensed)", "Guitar Hero Arcade (v1.0.5)",      MACHINE_IS_SKELETON)
+GAME(2008, guitarheroac, 0, rawthrillspc, rawthrillspc, rawthrillspc_state, empty_init, ROT0, "Raw Thrills (Activision / Konami license)", "Guitar Hero Arcade (v1.0.5)",      MACHINE_IS_SKELETON)
