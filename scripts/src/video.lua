@@ -907,7 +907,7 @@ end
 
 --------------------------------------------------
 --
---@src/devices/video/pc_vga_nvidia.h,VIDEOS["PC_VGA_S3"] = true
+--@src/devices/video/pc_vga_s3.h,VIDEOS["PC_VGA_S3"] = true
 --------------------------------------------------
 
 if (VIDEOS["PC_VGA_S3"]~=null) then
