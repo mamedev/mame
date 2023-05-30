@@ -35339,6 +35339,7 @@ streetgr3                       // (c) 1993
 pcipc                           //
 pcinv3                          //
 pcipctx                         //
+pciagp                          //
 
 @source:pc/pcxt.cpp
 filetto                         // (c) 1990 Novamatic

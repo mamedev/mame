@@ -27,15 +27,20 @@
 #include "bus/rs232/terminal.h"
 #include "cpu/i386/i386.h"
 #include "machine/fdc37c93x.h"
+#include "machine/w83977tf.h"
 #include "machine/i82371sb.h"
 #include "machine/i82439hx.h"
 #include "machine/i82439tx.h"
+#include "machine/i82443bx_host.h"
+#include "machine/i82371eb_isa.h"
+#include "machine/i82371eb_ide.h"
+#include "machine/i82371eb_acpi.h"
+#include "machine/i82371eb_usb.h"
 #include "machine/pci-ide.h"
 #include "machine/pci.h"
 #include "video/mga2064w.h"
 #include "video/virge_pci.h"
 #include "video/riva128.h"
-
 
 namespace {
 
@@ -54,6 +59,7 @@ public:
 	void pcipc(machine_config &config);
 	void pcipctx(machine_config &config);
 	void pcinv3(machine_config &config);
+	void pciagp(machine_config &config);
 
 	pcipc_state(const machine_config &mconfig, device_type type, const char *tag);
 
@@ -67,7 +73,8 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	static void superio_config(device_t *device);
+	static void smc_superio_config(device_t *device);
+	static void winbond_superio_config(device_t *device);
 };
 
 pcipc_state::pcipc_state(const machine_config &mconfig, device_type type, const char *tag) : driver_device(mconfig, type, tag)
@@ -485,6 +492,7 @@ void pcipc_state::boot_state_award_w(uint8_t data)
 static void isa_internal_devices(device_slot_interface &device)
 {
 	device.option_add("fdc37c93x", FDC37C93X);
+	device.option_add("w83977tf", W83977TF);
 }
 
 static void isa_com(device_slot_interface &device)
@@ -499,7 +507,7 @@ static void isa_com(device_slot_interface &device)
 	device.option_add("sun_kbd", SUN_KBD_ADAPTOR);
 }
 
-void pcipc_state::superio_config(device_t *device)
+void pcipc_state::smc_superio_config(device_t *device)
 {
 	fdc37c93x_device &fdc = *downcast<fdc37c93x_device *>(device);
 	fdc.set_sysopt_pin(1);
@@ -514,6 +522,23 @@ void pcipc_state::superio_config(device_t *device)
 	fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
 	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
 }
+
+void pcipc_state::winbond_superio_config(device_t *device)
+{
+	w83977tf_device &fdc = *downcast<w83977tf_device *>(device);
+//	fdc.set_sysopt_pin(1);
+	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
+	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
+	fdc.irq1().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq1_w));
+	fdc.irq8().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq8n_w));
+//	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
+//	fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
+//	fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
+//	fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
+//	fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
+//	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
+}
+
 
 void pcipc_state::pcipc_map(address_map &map)
 {
@@ -546,7 +571,7 @@ void pcipc_state::pcipc(machine_config &config)
 //  MGA2064W(config, "pci:12.0", 0);
 	VIRGE_PCI(config, "pci:12.0", 0);   // use VIRGEDX_PCI for its VESA 2.0 BIOS
 
-	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", superio_config);
+	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", smc_superio_config);
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa3", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
@@ -588,6 +613,58 @@ void pcipc_state::pcinv3(machine_config &config)
 	RIVA128(config.replace(), "pci:12.0", 0);
 }
 
+void pcipc_state::pciagp(machine_config &config)
+{
+	// TODO: starts at 233'000'000
+	pentium2_device &maincpu(PENTIUM2(config, "maincpu", 90'000'000));
+	maincpu.set_addrmap(AS_PROGRAM, &pcipc_state::pcipc_map);
+	maincpu.set_addrmap(AS_IO, &pcipc_state::pcipc_map_io);
+	maincpu.set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
+	maincpu.smiact().set("pci:00.0", FUNC(i82443bx_host_device::smi_act_w));
+
+	PCI_ROOT(config, "pci", 0);
+	I82443BX_HOST(config, "pci:00.0", 0, "maincpu", 128*1024*1024);
+	I82443BX_BRIDGE(config, "pci:01.0", 0 ); //"pci:01.0:00.0");
+	//I82443BX_AGP   (config, "pci:01.0:00.0");
+
+	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, "maincpu"));
+	isa.boot_state_hook().set(FUNC(pcipc_state::boot_state_award_w));
+	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
+
+	i82371eb_ide_device &ide(I82371EB_IDE(config, "pci:07.1", 0, "maincpu"));
+	ide.irq_pri().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq14_w));
+	ide.irq_sec().set("pci:07.0", FUNC(i82371eb_isa_device::pc_mirq0_w));
+
+	I82371EB_USB (config, "pci:07.2", 0);
+	I82371EB_ACPI(config, "pci:07.3", 0);
+	LPC_ACPI     (config, "pci:07.3:acpi", 0);
+	SMBUS        (config, "pci:07.3:smbus", 0);
+
+	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "w83977tf", true).set_option_machine_config("w83977tf", winbond_superio_config);
+	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+
+#if 0
+	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, nullptr)); // "microsoft_mouse"));
+	serport0.rxd_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::rxd1_w));
+	serport0.dcd_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::ndcd1_w));
+	serport0.dsr_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::ndsr1_w));
+	serport0.ri_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::nri1_w));
+	serport0.cts_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::ncts1_w));
+
+	rs232_port_device &serport1(RS232_PORT(config, "serport1", isa_com, nullptr));
+	serport1.rxd_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::rxd2_w));
+	serport1.dcd_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::ndcd2_w));
+	serport1.dsr_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::ndsr2_w));
+	serport1.ri_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::nri2_w));
+	serport1.cts_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::ncts2_w));
+#endif
+
+	// TODO: temp, to be converted to a proper AGP card once we make this to boot
+	VIRGE_PCI(config, "pci:0e.0", 0); // J4C1
+}
+
 ROM_START(pcipc)
 	ROM_REGION32_LE(0x40000, "pci:07.0", 0) /* PC bios */
 	ROM_SYSTEM_BIOS(0, "m55ns04", "m55ns04") // Micronics M55HI-Plus with no sound
@@ -617,6 +694,13 @@ ROM_START(pcinv3)
 	ROMX_LOAD("m55-04ns.rom", 0x20000, 0x20000, CRC(0116b2b0) SHA1(19b0203decfd4396695334517488d488aec3ccde), ROM_BIOS(0))
 ROM_END
 
+ROM_START(pciagp)
+	ROM_REGION32_LE(0x40000, "pci:07.0", 0) /* PC bios */
+	// a.k.a. the BIOS present in savquest.cpp
+	ROM_SYSTEM_BIOS(0, "dfi_p2xbl", "Octek Rhino BX-ATX")
+	ROMX_LOAD( "p2xbl_award_451pg.bin", 0x00000, 0x040000, CRC(37d0030e) SHA1(c6773d0e02325116f95c497b9953f59a9ac81317), ROM_BIOS(0) )
+ROM_END
+
 static INPUT_PORTS_START(pcipc)
 INPUT_PORTS_END
 
@@ -624,5 +708,6 @@ INPUT_PORTS_END
 
 
 COMP(1998, pcipc,    0,     0, pcipc,   pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX)", MACHINE_NO_SOUND)
-COMP(1998, pcinv3,   pcipc, 0, pcinv3,pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX with Riva 128)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1998, pcinv3,   pcipc, 0, pcinv3,  pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX with Riva 128)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 COMP(1998, pcipctx,  0,     0, pcipctx, pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430TX)", MACHINE_NO_SOUND)
+COMP(1999, pciagp,   0,     0, pciagp,  pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI/AGP PC (440BX)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
