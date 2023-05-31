@@ -4,6 +4,9 @@
 
     Markham (c) 1983 Sun Electronics
     Strength & Skill (c) 1984 Sun Electronics
+	The Guiness (Japan) (c) 1984 Sun Electronics
+	BanBam (c) 1984 Sun Electronics
+	Pettan Pyuu (Japan) (c) 1984 Sun Electronics
 
     Driver by Uki
 
