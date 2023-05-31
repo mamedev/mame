@@ -352,6 +352,6 @@ ROM_END
 
 //    YEAR  NAME         PARENT   MACHINE           INPUT      CLASS                  INIT        ROT   COMPANY   FULLNAME                             FLAGS
 GAME( 1991, cbully,      0,       falgasm89_simple, falgasm89, falgasm89_state,       empty_init, ROT0, "Falgas", "Coche Bully",                       MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 19??, fantcar,     0,       falgasm89,        falgasm89, falgasm89_state,       empty_init, ROT0, "Falgas", "Fantastic Car (M89 hardware)",      MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1989, fantcar,     0,       falgasm89,        falgasm89, falgasm89_state,       empty_init, ROT0, "Falgas", "Fantastic Car (M89 hardware)",      MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1987, fantcar87,   fantcar, falgasm87,        falgasm89, falgasm89_state,       empty_init, ROT0, "Falgas", "Fantastic Car (Micro-87 hardware)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1991, rmontecarlo, 0,       falgasm89_video,  falgasm89, falgasm89_video_state, empty_init, ROT0, "Falgas", "Rally Montecarlo",                  MACHINE_IS_SKELETON_MECHANICAL )
