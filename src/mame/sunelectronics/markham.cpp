@@ -9,7 +9,7 @@
     TODO:
     - needs merging with ikki.cpp
     - look up schematics for all games
-   	- hook up actual SUN 8212 and figure out ROM mode communications
+    - hook up actual SUN 8212 and figure out ROM mode communications
 
     Notes:
     Banbam has a Fujitsu MB8841 4-Bit MCU for protection labeled SUN 8212.
