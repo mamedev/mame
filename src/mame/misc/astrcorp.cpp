@@ -95,11 +95,11 @@ public:
 	astro_cpucode_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// read handlers
-	int do_read();    // DO
+	int do_read();              // DO
 
 	// write handlers
-	void cs_write(int state);  // CS signal (active high)
-	void clk_write(int state); // CLK signal (active high)
+	void cs_write(int state);   // CS signal (active high)
+	void clk_write(int state);  // CLK signal (active high)
 
 protected:
 	virtual void device_start() override;
