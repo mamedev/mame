@@ -16,40 +16,40 @@ DEFINE_DEVICE_TYPE(H8S_TIMER16_CHANNEL, h8s_timer16_channel_device, "h8s_timer16
 h8_timer16_channel_device::h8_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8_timer16_channel_device(mconfig, H8_TIMER16_CHANNEL, tag, owner, clock)
 {
-	chain_tag = nullptr;
+	m_chain_tag = nullptr;
 }
 
 h8_timer16_channel_device::h8_timer16_channel_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	cpu(*this, "^^"), chained_timer(nullptr), intc(nullptr), intc_tag(nullptr), tier_mask(0), tgr_count(0), tbr_count(0), tgr_clearing(0), tcr(0), tier(0), ier(0), isr(0), clock_type(0),
-	clock_divider(0), tcnt(0), last_clock_update(0), event_time(0), phase(0), counter_cycle(0), counter_incrementing(false), channel_active(false)
+	m_cpu(*this, "^^"), m_chained_timer(nullptr), m_intc(nullptr), m_intc_tag(nullptr), m_tier_mask(0), m_tgr_count(0), m_tbr_count(0), m_tgr_clearing(0), m_tcr(0), m_tier(0), m_ier(0), m_isr(0), m_clock_type(0),
+	m_clock_divider(0), m_tcnt(0), m_last_clock_update(0), m_event_time(0), m_phase(0), m_counter_cycle(0), m_counter_incrementing(false), m_channel_active(false)
 {
-	chain_tag = nullptr;
+	m_chain_tag = nullptr;
 }
 
-void h8_timer16_channel_device::set_info(int _tgr_count, int _tbr_count, const char *intc, int irq_base)
+void h8_timer16_channel_device::set_info(int tgr_count, int tbr_count, const char *intc, int irq_base)
 {
-	tgr_count = _tgr_count;
-	tbr_count = _tbr_count;
-	intc_tag = intc;
+	m_tgr_count = tgr_count;
+	m_tbr_count = tbr_count;
+	m_intc_tag = intc;
 
-	interrupt[0] = irq_base++;
-	interrupt[1] = irq_base++;
-	interrupt[2] = -1;
-	interrupt[3] = -1;
-	interrupt[4] = irq_base;
-	interrupt[5] = irq_base;
+	m_interrupt[0] = irq_base++;
+	m_interrupt[1] = irq_base++;
+	m_interrupt[2] = -1;
+	m_interrupt[3] = -1;
+	m_interrupt[4] = irq_base;
+	m_interrupt[5] = irq_base;
 }
 
 uint8_t h8_timer16_channel_device::tcr_r()
 {
-	return tcr;
+	return m_tcr;
 }
 
 void h8_timer16_channel_device::tcr_w(uint8_t data)
 {
 	update_counter();
-	tcr = data;
+	m_tcr = data;
 	if(V>=1) logerror("tcr_w %02x\n", data);
 	tcr_update();
 	recalc_event();
@@ -78,36 +78,36 @@ void h8_timer16_channel_device::tior_w(offs_t offset, uint8_t data)
 void h8_timer16_channel_device::set_ier(uint8_t value)
 {
 	update_counter();
-	ier = value;
+	m_ier = value;
 	recalc_event();
 }
 
 void h8_timer16_channel_device::set_enable(bool enable)
 {
 	update_counter();
-	channel_active = enable;
+	m_channel_active = enable;
 	recalc_event();
 }
 
 uint8_t h8_timer16_channel_device::tier_r()
 {
-	return tier;
+	return m_tier;
 }
 
 void h8_timer16_channel_device::tier_w(uint8_t data)
 {
 	update_counter();
 	if(V>=1) logerror("tier_w %02x\n", data);
-	tier = data;
+	m_tier = data;
 	tier_update();
 	if(V>=1) logerror("irq %c%c%c%c%c%c trigger=%d\n",
-						ier & IRQ_A ? 'a' : '.',
-						ier & IRQ_B ? 'b' : '.',
-						ier & IRQ_C ? 'c' : '.',
-						ier & IRQ_D ? 'd' : '.',
-						ier & IRQ_V ? 'v' : '.',
-						ier & IRQ_U ? 'u' : '.',
-						ier & IRQ_TRIG ? 1 : 0);
+						m_ier & IRQ_A ? 'a' : '.',
+						m_ier & IRQ_B ? 'b' : '.',
+						m_ier & IRQ_C ? 'c' : '.',
+						m_ier & IRQ_D ? 'd' : '.',
+						m_ier & IRQ_V ? 'v' : '.',
+						m_ier & IRQ_U ? 'u' : '.',
+						m_ier & IRQ_TRIG ? 1 : 0);
 	recalc_event();
 }
 
@@ -125,174 +125,174 @@ void h8_timer16_channel_device::tsr_w(uint8_t data)
 uint16_t h8_timer16_channel_device::tcnt_r()
 {
 	update_counter();
-	return tcnt;
+	return m_tcnt;
 }
 
 void h8_timer16_channel_device::tcnt_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	update_counter();
-	COMBINE_DATA(&tcnt);
-	if(V>=1) logerror("tcnt_w %04x\n", tcnt);
+	COMBINE_DATA(&m_tcnt);
+	if(V>=1) logerror("tcnt_w %04x\n", m_tcnt);
 	recalc_event();
 }
 
 uint16_t h8_timer16_channel_device::tgr_r(offs_t offset)
 {
-	return tgr[offset];
+	return m_tgr[offset];
 }
 
 void h8_timer16_channel_device::tgr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	update_counter();
-	COMBINE_DATA(tgr + offset);
-	if(V>=1) logerror("tgr%c_w %04x\n", 'a'+offset, tgr[offset]);
+	COMBINE_DATA(m_tgr + offset);
+	if(V>=1) logerror("tgr%c_w %04x\n", 'a'+offset, m_tgr[offset]);
 	recalc_event();
 }
 
 uint16_t h8_timer16_channel_device::tbr_r(offs_t offset)
 {
-	return tgr[offset+tgr_count];
+	return m_tgr[offset+m_tgr_count];
 }
 
 void h8_timer16_channel_device::tbr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(tgr + offset + tgr_count);
-	if(V>=1) logerror("tbr%c_w %04x\n", 'a'+offset, tgr[offset]);
+	COMBINE_DATA(m_tgr + offset + m_tgr_count);
+	if(V>=1) logerror("tbr%c_w %04x\n", 'a'+offset, m_tgr[offset]);
 }
 
 void h8_timer16_channel_device::device_start()
 {
-	intc = owner()->siblingdevice<h8_intc_device>(intc_tag);
-	channel_active = false;
+	m_intc = owner()->siblingdevice<h8_intc_device>(m_intc_tag);
+	m_channel_active = false;
 	device_reset();
 
-	save_item(NAME(tgr_clearing));
-	save_item(NAME(tcr));
-	save_item(NAME(tier));
-	save_item(NAME(ier));
-	save_item(NAME(isr));
-	save_item(NAME(clock_type));
-	save_item(NAME(clock_divider));
-	save_item(NAME(tcnt));
-	save_item(NAME(tgr));
-	save_item(NAME(last_clock_update));
-	save_item(NAME(event_time));
-	save_item(NAME(phase));
-	save_item(NAME(counter_cycle));
-	save_item(NAME(counter_incrementing));
-	save_item(NAME(channel_active));
+	save_item(NAME(m_tgr_clearing));
+	save_item(NAME(m_tcr));
+	save_item(NAME(m_tier));
+	save_item(NAME(m_ier));
+	save_item(NAME(m_isr));
+	save_item(NAME(m_clock_type));
+	save_item(NAME(m_clock_divider));
+	save_item(NAME(m_tcnt));
+	save_item(NAME(m_tgr));
+	save_item(NAME(m_last_clock_update));
+	save_item(NAME(m_event_time));
+	save_item(NAME(m_phase));
+	save_item(NAME(m_counter_cycle));
+	save_item(NAME(m_counter_incrementing));
+	save_item(NAME(m_channel_active));
 }
 
 void h8_timer16_channel_device::device_reset()
 {
 	// Don't touch channel_active here, top level device handles it
-	tcr = 0;
-	tcnt = 0;
-	memset(tgr, 0xff, sizeof(tgr));
-	tgr_clearing = TGR_CLEAR_NONE;
-	clock_type = DIV_1;
-	clock_divider = 0;
-	counter_cycle = 0x10000;
-	phase = 0;
-	tier = 0x40 & tier_mask;
-	ier = 0;
-	isr = 0;
-	last_clock_update = 0;
-	event_time = 0;
-	counter_incrementing = true;
+	m_tcr = 0;
+	m_tcnt = 0;
+	memset(m_tgr, 0xff, sizeof(m_tgr));
+	m_tgr_clearing = TGR_CLEAR_NONE;
+	m_clock_type = DIV_1;
+	m_clock_divider = 0;
+	m_counter_cycle = 0x10000;
+	m_phase = 0;
+	m_tier = 0x40 & m_tier_mask;
+	m_ier = 0;
+	m_isr = 0;
+	m_last_clock_update = 0;
+	m_event_time = 0;
+	m_counter_incrementing = true;
 }
 
 uint64_t h8_timer16_channel_device::internal_update(uint64_t current_time)
 {
-	if(event_time && current_time >= event_time) {
+	if(m_event_time && current_time >= m_event_time) {
 		update_counter(current_time);
 		recalc_event(current_time);
 	}
 
-	return event_time;
+	return m_event_time;
 }
 
 void h8_timer16_channel_device::update_counter(uint64_t cur_time)
 {
-	if(clock_type != DIV_1)
+	if(m_clock_type != DIV_1)
 		return;
 
 	if(!cur_time)
-		cur_time = cpu->total_cycles();
+		cur_time = m_cpu->total_cycles();
 
-	if(!channel_active) {
-		last_clock_update = cur_time;
+	if(!m_channel_active) {
+		m_last_clock_update = cur_time;
 		return;
 	}
 
-	uint64_t base_time = last_clock_update;
+	uint64_t base_time = m_last_clock_update;
 	uint64_t new_time = cur_time;
-	if(clock_divider) {
-		base_time = (base_time + phase) >> clock_divider;
-		new_time = (new_time + phase) >> clock_divider;
+	if(m_clock_divider) {
+		base_time = (base_time + m_phase) >> m_clock_divider;
+		new_time = (new_time + m_phase) >> m_clock_divider;
 	}
-	if(counter_incrementing) {
-		int tt = tcnt + new_time - base_time;
-		tcnt = tt % counter_cycle;
+	if(m_counter_incrementing) {
+		int tt = m_tcnt + new_time - base_time;
+		m_tcnt = tt % m_counter_cycle;
 
-		for(int i=0; i<tgr_count; i++)
-			if((ier & (1 << i)) && (tt == tgr[i] || tcnt == tgr[i]) && interrupt[i] != -1) {
-				isr |= 1 << i;
-				intc->internal_interrupt(interrupt[i]);
+		for(int i=0; i<m_tgr_count; i++)
+			if((m_ier & (1 << i)) && (tt == m_tgr[i] || m_tcnt == m_tgr[i]) && m_interrupt[i] != -1) {
+				m_isr |= 1 << i;
+				m_intc->internal_interrupt(m_interrupt[i]);
 			}
-		if(tt >= 0x10000 && (ier & IRQ_V) && interrupt[4] != -1) {
-			isr |= IRQ_V;
-			intc->internal_interrupt(interrupt[4]);
+		if(tt >= 0x10000 && (m_ier & IRQ_V) && m_interrupt[4] != -1) {
+			m_isr |= IRQ_V;
+			m_intc->internal_interrupt(m_interrupt[4]);
 		}
 	} else
-		tcnt = (((tcnt ^ 0xffff) + new_time - base_time) % counter_cycle) ^ 0xffff;
-	last_clock_update = cur_time;
+		m_tcnt = (((m_tcnt ^ 0xffff) + new_time - base_time) % m_counter_cycle) ^ 0xffff;
+	m_last_clock_update = cur_time;
 }
 
 void h8_timer16_channel_device::recalc_event(uint64_t cur_time)
 {
-	if(!channel_active) {
-		event_time = 0;
+	if(!m_channel_active) {
+		m_event_time = 0;
 		return;
 	}
 
 	bool update_cpu = cur_time == 0;
-	uint64_t old_event_time = event_time;
+	uint64_t old_event_time = m_event_time;
 
-	if(clock_type != DIV_1) {
-		event_time = 0;
+	if(m_clock_type != DIV_1) {
+		m_event_time = 0;
 		if(old_event_time && update_cpu)
-			cpu->internal_update();
+			m_cpu->internal_update();
 
 		return;
 	}
 
 	if(!cur_time)
-		cur_time = cpu->total_cycles();
+		cur_time = m_cpu->total_cycles();
 
-	if(counter_incrementing) {
+	if(m_counter_incrementing) {
 		uint32_t event_delay = 0xffffffff;
-		if(tgr_clearing >= 0 && tgr[tgr_clearing])
-			counter_cycle = tgr[tgr_clearing];
+		if(m_tgr_clearing >= 0 && m_tgr[m_tgr_clearing])
+			m_counter_cycle = m_tgr[m_tgr_clearing];
 		else {
-			counter_cycle = 0x10000;
-			if(ier & IRQ_V) {
-				event_delay = counter_cycle - tcnt;
+			m_counter_cycle = 0x10000;
+			if(m_ier & IRQ_V) {
+				event_delay = m_counter_cycle - m_tcnt;
 				if(!event_delay)
-					event_delay = counter_cycle;
+					event_delay = m_counter_cycle;
 			}
 		}
-		for(int i=0; i<tgr_count; i++)
-			if(ier & (1 << i)) {
+		for(int i=0; i<m_tgr_count; i++)
+			if(m_ier & (1 << i)) {
 				uint32_t new_delay = 0xffffffff;
-				if(tgr[i] > tcnt) {
-					if(tcnt >= counter_cycle || tgr[i] <= counter_cycle)
-						new_delay = tgr[i] - tcnt;
-				} else if(tgr[i] <= counter_cycle) {
-					if(tcnt < counter_cycle)
-						new_delay = (counter_cycle - tcnt) + tgr[i];
+				if(m_tgr[i] > m_tcnt) {
+					if(m_tcnt >= m_counter_cycle || m_tgr[i] <= m_counter_cycle)
+						new_delay = m_tgr[i] - m_tcnt;
+				} else if(m_tgr[i] <= m_counter_cycle) {
+					if(m_tcnt < m_counter_cycle)
+						new_delay = (m_counter_cycle - m_tcnt) + m_tgr[i];
 					else
-						new_delay = (0x10000 - tcnt) + tgr[i];
+						new_delay = (0x10000 - m_tcnt) + m_tgr[i];
 				}
 
 				if(event_delay > new_delay)
@@ -300,62 +300,62 @@ void h8_timer16_channel_device::recalc_event(uint64_t cur_time)
 			}
 
 		if(event_delay != 0xffffffff)
-			event_time = ((((cur_time + (1ULL << clock_divider) - phase) >> clock_divider) + event_delay - 1) << clock_divider) + phase;
+			m_event_time = ((((cur_time + (1ULL << m_clock_divider) - m_phase) >> m_clock_divider) + event_delay - 1) << m_clock_divider) + m_phase;
 		else
-			event_time = 0;
+			m_event_time = 0;
 
 	} else {
 		logerror("decrementing counter\n");
 		exit(1);
 	}
 
-	if(old_event_time != event_time && update_cpu)
-		cpu->internal_update();
+	if(old_event_time != m_event_time && update_cpu)
+		m_cpu->internal_update();
 }
 
 h8_timer16_device::h8_timer16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, H8_TIMER16, tag, owner, clock),
-	cpu(*this, DEVICE_SELF_OWNER)
+	m_cpu(*this, DEVICE_SELF_OWNER)
 {
 }
 
 void h8_timer16_device::set_info(int count, uint8_t tstr)
 {
-	timer_count = count;
-	default_tstr = tstr;
+	m_timer_count = count;
+	m_default_tstr = tstr;
 }
 
 void h8_timer16_device::device_start()
 {
-	memset(timer_channel, 0, sizeof(timer_channel));
-	for(int i=0; i<timer_count; i++) {
+	memset(m_timer_channel, 0, sizeof(m_timer_channel));
+	for(int i=0; i<m_timer_count; i++) {
 		char tm[0x10];
 		sprintf(tm, "%d", i);
-		timer_channel[i] = subdevice<h8_timer16_channel_device>(tm);
+		m_timer_channel[i] = subdevice<h8_timer16_channel_device>(tm);
 	}
 
-	save_item(NAME(tstr));
+	save_item(NAME(m_tstr));
 }
 
 void h8_timer16_device::device_reset()
 {
-	tstr = default_tstr;
-	for(int i=0; i<timer_count; i++)
-		timer_channel[i]->set_enable((tstr >> i) & 1);
+	m_tstr = m_default_tstr;
+	for(int i=0; i<m_timer_count; i++)
+		m_timer_channel[i]->set_enable((m_tstr >> i) & 1);
 }
 
 
 uint8_t h8_timer16_device::tstr_r()
 {
-	return tstr;
+	return m_tstr;
 }
 
 void h8_timer16_device::tstr_w(uint8_t data)
 {
 	if(V>=1) logerror("tstr_w %02x\n", data);
-	tstr = data;
-	for(int i=0; i<timer_count; i++)
-		timer_channel[i]->set_enable((tstr >> i) & 1);
+	m_tstr = data;
+	for(int i=0; i<m_timer_count; i++)
+		m_timer_channel[i]->set_enable((m_tstr >> i) & 1);
 }
 
 uint8_t h8_timer16_device::tsyr_r()
@@ -411,9 +411,9 @@ void h8_timer16_device::tocr_w(uint8_t data)
 uint8_t h8_timer16_device::tisr_r(offs_t offset)
 {
 	uint8_t r = 0;
-	for(int i=0; i<timer_count; i++)
-		r |= timer_channel[i]->tisr_r(offset) << i;
-	for(int i=timer_count; i<4; i++)
+	for(int i=0; i<m_timer_count; i++)
+		r |= m_timer_channel[i]->tisr_r(offset) << i;
+	for(int i=m_timer_count; i<4; i++)
 		r |= 0x11 <<i;
 
 	if(V>=1) logerror("tisr%c_r %02x\n", 'a'+offset, r);
@@ -424,8 +424,8 @@ uint8_t h8_timer16_device::tisr_r(offs_t offset)
 void h8_timer16_device::tisr_w(offs_t offset, uint8_t data)
 {
 	if(V>=1) logerror("tisr%c_w %02x\n", 'a'+offset, data);
-	for(int i=0; i<timer_count; i++)
-		timer_channel[i]->tisr_w(offset, data >> i);
+	for(int i=0; i<m_timer_count; i++)
+		m_timer_channel[i]->tisr_w(offset, data >> i);
 }
 
 uint8_t h8_timer16_device::tisrc_r()
@@ -468,38 +468,38 @@ void h8_timer16_channel_device::tisr_w(int offset, uint8_t value)
 	if(!(value & 0x01)) {
 		switch(offset) {
 		case 0:
-			isr &= ~IRQ_A;
+			m_isr &= ~IRQ_A;
 			break;
 		case 1:
-			isr &= ~IRQ_B;
+			m_isr &= ~IRQ_B;
 			break;
 		case 2:
-			isr &= ~IRQ_V;
+			m_isr &= ~IRQ_V;
 			break;
 		}
 	}
 	if(value & 0x10) {
 		switch(offset) {
 		case 0:
-			ier |= IRQ_A;
+			m_ier |= IRQ_A;
 			break;
 		case 1:
-			ier |= IRQ_B;
+			m_ier |= IRQ_B;
 			break;
 		case 2:
-			ier |= IRQ_V;
+			m_ier |= IRQ_V;
 			break;
 		}
 	} else {
 		switch(offset) {
 		case 0:
-			ier &= ~IRQ_A;
+			m_ier &= ~IRQ_A;
 			break;
 		case 1:
-			ier &= ~IRQ_B;
+			m_ier &= ~IRQ_B;
 			break;
 		case 2:
-			ier &= ~IRQ_V;
+			m_ier &= ~IRQ_V;
 			break;
 		}
 	}
@@ -510,11 +510,11 @@ uint8_t h8_timer16_channel_device::tisr_r(int offset) const
 {
 	switch(offset) {
 	case 0:
-		return ((ier & IRQ_A) ? 0x10 : 0x00) | ((isr & IRQ_A) ? 0x01 : 0x00);
+		return ((m_ier & IRQ_A) ? 0x10 : 0x00) | ((m_isr & IRQ_A) ? 0x01 : 0x00);
 	case 1:
-		return ((ier & IRQ_B) ? 0x10 : 0x00) | ((isr & IRQ_B) ? 0x01 : 0x00);
+		return ((m_ier & IRQ_B) ? 0x10 : 0x00) | ((m_isr & IRQ_B) ? 0x01 : 0x00);
 	case 2:
-		return ((ier & IRQ_V) ? 0x10 : 0x00) | ((isr & IRQ_V) ? 0x01 : 0x00);
+		return ((m_ier & IRQ_V) ? 0x10 : 0x00) | ((m_isr & IRQ_V) ? 0x01 : 0x00);
 	}
 	return 0x00;
 }
@@ -528,91 +528,91 @@ h8h_timer16_channel_device::~h8h_timer16_channel_device()
 {
 }
 
-void h8h_timer16_channel_device::set_info(int _tgr_count, int _tbr_count, const char *intc, int irq_base)
+void h8h_timer16_channel_device::set_info(int tgr_count, int tbr_count, const char *intc, int irq_base)
 {
-	tgr_count = _tgr_count;
-	tbr_count = _tbr_count;
-	intc_tag = intc;
+	m_tgr_count = tgr_count;
+	m_tbr_count = tbr_count;
+	m_intc_tag = intc;
 
-	interrupt[0] = irq_base++;
-	interrupt[1] = irq_base++;
-	interrupt[2] = -1;
-	interrupt[3] = -1;
-	interrupt[4] = irq_base;
-	interrupt[5] = irq_base;
+	m_interrupt[0] = irq_base++;
+	m_interrupt[1] = irq_base++;
+	m_interrupt[2] = -1;
+	m_interrupt[3] = -1;
+	m_interrupt[4] = irq_base;
+	m_interrupt[5] = irq_base;
 }
 
 void h8h_timer16_channel_device::tier_update()
 {
-	tier = tier | 0xf8;
-	ier =
-		(tier & 0x01 ? IRQ_A : 0) |
-		(tier & 0x02 ? IRQ_B : 0) |
-		(tier & 0x04 ? IRQ_V : 0);
+	m_tier = m_tier | 0xf8;
+	m_ier =
+		(m_tier & 0x01 ? IRQ_A : 0) |
+		(m_tier & 0x02 ? IRQ_B : 0) |
+		(m_tier & 0x04 ? IRQ_V : 0);
 }
 
 void h8h_timer16_channel_device::isr_update(uint8_t val)
 {
 	if(!(val & 1))
-		isr &= ~IRQ_A;
+		m_isr &= ~IRQ_A;
 	if(!(val & 2))
-		isr &= ~IRQ_B;
+		m_isr &= ~IRQ_B;
 	if(!(val & 4))
-		isr &= ~IRQ_V;
+		m_isr &= ~IRQ_V;
 }
 
 uint8_t h8h_timer16_channel_device::isr_to_sr() const
 {
-	return 0xf8 | (isr & IRQ_V ? 4 : 0) | (isr & IRQ_B ? 2 : 0) | (isr & IRQ_A ? 1 : 0);
+	return 0xf8 | (m_isr & IRQ_V ? 4 : 0) | (m_isr & IRQ_B ? 2 : 0) | (m_isr & IRQ_A ? 1 : 0);
 }
 
 
 void h8h_timer16_channel_device::tcr_update()
 {
-	switch(tcr & 0x60) {
+	switch(m_tcr & 0x60) {
 	case 0x00:
-		tgr_clearing = TGR_CLEAR_NONE;
+		m_tgr_clearing = TGR_CLEAR_NONE;
 		if(V>=1) logerror("No automatic tcnt clearing\n");
 		break;
 	case 0x20: case 0x40: {
-		tgr_clearing = tcr & 0x20 ? 0 : 1;
-		if(V>=1) logerror("Auto-clear on tgr%c (%04x)\n", 'a'+tgr_clearing, tgr[tgr_clearing]);
+		m_tgr_clearing = m_tcr & 0x20 ? 0 : 1;
+		if(V>=1) logerror("Auto-clear on tgr%c (%04x)\n", 'a'+m_tgr_clearing, m_tgr[m_tgr_clearing]);
 		break;
 	}
 	case 0x60:
-		tgr_clearing = TGR_CLEAR_EXT;
+		m_tgr_clearing = TGR_CLEAR_EXT;
 		if(V>=1) logerror("External sync clear\n");
 		break;
 	}
 
-	int count_type = tcr & 7;
+	int count_type = m_tcr & 7;
 	if(count_type < 4) {
-		clock_type = DIV_1;
-		clock_divider = count_type;
-		if(V>=1) logerror("clock divider %d (%d)\n", clock_divider, 1 << clock_divider);
+		m_clock_type = DIV_1;
+		m_clock_divider = count_type;
+		if(V>=1) logerror("clock divider %d (%d)\n", m_clock_divider, 1 << m_clock_divider);
 		if(count_type <= DIV_2)
-			phase = 0;
+			m_phase = 0;
 		else {
-			switch(tcr & 0x18) {
+			switch(m_tcr & 0x18) {
 			case 0x00:
-				phase = 0;
+				m_phase = 0;
 				if(V>=1) logerror("Phase 0\n");
 				break;
 			case 0x08:
-				phase = 1 << (clock_divider-1);
+				m_phase = 1 << (m_clock_divider-1);
 				if(V>=1) logerror("Phase 180\n");
 				break;
 			case 0x10: case 0x18:
-				phase = 0;
-				clock_divider--;
+				m_phase = 0;
+				m_clock_divider--;
 				if(V>=1) logerror("Phase 0+180\n");
 				break;
 			}
 		}
 	} else {
-		clock_type = INPUT_A + (count_type-4);
-		clock_divider = 0;
-		phase = 0;
+		m_clock_type = INPUT_A + (count_type-4);
+		m_clock_divider = 0;
+		m_phase = 0;
 		if(V>=1) logerror("counting input %c\n", 'a'+count_type-INPUT_A);
 	}
 }
@@ -626,114 +626,114 @@ h8s_timer16_channel_device::~h8s_timer16_channel_device()
 {
 }
 
-void h8s_timer16_channel_device::set_chain(const char *_chain_tag)
+void h8s_timer16_channel_device::set_chain(const char *chain_tag)
 {
-	chain_tag = _chain_tag;
+	m_chain_tag = chain_tag;
 }
 
-void h8s_timer16_channel_device::set_info(int _tgr_count, uint8_t _tier_mask, const char *intc, int irq_base,
-											int t0, int t1, int t2, int t3, int t4, int t5, int t6, int t7)
+void h8s_timer16_channel_device::set_info(int tgr_count, uint8_t tier_mask, const char *intc, int irq_base,
+										  int t0, int t1, int t2, int t3, int t4, int t5, int t6, int t7)
 {
-	tgr_count = _tgr_count;
-	tbr_count = 0;
-	tier_mask = _tier_mask;
-	intc_tag = intc;
+	m_tgr_count = tgr_count;
+	m_tbr_count = 0;
+	m_tier_mask = tier_mask;
+	m_intc_tag = intc;
 
-	interrupt[0] = irq_base++;
-	interrupt[1] = irq_base++;
-	interrupt[2] = tier_mask & 0x04 ? -1 : irq_base++;
-	interrupt[3] = tier_mask & 0x08 ? -1 : irq_base++;
-	interrupt[4] = irq_base;
-	interrupt[5] = tier_mask & 0x20 ? -1 : irq_base++;
+	m_interrupt[0] = irq_base++;
+	m_interrupt[1] = irq_base++;
+	m_interrupt[2] = tier_mask & 0x04 ? -1 : irq_base++;
+	m_interrupt[3] = tier_mask & 0x08 ? -1 : irq_base++;
+	m_interrupt[4] = irq_base;
+	m_interrupt[5] = tier_mask & 0x20 ? -1 : irq_base++;
 
-	count_types[0] = t0;
-	count_types[1] = t1;
-	count_types[2] = t2;
-	count_types[3] = t3;
-	count_types[4] = t4;
-	count_types[5] = t5;
-	count_types[6] = t6;
-	count_types[7] = t7;
+	m_count_types[0] = t0;
+	m_count_types[1] = t1;
+	m_count_types[2] = t2;
+	m_count_types[3] = t3;
+	m_count_types[4] = t4;
+	m_count_types[5] = t5;
+	m_count_types[6] = t6;
+	m_count_types[7] = t7;
 }
 
 void h8s_timer16_channel_device::tier_update()
 {
-	tier = (tier & ~tier_mask) | 0x40;
-	ier =
-		(tier & 0x01 ? IRQ_A : 0) |
-		(tier & 0x02 ? IRQ_B : 0) |
-		(tier & 0x04 ? IRQ_C : 0) |
-		(tier & 0x08 ? IRQ_D : 0) |
-		(tier & 0x10 ? IRQ_V : 0) |
-		(tier & 0x20 ? IRQ_U : 0) |
-		(tier & 0x80 ? IRQ_TRIG : 0);
+	m_tier = (m_tier & ~m_tier_mask) | 0x40;
+	m_ier =
+		(m_tier & 0x01 ? IRQ_A : 0) |
+		(m_tier & 0x02 ? IRQ_B : 0) |
+		(m_tier & 0x04 ? IRQ_C : 0) |
+		(m_tier & 0x08 ? IRQ_D : 0) |
+		(m_tier & 0x10 ? IRQ_V : 0) |
+		(m_tier & 0x20 ? IRQ_U : 0) |
+		(m_tier & 0x80 ? IRQ_TRIG : 0);
 }
 
 void h8s_timer16_channel_device::isr_update(uint8_t val)
 {
-	isr &= (val | tier_mask | 0xc0);
+	m_isr &= (val | m_tier_mask | 0xc0);
 }
 
 uint8_t h8s_timer16_channel_device::isr_to_sr() const
 {
-	return 0xc0 | isr;
+	return 0xc0 | m_isr;
 }
 
 void h8s_timer16_channel_device::tcr_update()
 {
-	switch(tcr & 0x60) {
+	switch(m_tcr & 0x60) {
 	case 0x00:
-		tgr_clearing = TGR_CLEAR_NONE;
+		m_tgr_clearing = TGR_CLEAR_NONE;
 		if(V>=1) logerror("No automatic tcnt clearing\n");
 		break;
 	case 0x20: case 0x40: {
-		tgr_clearing = tcr & 0x20 ? 0 : 1;
-		if(tgr_count > 2 && (tcr & 0x80))
-			tgr_clearing += 2;
-		if(V>=1) logerror("Auto-clear on tgr%c\n", 'a'+tgr_clearing);
+		m_tgr_clearing = m_tcr & 0x20 ? 0 : 1;
+		if(m_tgr_count > 2 && (m_tcr & 0x80))
+			m_tgr_clearing += 2;
+		if(V>=1) logerror("Auto-clear on tgr%c\n", 'a'+m_tgr_clearing);
 		break;
 	}
 	case 0x60:
-		tgr_clearing = TGR_CLEAR_EXT;
+		m_tgr_clearing = TGR_CLEAR_EXT;
 		if(V>=1) logerror("External sync clear\n");
 		break;
 	}
 
-	int count_type = count_types[tcr & 7];
-	if(count_type >= DIV_1 && clock_type <= DIV_4) {
-		clock_type = DIV_1;
-		clock_divider = count_type - DIV_1;
-		if(V>=1) logerror("clock divider %d (%d)\n", clock_divider, 1 << clock_divider);
-		if(!clock_divider)
-			phase = 0;
+	int count_type = m_count_types[m_tcr & 7];
+	if(count_type >= DIV_1 && m_clock_type <= DIV_4) {
+		m_clock_type = DIV_1;
+		m_clock_divider = count_type - DIV_1;
+		if(V>=1) logerror("clock divider %d (%d)\n", m_clock_divider, 1 << m_clock_divider);
+		if(!m_clock_divider)
+			m_phase = 0;
 		else {
-			switch(tcr & 0x18) {
+			switch(m_tcr & 0x18) {
 			case 0x00:
-				phase = 0;
+				m_phase = 0;
 				if(V>=1) logerror("Phase 0\n");
 				break;
 			case 0x08:
-				phase = 1 << (clock_divider-1);
+				m_phase = 1 << (m_clock_divider-1);
 				if(V>=1) logerror("Phase 180\n");
 				break;
 			case 0x10: case 0x18:
-				phase = 0;
-				clock_divider--;
+				m_phase = 0;
+				m_clock_divider--;
 				if(V>=1) logerror("Phase 0+180\n");
 				break;
 			}
 		}
 
 	} else if(count_type == CHAIN) {
-		clock_type = CHAIN;
-		clock_divider = 0;
-		phase = 0;
+		m_clock_type = CHAIN;
+		m_clock_divider = 0;
+		m_phase = 0;
 		if(V>=1) logerror("chained timer\n");
 
 	} else if(count_type >= INPUT_A && count_type <= INPUT_D) {
-		clock_type = count_type;
-		clock_divider = 0;
-		phase = 0;
+		m_clock_type = count_type;
+		m_clock_divider = 0;
+		m_phase = 0;
 		if(V>=1) logerror("counting input %c\n", 'a'+count_type-INPUT_A);
 	}
 }

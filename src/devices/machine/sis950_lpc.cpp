@@ -420,7 +420,7 @@ void sis950_lpc_device::io_map(address_map &map)
 	// map(0x0000, 0x000f) DMA1
 	map(0x0000, 0x001f).rw(m_dmac_master, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	// map(0x0020, 0x0021) INT1
-	map(0x0020, 0x003f).rw(m_pic_master, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x0020, 0x0021).rw(m_pic_master, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	// map(0x0040, 0x0043) PIT
 	map(0x0040, 0x0043).rw(m_pit, FUNC(pit8254_device::read), FUNC(pit8254_device::write));
 	map(0x0060, 0x0060).rw(m_keybc, FUNC(ps2_keyboard_controller_device::data_r), FUNC(ps2_keyboard_controller_device::data_w));
@@ -436,7 +436,7 @@ void sis950_lpc_device::io_map(address_map &map)
 	// map(0x0092, 0x0092) INIT and A20
 	map(0x0092, 0x0092).rw(FUNC(sis950_lpc_device::lpc_fast_init_r), FUNC(sis950_lpc_device::lpc_fast_init_w));
 	// map(0x00a0, 0x00a1) INT2
-	map(0x00a0, 0x00bf).rw(m_pic_slave, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x00a0, 0x00a1).rw(m_pic_slave, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	// map(0x00c0, 0x00df) DMA2
 	map(0x00c0, 0x00df).lrw8(
 		NAME([this] (offs_t offset) { return m_dmac_slave->read( offset / 2 ); }),

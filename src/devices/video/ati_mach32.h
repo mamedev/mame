@@ -11,10 +11,9 @@
 
 #pragma once
 
-#include "video/pc_vga.h"
+#include "video/ati_mach8.h"
+#include "video/pc_vga_ati.h"
 #include "machine/eepromser.h"
-
-#define LOG_MACH32 1
 
 // 8514/A module of the Mach32
 class mach32_8514a_device : public mach8_device
@@ -25,7 +24,7 @@ public:
 
 	uint16_t mach32_chipid_r() { return m_chip_ID; }
 	uint16_t mach32_mem_boundary_r() { return m_membounds; }
-	void mach32_mem_boundary_w(uint16_t data) { m_membounds = data; if(data & 0x10) logerror("ATI: Unimplemented memory boundary activated."); }
+	void mach32_mem_boundary_w(uint16_t data);
 	void mach32_ge_ext_config_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint16_t mach32_config1_r();

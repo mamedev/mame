@@ -76,17 +76,17 @@ protected:
 		CLEAR_EXTERNAL
 	};
 
-	required_device<h8_device> cpu;
-	h8_timer8_channel_device *chained_timer;
-	h8_intc_device *intc;
-	const char *chain_tag, *intc_tag;
-	int irq_ca, irq_cb, irq_v, chain_type;
-	int div_tab[6];
-	uint8_t tcor[2];
-	uint8_t tcr, tcsr, tcnt;
-	bool extra_clock_bit, has_adte, has_ice;
-	int clock_type, clock_divider, clear_type, counter_cycle;
-	uint64_t last_clock_update, event_time;
+	required_device<h8_device> m_cpu;
+	h8_timer8_channel_device *m_chained_timer;
+	h8_intc_device *m_intc;
+	const char *m_chain_tag, *m_intc_tag;
+	int m_irq_ca, m_irq_cb, m_irq_v, m_chain_type;
+	int m_div_tab[6];
+	uint8_t m_tcor[2];
+	uint8_t m_tcr, m_tcsr, m_tcnt;
+	bool m_extra_clock_bit, m_has_adte, m_has_ice;
+	int m_clock_type, m_clock_divider, m_clear_type, m_counter_cycle;
+	uint64_t m_last_clock_update, m_event_time;
 
 	h8_timer8_channel_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

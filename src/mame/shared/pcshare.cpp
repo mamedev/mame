@@ -15,11 +15,8 @@
 
 #include "emu.h"
 #include "pcshare.h"
+
 #include "cpu/i86/i286.h"
-#include "bus/isa/trident.h"
-#include "video/pc_vga.h"
-#include "video/clgd542x.h"
-#include "screen.h"
 
 /******************
 DMA8237 Controller
@@ -138,65 +135,6 @@ void pcat_base_state::pcat32_io_common(address_map &map)
 	map(0x0080, 0x009f).rw(FUNC(pcat_base_state::dma_page_select_r), FUNC(pcat_base_state::dma_page_select_w));//TODO
 	map(0x00a0, 0x00bf).rw(m_pic8259_2, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x00c0, 0x00df).rw(m_dma8237_2, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask32(0x00ff00ff);
-}
-
-
-void pcat_base_state::pcvideo_vga(machine_config &config)
-{
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
-	screen.set_screen_update("vga", FUNC(vga_device::screen_update));
-
-	vga_device &vga(VGA(config, "vga", 0));
-	vga.set_screen("screen");
-	vga.set_vram_size(0x100000);
-}
-
-void pcat_base_state::pcvideo_trident_vga(machine_config &config)
-{
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
-	screen.set_screen_update("vga", FUNC(trident_vga_device::screen_update));
-
-	trident_vga_device &vga(TRIDENT_VGA(config, "vga", 0));
-	vga.set_screen("screen");
-	vga.set_vram_size(0x200000);
-}
-
-void pcat_base_state::pcvideo_s3_vga(machine_config &config)
-{
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
-	screen.set_screen_update("vga", FUNC(s3_vga_device::screen_update));
-
-	s3_vga_device &vga(S3_VGA(config, "vga", 0));
-	vga.set_screen("screen");
-	vga.set_vram_size(0x100000);
-}
-
-
-void pcat_base_state::pcvideo_cirrus_gd5428(machine_config &config)
-{
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
-	screen.set_screen_update("vga", FUNC(cirrus_gd5428_device::screen_update));
-
-	cirrus_gd5428_device &vga(CIRRUS_GD5428(config, "vga", 0));
-	vga.set_screen("screen");
-	vga.set_vram_size(0x200000);
-
-}
-
-void pcat_base_state::pcvideo_cirrus_gd5430(machine_config &config)
-{
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
-	screen.set_screen_update("vga", FUNC(cirrus_gd5430_device::screen_update));
-
-	cirrus_gd5430_device &vga(CIRRUS_GD5430(config, "vga", 0));
-	vga.set_screen("screen");
-	vga.set_vram_size(0x200000);
-
 }
 
 void pcat_base_state::pcat_common(machine_config &config)

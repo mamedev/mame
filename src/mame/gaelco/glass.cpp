@@ -78,12 +78,11 @@ private:
 
 	// misc
 	uint8_t m_current_bit = 0;
-	uint8_t m_cause_interrupt = 0;
 	uint8_t m_blitter_command = 0;
 
 	void shareram_w(offs_t offset, uint8_t data);
 	uint8_t shareram_r(offs_t offset);
-	void clr_int_w(uint16_t data);
+	void clr_int_w(uint8_t data);
 	void oki_bankswitch_w(uint8_t data);
 	void coin_w(offs_t offset, uint16_t data);
 	void blitter_w(uint16_t data);
@@ -94,7 +93,6 @@ private:
 
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void main_map(address_map &map);
 	void mcu_hostmem_map(address_map &map);
@@ -295,18 +293,9 @@ uint8_t glass_state::shareram_r(offs_t offset)
 }
 
 
-void glass_state::clr_int_w(uint16_t data)
+void glass_state::clr_int_w(uint8_t data)
 {
-	m_cause_interrupt = 1;
-}
-
-INTERRUPT_GEN_MEMBER(glass_state::interrupt)
-{
-	if (m_cause_interrupt)
-	{
-		device.execute().set_input_line(6, HOLD_LINE);
-		m_cause_interrupt = 0;
-	}
+	m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
 }
 
 
@@ -361,7 +350,8 @@ void glass_state::main_map(address_map &map)
 	map(0x100000, 0x101fff).ram().w(FUNC(glass_state::vram_w)).share(m_videoram);
 	map(0x102000, 0x102fff).ram();                                                                  // Extra Video RAM
 	map(0x108000, 0x108007).writeonly().share(m_vregs);
-	map(0x108008, 0x108009).w(FUNC(glass_state::clr_int_w));
+	map(0x108008, 0x108008).w(FUNC(glass_state::clr_int_w));
+	map(0x108008, 0x108009).nopr();
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x440000, 0x440fff).ram().share(m_spriteram);
 	map(0x700000, 0x700001).portr("DSW2");
@@ -460,14 +450,12 @@ void glass_state::machine_start()
 {
 	m_okibank->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 
-	save_item(NAME(m_cause_interrupt));
 	save_item(NAME(m_current_bit));
 	save_item(NAME(m_blitter_command));
 }
 
 void glass_state::machine_reset()
 {
-	m_cause_interrupt = 1;
 	m_current_bit = 0;
 	m_blitter_command = 0;
 }
@@ -477,7 +465,6 @@ void glass_state::glass(machine_config &config)
 	// basic machine hardware
 	M68000(config, m_maincpu, XTAL(24'000'000) / 2);      // 12 MHz verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &glass_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(glass_state::interrupt));
 
 	LS259(config, m_outlatch);
 	m_outlatch->q_out_cb<0>().set(FUNC(glass_state::coin_lockout_w<0>));
@@ -488,12 +475,13 @@ void glass_state::glass(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
+	screen.set_refresh_hz(57.42); // see note in gaelco.cpp
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(32*16, 32*16);
 	screen.set_visarea(0, 368-1, 16, 256-1);
 	screen.set_screen_update(FUNC(glass_state::screen_update));
 	screen.set_palette(m_palette);
+	screen.screen_vblank().set_inputline(m_maincpu, M68K_IRQ_6, ASSERT_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_glass);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);

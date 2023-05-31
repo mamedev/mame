@@ -38,14 +38,14 @@ public:
 	uint8_t odr_r();
 
 protected:
-	required_device<h8_device> cpu;
-	address_space *io;
+	required_device<h8_device> m_cpu;
+	address_space *m_io;
 
-	int address;
-	uint8_t default_ddr, ddr, pcr, odr;
-	uint8_t mask;
-	uint8_t dr;
-	uint8_t last_output;
+	int m_address;
+	uint8_t m_default_ddr, m_ddr, m_pcr, m_odr;
+	uint8_t m_mask;
+	uint8_t m_dr;
+	uint8_t m_last_output;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

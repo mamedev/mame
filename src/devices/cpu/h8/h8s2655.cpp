@@ -8,37 +8,37 @@ DEFINE_DEVICE_TYPE(H8S2653, h8s2653_device, "h8s2653", "Hitachi H8S/2653")
 
 h8s2655_device::h8s2655_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	h8s2600_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h8s2655_device::map), this)),
-	intc(*this, "intc"),
-	adc(*this, "adc"),
-	port1(*this, "port1"),
-	port2(*this, "port2"),
-	port3(*this, "port3"),
-	port4(*this, "port4"),
-	port5(*this, "port5"),
-	port6(*this, "port6"),
-	porta(*this, "porta"),
-	portb(*this, "portb"),
-	portc(*this, "portc"),
-	portd(*this, "portd"),
-	porte(*this, "porte"),
-	portf(*this, "portf"),
-	portg(*this, "portg"),
-	timer8_0(*this, "timer8_0"),
-	timer8_1(*this, "timer8_1"),
-	timer16(*this, "timer16"),
-	timer16_0(*this, "timer16:0"),
-	timer16_1(*this, "timer16:1"),
-	timer16_2(*this, "timer16:2"),
-	timer16_3(*this, "timer16:3"),
-	timer16_4(*this, "timer16:4"),
-	timer16_5(*this, "timer16:5"),
-	sci0(*this, "sci0"),
-	sci1(*this, "sci1"),
-	sci2(*this, "sci2"),
-	watchdog(*this, "watchdog"),
-	syscr(0)
+	m_intc(*this, "intc"),
+	m_adc(*this, "adc"),
+	m_port1(*this, "port1"),
+	m_port2(*this, "port2"),
+	m_port3(*this, "port3"),
+	m_port4(*this, "port4"),
+	m_port5(*this, "port5"),
+	m_port6(*this, "port6"),
+	m_porta(*this, "porta"),
+	m_portb(*this, "portb"),
+	m_portc(*this, "portc"),
+	m_portd(*this, "portd"),
+	m_porte(*this, "porte"),
+	m_portf(*this, "portf"),
+	m_portg(*this, "portg"),
+	m_timer8_0(*this, "timer8_0"),
+	m_timer8_1(*this, "timer8_1"),
+	m_timer16(*this, "timer16"),
+	m_timer16_0(*this, "timer16:0"),
+	m_timer16_1(*this, "timer16:1"),
+	m_timer16_2(*this, "timer16:2"),
+	m_timer16_3(*this, "timer16:3"),
+	m_timer16_4(*this, "timer16:4"),
+	m_timer16_5(*this, "timer16:5"),
+	m_sci0(*this, "sci0"),
+	m_sci1(*this, "sci1"),
+	m_sci2(*this, "sci2"),
+	m_watchdog(*this, "watchdog"),
+	m_syscr(0)
 {
-	has_trace = true;
+	m_has_trace = true;
 }
 
 h8s2655_device::h8s2655_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -270,115 +270,115 @@ void h8s2655_device::device_add_mconfig(machine_config &config)
 
 void h8s2655_device::execute_set_input(int inputnum, int state)
 {
-	intc->set_input(inputnum, state);
+	m_intc->set_input(inputnum, state);
 }
 
 bool h8s2655_device::exr_in_stack() const
 {
-	return syscr & 0x20;
+	return m_syscr & 0x20;
 }
 
 int h8s2655_device::trace_setup()
 {
-	if(syscr & 0x10)
-		CCR |= F_I|F_UI;
+	if(m_syscr & 0x10)
+		m_CCR |= F_I|F_UI;
 	else
-		CCR |= F_I;
-	EXR &= ~EXR_T;
+		m_CCR |= F_I;
+	m_EXR &= ~EXR_T;
 	return 5;
 }
 
 int h8s2655_device::trapa_setup()
 {
-	if(syscr & 0x10)
-		CCR |= F_I|F_UI;
+	if(m_syscr & 0x10)
+		m_CCR |= F_I|F_UI;
 	else
-		CCR |= F_I;
-	if(syscr & 0x20)
-		EXR &= ~EXR_T;
+		m_CCR |= F_I;
+	if(m_syscr & 0x20)
+		m_EXR &= ~EXR_T;
 	return 8;
 }
 
 void h8s2655_device::irq_setup()
 {
-	switch(syscr & 0x30) {
+	switch(m_syscr & 0x30) {
 	case 0x00:
-		CCR |= F_I;
+		m_CCR |= F_I;
 		break;
 	case 0x10:
-		CCR |= F_I|F_UI;
+		m_CCR |= F_I|F_UI;
 		break;
 	case 0x20:
-		EXR = EXR & (EXR_NC);
-		if(taken_irq_level == 8)
-			EXR |= 7;
+		m_EXR = m_EXR & (EXR_NC);
+		if(m_taken_irq_level == 8)
+			m_EXR |= 7;
 		else
-			EXR |= taken_irq_level;
+			m_EXR |= m_taken_irq_level;
 		break;
 	case 0x30:
-		CCR |= F_I|F_UI;
-		EXR = EXR & (EXR_NC);
-		if(taken_irq_level == 8)
-			EXR |= 7;
+		m_CCR |= F_I|F_UI;
+		m_EXR = m_EXR & (EXR_NC);
+		if(m_taken_irq_level == 8)
+			m_EXR |= 7;
 		else
-			EXR |= taken_irq_level;
+			m_EXR |= m_taken_irq_level;
 		break;
 	}
 }
 
 void h8s2655_device::update_irq_filter()
 {
-	switch(syscr & 0x30) {
+	switch(m_syscr & 0x30) {
 	case 0x00:
-		if(CCR & F_I)
-			intc->set_filter(2, -1);
+		if(m_CCR & F_I)
+			m_intc->set_filter(2, -1);
 		else
-			intc->set_filter(0, -1);
+			m_intc->set_filter(0, -1);
 		break;
 	case 0x10:
-		if((CCR & (F_I|F_UI)) == (F_I|F_UI))
-			intc->set_filter(2, -1);
-		else if(CCR & F_I)
-			intc->set_filter(1, -1);
+		if((m_CCR & (F_I|F_UI)) == (F_I|F_UI))
+			m_intc->set_filter(2, -1);
+		else if(m_CCR & F_I)
+			m_intc->set_filter(1, -1);
 		else
-			intc->set_filter(0, -1);
+			m_intc->set_filter(0, -1);
 		break;
 	case 0x20:
-		intc->set_filter(0, EXR & 7);
+		m_intc->set_filter(0, m_EXR & 7);
 		break;
 	case 0x30:
-		if((CCR & (F_I|F_UI)) == (F_I|F_UI))
-			intc->set_filter(2, EXR & 7);
-		else if(CCR & F_I)
-			intc->set_filter(1, EXR & 7);
+		if((m_CCR & (F_I|F_UI)) == (F_I|F_UI))
+			m_intc->set_filter(2, m_EXR & 7);
+		else if(m_CCR & F_I)
+			m_intc->set_filter(1, m_EXR & 7);
 		else
-			intc->set_filter(0, EXR & 7);
+			m_intc->set_filter(0, m_EXR & 7);
 		break;
 	}
 }
 
 void h8s2655_device::interrupt_taken()
 {
-	standard_irq_callback(intc->interrupt_taken(taken_irq_vector), NPC);
+	standard_irq_callback(m_intc->interrupt_taken(m_taken_irq_vector), m_NPC);
 }
 
 void h8s2655_device::internal_update(uint64_t current_time)
 {
 	uint64_t event_time = 0;
 
-	add_event(event_time, adc->internal_update(current_time));
-	add_event(event_time, sci0->internal_update(current_time));
-	add_event(event_time, sci1->internal_update(current_time));
-	add_event(event_time, sci2->internal_update(current_time));
-	add_event(event_time, timer8_0->internal_update(current_time));
-	add_event(event_time, timer8_1->internal_update(current_time));
-	add_event(event_time, timer16_0->internal_update(current_time));
-	add_event(event_time, timer16_1->internal_update(current_time));
-	add_event(event_time, timer16_2->internal_update(current_time));
-	add_event(event_time, timer16_3->internal_update(current_time));
-	add_event(event_time, timer16_4->internal_update(current_time));
-	add_event(event_time, timer16_5->internal_update(current_time));
-	add_event(event_time, watchdog->internal_update(current_time));
+	add_event(event_time, m_adc->internal_update(current_time));
+	add_event(event_time, m_sci0->internal_update(current_time));
+	add_event(event_time, m_sci1->internal_update(current_time));
+	add_event(event_time, m_sci2->internal_update(current_time));
+	add_event(event_time, m_timer8_0->internal_update(current_time));
+	add_event(event_time, m_timer8_1->internal_update(current_time));
+	add_event(event_time, m_timer16_0->internal_update(current_time));
+	add_event(event_time, m_timer16_1->internal_update(current_time));
+	add_event(event_time, m_timer16_2->internal_update(current_time));
+	add_event(event_time, m_timer16_3->internal_update(current_time));
+	add_event(event_time, m_timer16_4->internal_update(current_time));
+	add_event(event_time, m_timer16_5->internal_update(current_time));
+	add_event(event_time, m_watchdog->internal_update(current_time));
 
 	recompute_bcount(event_time);
 }
@@ -391,17 +391,17 @@ void h8s2655_device::device_start()
 void h8s2655_device::device_reset()
 {
 	h8s2600_device::device_reset();
-	syscr = 0x01;
+	m_syscr = 0x01;
 }
 
 uint8_t h8s2655_device::syscr_r()
 {
-	return syscr;
+	return m_syscr;
 }
 
 void h8s2655_device::syscr_w(uint8_t data)
 {
-	syscr = data;
+	m_syscr = data;
 	update_irq_filter();
 	logerror("syscr = %02x\n", data);
 }

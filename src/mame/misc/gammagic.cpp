@@ -80,7 +80,7 @@ private:
 void gammagic_state::gammagic_map(address_map &map)
 {
 	map(0x00000000, 0x0009ffff).ram();
-	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
+//	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
 	map(0x000e0000, 0x000fffff).rom().region("isa", 0x20000);/* System BIOS */
 	map(0x00100000, 0x07ffffff).ram();
 	map(0x08000000, 0xfffdffff).noprw();
@@ -93,9 +93,9 @@ void gammagic_state::gammagic_io(address_map &map)
 	map(0x00e8, 0x00ef).noprw();
 //  map(0x00f0, 0x01ef).noprw();
 //  map(0x01f8, 0x03af).noprw();
-	map(0x03b0, 0x03bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
-	map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
-	map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
+//	map(0x03b0, 0x03bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
+//	map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
+//	map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
 //  map(0x03e0, 0x03ef).noprw();
 //  map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_device::read), FUNC(pci_bus_device::write));
 //  map(0x0400, 0xffff).noprw();
@@ -120,9 +120,6 @@ void gammagic_state::gammagic(machine_config &config)
 
 	PCI_ROOT(config, "pci", 0);
 	// ...
-
-	/* video hardware */
-	pcvideo_vga(config);
 }
 
 
@@ -130,11 +127,9 @@ ROM_START( gammagic )
 	ROM_REGION32_LE(0x40000, "isa", 0)
 	//Original Memory Set
 	//ROM_LOAD("m7s04.rom",   0, 0x40000, CRC(3689f5a9) SHA1(8daacdb0dc6783d2161680564ffe83ac2515f7ef))
+	// TODO: add this (needs "OAK SVGA" PCI BIOS hooked up)
 	//ROM_LOAD("otivga_tx2953526.rom", 0x0000, 0x8000, CRC(916491af) SHA1(d64e3a43a035d70ace7a2d0603fc078f22d237e1))
 
-	// TODO: remove this (needs "OAK SVGA" PCI BIOS hooked up)
-	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
-	ROM_CONTINUE(                                 0x0001, 0x4000 )
 	// TODO: specs mentions a m55hipl compatible BIOS, this is 5HX29
 	ROM_LOAD("5hx29.bin",   0x20000, 0x20000, BAD_DUMP CRC(07719a55) SHA1(b63993fd5186cdb4f28c117428a507cd069e1f68))
 
@@ -150,11 +145,9 @@ ROM_START( 99bottles )
 	ROM_REGION32_LE(0x40000, "isa", 0)
 	//Original BIOS/VGA-BIOS Rom Set
 	//ROM_LOAD("m7s04.rom",   0, 0x40000, CRC(3689f5a9) SHA1(8daacdb0dc6783d2161680564ffe83ac2515f7ef))
+	// TODO: add this (needs "OAK SVGA" PCI BIOS hooked up)
 	//ROM_LOAD("otivga_tx2953526.rom", 0x0000, 0x8000, CRC(916491af) SHA1(d64e3a43a035d70ace7a2d0603fc078f22d237e1))
 
-	// TODO: remove this (needs "OAK SVGA" PCI BIOS hooked up)
-	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
-	ROM_CONTINUE(                                 0x0001, 0x4000 )
 	// TODO: specs mentions a m55hipl compatible BIOS, this is 5HX29
 	ROM_LOAD("5hx29.bin",   0x20000, 0x20000, BAD_DUMP CRC(07719a55) SHA1(b63993fd5186cdb4f28c117428a507cd069e1f68))
 

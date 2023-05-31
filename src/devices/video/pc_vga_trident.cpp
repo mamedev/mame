@@ -5,13 +5,26 @@
  *
  * Implementation of Trident VGA GUI accelerators
  *
+ * TODO:
+ * - TVGA8200LX (just bog standard VGA?)
+ * - TVGA8800 early SVGA
+ * - TVGA8900 (2MB VRAM)
+ * - TVGA9000 needs to be downgraded from '9680
+ * \- none of the SVGA modes works
+ * \- subclassed from TGUI9680 just for pntnpuzl, consider swapping inheritance or even decouple;
+ * \- it's also really a downgraded version of '8900
+ * - TVGA92xx, TVGA938x (2d accelerator)
+ * - TVGA94xx (PCI version of above)
+ * - TGUI9680 is a PCI SVGA
+ * \- several missing features (namely YUV-to-RGB conversions)
+ * - ProVidia 968x ('9680 + TV video out & AD724 for NTSC/PAL conversion)
+ * - AGP cards (3DImage, Blade3D, XP series)
  *
  */
 
 #include "emu.h"
-#include "trident.h"
+#include "pc_vga_trident.h"
 
-#include "debugger.h"
 #include "screen.h"
 
 #define LOG_WARN  (1U << 1)
@@ -30,8 +43,6 @@
 
 DEFINE_DEVICE_TYPE(TRIDENT_VGA,  tgui9860_device, "trident_vga",  "Trident TGUI9860")
 DEFINE_DEVICE_TYPE(TVGA9000_VGA, tvga9000_device, "tvga9000_vga", "Trident TVGA9000")
-
-#define CRTC_PORT_ADDR ((vga.miscellaneous_output&1)?0x3d0:0x3b0)
 
 trident_vga_device::trident_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: svga_device(mconfig, type, tag, owner, clock)
@@ -178,7 +189,6 @@ void trident_vga_device::device_start()
 
 
 	// copy over interfaces
-	vga.read_dipswitch.set(nullptr); //read_dipswitch;
 	vga.memory = std::make_unique<uint8_t []>(vga.svga_intf.vram_size);
 	memset(&vga.memory[0], 0, vga.svga_intf.vram_size);
 
@@ -865,7 +875,7 @@ uint8_t trident_vga_device::port_03d0_r(offs_t offset)
 {
 	uint8_t res = 0xff;
 
-	if (CRTC_PORT_ADDR == 0x3d0)
+	if (get_crtc_port() == 0x3d0)
 	{
 		switch(offset)
 		{
@@ -903,7 +913,7 @@ uint8_t trident_vga_device::port_03d0_r(offs_t offset)
 
 void trident_vga_device::port_03d0_w(offs_t offset, uint8_t data)
 {
-	if (CRTC_PORT_ADDR == 0x3d0)
+	if (get_crtc_port() == 0x3d0)
 	{
 		switch(offset)
 		{

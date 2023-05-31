@@ -111,6 +111,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP1228   TMS1100   1980, Entex Musical Marvin (6014)
  @MP1231   TMS1100   1984, Tandy 3 in 1 Sports Arena (model 60-2178)
  *MP1272   TMS1100   1981, Tandy Computerized Arcade (assumed same as CD7282, not confirmed)
+ @MP1288   TMS1100   1981, Tiger Finger Bowl
  @MP1296   TMS1100   1982, Entex Black Knight Pinball (6081)
  @MP1311   TMS1100   1981, Bandai TC7: Air Traffic Control
  @MP1312   TMS1100   1981, Gakken FX-Micom R-165/Radio Shack Science Fair Microcomputer Trainer
@@ -288,6 +289,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "esoccer.lh"
 #include "f2pbball.lh"
 #include "f3in1.lh"
+#include "fingbowl.lh" // clickable
 #include "fxmcr165.lh" // clickable
 #include "gjackpot.lh"
 #include "gpoker.lh"
@@ -11038,7 +11040,8 @@ ROM_END
   - World: Computerized Arcade, Radio Shack brand, also model 60-2159 and same
     hardware as above. "Tandy-12" on the side of the handheld was changed to
     "Radio Shack-12", but there's no title prefix on the box.
-  - World: Computerized Arcade, Radio Shack brand, model 60-2159A, COP421 MCU.
+  - World: Computerized Arcade, Radio Shack brand, model 60-2159A, COP421 MCU,
+    see hh_cop400.cpp driver
   - World: Computerized Arcade, Radio Shack brand, model 60-2495, hardware unknown.
   - Mexico: Fabuloso Fred, published by Ensueño Toys (also released as
     9-button version, a clone of Mego Fabulous Fred)
@@ -11142,9 +11145,7 @@ static INPUT_PORTS_START( comparc )
 
 	PORT_START("IN.2") // R7
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Repeat-2")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.3") // R8
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Button 4")
@@ -15224,6 +15225,135 @@ ROM_END
 
 /*******************************************************************************
 
+  Tiger Finger Bowl (model 7-545)
+  * TMS1100 MP1288 (no decap)
+  * 3 7seg LEDs, 1-bit sound
+
+  It's a track & field electronic board game, played by sliding or tapping
+  your finger. Instructions on how to play the events are written on the
+  device itself. 5 hurdles were included, though they're not essential.
+
+*******************************************************************************/
+
+class fingbowl_state : public hh_tms1k_state
+{
+public:
+	fingbowl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void fingbowl(machine_config &config);
+
+private:
+	void update_display();
+	void write_r(u32 data);
+	void write_o(u16 data);
+	u8 read_k();
+};
+
+// handlers
+
+void fingbowl_state::update_display()
+{
+	m_display->matrix(m_r, m_o);
+}
+
+void fingbowl_state::write_r(u32 data)
+{
+	// R8: speaker out
+	m_speaker->level_w(BIT(data, 8));
+
+	// R4-R7: input mux
+	m_inp_mux = data >> 4 & 0xf;
+
+	// R0-R2: digit select
+	m_r = data;
+	update_display();
+}
+
+void fingbowl_state::write_o(u16 data)
+{
+	// O0-O6: led data
+	m_o = data;
+	update_display();
+}
+
+u8 fingbowl_state::read_k()
+{
+	// K: multiplexed inputs
+	return read_inputs(4);
+}
+
+// inputs
+
+static INPUT_PORTS_START( fingbowl )
+	PORT_START("IN.0") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+
+	PORT_START("IN.1") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON8 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON7 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 )
+
+	PORT_START("IN.2") // R6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON12 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON11 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON10 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON9 )
+
+	PORT_START("IN.3") // R7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON16 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON15 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON14 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON13 )
+INPUT_PORTS_END
+
+// config
+
+void fingbowl_state::fingbowl(machine_config &config)
+{
+	// basic machine hardware
+	TMS1100(config, m_maincpu, 250000); // approximation - RC osc. R=68K, C=47pF
+	m_maincpu->read_k().set(FUNC(fingbowl_state::read_k));
+	m_maincpu->write_r().set(FUNC(fingbowl_state::write_r));
+	m_maincpu->write_o().set(FUNC(fingbowl_state::write_o));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(3, 7);
+	m_display->set_segmask(7, 0x7f);
+	config.set_default_layout(layout_fingbowl);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( fingbowl )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1288", 0x0000, 0x0800, CRC(8eb489ad) SHA1(65efe9fb25f6a5e0a1319558388d84053e003e93) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, BAD_DUMP CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) ) // not verified
+	ROM_REGION( 365, "maincpu:opla", ROMREGION_ERASE00 )
+	ROM_LOAD( "tms1100_fingbowl_output.pla", 0, 365, NO_DUMP )
+
+	ROM_REGION16_LE( 0x40, "maincpu:opla_b", ROMREGION_ERASE00 ) // verified, electronic dump, 2nd half unused
+	ROM_LOAD16_BYTE( "tms1100_fingbowl_output.bin", 0, 0x20, CRC(b84a8afb) SHA1(777c06c1ebb7884a268385b0f9d6d064400ff757) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
   Tiger 7 in 1 Sports Stadium (model 7-555)
   * TMS1400 MP7304 (die label: TMS1400, MP7304A, 28L 01D D000 R300)
   * 2x2-digit 7seg LED display + 39 other LEDs, 1-bit sound
@@ -16713,7 +16843,7 @@ SYST( 1978, alphie,     0,         0,      alphie,    alphie,    alphie_state,  
 
 SYST( 1980, tcfball,    0,         0,      tcfball,   tcfball,   tcfball_state,   empty_init, "Tandy Corporation", "Championship Football (model 60-2150)", MACHINE_SUPPORTS_SAVE )
 SYST( 1980, tcfballa,   tcfball,   0,      tcfballa,  tcfballa,  tcfballa_state,  empty_init, "Tandy Corporation", "Championship Football (model 60-2151)", MACHINE_SUPPORTS_SAVE )
-SYST( 1981, comparc,    0,         0,      comparc,   comparc,   comparc_state,   empty_init, "Tandy Corporation", "Computerized Arcade (TMS1100 version, model 60-2159)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
+SYST( 1981, comparc,    0,         0,      comparc,   comparc,   comparc_state,   empty_init, "Tandy Corporation", "Computerized Arcade (TMS1100 version, model 60-2159)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the games: ***
 SYST( 1982, monkeysee,  0,         0,      monkeysee, monkeysee, monkeysee_state, empty_init, "Tandy Corporation", "Monkey See (1982 version)", MACHINE_SUPPORTS_SAVE )
 SYST( 1984, t3in1sa,    0,         0,      t3in1sa,   t3in1sa,   t3in1sa_state,   empty_init, "Tandy Corporation", "3 in 1 Sports Arena", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1984, vclock3,    0,         0,      vclock3,   vclock3,   vclock3_state,   empty_init, "Tandy Corporation", "VoxClock 3", MACHINE_SUPPORTS_SAVE )
@@ -16750,6 +16880,7 @@ SYST( 1980, dxfootb,    0,         0,      dxfootb,   dxfootb,   dxfootb_state, 
 SYST( 1979, copycat,    0,         0,      copycat,   copycat,   copycat_state,   empty_init, "Tiger Electronics", "Copy Cat (model 7-520)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1989, copycata,   copycat,   0,      copycata,  copycata,  copycata_state,  empty_init, "Tiger Electronics", "Copy Cat (model 7-522)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1981, ditto,      0,         0,      ditto,     ditto,     ditto_state,     empty_init, "Tiger Electronics", "Ditto", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, fingbowl,   0,         0,      fingbowl,  fingbowl,  fingbowl_state,  empty_init, "Tiger Electronics", "Finger Bowl", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the games: ***
 SYST( 1982, t7in1ss,    0,         0,      t7in1ss,   t7in1ss,   t7in1ss_state,   empty_init, "Tiger Electronics", "7 in 1 Sports Stadium", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 SYST( 1979, tmvolleyb,  0,         0,      tmvolleyb, tmvolleyb, tmvolleyb_state, empty_init, "Tomy", "Volleyball (Tomy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

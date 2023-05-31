@@ -636,6 +636,8 @@ std::pair<std::error_condition, std::string> tx0_punchtape_image_device::call_lo
 	if (m_tx0)
 		m_tx0->m_tape_puncher.fd = this;
 
+	fseek(0, SEEK_END);
+
 	return std::make_pair(std::error_condition(), std::string());
 }
 
@@ -718,6 +720,8 @@ std::pair<std::error_condition, std::string> tx0_printer_image_device::call_load
 	/* open file */
 	if (m_tx0)
 		m_tx0->m_typewriter.fd = this;
+
+	fseek(0, SEEK_END);
 
 	return std::make_pair(std::error_condition(), std::string());
 }

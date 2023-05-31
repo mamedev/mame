@@ -7,7 +7,6 @@ National Semiconductor COPS(COP400 MCU series) handhelds or other simple
 devices, mostly LED electronic games/toys.
 
 TODO:
-- why does h2hbaskbc(and clones) need a workaround on writing L pins?
 - vidchal: Add screen and gun cursor with brightness detection callback,
   and softwarelist for the video tapes. We'd also need a VHS player device.
   The emulated lightgun itself appears to be working fine(eg. add a 30hz
@@ -31,6 +30,7 @@ TODO:
 
 // internal artwork
 #include "bshipg.lh" // clickable
+#include "comparca.lh" // clickable
 #include "ctstein.lh" // clickable
 #include "einvaderc.lh"
 #include "funjacks.lh" // clickable
@@ -291,6 +291,7 @@ public:
 	void h2hhockeyc(machine_config &config);
 
 private:
+	void update_display();
 	void write_d(u8 data);
 	void write_g(u8 data);
 	void write_l(u8 data);
@@ -299,28 +300,35 @@ private:
 
 // handlers
 
+void h2hbaskbc_state::update_display()
+{
+	// D2,D3 double as multiplexer
+	u16 mask = ((~m_d >> 3 & 1) * 0x00ff) | ((~m_d >> 2 & 1) * 0xff00);
+	u16 sel = m_g | m_d << 4;
+
+	m_display->matrix((sel << 8 | sel) & mask, m_l);
+}
+
 void h2hbaskbc_state::write_d(u8 data)
 {
 	// D: led select
-	m_d = data & 0xf;
+	m_d = data;
+	update_display();
 }
 
 void h2hbaskbc_state::write_g(u8 data)
 {
 	// G: led select, input mux
-	m_inp_mux = data;
-	m_g = data & 0xf;
+	m_g = m_inp_mux = data;
+	update_display();
 }
 
 void h2hbaskbc_state::write_l(u8 data)
 {
-	// D2,D3 double as multiplexer
-	u16 mask = ((m_d >> 2 & 1) * 0x00ff) | ((m_d >> 3 & 1) * 0xff00);
-	u16 sel = (m_g | m_d << 4 | m_g << 8 | m_d << 12) & mask;
-
-	// D2+G0,G1 are 7segs
-	// L0-L6: digit segments A-G, L0-L4: led data
-	m_display->matrix(sel, data);
+	// L0-L6: digit segments A-G
+	// L0-L4: led data
+	m_l = data;
+	update_display();
 }
 
 u8 h2hbaskbc_state::read_in()
@@ -385,7 +393,7 @@ INPUT_PORTS_END
 void h2hbaskbc_state::h2hbaskbc(machine_config &config)
 {
 	// basic machine hardware
-	COP420(config, m_maincpu, 1000000); // approximation - RC osc. R=43K, C=101pF
+	COP420(config, m_maincpu, 1000000); // approximation - RC osc. R=43K, C=100pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(h2hbaskbc_state::write_d));
 	m_maincpu->write_g().set(FUNC(h2hbaskbc_state::write_g));
@@ -765,7 +773,7 @@ void lchicken_state::write_d(u8 data)
 {
 	// D0-D3: input mux
 	// D3: motor on
-	m_inp_mux = data & 0xf;
+	m_inp_mux = data;
 	m_motor_on_out = ~data >> 3 & 1;
 }
 
@@ -1280,7 +1288,7 @@ void mbaskb2_state::sub_write_g(u8 data)
 void mbaskb2_state::sub_write_d(u8 data)
 {
 	// D: led select (high)
-	m_d = data & 0xf;
+	m_d = data;
 	update_display();
 }
 
@@ -1443,7 +1451,7 @@ void lafootb_state::write_l(u8 data)
 void lafootb_state::write_d(u8 data)
 {
 	// D: led select, D2,D3: input mux
-	m_d = data & 0xf;
+	m_d = data;
 	m_inp_mux = data >> 2 & 3;
 	update_display();
 }
@@ -1561,7 +1569,7 @@ void mdallas_state::write_d(u8 data)
 {
 	// D: select digit, input mux high
 	m_inp_mux = (m_inp_mux & 0xf) | (data << 4 & 0x30);
-	m_d = data & 0xf;
+	m_d = data;
 	update_display();
 }
 
@@ -1569,7 +1577,7 @@ void mdallas_state::write_g(u8 data)
 {
 	// G: select digit, input mux low
 	m_inp_mux = (m_inp_mux & 0x30) | (data & 0xf);
-	m_g = data & 0xf;
+	m_g = data;
 	update_display();
 }
 
@@ -1634,7 +1642,7 @@ INPUT_PORTS_END
 void mdallas_state::mdallas(machine_config &config)
 {
 	// basic machine hardware
-	COP444L(config, m_maincpu, 900000); // approximation - RC osc. R=57K, C=101pF
+	COP444L(config, m_maincpu, 900000); // approximation - RC osc. R=57K, C=100pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_l().set(FUNC(mdallas_state::write_l));
 	m_maincpu->write_d().set(FUNC(mdallas_state::write_d));
@@ -1902,7 +1910,7 @@ ROM_END
   * PCB label: 7924750G02 REV A
   * COP420 MCU label COP420-JWE/N
 
-  see hh_tms1k.cpp bship driver for more information
+  This is the COP420 version, see hh_tms1k.cpp bship driver for more information.
 
 *******************************************************************************/
 
@@ -2096,7 +2104,7 @@ void qkracer_state::write_d(u8 data)
 {
 	// D: select digit, D3: input mux low bit
 	m_inp_mux = (m_inp_mux & ~1) | (data >> 3 & 1);
-	m_d = data & 0xf;
+	m_d = data;
 	update_display();
 }
 
@@ -2104,7 +2112,7 @@ void qkracer_state::write_g(u8 data)
 {
 	// G: select digit, input mux
 	m_inp_mux = (m_inp_mux & 1) | (data << 1 & 0x1e);
-	m_g = data & 0xf;
+	m_g = data;
 	update_display();
 }
 
@@ -2309,7 +2317,7 @@ void scat_state::write_d(u8 data)
 {
 	// D: select digit, input mux (low)
 	m_inp_mux = (m_inp_mux & 0x30) | (data & 0xf);
-	m_d = data & 0xf;
+	m_d = data;
 	update_display();
 }
 
@@ -2317,7 +2325,7 @@ void scat_state::write_g(u8 data)
 {
 	// G: select digit, input mux (high)
 	m_inp_mux = (m_inp_mux & 0xf) | (data << 4 & 0x30);
-	m_g = data & 0xf;
+	m_g = data;
 	update_display();
 }
 
@@ -2518,6 +2526,133 @@ ROM_END
 
 /*******************************************************************************
 
+  Tandy Computerized Arcade (model 60-2159A)
+  * PCB label: 60-2159A
+  * COP421 MCU label -B9112 COP421-UPG/N
+  * 12 lamps behind buttons, 1-bit sound
+
+  This is the COP421 version, see hh_tms1k.cpp comparc driver for more information.
+
+*******************************************************************************/
+
+class comparca_state : public hh_cop400_state
+{
+public:
+	comparca_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_cop400_state(mconfig, type, tag)
+	{ }
+
+	void comparca(machine_config &config);
+
+private:
+	void write_d(u8 data);
+	void write_l(u8 data);
+	u8 read_l();
+	u8 read_g();
+	int read_si();
+};
+
+// handlers
+
+void comparca_state::write_d(u8 data)
+{
+	// D: input mux
+	m_d = m_inp_mux = data;
+}
+
+void comparca_state::write_l(u8 data)
+{
+	// L0-L3: lamp data
+	// L4-L6: lamp select
+	m_l = data;
+	m_display->matrix(~m_l >> 4 & 7, m_l);
+}
+
+u8 comparca_state::read_l()
+{
+	// L7: Repeat-2 button
+	return m_inputs[4]->read() << 7 | m_l;
+}
+
+u8 comparca_state::read_g()
+{
+	// G: multiplexed inputs
+	return read_inputs(4, 0xf);
+}
+
+int comparca_state::read_si()
+{
+	// SI: D3
+	return BIT(m_d, 3);
+}
+
+// inputs
+
+static INPUT_PORTS_START( comparca )
+	PORT_START("IN.0") // D0 port G
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Button 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Button 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Button 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Button 4")
+
+	PORT_START("IN.1") // D1 port G
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Button 5")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Button 6")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("Button 7")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Button 8")
+
+	PORT_START("IN.2") // D2 port G
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("Button 9")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Button 10")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("Button 11")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("Button 12")
+
+	PORT_START("IN.3") // D3 port G
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Space-2")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Select")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Play-2/Hit-7")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Start")
+
+	PORT_START("IN.4") // L7
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Repeat-2")
+INPUT_PORTS_END
+
+// config
+
+void comparca_state::comparca(machine_config &config)
+{
+	// basic machine hardware
+	COP421(config, m_maincpu, 550000); // approximation - RC osc. R=33K, C=56pF
+	m_maincpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
+	m_maincpu->write_d().set(FUNC(comparca_state::write_d));
+	m_maincpu->write_l().set(FUNC(comparca_state::write_l));
+	m_maincpu->read_l().set(FUNC(comparca_state::read_l));
+	m_maincpu->read_g().set(FUNC(comparca_state::read_g));
+	m_maincpu->write_so().set(m_speaker, FUNC(speaker_sound_device::level_w));
+	m_maincpu->read_si().set(FUNC(comparca_state::read_si));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(3, 4);
+	config.set_default_layout(layout_comparca);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( comparca )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "cop421-upg_n.ic1", 0x0000, 0x0400, CRC(dcaf8655) SHA1(68bc84a108476c41f91b882d24cb516ba72a8d99) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
   Texas Instruments My Little Computer
   * PCB label: 1066659-4, 17-92-81
   * COP444L MCU label COP444L 1066666
@@ -2591,11 +2726,10 @@ u8 lilcomp_state::read_g()
 
 void lilcomp_state::write_sk(int state)
 {
-	if (state == m_sk)
-		return;
-
 	// SK: trigger power off after a short delay (since it also toggles at boot)
-	m_power_timer->adjust(state ? attotime::from_msec(100) : attotime::never);
+	if (state != m_sk)
+		m_power_timer->adjust(state ? attotime::from_msec(100) : attotime::never);
+
 	m_sk = state;
 }
 
@@ -2697,6 +2831,8 @@ SYST( 1982, copspa,     0,         0,      mdallas,    copspa,     mdallas_state
 SYST( 1984, solution,   0,         0,      scat,       solution,   scat_state,      empty_init, "SCAT", "The Solution", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 SYST( 1987, vidchal,    0,         0,      vidchal,    vidchal,    vidchal_state,   empty_init, "Select Merchandise", "Video Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+
+SYST( 1981, comparca,   comparc,   0,      comparca,   comparca,   comparca_state,  empty_init, "Tandy Corporation", "Computerized Arcade (COP421 version, model 60-2159A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the games: ***
 
 SYST( 1989, lilcomp,    0,         0,      lilcomp,    lilcomp,    lilcomp_state,   empty_init, "Texas Instruments", "My Little Computer", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 

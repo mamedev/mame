@@ -10,9 +10,13 @@
  */
 
 #include "emu.h"
-#include "mach32.h"
+#include "video/ati_mach32.h"
 
 #include "screen.h"
+
+#define VERBOSE (LOG_GENERAL)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+#include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(ATIMACH32,       mach32_device,       "mach32",       "ATi mach32")
 DEFINE_DEVICE_TYPE(ATIMACH32_8514A, mach32_8514a_device, "mach32_8514a", "ATi mach32 (2D acceleration module)")
@@ -110,6 +114,14 @@ void mach32_8514a_device::mach32_ge_ext_config_w(offs_t offset, uint16_t data, u
 void mach32_8514a_device::device_reset()
 {
 }
+
+void mach32_8514a_device::mach32_mem_boundary_w(uint16_t data)
+{ 
+	m_membounds = data;
+	if(data & 0x10)
+		LOG("ATI: Unimplemented memory boundary activated.\n"); 
+}
+
 
 void mach32_device::device_start()
 {
@@ -238,7 +250,7 @@ void mach32_device::mach32_cursor_l_w(offs_t offset, uint16_t data)
 {
 	if(offset == 1)
 		m_cursor_address = (m_cursor_address & 0xf0000) | data;
-	if(LOG_MACH32) logerror("mach32 HW pointer data address: %05x",m_cursor_address);
+	LOG("mach32 HW pointer data address: %05x",m_cursor_address);
 }
 
 void mach32_device::mach32_cursor_h_w(offs_t offset, uint16_t data)
@@ -247,7 +259,7 @@ void mach32_device::mach32_cursor_h_w(offs_t offset, uint16_t data)
 	{
 		m_cursor_address = (m_cursor_address & 0x0ffff) | ((data & 0x000f) << 16);
 		m_cursor_enable = data & 0x8000;
-		if(LOG_MACH32) logerror("mach32 HW pointer data address: %05x",m_cursor_address);
+		LOG("mach32 HW pointer data address: %05x",m_cursor_address);
 	}
 }
 
@@ -269,7 +281,7 @@ void mach32_device::mach32_cursor_colour_b_w(offs_t offset, uint16_t data)
 	{
 		m_cursor_colour0_b = data & 0xff;
 		m_cursor_colour1_b = data >> 8;
-		if(LOG_MACH32) logerror("Mach32: HW Cursor Colour Blue write RGB: 0: %02x %02x %02x  1: %02x %02x %02x\n"
+		LOG("Mach32: HW Cursor Colour Blue write RGB: 0: %02x %02x %02x  1: %02x %02x %02x\n"
 			,m_cursor_colour0_r,m_cursor_colour0_g,m_cursor_colour0_b,m_cursor_colour1_r,m_cursor_colour1_g,m_cursor_colour1_b);
 	}
 }
@@ -280,7 +292,7 @@ void mach32_device::mach32_cursor_colour_0_w(offs_t offset, uint16_t data)
 	{
 		m_cursor_colour0_g = data & 0xff;
 		m_cursor_colour0_r = data >> 8;
-		if(LOG_MACH32) logerror("Mach32: HW Cursor Colour 0 write RGB: %02x %02x %02x\n",m_cursor_colour0_r,m_cursor_colour0_g,m_cursor_colour0_b);
+		LOG("Mach32: HW Cursor Colour 0 write RGB: %02x %02x %02x\n",m_cursor_colour0_r,m_cursor_colour0_g,m_cursor_colour0_b);
 	}
 }
 
@@ -290,7 +302,7 @@ void mach32_device::mach32_cursor_colour_1_w(offs_t offset, uint16_t data)
 	{
 		m_cursor_colour1_g = data & 0xff;
 		m_cursor_colour1_r = data >> 8;
-		if(LOG_MACH32) logerror("Mach32: HW Cursor Colour 1 write RGB: %02x %02x %02x\n",m_cursor_colour1_r,m_cursor_colour1_g,m_cursor_colour1_b);
+		LOG("Mach32: HW Cursor Colour 1 write RGB: %02x %02x %02x\n",m_cursor_colour1_r,m_cursor_colour1_g,m_cursor_colour1_b);
 	}
 }
 
@@ -302,7 +314,7 @@ void mach32_device::mach32_cursor_offset_w(offs_t offset, uint16_t data, uint16_
 			m_cursor_offset_horizontal = data & 0x00ff;
 		if(ACCESSING_BITS_8_15)
 			m_cursor_offset_vertical = data >> 8;
-		if(LOG_MACH32) logerror("Mach32: HW Cursor Offset write H:%i V:%i\n",m_cursor_offset_horizontal,m_cursor_offset_vertical);
+		LOG("Mach32: HW Cursor Offset write H:%i V:%i\n",m_cursor_offset_horizontal,m_cursor_offset_vertical);
 	}
 }
 
