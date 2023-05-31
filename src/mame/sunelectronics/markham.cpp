@@ -2,7 +2,9 @@
 // copyright-holders:Uki
 /*****************************************************************************
 
-    Driver by Uki
+    Sun Electronics Markham hardware
+	
+	Driver by Uki
 
     TODO:
     - needs merging with ikki.cpp
