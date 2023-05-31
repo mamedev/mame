@@ -1,22 +1,27 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
 /*
-
-    Cirrus Logic GD542x/3x video chipsets
-
-*/
+ *
+ * Cirrus Logic CL-GD542x/3x video chipsets
+ *
+ * TODO:
+ * - Original Acumos AVGA1/2 chipsets (Cirrus Logic eventually bought Acumos and rebranded)
+ *
+ */
 
 #include "emu.h"
-#include "clgd542x.h"
+#include "pc_vga_cirrus.h"
 
 #include "screen.h"
 
 
 #define LOG_REG  (1U << 1)
 #define LOG_BLIT (1U << 2)
-#define VERBOSE (0)
+
+#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
+// TODO: remove these macros
 //#define TEXT_LINES (LINES_HELPER)
 #define LINES (vga.crtc.vert_disp_end+1)
 #define TEXT_LINES (vga.crtc.vert_disp_end+1)

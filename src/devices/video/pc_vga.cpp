@@ -34,9 +34,9 @@
     - several vga cards drive also MDA, CGA, EGA monitors, some vga cards have register compatible
       MDA, CGA, Hercules modes;
     - SVGA is not a real interface but more like an overlay of the VGA standard that individual
-      manufacturers put together and which eventually became VESA.
-      It has incidentally a couple points in common but it's otherwise mostly a commercial naming
-      rather than a real 
+      manufacturers put together and which eventually became the VESA consortium.
+      It has incidentally a couple points in common across families but it's otherwise mostly a
+      commercial naming rather than a real physical change over the bus slot.
 
     References:
     - http://www.osdever.net/FreeVGA/vga/vga.htm

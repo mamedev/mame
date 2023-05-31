@@ -64,7 +64,7 @@ USB Dongle
 #include "machine/lpci.h"
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
-#include "video/clgd542x.h"
+#include "video/pc_vga_cirrus.h"
 
 namespace {
 

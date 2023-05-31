@@ -91,7 +91,7 @@ Smitdogg
 #include "machine/ins8250.h"
 #include "machine/microtch.h"
 #include "machine/nvram.h"
-#include "video/clgd542x.h"
+#include "video/pc_vga_cirrus.h"
 
 namespace {
 

@@ -6,7 +6,7 @@
 #pragma once
 
 #include "isa.h"
-#include "video/clgd542x.h"
+#include "video/pc_vga_cirrus.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

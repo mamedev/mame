@@ -883,13 +883,13 @@ end
 
 --------------------------------------------------
 --
---@src/devices/video/clgd542x.h,VIDEOS["PC_VGA_CIRRUS"] = true
+--@src/devices/video/pc_vga_cirrus.h,VIDEOS["PC_VGA_CIRRUS"] = true
 --------------------------------------------------
 
 if (VIDEOS["PC_VGA_CIRRUS"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/video/clgd542x.cpp",
-		MAME_DIR .. "src/devices/video/clgd542x.h",
+		MAME_DIR .. "src/devices/video/pc_vga_cirrus.cpp",
+		MAME_DIR .. "src/devices/video/pc_vga_cirrus.h",
 	}
 end
 

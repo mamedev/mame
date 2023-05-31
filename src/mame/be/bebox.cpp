@@ -13,13 +13,14 @@
 #include "bebox.h"
 
 /* Components */
-#include "video/clgd542x.h"
 #include "bus/lpci/cirrus.h"
+#include "bus/lpci/mpc105.h"
+#include "bus/scsi/scsi.h"
 #include "sound/ymopl.h"
 #include "machine/mc146818.h"
 #include "machine/pckeybrd.h"
-#include "bus/lpci/mpc105.h"
-#include "bus/scsi/scsi.h"
+#include "video/pc_vga_cirrus.h"
+
 #include "speaker.h"
 
 /* Devices */
