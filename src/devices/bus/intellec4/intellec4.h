@@ -227,18 +227,18 @@ protected:
 	address_space &status_space()       { return *m_bus->m_status_space; }
 	address_space &ram_ports_space()    { return *m_bus->m_ram_ports_space; }
 
-	void test_out(int state)         { m_bus->set_test(m_index, state); }
-	void stop_out(int state)         { m_bus->set_stop(m_index, state); }
-	void reset_4002_out(int state)   { m_bus->set_reset_4002(m_index, state); }
-	void user_reset_out(int state)   { m_bus->set_user_reset(m_index, state); }
+	void test_out(int state)            { m_bus->set_test(m_index, state); }
+	void stop_out(int state)            { m_bus->set_stop(m_index, state); }
+	void reset_4002_out(int state)      { m_bus->set_reset_4002(m_index, state); }
+	void user_reset_out(int state)      { m_bus->set_user_reset(m_index, state); }
 
-	virtual void sync_in(int state)              { }
-	virtual void test_in(int state)              { }
-	virtual void stop_in(int state)              { }
-	virtual void stop_acknowledge_in(int state)  { }
-	virtual void cpu_reset_in(int state)         { }
-	virtual void reset_4002_in(int state)        { }
-	virtual void user_reset_in(int state)        { }
+	virtual void sync_in(int state)             { }
+	virtual void test_in(int state)             { }
+	virtual void stop_in(int state)             { }
+	virtual void stop_acknowledge_in(int state) { }
+	virtual void cpu_reset_in(int state)        { }
+	virtual void reset_4002_in(int state)       { }
+	virtual void user_reset_in(int state)       { }
 
 private:
 	void set_bus(univ_bus_device &bus);
