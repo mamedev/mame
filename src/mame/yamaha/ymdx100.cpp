@@ -272,7 +272,7 @@ public:
 
 	void dx100(machine_config &config);
 
-	void led_w(int state)       { m_led = state; }
+	void led_w(int state)                  { m_led = state; }
 	DECLARE_CUSTOM_INPUT_MEMBER(midi_in_r) { return m_midi_in; }
 
 protected:
