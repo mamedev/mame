@@ -12,9 +12,7 @@
  ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "machine/z80daisy.h"
-#include "machine/z80daisy_generic.h"
+
 #include "bus/centronics/ctronics.h"
 #include "bus/einstein/pipe/pipe.h"
 #include "bus/einstein/userport/userport.h"
@@ -24,6 +22,7 @@
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
+#include "cpu/z80/z80.h"
 #include "machine/adc0844.h"
 #include "machine/i8251.h"
 #include "machine/ram.h"
@@ -31,10 +30,12 @@
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
+#include "machine/z80daisy.h"
+#include "machine/z80daisy_generic.h"
 #include "machine/z80pio.h"
+#include "sound/ay8910.h"
 #include "video/tms9928a.h"
 #include "video/v9938.h"
-#include "sound/ay8910.h"
 
 #include "screen.h"
 #include "softlist_dev.h"
@@ -122,7 +123,7 @@ private:
 	void reset_w(uint8_t data);
 	uint8_t rom_r();
 	void rom_w(uint8_t data);
-	template <int src> void int_w(int state);
+	template <int Src> void int_w(int state);
 	uint8_t kybint_msk_r();
 	void kybint_msk_w(uint8_t data);
 	void adcint_msk_w(uint8_t data);
@@ -349,13 +350,14 @@ static const z80_daisy_config einst256_daisy_chain[] =
 	{ nullptr }
 };
 
-template <int src> void einstein_state::int_w(int state)
+template <int Src>
+void einstein_state::int_w(int state)
 {
 	int old = m_int;
 
 	if (state)
 	{
-		m_int |= (1 << src);
+		m_int |= (1 << Src);
 		if (!old)
 		{
 			m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
@@ -364,7 +366,7 @@ template <int src> void einstein_state::int_w(int state)
 	}
 	else
 	{
-		m_int &= ~(1 << src);
+		m_int &= ~(1 << Src);
 		if (old && !m_int)
 		{
 			m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
