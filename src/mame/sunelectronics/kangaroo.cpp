@@ -18,7 +18,7 @@
     driver by Ville Laitinen
 
     Games supported:
-        * Kangaroo
+        * Kangaroo 
         * Funky Fish
 
     Known bugs:
