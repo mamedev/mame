@@ -23,7 +23,7 @@ public:
 	template <typename T> void set_cpu_tag(T &&tag) { cpu.set_tag(std::forward<T>(tag)); }
 	void set_ram_size(int ram_size);
 
-	DECLARE_WRITE_LINE_MEMBER(smi_act_w);
+	void smi_act_w(int state);
 
 protected:
 	i82439hx_host_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

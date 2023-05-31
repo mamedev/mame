@@ -126,7 +126,7 @@ void sun_mouse_port_device::device_start()
 }
 
 
-WRITE_LINE_MEMBER( sun_mouse_port_device::write_txd )
+void sun_mouse_port_device::write_txd(int state)
 {
 	if (m_dev)
 		m_dev->input_txd(state ? 0 : 1);

@@ -21,7 +21,7 @@ class hle_device_base
 public:
 	virtual ~hle_device_base() override;
 
-	virtual DECLARE_WRITE_LINE_MEMBER(input_txd) override;
+	virtual void input_txd(int state) override;
 
 protected:
 	// constructor/destructor

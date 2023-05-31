@@ -149,7 +149,7 @@ void f4702_device::reset_counters()
 //  im_w - set external rate input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(f4702_device::im_w)
+void f4702_device::im_w(int state)
 {
 	m_im = state;
 }

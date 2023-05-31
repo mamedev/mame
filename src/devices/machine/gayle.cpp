@@ -360,7 +360,7 @@ void gayle_device::ide_cs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	m_ide_cs_w_cb[N]((offset >> 1) & 0x07, data, mem_mask);
 }
 
-WRITE_LINE_MEMBER( gayle_device::ide_interrupt_w )
+void gayle_device::ide_interrupt_w(int state)
 {
 	LOGMASKED(LOG_IDE, "ide_interrupt_w: %d\n", state);
 	line_change(7, state, 2);
@@ -371,25 +371,25 @@ WRITE_LINE_MEMBER( gayle_device::ide_interrupt_w )
 //  CREDIT CARD
 //**************************************************************************
 
-WRITE_LINE_MEMBER( gayle_device::cc_cd_w )
+void gayle_device::cc_cd_w(int state)
 {
 	LOGMASKED(LOG_CC, "cc_cd_w: %d\n", state);
 	line_change(LINE_CC_DET, state, 6);
 }
 
-WRITE_LINE_MEMBER( gayle_device::cc_bvd1_w )
+void gayle_device::cc_bvd1_w(int state)
 {
 	LOGMASKED(LOG_CC, "cc_bvd1_w: %d\n", state);
 	line_change(LINE_CC_BVD1_SC, state, BIT(m_gayle_reg[REG_INT], 1) ? 6 : 2);
 }
 
-WRITE_LINE_MEMBER( gayle_device::cc_bvd2_w )
+void gayle_device::cc_bvd2_w(int state)
 {
 	LOGMASKED(LOG_CC, "cc_bvd2_w: %d\n", state);
 	line_change(LINE_CC_BVD2_DA, state, BIT(m_gayle_reg[REG_INT], 1) ? 6 : 2);
 }
 
-WRITE_LINE_MEMBER( gayle_device::cc_wp_w )
+void gayle_device::cc_wp_w(int state)
 {
 	LOGMASKED(LOG_CC, "cc_wp_w: %d\n", state);
 	line_change(LINE_CC_WP, state, 2);

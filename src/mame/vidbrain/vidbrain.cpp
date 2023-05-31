@@ -320,7 +320,7 @@ INPUT_PORTS_END
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-WRITE_LINE_MEMBER( vidbrain_state::ext_int_w )
+void vidbrain_state::ext_int_w(int state)
 {
 	if (state)
 	{
@@ -328,7 +328,7 @@ WRITE_LINE_MEMBER( vidbrain_state::ext_int_w )
 	}
 }
 
-WRITE_LINE_MEMBER( vidbrain_state::hblank_w )
+void vidbrain_state::hblank_w(int state)
 {
 	if (state && m_joy_enable)
 	{

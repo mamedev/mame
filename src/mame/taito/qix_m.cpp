@@ -50,7 +50,7 @@ void zookeep_state::machine_start()
  *
  *************************************/
 
-WRITE_LINE_MEMBER(qix_state::qix_vsync_changed)
+void qix_state::qix_vsync_changed(int state)
 {
 	m_sndpia0->cb1_w(state);
 }

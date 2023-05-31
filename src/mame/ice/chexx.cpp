@@ -113,10 +113,10 @@ public:
 	void via_a_out(uint8_t data);
 	void via_b_out(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(via_ca2_out);
-	DECLARE_WRITE_LINE_MEMBER(via_cb1_out);
-	DECLARE_WRITE_LINE_MEMBER(via_cb2_out);
-	DECLARE_WRITE_LINE_MEMBER(via_irq_out);
+	void via_ca2_out(int state);
+	void via_cb1_out(int state);
+	void via_cb2_out(int state);
+	void via_irq_out(int state);
 
 	uint8_t input_r();
 
@@ -214,7 +214,7 @@ void chexx_state::via_b_out(uint8_t data)
 //  logerror("%s: VIA write B = %02X\n", machine().describe_context(), data);
 }
 
-WRITE_LINE_MEMBER(chexx_state::via_ca2_out)
+void chexx_state::via_ca2_out(int state)
 {
 	m_digitalker->digitalker_0_cms_w(CLEAR_LINE);
 	m_digitalker->digitalker_0_cs_w(CLEAR_LINE);
@@ -223,12 +223,12 @@ WRITE_LINE_MEMBER(chexx_state::via_ca2_out)
 //  logerror("%s: VIA write CA2 = %02X\n", machine().describe_context(), state);
 }
 
-WRITE_LINE_MEMBER(chexx_state::via_cb1_out)
+void chexx_state::via_cb1_out(int state)
 {
 //  logerror("%s: VIA write CB1 = %02X\n", machine().describe_context(), state);
 }
 
-WRITE_LINE_MEMBER(chexx_state::via_cb2_out)
+void chexx_state::via_cb2_out(int state)
 {
 	m_shift = ((m_shift << 1) & 0xffffff) | state;
 
@@ -248,7 +248,7 @@ WRITE_LINE_MEMBER(chexx_state::via_cb2_out)
 //  logerror("%s: VIA write CB2 = %02X\n", machine().describe_context(), state);
 }
 
-WRITE_LINE_MEMBER(chexx_state::via_irq_out)
+void chexx_state::via_irq_out(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 //  logerror("%s: VIA write IRQ = %02X\n", machine().describe_context(), state);

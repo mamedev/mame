@@ -82,7 +82,7 @@ TIMER_CALLBACK_MEMBER(z88_impexp_device::poll_queue)
 	queue();
 }
 
-WRITE_LINE_MEMBER( z88_impexp_device::input_rts )
+void z88_impexp_device::input_rts(int state)
 {
 	if (!state && m_rts)
 	{

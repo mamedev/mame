@@ -418,12 +418,12 @@ void ti99_cartridge_device::cruwrite(offs_t offset, uint8_t data)
 	if (m_pcb != nullptr) m_pcb->cruwrite(offset, data);
 }
 
-WRITE_LINE_MEMBER( ti99_cartridge_device::ready_line )
+void ti99_cartridge_device::ready_line(int state)
 {
 	m_connector->ready_line(state);
 }
 
-WRITE_LINE_MEMBER( ti99_cartridge_device::romgq_line )
+void ti99_cartridge_device::romgq_line(int state)
 {
 	if (m_pcb != nullptr)
 	{
@@ -440,7 +440,7 @@ void ti99_cartridge_device::set_gromlines(line_state mline, line_state moline, l
 	if (m_pcb != nullptr) m_pcb->set_gromlines(mline, moline, gsq);
 }
 
-WRITE_LINE_MEMBER(ti99_cartridge_device::gclock_in)
+void ti99_cartridge_device::gclock_in(int state)
 {
 	if (m_pcb != nullptr) m_pcb->gclock_in(state);
 }
@@ -609,7 +609,7 @@ void ti99_cartridge_pcb::set_grom_pointer(int number, device_t *dev)
 }
 
 
-WRITE_LINE_MEMBER( ti99_cartridge_pcb::romgq_line )
+void ti99_cartridge_pcb::romgq_line(int state)
 {
 	m_romspace_selected = (state==ASSERT_LINE);
 }
@@ -631,7 +631,7 @@ void ti99_cartridge_pcb::set_gromlines(line_state mline, line_state moline, line
 	}
 }
 
-WRITE_LINE_MEMBER(ti99_cartridge_pcb::gclock_in)
+void ti99_cartridge_pcb::gclock_in(int state)
 {
 	for (auto& elem : m_grom)
 	{

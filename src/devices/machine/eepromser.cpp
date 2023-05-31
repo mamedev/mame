@@ -656,16 +656,16 @@ void eeprom_serial_93cxx_device::parse_command_and_address()
 //  do_read - read handlers
 //-------------------------------------------------
 
-READ_LINE_MEMBER(eeprom_serial_93cxx_device::do_read) { return base_do_read() & ((m_state == STATE_WAIT_FOR_START_BIT) ? base_ready_read() : 1); }
+int eeprom_serial_93cxx_device::do_read() { return base_do_read() & ((m_state == STATE_WAIT_FOR_START_BIT) ? base_ready_read() : 1); }
 
 
 //-------------------------------------------------
 //  cs_write/clk_write/di_write - write handlers
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(eeprom_serial_93cxx_device::cs_write) { base_cs_write(state); }
-WRITE_LINE_MEMBER(eeprom_serial_93cxx_device::clk_write) { base_clk_write(state); }
-WRITE_LINE_MEMBER(eeprom_serial_93cxx_device::di_write) { base_di_write(state); }
+void eeprom_serial_93cxx_device::cs_write(int state) { base_cs_write(state); }
+void eeprom_serial_93cxx_device::clk_write(int state) { base_clk_write(state); }
+void eeprom_serial_93cxx_device::di_write(int state) { base_di_write(state); }
 
 
 
@@ -713,17 +713,17 @@ void eeprom_serial_er5911_device::parse_command_and_address()
 //  do_read/ready_read - read handlers
 //-------------------------------------------------
 
-READ_LINE_MEMBER(eeprom_serial_er5911_device::do_read) { return base_do_read(); }
-READ_LINE_MEMBER(eeprom_serial_er5911_device::ready_read) { return base_ready_read(); }
+int eeprom_serial_er5911_device::do_read() { return base_do_read(); }
+int eeprom_serial_er5911_device::ready_read() { return base_ready_read(); }
 
 
 //-------------------------------------------------
 //  cs_write/clk_write/di_write - write handlers
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(eeprom_serial_er5911_device::cs_write) { base_cs_write(state); }
-WRITE_LINE_MEMBER(eeprom_serial_er5911_device::clk_write) { base_clk_write(state); }
-WRITE_LINE_MEMBER(eeprom_serial_er5911_device::di_write) { base_di_write(state); }
+void eeprom_serial_er5911_device::cs_write(int state) { base_cs_write(state); }
+void eeprom_serial_er5911_device::clk_write(int state) { base_clk_write(state); }
+void eeprom_serial_er5911_device::di_write(int state) { base_di_write(state); }
 
 
 
@@ -1064,16 +1064,16 @@ void eeprom_serial_x24c44_device::parse_command_and_address_2_bit()
 //  do_read/ready_read - read handlers
 //-------------------------------------------------
 
-READ_LINE_MEMBER(eeprom_serial_x24c44_device::do_read) { return base_do_read(); }
+int eeprom_serial_x24c44_device::do_read() { return base_do_read(); }
 
 
 //-------------------------------------------------
 //  cs_write/clk_write/di_write - write handlers
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(eeprom_serial_x24c44_device::cs_write) { base_cs_write(state); }
-WRITE_LINE_MEMBER(eeprom_serial_x24c44_device::clk_write) { base_clk_write(state); }
-WRITE_LINE_MEMBER(eeprom_serial_x24c44_device::di_write) { base_di_write(state); }
+void eeprom_serial_x24c44_device::cs_write(int state) { base_cs_write(state); }
+void eeprom_serial_x24c44_device::clk_write(int state) { base_clk_write(state); }
+void eeprom_serial_x24c44_device::di_write(int state) { base_di_write(state); }
 
 
 //**************************************************************************

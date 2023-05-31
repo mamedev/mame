@@ -134,7 +134,7 @@ void midway_cheap_squeak_deluxe_device::sr_w(u8 data)
 //  sirq_w - external irq write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( midway_cheap_squeak_deluxe_device::sirq_w )
+void midway_cheap_squeak_deluxe_device::sirq_w(int state)
 {
 	m_pia_sync_timer->adjust(attotime::zero, !state);
 }
@@ -143,7 +143,7 @@ WRITE_LINE_MEMBER( midway_cheap_squeak_deluxe_device::sirq_w )
 //  reset_write - write to the reset line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( midway_cheap_squeak_deluxe_device::reset_w )
+void midway_cheap_squeak_deluxe_device::reset_w(int state)
 {
 	m_cpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 	m_cpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
@@ -179,7 +179,7 @@ void midway_cheap_squeak_deluxe_device::portb_w(uint8_t data)
 //  irq_w - IRQ line state changes
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( midway_cheap_squeak_deluxe_device::irq_w )
+void midway_cheap_squeak_deluxe_device::irq_w(int state)
 {
 	int combined_state = m_pia->irq_a_state() | m_pia->irq_b_state();
 	m_cpu->set_input_line(4, combined_state ? ASSERT_LINE : CLEAR_LINE);

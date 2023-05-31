@@ -85,7 +85,7 @@ void pc1403_state::out_c_w(uint8_t data)
 	m_portc = data;
 }
 
-READ_LINE_MEMBER(pc1403_state::reset_r)
+int pc1403_state::reset_r()
 {
 	return BIT(m_extra->read(), 1);
 }

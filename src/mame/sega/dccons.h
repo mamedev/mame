@@ -29,9 +29,9 @@ public:
 
 	uint64_t dc_pdtra_r();
 	void dc_pdtra_w(uint64_t data);
-	DECLARE_WRITE_LINE_MEMBER(aica_irq);
-	DECLARE_WRITE_LINE_MEMBER(sh4_aica_irq);
-	DECLARE_WRITE_LINE_MEMBER(ata_interrupt);
+	void aica_irq(int state);
+	void sh4_aica_irq(int state);
+	void ata_interrupt(int state);
 
 	TIMER_CALLBACK_MEMBER( atapi_xfer_end );
 

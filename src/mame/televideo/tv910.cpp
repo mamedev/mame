@@ -83,12 +83,12 @@ private:
 	void nmi_ack_w(uint8_t data);
 	void control_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(vbl_w);
+	void vbl_w(int state);
 
-	DECLARE_READ_LINE_MEMBER(ay3600_shift_r);
-	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
-	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
-	DECLARE_WRITE_LINE_MEMBER(ay3600_ako_w);
+	int ay3600_shift_r();
+	int ay3600_control_r();
+	void ay3600_data_ready_w(int state);
+	void ay3600_ako_w(int state);
 
 	void tv910_mem(address_map &map);
 
@@ -185,7 +185,7 @@ uint8_t tv910_state::kbd_flags_r()
 	return rv;
 }
 
-READ_LINE_MEMBER(tv910_state::ay3600_shift_r)
+int tv910_state::ay3600_shift_r()
 {
 	// either shift key
 	if (m_kbspecial->read() & 0x06)
@@ -196,7 +196,7 @@ READ_LINE_MEMBER(tv910_state::ay3600_shift_r)
 	return CLEAR_LINE;
 }
 
-READ_LINE_MEMBER(tv910_state::ay3600_control_r)
+int tv910_state::ay3600_control_r()
 {
 	if (m_kbspecial->read() & 0x08)
 	{
@@ -206,7 +206,7 @@ READ_LINE_MEMBER(tv910_state::ay3600_control_r)
 	return CLEAR_LINE;
 }
 
-WRITE_LINE_MEMBER(tv910_state::ay3600_data_ready_w)
+void tv910_state::ay3600_data_ready_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -219,7 +219,7 @@ WRITE_LINE_MEMBER(tv910_state::ay3600_data_ready_w)
 	}
 }
 
-WRITE_LINE_MEMBER(tv910_state::ay3600_ako_w)
+void tv910_state::ay3600_ako_w(int state)
 {
 	m_anykeydown = (state == ASSERT_LINE) ? true : false;
 
@@ -458,7 +458,7 @@ MC6845_ON_UPDATE_ADDR_CHANGED( tv910_state::crtc_update_addr )
 {
 }
 
-WRITE_LINE_MEMBER(tv910_state::vbl_w)
+void tv910_state::vbl_w(int state)
 {
 	// this is ACKed by vbl_ack_w, state going 0 here doesn't ack the IRQ
 	if (state)

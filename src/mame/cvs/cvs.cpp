@@ -189,8 +189,8 @@ private:
 	uint8_t huncholy_prot_r(offs_t offset);
 	uint8_t superbik_prot_r();
 	uint8_t hero_prot_r(offs_t offset);
-	DECLARE_READ_LINE_MEMBER(speech_rom_read_bit);
-	DECLARE_WRITE_LINE_MEMBER(slave_cpu_interrupt);
+	int speech_rom_read_bit();
+	void slave_cpu_interrupt(int state);
 	uint8_t input_r(offs_t offset);
 	void speech_rom_address_lo_w(uint8_t data);
 	void speech_rom_address_hi_w(uint8_t data);
@@ -485,7 +485,7 @@ INTERRUPT_GEN_MEMBER(cvs_state::main_cpu_interrupt)
 }
 
 
-WRITE_LINE_MEMBER(cvs_state::slave_cpu_interrupt)
+void cvs_state::slave_cpu_interrupt(int state)
 {
 	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -529,7 +529,7 @@ uint8_t cvs_state::input_r(offs_t offset)
  *
  *************************************/
 #if 0
-READ_LINE_MEMBER(cvs_state::cvs_393hz_clock_r)
+int cvs_state::cvs_393hz_clock_r()
 {
 	return m_393hz_clock;
 }
@@ -651,7 +651,7 @@ void cvs_state::tms5110_pdc_w(offs_t offset, uint8_t data)
 }
 
 
-READ_LINE_MEMBER(cvs_state::speech_rom_read_bit)
+int cvs_state::speech_rom_read_bit()
 {
 	// before reading the bit, clamp the address to the region length
 	m_speech_rom_bit_address &= ((m_speech_data_rom.bytes() * 8) - 1);

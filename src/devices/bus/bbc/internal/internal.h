@@ -39,7 +39,7 @@ public:
 	virtual void mos_w(offs_t offset, uint8_t data) { }
 	virtual void latch_fe60_w(uint8_t data) { }
 
-	virtual DECLARE_WRITE_LINE_MEMBER(irq6502_w) { }
+	virtual void irq6502_w(int state) { }
 
 protected:
 	device_bbc_internal_interface(const machine_config &mconfig, device_t &device);
@@ -75,8 +75,8 @@ public:
 	auto irq_handler() { return m_irq_handler.bind(); }
 	auto nmi_handler() { return m_nmi_handler.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(irq_w) { m_irq_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER(nmi_w) { m_nmi_handler(state); }
+	void irq_w(int state) { m_irq_handler(state); }
+	void nmi_w(int state) { m_nmi_handler(state); }
 
 	virtual bool overrides_ram() { return m_card ? m_card->overrides_ram() : false; }
 	virtual bool overrides_rom() { return m_card ? m_card->overrides_rom() : false; }
@@ -91,7 +91,7 @@ public:
 	virtual void mos_w(offs_t offset, uint8_t data);
 	virtual void latch_fe60_w(uint8_t data);
 
-	virtual DECLARE_WRITE_LINE_MEMBER(irq6502_w);
+	virtual void irq6502_w(int state);
 
 protected:
 	// device-level overrides

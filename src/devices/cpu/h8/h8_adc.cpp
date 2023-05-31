@@ -83,7 +83,7 @@ void h8_adc_device::adcr_w(uint8_t data)
 	mode_update();
 }
 
-WRITE_LINE_MEMBER(h8_adc_device::adtrg_w)
+void h8_adc_device::adtrg_w(int state)
 {
 	if(state != m_adtrg) {
 		m_adtrg = state;

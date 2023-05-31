@@ -81,7 +81,7 @@ private:
 	void palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	void set_pens();
 	inline int get_x_pos(int n);
 	inline int get_y_pos(int n);
@@ -258,7 +258,7 @@ uint32_t tank8_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 }
 
 
-WRITE_LINE_MEMBER(tank8_state::screen_vblank)
+void tank8_state::screen_vblank(int state)
 {
 	// on falling edge
 	if (!state)

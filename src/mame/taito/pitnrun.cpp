@@ -102,7 +102,7 @@ public:
 
 	void pitnrun(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(tilt_w); // TODO: privatize eventually
+	void tilt_w(int state); // TODO: privatize eventually
 
 protected:
 	virtual void machine_start() override;
@@ -136,23 +136,23 @@ private:
 	tilemap_t *m_bg = nullptr;
 	tilemap_t *m_fg = nullptr;
 
-	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(hflip_w);
-	DECLARE_WRITE_LINE_MEMBER(vflip_w);
+	void nmi_enable_w(int state);
+	void hflip_w(int state);
+	void vflip_w(int state);
 	uint8_t inputs_watchdog_r();
 	template <uint8_t Which> void videoram_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(char_bank_select_w);
+	void char_bank_select_w(int state);
 	void scroll_w(offs_t offset, uint8_t data);
 	void scroll_y_w(uint8_t data);
 	void ha_w(uint8_t data);
 	void h_heed_w(uint8_t data);
 	void v_heed_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(color_select_w);
+	void color_select_w(int state);
 
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 
-	DECLARE_WRITE_LINE_MEMBER(vbl_w);
+	void vbl_w(int state);
 
 	void main_map(address_map &map);
 
@@ -254,7 +254,7 @@ void pitnrun_state::videoram_w(offs_t offset, uint8_t data)
 	Which ? m_bg->mark_all_dirty() : m_fg->mark_all_dirty();
 }
 
-WRITE_LINE_MEMBER(pitnrun_state::char_bank_select_w)
+void pitnrun_state::char_bank_select_w(int state)
 {
 	m_char_bank = state;
 	m_bg->mark_all_dirty();
@@ -287,7 +287,7 @@ void pitnrun_state::v_heed_w(uint8_t data)
 	m_v_heed = data;
 }
 
-WRITE_LINE_MEMBER(pitnrun_state::color_select_w)
+void pitnrun_state::color_select_w(int state)
 {
 	m_color_select = state;
 	machine().tilemap().mark_all_dirty();
@@ -638,32 +638,32 @@ void pitnrun_mcu_state::machine_reset()
 	m_mcu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(pitnrun_state::tilt_w)
+void pitnrun_state::tilt_w(int state)
 {
 	// HACK: this input actually asserts the master reset line on all devices
 	if (state)
 		reset();
 }
 
-WRITE_LINE_MEMBER(pitnrun_state::vbl_w)
+void pitnrun_state::vbl_w(int state)
 {
 	if (state && m_nmi)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(pitnrun_state::nmi_enable_w)
+void pitnrun_state::nmi_enable_w(int state)
 {
 	m_nmi = state;
 	if (!m_nmi)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(pitnrun_state::hflip_w)
+void pitnrun_state::hflip_w(int state)
 {
 	flip_screen_x_set(state);
 }
 
-WRITE_LINE_MEMBER(pitnrun_state::vflip_w)
+void pitnrun_state::vflip_w(int state)
 {
 	flip_screen_y_set(state);
 }

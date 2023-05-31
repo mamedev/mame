@@ -110,7 +110,7 @@ void dec_ioga_device::dmaptr_w(offs_t offset, u32 data, u32 mem_mask)
 	LOGMASKED(LOG_DMA, "DECIOGA: %08x to DMA pointer %x (addr %x)\n", data, offset/4, offset*4);
 }
 
-WRITE_LINE_MEMBER(dec_ioga_device::rtc_irq_w)
+void dec_ioga_device::rtc_irq_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -119,7 +119,7 @@ WRITE_LINE_MEMBER(dec_ioga_device::rtc_irq_w)
 	recalc_irq();
 }
 
-WRITE_LINE_MEMBER(dec_ioga_device::lance_irq_w)
+void dec_ioga_device::lance_irq_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -132,7 +132,7 @@ WRITE_LINE_MEMBER(dec_ioga_device::lance_irq_w)
 	recalc_irq();
 }
 
-WRITE_LINE_MEMBER(dec_ioga_device::scc0_irq_w)
+void dec_ioga_device::scc0_irq_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -145,7 +145,7 @@ WRITE_LINE_MEMBER(dec_ioga_device::scc0_irq_w)
 	recalc_irq();
 }
 
-WRITE_LINE_MEMBER(dec_ioga_device::scc1_irq_w)
+void dec_ioga_device::scc1_irq_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{

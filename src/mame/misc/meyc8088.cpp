@@ -80,7 +80,7 @@ private:
 
 	void meyc8088_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(heartbeat_callback);
 	void meyc8088_map(address_map &map);
 };
@@ -170,7 +170,7 @@ uint32_t meyc8088_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-WRITE_LINE_MEMBER(meyc8088_state::screen_vblank)
+void meyc8088_state::screen_vblank(int state)
 {
 	// LC255(200ns pulse) rising edge asserts INTR at start and end of vblank
 	// INTA wired back to INTR to clear it, vector is hardwired to $20

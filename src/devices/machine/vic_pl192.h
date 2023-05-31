@@ -15,7 +15,7 @@ public:
 	auto out_fiq_cb() { return m_out_fiq_func.bind(); }
 
 	template<unsigned IRQ>
-	DECLARE_WRITE_LINE_MEMBER(irq_w) { set_irq_line(IRQ, state); }
+	void irq_w(int state) { set_irq_line(IRQ, state); }
 
 	void map(address_map &map);
 

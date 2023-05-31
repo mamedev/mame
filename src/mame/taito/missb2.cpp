@@ -51,7 +51,7 @@ private:
 	void missb2_bg_bank_w(uint8_t data);
 	void missb2_oki_w(uint8_t data);
 	uint8_t missb2_oki_r();
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	void irqhandler(int state);
 	uint32_t screen_update_missb2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void maincpu_map(address_map &map);
@@ -441,7 +441,7 @@ GFXDECODE_END
 /* Sound Interfaces */
 
 // Handler called by the 3526 emulator when the internal timers cause an IRQ
-WRITE_LINE_MEMBER(missb2_state::irqhandler)
+void missb2_state::irqhandler(int state)
 {
 	logerror("YM3526 firing an IRQ\n");
 //  m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);

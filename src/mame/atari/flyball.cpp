@@ -64,7 +64,7 @@ private:
 	void pitcher_vert_w(uint8_t data);
 	void pitcher_horz_w(uint8_t data);
 	void misc_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(lamp_w);
+	void lamp_w(int state);
 
 	TILEMAP_MAPPER_MEMBER(get_memory_offset);
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -282,7 +282,7 @@ void flyball_state::misc_w(offs_t offset, uint8_t data)
 	m_outlatch->write_d0(~offset, ~data);
 }
 
-WRITE_LINE_MEMBER(flyball_state::lamp_w)
+void flyball_state::lamp_w(int state)
 {
 	m_lamp = state ? 1 : 0;
 }

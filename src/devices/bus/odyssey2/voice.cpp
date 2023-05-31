@@ -90,7 +90,7 @@ const tiny_rom_entry *o2_voice_device::device_rom_region() const
 //  mapper specific handlers
 //-------------------------------------------------
 
-READ_LINE_MEMBER(o2_voice_device::t0_read)
+int o2_voice_device::t0_read()
 {
 	return m_speech->lrq_r() ? 0 : 1;
 }

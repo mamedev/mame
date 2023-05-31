@@ -217,12 +217,12 @@ private:
 	uint8_t mem_read(offs_t offset);
 	void mem_write(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(hold);
-	DECLARE_WRITE_LINE_MEMBER(holda);
-	DECLARE_WRITE_LINE_MEMBER(interrupt);
-	DECLARE_WRITE_LINE_MEMBER(cassette_output);
+	void hold(int state);
+	void holda(int state);
+	void interrupt(int state);
+	void cassette_output(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( rombank_set );
+	void rombank_set(int state);
 
 	void crumap(address_map &map);
 	void memmap(address_map &map);
@@ -260,7 +260,7 @@ void ti99_2_state::driver_reset()
 	m_maincpu->reset_line(ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( ti99_2_state::rombank_set )
+void ti99_2_state::rombank_set(int state)
 {
 	m_otherbank = (state==ASSERT_LINE);
 }
@@ -383,7 +383,7 @@ void ti99_2_state::mem_write(offs_t offset, uint8_t data)
 /*
     Called by the VDC as a vblank interrupt
 */
-WRITE_LINE_MEMBER(ti99_2_state::interrupt)
+void ti99_2_state::interrupt(int state)
 {
 	LOGMASKED(LOG_SIGNALS, "Interrupt: %d\n", state);
 	m_maincpu->set_input_line(INT_9995_INT4, state);
@@ -392,7 +392,7 @@ WRITE_LINE_MEMBER(ti99_2_state::interrupt)
 /*
     Called by the VDC to HOLD the CPU
 */
-WRITE_LINE_MEMBER(ti99_2_state::hold)
+void ti99_2_state::hold(int state)
 {
 	LOGMASKED(LOG_SIGNALS, "HOLD: %d\n", state);
 	m_maincpu->hold_line(state);
@@ -401,7 +401,7 @@ WRITE_LINE_MEMBER(ti99_2_state::hold)
 /*
     Called by the CPU to ack the HOLD
 */
-WRITE_LINE_MEMBER(ti99_2_state::holda)
+void ti99_2_state::holda(int state)
 {
 	LOGMASKED(LOG_SIGNALS, "HOLDA: %d\n", state);
 }

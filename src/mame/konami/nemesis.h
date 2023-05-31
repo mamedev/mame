@@ -114,14 +114,14 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE_LINE_MEMBER(irq_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(irq1_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(irq2_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(irq4_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(coin1_lockout_w);
-	DECLARE_WRITE_LINE_MEMBER(coin2_lockout_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_nmi_w);
+	void irq_enable_w(int state);
+	void irq1_enable_w(int state);
+	void irq2_enable_w(int state);
+	void irq4_enable_w(int state);
+	void coin1_lockout_w(int state);
+	void coin2_lockout_w(int state);
+	void sound_irq_w(int state);
+	void sound_nmi_w(int state);
 	uint16_t gx400_sharedram_word_r(offs_t offset);
 	void gx400_sharedram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t konamigt_input_word_r();
@@ -129,8 +129,8 @@ private:
 	uint8_t selected_ip_r();
 	void bubsys_mcu_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t wd_r();
-	DECLARE_WRITE_LINE_MEMBER(gfx_flipx_w);
-	DECLARE_WRITE_LINE_MEMBER(gfx_flipy_w);
+	void gfx_flipx_w(int state);
+	void gfx_flipy_w(int state);
 	void salamand_control_port_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void nemesis_palette_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void nemesis_videoram1_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -149,10 +149,10 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_nemesis(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(nemesis_vblank_irq);
-	DECLARE_WRITE_LINE_MEMBER(bubsys_vblank_irq);
+	void nemesis_vblank_irq(int state);
+	void bubsys_vblank_irq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(blkpnthr_vblank_irq);
+	void blkpnthr_vblank_irq(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(bubsys_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(konamigt_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(hcrash_interrupt);

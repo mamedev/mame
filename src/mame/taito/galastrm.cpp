@@ -116,7 +116,7 @@ public:
 	{ }
 
 	void galastrm(machine_config &config);
-	DECLARE_READ_LINE_MEMBER(frame_counter_r);
+	int frame_counter_r();
 
 protected:
 	virtual void video_start() override;
@@ -721,7 +721,7 @@ void galastrm_state::tc0610_w(offs_t offset, u16 data)
 }
 
 
-READ_LINE_MEMBER(galastrm_state::frame_counter_r)
+int galastrm_state::frame_counter_r()
 {
 	return m_frame_counter;
 }

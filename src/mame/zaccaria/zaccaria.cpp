@@ -137,12 +137,12 @@ uint8_t zaccaria_state::prot2_r(offs_t offset)
 }
 
 
-WRITE_LINE_MEMBER(zaccaria_state::coin_w)
+void zaccaria_state::coin_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(zaccaria_state::nmi_mask_w)
+void zaccaria_state::nmi_mask_w(int state)
 {
 	m_nmi_mask = state;
 	if (!m_nmi_mask)
@@ -327,7 +327,7 @@ static GFXDECODE_START( gfx_zaccaria )
 GFXDECODE_END
 
 
-WRITE_LINE_MEMBER(zaccaria_state::vblank_irq)
+void zaccaria_state::vblank_irq(int state)
 {
 	if (state && m_nmi_mask)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);

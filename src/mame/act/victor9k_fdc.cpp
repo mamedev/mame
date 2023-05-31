@@ -513,7 +513,7 @@ void victor_9000_fdc_device::floppy_p2_w(uint8_t data)
 //  tach0_r -
 //-------------------------------------------------
 
-READ_LINE_MEMBER(victor_9000_fdc_device::tach0_r)
+int victor_9000_fdc_device::tach0_r()
 {
 	LOGSCP("%s %s Read TACH0 %u\n", machine().time().as_string(), machine().describe_context(), m_tach[0]);
 	return m_tach[0];
@@ -524,7 +524,7 @@ READ_LINE_MEMBER(victor_9000_fdc_device::tach0_r)
 //  tach1_r -
 //-------------------------------------------------
 
-READ_LINE_MEMBER(victor_9000_fdc_device::tach1_r)
+int victor_9000_fdc_device::tach1_r()
 {
 	LOGSCP("%s %s Read TACH1 %u\n", machine().time().as_string(), machine().describe_context(), m_tach[1]);
 	return m_tach[1];
@@ -750,7 +750,7 @@ void victor_9000_fdc_device::via4_pb_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER( victor_9000_fdc_device::wrsync_w )
+void victor_9000_fdc_device::wrsync_w(int state)
 {
 	if (m_wrsync != state)
 	{
@@ -763,7 +763,7 @@ WRITE_LINE_MEMBER( victor_9000_fdc_device::wrsync_w )
 	}
 }
 
-WRITE_LINE_MEMBER( victor_9000_fdc_device::via4_irq_w )
+void victor_9000_fdc_device::via4_irq_w(int state)
 {
 	m_via4_irq = state;
 
@@ -820,7 +820,7 @@ void victor_9000_fdc_device::via5_pb_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER( victor_9000_fdc_device::via5_irq_w )
+void victor_9000_fdc_device::via5_irq_w(int state)
 {
 	m_via5_irq = state;
 
@@ -1014,7 +1014,7 @@ void victor_9000_fdc_device::via6_pb_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER( victor_9000_fdc_device::drw_w )
+void victor_9000_fdc_device::drw_w(int state)
 {
 	if (m_drw != state)
 	{
@@ -1034,7 +1034,7 @@ WRITE_LINE_MEMBER( victor_9000_fdc_device::drw_w )
 	}
 }
 
-WRITE_LINE_MEMBER( victor_9000_fdc_device::erase_w )
+void victor_9000_fdc_device::erase_w(int state)
 {
 	if (m_erase != state)
 	{
@@ -1046,7 +1046,7 @@ WRITE_LINE_MEMBER( victor_9000_fdc_device::erase_w )
 	}
 }
 
-WRITE_LINE_MEMBER( victor_9000_fdc_device::via6_irq_w )
+void victor_9000_fdc_device::via6_irq_w(int state)
 {
 	m_via6_irq = state;
 

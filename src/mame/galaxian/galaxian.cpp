@@ -758,7 +758,7 @@ TODO:
  *
  *************************************/
 
-WRITE_LINE_MEMBER(galaxian_state::vblank_interrupt_w)
+void galaxian_state::vblank_interrupt_w(int state)
 {
 	// interrupt line is clocked at VBLANK
 	// a flip-flop at 6F is held in the preset state based on the NMI ON signal
@@ -1014,7 +1014,7 @@ uint8_t galaxian_state::theend_protection_r()
 }
 
 template <int N>
-READ_LINE_MEMBER(galaxian_state::theend_protection_alt_r)
+int galaxian_state::theend_protection_alt_r()
 {
 	/*
 	    Handled by a custom IC. Holds two bits derived from the upper bit of
@@ -1398,7 +1398,7 @@ void zigzagb_state::ay8910_w(offs_t offset, uint8_t data)
  *************************************/
 
 template <int N>
-READ_LINE_MEMBER(galaxian_state::azurian_port_r)
+int galaxian_state::azurian_port_r()
 {
 	return (ioport("FAKE")->read() >> N) & 1;
 }
@@ -1423,14 +1423,14 @@ void kingball_state::machine_start()
 }
 
 
-READ_LINE_MEMBER(kingball_state::muxbit_r)
+int kingball_state::muxbit_r()
 {
 	// multiplex the service mode switch with a speech DIP switch
 	return BIT(m_mux_port->read(), m_speech_dip);
 }
 
 
-READ_LINE_MEMBER(kingball_state::noise_r)
+int kingball_state::noise_r()
 {
 	/* bit 5 is the NOISE line from the sound circuit.  The code just verifies
 	   that it's working, doesn't actually use return value, so we can just use
@@ -6404,7 +6404,7 @@ INPUT_PORTS_END
 
 // ckongs coinage DIPs are spread across two input ports
 template <int Mask>
-READ_LINE_MEMBER(galaxian_state::ckongs_coinage_r)
+int galaxian_state::ckongs_coinage_r()
 {
 	return (m_ckong_coinage->read() & Mask) ? 1 : 0;
 }

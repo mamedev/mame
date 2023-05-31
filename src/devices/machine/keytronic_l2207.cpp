@@ -100,7 +100,7 @@ void keytronic_l2207_device::device_start()
 	save_item(NAME(m_beeper_latch));
 }
 
-WRITE_LINE_MEMBER(keytronic_l2207_device::ser_in_w)
+void keytronic_l2207_device::ser_in_w(int state)
 {
 	m_mcu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
 }

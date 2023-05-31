@@ -270,10 +270,10 @@ protected:
 	uint8_t dispon_r();
 	void keylatch_w(uint8_t data);
 	void dispon_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( clear_r );
-	DECLARE_READ_LINE_MEMBER( ef3_r );
-	DECLARE_READ_LINE_MEMBER( ef4_r );
-	DECLARE_WRITE_LINE_MEMBER( q_w );
+	int clear_r();
+	int ef3_r();
+	int ef4_r();
+	void q_w(int state);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 
 	/* keyboard state */
@@ -325,9 +325,9 @@ private:
 	virtual void machine_reset() override;
 
 	void dma_w(offs_t offset, uint8_t data);
-	DECLARE_READ_LINE_MEMBER( rdata_r );
-	DECLARE_READ_LINE_MEMBER( bdata_r );
-	DECLARE_READ_LINE_MEMBER( gdata_r );
+	int rdata_r();
+	int bdata_r();
+	int gdata_r();
 
 	/* video state */
 	required_shared_ptr<uint8_t> m_color_ram;
@@ -471,39 +471,39 @@ uint32_t visicom_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-READ_LINE_MEMBER( mpt02_state::rdata_r )
+int mpt02_state::rdata_r()
 {
 	return BIT(m_color, 0);
 }
 
-READ_LINE_MEMBER( mpt02_state::bdata_r )
+int mpt02_state::bdata_r()
 {
 	return BIT(m_color, 1);
 }
 
-READ_LINE_MEMBER( mpt02_state::gdata_r )
+int mpt02_state::gdata_r()
 {
 	return BIT(m_color, 2);
 }
 
 /* CDP1802 Configuration */
 
-READ_LINE_MEMBER( studio2_state::clear_r )
+int studio2_state::clear_r()
 {
 	return BIT(m_clear->read(), 0);
 }
 
-READ_LINE_MEMBER( studio2_state::ef3_r )
+int studio2_state::ef3_r()
 {
 	return BIT(m_a->read(), m_keylatch);
 }
 
-READ_LINE_MEMBER( studio2_state::ef4_r )
+int studio2_state::ef4_r()
 {
 	return BIT(m_b->read(), m_keylatch);
 }
 
-WRITE_LINE_MEMBER( studio2_state::q_w )
+void studio2_state::q_w(int state)
 {
 	m_beeper->set_state(state);
 }

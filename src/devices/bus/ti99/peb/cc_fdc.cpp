@@ -177,19 +177,19 @@ void corcomp_fdc_device::operate_ready_line()
 /*
     Callbacks from the WDC chip
 */
-WRITE_LINE_MEMBER( corcomp_fdc_device::fdc_irq_w )
+void corcomp_fdc_device::fdc_irq_w(int state)
 {
 	LOGMASKED(LOG_SIGNALS, "INTRQ callback = %d\n", state);
 	operate_ready_line();
 }
 
-WRITE_LINE_MEMBER( corcomp_fdc_device::fdc_drq_w )
+void corcomp_fdc_device::fdc_drq_w(int state)
 {
 	LOGMASKED(LOG_DRQ, "DRQ callback = %d\n", state);
 	operate_ready_line();
 }
 
-WRITE_LINE_MEMBER( corcomp_fdc_device::fdc_hld_w )
+void corcomp_fdc_device::fdc_hld_w(int state)
 {
 	LOGMASKED(LOG_SIGNALS, "HLD callback = %d\n", state);
 }
@@ -281,7 +281,7 @@ void corcomp_fdc_device::cruwrite(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER( corcomp_fdc_device::clock_in )
+void corcomp_fdc_device::clock_in(int state)
 {
 	m_tms9901->phi_line(state);
 }
@@ -329,7 +329,7 @@ uint8_t corcomp_fdc_device::tms9901_input(offs_t offset)
 	}
 }
 
-WRITE_LINE_MEMBER( corcomp_fdc_device::select_dsk )
+void corcomp_fdc_device::select_dsk(int state)
 {
 	if (state == CLEAR_LINE)
 	{
@@ -371,7 +371,7 @@ WRITE_LINE_MEMBER( corcomp_fdc_device::select_dsk )
 	}
 }
 
-WRITE_LINE_MEMBER( corcomp_fdc_device::side_select )
+void corcomp_fdc_device::side_select(int state)
 {
 	// Select side of disk (bit 7)
 	if (m_selected_drive != 0)
@@ -384,7 +384,7 @@ WRITE_LINE_MEMBER( corcomp_fdc_device::side_select )
 /*
     All floppy motors are operated by the same line.
 */
-WRITE_LINE_MEMBER( corcomp_fdc_device::motor_w )
+void corcomp_fdc_device::motor_w(int state)
 {
 	LOGMASKED(LOG_DRIVE, "Motor %s\n", state? "on" : "off");
 	m_wdc->set_force_ready(state==ASSERT_LINE);
@@ -398,14 +398,14 @@ WRITE_LINE_MEMBER( corcomp_fdc_device::motor_w )
 /*
     Push the P11 state to the variable.
 */
-WRITE_LINE_MEMBER( corcomp_fdc_device::select_bank )
+void corcomp_fdc_device::select_bank(int state)
 {
 	LOGMASKED(LOG_CRU, "Set bank %d\n", state);
 	m_banksel = (state==ASSERT_LINE);
 	operate_ready_line();
 }
 
-WRITE_LINE_MEMBER( corcomp_fdc_device::select_card )
+void corcomp_fdc_device::select_card(int state)
 {
 	LOGMASKED(LOG_CRU, "Select card = %d\n", state);
 	m_cardsel = (state==ASSERT_LINE);
@@ -611,7 +611,7 @@ void ccfdc_dec_pal_device::device_config_complete()
 /*
     Indicates 9901 addressing.
 */
-READ_LINE_MEMBER( ccfdc_dec_pal_device::address9901 )
+int ccfdc_dec_pal_device::address9901()
 {
 	return ((m_board->get_address() & 0xff80)==0x1100)? ASSERT_LINE : CLEAR_LINE;
 }
@@ -619,7 +619,7 @@ READ_LINE_MEMBER( ccfdc_dec_pal_device::address9901 )
 /*
     Indicates SRAM addressing.
 */
-READ_LINE_MEMBER( ccfdc_dec_pal_device::addressram )
+int ccfdc_dec_pal_device::addressram()
 {
 	return ((m_board->card_selected()) &&
 		(m_board->get_address() & 0xff80)==0x4000)? ASSERT_LINE : CLEAR_LINE;
@@ -628,7 +628,7 @@ READ_LINE_MEMBER( ccfdc_dec_pal_device::addressram )
 /*
     Indicates WDC addressing.
 */
-READ_LINE_MEMBER( ccfdc_dec_pal_device::addresswdc )
+int ccfdc_dec_pal_device::addresswdc()
 {
 	return ((m_board->card_selected()) &&
 		(m_board->get_address() & 0xff80)==0x5f80)? ASSERT_LINE : CLEAR_LINE;
@@ -637,7 +637,7 @@ READ_LINE_MEMBER( ccfdc_dec_pal_device::addresswdc )
 /*
     Indicates DSR addressing.
 */
-READ_LINE_MEMBER( ccfdc_dec_pal_device::address4 )
+int ccfdc_dec_pal_device::address4()
 {
 	return ((m_board->card_selected()) &&
 		(m_board->get_address() & 0xe000)==0x4000)? ASSERT_LINE : CLEAR_LINE;
@@ -646,7 +646,7 @@ READ_LINE_MEMBER( ccfdc_dec_pal_device::address4 )
 /*
     Indicates SRAM selection.
 */
-READ_LINE_MEMBER( ccfdc_sel_pal_device::selectram )
+int ccfdc_sel_pal_device::selectram()
 {
 	return (m_decpal->addressram() && (m_board->upper_bank()))
 		? ASSERT_LINE : CLEAR_LINE;
@@ -655,7 +655,7 @@ READ_LINE_MEMBER( ccfdc_sel_pal_device::selectram )
 /*
     Indicates WDC selection.
 */
-READ_LINE_MEMBER( ccfdc_sel_pal_device::selectwdc )
+int ccfdc_sel_pal_device::selectwdc()
 {
 	return (m_decpal->addresswdc() && ((m_board->get_address()&1)==0))? ASSERT_LINE : CLEAR_LINE;
 }
@@ -663,7 +663,7 @@ READ_LINE_MEMBER( ccfdc_sel_pal_device::selectwdc )
 /*
     Indicates EPROM selection.
 */
-READ_LINE_MEMBER( ccfdc_sel_pal_device::selectdsr )
+int ccfdc_sel_pal_device::selectdsr()
 {
 	return (m_decpal->address4()
 		&& !m_decpal->addresswdc()
@@ -690,7 +690,7 @@ ccdcc_palu1_device::ccdcc_palu1_device(const machine_config &mconfig, const char
 /*
     Wait state logic
 */
-READ_LINE_MEMBER( ccdcc_palu1_device::ready_out )
+int ccdcc_palu1_device::ready_out()
 {
 	bool wdc = m_decpal->addresswdc();                         // Addressing the WDC
 	bool lastdig = (m_board->get_address()&7)==6;              // Address ends with 6 or e (5ff6, 5ffe)
@@ -773,7 +773,7 @@ ccfdc_palu12_device::ccfdc_palu12_device(const machine_config &mconfig, const ch
     Indicates 9901 addressing. In this PAL version, the A9 address line is
     also used.
 */
-READ_LINE_MEMBER( ccfdc_palu12_device::address9901 )
+int ccfdc_palu12_device::address9901()
 {
 	return ((m_board->get_address() & 0xffc0)==0x1100)? ASSERT_LINE : CLEAR_LINE;
 }
@@ -788,7 +788,7 @@ ccfdc_palu6_device::ccfdc_palu6_device(const machine_config &mconfig, const char
     That is, when writing (/WE=0), A12 must be 1 (addresses 5ff8..e),
     otherwise (/WE=1), A12 must be 0 (addresses 5ff0..6)
 */
-READ_LINE_MEMBER( ccfdc_palu6_device::selectwdc )
+int ccfdc_palu6_device::selectwdc()
 {
 	return (m_decpal->addresswdc()
 		&& ((m_board->get_address()&1)==0)
@@ -799,7 +799,7 @@ READ_LINE_MEMBER( ccfdc_palu6_device::selectwdc )
     Indicates EPROM selection. The Rev A selector PAL leads back some of
     its outputs for this calculation.
 */
-READ_LINE_MEMBER( ccfdc_palu6_device::selectdsr )
+int ccfdc_palu6_device::selectdsr()
 {
 	return (m_decpal->address4() && !selectwdc() && !selectram())? ASSERT_LINE : CLEAR_LINE;
 }
@@ -809,7 +809,7 @@ READ_LINE_MEMBER( ccfdc_palu6_device::selectdsr )
     board which evaluates whether the trap is active.
 */
 
-READ_LINE_MEMBER( ccfdc_palu6_device::ready_out )
+int ccfdc_palu6_device::ready_out()
 {
 	bool wdc = m_decpal->addresswdc();                   // Addressing the WDC
 	bool even = (m_board->get_address()&1)==0;          // A15 = 0

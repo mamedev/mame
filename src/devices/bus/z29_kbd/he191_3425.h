@@ -17,7 +17,7 @@ public:
 	he191_3425_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// miscellanous handlers
-	DECLARE_WRITE_LINE_MEMBER(shift_reset);
+	void shift_reset(int state);
 
 protected:
 	// device-level overrides
@@ -35,7 +35,7 @@ private:
 	u8 mcu_pa_r();
 	void mcu_pb_w(u8 data);
 	void mcu_pc_w(u8 data);
-	DECLARE_READ_LINE_MEMBER(mcu_t1_r);
+	int mcu_t1_r();
 
 	// misc. helpers
 	TIMER_CALLBACK_MEMBER(receive_data_synced);

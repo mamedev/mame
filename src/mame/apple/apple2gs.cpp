@@ -386,11 +386,11 @@ private:
 	void bank1_0000_sh_w(offs_t offset, u8 data);
 	u8 bank1_c000_r(offs_t offset);
 	void bank1_c000_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_inh_w);
-	DECLARE_WRITE_LINE_MEMBER(doc_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(scc_irq_w);
+	void a2bus_irq_w(int state);
+	void a2bus_nmi_w(int state);
+	void a2bus_inh_w(int state);
+	void doc_irq_w(int state);
+	void scc_irq_w(int state);
 	u8 doc_adc_read();
 	u8 apple2gs_read_vector(offs_t offset);
 
@@ -568,7 +568,7 @@ offs_t apple2gs_state::dasm_trampoline(std::ostream &stream, offs_t pc, const ut
 	return m_a2common->dasm_override_GS(stream, pc, opcodes, params);
 }
 
-WRITE_LINE_MEMBER(apple2gs_state::a2bus_irq_w)
+void apple2gs_state::a2bus_irq_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -581,13 +581,13 @@ WRITE_LINE_MEMBER(apple2gs_state::a2bus_irq_w)
 	}
 }
 
-WRITE_LINE_MEMBER(apple2gs_state::a2bus_nmi_w)
+void apple2gs_state::a2bus_nmi_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
 // TODO: this assumes /INH only on ROM, needs expansion to support e.g. phantom-slotting cards and etc.
-WRITE_LINE_MEMBER(apple2gs_state::a2bus_inh_w)
+void apple2gs_state::a2bus_inh_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -3642,7 +3642,7 @@ void apple2gs_state::keyglu_regen_irqs()
 	}
 }
 
-WRITE_LINE_MEMBER(apple2gs_state::scc_irq_w)
+void apple2gs_state::scc_irq_w(int state)
 {
 	if (state)
 	{
@@ -3655,7 +3655,7 @@ WRITE_LINE_MEMBER(apple2gs_state::scc_irq_w)
 }
 
 /* Sound - DOC */
-WRITE_LINE_MEMBER(apple2gs_state::doc_irq_w)
+void apple2gs_state::doc_irq_w(int state)
 {
 	if (state)
 	{

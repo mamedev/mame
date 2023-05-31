@@ -1044,12 +1044,12 @@ void hpc3_device::do_scsi_dma(int channel)
 	}
 }
 
-WRITE_LINE_MEMBER(hpc3_device::scsi0_drq)
+void hpc3_device::scsi0_drq(int state)
 {
 	scsi_drq(state, 0);
 }
 
-WRITE_LINE_MEMBER(hpc3_device::scsi1_drq)
+void hpc3_device::scsi1_drq(int state)
 {
 	scsi_drq(state, 1);
 }

@@ -323,19 +323,19 @@ void at45db041_device::write_byte(uint8_t data)
 	}
 }
 
-READ_LINE_MEMBER(at45db041_device::so_r)
+int at45db041_device::so_r()
 {
 	if (m_pin.cs == 0) return 0;
 	return m_pin.so;
 }
 
-WRITE_LINE_MEMBER(at45db041_device::si_w)
+void at45db041_device::si_w(int state)
 {
 	if (m_pin.cs == 0) return;
 	m_pin.si = state;
 }
 
-WRITE_LINE_MEMBER(at45db041_device::cs_w)
+void at45db041_device::cs_w(int state)
 {
 	// check if changed
 	if (m_pin.cs == state) return;
@@ -358,7 +358,7 @@ WRITE_LINE_MEMBER(at45db041_device::cs_w)
 	m_pin.cs = state;
 }
 
-WRITE_LINE_MEMBER(at45db041_device::sck_w)
+void at45db041_device::sck_w(int state)
 {
 	// check if changed
 	if (m_pin.sck == state) return;

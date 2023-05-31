@@ -151,17 +151,17 @@ void bbc_udm_device::write(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(bbc_udm_device::intrq_w)
+void bbc_udm_device::intrq_w(int state)
 {
 	m_slot->intrq_w((state && m_fdc_ie) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(bbc_udm_device::drq_w)
+void bbc_udm_device::drq_w(int state)
 {
 	m_slot->drq_w((state && m_fdc_ie) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(bbc_udm_device::motor_w)
+void bbc_udm_device::motor_w(int state)
 {
 	if (m_floppy[0]->get_device()) m_floppy[0]->get_device()->mon_w(!state);
 	if (m_floppy[1]->get_device()) m_floppy[1]->get_device()->mon_w(!state);

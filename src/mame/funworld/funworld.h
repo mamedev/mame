@@ -68,7 +68,7 @@ protected:
 private:
 	uint8_t questions_r(offs_t offset);
 	void question_bank_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia1_ca2_w);
+	void pia1_ca2_w(int state);
 	uint8_t funquiz_ay8910_a_r();
 	uint8_t funquiz_ay8910_b_r();
 

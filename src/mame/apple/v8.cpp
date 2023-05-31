@@ -251,7 +251,7 @@ u8 v8_device::via_in_b()
 	return read_pb3() << 3;
 }
 
-WRITE_LINE_MEMBER(v8_device::via_out_cb2)
+void v8_device::via_out_cb2(int state)
 {
 	write_cb2(state & 1);
 }
@@ -267,13 +267,13 @@ void v8_device::via_out_b(u8 data)
 	write_pb5(BIT(data, 5));
 }
 
-WRITE_LINE_MEMBER(v8_device::via1_irq)
+void v8_device::via1_irq(int state)
 {
 	m_via_interrupt = state;
 	field_interrupts();
 }
 
-WRITE_LINE_MEMBER(v8_device::via2_irq)
+void v8_device::via2_irq(int state)
 {
 	m_via2_interrupt = state;
 	field_interrupts();
@@ -309,13 +309,13 @@ void v8_device::field_interrupts()
 	}
 }
 
-WRITE_LINE_MEMBER(v8_device::scc_irq_w)
+void v8_device::scc_irq_w(int state)
 {
 	m_scc_interrupt = (state == ASSERT_LINE);
 	field_interrupts();
 }
 
-WRITE_LINE_MEMBER(v8_device::vbl_w)
+void v8_device::vbl_w(int state)
 {
 	if (!state)
 	{
@@ -330,7 +330,7 @@ WRITE_LINE_MEMBER(v8_device::vbl_w)
 	}
 }
 
-WRITE_LINE_MEMBER(v8_device::asc_irq)
+void v8_device::asc_irq(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -603,12 +603,12 @@ void v8_device::ram_size(u8 config)
 	}
 }
 
-WRITE_LINE_MEMBER(v8_device::cb1_w)
+void v8_device::cb1_w(int state)
 {
 	m_via1->write_cb1(state);
 }
 
-WRITE_LINE_MEMBER(v8_device::cb2_w)
+void v8_device::cb2_w(int state)
 {
 	m_via1->write_cb2(state);
 }

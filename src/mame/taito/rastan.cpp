@@ -218,7 +218,7 @@ private:
 	void msm5205_stop_w(u8 data);
 	void colpri_cb(u32 &sprite_colbank, u32 &pri_mask, u16 sprite_ctrl);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(msm5205_vck);
+	void msm5205_vck(int state);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };
@@ -265,7 +265,7 @@ void rastan_state::sound_bankswitch_w(u8 data)
 	m_audiobank->set_entry(data & 3);
 }
 
-WRITE_LINE_MEMBER(rastan_state::msm5205_vck)
+void rastan_state::msm5205_vck(int state)
 {
 	if (!state)
 		return;

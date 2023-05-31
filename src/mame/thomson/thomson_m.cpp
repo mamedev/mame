@@ -111,14 +111,14 @@ int thomson_state::to7_get_cassette()
 
 
 /* 1-bit cassette output */
-WRITE_LINE_MEMBER(thomson_state::to7_set_cassette)
+void thomson_state::to7_set_cassette(int state)
 {
 	m_cassette->output(state ? 1. : -1. );
 }
 
 
 
-WRITE_LINE_MEMBER( thomson_state::to7_set_cassette_motor )
+void thomson_state::to7_set_cassette_motor(int state)
 {
 	cassette_state cassstate =  m_cassette->get_state();
 	double pos = m_cassette->get_position();
@@ -189,7 +189,7 @@ void thomson_state::mo5_set_cassette( int data )
 
 
 
-WRITE_LINE_MEMBER( thomson_state::mo5_set_cassette_motor )
+void thomson_state::mo5_set_cassette_motor(int state)
 {
 	cassette_state cassstate = m_cassette->get_state();
 	double pos = m_cassette->get_position();
@@ -409,7 +409,7 @@ void thomson_state::to7_set_init( int init )
 
 
 
-WRITE_LINE_MEMBER( thomson_state::to7_sys_cb2_out )
+void thomson_state::to7_sys_cb2_out(int state)
 {
 	m_to7_lightpen = !state;
 }
@@ -582,7 +582,7 @@ void thomson_state::to7_game_portb_out(uint8_t data)
 
 
 
-WRITE_LINE_MEMBER( thomson_state::to7_game_cb2_out )
+void thomson_state::to7_game_cb2_out(int state)
 {
 	/* undocumented */
 	/* some TO8 games (e.g.: F15) seem to write here a lot */
@@ -738,7 +738,7 @@ MACHINE_START_MEMBER( thomson_state, to7 )
 
 
 
-WRITE_LINE_MEMBER( thomson_state::to770_sys_cb2_out )
+void thomson_state::to770_sys_cb2_out(int state)
 {
 	/* video overlay: black pixels are transparent and show TV image underneath */
 	LOG("$%04x to770_sys_cb2_out: video overlay %i\n", m_maincpu->pc(), state);
@@ -3030,7 +3030,7 @@ void to9_state::to8_sys_portb_out(uint8_t data)
 /* ------------ 6846 (timer, I/O) ------------ */
 
 
-WRITE_LINE_MEMBER(to9_state::write_centronics_busy )
+void to9_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
@@ -3059,7 +3059,7 @@ void to9_state::to8_timer_port_out(uint8_t data)
 
 
 
-WRITE_LINE_MEMBER( to9_state::to8_timer_cp2_out )
+void to9_state::to8_timer_cp2_out(int state)
 {
 	/* mute */
 	m_to7_game_mute = state;
@@ -3610,7 +3610,7 @@ void mo6_state::mo6_ext_w(uint8_t data)
 /* similar to SX 90-018, but with a few differences: mute, printer */
 
 
-WRITE_LINE_MEMBER( mo6_state::mo6_centronics_busy )
+void mo6_state::mo6_centronics_busy(int state)
 {
 	m_pia_game->cb1_w(state);
 }
@@ -3626,7 +3626,7 @@ void mo6_state::mo6_game_porta_out(uint8_t data)
 
 
 
-WRITE_LINE_MEMBER( mo6_state::mo6_game_cb2_out )
+void mo6_state::mo6_game_cb2_out(int state)
 {
 	LOG("$%04x %f mo6_game_cb2_out: CENTRONICS set strobe=%i\n", m_maincpu->pc(), machine().time().as_double(), state);
 
@@ -3723,7 +3723,7 @@ void mo6_state::mo6_sys_porta_out(uint8_t data)
 
 
 
-WRITE_LINE_MEMBER( mo6_state::mo6_sys_cb2_out )
+void mo6_state::mo6_sys_cb2_out(int state)
 {
 	/* SCART pin 8 = slow switch (?) */
 	LOG("mo6_sys_cb2_out: SCART slow switch set to %i\n", state);

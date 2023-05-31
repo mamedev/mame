@@ -77,12 +77,12 @@ public:
 	auto reset_handler() { return m_reset_handler.bind(); }
 
 	// called from host
-	DECLARE_WRITE_LINE_MEMBER( host_int_w );
+	void host_int_w(int state);
 
 	// called from card device
-	DECLARE_WRITE_LINE_MEMBER( int_w ) { m_int_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( reset_w ) { m_reset_handler(state); }
+	void int_w(int state) { m_int_handler(state); }
+	void nmi_w(int state) { m_nmi_handler(state); }
+	void reset_w(int state) { m_reset_handler(state); }
 
 protected:
 	// device-level overrides

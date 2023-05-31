@@ -66,7 +66,7 @@ void forti_device::readz(offs_t offset, uint8_t *value)
 /*
     READY callbacks from the sound chips.
 */
-WRITE_LINE_MEMBER( forti_device::ready_sound )
+void forti_device::ready_sound(int state)
 {
 	LOGMASKED(LOG_READY, "READY (%d, %d, %d, %d)\n",  m_generator1->ready_r(),
 		m_generator2->ready_r(), m_generator3->ready_r(), m_generator4->ready_r());

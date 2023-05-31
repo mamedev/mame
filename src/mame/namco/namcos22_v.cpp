@@ -1547,7 +1547,7 @@ void namcos22_state::render_frame_active()
 	m_render_refresh = false;
 }
 
-WRITE_LINE_MEMBER(namcos22_state::screen_vblank)
+void namcos22_state::screen_vblank(int state)
 {
 	if (state)
 	{

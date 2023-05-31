@@ -22,8 +22,8 @@ public:
 
 	u32 eisa_irq_ack() { return m_pic[0]->acknowledge(); }
 
-	DECLARE_WRITE_LINE_MEMBER(in_iochk);
-	DECLARE_WRITE_LINE_MEMBER(in_parity);
+	void in_iochk(int state);
+	void in_parity(int state);
 
 	void map(address_map &map);
 

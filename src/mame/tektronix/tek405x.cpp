@@ -410,21 +410,21 @@ void tek4051_state::x_pia_pb_w(uint8_t data)
 	*/
 }
 
-WRITE_LINE_MEMBER( tek4051_state::adot_w )
+void tek4051_state::adot_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( tek4051_state::bufclk_w )
+void tek4051_state::bufclk_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( tek4051_state::x_pia_irqa_w )
+void tek4051_state::x_pia_irqa_w(int state)
 {
 	m_x_pia_irqa = state;
 	update_irq();
 }
 
-WRITE_LINE_MEMBER( tek4051_state::x_pia_irqb_w )
+void tek4051_state::x_pia_irqb_w(int state)
 {
 	m_x_pia_irqb = state;
 	update_irq();
@@ -486,17 +486,17 @@ void tek4051_state::sb_w(uint8_t data)
 	*/
 }
 
-WRITE_LINE_MEMBER( tek4051_state::sot_w )
+void tek4051_state::sot_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( tek4051_state::y_pia_irqa_w )
+void tek4051_state::y_pia_irqa_w(int state)
 {
 	m_y_pia_irqa = state;
 	update_nmi();
 }
 
-WRITE_LINE_MEMBER( tek4051_state::y_pia_irqb_w )
+void tek4051_state::y_pia_irqb_w(int state)
 {
 	m_y_pia_irqb = state;
 	update_nmi();
@@ -593,17 +593,17 @@ void tek4051_state::kb_pia_pb_w(uint8_t data)
 	m_gpib->host_ren_w(!BIT(data, 7));
 }
 
-WRITE_LINE_MEMBER( tek4051_state::kb_halt_w )
+void tek4051_state::kb_halt_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( tek4051_state::kb_pia_irqa_w )
+void tek4051_state::kb_pia_irqa_w(int state)
 {
 	m_kb_pia_irqa = state;
 	update_irq();
 }
 
-WRITE_LINE_MEMBER( tek4051_state::kb_pia_irqb_w )
+void tek4051_state::kb_pia_irqb_w(int state)
 {
 	m_kb_pia_irqb = state;
 	update_irq();
@@ -666,13 +666,13 @@ void tek4051_state::tape_pia_pb_w(uint8_t data)
 	*/
 }
 
-WRITE_LINE_MEMBER( tek4051_state::tape_pia_irqa_w )
+void tek4051_state::tape_pia_irqa_w(int state)
 {
 	m_tape_pia_irqa = state;
 	update_nmi();
 }
 
-WRITE_LINE_MEMBER( tek4051_state::tape_pia_irqb_w )
+void tek4051_state::tape_pia_irqb_w(int state)
 {
 	m_tape_pia_irqb = state;
 	update_nmi();
@@ -774,7 +774,7 @@ void tek4051_state::gpib_pia_pb_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER( tek4051_state::talk_w )
+void tek4051_state::talk_w(int state)
 {
 	m_talk = state;
 
@@ -786,13 +786,13 @@ WRITE_LINE_MEMBER( tek4051_state::talk_w )
 	}
 }
 
-WRITE_LINE_MEMBER( tek4051_state::gpib_pia_irqa_w )
+void tek4051_state::gpib_pia_irqa_w(int state)
 {
 	m_gpib_pia_irqa = state;
 	update_irq();
 }
 
-WRITE_LINE_MEMBER( tek4051_state::gpib_pia_irqb_w )
+void tek4051_state::gpib_pia_irqb_w(int state)
 {
 	m_gpib_pia_irqb = state;
 	update_irq();
@@ -877,25 +877,25 @@ void tek4051_state::com_pia_pb_w(uint8_t data)
 	m_acia_clock->set_clock_scale((double) 1 / div);
 }
 
-WRITE_LINE_MEMBER( tek4051_state::com_pia_irqa_w )
+void tek4051_state::com_pia_irqa_w(int state)
 {
 	m_com_pia_irqa = state;
 	update_irq();
 }
 
-WRITE_LINE_MEMBER( tek4051_state::com_pia_irqb_w )
+void tek4051_state::com_pia_irqb_w(int state)
 {
 	m_com_pia_irqb = state;
 	update_irq();
 }
 
-WRITE_LINE_MEMBER( tek4051_state::acia_irq_w )
+void tek4051_state::acia_irq_w(int state)
 {
 	m_acia_irq = state;
 	update_irq();
 }
 
-WRITE_LINE_MEMBER( tek4051_state::write_acia_clock )
+void tek4051_state::write_acia_clock(int state)
 {
 	m_acia->write_txc(state);
 	m_acia->write_rxc(state);

@@ -24,10 +24,10 @@ public:
 	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual std::pair<std::error_condition, std::string> call_create(int format_type, util::option_resolution *format_options) override;
 
-	DECLARE_WRITE_LINE_MEMBER(data_w) { if(!m_read) m_data = state; }
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
-	DECLARE_WRITE_LINE_MEMBER(reset_w) { if(!state && m_reset) reset(); m_reset = state; }
-	DECLARE_READ_LINE_MEMBER(data_r) { return m_read ? m_data : 0; }
+	void data_w(int state) { if(!m_read) m_data = state; }
+	void clock_w(int state);
+	void reset_w(int state) { if(!state && m_reset) reset(); m_reset = state; }
+	int data_r() { return m_read ? m_data : 0; }
 
 protected:
 	virtual void device_start() override;

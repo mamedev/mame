@@ -77,14 +77,14 @@ IO ports and memory map changes. Dip switches differ too.
 * VS Version        *
 ********************/
 
-WRITE_LINE_MEMBER(kchamp_state::nmi_enable_w)
+void kchamp_state::nmi_enable_w(int state)
 {
 	m_nmi_enable = state;
 	if (!m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(kchamp_state::sound_reset_w)
+void kchamp_state::sound_reset_w(int state)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 	if (!state)
@@ -354,13 +354,13 @@ static GFXDECODE_START( gfx_kchamp )
 GFXDECODE_END
 
 
-WRITE_LINE_MEMBER(kchamp_state::vblank_irq)
+void kchamp_state::vblank_irq(int state)
 {
 	if (state && m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(kchamp_state::msmint)
+void kchamp_state::msmint(int state)
 {
 	if (!state)
 		return;

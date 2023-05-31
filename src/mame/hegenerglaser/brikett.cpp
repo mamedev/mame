@@ -147,12 +147,12 @@ private:
 
 	// I/O handlers
 	INTERRUPT_GEN_MEMBER(interrupt);
-	DECLARE_READ_LINE_MEMBER(clear_r);
+	int clear_r();
 	u8 input_r(offs_t offset);
 	u8 sound_r();
 
 	void esb_w(u8 data);
-	DECLARE_READ_LINE_MEMBER(esb_r);
+	int esb_r();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_off) { m_dac->write(0); }
 
@@ -202,7 +202,7 @@ INTERRUPT_GEN_MEMBER(brikett_state::interrupt)
 	m_maincpu->set_input_line(COSMAC_INPUT_LINE_INT, HOLD_LINE);
 }
 
-READ_LINE_MEMBER(brikett_state::clear_r)
+int brikett_state::clear_r()
 {
 	// CLEAR low + WAIT high resets cpu
 	int ret = (m_reset) ? 0 : 1;
@@ -265,7 +265,7 @@ void brikett_state::esb_w(u8 data)
 	m_led_pwm->matrix(~m_esb_row, m_esb_led);
 }
 
-READ_LINE_MEMBER(brikett_state::esb_r)
+int brikett_state::esb_r()
 {
 	// EF1: read chessboard sensor
 	if (m_board && m_inputs[5].read_safe(0))

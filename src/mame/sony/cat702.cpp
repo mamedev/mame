@@ -183,7 +183,7 @@ void cat702_device::apply_sbox(const uint8_t *sbox)
 	m_state = r;
 }
 
-WRITE_LINE_MEMBER(cat702_device::write_select)
+void cat702_device::write_select(int state)
 {
 	if (m_select != state)
 	{
@@ -201,7 +201,7 @@ WRITE_LINE_MEMBER(cat702_device::write_select)
 	}
 }
 
-WRITE_LINE_MEMBER(cat702_device::write_clock)
+void cat702_device::write_clock(int state)
 {
 	static const uint8_t initial_sbox[8] = { 0xff, 0xfe, 0xfc, 0xf8, 0xf0, 0xe0, 0xc0, 0x7f };
 
@@ -229,7 +229,7 @@ WRITE_LINE_MEMBER(cat702_device::write_clock)
 	m_clock = state;
 }
 
-WRITE_LINE_MEMBER(cat702_device::write_datain)
+void cat702_device::write_datain(int state)
 {
 	m_datain = state;
 }

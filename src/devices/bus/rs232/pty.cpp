@@ -29,7 +29,7 @@ pseudo_terminal_device::pseudo_terminal_device(const machine_config &mconfig, co
 {
 }
 
-WRITE_LINE_MEMBER(pseudo_terminal_device::update_serial)
+void pseudo_terminal_device::update_serial(int state)
 {
 	int startbits = 1;
 	int databits = convert_databits(m_rs232_databits->read());

@@ -27,18 +27,18 @@ public:
 	{
 	}
 
-	DECLARE_WRITE_LINE_MEMBER(pc_dma_hrq_changed);
+	void pc_dma_hrq_changed(int state);
 	uint8_t pc_dma_read_byte(offs_t offset);
 	void pc_dma_write_byte(offs_t offset, uint8_t data);
 	uint8_t dma_page_select_r(offs_t offset);
 	void dma_page_select_w(offs_t offset, uint8_t data);
 	void set_dma_channel(int channel, int state);
-	DECLARE_WRITE_LINE_MEMBER( pc_dack0_w );
-	DECLARE_WRITE_LINE_MEMBER( pc_dack1_w );
-	DECLARE_WRITE_LINE_MEMBER( pc_dack2_w );
-	DECLARE_WRITE_LINE_MEMBER( pc_dack3_w );
+	void pc_dack0_w(int state);
+	void pc_dack1_w(int state);
+	void pc_dack2_w(int state);
+	void pc_dack3_w(int state);
 	uint8_t get_slave_ack(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER( at_pit8254_out2_changed );
+	void at_pit8254_out2_changed(int state);
 
 protected:
 	void pcat_common(machine_config &config);

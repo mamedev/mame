@@ -59,7 +59,7 @@ void mulcd_device::set_leds(u8 leds)
 		m_led_outputs[x] = (leds >> x) & 1;
 }
 
-WRITE_LINE_MEMBER(mulcd_device::render_w)
+void mulcd_device::render_w(int state)
 {
 	if(!state)
 		return;

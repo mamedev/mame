@@ -106,10 +106,10 @@ private:
 	uint8_t at_portb_r();
 	void at_portb_w(uint8_t data);
 	uint8_t get_slave_ack(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(at_pit8254_out0_changed);
-	DECLARE_WRITE_LINE_MEMBER(at_pit8254_out1_changed);
-	DECLARE_WRITE_LINE_MEMBER(at_pit8254_out2_changed);
-	DECLARE_WRITE_LINE_MEMBER(pc_dma_hrq_changed);
+	void at_pit8254_out0_changed(int state);
+	void at_pit8254_out1_changed(int state);
+	void at_pit8254_out2_changed(int state);
+	void pc_dma_hrq_changed(int state);
 	uint8_t pc_dma8237_0_dack_r();
 	uint8_t pc_dma8237_1_dack_r();
 	uint8_t pc_dma8237_2_dack_r();
@@ -124,15 +124,15 @@ private:
 	void pc_dma8237_5_dack_w(uint8_t data);
 	void pc_dma8237_6_dack_w(uint8_t data);
 	void pc_dma8237_7_dack_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(at_dma8237_out_eop);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack0_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack1_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack4_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack5_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack6_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack7_w);
+	void at_dma8237_out_eop(int state);
+	void pc_dack0_w(int state);
+	void pc_dack1_w(int state);
+	void pc_dack2_w(int state);
+	void pc_dack3_w(int state);
+	void pc_dack4_w(int state);
+	void pc_dack5_w(int state);
+	void pc_dack6_w(int state);
+	void pc_dack7_w(int state);
 	uint8_t at_dma8237_2_r(offs_t offset);
 	void at_dma8237_2_w(offs_t offset, uint8_t data);
 	uint8_t at_keybc_r(offs_t offset);
@@ -142,9 +142,9 @@ private:
 	void pc_dma_write_byte(offs_t offset, uint8_t data);
 	uint8_t pc_dma_read_word(offs_t offset);
 	void pc_dma_write_word(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(cpu_int_w);
-	DECLARE_WRITE_LINE_MEMBER(cpu_a20_w);
-	DECLARE_WRITE_LINE_MEMBER(cpu_reset_w);
+	void cpu_int_w(int state);
+	void cpu_a20_w(int state);
+	void cpu_reset_w(int state);
 };
 
 DECLARE_DEVICE_TYPE(SIS85C496, sis85c496_host_device)

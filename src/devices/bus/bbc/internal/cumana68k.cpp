@@ -197,13 +197,13 @@ void bbc_cumana68k_device::device_reset_after_children()
 //  IMPLEMENTATION
 //**************************************************************************
 
-WRITE_LINE_MEMBER(bbc_cumana68k_device::reset68008_w)
+void bbc_cumana68k_device::reset68008_w(int state)
 {
 	m_m68008->set_input_line(INPUT_LINE_HALT, state);
 	m_m68008->set_input_line(INPUT_LINE_RESET, state);
 }
 
-WRITE_LINE_MEMBER(bbc_cumana68k_device::irq6502_w)
+void bbc_cumana68k_device::irq6502_w(int state)
 {
 	m_m68008->set_input_line(M68K_IRQ_2, state);
 }
@@ -255,7 +255,7 @@ void bbc_cumana68k_device::mem6502_w(offs_t offset, uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(bbc_cumana68k_device::rtc_ce_w)
+void bbc_cumana68k_device::rtc_ce_w(int state)
 {
 	m_mc146818_ce = !state;
 }

@@ -111,7 +111,7 @@ uint8_t gameplan_state::io_port_r()
 }
 
 
-WRITE_LINE_MEMBER(gameplan_state::coin_w)
+void gameplan_state::coin_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, ~state & 1);
 }
@@ -124,7 +124,7 @@ WRITE_LINE_MEMBER(gameplan_state::coin_w)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(gameplan_state::audio_reset_w)
+void gameplan_state::audio_reset_w(int state)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 
@@ -142,7 +142,7 @@ void gameplan_state::audio_cmd_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(gameplan_state::audio_trigger_w)
+void gameplan_state::audio_trigger_w(int state)
 {
 	m_riot->porta_in_set(state << 7, 0x80);
 }
@@ -155,7 +155,7 @@ WRITE_LINE_MEMBER(gameplan_state::audio_trigger_w)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(gameplan_state::r6532_irq)
+void gameplan_state::r6532_irq(int state)
 {
 	m_audiocpu->set_input_line(0, state);
 	if (state == ASSERT_LINE)

@@ -53,7 +53,7 @@ private:
 	uint8_t bim_irq_state;
 	int bim_irq_level;
 
-	DECLARE_WRITE_LINE_MEMBER(bim_irq_callback);
+	void bim_irq_callback(int state);
 	void update_irq_to_maincpu();
 
 	void pit1_pb_w(uint8_t data);

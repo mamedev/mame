@@ -174,7 +174,7 @@ void isa16_s3virge_device::device_add_mconfig(machine_config &config)
 //  framebuffer configuration.
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(isa16_s3virge_device::linear_config_changed_w)
+void isa16_s3virge_device::linear_config_changed_w(int state)
 {
 }
 
@@ -266,7 +266,7 @@ void isa16_s3virgedx_device::device_add_mconfig(machine_config &config)
 //  framebuffer configuration.
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(isa16_s3virgedx_device::linear_config_changed_w)
+void isa16_s3virgedx_device::linear_config_changed_w(int state)
 {
 	const bool old = m_lfb_enable;
 	m_lfb_enable = state;
@@ -382,7 +382,7 @@ void isa16_stealth3d2kpro_device::device_add_mconfig(machine_config &config)
 //  framebuffer configuration.
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(isa16_stealth3d2kpro_device::linear_config_changed_w)
+void isa16_stealth3d2kpro_device::linear_config_changed_w(int state)
 {
 }
 

@@ -126,16 +126,16 @@ private:
 
 	uint8_t sh_timer_r();
 	void sh_irqtrigger_w(uint8_t data);
-	template <uint8_t Which> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
+	template <uint8_t Which> void coin_counter_w(int state);
 	void sound_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
+	void irq_mask_w(int state);
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(spritebank_w);
+	void spritebank_w(int state);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
@@ -276,7 +276,7 @@ void circusc_state::colorram_w(offs_t offset, uint8_t data)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE_LINE_MEMBER(circusc_state::spritebank_w)
+void circusc_state::spritebank_w(int state)
 {
 	m_spritebank = state;
 }
@@ -371,7 +371,7 @@ void circusc_state::sh_irqtrigger_w(uint8_t data)
 }
 
 template <uint8_t Which>
-WRITE_LINE_MEMBER(circusc_state::coin_counter_w)
+void circusc_state::coin_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(Which, state);
 }
@@ -409,7 +409,7 @@ void circusc_state::sound_w(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(circusc_state::irq_mask_w)
+void circusc_state::irq_mask_w(int state)
 {
 	m_irq_mask = state;
 	if (!m_irq_mask)
@@ -577,7 +577,7 @@ static DISCRETE_SOUND_START( circusc_discrete )
 
 DISCRETE_SOUND_END
 
-WRITE_LINE_MEMBER(circusc_state::vblank_irq)
+void circusc_state::vblank_irq(int state)
 {
 	if (state && m_irq_mask)
 		m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);

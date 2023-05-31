@@ -117,7 +117,7 @@ void spg2xx_device::fiq_vector_w(uint8_t data)
 	m_fiq_vector = data;
 }
 
-WRITE_LINE_MEMBER(spg2xx_device::videoirq_w)
+void spg2xx_device::videoirq_w(int state)
 {
 	if (m_fiq_vector == 0)
 	{
@@ -129,37 +129,37 @@ WRITE_LINE_MEMBER(spg2xx_device::videoirq_w)
 	}
 }
 
-WRITE_LINE_MEMBER(spg2xx_device::timerirq_w)
+void spg2xx_device::timerirq_w(int state)
 {
 	set_state_unsynced(UNSP_IRQ2_LINE, state);
 }
 
-WRITE_LINE_MEMBER(spg2xx_device::uartirq_w)
+void spg2xx_device::uartirq_w(int state)
 {
 	set_state_unsynced(UNSP_IRQ3_LINE, state);
 }
 
-WRITE_LINE_MEMBER(spg2xx_device::audioirq_w)
+void spg2xx_device::audioirq_w(int state)
 {
 	set_state_unsynced(UNSP_IRQ4_LINE, state);
 }
 
-WRITE_LINE_MEMBER(spg2xx_device::audiochirq_w)
+void spg2xx_device::audiochirq_w(int state)
 {
 	set_state_unsynced(UNSP_FIQ_LINE, state);
 }
 
-WRITE_LINE_MEMBER(spg2xx_device::extirq_w)
+void spg2xx_device::extirq_w(int state)
 {
 	set_state_unsynced(UNSP_IRQ5_LINE, state);
 }
 
-WRITE_LINE_MEMBER(spg2xx_device::ffreq1_w)
+void spg2xx_device::ffreq1_w(int state)
 {
 	set_state_unsynced(UNSP_IRQ6_LINE, state);
 }
 
-WRITE_LINE_MEMBER(spg2xx_device::ffreq2_w)
+void spg2xx_device::ffreq2_w(int state)
 {
 	set_state_unsynced(UNSP_IRQ7_LINE, state);
 }

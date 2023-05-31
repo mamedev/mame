@@ -719,7 +719,7 @@ u32 mpcba63_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	return 0;
 }
 
-WRITE_LINE_MEMBER(edge1_device_base::vblank)
+void edge1_device_base::vblank(int state)
 {
 	if (state)
 	{
@@ -779,7 +779,7 @@ void edge1_device_base::control_w(offs_t offset, u32 data, u32 mem_mask)
 		m_dsp->set_input_line(TMS3203X_HOLD, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(edge1_device_base::holda)
+void edge1_device_base::holda(int state)
 {
 	LOGMASKED(LOG_INTERRUPT, "hold acknowledge %d\n", state);
 
@@ -811,7 +811,7 @@ void edge2plus_processor_device_base::control_w(offs_t offset, u32 data, u32 mem
 		m_dsp1->set_input_line(TMS3203X_HOLD, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(edge2plus_processor_device_base::holda)
+void edge2plus_processor_device_base::holda(int state)
 {
 	LOGMASKED(LOG_INTERRUPT, "hold acknowledge %d\n", state);
 
@@ -854,7 +854,7 @@ void edge2plus_framebuffer_device_base::lut_select_w(u32 data)
 	// lookup table 3 enables address range 92030000-92030fff, written with zeroes
 }
 
-WRITE_LINE_MEMBER(edge1_device_base::scc_irq)
+void edge1_device_base::scc_irq(int state)
 {
 	if (state)
 		m_reg0 |= SCC_INT;
@@ -876,7 +876,7 @@ void edge1_device_base::kernel_w(offs_t offset, u32 data, u32 mem_mask)
 	m_status |= KREG_IN_FULL; // FIXME: what clears this?
 }
 
-WRITE_LINE_MEMBER(edge2plus_processor_device_base::scc_irq)
+void edge2plus_processor_device_base::scc_irq(int state)
 {
 	if (state)
 		m_reg0 |= SCC_INT;

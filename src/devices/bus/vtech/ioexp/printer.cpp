@@ -80,7 +80,7 @@ void vtech_printer_interface_device::device_start()
 //  IMPLEMENTATION
 //**************************************************************************
 
-WRITE_LINE_MEMBER( vtech_printer_interface_device::busy_w )
+void vtech_printer_interface_device::busy_w(int state)
 {
 	m_centronics_busy = state;
 }

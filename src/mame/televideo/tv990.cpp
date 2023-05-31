@@ -84,10 +84,10 @@ private:
 	uint8_t kbdc_r(offs_t offset);
 	void kbdc_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(uart0_irq);
-	DECLARE_WRITE_LINE_MEMBER(uart1_irq);
-	DECLARE_WRITE_LINE_MEMBER(lpt_irq);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void uart0_irq(int state);
+	void uart1_irq(int state);
+	void lpt_irq(int state);
+	void vblank_irq(int state);
 
 	required_device<m68000_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_vram;
@@ -105,7 +105,7 @@ private:
 	int m_height = 0;
 };
 
-WRITE_LINE_MEMBER(tv990_state::vblank_irq)
+void tv990_state::vblank_irq(int state)
 {
 	if (state)
 	{
@@ -132,17 +132,17 @@ TIMER_CALLBACK_MEMBER(tv990_state::trigger_row_irq)
 	m_screen->update_now();
 }
 
-WRITE_LINE_MEMBER(tv990_state::uart0_irq)
+void tv990_state::uart0_irq(int state)
 {
 	m_maincpu->set_input_line(M68K_IRQ_5, state);
 }
 
-WRITE_LINE_MEMBER(tv990_state::uart1_irq)
+void tv990_state::uart1_irq(int state)
 {
 	m_maincpu->set_input_line(M68K_IRQ_4, state);
 }
 
-WRITE_LINE_MEMBER(tv990_state::lpt_irq)
+void tv990_state::lpt_irq(int state)
 {
 	m_maincpu->set_input_line(M68K_IRQ_3, state);
 }

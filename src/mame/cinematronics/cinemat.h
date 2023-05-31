@@ -71,11 +71,11 @@ public:
 	u8 inputs_r(offs_t offset);
 	u8 switches_r(offs_t offset);
 	u8 coin_input_r();
-	WRITE_LINE_MEMBER(coin_reset_w);
-	WRITE_LINE_MEMBER(mux_select_w);
+	void coin_reset_w(int state);
+	void mux_select_w(int state);
 	u8 speedfrk_wheel_r(offs_t offset);
 	u8 speedfrk_gear_r(offs_t offset);
-	virtual DECLARE_WRITE_LINE_MEMBER(vector_control_w);
+	virtual void vector_control_w(int state);
 	u8 joystick_read();
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	void init_speedfrk();
@@ -94,7 +94,7 @@ public:
 	void armora(machine_config &config);
 
 	template<int Index>
-	DECLARE_WRITE_LINE_MEMBER(speedfrk_gear_change_w)
+	void speedfrk_gear_change_w(int state)
 	{
 		if (state)
 			m_gear = Index;
@@ -109,7 +109,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE_LINE_MEMBER(speedfrk_start_led_w);
+	void speedfrk_start_led_w(int state);
 
 	void cinemat_nojmi_4k(machine_config &config);
 	void cinemat_jmi_4k(machine_config &config);
@@ -137,7 +137,7 @@ public:
 	void sundance(machine_config &config);
 
 protected:
-	virtual DECLARE_WRITE_LINE_MEMBER(vector_control_w) override;
+	virtual void vector_control_w(int state) override;
 	u8 sundance_inputs_r(offs_t offset);
 };
 
@@ -152,7 +152,7 @@ public:
 	void init_solarq();
 
 protected:
-	virtual DECLARE_WRITE_LINE_MEMBER(vector_control_w) override;
+	virtual void vector_control_w(int state) override;
 };
 
 
@@ -167,7 +167,7 @@ public:
 	void wotwc(machine_config &config);
 
 protected:
-	virtual DECLARE_WRITE_LINE_MEMBER(vector_control_w) override;
+	virtual void vector_control_w(int state) override;
 	u8 boxingb_dial_r(offs_t offset);
 };
 
@@ -181,7 +181,7 @@ public:
 
 protected:
 	TIMER_CALLBACK_MEMBER(synced_sound_w);
-	DECLARE_WRITE_LINE_MEMBER(demon_sound4_w);
+	void demon_sound4_w(int state);
 	u8 sound_porta_r();
 	u8 sound_portb_r();
 	void sound_portb_w(u8 data);
@@ -213,7 +213,7 @@ public:
 	void qb3(machine_config &config);
 
 protected:
-	virtual DECLARE_WRITE_LINE_MEMBER(vector_control_w) override;
+	virtual void vector_control_w(int state) override;
 	u8 qb3_frame_r();
 	void qb3_ram_bank_w(u8 data);
 	void qb3_sound_fifo_w(u8 data);

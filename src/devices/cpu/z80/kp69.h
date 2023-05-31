@@ -31,7 +31,7 @@ public:
 	u8 imrh_r();
 
 	// interrupt inputs
-	template <int N> DECLARE_WRITE_LINE_MEMBER(ir_w)
+	template <int N> void ir_w(int state)
 	{
 		static_assert(N >= 0 && N < 16, "Invalid level");
 		set_input_level(N, state);

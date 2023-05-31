@@ -167,8 +167,8 @@ protected:
 
 	static void floppy_formats(format_registration &fr);
 
-	DECLARE_WRITE_LINE_MEMBER(towns_scsi_irq);
-	DECLARE_WRITE_LINE_MEMBER(towns_scsi_drq);
+	void towns_scsi_irq(int state);
+	void towns_scsi_drq(int state);
 
 private:
 	/* devices */
@@ -334,22 +334,22 @@ private:
 	uint8_t towns_spriteram_r(offs_t offset);
 	void towns_spriteram_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(mb8877a_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(mb8877a_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(pit_out2_changed);
+	void mb8877a_irq_w(int state);
+	void mb8877a_drq_w(int state);
+	void pit_out2_changed(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(towns_serial_irq);
-	DECLARE_WRITE_LINE_MEMBER(towns_rxrdy_irq);
-	DECLARE_WRITE_LINE_MEMBER(towns_txrdy_irq);
-	DECLARE_WRITE_LINE_MEMBER(towns_syndet_irq);
+	void towns_serial_irq(int state);
+	void towns_rxrdy_irq(int state);
+	void towns_txrdy_irq(int state);
+	void towns_syndet_irq(int state);
 	uint8_t towns_serial_r(offs_t offset);
 	void towns_serial_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(rtc_d0_w);
-	DECLARE_WRITE_LINE_MEMBER(rtc_d1_w);
-	DECLARE_WRITE_LINE_MEMBER(rtc_d2_w);
-	DECLARE_WRITE_LINE_MEMBER(rtc_d3_w);
-	DECLARE_WRITE_LINE_MEMBER(rtc_busy_w);
+	void rtc_d0_w(int state);
+	void rtc_d1_w(int state);
+	void rtc_d2_w(int state);
+	void rtc_d3_w(int state);
+	void rtc_busy_w(int state);
 
 	RF5C68_SAMPLE_END_CB_MEMBER(towns_pcm_irq);
 
@@ -384,11 +384,11 @@ private:
 	TIMER_CALLBACK_MEMBER(towns_cdrom_read_byte);
 	TIMER_CALLBACK_MEMBER(towns_vblank_end);
 	TIMER_CALLBACK_MEMBER(draw_sprites);
-	DECLARE_WRITE_LINE_MEMBER(towns_pit_out0_changed);
-	DECLARE_WRITE_LINE_MEMBER(towns_pit_out1_changed);
-	DECLARE_WRITE_LINE_MEMBER(pit2_out1_changed);
+	void towns_pit_out0_changed(int state);
+	void towns_pit_out1_changed(int state);
+	void pit2_out1_changed(int state);
 	uint8_t get_slave_ack(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(towns_fm_irq);
+	void towns_fm_irq(int state);
 	void towns_sprite_start();
 	void towns_crtc_refresh_mode();
 	void towns_update_kanji_offset();

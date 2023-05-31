@@ -73,7 +73,7 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	DECLARE_WRITE_LINE_MEMBER(write_s2650_flag);
+	void write_s2650_flag(int state);
 	uint8_t collision_r();
 	uint8_t collision_clear();
 	void scroll_start();

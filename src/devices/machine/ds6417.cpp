@@ -61,7 +61,7 @@ uint8_t ds6417_device::calccrc(uint8_t bit, uint8_t crc) const
 		return crc >> 1;
 }
 
-WRITE_LINE_MEMBER( ds6417_device::clock_w )
+void ds6417_device::clock_w(int state)
 {
 	if(!m_reset || !exists())
 		return;

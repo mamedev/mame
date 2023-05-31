@@ -408,7 +408,7 @@ MACHINE_RESET_MEMBER(pacman_state,maketrax)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(pacman_state::vblank_irq)
+void pacman_state::vblank_irq(int state)
 {
 	if (state && m_irq_mask)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
@@ -420,20 +420,20 @@ INTERRUPT_GEN_MEMBER(pacman_state::periodic_irq)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(pacman_state::vblank_nmi)
+void pacman_state::vblank_nmi(int state)
 {
 	if (state && m_irq_mask)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(pacman_state::irq_mask_w)
+void pacman_state::irq_mask_w(int state)
 {
 	m_irq_mask = state;
 	if (!state)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(pacman_state::nmi_mask_w)
+void pacman_state::nmi_mask_w(int state)
 {
 	m_irq_mask = state;
 	if (!state)
@@ -539,13 +539,13 @@ void pacman_state::mspacii_interrupt_vector_w(uint8_t data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(pacman_state::coin_counter_w)
+void pacman_state::coin_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
 
-WRITE_LINE_MEMBER(pacman_state::coin_lockout_global_w)
+void pacman_state::coin_lockout_global_w(int state)
 {
 	machine().bookkeeping().coin_lockout_global_w(!state);
 }
@@ -741,7 +741,7 @@ uint8_t pacman_state::bigbucks_question_r(offs_t offset)
  *
  ************************************/
 
-WRITE_LINE_MEMBER(pacman_state::s2650_interrupt)
+void pacman_state::s2650_interrupt(int state)
 {
 	if (state)
 		m_maincpu->set_input_line(0, ASSERT_LINE);

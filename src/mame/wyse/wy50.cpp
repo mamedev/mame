@@ -67,7 +67,7 @@ protected:
 private:
 	u8 pvtc_videoram_r(offs_t offset);
 	SCN2672_DRAW_CHARACTER_MEMBER(draw_character);
-	DECLARE_WRITE_LINE_MEMBER(mbc_attr_clock_w);
+	void mbc_attr_clock_w(int state);
 
 	u8 pvtc_r(offs_t offset);
 	void pvtc_w(offs_t offset, u8 data);
@@ -176,7 +176,7 @@ SCN2672_DRAW_CHARACTER_MEMBER(wy50_state::draw_character)
 		bitmap.pix(y, x++) = BIT(dots, 9) ? fg : rgb_t::black();
 }
 
-WRITE_LINE_MEMBER(wy50_state::mbc_attr_clock_w)
+void wy50_state::mbc_attr_clock_w(int state)
 {
 	if (state)
 		m_last_row_attr = m_cur_attr;

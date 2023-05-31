@@ -128,7 +128,7 @@ void pet_expansion_slot_device::write(offs_t offset, uint8_t data, int &sel)
 //  diag_r - DIAG read
 //-------------------------------------------------
 
-READ_LINE_MEMBER( pet_expansion_slot_device::diag_r )
+int pet_expansion_slot_device::diag_r()
 {
 	return m_card ? m_card->pet_diag_r() : 1;
 }
@@ -138,7 +138,7 @@ READ_LINE_MEMBER( pet_expansion_slot_device::diag_r )
 //  irq_w - IRQ write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( pet_expansion_slot_device::irq_w )
+void pet_expansion_slot_device::irq_w(int state)
 {
 	if (m_card) m_card->pet_irq_w(state);
 }

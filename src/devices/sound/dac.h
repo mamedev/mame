@@ -51,7 +51,7 @@ stream_buffer::sample_t dac_mapper_ones_complement(u32 input, u8 bits);
 class dac_bit_interface
 {
 public:
-	virtual DECLARE_WRITE_LINE_MEMBER(write) = 0;
+	virtual void write(int state) = 0;
 	virtual void data_w(u8 data) = 0;
 };
 
@@ -134,7 +134,7 @@ protected:
 	}
 
 public:
-	virtual WRITE_LINE_MEMBER(write) override { this->set_value(state); }
+	virtual void write(int state) override { this->set_value(state); }
 	virtual void data_w(u8 data) override { this->set_value(data); }
 };
 

@@ -38,7 +38,7 @@ namespace
 			virtual void meb_write(offs_t offset, u8 data) override;
 
 		private:
-			DECLARE_WRITE_LINE_MEMBER(busy_w);
+			void busy_w(int state);
 
 			required_device<msm6242_device> m_rtc;
 			u8 m_rtc_address;
@@ -159,7 +159,7 @@ namespace
 	//    busy_w - centronics busy call back
 	//-------------------------------------------------
 
-	WRITE_LINE_MEMBER( disto_rtime_device::busy_w )
+	void disto_rtime_device::busy_w(int state)
 	{
 		m_centronics_busy = state;
 	}

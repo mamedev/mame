@@ -126,17 +126,17 @@ protected:
 	// PIO callback
 	uint8_t pio_porta_r();
 	uint8_t pio_portb_r();
-	DECLARE_WRITE_LINE_MEMBER( pio_ardy_cb);
-	DECLARE_WRITE_LINE_MEMBER( pio_brdy_cb);
+	void pio_ardy_cb(int state);
+	void pio_brdy_cb(int state);
 	void pio_porta_w(uint8_t data);
 	virtual void pio_portb_w(uint8_t data);
 
 	// CTC callback
-	DECLARE_WRITE_LINE_MEMBER( ctc_zc0_callback );
-	DECLARE_WRITE_LINE_MEMBER( ctc_zc1_callback );
+	void ctc_zc0_callback(int state);
+	void ctc_zc1_callback(int state);
 
 	// keyboard
-	DECLARE_WRITE_LINE_MEMBER( keyboard_cb );
+	void keyboard_cb(int state);
 
 	// cassette
 	void update_cassette(int state);
@@ -147,7 +147,7 @@ protected:
 	void tapeout_update();
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER( video_toggle_blink_state );
+	void video_toggle_blink_state(int state);
 	void video_draw_8_pixels(bitmap_ind16 &bitmap, int x, int y, uint8_t colour_byte, uint8_t gfx_byte);
 
 	void kc85_palette(palette_device &palette) const ATTR_COLD;
@@ -183,7 +183,7 @@ protected:
 	uint8_t         m_speaker_level = 0U;
 
 	// CTC callback
-	DECLARE_WRITE_LINE_MEMBER( ctc_zc0_callback );
+	void ctc_zc0_callback(int state);
 
 	// sound
 	virtual void speaker_update();

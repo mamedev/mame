@@ -730,26 +730,26 @@ uint8_t galaga_state::bosco_dsw_r(offs_t offset)
 	return bit0 | (bit1 << 1);
 }
 
-WRITE_LINE_MEMBER(galaga_state::flip_screen_w)
+void galaga_state::flip_screen_w(int state)
 {
 	flip_screen_set(state);
 }
 
-WRITE_LINE_MEMBER(galaga_state::irq1_clear_w)
+void galaga_state::irq1_clear_w(int state)
 {
 	m_main_irq_mask = state;
 	if (!m_main_irq_mask)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(galaga_state::irq2_clear_w)
+void galaga_state::irq2_clear_w(int state)
 {
 	m_sub_irq_mask = state;
 	if (!m_sub_irq_mask)
 		m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(galaga_state::nmion_w)
+void galaga_state::nmion_w(int state)
 {
 	m_sub2_nmi_mask = !state;
 }
@@ -762,7 +762,7 @@ void galaga_state::out(uint8_t data)
 	machine().bookkeeping().coin_counter_w(0,~data & 8);
 }
 
-WRITE_LINE_MEMBER(galaga_state::lockout)
+void galaga_state::lockout(int state)
 {
 	machine().bookkeeping().coin_lockout_global_w(state);
 }
@@ -1544,7 +1544,7 @@ static const char *const battles_sample_names[] =
 	nullptr   /* end of array */
 };
 
-WRITE_LINE_MEMBER(galaga_state::vblank_irq)
+void galaga_state::vblank_irq(int state)
 {
 	if (state && m_main_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);

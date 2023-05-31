@@ -456,7 +456,7 @@ void okim6376_device::device_clock_changed()
 
 ***********************************************************************************************/
 
-READ_LINE_MEMBER( okim6376_device::busy_r )
+int okim6376_device::busy_r()
 {
 	struct ADPCMVoice *voice0 = &m_voice[0];
 	struct ADPCMVoice *voice1 = &m_voice[1];
@@ -472,13 +472,13 @@ READ_LINE_MEMBER( okim6376_device::busy_r )
 	}
 }
 
-READ_LINE_MEMBER( okim6376_device::nar_r )
+int okim6376_device::nar_r()
 {
 	LOG("OKIM6376: NAR %x\n",m_nar);
 	return m_nar;
 }
 
-WRITE_LINE_MEMBER( okim6376_device::ch2_w )
+void okim6376_device::ch2_w(int state)
 {
 	m_ch2_update = 0;//Clear flag
 	LOG("OKIM6376: CH2 %x\n",state);
@@ -515,7 +515,7 @@ WRITE_LINE_MEMBER( okim6376_device::ch2_w )
 }
 
 
-WRITE_LINE_MEMBER( okim6376_device::st_w )
+void okim6376_device::st_w(int state)
 {
 	//As in STart, presumably, this triggers everything
 
@@ -557,7 +557,7 @@ WRITE_LINE_MEMBER( okim6376_device::st_w )
 }
 
 
-WRITE_LINE_MEMBER( okim6650_device::cmd_w )
+void okim6650_device::cmd_w(int state)
 {
 	// TODO
 }

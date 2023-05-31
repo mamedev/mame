@@ -15,7 +15,7 @@ class swtpc8212_terminal_device : public device_t, public device_rs232_port_inte
 public:
 	swtpc8212_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE_LINE_MEMBER(input_txd) override;
+	virtual void input_txd(int state) override;
 
 	DECLARE_INPUT_CHANGED_MEMBER(flow_control);
 
@@ -29,8 +29,8 @@ private:
 	required_device<swtpc8212_device> m_swtpc8212;
 	required_ioport m_flow_control;
 
-	DECLARE_WRITE_LINE_MEMBER(route_term_rts);
-	DECLARE_WRITE_LINE_MEMBER(route_term_dtr);
+	void route_term_rts(int state);
+	void route_term_dtr(int state);
 
 	int m_dtr;
 };

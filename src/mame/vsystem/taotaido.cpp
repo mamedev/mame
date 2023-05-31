@@ -157,7 +157,7 @@ private:
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_rows);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	uint32_t tile_callback(uint32_t code);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
@@ -272,7 +272,7 @@ uint32_t taotaido_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-WRITE_LINE_MEMBER(taotaido_state::screen_vblank)
+void taotaido_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)

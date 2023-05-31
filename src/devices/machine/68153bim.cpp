@@ -362,7 +362,7 @@ void bim68153_channel::device_reset()
 }
 
 /* Trigger an interrupt */
-WRITE_LINE_MEMBER( bim68153_channel::int_w )
+void bim68153_channel::int_w(int state)
 {
 	LOGINT("%s Ch %d: %s\n",FUNCNAME, m_index, state == CLEAR_LINE ? "Cleared" : "Asserted");
 	if (state == ASSERT_LINE)

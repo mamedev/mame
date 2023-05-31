@@ -72,7 +72,7 @@ private:
 	template <uint8_t Which> void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(interrupt);
-	DECLARE_WRITE_LINE_MEMBER(pcm_w);
+	void pcm_w(int state);
 	void prg_map(address_map &map);
 	void io_map(address_map &map);
 };
@@ -231,7 +231,7 @@ void drmicro_state::nmi_enable_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(drmicro_state::pcm_w)
+void drmicro_state::pcm_w(int state)
 {
 	int data = m_adpcm_rom[m_pcm_adr / 2];
 

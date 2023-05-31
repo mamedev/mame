@@ -152,34 +152,34 @@ private:
 	virtual void machine_reset() override;
 
 	void via1_pa_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( write_nfrd );
-	DECLARE_WRITE_LINE_MEMBER( write_ndac );
+	void write_nfrd(int state);
+	void write_ndac(int state);
 	void via1_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( via1_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( codec_vol_w );
+	void via1_irq_w(int state);
+	void codec_vol_w(int state);
 
 	void via2_pa_w(uint8_t data);
 	void via2_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( via2_irq_w );
+	void via2_irq_w(int state);
 
 	void via3_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( via3_irq_w );
+	void via3_irq_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
+	void fdc_irq_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( ssda_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( ssda_sm_dtr_w );
+	void ssda_irq_w(int state);
+	void ssda_sm_dtr_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( kbrdy_w );
-	DECLARE_WRITE_LINE_MEMBER( kbdata_w );
-	DECLARE_WRITE_LINE_MEMBER( vert_w );
+	void kbrdy_w(int state);
+	void kbdata_w(int state);
+	void vert_w(int state);
 
 
 	MC6845_UPDATE_ROW( crtc_update_row );
 	MC6845_BEGIN_UPDATE( crtc_begin_update );
 
-	DECLARE_WRITE_LINE_MEMBER( mux_serial_b_w );
-	DECLARE_WRITE_LINE_MEMBER( mux_serial_a_w );
+	void mux_serial_b_w(int state);
+	void mux_serial_a_w(int state);
 
 	void victor9k_palette(palette_device &palette) const;
 
@@ -342,17 +342,17 @@ MC6845_BEGIN_UPDATE( victor9k_state::crtc_begin_update )
 	}
 }
 
-WRITE_LINE_MEMBER(victor9k_state::vert_w)
+void victor9k_state::vert_w(int state)
 {
 	m_via2->write_pa7(state);
 	m_pic->ir7_w(state);
 }
 
-WRITE_LINE_MEMBER(victor9k_state::mux_serial_b_w)
+void victor9k_state::mux_serial_b_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER(victor9k_state::mux_serial_a_w)
+void victor9k_state::mux_serial_a_w(int state)
 {
 }
 
@@ -379,7 +379,7 @@ WRITE_LINE_MEMBER(victor9k_state::mux_serial_a_w)
 //  MC6852_INTERFACE( ssda_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( victor9k_state::ssda_irq_w )
+void victor9k_state::ssda_irq_w(int state)
 {
 	m_ssda_irq = state;
 
@@ -387,7 +387,7 @@ WRITE_LINE_MEMBER( victor9k_state::ssda_irq_w )
 }
 
 
-WRITE_LINE_MEMBER( victor9k_state::ssda_sm_dtr_w )
+void victor9k_state::ssda_sm_dtr_w(int state)
 {
 	m_ssda->cts_w(state);
 	m_ssda->dcd_w(!state);
@@ -426,13 +426,13 @@ void victor9k_state::via1_pa_w(uint8_t data)
 	m_ieee488->host_dio_w(data);
 }
 
-DECLARE_WRITE_LINE_MEMBER( victor9k_state::write_nfrd )
+void victor9k_state::write_nfrd(int state)
 {
 	m_via1->write_pb6(state);
 	m_via1->write_ca1(state);
 }
 
-DECLARE_WRITE_LINE_MEMBER( victor9k_state::write_ndac )
+void victor9k_state::write_ndac(int state)
 {
 	m_via1->write_pb7(state);
 	m_via1->write_ca2(state);
@@ -469,11 +469,11 @@ void victor9k_state::via1_pb_w(uint8_t data)
 	m_ieee488->host_ndac_w(BIT(data, 7));
 }
 
-WRITE_LINE_MEMBER( victor9k_state::codec_vol_w )
+void victor9k_state::codec_vol_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( victor9k_state::via1_irq_w )
+void victor9k_state::via1_irq_w(int state)
 {
 	m_via1_irq = state;
 
@@ -535,7 +535,7 @@ void victor9k_state::via2_pb_w(uint8_t data)
 	LOGDISPLAY("BRT %u CONT %u\n", m_brt, m_cont);
 }
 
-WRITE_LINE_MEMBER( victor9k_state::via2_irq_w )
+void victor9k_state::via2_irq_w(int state)
 {
 	m_via2_irq = state;
 
@@ -577,7 +577,7 @@ void victor9k_state::via3_pb_w(uint8_t data)
 	m_cvsd->clock_w(!BIT(data, 7));
 }
 
-WRITE_LINE_MEMBER( victor9k_state::via3_irq_w )
+void victor9k_state::via3_irq_w(int state)
 {
 	m_via3_irq = state;
 
@@ -589,7 +589,7 @@ WRITE_LINE_MEMBER( victor9k_state::via3_irq_w )
 //  VICTOR9K_KEYBOARD_INTERFACE( kb_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( victor9k_state::kbrdy_w )
+void victor9k_state::kbrdy_w(int state)
 {
 	LOGKEYBOARD("KBRDY %u\n", state);
 
@@ -599,7 +599,7 @@ WRITE_LINE_MEMBER( victor9k_state::kbrdy_w )
 	update_kback();
 }
 
-WRITE_LINE_MEMBER( victor9k_state::kbdata_w )
+void victor9k_state::kbdata_w(int state)
 {
 	LOGKEYBOARD("KBDATA %u\n", state);
 
@@ -608,7 +608,7 @@ WRITE_LINE_MEMBER( victor9k_state::kbdata_w )
 }
 
 
-WRITE_LINE_MEMBER( victor9k_state::fdc_irq_w )
+void victor9k_state::fdc_irq_w(int state)
 {
 	m_fdc_irq = state;
 

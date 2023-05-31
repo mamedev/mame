@@ -172,10 +172,10 @@ protected:
 	bool m_irq_enable = 0;
 
 	// common
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-	DECLARE_WRITE_LINE_MEMBER(irq_reset_w);
-	template <uint8_t Which> DECLARE_WRITE_LINE_MEMBER(coin_w);
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
+	void vblank_irq(int state);
+	void irq_reset_w(int state);
+	template <uint8_t Which> void coin_w(int state);
+	void flip_screen_w(int state);
 	void bg_videoram_w(offs_t offset, uint8_t data);
 	void bg_colorram_w(offs_t offset, uint8_t data);
 	void scroll_bg_w(uint8_t data);
@@ -228,8 +228,8 @@ private:
 
 	void sound_command_w(uint8_t data);
 	uint8_t sound_command_r();
-	DECLARE_WRITE_LINE_MEMBER(palette_bank0_w);
-	DECLARE_WRITE_LINE_MEMBER(palette_bank1_w);
+	void palette_bank0_w(int state);
+	void palette_bank1_w(int state);
 	void scroll_fg_w(uint8_t data);
 	void fg_videoram_w(offs_t offset, uint8_t data);
 	void fg_colorram_w(offs_t offset, uint8_t data);
@@ -302,7 +302,7 @@ TILE_GET_INFO_MEMBER(sauro_state::get_tile_info_fg)
 static const int scroll2_map[8] = {2, 1, 4, 3, 6, 5, 0, 7};
 static const int scroll2_map_flip[8] = {0, 7, 2, 1, 4, 3, 6, 5};
 
-WRITE_LINE_MEMBER(sauro_state::palette_bank0_w)
+void sauro_state::palette_bank0_w(int state)
 {
 	if (state)
 		m_palette_bank |= 0x10;
@@ -311,7 +311,7 @@ WRITE_LINE_MEMBER(sauro_state::palette_bank0_w)
 	machine().tilemap().mark_all_dirty();
 }
 
-WRITE_LINE_MEMBER(sauro_state::palette_bank1_w)
+void sauro_state::palette_bank1_w(int state)
 {
 	if (state)
 		m_palette_bank |= 0x20;
@@ -486,13 +486,13 @@ uint8_t sauro_state::sound_command_r()
 	return ret;
 }
 
-WRITE_LINE_MEMBER(base_state::vblank_irq)
+void base_state::vblank_irq(int state)
 {
 	if (state && m_irq_enable)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(base_state::irq_reset_w)
+void base_state::irq_reset_w(int state)
 {
 	m_irq_enable = !state;
 	if (m_irq_enable)
@@ -500,12 +500,12 @@ WRITE_LINE_MEMBER(base_state::irq_reset_w)
 }
 
 template <uint8_t Which>
-WRITE_LINE_MEMBER(base_state::coin_w)
+void base_state::coin_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(Which, state);
 }
 
-WRITE_LINE_MEMBER(base_state::flip_screen_w)
+void base_state::flip_screen_w(int state)
 {
 	flip_screen_set(state);
 }

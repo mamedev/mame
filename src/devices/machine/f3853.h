@@ -76,8 +76,8 @@ public:
 	virtual uint8_t read(offs_t offset);
 	virtual void write(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(ext_int_w);
-	DECLARE_WRITE_LINE_MEMBER(pri_in_w);
+	void ext_int_w(int state);
+	void pri_in_w(int state);
 
 	virtual TIMER_CALLBACK_MEMBER(timer_callback);
 

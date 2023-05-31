@@ -57,22 +57,22 @@ u8 cmi_alphanumeric_keyboard_device::col_r()
 	}
 }
 
-WRITE_LINE_MEMBER( cmi_alphanumeric_keyboard_device::rxd_w )
+void cmi_alphanumeric_keyboard_device::rxd_w(int state)
 {
 	m_pia->cb2_w(state);
 }
 
-WRITE_LINE_MEMBER( cmi_alphanumeric_keyboard_device::cts_w )
+void cmi_alphanumeric_keyboard_device::cts_w(int state)
 {
 	m_pia->ca1_w(state);
 }
 
-WRITE_LINE_MEMBER( cmi_alphanumeric_keyboard_device::txd_w )
+void cmi_alphanumeric_keyboard_device::txd_w(int state)
 {
 	m_txd_handler(state);
 }
 
-WRITE_LINE_MEMBER( cmi_alphanumeric_keyboard_device::rts_w )
+void cmi_alphanumeric_keyboard_device::rts_w(int state)
 {
 	m_rts_handler(state);
 }

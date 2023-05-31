@@ -329,7 +329,7 @@ void dp835x_device::reconfigure_screen()
 //  field refresh rates (f1 = 60 Hz, f0 = 50 Hz)
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(dp835x_device::refresh_control)
+void dp835x_device::refresh_control(int state)
 {
 	if (m_60hz_refresh != bool(state))
 	{
@@ -349,7 +349,7 @@ WRITE_LINE_MEMBER(dp835x_device::refresh_control)
 //  loaded on scan line 0
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(dp835x_device::character_generator_program)
+void dp835x_device::character_generator_program(int state)
 {
 	m_cgpi = bool(state);
 }
@@ -404,7 +404,7 @@ void dp835x_device::register_load(u8 rs, u16 addr)
 //  lrc_r - poll line rate clock state
 //-------------------------------------------------
 
-READ_LINE_MEMBER(dp835x_device::lrc_r)
+int dp835x_device::lrc_r()
 {
 	if (m_hblank_start_timer->remaining() > m_hblank_near_end_timer->remaining())
 		return 0;
@@ -418,7 +418,7 @@ READ_LINE_MEMBER(dp835x_device::lrc_r)
 //  state
 //-------------------------------------------------
 
-READ_LINE_MEMBER(dp835x_device::lbre_r)
+int dp835x_device::lbre_r()
 {
 	if (m_lc == (m_cgpi ? 0 : m_char_height - 1))
 		return 0;
@@ -432,7 +432,7 @@ READ_LINE_MEMBER(dp835x_device::lbre_r)
 //  hsync_r - poll horizontal sync state
 //-------------------------------------------------
 
-READ_LINE_MEMBER(dp835x_device::hsync_r)
+int dp835x_device::hsync_r()
 {
 	if (m_hsync_on_timer->remaining() > m_hsync_off_timer->remaining())
 		return m_hsync_active;
@@ -445,7 +445,7 @@ READ_LINE_MEMBER(dp835x_device::hsync_r)
 //  vsync_r - poll vertical sync state
 //-------------------------------------------------
 
-READ_LINE_MEMBER(dp835x_device::vsync_r)
+int dp835x_device::vsync_r()
 {
 	int vsync_begin = m_video_scan_lines + m_vsync_delay[m_60hz_refresh ? 1 : 0];
 	int vsync_end = vsync_begin + m_vsync_width[m_60hz_refresh ? 1 : 0];
@@ -457,7 +457,7 @@ READ_LINE_MEMBER(dp835x_device::vsync_r)
 //  vblank_r - poll vertical blanking state
 //-------------------------------------------------
 
-READ_LINE_MEMBER(dp835x_device::vblank_r)
+int dp835x_device::vblank_r()
 {
 	int vblank_end = m_video_scan_lines + m_vblank_interval[m_60hz_refresh ? 1 : 0] - m_vblank_stop;
 	return (m_line >= m_video_scan_lines && m_line < vblank_end) ? m_vblank_active : !m_vblank_active;

@@ -3209,7 +3209,7 @@ INPUT_PORTS_END
 /*********************************************************************************************/
 
 template <int N>
-READ_LINE_MEMBER(alpine_state::alpine_motor_r)
+int alpine_state::alpine_motor_r()
 {
 	return BIT(m_motor_status, N);
 }

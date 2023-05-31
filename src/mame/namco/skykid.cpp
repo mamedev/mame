@@ -104,7 +104,7 @@ private:
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void mcu_map(address_map &map);
 	void main_map(address_map &map);
@@ -690,7 +690,7 @@ static GFXDECODE_START( gfx_skykid )
 GFXDECODE_END
 
 
-WRITE_LINE_MEMBER(skykid_state::vblank_irq)
+void skykid_state::vblank_irq(int state)
 {
 	if (state && m_main_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);

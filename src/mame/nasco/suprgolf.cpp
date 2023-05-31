@@ -92,7 +92,7 @@ private:
 	uint8_t p2_r();
 	void writeA(uint8_t data);
 	void writeB(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void adpcm_int(int state);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
@@ -437,7 +437,7 @@ void suprgolf_state::writeB(uint8_t data)
 	osd_printf_debug("ymwA\n");
 }
 
-WRITE_LINE_MEMBER(suprgolf_state::adpcm_int)
+void suprgolf_state::adpcm_int(int state)
 {
 	m_msm->reset_w(0);
 	m_toggle ^= 1;

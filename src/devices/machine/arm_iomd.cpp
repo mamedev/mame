@@ -671,7 +671,7 @@ void arm_iomd_device::vidinita_w(offs_t offset, u32 data, u32 mem_mask)
 //  IRQ/DRQ/Reset signals
 //**************************************************************************
 
-WRITE_LINE_MEMBER( arm_iomd_device::vblank_irq )
+void arm_iomd_device::vblank_irq(int state)
 {
 	if (!state)
 		return;
@@ -715,7 +715,7 @@ inline void arm_iomd_device::sounddma_swap_buffer()
 //  m_sndbuffer_ok[m_sndcur_buffer] = true;
 }
 
-WRITE_LINE_MEMBER( arm_iomd_device::sound_drq )
+void arm_iomd_device::sound_drq(int state)
 {
 	if (!state)
 		return;
@@ -751,7 +751,7 @@ WRITE_LINE_MEMBER( arm_iomd_device::sound_drq )
 	}
 }
 
-WRITE_LINE_MEMBER( arm_iomd_device::keyboard_irq )
+void arm_iomd_device::keyboard_irq(int state)
 {
 	printf("IRQ %d\n",state);
 	if (!state)
@@ -760,7 +760,7 @@ WRITE_LINE_MEMBER( arm_iomd_device::keyboard_irq )
 	trigger_irq<IRQB>(0x80);
 }
 
-WRITE_LINE_MEMBER( arm_iomd_device::keyboard_reset )
+void arm_iomd_device::keyboard_reset(int state)
 {
 	printf("RST %d\n",state);
 }

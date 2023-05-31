@@ -241,7 +241,7 @@ MC6845_UPDATE_ROW( dgn_beta_state::crtc_update_row )
 
 }
 
-WRITE_LINE_MEMBER(dgn_beta_state::dgnbeta_vsync_changed)
+void dgn_beta_state::dgnbeta_vsync_changed(int state)
 {
 	m_beta_VSync=state;
 	if (!m_beta_VSync)

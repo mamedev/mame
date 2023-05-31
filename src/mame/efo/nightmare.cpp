@@ -238,10 +238,10 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(clear_reset);
 
-	DECLARE_READ_LINE_MEMBER( clear_r );
-	DECLARE_READ_LINE_MEMBER( ef1_r );
-	DECLARE_READ_LINE_MEMBER( ef2_r );
-	DECLARE_WRITE_LINE_MEMBER( q_w );
+	int clear_r();
+	int ef1_r();
+	int ef2_r();
+	void q_w(int state);
 	void ic10_w(uint8_t data);
 	void unkout_w(uint8_t data);
 
@@ -284,17 +284,17 @@ void nightmare_state::machine_reset()
 
 /* CDP1802 Interface */
 
-READ_LINE_MEMBER( nightmare_state::clear_r )
+int nightmare_state::clear_r()
 {
 	return m_reset;
 }
 
-WRITE_LINE_MEMBER( nightmare_state::q_w )
+void nightmare_state::q_w(int state)
 {
 	m_eeprom->write_clock(state);
 }
 
-READ_LINE_MEMBER( nightmare_state::ef1_r )
+int nightmare_state::ef1_r()
 {
 	//EEPROM Inv ???
 
@@ -302,7 +302,7 @@ READ_LINE_MEMBER( nightmare_state::ef1_r )
 }
 
 
-READ_LINE_MEMBER( nightmare_state::ef2_r )
+int nightmare_state::ef2_r()
 {
 	//EEPROM Dq data read;
 	return m_eeprom->read_data();

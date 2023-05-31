@@ -88,9 +88,9 @@ public:
 	void data_w(offs_t offset, uint8_t data);
 	uint8_t data_r(offs_t offset);
 
-	DECLARE_WRITE_LINE_MEMBER( ce_w );
-	DECLARE_WRITE_LINE_MEMBER( oe_w );
-	DECLARE_WRITE_LINE_MEMBER( we_w );
+	void ce_w(int state);
+	void oe_w(int state);
+	void we_w(int state);
 
 protected:
 	enum

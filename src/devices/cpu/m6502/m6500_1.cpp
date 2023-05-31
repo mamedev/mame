@@ -136,7 +136,7 @@ void m6500_1_device::pd_w(u8 data)
 }
 
 
-WRITE_LINE_MEMBER(m6500_1_device::cntr_w)
+void m6500_1_device::cntr_w(int state)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m6500_1_device::set_cntr_in), this), state);
 }

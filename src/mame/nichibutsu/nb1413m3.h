@@ -58,8 +58,8 @@ public:
 	uint8_t dipsw3_h_r();
 	void outcoin_w(uint8_t data);
 	void vcrctrl_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( busyflag_r );
-	DECLARE_WRITE_LINE_MEMBER( busyflag_w );
+	int busyflag_r();
+	void busyflag_w(int state);
 
 	required_device<cpu_device> m_maincpu;
 	const char * m_sndromrgntag;

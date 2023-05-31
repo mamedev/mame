@@ -2263,7 +2263,7 @@ static INPUT_PORTS_START( cps3_jojo)
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-WRITE_LINE_MEMBER(cps3_state::vbl_interrupt)
+void cps3_state::vbl_interrupt(int state)
 {
 	if (state)
 		m_maincpu->set_input_line(12, ASSERT_LINE);

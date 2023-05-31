@@ -74,9 +74,9 @@ private:
 	u8 port81_r();
 	void port40_w(u8 data);
 	void kbd_put(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
+	void ctc_z0_w(int state);
+	void ctc_z1_w(int state);
+	void ctc_z2_w(int state);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 	u8 m_term_data = 0U;
@@ -142,16 +142,16 @@ static const z80_daisy_config daisy_chain[] =
 
 /* Z80-CTC Interface */
 
-WRITE_LINE_MEMBER( ckz80_state::ctc_z0_w )
+void ckz80_state::ctc_z0_w(int state)
 {
 // guess this generates clock for z80dart
 }
 
-WRITE_LINE_MEMBER( ckz80_state::ctc_z1_w )
+void ckz80_state::ctc_z1_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( ckz80_state::ctc_z2_w )
+void ckz80_state::ctc_z2_w(int state)
 {
 }
 

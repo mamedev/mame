@@ -68,9 +68,9 @@ protected:
 
 	pc8801_exp_slot_device *m_slot;
 
-	DECLARE_WRITE_LINE_MEMBER( int3_w );
-	virtual DECLARE_WRITE_LINE_MEMBER( int4_w );
-	DECLARE_WRITE_LINE_MEMBER( int5_w );
+	void int3_w(int state);
+	virtual void int4_w(int state);
+	void int5_w(int state);
 };
 
 class pc8801_exp_device : public device_t, public device_pc8801_exp_interface

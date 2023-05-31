@@ -131,8 +131,8 @@ private:
 	void stack_limit_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t romboard_r(offs_t offset);
 	[[maybe_unused]] void romboard_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(duarta_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(duartb_irq_handler);
+	void duarta_irq_handler(int state);
+	void duartb_irq_handler(int state);
 
 	void mem_map(address_map &map);
 	void storager_map(address_map& map);
@@ -599,12 +599,12 @@ void iris3000_state::storager_map(address_map& map)
     MACHINE DRIVERS
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(iris3000_state::duarta_irq_handler)
+void iris3000_state::duarta_irq_handler(int state)
 {
 	m_maincpu->set_input_line(M68K_IRQ_6, state);
 }
 
-WRITE_LINE_MEMBER(iris3000_state::duartb_irq_handler)
+void iris3000_state::duartb_irq_handler(int state)
 {
 	m_maincpu->set_input_line(M68K_IRQ_6, state);
 }

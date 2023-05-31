@@ -35,15 +35,15 @@ public:
 	uint16_t reg_r(offs_t offset);
 
 	// Flag & status read
-	DECLARE_READ_LINE_MEMBER(flg_r);
-	DECLARE_READ_LINE_MEMBER(sts_r);
+	int flg_r();
+	int sts_r();
 
-	DECLARE_WRITE_LINE_MEMBER(cart_out_w);
-	DECLARE_WRITE_LINE_MEMBER(hole_w);
-	DECLARE_WRITE_LINE_MEMBER(tacho_tick_w);
-	DECLARE_WRITE_LINE_MEMBER(motion_w);
-	DECLARE_WRITE_LINE_MEMBER(rd_bit_w);
-	DECLARE_READ_LINE_MEMBER(wr_bit_r);
+	void cart_out_w(int state);
+	void hole_w(int state);
+	void tacho_tick_w(int state);
+	void motion_w(int state);
+	void rd_bit_w(int state);
+	int wr_bit_r();
 
 protected:
 	hp_taco_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

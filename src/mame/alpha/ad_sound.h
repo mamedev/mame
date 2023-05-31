@@ -78,10 +78,10 @@ private:
 	void i8155_portc_w(uint8_t data);
 	void ay8910_porta_w(uint8_t data);
 	void ay8910_portb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(i8155_timer_pulse);
+	void i8155_timer_pulse(int state);
 	TIMER_CALLBACK_MEMBER(frq_adjuster_callback);
 	void update_dac();
-	DECLARE_WRITE_LINE_MEMBER(msm5232_gate);
+	void msm5232_gate(int state);
 };
 
 

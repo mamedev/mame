@@ -484,7 +484,7 @@ u16 huc6270_device::next_pixel()
 //}
 
 
-WRITE_LINE_MEMBER( huc6270_device::vsync_changed )
+void huc6270_device::vsync_changed(int state)
 {
 	state &= 0x01;
 	if ( m_vsync != state )
@@ -510,7 +510,7 @@ WRITE_LINE_MEMBER( huc6270_device::vsync_changed )
 }
 
 
-WRITE_LINE_MEMBER( huc6270_device::hsync_changed )
+void huc6270_device::hsync_changed(int state)
 {
 	state &= 0x01;
 

@@ -160,32 +160,32 @@ void am2901b_device::i_w(uint16_t data)
 	m_i = data;
 }
 
-WRITE_LINE_MEMBER(am2901b_device::q0_w)
+void am2901b_device::q0_w(int state)
 {
 	m_q0_in = (bool)state;
 }
 
-WRITE_LINE_MEMBER(am2901b_device::q3_w)
+void am2901b_device::q3_w(int state)
 {
 	m_q3_in = (bool)state;
 }
 
-WRITE_LINE_MEMBER(am2901b_device::ram0_w)
+void am2901b_device::ram0_w(int state)
 {
 	m_ram0_in = (bool)state;
 }
 
-WRITE_LINE_MEMBER(am2901b_device::ram3_w)
+void am2901b_device::ram3_w(int state)
 {
 	m_ram3_in = (bool)state;
 }
 
-WRITE_LINE_MEMBER(am2901b_device::ci_w)
+void am2901b_device::ci_w(int state)
 {
 	m_ci = (bool)state;
 }
 
-WRITE_LINE_MEMBER(am2901b_device::cp_w)
+void am2901b_device::cp_w(int state)
 {
 	bool old = m_cp;
 	m_cp = (bool)state;

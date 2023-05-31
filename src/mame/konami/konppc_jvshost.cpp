@@ -39,7 +39,7 @@ void konppc_jvs_host_device::device_reset()
 	m_jvs_sdata_ptr = 0;
 }
 
-READ_LINE_MEMBER( konppc_jvs_host_device::sense )
+int konppc_jvs_host_device::sense()
 {
 	return !get_address_set_line();
 }

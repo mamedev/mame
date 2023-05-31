@@ -151,10 +151,10 @@ private:
 	uint8_t analog_input_r();
 	void switch_input_select_w(uint8_t data);
 	void unknown_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(color_select_w);
-	DECLARE_WRITE_LINE_MEMBER(screen_flip_w);
-	DECLARE_WRITE_LINE_MEMBER(screen_select_w);
-	template <uint8_t Which> DECLARE_WRITE_LINE_MEMBER(screen_enable_w);
+	void color_select_w(int state);
+	void screen_flip_w(int state);
+	void screen_select_w(int state);
+	template <uint8_t Which> void screen_enable_w(int state);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void main_map(address_map &map);
@@ -187,7 +187,7 @@ private:
 	uint8_t m_sample_count = 0U;
 
 	void sample_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(vck_callback);
+	void vck_callback(int state);
 
 	void sound_map(address_map &map);
 };
@@ -423,7 +423,7 @@ void crgolf_state::unknown_w(uint8_t data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(crgolfhi_state::vck_callback)
+void crgolfhi_state::vck_callback(int state)
 {
 	// only play back if we have data remaining
 	if (m_sample_count != 0xff)
@@ -474,20 +474,20 @@ void crgolfhi_state::sample_w(offs_t offset, uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(crgolf_state::color_select_w)
+void crgolf_state::color_select_w(int state)
 {
 	m_color_select = state;
 }
 
 
-WRITE_LINE_MEMBER(crgolf_state::screen_flip_w)
+void crgolf_state::screen_flip_w(int state)
 {
 	m_screen_flip = state;
 }
 
 
 template <uint8_t Which>
-WRITE_LINE_MEMBER(crgolf_state::screen_enable_w)
+void crgolf_state::screen_enable_w(int state)
 {
 	m_screen_enable[Which] = state;
 }

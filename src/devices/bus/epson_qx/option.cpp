@@ -60,18 +60,18 @@ void option_slot_device::device_start()
 	m_bus->add_slot(*this);
 }
 
-WRITE_LINE_MEMBER(option_slot_device::eopf) { m_eopf_cb(state); }
-WRITE_LINE_MEMBER(option_slot_device::eops) { m_eops_cb(state); }
+void option_slot_device::eopf(int state) { m_eopf_cb(state); }
+void option_slot_device::eops(int state) { m_eops_cb(state); }
 
-WRITE_LINE_MEMBER(option_slot_device::inth1_w) { (*m_bus).set_inth1_line(state, m_slot); }
-WRITE_LINE_MEMBER(option_slot_device::inth2_w) { (*m_bus).set_inth2_line(state, m_slot); }
-WRITE_LINE_MEMBER(option_slot_device::intl_w) { (*m_bus).set_intl_line(state, m_slot); }
+void option_slot_device::inth1_w(int state) { (*m_bus).set_inth1_line(state, m_slot); }
+void option_slot_device::inth2_w(int state) { (*m_bus).set_inth2_line(state, m_slot); }
+void option_slot_device::intl_w(int state) { (*m_bus).set_intl_line(state, m_slot); }
 
-WRITE_LINE_MEMBER(option_slot_device::drqf_w) { (*m_bus).set_drqf_line(state, m_slot); }
-WRITE_LINE_MEMBER(option_slot_device::drqs_w) { (*m_bus).set_drqs_line(state, m_slot); }
+void option_slot_device::drqf_w(int state) { (*m_bus).set_drqf_line(state, m_slot); }
+void option_slot_device::drqs_w(int state) { (*m_bus).set_drqs_line(state, m_slot); }
 
-WRITE_LINE_MEMBER(option_slot_device::rdyf_w) { (*m_bus).set_rdyf_line(state, m_slot); }
-WRITE_LINE_MEMBER(option_slot_device::rdys_w) { (*m_bus).set_rdys_line(state, m_slot); }
+void option_slot_device::rdyf_w(int state) { (*m_bus).set_rdyf_line(state, m_slot); }
+void option_slot_device::rdys_w(int state) { (*m_bus).set_rdys_line(state, m_slot); }
 
 //**************************************************************************
 //  EPSON OPTION BUS DEVICE

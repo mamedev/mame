@@ -64,7 +64,7 @@ public:
 	void ym_w(offs_t offset, u8 data);
 	void bank_w(u8 data);
 	void coin_w(u8 data);
-	WRITE_LINE_MEMBER( fm_irqhandler );
+	void fm_irqhandler(int state);
 	u8 soundlatch_r(offs_t offset);
 	u8 main_data_pending_r();
 	void main_data_w(offs_t offset, u8 data);

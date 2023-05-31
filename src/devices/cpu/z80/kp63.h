@@ -28,7 +28,7 @@ public:
 	void write(offs_t offset, u8 data);
 
 	// input line interface
-	template <int N> DECLARE_WRITE_LINE_MEMBER(gate_w) { write_gate(N, state); }
+	template <int N> void gate_w(int state) { write_gate(N, state); }
 
 protected:
 	// construction/destruction

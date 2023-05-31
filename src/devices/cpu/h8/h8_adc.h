@@ -27,7 +27,7 @@ public:
 	uint8_t adcr_r();
 	void adcsr_w(uint8_t data);
 	void adcr_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(adtrg_w);
+	void adtrg_w(int state);
 
 	void set_suspend(bool suspend);
 	uint64_t internal_update(uint64_t current_time);

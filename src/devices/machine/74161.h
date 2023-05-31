@@ -68,19 +68,19 @@ public:
 	auto tc_cb() { return m_tc_func.bind(); }
 
 	// public interfaces
-	DECLARE_WRITE_LINE_MEMBER( clear_w );
-	DECLARE_WRITE_LINE_MEMBER( pe_w );
-	DECLARE_WRITE_LINE_MEMBER( cet_w );
-	DECLARE_WRITE_LINE_MEMBER( cep_w );
-	DECLARE_WRITE_LINE_MEMBER( clock_w );
+	void clear_w(int state);
+	void pe_w(int state);
+	void cet_w(int state);
+	void cep_w(int state);
+	void clock_w(int state);
 	void p_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( p1_w );
-	DECLARE_WRITE_LINE_MEMBER( p2_w );
-	DECLARE_WRITE_LINE_MEMBER( p3_w );
-	DECLARE_WRITE_LINE_MEMBER( p4_w );
+	void p1_w(int state);
+	void p2_w(int state);
+	void p3_w(int state);
+	void p4_w(int state);
 
-	DECLARE_READ_LINE_MEMBER( output_r );
-	DECLARE_READ_LINE_MEMBER( tc_r );
+	int output_r();
+	int tc_r();
 
 	void set_cet_pin_value(int value) { m_cetpre = value; }
 	void set_cep_pin_value(int value) { m_ceppre = value; }

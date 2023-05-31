@@ -150,7 +150,7 @@ void e05a30_device::update_cr_stepper(uint8_t data)
     Centronics
 ***************************************************************************/
 
-WRITE_LINE_MEMBER( e05a30_device::centronics_input_strobe )
+void e05a30_device::centronics_input_strobe(int state)
 {
 	if (m_centronics_strobe == true && state == false && !m_centronics_busy) {
 		m_centronics_data_latch   = m_centronics_data;
@@ -165,7 +165,7 @@ WRITE_LINE_MEMBER( e05a30_device::centronics_input_strobe )
 }
 
 
-WRITE_LINE_MEMBER( e05a30_device::centronics_input_init )
+void e05a30_device::centronics_input_init(int state)
 {
 	if (m_centronics_init == 1 && state == 0) // when init goes low, do a reset cycle
 	{

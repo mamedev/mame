@@ -69,7 +69,7 @@ void lc7582_device::refresh_output()
 	m_write_segs(1, (m_blank || !m_duty) ? 0 : m_latch[1]);
 }
 
-WRITE_LINE_MEMBER(lc7582_device::clk_w)
+void lc7582_device::clk_w(int state)
 {
 	state = (state) ? 1 : 0;
 
@@ -80,7 +80,7 @@ WRITE_LINE_MEMBER(lc7582_device::clk_w)
 	m_clk = state;
 }
 
-WRITE_LINE_MEMBER(lc7582_device::ce_w)
+void lc7582_device::ce_w(int state)
 {
 	state = (state) ? 1 : 0;
 

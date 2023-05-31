@@ -107,7 +107,7 @@ private:
 	uint8_t pio1_pa_r();
 	void pio1_pa_w(uint8_t data);
 	void pio1_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( pio1_brdy_w );
+	void pio1_brdy_w(int state);
 
 	/* keyboard state */
 	u8 m_keylatch = 0;
@@ -274,7 +274,7 @@ void c80_state::pio1_pb_w(uint8_t data)
 	m_keylatch = data;
 }
 
-WRITE_LINE_MEMBER( c80_state::pio1_brdy_w )
+void c80_state::pio1_brdy_w(int state)
 {
 	m_pio1_brdy = state ? 0 : 0x10;
 

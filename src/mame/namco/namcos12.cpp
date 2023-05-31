@@ -1220,7 +1220,7 @@ private:
 
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	void namcos12_rom_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
-	DECLARE_WRITE_LINE_MEMBER(namcos12_sub_irq);
+	void namcos12_sub_irq(int state);
 };
 
 
@@ -1362,7 +1362,7 @@ void namcos12_state::namcos12_rom_read( uint32_t *p_n_psxram, uint32_t n_address
 	}
 }
 
-WRITE_LINE_MEMBER(namcos12_state::namcos12_sub_irq)
+void namcos12_state::namcos12_sub_irq(int state)
 {
 	m_sub->set_input_line(1, state ? ASSERT_LINE : CLEAR_LINE);
 	m_adc->adtrg_w(state);

@@ -52,7 +52,7 @@ public:
 	void strobe(uint8_t data);
 
 	// line write handlers
-	DECLARE_WRITE_LINE_MEMBER(stb_w);
+	void stb_w(int state);
 
 protected:
 	// device-level overrides

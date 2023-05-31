@@ -104,7 +104,7 @@ private:
 	uint8_t pb_r();
 	void pa_w(uint8_t data);
 	void pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(cb2_w);
+	void cb2_w(int state);
 	uint32_t readByLittleEndian(uint8_t *buf,int pos);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
@@ -309,7 +309,7 @@ void jr100_state::pb_w(uint8_t data)
 	m_via->write_pb6(m_pb7);
 }
 
-WRITE_LINE_MEMBER(jr100_state::cb2_w)
+void jr100_state::cb2_w(int state)
 {
 	m_cassette->output(state ? -1.0 : +1.0);
 }

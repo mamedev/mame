@@ -197,8 +197,8 @@ public:
 		m_ipu_pio1(*this, "ipu_pio1")
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER(sio_txda_w);
-	DECLARE_WRITE_LINE_MEMBER(sio_txdb_w);
+	void sio_txda_w(int state);
+	void sio_txdb_w(int state);
 	void ipu_laserdisk_w(offs_t offset, uint8_t data);
 	uint8_t ipu_watchdog_r();
 	void ipu_watchdog_w(uint8_t data);

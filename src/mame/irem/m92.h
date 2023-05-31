@@ -68,7 +68,7 @@ public:
 
 	void init_bank();
 
-	DECLARE_READ_LINE_MEMBER(sprite_busy_r);
+	int sprite_busy_r();
 
 private:
 	required_device<buffered_spriteram16_device> m_spriteram;

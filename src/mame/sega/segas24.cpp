@@ -648,7 +648,7 @@ TIMER_CALLBACK_MEMBER(segas24_state::gground_hack_timer_callback)
 // Cpu #1 reset control
 
 
-WRITE_LINE_MEMBER(segas24_state::cnt1)
+void segas24_state::cnt1(int state)
 {
 	if (bool(state) != m_cnt1)
 	{
@@ -974,7 +974,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_vbl)
 	m_irq_vsynctime = machine().time();
 }
 
-WRITE_LINE_MEMBER(segas24_state::irq_ym)
+void segas24_state::irq_ym(int state)
 {
 	m_irq_yms = state;
 	m_maincpu->set_input_line(IRQ_YM2151+1, m_irq_yms && (m_irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);

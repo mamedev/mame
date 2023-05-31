@@ -120,7 +120,7 @@ protected:
 	void gpu_w(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	u16 vram_r(offs_t offset);
 	void vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(vblank);
+	void vblank(int state);
 	void do_render(bool vbkem);
 	void draw_quad_tex(u16 cmd, u16 *data);
 	void draw_quad_bin(u16 cmd, u16 *data);
@@ -400,7 +400,7 @@ void gsan_state::gpu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 }
 
-WRITE_LINE_MEMBER(gsan_state::vblank)
+void gsan_state::vblank(int state)
 {
 	if (state)
 	{

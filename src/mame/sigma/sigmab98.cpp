@@ -164,7 +164,7 @@ protected:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri_mask);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(screen_vblank_sammymdl);
+	[[maybe_unused]] void screen_vblank_sammymdl(int state);
 
 	// Required devices
 	required_device<screen_device> m_screen;
@@ -260,7 +260,7 @@ private:
 	required_device_array<ttl165_device, 2> m_dsw_shifter;
 
 	int m_dsw_bit;
-	DECLARE_WRITE_LINE_MEMBER(dsw_w);
+	void dsw_w(int state);
 
 	void lufykzku_c4_w(uint8_t data);
 	void lufykzku_c6_w(uint8_t data);
@@ -824,7 +824,7 @@ void sigmab98_state::gegege_io_map(address_map &map)
                        Otakara Itadaki Luffy Kaizoku-Dan!
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(lufykzku_state::dsw_w)
+void lufykzku_state::dsw_w(int state)
 {
 	m_dsw_bit = state;
 }
@@ -947,7 +947,7 @@ void sigmab98_base_state::vblank_w(uint8_t data)
 	m_vblank = (m_vblank & ~0x03) | (data & 0x03);
 }
 
-WRITE_LINE_MEMBER(sigmab98_base_state::screen_vblank_sammymdl)
+void sigmab98_base_state::screen_vblank_sammymdl(int state)
 {
 	// rising edge
 	if (state)

@@ -62,7 +62,7 @@ void option_slot_device::io_write(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(option_slot_device::int_w) {  (*m_bus).set_int_line(state, m_slot); }
+void option_slot_device::int_w(int state) {  (*m_bus).set_int_line(state, m_slot); }
 
 
 //**************************************************************************

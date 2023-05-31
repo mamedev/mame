@@ -644,19 +644,19 @@ TIMER_CALLBACK_MEMBER (vrc5074_device::dma_transfer)
 *  nile timers & interrupts
 *
 *************************************/
-WRITE_LINE_MEMBER(vrc5074_device::pci_intr_a) {
+void vrc5074_device::pci_intr_a(int state) {
 	update_pci_irq(0, state);
 }
-WRITE_LINE_MEMBER(vrc5074_device::pci_intr_b) {
+void vrc5074_device::pci_intr_b(int state) {
 	update_pci_irq(1, state);
 }
-WRITE_LINE_MEMBER(vrc5074_device::pci_intr_c) {
+void vrc5074_device::pci_intr_c(int state) {
 	update_pci_irq(2, state);
 }
-WRITE_LINE_MEMBER(vrc5074_device::pci_intr_d) {
+void vrc5074_device::pci_intr_d(int state) {
 	update_pci_irq(3, state);
 }
-WRITE_LINE_MEMBER(vrc5074_device::pci_intr_e) {
+void vrc5074_device::pci_intr_e(int state) {
 	update_pci_irq(4, state);
 }
 
@@ -989,7 +989,7 @@ void vrc5074_device::cpu_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		LOGMASKED(LOG_NILE, "%s cpu_reg_w offset %03X = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
 }
 
-WRITE_LINE_MEMBER(vrc5074_device::uart_irq_callback)
+void vrc5074_device::uart_irq_callback(int state)
 {
 	if (state ^ m_uart_irq) {
 		m_uart_irq = state;

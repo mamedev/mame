@@ -133,7 +133,7 @@ private:
 	uint8_t videoram_r(offs_t offset);
 	uint8_t pia0_porta_r();
 	void pia0_portb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia0_ca2_w);
+	void pia0_ca2_w(int state);
 	uint8_t pia1_porta_r();
 	uint8_t pia1_portb_r();
 	void pia1_portb_w(uint8_t data);
@@ -219,7 +219,7 @@ void apf_state::pia0_portb_w(uint8_t data)
 	m_pad_data = data;
 }
 
-WRITE_LINE_MEMBER( apf_state::pia0_ca2_w )
+void apf_state::pia0_ca2_w(int state)
 {
 	m_ca2 = state;
 }

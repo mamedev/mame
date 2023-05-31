@@ -44,8 +44,8 @@ public:
 	void write(u8 data);
 
 	// status output polling
-	DECLARE_READ_LINE_MEMBER(busy_r) { return internal_busy() ? 0 : 1; }
-	DECLARE_READ_LINE_MEMBER(irq_r) { return m_irq_active ? 0 : 1; }
+	int busy_r() { return internal_busy() ? 0 : 1; }
+	int irq_r() { return m_irq_active ? 0 : 1; }
 
 protected:
 	m3002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);

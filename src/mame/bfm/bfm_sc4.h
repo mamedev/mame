@@ -161,7 +161,7 @@ public:
 	int m_reel4_latch = 0;
 	int m_reel56_latch = 0;
 	int m_optic_pattern = 0;
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
+	template <unsigned N> void reel_optic_cb(int state) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 
 	int m_meterstatus = 0;
 
@@ -173,19 +173,19 @@ public:
 	uint8_t read_input_matrix(int row);
 
 
-	DECLARE_WRITE_LINE_MEMBER(bfmdm01_busy);
+	void bfmdm01_busy(int state);
 
 	uint16_t sc4_mem_r(offs_t offset, uint16_t mem_mask = ~0);
 	void sc4_mem_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint16_t sc4_cs1_r(offs_t offset, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE_LINE_MEMBER(bfm_sc4_duart_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(bfm_sc4_duart_txa);
+	void bfm_sc4_duart_irq_handler(int state);
+	void bfm_sc4_duart_txa(int state);
 	uint8_t bfm_sc4_duart_input_r();
 	void bfm_sc4_duart_output_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txa);
+	void m68307_duart_txa(int state);
 	uint8_t m68307_duart_input_r();
 	void m68307_duart_output_w(uint8_t data);
 
