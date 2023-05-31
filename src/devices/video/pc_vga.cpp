@@ -1,31 +1,26 @@
 // license:BSD-3-Clause
 // copyright-holders:Nathan Woods, Peter Trauner, Angelo Salese
-/***************************************************************************
+/**************************************************************************************************
 
     Video Graphics Adapter (VGA) section
 
     Nathan Woods    npwoods@mess.org
     Peter Trauner   PeT mess@utanet.at
 
-    This code takes care of installing the various VGA memory and port
-    handlers
-
-    The VGA standard is compatible with MDA, CGA, Hercules, EGA
-    (mda, cga, hercules not real register compatible)
-    several vga cards drive also mda, cga, ega monitors
-    some vga cards have register compatible mda, cga, hercules modes
-
     ega/vga
     64k (early ega 16k) words of 32 bit memory
 
     TODO:
-    - modernize
-    - fix video update, still need to get that choosevideomode() out of it.
-    - rewrite video drawing functions (they are horrible)
-    - add per-gfx card VESA functions;
-    - (and many more ...)
+    - modernize (in progress);
+    - Make RAMDAC a subclassable entity;
+    \- Clients needs to be able to swap that to SVGA extensions of the original 6bpp;
+    - Attribute from graphics to text mode in DOS doesn't restore properly, particularly if you
+      have a custom background color defined (verify);
+    - Improve debugging;
+    - Make a VGA bus slot option, already needed by 3dfx Voodoo and other similar cards;
+    - Verify how CAD ISA cards needs to r/w the VRAM space (uPD7220, HD63484, others);
 
-    per-game issues:
+    per-game issues (very outdated, to be moved to SW list/to device files if necessary):
     - The Incredible Machine: fix partial updates
     - MAME 0.01: fix 92 Hz refresh rate bug (uses VESA register?).
     - Virtual Pool: ET4k unrecognized;
@@ -33,12 +28,25 @@
     - Jazz Jackrabbit: status bar is very jerky, but main screen scrolling is fine?
     - Catacombs: weird resolution (untested)
 
-    ROM declarations:
+    Notes:
+    - The VGA standard is compatible with MDA, CGA, Hercules, EGA
+      (MDA, EGA, Hercules not real register compatible)
+    - several vga cards drive also MDA, CGA, EGA monitors, some vga cards have register compatible
+      MDA, CGA, Hercules modes;
+    - SVGA is not a real interface but more like an overlay of the VGA standard that individual
+      manufacturers put together and which eventually became VESA.
+      It has incidentally a couple points in common but it's otherwise mostly a commercial naming
+      rather than a real 
+
+    References:
+    - http://www.osdever.net/FreeVGA/vga/vga.htm
+
+    ROM declarations (move to pc_vga_oak):
 
     (oti 037 chip)
     ROM_LOAD("oakvga.bin", 0xc0000, 0x8000, CRC(318c5f43) SHA1(2aeb6cf737fd87dfd08c9f5b5bc421fcdbab4ce9) )
 
-***************************************************************************/
+***************************************************************************************************/
 
 #include "emu.h"
 #include "pc_vga.h"
@@ -99,7 +107,7 @@
 
 ***************************************************************************/
 // device type definition
-DEFINE_DEVICE_TYPE(VGA,        vga_device,        "vga",        "VGA")
+DEFINE_DEVICE_TYPE(VGA, vga_device, "vga", "VGA")
 
 vga_device::vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
@@ -112,11 +120,6 @@ vga_device::vga_device(const machine_config &mconfig, device_type type, const ch
 
 vga_device::vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: vga_device(mconfig, VGA, tag, owner, clock)
-{
-}
-
-svga_device::svga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: vga_device(mconfig, type, tag, owner, clock)
 {
 }
 
@@ -136,12 +139,6 @@ void vga_device::zero()
 	memset(&vga.oak, 0, sizeof(vga.oak));
 }
 
-void svga_device::zero()
-{
-	vga_device::zero();
-	memset(&svga, 0, sizeof(svga));
-}
-
 /* VBLANK callback, start address definitely updates AT vblank, not before. */
 TIMER_CALLBACK_MEMBER(vga_device::vblank_timer_cb)
 {
@@ -159,7 +156,6 @@ void vga_device::device_start()
 
 	// Avoid an infinite loop when displaying.  0 is not possible anyway.
 	vga.crtc.maximum_scan_line = 1;
-
 
 	// copy over interfaces
 	vga.svga_intf.seq_regcount = 0x05;
@@ -261,19 +257,33 @@ void vga_device::device_start()
 	m_vblank_timer = timer_alloc(FUNC(vga_device::vblank_timer_cb), this);
 }
 
-void svga_device::device_start()
+void vga_device::device_reset()
 {
-	vga_device::device_start();
-	memset(&svga, 0, sizeof(svga));
+	/* clear out the VGA structure */
+	memset(vga.pens, 0, sizeof(vga.pens));
+	vga.miscellaneous_output = 0;
+	vga.feature_control = 0;
+	vga.sequencer.index = 0;
+	memset(vga.sequencer.data, 0, sizeof(vga.sequencer.data));
+	vga.crtc.index = 0;
+	memset(vga.crtc.data, 0, sizeof(vga.crtc.data));
+	vga.gc.index = 0;
+	memset(vga.gc.latch, 0, sizeof(vga.gc.latch));
+	memset(&vga.attribute, 0, sizeof(vga.attribute));
+	memset(&vga.dac, 0, sizeof(vga.dac));
+	memset(&vga.cursor, 0, sizeof(vga.cursor));
+	memset(&vga.oak, 0, sizeof(vga.oak));
 
-	save_item(NAME(svga.bank_r));
-	save_item(NAME(svga.bank_w));
-	save_item(NAME(svga.rgb8_en));
-	save_item(NAME(svga.rgb15_en));
-	save_item(NAME(svga.rgb16_en));
-	save_item(NAME(svga.rgb24_en));
-	save_item(NAME(svga.rgb32_en));
-	save_item(NAME(svga.id));
+	vga.gc.memory_map_sel = 0x3; /* prevent xtbios excepting vga ram as system ram */
+/* amstrad pc1640 bios relies on the position of
+   the video memory area,
+   so I introduced the reset to switch to b8000 area */
+	vga.sequencer.data[4] = 0;
+
+	/* TODO: real defaults */
+	vga.crtc.line_compare = 0x3ff;
+	/* skeleton/indiana.cpp boot PROM doesn't set this and assumes it's 0xff */
+	vga.dac.mask = 0xff;
 }
 
 uint16_t vga_device::offset()
@@ -375,9 +385,6 @@ void vga_device::vga_vh_ega(bitmap_rgb32 &bitmap,  const rectangle &cliprect)
 	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
 	int pel_shift = (vga.attribute.pel_shift & 7);
 
-//  popmessage("%08x %02x",EGA_START_ADDRESS,pel_shift);
-
-	/**/
 	for (int addr=EGA_START_ADDRESS, line=0; line<LINES; line += height, addr += offset())
 	{
 		for (int yi=0;yi<height;yi++)
@@ -547,184 +554,6 @@ void vga_device::vga_vh_mono(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	}
 }
 
-void svga_device::svga_vh_rgb8(bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
-
-	/* line compare is screen sensitive */
-	uint16_t  mask_comp = 0x3ff;
-	int curr_addr = 0;
-//  uint16_t line_length;
-//  if(vga.crtc.dw)
-//      line_length = vga.crtc.offset << 3;  // doubleword mode
-//  else
-//  {
-//      line_length = vga.crtc.offset << 4;
-//  }
-
-	uint8_t start_shift = (!(vga.sequencer.data[4] & 0x08) || svga.ignore_chain4) ? 2 : 0;
-	for (int addr = VGA_START_ADDRESS << start_shift, line=0; line<LINES; line+=height, addr+=offset(), curr_addr+=offset())
-	{
-		for (int yi = 0;yi < height; yi++)
-		{
-			if((line + yi) < (vga.crtc.line_compare & mask_comp))
-				curr_addr = addr;
-			if((line + yi) == (vga.crtc.line_compare & mask_comp))
-				curr_addr = 0;
-			uint32_t *const bitmapline = &bitmap.pix(line + yi);
-			addr %= vga.svga_intf.vram_size;
-			for (int pos=curr_addr, c=0, column=0; column<VGA_COLUMNS; column++, c+=8, pos+=0x8)
-			{
-				if(pos + 0x08 >= vga.svga_intf.vram_size)
-					return;
-
-				for (int xi=0;xi<8;xi++)
-				{
-					if(!screen().visible_area().contains(c+xi, line + yi))
-						continue;
-					bitmapline[c+xi] = pen(vga.memory[(pos+(xi))]);
-				}
-			}
-		}
-	}
-}
-
-void svga_device::svga_vh_rgb15(bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	#define MV(x) (vga.memory[x]+(vga.memory[x+1]<<8))
-	constexpr uint32_t IV = 0xff000000;
-	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
-
-	/* line compare is screen sensitive */
-//  uint16_t mask_comp = 0xff | (TLINES & 0x300);
-	int curr_addr = 0;
-	int yi=0;
-	for (int addr = TGA_START_ADDRESS, line=0; line<TLINES; line+=height, addr+=offset(), curr_addr+=offset())
-	{
-		uint32_t *const bitmapline = &bitmap.pix(line);
-		addr %= vga.svga_intf.vram_size;
-		for (int pos=addr, c=0, column=0; column<TGA_COLUMNS; column++, c+=8, pos+=0x10)
-		{
-			if(pos + 0x10 >= vga.svga_intf.vram_size)
-				return;
-			for(int xi=0,xm=0;xi<8;xi++,xm+=2)
-			{
-				if(!screen().visible_area().contains(c+xi, line + yi))
-					continue;
-
-				int r = (MV(pos+xm)&0x7c00)>>10;
-				int g = (MV(pos+xm)&0x03e0)>>5;
-				int b = (MV(pos+xm)&0x001f)>>0;
-				r = (r << 3) | (r & 0x7);
-				g = (g << 3) | (g & 0x7);
-				b = (b << 3) | (b & 0x7);
-				bitmapline[c+xi] = IV|(r<<16)|(g<<8)|(b<<0);
-			}
-		}
-	}
-}
-
-void svga_device::svga_vh_rgb16(bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	#define MV(x) (vga.memory[x]+(vga.memory[x+1]<<8))
-	constexpr uint32_t IV = 0xff000000;
-	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
-
-	/* line compare is screen sensitive */
-//  uint16_t mask_comp = 0xff | (TLINES & 0x300);
-	int curr_addr = 0;
-	int yi=0;
-	for (int addr = TGA_START_ADDRESS, line=0; line<TLINES; line+=height, addr+=offset(), curr_addr+=offset())
-	{
-		uint32_t *const bitmapline = &bitmap.pix(line);
-		addr %= vga.svga_intf.vram_size;
-		for (int pos=addr, c=0, column=0; column<TGA_COLUMNS; column++, c+=8, pos+=0x10)
-		{
-			if(pos + 0x10 >= vga.svga_intf.vram_size)
-				return;
-			for (int xi=0,xm=0;xi<8;xi++,xm+=2)
-			{
-				if(!screen().visible_area().contains(c+xi, line + yi))
-					continue;
-
-				int r = (MV(pos+xm)&0xf800)>>11;
-				int g = (MV(pos+xm)&0x07e0)>>5;
-				int b = (MV(pos+xm)&0x001f)>>0;
-				r = (r << 3) | (r & 0x7);
-				g = (g << 2) | (g & 0x3);
-				b = (b << 3) | (b & 0x7);
-				bitmapline[c+xi] = IV|(r<<16)|(g<<8)|(b<<0);
-			}
-		}
-	}
-}
-
-void svga_device::svga_vh_rgb24(bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	#define MD(x) (vga.memory[x]+(vga.memory[x+1]<<8)+(vga.memory[x+2]<<16))
-	constexpr uint32_t ID = 0xff000000;
-	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
-
-	/* line compare is screen sensitive */
-//  uint16_t mask_comp = 0xff | (TLINES & 0x300);
-	int curr_addr = 0;
-	int yi=0;
-	for (int addr = TGA_START_ADDRESS<<1, line=0; line<TLINES; line+=height, addr+=offset(), curr_addr+=offset())
-	{
-		uint32_t *const bitmapline = &bitmap.pix(line);
-		addr %= vga.svga_intf.vram_size;
-		for (int pos=addr, c=0, column=0; column<TGA_COLUMNS; column++, c+=8, pos+=24)
-		{
-			if(pos + 24 >= vga.svga_intf.vram_size)
-				return;
-			for (int xi=0,xm=0;xi<8;xi++,xm+=3)
-			{
-				if(!screen().visible_area().contains(c+xi, line + yi))
-					continue;
-
-				int r = (MD(pos+xm)&0xff0000)>>16;
-				int g = (MD(pos+xm)&0x00ff00)>>8;
-				int b = (MD(pos+xm)&0x0000ff)>>0;
-				bitmapline[c+xi] = ID|(r<<16)|(g<<8)|(b<<0);
-			}
-		}
-	}
-}
-
-void svga_device::svga_vh_rgb32(bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	#define MD(x) (vga.memory[x]+(vga.memory[x+1]<<8)+(vga.memory[x+2]<<16))
-	constexpr uint32_t ID = 0xff000000;
-	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
-
-//  uint16_t mask_comp;
-
-	/* line compare is screen sensitive */
-//  mask_comp = 0xff | (TLINES & 0x300);
-	int curr_addr = 0;
-	int yi=0;
-	for (int addr = TGA_START_ADDRESS, line=0; line<TLINES; line+=height, addr+=(offset()), curr_addr+=(offset()))
-	{
-		uint32_t *const bitmapline = &bitmap.pix(line);
-		addr %= vga.svga_intf.vram_size;
-		for (int pos=addr, c=0, column=0; column<TGA_COLUMNS; column++, c+=8, pos+=0x20)
-		{
-			if(pos + 0x20 >= vga.svga_intf.vram_size)
-				return;
-			for (int xi=0,xm=0;xi<8;xi++,xm+=4)
-			{
-				if(!screen().visible_area().contains(c+xi, line + yi))
-					continue;
-
-				int r = (MD(pos+xm)&0xff0000)>>16;
-				int g = (MD(pos+xm)&0x00ff00)>>8;
-				int b = (MD(pos+xm)&0x0000ff)>>0;
-				bitmapline[c+xi] = ID|(r<<16)|(g<<8)|(b<<0);
-			}
-		}
-	}
-}
-
 uint8_t vga_device::pc_vga_choosevideomode()
 {
 	if (vga.crtc.sync_en)
@@ -783,102 +612,6 @@ uint8_t vga_device::pc_vga_choosevideomode()
 	return SCREEN_OFF;
 }
 
-
-uint8_t svga_device::pc_vga_choosevideomode()
-{
-	if (vga.crtc.sync_en)
-	{
-		if (vga.dac.dirty)
-		{
-			for (int i=0; i<256;i++)
-			{
-				/* TODO: color shifters? */
-				set_pen_color(i, (vga.dac.color[3*(i & vga.dac.mask)] & 0x3f) << 2,
-										(vga.dac.color[3*(i & vga.dac.mask) + 1] & 0x3f) << 2,
-										(vga.dac.color[3*(i & vga.dac.mask) + 2] & 0x3f) << 2);
-			}
-			vga.dac.dirty = 0;
-		}
-
-		if (vga.attribute.data[0x10] & 0x80)
-		{
-			for (int i=0; i<16;i++)
-			{
-				vga.pens[i] = pen((vga.attribute.data[i]&0x0f)
-											|((vga.attribute.data[0x14]&0xf)<<4));
-			}
-		}
-		else
-		{
-			for (int i=0; i<16;i++)
-			{
-				vga.pens[i] = pen((vga.attribute.data[i]&0x3f)
-											|((vga.attribute.data[0x14]&0xc)<<4));
-			}
-		}
-
-		if (svga.rgb32_en)
-		{
-			return RGB32_MODE;
-		}
-		else if (svga.rgb24_en)
-		{
-			return RGB24_MODE;
-		}
-		else if (svga.rgb16_en)
-		{
-			return RGB16_MODE;
-		}
-		else if (svga.rgb15_en)
-		{
-			return RGB15_MODE;
-		}
-		else if (svga.rgb8_en)
-		{
-			return RGB8_MODE;
-		}
-		else if (!GRAPHIC_MODE)
-		{
-			return TEXT_MODE;
-		}
-		else if (vga.gc.shift256)
-		{
-			return VGA_MODE;
-		}
-		else if (vga.gc.shift_reg)
-		{
-			return CGA_MODE;
-		}
-		else if (vga.gc.memory_map_sel == 0x03)
-		{
-			return MONO_MODE;
-		}
-		else
-		{
-			return EGA_MODE;
-		}
-	}
-
-	return SCREEN_OFF;
-}
-
-uint8_t svga_device::get_video_depth()
-{
-	switch(pc_vga_choosevideomode())
-	{
-		case VGA_MODE:
-		case RGB8_MODE:
-			return 8;
-		case RGB15_MODE:
-		case RGB16_MODE:
-			return 16;
-		case RGB24_MODE:
-		case RGB32_MODE:
-			return 32;
-	}
-	return 0;
-}
-
 uint32_t vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint8_t cur_mode = pc_vga_choosevideomode();
@@ -891,28 +624,6 @@ uint32_t vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 		case EGA_MODE:     vga_vh_ega   (bitmap, cliprect); break;
 		case CGA_MODE:     vga_vh_cga   (bitmap, cliprect); break;
 		case MONO_MODE:    vga_vh_mono  (bitmap, cliprect); break;
-	}
-
-	return 0;
-}
-
-uint32_t svga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	uint8_t cur_mode = pc_vga_choosevideomode();
-
-	switch(cur_mode)
-	{
-		case SCREEN_OFF:   bitmap.fill  (black_pen(), cliprect);break;
-		case TEXT_MODE:    vga_vh_text  (bitmap, cliprect); break;
-		case VGA_MODE:     vga_vh_vga   (bitmap, cliprect); break;
-		case EGA_MODE:     vga_vh_ega   (bitmap, cliprect); break;
-		case CGA_MODE:     vga_vh_cga   (bitmap, cliprect); break;
-		case MONO_MODE:    vga_vh_mono  (bitmap, cliprect); break;
-		case RGB8_MODE:    svga_vh_rgb8 (bitmap, cliprect); break;
-		case RGB15_MODE:   svga_vh_rgb15(bitmap, cliprect); break;
-		case RGB16_MODE:   svga_vh_rgb16(bitmap, cliprect); break;
-		case RGB24_MODE:   svga_vh_rgb24(bitmap, cliprect); break;
-		case RGB32_MODE:   svga_vh_rgb32(bitmap, cliprect); break;
 	}
 
 	return 0;
@@ -1737,46 +1448,15 @@ void vga_device::port_03c0_w(offs_t offset, uint8_t data)
 	}
 }
 
-
-
 void vga_device::port_03d0_w(offs_t offset, uint8_t data)
 {
 	if (get_crtc_port() == 0x3d0)
 		vga_crtc_w(offset, data);
 }
 
-void vga_device::device_reset()
-{
-	/* clear out the VGA structure */
-	memset(vga.pens, 0, sizeof(vga.pens));
-	vga.miscellaneous_output = 0;
-	vga.feature_control = 0;
-	vga.sequencer.index = 0;
-	memset(vga.sequencer.data, 0, sizeof(vga.sequencer.data));
-	vga.crtc.index = 0;
-	memset(vga.crtc.data, 0, sizeof(vga.crtc.data));
-	vga.gc.index = 0;
-	memset(vga.gc.latch, 0, sizeof(vga.gc.latch));
-	memset(&vga.attribute, 0, sizeof(vga.attribute));
-	memset(&vga.dac, 0, sizeof(vga.dac));
-	memset(&vga.cursor, 0, sizeof(vga.cursor));
-	memset(&vga.oak, 0, sizeof(vga.oak));
-
-	vga.gc.memory_map_sel = 0x3; /* prevent xtbios excepting vga ram as system ram */
-/* amstrad pc1640 bios relies on the position of
-   the video memory area,
-   so I introduced the reset to switch to b8000 area */
-	vga.sequencer.data[4] = 0;
-
-	/* TODO: real defaults */
-	vga.crtc.line_compare = 0x3ff;
-	/* skeleton/indiana.cpp boot PROM doesn't set this and assumes it's 0xff */
-	vga.dac.mask = 0xff;
-}
-
+// TODO: convert to mapped space
 uint8_t vga_device::mem_r(offs_t offset)
 {
-	/* TODO: check me */
 	switch(vga.gc.memory_map_sel & 0x03)
 	{
 		case 0: break;
@@ -1824,7 +1504,6 @@ uint8_t vga_device::mem_r(offs_t offset)
 	}
 	else
 	{
-		// TODO: Guesswork, probably not right
 		uint8_t i,data;
 
 		data = 0;
@@ -1889,4 +1568,331 @@ uint8_t vga_device::mem_linear_r(offs_t offset)
 void vga_device::mem_linear_w(offs_t offset, uint8_t data)
 {
 	vga.memory[offset % vga.svga_intf.vram_size] = data;
+}
+
+/*
+ * SVGA overrides
+ */
+
+svga_device::svga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: vga_device(mconfig, type, tag, owner, clock)
+{
+}
+
+void svga_device::zero()
+{
+	vga_device::zero();
+	memset(&svga, 0, sizeof(svga));
+}
+
+void svga_device::device_start()
+{
+	vga_device::device_start();
+	memset(&svga, 0, sizeof(svga));
+
+	save_item(NAME(svga.bank_r));
+	save_item(NAME(svga.bank_w));
+	save_item(NAME(svga.rgb8_en));
+	save_item(NAME(svga.rgb15_en));
+	save_item(NAME(svga.rgb16_en));
+	save_item(NAME(svga.rgb24_en));
+	save_item(NAME(svga.rgb32_en));
+	save_item(NAME(svga.id));
+}
+
+void svga_device::svga_vh_rgb8(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
+
+	/* line compare is screen sensitive */
+	uint16_t  mask_comp = 0x3ff;
+	int curr_addr = 0;
+//  uint16_t line_length;
+//  if(vga.crtc.dw)
+//      line_length = vga.crtc.offset << 3;  // doubleword mode
+//  else
+//  {
+//      line_length = vga.crtc.offset << 4;
+//  }
+
+	uint8_t start_shift = (!(vga.sequencer.data[4] & 0x08) || svga.ignore_chain4) ? 2 : 0;
+	for (int addr = VGA_START_ADDRESS << start_shift, line=0; line<LINES; line+=height, addr+=offset(), curr_addr+=offset())
+	{
+		for (int yi = 0;yi < height; yi++)
+		{
+			if((line + yi) < (vga.crtc.line_compare & mask_comp))
+				curr_addr = addr;
+			if((line + yi) == (vga.crtc.line_compare & mask_comp))
+				curr_addr = 0;
+			uint32_t *const bitmapline = &bitmap.pix(line + yi);
+			addr %= vga.svga_intf.vram_size;
+			for (int pos=curr_addr, c=0, column=0; column<VGA_COLUMNS; column++, c+=8, pos+=0x8)
+			{
+				if(pos + 0x08 >= vga.svga_intf.vram_size)
+					return;
+
+				for (int xi=0;xi<8;xi++)
+				{
+					if(!screen().visible_area().contains(c+xi, line + yi))
+						continue;
+					bitmapline[c+xi] = pen(vga.memory[(pos+(xi))]);
+				}
+			}
+		}
+	}
+}
+
+void svga_device::svga_vh_rgb15(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	#define MV(x) (vga.memory[x]+(vga.memory[x+1]<<8))
+	constexpr uint32_t IV = 0xff000000;
+	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
+
+	/* line compare is screen sensitive */
+//  uint16_t mask_comp = 0xff | (TLINES & 0x300);
+	int curr_addr = 0;
+	int yi=0;
+	for (int addr = TGA_START_ADDRESS, line=0; line<TLINES; line+=height, addr+=offset(), curr_addr+=offset())
+	{
+		uint32_t *const bitmapline = &bitmap.pix(line);
+		addr %= vga.svga_intf.vram_size;
+		for (int pos=addr, c=0, column=0; column<TGA_COLUMNS; column++, c+=8, pos+=0x10)
+		{
+			if(pos + 0x10 >= vga.svga_intf.vram_size)
+				return;
+			for(int xi=0,xm=0;xi<8;xi++,xm+=2)
+			{
+				if(!screen().visible_area().contains(c+xi, line + yi))
+					continue;
+
+				int r = (MV(pos+xm)&0x7c00)>>10;
+				int g = (MV(pos+xm)&0x03e0)>>5;
+				int b = (MV(pos+xm)&0x001f)>>0;
+				r = (r << 3) | (r & 0x7);
+				g = (g << 3) | (g & 0x7);
+				b = (b << 3) | (b & 0x7);
+				bitmapline[c+xi] = IV|(r<<16)|(g<<8)|(b<<0);
+			}
+		}
+	}
+}
+
+void svga_device::svga_vh_rgb16(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	#define MV(x) (vga.memory[x]+(vga.memory[x+1]<<8))
+	constexpr uint32_t IV = 0xff000000;
+	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
+
+	/* line compare is screen sensitive */
+//  uint16_t mask_comp = 0xff | (TLINES & 0x300);
+	int curr_addr = 0;
+	int yi=0;
+	for (int addr = TGA_START_ADDRESS, line=0; line<TLINES; line+=height, addr+=offset(), curr_addr+=offset())
+	{
+		uint32_t *const bitmapline = &bitmap.pix(line);
+		addr %= vga.svga_intf.vram_size;
+		for (int pos=addr, c=0, column=0; column<TGA_COLUMNS; column++, c+=8, pos+=0x10)
+		{
+			if(pos + 0x10 >= vga.svga_intf.vram_size)
+				return;
+			for (int xi=0,xm=0;xi<8;xi++,xm+=2)
+			{
+				if(!screen().visible_area().contains(c+xi, line + yi))
+					continue;
+
+				int r = (MV(pos+xm)&0xf800)>>11;
+				int g = (MV(pos+xm)&0x07e0)>>5;
+				int b = (MV(pos+xm)&0x001f)>>0;
+				r = (r << 3) | (r & 0x7);
+				g = (g << 2) | (g & 0x3);
+				b = (b << 3) | (b & 0x7);
+				bitmapline[c+xi] = IV|(r<<16)|(g<<8)|(b<<0);
+			}
+		}
+	}
+}
+
+void svga_device::svga_vh_rgb24(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	#define MD(x) (vga.memory[x]+(vga.memory[x+1]<<8)+(vga.memory[x+2]<<16))
+	constexpr uint32_t ID = 0xff000000;
+	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
+
+	/* line compare is screen sensitive */
+//  uint16_t mask_comp = 0xff | (TLINES & 0x300);
+	int curr_addr = 0;
+	int yi=0;
+	for (int addr = TGA_START_ADDRESS<<1, line=0; line<TLINES; line+=height, addr+=offset(), curr_addr+=offset())
+	{
+		uint32_t *const bitmapline = &bitmap.pix(line);
+		addr %= vga.svga_intf.vram_size;
+		for (int pos=addr, c=0, column=0; column<TGA_COLUMNS; column++, c+=8, pos+=24)
+		{
+			if(pos + 24 >= vga.svga_intf.vram_size)
+				return;
+			for (int xi=0,xm=0;xi<8;xi++,xm+=3)
+			{
+				if(!screen().visible_area().contains(c+xi, line + yi))
+					continue;
+
+				int r = (MD(pos+xm)&0xff0000)>>16;
+				int g = (MD(pos+xm)&0x00ff00)>>8;
+				int b = (MD(pos+xm)&0x0000ff)>>0;
+				bitmapline[c+xi] = ID|(r<<16)|(g<<8)|(b<<0);
+			}
+		}
+	}
+}
+
+void svga_device::svga_vh_rgb32(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	#define MD(x) (vga.memory[x]+(vga.memory[x+1]<<8)+(vga.memory[x+2]<<16))
+	constexpr uint32_t ID = 0xff000000;
+	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
+
+//  uint16_t mask_comp;
+
+	/* line compare is screen sensitive */
+//  mask_comp = 0xff | (TLINES & 0x300);
+	int curr_addr = 0;
+	int yi=0;
+	for (int addr = TGA_START_ADDRESS, line=0; line<TLINES; line+=height, addr+=(offset()), curr_addr+=(offset()))
+	{
+		uint32_t *const bitmapline = &bitmap.pix(line);
+		addr %= vga.svga_intf.vram_size;
+		for (int pos=addr, c=0, column=0; column<TGA_COLUMNS; column++, c+=8, pos+=0x20)
+		{
+			if(pos + 0x20 >= vga.svga_intf.vram_size)
+				return;
+			for (int xi=0,xm=0;xi<8;xi++,xm+=4)
+			{
+				if(!screen().visible_area().contains(c+xi, line + yi))
+					continue;
+
+				int r = (MD(pos+xm)&0xff0000)>>16;
+				int g = (MD(pos+xm)&0x00ff00)>>8;
+				int b = (MD(pos+xm)&0x0000ff)>>0;
+				bitmapline[c+xi] = ID|(r<<16)|(g<<8)|(b<<0);
+			}
+		}
+	}
+}
+
+// TODO: inherit from base class
+uint8_t svga_device::pc_vga_choosevideomode()
+{
+	if (vga.crtc.sync_en)
+	{
+		if (vga.dac.dirty)
+		{
+			for (int i=0; i<256;i++)
+			{
+				/* TODO: color shifters? */
+				set_pen_color(i, (vga.dac.color[3*(i & vga.dac.mask)] & 0x3f) << 2,
+										(vga.dac.color[3*(i & vga.dac.mask) + 1] & 0x3f) << 2,
+										(vga.dac.color[3*(i & vga.dac.mask) + 2] & 0x3f) << 2);
+			}
+			vga.dac.dirty = 0;
+		}
+
+		if (vga.attribute.data[0x10] & 0x80)
+		{
+			for (int i=0; i<16;i++)
+			{
+				vga.pens[i] = pen((vga.attribute.data[i]&0x0f)
+											|((vga.attribute.data[0x14]&0xf)<<4));
+			}
+		}
+		else
+		{
+			for (int i=0; i<16;i++)
+			{
+				vga.pens[i] = pen((vga.attribute.data[i]&0x3f)
+											|((vga.attribute.data[0x14]&0xc)<<4));
+			}
+		}
+
+		if (svga.rgb32_en)
+		{
+			return RGB32_MODE;
+		}
+		else if (svga.rgb24_en)
+		{
+			return RGB24_MODE;
+		}
+		else if (svga.rgb16_en)
+		{
+			return RGB16_MODE;
+		}
+		else if (svga.rgb15_en)
+		{
+			return RGB15_MODE;
+		}
+		else if (svga.rgb8_en)
+		{
+			return RGB8_MODE;
+		}
+		else if (!GRAPHIC_MODE)
+		{
+			return TEXT_MODE;
+		}
+		else if (vga.gc.shift256)
+		{
+			return VGA_MODE;
+		}
+		else if (vga.gc.shift_reg)
+		{
+			return CGA_MODE;
+		}
+		else if (vga.gc.memory_map_sel == 0x03)
+		{
+			return MONO_MODE;
+		}
+		else
+		{
+			return EGA_MODE;
+		}
+	}
+
+	return SCREEN_OFF;
+}
+
+uint8_t svga_device::get_video_depth()
+{
+	switch(pc_vga_choosevideomode())
+	{
+		case VGA_MODE:
+		case RGB8_MODE:
+			return 8;
+		case RGB15_MODE:
+		case RGB16_MODE:
+			return 16;
+		case RGB24_MODE:
+		case RGB32_MODE:
+			return 32;
+	}
+	return 0;
+}
+
+// TODO: inherit from base class
+uint32_t svga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	uint8_t cur_mode = pc_vga_choosevideomode();
+
+	switch(cur_mode)
+	{
+		case SCREEN_OFF:   bitmap.fill  (black_pen(), cliprect);break;
+		case TEXT_MODE:    vga_vh_text  (bitmap, cliprect); break;
+		case VGA_MODE:     vga_vh_vga   (bitmap, cliprect); break;
+		case EGA_MODE:     vga_vh_ega   (bitmap, cliprect); break;
+		case CGA_MODE:     vga_vh_cga   (bitmap, cliprect); break;
+		case MONO_MODE:    vga_vh_mono  (bitmap, cliprect); break;
+		case RGB8_MODE:    svga_vh_rgb8 (bitmap, cliprect); break;
+		case RGB15_MODE:   svga_vh_rgb15(bitmap, cliprect); break;
+		case RGB16_MODE:   svga_vh_rgb16(bitmap, cliprect); break;
+		case RGB24_MODE:   svga_vh_rgb24(bitmap, cliprect); break;
+		case RGB32_MODE:   svga_vh_rgb32(bitmap, cliprect); break;
+	}
+
+	return 0;
 }
