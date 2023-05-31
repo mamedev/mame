@@ -2,21 +2,12 @@
 // copyright-holders:Uki
 /*****************************************************************************
 
-    
-	Games supported:
-	
-	Markham (c) 1983 Sun Electronics
-    Strength & Skill (c) 1984 Sun Electronics
-	The Guiness (Japan) (c) 1984 Sun Electronics
-	BanBam (c) 1984 Sun Electronics
-	Pettan Pyuu (Japan) (c) 1984 Sun Electronics
-
     Driver by Uki
 
     TODO:
     - needs merging with ikki.cpp
     - look up schematics for all games
-    - hook up actual SUN 8212 and figure out ROM mode communications
+   	- hook up actual SUN 8212 and figure out ROM mode communications
 
     Notes:
     Banbam has a Fujitsu MB8841 4-Bit MCU for protection labeled SUN 8212.
@@ -24,9 +15,9 @@
     Pettan Pyuu is a clone of Banbam although with different levels / play fields.
 
     The MCU controls:
-      - general protection startup
-      - the time between when enemies spawn
-      - graphics selection for playfields
+    - general protection startup
+    - the time between when enemies spawn
+    - graphics selection for playfields
 
 *****************************************************************************/
 
