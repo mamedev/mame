@@ -7,7 +7,6 @@ National Semiconductor COPS(COP400 MCU series) handhelds or other simple
 devices, mostly LED electronic games/toys.
 
 TODO:
-- why does h2hbaskbc(and clones) need a workaround on writing L pins?
 - vidchal: Add screen and gun cursor with brightness detection callback,
   and softwarelist for the video tapes. We'd also need a VHS player device.
   The emulated lightgun itself appears to be working fine(eg. add a 30hz
@@ -292,6 +291,7 @@ public:
 	void h2hhockeyc(machine_config &config);
 
 private:
+	void update_display();
 	void write_d(u8 data);
 	void write_g(u8 data);
 	void write_l(u8 data);
@@ -300,28 +300,35 @@ private:
 
 // handlers
 
+void h2hbaskbc_state::update_display()
+{
+	// D2,D3 double as multiplexer
+	u16 mask = ((~m_d >> 3 & 1) * 0x00ff) | ((~m_d >> 2 & 1) * 0xff00);
+	u16 sel = m_g | m_d << 4;
+
+	m_display->matrix((sel << 8 | sel) & mask, m_l);
+}
+
 void h2hbaskbc_state::write_d(u8 data)
 {
 	// D: led select
 	m_d = data;
+	update_display();
 }
 
 void h2hbaskbc_state::write_g(u8 data)
 {
 	// G: led select, input mux
-	m_inp_mux = data;
-	m_g = data;
+	m_g = m_inp_mux = data;
+	update_display();
 }
 
 void h2hbaskbc_state::write_l(u8 data)
 {
-	// D2,D3 double as multiplexer
-	u16 mask = ((m_d >> 2 & 1) * 0x00ff) | ((m_d >> 3 & 1) * 0xff00);
-	u16 sel = (m_g | m_d << 4 | m_g << 8 | m_d << 12) & mask;
-
-	// D2+G0,G1 are 7segs
-	// L0-L6: digit segments A-G, L0-L4: led data
-	m_display->matrix(sel, data);
+	// L0-L6: digit segments A-G
+	// L0-L4: led data
+	m_l = data;
+	update_display();
 }
 
 u8 h2hbaskbc_state::read_in()
@@ -386,7 +393,7 @@ INPUT_PORTS_END
 void h2hbaskbc_state::h2hbaskbc(machine_config &config)
 {
 	// basic machine hardware
-	COP420(config, m_maincpu, 1000000); // approximation - RC osc. R=43K, C=101pF
+	COP420(config, m_maincpu, 1000000); // approximation - RC osc. R=43K, C=100pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(h2hbaskbc_state::write_d));
 	m_maincpu->write_g().set(FUNC(h2hbaskbc_state::write_g));
@@ -1635,7 +1642,7 @@ INPUT_PORTS_END
 void mdallas_state::mdallas(machine_config &config)
 {
 	// basic machine hardware
-	COP444L(config, m_maincpu, 900000); // approximation - RC osc. R=57K, C=101pF
+	COP444L(config, m_maincpu, 900000); // approximation - RC osc. R=57K, C=100pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_l().set(FUNC(mdallas_state::write_l));
 	m_maincpu->write_d().set(FUNC(mdallas_state::write_d));
@@ -2719,11 +2726,10 @@ u8 lilcomp_state::read_g()
 
 void lilcomp_state::write_sk(int state)
 {
-	if (state == m_sk)
-		return;
-
 	// SK: trigger power off after a short delay (since it also toggles at boot)
-	m_power_timer->adjust(state ? attotime::from_msec(100) : attotime::never);
+	if (state != m_sk)
+		m_power_timer->adjust(state ? attotime::from_msec(100) : attotime::never);
+
 	m_sk = state;
 }
 

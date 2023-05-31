@@ -3,7 +3,8 @@
 // thanks-to:Sean Riddle
 /*******************************************************************************
 
-Matsushita (Panasonic) MN1400 handhelds
+Matsushita (Panasonic) MN1400 handhelds. Matsushita used this MCU in their
+audio/video equipment, and it's used in some handheld toys too.
 
 *******************************************************************************/
 
