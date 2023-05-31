@@ -35365,9 +35365,12 @@ quake                           // (c) 19?? Lazer-Tron / iD Software
 queen                           //
 
 @source:pc/sis630.cpp
+asuspolo                        // (c) 2001
+asuscusc                        // (c) 2001
 gamecst2                        // MAME based bootleg, version 2.613
 gamecstl                        // MAME based bootleg
 shutms11                        // (c) 2000
+zidav630e                       // (c) 2000/2001
 
 @source:pc/tandy1t.cpp
 t1000hx                         // 1987 Tandy 1000 HX (similiar to PCJr)
