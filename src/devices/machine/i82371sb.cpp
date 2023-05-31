@@ -145,7 +145,29 @@ void i82371sb_isa_device::device_config_complete()
 }
 
 i82371sb_isa_device::i82371sb_isa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, type, tag, owner, clock), m_smi_callback(*this), m_nmi_callback(*this), m_stpclk_callback(*this), m_boot_state_hook(*this), m_maincpu(*this, finder_base::DUMMY_TAG), m_pic8259_master(*this, "pic8259_master"), m_pic8259_slave(*this, "pic8259_slave"), m_dma8237_1(*this, "dma8237_1"), m_dma8237_2(*this, "dma8237_2"), m_pit8254(*this, "pit8254"), m_isabus(*this, "isabus"), m_speaker(*this, "speaker"), m_at_spkrdata(0), m_pit_out2(0), m_dma_channel(0), m_cur_eop(false), m_dma_high_byte(0), m_eisa_irq_mode(0), m_at_speaker(0), m_refresh(false), m_channel_check(0), m_nmi_enabled(0)
+	: pci_device(mconfig, type, tag, owner, clock)
+	, m_smi_callback(*this)
+	, m_nmi_callback(*this)
+	, m_stpclk_callback(*this)
+	, m_boot_state_hook(*this)
+	, m_maincpu(*this, finder_base::DUMMY_TAG)
+	, m_pic8259_master(*this, "pic8259_master")
+	, m_pic8259_slave(*this, "pic8259_slave")
+	, m_dma8237_1(*this, "dma8237_1")
+	, m_dma8237_2(*this, "dma8237_2")
+	, m_pit8254(*this, "pit8254")
+	, m_isabus(*this, "isabus")
+	, m_speaker(*this, "speaker")
+	, m_at_spkrdata(0)
+	, m_pit_out2(0)
+	, m_dma_channel(0)
+	, m_cur_eop(false)
+	, m_dma_high_byte(0)
+	, m_eisa_irq_mode(0)
+	, m_at_speaker(0)
+	, m_refresh(false)
+	, m_channel_check(0)
+	, m_nmi_enabled(0)
 {
 }
 
@@ -420,8 +442,15 @@ void i82371sb_isa_device::map_bios(address_space *memory_space, uint32_t start, 
 	memory_space->install_rom(start, end, m_region->base() + (start & mask));
 }
 
-void i82371sb_isa_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
-									uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
+void i82371sb_isa_device::map_extra(
+		uint64_t memory_window_start,
+		uint64_t memory_window_end,
+		uint64_t memory_offset,
+		address_space *memory_space,
+		uint64_t io_window_start,
+		uint64_t io_window_end,
+		uint64_t io_offset,
+		address_space *io_space)
 {
 	// assume that map_extra of the southbridge is called before the one of the northbridge
 	m_isabus->remap(AS_PROGRAM, 0, 1 << 24);
@@ -1009,8 +1038,15 @@ void i82371sb_ide_device::reset_all_mappings()
 {
 }
 
-void i82371sb_ide_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
-									uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
+void i82371sb_ide_device::map_extra(
+		uint64_t memory_window_start,
+		uint64_t memory_window_end,
+		uint64_t memory_offset,
+		address_space *memory_space,
+		uint64_t io_window_start,
+		uint64_t io_window_end,
+		uint64_t io_offset,
+		address_space *io_space)
 {
 	io_space->install_device(0, 0x3ff, *this, &i82371sb_ide_device::internal_io_map);
 	if (command & 1)
