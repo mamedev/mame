@@ -21,7 +21,7 @@
 #define LOG_HDAC (1U << 3) // log hidden DAC
 
 #define VERBOSE (LOG_GENERAL | LOG_HDAC)
-#define LOG_OUTPUT_FUNC osd_printf_info
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 // TODO: remove these macros
@@ -238,9 +238,12 @@ void cirrus_gd5428_device::cirrus_define_video_mode()
 		clock = (xtal * numerator / denominator / mul).dvalue();
 	}
 
-	if (!gc_locked && (vga.sequencer.data[0x07] & 0x01))
+	if (!gc_locked)
 	{
 		svga.rgb8_en = svga.rgb15_en = svga.rgb16_en = svga.rgb24_en = 0;
+		// gambl186 relies on this, don't setup any hidden DAC but only this
+		if (vga.sequencer.data[0x07] & 0x01)
+			svga.rgb8_en = 1;
 
 		if (BIT(m_hidden_dac_mode, 7))
 		{
