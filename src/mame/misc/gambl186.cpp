@@ -57,7 +57,7 @@ TODO:
 #include "cpu/mcs51/mcs51.h"
 #include "machine/nvram.h"
 #include "sound/upd7759.h"
-#include "video/clgd542x.h"
+#include "video/pc_vga_cirrus.h"
 
 #include "speaker.h"
 
