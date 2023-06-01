@@ -303,9 +303,31 @@ TEST_CASE("atan2", "")
 
 TEST_CASE("sign", "")
 {
-	REQUIRE(-1 == bx::sign(-0.1389f) );
-	REQUIRE( 0 == bx::sign( 0.0000f) );
-	REQUIRE( 1 == bx::sign( 0.1389f) );
+	STATIC_REQUIRE(-1 == bx::sign(-0.1389f) );
+	STATIC_REQUIRE( 0 == bx::sign( 0.0000f) );
+	STATIC_REQUIRE( 1 == bx::sign( 0.1389f) );
+
+	REQUIRE(-1 == bx::sign(-bx::kFloatInfinity) );
+	REQUIRE( 1 == bx::sign( bx::kFloatInfinity) );
+}
+
+TEST_CASE("signbit", "")
+{
+	STATIC_REQUIRE( bx::signbit(-0.1389f) );
+	STATIC_REQUIRE(!bx::signbit( 0.0000f) );
+	STATIC_REQUIRE(!bx::signbit( 0.1389f) );
+
+	REQUIRE( bx::signbit(-bx::kFloatInfinity) );
+	REQUIRE(!bx::signbit( bx::kFloatInfinity) );
+}
+
+TEST_CASE("copysign", "")
+{
+	STATIC_REQUIRE( 0.1389f == bx::copysign(-0.1389f, +1389) );
+	STATIC_REQUIRE(-0.0000f == bx::copysign( 0.0000f, -1389) );
+	STATIC_REQUIRE(-0.1389f == bx::copysign( 0.1389f, -1389) );
+
+	REQUIRE(-bx::kFloatInfinity == bx::copysign(bx::kFloatInfinity, -1389) );
 }
 
 TEST_CASE("ToBits", "")
