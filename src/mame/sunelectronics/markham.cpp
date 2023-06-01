@@ -3,6 +3,10 @@
 /*****************************************************************************
 
     Sun Electronics Markham hardware
+
+	Sun Electronics Strength & Skill hardware
+	
+	Sun Electronics Strength & Skill hardware with SUN 8212 MCU
 	
 	Driver by Uki
 
