@@ -7220,7 +7220,7 @@ INPUT_PORTS_END
 void elecdet_state::elecdet(machine_config &config)
 {
 	// basic machine hardware
-	TMS0980(config, m_maincpu, 425000); // approximation
+	TMS0980(config, m_maincpu, 450000); // approximation
 	m_maincpu->read_k().set(FUNC(elecdet_state::read_k));
 	m_maincpu->write_r().set(FUNC(elecdet_state::write_r));
 	m_maincpu->write_o().set(FUNC(elecdet_state::write_o));
@@ -15513,8 +15513,9 @@ private:
 
 void tmvolleyb_state::update_display()
 {
-	// O7 also selects left digit
-	m_display->matrix((m_o >> 7 & 1) | (m_r >> 3 & 0xe), m_o);
+	// O7 goes to left digit segments B/C
+	m_display->matrix_partial(0, 1, BIT(m_r, 4), BIT(m_o, 7) * 6);
+	m_display->matrix_partial(1, 3, m_r >> 4, m_o);
 }
 
 void tmvolleyb_state::write_r(u32 data)
@@ -15522,7 +15523,8 @@ void tmvolleyb_state::write_r(u32 data)
 	// R0-R3,R7-R9: input mux
 	m_inp_mux = (data & 0xf) | (data >> 3 & 0x70);
 
-	// R4-R6: led select
+	// R4: digit select
+	// R5,R6: led select
 	m_r = data;
 	update_display();
 

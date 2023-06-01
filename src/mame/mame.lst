@@ -18656,7 +18656,7 @@ mbaskb2                         // Mattel
 mdallas                         // Mattel
 msoccer2                        // Mattel
 plus1                           // Milton Bradley
-qkracer                         // National Semiconductor
+qkracera                        // National Semiconductor
 solution                        // SCAT
 unkeinv                         // Gordon Barlow Design
 vidchal                         // Select Merchandise
@@ -18667,7 +18667,7 @@ mbaskb                          // Mattel
 mhockey                         // Mattel
 mhockeya                        // Mattel
 msoccer                         // Mattel
-qkracerm                        // National Semiconductor
+qkracer                         // National Semiconductor
 qkspeller                       // National Semiconductor
 
 @source:handheld/hh_hmcs40.cpp

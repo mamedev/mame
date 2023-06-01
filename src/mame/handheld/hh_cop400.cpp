@@ -46,7 +46,7 @@ TODO:
 #include "mbaskb2.lh"
 #include "mdallas.lh"
 #include "msoccer2.lh"
-#include "qkracer.lh"
+#include "qkracera.lh"
 #include "scat.lh"
 #include "unkeinv.lh"
 #include "vidchal.lh"
@@ -2075,14 +2075,14 @@ ROM_END
 
 *******************************************************************************/
 
-class qkracer_state : public hh_cop400_state
+class qkracera_state : public hh_cop400_state
 {
 public:
-	qkracer_state(const machine_config &mconfig, device_type type, const char *tag) :
+	qkracera_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
-	void qkracer(machine_config &config);
+	void qkracera(machine_config &config);
 
 private:
 	void update_display();
@@ -2095,12 +2095,12 @@ private:
 
 // handlers
 
-void qkracer_state::update_display()
+void qkracera_state::update_display()
 {
 	m_display->matrix(~(m_d | m_g << 4 | m_sk << 8), m_l);
 }
 
-void qkracer_state::write_d(u8 data)
+void qkracera_state::write_d(u8 data)
 {
 	// D: select digit, D3: input mux low bit
 	m_inp_mux = (m_inp_mux & ~1) | (data >> 3 & 1);
@@ -2108,7 +2108,7 @@ void qkracer_state::write_d(u8 data)
 	update_display();
 }
 
-void qkracer_state::write_g(u8 data)
+void qkracera_state::write_g(u8 data)
 {
 	// G: select digit, input mux
 	m_inp_mux = (m_inp_mux & 1) | (data << 1 & 0x1e);
@@ -2116,20 +2116,20 @@ void qkracer_state::write_g(u8 data)
 	update_display();
 }
 
-void qkracer_state::write_l(u8 data)
+void qkracera_state::write_l(u8 data)
 {
 	// L0-L6: digit segment data
 	m_l = data & 0x7f;
 	update_display();
 }
 
-u8 qkracer_state::read_in()
+u8 qkracera_state::read_in()
 {
 	// IN: multiplexed inputs
 	return read_inputs(5, 0xf);
 }
 
-void qkracer_state::write_sk(int state)
+void qkracera_state::write_sk(int state)
 {
 	// SK: green led
 	m_sk = state;
@@ -2138,7 +2138,7 @@ void qkracer_state::write_sk(int state)
 
 // inputs
 
-static INPUT_PORTS_START( qkracer )
+static INPUT_PORTS_START( qkracera )
 	PORT_START("IN.0") // D3 port IN
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Amateur")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Pro")
@@ -2172,29 +2172,29 @@ INPUT_PORTS_END
 
 // config
 
-void qkracer_state::qkracer(machine_config &config)
+void qkracera_state::qkracera(machine_config &config)
 {
 	// basic machine hardware
-	COP420(config, m_maincpu, 950000); // approximation - RC osc. R=47K, C=100pF
+	COP420(config, m_maincpu, 700000); // approximation - RC osc. R=47K, C=100pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
-	m_maincpu->write_d().set(FUNC(qkracer_state::write_d));
-	m_maincpu->write_g().set(FUNC(qkracer_state::write_g));
-	m_maincpu->write_l().set(FUNC(qkracer_state::write_l));
-	m_maincpu->read_in().set(FUNC(qkracer_state::read_in));
-	m_maincpu->write_sk().set(FUNC(qkracer_state::write_sk));
+	m_maincpu->write_d().set(FUNC(qkracera_state::write_d));
+	m_maincpu->write_g().set(FUNC(qkracera_state::write_g));
+	m_maincpu->write_l().set(FUNC(qkracera_state::write_l));
+	m_maincpu->read_in().set(FUNC(qkracera_state::read_in));
+	m_maincpu->write_sk().set(FUNC(qkracera_state::write_sk));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
 	m_display->set_segmask(0xdf, 0x7f);
 	m_display->set_segmask(0x20, 0x41); // equals sign
-	config.set_default_layout(layout_qkracer);
+	config.set_default_layout(layout_qkracera);
 
 	// no sound!
 }
 
 // roms
 
-ROM_START( qkracer )
+ROM_START( qkracera )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "cop420-npg_n", 0x0000, 0x0400, CRC(17f8e538) SHA1(23d1a1819e6ba552d8da83da2948af1cf5b13d5b) )
 ROM_END
@@ -2825,7 +2825,7 @@ SYST( 1980, plus1,      0,         0,      plus1,      plus1,      plus1_state, 
 SYST( 1981, lightfgt,   0,         0,      lightfgt,   lightfgt,   lightfgt_state,  empty_init, "Milton Bradley", "Electronic Lightfight: The Games of Dueling Lights", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1982, bshipg,     bship,     0,      bshipg,     bshipg,     bshipg_state,    empty_init, "Milton Bradley", "Electronic Battleship (COP420 version, Rev. G)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 
-SYST( 1979, qkracer,    0,         0,      qkracer,    qkracer,    qkracer_state,   empty_init, "National Semiconductor", "QuizKid Racer (COP420 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1979, qkracera,   qkracer,   0,      qkracera,   qkracera,   qkracera_state,  empty_init, "National Semiconductor", "QuizKid Racer (COP420 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1982, copspa,     0,         0,      mdallas,    copspa,     mdallas_state,   empty_init, "National Semiconductor", "COPS Pocket Assistant", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1984, solution,   0,         0,      scat,       solution,   scat_state,      empty_init, "SCAT", "The Solution", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
