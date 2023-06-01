@@ -10,7 +10,7 @@
 #include "uint32_t.h"
 
 #define BX_NEW(_allocator, _type)                 BX_PLACEMENT_NEW(bx::alloc(_allocator, sizeof(_type) ), _type)
-#define BX_ALIGNED_NEW(_allocator, _type, _align) BX_PLACEMENT_NEW(bx::alignedAlloc(_allocator, sizeof(_type), _align), _type)
+#define BX_ALIGNED_NEW(_allocator, _type, _align) BX_PLACEMENT_NEW(bx::alloc(_allocator, sizeof(_type), _align), _type)
 #define BX_PLACEMENT_NEW(_ptr, _type)             ::new(bx::PlacementNew, _ptr) _type
 
 void* operator new(size_t, bx::PlacementNewTag, void* _ptr);
