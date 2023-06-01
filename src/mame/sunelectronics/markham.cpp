@@ -2,13 +2,9 @@
 // copyright-holders:Uki
 /*****************************************************************************
 
-    Sun Electronics Markham hardware
+    Sun Electronics Markham / Strength & Skill hardware
 
-	Sun Electronics Strength & Skill hardware
-	
-	Sun Electronics Strength & Skill hardware with SUN 8212 MCU
-	
-	Driver by Uki
+    Driver by Uki
 
     TODO:
     - needs merging with ikki.cpp
