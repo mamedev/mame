@@ -38,6 +38,13 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
+	virtual uint8_t crtc_reg_read(uint8_t index) override;
+	virtual void crtc_reg_write(uint8_t index, uint8_t data) override;
+	virtual uint8_t seq_reg_read(uint8_t index) override;
+	virtual void seq_reg_write(uint8_t index, uint8_t data) override;
+
+
+	// TODO: remove this leaky abstraction
 	struct
 	{
 		uint8_t memory_config;
@@ -87,15 +94,8 @@ protected:
 	} s3;
 	virtual uint16_t offset() override;
 
-protected:
-	uint8_t crtc_reg_read(uint8_t index) override;
-	void crtc_reg_write(uint8_t index, uint8_t data) override;
-
 private:
-
 	void s3_define_video_mode(void);
-	uint8_t s3_seq_reg_read(uint8_t index);
-	void s3_seq_reg_write(uint8_t index, uint8_t data);
 	ibm8514a_device* m_8514;
 };
 

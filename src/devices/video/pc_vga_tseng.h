@@ -31,11 +31,11 @@ protected:
 
 private:
 	void tseng_define_video_mode();
-	uint8_t tseng_crtc_reg_read(uint8_t index);
-	void tseng_crtc_reg_write(uint8_t index, uint8_t data);
-	uint8_t tseng_seq_reg_read(uint8_t index);
-	void tseng_seq_reg_write(uint8_t index, uint8_t data);
-	void tseng_attribute_reg_write(uint8_t index, uint8_t data);
+	virtual uint8_t crtc_reg_read(uint8_t index) override;
+	virtual void crtc_reg_write(uint8_t index, uint8_t data) override;
+	virtual uint8_t seq_reg_read(uint8_t index) override;
+	virtual void seq_reg_write(uint8_t index, uint8_t data) override;
+	virtual void attribute_reg_write(uint8_t index, uint8_t data) override;
 
 	struct
 	{

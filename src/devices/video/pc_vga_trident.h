@@ -43,6 +43,14 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	virtual uint8_t seq_reg_read(uint8_t index) override;
+	virtual void seq_reg_write(uint8_t index, uint8_t data) override;
+	virtual uint8_t crtc_reg_read(uint8_t index) override;
+	virtual void crtc_reg_write(uint8_t index, uint8_t data) override;
+	virtual uint8_t gc_reg_read(uint8_t index) override;
+	virtual void gc_reg_write(uint8_t index, uint8_t data) override;
+
+	// TODO: remove this leaky abstraction
 	struct
 	{
 		uint8_t sr0c;
@@ -117,13 +125,7 @@ protected:
 	} tri;
 	uint8_t m_version;
 private:
-	uint8_t trident_seq_reg_read(uint8_t index);
-	void trident_seq_reg_write(uint8_t index, uint8_t data);
 	virtual void trident_define_video_mode();
-	uint8_t trident_crtc_reg_read(uint8_t index);
-	void trident_crtc_reg_write(uint8_t index, uint8_t data);
-	uint8_t trident_gc_reg_read(uint8_t index);
-	void trident_gc_reg_write(uint8_t index, uint8_t data);
 
 	int calculate_clock();
 

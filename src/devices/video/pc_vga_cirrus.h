@@ -90,12 +90,12 @@ protected:
 
 private:
 	void cirrus_define_video_mode();
-	uint8_t cirrus_seq_reg_read(uint8_t index);
-	void cirrus_seq_reg_write(uint8_t index, uint8_t data);
-	uint8_t cirrus_gc_reg_read(uint8_t index);
-	void cirrus_gc_reg_write(uint8_t index, uint8_t data);
-	uint8_t cirrus_crtc_reg_read(uint8_t index);
-	void cirrus_crtc_reg_write(uint8_t index, uint8_t data);
+	virtual uint8_t seq_reg_read(uint8_t index) override;
+	virtual void seq_reg_write(uint8_t index, uint8_t data) override;
+	virtual uint8_t gc_reg_read(uint8_t index) override;
+	virtual void gc_reg_write(uint8_t index, uint8_t data) override;
+	virtual uint8_t crtc_reg_read(uint8_t index) override;
+	virtual void crtc_reg_write(uint8_t index, uint8_t data) override;
 
 	void start_bitblt();
 	void start_reverse_bitblt();

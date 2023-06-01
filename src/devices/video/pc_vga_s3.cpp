@@ -557,12 +557,12 @@ bit    0  Vertical Total bit 10. Bit 10 of the Vertical Total register (3d4h
 	}
 }
 
-uint8_t s3_vga_device::s3_seq_reg_read(uint8_t index)
+uint8_t s3_vga_device::seq_reg_read(uint8_t index)
 {
 	uint8_t res = 0xff;
 
 	if(index <= 0x0c)
-		res = vga.sequencer.data[index];
+		res = svga_device::seq_reg_read(index);
 	else
 	{
 		switch(index)
@@ -592,12 +592,12 @@ uint8_t s3_vga_device::s3_seq_reg_read(uint8_t index)
 	return res;
 }
 
-void s3_vga_device::s3_seq_reg_write(uint8_t index, uint8_t data)
+void s3_vga_device::seq_reg_write(uint8_t index, uint8_t data)
 {
 	if(index <= 0x0c)
 	{
 		vga.sequencer.data[vga.sequencer.index] = data;
-		seq_reg_write(vga.sequencer.index,data);
+		svga_device::seq_reg_write(vga.sequencer.index,data);
 	}
 	else
 	{
@@ -683,7 +683,7 @@ uint8_t s3_vga_device::port_03c0_r(offs_t offset)
 	switch(offset)
 	{
 		case 5:
-			res = s3_seq_reg_read(vga.sequencer.index);
+			res = s3_vga_device::seq_reg_read(vga.sequencer.index);
 			break;
 		default:
 			res = vga_device::port_03c0_r(offset);
@@ -698,7 +698,7 @@ void s3_vga_device::port_03c0_w(offs_t offset, uint8_t data)
 	switch(offset)
 	{
 		case 5:
-			s3_seq_reg_write(vga.sequencer.index,data);
+			s3_vga_device::seq_reg_write(vga.sequencer.index,data);
 			break;
 		default:
 			vga_device::port_03c0_w(offset,data);

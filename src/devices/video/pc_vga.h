@@ -81,17 +81,20 @@ protected:
 	void vga_vh_mono(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual uint8_t pc_vga_choosevideomode();
 	void recompute_params_clock(int divisor, int xtal);
-	virtual uint8_t crtc_reg_read(uint8_t index);
 	virtual void recompute_params();
+	uint8_t vga_vblank();
+
+	uint8_t vga_crtc_r(offs_t offset);
+	void vga_crtc_w(offs_t offset, uint8_t data);
+	virtual uint8_t crtc_reg_read(uint8_t index);
 	virtual void crtc_reg_write(uint8_t index, uint8_t data);
 	virtual uint8_t seq_reg_read(uint8_t index);
 	virtual void seq_reg_write(uint8_t index, uint8_t data);
-	uint8_t vga_vblank();
-	uint8_t vga_crtc_r(offs_t offset);
-	void vga_crtc_w(offs_t offset, uint8_t data);
-	uint8_t gc_reg_read(uint8_t index);
-	void attribute_reg_write(uint8_t index, uint8_t data);
-	void gc_reg_write(uint8_t index,uint8_t data);
+	virtual uint8_t gc_reg_read(uint8_t index);
+	virtual void gc_reg_write(uint8_t index,uint8_t data);
+
+	virtual void attribute_reg_write(uint8_t index, uint8_t data);
+
 	virtual uint16_t offset();
 	virtual uint32_t start_addr();
 	virtual uint8_t vga_latch_write(int offs, uint8_t data);

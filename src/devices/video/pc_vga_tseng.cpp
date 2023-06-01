@@ -99,12 +99,12 @@ void tseng_vga_device::tseng_define_video_mode()
 	recompute_params_clock(divisor, xtal);
 }
 
-uint8_t tseng_vga_device::tseng_crtc_reg_read(uint8_t index)
+uint8_t tseng_vga_device::crtc_reg_read(uint8_t index)
 {
 	uint8_t res;
 
 	if(index <= 0x18)
-		res = crtc_reg_read(index);
+		res = svga_device::crtc_reg_read(index);
 	else
 	{
 		switch(index)
@@ -125,10 +125,10 @@ uint8_t tseng_vga_device::tseng_crtc_reg_read(uint8_t index)
 	return res;
 }
 
-void tseng_vga_device::tseng_crtc_reg_write(uint8_t index, uint8_t data)
+void tseng_vga_device::crtc_reg_write(uint8_t index, uint8_t data)
 {
 	if(index <= 0x18)
-		crtc_reg_write(index,data);
+		svga_device::crtc_reg_write(index,data);
 	else
 	{
 		switch(index)
@@ -147,14 +147,14 @@ void tseng_vga_device::tseng_crtc_reg_write(uint8_t index, uint8_t data)
 	}
 }
 
-uint8_t tseng_vga_device::tseng_seq_reg_read(uint8_t index)
+uint8_t tseng_vga_device::seq_reg_read(uint8_t index)
 {
 	uint8_t res;
 
 	res = 0xff;
 
 	if(index <= 0x04)
-		res = vga.sequencer.data[index];
+		res = svga_device::seq_reg_read(index);
 	else
 	{
 		switch(index)
@@ -169,12 +169,12 @@ uint8_t tseng_vga_device::tseng_seq_reg_read(uint8_t index)
 	return res;
 }
 
-void tseng_vga_device::tseng_seq_reg_write(uint8_t index, uint8_t data)
+void tseng_vga_device::seq_reg_write(uint8_t index, uint8_t data)
 {
 	if(index <= 0x04)
 	{
 		vga.sequencer.data[vga.sequencer.index] = data;
-		seq_reg_write(vga.sequencer.index,data);
+		svga_device::seq_reg_write(vga.sequencer.index,data);
 	}
 	else
 	{
@@ -197,7 +197,7 @@ uint8_t tseng_vga_device::port_03b0_r(offs_t offset)
 		switch(offset)
 		{
 			case 5:
-				res = tseng_crtc_reg_read(vga.crtc.index);
+				res = tseng_vga_device::crtc_reg_read(vga.crtc.index);
 				break;
 			case 8:
 				res = et4k.reg_3d8;
@@ -219,7 +219,7 @@ void tseng_vga_device::port_03b0_w(offs_t offset, uint8_t data)
 		{
 			case 5:
 				vga.crtc.data[vga.crtc.index] = data;
-				tseng_crtc_reg_write(vga.crtc.index,data);
+				tseng_vga_device::crtc_reg_write(vga.crtc.index,data);
 				break;
 			case 8:
 				et4k.reg_3d8 = data;
@@ -236,18 +236,18 @@ void tseng_vga_device::port_03b0_w(offs_t offset, uint8_t data)
 	tseng_define_video_mode();
 }
 
-void tseng_vga_device::tseng_attribute_reg_write(uint8_t index, uint8_t data)
+void tseng_vga_device::attribute_reg_write(uint8_t index, uint8_t data)
 {
 	switch(index)
 	{
 		case 0x16:
 			et4k.misc1 = data;
+			// TODO: left-over code for et4k/w32?
 			#if 0
 			svga.rgb8_en = 0;
 			svga.rgb15_en = 0;
 			svga.rgb16_en = 0;
 			svga.rgb32_en = 0;
-			/* TODO: et4k and w32 are different here */
 			switch(et4k.misc1 & 0x30)
 			{
 				case 0:
@@ -265,7 +265,7 @@ void tseng_vga_device::tseng_attribute_reg_write(uint8_t index, uint8_t data)
 			break;
 		case 0x17: et4k.misc2 = data; break;
 		default:
-			attribute_reg_write(index,data);
+			svga_device::attribute_reg_write(index,data);
 	}
 
 }
@@ -289,7 +289,7 @@ uint8_t tseng_vga_device::port_03c0_r(offs_t offset)
 			break;
 
 		case 0x05:
-			res = tseng_seq_reg_read(vga.sequencer.index);
+			res = tseng_vga_device::seq_reg_read(vga.sequencer.index);
 			break;
 		case 0x0d:
 			res = svga.bank_w & 0xf;
@@ -322,19 +322,20 @@ void tseng_vga_device::port_03c0_w(offs_t offset, uint8_t data)
 	switch(offset)
 	{
 		case 0:
+			// TODO: should derive from svga_device
 			if (vga.attribute.state==0)
 			{
 				vga.attribute.index=data;
 			}
 			else
 			{
-				tseng_attribute_reg_write(vga.attribute.index,data);
+				tseng_vga_device::attribute_reg_write(vga.attribute.index,data);
 			}
 			vga.attribute.state=!vga.attribute.state;
 			break;
 
 		case 0x05:
-			tseng_seq_reg_write(vga.sequencer.index,data);
+			tseng_vga_device::seq_reg_write(vga.sequencer.index,data);
 			break;
 		case 0x0d:
 			svga.bank_w = data & 0xf;
@@ -363,7 +364,7 @@ uint8_t tseng_vga_device::port_03d0_r(offs_t offset)
 		switch(offset)
 		{
 			case 5:
-				res = tseng_crtc_reg_read(vga.crtc.index);
+				res = tseng_vga_device::crtc_reg_read(vga.crtc.index);
 				break;
 			case 8:
 				res = et4k.reg_3d8;
@@ -385,7 +386,7 @@ void tseng_vga_device::port_03d0_w(offs_t offset, uint8_t data)
 		{
 			case 5:
 				vga.crtc.data[vga.crtc.index] = data;
-				tseng_crtc_reg_write(vga.crtc.index,data);
+				tseng_vga_device::crtc_reg_write(vga.crtc.index,data);
 				//if((vga.crtc.index & 0xfe) != 0x0e)
 				//  printf("%02x %02x %d\n",vga.crtc.index,data,screen().vpos());
 				break;

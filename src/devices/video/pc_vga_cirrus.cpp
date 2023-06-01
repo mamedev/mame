@@ -522,7 +522,7 @@ void cirrus_gd5428_device::copy_pixel(uint8_t src, uint8_t dst)
 	vga.memory[m_blt_dest_current % vga.svga_intf.vram_size] = res;
 }
 
-uint8_t cirrus_gd5428_device::cirrus_seq_reg_read(uint8_t index)
+uint8_t cirrus_gd5428_device::seq_reg_read(uint8_t index)
 {
 	uint8_t res;
 
@@ -575,13 +575,14 @@ uint8_t cirrus_gd5428_device::cirrus_seq_reg_read(uint8_t index)
 			res = m_vclk_denom[index-0x1b];
 			break;
 		default:
-			res = vga.sequencer.data[index];
+			res = svga_device::seq_reg_read(index);
+			break;
 	}
 
 	return res;
 }
 
-void cirrus_gd5428_device::cirrus_seq_reg_write(uint8_t index, uint8_t data)
+void cirrus_gd5428_device::seq_reg_write(uint8_t index, uint8_t data)
 {
 	LOGMASKED(LOG_REG, "CL: SEQ write %02x to SR%02x\n",data,index);
 	switch(index)
@@ -669,11 +670,11 @@ void cirrus_gd5428_device::cirrus_seq_reg_write(uint8_t index, uint8_t data)
 			break;
 		default:
 			vga.sequencer.data[vga.sequencer.index] = data;
-			seq_reg_write(vga.sequencer.index,data);
+			svga_device::seq_reg_write(vga.sequencer.index,data);
 	}
 }
 
-uint8_t cirrus_gd5428_device::cirrus_gc_reg_read(uint8_t index)
+uint8_t cirrus_gd5428_device::gc_reg_read(uint8_t index)
 {
 	uint8_t res = 0xff;
 
@@ -789,13 +790,13 @@ uint8_t cirrus_gd5428_device::cirrus_gc_reg_read(uint8_t index)
 		res = m_blt_trans_colour_mask >> 8;
 		break;
 	default:
-		res = gc_reg_read(index);
+		res = svga_device::gc_reg_read(index);
 	}
 
 	return res;
 }
 
-void cirrus_gd5428_device::cirrus_gc_reg_write(uint8_t index, uint8_t data)
+void cirrus_gd5428_device::gc_reg_write(uint8_t index, uint8_t data)
 {
 	LOGMASKED(LOG_REG, "CL: GC write %02x to GR%02x\n",data,index);
 	switch(index)
@@ -920,7 +921,7 @@ void cirrus_gd5428_device::cirrus_gc_reg_write(uint8_t index, uint8_t data)
 		m_blt_trans_colour_mask = (m_blt_trans_colour_mask & 0x00ff) | (data << 8);
 		break;
 	default:
-		gc_reg_write(index,data);
+		svga_device::gc_reg_write(index,data);
 	}
 }
 
@@ -931,7 +932,7 @@ uint8_t cirrus_gd5428_device::port_03c0_r(offs_t offset)
 	switch(offset)
 	{
 		case 0x05:
-			res = cirrus_seq_reg_read(vga.sequencer.index);
+			res = cirrus_gd5428_device::seq_reg_read(vga.sequencer.index);
 			break;
 		case 0x09:
 			if(!m_ext_palette_enabled)
@@ -962,7 +963,7 @@ uint8_t cirrus_gd5428_device::port_03c0_r(offs_t offset)
 			}
 			break;
 		case 0x0f:
-			res = cirrus_gc_reg_read(vga.gc.index);
+			res = cirrus_gd5428_device::gc_reg_read(vga.gc.index);
 			break;
 		default:
 			res = vga_device::port_03c0_r(offset);
@@ -977,7 +978,7 @@ void cirrus_gd5428_device::port_03c0_w(offs_t offset, uint8_t data)
 	switch(offset)
 	{
 		case 0x05:
-			cirrus_seq_reg_write(vga.sequencer.index,data);
+			cirrus_gd5428_device::seq_reg_write(vga.sequencer.index,data);
 			break;
 		case 0x09:
 			if(!m_ext_palette_enabled)
@@ -1007,7 +1008,7 @@ void cirrus_gd5428_device::port_03c0_w(offs_t offset, uint8_t data)
 			}
 			break;
 		case 0x0f:
-			cirrus_gc_reg_write(vga.gc.index,data);
+			cirrus_gd5428_device::gc_reg_write(vga.gc.index,data);
 			break;
 		default:
 			vga_device::port_03c0_w(offset,data);
@@ -1025,7 +1026,7 @@ uint8_t cirrus_gd5428_device::port_03b0_r(offs_t offset)
 		switch(offset)
 		{
 			case 5:
-				res = cirrus_crtc_reg_read(vga.crtc.index);
+				res = cirrus_gd5428_device::crtc_reg_read(vga.crtc.index);
 				break;
 			default:
 				res = vga_device::port_03b0_r(offset);
@@ -1045,7 +1046,7 @@ uint8_t cirrus_gd5428_device::port_03d0_r(offs_t offset)
 		switch(offset)
 		{
 			case 5:
-				res = cirrus_crtc_reg_read(vga.crtc.index);
+				res = cirrus_gd5428_device::crtc_reg_read(vga.crtc.index);
 				break;
 			default:
 				res = vga_device::port_03d0_r(offset);
@@ -1064,7 +1065,7 @@ void cirrus_gd5428_device::port_03b0_w(offs_t offset, uint8_t data)
 		{
 			case 5:
 				vga.crtc.data[vga.crtc.index] = data;
-				cirrus_crtc_reg_write(vga.crtc.index,data);
+				cirrus_gd5428_device::crtc_reg_write(vga.crtc.index,data);
 				break;
 			default:
 				vga_device::port_03b0_w(offset,data);
@@ -1082,7 +1083,7 @@ void cirrus_gd5428_device::port_03d0_w(offs_t offset, uint8_t data)
 		{
 			case 5:
 				vga.crtc.data[vga.crtc.index] = data;
-				cirrus_crtc_reg_write(vga.crtc.index,data);
+				cirrus_gd5428_device::crtc_reg_write(vga.crtc.index,data);
 				break;
 			default:
 				vga_device::port_03d0_w(offset,data);
@@ -1092,7 +1093,7 @@ void cirrus_gd5428_device::port_03d0_w(offs_t offset, uint8_t data)
 	cirrus_define_video_mode();
 }
 
-uint8_t cirrus_gd5428_device::cirrus_crtc_reg_read(uint8_t index)
+uint8_t cirrus_gd5428_device::crtc_reg_read(uint8_t index)
 {
 	uint8_t res;
 
@@ -1114,14 +1115,14 @@ uint8_t cirrus_gd5428_device::cirrus_crtc_reg_read(uint8_t index)
 		res = m_chip_id;
 		break;
 	default:
-		res = crtc_reg_read(index);
+		res = svga_device::crtc_reg_read(index);
 		break;
 	}
 
 	return res;
 }
 
-void cirrus_gd5428_device::cirrus_crtc_reg_write(uint8_t index, uint8_t data)
+void cirrus_gd5428_device::crtc_reg_write(uint8_t index, uint8_t data)
 {
 	LOGMASKED(LOG_REG, "CL: CRTC write %02x to CR%02x\n",data,index);
 	switch(index)
@@ -1153,7 +1154,7 @@ void cirrus_gd5428_device::cirrus_crtc_reg_write(uint8_t index, uint8_t data)
 		// Do nothing, read only
 		break;
 	default:
-		crtc_reg_write(index,data);
+		svga_device::crtc_reg_write(index,data);
 		break;
 	}
 

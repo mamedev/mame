@@ -416,14 +416,14 @@ void trident_vga_device::trident_define_video_mode()
 	recompute_params_clock(divisor, xtal);
 }
 
-uint8_t trident_vga_device::trident_seq_reg_read(uint8_t index)
+uint8_t trident_vga_device::seq_reg_read(uint8_t index)
 {
 	uint8_t res;
 
 	res = 0xff;
 
 	if(index <= 0x04)
-		res = vga.sequencer.data[index];
+		res = svga_device::seq_reg_read(index);
 	else
 	{
 		switch(index)
@@ -465,12 +465,12 @@ uint8_t trident_vga_device::trident_seq_reg_read(uint8_t index)
 	return res;
 }
 
-void trident_vga_device::trident_seq_reg_write(uint8_t index, uint8_t data)
+void trident_vga_device::seq_reg_write(uint8_t index, uint8_t data)
 {
 	vga.sequencer.data[vga.sequencer.index] = data;
 	if(index <= 0x04)
 	{
-		seq_reg_write(vga.sequencer.index,data);
+		svga_device::seq_reg_write(vga.sequencer.index,data);
 		recompute_params();
 	}
 	else
@@ -524,12 +524,12 @@ void trident_vga_device::trident_seq_reg_write(uint8_t index, uint8_t data)
 	LOG("Trident SR%02X: %s mode write %02x\n",index,tri.new_mode ? "new" : "old",data);
 }
 
-uint8_t trident_vga_device::trident_crtc_reg_read(uint8_t index)
+uint8_t trident_vga_device::crtc_reg_read(uint8_t index)
 {
 	uint8_t res = 0;
 
 	if(index <= 0x18)
-		res = crtc_reg_read(index);
+		res = svga_device::crtc_reg_read(index);
 	else
 	{
 		switch(index)
@@ -628,11 +628,11 @@ uint8_t trident_vga_device::trident_crtc_reg_read(uint8_t index)
 	LOG("Trident CR%02X: read %02x\n",index,res);
 	return res;
 }
-void trident_vga_device::trident_crtc_reg_write(uint8_t index, uint8_t data)
+void trident_vga_device::crtc_reg_write(uint8_t index, uint8_t data)
 {
 	if(index <= 0x18)
 	{
-		crtc_reg_write(index,data);
+		svga_device::crtc_reg_write(index,data);
 		trident_define_video_mode();
 	}
 	else
@@ -739,12 +739,12 @@ void trident_vga_device::trident_crtc_reg_write(uint8_t index, uint8_t data)
 	LOG("Trident CR%02X: write %02x\n",index,data);
 }
 
-uint8_t trident_vga_device::trident_gc_reg_read(uint8_t index)
+uint8_t trident_vga_device::gc_reg_read(uint8_t index)
 {
 	uint8_t res;
 
 	if(index <= 0x0d)
-		res = gc_reg_read(index);
+		res = svga_device::gc_reg_read(index);
 	else
 	{
 		switch(index)
@@ -768,10 +768,10 @@ uint8_t trident_vga_device::trident_gc_reg_read(uint8_t index)
 	return res;
 }
 
-void trident_vga_device::trident_gc_reg_write(uint8_t index, uint8_t data)
+void trident_vga_device::gc_reg_write(uint8_t index, uint8_t data)
 {
 	if(index <= 0x0d)
-		gc_reg_write(index,data);
+		svga_device::gc_reg_write(index,data);
 	else
 	{
 		LOG("Trident GC%02X: write %02x\n",index,data);
@@ -807,7 +807,7 @@ uint8_t trident_vga_device::port_03c0_r(offs_t offset)
 	switch(offset)
 	{
 		case 0x05:
-			res = trident_seq_reg_read(vga.sequencer.index);
+			res = trident_vga_device::seq_reg_read(vga.sequencer.index);
 			break;
 		case 0x06:
 			tri.dac_count++;
@@ -826,7 +826,7 @@ uint8_t trident_vga_device::port_03c0_r(offs_t offset)
 			res = vga_device::port_03c0_r(offset);
 			break;
 		case 0x0f:
-			res = trident_gc_reg_read(vga.gc.index);
+			res = trident_vga_device::gc_reg_read(vga.gc.index);
 			break;
 		default:
 			res = vga_device::port_03c0_r(offset);
@@ -841,7 +841,7 @@ void trident_vga_device::port_03c0_w(offs_t offset, uint8_t data)
 	switch(offset)
 	{
 		case 0x05:
-			trident_seq_reg_write(vga.sequencer.index,data);
+			trident_vga_device::seq_reg_write(vga.sequencer.index,data);
 			break;
 		case 0x06:
 			if(tri.dac_active)
@@ -862,7 +862,7 @@ void trident_vga_device::port_03c0_w(offs_t offset, uint8_t data)
 			vga_device::port_03c0_w(offset,data);
 			break;
 		case 0x0f:
-			trident_gc_reg_write(vga.gc.index,data);
+			trident_vga_device::gc_reg_write(vga.gc.index,data);
 			break;
 		default:
 			vga_device::port_03c0_w(offset,data);
@@ -880,7 +880,7 @@ uint8_t trident_vga_device::port_03d0_r(offs_t offset)
 		switch(offset)
 		{
 			case 5:
-				res = trident_crtc_reg_read(vga.crtc.index);
+				res = trident_vga_device::crtc_reg_read(vga.crtc.index);
 				break;
 			case 8:
 				if(tri.gc0f & 0x04)  // if enabled
@@ -919,7 +919,7 @@ void trident_vga_device::port_03d0_w(offs_t offset, uint8_t data)
 		{
 			case 5:
 				vga.crtc.data[vga.crtc.index] = data;
-				trident_crtc_reg_write(vga.crtc.index,data);
+				trident_vga_device::crtc_reg_write(vga.crtc.index,data);
 				break;
 			case 8:
 				if(tri.gc0f & 0x04)  // if enabled
