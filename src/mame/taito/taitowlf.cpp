@@ -141,7 +141,8 @@ void p5txla_state::p5txla(machine_config &config)
 //	maincpu.smiact().set("pci:00.0", FUNC(i82439tx_host_device::smi_act_w));
 
 	PCI_ROOT(config, "pci", 0);
-	I82439TX(config, "pci:00.0", 0, "maincpu", 256*1024*1024);
+    // 64MB for Taito Wolf HW, to be checked for base p5txla
+	I82439TX(config, "pci:00.0", 0, "maincpu", 64*1024*1024);
 
 	i82371sb_isa_device &isa(I82371SB_ISA(config, "pci:07.0", 0, "maincpu"));
 	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
