@@ -857,6 +857,7 @@ public:
 	void ns10_taiko4(machine_config &config);
 	void ns10_taiko5(machine_config &config);
 	void ns10_taiko6(machine_config &config);
+	void ns10_taikort(machine_config &config);
 
 	void memn_driver_init();
 
@@ -2569,6 +2570,36 @@ void namcos10_memn_state::ns10_taiko6(machine_config &config)
 	});
 }
 
+void namcos10_memn_state::ns10_taikort(machine_config &config)
+{
+	namcos10_memn_base(config);
+	namcos10_exio(config);
+	namcos10_nand_k9f2808u0b(config, 3);
+
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xc, 0xf, 0xd, 0x8, 0xb, 0xa, 0x9, 0x5, 0x7, 0x4, 0x6, 0x2, 0x3, 0x0, 0x1); };
+
+	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
+		{
+			0x0000000014020804ULL, 0x000000000000c080ULL, 0x0000000080140400ULL, 0x0000000030102218ULL,
+			0x0000704018840801ULL, 0x0000000000002210ULL, 0x00008c0102000080ULL, 0x0000000000846000ULL,
+			0x00000000b1120202ULL, 0x0000000000001000ULL, 0x0000000000000640ULL, 0x00000000000040a0ULL,
+			0x0000000090009200ULL, 0x0000000000000908ULL, 0x000000000c0c0000ULL, 0x0000201810000000ULL
+		}, {
+			0x0000000010060824ULL, 0x000000000000e000ULL, 0x0000000080570000ULL, 0x0000000038382210ULL,
+			0x0000404011800001ULL, 0x0000000000002600ULL, 0x00001600b0080288ULL, 0x0000000000944000ULL,
+			0x00000000393a0280ULL, 0x0000000000001820ULL, 0x0000000000008440ULL, 0x00000000000000a0ULL,
+			0x0000000098619241ULL, 0x0000000000004808ULL, 0x000000000f201040ULL, 0x0000a0d290820001ULL
+		},
+		0x0000,
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+			return ((((previous_plainwords >> 25) & (gf2_reduce(previous_cipherwords & 0x40a000000001ULL) ^ gf2_reduce(previous_plainwords & 0xa000200001ULL))) ^
+					((previous_plainwords >> 27) & (gf2_reduce(previous_cipherwords & 0x2400440ULL) ^ gf2_reduce(previous_plainwords & 0x80400440ULL))) ^
+					((previous_cipherwords >> 19) & (gf2_reduce(previous_cipherwords & 0x18000201ULL) ^ gf2_reduce(previous_plainwords & 0x10000201ULL))) ^
+					((previous_cipherwords ^ previous_plainwords ^ (previous_cipherwords >> 27) ^ (previous_plainwords >> 21)) & ((previous_cipherwords^previous_plainwords) >> 6 ^ (previous_cipherwords^previous_plainwords) >> 26)) ) & 1) * 0x4010;
+		}
+	});
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // MEM(P3)
 
@@ -3773,6 +3804,27 @@ ROM_START( taiko6 )
 	DISK_IMAGE_READONLY( "tk-6", 0, SHA1(ca8b8dfccc2022094c428b5e0b6391a77ec351f4) )
 ROM_END
 
+ROM_START( taikort )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "tkn1vera_0.8e", 0x0000000, 0x1080000, CRC(8d4a0234) SHA1(25128ba304a4f89e83720912b756854d370e8af3) )
+
+	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
+	ROM_LOAD( "tkn1vera_1.8d", 0x0000000, 0x1080000, CRC(66ac3551) SHA1(91b5af4c9ce0e1e9da0435d31d055eea41cde04d) )
+
+	ROM_REGION32_LE( 0x1080000, "nand2", 0 )
+	ROM_LOAD( "tkn1vera_2.7e", 0x0000000, 0x1080000, CRC(ac0b5f03) SHA1(f617a5bf4589edef8e1cef527dd0308be1ca9a46) )
+
+	// This is a recreated CD image using UltraISO based on the loose files from the CD since a proper image wasn't
+	// made in the past when the dumper had the chance.
+	// All 20 songs have been tested in-game to make sure the provided data actually works.
+	// A proper image of the TK-N CD must be made if there is ever a chance.
+	DISK_REGION( "ata:0:cdrom" )
+	DISK_IMAGE_READONLY( "tk-n", 0, BAD_DUMP SHA1(3987d163a47dd8616b7c15dbbbaea75f0762cce3) )
+ROM_END
+
 
 // MEM(P3)
 ROM_START( g13jnr )
@@ -3914,6 +3966,7 @@ GAME( 2002, taiko3,    0,        ns10_taiko3,    taiko,        namcos10_memn_sta
 GAME( 2002, taiko4,    0,        ns10_taiko4,    taiko,        namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Taiko no Tatsujin 4 (Japan, TK41 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME( 2003, taiko5,    0,        ns10_taiko5,    taiko,        namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Taiko no Tatsujin 5 (Japan, TK51 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME( 2004, taiko6,    0,        ns10_taiko6,    taiko,        namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Taiko no Tatsujin 6 (Japan, TK61 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2004, taikort,   0,        ns10_taikort,   taiko,        namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Taiko no Tatsujin RT: Nippon no Kokoro (Japan, TKN1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // MEM(P3)
 GAME( 2001, g13jnr,    0,        ns10_g13jnr,    g13jnr,       namcos10_memp3_state, memn_driver_init, ROT0, "Eighting / Raizing / Namco", "Golgo 13: Juusei no Requiem (Japan, GLT1 VER.A)", MACHINE_IMPERFECT_SOUND )

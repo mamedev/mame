@@ -32547,6 +32547,7 @@ taiko3                          // 2002.03 Taiko no Tatsujin 3 (Japan, TK31 Ver.
 taiko4                          // 2002.12 Taiko no Tatsujin 4 (Japan, TK41 Ver.A)
 taiko5                          // 2003.10 Taiko no Tatsujin 5 (Japan, TK51 Ver.A)
 taiko6                          // 2004.07 Taiko no Tatsujin 6 (Japan, TK61 Ver.A)
+taikort                         // 2004.11 Taiko no Tatsujin RT: Nippon no Kokoro (Japan, TKN1 Ver.A)
 
 @source:namco/namcos11.cpp
 danceyes                        // 1996.09 Dancing Eyes (World, DC2/VER.B)
