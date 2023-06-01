@@ -5,7 +5,8 @@
  * Cirrus Logic CL-GD542x/3x video chipsets
  *
  * TODO:
- * - Original Acumos AVGA1/2 chipsets (Cirrus Logic eventually bought Acumos and rebranded)
+ * - Original Acumos AVGA1/2 chipsets (Cirrus Logic eventually bought Acumos and rebranded);
+ * - Fix or implement hidden DAC modes (15bpp + mixed, true color, others);
  *
  */
 
@@ -17,8 +18,10 @@
 
 #define LOG_REG  (1U << 1)
 #define LOG_BLIT (1U << 2)
+#define LOG_HDAC (1U << 3) // log hidden DAC
 
-#define VERBOSE (LOG_GENERAL)
+#define VERBOSE (LOG_GENERAL | LOG_HDAC)
+#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 // TODO: remove these macros
@@ -92,6 +95,8 @@ void cirrus_gd5428_device::device_start()
 	save_pointer(vga.sequencer.data,"Sequencer Registers",0x100);
 	save_pointer(vga.attribute.data,"Attribute Registers", 0x15);
 	save_item(NAME(m_chip_id));
+	save_item(NAME(m_hidden_dac_phase));
+	save_item(NAME(m_hidden_dac_mode));
 
 	m_vblank_timer = timer_alloc(FUNC(vga_device::vblank_timer_cb), this);
 
@@ -132,6 +137,8 @@ void cirrus_gd5428_device::device_reset()
 	memset(m_ext_palette, 0, sizeof(m_ext_palette));
 	m_ext_palette_enabled = false;
 	m_blt_system_transfer = false;
+	m_hidden_dac_phase = 0;
+	m_hidden_dac_mode = 0;
 }
 
 uint32_t cirrus_gd5428_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -233,12 +240,54 @@ void cirrus_gd5428_device::cirrus_define_video_mode()
 
 	if (!gc_locked && (vga.sequencer.data[0x07] & 0x01))
 	{
+		svga.rgb8_en = svga.rgb15_en = svga.rgb16_en = svga.rgb24_en = 0;
+
+		if (BIT(m_hidden_dac_mode, 7))
+		{
+			// TODO: needs subclassing, not all chips have these modes
+			if (BIT(m_hidden_dac_mode, 4))
+				popmessage("Cirrus: Unsupported mixed 5-5-5 / 8bpp mode selected");
+			switch(m_hidden_dac_mode & 0x4f)
+			{
+				case 0x00:
+				case 0x40:
+					// 5-5-5 Sierra
+					svga.rgb15_en = 1;
+					break;
+				case 0x41:
+					svga.rgb16_en = 1;
+					break;
+				case 0x43: // CCIR601 YUV422 16-bit
+				case 0x44: // YUV411 8-bit
+				case 0x4a: // 16bpp + YUV422 overlay
+				case 0x4b: // 16bpp + YUV411 overlay
+					popmessage("Cirrus: CL-GD545 YUV mode selected %02x", m_hidden_dac_mode);
+					break;
+				case 0x45:
+					svga.rgb24_en = 1;
+					break;
+				case 0x46:
+				case 0x47:
+					popmessage("Cirrus: CL-GD545+ DAC power down selected %02x", m_hidden_dac_mode);
+					break;
+				case 0x48:
+					popmessage("Cirrus: CL-GD545+ 8-bit grayscale selected");
+					break;
+				case 0x49:
+					svga.rgb8_en = 1;
+					break;
+				default:
+					popmessage("Cirrus: reserved mode selected %02x", m_hidden_dac_mode);
+					break;
+			}
+		}
+
 		switch(vga.sequencer.data[0x07] & 0x06)  // bit 3 is reserved on GD542x
 		{
-			case 0x00:  svga.rgb8_en = 1; break;
-			case 0x02:  svga.rgb16_en = 1; clock /= 2; break;  // Clock / 2 for 16-bit data
-			case 0x04:  svga.rgb24_en = 1; clock /= 3; break; // Clock / 3 for 24-bit data
-			case 0x06:  svga.rgb16_en = 1; divisor = 2; break; // Clock rate for 16-bit data
+			case 0x00:  break;
+			case 0x02:  clock /= 2; break;  // Clock / 2 for 16-bit data
+			case 0x04:  clock /= 3; break; // Clock / 3 for 24-bit data
+			case 0x06:  divisor = 2; break; // Clock rate for 16-bit data
 		}
 	}
 	recompute_params_clock(divisor, (int)clock);
@@ -934,6 +983,19 @@ uint8_t cirrus_gd5428_device::port_03c0_r(offs_t offset)
 		case 0x05:
 			res = cirrus_gd5428_device::seq_reg_read(vga.sequencer.index);
 			break;
+		case 0x06:
+			m_hidden_dac_phase ++;
+			if (m_hidden_dac_phase >= 4)
+			{
+				// TODO: '5420 doesn't have this
+				// TODO: '5428 reads do not lock the Hidden DAC
+				res = m_hidden_dac_mode;
+				//m_hidden_dac_phase = 0;
+				LOGMASKED(LOG_HDAC, "CL: Hidden DAC read (%02x)\n", res);
+			}
+			else
+				res = vga_device::port_03c0_r(offset);
+			break;
 		case 0x09:
 			if(!m_ext_palette_enabled)
 				res = vga_device::port_03c0_r(offset);
@@ -979,6 +1041,21 @@ void cirrus_gd5428_device::port_03c0_w(offs_t offset, uint8_t data)
 	{
 		case 0x05:
 			cirrus_gd5428_device::seq_reg_write(vga.sequencer.index,data);
+			break;
+		case 0x06:
+			if (m_hidden_dac_phase >= 4)
+			{
+				// TODO: '5420 doesn't have this
+				// TODO: '5428 reads do not lock the Hidden DAC
+				m_hidden_dac_mode = data;
+				m_hidden_dac_phase = 0;
+				LOGMASKED(LOG_HDAC, "CL: Hidden DAC write %02x\n", data);
+			}
+			else
+			{
+				m_hidden_dac_phase = 0;
+				vga_device::port_03c0_w(offset, data);
+			}
 			break;
 		case 0x09:
 			if(!m_ext_palette_enabled)
@@ -1204,7 +1281,9 @@ uint8_t cirrus_gd5428_device::mem_r(offs_t offset)
 	else  // 4kB bank granularity
 		addr = bank * 0x1000;
 
-	// Is the display address adjusted automatically when not using Chain-4 addressing?  The GD542x BIOS doesn't do it, but Virtual Pool expects it.
+	// Is the display address adjusted automatically when not using Chain-4 addressing?
+	// The GD542x BIOS doesn't do it, but Virtual Pool expects it.
+
 	if(!(vga.sequencer.data[4] & 0x8))
 		addr <<= 2;
 

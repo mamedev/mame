@@ -957,24 +957,6 @@ void vga_device::crtc_reg_write(uint8_t index, uint8_t data)
 	}
 }
 
-void vga_device::seq_reg_write(uint8_t index, uint8_t data)
-{
-	switch(index)
-	{
-		case 0x02:
-			vga.sequencer.map_mask = data & 0xf;
-			break;
-		case 0x03:
-			/* --2- 84-- character select A
-			   ---2 --84 character select B */
-			vga.sequencer.char_sel.A = (((data & 0xc) >> 2)<<1) | ((data & 0x20) >> 5);
-			vga.sequencer.char_sel.B = (((data & 0x3) >> 0)<<1) | ((data & 0x10) >> 4);
-			if(data)
-				popmessage("Char SEL checker, contact MAMEdev (%02x %02x)\n",vga.sequencer.char_sel.A,vga.sequencer.char_sel.B);
-			break;
-	}
-}
-
 uint8_t vga_device::vga_vblank()
 {
 	uint8_t res;
@@ -1142,8 +1124,27 @@ uint8_t vga_device::gc_reg_read(uint8_t index)
 
 uint8_t vga_device::seq_reg_read(uint8_t index)
 {
-	LOG( "Reading unmapped sequencer read register %02x (SVGA?)\n", index);
-	return 0;
+	const u8 res = vga.sequencer.data[vga.sequencer.index];
+	LOG("Reading unmapped sequencer read register [%02x] -> %02x (SVGA?)\n", index, res);
+	return res;
+}
+
+void vga_device::seq_reg_write(uint8_t index, uint8_t data)
+{
+	switch(index)
+	{
+		case 0x02:
+			vga.sequencer.map_mask = data & 0xf;
+			break;
+		case 0x03:
+			/* --2- 84-- character select A
+			   ---2 --84 character select B */
+			vga.sequencer.char_sel.A = (((data & 0xc) >> 2)<<1) | ((data & 0x20) >> 5);
+			vga.sequencer.char_sel.B = (((data & 0x3) >> 0)<<1) | ((data & 0x10) >> 4);
+			if(data)
+				popmessage("Char SEL checker, contact MAMEdev (%02x %02x)\n",vga.sequencer.char_sel.A,vga.sequencer.char_sel.B);
+			break;
+	}
 }
 
 /*
@@ -1221,10 +1222,7 @@ uint8_t vga_device::port_03c0_r(offs_t offset)
 			break;
 
 		case 5:
-			if (vga.sequencer.index < vga.svga_intf.seq_regcount)
-				data = vga.sequencer.data[vga.sequencer.index];
-			else
-				data = seq_reg_read(vga.sequencer.index);
+			data = seq_reg_read(vga.sequencer.index);
 			break;
 
 		case 6:

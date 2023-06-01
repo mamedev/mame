@@ -37,6 +37,8 @@ protected:
 	virtual void device_reset() override;
 	virtual uint16_t offset() override;
 
+	u8 m_hidden_dac_mode = 0;
+	u8 m_hidden_dac_phase = 0;
 	uint8_t m_chip_id;
 
 	uint8_t gc_mode_ext;
