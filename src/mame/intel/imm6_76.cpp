@@ -121,12 +121,12 @@ u8 intel_imm6_76_device::do_r() const
 	}
 }
 
-DECLARE_WRITE_LINE_MEMBER(intel_imm6_76_device::data_out_enable)
+void intel_imm6_76_device::data_out_enable(int state)
 {
 	m_do_enable = bool(state);
 }
 
-DECLARE_WRITE_LINE_MEMBER(intel_imm6_76_device::data_in_positive)
+void intel_imm6_76_device::data_in_positive(int state)
 {
 	if (bool(state) != m_di_pos)
 	{
@@ -136,12 +136,12 @@ DECLARE_WRITE_LINE_MEMBER(intel_imm6_76_device::data_in_positive)
 	}
 }
 
-DECLARE_WRITE_LINE_MEMBER(intel_imm6_76_device::data_out_positive)
+void intel_imm6_76_device::data_out_positive(int state)
 {
 	m_do_pos = !bool(state);
 }
 
-WRITE_LINE_MEMBER(intel_imm6_76_device::r_w)
+void intel_imm6_76_device::r_w(int state)
 {
 	if (!m_r_w && !bool(state) && !m_cycle)
 	{
@@ -154,7 +154,7 @@ WRITE_LINE_MEMBER(intel_imm6_76_device::r_w)
 	m_r_w = !bool(state);
 }
 
-WRITE_LINE_MEMBER(intel_imm6_76_device::r_w_a)
+void intel_imm6_76_device::r_w_a(int state)
 {
 	if (!m_r_w_a && !bool(state) && !m_cycle_a)
 	{
@@ -167,7 +167,7 @@ WRITE_LINE_MEMBER(intel_imm6_76_device::r_w_a)
 	m_r_w_a = !bool(state);
 }
 
-WRITE_LINE_MEMBER(intel_imm6_76_device::prgm_prom_pwr)
+void intel_imm6_76_device::prgm_prom_pwr(int state)
 {
 	if (!bool(state) != m_prgm_pwr)
 	{

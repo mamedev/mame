@@ -30,7 +30,7 @@ public:
 	u8 read();
 	void write(u8 data);
 	u8 status_r();
-	DECLARE_WRITE_LINE_MEMBER( reset_w );
+	void reset_w(int state);
 
 protected:
 	midway_serial_pic_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -70,7 +70,7 @@ public:
 	u8 read();
 	void write(u8 data);
 	u8 status_r();
-	DECLARE_WRITE_LINE_MEMBER(reset_w);
+	void reset_w(int state);
 
 protected:
 	midway_serial_pic_emu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -172,12 +172,12 @@ public:
 	void fifo_w(uint16_t data);
 	void fifo_full_w(uint16_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(fifo_reset_w);
+	void fifo_reset_w(int state);
 	uint16_t fifo_r();
 	uint16_t fifo_status_r(address_space &space);
 
-	DECLARE_WRITE_LINE_MEMBER(ioasic_input_empty);
-	DECLARE_WRITE_LINE_MEMBER(ioasic_output_full);
+	void ioasic_input_empty(int state);
+	void ioasic_output_full(int state);
 
 	uint32_t read(address_space &space, offs_t offset);
 	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

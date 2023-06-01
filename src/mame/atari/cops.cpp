@@ -103,10 +103,10 @@ private:
 	uint8_t io1_lm_r(offs_t offset);
 	void io2_w(offs_t offset, uint8_t data);
 	uint8_t io2_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(dacia_irq);
-	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(ld_w);
-	DECLARE_WRITE_LINE_MEMBER(via1_irq);
-	DECLARE_WRITE_LINE_MEMBER(via2_irq);
+	void dacia_irq(int state);
+	[[maybe_unused]] void ld_w(int state);
+	void via1_irq(int state);
+	void via2_irq(int state);
 	void dacia_receive(uint8_t data);
 	void update_dacia_irq();
 	void dacia_w(offs_t offset, uint8_t data);
@@ -260,7 +260,7 @@ TIMER_CALLBACK_MEMBER(cops_state::ld_timer_callback)
 	}
 }
 
-WRITE_LINE_MEMBER(cops_state::ld_w)
+void cops_state::ld_w(int state)
 {
 	m_lddata <<= 1;
 
@@ -737,7 +737,7 @@ void cops_state::io2_w(offs_t offset, uint8_t data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(cops_state::via1_irq)
+void cops_state::via1_irq(int state)
 {
 	if ( state == ASSERT_LINE )
 	{
@@ -773,7 +773,7 @@ void cops_state::via1_cb1_w(uint8_t data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(cops_state::via2_irq)
+void cops_state::via2_irq(int state)
 {
 	if ( state == ASSERT_LINE )
 	{

@@ -317,7 +317,7 @@ TIMER_CALLBACK_MEMBER(h8_sci_device::sync_tick)
 	// Used only to force system-wide syncs
 }
 
-WRITE_LINE_MEMBER(h8_sci_device::rx_w)
+void h8_sci_device::rx_w(int state)
 {
 	m_rx_value = state;
 	if(V>=2) logerror("rx=%d\n", state);
@@ -325,7 +325,7 @@ WRITE_LINE_MEMBER(h8_sci_device::rx_w)
 		clock_start(CLK_RX);
 }
 
-WRITE_LINE_MEMBER(h8_sci_device::clk_w)
+void h8_sci_device::clk_w(int state)
 {
 	if(m_ext_clock_value != state) {
 		m_ext_clock_value = state;

@@ -61,7 +61,7 @@ protected:
 	void p3_w(u8 data);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	int m_centronics_busy = 0;
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	void write_centronics_busy(int state);
 	required_device<z8_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<cassette_image_device> m_cassette;
@@ -143,7 +143,7 @@ void jtc_state::p2_w(u8 data)
 	m_centronics->write_strobe(BIT(data, 5));
 }
 
-DECLARE_WRITE_LINE_MEMBER( jtc_state::write_centronics_busy )
+void jtc_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }

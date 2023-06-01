@@ -29,8 +29,8 @@ private:
 
 	TILE_GET_INFO_MEMBER(powerins_get_bg_tile_info);
 
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_powerinsa);
+	void screen_vblank(int state);
+	void screen_vblank_powerinsa(int state);
 
 	virtual void video_start() override;
 

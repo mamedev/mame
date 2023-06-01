@@ -68,29 +68,29 @@ private:
 	uint8_t flyboy_custom2_io_r(offs_t offset);
 	uint8_t jumpcoas_custom_io_r(offs_t offset);
 	uint8_t boggy84_custom_io_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(imago_dma_irq_w);
+	void imago_dma_irq_w(int state);
 	void imago_sprites_bank_w(uint8_t data);
 	void imago_sprites_dma_w(offs_t offset, uint8_t data);
 	uint8_t imago_sprites_offset_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
+	void nmi_mask_w(int state);
 	void sound_nmi_mask_w(uint8_t data);
 	void fastfred_videoram_w(offs_t offset, uint8_t data);
 	void fastfred_attributes_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(charbank1_w);
-	DECLARE_WRITE_LINE_MEMBER(charbank2_w);
-	DECLARE_WRITE_LINE_MEMBER(colorbank1_w);
-	DECLARE_WRITE_LINE_MEMBER(colorbank2_w);
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
+	void charbank1_w(int state);
+	void charbank2_w(int state);
+	void colorbank1_w(int state);
+	void colorbank2_w(int state);
+	void flip_screen_x_w(int state);
+	void flip_screen_y_w(int state);
 	void imago_fg_videoram_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(imago_charbank_w);
+	void imago_charbank_w(int state);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(imago_get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(imago_get_tile_info_fg);
 	TILE_GET_INFO_MEMBER(imago_get_tile_info_web);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
 
 	virtual void machine_start() override;

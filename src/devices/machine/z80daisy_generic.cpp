@@ -94,13 +94,13 @@ void z80daisy_generic_device::update_interrupt()
 //  INTERFACE
 //**************************************************************************
 
-WRITE_LINE_MEMBER( z80daisy_generic_device::int_w )
+void z80daisy_generic_device::int_w(int state)
 {
 	m_int = state;
 	update_interrupt();
 }
 
-WRITE_LINE_MEMBER( z80daisy_generic_device::mask_w )
+void z80daisy_generic_device::mask_w(int state)
 {
 	m_mask = state;
 	update_interrupt();

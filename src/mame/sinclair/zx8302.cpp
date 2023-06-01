@@ -529,7 +529,7 @@ void zx8302_device::data_w(uint8_t data)
 //  vsync_w - vertical sync
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( zx8302_device::vsync_w )
+void zx8302_device::vsync_w(int state)
 {
 	if (state)
 	{
@@ -544,7 +544,7 @@ WRITE_LINE_MEMBER( zx8302_device::vsync_w )
 //  comctl_w - IPC COMCTL
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( zx8302_device::comctl_w )
+void zx8302_device::comctl_w(int state)
 {
 	if (LOG) logerror("ZX8302 '%s' COMCTL: %x\n", tag(), state);
 
@@ -562,7 +562,7 @@ WRITE_LINE_MEMBER( zx8302_device::comctl_w )
 // IPC writing comdata to CPU
 //
 
-WRITE_LINE_MEMBER( zx8302_device::comdata_w )
+void zx8302_device::comdata_w(int state)
 {
 	if (LOG) logerror("ZX8302 '%s' COMDATA->CPU(pending): %x\n", tag(), state);
 
@@ -574,7 +574,7 @@ WRITE_LINE_MEMBER( zx8302_device::comdata_w )
 //  extint_w - external interrupt
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( zx8302_device::extint_w )
+void zx8302_device::extint_w(int state)
 {
 	if (LOG) logerror("ZX8302 '%s' EXTINT: %x\n", tag(), state);
 
@@ -584,18 +584,18 @@ WRITE_LINE_MEMBER( zx8302_device::extint_w )
 	}
 }
 
-WRITE_LINE_MEMBER( zx8302_device::write_netin )
+void zx8302_device::write_netin(int state)
 {
 	m_rs232_rx = state;
 	device_serial_interface::rx_w(state);
 }
 
-WRITE_LINE_MEMBER( zx8302_device::write_dtr1 )
+void zx8302_device::write_dtr1(int state)
 {
 	m_dtr1 = state;
 }
 
-WRITE_LINE_MEMBER( zx8302_device::write_cts2 )
+void zx8302_device::write_cts2(int state)
 {
 	m_cts2 = state;
 }

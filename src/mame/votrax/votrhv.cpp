@@ -96,9 +96,9 @@ public:
 	void votrhv(machine_config &config);
 	void hc110(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(reset_counter);
-	DECLARE_WRITE_LINE_MEMBER(key_pressed);
-	DECLARE_WRITE_LINE_MEMBER(pho_done);
+	void reset_counter(int state);
+	void key_pressed(int state);
+	void pho_done(int state);
 
 protected:
 	virtual void machine_start() override;
@@ -442,7 +442,7 @@ void hc120_state::machine_reset()
  Driver specific functions
 ******************************************************************************/
 
-WRITE_LINE_MEMBER( votrhv_state::reset_counter )
+void votrhv_state::reset_counter(int state)
 {
 	if (state == CLEAR_LINE)
 	{
@@ -458,7 +458,7 @@ WRITE_LINE_MEMBER( votrhv_state::reset_counter )
 	}
 }
 
-WRITE_LINE_MEMBER( votrhv_state::key_pressed )
+void votrhv_state::key_pressed(int state)
 {
 	// If we got called here, a key was pressed or released somewhere on the keyboard, and we don't know where.
 	// If, regardless of whether a key was pressed or released, our currently selected column has a non-zero
@@ -467,7 +467,7 @@ WRITE_LINE_MEMBER( votrhv_state::key_pressed )
 	key_check();
 }
 
-WRITE_LINE_MEMBER( votrhv_state::pho_done )
+void votrhv_state::pho_done(int state)
 {
 	bool rising_edge = (!m_latcha_in && (state == ASSERT_LINE));
 	m_latcha_in = (state == ASSERT_LINE);

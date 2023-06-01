@@ -133,7 +133,7 @@ const tiny_rom_entry *econet_e01_device::device_rom_region() const
 //  MC146818_INTERFACE( rtc_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(econet_e01_device::rtc_irq_w)
+void econet_e01_device::rtc_irq_w(int state)
 {
 	m_rtc_irq = state;
 
@@ -145,26 +145,26 @@ WRITE_LINE_MEMBER(econet_e01_device::rtc_irq_w)
 //  mc6854_interface adlc_intf
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( econet_e01_device::adlc_irq_w )
+void econet_e01_device::adlc_irq_w(int state)
 {
 	m_adlc_irq = state;
 
 	update_interrupts();
 }
 
-WRITE_LINE_MEMBER( econet_e01_device::econet_data_w )
+void econet_e01_device::econet_data_w(int state)
 {
 	m_econet->data_w(this, state);
 }
 
-WRITE_LINE_MEMBER(econet_e01_device::via_irq_w)
+void econet_e01_device::via_irq_w(int state)
 {
 	m_via_irq = state;
 
 	update_interrupts();
 }
 
-WRITE_LINE_MEMBER( econet_e01_device::clk_en_w )
+void econet_e01_device::clk_en_w(int state)
 {
 	m_clk_en = state;
 }
@@ -174,21 +174,21 @@ void econet_e01_device::floppy_formats_afs(format_registration &fr)
 	fr.add(FLOPPY_AFS_FORMAT);
 }
 
-WRITE_LINE_MEMBER( econet_e01_device::fdc_irq_w )
+void econet_e01_device::fdc_irq_w(int state)
 {
 	m_fdc_irq = state;
 
 	update_interrupts();
 }
 
-WRITE_LINE_MEMBER( econet_e01_device::fdc_drq_w )
+void econet_e01_device::fdc_drq_w(int state)
 {
 	m_fdc_drq = state;
 
 	update_interrupts();
 }
 
-WRITE_LINE_MEMBER( econet_e01_device::scsi_bsy_w )
+void econet_e01_device::scsi_bsy_w(int state)
 {
 	m_scsi_ctrl_in->write_bit1(state);
 
@@ -198,7 +198,7 @@ WRITE_LINE_MEMBER( econet_e01_device::scsi_bsy_w )
 	}
 }
 
-WRITE_LINE_MEMBER( econet_e01_device::scsi_req_w )
+void econet_e01_device::scsi_req_w(int state)
 {
 	m_scsi_ctrl_in->write_bit5(state);
 

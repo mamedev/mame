@@ -68,10 +68,10 @@ private:
 	void panel_write(offs_t offset, uint8_t data);
 	void external_operation(offs_t offset, uint8_t data);
 	uint8_t interrupt_level();
-	DECLARE_WRITE_LINE_MEMBER( fd_interrupt );
-	DECLARE_WRITE_LINE_MEMBER( asrkey_interrupt );
-	DECLARE_WRITE_LINE_MEMBER( vdtkey_interrupt );
-	DECLARE_WRITE_LINE_MEMBER( line_interrupt );
+	void fd_interrupt(int state);
+	void asrkey_interrupt(int state);
+	void vdtkey_interrupt(int state);
+	void line_interrupt(int state);
 
 	void crumap(address_map &map);
 	void crumap_v(address_map &map);
@@ -148,7 +148,7 @@ void ti990_4_state::reset_int_lines()
 /*
     Callback from the floppy controller.
 */
-WRITE_LINE_MEMBER(ti990_4_state::fd_interrupt)
+void ti990_4_state::fd_interrupt(int state)
 {
 	set_int_line(7, state);
 }
@@ -156,12 +156,12 @@ WRITE_LINE_MEMBER(ti990_4_state::fd_interrupt)
 /*
     Connection to VDT
 */
-WRITE_LINE_MEMBER(ti990_4_state::vdtkey_interrupt)
+void ti990_4_state::vdtkey_interrupt(int state)
 {
 	set_int_line(3, state);
 }
 
-WRITE_LINE_MEMBER(ti990_4_state::line_interrupt)
+void ti990_4_state::line_interrupt(int state)
 {
 	if (m_ckon_state) set_int_line(5, state);
 }
@@ -169,7 +169,7 @@ WRITE_LINE_MEMBER(ti990_4_state::line_interrupt)
 /*
     Callback from the terminal.
 */
-WRITE_LINE_MEMBER(ti990_4_state::asrkey_interrupt)
+void ti990_4_state::asrkey_interrupt(int state)
 {
 	set_int_line(6, state);
 }

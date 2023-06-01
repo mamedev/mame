@@ -34,11 +34,11 @@ public:
 	template <typename... T> void set_maincpu_tag(T &&... args) { m_maincpu.set_tag(std::forward<T>(args)...); }
 	template <typename... T> void set_pci_root_tag(T &&... args) { m_pci_memory.set_tag(std::forward<T>(args)...); }
 
-	DECLARE_WRITE_LINE_MEMBER(cb1_w);
-	DECLARE_WRITE_LINE_MEMBER(cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(scc_irq_w);
+	void cb1_w(int state);
+	void cb2_w(int state);
+	void scc_irq_w(int state);
 
-	template <int bit> DECLARE_WRITE_LINE_MEMBER(set_irq_line);
+	template <int bit> void set_irq_line(int state);
 
 	u32 codec_dma_read(u32 offset);
 	void codec_dma_write(u32 offset, u32 data);
@@ -98,7 +98,7 @@ private:
 	void via_out_b(u8 data);
 	void via_sync();
 	void field_interrupts();
-	DECLARE_WRITE_LINE_MEMBER(via_out_cb2);
+	void via_out_cb2(int state);
 
 	void phases_w(u8 phases);
 	void devsel_w(u8 devsel);

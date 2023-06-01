@@ -122,31 +122,31 @@ void rs232_port_device::device_start()
 	save_item(NAME(m_dce_txc));
 }
 
-WRITE_LINE_MEMBER( rs232_port_device::write_txd )
+void rs232_port_device::write_txd(int state)
 {
 	if (m_dev)
 		m_dev->input_txd(state);
 }
 
-WRITE_LINE_MEMBER( rs232_port_device::write_dtr )
+void rs232_port_device::write_dtr(int state)
 {
 	if (m_dev)
 		m_dev->input_dtr(state);
 }
 
-WRITE_LINE_MEMBER( rs232_port_device::write_rts )
+void rs232_port_device::write_rts(int state)
 {
 	if (m_dev)
 		m_dev->input_rts(state);
 }
 
-WRITE_LINE_MEMBER( rs232_port_device::write_etc )
+void rs232_port_device::write_etc(int state)
 {
 	if (m_dev)
 		m_dev->input_etc(state);
 }
 
-WRITE_LINE_MEMBER( rs232_port_device::write_spds )
+void rs232_port_device::write_spds(int state)
 {
 	if (m_dev)
 		m_dev->input_spds(state);

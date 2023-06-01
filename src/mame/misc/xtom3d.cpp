@@ -316,7 +316,7 @@ private:
 	void xtom3d_map(address_map &map);
 //  void xtom3d_io(address_map &map);
 
-//  DECLARE_WRITE_LINE_MEMBER(vblank_assert);
+//  void vblank_assert(int state);
 
 	static void romdisk_config(device_t *device);
 //  static void cdrom_config(device_t *device);

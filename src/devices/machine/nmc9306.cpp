@@ -186,7 +186,7 @@ bool nmc9306_device::nvram_write(util::write_stream &file)
 //  cs_w - chip select input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( nmc9306_device::cs_w )
+void nmc9306_device::cs_w(int state)
 {
 	if (m_cs != state)
 	{
@@ -254,7 +254,7 @@ WRITE_LINE_MEMBER( nmc9306_device::cs_w )
 //  ck_w - serial clock input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( nmc9306_device::sk_w )
+void nmc9306_device::sk_w(int state)
 {
 	if (!m_cs) return;
 	if (m_sk == state) return;
@@ -408,7 +408,7 @@ WRITE_LINE_MEMBER( nmc9306_device::sk_w )
 //  di_w - serial data input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( nmc9306_device::di_w )
+void nmc9306_device::di_w(int state)
 {
 	m_di = state;
 }
@@ -418,7 +418,7 @@ WRITE_LINE_MEMBER( nmc9306_device::di_w )
 //  do_r - serial data output
 //-------------------------------------------------
 
-READ_LINE_MEMBER( nmc9306_device::do_r )
+int nmc9306_device::do_r()
 {
 	return m_do;
 }

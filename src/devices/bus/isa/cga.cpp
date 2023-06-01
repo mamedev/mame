@@ -692,7 +692,7 @@ MC6845_UPDATE_ROW( isa8_cga_device::cga_gfx_1bpp_update_row )
 }
 
 
-WRITE_LINE_MEMBER( isa8_cga_device::hsync_changed )
+void isa8_cga_device::hsync_changed(int state)
 {
 	m_hsync = state ? 1 : 0;
 	if(state && !m_vsync)
@@ -703,7 +703,7 @@ WRITE_LINE_MEMBER( isa8_cga_device::hsync_changed )
 }
 
 
-WRITE_LINE_MEMBER( isa8_cga_device::vsync_changed )
+void isa8_cga_device::vsync_changed(int state)
 {
 	if ( state )
 	{

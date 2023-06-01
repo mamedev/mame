@@ -90,7 +90,7 @@ private:
 	u8 portb_r();
 	u8 portc_r();
 	void portc_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(centronics_busy_w);
+	void centronics_busy_w(int state);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
@@ -590,7 +590,7 @@ static GFXDECODE_START( gfx_fp1100 )
 	GFXDECODE_ENTRY( "sub_ipl", 0x2400, chars_8x8, 0, 1 )
 GFXDECODE_END
 
-WRITE_LINE_MEMBER( fp1100_state::centronics_busy_w )
+void fp1100_state::centronics_busy_w(int state)
 {
 	m_centronics_busy = state;
 }

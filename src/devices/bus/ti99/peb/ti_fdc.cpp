@@ -79,21 +79,21 @@ void ti_fdc_device::operate_ready_line()
 /*
  * Callbacks from the FD1771 chip
  */
-WRITE_LINE_MEMBER( ti_fdc_device::fdc_irq_w )
+void ti_fdc_device::fdc_irq_w(int state)
 {
 	m_IRQ = state? ASSERT_LINE : CLEAR_LINE;
 	LOGMASKED(LOG_SIGNALS, "INTRQ callback = %d\n", m_IRQ);
 	operate_ready_line();
 }
 
-WRITE_LINE_MEMBER( ti_fdc_device::fdc_drq_w )
+void ti_fdc_device::fdc_drq_w(int state)
 {
 	m_DRQ = state? ASSERT_LINE : CLEAR_LINE;
 	LOGMASKED(LOG_DRQ, "DRQ callback = %d\n", m_DRQ);
 	operate_ready_line();
 }
 
-WRITE_LINE_MEMBER( ti_fdc_device::fdc_hld_w )
+void ti_fdc_device::fdc_hld_w(int state)
 {
 	m_HLD = state? ASSERT_LINE : CLEAR_LINE;
 	LOGMASKED(LOG_SIGNALS, "HLD callback = %d\n", m_HLD);
@@ -230,7 +230,7 @@ void ti_fdc_device::cruwrite(offs_t offset, uint8_t data)
 		m_crulatch->write_bit((offset >> 1) & 0x07, BIT(data, 0));
 }
 
-WRITE_LINE_MEMBER(ti_fdc_device::dskpgena_w)
+void ti_fdc_device::dskpgena_w(int state)
 {
 	// (De)select the card. Indicated by a LED on the board.
 	m_selected = state;
@@ -240,12 +240,12 @@ WRITE_LINE_MEMBER(ti_fdc_device::dskpgena_w)
 /*
     Trigger the motor monoflop.
 */
-WRITE_LINE_MEMBER(ti_fdc_device::kaclk_w)
+void ti_fdc_device::kaclk_w(int state)
 {
 	m_motormf->b_w(state);
 }
 
-WRITE_LINE_MEMBER(ti_fdc_device::dvena_w)
+void ti_fdc_device::dvena_w(int state)
 {
 	m_DVENA = state;
 	LOGMASKED(LOG_MOTOR, "Motor %s\n", state? "on" : "off");
@@ -261,7 +261,7 @@ WRITE_LINE_MEMBER(ti_fdc_device::dvena_w)
 	operate_ready_line();
 }
 
-WRITE_LINE_MEMBER(ti_fdc_device::waiten_w)
+void ti_fdc_device::waiten_w(int state)
 {
 	// Set disk ready/hold (bit 2)
 	// 0: ignore IRQ and DRQ
@@ -271,13 +271,13 @@ WRITE_LINE_MEMBER(ti_fdc_device::waiten_w)
 	LOGMASKED(LOG_CRU, "Arm wait state logic (bit 2) = %d\n", state);
 }
 
-WRITE_LINE_MEMBER(ti_fdc_device::hlt_w)
+void ti_fdc_device::hlt_w(int state)
 {
 	// Load disk heads (HLT pin) (bit 3). Not implemented.
 	LOGMASKED(LOG_CRU, "Set head load (bit 3) = %d\n", state);
 }
 
-WRITE_LINE_MEMBER(ti_fdc_device::sidsel_w)
+void ti_fdc_device::sidsel_w(int state)
 {
 	// Select side of disk (bit 7)
 	LOGMASKED(LOG_CRU, "Set side (bit 7) = %d\n", state);
@@ -287,17 +287,17 @@ WRITE_LINE_MEMBER(ti_fdc_device::sidsel_w)
 /*
     Drive selects
 */
-WRITE_LINE_MEMBER(ti_fdc_device::dsel1_w)
+void ti_fdc_device::dsel1_w(int state)
 {
 	select_drive(1, state);
 }
 
-WRITE_LINE_MEMBER(ti_fdc_device::dsel2_w)
+void ti_fdc_device::dsel2_w(int state)
 {
 	select_drive(2, state);
 }
 
-WRITE_LINE_MEMBER(ti_fdc_device::dsel3_w)
+void ti_fdc_device::dsel3_w(int state)
 {
 	select_drive(3, state);
 }

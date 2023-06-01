@@ -76,8 +76,8 @@ private:
 	u8 data_r();
 	void ctrl_w(u8 data);
 	void data_w(u8 data);
-	DECLARE_READ_LINE_MEMBER(serial_r);
-	DECLARE_WRITE_LINE_MEMBER(serial_w);
+	int serial_r();
+	void serial_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_2_inttimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_2_outtimer);
 	void zac_2_data(address_map &map);
@@ -236,13 +236,13 @@ void zac_2_state::data_w(u8 data)
 // writes to sound card
 }
 
-READ_LINE_MEMBER( zac_2_state::serial_r )
+int zac_2_state::serial_r()
 {
 // from printer
 	return 0;
 }
 
-WRITE_LINE_MEMBER( zac_2_state::serial_w )
+void zac_2_state::serial_w(int state)
 {
 // to printer
 }

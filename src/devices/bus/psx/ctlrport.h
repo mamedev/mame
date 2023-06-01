@@ -89,9 +89,9 @@ public:
 	auto dsr() { return m_dsr_handler.bind(); }
 	auto rxd() { return m_rxd_handler.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(write_sck);
-	DECLARE_WRITE_LINE_MEMBER(write_dtr);
-	DECLARE_WRITE_LINE_MEMBER(write_txd);
+	void write_sck(int state);
+	void write_dtr(int state);
+	void write_txd(int state);
 
 protected:
 	virtual void device_start() override;
@@ -123,13 +123,13 @@ public:
 	void ack() { if(!ack_cb.isnull()) ack_cb(); }
 	void setup_ack_cb(void_cb cb) { ack_cb = cb; }
 
-	DECLARE_WRITE_LINE_MEMBER(tx_w) { m_tx = state; }
-	DECLARE_WRITE_LINE_MEMBER(sel_w) { if(m_dev) m_dev->sel_w(state); m_card->sel_w(state); }
-	DECLARE_WRITE_LINE_MEMBER(clock_w) { if(m_dev) m_dev->clock_w(state); m_card->clock_w(state); }
+	void tx_w(int state) { m_tx = state; }
+	void sel_w(int state) { if(m_dev) m_dev->sel_w(state); m_card->sel_w(state); }
+	void clock_w(int state) { if(m_dev) m_dev->clock_w(state); m_card->clock_w(state); }
 
-	DECLARE_READ_LINE_MEMBER(rx_r) { return (m_dev?m_dev->rx_r():true) && m_card->rx_r(); }
-	DECLARE_READ_LINE_MEMBER(ack_r) { return (m_dev?m_dev->ack_r():true) && m_card->ack_r(); }
-	DECLARE_READ_LINE_MEMBER(tx_r) { return m_tx; }
+	int rx_r() { return (m_dev?m_dev->rx_r():true) && m_card->rx_r(); }
+	int ack_r() { return (m_dev?m_dev->ack_r():true) && m_card->ack_r(); }
+	int tx_r() { return m_tx; }
 
 	void disable_card(bool status);
 

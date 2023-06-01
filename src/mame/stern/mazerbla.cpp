@@ -168,7 +168,7 @@ private:
 	void gg_led_ctrl_w(uint8_t data);
 	void mazerbla_palette(palette_device &palette);
 	uint32_t screen_update_mazerbla(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
 	TIMER_CALLBACK_MEMBER(deferred_ls670_0_w);
 	TIMER_CALLBACK_MEMBER(deferred_ls670_1_w);
@@ -260,7 +260,7 @@ uint32_t mazerbla_state::screen_update_mazerbla(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-WRITE_LINE_MEMBER(mazerbla_state::screen_vblank)
+void mazerbla_state::screen_vblank(int state)
 {
 	if (state)
 	{

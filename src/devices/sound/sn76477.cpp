@@ -950,7 +950,7 @@ inline uint32_t sn76477_device::generate_next_real_noise_bit()
  *
  *****************************************************************************/
 
-WRITE_LINE_MEMBER(sn76477_device::enable_w)
+void sn76477_device::enable_w(int state)
 {
 	CHECK_BOOLEAN;
 
@@ -982,7 +982,7 @@ WRITE_LINE_MEMBER(sn76477_device::enable_w)
  *
  *****************************************************************************/
 
-WRITE_LINE_MEMBER( sn76477_device::mixer_a_w )
+void sn76477_device::mixer_a_w(int state)
 {
 	CHECK_BOOLEAN;
 
@@ -996,7 +996,7 @@ WRITE_LINE_MEMBER( sn76477_device::mixer_a_w )
 	}
 }
 
-WRITE_LINE_MEMBER( sn76477_device::mixer_b_w )
+void sn76477_device::mixer_b_w(int state)
 {
 	CHECK_BOOLEAN;
 
@@ -1010,7 +1010,7 @@ WRITE_LINE_MEMBER( sn76477_device::mixer_b_w )
 	}
 }
 
-WRITE_LINE_MEMBER( sn76477_device::mixer_c_w )
+void sn76477_device::mixer_c_w(int state)
 {
 	CHECK_BOOLEAN;
 
@@ -1030,7 +1030,7 @@ WRITE_LINE_MEMBER( sn76477_device::mixer_c_w )
  *
  *****************************************************************************/
 
-WRITE_LINE_MEMBER( sn76477_device::envelope_1_w )
+void sn76477_device::envelope_1_w(int state)
 {
 	CHECK_BOOLEAN;
 
@@ -1044,7 +1044,7 @@ WRITE_LINE_MEMBER( sn76477_device::envelope_1_w )
 	}
 }
 
-WRITE_LINE_MEMBER( sn76477_device::envelope_2_w )
+void sn76477_device::envelope_2_w(int state)
 {
 	CHECK_BOOLEAN;
 
@@ -1064,7 +1064,7 @@ WRITE_LINE_MEMBER( sn76477_device::envelope_2_w )
  *
  *****************************************************************************/
 
-WRITE_LINE_MEMBER( sn76477_device::vco_w )
+void sn76477_device::vco_w(int state)
 {
 	CHECK_BOOLEAN;
 
@@ -1362,7 +1362,7 @@ void sn76477_device::pitch_voltage_w(double data)
  *
  *****************************************************************************/
 
-WRITE_LINE_MEMBER( sn76477_device::noise_clock_w )
+void sn76477_device::noise_clock_w(int state)
 {
 	CHECK_BOOLEAN;
 

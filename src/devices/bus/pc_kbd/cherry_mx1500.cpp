@@ -241,7 +241,7 @@ ioport_constructor cherry_g80_1500_device::device_input_ports() const
 }
 
 
-WRITE_LINE_MEMBER(cherry_g80_1500_device::data_write)
+void cherry_g80_1500_device::data_write(int state)
 {
 	m_mcu->set_input_line(MCS51_INT1_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }

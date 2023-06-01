@@ -186,24 +186,24 @@ uint8_t thepit_state::intrepid_colorram_mirror_r(offs_t offset)
 	return m_colorram[offset];
 }
 
-WRITE_LINE_MEMBER(thepit_state::coin_lockout_w)
+void thepit_state::coin_lockout_w(int state)
 {
 	machine().bookkeeping().coin_lockout_w(0, !state);
 }
 
-WRITE_LINE_MEMBER(thepit_state::sound_enable_w)
+void thepit_state::sound_enable_w(int state)
 {
 	machine().sound().system_mute(!state);
 }
 
-WRITE_LINE_MEMBER(thepit_state::nmi_mask_w)
+void thepit_state::nmi_mask_w(int state)
 {
 	m_nmi_mask = state;
 	if (!m_nmi_mask)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(thepit_state::vblank_w)
+void thepit_state::vblank_w(int state)
 {
 	if (state)
 	{

@@ -75,7 +75,7 @@ private:
 	void disc_w(uint8_t data);
 	void status_callback(uint8_t data);
 	void ramdisk_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(speaker_w);
+	void speaker_w(int state);
 	void machine_start() override;
 	void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

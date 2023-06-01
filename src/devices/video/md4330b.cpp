@@ -80,7 +80,7 @@ void md4330b_device::update_output()
 	m_write_q(0, out);
 }
 
-WRITE_LINE_MEMBER(md4330b_device::clk_w)
+void md4330b_device::clk_w(int state)
 {
 	state = (state) ? 1 : 0;
 

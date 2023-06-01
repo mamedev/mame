@@ -92,14 +92,14 @@ private:
 	uint8_t m_firq_old_data_b = 0;
 	uint8_t m_i8039_status = 0;
 
-	DECLARE_WRITE_LINE_MEMBER(cpua_irq_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(cpub_irq_enable_w);
+	void cpua_irq_enable_w(int state);
+	void cpub_irq_enable_w(int state);
 	void cpua_irqtrigger_w(uint8_t data);
 	void cpub_irqtrigger_w(uint8_t data);
 	void i8039_irqtrigger_w(uint8_t data);
 	void i8039_irqen_and_status_w(uint8_t data);
 	void z80_irqtrigger_w(uint8_t data);
-	template <uint8_t Which> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
+	template <uint8_t Which> void coin_counter_w(int state);
 	void vram_w(offs_t offset, uint8_t data);
 	void cram_w(offs_t offset, uint8_t data);
 	void scrolly_w(uint8_t data);
@@ -108,7 +108,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* sr);
 
 	void i8039_io_map(address_map &map);
@@ -283,7 +283,7 @@ uint32_t pandoras_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 // machine
 
-WRITE_LINE_MEMBER(pandoras_state::vblank_irq)
+void pandoras_state::vblank_irq(int state)
 {
 	if (state && m_irq_enable_a)
 		m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
@@ -291,14 +291,14 @@ WRITE_LINE_MEMBER(pandoras_state::vblank_irq)
 		m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(pandoras_state::cpua_irq_enable_w)
+void pandoras_state::cpua_irq_enable_w(int state)
 {
 	if (!state)
 		m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 	m_irq_enable_a = state;
 }
 
-WRITE_LINE_MEMBER(pandoras_state::cpub_irq_enable_w)
+void pandoras_state::cpub_irq_enable_w(int state)
 {
 	if (!state)
 		m_subcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
@@ -342,7 +342,7 @@ void pandoras_state::z80_irqtrigger_w(uint8_t data)
 }
 
 template <uint8_t Which>
-WRITE_LINE_MEMBER(pandoras_state::coin_counter_w)
+void pandoras_state::coin_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(Which, state);
 }

@@ -486,7 +486,7 @@ void vme_fccpu20_device::bootvect_w(offs_t offset, uint32_t data, uint32_t mem_m
 	m_sysrom = &m_sysram[0]; // redirect all upcoming accesses to masking RAM until reset.
 }
 
-WRITE_LINE_MEMBER(vme_fccpu20_device::bim_irq_callback)
+void vme_fccpu20_device::bim_irq_callback(int state)
 {
 	LOGINT("vme_fccpu20_device::bim_irq_callback(%02x)\n", state);
 

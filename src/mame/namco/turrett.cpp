@@ -157,13 +157,13 @@ INPUT_PORTS_END
  *
  *************************************/
 
-READ_LINE_MEMBER( turrett_state::sbrc2_r )
+int turrett_state::sbrc2_r()
 {
 	return m_screen->vblank();
 }
 
 
-READ_LINE_MEMBER( turrett_state::sbrc3_r )
+int turrett_state::sbrc3_r()
 {
 	return m_dma_idle;
 }

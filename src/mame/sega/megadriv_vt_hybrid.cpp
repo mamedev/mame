@@ -44,7 +44,7 @@ private:
 	required_region_ptr<uint16_t> m_rom;
 
 	uint32_t screen_update_hybrid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_hybrid);
+	void screen_vblank_hybrid(int state);
 
 	void megadriv_vt0203_map(address_map &map);
 };
@@ -116,7 +116,7 @@ uint32_t megadriv_vt0203_state::screen_update_hybrid(screen_device &screen, bitm
 	return 0;
 }
 
-WRITE_LINE_MEMBER(megadriv_vt0203_state::screen_vblank_hybrid)
+void megadriv_vt0203_state::screen_vblank_hybrid(int state)
 {
 	if (m_md_is_running)
 	{

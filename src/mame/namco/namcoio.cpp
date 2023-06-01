@@ -496,7 +496,7 @@ void namcoio_device::write(offs_t offset, uint8_t data)
 	m_ram[offset] = data;
 }
 
-WRITE_LINE_MEMBER( namcoio_device::set_reset_line )
+void namcoio_device::set_reset_line(int state)
 {
 	m_reset = (state == ASSERT_LINE) ? 1 : 0;
 	if (state != CLEAR_LINE)
@@ -513,7 +513,7 @@ WRITE_LINE_MEMBER( namcoio_device::set_reset_line )
 	}
 }
 
-READ_LINE_MEMBER( namcoio_device::read_reset_line )
+int namcoio_device::read_reset_line()
 {
 	return m_reset;
 }

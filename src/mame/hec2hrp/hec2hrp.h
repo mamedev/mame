@@ -170,8 +170,8 @@ private:
 	uint32_t screen_update_hec2hrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(cassette_clock);
 
-	DECLARE_WRITE_LINE_MEMBER( disc2_fdc_interrupt );
-	DECLARE_WRITE_LINE_MEMBER( disc2_fdc_dma_irq );
+	void disc2_fdc_interrupt(int state);
+	void disc2_fdc_dma_irq(int state);
 
 	void update_state(int Adresse, int Value );
 	void init_sn76477();

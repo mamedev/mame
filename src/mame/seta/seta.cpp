@@ -1595,7 +1595,7 @@ void seta_state::timer_regs_w(offs_t offset, u16 data)
 
 */
 
-WRITE_LINE_MEMBER(seta_state::pit_out0)
+void seta_state::pit_out0(int state)
 {
 	if (state)
 		m_maincpu->set_input_line(4, ASSERT_LINE);
@@ -1680,7 +1680,7 @@ u8 downtown_state::dsw2_r()
  Sprites Buffering
 
 */
-WRITE_LINE_MEMBER(seta_state::screen_vblank_seta_buffer_sprites)
+void seta_state::screen_vblank_seta_buffer_sprites(int state)
 {
 	// rising edge
 	if (state)

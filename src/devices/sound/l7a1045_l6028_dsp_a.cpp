@@ -393,7 +393,7 @@ void l7a1045_sound_device::sound_status_w(uint16_t data)
 }
 
 // TODO: stub functions not really used
-WRITE_LINE_MEMBER(l7a1045_sound_device::dma_hreq_cb)
+void l7a1045_sound_device::dma_hreq_cb(int state)
 {
 //  m_maincpu->hack_w(1);
 }

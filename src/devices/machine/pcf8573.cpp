@@ -123,7 +123,7 @@ void pcf8573_device::rtc_clock_updated(int year, int month, int day, int day_of_
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-WRITE_LINE_MEMBER(pcf8573_device::a0_w)
+void pcf8573_device::a0_w(int state)
 {
 	state &= 1;
 	if (BIT(m_slave_address, 1) != state)
@@ -133,7 +133,7 @@ WRITE_LINE_MEMBER(pcf8573_device::a0_w)
 	}
 }
 
-WRITE_LINE_MEMBER(pcf8573_device::a1_w)
+void pcf8573_device::a1_w(int state)
 {
 	state &= 1;
 	if (BIT(m_slave_address, 2) != state)
@@ -143,7 +143,7 @@ WRITE_LINE_MEMBER(pcf8573_device::a1_w)
 	}
 }
 
-WRITE_LINE_MEMBER(pcf8573_device::scl_w)
+void pcf8573_device::scl_w(int state)
 {
 	if (m_scl != state)
 	{
@@ -323,7 +323,7 @@ WRITE_LINE_MEMBER(pcf8573_device::scl_w)
 	}
 }
 
-WRITE_LINE_MEMBER(pcf8573_device::sda_w)
+void pcf8573_device::sda_w(int state)
 {
 	state &= 1;
 	if (m_sdaw != state)
@@ -350,7 +350,7 @@ WRITE_LINE_MEMBER(pcf8573_device::sda_w)
 	}
 }
 
-READ_LINE_MEMBER(pcf8573_device::sda_r)
+int pcf8573_device::sda_r()
 {
 	int res = m_sdar & 1;
 

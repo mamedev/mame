@@ -2306,7 +2306,7 @@ void z80sio_channel::queue_received(uint16_t data, uint32_t error)
 //-------------------------------------------------
 //  cts_w - clear to send handler
 //-------------------------------------------------
-WRITE_LINE_MEMBER( z80sio_channel::cts_w )
+void z80sio_channel::cts_w(int state)
 {
 	if (bool(m_cts) != bool(state))
 	{
@@ -2324,7 +2324,7 @@ WRITE_LINE_MEMBER( z80sio_channel::cts_w )
 //-------------------------------------------------
 //  dcd_w - data carrier detected handler
 //-------------------------------------------------
-WRITE_LINE_MEMBER( z80sio_channel::dcd_w )
+void z80sio_channel::dcd_w(int state)
 {
 	if (bool(m_dcd) != bool(state))
 	{
@@ -2344,7 +2344,7 @@ WRITE_LINE_MEMBER( z80sio_channel::dcd_w )
 //-------------------------------------------------
 //  sh_w - Sync Hunt handler
 //-------------------------------------------------
-WRITE_LINE_MEMBER( z80sio_channel::sync_w )
+void z80sio_channel::sync_w(int state)
 {
 	if (bool(m_sync) != bool(state))
 	{
@@ -2362,7 +2362,7 @@ WRITE_LINE_MEMBER( z80sio_channel::sync_w )
 //-------------------------------------------------
 //  rxc_w - receive clock
 //-------------------------------------------------
-WRITE_LINE_MEMBER( z80sio_channel::rxc_w )
+void z80sio_channel::rxc_w(int state)
 {
 	//LOG("Z80SIO \"%s\" Channel %c : Receiver Clock Pulse\n", owner()->tag(), m_index + 'A');
 	//if ((receive_allowed() || m_rx_bit != 0) && state && !m_rx_clock)
@@ -2487,7 +2487,7 @@ WRITE_LINE_MEMBER( z80sio_channel::rxc_w )
 //-------------------------------------------------
 //  txc_w - transmit clock
 //-------------------------------------------------
-WRITE_LINE_MEMBER( z80sio_channel::txc_w )
+void z80sio_channel::txc_w(int state)
 {
 	//LOG("Z80SIO \"%s\" Channel %c : Transmitter Clock Pulse\n", owner()->tag(), m_index + 'A');
 	if (!state && m_tx_clock)

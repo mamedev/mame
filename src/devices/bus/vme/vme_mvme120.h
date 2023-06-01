@@ -81,8 +81,8 @@ protected:
 
 	void rom_shadow_tap(offs_t address, u16 data, u16 mem_mask);
 
-	DECLARE_WRITE_LINE_MEMBER(watchdog_reset);
-	DECLARE_WRITE_LINE_MEMBER(mfp_interrupt);
+	void watchdog_reset(int state);
+	void mfp_interrupt(int state);
 
 	const mvme12x_variant  m_board_id;
 };

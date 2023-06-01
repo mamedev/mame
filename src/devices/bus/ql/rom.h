@@ -88,7 +88,7 @@ public:
 	// computer interface
 	uint8_t read(offs_t offset, uint8_t data) { if (m_card) data = m_card->read(offset, data); return data; }
 	void write(offs_t offset, uint8_t data) { if (m_card) m_card->write(offset, data); }
-	DECLARE_WRITE_LINE_MEMBER( romoeh_w ) { if (m_card) m_card->romoeh_w(state); }
+	void romoeh_w(int state) { if (m_card) m_card->romoeh_w(state); }
 
 protected:
 	// device_t implementation

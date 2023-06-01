@@ -110,8 +110,8 @@ public:
 	void hrdvd_mux_w(uint16_t data);
 	void tmp68301_parallel_port_w(uint16_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(ata_irq);
-	DECLARE_WRITE_LINE_MEMBER(ata_drq);
+	void ata_irq(int state);
+	void ata_drq(int state);
 
 	virtual void machine_reset() override;
 
@@ -409,12 +409,12 @@ void hrdvd_state::machine_reset()
 	m_pb = 0;
 }
 
-WRITE_LINE_MEMBER(hrdvd_state::ata_irq)
+void hrdvd_state::ata_irq(int state)
 {
 	//  logerror("ata irq %d\n", state);
 }
 
-WRITE_LINE_MEMBER(hrdvd_state::ata_drq)
+void hrdvd_state::ata_drq(int state)
 {
 	//  logerror("ata drq %d\n", state);
 	m_pb = (m_pb & 0x7f) | (state ? 0x00 : 0x80);

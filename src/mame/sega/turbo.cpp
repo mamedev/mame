@@ -480,19 +480,19 @@ void turbo_state::analog_reset_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(turbo_state::coin_meter_1_w)
+void turbo_state::coin_meter_1_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
 
-WRITE_LINE_MEMBER(turbo_state::coin_meter_2_w)
+void turbo_state::coin_meter_2_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
 
-WRITE_LINE_MEMBER(turbo_state::start_lamp_w)
+void turbo_state::start_lamp_w(int state)
 {
 	m_lamp = state ? 1 : 0;
 }

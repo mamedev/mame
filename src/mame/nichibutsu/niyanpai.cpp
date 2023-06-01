@@ -107,7 +107,7 @@ void niyanpai_state::tmp68301_parallel_port_w(uint16_t data)
 	machine().bookkeeping().coin_lockout_w(0,data & 0x08);
 }
 
-READ_LINE_MEMBER(niyanpai_state::musobana_outcoin_flag_r)
+int niyanpai_state::musobana_outcoin_flag_r()
 {
 	if (m_motor_on) m_musobana_outcoin_flag ^= 1;
 	else m_musobana_outcoin_flag = 1;

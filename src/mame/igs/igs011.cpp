@@ -107,7 +107,7 @@ public:
 	{
 	}
 
-	DECLARE_READ_LINE_MEMBER(igs_hopper_r);
+	int igs_hopper_r();
 
 	void init_lhbv33c();
 	void init_drgnwrldv21j();
@@ -265,13 +265,13 @@ private:
 	void vbowl_link_2_w(u16 data);
 	void vbowl_link_3_w(u16 data);
 	void lhb_okibank_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(sound_irq);
+	void sound_irq(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(lev5_timer_irq_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(lhb_timer_irq_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(lev3_timer_irq_cb);
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_vbowl);
+	void screen_vblank_vbowl(int state);
 	INTERRUPT_GEN_MEMBER(lhb_vblank_irq);
 	void wlcc_decrypt();
 	void lhb_decrypt();
@@ -647,7 +647,7 @@ void igs011_state::machine_start()
 // Inputs
 
 
-READ_LINE_MEMBER(igs011_state::igs_hopper_r)
+int igs011_state::igs_hopper_r()
 {
 	return (m_igs_hopper && ((m_screen->frame_number()/5)&1)) ? 0x0000 : 0x0001;
 }
@@ -2826,7 +2826,7 @@ u16 igs011_state::vbowl_unk_r()
 	return 0xffff;
 }
 
-WRITE_LINE_MEMBER(igs011_state::screen_vblank_vbowl)
+void igs011_state::screen_vblank_vbowl(int state)
 {
 	// rising edge
 	if (state)
@@ -4176,7 +4176,7 @@ void igs011_state::nkishusp(machine_config &config)
 }
 
 
-WRITE_LINE_MEMBER(igs011_state::sound_irq)
+void igs011_state::sound_irq(int state)
 {
 //   m_maincpu->set_input_line(3, state);
 }

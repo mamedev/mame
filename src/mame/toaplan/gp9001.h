@@ -46,9 +46,9 @@ public:
 	u16 read(offs_t offset, u16 mem_mask = ~0);
 	void write(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	DECLARE_READ_LINE_MEMBER(hsync_r);
-	DECLARE_READ_LINE_MEMBER(vsync_r);
-	DECLARE_READ_LINE_MEMBER(fblank_r);
+	int hsync_r();
+	int vsync_r();
+	int fblank_r();
 
 	// this bootleg has strange access
 	u16 pipibibi_bootleg_videoram16_r(offs_t offset);

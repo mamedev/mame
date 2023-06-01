@@ -75,7 +75,7 @@ public:
 	void dma_ack_w(offs_t offset, uint8_t data) { if (m_card) m_card->dma_ack_w(offset, data); }
 
 	// card interface
-	DECLARE_WRITE_LINE_MEMBER( dma_request_w ) { m_write_dma_request(state); }
+	void dma_request_w(int state) { m_write_dma_request(state); }
 
 protected:
 	// device-level overrides

@@ -236,7 +236,7 @@ void wd_fdc_device_base::soft_reset()
 	}
 }
 
-WRITE_LINE_MEMBER(wd_fdc_device_base::mr_w)
+void wd_fdc_device_base::mr_w(int state)
 {
 	if(mr && !state) {
 		command = 0x03;
@@ -314,7 +314,7 @@ void wd_fdc_device_base::set_floppy(floppy_image_device *_floppy)
 		ready_callback(floppy, next_ready);
 }
 
-WRITE_LINE_MEMBER(wd_fdc_device_base::dden_w)
+void wd_fdc_device_base::dden_w(int state)
 {
 	if(disable_mfm) {
 		logerror("Error, this chip does not have a dden line\n");
@@ -1596,27 +1596,27 @@ void wd_fdc_device_base::index_callback(floppy_image_device *floppy, int state)
 	general_continue();
 }
 
-READ_LINE_MEMBER(wd_fdc_device_base::intrq_r)
+int wd_fdc_device_base::intrq_r()
 {
 	return intrq;
 }
 
-READ_LINE_MEMBER(wd_fdc_device_base::drq_r)
+int wd_fdc_device_base::drq_r()
 {
 	return drq;
 }
 
-READ_LINE_MEMBER(wd_fdc_device_base::hld_r)
+int wd_fdc_device_base::hld_r()
 {
 	return hld;
 }
 
-WRITE_LINE_MEMBER(wd_fdc_device_base::hlt_w)
+void wd_fdc_device_base::hlt_w(int state)
 {
 	hlt = bool(state);
 }
 
-READ_LINE_MEMBER(wd_fdc_device_base::enp_r)
+int wd_fdc_device_base::enp_r()
 {
 	return enp;
 }

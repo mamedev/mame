@@ -207,7 +207,7 @@ void ioc2_device::lower_local_irq(int channel, uint8_t mask)
 	m_maincpu->set_input_line(channel, (m_int3_local_mask_reg[channel] & m_int3_local_status_reg[channel]) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(ioc2_device::timer0_int)
+void ioc2_device::timer0_int(int state)
 {
 	if (state)
 	{
@@ -216,7 +216,7 @@ WRITE_LINE_MEMBER(ioc2_device::timer0_int)
 	}
 }
 
-WRITE_LINE_MEMBER(ioc2_device::timer1_int)
+void ioc2_device::timer1_int(int state)
 {
 	if (state)
 	{
@@ -225,18 +225,18 @@ WRITE_LINE_MEMBER(ioc2_device::timer1_int)
 	}
 }
 
-WRITE_LINE_MEMBER(ioc2_device::pit_clock2_out)
+void ioc2_device::pit_clock2_out(int state)
 {
 	m_pit->write_clk0(state);
 	m_pit->write_clk1(state);
 }
 
-WRITE_LINE_MEMBER(ioc2_device::kbdc_int_w)
+void ioc2_device::kbdc_int_w(int state)
 {
 	set_mappable_int(0x10, state);
 }
 
-WRITE_LINE_MEMBER(ioc2_device::duart_int_w)
+void ioc2_device::duart_int_w(int state)
 {
 	set_mappable_int(0x20, state);
 }
@@ -687,7 +687,7 @@ INPUT_CHANGED_MEMBER( ioc2_device::volume_down )
 		raise_local_irq(1, INT3_LOCAL1_PANEL);
 }
 
-WRITE_LINE_MEMBER(ioc2_device::gio_int0_w)
+void ioc2_device::gio_int0_w(int state)
 {
 	if (state == ASSERT_LINE)
 		raise_local_irq(0, ioc2_device::INT3_LOCAL0_FIFO);
@@ -695,7 +695,7 @@ WRITE_LINE_MEMBER(ioc2_device::gio_int0_w)
 		lower_local_irq(0, ioc2_device::INT3_LOCAL0_FIFO);
 }
 
-WRITE_LINE_MEMBER(ioc2_device::gio_int1_w)
+void ioc2_device::gio_int1_w(int state)
 {
 	if (state == ASSERT_LINE)
 		raise_local_irq(0, ioc2_device::INT3_LOCAL0_GRAPHICS);
@@ -703,7 +703,7 @@ WRITE_LINE_MEMBER(ioc2_device::gio_int1_w)
 		lower_local_irq(0, ioc2_device::INT3_LOCAL0_GRAPHICS);
 }
 
-WRITE_LINE_MEMBER(ioc2_device::gio_int2_w)
+void ioc2_device::gio_int2_w(int state)
 {
 	if (state == ASSERT_LINE)
 		raise_local_irq(1, ioc2_device::INT3_LOCAL1_RETRACE);
@@ -711,7 +711,7 @@ WRITE_LINE_MEMBER(ioc2_device::gio_int2_w)
 		lower_local_irq(1, ioc2_device::INT3_LOCAL1_RETRACE);
 }
 
-WRITE_LINE_MEMBER(ioc2_device::hpc_dma_done_w)
+void ioc2_device::hpc_dma_done_w(int state)
 {
 	if (state)
 		raise_local_irq(1, ioc2_device::INT3_LOCAL1_HPC_DMA);
@@ -719,7 +719,7 @@ WRITE_LINE_MEMBER(ioc2_device::hpc_dma_done_w)
 		lower_local_irq(1, ioc2_device::INT3_LOCAL1_HPC_DMA);
 }
 
-WRITE_LINE_MEMBER(ioc2_device::mc_dma_done_w)
+void ioc2_device::mc_dma_done_w(int state)
 {
 	if (state == ASSERT_LINE)
 		raise_local_irq(0, ioc2_device::INT3_LOCAL0_MC_DMA);
@@ -727,7 +727,7 @@ WRITE_LINE_MEMBER(ioc2_device::mc_dma_done_w)
 		lower_local_irq(0, ioc2_device::INT3_LOCAL0_MC_DMA);
 }
 
-WRITE_LINE_MEMBER(ioc2_device::scsi0_int_w)
+void ioc2_device::scsi0_int_w(int state)
 {
 	if (state)
 		raise_local_irq(0, ioc2_device::INT3_LOCAL0_SCSI0);
@@ -735,7 +735,7 @@ WRITE_LINE_MEMBER(ioc2_device::scsi0_int_w)
 		lower_local_irq(0, ioc2_device::INT3_LOCAL0_SCSI0);
 }
 
-WRITE_LINE_MEMBER(ioc2_device::scsi1_int_w)
+void ioc2_device::scsi1_int_w(int state)
 {
 	if (state)
 		raise_local_irq(0, ioc2_device::INT3_LOCAL0_SCSI1);
@@ -743,7 +743,7 @@ WRITE_LINE_MEMBER(ioc2_device::scsi1_int_w)
 		lower_local_irq(0, ioc2_device::INT3_LOCAL0_SCSI1);
 }
 
-WRITE_LINE_MEMBER(ioc2_device::enet_int_w)
+void ioc2_device::enet_int_w(int state)
 {
 	if (state)
 		raise_local_irq(0, ioc2_device::INT3_LOCAL0_ETHERNET);
@@ -751,7 +751,7 @@ WRITE_LINE_MEMBER(ioc2_device::enet_int_w)
 		lower_local_irq(0, ioc2_device::INT3_LOCAL0_ETHERNET);
 }
 
-WRITE_LINE_MEMBER(ioc2_device::video_int_w)
+void ioc2_device::video_int_w(int state)
 {
 	if (state)
 		raise_local_irq(1, ioc2_device::INT3_LOCAL1_VIDEO);

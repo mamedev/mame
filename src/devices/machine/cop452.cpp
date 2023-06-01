@@ -25,7 +25,7 @@ cop452_device::cop452_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-WRITE_LINE_MEMBER(cop452_device::cs_w)
+void cop452_device::cs_w(int state)
 {
 	m_cs = state;
 	if (m_cs) {
@@ -35,7 +35,7 @@ WRITE_LINE_MEMBER(cop452_device::cs_w)
 	}
 }
 
-WRITE_LINE_MEMBER(cop452_device::sk_w)
+void cop452_device::sk_w(int state)
 {
 	if (!m_cs && !m_sk && state) {
 		// Rising edge on SK
@@ -132,12 +132,12 @@ WRITE_LINE_MEMBER(cop452_device::sk_w)
 	m_sk = state;
 }
 
-WRITE_LINE_MEMBER(cop452_device::di_w)
+void cop452_device::di_w(int state)
 {
 	m_di = state;
 }
 
-READ_LINE_MEMBER(cop452_device::do_r)
+int cop452_device::do_r()
 {
 	// TODO:
 	return 0;

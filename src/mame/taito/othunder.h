@@ -55,11 +55,11 @@ private:
 	void irq_ack_w(offs_t offset, u16 data);
 	void eeprom_w(u8 data);
 	void coins_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(adc_eoc_w);
+	void adc_eoc_w(int state);
 	void sound_bankswitch_w(u8 data);
 	void tc0310fam_w(offs_t offset, u8 data);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_w);
+	void vblank_w(int state);
 
 	void othunder_map(address_map &map);
 	void z80_sound_map(address_map &map);

@@ -601,7 +601,7 @@ void lisa_state::COPS_via_out_a(uint8_t data)
 	m_COPS_command = data;
 }
 
-WRITE_LINE_MEMBER(lisa_state::COPS_via_out_ca2)
+void lisa_state::COPS_via_out_ca2(int state)
 {
 	m_hold_COPS_data = state;
 
@@ -650,7 +650,7 @@ void lisa_state::COPS_via_out_b(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(lisa_state::COPS_via_out_cb2)
+void lisa_state::COPS_via_out_cb2(int state)
 {
 	m_speaker->level_w(state);
 }
@@ -1569,18 +1569,18 @@ void lisa_state::cpu_board_control_access(offs_t offset)
 	m_latch->write_bit(offset >> 1, offset & 1);
 }
 
-WRITE_LINE_MEMBER(lisa_state::diag1_w)
+void lisa_state::diag1_w(int state)
 {
 	// Set/reset DIAG1
 }
 
-WRITE_LINE_MEMBER(lisa_state::diag2_w)
+void lisa_state::diag2_w(int state)
 {
 	// Set/reset DIAG2
 	m_diag2 = state;
 }
 
-WRITE_LINE_MEMBER(lisa_state::seg1_w)
+void lisa_state::seg1_w(int state)
 {
 	// Set/reset SEG1 Context Selection bit
 	//logerror("seg bit 0 %s\n", state ? "set" : "clear");
@@ -1590,7 +1590,7 @@ WRITE_LINE_MEMBER(lisa_state::seg1_w)
 		m_seg &= ~1;
 }
 
-WRITE_LINE_MEMBER(lisa_state::seg2_w)
+void lisa_state::seg2_w(int state)
 {
 	// Set/reset SEG2 Context Selection bit
 	//logerror("seg bit 1 %s\n", state ? "set" : "clear");
@@ -1600,14 +1600,14 @@ WRITE_LINE_MEMBER(lisa_state::seg2_w)
 		m_seg &= ~2;
 }
 
-WRITE_LINE_MEMBER(lisa_state::setup_w)
+void lisa_state::setup_w(int state)
 {
 	// Reset/set SETUP register
 	logerror("setup %s %s\n", state ? "UNSET" : "SET", machine().describe_context());
 	m_setup = !state;
 }
 
-WRITE_LINE_MEMBER(lisa_state::vtmsk_w)
+void lisa_state::vtmsk_w(int state)
 {
 	// Enable/disable Vertical Retrace Interrupt
 	logerror("%s retrace %s\n", state ? "enable" : "disable", machine().describe_context());
@@ -1616,12 +1616,12 @@ WRITE_LINE_MEMBER(lisa_state::vtmsk_w)
 		set_VTIR(2);
 }
 
-WRITE_LINE_MEMBER(lisa_state::sfmsk_w)
+void lisa_state::sfmsk_w(int state)
 {
 	// Enable/disable Soft Error Detect
 }
 
-WRITE_LINE_MEMBER(lisa_state::hdmsk_w)
+void lisa_state::hdmsk_w(int state)
 {
 	// Enable/disable Hard Error Detect
 	m_test_parity = state;

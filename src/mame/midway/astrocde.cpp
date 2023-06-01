@@ -228,14 +228,14 @@ uint8_t astrocde_state::input_mux_r(offs_t offset)
 
 
 template<int Coin>
-WRITE_LINE_MEMBER(astrocde_state::coin_counter_w)
+void astrocde_state::coin_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(Coin, state);
 }
 
 
 template<int Bit>
-WRITE_LINE_MEMBER(astrocde_state::sparkle_w)
+void astrocde_state::sparkle_w(int state)
 {
 	m_sparkle[Bit] = state;
 }
@@ -274,7 +274,7 @@ void ebases_state::coin_w(uint8_t data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(astrocde_state::gorf_sound_switch_w)
+void astrocde_state::gorf_sound_switch_w(int state)
 {
 	m_astrocade_sound1->set_output_gain(0, state ? 0.0 : 1.0);
 	m_votrax->set_output_gain(0, state ? 1.0 : 0.0);
@@ -295,7 +295,7 @@ void astrocde_state::demndrgn_banksw_w(uint8_t data)
 	m_bank8000->set_entry(bank);
 }
 
-WRITE_LINE_MEMBER(demndrgn_state::input_select_w)
+void demndrgn_state::input_select_w(int state)
 {
 	m_input_select = state;
 }
@@ -412,7 +412,7 @@ void astrocde_state::votrax_speech_w(uint8_t data)
 }
 
 
-READ_LINE_MEMBER( astrocde_state::votrax_speech_status_r )
+int astrocde_state::votrax_speech_status_r()
 {
 	return m_votrax->request();
 }

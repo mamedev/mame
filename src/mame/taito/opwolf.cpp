@@ -351,7 +351,7 @@ private:
 	void opwolf_colpri_cb(u32 &sprite_colbank, u32 &pri_mask, u16 sprite_ctrl);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void opwolf_msm5205_vck(msm5205_device *device, int chip);
-	template<int N> DECLARE_WRITE_LINE_MEMBER(msm5205_vck_w);
+	template<int N> void msm5205_vck_w(int state);
 
 	void opwolf_map(address_map &map);
 	void opwolf_sound_z80_map(address_map &map);
@@ -719,7 +719,7 @@ GFXDECODE_END
 //7 - N/C
 
 template<int N>
-WRITE_LINE_MEMBER(opwolf_state::msm5205_vck_w)
+void opwolf_state::msm5205_vck_w(int state)
 {
 	if (m_adpcm_data[N] != -1)
 	{

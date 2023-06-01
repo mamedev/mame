@@ -59,8 +59,8 @@ private:
 	void output2_w(uint8_t data);
 
 	// linked cabinet specific handlers
-	DECLARE_WRITE_LINE_MEMBER(mb8421_intl);
-	DECLARE_WRITE_LINE_MEMBER(mb8421_intr);
+	void mb8421_intl(int state);
+	void mb8421_intr(int state);
 	uint16_t link_r();
 	uint16_t link2_r();
 	void link2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

@@ -276,7 +276,7 @@ void dave_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 //  int1_w - interrupt 1 write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( dave_device::int1_w )
+void dave_device::int1_w(int state)
 {
 	if (!(m_irq_status & IRQ_INT1) && state)
 		m_irq_status |= IRQ_INT1_LATCH;
@@ -294,7 +294,7 @@ WRITE_LINE_MEMBER( dave_device::int1_w )
 //  int2_w - interrupt 2 write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( dave_device::int2_w )
+void dave_device::int2_w(int state)
 {
 	if (!(m_irq_status & IRQ_INT2) && state)
 		m_irq_status |= IRQ_INT2_LATCH;

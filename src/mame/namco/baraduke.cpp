@@ -165,7 +165,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_priority);
 	void set_scroll(int layer);
 	void main_map(address_map &map);
@@ -497,7 +497,7 @@ uint32_t baraduke_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-WRITE_LINE_MEMBER(baraduke_state::screen_vblank)
+void baraduke_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)

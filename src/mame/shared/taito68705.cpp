@@ -74,7 +74,7 @@ void taito68705_mcu_device_base::data_w(u8 data)
 	m_mcu->set_input_line(M68705_IRQ_LINE, m_host_flag ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(taito68705_mcu_device_base::reset_w)
+void taito68705_mcu_device_base::reset_w(int state)
 {
 	m_reset_input = ASSERT_LINE == state;
 	if (CLEAR_LINE != state)

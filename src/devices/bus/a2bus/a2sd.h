@@ -46,7 +46,7 @@ protected:
 	virtual void write_c800(uint16_t offset, u8 data) override;
 
 	// SPI 4-wire interface
-	WRITE_LINE_MEMBER(spi_miso_w) { m_in_bit = state; }
+	void spi_miso_w(int state) { m_in_bit = state; }
 
 	TIMER_CALLBACK_MEMBER(shift_tick);
 private:

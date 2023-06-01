@@ -81,8 +81,8 @@ private:
 	uint8_t pio_pb_r();
 	void pio_pb_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
 
 	void ctrl_w(uint8_t data);
 	void status_w(uint8_t data);

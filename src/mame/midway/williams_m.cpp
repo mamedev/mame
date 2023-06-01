@@ -458,7 +458,7 @@ void tshoot_state::machine_start()
 }
 
 
-WRITE_LINE_MEMBER(tshoot_state::maxvol_w)
+void tshoot_state::maxvol_w(int state)
 {
 	/* something to do with the sound volume */
 	logerror("tshoot maxvol = %d (%s)\n", state, machine().describe_context());
@@ -498,7 +498,7 @@ TIMER_CALLBACK_MEMBER(joust2_state::deferred_snd_cmd_w)
 }
 
 
-WRITE_LINE_MEMBER(joust2_state::pia_s11_bg_strobe_w)
+void joust2_state::pia_s11_bg_strobe_w(int state)
 {
 	m_current_sound_data = (m_current_sound_data & ~0x100) | ((state << 8) & 0x100);
 	m_bg->ctrl_w(state);

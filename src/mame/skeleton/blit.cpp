@@ -72,7 +72,7 @@ public:
 		, m_sysrom(*this, M68K_TAG)
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER(system_clock_write);
+	void system_clock_write(int state);
 
 	void start_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void vblank_ack(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -156,7 +156,7 @@ void blit_state::start_write(offs_t offset, uint16_t data, uint16_t mem_mask)
 	m_videostart = data << 1;
 }
 
-WRITE_LINE_MEMBER(blit_state::system_clock_write)
+void blit_state::system_clock_write(int state)
 {
 	m_acia0->write_txc(state);
 	m_acia0->write_rxc(state);

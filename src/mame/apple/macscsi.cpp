@@ -147,7 +147,7 @@ void mac_scsi_helper_device::write_fifo_process()
 	}
 }
 
-WRITE_LINE_MEMBER(mac_scsi_helper_device::drq_w)
+void mac_scsi_helper_device::drq_w(int state)
 {
 	if (state)
 	{

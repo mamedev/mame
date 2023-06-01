@@ -172,7 +172,7 @@ public:
 	void init_speedwaya();
 	void init_superb2k();
 
-	READ_LINE_MEMBER(mbutrfly_prot_r);
+	int mbutrfly_prot_r();
 
 protected:
 	virtual void machine_start() override;
@@ -359,7 +359,7 @@ void skylncr_state::mbutrfly_prot_w(uint8_t data)
 	m_mbutrfly_prot = BIT(data, 7);
 }
 
-READ_LINE_MEMBER(skylncr_state::mbutrfly_prot_r)
+int skylncr_state::mbutrfly_prot_r()
 {
 	return m_mbutrfly_prot;
 }

@@ -43,8 +43,8 @@ public:
 	void scmr_w(uint8_t data);
 	uint8_t scmr_r();
 
-	DECLARE_WRITE_LINE_MEMBER(rx_w);
-	DECLARE_WRITE_LINE_MEMBER(clk_w);
+	void rx_w(int state);
+	void clk_w(int state);
 
 	auto tx_handler() { return m_tx_cb.bind(); }
 	auto clk_handler() { return m_clk_cb.bind(); }

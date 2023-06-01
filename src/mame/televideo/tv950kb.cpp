@@ -30,7 +30,7 @@ void tv950kb_device::device_start()
 {
 }
 
-WRITE_LINE_MEMBER(tv950kb_device::rx_w)
+void tv950kb_device::rx_w(int state)
 {
 	m_beeper->level_w(state);
 }
@@ -47,7 +47,7 @@ u8 tv950kb_device::keys_r()
 	return result;
 }
 
-WRITE_LINE_MEMBER(tv950kb_device::tx_w)
+void tv950kb_device::tx_w(int state)
 {
 	m_tx_cb(state);
 }

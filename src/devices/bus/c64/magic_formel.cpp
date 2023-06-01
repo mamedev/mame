@@ -83,7 +83,7 @@ void c64_magic_formel_cartridge_device::pia_pb_w(uint8_t data)
 	m_pb7 = BIT(data, 7);
 }
 
-WRITE_LINE_MEMBER( c64_magic_formel_cartridge_device::pia_cb2_w )
+void c64_magic_formel_cartridge_device::pia_cb2_w(int state)
 {
 	if (!state)
 	{

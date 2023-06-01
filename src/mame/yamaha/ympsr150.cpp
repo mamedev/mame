@@ -93,30 +93,30 @@ public:
 	// most of these keyboards have key matrix rows & columns split across multiple ports each,
 	// so use templates to be able to generate multiple r/w methods as appropriate
 	template <unsigned StartBit, unsigned Count>
-	DECLARE_WRITE_LINE_MEMBER(keys_w);
+	void keys_w(int state);
 	template <unsigned StartBit>
 	DECLARE_CUSTOM_INPUT_MEMBER(keys_r);
 
 	DECLARE_INPUT_CHANGED_MEMBER(switch_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(switch_r) { return m_switch; }
 
-	DECLARE_WRITE_LINE_MEMBER(apo_w) { if (state) m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); }
+	void apo_w(int state) { if (state) m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); }
 	DECLARE_INPUT_CHANGED_MEMBER(power_w) { if (!newval) m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE); }
 
 	template <unsigned Num>
-	DECLARE_WRITE_LINE_MEMBER(led_w) { m_led[Num] = (state ? 1 : 0); }
+	void led_w(int state) { m_led[Num] = (state ? 1 : 0); }
 
-	DECLARE_WRITE_LINE_MEMBER(pwm_row_w);
+	void pwm_row_w(int state);
 	template <unsigned Bit>
-	DECLARE_WRITE_LINE_MEMBER(pwm_col_w);
+	void pwm_col_w(int state);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(lcd_r) { return m_lcdc->db_r() >> 4; }
-	DECLARE_WRITE_LINE_MEMBER(lcd_w) { m_lcdc->db_w(state << 4); }
+	void lcd_w(int state) { m_lcdc->db_w(state << 4); }
 
 private:
 	virtual void driver_start() override;
 
-	DECLARE_WRITE_LINE_MEMBER(render_w);
+	void render_w(int state);
 
 	required_device<gew7_device> m_maincpu;
 	optional_device<pwm_display_device> m_pwm;
@@ -141,7 +141,7 @@ void psr150_state::port_pullup_w(offs_t offset, u8 data, u8 mem_mask)
 }
 
 template <unsigned StartBit, unsigned Count>
-WRITE_LINE_MEMBER(psr150_state::keys_w)
+void psr150_state::keys_w(int state)
 {
 	constexpr auto mask = make_bitmask<ioport_value>(Count);
 
@@ -166,13 +166,13 @@ INPUT_CHANGED_MEMBER(psr150_state::switch_w)
 		m_switch = param;
 }
 
-WRITE_LINE_MEMBER(psr150_state::pwm_row_w)
+void psr150_state::pwm_row_w(int state)
 {
 	m_pwm->matrix(state, m_pwm_col);
 }
 
 template <unsigned Bit>
-WRITE_LINE_MEMBER(psr150_state::pwm_col_w)
+void psr150_state::pwm_col_w(int state)
 {
 	keys_w<11 + Bit, 1>(state);
 	m_pwm_col = m_key_sel >> 11;
@@ -181,7 +181,7 @@ WRITE_LINE_MEMBER(psr150_state::pwm_col_w)
 		m_pwm->write_mx(m_pwm_col);
 }
 
-WRITE_LINE_MEMBER(psr150_state::render_w)
+void psr150_state::render_w(int state)
 {
 	if (!state)
 		return;

@@ -88,7 +88,7 @@ void i8243_device::output_update(int which)
 //  state
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(i8243_device::prog_w)
+void i8243_device::prog_w(int state)
 {
 	/* on high->low transition state, latch opcode/port */
 	if (m_prog && !state && !m_cs)
@@ -144,7 +144,7 @@ WRITE_LINE_MEMBER(i8243_device::prog_w)
 //  cs_w - handle chip select line (active low)
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(i8243_device::cs_w)
+void i8243_device::cs_w(int state)
 {
 	m_cs = state;
 	if (m_cs)

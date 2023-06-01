@@ -112,28 +112,28 @@ public:
 
 	void mekd5(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(reset_key_w);
+	void reset_key_w(int state);
 	DECLARE_INPUT_CHANGED_MEMBER(keypad_changed);
 
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE_LINE_MEMBER(trace_timer_clear_w);
+	void trace_timer_clear_w(int state);
 
-	DECLARE_READ_LINE_MEMBER(keypad_cb1_r);
+	int keypad_cb1_r();
 	uint8_t keypad_key_r();
 	void led_digit_w(uint8_t data);
 	void led_segment_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER(kansas_r);
+	int kansas_r();
 
 	// Clocks
-	DECLARE_WRITE_LINE_MEMBER(write_f1_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_f3_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_f5_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_f7_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_f9_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_f13_clock);
+	void write_f1_clock(int state);
+	void write_f3_clock(int state);
+	void write_f5_clock(int state);
+	void write_f7_clock(int state);
+	void write_f9_clock(int state);
+	void write_f13_clock(int state);
 
 	void mekd5_mem(address_map &map);
 
@@ -256,7 +256,7 @@ TIMER_CALLBACK_MEMBER(mekd5_state::trace_tick)
 // account for the store that writes here as occuring at the start of that
 // instruction adding 5 cycles to give an effective 21 cycles. TODO adjust
 // this back to 16 cycles when the 6800 cycle timing becomes more accurate.
-WRITE_LINE_MEMBER(mekd5_state::trace_timer_clear_w)
+void mekd5_state::trace_timer_clear_w(int state)
 {
 	if (state)
 		m_kpd_pia->cb2_w(0);
@@ -272,7 +272,7 @@ WRITE_LINE_MEMBER(mekd5_state::trace_timer_clear_w)
 
 // Keypad input is disable on views with the RS232 input.
 
-WRITE_LINE_MEMBER(mekd5_state::reset_key_w)
+void mekd5_state::reset_key_w(int state)
 {
 	uint8_t view = machine().render().first_target()->view();
 	if (view > 1) return;
@@ -299,7 +299,7 @@ INPUT_CHANGED_MEMBER(mekd5_state::keypad_changed)
 	m_kpd_pia->cb1_w(mekd5_state::keypad_key_pressed());
 }
 
-READ_LINE_MEMBER(mekd5_state::keypad_cb1_r)
+int mekd5_state::keypad_cb1_r()
 {
 	return mekd5_state::keypad_key_pressed();
 }
@@ -339,7 +339,7 @@ void mekd5_state::led_digit_w(uint8_t data)
 	m_kpd_pia->cb1_w(mekd5_state::keypad_key_pressed());
 }
 
-READ_LINE_MEMBER(mekd5_state::kansas_r)
+int mekd5_state::kansas_r()
 {
 	uint8_t data = m_cass->input() > +0.0;
 	return data;
@@ -352,7 +352,7 @@ READ_LINE_MEMBER(mekd5_state::kansas_r)
 
 ************************************************************/
 
-WRITE_LINE_MEMBER(mekd5_state::write_f1_clock)
+void mekd5_state::write_f1_clock(int state)
 {
 	if (BIT(m_baud_rate->read(), 0))
 	{
@@ -361,7 +361,7 @@ WRITE_LINE_MEMBER(mekd5_state::write_f1_clock)
 	}
 }
 
-WRITE_LINE_MEMBER(mekd5_state::write_f3_clock)
+void mekd5_state::write_f3_clock(int state)
 {
 	if (BIT(m_baud_rate->read(), 1))
 	{
@@ -370,7 +370,7 @@ WRITE_LINE_MEMBER(mekd5_state::write_f3_clock)
 	}
 }
 
-WRITE_LINE_MEMBER(mekd5_state::write_f5_clock)
+void mekd5_state::write_f5_clock(int state)
 {
 	if (BIT(m_baud_rate->read(), 2))
 	{
@@ -379,7 +379,7 @@ WRITE_LINE_MEMBER(mekd5_state::write_f5_clock)
 	}
 }
 
-WRITE_LINE_MEMBER(mekd5_state::write_f7_clock)
+void mekd5_state::write_f7_clock(int state)
 {
 	if (BIT(m_baud_rate->read(), 3))
 	{
@@ -388,7 +388,7 @@ WRITE_LINE_MEMBER(mekd5_state::write_f7_clock)
 	}
 }
 
-WRITE_LINE_MEMBER(mekd5_state::write_f9_clock)
+void mekd5_state::write_f9_clock(int state)
 {
 	if (BIT(m_baud_rate->read(), 4))
 	{
@@ -397,7 +397,7 @@ WRITE_LINE_MEMBER(mekd5_state::write_f9_clock)
 	}
 }
 
-WRITE_LINE_MEMBER(mekd5_state::write_f13_clock)
+void mekd5_state::write_f13_clock(int state)
 {
 	if (BIT(m_baud_rate->read(), 5))
 	{

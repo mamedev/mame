@@ -56,11 +56,11 @@ public:
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( i0_w );
-	DECLARE_WRITE_LINE_MEMBER( i1_w );
-	DECLARE_WRITE_LINE_MEMBER( i2_w );
-	DECLARE_WRITE_LINE_MEMBER( i3_w );
-	DECLARE_WRITE_LINE_MEMBER( i4_w );
+	void i0_w(int state);
+	void i1_w(int state);
+	void i2_w(int state);
+	void i3_w(int state);
+	void i4_w(int state);
 
 	uint8_t pa_r();
 	uint8_t pb_r();
@@ -69,14 +69,14 @@ public:
 	void pb_w(uint8_t data);
 	void pc_w(uint8_t data);
 
-	WRITE_LINE_MEMBER( pb0_w ) { port_line_w(m_in_b, 0, state); }
-	WRITE_LINE_MEMBER( pb1_w ) { port_line_w(m_in_b, 1, state); }
-	WRITE_LINE_MEMBER( pb2_w ) { port_line_w(m_in_b, 2, state); }
-	WRITE_LINE_MEMBER( pb3_w ) { port_line_w(m_in_b, 3, state); }
-	WRITE_LINE_MEMBER( pb4_w ) { port_line_w(m_in_b, 4, state); }
-	WRITE_LINE_MEMBER( pb5_w ) { port_line_w(m_in_b, 5, state); }
-	WRITE_LINE_MEMBER( pb6_w ) { port_line_w(m_in_b, 6, state); }
-	WRITE_LINE_MEMBER( pb7_w ) { port_line_w(m_in_b, 7, state); }
+	void pb0_w(int state) { port_line_w(m_in_b, 0, state); }
+	void pb1_w(int state) { port_line_w(m_in_b, 1, state); }
+	void pb2_w(int state) { port_line_w(m_in_b, 2, state); }
+	void pb3_w(int state) { port_line_w(m_in_b, 3, state); }
+	void pb4_w(int state) { port_line_w(m_in_b, 4, state); }
+	void pb5_w(int state) { port_line_w(m_in_b, 5, state); }
+	void pb6_w(int state) { port_line_w(m_in_b, 6, state); }
+	void pb7_w(int state) { port_line_w(m_in_b, 7, state); }
 
 	uint8_t get_ddr_a();
 	uint8_t get_ddr_b();

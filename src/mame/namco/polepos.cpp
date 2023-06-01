@@ -292,12 +292,12 @@ uint8_t polepos_state::ready_r()
 	return ret;
 }
 
-WRITE_LINE_MEMBER(polepos_state::gasel_w)
+void polepos_state::gasel_w(int state)
 {
 	m_adc_input = state;
 }
 
-WRITE_LINE_MEMBER(polepos_state::sb0_w)
+void polepos_state::sb0_w(int state)
 {
 	m_auto_start_mask = !state;
 }
@@ -311,7 +311,7 @@ template<bool sub1> void polepos_state::z8002_nvi_enable_w(uint16_t data)
 		(sub1 ? m_subcpu : m_subcpu2)->set_input_line(z8002_device::NVI_LINE, CLEAR_LINE);
 }
 
-READ_LINE_MEMBER(polepos_state::auto_start_r)
+int polepos_state::auto_start_r()
 {
 	return m_auto_start_mask;
 }
@@ -325,7 +325,7 @@ void polepos_state::out(uint8_t data)
 	machine().bookkeeping().coin_counter_w(0,~data & 8);
 }
 
-WRITE_LINE_MEMBER(polepos_state::lockout)
+void polepos_state::lockout(int state)
 {
 	machine().bookkeeping().coin_lockout_global_w(state);
 }

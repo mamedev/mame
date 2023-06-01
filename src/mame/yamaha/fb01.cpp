@@ -45,9 +45,9 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(ym2164_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(upd71051_txrdy_w);
-	DECLARE_WRITE_LINE_MEMBER(upd71051_rxrdy_w);
+	void ym2164_irq_w(int state);
+	void upd71051_txrdy_w(int state);
+	void upd71051_rxrdy_w(int state);
 
 	void fb01_palette(palette_device &palette) const;
 	HD44780_PIXEL_UPDATE(fb01_pixel_update);
@@ -119,21 +119,21 @@ void fb01_state::machine_reset()
 }
 
 
-WRITE_LINE_MEMBER(fb01_state::ym2164_irq_w)
+void fb01_state::ym2164_irq_w(int state)
 {
 	m_ym2164_irq = state;
 	update_int();
 }
 
 
-WRITE_LINE_MEMBER(fb01_state::upd71051_txrdy_w)
+void fb01_state::upd71051_txrdy_w(int state)
 {
 	m_upd71051_txrdy = state;
 	update_int();
 }
 
 
-WRITE_LINE_MEMBER(fb01_state::upd71051_rxrdy_w)
+void fb01_state::upd71051_rxrdy_w(int state)
 {
 	m_upd71051_rxrdy = state;
 	update_int();

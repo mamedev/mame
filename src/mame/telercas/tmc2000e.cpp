@@ -204,41 +204,41 @@ INPUT_PORTS_END
 
 /* Video */
 
-READ_LINE_MEMBER( tmc2000e_state::rdata_r )
+int tmc2000e_state::rdata_r()
 {
 	return BIT(m_color, 2);
 }
 
-READ_LINE_MEMBER( tmc2000e_state::bdata_r )
+int tmc2000e_state::bdata_r()
 {
 	return BIT(m_color, 1);
 }
 
-READ_LINE_MEMBER( tmc2000e_state::gdata_r )
+int tmc2000e_state::gdata_r()
 {
 	return BIT(m_color, 0);
 }
 
 /* CDP1802 Interface */
 
-READ_LINE_MEMBER( tmc2000e_state::clear_r )
+int tmc2000e_state::clear_r()
 {
 	return BIT(m_run->read(), 0);
 }
 
-READ_LINE_MEMBER( tmc2000e_state::ef2_r )
+int tmc2000e_state::ef2_r()
 {
 	return m_cassette->input() < 0;
 }
 
-READ_LINE_MEMBER( tmc2000e_state::ef3_r )
+int tmc2000e_state::ef3_r()
 {
 	uint8_t data = ~(m_key_row[m_keylatch / 8])->read();
 
 	return BIT(data, m_keylatch % 8);
 }
 
-WRITE_LINE_MEMBER( tmc2000e_state::q_w )
+void tmc2000e_state::q_w(int state)
 {
 	// turn CDP1864 sound generator on/off
 	m_cti->aoe_w(state);

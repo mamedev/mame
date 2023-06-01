@@ -103,7 +103,7 @@ void tpp2_state::refresh_w(offs_t offset, uint8_t data)
 	m_watchdog_enabled = ((offset >> 9) & 1) != 0;
 }
 
-WRITE_LINE_MEMBER(tnx1_state::screen_vblank)
+void tnx1_state::screen_vblank(int state)
 {
 	if (state)
 	{
@@ -117,7 +117,7 @@ WRITE_LINE_MEMBER(tnx1_state::screen_vblank)
 	}
 }
 
-WRITE_LINE_MEMBER(tpp2_state::screen_vblank)
+void tpp2_state::screen_vblank(int state)
 {
 	tnx1_state::screen_vblank(state);
 
@@ -281,7 +281,7 @@ protected:
 };
 
 
-READ_LINE_MEMBER(tnx1_state::dsw1_read)
+int tnx1_state::dsw1_read()
 {
 	return m_io_dsw1->read() >> m_dswbit;
 }
@@ -369,7 +369,7 @@ static INPUT_PORTS_START( skyskipr )
 	PORT_CONFSETTING(    0x02, "Interlaced (bitmap)" )
 INPUT_PORTS_END
 
-READ_LINE_MEMBER( tnx1_state::pop_field_r )
+int tnx1_state::pop_field_r()
 {
 	return m_field ^ 1;
 }

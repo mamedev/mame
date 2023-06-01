@@ -275,7 +275,7 @@ void m92_state::bankswitch_w(uint8_t data)
 		logerror("%05x: bankswitch %04x\n", m_maincpu->pc(), data);
 }
 
-READ_LINE_MEMBER(m92_state::sprite_busy_r)
+int m92_state::sprite_busy_r()
 {
 	return m_sprite_buffer_busy;
 }

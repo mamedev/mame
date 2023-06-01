@@ -69,10 +69,10 @@ private:
 	u8 u11_a_r();
 	void u11_a_w(u8 data);
 	void u11_b_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(u10_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(u10_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(u11_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
+	void u10_ca2_w(int state);
+	void u10_cb2_w(int state);
+	void u11_ca2_w(int state);
+	void u11_cb2_w(int state);
 	void mem_map(address_map &map);
 
 	u8 m_u10a = 0U;
@@ -516,26 +516,26 @@ INPUT_CHANGED_MEMBER( st_mp100_state::self_test )
 	m_pia_u10->ca1_w(newval);
 }
 
-WRITE_LINE_MEMBER( st_mp100_state::u10_ca2_w )
+void st_mp100_state::u10_ca2_w(int state)
 {
 	m_u10_ca2 = state;
 	if (!state)
 		m_counter = 0;
 }
 
-WRITE_LINE_MEMBER( st_mp100_state::u10_cb2_w )
+void st_mp100_state::u10_cb2_w(int state)
 {
 	m_u10_cb2 = state;
 	if (state)
 		m_stored_lamp = m_u10a;
 }
 
-WRITE_LINE_MEMBER( st_mp100_state::u11_ca2_w )
+void st_mp100_state::u11_ca2_w(int state)
 {
 	m_io_leds[0] = state ? 0 : 1;
 }
 
-WRITE_LINE_MEMBER( st_mp100_state::u11_cb2_w )
+void st_mp100_state::u11_cb2_w(int state)
 {
 	m_u11_cb2 = state;
 }

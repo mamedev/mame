@@ -55,8 +55,8 @@ private:
 	void video_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t int_r();
 	void int_w(uint32_t data);
-	DECLARE_READ_LINE_MEMBER(sbrc2_r);
-	DECLARE_READ_LINE_MEMBER(sbrc3_r);
+	int sbrc2_r();
+	int sbrc3_r();
 
 	TIMER_CALLBACK_MEMBER(dma_complete);
 	INTERRUPT_GEN_MEMBER(vblank);

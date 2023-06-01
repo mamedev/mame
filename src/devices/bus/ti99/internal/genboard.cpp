@@ -563,7 +563,7 @@ void geneve_gate_array_device::cru_ctrl_write(offs_t offset, uint8_t data)
     Pull down or release the clock line.
     Called by setting CRU bit 1EF0 to 0 or 1.
 */
-WRITE_LINE_MEMBER( geneve_gate_array_device::set_keyboard_clock)
+void geneve_gate_array_device::set_keyboard_clock(int state)
 {
 	m_keyb_clk(state);
 }
@@ -576,7 +576,7 @@ WRITE_LINE_MEMBER( geneve_gate_array_device::set_keyboard_clock)
 
     Called by setting CRU bit 1EF2 to 0 or 1
 */
-WRITE_LINE_MEMBER( geneve_gate_array_device::enable_shift_register)
+void geneve_gate_array_device::enable_shift_register(int state)
 {
 	m_shift_reg_enabled = (state==ASSERT_LINE);
 
@@ -607,7 +607,7 @@ void geneve_gate_array_device::shift_reg_changed()
     Incoming keyboard strobe. When 0, push the current data line level into
     the shift register at the leftmost position.
 */
-WRITE_LINE_MEMBER( geneve_gate_array_device::kbdclk )
+void geneve_gate_array_device::kbdclk(int state)
 {
 	LOGMASKED(LOG_KEYBOARD, "Keyboard clock: %d\n", state);
 	bool clock_falling_edge = (m_keyboard_last_clock == ASSERT_LINE && state == CLEAR_LINE);
@@ -624,7 +624,7 @@ WRITE_LINE_MEMBER( geneve_gate_array_device::kbdclk )
 /*
     Latch the value of the incoming data line.
 */
-WRITE_LINE_MEMBER( geneve_gate_array_device::kbddata )
+void geneve_gate_array_device::kbddata(int state)
 {
 	LOGMASKED(LOG_KEYBOARD, "Keyboard data: %d\n", state);
 	m_keyboard_data_in = (line_state)state;
@@ -890,7 +890,7 @@ void geneve_gate_array_device::setaddress(offs_t address, uint8_t busctrl)
    The Gate Array uses the clock to operate the wait state flags. The actual
    wait state generation is up to the PAL chip.
 */
-WRITE_LINE_MEMBER( geneve_gate_array_device::clock_in )
+void geneve_gate_array_device::clock_in(int state)
 {
 	// Falling CLK
 	if (state == CLEAR_LINE)
@@ -906,64 +906,64 @@ WRITE_LINE_MEMBER( geneve_gate_array_device::clock_in )
     READY line from the peribox. Together with the sndready and the READY output
     of the Gate Array itself, this forms a wired AND.
 */
-WRITE_LINE_MEMBER( geneve_gate_array_device::extready_in )
+void geneve_gate_array_device::extready_in(int state)
 {
 	LOGMASKED(LOG_READY, "External READY = %d\n", state);
 	m_extready = (state==ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( geneve_gate_array_device::sndready_in )
+void geneve_gate_array_device::sndready_in(int state)
 {
 	LOGMASKED(LOG_READY, "Sound READY = %d\n", state);
 	m_sndready = (state==ASSERT_LINE);
 }
 
-READ_LINE_MEMBER(geneve_gate_array_device::csw_out)
+int geneve_gate_array_device::csw_out()
 {
 	// Do not access a port-based device in debugger mode
 	if (m_debug) return CLEAR_LINE;
 	return ((m_decoded.function == MLVIDEO) && !m_decoded.read)? ASSERT_LINE : CLEAR_LINE;
 }
 
-READ_LINE_MEMBER(geneve_gate_array_device::csr_out)
+int geneve_gate_array_device::csr_out()
 {
 	// Do not access a port-based device in debugger mode
 	if (m_debug) return CLEAR_LINE;
 	return ((m_decoded.function == MLVIDEO) && m_decoded.read)? ASSERT_LINE : CLEAR_LINE;
 }
 
-READ_LINE_MEMBER(geneve_gate_array_device::romen_out)
+int geneve_gate_array_device::romen_out()
 {
 	// Do not restrict to read-only, as we could have a PFM here
 	decdata* dec = (m_debug)? &m_decdebug : &m_decoded;
 	return (dec->function == MPEPROM)? ASSERT_LINE : CLEAR_LINE;
 }
 
-READ_LINE_MEMBER(geneve_gate_array_device::ramen_out)
+int geneve_gate_array_device::ramen_out()
 {
 	decdata* dec = (m_debug)? &m_decdebug : &m_decoded;
 	return (dec->function == MPSRAM)? ASSERT_LINE : CLEAR_LINE;
 }
 
-READ_LINE_MEMBER(geneve_gate_array_device::ramenx_out)
+int geneve_gate_array_device::ramenx_out()
 {
 	decdata* dec = (m_debug)? &m_decdebug : &m_decoded;
 	return (dec->function == MPSRAMX)? ASSERT_LINE : CLEAR_LINE;
 }
 
-READ_LINE_MEMBER(geneve_gate_array_device::rtcen_out)
+int geneve_gate_array_device::rtcen_out()
 {
 	decdata* dec = (m_debug)? &m_decdebug : &m_decoded;
 	return (dec->function == MLCLOCK)? ASSERT_LINE : CLEAR_LINE;
 }
 
-READ_LINE_MEMBER(geneve_gate_array_device::snden_out)
+int geneve_gate_array_device::snden_out()
 {
 	decdata* dec = (m_debug)? &m_decdebug : &m_decoded;
 	return ((dec->function == MLSOUND) && !dec->read)? ASSERT_LINE : CLEAR_LINE;
 }
 
-READ_LINE_MEMBER(geneve_gate_array_device::dben_out)
+int geneve_gate_array_device::dben_out()
 {
 	decdata* dec = (m_debug)? &m_decdebug : &m_decoded;
 	return accessing_box_s(dec->function, false)? ASSERT_LINE : CLEAR_LINE;
@@ -980,7 +980,7 @@ READ_LINE_MEMBER(geneve_gate_array_device::dben_out)
 // - we access DRAM and have timode==1 OR
 // - extready = 0
 
-READ_LINE_MEMBER(geneve_gate_array_device::gaready_out)
+int geneve_gate_array_device::gaready_out()
 {
 	if (m_debug) return ASSERT_LINE;  // Always READY when debugging
 	// Return true (READY=1) when we are accessing SRAM/SRAMX and when we do not have extra waitstates
@@ -1193,7 +1193,7 @@ geneve_pal_device::geneve_pal_device(const machine_config &mconfig, const char *
 /*
     READY input from the Gate Array.
 */
-WRITE_LINE_MEMBER(geneve_pal_device::gaready_in)
+void geneve_pal_device::gaready_in(int state)
 {
 	bool prev = m_pin3;
 	m_pin3 = (state==ASSERT_LINE);
@@ -1208,7 +1208,7 @@ WRITE_LINE_MEMBER(geneve_pal_device::gaready_in)
 /*
     Video read (ASSERT=low).
 */
-WRITE_LINE_MEMBER(geneve_pal_device::csr_in)
+void geneve_pal_device::csr_in(int state)
 {
 	bool prev = m_pin4;
 	m_pin4 = (state==CLEAR_LINE);
@@ -1222,7 +1222,7 @@ WRITE_LINE_MEMBER(geneve_pal_device::csr_in)
 /*
     Video write (ASSERT=low).
 */
-WRITE_LINE_MEMBER(geneve_pal_device::csw_in)
+void geneve_pal_device::csw_in(int state)
 {
 	bool prev = m_pin9;
 	m_pin9 = (state==CLEAR_LINE);
@@ -1236,7 +1236,7 @@ WRITE_LINE_MEMBER(geneve_pal_device::csw_in)
 /*
     Memory enable (ASSERT=low); pass through
 */
-WRITE_LINE_MEMBER(geneve_pal_device::memen)
+void geneve_pal_device::memen(int state)
 {
 	LOGMASKED(LOG_LINES, "MEMEN -> %d\n", state);
 	m_peribox->memen_in(state);
@@ -1249,7 +1249,7 @@ WRITE_LINE_MEMBER(geneve_pal_device::memen)
     This function seems to have no effect. So either the equations are
     wrong, or something else is going on.
 */
-WRITE_LINE_MEMBER(geneve_pal_device::sysspeed)
+void geneve_pal_device::sysspeed(int state)
 {
 	bool prev = m_pin5;
 	m_pin5 = (state == ASSERT_LINE);
@@ -1264,7 +1264,7 @@ WRITE_LINE_MEMBER(geneve_pal_device::sysspeed)
     Write vdp wait cycles (1=add 14 cycles, 0=add none)
     see above for waitstate handling
 */
-WRITE_LINE_MEMBER(geneve_pal_device::vwaiten)
+void geneve_pal_device::vwaiten(int state)
 {
 	bool prev = m_pin19;
 	m_pin19 = (state==ASSERT_LINE);
@@ -1278,7 +1278,7 @@ WRITE_LINE_MEMBER(geneve_pal_device::vwaiten)
 /*
     Clock input. This controls the state of the waitstate counter.
 */
-WRITE_LINE_MEMBER(geneve_pal_device::clock_in)
+void geneve_pal_device::clock_in(int state)
 {
 	LOGMASKED(LOG_CLOCK, "CLK%s\n", state? "?" : "?");
 	// Set the FF
@@ -1438,7 +1438,7 @@ void genmod_decoder_device::set_function(int func, int page)
 	}
 }
 
-WRITE_LINE_MEMBER(genmod_decoder_device::gaready_in)
+void genmod_decoder_device::gaready_in(int state)
 {
 	m_gaready = state;
 }
@@ -1447,7 +1447,7 @@ WRITE_LINE_MEMBER(genmod_decoder_device::gaready_in)
     READY line from the box. Do not ignore this line, as it is important
     for device operation.
 */
-WRITE_LINE_MEMBER(genmod_decoder_device::extready_in)
+void genmod_decoder_device::extready_in(int state)
 {
 	m_extready = state;
 }
@@ -1455,7 +1455,7 @@ WRITE_LINE_MEMBER(genmod_decoder_device::extready_in)
 /*
     READY line from the sound chip.
 */
-WRITE_LINE_MEMBER(genmod_decoder_device::sndready_in)
+void genmod_decoder_device::sndready_in(int state)
 {
 	m_sndready = state;
 }
@@ -1465,7 +1465,7 @@ WRITE_LINE_MEMBER(genmod_decoder_device::sndready_in)
     The Genmod board does not look inside the Gate Array. The call we are using
     is just a shorthand for evaluating the states of the select lines.
 */
-READ_LINE_MEMBER(genmod_decoder_device::gaready_out)
+int genmod_decoder_device::gaready_out()
 {
 	int func = m_debug? m_function_debug : m_function;
 	int page = m_debug? m_page_debug : m_page;
@@ -1496,7 +1496,7 @@ READ_LINE_MEMBER(genmod_decoder_device::gaready_out)
     Note: It is not sufficient to check for the page area; we need to check
     the select lines (via the static functions).
 */
-READ_LINE_MEMBER(genmod_decoder_device::dben_out)
+int genmod_decoder_device::dben_out()
 {
 	int func = m_debug? m_function_debug : m_function;
 

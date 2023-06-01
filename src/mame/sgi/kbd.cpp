@@ -73,7 +73,7 @@ void sgi_kbd_port_device::device_start()
 	m_rxd_handler(1);
 }
 
-WRITE_LINE_MEMBER(sgi_kbd_port_device::write_txd)
+void sgi_kbd_port_device::write_txd(int state)
 {
 	if (m_kbd)
 		m_kbd->write_txd(state);

@@ -71,8 +71,8 @@ public:
 	void install_device(offs_t start, offs_t end, read8sm_delegate rhandler, write8sm_delegate whandler);
 	void install_bank(offs_t start, offs_t end, uint8_t *data);
 
-	DECLARE_WRITE_LINE_MEMBER( irq_w );
-	DECLARE_WRITE_LINE_MEMBER( nmi_w );
+	void irq_w(int state);
+	void nmi_w(int state);
 
 protected:
 	a1bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

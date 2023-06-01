@@ -61,19 +61,19 @@
 #include "screen.h"
 
 
-WRITE_LINE_MEMBER( namco_51xx_device::reset )
+void namco_51xx_device::reset(int state)
 {
 	// Reset line is active low.
 	m_cpu->set_input_line(INPUT_LINE_RESET, !state);
 }
 
-WRITE_LINE_MEMBER( namco_51xx_device::vblank )
+void namco_51xx_device::vblank(int state)
 {
 	// The timer is active on falling edges.
 	m_cpu->clock_w(!state);
 }
 
-WRITE_LINE_MEMBER(namco_51xx_device::rw)
+void namco_51xx_device::rw(int state)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_51xx_device::rw_sync),this), state);
 }
@@ -83,7 +83,7 @@ TIMER_CALLBACK_MEMBER( namco_51xx_device::rw_sync )
 	m_rw = param;
 }
 
-WRITE_LINE_MEMBER( namco_51xx_device::chip_select )
+void namco_51xx_device::chip_select(int state)
 {
 	m_cpu->set_input_line(0, state);
 }

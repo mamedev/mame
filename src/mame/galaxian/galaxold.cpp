@@ -594,7 +594,7 @@ void galaxold_state::bullsdrtg_data_map(address_map &map)
 
 // Lives Dips are spread across two input ports
 template <int Mask>
-READ_LINE_MEMBER(galaxold_state::vpool_lives_r)
+int galaxold_state::vpool_lives_r()
 {
 	switch (Mask)
 	{
@@ -933,7 +933,7 @@ static INPUT_PORTS_START( scrambleo )
 INPUT_PORTS_END
 
 template <int Mask>
-READ_LINE_MEMBER(galaxold_state::_4in1_fake_port_r)
+int galaxold_state::_4in1_fake_port_r()
 {
 	static const char *const portnames[] = { "FAKE1", "FAKE2", "FAKE3", "FAKE4" };
 

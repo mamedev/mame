@@ -451,7 +451,7 @@ TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_pixel)
 
 /******************************************************************************/
 
-WRITE_LINE_MEMBER(taito_f3_state::screen_vblank)
+void taito_f3_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)

@@ -160,9 +160,9 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(activity_button);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
-	template <int Param> DECLARE_READ_LINE_MEMBER(outhole_x0);
-	template <int Param> DECLARE_READ_LINE_MEMBER(drop_target_x0);
-	template <int Param> DECLARE_READ_LINE_MEMBER(kickback_x3);
+	template <int Param> int outhole_x0();
+	template <int Param> int drop_target_x0();
+	template <int Param> int kickback_x3();
 
 	void by35(machine_config &config);
 	void nuovo(machine_config &config);
@@ -217,10 +217,10 @@ protected:
 	void u11_b_w(uint8_t data);
 	uint8_t nibble_nvram_r(offs_t offset);
 	void nibble_nvram_w(offs_t offset, uint8_t data);
-	DECLARE_READ_LINE_MEMBER(u10_ca1_r);
-	DECLARE_WRITE_LINE_MEMBER(u10_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(u10_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
+	int u10_ca1_r();
+	void u10_ca2_w(int state);
+	void u10_cb2_w(int state);
+	void u11_cb2_w(int state);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_freq);
@@ -1011,7 +1011,7 @@ INPUT_PORTS_END
 
 
 template <int Param>
-READ_LINE_MEMBER( by35_state::outhole_x0 )
+int by35_state::outhole_x0()
 {
 	int bit_shift = (Param & 0x07);
 	int port = ((Param >> 4) & 0x07);
@@ -1025,7 +1025,7 @@ READ_LINE_MEMBER( by35_state::outhole_x0 )
 }
 
 template <int Param>
-READ_LINE_MEMBER( by35_state::kickback_x3 )
+int by35_state::kickback_x3()
 {
 	int bit_shift = (Param & 0x07);
 	int port = ((Param >> 4) & 0x07);
@@ -1039,7 +1039,7 @@ READ_LINE_MEMBER( by35_state::kickback_x3 )
 }
 
 template <int Param>
-READ_LINE_MEMBER( by35_state::drop_target_x0 )
+int by35_state::drop_target_x0()
 {
 	/* Here we simulate the Drop Target switch states so the Drop Target Reset Solenoid can also release the switches */
 
@@ -1088,12 +1088,12 @@ INPUT_CHANGED_MEMBER( by35_state::self_test )
 	m_pia_u10->ca1_w(newval);
 }
 
-READ_LINE_MEMBER( by35_state::u10_ca1_r )
+int by35_state::u10_ca1_r()
 {
 	return m_io_test->read() & 0x01;
 }
 
-WRITE_LINE_MEMBER( by35_state::u10_ca2_w )
+void by35_state::u10_ca2_w(int state)
 {
 #if 0                   // Display Blanking - Out of sync with video redraw rate and causes flicker so it's disabled
 	if (state == 0)
@@ -1112,7 +1112,7 @@ WRITE_LINE_MEMBER( by35_state::u10_ca2_w )
 	m_u10_ca2 = state;
 }
 
-WRITE_LINE_MEMBER( by35_state::u10_cb2_w )
+void by35_state::u10_cb2_w(int state)
 {
 	LOG("New U10 CB2 state %01x, was %01x.   PIA=%02x\n", state, m_u10_cb2, m_u10a);
 
@@ -1122,7 +1122,7 @@ WRITE_LINE_MEMBER( by35_state::u10_cb2_w )
 	m_u10_cb2 = state;
 }
 
-WRITE_LINE_MEMBER( by35_state::u11_cb2_w )
+void by35_state::u11_cb2_w(int state)
 {
 	// Handle sound
 	if (!m_sound_int_handler.isnull())

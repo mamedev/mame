@@ -190,7 +190,7 @@ void acorn_ioc_device::latch_timer_cnt(int tmr)
 	m_timerout[tmr] = m_timercnt[tmr] - (uint32_t)m_timers[tmr]->elapsed().as_ticks(clock() / 4);
 }
 
-WRITE_LINE_MEMBER(acorn_ioc_device::if_w)
+void acorn_ioc_device::if_w(int state)
 {
 	// set on falling edge
 	if (m_if && !state)
@@ -199,7 +199,7 @@ WRITE_LINE_MEMBER(acorn_ioc_device::if_w)
 	m_if = state;
 }
 
-WRITE_LINE_MEMBER(acorn_ioc_device::ir_w)
+void acorn_ioc_device::ir_w(int state)
 {
 	// set on rising edge
 	if (!m_ir && state)

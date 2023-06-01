@@ -109,7 +109,7 @@ TIMER_CALLBACK_MEMBER(vp415_state::drive_2ppr_tick)
 	m_drive_2ppr_timer->adjust(attotime::from_msec(10));
 }
 
-WRITE_LINE_MEMBER(vp415_state::refv_w)
+void vp415_state::refv_w(int state)
 {
 	m_refv = state;
 	m_drivecpu->set_input_line(MCS51_INT0_LINE, m_refv ? CLEAR_LINE : ASSERT_LINE);
@@ -118,7 +118,7 @@ WRITE_LINE_MEMBER(vp415_state::refv_w)
 
 // CPU Datagrabber Module (W)
 
-WRITE_LINE_MEMBER(vp415_state::cpu_int1_w)
+void vp415_state::cpu_int1_w(int state)
 {
 	set_int_line(0, state);
 }
@@ -420,13 +420,13 @@ void vp415_state::drive_cpu_port1_w(uint8_t data)
 	m_chargen->ldi_w(BIT(data, 2));
 }
 
-//READ_LINE_MEMBER(vp415_state::drive_rxd_r)
+//int vp415_state::drive_rxd_r()
 //{
 //  logerror("%s: drive_rxd_r: %d\n", machine().describe_context(), 0);
 //  return 0;
 //}
 
-//WRITE_LINE_MEMBER(vp415_state::drive_txd_w)
+//void vp415_state::drive_txd_w(int state)
 //{
 //  logerror("%s: drive_txd_w: %d\n", machine().describe_context(), state);
 //}

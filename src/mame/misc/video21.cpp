@@ -48,7 +48,7 @@ public:
 	{ }
 
 	void video21(machine_config &config);
-	DECLARE_READ_LINE_MEMBER(hopper_coinout_r);
+	int hopper_coinout_r();
 
 protected:
 	virtual void machine_start() override;
@@ -168,7 +168,7 @@ void video21_state::io_map(address_map &map) {
 }
 
 
-READ_LINE_MEMBER(video21_state::hopper_coinout_r)
+int video21_state::hopper_coinout_r()
 {
 	return m_hopper_coin;
 }

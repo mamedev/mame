@@ -345,7 +345,7 @@ private:
 	uint8_t dropdoor_r();
 	uint8_t watchdog_r();
 	void crtc_mode_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
+	void crtc_vsync(int state);
 	void i2c_nvram_w(uint8_t data);
 	uint8_t input_bank_a_r();
 	uint8_t input0_r();
@@ -444,7 +444,7 @@ void peplus_state::handle_lightpen()
 	m_assert_lp_timer->adjust(m_screen->time_until_pos(yt, xt), 0);
 }
 
-WRITE_LINE_MEMBER(peplus_state::crtc_vsync)
+void peplus_state::crtc_vsync(int state)
 {
 	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 	handle_lightpen();

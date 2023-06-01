@@ -57,7 +57,7 @@ private:
 	uint8_t m_bank;
 	int m_hidden;
 
-	DECLARE_WRITE_LINE_MEMBER(mainlatch_int) { m_slot->nmi_w(state); }
+	void mainlatch_int(int state) { m_slot->nmi_w(state); }
 	uint8_t rom_r(offs_t offset) { return m_romx[offset]; } // cartridge cpu rom
 	uint8_t nvram_r(offs_t offset) { return m_nvram[offset & 0x1fff]; }
 	void nvram_w(offs_t offset, uint8_t data) { m_nvram[offset & 0x1fff] = data; }

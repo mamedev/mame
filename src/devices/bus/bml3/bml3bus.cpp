@@ -184,9 +184,9 @@ void bml3bus_device::set_firq_line(int state)
 }
 
 // interrupt request from bml3bus card
-WRITE_LINE_MEMBER( bml3bus_device::nmi_w ) { m_out_nmi_cb(state); }
-WRITE_LINE_MEMBER( bml3bus_device::irq_w ) { m_out_irq_cb(state); }
-WRITE_LINE_MEMBER( bml3bus_device::firq_w ) { m_out_firq_cb(state); }
+void bml3bus_device::nmi_w(int state) { m_out_nmi_cb(state); }
+void bml3bus_device::irq_w(int state) { m_out_irq_cb(state); }
+void bml3bus_device::firq_w(int state) { m_out_firq_cb(state); }
 
 //**************************************************************************
 //  DEVICE CONFIG BML3BUS CARD INTERFACE

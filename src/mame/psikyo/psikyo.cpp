@@ -90,7 +90,7 @@ This was pointed out by Bart Puype
                         Strikers 1945 / Tengai MCU
 ***************************************************************************/
 
-READ_LINE_MEMBER(psikyo_state::mcu_status_r)
+int psikyo_state::mcu_status_r()
 {
 	int ret = 0x00;
 
@@ -431,7 +431,7 @@ void psikyo_state::s1945_sound_io_map(address_map &map)
 
 ***************************************************************************/
 
-READ_LINE_MEMBER(psikyo_state::z80_nmi_r)
+int psikyo_state::z80_nmi_r()
 {
 	int ret = 0x00;
 

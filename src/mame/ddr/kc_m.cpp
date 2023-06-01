@@ -677,20 +677,20 @@ uint8_t kc85_4_state::kc85_4_86_r()
 
 /* callback for ardy output from PIO */
 /* used in KC85/4 & KC85/3 cassette interface */
-WRITE_LINE_MEMBER( kc_state::pio_ardy_cb)
+void kc_state::pio_ardy_cb(int state)
 {
 	m_ardy = state & 0x01;
 }
 
 /* callback for brdy output from PIO */
 /* used in KC85/4 & KC85/3 keyboard interface */
-WRITE_LINE_MEMBER( kc_state::pio_brdy_cb)
+void kc_state::pio_brdy_cb(int state)
 {
 	m_brdy = state & 0x01;
 }
 
 /* used in cassette write -> K0 */
-WRITE_LINE_MEMBER( kc_state::ctc_zc0_callback )
+void kc_state::ctc_zc0_callback(int state)
 {
 	if (state)
 	{
@@ -700,7 +700,7 @@ WRITE_LINE_MEMBER( kc_state::ctc_zc0_callback )
 	}
 }
 
-WRITE_LINE_MEMBER( kc85_3_state::ctc_zc0_callback )
+void kc85_3_state::ctc_zc0_callback(int state)
 {
 	if (state)
 	{
@@ -712,7 +712,7 @@ WRITE_LINE_MEMBER( kc85_3_state::ctc_zc0_callback )
 }
 
 /* used in cassette write -> K1 */
-WRITE_LINE_MEMBER( kc_state::ctc_zc1_callback)
+void kc_state::ctc_zc1_callback(int state)
 {
 	if (state)
 	{
@@ -772,7 +772,7 @@ void kc_state::tapeout_update()
 }
 
 /* keyboard callback */
-WRITE_LINE_MEMBER( kc_state::keyboard_cb )
+void kc_state::keyboard_cb(int state)
 {
 	m_z80pio->strobe_b(state & m_brdy);
 
@@ -863,7 +863,7 @@ void kc_state::kc85_palette(palette_device &palette) const
 }
 
 /* set new blink state */
-WRITE_LINE_MEMBER( kc_state::video_toggle_blink_state )
+void kc_state::video_toggle_blink_state(int state)
 {
 	if (state)
 	{

@@ -43,13 +43,13 @@ public:
 	auto pse_wr_callback() { return pse_cb.bind(); }
 	auto nuc_wr_callback() { return nuc_cb.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( ce_w );
-	DECLARE_WRITE_LINE_MEMBER( sck_w );
-	DECLARE_READ_LINE_MEMBER( sdo_r );
-	DECLARE_WRITE_LINE_MEMBER( sdi_w );
-	DECLARE_WRITE_LINE_MEMBER( pwrsw_w );
-	DECLARE_WRITE_LINE_MEMBER( por_w );
-	DECLARE_WRITE_LINE_MEMBER( test_w );
+	void ce_w(int state);
+	void sck_w(int state);
+	int sdo_r();
+	void sdi_w(int state);
+	void pwrsw_w(int state);
+	void por_w(int state);
+	void test_w(int state);
 
 protected:
 	// device-level overrides

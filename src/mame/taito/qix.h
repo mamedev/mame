@@ -124,30 +124,30 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(pia_w_callback);
 	TIMER_CALLBACK_MEMBER(deferred_sndpia1_porta_w);
-	DECLARE_WRITE_LINE_MEMBER(qix_vsync_changed);
+	void qix_vsync_changed(int state);
 	void qix_pia_w(offs_t offset, uint8_t data);
 	void qix_coinctl_w(uint8_t data);
 	void slither_76489_0_w(uint8_t data);
 	void slither_76489_1_w(uint8_t data);
 	uint8_t slither_trak_lr_r();
 	uint8_t slither_trak_ud_r();
-	DECLARE_WRITE_LINE_MEMBER(display_enable_changed);
-	DECLARE_WRITE_LINE_MEMBER(qix_flip_screen_w);
+	void display_enable_changed(int state);
+	void qix_flip_screen_w(int state);
 	void qix_dac_w(uint8_t data);
 	void qix_vol_w(uint8_t data);
 	void sndpia_2_warning_w(uint8_t data);
 	void sync_sndpia1_porta_w(uint8_t data);
 	void slither_coinctl_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(qix_pia_dint);
-	DECLARE_WRITE_LINE_MEMBER(qix_pia_sint);
+	void qix_pia_dint(int state);
+	void qix_pia_sint(int state);
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	void set_pen(int offs);
 	int kram3_permut1(int idx, int value);
 	int kram3_permut2(int tbl_index, int idx, const uint8_t *xor_table);
 	int kram3_decrypt(int address, int value);
-	DECLARE_WRITE_LINE_MEMBER(kram3_lic_maincpu_changed);
-	DECLARE_WRITE_LINE_MEMBER(kram3_lic_videocpu_changed);
+	void kram3_lic_maincpu_changed(int state);
+	void kram3_lic_videocpu_changed(int state);
 
 	void audio_map(address_map &map);
 	void kram3_main_map(address_map &map);

@@ -68,7 +68,7 @@ private:
 	void io4_w(uint8_t data);
 	void adpcm_w(uint8_t data);
 	uint8_t arm_r();
-	DECLARE_WRITE_LINE_MEMBER(msm5205_vck);
+	void msm5205_vck(int state);
 
 	required_device<cpu_device> m_maincpu;
 	required_memory_bank m_rombank;
@@ -242,7 +242,7 @@ uint8_t armchamp_state::arm_r()
 	return (ioport("ARM")->read() & 0xff);
 }
 
-WRITE_LINE_MEMBER(armchamp_state::msm5205_vck)
+void armchamp_state::msm5205_vck(int state)
 {
 	if (m_io2 & 0x80)
 	{

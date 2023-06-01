@@ -159,8 +159,8 @@ public:
 	// callback configuration
 	auto out_irq_cb() { return m_out_irq.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(ca);
-	DECLARE_WRITE_LINE_MEMBER(reset_w);
+	void ca(int state);
+	void reset_w(int state);
 
 protected:
 	i82586_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endian, u8 datawidth, u8 addrwidth);

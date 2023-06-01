@@ -399,7 +399,7 @@ uint8_t i82439hx_host_device::errsyn_r()
 	return errsyn;
 }
 
-WRITE_LINE_MEMBER(i82439hx_host_device::smi_act_w)
+void i82439hx_host_device::smi_act_w(int state)
 {
 	// state is 0 when smm is not active
 	// but smiact_n reflects the state of the SMIACT# pin

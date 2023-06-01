@@ -51,7 +51,7 @@ public:
 	template <typename T> void set_irq_info(T &&tag, const int irq_num, int serial_num)
 	{ m_cpu.set_tag(std::forward<T>(tag)); m_irq_num = irq_num; m_serial_irq_num = serial_num; }
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_update);
+	void vblank_update(int state);
 	void serial_rx_w(uint8_t data);
 
 	enum { IO_SYSTEM, IO_IN1, IO_SW5, IO_NUM };
@@ -118,7 +118,7 @@ private:
 	uint32_t e1_ram_r(offs_t offset, uint32_t mem_mask = ~0);
 	void e1_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE_LINE_MEMBER(serial_interrupt);
+	void serial_interrupt(int state);
 };
 
 class iteagle_eeprom_device : public pci_device {

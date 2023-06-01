@@ -211,10 +211,10 @@ private:
 
 	emu_timer   *m_ack_clear_timer = nullptr;
 
-	DECLARE_WRITE_LINE_MEMBER(msm5205_int);
+	void msm5205_int(int state);
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
-	DECLARE_WRITE_LINE_MEMBER(cdda_end_mark_cb);
+	void cdda_end_mark_cb(int state);
 };
 
 

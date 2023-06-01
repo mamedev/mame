@@ -365,7 +365,7 @@ private:
 	tilemap_t *m_bg_tilemap2 = nullptr;
 	tilemap_t *m_bg_tilemap3 = nullptr;
 
-	DECLARE_WRITE_LINE_MEMBER(splash_msm5205_int);
+	void splash_msm5205_int(int state);
 	void splash_adpcm_data_w(uint8_t data);
 	void splash_adpcm_control_w(uint8_t data);
 	int m_adpcm_data = 0;
@@ -678,7 +678,7 @@ void bigkarnk_ms_state::splash_adpcm_control_w(uint8_t data)
 	m_soundrom->set_bank(bank & 0xf);
 }
 
-WRITE_LINE_MEMBER(bigkarnk_ms_state::splash_msm5205_int)
+void bigkarnk_ms_state::splash_msm5205_int(int state)
 {
 	m_msm->data_w(m_adpcm_data >> 4);
 	m_adpcm_data = (m_adpcm_data << 4) & 0xf0;

@@ -83,9 +83,9 @@ private:
 	tilemap_t *m_pf1_tilemap = nullptr;
 	tilemap_t *m_fix_tilemap = nullptr;
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-	DECLARE_WRITE_LINE_MEMBER(irq_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_reset_w);
+	void vblank_irq(int state);
+	void irq_enable_w(int state);
+	void sound_reset_w(int state);
 
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
@@ -206,13 +206,13 @@ void slapfght_ms_state::video_start()
 
 // machine
 
-WRITE_LINE_MEMBER(slapfght_ms_state::vblank_irq)
+void slapfght_ms_state::vblank_irq(int state)
 {
 	if (state && m_main_irq_enabled)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(slapfght_ms_state::irq_enable_w)
+void slapfght_ms_state::irq_enable_w(int state)
 {
 	m_main_irq_enabled = state ? true : false;
 
@@ -220,7 +220,7 @@ WRITE_LINE_MEMBER(slapfght_ms_state::irq_enable_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(slapfght_ms_state::sound_reset_w)
+void slapfght_ms_state::sound_reset_w(int state)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 

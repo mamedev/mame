@@ -466,7 +466,7 @@ void gt64xxx_device::reset_all_mappings()
 }
 
 // PCI Stalling
-WRITE_LINE_MEMBER(gt64xxx_device::pci_stall)
+void gt64xxx_device::pci_stall(int state)
 {
 	// Reset the retry count once unstalled
 	if (state==0 && m_pci_stall_state==1) {

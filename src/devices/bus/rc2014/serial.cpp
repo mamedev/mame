@@ -32,8 +32,8 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_bus->int_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( tx_w ) { m_bus->tx_w(state); }
+	void irq_w(int state) { m_bus->int_w(state); }
+	void tx_w(int state) { m_bus->tx_w(state); }
 private:
 	required_device<acia6850_device> m_acia;
 };
@@ -108,11 +108,11 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	virtual DECLARE_WRITE_LINE_MEMBER( irq_w ) = 0;
-	virtual DECLARE_WRITE_LINE_MEMBER( tx_w ) = 0;
-	virtual DECLARE_WRITE_LINE_MEMBER( tx2_w ) = 0;
-	DECLARE_WRITE_LINE_MEMBER( clk1_w ) { if (m_clk_portb == 1) { m_sio->txcb_w(state); m_sio->rxcb_w(state); } }
-	DECLARE_WRITE_LINE_MEMBER( clk2_w ) { if (m_clk_portb == 0) { m_sio->txcb_w(state); m_sio->rxcb_w(state); } }
+	virtual void irq_w(int state) = 0;
+	virtual void tx_w(int state) = 0;
+	virtual void tx2_w(int state) = 0;
+	void clk1_w(int state) { if (m_clk_portb == 1) { m_sio->txcb_w(state); m_sio->rxcb_w(state); } }
+	void clk2_w(int state) { if (m_clk_portb == 0) { m_sio->txcb_w(state); m_sio->rxcb_w(state); } }
 
 	// base-class members
 	u8 m_clk_portb;
@@ -188,9 +188,9 @@ protected:
 	virtual void device_resolve_objects() override;
 
 	// base-class overrides
-	DECLARE_WRITE_LINE_MEMBER( irq_w ) override { m_bus->int_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( tx_w ) override { m_bus->tx_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( tx2_w ) override { m_bus->tx2_w(state); }
+	void irq_w(int state) override { m_bus->int_w(state); }
+	void tx_w(int state) override { m_bus->tx_w(state); }
+	void tx2_w(int state) override { m_bus->tx2_w(state); }
 };
 
 dual_serial_device::dual_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -238,9 +238,9 @@ protected:
 	virtual void device_resolve_objects() override;
 
 	// base-class overrides
-	DECLARE_WRITE_LINE_MEMBER( irq_w ) override { m_bus->int_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( tx_w ) override { m_bus->tx_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( tx2_w ) override { }
+	void irq_w(int state) override { m_bus->int_w(state); }
+	void tx_w(int state) override { m_bus->tx_w(state); }
+	void tx2_w(int state) override { }
 };
 
 dual_serial_device_40pin::dual_serial_device_40pin(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)

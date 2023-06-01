@@ -213,7 +213,7 @@ device_memory_interface::space_config_vector i82586_base_device::memory_space_co
 	};
 }
 
-WRITE_LINE_MEMBER(i82586_base_device::ca)
+void i82586_base_device::ca(int state)
 {
 	LOG("channel attention %s (%s)\n", state ? "asserted" : "cleared", machine().describe_context());
 
@@ -227,7 +227,7 @@ WRITE_LINE_MEMBER(i82586_base_device::ca)
 	}
 }
 
-WRITE_LINE_MEMBER(i82586_base_device::reset_w)
+void i82586_base_device::reset_w(int state)
 {
 	LOG("reset %s (%s)\n", state ? "asserted" : "cleared", machine().describe_context());
 

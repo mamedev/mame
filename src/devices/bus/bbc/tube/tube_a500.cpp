@@ -140,7 +140,7 @@ void bbc_tube_a500_device::device_start()
 //  IMPLEMENTATION
 //**************************************************************************
 
-WRITE_LINE_MEMBER(bbc_tube_a500_device::prst_w)
+void bbc_tube_a500_device::prst_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, state);
 }

@@ -157,7 +157,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	INTERRUPT_GEN_MEMBER(interrupt_nmi);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -294,7 +294,7 @@ void jailbrek_state::coin_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 }
 
-WRITE_LINE_MEMBER(jailbrek_state::vblank_irq)
+void jailbrek_state::vblank_irq(int state)
 {
 	if (state && m_irq_enable)
 		m_maincpu->set_input_line(0, HOLD_LINE);

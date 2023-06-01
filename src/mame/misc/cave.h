@@ -55,10 +55,10 @@ public:
 		, m_led_outputs(*this, "led%u", 0U)
 	{ }
 
-	DECLARE_READ_LINE_MEMBER(korokoro_hopper_r);
-	DECLARE_READ_LINE_MEMBER(tjumpman_hopper_r);
-	DECLARE_READ_LINE_MEMBER(paccarn_bet4_r);
-	DECLARE_READ_LINE_MEMBER(paccarn_bet8_r);
+	int korokoro_hopper_r();
+	int tjumpman_hopper_r();
+	int paccarn_bet4_r();
+	int paccarn_bet8_r();
 
 	void init_uopoko();
 	void init_donpachi();
@@ -177,7 +177,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(sailormn_startup);
 	void get_sprite_info(int chip);
 	void sailormn_tilebank_w(int bank);
-	DECLARE_WRITE_LINE_MEMBER(sound_irq_gen);
+	void sound_irq_gen(int state);
 	void update_irq_state();
 	void unpack_sprites(int chip);
 	void sailormn_unpack_tiles(int chip);

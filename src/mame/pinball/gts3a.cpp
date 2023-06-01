@@ -97,8 +97,8 @@ private:
 	void u5a_w(u8 data);
 	u8 dmd_r();
 	void dmd_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(crtc_vs);
+	void nmi_w(int state);
+	void crtc_vs(int state);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	void palette_init(palette_device &palette);
 	required_device<palette_device> m_palette;
@@ -284,7 +284,7 @@ INPUT_CHANGED_MEMBER( gts3a_state::test_inp )
 }
 
 // This trampoline needed; WRITELINE("maincpu", m65c02_device, nmi_line) does not work
-WRITE_LINE_MEMBER( gts3a_state::nmi_w )
+void gts3a_state::nmi_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, (state) ? CLEAR_LINE : HOLD_LINE);
 }
@@ -401,7 +401,7 @@ MC6845_UPDATE_ROW( gts3a_state::crtc_update_row )
 	}
 }
 
-WRITE_LINE_MEMBER( gts3a_state::crtc_vs )
+void gts3a_state::crtc_vs(int state)
 {
 	if (state)
 		//m_dmdcpu->set_input_line(INPUT_LINE_NMI, HOLD_LINE);

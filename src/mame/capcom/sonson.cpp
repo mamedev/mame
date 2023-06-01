@@ -101,11 +101,11 @@ private:
 	// video-related
 	tilemap_t *m_bg_tilemap = nullptr;
 
-	DECLARE_WRITE_LINE_MEMBER(sh_irqtrigger_w);
+	void sh_irqtrigger_w(int state);
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
 	void scrollx_w(uint8_t data);
-	template<uint8_t Which> WRITE_LINE_MEMBER(coin_counter_w);
+	template<uint8_t Which> void coin_counter_w(int state);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -273,7 +273,7 @@ uint32_t sonson_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 // machine
 
-WRITE_LINE_MEMBER(sonson_state::sh_irqtrigger_w)
+void sonson_state::sh_irqtrigger_w(int state)
 {
 	// setting bit 0 low then high triggers IRQ on the sound CPU
 	if (state)
@@ -281,7 +281,7 @@ WRITE_LINE_MEMBER(sonson_state::sh_irqtrigger_w)
 }
 
 template <uint8_t Which>
-WRITE_LINE_MEMBER(sonson_state::coin_counter_w)
+void sonson_state::coin_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(Which, state);
 }

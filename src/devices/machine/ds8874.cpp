@@ -60,7 +60,7 @@ void ds8874_device::refresh_output()
 	m_write_output(m_shift);
 }
 
-WRITE_LINE_MEMBER(ds8874_device::data_w)
+void ds8874_device::data_w(int state)
 {
 	state = (state) ? 1 : 0;
 
@@ -74,7 +74,7 @@ WRITE_LINE_MEMBER(ds8874_device::data_w)
 	m_data = state;
 }
 
-WRITE_LINE_MEMBER(ds8874_device::cp_w)
+void ds8874_device::cp_w(int state)
 {
 	state = (state) ? 1 : 0;
 

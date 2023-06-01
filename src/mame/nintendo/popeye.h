@@ -42,8 +42,8 @@ public:
 		m_field(0)
 	{ }
 
-	DECLARE_READ_LINE_MEMBER(dsw1_read);
-	DECLARE_READ_LINE_MEMBER(pop_field_r);
+	int dsw1_read();
+	int pop_field_r();
 
 	virtual void config(machine_config &config);
 
@@ -94,7 +94,7 @@ protected:
 	virtual void video_start() override;
 	virtual void tnx1_palette(palette_device &palette);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	virtual DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	virtual void screen_vblank(int state);
 	void update_palette();
 	virtual void decrypt_rom();
 	virtual void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -143,7 +143,7 @@ protected:
 
 	virtual void driver_start() override;
 	virtual void refresh_w(offs_t offset, uint8_t data) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(screen_vblank) override;
+	virtual void screen_vblank(int state) override;
 	virtual void maincpu_program_map(address_map &map) override;
 	virtual void decrypt_rom() override;
 	virtual void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect) override;

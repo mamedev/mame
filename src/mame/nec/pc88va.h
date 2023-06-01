@@ -138,9 +138,9 @@ private:
 	TIMER_CALLBACK_MEMBER(pc88va_fdc_timer);
 	TIMER_CALLBACK_MEMBER(pc88va_fdc_motor_start_0);
 	TIMER_CALLBACK_MEMBER(pc88va_fdc_motor_start_1);
-	DECLARE_WRITE_LINE_MEMBER(tc_w);
+	void tc_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
+	void fdc_irq(int state);
 	static void floppy_formats(format_registration &fr);
 	void pc88va_fdc_update_ready(floppy_image_device *, int);
 	uint8_t fake_subfdc_r();
@@ -275,7 +275,7 @@ private:
 	u8 m_misc_ctrl = 0x80;
 	bool m_sound_irq_enable = false;
 	bool m_sound_irq_pending = false;
-	DECLARE_WRITE_LINE_MEMBER(int4_irq_w);
+	void int4_irq_w(int state);
 };
 
 

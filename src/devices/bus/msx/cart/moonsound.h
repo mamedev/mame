@@ -26,7 +26,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void irq_w(int state);
 	void write_ymf278b_pcm(offs_t offset, u8 data);
 	u8 read_ymf278b_pcm(offs_t offset);
 	u8 read_c0();

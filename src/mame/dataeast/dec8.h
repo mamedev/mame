@@ -189,10 +189,10 @@ private:
 	uint32_t screen_update_oscar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_srdarwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cobracom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_dec8);
-	DECLARE_WRITE_LINE_MEMBER(oscar_coin_irq);
+	void screen_vblank_dec8(int state);
+	void oscar_coin_irq(int state);
 	void oscar_coin_clear_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(shackled_coin_irq);
+	void shackled_coin_irq(int state);
 	void srdarwin_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &primap);
 	void gondo_colpri_cb(u32 &colour, u32 &pri_mask);
 	void cobracom_colpri_cb(u32 &colour, u32 &pri_mask);
@@ -240,7 +240,7 @@ private:
 	void csilver_sound_bank_w(uint8_t data);
 	void csilver_mcu_to_main_w(uint8_t data);
 	uint8_t csilver_adpcm_reset_r();
-	DECLARE_WRITE_LINE_MEMBER(csilver_adpcm_int);
+	void csilver_adpcm_int(int state);
 
 	void csilver_map(address_map &map);
 	void csilver_s_map(address_map &map);

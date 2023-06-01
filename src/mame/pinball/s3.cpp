@@ -103,14 +103,14 @@ protected:
 	u8 m_lamp_data = 0;
 	u8 m_game = 0;
 	bool m_disco = false;
-	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { m_io_outputs[20] = state; } //ST5
-	DECLARE_WRITE_LINE_MEMBER(pia22_cb2_w) { } //ST-solenoids enable
-	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { m_io_outputs[17] = state; } //ST2
-	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { m_io_outputs[16] = state; } //ST1
-	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { } //diag leds enable
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { m_io_outputs[21] = state; } //ST6
-	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { m_io_outputs[19] = state; } //ST4
-	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { m_io_outputs[18] = state; } //ST3
+	void pia22_ca2_w(int state) { m_io_outputs[20] = state; } //ST5
+	void pia22_cb2_w(int state) { } //ST-solenoids enable
+	void pia24_ca2_w(int state) { m_io_outputs[17] = state; } //ST2
+	void pia24_cb2_w(int state) { m_io_outputs[16] = state; } //ST1
+	void pia28_ca2_w(int state) { } //diag leds enable
+	void pia28_cb2_w(int state) { m_io_outputs[21] = state; } //ST6
+	void pia30_ca2_w(int state) { m_io_outputs[19] = state; } //ST4
+	void pia30_cb2_w(int state) { m_io_outputs[18] = state; } //ST3
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 	void main_map(address_map &map);
 

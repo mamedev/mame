@@ -252,8 +252,8 @@ private:
 		COMBINE_DATA(&m_automat_scroll_regs[offset]);
 	}
 	void sound_bankswitch_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(msm1_vclk_cb);
-	DECLARE_WRITE_LINE_MEMBER(msm2_vclk_cb);
+	void msm1_vclk_cb(int state);
+	void msm2_vclk_cb(int state);
 
 	virtual void machine_start() override;
 

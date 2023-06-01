@@ -5314,6 +5314,7 @@ void mips3_device::execute_run()
 {
 	if (m_isdrc)
 	{
+		printf("DRC on\n");
 		int execute_result;
 
 		/* reset the cache if dirty */
@@ -5345,6 +5346,8 @@ void mips3_device::execute_run()
 
 		return;
 	}
+
+	printf("DRC off\n");
 
 	/* count cycles and interrupt cycles */
 	m_core->icount -= m_interrupt_cycles;

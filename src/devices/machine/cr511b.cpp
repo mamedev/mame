@@ -93,12 +93,12 @@ void cr511b_device::write(uint8_t data)
 {
 }
 
-WRITE_LINE_MEMBER( cr511b_device::enable_w )
+void cr511b_device::enable_w(int state)
 {
 	m_enabled = state;
 }
 
-WRITE_LINE_MEMBER( cr511b_device::cmd_w )
+void cr511b_device::cmd_w(int state)
 {
 	m_cmd = state;
 }

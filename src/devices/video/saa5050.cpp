@@ -512,7 +512,7 @@ void saa5050_device::get_character_data(uint8_t data)
 //  crs_w - character rounding select
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( saa5050_device::crs_w )
+void saa5050_device::crs_w(int state)
 {
 	m_crs = !(state & 1);
 }
@@ -522,7 +522,7 @@ WRITE_LINE_MEMBER( saa5050_device::crs_w )
 //  dew_w - data entry window
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( saa5050_device::dew_w )
+void saa5050_device::dew_w(int state)
 {
 	if (state)
 	{
@@ -538,7 +538,7 @@ WRITE_LINE_MEMBER( saa5050_device::dew_w )
 //  lose_w - load output shift register enable
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( saa5050_device::lose_w )
+void saa5050_device::lose_w(int state)
 {
 	if (state)
 	{
@@ -574,7 +574,7 @@ WRITE_LINE_MEMBER( saa5050_device::lose_w )
 //  tlc_r - transmitted large character
 //-------------------------------------------------
 
-READ_LINE_MEMBER( saa5050_device::tlc_r )
+int saa5050_device::tlc_r()
 {
 	return !m_double_height_bottom_row;
 }
@@ -594,7 +594,7 @@ void saa5050_device::write(uint8_t data)
 //  f1_w - character clock
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( saa5050_device::f1_w )
+void saa5050_device::f1_w(int state)
 {
 	if (state)
 	{
@@ -607,7 +607,7 @@ WRITE_LINE_MEMBER( saa5050_device::f1_w )
 //  tr6_w - pixel clock
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( saa5050_device::tr6_w )
+void saa5050_device::tr6_w(int state)
 {
 	if (state)
 	{

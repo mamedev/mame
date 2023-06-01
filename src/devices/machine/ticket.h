@@ -64,8 +64,8 @@ public:
 	auto dispense_handler() { return m_dispense_handler.bind(); }
 
 	// read/write handlers
-	DECLARE_READ_LINE_MEMBER( line_r );
-	DECLARE_WRITE_LINE_MEMBER( motor_w );
+	int line_r();
+	void motor_w(int state);
 
 protected:
 	ticket_dispenser_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);

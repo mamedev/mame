@@ -115,7 +115,7 @@ public:
 	void inufuku(machine_config &config);
 	void _3on3dunk(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(soundflag_r);
+	int soundflag_r();
 
 protected:
 	virtual void machine_start() override;
@@ -335,7 +335,7 @@ void inufuku_state::soundrombank_w(u8 data)
 
 ******************************************************************************/
 
-READ_LINE_MEMBER(inufuku_state::soundflag_r)
+int inufuku_state::soundflag_r()
 {
 	return m_soundlatch->pending_r() ? 0 : 1;
 }

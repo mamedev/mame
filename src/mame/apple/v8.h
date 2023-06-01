@@ -37,10 +37,10 @@ public:
 	void set_ram_info(u32 *ram, u32 size);
 	void set_baseram_is_4M(bool ramSize) { m_baseIs4M = ramSize; }
 
-	DECLARE_WRITE_LINE_MEMBER(cb1_w);
-	DECLARE_WRITE_LINE_MEMBER(cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(vbl_w);
-	DECLARE_WRITE_LINE_MEMBER(scc_irq_w);
+	void cb1_w(int state);
+	void cb2_w(int state);
+	void vbl_w(int state);
+	void scc_irq_w(int state);
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -63,7 +63,7 @@ protected:
 
 	virtual u8 pseudovia_r(offs_t offset);
 
-	DECLARE_WRITE_LINE_MEMBER(asc_irq);
+	void asc_irq(int state);
 
 private:
 	devcb_write_line write_pb4, write_pb5, write_cb2, write_hdsel, write_hmmu_enable;
@@ -97,9 +97,9 @@ private:
 	void via_out_b(u8 data);
 	void via_sync();
 	void field_interrupts();
-	DECLARE_WRITE_LINE_MEMBER(via_out_cb2);
-	DECLARE_WRITE_LINE_MEMBER(via1_irq);
-	DECLARE_WRITE_LINE_MEMBER(via2_irq);
+	void via_out_cb2(int state);
+	void via1_irq(int state);
+	void via2_irq(int state);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
 
 	u32 vram_r(offs_t offset);

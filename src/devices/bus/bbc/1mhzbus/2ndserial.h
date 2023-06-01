@@ -40,7 +40,7 @@ protected:
 	virtual void jim_w(offs_t offset, uint8_t data) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	void write_acia_clock(int state);
 
 	required_device<bbc_1mhzbus_slot_device> m_1mhzbus;
 	required_device<acia6850_device> m_acia;

@@ -50,8 +50,8 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(midi_in);
-	DECLARE_WRITE_LINE_MEMBER(irq_write);
+	void midi_in(int state);
+	void irq_write(int state);
 
 	required_device<y8950_device> m_y8950;
 	required_device<acia6850_device> m_acia6850;

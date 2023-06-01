@@ -120,12 +120,12 @@ private:
 	void i8155_pc_w(uint8_t data);
 	void io_i8155_pb_w(uint8_t data);
 	void io_i8155_pc_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( io_i8155_to_w );
-	DECLARE_WRITE_LINE_MEMBER( srq_w );
-	DECLARE_WRITE_LINE_MEMBER( atn_w );
-	DECLARE_WRITE_LINE_MEMBER( rxrdy_w );
-	DECLARE_WRITE_LINE_MEMBER( txrdy_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
+	void io_i8155_to_w(int state);
+	void srq_w(int state);
+	void atn_w(int state);
+	void rxrdy_w(int state);
+	void txrdy_w(int state);
+	void fdc_intrq_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(vsync_tick);
 	IRQ_CALLBACK_MEMBER(vixen_int_ack);
 	uint8_t opram_r(offs_t offset);
@@ -696,7 +696,7 @@ void vixen_state::io_i8155_pc_w(uint8_t data)
 	m_enb_srq_int = BIT(data, 5);
 }
 
-WRITE_LINE_MEMBER( vixen_state::io_i8155_to_w )
+void vixen_state::io_i8155_to_w(int state)
 {
 	if (m_int_clk)
 	{
@@ -709,13 +709,13 @@ WRITE_LINE_MEMBER( vixen_state::io_i8155_to_w )
 //  i8251_interface usart_intf
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( vixen_state::rxrdy_w )
+void vixen_state::rxrdy_w(int state)
 {
 	m_rxrdy = state;
 	update_interrupt();
 }
 
-WRITE_LINE_MEMBER( vixen_state::txrdy_w )
+void vixen_state::txrdy_w(int state)
 {
 	m_txrdy = state;
 	update_interrupt();
@@ -725,13 +725,13 @@ WRITE_LINE_MEMBER( vixen_state::txrdy_w )
 //  IEEE488 interface
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( vixen_state::srq_w )
+void vixen_state::srq_w(int state)
 {
 	m_srq = state;
 	update_interrupt();
 }
 
-WRITE_LINE_MEMBER( vixen_state::atn_w )
+void vixen_state::atn_w(int state)
 {
 	m_atn = state;
 	update_interrupt();
@@ -742,7 +742,7 @@ static void vixen_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-WRITE_LINE_MEMBER( vixen_state::fdc_intrq_w )
+void vixen_state::fdc_intrq_w(int state)
 {
 	m_fdint = state;
 	update_interrupt();

@@ -512,14 +512,14 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// mode changing operations
-	DECLARE_WRITE_LINE_MEMBER( ag_w )       { change_mode(MODE_AG, state); }
-	DECLARE_WRITE_LINE_MEMBER( gm2_w )      { change_mode(MODE_GM2, state); }
-	DECLARE_WRITE_LINE_MEMBER( gm1_w )      { change_mode(MODE_GM1, state); }
-	DECLARE_WRITE_LINE_MEMBER( gm0_w )      { change_mode(MODE_GM0, state); }
-	DECLARE_WRITE_LINE_MEMBER( as_w )       { change_mode(MODE_AS, state); }
-	DECLARE_WRITE_LINE_MEMBER( css_w )      { change_mode(MODE_CSS, state); }
-	DECLARE_WRITE_LINE_MEMBER( intext_w )   { change_mode(MODE_INTEXT, state); }
-	DECLARE_WRITE_LINE_MEMBER( inv_w )      { change_mode(MODE_INV, state); }
+	void ag_w(int state)       { change_mode(MODE_AG, state); }
+	void gm2_w(int state)      { change_mode(MODE_GM2, state); }
+	void gm1_w(int state)      { change_mode(MODE_GM1, state); }
+	void gm0_w(int state)      { change_mode(MODE_GM0, state); }
+	void as_w(int state)       { change_mode(MODE_AS, state); }
+	void css_w(int state)      { change_mode(MODE_CSS, state); }
+	void intext_w(int state)   { change_mode(MODE_INTEXT, state); }
+	void inv_w(int state)      { change_mode(MODE_INV, state); }
 
 protected:
 	mc6847_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata, double tpfs);

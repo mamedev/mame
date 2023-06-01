@@ -122,7 +122,7 @@ private:
 	required_device<decospr_device> m_sprgen;
 
 	uint8_t irq_latch_r();
-	DECLARE_WRITE_LINE_MEMBER(soundlatch_irq_w);
+	void soundlatch_irq_w(int state);
 	uint32_t screen_update_dblewing(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
@@ -173,7 +173,7 @@ void dblewing_state::wf_protection_region_0_104_w(offs_t offset, uint16_t data, 
 	m_deco104->write_data( deco146_addr, data, mem_mask, cs );
 }
 
-WRITE_LINE_MEMBER( dblewing_state::soundlatch_irq_w )
+void dblewing_state::soundlatch_irq_w(int state)
 {
 	m_soundlatch_pending = bool(state);
 }

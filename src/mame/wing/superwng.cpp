@@ -108,7 +108,7 @@ private:
 	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(main_nmi_interrupt);
+	void main_nmi_interrupt(int state);
 	INTERRUPT_GEN_MEMBER(sound_nmi_assert);
 
 	void main_map(address_map &map);
@@ -234,7 +234,7 @@ void superwng_state::nmi_enable_w(uint8_t data)
 	m_nmi_enable = data;
 }
 
-WRITE_LINE_MEMBER(superwng_state::main_nmi_interrupt)
+void superwng_state::main_nmi_interrupt(int state)
 {
 	if (state && BIT(m_nmi_enable, 0))
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);

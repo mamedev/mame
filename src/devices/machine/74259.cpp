@@ -181,7 +181,7 @@ void addressable_latch_device::write_abcd(u8 a, bool d)
 //  enable_w - handle enable input (active low)
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(addressable_latch_device::enable_w)
+void addressable_latch_device::enable_w(int state)
 {
 	m_enable = !state;
 	if (m_enable)
@@ -346,7 +346,7 @@ void addressable_latch_device::clear(u8 data)
 //  clear_w - handle clear/reset input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(addressable_latch_device::clear_w)
+void addressable_latch_device::clear_w(int state)
 {
 	m_clear = bool(state) == m_clear_active;
 	if (m_clear)

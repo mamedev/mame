@@ -303,7 +303,7 @@ void macadb_device::device_start()
 	save_item(NAME(m_keyboard_handler));
 }
 
-WRITE_LINE_MEMBER(macadb_device::adb_data_w)
+void macadb_device::adb_data_w(int state)
 {
 	if (m_adb_timer_ticks > 0)
 	{
@@ -1105,7 +1105,7 @@ void macadb_device::device_reset()
 	m_last_adb_time = 0;
 }
 
-WRITE_LINE_MEMBER(macadb_device::adb_linechange_w)
+void macadb_device::adb_linechange_w(int state)
 {
 /*  static char const *const states[] =
     {

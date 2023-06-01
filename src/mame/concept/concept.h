@@ -68,9 +68,9 @@ private:
 	void via_out_a(uint8_t data);
 	uint8_t via_in_b();
 	void via_out_b(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(via_out_cb2);
-	DECLARE_WRITE_LINE_MEMBER(via_irq_func);
-	DECLARE_WRITE_LINE_MEMBER(ioc_interrupt);
+	void via_out_cb2(int state);
+	void via_irq_func(int state);
+	void ioc_interrupt(int state);
 	void concept_set_interrupt(int level, int state);
 
 	void concept_memmap(address_map &map);

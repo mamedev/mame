@@ -48,20 +48,20 @@ protected:
 private:
 	static void floppy_formats(format_registration &fr);
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_hld_w);
+	void fdc_irq_w(int state);
+	void fdc_drq_w(int state);
+	void fdc_hld_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(dskpgena_w);
-	DECLARE_WRITE_LINE_MEMBER(kaclk_w);
-	DECLARE_WRITE_LINE_MEMBER(waiten_w);
-	DECLARE_WRITE_LINE_MEMBER(hlt_w);
-	DECLARE_WRITE_LINE_MEMBER(sidsel_w);
+	void dskpgena_w(int state);
+	void kaclk_w(int state);
+	void waiten_w(int state);
+	void hlt_w(int state);
+	void sidsel_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(dvena_w);
-	DECLARE_WRITE_LINE_MEMBER(dsel1_w);
-	DECLARE_WRITE_LINE_MEMBER(dsel2_w);
-	DECLARE_WRITE_LINE_MEMBER(dsel3_w);
+	void dvena_w(int state);
+	void dsel1_w(int state);
+	void dsel2_w(int state);
+	void dsel3_w(int state);
 
 	void select_drive(int n, int state);
 

@@ -17,8 +17,8 @@ public:
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
-	WRITE_LINE_MEMBER( set_reset_line );
-	READ_LINE_MEMBER( read_reset_line );
+	void set_reset_line(int state);
+	int read_reset_line();
 
 	virtual void customio_run() = 0;
 

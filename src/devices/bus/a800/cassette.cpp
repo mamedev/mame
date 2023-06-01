@@ -66,7 +66,7 @@ void a8sio_cassette_device::device_reset()
 {
 }
 
-WRITE_LINE_MEMBER( a8sio_cassette_device::motor_w )
+void a8sio_cassette_device::motor_w(int state)
 {
 	//printf("a8sio_cassette::motor_w %d\n", state);
 	if (!state)

@@ -3080,7 +3080,7 @@ void S3C24_CLASS_NAME::s3c24xx_nand_w(offs_t offset, uint32_t data, uint32_t mem
 	}
 }
 
-[[maybe_unused]] WRITE_LINE_MEMBER( S3C24_CLASS_NAME::s3c24xx_pin_frnb_w )
+[[maybe_unused]] void S3C24_CLASS_NAME::s3c24xx_pin_frnb_w(int state)
 {
 	LOGMASKED(LOG_FLASH, "s3c24xx_pin_frnb_w (%d)\n", state);
 #if defined(DEVICE_S3C2440)

@@ -1795,12 +1795,12 @@ TIMER_CALLBACK_MEMBER(sunplus_gcm394_base_device::unknown_tick)
 }
 
 
-WRITE_LINE_MEMBER(sunplus_gcm394_base_device::audioirq_w)
+void sunplus_gcm394_base_device::audioirq_w(int state)
 {
 	//set_state_unsynced(UNSP_IRQ5_LINE, state);
 }
 
-WRITE_LINE_MEMBER(sunplus_gcm394_base_device::videoirq_w)
+void sunplus_gcm394_base_device::videoirq_w(int state)
 {
 	set_state_unsynced(UNSP_IRQ5_LINE, state);
 }

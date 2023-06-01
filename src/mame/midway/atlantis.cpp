@@ -178,14 +178,14 @@ private:
 	uint32_t board_ctrl[CTRL_SIZE]{};
 	void update_asic_irq();
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-	DECLARE_WRITE_LINE_MEMBER(zeus_irq);
-	DECLARE_WRITE_LINE_MEMBER(ide_irq);
-	DECLARE_WRITE_LINE_MEMBER(ioasic_irq);
-	DECLARE_WRITE_LINE_MEMBER(watchdog_irq);
-	DECLARE_WRITE_LINE_MEMBER(watchdog_reset);
+	void vblank_irq(int state);
+	void zeus_irq(int state);
+	void ide_irq(int state);
+	void ioasic_irq(int state);
+	void watchdog_irq(int state);
+	void watchdog_reset(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(duart_irq_callback);
+	void duart_irq_callback(int state);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(port_mod_r);
 	uint16_t port_ctrl_r(offs_t offset);
@@ -412,7 +412,7 @@ uint32_t atlantis_state::user_io_input()
 /*************************************
 *  DUART interrupt handler
 *************************************/
-WRITE_LINE_MEMBER(atlantis_state::duart_irq_callback)
+void atlantis_state::duart_irq_callback(int state)
 {
 	uint32_t status_bit = 1 << DUART_IRQ_SHIFT;
 	if (state && !(board_ctrl[STATUS] & status_bit)) {
@@ -429,7 +429,7 @@ WRITE_LINE_MEMBER(atlantis_state::duart_irq_callback)
 /*************************************
 *  Video interrupts
 *************************************/
-WRITE_LINE_MEMBER(atlantis_state::vblank_irq)
+void atlantis_state::vblank_irq(int state)
 {
 	//logerror("%s: atlantis_state::vblank state = %i\n", machine().describe_context(), state);
 	if (state) {
@@ -441,7 +441,7 @@ WRITE_LINE_MEMBER(atlantis_state::vblank_irq)
 	update_asic_irq();
 }
 
-WRITE_LINE_MEMBER(atlantis_state::zeus_irq)
+void atlantis_state::zeus_irq(int state)
 {
 	//logerror("%s: atlantis_state::zeus_irq state = %i\n", machine().describe_context(), state);
 	if (state) {
@@ -456,7 +456,7 @@ WRITE_LINE_MEMBER(atlantis_state::zeus_irq)
 /*************************************
 *  IDE interrupts
 *************************************/
-WRITE_LINE_MEMBER(atlantis_state::ide_irq)
+void atlantis_state::ide_irq(int state)
 {
 	if (state) {
 		m_maincpu->set_input_line(IDE_IRQ_NUM, ASSERT_LINE);
@@ -472,7 +472,7 @@ WRITE_LINE_MEMBER(atlantis_state::ide_irq)
 /*************************************
 *  I/O ASIC interrupts
 *************************************/
-WRITE_LINE_MEMBER(atlantis_state::ioasic_irq)
+void atlantis_state::ioasic_irq(int state)
 {
 	LOGMASKED(LOG_IRQ, "%s: atlantis_state::ioasic_irq state = %i\n", machine().describe_context(), state);
 	if (state) {
@@ -487,7 +487,7 @@ WRITE_LINE_MEMBER(atlantis_state::ioasic_irq)
 /*************************************
 *  Watchdog interrupts
 *************************************/
-WRITE_LINE_MEMBER(atlantis_state::watchdog_irq)
+void atlantis_state::watchdog_irq(int state)
 {
 	LOGMASKED(LOG_IRQ, "%s: atlantis_state::watchdog_irq state = %i\n", machine().describe_context(), state);
 	if (state) {
@@ -502,7 +502,7 @@ WRITE_LINE_MEMBER(atlantis_state::watchdog_irq)
 /*************************************
 *  Watchdog Reset
 *************************************/
-WRITE_LINE_MEMBER(atlantis_state::watchdog_reset)
+void atlantis_state::watchdog_reset(int state)
 {
 	if (state) {
 		printf("atlantis_state::watchdog_reset!!!\n");

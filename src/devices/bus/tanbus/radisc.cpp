@@ -194,17 +194,17 @@ uint8_t tanbus_radisc_device::status_r()
 	return m_status | (m_fdc->drq_r() << 7) | (m_fdc->hld_r() << 6) | (m_fdc->intrq_r() << 0);
 }
 
-WRITE_LINE_MEMBER(tanbus_radisc_device::fdc_drq_w)
+void tanbus_radisc_device::fdc_drq_w(int state)
 {
 	m_tanbus->so_w((m_drq_enable && state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(tanbus_radisc_device::fdc_irq_w)
+void tanbus_radisc_device::fdc_irq_w(int state)
 {
 	m_irq_line->in_w<IRQ_FDC>((m_irq_enable && state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(tanbus_radisc_device::irq_w)
+void tanbus_radisc_device::irq_w(int state)
 {
 	m_tanbus->irq_w(state ? ASSERT_LINE : CLEAR_LINE);
 }

@@ -764,19 +764,19 @@ CRTC_EGA_PIXEL_UPDATE( isa8_ega_device::ega_update_row )
 }
 
 
-WRITE_LINE_MEMBER( isa8_ega_device::de_changed )
+void isa8_ega_device::de_changed(int state)
 {
 	m_display_enable = state ? 1 : 0;
 }
 
 
-WRITE_LINE_MEMBER( isa8_ega_device::hsync_changed )
+void isa8_ega_device::hsync_changed(int state)
 {
 	m_hsync = state ? 1 : 0;
 }
 
 
-WRITE_LINE_MEMBER( isa8_ega_device::vsync_changed )
+void isa8_ega_device::vsync_changed(int state)
 {
 	m_vsync = state ? 1 : 0;
 	if ( state )
@@ -786,7 +786,7 @@ WRITE_LINE_MEMBER( isa8_ega_device::vsync_changed )
 }
 
 
-WRITE_LINE_MEMBER( isa8_ega_device::vblank_changed )
+void isa8_ega_device::vblank_changed(int state)
 {
 	m_vblank = state ? 8 : 0;
 }

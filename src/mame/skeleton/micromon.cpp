@@ -36,7 +36,7 @@ public:
 	void micromon(machine_config &config);
 
 private:
-	DECLARE_READ_LINE_MEMBER(clear_r);
+	int clear_r();
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
@@ -59,7 +59,7 @@ void micromon_state::io_map(address_map &map)
 static INPUT_PORTS_START( micromon )
 INPUT_PORTS_END
 
-READ_LINE_MEMBER( micromon_state::clear_r )
+int micromon_state::clear_r()
 {
 	if (m_resetcnt < 0x10)
 		m_maincpu->set_state_int(cosmac_device::COSMAC_R0, 0x0000);

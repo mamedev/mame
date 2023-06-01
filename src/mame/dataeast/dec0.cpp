@@ -1881,7 +1881,7 @@ void dec0_automat_state::sound_bankswitch_w(uint8_t data)
 	m_soundbank->set_entry(data & 7);
 }
 
-WRITE_LINE_MEMBER(dec0_automat_state::msm1_vclk_cb)
+void dec0_automat_state::msm1_vclk_cb(int state)
 {
 	if (!state)
 		return;
@@ -1891,7 +1891,7 @@ WRITE_LINE_MEMBER(dec0_automat_state::msm1_vclk_cb)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, m_adpcm_toggle[0]);
 }
 
-WRITE_LINE_MEMBER(dec0_automat_state::msm2_vclk_cb)
+void dec0_automat_state::msm2_vclk_cb(int state)
 {
 	if (!state)
 		return;
