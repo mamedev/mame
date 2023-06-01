@@ -45,8 +45,6 @@ enum
 	RTC_STATE_XPWRITE
 };
 
-static constexpr uint32_t mac_reference = 0x83da95d0;   // Seconds from January 1, 1904, 12:00:00 to when POSIX time starts
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -153,7 +151,7 @@ TIMER_CALLBACK_MEMBER(rtc3430042_device::half_seconds_tick)
 
 void rtc3430042_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
 {
-	struct tm cur_time;
+	struct tm cur_time, macref;
 	uint32_t seconds;
 
 	if (m_time_was_set)
@@ -171,7 +169,16 @@ void rtc3430042_device::rtc_clock_updated(int year, int month, int day, int day_
 		cur_time.tm_year = year+100;    // assumes post-2000 current system time
 		cur_time.tm_isdst = 0;
 
-		seconds = (uint32_t)((uint32_t)mktime(&cur_time) - mac_reference);
+		macref.tm_sec = 0;
+		macref.tm_min = 0;
+		macref.tm_hour = 0;
+		macref.tm_mday = 1;
+		macref.tm_mon = 0;
+		macref.tm_year = 4;
+		macref.tm_isdst = 0;
+		uint32_t ref = (uint32_t)mktime(&macref);
+
+		seconds = (uint32_t)((uint32_t)mktime(&cur_time) - ref);
 	}
 
 	LOG("second count 0x%lX\n", (unsigned long) seconds);
