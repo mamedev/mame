@@ -436,6 +436,18 @@ inline void epic12_device::gfx_draw_shadow_copy(address_space &space, offs_t *ad
 		return;
 	}
 
+	// Clip the blitter operations, to have the calculations only respect the area being written.
+	// It's not 100% clear this is how this is performed, but it is clear that there should be some amount of clipping
+	// applied here to match the hardware. This way seems most likely, and maps well to the delays seen on hardware.
+	// One example of this being utilized heavily is the transparent fog in Mushihimesama Futari Stage 1. This is drawn as
+	// 256x256 sprites, with large parts clipped away.
+	dst_x_start = std::max(dst_x_start, (u16)m_clip.min_x);
+	dst_y_start = std::max(dst_y_start, (u16)m_clip.min_y);
+	dst_x_end = std::min(dst_x_end, (u16)m_clip.max_x);
+	dst_y_end = std::min(dst_y_end, (u16)m_clip.max_y);
+	src_dimx = dst_x_end - dst_x_start + 1;
+	src_dimy = dst_y_end - dst_y_start + 1;
+
 	m_blit_idle_op_bytes = 0;  // Blitter no longer idle.
 
 	// VRAM data is laid out in 32x32 pixel rows. Calculate amount of rows accessed.
