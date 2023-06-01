@@ -1,10 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Uki
-/*************************************************************************
-
-
-
-*************************************************************************/
 
 #ifndef MAME_SUNELECTRONICS_MARKHAM_H
 #define MAME_SUNELECTRONICS_MARKHAM_H
