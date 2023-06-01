@@ -2,9 +2,6 @@
 // copyright-holders:Uki
 /******************************************************************************
 
-    Markham (c) 1983 Sun Electronics
-    Strength & Skill (c) 1984 Sun Electronics
-
     Video hardware driver by Uki
 
 ******************************************************************************/
