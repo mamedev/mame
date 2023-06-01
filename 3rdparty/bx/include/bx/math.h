@@ -174,9 +174,26 @@ namespace bx
 	///
 	/// @param[in] _a Value.
 	///
-	/// @returns -1 if `_a` less than zero, 0 if `_a` is equal to 0, or +1 if `_a` is greater than zero.
+	/// @returns -1 if `_a` is less than zero, 0 if `_a` is equal to 0, or +1 if `_a` is greater than zero.
 	///
 	BX_CONSTEXPR_FUNC float sign(float _a);
+
+	/// Returns `true` if the velue `_a` is negative.
+	///
+	/// @param[in] _a Value.
+	///
+	/// @returns `true` if `_a` is less than zero, otherwise returns `false`.
+	///
+	BX_CONSTEXPR_FUNC bool signbit(float _a);
+
+	/// Returns value with the magnitude `_value`, and the sign of `_sign`.
+	///
+	/// @param[in] _value Value.
+	/// @param[in] _sign Sign.
+	///
+	/// @returns Value with the magnitude `_value`, and the sign of `_sign`.
+	///
+	BX_CONSTEXPR_FUNC float copysign(float _value, float _sign);
 
 	/// Returns the absolute of _a.
 	///
