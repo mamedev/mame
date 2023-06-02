@@ -246,11 +246,14 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void recompute_params() override;
+	virtual void sequencer_map(address_map &map) override;
 private:
 	void vga_vh_yuv8(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vga_vh_yuv422(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	rgb_t yuv_to_rgb(int y, int u, int v) const;
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+
+	inline void flush_8bpp_mode();
 
 	int m_extcnt = 0;
 	uint8_t m_extreg = 0U;
@@ -268,6 +271,7 @@ vis_vga_device::vis_vga_device(const machine_config &mconfig, const char *tag, d
 {
 	set_screen(*this, "screen");
 	set_vram_size(0x100000);
+	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(vis_vga_device::sequencer_map), this));
 }
 
 void vis_vga_device::device_add_mconfig(machine_config &config)
@@ -276,6 +280,72 @@ void vis_vga_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update(FUNC(vis_vga_device::screen_update));
 }
+
+void vis_vga_device::sequencer_map(address_map &map)
+{
+	svga_device::sequencer_map(map);
+	map(0x01, 0x01).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			m_8bit_640 = !BIT(data, 3);
+			flush_8bpp_mode();
+		})
+	);
+	map(0x18, 0x18).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_wina >> 8;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_wina = (m_wina & 0xff) | (data << 8);
+		})
+	);
+	map(0x19, 0x19).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_wina & 0xff;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_wina = (m_wina & 0xff00) | data;
+		})
+	);
+	map(0x1c, 0x1c).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_winb >> 8;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_winb = (m_winb & 0xff) | (data << 8);
+		})
+	);
+	map(0x1d, 0x1d).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_winb & 0xff;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_winb = (m_winb & 0xff00) | data;
+		})
+	);
+	map(0x1f, 0x1f).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			if(data & 0x10)
+			{
+				vga.gc.shift256 = 1;
+				vga.crtc.dw = 1;
+				vga.crtc.no_wrap = 1;
+			}
+			else
+			{
+				vga.gc.shift256 = m_shift256;
+				vga.crtc.dw = m_dw;
+				vga.crtc.no_wrap = 0;
+			}
+			flush_8bpp_mode();
+		})
+	);
+}
+
+void vis_vga_device::flush_8bpp_mode()
+{
+	svga.rgb8_en = m_8bit_640 && BIT(vga.sequencer.data[0x1f], 4);
+}
+
 
 void vis_vga_device::recompute_params()
 {
@@ -534,49 +604,7 @@ void vis_vga_device::vga_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
-		case 0x15:
-			switch(vga.sequencer.index)
-			{
-				case 0x01:
-					m_8bit_640 = (data & 8) ? 0 : 1;
-					if(m_8bit_640 && (vga.sequencer.data[0x1f] & 0x10))
-						svga.rgb8_en = 1;
-					else
-						svga.rgb8_en = 0;
-					break;
-				case 0x19:
-					m_wina = (m_wina & 0xff00) | data;
-					break;
-				case 0x18:
-					m_wina = (m_wina & 0xff) | (data << 8);
-					break;
-				case 0x1d:
-					m_winb = (m_winb & 0xff00) | data;
-					break;
-				case 0x1c:
-					m_winb = (m_winb & 0xff) | (data << 8);
-					break;
-				case 0x1f:
-					if(data & 0x10)
-					{
-						vga.gc.shift256 = 1;
-						vga.crtc.dw = 1;
-						vga.crtc.no_wrap = 1;
-						if(m_8bit_640)
-							svga.rgb8_en = 1;
-						else
-							svga.rgb8_en = 0;
-					}
-					else
-					{
-						vga.gc.shift256 = m_shift256;
-						vga.crtc.dw = m_dw;
-						vga.crtc.no_wrap = 0;
-						svga.rgb8_en = 0;
-					}
-					break;
-			}
-			break;
+		// case 0x15: sequencer map
 		case 0x16:
 			if(m_extcnt == 4)
 			{
