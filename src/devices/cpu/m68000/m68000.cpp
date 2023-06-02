@@ -211,6 +211,7 @@ void m68000_device::device_start()
 	save_item(NAME(m_movems));
 	save_item(NAME(m_isr));
 	save_item(NAME(m_sr));
+	save_item(NAME(m_new_sr));
 	save_item(NAME(m_dbin));
 	save_item(NAME(m_dbout));
 	save_item(NAME(m_edb));
@@ -255,6 +256,7 @@ void m68000_device::device_start()
 	m_movems = 0;
 	m_isr = 0;
 	m_sr = 0;
+	m_new_sr = 0;
 	m_dbin = 0;
 	m_dbout = 0;
 	m_edb = 0;
@@ -393,6 +395,8 @@ void m68000_device::execute_set_input(int inputnum, int state)
 		blevel = vstate;
 
 	m_int_level = blevel;
+
+	logerror("irq %s %d vstate %02x level %d\n", inputnum, state, vstate, m_int_level);
 
 	/* A transition from < 7 to 7 always interrupts (NMI) */
 	/* Note: Level 7 can also level trigger like a normal IRQ */

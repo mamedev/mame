@@ -154,7 +154,7 @@ protected:
 	u32 m_sp;     // 15 or 16, index of currently active sp
 	int m_icount, m_bcount, m_count_before_instruction_step, m_t;
 	u32 m_movems;
-	u16 m_isr, m_sr, m_dbin, m_dbout, m_edb;
+	u16 m_isr, m_sr, m_new_sr, m_dbin, m_dbout, m_edb;
 	u16 m_irc, m_ir, m_ird, m_ftu, m_aluo, m_alue, m_alub, m_movemr, m_irdi;
 	u16 m_base_ssw, m_ssw;
 	u8 m_dcr;
