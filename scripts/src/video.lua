@@ -919,6 +919,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/s3virge.h,VIDEOS["S3VIRGE"] = true
+--------------------------------------------------
+
+if (VIDEOS["S3VIRGE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/s3virge.cpp",
+		MAME_DIR .. "src/devices/video/s3virge.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/pc_vga_sis.h,VIDEOS["PC_VGA_SIS"] = true
 --------------------------------------------------
 

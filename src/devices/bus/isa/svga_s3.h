@@ -7,7 +7,7 @@
 
 #include "isa.h"
 #include "video/pc_vga_s3.h"
-#include "s3virge.h"
+#include "video/s3virge.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

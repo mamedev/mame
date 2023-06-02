@@ -1100,7 +1100,7 @@ uint32_t s3virge_vga_device::GetROP(uint8_t rop, uint32_t src, uint32_t dst, uin
 			ret = 0xffffffff;
 			break;
 		default:
-			popmessage("bus/isa/s3virge.cpp: Unimplemented ROP 0x%02x",rop);
+			popmessage("video/s3virge.cpp: Unimplemented ROP 0x%02x",rop);
 	}
 
 	return ret;

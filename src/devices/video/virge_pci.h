@@ -11,7 +11,7 @@
 #pragma once
 
 #include "machine/pci.h"
-#include "bus/isa/s3virge.h"
+#include "video/s3virge.h"
 
 class virge_pci_device : public pci_device
 {
