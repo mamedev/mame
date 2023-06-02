@@ -8,6 +8,7 @@
  * - Original Acumos AVGA1/2 chipsets (Cirrus Logic eventually bought Acumos and rebranded);
  * - Fix or implement hidden DAC modes (15bpp + mixed, true color, others);
  * - bebox: logo at startup is squashed;
+ * - Merge with trs/vis.cpp implementation (CL-GD5200 RAMDAC with custom VGA controller)
  *
  */
 
@@ -58,6 +59,7 @@ DEFINE_DEVICE_TYPE(CIRRUS_GD5446, cirrus_gd5446_device, "clgd5446", "Cirrus Logi
 cirrus_gd5428_device::cirrus_gd5428_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cirrus_gd5428_device(mconfig, CIRRUS_GD5428, tag, owner, clock)
 {
+	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(cirrus_gd5428_device::sequencer_map), this));
 }
 
 cirrus_gd5428_device::cirrus_gd5428_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -68,11 +70,13 @@ cirrus_gd5428_device::cirrus_gd5428_device(const machine_config &mconfig, device
 cirrus_gd5430_device::cirrus_gd5430_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cirrus_gd5428_device(mconfig, CIRRUS_GD5430, tag, owner, clock)
 {
+	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(cirrus_gd5430_device::sequencer_map), this));
 }
 
 cirrus_gd5446_device::cirrus_gd5446_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cirrus_gd5428_device(mconfig, CIRRUS_GD5446, tag, owner, clock)
 {
+	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(cirrus_gd5446_device::sequencer_map), this));
 }
 
 void cirrus_gd5428_device::device_start()
@@ -247,7 +251,7 @@ void cirrus_gd5428_device::cirrus_define_video_mode()
 
 		if (BIT(m_hidden_dac_mode, 7))
 		{
-			// TODO: needs subclassing, not all chips have these modes
+			// TODO: needs subclassing, earlier chips don't have all of these modes
 			if (BIT(m_hidden_dac_mode, 4))
 				popmessage("Cirrus: Unsupported mixed 5-5-5 / 8bpp mode selected");
 			switch(m_hidden_dac_mode & 0x4f)
@@ -287,10 +291,10 @@ void cirrus_gd5428_device::cirrus_define_video_mode()
 
 		switch(vga.sequencer.data[0x07] & 0x06)  // bit 3 is reserved on GD542x
 		{
-			case 0x00:  break;
-			case 0x02:  clock /= 2; break;  // Clock / 2 for 16-bit data
-			case 0x04:  clock /= 3; break; // Clock / 3 for 24-bit data
-			case 0x06:  divisor = 2; break; // Clock rate for 16-bit data
+			case 0x00: break;
+			case 0x02: clock /= 2; break;  // Clock / 2 for 16-bit data
+			case 0x04: clock /= 3; break; // Clock / 3 for 24-bit data
+			case 0x06: divisor = 2; break; // Clock rate for 16-bit data
 		}
 	}
 	recompute_params_clock(divisor, (int)clock);
@@ -300,7 +304,8 @@ uint16_t cirrus_gd5428_device::offset()
 {
 	uint16_t off = vga_device::offset();
 
-	if (svga.rgb8_en == 1) // guess
+	// TODO: check true enable condition
+	if (svga.rgb8_en == 1)
 		off <<= 2;
 	if (svga.rgb16_en == 1)
 		off <<= 2;
@@ -604,6 +609,7 @@ void cirrus_gd5428_device::sequencer_map(address_map &map)
 			if((data & 0xf0) != 0)
 				popmessage("1MB framebuffer window enabled at %iMB (%02x)",data >> 4,data);
 			vga.sequencer.data[0x07] = data;
+			cirrus_define_video_mode();
 		})
 	);
 	// TODO: check me
@@ -958,6 +964,9 @@ uint8_t cirrus_gd5428_device::port_03c0_r(offs_t offset)
 
 	switch(offset)
 	{
+		case 5:
+			res = space().read_byte(vga.sequencer.index);
+			break;
 		case 0x06:
 			m_hidden_dac_phase ++;
 			if (m_hidden_dac_phase >= 4)
@@ -1003,7 +1012,7 @@ uint8_t cirrus_gd5428_device::port_03c0_r(offs_t offset)
 			res = cirrus_gd5428_device::gc_reg_read(vga.gc.index);
 			break;
 		default:
-			res = vga_device::port_03c0_r(offset);
+			res = svga_device::port_03c0_r(offset);
 			break;
 	}
 
@@ -1026,12 +1035,12 @@ void cirrus_gd5428_device::port_03c0_w(offs_t offset, uint8_t data)
 			else
 			{
 				m_hidden_dac_phase = 0;
-				vga_device::port_03c0_w(offset, data);
+				svga_device::port_03c0_w(offset, data);
 			}
 			break;
 		case 0x09:
 			if(!m_ext_palette_enabled)
-				vga_device::port_03c0_w(offset,data);
+				svga_device::port_03c0_w(offset,data);
 			else
 			{
 				if (!vga.dac.read)
@@ -1060,7 +1069,7 @@ void cirrus_gd5428_device::port_03c0_w(offs_t offset, uint8_t data)
 			cirrus_gd5428_device::gc_reg_write(vga.gc.index,data);
 			break;
 		default:
-			vga_device::port_03c0_w(offset,data);
+			svga_device::port_03c0_w(offset,data);
 			break;
 	}
 	cirrus_define_video_mode();

@@ -220,6 +220,7 @@ void nvidia_nv3_vga_device::mem_w(offs_t offset, uint8_t data)
 
 uint16_t nvidia_nv3_vga_device::offset()
 {
+	// TODO: check true enable condition
 	if (svga.rgb8_en || svga.rgb16_en || svga.rgb24_en || svga.rgb32_en)
 		return (vga.crtc.offset << 3) + m_ext_offset;
 	return svga_device::offset();

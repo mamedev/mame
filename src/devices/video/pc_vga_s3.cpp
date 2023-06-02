@@ -33,6 +33,7 @@ s3_vga_device::s3_vga_device(const machine_config &mconfig, const char *tag, dev
 s3_vga_device::s3_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: svga_device(mconfig, type, tag, owner, clock)
 {
+	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(s3_vga_device::sequencer_map), this));
 }
 
 void s3_vga_device::device_add_mconfig(machine_config &config)

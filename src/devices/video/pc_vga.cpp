@@ -116,8 +116,8 @@ vga_device::vga_device(const machine_config &mconfig, device_type type, const ch
 	, device_memory_interface(mconfig, *this)
 	, vga(*this)
 	, m_input_sense(*this, "VGA_SENSE")
-	, m_seq_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(vga_device::sequencer_map), this))
 {
+	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(vga_device::sequencer_map), this));
 }
 
 vga_device::vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -1226,7 +1226,7 @@ uint8_t vga_device::port_03c0_r(offs_t offset)
 			break;
 
 		case 5:
-			data = this->space(SEQ_REG).read_byte(vga.sequencer.index);
+			data = space(SEQ_REG).read_byte(vga.sequencer.index);
 			break;
 
 		case 6:
@@ -1397,7 +1397,7 @@ void vga_device::port_03c0_w(offs_t offset, uint8_t data)
 	case 5:
 		// TODO: temporary cheat for read-back
 		vga.sequencer.data[vga.sequencer.index] = data;
-		this->space(SEQ_REG).write_byte(vga.sequencer.index, data);
+		space(SEQ_REG).write_byte(vga.sequencer.index, data);
 		recompute_params();
 		break;
 	case 6:

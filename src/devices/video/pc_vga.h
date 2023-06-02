@@ -256,7 +256,7 @@ protected:
 		SEQ_REG
 	};
 
-	const address_space_config m_seq_space_config;
+	address_space_config m_seq_space_config;
 };
 
 
