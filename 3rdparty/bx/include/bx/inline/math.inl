@@ -143,7 +143,8 @@ namespace bx
 #if BX_COMPILER_MSVC
 		return _signbit(_a);
 #else
-		return __builtin_signbit(_a);
+		return copysign(1, _a) < 0;
+//		return __builtin_signbit(_a);
 #endif // BX_COMPILER_MSVC
 	}
 
