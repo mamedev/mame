@@ -183,7 +183,6 @@ protected:
 	void blockcar_map(address_map &map);
 	void blockcarb_map(address_map &map);
 	void blockcarb_sound_map(address_map &map);
-	void blockcarb_sound_portmap(address_map &map);
 	void daioh_map(address_map &map);
 	void daiohp_map(address_map &map);
 	void drgnunit_map(address_map &map);

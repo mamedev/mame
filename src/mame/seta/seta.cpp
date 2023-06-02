@@ -2354,7 +2354,7 @@ void seta_state::blockcarb_map(address_map &map)
 	map(0x500002, 0x500003).portr("P2");                 // P2
 	map(0x500004, 0x500005).portr("COINS");              // Coins
 	map(0x500009, 0x500009).w("oki", FUNC(okim6295_device::write));
-	//map(0x50000c, 0x50000d); // ??
+	map(0x50000d, 0x50000d).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xa00000, 0xa03fff).noprw();   // Sound - not on this bootleg
 	map(0xb00000, 0xb003ff).ram().share("paletteram1");  // Palette
 	map(0xc00000, 0xc03fff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecode_r16), FUNC(x1_001_device::spritecode_w16)); // Sprites Code + X + Attr
@@ -8438,16 +8438,13 @@ void seta_state::blockcarb_sound_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).rom();
-	map(0xd000, 0xdfff).ram();
-	//map(0xf001, 0xf001) ??
-}
-
-void seta_state::blockcarb_sound_portmap(address_map &map)
-{
-	map.unmap_value_high();
-	map.global_mask(0xff);
-//  map(0x00, 0x01).mirror(0x3e).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-//  map(0xc0, 0xc0).mirror(0x3f).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xd000, 0xd7ff).ram();
+	map(0xf000, 0xf001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xf002, 0xf002).noprw(); // ?
+	map(0xf004, 0xf004).nopw(); // ?
+	map(0xf006, 0xf006).nopw(); // ?
+	map(0xf008, 0xf008).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xf00a, 0xf00a).nopr(); // ?
 }
 
 void seta_state::blockcarb(machine_config &config)
@@ -8456,17 +8453,21 @@ void seta_state::blockcarb(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::blockcarb_map);
-	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq3_line_hold));
 
 	Z80(config, m_audiocpu, 4000000); // unk freq
 	m_audiocpu->set_addrmap(AS_PROGRAM, &seta_state::blockcarb_sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &seta_state::blockcarb_sound_portmap);
 
-	/* the sound hardware / program is ripped from Tetris (S16B) */
+	/* the sound hardware / program is ripped from Mercs (CPS1) */
 	config.device_remove("x1snd");
 
+	GENERIC_LATCH_8(config, m_soundlatch);
+
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 4000000)); // unk freq
+	ymsnd.irq_handler().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.5);
+
 	OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-		.add_route(ALL_OUTPUTS, "mono", 1.0);
+		.add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
