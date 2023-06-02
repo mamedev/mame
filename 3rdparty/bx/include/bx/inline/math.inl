@@ -11,6 +11,7 @@
 
 #include <bx/simd_t.h>
 #include <bx/uint32_t.h>
+#include <float.h>
 
 namespace bx
 {
@@ -140,18 +141,13 @@ namespace bx
 
 	inline BX_CONSTEXPR_FUNC bool signbit(float _a)
 	{
-#if BX_COMPILER_MSVC
-		return _signbit(_a);
-#else
-		return copysign(1, _a) < 0;
-//		return __builtin_signbit(_a);
-#endif // BX_COMPILER_MSVC
+		return -0.0f == _a ? 0.0f != _a : 0.0f > _a;
 	}
 
 	inline BX_CONSTEXPR_FUNC float copysign(float _value, float _sign)
 	{
 #if BX_COMPILER_MSVC
-		return _copysign(_value, _sign);
+		return signbit(_value) != signbit(_sign) ? -_value : _value;
 #else
 		return __builtin_copysign(_value, _sign);
 #endif // BX_COMPILER_MSVC
