@@ -20,7 +20,10 @@ class ibm8514a_device;
 
 // ======================> vga_device
 
-class vga_device : public device_t, public device_video_interface, public device_palette_interface
+class vga_device : public device_t
+                 , public device_video_interface
+                 , public device_palette_interface
+                 , public device_memory_interface
 {
 	friend class ibm8514a_device;
 
@@ -84,12 +87,13 @@ protected:
 	virtual void recompute_params();
 	uint8_t vga_vblank();
 
+	virtual space_config_vector memory_space_config() const override;
+
 	uint8_t vga_crtc_r(offs_t offset);
 	void vga_crtc_w(offs_t offset, uint8_t data);
 	virtual uint8_t crtc_reg_read(uint8_t index);
 	virtual void crtc_reg_write(uint8_t index, uint8_t data);
-	virtual uint8_t seq_reg_read(uint8_t index);
-	virtual void seq_reg_write(uint8_t index, uint8_t data);
+	virtual void sequencer_map(address_map &map);
 	virtual uint8_t gc_reg_read(uint8_t index);
 	virtual void gc_reg_write(uint8_t index,uint8_t data);
 
@@ -128,7 +132,6 @@ protected:
 		struct
 		{
 			size_t vram_size;
-			int seq_regcount;
 			int crtc_regcount;
 		} svga_intf;
 
@@ -248,6 +251,12 @@ protected:
 	required_ioport m_input_sense;
 
 	emu_timer *m_vblank_timer;
+
+	enum {
+		SEQ_REG
+	};
+
+	const address_space_config m_seq_space_config;
 };
 
 
@@ -276,7 +285,7 @@ protected:
 	virtual void device_start() override;
 	struct
 	{
-		uint8_t bank_r,bank_w;
+		uint8_t bank_r, bank_w;
 		uint8_t rgb8_en;
 		uint8_t rgb15_en;
 		uint8_t rgb16_en;

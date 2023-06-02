@@ -10,12 +10,14 @@ TODO:
 - BIOS CMOS doesn't save at all (needed for setting up the Hard Disk);
 - DISK BOOT FAILURE after EEPROM checking (many unknown IDE cs1 reads/writes);
 - Partition boot sector is missing from the CHD dump, protection?
-- Detects CPU type as "-S 16 MHz"? Sometimes it detects it as 486SX, unknown repro (after fiddling with CMOS settings anyway)
+- Detects CPU type as "-S 16 MHz"? Sometimes it detects it as 486SX, unknown repro
+  (after fiddling with CMOS settings anyway)
 - VGA BIOS reports being a Cirrus Logic GD5436 / 5446, it is unknown what exactly this game uses.
-- PCI hookups (no idea about what this uses), and improve/device-ify SiS85C49x;
+- PCI hookups (SiS496/SiS497 according to POST), and improve/device-ify SiS85C49x;
 - ISA bus cards are completely guessworked;
 - EEPROM timings are hacked (writes mostly fail otherwise);
-- Eventually needs AudioDrive ES688 / ES1688 / ES1788 & ES1868 devices and serial ports "for linking" before actually booting;
+- Eventually needs AudioDrive ES688 / ES1688 / ES1788 & ES1868 devices and serial ports "for linking"
+  before actually booting;
 
 INFO ABOUT SECURITY DONGLES:
 

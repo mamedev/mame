@@ -200,7 +200,6 @@ void trident_vga_device::device_start()
 	save_pointer(tri.lutdac_reg,"LUTDAC registers", 0x100);
 
 	m_vblank_timer = timer_alloc(FUNC(vga_device::vblank_timer_cb), this);
-	vga.svga_intf.seq_regcount = 0x0f;
 	vga.svga_intf.crtc_regcount = 0x60;
 	svga.ignore_chain4 = true;
 	memset(&tri, 0, sizeof(tri));
@@ -416,112 +415,87 @@ void trident_vga_device::trident_define_video_mode()
 	recompute_params_clock(divisor, xtal);
 }
 
-uint8_t trident_vga_device::seq_reg_read(uint8_t index)
+void trident_vga_device::sequencer_map(address_map &map)
 {
-	uint8_t res;
-
-	res = 0xff;
-
-	if(index <= 0x04)
-		res = svga_device::seq_reg_read(index);
-	else
-	{
-		switch(index)
-		{
-			case 0x09:
-				res = tri.revision;
-				break;
-			case 0x0b:
-				res = svga.id;
+	svga_device::sequencer_map(map);
+	map(0x09, 0x09).lr8(
+		NAME([this] (offs_t offset) {
+			return tri.revision;
+		})
+	);
+	map(0x0b, 0x0b).lrw8(
+		NAME([this] (offs_t offset) {
+			if (!machine().side_effects_disabled())
 				tri.new_mode = true;
-				break;
-			case 0x0c:  // Power Up Mode register 1
-				res = tri.sr0c & 0xef;
-				if(tri.port_3c3)
-					res |= 0x10;
-				break;
-			case 0x0d:  // Mode Control 2
-				//res = svga.rgb15_en;
-				if(tri.new_mode)
-					res = tri.sr0d_new;
-				else
-					res = tri.sr0d_old;
-				break;
-			case 0x0e:  // Mode Control 1
-				if(tri.new_mode)
-					res = tri.sr0e_new;
-				else
-					res = tri.sr0e_old;
-				break;
-			case 0x0f:  // Power Up Mode 2
-				res = tri.sr0f;
-				break;
-			default:
-				res = vga.sequencer.data[index];
-				LOGWARN("Trident: Sequencer index %02x read\n",index);
-		}
-	}
-	LOG("Trident SR%02X: read %02x\n",index,res);
-	return res;
-}
-
-void trident_vga_device::seq_reg_write(uint8_t index, uint8_t data)
-{
-	vga.sequencer.data[vga.sequencer.index] = data;
-	if(index <= 0x04)
-	{
-		svga_device::seq_reg_write(vga.sequencer.index,data);
-		recompute_params();
-	}
-	else
-	{
-		switch(index)
-		{
-			case 0x0b:
-				tri.new_mode = false;
-				break;
-			case 0x0c:  // Power Up Mode register 1
-				if(data & 0x10)
-					tri.port_3c3 = true;  // 'post port at 0x3c3'
-				else
-					tri.port_3c3 = false; // 'post port at 0x46e8'
-				tri.sr0c = data;
-				break;
-			case 0x0d:  // Mode Control 2
-				if(tri.new_mode)
-				{
-					tri.sr0d_new = data;
-					tri.clock = ((vga.miscellaneous_output & 0x0c) >> 2) | ((data & 0x01) << 2) | ((data & 0x40) >> 3);
-					trident_define_video_mode();
-				}
-				else
-					tri.sr0d_old = data;
-				break;
-			case 0x0e:  // Mode Control 1
-				if(tri.new_mode)
-				{
-					tri.sr0e_new = data ^ 0x02;
-					svga.bank_w = (data & 0x3f) ^ 0x02;  // bit 1 is inverted, used for card detection, it is not XORed on reading
-					if(!(tri.gc0f & 0x01))
-						svga.bank_r = (data & 0x3f) ^ 0x02;
-					// TODO: handle planar modes, where bits 0 and 2 only are used
-				}
-				else
-				{
-					tri.sr0e_old = data;
-					svga.bank_w = data & 0x0e;
-					if(!(tri.gc0f & 0x01))
-						svga.bank_r = data & 0x0e;
-				}
-				break;
-			case 0x0f:  // Power Up Mode 2
-				tri.sr0f = data;
-				break;
-			default:
-				LOGWARN("Trident: Sequencer index %02x read\n",index);
-		}
-	}
-	LOG("Trident SR%02X: %s mode write %02x\n",index,tri.new_mode ? "new" : "old",data);
+			return svga.id;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			tri.new_mode = false;
+		})
+	);
+	// Power Up Mode register 1
+	map(0x0c, 0x0c).lrw8(
+		NAME([this] (offs_t offset) {
+			u8 res = tri.sr0c & 0xef;
+			if(tri.port_3c3)
+				res |= 0x10;
+			return res;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			// ---1 ---- 'post port at 0x3c3'
+			// ---0 ---- 'post port at 0x46e8'
+			tri.port_3c3 = bool(BIT(data, 4));
+			tri.sr0c = data;
+		})
+	);
+	// Mode Control 2
+	map(0x0d, 0x0d).lrw8(
+		NAME([this] (offs_t offset) {
+			return (tri.new_mode) ? tri.sr0d_new : tri.sr0d_old;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			if(tri.new_mode)
+			{
+				tri.sr0d_new = data;
+				tri.clock = ((vga.miscellaneous_output & 0x0c) >> 2) | ((data & 0x01) << 2) | ((data & 0x40) >> 3);
+				trident_define_video_mode();
+			}
+			else
+				tri.sr0d_old = data;
+		})
+	);
+	// Mode Control 1
+	map(0x0e, 0x0e).lrw8(
+		NAME([this] (offs_t offset) {
+			return (tri.new_mode) ? tri.sr0e_new : tri.sr0e_old;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			if(tri.new_mode)
+			{
+				tri.sr0e_new = data ^ 0x02;
+				svga.bank_w = (data & 0x3f) ^ 0x02;  // bit 1 is inverted, used for card detection, it is not XORed on reading
+				if(!(tri.gc0f & 0x01))
+					svga.bank_r = (data & 0x3f) ^ 0x02;
+				// TODO: handle planar modes, where bits 0 and 2 only are used
+			}
+			else
+			{
+				tri.sr0e_old = data;
+				svga.bank_w = data & 0x0e;
+				if(!(tri.gc0f & 0x01))
+					svga.bank_r = data & 0x0e;
+			}
+		})
+	);
+	// Power Up Mode 2
+	map(0x0f, 0x0f).lrw8(
+		NAME([this] (offs_t offset) {
+			return tri.sr0f;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			tri.sr0f = data;
+		})
+	);
 }
 
 uint8_t trident_vga_device::crtc_reg_read(uint8_t index)
@@ -806,9 +780,6 @@ uint8_t trident_vga_device::port_03c0_r(offs_t offset)
 
 	switch(offset)
 	{
-		case 0x05:
-			res = trident_vga_device::seq_reg_read(vga.sequencer.index);
-			break;
 		case 0x06:
 			tri.dac_count++;
 			if(tri.dac_count > 3)
@@ -840,9 +811,6 @@ void trident_vga_device::port_03c0_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
-		case 0x05:
-			trident_vga_device::seq_reg_write(vga.sequencer.index,data);
-			break;
 		case 0x06:
 			if(tri.dac_active)
 			{

@@ -7,6 +7,7 @@
  * TODO:
  * - Original Acumos AVGA1/2 chipsets (Cirrus Logic eventually bought Acumos and rebranded);
  * - Fix or implement hidden DAC modes (15bpp + mixed, true color, others);
+ * - bebox: logo at startup is squashed;
  *
  */
 
@@ -85,7 +86,6 @@ void cirrus_gd5428_device::device_start()
 	vga.crtc.maximum_scan_line = 1;
 
 	// copy over interfaces
-	vga.svga_intf.seq_regcount = 0x1f;
 	vga.svga_intf.crtc_regcount = 0x2d;
 	vga.memory = std::make_unique<uint8_t []>(vga.svga_intf.vram_size);
 	memset(&vga.memory[0], 0, vga.svga_intf.vram_size);
@@ -574,156 +574,131 @@ void cirrus_gd5428_device::copy_pixel(uint8_t src, uint8_t dst)
 	vga.memory[m_blt_dest_current % vga.svga_intf.vram_size] = res;
 }
 
-uint8_t cirrus_gd5428_device::seq_reg_read(uint8_t index)
+void cirrus_gd5428_device::sequencer_map(address_map &map)
 {
-	uint8_t res;
+	svga_device::sequencer_map(map);
+	map(0x02, 0x02).lrw8(
+		NAME([this] (offs_t offset) { 
+			return vga.sequencer.map_mask & ((gc_mode_ext & 0x08) ? 0xff : 0x0f);
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			vga.sequencer.map_mask = data & ((gc_mode_ext & 0x08) ? 0xff : 0x0f);
+		})
+	);
+	map(0x06, 0x06).lrw8(
+		NAME([this] (offs_t offset) {
+			return (gc_locked) ? 0x0f : m_lock_reg;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			// TODO: extensions are always enabled on the GD5429
+			// bits 3,5,6,7 ignored
 
-	res = 0xff;
-
-	switch(index)
-	{
-		case 0x02:
-			if(gc_mode_ext & 0x08)
-				res = vga.sequencer.map_mask & 0xff;
-			else
-				res = vga.sequencer.map_mask & 0x0f;
-			break;
-		case 0x06:
-			if(gc_locked)
-				return 0x0f;
-			else
-				return m_lock_reg;
-			break;
-		case 0x09:
-			//printf("%02x\n",index);
-			res = vga.sequencer.data[index];
-			break;
-		case 0x0a:
-			res = m_scratchpad1;
-			break;
-		case 0x0b:
-		case 0x0c:
-		case 0x0d:
-		case 0x0e:
-			res = m_vclk_num[index-0x0b];
-			break;
-		case 0x0f:
-			res = vga.sequencer.data[index] & 0xe7;
-			res |= 0x18;  // 32-bit DRAM data bus width (1MB-2MB)
-			break;
-		case 0x12:
-			res = m_cursor_attr;
-			break;
-		case 0x14:
-			res = m_scratchpad2;
-			break;
-		case 0x15:
-			res = m_scratchpad3;
-			break;
-		case 0x1b:
-		case 0x1c:
-		case 0x1d:
-		case 0x1e:
-			res = m_vclk_denom[index-0x1b];
-			break;
-		default:
-			res = svga_device::seq_reg_read(index);
-			break;
-	}
-
-	return res;
-}
-
-void cirrus_gd5428_device::seq_reg_write(uint8_t index, uint8_t data)
-{
-	LOGMASKED(LOG_REG, "CL: SEQ write %02x to SR%02x\n",data,index);
-	switch(index)
-	{
-		case 0x02:
-			if(gc_mode_ext & 0x08)
-				vga.sequencer.map_mask = data & 0xff;
-			else
-				vga.sequencer.map_mask = data & 0x0f;
-			break;
-		case 0x06:
-			// Note: extensions are always enabled on the GD5429
-			if((data & 0x17) == 0x12)  // bits 3,5,6,7 ignored
-			{
-				gc_locked = false;
-				logerror("Cirrus register extensions unlocked\n");
-			}
-			else
-			{
-				gc_locked = true;
-				logerror("Cirrus register extensions locked\n");
-			}
+			gc_locked = (data & 0x17) != 0x12;
+			LOG("Cirrus register extensions %s\n", gc_locked ? "unlocked" : "locked");
 			m_lock_reg = data & 0x17;
-			break;
-		case 0x07:
+		})
+	);
+	map(0x07, 0x07).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			// TODO: bebox startup enables this
 			if((data & 0xf0) != 0)
 				popmessage("1MB framebuffer window enabled at %iMB (%02x)",data >> 4,data);
-			vga.sequencer.data[vga.sequencer.index] = data;
-			break;
-		case 0x09:
-			//printf("%02x %02x\n",index,data);
-			vga.sequencer.data[vga.sequencer.index] = data;
-			break;
-		case 0x0a:
-			m_scratchpad1 = data;  // GD5402/GD542x BIOS writes VRAM size here.
-			break;
-		case 0x0b:
-		case 0x0c:
-		case 0x0d:
-		case 0x0e:
-			m_vclk_num[index-0x0b] = data;
-			break;
-		case 0x10:
-		case 0x30:
-		case 0x50:
-		case 0x70:
-		case 0x90:
-		case 0xb0:
-		case 0xd0:
-		case 0xf0:  // bits 5-7 of the register index are the low bits of the X co-ordinate
-			m_cursor_x = (data << 3) | ((index & 0xe0) >> 5);
-			break;
-		case 0x11:
-		case 0x31:
-		case 0x51:
-		case 0x71:
-		case 0x91:
-		case 0xb1:
-		case 0xd1:
-		case 0xf1:  // bits 5-7 of the register index are the low bits of the Y co-ordinate
-			m_cursor_y = (data << 3) | ((index & 0xe0) >> 5);
-			break;
-		case 0x12:
+			vga.sequencer.data[0x07] = data;
+		})
+	);
+	// TODO: check me
+	map(0x09, 0x09).lrw8(
+		NAME([this] (offs_t offset) {
+			return vga.sequencer.data[0x09];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			vga.sequencer.data[0x09] = data;
+		})
+	);
+	map(0x0a, 0x0a).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_scratchpad1;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			// GD5402/GD542x BIOS writes VRAM size here
+			m_scratchpad1 = data;
+		})
+	);
+	map(0x0b, 0x0e).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_vclk_num[offset];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_vclk_num[offset] = data;
+		})
+	);
+	map(0x0f, 0x0f).lrw8(
+		NAME([this] (offs_t offset) {
+			u8 res = vga.sequencer.data[0x0f] & 0xe7;
+			// 32-bit DRAM data bus width (1MB-2MB)
+			res |= 0x18;
+			return res;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			vga.sequencer.data[0x0f] = data;
+		})
+	);
+	// bits 5-7 of the register index are the low bits of the X co-ordinate
+	map(0x10, 0x10).select(0xe0).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			m_cursor_x = (data << 3) | ((offset & 0xe0) >> 5);
+		})
+	);
+	// bits 5-7 of the register index are the low bits of the Y co-ordinate
+	map(0x11, 0x11).select(0xe0).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			m_cursor_y = (data << 3) | ((offset & 0xe0) >> 5);
+		})
+	);
+	map(0x12, 0x12).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_cursor_attr;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
 			// bit 0 - enable cursor
 			// bit 1 - enable extra palette (cursor colours are there)
 			// bit 2 - 64x64 cursor (32x32 if clear, GD5422+)
 			// bit 7 - overscan colour protect - if set, use colour 2 in the extra palette for the border (GD5424+)
 			m_cursor_attr = data;
 			m_ext_palette_enabled = data & 0x02;
-			break;
-		case 0x13:
-			m_cursor_addr = data;  // bits 0 and 1 are ignored if using 64x64 cursor
-			break;
-		case 0x14:
+		})
+	);
+	map(0x13, 0x13).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			// bits 0 and 1 are ignored if using 64x64 cursor
+			m_cursor_addr = data;
+		})
+	);
+	map(0x14, 0x14).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_scratchpad2;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
 			m_scratchpad2 = data;
-			break;
-		case 0x15:
-			m_scratchpad3 = data;  // GD543x BIOS writes VRAM size here
-			break;
-		case 0x1b:
-		case 0x1c:
-		case 0x1d:
-		case 0x1e:
-			m_vclk_denom[index-0x1b] = data;
-			break;
-		default:
-			vga.sequencer.data[vga.sequencer.index] = data;
-			svga_device::seq_reg_write(vga.sequencer.index,data);
-	}
+		})
+	);
+	map(0x15, 0x15).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_scratchpad3;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			// GD543x BIOS writes VRAM size here
+			m_scratchpad3 = data;
+		})
+	);
+	map(0x1b, 0x1e).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_vclk_denom[offset];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_vclk_denom[offset] = data;
+		})
+	);
 }
 
 uint8_t cirrus_gd5428_device::gc_reg_read(uint8_t index)
@@ -983,9 +958,6 @@ uint8_t cirrus_gd5428_device::port_03c0_r(offs_t offset)
 
 	switch(offset)
 	{
-		case 0x05:
-			res = cirrus_gd5428_device::seq_reg_read(vga.sequencer.index);
-			break;
 		case 0x06:
 			m_hidden_dac_phase ++;
 			if (m_hidden_dac_phase >= 4)
@@ -1042,9 +1014,6 @@ void cirrus_gd5428_device::port_03c0_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
-		case 0x05:
-			cirrus_gd5428_device::seq_reg_write(vga.sequencer.index,data);
-			break;
 		case 0x06:
 			if (m_hidden_dac_phase >= 4)
 			{

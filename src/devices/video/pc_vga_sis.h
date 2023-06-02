@@ -24,19 +24,18 @@ protected:
 	virtual void device_reset() override;
 	virtual uint8_t crtc_reg_read(uint8_t index) override;
 	virtual void crtc_reg_write(uint8_t index, uint8_t data) override;
-	virtual uint8_t seq_reg_read(uint8_t index) override;
-	virtual void seq_reg_write(uint8_t index, uint8_t data) override;
+	virtual void sequencer_map(address_map &map) override;
 	virtual uint16_t offset() override;
 	virtual void recompute_params() override;
 
 	u8 m_crtc_ext_regs[0x100]{};
-	u8 m_seq_ext_regs[0x100]{};
 	u8 m_ramdac_mode = 0;
 	u8 m_ext_misc_ctrl_0 = 0;
 	u8 m_ext_vert_overflow = 0;
 	u8 m_ext_horz_overflow[2]{};
 	u32 m_svga_bank_reg_w = 0;
 	u32 m_svga_bank_reg_r = 0;
+	u8 m_bus_width = 0;
 	bool m_unlock_reg = false;
 
 	std::tuple<u8, u8> flush_true_color_mode();

@@ -78,7 +78,6 @@ void nvidia_nv3_vga_device::device_start()
 
 	vga.crtc.maximum_scan_line = 1;
 
-	vga.svga_intf.seq_regcount = 0x05;
 	vga.svga_intf.crtc_regcount = 0x40;
 	// TODO: shared with main GPU, fake it for now
 	// Start address ends at 20 bits so 0x1fffff mask / 2,097,151 bytes / 2MB window is (theorically) given

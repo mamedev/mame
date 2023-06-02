@@ -92,8 +92,7 @@ protected:
 
 private:
 	void cirrus_define_video_mode();
-	virtual uint8_t seq_reg_read(uint8_t index) override;
-	virtual void seq_reg_write(uint8_t index, uint8_t data) override;
+	virtual void sequencer_map(address_map &map) override;
 	virtual uint8_t gc_reg_read(uint8_t index) override;
 	virtual void gc_reg_write(uint8_t index, uint8_t data) override;
 	virtual uint8_t crtc_reg_read(uint8_t index) override;

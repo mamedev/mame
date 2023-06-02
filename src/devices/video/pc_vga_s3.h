@@ -17,8 +17,8 @@ public:
 
 	virtual uint8_t port_03b0_r(offs_t offset) override;
 	virtual void port_03b0_w(offs_t offset, uint8_t data) override;
-	virtual uint8_t port_03c0_r(offs_t offset) override;
-	virtual void port_03c0_w(offs_t offset, uint8_t data) override;
+//	virtual uint8_t port_03c0_r(offs_t offset) override;
+//8	virtual void port_03c0_w(offs_t offset, uint8_t data) override;
 	virtual uint8_t port_03d0_r(offs_t offset) override;
 	virtual void port_03d0_w(offs_t offset, uint8_t data) override;
 	virtual uint8_t mem_r(offs_t offset) override;
@@ -40,9 +40,7 @@ protected:
 
 	virtual uint8_t crtc_reg_read(uint8_t index) override;
 	virtual void crtc_reg_write(uint8_t index, uint8_t data) override;
-	virtual uint8_t seq_reg_read(uint8_t index) override;
-	virtual void seq_reg_write(uint8_t index, uint8_t data) override;
-
+	virtual void sequencer_map(address_map &map) override;
 
 	// TODO: remove this leaky abstraction
 	struct

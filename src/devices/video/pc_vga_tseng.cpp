@@ -147,45 +147,11 @@ void tseng_vga_device::crtc_reg_write(uint8_t index, uint8_t data)
 	}
 }
 
-uint8_t tseng_vga_device::seq_reg_read(uint8_t index)
+void tseng_vga_device::sequencer_map(address_map &map)
 {
-	uint8_t res;
-
-	res = 0xff;
-
-	if(index <= 0x04)
-		res = svga_device::seq_reg_read(index);
-	else
-	{
-		switch(index)
-		{
-			case 0x06:
-			case 0x07:
-				//printf("%02x\n",index);
-				break;
-		}
-	}
-
-	return res;
-}
-
-void tseng_vga_device::seq_reg_write(uint8_t index, uint8_t data)
-{
-	if(index <= 0x04)
-	{
-		vga.sequencer.data[vga.sequencer.index] = data;
-		svga_device::seq_reg_write(vga.sequencer.index,data);
-	}
-	else
-	{
-		switch(index)
-		{
-			case 0x06:
-			case 0x07:
-				//printf("%02x %02x\n",index,data);
-				break;
-		}
-	}
+	svga_device::sequencer_map(map);
+	// TODO: preseve legacy hookup, to be investigated
+	map(0x05, 0xff).unmaprw();
 }
 
 uint8_t tseng_vga_device::port_03b0_r(offs_t offset)
@@ -277,6 +243,7 @@ uint8_t tseng_vga_device::port_03c0_r(offs_t offset)
 	switch(offset)
 	{
 		case 0x01:
+			// TODO: inherit from attribute_map
 			switch(vga.attribute.index)
 			{
 				case 0x16: res = et4k.misc1; break;
@@ -288,9 +255,6 @@ uint8_t tseng_vga_device::port_03c0_r(offs_t offset)
 
 			break;
 
-		case 0x05:
-			res = tseng_vga_device::seq_reg_read(vga.sequencer.index);
-			break;
 		case 0x0d:
 			res = svga.bank_w & 0xf;
 			res |= (svga.bank_r & 0xf) << 4;
@@ -334,9 +298,6 @@ void tseng_vga_device::port_03c0_w(offs_t offset, uint8_t data)
 			vga.attribute.state=!vga.attribute.state;
 			break;
 
-		case 0x05:
-			tseng_vga_device::seq_reg_write(vga.sequencer.index,data);
-			break;
 		case 0x0d:
 			svga.bank_w = data & 0xf;
 			svga.bank_r = (data & 0xf0) >> 4;

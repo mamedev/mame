@@ -113,8 +113,10 @@ vga_device::vga_device(const machine_config &mconfig, device_type type, const ch
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, device_palette_interface(mconfig, *this)
+	, device_memory_interface(mconfig, *this)
 	, vga(*this)
 	, m_input_sense(*this, "VGA_SENSE")
+	, m_seq_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(vga_device::sequencer_map), this))
 {
 }
 
@@ -126,7 +128,6 @@ vga_device::vga_device(const machine_config &mconfig, const char *tag, device_t 
 // zero everything, keep vtbls
 void vga_device::zero()
 {
-	vga.svga_intf.seq_regcount = 0;
 	vga.svga_intf.crtc_regcount = 0;
 	memset(vga.pens, 0, sizeof(vga.pens));
 	vga.miscellaneous_output = 0;
@@ -139,12 +140,11 @@ void vga_device::zero()
 	memset(&vga.oak, 0, sizeof(vga.oak));
 }
 
-/* VBLANK callback, start address definitely updates AT vblank, not before. */
-TIMER_CALLBACK_MEMBER(vga_device::vblank_timer_cb)
+device_memory_interface::space_config_vector vga_device::memory_space_config() const
 {
-	vga.crtc.start_addr = vga.crtc.start_addr_latch;
-	vga.attribute.pel_shift = vga.attribute.pel_shift_latch;
-	m_vblank_timer->adjust( screen().time_until_pos(vga.crtc.vert_blank_start + vga.crtc.vert_blank_end) );
+	return space_config_vector {
+		std::make_pair(SEQ_REG, &m_seq_space_config)
+	};
 }
 
 void vga_device::device_start()
@@ -158,7 +158,6 @@ void vga_device::device_start()
 	vga.crtc.maximum_scan_line = 1;
 
 	// copy over interfaces
-	vga.svga_intf.seq_regcount = 0x05;
 	vga.svga_intf.crtc_regcount = 0x19;
 
 	vga.memory = std::make_unique<uint8_t []>(vga.svga_intf.vram_size);
@@ -1122,29 +1121,34 @@ uint8_t vga_device::gc_reg_read(uint8_t index)
 	return res;
 }
 
-uint8_t vga_device::seq_reg_read(uint8_t index)
+void vga_device::sequencer_map(address_map &map)
 {
-	const u8 res = vga.sequencer.data[vga.sequencer.index];
-	LOG("Reading unmapped sequencer read register [%02x] -> %02x (SVGA?)\n", index, res);
-	return res;
-}
-
-void vga_device::seq_reg_write(uint8_t index, uint8_t data)
-{
-	switch(index)
-	{
-		case 0x02:
+	// TODO: legacy fallback trick
+	map(0x00, 0xff).lr8(
+		NAME([this] (offs_t offset) {
+			const u8 res = vga.sequencer.data[offset];
+			LOG("Reading unmapped sequencer read register [%02x] -> %02x (SVGA?)\n", offset, res);
+			return res;
+		})
+	);
+//	map(0x00, 0x00) Reset Register
+//	map(0x01, 0x01) Clocking Mode Register
+	map(0x02, 0x02).lw8(
+		NAME([this] (offs_t offset, u8 data) {
 			vga.sequencer.map_mask = data & 0xf;
-			break;
-		case 0x03:
+		})
+	);
+	map(0x03, 0x03).lw8(
+		NAME([this] (offs_t offset, u8 data) {
 			/* --2- 84-- character select A
 			   ---2 --84 character select B */
 			vga.sequencer.char_sel.A = (((data & 0xc) >> 2)<<1) | ((data & 0x20) >> 5);
 			vga.sequencer.char_sel.B = (((data & 0x3) >> 0)<<1) | ((data & 0x10) >> 4);
 			if(data)
 				popmessage("Char SEL checker, contact MAMEdev (%02x %02x)\n",vga.sequencer.char_sel.A,vga.sequencer.char_sel.B);
-			break;
-	}
+		})
+	);
+//	map(0x04, 0x04) Sequencer Memory Mode Register
 }
 
 /*
@@ -1222,7 +1226,7 @@ uint8_t vga_device::port_03c0_r(offs_t offset)
 			break;
 
 		case 5:
-			data = seq_reg_read(vga.sequencer.index);
+			data = this->space(SEQ_REG).read_byte(vga.sequencer.index);
 			break;
 
 		case 6:
@@ -1391,16 +1395,9 @@ void vga_device::port_03c0_w(offs_t offset, uint8_t data)
 		vga.sequencer.index = data;
 		break;
 	case 5:
-		LOGREGS("vga_port_03c0_w(): SEQ[0x%02X%s] = 0x%02X\n",
-			vga.sequencer.index,
-			(vga.sequencer.index < vga.svga_intf.seq_regcount) ? "" : "?",
-			data);
-		if (vga.sequencer.index < vga.svga_intf.seq_regcount)
-		{
-			vga.sequencer.data[vga.sequencer.index] = data;
-		}
-
-		seq_reg_write(vga.sequencer.index,data);
+		// TODO: temporary cheat for read-back
+		vga.sequencer.data[vga.sequencer.index] = data;
+		this->space(SEQ_REG).write_byte(vga.sequencer.index, data);
 		recompute_params();
 		break;
 	case 6:
@@ -1568,9 +1565,19 @@ void vga_device::mem_linear_w(offs_t offset, uint8_t data)
 	vga.memory[offset % vga.svga_intf.vram_size] = data;
 }
 
-/*
+/* VBLANK callback, start address definitely updates AT vblank, not before. */
+TIMER_CALLBACK_MEMBER(vga_device::vblank_timer_cb)
+{
+	vga.crtc.start_addr = vga.crtc.start_addr_latch;
+	vga.attribute.pel_shift = vga.attribute.pel_shift_latch;
+	m_vblank_timer->adjust( screen().time_until_pos(vga.crtc.vert_blank_start + vga.crtc.vert_blank_end) );
+}
+
+/**************************
+ *
  * SVGA overrides
- */
+ *
+ *************************/
 
 svga_device::svga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: vga_device(mconfig, type, tag, owner, clock)

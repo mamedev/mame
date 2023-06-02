@@ -27,6 +27,7 @@ DEFINE_DEVICE_TYPE(S3_VGA,     s3_vga_device,     "s3_vga",     "S3 Graphics VGA
 s3_vga_device::s3_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: s3_vga_device(mconfig, S3_VGA, tag, owner, clock)
 {
+
 }
 
 s3_vga_device::s3_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -557,75 +558,40 @@ bit    0  Vertical Total bit 10. Bit 10 of the Vertical Total register (3d4h
 	}
 }
 
-uint8_t s3_vga_device::seq_reg_read(uint8_t index)
+void s3_vga_device::sequencer_map(address_map &map)
 {
-	uint8_t res = 0xff;
-
-	if(index <= 0x0c)
-		res = svga_device::seq_reg_read(index);
-	else
-	{
-		switch(index)
-		{
-		case 0x10:
-			res = s3.sr10;
-			break;
-		case 0x11:
-			res = s3.sr11;
-			break;
-		case 0x12:
-			res = s3.sr12;
-			break;
-		case 0x13:
-			res = s3.sr13;
-			break;
-		case 0x15:
-			res = s3.sr15;
-			break;
-		case 0x17:
-			res = s3.sr17;  // CLKSYN test register
-			s3.sr17--;  // who knows what it should return, docs only say it defaults to 0, and is reserved for testing of the clock synthesiser
-			break;
-		}
-	}
-
-	return res;
-}
-
-void s3_vga_device::seq_reg_write(uint8_t index, uint8_t data)
-{
-	if(index <= 0x0c)
-	{
-		vga.sequencer.data[vga.sequencer.index] = data;
-		svga_device::seq_reg_write(vga.sequencer.index,data);
-	}
-	else
-	{
-		switch(index)
-		{
-		// Memory CLK PLL
-		case 0x10:
-			s3.sr10 = data;
-			break;
-		case 0x11:
-			s3.sr11 = data;
-			break;
-		// Video CLK PLL
-		case 0x12:
-			s3.sr12 = data;
-			break;
-		case 0x13:
-			s3.sr13 = data;
-			break;
-		case 0x15:
-			if(data & 0x02)  // load DCLK frequency (would normally have a small variable delay)
+	svga_device::sequencer_map(map);
+	// Memory CLK PLL
+	map(0x10, 0x10).lrw8(
+		NAME([this] (offs_t offset) { return s3.sr10; }),
+		NAME([this] (offs_t offset, u8 data) { s3.sr10 = data; })
+	);
+	map(0x11, 0x11).lrw8(
+		NAME([this] (offs_t offset) { return s3.sr11; }),
+		NAME([this] (offs_t offset, u8 data) { s3.sr11 = data; })
+	);
+	// Video CLK PLL
+	map(0x12, 0x12).lrw8(
+		NAME([this] (offs_t offset) { return s3.sr12; }),
+		NAME([this] (offs_t offset, u8 data) { s3.sr12 = data; })
+	);
+	map(0x13, 0x13).lrw8(
+		NAME([this] (offs_t offset) { return s3.sr13; }),
+		NAME([this] (offs_t offset, u8 data) { s3.sr13 = data; })
+	);
+	map(0x15, 0x15).lrw8(
+		NAME([this] (offs_t offset) { return s3.sr15; }),
+		NAME([this] (offs_t offset, u8 data) {
+			// load DCLK frequency (would normally have a small variable delay)
+			if(data & 0x02)
 			{
 				s3.clk_pll_n = s3.sr12 & 0x1f;
 				s3.clk_pll_r = (s3.sr12 & 0x60) >> 5;
 				s3.clk_pll_m = s3.sr13 & 0x7f;
 				s3_define_video_mode();
 			}
-			if(data & 0x20)  // immediate DCLK/MCLK load
+			// immediate DCLK/MCLK load
+			if(data & 0x20)
 			{
 				s3.clk_pll_n = s3.sr12 & 0x1f;
 				s3.clk_pll_r = (s3.sr12 & 0x60) >> 5;
@@ -633,11 +599,19 @@ void s3_vga_device::seq_reg_write(uint8_t index, uint8_t data)
 				s3_define_video_mode();
 			}
 			s3.sr15 = data;
-		}
-	}
+		})
+	),
+	map(0x17, 0x17).lr8(
+		NAME([this] (offs_t offset) {
+			// CLKSYN test register
+			const u8 res = s3.sr17;
+			// who knows what it should return, docs only say it defaults to 0, and is reserved for testing of the clock synthesiser
+			if (!machine().side_effects_disabled())
+				s3.sr17--;
+			return res;
+		})
+	);
 }
-
-
 
 uint8_t s3_vga_device::port_03b0_r(offs_t offset)
 {
@@ -673,36 +647,6 @@ void s3_vga_device::port_03b0_w(offs_t offset, uint8_t data)
 				vga_device::port_03b0_w(offset,data);
 				break;
 		}
-	}
-}
-
-uint8_t s3_vga_device::port_03c0_r(offs_t offset)
-{
-	uint8_t res;
-
-	switch(offset)
-	{
-		case 5:
-			res = s3_vga_device::seq_reg_read(vga.sequencer.index);
-			break;
-		default:
-			res = vga_device::port_03c0_r(offset);
-			break;
-	}
-
-	return res;
-}
-
-void s3_vga_device::port_03c0_w(offs_t offset, uint8_t data)
-{
-	switch(offset)
-	{
-		case 5:
-			s3_vga_device::seq_reg_write(vga.sequencer.index,data);
-			break;
-		default:
-			vga_device::port_03c0_w(offset,data);
-			break;
 	}
 }
 

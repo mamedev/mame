@@ -440,7 +440,6 @@ void vis_vga_device::device_start()
 	m_isa->install_device(0x03b0, 0x03df, read8sm_delegate(*this, FUNC(vis_vga_device::vga_r)), write8sm_delegate(*this, FUNC(vis_vga_device::vga_w)));
 	m_isa->install_memory(0x0a0000, 0x0bffff, read8sm_delegate(*this, FUNC(vis_vga_device::visvgamem_r)), write8sm_delegate(*this, FUNC(vis_vga_device::visvgamem_w)));
 	svga_device::device_start();
-	vga.svga_intf.seq_regcount = 0x2d;
 	save_pointer(m_crtc_regs,"VIS CRTC",0x32);
 }
 
