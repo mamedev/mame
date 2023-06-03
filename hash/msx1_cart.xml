@@ -11510,7 +11510,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="startreka">
+	<software name="startreka" cloneof="startrek">
 		<description>Star Trek (Japan, alt)</description>
 		<year>1986</year>
 		<publisher>SEGA</publisher>
@@ -18463,7 +18463,7 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
-	<software name="sensha21">
+	<software name="sensha21" cloneof="sensha">
 		<description>Sensha Game (20210318)</description>
 		<year>2021</year>
 		<publisher>&lt;homebrew&gt;</publisher>
@@ -19768,7 +19768,7 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
-	<software name="transbal132a">
+	<software name="transbal132a" cloneof="transbal">
 		<description>Transball (v1.3.2?, English, alt)</description>
 		<year>2016</year>
 		<publisher>&lt;homebrew&gt;</publisher>
