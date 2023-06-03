@@ -3323,6 +3323,8 @@ void z80_device::take_interrupt()
 					if (irq_vector == 0xfb)
 					{
 						// EI
+						CC(op, 0xfb);
+						T(m_icount_executing);
 						ei();
 					}
 					else if ((irq_vector & 0xc7) == 0xc7)
