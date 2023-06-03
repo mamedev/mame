@@ -51,11 +51,6 @@
 
 /* Protection Handlers */
 
-INTERRUPT_GEN_MEMBER(_1943_state::mcu_irq)
-{
-	m_mcu->set_input_line(MCS51_INT1_LINE, HOLD_LINE);
-}
-
 void _1943_state::mcu_p3_w(u8 data)
 {
 	// write strobe
@@ -289,7 +284,6 @@ void _1943_state::_1943(machine_config &config)
 	m_mcu->port_in_cb<2>().set([this](){ return m_audiocpu_to_mcu; });
 	m_mcu->port_out_cb<2>().set([this](u8 data){ m_mcu_p2 = data; });
 	m_mcu->port_out_cb<3>().set(FUNC(_1943_state::mcu_p3_w));
-	m_mcu->set_vblank_int("screen", FUNC(_1943_state::mcu_irq));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -298,6 +292,7 @@ void _1943_state::_1943(machine_config &config)
 	m_screen->set_raw(XTAL(24'000'000)/4, 384, 128, 0, 262, 22, 246);   // hsync is 50..77, vsync is 257..259
 	m_screen->set_screen_update(FUNC(_1943_state::screen_update));
 	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline(m_mcu, MCS51_INT1_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1943);
 	PALETTE(config, m_palette, FUNC(_1943_state::_1943_palette), 32*4+16*16+16*16+16*16, 256);

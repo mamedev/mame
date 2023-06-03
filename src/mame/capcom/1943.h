@@ -78,7 +78,6 @@ private:
 	u8 m_mcu_p2 = 0;
 	u8 m_mcu_p3 = 0;
 
-	INTERRUPT_GEN_MEMBER(mcu_irq);
 	void mcu_p3_w(u8 data);
 
 	void videoram_w(offs_t offset, u8 data);
