@@ -117,6 +117,8 @@ vga_device::vga_device(const machine_config &mconfig, device_type type, const ch
 	, vga(*this)
 	, m_input_sense(*this, "VGA_SENSE")
 {
+	//m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(vga_device::crtc_map), this));
+	m_gc_space_config = address_space_config("gc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(vga_device::gc_map), this));
 	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(vga_device::sequencer_map), this));
 	m_atc_space_config = address_space_config("attribute_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(vga_device::attribute_map), this));
 }
@@ -144,6 +146,8 @@ void vga_device::zero()
 device_memory_interface::space_config_vector vga_device::memory_space_config() const
 {
 	return space_config_vector {
+		//std::make_pair(CRTC_REG, &m_crtc_space_config),
+		std::make_pair(GC_REG, &m_gc_space_config),
 		std::make_pair(SEQ_REG, &m_seq_space_config),
 		std::make_pair(ATC_REG, &m_atc_space_config)
 	};
@@ -1065,8 +1069,6 @@ void vga_device::vga_crtc_w(offs_t offset, uint8_t data)
 	}
 }
 
-
-
 uint8_t vga_device::port_03b0_r(offs_t offset)
 {
 	uint8_t data = 0xff;
@@ -1075,52 +1077,100 @@ uint8_t vga_device::port_03b0_r(offs_t offset)
 	return data;
 }
 
-uint8_t vga_device::gc_reg_read(uint8_t index)
+void vga_device::gc_map(address_map &map)
 {
-	uint8_t res;
-
-	switch(index)
-	{
-		case 0x00:
-			res = vga.gc.set_reset & 0xf;
-			break;
-		case 0x01:
-			res = vga.gc.enable_set_reset & 0xf;
-			break;
-		case 0x02:
-			res = vga.gc.color_compare & 0xf;
-			break;
-		case 0x03:
-			res  = (vga.gc.logical_op & 3) << 3;
-			res |= (vga.gc.rotate_count & 7);
-			break;
-		case 0x04:
-			res = vga.gc.read_map_sel & 3;
-			break;
-		case 0x05:
-			res  = (vga.gc.shift256 & 1) << 6;
+	map.unmap_value_high();
+	map(0x00, 0x00).lrw8(
+		NAME([this](offs_t offset) {
+			return vga.gc.set_reset & 0xf; 
+		}),
+		NAME([this](offs_t offset, u8 data) { 
+			vga.gc.set_reset = data & 0xf; 
+		})
+	);
+	map(0x01, 0x01).lrw8(
+		NAME([this](offs_t offset) { 
+			return vga.gc.enable_set_reset & 0xf;
+		}),
+		NAME([this](offs_t offset, u8 data) { 
+			vga.gc.enable_set_reset = data & 0xf;
+		})
+	);
+	map(0x02, 0x02).lrw8(
+		NAME([this](offs_t offset) { 
+			return vga.gc.color_compare & 0xf;
+		}),
+		NAME([this](offs_t offset, u8 data) { 
+			vga.gc.color_compare = data & 0xf;
+		})
+	);
+	map(0x03, 0x03).lrw8(
+		NAME([this](offs_t offset) {
+			return ((vga.gc.logical_op & 3) << 3) | (vga.gc.rotate_count & 7);
+		}),
+		NAME([this](offs_t offset, u8 data) { 
+			vga.gc.logical_op = (data & 0x18) >> 3;
+			vga.gc.rotate_count = data & 7;
+		})
+	);
+	map(0x04, 0x04).lrw8(
+		NAME([this](offs_t offset) {
+			return vga.gc.read_map_sel & 3;
+		}),
+		NAME([this](offs_t offset, u8 data) { 
+			vga.gc.read_map_sel = data & 3;
+		})
+	);
+	map(0x05, 0x05).lrw8(
+		NAME([this](offs_t offset) {
+			u8 res = (vga.gc.shift256 & 1) << 6;
 			res |= (vga.gc.shift_reg & 1) << 5;
 			res |= (vga.gc.host_oe & 1) << 4;
 			res |= (vga.gc.read_mode & 1) << 3;
 			res |= (vga.gc.write_mode & 3);
-			break;
-		case 0x06:
-			res  = (vga.gc.memory_map_sel & 3) << 2;
+			return res;
+		}),
+		NAME([this](offs_t offset, u8 data) { 
+			vga.gc.shift256 = BIT(data, 6);
+			vga.gc.shift_reg = BIT(data, 5);
+			vga.gc.host_oe = BIT(data, 4);
+			vga.gc.read_mode = BIT(data, 3);
+			vga.gc.write_mode = data & 3;
+			//if(data & 0x10 && vga.gc.alpha_dis)
+			//  popmessage("Host O/E enabled, contact MAMEdev");
+		})
+	);
+	map(0x06, 0x06).lrw8(
+		NAME([this](offs_t offset) { 
+			u8 res = (vga.gc.memory_map_sel & 3) << 2;
 			res |= (vga.gc.chain_oe & 1) << 1;
 			res |= (vga.gc.alpha_dis & 1);
-			break;
-		case 0x07:
-			res = vga.gc.color_dont_care & 0xf;
-			break;
-		case 0x08:
-			res = vga.gc.bit_mask & 0xff;
-			break;
-		default:
-			res = 0xff;
-			break;
-	}
-
-	return res;
+			return res;
+		}),
+		NAME([this](offs_t offset, u8 data) {
+			vga.gc.memory_map_sel = (data & 0xc) >> 2;
+			vga.gc.chain_oe = BIT(data, 1);
+			vga.gc.alpha_dis = BIT(data, 0);
+			//if(data & 2 && vga.gc.alpha_dis)
+			//  popmessage("Chain O/E enabled, contact MAMEdev");
+		})
+	);
+	map(0x07, 0x07).lrw8(
+		NAME([this](offs_t offset) {
+			return vga.gc.color_dont_care & 0xf;
+		}),
+		NAME([this](offs_t offset, u8 data) {
+			vga.gc.color_dont_care = data & 0xf;
+		})
+	);
+	map(0x08, 0x08).lrw8(
+		NAME([this](offs_t offset) {
+			return vga.gc.bit_mask & 0xff;
+		}),
+		NAME([this](offs_t offset, u8 data) {
+			vga.gc.bit_mask = data & 0xff;
+		})
+	);
 }
 
 void vga_device::sequencer_map(address_map &map)
@@ -1321,7 +1371,7 @@ uint8_t vga_device::port_03c0_r(offs_t offset)
 			break;
 
 		case 0xf:
-			data = gc_reg_read(vga.gc.index);
+			data = space(GC_REG).read_byte(vga.gc.index);
 			break;
 	}
 	return data;
@@ -1345,51 +1395,6 @@ void vga_device::port_03b0_w(offs_t offset, uint8_t data)
 {
 	if (get_crtc_port() == 0x3b0)
 		vga_crtc_w(offset, data);
-}
-
-void vga_device::gc_reg_write(uint8_t index,uint8_t data)
-{
-	switch(index)
-	{
-		case 0x00:
-			vga.gc.set_reset = data & 0xf;
-			break;
-		case 0x01:
-			vga.gc.enable_set_reset = data & 0xf;
-			break;
-		case 0x02:
-			vga.gc.color_compare = data & 0xf;
-			break;
-		case 0x03:
-			vga.gc.logical_op = (data & 0x18) >> 3;
-			vga.gc.rotate_count = data & 7;
-			break;
-		case 0x04:
-			vga.gc.read_map_sel = data & 3;
-			break;
-		case 0x05:
-			vga.gc.shift256 = (data & 0x40) >> 6;
-			vga.gc.shift_reg = (data & 0x20) >> 5;
-			vga.gc.host_oe = (data & 0x10) >> 4;
-			vga.gc.read_mode = (data & 8) >> 3;
-			vga.gc.write_mode = data & 3;
-			//if(data & 0x10 && vga.gc.alpha_dis)
-			//  popmessage("Host O/E enabled, contact MAMEdev");
-			break;
-		case 0x06:
-			vga.gc.memory_map_sel = (data & 0xc) >> 2;
-			vga.gc.chain_oe = (data & 2) >> 1;
-			vga.gc.alpha_dis = (data & 1);
-			//if(data & 2 && vga.gc.alpha_dis)
-			//  popmessage("Chain O/E enabled, contact MAMEdev");
-			break;
-		case 0x07:
-			vga.gc.color_dont_care = data & 0xf;
-			break;
-		case 0x08:
-			vga.gc.bit_mask = data & 0xff;
-			break;
-	}
 }
 
 void vga_device::port_03c0_w(offs_t offset, uint8_t data)
@@ -1460,7 +1465,7 @@ void vga_device::port_03c0_w(offs_t offset, uint8_t data)
 		vga.gc.index=data;
 		break;
 	case 0xf:
-		gc_reg_write(vga.gc.index,data);
+		space(GC_REG).write_byte(vga.gc.index, data);
 		break;
 	}
 }

@@ -46,8 +46,7 @@ protected:
 	virtual uint8_t crtc_reg_read(uint8_t index) override;
 	virtual void crtc_reg_write(uint8_t index, uint8_t data) override;
 	virtual void sequencer_map(address_map &map) override;
-	virtual uint8_t gc_reg_read(uint8_t index) override;
-	virtual void gc_reg_write(uint8_t index, uint8_t data) override;
+	virtual void gc_map(address_map &map) override;
 
 	// TODO: remove this leaky abstraction
 	struct

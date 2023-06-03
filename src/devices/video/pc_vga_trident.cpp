@@ -47,6 +47,7 @@ DEFINE_DEVICE_TYPE(TVGA9000_VGA, tvga9000_device, "tvga9000_vga", "Trident TVGA9
 trident_vga_device::trident_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: svga_device(mconfig, type, tag, owner, clock)
 {
+	m_gc_space_config = address_space_config("gc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(trident_vga_device::gc_map), this));
 	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(trident_vga_device::sequencer_map), this));
 }
 
@@ -714,65 +715,41 @@ void trident_vga_device::crtc_reg_write(uint8_t index, uint8_t data)
 	LOG("Trident CR%02X: write %02x\n",index,data);
 }
 
-uint8_t trident_vga_device::gc_reg_read(uint8_t index)
+void trident_vga_device::gc_map(address_map &map)
 {
-	uint8_t res;
-
-	if(index <= 0x0d)
-		res = svga_device::gc_reg_read(index);
-	else
-	{
-		switch(index)
-		{
-		case 0x0e:
-			res = tri.gc0e;
-			break;
-		case 0x0f:
-			res = tri.gc0f;
-			break;
-		case 0x2f:
-			res = tri.gc2f;
-			break;
-		default:
-			res = 0xff;
-			LOGWARN("Trident: Sequencer index %02x read\n",index);
-			break;
-		}
-	}
-	LOG("Trident GC%02X: read %02x\n",index,res);
-	return res;
-}
-
-void trident_vga_device::gc_reg_write(uint8_t index, uint8_t data)
-{
-	if(index <= 0x0d)
-		svga_device::gc_reg_write(index,data);
-	else
-	{
-		LOG("Trident GC%02X: write %02x\n",index,data);
-		switch(index)
-		{
-		case 0x0e:  // New Source Address Register (bit 1 is inverted here, also)
+	svga_device::gc_map(map);
+	// New Source Address Register (bit 1 is inverted here, also)
+	map(0x0e, 0x0e).lrw8(
+		NAME([this] (offs_t offset) { 
+			return tri.gc0e;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
 			tri.gc0e = data ^ 0x02;
 			if(!(tri.gc0f & 0x04))  // if bank regs at 0x3d8/9 are not enabled
 			{
 				if(tri.gc0f & 0x01)  // if bank regs are separated
 					svga.bank_r = (data & 0x1f) ^ 0x02;
 			}
-			break;
-		case 0x0f:
+		})
+	);
+	map(0x0f, 0x0f).lrw8(
+		NAME([this] (offs_t offset) { 
+			return tri.gc0f;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
 			tri.gc0f = data;
 			trident_define_video_mode();
-			break;
-		case 0x2f:  // XFree86 refers to this register as "MiscIntContReg", setting bit 2, but gives no indication as to what it does
+		})
+	);
+	// XFree86 refers to this register as "MiscIntContReg", setting bit 2, but gives no indication as to what it does
+	map(0x2f, 0x2f).lrw8(
+		NAME([this] (offs_t offset) { 
+			return tri.gc2f;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
 			tri.gc2f = data;
-			break;
-		default:
-			LOGWARN("Trident: Unimplemented GC register %02x write %02x\n",index,data);
-			break;
-		}
-	}
-	LOG("Trident GC%02X: write %02x\n",index,data);
+		})
+	);
 }
 
 uint8_t trident_vga_device::port_03c0_r(offs_t offset)
@@ -796,9 +773,6 @@ uint8_t trident_vga_device::port_03c0_r(offs_t offset)
 			tri.dac_active = false;
 			tri.dac_count = 0;
 			res = vga_device::port_03c0_r(offset);
-			break;
-		case 0x0f:
-			res = trident_vga_device::gc_reg_read(vga.gc.index);
 			break;
 		default:
 			res = vga_device::port_03c0_r(offset);
@@ -829,9 +803,6 @@ void trident_vga_device::port_03c0_w(offs_t offset, uint8_t data)
 			tri.dac_active = false;
 			tri.dac_count = 0;
 			vga_device::port_03c0_w(offset,data);
-			break;
-		case 0x0f:
-			trident_vga_device::gc_reg_write(vga.gc.index,data);
 			break;
 		default:
 			vga_device::port_03c0_w(offset,data);
