@@ -39,26 +39,26 @@ void h83002_device::map(address_map &map)
 
 	map(base | 0xfd10, base | 0xff0f).ram();
 
-	map(base | 0xff20, base | 0xff21).rw(m_dma0, FUNC(h8_dma_channel_device::marah_r), FUNC(h8_dma_channel_device::marah_w));
-	map(base | 0xff22, base | 0xff23).rw(m_dma0, FUNC(h8_dma_channel_device::maral_r), FUNC(h8_dma_channel_device::maral_w));
-	map(base | 0xff24, base | 0xff25).rw(m_dma0, FUNC(h8_dma_channel_device::etcra_r), FUNC(h8_dma_channel_device::etcra_w));
-	map(base | 0xff26, base | 0xff26).rw(m_dma0, FUNC(h8_dma_channel_device::ioara8_r), FUNC(h8_dma_channel_device::ioara8_w));
-	map(base | 0xff27, base | 0xff27).rw(m_dma0, FUNC(h8_dma_channel_device::dtcra_r), FUNC(h8_dma_channel_device::dtcra_w));
-	map(base | 0xff28, base | 0xff29).rw(m_dma0, FUNC(h8_dma_channel_device::marbh_r), FUNC(h8_dma_channel_device::marbh_w));
-	map(base | 0xff2a, base | 0xff2b).rw(m_dma0, FUNC(h8_dma_channel_device::marbl_r), FUNC(h8_dma_channel_device::marbl_w));
-	map(base | 0xff2c, base | 0xff2d).rw(m_dma0, FUNC(h8_dma_channel_device::etcrb_r), FUNC(h8_dma_channel_device::etcrb_w));
-	map(base | 0xff2e, base | 0xff2e).rw(m_dma0, FUNC(h8_dma_channel_device::ioarb8_r), FUNC(h8_dma_channel_device::ioarb8_w));
-	map(base | 0xff2f, base | 0xff2f).rw(m_dma0, FUNC(h8_dma_channel_device::dtcrb_r), FUNC(h8_dma_channel_device::dtcrb_w));
-	map(base | 0xff30, base | 0xff31).rw(m_dma1, FUNC(h8_dma_channel_device::marah_r), FUNC(h8_dma_channel_device::marah_w));
-	map(base | 0xff32, base | 0xff33).rw(m_dma1, FUNC(h8_dma_channel_device::maral_r), FUNC(h8_dma_channel_device::maral_w));
-	map(base | 0xff34, base | 0xff35).rw(m_dma1, FUNC(h8_dma_channel_device::etcra_r), FUNC(h8_dma_channel_device::etcra_w));
-	map(base | 0xff36, base | 0xff36).rw(m_dma1, FUNC(h8_dma_channel_device::ioara8_r), FUNC(h8_dma_channel_device::ioara8_w));
-	map(base | 0xff37, base | 0xff37).rw(m_dma1, FUNC(h8_dma_channel_device::dtcra_r), FUNC(h8_dma_channel_device::dtcra_w));
-	map(base | 0xff38, base | 0xff39).rw(m_dma1, FUNC(h8_dma_channel_device::marbh_r), FUNC(h8_dma_channel_device::marbh_w));
-	map(base | 0xff3a, base | 0xff3b).rw(m_dma1, FUNC(h8_dma_channel_device::marbl_r), FUNC(h8_dma_channel_device::marbl_w));
-	map(base | 0xff3c, base | 0xff3d).rw(m_dma1, FUNC(h8_dma_channel_device::etcrb_r), FUNC(h8_dma_channel_device::etcrb_w));
-	map(base | 0xff3e, base | 0xff3e).rw(m_dma1, FUNC(h8_dma_channel_device::ioarb8_r), FUNC(h8_dma_channel_device::ioarb8_w));
-	map(base | 0xff3f, base | 0xff3f).rw(m_dma1, FUNC(h8_dma_channel_device::dtcrb_r), FUNC(h8_dma_channel_device::dtcrb_w));
+	map(base | 0xff20, base | 0xff21).rw(m_dma0, FUNC(h8h_dma_channel_device::marah_r), FUNC(h8h_dma_channel_device::marah_w));
+	map(base | 0xff22, base | 0xff23).rw(m_dma0, FUNC(h8h_dma_channel_device::maral_r), FUNC(h8h_dma_channel_device::maral_w));
+	map(base | 0xff24, base | 0xff25).rw(m_dma0, FUNC(h8h_dma_channel_device::etcra_r), FUNC(h8h_dma_channel_device::etcra_w));
+	map(base | 0xff26, base | 0xff26).rw(m_dma0, FUNC(h8h_dma_channel_device::ioara8_r), FUNC(h8h_dma_channel_device::ioara8_w));
+	map(base | 0xff27, base | 0xff27).rw(m_dma0, FUNC(h8h_dma_channel_device::dtcra_r), FUNC(h8h_dma_channel_device::dtcra_w));
+	map(base | 0xff28, base | 0xff29).rw(m_dma0, FUNC(h8h_dma_channel_device::marbh_r), FUNC(h8h_dma_channel_device::marbh_w));
+	map(base | 0xff2a, base | 0xff2b).rw(m_dma0, FUNC(h8h_dma_channel_device::marbl_r), FUNC(h8h_dma_channel_device::marbl_w));
+	map(base | 0xff2c, base | 0xff2d).rw(m_dma0, FUNC(h8h_dma_channel_device::etcrb_r), FUNC(h8h_dma_channel_device::etcrb_w));
+	map(base | 0xff2e, base | 0xff2e).rw(m_dma0, FUNC(h8h_dma_channel_device::ioarb8_r), FUNC(h8h_dma_channel_device::ioarb8_w));
+	map(base | 0xff2f, base | 0xff2f).rw(m_dma0, FUNC(h8h_dma_channel_device::dtcrb_r), FUNC(h8h_dma_channel_device::dtcrb_w));
+	map(base | 0xff30, base | 0xff31).rw(m_dma1, FUNC(h8h_dma_channel_device::marah_r), FUNC(h8h_dma_channel_device::marah_w));
+	map(base | 0xff32, base | 0xff33).rw(m_dma1, FUNC(h8h_dma_channel_device::maral_r), FUNC(h8h_dma_channel_device::maral_w));
+	map(base | 0xff34, base | 0xff35).rw(m_dma1, FUNC(h8h_dma_channel_device::etcra_r), FUNC(h8h_dma_channel_device::etcra_w));
+	map(base | 0xff36, base | 0xff36).rw(m_dma1, FUNC(h8h_dma_channel_device::ioara8_r), FUNC(h8h_dma_channel_device::ioara8_w));
+	map(base | 0xff37, base | 0xff37).rw(m_dma1, FUNC(h8h_dma_channel_device::dtcra_r), FUNC(h8h_dma_channel_device::dtcra_w));
+	map(base | 0xff38, base | 0xff39).rw(m_dma1, FUNC(h8h_dma_channel_device::marbh_r), FUNC(h8h_dma_channel_device::marbh_w));
+	map(base | 0xff3a, base | 0xff3b).rw(m_dma1, FUNC(h8h_dma_channel_device::marbl_r), FUNC(h8h_dma_channel_device::marbl_w));
+	map(base | 0xff3c, base | 0xff3d).rw(m_dma1, FUNC(h8h_dma_channel_device::etcrb_r), FUNC(h8h_dma_channel_device::etcrb_w));
+	map(base | 0xff3e, base | 0xff3e).rw(m_dma1, FUNC(h8h_dma_channel_device::ioarb8_r), FUNC(h8h_dma_channel_device::ioarb8_w));
+	map(base | 0xff3f, base | 0xff3f).rw(m_dma1, FUNC(h8h_dma_channel_device::dtcrb_r), FUNC(h8h_dma_channel_device::dtcrb_w));
 
 	map(base | 0xff60, base | 0xff60).rw(m_timer16, FUNC(h8_timer16_device::tstr_r), FUNC(h8_timer16_device::tstr_w));
 	map(base | 0xff61, base | 0xff61).rw(m_timer16, FUNC(h8_timer16_device::tsyr_r), FUNC(h8_timer16_device::tsyr_w));
@@ -145,10 +145,9 @@ void h83002_device::device_add_mconfig(machine_config &config)
 {
 	H8H_INTC(config, m_intc, *this);
 	H8_ADC_3337(config, m_adc, *this, m_intc, 60);
-	H8_DMA(config, m_dma, *this);
-	// (H8/2002.pdf) Table 8-11 DMAC Activation Sources
-	H8_DMA_CHANNEL(config, m_dma0, *this, m_dma, m_intc, 44, h8_dma_channel_device::NONE, 24, h8_dma_channel_device::DREQ_EDGE, h8_dma_channel_device::DREQ_LEVEL, 28, 32, 36, 54, 53);
-	H8_DMA_CHANNEL(config, m_dma1, *this, m_dma, m_intc, 46, h8_dma_channel_device::NONE, 24, h8_dma_channel_device::DREQ_EDGE, h8_dma_channel_device::DREQ_LEVEL, 28, 32, 36, 54, 53);
+	H8H_DMA(config, m_dma, *this);
+	H8H_DMA_CHANNEL(config, m_dma0, *this, m_dma, m_intc, false, false);
+	H8H_DMA_CHANNEL(config, m_dma1, *this, m_dma, m_intc, false, false);
 	H8_PORT(config, m_port4, *this, h8_device::PORT_4, 0x00, 0x00);
 	H8_PORT(config, m_port6, *this, h8_device::PORT_6, 0x80, 0x80);
 	H8_PORT(config, m_port7, *this, h8_device::PORT_7, 0x00, 0x00);

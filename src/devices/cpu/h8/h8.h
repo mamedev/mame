@@ -14,7 +14,7 @@
 
 #pragma once
 
-class h8_dma_device;
+class h8gen_dma_device;
 class h8_dtc_device;
 struct h8_dma_state;
 struct h8_dtc_state;
@@ -66,7 +66,8 @@ public:
 	void internal_update();
 	void set_irq(int irq_vector, int irq_level, bool irq_nmi);
 	bool trigger_dma(int vector);
-	void set_current_dma(h8_dma_state *state);
+	void set_dma_channel(h8_dma_state *state);
+	void update_active_dma_channel();
 	void set_current_dtc(h8_dtc_state *state);
 	void request_state(int state);
 	bool access_is_dma() const { return m_inst_state == STATE_DMA || m_inst_state == STATE_DTC; }
@@ -117,9 +118,10 @@ protected:
 	memory_access<32, 1, 0, ENDIANNESS_BIG>::cache m_cache;
 	memory_access<32, 1, 0, ENDIANNESS_BIG>::specific m_program;
 	memory_access<16, 1, -1, ENDIANNESS_BIG>::specific m_io;
-	h8_dma_device *m_dma_device;
+	h8gen_dma_device *m_dma_device;
 	h8_dtc_device *m_dtc_device;
-	h8_dma_state *m_current_dma;
+	h8_dma_state *m_dma_channel[8];
+	int m_current_dma;
 	h8_dtc_state *m_current_dtc;
 
 	uint32_t  m_PPC;                    /* previous program counter */

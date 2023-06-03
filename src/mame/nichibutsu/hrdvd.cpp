@@ -97,8 +97,14 @@ public:
 
 	uint16_t m_mux_data;
 
-	uint8_t m_p5, m_pa, m_pb;
+	uint8_t m_p6, m_pa, m_pb;
 
+	bool m_mpeg_dreq;
+
+	void mpeg_dreq_w(int state);
+
+	uint16_t p6_r();
+	void p6_w(uint16_t data);
 	uint16_t pb_r();
 	void pb_w(uint16_t data);
 	void pa_w(uint16_t data);
@@ -113,6 +119,7 @@ public:
 	void ata_irq(int state);
 	void ata_drq(int state);
 
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	void general_init(int patchaddress, int patchvalue);
@@ -123,6 +130,29 @@ public:
 
 	static void dvdrom_config(device_t *device);
 };
+
+void hrdvd_state::mpeg_dreq_w(int state)
+{
+	m_mpeg_dreq = state;
+	m_subcpu->set_input_line(H8_INPUT_LINE_DREQ0, m_mpeg_dreq && !(m_p6 & 0x04));
+}
+
+uint16_t hrdvd_state::p6_r()
+{
+	return m_p6;
+}
+
+void hrdvd_state::p6_w(uint16_t data)
+{
+	u8 delta = data ^ m_p6;
+	m_p6 = data;
+	if(delta & 0x02)
+		m_mpeg->reset();
+
+	m_subcpu->set_input_line(H8_INPUT_LINE_DREQ0, m_mpeg_dreq && !(m_p6 & 0x04));
+	
+	logerror("p6 %02x\n", m_p6);
+}
 
 uint16_t hrdvd_state::pb_r()
 {
@@ -241,17 +271,15 @@ void hrdvd_state::hrdvd_sub_map(address_map &map)
 	map(0x040018, 0x040019).rw(m_ata, FUNC(hrdvd_ata_controller_device::dma_read), FUNC(hrdvd_ata_controller_device::dma_write));
 	map(0x040028, 0x04002f).rw(m_ata, FUNC(hrdvd_ata_controller_device::read), FUNC(hrdvd_ata_controller_device::write));
 
-	map(0x060000, 0x06bfff).ram();
-
-	map(0x078000, 0x07ffff).mirror(0xf80000).ram(); //.share("nvram");
+	map(0x060000, 0x07ffff).mirror(0xf80000).ram(); //.share("nvram");
 }
 
 
 void hrdvd_state::hrdvd_sub_io_map(address_map &map)
 {
+	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(hrdvd_state::p6_r), FUNC(hrdvd_state::p6_w));
 	map(h8_device::PORT_A, h8_device::PORT_A).w (FUNC(hrdvd_state::pa_w));
 	map(h8_device::PORT_B, h8_device::PORT_B).rw(FUNC(hrdvd_state::pb_r), FUNC(hrdvd_state::pb_w));
-//  map(h8_device::PORT_6, h8_device::PORT_6).noprw();
 }
 
 
@@ -402,11 +430,22 @@ static INPUT_PORTS_START( hrdvd )
 INPUT_PORTS_END
 
 
+void hrdvd_state::machine_start()
+{
+	save_item(NAME(m_mux_data));
+	save_item(NAME(m_p6));
+	save_item(NAME(m_pa));
+	save_item(NAME(m_pb));
+	save_item(NAME(m_mpeg_dreq));
+}
+
 void hrdvd_state::machine_reset()
 {
-	m_p5 = 0;
+	m_mux_data = 0;
+	m_p6 = 0;
 	m_pa = 0;
 	m_pb = 0;
+	m_mpeg_dreq = false;
 }
 
 void hrdvd_state::ata_irq(int state)
@@ -474,7 +513,7 @@ void hrdvd_state::hrdvd(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 
 	ZR36110(config, m_mpeg, 27_MHz_XTAL/2);
-	m_mpeg->drq_w().set_inputline(m_maincpu, H8_INPUT_LINE_DREQ0);
+	m_mpeg->drq_w().set(FUNC(hrdvd_state::mpeg_dreq_w));
 
 	NN71003F(config, m_mpega, 0);
 	m_mpega->add_route(0, m_lspeaker, 1.0);

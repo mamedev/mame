@@ -52,9 +52,9 @@ public:
 protected:
 	required_device<h8s_intc_device> m_intc;
 	required_device<h8_adc_device> m_adc;
-	optional_device<h8_dma_device> m_dma;
-	optional_device<h8_dma_channel_device> m_dma0;
-	optional_device<h8_dma_channel_device> m_dma1;
+	optional_device<h8s_dma_device> m_dma;
+	optional_device<h8s_dma_channel_device> m_dma0;
+	optional_device<h8s_dma_channel_device> m_dma1;
 	required_device<h8_dtc_device> m_dtc;
 	required_device<h8_port_device> m_port1;
 	required_device<h8_port_device> m_port2;

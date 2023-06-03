@@ -301,7 +301,7 @@ void zr36110_device::cmdx_w(u16 data)
 
 void zr36110_device::dma8_w(u8 data)
 {
-	logerror("dna %02x\n", data);
+	//	logerror("dma %02x\n", data);
 }
 
 void zr36110_device::dma_w(u16 data)

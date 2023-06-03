@@ -20,6 +20,7 @@
 #include "h8s2600.h"
 #include "h8_intc.h"
 #include "h8_adc.h"
+#include "h8_dma.h"
 #include "h8_port.h"
 #include "h8_timer8.h"
 #include "h8_timer16.h"
@@ -36,6 +37,9 @@ public:
 protected:
 	required_device<h8s_intc_device> m_intc;
 	required_device<h8_adc_device> m_adc;
+	required_device<h8s_dma_device> m_dma;
+	required_device<h8s_dma_channel_device> m_dma0;
+	required_device<h8s_dma_channel_device> m_dma1;
 	required_device<h8_port_device> m_port1;
 	required_device<h8_port_device> m_port2;
 	required_device<h8_port_device> m_port3;

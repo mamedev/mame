@@ -141,27 +141,29 @@ void h8s2320_device::map(address_map &map)
 	map(0xfffec4, 0xfffecd).rw(m_intc, FUNC(h8s_intc_device::ipr_r), FUNC(h8s_intc_device::ipr_w));
 	map(0xfffece, 0xfffece).rw(m_intc, FUNC(h8s_intc_device::iprk_r), FUNC(h8s_intc_device::iprk_w));
 
-	map(0xfffee0, 0xfffee1).rw(m_dma0, FUNC(h8_dma_channel_device::marah_r), FUNC(h8_dma_channel_device::marah_w));
-	map(0xfffee2, 0xfffee3).rw(m_dma0, FUNC(h8_dma_channel_device::maral_r), FUNC(h8_dma_channel_device::maral_w));
-	map(0xfffee4, 0xfffee5).rw(m_dma0, FUNC(h8_dma_channel_device::ioara_r), FUNC(h8_dma_channel_device::ioara_w));
-	map(0xfffee6, 0xfffee7).rw(m_dma0, FUNC(h8_dma_channel_device::etcra_r), FUNC(h8_dma_channel_device::etcra_w));
-	map(0xfffee8, 0xfffee9).rw(m_dma0, FUNC(h8_dma_channel_device::marbh_r), FUNC(h8_dma_channel_device::marbh_w));
-	map(0xfffeea, 0xfffeeb).rw(m_dma0, FUNC(h8_dma_channel_device::marbl_r), FUNC(h8_dma_channel_device::marbl_w));
-	map(0xfffeec, 0xfffeed).rw(m_dma0, FUNC(h8_dma_channel_device::ioarb_r), FUNC(h8_dma_channel_device::ioarb_w));
-	map(0xfffeee, 0xfffeef).rw(m_dma0, FUNC(h8_dma_channel_device::etcrb_r), FUNC(h8_dma_channel_device::etcrb_w));
-	map(0xfffef0, 0xfffef1).rw(m_dma1, FUNC(h8_dma_channel_device::marah_r), FUNC(h8_dma_channel_device::marah_w));
-	map(0xfffef2, 0xfffef3).rw(m_dma1, FUNC(h8_dma_channel_device::maral_r), FUNC(h8_dma_channel_device::maral_w));
-	map(0xfffef4, 0xfffef5).rw(m_dma1, FUNC(h8_dma_channel_device::ioara_r), FUNC(h8_dma_channel_device::ioara_w));
-	map(0xfffef6, 0xfffef7).rw(m_dma1, FUNC(h8_dma_channel_device::etcra_r), FUNC(h8_dma_channel_device::etcra_w));
-	map(0xfffef8, 0xfffef9).rw(m_dma1, FUNC(h8_dma_channel_device::marbh_r), FUNC(h8_dma_channel_device::marbh_w));
-	map(0xfffefa, 0xfffefb).rw(m_dma1, FUNC(h8_dma_channel_device::marbl_r), FUNC(h8_dma_channel_device::marbl_w));
-	map(0xfffefc, 0xfffefd).rw(m_dma1, FUNC(h8_dma_channel_device::ioarb_r), FUNC(h8_dma_channel_device::ioarb_w));
-	map(0xfffefe, 0xfffeff).rw(m_dma1, FUNC(h8_dma_channel_device::etcrb_r), FUNC(h8_dma_channel_device::etcrb_w));
-	map(0xffff00, 0xffff00).rw(m_dma, FUNC(h8_dma_device::dmawer_r), FUNC(h8_dma_device::dmawer_w));
-	map(0xffff01, 0xffff01).rw(m_dma, FUNC(h8_dma_device::dmatcr_r), FUNC(h8_dma_device::dmatcr_w));
-	map(0xffff02, 0xffff03).rw(m_dma0, FUNC(h8_dma_channel_device::dmacr_r), FUNC(h8_dma_channel_device::dmacr_w));
-	map(0xffff04, 0xffff05).rw(m_dma1, FUNC(h8_dma_channel_device::dmacr_r), FUNC(h8_dma_channel_device::dmacr_w));
-	map(0xffff06, 0xffff07).rw(m_dma, FUNC(h8_dma_device::dmabcr_r), FUNC(h8_dma_device::dmabcr_w));
+	if(type() != H8S2321) {
+		map(0xfffee0, 0xfffee1).rw(m_dma0, FUNC(h8s_dma_channel_device::marah_r), FUNC(h8s_dma_channel_device::marah_w));
+		map(0xfffee2, 0xfffee3).rw(m_dma0, FUNC(h8s_dma_channel_device::maral_r), FUNC(h8s_dma_channel_device::maral_w));
+		map(0xfffee4, 0xfffee5).rw(m_dma0, FUNC(h8s_dma_channel_device::ioara_r), FUNC(h8s_dma_channel_device::ioara_w));
+		map(0xfffee6, 0xfffee7).rw(m_dma0, FUNC(h8s_dma_channel_device::etcra_r), FUNC(h8s_dma_channel_device::etcra_w));
+		map(0xfffee8, 0xfffee9).rw(m_dma0, FUNC(h8s_dma_channel_device::marbh_r), FUNC(h8s_dma_channel_device::marbh_w));
+		map(0xfffeea, 0xfffeeb).rw(m_dma0, FUNC(h8s_dma_channel_device::marbl_r), FUNC(h8s_dma_channel_device::marbl_w));
+		map(0xfffeec, 0xfffeed).rw(m_dma0, FUNC(h8s_dma_channel_device::ioarb_r), FUNC(h8s_dma_channel_device::ioarb_w));
+		map(0xfffeee, 0xfffeef).rw(m_dma0, FUNC(h8s_dma_channel_device::etcrb_r), FUNC(h8s_dma_channel_device::etcrb_w));
+		map(0xfffef0, 0xfffef1).rw(m_dma1, FUNC(h8s_dma_channel_device::marah_r), FUNC(h8s_dma_channel_device::marah_w));
+		map(0xfffef2, 0xfffef3).rw(m_dma1, FUNC(h8s_dma_channel_device::maral_r), FUNC(h8s_dma_channel_device::maral_w));
+		map(0xfffef4, 0xfffef5).rw(m_dma1, FUNC(h8s_dma_channel_device::ioara_r), FUNC(h8s_dma_channel_device::ioara_w));
+		map(0xfffef6, 0xfffef7).rw(m_dma1, FUNC(h8s_dma_channel_device::etcra_r), FUNC(h8s_dma_channel_device::etcra_w));
+		map(0xfffef8, 0xfffef9).rw(m_dma1, FUNC(h8s_dma_channel_device::marbh_r), FUNC(h8s_dma_channel_device::marbh_w));
+		map(0xfffefa, 0xfffefb).rw(m_dma1, FUNC(h8s_dma_channel_device::marbl_r), FUNC(h8s_dma_channel_device::marbl_w));
+		map(0xfffefc, 0xfffefd).rw(m_dma1, FUNC(h8s_dma_channel_device::ioarb_r), FUNC(h8s_dma_channel_device::ioarb_w));
+		map(0xfffefe, 0xfffeff).rw(m_dma1, FUNC(h8s_dma_channel_device::etcrb_r), FUNC(h8s_dma_channel_device::etcrb_w));
+		map(0xffff00, 0xffff00).rw(m_dma, FUNC(h8s_dma_device::dmawer_r), FUNC(h8s_dma_device::dmawer_w));
+		map(0xffff01, 0xffff01).rw(m_dma, FUNC(h8s_dma_device::dmatcr_r), FUNC(h8s_dma_device::dmatcr_w));
+		map(0xffff02, 0xffff03).rw(m_dma0, FUNC(h8s_dma_channel_device::dmacr_r), FUNC(h8s_dma_channel_device::dmacr_w));
+		map(0xffff04, 0xffff05).rw(m_dma1, FUNC(h8s_dma_channel_device::dmacr_r), FUNC(h8s_dma_channel_device::dmacr_w));
+		map(0xffff06, 0xffff07).rw(m_dma, FUNC(h8s_dma_device::dmabcr_r), FUNC(h8s_dma_device::dmabcr_w));
+	}
 	map(0xffff2c, 0xffff2c).rw(m_intc, FUNC(h8s_intc_device::iscrh_r), FUNC(h8s_intc_device::iscrh_w));
 	map(0xffff2d, 0xffff2d).rw(m_intc, FUNC(h8s_intc_device::iscrl_r), FUNC(h8s_intc_device::iscrl_w));
 	map(0xffff2e, 0xffff2e).rw(m_intc, FUNC(h8s_intc_device::ier_r), FUNC(h8s_intc_device::ier_w));
@@ -263,15 +265,15 @@ void h8s2320_device::map(address_map &map)
 	map(0xfffff8, 0xfffffb).rw(m_timer16_2, FUNC(h8_timer16_channel_device::tgr_r), FUNC(h8_timer16_channel_device::tgr_w));
 }
 
-// TODO: the 2321 doesn't have the dma subdevice
-
 void h8s2320_device::device_add_mconfig(machine_config &config)
 {
 	H8S_INTC(config, m_intc, *this);
 	H8_ADC_2320(config, m_adc, *this, m_intc, 28);
-	H8_DMA(config, m_dma, *this);
-	H8_DMA_CHANNEL(config, m_dma0, *this, m_dma, m_intc, 72, h8_dma_channel_device::NONE, 28, h8_dma_channel_device::NONE, h8_dma_channel_device::NONE, 82, 81, 86, 85, 32, 40, 44, 48, 56, 60);
-	H8_DMA_CHANNEL(config, m_dma1, *this, m_dma, m_intc, 74, h8_dma_channel_device::NONE, 28, h8_dma_channel_device::DREQ_EDGE, h8_dma_channel_device::DREQ_LEVEL, 82, 81, 86, 85, 32, 40, 44, 48, 56, 60);
+	if(type() != H8S2321) {
+		H8S_DMA(config, m_dma, *this);
+		H8S_DMA_CHANNEL(config, m_dma0, *this, m_dma, m_intc);
+		H8S_DMA_CHANNEL(config, m_dma1, *this, m_dma, m_intc);
+	}
 	H8_DTC(config, m_dtc, *this, m_intc, 24);
 	H8_PORT(config, m_port1, *this, h8_device::PORT_1, 0x00, 0x00);
 	H8_PORT(config, m_port2, *this, h8_device::PORT_2, 0x00, 0x00);
