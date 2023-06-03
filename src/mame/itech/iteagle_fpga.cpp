@@ -310,19 +310,19 @@ uint32_t iteagle_fpga_device::fpga_r(offs_t offset, uint32_t mem_mask)
 			}
 			if (ACCESSING_BITS_0_7) {
 				result |= m_scc1->cb_r(offset) << 0;
-				if (LOG_SERIAL) m_serial0_1.read_control(1);
+				if (VERBOSE & LOG_SERIAL) m_serial0_1.read_control(1);
 			}
 			if (ACCESSING_BITS_8_15) {
 				result |= m_scc1->ca_r(offset) << 8;
-				if (LOG_SERIAL) m_serial0_1.read_control(0);
+				if (VERBOSE & LOG_SERIAL) m_serial0_1.read_control(0);
 			}
 			if (ACCESSING_BITS_16_23) {
 				result |= m_scc1->db_r(offset) <<16;
-				if (LOG_SERIAL) m_serial0_1.read_data(1);
+				if (VERBOSE & LOG_SERIAL) m_serial0_1.read_data(1);
 			}
 			if (ACCESSING_BITS_24_31) {
 				result |= m_scc1->da_r(offset) << 24;
-				if (LOG_SERIAL) m_serial0_1.read_data(0);
+				if (VERBOSE & LOG_SERIAL) m_serial0_1.read_data(0);
 			}
 			if (m_prev_reg != offset)
 				LOGMASKED(LOG_SERIAL_VERBOSE, "%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
@@ -399,11 +399,11 @@ void iteagle_fpga_device::fpga_w(offs_t offset, uint32_t data, uint32_t mem_mask
 		case 0x0c/4:
 			if (ACCESSING_BITS_0_7) {
 				m_scc1->cb_w(offset, (data >> 0) & 0xff);
-				if (LOG_SERIAL) m_serial0_1.write_control((data >> 0) & 0xff, 1);
+				if (VERBOSE & LOG_SERIAL) m_serial0_1.write_control((data >> 0) & 0xff, 1);
 			}
 			if (ACCESSING_BITS_8_15) {
 				m_scc1->ca_w(offset, (data >> 8) & 0xff);
-				if (LOG_SERIAL) m_serial0_1.write_control((data >> 8) & 0xff, 0);
+				if (VERBOSE & LOG_SERIAL) m_serial0_1.write_control((data >> 8) & 0xff, 0);
 			}
 			if (ACCESSING_BITS_16_23) {
 				// Convert 0xd to 0xa
@@ -412,7 +412,7 @@ void iteagle_fpga_device::fpga_w(offs_t offset, uint32_t data, uint32_t mem_mask
 					m_scc1->db_w(offset, 0xa);
 				else
 					m_scc1->db_w(offset, byte);
-				if (LOG_SERIAL) {
+				if (VERBOSE & LOG_SERIAL) {
 					m_serial0_1.write_data((data >> 16) & 0xff, 1);
 					if (m_serial0_1.get_tx_str(1).back() == 0xd) {
 						logerror("com0: %s", m_serial0_1.get_tx_str(1).c_str());
@@ -423,7 +423,7 @@ void iteagle_fpga_device::fpga_w(offs_t offset, uint32_t data, uint32_t mem_mask
 			}
 			if (ACCESSING_BITS_24_31) {
 				m_scc1->da_w(offset, (data >> 24) & 0xff);
-				if (LOG_SERIAL) m_serial0_1.write_data((data >> 24) & 0xff, 0);
+				if (VERBOSE & LOG_SERIAL) m_serial0_1.write_data((data >> 24) & 0xff, 0);
 			}
 			LOGMASKED(LOG_FPGA, "%s:fpga_w offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 			break;
@@ -442,13 +442,13 @@ void iteagle_fpga_device::fpga_w(offs_t offset, uint32_t data, uint32_t mem_mask
 					int length = (uint8_t(txString[4]) << 8) | uint8_t(txString[5]);
 					if (txString.length() >= length) {
 						osd_printf_debug("com2:");
-						if (LOG_SERIAL) logerror("com2:\n");
+						LOGMASKED(LOG_SERIAL, "com2:\n");
 						for (int i = 0; i < txString.length(); i++) {
-							if (LOG_SERIAL) logerror(" %02x", uint8_t(txString[i]));
+							LOGMASKED(LOG_SERIAL, " %02x", uint8_t(txString[i]));
 							osd_printf_debug(" %02x", uint8_t(txString[i]));
 							if ((i + 1) % 16 == 0 || i==length-1) {
 								osd_printf_debug("\n");
-								if (LOG_SERIAL) logerror("\n");
+								LOGMASKED(LOG_SERIAL, "\n");
 							}
 						}
 						osd_printf_debug("\n");
@@ -465,7 +465,7 @@ void iteagle_fpga_device::fpga_w(offs_t offset, uint32_t data, uint32_t mem_mask
 				int chan = 0;
 				m_serial2_3.write_data((data >> 24) & 0xff, chan);
 				if (m_serial2_3.get_tx_str(chan).back() == 0xd) {
-					if (LOG_SERIAL) logerror("com3: %s\n", m_serial2_3.get_tx_str(chan).c_str());
+					LOGMASKED(LOG_SERIAL, "com3: %s\n", m_serial2_3.get_tx_str(chan).c_str());
 					osd_printf_debug("com3: %s\n", m_serial2_3.get_tx_str(chan));
 					if (m_serial2_3.get_tx_str(chan).find("ATI5") != -1)
 						m_serial2_3.write_rx_str(chan, "OK\r181\r");
@@ -530,7 +530,7 @@ uint8_t iteagle_am85c30::read_control(int channel)
 
 void iteagle_am85c30::write_data(uint8_t data, int channel)
 {
-	if (0 && LOG_SERIAL) printf("chan %i: TX 0x%2X\n", channel, data);
+	if (VERBOSE & LOG_SERIAL_VERBOSE) printf("chan %i: TX 0x%2X\n", channel, data);
 	m_serial_tx[channel] += data;
 	m_rr_regs[channel][0] |= 0x4; // Tx Buffer Empty
 	// Tx Interrupt
@@ -541,7 +541,7 @@ void iteagle_am85c30::write_data(uint8_t data, int channel)
 	}
 	// Limit length
 	if (m_serial_tx[channel].size() >= 4000) {
-		if (LOG_SERIAL) printf("%s\n", m_serial_tx[channel].c_str());
+		if (VERBOSE & LOG_SERIAL) printf("%s\n", m_serial_tx[channel].c_str());
 		osd_printf_debug("%s\n", m_serial_tx[channel]);
 		m_serial_tx[channel].clear();
 	}
