@@ -932,9 +932,9 @@ void wd_fdc_device_base::write_track_continue()
 			if(format_last_byte_count) {
 				char buf[32];
 				if(format_last_byte_count > 1)
-					sprintf(buf, "%dx%02x", format_last_byte_count, format_last_byte);
+					snprintf(buf, 32, "%dx%02x", format_last_byte_count, format_last_byte);
 				else
-					sprintf(buf, "%02x", format_last_byte);
+					snprintf(buf, 32, "%02x", format_last_byte);
 				format_description_string += buf;
 			}
 			LOGDESC("track description %s\n", format_description_string.c_str());
@@ -2104,9 +2104,9 @@ void wd_fdc_device_base::live_run(attotime limit)
 				if(format_last_byte_count) {
 					char buf[32];
 					if(format_last_byte_count > 1)
-						sprintf(buf, "%dx%02x ", format_last_byte_count, format_last_byte);
+						snprintf(buf, 32, "%dx%02x ", format_last_byte_count, format_last_byte);
 					else
-						sprintf(buf, "%02x ", format_last_byte);
+						snprintf(buf, 32, "%02x ", format_last_byte);
 					format_description_string += buf;
 				}
 				format_last_byte = data;
