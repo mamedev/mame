@@ -17999,11 +17999,12 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
+	<!-- There are mentions of a v1.10 rom linked to Sanyo but there is no photographic evidence of a Sanyo QDM-01 Quick Disk unit. -->
 	<!-- Hardware not emulated -->
 	<software name="qdm01" supported="no">
 		<description>QDM-01 Quick Disk Drive</description>
 		<year>1985</year>
-		<publisher>Sanyo</publisher>
+		<publisher>AVT</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="quickdisk" />
 			<dataarea name="rom" size="0x2000">
