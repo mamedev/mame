@@ -396,8 +396,6 @@ void m68000_device::execute_set_input(int inputnum, int state)
 
 	m_int_level = blevel;
 
-	logerror("irq %s %d vstate %02x level %d\n", inputnum, state, vstate, m_int_level);
-
 	/* A transition from < 7 to 7 always interrupts (NMI) */
 	/* Note: Level 7 can also level trigger like a normal IRQ */
 	// FIXME: This may cause unintended level 7 interrupts if one or two IPL lines are asserted
