@@ -118,6 +118,7 @@ vga_device::vga_device(const machine_config &mconfig, device_type type, const ch
 	, m_input_sense(*this, "VGA_SENSE")
 {
 	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(vga_device::sequencer_map), this));
+	m_atc_space_config = address_space_config("attribute_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(vga_device::attribute_map), this));
 }
 
 vga_device::vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -143,7 +144,8 @@ void vga_device::zero()
 device_memory_interface::space_config_vector vga_device::memory_space_config() const
 {
 	return space_config_vector {
-		std::make_pair(SEQ_REG, &m_seq_space_config)
+		std::make_pair(SEQ_REG, &m_seq_space_config),
+		std::make_pair(ATC_REG, &m_atc_space_config)
 	};
 }
 
@@ -1152,6 +1154,50 @@ void vga_device::sequencer_map(address_map &map)
 }
 
 /*
+ * xx-- ---- <reserved>
+ * --x- ---- Palette RAM address source (0) CPU access (1) ATC access
+ *           \- NB: leaving to '0' will disable video output from the ATC,
+ *                  and cause overscan drawing in canvas instead.
+ * ---x xxxx index register
+ *
+ */
+void vga_device::attribute_map(address_map &map)
+{
+	map.global_mask(0x3f);
+	map.unmap_value_high();
+	map(0x00, 0x0f).lrw8(
+		NAME([this] (offs_t offset) { return vga.attribute.data[ offset & 0x1f]; }),
+		NAME([this] (offs_t offset, u8 data) { vga.attribute.data[offset & 0x1f] = data & 0x3f; })
+	);
+	map(0x20, 0x2f).noprw();
+	// Mode Control
+	map(0x10, 0x10).mirror(0x20).lrw8(
+		NAME([this] (offs_t offset) { return vga.attribute.data[ 0x10 ]; }),
+		NAME([this] (offs_t offset, u8 data) { vga.attribute.data[ 0x10 ] = data & 0x3f; })
+	);
+	// Overscan Color
+	map(0x11, 0x11).mirror(0x20).lrw8(
+		NAME([this] (offs_t offset) { return vga.attribute.data[ 0x11 ]; }),
+		NAME([this] (offs_t offset, u8 data) { vga.attribute.data[ 0x11 ] = data & 0x3f; })
+	);
+	// Color Plane Enable
+	map(0x12, 0x12).mirror(0x20).lrw8(
+		NAME([this] (offs_t offset) { return vga.attribute.data[ 0x12 ]; }),
+		NAME([this] (offs_t offset, u8 data) { vga.attribute.data[ 0x12 ] = data & 0x3f; })
+	);
+	// Horizontal PEL shift
+	map(0x13, 0x13).mirror(0x20).lrw8(
+		NAME([this] (offs_t offset) { return vga.attribute.data[ 0x13 ]; }),
+		NAME([this] (offs_t offset, u8 data) { vga.attribute.pel_shift_latch = vga.attribute.data[ 0x13 ] = data & 0xf; })
+	);
+	// Color Select
+	map(0x14, 0x14).mirror(0x20).lrw8(
+		NAME([this] (offs_t offset) { return vga.attribute.data[ 0x14 ]; }),
+		NAME([this] (offs_t offset, u8 data) { vga.attribute.pel_shift_latch = vga.attribute.data[ 0x14 ] = data & 0xf; })
+	);
+}
+
+/*
   4 additional dipswitches
   seems to have emulation modes at register level
   (mda/hgc lines bit 8 not identical to ega/vga)
@@ -1199,12 +1245,9 @@ uint8_t vga_device::port_03c0_r(offs_t offset)
 		case 0:
 			data = vga.attribute.index;
 			break;
+
 		case 1:
-			if((vga.attribute.index&0x20)
-			&& ((vga.attribute.index&0x1f)<0x10))
-				data = 0; // palette access is disabled in this mode
-			else if ((vga.attribute.index&0x1f)<sizeof(vga.attribute.data))
-				data=vga.attribute.data[vga.attribute.index&0x1f];
+			data = space(ATC_REG).read_byte(vga.attribute.index);
 			break;
 
 		case 2:
@@ -1304,27 +1347,6 @@ void vga_device::port_03b0_w(offs_t offset, uint8_t data)
 		vga_crtc_w(offset, data);
 }
 
-void vga_device::attribute_reg_write(uint8_t index, uint8_t data)
-{
-	if((index & 0x30) == 0)
-	{
-		//if(vga.sequencer.data[1]&0x20) // ok?
-		vga.attribute.data[index & 0x1f] = data & 0x3f;
-	}
-	else
-	{
-		switch(index & 0x1f)
-		{
-			/* TODO: intentional dirtiness, variable names to be properly changed */
-			case 0x10: vga.attribute.data[0x10] = data; break;
-			case 0x11: vga.attribute.data[0x11] = data; break;
-			case 0x12: vga.attribute.data[0x12] = data; break;
-			case 0x13: vga.attribute.pel_shift_latch = vga.attribute.data[0x13] = data; break;
-			case 0x14: vga.attribute.data[0x14] = data; break;
-		}
-	}
-}
-
 void vga_device::gc_reg_write(uint8_t index,uint8_t data)
 {
 	switch(index)
@@ -1376,11 +1398,11 @@ void vga_device::port_03c0_w(offs_t offset, uint8_t data)
 	case 0:
 		if (vga.attribute.state==0)
 		{
-			vga.attribute.index=data;
+			vga.attribute.index = data;
 		}
 		else
 		{
-			attribute_reg_write(vga.attribute.index,data);
+			space(ATC_REG).write_byte(vga.attribute.index, data);
 		}
 		vga.attribute.state=!vga.attribute.state;
 		break;

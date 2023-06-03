@@ -96,8 +96,7 @@ protected:
 	virtual void sequencer_map(address_map &map);
 	virtual uint8_t gc_reg_read(uint8_t index);
 	virtual void gc_reg_write(uint8_t index,uint8_t data);
-
-	virtual void attribute_reg_write(uint8_t index, uint8_t data);
+	virtual void attribute_map(address_map &map);
 
 	virtual uint16_t offset();
 	virtual uint32_t start_addr();
@@ -253,10 +252,12 @@ protected:
 	emu_timer *m_vblank_timer;
 
 	enum {
-		SEQ_REG
+		SEQ_REG,
+		ATC_REG
 	};
 
 	address_space_config m_seq_space_config;
+	address_space_config m_atc_space_config;
 };
 
 

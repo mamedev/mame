@@ -25,6 +25,7 @@ tseng_vga_device::tseng_vga_device(const machine_config &mconfig, const char *ta
 	: svga_device(mconfig, TSENG_VGA, tag, owner, clock)
 {
 	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(tseng_vga_device::sequencer_map), this));
+	m_atc_space_config = address_space_config("attribute_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(tseng_vga_device::attribute_map), this));
 }
 
 void tseng_vga_device::device_start()
@@ -203,13 +204,28 @@ void tseng_vga_device::port_03b0_w(offs_t offset, uint8_t data)
 	tseng_define_video_mode();
 }
 
-void tseng_vga_device::attribute_reg_write(uint8_t index, uint8_t data)
+void tseng_vga_device::attribute_map(address_map &map)
 {
-	switch(index)
-	{
-		case 0x16:
+	map.global_mask(0x3f);
+	map.unmap_value_high();
+	svga_device::attribute_map(map);
+	// Miscellaneous 1
+	/*
+	 * x--- ---- Bypass the internal palette
+	 * -x-- ---- 2 byte character code (presumably for the Korean variants TBD)
+	 * --xx ---- Select High resolution/color mode
+	 * --00 ---- Normal power-up
+	 * --01 ---- <reserved>
+	 * --10 ---- 8bpp
+	 * --11 ---- 16bpp
+	 * ---- xxxx <reserved>
+	 */
+	// TODO: implement KEY protection
+	map(0x16, 0x16).mirror(0x20).lrw8(
+		NAME([this] (offs_t offset) { return et4k.misc1; }),
+		NAME([this] (offs_t offset, u8 data) { 
 			et4k.misc1 = data;
-			// TODO: left-over code for et4k/w32?
+			// TODO: this should be taken into account for tseng_define_video_mode
 			#if 0
 			svga.rgb8_en = 0;
 			svga.rgb15_en = 0;
@@ -229,12 +245,16 @@ void tseng_vga_device::attribute_reg_write(uint8_t index, uint8_t data)
 					break;
 			}
 			#endif
-			break;
-		case 0x17: et4k.misc2 = data; break;
-		default:
-			svga_device::attribute_reg_write(index,data);
-	}
-
+		})
+	);
+	// Miscellaneous 2
+	// TODO: not on stock et4k?
+	map(0x17, 0x17).mirror(0x20).lrw8(
+		NAME([this] (offs_t offset) { return et4k.misc2; }),
+		NAME([this] (offs_t offset, u8 data) { 
+			et4k.misc2 = data;
+		})
+	);
 }
 
 uint8_t tseng_vga_device::port_03c0_r(offs_t offset)
@@ -243,19 +263,6 @@ uint8_t tseng_vga_device::port_03c0_r(offs_t offset)
 
 	switch(offset)
 	{
-		case 0x01:
-			// TODO: inherit from attribute_map
-			switch(vga.attribute.index)
-			{
-				case 0x16: res = et4k.misc1; break;
-				case 0x17: res = et4k.misc2; break;
-				default:
-					res = vga_device::port_03c0_r(offset);
-					break;
-			}
-
-			break;
-
 		case 0x0d:
 			res = svga.bank_w & 0xf;
 			res |= (svga.bank_r & 0xf) << 4;
@@ -286,19 +293,6 @@ void tseng_vga_device::port_03c0_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
-		case 0:
-			// TODO: should derive from svga_device
-			if (vga.attribute.state==0)
-			{
-				vga.attribute.index=data;
-			}
-			else
-			{
-				tseng_vga_device::attribute_reg_write(vga.attribute.index,data);
-			}
-			vga.attribute.state=!vga.attribute.state;
-			break;
-
 		case 0x0d:
 			svga.bank_w = data & 0xf;
 			svga.bank_r = (data & 0xf0) >> 4;
