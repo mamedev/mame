@@ -21,6 +21,7 @@ public:
 	_1943_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_mcu(*this, "mcu"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
@@ -44,6 +45,7 @@ public:
 private:
 	/* devices / memory pointers */
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	optional_device<i8751_device> m_mcu;
 	required_shared_ptr<u8> m_videoram;
 	required_shared_ptr<u8> m_colorram;

@@ -266,10 +266,9 @@ void _1943_state::machine_start()
 
 void _1943_state::machine_reset()
 {
-	m_char_on = 0;
-	m_obj_on = 0;
-	m_bg1_on = 0;
-	m_bg2_on = 0;
+	// these latches are cleared at RESET
+	c804_w(0);
+	d806_w(0);
 }
 
 void _1943_state::_1943(machine_config &config)
@@ -279,9 +278,9 @@ void _1943_state::_1943(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &_1943_state::c1943_map);
 	m_maincpu->set_vblank_int("screen", FUNC(_1943_state::irq0_line_hold));
 
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(24'000'000)/8)); /* verified on pcb */
-	audiocpu.set_addrmap(AS_PROGRAM, &_1943_state::sound_map);
-	audiocpu.set_periodic_int(FUNC(_1943_state::irq0_line_hold), attotime::from_hz(4*60));
+	Z80(config, m_audiocpu, XTAL(24'000'000)/8); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &_1943_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(_1943_state::irq0_line_hold), attotime::from_hz(4*60));
 
 	I8751(config, m_mcu, XTAL(24'000'000)/4); // clock unknown
 	m_mcu->port_in_cb<0>().set([this](){ return m_cpu_to_mcu; });
