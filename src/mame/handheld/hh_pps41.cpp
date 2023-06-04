@@ -164,17 +164,14 @@ class addocalc_state : public hh_pps41_state
 {
 public:
 	addocalc_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_pps41_state(mconfig, type, tag),
-		m_power_timer(*this, "power")
+		hh_pps41_state(mconfig, type, tag)
 	{ }
 
 	void addocalc(machine_config &config);
 
-	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button) override { hh_pps41_state::power_button(field, param, oldval, newval); update_int(); }
+	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button) override;
 
 private:
-	required_device<timer_device> m_power_timer;
-
 	virtual void update_int() override;
 	void update_display();
 	void write_d(u16 data);
@@ -182,15 +179,20 @@ private:
 	u8 read_p();
 	void write_ssc(int state);
 	void write_sdo(int state);
-
-	TIMER_DEVICE_CALLBACK_MEMBER(power_off) { set_power(false); }
 };
 
 // handlers
 
+INPUT_CHANGED_MEMBER(addocalc_state::power_button)
+{
+	hh_pps41_state::power_button(field, param, oldval, newval);
+
+	// ON/OFF button is also tied to INT1 (see below)
+	update_int();
+}
+
 void addocalc_state::update_int()
 {
-	// ON/OFF button is tied to INT1
 	m_maincpu->set_input_line(1, (m_inputs[7]->read() & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -229,10 +231,9 @@ void addocalc_state::write_ssc(int state)
 
 void addocalc_state::write_sdo(int state)
 {
-	// DATAO: trigger power off after a short delay
-	if (state != m_sdo)
-		m_power_timer->adjust(state ? attotime::from_msec(50) : attotime::never);
-
+	// DATAO: power off on rising edge
+	if (state && !m_sdo)
+		set_power(false);
 	m_sdo = state;
 }
 
@@ -296,8 +297,7 @@ void addocalc_state::addocalc(machine_config &config)
 	m_maincpu->read_p().set(FUNC(addocalc_state::read_p));
 	m_maincpu->write_ssc().set(FUNC(addocalc_state::write_ssc));
 	m_maincpu->write_sdo().set(FUNC(addocalc_state::write_sdo));
-
-	TIMER(config, "power").configure_generic(FUNC(addocalc_state::power_off));
+	m_maincpu->read_sdi().set_constant(0);
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(11, 8);
