@@ -12,21 +12,17 @@
 
 #include "z37_fdc.h"
 
+#include "logmacro.h"
+
 DEFINE_DEVICE_TYPE(HEATH_Z37_FDC, heath_z37_fdc_device, "heath_z37_fdc", "Heath H/Z-37 Soft-sectored Controller");
 
 heath_z37_fdc_device::heath_z37_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, HEATH_Z37_FDC, tag, owner, 0)
-		, m_raise_irq_cb(*this)
-		, m_raise_drq_cb(*this)
-		, m_block_interrupt_cb(*this)
-		, m_fdc(*this, "z37_fdc")
-		, m_floppies(*this, "z37_fdc:%u", 0U)
-		, m_control_reg(0)
-		, m_interface_reg(0)
-		, m_intrq_allowed(false)
-		, m_drq_allowed(false)
-		, m_access_track_sector(false)
-		, m_floppy(nullptr)
+	: device_t(mconfig, HEATH_Z37_FDC, tag, owner, 0)
+	, m_fd_irq_cb(*this)
+	, m_drq_cb(*this)
+	, m_block_interrupt_cb(*this)
+	, m_fdc(*this, "z37_fdc")
+	, m_floppies(*this, "z37_fdc:%u", 0U)
 {
 }
 
@@ -34,14 +30,23 @@ heath_z37_fdc_device::heath_z37_fdc_device(const machine_config &mconfig, const 
 void heath_z37_fdc_device::ctrl_w(uint8_t val)
 {
 	m_control_reg = val;
+	logerror("Writing ctrl reg: %02x\n", val);
 
-	bool motor_on = BIT(val, ctrl_MotorsOn_c);
+	bool motor_on = bool(BIT(val, ctrl_MotorsOn_c));
 
 	m_intrq_allowed = bool(BIT(val, ctrl_EnableIntReq_c));
 	m_drq_allowed = bool(BIT(val, ctrl_EnableDrqInt_c));
-	m_fdc->dden_w(BIT(val, ctrl_SetMFMRecording_c));
+	m_fdc->dden_w(BIT(val, ctrl_SetMFMRecording_c) ? ASSERT_LINE : CLEAR_LINE);
 
-	m_block_interrupt_cb(m_drq_allowed ? ASSERT_LINE : CLEAR_LINE);
+	if (m_drq_allowed)
+	{
+		m_block_interrupt_cb(ASSERT_LINE);
+	}
+	else
+	{
+		m_block_interrupt_cb(CLEAR_LINE);
+		m_drq_cb(CLEAR_LINE);
+	}
 
 	m_floppy = nullptr;
 	if (BIT(val, ctrl_Drive_0_c))
@@ -63,10 +68,14 @@ void heath_z37_fdc_device::ctrl_w(uint8_t val)
 
 	m_fdc->set_floppy(m_floppy);
 
-	// TODO - check to see if all motor line controls all drives, not just the selected one.
-	if (m_floppy)
+
+	for (uint8_t i = 0; i < 4; i++)
 	{
-		m_floppy->mon_w(!motor_on);
+		floppy_image_device *floppy = m_floppies[i]->get_device();
+		if (floppy)
+		{
+			floppy->mon_w(!motor_on);
+		}
 	}
 }
 
@@ -77,6 +86,7 @@ uint8_t heath_z37_fdc_device::ctrl_r()
 
 void heath_z37_fdc_device::intf_w(uint8_t val)
 {
+	logerror("Writing interface reg: %02x\n", val);
 
 	m_access_track_sector = bool(BIT(val, if_SelectSectorTrack_c));
 }
@@ -90,10 +100,12 @@ void heath_z37_fdc_device::stat_w(uint8_t val)
 {
 	if (m_access_track_sector)
 	{
+		logerror("Writing sector reg: %02x\n", val);
 		m_fdc->sector_w(val);
 	}
 	else
 	{
+		logerror("Writing cmd reg: %02x\n", val);
 		m_fdc->cmd_w(val);
 	}
 }
@@ -102,10 +114,12 @@ uint8_t heath_z37_fdc_device::stat_r()
 {
 	if (m_access_track_sector)
 	{
+		logerror("Reading sector reg\n");
 		return m_fdc->sector_r();
 	}
 	else
 	{
+		logerror("Reading status reg\n");
 		return m_fdc->status_r();
 	}
 }
@@ -114,10 +128,12 @@ void heath_z37_fdc_device::data_w(uint8_t val)
 {
 	if (m_access_track_sector)
 	{
+		logerror("Writing track reg: %02x\n", val);
 		m_fdc->track_w(val);
 	}
 	else
 	{
+		logerror("Writing data reg: %02x\n", val);
 		m_fdc->data_w(val);
 	}
 }
@@ -126,11 +142,16 @@ uint8_t heath_z37_fdc_device::data_r()
 {
 	if (m_access_track_sector)
 	{
-		return m_fdc->track_r();
+		uint8_t val = m_fdc->track_r();
+		logerror("Reading track reg val: %02x\n", val);
+		return val;
 	}
 	else
 	{
-		return m_fdc->data_r();
+		uint8_t val = m_fdc->data_r();
+
+		logerror("Reading data reg, val: %02x\n", val);
+		return val;
 	}
 }
 
@@ -151,22 +172,30 @@ void heath_z37_fdc_device::write(offs_t reg, uint8_t val)
 		data_w(val);
 		break;
 	}
+	logerror("z37 write address: %d val: %02x\n", reg, val);
 }
 
 uint8_t heath_z37_fdc_device::read(offs_t reg)
 {
+	uint8_t value = 0xff;
 	switch (reg)
 	{
 	case 0:
-		return ctrl_r();
+		value = ctrl_r();
+		break;
 	case 1:
-		return intf_r();
+		value = intf_r();
+		break;
 	case 2:
-		return stat_r();
+		value = stat_r();
+		break;
 	case 3:
-		return data_r();
+		value = data_r();
+		break;
 	}
-	return 0xff;
+	logerror("Read address: %d val: %02x\n", reg, value);
+
+	return value;
 }
 
 void heath_z37_fdc_device::device_start()
@@ -201,8 +230,8 @@ static void z37_floppies(device_slot_interface &device)
 void heath_z37_fdc_device::device_add_mconfig(machine_config &config)
 {
 	FD1797(config, m_fdc, 16_MHz_XTAL / 16);
-	m_fdc->intrq_wr_callback().set(FUNC(heath_z37_fdc_device::raise_irq));
-	m_fdc->drq_wr_callback().set(FUNC(heath_z37_fdc_device::raise_drq));
+	m_fdc->intrq_wr_callback().set(FUNC(heath_z37_fdc_device::set_irq));
+	m_fdc->drq_wr_callback().set(FUNC(heath_z37_fdc_device::set_drq));
 
 	FLOPPY_CONNECTOR(config, m_floppies[0], z37_floppies, "qd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppies[1], z37_floppies, "qd", floppy_image_device::default_mfm_floppy_formats);
@@ -212,23 +241,17 @@ void heath_z37_fdc_device::device_add_mconfig(machine_config &config)
 
 void heath_z37_fdc_device::device_resolve_objects()
 {
-	m_raise_irq_cb.resolve_safe();
-	m_raise_drq_cb.resolve_safe();
+	m_fd_irq_cb.resolve_safe();
+	m_drq_cb.resolve_safe();
 	m_block_interrupt_cb.resolve_safe();
 }
 
-void heath_z37_fdc_device::raise_irq(uint8_t data)
+void heath_z37_fdc_device::set_irq(uint8_t data)
 {
-	if (m_intrq_allowed)
-	{
-		m_raise_irq_cb(data);
-	}
+	m_fd_irq_cb(m_intrq_allowed ? data : CLEAR_LINE);
 }
 
-void heath_z37_fdc_device::raise_drq(uint8_t data)
+void heath_z37_fdc_device::set_drq(uint8_t data)
 {
-	if (m_drq_allowed)
-	{
-		m_raise_drq_cb(data);
-	}
+	m_drq_cb(m_drq_allowed ? data : CLEAR_LINE);
 }

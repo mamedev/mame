@@ -22,18 +22,14 @@ public:
 
 	void write(offs_t reg, uint8_t val);
 	uint8_t read(offs_t reg);
-	auto irq_callback() { return m_raise_irq_cb.bind(); }
-	auto drq_callback() { return m_raise_drq_cb.bind(); }
+	auto irq_cb() { return m_fd_irq_cb.bind(); }
+	auto drq_cb() { return m_drq_cb.bind(); }
 
-	auto block_interrupt_callback() { return m_block_interrupt_cb.bind(); }
-
-	//void set_block_interrupt(uint8_t data);
+	auto block_interrupt_cb() { return m_block_interrupt_cb.bind(); }
 
 protected : virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_resolve_objects() override;
-
-	//void floppy_select_w(uint8_t data);
 
 	void ctrl_w(uint8_t val);
 	uint8_t ctrl_r();
@@ -47,12 +43,12 @@ protected : virtual void device_start() override;
 	void data_w(uint8_t val);
 	uint8_t data_r();
 
-  void raise_irq(uint8_t data);
-  void raise_drq(uint8_t data);
+  void set_irq(uint8_t data);
+  void set_drq(uint8_t data);
 
 private:
-	devcb_write_line m_raise_irq_cb;
-	devcb_write_line m_raise_drq_cb;
+	devcb_write_line m_fd_irq_cb;
+	devcb_write_line m_drq_cb;
 	devcb_write_line m_block_interrupt_cb;
 
 	required_device<fd1797_device> m_fdc;
@@ -60,7 +56,6 @@ private:
 
 	u8 m_control_reg;
 	u8 m_interface_reg;
-	// bool m_motor_on;
 	bool m_intrq_allowed;
 	bool m_drq_allowed;
 	bool m_access_track_sector;

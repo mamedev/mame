@@ -72,10 +72,6 @@ public:
 		, m_serial1(*this, "serial1")
 		, m_serial2(*this, "serial2")
 		, m_serial3(*this, "serial3")
-		, m_gpp(0)
-		, m_rom_enabled(true)
-		, m_timer_intr_enabled(true)
-		, m_floppy_ram_wp(true)
 	{
 	}
 
@@ -127,9 +123,6 @@ private:
 	uint8_t raise_NMI_r();
 	void raise_NMI_w(uint8_t data);
 	void console_intr(uint8_t data);
-
-	void trigger_interrupt(uint8_t data);
-
 };
 
 /*
@@ -353,13 +346,22 @@ void h89_state::machine_start()
 		m_mem_view[2].install_ram(0x0000, 0x1fff, m_ram_ptr + ram_size - 0x2000);
 	}
 
+	m_rom_enabled = true;
+	m_timer_intr_enabled = true;
+	m_floppy_ram_wp = true;
 	update_gpp(0);
+	update_mem_view();
 }
 
 
 void h89_state::machine_reset()
 {
+	m_rom_enabled = true;
+	m_timer_intr_enabled = true;
+	m_floppy_ram_wp = true;
+
 	update_gpp(0);
+	update_mem_view();
 }
 
 
@@ -375,14 +377,14 @@ void h89_state::raise_NMI_w(uint8_t)
 	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::from_usec(2));
 }
 
-void h89_state::trigger_interrupt(uint8_t data)
-{
-	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, HOLD_LINE, data);
-}
-
 void h89_state::console_intr(uint8_t data)
 {
-	if (data == ASSERT_LINE) {
+	if (data == CLEAR_LINE)
+	{
+		m_intr_cntrl->lower_irq(5);
+	}
+	else
+	{
 		m_intr_cntrl->raise_irq(5);
 	}
 }
@@ -404,17 +406,24 @@ void h89_state::update_gpp(uint8_t gpp)
 {
 	m_gpp = gpp;
 
-	m_rom_enabled = BIT(m_gpp, GPP_DISABLE_ROM_BIT) == 0;
+	bool new_rom_enabled = BIT(m_gpp, GPP_DISABLE_ROM_BIT) == 0;
 
-	update_mem_view();
+	if (m_rom_enabled != new_rom_enabled)
+	{
+		m_rom_enabled = new_rom_enabled;
 
-	m_timer_intr_enabled = BIT(m_gpp, GPP_ENABLE_TIMER_INTERRUPT_BIT) == 1;
+		update_mem_view();
+	}
+
+	m_timer_intr_enabled = bool(BIT(m_gpp, GPP_ENABLE_TIMER_INTERRUPT_BIT));
 }
 
 // General Purpose Port
 void h89_state::port_f2_w(uint8_t data)
 {
 	update_gpp(data);
+
+	m_intr_cntrl->lower_irq(1);
 }
 
 void h89_state::h89(machine_config & config)
@@ -423,25 +432,26 @@ void h89_state::h89(machine_config & config)
 	Z80(config, m_maincpu, H89_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &h89_state::h89_mem);
 	m_maincpu->set_addrmap(AS_IO, &h89_state::h89_io);
+	m_maincpu->set_irq_acknowledge_callback("intr_cntrl", FUNC(heath_intr_cntrl::irq_callback));
 
 	HEATH_Z37_INTR_CNTRL(config, m_intr_cntrl);
-	m_intr_cntrl->intr_inst_callback().set(FUNC(h89_state::trigger_interrupt));
+	m_intr_cntrl->irq_line_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	RAM(config, m_ram).set_default_size("64K").set_extra_options("16K,32K,48K").set_default_value(0x00);
 
 	INS8250(config, m_console, INS8250_CLOCK);
+	m_console->out_int_callback().set(FUNC(h89_state::console_intr));
+
 	HEATH_TLB(config, m_tlb);
 
 	// Connect the console port on CPU board to serial port on TLB
 	m_console->out_tx_callback().set(m_tlb, FUNC(heath_tlb_device::cb1_w));
 	m_tlb->serial_data_callback().set(m_console, FUNC(ins8250_uart_device::rx_w));
 
-	m_console->out_int_callback().set(FUNC(h89_state::console_intr));
-
 	HEATH_Z37_FDC(config, m_h37);
-	m_h37->drq_callback().set(m_intr_cntrl, FUNC(z37_intr_cntrl::set_drq));
-	m_h37->irq_callback().set(m_intr_cntrl, FUNC(z37_intr_cntrl::set_intrq));
-	m_h37->block_interrupt_callback().set(m_intr_cntrl, FUNC(z37_intr_cntrl::block_interrupts));
+	m_h37->drq_cb().set(m_intr_cntrl, FUNC(z37_intr_cntrl::set_drq));
+	m_h37->irq_cb().set(m_intr_cntrl, FUNC(z37_intr_cntrl::set_intrq));
+	m_h37->block_interrupt_cb().set(m_intr_cntrl, FUNC(z37_intr_cntrl::block_interrupts));
 
 	// H-88-3 3-port serial board
 	INS8250(config, m_serial1, INS8250_CLOCK);
