@@ -7,8 +7,8 @@ Tiger Electronics K-2-8 (model 7-232) Sold in Hong Kong, distributed in US as:
 - Coleco: Talking Teacher (model 8100)
 - Sears: Talkatron: Learning Computer
 
-1981 K-2-8 models 7-230 and 7-231 are on different hardware, showing a different
-keyboard, VFD, and use the SC-01 speech chip. --> driver k28.cpp
+1981 K-2-8 models 7-230 and 7-231 are on different hardware, having a different
+keyboard, VFD, and the SC-01-A speech chip. --> driver k28.cpp
 
 Hardware notes:
 - PCB label: 201223A (main), REV0 ET828D (LCD)

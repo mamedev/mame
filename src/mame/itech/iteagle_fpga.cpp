@@ -415,8 +415,7 @@ void iteagle_fpga_device::fpga_w(offs_t offset, uint32_t data, uint32_t mem_mask
 				if (VERBOSE & LOG_SERIAL) {
 					m_serial0_1.write_data((data >> 16) & 0xff, 1);
 					if (m_serial0_1.get_tx_str(1).back() == 0xd) {
-						logerror("com0: %s", m_serial0_1.get_tx_str(1).c_str());
-						osd_printf_info("com0: %s\n", m_serial0_1.get_tx_str(1));
+						LOGMASKED(LOG_SERIAL, "com0: %s\n", m_serial0_1.get_tx_str(1));
 						m_serial0_1.clear_tx_str(1);
 					}
 				}
@@ -465,7 +464,7 @@ void iteagle_fpga_device::fpga_w(offs_t offset, uint32_t data, uint32_t mem_mask
 				int chan = 0;
 				m_serial2_3.write_data((data >> 24) & 0xff, chan);
 				if (m_serial2_3.get_tx_str(chan).back() == 0xd) {
-					LOGMASKED(LOG_SERIAL, "com3: %s\n", m_serial2_3.get_tx_str(chan).c_str());
+					LOGMASKED(LOG_SERIAL, "com3: %s\n", m_serial2_3.get_tx_str(chan));
 					osd_printf_debug("com3: %s\n", m_serial2_3.get_tx_str(chan));
 					if (m_serial2_3.get_tx_str(chan).find("ATI5") != -1)
 						m_serial2_3.write_rx_str(chan, "OK\r181\r");
@@ -530,7 +529,7 @@ uint8_t iteagle_am85c30::read_control(int channel)
 
 void iteagle_am85c30::write_data(uint8_t data, int channel)
 {
-	if (VERBOSE & LOG_SERIAL_VERBOSE) printf("chan %i: TX 0x%2X\n", channel, data);
+	//osd_printf_debug("chan %i: TX 0x%2X\n", channel, data);
 	m_serial_tx[channel] += data;
 	m_rr_regs[channel][0] |= 0x4; // Tx Buffer Empty
 	// Tx Interrupt
@@ -541,7 +540,6 @@ void iteagle_am85c30::write_data(uint8_t data, int channel)
 	}
 	// Limit length
 	if (m_serial_tx[channel].size() >= 4000) {
-		if (VERBOSE & LOG_SERIAL) printf("%s\n", m_serial_tx[channel].c_str());
 		osd_printf_debug("%s\n", m_serial_tx[channel]);
 		m_serial_tx[channel].clear();
 	}
@@ -551,7 +549,7 @@ uint8_t iteagle_am85c30::read_data(int channel)
 {
 	uint8_t retVal = 0;
 	if (!m_serial_rx[channel].empty()) {
-		//logerror("fpga_r: read byte: %c\n", m_serial_rx[channel].at(0));
+		//printf("fpga_r: read byte: %c\n", m_serial_rx[channel].at(0));
 		retVal = m_serial_rx[channel].at(0);
 		m_serial_rx[channel].erase(m_serial_rx[channel].begin());
 	}
@@ -709,7 +707,7 @@ void iteagle_eeprom_device::device_start()
 	uint16_t checkSum = 0;
 	for (int i=0; i<0x3f; i++) {
 		checkSum += m_iteagle_default_eeprom[i];
-	//logerror("eeprom init i: %x data: %04x\n", i, iteagle_default_eeprom[i]);
+		//logerror("eeprom init i: %x data: %04x\n", i, iteagle_default_eeprom[i]);
 	}
 	m_iteagle_default_eeprom[0x3f] = checkSum;
 

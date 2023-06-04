@@ -27,6 +27,7 @@ public:
 	std::string get_tx_str(int channel) { return m_serial_tx[channel]; }
 	void clear_tx_str(int channel) { m_serial_tx[channel].clear(); }
 	bool check_interrupt() { return (m_rr_regs[0][3] != 0); }
+
 private:
 	uint8_t m_rr_regs[2][16];
 	uint8_t m_wr_regs[2][16];
@@ -80,7 +81,7 @@ private:
 	devcb_read16 m_gunx_cb;
 	devcb_read16 m_guny_cb;
 
-	emu_timer *     m_timer;
+	emu_timer *m_timer;
 	int m_irq_num;
 	int m_serial_irq_num;
 
@@ -169,7 +170,6 @@ private:
 
 	uint32_t ctrl_r(offs_t offset, uint32_t mem_mask = ~0);
 	void ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-
 };
 
 DECLARE_DEVICE_TYPE(ITEAGLE_FPGA, iteagle_fpga_device)

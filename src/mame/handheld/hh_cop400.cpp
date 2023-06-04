@@ -143,7 +143,8 @@ INPUT_CHANGED_MEMBER(hh_cop400_state::reset_button)
 
 INPUT_CHANGED_MEMBER(hh_cop400_state::power_button)
 {
-	set_power((bool)param);
+	if (newval != field.defvalue())
+		set_power((bool)param);
 }
 
 void hh_cop400_state::set_power(bool state)

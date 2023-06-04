@@ -18740,6 +18740,7 @@ us2pfball                       // US Games
 uspbball                        // US Games
 
 @source:handheld/hh_pps41.cpp
+addocalc                        // Addometer Company
 brainbaf                        // Mattel
 dunksunk                        // Kmart
 ftri1                           // Fonas

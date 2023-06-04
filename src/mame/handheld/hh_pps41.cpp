@@ -16,6 +16,7 @@ ROM source notes when dumped from another title, but confident it's the same:
 #include "cpu/pps41/mm76.h"
 #include "cpu/pps41/mm78.h"
 #include "cpu/pps41/mm78la.h"
+#include "machine/timer.h"
 #include "sound/beep.h"
 #include "sound/spkrdev.h"
 #include "video/pwm.h"
@@ -24,6 +25,7 @@ ROM source notes when dumped from another title, but confident it's the same:
 #include "speaker.h"
 
 // internal artwork
+#include "addocalc.lh"
 #include "brainbaf.lh"
 #include "dunksunk.lh"
 #include "ftri1.lh"
@@ -53,6 +55,7 @@ public:
 	{ }
 
 	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button);
 
 protected:
 	virtual void machine_start() override;
@@ -72,8 +75,11 @@ protected:
 	// MCU output pin state
 	u16 m_d = 0;
 	u16 m_r = 0;
+	u8 m_ssc = 0;
+	u8 m_sdo = 0;
 
 	u8 read_inputs(int columns);
+	void set_power(bool state);
 	virtual void update_int() { ; }
 };
 
@@ -88,6 +94,8 @@ void hh_pps41_state::machine_start()
 	save_item(NAME(m_plate));
 	save_item(NAME(m_d));
 	save_item(NAME(m_r));
+	save_item(NAME(m_ssc));
+	save_item(NAME(m_sdo));
 }
 
 
@@ -118,6 +126,20 @@ INPUT_CHANGED_MEMBER(hh_pps41_state::reset_button)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
+INPUT_CHANGED_MEMBER(hh_pps41_state::power_button)
+{
+	if (newval != field.defvalue())
+		set_power((bool)param);
+}
+
+void hh_pps41_state::set_power(bool state)
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
+
+	if (m_display && !state)
+		m_display->clear();
+}
+
 
 
 /*******************************************************************************
@@ -125,6 +147,176 @@ INPUT_CHANGED_MEMBER(hh_pps41_state::reset_button)
   Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
 
 *******************************************************************************/
+
+/*******************************************************************************
+
+  Addometer Company Addometer Calculator
+  * MM78 MCU (label MM78 A7872-11, die label A7872)
+  * 12-digit 7seg VFD, 1 digit unused (NEC LD8197A/FIP12A4A 0B)
+
+  This is presumably the only pocket calculator by Addometer Company (previously
+  known as Reliable Typewriter and Adding Machine Corporation). It's a feet
+  and inches/metric calculator.
+
+*******************************************************************************/
+
+class addocalc_state : public hh_pps41_state
+{
+public:
+	addocalc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_pps41_state(mconfig, type, tag),
+		m_power_timer(*this, "power")
+	{ }
+
+	void addocalc(machine_config &config);
+
+	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button) override { hh_pps41_state::power_button(field, param, oldval, newval); update_int(); }
+
+private:
+	required_device<timer_device> m_power_timer;
+
+	virtual void update_int() override;
+	void update_display();
+	void write_d(u16 data);
+	void write_r(u16 data);
+	u8 read_p();
+	void write_ssc(int state);
+	void write_sdo(int state);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(power_off) { set_power(false); }
+};
+
+// handlers
+
+void addocalc_state::update_int()
+{
+	// ON/OFF button is tied to INT1
+	m_maincpu->set_input_line(1, (m_inputs[7]->read() & 1) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void addocalc_state::update_display()
+{
+	m_display->matrix(m_d | m_ssc << 10, bitswap<8>(~m_r, 0,1,2,3,4,5,6,7));
+}
+
+void addocalc_state::write_d(u16 data)
+{
+	// DIO0-DIO9: digit select
+	// DIO0-DIO6: input mux
+	m_d = m_inp_mux = data;
+	update_display();
+}
+
+void addocalc_state::write_r(u16 data)
+{
+	// RIO1-RIO8: digit segment data
+	m_r = data;
+	update_display();
+}
+
+u8 addocalc_state::read_p()
+{
+	// PI1-PI4: multiplexed inputs
+	return ~read_inputs(7);
+}
+
+void addocalc_state::write_ssc(int state)
+{
+	// CLOCK: one more digit
+	m_ssc = state;
+	update_display();
+}
+
+void addocalc_state::write_sdo(int state)
+{
+	// DATAO: trigger power off after a short delay
+	if (state != m_sdo)
+		m_power_timer->adjust(state ? attotime::from_msec(50) : attotime::never);
+
+	m_sdo = state;
+}
+
+// inputs
+
+static INPUT_PORTS_START( addocalc )
+	PORT_START("IN.0") // DIO0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CL")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // DIO1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
+
+	PORT_START("IN.2") // DIO2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("STO")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("REC")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("EX")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
+
+	PORT_START("IN.3") // DIO3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("FT")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("IN")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("FRA")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("MET")
+
+	PORT_START("IN.4") // DIO4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+
+	PORT_START("IN.5") // DIO5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+
+	PORT_START("IN.6") // DIO6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.7") // INT1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_MEMBER(DEVICE_SELF, addocalc_state, power_button, true) PORT_NAME("ON/OFF")
+INPUT_PORTS_END
+
+// config
+
+void addocalc_state::addocalc(machine_config &config)
+{
+	// basic machine hardware
+	MM78(config, m_maincpu, 430000); // approximation - VC osc. R=47K
+	m_maincpu->write_d().set(FUNC(addocalc_state::write_d));
+	m_maincpu->write_r().set(FUNC(addocalc_state::write_r));
+	m_maincpu->read_p().set(FUNC(addocalc_state::read_p));
+	m_maincpu->write_ssc().set(FUNC(addocalc_state::write_ssc));
+	m_maincpu->write_sdo().set(FUNC(addocalc_state::write_sdo));
+
+	TIMER(config, "power").configure_generic(FUNC(addocalc_state::power_off));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(11, 8);
+	m_display->set_segmask(0x7ff, 0xff);
+	config.set_default_layout(layout_addocalc);
+
+	// no sound!
+}
+
+// roms
+
+ROM_START( addocalc )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mm78_a7872-11", 0x0000, 0x0800, CRC(1ff26da7) SHA1(b4b9b5886d60dcd634661604f9ef5346a6c8bd1b) )
+ROM_END
+
+
+
+
 
 /*******************************************************************************
 
@@ -197,7 +389,7 @@ static INPUT_PORTS_START( ftri1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Swing / S2 V")
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_pps41_state, reset_button, 0) PORT_CODE(KEYCODE_F1) PORT_NAME("Game Reset")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CHANGED_MEMBER(DEVICE_SELF, ftri1_state, reset_button, 0) PORT_CODE(KEYCODE_F1) PORT_NAME("Game Reset")
 INPUT_PORTS_END
 
 // config
@@ -1616,6 +1808,8 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1980, addocalc,  0,       0,      addocalc,  addocalc, addocalc_state, empty_init, "Addometer Company", "Addometer Calculator", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+
 SYST( 1979, ftri1,     0,       0,      ftri1,     ftri1,    ftri1_state,    empty_init, "Fonas", "Tri-1 (Fonas)", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1979, mastmind,  0,       0,      mastmind,  mastmind, mastmind_state, empty_init, "Invicta", "Electronic Master Mind (Invicta)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
