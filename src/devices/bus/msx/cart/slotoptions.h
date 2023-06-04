@@ -67,6 +67,7 @@ extern char const *const MSXDOS2J;
 extern char const *const MSXDOS2E;
 extern char const *const MSXWRITE;
 extern char const *const NOMAPPER;
+extern char const *const QUICKDISK;
 extern char const *const RAM16K;
 extern char const *const RAM32K;
 extern char const *const RAM48K;
