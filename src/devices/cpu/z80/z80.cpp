@@ -3335,9 +3335,8 @@ void z80_device::take_interrupt()
 						wm16_sp(m_pc);
 						PCD = irq_vector & 0x0038;
 					}
-					else {
-						logerror("z80device::take_interrupt unexpected opcode in im0 mode: 0x%02x\n", irq_vector);
-					}
+					else
+						logerror("take_interrupt: unexpected opcode in im0 mode: 0x%02x\n", irq_vector);
 					break;
 			}
 		}
