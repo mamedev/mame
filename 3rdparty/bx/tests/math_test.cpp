@@ -11,7 +11,7 @@
 #include <stdint.h> // intXX_t
 #include <limits.h> // UCHAR_*
 
-TEST_CASE("isFinite, isInfinite, isNan", "")
+TEST_CASE("isFinite, isInfinite, isNan", "[math]")
 {
 	for (uint64_t ii = 0; ii < UINT32_MAX; ii += rand()%(1<<13)+1)
 	{
@@ -39,7 +39,7 @@ bool log2_test(float _a)
 	return bx::log2(_a) == bx::log(_a) * (1.0f / bx::log(2.0f) );
 }
 
-TEST_CASE("log2", "")
+TEST_CASE("log2", "[math][libm]")
 {
 	log2_test(0.0f);
 	log2_test(256.0f);
@@ -75,7 +75,7 @@ TEST_CASE("log2", "")
 BX_PRAGMA_DIAGNOSTIC_PUSH();
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4723) // potential divide by 0
 
-TEST_CASE("libm sqrt", "")
+TEST_CASE("rsqrt", "[math][libm]")
 {
 	bx::WriterI* writer = bx::getNullOut();
 	bx::Error err;
@@ -110,6 +110,12 @@ TEST_CASE("libm sqrt", "")
 		REQUIRE(err.isOk());
 		REQUIRE(bx::isEqual(bx::rsqrt(xx), 1.0f / ::sqrtf(xx), 0.00001f));
 	}
+}
+
+TEST_CASE("sqrt", "[math][libm]")
+{
+	bx::WriterI* writer = bx::getNullOut();
+	bx::Error err;
 
 	// sqrtRef
 	REQUIRE(bx::isNan(bx::sqrtRef(-1.0f)));
@@ -165,27 +171,47 @@ TEST_CASE("libm sqrt", "")
 
 BX_PRAGMA_DIAGNOSTIC_POP();
 
-TEST_CASE("libm", "")
+TEST_CASE("abs", "[math][libm]")
 {
-	bx::WriterI* writer = bx::getNullOut();
-	bx::Error err;
-
 	REQUIRE(1389.0f == bx::abs(-1389.0f) );
 	REQUIRE(1389.0f == bx::abs( 1389.0f) );
 	REQUIRE(   0.0f == bx::abs(-0.0f) );
 	REQUIRE(   0.0f == bx::abs( 0.0f) );
+}
 
+TEST_CASE("mod", "[math][libm]")
+{
 	REQUIRE(389.0f == bx::mod(1389.0f, 1000.0f) );
+}
 
+TEST_CASE("floor", "[math][libm]")
+{
 	REQUIRE( 13.0f == bx::floor( 13.89f) );
 	REQUIRE(-14.0f == bx::floor(-13.89f) );
+}
+
+TEST_CASE("ceil", "[math][libm]")
+{
 	REQUIRE( 14.0f == bx::ceil(  13.89f) );
 	REQUIRE(-13.0f == bx::ceil( -13.89f) );
+}
 
+TEST_CASE("trunc", "[math][libm]")
+{
 	REQUIRE( 13.0f == bx::trunc( 13.89f) );
 	REQUIRE(-13.0f == bx::trunc(-13.89f) );
+}
+
+TEST_CASE("fract", "[math][libm]")
+{
 	REQUIRE(bx::isEqual( 0.89f, bx::fract( 13.89f), 0.000001f) );
 	REQUIRE(bx::isEqual(-0.89f, bx::fract(-13.89f), 0.000001f) );
+}
+
+TEST_CASE("ldexp", "[math][libm]")
+{
+	bx::WriterI* writer = bx::getNullOut();
+	bx::Error err;
 
 	for (int32_t yy = -10; yy < 10; ++yy)
 	{
@@ -195,6 +221,12 @@ TEST_CASE("libm", "")
 			REQUIRE(bx::isEqual(bx::ldexp(xx, yy), ::ldexpf(xx, yy), 0.00001f) );
 		}
 	}
+}
+
+TEST_CASE("exp", "[math][libm]")
+{
+	bx::WriterI* writer = bx::getNullOut();
+	bx::Error err;
 
 	for (float xx = -80.0f; xx < 80.0f; xx += 0.1f)
 	{
@@ -202,6 +234,12 @@ TEST_CASE("libm", "")
 		REQUIRE(err.isOk() );
 		REQUIRE(bx::isEqual(bx::exp(xx), ::expf(xx), 0.00001f) );
 	}
+}
+
+TEST_CASE("pow", "[math][libm]")
+{
+	bx::WriterI* writer = bx::getNullOut();
+	bx::Error err;
 
 	for (float xx = -100.0f; xx < 100.0f; xx += 0.1f)
 	{
@@ -209,6 +247,12 @@ TEST_CASE("libm", "")
 		REQUIRE(err.isOk() );
 		REQUIRE(bx::isEqual(bx::pow(1.389f, xx), ::powf(1.389f, xx), 0.00001f) );
 	}
+}
+
+TEST_CASE("asin", "[math][libm]")
+{
+	bx::WriterI* writer = bx::getNullOut();
+	bx::Error err;
 
 	for (float xx = -1.0f; xx < 1.0f; xx += 0.001f)
 	{
@@ -216,6 +260,12 @@ TEST_CASE("libm", "")
 		REQUIRE(err.isOk() );
 		REQUIRE(bx::isEqual(bx::asin(xx), ::asinf(xx), 0.0001f) );
 	}
+}
+
+TEST_CASE("sin", "[math][libm]")
+{
+	bx::WriterI* writer = bx::getNullOut();
+	bx::Error err;
 
 	for (float xx = -100.0f; xx < 100.0f; xx += 0.1f)
 	{
@@ -230,6 +280,12 @@ TEST_CASE("libm", "")
 		REQUIRE(err.isOk() );
 		REQUIRE(bx::isEqual(bx::sin(xx), ::sinf(xx), 0.00001f) );
 	}
+}
+
+TEST_CASE("sinh", "[math][libm]")
+{
+	bx::WriterI* writer = bx::getNullOut();
+	bx::Error err;
 
 	for (float xx = -1.0f; xx < 1.0f; xx += 0.1f)
 	{
@@ -237,6 +293,12 @@ TEST_CASE("libm", "")
 		REQUIRE(err.isOk() );
 		REQUIRE(bx::isEqual(bx::sinh(xx), ::sinhf(xx), 0.00001f) );
 	}
+}
+
+TEST_CASE("acos", "[math][libm]")
+{
+	bx::WriterI* writer = bx::getNullOut();
+	bx::Error err;
 
 	for (float xx = -1.0f; xx < 1.0f; xx += 0.001f)
 	{
@@ -244,6 +306,12 @@ TEST_CASE("libm", "")
 		REQUIRE(err.isOk() );
 		REQUIRE(bx::isEqual(bx::acos(xx), ::acosf(xx), 0.0001f) );
 	}
+}
+
+TEST_CASE("cos", "[math][libm]")
+{
+	bx::WriterI* writer = bx::getNullOut();
+	bx::Error err;
 
 	for (float xx = -100.0f; xx < 100.0f; xx += 0.1f)
 	{
@@ -258,6 +326,12 @@ TEST_CASE("libm", "")
 		REQUIRE(err.isOk() );
 		REQUIRE(bx::isEqual(bx::cos(xx), ::cosf(xx), 0.00001f) );
 	}
+}
+
+TEST_CASE("tan", "[math][libm]")
+{
+	bx::WriterI* writer = bx::getNullOut();
+	bx::Error err;
 
 	for (float xx = -100.0f; xx < 100.0f; xx += 0.1f)
 	{
@@ -265,6 +339,12 @@ TEST_CASE("libm", "")
 		REQUIRE(err.isOk() );
 		REQUIRE(bx::isEqual(bx::tan(xx), ::tanf(xx), 0.001f) );
 	}
+}
+
+TEST_CASE("tanh", "[math][libm]")
+{
+	bx::WriterI* writer = bx::getNullOut();
+	bx::Error err;
 
 	for (float xx = -1.0f; xx < 1.0f; xx += 0.1f)
 	{
@@ -272,6 +352,12 @@ TEST_CASE("libm", "")
 		REQUIRE(err.isOk() );
 		REQUIRE(bx::isEqual(bx::tanh(xx), ::tanhf(xx), 0.00001f) );
 	}
+}
+
+TEST_CASE("atan", "[math][libm]")
+{
+	bx::WriterI* writer = bx::getNullOut();
+	bx::Error err;
 
 	for (float xx = -100.0f; xx < 100.0f; xx += 0.1f)
 	{
@@ -281,7 +367,7 @@ TEST_CASE("libm", "")
 	}
 }
 
-TEST_CASE("atan2", "")
+TEST_CASE("atan2", "[math][libm]")
 {
 	bx::WriterI* writer = bx::getNullOut();
 	bx::Error err;
@@ -301,7 +387,7 @@ TEST_CASE("atan2", "")
 	}
 }
 
-TEST_CASE("sign", "")
+TEST_CASE("sign", "[math][libm]")
 {
 	STATIC_REQUIRE(-1 == bx::sign(-0.1389f) );
 	STATIC_REQUIRE( 0 == bx::sign( 0.0000f) );
@@ -311,7 +397,7 @@ TEST_CASE("sign", "")
 	REQUIRE( 1 == bx::sign( bx::kFloatInfinity) );
 }
 
-TEST_CASE("signbit", "")
+TEST_CASE("signbit", "[math][libm]")
 {
 	STATIC_REQUIRE( bx::signbit(-0.1389f) );
 	STATIC_REQUIRE(!bx::signbit( 0.0000f) );
@@ -321,7 +407,7 @@ TEST_CASE("signbit", "")
 	REQUIRE(!bx::signbit( bx::kFloatInfinity) );
 }
 
-TEST_CASE("copysign", "")
+TEST_CASE("copysign", "[math][libm]")
 {
 	STATIC_REQUIRE( 0.1389f == bx::copysign(-0.1389f, +1389) );
 	STATIC_REQUIRE(-0.0000f == bx::copysign( 0.0000f, -1389) );
@@ -330,17 +416,18 @@ TEST_CASE("copysign", "")
 	REQUIRE(-bx::kFloatInfinity == bx::copysign(bx::kFloatInfinity, -1389) );
 }
 
-TEST_CASE("ToBits", "")
+TEST_CASE("bitsToFloat, floatToBits, bitsToDouble, doubleToBits", "[math]")
 {
 	REQUIRE(UINT32_C(0x12345678)         == bx::floatToBits( bx::bitsToFloat( UINT32_C(0x12345678) ) ) );
 	REQUIRE(UINT64_C(0x123456789abcdef0) == bx::doubleToBits(bx::bitsToDouble(UINT32_C(0x123456789abcdef0) ) ) );
 }
 
-TEST_CASE("lerp", "")
+TEST_CASE("lerp", "[math]")
 {
 	REQUIRE(1389.0f == bx::lerp(1389.0f, 1453.0f, 0.0f) );
 	REQUIRE(1453.0f == bx::lerp(1389.0f, 1453.0f, 1.0f) );
-	REQUIRE(0.5f == bx::lerp(0.0f, 1.0f, 0.5f) );
+	REQUIRE(   0.5f == bx::lerp(   0.0f,    1.0f, 0.5f) );
+	REQUIRE(   0.0f == bx::lerp(   0.0f,    0.0f, 0.5f) );
 }
 
 void mtxCheck(const float* _a, const float* _b)
@@ -372,7 +459,7 @@ void mtxCheck(const float* _a, const float* _b)
 	}
 }
 
-TEST_CASE("vec3", "")
+TEST_CASE("vec3", "[math][vec3]")
 {
 	bx::Vec3 normalized = bx::normalize({0.0f, 1.0f, 0.0f});
 	REQUIRE(bx::isEqual(normalized, {0.0f, 1.0f, 0.0f}, 0.0f) );
@@ -381,7 +468,7 @@ TEST_CASE("vec3", "")
 	REQUIRE(bx::isEqual(length, 1.0f, 0.0f) );
 }
 
-TEST_CASE("quaternion", "")
+TEST_CASE("quaternion", "[math][quaternion]")
 {
 	float mtxQ[16];
 	float mtx[16];
@@ -450,7 +537,7 @@ TEST_CASE("quaternion", "")
 	}
 }
 
-TEST_CASE("limits", "")
+TEST_CASE("limits", "[math]")
 {
 	STATIC_REQUIRE(bx::LimitsT<int8_t>::min == INT8_MIN);
 	STATIC_REQUIRE(bx::LimitsT<int8_t>::max == INT8_MAX);

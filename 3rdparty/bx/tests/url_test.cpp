@@ -43,7 +43,7 @@ static const UrlTest s_urlTest[] =
 	},
 };
 
-TEST_CASE("tokenizeUrl", "")
+TEST_CASE("tokenizeUrl", "[url][string]")
 {
 	bx::UrlView url;
 

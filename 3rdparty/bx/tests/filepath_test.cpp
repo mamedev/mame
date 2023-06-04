@@ -88,7 +88,7 @@ static const FilePathSplit s_filePathSplit[] =
 	{ "/tmp/abv/gd/", true, "/tmp/abv/gd/", "", "", "" },
 };
 
-TEST_CASE("FilePath", "")
+TEST_CASE("FilePath", "[filepath][string]")
 {
 	bx::FilePath fp;
 	for (uint32_t ii = 0; ii < BX_COUNTOF(s_filePathTest); ++ii)
@@ -118,7 +118,7 @@ TEST_CASE("FilePath", "")
 	};
 }
 
-TEST_CASE("FilePath temp", "")
+TEST_CASE("FilePath temp", "[filepath]")
 {
 	bx::FilePath tmp(bx::Dir::Temp);
 	REQUIRE(0 != bx::strCmp(".", tmp.getPath().getPtr() ) );
