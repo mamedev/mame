@@ -10,14 +10,14 @@
 #include <limits>
 #include <inttypes.h>
 
-TEST_CASE("vsnprintf NULL buffer", "No output buffer provided.")
+TEST_CASE("No output buffer provided.", "[string][printf]")
 {
 	REQUIRE(4 == bx::snprintf(NULL, 0, "test") );
 
 	REQUIRE(1 == bx::snprintf(NULL, 0, "%d", 1) );
 }
 
-TEST_CASE("vsnprintf truncated", "Truncated output buffer.")
+TEST_CASE("Truncated output buffer.", "[string][printf]")
 {
 	REQUIRE(4 == bx::snprintf(NULL, 0, "abvg") );
 
@@ -70,7 +70,7 @@ static bool test(const char* _expected, const char* _format, ...)
 	return result;
 }
 
-TEST_CASE("vsnprintf f")
+TEST_CASE("Format %f", "[string][printf]")
 {
 	REQUIRE(test("1.337",    "%0.3f", 1.337) );
 	REQUIRE(test("  13.370", "%8.3f", 13.37) );
@@ -157,7 +157,7 @@ TEST_CASE("vsnprintf f")
 	REQUIRE(test("1.50000000000000000", "%.17f", 1.5) );
 }
 
-TEST_CASE("vsnprintf d/i/o/u/x")
+TEST_CASE("Format %d, %i, %o, %u, %x", "[string][printf]")
 {
 	REQUIRE(test("1337", "%d", 1337) );
 	REQUIRE(test("1337                ", "%-20d",  1337) );
@@ -230,7 +230,7 @@ TEST_CASE("vsnprintf d/i/o/u/x")
 	REQUIRE(test("ffffffffffffffff", "%016" PRIx64, UINT64_MAX) );
 }
 
-TEST_CASE("vsnprintf modifiers")
+TEST_CASE("Format modifiers", "[string][printf]")
 {
 	REQUIRE(test("|  1.000000|", "|%10f|",      1.0f) );
 	REQUIRE(test("|1.000000  |", "|%-10f|",     1.0f) );
@@ -245,18 +245,18 @@ TEST_CASE("vsnprintf modifiers")
 	REQUIRE(test("|+1.       |", "|%+#-10.0f|", 1.0f) );
 }
 
-TEST_CASE("vsnprintf p")
+TEST_CASE("Format %p", "[string][printf]")
 {
 	REQUIRE(test("0xbadc0de", "%p", (void*)0xbadc0de) );
 	REQUIRE(test("0xbadc0de           ", "%-20p", (void*)0xbadc0de) );
 }
 
-TEST_CASE("vsnprintf s")
+TEST_CASE("Format %s", "[string][printf]")
 {
 	REQUIRE(test("(null)", "%s", NULL) );
 }
 
-TEST_CASE("vsnprintf t")
+TEST_CASE("Format %td", "[string][printf]")
 {
 	size_t size = size_t(-1);
 
@@ -265,7 +265,7 @@ TEST_CASE("vsnprintf t")
 	REQUIRE(test("3221225472", "%td", size_t(3221225472) ) );
 }
 
-TEST_CASE("vsnprintf n")
+TEST_CASE("Format %n", "[string][printf]")
 {
 	char temp[64];
 
@@ -279,7 +279,7 @@ TEST_CASE("vsnprintf n")
 	REQUIRE(6 == p2);
 }
 
-TEST_CASE("vsnprintf g")
+TEST_CASE("Format %g", "[string][printf]")
 {
 	REQUIRE(test("   0.01",  "%7.2g", .01) );
 	REQUIRE(test(" 0.0123",  "%7.4G", .0123) );
@@ -287,7 +287,7 @@ TEST_CASE("vsnprintf g")
 //	REQUIRE(test("1e+05",    "%.0g",  123000.25) );
 }
 
-TEST_CASE("vsnprintf")
+TEST_CASE("Format %c, %s, %S", "[string][printf]")
 {
 	REQUIRE(test("x", "%c", 'x') );
 	REQUIRE(test("x                   ", "%-20c", 'x') );
@@ -315,7 +315,7 @@ TEST_CASE("vsnprintf")
 		) );
 }
 
-TEST_CASE("vsnprintf write")
+TEST_CASE("WriterI", "[string][printf]")
 {
 	char tmp[64];
 	bx::StaticMemoryBlock mb(tmp, sizeof(tmp));
@@ -330,7 +330,7 @@ TEST_CASE("vsnprintf write")
 	REQUIRE(0 == bx::strCmp(str, "1389") );
 }
 
-TEST_CASE("snprintf invalid")
+TEST_CASE("Invalid", "[string][printf]")
 {
 	char temp[64];
 	REQUIRE(0 == bx::snprintf(temp, sizeof(temp), "%", 1) );

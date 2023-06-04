@@ -9,7 +9,7 @@
 #include <bx/string.h>
 #include <bx/rng.h>
 
-TEST_CASE("sort-quickSort", "")
+TEST_CASE("quickSort", "[sort]")
 {
 	const char* str[] =
 	{
@@ -28,6 +28,40 @@ TEST_CASE("sort-quickSort", "")
 	REQUIRE(0 == bx::strCmp(str[2], "kruska") );
 	REQUIRE(0 == bx::strCmp(str[3], "malina") );
 
+	REQUIRE(bx::isSorted(str, BX_COUNTOF(str) ) );
+
+	int8_t byte[128];
+	bx::RngMwc rng;
+	for (uint32_t ii = 0; ii < BX_COUNTOF(byte); ++ii)
+	{
+		byte[ii] = rng.gen()&0xff;
+	}
+
+	REQUIRE(!bx::isSorted(byte, BX_COUNTOF(byte) ) );
+
+	bx::quickSort(byte, BX_COUNTOF(byte) );
+
+	for (uint32_t ii = 1; ii < BX_COUNTOF(byte); ++ii)
+	{
+		REQUIRE(byte[ii-1] <= byte[ii]);
+	}
+
+	REQUIRE(bx::isSorted(byte, BX_COUNTOF(byte) ) );
+}
+
+TEST_CASE("binarySearch", "[sort]")
+{
+	const char* str[] =
+	{
+		"jabuka",
+		"kruska",
+		"malina",
+		"jagoda",
+	};
+
+	REQUIRE(!bx::isSorted(str, BX_COUNTOF(str) ) );
+
+	bx::quickSort(str, BX_COUNTOF(str) );
 	REQUIRE(bx::isSorted(str, BX_COUNTOF(str) ) );
 
 	auto bsearchStrCmpFn = [](const void* _lhs, const void* _rhs)
@@ -55,27 +89,9 @@ TEST_CASE("sort-quickSort", "")
 
 	REQUIRE( 3 == bx::lowerBound("malina", str, BX_COUNTOF(str), sizeof(str[0]), bsearchStrCmpFn) );
 	REQUIRE( 4 == bx::upperBound("malina", str, BX_COUNTOF(str), sizeof(str[0]), bsearchStrCmpFn) );
-
-	int8_t byte[128];
-	bx::RngMwc rng;
-	for (uint32_t ii = 0; ii < BX_COUNTOF(byte); ++ii)
-	{
-		byte[ii] = rng.gen()&0xff;
-	}
-
-	REQUIRE(!bx::isSorted(byte, BX_COUNTOF(byte) ) );
-
-	bx::quickSort(byte, BX_COUNTOF(byte) );
-
-	for (uint32_t ii = 1; ii < BX_COUNTOF(byte); ++ii)
-	{
-		REQUIRE(byte[ii-1] <= byte[ii]);
-	}
-
-	REQUIRE(bx::isSorted(byte, BX_COUNTOF(byte) ) );
 }
 
-TEST_CASE("sort-unique", "")
+TEST_CASE("unique", "[sort]")
 {
 	//                   0    1    2    3    4    5    6    7    8    9   10   11   12   13 | 14
 	int32_t test[] = { 100, 101, 101, 101, 103, 104, 105, 105, 105, 106, 106, 107, 108, 109 };
@@ -96,7 +112,7 @@ TEST_CASE("sort-unique", "")
 	REQUIRE(9 == bx::unique(test, last) );
 }
 
-TEST_CASE("sort-lower/upperBound int32_t", "")
+TEST_CASE("lowerBound, upperBound int32_t", "[sort]")
 {
 	//                         0    1    2    3    4    5    6    7    8    9   10   11   12   13 | 14
 	const int32_t test[] = { 100, 101, 101, 101, 103, 104, 105, 105, 105, 106, 106, 107, 108, 109 };
@@ -150,7 +166,7 @@ void compareTest(const Ty& _min, const Ty& _max)
 	REQUIRE(-1 == compareDescendingTest<Ty>(_max, _min) );
 }
 
-TEST_CASE("sort-ComparisonFn", "")
+TEST_CASE("ComparisonFn", "[sort]")
 {
 	compareTest< int8_t>(  -13,   89);
 	compareTest<int16_t>(-1389, 1389);
