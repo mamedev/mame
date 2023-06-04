@@ -81,6 +81,15 @@ Line ram memory map:
         (usually 0x00f0; gseeker, spcinvdj, twinqix, puchicar set 0x0000)
 
     0x4000: Column scroll & clipping info
+      4400 Bits: RLrl --Ts ssss ssss
+        s = playfield 3 column scroll (0-511)
+        T = use alternate tilemap (+0x2000) - kirameki, kaiserkn, hthero
+        - = unused?
+        l = clip 0 left high bit
+        r = clip 0 right high bit
+        L = clip 1 left high bit
+        R = clip 1 right high bit
+      4600: as 4400, for playfield 4 / clip plane 2 and 3
 
     0x5000: Clip plane 0 (low bits (high in 4400))
     0x5200: Clip plane 1 (low bits (high in 4400))
@@ -219,14 +228,14 @@ Playfield tile info:
 
 #define VERBOSE 0
 #define DARIUSG_KLUDGE
-//#define DEBUG_F3 1
+#define TAITOF3_VIDEO_DEBUG 0
 
 
 // Game specific data - some of this can be removed when the software values are figured out
 struct taito_f3_state::F3config
 {
 	int name;
-	int extend;
+	int extend;     // playfield control 0x1F bit 7
 	int sprite_lag;
 };
 
@@ -304,75 +313,33 @@ void taito_f3_state::device_post_load()
 
 void taito_f3_state::print_debug_info(bitmap_rgb32 &bitmap)
 {
-/*  u16 *line_ram = m_line_ram;
-    int l[16];
-    char buf[64*16];
-    char *bufptr = buf;
-
-    bufptr += sprintf(bufptr,"%04X %04X %04X %04X\n", m_control_0[0] >> 6, m_control_0[1] >> 6, m_control_0[2] >> 6, m_control_0[3] >> 6);
-    bufptr += sprintf(bufptr,"%04X %04X %04X %04X\n", m_control_0[4] >> 7, m_control_0[5] >> 7, m_control_0[6] >> 7, m_control_0[7] >> 7);
-    bufptr += sprintf(bufptr,"%04X %04X %04X %04X\n", m_control_1[0], m_control_1[1], m_control_1[2], m_control_1[3]);
-    bufptr += sprintf(bufptr,"%04X %04X %04X %04X\n", m_control_1[4], m_control_1[5], m_control_1[6], m_control_1[7]);
-
-    bufptr += sprintf(bufptr,"%04X %04X %04X %04X %04X %04X %04X %04X\n", m_spriteram16_buffered[0], m_spriteram16_buffered[1], m_spriteram16_buffered[2], m_spriteram16_buffered[3], m_spriteram16_buffered[4], m_spriteram16_buffered[5], m_spriteram16_buffered[6], m_spriteram16_buffered[7]);
-    bufptr += sprintf(bufptr,"%04X %04X %04X %04X %04X %04X %04X %04X\n", m_spriteram16_buffered[8], m_spriteram16_buffered[9], m_spriteram16_buffered[10], m_spriteram16_buffered[11], m_spriteram16_buffered[12], m_spriteram16_buffered[13], m_spriteram16_buffered[14], m_spriteram16_buffered[15]);
-    bufptr += sprintf(bufptr,"%04X %04X %04X %04X %04X %04X %04X %04X\n", m_spriteram16_buffered[16], m_spriteram16_buffered[17], m_spriteram16_buffered[18], m_spriteram16_buffered[19], m_spriteram16_buffered[20], m_spriteram16_buffered[21], m_spriteram16_buffered[22], m_spriteram16_buffered[23]);
-
-    l[0] = line_ram[0x0040*2] & 0xffff;
-    l[1] = line_ram[0x00c0*2] & 0xffff;
-    l[2] = line_ram[0x0140*2] & 0xffff;
-    l[3] = line_ram[0x01c0*2] & 0xffff;
-    bufptr += sprintf(bufptr,"Ctr1: %04x %04x %04x %04x\n", l[0], l[1], l[2], l[3]);
-
-    l[0] = line_ram[0x0240*2] & 0xffff;
-    l[1] = line_ram[0x02c0*2] & 0xffff;
-    l[2] = line_ram[0x0340*2] & 0xffff;
-    l[3] = line_ram[0x03c0*2] & 0xffff;
-    bufptr += sprintf(bufptr,"Ctr2: %04x %04x %04x %04x\n", l[0], l[1], l[2], l[3]);
-
-    l[0] = line_ram[0x2c60*2] & 0xffff;
-    l[1] = line_ram[0x2ce0*2] & 0xffff;
-    l[2] = line_ram[0x2d60*2] & 0xffff;
-    l[3] = line_ram[0x2de0*2] & 0xffff;
-    bufptr += sprintf(bufptr,"Pri : %04x %04x %04x %04x\n", l[0], l[1], l[2], l[3]);
-
-    l[0] = line_ram[0x2060*2] & 0xffff;
-    l[1] = line_ram[0x20e0*2] & 0xffff;
-    l[2] = line_ram[0x2160*2] & 0xffff;
-    l[3] = line_ram[0x21e0*2] & 0xffff;
-    bufptr += sprintf(bufptr,"Zoom: %04x %04x %04x %04x\n", l[0], l[1], l[2], l[3]);
-
-    l[0] = line_ram[0x2860*2] & 0xffff;
-    l[1] = line_ram[0x28e0*2] & 0xffff;
-    l[2] = line_ram[0x2960*2] & 0xffff;
-    l[3] = line_ram[0x29e0*2] & 0xffff;
-    bufptr += sprintf(bufptr,"Line: %04x %04x %04x %04x\n", l[0], l[1], l[2], l[3]);
-
-    l[0] = line_ram[0x1c60*2] & 0xffff;
-    l[1] = line_ram[0x1ce0*2] & 0xffff;
-    l[2] = line_ram[0x1d60*2] & 0xffff;
-    l[3] = line_ram[0x1de0*2] & 0xffff;
-    bufptr += sprintf(bufptr,"Sprt: %04x %04x %04x %04x\n", l[0], l[1], l[2], l[3]);
-
-    l[0] = line_ram[0x1860*2] & 0xffff;
-    l[1] = line_ram[0x18e0*2] & 0xffff;
-    l[2] = line_ram[0x1960*2] & 0xffff;
-    l[3] = line_ram[0x19e0*2] & 0xffff;
-    bufptr += sprintf(bufptr,"Pivt: %04x %04x %04x %04x\n", l[0], l[1], l[2], l[3]);
-
-    l[0] = line_ram[0x1060*2] & 0xffff;
-    l[1] = line_ram[0x10e0*2] & 0xffff;
-    l[2] = line_ram[0x1160*2] & 0xffff;
-    l[3] = line_ram[0x11e0*2] & 0xffff;
-    bufptr += sprintf(bufptr,"Colm: %04x %04x %04x %04x\n", l[0], l[1], l[2], l[3]);
-
-    l[0] = line_ram[0x1460*2] & 0xffff;
-    l[1] = line_ram[0x14e0*2] & 0xffff;
-    l[2] = line_ram[0x1560*2] & 0xffff;
-    l[3] = line_ram[0x15e0*2] & 0xffff;
-    bufptr += sprintf(bufptr,"5000: %04x %04x %04x %04x\n", l[0], l[1], l[2], l[3]);
-
-    machine().ui().draw_text(&machine().render().ui_container(), buf, 60, 40); */
+#if (TAITOF3_VIDEO_DEBUG)
+	const u16 *line_ram = m_line_ram;
+	popmessage("%04X %04X %04X %04X %04X %04X %04X %04X\n"
+			   "%04X %04X %04X %04X %04X %04X %04X %04X\n"
+			   "%04X %04X %04X %04X %04X %04X %04X %04X\n"
+			   "Ctr1: %04x %04x %04x %04x\n"
+			   "Ctr2: %04x %04x %04x %04x\n"
+			   "Colm: %04x %04x %04x %04x\n"
+			   "Clip: %04x %04x %04x %04x\n"
+			   "Sprt: %04x %04x %04x %04x\n"
+			   "Pivt: %04x %04x %04x %04x\n"
+			   "Zoom: %04x %04x %04x %04x\n"
+			   "Line: %04x %04x %04x %04x\n"
+			   "Pri : %04x %04x %04x %04x\n",
+			   m_spriteram16_buffered[0], m_spriteram16_buffered[1], m_spriteram16_buffered[2], m_spriteram16_buffered[3], m_spriteram16_buffered[4], m_spriteram16_buffered[5], m_spriteram16_buffered[6], m_spriteram16_buffered[7],
+			   m_spriteram16_buffered[8], m_spriteram16_buffered[9], m_spriteram16_buffered[10], m_spriteram16_buffered[11], m_spriteram16_buffered[12], m_spriteram16_buffered[13], m_spriteram16_buffered[14], m_spriteram16_buffered[15],
+			   m_spriteram16_buffered[16], m_spriteram16_buffered[17], m_spriteram16_buffered[18], m_spriteram16_buffered[19], m_spriteram16_buffered[20], m_spriteram16_buffered[21], m_spriteram16_buffered[22], m_spriteram16_buffered[23],
+			   line_ram[0x0100/2] & 0xffff, line_ram[0x0300/2] & 0xffff, line_ram[0x0500/2] & 0xffff, line_ram[0x0700/2] & 0xffff,
+			   line_ram[0x0900/2] & 0xffff, line_ram[0x0b00/2] & 0xffff, line_ram[0x0d00/2] & 0xffff, line_ram[0x0f00/2] & 0xffff,
+			   line_ram[0x4180/2] & 0xffff, line_ram[0x4380/2] & 0xffff, line_ram[0x4580/2] & 0xffff, line_ram[0x4780/2] & 0xffff,
+			   line_ram[0x5180/2] & 0xffff, line_ram[0x5380/2] & 0xffff, line_ram[0x5580/2] & 0xffff, line_ram[0x5780/2] & 0xffff,
+			   line_ram[0x6180/2] & 0xffff, line_ram[0x6380/2] & 0xffff, line_ram[0x6580/2] & 0xffff, line_ram[0x6780/2] & 0xffff,
+			   line_ram[0x7180/2] & 0xffff, line_ram[0x7380/2] & 0xffff, line_ram[0x7580/2] & 0xffff, line_ram[0x7780/2] & 0xffff,
+			   line_ram[0x8180/2] & 0xffff, line_ram[0x8380/2] & 0xffff, line_ram[0x8580/2] & 0xffff, line_ram[0x8780/2] & 0xffff,
+			   line_ram[0xa180/2] & 0xffff, line_ram[0xa380/2] & 0xffff, line_ram[0xa580/2] & 0xffff, line_ram[0xa780/2] & 0xffff,
+			   line_ram[0xb180/2] & 0xffff, line_ram[0xb380/2] & 0xffff, line_ram[0xb580/2] & 0xffff, line_ram[0xb780/2] & 0xffff)
+#endif
 }
 
 /******************************************************************************/
@@ -1841,6 +1808,7 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 	}
 
 	tilemap_t* tm = tmap;
+	const u16* pfdata = pf_data_n;
 
 	y = y_start;
 	while (y != y_end)
@@ -1848,30 +1816,34 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 		u32 x_index_fx;
 		u32 y_index;
 
-		/* The football games use values in the range 0x200 - 0x3ff where the crowd should be drawn - !?
+		/* lines with 0x0200 set in column scroll look up in alternate tilemaps
+		   playfield 3 2000 -> 4000, playfield 4 3000 -> 5000 (non-extended only?)
+		   used by kaiserkn (high scores), kirameki, football games (crowd, goals)
 
-		   This appears to cause it to reference outside of the normal tilemap RAM area into the unused
-		   area on the 32x32 tilemap configuration.. but exactly how isn't understood
-
-		    Until this is understood we're creating additional tilemaps for the otherwise unused area of
-		    RAM and forcing it to look up there.
-
-		    the crowd area still seems to 'lag' behind the pitch area however.. but these are the values
-		    in ram??
+		   there's some seemingly unrelated issue with the timing of y scrolling,
+		   causing the pitch to scroll ahead of crowd areas
 		*/
 		const int cs = _colscroll[y];
-
 		if (cs & 0x200)
 		{
 			if (m_tilemap[4] && m_tilemap[5])
 			{
-				if (tmap == m_tilemap[2]) tmap = m_tilemap[4]; // pitch -> crowd
-				if (tmap == m_tilemap[3]) tmap = m_tilemap[5]; // corruption on goals -> blank (hthero94)
+				if (tmap == m_tilemap[2])
+				{
+					tmap = m_tilemap[4];
+					pf_data_n = m_pf_data[4];
+				}
+				else if (tmap == m_tilemap[3])
+				{
+					tmap = m_tilemap[5];
+					pf_data_n = m_pf_data[5];
+				}
 			}
 		}
 		else
 		{
 			tmap = tm;
+			pf_data_n = pfdata;
 		}
 
 		/* set pixmap pointer */
