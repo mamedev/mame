@@ -12,7 +12,7 @@ license:CC0-1.0
     (it also needs confirming if US / UK cartridges are different, dumps are all from UK cartridges)
 
 -->
-<softwarelist name="leapfrog_zippity_cart" description="LeapFrog Zippity Cartridges">
+<softwarelist name="leapfrog_zippity_cart" description="LeapFrog Zippity cartridges">
 
 	<software name="prinfrog" supported="no">
 		<description>The Princess and the Frog - Magical Bayou Adventure (UK)</description>
