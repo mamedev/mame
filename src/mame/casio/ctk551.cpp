@@ -227,11 +227,11 @@ public:
 
 	TIMER_CALLBACK_MEMBER(nmi_clear) { m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); }
 
-	DECLARE_WRITE_LINE_MEMBER(pwm_row_w) { m_pwm->write_my(state); }
-	DECLARE_WRITE_LINE_MEMBER(pwm_col_w) { m_pwm->write_mx(state ^ 0xff);  }
+	void pwm_row_w(int state) { m_pwm->write_my(state); }
+	void pwm_col_w(int state) { m_pwm->write_mx(state ^ 0xff);  }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(lcd_r)   { return m_lcdc->db_r() >> 4; }
-	DECLARE_WRITE_LINE_MEMBER(lcd_w)
+	void lcd_w(int state)
 	{
 		m_lcd_data = state << 4;
 		m_lcdc->db_w(m_lcd_data);
@@ -243,7 +243,7 @@ public:
 	template <unsigned Bit>
 	DECLARE_CUSTOM_INPUT_MEMBER(lcd_bit_r) { return BIT(m_lcdc->db_r(), Bit); }
 	template <unsigned Bit>
-	DECLARE_WRITE_LINE_MEMBER(lcd_bit_w)
+	void lcd_bit_w(int state)
 	{
 		m_lcd_data = (m_lcd_data & ~(1 << Bit)) | (state << Bit);
 		m_lcdc->db_w(m_lcd_data);
@@ -257,15 +257,15 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(power_w);
 	DECLARE_INPUT_CHANGED_MEMBER(switch_power_w);
 
-	DECLARE_WRITE_LINE_MEMBER(inputs_w) { m_input_sel = state; }
+	void inputs_w(int state) { m_input_sel = state; }
 	DECLARE_CUSTOM_INPUT_MEMBER(inputs_r);
 
 	void dsp_data_w(uint8_t data);
 	void dsp_cmd_w(uint8_t cmd);
 
-	DECLARE_WRITE_LINE_MEMBER(led_touch_w) { m_led_touch = state; }
+	void led_touch_w(int state) { m_led_touch = state; }
 	void led_console_w(uint8_t state);
-	DECLARE_WRITE_LINE_MEMBER(apo_w);
+	void apo_w(int state);
 
 private:
 	void ap10_map(address_map& map);
@@ -299,7 +299,7 @@ private:
 	uint8_t m_lcd_data{};
 	uint32_t m_dsp_data{};
 
-	DECLARE_WRITE_LINE_MEMBER(render_w);
+	void render_w(int state);
 };
 
 INPUT_CHANGED_MEMBER(ctk551_state::switch_w)
@@ -363,7 +363,7 @@ void ctk551_state::led_console_w(uint8_t state)
 		m_led_console[i] = !BIT(state, i);
 }
 
-WRITE_LINE_MEMBER(ctk551_state::apo_w)
+void ctk551_state::apo_w(int state)
 {
 	logerror("apo_w: %x\n", state);
 	/* auto power off - disable the LCD and speakers
@@ -380,7 +380,7 @@ WRITE_LINE_MEMBER(ctk551_state::apo_w)
 }
 
 
-WRITE_LINE_MEMBER(ctk551_state::render_w)
+void ctk551_state::render_w(int state)
 {
 	if(!state)
 		return;

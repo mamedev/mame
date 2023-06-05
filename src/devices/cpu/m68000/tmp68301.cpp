@@ -483,7 +483,7 @@ void tmp68301_device::iisr_w(offs_t, u16 data, u16 mem_mask)
 			s = s + ' ' + interrupt_slot_names[i];
 	if(s.empty())
 		s = " (none)";
-	//	logerror("interrupt in service%s\n", s);
+	//  logerror("interrupt in service%s\n", s);
 }
 
 void tmp68301_device::ivnr_w(u8 data)

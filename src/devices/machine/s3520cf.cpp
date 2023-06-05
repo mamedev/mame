@@ -282,19 +282,19 @@ inline void s3520cf_device::rtc_write(u8 offset,u8 data)
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ_LINE_MEMBER( s3520cf_device::read_bit )
+int s3520cf_device::read_bit()
 {
 	return m_read_latch;
 }
 
-WRITE_LINE_MEMBER( s3520cf_device::set_dir_line )
+void s3520cf_device::set_dir_line(int state)
 {
 	//printf("%d DIR LINE\n",state);
 
 	m_dir = state;
 }
 
-WRITE_LINE_MEMBER( s3520cf_device::set_cs_line )
+void s3520cf_device::set_cs_line(int state)
 {
 	m_reset_line = state;
 
@@ -308,13 +308,13 @@ WRITE_LINE_MEMBER( s3520cf_device::set_cs_line )
 	}
 }
 
-WRITE_LINE_MEMBER( s3520cf_device::write_bit )
+void s3520cf_device::write_bit(int state)
 {
 	m_latch = state;
 //  printf("%d LATCH LINE\n",state);
 }
 
-WRITE_LINE_MEMBER( s3520cf_device::set_clock_line )
+void s3520cf_device::set_clock_line(int state)
 {
 	// NOTE: this device use 1-cycle (8 clocks) delayed data output
 	if(state == 1 && m_reset_line == CLEAR_LINE)

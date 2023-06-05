@@ -430,7 +430,7 @@ void truxton2_state::machine_start()
 }
 
 
-WRITE_LINE_MEMBER(toaplan2_state::toaplan2_reset)
+void toaplan2_state::toaplan2_reset(int state)
 {
 	if (m_audiocpu != nullptr)
 		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
@@ -663,7 +663,7 @@ void toaplan2_state::shared_ram_w(offs_t offset, u8 data)
 }
 
 
-READ_LINE_MEMBER(toaplan2_state::c2map_r)
+int toaplan2_state::c2map_r()
 {
 	// For Teki Paki hardware
 	// bit 4 high signifies secondary CPU is ready

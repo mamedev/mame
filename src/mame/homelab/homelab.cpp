@@ -106,7 +106,7 @@ public:
 	void homelab3(machine_config &config);
 	void brailab4(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(cass3_r);
+	int cass3_r();
 
 protected:
 	virtual void machine_start() override;
@@ -184,7 +184,7 @@ void homelab3_state::portff_w(u8 data)
 	m_bank1->set_entry(0);
 }
 
-READ_LINE_MEMBER( homelab3_state::cass3_r )
+int homelab3_state::cass3_r()
 {
 	return (m_cass->input() > 0.03);
 }

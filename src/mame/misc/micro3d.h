@@ -58,7 +58,7 @@ public:
 	void init_micro3d();
 	void init_botss();
 
-	DECLARE_READ_LINE_MEMBER(botss_hwchk_r);
+	int botss_hwchk_r();
 
 protected:
 	virtual void machine_start() override;
@@ -177,11 +177,11 @@ private:
 	INTERRUPT_GEN_MEMBER(micro3d_vblank);
 	TIMER_CALLBACK_MEMBER(mac_done_callback);
 	void micro3d_upd7759_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
+	void duart_irq_handler(int state);
 	uint8_t duart_input_r();
 	void duart_output_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(duart_txb);
-	DECLARE_WRITE_LINE_MEMBER(tms_interrupt);
+	void duart_txb(int state);
+	void tms_interrupt(int state);
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
 
 	/* 3D graphics */

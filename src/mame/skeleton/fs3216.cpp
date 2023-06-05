@@ -54,7 +54,7 @@ private:
 	void mmu_reg_w(offs_t offset, u16 data);
 	u16 mmu_read(offs_t offset, u16 mem_mask);
 	void mmu_write(offs_t offset, u16 data, u16 mem_mask);
-	DECLARE_WRITE_LINE_MEMBER(mmu_reset_w);
+	void mmu_reset_w(int state);
 	void mmu_init_w(u16 data);
 
 	u16 irq_r();
@@ -65,10 +65,10 @@ private:
 	u16 earom_recall_r();
 	u16 earom_store_r();
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_int_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_hdl_w);
-	DECLARE_WRITE_LINE_MEMBER(floppy_idx_w);
+	void fdc_int_w(int state);
+	void fdc_drq_w(int state);
+	void fdc_hdl_w(int state);
+	void floppy_idx_w(int state);
 	void fdc_us_w(u8 data);
 	u16 floppy_select_r(offs_t offset);
 	void floppy_select_w(offs_t offset, u16 data);
@@ -203,7 +203,7 @@ void fs3216_state::mmu_write(offs_t offset, u16 data, u16 mem_mask)
 	m_clb->write16(clbaddr, data, mem_mask);
 }
 
-WRITE_LINE_MEMBER(fs3216_state::mmu_reset_w)
+void fs3216_state::mmu_reset_w(int state)
 {
 	if (state)
 		m_from_reset = true;
@@ -256,7 +256,7 @@ u16 fs3216_state::earom_store_r()
 	return 0xffff;
 }
 
-WRITE_LINE_MEMBER(fs3216_state::fdc_int_w)
+void fs3216_state::fdc_int_w(int state)
 {
 	if (state)
 		m_floppy_status |= 0x02;
@@ -264,7 +264,7 @@ WRITE_LINE_MEMBER(fs3216_state::fdc_int_w)
 		m_floppy_status &= 0xfd;
 }
 
-WRITE_LINE_MEMBER(fs3216_state::fdc_drq_w)
+void fs3216_state::fdc_drq_w(int state)
 {
 	if (state)
 	{
@@ -282,7 +282,7 @@ WRITE_LINE_MEMBER(fs3216_state::fdc_drq_w)
 	}
 }
 
-WRITE_LINE_MEMBER(fs3216_state::fdc_hdl_w)
+void fs3216_state::fdc_hdl_w(int state)
 {
 	if (state)
 		m_floppy_status |= 0x40;
@@ -290,7 +290,7 @@ WRITE_LINE_MEMBER(fs3216_state::fdc_hdl_w)
 		m_floppy_status &= 0xbf;
 }
 
-WRITE_LINE_MEMBER(fs3216_state::floppy_idx_w)
+void fs3216_state::floppy_idx_w(int state)
 {
 	if (state)
 		m_floppy_status |= 0x20;

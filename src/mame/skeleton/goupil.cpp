@@ -110,7 +110,7 @@ public:
 
 	void via_video_pba_w(uint8_t data);
 	void via_video_pbb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(via_video_ca2_w);
+	void via_video_ca2_w(int state);
 
 	void goupil_g1(machine_config &config);
 protected:
@@ -467,7 +467,7 @@ void goupil_g1_state::via_video_pbb_w(uint8_t data)
 	m_via_video_pbb_data = data;
 }
 
-WRITE_LINE_MEMBER( goupil_g1_state::via_video_ca2_w )
+void goupil_g1_state::via_video_ca2_w(int state)
 {
 	if (!m_old_state_ca2 && state)
 	{

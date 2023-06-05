@@ -33,7 +33,7 @@ processor speed is 533MHz <- likely to be a Celeron or a Pentium III class CPU -
 #include "machine/lpci.h"
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
-#include "video/pc_vga.h"
+//#include "video/pc_vga.h"
 
 namespace {
 
@@ -244,7 +244,7 @@ void queen_state::bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 void queen_state::queen_map(address_map &map)
 {
 	map(0x00000000, 0x0009ffff).ram();
-	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
+//	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
 	map(0x000e0000, 0x000effff).bankr("bios_ext").w(FUNC(queen_state::bios_ext_ram_w));
 	map(0x000f0000, 0x000fffff).bankr("bios_bank").w(FUNC(queen_state::bios_ram_w));
 	map(0x00100000, 0x01ffffff).ram();
@@ -259,9 +259,9 @@ void queen_state::queen_io(address_map &map)
 	map(0x0170, 0x0177).rw("ide2", FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
 	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_device::cs0_r), FUNC(ide_controller_device::cs0_w));
 	map(0x0370, 0x0377).rw("ide2", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
-	map(0x03b0, 0x03bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
-	map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
-	map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
+//	map(0x03b0, 0x03bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
+//	map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
+//	map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
 	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_device::cs1_r), FUNC(ide_controller_device::cs1_w));
 
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
@@ -299,19 +299,12 @@ void queen_state::queen(machine_config &config)
 
 	ide_controller_32_device &ide2(IDE_CONTROLLER_32(config, "ide2").options(ata_devices, nullptr, nullptr, true));
 	ide2.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir7_w));
-
-	/* video hardware */
-	pcvideo_vga(config);
 }
 
 
 ROM_START( queen )
 	ROM_REGION32_LE( 0x40000, "bios", 0 )
 	ROM_LOAD( "bios-original.bin", 0x00000, 0x40000, CRC(feb542d4) SHA1(3cc5d8aeb0e3b7d9ed33248a4f3dc507d29debd9) )
-
-	ROM_REGION( 0x8000, "video_bios", ROMREGION_ERASEFF ) // TODO: no VGA card is hooked up, to be removed
-//  ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
-//  ROM_CONTINUE(                                 0x0001, 0x4000 )
 
 	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE( "pqiidediskonmodule", 0,SHA1(a56efcc711b1c5a2e63160b3088001a8c4fb56c2) )

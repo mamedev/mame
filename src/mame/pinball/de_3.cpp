@@ -103,8 +103,8 @@ protected:
 private:
 	void de_bg_audio(machine_config &config);
 	void audio_map(address_map &map);
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(msm5205_irq_w);
+	void ym2151_irq_w(int state);
+	void msm5205_irq_w(int state);
 	uint8_t sound_latch_r();
 	void sample_bank_w(uint8_t data);
 	void sample_w(uint8_t data);
@@ -419,12 +419,12 @@ void de_3_state::lamps_w(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(de_3_state::ym2151_irq_w)
+void de_3_state::ym2151_irq_w(int state)
 {
 	m_audiocpu->set_input_line(M6809_IRQ_LINE,state);
 }
 
-WRITE_LINE_MEMBER(de_3_state::msm5205_irq_w)
+void de_3_state::msm5205_irq_w(int state)
 {
 	m_msm5205->data_w(m_sample_data >> 4);
 	if(m_more_data)

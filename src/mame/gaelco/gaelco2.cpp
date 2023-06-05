@@ -2241,13 +2241,13 @@ ROM_END
 ***************************************************************************/
 
 template <int N>
-READ_LINE_MEMBER(wrally2_state::wrally2_analog_bit_r)
+int wrally2_state::wrally2_analog_bit_r()
 {
 	return (m_analog_ports[N] >> 7) & 0x01;
 }
 
 
-WRITE_LINE_MEMBER(wrally2_state::wrally2_adc_clk)
+void wrally2_state::wrally2_adc_clk(int state)
 {
 	/* a zero/one combo is written here to clock the next analog port bit */
 	if (!state)
@@ -2258,7 +2258,7 @@ WRITE_LINE_MEMBER(wrally2_state::wrally2_adc_clk)
 }
 
 
-WRITE_LINE_MEMBER(wrally2_state::wrally2_adc_cs)
+void wrally2_state::wrally2_adc_cs(int state)
 {
 	/* a zero is written here to read the analog ports, and a one is written when finished */
 	if (!state)

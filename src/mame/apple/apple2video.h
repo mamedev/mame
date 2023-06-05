@@ -24,12 +24,12 @@ public:
 	u32 m_GSborder_colors[16]{}, m_shr_palette[256]{};
 	std::unique_ptr<bitmap_ind16> m_8bit_graphics;
 
-	DECLARE_WRITE_LINE_MEMBER(txt_w);
-	DECLARE_WRITE_LINE_MEMBER(mix_w);
-	DECLARE_WRITE_LINE_MEMBER(scr_w);
-	DECLARE_WRITE_LINE_MEMBER(res_w);
-	DECLARE_WRITE_LINE_MEMBER(dhires_w);
-	DECLARE_WRITE_LINE_MEMBER(an2_w);
+	void txt_w(int state);
+	void mix_w(int state);
+	void scr_w(int state);
+	void res_w(int state);
+	void dhires_w(int state);
+	void an2_w(int state);
 
 	bool get_graphics() const   { return m_graphics; }
 	bool get_hires() const      { return m_hires; }

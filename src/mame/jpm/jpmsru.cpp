@@ -111,12 +111,12 @@ public:
 	void sup2p(machine_config &config);
 	void lal(machine_config &config);
 
-	template <unsigned N> DECLARE_READ_LINE_MEMBER(opto_r) { return m_opto[N]; }
+	template <unsigned N> int opto_r() { return m_opto[N]; }
 protected:
 	virtual void machine_start() override;
 	virtual void device_post_load() override;
 
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(opto_cb) { m_opto[N] = state; }
+	template <unsigned N> void opto_cb(int state) { m_opto[N] = state; }
 
 	uint8_t inputs_r(offs_t offset);
 	uint8_t inputs_ext_r(offs_t offset);

@@ -65,7 +65,7 @@ public:
 	void pc_w(u8 data);
 	void pd_w(u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER(cntr_w);
+	void cntr_w(int state);
 
 protected:
 	enum

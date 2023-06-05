@@ -130,12 +130,12 @@ public:
 	void install_view(offs_t start, offs_t end, memory_view &view);
 	void set_irq_line(int slot, int state);
 
-	DECLARE_WRITE_LINE_MEMBER( irq9_w );
-	DECLARE_WRITE_LINE_MEMBER( irqa_w );
-	DECLARE_WRITE_LINE_MEMBER( irqb_w );
-	DECLARE_WRITE_LINE_MEMBER( irqc_w );
-	DECLARE_WRITE_LINE_MEMBER( irqd_w );
-	DECLARE_WRITE_LINE_MEMBER( irqe_w );
+	void irq9_w(int state);
+	void irqa_w(int state);
+	void irqb_w(int state);
+	void irqc_w(int state);
+	void irqd_w(int state);
+	void irqe_w(int state);
 
 protected:
 	nubus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

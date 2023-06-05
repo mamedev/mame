@@ -324,7 +324,7 @@ uint8_t vrender0soc_device::irq_callback()
 }
 
 
-WRITE_LINE_MEMBER(vrender0soc_device::soundirq_cb)
+void vrender0soc_device::soundirq_cb(int state)
 {
 	if (state)
 	{
@@ -708,7 +708,7 @@ uint32_t vrender0soc_device::screen_update(screen_device &screen, bitmap_ind16 &
 	return 0;
 }
 
-WRITE_LINE_MEMBER(vrender0soc_device::screen_vblank)
+void vrender0soc_device::screen_vblank(int state)
 {
 	// rising edge
 	if (state)

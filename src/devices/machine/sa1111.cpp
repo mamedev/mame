@@ -458,7 +458,7 @@ void sa1111_device::usb_int_test_w(offs_t offset, uint32_t data, uint32_t mem_ma
 
 */
 
-WRITE_LINE_MEMBER(sa1111_device::l3wd_in)
+void sa1111_device::l3wd_in(int state)
 {
 	if (state)
 		m_audio_regs.sasr0 |= (1 << SASR0_L3WD_BIT);

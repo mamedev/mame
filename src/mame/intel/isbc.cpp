@@ -61,11 +61,11 @@ public:
 	void sm1810(machine_config &config);
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
+	void write_centronics_ack(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(isbc86_tmr2_w);
-	DECLARE_WRITE_LINE_MEMBER(isbc286_tmr2_w);
-//  DECLARE_WRITE_LINE_MEMBER(isbc_uart8274_irq);
+	void isbc86_tmr2_w(int state);
+	void isbc286_tmr2_w(int state);
+//  void isbc_uart8274_irq(int state);
 	uint8_t get_slave_ack(offs_t offset);
 	void ppi_c_w(uint8_t data);
 	void upperen_w(uint8_t data);
@@ -74,9 +74,9 @@ private:
 
 	void edge_intr_clear_w(uint8_t data);
 	void status_register_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
-	DECLARE_WRITE_LINE_MEMBER(bus_intr_out1_w);
-	DECLARE_WRITE_LINE_MEMBER(bus_intr_out2_w);
+	void nmi_mask_w(int state);
+	void bus_intr_out1_w(int state);
+	void bus_intr_out2_w(int state);
 	void isbc2861_mem(address_map &map);
 	void isbc286_io(address_map &map);
 	void isbc286_mem(address_map &map);
@@ -253,7 +253,7 @@ static DEVICE_INPUT_DEFAULTS_START( isbc286_terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-WRITE_LINE_MEMBER( isbc_state::isbc86_tmr2_w )
+void isbc_state::isbc86_tmr2_w(int state)
 {
 	m_uart8251->write_rxc(state);
 	m_uart8251->write_txc(state);
@@ -267,13 +267,13 @@ uint8_t isbc_state::get_slave_ack(offs_t offset)
 	return 0x00;
 }
 
-WRITE_LINE_MEMBER( isbc_state::isbc286_tmr2_w )
+void isbc_state::isbc286_tmr2_w(int state)
 {
 	m_uart8274->rxca_w(state);
 	m_uart8274->txca_w(state);
 }
 
-WRITE_LINE_MEMBER( isbc_state::write_centronics_ack )
+void isbc_state::write_centronics_ack(int state)
 {
 	m_cent_status_in->write_bit4(state);
 
@@ -310,7 +310,7 @@ void isbc_state::bioslo_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 }
 
 #if 0
-WRITE_LINE_MEMBER(isbc_state::isbc_uart8274_irq)
+void isbc_state::isbc_uart8274_irq(int state)
 {
 	m_uart8274->m1_r(); // always set
 	m_pic_0->ir6_w(state);
@@ -328,18 +328,18 @@ void isbc_state::status_register_w(uint8_t data)
 	m_statuslatch->write_bit(data & 0x07, BIT(data, 3));
 }
 
-WRITE_LINE_MEMBER(isbc_state::nmi_mask_w)
+void isbc_state::nmi_mask_w(int state)
 {
 	// combined with NMI input by 74LS08 AND gate at U12
 	m_nmi_enable = state;
 }
 
-WRITE_LINE_MEMBER(isbc_state::bus_intr_out1_w)
+void isbc_state::bus_intr_out1_w(int state)
 {
 	// Multibus interrupt request (active high)
 }
 
-WRITE_LINE_MEMBER(isbc_state::bus_intr_out2_w)
+void isbc_state::bus_intr_out2_w(int state)
 {
 	// Multibus interrupt request (active high)
 }

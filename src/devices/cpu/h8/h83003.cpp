@@ -7,36 +7,36 @@ DEFINE_DEVICE_TYPE(H83003, h83003_device, "h83003", "Hitachi H8/3003")
 
 h83003_device::h83003_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8h_device(mconfig, H83003, tag, owner, clock, address_map_constructor(FUNC(h83003_device::map), this)),
-	intc(*this, "intc"),
-	adc(*this, "adc"),
-	dma(*this, "dma"),
-	dma0(*this, "dma:0"),
-	dma1(*this, "dma:1"),
-	dma2(*this, "dma:2"),
-	port4(*this, "port4"),
-	port6(*this, "port6"),
-	port7(*this, "port7"),
-	port8(*this, "port8"),
-	port9(*this, "port9"),
-	porta(*this, "porta"),
-	portb(*this, "portb"),
-	timer16(*this, "timer16"),
-	timer16_0(*this, "timer16:0"),
-	timer16_1(*this, "timer16:1"),
-	timer16_2(*this, "timer16:2"),
-	timer16_3(*this, "timer16:3"),
-	timer16_4(*this, "timer16:4"),
-	sci0(*this, "sci0"),
-	sci1(*this, "sci1"),
-	watchdog(*this, "watchdog"),
-	tend_cb(*this)
+	m_intc(*this, "intc"),
+	m_adc(*this, "adc"),
+	m_dma(*this, "dma"),
+	m_dma0(*this, "dma:0"),
+	m_dma1(*this, "dma:1"),
+	m_dma2(*this, "dma:2"),
+	m_port4(*this, "port4"),
+	m_port6(*this, "port6"),
+	m_port7(*this, "port7"),
+	m_port8(*this, "port8"),
+	m_port9(*this, "port9"),
+	m_porta(*this, "porta"),
+	m_portb(*this, "portb"),
+	m_timer16(*this, "timer16"),
+	m_timer16_0(*this, "timer16:0"),
+	m_timer16_1(*this, "timer16:1"),
+	m_timer16_2(*this, "timer16:2"),
+	m_timer16_3(*this, "timer16:3"),
+	m_timer16_4(*this, "timer16:4"),
+	m_sci0(*this, "sci0"),
+	m_sci1(*this, "sci1"),
+	m_watchdog(*this, "watchdog"),
+	m_tend_cb(*this)
 {
-	syscr = 0;
+	m_syscr = 0;
 }
 
 void h83003_device::map(address_map &map)
 {
-	const offs_t base = mode_a20 ? 0xf0000 : 0xff0000;
+	const offs_t base = m_mode_a20 ? 0xf0000 : 0xff0000;
 
 	map(base | 0xfd10, base | 0xff0f).ram();
 
@@ -191,70 +191,70 @@ void h83003_device::device_add_mconfig(machine_config &config)
 void h83003_device::execute_set_input(int inputnum, int state)
 {
 	if(inputnum >= H8_INPUT_LINE_TEND0 && inputnum <= H8_INPUT_LINE_TEND3) {
-		if(!tend_cb[inputnum - H8_INPUT_LINE_TEND0].isnull())
-			tend_cb[inputnum - H8_INPUT_LINE_TEND0](state);
+		if(!m_tend_cb[inputnum - H8_INPUT_LINE_TEND0].isnull())
+			m_tend_cb[inputnum - H8_INPUT_LINE_TEND0](state);
 	}
 	else if(inputnum >= H8_INPUT_LINE_DREQ0 && inputnum <= H8_INPUT_LINE_DREQ3)
-		dma->set_input(inputnum, state);
+		m_dma->set_input(inputnum, state);
 	else
-		intc->set_input(inputnum, state);
+		m_intc->set_input(inputnum, state);
 }
 
 int h83003_device::trapa_setup()
 {
-	if(syscr & 0x08)
-		CCR |= F_I;
+	if(m_syscr & 0x08)
+		m_CCR |= F_I;
 	else
-		CCR |= F_I|F_UI;
+		m_CCR |= F_I|F_UI;
 	return 8;
 }
 
 void h83003_device::irq_setup()
 {
-	if(syscr & 0x08)
-		CCR |= F_I;
+	if(m_syscr & 0x08)
+		m_CCR |= F_I;
 	else
-		CCR |= F_I|F_UI;
+		m_CCR |= F_I|F_UI;
 }
 
 void h83003_device::update_irq_filter()
 {
-	switch(syscr & 0x08) {
+	switch(m_syscr & 0x08) {
 	case 0x00:
-		if((CCR & (F_I|F_UI)) == (F_I|F_UI))
-			intc->set_filter(2, -1);
-		else if(CCR & F_I)
-			intc->set_filter(1, -1);
+		if((m_CCR & (F_I|F_UI)) == (F_I|F_UI))
+			m_intc->set_filter(2, -1);
+		else if(m_CCR & F_I)
+			m_intc->set_filter(1, -1);
 		else
-			intc->set_filter(0, -1);
+			m_intc->set_filter(0, -1);
 		break;
 	case 0x08:
-		if(CCR & F_I)
-			intc->set_filter(2, -1);
+		if(m_CCR & F_I)
+			m_intc->set_filter(2, -1);
 		else
-			intc->set_filter(0, -1);
+			m_intc->set_filter(0, -1);
 		break;
 	}
 }
 
 void h83003_device::interrupt_taken()
 {
-	standard_irq_callback(intc->interrupt_taken(taken_irq_vector), NPC);
+	standard_irq_callback(m_intc->interrupt_taken(m_taken_irq_vector), m_NPC);
 }
 
 void h83003_device::internal_update(uint64_t current_time)
 {
 	uint64_t event_time = 0;
 
-	add_event(event_time, adc->internal_update(current_time));
-	add_event(event_time, sci0->internal_update(current_time));
-	add_event(event_time, sci1->internal_update(current_time));
-	add_event(event_time, timer16_0->internal_update(current_time));
-	add_event(event_time, timer16_1->internal_update(current_time));
-	add_event(event_time, timer16_2->internal_update(current_time));
-	add_event(event_time, timer16_3->internal_update(current_time));
-	add_event(event_time, timer16_4->internal_update(current_time));
-	add_event(event_time, watchdog->internal_update(current_time));
+	add_event(event_time, m_adc->internal_update(current_time));
+	add_event(event_time, m_sci0->internal_update(current_time));
+	add_event(event_time, m_sci1->internal_update(current_time));
+	add_event(event_time, m_timer16_0->internal_update(current_time));
+	add_event(event_time, m_timer16_1->internal_update(current_time));
+	add_event(event_time, m_timer16_2->internal_update(current_time));
+	add_event(event_time, m_timer16_3->internal_update(current_time));
+	add_event(event_time, m_timer16_4->internal_update(current_time));
+	add_event(event_time, m_watchdog->internal_update(current_time));
 
 	recompute_bcount(event_time);
 }
@@ -262,25 +262,25 @@ void h83003_device::internal_update(uint64_t current_time)
 void h83003_device::device_start()
 {
 	h8h_device::device_start();
-	dma_device = dma;
+	m_dma_device = m_dma;
 
-	tend_cb.resolve_all();
+	m_tend_cb.resolve_all();
 }
 
 void h83003_device::device_reset()
 {
 	h8h_device::device_reset();
-	syscr = 0x09;
+	m_syscr = 0x09;
 }
 
 uint8_t h83003_device::syscr_r()
 {
-	return syscr;
+	return m_syscr;
 }
 
 void h83003_device::syscr_w(uint8_t data)
 {
-	syscr = data;
+	m_syscr = data;
 	update_irq_filter();
 	logerror("syscr = %02x\n", data);
 }
@@ -288,11 +288,11 @@ void h83003_device::syscr_w(uint8_t data)
 uint8_t h83003_device::rtmcsr_r()
 {
 	// set bit 7 -- Compare Match Flag (CMF): This status flag indicates that the RTCNT and RTCOR values have matched.
-	return rtmcsr | 0x80;
+	return m_rtmcsr | 0x80;
 }
 
 void h83003_device::rtmcsr_w(uint8_t data)
 {
-	rtmcsr = data;
+	m_rtmcsr = data;
 	logerror("rtmcsr = %02x\n", data);
 }

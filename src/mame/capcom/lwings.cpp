@@ -106,13 +106,13 @@ void lwings_state::lwings_bankswitch_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(0, data & 0x80);
 }
 
-WRITE_LINE_MEMBER(lwings_state::lwings_interrupt)
+void lwings_state::lwings_interrupt(int state)
 {
 	if (state && m_nmi_mask)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* Z80 - RST 10h */
 }
 
-WRITE_LINE_MEMBER(lwings_state::avengers_interrupt)
+void lwings_state::avengers_interrupt(int state)
 {
 	if (state && m_nmi_mask)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);

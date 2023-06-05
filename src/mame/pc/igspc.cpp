@@ -54,8 +54,8 @@ class speeddrv_state : public driver_device
 {
 public:
 	speeddrv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 	void speeddrv(machine_config &config);

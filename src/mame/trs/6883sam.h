@@ -117,7 +117,7 @@ public:
 		return m_ram_space.read_byte(m_counter & m_counter_mask);
 	}
 
-	DECLARE_WRITE_LINE_MEMBER( hs_w );
+	void hs_w(int state);
 
 protected:
 	// device-level overrides

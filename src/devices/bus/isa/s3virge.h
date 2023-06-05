@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include "video/pc_vga.h"
+#include "video/pc_vga_s3.h"
 
 // ======================> s3virge_vga_device
 
@@ -52,7 +52,6 @@ public:
 		}
 	}
 
-	uint16_t get_crtc_port() { return (vga.miscellaneous_output&1)?0x3d0:0x3b0; }
 	uint32_t get_linear_address() { return s3virge.linear_address; }
 	void set_linear_address(uint32_t addr) { s3virge.linear_address = addr; }
 	uint8_t get_linear_address_size() { return s3virge.linear_address_size; }

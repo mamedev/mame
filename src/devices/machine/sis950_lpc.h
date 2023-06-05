@@ -138,14 +138,14 @@ private:
 	} m_lpc_legacy;
 
 	// SB implementation, to be moved out
-	DECLARE_WRITE_LINE_MEMBER(pit_out0);
-	DECLARE_WRITE_LINE_MEMBER(pit_out1);
-	DECLARE_WRITE_LINE_MEMBER(pit_out2);
+	void pit_out0(int state);
+	void pit_out1(int state);
+	void pit_out2(int state);
 	uint8_t pc_dma_read_byte(offs_t offset);
 	void pc_dma_write_byte(offs_t offset, uint8_t data);
 	uint8_t pc_dma_read_word(offs_t offset);
 	void pc_dma_write_word(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pc_dma_hrq_changed);
+	void pc_dma_hrq_changed(int state);
 	void pc_select_dma_channel(int channel, bool state);
 
 	uint8_t m_at_pages[0x10]{};
@@ -159,8 +159,8 @@ private:
 //  bool m_cur_eop = false;
 	uint16_t m_dma_high_byte = 0;
 
-	DECLARE_WRITE_LINE_MEMBER(cpu_a20_w);
-	DECLARE_WRITE_LINE_MEMBER(cpu_reset_w);
+	void cpu_a20_w(int state);
+	void cpu_reset_w(int state);
 
 	uint8_t at_page8_r(offs_t offset);
 	void at_page8_w(offs_t offset, uint8_t data);

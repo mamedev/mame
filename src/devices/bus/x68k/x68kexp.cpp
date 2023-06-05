@@ -77,7 +77,7 @@ void x68k_expansion_slot_device::device_start()
 }
 
 
-WRITE_LINE_MEMBER( x68k_expansion_slot_device::irq2_w ) { m_out_irq2_cb(state); }
-WRITE_LINE_MEMBER( x68k_expansion_slot_device::irq4_w ) { m_out_irq4_cb(state); }
-WRITE_LINE_MEMBER( x68k_expansion_slot_device::nmi_w ) { m_out_nmi_cb(state); }
-WRITE_LINE_MEMBER( x68k_expansion_slot_device::reset_w ) { m_out_reset_cb(state); }
+void x68k_expansion_slot_device::irq2_w(int state) { m_out_irq2_cb(state); }
+void x68k_expansion_slot_device::irq4_w(int state) { m_out_irq4_cb(state); }
+void x68k_expansion_slot_device::nmi_w(int state) { m_out_nmi_cb(state); }
+void x68k_expansion_slot_device::reset_w(int state) { m_out_reset_cb(state); }

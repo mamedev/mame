@@ -9,31 +9,31 @@ DEFINE_DEVICE_TYPE(H83030, h83030_device, "h83030", "Hitachi H8/3030")
 
 h83032_device::h83032_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start) :
 	h8h_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h83032_device::map), this)),
-	intc(*this, "intc"),
-	adc(*this, "adc"),
-	port1(*this, "port1"),
-	port2(*this, "port2"),
-	port3(*this, "port3"),
-	port5(*this, "port5"),
-	port6(*this, "port6"),
-	port7(*this, "port7"),
-	port8(*this, "port8"),
-	port9(*this, "port9"),
-	porta(*this, "porta"),
-	portb(*this, "portb"),
-	portc(*this, "portc"),
-	timer16(*this, "timer16"),
-	timer16_0(*this, "timer16:0"),
-	timer16_1(*this, "timer16:1"),
-	timer16_2(*this, "timer16:2"),
-	timer16_3(*this, "timer16:3"),
-	timer16_4(*this, "timer16:4"),
-	sci0(*this, "sci0"),
-	watchdog(*this, "watchdog"),
-	ram_start(start),
-	syscr(0)
+	m_intc(*this, "intc"),
+	m_adc(*this, "adc"),
+	m_port1(*this, "port1"),
+	m_port2(*this, "port2"),
+	m_port3(*this, "port3"),
+	m_port5(*this, "port5"),
+	m_port6(*this, "port6"),
+	m_port7(*this, "port7"),
+	m_port8(*this, "port8"),
+	m_port9(*this, "port9"),
+	m_porta(*this, "porta"),
+	m_portb(*this, "portb"),
+	m_portc(*this, "portc"),
+	m_timer16(*this, "timer16"),
+	m_timer16_0(*this, "timer16:0"),
+	m_timer16_1(*this, "timer16:1"),
+	m_timer16_2(*this, "timer16:2"),
+	m_timer16_3(*this, "timer16:3"),
+	m_timer16_4(*this, "timer16:4"),
+	m_sci0(*this, "sci0"),
+	m_watchdog(*this, "watchdog"),
+	m_ram_start(start),
+	m_syscr(0)
 {
-	mode_a20 = true;
+	m_mode_a20 = true;
 }
 
 h83032_device::h83032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -55,7 +55,7 @@ void h83032_device::map(address_map &map)
 {
 	const offs_t base = 0xf0000; // 0 in mode 2, aka 16-bits address space, currently unemulated
 
-	map(base | ram_start, base | 0xfeff).ram();
+	map(base | m_ram_start, base | 0xfeff).ram();
 
 	map(base | 0xff60, base | 0xff60).rw("timer16", FUNC(h8_timer16_device::tstr_r), FUNC(h8_timer16_device::tstr_w));
 	map(base | 0xff61, base | 0xff61).rw("timer16", FUNC(h8_timer16_device::tsyr_r), FUNC(h8_timer16_device::tsyr_w));
@@ -168,63 +168,63 @@ void h83032_device::device_add_mconfig(machine_config &config)
 
 void h83032_device::execute_set_input(int inputnum, int state)
 {
-	intc->set_input(inputnum, state);
+	m_intc->set_input(inputnum, state);
 }
 
 int h83032_device::trapa_setup()
 {
-	if(syscr & 0x08)
-		CCR |= F_I;
+	if(m_syscr & 0x08)
+		m_CCR |= F_I;
 	else
-		CCR |= F_I|F_UI;
+		m_CCR |= F_I|F_UI;
 	return 8;
 }
 
 void h83032_device::irq_setup()
 {
-	if(syscr & 0x08)
-		CCR |= F_I;
+	if(m_syscr & 0x08)
+		m_CCR |= F_I;
 	else
-		CCR |= F_I|F_UI;
+		m_CCR |= F_I|F_UI;
 }
 
 void h83032_device::update_irq_filter()
 {
-	switch(syscr & 0x08) {
+	switch(m_syscr & 0x08) {
 	case 0x00:
-		if((CCR & (F_I|F_UI)) == (F_I|F_UI))
-			intc->set_filter(2, -1);
-		else if(CCR & F_I)
-			intc->set_filter(1, -1);
+		if((m_CCR & (F_I|F_UI)) == (F_I|F_UI))
+			m_intc->set_filter(2, -1);
+		else if(m_CCR & F_I)
+			m_intc->set_filter(1, -1);
 		else
-			intc->set_filter(0, -1);
+			m_intc->set_filter(0, -1);
 		break;
 	case 0x08:
-		if(CCR & F_I)
-			intc->set_filter(2, -1);
+		if(m_CCR & F_I)
+			m_intc->set_filter(2, -1);
 		else
-			intc->set_filter(0, -1);
+			m_intc->set_filter(0, -1);
 		break;
 	}
 }
 
 void h83032_device::interrupt_taken()
 {
-	standard_irq_callback(intc->interrupt_taken(taken_irq_vector), NPC);
+	standard_irq_callback(m_intc->interrupt_taken(m_taken_irq_vector), m_NPC);
 }
 
 void h83032_device::internal_update(uint64_t current_time)
 {
 	uint64_t event_time = 0;
 
-	add_event(event_time, adc->internal_update(current_time));
-	add_event(event_time, sci0->internal_update(current_time));
-	add_event(event_time, timer16_0->internal_update(current_time));
-	add_event(event_time, timer16_1->internal_update(current_time));
-	add_event(event_time, timer16_2->internal_update(current_time));
-	add_event(event_time, timer16_3->internal_update(current_time));
-	add_event(event_time, timer16_4->internal_update(current_time));
-	add_event(event_time, watchdog->internal_update(current_time));
+	add_event(event_time, m_adc->internal_update(current_time));
+	add_event(event_time, m_sci0->internal_update(current_time));
+	add_event(event_time, m_timer16_0->internal_update(current_time));
+	add_event(event_time, m_timer16_1->internal_update(current_time));
+	add_event(event_time, m_timer16_2->internal_update(current_time));
+	add_event(event_time, m_timer16_3->internal_update(current_time));
+	add_event(event_time, m_timer16_4->internal_update(current_time));
+	add_event(event_time, m_watchdog->internal_update(current_time));
 
 	recompute_bcount(event_time);
 }
@@ -237,17 +237,17 @@ void h83032_device::device_start()
 void h83032_device::device_reset()
 {
 	h8h_device::device_reset();
-	syscr = 0x0b;
+	m_syscr = 0x0b;
 }
 
 uint8_t h83032_device::syscr_r()
 {
-	return syscr;
+	return m_syscr;
 }
 
 void h83032_device::syscr_w(uint8_t data)
 {
-	syscr = data;
+	m_syscr = data;
 	update_irq_filter();
 	logerror("syscr = %02x\n", data);
 }

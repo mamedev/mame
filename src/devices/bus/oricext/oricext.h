@@ -53,8 +53,8 @@ protected:
 class device_oricext_interface : public device_interface
 {
 public:
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	DECLARE_WRITE_LINE_MEMBER(reset_w);
+	void irq_w(int state);
+	void reset_w(int state);
 
 	void set_view(memory_view &view);
 	virtual void map_io(address_space_installer &space) = 0;

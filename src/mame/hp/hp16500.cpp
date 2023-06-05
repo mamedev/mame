@@ -103,8 +103,8 @@ private:
 	void pal_b_w(uint8_t data);
 
 	void maskval_w(uint16_t data);
-	DECLARE_WRITE_LINE_MEMBER(irq_2);
-	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
+	void irq_2(int state);
+	void vsync_changed(int state);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_UPDATE_ROW(crtc_update_row_1650);
 
@@ -137,7 +137,7 @@ void hp16500_state::vbl_ack16_w(uint16_t data)
 	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( hp16500_state::vsync_changed )
+void hp16500_state::vsync_changed(int state)
 {
 	if (state)
 	{
@@ -219,7 +219,7 @@ void hp16500_state::maskval_w(uint16_t data)
 	m_mask = (data & 0xff) ^ 0xff;
 }
 
-WRITE_LINE_MEMBER(hp16500_state::irq_2)
+void hp16500_state::irq_2(int state)
 {
 	m_maincpu->set_input_line(M68K_IRQ_2, state);
 }

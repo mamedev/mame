@@ -31,8 +31,8 @@ public:
 	auto rom_out_cb() { return m_rom_out_cb.bind(); }
 
 	// control line handlers
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
-	DECLARE_WRITE_LINE_MEMBER(reset_w);
+	void clock_w(int state);
+	void reset_w(int state);
 
 	// getters
 	u32 count() const { return m_count; }

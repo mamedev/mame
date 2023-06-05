@@ -133,9 +133,9 @@ private:
 
 	void mem_map(address_map &map);
 
-	WRITE_LINE_MEMBER(midi_r) { m_rx_data = state; }
+	void midi_r(int state) { m_rx_data = state; }
 
-	WRITE_LINE_MEMBER(midiclock_w) { if (state) m_maincpu->m6801_clock_serial(); }
+	void midiclock_w(int state) { if (state) m_maincpu->m6801_clock_serial(); }
 
 	/**
 	 * @brief Handle a write to the synth's IO Port 1.

@@ -215,14 +215,14 @@ private:
 	void lisa_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t lisa_IO_r(offs_t offset, uint16_t mem_mask = ~0);
 	void lisa_IO_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(diag1_w);
-	DECLARE_WRITE_LINE_MEMBER(diag2_w);
-	DECLARE_WRITE_LINE_MEMBER(seg1_w);
-	DECLARE_WRITE_LINE_MEMBER(seg2_w);
-	DECLARE_WRITE_LINE_MEMBER(setup_w);
-	DECLARE_WRITE_LINE_MEMBER(vtmsk_w);
-	DECLARE_WRITE_LINE_MEMBER(sfmsk_w);
-	DECLARE_WRITE_LINE_MEMBER(hdmsk_w);
+	void diag1_w(int state);
+	void diag2_w(int state);
+	void seg1_w(int state);
+	void seg2_w(int state);
+	void setup_w(int state);
+	void vtmsk_w(int state);
+	void sfmsk_w(int state);
+	void hdmsk_w(int state);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -234,9 +234,9 @@ private:
 	TIMER_CALLBACK_MEMBER(read_COPS_command);
 	TIMER_CALLBACK_MEMBER(set_COPS_ready);
 	void COPS_via_out_a(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(COPS_via_out_ca2);
+	void COPS_via_out_ca2(int state);
 	void COPS_via_out_b(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(COPS_via_out_cb2);
+	void COPS_via_out_cb2(int state);
 
 	void field_interrupts();
 	void set_parity_error_pending(int value);

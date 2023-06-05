@@ -4,9 +4,9 @@
 
     PIIX4E ISA interface
 
-	TODO:
-	- i82371ab PIIX4 / i82371mb PIIX4M dispatches
-	- pinpoint actual differences wrt i82371sb (definitely EISA, then ...?)
+    TODO:
+    - i82371ab PIIX4 / i82371mb PIIX4M dispatches
+    - pinpoint actual differences wrt i82371sb (definitely EISA, then ...?)
 
 **************************************************************************************************/
 
@@ -43,7 +43,7 @@ i82371eb_isa_device::i82371eb_isa_device(const machine_config &mconfig, const ch
 void i82371eb_isa_device::config_map(address_map &map)
 {
 	i82371sb_isa_device::config_map(map);
-//	map(0x90, 0x91) PDMACFG
-//	map(0xb0, 0xb0) GENCFG
+//  map(0x90, 0x91) PDMACFG
+//  map(0xb0, 0xb0) GENCFG
 
 }

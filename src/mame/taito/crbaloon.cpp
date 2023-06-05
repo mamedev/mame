@@ -352,7 +352,7 @@ void crbaloon_state::machine_reset()
  *
  *************************************/
 
-WRITE_LINE_MEMBER(crbaloon_state::vbl_int_w)
+void crbaloon_state::vbl_int_w(int state)
 {
 	if (state && m_irq_mask)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);

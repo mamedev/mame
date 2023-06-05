@@ -88,7 +88,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(master_scanline);
-	DECLARE_WRITE_LINE_MEMBER(slave_vblank_irq);
+	void slave_vblank_irq(int state);
 
 	uint8_t irq_enable_r();
 	void irq_disable_w(uint8_t data);
@@ -690,7 +690,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos16_state::master_scanline)
 	}
 }
 
-WRITE_LINE_MEMBER(namcos16_state::slave_vblank_irq)
+void namcos16_state::slave_vblank_irq(int state)
 {
 	if (state && m_slave_irq_enable == true)
 		m_slave_cpu->set_input_line(6, HOLD_LINE);

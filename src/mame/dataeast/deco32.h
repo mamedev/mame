@@ -193,7 +193,7 @@ private:
 	void sprite1_color_bank_w(u8 data);
 	void sprite2_color_bank_w(u8 data);
 	void tattass_control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(tattass_sound_irq_w);
+	void tattass_sound_irq_w(int state);
 	u16 nslasher_debug_r();
 
 	virtual void video_start() override;

@@ -34,7 +34,7 @@ public:
 	void mpu_map(address_map &map);
 
 	// port B DMA interface
-	DECLARE_WRITE_LINE_MEMBER(breq_w);
+	void breq_w(int state);
 
 protected:
 	// device-specific overrides

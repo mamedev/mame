@@ -74,7 +74,7 @@ private:
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	void master_map(address_map &map);
 	void masterj_map(address_map &map);
 	void sei80bu_encrypted_full_map(address_map &map);

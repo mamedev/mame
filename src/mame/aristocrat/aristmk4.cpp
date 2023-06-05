@@ -428,15 +428,15 @@ private:
 	uint8_t cashcade_r();
 	void mk4_printer_w(uint8_t data);
 	uint8_t mk4_printer_r();
-	DECLARE_WRITE_LINE_MEMBER(mkiv_pia_ca2);
-	DECLARE_WRITE_LINE_MEMBER(mkiv_pia_cb2);
+	void mkiv_pia_ca2(int state);
+	void mkiv_pia_cb2(int state);
 	void mkiv_pia_outb(uint8_t data);
 	uint8_t via_a_r();
 	uint8_t via_b_r();
 	void via_a_w(uint8_t data);
 	void via_b_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(via_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(via_cb2_w);
+	void via_ca2_w(int state);
+	void via_cb2_w(int state);
 	void pblp_out(uint8_t data);
 	void pbltlp_out(uint8_t data);
 	void zn434_w(uint8_t data);
@@ -696,14 +696,14 @@ void aristmk4_state::mkiv_pia_outa(uint8_t data)
 }
 
 //output ca2
-WRITE_LINE_MEMBER(aristmk4_state::mkiv_pia_ca2)
+void aristmk4_state::mkiv_pia_ca2(int state)
 {
 	m_rtc_address_strobe = state;
 	// logerror("address strobe %02X\n", address_strobe);
 }
 
 //output cb2
-WRITE_LINE_MEMBER(aristmk4_state::mkiv_pia_cb2)
+void aristmk4_state::mkiv_pia_cb2(int state)
 {
 	m_rtc_data_strobe = state;
 	//logerror("data strobe: %02X\n", data);
@@ -937,13 +937,13 @@ void aristmk4_state::via_b_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(aristmk4_state::via_ca2_w)
+void aristmk4_state::via_ca2_w(int state)
 {
 	// CA2 is connected to CDSOL1 on schematics ?
 	//logerror("Via Port CA2 write %02X\n",data) ;
 }
 
-WRITE_LINE_MEMBER(aristmk4_state::via_cb2_w)
+void aristmk4_state::via_cb2_w(int state)
 {
 	// CB2 = hopper motor (HOPMO1). When it is 0x01, it is not running (active low)
 	// when it goes to 0, we're expecting to coins to be paid out, handled in via_b_r

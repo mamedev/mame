@@ -14,7 +14,7 @@ public:
 	uts_extw_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual DECLARE_WRITE_LINE_MEMBER(ready_w) override;
+	virtual void ready_w(int state) override;
 
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
@@ -26,8 +26,8 @@ private:
 	void p1_w(u8 data);
 	void p2_w(u8 data);
 	void t0_clock(u32 clk);
-	DECLARE_READ_LINE_MEMBER(t1_r);
-	DECLARE_WRITE_LINE_MEMBER(prog_w);
+	int t1_r();
+	void prog_w(int state);
 
 	void prog_map(address_map &map);
 	void ext_map(address_map &map);

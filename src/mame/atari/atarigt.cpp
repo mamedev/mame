@@ -82,7 +82,7 @@ INTERRUPT_GEN_MEMBER(atarigt_state::scanline_int_gen)
 }
 
 
-WRITE_LINE_MEMBER(atarigt_state::video_int_write_line)
+void atarigt_state::video_int_write_line(int state)
 {
 	if (state)
 	{

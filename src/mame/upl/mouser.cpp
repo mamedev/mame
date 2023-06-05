@@ -66,13 +66,13 @@ private:
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_decrypted_opcodes;
 
-	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
+	void nmi_enable_w(int state);
 	void sound_nmi_clear_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
+	void flip_screen_x_w(int state);
+	void flip_screen_y_w(int state);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(nmi_interrupt);
+	void nmi_interrupt(int state);
 	INTERRUPT_GEN_MEMBER(sound_nmi_assert);
 	void decrypted_opcodes_map(address_map &map);
 	void main_map(address_map &map);
@@ -127,12 +127,12 @@ void mouser_state::palette(palette_device &palette) const
 	}
 }
 
-WRITE_LINE_MEMBER(mouser_state::flip_screen_x_w)
+void mouser_state::flip_screen_x_w(int state)
 {
 	flip_screen_x_set(!state);
 }
 
-WRITE_LINE_MEMBER(mouser_state::flip_screen_y_w)
+void mouser_state::flip_screen_y_w(int state)
 {
 	flip_screen_y_set(!state);
 }
@@ -237,14 +237,14 @@ uint32_t mouser_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 // machine
 
 // Mouser has external masking circuitry around the NMI input on the main CPU
-WRITE_LINE_MEMBER(mouser_state::nmi_enable_w)
+void mouser_state::nmi_enable_w(int state)
 {
 	m_nmi_enable = state;
 	if (!m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(mouser_state::nmi_interrupt)
+void mouser_state::nmi_interrupt(int state)
 {
 	if (state && m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);

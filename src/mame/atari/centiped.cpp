@@ -581,13 +581,13 @@ uint8_t centiped_state::milliped_IN2_r()
 	return data;
 }
 
-WRITE_LINE_MEMBER(centiped_state::input_select_w)
+void centiped_state::input_select_w(int state)
 {
 	m_dsw_select = !state;
 }
 
 /* used P2 controls if 1, P1 controls if 0 */
-WRITE_LINE_MEMBER(centiped_state::control_select_w)
+void centiped_state::control_select_w(int state)
 {
 	m_control_select = state;
 }
@@ -635,25 +635,25 @@ uint8_t centiped_state::caterplr_unknown_r()
 }
 
 
-WRITE_LINE_MEMBER(centiped_state::coin_counter_left_w)
+void centiped_state::coin_counter_left_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
 
-WRITE_LINE_MEMBER(centiped_state::coin_counter_center_w)
+void centiped_state::coin_counter_center_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
 
-WRITE_LINE_MEMBER(centiped_state::coin_counter_right_w)
+void centiped_state::coin_counter_right_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(2, state);
 }
 
 
-WRITE_LINE_MEMBER(centiped_state::bullsdrt_coin_count_w)
+void centiped_state::bullsdrt_coin_count_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }

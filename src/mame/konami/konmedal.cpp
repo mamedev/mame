@@ -137,8 +137,8 @@ private:
 
 	K056832_CB_MEMBER(tile_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(konmedal_scanline);
-	WRITE_LINE_MEMBER(vbl_ack_w) { m_maincpu->set_input_line(0, CLEAR_LINE); }
-	WRITE_LINE_MEMBER(nmi_ack_w) { m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); }
+	void vbl_ack_w(int state) { m_maincpu->set_input_line(0, CLEAR_LINE); }
+	void nmi_ack_w(int state) { m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); }
 	void ccu_int_time_w(uint8_t data) { m_ccu_int_time = data; }
 	void k056832_w(offs_t offset, uint8_t data) { m_k056832->write(offset ^ 1, data); }
 	void k056832_b_w(offs_t offset, uint8_t data) { m_k056832->b_w(offset ^ 1, data); }

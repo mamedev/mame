@@ -77,22 +77,22 @@ public:
 private:
 	static void floppy_formats(format_registration &fr);
 
-	DECLARE_WRITE_LINE_MEMBER(i8086_lock_w);
+	void i8086_lock_w(int state);
 	void i8089_ca1_w(uint8_t data);
 	void i8089_ca2_w(uint8_t data);
 	void i8255_portb_w(uint8_t data);
 	uint8_t i8255_portc_r();
 	void i8255_portc_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
+	void fdc_intrq_w(int state);
 	uint8_t sio_da_r();
 	uint8_t sio_ca_r();
 	uint8_t sio_db_r();
 	uint8_t sio_cb_r();
 
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
+	void write_centronics_fault(int state);
+	void write_centronics_perror(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(apricot_hd6845_de) { m_display_enabled = state; };
+	void apricot_hd6845_de(int state) { m_display_enabled = state; };
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint32_t screen_update_apricot(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -148,14 +148,14 @@ void apricot_state::i8089_ca2_w(uint8_t data)
 	m_iop->ca_w(0);
 }
 
-WRITE_LINE_MEMBER( apricot_state::write_centronics_fault )
+void apricot_state::write_centronics_fault(int state)
 {
 	m_centronics_fault = state;
 	m_sio->syncb_w(state);
 	m_ppi->pc2_w(state);
 }
 
-WRITE_LINE_MEMBER( apricot_state::write_centronics_perror )
+void apricot_state::write_centronics_perror(int state)
 {
 	m_centronics_perror = state;
 }
@@ -247,7 +247,7 @@ uint8_t apricot_state::sio_db_r()
 //  FLOPPY
 //**************************************************************************
 
-WRITE_LINE_MEMBER( apricot_state::fdc_intrq_w )
+void apricot_state::fdc_intrq_w(int state)
 {
 	m_pic->ir4_w(state);
 	m_iop->ext1_w(state);
@@ -324,7 +324,7 @@ void apricot_state::machine_start()
 	membank("ram")->set_base(m_ram->pointer());
 }
 
-WRITE_LINE_MEMBER( apricot_state::i8086_lock_w )
+void apricot_state::i8086_lock_w(int state)
 {
 	m_bus_locked = state;
 }

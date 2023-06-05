@@ -38,10 +38,10 @@ public:
 	template <typename... T> void set_rom_tag(T &&... args) { m_rom.set_tag(std::forward<T>(args)...); }
 	void set_ram_info(u32 *ram, u32 size);
 
-	DECLARE_WRITE_LINE_MEMBER(cb1_w);
-	DECLARE_WRITE_LINE_MEMBER(cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(vbl_w);
-	DECLARE_WRITE_LINE_MEMBER(scc_irq_w);
+	void cb1_w(int state);
+	void cb2_w(int state);
+	void vbl_w(int state);
+	void scc_irq_w(int state);
 
 protected:
 	// device-level overrides
@@ -86,10 +86,10 @@ private:
 	void via_out_b(uint8_t data);
 	void via_sync();
 	void field_interrupts();
-	DECLARE_WRITE_LINE_MEMBER(via_out_cb2);
-	DECLARE_WRITE_LINE_MEMBER(via1_irq);
-	DECLARE_WRITE_LINE_MEMBER(via2_irq);
-	DECLARE_WRITE_LINE_MEMBER(asc_irq);
+	void via_out_cb2(int state);
+	void via1_irq(int state);
+	void via2_irq(int state);
+	void asc_irq(int state);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
 
 	void phases_w(uint8_t phases);

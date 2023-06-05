@@ -1710,7 +1710,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(c361_timer_cb);
-	DECLARE_WRITE_LINE_MEMBER(sub_irq);
+	void sub_irq(int state);
 	uint8_t nthbyte(const uint32_t *pSource, int offs);
 	uint16_t nthword(const uint32_t *pSource, int offs);
 	inline int32_t u32_to_s24(uint32_t v);
@@ -2681,7 +2681,7 @@ INTERRUPT_GEN_MEMBER(namcos23_state::interrupt)
 	m_render.count[m_render.cur] = 0;
 }
 
-WRITE_LINE_MEMBER(namcos23_state::sub_irq)
+void namcos23_state::sub_irq(int state)
 {
 	m_subcpu->set_input_line(1, state ? ASSERT_LINE : CLEAR_LINE);
 	m_adc->adtrg_w(state);

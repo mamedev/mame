@@ -72,7 +72,7 @@ void mb3773_device::reset_timer()
 	m_watchdog_timer->adjust( attotime::from_seconds( 5 ) );
 }
 
-WRITE_LINE_MEMBER( mb3773_device::write_line_ck )
+void mb3773_device::write_line_ck(int state)
 {
 	if( state == 0 && m_ck != 0 )
 	{

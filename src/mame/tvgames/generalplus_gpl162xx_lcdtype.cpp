@@ -173,7 +173,7 @@ private:
 	required_ioport m_io_in1;
 	required_device<bl_handhelds_menucontrol_device> m_menucontrol;
 
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 };
 
 uint32_t gpl162xx_lcdtype_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -820,7 +820,7 @@ void gpl162xx_lcdtype_state::machine_reset()
 //  m_spirom[0x16001] = (gamenum>>8) & 0xff;
 }
 
-WRITE_LINE_MEMBER(gpl162xx_lcdtype_state::screen_vblank)
+void gpl162xx_lcdtype_state::screen_vblank(int state)
 {
 	if (state)
 	{

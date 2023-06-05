@@ -87,17 +87,17 @@ private:
 
 	uint8_t fake_d900_r();
 	void fake_d900_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
+	void nmi_mask_w(int state);
 	void sound_nmi_mask_w(uint8_t data);
-	template <uint8_t Which> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
-	DECLARE_WRITE_LINE_MEMBER(charbank_0_w);
-	DECLARE_WRITE_LINE_MEMBER(charbank_1_w);
+	template <uint8_t Which> void coin_counter_w(int state);
+	void charbank_0_w(int state);
+	void charbank_1_w(int state);
 	void bkgpen_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(spritebank_w);
+	void spritebank_w(int state);
 	void backgroundpage_w(uint8_t data);
 	void backgroundcolor_w(uint8_t data);
 	void flipy_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(flipx_w);
+	void flipx_w(int state);
 	void vram_w(offs_t offset, uint8_t data);
 	void cram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -107,7 +107,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
@@ -200,13 +200,13 @@ void rollrace_state::palette(palette_device &palette) const
 	}
 }
 
-WRITE_LINE_MEMBER(rollrace_state::charbank_0_w)
+void rollrace_state::charbank_0_w(int state)
 {
 	m_chrbank = state | (m_chrbank & 2);
 	m_fg_tilemap->mark_all_dirty();
 }
 
-WRITE_LINE_MEMBER(rollrace_state::charbank_1_w)
+void rollrace_state::charbank_1_w(int state)
 {
 	m_chrbank = (m_chrbank & 1) | (state << 1);
 	m_fg_tilemap->mark_all_dirty();
@@ -217,7 +217,7 @@ void rollrace_state::bkgpen_w(uint8_t data)
 	m_bkgpen = data;
 }
 
-WRITE_LINE_MEMBER(rollrace_state::spritebank_w)
+void rollrace_state::spritebank_w(int state)
 {
 	m_spritebank = state;
 }
@@ -241,7 +241,7 @@ void rollrace_state::flipy_w(uint8_t data)
 	// bit 2: cleared at night stage in attract, unknown purpose
 }
 
-WRITE_LINE_MEMBER(rollrace_state::flipx_w)
+void rollrace_state::flipx_w(int state)
 {
 	m_flipx = state;
 	m_fg_tilemap->set_flip(m_flipx ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
@@ -341,7 +341,7 @@ void rollrace_state::fake_d900_w(uint8_t data)
 	LOGD900("d900: %02X\n", data);
 }
 
-WRITE_LINE_MEMBER(rollrace_state::nmi_mask_w)
+void rollrace_state::nmi_mask_w(int state)
 {
 	m_nmi_mask = state;
 	if (!m_nmi_mask)
@@ -354,7 +354,7 @@ void rollrace_state::sound_nmi_mask_w(uint8_t data)
 }
 
 template <uint8_t Which>
-WRITE_LINE_MEMBER(rollrace_state::coin_counter_w)
+void rollrace_state::coin_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(Which, state);
 }
@@ -530,7 +530,7 @@ static GFXDECODE_START( gfx_rollrace )
 	GFXDECODE_ENTRY( "sprites_2", 0x0000, spritelayout,  0,  32 )
 GFXDECODE_END
 
-WRITE_LINE_MEMBER(rollrace_state::vblank_irq)
+void rollrace_state::vblank_irq(int state)
 {
 	if (state && m_nmi_mask)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);

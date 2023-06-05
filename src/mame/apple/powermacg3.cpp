@@ -56,13 +56,13 @@ private:
 	u16 read_sense();
 	void write_sense(u16 data);
 
-	WRITE_LINE_MEMBER(cuda_reset_w)
+	void cuda_reset_w(int state)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 		m_maincpu->set_input_line(INPUT_LINE_RESET, state);
 	}
 
-	WRITE_LINE_MEMBER(irq_w)
+	void irq_w(int state)
 	{
 		m_maincpu->set_input_line(PPC_IRQ, state);
 	}

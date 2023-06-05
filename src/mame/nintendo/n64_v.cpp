@@ -190,7 +190,7 @@ uint32_t n64_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	return 0;
 }
 
-WRITE_LINE_MEMBER(n64_state::screen_vblank)
+void n64_state::screen_vblank(int state)
 {
 	if (state)
 		m_rcp_periphs->field_update();

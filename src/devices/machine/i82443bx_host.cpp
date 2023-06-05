@@ -4,8 +4,8 @@
 
     Intel 440BX 82443BX Host section
 
-	TODO:
-	- better subclassing leap, we currently use i82339hx base for convenience
+    TODO:
+    - better subclassing leap, we currently use i82339hx base for convenience
 
 **************************************************************************************************/
 
@@ -44,7 +44,7 @@ void i82443bx_host_device::config_map(address_map &map)
 
 	map(0x34, 0x34).r(FUNC(i82443bx_host_device::capptr_r));
 
-//	map(0x50, 0x53).lr32(NAME([this] () { return machine().rand(); }));
+//  map(0x50, 0x53).lr32(NAME([this] () { return machine().rand(); }));
 	// TODO: no DRT, moved as DRTC / DWTC in dword format to $e0/$e8
 	map(0x68, 0x68).rw(FUNC(i82443bx_host_device::fdhc_r), FUNC(i82443bx_host_device::fdhc_w));
 
@@ -65,7 +65,7 @@ void i82443bx_host_device::device_start()
 
 	// TODO: size
 	add_map(8*1024*1024, M_MEM, FUNC(i82443bx_host_device::apbase_map));
-	
+
 	save_item(NAME(m_fdhc));
 	save_pointer(NAME(m_bspad), 8);
 }
@@ -131,7 +131,7 @@ DEFINE_DEVICE_TYPE(I82443BX_BRIDGE, i82443bx_bridge_device, "i82443bx_bridge", "
 
 i82443bx_bridge_device::i82443bx_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_bridge_device(mconfig, I82443BX_BRIDGE, tag, owner, clock)
-//	, m_vga(*this, finder_base::DUMMY_TAG)
+//  , m_vga(*this, finder_base::DUMMY_TAG)
 {
 	set_ids_bridge(0x80867191, 0x00);
 }

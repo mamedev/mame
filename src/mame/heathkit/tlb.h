@@ -28,7 +28,7 @@ public:
 	// interface routines
 	auto serial_data_callback() { return m_write_sd.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(cb1_w);
+	void cb1_w(int state);
 
 protected:
 	heath_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
@@ -55,9 +55,9 @@ private:
 
 	void serial_out_b(uint8_t data);
 
-	DECLARE_READ_LINE_MEMBER(mm5740_shift_r);
-	DECLARE_READ_LINE_MEMBER(mm5740_control_r);
-	DECLARE_WRITE_LINE_MEMBER(mm5740_data_ready_w);
+	int mm5740_shift_r();
+	int mm5740_control_r();
+	void mm5740_data_ready_w(int state);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 

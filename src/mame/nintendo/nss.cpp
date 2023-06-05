@@ -328,7 +328,7 @@ public:
 
 	void init_nss();
 
-	DECLARE_READ_LINE_MEMBER(game_over_flag_r);
+	int game_over_flag_r();
 
 protected:
 	virtual void machine_start() override;
@@ -361,7 +361,7 @@ private:
 	void port_04_w(uint8_t data);
 	void port_07_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(nss_vblank_irq);
+	void nss_vblank_irq(int state);
 	void bios_io_map(address_map &map);
 	void bios_map(address_map &map);
 	void snes_map(address_map &map);
@@ -643,7 +643,7 @@ void nss_state::machine_start()
 }
 
 
-READ_LINE_MEMBER(nss_state::game_over_flag_r)
+int nss_state::game_over_flag_r()
 {
 	return m_game_over_flag;
 }
@@ -799,7 +799,7 @@ static INPUT_PORTS_START( snes )
 INPUT_PORTS_END
 
 
-WRITE_LINE_MEMBER(nss_state::nss_vblank_irq)
+void nss_state::nss_vblank_irq(int state)
 {
 	if (state && m_nmi_enable)
 		m_bioscpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);

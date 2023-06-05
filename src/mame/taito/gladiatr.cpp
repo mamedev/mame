@@ -221,7 +221,7 @@ void gladiatr_state::gladiator_int_control_w(u8 data)
 }
 
 /* YM2203 IRQ */
-WRITE_LINE_MEMBER(gladiatr_state_base::ym_irq)
+void gladiatr_state_base::ym_irq(int state)
 {
 	/* NMI IRQ is not used by gladiator sound program */
 	m_subcpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
@@ -265,7 +265,7 @@ u8 gladiatr_state_base::adpcm_command_r()
 	return m_soundlatch->read();
 }
 
-WRITE_LINE_MEMBER(gladiatr_state_base::flipscreen_w)
+void gladiatr_state_base::flipscreen_w(int state)
 {
 	flip_screen_set(state);
 }
@@ -279,7 +279,7 @@ void gladiatr_state::gladiatr_irq_patch_w(u8 data)
 #endif
 
 
-WRITE_LINE_MEMBER(gladiatr_state::tclk_w)
+void gladiatr_state::tclk_w(int state)
 {
 	m_tclk_val = state != 0;
 }
@@ -307,13 +307,13 @@ void gladiatr_state::ccpu_p2_w(u8 data)
 	machine().bookkeeping().coin_counter_w(1, !BIT(data, 7));
 }
 
-READ_LINE_MEMBER(gladiatr_state::tclk_r)
+int gladiatr_state::tclk_r()
 {
 	// fed to t0 on comms MCUs
 	return m_tclk_val ? 1 : 0;
 }
 
-READ_LINE_MEMBER(gladiatr_state::ucpu_t1_r)
+int gladiatr_state::ucpu_t1_r()
 {
 	// connected to p1 on other MCU
 	return BIT(m_csnd_p1, 1);
@@ -332,7 +332,7 @@ void gladiatr_state::ucpu_p1_w(u8 data)
 	m_ucpu_p1 = data;
 }
 
-READ_LINE_MEMBER(gladiatr_state::csnd_t1_r)
+int gladiatr_state::csnd_t1_r()
 {
 	// connected to p1 on other MCU
 	return BIT(m_ucpu_p1, 1);

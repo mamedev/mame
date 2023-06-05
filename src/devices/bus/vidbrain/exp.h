@@ -113,7 +113,7 @@ public:
 	void unmap_w(offs_t offset, uint8_t data) { bo_w(offset + 0x3000, data, 1, 0); }
 
 	// cartridge interface
-	DECLARE_WRITE_LINE_MEMBER( extres_w ) { m_write_extres(state); }
+	void extres_w(int state) { m_write_extres(state); }
 
 protected:
 	// device_t implementation

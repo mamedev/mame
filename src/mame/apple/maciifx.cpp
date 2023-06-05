@@ -121,7 +121,7 @@ private:
 	uint32_t biu_r(offs_t offset, uint32_t mem_mask = ~0);
 	void biu_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	template <int N>
-	DECLARE_WRITE_LINE_MEMBER(oss_interrupt);
+	void oss_interrupt(int state);
 	TIMER_CALLBACK_MEMBER(oss_6015_tick);
 	uint8_t oss_r(offs_t offset);
 	void oss_w(offs_t offset, uint8_t data);
@@ -397,7 +397,7 @@ void maciifx_state::biu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 }
 
 template <int N>
-WRITE_LINE_MEMBER(maciifx_state::oss_interrupt)
+void maciifx_state::oss_interrupt(int state)
 {
 	if (state == ASSERT_LINE)
 		m_oss_regs[N >= 8 ? 0x202 : 0x203] |= 1 << (N & 7);

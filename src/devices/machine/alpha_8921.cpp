@@ -89,7 +89,7 @@ void alpha_8921_device::device_reset()
 //  clk_w - Change clock pin status
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(alpha_8921_device::clk_w)
+void alpha_8921_device::clk_w(int state)
 {
 	if (m_clk != state)
 	{
@@ -110,7 +110,7 @@ WRITE_LINE_MEMBER(alpha_8921_device::clk_w)
 //  load_w - Change LOAD pin status
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(alpha_8921_device::load_w)
+void alpha_8921_device::load_w(int state)
 {
 	m_load = state;
 }
@@ -119,7 +119,7 @@ WRITE_LINE_MEMBER(alpha_8921_device::load_w)
 //  even_w - Change EVEN pin status
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(alpha_8921_device::even_w)
+void alpha_8921_device::even_w(int state)
 {
 	m_even = state;
 }
@@ -128,7 +128,7 @@ WRITE_LINE_MEMBER(alpha_8921_device::even_w)
 //  h_w - Change H pin status
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(alpha_8921_device::h_w)
+void alpha_8921_device::h_w(int state)
 {
 	m_h = state;
 }
@@ -195,7 +195,7 @@ u8 alpha_8921_device::gbd_r()
 //  dota_r - Read DOTA pin data (GAD isn't 0)
 //-------------------------------------------------
 
-READ_LINE_MEMBER(alpha_8921_device::dota_r)
+int alpha_8921_device::dota_r()
 {
 	update_output();
 	return m_dota;
@@ -205,7 +205,7 @@ READ_LINE_MEMBER(alpha_8921_device::dota_r)
 //  dotb_r - Read DOTB pin data (GBD isn't 0)
 //-------------------------------------------------
 
-READ_LINE_MEMBER(alpha_8921_device::dotb_r)
+int alpha_8921_device::dotb_r()
 {
 	update_output();
 	return m_dotb;

@@ -64,7 +64,7 @@
 #define PPCCAP_MFIOC                0x40        /* TRUE if we have memory-forced I/O controller interface accesses */
 #define PPCCAP_601BAT               0x80        /* TRUE if we're doing 601-style BATs (unified I/D, different bit layout) */
 #define PPCCAP_604_MMU              0x100       /* TRUE if we have 604-class MMU features */
-#define PPCCAP_750_TLB				0x200		/* TRUE if we have the extended 740/750 series TLB */
+#define PPCCAP_750_TLB              0x200       /* TRUE if we have the extended 740/750 series TLB */
 
 /* exception types */
 enum

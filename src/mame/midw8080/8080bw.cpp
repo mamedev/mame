@@ -1304,7 +1304,7 @@ void _8080bw_state::escmars(machine_config &config)
 /*                                                     */
 /*******************************************************/
 
-READ_LINE_MEMBER(_8080bw_state::cosmicmo_cab_r)
+int _8080bw_state::cosmicmo_cab_r()
 {
 	return m_cabinet_type->read();
 }
@@ -1897,7 +1897,7 @@ void _8080bw_state::crashrd(machine_config &config)
 /*                                                     */
 /*******************************************************/
 
-READ_LINE_MEMBER(_8080bw_state::sflush_80_r)
+int _8080bw_state::sflush_80_r()
 {
 	return (m_screen->vpos() & 0x80) ? 1 : 0;
 }
@@ -2136,7 +2136,7 @@ void _8080bw_state::lupin3a(machine_config &config)
 /*                                                     */
 /*******************************************************/
 
-WRITE_LINE_MEMBER(_8080bw_state::polaris_60hz_w)
+void _8080bw_state::polaris_60hz_w(int state)
 {
 	if (state)
 	{
@@ -3394,7 +3394,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(claybust_state::gun_callback)
 	m_gun_pos = 0;
 }
 
-READ_LINE_MEMBER(claybust_state::gun_on_r)
+int claybust_state::gun_on_r()
 {
 	return m_gun_pos ? 1 : 0;
 }

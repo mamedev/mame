@@ -70,8 +70,8 @@ protected:
 	virtual bool take_c800() override;
 
 private:
-	//DECLARE_WRITE_LINE_MEMBER(tms_irq_callback);
-	DECLARE_WRITE_LINE_MEMBER(tms_readyq_callback);
+	//void tms_irq_callback(int state);
+	void tms_readyq_callback(int state);
 	uint8_t m_writelatch_data; // 74ls373 latch
 	bool m_readlatch_flag; // 74c74 1st half
 	bool m_writelatch_flag; // 74c74 2nd half
@@ -140,13 +140,13 @@ void a2bus_echoii_device::device_reset()
 }
 
 /*
-WRITE_LINE_MEMBER(a2bus_echoii_device::tms_irq_callback)
+void a2bus_echoii_device::tms_irq_callback(int state)
 {
     update_irq_to_maincpu();
 }
 */
 
-WRITE_LINE_MEMBER(a2bus_echoii_device::tms_readyq_callback)
+void a2bus_echoii_device::tms_readyq_callback(int state)
 {
 	if (state == ASSERT_LINE)
 	{

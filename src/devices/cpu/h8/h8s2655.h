@@ -34,36 +34,36 @@ public:
 	void syscr_w(uint8_t data);
 
 protected:
-	required_device<h8s_intc_device> intc;
-	required_device<h8_adc_device> adc;
-	required_device<h8_port_device> port1;
-	required_device<h8_port_device> port2;
-	required_device<h8_port_device> port3;
-	required_device<h8_port_device> port4;
-	required_device<h8_port_device> port5;
-	required_device<h8_port_device> port6;
-	required_device<h8_port_device> porta;
-	required_device<h8_port_device> portb;
-	required_device<h8_port_device> portc;
-	required_device<h8_port_device> portd;
-	required_device<h8_port_device> porte;
-	required_device<h8_port_device> portf;
-	required_device<h8_port_device> portg;
-	required_device<h8h_timer8_channel_device> timer8_0;
-	required_device<h8h_timer8_channel_device> timer8_1;
-	required_device<h8_timer16_device> timer16;
-	required_device<h8s_timer16_channel_device> timer16_0;
-	required_device<h8s_timer16_channel_device> timer16_1;
-	required_device<h8s_timer16_channel_device> timer16_2;
-	required_device<h8s_timer16_channel_device> timer16_3;
-	required_device<h8s_timer16_channel_device> timer16_4;
-	required_device<h8s_timer16_channel_device> timer16_5;
-	required_device<h8_sci_device> sci0;
-	required_device<h8_sci_device> sci1;
-	required_device<h8_sci_device> sci2;
-	required_device<h8_watchdog_device> watchdog;
+	required_device<h8s_intc_device> m_intc;
+	required_device<h8_adc_device> m_adc;
+	required_device<h8_port_device> m_port1;
+	required_device<h8_port_device> m_port2;
+	required_device<h8_port_device> m_port3;
+	required_device<h8_port_device> m_port4;
+	required_device<h8_port_device> m_port5;
+	required_device<h8_port_device> m_port6;
+	required_device<h8_port_device> m_porta;
+	required_device<h8_port_device> m_portb;
+	required_device<h8_port_device> m_portc;
+	required_device<h8_port_device> m_portd;
+	required_device<h8_port_device> m_porte;
+	required_device<h8_port_device> m_portf;
+	required_device<h8_port_device> m_portg;
+	required_device<h8h_timer8_channel_device> m_timer8_0;
+	required_device<h8h_timer8_channel_device> m_timer8_1;
+	required_device<h8_timer16_device> m_timer16;
+	required_device<h8s_timer16_channel_device> m_timer16_0;
+	required_device<h8s_timer16_channel_device> m_timer16_1;
+	required_device<h8s_timer16_channel_device> m_timer16_2;
+	required_device<h8s_timer16_channel_device> m_timer16_3;
+	required_device<h8s_timer16_channel_device> m_timer16_4;
+	required_device<h8s_timer16_channel_device> m_timer16_5;
+	required_device<h8_sci_device> m_sci0;
+	required_device<h8_sci_device> m_sci1;
+	required_device<h8_sci_device> m_sci2;
+	required_device<h8_watchdog_device> m_watchdog;
 
-	uint8_t syscr;
+	uint8_t m_syscr;
 
 	h8s2655_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

@@ -87,7 +87,7 @@ void midxunit_state::midxunit_unknown_w(offs_t offset, uint16_t data, uint16_t m
 }
 
 
-WRITE_LINE_MEMBER(midxunit_state::adc_int_w)
+void midxunit_state::adc_int_w(int state)
 {
 	m_adc_int = (state != CLEAR_LINE);
 }
@@ -114,7 +114,7 @@ uint32_t midxunit_state::midxunit_status_r()
  *
  *************************************/
 
-WRITE_LINE_MEMBER(midxunit_state::midxunit_dcs_output_full)
+void midxunit_state::midxunit_dcs_output_full(int state)
 {
 	/* only signal if not in loopback state */
 	if (m_uart[1] != 0x66)

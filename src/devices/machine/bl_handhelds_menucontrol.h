@@ -17,11 +17,11 @@ public:
 	// the chip is the same between systems, but there's some logic not fully understood that is causing off-by-1 errors on some calcs
 	void set_is_unsp_type_hack() { m_is_unsp_type_hack = true; }
 
-	DECLARE_READ_LINE_MEMBER(status_r);
-	DECLARE_READ_LINE_MEMBER(data_r);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
-	DECLARE_WRITE_LINE_MEMBER(data_w);
-	DECLARE_WRITE_LINE_MEMBER(reset_w);
+	int status_r();
+	int data_r();
+	void clock_w(int state);
+	void data_w(int state);
+	void reset_w(int state);
 
 protected:
 	virtual void device_start() override;

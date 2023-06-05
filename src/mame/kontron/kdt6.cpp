@@ -77,7 +77,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(busreq_w);
+	void busreq_w(int state);
 	uint8_t memory_r(offs_t offset);
 	void memory_w(offs_t offset, uint8_t data);
 	uint8_t io_r(offs_t offset);
@@ -104,7 +104,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off);
 
 	void fdc_tc_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	void fdc_drq_w(int state);
 	void drive0_led_cb(floppy_image_device *floppy, int state);
 	void drive1_led_cb(floppy_image_device *floppy, int state);
 
@@ -112,9 +112,9 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void pio_porta_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(keyboard_rx_w);
-	DECLARE_WRITE_LINE_MEMBER(rs232b_rx_w);
-	DECLARE_WRITE_LINE_MEMBER(siob_tx_w);
+	void keyboard_rx_w(int state);
+	void rs232b_rx_w(int state);
+	void siob_tx_w(int state);
 
 	void psi98_io(address_map &map);
 	void psi98_mem(address_map &map);
@@ -239,7 +239,7 @@ void kdt6_state::fdc_tc_w(uint8_t data)
 	m_fdc->tc_w(0);
 }
 
-WRITE_LINE_MEMBER( kdt6_state::fdc_drq_w )
+void kdt6_state::fdc_drq_w(int state)
 {
 	if (!m_sasi_dma && BIT(m_status0, 4) == 0)
 		m_dma->rdy_w(state);
@@ -353,7 +353,7 @@ void kdt6_state::pio_porta_w(uint8_t data)
 	m_centronics->write_init(BIT(data, 1));
 }
 
-WRITE_LINE_MEMBER( kdt6_state::keyboard_rx_w )
+void kdt6_state::keyboard_rx_w(int state)
 {
 	if (machine().phase() >= machine_phase::RESET)
 	{
@@ -362,7 +362,7 @@ WRITE_LINE_MEMBER( kdt6_state::keyboard_rx_w )
 	}
 }
 
-WRITE_LINE_MEMBER( kdt6_state::rs232b_rx_w )
+void kdt6_state::rs232b_rx_w(int state)
 {
 	if (machine().phase() >= machine_phase::RESET)
 	{
@@ -371,7 +371,7 @@ WRITE_LINE_MEMBER( kdt6_state::rs232b_rx_w )
 	}
 }
 
-WRITE_LINE_MEMBER( kdt6_state::siob_tx_w )
+void kdt6_state::siob_tx_w(int state)
 {
 	if (machine().phase() >= machine_phase::RESET)
 	{
@@ -387,7 +387,7 @@ WRITE_LINE_MEMBER( kdt6_state::siob_tx_w )
 //  MACHINE
 //**************************************************************************
 
-WRITE_LINE_MEMBER( kdt6_state::busreq_w )
+void kdt6_state::busreq_w(int state)
 {
 	m_cpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
 	m_dma->bai_w(state);

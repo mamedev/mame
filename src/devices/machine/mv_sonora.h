@@ -25,8 +25,8 @@ public:
 	uint8_t dac_r(offs_t offset);
 	void dac_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ_LINE_MEMBER(vblank) const { return m_screen->vblank(); }
-	DECLARE_READ_LINE_MEMBER(hblank) const { return m_screen->hblank(); }
+	int vblank() const { return m_screen->vblank(); }
+	int hblank() const { return m_screen->hblank(); }
 
 	auto screen_vblank() { return m_screen_vblank.bind(); }
 

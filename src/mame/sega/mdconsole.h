@@ -41,7 +41,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_console);
+	void screen_vblank_console(int state);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( _32x_cart );
 

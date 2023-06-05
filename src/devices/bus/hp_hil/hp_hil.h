@@ -127,7 +127,7 @@ public:
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(ap_w);
+	void ap_w(int state);
 
 	void hil_write(uint16_t data);
 

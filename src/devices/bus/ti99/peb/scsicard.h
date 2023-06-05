@@ -35,8 +35,8 @@ public:
 	void crureadz(offs_t offset, uint8_t *value) override;
 	void cruwrite(offs_t offset, uint8_t data) override;
 
-	DECLARE_WRITE_LINE_MEMBER( drq_w );
-	DECLARE_WRITE_LINE_MEMBER( irq_w );
+	void drq_w(int state);
+	void irq_w(int state);
 
 	void debug_read(offs_t offset, uint8_t* value);
 	void debug_write(offs_t offset, uint8_t data);

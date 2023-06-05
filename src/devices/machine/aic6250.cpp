@@ -1014,7 +1014,7 @@ void aic6250_device::set_int_state(bool asserted)
  * the DMA transfer count falls below 8, data is transferred via individual
  * cycles on demand rather than prefetched.
  */
-WRITE_LINE_MEMBER(aic6250_device::back_w)
+void aic6250_device::back_w(int state)
 {
 	LOGMASKED(LOG_DMA, "back_w %d\n", state);
 

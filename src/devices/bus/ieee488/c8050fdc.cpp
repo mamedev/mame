@@ -517,19 +517,19 @@ void c8050_fdc_device::write(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER( c8050_fdc_device::ds0_w )
+void c8050_fdc_device::ds0_w(int state)
 {
 	m_ds0 = state;
 }
 
-WRITE_LINE_MEMBER( c8050_fdc_device::ds1_w )
+void c8050_fdc_device::ds1_w(int state)
 {
 	m_ds1 = state;
 
 	ds_w(m_ds1 << 1 | m_ds0);
 }
 
-WRITE_LINE_MEMBER( c8050_fdc_device::drv_sel_w )
+void c8050_fdc_device::drv_sel_w(int state)
 {
 	if (m_drv_sel != state)
 	{
@@ -541,7 +541,7 @@ WRITE_LINE_MEMBER( c8050_fdc_device::drv_sel_w )
 	}
 }
 
-WRITE_LINE_MEMBER( c8050_fdc_device::mode_sel_w )
+void c8050_fdc_device::mode_sel_w(int state)
 {
 	if (m_mode_sel != state)
 	{
@@ -553,7 +553,7 @@ WRITE_LINE_MEMBER( c8050_fdc_device::mode_sel_w )
 	}
 }
 
-WRITE_LINE_MEMBER( c8050_fdc_device::rw_sel_w )
+void c8050_fdc_device::rw_sel_w(int state)
 {
 	if (m_rw_sel != state)
 	{
@@ -570,7 +570,7 @@ WRITE_LINE_MEMBER( c8050_fdc_device::rw_sel_w )
 	}
 }
 
-WRITE_LINE_MEMBER( c8050_fdc_device::mtr0_w )
+void c8050_fdc_device::mtr0_w(int state)
 {
 	if (m_mtr0 != state)
 	{
@@ -592,7 +592,7 @@ WRITE_LINE_MEMBER( c8050_fdc_device::mtr0_w )
 	}
 }
 
-WRITE_LINE_MEMBER( c8050_fdc_device::mtr1_w )
+void c8050_fdc_device::mtr1_w(int state)
 {
 	if (m_mtr1 != state)
 	{
@@ -614,7 +614,7 @@ WRITE_LINE_MEMBER( c8050_fdc_device::mtr1_w )
 	}
 }
 
-WRITE_LINE_MEMBER( c8050_fdc_device::odd_hd_w )
+void c8050_fdc_device::odd_hd_w(int state)
 {
 	if (m_odd_hd != state)
 	{
@@ -628,7 +628,7 @@ WRITE_LINE_MEMBER( c8050_fdc_device::odd_hd_w )
 	}
 }
 
-WRITE_LINE_MEMBER( c8050_fdc_device::pull_sync_w )
+void c8050_fdc_device::pull_sync_w(int state)
 {
 	LOGMASKED(LOG_MORE, "%s %s PULL SYNC %u\n", machine().time().as_string(), machine().describe_context(), state);
 }

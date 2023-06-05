@@ -398,7 +398,7 @@ void vme_fcscsi1_card_device::led_w(uint8_t data) {
 	return;
 }
 
-WRITE_LINE_MEMBER(vme_fcscsi1_card_device::dma_irq)
+void vme_fcscsi1_card_device::dma_irq(int state)
 {
 	if(state != CLEAR_LINE)
 	{
@@ -421,7 +421,7 @@ uint8_t vme_fcscsi1_card_device::dma_iack()
 		return m68000_base_device::autovector(2);
 }
 
-WRITE_LINE_MEMBER(vme_fcscsi1_card_device::fdc_irq)
+void vme_fcscsi1_card_device::fdc_irq(int state)
 {
 	if (state != 0)
 	{

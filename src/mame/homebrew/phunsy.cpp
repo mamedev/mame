@@ -66,8 +66,8 @@ private:
 	void phunsy_ctrl_w(uint8_t data);
 	void phunsy_data_w(uint8_t data);
 	void kbd_put(u8 data);
-	DECLARE_READ_LINE_MEMBER(cass_r);
-	DECLARE_WRITE_LINE_MEMBER(cass_w);
+	int cass_r();
+	void cass_w(int state);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	void phunsy_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -87,12 +87,12 @@ private:
 };
 
 
-WRITE_LINE_MEMBER( phunsy_state::cass_w )
+void phunsy_state::cass_w(int state)
 {
 	m_cass->output(state ? -1.0 : +1.0);
 }
 
-READ_LINE_MEMBER(phunsy_state::cass_r)
+int phunsy_state::cass_r()
 {
 	return (m_cass->input() > 0.03) ? 0 : 1;
 }

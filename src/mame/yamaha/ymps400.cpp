@@ -3,14 +3,14 @@
 
 /*
 
-	Skeleton driver for Yamaha PortaSound PS-400 keyboard
+    Skeleton driver for Yamaha PortaSound PS-400 keyboard
 
-	IC1: Yamaha YM1034 (KAP2) "key assigner"
-	IC2: Yamaha YM1019 (GE4) sound chip
-	IC16: Toshiba TMP80C39P-6
-	IC18: Toshiba TMM2332P mask ROM
+    IC1: Yamaha YM1034 (KAP2) "key assigner"
+    IC2: Yamaha YM1019 (GE4) sound chip
+    IC16: Toshiba TMP80C39P-6
+    IC18: Toshiba TMM2332P mask ROM
 
-	Service manual/schematic: https://elektrotanya.com/yamaha_ps_400.pdf/download.html
+    Service manual/schematic: https://elektrotanya.com/yamaha_ps_400.pdf/download.html
 
 */
 

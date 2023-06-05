@@ -105,15 +105,15 @@ private:
 	void vsync_irq_enable_w(uint8_t data);
 	void smc777_palette(palette_device &palette) const;
 	uint32_t screen_update_smc777(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vsync_w);
+	void vsync_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 
 	uint8_t fdc_r(offs_t offset);
 	void fdc_w(offs_t offset, uint8_t data);
 	uint8_t fdc1_fast_status_r();
 	void fdc1_select_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
@@ -482,12 +482,12 @@ void smc777_state::fdc1_select_w(uint8_t data)
 		printf("floppy access %02x\n", data);
 }
 
-WRITE_LINE_MEMBER( smc777_state::fdc_intrq_w )
+void smc777_state::fdc_intrq_w(int state)
 {
 	m_fdc_irq_flag = state;
 }
 
-WRITE_LINE_MEMBER( smc777_state::fdc_drq_w )
+void smc777_state::fdc_drq_w(int state)
 {
 	m_fdc_drq_flag = state;
 }
@@ -1086,7 +1086,7 @@ void smc777_state::smc777_palette(palette_device &palette) const
 }
 
 
-WRITE_LINE_MEMBER(smc777_state::vsync_w)
+void smc777_state::vsync_w(int state)
 {
 	if (state && m_vsync_ief)
 	{

@@ -23,7 +23,7 @@ public:
 	virtual void ExecCommand() override;
 	virtual void WriteData( uint8_t *data, int dataLength ) override;
 	virtual void ReadData( uint8_t *data, int dataLength ) override;
-	DECLARE_WRITE_LINE_MEMBER(cdda_end_mark_cb);
+	void cdda_end_mark_cb(int state);
 
 protected:
 	virtual void process_buffer() override;
@@ -32,7 +32,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-//	virtual bool set_features() override;
+//  virtual bool set_features() override;
 	// TODO: how GDROM determines ready flag?
 	// cfr. dc.xml [GDROM READY] for a list of SW that wants this on.
 	virtual bool is_ready() override { return true; }

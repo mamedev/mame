@@ -94,7 +94,7 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 	for (int regnum = 0; regnum < NUM_TEMP_VARIABLES; regnum++)
 	{
 		char symname[10];
-		sprintf(symname, "temp%d", regnum);
+		snprintf(symname, 10, "temp%d", regnum);
 		m_symtable->add(symname, symbol_table::READ_WRITE, &m_tempvar[regnum]);
 	}
 }

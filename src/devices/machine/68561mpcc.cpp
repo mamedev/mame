@@ -254,7 +254,7 @@ void mpcc_device::device_reset()
 /*
  * Serial device implementation
  */
-WRITE_LINE_MEMBER(mpcc_device::cts_w)
+void mpcc_device::cts_w(int state)
 {
 	if (state == CLEAR_LINE)
 	{
@@ -278,7 +278,7 @@ WRITE_LINE_MEMBER(mpcc_device::cts_w)
 		m_sisr |= REG_SISR_CTSLVL;
 }
 
-WRITE_LINE_MEMBER(mpcc_device::dsr_w)
+void mpcc_device::dsr_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -301,7 +301,7 @@ WRITE_LINE_MEMBER(mpcc_device::dsr_w)
 		m_sisr &= ~REG_SISR_DSRLVL;
 }
 
-WRITE_LINE_MEMBER(mpcc_device::dcd_w)
+void mpcc_device::dcd_w(int state)
 {
 	if (state == CLEAR_LINE)
 	{
@@ -646,7 +646,7 @@ void mpcc_device::rcv_complete()
 //  write_rx - called by terminal through rs232/diserial
 //         when character is sent to board
 //-------------------------------------------------
-WRITE_LINE_MEMBER(mpcc_device::write_rx)
+void mpcc_device::write_rx(int state)
 {
 	LOGRCV("%s(%d)\n", FUNCNAME, state);
 	m_rxd = state;

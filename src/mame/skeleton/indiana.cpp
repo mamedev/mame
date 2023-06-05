@@ -7,8 +7,6 @@
         08/12/2009 Skeleton driver.
         01/20/2014 Added ISA bus and peripherals
 
-        TODO: Text appears in VGA f/b (0x6B8000), but doesn't display?
-
 ****************************************************************************/
 
 #include "emu.h"

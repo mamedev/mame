@@ -86,14 +86,14 @@ public:
 	auto user3_callback() { return m_user3.bind(); }
 	auto user4_callback() { return m_user4.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( clk_w ) { m_clk(state); }
-	DECLARE_WRITE_LINE_MEMBER( int_w ) { m_int(state); }
-	DECLARE_WRITE_LINE_MEMBER( tx_w ) { m_tx(state); }
-	DECLARE_WRITE_LINE_MEMBER( rx_w ) { m_rx(state); }
-	DECLARE_WRITE_LINE_MEMBER( user1_w ) { m_user1(state); }
-	DECLARE_WRITE_LINE_MEMBER( user2_w ) { m_user2(state); }
-	DECLARE_WRITE_LINE_MEMBER( user3_w ) { m_user3(state); }
-	DECLARE_WRITE_LINE_MEMBER( user4_w ) { m_user4(state); }
+	void clk_w(int state) { m_clk(state); }
+	void int_w(int state) { m_int(state); }
+	void tx_w(int state) { m_tx(state); }
+	void rx_w(int state) { m_rx(state); }
+	void user1_w(int state) { m_user1(state); }
+	void user2_w(int state) { m_user2(state); }
+	void user3_w(int state) { m_user3(state); }
+	void user4_w(int state) { m_user4(state); }
 
 	void set_bus_clock(u32 clock);
 	void set_bus_clock(const XTAL &xtal) { set_bus_clock(xtal.value()); }
@@ -188,15 +188,15 @@ public:
 	auto user7_callback() { return m_user7.bind(); }
 	auto user8_callback() { return m_user8.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( clk2_w ) { m_clk2(state); }
-	DECLARE_WRITE_LINE_MEMBER( page_w ) { m_page(state); }
-	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi(state); }
-	DECLARE_WRITE_LINE_MEMBER( tx2_w ) { m_tx2(state); }
-	DECLARE_WRITE_LINE_MEMBER( rx2_w ) { m_rx2(state); }
-	DECLARE_WRITE_LINE_MEMBER( user5_w ) { m_user5(state); }
-	DECLARE_WRITE_LINE_MEMBER( user6_w ) { m_user6(state); }
-	DECLARE_WRITE_LINE_MEMBER( user7_w ) { m_user7(state); }
-	DECLARE_WRITE_LINE_MEMBER( user8_w ) { m_user8(state); }
+	void clk2_w(int state) { m_clk2(state); }
+	void page_w(int state) { m_page(state); }
+	void nmi_w(int state) { m_nmi(state); }
+	void tx2_w(int state) { m_tx2(state); }
+	void rx2_w(int state) { m_rx2(state); }
+	void user5_w(int state) { m_user5(state); }
+	void user6_w(int state) { m_user6(state); }
+	void user7_w(int state) { m_user7(state); }
+	void user8_w(int state) { m_user8(state); }
 
 protected:
 	rc2014_ext_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

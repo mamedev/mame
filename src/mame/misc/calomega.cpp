@@ -737,7 +737,7 @@
 *               Read/Write Handlers               *
 **************************************************/
 
-WRITE_LINE_MEMBER(calomega_state::update_aciabaud_scale)
+void calomega_state::update_aciabaud_scale(int state)
 {
 	uint8_t dsw2 = m_sw2->read();
 
@@ -890,7 +890,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( calomega_state::timer_2 )
 	// logerror("Timer_2 event : state=%d\n", m_timer);
 }
 
-WRITE_LINE_MEMBER(calomega_state::vblank0_w)
+void calomega_state::vblank0_w(int state)
 {
 	m_pia[0]->read(0);
 	m_pia[0]->read(0);
@@ -899,14 +899,14 @@ WRITE_LINE_MEMBER(calomega_state::vblank0_w)
 	// logerror("V_BLANK_0 event : state=%d\n", state);
 }
 
-WRITE_LINE_MEMBER(calomega_state::vblank1_w)
+void calomega_state::vblank1_w(int state)
 {
 	m_pia[0]->read(2);
 	m_pia[0]->cb1_w(state);
 	// logerror("V_BLANK_1 event (sale ): state=%d\n", state);
 }
 
-WRITE_LINE_MEMBER(calomega_state::vblank2_w)
+void calomega_state::vblank2_w(int state)
 {
 	m_pia[1]->read(0);
 	m_pia[1]->read(0);
@@ -915,7 +915,7 @@ WRITE_LINE_MEMBER(calomega_state::vblank2_w)
 	// logerror("V_BLANK_2 event : state=%d\n", state);
 }
 
-WRITE_LINE_MEMBER(calomega_state::pia1_cb2_w)
+void calomega_state::pia1_cb2_w(int state)
 {
 	// Output to L9
 	m_lamps[8] = ~state;  // L9 (Door?)
@@ -933,7 +933,7 @@ void calomega_state::dummy_pia_w(uint8_t data)
 	m_pia_data = data;
 }
 
-WRITE_LINE_MEMBER(calomega_state::dummy_pia_line_w)
+void calomega_state::dummy_pia_line_w(int state)
 {
 }
 
@@ -4562,14 +4562,14 @@ GFXDECODE_END
 *                 ACIA Interface                 *
 *************************************************/
 
-WRITE_LINE_MEMBER(calomega_state::write_acia_clock)
+void calomega_state::write_acia_clock(int state)
 {
 	m_acia6850[0]->write_txc(state);
 	m_acia6850[0]->write_rxc(state);
 	update_aciabaud_scale(0);
 }
 
-WRITE_LINE_MEMBER(calomega_state::w_903kb_acia_clock)
+void calomega_state::w_903kb_acia_clock(int state)
 {
 	m_acia6850[0]->write_txc(state);
 	m_acia6850[0]->write_rxc(state);

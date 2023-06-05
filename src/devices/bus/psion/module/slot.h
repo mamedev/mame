@@ -75,7 +75,7 @@ public:
 	uint8_t data_r();
 	void data_w(uint16_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( intr_w ) { m_intr_cb(state); }
+	void intr_w(int state) { m_intr_cb(state); }
 
 protected:
 	// device-level overrides

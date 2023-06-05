@@ -61,8 +61,8 @@ private:
 	uint8_t port14_r();
 	uint8_t port15_r();
 
-	DECLARE_WRITE_LINE_MEMBER(write_line_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
+	void write_line_clock(int state);
+	void write_keyboard_clock(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -207,14 +207,14 @@ void att4425_state::machine_start()
 
 /* Machine Driver */
 
-WRITE_LINE_MEMBER(att4425_state::write_line_clock)
+void att4425_state::write_line_clock(int state)
 {
 	m_sio->rxca_w(state);
 	m_sio->txca_w(state);
 	m_sio->rxtxcb_w(state);
 }
 
-WRITE_LINE_MEMBER(att4425_state::write_keyboard_clock)
+void att4425_state::write_keyboard_clock(int state)
 {
 	m_i8251->write_txc(state);
 	m_i8251->write_rxc(state);

@@ -36,11 +36,11 @@ public:
 	uint8_t dmd_port_r(offs_t offset);
 	void dmd_port_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(blank_w);
-	DECLARE_WRITE_LINE_MEMBER(status_w);
-	DECLARE_WRITE_LINE_MEMBER(rowdata_w);
-	DECLARE_WRITE_LINE_MEMBER(rowclock_w);
-	DECLARE_WRITE_LINE_MEMBER(test_w);
+	void blank_w(int state);
+	void status_w(int state);
+	void rowdata_w(int state);
+	void rowclock_w(int state);
+	void test_w(int state);
 
 	template <typename T> void set_gfxregion(T &&tag) { m_rom.set_tag(std::forward<T>(tag)); }
 

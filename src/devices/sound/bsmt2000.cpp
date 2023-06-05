@@ -331,7 +331,7 @@ void bsmt2000_device::tms_right_w(uint16_t data)
 //  on the TMS32015
 //-------------------------------------------------
 
-READ_LINE_MEMBER( bsmt2000_device::tms_write_pending_r )
+int bsmt2000_device::tms_write_pending_r()
 {
 	return m_write_pending ? 1 : 0;
 }

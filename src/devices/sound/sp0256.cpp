@@ -1164,7 +1164,7 @@ void sp0256_device::ald_w(uint8_t data)
 	return;
 }
 
-READ_LINE_MEMBER( sp0256_device::lrq_r )
+int sp0256_device::lrq_r()
 {
 	// force stream update
 	m_stream->update();
@@ -1172,7 +1172,7 @@ READ_LINE_MEMBER( sp0256_device::lrq_r )
 	return m_lrq == 0x8000;
 }
 
-READ_LINE_MEMBER( sp0256_device::sby_r )
+int sp0256_device::sby_r()
 {
 	// TODO: force stream update??
 

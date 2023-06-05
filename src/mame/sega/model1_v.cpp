@@ -1664,7 +1664,7 @@ uint32_t model1_state::screen_update_model1(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-WRITE_LINE_MEMBER(model1_state::screen_vblank_model1)
+void model1_state::screen_vblank_model1(int state)
 {
 	// on rising edge
 	if (state)

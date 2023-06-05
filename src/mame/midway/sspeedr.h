@@ -58,7 +58,7 @@ private:
 	void track_ice_w(uint8_t data);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	void io_map(address_map &map);
 	void prg_map(address_map &map);
 

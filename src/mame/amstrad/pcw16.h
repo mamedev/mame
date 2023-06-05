@@ -101,12 +101,12 @@ protected:
 	uint32_t screen_update_pcw16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(pcw16_timer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(rtc_timer_callback);
-	DECLARE_WRITE_LINE_MEMBER(pcw16_com_interrupt_1);
-	DECLARE_WRITE_LINE_MEMBER(pcw16_com_interrupt_2);
-	DECLARE_WRITE_LINE_MEMBER(pcw16_keyboard_callback);
+	void pcw16_com_interrupt_1(int state);
+	void pcw16_com_interrupt_2(int state);
+	void pcw16_keyboard_callback(int state);
 
 	void trigger_fdc_int();
-	DECLARE_WRITE_LINE_MEMBER( fdc_interrupt );
+	void fdc_interrupt(int state);
 	inline void pcw16_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color);
 	void pcw16_vh_decode_mode0(bitmap_ind16 &bitmap, int x, int y, uint8_t byte);
 	void pcw16_vh_decode_mode1(bitmap_ind16 &bitmap, int x, int y, uint8_t byte);

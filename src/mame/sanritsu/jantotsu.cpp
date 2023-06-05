@@ -157,7 +157,7 @@ private:
 	void adpcm_w(offs_t offset, uint8_t data);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void adpcm_int(int state);
 	void io_map(address_map &map);
 	void prg_map(address_map &map);
 };
@@ -295,7 +295,7 @@ void jantotsu_state::adpcm_w(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(jantotsu_state::adpcm_int)
+void jantotsu_state::adpcm_int(int state)
 {
 	if (m_adpcm_pos >= 0x10000 || m_adpcm_idle)
 	{

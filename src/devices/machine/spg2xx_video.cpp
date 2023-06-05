@@ -439,7 +439,7 @@ void spg2xx_video_device::video_w(offs_t offset, uint16_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(spg2xx_video_device::vblank)
+void spg2xx_video_device::vblank(int state)
 {
 	if (!state)
 	{

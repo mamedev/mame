@@ -127,8 +127,8 @@ private:
 	void pio_pa_w(offs_t offset, u8 data);
 	void pio_pb_w(offs_t offset, u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER(intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(drq_w);
+	void intrq_w(int state);
+	void drq_w(int state);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	TIMER_DEVICE_CALLBACK_MEMBER(beep_timer);
 
@@ -316,12 +316,12 @@ void max80_state::drive_w(offs_t offset, u8 data)
 }
 
 
-WRITE_LINE_MEMBER(max80_state::intrq_w)
+void max80_state::intrq_w(int state)
 {
 	m_fdc_int = state;
 }
 
-WRITE_LINE_MEMBER(max80_state::drq_w)
+void max80_state::drq_w(int state)
 {
 	m_fdc_drq = state;
 	m_maincpu->set_input_line(INPUT_LINE_NMI, (state && m_allow_nmi) ? ASSERT_LINE : CLEAR_LINE);

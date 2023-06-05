@@ -46,23 +46,23 @@ protected:
 	ioport_constructor device_input_ports() const override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(int0_callback);
-	DECLARE_WRITE_LINE_MEMBER(int1_callback);
-	DECLARE_WRITE_LINE_MEMBER(rcv0_callback);
-	DECLARE_WRITE_LINE_MEMBER(rcv1_callback);
+	void int0_callback(int state);
+	void int1_callback(int state);
+	void rcv0_callback(int state);
+	void rcv1_callback(int state);
 	void xmit0_callback(uint8_t data);
 	void xmit1_callback(uint8_t data);
 	void ctrl0_callback(offs_t offset, uint8_t data);
 	void ctrl1_callback(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(selected_w);
-	DECLARE_WRITE_LINE_MEMBER(pio_direction_in_w);
-	DECLARE_WRITE_LINE_MEMBER(pio_handshake_out_w);
-	DECLARE_WRITE_LINE_MEMBER(pio_spareout_w);
-	DECLARE_WRITE_LINE_MEMBER(flag0_w);
-	DECLARE_WRITE_LINE_MEMBER(cts0_w);
-	DECLARE_WRITE_LINE_MEMBER(cts1_w);
-	DECLARE_WRITE_LINE_MEMBER(led_w);
+	void selected_w(int state);
+	void pio_direction_in_w(int state);
+	void pio_handshake_out_w(int state);
+	void pio_spareout_w(int state);
+	void flag0_w(int state);
+	void cts0_w(int state);
+	void cts1_w(int state);
+	void led_w(int state);
 
 	void        incoming_dtr(int uartind, line_state value);
 	void        transmit_data(int uartind, uint8_t value);

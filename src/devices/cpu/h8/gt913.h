@@ -79,7 +79,7 @@ protected:
 
 	required_memory_region        m_rom;
 
-	address_space_config data_config;
+	address_space_config m_data_config;
 	memory_access<32, 1, 0, ENDIANNESS_BIG>::specific m_data;
 	uint16_t m_banknum;
 	uint8_t m_syscr;

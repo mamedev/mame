@@ -393,7 +393,7 @@ public:
 	void init_missilem();
 	void init_suprmatk();
 
-	DECLARE_READ_LINE_MEMBER(vblank_r);
+	int vblank_r();
 
 protected:
 	virtual void machine_start() override;
@@ -512,7 +512,7 @@ TIMER_CALLBACK_MEMBER(missile_state::clock_irq)
 }
 
 
-READ_LINE_MEMBER(missile_state::vblank_r)
+int missile_state::vblank_r()
 {
 	int v = scanline_to_v(m_screen->vpos());
 	return v < 24;

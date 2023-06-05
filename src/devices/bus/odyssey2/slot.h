@@ -68,7 +68,7 @@ public:
 	virtual u8 io_read(offs_t offset) { return 0xff; }
 	virtual void bus_write(u8 data) { }
 	virtual u8 bus_read() { return 0xff; }
-	virtual DECLARE_READ_LINE_MEMBER(t0_read) { return 0; }
+	virtual int t0_read() { return 0; }
 	virtual int b_read() { return -1; }
 
 	virtual void cart_init() { } // called after loading ROM
@@ -133,7 +133,7 @@ public:
 	u8 io_read(offs_t offset);
 	void bus_write(u8 data);
 	u8 bus_read();
-	DECLARE_READ_LINE_MEMBER(t0_read);
+	int t0_read();
 	int b_read();
 
 	void write_p1(u8 data) { if (m_cart) m_cart->write_p1(data); }

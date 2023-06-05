@@ -77,7 +77,7 @@ protected:
 private:
 	void map_select_w(uint8_t data);
 	void page_select_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(bus_nmi_w);
+	void bus_nmi_w(int state);
 
 	required_device<cpu_device> m_maincpu;
 	required_memory_region m_rom;
@@ -148,7 +148,7 @@ void cms_state::machine_reset()
 }
 
 
-WRITE_LINE_MEMBER(cms_state::bus_nmi_w)
+void cms_state::bus_nmi_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }

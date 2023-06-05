@@ -41,8 +41,8 @@ protected:
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(keyboard_clk_w);
-	DECLARE_WRITE_LINE_MEMBER(keyboard_data_w);
+	void keyboard_clk_w(int state);
+	void keyboard_data_w(int state);
 
 	void eeprom_w(u8 data);
 	void keyboard_ack_w(u8 data);
@@ -76,7 +76,7 @@ u32 ikt5a_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	return 0;
 }
 
-WRITE_LINE_MEMBER(ikt5a_state::keyboard_clk_w)
+void ikt5a_state::keyboard_clk_w(int state)
 {
 	if (m_keyboard_clk && !state)
 	{
@@ -88,7 +88,7 @@ WRITE_LINE_MEMBER(ikt5a_state::keyboard_clk_w)
 	m_keyboard_clk = state;
 }
 
-WRITE_LINE_MEMBER(ikt5a_state::keyboard_data_w)
+void ikt5a_state::keyboard_data_w(int state)
 {
 	m_keyboard_data = state;
 }

@@ -185,28 +185,28 @@ private:
 	void floppy_p1_w(uint8_t data);
 	uint8_t floppy_p2_r();
 	void floppy_p2_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( tach0_r );
-	DECLARE_READ_LINE_MEMBER( tach1_r );
+	int tach0_r();
+	int tach1_r();
 	void da_w(uint8_t data);
 
 	uint8_t via4_pa_r();
 	void via4_pa_w(uint8_t data);
 	uint8_t via4_pb_r();
 	void via4_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( wrsync_w );
-	DECLARE_WRITE_LINE_MEMBER( via4_irq_w );
+	void wrsync_w(int state);
+	void via4_irq_w(int state);
 
 	uint8_t via5_pa_r();
 	void via5_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( via5_irq_w );
+	void via5_irq_w(int state);
 
 	uint8_t via6_pa_r();
 	uint8_t via6_pb_r();
 	void via6_pa_w(uint8_t data);
 	void via6_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( drw_w );
-	DECLARE_WRITE_LINE_MEMBER( erase_w );
-	DECLARE_WRITE_LINE_MEMBER( via6_irq_w );
+	void drw_w(int state);
+	void erase_w(int state);
+	void via6_irq_w(int state);
 };
 
 

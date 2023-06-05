@@ -132,16 +132,16 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER( upd7508_1sec_callback );
 
 	// serial
-	DECLARE_WRITE_LINE_MEMBER( sio_rx_w );
-	DECLARE_WRITE_LINE_MEMBER( sio_pin_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_rx_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_dsr_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_cts_w );
+	void sio_rx_w(int state);
+	void sio_pin_w(int state);
+	void rs232_rx_w(int state);
+	void rs232_dcd_w(int state);
+	void rs232_dsr_w(int state);
+	void rs232_cts_w(int state);
 
 	// centronics
-	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }
-	DECLARE_WRITE_LINE_MEMBER( centronics_perror_w ) { m_centronics_perror = state; }
+	void centronics_busy_w(int state) { m_centronics_busy = state; }
+	void centronics_perror_w(int state) { m_centronics_perror = state; }
 
 	void px4_io(address_map &map);
 	void px4_mem(address_map &map);
@@ -189,7 +189,7 @@ protected:
 
 	void gapnit_interrupt();
 
-	DECLARE_WRITE_LINE_MEMBER( serial_rx_w );
+	void serial_rx_w(int state);
 	void txd_w(int data);
 
 	void install_rom_capsule(address_space &space, int size, uint8_t *mem);
@@ -807,40 +807,40 @@ void px4_state::spur_w(uint8_t data)
 //  GAPNIO
 //**************************************************************************
 
-WRITE_LINE_MEMBER( px4_state::serial_rx_w )
+void px4_state::serial_rx_w(int state)
 {
 	m_serial_rx = state;
 	device_serial_interface::rx_w(state);
 }
 
-WRITE_LINE_MEMBER( px4_state::sio_rx_w )
+void px4_state::sio_rx_w(int state)
 {
 	if (!BIT(m_swr, 3) && BIT(m_swr, 2))
 		serial_rx_w(state);
 }
 
-WRITE_LINE_MEMBER( px4_state::sio_pin_w )
+void px4_state::sio_pin_w(int state)
 {
 	m_sio_pin = state;
 }
 
-WRITE_LINE_MEMBER( px4_state::rs232_rx_w )
+void px4_state::rs232_rx_w(int state)
 {
 	if (BIT(m_swr, 3))
 		serial_rx_w(state);
 }
 
-WRITE_LINE_MEMBER( px4_state::rs232_dcd_w )
+void px4_state::rs232_dcd_w(int state)
 {
 	m_rs232_dcd = state;
 }
 
-WRITE_LINE_MEMBER( px4_state::rs232_dsr_w )
+void px4_state::rs232_dsr_w(int state)
 {
 	m_artsr |= !state << 7;
 }
 
-WRITE_LINE_MEMBER( px4_state::rs232_cts_w )
+void px4_state::rs232_cts_w(int state)
 {
 	m_rs232_cts = state;
 }

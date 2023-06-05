@@ -81,7 +81,6 @@ void sis630_svga_device::device_start()
 	vga.crtc.maximum_scan_line = 1;
 
 	// copy over interfaces
-	vga.read_dipswitch.set(nullptr); //read_dipswitch;
 	vga.svga_intf.seq_regcount = 0x05;
 	vga.svga_intf.crtc_regcount = 0x27;
 	vga.svga_intf.vram_size = 64*1024*1024;

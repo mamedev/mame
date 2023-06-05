@@ -507,7 +507,7 @@ void pc9801_state::sasi_data_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER( pc9801_state::write_sasi_io )
+void pc9801_state::write_sasi_io(int state)
 {
 	m_sasi_ctrl_in->write_bit2(state);
 
@@ -527,7 +527,7 @@ WRITE_LINE_MEMBER( pc9801_state::write_sasi_io )
 		m_pic2->ir1_w(0);
 }
 
-WRITE_LINE_MEMBER( pc9801_state::write_sasi_req )
+void pc9801_state::write_sasi_req(int state)
 {
 	m_sasi_ctrl_in->write_bit7(state);
 
@@ -1467,7 +1467,7 @@ uint8_t pc9801_state::get_slave_ack(offs_t offset)
 *
 ****************************************/
 
-WRITE_LINE_MEMBER(pc9801_state::dma_hrq_changed)
+void pc9801_state::dma_hrq_changed(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
@@ -1476,7 +1476,7 @@ WRITE_LINE_MEMBER(pc9801_state::dma_hrq_changed)
 //  logerror("%02x HLDA\n",state);
 }
 
-WRITE_LINE_MEMBER(pc9801_state::tc_w )
+void pc9801_state::tc_w(int state)
 {
 	/* floppy terminal count */
 	m_fdc_2hd->tc_w(state);
@@ -1548,10 +1548,10 @@ ch2 FDC
 ch3 SCSI
 */
 
-WRITE_LINE_MEMBER(pc9801_state::dack0_w){ /*logerror("%02x 0\n",state);*/ set_dma_channel(0, state); }
-WRITE_LINE_MEMBER(pc9801_state::dack1_w){ /*logerror("%02x 1\n",state);*/ set_dma_channel(1, state); }
-WRITE_LINE_MEMBER(pc9801_state::dack2_w){ /*logerror("%02x 2\n",state);*/ set_dma_channel(2, state); }
-WRITE_LINE_MEMBER(pc9801_state::dack3_w){ /*logerror("%02x 3\n",state);*/ set_dma_channel(3, state); }
+void pc9801_state::dack0_w(int state) { /*logerror("%02x 0\n",state);*/ set_dma_channel(0, state); }
+void pc9801_state::dack1_w(int state) { /*logerror("%02x 1\n",state);*/ set_dma_channel(1, state); }
+void pc9801_state::dack2_w(int state) { /*logerror("%02x 2\n",state);*/ set_dma_channel(2, state); }
+void pc9801_state::dack3_w(int state) { /*logerror("%02x 3\n",state);*/ set_dma_channel(3, state); }
 
 /*
  * PPI "system" I/F
@@ -1836,7 +1836,7 @@ static void pc9801_cbus_devices(device_slot_interface &device)
 
 //  Jast Sound, could be installed independently
 
-WRITE_LINE_MEMBER( pc9801_state::fdc_2dd_irq )
+void pc9801_state::fdc_2dd_irq(int state)
 {
 	logerror("IRQ 2DD %d\n",state);
 
@@ -1848,7 +1848,7 @@ WRITE_LINE_MEMBER( pc9801_state::fdc_2dd_irq )
 	}
 }
 
-WRITE_LINE_MEMBER( pc9801vm_state::fdc_irq_w )
+void pc9801vm_state::fdc_irq_w(int state)
 {
 	if(m_fdc_mode & 1)
 		m_pic2->ir3_w(state);
@@ -1856,7 +1856,7 @@ WRITE_LINE_MEMBER( pc9801vm_state::fdc_irq_w )
 		m_pic2->ir2_w(state);
 }
 
-WRITE_LINE_MEMBER( pc9801vm_state::fdc_drq_w )
+void pc9801vm_state::fdc_drq_w(int state)
 {
 	if(m_fdc_mode & 1)
 		m_dmac->dreq2_w(state ^ 1);
@@ -2021,7 +2021,7 @@ MACHINE_RESET_MEMBER(pc9801bx_state,pc9801bx2)
 	m_dma_access_ctrl = 0x00;
 }
 
-WRITE_LINE_MEMBER(pc9801_state::vrtc_irq)
+void pc9801_state::vrtc_irq(int state)
 {
 	if(state)
 		m_pic1->ir2_w(1);

@@ -280,7 +280,7 @@ void hp9885_device::ext_control_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(hp9885_device::pctl_w)
+void hp9885_device::pctl_w(int state)
 {
 	m_pctl = state;
 	if (m_pctl) {
@@ -294,12 +294,12 @@ WRITE_LINE_MEMBER(hp9885_device::pctl_w)
 	update_busy();
 }
 
-WRITE_LINE_MEMBER(hp9885_device::io_w)
+void hp9885_device::io_w(int state)
 {
 	LOG_HS("I/O = %d\n" , state);
 }
 
-WRITE_LINE_MEMBER(hp9885_device::preset_w)
+void hp9885_device::preset_w(int state)
 {
 	LOG("PRESET = %d\n" , state);
 }

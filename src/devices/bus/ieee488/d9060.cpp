@@ -328,12 +328,12 @@ void d9060_device_base::via_pb_w(uint8_t data)
 	m_sasibus->write_rst(BIT(data, 1));
 }
 
-WRITE_LINE_MEMBER( d9060_device_base::ack_w )
+void d9060_device_base::ack_w(int state)
 {
 	m_sasibus->write_ack(!state);
 }
 
-WRITE_LINE_MEMBER( d9060_device_base::enable_w )
+void d9060_device_base::enable_w(int state)
 {
 	m_enable = state;
 

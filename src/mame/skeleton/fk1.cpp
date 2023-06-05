@@ -53,9 +53,9 @@ private:
 	uint8_t ppi3_a_r();
 	uint8_t ppi3_b_r();
 	uint8_t ppi3_c_r();
-	DECLARE_WRITE_LINE_MEMBER(pit_out0);
-	DECLARE_WRITE_LINE_MEMBER(pit_out1);
-	DECLARE_WRITE_LINE_MEMBER(pit_out2);
+	void pit_out0(int state);
+	void pit_out1(int state);
+	void pit_out2(int state);
 	void intr_w(uint8_t data);
 	uint8_t bank_ram_r();
 	uint8_t bank_rom_r();
@@ -236,22 +236,22 @@ uint8_t fk1_state::ppi3_c_r()
 	return 0;
 }
 
-WRITE_LINE_MEMBER( fk1_state::pit_out0 )
+void fk1_state::pit_out0(int state)
 {
 	// System time
-	logerror("WRITE_LINE_MEMBER(fk1_pit_out0)\n");
+	logerror("fk1_pit_out0\n");
 }
 
-WRITE_LINE_MEMBER( fk1_state::pit_out1 )
+void fk1_state::pit_out1(int state)
 {
 	// Timeout for disk operation
-	logerror("WRITE_LINE_MEMBER(fk1_pit_out1)\n");
+	logerror("fk1_pit_out1\n");
 }
 
-WRITE_LINE_MEMBER( fk1_state::pit_out2 )
+void fk1_state::pit_out2(int state)
 {
 	// Overflow for disk operations
-	logerror("WRITE_LINE_MEMBER(fk1_pit_out2)\n");
+	logerror("fk1_pit_out2\n");
 }
 
 /*

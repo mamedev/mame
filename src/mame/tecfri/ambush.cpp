@@ -92,17 +92,17 @@ private:
 	TILE_GET_INFO_MEMBER(mariobl_char_tile_info);
 	TILE_GET_INFO_MEMBER(dkong3abl_char_tile_info);
 
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
+	void flip_screen_w(int state);
 	void scroll_ram_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(color_bank_1_w);
-	DECLARE_WRITE_LINE_MEMBER(color_bank_2_w);
+	void color_bank_1_w(int state);
+	void color_bank_2_w(int state);
 
 	DECLARE_MACHINE_START(ambush);
 	DECLARE_MACHINE_START(mariobl);
 	DECLARE_MACHINE_START(dkong3abl);
 
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
+	void coin_counter_1_w(int state);
+	void coin_counter_2_w(int state);
 	void output_latches_w(offs_t offset, uint8_t data);
 
 	void bootleg_map(address_map &map);
@@ -557,7 +557,7 @@ uint32_t ambush_state::screen_update_bootleg(screen_device &screen, bitmap_ind16
 	return 0;
 }
 
-WRITE_LINE_MEMBER(ambush_state::flip_screen_w)
+void ambush_state::flip_screen_w(int state)
 {
 	flip_screen_set(state);
 }
@@ -568,12 +568,12 @@ void ambush_state::scroll_ram_w(offs_t offset, uint8_t data)
 	m_char_tilemap->set_scrolly(offset, data + 1);
 }
 
-WRITE_LINE_MEMBER(ambush_state::color_bank_1_w)
+void ambush_state::color_bank_1_w(int state)
 {
 	m_color_bank = (m_color_bank & 0x02) | (state ? 0x01 : 0x00);
 }
 
-WRITE_LINE_MEMBER(ambush_state::color_bank_2_w)
+void ambush_state::color_bank_2_w(int state)
 {
 	m_color_bank = (m_color_bank & 0x01) | (state ? 0x02 : 0x00);
 }
@@ -705,12 +705,12 @@ MACHINE_START_MEMBER( ambush_state, dkong3abl )
 	m_char_tilemap->set_transparent_pen(0);
 }
 
-WRITE_LINE_MEMBER(ambush_state::coin_counter_1_w)
+void ambush_state::coin_counter_1_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(ambush_state::coin_counter_2_w)
+void ambush_state::coin_counter_2_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }

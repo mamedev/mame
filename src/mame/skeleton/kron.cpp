@@ -147,7 +147,7 @@ public:
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(keyb_interrupt);
+	void keyb_interrupt(int state);
 	void sn74259_w(offs_t offset, uint8_t data) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset & 0x07, offset & 0x08 ? 1 : 0); }
 	void ap5_w(offs_t offset, uint8_t data) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
 	uint8_t ap5_r(offs_t offset) { LOGIO("%s() %02x = %02x\n", FUNCNAME, offset, 1); return 1; }
@@ -274,7 +274,7 @@ INTERRUPT_GEN_MEMBER(kron180_state::interrupt)
 }
 #endif
 
-WRITE_LINE_MEMBER(kron180_state::keyb_interrupt)
+void kron180_state::keyb_interrupt(int state)
 {
 	if(state && (m_kbd_data = m_keyboard->read()))
 	{

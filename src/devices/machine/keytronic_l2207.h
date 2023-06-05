@@ -33,7 +33,7 @@ public:
 	auto ser_out_callback() { return m_ser_out_callback.bind(); }
 
 	// serial line input
-	DECLARE_WRITE_LINE_MEMBER(ser_in_w);
+	void ser_in_w(int state);
 
 protected:
 	// device-level overrides

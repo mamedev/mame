@@ -85,13 +85,13 @@ private:
 	u8 portb_r();
 	void out1_w(offs_t offset, u8 data);
 	void out2_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(disp_data_w);
-	DECLARE_WRITE_LINE_MEMBER(disp_clock_w);
-	DECLARE_WRITE_LINE_MEMBER(disp_strobe_w);
-	DECLARE_WRITE_LINE_MEMBER(row_w);
+	void disp_data_w(int state);
+	void disp_clock_w(int state);
+	void disp_strobe_w(int state);
+	void row_w(int state);
 	void sample_bank_w(u8 data);
 	void adpcm_reset_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(vck_w);
+	void vck_w(int state);
 	IRQ_CALLBACK_MEMBER(sound_int_cb);
 
 	void main_map(address_map &map);
@@ -273,15 +273,15 @@ void jp_state::out2_w(offs_t offset, u8 data)
 	}
 }
 
-WRITE_LINE_MEMBER(jp_state::row_w)
+void jp_state::row_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER(jp_state::disp_data_w)
+void jp_state::disp_data_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER(jp_state::disp_clock_w)
+void jp_state::disp_clock_w(int state)
 {
 	if (state)
 	{
@@ -292,7 +292,7 @@ WRITE_LINE_MEMBER(jp_state::disp_clock_w)
 		update_display();
 }
 
-WRITE_LINE_MEMBER(jp_state::disp_strobe_w)
+void jp_state::disp_strobe_w(int state)
 {
 	if (state)
 		update_display();
@@ -461,7 +461,7 @@ void jp_state::adpcm_reset_w(u8 data)
 	m_msm->reset_w(BIT(data, 0));
 }
 
-WRITE_LINE_MEMBER(jp_state::vck_w)
+void jp_state::vck_w(int state)
 {
 	if (state)
 	{

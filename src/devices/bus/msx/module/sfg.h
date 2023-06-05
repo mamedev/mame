@@ -27,8 +27,8 @@ protected:
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(ym2148_irq_w);
+	void ym2151_irq_w(int state);
+	void ym2148_irq_w(int state);
 
 	required_memory_region m_region_sfg;
 	required_device<ym_generic_device> m_ym2151;

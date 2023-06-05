@@ -209,7 +209,7 @@ public:
 
 	void init_rongrong();
 
-	DECLARE_READ_LINE_MEMBER(blitter_irq_r);
+	int blitter_irq_r();
 	DECLARE_CUSTOM_INPUT_MEMBER(ddenlovj_blitter_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(nettoqc_special_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(mjflove_blitter_r);
@@ -239,12 +239,12 @@ protected:
 	uint32_t screen_update_ddenlovr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(ddenlovr_irq);
-	DECLARE_WRITE_LINE_MEMBER(mjflove_irq);
-	DECLARE_WRITE_LINE_MEMBER(mjflove_rtc_irq);
-	DECLARE_WRITE_LINE_MEMBER(ddenlovr_blitter_irq);
-	DECLARE_WRITE_LINE_MEMBER(ddenlovr_blitter_irq_ack_w);
-	DECLARE_WRITE_LINE_MEMBER(mjflove_blitter_irq);
+	void ddenlovr_irq(int state);
+	void mjflove_irq(int state);
+	void mjflove_rtc_irq(int state);
+	void ddenlovr_blitter_irq(int state);
+	void ddenlovr_blitter_irq_ack_w(int state);
+	void mjflove_blitter_irq(int state);
 
 protected:
 	void ddenlovr_bgcolor_w(uint8_t data);
@@ -268,8 +268,8 @@ protected:
 	void ddenlovr_select2_w(uint8_t data);
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(ddenlovr_coincounter_0_w);
-	DECLARE_WRITE_LINE_MEMBER(ddenlovr_coincounter_1_w);
+	void ddenlovr_coincounter_0_w(int state);
+	void ddenlovr_coincounter_1_w(int state);
 	void rongrong_coincounter_w(uint8_t data);
 	uint8_t rongrong_input2_r();
 	uint16_t quiz365_input2_r();
@@ -324,8 +324,8 @@ private:
 	uint16_t akamaru_protection1_r();
 	void akamaru_protection1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t akamaru_protection2_r();
-	DECLARE_WRITE_LINE_MEMBER(akamaru_dsw1_sel_w);
-	DECLARE_WRITE_LINE_MEMBER(akamaru_dsw2_sel_w);
+	void akamaru_dsw1_sel_w(int state);
+	void akamaru_dsw2_sel_w(int state);
 	uint16_t akamaru_dsw_r();
 	uint16_t akamaru_blitter_r();
 	uint16_t akamaru_e0010d_r();
@@ -348,8 +348,8 @@ private:
 	void seljan2_palette_w(offs_t offset, uint8_t data);
 	void quizchq_oki_bank_w(uint8_t data);
 	void ddenlovr_oki_bank_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(quiz365_oki_bank1_w);
-	DECLARE_WRITE_LINE_MEMBER(quiz365_oki_bank2_w);
+	void quiz365_oki_bank1_w(int state);
+	void quiz365_oki_bank2_w(int state);
 protected:
 	void ddenlovr_select_w(uint8_t data);
 private:
@@ -528,21 +528,21 @@ private:
 	DECLARE_VIDEO_START(mmpanic);
 	DECLARE_MACHINE_START(funkyfig);
 
-	DECLARE_WRITE_LINE_MEMBER(mmpanic_irq);
-	DECLARE_WRITE_LINE_MEMBER(mmpanic_rtc_irq);
-	DECLARE_WRITE_LINE_MEMBER(funkyfig_sound_irq);
+	void mmpanic_irq(int state);
+	void mmpanic_rtc_irq(int state);
+	void funkyfig_sound_irq(int state);
 
 	uint8_t magic_r();
 	void mmpanic_rombank_w(uint8_t data);
 	void mmpanic_blitter2_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(mmpanic_blitter_irq);
+	void mmpanic_blitter_irq(int state);
 	void mmpanic_leds_w(uint8_t data);
 	void mmpanic_leds2_w(uint8_t data);
 	void mmpanic_lockout_w(uint8_t data);
 	uint8_t mmpanic_link_r();
 	uint8_t funkyfig_busy_r();
 	void funkyfig_blitter_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(funkyfig_blitter_irq);
+	void funkyfig_blitter_irq(int state);
 	void funkyfig_rombank_w(uint8_t data);
 	uint8_t funkyfig_dsw_r();
 	uint8_t funkyfig_coin_r();
@@ -1678,7 +1678,7 @@ void ddenlovr_state::ddenlovr_blitter_w(offs_t offset, uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(ddenlovr_state::ddenlovr_blitter_irq)
+void ddenlovr_state::ddenlovr_blitter_irq(int state)
 {
 	if (state && m_ddenlovr_blitter_irq_enable)
 	{
@@ -1687,7 +1687,7 @@ WRITE_LINE_MEMBER(ddenlovr_state::ddenlovr_blitter_irq)
 	}
 }
 
-WRITE_LINE_MEMBER(ddenlovr_state::ddenlovr_blitter_irq_ack_w)
+void ddenlovr_state::ddenlovr_blitter_irq_ack_w(int state)
 {
 	if (state)
 	{
@@ -1857,17 +1857,17 @@ uint32_t ddenlovr_state::screen_update_ddenlovr(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-READ_LINE_MEMBER(ddenlovr_state::blitter_irq_r)
+int ddenlovr_state::blitter_irq_r()
 {
 	return m_ddenlovr_blitter_irq_flag;
 }
 
-WRITE_LINE_MEMBER(ddenlovr_state::ddenlovr_coincounter_0_w)
+void ddenlovr_state::ddenlovr_coincounter_0_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(ddenlovr_state::ddenlovr_coincounter_1_w)
+void ddenlovr_state::ddenlovr_coincounter_1_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }
@@ -1944,13 +1944,13 @@ void ddenlovr_state::ddenlovr_oki_bank_w(uint8_t data)
 	m_oki->set_rom_bank(data & 7);
 }
 
-WRITE_LINE_MEMBER(ddenlovr_state::quiz365_oki_bank1_w)
+void ddenlovr_state::quiz365_oki_bank1_w(int state)
 {
 	m_okibank = (m_okibank & 2) | state;
 	m_oki->set_rom_bank(m_okibank);
 }
 
-WRITE_LINE_MEMBER(ddenlovr_state::quiz365_oki_bank2_w)
+void ddenlovr_state::quiz365_oki_bank2_w(int state)
 {
 	m_okibank = (m_okibank & 1) | (state << 1);
 	m_oki->set_rom_bank(m_okibank);
@@ -2494,7 +2494,7 @@ void mmpanic_state::mmpanic_blitter2_w(offs_t offset, uint8_t data)
 	blitter_w(1, offset, data);
 }
 
-WRITE_LINE_MEMBER(mmpanic_state::mmpanic_blitter_irq)
+void mmpanic_state::mmpanic_blitter_irq(int state)
 {
 	if (state)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xdf);    // Z80 - RST 18
@@ -2640,7 +2640,7 @@ void mmpanic_state::funkyfig_blitter_w(offs_t offset, uint8_t data)
 	blitter_w_funkyfig(0, offset, data);
 }
 
-WRITE_LINE_MEMBER(mmpanic_state::funkyfig_blitter_irq)
+void mmpanic_state::funkyfig_blitter_irq(int state)
 {
 	if (0) // this vector looks wrong
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe0); // Z80
@@ -3811,12 +3811,12 @@ uint16_t ddenlovr_state::akamaru_protection2_r()
 	return 0x55;
 }
 
-WRITE_LINE_MEMBER(ddenlovr_state::akamaru_dsw1_sel_w)
+void ddenlovr_state::akamaru_dsw1_sel_w(int state)
 {
 	m_dsw_sel = (m_dsw_sel & 2) | state;
 }
 
-WRITE_LINE_MEMBER(ddenlovr_state::akamaru_dsw2_sel_w)
+void ddenlovr_state::akamaru_dsw2_sel_w(int state)
 {
 	m_dsw_sel = (m_dsw_sel & 1) | (state << 1);
 }
@@ -9813,7 +9813,7 @@ MACHINE_START_MEMBER(ddenlovr_state,sryudens)
                             Don Den Lover Vol.1
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(ddenlovr_state::ddenlovr_irq)
+void ddenlovr_state::ddenlovr_irq(int state)
 {
 	if (state)
 		m_maincpu->set_input_line(M68K_IRQ_1, HOLD_LINE);
@@ -10010,7 +10010,7 @@ void ddenlovr_state::rongrong(machine_config &config)
     RST 20 is from the link device?
  */
 
-WRITE_LINE_MEMBER(mmpanic_state::mmpanic_irq)
+void mmpanic_state::mmpanic_irq(int state)
 {
 	if (!state)
 		return;
@@ -10026,7 +10026,7 @@ WRITE_LINE_MEMBER(mmpanic_state::mmpanic_irq)
 }
 
 
-WRITE_LINE_MEMBER(mmpanic_state::mmpanic_rtc_irq)
+void mmpanic_state::mmpanic_rtc_irq(int state)
 {
 	if (state)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xdf); // Z80 - RST 18, clock
@@ -10236,7 +10236,7 @@ void hanakanz_state::mjchuuka(machine_config &config)
 }
 
 
-WRITE_LINE_MEMBER(mmpanic_state::funkyfig_sound_irq)
+void mmpanic_state::funkyfig_sound_irq(int state)
 {
 	if (state)
 		m_soundcpu->set_input_line(0, HOLD_LINE);   // NMI by main cpu
@@ -10502,7 +10502,7 @@ void ddenlovr_state::mjmyornt(machine_config &config)
 }
 
 
-WRITE_LINE_MEMBER(ddenlovr_state::mjflove_irq)
+void ddenlovr_state::mjflove_irq(int state)
 {
 	if (state)
 	{
@@ -10511,7 +10511,7 @@ WRITE_LINE_MEMBER(ddenlovr_state::mjflove_irq)
 	}
 }
 
-WRITE_LINE_MEMBER(ddenlovr_state::mjflove_rtc_irq)
+void ddenlovr_state::mjflove_rtc_irq(int state)
 {
 	if (state)
 	{
@@ -10520,7 +10520,7 @@ WRITE_LINE_MEMBER(ddenlovr_state::mjflove_rtc_irq)
 	}
 }
 
-WRITE_LINE_MEMBER(ddenlovr_state::mjflove_blitter_irq)
+void ddenlovr_state::mjflove_blitter_irq(int state)
 {
 	if (0) // ???
 		m_maincpu->set_input_line(0, HOLD_LINE);

@@ -59,8 +59,8 @@ public:
 
 	void init_megaplay();
 
-	DECLARE_READ_LINE_MEMBER(start1_r);
-	DECLARE_READ_LINE_MEMBER(start2_r);
+	int start1_r();
+	int start2_r();
 
 protected:
 	virtual void machine_reset() override;
@@ -396,12 +396,12 @@ INPUT_PORTS_END
 
 // MEGAPLAY specific
 
-READ_LINE_MEMBER(mplay_state::start1_r)
+int mplay_state::start1_r()
 {
 	return BIT(m_bios_bank, 4);
 }
 
-READ_LINE_MEMBER(mplay_state::start2_r)
+int mplay_state::start2_r()
 {
 	return BIT(m_bios_bank, 5);
 }

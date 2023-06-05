@@ -93,9 +93,9 @@ protected:
 	void smsj_ym2413_register_port_w(uint8_t data);
 	void smsj_ym2413_data_port_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(rapid_n_csync_callback);
-	DECLARE_WRITE_LINE_MEMBER(sms_ctrl1_th_input);
-	DECLARE_WRITE_LINE_MEMBER(sms_ctrl2_th_input);
+	void rapid_n_csync_callback(int state);
+	void sms_ctrl1_th_input(int state);
+	void sms_ctrl2_th_input(int state);
 
 	void sms_io(address_map &map);
 	void sms_mem(address_map &map);
@@ -210,7 +210,7 @@ private:
 	uint8_t sscope_r(offs_t offset);
 	void sscope_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(sscope_vblank);
+	void sscope_vblank(int state);
 	uint32_t screen_update_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -256,7 +256,7 @@ private:
 
 	uint8_t store_cart_peek(offs_t offset);
 
-	DECLARE_WRITE_LINE_MEMBER(sms_store_int_callback);
+	void sms_store_int_callback(int state);
 	void sms_store_mem(address_map &map);
 
 	required_device<cpu_device> m_control_cpu;
@@ -319,9 +319,9 @@ private:
 	uint8_t gg_input_port_dd_r();
 	void gg_io_control_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(gg_pause_callback);
-	DECLARE_WRITE_LINE_MEMBER(gg_ext_th_input);
-	DECLARE_WRITE_LINE_MEMBER(gg_nmi);
+	void gg_pause_callback(int state);
+	void gg_ext_th_input(int state);
+	void gg_nmi(int state);
 
 	uint32_t screen_update_gamegear(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

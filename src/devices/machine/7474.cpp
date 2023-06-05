@@ -153,7 +153,7 @@ void ttl7474_device::update()
 //  clear_w - set the clear line state
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( ttl7474_device::clear_w )
+void ttl7474_device::clear_w(int state)
 {
 	m_clear = state & 1;
 	update();
@@ -164,7 +164,7 @@ WRITE_LINE_MEMBER( ttl7474_device::clear_w )
 //  clear_w - set the clear line state
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( ttl7474_device::preset_w )
+void ttl7474_device::preset_w(int state)
 {
 	m_preset = state & 1;
 	update();
@@ -175,7 +175,7 @@ WRITE_LINE_MEMBER( ttl7474_device::preset_w )
 //  clock_w - set the clock line state
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( ttl7474_device::clock_w )
+void ttl7474_device::clock_w(int state)
 {
 	m_clk = state & 1;
 	update();
@@ -186,7 +186,7 @@ WRITE_LINE_MEMBER( ttl7474_device::clock_w )
 //  d_w - set the d line state
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( ttl7474_device::d_w )
+void ttl7474_device::d_w(int state)
 {
 	m_d = state & 1;
 	update();
@@ -197,7 +197,7 @@ WRITE_LINE_MEMBER( ttl7474_device::d_w )
 //  output_r - get the output line state
 //-------------------------------------------------
 
-READ_LINE_MEMBER( ttl7474_device::output_r )
+int ttl7474_device::output_r()
 {
 	return m_output!=0;
 }
@@ -207,7 +207,7 @@ READ_LINE_MEMBER( ttl7474_device::output_r )
 //  output_comp_r - get the output-compare line state
 //-----------------------------------------------------
 
-READ_LINE_MEMBER( ttl7474_device::output_comp_r )
+int ttl7474_device::output_comp_r()
 {
 	return m_output_comp!=0;
 }

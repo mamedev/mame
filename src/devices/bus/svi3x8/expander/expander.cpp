@@ -106,28 +106,28 @@ void svi_expander_device::iorq_w(offs_t offset, uint8_t data)
 		m_module->iorq_w(offset, data);
 }
 
-WRITE_LINE_MEMBER( svi_expander_device::bk21_w )
+void svi_expander_device::bk21_w(int state)
 {
-		if (m_module)
-			m_module->bk21_w(state);
+	if (m_module)
+		m_module->bk21_w(state);
 }
 
-WRITE_LINE_MEMBER( svi_expander_device::bk22_w )
+void svi_expander_device::bk22_w(int state)
 {
-		if (m_module)
-			m_module->bk22_w(state);
+	if (m_module)
+		m_module->bk22_w(state);
 }
 
-WRITE_LINE_MEMBER( svi_expander_device::bk31_w )
+void svi_expander_device::bk31_w(int state)
 {
-		if (m_module)
-			m_module->bk31_w(state);
+	if (m_module)
+		m_module->bk31_w(state);
 }
 
-WRITE_LINE_MEMBER( svi_expander_device::bk32_w )
+void svi_expander_device::bk32_w(int state)
 {
-		if (m_module)
-			m_module->bk32_w(state);
+	if (m_module)
+		m_module->bk32_w(state);
 }
 
 

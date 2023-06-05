@@ -195,7 +195,7 @@ void wangpcbus_device::dack_w(int line, uint8_t data)
 //  tc_w - terminal count
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( wangpcbus_device::tc_w )
+void wangpcbus_device::tc_w(int state)
 {
 	for (device_wangpcbus_card_interface &entry : m_device_list)
 		entry.wangpcbus_tc_w(state);

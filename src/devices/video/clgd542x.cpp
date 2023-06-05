@@ -17,8 +17,6 @@
 #define VERBOSE (0)
 #include "logmacro.h"
 
-#define CRTC_PORT_ADDR ((vga.miscellaneous_output&1)?0x3d0:0x3b0)
-
 //#define TEXT_LINES (LINES_HELPER)
 #define LINES (vga.crtc.vert_disp_end+1)
 #define TEXT_LINES (vga.crtc.vert_disp_end+1)
@@ -79,7 +77,6 @@ void cirrus_gd5428_device::device_start()
 	vga.crtc.maximum_scan_line = 1;
 
 	// copy over interfaces
-	vga.read_dipswitch.set(nullptr); //read_dipswitch;
 	vga.svga_intf.seq_regcount = 0x1f;
 	vga.svga_intf.crtc_regcount = 0x2d;
 	vga.memory = std::make_unique<uint8_t []>(vga.svga_intf.vram_size);
@@ -1018,7 +1015,7 @@ uint8_t cirrus_gd5428_device::port_03b0_r(offs_t offset)
 {
 	uint8_t res = 0xff;
 
-	if (CRTC_PORT_ADDR == 0x3b0)
+	if (get_crtc_port() == 0x3b0)
 	{
 		switch(offset)
 		{
@@ -1038,7 +1035,7 @@ uint8_t cirrus_gd5428_device::port_03d0_r(offs_t offset)
 {
 	uint8_t res = 0xff;
 
-	if (CRTC_PORT_ADDR == 0x3d0)
+	if (get_crtc_port() == 0x3d0)
 	{
 		switch(offset)
 		{
@@ -1056,7 +1053,7 @@ uint8_t cirrus_gd5428_device::port_03d0_r(offs_t offset)
 
 void cirrus_gd5428_device::port_03b0_w(offs_t offset, uint8_t data)
 {
-	if (CRTC_PORT_ADDR == 0x3b0)
+	if (get_crtc_port() == 0x3b0)
 	{
 		switch(offset)
 		{
@@ -1074,7 +1071,7 @@ void cirrus_gd5428_device::port_03b0_w(offs_t offset, uint8_t data)
 
 void cirrus_gd5428_device::port_03d0_w(offs_t offset, uint8_t data)
 {
-	if (CRTC_PORT_ADDR == 0x3d0)
+	if (get_crtc_port() == 0x3d0)
 	{
 		switch(offset)
 		{
@@ -1157,28 +1154,17 @@ void cirrus_gd5428_device::cirrus_crtc_reg_write(uint8_t index, uint8_t data)
 
 }
 
-inline uint8_t cirrus_gd5428_device::cirrus_vga_latch_write(int offs, uint8_t data)
+uint8_t cirrus_gd5428_device::vga_latch_write(int offs, uint8_t data)
 {
 	uint8_t res = 0;
 	uint8_t mode_mask = (gc_mode_ext & 0x04) ? 0x07 : 0x03;
 
 	switch (vga.gc.write_mode & mode_mask) {
 	case 0:
-		data = rotate_right(data);
-		if(vga.gc.enable_set_reset & 1<<offs)
-			res = vga_logical_op((vga.gc.set_reset & 1<<offs) ? vga.gc.bit_mask : 0, offs,vga.gc.bit_mask);
-		else
-			res = vga_logical_op(data, offs, vga.gc.bit_mask);
-		break;
 	case 1:
-		res = vga.gc.latch[offs];
-		break;
 	case 2:
-		res = vga_logical_op((data & 1<<offs) ? 0xff : 0x00,offs,vga.gc.bit_mask);
-		break;
 	case 3:
-		data = rotate_right(data);
-		res = vga_logical_op((vga.gc.set_reset & 1<<offs) ? 0xff : 0x00,offs,data&vga.gc.bit_mask);
+		res = vga_device::vga_latch_write(offs, data);
 		break;
 	case 4:
 		res = vga.gc.latch[offs];
@@ -1497,11 +1483,11 @@ void cirrus_gd5428_device::mem_w(offs_t offset, uint8_t data)
 				{
 					if(gc_mode_ext & 0x02)
 					{
-						vga.memory[(((offset+addr) << 1)+i*0x10000) % vga.svga_intf.vram_size] = (vga.sequencer.data[4] & 4) ? cirrus_vga_latch_write(i,data) : data;
-						vga.memory[(((offset+addr) << 1)+i*0x10000+1) % vga.svga_intf.vram_size] = (vga.sequencer.data[4] & 4) ? cirrus_vga_latch_write(i,data) : data;
+						vga.memory[(((offset+addr) << 1)+i*0x10000) % vga.svga_intf.vram_size] = (vga.sequencer.data[4] & 4) ? vga_latch_write(i,data) : data;
+						vga.memory[(((offset+addr) << 1)+i*0x10000+1) % vga.svga_intf.vram_size] = (vga.sequencer.data[4] & 4) ? vga_latch_write(i,data) : data;
 					}
 					else
-						vga.memory[(((offset+addr))+i*0x10000) % vga.svga_intf.vram_size] = (vga.sequencer.data[4] & 4) ? cirrus_vga_latch_write(i,data) : data;
+						vga.memory[(((offset+addr))+i*0x10000) % vga.svga_intf.vram_size] = (vga.sequencer.data[4] & 4) ? vga_latch_write(i,data) : data;
 				}
 			}
 			return;

@@ -1112,7 +1112,7 @@ void gcm394_base_video_device::check_video_irq()
 	m_video_irq_cb((m_video_irq_status & m_video_irq_enable) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(gcm394_base_video_device::vblank)
+void gcm394_base_video_device::vblank(int state)
 {
 	if (!state)
 	{

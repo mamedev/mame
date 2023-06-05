@@ -219,7 +219,7 @@ void seibu_sound_device::rst18_ack_w(u8)
 	update_irq_lines(RST18_EOI);
 }
 
-WRITE_LINE_MEMBER( seibu_sound_device::fm_irqhandler )
+void seibu_sound_device::fm_irqhandler(int state)
 {
 	update_irq_lines(state ? RST10_ASSERT : RST10_CLEAR);
 }

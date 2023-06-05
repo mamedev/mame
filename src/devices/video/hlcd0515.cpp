@@ -168,7 +168,7 @@ void hlcd0515_device::clock_data(int col)
 }
 
 
-WRITE_LINE_MEMBER(hlcd0515_device::clock_w)
+void hlcd0515_device::clock_w(int state)
 {
 	state = (state) ? 1 : 0;
 
@@ -194,7 +194,7 @@ WRITE_LINE_MEMBER(hlcd0515_device::clock_w)
 }
 
 
-WRITE_LINE_MEMBER(hlcd0515_device::cs_w)
+void hlcd0515_device::cs_w(int state)
 {
 	state = (state) ? 1 : 0;
 

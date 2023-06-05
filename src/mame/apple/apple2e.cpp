@@ -362,14 +362,14 @@ public:
 	void lc_romswitch_w(offs_t offset, u8 data);
 	u8 laser_mouse_r(offs_t offset);
 	void laser_mouse_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_inh_w);
-	DECLARE_WRITE_LINE_MEMBER(busy_w);
-	DECLARE_READ_LINE_MEMBER(ay3600_shift_r);
-	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
-	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
-	DECLARE_WRITE_LINE_MEMBER(ay3600_ako_w);
+	void a2bus_irq_w(int state);
+	void a2bus_nmi_w(int state);
+	void a2bus_inh_w(int state);
+	void busy_w(int state);
+	int ay3600_shift_r();
+	int ay3600_control_r();
+	void ay3600_data_ready_w(int state);
+	void ay3600_ako_w(int state);
 	u8 memexp_r(offs_t offset);
 	void memexp_w(offs_t offset, u8 data);
 	u8 nsc_backing_r(offs_t offset);
@@ -711,7 +711,7 @@ void apple2e_state::recalc_active_device()
 	}
 }
 
-WRITE_LINE_MEMBER(apple2e_state::a2bus_irq_w)
+void apple2e_state::a2bus_irq_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -723,13 +723,13 @@ WRITE_LINE_MEMBER(apple2e_state::a2bus_irq_w)
 	}
 }
 
-WRITE_LINE_MEMBER(apple2e_state::a2bus_nmi_w)
+void apple2e_state::a2bus_nmi_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
 // TODO: this assumes /INH only on ROM, needs expansion to support e.g. phantom-slotting cards and etc.
-WRITE_LINE_MEMBER(apple2e_state::a2bus_inh_w)
+void apple2e_state::a2bus_inh_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -777,7 +777,7 @@ WRITE_LINE_MEMBER(apple2e_state::a2bus_inh_w)
 	}
 }
 
-WRITE_LINE_MEMBER(apple2e_state::busy_w)
+void apple2e_state::busy_w(int state)
 {
 	m_centronics_busy = state;
 }
@@ -3682,7 +3682,7 @@ void apple2e_state::spectred_keyb_map(address_map &map)
     KEYBOARD
 ***************************************************************************/
 
-READ_LINE_MEMBER(apple2e_state::ay3600_shift_r)
+int apple2e_state::ay3600_shift_r()
 {
 	// either shift key
 	if (m_kbspecial->read() & 0x06)
@@ -3693,7 +3693,7 @@ READ_LINE_MEMBER(apple2e_state::ay3600_shift_r)
 	return CLEAR_LINE;
 }
 
-READ_LINE_MEMBER(apple2e_state::ay3600_control_r)
+int apple2e_state::ay3600_control_r()
 {
 	if (m_kbspecial->read() & 0x08)
 	{
@@ -3703,7 +3703,7 @@ READ_LINE_MEMBER(apple2e_state::ay3600_control_r)
 	return CLEAR_LINE;
 }
 
-WRITE_LINE_MEMBER(apple2e_state::ay3600_data_ready_w)
+void apple2e_state::ay3600_data_ready_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -3750,7 +3750,7 @@ WRITE_LINE_MEMBER(apple2e_state::ay3600_data_ready_w)
 	}
 }
 
-WRITE_LINE_MEMBER(apple2e_state::ay3600_ako_w)
+void apple2e_state::ay3600_ako_w(int state)
 {
 	m_anykeydown = (state == ASSERT_LINE) ? true : false;
 

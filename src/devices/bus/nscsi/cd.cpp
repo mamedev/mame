@@ -193,7 +193,7 @@ void nscsi_cdrom_device::scsi_command()
 	int blocks;
 
 	// check for media change
-	if(	sequence_counter != image->sequence_counter() && (scsi_cmdbuf[0] != SC_INQUIRY))
+	if( sequence_counter != image->sequence_counter() && (scsi_cmdbuf[0] != SC_INQUIRY))
 	{
 		// clear media change condition
 		cur_sector = -1;

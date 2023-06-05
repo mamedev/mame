@@ -98,8 +98,8 @@ private:
 	void coins_w(u8 data);
 
 	void msm5205_command_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(msm5205_1_vck);
-	DECLARE_WRITE_LINE_MEMBER(z80ctc_to0);
+	void msm5205_1_vck(int state);
+	void z80ctc_to0(int state);
 	void volume_w(offs_t offset, u8 data);
 
 	// video/topspeed.cpp

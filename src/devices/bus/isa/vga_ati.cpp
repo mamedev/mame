@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
 /*
- * isa_vga_ati.c
+ * isa_vga_ati.cpp
  *
  *  ATi Graphics Ultra ISA Video card
  *   - Uses ATi 28800-6 (VGA Wonder) and ATi 38800-1 (Mach8, 8514/A clone)
@@ -17,9 +17,10 @@
 
 #include "emu.h"
 #include "vga_ati.h"
-#include "mach32.h"
 
-#include "video/pc_vga.h"
+#include "video/pc_vga_ati.h"
+#include "video/ati_mach8.h"
+#include "video/ati_mach32.h"
 #include "screen.h"
 
 

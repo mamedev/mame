@@ -48,7 +48,7 @@ protected:
 private:
 	void pia_pa_w(uint8_t data);
 	void pia_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( pia_cb2_w );
+	void pia_cb2_w(int state);
 
 	required_device<pia6821_device> m_pia;
 	memory_share_creator<uint8_t> m_ram;

@@ -162,18 +162,18 @@ private:
 	uint8_t via_pa_r();
 	void via_pa_w(uint8_t data);
 	void via_pa_lw_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(via_ca2_w);
+	void via_ca2_w(int state);
 	uint8_t via_pb_r();
 	uint8_t via_pb_lw2nt_r();
 	void write_dtr(int state);
 	void via_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(via_cb1_w);
-	DECLARE_WRITE_LINE_MEMBER(via_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(via_int_w);
+	void via_cb1_w(int state);
+	void via_cb2_w(int state);
+	void via_int_w(int state);
 	emu_timer *m_pb6_timer;
 	TIMER_CALLBACK_MEMBER(pb6_tick);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	//DECLARE_WRITE_LINE_MEMBER(scc_int);
+	//void scc_int(int state);
 	void maincpu_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
@@ -470,7 +470,7 @@ void lwriter_state::via_pa_lw_w(uint8_t data)
 	m_cbsy = data & 1;
 }
 
-WRITE_LINE_MEMBER(lwriter_state::via_ca2_w)
+void lwriter_state::via_ca2_w(int state)
 {
 	logerror(" VIA: CA2 written with %d!\n", state);
 }
@@ -517,17 +517,17 @@ void lwriter_state::via_pb_w(uint8_t data)
 	m_via_pb = data;
 }
 
-WRITE_LINE_MEMBER (lwriter_state::via_cb1_w)
+void lwriter_state::via_cb1_w(int state)
 {
 	logerror(" VIA: CB1 written with %d!\n", state);
 }
 
-WRITE_LINE_MEMBER(lwriter_state::via_cb2_w)
+void lwriter_state::via_cb2_w(int state)
 {
 	logerror(" VIA: CB2 written with %d!\n", state);
 }
 
-WRITE_LINE_MEMBER(lwriter_state::via_int_w)
+void lwriter_state::via_int_w(int state)
 {
 	logerror(" VIA: INT output set to %d!\n", state);
 	//TODO: this is likely wrong, the VPA pin which controls whether autovector is enabled or not is controlled by PAL U8D, which is not dumped.
@@ -536,7 +536,7 @@ WRITE_LINE_MEMBER(lwriter_state::via_int_w)
 
 /* scc stuff */
 /*
-WRITE_LINE_MEMBER(lwriter_state::scc_int)
+void lwriter_state::scc_int(int state)
 {
     logerror(" SCC: INT output set to %d!\n", state);
     //m_via->set_input_line(VIA_CA1, state ? ASSERT_LINE : CLEAR_LINE);

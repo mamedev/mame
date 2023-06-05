@@ -188,7 +188,7 @@ void i8212_device::strobe(uint8_t data)
 //  stb_w - data strobe write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(i8212_device::stb_w)
+void i8212_device::stb_w(int state)
 {
 	// active on falling edge
 	if (m_stb && !state)

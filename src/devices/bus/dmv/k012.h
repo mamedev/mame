@@ -38,7 +38,7 @@ protected:
 	virtual void io_read(int ifsel, offs_t offset, uint8_t &data) override;
 	virtual void io_write(int ifsel, offs_t offset, uint8_t data) override;
 
-	DECLARE_WRITE_LINE_MEMBER(hdc_intrq_w);
+	void hdc_intrq_w(int state);
 
 private:
 	required_device<wd1000_device> m_hdc;

@@ -49,7 +49,7 @@ public:
 
 	void pzletime(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(ticket_status_r);
+	int ticket_status_r();
 
 private:
 	/* memory pointers */
@@ -214,7 +214,7 @@ void pzletime_state::oki_bank_w(uint16_t data)
 	m_oki->set_rom_bank(data & 0x3);
 }
 
-READ_LINE_MEMBER(pzletime_state::ticket_status_r)
+int pzletime_state::ticket_status_r()
 {
 	return (m_ticket && !(m_screen->frame_number() % 128));
 }

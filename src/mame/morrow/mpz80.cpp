@@ -639,14 +639,14 @@ INPUT_PORTS_END
 //  S100_INTERFACE( s100_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( mpz80_state::s100_pint_w )
+void mpz80_state::s100_pint_w(int state)
 {
 	m_pint = (state == ASSERT_LINE) ? 0 : 1;
 
 	check_interrupt();
 }
 
-WRITE_LINE_MEMBER( mpz80_state::s100_nmi_w )
+void mpz80_state::s100_nmi_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{

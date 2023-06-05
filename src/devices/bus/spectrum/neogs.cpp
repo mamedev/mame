@@ -52,7 +52,7 @@ namespace bus::spectrum::zxbus {
 
 namespace {
 
-#define TIMINGS_PERFECT	    1
+#define TIMINGS_PERFECT     1
 
 ROM_START( neogs )
 	ROM_REGION(0x80000, "maincpu", 0)

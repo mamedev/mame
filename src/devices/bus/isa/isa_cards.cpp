@@ -105,6 +105,7 @@ void pc_isa8_cards(device_slot_interface &device)
 	device.option_add("pgc", ISA8_PGC);
 	device.option_add("vga", ISA8_VGA);
 	device.option_add("svga_et4k", ISA8_SVGA_ET4K);
+	device.option_add("svga_et4k_kasan16", ISA8_SVGA_ET4K_KASAN16);
 	device.option_add("num9rev",ISA8_NUM_9_REV);
 	device.option_add("com", ISA8_COM);
 	device.option_add("fdc", ISA8_FDC_SUPERIO);
@@ -158,6 +159,7 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("pgc", ISA8_PGC);
 	device.option_add("vga", ISA8_VGA);
 	device.option_add("svga_et4k", ISA8_SVGA_ET4K);
+	device.option_add("svga_et4k_kasan16", ISA8_SVGA_ET4K_KASAN16);
 	device.option_add("num9rev",ISA8_NUM_9_REV);
 	device.option_add("com", ISA8_COM);
 	device.option_add("comat", ISA8_COM_AT);
@@ -213,7 +215,8 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("clgd542x",ISA16_SVGA_CIRRUS_GD542X);
 	device.option_add("gfxultra", ISA16_VGA_GFXULTRA);
 	device.option_add("gfxultrap", ISA16_SVGA_GFXULTRAPRO);
-	device.option_add("tgui9680",ISA16_SVGA_TGUI9680);
+	device.option_add("tvga9000", ISA16_SVGA_TVGA9000);
+//	device.option_add("tgui9680",ISA16_SVGA_TGUI9680);
 	device.option_add("3c505", ISA16_3C505);
 	device.option_add("mach64", ISA16_SVGA_MACH64);
 	device.option_add("sb16_lle", ISA16_SB16);

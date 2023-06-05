@@ -7,7 +7,7 @@
 #pragma once
 
 #include "machine/pci.h"
-#include "bus/isa/mach32.h"
+#include "video/ati_mach32.h"
 
 class atirage_device : public pci_device
 {

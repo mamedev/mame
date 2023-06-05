@@ -100,37 +100,37 @@ public:
 	void pc_update_bit(uint8_t bit, uint8_t state);
 	void update_tin(uint8_t);
 
-	DECLARE_WRITE_LINE_MEMBER( h1_w );
-	DECLARE_WRITE_LINE_MEMBER( h2_w );
-	DECLARE_WRITE_LINE_MEMBER( h3_w );
-	DECLARE_WRITE_LINE_MEMBER( h4_w );
+	void h1_w(int state);
+	void h2_w(int state);
+	void h3_w(int state);
+	void h4_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( pa0_w ) { pa_update_bit(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa1_w ) { pa_update_bit(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa2_w ) { pa_update_bit(2, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa3_w ) { pa_update_bit(3, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa4_w ) { pa_update_bit(4, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa5_w ) { pa_update_bit(5, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa6_w ) { pa_update_bit(6, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa7_w ) { pa_update_bit(7, state); }
+	void pa0_w(int state) { pa_update_bit(0, state); }
+	void pa1_w(int state) { pa_update_bit(1, state); }
+	void pa2_w(int state) { pa_update_bit(2, state); }
+	void pa3_w(int state) { pa_update_bit(3, state); }
+	void pa4_w(int state) { pa_update_bit(4, state); }
+	void pa5_w(int state) { pa_update_bit(5, state); }
+	void pa6_w(int state) { pa_update_bit(6, state); }
+	void pa7_w(int state) { pa_update_bit(7, state); }
 
-	DECLARE_WRITE_LINE_MEMBER( pb0_w ) { pb_update_bit(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb1_w ) { pb_update_bit(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb2_w ) { pb_update_bit(2, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb3_w ) { pb_update_bit(3, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb4_w ) { pb_update_bit(4, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb5_w ) { pb_update_bit(5, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb6_w ) { pb_update_bit(6, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb7_w ) { pb_update_bit(7, state); }
+	void pb0_w(int state) { pb_update_bit(0, state); }
+	void pb1_w(int state) { pb_update_bit(1, state); }
+	void pb2_w(int state) { pb_update_bit(2, state); }
+	void pb3_w(int state) { pb_update_bit(3, state); }
+	void pb4_w(int state) { pb_update_bit(4, state); }
+	void pb5_w(int state) { pb_update_bit(5, state); }
+	void pb6_w(int state) { pb_update_bit(6, state); }
+	void pb7_w(int state) { pb_update_bit(7, state); }
 
-	DECLARE_WRITE_LINE_MEMBER( pc0_w ) { pc_update_bit(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( pc1_w ) { pc_update_bit(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( pc2_w ) { pc_update_bit(2, state); }
-	DECLARE_WRITE_LINE_MEMBER( pc3_w ) { pc_update_bit(3, state); }
-	DECLARE_WRITE_LINE_MEMBER( pc4_w ) { pc_update_bit(4, state); }
-	DECLARE_WRITE_LINE_MEMBER( pc5_w ) { pc_update_bit(5, state); }
-	DECLARE_WRITE_LINE_MEMBER( pc6_w ) { pc_update_bit(6, state); }
-	DECLARE_WRITE_LINE_MEMBER( pc7_w ) { pc_update_bit(7, state); }
+	void pc0_w(int state) { pc_update_bit(0, state); }
+	void pc1_w(int state) { pc_update_bit(1, state); }
+	void pc2_w(int state) { pc_update_bit(2, state); }
+	void pc3_w(int state) { pc_update_bit(3, state); }
+	void pc4_w(int state) { pc_update_bit(4, state); }
+	void pc5_w(int state) { pc_update_bit(5, state); }
+	void pc6_w(int state) { pc_update_bit(6, state); }
+	void pc7_w(int state) { pc_update_bit(7, state); }
 
 	uint8_t irq_tiack();
 	uint8_t irq_piack();

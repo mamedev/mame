@@ -194,7 +194,7 @@ void at_mb_device::speaker_set_spkrdata(uint8_t data)
  *
  *************************************************************/
 
-WRITE_LINE_MEMBER( at_mb_device::pit8254_out2_changed )
+void at_mb_device::pit8254_out2_changed(int state)
 {
 	m_pit_out2 = state ? 1 : 0;
 	m_speaker->level_w(m_at_spkrdata & m_pit_out2);
@@ -257,7 +257,7 @@ void at_mb_device::page8_w(offs_t offset, uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER( at_mb_device::dma_hrq_changed )
+void at_mb_device::dma_hrq_changed(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
@@ -331,14 +331,14 @@ void at_mb_device::dma8237_5_dack_w(uint8_t data) { m_isabus->dack16_w(5, m_dma_
 void at_mb_device::dma8237_6_dack_w(uint8_t data) { m_isabus->dack16_w(6, m_dma_high_byte | data); }
 void at_mb_device::dma8237_7_dack_w(uint8_t data) { m_isabus->dack16_w(7, m_dma_high_byte | data); }
 
-WRITE_LINE_MEMBER( at_mb_device::dma8237_out_eop )
+void at_mb_device::dma8237_out_eop(int state)
 {
 	m_cur_eop = state == ASSERT_LINE;
 	if(m_dma_channel != -1)
 		m_isabus->eop_w(m_dma_channel, m_cur_eop ? ASSERT_LINE : CLEAR_LINE );
 }
 
-WRITE_LINE_MEMBER( at_mb_device::dma8237_2_out_eop )
+void at_mb_device::dma8237_2_out_eop(int state)
 {
 	m_cur_eop2 = state == ASSERT_LINE;
 	if(m_dma_channel != -1)
@@ -377,22 +377,22 @@ uint32_t at_mb_device::a20_286(bool state)
 	return (state ? 0xffffff : 0xefffff);
 }
 
-WRITE_LINE_MEMBER( at_mb_device::shutdown )
+void at_mb_device::shutdown(int state)
 {
 	if(state)
 		m_maincpu->reset();
 }
-WRITE_LINE_MEMBER( at_mb_device::dack0_w ) { set_dma_channel(0, state); }
-WRITE_LINE_MEMBER( at_mb_device::dack1_w ) { set_dma_channel(1, state); }
-WRITE_LINE_MEMBER( at_mb_device::dack2_w ) { set_dma_channel(2, state); }
-WRITE_LINE_MEMBER( at_mb_device::dack3_w ) { set_dma_channel(3, state); }
-WRITE_LINE_MEMBER( at_mb_device::dack4_w ) { m_dma8237_1->hack_w(state ? 0 : 1); } // it's inverted
-WRITE_LINE_MEMBER( at_mb_device::dack5_w ) { set_dma_channel(5, state); }
-WRITE_LINE_MEMBER( at_mb_device::dack6_w ) { set_dma_channel(6, state); }
-WRITE_LINE_MEMBER( at_mb_device::dack7_w ) { set_dma_channel(7, state); }
+void at_mb_device::dack0_w(int state) { set_dma_channel(0, state); }
+void at_mb_device::dack1_w(int state) { set_dma_channel(1, state); }
+void at_mb_device::dack2_w(int state) { set_dma_channel(2, state); }
+void at_mb_device::dack3_w(int state) { set_dma_channel(3, state); }
+void at_mb_device::dack4_w(int state) { m_dma8237_1->hack_w(state ? 0 : 1); } // it's inverted
+void at_mb_device::dack5_w(int state) { set_dma_channel(5, state); }
+void at_mb_device::dack6_w(int state) { set_dma_channel(6, state); }
+void at_mb_device::dack7_w(int state) { set_dma_channel(7, state); }
 
-WRITE_LINE_MEMBER( at_mb_device::kbd_clk_w ) { m_keybc->kbd_clk_w(state); }
-WRITE_LINE_MEMBER( at_mb_device::kbd_data_w ) { m_keybc->kbd_data_w(state); }
+void at_mb_device::kbd_clk_w(int state) { m_keybc->kbd_clk_w(state); }
+void at_mb_device::kbd_data_w(int state) { m_keybc->kbd_data_w(state); }
 
 uint8_t at_mb_device::portb_r()
 {
@@ -420,7 +420,7 @@ void at_mb_device::portb_w(uint8_t data)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( at_mb_device::iochck_w )
+void at_mb_device::iochck_w(int state)
 {
 	if (!state && m_nmi_enabled && !m_channel_check)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);

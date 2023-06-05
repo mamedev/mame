@@ -33,8 +33,8 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
-	virtual DECLARE_WRITE_LINE_MEMBER(input_dtr) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(input_rts) override;
+	virtual void input_dtr(int state) override;
+	virtual void input_rts(int state) override;
 
 	virtual void tra_complete() override;
 

@@ -346,7 +346,7 @@ INPUT_PORTS_END
 
 /* Interrupts */
 
-WRITE_LINE_MEMBER(coleco_state::coleco_vdp_interrupt)
+void coleco_state::coleco_vdp_interrupt(int state)
 {
 	// NMI on rising edge
 	if (state && !m_last_nmi_state)

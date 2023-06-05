@@ -203,42 +203,42 @@ phi_device::phi_device(const machine_config &mconfig, const char *tag, device_t 
 {
 }
 
-WRITE_LINE_MEMBER(phi_device::eoi_w)
+void phi_device::eoi_w(int state)
 {
 	set_ext_signal(PHI_488_EOI, state);
 }
 
-WRITE_LINE_MEMBER(phi_device::dav_w)
+void phi_device::dav_w(int state)
 {
 	set_ext_signal(PHI_488_DAV, state);
 }
 
-WRITE_LINE_MEMBER(phi_device::nrfd_w)
+void phi_device::nrfd_w(int state)
 {
 	set_ext_signal(PHI_488_NRFD, state);
 }
 
-WRITE_LINE_MEMBER(phi_device::ndac_w)
+void phi_device::ndac_w(int state)
 {
 	set_ext_signal(PHI_488_NDAC, state);
 }
 
-WRITE_LINE_MEMBER(phi_device::ifc_w)
+void phi_device::ifc_w(int state)
 {
 	set_ext_signal(PHI_488_IFC, state);
 }
 
-WRITE_LINE_MEMBER(phi_device::srq_w)
+void phi_device::srq_w(int state)
 {
 	set_ext_signal(PHI_488_SRQ, state);
 }
 
-WRITE_LINE_MEMBER(phi_device::atn_w)
+void phi_device::atn_w(int state)
 {
 	set_ext_signal(PHI_488_ATN, state);
 }
 
-WRITE_LINE_MEMBER(phi_device::ren_w)
+void phi_device::ren_w(int state)
 {
 	set_ext_signal(PHI_488_REN, state);
 }

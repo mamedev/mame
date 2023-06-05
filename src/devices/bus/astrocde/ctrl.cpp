@@ -42,7 +42,7 @@ void device_astrocade_ctrl_interface::interface_pre_start()
 		throw device_missing_dependencies();
 }
 
-WRITE_LINE_MEMBER( device_astrocade_ctrl_interface::write_ltpen )
+void device_astrocade_ctrl_interface::write_ltpen(int state)
 {
 	if (m_port->m_ltpen != state)
 	{

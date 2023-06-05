@@ -346,7 +346,7 @@ void i8089_device::execute_run()
 //  EXTERNAL INPUTS
 //**************************************************************************
 
-WRITE_LINE_MEMBER( i8089_device::ca_w )
+void i8089_device::ca_w(int state)
 {
 	if (VERBOSE)
 		logerror("%s('%s'): ca_w: %u\n", shortname(), basetag(), state);
@@ -367,7 +367,7 @@ WRITE_LINE_MEMBER( i8089_device::ca_w )
 	m_ca = state;
 }
 
-WRITE_LINE_MEMBER( i8089_device::drq1_w ) { m_ch1->drq_w(state); }
-WRITE_LINE_MEMBER( i8089_device::drq2_w ) { m_ch2->drq_w(state); }
-WRITE_LINE_MEMBER( i8089_device::ext1_w ) { m_ch1->ext_w(state); }
-WRITE_LINE_MEMBER( i8089_device::ext2_w ) { m_ch2->ext_w(state); }
+void i8089_device::drq1_w(int state) { m_ch1->drq_w(state); }
+void i8089_device::drq2_w(int state) { m_ch2->drq_w(state); }
+void i8089_device::ext1_w(int state) { m_ch1->ext_w(state); }
+void i8089_device::ext2_w(int state) { m_ch2->ext_w(state); }

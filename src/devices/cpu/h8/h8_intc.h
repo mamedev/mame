@@ -35,20 +35,20 @@ protected:
 	enum { IRQ_LEVEL, IRQ_EDGE, IRQ_DUAL_EDGE };
 	enum { MAX_VECTORS = 256 };
 
-	int irq_vector_base;
-	int irq_vector_count;
-	int irq_vector_nmi;
+	int m_irq_vector_base;
+	int m_irq_vector_count;
+	int m_irq_vector_nmi;
 
-	required_device<h8_device> cpu;
+	required_device<h8_device> m_cpu;
 
-	uint32_t pending_irqs[MAX_VECTORS/32];
-	int irq_type[8];
-	bool nmi_input;
-	uint8_t irq_input;
-	uint8_t ier;
-	uint8_t isr;
-	uint16_t iscr;
-	int icr_filter, ipr_filter;
+	uint32_t m_pending_irqs[MAX_VECTORS/32];
+	int m_irq_type[8];
+	bool m_nmi_input;
+	uint8_t m_irq_input;
+	uint8_t m_ier;
+	uint8_t m_isr;
+	uint16_t m_iscr;
+	int m_icr_filter, m_ipr_filter;
 
 	h8_intc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -90,7 +90,7 @@ public:
 protected:
 	static const int vector_to_slot[];
 
-	uint32_t icr;
+	uint32_t m_icr;
 
 	h8h_intc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -111,7 +111,7 @@ public:
 	void iprk_w(uint8_t data);
 private:
 	static const int vector_to_slot[];
-	uint8_t ipr[11];
+	uint8_t m_ipr[11];
 
 	virtual void get_priority(int vect, int &icr_pri, int &ipr_pri) const override;
 	virtual void device_reset() override;

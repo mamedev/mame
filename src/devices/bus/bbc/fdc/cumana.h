@@ -28,9 +28,9 @@ class bbc_cumanafdc_device :
 public:
 	static void floppy_formats(format_registration &fr);
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(motor_w);
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
+	void motor_w(int state);
 
 protected:
 	// construction/destruction

@@ -105,7 +105,7 @@ private:
 	void wmg_c400_w(u8 data);
 	void wmg_d000_w(u8 data);
 	void wmg_blitter_w(offs_t, u8);
-	DECLARE_WRITE_LINE_MEMBER(wmg_port_select_w);
+	void wmg_port_select_w(int state);
 	void wmg_sound_reset_w(u8 data);
 	void wmg_vram_select_w(u8 data);
 
@@ -458,7 +458,7 @@ void wmg_state::machine_reset()
  *
  *************************************/
 
-WRITE_LINE_MEMBER( wmg_state::wmg_port_select_w )
+void wmg_state::wmg_port_select_w(int state)
 {
 	m_wmg_port_select = state | (m_wmg_c400 << 1);
 }

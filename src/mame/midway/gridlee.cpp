@@ -270,7 +270,7 @@ uint8_t gridlee_state::random_num_r()
  *
  *************************************/
 
-WRITE_LINE_MEMBER(gridlee_state::coin_counter_w)
+void gridlee_state::coin_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 	logerror("coin counter %s\n", state ? "on" : "off");

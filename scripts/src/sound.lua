@@ -1620,3 +1620,15 @@ if (SOUNDS["LYNX"]~=null) then
 		MAME_DIR .. "src/devices/sound/lynx.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/sound/nn71003f.h,SOUNDS["NN71003F"] = true
+---------------------------------------------------
+
+if (SOUNDS["NN71003F"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/nn71003f.cpp",
+		MAME_DIR .. "src/devices/sound/nn71003f.h",
+	}
+end

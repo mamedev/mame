@@ -228,7 +228,7 @@ public:
 
 protected:
 	void e2ram_init(nvram_device &nvram, void *data, size_t size);
-	DECLARE_WRITE_LINE_MEMBER(bfmdm01_busy);
+	void bfmdm01_busy(int state);
 	void bankswitch_w(uint8_t data);
 	void mmtr_w(uint8_t data);
 	void mux_output_w(offs_t offset, uint8_t data);
@@ -376,7 +376,7 @@ public:
 	void init_drwho();
 
 protected:
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
+	template <unsigned N> void reel_optic_cb(int state) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 	void reel12_w(uint8_t data);
 	void reel34_w(uint8_t data);
 	void reel56_w(uint8_t data);
@@ -2813,7 +2813,7 @@ void bfm_sc2_state::sc3_expansion_w(offs_t offset, uint8_t data)
 }
 #endif
 
-WRITE_LINE_MEMBER(bfm_sc2_state::bfmdm01_busy)
+void bfm_sc2_state::bfmdm01_busy(int state)
 {
 	Scorpion2_SetSwitchState(4,4, state?0:1);
 }

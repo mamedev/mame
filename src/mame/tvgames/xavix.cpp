@@ -644,7 +644,7 @@ INPUT_PORTS_END
 
 */
 
-READ_LINE_MEMBER( xavix_mtrk_state::mtrk_wheel_r )
+int xavix_mtrk_state::mtrk_wheel_r()
 {
 	return m_wheel->read_direction();
 }

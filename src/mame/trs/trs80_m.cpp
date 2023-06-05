@@ -209,7 +209,7 @@ INTERRUPT_GEN_MEMBER(trs80_state::rtc_interrupt)
 }
 
 
-WRITE_LINE_MEMBER(trs80_state::intrq_w)
+void trs80_state::intrq_w(int state)
 {
 	if (state)
 	{

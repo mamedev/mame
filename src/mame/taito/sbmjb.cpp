@@ -69,7 +69,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<tc0091lvc_device> m_vdpcpu;
 
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
 	void main_map(address_map &map);
@@ -78,7 +78,7 @@ private:
 };
 
 
-WRITE_LINE_MEMBER(sbmjb_state::screen_vblank) // TODO: copy-pasted from other drivers using same chip, to be verified
+void sbmjb_state::screen_vblank(int state) // TODO: copy-pasted from other drivers using same chip, to be verified
 {
 	if (state)
 	{

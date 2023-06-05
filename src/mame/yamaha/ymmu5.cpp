@@ -59,7 +59,7 @@ private:
 	void lcd_data_w(u16 data);
 	u16 lcd_data_r();
 
-	DECLARE_WRITE_LINE_MEMBER(render_w);
+	void render_w(int state);
 
 	u8 m_matrixsel;
 	u8 matrix_r();
@@ -157,7 +157,7 @@ u16 mu5_state::lcd_data_r()
 	return m_lcd_data;
 }
 
-WRITE_LINE_MEMBER(mu5_state::render_w)
+void mu5_state::render_w(int state)
 {
 	if(!state)
 		return;

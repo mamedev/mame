@@ -2516,7 +2516,7 @@ void hng64_state::ioport4_w(uint8_t data)
 
 // there are also serial reads, TLCS870 core doesn't support them yet
 
-WRITE_LINE_MEMBER( hng64_state::sio0_w )
+void hng64_state::sio0_w(int state)
 {
 	// tlcs870 core provides better logging than anything we could put here at the moment
 }

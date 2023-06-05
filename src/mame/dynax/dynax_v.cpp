@@ -189,13 +189,13 @@ void jantouki_state::dynax_blit_palette67_w(uint8_t data)
 
 
 /* Layers Palettes (High Bits) */
-WRITE_LINE_MEMBER(dynax_state::blit_palbank_w)
+void dynax_state::blit_palbank_w(int state)
 {
 	m_blit_palbank = state;
 	LOG("PB=%d ", state);
 }
 
-WRITE_LINE_MEMBER(jantouki_state::blit2_palbank_w)
+void jantouki_state::blit2_palbank_w(int state)
 {
 	m_blit2_palbank = state;
 	LOG("PB'=%d ", state);
@@ -209,7 +209,7 @@ void dynax_adpcm_state::hnoridur_palbank_w(uint8_t data)
 
 
 /* Which half of the layers to write to (interleaved games only) */
-WRITE_LINE_MEMBER(dynax_state::layer_half_w)
+void dynax_state::layer_half_w(int state)
 {
 	m_hanamai_layer_half = !state;
 	LOG("H=%d ", state);
@@ -217,20 +217,20 @@ WRITE_LINE_MEMBER(dynax_state::layer_half_w)
 
 
 /* Write to both halves of the layers (interleaved games only) */
-WRITE_LINE_MEMBER(dynax_state::layer_half2_w)
+void dynax_state::layer_half2_w(int state)
 {
 	m_hnoridur_layer_half2 = !state;
 	LOG("H2=%d ", state);
 }
 
-WRITE_LINE_MEMBER(dynax_state::mjdialq2_blit_dest0_w)
+void dynax_state::mjdialq2_blit_dest0_w(int state)
 {
 	m_blit_dest &= ~1;
 	if (!state)
 		m_blit_dest |= 1;
 }
 
-WRITE_LINE_MEMBER(dynax_state::mjdialq2_blit_dest1_w)
+void dynax_state::mjdialq2_blit_dest1_w(int state)
 {
 	m_blit_dest &= ~2;
 	if (!state)
@@ -252,14 +252,14 @@ void jantouki_state::jantouki_layer_enable_w(offs_t offset, uint8_t data)
 	m_layer_enable |= 1;
 }
 
-WRITE_LINE_MEMBER(dynax_state::mjdialq2_layer0_enable_w)
+void dynax_state::mjdialq2_layer0_enable_w(int state)
 {
 	m_layer_enable &= ~1;
 	if (!state)
 		m_layer_enable |= 1;
 }
 
-WRITE_LINE_MEMBER(dynax_state::mjdialq2_layer1_enable_w)
+void dynax_state::mjdialq2_layer1_enable_w(int state)
 {
 	m_layer_enable &= ~2;
 	if (!state)
@@ -267,7 +267,7 @@ WRITE_LINE_MEMBER(dynax_state::mjdialq2_layer1_enable_w)
 }
 
 
-WRITE_LINE_MEMBER(dynax_state::flipscreen_w)
+void dynax_state::flipscreen_w(int state)
 {
 	m_flipscreen = state;
 	LOG("F=%d ", state);

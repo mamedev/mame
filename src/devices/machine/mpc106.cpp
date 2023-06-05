@@ -21,7 +21,7 @@ enum
 	AS_PCI_IO = 2
 };
 
-constexpr u32 PICR1_LE_MODE	= 0x00000020;	// Host CPU is little-endian if set, big-endian if clear
+constexpr u32 PICR1_LE_MODE = 0x00000020;   // Host CPU is little-endian if set, big-endian if clear
 
 DEFINE_DEVICE_TYPE(MPC106, mpc106_host_device, "mpc106", "Motorola MPC106 PCI Bridge/Memory Controller")
 

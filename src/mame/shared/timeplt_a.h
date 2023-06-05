@@ -16,8 +16,8 @@ public:
 	timeplt_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 14'318'181);
 
 	void sound_data_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(sh_irqtrigger_w);
-	DECLARE_WRITE_LINE_MEMBER(mute_w);
+	void sh_irqtrigger_w(int state);
+	void mute_w(int state);
 
 protected:
 	timeplt_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

@@ -276,7 +276,7 @@ protected:
 private:
 	uint8_t psga_r();
 	uint8_t porta_r();
-	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }
+	void centronics_busy_w(int state) { m_centronics_busy = state; }
 	uint8_t mc6845_videoram_r(offs_t offset);
 	uint8_t keyboard_r(offs_t offset);
 	void palet_w(offs_t offset, uint8_t data);

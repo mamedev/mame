@@ -149,7 +149,7 @@ void device_image_interface::check_preset_images()
 			set_image_tag();
 			set_user_loadable(false);
 		}
-	}			
+	}
 }
 
 //-------------------------------------------------
@@ -238,7 +238,7 @@ void device_image_interface::switch_preset_image(int id)
 			}
 			id--;
 		}
-	
+
 	return;
 }
 

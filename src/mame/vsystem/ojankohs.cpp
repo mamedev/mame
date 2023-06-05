@@ -66,7 +66,7 @@ void ojankohs_state::msm5205_w(uint8_t data)
 	m_vclk_left = 2;
 }
 
-WRITE_LINE_MEMBER(ojankohs_state::adpcm_int)
+void ojankohs_state::adpcm_int(int state)
 {
 	// skip if we're reset
 	if (!m_adpcm_reset)

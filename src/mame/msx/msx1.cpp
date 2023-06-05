@@ -25,7 +25,7 @@ using namespace msx_keyboard;
 
 /***************************************************************************
 
-  MSX1 Game drivers
+  MSX1 machine drivers
 
 Undumped and/or not emulated:
 - Daewoo CPC-200

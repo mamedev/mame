@@ -62,11 +62,11 @@ private:
 	void fdc_drq_w(bool state);
 
 	uint8_t i8255_pc_r();
-	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_select);
+	void ctc_z0_w(int state);
+	void ctc_z1_w(int state);
+	void ctc_z2_w(int state);
+	void write_centronics_busy(int state);
+	void write_centronics_select(int state);
 
 	void xor100_io(address_map &map);
 	void xor100_mem(address_map &map);
