@@ -61423,7 +61423,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<publisher>Accolade</publisher>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="starcon" sha1="cae7074b0498bc489d668a30a7bc94b541d10036" />
+				<disk name="starcon" sha1="800288bea4d525a49b162b65fe9f25bbc93c0179"/>
 			</diskarea>
 		</part>
 	</software>
