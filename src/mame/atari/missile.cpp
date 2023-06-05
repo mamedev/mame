@@ -350,11 +350,13 @@ Super Missile Attack Board Layout
 *****************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/rescap.h"
 #include "machine/watchdog.h"
 #include "sound/pokey.h"
 #include "sound/ay8910.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -437,12 +439,12 @@ private:
 
 	required_region_ptr<uint8_t> m_mainrom;
 	required_region_ptr<uint8_t> m_writeprom;
-	emu_timer *m_irq_timer;
-	emu_timer *m_cpu_timer;
-	uint8_t m_irq_state;
-	uint8_t m_ctrld;
-	uint8_t m_flipscreen;
-	uint64_t m_madsel_lastcycles;
+	emu_timer *m_irq_timer = nullptr;
+	emu_timer *m_cpu_timer = nullptr;
+	uint8_t m_irq_state = 0;
+	uint8_t m_ctrld = 0;
+	uint8_t m_flipscreen = 0;
+	uint64_t m_madsel_lastcycles = 0;
 };
 
 
@@ -546,17 +548,12 @@ void missile_state::machine_start()
 {
 	m_leds.resolve();
 
-	/* initialize globals */
-	m_flipscreen = 0;
-	m_ctrld = 0;
-
 	/* create a timer to speed/slow the CPU */
 	m_cpu_timer = timer_alloc(FUNC(missile_state::adjust_cpu_speed), this);
 	m_cpu_timer->adjust(m_screen->time_until_pos(v_to_scanline(0), 0));
 
 	/* create a timer for IRQs and set up the first callback */
 	m_irq_timer = timer_alloc(FUNC(missile_state::clock_irq), this);
-	m_irq_state = 0;
 	schedule_next_irq(-32);
 
 	/* setup for save states */
@@ -595,7 +592,7 @@ bool missile_state::get_madsel()
 		madsel = (m_maincpu->total_cycles() - m_madsel_lastcycles) == 5;
 
 		/* reset the count until next time */
-		if (madsel)
+		if (madsel && !machine().side_effects_disabled())
 			m_madsel_lastcycles = 0;
 	}
 
@@ -639,7 +636,8 @@ void missile_state::write_vram(offs_t address, uint8_t data)
 		m_videoram[vramaddr] = (m_videoram[vramaddr] & vrammask) | (vramdata & ~vrammask);
 
 		/* account for the extra clock cycle */
-		m_maincpu->adjust_icount(-1);
+		if (!machine().side_effects_disabled())
+			m_maincpu->adjust_icount(-1);
 	}
 }
 
@@ -673,7 +671,8 @@ uint8_t missile_state::read_vram(offs_t address)
 			result &= ~0x20;
 
 		/* account for the extra clock cycle */
-		m_maincpu->adjust_icount(-1);
+		if (!machine().side_effects_disabled())
+			m_maincpu->adjust_icount(-1);
 	}
 	return result;
 }
@@ -836,9 +835,8 @@ uint8_t missile_state::missile_r(offs_t offset)
 	else
 		logerror("%04X:Unknown read from %04X\n", m_maincpu->pc(), offset);
 
-
 	/* update the MADSEL state */
-	if (!m_irq_state && ((result & 0x1f) == 0x01) && m_maincpu->get_sync())
+	if (!m_irq_state && ((result & 0x1f) == 0x01) && m_maincpu->get_sync() && !machine().side_effects_disabled())
 		m_madsel_lastcycles = m_maincpu->total_cycles();
 
 	return result;
@@ -938,14 +936,12 @@ uint8_t missile_state::bootleg_r(offs_t offset)
 	else if (offset >= 0x4b00 && offset < 0x4c00) // seems ok
 		result = m_r10->read();
 
-
 	/* anything else */
 	else
 		logerror("%04X:Unknown read from %04X\n", m_maincpu->pc(), offset);
 
-
 	/* update the MADSEL state */
-	if (!m_irq_state && ((result & 0x1f) == 0x01) && m_maincpu->get_sync())
+	if (!m_irq_state && ((result & 0x1f) == 0x01) && m_maincpu->get_sync() && !machine().side_effects_disabled())
 		m_madsel_lastcycles = m_maincpu->total_cycles();
 
 	return result;
@@ -1341,70 +1337,70 @@ void missile_state::init_suprmatk()
 
 	for (int i = 0; i < 0x40; i++)
 	{
-		rom[0x7CC0+i] = rom[0x8000+i];
+		rom[0x7cc0+i] = rom[0x8000+i];
 		rom[0x5440+i] = rom[0x8040+i];
-		rom[0x5B00+i] = rom[0x8080+i];
-		rom[0x5740+i] = rom[0x80C0+i];
+		rom[0x5b00+i] = rom[0x8080+i];
+		rom[0x5740+i] = rom[0x80c0+i];
 		rom[0x6000+i] = rom[0x8100+i];
 		rom[0x6540+i] = rom[0x8140+i];
 		rom[0x7500+i] = rom[0x8180+i];
-		rom[0x7100+i] = rom[0x81C0+i];
+		rom[0x7100+i] = rom[0x81c0+i];
 		rom[0x7800+i] = rom[0x8200+i];
 		rom[0x5580+i] = rom[0x8240+i];
 		rom[0x5380+i] = rom[0x8280+i];
-		rom[0x6900+i] = rom[0x82C0+i];
-		rom[0x6E00+i] = rom[0x8300+i];
-		rom[0x6CC0+i] = rom[0x8340+i];
-		rom[0x7DC0+i] = rom[0x8380+i];
-		rom[0x5B80+i] = rom[0x83C0+i];
+		rom[0x6900+i] = rom[0x82c0+i];
+		rom[0x6e00+i] = rom[0x8300+i];
+		rom[0x6cc0+i] = rom[0x8340+i];
+		rom[0x7dc0+i] = rom[0x8380+i];
+		rom[0x5b80+i] = rom[0x83c0+i];
 		rom[0x5000+i] = rom[0x8400+i];
 		rom[0x7240+i] = rom[0x8440+i];
 		rom[0x7040+i] = rom[0x8480+i];
-		rom[0x62C0+i] = rom[0x84C0+i];
+		rom[0x62c0+i] = rom[0x84c0+i];
 		rom[0x6840+i] = rom[0x8500+i];
-		rom[0x7EC0+i] = rom[0x8540+i];
-		rom[0x7D40+i] = rom[0x8580+i];
-		rom[0x66C0+i] = rom[0x85C0+i];
-		rom[0x72C0+i] = rom[0x8600+i];
+		rom[0x7ec0+i] = rom[0x8540+i];
+		rom[0x7d40+i] = rom[0x8580+i];
+		rom[0x66c0+i] = rom[0x85c0+i];
+		rom[0x72c0+i] = rom[0x8600+i];
 		rom[0x7080+i] = rom[0x8640+i];
-		rom[0x7D00+i] = rom[0x8680+i];
-		rom[0x5F00+i] = rom[0x86C0+i];
-		rom[0x55C0+i] = rom[0x8700+i];
-		rom[0x5A80+i] = rom[0x8740+i];
+		rom[0x7d00+i] = rom[0x8680+i];
+		rom[0x5f00+i] = rom[0x86c0+i];
+		rom[0x55c0+i] = rom[0x8700+i];
+		rom[0x5a80+i] = rom[0x8740+i];
 		rom[0x6080+i] = rom[0x8780+i];
-		rom[0x7140+i] = rom[0x87C0+i];
+		rom[0x7140+i] = rom[0x87c0+i];
 		rom[0x7000+i] = rom[0x8800+i];
 		rom[0x6100+i] = rom[0x8840+i];
 		rom[0x5400+i] = rom[0x8880+i];
-		rom[0x5BC0+i] = rom[0x88C0+i];
-		rom[0x7E00+i] = rom[0x8900+i];
-		rom[0x71C0+i] = rom[0x8940+i];
+		rom[0x5bc0+i] = rom[0x88c0+i];
+		rom[0x7e00+i] = rom[0x8900+i];
+		rom[0x71c0+i] = rom[0x8940+i];
 		rom[0x6040+i] = rom[0x8980+i];
-		rom[0x6E40+i] = rom[0x89C0+i];
-		rom[0x5800+i] = rom[0x8A00+i];
-		rom[0x7D80+i] = rom[0x8A40+i];
-		rom[0x7A80+i] = rom[0x8A80+i];
-		rom[0x53C0+i] = rom[0x8AC0+i];
-		rom[0x6140+i] = rom[0x8B00+i];
-		rom[0x6700+i] = rom[0x8B40+i];
-		rom[0x7280+i] = rom[0x8B80+i];
-		rom[0x7F00+i] = rom[0x8BC0+i];
-		rom[0x5480+i] = rom[0x8C00+i];
-		rom[0x70C0+i] = rom[0x8C40+i];
-		rom[0x7F80+i] = rom[0x8C80+i];
-		rom[0x5780+i] = rom[0x8CC0+i];
-		rom[0x6680+i] = rom[0x8D00+i];
-		rom[0x7200+i] = rom[0x8D40+i];
-		rom[0x7E40+i] = rom[0x8D80+i];
-		rom[0x7AC0+i] = rom[0x8DC0+i];
-		rom[0x6300+i] = rom[0x8E00+i];
-		rom[0x7180+i] = rom[0x8E40+i];
-		rom[0x7E80+i] = rom[0x8E80+i];
-		rom[0x6280+i] = rom[0x8EC0+i];
-		rom[0x7F40+i] = rom[0x8F00+i];
-		rom[0x6740+i] = rom[0x8F40+i];
-		rom[0x74C0+i] = rom[0x8F80+i];
-		rom[0x7FC0+i] = rom[0x8FC0+i];
+		rom[0x6e40+i] = rom[0x89c0+i];
+		rom[0x5800+i] = rom[0x8a00+i];
+		rom[0x7d80+i] = rom[0x8a40+i];
+		rom[0x7a80+i] = rom[0x8a80+i];
+		rom[0x53c0+i] = rom[0x8ac0+i];
+		rom[0x6140+i] = rom[0x8b00+i];
+		rom[0x6700+i] = rom[0x8b40+i];
+		rom[0x7280+i] = rom[0x8b80+i];
+		rom[0x7f00+i] = rom[0x8bc0+i];
+		rom[0x5480+i] = rom[0x8c00+i];
+		rom[0x70c0+i] = rom[0x8c40+i];
+		rom[0x7f80+i] = rom[0x8c80+i];
+		rom[0x5780+i] = rom[0x8cc0+i];
+		rom[0x6680+i] = rom[0x8d00+i];
+		rom[0x7200+i] = rom[0x8d40+i];
+		rom[0x7e40+i] = rom[0x8d80+i];
+		rom[0x7ac0+i] = rom[0x8dc0+i];
+		rom[0x6300+i] = rom[0x8e00+i];
+		rom[0x7180+i] = rom[0x8e40+i];
+		rom[0x7e80+i] = rom[0x8e80+i];
+		rom[0x6280+i] = rom[0x8ec0+i];
+		rom[0x7f40+i] = rom[0x8f00+i];
+		rom[0x6740+i] = rom[0x8f40+i];
+		rom[0x74c0+i] = rom[0x8f80+i];
+		rom[0x7fc0+i] = rom[0x8fc0+i];
 	}
 }
 
@@ -1437,17 +1433,17 @@ void missile_state::init_missilem()
  *
  *************************************/
 
-GAME( 1980, missile,  0,       missile, missile,  missile_state,     empty_init, ROT0, "Atari", "Missile Command (rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, missile2, missile, missile, missile,  missile_state,     empty_init, ROT0, "Atari", "Missile Command (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, missile1, missile, missile, missile,  missile_state,     empty_init, ROT0, "Atari", "Missile Command (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, missile,  0,       missile, missile,  missile_state,  empty_init,    ROT0, "Atari", "Missile Command (rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, missile2, missile, missile, missile,  missile_state,  empty_init,    ROT0, "Atari", "Missile Command (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, missile1, missile, missile, missile,  missile_state,  empty_init,    ROT0, "Atari", "Missile Command (rev 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, suprmatk, missile, missile, suprmatk, missile_state,  init_suprmatk, ROT0, "Atari / General Computer Corporation", "Super Missile Attack (for rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, suprmatkd,missile, missile, suprmatk, missile_state,     empty_init, ROT0, "Atari / General Computer Corporation", "Super Missile Attack (not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, suprmatkd,missile, missile, suprmatk, missile_state,  empty_init,    ROT0, "Atari / General Computer Corporation", "Super Missile Attack (not encrypted)", MACHINE_SUPPORTS_SAVE )
 
 /* the following bootleg has extremely similar program ROMs to missile1, but has different unknown sound hardware and 2 more ROMs */
-GAME( 1981, missilea, missile, missilea, missile, missile_state,     empty_init, ROT0, "bootleg (U.Games)", "Missile Attack (U.Games bootleg of Missile Command)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, missilea, missile, missilea, missile, missile_state,  empty_init,    ROT0, "bootleg (U.Games)", "Missile Attack (U.Games bootleg of Missile Command)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /* the following bootlegs are on different hardware and don't work */
-GAME( 1980, mcombat,  missile, missileb, missileb, missile_state,    empty_init, ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 1)", MACHINE_NOT_WORKING )
-GAME( 1980, mcombata, missile, missileb, missileb, missile_state,    empty_init, ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 2)", MACHINE_NOT_WORKING )
-GAME( 1980, mcombats, missile, missileb, missileb, missile_state,    empty_init, ROT0, "bootleg (Sidam)", "Missile Combat (Sidam bootleg)", MACHINE_NOT_WORKING )
+GAME( 1980, mcombat,  missile, missileb, missileb, missile_state, empty_init,    ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 1)", MACHINE_NOT_WORKING )
+GAME( 1980, mcombata, missile, missileb, missileb, missile_state, empty_init,    ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 2)", MACHINE_NOT_WORKING )
+GAME( 1980, mcombats, missile, missileb, missileb, missile_state, empty_init,    ROT0, "bootleg (Sidam)", "Missile Combat (Sidam bootleg)", MACHINE_NOT_WORKING )
 GAME( 2005, missilem, missile, missilea, missileb, missile_state, init_missilem, ROT0, "hack (Braze Technologies)", "Missile Command Multigame", MACHINE_NOT_WORKING )

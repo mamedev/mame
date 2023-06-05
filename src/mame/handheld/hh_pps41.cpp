@@ -16,7 +16,6 @@ ROM source notes when dumped from another title, but confident it's the same:
 #include "cpu/pps41/mm76.h"
 #include "cpu/pps41/mm78.h"
 #include "cpu/pps41/mm78la.h"
-#include "machine/timer.h"
 #include "sound/beep.h"
 #include "sound/spkrdev.h"
 #include "video/pwm.h"
