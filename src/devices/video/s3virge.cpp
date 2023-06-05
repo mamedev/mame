@@ -54,18 +54,21 @@ DEFINE_DEVICE_TYPE(S3VIRGEDX1, s3virgedx_rev1_vga_device, "virgedx_vga_r1", "S3 
 s3virge_vga_device::s3virge_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: s3virge_vga_device(mconfig, S3VIRGE, tag, owner, clock)
 {
+	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(s3virge_vga_device::crtc_map), this));
+	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(s3virge_vga_device::sequencer_map), this));
 }
 
 s3virge_vga_device::s3virge_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: s3_vga_device(mconfig, type, tag, owner, clock)
 	, m_linear_config_changed_cb(*this)
 {
-	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(s3virge_vga_device::crtc_map), this));
 }
 
 s3virgedx_vga_device::s3virgedx_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: s3virgedx_vga_device(mconfig, S3VIRGEDX, tag, owner, clock)
 {
+	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(s3virgedx_vga_device::crtc_map), this));
+	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(s3virgedx_vga_device::sequencer_map), this));
 }
 
 s3virgedx_vga_device::s3virgedx_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -76,6 +79,8 @@ s3virgedx_vga_device::s3virgedx_vga_device(const machine_config &mconfig, device
 s3virgedx_rev1_vga_device::s3virgedx_rev1_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: s3virgedx_vga_device(mconfig, S3VIRGEDX1, tag, owner, clock)
 {
+	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(s3virgedx_rev1_vga_device::crtc_map), this));
+	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(s3virgedx_rev1_vga_device::sequencer_map), this));
 }
 
 void s3virge_vga_device::device_start()
@@ -246,7 +251,6 @@ void s3virge_vga_device::crtc_map(address_map &map)
 			return res;
 		})
 	);
-	map(0x53, 0x53).unmaprw();
 	map(0x58, 0x58).lrw8(
 		NAME([this] (offs_t offset) {
 			u8 res = s3virge.linear_address_size & 0x03;

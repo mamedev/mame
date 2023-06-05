@@ -235,6 +235,7 @@ void s3_vga_device::crtc_map(address_map &map)
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			// bit 5 = interlace, bits 0-3 = dot clock (seems to be undocumented)
+			// TODO: interlace used by modes 116h / 117h at least (1024x768)
 			s3.cr42 = data;
 		})
 	);

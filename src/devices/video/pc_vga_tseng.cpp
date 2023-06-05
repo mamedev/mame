@@ -7,10 +7,10 @@
  * - ET3000 (VGA only?)
  * - ET4000AX
  * \- No logging whatsoever;
- * \- Unsupported True Color modes;
+ * \- Unsupported True Color modes, also "Return current video mode failed" in VESA24_2 test;
  * - ET4000/W32 (2d accelerator)
  * - ET4000/W32p (PCI version)
- * 
+ *
  */
 
 #include "emu.h"

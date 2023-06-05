@@ -10,7 +10,7 @@
  * - TVGA8800 early SVGA
  * - TVGA8900 (2MB VRAM)
  * - TVGA9000 needs to be downgraded from '9680
- * \- none of the SVGA modes works
+ * \- none of the SVGA modes works properly;
  * \- subclassed from TGUI9680 just for pntnpuzl, consider swapping inheritance or even decouple;
  * \- it's also really a downgraded version of '8900
  * - TVGA92xx, TVGA938x (2d accelerator)
