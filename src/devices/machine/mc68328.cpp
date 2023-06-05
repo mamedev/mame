@@ -1299,7 +1299,7 @@ u32 mc68328_device::get_irq_mask_for_level(int level)
 	return 0;
 }
 
-WRITE_LINE_MEMBER(mc68328_base_device::irq5_w)
+void mc68328_base_device::irq5_w(int state)
 {
 	set_interrupt_line(INT_IRQ5, state);
 }

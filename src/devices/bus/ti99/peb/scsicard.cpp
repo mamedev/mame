@@ -338,7 +338,7 @@ void whtech_scsi_card_device::cruwrite(offs_t offset, uint8_t data)
 /*
     Callbacks for the controller chip.
 */
-WRITE_LINE_MEMBER( whtech_scsi_card_device::drq_w )
+void whtech_scsi_card_device::drq_w(int state)
 {
 	LOGMASKED(LOG_CB, "DRQ pin from controller = %d\n", state);
 	bool drq = (state==ASSERT_LINE);
@@ -350,7 +350,7 @@ WRITE_LINE_MEMBER( whtech_scsi_card_device::drq_w )
 	operate_ready_line();
 }
 
-WRITE_LINE_MEMBER( whtech_scsi_card_device::irq_w )
+void whtech_scsi_card_device::irq_w(int state)
 {
 	LOGMASKED(LOG_CB, "IRQ pin from controller = %d\n", state);
 	bool irq = (state==ASSERT_LINE);

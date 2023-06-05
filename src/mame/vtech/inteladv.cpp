@@ -25,8 +25,8 @@ public:
 	void inteladv(machine_config &config);
 	void dyndesk(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(st2205u_power_w);
-	DECLARE_WRITE_LINE_MEMBER(st2202_power_w);
+	void st2205u_power_w(int state);
+	void st2202_power_w(int state);
 
 private:
 	void inteladv_map(address_map &map);
@@ -46,13 +46,13 @@ void inteladv_state::dyndesk_map(address_map &map)
 	map(0x800000, 0x807fff).ram();
 }
 
-WRITE_LINE_MEMBER(inteladv_state::st2205u_power_w)
+void inteladv_state::st2205u_power_w(int state)
 {
 	if (!state)
 		m_maincpu->set_state_int(st2xxx_device::ST_IREQ, m_maincpu->state_int(st2xxx_device::ST_IREQ) | 0x0020);
 }
 
-WRITE_LINE_MEMBER(inteladv_state::st2202_power_w)
+void inteladv_state::st2202_power_w(int state)
 {
 	if (!state)
 		m_maincpu->set_state_int(st2xxx_device::ST_IREQ, m_maincpu->state_int(st2xxx_device::ST_IREQ) | 0x0010);

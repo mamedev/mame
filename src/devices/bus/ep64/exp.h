@@ -81,9 +81,9 @@ public:
 	auto nmi_wr() { return m_write_nmi.bind(); }
 	auto wait_wr() { return m_write_wait.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
-	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_write_nmi(state); }
-	DECLARE_WRITE_LINE_MEMBER( wait_w ) { m_write_wait(state); }
+	void irq_w(int state) { m_write_irq(state); }
+	void nmi_w(int state) { m_write_nmi(state); }
+	void wait_w(int state) { m_write_wait(state); }
 
 	address_space &program() { return *m_program_space; }
 	address_space &io() { return *m_io_space; }

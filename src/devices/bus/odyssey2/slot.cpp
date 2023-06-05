@@ -241,7 +241,7 @@ u8 o2_cart_slot_device::bus_read()
 	return (m_cart) ? m_cart->bus_read() : 0xff;
 }
 
-READ_LINE_MEMBER(o2_cart_slot_device::t0_read)
+int o2_cart_slot_device::t0_read()
 {
 	return (m_cart) ? m_cart->t0_read() : 0;
 }

@@ -62,10 +62,10 @@ public:
 
 	void stall() { m_stall = true; }
 
-	DECLARE_WRITE_LINE_MEMBER(gpio0_w);
-	DECLARE_WRITE_LINE_MEMBER(gpio1_w);
-	DECLARE_WRITE_LINE_MEMBER(gpio2_w);
-	DECLARE_WRITE_LINE_MEMBER(gpio3_w);
+	void gpio0_w(int state);
+	void gpio1_w(int state);
+	void gpio2_w(int state);
+	void gpio3_w(int state);
 
 protected:
 	mb86233_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

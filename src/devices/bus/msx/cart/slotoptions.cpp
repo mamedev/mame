@@ -64,6 +64,7 @@ char const *const MSXDOS2J        = "msxdos2j";
 char const *const MSXDOS2E        = "msxdos2e";
 char const *const MSXWRITE        = "msxwrite";
 char const *const NOMAPPER        = "nomapper";
+char const *const QUICKDISK       = "quickdisk";
 char const *const RAM16K          = "ram16k";
 char const *const RAM32K          = "ram32k";
 char const *const RAM48K          = "ram48k";

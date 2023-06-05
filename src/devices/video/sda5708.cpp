@@ -143,7 +143,7 @@ void sda5708_device::update_display()
 	}
 }
 
-WRITE_LINE_MEMBER( sda5708_device::load_w )
+void sda5708_device::load_w(int state)
 {
 	LOG("%s - line %s\n", FUNCNAME, state == ASSERT_LINE ? "asserted" : "cleared");
 	if (m_load != state && m_reset == CLEAR_LINE && state == CLEAR_LINE)
@@ -205,7 +205,7 @@ WRITE_LINE_MEMBER( sda5708_device::load_w )
 // line goes high. The least significant bit D0 is loaded first.
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( sda5708_device::data_w )
+void sda5708_device::data_w(int state)
 {
 	LOG("%s - line %s\n", FUNCNAME, state == ASSERT_LINE ? "asserted" : "cleared");
 	m_data = state;
@@ -220,7 +220,7 @@ WRITE_LINE_MEMBER( sda5708_device::data_w )
 // 200ns. Setup time, the time between a stable Data line and a rising SDCLK signal, should be a minimum of 50ns.
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( sda5708_device::sdclk_w )
+void sda5708_device::sdclk_w(int state)
 {
 	LOG("%s - line %s\n", FUNCNAME, state == ASSERT_LINE ? "asserted" : "cleared");
 
@@ -242,7 +242,7 @@ WRITE_LINE_MEMBER( sda5708_device::sdclk_w )
 // the circuit and is left at high level from then on.
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( sda5708_device::reset_w )
+void sda5708_device::reset_w(int state)
 {
 	LOG("%s - line %s\n", FUNCNAME, state == ASSERT_LINE ? "asserted" : "cleared");
 	m_reset = state;

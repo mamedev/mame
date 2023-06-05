@@ -30,7 +30,7 @@ public:
 	auto txd_callback() { return m_txd_callback.bind(); }
 
 	// serial line input
-	DECLARE_WRITE_LINE_MEMBER(rxd_w);
+	void rxd_w(int state);
 
 protected:
 	// device-level overrides
@@ -45,7 +45,7 @@ private:
 	void leds_w(u8 data);
 	u8 p1_r();
 	void p2_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(prog_w);
+	void prog_w(int state);
 
 	// address maps
 	void ext_map(address_map &map);

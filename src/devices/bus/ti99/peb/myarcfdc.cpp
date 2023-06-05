@@ -257,17 +257,17 @@ void myarc_fdc_device::cruwrite(offs_t offset, uint8_t data)
 /*
     Callbacks from the WDC chip
 */
-WRITE_LINE_MEMBER( myarc_fdc_device::fdc_irq_w )
+void myarc_fdc_device::fdc_irq_w(int state)
 {
 	LOGMASKED(LOG_IRQ, "INTRQ callback = %d\n", state);
 }
 
-WRITE_LINE_MEMBER( myarc_fdc_device::fdc_drq_w )
+void myarc_fdc_device::fdc_drq_w(int state)
 {
 	LOGMASKED(LOG_DRQ, "DRQ callback = %d\n", state);
 }
 
-WRITE_LINE_MEMBER( myarc_fdc_device::fdc_mon_w )
+void myarc_fdc_device::fdc_mon_w(int state)
 {
 	LOGMASKED(LOG_DRIVE, "MON callback = %d\n", state);
 	// All MON lines are connected
@@ -281,19 +281,19 @@ WRITE_LINE_MEMBER( myarc_fdc_device::fdc_mon_w )
 /*
     Callbacks from the 74LS259 latch
 */
-WRITE_LINE_MEMBER( myarc_fdc_device::den_w )
+void myarc_fdc_device::den_w(int state)
 {
 	LOGMASKED(LOG_CRU, "Card enable = %d\n", state);
 	m_cardsel = (state==1);
 }
 
-WRITE_LINE_MEMBER( myarc_fdc_device::wdreset_w )
+void myarc_fdc_device::wdreset_w(int state)
 {
 	LOGMASKED(LOG_CRU, "Controller reset = %d\n", state);
 	m_wdc->mr_w(state);
 }
 
-WRITE_LINE_MEMBER( myarc_fdc_device::sidsel_w )
+void myarc_fdc_device::sidsel_w(int state)
 {
 	LOGMASKED(LOG_CRU, "Side select = %d\n", state);
 	if (m_selected_drive != 0)
@@ -304,14 +304,14 @@ WRITE_LINE_MEMBER( myarc_fdc_device::sidsel_w )
 }
 
 // Selects the EPROM bank, and also controls the DDEN line
-WRITE_LINE_MEMBER( myarc_fdc_device::bankdden_w )
+void myarc_fdc_device::bankdden_w(int state)
 {
 	LOGMASKED(LOG_CRU, "EPROM bank select = %d\n", state);
 	m_banksel = (state==ASSERT_LINE);
 	m_wdc->dden_w(state==1);
 }
 
-WRITE_LINE_MEMBER( myarc_fdc_device::drivesel_w )
+void myarc_fdc_device::drivesel_w(int state)
 {
 	int driveno = 0;
 

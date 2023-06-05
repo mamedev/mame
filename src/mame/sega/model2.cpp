@@ -2363,7 +2363,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_interrupt)
 }
 
 #ifdef UNUSED_FUNCTION
-WRITE_LINE_MEMBER(model2_state::sound_ready_w)
+void model2_state::sound_ready_w(int state)
 {
 	if(state)
 	{

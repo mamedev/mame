@@ -33,10 +33,10 @@ public:
 	// construction/destruction
 	nmc9306_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER( cs_w );
-	DECLARE_WRITE_LINE_MEMBER( sk_w );
-	DECLARE_WRITE_LINE_MEMBER( di_w );
-	DECLARE_READ_LINE_MEMBER( do_r );
+	void cs_w(int state);
+	void sk_w(int state);
+	void di_w(int state);
+	int do_r();
 
 protected:
 	// device-level overrides

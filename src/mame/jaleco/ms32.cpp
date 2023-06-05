@@ -1652,22 +1652,22 @@ void ms32_base_state::irq_raise(int level, bool state)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(ms32_base_state::timer_irq_w)
+void ms32_base_state::timer_irq_w(int state)
 {
 	irq_raise(0, state);
 }
 
-WRITE_LINE_MEMBER(ms32_base_state::vblank_irq_w)
+void ms32_base_state::vblank_irq_w(int state)
 {
 	irq_raise(10, state);
 }
 
-WRITE_LINE_MEMBER(ms32_base_state::field_irq_w)
+void ms32_base_state::field_irq_w(int state)
 {
 	irq_raise(9, state);
 }
 
-WRITE_LINE_MEMBER(ms32_base_state::sound_reset_line_w)
+void ms32_base_state::sound_reset_line_w(int state)
 {
 	if (state)
 		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
@@ -1715,7 +1715,7 @@ void ms32_base_state::to_main_w(u8 data)
 }
 
 
-WRITE_LINE_MEMBER(ms32_base_state::sound_ack_w)
+void ms32_base_state::sound_ack_w(int state)
 {
 	// used by f1superb, is it the reason for sound dying?
 	if (state)

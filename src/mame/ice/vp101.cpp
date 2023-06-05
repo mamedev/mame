@@ -145,7 +145,7 @@ private:
 
 	void dmaaddr_w(uint32_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(dmarq_w);
+	void dmarq_w(int state);
 
 	uint32_t tty_4925_rdy_r() { return 0x2; }
 
@@ -201,7 +201,7 @@ void vp10x_state::dmaaddr_w(uint32_t data)
 	m_dma_ptr = (data & 0x07ffffff);
 }
 
-WRITE_LINE_MEMBER(vp10x_state::dmarq_w)
+void vp10x_state::dmarq_w(int state)
 {
 	if (state != m_dmarq_state)
 	{

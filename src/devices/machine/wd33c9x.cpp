@@ -670,7 +670,7 @@ void wd33c9x_base_device::indir_reg_w(uint8_t data)
 //  reset - Host reset line handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(wd33c9x_base_device::reset_w)
+void wd33c9x_base_device::reset_w(int state)
 {
 	if (state) {
 		LOGMASKED(LOG_LINES, "Reset via MR line\n");

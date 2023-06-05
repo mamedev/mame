@@ -31,23 +31,23 @@ public:
 	// which is a very bad design pattern and will cause synchronization/missed clock transition issues.
 	// This function WILL ASSERT if it is called and the clock hz is NOT specified!
 	// TODO: remove all use of this, and remove it.
-	READ_LINE_MEMBER( clock_r );
+	int clock_r();
 
 	// Clock push; this function WILL ASSERT if it is called and the clock hz IS specified!
-	WRITE_LINE_MEMBER( mclock_w );
+	void mclock_w(int state);
 
 	// Digital in push to the pin, as a pseudo 'buffer' implemented within the cvsd device itself.
 	// This is not technically accurate to hardware, and in the future should be deprecated in favor of
 	// digin_cb once the latter is implemented.
-	WRITE_LINE_MEMBER( digin_w );
+	void digin_w(int state);
 
 	// DEC/ENC decode/encode select push. This is not implemented yet, and relies on an input audio stream.
 	// TODO: implement this beyond a do-nothing stub
-	WRITE_LINE_MEMBER( dec_encq_w );
+	void dec_encq_w(int state);
 
 	// Digital out pull. TODO: this is not hooked up or implemented yet, although it is only really
 	// relevant for devices which use the CVSD chips in encode mode.
-	READ_LINE_MEMBER( digout_r );
+	int digout_r();
 
 	// Audio In pin, an analog value of the audio waveform being pushed to the chip.
 	// TODO: this is not hooked up or implemented yet, and this should really be handled as an
@@ -116,11 +116,11 @@ public:
 	// AGC callback function, called to push the state if the AGC pin changes, ok to leave unconnected
 	auto agc_cb() { return m_agc_push_cb.bind(); }
 
-	WRITE_LINE_MEMBER( fzq_w ); // /FZ (partial reset) push
-	READ_LINE_MEMBER( agc_r ); // AGC pull
+	void fzq_w(int state); // /FZ (partial reset) push
+	int agc_r(); // AGC pull
 	// TODO: These are only relevant for encode mode, which isn't done yet!
-	//WRITE_LINE_MEMBER( aptq_w ); // /APT (silence encoder output) push
-	//WRITE_LINE_MEMBER( dec_encq_w ); // DEC/ENC decode/encode select push
+	//void aptq_w(int state); // /APT (silence encoder output) push
+	//void dec_encq_w(int state); // DEC/ENC decode/encode select push
 
 protected:
 	// overridable type for subclass

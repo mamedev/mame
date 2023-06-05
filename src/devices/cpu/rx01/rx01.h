@@ -48,7 +48,7 @@ public:
 	auto shift_callback() { return m_interface_callback[4].bind(); }
 
 	// serial input for controller
-	DECLARE_READ_LINE_MEMBER(data_r) { return !data_in(); }
+	int data_r() { return !data_in(); }
 
 protected:
 	// device-level overrides

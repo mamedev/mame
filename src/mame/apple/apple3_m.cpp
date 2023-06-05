@@ -491,7 +491,7 @@ void apple3_state::apple3_c0xx_w(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(apple3_state::vbl_w)
+void apple3_state::vbl_w(int state)
 {
 	// do the font upload at the end of VBL, not the start
 	if ((!state) && (m_charwrt))
@@ -664,7 +664,7 @@ void apple3_state::machine_reset()
 	m_scanend->adjust(attotime::never);
 }
 
-WRITE_LINE_MEMBER(apple3_state::a2bus_inh_w)
+void apple3_state::a2bus_inh_w(int state)
 {
 	m_inh_state = state;
 }
@@ -1083,7 +1083,7 @@ void apple3_state::apple3_memory_w(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(apple3_state::apple3_sync_w)
+void apple3_state::apple3_sync_w(int state)
 {
 //  printf("sync: %d\n", state);
 	m_sync = (state == ASSERT_LINE) ? true : false;
@@ -1131,7 +1131,7 @@ TIMER_CALLBACK_MEMBER(apple3_state::scanend_cb)
 	}
 }
 
-READ_LINE_MEMBER(apple3_state::ay3600_shift_r)
+int apple3_state::ay3600_shift_r()
 {
 	// either shift key
 	if (m_kbspecial->read() & 0x06)
@@ -1142,7 +1142,7 @@ READ_LINE_MEMBER(apple3_state::ay3600_shift_r)
 	return CLEAR_LINE;
 }
 
-READ_LINE_MEMBER(apple3_state::ay3600_control_r)
+int apple3_state::ay3600_control_r()
 {
 	if (m_kbspecial->read() & 0x08)
 	{
@@ -1237,7 +1237,7 @@ static const uint8_t key_remap[0x50][4] =
 	{ 0x00,0x00,0x00,0x00 }     /* 0x4f unused    */
 };
 
-WRITE_LINE_MEMBER(apple3_state::ay3600_data_ready_w)
+void apple3_state::ay3600_data_ready_w(int state)
 {
 	m_via[1]->write_ca2(state);
 
@@ -1358,7 +1358,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple3_state::paddle_timer)
 	}
 }
 
-WRITE_LINE_MEMBER(apple3_state::a2bus_irq_w)
+void apple3_state::a2bus_irq_w(int state)
 {
 	uint8_t irq_mask = m_a2bus->get_a2bus_irq_mask();
 
@@ -1383,7 +1383,7 @@ WRITE_LINE_MEMBER(apple3_state::a2bus_irq_w)
 	}
 }
 
-WRITE_LINE_MEMBER(apple3_state::a2bus_nmi_w)
+void apple3_state::a2bus_nmi_w(int state)
 {
 	m_via[1]->write_pb7(state);
 

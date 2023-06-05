@@ -111,9 +111,9 @@ public:
 	uint8_t protected_ram_r(offs_t offset);
 	void protected_ram_w(offs_t offset, uint8_t data);
 	uint8_t input_mux_r(offs_t offset);
-	template<int Coin> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
-	template<int Bit> DECLARE_WRITE_LINE_MEMBER(sparkle_w);
-	DECLARE_WRITE_LINE_MEMBER(gorf_sound_switch_w);
+	template<int Coin> void coin_counter_w(int state);
+	template<int Bit> void sparkle_w(int state);
+	void gorf_sound_switch_w(int state);
 	void profpac_banksw_w(uint8_t data);
 	void demndrgn_banksw_w(uint8_t data);
 	uint8_t video_register_r(offs_t offset);
@@ -127,7 +127,7 @@ public:
 	uint8_t profpac_videoram_r(offs_t offset);
 	void profpac_videoram_w(offs_t offset, uint8_t data);
 	DECLARE_INPUT_CHANGED_MEMBER(spacezap_monitor);
-	DECLARE_WRITE_LINE_MEMBER(lightpen_trigger_w);
+	void lightpen_trigger_w(int state);
 	void init_profpac();
 	void init_spacezap();
 	void init_robby();
@@ -153,7 +153,7 @@ public:
 	void init_sparklestar();
 
 	void votrax_speech_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( votrax_speech_status_r );
+	int votrax_speech_status_r();
 
 	void astrocade_base(machine_config &config);
 	void astrocade_16color_base(machine_config &config);
@@ -247,7 +247,7 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(input_select_w);
+	void input_select_w(int state);
 	void sound_w(uint8_t data);
 	void trackball_reset_w(uint8_t data);
 

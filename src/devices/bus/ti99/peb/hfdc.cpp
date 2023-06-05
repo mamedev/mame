@@ -825,7 +825,7 @@ void myarc_hfdc_device::set_floppy_motors_running(bool run)
 /*
     Called whenever the state of the HDC9234 interrupt pin changes.
 */
-WRITE_LINE_MEMBER( myarc_hfdc_device::intrq_w )
+void myarc_hfdc_device::intrq_w(int state)
 {
 	m_irq = (line_state)state;
 	LOGMASKED(LOG_INT, "INT pin from controller = %d, propagating to INTA*\n", state);
@@ -840,7 +840,7 @@ WRITE_LINE_MEMBER( myarc_hfdc_device::intrq_w )
     Called whenever the HDC9234 desires bus access to the buffer RAM. The
     controller expects a call to dmarq in 1 byte time.
 */
-WRITE_LINE_MEMBER( myarc_hfdc_device::dmarq_w )
+void myarc_hfdc_device::dmarq_w(int state)
 {
 	LOGMASKED(LOG_DMA, "DMARQ pin from controller = %d\n", state);
 	if (state == ASSERT_LINE)
@@ -852,7 +852,7 @@ WRITE_LINE_MEMBER( myarc_hfdc_device::dmarq_w )
 /*
     Called whenever the state of the HDC9234 DMA in progress changes.
 */
-WRITE_LINE_MEMBER( myarc_hfdc_device::dip_w )
+void myarc_hfdc_device::dip_w(int state)
 {
 	m_dip = (line_state)state;
 }

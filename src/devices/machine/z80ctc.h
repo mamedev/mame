@@ -92,10 +92,10 @@ public:
 	// read/write handlers
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( trg0 );
-	DECLARE_WRITE_LINE_MEMBER( trg1 );
-	DECLARE_WRITE_LINE_MEMBER( trg2 );
-	DECLARE_WRITE_LINE_MEMBER( trg3 );
+	void trg0(int state);
+	void trg1(int state);
+	void trg2(int state);
+	void trg3(int state);
 
 	u16 get_channel_constant(int ch) const { return m_channel[ch]->m_tconst; }
 

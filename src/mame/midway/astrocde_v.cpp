@@ -398,7 +398,7 @@ TIMER_CALLBACK_MEMBER(astrocde_state::interrupt_off)
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(astrocde_state::lightpen_trigger_w)
+void astrocde_state::lightpen_trigger_w(int state)
 {
 	if (state)
 	{

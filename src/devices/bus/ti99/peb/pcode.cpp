@@ -214,7 +214,7 @@ void ti_pcode_card_device::write(offs_t offset, uint8_t data)
 /*
     Common READY* line from the GROMs.
 */
-WRITE_LINE_MEMBER( ti_pcode_card_device::ready_line )
+void ti_pcode_card_device::ready_line(int state)
 {
 	m_slot->set_ready(state);
 }
@@ -224,7 +224,7 @@ WRITE_LINE_MEMBER( ti_pcode_card_device::ready_line )
     clock input for the GROMs, which are thus running at a lower rate than
     those in the console driven by the VDP (477 kHz).
 */
-WRITE_LINE_MEMBER( ti_pcode_card_device::clock_in)
+void ti_pcode_card_device::clock_in(int state)
 {
 	m_clock_count = (m_clock_count+1) & 0x03;  // four pulses high, four pulses low
 	if (m_clock_count==0)
@@ -260,12 +260,12 @@ void ti_pcode_card_device::cruwrite(offs_t offset, uint8_t data)
 		m_crulatch->write_bit((offset & 0x80) >> 5 | (offset & 0x06) >> 1, data);
 }
 
-WRITE_LINE_MEMBER(ti_pcode_card_device::pcpage_w)
+void ti_pcode_card_device::pcpage_w(int state)
 {
 	m_selected = state;
 }
 
-WRITE_LINE_MEMBER(ti_pcode_card_device::ekrpg_w)
+void ti_pcode_card_device::ekrpg_w(int state)
 {
 	m_bank_select = state ? 2 : 1;   // we're calling this bank 1 and bank 2
 	LOGMASKED(LOG_CRU, "Select rom bank %d\n", m_bank_select);

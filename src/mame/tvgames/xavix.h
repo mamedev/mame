@@ -129,10 +129,10 @@ public:
 
 	void init_xavix();
 
-	DECLARE_WRITE_LINE_MEMBER(ioevent_trg01);
-	DECLARE_WRITE_LINE_MEMBER(ioevent_trg02);
-	DECLARE_WRITE_LINE_MEMBER(ioevent_trg04);
-	DECLARE_WRITE_LINE_MEMBER(ioevent_trg08);
+	void ioevent_trg01(int state);
+	void ioevent_trg02(int state);
+	void ioevent_trg04(int state);
+	void ioevent_trg08(int state);
 
 	int m_rgnlen = 0;
 	uint8_t* m_rgn = nullptr;
@@ -669,7 +669,7 @@ public:
 		: xavix_i2c_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_READ_LINE_MEMBER(camera_r);
+	int camera_r();
 
 protected:
 	//virtual void write_io1(uint8_t data, uint8_t direction) override;
@@ -689,7 +689,7 @@ public:
 	void xavix_mtrk(machine_config &config);
 	void xavix_mtrkp(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER( mtrk_wheel_r );
+	int mtrk_wheel_r();
 
 protected:
 	required_device<xavix_mtrk_wheel_device> m_wheel;
@@ -933,7 +933,7 @@ public:
 
 	void xavix_cart_popira2(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(i2c_r);
+	int i2c_r();
 
 protected:
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
@@ -952,7 +952,7 @@ public:
 		: xavix_cart_state(mconfig,type,tag)
 	{ }
 
-	DECLARE_READ_LINE_MEMBER(i2c_r);
+	int i2c_r();
 
 protected:
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
@@ -969,8 +969,8 @@ public:
 		m_extraiowrite(0)
 	{ }
 
-	DECLARE_READ_LINE_MEMBER(ekara_multi0_r);
-	DECLARE_READ_LINE_MEMBER(ekara_multi1_r);
+	int ekara_multi0_r();
+	int ekara_multi1_r();
 
 //  void xavix_ekara(machine_config &config);
 

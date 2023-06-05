@@ -128,7 +128,7 @@ public:
 		m_track(*this, "TRACK%c", 'X')
 	{ }
 
-	DECLARE_READ_LINE_MEMBER(vblank_r);
+	int vblank_r();
 	void cloud9(machine_config &config);
 
 protected:
@@ -505,7 +505,7 @@ TIMER_CALLBACK_MEMBER(cloud9_state::clock_irq)
 }
 
 
-READ_LINE_MEMBER(cloud9_state::vblank_r)
+int cloud9_state::vblank_r()
 {
 	int const scanline = m_screen->vpos();
 	return (~m_syncprom[scanline & 0xff] >> 1) & 1;

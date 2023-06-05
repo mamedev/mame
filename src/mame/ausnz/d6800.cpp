@@ -85,7 +85,7 @@ private:
 	void d6800_cassette_w(uint8_t data);
 	uint8_t d6800_keyboard_r();
 	void d6800_keyboard_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( d6800_screen_w );
+	void d6800_screen_w(int state);
 	uint32_t screen_update_d6800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(rtc_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
@@ -240,7 +240,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(d6800_state::kansas_r)
 }
 
 
-WRITE_LINE_MEMBER( d6800_state::d6800_screen_w )
+void d6800_state::d6800_screen_w(int state)
 {
 	m_cb2 = state;
 	m_maincpu->set_unscaled_clock(state ? 589744 : 1e6); // effective clock is ~590kHz while screen is on

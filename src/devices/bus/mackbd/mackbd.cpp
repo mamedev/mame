@@ -112,7 +112,7 @@ mac_keyboard_port_device::~mac_keyboard_port_device()
 {
 }
 
-WRITE_LINE_MEMBER(mac_keyboard_port_device::data_w)
+void mac_keyboard_port_device::data_w(int state)
 {
 	if (m_peripheral)
 		m_peripheral->data_w(state);

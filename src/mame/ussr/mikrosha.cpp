@@ -34,7 +34,7 @@ public:
 
 private:
 	void mikrosha_8255_font_page_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(mikrosha_pit_out2);
+	void mikrosha_pit_out2(int state);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	void machine_reset() override;
 	void machine_start() override;
@@ -169,7 +169,7 @@ void mikrosha_state::mikrosha_8255_font_page_w(uint8_t data)
 	m_mikrosha_font_page = (data >> 7) & 1;
 }
 
-WRITE_LINE_MEMBER(mikrosha_state::mikrosha_pit_out2)
+void mikrosha_state::mikrosha_pit_out2(int state)
 {
 }
 

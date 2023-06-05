@@ -46,8 +46,8 @@ private:
 	uint8_t mz80k_8255_portc_r();
 	void mz80k_8255_porta_w(uint8_t data);
 	void mz80k_8255_portc_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pit_out0_changed);
-	DECLARE_WRITE_LINE_MEMBER(pit_out2_changed);
+	void pit_out0_changed(int state);
+	void pit_out2_changed(int state);
 	uint32_t screen_update_mz80k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mz80kj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mz80a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

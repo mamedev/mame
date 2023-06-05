@@ -10,26 +10,26 @@ DEFINE_DEVICE_TYPE(H83337, h83337_device, "h83337", "Hitachi H8/3337")
 
 h83337_device::h83337_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start) :
 	h8_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h83337_device::map), this)),
-	intc(*this, "intc"),
-	adc(*this, "adc"),
-	port1(*this, "port1"),
-	port2(*this, "port2"),
-	port3(*this, "port3"),
-	port4(*this, "port4"),
-	port5(*this, "port5"),
-	port6(*this, "port6"),
-	port7(*this, "port7"),
-	port8(*this, "port8"),
-	port9(*this, "port9"),
-	timer8_0(*this, "timer8_0"),
-	timer8_1(*this, "timer8_1"),
-	timer16(*this, "timer16"),
-	timer16_0(*this, "timer16:0"),
-	sci0(*this, "sci0"),
-	sci1(*this, "sci1"),
-	watchdog(*this, "watchdog"),
-	syscr(0),
-	ram_start(start)
+	m_intc(*this, "intc"),
+	m_adc(*this, "adc"),
+	m_port1(*this, "port1"),
+	m_port2(*this, "port2"),
+	m_port3(*this, "port3"),
+	m_port4(*this, "port4"),
+	m_port5(*this, "port5"),
+	m_port6(*this, "port6"),
+	m_port7(*this, "port7"),
+	m_port8(*this, "port8"),
+	m_port9(*this, "port9"),
+	m_timer8_0(*this, "timer8_0"),
+	m_timer8_1(*this, "timer8_1"),
+	m_timer16(*this, "timer16"),
+	m_timer16_0(*this, "timer16:0"),
+	m_sci0(*this, "sci0"),
+	m_sci1(*this, "sci1"),
+	m_watchdog(*this, "watchdog"),
+	m_syscr(0),
+	m_ram_start(start)
 {
 }
 
@@ -50,7 +50,7 @@ h83336_device::h83336_device(const machine_config &mconfig, const char *tag, dev
 
 void h83337_device::map(address_map &map)
 {
-	map(ram_start, 0xff7f).ram();
+	map(m_ram_start, 0xff7f).ram();
 
 	map(0xff88, 0xff88).rw("sci1", FUNC(h8_sci_device::smr_r), FUNC(h8_sci_device::smr_w));
 	map(0xff89, 0xff89).rw("sci1", FUNC(h8_sci_device::brr_r), FUNC(h8_sci_device::brr_w));
@@ -139,38 +139,38 @@ void h83337_device::device_add_mconfig(machine_config &config)
 
 void h83337_device::execute_set_input(int inputnum, int state)
 {
-	intc->set_input(inputnum, state);
+	m_intc->set_input(inputnum, state);
 }
 
 void h83337_device::irq_setup()
 {
-	CCR |= F_I;
+	m_CCR |= F_I;
 }
 
 void h83337_device::update_irq_filter()
 {
-	if(CCR & F_I)
-		intc->set_filter(2, -1);
+	if(m_CCR & F_I)
+		m_intc->set_filter(2, -1);
 	else
-		intc->set_filter(0, -1);
+		m_intc->set_filter(0, -1);
 }
 
 void h83337_device::interrupt_taken()
 {
-	standard_irq_callback(intc->interrupt_taken(taken_irq_vector), NPC);
+	standard_irq_callback(m_intc->interrupt_taken(m_taken_irq_vector), m_NPC);
 }
 
 void h83337_device::internal_update(uint64_t current_time)
 {
 	uint64_t event_time = 0;
 
-	add_event(event_time, adc->internal_update(current_time));
-	add_event(event_time, sci0->internal_update(current_time));
-	add_event(event_time, sci1->internal_update(current_time));
-	add_event(event_time, timer8_0->internal_update(current_time));
-	add_event(event_time, timer8_1->internal_update(current_time));
-	add_event(event_time, timer16_0->internal_update(current_time));
-	add_event(event_time, watchdog->internal_update(current_time));
+	add_event(event_time, m_adc->internal_update(current_time));
+	add_event(event_time, m_sci0->internal_update(current_time));
+	add_event(event_time, m_sci1->internal_update(current_time));
+	add_event(event_time, m_timer8_0->internal_update(current_time));
+	add_event(event_time, m_timer8_1->internal_update(current_time));
+	add_event(event_time, m_timer16_0->internal_update(current_time));
+	add_event(event_time, m_watchdog->internal_update(current_time));
 
 	recompute_bcount(event_time);
 }
@@ -183,17 +183,17 @@ void h83337_device::device_start()
 void h83337_device::device_reset()
 {
 	h8_device::device_reset();
-	syscr = 0x09;
+	m_syscr = 0x09;
 }
 
 uint8_t h83337_device::syscr_r()
 {
-	return syscr;
+	return m_syscr;
 }
 
 void h83337_device::syscr_w(uint8_t data)
 {
-	syscr = data;
+	m_syscr = data;
 	logerror("syscr = %02x\n", data);
 }
 
@@ -215,8 +215,8 @@ uint8_t h83337_device::stcr_r()
 void h83337_device::stcr_w(uint8_t data)
 {
 	logerror("stcr = %02x\n", data);
-	timer8_0->set_extra_clock_bit(data & 0x01);
-	timer8_1->set_extra_clock_bit(data & 0x02);
+	m_timer8_0->set_extra_clock_bit(data & 0x01);
+	m_timer8_1->set_extra_clock_bit(data & 0x02);
 }
 
 uint8_t h83337_device::mdcr_r()

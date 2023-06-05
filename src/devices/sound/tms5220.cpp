@@ -1775,7 +1775,7 @@ TIMER_CALLBACK_MEMBER(tms5220_device::set_io_ready)
 /*
  * /RS line write handler
  */
-WRITE_LINE_MEMBER( tms5220_device::rsq_w )
+void tms5220_device::rsq_w(int state)
 {
 	m_true_timing = true;
 	state &= 0x01;
@@ -1822,7 +1822,7 @@ WRITE_LINE_MEMBER( tms5220_device::rsq_w )
 /*
  * /WS line write handler
  */
-WRITE_LINE_MEMBER( tms5220_device::wsq_w )
+void tms5220_device::wsq_w(int state)
 {
 	m_true_timing = true;
 	state &= 0x01;
@@ -2009,7 +2009,7 @@ uint8_t tms5220_device::status_r()
 
 ***********************************************************************************************/
 
-READ_LINE_MEMBER( tms5220_device::readyq_r )
+int tms5220_device::readyq_r()
 {
 	// prevent debugger from changing the internal state
 	if (!machine().side_effects_disabled())
@@ -2025,7 +2025,7 @@ READ_LINE_MEMBER( tms5220_device::readyq_r )
 
 ***********************************************************************************************/
 
-READ_LINE_MEMBER( tms5220_device::intq_r )
+int tms5220_device::intq_r()
 {
 	// prevent debugger from changing the internal state
 	if (!machine().side_effects_disabled())

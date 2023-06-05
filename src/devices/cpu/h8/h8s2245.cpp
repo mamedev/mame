@@ -11,33 +11,33 @@ DEFINE_DEVICE_TYPE(H8S2246, h8s2246_device, "h8s2246", "Hitachi H8S/2246")
 
 h8s2245_device::h8s2245_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start) :
 	h8s2000_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h8s2245_device::map), this)),
-	intc(*this, "intc"),
-	adc(*this, "adc"),
-	dtc(*this, "dtc"),
-	port1(*this, "port1"),
-	port2(*this, "port2"),
-	port3(*this, "port3"),
-	port4(*this, "port4"),
-	port5(*this, "port5"),
-	porta(*this, "porta"),
-	portb(*this, "portb"),
-	portc(*this, "portc"),
-	portd(*this, "portd"),
-	porte(*this, "porte"),
-	portf(*this, "portf"),
-	portg(*this, "portg"),
-	timer8_0(*this, "timer8_0"),
-	timer8_1(*this, "timer8_1"),
-	timer16(*this, "timer16"),
-	timer16_0(*this, "timer16:0"),
-	timer16_1(*this, "timer16:1"),
-	timer16_2(*this, "timer16:2"),
-	sci0(*this, "sci0"),
-	sci1(*this, "sci1"),
-	sci2(*this, "sci2"),
-	watchdog(*this, "watchdog"),
-	ram_start(start),
-	syscr(0)
+	m_intc(*this, "intc"),
+	m_adc(*this, "adc"),
+	m_dtc(*this, "dtc"),
+	m_port1(*this, "port1"),
+	m_port2(*this, "port2"),
+	m_port3(*this, "port3"),
+	m_port4(*this, "port4"),
+	m_port5(*this, "port5"),
+	m_porta(*this, "porta"),
+	m_portb(*this, "portb"),
+	m_portc(*this, "portc"),
+	m_portd(*this, "portd"),
+	m_porte(*this, "porte"),
+	m_portf(*this, "portf"),
+	m_portg(*this, "portg"),
+	m_timer8_0(*this, "timer8_0"),
+	m_timer8_1(*this, "timer8_1"),
+	m_timer16(*this, "timer16"),
+	m_timer16_0(*this, "timer16:0"),
+	m_timer16_1(*this, "timer16:1"),
+	m_timer16_2(*this, "timer16:2"),
+	m_sci0(*this, "sci0"),
+	m_sci1(*this, "sci1"),
+	m_sci2(*this, "sci2"),
+	m_watchdog(*this, "watchdog"),
+	m_ram_start(start),
+	m_syscr(0)
 {
 }
 
@@ -63,7 +63,7 @@ h8s2246_device::h8s2246_device(const machine_config &mconfig, const char *tag, d
 
 void h8s2245_device::map(address_map &map)
 {
-	map(ram_start, 0xfffbff).ram();
+	map(m_ram_start, 0xfffbff).ram();
 
 	map(0xfffeb0, 0xfffeb0).w("port1", FUNC(h8_port_device::ddr_w));
 	map(0xfffeb1, 0xfffeb1).w("port2", FUNC(h8_port_device::ddr_w));
@@ -231,7 +231,7 @@ void h8s2245_device::device_add_mconfig(machine_config &config)
 
 void h8s2245_device::execute_set_input(int inputnum, int state)
 {
-	intc->set_input(inputnum, state);
+	m_intc->set_input(inputnum, state);
 }
 
 bool h8s2245_device::exr_in_stack() const
@@ -241,64 +241,64 @@ bool h8s2245_device::exr_in_stack() const
 
 int h8s2245_device::trapa_setup()
 {
-	if(syscr & 0x10)
-		CCR |= F_I|F_UI;
+	if(m_syscr & 0x10)
+		m_CCR |= F_I|F_UI;
 	else
-		CCR |= F_I;
+		m_CCR |= F_I;
 	return 8;
 }
 
 void h8s2245_device::irq_setup()
 {
-	switch(syscr & 0x30) {
+	switch(m_syscr & 0x30) {
 	case 0x00:
-		CCR |= F_I;
+		m_CCR |= F_I;
 		break;
 	case 0x10:
-		CCR |= F_I|F_UI;
+		m_CCR |= F_I|F_UI;
 		break;
 	}
 }
 
 void h8s2245_device::update_irq_filter()
 {
-	switch(syscr & 0x30) {
+	switch(m_syscr & 0x30) {
 	case 0x00:
-		if(CCR & F_I)
-			intc->set_filter(2, -1);
+		if(m_CCR & F_I)
+			m_intc->set_filter(2, -1);
 		else
-			intc->set_filter(0, -1);
+			m_intc->set_filter(0, -1);
 		break;
 	case 0x10:
-		if((CCR & (F_I|F_UI)) == (F_I|F_UI))
-			intc->set_filter(2, -1);
-		else if(CCR & F_I)
-			intc->set_filter(1, -1);
+		if((m_CCR & (F_I|F_UI)) == (F_I|F_UI))
+			m_intc->set_filter(2, -1);
+		else if(m_CCR & F_I)
+			m_intc->set_filter(1, -1);
 		else
-			intc->set_filter(0, -1);
+			m_intc->set_filter(0, -1);
 		break;
 	}
 }
 
 void h8s2245_device::interrupt_taken()
 {
-	standard_irq_callback(intc->interrupt_taken(taken_irq_vector), NPC);
+	standard_irq_callback(m_intc->interrupt_taken(m_taken_irq_vector), m_NPC);
 }
 
 void h8s2245_device::internal_update(uint64_t current_time)
 {
 	uint64_t event_time = 0;
 
-	add_event(event_time, adc->internal_update(current_time));
-	add_event(event_time, sci0->internal_update(current_time));
-	add_event(event_time, sci1->internal_update(current_time));
-	add_event(event_time, sci2->internal_update(current_time));
-	add_event(event_time, timer8_0->internal_update(current_time));
-	add_event(event_time, timer8_1->internal_update(current_time));
-	add_event(event_time, timer16_0->internal_update(current_time));
-	add_event(event_time, timer16_1->internal_update(current_time));
-	add_event(event_time, timer16_2->internal_update(current_time));
-	add_event(event_time, watchdog->internal_update(current_time));
+	add_event(event_time, m_adc->internal_update(current_time));
+	add_event(event_time, m_sci0->internal_update(current_time));
+	add_event(event_time, m_sci1->internal_update(current_time));
+	add_event(event_time, m_sci2->internal_update(current_time));
+	add_event(event_time, m_timer8_0->internal_update(current_time));
+	add_event(event_time, m_timer8_1->internal_update(current_time));
+	add_event(event_time, m_timer16_0->internal_update(current_time));
+	add_event(event_time, m_timer16_1->internal_update(current_time));
+	add_event(event_time, m_timer16_2->internal_update(current_time));
+	add_event(event_time, m_watchdog->internal_update(current_time));
 
 	recompute_bcount(event_time);
 }
@@ -306,47 +306,47 @@ void h8s2245_device::internal_update(uint64_t current_time)
 void h8s2245_device::device_start()
 {
 	h8s2000_device::device_start();
-	dtc_device = dtc;
+	m_dtc_device = m_dtc;
 }
 
 void h8s2245_device::device_reset()
 {
 	h8s2000_device::device_reset();
-	syscr = 0x01;
-	mstpcr = 0x3fff;
+	m_syscr = 0x01;
+	m_mstpcr = 0x3fff;
 }
 
 uint8_t h8s2245_device::syscr_r()
 {
-	return syscr;
+	return m_syscr;
 }
 
 void h8s2245_device::syscr_w(uint8_t data)
 {
-	syscr = data;
+	m_syscr = data;
 	update_irq_filter();
 	logerror("syscr = %02x\n", data);
 }
 
 uint16_t h8s2245_device::mstpcr_r()
 {
-	return mstpcr;
+	return m_mstpcr;
 }
 
 void h8s2245_device::mstpcr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	uint16_t omstpcr = mstpcr;
-	COMBINE_DATA(&mstpcr);
-	if((omstpcr ^ mstpcr) & 0x72e0) {
+	uint16_t omstpcr = m_mstpcr;
+	COMBINE_DATA(&m_mstpcr);
+	if((omstpcr ^ m_mstpcr) & 0x72e0) {
 		std::ostringstream message;
 		message << "Online modules:";
-		if(mstpcr & 0x0020) message << " sci0";
-		if(mstpcr & 0x0040) message << " sci1";
-		if(mstpcr & 0x0080) message << " sci2";
-		if(mstpcr & 0x0200) message << " adc";
-		if(mstpcr & 0x1000) message << " timer8";
-		if(mstpcr & 0x2000) message << " timer16";
-		if(mstpcr & 0x4000) message << " dtc";
+		if(m_mstpcr & 0x0020) message << " sci0";
+		if(m_mstpcr & 0x0040) message << " sci1";
+		if(m_mstpcr & 0x0080) message << " sci2";
+		if(m_mstpcr & 0x0200) message << " adc";
+		if(m_mstpcr & 0x1000) message << " timer8";
+		if(m_mstpcr & 0x2000) message << " timer16";
+		if(m_mstpcr & 0x4000) message << " dtc";
 		message << "\n";
 		logerror(std::move(message).str());
 	}

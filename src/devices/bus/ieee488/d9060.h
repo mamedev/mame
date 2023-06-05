@@ -61,8 +61,8 @@ private:
 	uint8_t riot1_pb_r();
 	void riot1_pb_w(uint8_t data);
 	void via_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( ack_w );
-	DECLARE_WRITE_LINE_MEMBER( enable_w );
+	void ack_w(int state);
+	void enable_w(int state);
 	void scsi_data_w(uint8_t data);
 
 	required_device<m6502_device> m_maincpu;

@@ -615,9 +615,9 @@ private:
 
 	uint16_t magic_r();
 
-	DECLARE_WRITE_LINE_MEMBER(vsync_w);
-	DECLARE_WRITE_LINE_MEMBER(tc_w);
-	DECLARE_WRITE_LINE_MEMBER(hrq_w);
+	void vsync_w(int state);
+	void tc_w(int state);
+	void hrq_w(int state);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_UPDATE_ROW(crtc_update_row_mono);
@@ -666,12 +666,12 @@ uint8_t fanucspmg_state::get_slave_ack(offs_t offset)
 	return 0x00;
 }
 
-WRITE_LINE_MEMBER(fanucspmg_state::tc_w)
+void fanucspmg_state::tc_w(int state)
 {
 	m_fdc->tc_w(state);
 }
 
-WRITE_LINE_MEMBER(fanucspmg_state::hrq_w)
+void fanucspmg_state::hrq_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 	m_dmac->hlda_w(state);
@@ -731,7 +731,7 @@ void fanucspmg_state::maincpu_io(address_map &map)
 {
 }
 
-WRITE_LINE_MEMBER(fanucspmg_state::vsync_w)
+void fanucspmg_state::vsync_w(int state)
 {
 	if ((m_vbl_ctrl & 0x08) == 0x08)
 	{

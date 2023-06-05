@@ -196,7 +196,7 @@ private:
 	void fdc_ctrl_w(u8 data);
 	void fdc_irq_w(int state);
 	void dma_adr_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(dma_drq_w);
+	void dma_drq_w(int state);
 
 	TIMER_CALLBACK_MEMBER(lightpen_hit);
 	void lightpen_trigger(int state);
@@ -473,7 +473,7 @@ void mtu130_state::dma_adr_w(u8 data)
 	m_dma_adr = data << 6;
 }
 
-WRITE_LINE_MEMBER(mtu130_state::dma_drq_w)
+void mtu130_state::dma_drq_w(int state)
 {
 	while(m_fdc->get_drq()) {
 		if(m_dma_direction) {

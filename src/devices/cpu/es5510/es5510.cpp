@@ -779,9 +779,12 @@ void es5510_device::execute_run() {
 		} else {
 			// currently running, execute one instruction.
 
-			char buf[1024];
-			DESCRIBE_INSTR(buf, instr[pc], gpr[pc], nullptr, nullptr, nullptr, nullptr);
-			LOG_EXEC("EXECUTING %02x: %012x %06x  %s\n", pc, instr[pc], gpr[pc]&0xffffff, buf);
+			if (VERBOSE & LOG_EXECUTION)
+			{
+				char buf[1024];
+				DESCRIBE_INSTR(buf, instr[pc], gpr[pc], nullptr, nullptr, nullptr, nullptr);
+				LOG_EXEC("EXECUTING %02x: %012x %06x  %s\n", pc, instr[pc], gpr[pc]&0xffffff, buf);
+			}
 
 			ram_pp = ram_p;
 			ram_p = ram;

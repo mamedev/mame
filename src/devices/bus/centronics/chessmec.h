@@ -27,9 +27,9 @@ protected:
 	virtual void device_start() override { }
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual DECLARE_WRITE_LINE_MEMBER(input_data0) override { if (started()) m_chessm->data0_w(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(input_data1) override { if (started()) m_chessm->reset_w(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(input_data7) override { if (started()) m_chessm->data1_w(state); }
+	virtual void input_data0(int state) override { if (started()) m_chessm->data0_w(state); }
+	virtual void input_data1(int state) override { if (started()) m_chessm->reset_w(state); }
+	virtual void input_data7(int state) override { if (started()) m_chessm->data1_w(state); }
 
 private:
 	required_device<chessmachine_device> m_chessm;

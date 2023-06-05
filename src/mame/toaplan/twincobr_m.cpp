@@ -14,7 +14,7 @@
 #include "logmacro.h"
 
 
-WRITE_LINE_MEMBER(twincobr_state::twincobr_vblank_irq)
+void twincobr_state::twincobr_vblank_irq(int state)
 {
 	if (state && m_intenable)
 		m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
@@ -167,20 +167,20 @@ void twincobr_state::fsharkbt_dsp_w(u16 data)
 #endif
 }
 
-READ_LINE_MEMBER(twincobr_state::twincobr_bio_r)
+int twincobr_state::twincobr_bio_r()
 {
 	return m_dsp_bio;
 }
 
 
-WRITE_LINE_MEMBER(twincobr_state::int_enable_w)
+void twincobr_state::int_enable_w(int state)
 {
 	m_intenable = state;
 	if (!state)
 		m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(twincobr_state::dsp_int_w)
+void twincobr_state::dsp_int_w(int state)
 {
 	if (state)
 	{
@@ -200,22 +200,22 @@ WRITE_LINE_MEMBER(twincobr_state::dsp_int_w)
 }
 
 
-WRITE_LINE_MEMBER(twincobr_state::coin_counter_1_w)
+void twincobr_state::coin_counter_1_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(twincobr_state::coin_counter_2_w)
+void twincobr_state::coin_counter_2_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-WRITE_LINE_MEMBER(twincobr_state::coin_lockout_1_w)
+void twincobr_state::coin_lockout_1_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, !state);
 }
 
-WRITE_LINE_MEMBER(twincobr_state::coin_lockout_2_w)
+void twincobr_state::coin_lockout_2_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, !state);
 }

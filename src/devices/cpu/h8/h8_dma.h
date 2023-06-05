@@ -17,13 +17,13 @@
 #include "h8_intc.h"
 
 struct h8_dma_state {
-	uint32_t source, dest;
-	int32_t incs, incd;
-	uint32_t count;
-	int id;
-	bool autoreq; // activate by auto-request
-	bool suspended;
-	bool mode_16;
+	uint32_t m_source, m_dest;
+	int32_t m_incs, m_incd;
+	uint32_t m_count;
+	int m_id;
+	bool m_autoreq; // activate by auto-request
+	bool m_suspended;
+	bool m_mode_16;
 };
 
 class h8_dma_channel_device;
@@ -60,15 +60,15 @@ public:
 	void set_input(int inputnum, int state);
 
 protected:
-	required_device<h8_dma_channel_device> dmach0, dmach1;
+	required_device<h8_dma_channel_device> m_dmach0, m_dmach1;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	bool dreq[2];
+	bool m_dreq[2];
 
-	uint8_t dmawer, dmatcr;
-	uint16_t dmabcr;
+	uint8_t m_dmawer, m_dmatcr;
+	uint16_t m_dmabcr;
 };
 
 class h8_dma_channel_device : public device_t {
@@ -100,7 +100,7 @@ public:
 			int vf = h8_dma_channel_device::NONE)
 		: h8_dma_channel_device(mconfig, tag, owner, 0)
 	{
-		intc.set_tag(std::forward<T>(intc_tag));
+		m_intc.set_tag(std::forward<T>(intc_tag));
 		set_info(irq_base, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, va, vb, vc, vd, ve, vf);
 	}
 	void set_info(int irq_base, int v0, int v1, int v2, int v3, int v4, int v5, int v6, int v7, int v8, int v9, int va, int vb, int vc, int vd, int ve, int vf);
@@ -140,20 +140,20 @@ public:
 	void count_last(int submodule);
 	void count_done(int submodule);
 protected:
-	required_device<h8_dma_device> dmac;
-	required_device<h8_device> cpu;
-	required_device<h8_intc_device> intc;
-	h8_dma_state state[2];
-	int irq_base;
+	required_device<h8_dma_device> m_dmac;
+	required_device<h8_device> m_cpu;
+	required_device<h8_intc_device> m_intc;
+	h8_dma_state m_state[2];
+	int m_irq_base;
 
-	int activation_vectors[16];
+	int m_activation_vectors[16];
 
-	uint32_t mar[2];
-	uint16_t ioar[2], etcr[2], dmacr;
-	uint8_t dtcr[2]; // H8H
-	uint8_t dta, dte, dtie;
-	bool fae; // Full-Address Mode
-	bool sae; // Short-Address Mode
+	uint32_t m_mar[2];
+	uint16_t m_ioar[2], m_etcr[2], m_dmacr;
+	uint8_t m_dtcr[2]; // H8H
+	uint8_t m_dta, m_dte, m_dtie;
+	bool m_fae; // Full-Address Mode
+	bool m_sae; // Short-Address Mode
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

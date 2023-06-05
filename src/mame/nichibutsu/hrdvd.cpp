@@ -18,9 +18,12 @@
       H8/3002
       MN7100 8-bit channel data acquisition system
       Fujitsu MD0208
-      Zoran ZR36110PQC
+      Zoran ZR36110PQC (mpeg ps/video decoder)
+      Nippon Steel Corp NN71003F (mpeg audio decoder)
+      uPD6379A dual 16-bits DAC
+      Toshiba TC9223 PLL
       IDE and RS232c ports
-      xtal 27 MHz, 12.288MHz
+      xtal 27 MHz (dvd board), 12.288MHz (main board)
 
     H8 ports directions:
       8: fe /5 ---ooooi
@@ -38,8 +41,10 @@
 #include "cpu/m68000/tmp68301.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
+#include "sound/nn71003f.h"
 #include "video/v9938.h"
 #include "video/zr36110.h"
+#include "machine/tc9223.h"
 #include "nichisnd.h"
 
 class hrdvd_ata_controller_device : public abstract_ata_interface_device
@@ -64,8 +69,14 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
 		m_ata(*this, "ata"),
+		m_video(*this, "v9958"),
 		m_mpeg(*this, "mpeg"),
+		m_mpega(*this, "mpeg_audio"),
+		m_pll(*this, "pll"),
 		m_nichisnd(*this, "nichisnd"),
+		m_lspeaker(*this, "lspeaker"),
+		m_rspeaker(*this, "rspeaker"),
+		m_screen(*this, "screen"),
 		m_key(*this, "KEY.%u", 0),
 		m_region_maincpu(*this, "maincpu")
 	{ }
@@ -73,8 +84,14 @@ public:
 	required_device<tmp68301_device> m_maincpu;
 	required_device<h83002_device> m_subcpu;
 	required_device<hrdvd_ata_controller_device> m_ata;
+	required_device<v9958_device> m_video;
 	required_device<zr36110_device> m_mpeg;
+	required_device<nn71003f_device> m_mpega;
+	required_device<tc9223_device> m_pll;
 	required_device<nichisnd_device> m_nichisnd;
+	required_device<speaker_device> m_lspeaker;
+	required_device<speaker_device> m_rspeaker;
+	required_device<screen_device> m_screen;
 	required_ioport_array<5> m_key;
 	required_memory_region m_region_maincpu;
 
@@ -93,8 +110,8 @@ public:
 	void hrdvd_mux_w(uint16_t data);
 	void tmp68301_parallel_port_w(uint16_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(ata_irq);
-	DECLARE_WRITE_LINE_MEMBER(ata_drq);
+	void ata_irq(int state);
+	void ata_drq(int state);
 
 	virtual void machine_reset() override;
 
@@ -114,22 +131,24 @@ uint16_t hrdvd_state::pb_r()
 
 void hrdvd_state::pb_w(uint16_t data)
 {
+	u8 delta = data ^ m_pb;
 	m_pb = (m_pb & 0xc0) | (data & 0x3f);
-	logerror("pb %02x\n", data);
+	m_mpega->ss_w(BIT(m_pb, 0));
+	m_mpega->sclk_w(BIT(m_pb, 1));
+	m_mpega->mosi_w(BIT(m_pb, 2));
+	if(delta & 0x38)
+		logerror("pb %02x\n", data);
 }
 
 void hrdvd_state::pa_w(uint16_t data)
 {
-	if((m_pa & 0x80) && !(data & 0x80))
-		logerror("bit %c\n", data & 0x40 ? '1' : '0');
-	if(m_pa & 0x20)
-		logerror("bit reset\n");
+	u8 delta = data ^ m_pa;
 	m_pa = data;
-	logerror("pa %02x %c%c%c\n",
-			 data,
-			 data & 0x80 ? 'c' : '-',
-			 data & 0x40 ? 'd' : '-',
-			 data & 0x20 ? '#' : '-');
+	m_pll->stb_w(BIT(m_pa, 5));
+	m_pll->dat_w(BIT(m_pa, 6));
+	m_pll->clk_w(BIT(m_pa, 7));
+	if(delta & 0x1f)
+		logerror("pa %02x\n", data);
 }
 
 uint16_t hrdvd_state::hrdvd_mux_r()
@@ -213,10 +232,11 @@ void hrdvd_state::hrdvd_sub_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 
-	map(0x020008, 0x020008).rw(m_mpeg, FUNC(zr36110_device::stat0_r), FUNC(zr36110_device::setup8_w));
-	map(0x02000a, 0x02000a).rw(m_mpeg, FUNC(zr36110_device::stat1_r), FUNC(zr36110_device::mc18_w));
-	map(0x02000c, 0x02000c).rw(m_mpeg, FUNC(zr36110_device::stat2_r), FUNC(zr36110_device::cmd8_w));
-	map(0x02000e, 0x02000e). w(m_mpeg,                                FUNC(zr36110_device::mc238_w));
+	map(0x020008, 0x020009).rw(m_mpeg, FUNC(zr36110_device::stat0x_r), FUNC(zr36110_device::setupx_w));
+	map(0x02000a, 0x02000b).rw(m_mpeg, FUNC(zr36110_device::stat1x_r), FUNC(zr36110_device::mc1x_w));
+	map(0x02000c, 0x02000d).rw(m_mpeg, FUNC(zr36110_device::stat2x_r), FUNC(zr36110_device::cmdx_w));
+	map(0x02000e, 0x02000f).rw(m_mpeg, FUNC(zr36110_device::userx_r),  FUNC(zr36110_device::mc23x_w));
+	map(0x020010, 0x02001f). w(m_mpeg,                                 FUNC(zr36110_device::dmax_w));
 
 	map(0x040018, 0x040019).rw(m_ata, FUNC(hrdvd_ata_controller_device::dma_read), FUNC(hrdvd_ata_controller_device::dma_write));
 	map(0x040028, 0x04002f).rw(m_ata, FUNC(hrdvd_ata_controller_device::read), FUNC(hrdvd_ata_controller_device::write));
@@ -389,12 +409,12 @@ void hrdvd_state::machine_reset()
 	m_pb = 0;
 }
 
-WRITE_LINE_MEMBER(hrdvd_state::ata_irq)
+void hrdvd_state::ata_irq(int state)
 {
 	//  logerror("ata irq %d\n", state);
 }
 
-WRITE_LINE_MEMBER(hrdvd_state::ata_drq)
+void hrdvd_state::ata_drq(int state)
 {
 	//  logerror("ata drq %d\n", state);
 	m_pb = (m_pb & 0x7f) | (state ? 0x00 : 0x80);
@@ -443,18 +463,30 @@ void hrdvd_state::hrdvd(machine_config &config)
 
 	//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
-	v9958_device &v9958(V9958(config, "v9958", XTAL(21'477'272))); // typical 9958 clock, not verified
-	v9958.set_screen_ntsc("screen");
-	v9958.set_vram_size(0x20000);
-	v9958.int_cb().set_inputline(m_maincpu, 0);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	/* video & sound hardware */
+	TC9223(config, m_pll);
+
+	V9958(config, m_video, XTAL(21'477'272)); // typical 9958 clock, not verified
+	m_video->set_screen_ntsc(m_screen);
+	m_video->set_vram_size(0x20000);
+	m_video->int_cb().set_inputline(m_maincpu, 0);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 
 	ZR36110(config, m_mpeg, 27_MHz_XTAL/2);
-	m_mpeg->drq_handler().set_inputline(m_maincpu, H8_INPUT_LINE_DREQ0);
+	m_mpeg->drq_w().set_inputline(m_maincpu, H8_INPUT_LINE_DREQ0);
 
-	/* sound hardware */
+	NN71003F(config, m_mpega, 0);
+	m_mpega->add_route(0, m_lspeaker, 1.0);
+	m_mpega->add_route(1, m_rspeaker, 1.0);
+	m_mpeg->sp2_frm_w().set(m_mpega, FUNC(nn71003f_device::frm_w));
+	m_mpeg->sp2_clk_w().set(m_mpega, FUNC(nn71003f_device::clk_w));
+	m_mpeg->sp2_dat_w().set(m_mpega, FUNC(nn71003f_device::dat_w));
+
 	NICHISND(config, m_nichisnd, 0);
+
+	SPEAKER(config, m_lspeaker).front_left();
+	SPEAKER(config, m_rspeaker).front_right();
 }
 
 

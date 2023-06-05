@@ -40,10 +40,10 @@ public:
 	void astcl_w(uint8_t data);
 	void astch_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( rxa_wr );
-	DECLARE_WRITE_LINE_MEMBER( cts_wr );
-	DECLARE_WRITE_LINE_MEMBER( dcd_wr );
-	DECLARE_WRITE_LINE_MEMBER( cka_wr );
+	void rxa_wr(int state);
+	void cts_wr(int state);
+	void dcd_wr(int state);
+	void cka_wr(int state);
 
 	virtual void state_add(device_state_interface &parent) = 0;
 

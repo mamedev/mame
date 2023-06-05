@@ -135,7 +135,7 @@ TIMER_CALLBACK_MEMBER(rbv_device::mac_6015_tick)
 	write_6015(ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(rbv_device::vbl_w)
+void rbv_device::vbl_w(int state)
 {
 	if (!state)
 	{
@@ -149,7 +149,7 @@ WRITE_LINE_MEMBER(rbv_device::vbl_w)
 	pseudovia_recalc_irqs();
 }
 
-WRITE_LINE_MEMBER(rbv_device::slot0_irq_w)
+void rbv_device::slot0_irq_w(int state)
 {
 	if (state)
 	{
@@ -163,7 +163,7 @@ WRITE_LINE_MEMBER(rbv_device::slot0_irq_w)
 	pseudovia_recalc_irqs();
 }
 
-WRITE_LINE_MEMBER(rbv_device::slot1_irq_w)
+void rbv_device::slot1_irq_w(int state)
 {
 	if (state)
 	{
@@ -177,7 +177,7 @@ WRITE_LINE_MEMBER(rbv_device::slot1_irq_w)
 	pseudovia_recalc_irqs();
 }
 
-WRITE_LINE_MEMBER(rbv_device::slot2_irq_w)
+void rbv_device::slot2_irq_w(int state)
 {
 	if (state)
 	{
@@ -191,7 +191,7 @@ WRITE_LINE_MEMBER(rbv_device::slot2_irq_w)
 	pseudovia_recalc_irqs();
 }
 
-WRITE_LINE_MEMBER(rbv_device::asc_irq_w)
+void rbv_device::asc_irq_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{

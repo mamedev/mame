@@ -42,7 +42,7 @@ protected:
 	void kb_irq_clear_w(uint16_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off);
 
-	DECLARE_WRITE_LINE_MEMBER(prt_irl_w);
+	void prt_irl_w(int state);
 
 	void hp9845_base(machine_config &config);
 	void global_mem_map(address_map &map);

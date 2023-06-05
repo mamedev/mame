@@ -102,12 +102,12 @@ void dsbz80_device::device_reset()
 	m_uart->write_cts(0);
 }
 
-WRITE_LINE_MEMBER(dsbz80_device::write_txd)
+void dsbz80_device::write_txd(int state)
 {
 	m_uart->write_rxd(state);
 }
 
-WRITE_LINE_MEMBER(dsbz80_device::output_txd)
+void dsbz80_device::output_txd(int state)
 {
 	// not used by swa
 	m_rxd_handler(state);

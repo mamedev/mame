@@ -1026,7 +1026,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc88va_state::vrtc_irq)
 	}
 }
 
-WRITE_LINE_MEMBER( pc88va_state::fdc_irq )
+void pc88va_state::fdc_irq(int state)
 {
 	if(m_fdc_mode && state)
 	{
@@ -1035,7 +1035,7 @@ WRITE_LINE_MEMBER( pc88va_state::fdc_irq )
 	}
 }
 
-WRITE_LINE_MEMBER(pc88va_state::int4_irq_w)
+void pc88va_state::int4_irq_w(int state)
 {
 	bool irq_state = m_sound_irq_enable & state;
 
@@ -1048,7 +1048,7 @@ WRITE_LINE_MEMBER(pc88va_state::int4_irq_w)
 	m_sound_irq_pending = state;
 }
 
-WRITE_LINE_MEMBER( pc88va_state::tc_w )
+void pc88va_state::tc_w(int state)
 {
 	m_fdc->tc_w(state);
 }

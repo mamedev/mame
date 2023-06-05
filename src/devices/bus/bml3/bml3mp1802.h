@@ -47,7 +47,7 @@ protected:
 	virtual void map_io(address_space_installer &space) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(nmi_w);
+	void nmi_w(int state);
 
 	required_device<mb8866_device> m_fdc;
 	required_device_array<floppy_connector, 4> m_floppy;

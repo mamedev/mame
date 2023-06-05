@@ -83,9 +83,9 @@ public:
 
 	void set_inhibit_lines(offs_t offset);
 
-	DECLARE_WRITE_LINE_MEMBER(irq_w) { m_out_irq_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER(nmi_w) { m_out_nmi_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER(so_w) { m_out_so_cb(state); }
+	void irq_w(int state) { m_out_irq_cb(state); }
+	void nmi_w(int state) { m_out_nmi_cb(state); }
+	void so_w(int state) { m_out_so_cb(state); }
 
 	// pgm board has additional cable to fully decode the character generator
 	void pgm_w(offs_t offset, uint8_t data) { m_out_pgm_cb(offset, data); }

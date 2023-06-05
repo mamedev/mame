@@ -283,7 +283,7 @@ void topspeed_state::msm5205_update(int chip)
 	m_msm_nibble[chip] ^= 1;
 }
 
-WRITE_LINE_MEMBER(topspeed_state::msm5205_1_vck)
+void topspeed_state::msm5205_1_vck(int state)
 {
 	msm5205_update(0);
 }
@@ -338,7 +338,7 @@ void topspeed_state::volume_w(offs_t offset, u8 data)
 	filter->flt_volume_set_volume(data / 255.0f);
 }
 
-WRITE_LINE_MEMBER(topspeed_state::z80ctc_to0)
+void topspeed_state::z80ctc_to0(int state)
 {
 	if (m_msm2_vck2 && !state)
 	{

@@ -497,13 +497,13 @@ void am9516_device::command(u8 data)
 	}
 }
 
-WRITE_LINE_MEMBER(am9516_device::eop_w)
+void am9516_device::eop_w(int state)
 {
 	LOGMASKED(LOG_DMA, "eop %s\n", state ? "cleared" : "asserted");
 	m_eop_in_state = !state;
 }
 
-template <unsigned Channel> WRITE_LINE_MEMBER(am9516_device::dreq_w)
+template <unsigned Channel> void am9516_device::dreq_w(int state)
 {
 	LOGMASKED(LOG_DMA, "channel %d dreq %s\n", Channel, state ? "cleared" : "asserted");
 	channel &ch = m_channel[Channel];

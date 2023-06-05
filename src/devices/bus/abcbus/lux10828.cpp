@@ -306,7 +306,7 @@ void luxor_55_10828_device::floppy_formats(format_registration &fr)
 	fr.add(FLOPPY_ABC800_FORMAT);
 }
 
-WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_intrq_w )
+void luxor_55_10828_device::fdc_intrq_w(int state)
 {
 	m_fdc_irq = state;
 	m_pio->port_b_write(state << 7);
@@ -314,7 +314,7 @@ WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_intrq_w )
 	//if (state) m_maincpu->wait_w(CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_drq_w )
+void luxor_55_10828_device::fdc_drq_w(int state)
 {
 	m_fdc_drq = state;
 

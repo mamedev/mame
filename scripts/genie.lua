@@ -1238,7 +1238,7 @@ configuration { "linux-*" }
 		end
 
 
-configuration { "netbsd" }
+configuration { "freebsd or netbsd" }
 		flags {
 			"LinkSupportCircularDependencies",
 		}

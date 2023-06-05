@@ -138,7 +138,7 @@ TIMER_CALLBACK_MEMBER(metro_state::mouja_irq)
 	if (m_vdp3) m_vdp3->set_irq(0);
 }
 
-WRITE_LINE_MEMBER(metro_state::vblank_irq)
+void metro_state::vblank_irq(int state)
 {
 	if (state)
 	{
@@ -173,7 +173,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(metro_state::bangball_scanline)
 }
 
 /* lev 2-7 (lev 1 seems sound related) */
-WRITE_LINE_MEMBER(metro_state::karatour_vblank_irq)
+void metro_state::karatour_vblank_irq(int state)
 {
 //  printf("%d %d %lld\n", state, m_screen->vpos(), m_screen->frame_number());
 
@@ -198,7 +198,7 @@ WRITE_LINE_MEMBER(metro_state::karatour_vblank_irq)
 	}
 }
 
-WRITE_LINE_MEMBER(metro_state::ext_irq5_enable_w)
+void metro_state::ext_irq5_enable_w(int state)
 {
 	m_ext_irq_enable = state;
 }
@@ -210,7 +210,7 @@ void metro_state::mouja_irq_timer_ctrl_w(u16 data)
 	m_mouja_irq_timer->adjust(attotime::zero, 0, attotime::from_hz(freq));
 }
 
-WRITE_LINE_MEMBER(metro_state::puzzlet_vblank_irq)
+void metro_state::puzzlet_vblank_irq(int state)
 {
 	if (state)
 	{
@@ -230,7 +230,7 @@ WRITE_LINE_MEMBER(metro_state::puzzlet_vblank_irq)
 
 ***************************************************************************/
 
-READ_LINE_MEMBER(metro_state::rxd_r)
+int metro_state::rxd_r()
 {
 	u8 data = m_sound_data;
 
@@ -259,7 +259,7 @@ u8 metro_state::soundstatus_r()
 	return (m_busy_sndcpu ? 0x00 : 0x01);
 }
 
-READ_LINE_MEMBER(metro_state::custom_soundstatus_r)
+int metro_state::custom_soundstatus_r()
 {
 	return (m_busy_sndcpu ? 1 : 0);
 }
@@ -1110,7 +1110,7 @@ void metro_state::es8712_reset_w(u8 data)
 	m_essnd->reset();
 }
 
-WRITE_LINE_MEMBER(metro_state::vmetal_es8712_irq)
+void metro_state::vmetal_es8712_irq(int state)
 {
 	if (m_essnd_gate)
 		m_maincpu->set_input_line(3, state);

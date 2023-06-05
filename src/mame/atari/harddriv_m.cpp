@@ -117,14 +117,14 @@ void harddriv_state::hd68k_irq_ack_w(uint16_t data)
 }
 
 
-WRITE_LINE_MEMBER(harddriv_state::hdgsp_irq_gen)
+void harddriv_state::hdgsp_irq_gen(int state)
 {
 	m_gsp_irq_state = state;
 	update_interrupts();
 }
 
 
-WRITE_LINE_MEMBER(harddriv_state::hdmsp_irq_gen)
+void harddriv_state::hdmsp_irq_gen(int state)
 {
 	m_msp_irq_state = state;
 	update_interrupts();
@@ -488,7 +488,7 @@ void harddriv_state::hd68k_zram_w(offs_t offset, uint16_t data, uint16_t mem_mas
  *
  *************************************/
 
-WRITE_LINE_MEMBER(harddriv_state::harddriv_duart_irq_handler)
+void harddriv_state::harddriv_duart_irq_handler(int state)
 {
 	m_duart_irq_state = state;
 	update_interrupts();
@@ -1275,7 +1275,7 @@ void harddriv_state::hdds3sdsp_reset_timer()
 	m_ds3sdsp_internal_timer->adjust(m_ds3sdsp->cycles_to_attotime(count * scale));
 }
 
-WRITE_LINE_MEMBER(harddriv_state::hdds3sdsp_timer_enable_callback)
+void harddriv_state::hdds3sdsp_timer_enable_callback(int state)
 {
 	m_ds3sdsp_timer_en = state;
 
@@ -1311,7 +1311,7 @@ void harddriv_state::hdds3xdsp_reset_timer()
 }
 
 
-WRITE_LINE_MEMBER(harddriv_state::hdds3xdsp_timer_enable_callback)
+void harddriv_state::hdds3xdsp_timer_enable_callback(int state)
 {
 	m_ds3xdsp_timer_en = state;
 

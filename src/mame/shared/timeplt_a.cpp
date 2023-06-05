@@ -131,7 +131,7 @@ void timeplt_audio_device::sound_data_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(timeplt_audio_device::sh_irqtrigger_w)
+void timeplt_audio_device::sh_irqtrigger_w(int state)
 {
 	if (m_last_irq_state == 0 && state)
 	{
@@ -143,7 +143,7 @@ WRITE_LINE_MEMBER(timeplt_audio_device::sh_irqtrigger_w)
 }
 
 
-WRITE_LINE_MEMBER(timeplt_audio_device::mute_w)
+void timeplt_audio_device::mute_w(int state)
 {
 	// controls pin 6 (DC audio mute) of LA4460 amplifier
 	machine().sound().system_mute(state);

@@ -826,14 +826,14 @@ void i8251_device::write(offs_t offset, uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(i8251_device::write_rxd)
+void i8251_device::write_rxd(int state)
 {
 	m_rxd = state;
 	LOGBITS("8251: Presented a %d\n", m_rxd);
 	//  device_serial_interface::rx_w(state);
 }
 
-WRITE_LINE_MEMBER(i8251_device::write_cts)
+void i8251_device::write_cts(int state)
 {
 	m_cts = state;
 
@@ -845,12 +845,12 @@ WRITE_LINE_MEMBER(i8251_device::write_cts)
 	}
 }
 
-WRITE_LINE_MEMBER(i8251_device::write_dsr)
+void i8251_device::write_dsr(int state)
 {
 	m_dsr = !state;
 }
 
-WRITE_LINE_MEMBER(i8251_device::write_rxc)
+void i8251_device::write_rxc(int state)
 {
 	if (!m_rxc && state)
 	{
@@ -866,7 +866,7 @@ WRITE_LINE_MEMBER(i8251_device::write_rxc)
 	m_rxc = state;
 }
 
-WRITE_LINE_MEMBER(i8251_device::write_txc)
+void i8251_device::write_txc(int state)
 {
 	if (m_txc != state)
 	{
@@ -878,7 +878,7 @@ WRITE_LINE_MEMBER(i8251_device::write_txc)
 }
 
 // forcibly kill hunt mode
-WRITE_LINE_MEMBER(i8251_device::write_syn)
+void i8251_device::write_syn(int state)
 {
 	if (m_syndet_pin && state)    // must be set as input
 	{
@@ -888,7 +888,7 @@ WRITE_LINE_MEMBER(i8251_device::write_syn)
 	}
 }
 
-READ_LINE_MEMBER(i8251_device::txrdy_r)
+int i8251_device::txrdy_r()
 {
 	return is_tx_enabled() && (m_status & I8251_STATUS_TX_READY) != 0;
 }

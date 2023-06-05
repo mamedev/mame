@@ -21,8 +21,8 @@ public:
 	auto txd_handler() { return m_txd_handler.bind(); }
 	auto rts_handler() { return m_rts_handler.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( rxd_w );
-	DECLARE_WRITE_LINE_MEMBER( cts_w );
+	void rxd_w(int state);
+	void cts_w(int state);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -33,8 +33,8 @@ protected:
 
 private:
 	u8 col_r();
-	DECLARE_WRITE_LINE_MEMBER( txd_w );
-	DECLARE_WRITE_LINE_MEMBER( rts_w );
+	void txd_w(int state);
+	void rts_w(int state);
 
 	void alphakeys_map(address_map &map);
 

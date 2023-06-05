@@ -144,7 +144,7 @@ void ripple_counter_device::set_count(u32 count)
 //  clock_w - handle falling-edge clock input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(ripple_counter_device::clock_w)
+void ripple_counter_device::clock_w(int state)
 {
 	if (m_clk != bool(state))
 	{
@@ -159,7 +159,7 @@ WRITE_LINE_MEMBER(ripple_counter_device::clock_w)
 //  reset_w - handle active-high reset input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(ripple_counter_device::reset_w)
+void ripple_counter_device::reset_w(int state)
 {
 	if (m_reset != bool(state))
 	{

@@ -164,9 +164,9 @@ public:
 	void init_gstream();
 	void init_x2222();
 
-	DECLARE_READ_LINE_MEMBER(mirror_service_r);
+	int mirror_service_r();
 	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_r);
-	DECLARE_READ_LINE_MEMBER(x2222_toggle_r);
+	int x2222_toggle_r();
 
 private:
 	/* devices */
@@ -215,14 +215,14 @@ private:
 	void x2222_io(address_map &map);
 };
 
-READ_LINE_MEMBER(gstream_state::x2222_toggle_r) // or the game hangs when starting, might be a status flag for the sound?
+int gstream_state::x2222_toggle_r() // or the game hangs when starting, might be a status flag for the sound?
 {
 	m_toggle ^= 0xffff;
 	return m_toggle;
 }
 
 
-READ_LINE_MEMBER(gstream_state::mirror_service_r)
+int gstream_state::mirror_service_r()
 {
 	int result;
 

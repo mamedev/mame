@@ -111,7 +111,7 @@ TIMER_CALLBACK_MEMBER(e0516_device::timer_tick)
 //  cs_w - chip select input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( e0516_device::cs_w )
+void e0516_device::cs_w(int state)
 {
 	if (m_cs != state)
 	{
@@ -143,7 +143,7 @@ WRITE_LINE_MEMBER( e0516_device::cs_w )
 //  clk_w - serial clock input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( e0516_device::clk_w )
+void e0516_device::clk_w(int state)
 {
 	if (m_cs) return;
 	if (m_clk == state) return;
@@ -302,7 +302,7 @@ WRITE_LINE_MEMBER( e0516_device::clk_w )
 //  dio_w - serial data input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( e0516_device::dio_w )
+void e0516_device::dio_w(int state)
 {
 	LOG("E05-16 '%s' DIO %u\n", tag(), state);
 
@@ -317,7 +317,7 @@ WRITE_LINE_MEMBER( e0516_device::dio_w )
 //  do_r - serial data output
 //-------------------------------------------------
 
-READ_LINE_MEMBER( e0516_device::dio_r )
+int e0516_device::dio_r()
 {
 	if (m_cs || (m_state == STATE_HI_Z))
 	{
@@ -333,7 +333,7 @@ READ_LINE_MEMBER( e0516_device::dio_r )
 //  reset_w - reset input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( e0516_device::reset_w )
+void e0516_device::reset_w(int state)
 {
 	LOG("E05-16 '%s' RESET %u\n", tag(), state);
 

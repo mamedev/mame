@@ -32,16 +32,16 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	// device_centronics_peripheral_interface overrides
-	virtual DECLARE_WRITE_LINE_MEMBER(input_data0) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(input_data1) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(input_data2) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(input_data3) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(input_data4) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(input_data5) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(input_data6) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(input_data7) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(input_strobe) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(input_init) override;
+	virtual void input_data0(int state) override;
+	virtual void input_data1(int state) override;
+	virtual void input_data2(int state) override;
+	virtual void input_data3(int state) override;
+	virtual void input_data4(int state) override;
+	virtual void input_data5(int state) override;
+	virtual void input_data6(int state) override;
+	virtual void input_data7(int state) override;
+	virtual void input_strobe(int state) override;
+	virtual void input_init(int state) override;
 	virtual bool supports_pin35_5v() override { return true; }
 
 private:

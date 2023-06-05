@@ -142,7 +142,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_lockon_tile_info);
 	void lockon_palette(palette_device &palette) const;
 	uint32_t screen_update_lockon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_lockon);
+	void screen_vblank_lockon(int state);
 	TIMER_CALLBACK_MEMBER(cursor_callback);
 	TIMER_CALLBACK_MEMBER(bufend_callback);
 	void scene_draw();
@@ -150,7 +150,7 @@ private:
 	void objects_draw();
 	void rotate_draw( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void hud_draw( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	DECLARE_WRITE_LINE_MEMBER(ym2203_irq);
+	void ym2203_irq(int state);
 	void ground_v30(address_map &map);
 	void main_v30(address_map &map);
 	void object_v30(address_map &map);

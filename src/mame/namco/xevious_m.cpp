@@ -163,7 +163,7 @@ uint8_t battles_state::input_port_r(offs_t offset)
 }
 
 
-WRITE_LINE_MEMBER(battles_state::interrupt_4)
+void battles_state::interrupt_4(int state)
 {
 	if (state)
 		m_subcpu3->set_input_line(0, HOLD_LINE);

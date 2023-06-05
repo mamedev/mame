@@ -61,7 +61,7 @@ public:
 
 	void spdodgeb(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(mcu_busy_r);
+	int mcu_busy_r();
 
 protected:
 	virtual void machine_start() override;
@@ -95,7 +95,7 @@ private:
 	tilemap_t *m_bg_tilemap = nullptr;
 	uint16_t m_lastscroll = 0;
 
-	template <uint8_t Which> DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	template <uint8_t Which> void adpcm_int(int state);
 	void adpcm_w(offs_t offset, uint8_t data);
 	uint8_t mcu63701_r(offs_t offset);
 	void mcu_data_w(offs_t offset, uint8_t data);
@@ -356,7 +356,7 @@ void spdodgeb_state::adpcm_w(offs_t offset, uint8_t data)
 }
 
 template <uint8_t Which>
-WRITE_LINE_MEMBER(spdodgeb_state::adpcm_int)
+void spdodgeb_state::adpcm_int(int state)
 {
 	if (m_adpcm_pos[Which] >= m_adpcm_end[Which] || m_adpcm_pos[Which] >= 0x10000)
 	{
@@ -438,7 +438,7 @@ void spdodgeb_state::mcu_map(address_map &map)
 }
 
 
-READ_LINE_MEMBER(spdodgeb_state::mcu_busy_r)
+int spdodgeb_state::mcu_busy_r()
 {
 	return BIT(m_mcu_status, 7);
 }

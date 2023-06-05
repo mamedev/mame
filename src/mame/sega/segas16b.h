@@ -155,7 +155,7 @@ protected:
 	void sound_w16(uint16_t data);
 
 	// other callbacks
-	DECLARE_WRITE_LINE_MEMBER(upd7759_generate_nmi);
+	void upd7759_generate_nmi(int state);
 	INTERRUPT_GEN_MEMBER( i8751_main_cpu_vblank );
 	void spin_68k_w(uint8_t data);
 

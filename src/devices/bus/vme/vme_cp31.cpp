@@ -191,7 +191,7 @@ uint32_t vme_cp31_card_device::trap_r(offs_t offset, uint32_t mem_mask)
 	return 0xffffffff;
 }
 
-WRITE_LINE_MEMBER(vme_cp31_card_device::bim_irq_callback)
+void vme_cp31_card_device::bim_irq_callback(int state)
 {
 	LOGINT("%s(%02x)\n", FUNCNAME, state);
 

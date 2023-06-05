@@ -816,7 +816,7 @@ uint8_t vc2_device::get_cursor_pixel(int x, int y)
 	}
 }
 
-WRITE_LINE_MEMBER(vc2_device::vblank_w)
+void vc2_device::vblank_w(int state)
 {
 	if (state)
 	{
@@ -1706,7 +1706,7 @@ void newport_base_device::ramdac_write(uint32_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(newport_base_device::vrint_w)
+void newport_base_device::vrint_w(int state)
 {
 	if (state)
 	{
@@ -1716,7 +1716,7 @@ WRITE_LINE_MEMBER(newport_base_device::vrint_w)
 }
 
 // TOOD: Figure out a better way of doing this
-WRITE_LINE_MEMBER(newport_base_device::update_screen_size)
+void newport_base_device::update_screen_size(int state)
 {
 	const int x_start = m_vc2->readout_x0();
 	const int y_start = m_vc2->readout_y0();

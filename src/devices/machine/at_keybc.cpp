@@ -271,12 +271,12 @@ void at_kbc_device_base::command_w(uint8_t data)
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(at_kbc_device_base::write_command), this), unsigned(data));
 }
 
-WRITE_LINE_MEMBER(at_kbc_device_base::kbd_clk_w)
+void at_kbc_device_base::kbd_clk_w(int state)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(at_kbc_device_base::set_kbd_clk_in), this), state);
 }
 
-WRITE_LINE_MEMBER(at_kbc_device_base::kbd_data_w)
+void at_kbc_device_base::kbd_data_w(int state)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(at_kbc_device_base::set_kbd_data_in), this), state);
 }
@@ -441,12 +441,12 @@ uint8_t ps2_keyboard_controller_device::status_r()
 	return data;
 }
 
-WRITE_LINE_MEMBER(ps2_keyboard_controller_device::aux_clk_w)
+void ps2_keyboard_controller_device::aux_clk_w(int state)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(ps2_keyboard_controller_device::set_aux_clk_in), this), state);
 }
 
-WRITE_LINE_MEMBER(ps2_keyboard_controller_device::aux_data_w)
+void ps2_keyboard_controller_device::aux_data_w(int state)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(ps2_keyboard_controller_device::set_aux_data_in), this), state);
 }

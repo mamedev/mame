@@ -889,7 +889,7 @@ void duart_base_device::write(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(duart_base_device::ip0_w)
+void duart_base_device::ip0_w(int state)
 {
 	uint8_t newIP = (IP_last_state & ~0x01) | ((state == ASSERT_LINE) ? 1 : 0);
 
@@ -906,7 +906,7 @@ WRITE_LINE_MEMBER(duart_base_device::ip0_w)
 	IP_last_state = newIP;
 }
 
-WRITE_LINE_MEMBER(duart_base_device::ip1_w)
+void duart_base_device::ip1_w(int state)
 {
 	uint8_t newIP = (IP_last_state & ~0x02) | ((state == ASSERT_LINE) ? 2 : 0);
 
@@ -923,7 +923,7 @@ WRITE_LINE_MEMBER(duart_base_device::ip1_w)
 	IP_last_state = newIP;
 }
 
-WRITE_LINE_MEMBER(duart_base_device::ip2_w)
+void duart_base_device::ip2_w(int state)
 {
 	uint8_t newIP = (IP_last_state & ~0x04) | ((state == ASSERT_LINE) ? 4 : 0);
 
@@ -940,7 +940,7 @@ WRITE_LINE_MEMBER(duart_base_device::ip2_w)
 	IP_last_state = newIP;
 }
 
-WRITE_LINE_MEMBER(duart_base_device::ip3_w)
+void duart_base_device::ip3_w(int state)
 {
 	uint8_t newIP = (IP_last_state & ~0x08) | ((state == ASSERT_LINE) ? 8 : 0);
 
@@ -957,21 +957,21 @@ WRITE_LINE_MEMBER(duart_base_device::ip3_w)
 	IP_last_state = newIP;
 }
 
-WRITE_LINE_MEMBER(duart_base_device::ip4_w)
+void duart_base_device::ip4_w(int state)
 {
 	uint8_t newIP = (IP_last_state & ~0x10) | ((state == ASSERT_LINE) ? 0x10 : 0);
 // TODO: special mode for ip4 (Ch. A Rx clock)
 	IP_last_state = newIP;
 }
 
-WRITE_LINE_MEMBER(duart_base_device::ip5_w)
+void duart_base_device::ip5_w(int state)
 {
 	uint8_t newIP = (IP_last_state & ~0x20) | ((state == ASSERT_LINE) ? 0x20 : 0);
 // TODO: special mode for ip5 (Ch. B Tx clock)
 	IP_last_state = newIP;
 }
 
-WRITE_LINE_MEMBER(duart_base_device::ip6_w)
+void duart_base_device::ip6_w(int state)
 {
 	uint8_t newIP = (IP_last_state & ~0x40) | ((state == ASSERT_LINE) ? 0x40 : 0);
 // TODO: special mode for ip6 (Ch. B Rx clock)

@@ -216,7 +216,7 @@ uint8_t sonora_device::via_in_b()
 	return read_pb3() << 3;
 }
 
-WRITE_LINE_MEMBER(sonora_device::via_out_cb2)
+void sonora_device::via_out_cb2(int state)
 {
 	write_cb2(state & 1);
 }
@@ -240,13 +240,13 @@ void sonora_device::via_out_b(uint8_t data)
 	write_pb5(BIT(data, 5));
 }
 
-WRITE_LINE_MEMBER(sonora_device::via1_irq)
+void sonora_device::via1_irq(int state)
 {
 	m_via_interrupt = state;
 	field_interrupts();
 }
 
-WRITE_LINE_MEMBER(sonora_device::via2_irq)
+void sonora_device::via2_irq(int state)
 {
 	m_via2_interrupt = state;
 	field_interrupts();
@@ -282,13 +282,13 @@ void sonora_device::field_interrupts()
 	}
 }
 
-WRITE_LINE_MEMBER(sonora_device::scc_irq_w)
+void sonora_device::scc_irq_w(int state)
 {
 	m_scc_interrupt = (state == ASSERT_LINE);
 	field_interrupts();
 }
 
-WRITE_LINE_MEMBER(sonora_device::vbl_w)
+void sonora_device::vbl_w(int state)
 {
 	if (!state)
 	{
@@ -303,7 +303,7 @@ WRITE_LINE_MEMBER(sonora_device::vbl_w)
 	}
 }
 
-WRITE_LINE_MEMBER(sonora_device::asc_irq)
+void sonora_device::asc_irq(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -481,12 +481,12 @@ void sonora_device::pseudovia_w(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(sonora_device::cb1_w)
+void sonora_device::cb1_w(int state)
 {
 	m_via1->write_cb1(state);
 }
 
-WRITE_LINE_MEMBER(sonora_device::cb2_w)
+void sonora_device::cb2_w(int state)
 {
 	m_via1->write_cb2(state);
 }

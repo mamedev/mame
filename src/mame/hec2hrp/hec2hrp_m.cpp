@@ -876,14 +876,14 @@ void hec2hrp_state::hector_audio(machine_config &config)
 // Interrupt management
 
 /* upd765 INT is connected to Z80 interrupt, with RNMI hardware authorization */
-WRITE_LINE_MEMBER( hec2hrp_state::disc2_fdc_interrupt )
+void hec2hrp_state::disc2_fdc_interrupt(int state)
 {
 	m_irq_current_state = state;
 	m_disc2cpu->set_input_line(INPUT_LINE_IRQ0, state && m_hector_disc2_rnmi ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* upd765 DRQ is connected to Z80 NMI, with RNMI hardware authorization */
-WRITE_LINE_MEMBER( hec2hrp_state::disc2_fdc_dma_irq )
+void hec2hrp_state::disc2_fdc_dma_irq(int state)
 {
 	m_nmi_current_state = state;
 	m_disc2cpu->set_input_line(INPUT_LINE_NMI,  state && m_hector_disc2_rnmi ? ASSERT_LINE : CLEAR_LINE);

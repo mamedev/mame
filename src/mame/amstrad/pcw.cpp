@@ -193,7 +193,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pcw_state::pcw_timer_interrupt)
 /* PCW uses UPD765 in NON-DMA mode. FDC Ints are connected to /INT or
  * /NMI depending on choice (see system control below)
  * fdc interrupt callback. set/clear fdc int */
-WRITE_LINE_MEMBER( pcw_state::pcw_fdc_interrupt )
+void pcw_state::pcw_fdc_interrupt(int state)
 {
 	if (!state)
 		m_system_status &= ~(1<<5);
@@ -810,13 +810,13 @@ void pcw_state::mcu_printer_p2_w(uint8_t data)
 }
 
 // Paper sensor
-READ_LINE_MEMBER(pcw_state::mcu_printer_t1_r)
+int pcw_state::mcu_printer_t1_r()
 {
 	return 1;
 }
 
 // Print head location (0 if at left margin, otherwise 1)
-READ_LINE_MEMBER(pcw_state::mcu_printer_t0_r)
+int pcw_state::mcu_printer_t0_r()
 {
 	if(m_printer_headpos == 0)
 		return 0;
@@ -911,12 +911,12 @@ uint8_t pcw_state::mcu_kb_data_r()
 	return 0xff;
 }
 
-READ_LINE_MEMBER(pcw_state::mcu_kb_t1_r)
+int pcw_state::mcu_kb_t1_r()
 {
 	return 1;
 }
 
-READ_LINE_MEMBER(pcw_state::mcu_kb_t0_r)
+int pcw_state::mcu_kb_t0_r()
 {
 	return 0;
 }

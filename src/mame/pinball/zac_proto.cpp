@@ -56,8 +56,8 @@ private:
 	void out1_w(offs_t offset, uint8_t data);
 	void digit_w(offs_t offset, uint8_t data);
 	void sound_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(audio_clock);
-	DECLARE_READ_LINE_MEMBER(slam_r);
+	void audio_clock(int state);
+	int slam_r();
 	void zac_proto_map(address_map &map);
 	u8 m_u36 = 0x80U;  // preset divider for u44/u45
 	u8 m_u37 = 0U;  // selector for u48
@@ -227,7 +227,7 @@ static INPUT_PORTS_START( zac_proto )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Slam Tilt") PORT_CODE(KEYCODE_0)
 INPUT_PORTS_END
 
-READ_LINE_MEMBER( zac_proto_state::slam_r )
+int zac_proto_state::slam_r()
 {
 	return BIT(ioport("X8")->read(), 0);
 }
@@ -293,7 +293,7 @@ void zac_proto_state::sound_w(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(zac_proto_state::audio_clock)
+void zac_proto_state::audio_clock(int state)
 {
 	if (state)
 	{

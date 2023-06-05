@@ -643,7 +643,7 @@ private:
 
 	// CRTC
 	MC6845_UPDATE_ROW(crtc_update_row);
-	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
+	void crtc_vsync(int state);
 	void io_72_w(uint8_t data) { io_72 = data; }
 	void io_73_w(uint8_t data) { io_73 = data; }
 	void io_74_w(uint8_t data);
@@ -705,7 +705,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(lw450_state::int1_timer_callback)
 	maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(lw450_state::crtc_vsync)
+void lw450_state::crtc_vsync(int state)
 {
 	if(state) {
 		framecnt++;

@@ -162,12 +162,12 @@ protected:
 	uint32_t screen_update_glfgreat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_tmnt2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_thndrx2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_blswhstl);
+	void screen_vblank_blswhstl(int state);
 	INTERRUPT_GEN_MEMBER(tmnt_interrupt);
 	INTERRUPT_GEN_MEMBER(punkshot_interrupt);
 	INTERRUPT_GEN_MEMBER(lgtnfght_interrupt);
-	inline uint32_t tmnt2_get_word( uint32_t addr );
-	void tmnt2_put_word( uint32_t addr, uint16_t data );
+	inline uint32_t tmnt2_get_word(uint32_t addr);
+	void tmnt2_put_word(uint32_t addr, uint16_t data);
 	void volume_callback(uint8_t data);
 	K051960_CB_MEMBER(mia_sprite_callback);
 	K051960_CB_MEMBER(tmnt_sprite_callback);

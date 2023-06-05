@@ -56,11 +56,11 @@ private:
 	void block_select_w(u8 data);
 	void nvram_w(offs_t offset, u8 data);
 
-	template<int Line> DECLARE_WRITE_LINE_MEMBER(int_w);
+	template<int Line> void int_w(int state);
 	TIMER_CALLBACK_MEMBER(update_interrupts);
 	IRQ_CALLBACK_MEMBER(restart_cb);
 
-	template<int Bit> DECLARE_WRITE_LINE_MEMBER(foreign_char_bank_w);
+	template<int Bit> void foreign_char_bank_w(int state);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
@@ -88,7 +88,7 @@ void cdc721_state::interrupt_mask_w(u8 data)
 }
 
 template <int Line>
-WRITE_LINE_MEMBER(cdc721_state::int_w)
+void cdc721_state::int_w(int state)
 {
 	if (BIT(m_pending_interrupts, Line) == state)
 		return;
@@ -150,7 +150,7 @@ void cdc721_state::nvram_w(offs_t offset, u8 data)
 }
 
 template<int Bit>
-WRITE_LINE_MEMBER(cdc721_state::foreign_char_bank_w)
+void cdc721_state::foreign_char_bank_w(int state)
 {
 	if (state)
 		m_foreign_char_bank |= 1 << Bit;

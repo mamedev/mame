@@ -39,11 +39,11 @@ protected:
 
 private:
 	void mainic_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(gpib_int_w);
-	DECLARE_WRITE_LINE_MEMBER(acc_int_w);
+	void gpib_int_w(int state);
+	void acc_int_w(int state);
 	u8 gpibpsi_input_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(gpibc_we_w);
-	DECLARE_WRITE_LINE_MEMBER(gpibc_dbin_w);
+	void gpibc_we_w(int state);
+	void gpibc_dbin_w(int state);
 	u8 keypad_r(offs_t offset);
 
 	void mem_map(address_map &map);
@@ -73,12 +73,12 @@ void si5500_state::mainic_w(offs_t offset, u8 data)
 		m_maincpu->set_input_line(INT_9980A_CLEAR, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(si5500_state::gpib_int_w)
+void si5500_state::gpib_int_w(int state)
 {
 	m_mainpsi->set_int_line(4, state);
 }
 
-WRITE_LINE_MEMBER(si5500_state::acc_int_w)
+void si5500_state::acc_int_w(int state)
 {
 	m_mainpsi->set_int_line(5, state);
 }
@@ -102,7 +102,7 @@ u8 si5500_state::gpibpsi_input_r(offs_t offset)
 	}
 }
 
-WRITE_LINE_MEMBER(si5500_state::gpibc_we_w)
+void si5500_state::gpibc_we_w(int state)
 {
 	if (!state)
 	{
@@ -111,7 +111,7 @@ WRITE_LINE_MEMBER(si5500_state::gpibc_we_w)
 	}
 }
 
-WRITE_LINE_MEMBER(si5500_state::gpibc_dbin_w)
+void si5500_state::gpibc_dbin_w(int state)
 {
 	if (state)
 	{

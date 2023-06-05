@@ -165,7 +165,7 @@ private:
 	template <int chip> u16 object_vram_r(offs_t offset);
 	template <int chip> void palette_ram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	template <int chip> u16 palette_ram_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_dual_w);
+	void flipscreen_dual_w(int state);
 	template <int chip> TILE_GET_INFO_MEMBER(get_ascii_tile_info);
 	template <int chip> TILE_GET_INFO_MEMBER(get_scroll_tile_info);
 	template <int chip> TILE_GET_INFO_MEMBER(get_rotate_tile_info);
@@ -186,7 +186,7 @@ private:
 };
 
 
-WRITE_LINE_MEMBER(ms32_bnstars_state::flipscreen_dual_w)
+void ms32_bnstars_state::flipscreen_dual_w(int state)
 {
 	for (int chip = 0; chip < 2; chip++)
 	{

@@ -174,30 +174,30 @@ private:
 	void vme_a24_w(uint16_t data);
 	uint16_t vme_a16_r();
 	void vme_a16_w(uint16_t data);
-	virtual void machine_start () override;
-	virtual void machine_reset () override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	// Clocks
 	void write_acia_clocks(int id, int state);
-	DECLARE_WRITE_LINE_MEMBER (write_f1_clock){ write_acia_clocks(mc14411_device::TIMER_F1, state); }
-	DECLARE_WRITE_LINE_MEMBER (write_f3_clock){ write_acia_clocks(mc14411_device::TIMER_F3, state); }
-	DECLARE_WRITE_LINE_MEMBER (write_f5_clock){ write_acia_clocks(mc14411_device::TIMER_F5, state); }
-	DECLARE_WRITE_LINE_MEMBER (write_f7_clock){ write_acia_clocks(mc14411_device::TIMER_F7, state); }
-	DECLARE_WRITE_LINE_MEMBER (write_f8_clock){ write_acia_clocks(mc14411_device::TIMER_F8, state); }
-	DECLARE_WRITE_LINE_MEMBER (write_f9_clock){ write_acia_clocks(mc14411_device::TIMER_F9, state); }
-	DECLARE_WRITE_LINE_MEMBER (write_f11_clock){ write_acia_clocks(mc14411_device::TIMER_F11, state); }
-	DECLARE_WRITE_LINE_MEMBER (write_f13_clock){ write_acia_clocks(mc14411_device::TIMER_F13, state); }
-	DECLARE_WRITE_LINE_MEMBER (write_f15_clock){ write_acia_clocks(mc14411_device::TIMER_F15, state); }
+	void write_f1_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F1, state); }
+	void write_f3_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F3, state); }
+	void write_f5_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F5, state); }
+	void write_f7_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F7, state); }
+	void write_f8_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F8, state); }
+	void write_f9_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F9, state); }
+	void write_f11_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F11, state); }
+	void write_f13_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F13, state); }
+	void write_f15_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F15, state); }
 
 	// Centronics printer interface
-	DECLARE_WRITE_LINE_MEMBER (centronics_ack_w);
-	DECLARE_WRITE_LINE_MEMBER (centronics_busy_w);
-	DECLARE_WRITE_LINE_MEMBER (centronics_perror_w);
-	DECLARE_WRITE_LINE_MEMBER (centronics_select_w);
+	void centronics_ack_w(int state);
+	void centronics_busy_w(int state);
+	void centronics_perror_w(int state);
+	void centronics_select_w(int state);
 
 	// User EPROM/SRAM slot(s)
 	std::pair<std::error_condition, std::string> force68k_load_cart(device_image_interface &image, generic_slot_device *slot);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER (exp1_load) { return force68k_load_cart(image, m_cart); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp1_load) { return force68k_load_cart(image, m_cart); }
 	uint16_t read16_rom(offs_t offset);
 
 	void force68k_mem(address_map &map);
@@ -334,7 +334,7 @@ INPUT_PORTS_END
 /* Centronics ACK handler
  * The centronics ack signal is expected by the ROM to arrive at H1 input line
  */
-WRITE_LINE_MEMBER (force68k_state::centronics_ack_w)
+void force68k_state::centronics_ack_w(int state)
 {
 		LOG("%s(%d)\n", FUNCNAME, state);
 		m_centronics_ack = state;
@@ -344,7 +344,8 @@ WRITE_LINE_MEMBER (force68k_state::centronics_ack_w)
 /* Centronics BUSY handler
  * The centronics busy signal is not used by the ROM driver afaik
  */
-WRITE_LINE_MEMBER (force68k_state::centronics_busy_w){
+void force68k_state::centronics_busy_w(int state)
+{
 		LOG("%s(%d)\n", FUNCNAME, state);
 		m_centronics_busy = state;
 }
@@ -352,7 +353,8 @@ WRITE_LINE_MEMBER (force68k_state::centronics_busy_w){
 /* Centronics PERROR handler
  * The centronics perror signal is not used by the ROM driver afaik
  */
-WRITE_LINE_MEMBER (force68k_state::centronics_perror_w){
+void force68k_state::centronics_perror_w(int state)
+{
 		LOG("%s(%d)\n", FUNCNAME, state);
 		m_centronics_perror = state;
 }
@@ -360,7 +362,8 @@ WRITE_LINE_MEMBER (force68k_state::centronics_perror_w){
 /* Centronics SELECT handler
  * The centronics select signal is expected by the ROM on Port B bit 0
  */
-WRITE_LINE_MEMBER (force68k_state::centronics_select_w){
+void force68k_state::centronics_select_w(int state)
+{
 		LOG("%s(%d)\n", FUNCNAME, state);
 		m_centronics_select = state;
 		m_pit->portb_setbit (0, state);

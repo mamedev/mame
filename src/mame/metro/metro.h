@@ -94,7 +94,7 @@ public:
 	void init_lastfortg();
 	void init_puzzlet() { save_item(NAME(m_ext_irq_enable)); }
 
-	DECLARE_READ_LINE_MEMBER(custom_soundstatus_r);
+	int custom_soundstatus_r();
 
 private:
 	virtual void machine_start() override;
@@ -130,7 +130,7 @@ private:
 	// vmetal
 	void vmetal_control_w(u8 data);
 	void es8712_reset_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(vmetal_es8712_irq);
+	void vmetal_es8712_irq(int state);
 
 	TILE_GET_INFO_MEMBER(k053936_get_tile_info);
 	TILE_GET_INFO_MEMBER(k053936_gstrik2_get_tile_info);
@@ -138,12 +138,12 @@ private:
 	DECLARE_VIDEO_START(blzntrnd);
 	DECLARE_VIDEO_START(gstrik2);
 	uint32_t screen_update_psac_vdp2_mix(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	INTERRUPT_GEN_MEMBER(periodic_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(bangball_scanline);
-	DECLARE_WRITE_LINE_MEMBER(karatour_vblank_irq);
-	DECLARE_WRITE_LINE_MEMBER(puzzlet_vblank_irq);
-	DECLARE_READ_LINE_MEMBER(rxd_r);
+	void karatour_vblank_irq(int state);
+	void puzzlet_vblank_irq(int state);
+	int rxd_r();
 
 	void balcube_map(address_map &map);
 	void bangball_map(address_map &map);
@@ -223,7 +223,7 @@ private:
 
 	void gakusai_oki_bank_set();
 
-	DECLARE_WRITE_LINE_MEMBER(ext_irq5_enable_w);
+	void ext_irq5_enable_w(int state);
 
 	bool m_ext_irq_enable = false;
 };

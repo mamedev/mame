@@ -45,7 +45,7 @@ public:
 	virtual const char *image_brief_type_name() const noexcept override { return "hcca"; }
 	virtual std::pair<std::error_condition, std::string> call_load() override;
 
-	virtual DECLARE_WRITE_LINE_MEMBER(input_txd) override;
+	virtual void input_txd(int state) override;
 
 protected:
 	// device_t implementation

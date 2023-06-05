@@ -72,8 +72,8 @@ private:
 
 	uint8_t p1_r();
 	void p2_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( t1_r ) { return m_clock; }
-	DECLARE_WRITE_LINE_MEMBER( prog_w ) { m_stb = state; }
+	int t1_r() { return m_clock; }
+	void prog_w(int state) { m_stb = state; }
 	void j3_w(uint8_t data) { m_j3 = data; }
 
 	void abc77_io(address_map &map);

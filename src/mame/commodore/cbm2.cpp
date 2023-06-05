@@ -178,8 +178,8 @@ public:
 	void tpi1_pa_w(uint8_t data);
 	uint8_t tpi1_pb_r();
 	void tpi1_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( tpi1_ca_w );
-	DECLARE_WRITE_LINE_MEMBER( tpi1_cb_w );
+	void tpi1_ca_w(int state);
+	void tpi1_cb_w(int state);
 
 	void tpi2_pa_w(uint8_t data);
 	void tpi2_pb_w(uint8_t data);
@@ -193,7 +193,7 @@ public:
 	void ext_tpi_pb_w(uint8_t data);
 	void ext_tpi_pc_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( ext_cia_irq_w );
+	void ext_cia_irq_w(int state);
 	uint8_t ext_cia_pb_r();
 	void ext_cia_pb_w(uint8_t data);
 
@@ -302,8 +302,8 @@ public:
 	uint8_t vic_videoram_r(offs_t offset);
 	uint8_t vic_colorram_r(offs_t offset);
 
-	DECLARE_WRITE_LINE_MEMBER( tpi1_ca_w );
-	DECLARE_WRITE_LINE_MEMBER( tpi1_cb_w );
+	void tpi1_ca_w(int state);
+	void tpi1_cb_w(int state);
 
 	uint8_t tpi2_pc_r();
 	void tpi2_pc_w(uint8_t data);
@@ -1637,17 +1637,17 @@ void cbm2_state::tpi1_pb_w(uint8_t data)
 	m_cassette->motor_w(BIT(data, 6));
 }
 
-WRITE_LINE_MEMBER( cbm2_state::tpi1_ca_w )
+void cbm2_state::tpi1_ca_w(int state)
 {
 	m_graphics = state;
 }
 
-WRITE_LINE_MEMBER( p500_state::tpi1_ca_w )
+void p500_state::tpi1_ca_w(int state)
 {
 	m_statvid = state;
 }
 
-WRITE_LINE_MEMBER( p500_state::tpi1_cb_w )
+void p500_state::tpi1_cb_w(int state)
 {
 	m_vicdotsel = state;
 }
@@ -1973,7 +1973,7 @@ void cbm2_state::ext_tpi_pc_w(uint8_t data)
 //  MOS6526_INTERFACE( ext_cia_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( cbm2_state::ext_cia_irq_w )
+void cbm2_state::ext_cia_irq_w(int state)
 {
 	m_tpi1->i3_w(!state);
 }

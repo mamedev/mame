@@ -200,7 +200,7 @@ void ampex230_keyboard_device::device_start()
 //  EXTERNAL CONTROL
 //**************************************************************************
 
-WRITE_LINE_MEMBER(ampex230_keyboard_device::strobe_w)
+void ampex230_keyboard_device::strobe_w(int state)
 {
 	m_mcu->set_input_line(MCS48_INPUT_IRQ, state ? ASSERT_LINE : CLEAR_LINE);
 }

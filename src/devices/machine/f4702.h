@@ -35,7 +35,7 @@ public:
 	auto z_callback() { return m_z_callback.bind(); }
 
 	// external rate input
-	DECLARE_WRITE_LINE_MEMBER(im_w);
+	void im_w(int state);
 
 	// reset control (optional)
 	void reset_counters();

@@ -58,15 +58,15 @@ protected:
 	virtual void parallel_strobe_w(int state) override;
 
 	// device_pet_user_port_interface overrides
-	virtual DECLARE_WRITE_LINE_MEMBER(input_8) override;
-	virtual WRITE_LINE_MEMBER(input_c) override { if (state) m_parallel_output |= 1; else m_parallel_output &= ~1; update_output(); }
-	virtual WRITE_LINE_MEMBER(input_d) override { if (state) m_parallel_output |= 2; else m_parallel_output &= ~2; update_output(); }
-	virtual WRITE_LINE_MEMBER(input_e) override { if (state) m_parallel_output |= 4; else m_parallel_output &= ~4; update_output(); }
-	virtual WRITE_LINE_MEMBER(input_f) override { if (state) m_parallel_output |= 8; else m_parallel_output &= ~8; update_output(); }
-	virtual WRITE_LINE_MEMBER(input_h) override { if (state) m_parallel_output |= 16; else m_parallel_output &= ~16; update_output(); }
-	virtual WRITE_LINE_MEMBER(input_j) override { if (state) m_parallel_output |= 32; else m_parallel_output &= ~32; update_output(); }
-	virtual WRITE_LINE_MEMBER(input_k) override { if (state) m_parallel_output |= 64; else m_parallel_output &= ~64; update_output(); }
-	virtual WRITE_LINE_MEMBER(input_l) override { if (state) m_parallel_output |= 128; else m_parallel_output &= ~128; update_output(); }
+	virtual void input_8(int state) override;
+	virtual void input_c(int state) override { if (state) m_parallel_output |= 1; else m_parallel_output &= ~1; update_output(); }
+	virtual void input_d(int state) override { if (state) m_parallel_output |= 2; else m_parallel_output &= ~2; update_output(); }
+	virtual void input_e(int state) override { if (state) m_parallel_output |= 4; else m_parallel_output &= ~4; update_output(); }
+	virtual void input_f(int state) override { if (state) m_parallel_output |= 8; else m_parallel_output &= ~8; update_output(); }
+	virtual void input_h(int state) override { if (state) m_parallel_output |= 16; else m_parallel_output &= ~16; update_output(); }
+	virtual void input_j(int state) override { if (state) m_parallel_output |= 32; else m_parallel_output &= ~32; update_output(); }
+	virtual void input_k(int state) override { if (state) m_parallel_output |= 64; else m_parallel_output &= ~64; update_output(); }
+	virtual void input_l(int state) override { if (state) m_parallel_output |= 128; else m_parallel_output &= ~128; update_output(); }
 
 private:
 	void update_output();

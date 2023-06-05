@@ -59,7 +59,7 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_sensors_r);
-	DECLARE_READ_LINE_MEMBER(hopper_sensors_r);
+	int hopper_sensors_r();
 
 protected:
 	// driver_device overrides
@@ -134,7 +134,7 @@ INPUT_CHANGED_MEMBER( segajw_state::coin_drop_start )
 		m_coin_start_cycles = m_maincpu->total_cycles();
 }
 
-READ_LINE_MEMBER( segajw_state::hopper_sensors_r )
+int segajw_state::hopper_sensors_r()
 {
 	uint8_t data = 0;
 

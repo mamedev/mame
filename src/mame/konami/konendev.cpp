@@ -112,7 +112,7 @@ private:
 	uint16_t ifu_dpram_r(offs_t offset);
 	void ifu_dpram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE_LINE_MEMBER(gcu_interrupt);
+	void gcu_interrupt(int state);
 	INTERRUPT_GEN_MEMBER(vbl_interrupt);
 
 	uint8_t rtc_dev_r(uint32_t reg);
@@ -372,7 +372,7 @@ static INPUT_PORTS_START( konendev )
 INPUT_PORTS_END
 
 
-WRITE_LINE_MEMBER(konendev_state::gcu_interrupt)
+void konendev_state::gcu_interrupt(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ1, state);
 	m_maincpu->set_input_line(INPUT_LINE_IRQ3, state);

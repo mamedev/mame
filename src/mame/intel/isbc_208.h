@@ -42,11 +42,11 @@ private:
 	u16 m_seg;
 	address_space *m_maincpu_mem;
 
-	DECLARE_WRITE_LINE_MEMBER(out_eop_w);
-	DECLARE_WRITE_LINE_MEMBER(hreq_w);
+	void out_eop_w(int state);
+	void hreq_w(int state);
 	uint8_t dma_read_byte(offs_t offset);
 	void dma_write_byte(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void irq_w(int state);
 };
 
 DECLARE_DEVICE_TYPE(ISBC_208, isbc_208_device)

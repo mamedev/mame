@@ -57,7 +57,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_md_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	void irqhandler(int state);
 
 	uint32_t screen_update_pkscramble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -297,7 +297,7 @@ static GFXDECODE_START( gfx_pkscram )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 0x80 )
 GFXDECODE_END
 
-WRITE_LINE_MEMBER(pkscram_state::irqhandler)
+void pkscram_state::irqhandler(int state)
 {
 	if(m_out & 0x10)
 		m_maincpu->set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);

@@ -482,7 +482,7 @@ void sam6883_device::horizontal_sync()
 //  hs_w
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( sam6883_device::hs_w )
+void sam6883_device::hs_w(int state)
 {
 	if (state)
 	{

@@ -73,7 +73,7 @@ void sandy_super_disk_device::floppy_formats(format_registration &fr)
 //  centronics
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( sandy_super_disk_device::busy_w )
+void sandy_super_disk_device::busy_w(int state)
 {
 	m_busy = state;
 	check_interrupt();

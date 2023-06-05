@@ -416,12 +416,12 @@ MC6845_UPDATE_ROW( trs80m2_state::crtc_update_row )
 	}
 }
 
-WRITE_LINE_MEMBER( trs80m2_state::de_w )
+void trs80m2_state::de_w(int state)
 {
 	m_de = state;
 }
 
-WRITE_LINE_MEMBER( trs80m2_state::vsync_w )
+void trs80m2_state::vsync_w(int state)
 {
 	if (state)
 	{
@@ -463,7 +463,7 @@ uint32_t trs80m2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 //  TRS80M2_KEYBOARD_INTERFACE( kb_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( trs80m2_state::kb_clock_w )
+void trs80m2_state::kb_clock_w(int state)
 {
 	int kbdata = m_kb->data_r();
 
@@ -522,17 +522,17 @@ void trs80m2_state::io_write_byte(offs_t offset, uint8_t data)
 //  Z80PIO
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( trs80m2_state::write_centronics_busy )
+void trs80m2_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-WRITE_LINE_MEMBER( trs80m2_state::write_centronics_fault )
+void trs80m2_state::write_centronics_fault(int state)
 {
 	m_centronics_fault = state;
 }
 
-WRITE_LINE_MEMBER( trs80m2_state::write_centronics_perror )
+void trs80m2_state::write_centronics_perror(int state)
 {
 	m_centronics_perror = state;
 }
@@ -598,7 +598,7 @@ void trs80m2_state::pio_pa_w(uint8_t data)
 	m_centronics->write_init(BIT(data, 3));
 }
 
-WRITE_LINE_MEMBER( trs80m2_state::strobe_w )
+void trs80m2_state::strobe_w(int state)
 {
 	m_centronics->write_strobe(!state);
 }

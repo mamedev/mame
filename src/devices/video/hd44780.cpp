@@ -427,17 +427,17 @@ void hd44780_device::db_w(u8 data)
 	m_db_input = data;
 }
 
-WRITE_LINE_MEMBER(hd44780_device::rs_w)
+void hd44780_device::rs_w(int state)
 {
 	m_rs_input = state;
 }
 
-WRITE_LINE_MEMBER(hd44780_device::rw_w)
+void hd44780_device::rw_w(int state)
 {
 	m_rw_input = state;
 }
 
-WRITE_LINE_MEMBER(hd44780_device::e_w)
+void hd44780_device::e_w(int state)
 {
 	if (m_data_len == 4 && state && !m_enabled && !machine().side_effects_disabled())
 		update_nibble(m_rs_input, m_rw_input);

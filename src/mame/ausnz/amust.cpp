@@ -128,10 +128,10 @@ private:
 	u8 port0a_r();
 	void port0a_w(u8 data);
 	void port0d_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(hsync_w);
-	DECLARE_WRITE_LINE_MEMBER(vsync_w);
-	DECLARE_WRITE_LINE_MEMBER(drq_w);
-	DECLARE_WRITE_LINE_MEMBER(intrq_w);
+	void hsync_w(int state);
+	void vsync_w(int state);
+	void drq_w(int state);
+	void intrq_w(int state);
 	void kbd_put(u8 data);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	TIMER_DEVICE_CALLBACK_MEMBER(beep_timer);
@@ -245,25 +245,25 @@ void amust_state::do_int()
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( amust_state::drq_w )
+void amust_state::drq_w(int state)
 {
 	m_drq = state;
 	do_int();
 	m_fdc->tc_w(1);
 }
 
-WRITE_LINE_MEMBER( amust_state::intrq_w )
+void amust_state::intrq_w(int state)
 {
 	m_port09 = (m_port09 & 0xdf) | (state ? 0x20 : 0);
 }
 
-WRITE_LINE_MEMBER( amust_state::hsync_w )
+void amust_state::hsync_w(int state)
 {
 	m_hsync = state;
 	do_int();
 }
 
-WRITE_LINE_MEMBER( amust_state::vsync_w )
+void amust_state::vsync_w(int state)
 {
 	m_vsync = state;
 	do_int();

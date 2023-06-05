@@ -106,13 +106,13 @@ public:
 
 	void imds2(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(xack);
+	void xack(int state);
 
 private:
 	uint8_t ipc_mem_read(offs_t offset);
 	void ipc_mem_write(offs_t offset, uint8_t data);
 	void ipc_control_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(ipc_intr_w);
+	void ipc_intr_w(int state);
 	uint8_t ipcsyspic_r(offs_t offset);
 	uint8_t ipclocpic_r(offs_t offset);
 	void ipcsyspic_w(offs_t offset, uint8_t data);
@@ -210,7 +210,7 @@ void imds2_state::ipc_control_w(uint8_t data)
 		m_boot.disable();
 }
 
-WRITE_LINE_MEMBER(imds2_state::ipc_intr_w)
+void imds2_state::ipc_intr_w(int state)
 {
 	m_ipccpu->set_input_line(I8085_INTR_LINE, (state != 0) && m_ipcctrl->q2_r());
 }
@@ -313,7 +313,7 @@ void imds2_state::imds2(machine_config &config)
 	MULTIBUS_SLOT(config, m_slot, m_bus, imds2_cards, nullptr, false); // FIXME: isbc202
 }
 
-WRITE_LINE_MEMBER(imds2_state::xack)
+void imds2_state::xack(int state)
 {
 	if (state) {
 		// Put CPU in wait state

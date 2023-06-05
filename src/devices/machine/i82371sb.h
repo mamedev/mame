@@ -43,28 +43,28 @@ public:
 	template <typename T>
 	void set_cpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
 
-	DECLARE_WRITE_LINE_MEMBER(pc_pirqa_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_pirqb_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_pirqc_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_pirqd_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_mirq0_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_mirq1_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_ferr_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_extsmi_w);
+	void pc_pirqa_w(int state);
+	void pc_pirqb_w(int state);
+	void pc_pirqc_w(int state);
+	void pc_pirqd_w(int state);
+	void pc_mirq0_w(int state);
+	void pc_mirq1_w(int state);
+	void pc_ferr_w(int state);
+	void pc_extsmi_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(pc_irq1_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_irq3_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_irq4_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_irq5_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_irq6_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_irq7_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_irq8n_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_irq9_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_irq10_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_irq11_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_irq12m_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_irq14_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_irq15_w);
+	void pc_irq1_w(int state);
+	void pc_irq3_w(int state);
+	void pc_irq4_w(int state);
+	void pc_irq5_w(int state);
+	void pc_irq6_w(int state);
+	void pc_irq7_w(int state);
+	void pc_irq8n_w(int state);
+	void pc_irq9_w(int state);
+	void pc_irq10_w(int state);
+	void pc_irq11_w(int state);
+	void pc_irq12m_w(int state);
+	void pc_irq14_w(int state);
+	void pc_irq15_w(int state);
 
 protected:
 	i82371sb_isa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -83,9 +83,9 @@ protected:
 	virtual void config_map(address_map &map) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(at_pit8254_out0_changed);
-	DECLARE_WRITE_LINE_MEMBER(at_pit8254_out1_changed);
-	DECLARE_WRITE_LINE_MEMBER(at_pit8254_out2_changed);
+	void at_pit8254_out0_changed(int state);
+	void at_pit8254_out1_changed(int state);
+	void at_pit8254_out2_changed(int state);
 	uint8_t pc_dma8237_0_dack_r();
 	uint8_t pc_dma8237_1_dack_r();
 	uint8_t pc_dma8237_2_dack_r();
@@ -100,16 +100,16 @@ private:
 	void pc_dma8237_5_dack_w(uint8_t data);
 	void pc_dma8237_6_dack_w(uint8_t data);
 	void pc_dma8237_7_dack_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack0_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack1_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack4_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack5_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack6_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack7_w);
-	DECLARE_WRITE_LINE_MEMBER(at_dma8237_out_eop);
-	DECLARE_WRITE_LINE_MEMBER(pc_dma_hrq_changed);
+	void pc_dack0_w(int state);
+	void pc_dack1_w(int state);
+	void pc_dack2_w(int state);
+	void pc_dack3_w(int state);
+	void pc_dack4_w(int state);
+	void pc_dack5_w(int state);
+	void pc_dack6_w(int state);
+	void pc_dack7_w(int state);
+	void at_dma8237_out_eop(int state);
+	void pc_dma_hrq_changed(int state);
 	uint8_t pc_dma_read_byte(offs_t offset);
 	void pc_dma_write_byte(offs_t offset, uint8_t data);
 	uint8_t pc_dma_read_word(offs_t offset);
@@ -162,7 +162,7 @@ private:
 	void at_page8_w(offs_t offset, uint8_t data);
 	uint8_t at_portb_r();
 	void at_portb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(iochck_w);
+	void iochck_w(int state);
 	uint8_t at_dma8237_2_r(offs_t offset);
 	void at_dma8237_2_w(offs_t offset, uint8_t data);
 	uint8_t eisa_irq_read(offs_t offset);
@@ -251,8 +251,8 @@ protected:
 
 	virtual void config_map(address_map &map) override;
 
-	DECLARE_WRITE_LINE_MEMBER(primary_int);
-	DECLARE_WRITE_LINE_MEMBER(secondary_int);
+	void primary_int(int state);
+	void secondary_int(int state);
 
 private:
 	void status_w(offs_t offset, uint16_t data, uint16_t mem_mask);

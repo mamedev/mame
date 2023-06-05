@@ -52,9 +52,9 @@ public:
 
 	void sprint4(machine_config &config);
 
-	template <int N> DECLARE_READ_LINE_MEMBER(lever_r);
-	template <int N> DECLARE_READ_LINE_MEMBER(wheel_r);
-	template <int N> DECLARE_READ_LINE_MEMBER(collision_flipflop_r);
+	template <int N> int lever_r();
+	template <int N> int wheel_r();
+	template <int N> int collision_flipflop_r();
 
 private:
 	virtual void machine_start() override;
@@ -80,7 +80,7 @@ private:
 
 	TILE_GET_INFO_MEMBER(tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 
 	required_device<cpu_device> m_maincpu;
@@ -113,21 +113,21 @@ private:
 
 
 template <int N>
-READ_LINE_MEMBER(sprint4_state::lever_r)
+int sprint4_state::lever_r()
 {
 	return 4 * m_gear[N] > m_da_latch;
 }
 
 
 template <int N>
-READ_LINE_MEMBER(sprint4_state::wheel_r)
+int sprint4_state::wheel_r()
 {
 	return 8 * m_steer_FF1[N] + 8 * m_steer_FF2[N] > m_da_latch;
 }
 
 
 template <int N>
-READ_LINE_MEMBER(sprint4_state::collision_flipflop_r)
+int sprint4_state::collision_flipflop_r()
 {
 	return m_collision[N];
 }
@@ -345,7 +345,7 @@ uint32_t sprint4_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-WRITE_LINE_MEMBER(sprint4_state::screen_vblank)
+void sprint4_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)

@@ -252,7 +252,7 @@ void isa8_pgc_device::device_reset()
 
 //
 
-WRITE_LINE_MEMBER(isa8_pgc_device::vblank_irq)
+void isa8_pgc_device::vblank_irq(int state)
 {
 	if (state)
 	{

@@ -59,7 +59,7 @@ private:
 	uint8_t iox_status_r();
 	void iox_command_w(uint8_t data);
 	void iox_data_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void adpcm_int(int state);
 
 	// mjuugi
 	void mjyuugi_flags_w(uint16_t data);

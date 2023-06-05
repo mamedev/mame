@@ -454,7 +454,7 @@ public:
 	void init_vipercf();
 	void init_viperhd();
 
-	DECLARE_READ_LINE_MEMBER(ds2430_unk_r);
+	int ds2430_unk_r();
 
 protected:
 	virtual void machine_start() override;
@@ -490,13 +490,13 @@ private:
 	void ata_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	uint64_t unk_serial_r(offs_t offset, uint64_t mem_mask = ~0);
 	void unk_serial_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank);
+	void voodoo_vblank(int state);
 
 	uint16_t ppp_sensor_r(offs_t offset);
 
 	uint32_t screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(viper_vblank);
-	WRITE_LINE_MEMBER(voodoo_pciint);
+	void voodoo_pciint(int state);
 
 	//the following two arrays need to stay public til the legacy PCI bus is removed
 	uint32_t m_voodoo3_pci_reg[0x100];
@@ -2157,7 +2157,7 @@ void viper_state::viper_ppp_map(address_map &map)
 
 /*****************************************************************************/
 
-READ_LINE_MEMBER(viper_state::ds2430_unk_r)
+int viper_state::ds2430_unk_r()
 {
 	return m_ds2430_unk_status;
 }
@@ -2538,14 +2538,14 @@ INTERRUPT_GEN_MEMBER(viper_state::viper_vblank)
 	//mpc8240_interrupt(MPC8240_IRQ3);
 }
 
-WRITE_LINE_MEMBER(viper_state::voodoo_vblank)
+void viper_state::voodoo_vblank(int state)
 {
 	if (state)
 	  mpc8240_interrupt(MPC8240_IRQ0);
 	//mpc8240_interrupt(MPC8240_IRQ3);
 }
 
-WRITE_LINE_MEMBER(viper_state::voodoo_pciint)
+void viper_state::voodoo_pciint(int state)
 {
 	if (state)
 	{

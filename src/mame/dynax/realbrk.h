@@ -86,7 +86,7 @@ private:
 	u32 screen_update_dai2kaku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	template <bool Rotatable> void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, bitmap_ind8 &priority);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	void base_mem(address_map &map);
 	void dai2kaku_mem(address_map &map);
 	void pkgnsh_mem(address_map &map);

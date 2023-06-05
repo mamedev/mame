@@ -222,8 +222,8 @@ protected:
 	DECLARE_VIDEO_START(model2);
 	void reset_model2_scsp();
 	u32 screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-//  DECLARE_WRITE_LINE_MEMBER(screen_vblank_model2);
-//  DECLARE_WRITE_LINE_MEMBER(sound_ready_w);
+//  void screen_vblank_model2(int state);
+//  void sound_ready_w(int state);
 	template <int TNum> TIMER_DEVICE_CALLBACK_MEMBER(model2_timer_cb);
 	void scsp_irq(offs_t offset, u8 data);
 

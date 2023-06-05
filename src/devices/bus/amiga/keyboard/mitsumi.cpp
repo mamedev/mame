@@ -106,13 +106,13 @@ ROM_END
 class mitsumi_keyboard_base : public device_t, public device_amiga_keyboard_interface
 {
 public:
-	virtual WRITE_LINE_MEMBER(kdat_w) override
+	virtual void kdat_w(int state) override
 	{
 		m_kdat_in = state ? 0x01U : 0x00U;
 		m_mcu->pa_w(m_meta->read());
 	}
 
-	READ_LINE_MEMBER(kdat_r)
+	int kdat_r()
 	{
 		return m_kdat_in ^ 0x01U;
 	}
@@ -128,7 +128,7 @@ public:
 		return (result >> 2) ^ 0x3fU;
 	}
 
-	READ_LINE_MEMBER(reset_r)
+	int reset_r()
 	{
 		return m_ctrl_a_a;
 	}
@@ -230,7 +230,7 @@ protected:
 	}
 
 private:
-	WRITE_LINE_MEMBER(pd7_w)
+	void pd7_w(int state)
 	{
 		if (bool(state) != bool(m_pd7))
 		{
@@ -366,7 +366,7 @@ protected:
 	}
 
 private:
-	WRITE_LINE_MEMBER(reset_trigger)
+	void reset_trigger(int state)
 	{
 		if (bool(state) != bool(m_reset_trigger))
 		{

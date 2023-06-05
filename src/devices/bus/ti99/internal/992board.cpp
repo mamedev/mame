@@ -278,7 +278,7 @@ uint32_t video992_device::screen_update(screen_device &screen, bitmap_rgb32 &bit
 /*
     VIDENA pin, positive logic
 */
-WRITE_LINE_MEMBER(video992_device::videna)
+void video992_device::videna(int state)
 {
 	m_videna = state;
 }

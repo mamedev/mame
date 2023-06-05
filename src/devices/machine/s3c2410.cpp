@@ -320,7 +320,7 @@ void s3c2410_device::s3c2410_touch_screen( int state)
 	s3c24xx_touch_screen(state);
 }
 
-WRITE_LINE_MEMBER( s3c2410_device::frnb_w )
+void s3c2410_device::frnb_w(int state)
 {
 	s3c24xx_pin_frnb_w(state);
 }

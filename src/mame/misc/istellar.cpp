@@ -79,7 +79,7 @@ private:
 	uint8_t z80_2_unknown_read();
 	void z80_2_ldp_write(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	void z80_0_io(address_map &map);
 	void z80_0_mem(address_map &map);
 	void z80_1_io(address_map &map);
@@ -271,7 +271,7 @@ static GFXDECODE_START( gfx_istellar )
 	GFXDECODE_ENTRY( "tiles", 0, istellar_gfx_layout, 0x0, 0x20 )
 GFXDECODE_END
 
-WRITE_LINE_MEMBER(istellar_state::vblank_irq)
+void istellar_state::vblank_irq(int state)
 {
 	if (state)
 	{

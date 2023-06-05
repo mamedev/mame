@@ -342,19 +342,19 @@ void sis85c496_host_device::at_speaker_set_spkrdata(uint8_t data)
 
 
 
-WRITE_LINE_MEMBER( sis85c496_host_device::at_pit8254_out0_changed )
+void sis85c496_host_device::at_pit8254_out0_changed(int state)
 {
 	if (m_pic8259_master)
 		m_pic8259_master->ir0_w(state);
 }
 
-WRITE_LINE_MEMBER( sis85c496_host_device::at_pit8254_out1_changed )
+void sis85c496_host_device::at_pit8254_out1_changed(int state)
 {
 	if(state)
 		m_refresh = !m_refresh;
 }
 
-WRITE_LINE_MEMBER( sis85c496_host_device::at_pit8254_out2_changed )
+void sis85c496_host_device::at_pit8254_out2_changed(int state)
 {
 	m_pit_out2 = state ? 1 : 0;
 	m_speaker->level_w(m_at_spkrdata & m_pit_out2);
@@ -408,7 +408,7 @@ void sis85c496_host_device::at_page8_w(offs_t offset, uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER( sis85c496_host_device::pc_dma_hrq_changed )
+void sis85c496_host_device::pc_dma_hrq_changed(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
@@ -483,7 +483,7 @@ void sis85c496_host_device::pc_dma8237_5_dack_w(uint8_t data) { } //m_isabus->da
 void sis85c496_host_device::pc_dma8237_6_dack_w(uint8_t data) { } //m_isabus->dack_w(6, data); }
 void sis85c496_host_device::pc_dma8237_7_dack_w(uint8_t data) { } //m_isabus->dack_w(7, data); }
 
-WRITE_LINE_MEMBER( sis85c496_host_device::at_dma8237_out_eop )
+void sis85c496_host_device::at_dma8237_out_eop(int state)
 {
 	m_cur_eop = state == ASSERT_LINE;
 	//if(m_dma_channel != -1)
@@ -507,14 +507,14 @@ void sis85c496_host_device::pc_select_dma_channel(int channel, bool state)
 }
 
 
-WRITE_LINE_MEMBER( sis85c496_host_device::pc_dack0_w ) { pc_select_dma_channel(0, state); }
-WRITE_LINE_MEMBER( sis85c496_host_device::pc_dack1_w ) { pc_select_dma_channel(1, state); }
-WRITE_LINE_MEMBER( sis85c496_host_device::pc_dack2_w ) { pc_select_dma_channel(2, state); }
-WRITE_LINE_MEMBER( sis85c496_host_device::pc_dack3_w ) { pc_select_dma_channel(3, state); }
-WRITE_LINE_MEMBER( sis85c496_host_device::pc_dack4_w ) { m_dma8237_1->hack_w( state ? 0 : 1); } // it's inverted
-WRITE_LINE_MEMBER( sis85c496_host_device::pc_dack5_w ) { pc_select_dma_channel(5, state); }
-WRITE_LINE_MEMBER( sis85c496_host_device::pc_dack6_w ) { pc_select_dma_channel(6, state); }
-WRITE_LINE_MEMBER( sis85c496_host_device::pc_dack7_w ) { pc_select_dma_channel(7, state); }
+void sis85c496_host_device::pc_dack0_w(int state) { pc_select_dma_channel(0, state); }
+void sis85c496_host_device::pc_dack1_w(int state) { pc_select_dma_channel(1, state); }
+void sis85c496_host_device::pc_dack2_w(int state) { pc_select_dma_channel(2, state); }
+void sis85c496_host_device::pc_dack3_w(int state) { pc_select_dma_channel(3, state); }
+void sis85c496_host_device::pc_dack4_w(int state) { m_dma8237_1->hack_w( state ? 0 : 1); } // it's inverted
+void sis85c496_host_device::pc_dack5_w(int state) { pc_select_dma_channel(5, state); }
+void sis85c496_host_device::pc_dack6_w(int state) { pc_select_dma_channel(6, state); }
+void sis85c496_host_device::pc_dack7_w(int state) { pc_select_dma_channel(7, state); }
 
 uint8_t sis85c496_host_device::at_portb_r()
 {
@@ -584,17 +584,17 @@ void sis85c496_host_device::write_rtc(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(sis85c496_host_device::cpu_int_w)
+void sis85c496_host_device::cpu_int_w(int state)
 {
 	m_maincpu->set_input_line(0, state);
 }
 
-WRITE_LINE_MEMBER(sis85c496_host_device::cpu_a20_w)
+void sis85c496_host_device::cpu_a20_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_A20, state);
 }
 
-WRITE_LINE_MEMBER(sis85c496_host_device::cpu_reset_w)
+void sis85c496_host_device::cpu_reset_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, state);
 }

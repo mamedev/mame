@@ -75,8 +75,8 @@ private:
 	void rom1_out(u8 data) { m_rom1_output = data; }
 	u8 rom2_in();
 
-	DECLARE_WRITE_LINE_MEMBER(cm_ram1_w);
-	DECLARE_WRITE_LINE_MEMBER(cm_ram2_w);
+	void cm_ram1_w(int state);
+	void cm_ram2_w(int state);
 
 	void flicker_memory(address_map &map);
 	void flicker_ram_ports(address_map &map);
@@ -288,7 +288,7 @@ u8 flicker_state::rom2_in()
 }
 
 
-WRITE_LINE_MEMBER(flicker_state::cm_ram1_w)
+void flicker_state::cm_ram1_w(int state)
 {
 	static constexpr u8 led_digits[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0, 0, 0, 0, 0, 0 };
 	static constexpr char const *const lamp_matrix[][4] = {
@@ -332,7 +332,7 @@ WRITE_LINE_MEMBER(flicker_state::cm_ram1_w)
 }
 
 
-WRITE_LINE_MEMBER(flicker_state::cm_ram2_w)
+void flicker_state::cm_ram2_w(int state)
 {
 	if (!m_cm_ram2 && !state && (m_relay_drive != m_ram0_output))
 	{

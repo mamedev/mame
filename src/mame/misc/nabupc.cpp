@@ -210,11 +210,10 @@ private:
 	void centronics_busy_handler(uint8_t state);
 	void update_irq();
 
-	DECLARE_WRITE_LINE_MEMBER(hcca_fe_w);
-	DECLARE_WRITE_LINE_MEMBER(hcca_oe_w);
+	void hcca_fe_w(int state);
+	void hcca_oe_w(int state);
 
-	template <unsigned N>
-	DECLARE_WRITE_LINE_MEMBER(int_w);
+	template <unsigned N> void int_w(int state);
 
 	IRQ_CALLBACK_MEMBER(int_ack_cb);
 
@@ -427,13 +426,13 @@ void nabupc_state::centronics_busy_handler(uint8_t state)
 }
 
 // HCCA Framing Error
-WRITE_LINE_MEMBER(nabupc_state::hcca_fe_w)
+void nabupc_state::hcca_fe_w(int state)
 {
 	BIT_SET(m_portb, 5, state);
 }
 
 // HCCA Overrun Error
-WRITE_LINE_MEMBER(nabupc_state::hcca_oe_w)
+void nabupc_state::hcca_oe_w(int state)
 {
 	BIT_SET(m_portb, 6, state);
 }
@@ -444,7 +443,7 @@ WRITE_LINE_MEMBER(nabupc_state::hcca_oe_w)
 //**************************************************************************
 
 template <unsigned N>
-WRITE_LINE_MEMBER(nabupc_state::int_w)
+void nabupc_state::int_w(int state)
 {
 	BIT_SET(m_int_lines, N, state);
 	update_irq();

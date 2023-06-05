@@ -5,12 +5,12 @@
 
 /* CDP1802 Interface */
 
-READ_LINE_MEMBER( cidelsa_state::clear_r )
+int cidelsa_state::clear_r()
 {
 	return m_reset;
 }
 
-WRITE_LINE_MEMBER( cidelsa_state::q_w )
+void cidelsa_state::q_w(int state)
 {
 	m_cdp1802_q = state;
 }
@@ -207,7 +207,7 @@ void draco_state::draco_sound_map(address_map &map)
 
 /* Input Ports */
 
-READ_LINE_MEMBER( cidelsa_state::cdp1869_pcb_r )
+int cidelsa_state::cdp1869_pcb_r()
 {
 	return m_cdp1869_pcb;
 }

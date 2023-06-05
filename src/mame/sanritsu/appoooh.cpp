@@ -235,7 +235,7 @@ protected:
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites(bitmap_ind16 &dest_bmp, const rectangle &cliprect, gfx_element *gfx, uint8_t *sprite);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void adpcm_int(int state);
 
 	void common(machine_config &config);
 	void main_map(address_map &map);
@@ -498,7 +498,7 @@ uint32_t base_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
  *
  *************************************/
 
-WRITE_LINE_MEMBER(base_state::adpcm_int)
+void base_state::adpcm_int(int state)
 {
 	if (!m_adpcm_playing || !state)
 		return;

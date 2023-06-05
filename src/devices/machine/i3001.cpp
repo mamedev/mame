@@ -52,7 +52,7 @@ void i3001_device::fc_w(uint8_t fc)
 	}
 }
 
-WRITE_LINE_MEMBER(i3001_device::clk_w)
+void i3001_device::clk_w(int state)
 {
 	update();
 }

@@ -438,7 +438,7 @@ static void gdrom_devices(device_slot_interface &device)
 }
 
 
-WRITE_LINE_MEMBER(idegdrom_device::ide_irq)
+void idegdrom_device::ide_irq(int state)
 {
 	irq_cb(state);
 }

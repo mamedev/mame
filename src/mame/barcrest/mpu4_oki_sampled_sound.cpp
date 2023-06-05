@@ -153,7 +153,7 @@ uint8_t mpu4_oki_sampled_sound::pia_gb_portb_r()
 	return data | m_expansion_latch;
 }
 
-WRITE_LINE_MEMBER(mpu4_oki_sampled_sound::pia_gb_ca2_w)
+void mpu4_oki_sampled_sound::pia_gb_ca2_w(int state)
 {
 	LOG("OKI RESET data = %02X\n", state);
 	if ((m_last_reset != state) && !state)
@@ -166,7 +166,7 @@ WRITE_LINE_MEMBER(mpu4_oki_sampled_sound::pia_gb_ca2_w)
 
 
 
-WRITE_LINE_MEMBER(mpu4_oki_sampled_sound::pia_gb_cb2_w)
+void mpu4_oki_sampled_sound::pia_gb_cb2_w(int state)
 {
 	m_cb2_handler(state);
 }

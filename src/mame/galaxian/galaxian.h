@@ -107,7 +107,7 @@ public:
 	void scramble_background_green_w(uint8_t data);
 	void scramble_background_blue_w(uint8_t data);
 	void galaxian_gfxbank_w(offs_t offset, uint8_t data);
-	template <int N> DECLARE_READ_LINE_MEMBER(azurian_port_r);
+	template <int N> int azurian_port_r();
 	void irq_enable_w(uint8_t data);
 	void start_lamp_w(offs_t offset, uint8_t data);
 	void coin_lock_w(uint8_t data);
@@ -120,7 +120,7 @@ public:
 	void theend_ppi8255_w(offs_t offset, uint8_t data);
 	void theend_protection_w(uint8_t data);
 	uint8_t theend_protection_r();
-	template <int N> DECLARE_READ_LINE_MEMBER(theend_protection_alt_r);
+	template <int N> int theend_protection_alt_r();
 	void explorer_sound_control_w(uint8_t data);
 	uint8_t frogger_ppi8255_r(offs_t offset);
 	void frogger_ppi8255_w(offs_t offset, uint8_t data);
@@ -203,7 +203,7 @@ public:
 	void galaxian_palette(palette_device &palette);
 	void eagle_palette(palette_device &palette);
 	uint32_t screen_update_galaxian(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_interrupt_w);
+	void vblank_interrupt_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(checkmaj_irq0_gen);
 	TIMER_DEVICE_CALLBACK_MEMBER(scramble_stars_blink_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(timefgtr_scanline);
@@ -320,7 +320,7 @@ public:
 	void bigkonggx(machine_config &config);
 
 	template <int Mask> CUSTOM_INPUT_MEMBER(ckongg_coinage_r);
-	template <int Mask> DECLARE_READ_LINE_MEMBER(ckongs_coinage_r);
+	template <int Mask> int ckongs_coinage_r();
 
 protected:
 	// machine configuration helpers
@@ -593,8 +593,8 @@ public:
 	{
 	}
 
-	DECLARE_READ_LINE_MEMBER(muxbit_r);
-	DECLARE_READ_LINE_MEMBER(noise_r);
+	int muxbit_r();
+	int noise_r();
 
 	void kingball(machine_config &config);
 

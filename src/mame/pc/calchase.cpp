@@ -23,15 +23,7 @@ TODO:
 - Various graphics bugs (title screen uses ROZ?);
 - fix 129 Hz refresh rate bug;
 - inputs (is there a service mode?)
-
-I/O Memo (http://bochs.sourceforge.net/techspec/PORTS.LST):
-46E8    ----    8514/A and compatible video cards (e.g. ATI Graphics Ultra)
-46E8    w   ROM page select
-83C0-83CF ----  Compaq QVision - Line Draw Engine
-83C4      ----  Compaq Qvision EISA - Virtual Controller Select
-83C6-83C9 ----  Compaq Qvision EISA - DAC color registers
-
-43c4 is a 83c4 mirror?
+- hostinv: is an El Torito CD-ROM, can't boot here until PCI section is rewritten;
 
 =====================================================================================
 
@@ -122,8 +114,6 @@ compatible with chipset VIA.
 something wrong in the disk geometry reported by calchase.chd (20,255,63) since BIOS does not accept
  255 heads as parameter. Perhaps a bad dump?
 
- TODO: A lot of work to do yet!!!
-
 - update by peter ferrie:
 - corrected memory map to 64kb blocks
 - corrected access to PAM register
@@ -134,7 +124,8 @@ something wrong in the disk geometry reported by calchase.chd (20,255,63) since 
 
 #include "pcshare.h"
 
-#include "bus/isa/trident.h"
+#include "bus/isa/isa.h"
+#include "bus/isa/svga_trident.h"
 #include "cpu/i386/i386.h"
 #include "machine/lpci.h"
 #include "machine/pckeybrd.h"
@@ -148,6 +139,266 @@ something wrong in the disk geometry reported by calchase.chd (20,255,63) since 
 #include "speaker.h"
 
 
+class isa16_calchase_jamma_if : public device_t, public device_isa16_card_interface
+{
+public:
+	// construction/destruction
+	isa16_calchase_jamma_if(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ioport_constructor device_input_ports() const override;
+
+	DECLARE_CUSTOM_INPUT_MEMBER( heartbeat_r );
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	required_ioport_array<5> m_iocard;
+	std::unique_ptr<uint8_t[]> m_nvram_data;
+	TIMER_CALLBACK_MEMBER(heartbeat_cb);
+	emu_timer *m_hb_timer = nullptr;
+	bool m_hb_state = false;
+
+	void io_map(address_map &map);
+
+	template <unsigned N> uint16_t iocard_r();
+	uint8_t nvram_r(offs_t offset);
+	void nvram_w(offs_t offset, uint8_t data);
+};
+
+DEFINE_DEVICE_TYPE(ISA16_CALCHASE_JAMMA_IF, isa16_calchase_jamma_if, "calchase_jamma_if", "ISA16 AUSCOM System 1 custom JAMMA I/F")
+
+isa16_calchase_jamma_if::isa16_calchase_jamma_if(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, ISA16_CALCHASE_JAMMA_IF, tag, owner, clock)
+	, device_isa16_card_interface(mconfig, *this)
+	, m_iocard(*this, "IOCARD%u", 1U)
+{
+}
+
+void isa16_calchase_jamma_if::device_add_mconfig(machine_config &config)
+{
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // DS1220Y
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	DAC_12BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
+	DAC_12BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
+}
+
+void isa16_calchase_jamma_if::device_start()
+{
+	set_isa_device();
+
+	m_nvram_data = std::make_unique<uint8_t[]>(0x800);
+	subdevice<nvram_device>("nvram")->set_base(m_nvram_data.get(), 0x800);
+
+	m_hb_timer = timer_alloc(FUNC(isa16_calchase_jamma_if::heartbeat_cb), this);
+
+	m_isa->install_memory(0x000d0000, 0x000d0fff, *this, &isa16_calchase_jamma_if::io_map);
+}
+
+void isa16_calchase_jamma_if::device_reset()
+{
+	// TODO: timing and actual source
+	m_hb_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
+}
+
+template <unsigned N>
+uint16_t isa16_calchase_jamma_if::iocard_r()
+{
+	return m_iocard[N]->read();
+}
+
+uint8_t isa16_calchase_jamma_if::nvram_r(offs_t offset)
+{
+	return m_nvram_data[offset];
+}
+
+void isa16_calchase_jamma_if::nvram_w(offs_t offset, uint8_t data)
+{
+	m_nvram_data[offset] = data;
+}
+
+void isa16_calchase_jamma_if::io_map(address_map &map)
+{
+//  map(0x0000, 0x0003).ram();  // XYLINX - Sincronus serial communication
+	map(0x0004, 0x0005).r(FUNC(isa16_calchase_jamma_if::iocard_r<0>));
+	map(0x0008, 0x000b).nopw(); // ???
+	map(0x000c, 0x000d).r(FUNC(isa16_calchase_jamma_if::iocard_r<1>));
+	map(0x0024, 0x0025).w("ldac", FUNC(dac_word_interface::data_w));
+	map(0x0028, 0x0029).w("rdac", FUNC(dac_word_interface::data_w));
+	map(0x0032, 0x0033).r(FUNC(isa16_calchase_jamma_if::iocard_r<2>));
+	map(0x0030, 0x0031).r(FUNC(isa16_calchase_jamma_if::iocard_r<3>)); // These two controls wheel pot or whatever this game uses ...
+	map(0x0034, 0x0035).r(FUNC(isa16_calchase_jamma_if::iocard_r<4>));
+	map(0x0800, 0x0fff).rw(FUNC(isa16_calchase_jamma_if::nvram_r), FUNC(isa16_calchase_jamma_if::nvram_w)); // GAME_CMOS
+}
+
+// bit 13 of IOCARD3 needs to be flipped back and forth for logic to update
+// (causing an hang if this is either one of the two states).
+// This is either mirrored from PCI VGA card itself (unlikely) or it runs on its own free running timer.
+// Also cfr. ice/lethalj.cpp franticf, where they run an analog steering wheel thru a serial pot and an irq
+// (which is probably reused here)
+TIMER_CALLBACK_MEMBER(isa16_calchase_jamma_if::heartbeat_cb)
+{
+	m_hb_state ^= 1;
+}
+
+CUSTOM_INPUT_MEMBER(isa16_calchase_jamma_if::heartbeat_r)
+{
+	return m_hb_state;
+}
+
+static INPUT_PORTS_START( calchase_jamma )
+	PORT_START("IOCARD1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_DIPNAME( 0x0008, 0x0008, "1" )
+	PORT_DIPSETTING(    0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Accelerator")
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IOCARD2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 ) // guess
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Reset SW")
+	PORT_DIPNAME( 0x0004, 0x0004, "2" )
+	PORT_DIPSETTING(    0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Turbo")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN ) // returns back to MS-DOS (likely to be unmapped and actually used as a lame protection check)
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IOCARD3")
+//  PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("isa2:tgui9680:screen")
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(isa16_calchase_jamma_if, heartbeat_r)
+	PORT_BIT( 0xdfff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IOCARD4")
+	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, "DSWA" )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+//  PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("isa2:tgui9680:screen") // eggsplc
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(isa16_calchase_jamma_if, heartbeat_r)
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+
+	PORT_START("IOCARD5")
+	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, "DSWA" )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+ioport_constructor isa16_calchase_jamma_if::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(calchase_jamma);
+}
+
 namespace {
 
 class calchase_state : public pcat_base_state
@@ -155,7 +406,6 @@ class calchase_state : public pcat_base_state
 public:
 	calchase_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag)
-		, m_iocard(*this, "IOCARD%u", 1U)
 	{
 	}
 
@@ -169,21 +419,13 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	required_ioport_array<5> m_iocard;
 	std::unique_ptr<uint32_t[]> m_bios_ram;
 	std::unique_ptr<uint32_t[]> m_bios_ext_ram;
-	std::unique_ptr<uint8_t[]> m_nvram_data;
 	uint8_t m_mtxc_config_reg[256]{};
 	uint8_t m_piix4_config_reg[4][256]{};
 
-	uint32_t m_idle_skip_ram = 0;
 	void bios_ext_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint8_t nvram_r(offs_t offset);
-	void nvram_w(offs_t offset, uint8_t data);
-	template <unsigned N> uint16_t iocard_r();
-	uint32_t calchase_idle_skip_r();
-	void calchase_idle_skip_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	void intel82439tx_init();
 	void calchase_io(address_map &map);
@@ -371,242 +613,41 @@ void calchase_state::bios_ext_ram_w(offs_t offset, uint32_t data, uint32_t mem_m
 	}
 }
 
-uint8_t calchase_state::nvram_r(offs_t offset)
-{
-	return m_nvram_data[offset];
-}
-
-void calchase_state::nvram_w(offs_t offset, uint8_t data)
-{
-	m_nvram_data[offset] = data;
-}
-
-template <unsigned N>
-uint16_t calchase_state::iocard_r()
-{
-	return m_iocard[N]->read();
-}
-
-
 void calchase_state::calchase_map(address_map &map)
 {
 	map(0x00000000, 0x0009ffff).ram();
-	map(0x000a0000, 0x000bffff).rw("vga", FUNC(trident_vga_device::mem_r), FUNC(trident_vga_device::mem_w)); // VGA VRAM
-	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
-	map(0x000c8000, 0x000cffff).noprw();
-	//map(0x000d0000, 0x000d0003).ram();  // XYLINX - Sincronus serial communication
-	map(0x000d0004, 0x000d0005).r(FUNC(calchase_state::iocard_r<0>));
-	map(0x000d000c, 0x000d000d).r(FUNC(calchase_state::iocard_r<1>));
-	map(0x000d0032, 0x000d0033).r(FUNC(calchase_state::iocard_r<2>));
-	map(0x000d0030, 0x000d0031).r(FUNC(calchase_state::iocard_r<3>)); // These two controls wheel pot or whatever this game uses ...
-	map(0x000d0034, 0x000d0035).r(FUNC(calchase_state::iocard_r<4>));
-	map(0x000d0008, 0x000d000b).nopw(); // ???
-	map(0x000d0024, 0x000d0025).w("ldac", FUNC(dac_word_interface::data_w));
-	map(0x000d0028, 0x000d0029).w("rdac", FUNC(dac_word_interface::data_w));
-	map(0x000d0800, 0x000d0fff).rw(FUNC(calchase_state::nvram_r), FUNC(calchase_state::nvram_w)); // GAME_CMOS
-
+//  map(0x000a0000, 0x000bffff).rw("vga", FUNC(trident_vga_device::mem_r), FUNC(trident_vga_device::mem_w)); // VGA VRAM
+//  map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
+//  map(0x000c8000, 0x000cffff).noprw();
+//  map(0x000d0000, 0x000d0fff) ISA custom JAMMA (above)
 	map(0x000e0000, 0x000effff).bankr("bios_ext").w(FUNC(calchase_state::bios_ext_ram_w));
 	map(0x000f0000, 0x000fffff).bankr("bios_bank").w(FUNC(calchase_state::bios_ram_w));
 	map(0x00100000, 0x03ffffff).ram();  // 64MB
 	map(0x04000000, 0x28ffffff).noprw();
-	//map(0x04000000, 0x040001ff).ram();
-	//map(0x08000000, 0x080001ff).ram();
-	//map(0x0c000000, 0x0c0001ff).ram();
-	//map(0x10000000, 0x100001ff).ram();
-	//map(0x14000000, 0x140001ff).ram();
-	//map(0x18000000, 0x180001ff).ram();
-	//map(0x20000000, 0x200001ff).ram();
-	//map(0x28000000, 0x280001ff).ram();
 	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
 }
 
 void calchase_state::calchase_io(address_map &map)
 {
 	pcat32_io_common(map);
-	//map(0x00e8, 0x00eb).noprw();
 	map(0x00e8, 0x00ef).noprw(); //AMI BIOS write to this ports as delays between I/O ports operations sending al value -> NEWIODELAY
-	map(0x0170, 0x0177).noprw(); //To debug
+//  map(0x0170, 0x0177).noprw(); //To debug
 	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
-	map(0x0200, 0x021f).noprw(); //To debug
-	map(0x0260, 0x026f).noprw(); //To debug
-	map(0x0278, 0x027b).nopw();//.w(FUNC(calchase_state::pnp_config_w));
-	map(0x0280, 0x0287).noprw(); //To debug
-	map(0x02a0, 0x02a7).noprw(); //To debug
-	map(0x02c0, 0x02c7).noprw(); //To debug
-	map(0x02e0, 0x02ef).noprw(); //To debug
-	map(0x02f8, 0x02ff).noprw(); //To debug
-	map(0x0320, 0x038f).noprw(); //To debug
-	map(0x03a0, 0x03a7).noprw(); //To debug
-	map(0x03b0, 0x03bf).rw("vga", FUNC(trident_vga_device::port_03b0_r), FUNC(trident_vga_device::port_03b0_w));
-	map(0x03c0, 0x03cf).rw("vga", FUNC(trident_vga_device::port_03c0_r), FUNC(trident_vga_device::port_03c0_w));
-	map(0x03d0, 0x03df).rw("vga", FUNC(trident_vga_device::port_03d0_r), FUNC(trident_vga_device::port_03d0_w));
-	map(0x03e0, 0x03ef).noprw(); //To debug
-	map(0x0378, 0x037f).noprw(); //To debug
-	// map(0x0300, 0x03af).noprw();
-	// map(0x03b0, 0x03df).noprw();
 	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
-	map(0x03f8, 0x03ff).noprw(); // To debug Serial Port COM1:
-	map(0x0a78, 0x0a7b).nopw();//.w(FUNC(calchase_state::pnp_data_w));
+//  map(0x03f8, 0x03ff).noprw(); // To debug Serial Port COM1:
+//  map(0x0a78, 0x0a7b).nopw();//.w(FUNC(calchase_state::pnp_data_w));
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
-	map(0x42e8, 0x43ef).noprw(); //To debug
-	map(0x43c4, 0x43cb).rw("vga", FUNC(trident_vga_device::port_43c6_r), FUNC(trident_vga_device::port_43c6_w));  // Trident Memory and Video Clock register
-	map(0x46e8, 0x46ef).noprw(); //To debug
-	map(0x4ae8, 0x4aef).noprw(); //To debug
-	map(0x83c4, 0x83cb).rw("vga", FUNC(trident_vga_device::port_83c6_r), FUNC(trident_vga_device::port_83c6_w));  // Trident LUTDAC
-	map(0x92e8, 0x92ef).noprw(); //To debug
+//  map(0x43c4, 0x43cb).rw("vga", FUNC(trident_vga_device::port_43c6_r), FUNC(trident_vga_device::port_43c6_w));  // Trident Memory and Video Clock register
+//  map(0x83c4, 0x83cb).rw("vga", FUNC(trident_vga_device::port_83c6_r), FUNC(trident_vga_device::port_83c6_w));  // Trident LUTDAC
 }
 
-
-
 static INPUT_PORTS_START( calchase )
-	PORT_START("IOCARD1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_DIPNAME( 0x0008, 0x0008, "1" )
-	PORT_DIPSETTING(    0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Accelerator")
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IOCARD2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 ) // guess
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Reset SW")
-	PORT_DIPNAME( 0x0004, 0x0004, "2" )
-	PORT_DIPSETTING(    0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Turbo")
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN ) // returns back to MS-DOS (likely to be unmapped and actually used as a lame protection check)
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IOCARD3")
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0xdfff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IOCARD4")
-	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, "DSWA" )
-	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") //eggsplc
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-
-	PORT_START("IOCARD5")
-	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, "DSWA" )
-	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 void calchase_state::machine_start()
 {
 	m_bios_ram = std::make_unique<uint32_t[]>(0x10000/4);
 	m_bios_ext_ram = std::make_unique<uint32_t[]>(0x10000/4);
-
-	m_nvram_data = std::make_unique<uint8_t[]>(0x800);
-	subdevice<nvram_device>("nvram")->set_base(m_nvram_data.get(), 0x800);
 
 	for (int i = 0; i < 4; i++)
 		std::fill(std::begin(m_piix4_config_reg[i]), std::end(m_piix4_config_reg[i]), 0);
@@ -617,6 +658,12 @@ void calchase_state::machine_reset()
 	//membank("bank1")->set_base(memregion("bios")->base() + 0x10000);
 	membank("bios_bank")->set_base(memregion("bios")->base() + 0x10000);
 	membank("bios_ext")->set_base(memregion("bios")->base() + 0);
+}
+
+void calchase_isa16_cards(device_slot_interface &device)
+{
+	device.option_add("calchase_jamma_if", ISA16_CALCHASE_JAMMA_IF);
+	device.option_add("tgui9680", ISA16_SVGA_TGUI9680);
 }
 
 void calchase_state::calchase(machine_config &config)
@@ -635,20 +682,18 @@ void calchase_state::calchase(machine_config &config)
 	pcibus.set_device(0, FUNC(calchase_state::intel82439tx_pci_r), FUNC(calchase_state::intel82439tx_pci_w));
 	pcibus.set_device(7, FUNC(calchase_state::intel82371ab_pci_r), FUNC(calchase_state::intel82371ab_pci_w));
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // DS1220Y
-
-	/* video hardware */
-	pcvideo_trident_vga(config);
+	// FIXME: determine ISA bus clock
+	isa16_device &isa(ISA16(config, "isa", 0));
+	isa.set_memspace("maincpu", AS_PROGRAM);
+	isa.set_iospace("maincpu", AS_IO);
+	ISA16_SLOT(config, "isa1", 0, "isa", calchase_isa16_cards, "calchase_jamma_if", true);
+	// TODO: temp, to be converted to PCI slot
+	ISA16_SLOT(config, "isa2", 0, "isa", calchase_isa16_cards, "tgui9680", true);
 
 	ds12885_device &rtc(DS12885(config.replace(), "rtc"));
 	rtc.irq().set("pic8259_2", FUNC(pic8259_device::ir0_w));
 	rtc.set_century_index(0x32);
 
-	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	DAC_12BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
-	DAC_12BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
 }
 
 void calchase_state::hostinv(machine_config &config)
@@ -667,10 +712,13 @@ void calchase_state::hostinv(machine_config &config)
 	pcibus.set_device(0, FUNC(calchase_state::intel82439tx_pci_r), FUNC(calchase_state::intel82439tx_pci_w));
 	pcibus.set_device(7, FUNC(calchase_state::intel82371ab_pci_r), FUNC(calchase_state::intel82371ab_pci_w));
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // DS1220Y
-
-	/* video hardware */
-	pcvideo_trident_vga(config);
+	// TODO: determine isa bus clock
+	isa16_device &isa(ISA16(config, "isa", 0));
+	isa.set_memspace("maincpu", AS_PROGRAM);
+	isa.set_iospace("maincpu", AS_IO);
+	ISA16_SLOT(config, "isa1", 0, "isa", calchase_isa16_cards, "calchase_jamma_if", true);
+	// TODO: temp, to be converted to PCI slot
+	ISA16_SLOT(config, "isa2", 0, "isa", calchase_isa16_cards, "tgui9680", true);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -679,28 +727,11 @@ void calchase_state::hostinv(machine_config &config)
 	DAC_12BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
 }
 
-
-uint32_t calchase_state::calchase_idle_skip_r()
-{
-	if(m_maincpu->pc()==0x1406f48)
-		m_maincpu->spin_until_interrupt();
-
-	return m_idle_skip_ram;
-}
-
-void calchase_state::calchase_idle_skip_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	COMBINE_DATA(&m_idle_skip_ram);
-}
-
 void calchase_state::init_calchase()
 {
 	m_bios_ram = std::make_unique<uint32_t[]>(0x20000/4);
 
 	intel82439tx_init();
-
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3f0b160, 0x3f0b163, read32smo_delegate(*this, FUNC(calchase_state::calchase_idle_skip_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x3f0b160, 0x3f0b163, write32s_delegate(*this, FUNC(calchase_state::calchase_idle_skip_w)));
 }
 
 void calchase_state::init_hostinv()
@@ -714,26 +745,18 @@ ROM_START( calchase )
 	ROM_REGION32_LE( 0x40000, "bios", 0 )
 	ROM_LOAD( "mb_bios.bin", 0x00000, 0x20000, CRC(dea7a51b) SHA1(e2028c00bfa6d12959fc88866baca8b06a1eab68) )
 
-	ROM_REGION32_LE( 0x8000, "video_bios", 0 )
-	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
-	ROM_CONTINUE(                                 0x0001, 0x4000 )
-
-	ROM_REGION( 0x800, "nvram", 0 )
+	ROM_REGION( 0x800, "isa1:calchase_jamma_if:nvram", 0 )
 	ROM_LOAD( "ds1220y_nv.bin", 0x000, 0x800, CRC(7912c070) SHA1(b4c55c7ca76bcd8dad1c4b50297233349ae02ed3) )
 
 	DISK_REGION( "ide:0:hdd" )
-	DISK_IMAGE_READONLY( "calchase", 0,BAD_DUMP SHA1(6ae51a9b3f31cf4166322328a98c0235b0874eb3) )
+	DISK_IMAGE_READONLY( "calchase", 0, BAD_DUMP SHA1(6ae51a9b3f31cf4166322328a98c0235b0874eb3) )
 ROM_END
 
 ROM_START( hostinv )
 	ROM_REGION32_LE( 0x40000, "bios", 0 )
 	ROM_LOAD( "hostinv_bios.bin", 0x000000, 0x020000, CRC(5111e4b8) SHA1(20ab93150b61fd068f269368450734bba5dcb284) )
 
-	ROM_REGION32_LE( 0x8000, "video_bios", 0 )
-	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
-	ROM_CONTINUE(                                 0x0001, 0x4000 )
-
-	ROM_REGION( 0x800, "nvram", ROMREGION_ERASEFF )
+	ROM_REGION( 0x800, "isa1:calchase_jamma_if:nvram", ROMREGION_ERASEFF )
 	ROM_LOAD( "ds1220y_hostinv.bin", 0x000, 0x800, NO_DUMP )
 
 	DISK_REGION( "ide:0:cdrom" )
@@ -744,11 +767,7 @@ ROM_START( eggsplc )
 	ROM_REGION32_LE( 0x40000, "bios", 0 )
 	ROM_LOAD( "hostinv_bios.bin", 0x000000, 0x020000, CRC(5111e4b8) SHA1(20ab93150b61fd068f269368450734bba5dcb284) )
 
-	ROM_REGION32_LE( 0x8000, "video_bios", 0 )
-	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
-	ROM_CONTINUE(                                 0x0001, 0x4000 )
-
-	ROM_REGION( 0x800, "nvram", ROMREGION_ERASEFF )
+	ROM_REGION( 0x800, "isa1:calchase_jamma_if:nvram", ROMREGION_ERASEFF )
 	ROM_LOAD( "ds1220y_eggsplc.bin", 0x000, 0x800, NO_DUMP )
 
 	DISK_REGION( "ide:0:hdd" )

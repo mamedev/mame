@@ -262,7 +262,7 @@ sega_315_5250_compare_timer_device::sega_315_5250_compare_timer_device(const mac
 //  exck_w - clock the timer
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(sega_315_5250_compare_timer_device::exck_w)
+void sega_315_5250_compare_timer_device::exck_w(int state)
 {
 	if (m_exck == bool(state))
 		return;

@@ -31,7 +31,7 @@ public:
 	void crureadz(offs_t offset, uint8_t *value) override { }
 	void cruwrite(offs_t offset, uint8_t data) override { }
 
-	DECLARE_WRITE_LINE_MEMBER( ready_sound );
+	void ready_sound(int state);
 
 private:
 	void device_start() override;

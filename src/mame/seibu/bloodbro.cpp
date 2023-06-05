@@ -212,7 +212,7 @@ void bloodbro_state::weststry_map(address_map &map)
 	map(0x128000, 0x1287ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 }
 
-WRITE_LINE_MEMBER(bloodbro_state::weststry_opl_irq_w)
+void bloodbro_state::weststry_opl_irq_w(int state)
 {
 	m_weststry_opl_irq = state;
 	weststry_soundnmi_update();

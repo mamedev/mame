@@ -92,7 +92,7 @@ public:
 	// EEPROM
 	u8 eeprom_r();
 	void eeprom_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(eeprom_cs_write);
+	void eeprom_cs_write(int state);
 
 	// PIC
 	u8 pic_status_r();
@@ -265,7 +265,7 @@ public:
 	// EEPROM
 	u8 eeprom_r();
 	void eeprom_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(eeprom_cs_write);
+	void eeprom_cs_write(int state);
 
 	u8 get_cart() const { return m_cart; }
 
@@ -548,7 +548,7 @@ void galgames_cart_device::eeprom_w(u8 data)
 	m_eeprom->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(galgames_cart_device::eeprom_cs_write)
+void galgames_cart_device::eeprom_cs_write(int state)
 {
 	if (!m_eeprom)
 		return;
@@ -714,7 +714,7 @@ void galgames_slot_device::eeprom_w(u8 data)
 {
 	m_carts[m_cart]->eeprom_w(data);
 }
-WRITE_LINE_MEMBER(galgames_slot_device::eeprom_cs_write)
+void galgames_slot_device::eeprom_cs_write(int state)
 {
 	m_carts[m_cart]->eeprom_cs_write(state);
 }
@@ -742,7 +742,7 @@ public:
 		m_okiram(*this, "okiram")
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER(blitter_irq_callback);
+	void blitter_irq_callback(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_interrupt);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -780,7 +780,7 @@ protected:
 	u8 m_palette_data[3]{};
 };
 
-WRITE_LINE_MEMBER(galgames_state::blitter_irq_callback)
+void galgames_state::blitter_irq_callback(int state)
 {
 //  logerror("%s: Blitter IRQ callback state = %x\n", machine().describe_context(), state);
 	m_maincpu->set_input_line(2, state);

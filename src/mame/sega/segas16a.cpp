@@ -582,7 +582,7 @@ uint8_t segas16a_state::mcu_io_r(address_space &space, offs_t offset)
 //  handler, we hook this to execute it
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(segas16a_state::i8751_main_cpu_vblank_w)
+void segas16a_state::i8751_main_cpu_vblank_w(int state)
 {
 	// if we have a fake 8751 handler, call it on VBLANK
 	if (state && !m_i8751_vblank_hook.isnull())

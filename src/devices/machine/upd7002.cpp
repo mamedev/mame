@@ -63,7 +63,7 @@ void upd7002_device::device_reset()
 *****************************************************************************/
 
 
-READ_LINE_MEMBER( upd7002_device::eoc_r )
+int upd7002_device::eoc_r()
 {
 	return BIT(m_status, 7);
 }

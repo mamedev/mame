@@ -80,8 +80,8 @@ private:
 
 	uint16_t memmap_r();
 	void memmap_w(uint16_t data);
-	DECLARE_WRITE_LINE_MEMBER(adir_w);
-	DECLARE_WRITE_LINE_MEMBER(bdir_w);
+	void adir_w(int state);
+	void bdir_w(int state);
 	void via_a_w(uint8_t data);
 	void via_b_w(uint8_t data);
 	void videosram_store_w(uint8_t data);
@@ -91,9 +91,9 @@ private:
 	uint8_t vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint8_t data);
 	uint8_t video_status_r();
-	DECLARE_WRITE_LINE_MEMBER(dma_hrq_w);
-	DECLARE_WRITE_LINE_MEMBER(crtc_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(crtc_irq_clear_w);
+	void dma_hrq_w(int state);
+	void crtc_irq_w(int state);
+	void crtc_irq_clear_w(int state);
 	uint8_t hdc_r(offs_t offset);
 	void hdc_w(offs_t offset, uint8_t data);
 	uint8_t fdc_r(offs_t offset);
@@ -221,12 +221,12 @@ void wicat_state::machine_reset()
 	m_crtc_irq = false;
 }
 
-WRITE_LINE_MEMBER(wicat_state::adir_w)
+void wicat_state::adir_w(int state)
 {
 	// parallel port A direction (0 = input, 1 = output)
 }
 
-WRITE_LINE_MEMBER(wicat_state::bdir_w)
+void wicat_state::bdir_w(int state)
 {
 	// parallel port B direction (0 = input, 1 = output)
 }
@@ -430,13 +430,13 @@ uint8_t wicat_state::video_status_r()
 	return m_crtc_irq ? 0x04 : 0x00;
 }
 
-WRITE_LINE_MEMBER(wicat_state::dma_hrq_w)
+void wicat_state::dma_hrq_w(int state)
 {
 	m_videocpu->set_input_line(INPUT_LINE_HALT,state ? ASSERT_LINE : CLEAR_LINE);
 	m_videodma->hack_w(state);
 }
 
-WRITE_LINE_MEMBER(wicat_state::crtc_irq_w)
+void wicat_state::crtc_irq_w(int state)
 {
 	if (state && m_videoctrl->q0_r())
 	{
@@ -445,7 +445,7 @@ WRITE_LINE_MEMBER(wicat_state::crtc_irq_w)
 	}
 }
 
-WRITE_LINE_MEMBER(wicat_state::crtc_irq_clear_w)
+void wicat_state::crtc_irq_clear_w(int state)
 {
 	if (!state)
 	{

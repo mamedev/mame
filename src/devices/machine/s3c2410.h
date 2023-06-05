@@ -155,7 +155,7 @@ public:
 	auto nand_data_w_callback() { return m_nand_data_w_cb.bind(); }
 	void set_lcd_flags(int flags) { m_flags = flags; }
 
-	DECLARE_WRITE_LINE_MEMBER( frnb_w );
+	void frnb_w(int state);
 
 	uint32_t s3c24xx_lcd_r(offs_t offset, uint32_t mem_mask = ~0);
 
@@ -335,7 +335,7 @@ protected:
 	uint32_t s3c24xx_nand_r(offs_t offset, uint32_t mem_mask = ~0);
 	void s3c24xx_nand_init_ecc();
 	void s3c24xx_nand_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	[[maybe_unused]] WRITE_LINE_MEMBER( s3c24xx_pin_frnb_w );
+	[[maybe_unused]] void s3c24xx_pin_frnb_w(int state);
 	void s3c24xx_nand_auto_boot();
 	void s3c24xx_device_reset();
 	void s3c24xx_device_start();

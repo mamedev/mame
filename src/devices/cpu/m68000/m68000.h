@@ -120,10 +120,6 @@ protected:
 	static const handler s_handlers_if[];
 	static const handler s_handlers_dp[];
 	static const handler s_handlers_ip[];
-	static const handler s_handlers_dfm[];
-	static const handler s_handlers_ifm[];
-	static const handler s_handlers_dpm[];
-	static const handler s_handlers_ipm[];
 
 	const handler *m_handlers_f;
 	const handler *m_handlers_p;
@@ -148,6 +144,9 @@ protected:
 	// MMU, if one present
 	mmu *m_mmu;
 
+	bool m_disable_spaces;
+	bool m_disable_specifics;
+
 	// Internal processor state, in inverse size order
 
 	u32 m_da[17]; // 8 data, 7 address, usp, ssp in that order
@@ -155,7 +154,7 @@ protected:
 	u32 m_sp;     // 15 or 16, index of currently active sp
 	int m_icount, m_bcount, m_count_before_instruction_step, m_t;
 	u32 m_movems;
-	u16 m_isr, m_sr, m_dbin, m_dbout, m_edb;
+	u16 m_isr, m_sr, m_new_sr, m_dbin, m_dbout, m_edb;
 	u16 m_irc, m_ir, m_ird, m_ftu, m_aluo, m_alue, m_alub, m_movemr, m_irdi;
 	u16 m_base_ssw, m_ssw;
 	u8 m_dcr;
@@ -196,7 +195,7 @@ protected:
 	void end_interrupt_vector_lookup();
 
 	// update needed stuff on priviledge level switch
-	void update_user_super();
+	virtual void update_user_super();
 
 	// update needed stuff on interrupt level switch
 	void update_interrupt();
@@ -926,22 +925,6 @@ protected:
 	inline void sr_xnzvc_u() {
 		m_sr = (m_sr & ~(SR_X|SR_N|SR_V|SR_C) & (m_isr | ~SR_Z)) | (m_isr & (SR_X|SR_N|SR_V|SR_C));
 	}
-};
-
-class m68000_mcu_device : public m68000_device
-{
-protected:
-	m68000_mcu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
-
-	virtual void execute_run() override;
-	void recompute_bcount(uint64_t event_time);
-	static void add_event(uint64_t &event_time, uint64_t new_event);
-	void internal_update();
-
-	virtual void internal_update(uint64_t current_time) = 0;
-	virtual void device_start() override;
-
-	void set_current_interrupt_level(u32 level);
 };
 
 DECLARE_DEVICE_TYPE(M68000, m68000_device)

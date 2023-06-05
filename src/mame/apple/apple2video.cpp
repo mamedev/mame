@@ -100,7 +100,7 @@ void a2_video_device::device_reset()
 	m_monochrome = 0; // TODO: never set, but if left uninitialized could cause the emulation to start in monochrome by accident. Default to color for now
 }
 
-WRITE_LINE_MEMBER(a2_video_device::txt_w)
+void a2_video_device::txt_w(int state)
 {
 	if (m_graphics == state) // avoid flickering from II+ refresh polling
 	{
@@ -110,14 +110,14 @@ WRITE_LINE_MEMBER(a2_video_device::txt_w)
 	}
 }
 
-WRITE_LINE_MEMBER(a2_video_device::mix_w)
+void a2_video_device::mix_w(int state)
 {
 	// select mixed mode or nomix
 	screen().update_now();
 	m_mix = state;
 }
 
-WRITE_LINE_MEMBER(a2_video_device::scr_w)
+void a2_video_device::scr_w(int state)
 {
 	// select primary or secondary page
 	if (!m_80col)
@@ -125,14 +125,14 @@ WRITE_LINE_MEMBER(a2_video_device::scr_w)
 	m_page2 = state;
 }
 
-WRITE_LINE_MEMBER(a2_video_device::res_w)
+void a2_video_device::res_w(int state)
 {
 	// select lo-res or hi-res
 	screen().update_now();
 	m_hires = state;
 }
 
-WRITE_LINE_MEMBER(a2_video_device::dhires_w)
+void a2_video_device::dhires_w(int state)
 {
 	// select double hi-res
 	screen().update_now();
@@ -147,7 +147,7 @@ WRITE_LINE_MEMBER(a2_video_device::dhires_w)
 	m_dhires = !state;
 }
 
-WRITE_LINE_MEMBER(a2_video_device::an2_w)
+void a2_video_device::an2_w(int state)
 {
 	m_an2 = state;
 }

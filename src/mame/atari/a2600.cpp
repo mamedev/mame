@@ -147,7 +147,7 @@ protected:
 	void switch_A_w(uint8_t data);
 	uint8_t switch_A_r();
 	void switch_B_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(irq_callback);
+	void irq_callback(int state);
 	uint16_t a2600_read_input_port(offs_t offset);
 	uint8_t a2600_get_databus_contents(offs_t offset);
 	void a2600_tia_vsync_callback(uint16_t data);
@@ -378,7 +378,7 @@ void a2600_base_state::switch_B_w(uint8_t data)
 {
 }
 
-WRITE_LINE_MEMBER(a2600_base_state::irq_callback)
+void a2600_base_state::irq_callback(int state)
 {
 }
 

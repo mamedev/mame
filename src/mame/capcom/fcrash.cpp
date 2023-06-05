@@ -130,7 +130,7 @@ void fcrash_state::fcrash_snd_bankswitch_w(uint8_t data)
 	membank("bank1")->set_entry(data & 0x07);
 }
 
-WRITE_LINE_MEMBER(fcrash_state::m5205_int1)
+void fcrash_state::m5205_int1(int state)
 {
 	m_msm_1->data_w(m_sample_buffer1 & 0x0f);
 	m_sample_buffer1 >>= 4;
@@ -139,7 +139,7 @@ WRITE_LINE_MEMBER(fcrash_state::m5205_int1)
 		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE_LINE_MEMBER(fcrash_state::m5205_int2)
+void fcrash_state::m5205_int2(int state)
 {
 	m_msm_2->data_w(m_sample_buffer2 & 0x0f);
 	m_sample_buffer2 >>= 4;

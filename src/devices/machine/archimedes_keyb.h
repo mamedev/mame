@@ -27,7 +27,7 @@ public:
 
 	auto kout() { return m_kout.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(kin_w);
+	void kin_w(int state);
 
 protected:
 	// device-level overrides

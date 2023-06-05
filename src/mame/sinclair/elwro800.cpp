@@ -75,7 +75,7 @@ private:
 	INTERRUPT_GEN_MEMBER(elwro800jr_interrupt);
 	uint8_t i8255_port_c_r();
 	void i8255_port_c_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
+	void write_centronics_ack(int state);
 
 	void elwro800_bank1(address_map &map);
 	void elwro800_bank2(address_map &map);
@@ -202,7 +202,7 @@ void elwro800_state::elwro800jr_mmu_w(uint8_t data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(elwro800_state::write_centronics_ack)
+void elwro800_state::write_centronics_ack(int state)
 {
 	m_centronics_ack = state;
 	m_i8255->pc2_w(state);

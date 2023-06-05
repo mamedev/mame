@@ -103,7 +103,7 @@ protected:
 	tilemap_t *m_bg_tilemap = nullptr;
 
 	template <uint8_t Which> void video_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	void data_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 
@@ -359,7 +359,7 @@ uint32_t astrowar_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 // machine
 
-WRITE_LINE_MEMBER(galaxia_state::vblank_irq)
+void galaxia_state::vblank_irq(int state)
 {
 	if (state)
 	{

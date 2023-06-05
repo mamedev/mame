@@ -123,7 +123,7 @@ private:
 	void fg_videoram_w(offs_t offset, uint8_t data);
 	void bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void bgcolor_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(selchar_w);
+	void selchar_w(int state);
 	void bg_scrollx_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void bg_scrolly_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(fg_info);
@@ -434,7 +434,7 @@ void splendor_state::bgcolor_w(offs_t offset, uint8_t data)
 	m_bgcolor = data;
 }
 
-WRITE_LINE_MEMBER(splendor_state::selchar_w)
+void splendor_state::selchar_w(int state)
 {
 	// select active char map
 	m_fg_char_bank = (state == 0) ? 0 : 1;

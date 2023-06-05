@@ -474,7 +474,7 @@ TIMER_CALLBACK_MEMBER(bq48x2_device::rtc_watchdog_cb)
     Indicates that there is an interrupt condition. Also used to drive the
     outgoing line.
 */
-READ_LINE_MEMBER(bq48x2_device::intrq_r)
+int bq48x2_device::intrq_r()
 {
 	bool alarm = (is_set(reg_interrupts, FLAG_AIE) && is_set(reg_flags, FLAG_AF));
 	bool period = (is_set(reg_interrupts, FLAG_PIE) && is_set(reg_flags, FLAG_PF));

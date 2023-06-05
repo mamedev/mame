@@ -226,7 +226,7 @@ void srmp2_state::adpcm_code_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(srmp2_state::adpcm_int)
+void srmp2_state::adpcm_int(int state)
 {
 	if (m_adpcm_sptr)
 	{

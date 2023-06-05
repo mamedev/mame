@@ -89,12 +89,12 @@ TIMER_DEVICE_CALLBACK_MEMBER( ttl166_device::qh_output )
 //  INTERFACE
 //**************************************************************************
 
-WRITE_LINE_MEMBER( ttl166_device::serial_w )
+void ttl166_device::serial_w(int state)
 {
 	m_ser = state;
 }
 
-WRITE_LINE_MEMBER( ttl166_device::clock_w )
+void ttl166_device::clock_w(int state)
 {
 	if (m_clk == 0 && state == 1)
 	{
@@ -117,7 +117,7 @@ WRITE_LINE_MEMBER( ttl166_device::clock_w )
 	m_clk = state;
 }
 
-WRITE_LINE_MEMBER( ttl166_device::shift_load_w )
+void ttl166_device::shift_load_w(int state)
 {
 	m_shld = state;
 }

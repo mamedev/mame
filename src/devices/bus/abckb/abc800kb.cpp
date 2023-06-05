@@ -456,7 +456,7 @@ void abc800_keyboard_device::kb_p2_w(uint8_t data)
 //  kb_t1_r - keyboard T1 timer read
 //-------------------------------------------------
 
-READ_LINE_MEMBER( abc800_keyboard_device::kb_t1_r )
+int abc800_keyboard_device::kb_t1_r()
 {
 	return m_clk;
 }

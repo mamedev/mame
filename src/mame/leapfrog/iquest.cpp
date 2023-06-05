@@ -46,7 +46,7 @@ protected:
 	required_device<generic_slot_device> m_cart;
 	required_device<screen_device> m_screen;
 
-	DECLARE_WRITE_LINE_MEMBER(rx_line_hack);
+	void rx_line_hack(int state);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
@@ -517,7 +517,7 @@ uint32_t leapfrog_iquest_state::screen_update(screen_device &screen, bitmap_rgb3
 }
 
 // doesn't help?
-WRITE_LINE_MEMBER(leapfrog_iquest_state::rx_line_hack)
+void leapfrog_iquest_state::rx_line_hack(int state)
 {
 	if (0)
 	{

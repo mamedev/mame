@@ -289,7 +289,7 @@ void km035_device::device_reset()
 }
 
 
-WRITE_LINE_MEMBER(km035_device::write_rxd)
+void km035_device::write_rxd(int state)
 {
 	LOG("write_rxd %d\n", state);
 	m_maincpu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);

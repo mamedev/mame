@@ -87,8 +87,8 @@ private:
 	void charram_w(offs_t offset, uint16_t data);
 	void dmapg_w(uint8_t data);
 	void p7c_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(tc_w);
-	DECLARE_WRITE_LINE_MEMBER(hrq_w);
+	void tc_w(int state);
+	void hrq_w(int state);
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
 	static void floppy_formats(format_registration &fr);
@@ -168,12 +168,12 @@ void peoplepc_state::p7c_w(uint8_t data)
 	m_crtc->set_hpixels_per_column(BIT(data, 1) ? 16 : 8);
 }
 
-WRITE_LINE_MEMBER(peoplepc_state::tc_w)
+void peoplepc_state::tc_w(int state)
 {
 	m_fdc->tc_w(state);
 }
 
-WRITE_LINE_MEMBER(peoplepc_state::hrq_w)
+void peoplepc_state::hrq_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 	m_dmac->hlda_w(state);

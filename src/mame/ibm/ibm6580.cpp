@@ -234,21 +234,21 @@ private:
 
 	void video_w(offs_t offset, uint8_t data);
 	uint8_t video_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(vblank_w);
+	void vblank_w(int state);
 
 	uint8_t kb_data_r();
 	void led_w(uint8_t data);
 	void ppi_c_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(kb_data_w);
-	DECLARE_WRITE_LINE_MEMBER(kb_clock_w);
-	DECLARE_WRITE_LINE_MEMBER(kb_clock_w_internal);
-	DECLARE_WRITE_LINE_MEMBER(kb_strobe_w);
+	void kb_data_w(int state);
+	void kb_clock_w(int state);
+	void kb_clock_w_internal(int state);
+	void kb_strobe_w(int state);
 
 	void floppy_w(offs_t offset, uint8_t data);
 	uint8_t floppy_r(offs_t offset);
 	static void floppy_formats(format_registration &fr);
-	DECLARE_WRITE_LINE_MEMBER(hrq_w);
+	void hrq_w(int state);
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
 
@@ -445,7 +445,7 @@ uint8_t ibm6580_state::video_r(offs_t offset)
 	return data;
 }
 
-WRITE_LINE_MEMBER(ibm6580_state::vblank_w)
+void ibm6580_state::vblank_w(int state)
 {
 //  if (state)
 //      m_pic8259->ir6_w(state);
@@ -589,21 +589,21 @@ uint8_t ibm6580_state::kb_data_r()
 	return data;
 }
 
-WRITE_LINE_MEMBER(ibm6580_state::kb_data_w)
+void ibm6580_state::kb_data_w(int state)
 {
 	if (!BIT(m_p4a, 0)) return;
 
 	m_kb_data_bit = !state;
 }
 
-WRITE_LINE_MEMBER(ibm6580_state::kb_clock_w)
+void ibm6580_state::kb_clock_w(int state)
 {
 	if (!BIT(m_p4a, 0)) return;
 
 	kb_clock_w_internal(state);
 }
 
-WRITE_LINE_MEMBER(ibm6580_state::kb_clock_w_internal)
+void ibm6580_state::kb_clock_w_internal(int state)
 {
 	if (m_kb_clock == state) return;
 	m_kb_clock = state;
@@ -615,7 +615,7 @@ WRITE_LINE_MEMBER(ibm6580_state::kb_clock_w_internal)
 	}
 }
 
-WRITE_LINE_MEMBER(ibm6580_state::kb_strobe_w)
+void ibm6580_state::kb_strobe_w(int state)
 {
 	if (!BIT(m_p4a, 0)) return;
 
@@ -629,7 +629,7 @@ WRITE_LINE_MEMBER(ibm6580_state::kb_strobe_w)
 	m_ppi8255->pc4_w(m_kb_strobe);
 }
 
-WRITE_LINE_MEMBER(ibm6580_state::hrq_w)
+void ibm6580_state::hrq_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 	m_dma8257->hlda_w(state);

@@ -59,7 +59,7 @@ public:
 
 	uint16_t read_dma();
 	void write_dma(uint16_t data);
-	DECLARE_WRITE_LINE_MEMBER(write_dmack);
+	void write_dmack(int state);
 
 protected:
 	abstract_ata_interface_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -86,15 +86,15 @@ protected:
 	};
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(irq0_write_line);
-	DECLARE_WRITE_LINE_MEMBER(dmarq0_write_line);
-	DECLARE_WRITE_LINE_MEMBER(dasp0_write_line);
-	DECLARE_WRITE_LINE_MEMBER(pdiag0_write_line);
+	void irq0_write_line(int state);
+	void dmarq0_write_line(int state);
+	void dasp0_write_line(int state);
+	void pdiag0_write_line(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(irq1_write_line);
-	DECLARE_WRITE_LINE_MEMBER(dmarq1_write_line);
-	DECLARE_WRITE_LINE_MEMBER(dasp1_write_line);
-	DECLARE_WRITE_LINE_MEMBER(pdiag1_write_line);
+	void irq1_write_line(int state);
+	void dmarq1_write_line(int state);
+	void dasp1_write_line(int state);
+	void pdiag1_write_line(int state);
 
 	required_device_array<ata_slot_device, SLOT_COUNT> m_slot;
 	int m_irq[SLOT_COUNT];

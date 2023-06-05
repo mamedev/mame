@@ -101,7 +101,7 @@ void x76f041_device::device_reset()
 	m_is_password_accepted = false;
 }
 
-WRITE_LINE_MEMBER( x76f041_device::write_cs )
+void x76f041_device::write_cs(int state)
 {
 	if( m_cs != state )
 	{
@@ -125,7 +125,7 @@ WRITE_LINE_MEMBER( x76f041_device::write_cs )
 	m_cs = state;
 }
 
-WRITE_LINE_MEMBER( x76f041_device::write_rst )
+void x76f041_device::write_rst(int state)
 {
 	if( m_rst != state )
 	{
@@ -316,7 +316,7 @@ int x76f041_device::data_offset()
 	return ( block_offset & 0x180 ) | ( ( block_offset + m_byte ) & 0x7f );
 }
 
-WRITE_LINE_MEMBER( x76f041_device::write_scl )
+void x76f041_device::write_scl(int state)
 {
 	if( m_scl != state )
 	{
@@ -650,7 +650,7 @@ WRITE_LINE_MEMBER( x76f041_device::write_scl )
 	m_scl = state;
 }
 
-WRITE_LINE_MEMBER( x76f041_device::write_sda )
+void x76f041_device::write_sda(int state)
 {
 	if( m_sdaw != state )
 	{
@@ -700,7 +700,7 @@ WRITE_LINE_MEMBER( x76f041_device::write_sda )
 	m_sdaw = state;
 }
 
-READ_LINE_MEMBER( x76f041_device::read_sda )
+int x76f041_device::read_sda()
 {
 	if( m_cs != 0 )
 	{

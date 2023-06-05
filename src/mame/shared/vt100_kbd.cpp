@@ -266,7 +266,7 @@ void vt100_keyboard_device::device_start()
 //  signal_line_w - handle external serial input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(vt100_keyboard_device::signal_line_w)
+void vt100_keyboard_device::signal_line_w(int state)
 {
 	if (m_signal_line == bool(state))
 		return;
@@ -312,7 +312,7 @@ WRITE_LINE_MEMBER(vt100_keyboard_device::signal_line_w)
 //  signal_out_w - transmit serial keyboard output
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(vt100_keyboard_device::signal_out_w)
+void vt100_keyboard_device::signal_out_w(int state)
 {
 	m_signal_out_cb(state);
 }
@@ -534,7 +534,7 @@ void ms7002_device::device_start()
 //  keycode is being transmitted
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(ms7002_device::scan_disable_w)
+void ms7002_device::scan_disable_w(int state)
 {
 	if (!state)
 		m_scan_enable = false;

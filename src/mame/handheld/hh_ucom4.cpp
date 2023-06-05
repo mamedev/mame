@@ -3365,7 +3365,7 @@ SYST( 1979, mcompgin, 0,        0,      mcompgin, mcompgin, mcompgin_state, empt
 
 SYST( 1979, mvbfree,  0,        0,      mvbfree,  mvbfree,  mvbfree_state,  empty_init, "Mego", "Mini-Vid: Break Free", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1980, grobot9,  0,        0,      grobot9,  grobot9,  grobot9_state,  empty_init, "Takatoku Toys", "Game Robot 9", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
+SYST( 1980, grobot9,  0,        0,      grobot9,  grobot9,  grobot9_state,  empty_init, "Takatoku Toys", "Game Robot 9", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the games: ***
 
 SYST( 1980, tccombat, 0,        0,      tccombat, tccombat, tccombat_state, empty_init, "Tomy", "Cosmic Combat", MACHINE_SUPPORTS_SAVE )
 SYST( 1980, tmtennis, 0,        0,      tmtennis, tmtennis, tmtennis_state, empty_init, "Tomy", "Tennis (Tomy)", MACHINE_SUPPORTS_SAVE )

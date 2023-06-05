@@ -18,7 +18,7 @@ public:
 
 	template <typename T> std::optional<T> read(u32 virtual_address, bool supervisor);
 	template <typename T> bool write(u32 virtual_address, T data, bool supervisor);
-	WRITE_LINE_MEMBER(bus_error_w) { if (!machine().side_effects_disabled()) m_bus_error = true; }
+	void bus_error_w(int state) { if (!machine().side_effects_disabled()) m_bus_error = true; }
 
 protected:
 	virtual void device_start() override;

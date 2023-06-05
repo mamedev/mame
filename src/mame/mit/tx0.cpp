@@ -636,6 +636,8 @@ std::pair<std::error_condition, std::string> tx0_punchtape_image_device::call_lo
 	if (m_tx0)
 		m_tx0->m_tape_puncher.fd = this;
 
+	fseek(0, SEEK_END);
+
 	return std::make_pair(std::error_condition(), std::string());
 }
 
@@ -659,7 +661,7 @@ TIMER_CALLBACK_MEMBER(tx0_state::puncher_callback)
 /*
     Initiate read of a 6-bit word from tape
 */
-WRITE_LINE_MEMBER( tx0_state::tx0_io_r1l )
+void tx0_state::tx0_io_r1l(int state)
 {
 	begin_tape_read( 0);
 }
@@ -667,7 +669,7 @@ WRITE_LINE_MEMBER( tx0_state::tx0_io_r1l )
 /*
     Initiate read of a 18-bit word from tape (used in read-in mode)
 */
-WRITE_LINE_MEMBER( tx0_state::tx0_io_r3l )
+void tx0_state::tx0_io_r3l(int state)
 {
 	begin_tape_read(1);
 }
@@ -675,7 +677,7 @@ WRITE_LINE_MEMBER( tx0_state::tx0_io_r3l )
 /*
     Write a 7-bit word to tape (7th bit clear)
 */
-WRITE_LINE_MEMBER( tx0_state::tx0_io_p6h )
+void tx0_state::tx0_io_p6h(int state)
 {
 	int ac;
 
@@ -690,7 +692,7 @@ WRITE_LINE_MEMBER( tx0_state::tx0_io_p6h )
 /*
     Write a 7-bit word to tape (7th bit set)
 */
-WRITE_LINE_MEMBER( tx0_state::tx0_io_p7h )
+void tx0_state::tx0_io_p7h(int state)
 {
 	int ac;
 
@@ -718,6 +720,8 @@ std::pair<std::error_condition, std::string> tx0_printer_image_device::call_load
 	/* open file */
 	if (m_tx0)
 		m_tx0->m_typewriter.fd = this;
+
+	fseek(0, SEEK_END);
 
 	return std::make_pair(std::error_condition(), std::string());
 }
@@ -749,7 +753,7 @@ TIMER_CALLBACK_MEMBER(tx0_state::prt_callback)
 /*
     prt io callback
 */
-WRITE_LINE_MEMBER( tx0_state::tx0_io_prt )
+void tx0_state::tx0_io_prt(int state)
 {
 	int ac;
 	int ch;
@@ -775,7 +779,7 @@ TIMER_CALLBACK_MEMBER(tx0_state::dis_callback)
 /*
     Plot one point on crt
 */
-WRITE_LINE_MEMBER( tx0_state::tx0_io_dis )
+void tx0_state::tx0_io_dis(int state)
 {
 	int ac;
 	int x;
@@ -1335,7 +1339,7 @@ void tx0_state::magtape_callback()
 	}
 }
 
-WRITE_LINE_MEMBER( tx0_state::tx0_sel )
+void tx0_state::tx0_sel(int state)
 {
 	m_magtape.sel_pending = true;
 
@@ -1347,7 +1351,7 @@ WRITE_LINE_MEMBER( tx0_state::tx0_sel )
 	}
 }
 
-WRITE_LINE_MEMBER( tx0_state::tx0_io_cpy )
+void tx0_state::tx0_io_cpy(int state)
 {
 	switch (m_magtape.state)
 	{
@@ -1381,7 +1385,7 @@ WRITE_LINE_MEMBER( tx0_state::tx0_io_cpy )
 
     IO devices should reset
 */
-WRITE_LINE_MEMBER( tx0_state::tx0_io_reset_callback )
+void tx0_state::tx0_io_reset_callback(int state)
 {
 	m_tape_reader.rcl = m_tape_reader.rc = 0;
 	if (m_tape_reader.timer)
