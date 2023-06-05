@@ -117,7 +117,7 @@ vga_device::vga_device(const machine_config &mconfig, device_type type, const ch
 	, vga(*this)
 	, m_input_sense(*this, "VGA_SENSE")
 {
-	//m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(vga_device::crtc_map), this));
+	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(vga_device::crtc_map), this));
 	m_gc_space_config = address_space_config("gc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(vga_device::gc_map), this));
 	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(vga_device::sequencer_map), this));
 	m_atc_space_config = address_space_config("attribute_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(vga_device::attribute_map), this));
@@ -131,7 +131,6 @@ vga_device::vga_device(const machine_config &mconfig, const char *tag, device_t 
 // zero everything, keep vtbls
 void vga_device::zero()
 {
-	vga.svga_intf.crtc_regcount = 0;
 	memset(vga.pens, 0, sizeof(vga.pens));
 	vga.miscellaneous_output = 0;
 	vga.feature_control = 0;
@@ -146,7 +145,7 @@ void vga_device::zero()
 device_memory_interface::space_config_vector vga_device::memory_space_config() const
 {
 	return space_config_vector {
-		//std::make_pair(CRTC_REG, &m_crtc_space_config),
+		std::make_pair(CRTC_REG, &m_crtc_space_config),
 		std::make_pair(GC_REG, &m_gc_space_config),
 		std::make_pair(SEQ_REG, &m_seq_space_config),
 		std::make_pair(ATC_REG, &m_atc_space_config)
@@ -164,8 +163,6 @@ void vga_device::device_start()
 	vga.crtc.maximum_scan_line = 1;
 
 	// copy over interfaces
-	vga.svga_intf.crtc_regcount = 0x19;
-
 	vga.memory = std::make_unique<uint8_t []>(vga.svga_intf.vram_size);
 	memset(&vga.memory[0], 0, vga.svga_intf.vram_size);
 	save_pointer(NAME(vga.memory), vga.svga_intf.vram_size);
@@ -663,121 +660,6 @@ uint8_t vga_device::vga_latch_write(int offs, uint8_t data)
 	return res;
 }
 
-uint8_t vga_device::crtc_reg_read(uint8_t index)
-{
-	uint8_t res;
-
-	res = 0xff;
-
-	switch(index)
-	{
-		case 0x00:
-			res  = vga.crtc.horz_total & 0xff;
-			break;
-		case 0x01:
-			res  = vga.crtc.horz_disp_end & 0xff;
-			break;
-		case 0x02:
-			res  = vga.crtc.horz_blank_start & 0xff;
-			break;
-		case 0x03:
-			res  = vga.crtc.horz_blank_end & 0x1f;
-			res |= (vga.crtc.disp_enable_skew & 3) << 5;
-			res |= (vga.crtc.evra & 1) << 7;
-			break;
-		case 0x04:
-			res  = vga.crtc.horz_retrace_start & 0xff;
-			break;
-		case 0x05:
-			res  = (vga.crtc.horz_blank_end & 0x20) << 2;
-			res |= (vga.crtc.horz_retrace_skew & 3) << 5;
-			res |= (vga.crtc.horz_retrace_end & 0x1f);
-			break;
-		case 0x06:
-			res  = vga.crtc.vert_total & 0xff;
-			break;
-		case 0x07: // Overflow Register
-			res  = (vga.crtc.line_compare & 0x100) >> 4;
-			res |= (vga.crtc.vert_retrace_start & 0x200) >> 2;
-			res |= (vga.crtc.vert_disp_end & 0x200) >> 3;
-			res |= (vga.crtc.vert_total & 0x200) >> 4;
-			res |= (vga.crtc.vert_blank_start & 0x100) >> 5;
-			res |= (vga.crtc.vert_retrace_start & 0x100) >> 6;
-			res |= (vga.crtc.vert_disp_end & 0x100) >> 7;
-			res |= (vga.crtc.vert_total & 0x100) >> 8;
-			break;
-		case 0x08: // Preset Row Scan Register
-			res  = (vga.crtc.byte_panning & 3) << 5;
-			res |= (vga.crtc.preset_row_scan & 0x1f);
-			break;
-		case 0x09: // Maximum Scan Line Register
-			res  = (vga.crtc.maximum_scan_line - 1) & 0x1f;
-			res |= (vga.crtc.scan_doubling & 1) << 7;
-			res |= (vga.crtc.line_compare & 0x200) >> 3;
-			res |= (vga.crtc.vert_blank_start & 0x200) >> 4;
-			break;
-		case 0x0a:
-			res  = (vga.crtc.cursor_scan_start & 0x1f);
-			res |= ((vga.crtc.cursor_enable & 1) ^ 1) << 5;
-			break;
-		case 0x0b:
-			res  = (vga.crtc.cursor_skew & 3) << 5;
-			res |= (vga.crtc.cursor_scan_end & 0x1f);
-			break;
-		case 0x0c:
-		case 0x0d:
-			res  = (vga.crtc.start_addr_latch >> ((index & 1) ^ 1)*8) & 0xff;
-			break;
-		case 0x0e:
-		case 0x0f:
-			res  = (vga.crtc.cursor_addr >> ((index & 1) ^ 1)*8) & 0xff;
-			break;
-		case 0x10:
-			res  = vga.crtc.vert_retrace_start & 0xff;
-			break;
-		case 0x11:
-			res  = (vga.crtc.protect_enable & 1) << 7;
-			res |= (vga.crtc.bandwidth & 1) << 6;
-			res |= (vga.crtc.vert_retrace_end & 0xf);
-			res |= (vga.crtc.irq_clear & 1)  << 4;
-			res |= (vga.crtc.irq_disable & 1) << 5;
-			break;
-		case 0x12:
-			res  = vga.crtc.vert_disp_end & 0xff;
-			break;
-		case 0x13:
-			res  = vga.crtc.offset & 0xff;
-			break;
-		case 0x14:
-			res  = (vga.crtc.dw & 1) << 6;
-			res |= (vga.crtc.div4 & 1) << 5;
-			res |= (vga.crtc.underline_loc & 0x1f);
-			break;
-		case 0x15:
-			res  = vga.crtc.vert_blank_start & 0xff;
-			break;
-		case 0x16:
-			res  = vga.crtc.vert_blank_end & 0x7f;
-			break;
-		case 0x17:
-			res  = (vga.crtc.sync_en & 1) << 7;
-			res |= (vga.crtc.word_mode & 1) << 6;
-			res |= (vga.crtc.aw & 1) << 5;
-			res |= (vga.crtc.div2 & 1) << 3;
-			res |= (vga.crtc.sldiv & 1) << 2;
-			res |= (vga.crtc.map14 & 1) << 1;
-			res |= (vga.crtc.map13 & 1) << 0;
-			break;
-		case 0x18:
-			res = vga.crtc.line_compare & 0xff;
-			break;
-		default:
-			printf("Unhandled CRTC reg r %02x\n",index);
-			break;
-	}
-	return res;
-}
-
 void vga_device::recompute_params_clock(int divisor, int xtal)
 {
 	int vblank_period,hblank_period;
@@ -809,157 +691,6 @@ void vga_device::recompute_params()
 		LOGWARN("Warning: VGA external clock latch selected\n");
 	else
 		recompute_params_clock(1, ((vga.miscellaneous_output & 0xc) ? XTAL(28'636'363) : XTAL(25'174'800)).value());
-}
-
-void vga_device::crtc_reg_write(uint8_t index, uint8_t data)
-{
-	/* Doom does this */
-//  if(vga.crtc.protect_enable && index <= 0x07)
-//      printf("write to protected address %02x\n",index);
-	switch(index)
-	{
-		case 0x00:
-			if(vga.crtc.protect_enable)
-				break;
-			vga.crtc.horz_total = (vga.crtc.horz_total & ~0xff) | (data & 0xff);
-			recompute_params();
-			break;
-		case 0x01:
-			if(vga.crtc.protect_enable)
-				break;
-			vga.crtc.horz_disp_end = (data & 0xff);
-			recompute_params();
-			break;
-		case 0x02:
-			if(vga.crtc.protect_enable)
-				break;
-			vga.crtc.horz_blank_start = (data & 0xff);
-			break;
-		case 0x03:
-			if(vga.crtc.protect_enable)
-				break;
-			vga.crtc.horz_blank_end &= ~0x1f;
-			vga.crtc.horz_blank_end |= data & 0x1f;
-			vga.crtc.disp_enable_skew = (data & 0x60) >> 5;
-			vga.crtc.evra = (data & 0x80) >> 7;
-			break;
-		case 0x04:
-			if(vga.crtc.protect_enable)
-				break;
-			vga.crtc.horz_retrace_start = data & 0xff;
-			break;
-		case 0x05:
-			if(vga.crtc.protect_enable)
-				break;
-			vga.crtc.horz_blank_end &= ~0x20;
-			vga.crtc.horz_blank_end |= ((data & 0x80) >> 2);
-			vga.crtc.horz_retrace_skew = ((data & 0x60) >> 5);
-			vga.crtc.horz_retrace_end = data & 0x1f;
-			break;
-		case 0x06:
-			if(vga.crtc.protect_enable)
-				break;
-			vga.crtc.vert_total &= ~0xff;
-			vga.crtc.vert_total |= data & 0xff;
-			recompute_params();
-			break;
-		case 0x07: // Overflow Register
-			vga.crtc.line_compare       &= ~0x100;
-			vga.crtc.line_compare       |= ((data & 0x10) << (8-4));
-			if(vga.crtc.protect_enable)
-				break;
-			vga.crtc.vert_total         &= ~0x300;
-			vga.crtc.vert_retrace_start &= ~0x300;
-			vga.crtc.vert_disp_end      &= ~0x300;
-			vga.crtc.vert_blank_start   &= ~0x100;
-			vga.crtc.vert_retrace_start |= ((data & 0x80) << (9-7));
-			vga.crtc.vert_disp_end      |= ((data & 0x40) << (9-6));
-			vga.crtc.vert_total         |= ((data & 0x20) << (9-5));
-			vga.crtc.vert_blank_start   |= ((data & 0x08) << (8-3));
-			vga.crtc.vert_retrace_start |= ((data & 0x04) << (8-2));
-			vga.crtc.vert_disp_end      |= ((data & 0x02) << (8-1));
-			vga.crtc.vert_total         |= ((data & 0x01) << (8-0));
-			recompute_params();
-			break;
-		case 0x08: // Preset Row Scan Register
-			vga.crtc.byte_panning = (data & 0x60) >> 5;
-			vga.crtc.preset_row_scan = (data & 0x1f);
-			break;
-		case 0x09: // Maximum Scan Line Register
-			vga.crtc.line_compare      &= ~0x200;
-			vga.crtc.vert_blank_start  &= ~0x200;
-			vga.crtc.scan_doubling      = ((data & 0x80) >> 7);
-			vga.crtc.line_compare      |= ((data & 0x40) << (9-6));
-			vga.crtc.vert_blank_start  |= ((data & 0x20) << (9-5));
-			vga.crtc.maximum_scan_line  = (data & 0x1f) + 1;
-			break;
-		case 0x0a:
-			vga.crtc.cursor_enable = ((data & 0x20) ^ 0x20) >> 5;
-			vga.crtc.cursor_scan_start = data & 0x1f;
-			break;
-		case 0x0b:
-			vga.crtc.cursor_skew = (data & 0x60) >> 5;
-			vga.crtc.cursor_scan_end = data & 0x1f;
-			break;
-		case 0x0c:
-		case 0x0d:
-			vga.crtc.start_addr_latch &= ~(0xff << (((index & 1)^1) * 8));
-			vga.crtc.start_addr_latch |= (data << (((index & 1)^1) * 8));
-			break;
-		case 0x0e:
-		case 0x0f:
-			vga.crtc.cursor_addr &= ~(0xff << (((index & 1)^1) * 8));
-			vga.crtc.cursor_addr |= (data << (((index & 1)^1) * 8));
-			break;
-		case 0x10:
-			vga.crtc.vert_retrace_start &= ~0xff;
-			vga.crtc.vert_retrace_start |= data & 0xff;
-			break;
-		case 0x11:
-			vga.crtc.protect_enable = (data & 0x80) >> 7;
-			vga.crtc.bandwidth = (data & 0x40) >> 6;
-			vga.crtc.vert_retrace_end = data & 0x0f;
-			vga.crtc.irq_clear = (data & 0x10) >> 4;
-			vga.crtc.irq_disable = (data & 0x20) >> 5;
-			break;
-		case 0x12:
-			vga.crtc.vert_disp_end &= ~0xff;
-			vga.crtc.vert_disp_end |= data & 0xff;
-			recompute_params();
-			break;
-		case 0x13:
-			vga.crtc.offset &= ~0xff;
-			vga.crtc.offset |= data & 0xff;
-			break;
-		case 0x14:
-			vga.crtc.dw = (data & 0x40) >> 6;
-			vga.crtc.div4 = (data & 0x20) >> 5;
-			vga.crtc.underline_loc = (data & 0x1f);
-			break;
-		case 0x15:
-			vga.crtc.vert_blank_start &= ~0xff;
-			vga.crtc.vert_blank_start |= data & 0xff;
-			break;
-		case 0x16:
-			vga.crtc.vert_blank_end = data & 0x7f;
-			break;
-		case 0x17:
-			vga.crtc.sync_en = (data & 0x80) >> 7;
-			vga.crtc.word_mode = (data & 0x40) >> 6;
-			vga.crtc.aw = (data & 0x20) >> 5;
-			vga.crtc.div2 = (data & 0x08) >> 3;
-			vga.crtc.sldiv = (data & 0x04) >> 2;
-			vga.crtc.map14 = (data & 0x02) >> 1;
-			vga.crtc.map13 = (data & 0x01) >> 0;
-			break;
-		case 0x18:
-			vga.crtc.line_compare &= ~0xff;
-			vga.crtc.line_compare |= data & 0xff;
-			break;
-		default:
-			LOG( "Unhandled CRTC reg w %02x %02x\n",index,data);
-			break;
-	}
 }
 
 uint8_t vga_device::vga_vblank()
@@ -1000,7 +731,7 @@ uint8_t vga_device::vga_crtc_r(offs_t offset)
 		data = vga.crtc.index;
 		break;
 	case 5:
-		data = crtc_reg_read(vga.crtc.index);
+		data = space(CRTC_REG).read_byte(vga.crtc.index);
 		break;
 	case 0xa:
 		uint8_t hsync,vsync;
@@ -1050,17 +781,8 @@ void vga_device::vga_crtc_w(offs_t offset, uint8_t data)
 			break;
 
 		case 5:
-			LOGREGS("vga_crtc_w(): CRTC[0x%02X%s] = 0x%02X\n",
-				vga.crtc.index,
-				(vga.crtc.index < vga.svga_intf.crtc_regcount) ? "" : "?",
-				data);
-
-			crtc_reg_write(vga.crtc.index,data);
+			space(CRTC_REG).write_byte(vga.crtc.index, data);
 			//screen().update_partial(screen().vpos());
-			#if 0
-			if((vga.crtc.index & 0xfe) != 0x0e)
-				printf("%02x %02x %d\n",vga.crtc.index,data,screen().vpos());
-			#endif
 			break;
 
 		case 0xa:
@@ -1075,6 +797,315 @@ uint8_t vga_device::port_03b0_r(offs_t offset)
 	if (get_crtc_port() == 0x3b0)
 		data = vga_crtc_r(offset);
 	return data;
+}
+
+void vga_device::crtc_map(address_map &map)
+{
+	map(0x00, 0x00).lrw8(
+		NAME([this](offs_t offset) {
+			return vga.crtc.horz_total & 0xff;
+		}),
+		NAME([this](offs_t offset, u8 data) {
+			// doom (DOS) tries to write to protected regs
+			if(vga.crtc.protect_enable)
+				return;
+			vga.crtc.horz_total = (vga.crtc.horz_total & ~0xff) | (data & 0xff);
+			recompute_params();
+		})
+	);
+	map(0x01, 0x01).lrw8(
+		NAME([this](offs_t offset) {
+			return vga.crtc.horz_disp_end & 0xff;
+		}),
+		NAME([this](offs_t offset, u8 data) {
+			if(vga.crtc.protect_enable)
+				return;
+			vga.crtc.horz_disp_end = (data & 0xff);
+			recompute_params();
+		})
+	);
+	map(0x02, 0x02).lrw8(
+		NAME([this](offs_t offset) {
+			return vga.crtc.horz_blank_start & 0xff;
+		}),
+		NAME([this](offs_t offset, u8 data) {
+			if(vga.crtc.protect_enable)
+				return;
+			vga.crtc.horz_blank_start = (data & 0xff);
+		})
+	);
+	map(0x03, 0x03).lrw8(
+		NAME([this](offs_t offset) {
+			u8 res = vga.crtc.horz_blank_end & 0x1f;
+			res   |= (vga.crtc.disp_enable_skew & 3) << 5;
+			res   |= (vga.crtc.evra & 1) << 7;
+			return res;
+		}),
+		NAME([this](offs_t offset, u8 data) {
+			if(vga.crtc.protect_enable)
+				return;
+			vga.crtc.horz_blank_end &= ~0x1f;
+			vga.crtc.horz_blank_end |= data & 0x1f;
+			vga.crtc.disp_enable_skew = (data & 0x60) >> 5;
+			vga.crtc.evra = BIT(data, 7);
+		})
+	);
+	map(0x04, 0x04).lrw8(
+		NAME([this](offs_t offset) {
+			return vga.crtc.horz_retrace_start & 0xff;
+		}),
+		NAME([this](offs_t offset, u8 data) {
+			if(vga.crtc.protect_enable)
+				return;
+			vga.crtc.horz_retrace_start = data & 0xff;
+		})
+	);
+	map(0x05, 0x05).lrw8(
+		NAME([this](offs_t offset) {
+			u8 res = (vga.crtc.horz_blank_end & 0x20) << 2;
+			res   |= (vga.crtc.horz_retrace_skew & 3) << 5;
+			res   |= (vga.crtc.horz_retrace_end & 0x1f);
+			return res;
+		}),
+		NAME([this](offs_t offset, u8 data) {
+			if(vga.crtc.protect_enable)
+				return;
+			vga.crtc.horz_blank_end &= ~0x20;
+			vga.crtc.horz_blank_end |= ((data & 0x80) >> 2);
+			vga.crtc.horz_retrace_skew = ((data & 0x60) >> 5);
+			vga.crtc.horz_retrace_end = data & 0x1f;
+		})
+	);
+	map(0x06, 0x06).lrw8(
+		NAME([this](offs_t offset) {
+			return vga.crtc.vert_total & 0xff;
+		}),
+		NAME([this](offs_t offset, u8 data) {
+			if(vga.crtc.protect_enable)
+				return;
+			vga.crtc.vert_total &= ~0xff;
+			vga.crtc.vert_total |= data & 0xff;
+			recompute_params();
+		})
+	);
+	// Overflow Register
+	map(0x07, 0x07).lrw8(
+		NAME([this](offs_t offset) {
+			u8 res  = (vga.crtc.line_compare & 0x100) >> 4;
+			res    |= (vga.crtc.vert_retrace_start & 0x200) >> 2;
+			res    |= (vga.crtc.vert_disp_end & 0x200) >> 3;
+			res    |= (vga.crtc.vert_total & 0x200) >> 4;
+			res    |= (vga.crtc.vert_blank_start & 0x100) >> 5;
+			res    |= (vga.crtc.vert_retrace_start & 0x100) >> 6;
+			res    |= (vga.crtc.vert_disp_end & 0x100) >> 7;
+			res    |= (vga.crtc.vert_total & 0x100) >> 8;
+			return res;
+		}),
+		NAME([this](offs_t offset, u8 data) {
+			vga.crtc.line_compare       &= ~0x100;
+			vga.crtc.line_compare       |= ((data & 0x10) << (8-4));
+			if(vga.crtc.protect_enable)
+				return;
+			vga.crtc.vert_total         &= ~0x300;
+			vga.crtc.vert_retrace_start &= ~0x300;
+			vga.crtc.vert_disp_end      &= ~0x300;
+			vga.crtc.vert_blank_start   &= ~0x100;
+			vga.crtc.vert_retrace_start |= ((data & 0x80) << (9-7));
+			vga.crtc.vert_disp_end      |= ((data & 0x40) << (9-6));
+			vga.crtc.vert_total         |= ((data & 0x20) << (9-5));
+			vga.crtc.vert_blank_start   |= ((data & 0x08) << (8-3));
+			vga.crtc.vert_retrace_start |= ((data & 0x04) << (8-2));
+			vga.crtc.vert_disp_end      |= ((data & 0x02) << (8-1));
+			vga.crtc.vert_total         |= ((data & 0x01) << (8-0));
+			recompute_params();
+		})
+	);
+	// Preset Row Scan Register
+	map(0x08, 0x08).lrw8(
+		NAME([this](offs_t offset) {
+			u8 res = (vga.crtc.byte_panning & 3) << 5;
+			res |= (vga.crtc.preset_row_scan & 0x1f);
+			return res;
+		}),
+		NAME([this](offs_t offset, u8 data) {
+			vga.crtc.byte_panning = (data & 0x60) >> 5;
+			vga.crtc.preset_row_scan = (data & 0x1f);
+		})
+	);
+	// Maximum Scan Line Register
+	map(0x09, 0x09).lrw8(
+		NAME([this](offs_t offset) {
+			u8 res  = (vga.crtc.maximum_scan_line - 1) & 0x1f;
+			res    |= (vga.crtc.scan_doubling & 1) << 7;
+			res    |= (vga.crtc.line_compare & 0x200) >> 3;
+			res    |= (vga.crtc.vert_blank_start & 0x200) >> 4;
+			return res;
+		}),
+		NAME([this](offs_t offset, u8 data) {
+			vga.crtc.line_compare      &= ~0x200;
+			vga.crtc.vert_blank_start  &= ~0x200;
+			vga.crtc.scan_doubling      = ((data & 0x80) >> 7);
+			vga.crtc.line_compare      |= ((data & 0x40) << (9-6));
+			vga.crtc.vert_blank_start  |= ((data & 0x20) << (9-5));
+			vga.crtc.maximum_scan_line  = (data & 0x1f) + 1;
+		})
+	);
+	map(0x0a, 0x0a).lrw8(
+		NAME([this](offs_t offset) {
+			u8 res  = (vga.crtc.cursor_scan_start & 0x1f);
+			res    |= ((vga.crtc.cursor_enable & 1) ^ 1) << 5;
+			return res;
+		}),
+		NAME([this](offs_t offset, u8 data) {
+			vga.crtc.cursor_enable = ((data & 0x20) ^ 0x20) >> 5;
+			vga.crtc.cursor_scan_start = data & 0x1f;
+		})
+	);
+	map(0x0b, 0x0b).lrw8(
+		NAME([this](offs_t offset) {
+			u8 res  = (vga.crtc.cursor_skew & 3) << 5;
+			res    |= (vga.crtc.cursor_scan_end & 0x1f);
+			return res;
+		}),
+		NAME([this](offs_t offset, u8 data) {
+			vga.crtc.cursor_skew = (data & 0x60) >> 5;
+			vga.crtc.cursor_scan_end = data & 0x1f;
+		})
+	);
+	map(0x0c, 0x0d).lrw8(
+		NAME([this](offs_t offset) {
+			return (vga.crtc.start_addr_latch >> ((offset & 1) ^ 1) * 8) & 0xff;
+		}),
+		NAME([this](offs_t offset, u8 data) {
+			vga.crtc.start_addr_latch &= ~(0xff << (((offset & 1) ^ 1) * 8));
+			vga.crtc.start_addr_latch |= (data << (((offset & 1) ^ 1) * 8));
+		})
+	);
+	map(0x0e, 0x0f).lrw8(
+		NAME([this](offs_t offset) {
+			return (vga.crtc.cursor_addr >> ((offset & 1) ^ 1)*8) & 0xff;
+		}),
+		NAME([this](offs_t offset, u8 data) {
+			vga.crtc.cursor_addr &= ~(0xff << (((offset & 1) ^ 1) * 8));
+			vga.crtc.cursor_addr |= (data << (((offset & 1) ^ 1) * 8));
+		})
+	);
+	map(0x10, 0x10).lrw8(
+		NAME([this](offs_t offset) {
+			return vga.crtc.vert_retrace_start & 0xff;
+		}),
+		NAME([this](offs_t offset, u8 data) {
+			vga.crtc.vert_retrace_start &= ~0xff;
+			vga.crtc.vert_retrace_start |= data & 0xff;
+		})
+	);
+	map(0x11, 0x11).lrw8(
+		NAME([this](offs_t offset) {
+			u8 res  = (vga.crtc.protect_enable & 1) << 7;
+			res    |= (vga.crtc.bandwidth & 1) << 6;
+			res    |= (vga.crtc.vert_retrace_end & 0xf);
+			res    |= (vga.crtc.irq_clear & 1)  << 4;
+			res    |= (vga.crtc.irq_disable & 1) << 5;
+			return res;
+		}),
+		NAME([this](offs_t offset, u8 data) {
+			vga.crtc.protect_enable = (data & 0x80) >> 7;
+			vga.crtc.bandwidth = (data & 0x40) >> 6;
+			vga.crtc.vert_retrace_end = data & 0x0f;
+			vga.crtc.irq_clear = (data & 0x10) >> 4;
+			vga.crtc.irq_disable = (data & 0x20) >> 5;
+		})
+	);
+	map(0x12, 0x12).lrw8(
+		NAME([this](offs_t offset) {
+			return vga.crtc.vert_disp_end & 0xff;
+		}),
+		NAME([this](offs_t offset, u8 data) {
+			vga.crtc.vert_disp_end &= ~0xff;
+			vga.crtc.vert_disp_end |= data & 0xff;
+			recompute_params();
+		})
+	);
+	map(0x13, 0x13).lrw8(
+		NAME([this](offs_t offset) {
+			return vga.crtc.offset & 0xff;
+		}),
+		NAME([this](offs_t offset, u8 data) {
+			vga.crtc.offset &= ~0xff;
+			vga.crtc.offset |= data & 0xff;
+		})
+	);
+	map(0x14, 0x14).lrw8(
+		NAME([this](offs_t offset) {
+			u8 res  = (vga.crtc.dw & 1) << 6;
+			res    |= (vga.crtc.div4 & 1) << 5;
+			res    |= (vga.crtc.underline_loc & 0x1f);
+			return res;
+		}),
+		NAME([this](offs_t offset, u8 data) {
+			vga.crtc.dw = (data & 0x40) >> 6;
+			vga.crtc.div4 = (data & 0x20) >> 5;
+			vga.crtc.underline_loc = (data & 0x1f);
+		})
+	);
+	map(0x15, 0x15).lrw8(
+		NAME([this](offs_t offset) {
+			return vga.crtc.vert_blank_start & 0xff;
+		}),
+		NAME([this](offs_t offset, u8 data) {
+			vga.crtc.vert_blank_start &= ~0xff;
+			vga.crtc.vert_blank_start |= data & 0xff;
+		})
+	);
+	map(0x16, 0x16).lrw8(
+		NAME([this](offs_t offset) {
+			return vga.crtc.vert_blank_end & 0x7f;
+		}),
+		NAME([this](offs_t offset, u8 data) {
+			vga.crtc.vert_blank_end = data & 0x7f;
+		})
+	);
+	map(0x17, 0x17).lrw8(
+		NAME([this](offs_t offset) {
+			u8 res  = (vga.crtc.sync_en & 1) << 7;
+			res    |= (vga.crtc.word_mode & 1) << 6;
+			res    |= (vga.crtc.aw & 1) << 5;
+			res    |= (vga.crtc.div2 & 1) << 3;
+			res    |= (vga.crtc.sldiv & 1) << 2;
+			res    |= (vga.crtc.map14 & 1) << 1;
+			res    |= (vga.crtc.map13 & 1) << 0;
+			return res;
+		}),
+		NAME([this](offs_t offset, u8 data) {
+			vga.crtc.sync_en = BIT(data, 7);
+			vga.crtc.word_mode = BIT(data, 6);
+			vga.crtc.aw = BIT(data, 5);
+			vga.crtc.div2 = BIT(data, 3);
+			vga.crtc.sldiv = BIT(data, 2);
+			vga.crtc.map14 = BIT(data, 1);
+			vga.crtc.map13 = BIT(data, 0);
+		})
+	);
+	map(0x18, 0x18).lrw8(
+		NAME([this](offs_t offset) {
+			return vga.crtc.line_compare & 0xff;
+		}),
+		NAME([this](offs_t offset, u8 data) {
+			vga.crtc.line_compare &= ~0xff;
+			vga.crtc.line_compare |= data & 0xff;
+		})
+	);
+	// TODO: (undocumented) CR22 Memory Data Latch Register (read only)
+	// map(0x22, 0x22).lr8(
+	// (undocumented) CR24 Attribute Controller Toggle Register (read only)
+		// 0--- ---- index
+		// 1--- ---- data
+	map(0x24, 0x24).lr8(
+		NAME([this](offs_t offset) {
+			LOG("CR24 read undocumented Attribute reg\n");
+			return vga.attribute.state << 7;
+		})
+	);
 }
 
 void vga_device::gc_map(address_map &map)
@@ -1179,7 +1210,8 @@ void vga_device::sequencer_map(address_map &map)
 	map(0x00, 0xff).lr8(
 		NAME([this] (offs_t offset) {
 			const u8 res = vga.sequencer.data[offset];
-			LOG("Reading unmapped sequencer read register [%02x] -> %02x (SVGA?)\n", offset, res);
+			if (!machine().side_effects_disabled())
+				LOG("Reading unmapped sequencer read register [%02x] -> %02x (SVGA?)\n", offset, res);
 			return res;
 		})
 	);
@@ -1200,7 +1232,11 @@ void vga_device::sequencer_map(address_map &map)
 				popmessage("Char SEL checker, contact MAMEdev (%02x %02x)\n",vga.sequencer.char_sel.A,vga.sequencer.char_sel.B);
 		})
 	);
-//	map(0x04, 0x04) Sequencer Memory Mode Register
+	// Sequencer Memory Mode Register
+//	map(0x04, 0x04)
+	// (undocumented) Sequencer Horizontal Character Counter Reset
+	// Any write strobe to this register will lock the character generator until another write to other regs happens.
+//	map(0x07, 0x07)
 }
 
 /*

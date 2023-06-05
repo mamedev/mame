@@ -47,6 +47,7 @@ DEFINE_DEVICE_TYPE(TVGA9000_VGA, tvga9000_device, "tvga9000_vga", "Trident TVGA9
 trident_vga_device::trident_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: svga_device(mconfig, type, tag, owner, clock)
 {
+	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(trident_vga_device::crtc_map), this));
 	m_gc_space_config = address_space_config("gc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(trident_vga_device::gc_map), this));
 	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(trident_vga_device::sequencer_map), this));
 }
@@ -61,6 +62,407 @@ tvga9000_device::tvga9000_device(const machine_config &mconfig, const char *tag,
 	: trident_vga_device(mconfig, TVGA9000_VGA, tag, owner, clock)
 {
 	m_version = 0x43;
+}
+
+void trident_vga_device::crtc_map(address_map &map)
+{
+	svga_device::crtc_map(map);
+	// Module Testing Register
+	map(0x1e, 0x1e).lrw8(
+		NAME([this] (offs_t offset) {
+			return tri.cr1e;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			tri.cr1e = data;
+			vga.crtc.start_addr = (vga.crtc.start_addr & 0xfffeffff) | ((data & 0x20)<<11);
+			recompute_params();
+		})
+	);
+	// "Software Programming Register"  written to by the BIOS
+	map(0x1f, 0x1f).lrw8(
+		NAME([this] (offs_t offset) {
+			return tri.cr1f;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			tri.cr1f = data;
+		})
+	);
+	// FIFO Control (old MMIO enable? no documentation of this register)
+	map(0x20, 0x20).lrw8(
+		NAME([this] (offs_t offset) {
+			return tri.cr20;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			tri.cr20 = data;
+		})
+	);
+	// Linear aperture
+	map(0x21, 0x21).lrw8(
+		NAME([this] (offs_t offset) {
+			return tri.cr21;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			tri.cr21 = data;
+			tri.linear_address = ((data & 0xc0)<<18) | ((data & 0x0f)<<20);
+			tri.linear_active = data & 0x20;
+			if(tri.linear_active)
+				popmessage("Trident: Linear Aperture active - %08x, %s",tri.linear_address,(tri.cr21 & 0x10) ? "2MB" : "1MB" );
+		})
+	);
+	map(0x27, 0x27).lrw8(
+		NAME([this] (offs_t offset) {
+			return (vga.crtc.start_addr & 0x60000) >> 17;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			vga.crtc.start_addr = (vga.crtc.start_addr & 0xfff9ffff) | ((data & 0x03)<<17);
+		})
+	);
+	map(0x29, 0x29).lrw8(
+		NAME([this] (offs_t offset) {
+			return tri.cr29;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			tri.cr29 = data;
+			vga.crtc.offset = (vga.crtc.offset & 0xfeff) | ((data & 0x10)<<4);
+		})
+	);
+	map(0x2a, 0x2a).lrw8(
+		NAME([this] (offs_t offset) {
+			return tri.cr2a;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			tri.cr2a = data;
+		})
+	);
+	map(0x38, 0x38).lrw8(
+		NAME([this] (offs_t offset) {
+			return tri.pixel_depth;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			// bit 0: 16 bit bus
+			// bits 2-3: pixel depth (1=15/16bit, 2=24/32bit, 0=anything else)
+			// bit 5: packed mode
+			tri.pixel_depth = data;
+			recompute_params();
+		})
+	);
+	map(0x39, 0x39).lrw8(
+		NAME([this] (offs_t offset) {
+			return tri.cr39;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			tri.cr39 = data;
+			tri.mmio_active = data & 0x01;
+			if(tri.mmio_active)
+				popmessage("Trident: MMIO activated");
+		})
+	);
+	map(0x40, 0x40).lrw8(
+		NAME([this] (offs_t offset) {
+			return (tri.cursor_x & 0x00ff);
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			tri.cursor_x = (tri.cursor_x & 0xff00) | data;
+		})
+	);
+	map(0x41, 0x41).lrw8(
+		NAME([this] (offs_t offset) {
+			return (tri.cursor_x & 0xff00) >> 8;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			tri.cursor_x = (tri.cursor_x & 0x00ff) | (data << 8);
+		})
+	);
+	map(0x42, 0x42).lrw8(
+		NAME([this] (offs_t offset) {
+			return (tri.cursor_y & 0x00ff);
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			tri.cursor_y = (tri.cursor_y & 0xff00) | data;
+		})
+	);
+	map(0x43, 0x43).lrw8(
+		NAME([this] (offs_t offset) {
+			return (tri.cursor_y & 0xff00) >> 8;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			tri.cursor_y = (tri.cursor_y & 0x00ff) | (data << 8);
+		})
+	);
+	map(0x44, 0x44).lrw8(
+		NAME([this] (offs_t offset) {
+			return (tri.cursor_loc & 0x00ff);
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			tri.cursor_loc = (tri.cursor_loc & 0xff00) | data;
+		})
+	);
+	map(0x45, 0x45).lrw8(
+		NAME([this] (offs_t offset) {
+			return (tri.cursor_loc & 0xff00) >> 8;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			tri.cursor_loc = (tri.cursor_loc & 0x00ff) | (data << 8);
+		})
+	);
+	map(0x46, 0x46).lrw8(
+		NAME([this] (offs_t offset) {
+			return tri.cursor_x_off;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			tri.cursor_x_off = data;
+		})
+	);
+	map(0x47, 0x47).lrw8(
+		NAME([this] (offs_t offset) {
+			return tri.cursor_y_off;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			tri.cursor_y_off = data;
+		})
+	);
+	map(0x48, 0x48).lrw8(
+		NAME([this] (offs_t offset) {
+			return (tri.cursor_fg & 0x000000ff);
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			tri.cursor_fg = (tri.cursor_fg & 0xffffff00) | data;
+		})
+	);
+	map(0x49, 0x49).lrw8(
+		NAME([this] (offs_t offset) {
+			return (tri.cursor_fg & 0x0000ff00) >> 8;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			tri.cursor_fg = (tri.cursor_fg & 0xffff00ff) | (data << 8);
+		})
+	);
+	map(0x4a, 0x4a).lrw8(
+		NAME([this] (offs_t offset) {
+			return (tri.cursor_fg & 0x00ff0000) >> 16;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			tri.cursor_fg = (tri.cursor_fg & 0xff00ffff) | (data << 16);
+		})
+	);
+	map(0x4b, 0x4b).lrw8(
+		NAME([this] (offs_t offset) {
+			return (tri.cursor_fg & 0xff000000) >> 24;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			tri.cursor_fg = (tri.cursor_fg & 0x00ffffff) | (data << 24);
+		})
+	);
+	map(0x4c, 0x4c).lrw8(
+		NAME([this] (offs_t offset) {
+			return (tri.cursor_bg & 0x000000ff);
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			tri.cursor_bg = (tri.cursor_bg & 0xffffff00) | data;
+		})
+	);
+	map(0x4d, 0x4d).lrw8(
+		NAME([this] (offs_t offset) {
+			return (tri.cursor_bg & 0x0000ff00) >> 8;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			tri.cursor_bg = (tri.cursor_bg & 0xffff00ff) | (data << 8);
+		})
+	);
+	map(0x4e, 0x4e).lrw8(
+		NAME([this] (offs_t offset) {
+			return (tri.cursor_bg & 0x00ff0000) >> 16;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			tri.cursor_bg = (tri.cursor_bg & 0xff00ffff) | (data << 16);
+		})
+	);
+	map(0x4f, 0x4f).lrw8(
+		NAME([this] (offs_t offset) {
+			return (tri.cursor_bg & 0xff000000) >> 24;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			tri.cursor_bg = (tri.cursor_bg & 0x00ffffff) | (data << 24);
+		})
+	);
+	map(0x50, 0x50).lrw8(
+		NAME([this] (offs_t offset) {
+			return tri.cursor_ctrl;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			tri.cursor_ctrl = data;
+		})
+	);
+}
+
+void trident_vga_device::gc_map(address_map &map)
+{
+	svga_device::gc_map(map);
+	// New Source Address Register (bit 1 is inverted here, also)
+	map(0x0e, 0x0e).lrw8(
+		NAME([this] (offs_t offset) { 
+			return tri.gc0e;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			tri.gc0e = data ^ 0x02;
+			if(!(tri.gc0f & 0x04))  // if bank regs at 0x3d8/9 are not enabled
+			{
+				if(tri.gc0f & 0x01)  // if bank regs are separated
+					svga.bank_r = (data & 0x1f) ^ 0x02;
+			}
+		})
+	);
+	map(0x0f, 0x0f).lrw8(
+		NAME([this] (offs_t offset) { 
+			return tri.gc0f;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			tri.gc0f = data;
+			recompute_params();
+		})
+	);
+	// XFree86 refers to this register as "MiscIntContReg", setting bit 2, but gives no indication as to what it does
+	map(0x2f, 0x2f).lrw8(
+		NAME([this] (offs_t offset) { 
+			return tri.gc2f;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			tri.gc2f = data;
+		})
+	);
+}
+
+void trident_vga_device::sequencer_map(address_map &map)
+{
+	svga_device::sequencer_map(map);
+	map(0x09, 0x09).lr8(
+		NAME([this] (offs_t offset) {
+			return tri.revision;
+		})
+	);
+	map(0x0b, 0x0b).lrw8(
+		NAME([this] (offs_t offset) {
+			if (!machine().side_effects_disabled())
+				tri.new_mode = true;
+			return svga.id;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			tri.new_mode = false;
+		})
+	);
+	// Power Up Mode register 1
+	map(0x0c, 0x0c).lrw8(
+		NAME([this] (offs_t offset) {
+			u8 res = tri.sr0c & 0xef;
+			if(tri.port_3c3)
+				res |= 0x10;
+			return res;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			// ---1 ---- 'post port at 0x3c3'
+			// ---0 ---- 'post port at 0x46e8'
+			tri.port_3c3 = bool(BIT(data, 4));
+			tri.sr0c = data;
+		})
+	);
+	// Mode Control 2
+	map(0x0d, 0x0d).lrw8(
+		NAME([this] (offs_t offset) {
+			return (tri.new_mode) ? tri.sr0d_new : tri.sr0d_old;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			if(tri.new_mode)
+			{
+				tri.sr0d_new = data;
+				tri.clock = ((vga.miscellaneous_output & 0x0c) >> 2) | ((data & 0x01) << 2) | ((data & 0x40) >> 3);
+				recompute_params();
+			}
+			else
+				tri.sr0d_old = data;
+		})
+	);
+	// Mode Control 1
+	map(0x0e, 0x0e).lrw8(
+		NAME([this] (offs_t offset) {
+			return (tri.new_mode) ? tri.sr0e_new : tri.sr0e_old;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			if(tri.new_mode)
+			{
+				tri.sr0e_new = data ^ 0x02;
+				svga.bank_w = (data & 0x3f) ^ 0x02;  // bit 1 is inverted, used for card detection, it is not XORed on reading
+				if(!(tri.gc0f & 0x01))
+					svga.bank_r = (data & 0x3f) ^ 0x02;
+				// TODO: handle planar modes, where bits 0 and 2 only are used
+			}
+			else
+			{
+				tri.sr0e_old = data;
+				svga.bank_w = data & 0x0e;
+				if(!(tri.gc0f & 0x01))
+					svga.bank_r = data & 0x0e;
+			}
+		})
+	);
+	// Power Up Mode 2
+	map(0x0f, 0x0f).lrw8(
+		NAME([this] (offs_t offset) {
+			return tri.sr0f;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			tri.sr0f = data;
+		})
+	);
+}
+
+void trident_vga_device::device_start()
+{
+	zero();
+
+	for (int i = 0; i < 0x100; i++)
+		set_pen_color(i, 0, 0, 0);
+
+	// Avoid an infinite loop when displaying.  0 is not possible anyway.
+	vga.crtc.maximum_scan_line = 1;
+
+
+	// copy over interfaces
+	vga.memory = std::make_unique<uint8_t []>(vga.svga_intf.vram_size);
+	memset(&vga.memory[0], 0, vga.svga_intf.vram_size);
+
+	save_pointer(NAME(vga.memory), vga.svga_intf.vram_size);
+	save_pointer(vga.crtc.data,"CRTC Registers",0x100);
+	save_pointer(vga.sequencer.data,"Sequencer Registers",0x100);
+	save_pointer(vga.attribute.data,"Attribute Registers", 0x15);
+	save_pointer(tri.accel_pattern,"Pattern Data", 0x80);
+	save_pointer(tri.lutdac_reg,"LUTDAC registers", 0x100);
+
+	m_vblank_timer = timer_alloc(FUNC(vga_device::vblank_timer_cb), this);
+	svga.ignore_chain4 = true;
+	memset(&tri, 0, sizeof(tri));
+}
+
+void trident_vga_device::device_reset()
+{
+	svga_device::device_reset();
+	svga.id = m_version;
+	tri.revision = 0x01;  // revision identifies as TGUI9680
+	tri.new_mode = false;  // start up in old mode
+	tri.dac_active = false;
+	tri.linear_active = false;
+	tri.mmio_active = false;
+	tri.sr0f = 0x6f;
+	tri.sr0c = 0x70;
+	tri.cr2a = 0x03;  // set ISA interface?
+	tri.mem_clock = 0x2c6;  // 50MHz default
+	tri.vid_clock = 0;
+	tri.port_3c3 = true;
+	tri.accel_busy = false;
+	tri.accel_memwrite_active = false;
+	// Windows 3.1 TGUI9440AGi drivers do not set the pointer colour registers?
+	tri.cursor_bg = 0x00000000;
+	tri.cursor_fg = 0xffffffff;
+	tri.pixel_depth = 0x10;  //disable 8bpp mode by default
 }
 
 uint8_t trident_vga_device::READPIXEL8(int16_t x, int16_t y)
@@ -176,58 +578,6 @@ void trident_vga_device::WRITEPIXEL(int16_t x,int16_t y, uint32_t data)
 		WRITEPIXEL16(x,y,data & 0xffff);
 	if(svga.rgb32_en)
 		WRITEPIXEL32(x,y,data);
-}
-
-
-void trident_vga_device::device_start()
-{
-	zero();
-
-	for (int i = 0; i < 0x100; i++)
-		set_pen_color(i, 0, 0, 0);
-
-	// Avoid an infinite loop when displaying.  0 is not possible anyway.
-	vga.crtc.maximum_scan_line = 1;
-
-
-	// copy over interfaces
-	vga.memory = std::make_unique<uint8_t []>(vga.svga_intf.vram_size);
-	memset(&vga.memory[0], 0, vga.svga_intf.vram_size);
-
-	save_pointer(NAME(vga.memory), vga.svga_intf.vram_size);
-	save_pointer(vga.crtc.data,"CRTC Registers",0x100);
-	save_pointer(vga.sequencer.data,"Sequencer Registers",0x100);
-	save_pointer(vga.attribute.data,"Attribute Registers", 0x15);
-	save_pointer(tri.accel_pattern,"Pattern Data", 0x80);
-	save_pointer(tri.lutdac_reg,"LUTDAC registers", 0x100);
-
-	m_vblank_timer = timer_alloc(FUNC(vga_device::vblank_timer_cb), this);
-	vga.svga_intf.crtc_regcount = 0x60;
-	svga.ignore_chain4 = true;
-	memset(&tri, 0, sizeof(tri));
-}
-
-void trident_vga_device::device_reset()
-{
-	svga_device::device_reset();
-	svga.id = m_version;
-	tri.revision = 0x01;  // revision identifies as TGUI9680
-	tri.new_mode = false;  // start up in old mode
-	tri.dac_active = false;
-	tri.linear_active = false;
-	tri.mmio_active = false;
-	tri.sr0f = 0x6f;
-	tri.sr0c = 0x70;
-	tri.cr2a = 0x03;  // set ISA interface?
-	tri.mem_clock = 0x2c6;  // 50MHz default
-	tri.vid_clock = 0;
-	tri.port_3c3 = true;
-	tri.accel_busy = false;
-	tri.accel_memwrite_active = false;
-	// Windows 3.1 TGUI9440AGi drivers do not set the pointer colour registers?
-	tri.cursor_bg = 0x00000000;
-	tri.cursor_fg = 0xffffffff;
-	tri.pixel_depth = 0x10;  //disable 8bpp mode by default
 }
 
 uint32_t trident_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -350,7 +700,7 @@ int trident_vga_device::calculate_clock()
 	return freq * 1000000;
 }
 
-void trident_vga_device::trident_define_video_mode()
+void trident_vga_device::recompute_params()
 {
 	int divisor = 1;
 	int xtal;
@@ -417,341 +767,6 @@ void trident_vga_device::trident_define_video_mode()
 	recompute_params_clock(divisor, xtal);
 }
 
-void trident_vga_device::sequencer_map(address_map &map)
-{
-	svga_device::sequencer_map(map);
-	map(0x09, 0x09).lr8(
-		NAME([this] (offs_t offset) {
-			return tri.revision;
-		})
-	);
-	map(0x0b, 0x0b).lrw8(
-		NAME([this] (offs_t offset) {
-			if (!machine().side_effects_disabled())
-				tri.new_mode = true;
-			return svga.id;
-		}),
-		NAME([this] (offs_t offset, u8 data) {
-			tri.new_mode = false;
-		})
-	);
-	// Power Up Mode register 1
-	map(0x0c, 0x0c).lrw8(
-		NAME([this] (offs_t offset) {
-			u8 res = tri.sr0c & 0xef;
-			if(tri.port_3c3)
-				res |= 0x10;
-			return res;
-		}),
-		NAME([this] (offs_t offset, u8 data) {
-			// ---1 ---- 'post port at 0x3c3'
-			// ---0 ---- 'post port at 0x46e8'
-			tri.port_3c3 = bool(BIT(data, 4));
-			tri.sr0c = data;
-		})
-	);
-	// Mode Control 2
-	map(0x0d, 0x0d).lrw8(
-		NAME([this] (offs_t offset) {
-			return (tri.new_mode) ? tri.sr0d_new : tri.sr0d_old;
-		}),
-		NAME([this] (offs_t offset, u8 data) {
-			if(tri.new_mode)
-			{
-				tri.sr0d_new = data;
-				tri.clock = ((vga.miscellaneous_output & 0x0c) >> 2) | ((data & 0x01) << 2) | ((data & 0x40) >> 3);
-				trident_define_video_mode();
-			}
-			else
-				tri.sr0d_old = data;
-		})
-	);
-	// Mode Control 1
-	map(0x0e, 0x0e).lrw8(
-		NAME([this] (offs_t offset) {
-			return (tri.new_mode) ? tri.sr0e_new : tri.sr0e_old;
-		}),
-		NAME([this] (offs_t offset, u8 data) {
-			if(tri.new_mode)
-			{
-				tri.sr0e_new = data ^ 0x02;
-				svga.bank_w = (data & 0x3f) ^ 0x02;  // bit 1 is inverted, used for card detection, it is not XORed on reading
-				if(!(tri.gc0f & 0x01))
-					svga.bank_r = (data & 0x3f) ^ 0x02;
-				// TODO: handle planar modes, where bits 0 and 2 only are used
-			}
-			else
-			{
-				tri.sr0e_old = data;
-				svga.bank_w = data & 0x0e;
-				if(!(tri.gc0f & 0x01))
-					svga.bank_r = data & 0x0e;
-			}
-		})
-	);
-	// Power Up Mode 2
-	map(0x0f, 0x0f).lrw8(
-		NAME([this] (offs_t offset) {
-			return tri.sr0f;
-		}),
-		NAME([this] (offs_t offset, u8 data) {
-			tri.sr0f = data;
-		})
-	);
-}
-
-uint8_t trident_vga_device::crtc_reg_read(uint8_t index)
-{
-	uint8_t res = 0;
-
-	if(index <= 0x18)
-		res = svga_device::crtc_reg_read(index);
-	else
-	{
-		switch(index)
-		{
-		case 0x1e:
-			res = tri.cr1e;
-			break;
-		case 0x1f:
-			res = tri.cr1f;
-			break;
-		case 0x20:
-			res = tri.cr20;
-			break;
-		case 0x21:
-			res = tri.cr21;
-			break;
-		case 0x24:
-			if(vga.attribute.state != 0)
-				res |= 0x80;
-			break;
-		case 0x26:
-			res = vga.attribute.index;
-			break;
-		case 0x27:
-			res = (vga.crtc.start_addr & 0x60000) >> 17;
-			break;
-		case 0x29:
-			res = tri.cr29;
-			break;
-		case 0x2a:
-			res = tri.cr2a;
-			break;
-		case 0x38:
-			res = tri.pixel_depth;
-			break;
-		case 0x39:
-			res = tri.cr39;
-			break;
-		case 0x40:
-			res = (tri.cursor_x & 0x00ff);
-			break;
-		case 0x41:
-			res = (tri.cursor_x & 0xff00) >> 8;
-			break;
-		case 0x42:
-			res = (tri.cursor_y & 0x00ff);
-			break;
-		case 0x43:
-			res = (tri.cursor_y & 0xff00) >> 8;
-			break;
-		case 0x44:
-			res = (tri.cursor_loc & 0x00ff);
-			break;
-		case 0x45:
-			res = (tri.cursor_loc & 0xff00) >> 8;
-			break;
-		case 0x46:
-			res = tri.cursor_x_off;
-			break;
-		case 0x47:
-			res = tri.cursor_y_off;
-			break;
-		case 0x48:
-			res = (tri.cursor_fg & 0x000000ff);
-			break;
-		case 0x49:
-			res = (tri.cursor_fg & 0x0000ff00) >> 8;
-			break;
-		case 0x4a:
-			res = (tri.cursor_fg & 0x00ff0000) >> 16;
-			break;
-		case 0x4b:
-			res = (tri.cursor_fg & 0xff000000) >> 24;
-			break;
-		case 0x4c:
-			res = (tri.cursor_bg & 0x000000ff);
-			break;
-		case 0x4d:
-			res = (tri.cursor_bg & 0x0000ff00) >> 8;
-			break;
-		case 0x4e:
-			res = (tri.cursor_bg & 0x00ff0000) >> 16;
-			break;
-		case 0x4f:
-			res = (tri.cursor_bg & 0xff000000) >> 24;
-			break;
-		case 0x50:
-			res = tri.cursor_ctrl;
-			break;
-		default:
-			res = vga.crtc.data[index];
-			LOGWARN("Trident: CRTC index %02x read\n",index);
-			break;
-		}
-	}
-	LOG("Trident CR%02X: read %02x\n",index,res);
-	return res;
-}
-void trident_vga_device::crtc_reg_write(uint8_t index, uint8_t data)
-{
-	if(index <= 0x18)
-	{
-		svga_device::crtc_reg_write(index,data);
-		trident_define_video_mode();
-	}
-	else
-	{
-		switch(index)
-		{
-		case 0x1e:  // Module Testing Register
-			tri.cr1e = data;
-			vga.crtc.start_addr = (vga.crtc.start_addr & 0xfffeffff) | ((data & 0x20)<<11);
-			trident_define_video_mode();
-			break;
-		case 0x1f:
-			tri.cr1f = data;  // "Software Programming Register"  written to by the BIOS
-			break;
-		case 0x20:  // FIFO Control (old MMIO enable? no documentation of this register)
-			tri.cr20 = data;
-			break;
-		case 0x21:  // Linear aperture
-			tri.cr21 = data;
-			tri.linear_address = ((data & 0xc0)<<18) | ((data & 0x0f)<<20);
-			tri.linear_active = data & 0x20;
-			if(tri.linear_active)
-				popmessage("Trident: Linear Aperture active - %08x, %s",tri.linear_address,(tri.cr21 & 0x10) ? "2MB" : "1MB" );
-			break;
-		case 0x27:
-			vga.crtc.start_addr = (vga.crtc.start_addr & 0xfff9ffff) | ((data & 0x03)<<17);
-			break;
-		case 0x29:
-			tri.cr29 = data;
-			vga.crtc.offset = (vga.crtc.offset & 0xfeff) | ((data & 0x10)<<4);
-			break;
-		case 0x2a:
-			tri.cr2a = data;
-			break;
-		case 0x38:
-			// bit 0: 16 bit bus
-			// bits 2-3: pixel depth (1=15/16bit, 2=24/32bit, 0=anything else)
-			// bit 5: packed mode
-			tri.pixel_depth = data;
-			trident_define_video_mode();
-			break;
-		case 0x39:
-			tri.cr39 = data;
-			tri.mmio_active = data & 0x01;
-			if(tri.mmio_active)
-				popmessage("Trident: MMIO activated");
-			break;
-		case 0x40:
-			tri.cursor_x = (tri.cursor_x & 0xff00) | data;
-			break;
-		case 0x41:
-			tri.cursor_x = (tri.cursor_x & 0x00ff) | (data << 8);
-			break;
-		case 0x42:
-			tri.cursor_y = (tri.cursor_y & 0xff00) | data;
-			break;
-		case 0x43:
-			tri.cursor_y = (tri.cursor_y & 0x00ff) | (data << 8);
-			break;
-		case 0x44:
-			tri.cursor_loc = (tri.cursor_loc & 0xff00) | data;
-			break;
-		case 0x45:
-			tri.cursor_loc = (tri.cursor_loc & 0x00ff) | (data << 8);
-			break;
-		case 0x46:
-			tri.cursor_x_off = data;
-			break;
-		case 0x47:
-			tri.cursor_y_off = data;
-			break;
-		case 0x48:
-			tri.cursor_fg = (tri.cursor_fg & 0xffffff00) | data;
-			break;
-		case 0x49:
-			tri.cursor_fg = (tri.cursor_fg & 0xffff00ff) | (data << 8);
-			break;
-		case 0x4a:
-			tri.cursor_fg = (tri.cursor_fg & 0xff00ffff) | (data << 16);
-			break;
-		case 0x4b:
-			tri.cursor_fg = (tri.cursor_fg & 0x00ffffff) | (data << 24);
-			break;
-		case 0x4c:
-			tri.cursor_bg = (tri.cursor_bg & 0xffffff00) | data;
-			break;
-		case 0x4d:
-			tri.cursor_bg = (tri.cursor_bg & 0xffff00ff) | (data << 8);
-			break;
-		case 0x4e:
-			tri.cursor_bg = (tri.cursor_bg & 0xff00ffff) | (data << 16);
-			break;
-		case 0x4f:
-			tri.cursor_bg = (tri.cursor_bg & 0x00ffffff) | (data << 24);
-			break;
-		case 0x50:
-			tri.cursor_ctrl = data;
-			break;
-		default:
-			LOGWARN("Trident: 3D4 index %02x write %02x\n",index,data);
-			break;
-		}
-	}
-	LOG("Trident CR%02X: write %02x\n",index,data);
-}
-
-void trident_vga_device::gc_map(address_map &map)
-{
-	svga_device::gc_map(map);
-	// New Source Address Register (bit 1 is inverted here, also)
-	map(0x0e, 0x0e).lrw8(
-		NAME([this] (offs_t offset) { 
-			return tri.gc0e;
-		}),
-		NAME([this] (offs_t offset, u8 data) {
-			tri.gc0e = data ^ 0x02;
-			if(!(tri.gc0f & 0x04))  // if bank regs at 0x3d8/9 are not enabled
-			{
-				if(tri.gc0f & 0x01)  // if bank regs are separated
-					svga.bank_r = (data & 0x1f) ^ 0x02;
-			}
-		})
-	);
-	map(0x0f, 0x0f).lrw8(
-		NAME([this] (offs_t offset) { 
-			return tri.gc0f;
-		}),
-		NAME([this] (offs_t offset, u8 data) {
-			tri.gc0f = data;
-			trident_define_video_mode();
-		})
-	);
-	// XFree86 refers to this register as "MiscIntContReg", setting bit 2, but gives no indication as to what it does
-	map(0x2f, 0x2f).lrw8(
-		NAME([this] (offs_t offset) { 
-			return tri.gc2f;
-		}),
-		NAME([this] (offs_t offset, u8 data) {
-			tri.gc2f = data;
-		})
-	);
-}
-
 uint8_t trident_vga_device::port_03c0_r(offs_t offset)
 {
 	uint8_t res;
@@ -792,7 +807,7 @@ void trident_vga_device::port_03c0_w(offs_t offset, uint8_t data)
 				tri.dac = data;  // DAC command register
 				tri.dac_active = false;
 				tri.dac_count = 0;
-				trident_define_video_mode();
+				recompute_params();
 			}
 			else
 				vga_device::port_03c0_w(offset,data);
@@ -819,9 +834,6 @@ uint8_t trident_vga_device::port_03d0_r(offs_t offset)
 	{
 		switch(offset)
 		{
-			case 5:
-				res = trident_vga_device::crtc_reg_read(vga.crtc.index);
-				break;
 			case 8:
 				if(tri.gc0f & 0x04)  // if enabled
 				{
@@ -857,10 +869,6 @@ void trident_vga_device::port_03d0_w(offs_t offset, uint8_t data)
 	{
 		switch(offset)
 		{
-			case 5:
-				vga.crtc.data[vga.crtc.index] = data;
-				trident_vga_device::crtc_reg_write(vga.crtc.index,data);
-				break;
 			case 8:
 				if(tri.gc0f & 0x04)  // if enabled
 				{
@@ -1587,7 +1595,7 @@ void trident_vga_device::accel_data_write(uint32_t data)
 
 // tvga9000 CRTC override
 // not extensively tested, just enough for pntnpuzl to not throw a 168 Hz refresh rate.
-void tvga9000_device::trident_define_video_mode()
+void tvga9000_device::recompute_params()
 {
 	int divisor = 1;
 	int xtal;

@@ -22,13 +22,13 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual uint8_t crtc_reg_read(uint8_t index) override;
-	virtual void crtc_reg_write(uint8_t index, uint8_t data) override;
+
+	virtual void crtc_map(address_map &map) override;
 	virtual void sequencer_map(address_map &map) override;
+
 	virtual uint16_t offset() override;
 	virtual void recompute_params() override;
 
-	u8 m_crtc_ext_regs[0x100]{};
 	u8 m_ramdac_mode = 0;
 	u8 m_ext_misc_ctrl_0 = 0;
 	u8 m_ext_vert_overflow = 0;

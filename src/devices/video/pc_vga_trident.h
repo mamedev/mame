@@ -43,10 +43,12 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual uint8_t crtc_reg_read(uint8_t index) override;
-	virtual void crtc_reg_write(uint8_t index, uint8_t data) override;
+	virtual void crtc_map(address_map &map) override;
 	virtual void sequencer_map(address_map &map) override;
 	virtual void gc_map(address_map &map) override;
+
+	virtual void recompute_params() override;
+
 
 	// TODO: remove this leaky abstraction
 	struct
@@ -123,7 +125,6 @@ protected:
 	} tri;
 	uint8_t m_version;
 private:
-	virtual void trident_define_video_mode();
 
 	int calculate_clock();
 
@@ -162,7 +163,8 @@ public:
 
 	tvga9000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void trident_define_video_mode() override;
+protected:
+	virtual void recompute_params() override;
 };
 
 // device type definition

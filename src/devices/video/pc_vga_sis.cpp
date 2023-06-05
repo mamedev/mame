@@ -26,6 +26,7 @@ DEFINE_DEVICE_TYPE(SIS630_SVGA, sis630_svga_device, "sis630_svga", "SiS 630 SVGA
 sis630_svga_device::sis630_svga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: svga_device(mconfig, SIS630_SVGA, tag, owner, clock)
 {
+	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(sis630_svga_device::crtc_map), this));
 	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(sis630_svga_device::sequencer_map), this));
 }
 
@@ -38,7 +39,6 @@ void sis630_svga_device::device_start()
 	vga.crtc.maximum_scan_line = 1;
 
 	// copy over interfaces
-	vga.svga_intf.crtc_regcount = 0x27;
 	vga.svga_intf.vram_size = 64*1024*1024;
 	//vga.memory = std::make_unique<uint8_t []>(vga.svga_intf.vram_size);
 }
@@ -53,33 +53,39 @@ void sis630_svga_device::device_reset()
 }
 
 // Page 144
-uint8_t sis630_svga_device::crtc_reg_read(uint8_t index)
+void sis630_svga_device::crtc_map(address_map &map)
 {
-	if (index < 0x19)
-		return svga_device::crtc_reg_read(index);
-
-	// make sure '301 CRT2 is not enabled
-	if (index == 0x30)
-		return 0;
-
-	if (index == 0x31)
-		return 0x60;
-
-	if (index == 0x32)
-		return 0x20;
-
-	// TODO: if one of these is 0xff then it enables a single port transfer to $b8000
-	return m_crtc_ext_regs[index];
-}
-
-void sis630_svga_device::crtc_reg_write(uint8_t index, uint8_t data)
-{
-	if (index < 0x19)
-		svga_device::crtc_reg_write(index, data);
-	else
-	{
-		m_crtc_ext_regs[index] = data;
-	}
+	svga_device::crtc_map(map);
+	// CR19/CR1A Extended Signature Read-Back 0/1
+	// CR1B CRT horizontal counter (r/o)
+	// CR1C CRT vertical counter (r/o)
+	// CR1D CRT overflow counter (r/o)
+	// CR1E Extended Signature Read-Back 2
+	// CR26 Attribute Controller Index read-back
+	// TODO: is this an undocumented VGA or a SiS extension?
+	map(0x26, 0x26).lr8(
+		NAME([this] (offs_t offset) { return vga.attribute.index; })
+	);
+	// TODO: very preliminary, undocumented stuff
+	map(0x30, 0xff).lrw8(
+		NAME([this] (offs_t offset) { 
+			return vga.crtc.data[offset]; 
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			// TODO: if one of these is 0xff then it enables a single port transfer to $b8000
+			vga.crtc.data[offset] = data;
+		})
+	);
+	// make sure '301 CRT2 is not enabled for now
+	map(0x30, 0x30).lr8(
+		NAME([] (offs_t offset) { return 0; })
+	);
+	map(0x31, 0x31).lr8(
+		NAME([] (offs_t offset) { return 0x60; })
+	);
+	map(0x32, 0x32).lr8(
+		NAME([] (offs_t offset) { return 0x20; })
+	);
 }
 
 void sis630_svga_device::sequencer_map(address_map &map)
@@ -91,7 +97,7 @@ void sis630_svga_device::sequencer_map(address_map &map)
 			return m_unlock_reg ? 0xa1 : 0x21;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			// TODO: reimplement me thru memory_view
+			// TODO: reimplement me thru memory_view or direct handler override
 			m_unlock_reg = (data == 0x86);
 			LOG("Unlock register write %02x (%s)\n", data, m_unlock_reg ? "unlocked" : "locked");
 		})

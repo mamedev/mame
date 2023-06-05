@@ -24,6 +24,7 @@ DEFINE_DEVICE_TYPE(TSENG_VGA,  tseng_vga_device,  "tseng_vga",  "Tseng Labs ET40
 tseng_vga_device::tseng_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: svga_device(mconfig, TSENG_VGA, tag, owner, clock)
 {
+	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(tseng_vga_device::crtc_map), this));
 	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(tseng_vga_device::sequencer_map), this));
 	m_atc_space_config = address_space_config("attribute_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(tseng_vga_device::attribute_map), this));
 }
@@ -101,52 +102,26 @@ void tseng_vga_device::tseng_define_video_mode()
 	recompute_params_clock(divisor, xtal);
 }
 
-uint8_t tseng_vga_device::crtc_reg_read(uint8_t index)
+void tseng_vga_device::crtc_map(address_map &map)
 {
-	uint8_t res;
-
-	if(index <= 0x18)
-		res = svga_device::crtc_reg_read(index);
-	else
-	{
-		switch(index)
-		{
-			case 0x34:
-				res = et4k.aux_ctrl;
-				break;
-			case 0x3f:
-				res = et4k.horz_overflow;
-				break;
-			default:
-				res = vga.crtc.data[index];
-				//printf("%02x\n",index);
-				break;
-		}
-	}
-
-	return res;
-}
-
-void tseng_vga_device::crtc_reg_write(uint8_t index, uint8_t data)
-{
-	if(index <= 0x18)
-		svga_device::crtc_reg_write(index,data);
-	else
-	{
-		switch(index)
-		{
-			case 0x34:
-				et4k.aux_ctrl = data;
-				break;
-			case 0x3f:
-				et4k.horz_overflow = data;
-				vga.crtc.horz_total = (vga.crtc.horz_total & 0xff) | ((data & 1) << 8);
-				break;
-			default:
-				//printf("%02x %02x\n",index,data);
-				break;
-		}
-	}
+	svga_device::crtc_map(map);
+	map(0x34, 0x34).lrw8(
+		NAME([this] (offs_t offset) {
+			return et4k.aux_ctrl;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			et4k.aux_ctrl = data;
+		})
+	);
+	map(0x3f, 0x3f).lrw8(
+		NAME([this] (offs_t offset) {
+			return et4k.horz_overflow;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			et4k.horz_overflow = data;
+			vga.crtc.horz_total = (vga.crtc.horz_total & 0xff) | ((data & 1) << 8);
+		})
+	);
 }
 
 void tseng_vga_device::sequencer_map(address_map &map)
@@ -164,9 +139,6 @@ uint8_t tseng_vga_device::port_03b0_r(offs_t offset)
 	{
 		switch(offset)
 		{
-			case 5:
-				res = tseng_vga_device::crtc_reg_read(vga.crtc.index);
-				break;
 			case 8:
 				res = et4k.reg_3d8;
 				break;
@@ -185,10 +157,6 @@ void tseng_vga_device::port_03b0_w(offs_t offset, uint8_t data)
 	{
 		switch(offset)
 		{
-			case 5:
-				vga.crtc.data[vga.crtc.index] = data;
-				tseng_vga_device::crtc_reg_write(vga.crtc.index,data);
-				break;
 			case 8:
 				et4k.reg_3d8 = data;
 				if(data == 0xa0)
@@ -319,9 +287,6 @@ uint8_t tseng_vga_device::port_03d0_r(offs_t offset)
 	{
 		switch(offset)
 		{
-			case 5:
-				res = tseng_vga_device::crtc_reg_read(vga.crtc.index);
-				break;
 			case 8:
 				res = et4k.reg_3d8;
 				break;
@@ -340,12 +305,6 @@ void tseng_vga_device::port_03d0_w(offs_t offset, uint8_t data)
 	{
 		switch(offset)
 		{
-			case 5:
-				vga.crtc.data[vga.crtc.index] = data;
-				tseng_vga_device::crtc_reg_write(vga.crtc.index,data);
-				//if((vga.crtc.index & 0xfe) != 0x0e)
-				//  printf("%02x %02x %d\n",vga.crtc.index,data,screen().vpos());
-				break;
 			case 8:
 				et4k.reg_3d8 = data;
 				if(data == 0xa0)

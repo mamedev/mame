@@ -91,8 +91,8 @@ protected:
 
 	uint8_t vga_crtc_r(offs_t offset);
 	void vga_crtc_w(offs_t offset, uint8_t data);
-	virtual uint8_t crtc_reg_read(uint8_t index);
-	virtual void crtc_reg_write(uint8_t index, uint8_t data);
+
+	virtual void crtc_map(address_map &map);
 	virtual void sequencer_map(address_map &map);
 	virtual void gc_map(address_map &map);
 	virtual void attribute_map(address_map &map);
@@ -130,7 +130,6 @@ protected:
 		struct
 		{
 			size_t vram_size;
-			int crtc_regcount;
 		} svga_intf;
 
 		std::unique_ptr<uint8_t []> memory;
@@ -257,6 +256,7 @@ protected:
 		ATC_REG
 	};
 
+	address_space_config m_crtc_space_config;
 	address_space_config m_gc_space_config;
 	address_space_config m_seq_space_config;
 	address_space_config m_atc_space_config;

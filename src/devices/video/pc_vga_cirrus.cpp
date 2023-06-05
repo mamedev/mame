@@ -59,6 +59,7 @@ DEFINE_DEVICE_TYPE(CIRRUS_GD5446, cirrus_gd5446_device, "clgd5446", "Cirrus Logi
 cirrus_gd5428_device::cirrus_gd5428_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cirrus_gd5428_device(mconfig, CIRRUS_GD5428, tag, owner, clock)
 {
+	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(cirrus_gd5428_device::crtc_map), this));
 	m_gc_space_config = address_space_config("gc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(cirrus_gd5428_device::gc_map), this));
 	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(cirrus_gd5428_device::sequencer_map), this));
 }
@@ -71,6 +72,7 @@ cirrus_gd5428_device::cirrus_gd5428_device(const machine_config &mconfig, device
 cirrus_gd5430_device::cirrus_gd5430_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cirrus_gd5428_device(mconfig, CIRRUS_GD5430, tag, owner, clock)
 {
+	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(cirrus_gd5430_device::crtc_map), this));
 	m_gc_space_config = address_space_config("gc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(cirrus_gd5430_device::gc_map), this));
 	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(cirrus_gd5430_device::sequencer_map), this));
 }
@@ -78,8 +80,465 @@ cirrus_gd5430_device::cirrus_gd5430_device(const machine_config &mconfig, const 
 cirrus_gd5446_device::cirrus_gd5446_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cirrus_gd5428_device(mconfig, CIRRUS_GD5446, tag, owner, clock)
 {
+	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(cirrus_gd5446_device::crtc_map), this));
 	m_gc_space_config = address_space_config("gc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(cirrus_gd5446_device::gc_map), this));
 	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(cirrus_gd5446_device::sequencer_map), this));
+}
+
+void cirrus_gd5428_device::crtc_map(address_map &map)
+{
+	svga_device::crtc_map(map);
+	// VGA Vertical Blank end
+	// some SVGA chipsets use all 8 bits, and this is one of them (according to MFGTST CRTC tests)
+	map(0x16, 0x16).lrw8(
+		NAME([this] (offs_t offset) {
+			return vga.crtc.vert_blank_end & 0x00ff;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			vga.crtc.vert_blank_end &= ~0x00ff;
+			vga.crtc.vert_blank_end |= data;
+			cirrus_define_video_mode();
+		})
+	);
+	map(0x19, 0x19).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_cr19;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_cr19 = data;
+		})
+	);
+	map(0x1a, 0x1a).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_cr1a;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_cr1a = data;
+			vga.crtc.horz_blank_end = (vga.crtc.horz_blank_end & 0xff3f) | ((data & 0x30) << 2);
+			vga.crtc.vert_blank_end = (vga.crtc.vert_blank_end & 0xfcff) | ((data & 0xc0) << 2);
+			cirrus_define_video_mode();
+		})
+	);
+	map(0x1b, 0x1b).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_cr1b;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_cr1b = data;
+			vga.crtc.start_addr_latch &= ~0x070000;
+			vga.crtc.start_addr_latch |= ((data & 0x01) << 16);
+			vga.crtc.start_addr_latch |= ((data & 0x0c) << 15);
+			vga.crtc.offset = (vga.crtc.offset & 0x00ff) | ((data & 0x10) << 4);
+			cirrus_define_video_mode();
+		})
+	);
+	// TODO: CR1D for GD543x
+	//vga.crtc.start_addr_latch = (vga.crtc.start_addr_latch & 0xf7ffff) | ((data & 0x01) << 16);
+	map(0x27, 0x27).lr8(
+		NAME([this] (offs_t offset) {
+			return m_chip_id;
+		})
+	);
+}
+
+void cirrus_gd5428_device::gc_map(address_map &map)
+{
+	svga_device::gc_map(map);
+	map(0x00, 0x00).lrw8(
+		NAME([this](offs_t offset) {
+			return vga.gc.set_reset & ((gc_mode_ext & 0x04) ? 0xff : 0x0f);
+		}),
+		NAME([this](offs_t offset, u8 data) { 
+			// if extended writes are enabled (bit 2 of index 0bh), then index 0 and 1 are extended to 8 bits,
+			// however XFree86 does not appear to do this...
+			vga.gc.set_reset = data & 0xff;
+		})
+	);
+	map(0x01, 0x01).lrw8(
+		NAME([this](offs_t offset) {
+			return vga.gc.enable_set_reset & ((gc_mode_ext & 0x04) ? 0xff : 0x0f);
+		}),
+		NAME([this](offs_t offset, u8 data) { 
+			vga.gc.enable_set_reset = data & 0xff;
+		})
+	);
+	map(0x05, 0x05).lrw8(
+		NAME([this](offs_t offset) {
+			u8 res = (vga.gc.shift256 & 1) << 6;
+			res |= (vga.gc.shift_reg & 1) << 5;
+			res |= (vga.gc.host_oe & 1) << 4;
+			res |= (vga.gc.read_mode & 1) << 3;
+			if(gc_mode_ext & 0x04)
+				res |= (vga.gc.write_mode & 7);
+			else
+				res |= (vga.gc.write_mode & 3);
+			return res;
+		}),
+		NAME([this](offs_t offset, u8 data) { 
+			vga.gc.shift256 = (data & 0x40) >> 6;
+			vga.gc.shift_reg = (data & 0x20) >> 5;
+			vga.gc.host_oe = (data & 0x10) >> 4;
+			vga.gc.read_mode = (data & 8) >> 3;
+			if(gc_mode_ext & 0x04)
+				vga.gc.write_mode = data & 7;
+			else
+				vga.gc.write_mode = data & 3;
+		})
+	);
+	// Offset register 0
+	map(0x09, 0x09).lrw8(
+		NAME([this](offs_t offset) {
+			return gc_bank_0;
+		}),
+		NAME([this](offs_t offset, u8 data) { 
+			gc_bank_0 = data;
+			LOG("CL: Offset register 0 set to %i\n", data);
+		})
+	);
+	// Offset register 1
+	map(0x0a, 0x0a).lrw8(
+		NAME([this](offs_t offset) {
+			return gc_bank_1;
+		}),
+		NAME([this](offs_t offset, u8 data) { 
+			gc_bank_1 = data;
+			LOG("CL: Offset register 1 set to %i\n", data);
+		})
+	);
+	// Graphics controller mode extensions
+	map(0x0b, 0x0b).lrw8(
+		NAME([this](offs_t offset) {
+			return gc_mode_ext;
+		}),
+		NAME([this](offs_t offset, u8 data) { 
+			gc_mode_ext = data;
+			if(!(data & 0x04))
+			{
+				vga.gc.set_reset &= 0x0f;
+				vga.gc.enable_set_reset &= 0x0f;
+			}
+			if(!(data & 0x08))
+				vga.sequencer.map_mask &= 0x0f;
+		})
+	);
+	// Colour Key
+	// map(0x0c, 0x0c)
+	// Colour Key Mask
+	// map(0x0d, 0x0d)
+	// Miscellaneous Control
+	// map(0x0e, 0x0e)
+	// Background Colour Byte 1
+	map(0x10, 0x10).lrw8(
+		NAME([this](offs_t offset) {
+			return m_gr10;
+		}),
+		NAME([this](offs_t offset, u8 data) { 
+			m_gr10 = data;
+		})
+	);
+	// Foreground Colour Byte 1
+	map(0x11, 0x11).lrw8(
+		NAME([this](offs_t offset) {
+			return m_gr11;
+		}),
+		NAME([this](offs_t offset, u8 data) { 
+			m_gr11 = data;
+		})
+	);
+	// BLT Width 0
+	map(0x20, 0x20).lrw8(
+		NAME([this](offs_t offset) {
+			return m_blt_width & 0x00ff;
+		}),
+		NAME([this](offs_t offset, u8 data) { 
+			m_blt_width = (m_blt_width & 0xff00) | data;
+		})
+	);
+	// BLT Width 1
+	map(0x21, 0x21).lrw8(
+		NAME([this](offs_t offset) {
+			return m_blt_width >> 8;
+		}),
+		NAME([this](offs_t offset, u8 data) { 
+			m_blt_width = (m_blt_width & 0x00ff) | (data << 8);
+		})
+	);
+	// BLT Height 0
+	map(0x22, 0x22).lrw8(
+		NAME([this](offs_t offset) {
+			return m_blt_height & 0x00ff;
+		}),
+		NAME([this](offs_t offset, u8 data) { 
+			m_blt_height = (m_blt_height & 0xff00) | data;
+		})
+	);
+	// BLT Height 1
+	map(0x23, 0x23).lrw8(
+		NAME([this](offs_t offset) {
+			return m_blt_height >> 8;
+		}),
+		NAME([this](offs_t offset, u8 data) { 
+			m_blt_height = (m_blt_height & 0x00ff) | (data << 8);
+		})
+	);
+	// BLT Destination Pitch 0
+	map(0x24, 0x24).lrw8(
+		NAME([this](offs_t offset) {
+			return m_blt_dest_pitch & 0x00ff;
+		}),
+		NAME([this](offs_t offset, u8 data) { 
+			m_blt_dest_pitch = (m_blt_dest_pitch & 0xff00) | data;
+		})
+	);
+	// BLT Destination Pitch 1
+	map(0x25, 0x25).lrw8(
+		NAME([this](offs_t offset) {
+			return m_blt_dest_pitch >> 8;
+		}),
+		NAME([this](offs_t offset, u8 data) { 
+			m_blt_dest_pitch = (m_blt_dest_pitch & 0x00ff) | (data << 8);
+		})
+	);
+	// BLT Source Pitch 0
+	map(0x26, 0x26).lrw8(
+		NAME([this](offs_t offset) {
+			return m_blt_source_pitch & 0x00ff;
+		}),
+		NAME([this](offs_t offset, u8 data) { 
+			m_blt_source_pitch = (m_blt_source_pitch & 0xff00) | data;
+		})
+	);
+	// BLT Source Pitch 1
+	map(0x27, 0x27).lrw8(
+		NAME([this](offs_t offset) {
+			return m_blt_source_pitch >> 8;
+		}),
+		NAME([this](offs_t offset, u8 data) { 
+			m_blt_source_pitch = (m_blt_source_pitch & 0x00ff) | (data << 8);
+		})
+	);
+	// BLT Destination start 0/1/2
+	map(0x28, 0x2a).lrw8(
+		NAME([this](offs_t offset) {
+			return (m_blt_dest >> (8 * (offset & 3))) & 0xff;
+		}),
+		NAME([this](offs_t offset, u8 data) {
+			const u8 byte_access = (8 * (offset & 3));
+			const u32 old_mask = ~(0xff << byte_access);
+			m_blt_dest = (m_blt_dest & old_mask) | (data << byte_access);
+		})
+	);
+	// BLT source start 0/1/2
+	map(0x2c, 0x2e).lrw8(
+		NAME([this](offs_t offset) {
+			return (m_blt_source >> (8 * (offset & 3))) & 0xff;
+		}),
+		NAME([this](offs_t offset, u8 data) { 
+			const u8 byte_access = (8 * (offset & 3));
+			const u32 old_mask = ~(0xff << byte_access);
+			m_blt_source = (m_blt_source & old_mask) | (data << byte_access);
+		})
+	);
+	// BLT destination write mask (GD5430/36/40 only)
+	// map(0x2f, 0x2f)
+	// BLT Mode
+	map(0x30, 0x30).lrw8(
+		NAME([this](offs_t offset) {
+			return m_blt_mode;
+		}),
+		NAME([this](offs_t offset, u8 data) { 
+			m_blt_mode = data;
+		})
+	);
+	// BitBLT Start / Status
+	map(0x31, 0x31).lrw8(
+		NAME([this](offs_t offset) {
+			return m_blt_status;
+		}),
+		NAME([this](offs_t offset, u8 data) { 
+			m_blt_status = data & ~0xf2;
+			if(data & 0x02)
+			{
+				if(m_blt_mode & 0x04)  // blit source is system memory
+					start_system_bitblt();
+				else
+					start_bitblt();
+			}
+		})
+	);
+	// BitBLT ROP mode
+	map(0x32, 0x32).lrw8(
+		NAME([this](offs_t offset) {
+			return m_blt_rop;
+		}),
+		NAME([this](offs_t offset, u8 data) { 
+			m_blt_rop = data;
+		})
+	);
+	// BitBLT Transparent Colour 0
+	map(0x34, 0x34).lrw8(
+		NAME([this](offs_t offset) {
+			return m_blt_trans_colour & 0xff;
+		}),
+		NAME([this](offs_t offset, u8 data) {
+			m_blt_trans_colour = (m_blt_trans_colour & 0xff00) | data;
+		})
+	);
+	// BitBLT Transparent Colour 1
+	map(0x35, 0x35).lrw8(
+		NAME([this](offs_t offset) {
+			return m_blt_trans_colour >> 8;
+		}),
+		NAME([this](offs_t offset, u8 data) { 
+			m_blt_trans_colour = (m_blt_trans_colour & 0x00ff) | (data << 8);
+		})
+	);
+	// BitBLT Transparent Colour Mask 0
+	map(0x36, 0x36).lrw8(
+		NAME([this](offs_t offset) {
+			return m_blt_trans_colour_mask & 0xff;
+		}),
+		NAME([this](offs_t offset, u8 data) { 
+			m_blt_trans_colour_mask = (m_blt_trans_colour_mask & 0xff00) | data;
+		})
+	);
+	// BitBLT Transparent Colour Mask 1
+	map(0x37, 0x37).lrw8(
+		NAME([this](offs_t offset) {
+			return m_blt_trans_colour_mask >> 8;
+		}),
+		NAME([this](offs_t offset, u8 data) { 
+			m_blt_trans_colour_mask = (m_blt_trans_colour_mask & 0x00ff) | (data << 8);
+		})
+	);
+}
+
+void cirrus_gd5428_device::sequencer_map(address_map &map)
+{
+	svga_device::sequencer_map(map);
+	map(0x02, 0x02).lrw8(
+		NAME([this] (offs_t offset) { 
+			return vga.sequencer.map_mask & ((gc_mode_ext & 0x08) ? 0xff : 0x0f);
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			vga.sequencer.map_mask = data & ((gc_mode_ext & 0x08) ? 0xff : 0x0f);
+		})
+	);
+	map(0x06, 0x06).lrw8(
+		NAME([this] (offs_t offset) {
+			return (gc_locked) ? 0x0f : m_lock_reg;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			// TODO: extensions are always enabled on the GD5429
+			// bits 3,5,6,7 ignored
+
+			gc_locked = (data & 0x17) != 0x12;
+			LOG("Cirrus register extensions %s\n", gc_locked ? "unlocked" : "locked");
+			m_lock_reg = data & 0x17;
+		})
+	);
+	map(0x07, 0x07).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			// TODO: bebox startup enables this
+			if((data & 0xf0) != 0)
+				popmessage("1MB framebuffer window enabled at %iMB (%02x)",data >> 4,data);
+			vga.sequencer.data[0x07] = data;
+			cirrus_define_video_mode();
+		})
+	);
+	// TODO: check me
+	map(0x09, 0x09).lrw8(
+		NAME([this] (offs_t offset) {
+			return vga.sequencer.data[0x09];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			vga.sequencer.data[0x09] = data;
+		})
+	);
+	map(0x0a, 0x0a).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_scratchpad1;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			// GD5402/GD542x BIOS writes VRAM size here
+			m_scratchpad1 = data;
+		})
+	);
+	map(0x0b, 0x0e).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_vclk_num[offset];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_vclk_num[offset] = data;
+		})
+	);
+	map(0x0f, 0x0f).lrw8(
+		NAME([this] (offs_t offset) {
+			u8 res = vga.sequencer.data[0x0f] & 0xe7;
+			// 32-bit DRAM data bus width (1MB-2MB)
+			res |= 0x18;
+			return res;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			vga.sequencer.data[0x0f] = data;
+		})
+	);
+	// bits 5-7 of the register index are the low bits of the X co-ordinate
+	map(0x10, 0x10).select(0xe0).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			m_cursor_x = (data << 3) | ((offset & 0xe0) >> 5);
+		})
+	);
+	// bits 5-7 of the register index are the low bits of the Y co-ordinate
+	map(0x11, 0x11).select(0xe0).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			m_cursor_y = (data << 3) | ((offset & 0xe0) >> 5);
+		})
+	);
+	map(0x12, 0x12).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_cursor_attr;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			// bit 0 - enable cursor
+			// bit 1 - enable extra palette (cursor colours are there)
+			// bit 2 - 64x64 cursor (32x32 if clear, GD5422+)
+			// bit 7 - overscan colour protect - if set, use colour 2 in the extra palette for the border (GD5424+)
+			m_cursor_attr = data;
+			m_ext_palette_enabled = data & 0x02;
+		})
+	);
+	map(0x13, 0x13).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			// bits 0 and 1 are ignored if using 64x64 cursor
+			m_cursor_addr = data;
+		})
+	);
+	map(0x14, 0x14).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_scratchpad2;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_scratchpad2 = data;
+		})
+	);
+	map(0x15, 0x15).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_scratchpad3;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			// GD543x BIOS writes VRAM size here
+			m_scratchpad3 = data;
+		})
+	);
+	map(0x1b, 0x1e).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_vclk_denom[offset];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_vclk_denom[offset] = data;
+		})
+	);
 }
 
 void cirrus_gd5428_device::device_start()
@@ -93,7 +552,6 @@ void cirrus_gd5428_device::device_start()
 	vga.crtc.maximum_scan_line = 1;
 
 	// copy over interfaces
-	vga.svga_intf.crtc_regcount = 0x2d;
 	vga.memory = std::make_unique<uint8_t []>(vga.svga_intf.vram_size);
 	memset(&vga.memory[0], 0, vga.svga_intf.vram_size);
 
@@ -582,406 +1040,6 @@ void cirrus_gd5428_device::copy_pixel(uint8_t src, uint8_t dst)
 	vga.memory[m_blt_dest_current % vga.svga_intf.vram_size] = res;
 }
 
-void cirrus_gd5428_device::sequencer_map(address_map &map)
-{
-	svga_device::sequencer_map(map);
-	map(0x02, 0x02).lrw8(
-		NAME([this] (offs_t offset) { 
-			return vga.sequencer.map_mask & ((gc_mode_ext & 0x08) ? 0xff : 0x0f);
-		}),
-		NAME([this] (offs_t offset, u8 data) {
-			vga.sequencer.map_mask = data & ((gc_mode_ext & 0x08) ? 0xff : 0x0f);
-		})
-	);
-	map(0x06, 0x06).lrw8(
-		NAME([this] (offs_t offset) {
-			return (gc_locked) ? 0x0f : m_lock_reg;
-		}),
-		NAME([this] (offs_t offset, u8 data) {
-			// TODO: extensions are always enabled on the GD5429
-			// bits 3,5,6,7 ignored
-
-			gc_locked = (data & 0x17) != 0x12;
-			LOG("Cirrus register extensions %s\n", gc_locked ? "unlocked" : "locked");
-			m_lock_reg = data & 0x17;
-		})
-	);
-	map(0x07, 0x07).lw8(
-		NAME([this] (offs_t offset, u8 data) {
-			// TODO: bebox startup enables this
-			if((data & 0xf0) != 0)
-				popmessage("1MB framebuffer window enabled at %iMB (%02x)",data >> 4,data);
-			vga.sequencer.data[0x07] = data;
-			cirrus_define_video_mode();
-		})
-	);
-	// TODO: check me
-	map(0x09, 0x09).lrw8(
-		NAME([this] (offs_t offset) {
-			return vga.sequencer.data[0x09];
-		}),
-		NAME([this] (offs_t offset, u8 data) {
-			vga.sequencer.data[0x09] = data;
-		})
-	);
-	map(0x0a, 0x0a).lrw8(
-		NAME([this] (offs_t offset) {
-			return m_scratchpad1;
-		}),
-		NAME([this] (offs_t offset, u8 data) {
-			// GD5402/GD542x BIOS writes VRAM size here
-			m_scratchpad1 = data;
-		})
-	);
-	map(0x0b, 0x0e).lrw8(
-		NAME([this] (offs_t offset) {
-			return m_vclk_num[offset];
-		}),
-		NAME([this] (offs_t offset, u8 data) {
-			m_vclk_num[offset] = data;
-		})
-	);
-	map(0x0f, 0x0f).lrw8(
-		NAME([this] (offs_t offset) {
-			u8 res = vga.sequencer.data[0x0f] & 0xe7;
-			// 32-bit DRAM data bus width (1MB-2MB)
-			res |= 0x18;
-			return res;
-		}),
-		NAME([this] (offs_t offset, u8 data) {
-			vga.sequencer.data[0x0f] = data;
-		})
-	);
-	// bits 5-7 of the register index are the low bits of the X co-ordinate
-	map(0x10, 0x10).select(0xe0).lw8(
-		NAME([this] (offs_t offset, u8 data) {
-			m_cursor_x = (data << 3) | ((offset & 0xe0) >> 5);
-		})
-	);
-	// bits 5-7 of the register index are the low bits of the Y co-ordinate
-	map(0x11, 0x11).select(0xe0).lw8(
-		NAME([this] (offs_t offset, u8 data) {
-			m_cursor_y = (data << 3) | ((offset & 0xe0) >> 5);
-		})
-	);
-	map(0x12, 0x12).lrw8(
-		NAME([this] (offs_t offset) {
-			return m_cursor_attr;
-		}),
-		NAME([this] (offs_t offset, u8 data) {
-			// bit 0 - enable cursor
-			// bit 1 - enable extra palette (cursor colours are there)
-			// bit 2 - 64x64 cursor (32x32 if clear, GD5422+)
-			// bit 7 - overscan colour protect - if set, use colour 2 in the extra palette for the border (GD5424+)
-			m_cursor_attr = data;
-			m_ext_palette_enabled = data & 0x02;
-		})
-	);
-	map(0x13, 0x13).lw8(
-		NAME([this] (offs_t offset, u8 data) {
-			// bits 0 and 1 are ignored if using 64x64 cursor
-			m_cursor_addr = data;
-		})
-	);
-	map(0x14, 0x14).lrw8(
-		NAME([this] (offs_t offset) {
-			return m_scratchpad2;
-		}),
-		NAME([this] (offs_t offset, u8 data) {
-			m_scratchpad2 = data;
-		})
-	);
-	map(0x15, 0x15).lrw8(
-		NAME([this] (offs_t offset) {
-			return m_scratchpad3;
-		}),
-		NAME([this] (offs_t offset, u8 data) {
-			// GD543x BIOS writes VRAM size here
-			m_scratchpad3 = data;
-		})
-	);
-	map(0x1b, 0x1e).lrw8(
-		NAME([this] (offs_t offset) {
-			return m_vclk_denom[offset];
-		}),
-		NAME([this] (offs_t offset, u8 data) {
-			m_vclk_denom[offset] = data;
-		})
-	);
-}
-
-void cirrus_gd5428_device::gc_map(address_map &map)
-{
-	svga_device::gc_map(map);
-	map(0x00, 0x00).lrw8(
-		NAME([this](offs_t offset) {
-			return vga.gc.set_reset & ((gc_mode_ext & 0x04) ? 0xff : 0x0f);
-		}),
-		NAME([this](offs_t offset, u8 data) { 
-			// if extended writes are enabled (bit 2 of index 0bh), then index 0 and 1 are extended to 8 bits,
-			// however XFree86 does not appear to do this...
-			vga.gc.set_reset = data & 0xff;
-		})
-	);
-	map(0x01, 0x01).lrw8(
-		NAME([this](offs_t offset) {
-			return vga.gc.enable_set_reset & ((gc_mode_ext & 0x04) ? 0xff : 0x0f);
-		}),
-		NAME([this](offs_t offset, u8 data) { 
-			vga.gc.enable_set_reset = data & 0xff;
-		})
-	);
-	map(0x05, 0x05).lrw8(
-		NAME([this](offs_t offset) {
-			u8 res = (vga.gc.shift256 & 1) << 6;
-			res |= (vga.gc.shift_reg & 1) << 5;
-			res |= (vga.gc.host_oe & 1) << 4;
-			res |= (vga.gc.read_mode & 1) << 3;
-			if(gc_mode_ext & 0x04)
-				res |= (vga.gc.write_mode & 7);
-			else
-				res |= (vga.gc.write_mode & 3);
-			return res;
-		}),
-		NAME([this](offs_t offset, u8 data) { 
-			vga.gc.shift256 = (data & 0x40) >> 6;
-			vga.gc.shift_reg = (data & 0x20) >> 5;
-			vga.gc.host_oe = (data & 0x10) >> 4;
-			vga.gc.read_mode = (data & 8) >> 3;
-			if(gc_mode_ext & 0x04)
-				vga.gc.write_mode = data & 7;
-			else
-				vga.gc.write_mode = data & 3;
-		})
-	);
-	// Offset register 0
-	map(0x09, 0x09).lrw8(
-		NAME([this](offs_t offset) {
-			return gc_bank_0;
-		}),
-		NAME([this](offs_t offset, u8 data) { 
-			gc_bank_0 = data;
-			LOG("CL: Offset register 0 set to %i\n", data);
-		})
-	);
-	// Offset register 1
-	map(0x0a, 0x0a).lrw8(
-		NAME([this](offs_t offset) {
-			return gc_bank_1;
-		}),
-		NAME([this](offs_t offset, u8 data) { 
-			gc_bank_1 = data;
-			LOG("CL: Offset register 1 set to %i\n", data);
-		})
-	);
-	// Graphics controller mode extensions
-	map(0x0b, 0x0b).lrw8(
-		NAME([this](offs_t offset) {
-			return gc_mode_ext;
-		}),
-		NAME([this](offs_t offset, u8 data) { 
-			gc_mode_ext = data;
-			if(!(data & 0x04))
-			{
-				vga.gc.set_reset &= 0x0f;
-				vga.gc.enable_set_reset &= 0x0f;
-			}
-			if(!(data & 0x08))
-				vga.sequencer.map_mask &= 0x0f;
-		})
-	);
-	// Colour Key
-	// map(0x0c, 0x0c)
-	// Colour Key Mask
-	// map(0x0d, 0x0d)
-	// Miscellaneous Control
-	// map(0x0e, 0x0e)
-	// Background Colour Byte 1
-	map(0x10, 0x10).lrw8(
-		NAME([this](offs_t offset) {
-			return m_gr10;
-		}),
-		NAME([this](offs_t offset, u8 data) { 
-			m_gr10 = data;
-		})
-	);
-	// Foreground Colour Byte 1
-	map(0x11, 0x11).lrw8(
-		NAME([this](offs_t offset) {
-			return m_gr11;
-		}),
-		NAME([this](offs_t offset, u8 data) { 
-			m_gr11 = data;
-		})
-	);
-	// BLT Width 0
-	map(0x20, 0x20).lrw8(
-		NAME([this](offs_t offset) {
-			return m_blt_width & 0x00ff;
-		}),
-		NAME([this](offs_t offset, u8 data) { 
-			m_blt_width = (m_blt_width & 0xff00) | data;
-		})
-	);
-	// BLT Width 1
-	map(0x21, 0x21).lrw8(
-		NAME([this](offs_t offset) {
-			return m_blt_width >> 8;
-		}),
-		NAME([this](offs_t offset, u8 data) { 
-			m_blt_width = (m_blt_width & 0x00ff) | (data << 8);
-		})
-	);
-	// BLT Height 0
-	map(0x22, 0x22).lrw8(
-		NAME([this](offs_t offset) {
-			return m_blt_height & 0x00ff;
-		}),
-		NAME([this](offs_t offset, u8 data) { 
-			m_blt_height = (m_blt_height & 0xff00) | data;
-		})
-	);
-	// BLT Height 1
-	map(0x23, 0x23).lrw8(
-		NAME([this](offs_t offset) {
-			return m_blt_height >> 8;
-		}),
-		NAME([this](offs_t offset, u8 data) { 
-			m_blt_height = (m_blt_height & 0x00ff) | (data << 8);
-		})
-	);
-	// BLT Destination Pitch 0
-	map(0x24, 0x24).lrw8(
-		NAME([this](offs_t offset) {
-			return m_blt_dest_pitch & 0x00ff;
-		}),
-		NAME([this](offs_t offset, u8 data) { 
-			m_blt_dest_pitch = (m_blt_dest_pitch & 0xff00) | data;
-		})
-	);
-	// BLT Destination Pitch 1
-	map(0x25, 0x25).lrw8(
-		NAME([this](offs_t offset) {
-			return m_blt_dest_pitch >> 8;
-		}),
-		NAME([this](offs_t offset, u8 data) { 
-			m_blt_dest_pitch = (m_blt_dest_pitch & 0x00ff) | (data << 8);
-		})
-	);
-	// BLT Source Pitch 0
-	map(0x26, 0x26).lrw8(
-		NAME([this](offs_t offset) {
-			return m_blt_source_pitch & 0x00ff;
-		}),
-		NAME([this](offs_t offset, u8 data) { 
-			m_blt_source_pitch = (m_blt_source_pitch & 0xff00) | data;
-		})
-	);
-	// BLT Source Pitch 1
-	map(0x27, 0x27).lrw8(
-		NAME([this](offs_t offset) {
-			return m_blt_source_pitch >> 8;
-		}),
-		NAME([this](offs_t offset, u8 data) { 
-			m_blt_source_pitch = (m_blt_source_pitch & 0x00ff) | (data << 8);
-		})
-	);
-	// BLT Destination start 0/1/2
-	map(0x28, 0x2a).lrw8(
-		NAME([this](offs_t offset) {
-			return (m_blt_dest >> (8 * (offset & 3))) & 0xff;
-		}),
-		NAME([this](offs_t offset, u8 data) {
-			const u8 byte_access = (8 * (offset & 3));
-			const u32 old_mask = ~(0xff << byte_access);
-			m_blt_dest = (m_blt_dest & old_mask) | (data << byte_access);
-		})
-	);
-	// BLT source start 0/1/2
-	map(0x2c, 0x2e).lrw8(
-		NAME([this](offs_t offset) {
-			return (m_blt_source >> (8 * (offset & 3))) & 0xff;
-		}),
-		NAME([this](offs_t offset, u8 data) { 
-			const u8 byte_access = (8 * (offset & 3));
-			const u32 old_mask = ~(0xff << byte_access);
-			m_blt_source = (m_blt_source & old_mask) | (data << byte_access);
-		})
-	);
-	// BLT destination write mask (GD5430/36/40 only)
-	// map(0x2f, 0x2f)
-	// BLT Mode
-	map(0x30, 0x30).lrw8(
-		NAME([this](offs_t offset) {
-			return m_blt_mode;
-		}),
-		NAME([this](offs_t offset, u8 data) { 
-			m_blt_mode = data;
-		})
-	);
-	// BitBLT Start / Status
-	map(0x31, 0x31).lrw8(
-		NAME([this](offs_t offset) {
-			return m_blt_status;
-		}),
-		NAME([this](offs_t offset, u8 data) { 
-			m_blt_status = data & ~0xf2;
-			if(data & 0x02)
-			{
-				if(m_blt_mode & 0x04)  // blit source is system memory
-					start_system_bitblt();
-				else
-					start_bitblt();
-			}
-		})
-	);
-	// BitBLT ROP mode
-	map(0x32, 0x32).lrw8(
-		NAME([this](offs_t offset) {
-			return m_blt_rop;
-		}),
-		NAME([this](offs_t offset, u8 data) { 
-			m_blt_rop = data;
-		})
-	);
-	// BitBLT Transparent Colour 0
-	map(0x34, 0x34).lrw8(
-		NAME([this](offs_t offset) {
-			return m_blt_trans_colour & 0xff;
-		}),
-		NAME([this](offs_t offset, u8 data) {
-			m_blt_trans_colour = (m_blt_trans_colour & 0xff00) | data;
-		})
-	);
-	// BitBLT Transparent Colour 1
-	map(0x35, 0x35).lrw8(
-		NAME([this](offs_t offset) {
-			return m_blt_trans_colour >> 8;
-		}),
-		NAME([this](offs_t offset, u8 data) { 
-			m_blt_trans_colour = (m_blt_trans_colour & 0x00ff) | (data << 8);
-		})
-	);
-	// BitBLT Transparent Colour Mask 0
-	map(0x36, 0x36).lrw8(
-		NAME([this](offs_t offset) {
-			return m_blt_trans_colour_mask & 0xff;
-		}),
-		NAME([this](offs_t offset, u8 data) { 
-			m_blt_trans_colour_mask = (m_blt_trans_colour_mask & 0xff00) | data;
-		})
-	);
-	// BitBLT Transparent Colour Mask 1
-	map(0x37, 0x37).lrw8(
-		NAME([this](offs_t offset) {
-			return m_blt_trans_colour_mask >> 8;
-		}),
-		NAME([this](offs_t offset, u8 data) { 
-			m_blt_trans_colour_mask = (m_blt_trans_colour_mask & 0x00ff) | (data << 8);
-		})
-	);
-}
-
 uint8_t cirrus_gd5428_device::port_03c0_r(offs_t offset)
 {
 	uint8_t res = 0xff;
@@ -1087,7 +1145,6 @@ void cirrus_gd5428_device::port_03c0_w(offs_t offset, uint8_t data)
 			svga_device::port_03c0_w(offset,data);
 			break;
 	}
-	cirrus_define_video_mode();
 }
 
 uint8_t cirrus_gd5428_device::port_03b0_r(offs_t offset)
@@ -1098,9 +1155,6 @@ uint8_t cirrus_gd5428_device::port_03b0_r(offs_t offset)
 	{
 		switch(offset)
 		{
-			case 5:
-				res = cirrus_gd5428_device::crtc_reg_read(vga.crtc.index);
-				break;
 			default:
 				res = vga_device::port_03b0_r(offset);
 				break;
@@ -1118,9 +1172,6 @@ uint8_t cirrus_gd5428_device::port_03d0_r(offs_t offset)
 	{
 		switch(offset)
 		{
-			case 5:
-				res = cirrus_gd5428_device::crtc_reg_read(vga.crtc.index);
-				break;
 			default:
 				res = vga_device::port_03d0_r(offset);
 				break;
@@ -1136,16 +1187,11 @@ void cirrus_gd5428_device::port_03b0_w(offs_t offset, uint8_t data)
 	{
 		switch(offset)
 		{
-			case 5:
-				vga.crtc.data[vga.crtc.index] = data;
-				cirrus_gd5428_device::crtc_reg_write(vga.crtc.index,data);
-				break;
 			default:
 				vga_device::port_03b0_w(offset,data);
 				break;
 		}
 	}
-	cirrus_define_video_mode();
 }
 
 void cirrus_gd5428_device::port_03d0_w(offs_t offset, uint8_t data)
@@ -1154,84 +1200,13 @@ void cirrus_gd5428_device::port_03d0_w(offs_t offset, uint8_t data)
 	{
 		switch(offset)
 		{
-			case 5:
-				vga.crtc.data[vga.crtc.index] = data;
-				cirrus_gd5428_device::crtc_reg_write(vga.crtc.index,data);
-				break;
 			default:
 				vga_device::port_03d0_w(offset,data);
 				break;
 		}
 	}
-	cirrus_define_video_mode();
 }
 
-uint8_t cirrus_gd5428_device::crtc_reg_read(uint8_t index)
-{
-	uint8_t res;
-
-	switch(index)
-	{
-	case 0x16:  // VGA Vertical Blank end - some SVGA chipsets use all 8 bits, and this is one of them (according to MFGTST CRTC tests)
-		res = vga.crtc.vert_blank_end & 0x00ff;
-		break;
-	case 0x19:
-		res = m_cr19;
-		break;
-	case 0x1a:
-		res = m_cr1a;
-		break;
-	case 0x1b:
-		res = m_cr1b;
-		break;
-	case 0x27:
-		res = m_chip_id;
-		break;
-	default:
-		res = svga_device::crtc_reg_read(index);
-		break;
-	}
-
-	return res;
-}
-
-void cirrus_gd5428_device::crtc_reg_write(uint8_t index, uint8_t data)
-{
-	LOGMASKED(LOG_REG, "CL: CRTC write %02x to CR%02x\n",data,index);
-	switch(index)
-	{
-	case 0x16:  // VGA Vertical Blank end - some SVGA chipsets use all 8 bits, and this is one of them (according to MFGTST CRTC tests)
-		vga.crtc.vert_blank_end &= ~0x00ff;
-		vga.crtc.vert_blank_end |= data;
-		break;
-	case 0x19:
-		m_cr19 = data;
-		break;
-	case 0x1a:
-		m_cr1a = data;
-		vga.crtc.horz_blank_end = (vga.crtc.horz_blank_end & 0xff3f) | ((data & 0x30) << 2);
-		vga.crtc.vert_blank_end = (vga.crtc.vert_blank_end & 0xfcff) | ((data & 0xc0) << 2);
-		break;
-	case 0x1b:
-		m_cr1b = data;
-		vga.crtc.start_addr_latch &= ~0x070000;
-		vga.crtc.start_addr_latch |= ((data & 0x01) << 16);
-		vga.crtc.start_addr_latch |= ((data & 0x0c) << 15);
-		vga.crtc.offset = (vga.crtc.offset & 0x00ff) | ((data & 0x10) << 4);
-		cirrus_define_video_mode();
-		break;
-	case 0x1d:
-		//vga.crtc.start_addr_latch = (vga.crtc.start_addr_latch & 0xf7ffff) | ((data & 0x01) << 16);  // GD543x
-		break;
-	case 0x27:
-		// Do nothing, read only
-		break;
-	default:
-		svga_device::crtc_reg_write(index,data);
-		break;
-	}
-
-}
 
 uint8_t cirrus_gd5428_device::vga_latch_write(int offs, uint8_t data)
 {

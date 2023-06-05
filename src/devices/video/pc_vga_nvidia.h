@@ -31,8 +31,7 @@ public:
 
 protected:
 	virtual void device_start() override;
-	virtual uint8_t crtc_reg_read(uint8_t index) override;
-	virtual void crtc_reg_write(uint8_t index, uint8_t data) override;
+	virtual void crtc_map(address_map &map) override;
 
 	virtual ioport_constructor device_input_ports() const override;
 
