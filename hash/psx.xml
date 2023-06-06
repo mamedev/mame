@@ -56739,8 +56739,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tokimeki memorial 2 emotional voice system (vol.2 - homura-akane-kaori) (japan) [slpm-80544]" sha1="a14c4bd793988821bc164c28cb07aa7c5b777c70" status="baddump"
-/>
+				<disk name="tokimeki memorial 2 emotional voice system (vol.2 - homura-akane-kaori) (japan) [slpm-80544]" sha1="d2446f1b10485517963d7e068fe96713a78c41ba" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -56762,8 +56761,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tokimeki memorial 2 emotional voice system (vol.3 - miho-mei-sumire) (japan) [slpm-80550]" sha1="f1da5b225d32d08e35d762f0e473dc12212190e5" status="baddump"
-/>
+				<disk name="tokimeki memorial 2 emotional voice system (vol.3 - miho-mei-sumire) (japan) [slpm-80550]" sha1="a77315f6aadee2d92a5831467d086cf06d2507fc" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
