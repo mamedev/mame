@@ -30,13 +30,12 @@ heath_z37_fdc_device::heath_z37_fdc_device(const machine_config &mconfig, const 
 void heath_z37_fdc_device::ctrl_w(uint8_t val)
 {
 	m_control_reg = val;
-	logerror("Writing ctrl reg: %02x\n", val);
 
 	bool motor_on = bool(BIT(val, ctrl_MotorsOn_c));
 
 	m_intrq_allowed = bool(BIT(val, ctrl_EnableIntReq_c));
 	m_drq_allowed = bool(BIT(val, ctrl_EnableDrqInt_c));
-	m_fdc->dden_w(BIT(val, ctrl_SetMFMRecording_c) ? ASSERT_LINE : CLEAR_LINE);
+	m_fdc->dden_w(BIT(val, ctrl_SetMFMRecording_c) ? CLEAR_LINE : ASSERT_LINE);
 
 	if (m_drq_allowed)
 	{
@@ -86,8 +85,6 @@ uint8_t heath_z37_fdc_device::ctrl_r()
 
 void heath_z37_fdc_device::intf_w(uint8_t val)
 {
-	logerror("Writing interface reg: %02x\n", val);
-
 	m_access_track_sector = bool(BIT(val, if_SelectSectorTrack_c));
 }
 
@@ -100,12 +97,10 @@ void heath_z37_fdc_device::stat_w(uint8_t val)
 {
 	if (m_access_track_sector)
 	{
-		logerror("Writing sector reg: %02x\n", val);
 		m_fdc->sector_w(val);
 	}
 	else
 	{
-		logerror("Writing cmd reg: %02x\n", val);
 		m_fdc->cmd_w(val);
 	}
 }
@@ -114,12 +109,10 @@ uint8_t heath_z37_fdc_device::stat_r()
 {
 	if (m_access_track_sector)
 	{
-		logerror("Reading sector reg\n");
 		return m_fdc->sector_r();
 	}
 	else
 	{
-		logerror("Reading status reg\n");
 		return m_fdc->status_r();
 	}
 }
@@ -128,12 +121,10 @@ void heath_z37_fdc_device::data_w(uint8_t val)
 {
 	if (m_access_track_sector)
 	{
-		logerror("Writing track reg: %02x\n", val);
 		m_fdc->track_w(val);
 	}
 	else
 	{
-		logerror("Writing data reg: %02x\n", val);
 		m_fdc->data_w(val);
 	}
 }
@@ -143,14 +134,13 @@ uint8_t heath_z37_fdc_device::data_r()
 	if (m_access_track_sector)
 	{
 		uint8_t val = m_fdc->track_r();
-		logerror("Reading track reg val: %02x\n", val);
+
 		return val;
 	}
 	else
 	{
 		uint8_t val = m_fdc->data_r();
 
-		logerror("Reading data reg, val: %02x\n", val);
 		return val;
 	}
 }
@@ -172,7 +162,6 @@ void heath_z37_fdc_device::write(offs_t reg, uint8_t val)
 		data_w(val);
 		break;
 	}
-	logerror("z37 write address: %d val: %02x\n", reg, val);
 }
 
 uint8_t heath_z37_fdc_device::read(offs_t reg)
@@ -193,7 +182,6 @@ uint8_t heath_z37_fdc_device::read(offs_t reg)
 		value = data_r();
 		break;
 	}
-	logerror("Read address: %d val: %02x\n", reg, value);
 
 	return value;
 }

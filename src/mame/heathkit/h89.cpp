@@ -348,7 +348,7 @@ void h89_state::machine_start()
 
 	m_rom_enabled = true;
 	m_timer_intr_enabled = true;
-	m_floppy_ram_wp = true;
+	m_floppy_ram_wp = false;
 	update_gpp(0);
 	update_mem_view();
 }
@@ -358,7 +358,7 @@ void h89_state::machine_reset()
 {
 	m_rom_enabled = true;
 	m_timer_intr_enabled = true;
-	m_floppy_ram_wp = true;
+	m_floppy_ram_wp = false;
 
 	update_gpp(0);
 	update_mem_view();
@@ -381,11 +381,11 @@ void h89_state::console_intr(uint8_t data)
 {
 	if (data == CLEAR_LINE)
 	{
-		m_intr_cntrl->lower_irq(5);
+		m_intr_cntrl->lower_irq(3);
 	}
 	else
 	{
-		m_intr_cntrl->raise_irq(5);
+		m_intr_cntrl->raise_irq(3);
 	}
 }
 

@@ -91,8 +91,6 @@ uint8_t heath_intr_cntrl::get_instruction()
 		logerror("bad level: %d\n", level);
 	}
 
-	logerror("get instruct: intr_lines: %d level: %d\n", m_intr_lines, level);
-
 	// return RST based on level
 	return 0xc7 | ((level & 0x7) << 3);
 }
