@@ -31,6 +31,7 @@ namespace bx
 		void unlock();
 
 	private:
+		[[maybe_unused]]
 		BX_ALIGN_DECL(16, uint8_t) m_internal[64];
 	};
 
