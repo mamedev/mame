@@ -288,516 +288,11 @@ void vga_device::device_reset()
 	vga.dac.mask = 0xff;
 }
 
-uint16_t vga_device::offset()
-{
-//  popmessage("Offset: %04x  %s %s **",vga.crtc.offset,vga.crtc.dw?"DW":"--",vga.crtc.word_mode?"BYTE":"WORD");
-	if(vga.crtc.dw)
-		return vga.crtc.offset << 3;
-	if(vga.crtc.word_mode)
-		return vga.crtc.offset << 1;
-	else
-		return vga.crtc.offset << 2;
-}
-
-uint32_t vga_device::start_addr()
-{
-//  popmessage("Offset: %04x  %s %s **",vga.crtc.offset,vga.crtc.dw?"DW":"--",vga.crtc.word_mode?"BYTE":"WORD");
-	if(vga.crtc.dw)
-		return vga.crtc.start_addr << 2;
-	if(vga.crtc.word_mode)
-		return vga.crtc.start_addr << 0;
-	else
-		return vga.crtc.start_addr << 1;
-}
-
-void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	int width=VGA_CH_WIDTH, height = (vga.crtc.maximum_scan_line) * (vga.crtc.scan_doubling + 1);
-
-	if(vga.crtc.cursor_enable)
-		vga.cursor.visible = screen().frame_number() & 0x10;
-	else
-		vga.cursor.visible = 0;
-
-	for (int addr = vga.crtc.start_addr, line = -vga.crtc.preset_row_scan; line < TEXT_LINES;
-			line += height, addr += (offset()>>1))
-	{
-		for (int pos = addr, column=0; column<TEXT_COLUMNS; column++, pos++)
-		{
-			uint8_t ch   = vga.memory[(pos<<1) + 0];
-			uint8_t attr = vga.memory[(pos<<1) + 1];
-			uint32_t font_base = 0x20000+(ch<<5);
-			font_base += ((attr & 8) ? vga.sequencer.char_sel.A : vga.sequencer.char_sel.B)*0x2000;
-			uint8_t blink_en = (vga.attribute.data[0x10]&8&&screen().frame_number() & 0x20) ? attr & 0x80 : 0;
-
-			uint8_t fore_col = attr & 0xf;
-			uint8_t back_col = (attr & 0x70) >> 4;
-			back_col |= (vga.attribute.data[0x10]&8) ? 0 : ((attr & 0x80) >> 4);
-
-			for (int h = std::max(-line, 0); (h < height) && (line+h < std::min(TEXT_LINES, bitmap.height())); h++)
-			{
-				uint32_t *const bitmapline = &bitmap.pix(line+h);
-				uint8_t bits = vga.memory[font_base+(h>>(vga.crtc.scan_doubling))];
-
-				int mask, w;
-				for (mask=0x80, w=0; (w<width)&&(w<8); w++, mask>>=1)
-				{
-					pen_t pen;
-					if (bits&mask)
-						pen = vga.pens[blink_en ? back_col : fore_col];
-					else
-						pen = vga.pens[back_col];
-
-					if(!screen().visible_area().contains(column*width+w, line+h))
-						continue;
-					bitmapline[column*width+w] = pen;
-
-				}
-				if (w<width)
-				{
-					/* 9 column */
-					pen_t pen;
-					if (TEXT_COPY_9COLUMN(ch)&&(bits&1))
-						pen = vga.pens[blink_en ? back_col : fore_col];
-					else
-						pen = vga.pens[back_col];
-
-					if(!screen().visible_area().contains(column*width+w, line+h))
-						continue;
-					bitmapline[column*width+w] = pen;
-				}
-			}
-			if (vga.cursor.visible&&(pos==vga.crtc.cursor_addr))
-			{
-				for (int h=vga.crtc.cursor_scan_start;
-						(h<=vga.crtc.cursor_scan_end)&&(h<height)&&(line+h<TEXT_LINES);
-						h++)
-				{
-					if(!screen().visible_area().contains(column*width, line+h))
-						continue;
-					bitmap.plot_box(column*width, line+h, width, 1, vga.pens[attr&0xf]);
-				}
-			}
-		}
-	}
-}
-
-void vga_device::vga_vh_ega(bitmap_rgb32 &bitmap,  const rectangle &cliprect)
-{
-	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
-	int pel_shift = (vga.attribute.pel_shift & 7);
-
-	for (int addr=EGA_START_ADDRESS, line=0; line<LINES; line += height, addr += offset())
-	{
-		for (int yi=0;yi<height;yi++)
-		{
-			uint32_t *const bitmapline = &bitmap.pix(line + yi);
-			// ibm_5150:batmanmv uses this on gameplay for both EGA and "VGA" modes
-			// NB: EGA mode in that game sets 663, should be 303 like the other mode
-			// causing no status bar to appear. This is a known btanb in how VGA
-			// handles EGA mode, cfr. https://www.os2museum.com/wp/fantasyland-on-vga/
-			if((line + yi) == (vga.crtc.line_compare & 0x3ff))
-				addr = 0;
-
-			for (int pos=addr, c=0, column=0; column<EGA_COLUMNS+1; column++, c+=8, pos=(pos+1)&0xffff)
-			{
-				int data[4] = {
-						vga.memory[(pos & 0xffff)],
-						vga.memory[(pos & 0xffff)+0x10000]<<1,
-						vga.memory[(pos & 0xffff)+0x20000]<<2,
-						vga.memory[(pos & 0xffff)+0x30000]<<3 };
-
-				for (int i = 7; i >= 0; i--)
-				{
-					pen_t pen = vga.pens[(data[0]&1) | (data[1]&2) | (data[2]&4) | (data[3]&8)];
-
-					data[0]>>=1;
-					data[1]>>=1;
-					data[2]>>=1;
-					data[3]>>=1;
-
-					if(!screen().visible_area().contains(c+i-pel_shift, line + yi))
-						continue;
-					bitmapline[c+i-pel_shift] = pen;
-				}
-			}
-		}
-	}
-}
-
-/* TODO: I'm guessing that in 256 colors mode every pixel actually outputs two pixels. Is it right? */
-void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
-	int pel_shift = (vga.attribute.pel_shift & 6);
-	int addrmask = vga.crtc.no_wrap ? -1 : 0xffff;
-
-	/* line compare is screen sensitive */
-	uint16_t mask_comp = 0x3ff; //| (LINES & 0x300);
-
-//  popmessage("%02x %02x",vga.attribute.pel_shift,vga.sequencer.data[4] & 0x08);
-
-	int curr_addr = 0;
-	if(!(vga.sequencer.data[4] & 0x08))
-	{
-		for (int addr = start_addr(), line=0; line<LINES; line+=height, addr+=offset(), curr_addr+=offset())
-		{
-			for(int yi = 0;yi < height; yi++)
-			{
-				if((line + yi) < (vga.crtc.line_compare & mask_comp))
-					curr_addr = addr;
-				if((line + yi) == (vga.crtc.line_compare & mask_comp))
-				{
-					curr_addr = 0;
-					pel_shift = 0;
-				}
-				uint32_t *const bitmapline = &bitmap.pix(line + yi);
-				for (int pos=curr_addr, c=0, column=0; column<VGA_COLUMNS+1; column++, c+=8, pos++)
-				{
-					if(pos > 0x80000/4)
-						return;
-
-					for(int xi=0;xi<8;xi++)
-					{
-						if (!screen().visible_area().contains(c+xi-(pel_shift), line + yi))
-							continue;
-						bitmapline[c+xi-(pel_shift)] = pen(vga.memory[(pos & addrmask)+((xi >> 1)*0x10000)]);
-					}
-				}
-			}
-		}
-	}
-	else
-	{
-		for (int addr = start_addr(), line=0; line<LINES; line+=height, addr+=offset(), curr_addr+=offset())
-		{
-			for(int yi = 0;yi < height; yi++)
-			{
-				if((line + yi) < (vga.crtc.line_compare & mask_comp))
-					curr_addr = addr;
-				if((line + yi) == (vga.crtc.line_compare & mask_comp))
-					curr_addr = 0;
-				uint32_t *const bitmapline = &bitmap.pix(line + yi);
-				//addr %= 0x80000;
-				for (int pos=curr_addr, c=0, column=0; column<VGA_COLUMNS+1; column++, c+=0x10, pos+=0x8)
-				{
-					if(pos + 0x08 > 0x80000)
-						return;
-
-					for (int xi=0;xi<0x10;xi++)
-					{
-						if(!screen().visible_area().contains(c+xi-(pel_shift), line + yi))
-							continue;
-						bitmapline[c+xi-pel_shift] = pen(vga.memory[(pos+(xi >> 1)) & addrmask]);
-					}
-				}
-			}
-		}
-	}
-}
-
-void vga_device::vga_vh_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	int height = (vga.crtc.scan_doubling + 1);
-
-	int width = (vga.crtc.horz_disp_end + 1) * 8;
-
-	for(int y=0;y<LINES;y++)
-	{
-		uint32_t addr = ((y & 1) * 0x2000) + (((y & ~1) >> 1) * width/4);
-
-		for(int x=0;x<width;x+=4)
-		{
-			for(int yi=0;yi<height;yi++)
-			{
-				uint32_t *const bitmapline = &bitmap.pix(y * height + yi);
-
-				for(int xi=0;xi<4;xi++)
-				{
-					pen_t pen = vga.pens[(vga.memory[addr] >> (6-xi*2)) & 3];
-					if(!screen().visible_area().contains(x+xi, y * height + yi))
-						continue;
-					bitmapline[x+xi] = pen;
-				}
-			}
-
-			addr++;
-		}
-	}
-}
-
-void vga_device::vga_vh_mono(bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	int height = (vga.crtc.scan_doubling + 1);
-
-	int width = (vga.crtc.horz_disp_end + 1) * 8;
-
-	for(int y=0;y<LINES;y++)
-	{
-		uint32_t addr = ((y & 1) * 0x2000) + (((y & ~1) >> 1) * width/8);
-
-		for(int x=0;x<width;x+=8)
-		{
-			for(int yi=0;yi<height;yi++)
-			{
-				uint32_t *const bitmapline = &bitmap.pix(y * height + yi);
-
-				for(int xi=0;xi<8;xi++)
-				{
-					pen_t pen = vga.pens[(vga.memory[addr] >> (7-xi)) & 1];
-					if(!screen().visible_area().contains(x+xi, y * height + yi))
-						continue;
-					bitmapline[x+xi] = pen;
-				}
-			}
-
-			addr++;
-		}
-	}
-}
-
-uint8_t vga_device::pc_vga_choosevideomode()
-{
-	if (vga.crtc.sync_en)
-	{
-		if (vga.dac.dirty)
-		{
-			for (int i=0; i<256;i++)
-			{
-				/* TODO: color shifters? */
-				set_pen_color(i, (vga.dac.color[3*(i & vga.dac.mask)] & 0x3f) << 2,
-										(vga.dac.color[3*(i & vga.dac.mask) + 1] & 0x3f) << 2,
-										(vga.dac.color[3*(i & vga.dac.mask) + 2] & 0x3f) << 2);
-			}
-			vga.dac.dirty = 0;
-		}
-
-		if (vga.attribute.data[0x10] & 0x80)
-		{
-			for (int i=0; i<16;i++)
-			{
-				vga.pens[i] = pen((vga.attribute.data[i]&0x0f)
-											|((vga.attribute.data[0x14]&0xf)<<4));
-			}
-		}
-		else
-		{
-			for (int i=0; i<16;i++)
-			{
-				vga.pens[i] = pen((vga.attribute.data[i]&0x3f)
-											|((vga.attribute.data[0x14]&0xc)<<4));
-			}
-		}
-
-		if (!GRAPHIC_MODE)
-		{
-			return TEXT_MODE;
-		}
-		else if (vga.gc.shift256)
-		{
-			return VGA_MODE;
-		}
-		else if (vga.gc.shift_reg)
-		{
-			return CGA_MODE;
-		}
-		else if (vga.gc.memory_map_sel == 0x03)
-		{
-			return MONO_MODE;
-		}
-		else
-		{
-			return EGA_MODE;
-		}
-	}
-
-	return SCREEN_OFF;
-}
-
-uint32_t vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	uint8_t cur_mode = pc_vga_choosevideomode();
-
-	switch(cur_mode)
-	{
-		case SCREEN_OFF:   bitmap.fill  (black_pen(), cliprect);break;
-		case TEXT_MODE:    vga_vh_text  (bitmap, cliprect); break;
-		case VGA_MODE:     vga_vh_vga   (bitmap, cliprect); break;
-		case EGA_MODE:     vga_vh_ega   (bitmap, cliprect); break;
-		case CGA_MODE:     vga_vh_cga   (bitmap, cliprect); break;
-		case MONO_MODE:    vga_vh_mono  (bitmap, cliprect); break;
-	}
-
-	return 0;
-}
-
-/***************************************************************************/
-
-uint8_t vga_device::vga_latch_write(int offs, uint8_t data)
-{
-	uint8_t res = 0;
-
-	switch (vga.gc.write_mode & 3) {
-	case 0:
-		data = rotate_right(data);
-		if(vga.gc.enable_set_reset & 1<<offs)
-			res = vga_logical_op((vga.gc.set_reset & 1<<offs) ? vga.gc.bit_mask : 0, offs,vga.gc.bit_mask);
-		else
-			res = vga_logical_op(data, offs, vga.gc.bit_mask);
-		break;
-	case 1:
-		res = vga.gc.latch[offs];
-		break;
-	case 2:
-		res = vga_logical_op((data & 1<<offs) ? 0xff : 0x00,offs,vga.gc.bit_mask);
-		break;
-	case 3:
-		data = rotate_right(data);
-		res = vga_logical_op((vga.gc.set_reset & 1<<offs) ? 0xff : 0x00,offs,data&vga.gc.bit_mask);
-		break;
-	}
-
-	return res;
-}
-
-void vga_device::recompute_params_clock(int divisor, int xtal)
-{
-	int vblank_period,hblank_period;
-	attoseconds_t refresh;
-	uint8_t hclock_m = (!GRAPHIC_MODE) ? VGA_CH_WIDTH : 8;
-	int pixel_clock;
-
-	/* safety check */
-	if(!vga.crtc.horz_disp_end || !vga.crtc.vert_disp_end || !vga.crtc.horz_total || !vga.crtc.vert_total)
-		return;
-
-	rectangle visarea(0, ((vga.crtc.horz_disp_end + 1) * ((float)(hclock_m)/divisor))-1, 0, vga.crtc.vert_disp_end);
-
-	vblank_period = (vga.crtc.vert_total + 2);
-	hblank_period = ((vga.crtc.horz_total + 5) * ((float)(hclock_m)/divisor));
-
-	/* TODO: 10b and 11b settings aren't known */
-	pixel_clock = xtal / (((vga.sequencer.data[1]&8) >> 3) + 1);
-
-	refresh  = HZ_TO_ATTOSECONDS(pixel_clock) * (hblank_period) * vblank_period;
-	screen().configure((hblank_period), (vblank_period), visarea, refresh );
-	//popmessage("%d %d\n",vga.crtc.horz_total * 8,vga.crtc.vert_total);
-	m_vblank_timer->adjust( screen().time_until_pos(vga.crtc.vert_blank_start + vga.crtc.vert_blank_end) );
-}
-
-void vga_device::recompute_params()
-{
-	if(vga.miscellaneous_output & 8)
-		LOGWARN("Warning: VGA external clock latch selected\n");
-	else
-		recompute_params_clock(1, ((vga.miscellaneous_output & 0xc) ? XTAL(28'636'363) : XTAL(25'174'800)).value());
-}
-
-uint8_t vga_device::vga_vblank()
-{
-	uint8_t res;
-	uint16_t vblank_start,vblank_end,vpos;
-
-	/* calculate vblank start / end positions */
-	res = 0;
-	vblank_start = vga.crtc.vert_blank_start;
-	vblank_end = vga.crtc.vert_blank_start + vga.crtc.vert_blank_end;
-	vpos = screen().vpos();
-
-	/* check if we are under vblank period */
-	if(vblank_end > vga.crtc.vert_total)
-	{
-		vblank_end -= vga.crtc.vert_total;
-		if(vpos >= vblank_start || vpos <= vblank_end)
-			res = 1;
-	}
-	else
-	{
-		if(vpos >= vblank_start && vpos <= vblank_end)
-			res = 1;
-	}
-
-	//popmessage("%d %d %d - SR1=%02x",vblank_start,vblank_end,vga.crtc.vert_total,vga.sequencer.data[1]);
-
-	return res;
-}
-
-uint8_t vga_device::vga_crtc_r(offs_t offset)
-{
-	uint8_t data = 0xff;
-
-	switch (offset) {
-	case 4:
-		data = vga.crtc.index;
-		break;
-	case 5:
-		data = space(CRTC_REG).read_byte(vga.crtc.index);
-		break;
-	case 0xa:
-		uint8_t hsync,vsync;
-		vga.attribute.state = 0;
-		data = 0;
-
-		hsync = screen().hblank() & 1;
-		vsync = vga_vblank(); //screen().vblank() & 1;
-
-		data |= (hsync | vsync) & 1; // DD - display disable register
-		data |= (vsync & 1) << 3; // VRetrace register
-
-		/* ega diagnostic readback enough for oak bios */
-		switch (vga.attribute.data[0x12]&0x30) {
-		case 0:
-			if (vga.attribute.data[0x11]&1) data|=0x10;
-			if (vga.attribute.data[0x11]&4) data|=0x20;
-			break;
-		case 0x10:
-			data|=(vga.attribute.data[0x11]&0x30);
-			break;
-		case 0x20:
-			if (vga.attribute.data[0x11]&2) data|=0x10;
-			if (vga.attribute.data[0x11]&8) data|=0x20;
-			break;
-		case 0x30:
-			data|=(vga.attribute.data[0x11]&0xc0)>>2;
-			break;
-		}
-		break;
-	case 0xf:
-		/* oak test */
-		//data=0;
-		/* pega bios on/off */
-		data=0x80;
-		break;
-	}
-	return data;
-}
-
-void vga_device::vga_crtc_w(offs_t offset, uint8_t data)
-{
-	switch (offset)
-	{
-		case 4:
-			vga.crtc.index = data;
-			break;
-
-		case 5:
-			space(CRTC_REG).write_byte(vga.crtc.index, data);
-			//screen().update_partial(screen().vpos());
-			break;
-
-		case 0xa:
-			vga.feature_control = data;
-			break;
-	}
-}
-
-uint8_t vga_device::port_03b0_r(offs_t offset)
-{
-	uint8_t data = 0xff;
-	if (get_crtc_port() == 0x3b0)
-		data = vga_crtc_r(offset);
-	return data;
-}
+/**************************************
+ *
+ * Main I/O spaces
+ *
+ *************************************/
 
 void vga_device::crtc_map(address_map &map)
 {
@@ -1283,6 +778,528 @@ void vga_device::attribute_map(address_map &map)
 	);
 }
 
+/**************************************
+ *
+ * Drawing routines
+ *
+ *************************************/
+
+uint16_t vga_device::offset()
+{
+//  popmessage("Offset: %04x  %s %s **",vga.crtc.offset,vga.crtc.dw?"DW":"--",vga.crtc.word_mode?"BYTE":"WORD");
+	if(vga.crtc.dw)
+		return vga.crtc.offset << 3;
+	if(vga.crtc.word_mode)
+		return vga.crtc.offset << 1;
+	else
+		return vga.crtc.offset << 2;
+}
+
+uint32_t vga_device::start_addr()
+{
+//  popmessage("Offset: %04x  %s %s **",vga.crtc.offset,vga.crtc.dw?"DW":"--",vga.crtc.word_mode?"BYTE":"WORD");
+	if(vga.crtc.dw)
+		return vga.crtc.start_addr << 2;
+	if(vga.crtc.word_mode)
+		return vga.crtc.start_addr << 0;
+	else
+		return vga.crtc.start_addr << 1;
+}
+
+uint8_t vga_device::vga_latch_write(int offs, uint8_t data)
+{
+	uint8_t res = 0;
+
+	switch (vga.gc.write_mode & 3) {
+	case 0:
+		data = rotate_right(data);
+		if(vga.gc.enable_set_reset & 1<<offs)
+			res = vga_logical_op((vga.gc.set_reset & 1<<offs) ? vga.gc.bit_mask : 0, offs,vga.gc.bit_mask);
+		else
+			res = vga_logical_op(data, offs, vga.gc.bit_mask);
+		break;
+	case 1:
+		res = vga.gc.latch[offs];
+		break;
+	case 2:
+		res = vga_logical_op((data & 1<<offs) ? 0xff : 0x00,offs,vga.gc.bit_mask);
+		break;
+	case 3:
+		data = rotate_right(data);
+		res = vga_logical_op((vga.gc.set_reset & 1<<offs) ? 0xff : 0x00,offs,data&vga.gc.bit_mask);
+		break;
+	}
+
+	return res;
+}
+
+void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	int width=VGA_CH_WIDTH, height = (vga.crtc.maximum_scan_line) * (vga.crtc.scan_doubling + 1);
+
+	if(vga.crtc.cursor_enable)
+		vga.cursor.visible = screen().frame_number() & 0x10;
+	else
+		vga.cursor.visible = 0;
+
+	for (int addr = vga.crtc.start_addr, line = -vga.crtc.preset_row_scan; line < TEXT_LINES;
+			line += height, addr += (offset()>>1))
+	{
+		for (int pos = addr, column=0; column<TEXT_COLUMNS; column++, pos++)
+		{
+			uint8_t ch   = vga.memory[(pos<<1) + 0];
+			uint8_t attr = vga.memory[(pos<<1) + 1];
+			uint32_t font_base = 0x20000+(ch<<5);
+			font_base += ((attr & 8) ? vga.sequencer.char_sel.A : vga.sequencer.char_sel.B)*0x2000;
+			uint8_t blink_en = (vga.attribute.data[0x10]&8&&screen().frame_number() & 0x20) ? attr & 0x80 : 0;
+
+			uint8_t fore_col = attr & 0xf;
+			uint8_t back_col = (attr & 0x70) >> 4;
+			back_col |= (vga.attribute.data[0x10]&8) ? 0 : ((attr & 0x80) >> 4);
+
+			for (int h = std::max(-line, 0); (h < height) && (line+h < std::min(TEXT_LINES, bitmap.height())); h++)
+			{
+				uint32_t *const bitmapline = &bitmap.pix(line+h);
+				uint8_t bits = vga.memory[font_base+(h>>(vga.crtc.scan_doubling))];
+
+				int mask, w;
+				for (mask=0x80, w=0; (w<width)&&(w<8); w++, mask>>=1)
+				{
+					pen_t pen;
+					if (bits&mask)
+						pen = vga.pens[blink_en ? back_col : fore_col];
+					else
+						pen = vga.pens[back_col];
+
+					if(!screen().visible_area().contains(column*width+w, line+h))
+						continue;
+					bitmapline[column*width+w] = pen;
+
+				}
+				if (w<width)
+				{
+					/* 9 column */
+					pen_t pen;
+					if (TEXT_COPY_9COLUMN(ch)&&(bits&1))
+						pen = vga.pens[blink_en ? back_col : fore_col];
+					else
+						pen = vga.pens[back_col];
+
+					if(!screen().visible_area().contains(column*width+w, line+h))
+						continue;
+					bitmapline[column*width+w] = pen;
+				}
+			}
+			if (vga.cursor.visible&&(pos==vga.crtc.cursor_addr))
+			{
+				for (int h=vga.crtc.cursor_scan_start;
+						(h<=vga.crtc.cursor_scan_end)&&(h<height)&&(line+h<TEXT_LINES);
+						h++)
+				{
+					if(!screen().visible_area().contains(column*width, line+h))
+						continue;
+					bitmap.plot_box(column*width, line+h, width, 1, vga.pens[attr&0xf]);
+				}
+			}
+		}
+	}
+}
+
+void vga_device::vga_vh_ega(bitmap_rgb32 &bitmap,  const rectangle &cliprect)
+{
+	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
+	int pel_shift = (vga.attribute.pel_shift & 7);
+
+	for (int addr=EGA_START_ADDRESS, line=0; line<LINES; line += height, addr += offset())
+	{
+		for (int yi=0;yi<height;yi++)
+		{
+			uint32_t *const bitmapline = &bitmap.pix(line + yi);
+			// ibm_5150:batmanmv uses this on gameplay for both EGA and "VGA" modes
+			// NB: EGA mode in that game sets 663, should be 303 like the other mode
+			// causing no status bar to appear. This is a known btanb in how VGA
+			// handles EGA mode, cfr. https://www.os2museum.com/wp/fantasyland-on-vga/
+			if((line + yi) == (vga.crtc.line_compare & 0x3ff))
+				addr = 0;
+
+			for (int pos=addr, c=0, column=0; column<EGA_COLUMNS+1; column++, c+=8, pos=(pos+1)&0xffff)
+			{
+				int data[4] = {
+						vga.memory[(pos & 0xffff)],
+						vga.memory[(pos & 0xffff)+0x10000]<<1,
+						vga.memory[(pos & 0xffff)+0x20000]<<2,
+						vga.memory[(pos & 0xffff)+0x30000]<<3 };
+
+				for (int i = 7; i >= 0; i--)
+				{
+					pen_t pen = vga.pens[(data[0]&1) | (data[1]&2) | (data[2]&4) | (data[3]&8)];
+
+					data[0]>>=1;
+					data[1]>>=1;
+					data[2]>>=1;
+					data[3]>>=1;
+
+					if(!screen().visible_area().contains(c+i-pel_shift, line + yi))
+						continue;
+					bitmapline[c+i-pel_shift] = pen;
+				}
+			}
+		}
+	}
+}
+
+/* TODO: I'm guessing that in 256 colors mode every pixel actually outputs two pixels. Is it right? */
+void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
+	int pel_shift = (vga.attribute.pel_shift & 6);
+	int addrmask = vga.crtc.no_wrap ? -1 : 0xffff;
+
+	/* line compare is screen sensitive */
+	uint16_t mask_comp = 0x3ff; //| (LINES & 0x300);
+
+//  popmessage("%02x %02x",vga.attribute.pel_shift,vga.sequencer.data[4] & 0x08);
+
+	int curr_addr = 0;
+	if(!(vga.sequencer.data[4] & 0x08))
+	{
+		for (int addr = start_addr(), line=0; line<LINES; line+=height, addr+=offset(), curr_addr+=offset())
+		{
+			for(int yi = 0;yi < height; yi++)
+			{
+				if((line + yi) < (vga.crtc.line_compare & mask_comp))
+					curr_addr = addr;
+				if((line + yi) == (vga.crtc.line_compare & mask_comp))
+				{
+					curr_addr = 0;
+					pel_shift = 0;
+				}
+				uint32_t *const bitmapline = &bitmap.pix(line + yi);
+				for (int pos=curr_addr, c=0, column=0; column<VGA_COLUMNS+1; column++, c+=8, pos++)
+				{
+					if(pos > 0x80000/4)
+						return;
+
+					for(int xi=0;xi<8;xi++)
+					{
+						if (!screen().visible_area().contains(c+xi-(pel_shift), line + yi))
+							continue;
+						bitmapline[c+xi-(pel_shift)] = pen(vga.memory[(pos & addrmask)+((xi >> 1)*0x10000)]);
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		for (int addr = start_addr(), line=0; line<LINES; line+=height, addr+=offset(), curr_addr+=offset())
+		{
+			for(int yi = 0;yi < height; yi++)
+			{
+				if((line + yi) < (vga.crtc.line_compare & mask_comp))
+					curr_addr = addr;
+				if((line + yi) == (vga.crtc.line_compare & mask_comp))
+					curr_addr = 0;
+				uint32_t *const bitmapline = &bitmap.pix(line + yi);
+				//addr %= 0x80000;
+				for (int pos=curr_addr, c=0, column=0; column<VGA_COLUMNS+1; column++, c+=0x10, pos+=0x8)
+				{
+					if(pos + 0x08 > 0x80000)
+						return;
+
+					for (int xi=0;xi<0x10;xi++)
+					{
+						if(!screen().visible_area().contains(c+xi-(pel_shift), line + yi))
+							continue;
+						bitmapline[c+xi-pel_shift] = pen(vga.memory[(pos+(xi >> 1)) & addrmask]);
+					}
+				}
+			}
+		}
+	}
+}
+
+void vga_device::vga_vh_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	int height = (vga.crtc.scan_doubling + 1);
+
+	int width = (vga.crtc.horz_disp_end + 1) * 8;
+
+	for(int y=0;y<LINES;y++)
+	{
+		uint32_t addr = ((y & 1) * 0x2000) + (((y & ~1) >> 1) * width/4);
+
+		for(int x=0;x<width;x+=4)
+		{
+			for(int yi=0;yi<height;yi++)
+			{
+				uint32_t *const bitmapline = &bitmap.pix(y * height + yi);
+
+				for(int xi=0;xi<4;xi++)
+				{
+					pen_t pen = vga.pens[(vga.memory[addr] >> (6-xi*2)) & 3];
+					if(!screen().visible_area().contains(x+xi, y * height + yi))
+						continue;
+					bitmapline[x+xi] = pen;
+				}
+			}
+
+			addr++;
+		}
+	}
+}
+
+void vga_device::vga_vh_mono(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	int height = (vga.crtc.scan_doubling + 1);
+
+	int width = (vga.crtc.horz_disp_end + 1) * 8;
+
+	for(int y=0;y<LINES;y++)
+	{
+		uint32_t addr = ((y & 1) * 0x2000) + (((y & ~1) >> 1) * width/8);
+
+		for(int x=0;x<width;x+=8)
+		{
+			for(int yi=0;yi<height;yi++)
+			{
+				uint32_t *const bitmapline = &bitmap.pix(y * height + yi);
+
+				for(int xi=0;xi<8;xi++)
+				{
+					pen_t pen = vga.pens[(vga.memory[addr] >> (7-xi)) & 1];
+					if(!screen().visible_area().contains(x+xi, y * height + yi))
+						continue;
+					bitmapline[x+xi] = pen;
+				}
+			}
+
+			addr++;
+		}
+	}
+}
+
+uint8_t vga_device::pc_vga_choosevideomode()
+{
+	if (vga.crtc.sync_en)
+	{
+		if (vga.dac.dirty)
+		{
+			for (int i=0; i<256;i++)
+			{
+				/* TODO: color shifters? */
+				set_pen_color(i, (vga.dac.color[3*(i & vga.dac.mask)] & 0x3f) << 2,
+										(vga.dac.color[3*(i & vga.dac.mask) + 1] & 0x3f) << 2,
+										(vga.dac.color[3*(i & vga.dac.mask) + 2] & 0x3f) << 2);
+			}
+			vga.dac.dirty = 0;
+		}
+
+		if (vga.attribute.data[0x10] & 0x80)
+		{
+			for (int i=0; i<16;i++)
+			{
+				vga.pens[i] = pen((vga.attribute.data[i]&0x0f)
+											|((vga.attribute.data[0x14]&0xf)<<4));
+			}
+		}
+		else
+		{
+			for (int i=0; i<16;i++)
+			{
+				vga.pens[i] = pen((vga.attribute.data[i]&0x3f)
+											|((vga.attribute.data[0x14]&0xc)<<4));
+			}
+		}
+
+		if (!GRAPHIC_MODE)
+		{
+			return TEXT_MODE;
+		}
+		else if (vga.gc.shift256)
+		{
+			return VGA_MODE;
+		}
+		else if (vga.gc.shift_reg)
+		{
+			return CGA_MODE;
+		}
+		else if (vga.gc.memory_map_sel == 0x03)
+		{
+			return MONO_MODE;
+		}
+		else
+		{
+			return EGA_MODE;
+		}
+	}
+
+	return SCREEN_OFF;
+}
+
+uint32_t vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	uint8_t cur_mode = pc_vga_choosevideomode();
+
+	switch(cur_mode)
+	{
+		case SCREEN_OFF:   bitmap.fill  (black_pen(), cliprect);break;
+		case TEXT_MODE:    vga_vh_text  (bitmap, cliprect); break;
+		case VGA_MODE:     vga_vh_vga   (bitmap, cliprect); break;
+		case EGA_MODE:     vga_vh_ega   (bitmap, cliprect); break;
+		case CGA_MODE:     vga_vh_cga   (bitmap, cliprect); break;
+		case MONO_MODE:    vga_vh_mono  (bitmap, cliprect); break;
+	}
+
+	return 0;
+}
+
+/**************************************
+ *
+ * CRTC setups
+ *
+ *************************************/
+
+void vga_device::recompute_params_clock(int divisor, int xtal)
+{
+	int vblank_period,hblank_period;
+	attoseconds_t refresh;
+	uint8_t hclock_m = (!GRAPHIC_MODE) ? VGA_CH_WIDTH : 8;
+	int pixel_clock;
+
+	/* safety check */
+	if(!vga.crtc.horz_disp_end || !vga.crtc.vert_disp_end || !vga.crtc.horz_total || !vga.crtc.vert_total)
+		return;
+
+	rectangle visarea(0, ((vga.crtc.horz_disp_end + 1) * ((float)(hclock_m)/divisor))-1, 0, vga.crtc.vert_disp_end);
+
+	vblank_period = (vga.crtc.vert_total + 2);
+	hblank_period = ((vga.crtc.horz_total + 5) * ((float)(hclock_m)/divisor));
+
+	/* TODO: 10b and 11b settings aren't known */
+	pixel_clock = xtal / (((vga.sequencer.data[1]&8) >> 3) + 1);
+
+	refresh  = HZ_TO_ATTOSECONDS(pixel_clock) * (hblank_period) * vblank_period;
+	screen().configure((hblank_period), (vblank_period), visarea, refresh );
+	//popmessage("%d %d\n",vga.crtc.horz_total * 8,vga.crtc.vert_total);
+	m_vblank_timer->adjust( screen().time_until_pos(vga.crtc.vert_blank_start + vga.crtc.vert_blank_end) );
+}
+
+// TODO: rename me
+void vga_device::recompute_params()
+{
+	if(vga.miscellaneous_output & 8)
+		LOGWARN("Warning: VGA external clock latch selected\n");
+	else
+		recompute_params_clock(1, ((vga.miscellaneous_output & 0xc) ? XTAL(28'636'363) : XTAL(25'174'800)).value());
+}
+
+uint8_t vga_device::vga_vblank()
+{
+	uint8_t res;
+	uint16_t vblank_start,vblank_end,vpos;
+
+	/* calculate vblank start / end positions */
+	res = 0;
+	vblank_start = vga.crtc.vert_blank_start;
+	vblank_end = vga.crtc.vert_blank_start + vga.crtc.vert_blank_end;
+	vpos = screen().vpos();
+
+	/* check if we are under vblank period */
+	if(vblank_end > vga.crtc.vert_total)
+	{
+		vblank_end -= vga.crtc.vert_total;
+		if(vpos >= vblank_start || vpos <= vblank_end)
+			res = 1;
+	}
+	else
+	{
+		if(vpos >= vblank_start && vpos <= vblank_end)
+			res = 1;
+	}
+
+	//popmessage("%d %d %d - SR1=%02x",vblank_start,vblank_end,vga.crtc.vert_total,vga.sequencer.data[1]);
+
+	return res;
+}
+
+uint8_t vga_device::vga_crtc_r(offs_t offset)
+{
+	uint8_t data = 0xff;
+
+	switch (offset) {
+	case 4:
+		data = vga.crtc.index;
+		break;
+	case 5:
+		data = space(CRTC_REG).read_byte(vga.crtc.index);
+		break;
+	case 0xa:
+		uint8_t hsync,vsync;
+		vga.attribute.state = 0;
+		data = 0;
+
+		hsync = screen().hblank() & 1;
+		vsync = vga_vblank(); //screen().vblank() & 1;
+
+		data |= (hsync | vsync) & 1; // DD - display disable register
+		data |= (vsync & 1) << 3; // VRetrace register
+
+		/* ega diagnostic readback enough for oak bios */
+		switch (vga.attribute.data[0x12]&0x30) {
+		case 0:
+			if (vga.attribute.data[0x11]&1) data|=0x10;
+			if (vga.attribute.data[0x11]&4) data|=0x20;
+			break;
+		case 0x10:
+			data|=(vga.attribute.data[0x11]&0x30);
+			break;
+		case 0x20:
+			if (vga.attribute.data[0x11]&2) data|=0x10;
+			if (vga.attribute.data[0x11]&8) data|=0x20;
+			break;
+		case 0x30:
+			data|=(vga.attribute.data[0x11]&0xc0)>>2;
+			break;
+		}
+		break;
+	case 0xf:
+		/* oak test */
+		//data=0;
+		/* pega bios on/off */
+		data=0x80;
+		break;
+	}
+	return data;
+}
+
+void vga_device::vga_crtc_w(offs_t offset, uint8_t data)
+{
+	switch (offset)
+	{
+		case 4:
+			vga.crtc.index = data;
+			break;
+
+		case 5:
+			space(CRTC_REG).write_byte(vga.crtc.index, data);
+			//screen().update_partial(screen().vpos());
+			break;
+
+		case 0xa:
+			vga.feature_control = data;
+			break;
+	}
+}
+
+uint8_t vga_device::port_03b0_r(offs_t offset)
+{
+	uint8_t data = 0xff;
+	if (get_crtc_port() == 0x3b0)
+		data = vga_crtc_r(offset);
+	return data;
+}
+
 /*
   4 additional dipswitches
   seems to have emulation modes at register level
@@ -1618,6 +1635,7 @@ void vga_device::mem_w(offs_t offset, uint8_t data)
 	}
 }
 
+// TODO: is there any non-SVGA capable board capable of linear access?
 uint8_t vga_device::mem_linear_r(offs_t offset)
 {
 	return vga.memory[offset % vga.svga_intf.vram_size];
@@ -1636,11 +1654,11 @@ TIMER_CALLBACK_MEMBER(vga_device::vblank_timer_cb)
 	m_vblank_timer->adjust( screen().time_until_pos(vga.crtc.vert_blank_start + vga.crtc.vert_blank_end) );
 }
 
-/**************************
+/**************************************
  *
  * SVGA overrides
  *
- *************************/
+ *************************************/
 
 svga_device::svga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: vga_device(mconfig, type, tag, owner, clock)
