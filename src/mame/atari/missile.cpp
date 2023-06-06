@@ -411,6 +411,7 @@ private:
 	inline int scanline_to_v(int scanline);
 	inline int v_to_scanline(int v);
 	inline void schedule_next_irq(int curv);
+	void sync_w(int state);
 	inline bool get_madsel();
 	inline offs_t get_bit3_addr(offs_t pixaddr);
 	void write_vram(offs_t address, uint8_t data);
@@ -442,6 +443,7 @@ private:
 	emu_timer *m_irq_timer = nullptr;
 	emu_timer *m_cpu_timer = nullptr;
 	uint8_t m_irq_state = 0;
+	uint8_t m_irq_pin = 0;
 	uint8_t m_ctrld = 0;
 	uint8_t m_flipscreen = 0;
 	uint64_t m_madsel_lastcycles = 0;
@@ -502,15 +504,25 @@ TIMER_CALLBACK_MEMBER(missile_state::clock_irq)
 {
 	int curv = param;
 
-	/* assert the IRQ if not already asserted */
+	/* set pending IRQ change */
 	m_irq_state = (~curv >> 5) & 1;
-	m_maincpu->set_input_line(0, m_irq_state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* force an update while we're here */
 	m_screen->update_partial(v_to_scanline(curv));
 
 	/* find the next edge */
 	schedule_next_irq(curv);
+}
+
+
+void missile_state::sync_w(int state)
+{
+	/* SYNC latches IRQ pin */
+	if (state && m_irq_state != m_irq_pin)
+	{
+		m_irq_pin = m_irq_state;
+		m_maincpu->set_input_line(0, m_irq_pin ? ASSERT_LINE : CLEAR_LINE);
+	}
 }
 
 
@@ -558,6 +570,7 @@ void missile_state::machine_start()
 
 	/* setup for save states */
 	save_item(NAME(m_irq_state));
+	save_item(NAME(m_irq_pin));
 	save_item(NAME(m_ctrld));
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_madsel_lastcycles));
@@ -567,6 +580,7 @@ void missile_state::machine_start()
 void missile_state::machine_reset()
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
+	m_irq_pin = 0;
 	m_irq_state = 0;
 	m_madsel_lastcycles = 0;
 }
@@ -769,13 +783,7 @@ void missile_state::missile_w(offs_t offset, uint8_t data)
 
 	/* interrupt ack */
 	else if (offset >= 0x4d00 && offset < 0x4e00)
-	{
-		if (m_irq_state)
-		{
-			m_maincpu->set_input_line(0, CLEAR_LINE);
-			m_irq_state = 0;
-		}
-	}
+		m_irq_state = 0;
 
 	/* anything else */
 	else
@@ -836,7 +844,7 @@ uint8_t missile_state::missile_r(offs_t offset)
 		logerror("%04X:Unknown read from %04X\n", m_maincpu->pc(), offset);
 
 	/* update the MADSEL state */
-	if (!m_irq_state && ((result & 0x1f) == 0x01) && m_maincpu->get_sync() && !machine().side_effects_disabled())
+	if (!m_irq_pin && ((result & 0x1f) == 0x01) && m_maincpu->get_sync() && !machine().side_effects_disabled())
 		m_madsel_lastcycles = m_maincpu->total_cycles();
 
 	return result;
@@ -881,13 +889,7 @@ void missile_state::bootleg_w(offs_t offset, uint8_t data)
 
 	/* interrupt ack */
 	else if (offset >= 0x4d00 && offset < 0x4e00)
-	{
-		if (m_irq_state)
-		{
-			m_maincpu->set_input_line(0, CLEAR_LINE);
-			m_irq_state = 0;
-		}
-	}
+		m_irq_state = 0;
 
 	/* anything else */
 	else
@@ -941,7 +943,7 @@ uint8_t missile_state::bootleg_r(offs_t offset)
 		logerror("%04X:Unknown read from %04X\n", m_maincpu->pc(), offset);
 
 	/* update the MADSEL state */
-	if (!m_irq_state && ((result & 0x1f) == 0x01) && m_maincpu->get_sync() && !machine().side_effects_disabled())
+	if (!m_irq_pin && ((result & 0x1f) == 0x01) && m_maincpu->get_sync() && !machine().side_effects_disabled())
 		m_madsel_lastcycles = m_maincpu->total_cycles();
 
 	return result;
@@ -1087,6 +1089,7 @@ void missile_state::missile(machine_config &config)
 	/* basic machine hardware */
 	M6502(config, m_maincpu, MASTER_CLOCK/8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &missile_state::main_map);
+	m_maincpu->sync_cb().set(FUNC(missile_state::sync_w));
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count(m_screen, 8);
 
