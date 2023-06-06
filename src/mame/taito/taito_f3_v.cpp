@@ -1727,36 +1727,31 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 			if (m_line_ram[0x700 + y] & bit_select)
 				pri = m_line_ram[pri_base / 2] & 0xffff;
 
-			// HW bug? skip fixes landmakr intro, gekiridn title, recalh title
-			// (1 px discrepancies with pcb recordings on some layers)
-			if (y != y_start)
+			// Zoom for playfields 1 & 3 is interleaved, as is the latch select
+			switch (pos)
 			{
-				// Zoom for playfields 1 & 3 is interleaved, as is the latch select
-				switch (pos)
-				{
-				case 0:
-					if (m_line_ram[0x400 + y] & bit_select)
-						line_zoom = m_line_ram[(zoom_base + 0x000) / 2] & 0xffff;
-					break;
-				case 1:
-					if (m_line_ram[0x400 + y] & 0x2)
-						line_zoom = ((m_line_ram[(zoom_base + 0x200) / 2] & 0xffff) & 0xff00) | (line_zoom & 0x00ff);
-					if (m_line_ram[0x400 + y] & 0x8)
-						line_zoom = ((m_line_ram[(zoom_base + 0x600) / 2] & 0xffff) & 0x00ff) | (line_zoom & 0xff00);
-					break;
-				case 2:
-					if (m_line_ram[0x400 + y] & bit_select)
-						line_zoom = m_line_ram[(zoom_base + 0x400) / 2] & 0xffff;
-					break;
-				case 3:
-					if (m_line_ram[0x400 + y] & 0x8)
-						line_zoom = ((m_line_ram[(zoom_base + 0x600) / 2] & 0xffff) & 0xff00) | (line_zoom & 0x00ff);
-					if (m_line_ram[0x400 + y] & 0x2)
-						line_zoom = ((m_line_ram[(zoom_base + 0x200) / 2] & 0xffff) & 0x00ff) | (line_zoom & 0xff00);
-					break;
-				default:
-					break;
-				}
+			case 0:
+				if (m_line_ram[0x400 + y] & bit_select)
+					line_zoom = m_line_ram[(zoom_base + 0x000) / 2] & 0xffff;
+				break;
+			case 1:
+				if (m_line_ram[0x400 + y] & 0x2)
+					line_zoom = ((m_line_ram[(zoom_base + 0x200) / 2] & 0xffff) & 0xff00) | (line_zoom & 0x00ff);
+				if (m_line_ram[0x400 + y] & 0x8)
+					line_zoom = ((m_line_ram[(zoom_base + 0x600) / 2] & 0xffff) & 0x00ff) | (line_zoom & 0xff00);
+				break;
+			case 2:
+				if (m_line_ram[0x400 + y] & bit_select)
+					line_zoom = m_line_ram[(zoom_base + 0x400) / 2] & 0xffff;
+				break;
+			case 3:
+				if (m_line_ram[0x400 + y] & 0x8)
+					line_zoom = ((m_line_ram[(zoom_base + 0x600) / 2] & 0xffff) & 0xff00) | (line_zoom & 0x00ff);
+				if (m_line_ram[0x400 + y] & 0x2)
+					line_zoom = ((m_line_ram[(zoom_base + 0x200) / 2] & 0xffff) & 0x00ff) | (line_zoom & 0xff00);
+				break;
+			default:
+				break;
 			}
 
 			// Column scroll only affects playfields 2 & 3
@@ -1806,6 +1801,9 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 		pal_add_base += inc;
 		y += y_inc;
 	}
+	// ignore the first zoom value from ram and use the default
+	_y_zoom[y_start] = 0;
+	line_t->x_zoom[y_start] = 0x10000;
 
 	tilemap_t* tm = tmap;
 	const u16* pfdata = pf_data_n;
