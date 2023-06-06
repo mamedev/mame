@@ -373,14 +373,8 @@ public:
 		, m_videoram(*this, "videoram")
 		, m_watchdog(*this, "watchdog")
 		, m_pokey(*this, "pokey")
-		, m_in0(*this, "IN0")
-		, m_in1(*this, "IN1")
-		, m_r10(*this, "R10")
-		, m_r8(*this, "R8")
-		, m_track0_x(*this, "TRACK0_X")
-		, m_track0_y(*this, "TRACK0_Y")
-		, m_track1_x(*this, "TRACK1_X")
-		, m_track1_y(*this, "TRACK1_Y")
+		, m_inputs(*this, { "IN0", "IN1", "R10", "R8" })
+		, m_track(*this, { "TRACK0_X", "TRACK0_Y", "TRACK1_X", "TRACK1_Y" })
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_leds(*this, "led%u", 0U)
@@ -426,14 +420,8 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_device<watchdog_timer_device> m_watchdog;
 	optional_device<pokey_device> m_pokey;
-	required_ioport m_in0;
-	required_ioport m_in1;
-	required_ioport m_r10;
-	required_ioport m_r8;
-	required_ioport m_track0_x;
-	required_ioport m_track0_y;
-	required_ioport m_track1_x;
-	required_ioport m_track1_y;
+	required_ioport_array<4> m_inputs;
+	required_ioport_array<4> m_track;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	output_finder<2> m_leds;
@@ -823,21 +811,21 @@ uint8_t missile_state::missile_r(offs_t offset)
 		if (m_ctrld)    /* trackball */
 		{
 			if (!m_flipscreen)
-				result = ((m_track0_y->read() << 4) & 0xf0) | (m_track0_x->read() & 0x0f);
+				result = ((m_track[1]->read() << 4) & 0xf0) | (m_track[0]->read() & 0x0f);
 			else
-				result = ((m_track1_y->read() << 4) & 0xf0) | (m_track1_x->read() & 0x0f);
+				result = ((m_track[3]->read() << 4) & 0xf0) | (m_track[2]->read() & 0x0f);
 		}
 		else    /* buttons */
-			result = m_in0->read();
+			result = m_inputs[0]->read();
 	}
 
 	/* IN1 */
 	else if (offset < 0x4a00)
-		result = m_in1->read();
+		result = m_inputs[1]->read();
 
 	/* IN2 */
 	else if (offset < 0x4b00)
-		result = m_r10->read();
+		result = m_inputs[2]->read();
 
 	/* anything else */
 	else
@@ -922,21 +910,21 @@ uint8_t missile_state::bootleg_r(offs_t offset)
 		if (m_ctrld)    /* trackball */
 		{
 			if (!m_flipscreen)
-				result = ((m_track0_y->read() << 4) & 0xf0) | (m_track0_x->read() & 0x0f);
+				result = ((m_track[1]->read() << 4) & 0xf0) | (m_track[0]->read() & 0x0f);
 			else
-				result = ((m_track1_y->read() << 4) & 0xf0) | (m_track1_x->read() & 0x0f);
+				result = ((m_track[3]->read() << 4) & 0xf0) | (m_track[2]->read() & 0x0f);
 		}
 		else    /* buttons */
-			result = m_in0->read();
+			result = m_inputs[0]->read();
 	}
 
 	/* IN1 */
 	else if (offset >= 0x4900 && offset < 0x4a00) // seems ok
-		result = m_in1->read();
+		result = m_inputs[1]->read();
 
 	/* IN2 */
 	else if (offset >= 0x4b00 && offset < 0x4c00) // seems ok
-		result = m_r10->read();
+		result = m_inputs[2]->read();
 
 	/* anything else */
 	else
