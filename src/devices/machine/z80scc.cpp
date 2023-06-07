@@ -1650,7 +1650,7 @@ uint8_t z80scc_channel::do_sccreg_rr14()
 {
 	LOGR("%s\n", FUNCNAME);
 	if (m_uart->m_variant & (z80scc_device::SET_ESCC | z80scc_device::TYPE_SCC85C30))
-		return BIT(m_wr7, 6) ? m_wr7 : m_rr10;
+		return BIT(m_wr7p, 6) ? m_wr7p : m_rr10;
 	else
 		return m_rr10;
 }
@@ -2014,7 +2014,10 @@ void z80scc_channel::do_sccreg_wr6(uint8_t data)
 void z80scc_channel::do_sccreg_wr7(uint8_t data)
 {
 	LOG("%s(%02x): Receive sync\n", FUNCNAME, data);
-	m_sync_pattern = (data << 8) | (m_sync_pattern & 0xff);
+	if ((m_uart->m_variant & (z80scc_device::SET_ESCC | z80scc_device::TYPE_SCC85C30)) && BIT(m_wr15, 0))
+		m_wr7p = data;
+	else
+		m_sync_pattern = (data << 8) | (m_sync_pattern & 0xff);
 }
 
 /* WR8 is the transmit buffer register */
