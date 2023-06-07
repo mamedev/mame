@@ -18,7 +18,7 @@
 
     Video PCB:
     1 x TC0470LIN video custom
-    1 x TC06000BT video custom
+    1 x TC0600OBT video custom
     1 x TC0650FDA video custom
     1 x Z8400BB1
     1 x OKI M6295
@@ -144,7 +144,7 @@ const gfx_layout gfx_16x16x5_planar =
 	RGN_FRAC(1,5),
 	5,
 	{ RGN_FRAC(4,5), RGN_FRAC(3,5), RGN_FRAC(2,5), RGN_FRAC(1,5), RGN_FRAC(0,5) },
-	{ STEP16(0,1) },
+	{ STEP8(7,-1), STEP8(15,-1) },
 	{ STEP16(0,16) },
 	16*16
 };
@@ -175,6 +175,7 @@ void pkspirit_state::pkspirit(machine_config &config)
 	screen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
 	screen.set_palette("palette");
 	screen.set_screen_update(FUNC(pkspirit_state::screen_update));
+	screen.screen_vblank().set_inputline(m_maincpu, 1);
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_pkspirit);
 	PALETTE(config, "palette").set_format(palette_device::xRGB_888, 8192); // TODO: wrong
