@@ -223,28 +223,6 @@ Offset + 0x4:
 
 ***************************************************************************/
 
-void downtown_state::twineagl_tilebank_w(offs_t offset, u8 data)
-{
-	if (m_twineagl_tilebank[offset] != data)
-	{
-		m_twineagl_tilebank[offset] = data;
-		m_layers[0]->mark_all_dirty();
-	}
-}
-
-u16 downtown_state::twineagl_tile_offset(u16 code)
-{
-	if ((code & 0x3e00) == 0x3e00)
-		return (code & 0x007f) | ((m_twineagl_tilebank[(code & 0x0180) >> 7] >> 1) << 7);
-	else
-		return code;
-}
-
-u16 usclssic_state::tile_offset(u16 code)
-{
-	return m_tiles_offset + code;
-}
-
 X1_001_SPRITE_GFXBANK_CB_MEMBER(seta_state::setac_gfxbank_callback)
 {
 	const int bank = (color & 0x06) >> 1;
@@ -368,32 +346,6 @@ void setaroul_state::setaroul_palette(palette_device &palette) const
 	palette_init_RRRRRGGGGGBBBBB_proms(palette);
 }
 
-void usclssic_state::usclssic_palette(palette_device &palette) const
-{
-	const u8 *const color_prom = memregion("proms")->base();
-
-	// decode PROM
-	for (int x = 0; x < 0x200; x++)
-	{
-		const u16 data = (color_prom[x*2] << 8) | color_prom[x*2 + 1];
-		const rgb_t color(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
-
-		if (x >= 0x100)
-			palette.set_indirect_color(x + 0x000, color);
-		else
-			palette.set_indirect_color(x + 0x300, color);
-	}
-
-	for (int color = 0; color < 0x20; color++)
-	{
-		for (int pen = 0; pen < 0x40; pen++)
-		{
-			palette.set_pen_indirect(0x200 + ((color << 6) | pen), 0x200 + ((((color & ~3) << 4) + pen) & 0x1ff)); // used?
-			palette.set_pen_indirect(0xa00 + ((color << 6) | pen), 0x200 + ((((color & ~3) << 4) + pen) & 0x1ff));
-		}
-	}
-}
-
 
 void seta_state::set_pens()
 {
@@ -422,22 +374,6 @@ void seta_state::set_pens()
 			else
 				m_palette->set_pen_color(i + m_paletteram[0].bytes() / 2, color);
 		}
-	}
-}
-
-
-void usclssic_state::usclssic_set_pens()
-{
-	for (int i = 0; i < 0x200; i++)
-	{
-		const u16 data = m_paletteram[0][i];
-
-		rgb_t color = rgb_t(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
-
-		if (i >= 0x100)
-			m_palette->set_indirect_color(i - 0x100, color);
-		else
-			m_palette->set_indirect_color(i + 0x200, color);
 	}
 }
 
@@ -616,20 +552,4 @@ u32 seta_state::screen_update_seta(screen_device &screen, bitmap_ind16 &bitmap, 
 {
 	set_pens();
 	return screen_update_seta_layers(screen, bitmap, cliprect);
-}
-
-
-u32 usclssic_state::screen_update_usclssic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	usclssic_set_pens();
-	return screen_update_seta_layers(screen, bitmap, cliprect);
-}
-
-void seta_state::vram_layer0_vctrl_raster_trampoline_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	// Used by calibr50 as VIDEO_UPDATE_SCANLINE is problematic due to devices/video/x1_001.cpp not being optimized
-	// for scanline drawing, so instead we use this trampoline on tilemap register writes. Also see notes in x1_012.cpp
-	// for why we can't just do this in vctrl_w.
-	m_screen->update_partial(m_screen->vpos());
-	m_layers[0]->vctrl_w(offset, data, mem_mask);
 }

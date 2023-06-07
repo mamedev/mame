@@ -11,13 +11,11 @@
 
 ***************************************************************************/
 
-#include "machine/74157.h"
 #include "machine/adc083x.h"
 #include "machine/ds2430a.h"
 #include "machine/gen_latch.h"
 #include "machine/ticket.h"
 #include "machine/timer.h"
-#include "machine/upd4701.h"
 #include "machine/upd4992.h"
 #include "sound/okim6295.h"
 #include "sound/x1_010.h"
@@ -31,14 +29,6 @@
 class seta_state : public driver_device
 {
 public:
-	struct uPD71054_state
-	{
-		emu_timer *timer[3];            // Timer
-		u16  max[3];             // Max counter
-		u16  write_select;       // Max counter write select
-		u8   reg[4];             //
-	};
-
 	seta_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -50,7 +40,6 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_oki(*this, "oki"),
 		m_dsw(*this, "DSW"),
-		m_coins(*this, "COINS"),
 		m_extra_port(*this, "EXTRA"),
 		m_paletteram(*this, "paletteram%u", 1U),
 		m_x1_bank(*this, "x1_bank"),
@@ -121,7 +110,6 @@ protected:
 	optional_device<okim6295_device> m_oki;
 
 	optional_ioport m_dsw;
-	optional_ioport m_coins;
 	optional_ioport m_extra_port;
 
 	optional_shared_ptr_array<u16, 2> m_paletteram;
@@ -136,22 +124,20 @@ protected:
 	int m_tilemaps_flip;
 	int m_samples_bank;
 
-	uPD71054_state m_uPD71054;
-
 	void seta_coin_counter_w(u8 data);
 	void seta_coin_lockout_w(u8 data);
 	void seta_vregs_w(u8 data);
-	void timer_regs_w(offs_t offset, u16 data);
 	u16 seta_dsw_r(offs_t offset);
 
 	u16 zingzipbl_unknown_r();
+
+	void blockcar_interrupt_w(u8 data);
 
 	void utoukond_sound_control_w(u8 data);
 	u16 extra_r();
 
 	void blandia_palette(palette_device &palette) const;
 	void zingzip_palette(palette_device &palette) const;
-	DECLARE_MACHINE_START(wrofaero);
 	void gundhara_palette(palette_device &palette) const;
 	void jjsquawk_palette(palette_device &palette) const;
 	u32 screen_update_seta_no_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -164,16 +150,11 @@ protected:
 	void ipl1_ack_w(u16 data);
 	u16 ipl2_ack_r();
 	void ipl2_ack_w(u16 data);
-	void vram_layer0_vctrl_raster_trampoline_w(offs_t offset, u16 data, u16 mem_mask);
-	void uPD71054_update_timer(device_t *cpu, int no);
-	INTERRUPT_GEN_MEMBER(wrofaero_interrupt);
-	TIMER_CALLBACK_MEMBER(uPD71054_timer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(seta_interrupt_1_and_2);
 	TIMER_DEVICE_CALLBACK_MEMBER(seta_interrupt_2_and_4);
 
 	void set_pens();
 	void seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_bank_size);
-	void uPD71054_timer_init();
 	void pit_out0(int state);
 
 	void atehate_map(address_map &map);
@@ -197,6 +178,7 @@ protected:
 	void msgundamb_map(address_map &map);
 	void oisipuzl_map(address_map &map);
 	void orbs_map(address_map &map);
+	void rezon_map(address_map &map);
 	void triplfun_map(address_map &map);
 	void umanclub_map(address_map &map);
 	void utoukond_map(address_map &map);
@@ -206,135 +188,8 @@ protected:
 	void wiggie_sound_map(address_map &map);
 	void wits_map(address_map &map);
 	void wrofaero_map(address_map &map);
+	void zingzip_map(address_map &map);
 	void zingzipbl_map(address_map &map);
-};
-
-class downtown_state : public seta_state
-{
-public:
-	downtown_state(const machine_config &mconfig, device_type type, const char *tag) :
-		seta_state(mconfig, type, tag),
-		m_subcpu(*this, "sub"),
-		m_soundlatch(*this, "soundlatch%u", 1U),
-		m_rot(*this, "ROT%u", 1),
-		m_p1(*this, "P1"),
-		m_p2(*this, "P2"),
-		m_sharedram(*this, "sharedram"),
-		m_subbank(*this, "subbank"),
-		m_sub_ctrl_data(0)
-	{ }
-
-	void calibr50(machine_config &config);
-	void downtown(machine_config &config);
-	void metafox(machine_config &config);
-	void arbalest(machine_config &config);
-	void tndrcade(machine_config &config);
-	void twineagl(machine_config &config);
-
-	void init_bank6502();
-	void init_downtown();
-	void init_twineagl();
-	void init_metafox();
-	void init_arbalest();
-
-protected:
-	required_device<cpu_device> m_subcpu;
-	optional_device_array<generic_latch_8_device, 2> m_soundlatch;
-
-	optional_ioport_array<2> m_rot;
-	optional_ioport m_p1;
-	optional_ioport m_p2;
-
-	optional_shared_ptr<u8> m_sharedram;
-
-	required_memory_bank m_subbank;
-
-	u8 m_sub_ctrl_data;
-
-	u8 m_twineagl_xram[8];
-	u8 m_twineagl_tilebank[4];
-
-	std::unique_ptr<u8[]> m_downtown_protection;
-
-	u16 metafox_protection_r(offs_t offset);
-	void twineagl_tilebank_w(offs_t offset, u8 data);
-	u8 sharedram_68000_r(offs_t offset);
-	void sharedram_68000_w(offs_t offset, u8 data);
-	void sub_ctrl_w(offs_t offset, u8 data);
-	void sub_bankswitch_w(u8 data);
-	void sub_bankswitch_lockout_w(u8 data);
-	u8 ff_r();
-	u8 downtown_ip_r(offs_t offset);
-	void calibr50_sub_bankswitch_w(u8 data);
-	void calibr50_soundlatch2_w(u8 data);
-	void twineagl_ctrl_w(u8 data);
-	u16 twineagl_debug_r();
-	u16 twineagl_200100_r(offs_t offset);
-	void twineagl_200100_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u16 downtown_protection_r(offs_t offset);
-	void downtown_protection_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u16 arbalest_debug_r();
-	u8 dsw1_r();
-	u8 dsw2_r();
-
-	DECLARE_MACHINE_RESET(calibr50);
-	u16 twineagl_tile_offset(u16 code);
-
-	TIMER_DEVICE_CALLBACK_MEMBER(seta_sub_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(tndrcade_sub_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(calibr50_interrupt);
-
-	void calibr50_map(address_map &map);
-	void calibr50_sub_map(address_map &map);
-	void downtown_map(address_map &map);
-	void downtown_sub_map(address_map &map);
-	void metafox_sub_map(address_map &map);
-	void tndrcade_map(address_map &map);
-	void tndrcade_sub_map(address_map &map);
-	void twineagl_sub_map(address_map &map);
-};
-
-class usclssic_state : public downtown_state
-{
-public:
-	usclssic_state(const machine_config &mconfig, device_type type, const char *tag) :
-		downtown_state(mconfig, type, tag),
-		m_upd4701(*this, "upd4701"),
-		m_buttonmux(*this, "buttonmux"),
-		m_track_x(*this, "TRACK%u_X", 1U),
-		m_track_y(*this, "TRACK%u_Y", 1U),
-		m_port_select(0),
-		m_tiles_offset(0)
-	{ }
-
-	void usclssic(machine_config &config);
-
-	DECLARE_CUSTOM_INPUT_MEMBER(trackball_x_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(trackball_y_r);
-
-protected:
-	virtual void machine_start() override;
-
-private:
-	u16 dsw_r(offs_t offset);
-	void lockout_w(u8 data);
-
-	void usclssic_palette(palette_device &palette) const;
-
-	u16 tile_offset(u16 code);
-	u32 screen_update_usclssic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void usclssic_set_pens();
-
-	void usclssic_map(address_map &map);
-
-	required_device<upd4701_device> m_upd4701;
-	required_device<hc157_device> m_buttonmux;
-	required_ioport_array<2> m_track_x;
-	required_ioport_array<2> m_track_y;
-
-	u8 m_port_select;
-	u16 m_tiles_offset;
 };
 
 class thunderl_state : public seta_state
@@ -390,7 +245,8 @@ class keroppi_state : public seta_state
 {
 public:
 	keroppi_state(const machine_config &mconfig, device_type type, const char *tag) :
-		seta_state(mconfig, type, tag)
+		seta_state(mconfig, type, tag),
+		m_coins(*this, "COINS")
 	{
 	}
 
@@ -407,6 +263,8 @@ private:
 	TIMER_CALLBACK_MEMBER(prize_hop_callback);
 
 	void keroppi_map(address_map &map);
+
+	required_ioport m_coins;
 
 	emu_timer *m_prize_hop_timer;
 
