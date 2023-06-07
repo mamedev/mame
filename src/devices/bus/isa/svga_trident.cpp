@@ -52,6 +52,11 @@ isa16_svga_tvga9000_device::isa16_svga_tvga9000_device(const machine_config &mco
 {
 }
 
+void isa16_svga_tvga9000_device::io_isa_map(address_map &map)
+{
+	map(0x00, 0x2f).m(m_vga, FUNC(tvga9000_device::io_map));
+}
+
 uint8_t isa16_svga_tvga9000_device::input_port_0_r() { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
 
 void isa16_svga_tvga9000_device::device_start()
@@ -60,9 +65,8 @@ void isa16_svga_tvga9000_device::device_start()
 
 	m_isa->install_rom(this, 0xc0000, 0xc7fff, "tvga9000");
 
-	m_isa->install_device(0x3b0, 0x3bf, read8sm_delegate(*m_vga, FUNC(tvga9000_device::port_03b0_r)), write8sm_delegate(*m_vga, FUNC(tvga9000_device::port_03b0_w)));
-	m_isa->install_device(0x3c0, 0x3cf, read8sm_delegate(*m_vga, FUNC(tvga9000_device::port_03c0_r)), write8sm_delegate(*m_vga, FUNC(tvga9000_device::port_03c0_w)));
-	m_isa->install_device(0x3d0, 0x3df, read8sm_delegate(*m_vga, FUNC(tvga9000_device::port_03d0_r)), write8sm_delegate(*m_vga, FUNC(tvga9000_device::port_03d0_w)));
+	m_isa->install_device(0x03b0, 0x03df, *this, &isa16_svga_tvga9000_device::io_isa_map);
+
 	m_isa->install_device(0x43c4, 0x43cb, read8sm_delegate(*m_vga, FUNC(tvga9000_device::port_43c6_r)), write8sm_delegate(*m_vga, FUNC(tvga9000_device::port_43c6_w)));
 	m_isa->install_device(0x83c4, 0x83cb, read8sm_delegate(*m_vga, FUNC(tvga9000_device::port_83c6_r)), write8sm_delegate(*m_vga, FUNC(tvga9000_device::port_83c6_w)));
 
@@ -122,6 +126,11 @@ isa16_svga_tgui9680_device::isa16_svga_tgui9680_device(const machine_config &mco
 {
 }
 
+void isa16_svga_tgui9680_device::io_isa_map(address_map &map)
+{
+	map(0x00, 0x2f).m(m_vga, FUNC(trident_vga_device::io_map));
+}
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -133,9 +142,8 @@ void isa16_svga_tgui9680_device::device_start()
 
 	m_isa->install_rom(this, 0xc0000, 0xc7fff, "tgui9680");
 
-	m_isa->install_device(0x3b0, 0x3bf, read8sm_delegate(*m_vga, FUNC(trident_vga_device::port_03b0_r)), write8sm_delegate(*m_vga, FUNC(trident_vga_device::port_03b0_w)));
-	m_isa->install_device(0x3c0, 0x3cf, read8sm_delegate(*m_vga, FUNC(trident_vga_device::port_03c0_r)), write8sm_delegate(*m_vga, FUNC(trident_vga_device::port_03c0_w)));
-	m_isa->install_device(0x3d0, 0x3df, read8sm_delegate(*m_vga, FUNC(trident_vga_device::port_03d0_r)), write8sm_delegate(*m_vga, FUNC(trident_vga_device::port_03d0_w)));
+	m_isa->install_device(0x03b0, 0x03df, *this, &isa16_svga_tgui9680_device::io_isa_map);
+
 	m_isa->install_device(0x43c4, 0x43cb, read8sm_delegate(*m_vga, FUNC(trident_vga_device::port_43c6_r)), write8sm_delegate(*m_vga, FUNC(trident_vga_device::port_43c6_w)));
 	m_isa->install_device(0x83c4, 0x83cb, read8sm_delegate(*m_vga, FUNC(trident_vga_device::port_83c6_r)), write8sm_delegate(*m_vga, FUNC(trident_vga_device::port_83c6_w)));
 

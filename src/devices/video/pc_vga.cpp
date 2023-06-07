@@ -116,6 +116,8 @@ vga_device::vga_device(const machine_config &mconfig, device_type type, const ch
 	, device_memory_interface(mconfig, *this)
 	, vga(*this)
 	, m_input_sense(*this, "VGA_SENSE")
+	, m_ioas_3bx_view(*this, "ioas_3bx_view")
+	, m_ioas_3dx_view(*this, "ioas_3dx_view")
 {
 	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(vga_device::crtc_map), this));
 	m_gc_space_config = address_space_config("gc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(vga_device::gc_map), this));
@@ -264,6 +266,8 @@ void vga_device::device_reset()
 	/* clear out the VGA structure */
 	memset(vga.pens, 0, sizeof(vga.pens));
 	vga.miscellaneous_output = 0;
+	m_ioas_3bx_view.select(0);
+	m_ioas_3dx_view.select(0);
 	vga.feature_control = 0;
 	vga.sequencer.index = 0;
 	memset(vga.sequencer.data, 0, sizeof(vga.sequencer.data));
@@ -290,7 +294,338 @@ void vga_device::device_reset()
 
 /**************************************
  *
- * Main I/O spaces
+ * Main I/O space
+ *
+ *************************************/
+
+// NOTE: clients should never override this but rather the individual overrides below
+// additionally they must call space.unmap() rather than fixed values in order to preserve MDA compatibility
+void vga_device::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x0f).view(m_ioas_3bx_view);
+	m_ioas_3bx_view[0](0x00, 0x0f).m(FUNC(vga_device::io_3bx_3dx_map));
+//	m_ioas_3bx_view[1](0x00, 0x0f).unmaprw();
+	map(0x10, 0x1f).m(FUNC(vga_device::io_3cx_map));
+	map(0x20, 0x2f).view(m_ioas_3dx_view);
+//	m_ioas_3dx_view[0](0x20, 0x2f).unmaprw();
+	m_ioas_3dx_view[1](0x20, 0x2f).m(FUNC(vga_device::io_3bx_3dx_map));
+}
+
+void vga_device::io_3bx_3dx_map(address_map &map)
+{
+	map(0x04, 0x04).rw(FUNC(vga_device::crtc_address_r), FUNC(vga_device::crtc_address_w));
+	map(0x05, 0x05).rw(FUNC(vga_device::crtc_data_r), FUNC(vga_device::crtc_data_w));
+	map(0x0a, 0x0a).rw(FUNC(vga_device::input_status_1_r), FUNC(vga_device::feature_control_w));
+	// TODO: move these to indicated subclasses
+	map(0x08, 0x08).lr8(
+		NAME([this] (offs_t offset) {
+			LOG("VGA: 0x3d8 read %s\n", machine().describe_context());
+			// TODO: PC-200 reads back CGA register here, everything else returns open bus OR CGA emulation of register 0x3d8
+			return 0;
+		})
+	);
+	map(0x0f, 0x0f).lr8(
+		NAME([this] (offs_t offset) {
+			LOG("VGA: 0x3df \"oak test\" read %s\n", machine().describe_context());
+			/* oak test */
+			//return 0;
+			/* pega bios on/off */
+			return 0x80;
+		})
+	);
+}
+
+void vga_device::io_3cx_map(address_map &map)
+{
+	map(0x00, 0x00).rw(FUNC(vga_device::atc_address_r), FUNC(vga_device::atc_address_data_w));
+	map(0x01, 0x01).r(FUNC(vga_device::atc_data_r));
+	map(0x02, 0x02).rw(FUNC(vga_device::input_status_0_r), FUNC(vga_device::miscellaneous_output_w));
+	map(0x04, 0x04).rw(FUNC(vga_device::sequencer_address_r), FUNC(vga_device::sequencer_address_w));
+	map(0x05, 0x05).rw(FUNC(vga_device::sequencer_data_r), FUNC(vga_device::sequencer_data_w));
+	map(0x06, 0x06).rw(FUNC(vga_device::ramdac_mask_r), FUNC(vga_device::ramdac_mask_w));
+	map(0x07, 0x07).rw(FUNC(vga_device::ramdac_state_r), FUNC(vga_device::ramdac_read_index_w));
+	map(0x08, 0x08).rw(FUNC(vga_device::ramdac_write_index_r), FUNC(vga_device::ramdac_write_index_w));
+	map(0x09, 0x09).rw(FUNC(vga_device::ramdac_data_r), FUNC(vga_device::ramdac_data_w));
+	map(0x0a, 0x0a).r(FUNC(vga_device::feature_control_r));
+	map(0x0c, 0x0c).r(FUNC(vga_device::miscellaneous_output_r));
+	map(0x0e, 0x0e).rw(FUNC(vga_device::gc_address_r), FUNC(vga_device::gc_address_w));
+	map(0x0f, 0x0f).rw(FUNC(vga_device::gc_data_r), FUNC(vga_device::gc_data_w));
+	// TODO: doesn't belong here
+	map(0x03, 0x03).lrw8(
+		NAME([this] (offs_t offset) {
+			return vga.oak.reg;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			vga.oak.reg = data;
+		})
+	);
+}
+
+/**************************************
+ *
+ * 3bx/3dx implementation
+ *
+ *************************************/
+
+u8 vga_device::crtc_address_r(offs_t offset)
+{
+	return vga.crtc.index;
+}
+
+void vga_device::crtc_address_w(offs_t offset, u8 data)
+{
+	vga.crtc.index = data;
+}
+
+u8 vga_device::crtc_data_r(offs_t offset)
+{
+	return space(CRTC_REG).read_byte(vga.crtc.index);
+}
+
+void vga_device::crtc_data_w(offs_t offset, u8 data)
+{
+	vga.crtc.data[vga.crtc.index] = data;
+	space(CRTC_REG).write_byte(vga.crtc.index, data);
+}
+
+u8 vga_device::input_status_1_r(offs_t offset)
+{
+	u8 res = 0;
+	u8 hsync, vsync;
+	vga.attribute.state = 0;
+
+	hsync = screen().hblank() & 1;
+	vsync = vga_vblank(); //screen().vblank() & 1;
+
+	res |= (hsync | vsync) & 1; // DD - display disable register
+	res |= (vsync & 1) << 3; // VRetrace register
+
+	/* ega diagnostic readback enough for oak bios */
+	// TODO: move to OAK
+	switch (vga.attribute.data[0x12]&0x30) {
+	case 0:
+		if (vga.attribute.data[0x11]&1)
+			res |= 0x10;
+		if (vga.attribute.data[0x11]&4)
+			res |= 0x20;
+		break;
+	case 0x10:
+		res |= (vga.attribute.data[0x11]&0x30);
+		break;
+	case 0x20:
+		if (vga.attribute.data[0x11]&2)
+			res |= 0x10;
+		if (vga.attribute.data[0x11]&8) 
+			res |= 0x20;
+		break;
+	case 0x30:
+		res |= (vga.attribute.data[0x11]&0xc0)>>2;
+		break;
+	}
+
+	return res;
+}
+
+void vga_device::feature_control_w(offs_t offset, u8 data)
+{
+	vga.feature_control = data;
+}
+
+/**************************************
+ *
+ * 3cx implementation
+ *
+ *************************************/
+
+u8 vga_device::atc_address_r(offs_t offset)
+{
+	return vga.attribute.index;
+}
+
+u8 vga_device::atc_data_r(offs_t offset)
+{
+	return space(ATC_REG).read_byte(vga.attribute.index);
+}
+
+void vga_device::atc_address_data_w(offs_t offset, u8 data)
+{
+	if (vga.attribute.state == 0)
+	{
+		vga.attribute.index = data;
+	}
+	else
+	{
+		space(ATC_REG).write_byte(vga.attribute.index, data);
+	}
+
+	vga.attribute.state = !vga.attribute.state;
+}
+
+u8 vga_device::input_status_0_r(offs_t offset)
+{
+	u8 res = 0x60; // is VGA
+	const u8 sense_bit = (3 - (vga.miscellaneous_output >> 2)) & 3;
+	LOGDSW("Reading sense bit %d\n", sense_bit);
+	if(BIT(m_input_sense->read(), sense_bit))
+		res |= 0x10;
+	return res;
+}
+
+void vga_device::miscellaneous_output_w(offs_t offset, u8 data)
+{
+	vga.miscellaneous_output = data;
+	recompute_params();
+	m_ioas_3bx_view.select(data & 1);
+	m_ioas_3dx_view.select(data & 1);
+}
+
+u8 vga_device::sequencer_address_r(offs_t offset)
+{
+	return vga.sequencer.index;
+}
+
+u8 vga_device::sequencer_data_r(offs_t offset)
+{
+	return space(SEQ_REG).read_byte(vga.sequencer.index);
+}
+
+void vga_device::sequencer_address_w(offs_t offset, u8 data)
+{
+	vga.sequencer.index = data;
+}
+
+void vga_device::sequencer_data_w(offs_t offset, u8 data)
+{
+	// TODO: temporary cheat for read-back
+	vga.sequencer.data[vga.sequencer.index] = data;
+	space(SEQ_REG).write_byte(vga.sequencer.index, data);
+	recompute_params();
+}
+
+u8 vga_device::ramdac_mask_r(offs_t offset)
+{
+	return vga.dac.mask;
+}
+
+u8 vga_device::ramdac_state_r(offs_t offset)
+{
+	return (vga.dac.read) ? 3 : 0;
+}
+
+u8 vga_device::ramdac_write_index_r(offs_t offset)
+{
+	return vga.dac.write_index;
+}
+
+u8 vga_device::ramdac_data_r(offs_t offset)
+{
+	u8 res = space().unmap();
+	if (vga.dac.read)
+	{
+		switch (vga.dac.state++)
+		{
+			case 0:
+				res = vga.dac.color[3*vga.dac.read_index];
+				break;
+			case 1:
+				res = vga.dac.color[3*vga.dac.read_index + 1];
+				break;
+			case 2:
+				res = vga.dac.color[3*vga.dac.read_index + 2];
+				break;
+		}
+
+		if (vga.dac.state == 3)
+		{
+			vga.dac.state = 0;
+			vga.dac.read_index++;
+		}
+	}
+	return res;
+}
+
+u8 vga_device::feature_control_r(offs_t offset)
+{
+	return vga.feature_control;
+}
+
+u8 vga_device::miscellaneous_output_r(offs_t offset)
+{
+	return vga.miscellaneous_output;
+}
+
+u8 vga_device::gc_address_r(offs_t offset)
+{
+	return vga.gc.index;
+}
+
+u8 vga_device::gc_data_r(offs_t offset)
+{
+	return space(GC_REG).read_byte(vga.gc.index);
+}
+
+
+void vga_device::ramdac_mask_w(offs_t offset, u8 data)
+{
+	vga.dac.mask = data;
+	vga.dac.dirty = 1;
+}
+
+void vga_device::ramdac_read_index_w(offs_t offset, u8 data)
+{
+	vga.dac.read_index = data;
+	vga.dac.state = 0;
+	vga.dac.read = 1;
+}
+
+void vga_device::ramdac_write_index_w(offs_t offset, u8 data)
+{
+	vga.dac.write_index = data;
+	vga.dac.state = 0;
+	vga.dac.read = 0;
+}
+
+void vga_device::ramdac_data_w(offs_t offset, u8 data)
+{
+	if (!vga.dac.read)
+	{
+		switch (vga.dac.state++)
+		{
+			case 0:
+				vga.dac.color[3*vga.dac.write_index]=data;
+				break;
+			case 1:
+				vga.dac.color[3*vga.dac.write_index + 1]=data;
+				break;
+			case 2:
+				vga.dac.color[3*vga.dac.write_index + 2]=data;
+				break;
+		}
+
+		vga.dac.dirty=1;
+		if (vga.dac.state==3)
+		{
+			vga.dac.state = 0;
+			vga.dac.write_index++;
+		}
+	}
+}
+
+void vga_device::gc_address_w(offs_t offset, u8 data)
+{
+	vga.gc.index=data;
+}
+
+void vga_device::gc_data_w(offs_t offset, u8 data)
+{
+	space(GC_REG).write_byte(vga.gc.index, data);
+}
+
+
+/**************************************
+ *
+ * CRTC
  *
  *************************************/
 
@@ -603,6 +938,12 @@ void vga_device::crtc_map(address_map &map)
 	);
 }
 
+/**************************************
+ *
+ * GC
+ *
+ *************************************/
+
 void vga_device::gc_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -699,6 +1040,12 @@ void vga_device::gc_map(address_map &map)
 	);
 }
 
+/**************************************
+ *
+ * Sequencer
+ *
+ *************************************/
+
 void vga_device::sequencer_map(address_map &map)
 {
 	// TODO: legacy fallback trick
@@ -733,6 +1080,12 @@ void vga_device::sequencer_map(address_map &map)
 	// Any write strobe to this register will lock the character generator until another write to other regs happens.
 //	map(0x07, 0x07)
 }
+
+/**************************************
+ *
+ * Attribute (ATC)
+ *
+ *************************************/
 
 /*
  * xx-- ---- <reserved>
@@ -1223,83 +1576,6 @@ uint8_t vga_device::vga_vblank()
 	return res;
 }
 
-uint8_t vga_device::vga_crtc_r(offs_t offset)
-{
-	uint8_t data = 0xff;
-
-	switch (offset) {
-	case 4:
-		data = vga.crtc.index;
-		break;
-	case 5:
-		data = space(CRTC_REG).read_byte(vga.crtc.index);
-		break;
-	case 0xa:
-		uint8_t hsync,vsync;
-		vga.attribute.state = 0;
-		data = 0;
-
-		hsync = screen().hblank() & 1;
-		vsync = vga_vblank(); //screen().vblank() & 1;
-
-		data |= (hsync | vsync) & 1; // DD - display disable register
-		data |= (vsync & 1) << 3; // VRetrace register
-
-		/* ega diagnostic readback enough for oak bios */
-		switch (vga.attribute.data[0x12]&0x30) {
-		case 0:
-			if (vga.attribute.data[0x11]&1) data|=0x10;
-			if (vga.attribute.data[0x11]&4) data|=0x20;
-			break;
-		case 0x10:
-			data|=(vga.attribute.data[0x11]&0x30);
-			break;
-		case 0x20:
-			if (vga.attribute.data[0x11]&2) data|=0x10;
-			if (vga.attribute.data[0x11]&8) data|=0x20;
-			break;
-		case 0x30:
-			data|=(vga.attribute.data[0x11]&0xc0)>>2;
-			break;
-		}
-		break;
-	case 0xf:
-		/* oak test */
-		//data=0;
-		/* pega bios on/off */
-		data=0x80;
-		break;
-	}
-	return data;
-}
-
-void vga_device::vga_crtc_w(offs_t offset, uint8_t data)
-{
-	switch (offset)
-	{
-		case 4:
-			vga.crtc.index = data;
-			break;
-
-		case 5:
-			space(CRTC_REG).write_byte(vga.crtc.index, data);
-			//screen().update_partial(screen().vpos());
-			break;
-
-		case 0xa:
-			vga.feature_control = data;
-			break;
-	}
-}
-
-uint8_t vga_device::port_03b0_r(offs_t offset)
-{
-	uint8_t data = 0xff;
-	if (get_crtc_port() == 0x3b0)
-		data = vga_crtc_r(offset);
-	return data;
-}
-
 /*
   4 additional dipswitches
   seems to have emulation modes at register level
@@ -1337,196 +1613,6 @@ INPUT_PORTS_END
 ioport_constructor vga_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(vga_sense);
-}
-
-uint8_t vga_device::port_03c0_r(offs_t offset)
-{
-	uint8_t data = 0xff;
-
-	switch (offset)
-	{
-		case 0:
-			data = vga.attribute.index;
-			break;
-
-		case 1:
-			data = space(ATC_REG).read_byte(vga.attribute.index);
-			break;
-
-		case 2:
-		{
-			data = 0x60; // is VGA
-			const u8 sense_bit = (3 - (vga.miscellaneous_output >> 2)) & 3;
-			LOGDSW("Reading sense bit %d\n", sense_bit);
-			if(BIT(m_input_sense->read(), sense_bit))
-				data |= 0x10;
-			break;
-		}
-
-		case 3:
-			data = vga.oak.reg;
-			break;
-
-		case 4:
-			data = vga.sequencer.index;
-			break;
-
-		case 5:
-			data = space(SEQ_REG).read_byte(vga.sequencer.index);
-			break;
-
-		case 6:
-			data = vga.dac.mask;
-			break;
-
-		case 7:
-			data = (vga.dac.read) ? 3 : 0;
-			break;
-
-		case 8:
-			data = vga.dac.write_index;
-			break;
-
-		case 9:
-			if (vga.dac.read)
-			{
-				switch (vga.dac.state++)
-				{
-					case 0:
-						data = vga.dac.color[3*vga.dac.read_index];
-						break;
-					case 1:
-						data = vga.dac.color[3*vga.dac.read_index + 1];
-						break;
-					case 2:
-						data = vga.dac.color[3*vga.dac.read_index + 2];
-						break;
-				}
-
-				if (vga.dac.state==3)
-				{
-					vga.dac.state = 0;
-					vga.dac.read_index++;
-				}
-			}
-			break;
-
-		case 0xa:
-			data = vga.feature_control;
-			break;
-
-		case 0xc:
-			data = vga.miscellaneous_output;
-			break;
-
-		case 0xe:
-			data = vga.gc.index;
-			break;
-
-		case 0xf:
-			data = space(GC_REG).read_byte(vga.gc.index);
-			break;
-	}
-	return data;
-}
-
-uint8_t vga_device::port_03d0_r(offs_t offset)
-{
-	uint8_t data = 0xff;
-	if (get_crtc_port() == 0x3d0)
-		data = vga_crtc_r(offset);
-	if(offset == 8)
-	{
-		LOG("VGA: 0x3d8 read %s\n", machine().describe_context());
-		data = 0; // TODO: PC-200 reads back CGA register here, everything else returns open bus OR CGA emulation of register 0x3d8
-	}
-
-	return data;
-}
-
-void vga_device::port_03b0_w(offs_t offset, uint8_t data)
-{
-	if (get_crtc_port() == 0x3b0)
-		vga_crtc_w(offset, data);
-}
-
-void vga_device::port_03c0_w(offs_t offset, uint8_t data)
-{
-	switch (offset) {
-	case 0:
-		if (vga.attribute.state==0)
-		{
-			vga.attribute.index = data;
-		}
-		else
-		{
-			space(ATC_REG).write_byte(vga.attribute.index, data);
-		}
-		vga.attribute.state=!vga.attribute.state;
-		break;
-	case 2:
-		vga.miscellaneous_output=data;
-		recompute_params();
-		break;
-	case 3:
-		vga.oak.reg = data;
-		break;
-	case 4:
-		vga.sequencer.index = data;
-		break;
-	case 5:
-		// TODO: temporary cheat for read-back
-		vga.sequencer.data[vga.sequencer.index] = data;
-		space(SEQ_REG).write_byte(vga.sequencer.index, data);
-		recompute_params();
-		break;
-	case 6:
-		vga.dac.mask=data;
-		vga.dac.dirty=1;
-		break;
-	case 7:
-		vga.dac.read_index=data;
-		vga.dac.state=0;
-		vga.dac.read=1;
-		break;
-	case 8:
-		vga.dac.write_index=data;
-		vga.dac.state=0;
-		vga.dac.read=0;
-		break;
-	case 9:
-		if (!vga.dac.read)
-		{
-			switch (vga.dac.state++) {
-			case 0:
-				vga.dac.color[3*vga.dac.write_index]=data;
-				break;
-			case 1:
-				vga.dac.color[3*vga.dac.write_index + 1]=data;
-				break;
-			case 2:
-				vga.dac.color[3*vga.dac.write_index + 2]=data;
-				break;
-			}
-			vga.dac.dirty=1;
-			if (vga.dac.state==3) {
-				vga.dac.state=0; vga.dac.write_index++;
-			}
-		}
-		break;
-	case 0xe:
-		vga.gc.index=data;
-		break;
-	case 0xf:
-		space(GC_REG).write_byte(vga.gc.index, data);
-		break;
-	}
-}
-
-void vga_device::port_03d0_w(offs_t offset, uint8_t data)
-{
-	if (get_crtc_port() == 0x3d0)
-		vga_crtc_w(offset, data);
 }
 
 // TODO: convert to mapped space

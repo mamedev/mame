@@ -44,7 +44,158 @@ void tseng_vga_device::device_start()
 	save_item(NAME(et4k.misc2));
 }
 
-void tseng_vga_device::tseng_define_video_mode()
+void tseng_vga_device::io_3bx_3dx_map(address_map &map)
+{
+	svga_device::io_3bx_3dx_map(map);
+	map(0x08, 0x08).lrw8(
+		NAME([this] (offs_t offset) {
+			return et4k.reg_3d8;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			et4k.reg_3d8 = data;
+			if(data == 0xa0)
+				et4k.ext_reg_ena = true;
+			else if(data == 0x29)
+				et4k.ext_reg_ena = false;
+		})
+	);
+}
+
+void tseng_vga_device::io_3cx_map(address_map &map)
+{
+	svga_device::io_3cx_map(map);
+	map(0x06, 0x06).rw(FUNC(tseng_vga_device::ramdac_hidden_mask_r), FUNC(tseng_vga_device::ramdac_hidden_mask_w));
+	map(0x08, 0x08).r(FUNC(tseng_vga_device::ramdac_hidden_windex_r));
+	map(0x0d, 0x0d).lrw8(
+		NAME([this] (offs_t offset) {
+			u8 res = svga.bank_w & 0xf;
+			res   |= (svga.bank_r & 0xf) << 4;
+			return res;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			svga.bank_w = data & 0xf;
+			svga.bank_r = (data & 0xf0) >> 4;
+		})
+	);
+}
+
+u8 tseng_vga_device::ramdac_hidden_mask_r(offs_t offset)
+{
+	if(et4k.dac_state == 4)
+	{
+		if(!et4k.dac_ctrl)
+			et4k.dac_ctrl = 0x80;
+		return et4k.dac_ctrl;
+	}
+	if (!machine().side_effects_disabled())
+		et4k.dac_state++;
+	return vga_device::ramdac_mask_r(offset);
+}
+
+void tseng_vga_device::ramdac_hidden_mask_w(offs_t offset, u8 data)
+{
+	if(et4k.dac_state == 4)
+	{
+		et4k.dac_ctrl = data;
+		recompute_params();
+		return;
+	}
+
+	vga_device::ramdac_write_index_w(offset, data);
+}
+
+u8 tseng_vga_device::ramdac_hidden_windex_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+		et4k.dac_state = 0;
+	return vga_device::ramdac_write_index_r(offset);
+}
+
+void tseng_vga_device::crtc_map(address_map &map)
+{
+	svga_device::crtc_map(map);
+	map(0x34, 0x34).lrw8(
+		NAME([this] (offs_t offset) {
+			return et4k.aux_ctrl;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			et4k.aux_ctrl = data;
+			recompute_params();
+		})
+	);
+	map(0x3f, 0x3f).lrw8(
+		NAME([this] (offs_t offset) {
+			return et4k.horz_overflow;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			et4k.horz_overflow = data;
+			vga.crtc.horz_total = (vga.crtc.horz_total & 0xff) | ((data & 1) << 8);
+			recompute_params();
+		})
+	);
+}
+
+void tseng_vga_device::sequencer_map(address_map &map)
+{
+	svga_device::sequencer_map(map);
+	// TODO: preseve legacy hookup, to be investigated
+	map(0x05, 0xff).unmaprw();
+}
+
+void tseng_vga_device::attribute_map(address_map &map)
+{
+	map.global_mask(0x3f);
+	map.unmap_value_high();
+	svga_device::attribute_map(map);
+	// Miscellaneous 1
+	/*
+	 * x--- ---- Bypass the internal palette
+	 * -x-- ---- 2 byte character code (presumably for the Korean variants TBD)
+	 * --xx ---- Select High resolution/color mode
+	 * --00 ---- Normal power-up
+	 * --01 ---- <reserved>
+	 * --10 ---- 8bpp
+	 * --11 ---- 16bpp
+	 * ---- xxxx <reserved>
+	 */
+	// TODO: implement KEY protection
+	map(0x16, 0x16).mirror(0x20).lrw8(
+		NAME([this] (offs_t offset) { return et4k.misc1; }),
+		NAME([this] (offs_t offset, u8 data) { 
+			et4k.misc1 = data;
+			// TODO: this should be taken into account for recompute_params
+			#if 0
+			svga.rgb8_en = 0;
+			svga.rgb15_en = 0;
+			svga.rgb16_en = 0;
+			svga.rgb32_en = 0;
+			switch(et4k.misc1 & 0x30)
+			{
+				case 0:
+					// normal power-up mode
+					break;
+				case 0x10:
+					svga.rgb8_en = 1;
+					break;
+				case 0x20:
+				case 0x30:
+					popmessage("Tseng 15/16 bit HiColor mode, contact MAMEdev");
+					break;
+			}
+			#endif
+		})
+	);
+	// Miscellaneous 2
+	// TODO: not on stock et4k?
+	map(0x17, 0x17).mirror(0x20).lrw8(
+		NAME([this] (offs_t offset) { return et4k.misc2; }),
+		NAME([this] (offs_t offset, u8 data) { 
+			et4k.misc2 = data;
+		})
+	);
+}
+
+void tseng_vga_device::recompute_params()
 {
 	int divisor;
 	int xtal = 0;
@@ -102,223 +253,6 @@ void tseng_vga_device::tseng_define_video_mode()
 	recompute_params_clock(divisor, xtal);
 }
 
-void tseng_vga_device::crtc_map(address_map &map)
-{
-	svga_device::crtc_map(map);
-	map(0x34, 0x34).lrw8(
-		NAME([this] (offs_t offset) {
-			return et4k.aux_ctrl;
-		}),
-		NAME([this] (offs_t offset, u8 data) {
-			et4k.aux_ctrl = data;
-		})
-	);
-	map(0x3f, 0x3f).lrw8(
-		NAME([this] (offs_t offset) {
-			return et4k.horz_overflow;
-		}),
-		NAME([this] (offs_t offset, u8 data) {
-			et4k.horz_overflow = data;
-			vga.crtc.horz_total = (vga.crtc.horz_total & 0xff) | ((data & 1) << 8);
-		})
-	);
-}
-
-void tseng_vga_device::sequencer_map(address_map &map)
-{
-	svga_device::sequencer_map(map);
-	// TODO: preseve legacy hookup, to be investigated
-	map(0x05, 0xff).unmaprw();
-}
-
-uint8_t tseng_vga_device::port_03b0_r(offs_t offset)
-{
-	uint8_t res = 0xff;
-
-	if (get_crtc_port() == 0x3b0)
-	{
-		switch(offset)
-		{
-			case 8:
-				res = et4k.reg_3d8;
-				break;
-			default:
-				res = vga_device::port_03b0_r(offset);
-				break;
-		}
-	}
-
-	return res;
-}
-
-void tseng_vga_device::port_03b0_w(offs_t offset, uint8_t data)
-{
-	if (get_crtc_port() == 0x3b0)
-	{
-		switch(offset)
-		{
-			case 8:
-				et4k.reg_3d8 = data;
-				if(data == 0xa0)
-					et4k.ext_reg_ena = true;
-				else if(data == 0x29)
-					et4k.ext_reg_ena = false;
-				break;
-			default:
-				vga_device::port_03b0_w(offset,data);
-				break;
-		}
-	}
-	tseng_define_video_mode();
-}
-
-void tseng_vga_device::attribute_map(address_map &map)
-{
-	map.global_mask(0x3f);
-	map.unmap_value_high();
-	svga_device::attribute_map(map);
-	// Miscellaneous 1
-	/*
-	 * x--- ---- Bypass the internal palette
-	 * -x-- ---- 2 byte character code (presumably for the Korean variants TBD)
-	 * --xx ---- Select High resolution/color mode
-	 * --00 ---- Normal power-up
-	 * --01 ---- <reserved>
-	 * --10 ---- 8bpp
-	 * --11 ---- 16bpp
-	 * ---- xxxx <reserved>
-	 */
-	// TODO: implement KEY protection
-	map(0x16, 0x16).mirror(0x20).lrw8(
-		NAME([this] (offs_t offset) { return et4k.misc1; }),
-		NAME([this] (offs_t offset, u8 data) { 
-			et4k.misc1 = data;
-			// TODO: this should be taken into account for tseng_define_video_mode
-			#if 0
-			svga.rgb8_en = 0;
-			svga.rgb15_en = 0;
-			svga.rgb16_en = 0;
-			svga.rgb32_en = 0;
-			switch(et4k.misc1 & 0x30)
-			{
-				case 0:
-					// normal power-up mode
-					break;
-				case 0x10:
-					svga.rgb8_en = 1;
-					break;
-				case 0x20:
-				case 0x30:
-					popmessage("Tseng 15/16 bit HiColor mode, contact MAMEdev");
-					break;
-			}
-			#endif
-		})
-	);
-	// Miscellaneous 2
-	// TODO: not on stock et4k?
-	map(0x17, 0x17).mirror(0x20).lrw8(
-		NAME([this] (offs_t offset) { return et4k.misc2; }),
-		NAME([this] (offs_t offset, u8 data) { 
-			et4k.misc2 = data;
-		})
-	);
-}
-
-uint8_t tseng_vga_device::port_03c0_r(offs_t offset)
-{
-	uint8_t res;
-
-	switch(offset)
-	{
-		case 0x0d:
-			res = svga.bank_w & 0xf;
-			res |= (svga.bank_r & 0xf) << 4;
-			break;
-		case 0x06:
-			if(et4k.dac_state == 4)
-			{
-				if(!et4k.dac_ctrl)
-					et4k.dac_ctrl = 0x80;
-				res = et4k.dac_ctrl;
-				break;
-			}
-			et4k.dac_state++;
-			res = vga_device::port_03c0_r(offset);
-			break;
-		case 0x08:
-			et4k.dac_state = 0;
-			[[fallthrough]];
-		default:
-			res = vga_device::port_03c0_r(offset);
-			break;
-	}
-
-	return res;
-}
-
-void tseng_vga_device::port_03c0_w(offs_t offset, uint8_t data)
-{
-	switch(offset)
-	{
-		case 0x0d:
-			svga.bank_w = data & 0xf;
-			svga.bank_r = (data & 0xf0) >> 4;
-			break;
-		case 0x06:
-			if(et4k.dac_state == 4)
-			{
-				et4k.dac_ctrl = data;
-				break;
-			}
-			[[fallthrough]];
-		default:
-			vga_device::port_03c0_w(offset,data);
-			break;
-	}
-	tseng_define_video_mode();
-}
-
-uint8_t tseng_vga_device::port_03d0_r(offs_t offset)
-{
-	uint8_t res = 0xff;
-
-	if (get_crtc_port() == 0x3d0)
-	{
-		switch(offset)
-		{
-			case 8:
-				res = et4k.reg_3d8;
-				break;
-			default:
-				res = vga_device::port_03d0_r(offset);
-				break;
-		}
-	}
-
-	return res;
-}
-
-void tseng_vga_device::port_03d0_w(offs_t offset, uint8_t data)
-{
-	if (get_crtc_port() == 0x3d0)
-	{
-		switch(offset)
-		{
-			case 8:
-				et4k.reg_3d8 = data;
-				if(data == 0xa0)
-					et4k.ext_reg_ena = true;
-				else if(data == 0x29)
-					et4k.ext_reg_ena = false;
-				break;
-			default:
-				vga_device::port_03d0_w(offset,data);
-				break;
-		}
-	}
-	tseng_define_video_mode();
-}
 
 uint8_t tseng_vga_device::mem_r(offs_t offset)
 {

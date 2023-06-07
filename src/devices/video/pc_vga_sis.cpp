@@ -47,9 +47,33 @@ void sis630_svga_device::device_reset()
 {
 	svga_device::device_reset();
 
-	m_svga_bank_reg_w = m_svga_bank_reg_r = 0;
 	m_unlock_reg = false;
 	//m_dual_seg_mode = false;
+}
+
+void sis630_svga_device::io_3cx_map(address_map &map)
+{
+	svga_device::io_3cx_map(map);
+	// TODO: for '630 it's always with dual segment enabled?
+	// May be like trident_vga where there's a specific register
+
+	// read by gamecstl Kontron BIOS
+	map(0x0b, 0x0b).lrw8(
+		NAME([this] (offs_t offset) {
+			return svga.bank_r;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			svga.bank_r = data; 
+		})
+	);
+	map(0x0d, 0x0d).lrw8(
+		NAME([this] (offs_t offset) {
+			return svga.bank_w;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			svga.bank_w = data & 0x3f;
+		})
+	);
 }
 
 // Page 144
@@ -259,48 +283,10 @@ uint16_t sis630_svga_device::offset()
 	return svga_device::offset();
 }
 
-// read by gamecstl Kontron BIOS
-u8 sis630_svga_device::port_03c0_r(offs_t offset)
-{
-	if (offset == 0xd)
-		return m_svga_bank_reg_w;
-	if (offset == 0xb)
-		return m_svga_bank_reg_r;
-
-	return svga_device::port_03c0_r(offset);
-}
-
-void sis630_svga_device::port_03c0_w(offs_t offset, uint8_t data)
-{
-	// TODO: for '630 it's always with dual segment enabled?
-
-	if (offset == 0xd)
-	{
-		//if (m_dual_seg_mode)
-			m_svga_bank_reg_w = (data & 0x3f) * 0x10000;
-		//else
-		{
-		//  m_svga_bank_reg_w = (data >> 4) * 0x10000;
-		//  m_svga_bank_reg_r = (data & 0xf) * 0x10000;
-		}
-		return;
-	}
-
-	if (offset == 0xb)
-	{
-		//if (m_dual_seg_mode)
-			m_svga_bank_reg_r = (data & 0x3f) * 0x10000;
-		// otherwise ignored if dual segment mode disabled
-		return;
-	}
-
-	svga_device::port_03c0_w(offset, data);
-}
-
 uint8_t sis630_svga_device::mem_r(offs_t offset)
 {
 	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en || svga.rgb32_en)
-		return svga_device::mem_linear_r(offset + m_svga_bank_reg_r);
+		return svga_device::mem_linear_r(offset + svga.bank_r * 0x10000);
 	return svga_device::mem_r(offset);
 }
 
@@ -308,7 +294,7 @@ void sis630_svga_device::mem_w(offs_t offset, uint8_t data)
 {
 	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en || svga.rgb32_en)
 	{
-		svga_device::mem_linear_w(offset + m_svga_bank_reg_w, data);
+		svga_device::mem_linear_w(offset + svga.bank_w * 0x10000, data);
 		return;
 	}
 	svga_device::mem_w(offset, data);

@@ -216,9 +216,7 @@ void sis630_gui_device::space_io_map(address_map &map)
 	// RIO + 0x16: 301 RAMDAC
 	// RIO + 0x30/+0x40/+0x50: omitted, legacy '300/'630 VGA regs?
 	// (gamecstl definitely tries to access 0x44 index 5 for readback extension ID)
-	map(0x30, 0x3f).rw(FUNC(sis630_gui_device::vga_3b0_r), FUNC(sis630_gui_device::vga_3b0_w));
-	map(0x40, 0x4f).rw(FUNC(sis630_gui_device::vga_3c0_r), FUNC(sis630_gui_device::vga_3c0_w));
-	map(0x50, 0x5f).rw(FUNC(sis630_gui_device::vga_3d0_r), FUNC(sis630_gui_device::vga_3d0_w));
+	map(0x30, 0x5f).m(m_svga, FUNC(sis630_svga_device::io_map));
 }
 
 void sis630_gui_device::legacy_memory_map(address_map &map)
@@ -228,9 +226,7 @@ void sis630_gui_device::legacy_memory_map(address_map &map)
 
 void sis630_gui_device::legacy_io_map(address_map &map)
 {
-	map(0x03b0, 0x03bf).rw(FUNC(sis630_gui_device::vga_3b0_r), FUNC(sis630_gui_device::vga_3b0_w));
-	map(0x03c0, 0x03cf).rw(FUNC(sis630_gui_device::vga_3c0_r), FUNC(sis630_gui_device::vga_3c0_w));
-	map(0x03d0, 0x03df).rw(FUNC(sis630_gui_device::vga_3d0_r), FUNC(sis630_gui_device::vga_3d0_w));
+	map(0x03b0, 0x03df).m(m_svga, FUNC(sis630_svga_device::io_map));
 }
 
 void sis630_gui_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
@@ -274,85 +270,6 @@ uint8_t sis630_gui_device::vram_r(offs_t offset)
 void sis630_gui_device::vram_w(offs_t offset, uint8_t data)
 {
 	downcast<sis630_svga_device *>(m_svga.target())->mem_w(offset, data);
-}
-
-u32 sis630_gui_device::vga_3b0_r(offs_t offset, uint32_t mem_mask)
-{
-	uint32_t result = 0;
-	if (ACCESSING_BITS_0_7)
-		result |= downcast<sis630_svga_device *>(m_svga.target())->port_03b0_r(offset * 4 + 0) << 0;
-	if (ACCESSING_BITS_8_15)
-		result |= downcast<sis630_svga_device *>(m_svga.target())->port_03b0_r(offset * 4 + 1) << 8;
-	if (ACCESSING_BITS_16_23)
-		result |= downcast<sis630_svga_device *>(m_svga.target())->port_03b0_r(offset * 4 + 2) << 16;
-	if (ACCESSING_BITS_24_31)
-		result |= downcast<sis630_svga_device *>(m_svga.target())->port_03b0_r(offset * 4 + 3) << 24;
-	return result;
-}
-
-void sis630_gui_device::vga_3b0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-		downcast<sis630_svga_device *>(m_svga.target())->port_03b0_w(offset * 4 + 0, data >> 0);
-	if (ACCESSING_BITS_8_15)
-		downcast<sis630_svga_device *>(m_svga.target())->port_03b0_w(offset * 4 + 1, data >> 8);
-	if (ACCESSING_BITS_16_23)
-		downcast<sis630_svga_device *>(m_svga.target())->port_03b0_w(offset * 4 + 2, data >> 16);
-	if (ACCESSING_BITS_24_31)
-		downcast<sis630_svga_device *>(m_svga.target())->port_03b0_w(offset * 4 + 3, data >> 24);
-}
-
-
-u32 sis630_gui_device::vga_3c0_r(offs_t offset, uint32_t mem_mask)
-{
-	uint32_t result = 0;
-	if (ACCESSING_BITS_0_7)
-		result |= downcast<sis630_svga_device *>(m_svga.target())->port_03c0_r(offset * 4 + 0) << 0;
-	if (ACCESSING_BITS_8_15)
-		result |= downcast<sis630_svga_device *>(m_svga.target())->port_03c0_r(offset * 4 + 1) << 8;
-	if (ACCESSING_BITS_16_23)
-		result |= downcast<sis630_svga_device *>(m_svga.target())->port_03c0_r(offset * 4 + 2) << 16;
-	if (ACCESSING_BITS_24_31)
-		result |= downcast<sis630_svga_device *>(m_svga.target())->port_03c0_r(offset * 4 + 3) << 24;
-	return result;
-}
-
-void sis630_gui_device::vga_3c0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-		downcast<sis630_svga_device *>(m_svga.target())->port_03c0_w(offset * 4 + 0, data >> 0);
-	if (ACCESSING_BITS_8_15)
-		downcast<sis630_svga_device *>(m_svga.target())->port_03c0_w(offset * 4 + 1, data >> 8);
-	if (ACCESSING_BITS_16_23)
-		downcast<sis630_svga_device *>(m_svga.target())->port_03c0_w(offset * 4 + 2, data >> 16);
-	if (ACCESSING_BITS_24_31)
-		downcast<sis630_svga_device *>(m_svga.target())->port_03c0_w(offset * 4 + 3, data >> 24);
-}
-
-u32 sis630_gui_device::vga_3d0_r(offs_t offset, uint32_t mem_mask)
-{
-	uint32_t result = 0;
-	if (ACCESSING_BITS_0_7)
-		result |= downcast<sis630_svga_device *>(m_svga.target())->port_03d0_r(offset * 4 + 0) << 0;
-	if (ACCESSING_BITS_8_15)
-		result |= downcast<sis630_svga_device *>(m_svga.target())->port_03d0_r(offset * 4 + 1) << 8;
-	if (ACCESSING_BITS_16_23)
-		result |= downcast<sis630_svga_device *>(m_svga.target())->port_03d0_r(offset * 4 + 2) << 16;
-	if (ACCESSING_BITS_24_31)
-		result |= downcast<sis630_svga_device *>(m_svga.target())->port_03d0_r(offset * 4 + 3) << 24;
-	return result;
-}
-
-void sis630_gui_device::vga_3d0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-		downcast<sis630_svga_device *>(m_svga.target())->port_03d0_w(offset * 4 + 0, data >> 0);
-	if (ACCESSING_BITS_8_15)
-		downcast<sis630_svga_device *>(m_svga.target())->port_03d0_w(offset * 4 + 1, data >> 8);
-	if (ACCESSING_BITS_16_23)
-		downcast<sis630_svga_device *>(m_svga.target())->port_03d0_w(offset * 4 + 2, data >> 16);
-	if (ACCESSING_BITS_24_31)
-		downcast<sis630_svga_device *>(m_svga.target())->port_03d0_w(offset * 4 + 3, data >> 24);
 }
 
 /*****************************

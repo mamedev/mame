@@ -34,12 +34,8 @@ public:
 	virtual void zero();
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	virtual uint8_t port_03b0_r(offs_t offset);
-	virtual void port_03b0_w(offs_t offset, uint8_t data);
-	virtual uint8_t port_03c0_r(offs_t offset);
-	virtual void port_03c0_w(offs_t offset, uint8_t data);
-	virtual uint8_t port_03d0_r(offs_t offset);
-	virtual void port_03d0_w(offs_t offset, uint8_t data);
+	void io_map(address_map &map);
+
 	virtual uint8_t mem_r(offs_t offset);
 	virtual void mem_w(offs_t offset, uint8_t data);
 	virtual uint8_t mem_linear_r(offs_t offset);
@@ -89,8 +85,40 @@ protected:
 
 	virtual space_config_vector memory_space_config() const override;
 
-	uint8_t vga_crtc_r(offs_t offset);
-	void vga_crtc_w(offs_t offset, uint8_t data);
+	virtual void io_3bx_3dx_map(address_map &map);
+
+	u8 crtc_address_r(offs_t offset);
+	void crtc_address_w(offs_t offset, u8 data);
+	virtual u8 crtc_data_r(offs_t offset);
+	virtual void crtc_data_w(offs_t offset, u8 data);
+	u8 input_status_1_r(offs_t offset);
+	void feature_control_w(offs_t offset, u8 data);
+
+	virtual void io_3cx_map(address_map &map);
+
+	u8 atc_address_r(offs_t offset);
+	void atc_address_data_w(offs_t offset, u8 data);
+	u8 atc_data_r(offs_t offset);
+	u8 input_status_0_r(offs_t offset);
+	void miscellaneous_output_w(offs_t offset, u8 data);
+	u8 sequencer_address_r(offs_t offset);
+	void sequencer_address_w(offs_t offset, u8 data);
+	virtual u8 sequencer_data_r(offs_t offset);
+	virtual void sequencer_data_w(offs_t offset, u8 data);
+	u8 ramdac_mask_r(offs_t offset);
+	void ramdac_mask_w(offs_t offset, u8 data);
+	u8 ramdac_state_r(offs_t offset);
+	void ramdac_read_index_w(offs_t offset, u8 data);
+	u8 ramdac_write_index_r(offs_t offset);
+	void ramdac_write_index_w(offs_t offset, u8 data);
+	u8 ramdac_data_r(offs_t offset);
+	void ramdac_data_w(offs_t offset, u8 data);
+	u8 feature_control_r(offs_t offset);
+	u8 miscellaneous_output_r(offs_t offset);
+	virtual u8 gc_address_r(offs_t offset);
+	virtual void gc_address_w(offs_t offset, u8 data);
+	virtual u8 gc_data_r(offs_t offset);
+	virtual void gc_data_w(offs_t offset, u8 data);
 
 	virtual void crtc_map(address_map &map);
 	virtual void sequencer_map(address_map &map);
@@ -260,6 +288,10 @@ protected:
 	address_space_config m_gc_space_config;
 	address_space_config m_seq_space_config;
 	address_space_config m_atc_space_config;
+
+private:
+	memory_view m_ioas_3bx_view;
+	memory_view m_ioas_3dx_view;
 };
 
 

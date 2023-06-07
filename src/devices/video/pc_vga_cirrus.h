@@ -18,12 +18,6 @@ public:
 	// construction/destruction
 	cirrus_gd5428_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint8_t port_03c0_r(offs_t offset) override;
-	virtual void port_03c0_w(offs_t offset, uint8_t data) override;
-	virtual uint8_t port_03b0_r(offs_t offset) override;
-	virtual void port_03b0_w(offs_t offset, uint8_t data) override;
-	virtual uint8_t port_03d0_r(offs_t offset) override;
-	virtual void port_03d0_w(offs_t offset, uint8_t data) override;
 	virtual uint8_t mem_r(offs_t offset) override;
 	virtual void mem_w(offs_t offset, uint8_t data) override;
 
@@ -37,6 +31,12 @@ protected:
 	virtual void device_reset() override;
 	virtual uint16_t offset() override;
 
+	virtual void io_3cx_map(address_map &map) override;
+
+	u8 ramdac_hidden_mask_r(offs_t offset);
+	void ramdac_hidden_mask_w(offs_t offset, u8 data);
+	u8 ramdac_overlay_r(offs_t offset);
+	void ramdac_overlay_w(offs_t offset, u8 data);
 	u8 m_hidden_dac_mode = 0;
 	u8 m_hidden_dac_phase = 0;
 	uint8_t m_chip_id;

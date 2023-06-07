@@ -85,6 +85,107 @@ cirrus_gd5446_device::cirrus_gd5446_device(const machine_config &mconfig, const 
 	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(cirrus_gd5446_device::sequencer_map), this));
 }
 
+void cirrus_gd5428_device::io_3cx_map(address_map &map)
+{
+	svga_device::io_3cx_map(map);
+	map(0x06, 0x06).rw(FUNC(cirrus_gd5428_device::ramdac_hidden_mask_r), FUNC(cirrus_gd5428_device::ramdac_hidden_mask_w));
+	map(0x09, 0x09).rw(FUNC(cirrus_gd5428_device::ramdac_overlay_r), FUNC(cirrus_gd5428_device::ramdac_overlay_w));
+}
+
+u8 cirrus_gd5428_device::ramdac_hidden_mask_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+		m_hidden_dac_phase ++;
+	if (m_hidden_dac_phase >= 4)
+	{
+		u8 res;
+		// TODO: '5420 doesn't have this
+		// TODO: '5428 reads do not lock the Hidden DAC
+		res = m_hidden_dac_mode;
+		//m_hidden_dac_phase = 0;
+		LOGMASKED(LOG_HDAC, "CL: Hidden DAC read (%02x)\n", res);
+		return res;
+	}
+
+	return vga_device::ramdac_mask_r(0);
+}
+
+void cirrus_gd5428_device::ramdac_hidden_mask_w(offs_t offset, u8 data)
+{
+	if (m_hidden_dac_phase >= 4)
+	{
+		// TODO: '5420 doesn't have this
+		// TODO: '5428 reads do not lock the Hidden DAC
+		m_hidden_dac_mode = data;
+		m_hidden_dac_phase = 0;
+		LOGMASKED(LOG_HDAC, "CL: Hidden DAC write %02x\n", data);
+		return;
+	}
+
+	vga_device::ramdac_mask_w(0, data);
+}
+
+u8 cirrus_gd5428_device::ramdac_overlay_r(offs_t offset)
+{
+	if(!m_ext_palette_enabled)
+		return vga_device::ramdac_data_r(0);
+
+	u8 res = 0xff;
+	if (vga.dac.read && !machine().side_effects_disabled())
+	{
+		switch (vga.dac.state++)
+		{
+			case 0:
+				res = m_ext_palette[vga.dac.read_index & 0x0f].red;
+				break;
+			case 1:
+				res = m_ext_palette[vga.dac.read_index & 0x0f].green;
+				break;
+			case 2:
+				res = m_ext_palette[vga.dac.read_index & 0x0f].blue;
+				break;
+		}
+
+		if (vga.dac.state == 3)
+		{
+			vga.dac.state = 0;
+			vga.dac.read_index++;
+		}
+	}
+
+	return res;
+}
+
+void cirrus_gd5428_device::ramdac_overlay_w(offs_t offset, u8 data)
+{
+	if(!m_ext_palette_enabled)
+	{
+		vga_device::ramdac_data_w(0, data);
+		return;
+	}
+
+	if (!vga.dac.read)
+	{
+		switch (vga.dac.state++) {
+		case 0:
+			m_ext_palette[vga.dac.write_index & 0x0f].red=data;
+			break;
+		case 1:
+			m_ext_palette[vga.dac.write_index & 0x0f].green=data;
+			break;
+		case 2:
+			m_ext_palette[vga.dac.write_index & 0x0f].blue=data;
+			break;
+		}
+		vga.dac.dirty=1;
+		if (vga.dac.state==3)
+		{
+			vga.dac.state=0;
+			vga.dac.write_index++;
+		}
+	}
+}
+
 void cirrus_gd5428_device::crtc_map(address_map &map)
 {
 	svga_device::crtc_map(map);
@@ -1039,174 +1140,6 @@ void cirrus_gd5428_device::copy_pixel(uint8_t src, uint8_t dst)
 
 	vga.memory[m_blt_dest_current % vga.svga_intf.vram_size] = res;
 }
-
-uint8_t cirrus_gd5428_device::port_03c0_r(offs_t offset)
-{
-	uint8_t res = 0xff;
-
-	switch(offset)
-	{
-		case 0x06:
-			m_hidden_dac_phase ++;
-			if (m_hidden_dac_phase >= 4)
-			{
-				// TODO: '5420 doesn't have this
-				// TODO: '5428 reads do not lock the Hidden DAC
-				res = m_hidden_dac_mode;
-				//m_hidden_dac_phase = 0;
-				LOGMASKED(LOG_HDAC, "CL: Hidden DAC read (%02x)\n", res);
-			}
-			else
-				res = vga_device::port_03c0_r(offset);
-			break;
-		case 0x09:
-			if(!m_ext_palette_enabled)
-				res = vga_device::port_03c0_r(offset);
-			else
-			{
-				if (vga.dac.read)
-				{
-					switch (vga.dac.state++)
-					{
-						case 0:
-							res = m_ext_palette[vga.dac.read_index & 0x0f].red;
-							break;
-						case 1:
-							res = m_ext_palette[vga.dac.read_index & 0x0f].green;
-							break;
-						case 2:
-							res = m_ext_palette[vga.dac.read_index & 0x0f].blue;
-							break;
-					}
-
-					if (vga.dac.state==3)
-					{
-						vga.dac.state = 0;
-						vga.dac.read_index++;
-					}
-				}
-			}
-			break;
-		default:
-			res = svga_device::port_03c0_r(offset);
-			break;
-	}
-
-	return res;
-}
-
-void cirrus_gd5428_device::port_03c0_w(offs_t offset, uint8_t data)
-{
-	switch(offset)
-	{
-		case 0x06:
-			if (m_hidden_dac_phase >= 4)
-			{
-				// TODO: '5420 doesn't have this
-				// TODO: '5428 reads do not lock the Hidden DAC
-				m_hidden_dac_mode = data;
-				m_hidden_dac_phase = 0;
-				LOGMASKED(LOG_HDAC, "CL: Hidden DAC write %02x\n", data);
-			}
-			else
-			{
-				m_hidden_dac_phase = 0;
-				svga_device::port_03c0_w(offset, data);
-			}
-			break;
-		case 0x09:
-			if(!m_ext_palette_enabled)
-				svga_device::port_03c0_w(offset,data);
-			else
-			{
-				if (!vga.dac.read)
-				{
-					switch (vga.dac.state++) {
-					case 0:
-						m_ext_palette[vga.dac.write_index & 0x0f].red=data;
-						break;
-					case 1:
-						m_ext_palette[vga.dac.write_index & 0x0f].green=data;
-						break;
-					case 2:
-						m_ext_palette[vga.dac.write_index & 0x0f].blue=data;
-						break;
-					}
-					vga.dac.dirty=1;
-					if (vga.dac.state==3)
-					{
-						vga.dac.state=0;
-						vga.dac.write_index++;
-					}
-				}
-			}
-			break;
-		default:
-			svga_device::port_03c0_w(offset,data);
-			break;
-	}
-}
-
-uint8_t cirrus_gd5428_device::port_03b0_r(offs_t offset)
-{
-	uint8_t res = 0xff;
-
-	if (get_crtc_port() == 0x3b0)
-	{
-		switch(offset)
-		{
-			default:
-				res = vga_device::port_03b0_r(offset);
-				break;
-		}
-	}
-
-	return res;
-}
-
-uint8_t cirrus_gd5428_device::port_03d0_r(offs_t offset)
-{
-	uint8_t res = 0xff;
-
-	if (get_crtc_port() == 0x3d0)
-	{
-		switch(offset)
-		{
-			default:
-				res = vga_device::port_03d0_r(offset);
-				break;
-		}
-	}
-
-	return res;
-}
-
-void cirrus_gd5428_device::port_03b0_w(offs_t offset, uint8_t data)
-{
-	if (get_crtc_port() == 0x3b0)
-	{
-		switch(offset)
-		{
-			default:
-				vga_device::port_03b0_w(offset,data);
-				break;
-		}
-	}
-}
-
-void cirrus_gd5428_device::port_03d0_w(offs_t offset, uint8_t data)
-{
-	if (get_crtc_port() == 0x3d0)
-	{
-		switch(offset)
-		{
-			default:
-				vga_device::port_03d0_w(offset,data);
-				break;
-		}
-	}
-}
-
 
 uint8_t cirrus_gd5428_device::vga_latch_write(int offs, uint8_t data)
 {

@@ -251,6 +251,15 @@ void s3virge_vga_device::crtc_map(address_map &map)
 			return res;
 		})
 	);
+	map(0x53, 0x53).lrw8(
+		NAME([this] (offs_t offset) {
+			return s3.cr53;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			s3.cr53 = data;
+			//m_linear_config_changed_cb(s3virge.linear_address_enable);
+		})
+	);
 	map(0x58, 0x58).lrw8(
 		NAME([this] (offs_t offset) {
 			u8 res = s3virge.linear_address_size & 0x03;
@@ -379,90 +388,6 @@ void s3virge_vga_device::s3_define_video_mode()
 	if(s3.cr43 & 0x80)  // Horizontal clock doubling (technically, doubles horizontal CRT parameters)
 		divisor *= 2;
 	recompute_params_clock(divisor, xtal.value());
-}
-
-uint8_t s3virge_vga_device::port_03b0_r(offs_t offset)
-{
-	uint8_t res = 0xff;
-
-	if (get_crtc_port() == 0x3b0)
-	{
-		switch(offset)
-		{
-			default:
-				res = vga_device::port_03b0_r(offset);
-				break;
-		}
-	}
-
-	return res;
-}
-
-void s3virge_vga_device::port_03b0_w(offs_t offset, uint8_t data)
-{
-	if (get_crtc_port() == 0x3b0)
-	{
-		switch(offset)
-		{
-			default:
-				vga_device::port_03b0_w(offset,data);
-				break;
-		}
-	}
-}
-
-uint8_t s3virge_vga_device::port_03c0_r(offs_t offset)
-{
-	uint8_t res;
-
-	switch(offset)
-	{
-		default:
-			res = s3_vga_device::port_03c0_r(offset);
-			break;
-	}
-
-	return res;
-}
-
-void s3virge_vga_device::port_03c0_w(offs_t offset, uint8_t data)
-{
-	switch(offset)
-	{
-		default:
-			s3_vga_device::port_03c0_w(offset,data);
-			break;
-	}
-}
-
-uint8_t s3virge_vga_device::port_03d0_r(offs_t offset)
-{
-	uint8_t res = 0xff;
-
-	if (get_crtc_port() == 0x3d0)
-	{
-		switch(offset)
-		{
-			default:
-				res = vga_device::port_03d0_r(offset);
-				break;
-		}
-	}
-
-	return res;
-}
-
-void s3virge_vga_device::port_03d0_w(offs_t offset, uint8_t data)
-{
-	if (get_crtc_port() == 0x3d0)
-	{
-		switch(offset)
-		{
-			default:
-				vga_device::port_03d0_w(offset,data);
-				break;
-		}
-	}
 }
 
 uint8_t s3virge_vga_device::mem_r(offs_t offset)

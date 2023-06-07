@@ -256,9 +256,7 @@ void photoply_state::photoply_io(address_map &map)
 //  map(0x0278, 0x027f).ram(); //parallel port 2
 	map(0x0370, 0x0377).rw("ide2", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
 //  map(0x0378, 0x037f).ram(); //parallel port
-	map(0x03b0, 0x03bf).rw("vga", FUNC(cirrus_gd5446_device::port_03b0_r), FUNC(cirrus_gd5446_device::port_03b0_w));
-	map(0x03c0, 0x03cf).rw("vga", FUNC(cirrus_gd5446_device::port_03c0_r), FUNC(cirrus_gd5446_device::port_03c0_w));
-	map(0x03d0, 0x03df).rw("vga", FUNC(cirrus_gd5446_device::port_03d0_r), FUNC(cirrus_gd5446_device::port_03d0_w));
+	map(0x03b0, 0x03df).m("vga", FUNC(cirrus_gd5446_device::io_map));
 
 	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
 

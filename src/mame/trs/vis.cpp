@@ -237,8 +237,7 @@ class vis_vga_device : public svga_device,
 {
 public:
 	vis_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	uint8_t vga_r(offs_t offset);
-	void vga_w(offs_t offset, uint8_t data);
+
 	uint8_t visvgamem_r(offs_t offset);
 	void visvgamem_w(offs_t offset, uint8_t data);
 protected:
@@ -246,9 +245,18 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void recompute_params() override;
+
+	virtual void io_3cx_map(address_map &map) override;
+
 	virtual void crtc_map(address_map &map) override;
+	virtual void gc_map(address_map &map) override;
 	virtual void sequencer_map(address_map &map) override;
+
+	void io_isa_map(address_map &map);
 private:
+	u8 ramdac_hidden_mask_r(offs_t offset);
+	void ramdac_hidden_mask_w(offs_t offset, u8 data);
+
 	void vga_vh_yuv8(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vga_vh_yuv422(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	rgb_t yuv_to_rgb(int y, int u, int v) const;
@@ -272,6 +280,7 @@ vis_vga_device::vis_vga_device(const machine_config &mconfig, const char *tag, d
 	set_screen(*this, "screen");
 	set_vram_size(0x100000);
 	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(vis_vga_device::crtc_map), this));
+	m_gc_space_config = address_space_config("gc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(vis_vga_device::gc_map), this));
 	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(vis_vga_device::sequencer_map), this));
 }
 
@@ -280,6 +289,12 @@ void vis_vga_device::device_add_mconfig(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update(FUNC(vis_vga_device::screen_update));
+}
+
+void vis_vga_device::io_3cx_map(address_map &map)
+{
+	svga_device::io_3cx_map(map);
+	map(0x06, 0x06).rw(FUNC(vis_vga_device::ramdac_hidden_mask_r), FUNC(vis_vga_device::ramdac_hidden_mask_w));
 }
 
 void vis_vga_device::crtc_map(address_map &map)
@@ -461,6 +476,25 @@ void vis_vga_device::crtc_map(address_map &map)
 	);
 }
 
+void vis_vga_device::gc_map(address_map &map)
+{
+	svga_device::gc_map(map);
+	map(0x05, 0x05).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			vga.gc.shift256 = BIT(data, 6);
+			// TODO: is this an hack?
+			if (vga.sequencer.data[0x1f] & 0x10)
+				vga.gc.shift256 = 1;
+			vga.gc.shift_reg = BIT(data, 5);
+			vga.gc.host_oe = BIT(data, 4);
+			vga.gc.read_mode = BIT(data, 3);
+			vga.gc.write_mode = data & 3;
+			//if(data & 0x10 && vga.gc.alpha_dis)
+			//  popmessage("Host O/E enabled, contact MAMEdev");
+		})
+	);
+}
+
 void vis_vga_device::sequencer_map(address_map &map)
 {
 	svga_device::sequencer_map(map);
@@ -520,12 +554,15 @@ void vis_vga_device::sequencer_map(address_map &map)
 		})
 	);
 }
+void vis_vga_device::io_isa_map(address_map &map)
+{
+	map(0x00, 0x2f).m(FUNC(vis_vga_device::io_map));
+}
 
 void vis_vga_device::flush_8bpp_mode()
 {
 	svga.rgb8_en = m_8bit_640 && BIT(vga.sequencer.data[0x1f], 4);
 }
-
 
 void vis_vga_device::recompute_params()
 {
@@ -687,8 +724,9 @@ void vis_vga_device::vga_vh_yuv422(bitmap_rgb32 &bitmap, const rectangle &clipre
 void vis_vga_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x03b0, 0x03df, read8sm_delegate(*this, FUNC(vis_vga_device::vga_r)), write8sm_delegate(*this, FUNC(vis_vga_device::vga_w)));
 	m_isa->install_memory(0x0a0000, 0x0bffff, read8sm_delegate(*this, FUNC(vis_vga_device::visvgamem_r)), write8sm_delegate(*this, FUNC(vis_vga_device::visvgamem_w)));
+	m_isa->install_device(0x03b0, 0x03df, *this, &vis_vga_device::io_isa_map);
+
 	svga_device::device_start();
 }
 
@@ -755,60 +793,31 @@ void vis_vga_device::visvgamem_w(offs_t offset, uint8_t data)
 	return mem_linear_w((offset + (m_wina * 64)) & 0x3ffff, data);
 }
 
-uint8_t vis_vga_device::vga_r(offs_t offset)
+u8 vis_vga_device::ramdac_hidden_mask_r(offs_t offset)
 {
-	switch(offset)
+	if(m_extcnt == 4)
 	{
-		case 0x16:
-			if(m_extcnt == 4)
-			{
-				m_extcnt = 0;
-				return m_extreg;
-			}
-			m_extcnt++;
-			break;
-		// case 0x05: crtc map
-		// case 0x25:
+		m_extcnt = 0;
+		return m_extreg;
 	}
-	if(offset < 0x10)
-		return port_03b0_r(offset);
-	else if(offset < 0x20)
-		return port_03c0_r(offset - 0x10);
-	else
-		return port_03d0_r(offset - 0x20);
+
+	if (!machine().side_effects_disabled())
+		m_extcnt++;
+
+	return vga_device::ramdac_mask_r(offset);
 }
 
-void vis_vga_device::vga_w(offs_t offset, uint8_t data)
+void vis_vga_device::ramdac_hidden_mask_w(offs_t offset, u8 data)
 {
-	switch(offset)
+	if(m_extcnt == 4)
 	{
-		// case 0x15: sequencer map
-		case 0x16:
-			if(m_extcnt == 4)
-			{
-				if((data & 0xc7) != 0xc7)
-					m_extreg = data;
-				m_extcnt = 0;
-				return;
-			}
-			break;
-		case 0x1f:
-			if(vga.gc.index == 0x05)
-			{
-				m_shift256 = data & 0x40 ? 1 : 0;
-				if(vga.sequencer.data[0x1f] & 0x10)
-					data |= 0x40;
-			}
-			break;
-		// case 0x05: crtc map
-		// case 0x25:
+		if((data & 0xc7) != 0xc7)
+			m_extreg = data;
+		m_extcnt = 0;
+		return;
 	}
-	if(offset < 0x10)
-		port_03b0_w(offset, data);
-	else if(offset < 0x20)
-		port_03c0_w(offset - 0x10, data);
-	else
-		port_03d0_w(offset - 0x20, data);
+
+	vga_device::ramdac_write_index_w(offset, data);
 }
 
 class vis_state : public driver_device

@@ -34,6 +34,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	void io_isa_map(address_map &map);
+
 private:
 	required_device<tvga9000_device> m_vga;
 };
@@ -55,6 +57,8 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	void io_isa_map(address_map &map);
 
 private:
 	required_device<trident_vga_device> m_vga;

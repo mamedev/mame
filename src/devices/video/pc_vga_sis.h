@@ -16,12 +16,11 @@ public:
 	virtual uint8_t mem_r(offs_t offset) override;
 	virtual void mem_w(offs_t offset, uint8_t data) override;
 
-	virtual u8 port_03c0_r(offs_t offset) override;
-	virtual void port_03c0_w(offs_t offset, uint8_t data) override;
-
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	virtual void io_3cx_map(address_map &map) override;
 
 	virtual void crtc_map(address_map &map) override;
 	virtual void sequencer_map(address_map &map) override;
@@ -33,8 +32,6 @@ protected:
 	u8 m_ext_misc_ctrl_0 = 0;
 	u8 m_ext_vert_overflow = 0;
 	u8 m_ext_horz_overflow[2]{};
-	u32 m_svga_bank_reg_w = 0;
-	u32 m_svga_bank_reg_r = 0;
 	u8 m_bus_width = 0;
 	bool m_unlock_reg = false;
 

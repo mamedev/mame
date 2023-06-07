@@ -42,6 +42,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	void io_isa_map(address_map &map);
+
 private:
 	required_device<ati_vga_device> m_vga;
 	required_device<mach8_device> m_8514;
@@ -66,6 +68,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	void io_isa_map(address_map &map);
+
 private:
 	required_device<mach32_device> m_vga;
 };
@@ -89,6 +93,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	void io_isa_map(address_map &map);
 private:
 	required_device<mach64_device> m_vga;
 };

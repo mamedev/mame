@@ -686,66 +686,6 @@ void s3_vga_device::sequencer_map(address_map &map)
 	);
 }
 
-uint8_t s3_vga_device::port_03b0_r(offs_t offset)
-{
-	uint8_t res = 0xff;
-
-	if (get_crtc_port() == 0x3b0)
-	{
-		switch(offset)
-		{
-			default:
-				res = vga_device::port_03b0_r(offset);
-				break;
-		}
-	}
-
-	return res;
-}
-
-void s3_vga_device::port_03b0_w(offs_t offset, uint8_t data)
-{
-	if (get_crtc_port() == 0x3b0)
-	{
-		switch(offset)
-		{
-			default:
-				vga_device::port_03b0_w(offset,data);
-				break;
-		}
-	}
-}
-
-uint8_t s3_vga_device::port_03d0_r(offs_t offset)
-{
-	uint8_t res = 0xff;
-
-	if (get_crtc_port() == 0x3d0)
-	{
-		switch(offset)
-		{
-			default:
-				res = vga_device::port_03d0_r(offset);
-				break;
-		}
-	}
-
-	return res;
-}
-
-void s3_vga_device::port_03d0_w(offs_t offset, uint8_t data)
-{
-	if (get_crtc_port() == 0x3d0)
-	{
-		switch(offset)
-		{
-			default:
-				vga_device::port_03d0_w(offset,data);
-				break;
-		}
-	}
-}
-
 uint8_t s3_vga_device::mem_r(offs_t offset)
 {
 	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb32_en)

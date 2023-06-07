@@ -92,95 +92,18 @@ void nvidia_nv3_vga_device::device_start()
 	save_item(NAME(m_ext_offset));
 }
 
-// TODO: should really calculate the access bit internally 
-uint8_t nvidia_nv3_vga_device::port_03b0_r(offs_t offset)
+void nvidia_nv3_vga_device::io_3bx_3dx_map(address_map &map)
 {
-	uint8_t res = 0xff;
-
-	if (get_crtc_port() == 0x3b0)
-	{
-		switch(offset)
-		{
-			case 0:
-			case 1:
-			case 2:
-			case 3:
-				LOGRMA("RMA_ACCESS R %02x\n", offset & 3);
-				break;
-
-			default:
-				res = vga_device::port_03b0_r(offset);
-				break;
-		}
-	}
-
-	return res;
-}
-
-void nvidia_nv3_vga_device::port_03b0_w(offs_t offset, uint8_t data)
-{
-	if (get_crtc_port() == 0x3b0)
-	{
-		switch(offset)
-		{
-			case 0:
-			case 1:
-			case 2:
-			case 3:
-				LOGRMA("RMA_ACCESS W %02x -> %02x\n", offset & 3, data);
-				break;
-
-			default:
-				vga_device::port_03b0_w(offset, data);
-				break;
-		}
-	}
-	//define_video_mode();
-}
-
-uint8_t nvidia_nv3_vga_device::port_03d0_r(offs_t offset)
-{
-	uint8_t res = 0xff;
-
-	if (get_crtc_port() == 0x3d0)
-	{
-		switch(offset)
-		{
-			case 0:
-			case 1:
-			case 2:
-			case 3:
-				LOGRMA("RMA_ACCESS R %02x\n", offset & 3);
-				break;
-
-			default:
-				res = vga_device::port_03d0_r(offset);
-				break;
-		}
-	}
-
-	return res;
-}
-
-void nvidia_nv3_vga_device::port_03d0_w(offs_t offset, uint8_t data)
-{
-	if (get_crtc_port() == 0x3d0)
-	{
-		switch(offset)
-		{
-			case 0:
-			case 1:
-			case 2:
-			case 3:
-				LOGRMA("RMA_ACCESS W %02x -> %02x\n", offset & 3, data);
-				break;
-
-			default:
-				vga_device::port_03d0_w(offset, data);
-				break;
-		}
-	}
-	//define_video_mode();
+	svga_device::io_3bx_3dx_map(map);
+	map(0x00, 0x03).lrw8(
+		NAME([this] (offs_t offset) {
+			LOGRMA("RMA_ACCESS R %02x\n", offset & 3);
+			return space().unmap();
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOGRMA("RMA_ACCESS W %02x -> %02x\n", offset & 3, data);
+		})
+	);
 }
 
 uint8_t nvidia_nv3_vga_device::mem_r(offs_t offset)

@@ -64,6 +64,142 @@ tvga9000_device::tvga9000_device(const machine_config &mconfig, const char *tag,
 	m_version = 0x43;
 }
 
+void trident_vga_device::io_3cx_map(address_map &map)
+{
+	svga_device::io_3cx_map(map);
+	map(0x06, 0x06).rw(FUNC(trident_vga_device::ramdac_hidden_mask_r), FUNC(trident_vga_device::ramdac_hidden_mask_w));
+	map(0x07, 0x09).rw(FUNC(trident_vga_device::ramdac_overlay_r), FUNC(trident_vga_device::ramdac_overlay_w));
+}
+
+u8 trident_vga_device::ramdac_hidden_mask_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+		tri.dac_count++;
+	if(tri.dac_count > 3)
+		tri.dac_active = true;
+	if(tri.dac_active)
+		return tri.dac;
+
+	return vga_device::ramdac_mask_r(offset);
+}
+
+void trident_vga_device::ramdac_hidden_mask_w(offs_t offset, u8 data)
+{
+	if(tri.dac_active)
+	{
+		tri.dac = data;  // DAC command register
+		tri.dac_active = false;
+		tri.dac_count = 0;
+		recompute_params();
+		return;
+	}
+
+	vga_device::ramdac_mask_w(offset, data);
+}
+
+u8 trident_vga_device::ramdac_overlay_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+	{
+		tri.dac_active = false;
+		tri.dac_count = 0;
+	}
+
+	switch(offset)
+	{
+		case 0:
+			return vga_device::ramdac_state_r(0);
+		case 1:
+			return vga_device::ramdac_write_index_r(0);
+		case 2:
+			return vga_device::ramdac_data_r(0);
+	}
+
+	return space().unmap();
+}
+
+void trident_vga_device::ramdac_overlay_w(offs_t offset, u8 data)
+{
+	tri.dac_active = false;
+	tri.dac_count = 0;
+
+	switch(offset)
+	{
+		case 0:
+			vga_device::ramdac_read_index_w(0, data);
+			break;
+		case 1:
+			vga_device::ramdac_write_index_w(0, data);
+			break;
+		case 2:
+			vga_device::ramdac_data_w(0, data);
+			break;
+	}
+}
+
+void trident_vga_device::io_3bx_3dx_map(address_map &map)
+{
+	svga_device::io_3bx_3dx_map(map);
+	map(0x08, 0x08).rw(FUNC(trident_vga_device::svga_bank_write_r), FUNC(trident_vga_device::svga_bank_write_w));
+	map(0x09, 0x09).rw(FUNC(trident_vga_device::svga_bank_read_r), FUNC(trident_vga_device::svga_bank_read_w));
+	// no info on this port
+	// Bit 5 appears to be a clock divider
+	map(0x0b, 0x0b).lrw8(
+		NAME([this] (offs_t offset) {
+			return tri.port_3db;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			tri.port_3db = data;
+			recompute_params();
+		})
+	);
+}
+
+u8 trident_vga_device::svga_bank_write_r(offs_t offset)
+{
+	// if enabled
+	if(tri.gc0f & 0x04)
+		return svga.bank_w & 0x3f;
+
+	return space().unmap();
+}
+
+void trident_vga_device::svga_bank_write_w(offs_t offset, u8 data)
+{
+	// if enabled
+	if(tri.gc0f & 0x04)
+	{
+		svga.bank_w = data & 0x3f;
+		LOG("Trident: Write Bank set to %02x\n",data);
+		// if bank regs are not separated ...
+		if(!(tri.gc0f & 0x01))
+		{
+			// ... then this is also the read bank register
+			svga.bank_r = data & 0x3f;
+			LOG("Trident: Read Bank set to %02x\n",data);
+		}
+	}
+}
+
+u8 trident_vga_device::svga_bank_read_r(offs_t offset)
+{
+	// if enabled & if bank regs are separated
+	if(tri.gc0f & 0x04)
+		return svga.bank_r & 0x3f;
+
+	return space().unmap();
+}
+
+void trident_vga_device::svga_bank_read_w(offs_t offset, u8 data)
+{
+	// if enabled & if bank regs are separated
+	if(tri.gc0f & 0x04 && tri.gc0f & 0x01)
+	{
+		svga.bank_r = data & 0x3f;
+		LOG("Trident: Read Bank set to %02x\n",data);
+	}
+}
+
 void trident_vga_device::crtc_map(address_map &map)
 {
 	svga_device::crtc_map(map);
@@ -765,140 +901,6 @@ void trident_vga_device::recompute_params()
 		divisor = 2;
 
 	recompute_params_clock(divisor, xtal);
-}
-
-uint8_t trident_vga_device::port_03c0_r(offs_t offset)
-{
-	uint8_t res;
-
-	switch(offset)
-	{
-		case 0x06:
-			tri.dac_count++;
-			if(tri.dac_count > 3)
-				tri.dac_active = true;
-			if(tri.dac_active)
-				res = tri.dac;
-			else
-				res = vga_device::port_03c0_r(offset);
-			break;
-		case 0x07:
-		case 0x08:
-		case 0x09:
-			tri.dac_active = false;
-			tri.dac_count = 0;
-			res = vga_device::port_03c0_r(offset);
-			break;
-		default:
-			res = vga_device::port_03c0_r(offset);
-			break;
-	}
-
-	return res;
-}
-
-void trident_vga_device::port_03c0_w(offs_t offset, uint8_t data)
-{
-	switch(offset)
-	{
-		case 0x06:
-			if(tri.dac_active)
-			{
-				tri.dac = data;  // DAC command register
-				tri.dac_active = false;
-				tri.dac_count = 0;
-				recompute_params();
-			}
-			else
-				vga_device::port_03c0_w(offset,data);
-			break;
-		case 0x07:
-		case 0x08:
-		case 0x09:
-			tri.dac_active = false;
-			tri.dac_count = 0;
-			vga_device::port_03c0_w(offset,data);
-			break;
-		default:
-			vga_device::port_03c0_w(offset,data);
-			break;
-	}
-}
-
-
-uint8_t trident_vga_device::port_03d0_r(offs_t offset)
-{
-	uint8_t res = 0xff;
-
-	if (get_crtc_port() == 0x3d0)
-	{
-		switch(offset)
-		{
-			case 8:
-				if(tri.gc0f & 0x04)  // if enabled
-				{
-					res = svga.bank_w & 0x3f;
-				}
-				else
-					res = 0xff;
-				break;
-			case 9:
-				if(tri.gc0f & 0x04)  // if enabled
-					if(tri.gc0f & 0x01)  // and if bank regs are separated
-						res = svga.bank_r & 0x3f;
-					else
-						res = 0xff;
-				else
-					res = 0xff;
-				break;
-			case 11:
-				res = tri.port_3db;
-				break;
-			default:
-				res = vga_device::port_03d0_r(offset);
-				break;
-		}
-	}
-
-	return res;
-}
-
-void trident_vga_device::port_03d0_w(offs_t offset, uint8_t data)
-{
-	if (get_crtc_port() == 0x3d0)
-	{
-		switch(offset)
-		{
-			case 8:
-				if(tri.gc0f & 0x04)  // if enabled
-				{
-					svga.bank_w = data & 0x3f;
-					LOG("Trident: Write Bank set to %02x\n",data);
-					if(!(tri.gc0f & 0x01))  // if bank regs are not separated
-					{
-						svga.bank_r = data & 0x3f; // then this is also the read bank register
-						LOG("Trident: Read Bank set to %02x\n",data);
-					}
-				}
-				break;
-			case 9:
-				if(tri.gc0f & 0x04)  // if enabled
-				{
-					if(tri.gc0f & 0x01)  // and if bank regs are separated
-					{
-						svga.bank_r = data & 0x3f;
-						LOG("Trident: Read Bank set to %02x\n",data);
-					}
-				}
-				break;
-			case 11:
-				tri.port_3db = data;  // no info on this port?  Bit 5 appears to be a clock divider...
-				break;
-			default:
-				vga_device::port_03d0_w(offset,data);
-				break;
-		}
-	}
 }
 
 uint8_t trident_vga_device::port_43c6_r(offs_t offset)
