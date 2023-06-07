@@ -71,9 +71,7 @@ private:
 	int m_ch;
 
 	/* Transmitter */
-	uint8_t tx_enabled;
 	uint8_t tx_data;
-	uint8_t tx_ready;
 	bool m_tx_break;
 
 	/* Rx/Tx clocking */
