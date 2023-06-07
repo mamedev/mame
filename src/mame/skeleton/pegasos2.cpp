@@ -113,13 +113,13 @@ void pegasos2_state::pegasos2(machine_config &config)
 	PPC604(config, m_maincpu, 100000000); // wrong cpu/clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &pegasos2_state::mem_map);
 
-	MV64361(config, m_syscon, 0, m_maincpu);
+	MV64361(config, m_syscon, 0, m_maincpu, "pci0:00.0", "pci1:00.0");
 
 	PCI_ROOT(config, "pci0", 0);
-	MV64361_PCI_HOST(config, "pci0:00.0", 0, m_maincpu, 0);
+	MV64361_PCI_HOST(config, "pci0:00.0", 0);
 
 	PCI_ROOT(config, "pci1", 0);
-	MV64361_PCI_HOST(config, "pci1:00.0", 0, m_maincpu, 1);
+	MV64361_PCI_HOST(config, "pci1:00.0", 0);
 	vt8231_isa_device &isa(VT8231_ISA(config, "pci1:0c.0", 0));
 	isa.com1_txd_cb().set("com1", FUNC(rs232_port_device::write_txd));
 	isa.com1_dtr_cb().set("com1", FUNC(rs232_port_device::write_dtr));
@@ -141,7 +141,7 @@ void pegasos2_state::pegasos2(machine_config &config)
 //**************************************************************************
 
 ROM_START( pegasos2 )
-	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_REGION(0x80000, "maincpu", ROMREGION_64BIT | ROMREGION_BE)
 	// extracted from 'up050404'
 	ROM_LOAD("pegasos2.rom", 0x00000, 0x80000, CRC(7e992266) SHA1(08dc28afb3d10fb223376a28eebfd07c9f8df9fa))
 ROM_END

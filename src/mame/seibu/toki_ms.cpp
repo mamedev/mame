@@ -334,7 +334,7 @@ private:
 	u8 sound_status_r();
 	void sound_command_w(u8 data);
 	void adpcm_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void adpcm_int(int state);
 	u8 m_adpcm_data = 0;
 
 	void descramble_16x16tiles(uint8_t* src, int len);
@@ -680,7 +680,7 @@ void toki_ms_state::machine_start()
 	membank("sound_bank")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x8000, 0x4000);
 }
 
-WRITE_LINE_MEMBER(toki_ms_state::adpcm_int)
+void toki_ms_state::adpcm_int(int state)
 {
 	m_msm->data_w(m_adpcm_data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);

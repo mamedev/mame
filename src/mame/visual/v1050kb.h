@@ -32,7 +32,7 @@ public:
 
 	auto out_tx_handler() { return m_out_tx_handler.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( si_w );
+	void si_w(int state);
 
 protected:
 	// device-level overrides

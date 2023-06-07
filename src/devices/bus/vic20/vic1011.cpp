@@ -56,7 +56,7 @@ void vic1011_device::device_start()
 {
 }
 
-WRITE_LINE_MEMBER( vic1011_device::output_rxd )
+void vic1011_device::output_rxd(int state)
 {
 	output_b(state);
 	output_c(state);

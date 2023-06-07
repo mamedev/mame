@@ -154,8 +154,8 @@ public:
 
 	virtual bool present() { return is_loaded() || loaded_through_softlist(); }
 
-	DECLARE_WRITE_LINE_MEMBER(irq_w) { m_irq_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER(nmi_w) { m_nmi_handler(state); }
+	void irq_w(int state) { m_irq_handler(state); }
+	void nmi_w(int state) { m_nmi_handler(state); }
 
 protected:
 	electron_cartslot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

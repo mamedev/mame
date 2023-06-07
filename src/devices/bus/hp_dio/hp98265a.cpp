@@ -253,7 +253,7 @@ void dio16_98265a_device::update_irq(bool state)
 	irq6_out(state && irq_level == 3);
 }
 
-WRITE_LINE_MEMBER(dio16_98265a_device::irq_w)
+void dio16_98265a_device::irq_w(int state)
 {
 	LOG("%s: %s\n", __FUNCTION__, state ? "true" : "false");
 
@@ -288,7 +288,7 @@ void dio16_98265a_device::update_dma()
 	dmar0_out((m_control & REG_CONTROL_DE0) && m_dmar0);
 	dmar1_out((m_control & REG_CONTROL_DE1) && m_dmar0);
 }
-WRITE_LINE_MEMBER(dio16_98265a_device::dmar0_w)
+void dio16_98265a_device::dmar0_w(int state)
 {
 	m_dmar0 = state;
 	update_dma();

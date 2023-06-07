@@ -32,13 +32,13 @@
 // ======================> sn74s262_device
 
 class sn74s262_device : public device_t,
-                        public device_gfx_interface
+						public device_gfx_interface
 {
 public:
 	// construction/destruction
 	sn74s262_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-    u8 read(u8 character, u8 row);
+	u8 read(u8 character, u8 row);
 
 protected:
 	sn74s262_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

@@ -45,9 +45,9 @@ public:
 
 	u8 db_r();
 	void db_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(rs_w);
-	DECLARE_WRITE_LINE_MEMBER(rw_w);
-	DECLARE_WRITE_LINE_MEMBER(e_w);
+	void rs_w(int state);
+	void rw_w(int state);
+	void e_w(int state);
 
 	const u8 *render();
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

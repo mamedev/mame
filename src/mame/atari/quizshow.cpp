@@ -87,8 +87,8 @@ private:
 	void audio_w(uint8_t data);
 	void video_disable_w(uint8_t data);
 	uint8_t timing_r();
-	DECLARE_READ_LINE_MEMBER(tape_signal_r);
-	DECLARE_WRITE_LINE_MEMBER(flag_output_w);
+	int tape_signal_r();
+	void flag_output_w(int state);
 	void main_ram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void quizshow_palette(palette_device &palette) const;
@@ -229,12 +229,12 @@ uint8_t quizshow_state::timing_r()
 	return ret;
 }
 
-READ_LINE_MEMBER(quizshow_state::tape_signal_r)
+int quizshow_state::tape_signal_r()
 {
 	return (m_cass->input() > 0.0) ? 1 : 0;
 }
 
-WRITE_LINE_MEMBER(quizshow_state::flag_output_w)
+void quizshow_state::flag_output_w(int state)
 {
 	logerror("Flag output: %d\n", state);
 }

@@ -139,7 +139,7 @@ protected:
 	void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 public:
-	DECLARE_WRITE_LINE_MEMBER(set_state);   // enable/disable sound output
+	void set_state(int state);   // enable/disable sound output
 	void set_clock(uint32_t frequency);       // output frequency
 
 private:
@@ -216,7 +216,7 @@ void lw30_beep_device::sound_stream_update(sound_stream &stream, std::vector<rea
 	m_signal = signal;
 }
 
-WRITE_LINE_MEMBER(lw30_beep_device::set_state)
+void lw30_beep_device::set_state(int state)
 {
 	// only update if new state is not the same as old state
 	if(m_state == state)

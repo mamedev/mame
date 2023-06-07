@@ -560,8 +560,10 @@
 #include "irrmaze.lh"
 #include "neogeo.lh"
 
+#define LOG_VIDEO_SYSTEM         (1U << 1)
 
-#define LOG_VIDEO_SYSTEM         (0)
+#define VERBOSE (0)
+#include "logmacro.h"
 
 
 class mvs_state : public ngarcade_base_state
@@ -757,7 +759,7 @@ protected:
 void neogeo_base_state::adjust_display_position_interrupt_timer()
 {
 	attotime period = attotime::from_ticks((uint64_t)m_display_counter + 1, NEOGEO_PIXEL_CLOCK);
-	if (LOG_VIDEO_SYSTEM) logerror("adjust_display_position_interrupt_timer  current y: %02x  current x: %02x   target y: %x  target x: %x\n", m_screen->vpos(), m_screen->hpos(), (m_display_counter + 1) / NEOGEO_HTOTAL, (m_display_counter + 1) % NEOGEO_HTOTAL);
+	LOGMASKED(LOG_VIDEO_SYSTEM, "adjust_display_position_interrupt_timer  current y: %02x  current x: %02x   target y: %x  target x: %x\n", m_screen->vpos(), m_screen->hpos(), (m_display_counter + 1) / NEOGEO_HTOTAL, (m_display_counter + 1) % NEOGEO_HTOTAL);
 
 	m_display_position_interrupt_timer->adjust(period);
 }
@@ -773,7 +775,7 @@ void neogeo_base_state::set_display_counter_msb(uint16_t data)
 {
 	m_display_counter = (m_display_counter & 0x0000ffff) | ((uint32_t)data << 16);
 
-	if (LOG_VIDEO_SYSTEM) logerror("PC %06x: set_display_counter %08x\n", m_maincpu->pc(), m_display_counter);
+	LOGMASKED(LOG_VIDEO_SYSTEM, "PC %06x: set_display_counter %08x\n", m_maincpu->pc(), m_display_counter);
 }
 
 
@@ -781,11 +783,11 @@ void neogeo_base_state::set_display_counter_lsb(uint16_t data)
 {
 	m_display_counter = (m_display_counter & 0xffff0000) | data;
 
-	if (LOG_VIDEO_SYSTEM) logerror("PC %06x: set_display_counter %08x\n", m_maincpu->pc(), m_display_counter);
+	LOGMASKED(LOG_VIDEO_SYSTEM, "PC %06x: set_display_counter %08x\n", m_maincpu->pc(), m_display_counter);
 
 	if (m_display_position_interrupt_control & IRQ2CTRL_LOAD_RELATIVE)
 	{
-		if (LOG_VIDEO_SYSTEM) logerror("AUTOLOAD_RELATIVE ");
+		LOGMASKED(LOG_VIDEO_SYSTEM, "AUTOLOAD_RELATIVE ");
 		adjust_display_position_interrupt_timer();
 	}
 }
@@ -814,11 +816,11 @@ void neogeo_base_state::acknowledge_interrupt(uint16_t data)
 
 TIMER_CALLBACK_MEMBER(neogeo_base_state::display_position_interrupt_callback)
 {
-	if (LOG_VIDEO_SYSTEM) logerror("--- Scanline @ %d,%d\n", m_screen->vpos(), m_screen->hpos());
+	LOGMASKED(LOG_VIDEO_SYSTEM, "--- Scanline @ %d,%d\n", m_screen->vpos(), m_screen->hpos());
 
 	if (m_display_position_interrupt_control & IRQ2CTRL_ENABLE)
 	{
-		if (LOG_VIDEO_SYSTEM) logerror("*** Scanline interrupt (IRQ2) ***  y: %02x  x: %02x\n", m_screen->vpos(), m_screen->hpos());
+		LOGMASKED(LOG_VIDEO_SYSTEM, "*** Scanline interrupt (IRQ2) ***  y: %02x  x: %02x\n", m_screen->vpos(), m_screen->hpos());
 		m_display_position_interrupt_pending = 1;
 
 		update_interrupts();
@@ -826,7 +828,7 @@ TIMER_CALLBACK_MEMBER(neogeo_base_state::display_position_interrupt_callback)
 
 	if (m_display_position_interrupt_control & IRQ2CTRL_AUTOLOAD_REPEAT)
 	{
-		if (LOG_VIDEO_SYSTEM) logerror("AUTOLOAD_REPEAT ");
+		LOGMASKED(LOG_VIDEO_SYSTEM, "AUTOLOAD_REPEAT ");
 		adjust_display_position_interrupt_timer();
 	}
 }
@@ -836,7 +838,7 @@ TIMER_CALLBACK_MEMBER(neogeo_base_state::display_position_vblank_callback)
 {
 	if (m_display_position_interrupt_control & IRQ2CTRL_AUTOLOAD_VBLANK)
 	{
-		if (LOG_VIDEO_SYSTEM) logerror("AUTOLOAD_VBLANK ");
+		LOGMASKED(LOG_VIDEO_SYSTEM, "AUTOLOAD_VBLANK ");
 		adjust_display_position_interrupt_timer();
 	}
 
@@ -847,7 +849,7 @@ TIMER_CALLBACK_MEMBER(neogeo_base_state::display_position_vblank_callback)
 
 TIMER_CALLBACK_MEMBER(neogeo_base_state::vblank_interrupt_callback)
 {
-	if (LOG_VIDEO_SYSTEM) logerror("+++ VBLANK @ %d,%d\n", m_screen->vpos(), m_screen->hpos());
+	LOGMASKED(LOG_VIDEO_SYSTEM, "+++ VBLANK @ %d,%d\n", m_screen->vpos(), m_screen->hpos());
 
 	m_vblank_interrupt_pending = 1;
 	update_interrupts();
@@ -1037,7 +1039,7 @@ uint16_t neogeo_base_state::unmapped_r(address_space &space)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(ngarcade_base_state::set_save_ram_unlock)
+void ngarcade_base_state::set_save_ram_unlock(int state)
 {
 	m_save_ram_unlocked = state;
 }
@@ -1122,13 +1124,13 @@ uint8_t neogeo_base_state::audio_cpu_bank_select_r(offs_t offset)
  *************************************/
 
 
-WRITE_LINE_MEMBER(neogeo_base_state::set_use_cart_vectors)
+void neogeo_base_state::set_use_cart_vectors(int state)
 {
 	m_use_cart_vectors = state;
 }
 
 
-WRITE_LINE_MEMBER(neogeo_base_state::set_use_cart_audio)
+void neogeo_base_state::set_use_cart_audio(int state)
 {
 	m_use_cart_audio = state;
 	m_sprgen->neogeo_set_fixed_layer_source(state);

@@ -102,7 +102,8 @@ private:
 };
 
 
-typedef std::set<std::add_pointer_t<device_type>, device_type_compare> device_type_set;
+using device_type_set = std::set<std::add_pointer_t<device_type>, device_type_compare>;
+using device_type_vector = std::vector<std::add_pointer_t<device_type> >;
 
 // internal helper
 void output_header(std::ostream &out, bool dtd);
@@ -449,11 +450,6 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 		device_type_set m_dev_set;
 	};
 
-	// TODO: maybe not the best place for this as it affects the stream passed in
-	// if the device part is threaded, the local streams used by the tasks can be
-	// imbued and the stream passed in can be left alone
-	out.imbue(std::locale::classic());
-
 	// prepare a driver enumerator and the queue
 	driver_enumerator drivlist(m_lookup_options);
 	device_filter devfilter(filter);
@@ -461,14 +457,14 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 	bool header_outputted = false;
 
 	// essentially a local method to emit the header if necessary
-	auto output_header_if_necessary = [this, &header_outputted](std::ostream &out)
-	{
-		if (!header_outputted)
-		{
-			output_header(out, m_dtd);
-			header_outputted = true;
-		}
-	};
+	auto const output_header_if_necessary = [this, &header_outputted] (std::ostream &out)
+			{
+				if (!header_outputted)
+				{
+					output_header(out, m_dtd);
+					header_outputted = true;
+				}
+			};
 
 	// only keep a device set when we're asked to track it
 	std::optional<device_type_set> devset;
@@ -477,14 +473,14 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 
 	// prepare a queue of tasks - this is a FIFO queue because of the
 	// need to be deterministic
-	std::queue<std::future<prepared_info>> tasks;
+	std::queue<std::future<prepared_info> > tasks;
 
 	// while we want to be deterministic, asynchronous task scheduling is not; so we want to
 	// track the amount of active tasks so that we can keep on spawning tasks even if we're
 	// waiting on the task in the front of the queue
 	std::atomic<unsigned int> active_task_count = 0;
-	unsigned int maximum_active_task_count = std::thread::hardware_concurrency() + 10;
-	unsigned int maximum_outstanding_task_count = maximum_active_task_count + 20;
+	unsigned int const maximum_active_task_count = std::thread::hardware_concurrency() + 10;
+	unsigned int const maximum_outstanding_task_count = maximum_active_task_count + 20;
 
 	// loop until we're done enumerating drivers, and until there are no outstanding tasks
 	while (!filtered_drivlist.done() || !tasks.empty())
@@ -492,32 +488,32 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 		// loop until there are as many outstanding tasks as possible (we want to separately cap outstanding
 		// tasks and active tasks)
 		while (!filtered_drivlist.done()
-			&& active_task_count < maximum_active_task_count
-			&& tasks.size() < maximum_outstanding_task_count)
+				&& (active_task_count < maximum_active_task_count)
+				&& (tasks.size() < maximum_outstanding_task_count))
 		{
 			// we want to launch a task; grab a packet of drivers to process
-			std::vector<std::reference_wrapper<const game_driver>> drivers = filtered_drivlist.next(20);
+			std::vector<std::reference_wrapper<const game_driver> > drivers = filtered_drivlist.next(20);
 			if (drivers.empty())
 				break;
 
-			// do the dirty work asychronously
-			auto task_proc = [&drivlist, drivers{ std::move(drivers) }, include_devices, &active_task_count]
-			{
-				prepared_info result;
-				std::ostringstream stream;
-				stream.imbue(std::locale::classic());
+			// do the dirty work asynchronously
+			auto task_proc = [&drivlist, drivers = std::move(drivers), include_devices, &active_task_count]
+					{
+						prepared_info result;
+						std::ostringstream stream;
+						stream.imbue(std::locale::classic());
 
-				// output each of the drivers
-				for (const game_driver &driver : drivers)
-					output_one(stream, drivlist, driver, include_devices ? &result.m_dev_set : nullptr);
+						// output each of the drivers
+						for (const game_driver &driver : drivers)
+							output_one(stream, drivlist, driver, include_devices ? &result.m_dev_set : nullptr);
 
-				// capture the XML snippet
-				result.m_xml_snippet = stream.str();
+						// capture the XML snippet
+						result.m_xml_snippet = std::move(stream).str();
 
-				// we're done with the task; decrement the counter and return
-				active_task_count--;
-				return result;
-			};
+						// we're done with the task; decrement the counter and return
+						active_task_count--;
+						return result;
+					};
 
 			// add this task to the queue
 			active_task_count++;
@@ -527,8 +523,7 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 		// we've put as many outstanding tasks out as we can; are there any tasks outstanding?
 		if (!tasks.empty())
 		{
-			// wait for the task at the front of the queue to complete and get the info, in the
-			// spirit of determinism
+			// wait for the oldest task to complete and get the info, in the spirit of determinism
 			prepared_info pi = tasks.front().get();
 			tasks.pop();
 
@@ -593,9 +588,10 @@ bool device_filter::filter(const char *shortname)
 //  of game_drivers, while applying filters
 //-------------------------------------------------
 
-std::vector<std::reference_wrapper<const game_driver>> filtered_driver_enumerator::next(int count)
+std::vector<std::reference_wrapper<const game_driver> > filtered_driver_enumerator::next(int count)
 {
-	std::vector<std::reference_wrapper<const game_driver>> results;
+	std::vector<std::reference_wrapper<const game_driver> > results;
+	results.reserve(count);
 	while (!done() && results.size() < count)
 	{
 		if (!m_drivlist.next())
@@ -607,7 +603,7 @@ std::vector<std::reference_wrapper<const game_driver>> filtered_driver_enumerato
 		else if (m_devfilter.filter(m_drivlist.driver().name))
 		{
 			const game_driver &driver(m_drivlist.driver());
-			results.push_back(driver);
+			results.emplace_back(driver);
 		}
 	}
 	return results;
@@ -864,38 +860,85 @@ void output_one_device(std::ostream &out, machine_config &config, device_t &devi
 
 void output_devices(std::ostream &out, emu_options &lookup_options, device_type_set const *filter)
 {
-	// get config for empty machine
-	machine_config config(GAME_NAME(___empty), lookup_options);
-
-	auto const action = [&config, &out] (device_type type)
+	auto const action = [&lookup_options, &out] (auto &types, auto deref)
 			{
-				// add it at the root of the machine config
-				device_t *dev;
+				// machinery for making output order deterministic and capping outstanding tasks
+				std::queue<std::future<std::string> > tasks;
+				std::atomic<unsigned int> active_task_count = 0;
+				unsigned int const maximum_active_task_count = std::thread::hardware_concurrency() + 10;
+				unsigned int const maximum_outstanding_task_count = maximum_active_task_count + 20;
+
+				// loop until we're done enumerating devices and there are no outstanding tasks
+				auto it = std::begin(types);
+				while ((std::end(types) != it) || !tasks.empty())
 				{
-					machine_config::token const tok(config.begin_configuration(config.root_device()));
-					dev = config.device_add("_tmp", type, 0);
+					// look until there are as many outstanding tasks as possible
+					while ((std::end(types) != it)
+							&& (active_task_count < maximum_active_task_count)
+							&& (tasks.size() < maximum_outstanding_task_count))
+					{
+						device_type_vector batch;
+						batch.reserve(10);
+						while ((std::end(types) != it) && (batch.size() < 10))
+							batch.emplace_back(deref(*it++));
+						if (batch.empty())
+							break;
+
+						// do the dirty work asynchronously
+						auto task_proc = [&active_task_count, &lookup_options, batch = std::move(batch)]
+								{
+									// use a single machine configuration and stream for a batch of devices
+									machine_config config(GAME_NAME(___empty), lookup_options);
+									std::ostringstream stream;
+									stream.imbue(std::locale::classic());
+									for (auto type : batch)
+									{
+										// add it at the root of the machine config
+										device_t *dev;
+										{
+											machine_config::token const tok(config.begin_configuration(config.root_device()));
+											dev = config.device_add("_tmp", *type, 0);
+										}
+
+										// notify this device and all its subdevices that they are now configured
+										for (device_t &device : device_enumerator(*dev))
+											if (!device.configured())
+												device.config_complete();
+
+										// print details and remove it
+										output_one_device(stream, config, *dev, dev->tag());
+										machine_config::token const tok(config.begin_configuration(config.root_device()));
+										config.device_remove("_tmp");
+									}
+
+									// we're done with the task; decrement the counter and return
+									active_task_count--;
+									return std::move(stream).str();
+								};
+
+						// add this task to the queue
+						active_task_count++;
+						tasks.emplace(std::async(std::launch::async, std::move(task_proc)));
+					}
+
+					// we've put as many outstanding tasks out as we can; are there any tasks outstanding?
+					if (!tasks.empty())
+					{
+						// wait for the oldest task to complete and get the info, in the spirit of determinism
+						std::string snippet = tasks.front().get();
+						tasks.pop();
+
+						// emit whatever XML we accumulated in the task
+						out << snippet;
+					}
 				}
-
-				// notify this device and all its subdevices that they are now configured
-				for (device_t &device : device_enumerator(*dev))
-					if (!device.configured())
-						device.config_complete();
-
-				// print details and remove it
-				output_one_device(out, config, *dev, dev->tag());
-				machine_config::token const tok(config.begin_configuration(config.root_device()));
-				config.device_remove("_tmp");
 			};
 
 	// run through devices
 	if (filter)
-	{
-		for (std::add_pointer_t<device_type> type : *filter) action(*type);
-	}
+		action(*filter, [] (auto &x) { return x; });
 	else
-	{
-		for (device_type type : registered_device_types) action(type);
-	}
+		action(registered_device_types, [] (auto &x) { return &x; });
 }
 
 

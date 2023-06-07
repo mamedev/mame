@@ -15,7 +15,6 @@
 #include "emu.h"
 #include "rtpc_iocc.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_DMA     (1U << 1)
 #define LOG_WIDEPIO (1U << 2)
 

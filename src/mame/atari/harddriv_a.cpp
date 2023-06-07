@@ -197,35 +197,35 @@ void harddriv_sound_board_device::hdsnd68k_latches_w(offs_t offset, uint16_t dat
 }
 
 
-WRITE_LINE_MEMBER(harddriv_sound_board_device::speech_write_w)
+void harddriv_sound_board_device::speech_write_w(int state)
 {
 	// data == 0 means high, 1 means low
 	logerror("%06X:SPWR=%d\n", m_soundcpu->pcbase(), state);
 }
 
 
-WRITE_LINE_MEMBER(harddriv_sound_board_device::speech_reset_w)
+void harddriv_sound_board_device::speech_reset_w(int state)
 {
 	// data == 0 means low, 1 means high
 	logerror("%06X:SPRES=%d\n", m_soundcpu->pcbase(), state);
 }
 
 
-WRITE_LINE_MEMBER(harddriv_sound_board_device::speech_rate_w)
+void harddriv_sound_board_device::speech_rate_w(int state)
 {
 	// data == 0 means 8kHz, 1 means 10kHz
 	logerror("%06X:SPRATE=%d\n", m_soundcpu->pcbase(), state);
 }
 
 
-WRITE_LINE_MEMBER(harddriv_sound_board_device::cram_enable_w)
+void harddriv_sound_board_device::cram_enable_w(int state)
 {
 	// data == 0 means disable 68k access to COM320, 1 means enable
 	m_cramen = state;
 }
 
 
-WRITE_LINE_MEMBER(harddriv_sound_board_device::led_w)
+void harddriv_sound_board_device::led_w(int state)
 {
 }
 
@@ -300,7 +300,7 @@ void harddriv_sound_board_device::hdsnd68k_320com_w(offs_t offset, uint16_t data
  *
  *************************************/
 
-READ_LINE_MEMBER(harddriv_sound_board_device::hdsnddsp_get_bio)
+int harddriv_sound_board_device::hdsnddsp_get_bio()
 {
 	uint64_t cycles_since_last_bio = m_sounddsp->total_cycles() - m_last_bio_cycles;
 	int32_t cycles_until_bio = CYCLES_PER_BIO - cycles_since_last_bio;

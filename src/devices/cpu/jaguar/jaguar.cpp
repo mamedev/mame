@@ -22,10 +22,6 @@
 
 #include <algorithm>
 
-#define LOG_GPU_IO      0
-#define LOG_DSP_IO      0
-
-
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
@@ -1414,7 +1410,7 @@ u32 jaguar_cpu_device::status_r()
 	return result;
 }
 
-WRITE_LINE_MEMBER(jaguar_cpu_device::go_w)
+void jaguar_cpu_device::go_w(int state)
 {
 	m_go = state;
 	set_input_line(INPUT_LINE_HALT, (m_go == true) ? CLEAR_LINE : ASSERT_LINE);

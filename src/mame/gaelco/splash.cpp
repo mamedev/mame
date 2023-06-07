@@ -55,22 +55,22 @@ More notes about Funny Strip protection issues at the bottom of source file (ini
 #include "screen.h"
 #include "speaker.h"
 
-WRITE_LINE_MEMBER(splash_state::coin1_lockout_w)
+void splash_state::coin1_lockout_w(int state)
 {
 	machine().bookkeeping().coin_lockout_w(0, !state);
 }
 
-WRITE_LINE_MEMBER(splash_state::coin2_lockout_w)
+void splash_state::coin2_lockout_w(int state)
 {
 	machine().bookkeeping().coin_lockout_w(1, !state);
 }
 
-WRITE_LINE_MEMBER(splash_state::coin1_counter_w)
+void splash_state::coin1_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(splash_state::coin2_counter_w)
+void splash_state::coin2_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }
@@ -103,7 +103,7 @@ void splash_state::splash_adpcm_control_w(uint8_t data)
 	m_msm->reset_w(!BIT(data, 0));
 }
 
-WRITE_LINE_MEMBER(splash_state::splash_msm5205_int)
+void splash_state::splash_msm5205_int(int state)
 {
 	m_msm->data_w(m_adpcm_data >> 4);
 	m_adpcm_data = (m_adpcm_data << 4) & 0xf0;
@@ -147,7 +147,7 @@ void splash_state::roldfrog_vblank_ack_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(splash_state::ym_irq)
+void splash_state::ym_irq(int state)
 {
 	m_sound_irq = state;
 	roldfrog_update_irq();
@@ -660,7 +660,7 @@ void splash_state::roldfrog(machine_config &config)
 	ymsnd.add_route(3, "mono", 1.0);
 }
 
-WRITE_LINE_MEMBER(funystrp_state::adpcm_int1)
+void funystrp_state::adpcm_int1(int state)
 {
 	if (m_snd_interrupt_enable1  || m_msm_toggle1 == 1)
 	{
@@ -675,7 +675,7 @@ WRITE_LINE_MEMBER(funystrp_state::adpcm_int1)
 	}
 }
 
-WRITE_LINE_MEMBER(funystrp_state::adpcm_int2)
+void funystrp_state::adpcm_int2(int state)
 {
 	if (m_snd_interrupt_enable2 || m_msm_toggle2 == 1)
 	{

@@ -17,7 +17,6 @@
 #include "emu.h"
 #include "mips_rambo.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_REG     (1U << 1)
 #define LOG_DMA     (1U << 2)
 
@@ -357,10 +356,10 @@ u32 mips_rambo_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	return 0;
 }
 
-template WRITE_LINE_MEMBER(mips_rambo_device::drq_w<0>);
-template WRITE_LINE_MEMBER(mips_rambo_device::drq_w<1>);
+template void mips_rambo_device::drq_w<0>(int state);
+template void mips_rambo_device::drq_w<1>(int state);
 
-template <unsigned Channel> WRITE_LINE_MEMBER(mips_rambo_device::drq_w)
+template <unsigned Channel> void mips_rambo_device::drq_w(int state)
 {
 	dma_t &channel = m_channel[Channel];
 

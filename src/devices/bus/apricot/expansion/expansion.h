@@ -46,6 +46,9 @@
 
 #pragma once
 
+#include <functional>
+#include <vector>
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -75,7 +78,7 @@ public:
 protected:
 	apricot_expansion_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 };
 
@@ -107,16 +110,17 @@ public:
 	void add_card(device_apricot_expansion_card_interface *card);
 
 	// from cards
-	DECLARE_WRITE_LINE_MEMBER( dma1_w );
-	DECLARE_WRITE_LINE_MEMBER( dma2_w );
-	DECLARE_WRITE_LINE_MEMBER( ext1_w );
-	DECLARE_WRITE_LINE_MEMBER( ext2_w );
-	DECLARE_WRITE_LINE_MEMBER( int2_w );
-	DECLARE_WRITE_LINE_MEMBER( int3_w );
+	void dma1_w(int state);
+	void dma2_w(int state);
+	void ext1_w(int state);
+	void ext2_w(int state);
+	void int2_w(int state);
+	void int3_w(int state);
 
 	void install_ram(offs_t addrstart, offs_t addrend, void *baseptr);
 
-	template<typename T> void install_io_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(class address_map &map), uint64_t unitmask = ~u64(0))
+	template <typename T>
+	void install_io_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(class address_map &map), uint64_t unitmask = ~u64(0))
 	{
 		m_io->install_device(addrstart, addrend, device, map, unitmask);
 
@@ -125,11 +129,13 @@ public:
 	}
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 private:
-	simple_list<device_apricot_expansion_card_interface> m_dev;
+	using card_vector = std::vector<std::reference_wrapper<device_apricot_expansion_card_interface> >;
+
+	card_vector m_dev;
 
 	// address spaces we have access to
 	required_address_space m_program;
@@ -153,22 +159,16 @@ DECLARE_DEVICE_TYPE(APRICOT_EXPANSION_BUS, apricot_expansion_bus_device)
 
 class device_apricot_expansion_card_interface : public device_interface
 {
-	template <class ElementType> friend class simple_list;
-
 public:
 	// construction/destruction
 	virtual ~device_apricot_expansion_card_interface();
 
 	void set_bus_device(apricot_expansion_bus_device *bus);
 
-	device_apricot_expansion_card_interface *next() const { return m_next; }
-
 protected:
 	device_apricot_expansion_card_interface(const machine_config &mconfig, device_t &device);
 
 	apricot_expansion_bus_device *m_bus;
-
-	device_apricot_expansion_card_interface *m_next;
 };
 
 

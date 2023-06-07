@@ -10,6 +10,7 @@
 #include "atadev.h"
 
 #include "atapicdr.h"
+#include "cp2024.h"
 #include "idehd.h"
 #include "px320a.h"
 
@@ -71,4 +72,5 @@ void ata_devices(device_slot_interface &device)
 	device.option_add("cdrom", ATAPI_CDROM);
 	device.option_add("px320a", PX320A);
 	device.option_add("cf", ATA_CF);
+	device.option_add("cp2024", CP2024);
 }

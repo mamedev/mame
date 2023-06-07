@@ -74,16 +74,16 @@ std::error_condition liebao_device::load(std::string &message)
 	// install handlers
 	cart_space()->install_write_handler(
 			0x0000, 0x1fff,
-			write8sm_delegate(*this, FUNC(liebao_device::enable_ram)));
+			emu::rw_delegate(*this, FUNC(liebao_device::enable_ram)));
 	cart_space()->install_write_handler(
 			0x2000, 0x2fff,
-			write8sm_delegate(*this, FUNC(liebao_device::bank_switch_rom)));
+			emu::rw_delegate(*this, FUNC(liebao_device::bank_switch_rom)));
 	cart_space()->install_write_handler(
 			0x4000, 0x5fff,
-			write8smo_delegate(*this, FUNC(liebao_device::bank_switch_ram)));
+			emu::rw_delegate(*this, FUNC(liebao_device::bank_switch_ram)));
 	cart_space()->install_write_handler(
 			0x7000, 0x7fff,
-			write8sm_delegate(*this, FUNC(liebao_device::bank_switch_rom_high)));
+			emu::rw_delegate(*this, FUNC(liebao_device::bank_switch_rom_high)));
 
 	// all good
 	return std::error_condition();

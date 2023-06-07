@@ -478,7 +478,7 @@ private:
 	void mpu12wbk_videoram_w(offs_t offset, uint8_t data);
 	void mpu12wbk_colorram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_WRITE_LINE_MEMBER(crtc_vs);
+	void crtc_vs(int state);
 
 	uint32_t screen_update_mpu12wbk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void mpu12wbk_map(address_map &map);
@@ -602,7 +602,7 @@ uint32_t mpu12wbk_state::screen_update_mpu12wbk(screen_device &screen, bitmap_rg
 /********************************
 *    Interrupt Control          *
 ********************************/
-WRITE_LINE_MEMBER( mpu12wbk_state::crtc_vs )
+void mpu12wbk_state::crtc_vs(int state)
 {
 	if( m_frames++ > 120)
 	{

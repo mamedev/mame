@@ -85,7 +85,7 @@ ROM_START( neomania )
 	ROM_LOAD("pcbios.bin", 0x00000, 0x80000, NO_DUMP)
 
 	// Portuguese version with 48 games, from 2003
-	DISK_REGION( "ide:0:hdd:image" ) // From a Norton Ghost recovery image
+	DISK_REGION( "ide:0:hdd" ) // From a Norton Ghost recovery image
 	DISK_IMAGE( "neomania", 0, SHA1(4338be8214ca5a9aa6808a94d73e0820a4d34b98) )
 ROM_END
 

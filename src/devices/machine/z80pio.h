@@ -70,10 +70,10 @@ public:
 	// I/O line access
 	int rdy(int which) { return m_port[which].rdy(); }
 	void strobe(int which, bool state) { m_port[which].strobe(state); }
-	DECLARE_READ_LINE_MEMBER( rdy_a ) { return rdy(PORT_A); }
-	DECLARE_READ_LINE_MEMBER( rdy_b ) { return rdy(PORT_B); }
-	DECLARE_WRITE_LINE_MEMBER( strobe_a ) { strobe(PORT_A, state); }
-	DECLARE_WRITE_LINE_MEMBER( strobe_b ) { strobe(PORT_B, state); }
+	int rdy_a() { return rdy(PORT_A); }
+	int rdy_b() { return rdy(PORT_B); }
+	void strobe_a(int state) { strobe(PORT_A, state); }
+	void strobe_b(int state) { strobe(PORT_B, state); }
 
 	// control register I/O
 	uint8_t control_read();
@@ -97,22 +97,22 @@ public:
 	uint8_t port_b_read() { return port_read(PORT_B); }
 	void port_a_write(uint8_t data) { port_write(PORT_A, data); }
 	void port_b_write(uint8_t data) { port_write(PORT_B, data); }
-	DECLARE_WRITE_LINE_MEMBER( pa0_w ) { port_write(PORT_A, 0, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa1_w ) { port_write(PORT_A, 1, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa2_w ) { port_write(PORT_A, 2, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa3_w ) { port_write(PORT_A, 3, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa4_w ) { port_write(PORT_A, 4, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa5_w ) { port_write(PORT_A, 5, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa6_w ) { port_write(PORT_A, 6, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa7_w ) { port_write(PORT_A, 7, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb0_w ) { port_write(PORT_B, 0, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb1_w ) { port_write(PORT_B, 1, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb2_w ) { port_write(PORT_B, 2, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb3_w ) { port_write(PORT_B, 3, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb4_w ) { port_write(PORT_B, 4, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb5_w ) { port_write(PORT_B, 5, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb6_w ) { port_write(PORT_B, 6, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb7_w ) { port_write(PORT_B, 7, state); }
+	void pa0_w(int state) { port_write(PORT_A, 0, state); }
+	void pa1_w(int state) { port_write(PORT_A, 1, state); }
+	void pa2_w(int state) { port_write(PORT_A, 2, state); }
+	void pa3_w(int state) { port_write(PORT_A, 3, state); }
+	void pa4_w(int state) { port_write(PORT_A, 4, state); }
+	void pa5_w(int state) { port_write(PORT_A, 5, state); }
+	void pa6_w(int state) { port_write(PORT_A, 6, state); }
+	void pa7_w(int state) { port_write(PORT_A, 7, state); }
+	void pb0_w(int state) { port_write(PORT_B, 0, state); }
+	void pb1_w(int state) { port_write(PORT_B, 1, state); }
+	void pb2_w(int state) { port_write(PORT_B, 2, state); }
+	void pb3_w(int state) { port_write(PORT_B, 3, state); }
+	void pb4_w(int state) { port_write(PORT_B, 4, state); }
+	void pb5_w(int state) { port_write(PORT_B, 5, state); }
+	void pb6_w(int state) { port_write(PORT_B, 6, state); }
+	void pb7_w(int state) { port_write(PORT_B, 7, state); }
 
 	// standard read/write, with C/D in bit 1, B/A in bit 0
 	u8 read(offs_t offset);

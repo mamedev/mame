@@ -30,10 +30,10 @@ protected:
 	virtual void io_map(address_map &map);
 	virtual void ext_map(address_map &map);
 
-	DECLARE_WRITE_LINE_MEMBER(input_txd) override { m_txd = state; }
+	void input_txd(int state) override { m_txd = state; }
 
-	DECLARE_READ_LINE_MEMBER(t0_r);
-	DECLARE_READ_LINE_MEMBER(t1_r);
+	int t0_r();
+	int t1_r();
 	void p1_w(u8 data);
 	void p2_w(u8 data);
 	u8 bus_r();

@@ -199,13 +199,13 @@ std::error_condition slmulti_device::load(std::string &message)
 	// install memory mapping control handlers
 	cart_space()->install_write_handler(
 			0x0000, 0x1fff,
-			write8smo_delegate(*this, FUNC(slmulti_device::enable_ram)));
+			emu::rw_delegate(*this, FUNC(slmulti_device::enable_ram)));
 	cart_space()->install_write_handler(
 			0x2000, 0x3fff,
-			write8smo_delegate(*this, FUNC(slmulti_device::bank_switch_rom_fine)));
+			emu::rw_delegate(*this, FUNC(slmulti_device::bank_switch_rom_fine)));
 	cart_space()->install_write_handler(
 			0x4000, 0x5fff,
-			write8smo_delegate(*this, FUNC(slmulti_device::bank_switch_ram)));
+			emu::rw_delegate(*this, FUNC(slmulti_device::bank_switch_ram)));
 
 	// configuration mode and MBC5 mode partially overlay the normal handlers
 	cart_space()->install_view(
@@ -215,15 +215,15 @@ std::error_condition slmulti_device::load(std::string &message)
 	// this is for MBC5 games
 	m_view_ctrl[0].install_write_handler(
 			0x3000, 0x3fff,
-			write8smo_delegate(*this, FUNC(slmulti_device::bank_switch_rom_coarse)));
+			emu::rw_delegate(*this, FUNC(slmulti_device::bank_switch_rom_coarse)));
 
 	// install configuration handlers over the top
 	m_view_ctrl[1].install_write_handler(
 			0x5000, 0x5fff,
-			write8smo_delegate(*this, FUNC(slmulti_device::set_config_cmd)));
+			emu::rw_delegate(*this, FUNC(slmulti_device::set_config_cmd)));
 	m_view_ctrl[1].install_write_handler(
 			0x7000, 0x7fff,
-			write8smo_delegate(*this, FUNC(slmulti_device::do_config_cmd)));
+			emu::rw_delegate(*this, FUNC(slmulti_device::do_config_cmd)));
 
 	// do this here - the menu program apparently does a system reset to get into DMG mode
 	m_view_ctrl.select(1);

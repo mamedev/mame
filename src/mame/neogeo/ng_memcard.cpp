@@ -102,22 +102,22 @@ uint16_t ng_memcard_device::read(offs_t offset)
 
 void ng_memcard_device::write(offs_t offset, uint16_t data)
 {
-	if (m_regsel && !m_lock1 && m_unlock2)
+	if (!m_lock1 && m_unlock2)
 		m_memcard_data[offset & 0x07ff] = uint8_t(data & 0x00ff);
 }
 
 
-WRITE_LINE_MEMBER(ng_memcard_device::lock1_w)
+void ng_memcard_device::lock1_w(int state)
 {
 	m_lock1 = state;
 }
 
-WRITE_LINE_MEMBER(ng_memcard_device::unlock2_w)
+void ng_memcard_device::unlock2_w(int state)
 {
 	m_unlock2 = state;
 }
 
-WRITE_LINE_MEMBER(ng_memcard_device::regsel_w)
+void ng_memcard_device::regsel_w(int state)
 {
 	m_regsel = state;
 }

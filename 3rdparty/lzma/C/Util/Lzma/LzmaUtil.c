@@ -1,5 +1,5 @@
 /* LzmaUtil.c -- Test application for LZMA compression
-2015-11-08 : Igor Pavlov : Public domain */
+2021-11-01 : Igor Pavlov : Public domain */
 
 #include "../../Precomp.h"
 
@@ -7,26 +7,30 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../../CpuArch.h"
+
 #include "../../Alloc.h"
 #include "../../7zFile.h"
 #include "../../7zVersion.h"
+#include "../../LzFind.h"
 #include "../../LzmaDec.h"
 #include "../../LzmaEnc.h"
 
-const char *kCantReadMessage = "Can not read input file";
-const char *kCantWriteMessage = "Can not write output file";
-const char *kCantAllocateMessage = "Can not allocate memory";
-const char *kDataErrorMessage = "Data error";
+static const char * const kCantReadMessage = "Cannot read input file";
+static const char * const kCantWriteMessage = "Cannot write output file";
+static const char * const kCantAllocateMessage = "Cannot allocate memory";
+static const char * const kDataErrorMessage = "Data error";
 
-void PrintHelp(char *buffer)
+static void PrintHelp(char *buffer)
 {
-  strcat(buffer, "\nLZMA Utility " MY_VERSION_COPYRIGHT_DATE "\n"
-      "\nUsage:  lzma <e|d> inputFile outputFile\n"
-             "  e: encode file\n"
-             "  d: decode file\n");
+  strcat(buffer,
+    "\nLZMA-C " MY_VERSION_CPU " : " MY_COPYRIGHT_DATE "\n\n"
+    "Usage:  lzma <e|d> inputFile outputFile\n"
+    "  e: encode file\n"
+    "  d: decode file\n");
 }
 
-int PrintError(char *buffer, const char *message)
+static int PrintError(char *buffer, const char *message)
 {
   strcat(buffer, "\nError: ");
   strcat(buffer, message);
@@ -34,19 +38,37 @@ int PrintError(char *buffer, const char *message)
   return 1;
 }
 
-int PrintErrorNumber(char *buffer, SRes val)
+static int PrintError_WRes(char *buffer, const char *message, WRes wres)
 {
-  sprintf(buffer + strlen(buffer), "\nError code: %x\n", (unsigned)val);
+  strcat(buffer, "\nError: ");
+  strcat(buffer, message);
+  sprintf(buffer + strlen(buffer), "\nSystem error code: %d", (unsigned)wres);
+  #ifndef _WIN32
+  {
+    const char *s = strerror(wres);
+    if (s)
+      sprintf(buffer + strlen(buffer), " : %s", s);
+  }
+  #endif
+  strcat(buffer, "\n");
   return 1;
 }
 
-int PrintUserError(char *buffer)
+static int PrintErrorNumber(char *buffer, SRes val)
+{
+  sprintf(buffer + strlen(buffer), "\n7-Zip error code: %d\n", (unsigned)val);
+  return 1;
+}
+
+static int PrintUserError(char *buffer)
 {
   return PrintError(buffer, "Incorrect command");
 }
 
+
 #define IN_BUF_SIZE (1 << 16)
 #define OUT_BUF_SIZE (1 << 16)
+
 
 static SRes Decode2(CLzmaDec *state, ISeqOutStream *outStream, ISeqInStream *inStream,
     UInt64 unpackSize)
@@ -100,6 +122,7 @@ static SRes Decode2(CLzmaDec *state, ISeqOutStream *outStream, ISeqInStream *inS
     }
   }
 }
+
 
 static SRes Decode(ISeqOutStream *outStream, ISeqInStream *inStream)
 {
@@ -163,20 +186,25 @@ static SRes Encode(ISeqOutStream *outStream, ISeqInStream *inStream, UInt64 file
   return res;
 }
 
-int main2(int numArgs, const char *args[], char *rs)
+
+static int main2(int numArgs, const char *args[], char *rs)
 {
   CFileSeqInStream inStream;
   CFileOutStream outStream;
   char c;
   int res;
   int encodeMode;
-  Bool useOutFile = False;
+  BoolInt useOutFile = False;
+
+  LzFindPrepare();
 
   FileSeqInStream_CreateVTable(&inStream);
   File_Construct(&inStream.file);
+  inStream.wres = 0;
 
   FileOutStream_CreateVTable(&outStream);
   File_Construct(&outStream.file);
+  outStream.wres = 0;
 
   if (numArgs == 1)
   {
@@ -199,14 +227,19 @@ int main2(int numArgs, const char *args[], char *rs)
       return PrintError(rs, "Incorrect UInt32 or UInt64");
   }
 
-  if (InFile_Open(&inStream.file, args[2]) != 0)
-    return PrintError(rs, "Can not open input file");
+  {
+    WRes wres = InFile_Open(&inStream.file, args[2]);
+    if (wres != 0)
+      return PrintError_WRes(rs, "Cannot open input file", wres);
+  }
 
   if (numArgs > 3)
   {
+    WRes wres;
     useOutFile = True;
-    if (OutFile_Open(&outStream.file, args[3]) != 0)
-      return PrintError(rs, "Can not open output file");
+    wres = OutFile_Open(&outStream.file, args[3]);
+    if (wres != 0)
+      return PrintError_WRes(rs, "Cannot open output file", wres);
   }
   else if (encodeMode)
     PrintUserError(rs);
@@ -214,12 +247,14 @@ int main2(int numArgs, const char *args[], char *rs)
   if (encodeMode)
   {
     UInt64 fileSize;
-    File_GetLength(&inStream.file, &fileSize);
-    res = Encode(&outStream.s, &inStream.s, fileSize, rs);
+    WRes wres = File_GetLength(&inStream.file, &fileSize);
+    if (wres != 0)
+      return PrintError_WRes(rs, "Cannot get file length", wres);
+    res = Encode(&outStream.vt, &inStream.vt, fileSize, rs);
   }
   else
   {
-    res = Decode(&outStream.s, useOutFile ? &inStream.s : NULL);
+    res = Decode(&outStream.vt, useOutFile ? &inStream.vt : NULL);
   }
 
   if (useOutFile)
@@ -233,17 +268,18 @@ int main2(int numArgs, const char *args[], char *rs)
     else if (res == SZ_ERROR_DATA)
       return PrintError(rs, kDataErrorMessage);
     else if (res == SZ_ERROR_WRITE)
-      return PrintError(rs, kCantWriteMessage);
+      return PrintError_WRes(rs, kCantWriteMessage, outStream.wres);
     else if (res == SZ_ERROR_READ)
-      return PrintError(rs, kCantReadMessage);
+      return PrintError_WRes(rs, kCantReadMessage, inStream.wres);
     return PrintErrorNumber(rs, res);
   }
   return 0;
 }
 
+
 int MY_CDECL main(int numArgs, const char *args[])
 {
-  char rs[800] = { 0 };
+  char rs[1000] = { 0 };
   int res = main2(numArgs, args, rs);
   fputs(rs, stdout);
   return res;

@@ -385,8 +385,8 @@ public:
 	// beam positioning and state
 	int vpos() const;
 	int hpos() const;
-	DECLARE_READ_LINE_MEMBER(vblank) const { return (machine().time() < m_vblank_end_time) ? 1 : 0; }
-	DECLARE_READ_LINE_MEMBER(hblank) const { int const curpos = hpos(); return (curpos < m_visarea.left() || curpos > m_visarea.right()) ? 1 : 0; }
+	int vblank() const { return (machine().time() < m_vblank_end_time) ? 1 : 0; }
+	int hblank() const { int const curpos = hpos(); return (curpos < m_visarea.left() || curpos > m_visarea.right()) ? 1 : 0; }
 
 	// timing
 	attotime time_until_pos(int vpos, int hpos = 0) const;

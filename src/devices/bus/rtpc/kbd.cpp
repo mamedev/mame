@@ -49,7 +49,6 @@
 #include "sound/spkrdev.h"
 #include "speaker.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_PORTS   (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL)

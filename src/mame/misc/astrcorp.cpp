@@ -95,11 +95,11 @@ public:
 	astro_cpucode_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// read handlers
-	DECLARE_READ_LINE_MEMBER(do_read);    // DO
+	int do_read();              // DO
 
 	// write handlers
-	DECLARE_WRITE_LINE_MEMBER(cs_write);  // CS signal (active high)
-	DECLARE_WRITE_LINE_MEMBER(clk_write); // CLK signal (active high)
+	void cs_write(int state);   // CS signal (active high)
+	void clk_write(int state);  // CLK signal (active high)
 
 protected:
 	virtual void device_start() override;
@@ -134,12 +134,12 @@ void astro_cpucode_device::device_reset()
 	m_shift_register = 0;
 }
 
-READ_LINE_MEMBER(astro_cpucode_device::do_read)
+int astro_cpucode_device::do_read()
 {
 	return BIT(m_shift_register, 15);
 }
 
-WRITE_LINE_MEMBER(astro_cpucode_device::cs_write)
+void astro_cpucode_device::cs_write(int state)
 {
 	if (state != m_cs_state)
 	{
@@ -154,7 +154,7 @@ WRITE_LINE_MEMBER(astro_cpucode_device::cs_write)
 	}
 }
 
-WRITE_LINE_MEMBER(astro_cpucode_device::clk_write)
+void astro_cpucode_device::clk_write(int state)
 {
 	if (m_cs_state == ASSERT_LINE && state != m_clk_state)
 	{

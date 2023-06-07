@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "m68000.h"
+#include "m68000mcu.h"
 
 class tmp68301_device : public m68000_mcu_device
 {
@@ -16,9 +16,9 @@ public:
 	auto parallel_r_cb() { return m_parallel_r_cb.bind(); }
 	auto parallel_w_cb() { return m_parallel_w_cb.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(rx0_w) { serial_rx_w(0, state); }
-	DECLARE_WRITE_LINE_MEMBER(rx1_w) { serial_rx_w(1, state); }
-	DECLARE_WRITE_LINE_MEMBER(rx2_w) { serial_rx_w(2, state); }
+	void rx0_w(int state) { serial_rx_w(0, state); }
+	void rx1_w(int state) { serial_rx_w(1, state); }
+	void rx2_w(int state) { serial_rx_w(2, state); }
 
 	auto tx0_handler() { return m_tx_cb[0].bind(); }
 	auto tx1_handler() { return m_tx_cb[1].bind(); }
@@ -82,7 +82,7 @@ protected:
 	static const int interrupt_vector_to_slot[32];
 	static const int interrupt_slot_to_priority[11];
 
-	u16 m_external_interrupt_state;		
+	u16 m_external_interrupt_state;
 	u32 m_interrupt_state;
 	u8 m_icr[10];
 	u16 m_imr, m_ipr, m_iisr;
@@ -266,7 +266,7 @@ protected:
 	void timer_update(int ch);
 	void timer_sync(int ch);
 	void timer_predict(int ch);
-	
+
 	void tcr_w(int ch, u16 data, u16 mem_mask);
 	void tmcr1_w(int ch, u16 data, u16 mem_mask);
 	void tmcr2_w(int ch, u16 data, u16 mem_mask);

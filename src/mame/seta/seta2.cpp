@@ -2414,8 +2414,7 @@ void seta2_state::samshoot(machine_config &config)
 {
 	seta2(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::samshoot_map);
-	m_screen->screen_vblank().set(FUNC(seta2_state::screen_vblank));
-	m_screen->screen_vblank().append_inputline(m_maincpu, 2);
+	m_maincpu->set_periodic_int(FUNC(seta2_state::irq2_line_hold), attotime::from_hz(60));
 
 	downcast<tmp68301_device &>(*m_maincpu).parallel_w_cb().set_ioport("DSW2");
 

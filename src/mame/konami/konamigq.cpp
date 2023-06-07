@@ -124,7 +124,7 @@ private:
 	uint16_t tms57002_status_word_r();
 	void tms57002_control_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	INTERRUPT_GEN_MEMBER(tms_sync);
-	DECLARE_WRITE_LINE_MEMBER(k054539_irq_gen);
+	void k054539_irq_gen(int state);
 
 	void scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
@@ -251,7 +251,7 @@ void konamigq_state::konamigq_k054539_map(address_map &map)
 
 
 /* 058141 */
-WRITE_LINE_MEMBER(konamigq_state::k054539_irq_gen)
+void konamigq_state::k054539_irq_gen(int state)
 {
 	if (m_sound_ctrl & 1)
 	{
@@ -455,7 +455,7 @@ ROM_START( cryptklr )
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) /* bios */
 	ROM_LOAD( "420b03.27p",   0x0000000, 0x080000, CRC(aab391b1) SHA1(bf9dc7c0c8168c22a4be266fe6a66d3738df916b) )
 
-	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":harddisk:image" )
+	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":harddisk" )
 	DISK_IMAGE( "420uaa04", 0, SHA1(67cb1418fc0de2a89fc61847dc9efb9f1bebb347) )
 ROM_END
 

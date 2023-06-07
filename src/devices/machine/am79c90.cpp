@@ -44,7 +44,6 @@
 #include "emu.h"
 #include "am79c90.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_REG     (1U << 1)
 #define LOG_INIT    (1U << 2)
 #define LOG_RXTX    (1U << 3)

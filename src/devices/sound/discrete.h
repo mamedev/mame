@@ -4195,7 +4195,7 @@ public:
 	virtual ~discrete_device();
 
 	template<int DiscreteInput>
-	DECLARE_WRITE_LINE_MEMBER(write_line)
+	void write_line(int state)
 	{
 		write(DiscreteInput, state ? 1 : 0);
 	}

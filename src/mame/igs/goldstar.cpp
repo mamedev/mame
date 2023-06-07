@@ -9111,7 +9111,7 @@ void goldstar_state::cmast91(machine_config &config)
 
 
 
-WRITE_LINE_MEMBER(wingco_state::masked_irq)
+void wingco_state::masked_irq(int state)
 {
 	if (state && m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -9640,7 +9640,7 @@ void cmaster_state::nfm(machine_config &config)
 }
 
 
-WRITE_LINE_MEMBER(unkch_state::vblank_irq)
+void unkch_state::vblank_irq(int state)
 {
 	if (state && m_vblank_irq_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);

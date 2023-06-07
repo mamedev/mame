@@ -72,7 +72,7 @@ enum int_levels
  *
  *************************************/
 
-WRITE_LINE_MEMBER(jpmsys5v_state::generate_tms34061_interrupt)
+void jpmsys5v_state::generate_tms34061_interrupt(int state)
 {
 	m_maincpu->set_input_line(INT_TMS34061, state);
 }
@@ -632,7 +632,7 @@ INPUT_PORTS_END
  *  6821 PIA
  *
  *************************************/
-WRITE_LINE_MEMBER(jpmsys5_state::pia_irq)
+void jpmsys5_state::pia_irq(int state)
 {
 	m_maincpu->set_input_line(INT_6821PIA, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -664,13 +664,13 @@ void jpmsys5_state::u29_portb_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(jpmsys5_state::u29_ca2_w)
+void jpmsys5_state::u29_ca2_w(int state)
 {
 	//The 'CHOP' line controls power to the reel motors, without this the reels won't turn
 	m_chop = state;
 }
 
-WRITE_LINE_MEMBER(jpmsys5_state::u29_cb2_w)
+void jpmsys5_state::u29_cb2_w(int state)
 {
 	//On a cabinet, this overrides the volume, we don't emulate this yet
 	logerror("Alarm override enabled \n");
@@ -682,12 +682,12 @@ WRITE_LINE_MEMBER(jpmsys5_state::u29_cb2_w)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(jpmsys5_state::ptm_irq)
+void jpmsys5_state::ptm_irq(int state)
 {
 	m_maincpu->set_input_line(INT_6840PTM, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(jpmsys5_state::u26_o1_callback)
+void jpmsys5_state::u26_o1_callback(int state)
 {
 	if (m_mpxclk != state)
 	{
@@ -708,17 +708,17 @@ WRITE_LINE_MEMBER(jpmsys5_state::u26_o1_callback)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(jpmsys5_state::a0_tx_w)
+void jpmsys5_state::a0_tx_w(int state)
 {
 	m_a0_data_out = state;
 }
 
-WRITE_LINE_MEMBER(jpmsys5_state::a1_tx_w)
+void jpmsys5_state::a1_tx_w(int state)
 {
 	m_a1_data_out = state;
 }
 
-WRITE_LINE_MEMBER(jpmsys5_state::a2_tx_w)
+void jpmsys5_state::a2_tx_w(int state)
 {
 	m_a2_data_out = state;
 }

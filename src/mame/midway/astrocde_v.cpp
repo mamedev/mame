@@ -40,6 +40,20 @@ void seawolf2_state::machine_start()
 	m_port_1_last = m_port_2_last = 0xff;
 }
 
+void ebases_state::machine_start()
+{
+	astrocde_state::machine_start();
+
+	save_item(NAME(m_trackball_last));
+}
+
+void demndrgn_state::machine_start()
+{
+	astrocde_state::machine_start();
+
+	save_item(NAME(m_trackball_last));
+}
+
 void tenpindx_state::machine_start()
 {
 	astrocde_state::machine_start();
@@ -384,7 +398,7 @@ TIMER_CALLBACK_MEMBER(astrocde_state::interrupt_off)
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(astrocde_state::lightpen_trigger_w)
+void astrocde_state::lightpen_trigger_w(int state)
 {
 	if (state)
 	{

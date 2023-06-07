@@ -166,7 +166,7 @@ INTERRUPT_GEN_MEMBER(cave_state::interrupt_ppsatan)
 }
 
 /* Called by the YMZ280B to set the IRQ state */
-WRITE_LINE_MEMBER(cave_state::sound_irq_gen)
+void cave_state::sound_irq_gen(int state)
 {
 	m_sound_irq = (state != 0);
 	update_irq_state();
@@ -718,7 +718,7 @@ void cave_state::korokoro_eeprom_w(offs_t offset, u16 data, u16 mem_mask)
 	}
 }
 
-READ_LINE_MEMBER(cave_state::korokoro_hopper_r)
+int cave_state::korokoro_hopper_r()
 {
 	return m_hopper ? 1 : 0;
 }
@@ -1107,7 +1107,7 @@ void cave_state::tjumpman_leds_w(u8 data)
 //  popmessage("led %04X", data);
 }
 
-READ_LINE_MEMBER(cave_state::tjumpman_hopper_r)
+int cave_state::tjumpman_hopper_r()
 {
 	return (m_hopper && !(m_screen[0]->frame_number() % 10)) ? 0 : 1;
 }
@@ -1199,12 +1199,12 @@ void cave_state::paceight_map(address_map &map)
 
 //TODO: leds need verifying
 
-READ_LINE_MEMBER(cave_state::paccarn_bet4_r)
+int cave_state::paccarn_bet4_r()
 {
 	return (m_io_bet->read() & 0x5) ? 1 : 0;
 }
 
-READ_LINE_MEMBER(cave_state::paccarn_bet8_r)
+int cave_state::paccarn_bet8_r()
 {
 	return (m_io_bet->read() & 0x6) ? 1 : 0;
 }

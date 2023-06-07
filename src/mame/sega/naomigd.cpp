@@ -434,11 +434,11 @@ void idegdrom_device::map_extra(uint64_t memory_window_start, uint64_t memory_wi
 
 static void gdrom_devices(device_slot_interface &device)
 {
-	device.option_add("gdrom", GDROM);
+	device.option_add("gdrom", ATAPI_GDROM);
 }
 
 
-WRITE_LINE_MEMBER(idegdrom_device::ide_irq)
+void idegdrom_device::ide_irq(int state)
 {
 	irq_cb(state);
 }

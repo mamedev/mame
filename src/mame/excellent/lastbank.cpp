@@ -56,7 +56,7 @@ private:
 	required_device<okim6295_device> m_oki;
 	required_device<es8712_device> m_essnd;
 
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 
 	uint8_t m_mux_data = 0;
 	uint8_t m_sound_flags = 0;
@@ -80,7 +80,7 @@ void lastbank_state::machine_start()
 	save_item(NAME(m_sound_flags));
 }
 
-WRITE_LINE_MEMBER(lastbank_state::screen_vblank)
+void lastbank_state::screen_vblank(int state)
 {
 	if (state)
 	{

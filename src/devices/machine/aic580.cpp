@@ -97,7 +97,7 @@ void aic580_device::device_reset()
 //  breq_w - handle transfer requests for port B
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(aic580_device::breq_w)
+void aic580_device::breq_w(int state)
 {
 	if (state)
 	{

@@ -28,16 +28,12 @@
 #include "vme_cp31.h"
 
 
-//#define LOG_GENERAL (1U <<  0)
-#define LOG_SETUP   (1U <<  1)
-#define LOG_INT     (1U <<  2)
+#define LOG_INT     (1U << 1)
 
-//#define VERBOSE (LOG_GENERAL | LOG_SETUP | LOG_INT)
+#define VERBOSE (0) // (LOG_GENERAL | LOG_INT)
 //#define LOG_OUTPUT_FUNC printf
-
 #include "logmacro.h"
 
-#define LOGSETUP(...) LOGMASKED(LOG_SETUP, __VA_ARGS__)
 #define LOGINT(...)   LOGMASKED(LOG_INT,   __VA_ARGS__)
 
 
@@ -195,7 +191,7 @@ uint32_t vme_cp31_card_device::trap_r(offs_t offset, uint32_t mem_mask)
 	return 0xffffffff;
 }
 
-WRITE_LINE_MEMBER(vme_cp31_card_device::bim_irq_callback)
+void vme_cp31_card_device::bim_irq_callback(int state)
 {
 	LOGINT("%s(%02x)\n", FUNCNAME, state);
 

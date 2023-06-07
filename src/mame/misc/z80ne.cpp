@@ -244,7 +244,7 @@ protected:
 	void lx383_w(offs_t offset, uint8_t data);
 	uint8_t lx385_ctrl_r();
 	void lx385_ctrl_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(lx385_uart_tx_clock_w);
+	void lx385_uart_tx_clock_w(int state);
 
 	TIMER_CALLBACK_MEMBER(cassette_tc);
 	TIMER_CALLBACK_MEMBER(kbd_scan);
@@ -300,8 +300,8 @@ public:
 protected:
 	virtual void machine_reset() override;
 
-	DECLARE_READ_LINE_MEMBER(lx387_shift_r);
-	DECLARE_READ_LINE_MEMBER(lx387_control_r);
+	int lx387_shift_r();
+	int lx387_control_r();
 	uint8_t lx387_data_r();
 	uint8_t lx388_mc6847_videoram_r(offs_t offset);
 	uint8_t lx388_read_field_sync();
@@ -898,18 +898,18 @@ void z80ne_state::lx385_ctrl_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(z80ne_state::lx385_uart_tx_clock_w)
+void z80ne_state::lx385_uart_tx_clock_w(int state)
 {
 	if (BIT(m_lx385_ctrl, 2))
 		m_uart->write_tcp(state);
 }
 
-READ_LINE_MEMBER(z80net_state::lx387_shift_r)
+int z80net_state::lx387_shift_r()
 {
 	return BIT(m_io_modifiers->read(), 0) || BIT(m_io_modifiers->read(), 2);
 }
 
-READ_LINE_MEMBER(z80net_state::lx387_control_r)
+int z80net_state::lx387_control_r()
 {
 	return BIT(m_io_modifiers->read(), 1);
 }
@@ -1265,7 +1265,7 @@ static INPUT_PORTS_START( z80net )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K)          PORT_CHAR('k') PORT_CHAR('K')
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J)          PORT_CHAR('j') PORT_CHAR('J')
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H)          PORT_CHAR('h') PORT_CHAR('H')
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G)          PORT_CHAR('c') PORT_CHAR('G')
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G)          PORT_CHAR('g') PORT_CHAR('G')
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F)          PORT_CHAR('f') PORT_CHAR('F')
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D)          PORT_CHAR('d') PORT_CHAR('D')
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S)          PORT_CHAR('s') PORT_CHAR('S')

@@ -277,7 +277,7 @@ void zac1b11107_audio_device::sound_w(u8 data)
 	m_melody_command = data | 0xc0;
 }
 
-WRITE_LINE_MEMBER(zac1b11107_audio_device::reset_w)
+void zac1b11107_audio_device::reset_w(int state)
 {
 	// TODO: there is a pulse-stretching network attached that should be simulated
 	m_melodycpu->set_input_line(INPUT_LINE_RESET, state);
@@ -347,12 +347,12 @@ void zac1b11142_audio_device::hs_w(u8 data)
 	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-READ_LINE_MEMBER(zac1b11142_audio_device::acs_r)
+int zac1b11142_audio_device::acs_r()
 {
 	return (~m_pia_1i->b_output() >> 3) & 0x01;
 }
 
-WRITE_LINE_MEMBER(zac1b11142_audio_device::ressound_w)
+void zac1b11142_audio_device::ressound_w(int state)
 {
 	// TODO: there is a pulse-stretching network attached that should be simulated
 	m_melodycpu->set_input_line(INPUT_LINE_RESET, state);

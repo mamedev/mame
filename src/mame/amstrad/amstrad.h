@@ -229,23 +229,23 @@ private:
 	DECLARE_MACHINE_RESET(aleste);
 	void aleste_palette(palette_device &palette) const;
 	uint32_t screen_update_amstrad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_amstrad);
+	void screen_vblank_amstrad(int state);
 	TIMER_CALLBACK_MEMBER(amstrad_pc2_low);
 	TIMER_CALLBACK_MEMBER(amstrad_video_update_timer);
 	TIMER_CALLBACK_MEMBER(cb_set_resolution);
-	DECLARE_WRITE_LINE_MEMBER(amstrad_hsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(amstrad_plus_hsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(amstrad_vsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(amstrad_plus_vsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(amstrad_de_changed);
-	DECLARE_WRITE_LINE_MEMBER(amstrad_plus_de_changed);
+	void amstrad_hsync_changed(int state);
+	void amstrad_plus_hsync_changed(int state);
+	void amstrad_vsync_changed(int state);
+	void amstrad_plus_vsync_changed(int state);
+	void amstrad_de_changed(int state);
+	void amstrad_plus_de_changed(int state);
 	uint8_t amstrad_ppi_porta_r();
 	void amstrad_ppi_porta_w(uint8_t data);
 	uint8_t amstrad_ppi_portb_r();
 	void amstrad_ppi_portc_w(uint8_t data);
 
 	device_t* get_expansion_device(const char* tag);
-	DECLARE_WRITE_LINE_MEMBER( cpc_romdis );
+	void cpc_romdis(int state);
 	void rom_select(uint8_t data);
 
 	static void amstrad_floppy_formats(format_registration &fr);
@@ -259,7 +259,7 @@ private:
 	void amstrad_rethinkMemory();
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	void write_centronics_busy(int state);
 
 	void amstrad_io(address_map &map);
 	void amstrad_mem(address_map &map);

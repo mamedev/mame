@@ -21,7 +21,7 @@ Rewritten by Robbbert (see notes in driver file).
 
 ************************************************************/
 
-WRITE_LINE_MEMBER( mbee_state::pio_ardy )
+void mbee_state::pio_ardy(int state)
 {
 	m_centronics->write_strobe((state) ? 0 : 1);
 }
@@ -77,12 +77,12 @@ u8 mbee_state::pio_port_b_r()
 
 *************************************************************************************/
 
-WRITE_LINE_MEMBER( mbee_state::fdc_intrq_w )
+void mbee_state::fdc_intrq_w(int state)
 {
 	m_fdc_rq = (m_fdc_rq & 2) | state;
 }
 
-WRITE_LINE_MEMBER( mbee_state::fdc_drq_w )
+void mbee_state::fdc_drq_w(int state)
 {
 	m_fdc_rq = (m_fdc_rq & 1) | (state << 1);
 }
@@ -230,7 +230,7 @@ u8 mbee_state::port07_r()   // read
 }
 
 // See it work: Run mbeett, choose RTC in the config switches, run the F3 test, press Esc.
-WRITE_LINE_MEMBER( mbee_state::rtc_irq_w )
+void mbee_state::rtc_irq_w(int state)
 {
 	m_b7_rtc = state; // inverted by IC15 (pins 8,9,10) then again by mame
 

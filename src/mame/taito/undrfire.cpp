@@ -210,7 +210,7 @@ Board contains only 29 ROMs and not much else.
             GAME INPUTS
 **********************************************************/
 
-READ_LINE_MEMBER(undrfire_state::frame_counter_r)
+int undrfire_state::frame_counter_r()
 {
 	return m_frame_counter;
 }

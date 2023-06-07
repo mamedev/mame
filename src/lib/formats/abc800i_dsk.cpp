@@ -8,8 +8,10 @@
 
 *********************************************************************/
 
-#include "formats/abc800i_dsk.h"
+#include "abc800i_dsk.h"
+
 #include "ioprocs.h"
+
 
 abc800i_format::abc800i_format() : wd177x_format(formats)
 {

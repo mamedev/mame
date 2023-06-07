@@ -703,13 +703,13 @@ void venture_sound_device::pb_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(venture_sound_device::ca_w)
+void venture_sound_device::ca_w(int state)
 {
 	m_pia->ca1_w(state);
 }
 
 
-WRITE_LINE_MEMBER(venture_sound_device::cb_w)
+void venture_sound_device::cb_w(int state)
 {
 	m_pia->cb1_w(state);
 }
@@ -727,13 +727,13 @@ void venture_sound_device::pia_pb_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(venture_sound_device::pia_ca2_w)
+void venture_sound_device::pia_ca2_w(int state)
 {
 	m_ca2_callback(state);
 }
 
 
-WRITE_LINE_MEMBER(venture_sound_device::pia_cb2_w)
+void venture_sound_device::pia_cb2_w(int state)
 {
 	m_cb2_callback(state);
 }
@@ -880,7 +880,7 @@ void mtrap_sound_device::device_add_mconfig(machine_config &config)
 	m_cvsd_filter2->add_route(ALL_OUTPUTS, "mono", 1.0);
 	FILTER_BIQUAD(config, m_cvsd_filter).opamp_mfb_lowpass_setup(RES_K(10), RES_K(3.9), RES_K(18), CAP_N(20), CAP_N(2.2));
 	m_cvsd_filter->add_route(ALL_OUTPUTS, m_cvsd_filter2, 1.0);
-	MC3417(config, m_cvsd, 0).add_route(ALL_OUTPUTS, m_cvsd_filter, 0.3086); // each filter has gain of 1.8 for total gain of 3.24, 0.3086 cancels this out. was 0.8
+	MC3417(config, m_cvsd, 0).add_route(ALL_OUTPUTS, m_cvsd_filter, 0.3086); // each filter has gain of 1.8 for total gain of 3.24, 0.3086 cancels this out.
 
 }
 
@@ -937,7 +937,7 @@ void victory_sound_device::command_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(victory_sound_device::irq_clear_w)
+void victory_sound_device::irq_clear_w(int state)
 {
 	if (VICTORY_LOG_SOUND) logerror("%s:!!!! Sound IRQ clear = %02X\n", machine().describe_context(), state);
 
@@ -949,7 +949,7 @@ WRITE_LINE_MEMBER(victory_sound_device::irq_clear_w)
 }
 
 
-WRITE_LINE_MEMBER(victory_sound_device::main_ack_w)
+void victory_sound_device::main_ack_w(int state)
 {
 	if (VICTORY_LOG_SOUND) logerror("%s:!!!! Sound Main ACK W = %02X\n", machine().describe_context(), state);
 

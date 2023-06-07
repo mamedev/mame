@@ -209,11 +209,10 @@
 #include "machine/clock.h"
 //#include "machine/timekpr.h"
 
-//#define LOG_GENERAL (1U <<  0)
-#define LOG_SETUP   (1U <<  1)
-#define LOG_READ    (1U <<  2)
-#define LOG_INT     (1U <<  3)
-#define LOG_INIT    (1U <<  4)
+#define LOG_SETUP   (1U << 1)
+#define LOG_READ    (1U << 2)
+#define LOG_INT     (1U << 3)
+#define LOG_INIT    (1U << 4)
 
 //#define VERBOSE (LOG_GENERAL | LOG_SETUP)
 //#define LOG_OUTPUT_FUNC printf
@@ -284,7 +283,7 @@ private:
 
 	/* Interrupt  support */
 	void cpu_space_map(address_map &map);
-	DECLARE_WRITE_LINE_MEMBER(fga_irq_callback);
+	void fga_irq_callback(int state);
 	uint8_t fga_irq_state = 0;
 	//  int fga_irq_vector = 0;
 	int fga_irq_level = 0;
@@ -624,7 +623,7 @@ void cpu30_state::vme_a16_w(uint16_t data){
 }
 #endif
 
-WRITE_LINE_MEMBER(cpu30_state::fga_irq_callback)
+void cpu30_state::fga_irq_callback(int state)
 {
 	LOGINT("%s(%02x)\n", FUNCNAME, state);
 

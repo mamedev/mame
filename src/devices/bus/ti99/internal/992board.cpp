@@ -19,13 +19,13 @@
 #include "emu.h"
 #include "992board.h"
 
-#define LOG_WARN        (1U<<1)   // Warnings
-#define LOG_CRU         (1U<<2)   // CRU logging
-#define LOG_CASSETTE    (1U<<3)   // Cassette logging
-#define LOG_HEXBUS      (1U<<4)   // Hexbus logging
-#define LOG_BANK        (1U<<5)   // Change ROM banks
-#define LOG_KEYBOARD    (1U<<6)   // Keyboard operation
-#define LOG_EXPRAM      (1U<<7)   // Expansion RAM
+#define LOG_WARN        (1U << 1)   // Warnings
+#define LOG_CRU         (1U << 2)   // CRU logging
+#define LOG_CASSETTE    (1U << 3)   // Cassette logging
+#define LOG_HEXBUS      (1U << 4)   // Hexbus logging
+#define LOG_BANK        (1U << 5)   // Change ROM banks
+#define LOG_KEYBOARD    (1U << 6)   // Keyboard operation
+#define LOG_EXPRAM      (1U << 7)   // Expansion RAM
 
 #define VERBOSE (LOG_GENERAL | LOG_WARN)
 
@@ -278,7 +278,7 @@ uint32_t video992_device::screen_update(screen_device &screen, bitmap_rgb32 &bit
 /*
     VIDENA pin, positive logic
 */
-WRITE_LINE_MEMBER(video992_device::videna)
+void video992_device::videna(int state)
 {
 	m_videna = state;
 }

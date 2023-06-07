@@ -445,7 +445,7 @@ void topcat_device::ctrl_w(address_space &space, offs_t offset, uint16_t data, u
 	}
 }
 
-WRITE_LINE_MEMBER(topcat_device::vblank_w)
+void topcat_device::vblank_w(int state)
 {
 	if (state) {
 		m_vblank |= (m_plane_mask << 8);

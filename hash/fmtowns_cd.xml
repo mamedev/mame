@@ -21520,8 +21520,8 @@ User/save disks that can be created from the game itself are not included.
 	</software>
 
 	<!--
-		Bundled with the book of the same title (ISBN 978-4756106001). Disc 4 contains software for X68000, FM Towns and UNIX-based systems.
-		The other discs (currently not dumped) contain DOS/Windows software for IBM compatibles.
+	    Bundled with the book of the same title (ISBN 978-4756106001). Disc 4 contains software for X68000, FM Towns and UNIX-based systems.
+	    The other discs (currently not dumped) contain DOS/Windows software for IBM compatibles.
 	-->
 	<software name="pack13k">
 		<!--

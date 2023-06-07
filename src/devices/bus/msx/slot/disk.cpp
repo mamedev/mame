@@ -84,7 +84,6 @@ msx_slot_disk_device::msx_slot_disk_device(const machine_config &mconfig, device
 	, m_floppy(*this, "fdc:%u", 0U)
 	, m_current_floppy(nullptr)
 	, m_internal_drive_led(*this, "internal_drive%u_led", 0U)
-	, m_internal_drive_name(*this, "internal_drive%u_name", 0U)
 	, m_nr_drives(nr_drives)
 {
 }
@@ -100,7 +99,6 @@ void msx_slot_disk_device::device_start()
 	msx_slot_rom_device::device_start();
 
 	m_internal_drive_led.resolve();
-	m_internal_drive_name.resolve();
 }
 
 void msx_slot_disk_device::device_reset()
@@ -108,14 +106,13 @@ void msx_slot_disk_device::device_reset()
 	msx_slot_rom_device::device_reset();
 	for (int i = 0; i < m_internal_drive_led.size(); i++)
 	{
-		m_internal_drive_name[i] = m_floppy[i] ? 1 : 0;
 		set_drive_access_led_state(i, 0);
 	}
 }
 
 void msx_slot_disk_device::set_drive_access_led_state(int drive, int led_state)
 {
-	m_internal_drive_led[drive] = m_floppy[drive] ? 1 + led_state : 0;
+	m_internal_drive_led[drive] = led_state;
 }
 
 
@@ -180,35 +177,35 @@ void msx_slot_disk1_base_device::device_start()
 	save_item(NAME(m_control));
 
 	page(1)->install_rom(0x4000, 0x7fff, rom_base());
-	page(1)->install_read_handler(0x7ff8, 0x7ff8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
-	page(1)->install_read_handler(0x7ff9, 0x7ff9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
-	page(1)->install_read_handler(0x7ffa, 0x7ffa, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
-	page(1)->install_read_handler(0x7ffb, 0x7ffb, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
-	page(1)->install_read_handler(0x7ffc, 0x7ffc, read8smo_delegate(*this, FUNC(msx_slot_disk1_base_device::side_control_r)));
-	page(1)->install_read_handler(0x7ffd, 0x7ffd, read8smo_delegate(*this, FUNC(msx_slot_disk1_base_device::control_r)));
-	page(1)->install_read_handler(0x7fff, 0x7fff, read8smo_delegate(*this, FUNC(msx_slot_disk1_base_device::status_r)));
-	page(1)->install_write_handler(0x7ff8, 0x7ff8, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
-	page(1)->install_write_handler(0x7ff9, 0x7ff9, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
-	page(1)->install_write_handler(0x7ffa, 0x7ffa, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
-	page(1)->install_write_handler(0x7ffb, 0x7ffb, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
-	page(1)->install_write_handler(0x7ffc, 0x7ffc, write8smo_delegate(*this, FUNC(msx_slot_disk1_base_device::set_side_control)));
-	page(1)->install_write_handler(0x7ffd, 0x7ffd, write8smo_delegate(*this, FUNC(msx_slot_disk1_base_device::set_control)));
+	page(1)->install_read_handler(0x7ff8, 0x7ff8, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+	page(1)->install_read_handler(0x7ff9, 0x7ff9, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+	page(1)->install_read_handler(0x7ffa, 0x7ffa, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+	page(1)->install_read_handler(0x7ffb, 0x7ffb, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+	page(1)->install_read_handler(0x7ffc, 0x7ffc, emu::rw_delegate(*this, FUNC(msx_slot_disk1_base_device::side_control_r)));
+	page(1)->install_read_handler(0x7ffd, 0x7ffd, emu::rw_delegate(*this, FUNC(msx_slot_disk1_base_device::control_r)));
+	page(1)->install_read_handler(0x7fff, 0x7fff, emu::rw_delegate(*this, FUNC(msx_slot_disk1_base_device::status_r)));
+	page(1)->install_write_handler(0x7ff8, 0x7ff8, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+	page(1)->install_write_handler(0x7ff9, 0x7ff9, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+	page(1)->install_write_handler(0x7ffa, 0x7ffa, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+	page(1)->install_write_handler(0x7ffb, 0x7ffb, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+	page(1)->install_write_handler(0x7ffc, 0x7ffc, emu::rw_delegate(*this, FUNC(msx_slot_disk1_base_device::set_side_control)));
+	page(1)->install_write_handler(0x7ffd, 0x7ffd, emu::rw_delegate(*this, FUNC(msx_slot_disk1_base_device::set_control)));
 
 	if (page_configured(2))
 	{
-		page(2)->install_read_handler(0xbff8, 0xbff8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
-		page(2)->install_read_handler(0xbff9, 0xbff9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
-		page(2)->install_read_handler(0xbffa, 0xbffa, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
-		page(2)->install_read_handler(0xbffb, 0xbffb, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
-		page(2)->install_read_handler(0xbffc, 0xbffc, read8smo_delegate(*this, FUNC(msx_slot_disk1_base_device::side_control_r)));
-		page(2)->install_read_handler(0xbffd, 0xbffd, read8smo_delegate(*this, FUNC(msx_slot_disk1_base_device::control_r)));
-		page(2)->install_read_handler(0xbfff, 0xbfff, read8smo_delegate(*this, FUNC(msx_slot_disk1_base_device::status_r)));
-		page(2)->install_write_handler(0xbff8, 0xbff8, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
-		page(2)->install_write_handler(0xbff9, 0xbff9, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
-		page(2)->install_write_handler(0xbffa, 0xbffa, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
-		page(2)->install_write_handler(0xbffb, 0xbffb, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
-		page(2)->install_write_handler(0xbffc, 0xbffc, write8smo_delegate(*this, FUNC(msx_slot_disk1_base_device::set_side_control)));
-		page(2)->install_write_handler(0xbffd, 0xbffd, write8smo_delegate(*this, FUNC(msx_slot_disk1_base_device::set_control)));
+		page(2)->install_read_handler(0xbff8, 0xbff8, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+		page(2)->install_read_handler(0xbff9, 0xbff9, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+		page(2)->install_read_handler(0xbffa, 0xbffa, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+		page(2)->install_read_handler(0xbffb, 0xbffb, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+		page(2)->install_read_handler(0xbffc, 0xbffc, emu::rw_delegate(*this, FUNC(msx_slot_disk1_base_device::side_control_r)));
+		page(2)->install_read_handler(0xbffd, 0xbffd, emu::rw_delegate(*this, FUNC(msx_slot_disk1_base_device::control_r)));
+		page(2)->install_read_handler(0xbfff, 0xbfff, emu::rw_delegate(*this, FUNC(msx_slot_disk1_base_device::status_r)));
+		page(2)->install_write_handler(0xbff8, 0xbff8, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+		page(2)->install_write_handler(0xbff9, 0xbff9, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+		page(2)->install_write_handler(0xbffa, 0xbffa, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+		page(2)->install_write_handler(0xbffb, 0xbffb, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+		page(2)->install_write_handler(0xbffc, 0xbffc, emu::rw_delegate(*this, FUNC(msx_slot_disk1_base_device::set_side_control)));
+		page(2)->install_write_handler(0xbffd, 0xbffd, emu::rw_delegate(*this, FUNC(msx_slot_disk1_base_device::set_control)));
 	}
 }
 
@@ -394,27 +391,27 @@ void msx_slot_disk2_base_device::device_start()
 	save_item(NAME(m_control));
 
 	page(1)->install_rom(0x4000, 0x7fff, rom_base());
-	page(1)->install_read_handler(0x7fb8, 0x7fb8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
-	page(1)->install_read_handler(0x7fb9, 0x7fb9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
-	page(1)->install_read_handler(0x7fba, 0x7fba, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
-	page(1)->install_read_handler(0x7fbb, 0x7fbb, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
-	page(1)->install_read_handler(0x7fbc, 0x7fbc, read8smo_delegate(*this, FUNC(msx_slot_disk2_base_device::status_r)));
-	page(1)->install_write_handler(0x7fb8, 0x7fb8, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
-	page(1)->install_write_handler(0x7fb9, 0x7fb9, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
-	page(1)->install_write_handler(0x7fba, 0x7fba, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
-	page(1)->install_write_handler(0x7fbb, 0x7fbb, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
-	page(1)->install_write_handler(0x7fbc, 0x7fbc, write8smo_delegate(*this, FUNC(msx_slot_disk2_base_device::set_control)));
+	page(1)->install_read_handler(0x7fb8, 0x7fb8, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+	page(1)->install_read_handler(0x7fb9, 0x7fb9, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+	page(1)->install_read_handler(0x7fba, 0x7fba, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+	page(1)->install_read_handler(0x7fbb, 0x7fbb, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+	page(1)->install_read_handler(0x7fbc, 0x7fbc, emu::rw_delegate(*this, FUNC(msx_slot_disk2_base_device::status_r)));
+	page(1)->install_write_handler(0x7fb8, 0x7fb8, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+	page(1)->install_write_handler(0x7fb9, 0x7fb9, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+	page(1)->install_write_handler(0x7fba, 0x7fba, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+	page(1)->install_write_handler(0x7fbb, 0x7fbb, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+	page(1)->install_write_handler(0x7fbc, 0x7fbc, emu::rw_delegate(*this, FUNC(msx_slot_disk2_base_device::set_control)));
 
-	page(2)->install_read_handler(0xbfb8, 0xbfb8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
-	page(2)->install_read_handler(0xbfb9, 0xbfb9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
-	page(2)->install_read_handler(0xbfba, 0xbfba, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
-	page(2)->install_read_handler(0xbfbb, 0xbfbb, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
-	page(2)->install_read_handler(0xbfbc, 0xbfbc, read8smo_delegate(*this, FUNC(msx_slot_disk2_base_device::status_r)));
-	page(2)->install_write_handler(0xbfb8, 0xbfb8, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
-	page(2)->install_write_handler(0xbfb9, 0xbfb9, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
-	page(2)->install_write_handler(0xbfba, 0xbfba, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
-	page(2)->install_write_handler(0xbfbb, 0xbfbb, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
-	page(2)->install_write_handler(0xbfbc, 0xbfbc, write8smo_delegate(*this, FUNC(msx_slot_disk2_base_device::set_control)));
+	page(2)->install_read_handler(0xbfb8, 0xbfb8, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+	page(2)->install_read_handler(0xbfb9, 0xbfb9, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+	page(2)->install_read_handler(0xbfba, 0xbfba, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+	page(2)->install_read_handler(0xbfbb, 0xbfbb, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+	page(2)->install_read_handler(0xbfbc, 0xbfbc, emu::rw_delegate(*this, FUNC(msx_slot_disk2_base_device::status_r)));
+	page(2)->install_write_handler(0xbfb8, 0xbfb8, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+	page(2)->install_write_handler(0xbfb9, 0xbfb9, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+	page(2)->install_write_handler(0xbfba, 0xbfba, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+	page(2)->install_write_handler(0xbfbb, 0xbfbb, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+	page(2)->install_write_handler(0xbfbc, 0xbfbc, emu::rw_delegate(*this, FUNC(msx_slot_disk2_base_device::set_control)));
 }
 
 void msx_slot_disk2_base_device::device_reset()
@@ -558,17 +555,17 @@ void msx_slot_disk3_tc8566_device::device_start()
 	msx_slot_tc8566_disk_device::device_start();
 
 	page(1)->install_rom(0x4000, 0x7fff, rom_base());
-	page(1)->install_read_handler(0x7ffa, 0x7ffa, read8smo_delegate(*m_fdc, FUNC(tc8566af_device::msr_r)));
-	page(1)->install_read_handler(0x7ffb, 0x7ffb, read8smo_delegate(*m_fdc, FUNC(tc8566af_device::fifo_r)));
-	page(1)->install_write_handler(0x7ff8, 0x7ff8, write8smo_delegate(*this, FUNC(msx_slot_disk3_tc8566_device::dor_w)));
-	page(1)->install_write_handler(0x7ff9, 0x7ff9, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::cr1_w)));
-	page(1)->install_write_handler(0x7ffb, 0x7ffb, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::fifo_w)));
+	page(1)->install_read_handler(0x7ffa, 0x7ffa, emu::rw_delegate(*m_fdc, FUNC(tc8566af_device::msr_r)));
+	page(1)->install_read_handler(0x7ffb, 0x7ffb, emu::rw_delegate(*m_fdc, FUNC(tc8566af_device::fifo_r)));
+	page(1)->install_write_handler(0x7ff8, 0x7ff8, emu::rw_delegate(*this, FUNC(msx_slot_disk3_tc8566_device::dor_w)));
+	page(1)->install_write_handler(0x7ff9, 0x7ff9, emu::rw_delegate(*m_fdc, FUNC(tc8566af_device::cr1_w)));
+	page(1)->install_write_handler(0x7ffb, 0x7ffb, emu::rw_delegate(*m_fdc, FUNC(tc8566af_device::fifo_w)));
 
-	page(2)->install_read_handler(0xbffa, 0xbffa, read8smo_delegate(*m_fdc, FUNC(tc8566af_device::msr_r)));
-	page(2)->install_read_handler(0xbffb, 0xbffb, read8smo_delegate(*m_fdc, FUNC(tc8566af_device::fifo_r)));
-	page(2)->install_write_handler(0xbff8, 0xbff8, write8smo_delegate(*this, FUNC(msx_slot_disk3_tc8566_device::dor_w)));
-	page(2)->install_write_handler(0xbff9, 0xbff9, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::cr1_w)));
-	page(2)->install_write_handler(0xbffb, 0xbffb, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::fifo_w)));
+	page(2)->install_read_handler(0xbffa, 0xbffa, emu::rw_delegate(*m_fdc, FUNC(tc8566af_device::msr_r)));
+	page(2)->install_read_handler(0xbffb, 0xbffb, emu::rw_delegate(*m_fdc, FUNC(tc8566af_device::fifo_r)));
+	page(2)->install_write_handler(0xbff8, 0xbff8, emu::rw_delegate(*this, FUNC(msx_slot_disk3_tc8566_device::dor_w)));
+	page(2)->install_write_handler(0xbff9, 0xbff9, emu::rw_delegate(*m_fdc, FUNC(tc8566af_device::cr1_w)));
+	page(2)->install_write_handler(0xbffb, 0xbffb, emu::rw_delegate(*m_fdc, FUNC(tc8566af_device::fifo_w)));
 }
 
 
@@ -598,11 +595,11 @@ void msx_slot_disk4_tc8566_device::device_start()
 
 	page(1)->install_rom(0x4000, 0x7fff, rom_base());
 	// 0x7ff1 media change register
-	page(1)->install_write_handler(0x7ff2, 0x7ff2, write8smo_delegate(*this, FUNC(msx_slot_disk4_tc8566_device::dor_w)));
-	page(1)->install_write_handler(0x7ff3, 0x7ff3, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::cr1_w)));
-	page(1)->install_read_handler(0x7ff4, 0x7ff4, read8smo_delegate(*m_fdc, FUNC(tc8566af_device::msr_r)));
-	page(1)->install_read_handler(0x7ff5, 0x7ff5, read8smo_delegate(*m_fdc, FUNC(tc8566af_device::fifo_r)));
-	page(1)->install_write_handler(0x7ff5, 0x7ff5, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::fifo_w)));
+	page(1)->install_write_handler(0x7ff2, 0x7ff2, emu::rw_delegate(*this, FUNC(msx_slot_disk4_tc8566_device::dor_w)));
+	page(1)->install_write_handler(0x7ff3, 0x7ff3, emu::rw_delegate(*m_fdc, FUNC(tc8566af_device::cr1_w)));
+	page(1)->install_read_handler(0x7ff4, 0x7ff4, emu::rw_delegate(*m_fdc, FUNC(tc8566af_device::msr_r)));
+	page(1)->install_read_handler(0x7ff5, 0x7ff5, emu::rw_delegate(*m_fdc, FUNC(tc8566af_device::fifo_r)));
+	page(1)->install_write_handler(0x7ff5, 0x7ff5, emu::rw_delegate(*m_fdc, FUNC(tc8566af_device::fifo_w)));
 }
 
 void msx_slot_disk4_tc8566_device::device_add_mconfig(machine_config &config)
@@ -633,16 +630,16 @@ void msx_slot_disk5_wd2793_device::device_start()
 	page(1)->install_rom(0x4000, 0x7fff, rom_base());
 
 	// Install IO read/write handlers
-	io_space().install_write_handler(0xd0, 0xd0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
-	io_space().install_write_handler(0xd1, 0xd1, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
-	io_space().install_write_handler(0xd2, 0xd2, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
-	io_space().install_write_handler(0xd3, 0xd3, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
-	io_space().install_write_handler(0xd4, 0xd4, write8smo_delegate(*this, FUNC(msx_slot_disk5_wd2793_device::control_w)));
-	io_space().install_read_handler(0xd0, 0xd0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
-	io_space().install_read_handler(0xd1, 0xd1, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
-	io_space().install_read_handler(0xd2, 0xd2, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
-	io_space().install_read_handler(0xd3, 0xd3, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
-	io_space().install_read_handler(0xd4, 0xd4, read8smo_delegate(*this, FUNC(msx_slot_disk5_wd2793_device::status_r)));
+	io_space().install_write_handler(0xd0, 0xd0, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+	io_space().install_write_handler(0xd1, 0xd1, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+	io_space().install_write_handler(0xd2, 0xd2, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+	io_space().install_write_handler(0xd3, 0xd3, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+	io_space().install_write_handler(0xd4, 0xd4, emu::rw_delegate(*this, FUNC(msx_slot_disk5_wd2793_device::control_w)));
+	io_space().install_read_handler(0xd0, 0xd0, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+	io_space().install_read_handler(0xd1, 0xd1, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+	io_space().install_read_handler(0xd2, 0xd2, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+	io_space().install_read_handler(0xd3, 0xd3, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+	io_space().install_read_handler(0xd4, 0xd4, emu::rw_delegate(*this, FUNC(msx_slot_disk5_wd2793_device::status_r)));
 }
 
 void msx_slot_disk5_wd2793_device::device_reset()
@@ -743,21 +740,21 @@ void msx_slot_disk6_wd2793_n_device::device_start()
 	save_item(NAME(m_unknown));
 
 	page(1)->install_rom(0x4000, 0x7fff, rom_base());
-	page(1)->install_read_handler(0x7ff0, 0x7ff0, 0, 0x0008, 0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
-	page(1)->install_read_handler(0x7ff1, 0x7ff1, 0, 0x0008, 0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
-	page(1)->install_read_handler(0x7ff2, 0x7ff2, 0, 0x0008, 0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
-	page(1)->install_read_handler(0x7ff3, 0x7ff3, 0, 0x0008, 0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
-	page(1)->install_read_handler(0x7ff4, 0x7ff4, 0, 0x0008, 0, read8smo_delegate(*this, FUNC(msx_slot_disk6_wd2793_n_device::side_motor_r)));
-	page(1)->install_read_handler(0x7ff5, 0x7ff5, 0, 0x0008, 0, read8smo_delegate(*this, FUNC(msx_slot_disk6_wd2793_n_device::select0_r)));
-	page(1)->install_read_handler(0x7ff6, 0x7ff6, 0, 0x0008, 0, read8smo_delegate(*this, FUNC(msx_slot_disk6_wd2793_n_device::dskchg_r)));
-	page(1)->install_read_handler(0x7ff7, 0x7ff7, 0, 0x0008, 0, read8smo_delegate(*this, FUNC(msx_slot_disk6_wd2793_n_device::status_r)));
-	page(1)->install_write_handler(0x7ff0, 0x7ff0, 0, 0x0008, 0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
-	page(1)->install_write_handler(0x7ff1, 0x7ff1, 0, 0x0008, 0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
-	page(1)->install_write_handler(0x7ff2, 0x7ff2, 0, 0x0008, 0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
-	page(1)->install_write_handler(0x7ff3, 0x7ff3, 0, 0x0008, 0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
-	page(1)->install_write_handler(0x7ff4, 0x7ff4, 0, 0x0008, 0, write8smo_delegate(*this, FUNC(msx_slot_disk6_wd2793_n_device::side_motor_w)));
-	page(1)->install_write_handler(0x7ff5, 0x7ff5, 0, 0x0008, 0, write8smo_delegate(*this, FUNC(msx_slot_disk6_wd2793_n_device::select_w)));
-	page(1)->install_write_handler(0x7ff6, 0x7ff6, 0, 0x0008, 0, write8smo_delegate(*this, FUNC(msx_slot_disk6_wd2793_n_device::unknown_w)));
+	page(1)->install_read_handler(0x7ff0, 0x7ff0, 0, 0x0008, 0, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+	page(1)->install_read_handler(0x7ff1, 0x7ff1, 0, 0x0008, 0, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+	page(1)->install_read_handler(0x7ff2, 0x7ff2, 0, 0x0008, 0, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+	page(1)->install_read_handler(0x7ff3, 0x7ff3, 0, 0x0008, 0, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+	page(1)->install_read_handler(0x7ff4, 0x7ff4, 0, 0x0008, 0, emu::rw_delegate(*this, FUNC(msx_slot_disk6_wd2793_n_device::side_motor_r)));
+	page(1)->install_read_handler(0x7ff5, 0x7ff5, 0, 0x0008, 0, emu::rw_delegate(*this, FUNC(msx_slot_disk6_wd2793_n_device::select0_r)));
+	page(1)->install_read_handler(0x7ff6, 0x7ff6, 0, 0x0008, 0, emu::rw_delegate(*this, FUNC(msx_slot_disk6_wd2793_n_device::dskchg_r)));
+	page(1)->install_read_handler(0x7ff7, 0x7ff7, 0, 0x0008, 0, emu::rw_delegate(*this, FUNC(msx_slot_disk6_wd2793_n_device::status_r)));
+	page(1)->install_write_handler(0x7ff0, 0x7ff0, 0, 0x0008, 0, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+	page(1)->install_write_handler(0x7ff1, 0x7ff1, 0, 0x0008, 0, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+	page(1)->install_write_handler(0x7ff2, 0x7ff2, 0, 0x0008, 0, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+	page(1)->install_write_handler(0x7ff3, 0x7ff3, 0, 0x0008, 0, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+	page(1)->install_write_handler(0x7ff4, 0x7ff4, 0, 0x0008, 0, emu::rw_delegate(*this, FUNC(msx_slot_disk6_wd2793_n_device::side_motor_w)));
+	page(1)->install_write_handler(0x7ff5, 0x7ff5, 0, 0x0008, 0, emu::rw_delegate(*this, FUNC(msx_slot_disk6_wd2793_n_device::select_w)));
+	page(1)->install_write_handler(0x7ff6, 0x7ff6, 0, 0x0008, 0, emu::rw_delegate(*this, FUNC(msx_slot_disk6_wd2793_n_device::unknown_w)));
 }
 
 void msx_slot_disk6_wd2793_n_device::device_reset()
@@ -877,27 +874,27 @@ void msx_slot_disk7_mb8877_device::device_start()
 	save_item(NAME(m_drive_side_motor));
 
 	page(1)->install_rom(0x4000, 0x7fff, rom_base());
-	page(1)->install_read_handler(0x7ff8, 0x7ff8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
-	page(1)->install_read_handler(0x7ff9, 0x7ff9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
-	page(1)->install_read_handler(0x7ffa, 0x7ffa, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
-	page(1)->install_read_handler(0x7ffb, 0x7ffb, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
-	page(1)->install_read_handler(0x7ffc, 0x7ffc, read8smo_delegate(*this, FUNC(msx_slot_disk7_mb8877_device::status_r)));
-	page(1)->install_write_handler(0x7ff8, 0x7ff8, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
-	page(1)->install_write_handler(0x7ff9, 0x7ff9, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
-	page(1)->install_write_handler(0x7ffa, 0x7ffa, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
-	page(1)->install_write_handler(0x7ffb, 0x7ffb, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
-	page(1)->install_write_handler(0x7ffc, 0x7ffc, write8smo_delegate(*this, FUNC(msx_slot_disk7_mb8877_device::side_motor_w)));
+	page(1)->install_read_handler(0x7ff8, 0x7ff8, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+	page(1)->install_read_handler(0x7ff9, 0x7ff9, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+	page(1)->install_read_handler(0x7ffa, 0x7ffa, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+	page(1)->install_read_handler(0x7ffb, 0x7ffb, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+	page(1)->install_read_handler(0x7ffc, 0x7ffc, emu::rw_delegate(*this, FUNC(msx_slot_disk7_mb8877_device::status_r)));
+	page(1)->install_write_handler(0x7ff8, 0x7ff8, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+	page(1)->install_write_handler(0x7ff9, 0x7ff9, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+	page(1)->install_write_handler(0x7ffa, 0x7ffa, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+	page(1)->install_write_handler(0x7ffb, 0x7ffb, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+	page(1)->install_write_handler(0x7ffc, 0x7ffc, emu::rw_delegate(*this, FUNC(msx_slot_disk7_mb8877_device::side_motor_w)));
 
-	page(2)->install_read_handler(0xbff8, 0xbff8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
-	page(2)->install_read_handler(0xbff9, 0xbff9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
-	page(2)->install_read_handler(0xbffa, 0xbffa, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
-	page(2)->install_read_handler(0xbffb, 0xbffb, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
-	page(2)->install_read_handler(0xbffc, 0xbffc, read8smo_delegate(*this, FUNC(msx_slot_disk7_mb8877_device::status_r)));
-	page(2)->install_write_handler(0xbff8, 0xbff8, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
-	page(2)->install_write_handler(0xbff9, 0xbff9, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
-	page(2)->install_write_handler(0xbffa, 0xbffa, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
-	page(2)->install_write_handler(0xbffb, 0xbffb, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
-	page(2)->install_write_handler(0xbffc, 0xbffc, write8smo_delegate(*this, FUNC(msx_slot_disk7_mb8877_device::side_motor_w)));
+	page(2)->install_read_handler(0xbff8, 0xbff8, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+	page(2)->install_read_handler(0xbff9, 0xbff9, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+	page(2)->install_read_handler(0xbffa, 0xbffa, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+	page(2)->install_read_handler(0xbffb, 0xbffb, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+	page(2)->install_read_handler(0xbffc, 0xbffc, emu::rw_delegate(*this, FUNC(msx_slot_disk7_mb8877_device::status_r)));
+	page(2)->install_write_handler(0xbff8, 0xbff8, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+	page(2)->install_write_handler(0xbff9, 0xbff9, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+	page(2)->install_write_handler(0xbffa, 0xbffa, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+	page(2)->install_write_handler(0xbffb, 0xbffb, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+	page(2)->install_write_handler(0xbffc, 0xbffc, emu::rw_delegate(*this, FUNC(msx_slot_disk7_mb8877_device::side_motor_w)));
 }
 
 void msx_slot_disk7_mb8877_device::device_reset()
@@ -992,27 +989,27 @@ void msx_slot_disk8_mb8877_device::device_start()
 	save_item(NAME(m_control));
 
 	page(1)->install_rom(0x4000, 0x7fff, rom_base());
-	page(1)->install_read_handler(0x7f80, 0x7f80, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
-	page(1)->install_read_handler(0x7f81, 0x7f81, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
-	page(1)->install_read_handler(0x7f82, 0x7f82, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
-	page(1)->install_read_handler(0x7f83, 0x7f83, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
-	page(1)->install_read_handler(0x7f84, 0x7f84, read8smo_delegate(*this, FUNC(msx_slot_disk8_mb8877_device::status_r)));
-	page(1)->install_write_handler(0x7f80, 0x7f80, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
-	page(1)->install_write_handler(0x7f81, 0x7f81, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
-	page(1)->install_write_handler(0x7f82, 0x7f82, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
-	page(1)->install_write_handler(0x7f83, 0x7f83, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
-	page(1)->install_write_handler(0x7f84, 0x7f84, write8smo_delegate(*this, FUNC(msx_slot_disk8_mb8877_device::set_control)));
+	page(1)->install_read_handler(0x7f80, 0x7f80, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+	page(1)->install_read_handler(0x7f81, 0x7f81, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+	page(1)->install_read_handler(0x7f82, 0x7f82, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+	page(1)->install_read_handler(0x7f83, 0x7f83, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+	page(1)->install_read_handler(0x7f84, 0x7f84, emu::rw_delegate(*this, FUNC(msx_slot_disk8_mb8877_device::status_r)));
+	page(1)->install_write_handler(0x7f80, 0x7f80, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+	page(1)->install_write_handler(0x7f81, 0x7f81, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+	page(1)->install_write_handler(0x7f82, 0x7f82, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+	page(1)->install_write_handler(0x7f83, 0x7f83, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+	page(1)->install_write_handler(0x7f84, 0x7f84, emu::rw_delegate(*this, FUNC(msx_slot_disk8_mb8877_device::set_control)));
 
-	page(2)->install_read_handler(0xbf80, 0xbf80, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
-	page(2)->install_read_handler(0xbf81, 0xbf81, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
-	page(2)->install_read_handler(0xbf82, 0xbf82, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
-	page(2)->install_read_handler(0xbf83, 0xbf83, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
-	page(2)->install_read_handler(0xbf84, 0xbf84, read8smo_delegate(*this, FUNC(msx_slot_disk8_mb8877_device::status_r)));
-	page(2)->install_write_handler(0xbf80, 0xbf80, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
-	page(2)->install_write_handler(0xbf81, 0xbf81, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
-	page(2)->install_write_handler(0xbf82, 0xbf82, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
-	page(2)->install_write_handler(0xbf83, 0xbf83, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
-	page(2)->install_write_handler(0xbf84, 0xbf84, write8smo_delegate(*this, FUNC(msx_slot_disk8_mb8877_device::set_control)));
+	page(2)->install_read_handler(0xbf80, 0xbf80, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+	page(2)->install_read_handler(0xbf81, 0xbf81, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+	page(2)->install_read_handler(0xbf82, 0xbf82, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+	page(2)->install_read_handler(0xbf83, 0xbf83, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+	page(2)->install_read_handler(0xbf84, 0xbf84, emu::rw_delegate(*this, FUNC(msx_slot_disk8_mb8877_device::status_r)));
+	page(2)->install_write_handler(0xbf80, 0xbf80, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+	page(2)->install_write_handler(0xbf81, 0xbf81, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+	page(2)->install_write_handler(0xbf82, 0xbf82, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+	page(2)->install_write_handler(0xbf83, 0xbf83, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+	page(2)->install_write_handler(0xbf84, 0xbf84, emu::rw_delegate(*this, FUNC(msx_slot_disk8_mb8877_device::set_control)));
 }
 
 
@@ -1100,16 +1097,16 @@ void msx_slot_disk9_wd2793_n_device::device_start()
 	save_item(NAME(m_control));
 
 	page(1)->install_rom(0x4000, 0x7fff, rom_base());
-	page(1)->install_read_handler(0x7ff8, 0x7ff8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
-	page(1)->install_read_handler(0x7ff9, 0x7ff9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
-	page(1)->install_read_handler(0x7ffa, 0x7ffa, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
-	page(1)->install_read_handler(0x7ffb, 0x7ffb, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
-	page(1)->install_read_handler(0x7ffc, 0x7ffc, read8smo_delegate(*this, FUNC(msx_slot_disk9_wd2793_n_device::status_r)));
-	page(1)->install_write_handler(0x7ff8, 0x7ff8, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
-	page(1)->install_write_handler(0x7ff9, 0x7ff9, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
-	page(1)->install_write_handler(0x7ffa, 0x7ffa, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
-	page(1)->install_write_handler(0x7ffb, 0x7ffb, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
-	page(1)->install_write_handler(0x7ffc, 0x7ffc, write8smo_delegate(*this, FUNC(msx_slot_disk9_wd2793_n_device::control_w)));
+	page(1)->install_read_handler(0x7ff8, 0x7ff8, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+	page(1)->install_read_handler(0x7ff9, 0x7ff9, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+	page(1)->install_read_handler(0x7ffa, 0x7ffa, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+	page(1)->install_read_handler(0x7ffb, 0x7ffb, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+	page(1)->install_read_handler(0x7ffc, 0x7ffc, emu::rw_delegate(*this, FUNC(msx_slot_disk9_wd2793_n_device::status_r)));
+	page(1)->install_write_handler(0x7ff8, 0x7ff8, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+	page(1)->install_write_handler(0x7ff9, 0x7ff9, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+	page(1)->install_write_handler(0x7ffa, 0x7ffa, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+	page(1)->install_write_handler(0x7ffb, 0x7ffb, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+	page(1)->install_write_handler(0x7ffc, 0x7ffc, emu::rw_delegate(*this, FUNC(msx_slot_disk9_wd2793_n_device::control_w)));
 }
 
 void msx_slot_disk9_wd2793_n_device::device_reset()
@@ -1188,17 +1185,17 @@ void msx_slot_disk10_mb8877_device::device_start()
 	save_item(NAME(m_control));
 
 	page(1)->install_rom(0x4000, 0x7fff, rom_base());
-	page(1)->install_read_handler(0x7ff8, 0x7ff8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
-	page(1)->install_read_handler(0x7ff9, 0x7ff9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
-	page(1)->install_read_handler(0x7ffa, 0x7ffa, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
-	page(1)->install_read_handler(0x7ffb, 0x7ffb, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
-	page(1)->install_read_handler(0x7ffc, 0x7ffc, read8smo_delegate(*this, FUNC(msx_slot_disk10_mb8877_device::status_r)));
+	page(1)->install_read_handler(0x7ff8, 0x7ff8, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+	page(1)->install_read_handler(0x7ff9, 0x7ff9, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+	page(1)->install_read_handler(0x7ffa, 0x7ffa, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+	page(1)->install_read_handler(0x7ffb, 0x7ffb, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+	page(1)->install_read_handler(0x7ffc, 0x7ffc, emu::rw_delegate(*this, FUNC(msx_slot_disk10_mb8877_device::status_r)));
 	// TODO 0x7ffd return system control/status
-	page(1)->install_write_handler(0x7ff8, 0x7ff8, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
-	page(1)->install_write_handler(0x7ff9, 0x7ff9, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
-	page(1)->install_write_handler(0x7ffa, 0x7ffa, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
-	page(1)->install_write_handler(0x7ffb, 0x7ffb, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
-	page(1)->install_write_handler(0x7ffc, 0x7ffc, write8smo_delegate(*this, FUNC(msx_slot_disk10_mb8877_device::control_w)));
+	page(1)->install_write_handler(0x7ff8, 0x7ff8, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+	page(1)->install_write_handler(0x7ff9, 0x7ff9, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+	page(1)->install_write_handler(0x7ffa, 0x7ffa, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+	page(1)->install_write_handler(0x7ffb, 0x7ffb, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+	page(1)->install_write_handler(0x7ffc, 0x7ffc, emu::rw_delegate(*this, FUNC(msx_slot_disk10_mb8877_device::control_w)));
 }
 
 void msx_slot_disk10_mb8877_device::device_reset()
@@ -1285,33 +1282,33 @@ void msx_slot_disk11_wd2793_device::device_start()
 	save_item(NAME(m_control));
 
 	page(1)->install_rom(0x4000, 0x7fff, rom_base());
-	page(1)->install_read_handler(0x7ff8, 0x7ff8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
-	page(1)->install_read_handler(0x7ff9, 0x7ff9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
-	page(1)->install_read_handler(0x7ffa, 0x7ffa, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
-	page(1)->install_read_handler(0x7ffb, 0x7ffb, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
-	page(1)->install_read_handler(0x7ffc, 0x7ffc, read8smo_delegate(*this, FUNC(msx_slot_disk11_wd2793_device::side_control_r)));
-	page(1)->install_read_handler(0x7ffd, 0x7ffd, read8smo_delegate(*this, FUNC(msx_slot_disk11_wd2793_device::control_r)));
-	page(1)->install_read_handler(0x7fff, 0x7fff, read8smo_delegate(*this, FUNC(msx_slot_disk11_wd2793_device::status_r)));
-	page(1)->install_write_handler(0x7ff8, 0x7ff8, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
-	page(1)->install_write_handler(0x7ff9, 0x7ff9, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
-	page(1)->install_write_handler(0x7ffa, 0x7ffa, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
-	page(1)->install_write_handler(0x7ffb, 0x7ffb, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
-	page(1)->install_write_handler(0x7ffc, 0x7ffc, write8smo_delegate(*this, FUNC(msx_slot_disk11_wd2793_device::side_control_w)));
-	page(1)->install_write_handler(0x7ffd, 0x7ffd, write8smo_delegate(*this, FUNC(msx_slot_disk11_wd2793_device::control_w)));
+	page(1)->install_read_handler(0x7ff8, 0x7ff8, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+	page(1)->install_read_handler(0x7ff9, 0x7ff9, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+	page(1)->install_read_handler(0x7ffa, 0x7ffa, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+	page(1)->install_read_handler(0x7ffb, 0x7ffb, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+	page(1)->install_read_handler(0x7ffc, 0x7ffc, emu::rw_delegate(*this, FUNC(msx_slot_disk11_wd2793_device::side_control_r)));
+	page(1)->install_read_handler(0x7ffd, 0x7ffd, emu::rw_delegate(*this, FUNC(msx_slot_disk11_wd2793_device::control_r)));
+	page(1)->install_read_handler(0x7fff, 0x7fff, emu::rw_delegate(*this, FUNC(msx_slot_disk11_wd2793_device::status_r)));
+	page(1)->install_write_handler(0x7ff8, 0x7ff8, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+	page(1)->install_write_handler(0x7ff9, 0x7ff9, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+	page(1)->install_write_handler(0x7ffa, 0x7ffa, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+	page(1)->install_write_handler(0x7ffb, 0x7ffb, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+	page(1)->install_write_handler(0x7ffc, 0x7ffc, emu::rw_delegate(*this, FUNC(msx_slot_disk11_wd2793_device::side_control_w)));
+	page(1)->install_write_handler(0x7ffd, 0x7ffd, emu::rw_delegate(*this, FUNC(msx_slot_disk11_wd2793_device::control_w)));
 
-	page(2)->install_read_handler(0xbff8, 0xbff8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
-	page(2)->install_read_handler(0xbff9, 0xbff9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
-	page(2)->install_read_handler(0xbffa, 0xbffa, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
-	page(2)->install_read_handler(0xbffb, 0xbffb, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
-	page(2)->install_read_handler(0xbffc, 0xbffc, read8smo_delegate(*this, FUNC(msx_slot_disk11_wd2793_device::side_control_r)));
-	page(2)->install_read_handler(0xbffd, 0xbffd, read8smo_delegate(*this, FUNC(msx_slot_disk11_wd2793_device::control_r)));
-	page(2)->install_read_handler(0xbfff, 0xbfff, read8smo_delegate(*this, FUNC(msx_slot_disk11_wd2793_device::status_r)));
-	page(2)->install_write_handler(0xbff8, 0xbff8, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
-	page(2)->install_write_handler(0xbff9, 0xbff9, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
-	page(2)->install_write_handler(0xbffa, 0xbffa, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
-	page(2)->install_write_handler(0xbffb, 0xbffb, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
-	page(2)->install_write_handler(0xbffc, 0xbffc, write8smo_delegate(*this, FUNC(msx_slot_disk11_wd2793_device::side_control_w)));
-	page(2)->install_write_handler(0xbffd, 0xbffd, write8smo_delegate(*this, FUNC(msx_slot_disk11_wd2793_device::control_w)));
+	page(2)->install_read_handler(0xbff8, 0xbff8, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+	page(2)->install_read_handler(0xbff9, 0xbff9, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+	page(2)->install_read_handler(0xbffa, 0xbffa, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+	page(2)->install_read_handler(0xbffb, 0xbffb, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+	page(2)->install_read_handler(0xbffc, 0xbffc, emu::rw_delegate(*this, FUNC(msx_slot_disk11_wd2793_device::side_control_r)));
+	page(2)->install_read_handler(0xbffd, 0xbffd, emu::rw_delegate(*this, FUNC(msx_slot_disk11_wd2793_device::control_r)));
+	page(2)->install_read_handler(0xbfff, 0xbfff, emu::rw_delegate(*this, FUNC(msx_slot_disk11_wd2793_device::status_r)));
+	page(2)->install_write_handler(0xbff8, 0xbff8, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+	page(2)->install_write_handler(0xbff9, 0xbff9, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+	page(2)->install_write_handler(0xbffa, 0xbffa, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+	page(2)->install_write_handler(0xbffb, 0xbffb, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+	page(2)->install_write_handler(0xbffc, 0xbffc, emu::rw_delegate(*this, FUNC(msx_slot_disk11_wd2793_device::side_control_w)));
+	page(2)->install_write_handler(0xbffd, 0xbffd, emu::rw_delegate(*this, FUNC(msx_slot_disk11_wd2793_device::control_w)));
 }
 
 void msx_slot_disk11_wd2793_device::device_reset()

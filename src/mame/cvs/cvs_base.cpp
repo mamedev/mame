@@ -21,7 +21,7 @@ void cvs_base_state::machine_reset()
 	m_stars_scroll = 0;
 }
 
-WRITE_LINE_MEMBER(cvs_base_state::write_s2650_flag) // TODO: remove once set_memview is available via devcb
+void cvs_base_state::write_s2650_flag(int state) // TODO: remove once set_memview is available via devcb
 {
 	m_ram_view.select(state);
 }

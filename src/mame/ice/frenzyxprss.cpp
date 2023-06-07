@@ -96,7 +96,7 @@ ROM_START( frenzyxprss )
 	ROMX_LOAD( "a6309vms_2001-07-11.700.u24", 0x00000, 0x40000, CRC(72081fd3) SHA1(99556f6d7b638f229c466245eed82eb47a2c2304), ROM_BIOS(6) )
 	ROM_DEFAULT_BIOS("73x") // The one dumped from the actual machine
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE( "fexpress_cf_version_2.1", 0, SHA1(583607be83048ca10b1837a8982ba379256a3cf2) )
 ROM_END
 

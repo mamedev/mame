@@ -229,7 +229,7 @@ void vt100_video_device::recompute_parameters()
 		LOG("(RECOMPUTE) * LINEDOUBLER *\n");
 }
 
-READ_LINE_MEMBER(vt100_video_device::lba7_r)
+int vt100_video_device::lba7_r()
 {
 	return m_lba7;
 }

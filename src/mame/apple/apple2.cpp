@@ -142,13 +142,13 @@ public:
 	void c800_w(offs_t offset, u8 data);
 	u8 inh_r(offs_t offset);
 	void inh_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_inh_w);
-	DECLARE_READ_LINE_MEMBER(ay3600_shift_r);
-	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
-	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
-	DECLARE_WRITE_LINE_MEMBER(ay3600_ako_w);
+	void a2bus_irq_w(int state);
+	void a2bus_nmi_w(int state);
+	void a2bus_inh_w(int state);
+	int ay3600_shift_r();
+	int ay3600_control_r();
+	void ay3600_data_ready_w(int state);
+	void ay3600_ako_w(int state);
 
 	void apple2_common(machine_config &config);
 	void apple2jp(machine_config &config);
@@ -177,6 +177,8 @@ private:
 
 	int m_inh_bank;
 
+	bool m_reset_latch;
+
 	double m_x_calibration, m_y_calibration;
 
 	device_a2bus_card_interface *m_slotdevice[8];
@@ -199,18 +201,18 @@ offs_t apple2_state::dasm_trampoline(std::ostream &stream, offs_t pc, const util
 	return m_a2common->dasm_override(stream, pc, opcodes, params);
 }
 
-WRITE_LINE_MEMBER(apple2_state::a2bus_irq_w)
+void apple2_state::a2bus_irq_w(int state)
 {
 	m_maincpu->set_input_line(M6502_IRQ_LINE, state);
 }
 
-WRITE_LINE_MEMBER(apple2_state::a2bus_nmi_w)
+void apple2_state::a2bus_nmi_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
 // This code makes a ton of assumptions because we can guarantee a pre-IIe machine!
-WRITE_LINE_MEMBER(apple2_state::a2bus_inh_w)
+void apple2_state::a2bus_inh_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -292,6 +294,7 @@ void apple2_state::machine_start()
 	}
 
 	m_joystick_x1_time = m_joystick_x2_time = m_joystick_y1_time = m_joystick_y2_time = 0;
+	m_reset_latch = false;
 
 	// setup save states
 	save_item(NAME(m_speaker_state));
@@ -307,6 +310,7 @@ void apple2_state::machine_start()
 	save_item(NAME(m_inh_bank));
 	save_item(NAME(m_cnxx_slot));
 	save_item(NAME(m_anykeydown));
+	save_item(NAME(m_reset_latch));
 
 	// setup video pointers
 	m_video->set_ram_pointers(m_ram_ptr, m_ram_ptr);
@@ -337,14 +341,38 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2_state::apple2_interrupt)
 			{       // CTRL-RESET
 				if ((m_kbspecial->read() & 0x88) == 0x88)
 				{
-					m_maincpu->reset();
+					if (!m_reset_latch)
+					{
+						m_reset_latch = true;
+						m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+					}
+				}
+				else
+				{
+					if (m_reset_latch)
+					{
+						m_reset_latch = false;
+						m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+					}
 				}
 			}
 			else    // plain RESET
 			{
 				if (m_kbspecial->read() & 0x80)
 				{
-					m_maincpu->reset();
+					if (!m_reset_latch)
+					{
+						m_reset_latch = true;
+						m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+					}
+				}
+				else
+				{
+					if (m_reset_latch)
+					{
+						m_reset_latch = false;
+						m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+					}
 				}
 			}
 		}
@@ -806,7 +834,7 @@ void apple2_state::apple2_map(address_map &map)
     KEYBOARD
 ***************************************************************************/
 
-READ_LINE_MEMBER(apple2_state::ay3600_shift_r)
+int apple2_state::ay3600_shift_r()
 {
 	// either shift key
 	if (m_kbspecial->read() & 0x06)
@@ -817,7 +845,7 @@ READ_LINE_MEMBER(apple2_state::ay3600_shift_r)
 	return CLEAR_LINE;
 }
 
-READ_LINE_MEMBER(apple2_state::ay3600_control_r)
+int apple2_state::ay3600_control_r()
 {
 	if (m_kbspecial->read() & 0x08)
 	{
@@ -882,7 +910,7 @@ static const u8 a2_key_remap[0x32][4] =
 	{ 0x0d,0x0d,0x0d,0x0d },    /* Enter   31     */
 };
 
-WRITE_LINE_MEMBER(apple2_state::ay3600_data_ready_w)
+void apple2_state::ay3600_data_ready_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -907,7 +935,7 @@ WRITE_LINE_MEMBER(apple2_state::ay3600_data_ready_w)
 	}
 }
 
-WRITE_LINE_MEMBER(apple2_state::ay3600_ako_w)
+void apple2_state::ay3600_ako_w(int state)
 {
 	m_anykeydown = (state == ASSERT_LINE) ? true : false;
 }

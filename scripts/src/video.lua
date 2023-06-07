@@ -57,6 +57,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/atirage.h,VIDEOS["ATIRAGE"] = true
+--------------------------------------------------
+
+if (VIDEOS["ATIRAGE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/atirage.cpp",
+		MAME_DIR .. "src/devices/video/atirage.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/bufsprite.h,VIDEOS["BUFSPRITE"] = true
 --------------------------------------------------
 
@@ -266,6 +278,18 @@ if (VIDEOS["FIXFREQ"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/fixfreq.cpp",
 		MAME_DIR .. "src/devices/video/fixfreq.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/riva128.h,VIDEOS["RIVA128"] = true
+--------------------------------------------------
+
+if (VIDEOS["RIVA128"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/riva128.cpp",
+		MAME_DIR .. "src/devices/video/riva128.h",
 	}
 end
 
@@ -806,10 +830,126 @@ if (VIDEOS["PC_VGA"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/pc_vga.cpp",
 		MAME_DIR .. "src/devices/video/pc_vga.h",
-		MAME_DIR .. "src/devices/bus/isa/trident.cpp",
-		MAME_DIR .. "src/devices/bus/isa/trident.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/pc_vga_ati.h,VIDEOS["PC_VGA_ATI"] = true
+--------------------------------------------------
+
+if (VIDEOS["PC_VGA_ATI"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pc_vga_ati.cpp",
+		MAME_DIR .. "src/devices/video/pc_vga_ati.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/ibm8514a.h,VIDEOS["IBM8514A"] = true
+--------------------------------------------------
+
+if (VIDEOS["IBM8514A"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/ibm8514a.cpp",
+		MAME_DIR .. "src/devices/video/ibm8514a.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/ati_mach8.h,VIDEOS["ATI_MACH8"] = true
+--------------------------------------------------
+
+if (VIDEOS["ATI_MACH8"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/ati_mach8.cpp",
+		MAME_DIR .. "src/devices/video/ati_mach8.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/ati_mach8.h,VIDEOS["ATI_MACH32"] = true
+--------------------------------------------------
+
+if (VIDEOS["ATI_MACH32"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/ati_mach32.cpp",
+		MAME_DIR .. "src/devices/video/ati_mach32.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/clgd542x.h,VIDEOS["PC_VGA_CIRRUS"] = true
+--------------------------------------------------
+
+if (VIDEOS["PC_VGA_CIRRUS"]~=null) then
+	files {
 		MAME_DIR .. "src/devices/video/clgd542x.cpp",
 		MAME_DIR .. "src/devices/video/clgd542x.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/pc_vga_nvidia.h,VIDEOS["PC_VGA_NVIDIA"] = true
+--------------------------------------------------
+
+if (VIDEOS["PC_VGA_NVIDIA"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pc_vga_nvidia.cpp",
+		MAME_DIR .. "src/devices/video/pc_vga_nvidia.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/pc_vga_s3.h,VIDEOS["PC_VGA_S3"] = true
+--------------------------------------------------
+
+if (VIDEOS["PC_VGA_S3"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pc_vga_s3.cpp",
+		MAME_DIR .. "src/devices/video/pc_vga_s3.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/pc_vga_trident.h,VIDEOS["PC_VGA_TRIDENT"] = true
+--------------------------------------------------
+
+if (VIDEOS["PC_VGA_TRIDENT"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pc_vga_trident.cpp",
+		MAME_DIR .. "src/devices/video/pc_vga_trident.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/pc_vga_tseng.h,VIDEOS["PC_VGA_TSENG"] = true
+--------------------------------------------------
+
+if (VIDEOS["PC_VGA_TSENG"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pc_vga_tseng.cpp",
+		MAME_DIR .. "src/devices/video/pc_vga_tseng.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/pc_xga.h,VIDEOS["PC_XGA"] = true
+--------------------------------------------------
+
+if (VIDEOS["PC_XGA"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pc_xga.cpp",
+		MAME_DIR .. "src/devices/video/pc_xga.h",
 	}
 end
 
@@ -1478,5 +1618,17 @@ if (VIDEOS["X1_001"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/x1_001.cpp",
 		MAME_DIR .. "src/devices/video/x1_001.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/zr36110.h,VIDEOS["ZR36110"] = true
+--------------------------------------------------
+
+if (VIDEOS["ZR36110"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/zr36110.cpp",
+		MAME_DIR .. "src/devices/video/zr36110.h",
 	}
 end

@@ -55,7 +55,7 @@ private:
 	void key_row_w(u8 data);
 	void port48_w(u8 data);
 	void picu_w(u8 data);
-	template<int N> DECLARE_WRITE_LINE_MEMBER(picu_r_w);
+	template<int N> void picu_r_w(int state);
 	IRQ_CALLBACK_MEMBER(irq_ack);
 	void ppi_porta_w(u8 data);
 
@@ -200,7 +200,7 @@ void v100_state::picu_w(u8 data)
 }
 
 template<int N>
-WRITE_LINE_MEMBER(v100_state::picu_r_w)
+void v100_state::picu_r_w(int state)
 {
 	m_picu->r_w(N, state);
 }

@@ -63,8 +63,8 @@ private:
 	void tc0091lvc_l_prg_map(address_map &map);
 	void tc0091lvc_r_prg_map(address_map &map);
 
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_l) { if (state) { m_tc0091lvc_l->screen_eof(); } }
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_r) { if (state) { m_tc0091lvc_l->screen_eof(); } }
+	void screen_vblank_l(int state) { if (state) { m_tc0091lvc_l->screen_eof(); } }
+	void screen_vblank_r(int state) { if (state) { m_tc0091lvc_l->screen_eof(); } }
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_scanline_l);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_scanline_r);

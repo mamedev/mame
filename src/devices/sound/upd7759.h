@@ -20,9 +20,9 @@ class upd775x_device : public device_t,
 public:
 	enum : u32 { STANDARD_CLOCK = 640'000 };
 
-	DECLARE_WRITE_LINE_MEMBER( reset_w );
-	DECLARE_WRITE_LINE_MEMBER( start_w );
-	DECLARE_READ_LINE_MEMBER( busy_r );
+	void reset_w(int state);
+	void start_w(int state);
+	int busy_r();
 	virtual void port_w(u8 data);
 	void set_start_delay(uint32_t data) { m_start_delay = data; }
 
@@ -129,7 +129,7 @@ public:
 
 	upd7759_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = STANDARD_CLOCK);
 
-	DECLARE_WRITE_LINE_MEMBER( md_w );
+	void md_w(int state);
 
 protected:
 	upd7759_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

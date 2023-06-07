@@ -198,17 +198,17 @@ void ekara_rom_i2c_24lc02_gc0010_device::write_extra(offs_t offset, uint8_t data
 }
 
 
-WRITE_LINE_MEMBER(ekara_rom_i2c_24lc02_gc0010_device::write_sda)
+void ekara_rom_i2c_24lc02_gc0010_device::write_sda(int state)
 {
 	m_i2cmem->write_sda(state);
 }
 
-WRITE_LINE_MEMBER(ekara_rom_i2c_24lc02_gc0010_device::write_scl)
+void ekara_rom_i2c_24lc02_gc0010_device::write_scl(int state)
 {
 	m_i2cmem->write_scl(state);
 }
 
-READ_LINE_MEMBER(ekara_rom_i2c_24lc02_gc0010_device::read_sda )
+int ekara_rom_i2c_24lc02_gc0010_device::read_sda()
 {
 	return m_i2cmem->read_sda();
 }

@@ -995,7 +995,7 @@ uint32_t homedata_state::screen_update_mirderby(screen_device &screen, bitmap_in
 }
 
 
-WRITE_LINE_MEMBER(homedata_state::screen_vblank)
+void homedata_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)

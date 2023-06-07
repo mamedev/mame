@@ -61,11 +61,13 @@
 #include "machine/clock.h"
 #include "speaker.h"
 
+#define LOG_CEM_WRITES (1U << 1)
 
-#define LOG_CEM_WRITES      0
+#define VERBOSE (0)
+#include "logmacro.h"
+
 
 DEFINE_DEVICE_TYPE(SENTE6VB, sente6vb_device, "sente6vb", "Bally Sente 6VB Audio Board")
-
 
 
 /*************************************
@@ -221,13 +223,13 @@ void sente6vb_device::device_reset()
  *
  *************************************/
 
-WRITE_LINE_MEMBER(sente6vb_device::rec_w)
+void sente6vb_device::rec_w(int state)
 {
 	m_uart->write_rxd(state);
 }
 
 
-WRITE_LINE_MEMBER(sente6vb_device::uart_clock_w)
+void sente6vb_device::uart_clock_w(int state)
 {
 	if (state && BIT(m_counter_control, 5))
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, m_uint ? ASSERT_LINE : CLEAR_LINE);
@@ -243,7 +245,7 @@ WRITE_LINE_MEMBER(sente6vb_device::uart_clock_w)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(sente6vb_device::counter_0_set_out)
+void sente6vb_device::counter_0_set_out(int state)
 {
 	// OUT on counter 0 is hooked to the GATE line on counter 1 through an inverter
 	m_pit->write_gate1(!state);
@@ -253,7 +255,7 @@ WRITE_LINE_MEMBER(sente6vb_device::counter_0_set_out)
 }
 
 
-WRITE_LINE_MEMBER(sente6vb_device::set_counter_0_ff)
+void sente6vb_device::set_counter_0_ff(int state)
 {
 	// the flip/flop output is inverted, so if we went high to low, that's a clock
 	m_pit->write_clk0(!state);
@@ -404,19 +406,13 @@ void sente6vb_device::chip_select_w(uint8_t data)
 	for (i = 0; i < 6; i++)
 		if ((diffchip & (1 << i)) && (data & (1 << i)))
 		{
-#if LOG_CEM_WRITES
-			double temp = 0;
-
 			// remember the previous value
-			temp =
-#endif
-				m_cem_device[i]->get_parameter(reg);
+			double temp = m_cem_device[i]->get_parameter(reg);
 
 			// set the voltage
 			m_cem_device[i]->set_voltage(reg, voltage);
 
 			// only log changes
-#if LOG_CEM_WRITES
 			if (temp != m_cem_device[i]->get_parameter(reg))
 			{
 				static const char *const names[] =
@@ -430,9 +426,8 @@ void sente6vb_device::chip_select_w(uint8_t data)
 					"PULSE_WIDTH",
 					"WAVE_SELECT"
 				};
-				logerror("s%04X:   CEM#%d:%s=%f\n", m_audiocpu->pcbase(), i, names[m_dac_register], voltage);
+				LOGMASKED(LOG_CEM_WRITES, "s%04X:   CEM#%d:%s=%f\n", m_audiocpu->pcbase(), i, names[m_dac_register], voltage);
 			}
-#endif
 		}
 
 	// if a timer for counter 0 is running, recompute

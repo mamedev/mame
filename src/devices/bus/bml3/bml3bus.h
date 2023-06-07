@@ -75,16 +75,18 @@ public:
 	bml3bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration
-	template <class Object> void set_space(Object &&tag, int spacenum) { m_space.set_tag(std::forward<Object>(tag), spacenum); }
 	auto nmi_callback() { return m_out_nmi_cb.bind(); }
 	auto irq_callback() { return m_out_irq_cb.bind(); }
 	auto firq_callback() { return m_out_firq_cb.bind(); }
 
 	device_bml3bus_card_interface *get_bml3bus_card(int slot);
 
-	DECLARE_WRITE_LINE_MEMBER( nmi_w );
-	DECLARE_WRITE_LINE_MEMBER( irq_w );
-	DECLARE_WRITE_LINE_MEMBER( firq_w );
+	void map_exrom(address_space_installer &space);
+	void map_io(address_space_installer &space);
+
+	void nmi_w(int state);
+	void irq_w(int state);
+	void firq_w(int state);
 
 protected:
 	bml3bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -95,15 +97,11 @@ protected:
 
 	void add_bml3bus_card(int slot, device_bml3bus_card_interface &card);
 
-	address_space &space() const { return *m_space; }
-
 	void set_nmi_line(int state);
 	void set_irq_line(int state);
 	void set_firq_line(int state);
 
-	// internal state
-	required_address_space m_space;
-
+	// line callbacks
 	devcb_write_line    m_out_nmi_cb;
 	devcb_write_line    m_out_irq_cb;
 	devcb_write_line    m_out_firq_cb;
@@ -131,7 +129,8 @@ public:
 protected:
 	virtual void interface_pre_start() override;
 
-	address_space &space() { return m_bml3bus->space(); }
+	virtual void map_exrom(address_space_installer &space) { }
+	virtual void map_io(address_space_installer &space) { }
 
 	void raise_slot_nmi()  { m_bml3bus->set_nmi_line(ASSERT_LINE); }
 	void lower_slot_nmi()  { m_bml3bus->set_nmi_line(CLEAR_LINE); }

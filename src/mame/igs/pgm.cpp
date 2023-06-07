@@ -205,7 +205,7 @@ Notes:
 #include "screen.h"
 #include "speaker.h"
 
-#define LOG_Z80     (1U <<  1)
+#define LOG_Z80     (1U << 1)
 
 #define LOG_ALL     (LOG_Z80)
 

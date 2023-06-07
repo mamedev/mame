@@ -72,13 +72,13 @@
 #include "datamux.h"
 #include "cpu/tms9900/tms99com.h"
 
-#define LOG_WARN        (1U<<1)   // Warnings
-#define LOG_READY       (1U<<2)   // READY line
-#define LOG_ACCESS      (1U<<3)   // Access to this GROM
-#define LOG_ADDRESS     (1U<<4)   // Address register
-#define LOG_WAITCOUNT   (1U<<5)   // Wait state counter
+#define LOG_WARN        (1U << 1)   // Warnings
+#define LOG_READY       (1U << 2)   // READY line
+#define LOG_ACCESS      (1U << 3)   // Access to this GROM
+#define LOG_ADDRESS     (1U << 4)   // Address register
+#define LOG_WAITCOUNT   (1U << 5)   // Wait state counter
 
-#define VERBOSE ( LOG_GENERAL | LOG_WARN )
+#define VERBOSE (LOG_GENERAL | LOG_WARN)
 
 #include "logmacro.h"
 
@@ -481,7 +481,7 @@ void datamux_device::setaddress(offs_t offset, uint16_t busctrl)
     The datamux is connected to the clock line in order to operate
     the wait state counter and to read/write the bytes.
 */
-WRITE_LINE_MEMBER( datamux_device::clock_in )
+void datamux_device::clock_in(int state)
 {
 	// return immediately if the datamux is currently inactive
 	if (m_waitcount>0)
@@ -548,7 +548,7 @@ void datamux_device::ready_join()
 	m_ready((m_sysready==CLEAR_LINE || m_muxready==CLEAR_LINE)? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( datamux_device::ready_line )
+void datamux_device::ready_line(int state)
 {
 	if (state != m_sysready) LOGMASKED(LOG_READY, "READY line from PBox = %d\n", state);
 	m_sysready = (line_state)state;
@@ -557,7 +557,7 @@ WRITE_LINE_MEMBER( datamux_device::ready_line )
 }
 
 /* Called from VDP via console. */
-WRITE_LINE_MEMBER( datamux_device::gromclk_in )
+void datamux_device::gromclk_in(int state)
 {
 	// Don't propagate the clock in idle phase
 	if (m_grom_idle) return;

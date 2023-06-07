@@ -30,15 +30,15 @@ public:
 	void input_a_w(uint8_t data);
 	void input_b_w(uint8_t data);
 	void select_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( mode_w );
-	DECLARE_WRITE_LINE_MEMBER( carry_w );
+	void mode_w(int state);
+	void carry_w(int state);
 
 	// outputs
 	uint8_t function_r() { return m_f; }
-	DECLARE_READ_LINE_MEMBER( carry_r ) { return m_cn; }
-	DECLARE_READ_LINE_MEMBER( generate_r ) { return m_g; }
-	DECLARE_READ_LINE_MEMBER( propagate_r ) { return m_p; }
-	DECLARE_READ_LINE_MEMBER( equals_r ) { return m_equals; }
+	int carry_r() { return m_cn; }
+	int generate_r() { return m_g; }
+	int propagate_r() { return m_p; }
+	int equals_r() { return m_equals; }
 
 protected:
 	// device-level overrides

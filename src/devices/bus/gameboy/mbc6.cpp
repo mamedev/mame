@@ -156,35 +156,35 @@ std::error_condition mbc6_device::load(std::string &message)
 	// install memory controller handlers
 	cart_space()->install_write_handler(
 			0x0000, 0x03ff,
-			write8smo_delegate(*this, FUNC(mbc6_device::enable_ram)));
+			emu::rw_delegate(*this, FUNC(mbc6_device::enable_ram)));
 	cart_space()->install_write_handler(
 			0x0400, 0x07ff,
-			write8smo_delegate(*this, FUNC(mbc6_device::bank_switch_ram<0>)));
+			emu::rw_delegate(*this, FUNC(mbc6_device::bank_switch_ram<0>)));
 	cart_space()->install_write_handler(
 			0x0800, 0x0bff,
-			write8smo_delegate(*this, FUNC(mbc6_device::bank_switch_ram<1>)));
+			emu::rw_delegate(*this, FUNC(mbc6_device::bank_switch_ram<1>)));
 	cart_space()->install_write_handler(
 			0x0c00, 0x0fff,
-			write8smo_delegate(*this, FUNC(mbc6_device::enable_flash)));
+			emu::rw_delegate(*this, FUNC(mbc6_device::enable_flash)));
 	cart_space()->install_write_handler(
 			0x1000, 0x1000, // TODO: what range does this actually respond to?
-			write8smo_delegate(*this, FUNC(mbc6_device::enable_flash_write)));
+			emu::rw_delegate(*this, FUNC(mbc6_device::enable_flash_write)));
 	cart_space()->install_write_handler(
 			0x2000, 0x27ff, 0x0000, 0x0000, 0x1000,
-			write8sm_delegate(*this, FUNC(mbc6_device::bank_switch_rom)));
+			emu::rw_delegate(*this, FUNC(mbc6_device::bank_switch_rom)));
 	cart_space()->install_write_handler(
 			0x2800, 0x2fff, 0x0000, 0x0000, 0x1000,
-			write8sm_delegate(*this, FUNC(mbc6_device::select_flash)));
+			emu::rw_delegate(*this, FUNC(mbc6_device::select_flash)));
 
 	// install Flash handlers
 	m_view_rom_low[1].install_readwrite_handler(
 			0x4000, 0x5fff,
-			read8sm_delegate(*this, FUNC(mbc6_device::read_flash<0>)),
-			write8sm_delegate(*this, FUNC(mbc6_device::write_flash<0>)));
+			emu::rw_delegate(*this, FUNC(mbc6_device::read_flash<0>)),
+			emu::rw_delegate(*this, FUNC(mbc6_device::write_flash<0>)));
 	m_view_rom_high[1].install_readwrite_handler(
 			0x6000, 0x7fff,
-			read8sm_delegate(*this, FUNC(mbc6_device::read_flash<1>)),
-			write8sm_delegate(*this, FUNC(mbc6_device::write_flash<1>)));
+			emu::rw_delegate(*this, FUNC(mbc6_device::read_flash<1>)),
+			emu::rw_delegate(*this, FUNC(mbc6_device::write_flash<1>)));
 
 	// all good
 	return std::error_condition();
@@ -478,7 +478,6 @@ void mbc6_device::install_ram()
 		device_generic_cart_interface::install_non_power_of_two<0>(
 				nvrambytes ? nvrambytes : rambytes,
 				PAGE_RAM_SIZE - 1,
-				0,
 				0,
 				0xa000,
 				[this, base = nvrambase ? nvrambase : rambase] (offs_t begin, offs_t end, offs_t mirror, offs_t src)

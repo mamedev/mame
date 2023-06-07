@@ -59,16 +59,16 @@ std::error_condition msx_cart_holy_quran_device::initialize_cartridge(std::strin
 		m_rombank[i]->configure_entries(0, banks, m_decrypted.data(), BANK_SIZE);
 
 	page(1)->install_view(0x4000, 0x7fff, m_view1);
-	m_view1[0].install_read_handler(0x4000, 0x7fff, read8sm_delegate(*this, FUNC(msx_cart_holy_quran_device::read)));
+	m_view1[0].install_read_handler(0x4000, 0x7fff, emu::rw_delegate(*this, FUNC(msx_cart_holy_quran_device::read)));
 	m_view1[1].install_read_bank(0x4000, 0x5fff, m_rombank[0]);
 	m_view1[1].install_read_bank(0x6000, 0x7fff, m_rombank[1]);
-	m_view1[1].install_write_handler(0x5000, 0x5000, write8smo_delegate(*this, FUNC(msx_cart_holy_quran_device::bank_w<0>)));
-	m_view1[1].install_write_handler(0x5400, 0x5400, write8smo_delegate(*this, FUNC(msx_cart_holy_quran_device::bank_w<1>)));
-	m_view1[1].install_write_handler(0x5800, 0x5800, write8smo_delegate(*this, FUNC(msx_cart_holy_quran_device::bank_w<2>)));
-	m_view1[1].install_write_handler(0x5c00, 0x5c00, write8smo_delegate(*this, FUNC(msx_cart_holy_quran_device::bank_w<3>)));
+	m_view1[1].install_write_handler(0x5000, 0x5000, emu::rw_delegate(*this, FUNC(msx_cart_holy_quran_device::bank_w<0>)));
+	m_view1[1].install_write_handler(0x5400, 0x5400, emu::rw_delegate(*this, FUNC(msx_cart_holy_quran_device::bank_w<1>)));
+	m_view1[1].install_write_handler(0x5800, 0x5800, emu::rw_delegate(*this, FUNC(msx_cart_holy_quran_device::bank_w<2>)));
+	m_view1[1].install_write_handler(0x5c00, 0x5c00, emu::rw_delegate(*this, FUNC(msx_cart_holy_quran_device::bank_w<3>)));
 
 	page(2)->install_view(0x8000, 0xbfff, m_view2);
-	m_view2[0].install_read_handler(0x8000, 0xbfff, read8sm_delegate(*this, FUNC(msx_cart_holy_quran_device::read2)));
+	m_view2[0].install_read_handler(0x8000, 0xbfff, emu::rw_delegate(*this, FUNC(msx_cart_holy_quran_device::read2)));
 	m_view2[1].install_read_bank(0x8000, 0x9fff, m_rombank[2]);
 	m_view2[1].install_read_bank(0xa000, 0xbfff, m_rombank[3]);
 

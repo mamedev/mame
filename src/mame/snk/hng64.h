@@ -174,6 +174,7 @@ public:
 		m_fbscroll(*this, "fbscroll"),
 		m_fbunk(*this, "fbunk"),
 		m_idt7133_dpram(*this, "com_ram"),
+		m_com_bank(*this, "com_bank"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_in(*this, "IN%u", 0U),
 		m_samsho64_3d_hack(0),
@@ -246,6 +247,7 @@ private:
 
 	required_shared_ptr<uint32_t> m_idt7133_dpram;
 	//required_shared_ptr<uint8_t> m_com_mmu_mem;
+	required_memory_bank m_com_bank;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 
@@ -330,6 +332,7 @@ private:
 	void hng64_com_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void hng64_com_share_w(offs_t offset, uint8_t data);
 	uint8_t hng64_com_share_r(offs_t offset);
+	void hng64_com_bank_w(uint8_t data);
 	void hng64_com_share_mips_w(offs_t offset, uint8_t data);
 	uint8_t hng64_com_share_mips_r(offs_t offset);
 	uint32_t hng64_sysregs_r(offs_t offset, uint32_t mem_mask = ~0);
@@ -404,7 +407,7 @@ private:
 	// unknown access
 	void ioport4_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( sio0_w );
+	void sio0_w(int state);
 
 	uint8_t m_port7 = 0;
 	uint8_t m_port1 = 0;
@@ -440,7 +443,7 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_hng64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_hng64);
+	void screen_vblank_hng64(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(hng64_irq);
 	void do_dma(address_space &space);
 
@@ -500,12 +503,12 @@ private:
 	void reset_sound();
 	void reset_net();
 
-	DECLARE_WRITE_LINE_MEMBER(dma_hreq_cb);
+	void dma_hreq_cb(int state);
 	uint8_t dma_memr_cb(offs_t offset);
 	void dma_iow3_cb(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(tcu_tm0_cb);
-	DECLARE_WRITE_LINE_MEMBER(tcu_tm1_cb);
-	DECLARE_WRITE_LINE_MEMBER(tcu_tm2_cb);
+	void tcu_tm0_cb(int state);
+	void tcu_tm1_cb(int state);
+	void tcu_tm2_cb(int state);
 
 
 

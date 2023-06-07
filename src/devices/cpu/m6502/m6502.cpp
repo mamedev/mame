@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    m6502.c
+    m6502.cpp
 
     MOS Technology 6502, original NMOS variant
 
@@ -452,7 +452,9 @@ void m6502_device::state_import(const device_state_entry &entry)
 	case M6502_PC:
 		PC = NPC;
 		irq_taken = false;
-		prefetch();
+		prefetch_start();
+		IR = mintf->read_sync(PC);
+		prefetch_end();
 		PPC = NPC;
 		inst_state = IR | inst_state_base;
 		break;
@@ -483,12 +485,15 @@ void m6502_device::state_string_export(const device_state_entry &entry, std::str
 	}
 }
 
-void m6502_device::prefetch()
+void m6502_device::prefetch_start()
 {
 	sync = true;
 	sync_w(ASSERT_LINE);
 	NPC = PC;
-	IR = mintf->read_sync(PC);
+}
+
+void m6502_device::prefetch_end()
+{
 	sync = false;
 	sync_w(CLEAR_LINE);
 
@@ -499,12 +504,8 @@ void m6502_device::prefetch()
 		PC++;
 }
 
-void m6502_device::prefetch_noirq()
+void m6502_device::prefetch_end_noirq()
 {
-	sync = true;
-	sync_w(ASSERT_LINE);
-	NPC = PC;
-	IR = mintf->read_sync(PC);
 	sync = false;
 	sync_w(CLEAR_LINE);
 	PC++;
@@ -563,68 +564,6 @@ uint8_t m6502_device::mi_default14::read(uint16_t adr)
 void m6502_device::mi_default14::write(uint16_t adr, uint8_t val)
 {
 	program14.write_byte(adr, val);
-}
-
-m6502_mcu_device::m6502_mcu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	m6502_device(mconfig, type, tag, owner, clock)
-{
-}
-
-
-void m6502_mcu_device::recompute_bcount(uint64_t event_time)
-{
-	if(!event_time || event_time >= total_cycles() + icount) {
-		bcount = 0;
-		return;
-	}
-	bcount = total_cycles() + icount - event_time;
-}
-
-void m6502_mcu_device::execute_run()
-{
-	internal_update(total_cycles());
-
-	icount -= count_before_instruction_step;
-	if(icount < 0) {
-		count_before_instruction_step = -icount;
-		icount = 0;
-	} else
-		count_before_instruction_step = 0;
-
-	while(bcount && icount <= bcount)
-		internal_update(total_cycles() + icount - bcount);
-
-	if(icount > 0 && inst_substate)
-		do_exec_partial();
-
-	while(icount > 0) {
-		while(icount > bcount) {
-			if(inst_state < 0xff00) {
-				PPC = NPC;
-				inst_state = IR | inst_state_base;
-				if(machine().debug_flags & DEBUG_FLAG_ENABLED)
-					debugger_instruction_hook(NPC);
-			}
-			do_exec_full();
-		}
-		if(icount > 0)
-			while(bcount && icount <= bcount)
-				internal_update(total_cycles() + icount - bcount);
-		if(icount > 0 && inst_substate)
-			do_exec_partial();
-	}
-	if(icount < 0) {
-		count_before_instruction_step = -icount;
-		icount = 0;
-	}
-}
-
-void m6502_mcu_device::add_event(uint64_t &event_time, uint64_t new_event)
-{
-	if(!new_event)
-		return;
-	if(!event_time || event_time > new_event)
-		event_time = new_event;
 }
 
 

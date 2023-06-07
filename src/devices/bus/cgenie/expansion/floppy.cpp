@@ -188,7 +188,7 @@ DEVICE_IMAGE_LOAD_MEMBER( cgenie_fdc_device::socket_load )
 	return std::make_pair(std::error_condition(), std::string());
 }
 
-WRITE_LINE_MEMBER( cgenie_fdc_device::intrq_w )
+void cgenie_fdc_device::intrq_w(int state)
 {
 	if (VERBOSE)
 		logerror("cgenie_fdc_device::intrq_w: %d\n", state);

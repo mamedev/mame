@@ -58,9 +58,9 @@ private:
 	u8 page_r(offs_t offset);
 	void page_w(offs_t offset, u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER(vsyn_w);
-	DECLARE_WRITE_LINE_MEMBER(so_w);
-	DECLARE_WRITE_LINE_MEMBER(dav_w);
+	void vsyn_w(int state);
+	void so_w(int state);
+	void dav_w(int state);
 
 	void mem_map(address_map &map);
 
@@ -154,18 +154,18 @@ void ampex_state::page_w(offs_t offset, u8 data)
 	m_paged_ram[m_page * 0x1800 + offset] = data | m_attr << 8;
 }
 
-WRITE_LINE_MEMBER(ampex_state::vsyn_w)
+void ampex_state::vsyn_w(int state)
 {
 	// should generate RST 6 interrupt
 }
 
-WRITE_LINE_MEMBER(ampex_state::so_w)
+void ampex_state::so_w(int state)
 {
 	if (m_uart_loopback)
 		m_uart->write_si(state);
 }
 
-WRITE_LINE_MEMBER(ampex_state::dav_w)
+void ampex_state::dav_w(int state)
 {
 	// DAV should generate RST 7
 }

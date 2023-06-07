@@ -7,7 +7,7 @@
 
 // TODO: Convert to SVG rendering or internal layout
 
-#define LOG_LCD (1 << 0)
+#define LOG_LCD (1U << 1)
 
 #define VERBOSE (0)
 #include "logmacro.h"

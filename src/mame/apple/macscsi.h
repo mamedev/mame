@@ -27,7 +27,7 @@ public:
 	u8 read_wrapper(bool pseudo_dma, offs_t offset);
 	void write_wrapper(bool pseudo_dma, offs_t offset, u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER(drq_w);
+	void drq_w(int state);
 
 protected:
 	// device-level overrides

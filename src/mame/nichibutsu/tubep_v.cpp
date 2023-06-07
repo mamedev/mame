@@ -388,20 +388,20 @@ void tubep_state::tubep_textram_w(offs_t offset, uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(tubep_state::screen_flip_w)
+void tubep_state::screen_flip_w(int state)
 {
 	// screen flip, active high
 }
 
 
-WRITE_LINE_MEMBER(tubep_state::background_romselect_w)
+void tubep_state::background_romselect_w(int state)
 {
 	// 0->select roms: B1,B3,B5; 1->select roms: B2,B4,B6
 	m_background_romsel = state;
 }
 
 
-WRITE_LINE_MEMBER(tubep_state::colorproms_A4_line_w)
+void tubep_state::colorproms_A4_line_w(int state)
 {
 	// line A4 (color proms address) state
 	m_color_A4 = state << 4;

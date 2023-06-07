@@ -2,7 +2,7 @@
 // copyright-holders:Mark Garlanger
 /***************************************************************************
 
-    Heathkit Terminal Logic Board (TLB)
+  Heathkit Terminal Logic Board (TLB)
 
 ****************************************************************************/
 
@@ -28,7 +28,7 @@ public:
 	// interface routines
 	auto serial_data_callback() { return m_write_sd.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(cb1_w);
+	void cb1_w(int state);
 
 protected:
 	heath_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
@@ -39,11 +39,12 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_resolve_objects() override;
 
-private:
-
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
+	required_device<cpu_device> m_maincpu;
+
+private:
 	void key_click_w(uint8_t data);
 	void bell_w(uint8_t data);
 	uint8_t kbd_key_r();
@@ -54,9 +55,9 @@ private:
 
 	void serial_out_b(uint8_t data);
 
-	DECLARE_READ_LINE_MEMBER(mm5740_shift_r);
-	DECLARE_READ_LINE_MEMBER(mm5740_control_r);
-	DECLARE_WRITE_LINE_MEMBER(mm5740_data_ready_w);
+	int mm5740_shift_r();
+	int mm5740_control_r();
+	void mm5740_data_ready_w(int state);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
@@ -69,7 +70,6 @@ private:
 	devcb_write_line m_write_sd;
 
 	required_device<palette_device> m_palette;
-	required_device<cpu_device>     m_maincpu;
 	required_device<mc6845_device>  m_crtc;
 	required_device<ins8250_device> m_ace;
 	required_device<beep_device>    m_beep;
@@ -114,6 +114,9 @@ public:
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	void mem_map(address_map &map);
 };
 
 DECLARE_DEVICE_TYPE(HEATH_TLB, heath_tlb_device)

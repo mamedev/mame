@@ -286,7 +286,7 @@ void luxor_4105_device::write_sasi_data(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_bsy )
+void luxor_4105_device::write_sasi_bsy(int state)
 {
 	if (state)
 	{
@@ -295,13 +295,13 @@ WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_bsy )
 }
 
 
-WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_cd )
+void luxor_4105_device::write_sasi_cd(int state)
 {
 	update_dma();
 }
 
 
-WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_req )
+void luxor_4105_device::write_sasi_req(int state)
 {
 	if (LOG) logerror("%s REQ %u\n", machine().describe_context(), state);
 
@@ -316,13 +316,13 @@ WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_req )
 }
 
 
-WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_msg )
+void luxor_4105_device::write_sasi_msg(int state)
 {
 	update_ack();
 }
 
 
-WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_io )
+void luxor_4105_device::write_sasi_io(int state)
 {
 	if (state)
 	{

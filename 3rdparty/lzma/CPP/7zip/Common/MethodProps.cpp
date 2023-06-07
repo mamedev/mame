@@ -8,9 +8,39 @@
 
 using namespace NWindows;
 
-bool StringToBool(const UString &s, bool &res)
+UInt64 Calc_From_Val_Percents(UInt64 val, UInt64 percents)
 {
-  if (s.IsEmpty() || (s[0] == '+' && s[1] == 0) || StringsAreEqualNoCase_Ascii(s, "ON"))
+  // if (percents == 0) return 0;
+  const UInt64 q = percents / 100;
+  const UInt32 r = (UInt32)(percents % 100);
+  UInt64 res = 0;
+  
+  if (q != 0)
+  {
+    if (val > (UInt64)(Int64)-1 / q)
+      return (UInt64)(Int64)-1;
+    res = val * q;
+  }
+
+  if (r != 0)
+  {
+    UInt64 v2;
+    if (val <= (UInt64)(Int64)-1 / r)
+      v2 = val * r / 100;
+    else
+      v2 = val / 100 * r;
+    res += v2;
+    if (res < v2)
+      return (UInt64)(Int64)-1;
+  }
+  
+  return res;
+}
+
+
+bool StringToBool(const wchar_t *s, bool &res)
+{
+  if (s[0] == 0 || (s[0] == '+' && s[1] == 0) || StringsAreEqualNoCase_Ascii(s, "ON"))
   {
     res = true;
     return true;
@@ -42,10 +72,18 @@ unsigned ParseStringToUInt32(const UString &srcString, UInt32 &number)
   return (unsigned)(end - start);
 }
 
+static unsigned ParseStringToUInt64(const UString &srcString, UInt64 &number)
+{
+  const wchar_t *start = srcString;
+  const wchar_t *end;
+  number = ConvertStringToUInt64(start, &end);
+  return (unsigned)(end - start);
+}
+
 HRESULT ParsePropToUInt32(const UString &name, const PROPVARIANT &prop, UInt32 &resValue)
 {
   // =VT_UI4
-  // =VT_EMPTY
+  // =VT_EMPTY : it doesn't change (resValue), and returns S_OK
   // {stringUInt32}=VT_EMPTY
 
   if (prop.vt == VT_UI4)
@@ -66,66 +104,151 @@ HRESULT ParsePropToUInt32(const UString &name, const PROPVARIANT &prop, UInt32 &
   return S_OK;
 }
 
-HRESULT ParseMtProp(const UString &name, const PROPVARIANT &prop, UInt32 defaultNumThreads, UInt32 &numThreads)
+
+
+HRESULT ParseMtProp2(const UString &name, const PROPVARIANT &prop, UInt32 &numThreads, bool &force)
 {
+  force = false;
+  UString s;
   if (name.IsEmpty())
   {
-    switch (prop.vt)
+    if (prop.vt == VT_UI4)
     {
-      case VT_UI4:
-        numThreads = prop.ulVal;
-        break;
-      default:
-      {
-        bool val;
-        RINOK(PROPVARIANT_to_bool(prop, val));
-        numThreads = (val ? defaultNumThreads : 1);
-        break;
-      }
+      numThreads = prop.ulVal;
+      force = true;
+      return S_OK;
     }
+    bool val;
+    HRESULT res = PROPVARIANT_to_bool(prop, val);
+    if (res == S_OK)
+    {
+      if (!val)
+      {
+        numThreads = 1;
+        force = true;
+      }
+      // force = true; for debug
+      // "(VT_BOOL = VARIANT_TRUE)" set "force = false" and doesn't change numThreads
+      return S_OK;
+    }
+    if (prop.vt != VT_BSTR)
+      return res;
+    s.SetFromBstr(prop.bstrVal);
+    if (s.IsEmpty())
+      return E_INVALIDARG;
+  }
+  else
+  {
+    if (prop.vt != VT_EMPTY)
+      return E_INVALIDARG;
+    s = name;
+  }
+
+  s.MakeLower_Ascii();
+  const wchar_t *start = s;
+  UInt32 v = numThreads;
+
+  /* we force up, if threads number specified
+     only `d` will force it down */
+  bool force_loc = true;
+  for (;;)
+  {
+    const wchar_t c = *start;
+    if (!c)
+      break;
+    if (c == 'd')
+    {
+      force_loc = false;  // force down
+      start++;
+      continue;
+    }
+    if (c == 'u')
+    {
+      force_loc = true;   // force up
+      start++;
+      continue;
+    }
+    bool isPercent = false;
+    if (c == 'p')
+    {
+      isPercent = true;
+      start++;
+    }
+    const wchar_t *end;
+    v = ConvertStringToUInt32(start, &end);
+    if (end == start)
+      return E_INVALIDARG;
+    if (isPercent)
+      v = numThreads * v / 100;
+    start = end;
+  }
+
+  numThreads = v;
+  force = force_loc;
+  return S_OK;
+}
+
+
+
+static HRESULT SetLogSizeProp(UInt64 number, NCOM::CPropVariant &destProp)
+{
+  if (number >= 64)
+    return E_INVALIDARG;
+  UInt32 val32;
+  if (number < 32)
+    val32 = (UInt32)1 << (unsigned)number;
+  /*
+  else if (number == 32 && reduce_4GB_to_32bits)
+    val32 = (UInt32)(Int32)-1;
+  */
+  else
+  {
+    destProp = (UInt64)((UInt64)1 << (unsigned)number);
     return S_OK;
   }
-  if (prop.vt != VT_EMPTY)
-    return E_INVALIDARG;
-  return ParsePropToUInt32(name, prop, numThreads);
+  destProp = (UInt32)val32;
+  return S_OK;
 }
 
 
 static HRESULT StringToDictSize(const UString &s, NCOM::CPropVariant &destProp)
 {
+  /* if (reduce_4GB_to_32bits) we can reduce (4 GiB) property to (4 GiB - 1).
+     to fit the value to UInt32 for clients that do not support 64-bit values */
+
   const wchar_t *end;
-  UInt32 number = ConvertStringToUInt32(s, &end);
-  unsigned numDigits = (unsigned)(end - s);
+  const UInt64 number = ConvertStringToUInt64(s, &end);
+  const unsigned numDigits = (unsigned)(end - s.Ptr());
   if (numDigits == 0 || s.Len() > numDigits + 1)
     return E_INVALIDARG;
   
   if (s.Len() == numDigits)
-  {
-    if (number >= 64)
-      return E_INVALIDARG;
-    if (number < 32)
-      destProp = (UInt32)((UInt32)1 << (unsigned)number);
-    else
-      destProp = (UInt64)((UInt64)1 << (unsigned)number);
-    return S_OK;
-  }
+    return SetLogSizeProp(number, destProp);
   
   unsigned numBits;
   
   switch (MyCharLower_Ascii(s[numDigits]))
   {
-    case 'b': destProp = number; return S_OK;
+    case 'b': numBits =  0; break;
     case 'k': numBits = 10; break;
     case 'm': numBits = 20; break;
     case 'g': numBits = 30; break;
     default: return E_INVALIDARG;
   }
   
-  if (number < ((UInt32)1 << (32 - numBits)))
-    destProp = (UInt32)(number << numBits);
+  const UInt64 range4g = ((UInt64)1 << (32 - numBits));
+  if (number < range4g)
+    destProp = (UInt32)((UInt32)number << numBits);
+  /*
+  else if (number == range4g && reduce_4GB_to_32bits)
+    destProp = (UInt32)(Int32)-1;
+  */
+  else if (numBits == 0)
+    destProp = (UInt64)number;
+  else if (number >= ((UInt64)1 << (64 - numBits)))
+    return E_INVALIDARG;
   else
     destProp = (UInt64)((UInt64)number << numBits);
-  
   return S_OK;
 }
 
@@ -133,28 +256,32 @@ static HRESULT StringToDictSize(const UString &s, NCOM::CPropVariant &destProp)
 static HRESULT PROPVARIANT_to_DictSize(const PROPVARIANT &prop, NCOM::CPropVariant &destProp)
 {
   if (prop.vt == VT_UI4)
-  {
-    UInt32 v = prop.ulVal;
-    if (v >= 64)
-      return E_INVALIDARG;
-    if (v < 32)
-      destProp = (UInt32)((UInt32)1 << (unsigned)v);
-    else
-      destProp = (UInt64)((UInt64)1 << (unsigned)v);
-    return S_OK;
-  }
+    return SetLogSizeProp(prop.ulVal, destProp);
+
   if (prop.vt == VT_BSTR)
-    return StringToDictSize(prop.bstrVal, destProp);
+  {
+    UString s;
+    s = prop.bstrVal;
+    return StringToDictSize(s, destProp);
+  }
   return E_INVALIDARG;
 }
 
 
-void CProps::AddProp32(PROPID propid, UInt32 level)
+void CProps::AddProp32(PROPID propid, UInt32 val)
 {
   CProp &prop = Props.AddNew();
   prop.IsOptional = true;
   prop.Id = propid;
-  prop.Value = (UInt32)level;
+  prop.Value = (UInt32)val;
+}
+
+void CProps::AddPropBool(PROPID propid, bool val)
+{
+  CProp &prop = Props.AddNew();
+  prop.IsOptional = true;
+  prop.Id = propid;
+  prop.Value = val;
 }
 
 class CCoderProps
@@ -164,10 +291,12 @@ class CCoderProps
   unsigned _numProps;
   unsigned _numPropsMax;
 public:
-  CCoderProps(unsigned numPropsMax)
+  CCoderProps(unsigned numPropsMax):
+      _propIDs(NULL),
+      _props(NULL),
+      _numProps(0),
+      _numPropsMax(numPropsMax)
   {
-    _numPropsMax = numPropsMax;
-    _numProps = 0;
     _propIDs = new PROPID[numPropsMax];
     _props = new NCOM::CPropVariant[numPropsMax];
   }
@@ -194,7 +323,15 @@ void CCoderProps::AddProp(const CProp &prop)
 
 HRESULT CProps::SetCoderProps(ICompressSetCoderProperties *scp, const UInt64 *dataSizeReduce) const
 {
-  CCoderProps coderProps(Props.Size() + (dataSizeReduce ? 1 : 0));
+  return SetCoderProps_DSReduce_Aff(scp, dataSizeReduce, NULL);
+}
+
+HRESULT CProps::SetCoderProps_DSReduce_Aff(
+    ICompressSetCoderProperties *scp,
+    const UInt64 *dataSizeReduce,
+    const UInt64 *affinity) const
+{
+  CCoderProps coderProps(Props.Size() + (dataSizeReduce ? 1 : 0) + (affinity ? 1 : 0) );
   FOR_VECTOR (i, Props)
     coderProps.AddProp(Props[i]);
   if (dataSizeReduce)
@@ -204,27 +341,34 @@ HRESULT CProps::SetCoderProps(ICompressSetCoderProperties *scp, const UInt64 *da
     prop.Value = *dataSizeReduce;
     coderProps.AddProp(prop);
   }
+  if (affinity)
+  {
+    CProp prop;
+    prop.Id = NCoderPropID::kAffinity;
+    prop.Value = *affinity;
+    coderProps.AddProp(prop);
+  }
   return coderProps.SetProps(scp);
 }
 
 
 int CMethodProps::FindProp(PROPID id) const
 {
-  for (int i = Props.Size() - 1; i >= 0; i--)
-    if (Props[i].Id == id)
-      return i;
+  for (unsigned i = Props.Size(); i != 0;)
+    if (Props[--i].Id == id)
+      return (int)i;
   return -1;
 }
 
-int CMethodProps::GetLevel() const
+unsigned CMethodProps::GetLevel() const
 {
   int i = FindProp(NCoderPropID::kLevel);
   if (i < 0)
     return 5;
-  if (Props[i].Value.vt != VT_UI4)
+  if (Props[(unsigned)i].Value.vt != VT_UI4)
     return 9;
-  UInt32 level = Props[i].Value.ulVal;
-  return level > 9 ? 9 : (int)level;
+  UInt32 level = Props[(unsigned)i].Value.ulVal;
+  return level > 9 ? 9 : (unsigned)level;
 }
 
 struct CNameToPropID
@@ -232,6 +376,9 @@ struct CNameToPropID
   VARTYPE VarType;
   const char *Name;
 };
+
+
+// the following are related to NCoderPropID::EEnum values
 
 static const CNameToPropID g_NameToPropID[] =
 {
@@ -251,14 +398,19 @@ static const CNameToPropID g_NameToPropID[] =
   { VT_UI4, "mt" },
   { VT_BOOL, "eos" },
   { VT_UI4, "x" },
-  { VT_UI4, "reduceSize" }
+  { VT_UI8, "reduce" },
+  { VT_UI8, "expect" },
+  { VT_UI4, "b" },
+  { VT_UI4, "check" },
+  { VT_BSTR, "filter" },
+  { VT_UI8, "memuse" }
 };
 
 static int FindPropIdExact(const UString &name)
 {
   for (unsigned i = 0; i < ARRAY_SIZE(g_NameToPropID); i++)
     if (StringsAreEqualNoCase_Ascii(name, g_NameToPropID[i].Name))
-      return i;
+      return (int)i;
   return -1;
 }
 
@@ -269,6 +421,13 @@ static bool ConvertProperty(const PROPVARIANT &srcProp, VARTYPE varType, NCOM::C
     destProp = srcProp;
     return true;
   }
+
+  if (varType == VT_UI8 && srcProp.vt == VT_UI4)
+  {
+    destProp = (UInt64)srcProp.ulVal;
+    return true;
+  }
+
   if (varType == VT_BOOL)
   {
     bool res;
@@ -311,8 +470,8 @@ static void SplitParam(const UString &param, UString &name, UString &value)
   int eqPos = param.Find(L'=');
   if (eqPos >= 0)
   {
-    name.SetFrom(param, eqPos);
-    value = param.Ptr(eqPos + 1);
+    name.SetFrom(param, (unsigned)eqPos);
+    value = param.Ptr((unsigned)(eqPos + 1));
     return;
   }
   unsigned i;
@@ -333,7 +492,8 @@ static bool IsLogSizeProp(PROPID propid)
     case NCoderPropID::kDictionarySize:
     case NCoderPropID::kUsedMemorySize:
     case NCoderPropID::kBlockSize:
-    case NCoderPropID::kReduceSize:
+    case NCoderPropID::kBlockSize2:
+    // case NCoderPropID::kReduceSize:
       return true;
   }
   return false;
@@ -346,7 +506,7 @@ HRESULT CMethodProps::SetParam(const UString &name, const UString &value)
     return E_INVALIDARG;
   const CNameToPropID &nameToPropID = g_NameToPropID[(unsigned)index];
   CProp prop;
-  prop.Id = index;
+  prop.Id = (unsigned)index;
 
   if (IsLogSizeProp(prop.Id))
   {
@@ -366,9 +526,22 @@ HRESULT CMethodProps::SetParam(const UString &name, const UString &value)
     }
     else if (!value.IsEmpty())
     {
-      UInt32 number;
-      if (ParseStringToUInt32(value, number) == value.Len())
-        propValue = number;
+      if (nameToPropID.VarType == VT_UI4)
+      {
+        UInt32 number;
+        if (ParseStringToUInt32(value, number) == value.Len())
+          propValue = number;
+        else
+          propValue = value;
+      }
+      else if (nameToPropID.VarType == VT_UI8)
+      {
+        UInt64 number;
+        if (ParseStringToUInt64(value, number) == value.Len())
+          propValue = number;
+        else
+          propValue = value;
+      }
       else
         propValue = value;
     }
@@ -414,7 +587,7 @@ HRESULT CMethodProps::ParseParamsFromPROPVARIANT(const UString &realName, const 
     return E_INVALIDARG;
   const CNameToPropID &nameToPropID = g_NameToPropID[(unsigned)index];
   CProp prop;
-  prop.Id = index;
+  prop.Id = (unsigned)index;
   
   if (IsLogSizeProp(prop.Id))
   {
@@ -429,6 +602,59 @@ HRESULT CMethodProps::ParseParamsFromPROPVARIANT(const UString &realName, const 
   return S_OK;
 }
 
+
+static UInt64 GetMemoryUsage_LZMA(UInt32 dict, bool isBt, UInt32 numThreads)
+{
+  UInt32 hs = dict - 1;
+  hs |= (hs >> 1);
+  hs |= (hs >> 2);
+  hs |= (hs >> 4);
+  hs |= (hs >> 8);
+  hs >>= 1;
+  if (hs >= (1 << 24))
+    hs >>= 1;
+  hs |= (1 << 16) - 1;
+  // if (numHashBytes >= 5)
+  if (!isBt)
+    hs |= (256 << 10) - 1;
+  hs++;
+  UInt64 size1 = (UInt64)hs * 4;
+  size1 += (UInt64)dict * 4;
+  if (isBt)
+    size1 += (UInt64)dict * 4;
+  size1 += (2 << 20);
+  
+  if (numThreads > 1 && isBt)
+    size1 += (2 << 20) + (4 << 20);
+  return size1;
+}
+
+static const UInt32 kLzmaMaxDictSize = (UInt32)15 << 28;
+
+UInt64 CMethodProps::Get_Lzma_MemUsage(bool addSlidingWindowSize) const
+{
+  const UInt64 dicSize = Get_Lzma_DicSize();
+  const bool isBt = Get_Lzma_MatchFinder_IsBt();
+  const UInt32 dict32 = (dicSize >= kLzmaMaxDictSize ? kLzmaMaxDictSize : (UInt32)dicSize);
+  const UInt32 numThreads = Get_Lzma_NumThreads();
+  UInt64 size = GetMemoryUsage_LZMA(dict32, isBt, numThreads);
+  
+  if (addSlidingWindowSize)
+  {
+    const UInt32 kBlockSizeMax = (UInt32)0 - (UInt32)(1 << 16);
+    UInt64 blockSize = (UInt64)dict32 + (1 << 16)
+        + (numThreads > 1 ? (1 << 20) : 0);
+    blockSize += (blockSize >> (blockSize < ((UInt32)1 << 30) ? 1 : 2));
+    if (blockSize >= kBlockSizeMax)
+      blockSize = kBlockSizeMax;
+    size += blockSize;
+  }
+  return size;
+}
+
+
+
+
 HRESULT COneMethodInfo::ParseMethodFromString(const UString &s)
 {
   MethodName.Empty();
@@ -436,14 +662,14 @@ HRESULT COneMethodInfo::ParseMethodFromString(const UString &s)
   {
     UString temp = s;
     if (splitPos >= 0)
-      temp.DeleteFrom(splitPos);
+      temp.DeleteFrom((unsigned)splitPos);
     if (!temp.IsAscii())
       return E_INVALIDARG;
     MethodName.SetFromWStr_if_Ascii(temp);
   }
   if (splitPos < 0)
     return S_OK;
-  PropsString = s.Ptr(splitPos + 1);
+  PropsString = s.Ptr((unsigned)(splitPos + 1));
   return ParseParamsFromString(PropsString);
 }
 
@@ -454,5 +680,7 @@ HRESULT COneMethodInfo::ParseMethodFromPROPVARIANT(const UString &realName, cons
   // -m{N}=method
   if (value.vt != VT_BSTR)
     return E_INVALIDARG;
-  return ParseMethodFromString(value.bstrVal);
+  UString s;
+  s = value.bstrVal;
+  return ParseMethodFromString(s);
 }

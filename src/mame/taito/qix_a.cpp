@@ -131,7 +131,7 @@ void qix_state::slither_coinctl_w(uint8_t data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(qix_state::qix_pia_dint)
+void qix_state::qix_pia_dint(int state)
 {
 	int combined_state = m_sndpia0->irq_a_state() | m_sndpia0->irq_b_state();
 
@@ -140,7 +140,7 @@ WRITE_LINE_MEMBER(qix_state::qix_pia_dint)
 }
 
 
-WRITE_LINE_MEMBER(qix_state::qix_pia_sint)
+void qix_state::qix_pia_sint(int state)
 {
 	int combined_state = m_sndpia1->irq_a_state() | m_sndpia1->irq_b_state();
 

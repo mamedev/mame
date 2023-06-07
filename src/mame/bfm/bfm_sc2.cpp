@@ -193,6 +193,17 @@ Adder hardware:
 #include "sc2heypr.lh"
 #include "sc2prem2.lh"
 
+// log serial communication between mainboard (scorpion2) and videoboard (adder2)
+#define LOG_UART   (1U << 1)
+
+#ifdef MAME_DEBUG
+#define VERBOSE (LOG_GENERAL | LOG_UART)
+#else
+#define VERBOSE 0
+#endif
+
+#include "logmacro.h"
+
 
 namespace {
 
@@ -217,7 +228,7 @@ public:
 
 protected:
 	void e2ram_init(nvram_device &nvram, void *data, size_t size);
-	DECLARE_WRITE_LINE_MEMBER(bfmdm01_busy);
+	void bfmdm01_busy(int state);
 	void bankswitch_w(uint8_t data);
 	void mmtr_w(uint8_t data);
 	void mux_output_w(offs_t offset, uint8_t data);
@@ -365,7 +376,7 @@ public:
 	void init_drwho();
 
 protected:
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
+	template <unsigned N> void reel_optic_cb(int state) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 	void reel12_w(uint8_t data);
 	void reel34_w(uint8_t data);
 	void reel56_w(uint8_t data);
@@ -425,17 +436,6 @@ protected:
 	void dmd_reset_w(uint8_t data);
 };
 
-
-#ifdef MAME_DEBUG
-#define VERBOSE 1
-#else
-#define VERBOSE 0
-#endif
-
-// log serial communication between mainboard (scorpion2) and videoboard (adder2)
-#define LOG_SERIAL(x) do { if (VERBOSE) logerror x; } while (0)
-#define UART_LOG(x) do { if (VERBOSE) logerror x; } while (0)
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 #define MASTER_CLOCK        (XTAL(8'000'000))
 
@@ -1061,7 +1061,7 @@ uint8_t bfm_sc2_state::uart1data_r()
 
 void bfm_sc2_state::uart1ctrl_w(uint8_t data)
 {
-	UART_LOG(("uart1ctrl:%x\n", data));
+	LOGMASKED(LOG_UART, "uart1ctrl:%x\n", data);
 }
 ///////////////////////////////////////////////////////////////////////////
 
@@ -1069,7 +1069,7 @@ void bfm_sc2_state::uart1data_w(uint8_t data)
 {
 	m_data_to_uart2 = 1;
 	m_uart1_data    = data;
-	UART_LOG(("uart1:%x\n", data));
+	LOGMASKED(LOG_UART, "uart1:%x\n", data);
 }
 ///////////////////////////////////////////////////////////////////////////
 
@@ -1093,7 +1093,7 @@ uint8_t bfm_sc2_state::uart2data_r()
 
 void bfm_sc2_state::uart2ctrl_w(uint8_t data)
 {
-	UART_LOG(("uart2ctrl:%x\n", data));
+	LOGMASKED(LOG_UART, "uart2ctrl:%x\n", data);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1102,7 +1102,7 @@ void bfm_sc2_state::uart2data_w(uint8_t data)
 {
 	m_data_to_uart1 = 1;
 	m_uart2_data    = data;
-	UART_LOG(("uart2:%x\n", data));
+	LOGMASKED(LOG_UART, "uart2:%x\n", data);
 }
 
 
@@ -1169,7 +1169,7 @@ int bfm_sc2_state::recdata(int changed, int data)
 
 			m_e2data_to_read <<= 1;
 
-			LOG(("e2d pin= %d\n", m_e2data_pin));
+			LOG("e2d pin= %d\n", m_e2data_pin);
 
 			m_e2cnt++;
 			if ( m_e2cnt >= 8 )
@@ -1257,7 +1257,7 @@ void bfm_sc2_state::e2ram_w(uint8_t data)
 			{   // X24C08 Start condition (1->0 on SDA while SCL=1)
 				m_e2dummywrite = ( m_e2state == 5 );
 
-				LOG(("e2ram:   c:%d d:%d Start condition dummywrite=%d\n", (data & SCL)?1:0, (data&SDA)?1:0, m_e2dummywrite ));
+				LOG("e2ram:   c:%d d:%d Start condition dummywrite=%d\n", (data & SCL)?1:0, (data&SDA)?1:0, m_e2dummywrite);
 
 				m_e2state = 1; // ready for commands
 				m_e2cnt   = 0;
@@ -1269,7 +1269,7 @@ void bfm_sc2_state::e2ram_w(uint8_t data)
 				( !(changed & SCL) && (data & SCL) )     // SCL=1 and not changed
 				)
 			{   // X24C08 Stop condition (0->1 on SDA while SCL=1)
-				LOG(("e2ram:   c:%d d:%d Stop condition\n", (data & SCL)?1:0, (data&SDA)?1:0 ));
+				LOG("e2ram:   c:%d d:%d Stop condition\n", (data & SCL)?1:0, (data&SDA)?1:0);
 				m_e2state = 0;
 				m_e2data  = 0;
 				break;
@@ -1285,8 +1285,8 @@ void bfm_sc2_state::e2ram_w(uint8_t data)
 						m_e2cnt   = 0;
 						m_e2rw    = m_e2data & 1;
 
-						LOG(("e2ram: Slave address received !!  device id=%01X device adr=%01d high order adr %0X RW=%d) %02X\n",
-							m_e2data>>4, (m_e2data & 0x08)?1:0, (m_e2data>>1) & 0x03, m_e2rw , m_e2data ));
+						LOG("e2ram: Slave address received !!  device id=%01X device adr=%01d high order adr %0X RW=%d) %02X\n",
+							m_e2data>>4, (m_e2data & 0x08)?1:0, (m_e2data>>1) & 0x03, m_e2rw , m_e2data);
 
 						m_e2state = 2;
 					}
@@ -1301,12 +1301,12 @@ void bfm_sc2_state::e2ram_w(uint8_t data)
 
 						if ( ack < 0 )
 						{
-							LOG(("ACK = 0\n"));
+							LOG("ACK = 0\n");
 							m_e2state = 0;
 						}
 						else
 						{
-							LOG(("ACK = 1\n"));
+							LOG("ACK = 1\n");
 							if ( m_e2dummywrite )
 							{
 								m_e2dummywrite = 0;
@@ -1324,14 +1324,14 @@ void bfm_sc2_state::e2ram_w(uint8_t data)
 							switch ( m_e2state )
 							{
 								case 7:
-									LOG(("read address %04X\n",m_e2address));
+									LOG("read address %04X\n",m_e2address);
 									m_e2data_to_read = m_e2ram[m_e2address];
 									break;
 								case 3:
-									LOG(("write, awaiting address\n"));
+									LOG("write, awaiting address\n");
 									break;
 								default:
-									LOG(("?unknow action %04X\n",m_e2address));
+									LOG("?unknow action %04X\n",m_e2address);
 									break;
 							}
 						}
@@ -1346,7 +1346,7 @@ void bfm_sc2_state::e2ram_w(uint8_t data)
 						m_e2data_pin = 0;
 						m_e2address = (m_e2address & 0xFF00) | m_e2data;
 
-						LOG(("write address = %04X waiting for ACK\n", m_e2address));
+						LOG("write address = %04X waiting for ACK\n", m_e2address);
 						m_e2state = 4;
 						m_e2cnt   = 0;
 						m_e2data  = 0;
@@ -1363,12 +1363,12 @@ void bfm_sc2_state::e2ram_w(uint8_t data)
 						if ( ack < 0 )
 						{
 							m_e2state = 0;
-							LOG(("ACK = 0, cancel write\n" ));
+							LOG("ACK = 0, cancel write\n");
 						}
 						else
 						{
 							m_e2state = 5;
-							LOG(("ACK = 1, awaiting data to write\n" ));
+							LOG("ACK = 1, awaiting data to write\n");
 						}
 					}
 					break;
@@ -1376,7 +1376,7 @@ void bfm_sc2_state::e2ram_w(uint8_t data)
 				case 5: // receive data to write
 					if ( recdata(changed, data) )
 					{
-						LOG(("write data = %02X received, awaiting ACK\n", m_e2data));
+						LOG("write data = %02X received, awaiting ACK\n", m_e2data);
 						m_e2cnt   = 0;
 						m_e2state = 6;  // wait ack
 					}
@@ -1390,11 +1390,11 @@ void bfm_sc2_state::e2ram_w(uint8_t data)
 						if ( ack < 0 )
 						{
 							m_e2state = 0;
-							LOG(("ACK=0, write canceled\n"));
+							LOG("ACK=0, write canceled\n");
 						}
 						else
 						{
-							LOG(("ACK=1, writing %02X to %04X\n", m_e2data, m_e2address));
+							LOG("ACK=1, writing %02X to %04X\n", m_e2data, m_e2address);
 
 							m_e2ram[m_e2address] = m_e2data;
 
@@ -1411,7 +1411,7 @@ void bfm_sc2_state::e2ram_w(uint8_t data)
 					{
 						//m_e2data_pin = 0;
 
-						LOG(("address read, data = %02X waiting for ACK\n", m_e2data ));
+						LOG("address read, data = %02X waiting for ACK\n", m_e2data);
 
 						m_e2state = 8;
 					}
@@ -1427,7 +1427,7 @@ void bfm_sc2_state::e2ram_w(uint8_t data)
 
 						m_e2data_to_read = m_e2ram[m_e2address];
 
-						LOG(("ready for next address %04X\n", m_e2address));
+						LOG("ready for next address %04X\n", m_e2address);
 
 						m_e2cnt   = 0;
 						m_e2data  = 0;
@@ -1436,7 +1436,7 @@ void bfm_sc2_state::e2ram_w(uint8_t data)
 
 				case 0:
 
-					LOG(("e2ram: ? c:%d d:%d\n", (data & SCL)?1:0, (data&SDA)?1:0 ));
+					LOG("e2ram: ? c:%d d:%d\n", (data & SCL)?1:0, (data&SDA)?1:0);
 					break;
 			}
 			break;
@@ -1446,7 +1446,7 @@ void bfm_sc2_state::e2ram_w(uint8_t data)
 
 int bfm_sc2_state::read_e2ram()
 {
-	LOG(("e2ram: r %d (%02X) \n", m_e2data_pin, m_e2data_to_read ));
+	LOG("e2ram: r %d (%02X) \n", m_e2data_pin, m_e2data_to_read);
 
 	return m_e2data_pin;
 }
@@ -2813,7 +2813,7 @@ void bfm_sc2_state::sc3_expansion_w(offs_t offset, uint8_t data)
 }
 #endif
 
-WRITE_LINE_MEMBER(bfm_sc2_state::bfmdm01_busy)
+void bfm_sc2_state::bfmdm01_busy(int state)
 {
 	Scorpion2_SetSwitchState(4,4, state?0:1);
 }

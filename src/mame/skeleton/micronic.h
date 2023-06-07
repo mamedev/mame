@@ -71,7 +71,7 @@ private:
 	void rtc_address_w(uint8_t data);
 	uint8_t rtc_data_r();
 	void rtc_data_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( mc146818_irq );
+	void mc146818_irq(int state);
 
 	void micronic_palette(palette_device &palette) const;
 

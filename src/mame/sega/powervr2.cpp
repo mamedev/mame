@@ -2497,6 +2497,11 @@ inline void powervr2_device::render_span(bitmap_rgb32 &bitmap, texinfo *ti,
 	float dy;
 	int yy0, yy1;
 
+	// demofist, chocomk (hardlocks with -drc, MT#8088)
+	// TODO: should throw an error?
+	if (std::isnan(y0) || std::isnan(y1))
+		return;
+
 	if(y1 <= 0)
 		return;
 	if(y1 > 480)
@@ -3354,7 +3359,8 @@ void powervr2_device::pvr_accumulationbuffer_to_framebuffer(address_space &space
 		break;
 
 		case 0x02:
-			printf("pvr_accumulationbuffer_to_framebuffer buffer to tile at %d,%d - unsupported pack mode %02x (4444 ARGB)\n",x,y,packmode);
+			// TODO: demofist character select
+			//printf("pvr_accumulationbuffer_to_framebuffer buffer to tile at %d,%d - unsupported pack mode %02x (4444 ARGB)\n",x,y,packmode);
 			break;
 
 		case 0x03: // 1555 ARGB 16 bit

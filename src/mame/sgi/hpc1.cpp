@@ -13,22 +13,22 @@
 #include "machine/nscsi_bus.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
-#include "bus/sgikbd/sgikbd.h"
+#include "kbd.h"
 #include "hpc1.h"
 #include "speaker.h"
 
-#define LOG_UNKNOWN     (1 << 0)
-#define LOG_READS       (1 << 1)
-#define LOG_WRITES      (1 << 2)
-#define LOG_INT         (1 << 3)
-#define LOG_EEPROM      (1 << 4)
-#define LOG_SCSI        (1 << 5)
-#define LOG_SCSI_DMA    (1 << 6)
-#define LOG_DUART0      (1 << 7)
-#define LOG_DUART1      (1 << 8)
-#define LOG_DUART2      (1 << 9)
-#define LOG_PIT         (1 << 10)
-#define LOG_CHAIN       (1 << 11)
+#define LOG_UNKNOWN     (1U << 1)
+#define LOG_READS       (1U << 2)
+#define LOG_WRITES      (1U << 3)
+#define LOG_INT         (1U << 4)
+#define LOG_EEPROM      (1U << 5)
+#define LOG_SCSI        (1U << 6)
+#define LOG_SCSI_DMA    (1U << 7)
+#define LOG_DUART0      (1U << 8)
+#define LOG_DUART1      (1U << 9)
+#define LOG_DUART2      (1U << 10)
+#define LOG_PIT         (1U << 11)
+#define LOG_CHAIN       (1U << 12)
 #define LOG_REGS        (LOG_UNKNOWN | LOG_READS | LOG_WRITES)
 #define LOG_DUART       (LOG_DUART0 | LOG_DUART1 | LOG_DUART2)
 #define LOG_ALL         (LOG_REGS | LOG_INT | LOG_EEPROM | LOG_SCSI | LOG_SCSI_DMA | LOG_DUART | LOG_PIT | LOG_CHAIN)
@@ -139,7 +139,7 @@ void hpc1_device::device_add_mconfig(machine_config &config)
 	SCC85C30(config, m_scc[0], SCC_PCLK);
 	m_scc[0]->configure_channels(SCC_RXA_CLK.value(), SCC_TXA_CLK.value(), SCC_RXB_CLK.value(), SCC_TXB_CLK.value());
 	m_scc[0]->out_int_callback().set(FUNC(hpc1_device::duart0_int_w));
-	m_scc[0]->out_txda_callback().set("keyboard", FUNC(sgi_keyboard_port_device::write_txd));
+	m_scc[0]->out_txda_callback().set("keyboard_port", FUNC(sgi_kbd_port_device::write_txd));
 
 	SCC85C30(config, m_scc[1], SCC_PCLK);
 	m_scc[1]->configure_channels(SCC_RXA_CLK.value(), SCC_TXA_CLK.value(), SCC_RXB_CLK.value(), SCC_TXB_CLK.value());
@@ -155,9 +155,9 @@ void hpc1_device::device_add_mconfig(machine_config &config)
 	m_scc[2]->configure_channels(SCC_RXA_CLK.value(), SCC_TXA_CLK.value(), SCC_RXB_CLK.value(), SCC_TXB_CLK.value());
 	m_scc[2]->out_int_callback().set(FUNC(hpc1_device::duart2_int_w));
 
-	SGIKBD_PORT(config, "keyboard", default_sgi_keyboard_devices, "hlekbd").rxd_handler().set(m_scc[0], FUNC(z80scc_device::rxa_w));
+	SGI_KBD_PORT(config, "keyboard_port", default_sgi_kbd_devices, "keyboard").rxd_handler().set(m_scc[0], FUNC(z80scc_device::rxa_w));
 
-	rs232_port_device &mouseport(RS232_PORT(config, "mouseport", indigo_mice, "sgimouse"));
+	rs232_port_device &mouseport(RS232_PORT(config, "mouse_port", indigo_mice, "sgimouse"));
 	mouseport.set_fixed(true);
 	mouseport.rxd_handler().set(m_scc[0], FUNC(scc85c30_device::rxb_w));
 	mouseport.cts_handler().set(m_scc[0], FUNC(scc85c30_device::ctsb_w));
@@ -547,7 +547,7 @@ void hpc1_device::decrement_chain()
 	}
 }
 
-WRITE_LINE_MEMBER(hpc1_device::scsi_drq)
+void hpc1_device::scsi_drq(int state)
 {
 	m_scsi_dma.m_drq = state;
 
@@ -592,21 +592,21 @@ void hpc1_device::set_timer_int_clear(uint32_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(hpc1_device::timer0_int)
+void hpc1_device::timer0_int(int state)
 {
 	LOGMASKED(LOG_PIT, "Timer0 Interrupt: %d\n", state);
 	if (state)
 		m_maincpu->set_input_line(MIPS3_IRQ2, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(hpc1_device::timer1_int)
+void hpc1_device::timer1_int(int state)
 {
 	LOGMASKED(LOG_PIT, "Timer2 Interrupt: %d\n", state);
 	if (state)
 		m_maincpu->set_input_line(MIPS3_IRQ3, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(hpc1_device::timer2_int)
+void hpc1_device::timer2_int(int state)
 {
 	LOGMASKED(LOG_PIT, "Timer2 Interrupt (Disabled): %d\n", state);
 }
@@ -615,9 +615,9 @@ WRITE_LINE_MEMBER(hpc1_device::timer2_int)
 //  SERIAL DUARTS
 //**************************************************************************
 
-WRITE_LINE_MEMBER(hpc1_device::duart0_int_w) { duart_int_w(0, state); }
-WRITE_LINE_MEMBER(hpc1_device::duart1_int_w) { duart_int_w(1, state); }
-WRITE_LINE_MEMBER(hpc1_device::duart2_int_w) { duart_int_w(2, state); }
+void hpc1_device::duart0_int_w(int state) { duart_int_w(0, state); }
+void hpc1_device::duart1_int_w(int state) { duart_int_w(1, state); }
+void hpc1_device::duart2_int_w(int state) { duart_int_w(2, state); }
 
 void hpc1_device::duart_int_w(int channel, int state)
 {
@@ -665,7 +665,7 @@ void hpc1_device::update_irq(int channel)
 	}
 }
 
-WRITE_LINE_MEMBER(hpc1_device::scsi_irq)
+void hpc1_device::scsi_irq(int state)
 {
 	if (state)
 	{

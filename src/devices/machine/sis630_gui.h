@@ -134,8 +134,6 @@ private:
 	required_device<sis630_gui_device> m_vga;
 
 	virtual void bridge_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
-
-
 };
 
 DECLARE_DEVICE_TYPE(SIS630_BRIDGE, sis630_bridge_device)

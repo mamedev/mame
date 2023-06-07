@@ -47,13 +47,13 @@ thomson_extension_interface::thomson_extension_interface(const machine_config &m
 {
 }
 
-WRITE_LINE_MEMBER(thomson_extension_interface::firq_w)
+void thomson_extension_interface::firq_w(int state)
 {
 	if(m_ext)
 		m_ext->m_firq_callback(state);
 }
 
-WRITE_LINE_MEMBER(thomson_extension_interface::irq_w)
+void thomson_extension_interface::irq_w(int state)
 {
 	if(m_ext)
 		m_ext->m_irq_callback(state);

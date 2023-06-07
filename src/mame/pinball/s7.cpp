@@ -133,17 +133,17 @@ private:
 	void switch_w(u8 data);
 	u8 nvram_r(offs_t offset);
 	void nvram_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w) { }
-	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { } // enable solenoids
-	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { m_io_outputs[20] = state; } //ST5
-	DECLARE_WRITE_LINE_MEMBER(pia22_cb2_w) { } //ST-solenoids enable
-	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { m_io_outputs[17] = state; } //ST2
-	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { m_io_outputs[16] = state; } //ST1
-	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { } //diag leds enable
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { m_io_outputs[21] = state; } //ST6
-	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { m_io_outputs[19] = state; } //ST4
-	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { m_io_outputs[18] = state; } //ST3
-	DECLARE_WRITE_LINE_MEMBER(pia_irq);
+	void pia21_ca2_w(int state) { }
+	void pia21_cb2_w(int state) { } // enable solenoids
+	void pia22_ca2_w(int state) { m_io_outputs[20] = state; } //ST5
+	void pia22_cb2_w(int state) { } //ST-solenoids enable
+	void pia24_ca2_w(int state) { m_io_outputs[17] = state; } //ST2
+	void pia24_cb2_w(int state) { m_io_outputs[16] = state; } //ST1
+	void pia28_ca2_w(int state) { } //diag leds enable
+	void pia28_cb2_w(int state) { m_io_outputs[21] = state; } //ST6
+	void pia30_ca2_w(int state) { m_io_outputs[19] = state; } //ST4
+	void pia30_cb2_w(int state) { m_io_outputs[18] = state; } //ST3
+	void pia_irq(int state);
 	void main_map(address_map &map);
 
 	u8 m_strobe = 0U;
@@ -611,7 +611,7 @@ void s7_state::nvram_w(offs_t offset, u8 data)
 		m_nvram[offset] = data;
 }
 
-WRITE_LINE_MEMBER( s7_state::pia_irq )
+void s7_state::pia_irq(int state)
 {
 	if(state == CLEAR_LINE)
 	{

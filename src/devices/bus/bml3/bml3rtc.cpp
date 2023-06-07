@@ -95,13 +95,15 @@ bml3bus_rtc_device::bml3bus_rtc_device(const machine_config &mconfig, const char
 
 void bml3bus_rtc_device::device_start()
 {
-	// install into memory
-	address_space &space_prg = space();
-	space_prg.install_readwrite_handler(0xff38, 0xff3a, read8sm_delegate(*this, FUNC(bml3bus_rtc_device::bml3_rtc_r)), write8sm_delegate(*this, FUNC(bml3bus_rtc_device::bml3_rtc_w)));
-
 	m_addr_latch = 0;
 	m_data_latch = 0;
 
 	save_item(NAME(m_addr_latch));
 	save_item(NAME(m_data_latch));
+}
+
+void bml3bus_rtc_device::map_io(address_space_installer &space)
+{
+	// install into memory
+	space.install_readwrite_handler(0xff38, 0xff3a, read8sm_delegate(*this, FUNC(bml3bus_rtc_device::bml3_rtc_r)), write8sm_delegate(*this, FUNC(bml3bus_rtc_device::bml3_rtc_w)));
 }

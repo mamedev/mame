@@ -251,7 +251,7 @@ private:
 	void paletteram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	void mastercpu_am(address_map &map);
 	void mastercpu_port_am(address_map &map);
@@ -327,7 +327,7 @@ uint32_t djboy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-WRITE_LINE_MEMBER(djboy_state::screen_vblank)
+void djboy_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)

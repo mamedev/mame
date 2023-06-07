@@ -12,8 +12,7 @@
 #include "pc11.h"
 
 
-//#define LOG_GENERAL (1U <<  0)
-#define LOG_DBG     (1U <<  2)
+#define LOG_DBG     (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_DBG)
 //#define LOG_OUTPUT_FUNC osd_printf_info

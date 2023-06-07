@@ -24,19 +24,19 @@ class ioc2_device : public device_t
 public:
 	template <typename T> void set_cpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
 
-	DECLARE_INPUT_CHANGED_MEMBER( power_button );
-	DECLARE_INPUT_CHANGED_MEMBER( volume_down );
-	DECLARE_INPUT_CHANGED_MEMBER( volume_up );
+	DECLARE_INPUT_CHANGED_MEMBER(power_button);
+	DECLARE_INPUT_CHANGED_MEMBER(volume_down);
+	DECLARE_INPUT_CHANGED_MEMBER(volume_up);
 
-	DECLARE_WRITE_LINE_MEMBER(gio_int0_w);
-	DECLARE_WRITE_LINE_MEMBER(gio_int1_w);
-	DECLARE_WRITE_LINE_MEMBER(gio_int2_w);
-	DECLARE_WRITE_LINE_MEMBER(hpc_dma_done_w);
-	DECLARE_WRITE_LINE_MEMBER(mc_dma_done_w);
-	DECLARE_WRITE_LINE_MEMBER(scsi0_int_w);
-	DECLARE_WRITE_LINE_MEMBER(scsi1_int_w);
-	DECLARE_WRITE_LINE_MEMBER(enet_int_w);
-	DECLARE_WRITE_LINE_MEMBER(video_int_w);
+	void gio_int0_w(int state);
+	void gio_int1_w(int state);
+	void gio_int2_w(int state);
+	void hpc_dma_done_w(int state);
+	void mc_dma_done_w(int state);
+	void scsi0_int_w(int state);
+	void scsi1_int_w(int state);
+	void enet_int_w(int state);
+	void video_int_w(int state);
 
 	void raise_local_irq(int channel, uint8_t mask);
 	void lower_local_irq(int channel, uint8_t mask);
@@ -78,11 +78,11 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_WRITE_LINE_MEMBER(timer0_int);
-	DECLARE_WRITE_LINE_MEMBER(timer1_int);
-	DECLARE_WRITE_LINE_MEMBER(pit_clock2_out);
-	DECLARE_WRITE_LINE_MEMBER(kbdc_int_w);
-	DECLARE_WRITE_LINE_MEMBER(duart_int_w);
+	void timer0_int(int state);
+	void timer1_int(int state);
+	void pit_clock2_out(int state);
+	void kbdc_int_w(int state);
+	void duart_int_w(int state);
 
 	void check_mappable_interrupt(int channel);
 

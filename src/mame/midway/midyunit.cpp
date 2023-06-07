@@ -171,7 +171,7 @@ uint8_t midyunit_state::yawdim2_soundlatch_r()
  *
  *************************************/
 
-READ_LINE_MEMBER(midyunit_state::narc_talkback_strobe_r)
+int midyunit_state::narc_talkback_strobe_r()
 {
 	return (m_narc_sound->read() >> 8) & 1;
 }
@@ -183,7 +183,7 @@ CUSTOM_INPUT_MEMBER(midyunit_state::narc_talkback_data_r)
 }
 
 
-READ_LINE_MEMBER(midyunit_state::adpcm_irq_state_r)
+int midyunit_state::adpcm_irq_state_r()
 {
 	return m_adpcm_sound->irq_read() & 1;
 }

@@ -6,9 +6,16 @@
 #include "speaker.h"
 
 
-#define LOG_ES            (0)
-#define LOG_ES_REG        (0)
-#define LOG_ES_FILE       (0)
+#define LOG_OTHER         (1U << 1)
+#define LOG_REG           (1U << 2)
+#define LOG_IRQ           (1U << 3)
+#define LOG_ADC           (1U << 4)
+#define LOG_INVALID       (1U << 5)
+#define LOG_UNIMPL        (1U << 6)
+#define LOG_SAMPLES       (1U << 7)
+
+#define VERBOSE (LOG_UNIMPL | LOG_INVALID)
+#include "logmacro.h"
 
 
 /* Ensonic ES1373 registers 0x00-0x3f */
@@ -87,7 +94,7 @@ void es1373_device::map(address_map &map)
 es1373_device::es1373_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, ES1373, tag, owner, clock)
 	, device_sound_interface(mconfig, *this), m_stream(nullptr)
-	, m_eslog(nullptr), m_tempCount(0), m_timer(nullptr), m_memory_space(nullptr), m_irq_handler(*this)
+	, m_timer(nullptr), m_memory_space(nullptr), m_irq_handler(*this)
 {
 	set_ids(0x12741371, 0x04, 0x040100, 0x12741371);
 }
@@ -96,19 +103,6 @@ void es1373_device::device_resolve_objects()
 {
 	pci_device::device_resolve_objects();
 	m_irq_handler.resolve_safe();
-}
-
-//-------------------------------------------------
-//  device_stop - device-specific stop
-//-------------------------------------------------
-void es1373_device::device_stop()
-{
-	/* debugging */
-	if (LOG_ES_FILE && m_eslog)
-	{
-		fclose(m_eslog);
-		m_eslog = nullptr;
-	}
 }
 
 //-------------------------------------------------
@@ -179,16 +173,6 @@ void es1373_device::device_post_load()
 
 void es1373_device::device_reset()
 {
-	// debugging
-	m_tempCount = 0;
-	if (LOG_ES_FILE && m_eslog)
-	{
-		fclose(m_eslog);
-		m_eslog = nullptr;
-	}
-	if (LOG_ES_FILE && !m_eslog)
-		m_eslog = fopen("es.log", "w");
-
 	pci_device::device_reset();
 	memset(m_es_regs, 0, sizeof(m_es_regs));
 	memset(m_ac97_regs, 0, sizeof(m_ac97_regs));
@@ -236,7 +220,7 @@ TIMER_CALLBACK_MEMBER(es1373_device::delayed_stream_update)
 void es1373_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	if (m_dac1.enable) {
-		logerror("%s: sound_stream_update DAC1 not implemented yet\n", tag());
+		LOGMASKED(LOG_UNIMPL, "%s: sound_stream_update DAC1 not implemented yet\n", tag());
 	}
 
 	if (m_dac2.enable) {
@@ -248,13 +232,12 @@ void es1373_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 
 	if (m_adc.enable) {
 		if (m_adc.format!=SCTRL_16BIT_MONO) {
-			logerror("%s: sound_stream_update Only SCTRL_16BIT_MONO recorded supported\n", tag());
+			LOGMASKED(LOG_UNIMPL, "%s: sound_stream_update Only SCTRL_16BIT_MONO recorded supported\n", tag());
 		} else {
 			for (int i=0; i<outputs[0].samples(); i++) {
 				if (m_adc.buf_count<=m_adc.buf_size) {
-					if (LOG_ES)
-						logerror("%s: ADC buf_count: %i buf_size: %i buf_rptr: %i buf_wptr: %i\n", machine().describe_context(),
-							m_adc.buf_count, m_adc.buf_size, m_adc.buf_rptr, m_adc.buf_wptr);
+					LOGMASKED(LOG_OTHER, "%s: ADC buf_count: %i buf_size: %i buf_rptr: %i buf_wptr: %i\n", machine().describe_context(),
+						m_adc.buf_count, m_adc.buf_size, m_adc.buf_rptr, m_adc.buf_wptr);
 					if ((m_adc.buf_count&0x1)) {
 						m_adc.buf_wptr++;
 					}
@@ -263,13 +246,11 @@ void es1373_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 						if (m_adc.loop_en) {
 							// Keep playing
 							m_adc.buf_count = 0;
-							if (LOG_ES)
-								logerror("%s: send_audio_out ADC clearing buf_count\n", machine().describe_context());
+							LOGMASKED(LOG_OTHER, "%s: send_audio_out ADC clearing buf_count\n", machine().describe_context());
 						}
 						if (m_adc.int_en) {
 							m_es_regs[ES_INT_CS_STATUS] |= ICSTATUS_ADC_INT_MASK;
-							if (LOG_ES)
-								logerror("%s: send_audio_out Setting ADC interrupt\n", machine().describe_context());
+							LOGMASKED(LOG_OTHER, "%s: send_audio_out Setting ADC interrupt\n", machine().describe_context());
 						}
 					}
 					if (!(m_adc.buf_count&1) && !(m_adc.buf_wptr&0xf)) {
@@ -316,16 +297,16 @@ void es1373_device::send_audio_out(chan_info& chan, uint32_t intr_mask, write_st
 			if ((command & 0x4) && ((chan.buf_rptr&8)^(chan.buf_wptr&8))) {
 				transfer_pci_audio(chan, ES_PCI_READ);
 			}
-			if (LOG_ES && i==0)
-				logerror("%s: chan: %X samples: %i buf_count: %X buf_size: %X buf_rptr: %X buf_wptr: %X\n",
+			if (i == 0)
+				LOGMASKED(LOG_OTHER, "%s: chan: %X samples: %i buf_count: %X buf_size: %X buf_rptr: %X buf_wptr: %X\n",
 					machine().describe_context(), chan.number, outL.samples(), chan.buf_count, chan.buf_size, chan.buf_rptr, chan.buf_wptr);
 			// Buffer is 4 bytes per location, need to switch on sample mode
 			switch (chan.format) {
 				case SCTRL_8BIT_MONO:
-					logerror("es1373_device::send_audio_out SCTRL_8BIT_MONO not implemented yet\n");
+					LOGMASKED(LOG_UNIMPL, "es1373_device::send_audio_out SCTRL_8BIT_MONO not implemented yet\n");
 					break;
 				case SCTRL_8BIT_STEREO:
-					logerror("es1373_device::send_audio_out SCTRL_8BIT_STEREO not implemented yet\n");
+					LOGMASKED(LOG_UNIMPL, "es1373_device::send_audio_out SCTRL_8BIT_STEREO not implemented yet\n");
 					break;
 				case SCTRL_16BIT_MONO:
 					// The sound cache is 32 bit wide fifo, so each entry is two mono 16 bit samples
@@ -347,12 +328,6 @@ void es1373_device::send_audio_out(chan_info& chan, uint32_t intr_mask, write_st
 					buf_row_done = true;
 					break;
 			}
-			if (LOG_ES_FILE && m_tempCount<1000000) {
-				m_tempCount++;
-				//logerror("es1373_device::sound_stream_update count: %i samp16: %X\n", i, samp16);
-				//if (LOG_ES_FILE && m_eslog)
-					//fprintf(m_eslog, "%i\n", samp16);
-			}
 			chan.buf_count++;
 			if (chan.buf_count > chan.buf_size) {
 				if (chan.loop_en) {
@@ -360,13 +335,11 @@ void es1373_device::send_audio_out(chan_info& chan, uint32_t intr_mask, write_st
 					//chan.buf_count -= 1;  // Should check SCTRL_P2_END_MASK
 					chan.buf_count = 0;
 					//chan.buf_rptr -= 1;
-					if (LOG_ES)
-						logerror("%s: send_audio_out DAC2 clearing buf_count\n", machine().describe_context());
+					LOGMASKED(LOG_OTHER, "%s: send_audio_out DAC2 clearing buf_count\n", machine().describe_context());
 				}
 				if (chan.int_en) {
 					m_es_regs[ES_INT_CS_STATUS] |= intr_mask;
-					if (LOG_ES)
-						logerror("%s: send_audio_out Setting DAC2 interrupt\n", machine().describe_context());
+					LOGMASKED(LOG_OTHER, "%s: send_audio_out Setting DAC2 interrupt\n", machine().describe_context());
 				}
 			}
 			if (buf_row_done && !(chan.buf_rptr&0xf)) {
@@ -382,9 +355,8 @@ void es1373_device::transfer_pci_audio(chan_info& chan, int type)
 {
 	uint32_t pci_addr, data;
 	pci_addr = chan.pci_addr + (chan.pci_count<<2);
-	if (LOG_ES)
-		logerror("%s: transfer_pci_audio start chan: %X pci_addr: %08X pci_count: %X pci_size: %X buf_rptr: %X buf_wptr: %X\n",
-			machine().describe_context(), chan.number, pci_addr, chan.pci_count, chan.pci_size, chan.buf_rptr, chan.buf_wptr);
+	LOGMASKED(LOG_OTHER, "%s: transfer_pci_audio start chan: %X pci_addr: %08X pci_count: %X pci_size: %X buf_rptr: %X buf_wptr: %X\n",
+		machine().describe_context(), chan.number, pci_addr, chan.pci_count, chan.pci_size, chan.buf_rptr, chan.buf_wptr);
 	// Always transfer 8 longwords
 	for (int i=0; i<8; i++) {
 		pci_addr = chan.pci_addr + (chan.pci_count<<2);
@@ -425,7 +397,7 @@ uint32_t es1373_device::calc_size(const uint8_t &format)
 			return 4;
 			break;
 	}
-	logerror("%s: calc_size Invalid format = %X specified\n", tag(), format);
+	LOGMASKED(LOG_INVALID, "%s: calc_size Invalid format = %X specified\n", tag(), format);
 	return 0;
 }
 
@@ -487,8 +459,7 @@ uint32_t es1373_device::reg_r(offs_t offset, uint32_t mem_mask)
 		default:
 			break;
 	}
-	if (LOG_ES_REG)
-		logerror("%s:ES1373 read from offset %02X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
+	LOGMASKED(LOG_REG, "%s:ES1373 read from offset %02X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 	return result;
 }
 
@@ -538,12 +509,10 @@ void es1373_device::reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 					if (m_es_regs[ES_INT_CS_STATUS]&ICSTATUS_INTR_MASK && m_irq_num!=-1) {
 						m_irq_handler(0);
 						m_es_regs[ES_INT_CS_STATUS] &= ~ICSTATUS_INTR_MASK;
-						if (0 && LOG_ES_REG)
-							logerror("%s: es1373_device::reg_w Clearing interrupt\n", machine().describe_context());
+						LOGMASKED(LOG_IRQ, "%s: es1373_device::reg_w Clearing interrupt\n", machine().describe_context());
 					}
 				}
-				if (0 && LOG_ES_REG)
-					logerror("%s: es1373_device::reg_w adc_int_en: %i dac1_int_en: %i dac2_int_en: %i\n", tag(), m_adc.int_en, m_dac1.int_en, m_dac2.int_en);
+				LOGMASKED(LOG_ADC, "%s: es1373_device::reg_w adc_int_en: %i dac1_int_en: %i dac2_int_en: %i\n", tag(), m_adc.int_en, m_dac1.int_en, m_dac2.int_en);
 			break;
 		case ES_DAC2_CNT:
 				m_dac2.buf_count = 0;
@@ -593,8 +562,7 @@ void es1373_device::reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 				case 0xc:
 					m_dac2.pci_count = (data>>16)&0xffff;
 					m_dac2.pci_size = data&0xffff;
-					if (LOG_ES_REG)
-						logerror("%s:ES1373 write to offset %02X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
+					LOGMASKED(LOG_REG, "%s:ES1373 write to offset %02X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 					break;
 				default:
 					break;
@@ -604,7 +572,5 @@ void es1373_device::reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			break;
 	}
 
-	if (LOG_ES_REG)
-		logerror("%s:ES1373 write to offset %02X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
-
+	LOGMASKED(LOG_REG, "%s:ES1373 write to offset %02X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 }

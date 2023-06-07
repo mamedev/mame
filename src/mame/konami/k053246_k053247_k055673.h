@@ -68,6 +68,7 @@ public:
 
 	u16 k055673_rom_word_r(offs_t offset);
 	u16 k055673_ps_rom_word_r(offs_t offset);
+	u16 k055673_gr_rom_word_r(offs_t offset);
 	u16 k055673_5bpp_rom_word_r(offs_t offset);
 
 	u8 k053247_r(offs_t offset);

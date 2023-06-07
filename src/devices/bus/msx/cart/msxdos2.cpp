@@ -146,7 +146,7 @@ std::error_condition msx_cart_msxdos2j_device::initialize_cartridge(std::string 
 	page(1)->install_view(0x4000, 0x7fff, m_view_page1);
 	page(2)->install_view(0x8000, 0xbfff, m_view_page2);
 	page(3)->install_view(0xc000, 0xffff, m_view_page3);
-	page(3)->install_readwrite_handler(0xffff, 0xffff, read8smo_delegate(*this, FUNC(msx_cart_msxdos2j_device::secondary_slot_r)), write8smo_delegate(*this, FUNC(msx_cart_msxdos2j_device::secondary_slot_w)));
+	page(3)->install_readwrite_handler(0xffff, 0xffff, emu::rw_delegate(*this, FUNC(msx_cart_msxdos2j_device::secondary_slot_r)), emu::rw_delegate(*this, FUNC(msx_cart_msxdos2j_device::secondary_slot_w)));
 
 	// Make sure all views we can select do exist.
 	for (int subslot = 0; subslot < 4; subslot++)
@@ -162,7 +162,7 @@ std::error_condition msx_cart_msxdos2j_device::initialize_cartridge(std::string 
 
 	// MSX-DOS2 rom
 	m_view_page1[3].install_read_bank(0x4000, 0x7fff, m_rombank);
-	m_view_page1[3].install_write_handler(m_bank_address, m_bank_address, write8smo_delegate(*this, FUNC(msx_cart_msxdos2j_device::bank_w)));
+	m_view_page1[3].install_write_handler(m_bank_address, m_bank_address, emu::rw_delegate(*this, FUNC(msx_cart_msxdos2j_device::bank_w)));
 
 	// On-cartridge memory mapper RAM
 	if (ram_size)
@@ -229,7 +229,7 @@ std::error_condition msx_cart_msxdos2e_device::initialize_cartridge(std::string 
 		return result;
 
 	page(1)->install_read_bank(0x4000, 0x7fff, m_rombank);
-	page(1)->install_write_handler(m_bank_address, m_bank_address, write8smo_delegate(*this, FUNC(msx_cart_msxdos2e_device::bank_w)));
+	page(1)->install_write_handler(m_bank_address, m_bank_address, emu::rw_delegate(*this, FUNC(msx_cart_msxdos2e_device::bank_w)));
 
 	return std::error_condition();
 }

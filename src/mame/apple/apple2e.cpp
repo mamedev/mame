@@ -362,14 +362,14 @@ public:
 	void lc_romswitch_w(offs_t offset, u8 data);
 	u8 laser_mouse_r(offs_t offset);
 	void laser_mouse_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_inh_w);
-	DECLARE_WRITE_LINE_MEMBER(busy_w);
-	DECLARE_READ_LINE_MEMBER(ay3600_shift_r);
-	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
-	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
-	DECLARE_WRITE_LINE_MEMBER(ay3600_ako_w);
+	void a2bus_irq_w(int state);
+	void a2bus_nmi_w(int state);
+	void a2bus_inh_w(int state);
+	void busy_w(int state);
+	int ay3600_shift_r();
+	int ay3600_control_r();
+	void ay3600_data_ready_w(int state);
+	void ay3600_ako_w(int state);
 	u8 memexp_r(offs_t offset);
 	void memexp_w(offs_t offset, u8 data);
 	u8 nsc_backing_r(offs_t offset);
@@ -440,6 +440,7 @@ private:
 	bool m_romswitch;
 	bool m_mockingboard4c;
 	bool m_intc8rom;
+	bool m_reset_latch;
 
 	bool m_isiic, m_isiicplus, m_iscec, m_iscecm, m_iscec2000, m_pal;
 	u8 m_migram[0x800];
@@ -710,7 +711,7 @@ void apple2e_state::recalc_active_device()
 	}
 }
 
-WRITE_LINE_MEMBER(apple2e_state::a2bus_irq_w)
+void apple2e_state::a2bus_irq_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -722,13 +723,13 @@ WRITE_LINE_MEMBER(apple2e_state::a2bus_irq_w)
 	}
 }
 
-WRITE_LINE_MEMBER(apple2e_state::a2bus_nmi_w)
+void apple2e_state::a2bus_nmi_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
 // TODO: this assumes /INH only on ROM, needs expansion to support e.g. phantom-slotting cards and etc.
-WRITE_LINE_MEMBER(apple2e_state::a2bus_inh_w)
+void apple2e_state::a2bus_inh_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -776,7 +777,7 @@ WRITE_LINE_MEMBER(apple2e_state::a2bus_inh_w)
 	}
 }
 
-WRITE_LINE_MEMBER(apple2e_state::busy_w)
+void apple2e_state::busy_w(int state)
 {
 	m_centronics_busy = state;
 }
@@ -1033,6 +1034,7 @@ void apple2e_state::machine_start()
 	}
 
 	m_joystick_x1_time = m_joystick_x2_time = m_joystick_y1_time = m_joystick_y2_time = 0;
+	m_reset_latch = false;
 
 	// setup save states
 	save_item(NAME(m_speaker_state));
@@ -1111,6 +1113,7 @@ void apple2e_state::machine_start()
 	save_item(NAME(m_ace2200_axxx_bank));
 	save_item(NAME(m_laser_speed));
 	save_item(NAME(m_laser_fdc_on));
+	save_item(NAME(m_reset_latch));
 }
 
 void apple2e_state::machine_reset()
@@ -1304,18 +1307,47 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 		// check for ctrl-reset
 		if ((m_kbspecial->read() & 0x88) == 0x88)
 		{
-			m_maincpu->reset();
+			if (!m_reset_latch)
+			{
+				m_reset_latch = true;
+				m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
-			// reset intcxrom to default
-			if ((m_isiic) || (m_isace500))
-			{
-				m_intcxrom = true;
+				// As per Sather: LC resets to read ROM, write RAM, no pre-write, bank 2
+				m_lcram = false;
+				m_lcram2 = true;
+				m_lcprewrite = false;
+				m_lcwriteenable = true;
+
+				// More Sather: all MMU switches off (80STORE, RAMRD, RAMWRT, INTCXROM, ALTZP, SLOTC3ROM, PAGE2, HIRES, INTC8ROM)
+				m_video->a80store_w(false);
+				m_altzp = false;
+				m_ramrd = false;
+				m_ramwrt = false;
+				m_altzp = false;
+				m_video->page2_w(false);
+				m_video->res_w(0);
+
+				// reset intcxrom to default
+				if ((m_isiic) || (m_isace500))
+				{
+					m_intcxrom = true;
+				}
+				else
+				{
+					m_intcxrom = false;
+					m_slotc3rom = false;
+				}
+				auxbank_update();
+				update_slotrom_banks();
 			}
-			else
+		}
+		else    // user released Control-Reset
+		{
+			if (m_reset_latch)
 			{
-				m_intcxrom = false;
+				m_reset_latch = false;
+				m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 			}
-			update_slotrom_banks();
 		}
 
 		// check Franklin F-keys
@@ -1663,7 +1695,8 @@ void apple2e_state::do_io(int offset, bool is_iic)
 			}
 		}
 
-		if (m_ioudis)
+		// IIe does not have IOUDIS (ref: on-h/w tests by TomCh)
+		if ((m_ioudis) || (!m_isiic && !m_isace500))
 		{
 			switch (offset)
 			{
@@ -3649,7 +3682,7 @@ void apple2e_state::spectred_keyb_map(address_map &map)
     KEYBOARD
 ***************************************************************************/
 
-READ_LINE_MEMBER(apple2e_state::ay3600_shift_r)
+int apple2e_state::ay3600_shift_r()
 {
 	// either shift key
 	if (m_kbspecial->read() & 0x06)
@@ -3660,7 +3693,7 @@ READ_LINE_MEMBER(apple2e_state::ay3600_shift_r)
 	return CLEAR_LINE;
 }
 
-READ_LINE_MEMBER(apple2e_state::ay3600_control_r)
+int apple2e_state::ay3600_control_r()
 {
 	if (m_kbspecial->read() & 0x08)
 	{
@@ -3670,7 +3703,7 @@ READ_LINE_MEMBER(apple2e_state::ay3600_control_r)
 	return CLEAR_LINE;
 }
 
-WRITE_LINE_MEMBER(apple2e_state::ay3600_data_ready_w)
+void apple2e_state::ay3600_data_ready_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -3717,7 +3750,7 @@ WRITE_LINE_MEMBER(apple2e_state::ay3600_data_ready_w)
 	}
 }
 
-WRITE_LINE_MEMBER(apple2e_state::ay3600_ako_w)
+void apple2e_state::ay3600_ako_w(int state)
 {
 	m_anykeydown = (state == ASSERT_LINE) ? true : false;
 

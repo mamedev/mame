@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#ifndef MAME_BUS_MSX_CART_YAMAHA_H
-#define MAME_BUS_MSX_CART_YAMAHA_H
+#ifndef MAME_BUS_MSX_MODULE_SFG_H
+#define MAME_BUS_MSX_MODULE_SFG_H
 
 #pragma once
 
@@ -27,8 +27,8 @@ protected:
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(ym2148_irq_w);
+	void ym2151_irq_w(int state);
+	void ym2148_irq_w(int state);
 
 	required_memory_region m_region_sfg;
 	required_device<ym_generic_device> m_ym2151;
@@ -60,4 +60,4 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
-#endif // MAME_BUS_MSX_CART_YAMAHA_H
+#endif // MAME_BUS_MSX_MODULE_SFG_H

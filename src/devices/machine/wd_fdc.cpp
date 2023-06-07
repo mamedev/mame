@@ -7,7 +7,6 @@
 
 #include "debugger.h"
 
-//#define LOG_GENERAL   (1U << 0) //defined in logmacro.h already
 #define LOG_SETUP   (1U << 1) // Shows register setup
 #define LOG_SHIFT   (1U << 2) // Shows shift register contents
 #define LOG_COMP    (1U << 3) // Shows operations on the CPU side
@@ -237,7 +236,7 @@ void wd_fdc_device_base::soft_reset()
 	}
 }
 
-WRITE_LINE_MEMBER(wd_fdc_device_base::mr_w)
+void wd_fdc_device_base::mr_w(int state)
 {
 	if(mr && !state) {
 		command = 0x03;
@@ -315,7 +314,7 @@ void wd_fdc_device_base::set_floppy(floppy_image_device *_floppy)
 		ready_callback(floppy, next_ready);
 }
 
-WRITE_LINE_MEMBER(wd_fdc_device_base::dden_w)
+void wd_fdc_device_base::dden_w(int state)
 {
 	if(disable_mfm) {
 		logerror("Error, this chip does not have a dden line\n");
@@ -366,7 +365,7 @@ void wd_fdc_device_base::command_end()
 	main_state = sub_state = IDLE;
 	motor_timeout = 0;
 
-	if(!drq && (status & S_BUSY)) {
+	if(status & S_BUSY) {
 		if (!t_cmd->enabled()) {
 			status &= ~S_BUSY;
 		}
@@ -933,9 +932,9 @@ void wd_fdc_device_base::write_track_continue()
 			if(format_last_byte_count) {
 				char buf[32];
 				if(format_last_byte_count > 1)
-					sprintf(buf, "%dx%02x", format_last_byte_count, format_last_byte);
+					snprintf(buf, 32, "%dx%02x", format_last_byte_count, format_last_byte);
 				else
-					sprintf(buf, "%02x", format_last_byte);
+					snprintf(buf, 32, "%02x", format_last_byte);
 				format_description_string += buf;
 			}
 			LOGDESC("track description %s\n", format_description_string.c_str());
@@ -1094,6 +1093,7 @@ void wd_fdc_device_base::interrupt_start()
 		// when a force interrupt command is issued and there is no
 		// currently running command, return the status type 1 bits
 		status_type_1 = true;
+		drop_drq();
 	}
 
 	intrq_cond = command & 0x0f;
@@ -1596,27 +1596,27 @@ void wd_fdc_device_base::index_callback(floppy_image_device *floppy, int state)
 	general_continue();
 }
 
-READ_LINE_MEMBER(wd_fdc_device_base::intrq_r)
+int wd_fdc_device_base::intrq_r()
 {
 	return intrq;
 }
 
-READ_LINE_MEMBER(wd_fdc_device_base::drq_r)
+int wd_fdc_device_base::drq_r()
 {
 	return drq;
 }
 
-READ_LINE_MEMBER(wd_fdc_device_base::hld_r)
+int wd_fdc_device_base::hld_r()
 {
 	return hld;
 }
 
-WRITE_LINE_MEMBER(wd_fdc_device_base::hlt_w)
+void wd_fdc_device_base::hlt_w(int state)
 {
 	hlt = bool(state);
 }
 
-READ_LINE_MEMBER(wd_fdc_device_base::enp_r)
+int wd_fdc_device_base::enp_r()
 {
 	return enp;
 }
@@ -2046,7 +2046,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 				//FM Prefix match
 				if(cur_live.shift_reg_low<17>() == 0xabd5) { // 17-bit match
 					cur_live.data_separator_phase = false;
-					cur_live.bit_counter = 5*2;	// prefix is 5 of 8 bits
+					cur_live.bit_counter = 5*2; // prefix is 5 of 8 bits
 					cur_live.data_reg = 0xff;
 					break;
 				} else if(cur_live.bit_counter == 16) {
@@ -2104,9 +2104,9 @@ void wd_fdc_device_base::live_run(attotime limit)
 				if(format_last_byte_count) {
 					char buf[32];
 					if(format_last_byte_count > 1)
-						sprintf(buf, "%dx%02x ", format_last_byte_count, format_last_byte);
+						snprintf(buf, 32, "%dx%02x ", format_last_byte_count, format_last_byte);
 					else
-						sprintf(buf, "%02x ", format_last_byte);
+						snprintf(buf, 32, "%02x ", format_last_byte);
 					format_description_string += buf;
 				}
 				format_last_byte = data;

@@ -32,7 +32,7 @@ std::error_condition msx_cart_super_swangi_device::initialize_cartridge(std::str
 
 	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
 	page(2)->install_read_bank(0x8000, 0xbfff, m_rombank);
-	page(2)->install_write_handler(0x8000, 0x8000, write8smo_delegate(*this, FUNC(msx_cart_super_swangi_device::bank_w)));
+	page(2)->install_write_handler(0x8000, 0x8000, emu::rw_delegate(*this, FUNC(msx_cart_super_swangi_device::bank_w)));
 
 	return std::error_condition();
 }

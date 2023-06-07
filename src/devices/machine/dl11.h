@@ -43,10 +43,10 @@ public:
 	uint16_t read(offs_t offset);
 	void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ_LINE_MEMBER( rxrdy_r );
-	DECLARE_READ_LINE_MEMBER( txrdy_r );
+	int rxrdy_r();
+	int txrdy_r();
 
-	DECLARE_WRITE_LINE_MEMBER( rx_w ) { device_serial_interface::rx_w(state); }
+	void rx_w(int state) { device_serial_interface::rx_w(state); }
 
 protected:
 	// device-level overrides

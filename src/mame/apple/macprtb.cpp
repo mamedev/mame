@@ -180,7 +180,7 @@ private:
 	void mac_via_out_a(uint8_t data);
 	void mac_via_out_b(uint8_t data);
 	void field_interrupts();
-	DECLARE_WRITE_LINE_MEMBER(via_irq_w);
+	void via_irq_w(int state);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
 	int m_via_cycles = 0, m_via_interrupt = 0, m_scc_interrupt = 0, m_asc_interrupt = 0, m_last_taken_interrupt = 0;
 	int m_ca1_data = 0;
@@ -221,7 +221,7 @@ private:
 	// returns nonzero if no PDS RAM expansion, 0 if present
 	uint16_t mac_config_r() { return 0xffff; }
 
-	DECLARE_WRITE_LINE_MEMBER(asc_irq_w)
+	void asc_irq_w(int state)
 	{
 		m_asc_interrupt = state;
 		field_interrupts();
@@ -365,7 +365,7 @@ void macportable_state::mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mas
 	m_maincpu->adjust_icount(m_via_cycles);
 }
 
-WRITE_LINE_MEMBER(macportable_state::via_irq_w)
+void macportable_state::via_irq_w(int state)
 {
 	m_via_interrupt = state;
 	field_interrupts();

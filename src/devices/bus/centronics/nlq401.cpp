@@ -50,7 +50,7 @@ void nlq401_device::device_start()
 //  input_data0 - DATA1 line handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(nlq401_device::input_data0)
+void nlq401_device::input_data0(int state)
 {
 	// TODO
 }
@@ -59,7 +59,7 @@ WRITE_LINE_MEMBER(nlq401_device::input_data0)
 //  input_data1 - DATA2 line handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(nlq401_device::input_data1)
+void nlq401_device::input_data1(int state)
 {
 	// TODO
 }
@@ -68,7 +68,7 @@ WRITE_LINE_MEMBER(nlq401_device::input_data1)
 //  input_data2 - DATA3 line handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(nlq401_device::input_data2)
+void nlq401_device::input_data2(int state)
 {
 	// TODO
 }
@@ -77,7 +77,7 @@ WRITE_LINE_MEMBER(nlq401_device::input_data2)
 //  input_data3 - DATA4 line handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(nlq401_device::input_data3)
+void nlq401_device::input_data3(int state)
 {
 	// TODO
 }
@@ -86,7 +86,7 @@ WRITE_LINE_MEMBER(nlq401_device::input_data3)
 //  input_data4 - DATA5 line handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(nlq401_device::input_data4)
+void nlq401_device::input_data4(int state)
 {
 	// TODO
 }
@@ -95,7 +95,7 @@ WRITE_LINE_MEMBER(nlq401_device::input_data4)
 //  input_data5 - DATA6 line handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(nlq401_device::input_data5)
+void nlq401_device::input_data5(int state)
 {
 	// TODO
 }
@@ -104,7 +104,7 @@ WRITE_LINE_MEMBER(nlq401_device::input_data5)
 //  input_data6 - DATA7 line handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(nlq401_device::input_data6)
+void nlq401_device::input_data6(int state)
 {
 	// TODO
 }
@@ -113,7 +113,7 @@ WRITE_LINE_MEMBER(nlq401_device::input_data6)
 //  input_data7 - DATA8 line handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(nlq401_device::input_data7)
+void nlq401_device::input_data7(int state)
 {
 	// TODO
 }
@@ -122,7 +122,7 @@ WRITE_LINE_MEMBER(nlq401_device::input_data7)
 //  input_strobe - DATA STROBE line handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(nlq401_device::input_strobe)
+void nlq401_device::input_strobe(int state)
 {
 	// TODO
 }
@@ -131,7 +131,7 @@ WRITE_LINE_MEMBER(nlq401_device::input_strobe)
 //  input_init - INIT line handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(nlq401_device::input_init)
+void nlq401_device::input_init(int state)
 {
 	// TODO
 }

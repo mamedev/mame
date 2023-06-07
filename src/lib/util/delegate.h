@@ -969,4 +969,13 @@ public:
 	}
 };
 
+template <class FunctionClass, typename ReturnType, typename... Params>
+delegate(ReturnType (FunctionClass::*)(Params...), FunctionClass *) -> delegate<ReturnType (Params...)>;
+
+template <class FunctionClass, typename ReturnType, typename... Params>
+delegate(ReturnType (FunctionClass::*)(Params...) const, FunctionClass *) -> delegate<ReturnType (Params...)>;
+
+template <class FunctionClass, typename ReturnType, typename... Params>
+delegate(ReturnType (*)(FunctionClass &, Params...), FunctionClass *) -> delegate<ReturnType (Params...)>;
+
 #endif // MAME_LIB_UTIL_DELEGATE_H

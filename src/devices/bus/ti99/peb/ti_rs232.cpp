@@ -105,17 +105,17 @@
 #include "emu.h"
 #include "ti_rs232.h"
 
-#define LOG_WARN        (1U<<1)    // Warnings
-#define LOG_CONFIG      (1U<<2)
-#define LOG_LINES       (1U<<3)
-#define LOG_SETTING     (1U<<4)
-#define LOG_STATE       (1U<<5)
-#define LOG_MAP         (1U<<6)
-#define LOG_IN          (1U<<7)
-#define LOG_OUT         (1U<<8)
-#define LOG_ILA         (1U<<9)
+#define LOG_WARN        (1U << 1)    // Warnings
+#define LOG_CONFIG      (1U << 2)
+#define LOG_LINES       (1U << 3)
+#define LOG_SETTING     (1U << 4)
+#define LOG_STATE       (1U << 5)
+#define LOG_MAP         (1U << 6)
+#define LOG_IN          (1U << 7)
+#define LOG_OUT         (1U << 8)
+#define LOG_ILA         (1U << 9)
 
-#define VERBOSE ( LOG_CONFIG | LOG_WARN )
+#define VERBOSE (LOG_CONFIG | LOG_WARN)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(TI99_RS232,     bus::ti99::peb::ti_rs232_pio_device,      "ti99_rs232",           "TI-99 RS232/PIO interface")
@@ -293,17 +293,17 @@ void ti_rs232_pio_device::cruwrite(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(ti_rs232_pio_device::selected_w)
+void ti_rs232_pio_device::selected_w(int state)
 {
 	m_selected = state;
 }
 
-WRITE_LINE_MEMBER(ti_rs232_pio_device::pio_direction_in_w)
+void ti_rs232_pio_device::pio_direction_in_w(int state)
 {
 	m_pio_direction_in = state;
 }
 
-WRITE_LINE_MEMBER(ti_rs232_pio_device::pio_handshake_out_w)
+void ti_rs232_pio_device::pio_handshake_out_w(int state)
 {
 	m_pio_handshakeout = state;
 	if (m_pio_write && m_pio_writable && (!m_pio_direction_in))
@@ -342,31 +342,31 @@ WRITE_LINE_MEMBER(ti_rs232_pio_device::pio_handshake_out_w)
 	}
 }
 
-WRITE_LINE_MEMBER(ti_rs232_pio_device::pio_spareout_w)
+void ti_rs232_pio_device::pio_spareout_w(int state)
 {
 	m_pio_spareout = state;
 }
 
-WRITE_LINE_MEMBER(ti_rs232_pio_device::flag0_w)
+void ti_rs232_pio_device::flag0_w(int state)
 {
 	m_flag0 = state;
 }
 
-WRITE_LINE_MEMBER(ti_rs232_pio_device::cts0_w)
+void ti_rs232_pio_device::cts0_w(int state)
 {
 	// Set the CTS line for RS232/1
 	LOGMASKED(LOG_LINES, "(1/3) Setting CTS* via CRU to %d\n", state);
 	output_line_state(0, tms9902_device::CTS, state ? 0 : tms9902_device::CTS);
 }
 
-WRITE_LINE_MEMBER(ti_rs232_pio_device::cts1_w)
+void ti_rs232_pio_device::cts1_w(int state)
 {
 	// Set the CTS line for RS232/2
 	LOGMASKED(LOG_LINES, "(2/4) Setting CTS* via CRU to %d\n", state);
 	output_line_state(1, tms9902_device::CTS, state ? 0 : tms9902_device::CTS);
 }
 
-WRITE_LINE_MEMBER(ti_rs232_pio_device::led_w)
+void ti_rs232_pio_device::led_w(int state)
 {
 	m_led = state;
 }
@@ -931,7 +931,7 @@ void ti_rs232_pio_device::output_line_state(int uartind, int mask, uint8_t value
 /*
     Propagates the /INT signal of the UARTs to the /INT line of the pbox.
 */
-WRITE_LINE_MEMBER( ti_rs232_pio_device::int0_callback )
+void ti_rs232_pio_device::int0_callback(int state)
 {
 	int senila_bit = SENILA_0_BIT;
 
@@ -941,7 +941,7 @@ WRITE_LINE_MEMBER( ti_rs232_pio_device::int0_callback )
 	m_slot->set_inta(state);
 }
 
-WRITE_LINE_MEMBER( ti_rs232_pio_device::int1_callback )
+void ti_rs232_pio_device::int1_callback(int state)
 {
 	int senila_bit = SENILA_1_BIT;
 
@@ -957,12 +957,12 @@ WRITE_LINE_MEMBER( ti_rs232_pio_device::int1_callback )
     Instead, we check for signal line change or data transmission
     and call the respective function
 */
-WRITE_LINE_MEMBER( ti_rs232_pio_device::rcv0_callback )
+void ti_rs232_pio_device::rcv0_callback(int state)
 {
 	receive_data_or_line_state(0);
 }
 
-WRITE_LINE_MEMBER( ti_rs232_pio_device::rcv1_callback )
+void ti_rs232_pio_device::rcv1_callback(int state)
 {
 	receive_data_or_line_state(1);
 }

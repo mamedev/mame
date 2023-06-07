@@ -24,28 +24,29 @@ public:
 	template <typename T> void set_cmmu_i(T &&tag) { m_cmmu_i.set_tag(std::forward<T>(tag)); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_execute_interface overrides
+	// device_execute_interface implementation
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
-	// device_disasm_interface overrides
+	// device_disasm_interface implementation
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	// device_memory_interface overrides
+	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
 	void execute(u32 const inst);
 	void exception(unsigned vector, bool const trap = false);
 
 	// memory helpers
-	bool fetch(u32 address, u32 &inst);
-	template <typename T> void ld(u32 address, unsigned const reg);
-	template <typename T> bool st(u32 address, unsigned const reg);
-	template <typename T> void xmem(u32 address, unsigned const reg);
+	void fetch(u32 &address, u32 &inst);
+	template <typename T, bool Usr = false> void ld(u32 address, unsigned const reg);
+	template <typename T, bool Usr = false> void st(u32 address, unsigned const reg);
+	template <typename T, bool Usr = false> void xmem(u32 address, unsigned const reg);
 
 	// integer helpers
 	void set_cr(unsigned const cr, u32 const data);

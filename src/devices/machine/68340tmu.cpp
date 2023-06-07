@@ -14,18 +14,16 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-//#define LOG_GENERAL (1U <<  0) // Already defined in logmacro.h
-#define LOG_SETUP   (1U <<  1)
-#define LOG_READ    (1U <<  2)
-#define LOG_TIMER   (1U <<  3)
-#define LOG_INT     (1U <<  4)
-#define LOG_COUNT   (1U <<  5)
+#define LOG_SETUP   (1U << 1)
+#define LOG_READ    (1U << 2)
+#define LOG_TIMER   (1U << 3)
+#define LOG_INT     (1U << 4)
+#define LOG_COUNT   (1U << 5)
 
 //#define VERBOSE  (LOG_SETUP|LOG_INT|LOG_TIMER)
 
 #include "logmacro.h"
 
-//#define LOG(...) LOGMASKED(LOG_GENERAL,   __VA_ARGS__) // Already defined in logmacro.h
 #define LOGSETUP(...) LOGMASKED(LOG_SETUP, __VA_ARGS__)
 #define LOGR(...)     LOGMASKED(LOG_READ,  __VA_ARGS__)
 #define LOGTIMER(...) LOGMASKED(LOG_TIMER, __VA_ARGS__)
@@ -265,14 +263,14 @@ void mc68340_timer_module_device::write(offs_t offset, uint16_t data, uint16_t m
 	LOG("%08x m68340_internal_timer_w %08x, %08x (%08x)\n", m_cpu->pcbase(), offset * 2, data, mem_mask);
 }
 
-WRITE_LINE_MEMBER( mc68340_timer_module_device::tin_w)
+void mc68340_timer_module_device::tin_w(int state)
 {
 	LOGTIMER("%s\n", FUNCNAME);
 
 	m_tin = state;
 }
 
-WRITE_LINE_MEMBER( mc68340_timer_module_device::tgate_w)
+void mc68340_timer_module_device::tgate_w(int state)
 {
 	LOGTIMER("%s\n", FUNCNAME);
 

@@ -124,30 +124,30 @@ enum
     Add the desired LOG aspect to the VERBOSE line
 ******************************************************************/
 
-#define LOG_OP         (1U<<1)   // Current instruction
-#define LOG_EXEC       (1U<<2)   // Address of current instruction
-#define LOG_CONFIG     (1U<<3)   // Configuration
-#define LOG_CYCLES     (1U<<4)   // Cycles
-#define LOG_WARN       (1U<<5)   // Illegal operation or other condition
-#define LOG_MEM        (1U<<6)   // Memory access
-#define LOG_CONTEXT    (1U<<7)   // Context switch
-#define LOG_INT        (1U<<8)   // Interrupts
-#define LOG_READY      (1U<<9)   // READY line input
-#define LOG_CLOCK      (1U<<10)  // Clock pulses
-#define LOG_ADDRESSBUS (1U<<11)  // Address bus operation
-#define LOG_STATUS     (1U<<12)  // Status register
-#define LOG_CRU        (1U<<13)  // CRU operations
-#define LOG_DEC        (1U<<14)  // Decrementer
-#define LOG_WAIT       (1U<<15)  // Wait states
-#define LOG_HOLD       (1U<<16)  // Hold states
-#define LOG_IDLE       (1U<<17)  // Idle states
-#define LOG_EMU        (1U<<18)  // Emulation details
-#define LOG_MICRO      (1U<<19)  // Microinstruction processing
-#define LOG_INTD       (1U<<20)  // Interrupts (detailed phases)
-#define LOG_DETAIL     (1U<<31)  // Increased detail
+#define LOG_OP         (1U << 1)   // Current instruction
+#define LOG_EXEC       (1U << 2)   // Address of current instruction
+#define LOG_CONFIG     (1U << 3)   // Configuration
+#define LOG_CYCLES     (1U << 4)   // Cycles
+#define LOG_WARN       (1U << 5)   // Illegal operation or other condition
+#define LOG_MEM        (1U << 6)   // Memory access
+#define LOG_CONTEXT    (1U << 7)   // Context switch
+#define LOG_INT        (1U << 8)   // Interrupts
+#define LOG_READY      (1U << 9)   // READY line input
+#define LOG_CLOCK      (1U << 10)  // Clock pulses
+#define LOG_ADDRESSBUS (1U << 11)  // Address bus operation
+#define LOG_STATUS     (1U << 12)  // Status register
+#define LOG_CRU        (1U << 13)  // CRU operations
+#define LOG_DEC        (1U << 14)  // Decrementer
+#define LOG_WAIT       (1U << 15)  // Wait states
+#define LOG_HOLD       (1U << 16)  // Hold states
+#define LOG_IDLE       (1U << 17)  // Idle states
+#define LOG_EMU        (1U << 18)  // Emulation details
+#define LOG_MICRO      (1U << 19)  // Microinstruction processing
+#define LOG_INTD       (1U << 20)  // Interrupts (detailed phases)
+#define LOG_DETAIL     (1U << 31)  // Increased detail
 
 // Minimum log should be config and warnings
-#define VERBOSE ( LOG_CONFIG | LOG_WARN )
+#define VERBOSE (LOG_CONFIG | LOG_WARN)
 
 #include "logmacro.h"
 
@@ -1343,7 +1343,7 @@ void tms9995_device::execute_set_input(int irqline, int state)
 /*
     Triggers a RESET.
 */
-WRITE_LINE_MEMBER( tms9995_device::reset_line )
+void tms9995_device::reset_line(int state)
 {
 	if (state==ASSERT_LINE)
 	{
@@ -1386,7 +1386,7 @@ void tms9995_device::pulse_clock(int count)
 /*
     Enter the hold state.
 */
-WRITE_LINE_MEMBER( tms9995_device::hold_line )
+void tms9995_device::hold_line(int state)
 {
 	m_hold_requested = (state==ASSERT_LINE);
 	LOGMASKED(LOG_HOLD, "set HOLD = %d\n", state);
@@ -1400,7 +1400,7 @@ WRITE_LINE_MEMBER( tms9995_device::hold_line )
     Signal READY to the CPU. When cleared, the CPU enters wait states. This
     becomes effective on a clock pulse.
 */
-WRITE_LINE_MEMBER( tms9995_device::ready_line )
+void tms9995_device::ready_line(int state)
 {
 	bool newready = (state==ASSERT_LINE);
 

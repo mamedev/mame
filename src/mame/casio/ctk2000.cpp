@@ -49,9 +49,9 @@ public:
 	void ctk2000(machine_config &config);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(lcd_r) { return m_lcdc->db_r() >> 4; }
-	DECLARE_WRITE_LINE_MEMBER(lcd_w) { m_lcdc->db_w(state << 4); }
+	void lcd_w(int state) { m_lcdc->db_w(state << 4); }
 
-	DECLARE_WRITE_LINE_MEMBER(apo_w);
+	void apo_w(int state);
 
 private:
 	void ctk2000_map(address_map &map);
@@ -66,7 +66,7 @@ private:
 	required_device<hd44780_device> m_lcdc;
 };
 
-WRITE_LINE_MEMBER(ctk2000_state::apo_w)
+void ctk2000_state::apo_w(int state)
 {
 	logerror("apo_w: %x\n", state);
 	/* TODO: when 0, this should turn off the LCD, speakers, etc. */

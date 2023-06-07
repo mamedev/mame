@@ -13,20 +13,13 @@
 
 #include "emu.h"
 #include "mas3507d.h"
+#include "mp3_audio.h"
 
-#define MINIMP3_ONLY_MP3
-#define MINIMP3_NO_STDIO
-#define MINIMP3_IMPLEMENTATION
-#define MAX_FRAME_SYNC_MATCHES 3
-#include "minimp3/minimp3.h"
-#include "minimp3/minimp3_ex.h"
-
-#define LOG_GENERAL  (1 << 0)
-#define LOG_READ     (1 << 1)
-#define LOG_WRITE    (1 << 2)
-#define LOG_REGISTER (1 << 3)
-#define LOG_CONFIG   (1 << 4)
-#define LOG_OTHER    (1 << 5)
+#define LOG_READ     (1U << 1)
+#define LOG_WRITE    (1U << 2)
+#define LOG_REGISTER (1U << 3)
+#define LOG_CONFIG   (1U << 4)
+#define LOG_OTHER    (1U << 5)
 // #define VERBOSE      (LOG_GENERAL | LOG_READ | LOG_WRITE | LOG_REGISTER | LOG_CONFIG | LOG_OTHER)
 // #define LOG_OUTPUT_STREAM std::cout
 
@@ -59,6 +52,7 @@ mas3507d_device::mas3507d_device(const machine_config &mconfig, const char *tag,
 void mas3507d_device::device_start()
 {
 	stream = stream_alloc(0, 2, 44100);
+	mp3dec = std::make_unique<mp3_audio>(reinterpret_cast<const uint8_t *>(&mp3data[0]));
 
 	cb_mpeg_frame_sync.resolve();
 	cb_demand.resolve();
@@ -78,7 +72,6 @@ void mas3507d_device::device_start()
 
 	save_item(NAME(mp3data_count));
 	save_item(NAME(decoded_frame_count));
-	save_item(NAME(decoded_samples));
 	save_item(NAME(sample_count));
 	save_item(NAME(samples_idx));
 	save_item(NAME(is_muted));
@@ -91,22 +84,10 @@ void mas3507d_device::device_start()
 	save_item(NAME(i2c_io_val));
 	save_item(NAME(i2c_sdao_data));
 	save_item(NAME(playback_status));
-	save_item(NAME(mp3_is_buffered));
 
-	// This should be removed in the future if/when native MP3 decoding is implemented in MAME
-	save_item(NAME(mp3_dec.mdct_overlap));
-	save_item(NAME(mp3_dec.qmf_state));
-	save_item(NAME(mp3_dec.reserv));
-	save_item(NAME(mp3_dec.free_format_bytes));
-	save_item(NAME(mp3_dec.header));
-	save_item(NAME(mp3_dec.reserv_buf));
+	save_item(NAME(frame_channels));
 
-	save_item(NAME(mp3_info.frame_bytes));
-	save_item(NAME(mp3_info.frame_offset));
-	save_item(NAME(mp3_info.channels));
-	save_item(NAME(mp3_info.hz));
-	save_item(NAME(mp3_info.layer));
-	save_item(NAME(mp3_info.bitrate_kbps));
+	mp3dec->register_save(*this);
 }
 
 void mas3507d_device::device_reset()
@@ -120,6 +101,8 @@ void mas3507d_device::device_reset()
 
 	is_muted = false;
 	gain_ll = gain_rr = 0;
+
+	frame_channels = 2;
 
 	stream->set_sample_rate(44100);
 
@@ -439,50 +422,43 @@ void mas3507d_device::sid_w(uint8_t byte)
 
 	mp3data[mp3data_count++] = byte;
 
-	if (!mp3_is_buffered) {
-		// Only start the decoder when a full MP3 frame is found
-		int free_format_bytes = 0, frame_size = 0;
-		int frame_offset = mp3d_find_frame(static_cast<const uint8_t *>(&mp3data[0]), mp3data_count, &free_format_bytes, &frame_size);
-		mp3_is_buffered = frame_size && frame_offset + frame_size < mp3data_count;
-	}
-
-	cb_demand(!mp3_is_buffered || mp3data_count < mp3data.size());
+	cb_demand(mp3data_count < mp3data.size());
 }
 
 void mas3507d_device::fill_buffer()
 {
 	cb_mpeg_frame_sync(0);
 
-	if (!mp3_is_buffered) {
-		cb_demand(!mp3_is_buffered || mp3data_count < mp3data.size());
-		return;
-	}
-
-	memset(&mp3_info, 0, sizeof(mp3dec_frame_info_t));
-	sample_count = mp3dec_decode_frame(&mp3_dec, static_cast<const uint8_t *>(&mp3data[0]), mp3data_count, static_cast<mp3d_sample_t *>(&samples[0]), &mp3_info);
+	int pos = 0, frame_sample_rate = 0;
+	bool decoded_frame = mp3dec->decode_buffer(pos, mp3data_count, &samples[0], sample_count, frame_sample_rate, frame_channels);
 	samples_idx = 0;
 
-	if (sample_count == 0) {
+	if (!decoded_frame || sample_count == 0) {
 		// Frame decode failed
-		reset_playback();
+		if (mp3data_count >= mp3data.size()) {
+			std::copy(mp3data.begin() + 1, mp3data.end(), mp3data.begin());
+			mp3data_count--;
+		}
+
+		cb_demand(mp3data_count < mp3data.size());
 		return;
 	}
 
-	std::copy(mp3data.begin() + mp3_info.frame_bytes, mp3data.end(), mp3data.begin());
-	mp3data_count -= mp3_info.frame_bytes;
+	std::copy(mp3data.begin() + pos, mp3data.end(), mp3data.begin());
+	mp3data_count -= pos;
 
-	stream->set_sample_rate(mp3_info.hz);
+	stream->set_sample_rate(frame_sample_rate);
 
 	decoded_frame_count++;
 	cb_mpeg_frame_sync(1);
 
-	cb_demand(!mp3_is_buffered || mp3data_count < mp3data.size());
+	cb_demand(mp3data_count < mp3data.size());
 }
 
 void mas3507d_device::append_buffer(std::vector<write_stream_view> &outputs, int &pos, int scount)
 {
 	int s1 = scount - pos;
-	int bytes_per_sample = mp3_info.channels > 2 ? 2 : mp3_info.channels; // More than 2 channels is unsupported here
+	int bytes_per_sample = std::min(frame_channels, 2); // More than 2 channels is unsupported here
 
 	if(s1 > sample_count)
 		s1 = sample_count;
@@ -492,7 +468,6 @@ void mas3507d_device::append_buffer(std::vector<write_stream_view> &outputs, int
 		outputs[1].put_int(pos, samples[samples_idx * bytes_per_sample + (bytes_per_sample >> 1)], 32768);
 
 		samples_idx++;
-		decoded_samples++;
 		pos++;
 
 		if(samples_idx >= sample_count) {
@@ -504,20 +479,14 @@ void mas3507d_device::append_buffer(std::vector<write_stream_view> &outputs, int
 
 void mas3507d_device::reset_playback()
 {
-	if (mp3data_count != 0)
-		std::fill(mp3data.begin(), mp3data.end(), 0);
+	std::fill(mp3data.begin(), mp3data.end(), 0);
+	std::fill(samples.begin(), samples.end(), 0);
 
-	if (sample_count != 0 || decoded_samples != 0)
-		std::fill(samples.begin(), samples.end(), 0);
-
-	mp3dec_init(&mp3_dec);
+	mp3dec->clear();
 	mp3data_count = 0;
 	sample_count = 0;
 	decoded_frame_count = 0;
-	decoded_samples = 0;
 	samples_idx = 0;
-
-	mp3_is_buffered = false;
 }
 
 void mas3507d_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)

@@ -103,7 +103,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	required_device<dac_byte_interface> m_dac;
+	required_device<dac_8bit_r2r_device> m_dac;
 };
 
 

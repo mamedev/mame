@@ -24,6 +24,19 @@ Framebuffer todo:
 #include "emu.h"
 #include "saturn.h"
 
+#define LOG_VDP2 (1U << 1)
+#define LOG_ROZ  (1U << 2)
+
+#define DEBUG_MODE 0
+
+#if DEBUG_MODE
+#define VERBOSE (LOG_VDP2)
+#else
+#define VERBOSE (0)
+#endif
+
+#include "logmacro.h"
+
 
 #define VDP1_LOG 0
 
@@ -2323,7 +2336,6 @@ In other words,the first three types uses the offset and not the color allocated
     \-N Stores VDP1 ram contents into a file.
 */
 
-#define DEBUG_MODE 0
 #define TEST_FUNCTIONS 0
 #define POPMESSAGE_DEBUG 0
 
@@ -2336,13 +2348,7 @@ enum
 	STV_TRANSPARENCY_ALPHA = 0x4
 };
 
-#if DEBUG_MODE
-#define LOG_VDP2 1
-#define LOG_ROZ 0
-#else
-#define LOG_VDP2 0
-#define LOG_ROZ 0
-#endif
+#define DEBUG_DRAW_ROZ (0)
 
 /*
 
@@ -4403,20 +4409,19 @@ void saturn_state::stv_vdp2_fill_rotation_parameter_table( uint8_t rot_parameter
 
 #define RP  stv_current_rotation_parameter_table
 
-	if(LOG_ROZ == 1) logerror( "Rotation parameter table (%d)\n", rot_parameter );
-	if(LOG_ROZ == 1) logerror( "xst = %x, yst = %x, zst = %x\n", RP.xst, RP.yst, RP.zst );
-	if(LOG_ROZ == 1) logerror( "dxst = %x, dyst = %x\n", RP.dxst, RP.dyst );
-	if(LOG_ROZ == 1) logerror( "dx = %x, dy = %x\n", RP.dx, RP.dy );
-	if(LOG_ROZ == 1) logerror( "A = %x, B = %x, C = %x, D = %x, E = %x, F = %x\n", RP.A, RP.B, RP.C, RP.D, RP.E, RP.F );
-	if(LOG_ROZ == 1) logerror( "px = %x, py = %x, pz = %x\n", RP.px, RP.py, RP.pz );
-	if(LOG_ROZ == 1) logerror( "cx = %x, cy = %x, cz = %x\n", RP.cx, RP.cy, RP.cz );
-	if(LOG_ROZ == 1) logerror( "mx = %x, my = %x\n", RP.mx, RP.my );
-	if(LOG_ROZ == 1) logerror( "kx = %x, ky = %x\n", RP.kx, RP.ky );
-	if(LOG_ROZ == 1) logerror( "kast = %x, dkast = %x, dkax = %x\n", RP.kast, RP.dkast, RP.dkax );
+	LOGMASKED(LOG_ROZ, "Rotation parameter table (%d)\n", rot_parameter);
+	LOGMASKED(LOG_ROZ, "xst = %x, yst = %x, zst = %x\n", RP.xst, RP.yst, RP.zst);
+	LOGMASKED(LOG_ROZ, "dxst = %x, dyst = %x\n", RP.dxst, RP.dyst);
+	LOGMASKED(LOG_ROZ, "dx = %x, dy = %x\n", RP.dx, RP.dy);
+	LOGMASKED(LOG_ROZ, "A = %x, B = %x, C = %x, D = %x, E = %x, F = %x\n", RP.A, RP.B, RP.C, RP.D, RP.E, RP.F);
+	LOGMASKED(LOG_ROZ, "px = %x, py = %x, pz = %x\n", RP.px, RP.py, RP.pz);
+	LOGMASKED(LOG_ROZ, "cx = %x, cy = %x, cz = %x\n", RP.cx, RP.cy, RP.cz);
+	LOGMASKED(LOG_ROZ, "mx = %x, my = %x\n", RP.mx, RP.my);
+	LOGMASKED(LOG_ROZ, "kx = %x, ky = %x\n", RP.kx, RP.ky);
+	LOGMASKED(LOG_ROZ, "kast = %x, dkast = %x, dkax = %x\n", RP.kast, RP.dkast, RP.dkax);
 
 	/*Attempt to show on screen the rotation table*/
-	#if 0
-	if(LOG_ROZ == 2)
+	if (DEBUG_DRAW_ROZ)
 	{
 		if(machine().input().code_pressed_once(JOYCODE_Y_UP_SWITCH))
 			m_vdpdebug_roz++;
@@ -4442,7 +4447,6 @@ void saturn_state::stv_vdp2_fill_rotation_parameter_table( uint8_t rot_parameter
 			case 10: break;
 		}
 	}
-	#endif
 }
 
 /* check if RGB layer has rotation applied */
@@ -6329,15 +6333,12 @@ void saturn_state::stv_vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const recta
 		uppermaskshift = (1-stv2_current_tilemap.pattern_data_size) | ((1-stv2_current_tilemap.tile_size)<<1);
 		uppermask = 0x1ff >> uppermaskshift;
 
-		if ( LOG_VDP2 )
+		LOGMASKED(LOG_VDP2, "Layer RBG%d, size %d x %d\n", stv2_current_tilemap.layer_name & 0x7f, cliprect.right() + 1, cliprect.bottom() + 1);
+		LOGMASKED(LOG_VDP2, "Tiles: min %08X, max %08X\n", tilecodemin, tilecodemax);
+		LOGMASKED(LOG_VDP2, "MAP size in dwords %08X\n", mpsize_dwords);
+		for (i = 0; i < stv2_current_tilemap.map_count; i++)
 		{
-			logerror( "Layer RBG%d, size %d x %d\n", stv2_current_tilemap.layer_name & 0x7f, cliprect.right() + 1, cliprect.bottom() + 1 );
-			logerror( "Tiles: min %08X, max %08X\n", tilecodemin, tilecodemax );
-			logerror( "MAP size in dwords %08X\n", mpsize_dwords );
-			for (i = 0; i < stv2_current_tilemap.map_count; i++)
-			{
-				logerror( "Map register %d: base %08X\n", stv2_current_tilemap.map_offset[i], base[i] );
-			}
+			LOGMASKED(LOG_VDP2, "Map register %d: base %08X\n", stv2_current_tilemap.map_offset[i], base[i]);
 		}
 
 		// store map information
@@ -6498,7 +6499,7 @@ void saturn_state::stv_vdp2_check_tilemap_with_linescroll(bitmap_rgb32 &bitmap, 
 			i++;
 		}
 
-//      if ( LOG_VDP2 ) logerror( "Linescroll: y < %d, %d >, scrollx = %d, scrolly = %d, incx = %f\n", mycliprect.top(), mycliprect.bottom(), stv2_current_tilemap.scrollx, stv2_current_tilemap.scrolly, (float)stv2_current_tilemap.incx/65536.0 );
+//      LOGMASKED(LOG_VDP2, "Linescroll: y < %d, %d >, scrollx = %d, scrolly = %d, incx = %f\n", mycliprect.top(), mycliprect.bottom(), stv2_current_tilemap.scrollx, stv2_current_tilemap.scrolly, (float)stv2_current_tilemap.incx/65536.0);
 		// render current tilemap portion
 		if (stv2_current_tilemap.bitmap_enable) // this layer is a bitmap
 		{
@@ -6792,12 +6793,12 @@ void saturn_state::stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 	coeff_table_val = 0;
 	coeff_table_base = nullptr;
 
-	if ( LOG_ROZ == 1 ) logerror( "Rendering RBG with parameter %s\n", iRP == 1 ? "A" : "B" );
-	if ( LOG_ROZ == 1 ) logerror( "RPMD (parameter mode) = %x\n", STV_VDP2_RPMD );
-	if ( LOG_ROZ == 1 ) logerror( "RPRCTL (parameter read control) = %04x\n", STV_VDP2_RPRCTL );
-	if ( LOG_ROZ == 1 ) logerror( "KTCTL (coefficient table control) = %04x\n", STV_VDP2_KTCTL );
-	if ( LOG_ROZ == 1 ) logerror( "KTAOF (coefficient table address offset) = %04x\n", STV_VDP2_KTAOF );
-	if ( LOG_ROZ == 1 ) logerror( "RAOVR (screen-over process) = %x\n", STV_VDP2_RAOVR );
+	LOGMASKED(LOG_ROZ, "Rendering RBG with parameter %s\n", iRP == 1 ? "A" : "B");
+	LOGMASKED(LOG_ROZ, "RPMD (parameter mode) = %x\n", STV_VDP2_RPMD);
+	LOGMASKED(LOG_ROZ, "RPRCTL (parameter read control) = %04x\n", STV_VDP2_RPRCTL);
+	LOGMASKED(LOG_ROZ, "KTCTL (coefficient table control) = %04x\n", STV_VDP2_KTCTL);
+	LOGMASKED(LOG_ROZ, "KTAOF (coefficient table address offset) = %04x\n", STV_VDP2_KTAOF);
+	LOGMASKED(LOG_ROZ, "RAOVR (screen-over process) = %x\n", STV_VDP2_RAOVR);
 	if ( iRP == 1 )
 	{
 		use_coeff_table = STV_VDP2_RAKTE;
@@ -7775,7 +7776,7 @@ void saturn_state::stv_vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rec
 		stv2_current_tilemap.fade_control = 0;
 		{
 			auto profile1 = g_profiler.start(PROFILER_USER1);
-			if ( LOG_VDP2 ) logerror( "Checking for cached RBG bitmap, cache_dirty = %d, memcmp() = %d\n", stv_rbg_cache_data.is_cache_dirty, memcmp(&stv_rbg_cache_data.layer_data[iRP-1],&stv2_current_tilemap,sizeof(stv2_current_tilemap)));
+			LOGMASKED(LOG_VDP2, "Checking for cached RBG bitmap, cache_dirty = %d, memcmp() = %d\n", stv_rbg_cache_data.is_cache_dirty, memcmp(&stv_rbg_cache_data.layer_data[iRP-1],&stv2_current_tilemap,sizeof(stv2_current_tilemap)));
 			if ( (stv_rbg_cache_data.is_cache_dirty & iRP) ||
 				memcmp(&stv_rbg_cache_data.layer_data[iRP-1],&stv2_current_tilemap,sizeof(stv2_current_tilemap)) != 0 )
 			{
@@ -7789,8 +7790,8 @@ void saturn_state::stv_vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rec
 				stv_rbg_cache_data.map_offset_max[iRP-1] = stv_vdp2_layer_data_placement.map_offset_max;
 				stv_rbg_cache_data.tile_offset_min[iRP-1] = stv_vdp2_layer_data_placement.tile_offset_min;
 				stv_rbg_cache_data.tile_offset_max[iRP-1] = stv_vdp2_layer_data_placement.tile_offset_max;
-				if ( LOG_VDP2 ) logerror( "Cache watch: map = %06X - %06X, tile = %06X - %06X\n", stv_rbg_cache_data.map_offset_min[iRP-1],
-					stv_rbg_cache_data.map_offset_max[iRP-1], stv_rbg_cache_data.tile_offset_min[iRP-1], stv_rbg_cache_data.tile_offset_max[iRP-1] );
+				LOGMASKED(LOG_VDP2, "Cache watch: map = %06X - %06X, tile = %06X - %06X\n", stv_rbg_cache_data.map_offset_min[iRP-1],
+					stv_rbg_cache_data.map_offset_max[iRP-1], stv_rbg_cache_data.tile_offset_min[iRP-1], stv_rbg_cache_data.tile_offset_max[iRP-1]);
 			}
 			// stop profiling USER1
 		}
@@ -8006,7 +8007,7 @@ void saturn_state::saturn_vdp2_vram_w(offs_t offset, uint32_t data, uint32_t mem
 					(offset >= stv_rbg_cache_data.tile_offset_min[0] &&
 					offset < stv_rbg_cache_data.tile_offset_max[0]) )
 			{
-				if ( LOG_VDP2 ) logerror( "RBG Cache: dirtying for RP = 1, write at offset = %06X\n", offset );
+				LOGMASKED(LOG_VDP2, "RBG Cache: dirtying for RP = 1, write at offset = %06X\n", offset);
 				stv_rbg_cache_data.is_cache_dirty |= STV_VDP2_RBG_ROTATION_PARAMETER_A;
 				stv_rbg_cache_data.watch_vdp2_vram_writes &= ~STV_VDP2_RBG_ROTATION_PARAMETER_A;
 			}
@@ -8018,7 +8019,7 @@ void saturn_state::saturn_vdp2_vram_w(offs_t offset, uint32_t data, uint32_t mem
 					(offset >= stv_rbg_cache_data.tile_offset_min[1] &&
 					offset < stv_rbg_cache_data.tile_offset_max[1]) )
 			{
-				if ( LOG_VDP2 ) logerror( "RBG Cache: dirtying for RP = 2, write at offset = %06X\n", offset );
+				LOGMASKED(LOG_VDP2, "RBG Cache: dirtying for RP = 2, write at offset = %06X\n", offset);
 				stv_rbg_cache_data.is_cache_dirty |= STV_VDP2_RBG_ROTATION_PARAMETER_B;
 				stv_rbg_cache_data.watch_vdp2_vram_writes &= ~STV_VDP2_RBG_ROTATION_PARAMETER_B;
 			}

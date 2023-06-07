@@ -23,7 +23,7 @@ Notes:
 SPEED ATTACK!
 (c)SETA
 
-CPU :Z80 x 1
+CPU :NEC D780C x 1
 SOUND   :AY-3-8910 x 1
 XTAL    :12MHZ
 
@@ -313,7 +313,7 @@ void speedatk_state::speedatk(machine_config &config)
 	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
 	screen.set_screen_update(FUNC(speedatk_state::screen_update));
 
-	MC6845(config, m_crtc, MASTER_CLOCK/16);   /* unknown variant; hand tuned to get ~60 fps */
+	HD6845S(config, m_crtc, MASTER_CLOCK/16);   /* HD46505SP/HD6845SP; hand tuned to get ~60 fps */
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);

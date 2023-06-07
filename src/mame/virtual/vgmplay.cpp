@@ -432,7 +432,7 @@ public:
 	template<int Index> void upd7759_reset_w(uint8_t data);
 	template<int Index> void upd7759_start_w(uint8_t data);
 	template<int Index> void upd7759_data_w(uint8_t data);
-	template<int Index> DECLARE_WRITE_LINE_MEMBER(upd7759_drq_w);
+	template<int Index> void upd7759_drq_w(int state);
 	template<int Index> void okim6258_clock_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 	template<int Index> void okim6258_divider_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 	template<int Index> void okim6295_clock_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
@@ -3154,7 +3154,7 @@ void vgmplay_state::upd7759_data_w(uint8_t data)
 }
 
 template<int Index>
-WRITE_LINE_MEMBER(vgmplay_state::upd7759_drq_w)
+void vgmplay_state::upd7759_drq_w(int state)
 {
 	if (m_upd7759_drq[Index] && !state)
 		osd_printf_error("upd7759.%d underflow\n", Index);

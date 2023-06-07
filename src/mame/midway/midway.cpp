@@ -100,7 +100,7 @@ void midway_ssio_device::write(offs_t offset, uint8_t data)
 //  reset_write - write to the reset line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(midway_ssio_device::reset_write)
+void midway_ssio_device::reset_write(int state)
 {
 	if (state)
 	{
@@ -517,7 +517,7 @@ void midway_sounds_good_device::write(uint8_t data)
 //  reset_write - write to the reset line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(midway_sounds_good_device::reset_write)
+void midway_sounds_good_device::reset_write(int state)
 {
 //if (state) osd_printf_debug("SG Reset\n");
 	m_cpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
@@ -555,7 +555,7 @@ void midway_sounds_good_device::portb_w(uint8_t data)
 //  irq_w - IRQ line state changes
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(midway_sounds_good_device::irq_w)
+void midway_sounds_good_device::irq_w(int state)
 {
 	int combined_state = m_pia->irq_a_state() | m_pia->irq_b_state();
 	m_cpu->set_input_line(4, combined_state ? ASSERT_LINE : CLEAR_LINE);
@@ -712,7 +712,7 @@ void midway_turbo_cheap_squeak_device::write(uint8_t data)
 //  reset_write - write to the reset line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(midway_turbo_cheap_squeak_device::reset_write)
+void midway_turbo_cheap_squeak_device::reset_write(int state)
 {
 	m_cpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -745,7 +745,7 @@ void midway_turbo_cheap_squeak_device::portb_w(uint8_t data)
 //  irq_w - IRQ line state changes
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(midway_turbo_cheap_squeak_device::irq_w)
+void midway_turbo_cheap_squeak_device::irq_w(int state)
 {
 	int combined_state = m_pia->irq_a_state() | m_pia->irq_b_state();
 	m_cpu->set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);

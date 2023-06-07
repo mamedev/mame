@@ -217,13 +217,13 @@ private:
 	void macplus_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t macse_scsi_r(offs_t offset, uint16_t mem_mask = ~0);
 	void macse_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(scsi_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(scsi_drq_w);
+	void scsi_irq_w(int state);
+	void scsi_drq_w(int state);
 	void scsi_berr_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(set_scc_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(vblank_w);
+	void set_scc_interrupt(int state);
+	void vblank_w(int state);
 
-	WRITE_LINE_MEMBER(adb_irq_w) { m_adb_irq_pending = state; }
+	void adb_irq_w(int state) { m_adb_irq_pending = state; }
 
 	TIMER_CALLBACK_MEMBER(mac_scanline);
 	TIMER_CALLBACK_MEMBER(mac_hblank);
@@ -236,7 +236,7 @@ private:
 	void mac_via_out_b(uint8_t data);
 	void mac_via_out_a_se(uint8_t data);
 	void mac_via_out_b_se(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(mac_via_irq);
+	void mac_via_irq(int state);
 	void update_volume();
 
 	void mac512ke_map(address_map &map);
@@ -400,7 +400,7 @@ void mac128_state::field_interrupts()
 	}
 }
 
-WRITE_LINE_MEMBER(mac128_state::set_scc_interrupt)
+void mac128_state::set_scc_interrupt(int state)
 {
 //  printf("SCC IRQ: %d\n", state);
 	m_scc_interrupt = state;
@@ -450,7 +450,7 @@ void mac128_state::update_volume()
 	m_volfilter->opamp_mfb_lowpass_modify(res_ohm_tbl[m_snd_vol&7], RES_K(0), RES_K(200), CAP_U(0), CAP_P(220)); // variable based on cd4016, short, R15, absent, C10
 }
 
-WRITE_LINE_MEMBER(mac128_state::vblank_w)
+void mac128_state::vblank_w(int state)
 {
 	m_via->write_ca1(state);
 }
@@ -598,11 +598,11 @@ void mac128_state::pwm_push(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(mac128_state::scsi_irq_w)
+void mac128_state::scsi_irq_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER(mac128_state::scsi_drq_w)
+void mac128_state::scsi_drq_w(int state)
 {
 	m_scsi_drq = state;
 }
@@ -714,7 +714,7 @@ void mac128_state::mac_iwm_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_iwm->write((offset >> 8) & 0xf, data>>8);
 }
 
-WRITE_LINE_MEMBER(mac128_state::mac_via_irq)
+void mac128_state::mac_via_irq(int state)
 {
 	/* interrupt the 68k (level 1) */
 	set_via_interrupt(state);

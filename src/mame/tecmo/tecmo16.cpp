@@ -125,7 +125,7 @@ private:
 	DECLARE_VIDEO_START(riot);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 
 	void save_state();
 	void common_map(address_map& map);
@@ -329,7 +329,7 @@ uint32_t tecmo16_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-WRITE_LINE_MEMBER(tecmo16_state::screen_vblank)
+void tecmo16_state::screen_vblank(int state)
 {
 	if (state)
 	{

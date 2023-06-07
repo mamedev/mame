@@ -124,33 +124,33 @@ TODO:
  *
  *************************************/
 
-WRITE_LINE_MEMBER(freekick_state::flipscreen_x_w)
+void freekick_state::flipscreen_x_w(int state)
 {
 	flip_screen_x_set(!state);
 }
 
-WRITE_LINE_MEMBER(freekick_state::flipscreen_y_w)
+void freekick_state::flipscreen_y_w(int state)
 {
 	flip_screen_y_set(!state);
 }
 
-WRITE_LINE_MEMBER(freekick_state::flipscreen_w)
+void freekick_state::flipscreen_w(int state)
 {
 	flip_screen_set(!state);
 }
 
 
-WRITE_LINE_MEMBER(freekick_state::coin1_w)
+void freekick_state::coin1_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(freekick_state::coin2_w)
+void freekick_state::coin2_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-WRITE_LINE_MEMBER(freekick_state::spinner_select_w)
+void freekick_state::spinner_select_w(int state)
 {
 	m_spinner = state;
 }
@@ -172,14 +172,14 @@ void freekick_state::pbillrd_bankswitch_w(uint8_t data)
 		m_bank1d->set_entry(data & 1);
 }
 
-WRITE_LINE_MEMBER(freekick_state::nmi_enable_w)
+void freekick_state::nmi_enable_w(int state)
 {
 	m_nmi_en = state;
 	if (!m_nmi_en)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(freekick_state::vblank_irq)
+void freekick_state::vblank_irq(int state)
 {
 	if (state && m_nmi_en)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);

@@ -277,21 +277,23 @@ uint8_t n8080_state::n8080_8035_p1_r()
 }
 
 
-READ_LINE_MEMBER(n8080_state::n8080_8035_t0_r)
+int n8080_state::n8080_8035_t0_r()
 {
 	return (m_curr_sound_pins >> 0x7) & 1;
 }
-READ_LINE_MEMBER(n8080_state::n8080_8035_t1_r)
+
+int n8080_state::n8080_8035_t1_r()
 {
 	return (m_curr_sound_pins >> 0xc) & 1;
 }
 
 
-READ_LINE_MEMBER(helifire_state::helifire_8035_t0_r)
+int helifire_state::helifire_8035_t0_r()
 {
 	return (m_curr_sound_pins >> 0x3) & 1;
 }
-READ_LINE_MEMBER(helifire_state::helifire_8035_t1_r)
+
+int helifire_state::helifire_8035_t1_r()
 {
 	return (m_curr_sound_pins >> 0x4) & 1;
 }

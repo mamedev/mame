@@ -110,7 +110,7 @@ license:CC0-1.0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
-				<rom name="cpm_turbo.img" size="655360" crc="813569d" sha1="4c30813fb28e817257277ebd1c555622bfc840c4"/>
+				<rom name="cpm_turbo.img" size="655360" crc="0813569d" sha1="4c30813fb28e817257277ebd1c555622bfc840c4"/>
 			</dataarea>
 		</part>
 	</software>

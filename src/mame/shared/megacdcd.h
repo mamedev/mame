@@ -3,7 +3,7 @@
 #ifndef MAME_SHARED_SEGACDCD_H
 #define MAME_SHARED_SEGACDCD_H
 
-#include "imagedev/chd_cd.h"
+#include "imagedev/cdromimg.h"
 #include "machine/timer.h"
 #include "sound/cdda.h"
 
@@ -22,7 +22,7 @@ public:
 
 	template <typename... T> void set_cdc_do_dma_callback(T &&... args) { m_segacd_dma_callback.set(std::forward<T>(args)...); }
 
-	template <typename T> void set_cdrom_tag(T &&tag) { m_cdrom.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_cdrom_tag(T &&tag) { m_cdrom.set_tag(std::forward<T>(tag)); subdevice<cdda_device>("cdda")->set_cdrom_tag(std::forward<T>(tag)); }
 	template <typename T> void set_68k_tag(T &&tag) { m_68k.set_tag(std::forward<T>(tag)); }
 
 
@@ -91,7 +91,6 @@ protected:
 
 	struct segacd_t
 	{
-		cdrom_file  *cd;
 		const cdrom_file::toc   *toc;
 		uint32_t current_frame;
 	};

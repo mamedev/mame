@@ -18,7 +18,6 @@
 #include "romp.h"
 #include "rompdasm.h"
 
-#define LOG_GENERAL   (1U << 0)
 #define LOG_INTERRUPT (1U << 1)
 
 //#define VERBOSE     (LOG_INTERRUPT)

@@ -272,7 +272,7 @@ public:
 
 	void dx100(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(led_w)       { m_led = state; }
+	void led_w(int state)                  { m_led = state; }
 	DECLARE_CUSTOM_INPUT_MEMBER(midi_in_r) { return m_midi_in; }
 
 protected:
@@ -284,7 +284,7 @@ private:
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 	void palette_init(palette_device &palette);
 
-	DECLARE_WRITE_LINE_MEMBER(p22_w);
+	void p22_w(int state);
 
 	void mem_map(address_map &map);
 
@@ -331,7 +331,7 @@ void yamaha_dx100_state::palette_init(palette_device &palette)
 	palette.set_pen_color(2, rgb_t(0xe7, 0xe7, 0xe7)); // lcd pixel off
 }
 
-WRITE_LINE_MEMBER(yamaha_dx100_state::p22_w)
+void yamaha_dx100_state::p22_w(int state)
 {
 	if (state)
 		m_maincpu->m6801_clock_serial();

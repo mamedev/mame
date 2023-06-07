@@ -26,10 +26,16 @@ tp1 = phi clock (tied to f2q rom access)
 #include "votrax.h"
 
 
-DEFINE_DEVICE_TYPE(VOTRAX_SC01, votrax_sc01_device, "votrax", "Votrax SC-01")
+DEFINE_DEVICE_TYPE(VOTRAX_SC01, votrax_sc01_device, "votrsc01", "Votrax SC-01")
+DEFINE_DEVICE_TYPE(VOTRAX_SC01A, votrax_sc01a_device, "votrsc01a", "Votrax SC-01-A")
 
 // ROM definition for the Votrax phone ROM
 ROM_START( votrax_sc01 )
+	ROM_REGION64_LE( 0x200, "internal", 0 )
+	ROM_LOAD( "sc01.bin", 0x000, 0x200, CRC(528d1c57) SHA1(268b5884dce04e49e2376df3e2dc82e852b708c1) )
+ROM_END
+
+ROM_START( votrax_sc01a )
 	ROM_REGION64_LE( 0x200, "internal", 0 )
 	ROM_LOAD( "sc01a.bin", 0x000, 0x200, CRC(fc416227) SHA1(1d6da90b1807a01b5e186ef08476119a862b5e6d) )
 ROM_END
@@ -74,13 +80,23 @@ const double votrax_sc01_device::s_glottal_wave[9] =
 	1/7.0
 };
 
-
 votrax_sc01_device::votrax_sc01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, VOTRAX_SC01, tag, owner, clock),
+	: votrax_sc01_device(mconfig, VOTRAX_SC01, tag, owner, clock)
+{
+}
+
+// overridable type for subclass
+votrax_sc01_device::votrax_sc01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 	  device_sound_interface(mconfig, *this),
 	  m_stream(nullptr),
 	  m_rom(*this, "internal"),
 	  m_ar_cb(*this)
+{
+}
+
+votrax_sc01a_device::votrax_sc01a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: votrax_sc01_device(mconfig, VOTRAX_SC01A, tag, owner, clock)
 {
 }
 
@@ -156,6 +172,11 @@ void votrax_sc01_device::sound_stream_update(sound_stream &stream, std::vector<r
 const tiny_rom_entry *votrax_sc01_device::device_rom_region() const
 {
 	return ROM_NAME( votrax_sc01 );
+}
+
+const tiny_rom_entry *votrax_sc01a_device::device_rom_region() const
+{
+	return ROM_NAME( votrax_sc01a );
 }
 
 

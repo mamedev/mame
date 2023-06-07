@@ -160,12 +160,12 @@ private:
 	void dsp_speedup_w(uint32_t data);
 	uint32_t ncr53c700_read(offs_t offset, uint32_t mem_mask = ~0);
 	void ncr53c700_write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
+	void scsi_irq(int state);
 
 	TIMER_CALLBACK_MEMBER(tms_timer1);
 	TIMER_CALLBACK_MEMBER(tms_tx_timer);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-	DECLARE_WRITE_LINE_MEMBER(duart_irq);
+	void vblank_irq(int state);
+	void duart_irq(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void upload_palette(uint32_t word1, uint32_t word2);
@@ -206,7 +206,7 @@ public:
 
 	void fbcrazy(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(meter_pulse_r);
+	int meter_pulse_r();
 
 protected:
 	virtual void machine_reset() override;
@@ -227,7 +227,7 @@ private:
 	void dsp_map(address_map &map);
 
 	TIMER_CALLBACK_MEMBER(trackball_timer);
-	DECLARE_WRITE_LINE_MEMBER(trackball_rts);
+	void trackball_rts(int state);
 
 	uint8_t m_aux_port3_data;
 	uint8_t m_trackball_ctr;
@@ -607,7 +607,7 @@ void rastersp_state::update_irq(uint32_t which, uint32_t state)
 }
 
 
-WRITE_LINE_MEMBER( rastersp_state::scsi_irq )
+void rastersp_state::scsi_irq(int state)
 {
 	update_irq(IRQ_SCSI, state);
 
@@ -619,19 +619,19 @@ WRITE_LINE_MEMBER( rastersp_state::scsi_irq )
 }
 
 
-WRITE_LINE_MEMBER( rastersp_state::vblank_irq )
+void rastersp_state::vblank_irq(int state)
 {
 	if (state)
 		update_irq(IRQ_VBLANK, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( rastersp_state::duart_irq )
+void rastersp_state::duart_irq(int state)
 {
 	update_irq(IRQ_UART, state);
 }
 
 
-WRITE_LINE_MEMBER( fbcrazy_state::trackball_rts )
+void fbcrazy_state::trackball_rts(int state)
 {
 	m_trackball_enabled = state;
 }
@@ -899,7 +899,7 @@ void fbcrazy_state::aux_port4_w(offs_t offset, uint8_t data)
 	// Bit 7 - 5p lockout
 }
 
-READ_LINE_MEMBER(fbcrazy_state::meter_pulse_r)
+int fbcrazy_state::meter_pulse_r()
 {
 	return m_aux_port3_data & 0xbc ? 1 : 0;
 }
@@ -1552,7 +1552,7 @@ ROM_START( rotr )
 	ROM_REGION(0x8000, "nvram", 0) /* Default NVRAM */
 	ROM_LOAD( "rotr.nv", 0x0000, 0x8000, CRC(62543517) SHA1(a4bf3431cdab956839bb155c4a8c140d30e5c7ec) )
 
-	DISK_REGION( "scsibus:0:harddisk:image" )
+	DISK_REGION( "scsibus:0:harddisk" )
 	DISK_IMAGE( "rotr", 0, SHA1(d67d7feb52d8c7ba1d2a190a40d97e84871f2d80) )
 ROM_END
 
@@ -1568,7 +1568,7 @@ ROM_START( rotra )
 	ROM_REGION(0x8000, "nvram", 0) /* Default NVRAM */
 	ROM_LOAD( "rotr.nv", 0x0000, 0x8000, CRC(62543517) SHA1(a4bf3431cdab956839bb155c4a8c140d30e5c7ec) )
 
-	DISK_REGION( "scsibus:0:harddisk:image" )
+	DISK_REGION( "scsibus:0:harddisk" )
 	DISK_IMAGE( "rotra", 0, SHA1(570d402e5e9bba123edf7dfa9db7a0e6bdb23823) )
 ROM_END
 

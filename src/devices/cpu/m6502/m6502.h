@@ -11,6 +11,9 @@
 #ifndef MAME_CPU_M6502_M6502_H
 #define MAME_CPU_M6502_M6502_H
 
+#pragma once
+
+
 class m6502_device : public cpu_device {
 public:
 	enum {
@@ -95,6 +98,7 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
+	virtual bool cpu_is_interruptible() const override { return true; }
 	virtual uint32_t execute_min_cycles() const noexcept override;
 	virtual uint32_t execute_max_cycles() const noexcept override;
 	virtual uint32_t execute_input_lines() const noexcept override;
@@ -142,8 +146,9 @@ protected:
 	uint8_t read_arg(uint16_t adr) { return mintf->read_arg(adr); }
 	uint8_t read_pc() { return mintf->read_arg(PC++); }
 	uint8_t read_pc_noinc() { return mintf->read_arg(PC); }
-	void prefetch();
-	void prefetch_noirq();
+	void prefetch_start();
+	void prefetch_end();
+	void prefetch_end_noirq();
 	void set_nz(uint8_t v);
 
 	u32 XPC;
@@ -274,18 +279,6 @@ protected:
 	O(kil_non);
 
 #undef O
-};
-
-class m6502_mcu_device : public m6502_device {
-protected:
-	m6502_mcu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-
-	void internal_update() { internal_update(total_cycles()); }
-	virtual void internal_update(uint64_t current_time) = 0;
-	void recompute_bcount(uint64_t event_time);
-	static void add_event(uint64_t &event_time, uint64_t new_event);
-
-	virtual void execute_run() override;
 };
 
 class m6512_device : public m6502_device {

@@ -212,7 +212,7 @@ uint8_t ym2148_device::get_irq_vector()
 }
 
 
-WRITE_LINE_MEMBER(ym2148_device::write_rxd)
+void ym2148_device::write_rxd(int state)
 {
 	m_rxd = state;
 }

@@ -48,7 +48,7 @@
 #define LOG_CONF    (1U << 3)
 
 //#define VERBOSE (LOG_SETUP|LOG_CONF|LOG_REGS)
-//#define LOG_OUTPUT_STREAM std::cout
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 
@@ -380,25 +380,25 @@ void hd6345_device::register_w(uint8_t data)
 }
 
 
-READ_LINE_MEMBER( mc6845_device::de_r )
+int mc6845_device::de_r()
 {
 	return m_de;
 }
 
 
-READ_LINE_MEMBER( mc6845_device::cursor_r )
+int mc6845_device::cursor_r()
 {
 	return m_cur;
 }
 
 
-READ_LINE_MEMBER( mc6845_device::hsync_r )
+int mc6845_device::hsync_r()
 {
 	return m_hsync;
 }
 
 
-READ_LINE_MEMBER( mc6845_device::vsync_r )
+int mc6845_device::vsync_r()
 {
 	return m_vsync;
 }

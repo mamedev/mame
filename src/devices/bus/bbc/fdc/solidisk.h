@@ -35,8 +35,8 @@ protected:
 	// construction/destruction
 	bbc_stlfdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER(motor_w);
-	DECLARE_WRITE_LINE_MEMBER(side_w);
+	void motor_w(int state);
+	void side_w(int state);
 
 	required_device<wd1770_device> m_wd1770;
 	optional_device<i8271_device> m_i8271;

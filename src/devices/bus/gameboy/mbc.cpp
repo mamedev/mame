@@ -178,16 +178,16 @@ public:
 		// install handlers
 		cart_space()->install_write_handler(
 				0x0000, 0x1fff,
-				write8smo_delegate(*this, FUNC(mbc5_device_base::enable_ram)));
+				emu::rw_delegate(*this, FUNC(mbc5_device_base::enable_ram)));
 		cart_space()->install_write_handler(
 				0x2000, 0x2fff,
-				write8smo_delegate(*this, FUNC(mbc5_device_base::bank_switch_fine_low)));
+				emu::rw_delegate(*this, FUNC(mbc5_device_base::bank_switch_fine_low)));
 		cart_space()->install_write_handler(
 				0x3000, 0x3fff,
-				write8smo_delegate(*this, FUNC(mbc5_device_base::bank_switch_fine_high)));
+				emu::rw_delegate(*this, FUNC(mbc5_device_base::bank_switch_fine_high)));
 		cart_space()->install_write_handler(
 				0x4000, 0x5fff,
-				write8smo_delegate(*this, FUNC(mbc5_device_base::bank_switch_coarse)));
+				emu::rw_delegate(*this, FUNC(mbc5_device_base::bank_switch_coarse)));
 
 		// all good
 		return std::error_condition();
@@ -249,7 +249,7 @@ public:
 		// intercept ROM reads for logo spoofing
 		cart_space()->install_read_handler(
 				0x0000, 0x7fff,
-				read8sm_delegate(*this, FUNC(mbc5_logo_spoof_device_base::read_rom)));
+				emu::rw_delegate(*this, FUNC(mbc5_logo_spoof_device_base::read_rom)));
 
 		// all good
 		return std::error_condition();
@@ -415,19 +415,19 @@ class mbc5_scrambled_device_base : public mbc5_logo_spoof_device_base
 		// bank numbers and ROM contents are scrambled for protection
 		cart_space()->install_read_handler(
 				0x0000, 0x3fff,
-				read8sm_delegate(*this, FUNC(mbc5_scrambled_device_base::read_rom_low)));
+				emu::rw_delegate(*this, FUNC(mbc5_scrambled_device_base::read_rom_low)));
 		cart_space()->install_read_handler(
 				0x4000, 0x7fff,
-				read8sm_delegate(*this, FUNC(mbc5_scrambled_device_base::read_rom_high)));
+				emu::rw_delegate(*this, FUNC(mbc5_scrambled_device_base::read_rom_high)));
 		cart_space()->install_write_handler(
 				0x2000, 0x2000, 0x0000, 0x0f00, 0x0000,
-				write8smo_delegate(*this, FUNC(mbc5_scrambled_device_base::bank_switch_fine_low_scrambled)));
+				emu::rw_delegate(*this, FUNC(mbc5_scrambled_device_base::bank_switch_fine_low_scrambled)));
 		cart_space()->install_write_handler(
 				0x2001, 0x2001, 0x0000, 0x0f00, 0x0000,
-				write8smo_delegate(*this, FUNC(mbc5_scrambled_device_base::set_data_scramble)));
+				emu::rw_delegate(*this, FUNC(mbc5_scrambled_device_base::set_data_scramble)));
 		cart_space()->install_write_handler(
 				0x2080, 0x2080, 0x0000, 0x0f00, 0x0000,
-				write8smo_delegate(*this, FUNC(mbc5_scrambled_device_base::set_bank_scramble)));
+				emu::rw_delegate(*this, FUNC(mbc5_scrambled_device_base::set_bank_scramble)));
 
 		// all good
 		return std::error_condition();
@@ -563,16 +563,16 @@ public:
 		// install handlers
 		cart_space()->install_write_handler(
 				0x0000, 0x1fff,
-				write8smo_delegate(*this, FUNC(mbc1_device::enable_ram)));
+				emu::rw_delegate(*this, FUNC(mbc1_device::enable_ram)));
 		cart_space()->install_write_handler(
 				0x2000, 0x3fff,
-				write8smo_delegate(*this, FUNC(mbc1_device::bank_switch_fine)));
+				emu::rw_delegate(*this, FUNC(mbc1_device::bank_switch_fine)));
 		cart_space()->install_write_handler(
 				0x4000, 0x5fff,
-				write8smo_delegate(*this, FUNC(mbc1_device::bank_switch_coarse)));
+				emu::rw_delegate(*this, FUNC(mbc1_device::bank_switch_coarse)));
 		cart_space()->install_write_handler(
 				0x6000, 0x7fff,
-				write8smo_delegate(*this, FUNC(mbc1_device::bank_low_mask)));
+				emu::rw_delegate(*this, FUNC(mbc1_device::bank_low_mask)));
 
 		// all good
 		return std::error_condition();
@@ -775,7 +775,7 @@ public:
 		{
 			cart_space()->install_write_handler(
 					0x4000, 0x5fff,
-					write8smo_delegate(*this, FUNC(mbc5_device::bank_switch_coarse)));
+					emu::rw_delegate(*this, FUNC(mbc5_device::bank_switch_coarse)));
 		}
 
 		// all good
@@ -939,19 +939,19 @@ public:
 		// bank numbers and ROM contents are scrambled for protection
 		cart_space()->install_read_handler(
 				0x0000, 0x3fff,
-				read8sm_delegate(*this, FUNC(sintax_device::read_rom_low)));
+				emu::rw_delegate(*this, FUNC(sintax_device::read_rom_low)));
 		cart_space()->install_read_handler(
 				0x4000, 0x7fff,
-				read8sm_delegate(*this, FUNC(sintax_device::read_rom_high)));
+				emu::rw_delegate(*this, FUNC(sintax_device::read_rom_high)));
 		cart_space()->install_write_handler(
 				0x2000, 0x2fff,
-				write8smo_delegate(*this, FUNC(sintax_device::bank_switch_fine_low_scrambled)));
+				emu::rw_delegate(*this, FUNC(sintax_device::bank_switch_fine_low_scrambled)));
 		cart_space()->install_write_handler(
 				0x5000, 0x5fff,
-				write8smo_delegate(*this, FUNC(sintax_device::set_scramble_mode)));
+				emu::rw_delegate(*this, FUNC(sintax_device::set_scramble_mode)));
 		cart_space()->install_write_handler(
 				0x7000, 0x70ff, 0x0000, 0x0f00, 0x0000,
-				write8sm_delegate(*this, FUNC(sintax_device::set_xor)));
+				emu::rw_delegate(*this, FUNC(sintax_device::set_xor)));
 
 		// all good
 		return std::error_condition();
@@ -1205,13 +1205,13 @@ public:
 		// install handlers
 		cart_space()->install_write_handler(
 				0x0000, 0x1fff,
-				write8smo_delegate(*this, FUNC(ngbchk_device::enable_ram)));
+				emu::rw_delegate(*this, FUNC(ngbchk_device::enable_ram)));
 		cart_space()->install_write_handler(
 				0x2000, 0x3fff,
-				write8smo_delegate(*this, FUNC(ngbchk_device::bank_switch_fine)));
+				emu::rw_delegate(*this, FUNC(ngbchk_device::bank_switch_fine)));
 		cart_space()->install_write_handler(
 				0x4000, 0x5fff,
-				write8smo_delegate(*this, FUNC(ngbchk_device::bank_switch_coarse)));
+				emu::rw_delegate(*this, FUNC(ngbchk_device::bank_switch_coarse)));
 
 		// install protection over the top of high ROM bank
 		cart_space()->install_view(
@@ -1219,7 +1219,7 @@ public:
 				m_view_prot);
 		m_view_prot[0].install_read_handler(
 				0x4000, 0x4fff, 0x0ff0, 0x0000, 0x0000,
-				read8sm_delegate(*this, FUNC(ngbchk_device::protection)));
+				emu::rw_delegate(*this, FUNC(ngbchk_device::protection)));
 		m_view_prot[0].unmap_read(0x5000, 0x7fff);
 
 		// all good
@@ -1358,10 +1358,10 @@ public:
 		// install handlers with protection emulation
 		cart_space()->install_read_handler(
 				0x0000, 0x7fff,
-				read8sm_delegate(*this, FUNC(vf001_device::read_rom)));
+				emu::rw_delegate(*this, FUNC(vf001_device::read_rom)));
 		cart_space()->install_write_handler(
 				0x6000, 0x700f, 0x100f, 0x0000, 0x0000,
-				write8sm_delegate(*this, FUNC(vf001_device::prot_cmd)));
+				emu::rw_delegate(*this, FUNC(vf001_device::prot_cmd)));
 
 		// all good
 		return std::error_condition();

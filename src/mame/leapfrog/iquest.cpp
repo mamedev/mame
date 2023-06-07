@@ -46,7 +46,7 @@ protected:
 	required_device<generic_slot_device> m_cart;
 	required_device<screen_device> m_screen;
 
-	DECLARE_WRITE_LINE_MEMBER(rx_line_hack);
+	void rx_line_hack(int state);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
@@ -116,10 +116,6 @@ private:
 	uint8_t m_ffa8 = 0;
 
 	void unk_ffa9_w(uint8_t data);
-
-	void tx(uint8_t data);
-	uint8_t rx();
-
 
 	uint8_t port0_r();
 	void port0_w(u8 data);
@@ -520,28 +516,9 @@ uint32_t leapfrog_iquest_state::screen_update(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
-// never triggered?
-void leapfrog_iquest_state::tx(uint8_t data)
-{
-	logerror("%s: transmitting %02x\n", machine().describe_context().c_str(), data);
-}
-
-// never triggered?
-uint8_t leapfrog_iquest_state::rx()
-{
-	logerror("%s: receiving\n", machine().describe_context().c_str());
-	return machine().rand();
-}
-
-
 // doesn't help?
-WRITE_LINE_MEMBER(leapfrog_iquest_state::rx_line_hack)
+void leapfrog_iquest_state::rx_line_hack(int state)
 {
-	/*
-	m_maincpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);
-	m_maincpu->set_input_line(MCS51_RX_LINE, CLEAR_LINE);
-	*/
-
 	if (0)
 	{
 		// HACK: force past the wait loop if we're treating ff80 - ffff as RAM
@@ -605,8 +582,6 @@ void leapfrog_iquest_state::leapfrog_base(machine_config &config)
 	I8032(config, m_maincpu, 96000000/10); // unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &leapfrog_iquest_state::prog_map);
 	m_maincpu->set_addrmap(AS_IO, &leapfrog_iquest_state::ext_map);
-	m_maincpu->serial_tx_cb().set(FUNC(leapfrog_iquest_state::tx));
-	m_maincpu->serial_rx_cb().set(FUNC(leapfrog_iquest_state::rx));
 	m_maincpu->port_in_cb<0>().set(FUNC(leapfrog_iquest_state::port0_r));
 	m_maincpu->port_out_cb<0>().set(FUNC(leapfrog_iquest_state::port0_w));
 	m_maincpu->port_in_cb<1>().set(FUNC(leapfrog_iquest_state::port1_r));

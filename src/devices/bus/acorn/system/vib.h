@@ -45,8 +45,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	template<mc14411_device::timer_id T> DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	template<mc14411_device::timer_id T> void write_acia_clock(int state);
+	void irq_w(int state);
 
 	required_device<i8255_device> m_ppi8255;
 	required_device<via6522_device> m_via6522;

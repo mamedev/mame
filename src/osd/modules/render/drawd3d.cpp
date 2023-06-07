@@ -755,6 +755,9 @@ void renderer_d3d9::begin_frame()
 
 	if (m_shaders->enabled())
 		m_shaders->begin_frame(window().m_primlist);
+
+	// set an initial default texture
+	set_texture(nullptr);
 }
 
 void renderer_d3d9::process_primitives()

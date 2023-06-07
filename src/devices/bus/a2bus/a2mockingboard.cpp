@@ -43,8 +43,8 @@ class a2bus_ayboard_device:
 	public device_a2bus_card_interface
 {
 public:
-	DECLARE_WRITE_LINE_MEMBER( via1_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( via2_irq_w );
+	void via1_irq_w(int state);
+	void via2_irq_w(int state);
 	u8 via1_in_a() { return m_porta1; }
 	u8 via2_in_a() { return m_porta2; }
 	void via1_out_a(u8 data);
@@ -90,7 +90,7 @@ protected:
 	required_device<votrax_sc01_device> m_sc01;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(write_via1_cb2);
+	void write_via1_cb2(int state);
 
 	u8 m_portb1;
 	int m_last_cb2_state;
@@ -181,7 +181,7 @@ void a2bus_mockingboard_device::device_add_mconfig(machine_config &config)
 	AY8913(config, m_ay2, 1022727);
 	m_ay2->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 
-	VOTRAX_SC01(config, m_sc01, 1022727);
+	VOTRAX_SC01A(config, m_sc01, 1022727);
 	m_sc01->ar_callback().set(m_via1, FUNC(via6522_device::write_cb1));
 	m_sc01->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_sc01->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
@@ -373,7 +373,7 @@ void a2bus_phasor_device::write_cnxx(u8 offset, u8 data)
 	}
 }
 
-WRITE_LINE_MEMBER( a2bus_ayboard_device::via1_irq_w )
+void a2bus_ayboard_device::via1_irq_w(int state)
 {
 	if (state)
 	{
@@ -385,7 +385,7 @@ WRITE_LINE_MEMBER( a2bus_ayboard_device::via1_irq_w )
 	}
 }
 
-WRITE_LINE_MEMBER( a2bus_ayboard_device::via2_irq_w )
+void a2bus_ayboard_device::via2_irq_w(int state)
 {
 	if (state)
 	{
@@ -675,7 +675,7 @@ void a2bus_mockingboard_device::device_reset()
 	m_last_cb2_state = ASSERT_LINE;
 }
 
-WRITE_LINE_MEMBER( a2bus_mockingboard_device::write_via1_cb2 )
+void a2bus_mockingboard_device::write_via1_cb2(int state)
 {
 	if ((state == CLEAR_LINE) && (m_last_cb2_state == ASSERT_LINE))
 	{

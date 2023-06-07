@@ -60,16 +60,11 @@ Taito W Rom Board:
 
 #include "emu.h"
 
-#define TAITOWLF_ENABLE_VGA 0
-
 #include "pcshare.h"
 
 #include "cpu/i386/i386.h"
 #include "machine/lpci.h"
 #include "machine/pckeybrd.h"
-#if TAITOWLF_ENABLE_VGA
-#include "video/pc_vga.h"
-#endif
 #include "emupal.h"
 #include "screen.h"
 
@@ -102,9 +97,7 @@ private:
 	void pnp_data_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-#if !TAITOWLF_ENABLE_VGA
 	void taitowlf_palette(palette_device &palette) const;
-#endif
 	uint32_t screen_update_taitowlf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void intel82439tx_init();
 	void taitowlf_io(address_map &map);
@@ -124,7 +117,6 @@ private:
 	uint8_t m_piix4_config_reg[4][256];
 };
 
-#if !TAITOWLF_ENABLE_VGA
 uint32_t taitowlf_state::screen_update_taitowlf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
@@ -146,7 +138,6 @@ uint32_t taitowlf_state::screen_update_taitowlf(screen_device &screen, bitmap_rg
 
 	return 0;
 }
-#endif
 
 
 // Intel 82439TX System Controller (MTXC)
@@ -302,16 +293,8 @@ void taitowlf_state::bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 void taitowlf_state::taitowlf_map(address_map &map)
 {
 	map(0x00000000, 0x0009ffff).ram();
-#if TAITOWLF_ENABLE_VGA
-	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
-#else
 	map(0x000a0000, 0x000bffff).ram();
-#endif
-#if TAITOWLF_ENABLE_VGA
-	map(0x000c0000, 0x000c7fff).ram().region("video_bios", 0);
-#else
 	map(0x000c0000, 0x000c7fff).noprw();
-#endif
 	map(0x000e0000, 0x000effff).ram();
 	map(0x000f0000, 0x000fffff).bankr("bank1");
 	map(0x000f0000, 0x000fffff).w(FUNC(taitowlf_state::bios_ram_w));
@@ -327,13 +310,7 @@ void taitowlf_state::taitowlf_io(address_map &map)
 	map(0x00e8, 0x00eb).noprw();
 	map(0x0300, 0x03af).noprw();
 	map(0x0278, 0x027b).w(FUNC(taitowlf_state::pnp_config_w));
-#if TAITOWLF_ENABLE_VGA
-	map(0x03b0, 0x03bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
-	map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
-	map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
-#else
 	map(0x03b0, 0x03df).noprw();
-#endif
 	map(0x0a78, 0x0a7b).w(FUNC(taitowlf_state::pnp_data_w));
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 }
@@ -353,7 +330,6 @@ void taitowlf_state::machine_reset()
 }
 
 
-#if !TAITOWLF_ENABLE_VGA
 /* debug purpose*/
 void taitowlf_state::taitowlf_palette(palette_device &palette) const
 {
@@ -363,7 +339,6 @@ void taitowlf_state::taitowlf_palette(palette_device &palette) const
 	palette.set_pen_color(0x10, rgb_t(0xaa, 0x00, 0x00));
 	palette.set_pen_color(0x00, rgb_t(0x00, 0x00, 0x00));
 }
-#endif
 
 void taitowlf_state::taitowlf(machine_config &config)
 {
@@ -381,9 +356,6 @@ void taitowlf_state::taitowlf(machine_config &config)
 	pcat_common(config);
 
 	/* video hardware */
-#if TAITOWLF_ENABLE_VGA
-	pcvideo_vga(config);
-#else
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -391,7 +363,6 @@ void taitowlf_state::taitowlf(machine_config &config)
 	screen.set_visarea(0, 512-1, 0, 256-1);
 	screen.set_screen_update(FUNC(taitowlf_state::screen_update_taitowlf));
 	PALETTE(config, m_palette, FUNC(taitowlf_state::taitowlf_palette), 256);
-#endif
 }
 
 void taitowlf_state::init_taitowlf()
@@ -408,12 +379,6 @@ void taitowlf_state::init_taitowlf()
 ROM_START(pf2012)
 	ROM_REGION32_LE(0x40000, "bios", 0)
 	ROM_LOAD("p5tx-la.bin", 0x00000, 0x40000, CRC(072e6d51) SHA1(70414349b37e478fc28ecbaba47ad1033ae583b7))
-
-#if TAITOWLF_ENABLE_VGA
-	ROM_REGION( 0x8000, "video_bios", 0 ) // debug
-	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
-	ROM_CONTINUE(                                 0x0001, 0x4000 )
-#endif
 
 	ROM_REGION(0x400000, "user3", 0) // Program ROM (FAT12)
 	ROM_LOAD("u1.bin", 0x000000, 0x200000, CRC(8f4c09cb) SHA1(0969a92fec819868881683c580f9e01cbedf4ad2))

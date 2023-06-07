@@ -39,7 +39,7 @@ void a2bus_nippelclock_device::device_add_mconfig(machine_config &config)
 	m_rtc->set_binary(true);
 }
 
-WRITE_LINE_MEMBER(a2bus_nippelclock_device::irq_w)
+void a2bus_nippelclock_device::irq_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{

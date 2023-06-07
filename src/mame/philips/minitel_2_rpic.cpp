@@ -156,6 +156,8 @@ private:
 	uint8_t port1_r();
 	uint8_t port3_r();
 
+	void serial_rxd(int state);
+
 	void dev_ctrl_reg_w(offs_t offset, uint8_t data);
 	uint8_t dev_keyb_ser_r(offs_t offset);
 
@@ -243,9 +245,16 @@ void minitel_state::port3_w(uint8_t data)
 
 	m_serport->write_txd( !!(data & PORT_3_SER_TXD) );
 
-	port3 = data;
+	port3 = (port3 & PORT_3_SER_RXD) | (data & ~PORT_3_SER_RXD);
 }
 
+void minitel_state::serial_rxd(int state)
+{
+	if (state)
+		port3 |= PORT_3_SER_RXD;
+	else
+		port3 &= ~PORT_3_SER_RXD;
+}
 
 
 void minitel_state::update_modem_state()
@@ -532,7 +541,7 @@ void minitel_state::minitel2(machine_config &config)
 	m_modem->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(m_modem));
 
 	RS232_PORT(config, m_serport, default_rs232_devices, nullptr);
-	m_serport->rxd_handler().set_inputline(m_maincpu, MCS51_RX_LINE);
+	m_serport->rxd_handler().set(FUNC(minitel_state::serial_rxd));
 	m_serport->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(m_serport));
 
 	lineconnected = 0;

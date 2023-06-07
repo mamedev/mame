@@ -450,7 +450,7 @@ void uv201_device::write(offs_t offset, uint8_t data)
 //  ext_int_w - external interrupt write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( uv201_device::ext_int_w )
+void uv201_device::ext_int_w(int state)
 {
 	if (!state && (m_cmd & COMMAND_FRZ))
 	{
@@ -464,7 +464,7 @@ WRITE_LINE_MEMBER( uv201_device::ext_int_w )
 //  kbd_r - keyboard select read
 //-------------------------------------------------
 
-READ_LINE_MEMBER( uv201_device::kbd_r )
+int uv201_device::kbd_r()
 {
 	return (m_cmd & COMMAND_KBD) ? 1 : 0;
 }

@@ -34,14 +34,14 @@
 //**************************************************************************
 //  CONFIGURABLE LOGGING
 //**************************************************************************
-#define LOG_IRQ     (1U <<  1)
-#define LOG_RESET   (1U <<  2)
-#define LOG_BITS    (1U <<  3)
-#define LOG_UI      (1U <<  4)
-#define LOG_LEDS    (1U <<  5)
-#define LOG_ROM     (1U <<  6)
-#define LOG_ADEC    (1U <<  7)
-#define LOG_IO      (1U <<  8)
+#define LOG_IRQ     (1U << 1)
+#define LOG_RESET   (1U << 2)
+#define LOG_BITS    (1U << 3)
+#define LOG_UI      (1U << 4)
+#define LOG_LEDS    (1U << 5)
+#define LOG_ROM     (1U << 6)
+#define LOG_ADEC    (1U << 7)
+#define LOG_IO      (1U << 8)
 
 //#define VERBOSE (LOG_GENERAL|LOG_IO|LOG_IRQ|LOG_LEDS|LOG_BITS|LOG_RESET)
 //#define LOG_OUTPUT_STREAM std::cout
@@ -223,18 +223,18 @@ alfaskop_s41_keyboard_device::alfaskop_s41_keyboard_device(
 {
 }
 
-WRITE_LINE_MEMBER(alfaskop_s41_keyboard_device::rxd_w)
+void alfaskop_s41_keyboard_device::rxd_w(int state)
 {
 	LOGBITS("KBD bit presented: %d\n", state);
 	//m_rxd_high = CLEAR_LINE != state;
 }
 
-// WRITE_LINE_MEMBER(alfaskop_s41_keyboard_device::hold_w)
+// void alfaskop_s41_keyboard_device::hold_w(int state)
 // {
 //  m_hold = CLEAR_LINE == state;
 // }
 
-WRITE_LINE_MEMBER(alfaskop_s41_keyboard_device::rst_line_w)
+void alfaskop_s41_keyboard_device::rst_line_w(int state)
 {
 	if (state == CLEAR_LINE)
 	{

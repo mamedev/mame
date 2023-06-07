@@ -171,31 +171,31 @@ void ss50_interface_port_device::write(offs_t offset, u8 data)
 //  fN_w - baud rate clocks for serial interfaces
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(ss50_interface_port_device::f110_w)
+void ss50_interface_port_device::f110_w(int state)
 {
 	if (m_card != nullptr)
 		m_card->f110_w(state);
 }
 
-WRITE_LINE_MEMBER(ss50_interface_port_device::f150_9600_w)
+void ss50_interface_port_device::f150_9600_w(int state)
 {
 	if (m_card != nullptr)
 		m_card->f150_9600_w(state);
 }
 
-WRITE_LINE_MEMBER(ss50_interface_port_device::f300_w)
+void ss50_interface_port_device::f300_w(int state)
 {
 	if (m_card != nullptr)
 		m_card->f300_w(state);
 }
 
-WRITE_LINE_MEMBER(ss50_interface_port_device::f600_4800_w)
+void ss50_interface_port_device::f600_4800_w(int state)
 {
 	if (m_card != nullptr)
 		m_card->f600_4800_w(state);
 }
 
-WRITE_LINE_MEMBER(ss50_interface_port_device::f600_1200_w)
+void ss50_interface_port_device::f600_1200_w(int state)
 {
 	if (m_card != nullptr)
 		m_card->f600_1200_w(state);

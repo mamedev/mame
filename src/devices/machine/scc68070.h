@@ -58,14 +58,14 @@ public:
 	auto i2c_sda_w() { return m_i2c_sdaw_callback.bind(); }
 	auto i2c_sda_r() { return m_i2c_sdar_callback.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(in2_w);
-	DECLARE_WRITE_LINE_MEMBER(in4_w);
-	DECLARE_WRITE_LINE_MEMBER(in5_w);
-	DECLARE_WRITE_LINE_MEMBER(nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(int1_w);
-	DECLARE_WRITE_LINE_MEMBER(int2_w);
+	void in2_w(int state);
+	void in4_w(int state);
+	void in5_w(int state);
+	void nmi_w(int state);
+	void int1_w(int state);
+	void int2_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(write_scl);
+	void write_scl(int state);
 
 	TIMER_CALLBACK_MEMBER(timer0_callback);
 	TIMER_CALLBACK_MEMBER(rx_callback);
@@ -203,7 +203,7 @@ private:
 	void internal_map(address_map &map);
 	void cpu_space_map(address_map &map);
 
-	DECLARE_WRITE_LINE_MEMBER(reset_peripherals);
+	void reset_peripherals(int state);
 
 	void update_ipl();
 	uint8_t iack_r(offs_t offset);

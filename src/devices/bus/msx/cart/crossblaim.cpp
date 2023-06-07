@@ -30,7 +30,7 @@ std::error_condition msx_cart_crossblaim_device::initialize_cartridge(std::strin
 	m_rombank->configure_entries(0, 4, cart_rom_region()->base(), 0x4000);
 
 	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
-	page(1)->install_write_handler(0x4045, 0x4045, write8smo_delegate(*this, FUNC(msx_cart_crossblaim_device::mapper_write)));
+	page(1)->install_write_handler(0x4045, 0x4045, emu::rw_delegate(*this, FUNC(msx_cart_crossblaim_device::mapper_write)));
 	page(2)->install_read_bank(0x8000, 0xbfff, m_rombank);
 
 	return std::error_condition();

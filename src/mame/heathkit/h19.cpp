@@ -2,24 +2,10 @@
 // copyright-holders:Mark Garlanger
 /***************************************************************************
 
-    Heathkit H19
+  Heathkit H19
 
-    A smart terminal designed and manufactured by Heath Company.
-
-    The keyboard consists of a 9x10 matrix connected to a MM5740AAC/N
-    mask-programmed keyboard controller. The output of this passes
-    through a rom.
-
-    Input can also come from the serial port (a 8250).
-    Either device will signal an interrupt to the CPU when a key
-    is pressed/data is received.
-
-    TODO:
-    - speed up emulation
-    - update SW401 baud rate options for Watz ROM
-    - update SW401 & SW402 definitions for Super-19 ROM
-    - update SW401 & SW402 definitions for ULTRA ROM
-    - add option for ULTRA ROMs second page of screen RAM
+    A smart terminal designed and manufactured by Heath Company. This
+        is identical to the Zenith Data Systems Z-19.
 
 ****************************************************************************/
 
@@ -69,7 +55,7 @@ void h19_state::h19_ultrah19(machine_config &config)
 	HEATH_ULTRA(config, m_tlb);
 }
 
-/* ROM definition */
+// ROM definition
 ROM_START( h19 )
 ROM_END
 

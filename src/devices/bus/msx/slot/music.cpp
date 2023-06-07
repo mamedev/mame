@@ -31,5 +31,5 @@ void msx_slot_music_device::device_start()
 	}
 
 	// Install IO read/write handlers
-	io_space().install_write_handler(0x7c, 0x7d, write8sm_delegate(*m_ym2413, FUNC(ym2413_device::write)));
+	io_space().install_write_handler(0x7c, 0x7d, emu::rw_delegate(*m_ym2413, FUNC(ym2413_device::write)));
 }

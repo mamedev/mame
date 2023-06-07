@@ -12,6 +12,9 @@
         - MK48T08
         - MK48T12
 
+    Dallas clones that have the same functional interface:
+        - DS1643
+
 ***************************************************************************/
 
 #ifndef MAME_MACHINE_TIMEKPR_H
@@ -119,6 +122,9 @@ class m48t58_device : public timekeeper_device
 {
 public:
 	m48t58_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+protected:
+	m48t58_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 };
 
 class mk48t08_device : public timekeeper_device
@@ -133,6 +139,12 @@ public:
 	mk48t12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
+class ds1643_device : public m48t58_device
+{
+public:
+	ds1643_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+};
+
 // device type definition
 DECLARE_DEVICE_TYPE(M48T02,  m48t02_device)
 DECLARE_DEVICE_TYPE(M48T35,  m48t35_device)
@@ -140,5 +152,6 @@ DECLARE_DEVICE_TYPE(M48T37,  m48t37_device)
 DECLARE_DEVICE_TYPE(M48T58,  m48t58_device)
 DECLARE_DEVICE_TYPE(MK48T08, mk48t08_device)
 DECLARE_DEVICE_TYPE(MK48T12, mk48t12_device)
+DECLARE_DEVICE_TYPE(DS1643,  ds1643_device)
 
 #endif // MAME_MACHINE_TIMEKPR_H

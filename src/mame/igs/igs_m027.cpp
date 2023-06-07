@@ -67,7 +67,7 @@ private:
 	required_device<igs017_igs031_device> m_igs017_igs031;
 
 	virtual void video_start() override;
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 
 	void sdwx_gfx_decrypt();
 	void pgm_create_dummy_internal_arm_region();
@@ -314,7 +314,7 @@ INPUT_PORTS_END
 
 
 
-WRITE_LINE_MEMBER(igs_m027_state::vblank_irq)
+void igs_m027_state::vblank_irq(int state)
 {
 	if (state)
 		m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());

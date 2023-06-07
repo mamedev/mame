@@ -16,8 +16,8 @@ public:
 
 	uint16_t read(offs_t offset, uint16_t mem_mask = ~0);
 	void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER( tin_w );
-	DECLARE_WRITE_LINE_MEMBER( tgate_w );
+	void tin_w(int state);
+	void tgate_w(int state);
 
 	uint8_t irq_level() const { return (m_sr & REG_SR_IRQ) ? (m_ir & REG_IR_INTLEV) >> 8 : 0; }
 	uint8_t irq_vector() const { return m_ir & REG_IR_INTVEC; }

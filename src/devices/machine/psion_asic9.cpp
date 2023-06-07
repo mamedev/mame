@@ -11,9 +11,9 @@
     free-running clock (FRC) and a codec interface for sound.
 
     TODO:
-    - memory protection
     - improve RAM configuration for mx machines
     - set RTC timer
+    - ASIC9MX implements V30MX, and likely the unknown Temic device found in 3c/Siena
 
 ******************************************************************************/
 
@@ -28,18 +28,19 @@
 #include "logmacro.h"
 
 
-DEFINE_DEVICE_TYPE(PSION_ASIC9, psion_asic9_device, "psion_asic9", "Psion ASIC9")
+DEFINE_DEVICE_TYPE(PSION_ASIC9, psion_asic9_device, "psion_asic9", "Psion ASIC9 V30H")
+DEFINE_DEVICE_TYPE(PSION_ASIC9MX, psion_asic9mx_device, "psion_asic9mx", "Psion ASIC9 V30MX")
 
 
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
-psion_asic9_device::psion_asic9_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PSION_ASIC9, tag, owner, clock)
+psion_asic9_device::psion_asic9_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
-	, m_maincpu(*this, "maincpu")
+	, m_v30(*this, "v30")
 	, m_ram(*this, finder_base::DUMMY_TAG)
 	, m_rom(*this, finder_base::DUMMY_TAG)
 	, m_ram_config("asic9_ram", ENDIANNESS_LITTLE, 16, 24, 0)
@@ -49,13 +50,22 @@ psion_asic9_device::psion_asic9_device(const machine_config &mconfig, const char
 	, m_frc2_timer(nullptr)
 	, m_watchdog_timer(nullptr)
 	, m_rtc_timer(nullptr)
-	, m_configure_ram_cb(*this)
 	, m_buz_cb(*this)
 	, m_col_cb(*this)
 	, m_port_ab_r(*this)
 	, m_port_ab_w(*this)
 	, m_data_r(*this)
 	, m_data_w(*this)
+{
+}
+
+psion_asic9_device::psion_asic9_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: psion_asic9_device(mconfig, PSION_ASIC9, tag, owner, clock)
+{
+}
+
+psion_asic9mx_device::psion_asic9mx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: psion_asic9_device(mconfig, PSION_ASIC9MX, tag, owner, clock)
 {
 }
 
@@ -77,10 +87,10 @@ void psion_asic9_device::io_map(address_map &map)
 
 void psion_asic9_device::device_add_mconfig(machine_config &config)
 {
-	V30(config, m_maincpu, DERIVED_CLOCK(1, 1));
-	m_maincpu->set_addrmap(AS_PROGRAM, &psion_asic9_device::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &psion_asic9_device::io_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(psion_asic9_device::inta_cb));
+	V30(config, m_v30, DERIVED_CLOCK(1, 1));
+	m_v30->set_addrmap(AS_PROGRAM, &psion_asic9_device::mem_map);
+	m_v30->set_addrmap(AS_IO, &psion_asic9_device::io_map);
+	m_v30->set_irq_acknowledge_callback(FUNC(psion_asic9_device::inta_cb));
 }
 
 
@@ -121,6 +131,9 @@ void psion_asic9_device::device_resolve_objects()
 
 void psion_asic9_device::device_start()
 {
+	if (!m_ram->started())
+		throw device_missing_dependencies();
+
 	m_ram_space = &space(AS_A9_RAM);
 	m_rom_space = &space(AS_A9_ROM);
 
@@ -214,7 +227,6 @@ void psion_asic9_device::device_reset()
 	m_a9_control_extra = 0x00;
 	m_rtc = time(nullptr) - 946684800;
 
-	//m_a9_status |= 0x2000; // A9MReset
 	m_a9_status |= 0xe000; // A9MCold
 	m_a9_serial_control = 0x00;
 	m_a9_channel_select = 0x00;
@@ -276,28 +288,38 @@ TIMER_CALLBACK_MEMBER(psion_asic9_device::rtc)
 	m_rtc++;
 }
 
-WRITE_LINE_MEMBER(psion_asic9_device::eint_w)
+void psion_asic9_device::eint0_w(int state)
 {
 	if (state)
-		m_a9_interrupt_status |= 0x10; // Asic2Int
+		m_a9_interrupt_status |= 0x08; // A9MExpIntC
+	else
+		m_a9_interrupt_status &= ~0x08;
+
+	update_interrupts();
+}
+
+void psion_asic9_device::eint1_w(int state)
+{
+	if (state)
+		m_a9_interrupt_status |= 0x10; // A9MExpIntA
 	else
 		m_a9_interrupt_status &= ~0x10;
 
 	update_interrupts();
 }
 
-WRITE_LINE_MEMBER(psion_asic9_device::enmi_w)
+void psion_asic9_device::eint2_w(int state)
 {
 	if (state)
-		m_a9_control |= 0x0200; // ExternalNmi
+		m_a9_interrupt_status |= 0x20; // A9MExpIntB
 	else
-		m_a9_control &= ~0x0200;
+		m_a9_interrupt_status &= ~0x20;
 
 	update_interrupts();
 }
 
 
-WRITE_LINE_MEMBER(psion_asic9_device::medchng_w)
+void psion_asic9_device::medchng_w(int state)
 {
 	if (state)
 		m_a9_status |= 0x04; // A9MDoorNMI
@@ -312,8 +334,8 @@ void psion_asic9_device::update_interrupts()
 	bool irq = m_a9_interrupt_status & m_a9_interrupt_mask;
 	bool nmi = m_a9_status & 0x000f;
 
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, irq ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(INPUT_LINE_NMI,  nmi ? ASSERT_LINE : CLEAR_LINE);
+	m_v30->set_input_line(INPUT_LINE_IRQ0, irq ? ASSERT_LINE : CLEAR_LINE);
+	m_v30->set_input_line(INPUT_LINE_NMI,  nmi ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -343,7 +365,7 @@ IRQ_CALLBACK_MEMBER(psion_asic9_device::inta_cb)
 
 TIMER_CALLBACK_MEMBER(psion_asic9_device::busy)
 {
-	m_maincpu->set_input_line(NEC_INPUT_LINE_POLL, ASSERT_LINE);
+	m_v30->set_input_line(NEC_INPUT_LINE_POLL, ASSERT_LINE);
 }
 
 
@@ -404,14 +426,44 @@ uint8_t psion_asic9_device::col_r()
 
 bool psion_asic9_device::is_protected(offs_t offset)
 {
-	//if (m_a9_protection_mode && (offset <= m_a9_protection_lower || offset > m_a9_protection_upper))
-	//{
-	//  LOG("%s is_protected: %05x < %05x <= %05x\n", machine().describe_context(), m_a9_protection_lower, offset, m_a9_protection_upper);
-	//  m_a9_status |= 0x0002; // A9MProtectedModeNMI
-	//  update_interrupts();
-	//  return true;
-	//}
+	if (m_a9_protection_mode && (offset <= m_a9_protection_lower || offset > m_a9_protection_upper))
+	{
+	  LOG("%s is_protected: %05x < %05x <= %05x\n", machine().describe_context(), m_a9_protection_lower, offset, m_a9_protection_upper);
+	  m_a9_status |= 0x0002; // A9MProtectedModeNMI
+	  update_interrupts();
+	  return true;
+	}
 	return false;
+}
+
+offs_t psion_asic9_device::translate_address(offs_t offset)
+{
+	switch (offset & 0xf0000)
+	{
+	case 0x00000: case 0x10000: case 0x20000: case 0x30000: case 0x40000: case 0x50000:
+		break;
+
+	case 0x60000:
+		offset = (m_a9_psel_6000 << 16) | (offset & 0xffff);
+		break;
+
+	case 0x70000:
+		offset = (m_a9_psel_7000 << 16) | (offset & 0xffff);
+		break;
+
+	case 0x80000:
+		offset = (m_a9_psel_8000 << 16) | (offset & 0xffff);
+		break;
+
+	case 0x90000:
+		offset = (m_a9_psel_9000 << 16) | (offset & 0xffff);
+		break;
+
+	case 0xa0000: case 0xb0000: case 0xc0000: case 0xd0000: case 0xe0000: case 0xf0000:
+		offset = 0xf00000 | offset;
+		break;
+	}
+	return offset;
 }
 
 uint16_t psion_asic9_device::mem_r(offs_t offset, uint16_t mem_mask)
@@ -420,30 +472,16 @@ uint16_t psion_asic9_device::mem_r(offs_t offset, uint16_t mem_mask)
 
 	offset <<= 1;
 
-	switch (offset & 0xf0000)
+	offs_t addr = translate_address(offset);
+
+	switch (offset & 0x80000)
 	{
-	case 0x00000: case 0x10000: case 0x20000: case 0x30000: case 0x40000: case 0x50000:
-		data = m_ram_space->read_word(offset, mem_mask);
-		break;
-
-	case 0x60000:
-		data = m_ram_space->read_word((m_a9_psel_6000 << 16) | (offset & 0xffff), mem_mask);
-		break;
-
-	case 0x70000:
-		data = m_ram_space->read_word((m_a9_psel_7000 << 16) | (offset & 0xffff), mem_mask);
+	case 0x00000:
+		data = m_ram_space->read_word(addr, mem_mask);
 		break;
 
 	case 0x80000:
-		data = m_rom_space->read_word((m_a9_psel_8000 << 16) | (offset & 0xffff), mem_mask);
-		break;
-
-	case 0x90000:
-		data = m_rom_space->read_word((m_a9_psel_9000 << 16) | (offset & 0xffff), mem_mask);
-		break;
-
-	case 0xa0000: case 0xb0000: case 0xc0000: case 0xd0000: case 0xe0000: case 0xf0000:
-		data = m_rom_space->read_word(0xf00000 | offset, mem_mask);
+		data = m_rom_space->read_word(addr, mem_mask);
 		break;
 	}
 
@@ -454,20 +492,14 @@ void psion_asic9_device::mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset <<= 1;
 
-	if (!is_protected(offset))
+	offs_t addr = translate_address(offset);
+
+	if (!is_protected(addr))
 	{
-		switch (offset & 0xf0000)
+		switch (offset & 0x80000)
 		{
-		case 0x00000: case 0x10000: case 0x20000: case 0x30000: case 0x40000: case 0x50000:
-			m_ram_space->write_word(offset, data, mem_mask);
-			break;
-
-		case 0x60000:
-			m_ram_space->write_word((m_a9_psel_6000 << 16) | (offset & 0xffff), data, mem_mask);
-			break;
-
-		case 0x70000:
-			m_ram_space->write_word((m_a9_psel_7000 << 16) | (offset & 0xffff), data, mem_mask);
+		case 0x00000:
+			m_ram_space->write_word(addr, data, mem_mask);
 			break;
 		}
 	}
@@ -1017,9 +1049,9 @@ void psion_asic9_device::io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		// WriteSingle  10000000b;  ReadSingle   11000000b
 		// WriteMulti   10010000b;  ReadMulti    11010000b
 		// Reset        00000000b;  Select       01000000b
-		// Asic4Id           001h;  Asic5PackId       002h
+		// Asic2SlaveId      001h;  Asic5PackId       002h
 		// Asic5NormalId     003h;  Asic6Id           004h
-		// Asic8Id           005h;  Asic2SlaveId      01fh
+		// Asic8Id           005h;  Asic4Id           006h
 		LOG("%s io_w: A2SerialControl <= %02x\n", machine().describe_context(), data & 0xff);
 		m_a9_serial_control = data & 0xff;
 		transmit_frame(CONTROL_FRAME | m_a9_serial_control);
@@ -1069,7 +1101,7 @@ bool psion_asic9_device::channel_active(int channel)
 void psion_asic9_device::transmit_frame(uint16_t data)
 {
 	m_busy_timer->adjust(attotime::from_ticks(12, clock() / 2));
-	m_maincpu->set_input_line(NEC_INPUT_LINE_POLL, CLEAR_LINE);
+	m_v30->set_input_line(NEC_INPUT_LINE_POLL, CLEAR_LINE);
 
 	for (int ch = 0; ch < 8; ch++)
 	{
@@ -1086,7 +1118,7 @@ uint8_t psion_asic9_device::receive_frame()
 	uint8_t data = 0x00;
 
 	m_busy_timer->adjust(attotime::from_ticks(12, clock() / 2));
-	m_maincpu->set_input_line(NEC_INPUT_LINE_POLL, CLEAR_LINE);
+	m_v30->set_input_line(NEC_INPUT_LINE_POLL, CLEAR_LINE);
 
 	for (int ch = 0; ch < 8; ch++)
 	{

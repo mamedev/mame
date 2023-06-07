@@ -82,7 +82,7 @@ protected:
 	INTERRUPT_GEN_MEMBER(rtc_interrupt);
 	INTERRUPT_GEN_MEMBER(fdc_interrupt);
 	TIMER_CALLBACK_MEMBER(cassette_data_callback);
-	DECLARE_WRITE_LINE_MEMBER(intrq_w);
+	void intrq_w(int state);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	u8 m_irq = 0U;

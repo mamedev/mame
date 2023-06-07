@@ -52,7 +52,7 @@ class bbc_opusfdc_device :
 public:
 	static void floppy_formats(format_registration &fr);
 
-	DECLARE_WRITE_LINE_MEMBER(motor_w);
+	void motor_w(int state);
 
 protected:
 	// construction/destruction

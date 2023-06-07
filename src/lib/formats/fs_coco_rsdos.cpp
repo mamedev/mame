@@ -45,7 +45,7 @@ public:
 		{
 			rsdos_dirent    m_dirent;
 			u8              m_unused[16];
-		} m_entries[4];
+		} m_entries[8];
 	};
 
 	class granule_iterator

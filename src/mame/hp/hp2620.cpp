@@ -54,8 +54,8 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(nlrc_w);
-	DECLARE_WRITE_LINE_MEMBER(bell_w);
+	void nlrc_w(int state);
+	void bell_w(int state);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
@@ -139,7 +139,7 @@ void hp2620_state::ennmi_w(offs_t offset, u8 data)
 	m_nmigate->in_w<0>(BIT(offset, 0));
 }
 
-WRITE_LINE_MEMBER(hp2620_state::nlrc_w)
+void hp2620_state::nlrc_w(int state)
 {
 	// clock input for LS175 at U59
 	if (state)
@@ -148,7 +148,7 @@ WRITE_LINE_MEMBER(hp2620_state::nlrc_w)
 	// TODO: shift keyboard response into m_key_status
 }
 
-WRITE_LINE_MEMBER(hp2620_state::bell_w)
+void hp2620_state::bell_w(int state)
 {
 	m_bell->level_w(state);
 }

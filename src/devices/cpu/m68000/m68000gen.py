@@ -799,6 +799,7 @@ class GEN(IntEnum):
     direct = 0x0001
     full = 0x0002
     mcu = 0x0004
+    m68008 = 0x0008
 
 # Load the instruction list
 
@@ -912,7 +913,7 @@ def code_find_deps(ci):
         if t & DEP.atl:
             t |= DEP.ath
         return [t, expr_deps(ci[2:])]
-    elif ci[0] == "=sr" or ci[0] == "=ccr" or ci[0] == "=8" or ci[0] == "=8h" or ci[0] == "=8xh" or ci[0] == "=8xl" or ci[0] == "=16l" or ci[0] == "=16h":
+    elif ci[0] == "=sr" or ci[0] == "=srd" or ci[0] == "=ccr" or ci[0] == "=8" or ci[0] == "=8h" or ci[0] == "=8xh" or ci[0] == "=8xl" or ci[0] == "=16l" or ci[0] == "=16h":
         return [regdep[ci[1]], expr_deps(ci[2:])]
     elif ci[0] == "=sri" or ci[0] == "=sri7":
         return [regdep[R.sr], 0]
@@ -1635,7 +1636,10 @@ def generate_base_code_for_microcode(ir, irmask, madr, tvn, group01):
 
     if ftu_to_sr and not to_ccr:
         assert(ftu_to_ccr)
-        code_to_sort.append(["=sr", R.sr, R.ftu])
+        if wait_bus_finish:
+            code_to_sort.append(["=srd", R.sr, R.ftu])
+        else:
+            code_to_sort.append(["=sr", R.sr, R.ftu])
     elif ftu_to_ccr:
         code_to_sort.append(["=ccr", R.sr, R.ftu])
         
@@ -1712,7 +1716,7 @@ def generate_base_code_for_microcode(ir, irmask, madr, tvn, group01):
     sort_and_append(code_to_sort, code)
 
     if wait_bus_finish:
-        code.append(["bus_end"])
+        code.append(["bus_end", ftu_to_sr and not to_ccr])
 
     if to_irc:
         code.append(["=", R.irc, R.edb])
@@ -1786,7 +1790,7 @@ def analyze_register_usage(code):
     usage = { 'rx': False, 'ry': False, 't': False }
     for cib in code:
         for ci in cib:
-            if ci[0] == "=" or ci[0] == "=sr" or ci[0] == "=ccr" or ci[0] == "=8" or ci[0] == "=16l" or ci[0] == "=16h" or ci[0] == "=8xl" or ci[0] == "=8xh" or ci[0] == "=8h":
+            if ci[0] == "=" or ci[0] == "=sr" or ci[0] == "=srd" or ci[0] == "=ccr" or ci[0] == "=8" or ci[0] == "=16l" or ci[0] == "=16h" or ci[0] == "=8xl" or ci[0] == "=8xh" or ci[0] == "=8h":
                 from_reg(ci[1], usage)
                 in_expression(ci[2:], usage)
             if ci[0] == "=t":
@@ -1906,7 +1910,7 @@ def generate_code_from_blocks(blocks, ir, irmask, tvn, priv, group01):
 # Propagate bus accesses from bus initiation to access completion in
 # the code blocks
 
-def propagate_bus_access(blocks, code, critical):
+def propagate_bus_access(blocks, code, critical, gen_mode):
     def propagate(blocks, code, seen, i, bus_access, bid, critical):
         if i in seen:
             return bid, critical
@@ -1916,11 +1920,16 @@ def propagate_bus_access(blocks, code, critical):
                 bus_access = ci
             elif ci[0] == 'bus_end':
                 if bus_access:
+                    sr_update = ci.pop()
                     ci.append(bid)
                     ci += bus_access[1:]
                     ci.append(critical)
+                    ci.append(sr_update)
                     bus_access = None
-                    bid += 2
+                    if (gen_mode & GEN.m68008) and ci[2] != 2 and not ci[3]:
+                        bid += 4
+                    else:
+                        bid += 2
             elif ci[0] == "drop_critical":
                 critical = False
         for nc in blocks[i][3]:
@@ -1947,30 +1956,30 @@ def detect_reset_toggling(blocks, code):
 
 # Generic code generation
 
-def generate_intermediate_code(a1, a2, a3, ir, irmask, tvn, critical, priv, group01, name):
+def generate_intermediate_code(a1, a2, a3, ir, irmask, tvn, critical, priv, group01, gen_mode, name):
     fwd, suc = generate_forward_graph(a1, a2, a3, ir, irmask)
     blocks = generate_blocks(fwd)
 #    show_blocks(blocks)
     code = generate_code_from_blocks(blocks, ir, irmask, tvn, priv, group01)
-    propagate_bus_access(blocks, code, critical)
+    propagate_bus_access(blocks, code, critical, gen_mode)
     detect_reset_toggling(blocks, code)
     return code
 
 
 # Generate the code for an instruction
 
-def generate_intermediate_code_from_instruction(ir, irmask, name):
+def generate_intermediate_code_from_instruction(ir, irmask, name, gen_mode):
     # Avoid the rel16 case when looking for rel8
     if (ir & 0xf000) == 0x6000 and irmask == 0xff00:
         ir |= 0x0002
     a1 = a1_pal_apply(ir)
     a2, a3 = a23_pal_apply(ir)
-    return generate_intermediate_code(a1, a2, a3, ir, irmask, None, False, priv_test(ir), False, name)
+    return generate_intermediate_code(a1, a2, a3, ir, irmask, None, False, priv_test(ir), False, gen_mode, name)
 
 # Generate the code for a state
 
-def generate_intermediate_code_from_state(state):
-    return generate_intermediate_code(state[0], 0x3ff, 0x3ff, 0xffff, 0, state[2], state[3], False, True, "state_" + state[1])
+def generate_intermediate_code_from_state(state, gen_mode):
+    return generate_intermediate_code(state[0], 0x3ff, 0x3ff, 0xffff, 0, state[2], state[3], False, True, gen_mode, "state_" + state[1])
 
 
 # Create the base C++ method name for handling a state
@@ -2002,7 +2011,7 @@ def generate_source_from_code(code, gen_mode):
             if ci == R.dcro8:
                 return "1 << (m_dcr & 7)"
             if ci == "ftu-i":
-                return "0xfff0 | ((m_next_state >> 23) & 0xe)"
+                return "0xfff1 | ((m_next_state >> 23) & 0xe)" if gen_mode & GEN.m68008 else "0xfff0 | ((m_next_state >> 23) & 0xe)"
             if ci == "ftu-ssw":
                 return "(m_ftu & ~0x1f) | m_ssw"
             if ci == "trap-tvn":
@@ -2107,77 +2116,126 @@ def generate_source_from_code(code, gen_mode):
                 is_interrupt_vector_lookup = not ci[4] and ci[2] == 2
                 if is_interrupt_vector_lookup:
                     source.append("\tstart_interrupt_vector_lookup();")
-                if not (gen_mode & GEN.full):
-                    source.append("\t[[fallthrough]]; case %d:" % (ci[1]))
-                if ci[4]:
-                    if ci[3]:
-                        if ci[8]:
-                            source.append("\tif(!m_tas_write_callback.isnull())")
-                            source.append("\t\tm_tas_write_callback(m_aob, m_dbout);")
-                            source.append("\telse")
-                            if gen_mode & GEN.direct:
-                                source.append("\t\t%s.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);" % (["m_opcodes", "m_program"][ci[2]]))
-                            else:
-                                source.append("\t\tm_mmu->write_%s(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);" % (["program", "data"][ci[2]]))
-                        elif gen_mode & GEN.direct:
-                            source.append("\t%s.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);" % (["m_opcodes", "m_program"][ci[2]]))
-                        else:
-                            source.append("\tm_mmu->write_%s(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);" % (["program", "data"][ci[2]]))
-                    else:
-                        if gen_mode & GEN.direct:
-                            source.append("\t%s.write_interruptible(m_aob & ~1, m_dbout);" % (["m_opcodes", "m_program"][ci[2]]))
-                        else:
-                            source.append("\tm_mmu->write_%s(m_aob & ~1, m_dbout, 0xffff);" % (["program", "data"][ci[2]]))
-                else:
-                    if ci[2] == 2:
-                        # cpu space access, e.g. interrupt vector lookup
-                        if gen_mode & GEN.direct:
-                            source.append("\tm_edb = m_cpu_space.read_interruptible(m_aob);")
-                        else:
-                            source.append("\tm_edb = m_mmu->read_cpu(m_aob, 0xffff);")
-                    elif ci[3]:
-                        if gen_mode & GEN.direct:
-                            source.append("\tm_edb = %s.read_interruptible(m_aob & ~1, m_aob & 1 ? 0x00ff : 0xff00);" % (["m_opcodes", "m_program"][ci[2]]))
-                        else:
-                            source.append("\tm_edb = m_mmu->read_%s(m_aob & ~1, m_aob & 1 ? 0x00ff : 0xff00);" % (["program", "data"][ci[2]]))
-                        source.append("\tif(!(m_aob & 1))")
-                        source.append("\t\tm_edb >>= 8;")
-                    else:
-                        if gen_mode & GEN.direct:
-                            source.append("\tm_edb = %s.read_interruptible(m_aob & ~1);" % (["m_opcodes", "m_program"][ci[2]]))
-                        else:
-                            source.append("\tm_edb = m_mmu->read_%s(m_aob & ~1, 0xffff);" % (["program", "data"][ci[2]]))
-                source.append("\tm_icount -= 4;")
-                if ci[8]:
+                access_steps = 2 if (gen_mode & GEN.m68008) and ci[2] != 2 and not ci[3] else 1
+                cid = ci[1]
+                for access_step in range(access_steps):
+                    if not (gen_mode & GEN.full):
+                        source.append("\t[[fallthrough]]; case %d:" % (cid))
                     if ci[4]:
+                        if ci[3]:
+                            if ci[8]:
+                                source.append("\tif(!m_tas_write_callback.isnull())")
+                                source.append("\t\tm_tas_write_callback(m_aob, m_dbout);")
+                                source.append("\telse")
+                                if gen_mode & GEN.m68008:
+                                    if gen_mode & GEN.direct:
+                                        source.append("\t\t%s.write_interruptible(m_aob, m_dbout);" % (["m_opcodes8", "m_program8"][ci[2]]))
+                                    else:
+                                        source.append("\t\tm_mmu8->write_%s(m_aob, m_dbout);" % (["program", "data"][ci[2]]))
+                                else:
+                                    if gen_mode & GEN.direct:
+                                        source.append("\t\t%s.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);" % (["m_opcodes", "m_program"][ci[2]]))
+                                    else:
+                                        source.append("\t\tm_mmu->write_%s(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);" % (["program", "data"][ci[2]]))
+                            elif gen_mode & GEN.m68008:
+                                if gen_mode & GEN.direct:
+                                    source.append("\t%s.write_interruptible(m_aob, m_dbout);" % (["m_opcodes8", "m_program8"][ci[2]]))
+                                else:
+                                    source.append("\tm_mmu8->write_%s(m_aob, m_dbout);" % (["program", "data"][ci[2]]))
+                            else:
+                                if gen_mode & GEN.direct:
+                                    source.append("\t%s.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);" % (["m_opcodes", "m_program"][ci[2]]))
+                                else:
+                                    source.append("\tm_mmu->write_%s(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);" % (["program", "data"][ci[2]]))
+                        elif gen_mode & GEN.m68008:
+                            if gen_mode & GEN.direct:
+                                source.append("\t%s.write_interruptible(m_aob%s, m_dbout%s);" % (["m_opcodes8", "m_program8"][ci[2]], " | 1" if access_step == 1 else " & ~1", "" if access_step == 1 else " >> 8"))
+                            else:
+                                source.append("\tm_mmu8->write_%s(m_aob%s, m_dbout%s);" % (["program", "data"][ci[2]], " | 1" if access_step == 1 else " & ~1", "" if access_step == 1 else " >> 8"))
+                        else:
+                            if gen_mode & GEN.direct:
+                                source.append("\t%s.write_interruptible(m_aob & ~1, m_dbout);" % (["m_opcodes", "m_program"][ci[2]]))
+                            else:
+                                source.append("\tm_mmu->write_%s(m_aob & ~1, m_dbout, 0xffff);" % (["program", "data"][ci[2]]))
+                    else:
+                        if ci[2] == 2:
+                            # cpu space access, e.g. interrupt vector lookup
+                            if gen_mode & GEN.m68008:
+                                if gen_mode & GEN.direct:
+                                    source.append("\tm_edb = m_cpu_space8.read_interruptible(m_aob);")
+                                else:
+                                    source.append("\tm_edb = m_mmu8->read_cpu(m_aob);")
+                            else:
+                                if gen_mode & GEN.direct:
+                                    source.append("\tm_edb = m_cpu_space.read_interruptible(m_aob);")
+                                else:
+                                    source.append("\tm_edb = m_mmu->read_cpu(m_aob, 0xffff);")
+                        elif ci[3]:
+                            if gen_mode & GEN.m68008:
+                                if gen_mode & GEN.direct:
+                                    source.append("\tm_edb = %s.read_interruptible(m_aob);" % (["m_opcodes8", "m_program8"][ci[2]]))
+                                else:
+                                    source.append("\tm_edb = m_mmu8->read_%s(m_aob);" % (["program", "data"][ci[2]]))
+                            else:
+                                if gen_mode & GEN.direct:
+                                    source.append("\tm_edb = %s.read_interruptible(m_aob & ~1, m_aob & 1 ? 0x00ff : 0xff00);" % (["m_opcodes", "m_program"][ci[2]]))
+                                else:
+                                    source.append("\tm_edb = m_mmu->read_%s(m_aob & ~1, m_aob & 1 ? 0x00ff : 0xff00);" % (["program", "data"][ci[2]]))
+                                source.append("\tif(!(m_aob & 1))")
+                                source.append("\t\tm_edb >>= 8;")
+                        else:
+                            if gen_mode & GEN.m68008:
+                                if access_step == 1:
+                                    if gen_mode & GEN.direct:
+                                        source.append("\tm_edb |= %s.read_interruptible(m_aob | 1);" % (["m_opcodes8", "m_program8"][ci[2]]))
+                                    else:
+                                        source.append("\tm_edb |= m_mmu8->read_%s(m_aob | 1);" % (["program", "data"][ci[2]]))
+                                else:
+                                    if gen_mode & GEN.direct:
+                                        source.append("\tm_edb = %s.read_interruptible(m_aob & ~1) << 8;" % (["m_opcodes8", "m_program8"][ci[2]]))
+                                    else:
+                                        source.append("\tm_edb = m_mmu8->read_%s(m_aob & ~1) << 8;" % (["program", "data"][ci[2]]))
+                            else:
+                                if gen_mode & GEN.direct:
+                                    source.append("\tm_edb = %s.read_interruptible(m_aob & ~1);" % (["m_opcodes", "m_program"][ci[2]]))
+                                else:
+                                    source.append("\tm_edb = m_mmu->read_%s(m_aob & ~1, 0xffff);" % (["program", "data"][ci[2]]))
+                    source.append("\tm_icount -= 4;")
+                    if ci[8]:
+                        if ci[4]:
+                            source.append("\tif(m_icount <= %s) {" % ("m_bcount" if gen_mode & GEN.mcu else "0"))
+                            source.append("\t\tif(access_to_be_redone()) {")
+                            source.append("\t\t\tm_icount += 4;")
+                            source.append("\t\t\tm_inst_substate = %d;" % (cid-2))
+                            source.append("\t\t} else")
+                            source.append("\t\t\tm_inst_substate = %d;" % (cid+1))
+                            source.append("\t\treturn;")
+                            source.append("\t}")
+                        else:
+                            source.append("\tif(m_icount <= %s && access_to_be_redone()) {" % ("m_bcount" if gen_mode & GEN.mcu else "0"))
+                            source.append("\t\tm_icount += 4;")
+                            source.append("\t\tm_inst_substate = %d;" % cid)
+                            source.append("\t\treturn;")
+                            source.append("\t}")
+                    else:
                         source.append("\tif(m_icount <= %s) {" % ("m_bcount" if gen_mode & GEN.mcu else "0"))
                         source.append("\t\tif(access_to_be_redone()) {")
                         source.append("\t\t\tm_icount += 4;")
-                        source.append("\t\t\tm_inst_substate = %d;" % (ci[1]-2))
+                        source.append("\t\t\tm_inst_substate = %d;" % cid)
                         source.append("\t\t} else")
-                        source.append("\t\t\tm_inst_substate = %d;" % (ci[1]+1))
+                        source.append("\t\t\tm_inst_substate = %d;" % (cid+1))
                         source.append("\t\treturn;")
                         source.append("\t}")
-                    else:
-                        source.append("\tif(m_icount <= %s && access_to_be_redone()) {" % ("m_bcount" if gen_mode & GEN.mcu else "0"))
-                        source.append("\t\tm_icount += 4;")
-                        source.append("\t\tm_inst_substate = %d;" % ci[1])
-                        source.append("\t\treturn;")
-                        source.append("\t}")
-                else:
-                    source.append("\tif(m_icount <= %s) {" % ("m_bcount" if gen_mode & GEN.mcu else "0"))
-                    source.append("\t\tif(access_to_be_redone()) {")
-                    source.append("\t\t\tm_icount += 4;")
-                    source.append("\t\t\tm_inst_substate = %d;" % ci[1])
-                    source.append("\t\t} else")
-                    source.append("\t\t\tm_inst_substate = %d;" % (ci[1]+1))
-                    source.append("\t\treturn;")
-                    source.append("\t}")
-                if not (gen_mode & GEN.full):
-                    source.append("\t[[fallthrough]]; case %d:" % (ci[1]+1))
+                    if not (gen_mode & GEN.full):
+                        source.append("\t[[fallthrough]]; case %d:" % (cid+1))
+                    if ci[10]:
+                        source.append("\tm_sr = m_new_sr;")
+                        source.append("\tupdate_user_super();")
+                        source.append("\tupdate_interrupt();")
+                    cid += 2
                 if is_interrupt_vector_lookup:
                     source.append("\tend_interrupt_vector_lookup();")
-                if not ci[3]:
+                if not ci[3] and (ci[2] != 2 or not (gen_mode & GEN.m68008)):
                     source.append("\tif(m_aob & 1) {")
                     source.append("\t\tm_icount -= 4;")
                     source.append("\t\tm_inst_state = %s;" % ("S_DOUBLE_FAULT" if ci[8] else "S_ADDRESS_ERROR"));
@@ -2187,6 +2245,8 @@ def generate_source_from_code(code, gen_mode):
                     source.append("\t}")
             elif ci[0] == "=":
                 source.append("\t%s = %s;" % (regname[ci[1]], make_expression(ci[2:])))
+            elif ci[0] == "=srd":
+                source.append("\tm_new_sr = m_isr = %s & (SR_CCR|SR_SR);" % make_expression(ci[2:]))
             elif ci[0] == "=sr":
                 source.append("\t%s = m_isr = %s & (SR_CCR|SR_SR);" % (regname[ci[1]], make_expression(ci[2:])))
                 source.append("\tupdate_user_super();")
@@ -2312,22 +2372,26 @@ def generate_source_file(fname, cmd, gen_mode):
     suf = 'd' if gen_mode & GEN.direct else 'i'
     suf += 'f' if gen_mode & GEN.full else 'p'
     suf += 'm' if gen_mode & GEN.mcu else ''
+    suf += '8' if gen_mode & GEN.m68008 else ''
 
     print("Generating %s" % suf)
+
+    cpu = "m68008" if gen_mode & GEN.m68008 else "m68000_mcu" if gen_mode & GEN.mcu else "m68000"
+    head = "m68008" if gen_mode & GEN.m68008 else "m68000mcu" if gen_mode & GEN.mcu else "m68000"
 
     print("// Instruction handlers for the m68000 (%s, %s, %s)" % ("direct" if gen_mode & GEN.direct else "indirect", "full" if gen_mode & GEN.full else "partial", "mcu" if gen_mode & GEN.mcu else "cpu"), file=out)
     print("//", file=out)
     print("// Generated by m68000gen.py %s"  % cmd, file=out)
     print("", file=out)
     print("#include \"emu.h\"", file=out)
-    print("#include \"m68000.h\"", file=out)
+    print("#include \"%s.h\"" % head, file=out)
     print("", file=out)
 
     for st in states:        
 #        print(handler_name_for_state(st))
-        code = generate_intermediate_code_from_state(st)
+        code = generate_intermediate_code_from_state(st, gen_mode)
         source = generate_source_from_code(code, gen_mode)
-        print("void m68000_device::%s_%s()" % (handler_name_for_state(st), suf), file=out)
+        print("void %s_device::%s_%s()" % (cpu, handler_name_for_state(st), suf), file=out)
         print("{", file=out)
         for l in source:
             print(l, file=out)
@@ -2338,24 +2402,24 @@ def generate_source_file(fname, cmd, gen_mode):
         if ii[0] == 0xa000 or ii[0] == 0xf000 or ii[0] == 0x4afc:
             continue
 #        print(handler_name_for_instruction(ii))
-        code = generate_intermediate_code_from_instruction(ii[0], ii[1], " ".join(ii[2]))
+        code = generate_intermediate_code_from_instruction(ii[0], ii[1], " ".join(ii[2]), gen_mode)
         source = generate_source_from_code(code, gen_mode)
-        print("void m68000_device::%s_%s() // %04x %04x" % (handler_name_for_instruction(ii), suf, ii[0], ii[1]), file=out)
+        print("void %s_device::%s_%s() // %04x %04x" % (cpu, handler_name_for_instruction(ii), suf, ii[0], ii[1]), file=out)
         print("{", file=out)
         for l in source:
             print(l, file=out)
         print("}", file=out)
         print("", file=out)
 
-    print("const m68000_device::handler m68000_device::s_handlers_%s[] = {" % suf, file=out)
+    print("const %s_device::%s %s_device::s_handlers_%s[] = {" % (cpu, "handler8" if gen_mode & GEN.m68008 else "handlerm" if gen_mode & GEN.mcu else "handler", cpu, suf), file=out)
     for st in states:        
         name = handler_name_for_state(st)
-        print("\t&m68000_device::%s_%s," % (name, suf), file=out)
+        print("\t&%s_device::%s_%s," % (cpu, name, suf), file=out)
     for ii in instructions:
         if ii[0] == 0xa000 or ii[0] == 0xf000 or ii[0] == 0x4afc:
             continue
         name = handler_name_for_instruction(ii)
-        print("\t&m68000_device::%s_%s," % (name, suf), file=out)
+        print("\t&%s_device::%s_%s," % (cpu, name, suf), file=out)
     print("};", file=out)
 
 
@@ -2373,7 +2437,7 @@ if sys.argv[1] == "i":
     if line == None or ii[0] == 0xa000 or ii[0] == 0xf000 or ii[0] == 0x4afc:
         print("Illegal instruction")
         sys.exit(0)
-    code = generate_intermediate_code_from_instruction(ii[0], ii[2], " ".join(ii[2]))
+    code = generate_intermediate_code_from_instruction(ii[0], ii[2], " ".join(ii[2]), 0)
     source = generate_source_from_code(code, GEN.direct|GEN.full)
     print("# %s" % handler_name_for_instruction(ii))
     for l in source:
@@ -2422,7 +2486,39 @@ if sys.argv[1] == 'header':
     print("//", file=out)
     print("// Generated by m68000gen.py %s"  % ' '.join(sys.argv[1:]), file=out)
     print("", file=out)
-    for variant in ["df", "if", "dp", "ip", "dfm", "ifm", "dpm", "ipm"]:
+    for variant in ["df", "if", "dp", "ip"]:
+        for st in states:        
+            name = handler_name_for_state(st)
+            print("void %s_%s();" % (name, variant), file=out)
+        for ii in instructions:
+            if ii[0] == 0xa000 or ii[0] == 0xf000 or ii[0] == 0x4afc:
+                continue
+            name = handler_name_for_instruction(ii)
+            print("void %s_%s();" % (name, variant), file=out)
+
+if sys.argv[1] == 'headerm':
+    out = open(sys.argv[3], 'wt')
+    print("// Header fragment for the handlers", file=out)
+    print("//", file=out)
+    print("// Generated by m68000gen.py %s"  % ' '.join(sys.argv[1:]), file=out)
+    print("", file=out)
+    for variant in ["dfm", "ifm", "dpm", "ipm"]:
+        for st in states:        
+            name = handler_name_for_state(st)
+            print("void %s_%s();" % (name, variant), file=out)
+        for ii in instructions:
+            if ii[0] == 0xa000 or ii[0] == 0xf000 or ii[0] == 0x4afc:
+                continue
+            name = handler_name_for_instruction(ii)
+            print("void %s_%s();" % (name, variant), file=out)
+
+if sys.argv[1] == 'header8':
+    out = open(sys.argv[3], 'wt')
+    print("// Header fragment for the handlers", file=out)
+    print("//", file=out)
+    print("// Generated by m68000gen.py %s"  % ' '.join(sys.argv[1:]), file=out)
+    print("", file=out)
+    for variant in ["df8", "if8", "dp8" ,"ip8"]:
         for st in states:        
             name = handler_name_for_state(st)
             print("void %s_%s();" % (name, variant), file=out)
@@ -2457,3 +2553,15 @@ if sys.argv[1] == 'sdpm':
 
 if sys.argv[1] == 'sipm':
     generate_source_file(sys.argv[3], ' '.join(sys.argv[1:]), GEN.mcu)
+
+if sys.argv[1] == 'sdf8':
+    generate_source_file(sys.argv[3], ' '.join(sys.argv[1:]), GEN.direct|GEN.full|GEN.m68008)
+
+if sys.argv[1] == 'sif8':
+    generate_source_file(sys.argv[3], ' '.join(sys.argv[1:]), GEN.full|GEN.m68008)
+
+if sys.argv[1] == 'sdp8':
+    generate_source_file(sys.argv[3], ' '.join(sys.argv[1:]), GEN.direct|GEN.m68008)
+
+if sys.argv[1] == 'sip8':
+    generate_source_file(sys.argv[3], ' '.join(sys.argv[1:]), GEN.m68008)

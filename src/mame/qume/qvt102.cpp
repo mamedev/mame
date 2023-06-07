@@ -106,18 +106,18 @@ private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	uint8_t vsync_ack_r();
-	DECLARE_WRITE_LINE_MEMBER(vsync_w);
+	void vsync_w(int state);
 	uint8_t kbd_r();
 	void latch_w(uint8_t data);
 
 	uint8_t ctc_r();
 	void ctc_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(acia_txd_w);
-	DECLARE_WRITE_LINE_MEMBER(acia_rts_w);
-	DECLARE_WRITE_LINE_MEMBER(dsr_w);
-	DECLARE_WRITE_LINE_MEMBER(host_rxd_w);
-	DECLARE_WRITE_LINE_MEMBER(host_dcd_w);
+	void acia_txd_w(int state);
+	void acia_rts_w(int state);
+	void dsr_w(int state);
+	void host_rxd_w(int state);
+	void host_dcd_w(int state);
 
 	uint8_t m_latch;
 	int m_kbd_data;
@@ -125,8 +125,8 @@ private:
 	// keyboard mcu
 	uint8_t mcu_bus_r();
 	void mcu_bus_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER(mcu_t0_r);
-	DECLARE_READ_LINE_MEMBER(mcu_t1_r);
+	int mcu_t0_r();
+	int mcu_t1_r();
 	void mcu_p1_w(uint8_t data);
 	void mcu_p2_w(uint8_t data);
 
@@ -367,7 +367,7 @@ void qvt102_state::mcu_bus_w(uint8_t data)
 	m_kbd_bus = data;
 }
 
-READ_LINE_MEMBER(qvt102_state::mcu_t0_r)
+int qvt102_state::mcu_t0_r()
 {
 	int state = 1;
 
@@ -383,7 +383,7 @@ READ_LINE_MEMBER(qvt102_state::mcu_t0_r)
 	return state;
 }
 
-READ_LINE_MEMBER(qvt102_state::mcu_t1_r)
+int qvt102_state::mcu_t1_r()
 {
 	int state = 1;
 
@@ -439,7 +439,7 @@ uint8_t qvt102_state::vsync_ack_r()
 	return 0;
 }
 
-WRITE_LINE_MEMBER(qvt102_state::vsync_w)
+void qvt102_state::vsync_w(int state)
 {
 	if (state)
 		m_irqs->in_w<0>(ASSERT_LINE);
@@ -563,7 +563,7 @@ void qvt102_state::ctc_w(uint8_t data)
 	m_ctc->write(BIT(m_latch, 5), data);
 }
 
-WRITE_LINE_MEMBER(qvt102_state::acia_txd_w)
+void qvt102_state::acia_txd_w(int state)
 {
 	if (BIT(m_latch, 6) == 0)
 	{
@@ -580,7 +580,7 @@ WRITE_LINE_MEMBER(qvt102_state::acia_txd_w)
 	}
 }
 
-WRITE_LINE_MEMBER(qvt102_state::acia_rts_w)
+void qvt102_state::acia_rts_w(int state)
 {
 	m_host->write_rts(state);
 
@@ -590,14 +590,14 @@ WRITE_LINE_MEMBER(qvt102_state::acia_rts_w)
 			m_host->write_dtr(state);
 }
 
-WRITE_LINE_MEMBER(qvt102_state::dsr_w)
+void qvt102_state::dsr_w(int state)
 {
 	if (machine().phase() != machine_phase::INIT)
 		if (BIT(m_jumper->read(), 0))
 			m_acia->write_dcd(state);
 }
 
-WRITE_LINE_MEMBER(qvt102_state::host_rxd_w)
+void qvt102_state::host_rxd_w(int state)
 {
 	m_acia->write_rxd(state);
 
@@ -606,7 +606,7 @@ WRITE_LINE_MEMBER(qvt102_state::host_rxd_w)
 		m_aux->write_txd(state);
 }
 
-WRITE_LINE_MEMBER(qvt102_state::host_dcd_w)
+void qvt102_state::host_dcd_w(int state)
 {
 	if (machine().phase() != machine_phase::INIT)
 		if (BIT(m_jumper->read(), 1))

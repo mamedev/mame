@@ -64,6 +64,33 @@ public:
 	}
 
 	// TODO: find a better home for this helper
+	template <unsigned Shift, typename T>
+	static void install_non_power_of_two(
+			offs_t length,
+			offs_t decode_limit,
+			offs_t decode_offset,
+			offs_t base,
+			T &&install)
+	{
+		offs_t decode_mask(length - 1);
+		for (unsigned i = 31 - count_leading_zeros_32(decode_mask); 0U < i; --i)
+		{
+			if (!BIT(decode_mask, i - 1))
+			{
+				decode_mask &= ~((offs_t(1) << i) - 1);
+				break;
+			}
+		}
+		install_non_power_of_two<Shift, T>(
+				length,
+				decode_limit,
+				decode_mask,
+				decode_offset,
+				base,
+				std::forward<T>(install));
+	}
+
+	// TODO: find a better home for this helper
 	template <typename T, typename U>
 	static T map_non_power_of_two(T count, U &&map)
 	{
@@ -72,7 +99,7 @@ public:
 
 		T const max(count - 1);
 		T mask(max);
-		for (unsigned i = 1; (sizeof(T) * 8) > i; i <<= 1)
+		for (unsigned i = 1U; (sizeof(T) * 8) > i; i <<= 1)
 			mask = T(std::make_unsigned_t<T>(mask) | (std::make_unsigned_t<T>(mask) >> i));
 		int bits(0);
 		while (BIT(mask, bits))

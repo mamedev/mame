@@ -62,7 +62,6 @@ std::error_condition vboy_flat_rom_device::load()
 				romregion->bytes() >> 2,
 				0x00ff'ffff >> 2,
 				0,
-				0,
 				rom_base(),
 				[this, rom = &romregion->as_u32()] (offs_t begin, offs_t end, offs_t mirror, offs_t src)
 				{
@@ -118,7 +117,6 @@ std::error_condition vboy_flat_rom_sram_device::load()
 						sramregion->bytes() >> 1,
 						0x00ff'ffff >> 2,
 						0,
-						0,
 						chip_base(),
 						[this, sramregion] (offs_t begin, offs_t end, offs_t mirror, offs_t src)
 						{
@@ -150,7 +148,6 @@ std::error_condition vboy_flat_rom_sram_device::load()
 				device_generic_cart_interface::install_non_power_of_two<2>(
 						sramregion->bytes() >> 2,
 						0x00ff'ffff >> 2,
-						0,
 						0,
 						chip_base(),
 						[this, sramregion] (offs_t begin, offs_t end, offs_t mirror, offs_t src)

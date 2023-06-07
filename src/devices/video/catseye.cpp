@@ -1259,7 +1259,7 @@ uint16_t catseye_device::ctrl_r(address_space &space, offs_t offset, uint16_t me
 	return ret;
 }
 
-WRITE_LINE_MEMBER(catseye_device::vblank_w)
+void catseye_device::vblank_w(int state)
 {
 	m_in_vblank = state ? m_plane_mask_h : 0;
 	if (state && m_vblank_int_enable)

@@ -89,17 +89,17 @@ float lc7535_device::normalize(int attenuation)
 //  INTERFACE
 //**************************************************************************
 
-WRITE_LINE_MEMBER( lc7535_device::ce_w )
+void lc7535_device::ce_w(int state)
 {
 	m_ce = state;
 }
 
-WRITE_LINE_MEMBER( lc7535_device::di_w )
+void lc7535_device::di_w(int state)
 {
 	m_di = state;
 }
 
-WRITE_LINE_MEMBER( lc7535_device::clk_w )
+void lc7535_device::clk_w(int state)
 {
 	if (m_clk == 0 && state == 1)
 	{

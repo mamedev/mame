@@ -244,12 +244,12 @@ public:
 	// Static configuration helpers
 	auto int_handler() { return m_int_handler.bind(); }
 
-	template<uint32_t line> WRITE_LINE_MEMBER( int_line )
+	template <uint32_t Line> void int_line(int state)
 	{
 		if (state)
-			m_int_status |= 1 << line;
+			m_int_status |= 1 << Line;
 		else
-			m_int_status &= ~(1 << line);
+			m_int_status &= ~(1 << Line);
 
 		update_interrupts();
 	}
@@ -457,9 +457,6 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
-private:
-
 };
 
 
@@ -479,9 +476,6 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
-private:
-
 };
 
 

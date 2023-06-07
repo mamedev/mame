@@ -51,7 +51,7 @@ public:
 	uint8_t data_r(offs_t offset);
 	void data_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( write_out2 );
+	void write_out2(int state);
 
 	void at_8042_set_outport(uint8_t data, int initial);
 	void at_8042_receive(uint8_t data, bool mouse = false);
@@ -129,7 +129,7 @@ private:
 
 	emu_timer *         m_update_timer;
 
-	DECLARE_WRITE_LINE_MEMBER( keyboard_w );
+	void keyboard_w(int state);
 };
 
 // device type definition

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Berger
-/******************************************************************************
+/*******************************************************************************
 
 SciSys / Novag Chess Champion: Super System III (aka MK III), distributed by
 both SciSys and Novag. Which company was responsible for which part of the
@@ -61,7 +61,7 @@ BTANB (ssystem3):
 - chess unit screen briefly flickers at power-on and when the subcpu receives an
   NMI in the middle of updating the LCD, it is mentioned in the manual
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -175,9 +175,9 @@ void ssystem3_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // Master Unit
 
@@ -346,9 +346,9 @@ u8 ssystem3_state::cu_pia_b_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void ssystem3_state::ssystem3_map(address_map &map)
 {
@@ -375,9 +375,9 @@ void ssystem3_state::chessunit_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( ssystem4 )
 	PORT_START("IN.0")
@@ -446,13 +446,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void ssystem3_state::ssystem4(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M6502(config, m_maincpu, 4_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ssystem3_state::ssystem4_map);
 
@@ -462,7 +462,7 @@ void ssystem3_state::ssystem4(machine_config &config)
 	m_via->writepb_handler().set(FUNC(ssystem3_state::control_w));
 	m_via->readpb_handler().set(FUNC(ssystem3_state::control_r));
 
-	/* video hardware */
+	// video hardware
 	MD4332B(config, m_lcd1);
 	m_lcd1->write_q().set(FUNC(ssystem3_state::lcd1_output_w));
 
@@ -476,7 +476,7 @@ void ssystem3_state::ssystem4(machine_config &config)
 
 	config.set_default_layout(layout_saitek_ssystem4);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
@@ -485,7 +485,7 @@ void ssystem3_state::ssystem3(machine_config &config)
 {
 	ssystem4(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &ssystem3_state::ssystem3_map);
 
 	M6808(config, m_subcpu, 6800000); // LC circuit, measured
@@ -504,7 +504,7 @@ void ssystem3_state::ssystem3(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	// video hardware
 	HLCD0438(config, m_lcd2[0], 0);
 	m_lcd2[0]->write_segs().set(FUNC(ssystem3_state::lcd2_output_w<0>));
 	m_lcd2[0]->write_data().set(m_lcd2[1], FUNC(hlcd0438_device::data_w));
@@ -526,9 +526,9 @@ void ssystem3_state::ssystem3(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( ssystem3 )
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -562,10 +562,10 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME      PARENT CMP MACHINE   INPUT     STATE           INIT           COMPANY, FULLNAME, FLAGS
-CONS( 1979, ssystem3, 0,      0, ssystem3, ssystem3, ssystem3_state, init_ssystem3, "SciSys / Novag", "Chess Champion: Super System III", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1980, ssystem4, 0,      0, ssystem4, ssystem4, ssystem3_state, empty_init,    "SciSys", "Chess Champion: Super System IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY, FULLNAME, FLAGS
+SYST( 1979, ssystem3, 0,      0,      ssystem3, ssystem3, ssystem3_state, init_ssystem3, "SciSys / Novag", "Chess Champion: Super System III", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, ssystem4, 0,      0,      ssystem4, ssystem4, ssystem3_state, empty_init,    "SciSys", "Chess Champion: Super System IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

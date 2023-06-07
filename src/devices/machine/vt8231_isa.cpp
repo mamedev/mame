@@ -9,7 +9,6 @@
 #include "emu.h"
 #include "vt8231_isa.h"
 
-//#define LOG_GENERAL (1U << 0)
 #define LOG_MAPPING (1U << 1)
 #define LOG_REG     (1U << 2)
 #define LOG_SUPERIO (1U << 3)
@@ -23,7 +22,8 @@ DEFINE_DEVICE_TYPE(VT8231_ISA, vt8231_isa_device, "vt8231_isa", "VT8231 South Br
 vt8231_isa_device::vt8231_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)   :
 	pci_device(mconfig, VT8231_ISA, tag, owner, clock),
 	m_com1(*this, "com1"),
-	m_com1_txd_cb(*this), m_com1_dtr_cb(*this), m_com1_rts_cb(*this)
+	m_com1_txd_cb(*this), m_com1_dtr_cb(*this), m_com1_rts_cb(*this),
+	m_initialized(false)
 {
 	set_ids(0x11068231, 0x00, 0x060100, 0x00000000);
 }
@@ -63,12 +63,16 @@ void vt8231_isa_device::device_reset()
 
 	m_baud_divisor = 0x01; // 115200 baud
 
+	m_initialized = true;
 	remap_cb();
 }
 
 void vt8231_isa_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 									 uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
+	if (!m_initialized)
+		return;
+
 	io_space->install_device(0x000, 0x7ff, *this, &vt8231_isa_device::io_map);
 
 	// serial port enabled?

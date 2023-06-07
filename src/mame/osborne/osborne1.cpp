@@ -141,8 +141,7 @@ public:
 		m_acia(*this, "acia"),
 		m_fdc(*this, "mb8877"),
 		m_ieee(*this, IEEE488_TAG),
-		m_floppy0(*this, "mb8877:0"),
-		m_floppy1(*this, "mb8877:1"),
+		m_floppy(*this, "mb8877:%u", 0U),
 		m_keyb_row(*this, { "ROW0", "ROW1", "ROW3", "ROW4", "ROW5", "ROW2", "ROW6", "ROW7" }),
 		m_btn_reset(*this, "RESET"),
 		m_cnf(*this, "CNF"),
@@ -175,7 +174,7 @@ protected:
 	void attrram_w(offs_t offset, u8 data);
 	u8 opcode_r(offs_t offset);
 	void bankswitch_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(irqack_w);
+	void irqack_w(int state);
 
 	bool rom_mode() const { return 0 != m_rom_mode; }
 	u8 scroll_x() const { return m_scroll_x; }
@@ -193,14 +192,14 @@ protected:
 private:
 	u8 ieee_pia_pb_r();
 	void ieee_pia_pb_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(ieee_pia_irq_a_func);
+	void ieee_pia_irq_a_func(int state);
 
 	void video_pia_port_a_w(u8 data);
 	void video_pia_port_b_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(video_pia_out_cb2_dummy);
-	DECLARE_WRITE_LINE_MEMBER(video_pia_irq_a_func);
+	void video_pia_out_cb2_dummy(int state);
+	void video_pia_irq_a_func(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(serial_acia_irq_func);
+	void serial_acia_irq_func(int state);
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -218,8 +217,7 @@ private:
 	required_device<acia6850_device>        m_acia;
 	required_device<mb8877_device>          m_fdc;
 	required_device<ieee488_device>         m_ieee;
-	required_device<floppy_connector>       m_floppy0;
-	required_device<floppy_connector>       m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 
 	// user inputs
 	required_ioport_array<8>    m_keyb_row;
@@ -424,7 +422,7 @@ void osborne1_state::bankswitch_w(offs_t offset, u8 data)
 	}
 }
 
-WRITE_LINE_MEMBER( osborne1_state::irqack_w )
+void osborne1_state::irqack_w(int state)
 {
 	// Update the flipflops that control bank selection and NMI
 	if (!rom_mode())
@@ -480,7 +478,7 @@ void osborne1_state::ieee_pia_pb_w(u8 data)
 	m_ieee->host_nrfd_w(BIT(data, 7));
 }
 
-WRITE_LINE_MEMBER( osborne1_state::ieee_pia_irq_a_func )
+void osborne1_state::ieee_pia_irq_a_func(int state)
 {
 	update_irq();
 }
@@ -499,13 +497,13 @@ void osborne1_state::video_pia_port_b_w(u8 data)
 
 	if (BIT(data, 6))
 	{
-		m_fdc->set_floppy(m_floppy0->get_device());
-		m_floppy0->get_device()->mon_w(0);
+		m_fdc->set_floppy(m_floppy[0]->get_device());
+		m_floppy[0]->get_device()->mon_w(0);
 	}
 	else if (BIT(data, 7))
 	{
-		m_fdc->set_floppy(m_floppy1->get_device());
-		m_floppy1->get_device()->mon_w(0);
+		m_fdc->set_floppy(m_floppy[1]->get_device());
+		m_floppy[1]->get_device()->mon_w(0);
 	}
 	else
 	{
@@ -513,17 +511,17 @@ void osborne1_state::video_pia_port_b_w(u8 data)
 	}
 }
 
-WRITE_LINE_MEMBER( osborne1_state::video_pia_out_cb2_dummy )
+void osborne1_state::video_pia_out_cb2_dummy(int state)
 {
 }
 
-WRITE_LINE_MEMBER( osborne1_state::video_pia_irq_a_func )
+void osborne1_state::video_pia_irq_a_func(int state)
 {
 	update_irq();
 }
 
 
-WRITE_LINE_MEMBER( osborne1_state::serial_acia_irq_func )
+void osborne1_state::serial_acia_irq_func(int state)
 {
 	m_acia_irq_state = state;
 	update_irq();
@@ -1018,8 +1016,8 @@ void osborne1_state::osborne1_base(machine_config &config)
 
 	MB8877(config, m_fdc, MAIN_CLOCK/16);
 	m_fdc->set_force_ready(true);
-	FLOPPY_CONNECTOR(config, m_floppy0, osborne1_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, osborne1_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], osborne1_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], osborne1_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("osborne1");
 }

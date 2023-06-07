@@ -35,6 +35,11 @@
 
 #include "speaker.h"
 
+#define LOG_IO (1U << 1)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
 
 namespace {
 
@@ -76,16 +81,6 @@ private:
 
 	required_device<i8255_device> m_ppi;
 };
-
-
-/*************************************
- *
- *  Debugging
- *
- *************************************/
-
-#define LOG_IO          0
-
 
 
 /*************************************
@@ -143,7 +138,7 @@ void upscope_state::upscope_cia_1_porta_w(uint8_t data)
 		/* if SEL == 1 && BUSY == 0, we latch an address */
 		if ((data & 5) == 4)
 		{
-			if (LOG_IO) logerror("Latch address: %02X\n", m_parallel_data);
+			LOGMASKED(LOG_IO, "Latch address: %02X\n", m_parallel_data);
 			m_nvram_address_latch = m_parallel_data;
 		}
 
@@ -156,7 +151,7 @@ void upscope_state::upscope_cia_1_porta_w(uint8_t data)
 		/* if SEL == 0 && BUSY == 1, we write data to NVRAM */
 		else if ((data & 5) == 1)
 		{
-			if (LOG_IO) logerror("NVRAM data write @ %02X = %02X\n", m_nvram_address_latch, m_parallel_data);
+			LOGMASKED(LOG_IO, "NVRAM data write @ %02X = %02X\n", m_nvram_address_latch, m_parallel_data);
 			m_nvram[m_nvram_address_latch] = m_parallel_data;
 		}
 
@@ -173,7 +168,7 @@ void upscope_state::upscope_cia_1_porta_w(uint8_t data)
 		/* if SEL == 1, we read internal data registers */
 		if (data & 4)
 		{
-			if (LOG_IO) logerror("Internal register (%d) read\n", m_nvram_address_latch);
+			LOGMASKED(LOG_IO, "Internal register (%d) read\n", m_nvram_address_latch);
 			m_nvram_data_latch = m_ppi->read(m_nvram_address_latch & 0x03);
 		}
 
@@ -181,7 +176,7 @@ void upscope_state::upscope_cia_1_porta_w(uint8_t data)
 		else
 		{
 			m_nvram_data_latch = m_nvram[m_nvram_address_latch];
-			if (LOG_IO) logerror("NVRAM data read @ %02X = %02X\n", m_nvram_address_latch, m_nvram_data_latch);
+			LOGMASKED(LOG_IO, "NVRAM data read @ %02X = %02X\n", m_nvram_address_latch, m_nvram_data_latch);
 		}
 	}
 

@@ -50,7 +50,7 @@ protected:
 	virtual void write(offs_t offset, uint8_t data) override;
 
 private:
-	WRITE_LINE_MEMBER( busy_w );
+	void busy_w(int state);
 
 	static void floppy_formats(format_registration &fr);
 

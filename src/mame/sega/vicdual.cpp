@@ -243,7 +243,7 @@ void carnival_state::mboard_map(address_map &map)
 	map(0x0000, 0x03ff).rom();
 }
 
-READ_LINE_MEMBER( carnival_state::carnival_music_port_t1_r )
+int carnival_state::carnival_music_port_t1_r()
 {
 	// T1: comms from audio port 2 d3
 	return ~m_port2State >> 3 & 1;
@@ -728,7 +728,7 @@ void vicdual_state::assert_coin_status()
 	m_coin_status = 1;
 }
 
-READ_LINE_MEMBER(vicdual_state::coin_status_r)
+int vicdual_state::coin_status_r()
 {
 	return m_coin_status;
 }
@@ -803,25 +803,25 @@ int vicdual_state::get_vcounter()
 }
 
 
-READ_LINE_MEMBER(vicdual_state::get_64v)
+int vicdual_state::get_64v()
 {
 	return (get_vcounter() >> 6) & 0x01;
 }
 
 
-READ_LINE_MEMBER(vicdual_state::vblank_comp_r)
+int vicdual_state::vblank_comp_r()
 {
 	return (get_vcounter() < VICDUAL_VBSTART);
 }
 
 
-READ_LINE_MEMBER(vicdual_state::cblank_comp_r)
+int vicdual_state::cblank_comp_r()
 {
 	return (vblank_comp_r() && !m_screen->hblank());
 }
 
 
-READ_LINE_MEMBER(vicdual_state::timer_value_r)
+int vicdual_state::timer_value_r()
 {
 	/* return the state of the timer (old code claims "4MHz square wave", but it was toggled once every 2msec, or 500Hz) */
 	return machine().time().as_ticks(500) & 1;
@@ -2182,7 +2182,7 @@ void vicdual_state::headonn_io_map(address_map &map)
 
 /* several of the games' lives DIPs are spread across two input ports */
 template <int Param>
-READ_LINE_MEMBER(vicdual_state::fake_lives_r)
+int vicdual_state::fake_lives_r()
 {
 	// FIXME: there should be two template parameters, but that makes port macros confused
 	// use the low byte for the bitmask
@@ -3142,7 +3142,7 @@ void vicdual_state::samurai_protection_w(uint8_t data)
 
 
 template <int Offset>
-READ_LINE_MEMBER(vicdual_state::samurai_protection_r)
+int vicdual_state::samurai_protection_r()
 {
 	uint32_t answer = 0;
 

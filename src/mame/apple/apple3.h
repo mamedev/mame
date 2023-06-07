@@ -90,7 +90,7 @@ public:
 
 	uint8_t apple3_memory_r(offs_t offset);
 	void apple3_memory_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(apple3_sync_w);
+	void apple3_sync_w(int state);
 	uint8_t apple3_c0xx_r(offs_t offset);
 	void apple3_c0xx_w(offs_t offset, uint8_t data);
 	void init_apple3();
@@ -117,17 +117,17 @@ public:
 	uint8_t *apple3_get_indexed_addr(offs_t offset);
 	TIMER_DEVICE_CALLBACK_MEMBER(apple3_c040_tick);
 	void palette_init(palette_device &palette) const;
-	DECLARE_READ_LINE_MEMBER(ay3600_shift_r);
-	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
-	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
+	int ay3600_shift_r();
+	int ay3600_control_r();
+	void ay3600_data_ready_w(int state);
 	virtual void device_post_load() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(paddle_timer);
 	void pdl_handler(int offset);
 	static void floppy_formats(format_registration &fr);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(vbl_w);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_inh_w);
+	void a2bus_irq_w(int state);
+	void a2bus_nmi_w(int state);
+	void vbl_w(int state);
+	void a2bus_inh_w(int state);
 
 	// these need to be public for now
 	uint32_t m_flags = 0;

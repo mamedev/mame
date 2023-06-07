@@ -51,9 +51,9 @@ protected:
 	virtual void mreq_w(offs_t offset, uint8_t data) override;
 	virtual uint8_t iorq_r(offs_t offset) override;
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
-	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
+	virtual int romcs() override;
 
-	DECLARE_WRITE_LINE_MEMBER(busy_w);
+	void busy_w(int state);
 
 	required_memory_region m_rom;
 	required_device<wd_fdc_device_base> m_fdc;
@@ -88,7 +88,7 @@ protected:
 	virtual void mreq_w(offs_t offset, uint8_t data) override;
 	virtual uint8_t iorq_r(offs_t offset) override;
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
-	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
+	virtual int romcs() override;
 
 	TIMER_CALLBACK_MEMBER(reset_tick);
 

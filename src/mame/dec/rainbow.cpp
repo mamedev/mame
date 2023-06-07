@@ -523,7 +523,7 @@ protected:
 	void rtc_w(offs_t offset, uint8_t data);
 
 	uint8_t read_video_ram_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(video_interrupt);
+	void video_interrupt(int state);
 
 	uint8_t diagnostic_r();
 	void diagnostic_w(uint8_t data);
@@ -543,18 +543,18 @@ protected:
 
 	uint8_t hd_status_69_r(); // EXTRA REGISTER 0x69 (R/- 8088)
 
-	DECLARE_WRITE_LINE_MEMBER(bundle_irq);
-	DECLARE_WRITE_LINE_MEMBER(hdc_bdrq);  // BUFFER DATA REQUEST (FROM WD)
-	DECLARE_WRITE_LINE_MEMBER(hdc_bcr);   // BUFFER COUNTER RESET (FROM WD)
+	void bundle_irq(int state);
+	void hdc_bdrq(int state);  // BUFFER DATA REQUEST (FROM WD)
+	void hdc_bcr(int state);   // BUFFER COUNTER RESET (FROM WD)
 
-	DECLARE_WRITE_LINE_MEMBER(hdc_step);
-	DECLARE_WRITE_LINE_MEMBER(hdc_direction);
+	void hdc_step(int state);
+	void hdc_direction(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(hdc_read_sector);
-	DECLARE_WRITE_LINE_MEMBER(hdc_write_sector);
+	void hdc_read_sector(int state);
+	void hdc_write_sector(int state);
 
-	DECLARE_READ_LINE_MEMBER(hdc_drive_ready);
-	DECLARE_READ_LINE_MEMBER(hdc_write_fault);
+	int hdc_drive_ready();
+	int hdc_write_fault();
 
 	uint8_t corvus_status_r();
 
@@ -571,19 +571,19 @@ protected:
 	uint8_t z80_diskstatus_r();
 	void z80_diskcontrol_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(kbd_tx);
-	DECLARE_WRITE_LINE_MEMBER(kbd_rxready_w);
-	DECLARE_WRITE_LINE_MEMBER(kbd_txready_w);
+	void kbd_tx(int state);
+	void kbd_rxready_w(int state);
+	void kbd_txready_w(int state);
 
 	uint8_t rtc_reset();
 	uint8_t rtc_enable();
 
-	DECLARE_WRITE_LINE_MEMBER(mpsc_irq);
+	void mpsc_irq(int state);
 	void comm_bitrate_w(uint8_t data);
 	void printer_bitrate_w(uint8_t data);
 	void bitrate_counter_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(dbrg_fr_w);
-	DECLARE_WRITE_LINE_MEMBER(dbrg_ft_w);
+	void dbrg_fr_w(int state);
+	void dbrg_ft_w(int state);
 
 	void GDC_EXTRA_REGISTER_w(offs_t offset, uint8_t data);
 	uint8_t GDC_EXTRA_REGISTER_r(offs_t offset);
@@ -598,7 +598,7 @@ protected:
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	uint16_t vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint16_t data);
-	DECLARE_WRITE_LINE_MEMBER(GDC_vblank_irq);
+	void GDC_vblank_irq(int state);
 
 	void rainbowz80_io(address_map &map);
 	void rainbowz80_mem(address_map &map);
@@ -674,7 +674,7 @@ protected:
 	void hdc_buffer_counter_reset();
 	void hdc_reset();
 
-	hard_disk_file *rainbow_hdc_file(int ref);
+	harddisk_image_device *rainbow_hdc_file(int ref);
 
 	uint8_t m_gdc_write_buffer[16]; // 16 x 8 bits for CPU, 8 x 16 for GDC
 	uint8_t m_gdc_color_map[32];
@@ -768,7 +768,7 @@ private:
 
 	void ext_ram_w(offs_t offset, uint8_t data);
 	uint8_t rtc_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(irq_hi_w);
+	void irq_hi_w(int state);
 	uint8_t system_parameter_r();
 };
 
@@ -790,7 +790,7 @@ private:
 
 	void ext_ram_w(offs_t offset, uint8_t data);
 	uint8_t rtc_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(irq_hi_w);
+	void irq_hi_w(int state);
 	uint8_t system_parameter_r();
 };
 
@@ -1196,7 +1196,7 @@ void rainbow_base_state::machine_reset()
 		m_hdc_drive_ready = true;
 		m_hdc_write_fault = false;
 
-		hard_disk_file *local_hard_disk;
+		harddisk_image_device *local_hard_disk;
 		local_hard_disk = rainbow_hdc_file(0); // one hard disk for now.
 
 		m_leds[0] = 0;
@@ -1385,7 +1385,7 @@ void rainbow_base_state::update_mpsc_irq()
 		raise_8088_irq(IRQ_COMM_PTR_INTR_L);
 }
 
-WRITE_LINE_MEMBER(rainbow_base_state::mpsc_irq)
+void rainbow_base_state::mpsc_irq(int state)
 {
 	m_mpsc_irq = state;
 	update_mpsc_irq();
@@ -1420,12 +1420,12 @@ void rainbow_base_state::printer_bitrate_w(uint8_t data)
 	logerror(" - CLOCK (0 = internal): %02x", data & 8);
 }
 
-WRITE_LINE_MEMBER(rainbow_base_state::dbrg_fr_w)
+void rainbow_base_state::dbrg_fr_w(int state)
 {
 	m_mpsc->rxca_w(state);
 }
 
-WRITE_LINE_MEMBER(rainbow_base_state::dbrg_ft_w)
+void rainbow_base_state::dbrg_ft_w(int state)
 {
 	m_mpsc->txca_w(state);
 }
@@ -1665,7 +1665,7 @@ void rainbow_base_state::hdc_reset()
 
 // Return 'hard_disk_file' object for harddisk 1 (fixed).
 // < nullptr if geometry is insane or other errors occured >
-hard_disk_file *rainbow_base_state::rainbow_hdc_file(int drv)
+harddisk_image_device *rainbow_base_state::rainbow_hdc_file(int drv)
 {
 	m_hdc_drive_ready = false;
 
@@ -1683,8 +1683,7 @@ hard_disk_file *rainbow_base_state::rainbow_hdc_file(int drv)
 	if (!img->exists())
 		return nullptr;
 
-	hard_disk_file *file = img->get_hard_disk_file();
-	const auto &info = file->get_info();
+	const auto &info = img->get_info();
 
 	// MFM ALLOWS UP TO 17 SECTORS / TRACK.
 	// CYLINDERS: 151 (~ 5 MB) to 1024 (max. cylinders on WD1010 controller)
@@ -1693,7 +1692,7 @@ hard_disk_file *rainbow_base_state::rainbow_hdc_file(int drv)
 		((info.cylinders > 150) && (info.cylinders <= RD51_MAX_CYLINDER)))
 	{
 		m_hdc_drive_ready = true;
-		return file;  // HAS SANE GEOMETRY
+		return img;  // HAS SANE GEOMETRY
 	}
 	else
 	{
@@ -1724,7 +1723,7 @@ static uint32_t get_and_print_lbasector(device_t *device, const hard_disk_file::
 }
 
 // READ SECTOR (on BCS 1 -> 0 transition)
-WRITE_LINE_MEMBER(rainbow_base_state::hdc_read_sector)
+void rainbow_base_state::hdc_read_sector(int state)
 {
 	static int last_state;
 	int read_status = 1;
@@ -1744,7 +1743,7 @@ WRITE_LINE_MEMBER(rainbow_base_state::hdc_read_sector)
 			uint16_t cylinder = (m_hdc->read(0x04)) | (hi << 8);
 			uint8_t sector_number = m_hdc->read(0x03);
 
-			hard_disk_file *local_hard_disk = rainbow_hdc_file(0); // one hard disk for now.
+			harddisk_image_device *local_hard_disk = rainbow_hdc_file(0); // one hard disk for now.
 
 			if (local_hard_disk)
 			{
@@ -1788,7 +1787,7 @@ WRITE_LINE_MEMBER(rainbow_base_state::hdc_read_sector)
 // ...IF WRITE_GATE (WG) TRANSITS FROM 1 -> 0
 
 // NO PROVISIONS for  sector sizes != 512 or MULTIPLE DRIVES (> 0) !!!
-WRITE_LINE_MEMBER(rainbow_base_state::hdc_write_sector)
+void rainbow_base_state::hdc_write_sector(int state)
 {
 	int success = 0;
 	static int wg_last;
@@ -1842,7 +1841,7 @@ int rainbow_base_state::do_write_sector()
 	m_leds[0] = 0; // ON
 	switch_off_timer->adjust(attotime::from_msec(500));
 
-	hard_disk_file *local_hard_disk = rainbow_hdc_file(0); // one hard disk for now.
+	harddisk_image_device *local_hard_disk = rainbow_hdc_file(0); // one hard disk for now.
 
 	if (local_hard_disk)
 	{
@@ -2054,7 +2053,7 @@ uint8_t rainbow_base_state::hd_status_69_r()
 }
 
 // TREAT SIGNALS FROM / TO CONTROLLER
-WRITE_LINE_MEMBER(rainbow_base_state::hdc_step)
+void rainbow_base_state::hdc_step(int state)
 {
 	m_hdc_step_latch = true;
 
@@ -2062,23 +2061,23 @@ WRITE_LINE_MEMBER(rainbow_base_state::hdc_step)
 	switch_off_timer->adjust(attotime::from_msec(500));
 }
 
-WRITE_LINE_MEMBER(rainbow_base_state::hdc_direction)
+void rainbow_base_state::hdc_direction(int state)
 {
 	m_hdc_direction = state; // (0 = OUT)
 }
 
-READ_LINE_MEMBER(rainbow_base_state::hdc_drive_ready)
+int rainbow_base_state::hdc_drive_ready()
 {
 	return m_hdc_drive_ready;
 }
 
-READ_LINE_MEMBER(rainbow_base_state::hdc_write_fault)
+int rainbow_base_state::hdc_write_fault()
 {
 	return m_hdc_write_fault;
 }
 
 // Buffer counter reset when BCR goes from 0 -> 1
-WRITE_LINE_MEMBER(rainbow_base_state::hdc_bcr)
+void rainbow_base_state::hdc_bcr(int state)
 {
 	static int bcr_state;
 	if (bcr_state == 0 && state == 1)
@@ -2098,7 +2097,7 @@ void rainbow_base_state::hdc_buffer_counter_reset()
 
 // On a WRITE / FORMAT command, signal goes high when the WD1010
 // chip is READY TO ACCESS the information in the sector buffer.
-WRITE_LINE_MEMBER(rainbow_base_state::hdc_bdrq)
+void rainbow_base_state::hdc_bdrq(int state)
 {
 	static int old_state;
 //  logerror("BDRQ - BUFFER DATA REQUEST OBTAINED: %u\n", state);
@@ -2131,7 +2130,7 @@ void rainbow_base_state::update_bundle_irq()
 	}
 }
 
-WRITE_LINE_MEMBER(rainbow_base_state::bundle_irq)
+void rainbow_base_state::bundle_irq(int state)
 {
 	m_bdl_irq = state;
 	update_bundle_irq();
@@ -2533,7 +2532,7 @@ IRQ_CALLBACK_MEMBER(rainbow_base_state::irq_callback)
 // NEC7220 Vsync IRQ ***************************************** GDC
 
 // VERIFY: SCROLL_MAP & COLOR_MAP are updated at the next VSYNC (not immediately)... Are there more registers?
-WRITE_LINE_MEMBER(rainbow_base_state::GDC_vblank_irq)
+void rainbow_base_state::GDC_vblank_irq(int state)
 {
 	// VERIFICATION NEEDED: IRQ raised before or after new palette loaded...?
 	if (m_gdc_mode_register & GDC_MODE_ENABLE_VSYNC_IRQ) // 0x40
@@ -2625,7 +2624,7 @@ WRITE_LINE_MEMBER(rainbow_base_state::GDC_vblank_irq)
 } // 7220 vblank IRQ
 
 
-WRITE_LINE_MEMBER(rainbow_base_state::video_interrupt)
+void rainbow_base_state::video_interrupt(int state)
 {
 	if (state == ASSERT_LINE)
 		raise_8088_irq(IRQ_8088_VBL);
@@ -2776,18 +2775,18 @@ void rainbow_base_state::update_kbd_irq()
 		lower_8088_irq(IRQ_8088_KBD);
 }
 
-WRITE_LINE_MEMBER(rainbow_base_state::kbd_tx)
+void rainbow_base_state::kbd_tx(int state)
 {
 	m_lk201->rx_w(state);
 }
 
-WRITE_LINE_MEMBER(rainbow_base_state::kbd_rxready_w)
+void rainbow_base_state::kbd_rxready_w(int state)
 {
 	m_kbd_rx_ready = (state == 1) ? true : false;
 	update_kbd_irq();
 }
 
-WRITE_LINE_MEMBER(rainbow_base_state::kbd_txready_w)
+void rainbow_base_state::kbd_txready_w(int state)
 {
 	m_kbd_tx_ready = (state == 1) ? true : false;
 	update_kbd_irq();
@@ -2801,13 +2800,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(rainbow_base_state::hd_motor_tick)
 	m_hdc_index_latch = true; // HDC drive index signal (not working ?)
 }
 
-WRITE_LINE_MEMBER(rainbow_modela_state::irq_hi_w)
+void rainbow_modela_state::irq_hi_w(int state)
 {
 	m_irq_high = 0;
 }
 
 // on 100-B, DTR from the keyboard 8051 controls bit 7 of IRQ vectors
-WRITE_LINE_MEMBER(rainbow_modelb_state::irq_hi_w)
+void rainbow_modelb_state::irq_hi_w(int state)
 {
 	m_irq_high = (state == ASSERT_LINE) ? 0x80 : 0;
 }

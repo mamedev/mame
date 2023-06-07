@@ -507,7 +507,7 @@ protected:
 
 	bool m_skipped_this_frame = false;
 	void render_frame_active();
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	bool m_pdp_render_done = false;
 	bool m_render_refresh = false;
 	u64 m_pdp_frame = 0;
@@ -597,7 +597,7 @@ public:
 	void init_alpiner();
 	void init_alpiner2();
 
-	template <int N> DECLARE_READ_LINE_MEMBER(alpine_motor_r);
+	template <int N> int alpine_motor_r();
 
 protected:
 	required_device<timer_device> m_motor_timer;

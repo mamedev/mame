@@ -62,22 +62,22 @@ std::error_condition msx_cart_halnote_device::initialize_cartridge(std::string &
 	m_view0[0];
 	m_view0[1].install_ram(0x0000, 0x3fff, cart_sram_region()->base());
 	page(1)->install_read_bank(0x4000, 0x5fff, m_rombank[0]);
-	page(1)->install_write_handler(0x4fff, 0x4fff, write8smo_delegate(*this, FUNC(msx_cart_halnote_device::bank0_w)));
+	page(1)->install_write_handler(0x4fff, 0x4fff, emu::rw_delegate(*this, FUNC(msx_cart_halnote_device::bank0_w)));
 	page(1)->install_view(0x6000, 0x7fff, m_view1);
 	m_view1[0].install_read_bank(0x6000, 0x7fff, m_rombank[1]);
-	m_view1[0].install_write_handler(0x6fff, 0x6fff, write8smo_delegate(*this, FUNC(msx_cart_halnote_device::bank1_w)));
-	m_view1[0].install_write_handler(0x77ff, 0x77ff, write8smo_delegate(*this, FUNC(msx_cart_halnote_device::bank4_w)));
-	m_view1[0].install_write_handler(0x7fff, 0x7fff, write8smo_delegate(*this, FUNC(msx_cart_halnote_device::bank5_w)));
+	m_view1[0].install_write_handler(0x6fff, 0x6fff, emu::rw_delegate(*this, FUNC(msx_cart_halnote_device::bank1_w)));
+	m_view1[0].install_write_handler(0x77ff, 0x77ff, emu::rw_delegate(*this, FUNC(msx_cart_halnote_device::bank4_w)));
+	m_view1[0].install_write_handler(0x7fff, 0x7fff, emu::rw_delegate(*this, FUNC(msx_cart_halnote_device::bank5_w)));
 	m_view1[1].install_read_bank(0x6000, 0x6fff, m_rombank[1]);
-	m_view1[1].install_write_handler(0x6fff, 0x6fff, write8smo_delegate(*this, FUNC(msx_cart_halnote_device::bank1_w)));
+	m_view1[1].install_write_handler(0x6fff, 0x6fff, emu::rw_delegate(*this, FUNC(msx_cart_halnote_device::bank1_w)));
 	m_view1[1].install_read_bank(0x7000, 0x77ff, m_rombank[4]);
-	m_view1[1].install_write_handler(0x77ff, 0x77ff, write8smo_delegate(*this, FUNC(msx_cart_halnote_device::bank4_w)));
+	m_view1[1].install_write_handler(0x77ff, 0x77ff, emu::rw_delegate(*this, FUNC(msx_cart_halnote_device::bank4_w)));
 	m_view1[1].install_read_bank(0x7800, 0x7fff, m_rombank[5]);
-	m_view1[1].install_write_handler(0x7fff, 0x7fff, write8smo_delegate(*this, FUNC(msx_cart_halnote_device::bank5_w)));
+	m_view1[1].install_write_handler(0x7fff, 0x7fff, emu::rw_delegate(*this, FUNC(msx_cart_halnote_device::bank5_w)));
 	page(2)->install_read_bank(0x8000, 0x9fff, m_rombank[2]);
-	page(2)->install_write_handler(0x8fff, 0x8fff, write8smo_delegate(*this, FUNC(msx_cart_halnote_device::bank2_w)));
+	page(2)->install_write_handler(0x8fff, 0x8fff, emu::rw_delegate(*this, FUNC(msx_cart_halnote_device::bank2_w)));
 	page(2)->install_read_bank(0xa000, 0xbfff, m_rombank[3]);
-	page(2)->install_write_handler(0xafff, 0xafff, write8smo_delegate(*this, FUNC(msx_cart_halnote_device::bank3_w)));
+	page(2)->install_write_handler(0xafff, 0xafff, emu::rw_delegate(*this, FUNC(msx_cart_halnote_device::bank3_w)));
 
 	return std::error_condition();
 }

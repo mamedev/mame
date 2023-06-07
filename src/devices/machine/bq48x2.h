@@ -28,7 +28,7 @@ public:
 	virtual uint8_t read(offs_t address);
 	virtual void write(offs_t address, uint8_t data);
 
-	DECLARE_READ_LINE_MEMBER(intrq_r);
+	int intrq_r();
 
 	// Mainly used to disconnect from oscillator
 	void connect_osc(bool conn);

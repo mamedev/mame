@@ -81,11 +81,11 @@
 //**************************************************************************
 //  CONFIGURABLE LOGGING
 //**************************************************************************
-#define LOG_PORTS   (1U <<  1)
-#define LOG_RESET   (1U <<  2)
-#define LOG_BITS    (1U <<  3)
-#define LOG_UI      (1U <<  4)
-#define LOG_LEDS    (1U <<  5)
+#define LOG_PORTS   (1U << 1)
+#define LOG_RESET   (1U << 2)
+#define LOG_BITS    (1U << 3)
+#define LOG_UI      (1U << 4)
+#define LOG_LEDS    (1U << 5)
 
 //#define VERBOSE (LOG_LEDS)
 //#define LOG_OUTPUT_STREAM std::cout
@@ -261,18 +261,18 @@ eispc_keyboard_device::eispc_keyboard_device(
 {
 }
 
-WRITE_LINE_MEMBER(eispc_keyboard_device::rxd_w)
+void eispc_keyboard_device::rxd_w(int state)
 {
 	LOGBITS("KBD bit presented: %d\n", state);
 	m_rxd_high = CLEAR_LINE != state;
 }
 
-WRITE_LINE_MEMBER(eispc_keyboard_device::hold_w)
+void eispc_keyboard_device::hold_w(int state)
 {
 	m_hold = CLEAR_LINE == state;
 }
 
-WRITE_LINE_MEMBER(eispc_keyboard_device::rst_line_w)
+void eispc_keyboard_device::rst_line_w(int state)
 {
 	if (state == CLEAR_LINE)
 	{

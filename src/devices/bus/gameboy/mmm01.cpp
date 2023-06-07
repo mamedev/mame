@@ -176,16 +176,16 @@ std::error_condition mmm01_device::load(std::string &message)
 	// install memory controller handlers
 	cart_space()->install_write_handler(
 			0x0000, 0x1fff,
-			write8smo_delegate(*this, FUNC(mmm01_device::enable_ram)));
+			emu::rw_delegate(*this, FUNC(mmm01_device::enable_ram)));
 	cart_space()->install_write_handler(
 			0x2000, 0x3fff,
-			write8smo_delegate(*this, FUNC(mmm01_device::bank_switch_fine)));
+			emu::rw_delegate(*this, FUNC(mmm01_device::bank_switch_fine)));
 	cart_space()->install_write_handler(
 			0x4000, 0x5fff,
-			write8smo_delegate(*this, FUNC(mmm01_device::bank_switch_coarse)));
+			emu::rw_delegate(*this, FUNC(mmm01_device::bank_switch_coarse)));
 	cart_space()->install_write_handler(
 			0x6000, 0x6fff,
-			write8smo_delegate(*this, FUNC(mmm01_device::enable_bank_low_mid)));
+			emu::rw_delegate(*this, FUNC(mmm01_device::enable_bank_low_mid)));
 
 	// all good
 	return std::error_condition();

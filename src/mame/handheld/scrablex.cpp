@@ -11,14 +11,17 @@ Hardware notes:
 - Fujitsu MB8841 MCU
 - 8-digit 14-seg LEDs, 2-bit sound
 
-There's also a version of this game on a Panasonic MN1405 MCU.
+There's also a version of this game on a Matsushita MN1405 MCU (see hh_mn1400.cpp),
+even though it's a different MCU, the I/O is very similar.
 
 *******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/mb88xx/mb88xx.h"
 #include "sound/spkrdev.h"
 #include "video/pwm.h"
+
 #include "speaker.h"
 
 #include "scrablex.lh"
@@ -225,5 +228,5 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME      PARENT CMP MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1980, scrablex, 0,      0, scrablex, scrablex, scrablex_state, empty_init, "Selchow & Righter", "Scrabble Lexor - Computer Word Game", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1980, scrablex, 0,      0,      scrablex, scrablex, scrablex_state, empty_init, "Selchow & Righter", "Scrabble Lexor: Computer Word Game (MB8841 version)", MACHINE_SUPPORTS_SAVE )

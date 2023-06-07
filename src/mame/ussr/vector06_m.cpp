@@ -171,7 +171,7 @@ void vector06_state::status_callback(uint8_t data)
 		update_mem();
 }
 
-WRITE_LINE_MEMBER(vector06_state::speaker_w)
+void vector06_state::speaker_w(int state)
 {
 	m_speaker->level_w(state);
 }

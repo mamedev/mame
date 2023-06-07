@@ -54,7 +54,7 @@ public:
 	// read/write
 	uint8_t read();
 	void write(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(reset_write);
+	void reset_write(int state);
 	uint8_t ioport_read(offs_t offset);
 	void ioport_write(offs_t offset, uint8_t data);
 
@@ -136,7 +136,7 @@ public:
 	// read/write
 	uint8_t read();
 	void write(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(reset_write);
+	void reset_write(int state);
 
 	void soundsgood_map(address_map &map);
 protected:
@@ -161,7 +161,7 @@ private:
 	// internal communications
 	void porta_w(uint8_t data);
 	void portb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void irq_w(int state);
 };
 
 
@@ -177,7 +177,7 @@ public:
 	// read/write
 	uint8_t read();
 	void write(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(reset_write);
+	void reset_write(int state);
 
 	void turbocs_map(address_map &map);
 protected:
@@ -202,7 +202,7 @@ private:
 	// internal communications
 	void porta_w(uint8_t data);
 	void portb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void irq_w(int state);
 };
 
 #endif // MAME_MIDWAY_MIDWAY_H

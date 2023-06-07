@@ -24,12 +24,12 @@ public:
 	u8 data_r();
 	void data_w(u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER(pload_w);
-	DECLARE_WRITE_LINE_MEMBER(cload_w);
-	DECLARE_READ_LINE_MEMBER(empty_r);
-	DECLARE_READ_LINE_MEMBER(dready_r);
-	DECLARE_READ_LINE_MEMBER(pc0_r);
-	DECLARE_WRITE_LINE_MEMBER(sync_w);
+	void pload_w(int state);
+	void cload_w(int state);
+	int empty_r();
+	int dready_r();
+	int pc0_r();
+	void sync_w(int state);
 
 	void internal_pgm(address_map &map);
 protected:

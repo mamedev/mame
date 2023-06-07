@@ -757,6 +757,17 @@ public:
 	ppc604_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+class ppc740_device : public ppc_device
+{
+public:
+	ppc740_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class ppc750_device : public ppc_device
+{
+public:
+	ppc750_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
 
 class ppc4xx_device : public ppc_device
 {
@@ -812,5 +823,7 @@ DECLARE_DEVICE_TYPE(MPC8240,   mpc8240_device)
 DECLARE_DEVICE_TYPE(PPC403GA,  ppc403ga_device)
 DECLARE_DEVICE_TYPE(PPC403GCX, ppc403gcx_device)
 DECLARE_DEVICE_TYPE(PPC405GP,  ppc405gp_device)
+DECLARE_DEVICE_TYPE(PPC740,    ppc740_device)
+DECLARE_DEVICE_TYPE(PPC750,    ppc750_device)
 
 #endif  // MAME_CPU_POWERPC_PPC_H

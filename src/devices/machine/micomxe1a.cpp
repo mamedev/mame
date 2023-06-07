@@ -252,7 +252,7 @@ u8 micom_xe_1a_device::out_r()
 }
 
 
-WRITE_LINE_MEMBER(micom_xe_1a_device::req_w)
+void micom_xe_1a_device::req_w(int state)
 {
 	u8 const req = state ? 1 : 0;
 	if (req != m_req)
@@ -289,7 +289,7 @@ WRITE_LINE_MEMBER(micom_xe_1a_device::req_w)
 }
 
 
-WRITE_LINE_MEMBER(micom_xe_1a_device::mode_w)
+void micom_xe_1a_device::mode_w(int state)
 {
 	u8 const mode = state ? 1 : 0;
 	if (mode != m_mode)
@@ -309,7 +309,7 @@ WRITE_LINE_MEMBER(micom_xe_1a_device::mode_w)
 }
 
 
-WRITE_LINE_MEMBER(micom_xe_1a_device::interface_w)
+void micom_xe_1a_device::interface_w(int state)
 {
 	m_interface = state ? 1 : 0;
 }

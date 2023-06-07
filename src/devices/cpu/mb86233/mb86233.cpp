@@ -165,22 +165,22 @@ void mb86233_device::state_string_export(const device_state_entry &entry, std::s
 {
 }
 
-WRITE_LINE_MEMBER(mb86233_device::gpio0_w)
+void mb86233_device::gpio0_w(int state)
 {
 	m_gpio0 = state;
 }
 
-WRITE_LINE_MEMBER(mb86233_device::gpio1_w)
+void mb86233_device::gpio1_w(int state)
 {
 	m_gpio1 = state;
 }
 
-WRITE_LINE_MEMBER(mb86233_device::gpio2_w)
+void mb86233_device::gpio2_w(int state)
 {
 	m_gpio2 = state;
 }
 
-WRITE_LINE_MEMBER(mb86233_device::gpio3_w)
+void mb86233_device::gpio3_w(int state)
 {
 	m_gpio3 = state;
 }

@@ -114,6 +114,7 @@ private:
 	required_device<input_buffer_device> m_scsi_data_in;
 	required_device<output_latch_device> m_scsi_data_out;
 	required_device<input_buffer_device> m_scsi_ctrl_in;
+	required_device<input_buffer_device> m_scsi_cmd_in;
 
 	/* Callback for when the irq line may have changed (mandatory) */
 	devcb_write_line    m_irq_changed_cb;
@@ -142,6 +143,7 @@ private:
 	u32 scsi_data_r(offs_t offset);
 	void scsi_data_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
+	u32 scsi_cmd_status_r(offs_t offset);
 	void scsi_initiate_cmd_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	void scsi_target_cmd_w(offs_t offset, u32 data, u32 mem_mask = ~0);

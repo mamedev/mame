@@ -15,8 +15,8 @@ Omar II has an LCD instead of 7segs. PCB label is AN2379 REV.6, PC101.
 There are more 'sequels', but assumed to be the same game. The newer ones didn't
 include a backgammon board.
 
-LED versions: Omar(I), Omar IV, Electronic Backgammon (Cardinal)
-LCD versions: Omar II, Omar III, Omar V, Computerized Backgammon (Tandy)
+LED versions: Omar(I), Omar IV, Cardinal Electronic Backgammon
+LCD versions: Omar II, Omar III, Omar V, Tandy Computerized Backgammon
 
 BTANB:
 - piezo buzzes when you hold down a button
@@ -242,4 +242,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1979, omar,  0,      0,      omar,    omar,  omar_state, empty_init, "Tryom", "Omar", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, omar,  0,      0,      omar,    omar,  omar_state, empty_init, "Tryom", "Omar", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

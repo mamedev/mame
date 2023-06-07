@@ -87,7 +87,7 @@ void joyport_device::pulse_clock()
     Propagate the interrupt to the defined target. Only used for the handset
     at the prototype 99/4.
 */
-WRITE_LINE_MEMBER( joyport_device::set_interrupt )
+void joyport_device::set_interrupt(int state)
 {
 	m_interrupt(state);
 }

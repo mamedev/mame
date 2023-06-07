@@ -43,8 +43,8 @@ std::error_condition msx_cart_hfox_device::initialize_cartridge(std::string &mes
 	m_rombank[1]->configure_entries(0, 4, cart_rom_region()->base() + 0x4000, 0x8000);
 
 	page(1)->install_read_bank(0x4000, 0x7fff, m_rombank[0]);
-	page(1)->install_write_handler(0x6000, 0x6000, write8smo_delegate(*this, FUNC(msx_cart_hfox_device::bank_w<0>)));
-	page(1)->install_write_handler(0x7000, 0x7000, write8smo_delegate(*this, FUNC(msx_cart_hfox_device::bank_w<1>)));
+	page(1)->install_write_handler(0x6000, 0x6000, emu::rw_delegate(*this, FUNC(msx_cart_hfox_device::bank_w<0>)));
+	page(1)->install_write_handler(0x7000, 0x7000, emu::rw_delegate(*this, FUNC(msx_cart_hfox_device::bank_w<1>)));
 	page(2)->install_read_bank(0x8000, 0xbfff, m_rombank[1]);
 
 	return std::error_condition();

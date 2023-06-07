@@ -1706,6 +1706,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/roland_dsk.h,FORMATS["ROLAND_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "ROLAND_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/roland_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/roland_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/rx50_dsk.h,FORMATS["RX50_DSK"] = true
 --------------------------------------------------
 
@@ -2277,6 +2289,18 @@ if opt_tool(FORMATS, "FS_ISIS") then
 	files {
 		MAME_DIR.. "src/lib/formats/fs_isis.cpp",
 		MAME_DIR.. "src/lib/formats/fs_isis.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/fs_hp98x5.h,FORMATS["FS_HP98X5"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "FS_HP98X5") then
+	files {
+		MAME_DIR.. "src/lib/formats/fs_hp98x5.cpp",
+		MAME_DIR.. "src/lib/formats/fs_hp98x5.h",
 	}
 end
 

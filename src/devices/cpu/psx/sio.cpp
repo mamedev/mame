@@ -10,7 +10,6 @@
 #include "emu.h"
 #include "sio.h"
 
-//#define LOG_GENERAL (1U << 0)
 #define LOG_TIMER (1U << 1)
 
 #define VERBOSE ( 0 )
@@ -329,12 +328,12 @@ uint32_t psxsio_device::read(offs_t offset, uint32_t mem_mask)
 	return data;
 }
 
-WRITE_LINE_MEMBER(psxsio_device::write_rxd)
+void psxsio_device::write_rxd(int state)
 {
 	m_rxd = state;
 }
 
-WRITE_LINE_MEMBER(psxsio_device::write_dsr)
+void psxsio_device::write_dsr(int state)
 {
 	if (state)
 	{

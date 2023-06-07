@@ -113,8 +113,8 @@ void a2eauxslot_device::set_nmi_line(int state)
 }
 
 // interrupt request from a2eauxslot card
-WRITE_LINE_MEMBER( a2eauxslot_device::irq_w ) { m_out_irq_cb(state); }
-WRITE_LINE_MEMBER( a2eauxslot_device::nmi_w ) { m_out_nmi_cb(state); }
+void a2eauxslot_device::irq_w(int state) { m_out_irq_cb(state); }
+void a2eauxslot_device::nmi_w(int state) { m_out_nmi_cb(state); }
 
 //**************************************************************************
 //  DEVICE CONFIG A2EAUXSLOT CARD INTERFACE

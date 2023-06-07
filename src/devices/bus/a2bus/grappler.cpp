@@ -84,9 +84,9 @@ protected:
 
 private:
 	// printer status inputs
-	DECLARE_WRITE_LINE_MEMBER(busy_w);
-	DECLARE_WRITE_LINE_MEMBER(pe_w);
-	DECLARE_WRITE_LINE_MEMBER(slct_w);
+	void busy_w(int state);
+	void pe_w(int state);
+	void slct_w(int state);
 
 	// synchronised printer status inputs
 	void set_busy_in(s32 param);
@@ -169,19 +169,19 @@ void a2bus_grappler_device_base::set_rom_bank(u16 rom_bank)
 //  printer status inputs
 //--------------------------------------------------
 
-WRITE_LINE_MEMBER(a2bus_grappler_device_base::busy_w)
+void a2bus_grappler_device_base::busy_w(int state)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grappler_device_base::set_busy_in), this), state ? 1 : 0);
 }
 
 
-WRITE_LINE_MEMBER(a2bus_grappler_device_base::pe_w)
+void a2bus_grappler_device_base::pe_w(int state)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grappler_device_base::set_pe_in), this), state ? 1 : 0);
 }
 
 
-WRITE_LINE_MEMBER(a2bus_grappler_device_base::slct_w)
+void a2bus_grappler_device_base::slct_w(int state)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grappler_device_base::set_slct_in), this), state ? 1 : 0);
 }
@@ -247,7 +247,7 @@ protected:
 
 private:
 	// printer status inputs
-	DECLARE_WRITE_LINE_MEMBER(ack_w);
+	void ack_w(int state);
 
 	// synchronised signals
 	void set_data(s32 param);
@@ -362,7 +362,7 @@ void a2bus_grappler_device::device_reset()
 //  printer status inputs
 //--------------------------------------------------
 
-WRITE_LINE_MEMBER(a2bus_grappler_device::ack_w)
+void a2bus_grappler_device::ack_w(int state)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grappler_device::set_ack_in), this), state ? 1 : 0);
 }
@@ -451,7 +451,7 @@ protected:
 	virtual void device_reset() override;
 
 	// ACK latch set input
-	DECLARE_WRITE_LINE_MEMBER(ack_w);
+	void ack_w(int state);
 
 	// signal state
 	u8 ack_latch() const { return m_ack_latch; }
@@ -581,7 +581,7 @@ void a2bus_grapplerplus_device_base::write_cnxx(u8 offset, u8 data)
 //  ACK latch set input
 //--------------------------------------------------
 
-WRITE_LINE_MEMBER(a2bus_grapplerplus_device_base::ack_w)
+void a2bus_grapplerplus_device_base::ack_w(int state)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grapplerplus_device_base::set_ack_in), this), state ? 1 : 0);
 }
@@ -868,7 +868,7 @@ private:
 	virtual void data_latched(u8 data) override;
 
 	// printer status inputs
-	DECLARE_WRITE_LINE_MEMBER(buf_ack_w);
+	void buf_ack_w(int state);
 
 	// MCU I/O handlers
 	void mcu_io(address_map &map);
@@ -1039,7 +1039,7 @@ void a2bus_buf_grapplerplus_device::data_latched(u8 data)
 //  printer status inputs
 //--------------------------------------------------
 
-DECLARE_WRITE_LINE_MEMBER(a2bus_buf_grapplerplus_device::buf_ack_w)
+void a2bus_buf_grapplerplus_device::buf_ack_w(int state)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_buf_grapplerplus_device::set_buf_ack_in), this), state ? 1 : 0);
 }

@@ -5,7 +5,6 @@
 #include "m6801.h"
 #include "6800dasm.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_TX      (1U << 1)
 #define LOG_TXTICK  (1U << 2)
 #define LOG_RX      (1U << 3)
@@ -334,28 +333,28 @@ m6803e_cpu_device::m6803e_cpu_device(const machine_config &mconfig, const char *
 {
 }
 
-hd6301_cpu_device::hd6301_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: m6801_cpu_device(mconfig, type, tag, owner, clock, hd63701_insn, cycles_63701)
+hd6301_cpu_device::hd6301_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const m6800_cpu_device::op_func *insn, const uint8_t *cycles, address_map_constructor internal)
+	: m6801_cpu_device(mconfig, type, tag, owner, clock, hd63701_insn, cycles_63701, internal)
 {
 }
 
 hd6301v1_cpu_device::hd6301v1_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hd6301_cpu_device(mconfig, HD6301V1, tag, owner, clock)
+	: hd6301_cpu_device(mconfig, HD6301V1, tag, owner, clock, hd63701_insn, cycles_63701)
 {
 }
 
 hd63701v0_cpu_device::hd63701v0_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hd6301_cpu_device(mconfig, HD63701V0, tag, owner, clock)
+	: hd6301_cpu_device(mconfig, HD63701V0, tag, owner, clock, hd63701_insn, cycles_63701)
 {
 }
 
 hd6303r_cpu_device::hd6303r_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hd6301_cpu_device(mconfig, HD6303R, tag, owner, clock)
+	: hd6301_cpu_device(mconfig, HD6303R, tag, owner, clock, m6803_insn, cycles_6803, address_map_constructor(FUNC(hd6303r_cpu_device::m6803_mem), this))
 {
 }
 
 hd6301x_cpu_device::hd6301x_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: hd6301_cpu_device(mconfig, type, tag, owner, clock)
+	: hd6301_cpu_device(mconfig, type, tag, owner, clock, hd63701_insn, cycles_63701)
 	, m_in_portx_func(*this)
 	, m_out_portx_func(*this)
 {

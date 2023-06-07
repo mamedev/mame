@@ -588,7 +588,7 @@ void victor_9000_keyboard_device::device_start()
 //  kback_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( victor_9000_keyboard_device::kback_w )
+void victor_9000_keyboard_device::kback_w(int state)
 {
 	if (LOG) logerror("KBACK %u\n", state);
 
@@ -664,7 +664,7 @@ void victor_9000_keyboard_device::kb_p2_w(uint8_t data)
 //  kb_t1_r -
 //-------------------------------------------------
 
-READ_LINE_MEMBER( victor_9000_keyboard_device::kb_t1_r )
+int victor_9000_keyboard_device::kb_t1_r()
 {
 	return m_kback;
 }

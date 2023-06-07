@@ -92,7 +92,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER( maygay1b_nmitimer_callback );
 	uint8_t m_Lamps[256]{};
 	int m_optic_pattern = 0;
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
+	template <unsigned N> void reel_optic_cb(int state) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 	void scanlines_w(uint8_t data);
 	void scanlines_2_w(uint8_t data);
 	void lamp_data_w(uint8_t data);
@@ -101,13 +101,13 @@ private:
 	void reel12_w(uint8_t data);
 	void reel34_w(uint8_t data);
 	void reel56_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(ramen_w);
-	DECLARE_WRITE_LINE_MEMBER(alarmen_w);
-	DECLARE_WRITE_LINE_MEMBER(nmien_w);
-	DECLARE_WRITE_LINE_MEMBER(rts_w);
-	DECLARE_WRITE_LINE_MEMBER(psurelay_w);
-	DECLARE_WRITE_LINE_MEMBER(wdog_w);
-	DECLARE_WRITE_LINE_MEMBER(srsel_w);
+	void ramen_w(int state);
+	void alarmen_w(int state);
+	void nmien_w(int state);
+	void rts_w(int state);
+	void psurelay_w(int state);
+	void wdog_w(int state);
+	void srsel_w(int state);
 	void latch_ch2_w(uint8_t data);
 	uint8_t latch_st_hi();
 	uint8_t latch_st_lo();
@@ -123,7 +123,7 @@ private:
 	uint8_t nec_reset_r();
 	void nec_bank0_w(uint8_t data);
 	void nec_bank1_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
+	void duart_irq_handler(int state);
 	uint8_t m1_duart_r();
 	void mcu_port0_w(uint8_t data);
 	void mcu_port1_w(uint8_t data);

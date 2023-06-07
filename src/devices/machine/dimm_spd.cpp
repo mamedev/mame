@@ -14,7 +14,6 @@
 #include "emu.h"
 #include "dimm_spd.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_DATAOUT (1U << 1)
 
 #define VERBOSE (0)
@@ -163,7 +162,7 @@ void dimm_spd_device::sda_write(int state)
 		{
 			if (m_sda)
 			{
-				LOGMASKED(LOG_GENERAL, "%s: stop\n", tag());
+				LOG("%s: stop\n", tag());
 				m_state = STATE_IDLE;
 				m_last_address = 0;
 				m_just_acked = false;
@@ -171,7 +170,7 @@ void dimm_spd_device::sda_write(int state)
 			}
 			else
 			{
-				LOGMASKED(LOG_GENERAL, "%s: start\n", tag());
+				LOG("%s: start\n", tag());
 				m_state = STATE_GET_ADDRESS;
 				m_bit = 0;
 				m_latch = 0;
@@ -221,13 +220,13 @@ void dimm_spd_device::scl_write(int state)
 						{
 							if (m_state == STATE_GET_ADDRESS)
 							{
-								LOGMASKED(LOG_GENERAL, "%s: Got address %02x (ours is %02x r/w %d)\n", tag(), m_latch >> 1, m_address, m_latch & 1);
+								LOG("%s: Got address %02x (ours is %02x r/w %d)\n", tag(), m_latch >> 1, m_address, m_latch & 1);
 								// check if reading
 								if (m_latch & 1)
 								{
 									if ((m_latch >> 1) == m_address)
 									{
-										LOGMASKED(LOG_GENERAL, "%s: address matches, ACKing\n", tag());
+										LOG("%s: address matches, ACKing\n", tag());
 										write_sda(0);
 										m_bit = 0;
 										m_latch = 0;
@@ -236,7 +235,7 @@ void dimm_spd_device::scl_write(int state)
 									}
 									else
 									{
-										LOGMASKED(LOG_GENERAL, "%s: address doesn't match, ignoring\n", tag());
+										LOG("%s: address doesn't match, ignoring\n", tag());
 										m_state = STATE_IDLE;
 										write_sda(1);
 									}

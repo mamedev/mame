@@ -1,13 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia, David Haywood
 /* Puckman Pockimon
-  -- original driver by Luca Elia
 
 Seems to be based around genesis hardware, despite containing no original Sega chips
 
 Supported:
 
-Puckman Pockimon - (c)2000 Genie?
+Puckman Pockimon
 (there should be a way to show Sun Mixing copyright, ROMs are the same on a version with the SM (c))
 
 |---------------------------------------|
@@ -70,7 +69,7 @@ public:
 	}
 
 	void puckpkmn(machine_config &config) ATTR_COLD;
-	void puckpkmna(machine_config &config) ATTR_COLD;
+	void jingling(machine_config &config) ATTR_COLD;
 	void puckpkmnb(machine_config &config) ATTR_COLD;
 
 	void init_puckpkmn() ATTR_COLD;
@@ -80,7 +79,7 @@ protected:
 
 private:
 	void puckpkmn_map(address_map &map) ATTR_COLD;
-	void puckpkmna_map(address_map &map) ATTR_COLD;
+	void jingling_map(address_map &map) ATTR_COLD;
 	void puckpkmnb_map(address_map &map) ATTR_COLD;
 
 	optional_device<ym_generic_device> m_ymsnd;
@@ -283,7 +282,7 @@ void puckpkmn_state::puckpkmn_base_map(address_map &map)
 }
 
 
-void puckpkmn_state::puckpkmn_map(address_map &map)
+void puckpkmn_state::puckpkmnb_map(address_map &map)
 {
 	puckpkmn_base_map(map);
 
@@ -297,19 +296,19 @@ void puckpkmn_state::puckpkmn_map(address_map &map)
 	map(0xa11200, 0xa11201).nopw();                            // ?
 }
 
-void puckpkmn_state::puckpkmna_map(address_map &map)
+void puckpkmn_state::puckpkmn_map(address_map &map)
 {
-	puckpkmn_map(map);
+	puckpkmnb_map(map);
 
-	map(0x4b2476, 0x4b2477).lr16(NAME([] () { return uint16_t(0x3400); }));
+	map(0x4b2476, 0x4b2477).lr16(NAME([] () { return uint16_t(0x3100); }));
 	map(0x70001c, 0x70001d).lr16(NAME([] () { return uint16_t(0x000e); }));
 }
 
-void puckpkmn_state::puckpkmnb_map(address_map &map)
+void puckpkmn_state::jingling_map(address_map &map)
 {
-	puckpkmn_map(map);
+	puckpkmnb_map(map);
 
-	map(0x4b2476, 0x4b2477).lr16(NAME([] () { return uint16_t(0x3100); }));
+	map(0x4b2476, 0x4b2477).lr16(NAME([] () { return uint16_t(0x3400); }));
 	map(0x70001c, 0x70001d).lr16(NAME([] () { return uint16_t(0x000e); }));
 }
 
@@ -421,11 +420,11 @@ void puckpkmn_state::puckpkmn(machine_config &config)
 	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 }
 
-void puckpkmn_state::puckpkmna(machine_config &config)
+void puckpkmn_state::jingling(machine_config &config)
 {
 	puckpkmn(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &puckpkmn_state::puckpkmna_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &puckpkmn_state::jingling_map);
 }
 
 void puckpkmn_state::puckpkmnb(machine_config &config)
@@ -542,16 +541,16 @@ void puckpkmn_state::init_puckpkmn()
 }
 
 
-// Puckman Pockimon  (c)2000 Genie
+// Puckman Pockimon  (c)2000 Sun Mixing
 ROM_START( puckpkmn )
 	ROM_REGION( 0x400000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "puckpoke.u5", 0x000000, 0x080000, CRC(fd334b91) SHA1(cf8bf6645a4082ea4392937e169b1686c9c7e246) )
-	ROM_LOAD16_BYTE( "puckpoke.u4", 0x000001, 0x080000, CRC(839cc76b) SHA1(e15662a7175db7a8e222dda176a8ed92e0d56e9d) )
-	ROM_LOAD16_BYTE( "puckpoke.u8", 0x100000, 0x080000, CRC(7936bec8) SHA1(4b350105abe514fbfeabae1c6f3aeee695c3d07a) )
-	ROM_LOAD16_BYTE( "puckpoke.u7", 0x100001, 0x080000, CRC(96b66bdf) SHA1(3cc2861ad9bc232cbe683e01b58090f832d03db5) )
+	ROM_LOAD16_BYTE( "200061.u5", 0x000000, 0x080000, CRC(502a5093) SHA1(6dc1c79d52ebb653cb2e4388f74fd975ec323566) )
+	ROM_LOAD16_BYTE( "200060.u4", 0x000001, 0x080000, CRC(5f160c18) SHA1(5a5ce1b9a81afe836e435e9d6f16cf57b63cbd31) )
+	ROM_LOAD16_BYTE( "200063.u8", 0x100000, 0x080000, CRC(0c29781e) SHA1(db442f9b588608b2ac04d65fd830103296599a6a) )
+	ROM_LOAD16_BYTE( "200062.u7", 0x100001, 0x080000, CRC(00bbf9a9) SHA1(924c1ed85090c497ce89528082c15d1548a854a0) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "puckpoke.u3", 0x00000, 0x40000, CRC(7b066bac) SHA1(429616e21c672b07e0705bc63234249cac3af56f) )
+	ROM_LOAD( "206295.u3", 0x00000, 0x40000, CRC(7b066bac) SHA1(429616e21c672b07e0705bc63234249cac3af56f) )
 ROM_END
 
 
@@ -597,7 +596,7 @@ Notes:
 
 */
 
-ROM_START( puckpkmna )
+ROM_START( jingling )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "b2.u59", 0x000000, 0x080000, CRC(3fbea2c7) SHA1(89f3770ae92c62714f0795ddd2f311a9532eb25a) ) // FIRST AND SECOND HALF IDENTICAL
 	ROM_IGNORE(0x080000)
@@ -613,16 +612,16 @@ ROM_START( puckpkmna )
 ROM_END
 
 
-// Puckman Pockimon  (c)2000 Sun Mixing
+// Puckman Pockimon (no copyright, presumably a bootleg of the Sun Mixing version)
 ROM_START( puckpkmnb )
 	ROM_REGION( 0x400000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "200061.u5", 0x000000, 0x080000, CRC(502a5093) SHA1(6dc1c79d52ebb653cb2e4388f74fd975ec323566) )
-	ROM_LOAD16_BYTE( "200060.u4", 0x000001, 0x080000, CRC(5f160c18) SHA1(5a5ce1b9a81afe836e435e9d6f16cf57b63cbd31) )
-	ROM_LOAD16_BYTE( "200063.u8", 0x100000, 0x080000, CRC(0c29781e) SHA1(db442f9b588608b2ac04d65fd830103296599a6a) )
-	ROM_LOAD16_BYTE( "200062.u7", 0x100001, 0x080000, CRC(00bbf9a9) SHA1(924c1ed85090c497ce89528082c15d1548a854a0) )
+	ROM_LOAD16_BYTE( "puckpoke.u5", 0x000000, 0x080000, CRC(fd334b91) SHA1(cf8bf6645a4082ea4392937e169b1686c9c7e246) )
+	ROM_LOAD16_BYTE( "puckpoke.u4", 0x000001, 0x080000, CRC(839cc76b) SHA1(e15662a7175db7a8e222dda176a8ed92e0d56e9d) )
+	ROM_LOAD16_BYTE( "puckpoke.u8", 0x100000, 0x080000, CRC(7936bec8) SHA1(4b350105abe514fbfeabae1c6f3aeee695c3d07a) )
+	ROM_LOAD16_BYTE( "puckpoke.u7", 0x100001, 0x080000, CRC(96b66bdf) SHA1(3cc2861ad9bc232cbe683e01b58090f832d03db5) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "206295.u3", 0x00000, 0x40000, CRC(7b066bac) SHA1(429616e21c672b07e0705bc63234249cac3af56f) )
+	ROM_LOAD( "puckpoke.u3", 0x00000, 0x40000, CRC(7b066bac) SHA1(429616e21c672b07e0705bc63234249cac3af56f) )
 ROM_END
 
 
@@ -648,7 +647,7 @@ ROM_END
 
 // Genie Hardware (uses Genesis VDP) also has 'Sun Mixing Co' put into tile RAM
 // Is 'Genie 2000' part of the title, and the parent set a bootleg?
-GAME( 2000, puckpkmn,  0,        puckpkmn,  puckpkmn, puckpkmn_state, init_puckpkmn, ROT0, "Genie",      "Puckman Pockimon (set 1)", 0 )
-GAME( 2000, puckpkmna, puckpkmn, puckpkmna, puckpkmn, puckpkmn_state, init_puckpkmn, ROT0, "IBS",        "Jingling Jiazu",           0 )
-GAME( 2000, puckpkmnb, puckpkmn, puckpkmnb, puckpkmn, puckpkmn_state, init_puckpkmn, ROT0, "Sun Mixing", "Puckman Pockimon (set 2)", 0 )
-GAME( 2000, jzth,      0,        jzth,      jzth,     jzth_state,     init_puckpkmn, ROT0, "<unknown>",  "Juezhan Tianhuang",        MACHINE_IMPERFECT_SOUND )
+GAME( 2000, puckpkmn,  0,        puckpkmn,  puckpkmn, puckpkmn_state, init_puckpkmn, ROT0, "Sun Mixing",  "Puckman Pockimon Genie 2000",           0 )
+GAME( 2000, jingling,  puckpkmn, jingling,  puckpkmn, puckpkmn_state, init_puckpkmn, ROT0, "IBS Co. Ltd", "Jingling Jiazu Genie 2000",             0 )
+GAME( 2000, puckpkmnb, puckpkmn, puckpkmnb, puckpkmn, puckpkmn_state, init_puckpkmn, ROT0, "bootleg",     "Puckman Pockimon Genie 2000 (bootleg)", 0 )
+GAME( 2000, jzth,      0,        jzth,      jzth,     jzth_state,     init_puckpkmn, ROT0, "<unknown>",   "Juezhan Tianhuang",                     MACHINE_IMPERFECT_SOUND )

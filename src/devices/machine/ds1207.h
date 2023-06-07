@@ -20,10 +20,10 @@ public:
 	// construction/destruction
 	ds1207_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	DECLARE_WRITE_LINE_MEMBER(write_rst);
-	DECLARE_WRITE_LINE_MEMBER(write_clk);
-	DECLARE_WRITE_LINE_MEMBER(write_dq);
-	DECLARE_READ_LINE_MEMBER(read_dq);
+	void write_rst(int state);
+	void write_clk(int state);
+	void write_dq(int state);
+	int read_dq();
 
 protected:
 	// device-level overrides

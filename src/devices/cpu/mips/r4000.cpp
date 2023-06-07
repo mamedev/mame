@@ -35,7 +35,6 @@
 
 #include "softfloat3/source/include/softfloat.h"
 
-#define LOG_GENERAL   (1U << 0)
 #define LOG_TLB       (1U << 1)
 #define LOG_CACHE     (1U << 2)
 #define LOG_EXCEPTION (1U << 3)
@@ -43,6 +42,7 @@
 #define LOG_STATS     (1U << 5)
 
 #define VERBOSE       (LOG_GENERAL)
+#include "logmacro.h"
 
 // operating system specific system call logging
 #define SYSCALL_IRIX53 (1U << 0)
@@ -57,8 +57,6 @@
 #define ICACHE 0
 
 #define SCACHE !(m_cp0[CP0_Config] & CONFIG_SC)
-
-#include "logmacro.h"
 
 #define USE_ABI_REG_NAMES 1
 

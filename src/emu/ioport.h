@@ -25,6 +25,7 @@
 #include <cstdint>
 #include <cstring>
 #include <ctime>
+#include <initializer_list>
 #include <list>
 #include <memory>
 #include <vector>
@@ -961,7 +962,7 @@ public:
 private:
 	// internal helpers
 	void init_port_types();
-	void init_autoselect_devices(int type1, int type2, int type3, const char *option, const char *ananame);
+	void init_autoselect_devices(std::initializer_list<ioport_type> types, std::string_view option, std::string_view ananame);
 
 	void frame_update_callback();
 	void frame_update();

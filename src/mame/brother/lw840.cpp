@@ -173,11 +173,11 @@ private:
 		fr.add(FLOPPY_PC_FORMAT);
 	}
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_interrupt)
+	void fdc_interrupt(int state)
 	{
 		maincpu->set_input_line(INPUT_LINE_IRQ4, state ? ASSERT_LINE : CLEAR_LINE);
 	}
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq)
+	void fdc_drq(int state)
 	{
 		maincpu->set_input_line(H8_INPUT_LINE_DREQ0, state ? ASSERT_LINE : CLEAR_LINE);
 	}

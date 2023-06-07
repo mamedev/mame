@@ -68,8 +68,7 @@ public:
 		m_epci(*this, SCN2661_TAG),
 		m_fdc(*this, UPD765_TAG),
 		m_ram(*this, RAM_TAG),
-		m_floppy0(*this, UPD765_TAG ":0:525dd"),
-		m_floppy1(*this, UPD765_TAG ":1:525dd"),
+		m_floppy(*this, UPD765_TAG ":%u:525dd", 0U),
 		m_centronics(*this, CENTRONICS_TAG),
 		m_cent_data_in(*this, "cent_data_in"),
 		m_cent_data_out(*this, "cent_data_out"),
@@ -107,8 +106,7 @@ private:
 	required_device<scn_pci_device> m_epci;
 	required_device<upd765a_device> m_fdc;
 	required_device<ram_device> m_ram;
-	required_device<floppy_image_device> m_floppy0;
-	required_device<floppy_image_device> m_floppy1;
+	required_device_array<floppy_image_device, 2> m_floppy;
 	required_device<centronics_device> m_centronics;
 	required_device<input_buffer_device> m_cent_data_in;
 	required_device<output_latch_device> m_cent_data_out;
@@ -134,14 +132,10 @@ private:
 	void deselect_drive2_w(uint8_t data);
 	uint8_t select_drive2_r();
 	void select_drive2_w(uint8_t data);
-	uint8_t motor1_off_r();
-	void motor1_off_w(uint8_t data);
-	uint8_t motor1_on_r();
-	void motor1_on_w(uint8_t data);
-	uint8_t motor2_off_r();
-	void motor2_off_w(uint8_t data);
-	uint8_t motor2_on_r();
-	void motor2_on_w(uint8_t data);
+	uint8_t motor1_on_r(offs_t offset);
+	void motor1_on_w(offs_t offset, uint8_t data);
+	uint8_t motor2_on_r(offs_t offset);
+	void motor2_on_w(offs_t offset, uint8_t data);
 	uint8_t fdc_reset_r();
 	void fdc_reset_w(uint8_t data);
 	uint8_t fdc_tc_r();
@@ -165,32 +159,33 @@ private:
 	void parity_nmi_clr_w(uint8_t data);
 	uint8_t option_id_r();
 
-	DECLARE_WRITE_LINE_MEMBER( hrq_w );
-	DECLARE_WRITE_LINE_MEMBER( eop_w );
+	void hrq_w(int state);
+	void eop_w(int state);
 	uint8_t memr_r(offs_t offset);
 	void memw_w(offs_t offset, uint8_t data);
 	uint8_t ior2_r();
 	void iow2_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( dack0_w );
-	DECLARE_WRITE_LINE_MEMBER( dack1_w );
-	DECLARE_WRITE_LINE_MEMBER( dack2_w );
-	DECLARE_WRITE_LINE_MEMBER( dack3_w );
+	void dack0_w(int state);
+	void dack1_w(int state);
+	void dack2_w(int state);
+	void dack3_w(int state);
 	uint8_t ppi_pa_r();
 	uint8_t ppi_pb_r();
 	uint8_t ppi_pc_r();
 	void ppi_pc_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( pit2_w );
-	DECLARE_WRITE_LINE_MEMBER( uart_dr_w );
-	DECLARE_WRITE_LINE_MEMBER( uart_tbre_w );
-	DECLARE_WRITE_LINE_MEMBER( epci_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_ack );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_perror );
-	DECLARE_WRITE_LINE_MEMBER( bus_irq2_w );
+	void pit0_w(int state);
+	void pit2_w(int state);
+	void uart_dr_w(int state);
+	void uart_tbre_w(int state);
+	void epci_irq_w(int state);
+	void write_centronics_ack(int state);
+	void write_centronics_busy(int state);
+	void write_centronics_fault(int state);
+	void write_centronics_perror(int state);
+	void bus_irq2_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_irq );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq );
+	void fdc_irq(int state);
+	void fdc_drq(int state);
 
 	void on_disk0_load(floppy_image_device *image);
 	void on_disk0_unload(floppy_image_device *image);
@@ -245,8 +240,8 @@ void wangpc_state::select_drive()
 {
 	floppy_image_device *floppy = nullptr;
 
-	if (m_ds1) floppy = m_floppy0;
-	if (m_ds2) floppy = m_floppy1;
+	if (m_ds1) floppy = m_floppy[0];
+	if (m_ds2) floppy = m_floppy[1];
 
 	m_fdc->set_floppy(floppy);
 }
@@ -337,60 +332,34 @@ void wangpc_state::select_drive2_w(uint8_t data)
 	select_drive2_r();
 }
 
-uint8_t wangpc_state::motor1_off_r()
+uint8_t wangpc_state::motor1_on_r(offs_t offset)
 {
-	if (LOG) logerror("%s: Drive 1 motor OFF\n", machine().describe_context());
-
-	m_floppy0->mon_w(1);
+	if (!machine().side_effects_disabled())
+		motor1_on_w(offset, 0);
 
 	return 0xff;
 }
 
-void wangpc_state::motor1_off_w(uint8_t data)
+void wangpc_state::motor1_on_w(offs_t offset, uint8_t data)
 {
-	motor1_off_r();
+	if (LOG) logerror("%s: Drive 1 motor %s\n", machine().describe_context(), offset ? "ON" : "OFF");
+
+	m_floppy[0]->mon_w(!offset);
 }
 
-uint8_t wangpc_state::motor1_on_r()
+uint8_t wangpc_state::motor2_on_r(offs_t offset)
 {
-	if (LOG) logerror("%s: Drive 1 motor ON\n", machine().describe_context());
-
-	m_floppy0->mon_w(0);
+	if (!machine().side_effects_disabled())
+		motor2_on_w(offset, 0);
 
 	return 0xff;
 }
 
-void wangpc_state::motor1_on_w(uint8_t data)
+void wangpc_state::motor2_on_w(offs_t offset, uint8_t data)
 {
-	motor1_on_r();
-}
+	if (LOG) logerror("%s: Drive 2 motor %s\n", machine().describe_context(), offset ? "ON" : "OFF");
 
-uint8_t wangpc_state::motor2_off_r()
-{
-	if (LOG) logerror("%s: Drive 2 motor OFF\n", machine().describe_context());
-
-	m_floppy1->mon_w(1);
-
-	return 0xff;
-}
-
-void wangpc_state::motor2_off_w(uint8_t data)
-{
-	motor2_off_r();
-}
-
-uint8_t wangpc_state::motor2_on_r()
-{
-	if (LOG) logerror("%s: Drive 2 motor ON\n", machine().describe_context());
-
-	m_floppy1->mon_w(0);
-
-	return 0xff;
-}
-
-void wangpc_state::motor2_on_w(uint8_t data)
-{
-	motor2_on_r();
+	m_floppy[1]->mon_w(!offset);
 }
 
 uint8_t wangpc_state::fdc_reset_r()
@@ -462,8 +431,8 @@ uint8_t wangpc_state::status_r()
 	data |= m_fdc->get_irq() << 3;
 	data |= m_fdc_dd0 << 4;
 	data |= m_fdc_dd1 << 5;
-	data |= m_floppy0->exists() ? 0 : 0x40;
-	data |= m_floppy1->exists() ? 0 : 0x80;
+	data |= m_floppy[0]->exists() ? 0 : 0x40;
+	data |= m_floppy[1]->exists() ? 0 : 0x80;
 
 	return data;
 }
@@ -477,7 +446,7 @@ void wangpc_state::timer0_irq_clr_w(uint8_t data)
 {
 	//if (LOG) logerror("%s: Timer 0 IRQ clear\n", machine().describe_context());
 
-	m_pic->ir0_w(CLEAR_LINE);
+	m_pic->ir0_w(0);
 }
 
 
@@ -754,10 +723,8 @@ void wangpc_state::wangpc_io(address_map &map)
 	map(0x1006, 0x1006).rw(FUNC(wangpc_state::select_drive1_r), FUNC(wangpc_state::select_drive1_w));
 	map(0x1008, 0x1008).rw(FUNC(wangpc_state::deselect_drive2_r), FUNC(wangpc_state::deselect_drive2_w));
 	map(0x100a, 0x100a).rw(FUNC(wangpc_state::select_drive2_r), FUNC(wangpc_state::select_drive2_w));
-	map(0x100c, 0x100c).rw(FUNC(wangpc_state::motor1_off_r), FUNC(wangpc_state::motor1_off_w));
-	map(0x100e, 0x100e).rw(FUNC(wangpc_state::motor1_on_r), FUNC(wangpc_state::motor1_on_w));
-	map(0x1010, 0x1010).rw(FUNC(wangpc_state::motor2_off_r), FUNC(wangpc_state::motor2_off_w));
-	map(0x1012, 0x1012).rw(FUNC(wangpc_state::motor2_on_r), FUNC(wangpc_state::motor2_on_w));
+	map(0x100c, 0x100f).rw(FUNC(wangpc_state::motor1_on_r), FUNC(wangpc_state::motor1_on_w)).umask16(0x00ff);
+	map(0x1010, 0x1013).rw(FUNC(wangpc_state::motor2_on_r), FUNC(wangpc_state::motor2_on_w)).umask16(0x00ff);
 	map(0x1014, 0x1017).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
 	map(0x1018, 0x1018).mirror(0x0002).rw(FUNC(wangpc_state::fdc_reset_r), FUNC(wangpc_state::fdc_reset_w));
 	map(0x101c, 0x101c).mirror(0x0002).rw(FUNC(wangpc_state::fdc_tc_r), FUNC(wangpc_state::fdc_tc_w));
@@ -832,14 +799,14 @@ void wangpc_state::update_fdc_tc()
 		m_fdc->tc_w(0);
 }
 
-WRITE_LINE_MEMBER( wangpc_state::hrq_w )
+void wangpc_state::hrq_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	m_dmac->hack_w(state);
 }
 
-WRITE_LINE_MEMBER( wangpc_state::eop_w )
+void wangpc_state::eop_w(int state)
 {
 	if (m_dack == 2)
 	{
@@ -890,22 +857,22 @@ void wangpc_state::iow2_w(uint8_t data)
 		m_fdc->dma_w(data);
 }
 
-WRITE_LINE_MEMBER( wangpc_state::dack0_w )
+void wangpc_state::dack0_w(int state)
 {
 	if (!state) m_dack = 0;
 }
 
-WRITE_LINE_MEMBER( wangpc_state::dack1_w )
+void wangpc_state::dack1_w(int state)
 {
 	if (!state) m_dack = 1;
 }
 
-WRITE_LINE_MEMBER( wangpc_state::dack2_w )
+void wangpc_state::dack2_w(int state)
 {
 	if (!state) m_dack = 2;
 }
 
-WRITE_LINE_MEMBER( wangpc_state::dack3_w )
+void wangpc_state::dack3_w(int state)
 {
 	if (!state) m_dack = 3;
 }
@@ -1046,7 +1013,13 @@ void wangpc_state::ppi_pc_w(uint8_t data)
 	m_centronics->write_init(BIT(data, 2));
 }
 
-WRITE_LINE_MEMBER( wangpc_state::pit2_w )
+void wangpc_state::pit0_w(int state)
+{
+	if (state)
+		m_pic->ir0_w(1);
+}
+
+void wangpc_state::pit2_w(int state)
 {
 	if (state)
 	{
@@ -1059,7 +1032,7 @@ WRITE_LINE_MEMBER( wangpc_state::pit2_w )
 //  IM6402_INTERFACE( uart_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( wangpc_state::uart_dr_w )
+void wangpc_state::uart_dr_w(int state)
 {
 	if (state)
 	{
@@ -1070,7 +1043,7 @@ WRITE_LINE_MEMBER( wangpc_state::uart_dr_w )
 	}
 }
 
-WRITE_LINE_MEMBER( wangpc_state::uart_tbre_w )
+void wangpc_state::uart_tbre_w(int state)
 {
 	if (state)
 	{
@@ -1086,7 +1059,7 @@ WRITE_LINE_MEMBER( wangpc_state::uart_tbre_w )
 //  SCN2661_INTERFACE( epci_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( wangpc_state::epci_irq_w )
+void wangpc_state::epci_irq_w(int state)
 {
 	check_level1_interrupts();
 }
@@ -1101,14 +1074,14 @@ static void wangpc_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-WRITE_LINE_MEMBER( wangpc_state::fdc_irq )
+void wangpc_state::fdc_irq(int state)
 {
 	if (LOG) logerror("FDC INT %u\n", state);
 
 	check_level2_interrupts();
 }
 
-WRITE_LINE_MEMBER( wangpc_state::fdc_drq )
+void wangpc_state::fdc_drq(int state)
 {
 	if (LOG) logerror("FDC DRQ %u\n", state);
 
@@ -1129,7 +1102,7 @@ void wangpc_state::update_fdc_drq()
 //  centronics_interface centronics_intf
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( wangpc_state::write_centronics_ack )
+void wangpc_state::write_centronics_ack(int state)
 {
 	if (LOG) logerror("ACKNLG %u\n", state);
 
@@ -1138,7 +1111,7 @@ WRITE_LINE_MEMBER( wangpc_state::write_centronics_ack )
 	check_level1_interrupts();
 }
 
-WRITE_LINE_MEMBER( wangpc_state::write_centronics_busy )
+void wangpc_state::write_centronics_busy(int state)
 {
 	if (LOG) logerror("BUSY %u\n", state);
 
@@ -1147,12 +1120,12 @@ WRITE_LINE_MEMBER( wangpc_state::write_centronics_busy )
 	check_level1_interrupts();
 }
 
-WRITE_LINE_MEMBER( wangpc_state::write_centronics_fault )
+void wangpc_state::write_centronics_fault(int state)
 {
 	m_centronics_fault = state;
 }
 
-WRITE_LINE_MEMBER( wangpc_state::write_centronics_perror )
+void wangpc_state::write_centronics_perror(int state)
 {
 	m_centronics_perror = state;
 }
@@ -1161,7 +1134,7 @@ WRITE_LINE_MEMBER( wangpc_state::write_centronics_perror )
 //  WANGPC_BUS_INTERFACE( kb_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( wangpc_state::bus_irq2_w )
+void wangpc_state::bus_irq2_w(int state)
 {
 	if (LOG) logerror("Bus IRQ2 %u\n", state);
 
@@ -1183,10 +1156,10 @@ WRITE_LINE_MEMBER( wangpc_state::bus_irq2_w )
 void wangpc_state::machine_start()
 {
 	// connect floppy callbacks
-	m_floppy0->setup_load_cb(floppy_image_device::load_cb(&wangpc_state::on_disk0_load, this));
-	m_floppy0->setup_unload_cb(floppy_image_device::unload_cb(&wangpc_state::on_disk0_unload, this));
-	m_floppy1->setup_load_cb(floppy_image_device::load_cb(&wangpc_state::on_disk1_load, this));
-	m_floppy1->setup_unload_cb(floppy_image_device::unload_cb(&wangpc_state::on_disk1_unload, this));
+	m_floppy[0]->setup_load_cb(floppy_image_device::load_cb(&wangpc_state::on_disk0_load, this));
+	m_floppy[0]->setup_unload_cb(floppy_image_device::unload_cb(&wangpc_state::on_disk0_unload, this));
+	m_floppy[1]->setup_load_cb(floppy_image_device::load_cb(&wangpc_state::on_disk1_load, this));
+	m_floppy[1]->setup_unload_cb(floppy_image_device::unload_cb(&wangpc_state::on_disk1_unload, this));
 
 	m_led_diagnostic.resolve();
 
@@ -1278,6 +1251,7 @@ void wangpc_state::wangpc(machine_config &config)
 
 	// devices
 	AM9517A(config, m_dmac, 4000000);
+	m_dmac->dreq_active_low();
 	m_dmac->out_hreq_callback().set(FUNC(wangpc_state::hrq_w));
 	m_dmac->out_eop_callback().set(FUNC(wangpc_state::eop_w));
 	m_dmac->in_memr_callback().set(FUNC(wangpc_state::memr_r));
@@ -1304,7 +1278,7 @@ void wangpc_state::wangpc(machine_config &config)
 
 	PIT8253(config, m_pit, 0);
 	m_pit->set_clk<0>(500000);
-	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
+	m_pit->out_handler<0>().set(FUNC(wangpc_state::pit0_w));
 	m_pit->set_clk<1>(2000000);
 	m_pit->set_clk<2>(500000);
 	m_pit->out_handler<2>().set(FUNC(wangpc_state::pit2_w));
@@ -1345,7 +1319,7 @@ void wangpc_state::wangpc(machine_config &config)
 	rs232.dsr_handler().set(m_epci, FUNC(scn_pci_device::dsr_w));
 	rs232.dcd_handler().set(m_epci, FUNC(scn_pci_device::dcd_w));
 
-	WANGPC_KEYBOARD(config, "wangpckb").txd_handler().set(m_uart, FUNC(im6402_device::write_rri));
+	WANGPC_KEYBOARD(config, "wangpckb").txd_handler().set(m_uart, FUNC(im6402_device::rri_w));
 
 	// bus
 	WANGPC_BUS(config, m_bus, 0);

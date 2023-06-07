@@ -212,7 +212,6 @@
 
 #include "cpu/mcs48/mcs48.h"
 
-#define LOG_GENERAL     (1U << 0)
 #define LOG_WATCHDOG    (1U << 1)
 #define LOG_MATRIX      (1U << 2)
 #define LOG_COMM        (1U << 3)
@@ -294,12 +293,12 @@ protected:
 		save_item(NAME(m_watchdog_in));
 	}
 
-	virtual DECLARE_WRITE_LINE_MEMBER(data_w) override
+	virtual void data_w(int state) override
 	{
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(peripheral_base::update_host_data), this), state);
 	}
 
-	DECLARE_WRITE_LINE_MEMBER(watchdog_w)
+	void watchdog_w(int state)
 	{
 		if (bool(state) != bool(m_watchdog_in))
 		{
@@ -322,7 +321,7 @@ protected:
 	required_device<i8021_device> m_mpu;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(host_clock_w)
+	void host_clock_w(int state)
 	{
 		if (bool(state) != bool(m_host_clock_out))
 		{
@@ -334,7 +333,7 @@ private:
 		}
 	}
 
-	DECLARE_WRITE_LINE_MEMBER(host_data_w)
+	void host_data_w(int state)
 	{
 		if (bool(state) != bool(m_host_data_out))
 		{
@@ -455,7 +454,7 @@ protected:
 	required_device<mac_keyboard_port_device> m_keyboard_port;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(keyboard_data_out_w)
+	void keyboard_data_out_w(int state)
 	{
 		if (bool(state) != bool(m_keyboard_data_out))
 		{
@@ -464,12 +463,12 @@ private:
 		}
 	}
 
-	DECLARE_WRITE_LINE_MEMBER(keyboard_clock_in_w)
+	void keyboard_clock_in_w(int state)
 	{
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(keypad_base::update_keyboard_clock), this), state);
 	}
 
-	DECLARE_WRITE_LINE_MEMBER(keyboard_data_in_w)
+	void keyboard_data_in_w(int state)
 	{
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(keypad_base::update_keyboard_data), this), state);
 	}

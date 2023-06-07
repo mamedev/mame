@@ -30,7 +30,6 @@
 #include "emu.h"
 #include "macrtc.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_COMMANDS (1U << 1)
 
 //#define VERBOSE (LOG_COMMANDS)
@@ -45,8 +44,6 @@ enum
 	RTC_STATE_XPCOMMAND,
 	RTC_STATE_XPWRITE
 };
-
-static constexpr uint32_t mac_reference = 0x83da95d0;   // Seconds from January 1, 1904, 12:00:00 to when POSIX time starts
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -154,7 +151,7 @@ TIMER_CALLBACK_MEMBER(rtc3430042_device::half_seconds_tick)
 
 void rtc3430042_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
 {
-	struct tm cur_time;
+	struct tm cur_time, macref;
 	uint32_t seconds;
 
 	if (m_time_was_set)
@@ -172,10 +169,19 @@ void rtc3430042_device::rtc_clock_updated(int year, int month, int day, int day_
 		cur_time.tm_year = year+100;    // assumes post-2000 current system time
 		cur_time.tm_isdst = 0;
 
-		seconds = (uint32_t)((uint32_t)mktime(&cur_time) - mac_reference);
+		macref.tm_sec = 0;
+		macref.tm_min = 0;
+		macref.tm_hour = 0;
+		macref.tm_mday = 1;
+		macref.tm_mon = 0;
+		macref.tm_year = 4;
+		macref.tm_isdst = 0;
+		uint32_t ref = (uint32_t)mktime(&macref);
+
+		seconds = (uint32_t)((uint32_t)mktime(&cur_time) - ref);
 	}
 
-	LOGMASKED(LOG_GENERAL, "second count 0x%lX\n", (unsigned long) seconds);
+	LOG("second count 0x%lX\n", (unsigned long) seconds);
 
 	m_seconds[0] = seconds & 0xff;
 	m_seconds[1] = (seconds >> 8) & 0xff;
@@ -184,7 +190,7 @@ void rtc3430042_device::rtc_clock_updated(int year, int month, int day, int day_
 }
 
 /* write the chip enable state */
-WRITE_LINE_MEMBER( rtc3430042_device::ce_w )
+void rtc3430042_device::ce_w(int state)
 {
 	if (state && (! m_rTCEnb))
 	{
@@ -204,7 +210,7 @@ WRITE_LINE_MEMBER( rtc3430042_device::ce_w )
 	m_rTCEnb = state;
 }
 
-WRITE_LINE_MEMBER( rtc3430042_device::clk_w )
+void rtc3430042_device::clk_w(int state)
 {
 	if ((!state) && (m_rTCClk))
 	{
@@ -214,12 +220,12 @@ WRITE_LINE_MEMBER( rtc3430042_device::clk_w )
 	m_rTCClk = state;
 }
 
-READ_LINE_MEMBER( rtc3430042_device::data_r )
+int rtc3430042_device::data_r()
 {
 	return m_data_out;
 }
 
-WRITE_LINE_MEMBER( rtc3430042_device::data_w )
+void rtc3430042_device::data_w(int state)
 {
 	m_data_latch = state;
 }
@@ -237,7 +243,7 @@ void rtc3430042_device::rtc_shift_data(int data)
 	if (m_data_dir)
 	{
 		m_data_out = (m_data_byte >> --m_bit_count) & 0x01;
-		LOGMASKED(LOG_GENERAL, "RTC shifted new data %d\n", m_data_out);
+		LOG("RTC shifted new data %d\n", m_data_out);
 	}
 	else
 	{

@@ -100,15 +100,15 @@ void tms2100_cpu_device::device_start()
 	m_int_pin = 0;
 	m_ec1_pin = 0;
 
-	m_pb_save = 0;
-	m_cb_save = 0;
-	m_a_save = 0;
-	m_ac2_save = 0;
-	m_x_save = 0;
-	m_y_save = 0;
-	m_s_save = 0;
-	m_sl_save = 0;
-	m_o_save = 0;
+	m_pb_stack = 0;
+	m_cb_stack = 0;
+	m_a_stack = 0;
+	m_ac2_stack = 0;
+	m_x_stack = 0;
+	m_y_stack = 0;
+	m_s_stack = 0;
+	m_sl_stack = 0;
+	m_o_stack = 0;
 
 	// register for savestates
 	save_item(NAME(m_ac2));
@@ -120,15 +120,15 @@ void tms2100_cpu_device::device_start()
 	save_item(NAME(m_int_pin));
 	save_item(NAME(m_ec1_pin));
 
-	save_item(NAME(m_pb_save));
-	save_item(NAME(m_cb_save));
-	save_item(NAME(m_a_save));
-	save_item(NAME(m_ac2_save));
-	save_item(NAME(m_x_save));
-	save_item(NAME(m_y_save));
-	save_item(NAME(m_s_save));
-	save_item(NAME(m_sl_save));
-	save_item(NAME(m_o_save));
+	save_item(NAME(m_pb_stack));
+	save_item(NAME(m_cb_stack));
+	save_item(NAME(m_a_stack));
+	save_item(NAME(m_ac2_stack));
+	save_item(NAME(m_x_stack));
+	save_item(NAME(m_y_stack));
+	save_item(NAME(m_s_stack));
+	save_item(NAME(m_sl_stack));
+	save_item(NAME(m_o_stack));
 
 	state_add(++m_state_count, "AC2", m_ac2).formatstr("%01X"); // 9
 }
@@ -215,15 +215,15 @@ void tms2100_cpu_device::read_opcode()
 		m_il = 0;
 
 		// restore registers
-		m_pb = m_pb_save;
-		m_cb = m_cb_save;
-		m_a = m_a_save;
-		m_ac2 = m_ac2_save;
-		m_x = m_x_save;
-		m_y = m_y_save;
-		m_status = m_s_save;
-		m_status_latch = m_sl_save;
-		write_o_reg(m_o_save);
+		m_pb = m_pb_stack;
+		m_cb = m_cb_stack;
+		m_a = m_a_stack;
+		m_ac2 = m_ac2_stack;
+		m_x = m_x_stack;
+		m_y = m_y_stack;
+		m_status = m_s_stack;
+		m_status_latch = m_sl_stack;
+		write_o_reg(m_o_stack);
 	}
 
 	// interrupt pending (blocked during jump opcodes)
@@ -247,17 +247,17 @@ void tms2100_cpu_device::interrupt()
 	standard_irq_callback(0, m_rom_address);
 
 	// save registers
-	m_pb_save = m_pb;
-	m_cb_save = m_cb;
-	m_a_save = m_a;
-	m_ac2_save = m_ac2;
-	m_x_save = m_x;
-	m_y_save = m_y;
-	m_s_save = m_status;
-	m_sl_save = m_status_latch;
-	m_o_save = m_o_index;
+	m_pb_stack = m_pb;
+	m_cb_stack = m_cb;
+	m_a_stack = m_a;
+	m_ac2_stack = m_ac2;
+	m_x_stack = m_x;
+	m_y_stack = m_y;
+	m_s_stack = m_status;
+	m_sl_stack = m_status_latch;
+	m_o_stack = m_o_index;
 
-	// insert CALL to 0
+	// insert CALL to 0 on page 0
 	m_opcode = 0xc0;
 	m_c4 = 0;
 	m_fixed = m_fixed_decode[m_opcode];

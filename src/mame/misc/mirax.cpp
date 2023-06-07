@@ -153,12 +153,12 @@ private:
 	uint8_t m_flipscreen_y = 0;
 
 	void audio_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
+	void nmi_mask_w(int state);
 	void sound_cmd_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter0_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter1_w);
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
+	void coin_counter0_w(int state);
+	void coin_counter1_w(int state);
+	void flip_screen_x_w(int state);
+	void flip_screen_y_w(int state);
 	void ay1_sel(uint8_t data);
 	void ay2_sel(uint8_t data);
 
@@ -168,7 +168,7 @@ private:
 	void draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t draw_flag);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	void mirax_main_map(address_map &map);
 	void mirax_sound_map(address_map &map);
 };
@@ -289,7 +289,7 @@ void mirax_state::ay2_sel(uint8_t data)
 	m_ay[1]->data_w(data);
 }
 
-WRITE_LINE_MEMBER(mirax_state::nmi_mask_w)
+void mirax_state::nmi_mask_w(int state)
 {
 	m_nmi_mask = state;
 	if (!m_nmi_mask)
@@ -303,22 +303,22 @@ void mirax_state::sound_cmd_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(mirax_state::coin_counter0_w)
+void mirax_state::coin_counter0_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(mirax_state::coin_counter1_w)
+void mirax_state::coin_counter1_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-WRITE_LINE_MEMBER(mirax_state::flip_screen_x_w)
+void mirax_state::flip_screen_x_w(int state)
 {
 	m_flipscreen_x = state;
 }
 
-WRITE_LINE_MEMBER(mirax_state::flip_screen_y_w)
+void mirax_state::flip_screen_y_w(int state)
 {
 	m_flipscreen_y = state;
 }
@@ -467,7 +467,7 @@ static GFXDECODE_START( gfx_mirax )
 GFXDECODE_END
 
 
-WRITE_LINE_MEMBER(mirax_state::vblank_irq)
+void mirax_state::vblank_irq(int state)
 {
 	if (state && m_nmi_mask)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);

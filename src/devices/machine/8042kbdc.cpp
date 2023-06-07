@@ -22,8 +22,10 @@
 #define PS2_MOUSE_ON    1
 #define KEYBOARD_ON     1
 
-#define LOG_KEYBOARD    0
-#define LOG_ACCESSES    0
+#define LOG_KEYBOARD    (1U << 1)
+#define LOG_ACCESSES    (1U << 2)
+#define VERBOSE (0)
+#include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(KBDC8042, kbdc8042_device, "kbdc8042", "8042 Keyboard/Mouse Controller")
 
@@ -114,7 +116,7 @@ void kbdc8042_device::at_8042_set_outport(uint8_t data, int initial)
 	}
 }
 
-WRITE_LINE_MEMBER( kbdc8042_device::keyboard_w )
+void kbdc8042_device::keyboard_w(int state)
 {
 	if(state)
 		at_8042_check_keyboard();
@@ -122,8 +124,7 @@ WRITE_LINE_MEMBER( kbdc8042_device::keyboard_w )
 
 void kbdc8042_device::at_8042_receive(uint8_t data, bool mouse)
 {
-	if (LOG_KEYBOARD)
-		logerror("at_8042_receive Received 0x%02x\n", data);
+	LOGMASKED(LOG_KEYBOARD, "at_8042_receive Received 0x%02x\n", data);
 
 	m_data = data;
 	if(!(m_speaker & 0x80) || mouse)
@@ -213,8 +214,7 @@ void kbdc8042_device::at_8042_clear_keyboard_received()
 {
 	if (m_keyboard.received)
 	{
-		if (LOG_KEYBOARD)
-			logerror("kbdc8042_8_r(): Clearing m_keyboard.received\n");
+		LOGMASKED(LOG_KEYBOARD, "kbdc8042_8_r(): Clearing m_keyboard.received\n");
 	}
 
 	m_input_buffer_full_cb(0);
@@ -335,8 +335,7 @@ uint8_t kbdc8042_device::data_r(offs_t offset)
 		break;
 	}
 
-	if (LOG_ACCESSES)
-		logerror("kbdc8042_8_r(): offset=%d data=0x%02x\n", offset, (unsigned) data);
+	LOGMASKED(LOG_ACCESSES, "kbdc8042_8_r(): offset=%d data=0x%02x\n", offset, (unsigned) data);
 	return data;
 }
 
@@ -591,7 +590,7 @@ void kbdc8042_device::data_w(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(kbdc8042_device::write_out2)
+void kbdc8042_device::write_out2(int state)
 {
 	m_out2 = state;
 }

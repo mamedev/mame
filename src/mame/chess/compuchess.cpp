@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Peter Trauner, Wilbert Pol, hap
 // thanks-to:Sean Riddle, Berger
-/******************************************************************************
+/*******************************************************************************
 
 DCS CompuChess / Novag Chess Champion MK I
 Initial driver version by PeT mess@utanet.at 2000,2001.
@@ -18,7 +18,7 @@ BTANB:
 - digits may flash briefly after entering a command, eg. the "b" or "P" digit
   after setting board preset, this happens on the real device
 
-===============================================================================
+================================================================================
 
 DataCash Systems's CompuChess released mid-1977. One of the first chess
 computers, the first one being Fidelity Chess Challenger (fidelity/cc1.cpp)
@@ -36,7 +36,7 @@ and Mostek MK3853N. The MCU speed was also confirmed with move calculation time.
 2nd edition added 3 new game modes: E for "Game of Knights", F for "Amazon Queen",
 and G for "Survival".
 
-===============================================================================
+================================================================================
 
 The game underneath CompuChess is better known as Novag's MK I, it was an
 unlicensed clone. The ROM is identical. DCS sued JS&A / Novag Industries for
@@ -87,7 +87,7 @@ MK I hardware description:
 - Hardware addressing is controlled by a HBF4001AE.
 - No speaker.
 
-===============================================================================
+================================================================================
 
 Conic Computer Chess (aka Master I in Germany) is also based on DCS CompuChess,
 this time the 2nd edition. Conic have done a few changes, not enough to hide that
@@ -100,7 +100,7 @@ Hardware notes:
 
 "bP" buttons are F, G, H (instead of A, B, C)
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 #include "cpu/f8/f8.h"
@@ -217,9 +217,9 @@ void cmpchess_state::update_cpu_freq(ioport_value state)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void cmpchess_state::update_display()
 {
@@ -289,9 +289,9 @@ u8 cmpchess_state::beeper_r(offs_t offset)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void cmpchess_state::main_map(address_map &map)
 {
@@ -323,9 +323,9 @@ void cmpchess_state::cncchess_io(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( cmpchess )
 	PORT_START("IN.0")
@@ -399,13 +399,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void cmpchess_state::cmpchess(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	F8(config, m_maincpu, 2_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cmpchess_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &cmpchess_state::main_io);
@@ -414,7 +414,7 @@ void cmpchess_state::cmpchess(machine_config &config)
 	f3853_device &smi(F3853(config, "smi", 2_MHz_XTAL));
 	smi.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 8+1);
 	m_display->set_segmask(0xf, 0xff);
 	config.set_default_layout(layout_cmpchess);
@@ -427,7 +427,7 @@ void cmpchess_state::cmpchess2(machine_config &config)
 {
 	cmpchess(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_clock(3.579545_MHz_XTAL);
 	subdevice<f3853_device>("smi")->set_clock(3.579545_MHz_XTAL);
 }
@@ -436,7 +436,7 @@ void cmpchess_state::mk1(machine_config &config)
 {
 	cmpchess(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_clock(2250000); // see notes
 	subdevice<f3853_device>("smi")->set_clock(2250000);
 
@@ -447,7 +447,7 @@ void cmpchess_state::cncchess(machine_config &config)
 {
 	cmpchess2(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_clock(2000000); // LC circuit, measured 2MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &cmpchess_state::cncchess_map);
 	m_maincpu->set_addrmap(AS_IO, &cmpchess_state::cncchess_io);
@@ -456,7 +456,7 @@ void cmpchess_state::cncchess(machine_config &config)
 
 	config.set_default_layout(layout_conic_cchess);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	BEEP(config, m_beeper, 2000); // wrong, see TODO
 	m_beeper->add_route(ALL_OUTPUTS, "speaker", 0.25);
@@ -465,9 +465,9 @@ void cmpchess_state::cncchess(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( cmpchess )
 	ROM_REGION( 0x0800, "maincpu", 0 )
@@ -495,14 +495,14 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME       PARENT   CMP MACHINE    INPUT     STATE           INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1977, cmpchess,  0,        0, cmpchess,  cmpchess, cmpchess_state, empty_init, "DataCash Systems / Staid", "CompuChess", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka CompuChess I
-CONS( 1978, cmpchess2, 0,        0, cmpchess2, cmpchess, cmpchess_state, empty_init, "DataCash Systems / Staid", "CompuChess: The Second Edition", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1977, cmpchess,  0,        0,      cmpchess,  cmpchess, cmpchess_state, empty_init, "DataCash Systems / Staid", "CompuChess", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka CompuChess I
+SYST( 1978, cmpchess2, 0,        0,      cmpchess2, cmpchess, cmpchess_state, empty_init, "DataCash Systems / Staid", "CompuChess: The Second Edition", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1978, ccmk1,     cmpchess, 0, mk1,       mk1,      cmpchess_state, empty_init, "bootleg (Novag)", "Chess Champion: MK I", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1978, ccmk1,     cmpchess, 0,      mk1,       mk1,      cmpchess_state, empty_init, "bootleg (Novag)", "Chess Champion: MK I", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, cncchess,  0,        0, cncchess,  cncchess, cmpchess_state, empty_init, "Conic", "Computer Chess (Conic, model 7011)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, cncchess,  0,        0,      cncchess,  cncchess, cmpchess_state, empty_init, "Conic", "Computer Chess (Conic, model 7011)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

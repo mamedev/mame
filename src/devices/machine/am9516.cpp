@@ -24,7 +24,6 @@
 #include "emu.h"
 #include "am9516.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_REGR    (1U << 1)
 #define LOG_REGW    (1U << 2)
 #define LOG_COMMAND (1U << 3)
@@ -498,13 +497,13 @@ void am9516_device::command(u8 data)
 	}
 }
 
-WRITE_LINE_MEMBER(am9516_device::eop_w)
+void am9516_device::eop_w(int state)
 {
 	LOGMASKED(LOG_DMA, "eop %s\n", state ? "cleared" : "asserted");
 	m_eop_in_state = !state;
 }
 
-template <unsigned Channel> WRITE_LINE_MEMBER(am9516_device::dreq_w)
+template <unsigned Channel> void am9516_device::dreq_w(int state)
 {
 	LOGMASKED(LOG_DMA, "channel %d dreq %s\n", Channel, state ? "cleared" : "asserted");
 	channel &ch = m_channel[Channel];

@@ -7,7 +7,7 @@
 
 #include "screen.h"
 
-#define LOG_DEBUG     (1U <<  1)
+#define LOG_DEBUG     (1U << 1)
 
 //#define VERBOSE (LOG_DEBUG)
 #include "logmacro.h"
@@ -25,6 +25,11 @@ static constexpr int EP1C_FRAME_DURATION_NANOSEC = 16666666;
 static constexpr int EP1C_DRAW_OPERATION_SIZE_BYTES = 20;
 static constexpr int EP1C_CLIP_OPERATION_SIZE_BYTES = 2;
 
+// When looking at VRAM viewer in Special mode in Muchi Muchi Pork, draws 32 pixels outside of
+// the "clip area" is visible. This is likely why the frame buffers will have at least a 32 pixel offset
+// from the VRAM borders or other buffers in all games.
+static constexpr int EP1C_CLIP_MARGIN = 32;
+
 epic12_device::epic12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, EPIC12, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
@@ -37,15 +42,13 @@ epic12_device::epic12_device(const machine_config &mconfig, const char *tag, dev
 	m_blitter_delay_timer = nullptr;
 	m_blitter_busy = 0;
 	m_gfx_addr = 0;
-	m_gfx_scroll_0_x = 0;
-	m_gfx_scroll_0_y = 0;
-	m_gfx_scroll_1_x = 0;
-	m_gfx_scroll_1_y = 0;
+	m_gfx_scroll_x = 0;
+	m_gfx_scroll_y = 0;
+	m_gfx_clip_x = 0;
+	m_gfx_clip_y = 0;
 	m_gfx_addr_shadowcopy = 0;
-	m_gfx_scroll_0_x_shadowcopy = 0;
-	m_gfx_scroll_0_y_shadowcopy = 0;
-	m_gfx_scroll_1_x_shadowcopy = 0;
-	m_gfx_scroll_1_y_shadowcopy = 0;
+	m_gfx_clip_x_shadowcopy = 0;
+	m_gfx_clip_y_shadowcopy = 0;
 	m_blit_delay_ns = 0;
 	m_blit_idle_op_bytes = 0;
 }
@@ -84,15 +87,13 @@ void epic12_device::device_start()
 	m_firmware_version = -1;
 
 	save_item(NAME(m_gfx_addr));
-	save_item(NAME(m_gfx_scroll_0_x));
-	save_item(NAME(m_gfx_scroll_0_y));
-	save_item(NAME(m_gfx_scroll_1_x));
-	save_item(NAME(m_gfx_scroll_1_y));
+	save_item(NAME(m_gfx_scroll_x));
+	save_item(NAME(m_gfx_scroll_y));
+	save_item(NAME(m_gfx_clip_x));
+	save_item(NAME(m_gfx_clip_y));
 	save_item(NAME(m_gfx_addr_shadowcopy));
-	save_item(NAME(m_gfx_scroll_0_x_shadowcopy));
-	save_item(NAME(m_gfx_scroll_0_y_shadowcopy));
-	save_item(NAME(m_gfx_scroll_1_x_shadowcopy));
-	save_item(NAME(m_gfx_scroll_1_y_shadowcopy));
+	save_item(NAME(m_gfx_clip_x_shadowcopy));
+	save_item(NAME(m_gfx_clip_y_shadowcopy));
 	save_pointer(NAME(m_ram16_copy), m_main_ramsize/2);
 	save_item(NAME(*m_bitmaps));
 	save_item(NAME(m_firmware_pos));
@@ -366,7 +367,7 @@ inline u16 calculate_vram_accesses(u16 start_x, u16 start_y, u16 dimx, u16 dimy)
 	{
 		num_vram_rows += x_rows;
 		if (((start_y & 31) + std::min(32, y_pixels)) > 32)
-			num_vram_rows += x_rows;  // Drawing across multiple vertical VRAM row boundaries.	
+			num_vram_rows += x_rows;  // Drawing across multiple vertical VRAM row boundaries.
 	}
 	return num_vram_rows;
 }
@@ -412,7 +413,7 @@ inline void epic12_device::gfx_draw_shadow_copy(address_space &space, offs_t *ad
 	COPY_NEXT_WORD(space, addr);
 	u16 src_x_start = COPY_NEXT_WORD(space, addr);
 	u16 src_y_start = COPY_NEXT_WORD(space, addr);
-	u16 dst_x_start = COPY_NEXT_WORD(space, addr); 
+	u16 dst_x_start = COPY_NEXT_WORD(space, addr);
 	u16 dst_y_start = COPY_NEXT_WORD(space, addr);
 	u16 src_dimx = (COPY_NEXT_WORD(space, addr) & 0x1fff) + 1;
 	u16 src_dimy = (COPY_NEXT_WORD(space, addr) & 0x0fff) + 1;
@@ -424,7 +425,7 @@ inline void epic12_device::gfx_draw_shadow_copy(address_space &space, offs_t *ad
 	// by asserting BREQ on the SH3 and then reading from Main RAM.
 	// Since the reads are done concurrently to executions of operations, its
 	// ok to estimate the delay all at once instead for emulation purposes.
-	
+
 	u16 dst_x_end = dst_x_start + src_dimx - 1;
 	u16 dst_y_end = dst_y_start + src_dimy - 1;
 
@@ -435,15 +436,27 @@ inline void epic12_device::gfx_draw_shadow_copy(address_space &space, offs_t *ad
 		return;
 	}
 
+	// Clip the blitter operations, to have the calculations only respect the area being written.
+	// It's not 100% clear this is how this is performed, but it is clear that there should be some amount of clipping
+	// applied here to match the hardware. This way seems most likely, and maps well to the delays seen on hardware.
+	// One example of this being utilized heavily is the transparent fog in Mushihimesama Futari Stage 1. This is drawn as
+	// 256x256 sprites, with large parts clipped away.
+	dst_x_start = std::max(dst_x_start, (u16)m_clip.min_x);
+	dst_y_start = std::max(dst_y_start, (u16)m_clip.min_y);
+	dst_x_end = std::min(dst_x_end, (u16)m_clip.max_x);
+	dst_y_end = std::min(dst_y_end, (u16)m_clip.max_y);
+	src_dimx = dst_x_end - dst_x_start + 1;
+	src_dimy = dst_y_end - dst_y_start + 1;
+
 	m_blit_idle_op_bytes = 0;  // Blitter no longer idle.
-	
-	// VRAM data is laid out in 32x32 pixel rows. Calculate amount of rows accessed. 
+
+	// VRAM data is laid out in 32x32 pixel rows. Calculate amount of rows accessed.
 	int src_num_vram_rows = calculate_vram_accesses(src_x_start, src_y_start, src_dimx, src_dimy);
 	int dst_num_vram_rows = calculate_vram_accesses(dst_x_start, dst_y_start, src_dimx, src_dimy);
 
 	// Since draws are done 4 pixels at the time, extend the draw area to coordinates aligned for this.
 	// Doing this after VRAM calculations simplify things a bit, and these extensions will never make the
-	// destination area span additional VRAM rows. 
+	// destination area span additional VRAM rows.
 	dst_x_start -= dst_x_start & 3;
 	dst_x_end += (4 - ((dst_x_end + 1) & 3)) & 3;
 	u16 dst_dimx = dst_x_end - dst_x_start + 1;
@@ -459,7 +472,7 @@ inline void epic12_device::gfx_draw_shadow_copy(address_space &space, offs_t *ad
 	//   - 11 CLK of overhead after each write to a destination VRAM row.
 	// - 12 CLK of additional overhead per sprite at the end of writing.
 	// Note: Details are from https://buffis.com/docs/CV1000_Blitter_Research_by_buffi.pdf
-	//       There may be mistakes.	
+	//       There may be mistakes.
 	u32 num_vram_clk = src_dimx * src_dimy / 4 + dst_dimx * dst_dimy / 2 + src_num_vram_rows * 6 + dst_num_vram_rows * (20 + 11) + 12;
 	m_blit_delay_ns += num_vram_clk * EP1C_VRAM_CLK_NANOSEC;
 }
@@ -676,10 +689,8 @@ void epic12_device::gfx_create_shadow_copy(address_space &space)
 {
 	offs_t addr = m_gfx_addr & 0x1fffffff;
 
-	// TODO: Stop respecting this clipping area in draw operations not fully outside of it.
-	// For Muchi Muchi Pork, it looks like it draws 32px around visible area, when checking in Special Mode test menu VRAM viewer.
-	// Draws outside of clip area is also visible in logic analyzer for Pink Sweets.
-	m_clip.set(m_gfx_scroll_1_x_shadowcopy, m_gfx_scroll_1_x_shadowcopy + 320-1, m_gfx_scroll_1_y_shadowcopy, m_gfx_scroll_1_y_shadowcopy + 240-1);
+	m_clip.set(m_gfx_clip_x_shadowcopy - EP1C_CLIP_MARGIN, m_gfx_clip_x_shadowcopy + 320 - 1 + EP1C_CLIP_MARGIN,
+		m_gfx_clip_y_shadowcopy - EP1C_CLIP_MARGIN, m_gfx_clip_y_shadowcopy + 240 - 1 + EP1C_CLIP_MARGIN);
 	while (1)
 	{
 		// request commands from main CPU RAM
@@ -693,7 +704,8 @@ void epic12_device::gfx_create_shadow_copy(address_space &space)
 
 			case 0xc000:
 				if (COPY_NEXT_WORD(space, &addr)) // cliptype
-					m_clip.set(m_gfx_scroll_1_x_shadowcopy, m_gfx_scroll_1_x_shadowcopy + 320 - 1, m_gfx_scroll_1_y_shadowcopy, m_gfx_scroll_1_y_shadowcopy + 240 - 1);
+					m_clip.set(m_gfx_clip_x_shadowcopy - EP1C_CLIP_MARGIN, m_gfx_clip_x_shadowcopy + 320 - 1 + EP1C_CLIP_MARGIN,
+						m_gfx_clip_y_shadowcopy - EP1C_CLIP_MARGIN, m_gfx_clip_y_shadowcopy + 240 - 1 + EP1C_CLIP_MARGIN);
 				else
 					m_clip.set(0, 0x2000 - 1, 0, 0x1000 - 1);
 				idle_blitter(EP1C_CLIP_OPERATION_SIZE_BYTES);
@@ -720,7 +732,8 @@ void epic12_device::gfx_create_shadow_copy(address_space &space)
 void epic12_device::gfx_exec(void)
 {
 	offs_t addr = m_gfx_addr_shadowcopy & 0x1fffffff;
-	m_clip.set(m_gfx_scroll_1_x_shadowcopy, m_gfx_scroll_1_x_shadowcopy + 320 - 1, m_gfx_scroll_1_y_shadowcopy, m_gfx_scroll_1_y_shadowcopy + 240 - 1);
+	m_clip.set(m_gfx_clip_x_shadowcopy - EP1C_CLIP_MARGIN, m_gfx_clip_x_shadowcopy + 320 - 1 + EP1C_CLIP_MARGIN,
+		m_gfx_clip_y_shadowcopy - EP1C_CLIP_MARGIN, m_gfx_clip_y_shadowcopy + 240 - 1 + EP1C_CLIP_MARGIN);
 
 //  logerror("GFX EXEC: %08X\n", addr);
 
@@ -737,7 +750,8 @@ void epic12_device::gfx_exec(void)
 
 			case 0xc000:
 				if (READ_NEXT_WORD(&addr)) // cliptype
-					m_clip.set(m_gfx_scroll_1_x_shadowcopy, m_gfx_scroll_1_x_shadowcopy + 320 - 1, m_gfx_scroll_1_y_shadowcopy, m_gfx_scroll_1_y_shadowcopy + 240 - 1);
+					m_clip.set(m_gfx_clip_x_shadowcopy - EP1C_CLIP_MARGIN, m_gfx_clip_x_shadowcopy + 320 - 1 + EP1C_CLIP_MARGIN,
+						m_gfx_clip_y_shadowcopy - EP1C_CLIP_MARGIN, m_gfx_clip_y_shadowcopy + 240 - 1 + EP1C_CLIP_MARGIN);
 				else
 					m_clip.set(0, 0x2000 - 1, 0, 0x1000 - 1);
 				break;
@@ -789,15 +803,13 @@ void epic12_device::gfx_exec_w(address_space &space, offs_t offset, u32 data, u3
 				osd_work_item_release(m_blitter_request);
 			}
 
-			m_gfx_scroll_0_x_shadowcopy = m_gfx_scroll_0_x;
-			m_gfx_scroll_0_y_shadowcopy = m_gfx_scroll_0_y;
-			m_gfx_scroll_1_x_shadowcopy = m_gfx_scroll_1_x;
-			m_gfx_scroll_1_y_shadowcopy = m_gfx_scroll_1_y;
+			m_gfx_clip_x_shadowcopy = m_gfx_clip_x;
+			m_gfx_clip_y_shadowcopy = m_gfx_clip_y;
 
 			// Create a copy of the blit list so we can safely thread it.
 			// Copying the Blitter operations will also estimate the delay needed for processing.
 			m_blit_delay_ns = 0;
-			gfx_create_shadow_copy(space); 
+			gfx_create_shadow_copy(space);
 
 			// Every EP1C_VRAM_H_LINE_PERIOD_NANOSEC, the Blitter will block other operations, due
 			// to fetching a horizontal line from VRAM for output.
@@ -830,8 +842,6 @@ void epic12_device::draw_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		osd_work_item_release(m_blitter_request);
 	}
 
-	int scroll_0_x, scroll_0_y;
-
 	bitmap.fill(0, cliprect);
 
 #if DEBUG_VRAM_VIEWER
@@ -854,8 +864,8 @@ void epic12_device::draw_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	}
 #endif
 
-	scroll_0_x = -m_gfx_scroll_0_x;
-	scroll_0_y = -m_gfx_scroll_0_y;
+	int scroll_x = -m_gfx_scroll_x;
+	int scroll_y = -m_gfx_scroll_y;
 
 
 #if DEBUG_VRAM_VIEWER
@@ -863,7 +873,7 @@ void epic12_device::draw_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		copybitmap(bitmap, *m_bitmaps, 0, 0, 0, 0, cliprect);
 	else
 #endif
-		copyscrollbitmap(bitmap, *m_bitmaps, 1, &scroll_0_x, 1, &scroll_0_y, cliprect);
+		copyscrollbitmap(bitmap, *m_bitmaps, 1, &scroll_x, 1, &scroll_y, cliprect);
 }
 
 
@@ -904,11 +914,11 @@ void epic12_device::blitter_w(address_space &space, offs_t offset, u32 data, u32
 			break;
 
 		case 0x14:
-			COMBINE_DATA(&m_gfx_scroll_0_x);
+			COMBINE_DATA(&m_gfx_scroll_x);
 			break;
 
 		case 0x18:
-			COMBINE_DATA(&m_gfx_scroll_0_y);
+			COMBINE_DATA(&m_gfx_scroll_y);
 			break;
 
 		case 0x24:  // Some sort of handshake at start of IRQ's.
@@ -920,11 +930,11 @@ void epic12_device::blitter_w(address_space &space, offs_t offset, u32 data, u32
 			break;
 
 		case 0x40:
-			COMBINE_DATA(&m_gfx_scroll_1_x);
+			COMBINE_DATA(&m_gfx_clip_x);
 			break;
 
 		case 0x44:
-			COMBINE_DATA(&m_gfx_scroll_1_y);
+			COMBINE_DATA(&m_gfx_clip_y);
 			break;
 
 	}

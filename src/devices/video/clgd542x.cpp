@@ -12,10 +12,10 @@
 #include "screen.h"
 
 
-#define LOG_REG 0
-#define LOG_BLIT 1
-
-#define CRTC_PORT_ADDR ((vga.miscellaneous_output&1)?0x3d0:0x3b0)
+#define LOG_REG  (1U << 1)
+#define LOG_BLIT (1U << 2)
+#define VERBOSE (0)
+#include "logmacro.h"
 
 //#define TEXT_LINES (LINES_HELPER)
 #define LINES (vga.crtc.vert_disp_end+1)
@@ -77,7 +77,6 @@ void cirrus_gd5428_device::device_start()
 	vga.crtc.maximum_scan_line = 1;
 
 	// copy over interfaces
-	vga.read_dipswitch.set(nullptr); //read_dipswitch;
 	vga.svga_intf.seq_regcount = 0x1f;
 	vga.svga_intf.crtc_regcount = 0x2d;
 	vga.memory = std::make_unique<uint8_t []>(vga.svga_intf.vram_size);
@@ -266,7 +265,7 @@ void cirrus_gd5428_device::start_bitblt()
 		return;
 	}
 
-	if(LOG_BLIT) logerror("CL: BitBLT started: Src: %06x Dst: %06x Width: %i Height %i ROP: %02x Mode: %02x\n",m_blt_source,m_blt_dest,m_blt_width,m_blt_height,m_blt_rop,m_blt_mode);
+	LOGMASKED(LOG_BLIT, "CL: BitBLT started: Src: %06x Dst: %06x Width: %i Height %i ROP: %02x Mode: %02x\n",m_blt_source,m_blt_dest,m_blt_width,m_blt_height,m_blt_rop,m_blt_mode);
 
 	m_blt_source_current = m_blt_source;
 	m_blt_dest_current = m_blt_dest;
@@ -341,7 +340,7 @@ void cirrus_gd5428_device::start_reverse_bitblt()
 {
 	uint32_t x,y;
 
-	if(LOG_BLIT) logerror("CL: Reverse BitBLT started: Src: %06x Dst: %06x Width: %i Height %i ROP: %02x Mode: %02x\n",m_blt_source,m_blt_dest,m_blt_width,m_blt_height,m_blt_rop,m_blt_mode);
+	LOGMASKED(LOG_BLIT, "CL: Reverse BitBLT started: Src: %06x Dst: %06x Width: %i Height %i ROP: %02x Mode: %02x\n",m_blt_source,m_blt_dest,m_blt_width,m_blt_height,m_blt_rop,m_blt_mode);
 
 	// Start at end of blit
 	m_blt_source_current = m_blt_source;
@@ -414,7 +413,7 @@ void cirrus_gd5428_device::start_reverse_bitblt()
 
 void cirrus_gd5428_device::start_system_bitblt()
 {
-	if(LOG_BLIT) logerror("CL: BitBLT from system memory started: Src: %06x Dst: %06x Width: %i Height %i ROP: %02x Mode: %02x\n",m_blt_source,m_blt_dest,m_blt_width,m_blt_height,m_blt_rop,m_blt_mode);
+	LOGMASKED(LOG_BLIT, "CL: BitBLT from system memory started: Src: %06x Dst: %06x Width: %i Height %i ROP: %02x Mode: %02x\n",m_blt_source,m_blt_dest,m_blt_width,m_blt_height,m_blt_rop,m_blt_mode);
 	m_blt_system_transfer = true;
 	m_blt_system_count = 0;
 	m_blt_system_buffer = 0;
@@ -579,7 +578,7 @@ uint8_t cirrus_gd5428_device::cirrus_seq_reg_read(uint8_t index)
 
 void cirrus_gd5428_device::cirrus_seq_reg_write(uint8_t index, uint8_t data)
 {
-	if(LOG_REG) logerror("CL: SEQ write %02x to SR%02x\n",data,index);
+	LOGMASKED(LOG_REG, "CL: SEQ write %02x to SR%02x\n",data,index);
 	switch(index)
 	{
 		case 0x02:
@@ -793,7 +792,7 @@ uint8_t cirrus_gd5428_device::cirrus_gc_reg_read(uint8_t index)
 
 void cirrus_gd5428_device::cirrus_gc_reg_write(uint8_t index, uint8_t data)
 {
-	if(LOG_REG) logerror("CL: GC write %02x to GR%02x\n",data,index);
+	LOGMASKED(LOG_REG, "CL: GC write %02x to GR%02x\n",data,index);
 	switch(index)
 	{
 	case 0x00:  // if extended writes are enabled (bit 2 of index 0bh), then index 0 and 1 are extended to 8 bits, however XFree86 does not appear to do this...
@@ -1016,7 +1015,7 @@ uint8_t cirrus_gd5428_device::port_03b0_r(offs_t offset)
 {
 	uint8_t res = 0xff;
 
-	if (CRTC_PORT_ADDR == 0x3b0)
+	if (get_crtc_port() == 0x3b0)
 	{
 		switch(offset)
 		{
@@ -1036,7 +1035,7 @@ uint8_t cirrus_gd5428_device::port_03d0_r(offs_t offset)
 {
 	uint8_t res = 0xff;
 
-	if (CRTC_PORT_ADDR == 0x3d0)
+	if (get_crtc_port() == 0x3d0)
 	{
 		switch(offset)
 		{
@@ -1054,7 +1053,7 @@ uint8_t cirrus_gd5428_device::port_03d0_r(offs_t offset)
 
 void cirrus_gd5428_device::port_03b0_w(offs_t offset, uint8_t data)
 {
-	if (CRTC_PORT_ADDR == 0x3b0)
+	if (get_crtc_port() == 0x3b0)
 	{
 		switch(offset)
 		{
@@ -1072,7 +1071,7 @@ void cirrus_gd5428_device::port_03b0_w(offs_t offset, uint8_t data)
 
 void cirrus_gd5428_device::port_03d0_w(offs_t offset, uint8_t data)
 {
-	if (CRTC_PORT_ADDR == 0x3d0)
+	if (get_crtc_port() == 0x3d0)
 	{
 		switch(offset)
 		{
@@ -1119,7 +1118,7 @@ uint8_t cirrus_gd5428_device::cirrus_crtc_reg_read(uint8_t index)
 
 void cirrus_gd5428_device::cirrus_crtc_reg_write(uint8_t index, uint8_t data)
 {
-	if(LOG_REG) logerror("CL: CRTC write %02x to CR%02x\n",data,index);
+	LOGMASKED(LOG_REG, "CL: CRTC write %02x to CR%02x\n",data,index);
 	switch(index)
 	{
 	case 0x16:  // VGA Vertical Blank end - some SVGA chipsets use all 8 bits, and this is one of them (according to MFGTST CRTC tests)
@@ -1155,28 +1154,17 @@ void cirrus_gd5428_device::cirrus_crtc_reg_write(uint8_t index, uint8_t data)
 
 }
 
-inline uint8_t cirrus_gd5428_device::cirrus_vga_latch_write(int offs, uint8_t data)
+uint8_t cirrus_gd5428_device::vga_latch_write(int offs, uint8_t data)
 {
 	uint8_t res = 0;
 	uint8_t mode_mask = (gc_mode_ext & 0x04) ? 0x07 : 0x03;
 
 	switch (vga.gc.write_mode & mode_mask) {
 	case 0:
-		data = rotate_right(data);
-		if(vga.gc.enable_set_reset & 1<<offs)
-			res = vga_logical_op((vga.gc.set_reset & 1<<offs) ? vga.gc.bit_mask : 0, offs,vga.gc.bit_mask);
-		else
-			res = vga_logical_op(data, offs, vga.gc.bit_mask);
-		break;
 	case 1:
-		res = vga.gc.latch[offs];
-		break;
 	case 2:
-		res = vga_logical_op((data & 1<<offs) ? 0xff : 0x00,offs,vga.gc.bit_mask);
-		break;
 	case 3:
-		data = rotate_right(data);
-		res = vga_logical_op((vga.gc.set_reset & 1<<offs) ? 0xff : 0x00,offs,data&vga.gc.bit_mask);
+		res = vga_device::vga_latch_write(offs, data);
 		break;
 	case 4:
 		res = vga.gc.latch[offs];
@@ -1495,11 +1483,11 @@ void cirrus_gd5428_device::mem_w(offs_t offset, uint8_t data)
 				{
 					if(gc_mode_ext & 0x02)
 					{
-						vga.memory[(((offset+addr) << 1)+i*0x10000) % vga.svga_intf.vram_size] = (vga.sequencer.data[4] & 4) ? cirrus_vga_latch_write(i,data) : data;
-						vga.memory[(((offset+addr) << 1)+i*0x10000+1) % vga.svga_intf.vram_size] = (vga.sequencer.data[4] & 4) ? cirrus_vga_latch_write(i,data) : data;
+						vga.memory[(((offset+addr) << 1)+i*0x10000) % vga.svga_intf.vram_size] = (vga.sequencer.data[4] & 4) ? vga_latch_write(i,data) : data;
+						vga.memory[(((offset+addr) << 1)+i*0x10000+1) % vga.svga_intf.vram_size] = (vga.sequencer.data[4] & 4) ? vga_latch_write(i,data) : data;
 					}
 					else
-						vga.memory[(((offset+addr))+i*0x10000) % vga.svga_intf.vram_size] = (vga.sequencer.data[4] & 4) ? cirrus_vga_latch_write(i,data) : data;
+						vga.memory[(((offset+addr))+i*0x10000) % vga.svga_intf.vram_size] = (vga.sequencer.data[4] & 4) ? vga_latch_write(i,data) : data;
 				}
 			}
 			return;

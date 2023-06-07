@@ -231,6 +231,9 @@ constexpr chd_metadata_tag GDROM_OLD_METADATA_TAG = CHD_MAKE_TAG('C','H','G','T'
 constexpr chd_metadata_tag GDROM_TRACK_METADATA_TAG = CHD_MAKE_TAG('C', 'H', 'G', 'D');
 extern const char *GDROM_TRACK_METADATA_FORMAT;
 
+// standard DVD metafata
+constexpr chd_metadata_tag DVD_METADATA_TAG = CHD_MAKE_TAG('D', 'V', 'D', ' ');
+
 // standard A/V metadata
 constexpr chd_metadata_tag AV_METADATA_TAG = CHD_MAKE_TAG('A','V','A','V');
 extern const char *AV_METADATA_FORMAT;
@@ -352,16 +355,23 @@ public:
 	// codec interfaces
 	std::error_condition codec_configure(chd_codec_type codec, int param, void *config);
 
+	// typing
+	bool is_hd() const;
+	bool is_cd() const;
+	bool is_gd() const;
+	bool is_dvd() const;
+	bool is_av() const;
+
 private:
 	struct metadata_entry;
 	struct metadata_hash;
 
 	// inline helpers
-	uint64_t be_read(const uint8_t *base, int numbytes);
+	uint64_t be_read(const uint8_t *base, int numbytes) const;
 	void be_write(uint8_t *base, uint64_t value, int numbytes);
-	util::sha1_t be_read_sha1(const uint8_t *base);
+	util::sha1_t be_read_sha1(const uint8_t *base) const;
 	void be_write_sha1(uint8_t *base, util::sha1_t value);
-	void file_read(uint64_t offset, void *dest, uint32_t length);
+	void file_read(uint64_t offset, void *dest, uint32_t length) const;
 	void file_write(uint64_t offset, const void *source, uint32_t length);
 	uint64_t file_append(const void *source, uint32_t length, uint32_t alignment = 0);
 	uint8_t bits_for_value(uint64_t value);
@@ -380,7 +390,7 @@ private:
 	void hunk_write_compressed(uint32_t hunknum, int8_t compression, const uint8_t *compressed, uint32_t complength, util::crc16_t crc16);
 	void hunk_copy_from_self(uint32_t hunknum, uint32_t otherhunk);
 	void hunk_copy_from_parent(uint32_t hunknum, uint64_t parentunit);
-	bool metadata_find(chd_metadata_tag metatag, int32_t metaindex, metadata_entry &metaentry, bool resume = false);
+	bool metadata_find(chd_metadata_tag metatag, int32_t metaindex, metadata_entry &metaentry, bool resume = false) const;
 	void metadata_set_previous_next(uint64_t prevoffset, uint64_t nextoffset);
 	void metadata_update_hash();
 	static int CLIB_DECL metadata_hash_compare(const void *elem1, const void *elem2);

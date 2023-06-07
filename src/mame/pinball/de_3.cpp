@@ -103,8 +103,8 @@ protected:
 private:
 	void de_bg_audio(machine_config &config);
 	void audio_map(address_map &map);
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(msm5205_irq_w);
+	void ym2151_irq_w(int state);
+	void msm5205_irq_w(int state);
 	uint8_t sound_latch_r();
 	void sample_bank_w(uint8_t data);
 	void sample_w(uint8_t data);
@@ -419,12 +419,12 @@ void de_3_state::lamps_w(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(de_3_state::ym2151_irq_w)
+void de_3_state::ym2151_irq_w(int state)
 {
 	m_audiocpu->set_input_line(M6809_IRQ_LINE,state);
 }
 
-WRITE_LINE_MEMBER(de_3_state::msm5205_irq_w)
+void de_3_state::msm5205_irq_w(int state)
 {
 	m_msm5205->data_w(m_sample_data >> 4);
 	if(m_more_data)
@@ -1429,6 +1429,20 @@ ROM_START(tmnt_101)
 	ROM_LOAD("tmntf4.rom", 0x20000, 0x20000, CRC(6c38cd84) SHA1(bbe8797fe1622cb8f0842c4d7159760fed080880))
 ROM_END
 
+ROM_START(tmnt_a07)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("tmntb5a.007", 0x4000, 0x4000, CRC(7314f444) SHA1(e18c46009b90d8671a1f15542eb882f391bd57db))
+	ROM_LOAD("tmntc5a.007", 0x8000, 0x8000, CRC(f0ec9ac0) SHA1(c7c70c1185dffa725fbba09aa1c5ea52cabbc4a5))
+	ROM_REGION(0x20000, "dmdcpu", 0)
+	ROM_LOAD("tmntdsp16.491", 0x00000, 0x10000, CRC(6ed5744e) SHA1(7d02ed19d3bc479386c58282826a3dc06999307f))
+	ROM_RELOAD(0x10000, 0x10000)
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("tmntf7.rom", 0x8000, 0x8000, CRC(59ba0153) SHA1(e7b02a656c67a0d866020a60ee90e30bef77f67f))
+	ROM_REGION(0x40000, "sound1", 0)
+	ROM_LOAD("tmntf6.rom", 0x00000, 0x20000, CRC(5668d45a) SHA1(65766cb47791ec0a2243015d487f1156a2819fe6))
+	ROM_LOAD("tmntf4.rom", 0x20000, 0x20000, CRC(6c38cd84) SHA1(bbe8797fe1622cb8f0842c4d7159760fed080880))
+ROM_END
+
 /*-------------------------------------------------------------
 / The Who's Tommy Pinball Wizard - CPU Rev 3b /DMD  Type 2 512K Rom - 64K CPU Rom
 /------------------------------------------------------------*/
@@ -2064,6 +2078,7 @@ GAME(1991,  tmnt_104,      0,        de_3_dmdo, de3, de_3_state, empty_init, ROT
 GAME(1991,  tmnt_104g,     tmnt_104, de_3_dmdo, de3, de_3_state, empty_init, ROT0, "Data East", "Teenage Mutant Ninja Turtles (Germany 1.04, display A1.04)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // T.M.N.T. GERMANY 1.04.
 GAME(1991,  tmnt_103,      tmnt_104, de_3_dmdo, de3, de_3_state, empty_init, ROT0, "Data East", "Teenage Mutant Ninja Turtles (1.03)",                                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // T.M.N.T. A 1.03
 GAME(1991,  tmnt_101,      tmnt_104, de_3_dmdo, de3, de_3_state, empty_init, ROT0, "Data East", "Teenage Mutant Ninja Turtles (1.01)",                                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // T.M.N.T. A 1.01
+GAME(1991,  tmnt_a07,      tmnt_104, de_3_dmdo, de3, de_3_state, empty_init, ROT0, "Data East", "Teenage Mutant Ninja Turtles (A 0.7 VUK prototype)",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // T.M.N.T. A 0.7 VUK
 GAME(1994,  tomy_400,      0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "The Who's Tommy Pinball Wizard (USA 4.00, display A4.00)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // TOMMY APRIL 6, 1994 USA CPU 4.00. DISPLAY VERSION- TOMMY A4.00 MAY 5, 1994
 GAME(1994,  tomy_301g,     tomy_400, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "The Who's Tommy Pinball Wizard (German 3.01, display G3.00)",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // TOMMY MARCH 22, 1994 GERMAN CPU 3.01. DISPLAY VERSION- TOMMY G3.00 FEBRUARY 16, 1994
 GAME(1994,  tomy_300h,     tomy_400, de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "The Who's Tommy Pinball Wizard (Dutch 3.00, display A3.00)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // TOMMY FEBRUARY 16, 1994 DUTCH CPU 3.00. DISPLAY VERSION- TOMMY A3.00 FEBRUARY 15, 1994
