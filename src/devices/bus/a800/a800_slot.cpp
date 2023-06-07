@@ -103,10 +103,10 @@ void device_a800_cart_interface::cctl_map(address_map &map)
 	map(0x0000, 0x00ff).unmaprw();
 }
 
-WRITE_LINE_MEMBER( device_a800_cart_interface::rd4_w ) { m_slot->m_rd4_cb(state); }
-WRITE_LINE_MEMBER( device_a800_cart_interface::rd5_w ) { m_slot->m_rd5_cb(state); }
+void device_a800_cart_interface::rd4_w(int state) { m_slot->m_rd4_cb(state); }
+void device_a800_cart_interface::rd5_w(int state) { m_slot->m_rd5_cb(state); }
 // helper to call both lines at same time, for anything banking on the full range.
-WRITE_LINE_MEMBER( device_a800_cart_interface::rd_both_w ) { rd4_w(state); rd5_w(state); }
+void device_a800_cart_interface::rd_both_w(int state) { rd4_w(state); rd5_w(state); }
 
 
 // a5200

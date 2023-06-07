@@ -38,8 +38,8 @@ private:
 	memory_view m_cart_view;
 
 	void subslot_config_access(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER( subcart_rd4_w );
-	DECLARE_WRITE_LINE_MEMBER( subcart_rd5_w );
+	void subcart_rd4_w( int state );
+	void subcart_rd5_w( int state );
 
 	bool m_subcart_enabled;
 	int m_subcart_rd4_enabled = 0, m_subcart_rd5_enabled = 0;

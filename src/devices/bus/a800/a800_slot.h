@@ -72,7 +72,7 @@ public:
 	/// Carts can either init RD4/RD5 at startup or not, depending on if they have
 	/// reset circuitry or not. Future expansion of this getter will return a third value,
 	/// giving back the timing value where the initialization should happen.
-	/// 
+	///
 	/// \return RD4, RD5 initial state
 	virtual std::tuple<int, int> get_initial_rd_state() { return std::make_tuple(0, 0); }
 
@@ -89,9 +89,9 @@ protected:
 	// helpers
 	int m_bank_mask;
 
-	DECLARE_WRITE_LINE_MEMBER( rd4_w );
-	DECLARE_WRITE_LINE_MEMBER( rd5_w );
-	DECLARE_WRITE_LINE_MEMBER( rd_both_w );
+	void rd4_w( int state );
+	void rd5_w( int state );
+	void rd_both_w ( int state );
 };
 
 

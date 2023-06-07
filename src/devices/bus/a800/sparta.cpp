@@ -44,7 +44,7 @@ static void spartados_carts(device_slot_interface &device)
 	a800_left(device);
 }
 
-WRITE_LINE_MEMBER( a800_rom_spartados_device::subcart_rd4_w )
+void a800_rom_spartados_device::subcart_rd4_w(int state)
 {
 	m_subcart_rd4_enabled = state;
 	if (m_subcart_enabled)
@@ -54,7 +54,7 @@ WRITE_LINE_MEMBER( a800_rom_spartados_device::subcart_rd4_w )
 	}
 }
 
-WRITE_LINE_MEMBER( a800_rom_spartados_device::subcart_rd5_w )
+void a800_rom_spartados_device::subcart_rd5_w(int state)
 {
 	m_subcart_rd5_enabled = state;
 	if (m_subcart_enabled)

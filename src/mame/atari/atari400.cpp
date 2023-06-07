@@ -19,7 +19,7 @@
     - a600xl, a1200xl: crashes on MMU test in Acid800;
     - slot support for PBI/ECI bus;
     - slot support for overlay DIY HW mods:
-      \- PokeyMAX 
+      \- PokeyMAX
          (with stereo support via second Pokey alias accessed to $d280-$d2ff,
          cfr. yoomp);
       \- Ultimate1MB;
@@ -340,8 +340,8 @@ protected:
 	void hw_iomap(address_map &map);
 
 	int m_cart_rd4_enabled = 0, m_cart_rd5_enabled = 0;
-	DECLARE_WRITE_LINE_MEMBER( cart_rd4_w );
-	DECLARE_WRITE_LINE_MEMBER( cart_rd5_w );
+	void cart_rd4_w( int state );
+	void cart_rd5_w( int state );
 
 	virtual void area_8000_map(address_map &map);
 	virtual void area_a000_map(address_map &map);
@@ -1699,13 +1699,13 @@ LIGHT-ORANGE
  *
  **************************************************************/
 
-WRITE_LINE_MEMBER( a400_state::cart_rd4_w )
+void a400_state::cart_rd4_w(int state)
 {
 	m_cart_rd4_enabled = state;
 	m_cart_rd4_view.select(m_cart_rd4_enabled);
 }
 
-WRITE_LINE_MEMBER( a400_state::cart_rd5_w )
+void a400_state::cart_rd5_w(int state)
 {
 	m_cart_rd5_enabled = state;
 	m_cart_rd5_view.select(m_cart_rd5_enabled);
@@ -1756,7 +1756,7 @@ void a400_state::machine_reset()
 	}
 	else
 		std::tie(m_cart_rd4_enabled, m_cart_rd5_enabled) = m_cartleft->get_initial_rd_state();
-	
+
 	m_cart_rd4_view.select(m_cart_rd4_enabled);
 	m_cart_rd5_view.select(m_cart_rd5_enabled);
 }
