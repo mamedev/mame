@@ -40,7 +40,6 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_oki(*this, "oki"),
 		m_dsw(*this, "DSW"),
-		m_extra_port(*this, "EXTRA"),
 		m_paletteram(*this, "paletteram%u", 1U),
 		m_x1_bank(*this, "x1_bank"),
 		m_oki_bank(*this, "oki_bank"),
@@ -110,7 +109,6 @@ protected:
 	optional_device<okim6295_device> m_oki;
 
 	optional_ioport m_dsw;
-	optional_ioport m_extra_port;
 
 	optional_shared_ptr_array<u16, 2> m_paletteram;
 
@@ -134,7 +132,6 @@ protected:
 	void blockcar_interrupt_w(u8 data);
 
 	void utoukond_sound_control_w(u8 data);
-	u16 extra_r();
 
 	void blandia_palette(palette_device &palette) const;
 	void zingzip_palette(palette_device &palette) const;
