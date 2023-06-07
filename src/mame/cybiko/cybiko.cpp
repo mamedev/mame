@@ -179,32 +179,6 @@ uint16_t cybiko_state::port0_r()
 }
 
 
-//////////////////////
-// ADDRESS MAP - IO //
-//////////////////////
-
-void cybiko_state::cybikov1_io(address_map &map)
-{
-	map(h8_device::PORT_3, h8_device::PORT_3).w(FUNC(cybiko_state::serflash_w));
-	map(h8_device::PORT_F, h8_device::PORT_F).rw(FUNC(cybiko_state::clock_r), FUNC(cybiko_state::clock_w));
-	map(h8_device::ADC_1, h8_device::ADC_1).r(FUNC(cybiko_state::adc1_r));
-	map(h8_device::ADC_2, h8_device::ADC_2).r(FUNC(cybiko_state::adc2_r));
-}
-
-void cybiko_state::cybikov2_io(address_map &map)
-{
-	map(h8_device::PORT_1, h8_device::PORT_1).r(FUNC(cybiko_state::port0_r));
-	map(h8_device::PORT_3, h8_device::PORT_3).w(FUNC(cybiko_state::serflash_w));
-	map(h8_device::PORT_F, h8_device::PORT_F).rw(FUNC(cybiko_state::clock_r), FUNC(cybiko_state::clock_w));
-	map(h8_device::ADC_1, h8_device::ADC_1).r(FUNC(cybiko_state::adc1_r));
-	map(h8_device::ADC_2, h8_device::ADC_2).r(FUNC(cybiko_state::adc2_r));
-}
-
-void cybiko_state::cybikoxt_io(address_map &map)
-{
-	map(h8_device::PORT_A, h8_device::PORT_A).r(FUNC(cybiko_state::xtpower_r));
-	map(h8_device::PORT_F, h8_device::PORT_F).rw(FUNC(cybiko_state::xtclock_r), FUNC(cybiko_state::xtclock_w));
-}
 
 /////////////////
 // INPUT PORTS //
@@ -439,9 +413,13 @@ void cybiko_state::cybikov1(machine_config &config)
 	cybikov1_base(config);
 
 	// cpu
-	H8S2241(config, m_maincpu, XTAL(11'059'200));
-	m_maincpu->set_addrmap(AS_PROGRAM, &cybiko_state::cybikov1_mem);
-	m_maincpu->set_addrmap(AS_IO, &cybiko_state::cybikov1_io);
+	auto &maincpu(H8S2241(config, m_maincpu, XTAL(11'059'200)));
+	maincpu.set_addrmap(AS_PROGRAM, &cybiko_state::cybikov1_mem);
+	maincpu.read_adc(1).set(FUNC(cybiko_state::adc1_r));
+	maincpu.read_adc(2).set(FUNC(cybiko_state::adc2_r));
+	maincpu.write_port3().set(FUNC(cybiko_state::serflash_w));
+	maincpu.read_portf().set(FUNC(cybiko_state::clock_r));
+	maincpu.write_portf().set(FUNC(cybiko_state::clock_w));
 
 	subdevice<h8_sci_device>("maincpu:sci1")->tx_handler().set("flash1", FUNC(at45db041_device::si_w));
 	subdevice<h8_sci_device>("maincpu:sci1")->clk_handler().set("flash1", FUNC(at45db041_device::sck_w));
@@ -457,9 +435,14 @@ void cybiko_state::cybikov2(machine_config &config)
 	cybikov1_flash(config);
 
 	// cpu
-	H8S2246(config, m_maincpu, XTAL(11'059'200));
-	m_maincpu->set_addrmap(AS_PROGRAM, &cybiko_state::cybikov2_mem);
-	m_maincpu->set_addrmap(AS_IO, &cybiko_state::cybikov2_io);
+	auto &maincpu(H8S2246(config, m_maincpu, XTAL(11'059'200)));
+	maincpu.set_addrmap(AS_PROGRAM, &cybiko_state::cybikov2_mem);
+	maincpu.read_adc(1).set(FUNC(cybiko_state::adc1_r));
+	maincpu.read_adc(2).set(FUNC(cybiko_state::adc2_r));
+	maincpu.read_port1().set(FUNC(cybiko_state::port0_r));
+	maincpu.write_port3().set(FUNC(cybiko_state::serflash_w));
+	maincpu.read_portf().set(FUNC(cybiko_state::clock_r));
+	maincpu.write_portf().set(FUNC(cybiko_state::clock_w));
 
 	subdevice<h8_sci_device>("maincpu:sci1")->tx_handler().set("flash1", FUNC(at45db041_device::si_w));
 	subdevice<h8_sci_device>("maincpu:sci1")->clk_handler().set("flash1", FUNC(at45db041_device::sck_w));
@@ -481,9 +464,11 @@ void cybiko_state::cybikoxt(machine_config &config)
 	cybikov1_base(config);
 
 	// cpu
-	H8S2323(config, m_maincpu, XTAL(18'432'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &cybiko_state::cybikoxt_mem);
-	m_maincpu->set_addrmap(AS_IO, &cybiko_state::cybikoxt_io);
+	auto &maincpu(H8S2323(config, m_maincpu, XTAL(18'432'000)));
+	maincpu.set_addrmap(AS_PROGRAM, &cybiko_state::cybikoxt_mem);
+	maincpu.read_porta().set(FUNC(cybiko_state::xtpower_r));
+	maincpu.read_portf().set(FUNC(cybiko_state::xtclock_r));
+	maincpu.write_portf().set(FUNC(cybiko_state::xtclock_w));
 
 	// machine
 	SST_39VF400A(config, "flashxt");

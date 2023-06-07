@@ -94,7 +94,6 @@ private:
 	void pc_w(u16 data);
 	u16 pc_r();
 
-	void mu50_iomap(address_map &map);
 	void mu50_map(address_map &map);
 
 	virtual void machine_start() override;
@@ -209,28 +208,26 @@ u16 mu50_state::pc_r()
 	return res;
 }
 
-
-void mu50_state::mu50_iomap(address_map &map)
-{
-	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(mu50_state::p6_r), FUNC(mu50_state::p6_w));
-	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(mu50_state::pa_r), FUNC(mu50_state::pa_w));
-	map(h8_device::PORT_B, h8_device::PORT_B).rw(FUNC(mu50_state::pb_r), FUNC(mu50_state::pb_w));
-	map(h8_device::PORT_C, h8_device::PORT_C).rw(FUNC(mu50_state::pc_r), FUNC(mu50_state::pc_w));
-	map(h8_device::ADC_0, h8_device::ADC_0).r(FUNC(mu50_state::adc_ar_r));
-	map(h8_device::ADC_1, h8_device::ADC_1).lr16([]() -> u16 { return 0; }, "gnd");
-	map(h8_device::ADC_2, h8_device::ADC_2).r(FUNC(mu50_state::adc_al_r));
-	map(h8_device::ADC_3, h8_device::ADC_3).lr16([]() -> u16 { return 0; }, "gnd");
-	map(h8_device::ADC_4, h8_device::ADC_4).r(FUNC(mu50_state::adc_midisw_r));
-	map(h8_device::ADC_5, h8_device::ADC_6).lr16([]() -> u16 { return 0; }, "gnd");
-	map(h8_device::ADC_6, h8_device::ADC_6).r(FUNC(mu50_state::adc_battery_r));
-	map(h8_device::ADC_7, h8_device::ADC_7).lr16([]() -> u16 { return 0; }, "gnd");
-}
-
 void mu50_state::mu50(machine_config &config)
 {
 	H83003(config, m_mu50cpu, 12_MHz_XTAL);
 	m_mu50cpu->set_addrmap(AS_PROGRAM, &mu50_state::mu50_map);
-	m_mu50cpu->set_addrmap(AS_IO, &mu50_state::mu50_iomap);
+	m_mu50cpu->read_adc(0).set(FUNC(mu50_state::adc_ar_r));
+	m_mu50cpu->read_adc(1).set([]() -> u16 { return 0; });
+	m_mu50cpu->read_adc(2).set(FUNC(mu50_state::adc_al_r));
+	m_mu50cpu->read_adc(3).set([]() -> u16 { return 0; });
+	m_mu50cpu->read_adc(4).set(FUNC(mu50_state::adc_midisw_r));
+	m_mu50cpu->read_adc(5).set([]() -> u16 { return 0; });
+	m_mu50cpu->read_adc(6).set(FUNC(mu50_state::adc_battery_r));
+	m_mu50cpu->read_adc(7).set([]() -> u16 { return 0; });
+	m_mu50cpu->read_port6().set(FUNC(mu50_state::p6_r));
+	m_mu50cpu->write_port6().set(FUNC(mu50_state::p6_w));
+	m_mu50cpu->read_porta().set(FUNC(mu50_state::pa_r));
+	m_mu50cpu->write_porta().set(FUNC(mu50_state::pa_w));
+	m_mu50cpu->read_portb().set(FUNC(mu50_state::pb_r));
+	m_mu50cpu->write_portb().set(FUNC(mu50_state::pb_w));
+	m_mu50cpu->read_portc().set(FUNC(mu50_state::pc_r));
+	m_mu50cpu->write_portc().set(FUNC(mu50_state::pc_w));
 
 	MULCD(config, m_lcd);
 

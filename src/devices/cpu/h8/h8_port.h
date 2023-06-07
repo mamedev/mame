@@ -40,7 +40,6 @@ public:
 
 protected:
 	required_device<h8_device> m_cpu;
-	address_space *m_io;
 
 	int m_address;
 	uint8_t m_default_ddr, m_ddr, m_pcr, m_odr;

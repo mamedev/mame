@@ -236,7 +236,7 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_mcu;
+	required_device<h83002_device> m_mcu;
 	required_device<ygv608_device> m_ygv608;
 
 	required_shared_ptr<uint16_t> m_shared_ram;
@@ -254,7 +254,6 @@ private:
 	INTERRUPT_GEN_MEMBER(mcu_interrupt);
 	void abcheck_main_map(address_map &map);
 	void main_map(address_map &map);
-	void h8iomap(address_map &map);
 	void h8rwmap(address_map &map);
 };
 
@@ -472,14 +471,6 @@ void namcond1_state::h8rwmap(address_map &map)
 	map(0xffff1e, 0xffff1f).noprw();     // ^
 }
 
-void namcond1_state::h8iomap(address_map &map)
-{
-	map(h8_device::PORT_7, h8_device::PORT_7).r(FUNC(namcond1_state::mcu_p7_read));
-	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(namcond1_state::mcu_pa_read), FUNC(namcond1_state::mcu_pa_write));
-	map(h8_device::ADC_0, h8_device::ADC_3).noprw(); // MCU reads these, but the games have no analog controls
-	map(0x14, 0x17).nopr();         // abcheck
-}
-
 INTERRUPT_GEN_MEMBER(namcond1_state::mcu_interrupt)
 {
 	if (m_h8_irq5_enabled)
@@ -504,8 +495,15 @@ void namcond1_state::namcond1(machine_config &config)
 
 	H83002(config, m_mcu, XTAL(49'152'000) / 3);
 	m_mcu->set_addrmap(AS_PROGRAM, &namcond1_state::h8rwmap);
-	m_mcu->set_addrmap(AS_IO, &namcond1_state::h8iomap);
 	m_mcu->set_vblank_int("screen", FUNC(namcond1_state::mcu_interrupt));
+	m_mcu->read_adc(0).set([]() -> u16 { return 0; }); // MCU reads these, but the games have no analog controls
+	m_mcu->read_adc(1).set([]() -> u16 { return 0; });
+	m_mcu->read_adc(2).set([]() -> u16 { return 0; });
+	m_mcu->read_adc(3).set([]() -> u16 { return 0; });
+	m_mcu->read_port7().set(FUNC(namcond1_state::mcu_p7_read));
+	m_mcu->read_porta().set(FUNC(namcond1_state::mcu_pa_read));
+	m_mcu->write_porta().set(FUNC(namcond1_state::mcu_pa_write));
+
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 

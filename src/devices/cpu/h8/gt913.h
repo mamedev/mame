@@ -27,6 +27,15 @@ public:
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
+	auto read_port1()  { return m_read_port [PORT_1].bind(); }
+	auto write_port1() { return m_write_port[PORT_1].bind(); }
+	auto read_port2()  { return m_read_port [PORT_2].bind(); }
+	auto write_port2() { return m_write_port[PORT_2].bind(); }
+	auto read_port3()  { return m_read_port [PORT_3].bind(); }
+	auto write_port3() { return m_write_port[PORT_3].bind(); }
+	auto read_port4()  { return m_read_port [PORT_4].bind(); }
+	auto write_port4() { return m_write_port[PORT_4].bind(); }
+
 	void uart_rate_w(uint8_t data);
 	void uart_control_w(offs_t offset, uint8_t data);
 	uint8_t uart_control_r(offs_t offset);

@@ -125,7 +125,6 @@ public:
 	void general_init(int patchaddress, int patchvalue);
 	void hrdvd(machine_config &config);
 	void hrdvd_map(address_map &map);
-	void hrdvd_sub_io_map(address_map &map);
 	void hrdvd_sub_map(address_map &map);
 
 	static void dvdrom_config(device_t *device);
@@ -272,14 +271,6 @@ void hrdvd_state::hrdvd_sub_map(address_map &map)
 	map(0x040028, 0x04002f).rw(m_ata, FUNC(hrdvd_ata_controller_device::read), FUNC(hrdvd_ata_controller_device::write));
 
 	map(0x060000, 0x07ffff).mirror(0xf80000).ram(); //.share("nvram");
-}
-
-
-void hrdvd_state::hrdvd_sub_io_map(address_map &map)
-{
-	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(hrdvd_state::p6_r), FUNC(hrdvd_state::p6_w));
-	map(h8_device::PORT_A, h8_device::PORT_A).w (FUNC(hrdvd_state::pa_w));
-	map(h8_device::PORT_B, h8_device::PORT_B).rw(FUNC(hrdvd_state::pb_r), FUNC(hrdvd_state::pb_w));
 }
 
 
@@ -490,7 +481,11 @@ void hrdvd_state::hrdvd(machine_config &config)
 
 	H83002(config, m_subcpu, 27_MHz_XTAL/2);
 	m_subcpu->set_addrmap(AS_PROGRAM, &hrdvd_state::hrdvd_sub_map);
-	m_subcpu->set_addrmap(AS_IO, &hrdvd_state::hrdvd_sub_io_map);
+	m_subcpu->read_port6().set(FUNC(hrdvd_state::p6_r));
+	m_subcpu->write_port6().set(FUNC(hrdvd_state::p6_w));
+	m_subcpu->write_porta().set(FUNC(hrdvd_state::pa_w));
+	m_subcpu->read_portb().set(FUNC(hrdvd_state::pb_r));
+	m_subcpu->write_portb().set(FUNC(hrdvd_state::pb_w));
 
 	m_maincpu->tx0_handler().set(*m_subcpu->subdevice<h8_sci_device>("sci0"), FUNC(h8_sci_device::rx_w));
 	m_subcpu->subdevice<h8_sci_device>("sci0")->tx_handler().set(m_maincpu, FUNC(tmp68301_device::rx0_w));

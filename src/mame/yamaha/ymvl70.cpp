@@ -104,7 +104,6 @@ private:
 	u16 pc_r();
 
 	virtual void machine_start() override;
-	void vl70_iomap(address_map &map);
 	void vl70_map(address_map &map);
 };
 
@@ -219,27 +218,25 @@ u16 vl70_state::pa_r()
 	return cur_pa;
 }
 
-void vl70_state::vl70_iomap(address_map &map)
-{
-	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(vl70_state::p6_r), FUNC(vl70_state::p6_w));
-	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(vl70_state::pa_r), FUNC(vl70_state::pa_w));
-	map(h8_device::PORT_B, h8_device::PORT_B).w(FUNC(vl70_state::pb_w));
-	map(h8_device::PORT_C, h8_device::PORT_C).rw(FUNC(vl70_state::pc_r), FUNC(vl70_state::pc_w));
-	map(h8_device::ADC_0, h8_device::ADC_0).r(FUNC(vl70_state::adc_breath_r));
-	map(h8_device::ADC_1, h8_device::ADC_6).r(FUNC(vl70_state::adc_zero_r));
-	map(h8_device::ADC_2, h8_device::ADC_2).r(FUNC(vl70_state::adc_midisw_r));
-	map(h8_device::ADC_3, h8_device::ADC_6).r(FUNC(vl70_state::adc_zero_r));
-	map(h8_device::ADC_4, h8_device::ADC_4).r(FUNC(vl70_state::adc_battery_r));
-	map(h8_device::ADC_5, h8_device::ADC_6).r(FUNC(vl70_state::adc_zero_r));
-	map(h8_device::ADC_6, h8_device::ADC_6).r(FUNC(vl70_state::adc_zero_r));
-	map(h8_device::ADC_7, h8_device::ADC_7).r(FUNC(vl70_state::adc_zero_r));
-}
-
 void vl70_state::vl70(machine_config &config)
 {
 	H83003(config, m_vl70cpu, 10_MHz_XTAL);
 	m_vl70cpu->set_addrmap(AS_PROGRAM, &vl70_state::vl70_map);
-	m_vl70cpu->set_addrmap(AS_IO, &vl70_state::vl70_iomap);
+	m_vl70cpu->read_adc(0).set(FUNC(vl70_state::adc_breath_r));
+	m_vl70cpu->read_adc(1).set([]() -> u16 { return 0; });
+	m_vl70cpu->read_adc(2).set(FUNC(vl70_state::adc_midisw_r));
+	m_vl70cpu->read_adc(3).set([]() -> u16 { return 0; });
+	m_vl70cpu->read_adc(4).set(FUNC(vl70_state::adc_battery_r));
+	m_vl70cpu->read_adc(5).set([]() -> u16 { return 0; });
+	m_vl70cpu->read_adc(6).set([]() -> u16 { return 0; });
+	m_vl70cpu->read_adc(7).set([]() -> u16 { return 0; });
+	m_vl70cpu->read_port6().set(FUNC(vl70_state::p6_r));
+	m_vl70cpu->write_port6().set(FUNC(vl70_state::p6_w));
+	m_vl70cpu->read_porta().set(FUNC(vl70_state::pa_r));
+	m_vl70cpu->write_porta().set(FUNC(vl70_state::pa_w));
+	m_vl70cpu->write_portb().set(FUNC(vl70_state::pb_w));
+	m_vl70cpu->read_portc().set(FUNC(vl70_state::pc_r));
+	m_vl70cpu->write_portc().set(FUNC(vl70_state::pc_w));
 
 	MULCD(config, m_lcd);
 

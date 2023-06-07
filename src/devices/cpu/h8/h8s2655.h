@@ -31,6 +31,32 @@ class h8s2655_device : public h8s2600_device {
 public:
 	h8s2655_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto read_port1()  { return m_read_port [PORT_1].bind(); }
+	auto write_port1() { return m_write_port[PORT_1].bind(); }
+	auto read_port2()  { return m_read_port [PORT_2].bind(); }
+	auto write_port2() { return m_write_port[PORT_2].bind(); }
+	auto read_port3()  { return m_read_port [PORT_3].bind(); }
+	auto write_port3() { return m_write_port[PORT_3].bind(); }
+	auto read_port4()  { return m_read_port [PORT_4].bind(); }
+	auto read_port5()  { return m_read_port [PORT_5].bind(); }
+	auto write_port5() { return m_write_port[PORT_5].bind(); }
+	auto read_port6()  { return m_read_port [PORT_6].bind(); }
+	auto write_port6() { return m_write_port[PORT_6].bind(); }
+	auto read_porta()  { return m_read_port [PORT_A].bind(); }
+	auto write_porta() { return m_write_port[PORT_A].bind(); }
+	auto read_portb()  { return m_read_port [PORT_B].bind(); }
+	auto write_portb() { return m_write_port[PORT_B].bind(); }
+	auto read_portc()  { return m_read_port [PORT_C].bind(); }
+	auto write_portc() { return m_write_port[PORT_C].bind(); }
+	auto read_portd()  { return m_read_port [PORT_D].bind(); }
+	auto write_portd() { return m_write_port[PORT_D].bind(); }
+	auto read_porte()  { return m_read_port [PORT_E].bind(); }
+	auto write_porte() { return m_write_port[PORT_E].bind(); }
+	auto read_portf()  { return m_read_port [PORT_F].bind(); }
+	auto write_portf() { return m_write_port[PORT_F].bind(); }
+	auto read_portg()  { return m_read_port [PORT_G].bind(); }
+	auto write_portg() { return m_write_port[PORT_G].bind(); }
+
 	uint8_t syscr_r();
 	void syscr_w(uint8_t data);
 

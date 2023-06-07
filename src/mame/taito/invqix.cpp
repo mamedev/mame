@@ -155,11 +155,10 @@ private:
 
 	void vctl_w(uint16_t data);
 
-	void invqix_io_map(address_map &map);
 	void invqix_prg_map(address_map &map);
 
 	// devices
-	required_device<cpu_device> m_maincpu;
+	required_device<h8s2394_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_shared_ptr<uint16_t> m_vram;
 
@@ -285,18 +284,6 @@ void invqix_state::invqix_prg_map(address_map &map)
 	map(0x620004, 0x620005).w(FUNC(invqix_state::vctl_w));
 }
 
-void invqix_state::invqix_io_map(address_map &map)
-{
-	map(h8_device::PORT_1, h8_device::PORT_1).portr("P1");
-	map(h8_device::PORT_2, h8_device::PORT_2).portr("SYSTEM").nopw();
-	map(h8_device::PORT_3, h8_device::PORT_3).rw(FUNC(invqix_state::port3_r), FUNC(invqix_state::port3_w));
-	map(h8_device::PORT_4, h8_device::PORT_4).portr("P4");
-	map(h8_device::PORT_5, h8_device::PORT_5).rw(FUNC(invqix_state::port5_r), FUNC(invqix_state::port5_w));
-	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(invqix_state::port6_r), FUNC(invqix_state::port6_w));
-	map(h8_device::PORT_A, h8_device::PORT_A).r(FUNC(invqix_state::porta_r));
-	map(h8_device::PORT_G, h8_device::PORT_G).r(FUNC(invqix_state::portg_r)).nopw();
-}
-
 static INPUT_PORTS_START( invqix )
 	PORT_START("SYSTEM")
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
@@ -333,9 +320,21 @@ void invqix_state::invqix(machine_config &config)
 {
 	H8S2394(config, m_maincpu, XTAL(20'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &invqix_state::invqix_prg_map);
-	m_maincpu->set_addrmap(AS_IO, &invqix_state::invqix_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(invqix_state::irq1_line_hold));
 	m_maincpu->set_periodic_int(FUNC(invqix_state::irq0_line_hold), attotime::from_hz(60));
+	m_maincpu->read_port1().set_ioport("P1");
+	m_maincpu->read_port2().set_ioport("SYSTEM");
+	m_maincpu->write_port2().set([](u8) {});
+	m_maincpu->read_port3().set(FUNC(invqix_state::port3_r));
+	m_maincpu->write_port3().set(FUNC(invqix_state::port3_w));
+	m_maincpu->read_port4().set_ioport("P4");
+	m_maincpu->read_port5().set(FUNC(invqix_state::port5_r));
+	m_maincpu->write_port5().set(FUNC(invqix_state::port5_w));
+	m_maincpu->read_port6().set(FUNC(invqix_state::port6_r));
+	m_maincpu->write_port6().set(FUNC(invqix_state::port6_w));
+	m_maincpu->read_porta().set(FUNC(invqix_state::porta_r));
+	m_maincpu->read_portg().set(FUNC(invqix_state::portg_r));
+	m_maincpu->write_portg().set([](u8) {});
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

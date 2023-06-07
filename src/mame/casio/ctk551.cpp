@@ -273,11 +273,6 @@ private:
 	void gz70sp_map(address_map& map);
 	void ctk601_map(address_map& map);
 
-	void ap10_io_map(address_map& map);
-	void ctk530_io_map(address_map& map);
-	void gz70sp_io_map(address_map& map);
-	void ctk551_io_map(address_map &map);
-
 	virtual void driver_start() override;
 
 	required_device<gt913_device> m_maincpu;
@@ -431,38 +426,6 @@ void ctk551_state::ctk601_map(address_map& map)
 	map(0x380002, 0x380003).portr("PB").portw("PA").umask16(0x00ff);
 }
 
-void ctk551_state::ap10_io_map(address_map& map)
-{
-	map(h8_device::PORT_1, h8_device::PORT_1).portrw("P1").umask16(0x00ff);
-	map(h8_device::PORT_2, h8_device::PORT_4).noprw();
-	map(h8_device::ADC_0, h8_device::ADC_1).nopr();
-}
-
-void ctk551_state::ctk530_io_map(address_map& map)
-{
-	map(h8_device::PORT_1, h8_device::PORT_1).portrw("P1").umask16(0x00ff);
-	map(h8_device::PORT_2, h8_device::PORT_3).noprw();
-	map(h8_device::PORT_4, h8_device::PORT_4).portw("PLE");
-	map(h8_device::ADC_0, h8_device::ADC_1).nopr();
-}
-
-void ctk551_state::gz70sp_io_map(address_map& map)
-{
-	map(h8_device::PORT_1, h8_device::PORT_1).portrw("P1").umask16(0x00ff);
-	map(h8_device::PORT_2, h8_device::PORT_2).portrw("P2").umask16(0x00ff);
-	map(h8_device::PORT_3, h8_device::PORT_4).noprw();
-	map(h8_device::ADC_0, h8_device::ADC_1).nopr();
-}
-
-void ctk551_state::ctk551_io_map(address_map &map)
-{
-	map(h8_device::PORT_1, h8_device::PORT_1).portr("P1_R").portw("P1_W").umask16(0x00ff);
-	map(h8_device::PORT_2, h8_device::PORT_2).portrw("P2").umask16(0x00ff);
-	map(h8_device::PORT_3, h8_device::PORT_4).noprw(); // port 3 pins are shared w/ key matrix
-	map(h8_device::ADC_0,  h8_device::ADC_0).portr("AN0");
-	map(h8_device::ADC_1,  h8_device::ADC_1).portr("AN1");
-}
-
 void ctk551_state::driver_start()
 {
 	m_led_touch.resolve();
@@ -486,9 +449,18 @@ void ctk551_state::ap10(machine_config& config)
 	// CPU
 	GT913(config, m_maincpu, 24_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_DATA, &ctk551_state::ap10_map);
-	m_maincpu->set_addrmap(AS_IO, &ctk551_state::ap10_io_map);
 	m_maincpu->add_route(0, "lspeaker", 1.0);
 	m_maincpu->add_route(1, "rspeaker", 1.0);
+	m_maincpu->read_adc(0).set([]() -> u16 { return 0; });
+	m_maincpu->read_adc(1).set([]() -> u16 { return 0; });
+	m_maincpu->read_port1().set_ioport("P1");
+	m_maincpu->write_port1().set_ioport("P1");
+	m_maincpu->read_port2().set([]() -> u16 { return 0; });
+	m_maincpu->write_port2().set([](u16) {});
+	m_maincpu->read_port3().set([]() -> u16 { return 0; });
+	m_maincpu->write_port3().set([](u16) {});
+	m_maincpu->read_port4().set([]() -> u16 { return 0; });
+	m_maincpu->write_port4().set([](u16) {});
 
 	NVRAM(config, "nvram");
 
@@ -514,9 +486,17 @@ void ctk551_state::ctk530(machine_config& config)
 	// CPU
 	GT913(config, m_maincpu, 20_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_DATA, &ctk551_state::ctk530_map);
-	m_maincpu->set_addrmap(AS_IO, &ctk551_state::ctk530_io_map);
 	m_maincpu->add_route(0, "lspeaker", 1.0);
 	m_maincpu->add_route(1, "rspeaker", 1.0);
+	m_maincpu->read_adc(0).set([]() -> u16 { return 0; });
+	m_maincpu->read_adc(1).set([]() -> u16 { return 0; });
+	m_maincpu->read_port1().set_ioport("P1");
+	m_maincpu->write_port1().set_ioport("P1");
+	m_maincpu->read_port2().set([]() -> u16 { return 0; });
+	m_maincpu->write_port2().set([](u16) {});
+	m_maincpu->read_port3().set([]() -> u16 { return 0; });
+	m_maincpu->write_port3().set([](u16) {});
+	m_maincpu->write_port4().set_ioport("PLE");
 
 	// MIDI
 	auto& mdin(MIDI_PORT(config, "mdin"));
@@ -542,9 +522,18 @@ void ctk551_state::gz70sp(machine_config& config)
 	// CPU
 	GT913(config, m_maincpu, 30_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_DATA, &ctk551_state::gz70sp_map);
-	m_maincpu->set_addrmap(AS_IO, &ctk551_state::gz70sp_io_map);
 	m_maincpu->add_route(0, "lspeaker", 1.0);
 	m_maincpu->add_route(1, "rspeaker", 1.0);
+	m_maincpu->read_adc(0).set([]() -> u16 { return 0; });
+	m_maincpu->read_adc(1).set([]() -> u16 { return 0; });
+	m_maincpu->read_port1().set_ioport("P1");
+	m_maincpu->write_port1().set_ioport("P1");
+	m_maincpu->read_port2().set_ioport("P2");
+	m_maincpu->write_port2().set_ioport("P2");
+	m_maincpu->read_port3().set([]() -> u16 { return 0; });
+	m_maincpu->write_port3().set([](u16) {});
+	m_maincpu->read_port4().set([]() -> u16 { return 0; });
+	m_maincpu->write_port4().set([](u16) {});
 
 	// MIDI (sci0 for RS232/422, sci1 for standard MIDI)
 	auto& mdin(MIDI_PORT(config, "mdin"));
@@ -560,9 +549,18 @@ void ctk551_state::ctk601(machine_config& config)
 	// CPU
 	GT913(config, m_maincpu, 30_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_DATA, &ctk551_state::ctk601_map);
-	m_maincpu->set_addrmap(AS_IO, &ctk551_state::ctk551_io_map);
 	m_maincpu->add_route(0, "lspeaker", 1.0);
 	m_maincpu->add_route(1, "rspeaker", 1.0);
+	m_maincpu->read_adc(0).set([]() -> u16 { return 0; });
+	m_maincpu->read_adc(1).set([]() -> u16 { return 0; });
+	m_maincpu->read_port1().set_ioport("P1_R");
+	m_maincpu->write_port1().set_ioport("P1_W");
+	m_maincpu->read_port2().set_ioport("P2");
+	m_maincpu->write_port2().set_ioport("P2");
+	m_maincpu->read_port3().set([]() -> u16 { return 0; }); // port 3 pins are shared w/ key matrix
+	m_maincpu->write_port3().set([](u16) {});
+	m_maincpu->read_port4().set([]() -> u16 { return 0; });
+	m_maincpu->write_port4().set([](u16) {});
 
 	// TODO: DSP
 
@@ -596,9 +594,18 @@ void ctk551_state::ctk551(machine_config &config)
 	// CPU
 	GT913(config, m_maincpu, 30'000'000 / 2);
 	m_maincpu->set_addrmap(AS_DATA, &ctk551_state::ctk530_map);
-	m_maincpu->set_addrmap(AS_IO, &ctk551_state::ctk551_io_map);
 	m_maincpu->add_route(0, "lspeaker", 1.0);
 	m_maincpu->add_route(1, "rspeaker", 1.0);
+	m_maincpu->read_adc(0).set_ioport("AN0");
+	m_maincpu->read_adc(1).set_ioport("AN1");
+	m_maincpu->read_port1().set_ioport("P1_R");
+	m_maincpu->write_port1().set_ioport("P1_W");
+	m_maincpu->read_port2().set_ioport("P2");
+	m_maincpu->write_port2().set_ioport("P2");
+	m_maincpu->read_port3().set([]() -> u16 { return 0; }); // port 3 pins are shared w/ key matrix
+	m_maincpu->write_port3().set([](u16) {});
+	m_maincpu->read_port4().set([]() -> u16 { return 0; });
+	m_maincpu->write_port4().set([](u16) {});
 
 	// MIDI
 	auto &mdin(MIDI_PORT(config, "mdin"));

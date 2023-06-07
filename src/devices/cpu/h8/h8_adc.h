@@ -37,8 +37,6 @@ protected:
 
 	required_device<h8_device> m_cpu;
 	required_device<h8_intc_device> m_intc;
-	address_space *m_io;
-	const char *m_intc_tag;
 	int m_intc_vector;
 
 	enum {

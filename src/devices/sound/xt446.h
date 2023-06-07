@@ -33,7 +33,6 @@ private:
 	required_device<swp30_device> m_swp30;
 	required_device<h8_sci_device> m_midi_serial;
 
-	void xt446_iomap(address_map &map);
 	void xt446_map(address_map &map);
 	void swp30_map(address_map &map);
 };

@@ -35,6 +35,28 @@ class h83048_device : public h8h_device {
 public:
 	h83048_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto read_port1()  { return m_read_port [PORT_1].bind(); }
+	auto write_port1() { return m_write_port[PORT_1].bind(); }
+	auto read_port2()  { return m_read_port [PORT_2].bind(); }
+	auto write_port2() { return m_write_port[PORT_2].bind(); }
+	auto read_port3()  { return m_read_port [PORT_3].bind(); }
+	auto write_port3() { return m_write_port[PORT_3].bind(); }
+	auto read_port4()  { return m_read_port [PORT_4].bind(); }
+	auto write_port4() { return m_write_port[PORT_4].bind(); }
+	auto read_port5()  { return m_read_port [PORT_5].bind(); }
+	auto write_port5() { return m_write_port[PORT_5].bind(); }
+	auto read_port6()  { return m_read_port [PORT_6].bind(); }
+	auto write_port6() { return m_write_port[PORT_6].bind(); }
+	auto read_port7()  { return m_read_port [PORT_7].bind(); }
+	auto read_port8()  { return m_read_port [PORT_8].bind(); }
+	auto write_port8() { return m_write_port[PORT_8].bind(); }
+	auto read_port9()  { return m_read_port [PORT_9].bind(); }
+	auto write_port9() { return m_write_port[PORT_9].bind(); }
+	auto read_porta()  { return m_read_port [PORT_A].bind(); }
+	auto write_porta() { return m_write_port[PORT_A].bind(); }
+	auto read_portb()  { return m_read_port [PORT_B].bind(); }
+	auto write_portb() { return m_write_port[PORT_B].bind(); }
+
 	void set_mode_a20() { m_mode_a20 = true; }
 	void set_mode_a24() { m_mode_a20 = false; }
 

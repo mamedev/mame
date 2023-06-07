@@ -1070,13 +1070,6 @@ void metro_state::puzzlet_portb_w(u16 data)
 //  popmessage("PORTB %02x", data);
 }
 
-void metro_state::puzzlet_io_map(address_map &map)
-{
-	map(h8_device::PORT_7, h8_device::PORT_7).portr("IN2");
-	map(h8_device::PORT_B, h8_device::PORT_B).portr("DSW0").w(FUNC(metro_state::puzzlet_portb_w));
-}
-
-
 /***************************************************************************
                                 Varia Metal
 ***************************************************************************/
@@ -3492,9 +3485,11 @@ void metro_state::gstrik2(machine_config &config)
 void metro_state::puzzlet(machine_config &config)
 {
 	/* basic machine hardware */
-	H83007(config, m_maincpu, 20_MHz_XTAL); // H8/3007 - Hitachi HD6413007F20 CPU. Clock 20MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::puzzlet_map);
-	m_maincpu->set_addrmap(AS_IO, &metro_state::puzzlet_io_map);
+	auto &maincpu(H83007(config, m_maincpu, 20_MHz_XTAL)); // H8/3007 - Hitachi HD6413007F20 CPU. Clock 20MHz
+	maincpu.set_addrmap(AS_PROGRAM, &metro_state::puzzlet_map);
+	maincpu.read_port7().set_ioport("IN2");
+	maincpu.read_portb().set_ioport("DSW0");
+	maincpu.write_portb().set(FUNC(metro_state::puzzlet_portb_w));
 
 	/* Coins/service */
 	z8_device &coinmcu(Z86E02(config, "coinmcu", 20_MHz_XTAL/5)); // clock divider guessed

@@ -19,6 +19,9 @@ h8_device::h8_device(const machine_config &mconfig, device_type type, const char
 	cpu_device(mconfig, type, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_BIG, 16, 16, 0, map_delegate),
 	m_io_config("io", ENDIANNESS_BIG, 16, 16, -1),
+	m_read_adc{ *this, *this, *this, *this, *this, *this, *this, *this },
+	m_read_port{ *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this },
+	m_write_port{ *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this },
 	m_PPC(0), m_NPC(0), m_PC(0), m_PIR(0), m_EXR(0), m_CCR(0), m_MAC(0), m_MACF(0),
 	m_TMP1(0), m_TMP2(0), m_TMPR(0), m_inst_state(0), m_inst_substate(0), m_icount(0), m_bcount(0), m_irq_vector(0), m_taken_irq_vector(0), m_irq_level(0), m_taken_irq_level(0), m_irq_required(false), m_irq_nmi(false)
 {
@@ -30,6 +33,32 @@ h8_device::h8_device(const machine_config &mconfig, device_type type, const char
 	m_mac_saturating = false;
 	m_has_trace = false;
 	m_has_hc = true;
+
+	for(int i=0; i != 8; i++)
+		m_read_adc[i].bind().set([this, i]() { return adc_default(i); });
+	for(int i=0; i != PORT_COUNT; i++) {
+		m_read_port[i].bind().set([this, i]() { return port_default_r(i); });
+		m_write_port[i].bind().set([this, i](u8 data) { port_default_w(i, data); });
+	}
+}
+
+u16 h8_device::adc_default(int adc)
+{
+	logerror("read of un-hooked adc %d\n", adc);
+	return 0;
+}
+
+const char h8_device::port_names[] = "123456789abcdefg";
+
+u8 h8_device::port_default_r(int port)
+{
+	logerror("read of un-hooked port %c\n", port_names[port]);
+	return 0;
+}
+
+void h8_device::port_default_w(int port, u8 data)
+{
+	logerror("write of un-hooked port %c %02x\n", port_names[port], data);
 }
 
 void h8_device::device_config_complete()
@@ -43,6 +72,13 @@ void h8_device::device_start()
 	space(AS_PROGRAM).cache(m_cache);
 	space(AS_PROGRAM).specific(m_program);
 	space(AS_IO).specific(m_io);
+
+	for(auto &r : m_read_adc)
+		r.resolve();
+	for(auto &r : m_read_port)
+		r.resolve();
+	for(auto &w : m_write_port)
+		w.resolve();
 
 	uint32_t pcmask = m_mode_advanced ? 0xffffff : 0xffff;
 	state_add<uint32_t>(H8_PC, "PC",

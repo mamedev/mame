@@ -224,23 +224,24 @@ void namcos10_mgexio_device::port_w(uint16_t data)
 	m_port_write[Port](data);
 }
 
-void namcos10_mgexio_device::io_map(address_map &map)
-{
-	map(h8_device::PORT_4, h8_device::PORT_4).rw(FUNC(namcos10_mgexio_device::port_r<0>), FUNC(namcos10_mgexio_device::port_w<0>));
-	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(namcos10_mgexio_device::port_r<1>), FUNC(namcos10_mgexio_device::port_w<1>));
-	map(h8_device::PORT_7, h8_device::PORT_7).rw(FUNC(namcos10_mgexio_device::port_r<2>), FUNC(namcos10_mgexio_device::port_w<2>));
-	map(h8_device::PORT_8, h8_device::PORT_8).rw(FUNC(namcos10_mgexio_device::port_r<3>), FUNC(namcos10_mgexio_device::port_w<3>));
-	map(h8_device::PORT_9, h8_device::PORT_9).rw(FUNC(namcos10_mgexio_device::port_r<4>), FUNC(namcos10_mgexio_device::port_w<4>));
-	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(namcos10_mgexio_device::port_r<5>), FUNC(namcos10_mgexio_device::port_w<5>));
-	map(h8_device::PORT_B, h8_device::PORT_B).rw(FUNC(namcos10_mgexio_device::port_r<6>), FUNC(namcos10_mgexio_device::port_w<6>));
-}
-
 void namcos10_mgexio_device::device_add_mconfig(machine_config &config)
 {
 	H83007(config, m_maincpu, 14.746_MHz_XTAL);
 	m_maincpu->set_mode_a20();
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos10_mgexio_device::map);
-	m_maincpu->set_addrmap(AS_IO, &namcos10_mgexio_device::io_map);
+	m_maincpu->read_port4().set(FUNC(namcos10_mgexio_device::port_r<0>));
+	m_maincpu->write_port4().set(FUNC(namcos10_mgexio_device::port_w<0>));
+	m_maincpu->read_port6().set(FUNC(namcos10_mgexio_device::port_r<1>));
+	m_maincpu->write_port6().set(FUNC(namcos10_mgexio_device::port_w<1>));
+	m_maincpu->read_port7().set(FUNC(namcos10_mgexio_device::port_r<2>));
+	m_maincpu->read_port8().set(FUNC(namcos10_mgexio_device::port_r<3>));
+	m_maincpu->write_port8().set(FUNC(namcos10_mgexio_device::port_w<3>));
+	m_maincpu->read_port9().set(FUNC(namcos10_mgexio_device::port_r<4>));
+	m_maincpu->write_port9().set(FUNC(namcos10_mgexio_device::port_w<4>));
+	m_maincpu->read_porta().set(FUNC(namcos10_mgexio_device::port_r<5>));
+	m_maincpu->write_porta().set(FUNC(namcos10_mgexio_device::port_w<5>));
+	m_maincpu->read_portb().set(FUNC(namcos10_mgexio_device::port_r<6>));
+	m_maincpu->write_portb().set(FUNC(namcos10_mgexio_device::port_w<6>));
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 }

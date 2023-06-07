@@ -301,7 +301,6 @@ private:
 	void pg_w(u16 data);
 
 	virtual void machine_start() override;
-	void mu100_iomap(address_map &map);
 	void mu100_map(address_map &map);
 	void swp30_map(address_map &map);
 };
@@ -671,26 +670,6 @@ void mu100_state::pg_w(u16 data)
 	logerror("pbsel3 %d\n", data & 1);
 }
 
-void mu100_state::mu100_iomap(address_map &map)
-{
-	map(h8_device::PORT_1, h8_device::PORT_1).rw(FUNC(mu100_state::p1_r), FUNC(mu100_state::p1_w));
-	map(h8_device::PORT_2, h8_device::PORT_2).w(FUNC(mu100_state::p2_w));
-	map(h8_device::PORT_3, h8_device::PORT_3).w(FUNC(mu100_state::p3_w));
-	map(h8_device::PORT_5, h8_device::PORT_5).w(FUNC(mu100_state::p5_w));
-	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(mu100_state::p6_r), FUNC(mu100_state::p6_w));
-	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(mu100_state::pa_r), FUNC(mu100_state::pa_w));
-	map(h8_device::PORT_F, h8_device::PORT_F).w(FUNC(mu100_state::pf_w));
-	map(h8_device::PORT_G, h8_device::PORT_G).w(FUNC(mu100_state::pg_w));
-	map(h8_device::ADC_0, h8_device::ADC_0).r(FUNC(mu100_state::adc_ar_r));
-	map(h8_device::ADC_1, h8_device::ADC_1).r(FUNC(mu100_state::adc_zero_r));
-	map(h8_device::ADC_2, h8_device::ADC_2).r(FUNC(mu100_state::adc_al_r));
-	map(h8_device::ADC_1, h8_device::ADC_3).r(FUNC(mu100_state::adc_zero_r));
-	map(h8_device::ADC_4, h8_device::ADC_4).r(FUNC(mu100_state::adc_midisw_r));
-	map(h8_device::ADC_5, h8_device::ADC_5).r(FUNC(mu100_state::adc_zero_r));
-	map(h8_device::ADC_6, h8_device::ADC_6).r(FUNC(mu100_state::adc_battery_r));
-	map(h8_device::ADC_7, h8_device::ADC_7).r(FUNC(mu100_state::adc_type_r));
-}
-
 void mu100_state::swp30_map(address_map &map)
 {
 	map(0x000000*4, 0x200000*4-1).rom().region("swp30",         0).mirror(4*0x200000);
@@ -702,7 +681,25 @@ void mu100_state::mu100(machine_config &config)
 {
 	H8S2655(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mu100_state::mu100_map);
-	m_maincpu->set_addrmap(AS_IO, &mu100_state::mu100_iomap);
+	m_maincpu->read_adc(0).set(FUNC(mu100_state::adc_ar_r));
+	m_maincpu->read_adc(1).set([]() -> u16 { return 0; });
+	m_maincpu->read_adc(2).set(FUNC(mu100_state::adc_al_r));
+	m_maincpu->read_adc(3).set([]() -> u16 { return 0; });
+	m_maincpu->read_adc(4).set(FUNC(mu100_state::adc_midisw_r));
+	m_maincpu->read_adc(5).set([]() -> u16 { return 0; });
+	m_maincpu->read_adc(6).set(FUNC(mu100_state::adc_battery_r));
+	m_maincpu->read_adc(7).set(FUNC(mu100_state::adc_type_r));
+	m_maincpu->read_port1().set(FUNC(mu100_state::p1_r));
+	m_maincpu->write_port1().set(FUNC(mu100_state::p1_w));
+	m_maincpu->write_port2().set(FUNC(mu100_state::p2_w));
+	m_maincpu->write_port3().set(FUNC(mu100_state::p3_w));
+	m_maincpu->write_port5().set(FUNC(mu100_state::p5_w));
+	m_maincpu->read_port6().set(FUNC(mu100_state::p6_r));
+	m_maincpu->write_port6().set(FUNC(mu100_state::p6_w));
+	m_maincpu->read_porta().set(FUNC(mu100_state::pa_r));
+	m_maincpu->write_porta().set(FUNC(mu100_state::pa_w));
+	m_maincpu->write_portf().set(FUNC(mu100_state::pf_w));
+	m_maincpu->write_portg().set(FUNC(mu100_state::pg_w));
 
 	MULCD(config, m_lcd);
 

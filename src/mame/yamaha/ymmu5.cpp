@@ -48,7 +48,6 @@ private:
 	output_finder<2, 8, 8, 5> m_outputs;
 
 	void mu5_map(address_map &map);
-	void mu5_io_map(address_map &map);
 	void ymw258_map(address_map &map);
 
 	u8 m_lcd_ctrl = 0U;
@@ -70,18 +69,6 @@ void mu5_state::mu5_map(address_map &map)
 	map(0x000000, 0x01ffff).rom().region("maincpu", 0);
 	map(0x200000, 0x21ffff).ram();
 	map(0x400000, 0x400007).rw(m_ymw258, FUNC(multipcm_device::read), FUNC(multipcm_device::write)).umask16(0xffff);
-}
-
-void mu5_state::mu5_io_map(address_map &map)
-{
-	map(h8_device::PORT_4, h8_device::PORT_4).lr8(NAME([this]() -> u8 { return m_matrixsel; }));
-	map(h8_device::PORT_4, h8_device::PORT_4).lw8(NAME([this](u8 data) { m_matrixsel = data; }));
-	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(mu5_state::lcd_ctrl_r), FUNC(mu5_state::lcd_ctrl_w));
-	map(h8_device::PORT_7, h8_device::PORT_7).r(FUNC(mu5_state::matrix_r));
-	map(h8_device::PORT_A, h8_device::PORT_A).nopr();
-	map(h8_device::PORT_B, h8_device::PORT_B).rw(FUNC(mu5_state::lcd_data_r), FUNC(mu5_state::lcd_data_w));
-
-	map(h8_device::ADC_7, h8_device::ADC_7).lr8(NAME([]() -> u8 { return 0xff; })); // battery level
 }
 
 void mu5_state::ymw258_map(address_map &map)
@@ -225,7 +212,15 @@ void mu5_state::mu5(machine_config &config)
 	/* basic machine hardware */
 	H83002(config, m_maincpu, 10_MHz_XTAL); // clock verified by schematics
 	m_maincpu->set_addrmap(AS_PROGRAM, &mu5_state::mu5_map);
-	m_maincpu->set_addrmap(AS_IO, &mu5_state::mu5_io_map);
+	m_maincpu->read_adc(7).set([]() -> u8 { return 0xff; }); // Bettery level
+	m_maincpu->read_port4().set([this]() -> u8 { return m_matrixsel; });
+	m_maincpu->write_port4().set([this](u8 data) { m_matrixsel = data; });
+	m_maincpu->read_port6().set(FUNC(mu5_state::lcd_ctrl_r));
+	m_maincpu->write_port6().set(FUNC(mu5_state::lcd_ctrl_w));
+	m_maincpu->read_port7().set(FUNC(mu5_state::matrix_r));
+	m_maincpu->read_porta().set([]() -> u8 { return 0; });
+	m_maincpu->read_portb().set(FUNC(mu5_state::lcd_data_r));
+	m_maincpu->write_portb().set(FUNC(mu5_state::lcd_data_w));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

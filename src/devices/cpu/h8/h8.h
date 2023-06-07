@@ -22,38 +22,6 @@ struct h8_dtc_state;
 class h8_device : public cpu_device {
 public:
 	enum {
-		// digital I/O ports
-		// ports 4-B are valid on 16-bit H8/3xx, ports 1-9 on 8-bit H8/3xx
-		// H8S/2394 has 12 ports named 1-6 and A-G
-		PORT_1,  // 0
-		PORT_2,  // 1
-		PORT_3,  // 2
-		PORT_4,  // 3
-		PORT_5,  // 4
-		PORT_6,  // 5
-		PORT_7,  // 6
-		PORT_8,  // 7
-		PORT_9,  // 8
-		PORT_A,  // 9
-		PORT_B,  // A
-		PORT_C,  // B
-		PORT_D,  // C
-		PORT_E,  // D
-		PORT_F,  // E
-		PORT_G,  // F
-
-		// analog inputs
-		ADC_0,
-		ADC_1,
-		ADC_2,
-		ADC_3,
-		ADC_4,
-		ADC_5,
-		ADC_6,
-		ADC_7
-	};
-
-	enum {
 		STATE_RESET              = 0x10000,
 		STATE_IRQ                = 0x10001,
 		STATE_TRACE              = 0x10002,
@@ -62,6 +30,8 @@ public:
 		STATE_DTC_VECTOR         = 0x10005,
 		STATE_DTC_WRITEBACK      = 0x10006
 	};
+
+	auto read_adc(int port) { return m_read_adc[port].bind(); }
 
 	void internal_update();
 	void set_irq(int irq_vector, int irq_level, bool irq_nmi);
@@ -72,7 +42,36 @@ public:
 	void request_state(int state);
 	bool access_is_dma() const { return m_inst_state == STATE_DMA || m_inst_state == STATE_DTC; }
 
+	u16 do_read_adc(int port) { return m_read_adc[port](); }
+	u8 do_read_port(int port) { return m_read_port[port](); }
+	void do_write_port(int port, u8 data) { return m_write_port[port](data); }
+
 protected:
+	enum {
+		// digital I/O ports
+		// ports 4-B are valid on 16-bit H8/3xx, ports 1-9 on 8-bit H8/3xx
+		// H8S/2394 has 12 ports named 1-6 and A-G
+		PORT_1,
+		PORT_2,
+		PORT_3,
+		PORT_4,
+		PORT_5,
+		PORT_6,
+		PORT_7,
+		PORT_8,
+		PORT_9,
+		PORT_A,
+		PORT_B,
+		PORT_C,
+		PORT_D,
+		PORT_E,
+		PORT_F,
+		PORT_G,
+		PORT_COUNT
+	};
+
+	static const char port_names[];
+
 	enum {
 		F_I  = 0x80,
 		F_UI = 0x40,
@@ -118,6 +117,10 @@ protected:
 	memory_access<32, 1, 0, ENDIANNESS_BIG>::cache m_cache;
 	memory_access<32, 1, 0, ENDIANNESS_BIG>::specific m_program;
 	memory_access<16, 1, -1, ENDIANNESS_BIG>::specific m_io;
+	std::array<devcb_read16, 8> m_read_adc;
+	std::array<devcb_read8, PORT_COUNT> m_read_port;
+	std::array<devcb_write8, PORT_COUNT> m_write_port;
+
 	h8gen_dma_device *m_dma_device;
 	h8_dtc_device *m_dtc_device;
 	h8_dma_state *m_dma_channel[8];
@@ -169,6 +172,9 @@ protected:
 	void prefetch_done_noirq();
 	void prefetch_done_noirq_notrace();
 	void illegal();
+	u16 adc_default(int adc);
+	u8 port_default_r(int port);
+	void port_default_w(int port, u8 data);
 
 	uint8_t do_addx8(uint8_t a, uint8_t b);
 	uint8_t do_subx8(uint8_t a, uint8_t b);

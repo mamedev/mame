@@ -92,7 +92,6 @@ funcube series:
 #include "emu.h"
 #include "seta2.h"
 
-#include "cpu/h8/h83006.h"
 #include "cpu/m68000/mcf5206e.h"
 #include "machine/mcf5206e.h"
 #include "machine/nvram.h"
@@ -906,13 +905,13 @@ uint16_t funcube_state::coins_r()
 void funcube_state::funcube_debug_outputs()
 {
 #ifdef MAME_DEBUG
-//  popmessage("LED: %02x OUT: %02x", (int)*m_funcube_leds, (int)*m_outputs);
+//  popmessage("LED: %02x OUT: %02x", m_funcube_leds, m_outputs);
 #endif
 }
 
 void funcube_state::leds_w(uint16_t data)
 {
-	*m_funcube_leds = data;
+	m_funcube_leds = data;
 
 	m_leds[0] = BIT(~data, 0); // win lamp (red)
 	m_leds[1] = BIT(~data, 1); // win lamp (green)
@@ -929,12 +928,12 @@ void funcube_state::leds_w(uint16_t data)
 uint16_t funcube_state::outputs_r()
 {
 	// Bits 1,2,3 read
-	return *m_outputs;
+	return m_outputs;
 }
 
 void funcube_state::outputs_w(uint16_t data)
 {
-	*m_outputs = data;
+	m_outputs = data;
 
 	// Bits 0,1,3 written
 
@@ -953,25 +952,6 @@ uint16_t funcube_state::battery_r()
 {
 	return ioport("BATTERY")->read() ? 0x40 : 0x00;
 }
-
-// cabinet linking on sci0
-void funcube_state::funcube_sub_io(address_map &map)
-{
-	map(h8_device::PORT_7, h8_device::PORT_7).r(FUNC(funcube_state::coins_r));
-	map(h8_device::PORT_4, h8_device::PORT_4).r(FUNC(funcube_state::battery_r));
-	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(funcube_state::outputs_r), FUNC(funcube_state::outputs_w)).share("outputs");
-	map(h8_device::PORT_B, h8_device::PORT_B).w(FUNC(funcube_state::leds_w)).share("funcube_leds");
-}
-
-void funcube_state::funcube2_sub_io(address_map &map)
-{
-	map(h8_device::PORT_7, h8_device::PORT_7).r(FUNC(funcube_state::coins_r));
-	map(h8_device::PORT_4, h8_device::PORT_4).noprw();  // unused
-	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(funcube_state::outputs_r), FUNC(funcube_state::outputs_w)).share("outputs");
-	map(h8_device::PORT_B, h8_device::PORT_B).w(FUNC(funcube_state::leds_w)).share("funcube_leds");
-}
-
-
 
 
 /***************************************************************************
@@ -2477,12 +2457,17 @@ void funcube_state::machine_start()
 	seta2_state::machine_start();
 	save_item(NAME(m_coin_start_cycles));
 	save_item(NAME(m_hopper_motor));
+	save_item(NAME(m_outputs));
+	save_item(NAME(m_funcube_leds));
+
 }
 
 void funcube_state::machine_reset()
 {
 	m_coin_start_cycles = 0;
 	m_hopper_motor = 0;
+	m_outputs = 0;
+	m_funcube_leds = 0;
 }
 
 void funcube_state::funcube(machine_config &config)
@@ -2493,7 +2478,11 @@ void funcube_state::funcube(machine_config &config)
 
 	H83007(config, m_sub, FUNCUBE_SUB_CPU_CLOCK);
 	m_sub->set_addrmap(AS_PROGRAM, &funcube_state::funcube_sub_map);
-	m_sub->set_addrmap(AS_IO, &funcube_state::funcube_sub_io);
+	m_sub->read_port4().set(FUNC(funcube_state::battery_r));
+	m_sub->read_port7().set(FUNC(funcube_state::coins_r));
+	m_sub->read_porta().set(FUNC(funcube_state::outputs_r));
+	m_sub->write_porta().set(FUNC(funcube_state::outputs_w));
+	m_sub->write_portb().set(FUNC(funcube_state::leds_w));
 
 	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0, m_maincpu);
 
@@ -2531,7 +2520,7 @@ void funcube_state::funcube2(machine_config &config)
 	funcube(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &funcube_state::funcube2_map);
 
-	m_sub->set_addrmap(AS_IO, &funcube_state::funcube2_sub_io);
+	m_sub->read_port4().set([]() -> u8 { return 0; }); // unused
 
 	// video hardware
 	m_screen->set_visarea(0x0, 0x140-1, 0x00, 0xf0-1);

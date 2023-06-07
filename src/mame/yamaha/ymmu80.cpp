@@ -214,7 +214,6 @@ private:
 	u16 pb_r();
 
 	virtual void machine_start() override;
-	void mu80_iomap(address_map &map);
 	void mu80_map(address_map &map);
 };
 
@@ -325,26 +324,24 @@ u16 mu80_state::pa_r()
 	return cur_pa;
 }
 
-void mu80_state::mu80_iomap(address_map &map)
-{
-	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(mu80_state::p6_r), FUNC(mu80_state::p6_w));
-	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(mu80_state::pa_r), FUNC(mu80_state::pa_w));
-	map(h8_device::PORT_B, h8_device::PORT_B).rw(FUNC(mu80_state::pb_r), FUNC(mu80_state::pb_w));
-	map(h8_device::ADC_0, h8_device::ADC_0).r(FUNC(mu80_state::adc_ar_r));
-	map(h8_device::ADC_1, h8_device::ADC_1).r(FUNC(mu80_state::adc_zero_r));
-	map(h8_device::ADC_2, h8_device::ADC_2).r(FUNC(mu80_state::adc_al_r));
-	map(h8_device::ADC_3, h8_device::ADC_3).r(FUNC(mu80_state::adc_zero_r));
-	map(h8_device::ADC_4, h8_device::ADC_4).r(FUNC(mu80_state::adc_midisw_r));
-	map(h8_device::ADC_5, h8_device::ADC_6).r(FUNC(mu80_state::adc_zero_r));
-	map(h8_device::ADC_6, h8_device::ADC_6).r(FUNC(mu80_state::adc_battery_r));
-	map(h8_device::ADC_7, h8_device::ADC_7).r(FUNC(mu80_state::adc_zero_r)); // inputmod from the gate array
-}
-
 void mu80_state::mu80(machine_config &config)
 {
 	H83002(config, m_mu80cpu, 12_MHz_XTAL);
 	m_mu80cpu->set_addrmap(AS_PROGRAM, &mu80_state::mu80_map);
-	m_mu80cpu->set_addrmap(AS_IO, &mu80_state::mu80_iomap);
+	m_mu80cpu->read_adc(0).set(FUNC(mu80_state::adc_ar_r));
+	m_mu80cpu->read_adc(1).set([]() -> u16 { return 0; });
+	m_mu80cpu->read_adc(2).set(FUNC(mu80_state::adc_al_r));
+	m_mu80cpu->read_adc(3).set([]() -> u16 { return 0; });
+	m_mu80cpu->read_adc(4).set(FUNC(mu80_state::adc_midisw_r));
+	m_mu80cpu->read_adc(5).set([]() -> u16 { return 0; });
+	m_mu80cpu->read_adc(6).set(FUNC(mu80_state::adc_battery_r));
+	m_mu80cpu->read_adc(7).set([]() -> u16 { return 0; }); // inputmod from the gate array
+	m_mu80cpu->read_port6().set(FUNC(mu80_state::p6_r));
+	m_mu80cpu->write_port6().set(FUNC(mu80_state::p6_w));
+	m_mu80cpu->read_porta().set(FUNC(mu80_state::pa_r));
+	m_mu80cpu->write_porta().set(FUNC(mu80_state::pa_w));
+	m_mu80cpu->read_portb().set(FUNC(mu80_state::pb_r));
+	m_mu80cpu->write_portb().set(FUNC(mu80_state::pb_w));
 
 	MULCD(config, m_lcd);
 
