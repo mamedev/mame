@@ -392,9 +392,9 @@ protected:
 	std::unique_ptr<u8[]> m_downtown_protection;
 
 	u16 ipl1_ack_r();
-	void ipl1_ack_w(u16 data);
+	void ipl1_ack_w(u16 data = 0);
 	u16 ipl2_ack_r();
-	void ipl2_ack_w(u16 data);
+	void ipl2_ack_w(u16 data = 0);
 
 	void seta_coin_lockout_w(u8 data);
 	X1_001_SPRITE_GFXBANK_CB_MEMBER(setac_gfxbank_callback);
@@ -526,9 +526,7 @@ void downtown_state::vram_layer0_vctrl_raster_trampoline_w(offs_t offset, u16 da
 
 /***************************************************************************
 
-
                             Palette Init Functions
-
 
 ***************************************************************************/
 
@@ -577,9 +575,7 @@ void usclssic_state::usclssic_set_pens()
 
 /***************************************************************************
 
-
                                 Screen Drawing
-
 
 ***************************************************************************/
 
@@ -622,9 +618,7 @@ u32 usclssic_state::screen_update_usclssic(screen_device &screen, bitmap_ind16 &
 
 /***************************************************************************
 
-
                                 Common Routines
-
 
 ***************************************************************************/
 
@@ -702,7 +696,6 @@ void downtown_state::seta_coin_lockout_w(u8 data)
 
 /***************************************************************************
 
-
                                     Main CPU
 
 ***************************************************************************/
@@ -711,7 +704,7 @@ void downtown_state::seta_coin_lockout_w(u8 data)
 u16 downtown_state::ipl1_ack_r()
 {
 	if (!machine().side_effects_disabled())
-		m_maincpu->set_input_line(2, CLEAR_LINE);
+		ipl1_ack_w();
 	return 0;
 }
 
@@ -723,7 +716,7 @@ void downtown_state::ipl1_ack_w(u16 data)
 u16 downtown_state::ipl2_ack_r()
 {
 	if (!machine().side_effects_disabled())
-		m_maincpu->set_input_line(4, CLEAR_LINE);
+		ipl2_ack_w();
 	return 0;
 }
 
@@ -910,9 +903,7 @@ void usclssic_state::usclssic_map(address_map &map)
 
 /***************************************************************************
 
-
                                 Sub / Sound CPU
-
 
 ***************************************************************************/
 
@@ -1671,7 +1662,6 @@ INPUT_PORTS_END
 
 
 /***************************************************************************
-
 
                                 Graphics Layouts
 

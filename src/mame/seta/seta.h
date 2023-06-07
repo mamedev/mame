@@ -145,11 +145,11 @@ protected:
 
 	void screen_vblank_seta_buffer_sprites(int state);
 	u16 ipl0_ack_r();
-	void ipl0_ack_w(u16 data);
+	void ipl0_ack_w(u16 data = 0);
 	u16 ipl1_ack_r();
-	void ipl1_ack_w(u16 data);
+	void ipl1_ack_w(u16 data = 0);
 	u16 ipl2_ack_r();
-	void ipl2_ack_w(u16 data);
+	void ipl2_ack_w(u16 data = 0);
 	TIMER_DEVICE_CALLBACK_MEMBER(seta_interrupt_1_and_2);
 	TIMER_DEVICE_CALLBACK_MEMBER(seta_interrupt_2_and_4);
 
