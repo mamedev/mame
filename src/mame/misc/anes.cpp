@@ -79,7 +79,7 @@ private:
 	uint8_t m_palette_offset_msb;
 	uint8_t m_palette_active_bank;
 	uint8_t m_palette_active_bank_alt;
-	uint8_t palette_data_lsb[0x2000];
+	uint8_t m_palette_data_lsb[0x2000];
 	uint8_t m_palette_data_msb[0x2000];
 
 	void do_blit();
@@ -96,6 +96,7 @@ private:
 	void palette_offset_msb_w(uint8_t data);
 	void palette_active_bank_w(uint8_t data);
 	uint8_t palette_data_lsb_r();
+	uint8_t palette_data_msb_r();
 	void palette_data_lsb_w(uint8_t data);
 	void palette_data_msb_w(uint8_t data);
 	void set_color(int offset);
@@ -305,7 +306,7 @@ void anes_state::palette_enable_w(uint8_t data)
 
 void anes_state::set_color(int offset)
 {
-	uint16_t dat = (m_palette_data_msb[offset] << 8) | palette_data_lsb[offset];
+	uint16_t dat = (m_palette_data_msb[offset] << 8) | m_palette_data_lsb[offset];
 	m_palette->set_pen_color(offset, rgb_t(pal5bit(dat >> 0), pal5bit(dat >> 5), pal5bit(dat >> 10)));
 }
 
@@ -348,10 +349,25 @@ uint8_t anes_state::palette_data_lsb_r()
 	else
 	{
 		int offs = (m_palette_offset + (m_palette_offset_msb << 8)) & 0x1fff;
-		return palette_data_lsb[offs];
+		return m_palette_data_lsb[offs];
 	}
 	return 0x00;
 }
+
+uint8_t anes_state::palette_data_msb_r()
+{
+	if (m_palette_enable != 0x01)
+	{
+		logerror("read from palette_data_msb_r when not enabled\n");
+	}
+	else
+	{
+		int offs = (m_palette_offset + (m_palette_offset_msb << 8)) & 0x1fff;
+		return m_palette_data_msb[offs];
+	}
+	return 0x00;
+}
+
 
 
 void anes_state::palette_data_lsb_w(uint8_t data)
@@ -363,7 +379,7 @@ void anes_state::palette_data_lsb_w(uint8_t data)
 	else
 	{
 		int offs = (m_palette_offset + (m_palette_offset_msb << 8)) & 0x1fff;
-		palette_data_lsb[offs] = data;
+		m_palette_data_lsb[offs] = data;
 		set_color(offs);
 	}
 }
@@ -418,7 +434,7 @@ void anes_state::io_map(address_map &map)
 	map(0x52, 0x52).w(FUNC(anes_state::palette_offset_msb_w));
 	map(0x53, 0x53).w(FUNC(anes_state::palette_active_bank_w));
 	map(0x54, 0x54).rw(FUNC(anes_state::palette_data_lsb_r), FUNC(anes_state::palette_data_lsb_w));
-	map(0x55, 0x55).w(FUNC(anes_state::palette_data_msb_w));
+	map(0x55, 0x55).rw(FUNC(anes_state::palette_data_msb_r), FUNC(anes_state::palette_data_msb_w));
 	map(0xfe, 0xfe).w(FUNC(anes_state::rombank_w));
 }
 
@@ -573,7 +589,7 @@ void anes_state::video_start()
 	m_palette_active_bank = 0;
 	m_palette_active_bank_alt = 0;
 
-	std::fill(std::begin(palette_data_lsb), std::end(palette_data_lsb), 0);
+	std::fill(std::begin(m_palette_data_lsb), std::end(m_palette_data_lsb), 0);
 	std::fill(std::begin(m_palette_data_msb), std::end(m_palette_data_msb), 0);
 
 	save_item(NAME(m_palette_enable));
@@ -581,7 +597,7 @@ void anes_state::video_start()
 	save_item(NAME(m_palette_offset_msb));
 	save_item(NAME(m_palette_active_bank));
 	save_item(NAME(m_palette_active_bank_alt));
-	save_item(NAME(palette_data_lsb));
+	save_item(NAME(m_palette_data_lsb));
 	save_item(NAME(m_palette_data_msb));
 }
 
