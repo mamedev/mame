@@ -44,7 +44,7 @@ public:
 		m_palette(*this, "palette"),
 		m_rombank(*this, "rombank"),
 		m_blitrom(*this, "blitter"),
-		m_key{ { *this, "KEY1.%u", 0U }, { *this, "KEY2.%u", 0U } }
+		m_key(*this, "KEY1.%u", 0U)
 	{
 	}
 
@@ -63,7 +63,7 @@ private:
 	required_memory_bank m_rombank;
 	required_region_ptr<uint8_t> m_blitrom;
 
-	required_ioport_array<5> m_key[2];
+	required_ioport_array<5> m_key;
 
 	uint8_t m_inp_matrix;
 	uint8_t m_bank;
@@ -281,7 +281,7 @@ uint8_t anes_state::key_r(offs_t offset)
 	// read key matrix
 	for (int i = 0; i < 5; i++)
 		if (!BIT(m_inp_matrix, i))
-			data &= m_key[offset][i]->read();
+			data &= m_key[i]->read();
 
 	return data;
 }
@@ -408,7 +408,8 @@ void anes_state::io_map(address_map &map)
 	map(0x11, 0x11).portr("SW2");
 	map(0x12, 0x12).portr("SW3");
 	map(0x13, 0x13).portr("SW4");
-	map(0x14, 0x15).r(FUNC(anes_state::key_r));
+	map(0x14, 0x14).r(FUNC(anes_state::key_r));
+	map(0x15, 0x15).portr("COIN");
 	map(0x16, 0x16).r(FUNC(anes_state::blit_status_r));
 	map(0x50, 0x50).w(FUNC(anes_state::palette_enable_w));
 	map(0x51, 0x51).w(FUNC(anes_state::palette_offset_w));
@@ -421,6 +422,11 @@ void anes_state::io_map(address_map &map)
 
 
 static INPUT_PORTS_START( anes )
+	PORT_START("COIN")
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
 	PORT_START("KEY1.0")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
@@ -461,31 +467,6 @@ static INPUT_PORTS_START( anes )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY2.0")
-	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN5 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY2.1")
-	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY2.2")
-	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY2.3")
-	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY2.4")
-	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SW1")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW1:1" )
