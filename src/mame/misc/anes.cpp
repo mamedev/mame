@@ -95,8 +95,8 @@ private:
 	void palette_offset_w(uint8_t data);
 	void palette_offset_msb_w(uint8_t data);
 	void palette_active_bank_w(uint8_t data);
-	uint8_t palette_data2_r();
-	void palette_data2_w(uint8_t data);
+	uint8_t palette_data_lsb_r();
+	void palette_data_lsb_w(uint8_t data);
 	void palette_data_msb_w(uint8_t data);
 	void set_color(int offset);
 
@@ -339,11 +339,11 @@ void anes_state::palette_active_bank_w(uint8_t data)
 	m_palette_active_bank = data & 0x1f;
 }
 
-uint8_t anes_state::palette_data2_r()
+uint8_t anes_state::palette_data_lsb_r()
 {
 	if (m_palette_enable != 0x01)
 	{
-		logerror("read from palette_data2_r when not enabled\n");
+		logerror("read from palette_data_lsb_r when not enabled\n");
 	}
 	else
 	{
@@ -354,11 +354,11 @@ uint8_t anes_state::palette_data2_r()
 }
 
 
-void anes_state::palette_data2_w(uint8_t data)
+void anes_state::palette_data_lsb_w(uint8_t data)
 {
 	if (m_palette_enable != 0x01)
 	{
-		logerror("write to palette_data2_w when not enabled %02x\n", data);
+		logerror("write to palette_data_lsb_w when not enabled %02x\n", data);
 	}
 	else
 	{
@@ -417,7 +417,7 @@ void anes_state::io_map(address_map &map)
 	map(0x51, 0x51).w(FUNC(anes_state::palette_offset_w));
 	map(0x52, 0x52).w(FUNC(anes_state::palette_offset_msb_w));
 	map(0x53, 0x53).w(FUNC(anes_state::palette_active_bank_w));
-	map(0x54, 0x54).rw(FUNC(anes_state::palette_data2_r), FUNC(anes_state::palette_data2_w));
+	map(0x54, 0x54).rw(FUNC(anes_state::palette_data_lsb_r), FUNC(anes_state::palette_data_lsb_w));
 	map(0x55, 0x55).w(FUNC(anes_state::palette_data_msb_w));
 	map(0xfe, 0xfe).w(FUNC(anes_state::rombank_w));
 }
