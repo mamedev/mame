@@ -78,6 +78,7 @@ private:
 	uint8_t m_palette_offset;
 	uint8_t m_palette_offset_msb;
 	uint8_t m_palette_active_bank;
+	uint8_t m_palette_active_bank_alt;
 	uint8_t palette_data_lsb[0x2000];
 	uint8_t m_palette_data_msb[0x2000];
 
@@ -122,7 +123,7 @@ uint32_t anes_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 
 			uint16_t* dst = &bitmap.pix(y, x);
 
-			dst[0] = src[0] + m_palette_active_bank * 0x100;
+			dst[0] = src[0] + (m_palette_active_bank_alt * 0x100);
 
 			if (src2[0])
 				dst[0] = src2[0] + m_palette_active_bank * 0x100;
@@ -325,6 +326,7 @@ void anes_state::palette_offset_msb_w(uint8_t data)
 	if (m_palette_enable != 0x01)
 	{
 		logerror("%s: write to palette_offset_msb_w when not enabled %02x (enable %02x)\n", machine().describe_context(), data, m_palette_enable);
+		m_palette_active_bank_alt = data;
 	}
 	else
 	{
@@ -334,7 +336,7 @@ void anes_state::palette_offset_msb_w(uint8_t data)
 
 void anes_state::palette_active_bank_w(uint8_t data)
 {
-	m_palette_active_bank = data & 0xf;
+	m_palette_active_bank = data & 0x1f;
 }
 
 uint8_t anes_state::palette_data2_r()
@@ -543,7 +545,6 @@ void anes_state::machine_start()
 	m_inp_matrix = 0;
 	m_bank = 0;
 	m_bank_delay = 0;
-	m_palette_active_bank = 0;
 
 	save_item(NAME(m_inp_matrix));
 	save_item(NAME(m_bank));
@@ -570,6 +571,7 @@ void anes_state::video_start()
 	m_palette_offset = 0;
 	m_palette_offset_msb = 0;
 	m_palette_active_bank = 0;
+	m_palette_active_bank_alt = 0;
 
 	std::fill(std::begin(palette_data_lsb), std::end(palette_data_lsb), 0);
 	std::fill(std::begin(m_palette_data_msb), std::end(m_palette_data_msb), 0);
@@ -578,6 +580,7 @@ void anes_state::video_start()
 	save_item(NAME(m_palette_offset));
 	save_item(NAME(m_palette_offset_msb));
 	save_item(NAME(m_palette_active_bank));
+	save_item(NAME(m_palette_active_bank_alt));
 	save_item(NAME(palette_data_lsb));
 	save_item(NAME(m_palette_data_msb));
 }
