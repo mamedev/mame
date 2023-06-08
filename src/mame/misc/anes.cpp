@@ -507,10 +507,10 @@ static INPUT_PORTS_START( anes )
 	PORT_DIPSETTING(    0x10, "1/rand<3" )  // 3
 	PORT_DIPSETTING(    0x20, "1/rand<5" )  // 5
 	PORT_DIPSETTING(    0x00, "1/rand<10" ) // 10
-	PORT_DIPNAME( 0x40, 0x40, "Use Rand" )               PORT_DIPLOCATION("SW3:7")
+	PORT_DIPNAME( 0x40, 0x40, "Use Rand" )             PORT_DIPLOCATION("SW3:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Twice" )               PORT_DIPLOCATION("SW3:8")
+	PORT_DIPNAME( 0x80, 0x80, "Twice" )                PORT_DIPLOCATION("SW3:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -525,6 +525,14 @@ static INPUT_PORTS_START( anes )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW4:8" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( tonpuu )
+	PORT_INCLUDE( anes )
+
+	PORT_MODIFY("SW4") // port 0x13
+	PORT_DIPNAME( 0x04, 0x04, "Background Style" )    PORT_DIPLOCATION("SW4:3")
+	PORT_DIPSETTING(    0x04, "Textured" )
+	PORT_DIPSETTING(    0x00, "Flat")
+INPUT_PORTS_END
 
 void anes_state::machine_start()
 {
@@ -636,5 +644,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2001, sanma,  0, anes, anes, anes_state, empty_init, ROT0, "ANES", "Sanma - San-nin Uchi Mahjong [BET] (Japan, version 2.60)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // flyer says 2000, manual says 2001 version 2.60
-GAME( 200?, tonpuu, 0, anes, anes, anes_state, empty_init, ROT0, "ANES", "Ton Puu Mahjong [BET] (Japan)",                            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2001, sanma,  0, anes, anes,   anes_state, empty_init, ROT0, "ANES", "Sanma - San-nin Uchi Mahjong [BET] (Japan, version 2.60)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // flyer says 2000, manual says 2001 version 2.60
+GAME( 200?, tonpuu, 0, anes, tonpuu, anes_state, empty_init, ROT0, "ANES", "Ton Puu Mahjong [BET] (Japan)",                            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
