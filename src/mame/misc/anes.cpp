@@ -391,8 +391,7 @@ void anes_state::prg_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0xefff).bankr(m_rombank);
 	map(0x0000, 0x01ff).w(FUNC(anes_state::blit_rom_w));
-	map(0xf000, 0xf7ff).ram();
-	map(0xf900, 0xffff).ram();
+	map(0xf000, 0xffff).ram(); // there might be a hole at 0xf800 - 0xf8ff
 }
 
 void anes_state::io_map(address_map &map)
