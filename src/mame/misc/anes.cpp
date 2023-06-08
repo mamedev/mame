@@ -383,7 +383,7 @@ void anes_state::palette_data_msb_w(uint8_t data)
 
 void anes_state::opcodes_map(address_map &map)
 {
-	map(0x0000, 0xefff).r(FUNC(anes_state::m1_rom_r));
+	map(0x0000, 0xffff).r(FUNC(anes_state::m1_rom_r));
 }
 
 void anes_state::prg_map(address_map &map)
