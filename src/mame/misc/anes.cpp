@@ -86,6 +86,8 @@ private:
 	void blit_w(offs_t offset, uint8_t data);
 	void blit_rom_w(offs_t offset, uint8_t data);
 	uint8_t blit_status_r();
+	void blit_unk_w(uint8_t data);
+
 	void rombank_w(uint8_t data);
 	void matrix_w(uint8_t data);
 	uint8_t key_r(offs_t offset);
@@ -326,7 +328,7 @@ void anes_state::palette_offset_msb_w(uint8_t data)
 {
 	if (m_palette_enable != 0x01)
 	{
-		logerror("%s: write to palette_offset_msb_w when not enabled %02x (enable %02x)\n", machine().describe_context(), data, m_palette_enable);
+		//logerror("%s: write to palette_offset_msb_w when not enabled %02x (enable %02x)\n", machine().describe_context(), data, m_palette_enable);
 		m_palette_active_bank_alt = data;
 	}
 	else
@@ -398,6 +400,11 @@ void anes_state::palette_data_msb_w(uint8_t data)
 	}
 }
 
+void anes_state::blit_unk_w(uint8_t data)
+{
+	if (data != 0x1f)
+		logerror("write to blit_unk_w %02x\n", data);
+}
 
 void anes_state::opcodes_map(address_map &map)
 {
@@ -409,6 +416,7 @@ void anes_state::prg_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0xefff).bankr(m_rombank);
 	map(0x0000, 0x01ff).w(FUNC(anes_state::blit_rom_w));
+	map(0x1000, 0x11ff).w(FUNC(anes_state::blit_rom_w)); // does writing with 0x1000 set on the address have a different meaning?
 	map(0xf000, 0xffff).ram(); // there might be a hole at 0xf800 - 0xf8ff
 }
 
@@ -428,7 +436,7 @@ void anes_state::io_map(address_map &map)
 	map(0x13, 0x13).portr("SW4");
 	map(0x14, 0x14).r(FUNC(anes_state::key_r));
 	map(0x15, 0x15).portr("COIN");
-	map(0x16, 0x16).r(FUNC(anes_state::blit_status_r));
+	map(0x16, 0x16).rw(FUNC(anes_state::blit_status_r), FUNC(anes_state::blit_unk_w));
 	map(0x50, 0x50).w(FUNC(anes_state::palette_enable_w));
 	map(0x51, 0x51).w(FUNC(anes_state::palette_offset_w));
 	map(0x52, 0x52).w(FUNC(anes_state::palette_offset_msb_w));
