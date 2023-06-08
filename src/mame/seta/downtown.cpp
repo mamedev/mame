@@ -345,8 +345,7 @@ public:
 		m_coins(*this, "COINS"),
 		m_paletteram(*this, "paletteram"),
 		m_sharedram(*this, "sharedram"),
-		m_subbank(*this, "subbank"),
-		m_sub_ctrl_data(0)
+		m_subbank(*this, "subbank")
 	{ }
 
 	void calibr50(machine_config &config);
@@ -384,10 +383,9 @@ protected:
 
 	required_memory_bank m_subbank;
 
-	u8 m_sub_ctrl_data;
-
-	u8 m_twineagl_xram[8];
-	u8 m_twineagl_tilebank[4];
+	u8 m_sub_ctrl_data = 0;
+	u8 m_twineagl_xram[8] = { };
+	u8 m_twineagl_tilebank[4] = { };
 
 	std::unique_ptr<u8[]> m_downtown_protection;
 
@@ -447,9 +445,7 @@ public:
 		m_upd4701(*this, "upd4701"),
 		m_buttonmux(*this, "buttonmux"),
 		m_track_x(*this, "TRACK%u_X", 1U),
-		m_track_y(*this, "TRACK%u_Y", 1U),
-		m_port_select(0),
-		m_tiles_offset(0)
+		m_track_y(*this, "TRACK%u_Y", 1U)
 	{ }
 
 	void usclssic(machine_config &config);
@@ -478,8 +474,8 @@ private:
 	required_ioport_array<2> m_track_x;
 	required_ioport_array<2> m_track_y;
 
-	u8 m_port_select;
-	u16 m_tiles_offset;
+	u8 m_port_select = 0;
+	u16 m_tiles_offset = 0;
 };
 
 
