@@ -145,16 +145,19 @@ uint32_t anes_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 
 void anes_state::do_blit()
 {
-	//	int m4      =   m_blit[0x04];
-	//	int m0      =   m_blit[0x00];
 	int which = m_blit[0x0b];
 	int src = (m_blit[0x0c] << 16) + (m_blit[0x0d] << 8) + m_blit[0x0e];
 
-	//	logerror("%s: blit s %02x, y %02x, src %06x, addr1 %04X %02X, addr2 %04X %02X, which %02X\n", machine().describe_context(),
-	//			m4, m0, src, m_blit_addr[0], m_blit_val[0], m_blit_addr[1], m_blit_val[1], which );
+	logerror("%s: src %06x, xpos %04X width %02X, ypos %04X height %02X | %02X %02X %02X %02X %02X %02X %02X | %02X %02X | %02X\n", machine().describe_context(),
+		src, m_blit_addr[0], m_blit_val[0], m_blit_addr[1], m_blit_val[1],
+		m_blit[0x00], m_blit[0x01], m_blit[0x02], m_blit[0x03], m_blit[0x04], m_blit[0x05], m_blit[0x06],
+		m_blit[0x0a], m_blit[0x0b],
+		m_blit[0x0f]
+	);
 
 	int layer = 0;
 	int buffer = 0;
+
 	bitmap_ind16& bitmap = m_bitmap[layer][buffer];
 
 	int sx = m_blit_addr[0];
