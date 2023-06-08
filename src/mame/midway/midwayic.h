@@ -45,14 +45,14 @@ protected:
 
 	required_ioport m_io_serial_digit;
 
-	uint8_t   m_data[16]{}; // reused by other devices
+	uint8_t m_data[16]{}; // reused by other devices
 	int     m_upper = 0;
 
 private:
-	uint8_t   m_buff = 0;
-	uint8_t   m_idx = 0;
-	uint8_t   m_status = 0;
-	uint8_t   m_bits = 0;
+	uint8_t m_buff = 0;
+	uint8_t m_idx = 0;
+	uint8_t m_status = 0;
+	uint8_t m_bits = 0;
 };
 
 
@@ -129,10 +129,10 @@ protected:
 private:
 
 	void pic_register_state();
-	TIMER_CALLBACK_MEMBER( reset_timer );
+	TIMER_CALLBACK_MEMBER(reset_timer);
 
 	uint16_t  m_latch = 0;
-	attotime m_latch_expire_time{};
+	attotime  m_latch_expire_time;
 	uint8_t   m_state = 0;
 	uint8_t   m_index = 0;
 	uint8_t   m_total = 0;
