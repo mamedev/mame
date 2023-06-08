@@ -113,13 +113,12 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	address_space_config m_program_config, m_io_config;
+	address_space_config m_program_config;
 	memory_access<32, 1, 0, ENDIANNESS_BIG>::cache m_cache;
 	memory_access<32, 1, 0, ENDIANNESS_BIG>::specific m_program;
-	memory_access<16, 1, -1, ENDIANNESS_BIG>::specific m_io;
-	std::array<devcb_read16, 8> m_read_adc;
-	std::array<devcb_read8, PORT_COUNT> m_read_port;
-	std::array<devcb_write8, PORT_COUNT> m_write_port;
+	devcb_read16::array<8> m_read_adc;
+	devcb_read8::array<PORT_COUNT> m_read_port;
+	devcb_write8::array<PORT_COUNT> m_write_port;
 
 	h8gen_dma_device *m_dma_device;
 	h8_dtc_device *m_dtc_device;

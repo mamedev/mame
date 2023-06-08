@@ -675,11 +675,11 @@ void mu100_state::mu100(machine_config &config)
 	H8S2655(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mu100_state::mu100_map);
 	m_maincpu->read_adc(0).set(FUNC(mu100_state::adc_ar_r));
-	m_maincpu->read_adc(1).set([]() -> u16 { return 0; });
+	m_maincpu->read_adc(1).set_constant(0);
 	m_maincpu->read_adc(2).set(FUNC(mu100_state::adc_al_r));
-	m_maincpu->read_adc(3).set([]() -> u16 { return 0; });
+	m_maincpu->read_adc(3).set_constant(0);
 	m_maincpu->read_adc(4).set(FUNC(mu100_state::adc_midisw_r));
-	m_maincpu->read_adc(5).set([]() -> u16 { return 0; });
+	m_maincpu->read_adc(5).set_constant(0);
 	m_maincpu->read_adc(6).set(FUNC(mu100_state::adc_battery_r));
 	m_maincpu->read_adc(7).set(FUNC(mu100_state::adc_type_r));
 	m_maincpu->read_port1().set(FUNC(mu100_state::p1_r));

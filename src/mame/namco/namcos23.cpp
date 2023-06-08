@@ -3793,10 +3793,10 @@ void namcos23_state::gorgon(machine_config &config)
 
 	H83002(config, m_subcpu, H8CLOCK);
 	m_subcpu->set_addrmap(AS_PROGRAM, &namcos23_state::s23h8rwmap);
-	m_subcpu->read_adc(0).set([]() -> u16 { return 0; });
-	m_subcpu->read_adc(1).set([]() -> u16 { return 0; });
-	m_subcpu->read_adc(2).set([]() -> u16 { return 0; });
-	m_subcpu->read_adc(3).set([]() -> u16 { return 0; });
+	m_subcpu->read_adc(0).set_constant(0);
+	m_subcpu->read_adc(1).set_constant(0);
+	m_subcpu->read_adc(2).set_constant(0);
+	m_subcpu->read_adc(3).set_constant(0);
 	m_subcpu->read_port6().set(FUNC(namcos23_state::mcu_p6_r));
 	m_subcpu->write_port6().set(FUNC(namcos23_state::mcu_p6_w));
 	m_subcpu->read_port8().set(FUNC(namcos23_state::mcu_p8_r));
@@ -3821,11 +3821,11 @@ void namcos23_state::gorgon(machine_config &config)
 	m_iocpu->read_adc(7).set_ioport("ADC7");
 	m_iocpu->read_port4().set(FUNC(namcos23_state::iob_p4_r));
 	m_iocpu->write_port4().set(FUNC(namcos23_state::iob_p4_w));
-	m_iocpu->write_port5().set([](u8) {});   // bit 2 = status LED to indicate transmitting packet to main
+	m_iocpu->write_port5().set_nop();   // bit 2 = status LED to indicate transmitting packet to main
 	m_iocpu->read_port6().set(FUNC(namcos23_state::iob_p6_r));
 	m_iocpu->write_port6().set(FUNC(namcos23_state::iob_p6_w));
-	m_iocpu->write_port8().set([](u8) {});   // unknown - used on ASCA-5 only
-	m_iocpu->write_port9().set([](u8) {});   // unknown - used on ASCA-5 only
+	m_iocpu->write_port8().set_nop();   // unknown - used on ASCA-5 only
+	m_iocpu->write_port9().set_nop();   // unknown - used on ASCA-5 only
 
 	m_iocpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("subcpu:sci0", FUNC(h8_sci_device::rx_w));
 	m_subcpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("iocpu:sci0", FUNC(h8_sci_device::rx_w));
@@ -3880,10 +3880,10 @@ void namcos23_state::s23(machine_config &config)
 
 	H83002(config, m_subcpu, H8CLOCK);
 	m_subcpu->set_addrmap(AS_PROGRAM, &namcos23_state::s23h8rwmap);
-	m_subcpu->read_adc(0).set([]() -> u16 { return 0; });
-	m_subcpu->read_adc(1).set([]() -> u16 { return 0; });
-	m_subcpu->read_adc(2).set([]() -> u16 { return 0; });
-	m_subcpu->read_adc(3).set([]() -> u16 { return 0; });
+	m_subcpu->read_adc(0).set_constant(0);
+	m_subcpu->read_adc(1).set_constant(0);
+	m_subcpu->read_adc(2).set_constant(0);
+	m_subcpu->read_adc(3).set_constant(0);
 	m_subcpu->read_port6().set(FUNC(namcos23_state::mcu_p6_r));
 	m_subcpu->write_port6().set(FUNC(namcos23_state::mcu_p6_w));
 	m_subcpu->read_port8().set(FUNC(namcos23_state::mcu_p8_r));

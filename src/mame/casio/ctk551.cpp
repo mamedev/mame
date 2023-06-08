@@ -451,16 +451,16 @@ void ctk551_state::ap10(machine_config& config)
 	m_maincpu->set_addrmap(AS_DATA, &ctk551_state::ap10_map);
 	m_maincpu->add_route(0, "lspeaker", 1.0);
 	m_maincpu->add_route(1, "rspeaker", 1.0);
-	m_maincpu->read_adc(0).set([]() -> u16 { return 0; });
-	m_maincpu->read_adc(1).set([]() -> u16 { return 0; });
+	m_maincpu->read_adc(0).set_constant(0);
+	m_maincpu->read_adc(1).set_constant(0);
 	m_maincpu->read_port1().set_ioport("P1");
 	m_maincpu->write_port1().set_ioport("P1");
-	m_maincpu->read_port2().set([]() -> u16 { return 0; });
-	m_maincpu->write_port2().set([](u16) {});
-	m_maincpu->read_port3().set([]() -> u16 { return 0; });
-	m_maincpu->write_port3().set([](u16) {});
-	m_maincpu->read_port4().set([]() -> u16 { return 0; });
-	m_maincpu->write_port4().set([](u16) {});
+	m_maincpu->read_port2().set_constant(0);
+	m_maincpu->write_port2().set_nop();
+	m_maincpu->read_port3().set_constant(0);
+	m_maincpu->write_port3().set_nop();
+	m_maincpu->read_port4().set_constant(0);
+	m_maincpu->write_port4().set_nop();
 
 	NVRAM(config, "nvram");
 
@@ -488,14 +488,14 @@ void ctk551_state::ctk530(machine_config& config)
 	m_maincpu->set_addrmap(AS_DATA, &ctk551_state::ctk530_map);
 	m_maincpu->add_route(0, "lspeaker", 1.0);
 	m_maincpu->add_route(1, "rspeaker", 1.0);
-	m_maincpu->read_adc(0).set([]() -> u16 { return 0; });
-	m_maincpu->read_adc(1).set([]() -> u16 { return 0; });
+	m_maincpu->read_adc(0).set_constant(0);
+	m_maincpu->read_adc(1).set_constant(0);
 	m_maincpu->read_port1().set_ioport("P1");
 	m_maincpu->write_port1().set_ioport("P1");
-	m_maincpu->read_port2().set([]() -> u16 { return 0; });
-	m_maincpu->write_port2().set([](u16) {});
-	m_maincpu->read_port3().set([]() -> u16 { return 0; });
-	m_maincpu->write_port3().set([](u16) {});
+	m_maincpu->read_port2().set_constant(0);
+	m_maincpu->write_port2().set_nop();
+	m_maincpu->read_port3().set_constant(0);
+	m_maincpu->write_port3().set_nop();
 	m_maincpu->write_port4().set_ioport("PLE");
 
 	// MIDI
@@ -524,16 +524,16 @@ void ctk551_state::gz70sp(machine_config& config)
 	m_maincpu->set_addrmap(AS_DATA, &ctk551_state::gz70sp_map);
 	m_maincpu->add_route(0, "lspeaker", 1.0);
 	m_maincpu->add_route(1, "rspeaker", 1.0);
-	m_maincpu->read_adc(0).set([]() -> u16 { return 0; });
-	m_maincpu->read_adc(1).set([]() -> u16 { return 0; });
+	m_maincpu->read_adc(0).set_constant(0);
+	m_maincpu->read_adc(1).set_constant(0);
 	m_maincpu->read_port1().set_ioport("P1");
 	m_maincpu->write_port1().set_ioport("P1");
 	m_maincpu->read_port2().set_ioport("P2");
 	m_maincpu->write_port2().set_ioport("P2");
-	m_maincpu->read_port3().set([]() -> u16 { return 0; });
-	m_maincpu->write_port3().set([](u16) {});
-	m_maincpu->read_port4().set([]() -> u16 { return 0; });
-	m_maincpu->write_port4().set([](u16) {});
+	m_maincpu->read_port3().set_constant(0);
+	m_maincpu->write_port3().set_nop();
+	m_maincpu->read_port4().set_constant(0);
+	m_maincpu->write_port4().set_nop();
 
 	// MIDI (sci0 for RS232/422, sci1 for standard MIDI)
 	auto& mdin(MIDI_PORT(config, "mdin"));
@@ -551,16 +551,16 @@ void ctk551_state::ctk601(machine_config& config)
 	m_maincpu->set_addrmap(AS_DATA, &ctk551_state::ctk601_map);
 	m_maincpu->add_route(0, "lspeaker", 1.0);
 	m_maincpu->add_route(1, "rspeaker", 1.0);
-	m_maincpu->read_adc(0).set([]() -> u16 { return 0; });
-	m_maincpu->read_adc(1).set([]() -> u16 { return 0; });
+	m_maincpu->read_adc(0).set_constant(0);
+	m_maincpu->read_adc(1).set_constant(0);
 	m_maincpu->read_port1().set_ioport("P1_R");
 	m_maincpu->write_port1().set_ioport("P1_W");
 	m_maincpu->read_port2().set_ioport("P2");
 	m_maincpu->write_port2().set_ioport("P2");
-	m_maincpu->read_port3().set([]() -> u16 { return 0; }); // port 3 pins are shared w/ key matrix
-	m_maincpu->write_port3().set([](u16) {});
-	m_maincpu->read_port4().set([]() -> u16 { return 0; });
-	m_maincpu->write_port4().set([](u16) {});
+	m_maincpu->read_port3().set_constant(0); // port 3 pins are shared w/ key matrix
+	m_maincpu->write_port3().set_nop();
+	m_maincpu->read_port4().set_constant(0);
+	m_maincpu->write_port4().set_nop();
 
 	// TODO: DSP
 
@@ -602,10 +602,10 @@ void ctk551_state::ctk551(machine_config &config)
 	m_maincpu->write_port1().set_ioport("P1_W");
 	m_maincpu->read_port2().set_ioport("P2");
 	m_maincpu->write_port2().set_ioport("P2");
-	m_maincpu->read_port3().set([]() -> u16 { return 0; }); // port 3 pins are shared w/ key matrix
-	m_maincpu->write_port3().set([](u16) {});
-	m_maincpu->read_port4().set([]() -> u16 { return 0; });
-	m_maincpu->write_port4().set([](u16) {});
+	m_maincpu->read_port3().set_constant(0); // port 3 pins are shared w/ key matrix
+	m_maincpu->write_port3().set_nop();
+	m_maincpu->read_port4().set_constant(0);
+	m_maincpu->write_port4().set_nop();
 
 	// MIDI
 	auto &mdin(MIDI_PORT(config, "mdin"));

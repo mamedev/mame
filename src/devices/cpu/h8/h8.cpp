@@ -18,10 +18,9 @@
 h8_device::h8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map_delegate) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_BIG, 16, 16, 0, map_delegate),
-	m_io_config("io", ENDIANNESS_BIG, 16, 16, -1),
-	m_read_adc{ *this, *this, *this, *this, *this, *this, *this, *this },
-	m_read_port{ *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this },
-	m_write_port{ *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this },
+	m_read_adc(*this),
+	m_read_port(*this),
+	m_write_port(*this),
 	m_PPC(0), m_NPC(0), m_PC(0), m_PIR(0), m_EXR(0), m_CCR(0), m_MAC(0), m_MACF(0),
 	m_TMP1(0), m_TMP2(0), m_TMPR(0), m_inst_state(0), m_inst_substate(0), m_icount(0), m_bcount(0), m_irq_vector(0), m_taken_irq_vector(0), m_irq_level(0), m_taken_irq_level(0), m_irq_required(false), m_irq_nmi(false)
 {
@@ -34,7 +33,7 @@ h8_device::h8_device(const machine_config &mconfig, device_type type, const char
 	m_has_trace = false;
 	m_has_hc = true;
 
-	for(int i=0; i != 8; i++)
+	for(unsigned int i=0; i != m_read_adc.size(); i++)
 		m_read_adc[i].bind().set([this, i]() { return adc_default(i); });
 	for(int i=0; i != PORT_COUNT; i++) {
 		m_read_port[i].bind().set([this, i]() { return port_default_r(i); });
@@ -71,14 +70,10 @@ void h8_device::device_start()
 {
 	space(AS_PROGRAM).cache(m_cache);
 	space(AS_PROGRAM).specific(m_program);
-	space(AS_IO).specific(m_io);
 
-	for(auto &r : m_read_adc)
-		r.resolve();
-	for(auto &r : m_read_port)
-		r.resolve();
-	for(auto &w : m_write_port)
-		w.resolve();
+	m_read_adc.resolve_all();
+	m_read_port.resolve_all();
+	m_write_port.resolve_all();
 
 	uint32_t pcmask = m_mode_advanced ? 0xffffff : 0xffff;
 	state_add<uint32_t>(H8_PC, "PC",
@@ -321,8 +316,7 @@ void h8_device::internal_update()
 device_memory_interface::space_config_vector h8_device::memory_space_config() const
 {
 	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_IO,      &m_io_config)
+		std::make_pair(AS_PROGRAM, &m_program_config)
 	};
 }
 

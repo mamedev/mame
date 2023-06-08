@@ -324,7 +324,7 @@ void invqix_state::invqix(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(invqix_state::irq0_line_hold), attotime::from_hz(60));
 	m_maincpu->read_port1().set_ioport("P1");
 	m_maincpu->read_port2().set_ioport("SYSTEM");
-	m_maincpu->write_port2().set([](u8) {});
+	m_maincpu->write_port2().set_nop();
 	m_maincpu->read_port3().set(FUNC(invqix_state::port3_r));
 	m_maincpu->write_port3().set(FUNC(invqix_state::port3_w));
 	m_maincpu->read_port4().set_ioport("P4");
@@ -334,7 +334,7 @@ void invqix_state::invqix(machine_config &config)
 	m_maincpu->write_port6().set(FUNC(invqix_state::port6_w));
 	m_maincpu->read_porta().set(FUNC(invqix_state::porta_r));
 	m_maincpu->read_portg().set(FUNC(invqix_state::portg_r));
-	m_maincpu->write_portg().set([](u8) {});
+	m_maincpu->write_portg().set_nop();
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

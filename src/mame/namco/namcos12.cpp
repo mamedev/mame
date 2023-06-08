@@ -1691,14 +1691,14 @@ void namcos12_state::namcos12_mobo(machine_config &config)
 	/* basic machine hardware */
 	H83002(config, m_sub, 16934400); // frequency based on research (superctr)
 	m_sub->set_addrmap(AS_PROGRAM, &namcos12_state::s12h8rwmap);
-	m_sub->read_adc(0).set([]() -> u16 { return 0; });
-	m_sub->read_adc(1).set([]() -> u16 { return 0; });
-	m_sub->read_adc(2).set([]() -> u16 { return 0; });
-	m_sub->read_adc(3).set([]() -> u16 { return 0; });
+	m_sub->read_adc(0).set_constant(0);
+	m_sub->read_adc(1).set_constant(0);
+	m_sub->read_adc(2).set_constant(0);
+	m_sub->read_adc(3).set_constant(0);
 	m_sub->read_port6().set(FUNC(namcos12_state::s12_mcu_p6_r));
 	m_sub->read_port7().set_ioport("DSW");
 	m_sub->read_port8().set(FUNC(namcos12_state::s12_mcu_p8_r));
-	m_sub->write_port8().set([](u16) {});
+	m_sub->write_port8().set_nop();
 	m_sub->read_porta().set(FUNC(namcos12_state::s12_mcu_pa_r));
 	m_sub->write_porta().set(FUNC(namcos12_state::s12_mcu_pa_w));
 	m_sub->read_portb().set(FUNC(namcos12_state::s12_mcu_portB_r));
@@ -1889,13 +1889,13 @@ void namcos12_boothack_state::aplarail(machine_config &config)
 	// modify H8/3002 map to omit direct-connected controls
 	m_sub->set_addrmap(AS_PROGRAM, &namcos12_boothack_state::s12h8rwjvsmap);
 	m_sub->read_adc(0).set_ioport("LEVER");
-	m_sub->read_adc(1).set([]() -> u16 { return 0; });
-	m_sub->read_adc(2).set([]() -> u16 { return 0; });
-	m_sub->read_adc(3).set([]() -> u16 { return 0; });
+	m_sub->read_adc(1).set_constant(0);
+	m_sub->read_adc(2).set_constant(0);
+	m_sub->read_adc(3).set_constant(0);
 	m_sub->read_port6().set(FUNC(namcos12_boothack_state::s12_mcu_p6_r));
 	m_sub->read_port7().set_ioport("DSW");
 	m_sub->read_port8().set(FUNC(namcos12_boothack_state::s12_mcu_jvs_p8_r));
-	m_sub->write_port8().set([](u8) {});
+	m_sub->write_port8().set_nop();
 	m_sub->read_porta().set(FUNC(namcos12_boothack_state::s12_mcu_pa_r));
 	m_sub->write_porta().set(FUNC(namcos12_boothack_state::s12_mcu_pa_w));
 	m_sub->read_portb().set(FUNC(namcos12_boothack_state::s12_mcu_portB_r));
@@ -1903,10 +1903,10 @@ void namcos12_boothack_state::aplarail(machine_config &config)
 
 	h83334_device &iocpu(H83334(config, "iocpu", JVSCLOCK));
 	iocpu.set_addrmap(AS_PROGRAM, &namcos12_boothack_state::plarailjvsmap);
-	iocpu.read_adc(0).set([]() -> u16 { return 0; });
-	iocpu.read_adc(1).set([]() -> u16 { return 0; });
-	iocpu.read_adc(2).set([]() -> u16 { return 0; });
-	iocpu.read_adc(3).set([]() -> u16 { return 0; });
+	iocpu.read_adc(0).set_constant(0);
+	iocpu.read_adc(1).set_constant(0);
+	iocpu.read_adc(2).set_constant(0);
+	iocpu.read_adc(3).set_constant(0);
 	iocpu.read_port4().set(FUNC(namcos12_boothack_state::iob_p4_r));
 	iocpu.write_port4().set(FUNC(namcos12_boothack_state::iob_p4_w));
 	iocpu.read_port6().set_ioport("SERVICE");

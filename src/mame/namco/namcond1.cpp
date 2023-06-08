@@ -496,10 +496,10 @@ void namcond1_state::namcond1(machine_config &config)
 	H83002(config, m_mcu, XTAL(49'152'000) / 3);
 	m_mcu->set_addrmap(AS_PROGRAM, &namcond1_state::h8rwmap);
 	m_mcu->set_vblank_int("screen", FUNC(namcond1_state::mcu_interrupt));
-	m_mcu->read_adc(0).set([]() -> u16 { return 0; }); // MCU reads these, but the games have no analog controls
-	m_mcu->read_adc(1).set([]() -> u16 { return 0; });
-	m_mcu->read_adc(2).set([]() -> u16 { return 0; });
-	m_mcu->read_adc(3).set([]() -> u16 { return 0; });
+	m_mcu->read_adc(0).set_constant(0); // MCU reads these, but the games have no analog controls
+	m_mcu->read_adc(1).set_constant(0);
+	m_mcu->read_adc(2).set_constant(0);
+	m_mcu->read_adc(3).set_constant(0);
 	m_mcu->read_port7().set(FUNC(namcond1_state::mcu_p7_read));
 	m_mcu->read_porta().set(FUNC(namcond1_state::mcu_pa_read));
 	m_mcu->write_porta().set(FUNC(namcond1_state::mcu_pa_write));

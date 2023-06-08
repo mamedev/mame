@@ -206,13 +206,13 @@ void mu50_state::mu50(machine_config &config)
 	H83003(config, m_mu50cpu, 12_MHz_XTAL);
 	m_mu50cpu->set_addrmap(AS_PROGRAM, &mu50_state::mu50_map);
 	m_mu50cpu->read_adc(0).set(FUNC(mu50_state::adc_ar_r));
-	m_mu50cpu->read_adc(1).set([]() -> u16 { return 0; });
+	m_mu50cpu->read_adc(1).set_constant(0);
 	m_mu50cpu->read_adc(2).set(FUNC(mu50_state::adc_al_r));
-	m_mu50cpu->read_adc(3).set([]() -> u16 { return 0; });
+	m_mu50cpu->read_adc(3).set_constant(0);
 	m_mu50cpu->read_adc(4).set(FUNC(mu50_state::adc_midisw_r));
-	m_mu50cpu->read_adc(5).set([]() -> u16 { return 0; });
+	m_mu50cpu->read_adc(5).set_constant(0);
 	m_mu50cpu->read_adc(6).set(FUNC(mu50_state::adc_battery_r));
-	m_mu50cpu->read_adc(7).set([]() -> u16 { return 0; });
+	m_mu50cpu->read_adc(7).set_constant(0);
 	m_mu50cpu->read_port6().set(FUNC(mu50_state::p6_r));
 	m_mu50cpu->write_port6().set(FUNC(mu50_state::p6_w));
 	m_mu50cpu->read_porta().set(FUNC(mu50_state::pa_r));

@@ -202,13 +202,13 @@ void vl70_state::vl70(machine_config &config)
 	H83003(config, m_vl70cpu, 10_MHz_XTAL);
 	m_vl70cpu->set_addrmap(AS_PROGRAM, &vl70_state::vl70_map);
 	m_vl70cpu->read_adc(0).set(FUNC(vl70_state::adc_breath_r));
-	m_vl70cpu->read_adc(1).set([]() -> u16 { return 0; });
+	m_vl70cpu->read_adc(1).set_constant(0);
 	m_vl70cpu->read_adc(2).set(FUNC(vl70_state::adc_midisw_r));
-	m_vl70cpu->read_adc(3).set([]() -> u16 { return 0; });
+	m_vl70cpu->read_adc(3).set_constant(0);
 	m_vl70cpu->read_adc(4).set(FUNC(vl70_state::adc_battery_r));
-	m_vl70cpu->read_adc(5).set([]() -> u16 { return 0; });
-	m_vl70cpu->read_adc(6).set([]() -> u16 { return 0; });
-	m_vl70cpu->read_adc(7).set([]() -> u16 { return 0; });
+	m_vl70cpu->read_adc(5).set_constant(0);
+	m_vl70cpu->read_adc(6).set_constant(0);
+	m_vl70cpu->read_adc(7).set_constant(0);
 	m_vl70cpu->read_port6().set(FUNC(vl70_state::p6_r));
 	m_vl70cpu->write_port6().set(FUNC(vl70_state::p6_w));
 	m_vl70cpu->read_porta().set(FUNC(vl70_state::pa_r));

@@ -322,13 +322,13 @@ void mu80_state::mu80(machine_config &config)
 	H83002(config, m_mu80cpu, 12_MHz_XTAL);
 	m_mu80cpu->set_addrmap(AS_PROGRAM, &mu80_state::mu80_map);
 	m_mu80cpu->read_adc(0).set(FUNC(mu80_state::adc_ar_r));
-	m_mu80cpu->read_adc(1).set([]() -> u16 { return 0; });
+	m_mu80cpu->read_adc(1).set_constant(0);
 	m_mu80cpu->read_adc(2).set(FUNC(mu80_state::adc_al_r));
-	m_mu80cpu->read_adc(3).set([]() -> u16 { return 0; });
+	m_mu80cpu->read_adc(3).set_constant(0);
 	m_mu80cpu->read_adc(4).set(FUNC(mu80_state::adc_midisw_r));
-	m_mu80cpu->read_adc(5).set([]() -> u16 { return 0; });
+	m_mu80cpu->read_adc(5).set_constant(0);
 	m_mu80cpu->read_adc(6).set(FUNC(mu80_state::adc_battery_r));
-	m_mu80cpu->read_adc(7).set([]() -> u16 { return 0; }); // inputmod from the gate array
+	m_mu80cpu->read_adc(7).set_constant(0); // inputmod from the gate array
 	m_mu80cpu->read_port6().set(FUNC(mu80_state::p6_r));
 	m_mu80cpu->write_port6().set(FUNC(mu80_state::p6_w));
 	m_mu80cpu->read_porta().set(FUNC(mu80_state::pa_r));
