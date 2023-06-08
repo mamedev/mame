@@ -170,7 +170,6 @@ private:
 	void pangpoms_map(address_map &map);
 	void poitto_map(address_map &map);
 	void pururun_map(address_map &map);
-	void puzzlet_io_map(address_map &map);
 	void puzzlet_map(address_map &map);
 	void skyalert_map(address_map &map);
 	void toride2g_map(address_map &map);

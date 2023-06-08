@@ -34,7 +34,6 @@ gt913_device::gt913_device(const machine_config &mconfig, const char *tag, devic
 	m_sound(*this, "gt_sound"),
 	m_kbd(*this, "kbd"),
 	m_io_hle(*this, "io_hle"),
-	m_sci(*this, "sci%u", 0),
 	m_port(*this, "port%u", 1)
 {
 	m_has_hc = false;
@@ -54,7 +53,7 @@ void gt913_device::map(address_map &map)
 	/* ctk530 writes here to latch LED matrix data, which generates an active high strobe on pin 99 (PLE/P16)
 	   there's otherwise no external address decoding (or the usual read/write strobes) used for the LED latches.
 	   just treat as a 16-bit write-only port for now */
-	map(0xe000, 0xe001).lw16(NAME([this](uint16_t data) { m_io.write_word(h8_device::PORT_4, data); }));
+	map(0xe000, 0xe001).lw16(NAME([this](uint16_t data) { do_write_port(h8_device::PORT_4, data); }));
 
 	map(0xfac0, 0xffbf).ram();
 
@@ -112,8 +111,8 @@ void gt913_device::device_add_mconfig(machine_config &config)
 								m_intc->clear_interrupt(5);
 						});
 	GT913_IO_HLE(config, m_io_hle, *this, m_intc, 6, 7);
-	H8_SCI(config, m_sci[0], *this, m_intc, 8, 9, 10, 0);
-	H8_SCI(config, m_sci[1], *this, m_intc, 11, 12, 13, 0);
+	H8_SCI(config, m_sci[0], 0, *this, m_intc, 8, 9, 10, 0);
+	H8_SCI(config, m_sci[1], 1, *this, m_intc, 11, 12, 13, 0);
 
 	H8_PORT(config, m_port[0], *this, h8_device::PORT_1, 0x00, 0x00);
 	H8_PORT(config, m_port[1], *this, h8_device::PORT_2, 0x00, 0x00);
@@ -268,7 +267,6 @@ device_memory_interface::space_config_vector gt913_device::memory_space_config()
 {
 	return space_config_vector{
 		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_IO,      &m_io_config),
 		std::make_pair(AS_DATA,    &m_data_config)
 	};
 }

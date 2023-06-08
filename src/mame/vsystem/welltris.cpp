@@ -339,6 +339,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_spr_old(*this, "vsystem_spr_old"),
+		m_soundlatch(*this, "soundlatch"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_spriteram(*this, "spriteram"),
 		m_pixelram(*this, "pixelram"),
@@ -360,6 +361,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<vsystem_spr2_device> m_spr_old;
+	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	required_shared_ptr<uint16_t> m_spriteram;
@@ -376,6 +378,7 @@ private:
 	int m_scrolly;
 
 	void sound_bankswitch_w(uint8_t data);
+	void soundlatch_pending_w(int state);
 	void palette_bank_w(offs_t offset, uint8_t data);
 	void gfxbank_w(offs_t offset, uint8_t data);
 	void scrollreg_w(offs_t offset, uint16_t data);
@@ -492,6 +495,16 @@ void welltris_state::sound_bankswitch_w(uint8_t data)
 	m_soundbank->set_entry(data & 0x03);
 }
 
+void welltris_state::soundlatch_pending_w(int state)
+{
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+
+	// sound comms is 2-way (see pending_r in "SYSTEM"),
+	// NMI routine is very short, so briefly set perfect_quantum to make sure that the timing is right
+	if (state)
+		machine().scheduler().perfect_quantum(attotime::from_usec(100));
+}
+
 
 void welltris_state::main_map(address_map &map)
 {
@@ -510,7 +523,7 @@ void welltris_state::main_map(address_map &map)
 	map(0xfff004, 0xfff007).w(FUNC(welltris_state::scrollreg_w));
 	map(0xfff006, 0xfff007).portr("P4");                 // right side controls
 	map(0xfff008, 0xfff009).portr("SYSTEM");             // bit 5 tested at start of IRQ 1 */
-	map(0xfff009, 0xfff009).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xfff009, 0xfff009).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xfff00a, 0xfff00b).portr("EXTRA");              // P3+P4 coin + start buttons
 	map(0xfff00c, 0xfff00d).portr("DSW1");
 	map(0xfff00e, 0xfff00f).portr("DSW2");
@@ -529,8 +542,8 @@ void welltris_state::sound_port_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).w(FUNC(welltris_state::sound_bankswitch_w));
 	map(0x08, 0x0b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
-	map(0x10, 0x10).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x18, 0x18).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));
+	map(0x10, 0x10).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x18, 0x18).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
 }
 
 static INPUT_PORTS_START( welltris )
@@ -854,9 +867,9 @@ void welltris_state::welltris(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
-	soundlatch.data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
-	soundlatch.set_separate_acknowledge(true);
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set(FUNC(welltris_state::soundlatch_pending_w));
+	m_soundlatch->set_separate_acknowledge(true);
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);

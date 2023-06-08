@@ -31,6 +31,26 @@ class h83032_device : public h8h_device {
 public:
 	h83032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto read_port1()  { return m_read_port [PORT_1].bind(); }
+	auto write_port1() { return m_write_port[PORT_1].bind(); }
+	auto read_port2()  { return m_read_port [PORT_2].bind(); }
+	auto write_port2() { return m_write_port[PORT_2].bind(); }
+	auto read_port3()  { return m_read_port [PORT_3].bind(); }
+	auto write_port3() { return m_write_port[PORT_3].bind(); }
+	auto read_port5()  { return m_read_port [PORT_5].bind(); }
+	auto write_port5() { return m_write_port[PORT_5].bind(); }
+	auto read_port6()  { return m_read_port [PORT_6].bind(); }
+	auto write_port6() { return m_write_port[PORT_6].bind(); }
+	auto read_port7()  { return m_read_port [PORT_7].bind(); }
+	auto read_port8()  { return m_read_port [PORT_8].bind(); }
+	auto write_port8() { return m_write_port[PORT_8].bind(); }
+	auto read_port9()  { return m_read_port [PORT_9].bind(); }
+	auto write_port9() { return m_write_port[PORT_9].bind(); }
+	auto read_porta()  { return m_read_port [PORT_A].bind(); }
+	auto write_porta() { return m_write_port[PORT_A].bind(); }
+	auto read_portb()  { return m_read_port [PORT_B].bind(); }
+	auto write_portb() { return m_write_port[PORT_B].bind(); }
+
 	uint8_t syscr_r();
 	void syscr_w(uint8_t data);
 
@@ -56,7 +76,6 @@ protected:
 	required_device<h8h_timer16_channel_device> m_timer16_2;
 	required_device<h8h_timer16_channel_device> m_timer16_3;
 	required_device<h8h_timer16_channel_device> m_timer16_4;
-	required_device<h8_sci_device> m_sci0;
 	required_device<h8_watchdog_device> m_watchdog;
 
 	uint32_t m_ram_start;

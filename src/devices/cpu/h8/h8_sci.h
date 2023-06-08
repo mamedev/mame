@@ -14,24 +14,25 @@
 
 #pragma once
 
-#include "h8.h"
-#include "h8_intc.h"
+class h8_device;
+class h8_intc_device;
 
 class h8_sci_device : public device_t {
 public:
 	h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	template<typename T, typename U> h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu, U &&intc, int eri, int rxi, int txi, int tei)
+	template<typename T, typename U> h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, int id, T &&cpu, U &&intc, int eri, int rxi, int txi, int tei)
 		: h8_sci_device(mconfig, tag, owner, 0)
 	{
 		m_cpu.set_tag(std::forward<T>(cpu));
 		m_intc.set_tag(std::forward<U>(intc));
+		m_id = id;
 		m_eri_int = eri;
 		m_rxi_int = rxi;
 		m_txi_int = txi;
 		m_tei_int = tei;
 	}
 
-	void set_external_clock_period(const attotime &_period);
+	void do_set_external_clock_period(const attotime &_period);
 
 	void smr_w(uint8_t data);
 	uint8_t smr_r();
@@ -47,11 +48,8 @@ public:
 	void scmr_w(uint8_t data);
 	uint8_t scmr_r();
 
-	void rx_w(int state);
-	void clk_w(int state);
-
-	auto tx_handler() { return m_tx_cb.bind(); }
-	auto clk_handler() { return m_clk_cb.bind(); }
+	void do_rx_w(int state);
+	void do_clk_w(int state);
 
 	uint64_t internal_update(uint64_t current_time);
 
@@ -108,12 +106,11 @@ protected:
 
 	required_device<h8_device> m_cpu;
 	required_device<h8_intc_device> m_intc;
-	devcb_write_line m_tx_cb, m_clk_cb;
 	attotime m_external_clock_period, m_cur_sync_time;
 	double m_external_to_internal_ratio, m_internal_to_external_ratio;
 	emu_timer *m_sync_timer;
 
-	int m_eri_int, m_rxi_int, m_txi_int, m_tei_int;
+	int m_id, m_eri_int, m_rxi_int, m_txi_int, m_tei_int;
 
 	int m_tx_state, m_rx_state, m_tx_bit, m_rx_bit, m_clock_state, m_tx_parity, m_rx_parity, m_ext_clock_counter;
 	clock_mode_t m_clock_mode;

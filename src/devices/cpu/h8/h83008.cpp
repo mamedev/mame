@@ -24,8 +24,6 @@ h83008_device::h83008_device(const machine_config &mconfig, const char *tag, dev
 	m_timer16_0(*this, "timer16:0"),
 	m_timer16_1(*this, "timer16:1"),
 	m_timer16_2(*this, "timer16:2"),
-	m_sci0(*this, "sci0"),
-	m_sci1(*this, "sci1"),
 	m_watchdog(*this, "watchdog"),
 	m_syscr(0)
 {
@@ -89,20 +87,20 @@ void h83008_device::map(address_map &map)
 	map(base | 0xfff98, base | 0xfff98).rw(m_timer8_2, FUNC(h8_timer8_channel_device::tcnt_r), FUNC(h8_timer8_channel_device::tcnt_w));
 	map(base | 0xfff99, base | 0xfff99).rw(m_timer8_3, FUNC(h8_timer8_channel_device::tcnt_r), FUNC(h8_timer8_channel_device::tcnt_w));
 
-	map(base | 0xfffb0, base | 0xfffb0).rw(m_sci0, FUNC(h8_sci_device::smr_r), FUNC(h8_sci_device::smr_w));
-	map(base | 0xfffb1, base | 0xfffb1).rw(m_sci0, FUNC(h8_sci_device::brr_r), FUNC(h8_sci_device::brr_w));
-	map(base | 0xfffb2, base | 0xfffb2).rw(m_sci0, FUNC(h8_sci_device::scr_r), FUNC(h8_sci_device::scr_w));
-	map(base | 0xfffb3, base | 0xfffb3).rw(m_sci0, FUNC(h8_sci_device::tdr_r), FUNC(h8_sci_device::tdr_w));
-	map(base | 0xfffb4, base | 0xfffb4).rw(m_sci0, FUNC(h8_sci_device::ssr_r), FUNC(h8_sci_device::ssr_w));
-	map(base | 0xfffb5, base | 0xfffb5).r(m_sci0, FUNC(h8_sci_device::rdr_r));
-	map(base | 0xfffb6, base | 0xfffb6).rw(m_sci0, FUNC(h8_sci_device::scmr_r), FUNC(h8_sci_device::scmr_w));
-	map(base | 0xfffb8, base | 0xfffb8).rw(m_sci1, FUNC(h8_sci_device::smr_r), FUNC(h8_sci_device::smr_w));
-	map(base | 0xfffb9, base | 0xfffb9).rw(m_sci1, FUNC(h8_sci_device::brr_r), FUNC(h8_sci_device::brr_w));
-	map(base | 0xfffba, base | 0xfffba).rw(m_sci1, FUNC(h8_sci_device::scr_r), FUNC(h8_sci_device::scr_w));
-	map(base | 0xfffbb, base | 0xfffbb).rw(m_sci1, FUNC(h8_sci_device::tdr_r), FUNC(h8_sci_device::tdr_w));
-	map(base | 0xfffbc, base | 0xfffbc).rw(m_sci1, FUNC(h8_sci_device::ssr_r), FUNC(h8_sci_device::ssr_w));
-	map(base | 0xfffbd, base | 0xfffbd).r(m_sci1, FUNC(h8_sci_device::rdr_r));
-	map(base | 0xfffbe, base | 0xfffbe).rw(m_sci1, FUNC(h8_sci_device::scmr_r), FUNC(h8_sci_device::scmr_w));
+	map(base | 0xfffb0, base | 0xfffb0).rw(m_sci[0], FUNC(h8_sci_device::smr_r), FUNC(h8_sci_device::smr_w));
+	map(base | 0xfffb1, base | 0xfffb1).rw(m_sci[0], FUNC(h8_sci_device::brr_r), FUNC(h8_sci_device::brr_w));
+	map(base | 0xfffb2, base | 0xfffb2).rw(m_sci[0], FUNC(h8_sci_device::scr_r), FUNC(h8_sci_device::scr_w));
+	map(base | 0xfffb3, base | 0xfffb3).rw(m_sci[0], FUNC(h8_sci_device::tdr_r), FUNC(h8_sci_device::tdr_w));
+	map(base | 0xfffb4, base | 0xfffb4).rw(m_sci[0], FUNC(h8_sci_device::ssr_r), FUNC(h8_sci_device::ssr_w));
+	map(base | 0xfffb5, base | 0xfffb5).r(m_sci[0], FUNC(h8_sci_device::rdr_r));
+	map(base | 0xfffb6, base | 0xfffb6).rw(m_sci[0], FUNC(h8_sci_device::scmr_r), FUNC(h8_sci_device::scmr_w));
+	map(base | 0xfffb8, base | 0xfffb8).rw(m_sci[1], FUNC(h8_sci_device::smr_r), FUNC(h8_sci_device::smr_w));
+	map(base | 0xfffb9, base | 0xfffb9).rw(m_sci[1], FUNC(h8_sci_device::brr_r), FUNC(h8_sci_device::brr_w));
+	map(base | 0xfffba, base | 0xfffba).rw(m_sci[1], FUNC(h8_sci_device::scr_r), FUNC(h8_sci_device::scr_w));
+	map(base | 0xfffbb, base | 0xfffbb).rw(m_sci[1], FUNC(h8_sci_device::tdr_r), FUNC(h8_sci_device::tdr_w));
+	map(base | 0xfffbc, base | 0xfffbc).rw(m_sci[1], FUNC(h8_sci_device::ssr_r), FUNC(h8_sci_device::ssr_w));
+	map(base | 0xfffbd, base | 0xfffbd).r(m_sci[1], FUNC(h8_sci_device::rdr_r));
+	map(base | 0xfffbe, base | 0xfffbe).rw(m_sci[1], FUNC(h8_sci_device::scmr_r), FUNC(h8_sci_device::scmr_w));
 	map(base | 0xfffd3, base | 0xfffd3).rw(m_port4, FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 	map(base | 0xfffd5, base | 0xfffd5).rw(m_port6, FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 	map(base | 0xfffd6, base | 0xfffd6).rw(m_port7, FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
@@ -135,8 +133,8 @@ void h83008_device::device_add_mconfig(machine_config &config)
 	H8H_TIMER16_CHANNEL(config, m_timer16_0, *this, 2, 2, m_intc, 24);
 	H8H_TIMER16_CHANNEL(config, m_timer16_1, *this, 2, 2, m_intc, 28);
 	H8H_TIMER16_CHANNEL(config, m_timer16_2, *this, 2, 2, m_intc, 32);
-	H8_SCI(config, m_sci0, *this, m_intc, 52, 53, 54, 55);
-	H8_SCI(config, m_sci1, *this, m_intc, 56, 57, 58, 59);
+	H8_SCI(config, m_sci[0], 0, *this, m_intc, 52, 53, 54, 55);
+	H8_SCI(config, m_sci[1], 1, *this, m_intc, 56, 57, 58, 59);
 	H8_WATCHDOG(config, m_watchdog, *this, m_intc, 20, h8_watchdog_device::H);
 }
 
@@ -192,8 +190,8 @@ void h83008_device::internal_update(uint64_t current_time)
 	uint64_t event_time = 0;
 
 	add_event(event_time, m_adc->internal_update(current_time));
-	add_event(event_time, m_sci0->internal_update(current_time));
-	add_event(event_time, m_sci1->internal_update(current_time));
+	add_event(event_time, m_sci[0]->internal_update(current_time));
+	add_event(event_time, m_sci[1]->internal_update(current_time));
 	add_event(event_time, m_timer8_0->internal_update(current_time));
 	add_event(event_time, m_timer8_1->internal_update(current_time));
 	add_event(event_time, m_timer8_2->internal_update(current_time));

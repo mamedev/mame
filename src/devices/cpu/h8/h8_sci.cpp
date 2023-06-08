@@ -1,7 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+
 #include "emu.h"
 #include "h8_sci.h"
+#include "h8.h"
+#include "h8_intc.h"
 
 // Verbosity level
 // 0 = no messages
@@ -19,15 +22,14 @@ h8_sci_device::h8_sci_device(const machine_config &mconfig, const char *tag, dev
 	device_t(mconfig, H8_SCI, tag, owner, clock),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_intc(*this, finder_base::DUMMY_TAG),
-	m_tx_cb(*this),
-	m_clk_cb(*this), m_external_to_internal_ratio(0), m_internal_to_external_ratio(0), m_sync_timer(nullptr), m_eri_int(0), m_rxi_int(0), m_txi_int(0), m_tei_int(0),
+	m_external_to_internal_ratio(0), m_internal_to_external_ratio(0), m_sync_timer(nullptr), m_id(0), m_eri_int(0), m_rxi_int(0), m_txi_int(0), m_tei_int(0),
 	m_tx_state(0), m_rx_state(0), m_tx_bit(0), m_rx_bit(0), m_clock_state(0), m_tx_parity(0), m_rx_parity(0), m_ext_clock_counter(0), m_clock_mode(clock_mode_t::INTERNAL_ASYNC), m_clock_value(false), m_ext_clock_value(false), m_rx_value(false),
 	m_rdr(0), m_tdr(0), m_smr(0), m_scr(0), m_ssr(0), m_brr(0), m_rsr(0), m_tsr(0), m_clock_base(0), m_divider(0)
 {
 	m_external_clock_period = attotime::never;
 }
 
-void h8_sci_device::set_external_clock_period(const attotime &period)
+void h8_sci_device::do_set_external_clock_period(const attotime &period)
 {
 	m_external_clock_period = period;
 }
@@ -235,9 +237,6 @@ void h8_sci_device::clock_update()
 
 void h8_sci_device::device_start()
 {
-	m_tx_cb.resolve_safe();
-	m_clk_cb.resolve_safe();
-
 	m_sync_timer = timer_alloc(FUNC(h8_sci_device::sync_tick), this);
 
 	if(m_external_clock_period.is_never()) {
@@ -293,8 +292,8 @@ void h8_sci_device::device_reset()
 	m_ext_clock_value = true;
 	m_ext_clock_counter = 0;
 	m_rx_value = true;
-	m_clk_cb(m_clock_value);
-	m_tx_cb(1);
+	m_cpu->do_sci_clk(m_id, m_clock_value);
+	m_cpu->do_sci_tx(m_id, 1);
 	m_cur_sync_time = attotime::never;
 }
 
@@ -309,7 +308,7 @@ TIMER_CALLBACK_MEMBER(h8_sci_device::sync_tick)
 	// Used only to force system-wide syncs
 }
 
-void h8_sci_device::rx_w(int state)
+void h8_sci_device::do_rx_w(int state)
 {
 	m_rx_value = state;
 	if(V>=2) logerror("rx=%d\n", state);
@@ -317,7 +316,7 @@ void h8_sci_device::rx_w(int state)
 		clock_start(CLK_RX);
 }
 
-void h8_sci_device::clk_w(int state)
+void h8_sci_device::do_clk_w(int state)
 {
 	if(m_ext_clock_value != state) {
 		m_ext_clock_value = state;
@@ -375,7 +374,7 @@ uint64_t h8_sci_device::internal_update(uint64_t current_time)
 
 					m_clock_value = new_clock;
 					if(m_clock_state || m_clock_value)
-						m_clk_cb(m_clock_value);
+						m_cpu->do_sci_clk(m_id, m_clock_value);
 				}
 			}
 			event = m_clock_base + (m_clock_value ? fp : m_divider);
@@ -404,7 +403,7 @@ uint64_t h8_sci_device::internal_update(uint64_t current_time)
 
 					m_clock_value = new_clock;
 					if(m_clock_mode == clock_mode_t::INTERNAL_ASYNC_OUT && (m_clock_state || !m_clock_value))
-						m_clk_cb(m_clock_value);
+						m_cpu->do_sci_clk(m_id, m_clock_value);
 				}
 			}
 
@@ -550,7 +549,7 @@ void h8_sci_device::tx_dropped_edge()
 	if(V>=2) logerror("tx_dropped_edge state=%s bit=%d\n", state_names[m_tx_state], m_tx_bit);
 	switch(m_tx_state) {
 	case ST_START:
-		m_tx_cb(false);
+		m_cpu->do_sci_tx(m_id, false);
 		assert(m_tx_bit == 1);
 		m_tx_state = ST_BIT;
 		m_tx_bit = m_smr & SMR_CHR ? 7 : 8;
@@ -558,7 +557,7 @@ void h8_sci_device::tx_dropped_edge()
 
 	case ST_BIT:
 		m_tx_parity ^= (m_tsr & 1);
-		m_tx_cb(m_tsr & 1);
+		m_cpu->do_sci_tx(m_id, m_tsr & 1);
 		m_tsr >>= 1;
 		m_tx_bit--;
 		if(!m_tx_bit) {
@@ -580,14 +579,14 @@ void h8_sci_device::tx_dropped_edge()
 		break;
 
 	case ST_PARITY:
-		m_tx_cb(m_tx_parity);
+		m_cpu->do_sci_tx(m_id, m_tx_parity);
 		assert(m_tx_bit == 1);
 		m_tx_state = ST_STOP;
 		m_tx_bit = m_smr & SMR_STOP ? 2 : 1;
 		break;
 
 	case ST_STOP:
-		m_tx_cb(true);
+		m_cpu->do_sci_tx(m_id, true);
 		m_tx_bit--;
 		if(!m_tx_bit) {
 			if(!(m_ssr & SSR_TDRE))
@@ -603,7 +602,7 @@ void h8_sci_device::tx_dropped_edge()
 		m_tx_state = ST_IDLE;
 		m_tx_bit = 0;
 		clock_stop(CLK_TX);
-		m_tx_cb(1);
+		m_cpu->do_sci_tx(m_id, 1);
 		m_ssr |= SSR_TEND;
 		if(m_scr & SCR_TEIE)
 			m_intc->internal_interrupt(m_tei_int);

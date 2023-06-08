@@ -7,7 +7,7 @@ DEFINE_DEVICE_TYPE(H8_PORT, h8_port_device, "h8_digital_port", "H8 digital port"
 
 h8_port_device::h8_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, H8_PORT, tag, owner, clock),
-	m_cpu(*this, DEVICE_SELF_OWNER), m_io(nullptr), m_address(0), m_default_ddr(0), m_ddr(0), m_pcr(0), m_odr(0), m_mask(0), m_dr(0), m_last_output(0)
+	m_cpu(*this, DEVICE_SELF_OWNER), m_address(0), m_default_ddr(0), m_ddr(0), m_pcr(0), m_odr(0), m_mask(0), m_dr(0), m_last_output(0)
 {
 }
 
@@ -40,7 +40,7 @@ uint8_t h8_port_device::port_r()
 {
 	uint8_t res = m_mask | (m_dr & m_ddr);
 	if((m_ddr & ~m_mask) != uint8_t(~m_mask))
-		res |= m_io->read_word(m_address) & ~m_ddr;
+		res |= m_cpu->do_read_port(m_address) & ~m_ddr;
 
 	//  logerror("port_r %02x (%02x %02x)\n", res, ddr & ~mask, uint8_t(~mask));
 	return res;
@@ -75,13 +75,12 @@ void h8_port_device::update_output()
 	uint8_t res = m_dr & m_ddr & ~m_mask;
 	if(res != m_last_output) {
 		m_last_output = res;
-		m_io->write_word(m_address, res);
+		m_cpu->do_write_port(m_address, res);
 	}
 }
 
 void h8_port_device::device_start()
 {
-	m_io = &m_cpu->space(AS_IO);
 	save_item(NAME(m_ddr));
 	save_item(NAME(m_dr));
 	save_item(NAME(m_pcr));

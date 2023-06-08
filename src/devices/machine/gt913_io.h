@@ -51,9 +51,8 @@ protected:
 	TIMER_CALLBACK_MEMBER(irq_timer_tick);
 
 private:
-	required_device<cpu_device> m_cpu;
+	required_device<h8_device> m_cpu;
 	required_device<h8_intc_device> m_intc;
-	address_space *m_cpu_io;
 
 	/* timers */
 	uint8_t m_timer_control[2];

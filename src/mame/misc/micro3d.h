@@ -12,10 +12,11 @@
 
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/mcs51/mcs51.h"
-#include "sound/upd7759.h"
 #include "machine/adc0844.h"
 #include "machine/mc68681.h"
 #include "machine/scn_pci.h"
+#include "sound/upd7759.h"
+
 #include "emupal.h"
 
 
@@ -36,6 +37,7 @@ public:
 		m_upd7759(*this, "upd7759"),
 		m_drmath(*this, "drmath"),
 		m_vgb(*this, "vgb"),
+		m_vgb_uart(*this, "uart"),
 		m_palette(*this, "palette"),
 		m_duart(*this, "duart"),
 		m_noise_1(*this, "noise_1"),
@@ -48,8 +50,7 @@ public:
 		m_joystick_y(*this, "JOYSTICK_Y"),
 		m_shared_ram(*this, "shared_ram"),
 		m_mac_sram(*this, "mac_sram"),
-		m_sprite_vram(*this, "sprite_vram"),
-		m_vgb_uart(*this, "uart")
+		m_sprite_vram(*this, "sprite_vram")
 	{ }
 
 	void micro3d(machine_config &config);
@@ -89,6 +90,7 @@ private:
 	required_device<upd7759_device> m_upd7759;
 	required_device<cpu_device> m_drmath;
 	required_device<tms34010_device> m_vgb;
+	required_device<scn2651_device> m_vgb_uart;
 	required_device<palette_device> m_palette;
 	required_device<mc68681_device> m_duart;
 	required_device<micro3d_sound_device> m_noise_1;
@@ -102,48 +104,48 @@ private:
 	optional_ioport m_joystick_y;
 
 	required_shared_ptr<uint16_t> m_shared_ram;
-	uint8_t               m_m68681_tx0 = 0;
+	uint8_t             m_m68681_tx0 = 0;
 
 	/* Sound */
-	uint8_t               m_sound_port_latch[4]{};
+	uint8_t             m_sound_port_latch[4]{};
 
 	/* Hardware version-check latch for BOTSS 1.1a */
-	uint8_t               m_botss_latch = 0;
+	uint8_t             m_botss_latch = 0;
 
 	/* MAC */
 	required_shared_ptr<uint32_t> m_mac_sram;
-	emu_timer            *m_mac_done_timer = nullptr;
-	uint32_t              m_sram_r_addr = 0;
-	uint32_t              m_sram_w_addr = 0;
-	uint32_t              m_vtx_addr = 0;
-	uint32_t              m_mrab11 = 0;
-	uint32_t              m_mac_stat = 0;
-	uint32_t              m_mac_inst = 0;
+	emu_timer           *m_mac_done_timer = nullptr;
+	uint32_t            m_sram_r_addr = 0;
+	uint32_t            m_sram_w_addr = 0;
+	uint32_t            m_vtx_addr = 0;
+	uint32_t            m_mrab11 = 0;
+	uint32_t            m_mac_stat = 0;
+	uint32_t            m_mac_inst = 0;
 
 	/* 2D video */
 	required_shared_ptr<uint16_t> m_sprite_vram;
-	uint16_t              m_creg = 0;
-	uint16_t              m_xfer3dk = 0;
+	uint16_t            m_creg = 0;
+	uint16_t            m_xfer3dk = 0;
 
 	/* 3D pipeline */
-	uint32_t              m_pipe_data = 0;
-	uint32_t              m_pipeline_state = 0;
-	int32_t               m_vtx_fifo[512]{};
-	uint32_t              m_fifo_idx = 0;
-	uint32_t              m_draw_cmd = 0;
+	uint32_t            m_pipe_data = 0;
+	uint32_t            m_pipeline_state = 0;
+	int32_t             m_vtx_fifo[512]{};
+	uint32_t            m_fifo_idx = 0;
+	uint32_t            m_draw_cmd = 0;
 	int                 m_draw_state = 0;
-	int32_t               m_x_min = 0;
-	int32_t               m_x_max = 0;
-	int32_t               m_y_min = 0;
-	int32_t               m_y_max = 0;
-	int32_t               m_z_min = 0;
-	int32_t               m_z_max = 0;
-	int32_t               m_x_mid = 0;
-	int32_t               m_y_mid = 0;
+	int32_t             m_x_min = 0;
+	int32_t             m_x_max = 0;
+	int32_t             m_y_min = 0;
+	int32_t             m_y_max = 0;
+	int32_t             m_z_min = 0;
+	int32_t             m_z_max = 0;
+	int32_t             m_x_mid = 0;
+	int32_t             m_y_mid = 0;
 	int                 m_dpram_bank = 0;
-	uint32_t              m_draw_dpram[1024]{};
-	std::unique_ptr<uint16_t[]>              m_frame_buffers[2];
-	std::unique_ptr<uint16_t[]>              m_tmp_buffer;
+	uint32_t            m_draw_dpram[1024]{};
+	std::unique_ptr<uint16_t[]> m_frame_buffers[2];
+	std::unique_ptr<uint16_t[]> m_tmp_buffer;
 	int                 m_drawing_buffer = 0;
 	int                 m_display_buffer = 0;
 
@@ -200,8 +202,6 @@ private:
 	void soundmem_io(address_map &map);
 	void soundmem_prg(address_map &map);
 	void vgbmem(address_map &map);
-
-	required_device<scn2651_device> m_vgb_uart;
 };
 
 #endif // MAME_MISC_MICRO3D_H

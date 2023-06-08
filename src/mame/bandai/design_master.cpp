@@ -65,17 +65,15 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
 	uint16_t io_p7_r();
-	void io_p7_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
 	[[maybe_unused]] DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load_bdesignm);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<h83334_device> m_maincpu;
 	required_device<generic_slot_device> m_cartslot;
 	memory_region *m_cartslot_region;
 	required_memory_bank m_bank;
@@ -115,17 +113,6 @@ uint16_t bdsm_state::io_p7_r()
 	return machine().rand();
 }
 
-void bdsm_state::io_p7_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	logerror("%s: io_p7_w %04x %04x\n", machine().describe_context(), data, mem_mask);
-}
-
-
-void bdsm_state::io_map(address_map &map)
-{
-	map(h8_device::PORT_7, h8_device::PORT_7).rw(FUNC(bdsm_state::io_p7_r), FUNC(bdsm_state::io_p7_w));
-}
-
 static INPUT_PORTS_START( bdesignm )
 INPUT_PORTS_END
 
@@ -140,7 +127,7 @@ void bdsm_state::bdesignm(machine_config &config)
 	/* basic machine hardware */
 	H83334(config, m_maincpu, XTAL(20'000'000)); /* H8/328 (24kbytes internal ROM, 1kbyte internal ROM) ?Mhz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &bdsm_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &bdsm_state::io_map);
+	m_maincpu->read_port7().set(FUNC(bdsm_state::io_p7_r));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60);

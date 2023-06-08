@@ -201,7 +201,7 @@ protected:
 
 private:
 	void bankswitch_w(uint8_t data);
-	uint8_t pending_command_r();
+	uint8_t soundlatch_pending_r();
 };
 
 class pipedrm_state : public hatris_state
@@ -273,7 +273,7 @@ void pipedrm_state::sound_bankswitch_w(uint8_t data)
  *
  *************************************/
 
-uint8_t hatris_state::pending_command_r()
+uint8_t hatris_state::soundlatch_pending_r()
 {
 	return m_soundlatch->pending_r();
 }
@@ -342,7 +342,7 @@ void hatris_state::main_portmap(address_map &map)
 	map(0x22, 0x22).portr("DSW1");
 	map(0x23, 0x23).portr("DSW2");
 	map(0x24, 0x24).portr("SYSTEM");
-	map(0x25, 0x25).r(FUNC(hatris_state::pending_command_r));
+	map(0x25, 0x25).r(FUNC(hatris_state::soundlatch_pending_r));
 }
 
 
@@ -376,7 +376,7 @@ void hatris_state::sound_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).mirror(0x08).rw("ymsnd", FUNC(ym2608_device::read), FUNC(ym2608_device::write));
 	map(0x04, 0x04).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x05, 0x05).r(FUNC(hatris_state::pending_command_r)).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
+	map(0x05, 0x05).r(FUNC(hatris_state::soundlatch_pending_r)).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
 }
 
 
