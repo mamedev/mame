@@ -56,7 +56,6 @@ private:
 	required_ioport_array<8> m_key;
 
 	void psr340_map(address_map &map);
-	void psr340_io_map(address_map &map);
 
 	void lcd_ctrl_w(u8 data);
 	void lcd_data_w(u8 data);
@@ -111,10 +110,6 @@ void psr340_state::psr340_map(address_map &map)
 	map(0xffe02b, 0xffe02b).w(FUNC(psr340_state::lcd_data_w));
 
 	map(0xffe02f, 0xffe02f).lr8(NAME([]() -> uint8_t { return 0xff; }));
-}
-
-void psr340_state::psr340_io_map(address_map &map)
-{
 }
 
 void psr340_state::machine_start()
@@ -276,7 +271,6 @@ void psr340_state::psr340(machine_config &config)
 	/* basic machine hardware */
 	H8S2655(config, m_maincpu, 16_MHz_XTAL);    // gives correct MIDI serial rate and matches MU100, but doesn't line up exactly with schematic value
 	m_maincpu->set_addrmap(AS_PROGRAM, &psr340_state::psr340_map);
-	m_maincpu->set_addrmap(AS_IO, &psr340_state::psr340_io_map);
 
 	// SCI0 is externally clocked at the 31250 Hz MIDI rate
 	m_maincpu->sci_set_external_clock_period(0, attotime::from_hz(31250 * 16));
