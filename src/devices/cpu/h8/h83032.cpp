@@ -28,7 +28,6 @@ h83032_device::h83032_device(const machine_config &mconfig, device_type type, co
 	m_timer16_2(*this, "timer16:2"),
 	m_timer16_3(*this, "timer16:3"),
 	m_timer16_4(*this, "timer16:4"),
-	m_sci0(*this, "sci0"),
 	m_watchdog(*this, "watchdog"),
 	m_ram_start(start),
 	m_syscr(0)
@@ -99,12 +98,12 @@ void h83032_device::map(address_map &map)
 	map(base | 0xffa8, base | 0xffa9).rw(m_watchdog, FUNC(h8_watchdog_device::wd_r), FUNC(h8_watchdog_device::wd_w));
 	map(base | 0xffaa, base | 0xffab).rw(m_watchdog, FUNC(h8_watchdog_device::rst_r), FUNC(h8_watchdog_device::rst_w));
 
-	map(base | 0xffb0, base | 0xffb0).rw(m_sci0, FUNC(h8_sci_device::smr_r), FUNC(h8_sci_device::smr_w));
-	map(base | 0xffb1, base | 0xffb1).rw(m_sci0, FUNC(h8_sci_device::brr_r), FUNC(h8_sci_device::brr_w));
-	map(base | 0xffb2, base | 0xffb2).rw(m_sci0, FUNC(h8_sci_device::scr_r), FUNC(h8_sci_device::scr_w));
-	map(base | 0xffb3, base | 0xffb3).rw(m_sci0, FUNC(h8_sci_device::tdr_r), FUNC(h8_sci_device::tdr_w));
-	map(base | 0xffb4, base | 0xffb4).rw(m_sci0, FUNC(h8_sci_device::ssr_r), FUNC(h8_sci_device::ssr_w));
-	map(base | 0xffb5, base | 0xffb5).r(m_sci0, FUNC(h8_sci_device::rdr_r));
+	map(base | 0xffb0, base | 0xffb0).rw(m_sci[0], FUNC(h8_sci_device::smr_r), FUNC(h8_sci_device::smr_w));
+	map(base | 0xffb1, base | 0xffb1).rw(m_sci[0], FUNC(h8_sci_device::brr_r), FUNC(h8_sci_device::brr_w));
+	map(base | 0xffb2, base | 0xffb2).rw(m_sci[0], FUNC(h8_sci_device::scr_r), FUNC(h8_sci_device::scr_w));
+	map(base | 0xffb3, base | 0xffb3).rw(m_sci[0], FUNC(h8_sci_device::tdr_r), FUNC(h8_sci_device::tdr_w));
+	map(base | 0xffb4, base | 0xffb4).rw(m_sci[0], FUNC(h8_sci_device::ssr_r), FUNC(h8_sci_device::ssr_w));
+	map(base | 0xffb5, base | 0xffb5).r(m_sci[0], FUNC(h8_sci_device::rdr_r));
 	map(base | 0xffc0, base | 0xffc0).w(m_port1, FUNC(h8_port_device::ddr_w));
 	map(base | 0xffc1, base | 0xffc1).w(m_port2, FUNC(h8_port_device::ddr_w));
 	map(base | 0xffc2, base | 0xffc2).rw(m_port1, FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
@@ -162,7 +161,7 @@ void h83032_device::device_add_mconfig(machine_config &config)
 	H8H_TIMER16_CHANNEL(config, m_timer16_2, *this, 2, 2, m_intc, 32);
 	H8H_TIMER16_CHANNEL(config, m_timer16_3, *this, 2, 2, m_intc, 36);
 	H8H_TIMER16_CHANNEL(config, m_timer16_4, *this, 2, 2, m_intc, 40);
-	H8_SCI(config, m_sci0, *this, m_intc, 52, 53, 54, 55);
+	H8_SCI(config, m_sci[0], 0, *this, m_intc, 52, 53, 54, 55);
 	H8_WATCHDOG(config, m_watchdog, *this, m_intc, 20, h8_watchdog_device::H);
 }
 
@@ -218,7 +217,7 @@ void h83032_device::internal_update(uint64_t current_time)
 	uint64_t event_time = 0;
 
 	add_event(event_time, m_adc->internal_update(current_time));
-	add_event(event_time, m_sci0->internal_update(current_time));
+	add_event(event_time, m_sci[0]->internal_update(current_time));
 	add_event(event_time, m_timer16_0->internal_update(current_time));
 	add_event(event_time, m_timer16_1->internal_update(current_time));
 	add_event(event_time, m_timer16_2->internal_update(current_time));

@@ -363,8 +363,8 @@ DEVICE_INPUT_DEFAULTS_END
 
 void cybiko_state::cybikov1_debug_serial(machine_config &config)
 {
-	m_debug_serial->rxd_handler().set("maincpu:sci2", FUNC(h8_sci_device::rx_w));
-	subdevice<h8_sci_device>("maincpu:sci2")->tx_handler().set(m_debug_serial, FUNC(rs232_port_device::write_txd));
+	m_debug_serial->rxd_handler().set(m_maincpu, FUNC(h8_device::sci_rx_w<2>));
+	m_maincpu->write_sci_tx<2>().set(m_debug_serial, FUNC(rs232_port_device::write_txd));
 }
 
 void cybiko_state::cybikov1_base(machine_config &config)
@@ -405,7 +405,7 @@ void cybiko_state::cybikov1_base(machine_config &config)
 void cybiko_state::cybikov1_flash(machine_config &config)
 {
 	AT45DB041(config, m_flash1, 0);
-	m_flash1->so_callback().set("maincpu:sci1", FUNC(h8_sci_device::rx_w));
+	m_flash1->so_callback().set(m_maincpu, FUNC(h8_device::sci_rx_w<1>));
 }
 
 void cybiko_state::cybikov1(machine_config &config)
@@ -415,14 +415,14 @@ void cybiko_state::cybikov1(machine_config &config)
 	// cpu
 	auto &maincpu(H8S2241(config, m_maincpu, XTAL(11'059'200)));
 	maincpu.set_addrmap(AS_PROGRAM, &cybiko_state::cybikov1_mem);
-	maincpu.read_adc(1).set(FUNC(cybiko_state::adc1_r));
-	maincpu.read_adc(2).set(FUNC(cybiko_state::adc2_r));
+	maincpu.read_adc<1>().set(FUNC(cybiko_state::adc1_r));
+	maincpu.read_adc<2>().set(FUNC(cybiko_state::adc2_r));
 	maincpu.write_port3().set(FUNC(cybiko_state::serflash_w));
 	maincpu.read_portf().set(FUNC(cybiko_state::clock_r));
 	maincpu.write_portf().set(FUNC(cybiko_state::clock_w));
 
-	subdevice<h8_sci_device>("maincpu:sci1")->tx_handler().set("flash1", FUNC(at45db041_device::si_w));
-	subdevice<h8_sci_device>("maincpu:sci1")->clk_handler().set("flash1", FUNC(at45db041_device::sck_w));
+	m_maincpu->write_sci_tx<1>().set("flash1", FUNC(at45db041_device::si_w));
+	m_maincpu->write_sci_clk<1>().set("flash1", FUNC(at45db041_device::sck_w));
 
 	// machine
 	cybikov1_flash(config);
@@ -437,15 +437,15 @@ void cybiko_state::cybikov2(machine_config &config)
 	// cpu
 	auto &maincpu(H8S2246(config, m_maincpu, XTAL(11'059'200)));
 	maincpu.set_addrmap(AS_PROGRAM, &cybiko_state::cybikov2_mem);
-	maincpu.read_adc(1).set(FUNC(cybiko_state::adc1_r));
-	maincpu.read_adc(2).set(FUNC(cybiko_state::adc2_r));
+	maincpu.read_adc<1>().set(FUNC(cybiko_state::adc1_r));
+	maincpu.read_adc<2>().set(FUNC(cybiko_state::adc2_r));
 	maincpu.read_port1().set(FUNC(cybiko_state::port0_r));
 	maincpu.write_port3().set(FUNC(cybiko_state::serflash_w));
 	maincpu.read_portf().set(FUNC(cybiko_state::clock_r));
 	maincpu.write_portf().set(FUNC(cybiko_state::clock_w));
 
-	subdevice<h8_sci_device>("maincpu:sci1")->tx_handler().set("flash1", FUNC(at45db041_device::si_w));
-	subdevice<h8_sci_device>("maincpu:sci1")->clk_handler().set("flash1", FUNC(at45db041_device::sck_w));
+	m_maincpu->write_sci_tx<1>().set("flash1", FUNC(at45db041_device::si_w));
+	m_maincpu->write_sci_clk<1>().set("flash1", FUNC(at45db041_device::sck_w));
 
 	// machine
 	SST_39VF020(config, "flash2");
@@ -455,8 +455,8 @@ void cybiko_state::cybikov2(machine_config &config)
 	m_ram->set_default_size("256K").set_extra_options("512K,1M");
 
 	// serial debug port
-	m_debug_serial->rxd_handler().set("maincpu:sci2", FUNC(h8_sci_device::rx_w));
-	subdevice<h8_sci_device>("maincpu:sci2")->tx_handler().set(m_debug_serial, FUNC(rs232_port_device::write_txd));
+	m_debug_serial->rxd_handler().set(m_maincpu, FUNC(h8_device::sci_rx_w<2>));
+	m_maincpu->write_sci_tx<2>().set(m_debug_serial, FUNC(rs232_port_device::write_txd));
 }
 
 void cybiko_state::cybikoxt(machine_config &config)
@@ -477,8 +477,8 @@ void cybiko_state::cybikoxt(machine_config &config)
 	m_ram->set_default_size("2M");
 
 	// serial debug port
-	m_debug_serial->rxd_handler().set("maincpu:sci2", FUNC(h8_sci_device::rx_w));
-	subdevice<h8_sci_device>("maincpu:sci2")->tx_handler().set("debug_serial", FUNC(rs232_port_device::write_txd));
+	m_debug_serial->rxd_handler().set(m_maincpu, FUNC(h8_device::sci_rx_w<2>));
+	m_maincpu->write_sci_tx<2>().set(m_debug_serial, FUNC(rs232_port_device::write_txd));
 
 	// quickload
 	QUICKLOAD(config.replace(), "quickload", "bin,nv").set_load_callback(FUNC(cybiko_state::quickload_cybikoxt));

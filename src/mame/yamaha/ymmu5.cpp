@@ -212,7 +212,7 @@ void mu5_state::mu5(machine_config &config)
 	/* basic machine hardware */
 	H83002(config, m_maincpu, 10_MHz_XTAL); // clock verified by schematics
 	m_maincpu->set_addrmap(AS_PROGRAM, &mu5_state::mu5_map);
-	m_maincpu->read_adc(7).set([]() -> u8 { return 0xff; }); // Bettery level
+	m_maincpu->read_adc<7>().set([]() -> u8 { return 0xff; }); // Battery level
 	m_maincpu->read_port4().set([this]() -> u8 { return m_matrixsel; });
 	m_maincpu->write_port4().set([this](u8 data) { m_matrixsel = data; });
 	m_maincpu->read_port6().set(FUNC(mu5_state::lcd_ctrl_r));
@@ -232,10 +232,10 @@ void mu5_state::mu5(machine_config &config)
 
 	LC7985(config, m_lcd);
 
-	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set("maincpu:sci1", FUNC(h8_sci_device::rx_w));
+	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(m_maincpu, FUNC(h83002_device::sci_rx_w<1>));
 
 	auto &mdout(MIDI_PORT(config, "mdout", midiout_slot, "midiout"));
-	m_maincpu->subdevice<h8_sci_device>("sci1")->tx_handler().set(mdout, FUNC(midi_port_device::write_txd));
+	m_maincpu->write_sci_tx<0>().set(mdout, FUNC(midi_port_device::write_txd));
 
 	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_SVG);
 	screen.set_refresh_hz(60);

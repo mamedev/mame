@@ -14,8 +14,7 @@
 
 #pragma once
 
-#include "h8.h"
-
+class h8_device;
 
 class h8_intc_device : public device_t {
 public:

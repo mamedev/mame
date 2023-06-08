@@ -19,6 +19,10 @@ class h8_dtc_device;
 struct h8_dma_state;
 struct h8_dtc_state;
 
+class h8_device;
+
+#include "h8_sci.h"
+
 class h8_device : public cpu_device {
 public:
 	enum {
@@ -31,7 +35,15 @@ public:
 		STATE_DTC_WRITEBACK      = 0x10006
 	};
 
-	auto read_adc(int port) { return m_read_adc[port].bind(); }
+	template<int port> auto read_adc() { return m_read_adc[port].bind(); }
+	template<int sci> auto write_sci_tx() { return m_sci_tx[sci].bind(); }
+	template<int sci> auto write_sci_clk() { return m_sci_clk[sci].bind(); }
+	template<int sci> auto sci_rx_w(int state) { m_sci[sci]->do_rx_w(state); }
+	template<int sci> auto sci_clk_w(int state) { m_sci[sci]->do_clk_w(state); }
+
+	void sci_set_external_clock_period(int sci, const attotime &period) {
+		m_sci[sci].finder_target().first.subdevice<h8_sci_device>(m_sci[sci].finder_target().second)->do_set_external_clock_period(period);
+	}
 
 	void internal_update();
 	void set_irq(int irq_vector, int irq_level, bool irq_nmi);
@@ -45,6 +57,8 @@ public:
 	u16 do_read_adc(int port) { return m_read_adc[port](); }
 	u8 do_read_port(int port) { return m_read_port[port](); }
 	void do_write_port(int port, u8 data) { return m_write_port[port](data); }
+	void do_sci_tx(int sci, int state) { m_sci_tx[sci](state); }
+	void do_sci_clk(int sci, int state) { m_sci_clk[sci](state); }
 
 protected:
 	enum {
@@ -119,6 +133,8 @@ protected:
 	devcb_read16::array<8> m_read_adc;
 	devcb_read8::array<PORT_COUNT> m_read_port;
 	devcb_write8::array<PORT_COUNT> m_write_port;
+	optional_device_array<h8_sci_device, 3> m_sci;
+	devcb_write_line::array<3> m_sci_tx, m_sci_clk;
 
 	h8gen_dma_device *m_dma_device;
 	h8_dtc_device *m_dtc_device;

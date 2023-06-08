@@ -34,7 +34,6 @@ gt913_device::gt913_device(const machine_config &mconfig, const char *tag, devic
 	m_sound(*this, "gt_sound"),
 	m_kbd(*this, "kbd"),
 	m_io_hle(*this, "io_hle"),
-	m_sci(*this, "sci%u", 0),
 	m_port(*this, "port%u", 1)
 {
 	m_has_hc = false;
@@ -112,8 +111,8 @@ void gt913_device::device_add_mconfig(machine_config &config)
 								m_intc->clear_interrupt(5);
 						});
 	GT913_IO_HLE(config, m_io_hle, *this, m_intc, 6, 7);
-	H8_SCI(config, m_sci[0], *this, m_intc, 8, 9, 10, 0);
-	H8_SCI(config, m_sci[1], *this, m_intc, 11, 12, 13, 0);
+	H8_SCI(config, m_sci[0], 0, *this, m_intc, 8, 9, 10, 0);
+	H8_SCI(config, m_sci[1], 1, *this, m_intc, 11, 12, 13, 0);
 
 	H8_PORT(config, m_port[0], *this, h8_device::PORT_1, 0x00, 0x00);
 	H8_PORT(config, m_port[1], *this, h8_device::PORT_2, 0x00, 0x00);

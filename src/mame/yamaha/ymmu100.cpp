@@ -674,14 +674,14 @@ void mu100_state::mu100(machine_config &config)
 {
 	H8S2655(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mu100_state::mu100_map);
-	m_maincpu->read_adc(0).set(FUNC(mu100_state::adc_ar_r));
-	m_maincpu->read_adc(1).set_constant(0);
-	m_maincpu->read_adc(2).set(FUNC(mu100_state::adc_al_r));
-	m_maincpu->read_adc(3).set_constant(0);
-	m_maincpu->read_adc(4).set(FUNC(mu100_state::adc_midisw_r));
-	m_maincpu->read_adc(5).set_constant(0);
-	m_maincpu->read_adc(6).set(FUNC(mu100_state::adc_battery_r));
-	m_maincpu->read_adc(7).set(FUNC(mu100_state::adc_type_r));
+	m_maincpu->read_adc<0>().set(FUNC(mu100_state::adc_ar_r));
+	m_maincpu->read_adc<1>().set_constant(0);
+	m_maincpu->read_adc<2>().set(FUNC(mu100_state::adc_al_r));
+	m_maincpu->read_adc<3>().set_constant(0);
+	m_maincpu->read_adc<4>().set(FUNC(mu100_state::adc_midisw_r));
+	m_maincpu->read_adc<5>().set_constant(0);
+	m_maincpu->read_adc<6>().set(FUNC(mu100_state::adc_battery_r));
+	m_maincpu->read_adc<7>().set(FUNC(mu100_state::adc_type_r));
 	m_maincpu->read_port1().set(FUNC(mu100_state::p1_r));
 	m_maincpu->write_port1().set(FUNC(mu100_state::p1_w));
 	m_maincpu->write_port2().set(FUNC(mu100_state::p2_w));
@@ -706,15 +706,15 @@ void mu100_state::mu100(machine_config &config)
 
 	auto &mdin_a(MIDI_PORT(config, "mdin_a"));
 	midiin_slot(mdin_a);
-	mdin_a.rxd_handler().set("maincpu:sci1", FUNC(h8_sci_device::rx_w));
+	mdin_a.rxd_handler().set(m_maincpu, FUNC(h8s2655_device::sci_rx_w<1>));
 
 	auto &mdin_b(MIDI_PORT(config, "mdin_b"));
 	midiin_slot(mdin_b);
-	mdin_b.rxd_handler().set("maincpu:sci0", FUNC(h8_sci_device::rx_w));
+	mdin_b.rxd_handler().set(m_maincpu, FUNC(h8s2655_device::sci_rx_w<0>));
 
 	auto &mdout(MIDI_PORT(config, "mdout"));
 	midiout_slot(mdout);
-	m_maincpu->subdevice<h8_sci_device>("sci0")->tx_handler().set(mdout, FUNC(midi_port_device::write_txd));
+	m_maincpu->write_sci_tx<0>().set(mdout, FUNC(midi_port_device::write_txd));
 }
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \

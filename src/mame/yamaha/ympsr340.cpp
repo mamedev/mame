@@ -279,7 +279,7 @@ void psr340_state::psr340(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &psr340_state::psr340_io_map);
 
 	// SCI0 is externally clocked at the 31250 Hz MIDI rate
-	m_maincpu->subdevice<h8_sci_device>("sci0")->set_external_clock_period(attotime::from_hz(31250 * 16));
+	m_maincpu->sci_set_external_clock_period(0, attotime::from_hz(31250 * 16));
 
 	KS0066_F05(config, m_lcdc, 0);
 	m_lcdc->set_lcd_size(2, 40);
@@ -291,10 +291,10 @@ void psr340_state::psr340(machine_config &config)
 	screen.set_visarea_full();
 	screen.screen_vblank().set(FUNC(psr340_state::render_w));
 
-	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set("maincpu:sci0", FUNC(h8_sci_device::rx_w));
+	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(m_maincpu, FUNC(h8s2655_device::sci_rx_w<0>));
 
 	auto &mdout(MIDI_PORT(config, "mdout", midiout_slot, "midiout"));
-	m_maincpu->subdevice<h8_sci_device>("sci0")->tx_handler().set(mdout, FUNC(midi_port_device::write_txd));
+	m_maincpu->write_sci_tx<0>().set(mdout, FUNC(midi_port_device::write_txd));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

@@ -158,7 +158,7 @@ void qy70_state::qy70(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &qy70_state::mem_map);
 	// ADC_0  Power battery voltage
 	// ADC_2  Host type select: 5V Mac, 3.33V PC-1, 1.66V PC-2, 0V MIDI
-	m_maincpu->read_adc(4).set(FUNC(qy70_state::adc_bkupbat_r));
+	m_maincpu->read_adc<4>().set(FUNC(qy70_state::adc_bkupbat_r));
 	m_maincpu->write_porta().set(FUNC(qy70_state::pa_w));
 	// PORT_B bit 0 1MHz output for Mac serial, bit 1 Rec LED, bit 2 Play LED,
 	//        bit 3 lcdc reset, bit 4 GND, bit 5 subcpu SBSY, bit 6-7 subcpu
@@ -185,15 +185,15 @@ void qy70_state::qy70(machine_config &config)
 
 	auto &mdin_a(MIDI_PORT(config, "mdin_a"));
 	midiin_slot(mdin_a);
-	mdin_a.rxd_handler().set("maincpu:sci1", FUNC(h8_sci_device::rx_w));
+	mdin_a.rxd_handler().set(m_maincpu, FUNC(h83002_device::sci_rx_w<1>));
 
 	auto &mdin_b(MIDI_PORT(config, "mdin_b"));
 	midiin_slot(mdin_b);
-	mdin_b.rxd_handler().set("maincpu:sci0", FUNC(h8_sci_device::rx_w));
+	mdin_b.rxd_handler().set(m_maincpu, FUNC(h83002_device::sci_rx_w<0>));
 
 	auto &mdout(MIDI_PORT(config, "mdout_a"));
 	midiout_slot(mdout);
-	m_maincpu->subdevice<h8_sci_device>("sci1")->tx_handler().set(mdout, FUNC(midi_port_device::write_txd));
+	m_maincpu->write_sci_tx<0>().set(mdout, FUNC(midi_port_device::write_txd));
 }
 
 ROM_START(qy70)

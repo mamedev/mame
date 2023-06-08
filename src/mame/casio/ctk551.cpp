@@ -451,8 +451,8 @@ void ctk551_state::ap10(machine_config& config)
 	m_maincpu->set_addrmap(AS_DATA, &ctk551_state::ap10_map);
 	m_maincpu->add_route(0, "lspeaker", 1.0);
 	m_maincpu->add_route(1, "rspeaker", 1.0);
-	m_maincpu->read_adc(0).set_constant(0);
-	m_maincpu->read_adc(1).set_constant(0);
+	m_maincpu->read_adc<0>().set_constant(0);
+	m_maincpu->read_adc<1>().set_constant(0);
 	m_maincpu->read_port1().set_ioport("P1");
 	m_maincpu->write_port1().set_ioport("P1");
 	m_maincpu->read_port2().set_constant(0);
@@ -469,11 +469,11 @@ void ctk551_state::ap10(machine_config& config)
 	// MIDI
 	auto& mdin(MIDI_PORT(config, "mdin"));
 	midiin_slot(mdin);
-	mdin.rxd_handler().set("maincpu:sci0", FUNC(h8_sci_device::rx_w));
+	mdin.rxd_handler().set(m_maincpu, FUNC(gt913_device::sci_rx_w<0>));
 
 	auto& mdout(MIDI_PORT(config, "mdout"));
 	midiout_slot(mdout);
-	m_maincpu->subdevice<h8_sci_device>("sci0")->tx_handler().set(mdout, FUNC(midi_port_device::write_txd));
+	m_maincpu->write_sci_tx<0>().set(mdout, FUNC(midi_port_device::write_txd));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -488,8 +488,8 @@ void ctk551_state::ctk530(machine_config& config)
 	m_maincpu->set_addrmap(AS_DATA, &ctk551_state::ctk530_map);
 	m_maincpu->add_route(0, "lspeaker", 1.0);
 	m_maincpu->add_route(1, "rspeaker", 1.0);
-	m_maincpu->read_adc(0).set_constant(0);
-	m_maincpu->read_adc(1).set_constant(0);
+	m_maincpu->read_adc<0>().set_constant(0);
+	m_maincpu->read_adc<1>().set_constant(0);
 	m_maincpu->read_port1().set_ioport("P1");
 	m_maincpu->write_port1().set_ioport("P1");
 	m_maincpu->read_port2().set_constant(0);
@@ -501,11 +501,11 @@ void ctk551_state::ctk530(machine_config& config)
 	// MIDI
 	auto& mdin(MIDI_PORT(config, "mdin"));
 	midiin_slot(mdin);
-	mdin.rxd_handler().set("maincpu:sci0", FUNC(h8_sci_device::rx_w));
+	mdin.rxd_handler().set(m_maincpu, FUNC(gt913_device::sci_rx_w<0>));
 
 	auto& mdout(MIDI_PORT(config, "mdout"));
 	midiout_slot(mdout);
-	m_maincpu->subdevice<h8_sci_device>("sci0")->tx_handler().set(mdout, FUNC(midi_port_device::write_txd));
+	m_maincpu->write_sci_tx<0>().set(mdout, FUNC(midi_port_device::write_txd));
 
 	PWM_DISPLAY(config, m_pwm, 0);
 	m_pwm->set_size(4, 8);
@@ -524,8 +524,8 @@ void ctk551_state::gz70sp(machine_config& config)
 	m_maincpu->set_addrmap(AS_DATA, &ctk551_state::gz70sp_map);
 	m_maincpu->add_route(0, "lspeaker", 1.0);
 	m_maincpu->add_route(1, "rspeaker", 1.0);
-	m_maincpu->read_adc(0).set_constant(0);
-	m_maincpu->read_adc(1).set_constant(0);
+	m_maincpu->read_adc<0>().set_constant(0);
+	m_maincpu->read_adc<1>().set_constant(0);
 	m_maincpu->read_port1().set_ioport("P1");
 	m_maincpu->write_port1().set_ioport("P1");
 	m_maincpu->read_port2().set_ioport("P2");
@@ -538,7 +538,7 @@ void ctk551_state::gz70sp(machine_config& config)
 	// MIDI (sci0 for RS232/422, sci1 for standard MIDI)
 	auto& mdin(MIDI_PORT(config, "mdin"));
 	midiin_slot(mdin);
-	mdin.rxd_handler().set("maincpu:sci1", FUNC(h8_sci_device::rx_w));
+	mdin.rxd_handler().set(m_maincpu, FUNC(gt913_device::sci_rx_w<1>));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -551,8 +551,8 @@ void ctk551_state::ctk601(machine_config& config)
 	m_maincpu->set_addrmap(AS_DATA, &ctk551_state::ctk601_map);
 	m_maincpu->add_route(0, "lspeaker", 1.0);
 	m_maincpu->add_route(1, "rspeaker", 1.0);
-	m_maincpu->read_adc(0).set_constant(0);
-	m_maincpu->read_adc(1).set_constant(0);
+	m_maincpu->read_adc<0>().set_constant(0);
+	m_maincpu->read_adc<1>().set_constant(0);
 	m_maincpu->read_port1().set_ioport("P1_R");
 	m_maincpu->write_port1().set_ioport("P1_W");
 	m_maincpu->read_port2().set_ioport("P2");
@@ -567,11 +567,11 @@ void ctk551_state::ctk601(machine_config& config)
 	// MIDI
 	auto& mdin(MIDI_PORT(config, "mdin"));
 	midiin_slot(mdin);
-	mdin.rxd_handler().set("maincpu:sci0", FUNC(h8_sci_device::rx_w));
+	mdin.rxd_handler().set(m_maincpu, FUNC(gt913_device::sci_rx_w<0>));
 
 	auto& mdout(MIDI_PORT(config, "mdout"));
 	midiout_slot(mdout);
-	m_maincpu->subdevice<h8_sci_device>("sci0")->tx_handler().set(mdout, FUNC(midi_port_device::write_txd));
+	m_maincpu->write_sci_tx<0>().set(mdout, FUNC(midi_port_device::write_txd));
 
 	// LCD
 	HD44780(config, m_lcdc, 0);
@@ -596,8 +596,8 @@ void ctk551_state::ctk551(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &ctk551_state::ctk530_map);
 	m_maincpu->add_route(0, "lspeaker", 1.0);
 	m_maincpu->add_route(1, "rspeaker", 1.0);
-	m_maincpu->read_adc(0).set_ioport("AN0");
-	m_maincpu->read_adc(1).set_ioport("AN1");
+	m_maincpu->read_adc<0>().set_ioport("AN0");
+	m_maincpu->read_adc<1>().set_ioport("AN1");
 	m_maincpu->read_port1().set_ioport("P1_R");
 	m_maincpu->write_port1().set_ioport("P1_W");
 	m_maincpu->read_port2().set_ioport("P2");
@@ -610,11 +610,11 @@ void ctk551_state::ctk551(machine_config &config)
 	// MIDI
 	auto &mdin(MIDI_PORT(config, "mdin"));
 	midiin_slot(mdin);
-	mdin.rxd_handler().set("maincpu:sci0", FUNC(h8_sci_device::rx_w));
+	mdin.rxd_handler().set(m_maincpu, FUNC(gt913_device::sci_rx_w<0>));
 
 	auto &mdout(MIDI_PORT(config, "mdout"));
 	midiout_slot(mdout);
-	m_maincpu->subdevice<h8_sci_device>("sci0")->tx_handler().set(mdout, FUNC(midi_port_device::write_txd));
+	m_maincpu->write_sci_tx<0>().set(mdout, FUNC(midi_port_device::write_txd));
 
 	// LCD
 	HD44780(config, m_lcdc, 0);

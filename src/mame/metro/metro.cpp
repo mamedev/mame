@@ -3495,9 +3495,9 @@ void metro_state::puzzlet(machine_config &config)
 	z8_device &coinmcu(Z86E02(config, "coinmcu", 20_MHz_XTAL/5)); // clock divider guessed
 	coinmcu.p0_in_cb().set_ioport("COIN");
 	coinmcu.p2_in_cb().set_ioport("START");
-	coinmcu.p2_out_cb().set("maincpu:sci1", FUNC(h8_sci_device::rx_w)).bit(6);
-	subdevice<h8_sci_device>("maincpu:sci1")->tx_handler().set_inputline("coinmcu", INPUT_LINE_IRQ2).invert();
-	subdevice<h8_sci_device>("maincpu:sci1")->clk_handler().set_inputline("coinmcu", INPUT_LINE_IRQ0).invert();
+	coinmcu.p2_out_cb().set(maincpu, FUNC(h83007_device::sci_rx_w<1>)).bit(6);
+	maincpu.write_sci_tx<1>().set_inputline("coinmcu", INPUT_LINE_IRQ2).invert();
+	maincpu.write_sci_clk<1>().set_inputline("coinmcu", INPUT_LINE_IRQ0).invert();
 
 	/* video hardware */
 	// TODO: looks like game is running in i4220 compatibility mode, $778000 seems to be an id for the chip?

@@ -40,7 +40,6 @@ xt446_device::xt446_device(const machine_config &mconfig, const char *tag, devic
 	, device_mixer_interface(mconfig, *this, 2)
 	, m_maincpu(*this, "maincpu")
 	, m_swp30(*this, "swp30")
-	, m_midi_serial(*this, "maincpu:sci1")
 {
 }
 
@@ -75,14 +74,14 @@ void xt446_device::device_add_mconfig(machine_config &config)
 {
 	H8S2655(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &xt446_device::xt446_map);
-	m_maincpu->read_adc(0).set_constant(0);
-	m_maincpu->read_adc(1).set_constant(0);
-	m_maincpu->read_adc(2).set_constant(0);
-	m_maincpu->read_adc(3).set_constant(0);
-	m_maincpu->read_adc(4).set_constant(0);
-	m_maincpu->read_adc(5).set_constant(0);
-	m_maincpu->read_adc(6).set_constant(0x200);
-	m_maincpu->read_adc(7).set_constant(0x200);
+	m_maincpu->read_adc<0>().set_constant(0);
+	m_maincpu->read_adc<1>().set_constant(0);
+	m_maincpu->read_adc<2>().set_constant(0);
+	m_maincpu->read_adc<3>().set_constant(0);
+	m_maincpu->read_adc<4>().set_constant(0);
+	m_maincpu->read_adc<5>().set_constant(0);
+	m_maincpu->read_adc<6>().set_constant(0x200);
+	m_maincpu->read_adc<7>().set_constant(0x200);
 
 	SWP30(config, m_swp30);
 	m_swp30->set_addrmap(0, &xt446_device::swp30_map);

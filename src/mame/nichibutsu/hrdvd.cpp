@@ -487,8 +487,8 @@ void hrdvd_state::hrdvd(machine_config &config)
 	m_subcpu->read_portb().set(FUNC(hrdvd_state::pb_r));
 	m_subcpu->write_portb().set(FUNC(hrdvd_state::pb_w));
 
-	m_maincpu->tx0_handler().set(*m_subcpu->subdevice<h8_sci_device>("sci0"), FUNC(h8_sci_device::rx_w));
-	m_subcpu->subdevice<h8_sci_device>("sci0")->tx_handler().set(m_maincpu, FUNC(tmp68301_device::rx0_w));
+	m_maincpu->tx0_handler().set(m_subcpu, FUNC(h83002_device::sci_rx_w<0>));
+	m_subcpu->write_sci_tx<0>().set(m_maincpu, FUNC(tmp68301_device::rx0_w));
 
 	HRDVD_ATA_CONTROLLER_DEVICE(config, m_ata).options(atapi_devs, "dvdrom", nullptr, true);
 	m_ata->slot(0).set_option_machine_config("dvdrom", dvdrom_config);

@@ -81,8 +81,6 @@ protected:
 	required_device<h8_timer8_channel_device> m_timer8_1;
 	required_device<h8_timer16_device> m_timer16;
 	required_device<h8_timer16_channel_device> m_timer16_0;
-	required_device<h8_sci_device> m_sci0;
-	required_device<h8_sci_device> m_sci1;
 	required_device<h8_watchdog_device> m_watchdog;
 
 	uint8_t m_syscr;

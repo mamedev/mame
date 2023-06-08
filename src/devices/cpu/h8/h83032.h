@@ -76,7 +76,6 @@ protected:
 	required_device<h8h_timer16_channel_device> m_timer16_2;
 	required_device<h8h_timer16_channel_device> m_timer16_3;
 	required_device<h8h_timer16_channel_device> m_timer16_4;
-	required_device<h8_sci_device> m_sci0;
 	required_device<h8_watchdog_device> m_watchdog;
 
 	uint32_t m_ram_start;

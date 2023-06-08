@@ -1691,10 +1691,10 @@ void namcos12_state::namcos12_mobo(machine_config &config)
 	/* basic machine hardware */
 	H83002(config, m_sub, 16934400); // frequency based on research (superctr)
 	m_sub->set_addrmap(AS_PROGRAM, &namcos12_state::s12h8rwmap);
-	m_sub->read_adc(0).set_constant(0);
-	m_sub->read_adc(1).set_constant(0);
-	m_sub->read_adc(2).set_constant(0);
-	m_sub->read_adc(3).set_constant(0);
+	m_sub->read_adc<0>().set_constant(0);
+	m_sub->read_adc<1>().set_constant(0);
+	m_sub->read_adc<2>().set_constant(0);
+	m_sub->read_adc<3>().set_constant(0);
 	m_sub->read_port6().set(FUNC(namcos12_state::s12_mcu_p6_r));
 	m_sub->read_port7().set_ioport("DSW");
 	m_sub->read_port8().set(FUNC(namcos12_state::s12_mcu_p8_r));
@@ -1707,13 +1707,11 @@ void namcos12_state::namcos12_mobo(machine_config &config)
 	NAMCO_SETTINGS(config, m_settings, 0);
 
 	RTC4543(config, m_rtc, XTAL(32'768));
-	m_rtc->data_cb().set("sub:sci1", FUNC(h8_sci_device::rx_w));
+	m_rtc->data_cb().set(m_sub, FUNC(h8_device::sci_rx_w<1>));
 
-	// FIXME: need better syntax for configuring H8 onboard devices
-	h8_sci_device &sub_sci1(*m_sub->subdevice<h8_sci_device>("sci1"));
-	sub_sci1.tx_handler().set(m_settings, FUNC(namco_settings_device::data_w));
-	sub_sci1.clk_handler().set(m_rtc, FUNC(rtc4543_device::clk_w)).invert();
-	sub_sci1.clk_handler().append(m_settings, FUNC(namco_settings_device::clk_w));
+	m_sub->write_sci_tx<1>().set(m_settings, FUNC(namco_settings_device::data_w));
+	m_sub->write_sci_clk<1>().set(m_rtc, FUNC(rtc4543_device::clk_w)).invert();
+	m_sub->write_sci_clk<1>().append(m_settings, FUNC(namco_settings_device::clk_w));
 
 	AT28C16(config, "at28c16", 0);
 
@@ -1781,8 +1779,8 @@ void namcos12_boothack_state::golgo13(machine_config &config)
 	coh700(config);
 
 	/* basic machine hardware */
-	m_sub->read_adc(1).set(FUNC(namcos12_boothack_state::s12_mcu_gun_h_r));
-	m_sub->read_adc(2).set(FUNC(namcos12_boothack_state::s12_mcu_gun_v_r));
+	m_sub->read_adc<1>().set(FUNC(namcos12_boothack_state::s12_mcu_gun_h_r));
+	m_sub->read_adc<2>().set(FUNC(namcos12_boothack_state::s12_mcu_gun_v_r));
 }
 
 void namcos12_boothack_state::kartduel(machine_config &config)
@@ -1790,9 +1788,9 @@ void namcos12_boothack_state::kartduel(machine_config &config)
 	coh700(config);
 
 	/* basic machine hardware */
-	m_sub->read_adc(0).set_ioport("BRAKE");
-	m_sub->read_adc(1).set_ioport("GAS");
-	m_sub->read_adc(2).set_ioport("STEER");
+	m_sub->read_adc<0>().set_ioport("BRAKE");
+	m_sub->read_adc<1>().set_ioport("GAS");
+	m_sub->read_adc<2>().set_ioport("STEER");
 }
 
 #define JVSCLOCK    (XTAL(14'745'600))
@@ -1806,13 +1804,13 @@ void namcos12_boothack_state::truckk(machine_config &config)
 {
 	coh700(config);
 	// Timer at 115200*16 for the jvs serial clock
-	subdevice<h8_sci_device>("sub:sci0")->set_external_clock_period(attotime::from_hz(JVSCLOCK/8));
+	m_sub->sci_set_external_clock_period(0, attotime::from_hz(JVSCLOCK/8));
 
 	h83334_device &iocpu(H83334(config, "iocpu", JVSCLOCK));
 	iocpu.set_addrmap(AS_PROGRAM, &namcos12_boothack_state::jvsmap);
 
-	subdevice<h8_sci_device>("iocpu:sci0")->tx_handler().set("sub:sci0", FUNC(h8_sci_device::rx_w));
-	subdevice<h8_sci_device>("sub:sci0")->tx_handler().set("iocpu:sci0", FUNC(h8_sci_device::rx_w));
+	iocpu.write_sci_tx<0>().set(m_sub, FUNC(h8_device::sci_rx_w<0>));
+	m_sub->write_sci_tx<0>().set(iocpu, FUNC(h8_device::sci_rx_w<0>));
 
 	config.set_maximum_quantum(attotime::from_hz(2*115200));
 }
@@ -1859,7 +1857,7 @@ void namcos12_boothack_state::technodr(machine_config &config)
 {
 	coh700(config);
 	// Timer at 115200*16 for the jvs serial clock
-	subdevice<h8_sci_device>("sub:sci0")->set_external_clock_period(attotime::from_hz(JVSCLOCK/8));
+	m_sub->sci_set_external_clock_period(0, attotime::from_hz(JVSCLOCK/8));
 
 	// modify H8/3002 map to omit direct-connected controls
 	m_sub->set_addrmap(AS_PROGRAM, &namcos12_boothack_state::s12h8rwjvsmap);
@@ -1867,15 +1865,15 @@ void namcos12_boothack_state::technodr(machine_config &config)
 
 	h83334_device &iocpu(H83334(config, "iocpu", JVSCLOCK));
 	iocpu.set_addrmap(AS_PROGRAM, &namcos12_boothack_state::tdjvsmap);
-	iocpu.read_adc(0).set_ioport("STEER");
-	iocpu.read_adc(1).set_ioport("BRAKE");
-	iocpu.read_adc(2).set_ioport("GAS");
+	iocpu.read_adc<0>().set_ioport("STEER");
+	iocpu.read_adc<1>().set_ioport("BRAKE");
+	iocpu.read_adc<2>().set_ioport("GAS");
 	iocpu.read_port4().set(FUNC(namcos12_boothack_state::iob_p4_r));
 	iocpu.write_port4().set(FUNC(namcos12_boothack_state::iob_p4_w));
 	iocpu.read_port6().set(FUNC(namcos12_boothack_state::iob_p6_r));
 
-	subdevice<h8_sci_device>("iocpu:sci0")->tx_handler().set("sub:sci0", FUNC(h8_sci_device::rx_w));
-	subdevice<h8_sci_device>("sub:sci0")->tx_handler().set("iocpu:sci0", FUNC(h8_sci_device::rx_w));
+	iocpu.write_sci_tx<0>().set(m_sub, FUNC(h8_device::sci_rx_w<0>));
+	m_sub->write_sci_tx<0>().set(iocpu, FUNC(h8_device::sci_rx_w<0>));
 
 	config.set_maximum_quantum(attotime::from_hz(2*115200));
 }
@@ -1884,14 +1882,14 @@ void namcos12_boothack_state::aplarail(machine_config &config)
 {
 	coh700(config);
 	// Timer at 115200*16 for the jvs serial clock
-	subdevice<h8_sci_device>("sub:sci0")->set_external_clock_period(attotime::from_hz(JVSCLOCK/8));
+	m_sub->sci_set_external_clock_period(0, attotime::from_hz(JVSCLOCK/8));
 
 	// modify H8/3002 map to omit direct-connected controls
 	m_sub->set_addrmap(AS_PROGRAM, &namcos12_boothack_state::s12h8rwjvsmap);
-	m_sub->read_adc(0).set_ioport("LEVER");
-	m_sub->read_adc(1).set_constant(0);
-	m_sub->read_adc(2).set_constant(0);
-	m_sub->read_adc(3).set_constant(0);
+	m_sub->read_adc<0>().set_ioport("LEVER");
+	m_sub->read_adc<1>().set_constant(0);
+	m_sub->read_adc<2>().set_constant(0);
+	m_sub->read_adc<3>().set_constant(0);
 	m_sub->read_port6().set(FUNC(namcos12_boothack_state::s12_mcu_p6_r));
 	m_sub->read_port7().set_ioport("DSW");
 	m_sub->read_port8().set(FUNC(namcos12_boothack_state::s12_mcu_jvs_p8_r));
@@ -1903,16 +1901,16 @@ void namcos12_boothack_state::aplarail(machine_config &config)
 
 	h83334_device &iocpu(H83334(config, "iocpu", JVSCLOCK));
 	iocpu.set_addrmap(AS_PROGRAM, &namcos12_boothack_state::plarailjvsmap);
-	iocpu.read_adc(0).set_constant(0);
-	iocpu.read_adc(1).set_constant(0);
-	iocpu.read_adc(2).set_constant(0);
-	iocpu.read_adc(3).set_constant(0);
+	iocpu.read_adc<0>().set_constant(0);
+	iocpu.read_adc<1>().set_constant(0);
+	iocpu.read_adc<2>().set_constant(0);
+	iocpu.read_adc<3>().set_constant(0);
 	iocpu.read_port4().set(FUNC(namcos12_boothack_state::iob_p4_r));
 	iocpu.write_port4().set(FUNC(namcos12_boothack_state::iob_p4_w));
 	iocpu.read_port6().set_ioport("SERVICE");
 
-	subdevice<h8_sci_device>("iocpu:sci0")->tx_handler().set("sub:sci0", FUNC(h8_sci_device::rx_w));
-	subdevice<h8_sci_device>("sub:sci0")->tx_handler().set("iocpu:sci0", FUNC(h8_sci_device::rx_w));
+	iocpu.write_sci_tx<0>().set(m_sub, FUNC(h8_device::sci_rx_w<0>));
+	m_sub->write_sci_tx<0>().set(iocpu, FUNC(h8_device::sci_rx_w<0>));
 
 	config.set_maximum_quantum(attotime::from_hz(2*115200));
 }

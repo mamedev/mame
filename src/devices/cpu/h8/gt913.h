@@ -104,9 +104,6 @@ protected:
 	/* misc. I/O (timers, ADCs) */
 	required_device<gt913_io_hle_device> m_io_hle;
 
-	/* serial port */
-	required_device_array<h8_sci_device, 2> m_sci;
-
 	/* 3x 8-bit I/O ports */
 	required_device_array<h8_port_device, 3> m_port;
 };

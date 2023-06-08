@@ -39,9 +39,6 @@ h8s2357_device::h8s2357_device(const machine_config &mconfig, device_type type, 
 	m_timer16_3(*this, "timer16:3"),
 	m_timer16_4(*this, "timer16:4"),
 	m_timer16_5(*this, "timer16:5"),
-	m_sci0(*this, "sci0"),
-	m_sci1(*this, "sci1"),
-	m_sci2(*this, "sci2"),
 	m_watchdog(*this, "watchdog"),
 	m_ram_start(start),
 	m_syscr(0)
@@ -174,27 +171,27 @@ void h8s2357_device::map(address_map &map)
 	map(0xffff74, 0xffff74).rw(m_porte, FUNC(h8_port_device::pcr_r), FUNC(h8_port_device::pcr_w));
 	map(0xffff76, 0xffff76).rw(m_port3, FUNC(h8_port_device::odr_r), FUNC(h8_port_device::odr_w));
 	map(0xffff77, 0xffff77).rw(m_porta, FUNC(h8_port_device::odr_r), FUNC(h8_port_device::odr_w));
-	map(0xffff78, 0xffff78).rw(m_sci0, FUNC(h8_sci_device::smr_r), FUNC(h8_sci_device::smr_w));
-	map(0xffff79, 0xffff79).rw(m_sci0, FUNC(h8_sci_device::brr_r), FUNC(h8_sci_device::brr_w));
-	map(0xffff7a, 0xffff7a).rw(m_sci0, FUNC(h8_sci_device::scr_r), FUNC(h8_sci_device::scr_w));
-	map(0xffff7b, 0xffff7b).rw(m_sci0, FUNC(h8_sci_device::tdr_r), FUNC(h8_sci_device::tdr_w));
-	map(0xffff7c, 0xffff7c).rw(m_sci0, FUNC(h8_sci_device::ssr_r), FUNC(h8_sci_device::ssr_w));
-	map(0xffff7d, 0xffff7d).r(m_sci0, FUNC(h8_sci_device::rdr_r));
-	map(0xffff7e, 0xffff7e).rw(m_sci0, FUNC(h8_sci_device::scmr_r), FUNC(h8_sci_device::scmr_w));
-	map(0xffff80, 0xffff80).rw(m_sci1, FUNC(h8_sci_device::smr_r), FUNC(h8_sci_device::smr_w));
-	map(0xffff81, 0xffff81).rw(m_sci1, FUNC(h8_sci_device::brr_r), FUNC(h8_sci_device::brr_w));
-	map(0xffff82, 0xffff82).rw(m_sci1, FUNC(h8_sci_device::scr_r), FUNC(h8_sci_device::scr_w));
-	map(0xffff83, 0xffff83).rw(m_sci1, FUNC(h8_sci_device::tdr_r), FUNC(h8_sci_device::tdr_w));
-	map(0xffff84, 0xffff84).rw(m_sci1, FUNC(h8_sci_device::ssr_r), FUNC(h8_sci_device::ssr_w));
-	map(0xffff85, 0xffff85).r(m_sci1, FUNC(h8_sci_device::rdr_r));
-	map(0xffff86, 0xffff86).rw(m_sci1, FUNC(h8_sci_device::scmr_r), FUNC(h8_sci_device::scmr_w));
-	map(0xffff88, 0xffff88).rw(m_sci2, FUNC(h8_sci_device::smr_r), FUNC(h8_sci_device::smr_w));
-	map(0xffff89, 0xffff89).rw(m_sci2, FUNC(h8_sci_device::brr_r), FUNC(h8_sci_device::brr_w));
-	map(0xffff8a, 0xffff8a).rw(m_sci2, FUNC(h8_sci_device::scr_r), FUNC(h8_sci_device::scr_w));
-	map(0xffff8b, 0xffff8b).rw(m_sci2, FUNC(h8_sci_device::tdr_r), FUNC(h8_sci_device::tdr_w));
-	map(0xffff8c, 0xffff8c).rw(m_sci2, FUNC(h8_sci_device::ssr_r), FUNC(h8_sci_device::ssr_w));
-	map(0xffff8d, 0xffff8d).r(m_sci2, FUNC(h8_sci_device::rdr_r));
-	map(0xffff8e, 0xffff8e).rw(m_sci2, FUNC(h8_sci_device::scmr_r), FUNC(h8_sci_device::scmr_w));
+	map(0xffff78, 0xffff78).rw(m_sci[0], FUNC(h8_sci_device::smr_r), FUNC(h8_sci_device::smr_w));
+	map(0xffff79, 0xffff79).rw(m_sci[0], FUNC(h8_sci_device::brr_r), FUNC(h8_sci_device::brr_w));
+	map(0xffff7a, 0xffff7a).rw(m_sci[0], FUNC(h8_sci_device::scr_r), FUNC(h8_sci_device::scr_w));
+	map(0xffff7b, 0xffff7b).rw(m_sci[0], FUNC(h8_sci_device::tdr_r), FUNC(h8_sci_device::tdr_w));
+	map(0xffff7c, 0xffff7c).rw(m_sci[0], FUNC(h8_sci_device::ssr_r), FUNC(h8_sci_device::ssr_w));
+	map(0xffff7d, 0xffff7d).r(m_sci[0], FUNC(h8_sci_device::rdr_r));
+	map(0xffff7e, 0xffff7e).rw(m_sci[0], FUNC(h8_sci_device::scmr_r), FUNC(h8_sci_device::scmr_w));
+	map(0xffff80, 0xffff80).rw(m_sci[1], FUNC(h8_sci_device::smr_r), FUNC(h8_sci_device::smr_w));
+	map(0xffff81, 0xffff81).rw(m_sci[1], FUNC(h8_sci_device::brr_r), FUNC(h8_sci_device::brr_w));
+	map(0xffff82, 0xffff82).rw(m_sci[1], FUNC(h8_sci_device::scr_r), FUNC(h8_sci_device::scr_w));
+	map(0xffff83, 0xffff83).rw(m_sci[1], FUNC(h8_sci_device::tdr_r), FUNC(h8_sci_device::tdr_w));
+	map(0xffff84, 0xffff84).rw(m_sci[1], FUNC(h8_sci_device::ssr_r), FUNC(h8_sci_device::ssr_w));
+	map(0xffff85, 0xffff85).r(m_sci[1], FUNC(h8_sci_device::rdr_r));
+	map(0xffff86, 0xffff86).rw(m_sci[1], FUNC(h8_sci_device::scmr_r), FUNC(h8_sci_device::scmr_w));
+	map(0xffff88, 0xffff88).rw(m_sci[2], FUNC(h8_sci_device::smr_r), FUNC(h8_sci_device::smr_w));
+	map(0xffff89, 0xffff89).rw(m_sci[2], FUNC(h8_sci_device::brr_r), FUNC(h8_sci_device::brr_w));
+	map(0xffff8a, 0xffff8a).rw(m_sci[2], FUNC(h8_sci_device::scr_r), FUNC(h8_sci_device::scr_w));
+	map(0xffff8b, 0xffff8b).rw(m_sci[2], FUNC(h8_sci_device::tdr_r), FUNC(h8_sci_device::tdr_w));
+	map(0xffff8c, 0xffff8c).rw(m_sci[2], FUNC(h8_sci_device::ssr_r), FUNC(h8_sci_device::ssr_w));
+	map(0xffff8d, 0xffff8d).r(m_sci[2], FUNC(h8_sci_device::rdr_r));
+	map(0xffff8e, 0xffff8e).rw(m_sci[2], FUNC(h8_sci_device::scmr_r), FUNC(h8_sci_device::scmr_w));
 	map(0xffff90, 0xffff97).r(m_adc, FUNC(h8_adc_device::addr8_r));
 	map(0xffff98, 0xffff98).rw(m_adc, FUNC(h8_adc_device::adcsr_r), FUNC(h8_adc_device::adcsr_w));
 	map(0xffff99, 0xffff99).rw(m_adc, FUNC(h8_adc_device::adcr_r), FUNC(h8_adc_device::adcr_w));
@@ -310,9 +307,9 @@ void h8s2357_device::device_add_mconfig(machine_config &config)
 									h8_timer16_channel_device::INPUT_C,
 									h8_timer16_channel_device::DIV_256,
 									h8_timer16_channel_device::INPUT_D);
-	H8_SCI(config, m_sci0, *this, m_intc, 80, 81, 82, 83);
-	H8_SCI(config, m_sci1, *this, m_intc, 84, 85, 86, 87);
-	H8_SCI(config, m_sci2, *this, m_intc, 88, 89, 90, 91);
+	H8_SCI(config, m_sci[0], 0, *this, m_intc, 80, 81, 82, 83);
+	H8_SCI(config, m_sci[1], 1, *this, m_intc, 84, 85, 86, 87);
+	H8_SCI(config, m_sci[2], 2, *this, m_intc, 88, 89, 90, 91);
 	H8_WATCHDOG(config, m_watchdog, *this, m_intc, 25, h8_watchdog_device::S);
 }
 
@@ -382,9 +379,9 @@ void h8s2357_device::internal_update(uint64_t current_time)
 	uint64_t event_time = 0;
 
 	add_event(event_time, m_adc->internal_update(current_time));
-	add_event(event_time, m_sci0->internal_update(current_time));
-	add_event(event_time, m_sci1->internal_update(current_time));
-	add_event(event_time, m_sci2->internal_update(current_time));
+	add_event(event_time, m_sci[0]->internal_update(current_time));
+	add_event(event_time, m_sci[1]->internal_update(current_time));
+	add_event(event_time, m_sci[2]->internal_update(current_time));
 	add_event(event_time, m_timer8_0->internal_update(current_time));
 	add_event(event_time, m_timer8_1->internal_update(current_time));
 	add_event(event_time, m_timer16_0->internal_update(current_time));

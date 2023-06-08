@@ -2486,7 +2486,7 @@ void funcube_state::funcube(machine_config &config)
 
 	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0, m_maincpu);
 
-	FUNCUBE_TOUCHSCREEN(config, "touchscreen", 200).tx_cb().set(":sub:sci1", FUNC(h8_sci_device::rx_w));
+	FUNCUBE_TOUCHSCREEN(config, "touchscreen", 200).tx_cb().set(m_sub, FUNC(h8_device::sci_rx_w<1>));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
