@@ -118,15 +118,21 @@ private:
 uint32_t anes_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap_ind16 *srcbitmap = &m_bitmap[0][0];
+	bitmap_ind16 *srcbitmap2 = &m_bitmap[1][0];
 
 	for (int y = cliprect.min_y; y < cliprect.max_y; y++)
 	{
 		for (int x = cliprect.min_x; x < cliprect.max_x; x++)
 		{
 			uint16_t* src = &srcbitmap->pix(y, x);
+			uint16_t* src2 = &srcbitmap2->pix(y, x);
+
 			uint16_t* dst = &bitmap.pix(y, x);
 
 			dst[0] = src[0] + m_palette_active_bank * 0x100;
+
+			if (src2[0])
+				dst[0] = src2[0] + m_palette_active_bank * 0x100;
 		}
 	}
 
@@ -155,8 +161,11 @@ void anes_state::do_blit()
 		m_blit[0x0f]
 	);
 
-	int layer = 0;
+	int layer = (m_blit[0x0b] & 0x04) ? 1 : 0;
 	int buffer = 0;
+
+	//if (m_blit[0x0b] & 0x04)
+	//	return;
 
 	bool flipx = m_blit[0x04] & 0x01;
 	bool flipy = m_blit[0x04] & 0x02;
@@ -190,8 +199,10 @@ void anes_state::do_blit()
 
 				int pen = (which & 0x10) ? 0 : m_blitrom[(addr++) & (m_blitrom.bytes() - 1)];
 
-				//          if (pen != 0xff)
-				bitmap.pix(drawy, drawx) = pen;
+				if (pen != 0xff)
+					bitmap.pix(drawy, drawx) = pen;
+				else
+					bitmap.pix(drawy, drawx) = 0x00;
 			}
 		}
 	}
@@ -215,8 +226,10 @@ void anes_state::do_blit()
 
 				int pen = (which & 0x10) ? 0 : m_blitrom[(addr++) & (m_blitrom.bytes() - 1)];
 
-				//          if (pen != 0xff)
-				bitmap.pix(drawy, drawx) = pen;
+				if (pen != 0xff)
+					bitmap.pix(drawy, drawx) = pen;
+				else
+					bitmap.pix(drawy, drawx) = 0x00;
 			}
 		}
 	}
