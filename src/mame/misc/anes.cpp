@@ -44,7 +44,6 @@ public:
 		m_palette(*this, "palette"),
 		m_rombank(*this, "rombank"),
 		m_blitrom(*this, "blitter"),
-		m_coin(*this, "COIN"),
 		m_key{ { *this, "KEY1.%u", 0U }, { *this, "KEY2.%u", 0U } }
 	{
 	}
@@ -64,10 +63,9 @@ private:
 	required_memory_bank m_rombank;
 	required_region_ptr<uint8_t> m_blitrom;
 
-	required_ioport m_coin;
 	required_ioport_array<5> m_key[2];
 
-	uint8_t m_mux;
+	uint8_t m_inp_matrix;
 	uint8_t m_bank;
 	uint8_t m_bank_delay;
 
@@ -88,7 +86,7 @@ private:
 	void blit_rom_w(offs_t offset, uint8_t data);
 	uint8_t blit_status_r();
 	void rombank_w(uint8_t data);
-	void mux_w(uint8_t data);
+	void matrix_w(uint8_t data);
 	uint8_t key_r(offs_t offset);
 	uint8_t m1_rom_r(offs_t offset);
 
@@ -269,22 +267,23 @@ uint8_t anes_state::blit_status_r()
 	return 0x00;
 }
 
-void anes_state::mux_w(uint8_t data)
+void anes_state::matrix_w(uint8_t data)
 {
-	m_mux = data;
-	if (m_mux & (~0x1f))
+	m_inp_matrix = data;
+	if (m_inp_matrix & (~0x1f))
 		logerror("%s: Unknown mux bit written %02X\n", machine().describe_context(), data);
 }
 
 uint8_t anes_state::key_r(offs_t offset)
 {
-	for (int i = 0; i < 5; i++)
-		if (!BIT(m_mux, i))
-			return m_key[offset][i]->read();
+	uint8_t data = 0xff;
 
-	//  logerror("%s: Unknown key read with mux = %02X\n", machine().describe_context(), m_mux);
-	//  return 0xff;
-	return offset ? m_coin->read() : 0xff;
+	// read key matrix
+	for (int i = 0; i < 5; i++)
+		if (!BIT(m_inp_matrix, i))
+			data &= m_key[offset][i]->read();
+
+	return data;
 }
 
 uint8_t anes_state::m1_rom_r(offs_t offset)
@@ -403,7 +402,7 @@ void anes_state::io_map(address_map &map)
 
 	map(0x00, 0x0f).w(FUNC(anes_state::blit_w));
 
-	map(0x07, 0x07).w(FUNC(anes_state::mux_w));
+	map(0x07, 0x07).w(FUNC(anes_state::matrix_w));
 	map(0x08, 0x09).w("ym", FUNC(ym2413_device::write));
 
 	map(0x10, 0x10).portr("SW1");
@@ -423,9 +422,6 @@ void anes_state::io_map(address_map &map)
 
 
 static INPUT_PORTS_START( anes )
-	PORT_START("COIN")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-
 	PORT_START("KEY1.0")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
@@ -468,16 +464,24 @@ static INPUT_PORTS_START( anes )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("KEY2.0")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN5 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("KEY2.1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN4 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("KEY2.2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("KEY2.3")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("KEY2.4")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -548,12 +552,12 @@ void anes_state::machine_start()
 	for (int i = 0; i < (memregion("maincpu")->bytes() - 0x2000) / 0xc000; i++)
 		m_rombank->configure_entry(i, &rom[0x2000 + (0xc000 * i)]);
 
-	m_mux = 0;
+	m_inp_matrix = 0;
 	m_bank = 0;
 	m_bank_delay = 0;
 	m_palette_active_bank = 0;
 
-	save_item(NAME(m_mux));
+	save_item(NAME(m_inp_matrix));
 	save_item(NAME(m_bank));
 	save_item(NAME(m_bank_delay));
 }
