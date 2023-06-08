@@ -28,7 +28,6 @@ public:
 	void eop_w(int state);
 	u8 dma_r();
 	void dma_w(u8 val);
-	bool in_dma_mode();
 
 protected:
 	ncr5380_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, bool has_lbs = false);

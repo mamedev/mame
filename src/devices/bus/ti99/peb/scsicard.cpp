@@ -264,7 +264,7 @@ void whtech_scsi_card_device::readz(offs_t offset, uint8_t *value)
 			int reg = (m_address >> 1)&0x07;
 
 			// If we are in DMA mode, reading from register 6 means DMA read
-			if (m_controller->in_dma_mode() && (reg == 6))
+			if (m_drq && (reg == 6))
 			{
 				*value = m_controller->dma_r();
 				LOGMASKED(LOG_DMA, "CTR: DMA in [%d] -> %02x (%s)\n",  m_dmacount++, *value, machine().describe_context());
@@ -306,7 +306,7 @@ void whtech_scsi_card_device::write(offs_t offset, uint8_t data)
 			int reg = (m_address >> 1)&0x07;
 
 			// If we are in DMA mode, writing to register 0 means DMA write
-			if (m_controller->in_dma_mode() && (reg == 0))
+			if (m_drq && (reg == 0))
 			{
 				LOGMASKED(LOG_DMA, "CTR: DMA out <- %02x [%d] (%s)\n",  data, m_dmacount++, machine().describe_context());
 				m_controller->dma_w(data);

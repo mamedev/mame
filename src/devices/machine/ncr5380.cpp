@@ -585,11 +585,6 @@ void ncr5380_device::dma_w(u8 data)
 	}
 }
 
-bool ncr5380_device::in_dma_mode()
-{
-	return ((m_mode & MODE_DMA) != 0);
-}
-
 u8 ncr5380_device::dma_r()
 {
 	set_drq(false);
