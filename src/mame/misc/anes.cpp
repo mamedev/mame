@@ -117,9 +117,9 @@ uint32_t anes_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	bitmap_ind16 *srcbitmap = &m_bitmap[0];
 	bitmap_ind16 *srcbitmap2 = &m_bitmap[1];
 
-	for (int y = cliprect.min_y; y < cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for (int x = cliprect.min_x; x < cliprect.max_x; x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			uint16_t* src = &srcbitmap->pix(y, x);
 			uint16_t* src2 = &srcbitmap2->pix(y, x);
@@ -630,7 +630,7 @@ void anes_state::anes(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
-	screen.set_visarea(0*8, 46*8-1, 0*8, 32*8-1);
+	screen.set_visarea(0*8, 46*8-1, 0*8, 31*8-1);
 	screen.set_screen_update(FUNC(anes_state::screen_update));
 	screen.set_palette("palette");
 
