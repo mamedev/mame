@@ -69,6 +69,9 @@ private:
 	// Settings
 	int m_sw2;
 
+	// Debugging
+	int m_dmacount;
+
 	// Latches for the lines
 	// Should be removed and accessor functions be added to ncr5380
 	bool m_irq;

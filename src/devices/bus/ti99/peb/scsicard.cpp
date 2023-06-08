@@ -112,6 +112,8 @@
     Thanks to Don O'Neil of WHT for providing the required schematics, ROM dumps,
     and documentation
 
+    TODO: Enable block DMA. The only other driver using eop is lbpc.
+
 *****************************************************************************/
 
 #include "emu.h"
@@ -260,12 +262,12 @@ void whtech_scsi_card_device::readz(offs_t offset, uint8_t *value)
 		if ((m_address & 0x0010)==0x0000)
 		{
 			int reg = (m_address >> 1)&0x07;
+
 			// If we are in DMA mode, reading from register 6 means DMA read
-			if ((m_controller->read(2) & 0x02) && (reg == 6))
+			if (m_controller->in_dma_mode() && (reg == 6))
 			{
-				LOGMASKED(LOG_DMA, "CTR: DMA in (%s)\n", machine().describe_context());
 				*value = m_controller->dma_r();
-				LOGMASKED(LOG_DMA, "CTR: DMA -> %02x\n", *value);
+				LOGMASKED(LOG_DMA, "CTR: DMA in [%d] -> %02x (%s)\n",  m_dmacount++, *value, machine().describe_context());
 			}
 			else
 			{
@@ -304,9 +306,9 @@ void whtech_scsi_card_device::write(offs_t offset, uint8_t data)
 			int reg = (m_address >> 1)&0x07;
 
 			// If we are in DMA mode, writing to register 0 means DMA write
-			if ((m_controller->read(2) & 0x02) && (reg == 0))
+			if (m_controller->in_dma_mode() && (reg == 0))
 			{
-				LOGMASKED(LOG_DMA, "CTR: DMA out <- %02x (%s)\n", data, machine().describe_context());
+				LOGMASKED(LOG_DMA, "CTR: DMA out <- %02x [%d] (%s)\n",  data, m_dmacount++, machine().describe_context());
 				m_controller->dma_w(data);
 			}
 			else
@@ -613,36 +615,37 @@ void whtscsi_pld_device::cruwrite(offs_t offset, uint8_t data)
 	int crubase = m_board->get_sw1();
 	if ((offset & 0xff00)==crubase)
 	{
-		LOGMASKED(LOG_CRU, "CRU %04x <- %d (%s)\n", offset & 0xffff, data, machine().describe_context());
+		// LOGMASKED(LOG_CRU, "CRU %04x <- %d (%s)\n", offset & 0xffff, data, machine().describe_context());
 		int bit = (offset >> 1) & 0x1f;
 		switch (bit)
 		{
 		case 0:           // card activation
-			LOGMASKED(LOG_CRU, "DSR %s\n", (data!=0)? "on" : "off");
+			LOGMASKED(LOG_CRU, "DSR %s (%s)\n", (data!=0)? "on" : "off", machine().describe_context());
 			m_selected = (data != 0);
 			break;
 		case 1:           // SRAM shadow
-			LOGMASKED(LOG_CRU, "SRAM shadow %s\n", (data!=0)? "on" : "off");
+			LOGMASKED(LOG_CRU, "SRAM shadow %s (%s)\n", (data!=0)? "on" : "off", machine().describe_context());
 			m_sram_shadow = (data != 0);
 			break;
 		case 2:           // DMA lock enable
-			LOGMASKED(LOG_CRU, "DMA lock %s\n", (data!=0)? "on" : "off");
+			LOGMASKED(LOG_CRU, "DMA lock %s (%s)\n", (data!=0)? "on" : "off", machine().describe_context());
 			m_dma_lock = (data != 0);
+			m_board->m_dmacount = 0;
 			break;
 		case 3:           // SCSI EOP
-			LOGMASKED(LOG_CRU, "SCSI EOP %s\n", (data!=0)? "on" : "off");
+			LOGMASKED(LOG_CRU, "SCSI EOP %s (%s)\n", (data!=0)? "on" : "off", machine().describe_context());
 			m_board->signal_scsi_eop((data != 0)? ASSERT_LINE : CLEAR_LINE);
 			break;
 		case 4:
-			LOGMASKED(LOG_CRU, "Word transfer %s\n", (data!=0)? "on" : "off");
+			LOGMASKED(LOG_CRU, "Word transfer %s (%s)\n", (data!=0)? "on" : "off", machine().describe_context());
 			m_word_transfer = (data != 0);
 			break;
 		case 5:
-			LOGMASKED(LOG_CRU, "Bank swap %s\n", (data!=0)? "on" : "off");
+			LOGMASKED(LOG_CRU, "Bank swap %s (%s)\n", (data!=0)? "on" : "off", machine().describe_context());
 			m_bank_swapped = (data != 0);
 			break;
 		case 6:
-			LOGMASKED(LOG_CRU, "Block mode %s (not implemented)\n", (data!=0)? "on" : "off");
+			LOGMASKED(LOG_CRU, "Block mode %s (not implemented) (%s)\n", (data!=0)? "on" : "off", machine().describe_context());
 			break;
 		case 8:
 		case 9:
@@ -651,6 +654,7 @@ void whtscsi_pld_device::cruwrite(offs_t offset, uint8_t data)
 				m_eprom_bank = m_eprom_bank | (1<<(bit-8));
 			else
 				m_eprom_bank = m_eprom_bank & ~(1<<(bit-8));
+			LOGMASKED(LOG_CRU, "Set EPROM bank %d (%s)\n", m_eprom_bank, machine().describe_context());
 			break;
 		case 12:
 		case 13:
@@ -659,6 +663,7 @@ void whtscsi_pld_device::cruwrite(offs_t offset, uint8_t data)
 				m_sram_bank = m_sram_bank | (1<<(bit-12));
 			else
 				m_sram_bank = m_sram_bank & ~(1<<(bit-12));
+			LOGMASKED(LOG_CRU, "Set SRAM bank %d (%s)\n", m_sram_bank, machine().describe_context());
 			break;
 		default:
 			break;
