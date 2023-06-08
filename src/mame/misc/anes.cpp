@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ivan Vangelista
+// copyright-holders:Ivan Vangelista, Luca Elia, David Haywood
 
 /*
 Sanma - San-nin Uchi Mahjong (Japan) by ANES
@@ -158,6 +158,9 @@ void anes_state::do_blit()
 	int layer = 0;
 	int buffer = 0;
 
+	bool flipx = m_blit[0x04] & 0x01;
+	bool flipy = m_blit[0x04] & 0x02;
+
 	bitmap_ind16& bitmap = m_bitmap[layer][buffer];
 
 	int sx = m_blit_addr[0];
@@ -171,10 +174,22 @@ void anes_state::do_blit()
 	{
 		for (int x = 0; x < sw; x++)
 		{
+			int drawx, drawy;
+
+			if (!flipy)
+				drawy = ((sy + y) & 0x1ff);
+			else
+				drawy = ((sy + (sh-1) - y) & 0x1ff);
+
+			if (!flipx)
+				drawx = ((sx + x) & 0x1ff);
+			else
+				drawx = ((sx + (sw-1) - x) & 0x1ff);
+
 			int pen = (which & 0x10) ? 0 : m_blitrom[(addr++) & (m_blitrom.bytes() - 1)];
 
 			//          if (pen != 0xff)
-			bitmap.pix(((sy + y) & 0x1ff), ((sx + x) & 0x1ff)) = pen;
+			bitmap.pix(drawy,drawx) = pen;
 		}
 	}
 }
