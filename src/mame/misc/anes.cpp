@@ -26,7 +26,6 @@ TODO:
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
-#include "machine/timer.h"
 #include "sound/ymopl.h"
 
 #include "emupal.h"
@@ -43,7 +42,6 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
-		m_banktimer(*this, "banktimer"),
 		m_rombank(*this, "rombank"),
 		m_blitrom(*this, "blitter"),
 		m_coin(*this, "COIN"),
@@ -62,7 +60,6 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
-	required_device<timer_device> m_banktimer;
 
 	required_memory_bank m_rombank;
 	required_region_ptr<uint8_t> m_blitrom;
@@ -111,7 +108,6 @@ private:
 	void opcodes_map(address_map &map);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(bank_timer_expired);
 };
 
 uint32_t anes_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -293,15 +289,13 @@ uint8_t anes_state::key_r(offs_t offset)
 
 uint8_t anes_state::m1_rom_r(offs_t offset)
 {
-	uint8_t ret = m_maincpu->space(AS_PROGRAM).read_byte(offset);
-	if (!machine().side_effects_disabled())
+	if (!machine().side_effects_disabled() && m_bank_delay)
 	{
-		if (m_bank_delay)
-		{
-			m_banktimer->adjust(attotime::from_usec(1));
-		}
+		if (--m_bank_delay == 0)
+			m_rombank->set_entry(m_bank);
 	}
-	return ret;
+
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
 void anes_state::palette_enable_w(uint8_t data)
@@ -603,12 +597,6 @@ INTERRUPT_GEN_MEMBER(anes_state::interrupt)
 		device.execute().set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(anes_state::bank_timer_expired)
-{
-	m_rombank->set_entry(m_bank);
-	m_bank_delay = 0;
-}
-
 void anes_state::anes(machine_config &config)
 {
 	// basic machine hardware
@@ -628,8 +616,6 @@ void anes_state::anes(machine_config &config)
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_entries(0x2000);
-
-	TIMER(config, m_banktimer).configure_generic(FUNC(anes_state::bank_timer_expired));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
