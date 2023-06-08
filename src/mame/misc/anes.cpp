@@ -82,6 +82,7 @@ private:
 	uint8_t m_palette_data_lsb[0x2000];
 	uint8_t m_palette_data_msb[0x2000];
 
+	void do_blit_draw(bitmap_ind16& bitmap, int& addr, int sx, int sy, int sw, int sh, int x, int y, bool flipx, bool flipy);
 	void do_blit();
 	void blit_w(offs_t offset, uint8_t data);
 	void blit_rom_w(offs_t offset, uint8_t data);
@@ -146,9 +147,37 @@ uint32_t anes_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
  writes a mode to port $0b, writes to trigger port $0a
  */
 
+void anes_state::do_blit_draw(bitmap_ind16& bitmap, int& addr, int sx, int sy, int sw, int sh, int x, int y, bool flipx, bool flipy)
+{
+	int drawx, drawy;
+
+	if (!flipy)
+		drawy = ((sy + y) & 0x1ff);
+	else
+		drawy = ((sy + (sh - 1) - y) & 0x1ff);
+
+	if (!flipx)
+		drawx = ((sx + x) & 0x1ff);
+	else
+		drawx = ((sx + (sw - 1) - x) & 0x1ff);
+
+	int pen = m_blitrom[(addr) & (m_blitrom.bytes() - 1)];
+	if (!(m_blit[0x0b] & 0x10))
+		addr++;
+
+	if (pen != 0xff)
+	{
+		//	if (pen != 0x00)
+		bitmap.pix(drawy, drawx) = pen;
+	}
+	else
+	{
+		bitmap.pix(drawy, drawx) = 0x00;
+	}
+}
+
 void anes_state::do_blit()
 {
-	int which = m_blit[0x0b];
 	int src = (m_blit[0x0c] << 16) + (m_blit[0x0d] << 8) + m_blit[0x0e];
 
 	logerror("%s: src %06x, xpos %04X width %02X, ypos %04X height %02X | %02X %02X %02X %02X %02X %02X %02X | %02X %02X | %02X\n", machine().describe_context(),
@@ -158,19 +187,15 @@ void anes_state::do_blit()
 		m_blit[0x0f]
 	);
 
-	int layer = (m_blit[0x0b] & 0x04) ? 1 : 0;
-
 	bool flipx = m_blit[0x04] & 0x01;
 	bool flipy = m_blit[0x04] & 0x02;
 
-	bitmap_ind16& bitmap = m_bitmap[layer];
+	bitmap_ind16& bitmap = m_bitmap[(m_blit[0x0b] & 0x04) ? 1 : 0];
 
 	int sx = m_blit_addr[0];
 	int sy = m_blit_val[0];
 	int16_t sw = m_blit_addr[1] - m_blit_addr[0] + 1;
 	int16_t sh = m_blit_val[1] - m_blit_val[0] + 1;
-
-	int addr = src;
 
 	if (m_blit[0x0b] & 0x40) // flipx x/y scan order on output?
 	{
@@ -178,31 +203,7 @@ void anes_state::do_blit()
 		{
 			for (int y = 0; y < sh; y++)
 			{
-				int drawx, drawy;
-
-				if (!flipy)
-					drawy = ((sy + y) & 0x1ff);
-				else
-					drawy = ((sy + (sh - 1) - y) & 0x1ff);
-
-				if (!flipx)
-					drawx = ((sx + x) & 0x1ff);
-				else
-					drawx = ((sx + (sw - 1) - x) & 0x1ff);
-
-				int pen = m_blitrom[(addr) & (m_blitrom.bytes() - 1)];
-				if (!(which & 0x10))
-					addr++;
-
-				if (pen != 0xff)
-				{
-					//	if (pen != 0x00)
-					bitmap.pix(drawy, drawx) = pen;
-				}
-				else
-				{
-					bitmap.pix(drawy, drawx) = 0x00;
-				}
+				do_blit_draw(bitmap, src, sx, sy, sw, sh, x, y, flipx, flipy);
 			}
 		}
 	}
@@ -212,31 +213,7 @@ void anes_state::do_blit()
 		{
 			for (int x = 0; x < sw; x++)
 			{
-				int drawx, drawy;
-
-				if (!flipy)
-					drawy = ((sy + y) & 0x1ff);
-				else
-					drawy = ((sy + (sh - 1) - y) & 0x1ff);
-
-				if (!flipx)
-					drawx = ((sx + x) & 0x1ff);
-				else
-					drawx = ((sx + (sw - 1) - x) & 0x1ff);
-
-				int pen = m_blitrom[(addr) & (m_blitrom.bytes() - 1)];
-				if (!(which & 0x10))
-					addr++;
-
-				if (pen != 0xff)
-				{
-				//	if (pen != 0x00)
-						bitmap.pix(drawy, drawx) = pen;
-				}
-				else
-				{
-					bitmap.pix(drawy, drawx) = 0x00;
-				}
+				do_blit_draw(bitmap, src, sx, sy, sw, sh, x, y, flipx, flipy);
 			}
 		}
 	}
