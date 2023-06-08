@@ -165,31 +165,59 @@ void anes_state::do_blit()
 
 	int sx = m_blit_addr[0];
 	int sy = m_blit_val[0];
-
 	int16_t sw = m_blit_addr[1] - m_blit_addr[0] + 1;
 	int16_t sh = m_blit_val[1] - m_blit_val[0] + 1;
 
 	int addr = src;
-	for (int y = 0; y < sh; y++)
+
+	if (m_blit[0x0b] & 0x40) // flipx x/y scan order on output?
 	{
 		for (int x = 0; x < sw; x++)
 		{
-			int drawx, drawy;
+			for (int y = 0; y < sh; y++)
+			{
+				int drawx, drawy;
 
-			if (!flipy)
-				drawy = ((sy + y) & 0x1ff);
-			else
-				drawy = ((sy + (sh-1) - y) & 0x1ff);
+				if (!flipy)
+					drawy = ((sy + y) & 0x1ff);
+				else
+					drawy = ((sy + (sh - 1) - y) & 0x1ff);
 
-			if (!flipx)
-				drawx = ((sx + x) & 0x1ff);
-			else
-				drawx = ((sx + (sw-1) - x) & 0x1ff);
+				if (!flipx)
+					drawx = ((sx + x) & 0x1ff);
+				else
+					drawx = ((sx + (sw - 1) - x) & 0x1ff);
 
-			int pen = (which & 0x10) ? 0 : m_blitrom[(addr++) & (m_blitrom.bytes() - 1)];
+				int pen = (which & 0x10) ? 0 : m_blitrom[(addr++) & (m_blitrom.bytes() - 1)];
 
-			//          if (pen != 0xff)
-			bitmap.pix(drawy,drawx) = pen;
+				//          if (pen != 0xff)
+				bitmap.pix(drawy, drawx) = pen;
+			}
+		}
+	}
+	else
+	{
+		for (int y = 0; y < sh; y++)
+		{
+			for (int x = 0; x < sw; x++)
+			{
+				int drawx, drawy;
+
+				if (!flipy)
+					drawy = ((sy + y) & 0x1ff);
+				else
+					drawy = ((sy + (sh - 1) - y) & 0x1ff);
+
+				if (!flipx)
+					drawx = ((sx + x) & 0x1ff);
+				else
+					drawx = ((sx + (sw - 1) - x) & 0x1ff);
+
+				int pen = (which & 0x10) ? 0 : m_blitrom[(addr++) & (m_blitrom.bytes() - 1)];
+
+				//          if (pen != 0xff)
+				bitmap.pix(drawy, drawx) = pen;
+			}
 		}
 	}
 }
