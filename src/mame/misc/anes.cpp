@@ -42,6 +42,7 @@ public:
 	anes_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette"),
 		m_banktimer(*this, "banktimer"),
 		m_rombank(*this, "rombank"),
 		m_blitrom(*this, "blitter"),
@@ -61,6 +62,7 @@ private:
 	void vram_offset_w(offs_t offset, uint8_t data);
 
 	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
 	required_device<timer_device> m_banktimer;
 
 	required_memory_bank m_rombank;
@@ -78,6 +80,16 @@ private:
 	uint16_t m_blit_addr[2];
 	uint8_t m_blit_val[2];
 
+	uint8_t m_palette_enable;
+	uint8_t m_palette_offset;
+	int m_palette_offset2 = 0;
+	int m_palette_offset3 = 0;
+
+
+	uint8_t m_palette_latch;
+	uint8_t m_palette_data2[0x2000];
+	uint8_t m_palette_data3[0x2000];
+
 	void do_blit();
 	void blit_w(offs_t offset, uint8_t data);
 	void blit_rom_w(offs_t offset, uint8_t data);
@@ -87,6 +99,13 @@ private:
 	uint8_t key_r(offs_t offset);
 	uint8_t fixed_rom_r(offs_t offset);
 	uint8_t banked_rom_r(offs_t offset);
+
+	void palette_enable_w(uint8_t data);
+	void palette_offset_w(uint8_t data);
+	void palette_latch_w(uint8_t data);
+	void palette_data2_w(uint8_t data);
+	void palette_data3_w(uint8_t data);
+	void set_color(int offset);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -249,6 +268,69 @@ uint8_t anes_state::banked_rom_r(offs_t offset)
 	return ret;
 }
 
+void anes_state::palette_enable_w(uint8_t data)
+{
+	m_palette_enable = data;
+}
+
+void anes_state::set_color(int offset)
+{
+	uint16_t dat = (m_palette_data3[offset] << 8) | m_palette_data2[offset];
+	m_palette->set_pen_color(offset, rgb_t(pal5bit(dat >> 0), pal5bit(dat >> 5), pal5bit(dat >> 10)));
+}
+
+void anes_state::palette_offset_w(uint8_t data)
+{
+	if (m_palette_enable != 0x01)
+	{
+		logerror("write to palette_offset_w when not enabled %02x (enable %02x)\n", data, m_palette_enable);
+	}
+	else
+	{
+		m_palette_offset = data;
+	}
+}
+
+void anes_state::palette_latch_w(uint8_t data)
+{
+	if (m_palette_enable != 0x01)
+	{
+		logerror("%s: write to palette_latch_w when not enabled %02x (enable %02x)\n", machine().describe_context(), data, m_palette_enable);
+	}
+	else
+	{
+		m_palette_latch = data;
+	}
+}
+
+void anes_state::palette_data2_w(uint8_t data)
+{
+	if (m_palette_enable != 0x01)
+	{
+		logerror("write to palette_data2_w when not enabled %02x\n", data);
+	}
+	else
+	{
+		int offs = (m_palette_offset + (m_palette_latch << 8)) & 0x1fff;
+		m_palette_data2[offs] = data;
+		set_color(offs);
+	}
+}
+
+void anes_state::palette_data3_w(uint8_t data)
+{
+	if (m_palette_enable != 0x01)
+	{
+		logerror("write to palette_data3_w when not enabled %02x\n", data);
+	}
+	else
+	{
+		int offs = (m_palette_offset + (m_palette_latch << 8)) & 0x1fff;
+		m_palette_data3[offs] = data;
+		set_color(offs);
+	}
+}
+
 
 void anes_state::opcodes_map(address_map &map)
 {
@@ -280,13 +362,13 @@ void anes_state::io_map(address_map &map)
 	map(0x12, 0x12).portr("SW3");
 	map(0x13, 0x13).portr("SW4");
 	map(0x14, 0x15).r(FUNC(anes_state::key_r));
-	map(0x16, 0x16).r(FUNC(anes_state::blit_status_r)).nopw();
-	map(0x50, 0x50).nopw();
-	map(0x51, 0x51).nopw();
-	map(0x52, 0x52).nopw();
-	map(0x53, 0x53).nopw();
-	map(0x54, 0x54).noprw();
-	map(0x55, 0x55).noprw();
+	map(0x16, 0x16).r(FUNC(anes_state::blit_status_r));
+	map(0x50, 0x50).w(FUNC(anes_state::palette_enable_w));
+	map(0x51, 0x51).w(FUNC(anes_state::palette_offset_w));
+	map(0x52, 0x52).w(FUNC(anes_state::palette_latch_w));
+//	map(0x53, 0x53).nopw();
+	map(0x54, 0x54).w(FUNC(anes_state::palette_data2_w));
+	map(0x55, 0x55).w(FUNC(anes_state::palette_data3_w));
 	map(0xfe, 0xfe).w(FUNC(anes_state::rombank_w));
 }
 
@@ -454,9 +536,17 @@ void anes_state::video_start()
 	std::fill(std::begin(m_blit_addr), std::end(m_blit_addr), 0);
 	std::fill(std::begin(m_blit_val), std::end(m_blit_val), 0);
 
+	std::fill(std::begin(m_palette_data2), std::end(m_palette_data2), 0);
+	std::fill(std::begin(m_palette_data3), std::end(m_palette_data3), 0);	
+
 	save_item(NAME(m_blit));
 	save_item(NAME(m_blit_addr));
 	save_item(NAME(m_blit_val));
+
+	save_item(NAME(m_palette_offset));
+	save_item(NAME(m_palette_latch));
+	save_item(NAME(m_palette_data2));
+	save_item(NAME(m_palette_data3));
 }
 
 
@@ -490,7 +580,7 @@ void anes_state::anes(machine_config &config)
 	screen.set_screen_update(FUNC(anes_state::screen_update));
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette").set_entries(0x100);
+	PALETTE(config, "palette").set_entries(0x2000);
 
 	TIMER(config, m_banktimer).configure_generic(FUNC(anes_state::bank_timer_expired));
 
