@@ -82,11 +82,9 @@ private:
 
 	uint8_t m_palette_enable;
 	uint8_t m_palette_offset;
-	int m_palette_offset2 = 0;
-	int m_palette_offset3 = 0;
+	uint8_t m_palette_active_bank;
 
-
-	uint8_t m_palette_latch;
+	uint8_t m_palette_offset_msb;
 	uint8_t m_palette_data2[0x2000];
 	uint8_t m_palette_data3[0x2000];
 
@@ -97,12 +95,12 @@ private:
 	void rombank_w(uint8_t data);
 	void mux_w(uint8_t data);
 	uint8_t key_r(offs_t offset);
-	uint8_t fixed_rom_r(offs_t offset);
-	uint8_t banked_rom_r(offs_t offset);
+	uint8_t m1_rom_r(offs_t offset);
 
 	void palette_enable_w(uint8_t data);
 	void palette_offset_w(uint8_t data);
-	void palette_latch_w(uint8_t data);
+	void palette_offset_msb_w(uint8_t data);
+	void palette_active_bank_w(uint8_t data);
 	void palette_data2_w(uint8_t data);
 	void palette_data3_w(uint8_t data);
 	void set_color(int offset);
@@ -128,7 +126,7 @@ uint32_t anes_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 			uint16_t* src = &srcbitmap->pix(y, x);
 			uint16_t* dst = &bitmap.pix(y, x);
 
-			dst[0] = src[0];
+			dst[0] = src[0] + m_palette_active_bank * 0x100;
 		}
 	}
 
@@ -240,28 +238,13 @@ uint8_t anes_state::key_r(offs_t offset)
 }
 
 
-uint8_t anes_state::fixed_rom_r(offs_t offset)
+uint8_t anes_state::m1_rom_r(offs_t offset)
 {
 	uint8_t ret = m_maincpu->space(AS_PROGRAM).read_byte(offset);
 	if (!machine().side_effects_disabled())
 	{
 		if (m_bank_delay)
 		{
-			logerror("reading non-banked rom area with bank delay %04x: %02x\n", offset, ret);
-			m_banktimer->adjust(attotime::from_usec(1));
-		}
-	}
-	return ret;
-}
-
-uint8_t anes_state::banked_rom_r(offs_t offset)
-{
-	uint8_t ret = m_maincpu->space(AS_PROGRAM).read_byte(offset + 0x2000);
-	if (!machine().side_effects_disabled())
-	{
-		if (m_bank_delay)
-		{
-			logerror("reading banked rom area with bank delay %04x: %02x\n", offset + 0x2000, ret);
 			m_banktimer->adjust(attotime::from_usec(1));
 		}
 	}
@@ -291,16 +274,21 @@ void anes_state::palette_offset_w(uint8_t data)
 	}
 }
 
-void anes_state::palette_latch_w(uint8_t data)
+void anes_state::palette_offset_msb_w(uint8_t data)
 {
 	if (m_palette_enable != 0x01)
 	{
-		logerror("%s: write to palette_latch_w when not enabled %02x (enable %02x)\n", machine().describe_context(), data, m_palette_enable);
+		logerror("%s: write to palette_offset_msb_w when not enabled %02x (enable %02x)\n", machine().describe_context(), data, m_palette_enable);
 	}
 	else
 	{
-		m_palette_latch = data;
+		m_palette_offset_msb = data;
 	}
+}
+
+void anes_state::palette_active_bank_w(uint8_t data)
+{
+	m_palette_active_bank = data & 0xf;
 }
 
 void anes_state::palette_data2_w(uint8_t data)
@@ -311,7 +299,7 @@ void anes_state::palette_data2_w(uint8_t data)
 	}
 	else
 	{
-		int offs = (m_palette_offset + (m_palette_latch << 8)) & 0x1fff;
+		int offs = (m_palette_offset + (m_palette_offset_msb << 8)) & 0x1fff;
 		m_palette_data2[offs] = data;
 		set_color(offs);
 	}
@@ -325,7 +313,7 @@ void anes_state::palette_data3_w(uint8_t data)
 	}
 	else
 	{
-		int offs = (m_palette_offset + (m_palette_latch << 8)) & 0x1fff;
+		int offs = (m_palette_offset + (m_palette_offset_msb << 8)) & 0x1fff;
 		m_palette_data3[offs] = data;
 		set_color(offs);
 	}
@@ -334,8 +322,7 @@ void anes_state::palette_data3_w(uint8_t data)
 
 void anes_state::opcodes_map(address_map &map)
 {
-	map(0x0000, 0x1fff).r(FUNC(anes_state::fixed_rom_r));
-	map(0x2000, 0xefff).r(FUNC(anes_state::banked_rom_r));
+	map(0x0000, 0xefff).r(FUNC(anes_state::m1_rom_r));
 }
 
 void anes_state::prg_map(address_map &map)
@@ -365,8 +352,8 @@ void anes_state::io_map(address_map &map)
 	map(0x16, 0x16).r(FUNC(anes_state::blit_status_r));
 	map(0x50, 0x50).w(FUNC(anes_state::palette_enable_w));
 	map(0x51, 0x51).w(FUNC(anes_state::palette_offset_w));
-	map(0x52, 0x52).w(FUNC(anes_state::palette_latch_w));
-//	map(0x53, 0x53).nopw();
+	map(0x52, 0x52).w(FUNC(anes_state::palette_offset_msb_w));
+	map(0x53, 0x53).w(FUNC(anes_state::palette_active_bank_w));
 	map(0x54, 0x54).w(FUNC(anes_state::palette_data2_w));
 	map(0x55, 0x55).w(FUNC(anes_state::palette_data3_w));
 	map(0xfe, 0xfe).w(FUNC(anes_state::rombank_w));
@@ -515,6 +502,7 @@ void anes_state::machine_start()
 	m_mux = 0;
 	m_bank = 0;
 	m_bank_delay = 0;
+	m_palette_active_bank = 0;
 
 	save_item(NAME(m_mux));
 	save_item(NAME(m_bank));
@@ -544,9 +532,10 @@ void anes_state::video_start()
 	save_item(NAME(m_blit_val));
 
 	save_item(NAME(m_palette_offset));
-	save_item(NAME(m_palette_latch));
+	save_item(NAME(m_palette_offset_msb));
 	save_item(NAME(m_palette_data2));
 	save_item(NAME(m_palette_data3));
+	save_item(NAME(m_palette_active_bank));
 }
 
 
