@@ -57,7 +57,6 @@ protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-
 private:
 	void vram_offset_w(offs_t offset, uint8_t data);
 
@@ -75,18 +74,17 @@ private:
 	uint8_t m_bank;
 	uint8_t m_bank_delay;
 
-	bitmap_ind16 m_bitmap[2][2];
+	bitmap_ind16 m_bitmap[2];
 	uint8_t m_blit[16];
 	uint16_t m_blit_addr[2];
 	uint8_t m_blit_val[2];
 
 	uint8_t m_palette_enable;
 	uint8_t m_palette_offset;
-	uint8_t m_palette_active_bank;
-
 	uint8_t m_palette_offset_msb;
-	uint8_t m_palette_data2[0x2000];
-	uint8_t m_palette_data3[0x2000];
+	uint8_t m_palette_active_bank;
+	uint8_t palette_data_lsb[0x2000];
+	uint8_t m_palette_data_msb[0x2000];
 
 	void do_blit();
 	void blit_w(offs_t offset, uint8_t data);
@@ -103,7 +101,7 @@ private:
 	void palette_active_bank_w(uint8_t data);
 	uint8_t palette_data2_r();
 	void palette_data2_w(uint8_t data);
-	void palette_data3_w(uint8_t data);
+	void palette_data_msb_w(uint8_t data);
 	void set_color(int offset);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -118,8 +116,8 @@ private:
 
 uint32_t anes_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap_ind16 *srcbitmap = &m_bitmap[0][0];
-	bitmap_ind16 *srcbitmap2 = &m_bitmap[1][0];
+	bitmap_ind16 *srcbitmap = &m_bitmap[0];
+	bitmap_ind16 *srcbitmap2 = &m_bitmap[1];
 
 	for (int y = cliprect.min_y; y < cliprect.max_y; y++)
 	{
@@ -163,15 +161,11 @@ void anes_state::do_blit()
 	);
 
 	int layer = (m_blit[0x0b] & 0x04) ? 1 : 0;
-	int buffer = 0;
-
-	//if (m_blit[0x0b] & 0x04)
-	//	return;
 
 	bool flipx = m_blit[0x04] & 0x01;
 	bool flipy = m_blit[0x04] & 0x02;
 
-	bitmap_ind16& bitmap = m_bitmap[layer][buffer];
+	bitmap_ind16& bitmap = m_bitmap[layer];
 
 	int sx = m_blit_addr[0];
 	int sy = m_blit_val[0];
@@ -297,7 +291,6 @@ uint8_t anes_state::key_r(offs_t offset)
 	return offset ? m_coin->read() : 0xff;
 }
 
-
 uint8_t anes_state::m1_rom_r(offs_t offset)
 {
 	uint8_t ret = m_maincpu->space(AS_PROGRAM).read_byte(offset);
@@ -318,7 +311,7 @@ void anes_state::palette_enable_w(uint8_t data)
 
 void anes_state::set_color(int offset)
 {
-	uint16_t dat = (m_palette_data3[offset] << 8) | m_palette_data2[offset];
+	uint16_t dat = (m_palette_data_msb[offset] << 8) | palette_data_lsb[offset];
 	m_palette->set_pen_color(offset, rgb_t(pal5bit(dat >> 0), pal5bit(dat >> 5), pal5bit(dat >> 10)));
 }
 
@@ -360,7 +353,7 @@ uint8_t anes_state::palette_data2_r()
 	else
 	{
 		int offs = (m_palette_offset + (m_palette_offset_msb << 8)) & 0x1fff;
-		return m_palette_data2[offs];
+		return palette_data_lsb[offs];
 	}
 	return 0x00;
 }
@@ -375,21 +368,21 @@ void anes_state::palette_data2_w(uint8_t data)
 	else
 	{
 		int offs = (m_palette_offset + (m_palette_offset_msb << 8)) & 0x1fff;
-		m_palette_data2[offs] = data;
+		palette_data_lsb[offs] = data;
 		set_color(offs);
 	}
 }
 
-void anes_state::palette_data3_w(uint8_t data)
+void anes_state::palette_data_msb_w(uint8_t data)
 {
 	if (m_palette_enable != 0x01)
 	{
-		logerror("write to palette_data3_w when not enabled %02x\n", data);
+		logerror("write to palette_data_msb_w when not enabled %02x\n", data);
 	}
 	else
 	{
 		int offs = (m_palette_offset + (m_palette_offset_msb << 8)) & 0x1fff;
-		m_palette_data3[offs] = data;
+		m_palette_data_msb[offs] = data;
 		set_color(offs);
 	}
 }
@@ -430,7 +423,7 @@ void anes_state::io_map(address_map &map)
 	map(0x52, 0x52).w(FUNC(anes_state::palette_offset_msb_w));
 	map(0x53, 0x53).w(FUNC(anes_state::palette_active_bank_w));
 	map(0x54, 0x54).rw(FUNC(anes_state::palette_data2_r), FUNC(anes_state::palette_data2_w));
-	map(0x55, 0x55).w(FUNC(anes_state::palette_data3_w));
+	map(0x55, 0x55).w(FUNC(anes_state::palette_data_msb_w));
 	map(0xfe, 0xfe).w(FUNC(anes_state::rombank_w));
 }
 
@@ -575,29 +568,32 @@ void anes_state::video_start()
 {
 	for (int layer = 0; layer < 2; layer++)
 	{
-		for (int buffer = 0; buffer < 2; buffer++)
-		{
-			m_bitmap[layer][buffer].allocate(512, 512);
-			m_bitmap[layer][buffer].fill(0);
-		}
+		m_bitmap[layer].allocate(512, 512);
+		m_bitmap[layer].fill(0);
 	}
 
 	std::fill(std::begin(m_blit), std::end(m_blit), 0);
 	std::fill(std::begin(m_blit_addr), std::end(m_blit_addr), 0);
 	std::fill(std::begin(m_blit_val), std::end(m_blit_val), 0);
 
-	std::fill(std::begin(m_palette_data2), std::end(m_palette_data2), 0);
-	std::fill(std::begin(m_palette_data3), std::end(m_palette_data3), 0);	
-
 	save_item(NAME(m_blit));
 	save_item(NAME(m_blit_addr));
 	save_item(NAME(m_blit_val));
 
+	m_palette_enable = 0;
+	m_palette_offset = 0;
+	m_palette_offset_msb = 0;
+	m_palette_active_bank = 0;
+
+	std::fill(std::begin(palette_data_lsb), std::end(palette_data_lsb), 0);
+	std::fill(std::begin(m_palette_data_msb), std::end(m_palette_data_msb), 0);
+
+	save_item(NAME(m_palette_enable));
 	save_item(NAME(m_palette_offset));
 	save_item(NAME(m_palette_offset_msb));
-	save_item(NAME(m_palette_data2));
-	save_item(NAME(m_palette_data3));
 	save_item(NAME(m_palette_active_bank));
+	save_item(NAME(palette_data_lsb));
+	save_item(NAME(m_palette_data_msb));
 }
 
 
