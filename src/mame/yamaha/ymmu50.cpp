@@ -79,7 +79,6 @@ private:
 
 	u8 cur_p6, cur_pa, cur_pb, cur_pc;
 
-	[[maybe_unused]] u16 adc_zero_r();
 	u16 adc_ar_r();
 	u16 adc_al_r();
 	u16 adc_midisw_r();
@@ -109,12 +108,6 @@ void mu50_state::mu50_map(address_map &map)
 	map(0x000000, 0x07ffff).rom().region("mu50cpu", 0);
 	map(0x200000, 0x20ffff).ram(); // 64K work RAM
 	map(0x400000, 0x400fff).m(m_swp00, FUNC(swp00_device::map)).umask16(0xff00);
-}
-
-// Grounded adc input
-u16 mu50_state::adc_zero_r()
-{
-	return 0;
 }
 
 // Analog input right (not sent to the swp)

@@ -200,7 +200,6 @@ private:
 
 	u8 cur_p6, cur_pa, cur_pb, cur_ic32;
 
-	u16 adc_zero_r();
 	u16 adc_ar_r();
 	u16 adc_al_r();
 	u16 adc_midisw_r();
@@ -229,12 +228,6 @@ void mu80_state::mu80_map(address_map &map)
 	map(0x400000, 0x40003f).m(m_swp20_0, FUNC(swp20_device::map));
 	map(0x440000, 0x44001f).m(m_meg, FUNC(meg_device::map));
 	map(0x460000, 0x46003f).m(m_swp20_1, FUNC(swp20_device::map));
-}
-
-// Grounded adc input
-u16 mu80_state::adc_zero_r()
-{
-	return 0;
 }
 
 // Analog input right (also sent to the swp)

@@ -88,9 +88,6 @@ private:
 	u8 cur_p1, cur_p2, cur_p3, cur_p5, cur_p6, cur_pa, cur_pc, cur_pf, cur_pg;
 	u8 cur_ic32;
 
-	u16 adc_zero_r();
-	[[maybe_unused]] u16 adc_ar_r();
-	[[maybe_unused]] u16 adc_al_r();
 	u16 adc_midisw_r();
 	u16 adc_battery_r();
 	u16 adc_breath_r();
@@ -118,24 +115,6 @@ void vl70_state::vl70_map(address_map &map)
 	map(0x200000, 0x20ffff).ram(); // 64K work RAM
 	map(0x400000, 0x40007f).m(m_dspv, FUNC(dspv_device::map));
 	map(0x600000, 0x60001f).m(m_meg, FUNC(meg_device::map));
-}
-
-// Grounded adc input
-u16 vl70_state::adc_zero_r()
-{
-	return 0;
-}
-
-// Analog input right (also sent to the swp)
-u16 vl70_state::adc_ar_r()
-{
-	return 0;
-}
-
-// Analog input left (also sent to the swp)
-u16 vl70_state::adc_al_r()
-{
-	return 0;
 }
 
 // Put the host switch to pure midi
