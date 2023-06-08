@@ -190,12 +190,19 @@ void anes_state::do_blit()
 				else
 					drawx = ((sx + (sw - 1) - x) & 0x1ff);
 
-				int pen = (which & 0x10) ? 0 : m_blitrom[(addr++) & (m_blitrom.bytes() - 1)];
+				int pen = m_blitrom[(addr) & (m_blitrom.bytes() - 1)];
+				if (!(which & 0x10))
+					addr++;
 
 				if (pen != 0xff)
+				{
+					//	if (pen != 0x00)
 					bitmap.pix(drawy, drawx) = pen;
+				}
 				else
+				{
 					bitmap.pix(drawy, drawx) = 0x00;
+				}
 			}
 		}
 	}
@@ -217,12 +224,19 @@ void anes_state::do_blit()
 				else
 					drawx = ((sx + (sw - 1) - x) & 0x1ff);
 
-				int pen = (which & 0x10) ? 0 : m_blitrom[(addr++) & (m_blitrom.bytes() - 1)];
+				int pen = m_blitrom[(addr) & (m_blitrom.bytes() - 1)];
+				if (!(which & 0x10))
+					addr++;
 
 				if (pen != 0xff)
-					bitmap.pix(drawy, drawx) = pen;
+				{
+				//	if (pen != 0x00)
+						bitmap.pix(drawy, drawx) = pen;
+				}
 				else
+				{
 					bitmap.pix(drawy, drawx) = 0x00;
+				}
 			}
 		}
 	}
@@ -263,6 +277,8 @@ void anes_state::blit_rom_w(offs_t offset, uint8_t data)
 	else
 		logerror("%s: Unknown blit ROM which %02X\n", machine().describe_context(), which);
 }
+
+
 
 uint8_t anes_state::blit_status_r()
 {
