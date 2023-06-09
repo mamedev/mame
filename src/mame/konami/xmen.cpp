@@ -143,7 +143,7 @@ public:
 
 	void xmen6p(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(frame_r);
+	int frame_r();
 
 protected:
 	virtual void video_start() override;
@@ -155,7 +155,7 @@ private:
 	uint16_t *m_k053247_ram;
 
 	template <uint8_t Which> uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 
 	void main_map(address_map &map);
 };
@@ -277,7 +277,7 @@ uint32_t xmen6p_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 // my lefts and rights are mixed up in several places..
-WRITE_LINE_MEMBER(xmen6p_state::screen_vblank)
+void xmen6p_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)
@@ -558,7 +558,7 @@ static INPUT_PORTS_START( xmen2p )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, cs_write)
 INPUT_PORTS_END
 
-READ_LINE_MEMBER(xmen6p_state::frame_r)
+int xmen6p_state::frame_r()
 {
 	return m_screen->frame_number() & 1;
 }

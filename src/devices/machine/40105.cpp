@@ -163,7 +163,7 @@ void cmos_40105_device::output_ready()
 //  si_w - shift in write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( cmos_40105_device::si_w )
+void cmos_40105_device::si_w(int state)
 {
 	// load input on rising edge when ready
 	if (m_dir && !m_si && state)
@@ -185,7 +185,7 @@ WRITE_LINE_MEMBER( cmos_40105_device::si_w )
 //  so_w - shift out write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( cmos_40105_device::so_w )
+void cmos_40105_device::so_w(int state)
 {
 	// shift out on falling edge when ready
 	if (m_dor && m_so && !state)
@@ -218,7 +218,7 @@ WRITE_LINE_MEMBER( cmos_40105_device::so_w )
 //  dir_r - data in ready read
 //-------------------------------------------------
 
-READ_LINE_MEMBER( cmos_40105_device::dir_r )
+int cmos_40105_device::dir_r()
 {
 	return m_dir;
 }
@@ -228,7 +228,7 @@ READ_LINE_MEMBER( cmos_40105_device::dir_r )
 //  dor_r - data out ready read
 //-------------------------------------------------
 
-READ_LINE_MEMBER( cmos_40105_device::dor_r )
+int cmos_40105_device::dor_r()
 {
 	return m_dor;
 }

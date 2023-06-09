@@ -150,7 +150,7 @@ private:
 	TILE_GET_INFO_MEMBER(seibucrtc_sc2_tile_info);
 	TILE_GET_INFO_MEMBER(seibucrtc_sc3_tile_info);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 
 	void seibucrtc_sc0bank_w(uint16_t data);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
@@ -588,7 +588,7 @@ static GFXDECODE_START( gfx_goodejan )
 	GFXDECODE_ENTRY( "tx_gfx", 0, charlayout, 0x100, 0x10 ) /* Text */
 GFXDECODE_END
 
-WRITE_LINE_MEMBER(goodejan_state::vblank_irq)
+void goodejan_state::vblank_irq(int state)
 {
 	if (state)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x208/4); // V30

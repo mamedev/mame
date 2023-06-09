@@ -357,7 +357,7 @@ bool upd765_family_device::get_ready(int fid)
 	return !external_ready;
 }
 
-WRITE_LINE_MEMBER(upd765_family_device::reset_w)
+void upd765_family_device::reset_w(int state)
 {
 	// This implementation is not valid for devices with DOR and possibly other extra registers.
 	// The working assumption is that no need to manipulate the RESET line directly when software can use DOR instead.

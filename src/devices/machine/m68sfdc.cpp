@@ -138,12 +138,12 @@ void m68sfdc_device::set_floppies_4(floppy_connector *f0, floppy_connector *f1, 
 	}
 }
 
-WRITE_LINE_MEMBER(m68sfdc_device::handle_irq)
+void m68sfdc_device::handle_irq(int state)
 {
 	m_irq_handler(state);
 }
 
-WRITE_LINE_MEMBER(m68sfdc_device::handle_nmi)
+void m68sfdc_device::handle_nmi(int state)
 {
 	m_nmi_handler(state);
 }

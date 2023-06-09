@@ -177,7 +177,7 @@ public:
 	void wwfsstar(machine_config &config);
 	void wwfsstarb2(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(vblank_r);
+	int vblank_r();
 
 protected:
 	virtual void video_start() override;
@@ -538,7 +538,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(wwfsstar_state::scanline)
 	}
 }
 
-READ_LINE_MEMBER(wwfsstar_state::vblank_r)
+int wwfsstar_state::vblank_r()
 {
 	return m_vblank;
 }

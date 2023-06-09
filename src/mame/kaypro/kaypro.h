@@ -49,10 +49,10 @@ protected:
 //private:
 	void kaypro_map(address_map &map);
 
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	void write_centronics_busy(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(floppy_timer);
-	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
 	static void floppy_formats(format_registration &fr);
 
 	void kaypro_palette(palette_device &palette) const;

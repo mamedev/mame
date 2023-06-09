@@ -317,7 +317,7 @@ uint32_t helifire_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-WRITE_LINE_MEMBER(helifire_state::screen_vblank)
+void helifire_state::screen_vblank(int state)
 {
 	// falling edge
 	if (!state)

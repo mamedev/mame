@@ -140,18 +140,18 @@ private:
 	void irq_clear_w(uint8_t data);
 	void sh_irqtrigger_w(uint8_t data);
 	void i8039_irq_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(master_nmi_mask_w);
+	void master_nmi_mask_w(int state);
 	void slave_irq_mask_w(uint8_t data);
-	template <uint8_t Which> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
+	template <uint8_t Which> void coin_counter_w(int state);
 	void spriteram_w(offs_t offset, uint8_t data);
 	uint8_t scanline_r();
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	void flipscreen_w(int state);
 	uint8_t porta_r();
 	void dac_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	template <uint8_t Which> void filter_w(uint8_t data);
 
@@ -281,7 +281,7 @@ uint8_t gyruss_state::scanline_r()
 }
 
 
-WRITE_LINE_MEMBER(gyruss_state::flipscreen_w)
+void gyruss_state::flipscreen_w(int state)
 {
 	m_flipscreen = state;
 }
@@ -385,7 +385,7 @@ void gyruss_state::i8039_irq_w(uint8_t data)
 	m_audiocpu_2->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(gyruss_state::master_nmi_mask_w)
+void gyruss_state::master_nmi_mask_w(int state)
 {
 	m_master_nmi_mask = state;
 	if (!m_master_nmi_mask)
@@ -400,7 +400,7 @@ void gyruss_state::slave_irq_mask_w(uint8_t data)
 }
 
 template <uint8_t Which>
-WRITE_LINE_MEMBER(gyruss_state::coin_counter_w)
+void gyruss_state::coin_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(Which, state);
 }
@@ -684,7 +684,7 @@ void gyruss_state::machine_start()
 	save_item(NAME(m_slave_irq_mask));
 }
 
-WRITE_LINE_MEMBER(gyruss_state::vblank_irq)
+void gyruss_state::vblank_irq(int state)
 {
 	if (state && m_master_nmi_mask)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);

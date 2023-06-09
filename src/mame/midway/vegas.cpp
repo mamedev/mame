@@ -435,13 +435,13 @@ private:
 	uint32_t m_keypad_select;
 	uint32_t m_gear;
 
-	DECLARE_WRITE_LINE_MEMBER(duart_irq_cb);
-	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
+	void duart_irq_cb(int state);
+	void vblank_assert(int state);
 
 	void update_sio_irqs();
 
-	DECLARE_WRITE_LINE_MEMBER(watchdog_reset);
-	DECLARE_WRITE_LINE_MEMBER(watchdog_irq);
+	void watchdog_reset(int state);
+	void watchdog_irq(int state);
 	void timekeeper_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t timekeeper_r(offs_t offset, uint32_t mem_mask = ~0);
 	void reset_sio(void);
@@ -455,8 +455,8 @@ private:
 	uint32_t ethernet_r(offs_t offset, uint32_t mem_mask = ~0);
 	void ethernet_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void dcs3_fifo_full_w(uint32_t data);
-	DECLARE_WRITE_LINE_MEMBER(ethernet_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(ioasic_irq);
+	void ethernet_interrupt(int state);
+	void ioasic_irq(int state);
 	uint32_t unknown_r(offs_t offset, uint32_t mem_mask = ~0);
 	uint8_t parallel_r(offs_t offset);
 	void parallel_w(offs_t offset, uint8_t data);
@@ -552,7 +552,7 @@ void vegas_state::machine_reset()
 *  Watchdog interrupts
 *************************************/
 #define WD_IRQ 0x1
-WRITE_LINE_MEMBER(vegas_state::watchdog_irq)
+void vegas_state::watchdog_irq(int state)
 {
 	if (state && !(m_sio_irq_state & WD_IRQ)) {
 		LOGMASKED(LOG_WATCHDOG, "%s: vegas_state::watchdog_irq state = %i\n", machine().describe_context(), state);
@@ -569,7 +569,7 @@ WRITE_LINE_MEMBER(vegas_state::watchdog_irq)
 /*************************************
 *  Watchdog Reset
 *************************************/
-WRITE_LINE_MEMBER(vegas_state::watchdog_reset)
+void vegas_state::watchdog_reset(int state)
 {
 	if (state) {
 		LOGMASKED(LOG_WATCHDOG, "vegas_state::watchdog_reset!!!\n");
@@ -656,7 +656,7 @@ void vegas_state::update_sio_irqs()
 	LOGMASKED(LOG_SIO, "update_sio_irqs: irq_enable: %02x %s irq_state: %02x %s\n", m_sio_irq_enable, sioEnable, m_sio_irq_state, sioState);
 }
 
-WRITE_LINE_MEMBER(vegas_state::duart_irq_cb)
+void vegas_state::duart_irq_cb(int state)
 {
 	// Duart shares IRQ with SIO
 	if (state ^ m_duart_irq_state) {
@@ -665,7 +665,7 @@ WRITE_LINE_MEMBER(vegas_state::duart_irq_cb)
 	}
 }
 
-WRITE_LINE_MEMBER(vegas_state::vblank_assert)
+void vegas_state::vblank_assert(int state)
 {
 	LOGMASKED(LOG_SIO, "vblank_assert: m_sio_reset_ctrl: %04x state: %d\n", m_sio_reset_ctrl, state);
 	// latch on the correct polarity transition
@@ -677,7 +677,7 @@ WRITE_LINE_MEMBER(vegas_state::vblank_assert)
 }
 
 
-WRITE_LINE_MEMBER(vegas_state::ioasic_irq)
+void vegas_state::ioasic_irq(int state)
 {
 	if (state)
 		m_sio_irq_state |= 0x04;
@@ -686,7 +686,7 @@ WRITE_LINE_MEMBER(vegas_state::ioasic_irq)
 	update_sio_irqs();
 }
 
-WRITE_LINE_MEMBER(vegas_state::ethernet_interrupt)
+void vegas_state::ethernet_interrupt(int state)
 {
 	if (state)
 		m_sio_irq_state |= 0x10;

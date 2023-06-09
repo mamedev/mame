@@ -134,8 +134,8 @@ private:
 
 	u8 read_inputs();
 	u8 input_r();
-	DECLARE_READ_LINE_MEMBER(input6_r);
-	DECLARE_READ_LINE_MEMBER(input7_r);
+	int input6_r();
+	int input7_r();
 
 	u8 m_led_select = 0;
 	u8 m_inp_mux = 0;
@@ -207,13 +207,13 @@ u8 sc6_state::input_r()
 	return (read_inputs() & 0x3f) | 0xc0;
 }
 
-READ_LINE_MEMBER(sc6_state::input6_r)
+int sc6_state::input6_r()
 {
 	// T0: multiplexed inputs bit 6
 	return read_inputs() >> 6 & 1;
 }
 
-READ_LINE_MEMBER(sc6_state::input7_r)
+int sc6_state::input7_r()
 {
 	// T1: multiplexed inputs bit 7
 	return read_inputs() >> 7 & 1;

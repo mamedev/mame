@@ -330,10 +330,10 @@ private:
 	void twinkle_waveram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void spu_led_w(uint16_t data);
 	void spu_wavebank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(spu_ata_irq);
-	DECLARE_WRITE_LINE_MEMBER(spu_ata_dmarq);
-	void scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
-	void scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
+	void spu_ata_irq(int state);
+	void spu_ata_dmarq(int state);
+	void scsi_dma_read(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size);
+	void scsi_dma_write(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size);
 
 	void main_map(address_map &map);
 	void rf5c400_map(address_map &map);
@@ -896,7 +896,7 @@ void twinkle_state::main_map(address_map &map)
 
 /* SPU board */
 
-WRITE_LINE_MEMBER(twinkle_state::spu_ata_irq)
+void twinkle_state::spu_ata_irq(int state)
 {
 	if ((state) && (m_spu_ctrl & 0x0400))
 	{
@@ -948,7 +948,7 @@ void twinkle_state::spu_ata_dma_high_w(uint16_t data)
 	//printf("DMA now %x\n", m_spu_ata_dma);
 }
 
-WRITE_LINE_MEMBER(twinkle_state::spu_ata_dmarq)
+void twinkle_state::spu_ata_dmarq(int state)
 {
 	if (m_spu_ata_dmarq != state)
 	{

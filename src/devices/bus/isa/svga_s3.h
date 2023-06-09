@@ -58,7 +58,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_WRITE_LINE_MEMBER(linear_config_changed_w);
+	void linear_config_changed_w(int state);
 
 private:
 	required_device<s3virge_vga_device> m_vga;
@@ -83,7 +83,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_WRITE_LINE_MEMBER(linear_config_changed_w);
+	void linear_config_changed_w(int state);
 
 private:
 	required_device<s3virgedx_vga_device> m_vga;
@@ -111,7 +111,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_WRITE_LINE_MEMBER(linear_config_changed_w);
+	void linear_config_changed_w(int state);
 
 private:
 	required_device<s3virgedx_vga_device> m_vga;

@@ -235,7 +235,7 @@ public:
 
 	void alphaone(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(clock_r);
+	int clock_r();
 
 protected:
 	virtual void machine_start() override;
@@ -278,10 +278,10 @@ public:
 	void mhavoc(machine_config &config);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_service_r);
-	DECLARE_READ_LINE_MEMBER(gamma_rcvd_r);
-	DECLARE_READ_LINE_MEMBER(gamma_xmtd_r);
-	DECLARE_READ_LINE_MEMBER(alpha_rcvd_r);
-	DECLARE_READ_LINE_MEMBER(alpha_xmtd_r);
+	int gamma_rcvd_r();
+	int gamma_xmtd_r();
+	int alpha_rcvd_r();
+	int alpha_xmtd_r();
 
 protected:
 	virtual void machine_start() override;
@@ -562,25 +562,25 @@ CUSTOM_INPUT_MEMBER(mhavoc_state::coin_service_r)
 	return (m_player_1 ? m_service : m_coin)->read() & 0x03;
 }
 
-READ_LINE_MEMBER(mhavoc_state::gamma_rcvd_r)
+int mhavoc_state::gamma_rcvd_r()
 {
 	// Gamma rcvd flag
 	return m_gamma_rcvd;
 }
 
-READ_LINE_MEMBER(mhavoc_state::gamma_xmtd_r)
+int mhavoc_state::gamma_xmtd_r()
 {
 	// Gamma xmtd flag
 	return m_gamma_xmtd;
 }
 
-READ_LINE_MEMBER(mhavoc_state::alpha_rcvd_r)
+int mhavoc_state::alpha_rcvd_r()
 {
 	// Alpha rcvd flag
 	return m_alpha_rcvd;
 }
 
-READ_LINE_MEMBER(mhavoc_state::alpha_xmtd_r)
+int mhavoc_state::alpha_xmtd_r()
 {
 	// Alpha xmtd flag
 	return m_alpha_xmtd;
@@ -848,7 +848,7 @@ void alphaone_state::alpha_map(address_map &map)
  *
  *************************************/
 
-READ_LINE_MEMBER(alphaone_state::clock_r)
+int alphaone_state::clock_r()
 {
 	// 2.4kHz (divide 2.5MHz by 1024)
 	return (m_alpha->total_cycles() & 0x400) ? 0 : 1;

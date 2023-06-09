@@ -125,7 +125,7 @@ private:
 	void tms5220_w(offs_t offset, uint8_t data);
 	void control_w(uint8_t data);
 	void esripsys_bg_intensity_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
+	void ptm_irq(int state);
 	void esripsys_dac_w(offs_t offset, uint8_t data);
 	uint32_t screen_update_esripsys(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(esripsys_vblank_irq);

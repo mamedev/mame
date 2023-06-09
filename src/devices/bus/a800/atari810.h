@@ -29,9 +29,9 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	virtual DECLARE_WRITE_LINE_MEMBER(data_out_w) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(command_w) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(ready_w) override;
+	virtual void data_out_w(int state) override;
+	virtual void command_w(int state) override;
+	virtual void ready_w(int state) override;
 
 private:
 	void step_w(u8 data);

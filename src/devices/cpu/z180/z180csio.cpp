@@ -201,7 +201,7 @@ TIMER_CALLBACK_MEMBER(z180csio_device::internal_clock)
 }
 
 
-WRITE_LINE_MEMBER(z180csio_device::cks_wr)
+void z180csio_device::cks_wr(int state)
 {
 	state = state ? 1 : 0;
 	if (m_cks_in != state)
@@ -213,7 +213,7 @@ WRITE_LINE_MEMBER(z180csio_device::cks_wr)
 }
 
 
-WRITE_LINE_MEMBER(z180csio_device::rxs_wr)
+void z180csio_device::rxs_wr(int state)
 {
 	m_rxs_in = state ? 1 : 0;
 }

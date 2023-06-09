@@ -36,7 +36,7 @@ public:
 	{
 	}
 
-	DECLARE_READ_LINE_MEMBER(watchdog_bit2);
+	int watchdog_bit2();
 
 	void init_champbas();
 
@@ -51,15 +51,15 @@ public:
 
 protected:
 	// handlers
-	DECLARE_WRITE_LINE_MEMBER(irq_enable_w);
+	void irq_enable_w(int state);
 	uint8_t champbja_protection_r(offs_t offset);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 
 	void tilemap_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(gfxbank_w);
-	DECLARE_WRITE_LINE_MEMBER(palette_bank_w);
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	void gfxbank_w(int state);
+	void palette_bank_w(int state);
+	void flipscreen_w(int state);
 
 	void champbas_palette(palette_device &palette) const;
 	TILE_GET_INFO_MEMBER(champbas_get_bg_tile_info);

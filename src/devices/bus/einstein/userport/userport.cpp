@@ -76,7 +76,7 @@ void einstein_userport_device::write(uint8_t data)
 		m_card->write(data);
 }
 
-WRITE_LINE_MEMBER( einstein_userport_device::brdy_w )
+void einstein_userport_device::brdy_w(int state)
 {
 	if (m_card)
 		m_card->brdy_w(state);

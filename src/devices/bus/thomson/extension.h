@@ -21,8 +21,8 @@ public:
 	virtual void io_map(address_map &map) = 0;
 
 protected:
-	DECLARE_WRITE_LINE_MEMBER(firq_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void firq_w(int state);
+	void irq_w(int state);
 
 private:
 	thomson_extension_device *const m_ext;

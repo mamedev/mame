@@ -654,7 +654,7 @@ u32 pgm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const 
 	return 0;
 }
 
-WRITE_LINE_MEMBER(pgm_state::screen_vblank)
+void pgm_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)

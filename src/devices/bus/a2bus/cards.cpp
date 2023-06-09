@@ -21,6 +21,7 @@
 #include "a2diskiing.h"
 #include "a2dx1.h"
 #include "a2echoii.h"
+#include "a2hsscsi.h"
 #include "a2iwm.h"
 #include "a2mcms.h"
 #include "a2memexp.h"
@@ -30,6 +31,7 @@
 #include "a2pic.h"
 #include "a2sam.h"
 #include "a2scsi.h"
+#include "a2sd.h"
 #include "a2softcard.h"
 #include "a2ssc.h"
 #include "a2superdrive.h"
@@ -38,43 +40,45 @@
 #include "a2thunderclock.h"
 #include "a2ultraterm.h"
 #include "a2videoterm.h"
+#include "a2vulcan.h"
 #include "a2zipdrive.h"
+#include "booti.h"
 #include "byte8251.h"
 #include "computereyes2.h"
 #include "ccs7710.h"
+#include "cmsscsi.h"
 #include "excel9.h"
 #include "ezcgi.h"
 #include "grafex.h"
 #include "grappler.h"
+#include "lancegs.h"
 #include "laser128.h"
 #include "mouse.h"
+#include "pc_xporter.h"
 #include "prodosromdrive.h"
 #include "ramcard128k.h"
 #include "ramcard16k.h"
+#include "romcard.h"
+#include "sider.h"
+#include "softcard3.h"
 #include "ssbapple.h"
 #include "ssprite.h"
 #include "suprterminal.h"
 #include "timemasterho.h"
+#include "titan3plus2.h"
 #include "transwarp.h"
 #include "uniprint.h"
-#include "booti.h"
-#include "q68.h"
-#include "pc_xporter.h"
-#include "cmsscsi.h"
-#include "a2vulcan.h"
 #include "uthernet.h"
-#include "a2hsscsi.h"
-#include "a2sd.h"
-#include "sider.h"
-#include "lancegs.h"
-#include "titan3plus2.h"
-#include "softcard3.h"
+#include "q68.h"
 
 
 void apple2_slot0_cards(device_slot_interface &device)
 {
 	device.option_add("lang", A2BUS_RAMCARD16K);      // Apple II RAM Language Card
 	device.option_add("ssram", A2BUS_RAMCARD128K);    // Saturn Systems 128K extended language card
+	device.option_add("romcard", A2BUS_ROMCARDUSER);	// Apple II ROM Card that loads a custom ROM image
+	device.option_add("romcardfp", A2BUS_ROMCARDFP);	// Apple II ROM Card with Autostart Monitor + Applesoft BASIC
+	device.option_add("romcardint", A2BUS_ROMCARDINT);	// Apple II ROM Card with Autostart Monitor + Integer BASIC
 }
 
 void apple2_cards(device_slot_interface &device)

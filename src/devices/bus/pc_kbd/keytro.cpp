@@ -456,13 +456,13 @@ const tiny_rom_entry *pc_kbd_keytronic_pc3270_device::device_rom_region() const
 }
 
 
-WRITE_LINE_MEMBER( pc_kbd_keytronic_pc3270_device::clock_write )
+void pc_kbd_keytronic_pc3270_device::clock_write(int state)
 {
 	m_cpu->set_input_line(MCS51_INT0_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
-WRITE_LINE_MEMBER( pc_kbd_keytronic_pc3270_device::data_write )
+void pc_kbd_keytronic_pc3270_device::data_write(int state)
 {
 	m_cpu->set_input_line(MCS51_T0_LINE, state);
 }

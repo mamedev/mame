@@ -20,7 +20,7 @@ public:
 	{
 	}
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override { m_keyboard_port->write_txd(state); }
+	virtual void input_txd(int state) override { m_keyboard_port->write_txd(state); }
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override

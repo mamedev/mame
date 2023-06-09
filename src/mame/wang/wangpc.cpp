@@ -159,33 +159,33 @@ private:
 	void parity_nmi_clr_w(uint8_t data);
 	uint8_t option_id_r();
 
-	DECLARE_WRITE_LINE_MEMBER( hrq_w );
-	DECLARE_WRITE_LINE_MEMBER( eop_w );
+	void hrq_w(int state);
+	void eop_w(int state);
 	uint8_t memr_r(offs_t offset);
 	void memw_w(offs_t offset, uint8_t data);
 	uint8_t ior2_r();
 	void iow2_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( dack0_w );
-	DECLARE_WRITE_LINE_MEMBER( dack1_w );
-	DECLARE_WRITE_LINE_MEMBER( dack2_w );
-	DECLARE_WRITE_LINE_MEMBER( dack3_w );
+	void dack0_w(int state);
+	void dack1_w(int state);
+	void dack2_w(int state);
+	void dack3_w(int state);
 	uint8_t ppi_pa_r();
 	uint8_t ppi_pb_r();
 	uint8_t ppi_pc_r();
 	void ppi_pc_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( pit0_w );
-	DECLARE_WRITE_LINE_MEMBER( pit2_w );
-	DECLARE_WRITE_LINE_MEMBER( uart_dr_w );
-	DECLARE_WRITE_LINE_MEMBER( uart_tbre_w );
-	DECLARE_WRITE_LINE_MEMBER( epci_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_ack );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_perror );
-	DECLARE_WRITE_LINE_MEMBER( bus_irq2_w );
+	void pit0_w(int state);
+	void pit2_w(int state);
+	void uart_dr_w(int state);
+	void uart_tbre_w(int state);
+	void epci_irq_w(int state);
+	void write_centronics_ack(int state);
+	void write_centronics_busy(int state);
+	void write_centronics_fault(int state);
+	void write_centronics_perror(int state);
+	void bus_irq2_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_irq );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq );
+	void fdc_irq(int state);
+	void fdc_drq(int state);
 
 	void on_disk0_load(floppy_image_device *image);
 	void on_disk0_unload(floppy_image_device *image);
@@ -799,14 +799,14 @@ void wangpc_state::update_fdc_tc()
 		m_fdc->tc_w(0);
 }
 
-WRITE_LINE_MEMBER( wangpc_state::hrq_w )
+void wangpc_state::hrq_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	m_dmac->hack_w(state);
 }
 
-WRITE_LINE_MEMBER( wangpc_state::eop_w )
+void wangpc_state::eop_w(int state)
 {
 	if (m_dack == 2)
 	{
@@ -857,22 +857,22 @@ void wangpc_state::iow2_w(uint8_t data)
 		m_fdc->dma_w(data);
 }
 
-WRITE_LINE_MEMBER( wangpc_state::dack0_w )
+void wangpc_state::dack0_w(int state)
 {
 	if (!state) m_dack = 0;
 }
 
-WRITE_LINE_MEMBER( wangpc_state::dack1_w )
+void wangpc_state::dack1_w(int state)
 {
 	if (!state) m_dack = 1;
 }
 
-WRITE_LINE_MEMBER( wangpc_state::dack2_w )
+void wangpc_state::dack2_w(int state)
 {
 	if (!state) m_dack = 2;
 }
 
-WRITE_LINE_MEMBER( wangpc_state::dack3_w )
+void wangpc_state::dack3_w(int state)
 {
 	if (!state) m_dack = 3;
 }
@@ -1013,13 +1013,13 @@ void wangpc_state::ppi_pc_w(uint8_t data)
 	m_centronics->write_init(BIT(data, 2));
 }
 
-WRITE_LINE_MEMBER( wangpc_state::pit0_w )
+void wangpc_state::pit0_w(int state)
 {
 	if (state)
 		m_pic->ir0_w(1);
 }
 
-WRITE_LINE_MEMBER( wangpc_state::pit2_w )
+void wangpc_state::pit2_w(int state)
 {
 	if (state)
 	{
@@ -1032,7 +1032,7 @@ WRITE_LINE_MEMBER( wangpc_state::pit2_w )
 //  IM6402_INTERFACE( uart_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( wangpc_state::uart_dr_w )
+void wangpc_state::uart_dr_w(int state)
 {
 	if (state)
 	{
@@ -1043,7 +1043,7 @@ WRITE_LINE_MEMBER( wangpc_state::uart_dr_w )
 	}
 }
 
-WRITE_LINE_MEMBER( wangpc_state::uart_tbre_w )
+void wangpc_state::uart_tbre_w(int state)
 {
 	if (state)
 	{
@@ -1059,7 +1059,7 @@ WRITE_LINE_MEMBER( wangpc_state::uart_tbre_w )
 //  SCN2661_INTERFACE( epci_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( wangpc_state::epci_irq_w )
+void wangpc_state::epci_irq_w(int state)
 {
 	check_level1_interrupts();
 }
@@ -1074,14 +1074,14 @@ static void wangpc_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-WRITE_LINE_MEMBER( wangpc_state::fdc_irq )
+void wangpc_state::fdc_irq(int state)
 {
 	if (LOG) logerror("FDC INT %u\n", state);
 
 	check_level2_interrupts();
 }
 
-WRITE_LINE_MEMBER( wangpc_state::fdc_drq )
+void wangpc_state::fdc_drq(int state)
 {
 	if (LOG) logerror("FDC DRQ %u\n", state);
 
@@ -1102,7 +1102,7 @@ void wangpc_state::update_fdc_drq()
 //  centronics_interface centronics_intf
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( wangpc_state::write_centronics_ack )
+void wangpc_state::write_centronics_ack(int state)
 {
 	if (LOG) logerror("ACKNLG %u\n", state);
 
@@ -1111,7 +1111,7 @@ WRITE_LINE_MEMBER( wangpc_state::write_centronics_ack )
 	check_level1_interrupts();
 }
 
-WRITE_LINE_MEMBER( wangpc_state::write_centronics_busy )
+void wangpc_state::write_centronics_busy(int state)
 {
 	if (LOG) logerror("BUSY %u\n", state);
 
@@ -1120,12 +1120,12 @@ WRITE_LINE_MEMBER( wangpc_state::write_centronics_busy )
 	check_level1_interrupts();
 }
 
-WRITE_LINE_MEMBER( wangpc_state::write_centronics_fault )
+void wangpc_state::write_centronics_fault(int state)
 {
 	m_centronics_fault = state;
 }
 
-WRITE_LINE_MEMBER( wangpc_state::write_centronics_perror )
+void wangpc_state::write_centronics_perror(int state)
 {
 	m_centronics_perror = state;
 }
@@ -1134,7 +1134,7 @@ WRITE_LINE_MEMBER( wangpc_state::write_centronics_perror )
 //  WANGPC_BUS_INTERFACE( kb_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( wangpc_state::bus_irq2_w )
+void wangpc_state::bus_irq2_w(int state)
 {
 	if (LOG) logerror("Bus IRQ2 %u\n", state);
 

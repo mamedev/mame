@@ -68,7 +68,7 @@ void tv955kb_device::bell_reset()
 	m_bell_timer->enable(false);
 }
 
-WRITE_LINE_MEMBER(tv955kb_device::write_rxd)
+void tv955kb_device::write_rxd(int state)
 {
 	m_mcu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -86,7 +86,7 @@ u8 tv955kb_device::keys_r()
 	return result;
 }
 
-WRITE_LINE_MEMBER(tv955kb_device::bell_w)
+void tv955kb_device::bell_w(int state)
 {
 	if (state && m_bell_timer->enabled())
 		bell_reset();
@@ -98,12 +98,12 @@ WRITE_LINE_MEMBER(tv955kb_device::bell_w)
 	}
 }
 
-WRITE_LINE_MEMBER(tv955kb_device::txd_w)
+void tv955kb_device::txd_w(int state)
 {
 	m_txd_cb(state);
 }
 
-WRITE_LINE_MEMBER(tv955kb_device::reset_w)
+void tv955kb_device::reset_w(int state)
 {
 	m_mcu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 	if (!state)

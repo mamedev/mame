@@ -116,7 +116,7 @@ uint16_t toki_state::pip_r()
 
 
 
-WRITE_LINE_MEMBER(toki_state::tokib_adpcm_int)
+void toki_state::tokib_adpcm_int(int state)
 {
 	m_msm->data_w(m_msm5205next);
 	m_msm5205next >>= 4;

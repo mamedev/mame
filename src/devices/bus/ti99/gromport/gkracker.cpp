@@ -145,7 +145,7 @@ ti99_gkracker_device::ti99_gkracker_device(const machine_config &mconfig, const 
 {
 }
 
-WRITE_LINE_MEMBER(ti99_gkracker_device::romgq_line)
+void ti99_gkracker_device::romgq_line(int state)
 {
 	m_romspace_selected = (state==ASSERT_LINE);
 	// Propagate to the guest
@@ -161,7 +161,7 @@ void ti99_gkracker_device::set_gromlines(line_state mline, line_state moline, li
 	if (m_cartridge != nullptr) m_cartridge->set_gromlines(mline, moline, gsq);
 }
 
-WRITE_LINE_MEMBER(ti99_gkracker_device::gclock_in)
+void ti99_gkracker_device::gclock_in(int state)
 {
 	if (m_cartridge != nullptr) m_cartridge->gclock_in(state);
 }

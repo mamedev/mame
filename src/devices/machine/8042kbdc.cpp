@@ -116,7 +116,7 @@ void kbdc8042_device::at_8042_set_outport(uint8_t data, int initial)
 	}
 }
 
-WRITE_LINE_MEMBER( kbdc8042_device::keyboard_w )
+void kbdc8042_device::keyboard_w(int state)
 {
 	if(state)
 		at_8042_check_keyboard();
@@ -590,7 +590,7 @@ void kbdc8042_device::data_w(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(kbdc8042_device::write_out2)
+void kbdc8042_device::write_out2(int state)
 {
 	m_out2 = state;
 }

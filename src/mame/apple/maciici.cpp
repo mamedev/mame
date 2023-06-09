@@ -111,11 +111,11 @@ private:
 	void via_out_b(uint8_t data);
 	void via_out_b_iisi(uint8_t data);
 	void via_sync();
-	DECLARE_WRITE_LINE_MEMBER(via_irq);
-	WRITE_LINE_MEMBER(via_out_cb2);
-	WRITE_LINE_MEMBER(via_out_cb2_iisi);
-	WRITE_LINE_MEMBER(adb_irq_w) { m_adb_irq_pending = state; }
-	DECLARE_WRITE_LINE_MEMBER(scc_irq_w);
+	void via_irq(int state);
+	void via_out_cb2(int state);
+	void via_out_cb2_iisi(int state);
+	void adb_irq_w(int state) { m_adb_irq_pending = state; }
+	void scc_irq_w(int state);
 
 	uint32_t rom_switch_r(offs_t offset);
 
@@ -141,7 +141,7 @@ private:
 		m_maincpu->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
 	}
 
-	WRITE_LINE_MEMBER(egret_reset_w)
+	void egret_reset_w(int state)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 		m_maincpu->set_input_line(INPUT_LINE_RESET, state);
@@ -171,7 +171,7 @@ private:
 			m_fdc->write((offset >> 8) & 0xf, data >> 8);
 	}
 
-	WRITE_LINE_MEMBER(write_6015)
+	void write_6015(int state)
 	{
 		if (state)
 		{
@@ -258,13 +258,13 @@ void maciici_state::field_interrupts()
 	}
 }
 
-WRITE_LINE_MEMBER(maciici_state::via_irq)
+void maciici_state::via_irq(int state)
 {
 	m_via_interrupt = state;
 	field_interrupts();
 }
 
-WRITE_LINE_MEMBER(maciici_state::scc_irq_w)
+void maciici_state::scc_irq_w(int state)
 {
 	m_scc_interrupt = state;
 	field_interrupts();
@@ -385,12 +385,12 @@ void maciici_state::via_out_b_iisi(uint8_t data)
 	m_egret->set_sys_session(BIT(data, 5));
 }
 
-WRITE_LINE_MEMBER(maciici_state::via_out_cb2)
+void maciici_state::via_out_cb2(int state)
 {
 	m_macadb->adb_data_w(state);
 }
 
-WRITE_LINE_MEMBER(maciici_state::via_out_cb2_iisi)
+void maciici_state::via_out_cb2_iisi(int state)
 {
 	m_egret->set_via_data(state & 1);
 }

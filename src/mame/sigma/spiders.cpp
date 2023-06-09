@@ -243,7 +243,7 @@ INTERRUPT_GEN_MEMBER(spiders_state::update_pia_1)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(spiders_state::ic60_74123_output_changed)
+void spiders_state::ic60_74123_output_changed(int state)
 {
 	m_pia[1]->ca1_w(state);
 }
@@ -273,7 +273,7 @@ void spiders_state::machine_start()
  *************************************/
 
 
-WRITE_LINE_MEMBER(spiders_state::flipscreen_w)
+void spiders_state::flipscreen_w(int state)
 {
 	m_flipscreen = state;
 }

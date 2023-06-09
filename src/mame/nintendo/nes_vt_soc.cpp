@@ -1072,7 +1072,7 @@ void nes_vt02_vt03_soc_device::nes_vt_map(address_map &map)
 
 
 
-WRITE_LINE_MEMBER(nes_vt02_vt03_soc_device::apu_irq)
+void nes_vt02_vt03_soc_device::apu_irq(int state)
 {
 	// TODO
 //  set_input_line(RP2A03_APU_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);

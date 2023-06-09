@@ -50,8 +50,8 @@ protected:
 	virtual void s100_phantom_w(int state) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
 
 	// internal state
 	required_device<mb8866_device> m_fdc;

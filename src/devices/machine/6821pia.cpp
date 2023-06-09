@@ -921,7 +921,7 @@ uint8_t pia6821_device::a_output()
 //  ca1_w
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( pia6821_device::ca1_w )
+void pia6821_device::ca1_w(int state)
 {
 	LOGCA1("Set PIA input CA1 = %d\n", state);
 
@@ -951,7 +951,7 @@ WRITE_LINE_MEMBER( pia6821_device::ca1_w )
 //  ca2_w
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( pia6821_device::ca2_w )
+void pia6821_device::ca2_w(int state)
 {
 	LOG("Set PIA input CA2 = %d\n", state);
 
@@ -1046,7 +1046,7 @@ uint8_t pia6821_device::b_output()
 //  cb1_w
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( pia6821_device::cb1_w )
+void pia6821_device::cb1_w(int state)
 {
 	LOGCB1("Set PIA input CB1 = %d\n", state);
 
@@ -1077,7 +1077,7 @@ WRITE_LINE_MEMBER( pia6821_device::cb1_w )
 //  cb2_w
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( pia6821_device::cb2_w )
+void pia6821_device::cb2_w(int state)
 {
 	LOG("Set PIA input CB2 = %d\n", state);
 

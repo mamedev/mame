@@ -78,10 +78,10 @@ private:
 
 	const struct hard_disk_file::info* m_geom[2];
 
-	DECLARE_WRITE_LINE_MEMBER(isbx_irq_00_w);
-	DECLARE_WRITE_LINE_MEMBER(isbx_irq_01_w);
-	DECLARE_WRITE_LINE_MEMBER(isbx_irq_10_w);
-	DECLARE_WRITE_LINE_MEMBER(isbx_irq_11_w);
+	void isbx_irq_00_w(int state);
+	void isbx_irq_01_w(int state);
+	void isbx_irq_10_w(int state);
+	void isbx_irq_11_w(int state);
 };
 
 DECLARE_DEVICE_TYPE(ISBC_215G, isbc_215g_device)

@@ -327,13 +327,13 @@ void upc82c711_device::dor_w(uint8_t data)
 	m_fdc->reset_w(!BIT(dor, 2));
 }
 
-WRITE_LINE_MEMBER(upc82c711_device::fdc_irq_w)
+void upc82c711_device::fdc_irq_w(int state)
 {
 	fdc_irq = state;
 	check_irq();
 }
 
-WRITE_LINE_MEMBER(upc82c711_device::fdc_drq_w)
+void upc82c711_device::fdc_drq_w(int state)
 {
 	fdc_drq = state;
 	check_drq();
@@ -427,52 +427,52 @@ void upc82c711_device::write_cfg(int index, u8 data)
 }
 
 
-WRITE_LINE_MEMBER(upc82c711_device::rxd1_w)
+void upc82c711_device::rxd1_w(int state)
 {
 	m_serial[0]->rx_w(state);
 }
 
-WRITE_LINE_MEMBER(upc82c711_device::dcd1_w)
+void upc82c711_device::dcd1_w(int state)
 {
 	m_serial[0]->dcd_w(state);
 }
 
-WRITE_LINE_MEMBER(upc82c711_device::dsr1_w)
+void upc82c711_device::dsr1_w(int state)
 {
 	m_serial[0]->dsr_w(state);
 }
 
-WRITE_LINE_MEMBER(upc82c711_device::ri1_w)
+void upc82c711_device::ri1_w(int state)
 {
 	m_serial[0]->ri_w(state);
 }
 
-WRITE_LINE_MEMBER(upc82c711_device::cts1_w)
+void upc82c711_device::cts1_w(int state)
 {
 	m_serial[0]->cts_w(state);
 }
 
-WRITE_LINE_MEMBER(upc82c711_device::rxd2_w)
+void upc82c711_device::rxd2_w(int state)
 {
 	m_serial[1]->rx_w(state);
 }
 
-WRITE_LINE_MEMBER(upc82c711_device::dcd2_w)
+void upc82c711_device::dcd2_w(int state)
 {
 	m_serial[1]->dcd_w(state);
 }
 
-WRITE_LINE_MEMBER(upc82c711_device::dsr2_w)
+void upc82c711_device::dsr2_w(int state)
 {
 	m_serial[1]->dsr_w(state);
 }
 
-WRITE_LINE_MEMBER(upc82c711_device::ri2_w)
+void upc82c711_device::ri2_w(int state)
 {
 	m_serial[1]->ri_w(state);
 }
 
-WRITE_LINE_MEMBER(upc82c711_device::cts2_w)
+void upc82c711_device::cts2_w(int state)
 {
 	m_serial[1]->cts_w(state);
 }

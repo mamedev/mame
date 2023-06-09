@@ -172,7 +172,7 @@ void saa5240_device::device_reset()
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-WRITE_LINE_MEMBER(saa5240_device::write_scl)
+void saa5240_device::write_scl(int state)
 {
 	if (m_i2c_scl != state)
 	{
@@ -335,7 +335,7 @@ WRITE_LINE_MEMBER(saa5240_device::write_scl)
 	}
 }
 
-WRITE_LINE_MEMBER(saa5240_device::write_sda)
+void saa5240_device::write_sda(int state)
 {
 	state &= 1;
 	if (m_i2c_sdaw != state)
@@ -362,7 +362,7 @@ WRITE_LINE_MEMBER(saa5240_device::write_sda)
 	}
 }
 
-READ_LINE_MEMBER(saa5240_device::read_sda)
+int saa5240_device::read_sda()
 {
 	int res = m_i2c_sdar & 1;
 
@@ -639,7 +639,7 @@ void saa5240_device::get_character_data(uint8_t data)
 //  vcs_w - video composite sync
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(saa5240_device::vcs_w)
+void saa5240_device::vcs_w(int state)
 {
 	if (state)
 	{
@@ -675,7 +675,7 @@ WRITE_LINE_MEMBER(saa5240_device::vcs_w)
 //  f6_w - character display clock
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(saa5240_device::f6_w)
+void saa5240_device::f6_w(int state)
 {
 	if (state)
 	{

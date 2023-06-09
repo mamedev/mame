@@ -41,9 +41,9 @@ protected:
 private:
 	void porta_w(uint8_t data);
 	void portc_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(write_out0);
-	DECLARE_WRITE_LINE_MEMBER(write_out1);
-	DECLARE_WRITE_LINE_MEMBER(write_out2);
+	void write_out0(int state);
+	void write_out1(int state);
+	void write_out2(int state);
 
 	required_device<pit8253_device> m_pit;
 	required_device<i8255_device> m_ppi;

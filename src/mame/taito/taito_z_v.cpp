@@ -800,7 +800,7 @@ void contcirc_state::contcirc_out_w(u8 data)
 	m_road_palbank = (data & 0xc0) >> 6;
 }
 
-WRITE_LINE_MEMBER(contcirc_state::scope_vblank)
+void contcirc_state::scope_vblank(int state)
 {
 	if (state)
 	{

@@ -386,11 +386,11 @@ private:
 	void bank1_0000_sh_w(offs_t offset, u8 data);
 	u8 bank1_c000_r(offs_t offset);
 	void bank1_c000_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_inh_w);
-	DECLARE_WRITE_LINE_MEMBER(doc_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(scc_irq_w);
+	void a2bus_irq_w(int state);
+	void a2bus_nmi_w(int state);
+	void a2bus_inh_w(int state);
+	void doc_irq_w(int state);
+	void scc_irq_w(int state);
 	u8 doc_adc_read();
 	u8 apple2gs_read_vector(offs_t offset);
 
@@ -568,7 +568,7 @@ offs_t apple2gs_state::dasm_trampoline(std::ostream &stream, offs_t pc, const ut
 	return m_a2common->dasm_override_GS(stream, pc, opcodes, params);
 }
 
-WRITE_LINE_MEMBER(apple2gs_state::a2bus_irq_w)
+void apple2gs_state::a2bus_irq_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -581,13 +581,13 @@ WRITE_LINE_MEMBER(apple2gs_state::a2bus_irq_w)
 	}
 }
 
-WRITE_LINE_MEMBER(apple2gs_state::a2bus_nmi_w)
+void apple2gs_state::a2bus_nmi_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
 // TODO: this assumes /INH only on ROM, needs expansion to support e.g. phantom-slotting cards and etc.
-WRITE_LINE_MEMBER(apple2gs_state::a2bus_inh_w)
+void apple2gs_state::a2bus_inh_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -892,6 +892,9 @@ void apple2gs_state::machine_reset()
 	// RESEARCH: how does RESET affect LC state and aux banking states?
 	auxbank_update();
 	update_slotrom_banks();
+
+	// reset the slots
+	m_a2bus->reset_bus();
 
 	// with all the banking reset, now reset the CPU
 	m_maincpu->reset();
@@ -3385,8 +3388,26 @@ void apple2gs_state::adbmicro_p2_out(u8 data)
 	if (!BIT(data, 5) && BIT(m_adb_p2_last, 5))
 	{
 		m_adb_reset_freeze = 2;
+		m_a2bus->reset_bus();
 		m_maincpu->reset();
 		m_video->set_newvideo(0x41);
+
+		m_lcram = false;
+		m_lcram2 = true;
+		m_lcprewrite = false;
+		m_lcwriteenable = true;
+		m_intcxrom = false;
+		m_slotc3rom = false;
+		m_video->a80store_w(false);
+		m_altzp = false;
+		m_ramrd = false;
+		m_ramwrt = false;
+		m_altzp = false;
+		m_video->page2_w(false);
+		m_video->res_w(0);
+
+		auxbank_update();
+		update_slotrom_banks();
 	}
 
 	if (!(data & 0x10))
@@ -3642,7 +3663,7 @@ void apple2gs_state::keyglu_regen_irqs()
 	}
 }
 
-WRITE_LINE_MEMBER(apple2gs_state::scc_irq_w)
+void apple2gs_state::scc_irq_w(int state)
 {
 	if (state)
 	{
@@ -3655,7 +3676,7 @@ WRITE_LINE_MEMBER(apple2gs_state::scc_irq_w)
 }
 
 /* Sound - DOC */
-WRITE_LINE_MEMBER(apple2gs_state::doc_irq_w)
+void apple2gs_state::doc_irq_w(int state)
 {
 	if (state)
 	{

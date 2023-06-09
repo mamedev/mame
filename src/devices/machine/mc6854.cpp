@@ -583,7 +583,7 @@ uint8_t mc6854_device::rfifo_pop( )
 }
 
 
-WRITE_LINE_MEMBER( mc6854_device::set_rx )
+void mc6854_device::set_rx(int state)
 {
 	m_rxd = state;
 }
@@ -638,7 +638,7 @@ int mc6854_device::send_frame( uint8_t* data, int len )
 
 
 
-WRITE_LINE_MEMBER( mc6854_device::set_cts )
+void mc6854_device::set_cts(int state)
 {
 	if ( ! m_cts && state )
 		m_sr1 |= CTS;
@@ -653,7 +653,7 @@ WRITE_LINE_MEMBER( mc6854_device::set_cts )
 
 
 
-WRITE_LINE_MEMBER( mc6854_device::set_dcd )
+void mc6854_device::set_dcd(int state)
 {
 	if ( ! m_dcd && state )
 	{
@@ -917,7 +917,7 @@ inline bool mc6854_device::receive_allowed() const
 }
 
 /* MC6854 makes fields from bits */
-WRITE_LINE_MEMBER( mc6854_device::rxc_w )
+void mc6854_device::rxc_w(int state)
 {
 	if (receive_allowed() && state && !m_rxc)
 	{
@@ -989,7 +989,7 @@ WRITE_LINE_MEMBER( mc6854_device::rxc_w )
 	m_rxc = state;
 }
 
-WRITE_LINE_MEMBER( mc6854_device::txc_w )
+void mc6854_device::txc_w(int state)
 {
 	// TODO
 }

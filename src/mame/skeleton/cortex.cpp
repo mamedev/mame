@@ -73,9 +73,9 @@ protected:
 
 private:
 	void kbd_put(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(keyboard_ack_w);
-	DECLARE_WRITE_LINE_MEMBER(romsw_w);
-	DECLARE_WRITE_LINE_MEMBER(vdp_int_w);
+	void keyboard_ack_w(int state);
+	void romsw_w(int state);
+	void vdp_int_w(int state);
 	u8 pio_r(offs_t offset);
 	u8 keyboard_r(offs_t offset);
 
@@ -151,7 +151,7 @@ u8 cortex_state::keyboard_r(offs_t offset)
 	return BIT(m_term_data, offset);
 }
 
-WRITE_LINE_MEMBER( cortex_state::keyboard_ack_w )
+void cortex_state::keyboard_ack_w(int state)
 {
 	if (!state)
 	{
@@ -160,12 +160,12 @@ WRITE_LINE_MEMBER( cortex_state::keyboard_ack_w )
 	}
 }
 
-WRITE_LINE_MEMBER( cortex_state::romsw_w )
+void cortex_state::romsw_w(int state)
 {
 	m_bank1->set_entry(state ? 0 : 1);
 }
 
-WRITE_LINE_MEMBER( cortex_state::vdp_int_w )
+void cortex_state::vdp_int_w(int state)
 {
 	m_vdp_int = state ? 0 : 1;  // change polarity to match mame
 }

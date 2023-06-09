@@ -202,26 +202,26 @@ protected:
 	required_device<cpu_device> m_maincpu;
 
 private:
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
+	template <unsigned N> void reel_optic_cb(int state) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 
 	void mpu3ptm_w(offs_t offset, uint8_t data);
 	uint8_t mpu3ptm_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(ic2_o1_callback);
-	DECLARE_WRITE_LINE_MEMBER(ic2_o2_callback);
-	DECLARE_WRITE_LINE_MEMBER(ic2_o3_callback);
+	void ic2_o1_callback(int state);
+	void ic2_o2_callback(int state);
+	void ic2_o3_callback(int state);
 	uint8_t pia_ic3_porta_r();
 	void pia_ic3_portb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic3_ca2_w);
+	void pia_ic3_ca2_w(int state);
 	uint8_t pia_ic4_porta_r();
 	void pia_ic4_porta_w(uint8_t data);
 	void pia_ic4_portb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic4_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic4_cb2_w);
+	void pia_ic4_ca2_w(int state);
+	void pia_ic4_cb2_w(int state);
 	void pia_ic5_porta_w(uint8_t data);
 	uint8_t pia_ic5_portb_r();
 	void pia_ic5_portb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic5_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic5_cb2_w);
+	void pia_ic5_ca2_w(int state);
+	void pia_ic5_cb2_w(int state);
 	uint8_t pia_ic6_porta_r();
 	uint8_t pia_ic6_portb_r();
 	void pia_ic6_porta_w(uint8_t data);
@@ -329,17 +329,17 @@ void mpu3_state::machine_reset()
 
 
 /* IC2 6840 PTM handler probably clocked from elsewhere*/
-WRITE_LINE_MEMBER(mpu3_state::ic2_o1_callback)
+void mpu3_state::ic2_o1_callback(int state)
 {
 }
 
 //FIXME FROM HERE
-WRITE_LINE_MEMBER(mpu3_state::ic2_o2_callback)
+void mpu3_state::ic2_o2_callback(int state)
 {
 }
 
 
-WRITE_LINE_MEMBER(mpu3_state::ic2_o3_callback)
+void mpu3_state::ic2_o3_callback(int state)
 {
 }
 
@@ -469,7 +469,7 @@ void mpu3_state::pia_ic3_portb_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(mpu3_state::pia_ic3_ca2_w)
+void mpu3_state::pia_ic3_ca2_w(int state)
 {
 	LOG("%s: IC3 PIA Port CA2 Set to %2x (input A)\n", machine().describe_context(),state);
 	m_IC11GA = state;
@@ -543,14 +543,14 @@ void mpu3_state::pia_ic4_portb_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(mpu3_state::pia_ic4_ca2_w)
+void mpu3_state::pia_ic4_ca2_w(int state)
 {
 	LOG("%s: IC4 PIA Port CA2 Set to %2x (Input B)\n", machine().describe_context(),state);
 	m_IC11GB = state;
 	ic11_update();
 }
 
-WRITE_LINE_MEMBER(mpu3_state::pia_ic4_cb2_w)
+void mpu3_state::pia_ic4_cb2_w(int state)
 {
 	LOG("%s: IC4 PIA Port CA2 Set to %2x (Triac)\n", machine().describe_context(),state);
 	m_triac_ic4=state;
@@ -589,14 +589,14 @@ void mpu3_state::pia_ic5_portb_w(uint8_t data)
 	m_ic3_data = data;
 }
 
-WRITE_LINE_MEMBER(mpu3_state::pia_ic5_ca2_w)
+void mpu3_state::pia_ic5_ca2_w(int state)
 {
 	LOG("%s: IC5 PIA Port CA2 Set to %2x (C)\n", machine().describe_context(),state);
 	m_IC11GC = state;
 	ic11_update();
 }
 
-WRITE_LINE_MEMBER(mpu3_state::pia_ic5_cb2_w)
+void mpu3_state::pia_ic5_cb2_w(int state)
 {
 	LOG("%s: IC5 PIA Port CB2 Set to %2x (Triac)\n", machine().describe_context(),state);
 	m_triac_ic5 = state;

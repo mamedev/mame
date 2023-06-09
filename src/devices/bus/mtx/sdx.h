@@ -34,7 +34,7 @@ public:
 
 	uint8_t sdx_status_r();
 	void sdx_control_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(motor_w);
+	void motor_w(int state);
 
 protected:
 	// construction/destruction

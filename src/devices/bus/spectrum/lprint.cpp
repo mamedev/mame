@@ -251,7 +251,7 @@ void spectrum_kempcentre_device::device_reset()
 //  IMPLEMENTATION (lprint)
 //**************************************************************************
 
-READ_LINE_MEMBER(spectrum_lprint_device::romcs)
+int spectrum_lprint_device::romcs()
 {
 	return m_romcs;
 }
@@ -315,7 +315,7 @@ void spectrum_lprint_device::iorq_w(offs_t offset, uint8_t data)
 //  IMPLEMENTATION (lprint3)
 //**************************************************************************
 
-READ_LINE_MEMBER(spectrum_lprint3_device::romcs)
+int spectrum_lprint3_device::romcs()
 {
 	return m_romcs | m_exp->romcs();
 }
@@ -414,7 +414,7 @@ void spectrum_kempcentrs_device::iorq_w(offs_t offset, uint8_t data)
 //  IMPLEMENTATION (kempcentre)
 //**************************************************************************
 
-READ_LINE_MEMBER(spectrum_kempcentre_device::romcs)
+int spectrum_kempcentre_device::romcs()
 {
 	return m_romcs;
 }

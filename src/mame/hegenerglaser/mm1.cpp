@@ -91,11 +91,11 @@ private:
 
 	// I/O handlers
 	void update_display();
-	DECLARE_READ_LINE_MEMBER(clear_r);
+	int clear_r();
 	void sound_w(u8 data);
 	void unknown_w(u8 data);
 	void keypad_w(u8 data);
-	template<int N> DECLARE_READ_LINE_MEMBER(keypad_r);
+	template<int N> int keypad_r();
 
 	bool m_reset = false;
 	u8 m_kp_mux = 0;
@@ -119,7 +119,7 @@ void mm1_state::machine_reset()
     I/O
 *******************************************************************************/
 
-READ_LINE_MEMBER(mm1_state::clear_r)
+int mm1_state::clear_r()
 {
 	// CLEAR low + WAIT high resets cpu
 	int ret = (m_reset) ? 0 : 1;
@@ -145,7 +145,7 @@ void mm1_state::keypad_w(u8 data)
 }
 
 template<int N>
-READ_LINE_MEMBER(mm1_state::keypad_r)
+int mm1_state::keypad_r()
 {
 	// EF3,EF4: multiplexed inputs (keypad)
 	return (m_inputs[N]->read() & m_kp_mux) ? 1 : 0;

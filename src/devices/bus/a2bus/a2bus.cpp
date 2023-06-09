@@ -197,6 +197,18 @@ void a2bus_device::add_a2bus_card(int slot, device_a2bus_card_interface *card)
 	m_device_list[slot] = card;
 }
 
+void a2bus_device::reset_bus()
+{
+	for (int slot = 0; slot <= 7; slot++)
+	{
+		auto card = get_a2bus_card(slot);
+		if (card != nullptr)
+		{
+			card->bus_reset();
+		}
+	}
+}
+
 uint8_t a2bus_device::get_a2bus_irq_mask()
 {
 	return m_slot_irq_mask;
@@ -257,8 +269,8 @@ void a2bus_device::recalc_inh(int slot)
 }
 
 // interrupt request from a2bus card
-WRITE_LINE_MEMBER( a2bus_device::irq_w ) { m_out_irq_cb(state); }
-WRITE_LINE_MEMBER( a2bus_device::nmi_w ) { m_out_nmi_cb(state); }
+void a2bus_device::irq_w(int state) { m_out_irq_cb(state); }
+void a2bus_device::nmi_w(int state) { m_out_nmi_cb(state); }
 
 //**************************************************************************
 //  DEVICE CONFIG A2BUS CARD INTERFACE

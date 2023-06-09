@@ -58,7 +58,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(bim_irq_callback);
+	void bim_irq_callback(int state);
 
 	/* PIT callbacks */
 	uint8_t pita_r();

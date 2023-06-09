@@ -180,7 +180,7 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(adc_int_w);
+	void adc_int_w(int state);
 
 	uint16_t eeprom_r();
 	void eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

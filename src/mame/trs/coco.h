@@ -97,16 +97,16 @@ public:
 	// PIA0
 	void pia0_pa_w(uint8_t data);
 	void pia0_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( pia0_ca2_w );
-	DECLARE_WRITE_LINE_MEMBER( pia0_cb2_w );
+	void pia0_ca2_w(int state);
+	void pia0_cb2_w(int state);
 
 	// PIA1
 	uint8_t pia1_pa_r();
 	uint8_t pia1_pb_r();
 	void pia1_pa_w(uint8_t data);
 	void pia1_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w );
-	DECLARE_WRITE_LINE_MEMBER( pia1_cb2_w );
+	void pia1_ca2_w(int state);
+	void pia1_cb2_w(int state);
 
 	// floating bus & "space"
 	uint8_t floating_bus_r()   { return floating_bus_read(); }
@@ -114,7 +114,7 @@ public:
 	void floating_space_write(offs_t offset, uint8_t data);
 
 	// cartridge stuff
-	DECLARE_WRITE_LINE_MEMBER( cart_w ) { cart_w((bool) state); }
+	void cart_w(int state) { cart_w((bool) state); }
 	virtual address_space &cartridge_space() override;
 
 	// disassembly override

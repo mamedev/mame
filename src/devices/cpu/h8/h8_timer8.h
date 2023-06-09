@@ -30,14 +30,22 @@ public:
 	};
 
 	h8_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	h8_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intc, int irq_ca, int irq_cb, int irq_v,
+	template<typename T, typename U> h8_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu, U &&intc, int irq_ca, int irq_cb, int irq_v,
 				int div1, int div2, int div3, int div4, int div5, int div6)
 		: h8_timer8_channel_device(mconfig, tag, owner, 0)
 	{
-		set_info(intc, irq_ca, irq_cb, irq_v, div1, div2, div3, div4, div5, div6);
+		m_cpu.set_tag(std::forward<T>(cpu));
+		m_intc.set_tag(std::forward<U>(intc));
+		m_irq_ca = irq_ca;
+		m_irq_cb = irq_cb;
+		m_irq_v = irq_v;
+		m_div_tab[0] = div1;
+		m_div_tab[1] = div2;
+		m_div_tab[2] = div3;
+		m_div_tab[3] = div4;
+		m_div_tab[4] = div5;
+		m_div_tab[5] = div6;
 	}
-
-	void set_info(const char *intc, int irq_ca, int irq_cb, int irq_v, int div1, int div2, int div3, int div4, int div5, int div6);
 
 	uint8_t tcr_r();
 	void tcr_w(uint8_t data);
@@ -77,9 +85,9 @@ protected:
 	};
 
 	required_device<h8_device> m_cpu;
-	h8_timer8_channel_device *m_chained_timer;
-	h8_intc_device *m_intc;
-	const char *m_chain_tag, *m_intc_tag;
+	required_device<h8_intc_device> m_intc;
+	optional_device<h8_timer8_channel_device> m_chained_timer;
+
 	int m_irq_ca, m_irq_cb, m_irq_v, m_chain_type;
 	int m_div_tab[6];
 	uint8_t m_tcor[2];
@@ -103,15 +111,20 @@ protected:
 class h8h_timer8_channel_device : public h8_timer8_channel_device {
 public:
 	h8h_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	h8h_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intc, int irq_ca, int irq_cb, int irq_v,
-				const char *chain_tag, int chain_type, bool has_adte, bool has_ice)
+	template<typename T, typename U, typename V> h8h_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu, U &&intc, int irq_ca, int irq_cb, int irq_v,
+				V &&chain, int chain_type, bool has_adte, bool has_ice)
 		: h8h_timer8_channel_device(mconfig, tag, owner, 0)
 	{
-		set_info(intc, irq_ca, irq_cb, irq_v, chain_tag, chain_type, has_adte, has_ice);
+		m_cpu.set_tag(std::forward<T>(cpu));
+		m_intc.set_tag(std::forward<U>(intc));
+		m_irq_ca = irq_ca;
+		m_irq_cb = irq_cb;
+		m_irq_v = irq_v;
+		m_chained_timer.set_tag(std::forward<V>(chain));
+		m_chain_type = chain_type;
+		m_has_adte = has_adte;
+		m_has_ice = has_ice;
 	}
-	virtual ~h8h_timer8_channel_device();
-
-	void set_info(const char *intc, int irq_ca, int irq_cb, int irq_v, const char *chain_tag, int chain_type, bool has_adte, bool has_ice);
 };
 
 DECLARE_DEVICE_TYPE(H8_TIMER8_CHANNEL,  h8_timer8_channel_device)

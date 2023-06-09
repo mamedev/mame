@@ -655,7 +655,7 @@ TIMER_CALLBACK_MEMBER(mfm_harddisk_device::seek_update)
 			// Start the settle timer
 			m_step_phase = STEP_SETTLE;
 			m_seek_timer->adjust(m_settle_time);
-			LOGMASKED(LOG_STEPSDETAIL, "Arrived at target cylinder %d, settling ...\n", m_current_cylinder);
+			LOGMASKED(LOG_STEPSDETAIL, "Arrived at target cylinder %d, settling ...[%s]\n", m_current_cylinder, machine().time().to_string());
 		}
 		else
 		{
@@ -678,7 +678,7 @@ TIMER_CALLBACK_MEMBER(mfm_harddisk_device::seek_update)
 			}
 			else
 			{
-				LOGMASKED(LOG_SIGNALS, "Settling done at cylinder %d, seek complete\n", m_current_cylinder);
+				LOGMASKED(LOG_STEPSDETAIL, "Settling done at cylinder %d, seek complete [%s]\n", m_current_cylinder, machine().time().to_string());
 			}
 			m_seek_complete = true;
 			if (!m_seek_complete_cb.isnull()) m_seek_complete_cb(this, ASSERT_LINE);
@@ -703,7 +703,8 @@ void mfm_harddisk_device::head_move()
 	m_step_phase = STEP_MOVING;
 	m_seek_timer->adjust(m_step_time * steps);
 
-	LOGMASKED(LOG_TIMING, "Head movement takes %s time\n", (m_step_time * steps).to_string());
+	long moveus = (m_step_time.attoseconds() * steps) / ATTOSECONDS_PER_MICROSECOND;
+	LOGMASKED(LOG_STEPSDETAIL, "Head movement takes %.1f ms time [%s]\n", moveus/1000., machine().time().to_string());
 	// We pretend that we already arrived
 	// TODO: Check auto truncation?
 	m_current_cylinder += m_track_delta;
@@ -714,8 +715,8 @@ void mfm_harddisk_device::head_move()
 
 void mfm_harddisk_device::direction_in_w(line_state line)
 {
+	if (m_seek_inward != (line == ASSERT_LINE)) LOGMASKED(LOG_STEPSDETAIL, "Setting seek direction %s\n", m_seek_inward? "inward" : "outward");
 	m_seek_inward = (line == ASSERT_LINE);
-	LOGMASKED(LOG_STEPSDETAIL, "Setting seek direction %s\n", m_seek_inward? "inward" : "outward");
 }
 
 /*

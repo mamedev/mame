@@ -31,7 +31,7 @@ protected:
 
 private:
 	// printer status inputs
-	DECLARE_WRITE_LINE_MEMBER(ack_w);
+	void ack_w(int state);
 
 	// timer handlers
 	TIMER_CALLBACK_MEMBER(update_strobe);
@@ -232,7 +232,7 @@ void a2bus_parprn_device::device_reset()
 //  printer status inputs
 //----------------------------------------------
 
-WRITE_LINE_MEMBER(a2bus_parprn_device::ack_w)
+void a2bus_parprn_device::ack_w(int state)
 {
 	if (bool(state) != bool(m_ack_in))
 	{

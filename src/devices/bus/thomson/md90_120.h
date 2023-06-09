@@ -23,9 +23,9 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( modem_cb );
-	DECLARE_WRITE_LINE_MEMBER( modem_tx_w);
-	DECLARE_WRITE_LINE_MEMBER( write_acia_clock );
+	void modem_cb(int state);
+	void modem_tx_w(int state);
+	void write_acia_clock(int state);
 
 	required_device<acia6850_device> m_acia;
 

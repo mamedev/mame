@@ -20,7 +20,7 @@ class evpc_clock_connector : public device_t
 public:
 	evpc_clock_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER( vclock_line );
+	void vclock_line(int state);
 	void device_start() override;
 	auto vdpint_cb() { return m_vdpint.bind(); }
 

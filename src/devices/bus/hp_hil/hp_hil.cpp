@@ -225,7 +225,7 @@ void hp_hil_mlc_device::hil_write(uint16_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(hp_hil_mlc_device::ap_w)
+void hp_hil_mlc_device::ap_w(int state)
 {
 	uint16_t data = HPMLC_W1_C | HPHIL_POL;
 	if (state && (m_w3 & HPMLC_W3_APE))

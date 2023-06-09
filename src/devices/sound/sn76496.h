@@ -24,7 +24,7 @@ public:
 	auto ready_cb() { return m_ready_handler.bind(); }
 	void stereo_w(u8 data);
 	void write(u8 data);
-	DECLARE_READ_LINE_MEMBER( ready_r ) { return m_ready_state ? 1 : 0; }
+	int ready_r() { return m_ready_state ? 1 : 0; }
 
 protected:
 	sn76496_base_device(const machine_config &mconfig, device_type type, const char *tag,

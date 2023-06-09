@@ -265,7 +265,7 @@ zorba_keyboard_device::zorba_keyboard_device(
 }
 
 
-WRITE_LINE_MEMBER(zorba_keyboard_device::txd_w)
+void zorba_keyboard_device::txd_w(int state)
 {
 	m_txd_high = CLEAR_LINE != state;
 }

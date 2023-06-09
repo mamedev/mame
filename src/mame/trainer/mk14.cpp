@@ -64,8 +64,8 @@ protected:
 	uint8_t keyboard_r(offs_t offset);
 	void display_w(offs_t offset, uint8_t data);
 	void port_a_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(cass_w);
-	DECLARE_READ_LINE_MEMBER(cass_r);
+	void cass_w(int state);
+	int cass_r();
 	void mk14_map(address_map &map);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
@@ -251,13 +251,13 @@ void mk14_state::port_a_w(uint8_t data)
 {
 }
 
-WRITE_LINE_MEMBER(mk14_state::cass_w)
+void mk14_state::cass_w(int state)
 {
 	m_cass->output(state ? -1.0 : +1.0);
 	m_dac->write(state);
 }
 
-READ_LINE_MEMBER(mk14_state::cass_r)
+int mk14_state::cass_r()
 {
 	return (m_cass->input() > 0.03) ? 1 : 0;
 }

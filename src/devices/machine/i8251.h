@@ -39,14 +39,14 @@ public:
 	virtual uint8_t read(offs_t offset);
 	virtual void write(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( write_rxd );
-	DECLARE_WRITE_LINE_MEMBER( write_cts );
-	DECLARE_WRITE_LINE_MEMBER( write_dsr );
-	DECLARE_WRITE_LINE_MEMBER( write_txc );
-	DECLARE_WRITE_LINE_MEMBER( write_rxc );
-	DECLARE_WRITE_LINE_MEMBER( write_syn );
+	void write_rxd(int state);
+	void write_cts(int state);
+	void write_dsr(int state);
+	void write_txc(int state);
+	void write_rxc(int state);
+	void write_syn(int state);
 
-	DECLARE_READ_LINE_MEMBER(txrdy_r);
+	int txrdy_r();
 
 protected:
 	enum

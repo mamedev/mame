@@ -104,14 +104,14 @@ public:
 
 
 	/* these functions take 0 or 1 as a logic input */
-	WRITE_LINE_MEMBER( enable_w );      /* active LO, 0 = enabled, 1 = disabled */
-	WRITE_LINE_MEMBER( mixer_a_w );
-	WRITE_LINE_MEMBER( mixer_b_w );
-	WRITE_LINE_MEMBER( mixer_c_w );
-	WRITE_LINE_MEMBER( envelope_1_w );
-	WRITE_LINE_MEMBER( envelope_2_w );
-	WRITE_LINE_MEMBER( vco_w );         /* 0 = external, 1 = controlled by SLF */
-	WRITE_LINE_MEMBER( noise_clock_w ); /* noise clock write, if noise_clock_res = 0 */
+	void enable_w(int state);      /* active LO, 0 = enabled, 1 = disabled */
+	void mixer_a_w(int state);
+	void mixer_b_w(int state);
+	void mixer_c_w(int state);
+	void envelope_1_w(int state);
+	void envelope_2_w(int state);
+	void vco_w(int state);         /* 0 = external, 1 = controlled by SLF */
+	void noise_clock_w(int state); /* noise clock write, if noise_clock_res = 0 */
 
 	/* these functions take a resistor value in Ohms */
 	void one_shot_res_w(double data);

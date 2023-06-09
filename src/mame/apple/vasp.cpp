@@ -226,7 +226,7 @@ uint8_t vasp_device::via_in_b()
 	return read_pb3() << 3;
 }
 
-WRITE_LINE_MEMBER(vasp_device::via_out_cb2)
+void vasp_device::via_out_cb2(int state)
 {
 	write_cb2(state & 1);
 }
@@ -242,13 +242,13 @@ void vasp_device::via_out_b(uint8_t data)
 	write_pb5(BIT(data, 5));
 }
 
-WRITE_LINE_MEMBER(vasp_device::via1_irq)
+void vasp_device::via1_irq(int state)
 {
 	m_via_interrupt = state;
 	field_interrupts();
 }
 
-WRITE_LINE_MEMBER(vasp_device::via2_irq)
+void vasp_device::via2_irq(int state)
 {
 	m_via2_interrupt = state;
 	field_interrupts();
@@ -284,13 +284,13 @@ void vasp_device::field_interrupts()
 	}
 }
 
-WRITE_LINE_MEMBER(vasp_device::scc_irq_w)
+void vasp_device::scc_irq_w(int state)
 {
 	m_scc_interrupt = (state == ASSERT_LINE);
 	field_interrupts();
 }
 
-WRITE_LINE_MEMBER(vasp_device::vbl_w)
+void vasp_device::vbl_w(int state)
 {
 	if (!state)
 	{
@@ -305,7 +305,7 @@ WRITE_LINE_MEMBER(vasp_device::vbl_w)
 	}
 }
 
-WRITE_LINE_MEMBER(vasp_device::slot0_irq_w)
+void vasp_device::slot0_irq_w(int state)
 {
 	if (state)
 	{
@@ -319,7 +319,7 @@ WRITE_LINE_MEMBER(vasp_device::slot0_irq_w)
 	pseudovia_recalc_irqs();
 }
 
-WRITE_LINE_MEMBER(vasp_device::slot1_irq_w)
+void vasp_device::slot1_irq_w(int state)
 {
 	if (state)
 	{
@@ -333,7 +333,7 @@ WRITE_LINE_MEMBER(vasp_device::slot1_irq_w)
 	pseudovia_recalc_irqs();
 }
 
-WRITE_LINE_MEMBER(vasp_device::slot2_irq_w)
+void vasp_device::slot2_irq_w(int state)
 {
 	if (state)
 	{
@@ -347,7 +347,7 @@ WRITE_LINE_MEMBER(vasp_device::slot2_irq_w)
 	pseudovia_recalc_irqs();
 }
 
-WRITE_LINE_MEMBER(vasp_device::asc_irq)
+void vasp_device::asc_irq(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -526,12 +526,12 @@ void vasp_device::pseudovia_w(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(vasp_device::cb1_w)
+void vasp_device::cb1_w(int state)
 {
 	m_via1->write_cb1(state);
 }
 
-WRITE_LINE_MEMBER(vasp_device::cb2_w)
+void vasp_device::cb2_w(int state)
 {
 	m_via1->write_cb2(state);
 }

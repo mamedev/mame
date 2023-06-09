@@ -32,7 +32,7 @@ public:
 	// configuration
 	auto signal_out_callback() { return m_signal_out_cb.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(signal_line_w);
+	void signal_line_w(int state);
 
 protected:
 	vt100_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -47,8 +47,8 @@ protected:
 
 private:
 	// internal helpers
-	DECLARE_WRITE_LINE_MEMBER(signal_out_w);
-	DECLARE_WRITE_LINE_MEMBER(scan_disable_w);
+	void signal_out_w(int state);
+	void scan_disable_w(int state);
 	void key_scan_w(u8 data);
 
 	devcb_write_line m_signal_out_cb;
@@ -85,7 +85,7 @@ protected:
 	virtual void scan_start() override { m_scan_enable = true; }
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(scan_disable_w);
+	void scan_disable_w(int state);
 
 	bool m_scan_enable;
 };

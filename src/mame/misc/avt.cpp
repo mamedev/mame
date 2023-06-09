@@ -464,8 +464,8 @@ private:
 	uint8_t avt_6845_data_r();
 	void avt_videoram_w(offs_t offset, uint8_t data);
 	void avt_colorram_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(avtnfl_w);
-	DECLARE_WRITE_LINE_MEMBER(avtbingo_w);
+	void avtnfl_w(int state);
+	void avtbingo_w(int state);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void avt_palette(palette_device &palette) const;
 	uint32_t screen_update_avt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -959,7 +959,7 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 // our pio cannot detect a static interrupt, so we push the current switch state in, then it will work
-WRITE_LINE_MEMBER( avt_state::avtbingo_w )
+void avt_state::avtbingo_w(int state)
 {
 	if (state)
 		m_pio0->port_b_write(ioport("IN0")->read());
@@ -1016,7 +1016,7 @@ void avt_state::avt(machine_config &config)
 }
 
 // Leave avtnfl as it was until more is learnt.
-WRITE_LINE_MEMBER( avt_state::avtnfl_w )
+void avt_state::avtnfl_w(int state)
 {
 	m_pio1->port_b_write((m_pio1->port_b_read() & 0xbf) | (state ? 0x40 : 0));
 }

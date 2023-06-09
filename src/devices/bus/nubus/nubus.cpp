@@ -246,12 +246,12 @@ void nubus_device::set_irq_line(int slot, int state)
 }
 
 // interrupt request from nubus card
-WRITE_LINE_MEMBER( nubus_device::irq9_w ) { m_out_irq9_cb(state); }
-WRITE_LINE_MEMBER( nubus_device::irqa_w ) { m_out_irqa_cb(state); }
-WRITE_LINE_MEMBER( nubus_device::irqb_w ) { m_out_irqb_cb(state); }
-WRITE_LINE_MEMBER( nubus_device::irqc_w ) { m_out_irqc_cb(state); }
-WRITE_LINE_MEMBER( nubus_device::irqd_w ) { m_out_irqd_cb(state); }
-WRITE_LINE_MEMBER( nubus_device::irqe_w ) { m_out_irqe_cb(state); }
+void nubus_device::irq9_w(int state) { m_out_irq9_cb(state); }
+void nubus_device::irqa_w(int state) { m_out_irqa_cb(state); }
+void nubus_device::irqb_w(int state) { m_out_irqb_cb(state); }
+void nubus_device::irqc_w(int state) { m_out_irqc_cb(state); }
+void nubus_device::irqd_w(int state) { m_out_irqd_cb(state); }
+void nubus_device::irqe_w(int state) { m_out_irqe_cb(state); }
 
 //**************************************************************************
 //  DEVICE CONFIG NUBUS CARD INTERFACE

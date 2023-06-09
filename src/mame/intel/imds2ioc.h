@@ -41,14 +41,14 @@ protected:
 private:
 	void miscout_w(uint8_t data);
 	uint8_t miscin_r();
-	DECLARE_WRITE_LINE_MEMBER(beep_timer_w);
+	void beep_timer_w(int state);
 	void start_timer_w(uint8_t data);
 
 	uint8_t kb_read(offs_t offset);
 	uint8_t kb_port_p2_r();
 	void kb_port_p1_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER(kb_port_t0_r);
-	DECLARE_READ_LINE_MEMBER(kb_port_t1_r);
+	int kb_port_t0_r();
+	int kb_port_t1_r();
 
 	void ioc_dbbout_w(offs_t offset, uint8_t data);
 	void ioc_f0_w(offs_t offset, uint8_t data);
@@ -57,7 +57,7 @@ private:
 	uint8_t ioc_status_r();
 	uint8_t ioc_dbbin_r();
 
-	DECLARE_WRITE_LINE_MEMBER(hrq_w);
+	void hrq_w(int state);
 	uint8_t ioc_mem_r(offs_t offset);
 	void ioc_mem_w(offs_t offset, uint8_t data);
 
@@ -65,8 +65,8 @@ private:
 	void pio_port_p1_w(uint8_t data);
 	uint8_t pio_port_p2_r();
 	void pio_port_p2_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pio_lpt_ack_w);
-	DECLARE_WRITE_LINE_MEMBER(pio_lpt_busy_w);
+	void pio_lpt_ack_w(int state);
+	void pio_lpt_busy_w(int state);
 
 	I8275_DRAW_CHARACTER_MEMBER(crtc_display_pixels);
 

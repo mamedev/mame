@@ -63,25 +63,25 @@ public:
 	void write16(offs_t offset, u16 data);
 
 	// Source N inputs
-	DECLARE_WRITE_LINE_MEMBER(source1_w) { write_source(0, state); }
-	DECLARE_WRITE_LINE_MEMBER(source2_w) { write_source(1, state); }
-	DECLARE_WRITE_LINE_MEMBER(source3_w) { write_source(2, state); }
-	DECLARE_WRITE_LINE_MEMBER(source4_w) { write_source(3, state); }
-	DECLARE_WRITE_LINE_MEMBER(source5_w) { write_source(4, state); }
+	void source1_w(int state) { write_source(0, state); }
+	void source2_w(int state) { write_source(1, state); }
+	void source3_w(int state) { write_source(2, state); }
+	void source4_w(int state) { write_source(3, state); }
+	void source5_w(int state) { write_source(4, state); }
 
 	// Gate N inputs
-	DECLARE_WRITE_LINE_MEMBER(gate1_w) { write_gate(0, state); }
-	DECLARE_WRITE_LINE_MEMBER(gate2_w) { write_gate(1, state); }
-	DECLARE_WRITE_LINE_MEMBER(gate3_w) { write_gate(2, state); }
-	DECLARE_WRITE_LINE_MEMBER(gate4_w) { write_gate(3, state); }
-	DECLARE_WRITE_LINE_MEMBER(gate5_w) { write_gate(4, state); }
+	void gate1_w(int state) { write_gate(0, state); }
+	void gate2_w(int state) { write_gate(1, state); }
+	void gate3_w(int state) { write_gate(2, state); }
+	void gate4_w(int state) { write_gate(3, state); }
+	void gate5_w(int state) { write_gate(4, state); }
 
 	// Gate N alternate inputs (8-bit mode only; multiplexed with DB8-DB12)
-	DECLARE_WRITE_LINE_MEMBER(gate1a_w) { write_gate_alt(0, state); }
-	DECLARE_WRITE_LINE_MEMBER(gate2a_w) { write_gate_alt(1, state); }
-	DECLARE_WRITE_LINE_MEMBER(gate3a_w) { write_gate_alt(2, state); }
-	DECLARE_WRITE_LINE_MEMBER(gate4a_w) { write_gate_alt(3, state); }
-	DECLARE_WRITE_LINE_MEMBER(gate5a_w) { write_gate_alt(4, state); }
+	void gate1a_w(int state) { write_gate_alt(0, state); }
+	void gate2a_w(int state) { write_gate_alt(1, state); }
+	void gate3a_w(int state) { write_gate_alt(2, state); }
+	void gate4a_w(int state) { write_gate_alt(3, state); }
+	void gate5a_w(int state) { write_gate_alt(4, state); }
 
 	// diagnostic helper
 	std::string describe_register() const;

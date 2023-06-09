@@ -17,7 +17,7 @@ public:
 	auto clock_out_callback() { return m_clock_out_callback.bind(); }
 
 	// external control input
-	DECLARE_WRITE_LINE_MEMBER(strobe_w);
+	void strobe_w(int state);
 
 protected:
 	// device-level overrides

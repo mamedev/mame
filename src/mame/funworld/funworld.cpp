@@ -822,7 +822,7 @@ void funworld_state::funworld_lamp_b_w(uint8_t data)
 //  popmessage("Lamps B: %02X", data);
 }
 
-WRITE_LINE_MEMBER(funworld_state::pia1_ca2_w)
+void funworld_state::pia1_ca2_w(int state)
 {
 // TAB and Impera games are writing 0x01 constantly, and 0x00 with each screen change.
 // This line is tied to some sort of reset circuitery.

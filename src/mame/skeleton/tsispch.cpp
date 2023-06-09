@@ -159,8 +159,8 @@ private:
 	void dsp_data_w(uint16_t data);
 	uint16_t dsp_status_r();
 	void dsp_status_w(uint16_t data);
-	DECLARE_WRITE_LINE_MEMBER(dsp_to_8086_p0_w);
-	DECLARE_WRITE_LINE_MEMBER(dsp_to_8086_p1_w);
+	void dsp_to_8086_p0_w(int state);
+	void dsp_to_8086_p1_w(int state);
 
 	void dsp_data_map(address_map &map);
 	void dsp_prg_map(address_map &map);
@@ -240,13 +240,13 @@ void tsispch_state::dsp_status_w(uint16_t data)
 	m_dsp->snesdsp_write(false, data);
 }
 
-WRITE_LINE_MEMBER( tsispch_state::dsp_to_8086_p0_w )
+void tsispch_state::dsp_to_8086_p0_w(int state)
 {
 	LOG("upd772x changed p0 state to %d!\n",state);
 	//TODO: do stuff here!
 }
 
-WRITE_LINE_MEMBER( tsispch_state::dsp_to_8086_p1_w )
+void tsispch_state::dsp_to_8086_p1_w(int state)
 {
 	LOG("upd772x changed p1 state to %d!\n",state);
 	//TODO: do stuff here!

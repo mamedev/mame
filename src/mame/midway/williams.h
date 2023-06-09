@@ -458,7 +458,7 @@ public:
 private:
 	virtual void machine_start() override;
 
-	DECLARE_WRITE_LINE_MEMBER(maxvol_w);
+	void maxvol_w(int state);
 	void lamp_w(u8 data);
 
 	required_device<ls157_device> m_mux;
@@ -493,7 +493,7 @@ private:
 
 	TIMER_CALLBACK_MEMBER(deferred_snd_cmd_w);
 	virtual void snd_cmd_w(u8 data) override;
-	DECLARE_WRITE_LINE_MEMBER(pia_s11_bg_strobe_w);
+	void pia_s11_bg_strobe_w(int state);
 };
 
 

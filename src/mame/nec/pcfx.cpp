@@ -49,14 +49,14 @@ private:
 	[[maybe_unused]] uint8_t extio_r(offs_t offset);
 	[[maybe_unused]] void extio_w(offs_t offset, uint8_t data);
 
-	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER( irq8_w );
-	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER( irq9_w );
-	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER( irq10_w );
-	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER( irq11_w );
-	DECLARE_WRITE_LINE_MEMBER( irq12_w );
-	DECLARE_WRITE_LINE_MEMBER( irq13_w );
-	DECLARE_WRITE_LINE_MEMBER( irq14_w );
-	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER( irq15_w );
+	[[maybe_unused]] void irq8_w(int state);
+	[[maybe_unused]] void irq9_w(int state);
+	[[maybe_unused]] void irq10_w(int state);
+	[[maybe_unused]] void irq11_w(int state);
+	void irq12_w(int state);
+	void irq13_w(int state);
+	void irq14_w(int state);
+	[[maybe_unused]] void irq15_w(int state);
 	template <int Pad> TIMER_CALLBACK_MEMBER(pad_func);
 
 	void pcfx_io(address_map &map);
@@ -353,42 +353,42 @@ inline void pcfx_state::set_irq_line(int line, int state)
 	check_irqs();
 }
 
-WRITE_LINE_MEMBER( pcfx_state::irq8_w )
+void pcfx_state::irq8_w(int state)
 {
 	set_irq_line(8, state);
 }
 
-WRITE_LINE_MEMBER( pcfx_state::irq9_w )
+void pcfx_state::irq9_w(int state)
 {
 	set_irq_line(9, state);
 }
 
-WRITE_LINE_MEMBER( pcfx_state::irq10_w )
+void pcfx_state::irq10_w(int state)
 {
 	set_irq_line(10, state);
 }
 
-WRITE_LINE_MEMBER( pcfx_state::irq11_w )
+void pcfx_state::irq11_w(int state)
 {
 	set_irq_line(11, state);
 }
 
-WRITE_LINE_MEMBER( pcfx_state::irq12_w )
+void pcfx_state::irq12_w(int state)
 {
 	set_irq_line(12, state);
 }
 
-WRITE_LINE_MEMBER( pcfx_state::irq13_w )
+void pcfx_state::irq13_w(int state)
 {
 	set_irq_line(13, state);
 }
 
-WRITE_LINE_MEMBER( pcfx_state::irq14_w )
+void pcfx_state::irq14_w(int state)
 {
 	set_irq_line(14, state);
 }
 
-WRITE_LINE_MEMBER( pcfx_state::irq15_w )
+void pcfx_state::irq15_w(int state)
 {
 	set_irq_line(15, state);
 }

@@ -223,13 +223,13 @@ void sente6vb_device::device_reset()
  *
  *************************************/
 
-WRITE_LINE_MEMBER(sente6vb_device::rec_w)
+void sente6vb_device::rec_w(int state)
 {
 	m_uart->write_rxd(state);
 }
 
 
-WRITE_LINE_MEMBER(sente6vb_device::uart_clock_w)
+void sente6vb_device::uart_clock_w(int state)
 {
 	if (state && BIT(m_counter_control, 5))
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, m_uint ? ASSERT_LINE : CLEAR_LINE);
@@ -245,7 +245,7 @@ WRITE_LINE_MEMBER(sente6vb_device::uart_clock_w)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(sente6vb_device::counter_0_set_out)
+void sente6vb_device::counter_0_set_out(int state)
 {
 	// OUT on counter 0 is hooked to the GATE line on counter 1 through an inverter
 	m_pit->write_gate1(!state);
@@ -255,7 +255,7 @@ WRITE_LINE_MEMBER(sente6vb_device::counter_0_set_out)
 }
 
 
-WRITE_LINE_MEMBER(sente6vb_device::set_counter_0_ff)
+void sente6vb_device::set_counter_0_ff(int state)
 {
 	// the flip/flop output is inverted, so if we went high to low, that's a clock
 	m_pit->write_clk0(!state);

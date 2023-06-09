@@ -52,17 +52,17 @@ void atari1050_device::mem_map(address_map &map)
 }
 
 
-WRITE_LINE_MEMBER(atari1050_device::data_out_w)
+void atari1050_device::data_out_w(int state)
 {
 	m_pia->pb6_w(state);
 }
 
-WRITE_LINE_MEMBER(atari1050_device::command_w)
+void atari1050_device::command_w(int state)
 {
 	m_pia->pb7_w(state);
 }
 
-WRITE_LINE_MEMBER(atari1050_device::ready_w)
+void atari1050_device::ready_w(int state)
 {
 	m_pia->pb1_w(state);
 }

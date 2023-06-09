@@ -32,10 +32,10 @@ protected:
 private:
 	void remap();
 
-	DECLARE_WRITE_LINE_MEMBER(side_sel_w);
-	DECLARE_WRITE_LINE_MEMBER(ram_access_w);
-	DECLARE_WRITE_LINE_MEMBER(rom_access_w);
-	DECLARE_WRITE_LINE_MEMBER(select_w);
+	void side_sel_w(int state);
+	void ram_access_w(int state);
+	void rom_access_w(int state);
+	void select_w(int state);
 
 	static void floppy_formats(format_registration &fr);
 

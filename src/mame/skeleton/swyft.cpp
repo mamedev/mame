@@ -354,29 +354,29 @@ private:
 	uint32_t screen_update_swyft(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint8_t bitlatch_r(offs_t offset);
-	template<int B> DECLARE_WRITE_LINE_MEMBER(bitlatch_q_w);
+	template<int B> void bitlatch_q_w(int state);
 
 	uint8_t swyft_via0_r(offs_t offset);
 	void swyft_via0_w(offs_t offset, uint8_t data);
 	uint8_t via0_pa_r();
 	void via0_pa_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(via0_ca2_w);
+	void via0_ca2_w(int state);
 	uint8_t via0_pb_r();
 	void via0_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(via0_cb1_w);
-	DECLARE_WRITE_LINE_MEMBER(via0_cb2_w);
+	void via0_cb1_w(int state);
+	void via0_cb2_w(int state);
 
 	uint8_t swyft_via1_r(offs_t offset);
 	void swyft_via1_w(offs_t offset, uint8_t data);
 	uint8_t via1_pa_r();
 	void via1_pa_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(via1_ca2_w);
+	void via1_ca2_w(int state);
 	uint8_t via1_pb_r();
 	void via1_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(via1_cb1_w);
-	DECLARE_WRITE_LINE_MEMBER(via1_cb2_w);
+	void via1_cb1_w(int state);
+	void via1_cb2_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	void write_acia_clock(int state);
 
 	void swyft_mem(address_map &map);
 };
@@ -616,7 +616,7 @@ uint32_t swyft_state::screen_update_swyft(screen_device &screen, bitmap_ind16 &b
 }
 
 template<int B>
-WRITE_LINE_MEMBER(swyft_state::bitlatch_q_w)
+void swyft_state::bitlatch_q_w(int state)
 {
 	logerror("74HCT259: Q%d %s\n", B, state ? "on" : "off");
 }
@@ -679,7 +679,7 @@ void swyft_state::via0_pa_w(uint8_t data)
 	LOGMASKED(LOG_VIA0, "VIA0: Port A written with data of 0x%02x!\n", data);
 }
 
-WRITE_LINE_MEMBER ( swyft_state::via0_ca2_w )
+void swyft_state::via0_ca2_w(int state)
 {
 	LOGMASKED(LOG_VIA0, "VIA0: CA2 written with %d!\n", state);
 }
@@ -695,12 +695,12 @@ void swyft_state::via0_pb_w(uint8_t data)
 	LOGMASKED(LOG_VIA0, "VIA0: Port B written with data of 0x%02x!\n", data);
 }
 
-WRITE_LINE_MEMBER ( swyft_state::via0_cb1_w )
+void swyft_state::via0_cb1_w(int state)
 {
 	LOGMASKED(LOG_VIA0, "VIA0: CB1 written with %d!\n", state);
 }
 
-WRITE_LINE_MEMBER ( swyft_state::via0_cb2_w )
+void swyft_state::via0_cb2_w(int state)
 {
 	LOGMASKED(LOG_VIA0, "VIA0: CB2 written with %d!\n", state);
 }
@@ -717,7 +717,7 @@ void swyft_state::via1_pa_w(uint8_t data)
 	LOGMASKED(LOG_VIA1, "VIA1: Port A written with data of 0x%02x!\n", data);
 }
 
-WRITE_LINE_MEMBER ( swyft_state::via1_ca2_w )
+void swyft_state::via1_ca2_w(int state)
 {
 	LOGMASKED(LOG_VIA1, "VIA1: CA2 written with %d!\n", state);
 }
@@ -733,17 +733,17 @@ void swyft_state::via1_pb_w(uint8_t data)
 	LOGMASKED(LOG_VIA1, "VIA1: Port B written with data of 0x%02x!\n", data);
 }
 
-WRITE_LINE_MEMBER ( swyft_state::via1_cb1_w )
+void swyft_state::via1_cb1_w(int state)
 {
 	LOGMASKED(LOG_VIA1, "VIA1: CB1 written with %d!\n", state);
 }
 
-WRITE_LINE_MEMBER ( swyft_state::via1_cb2_w )
+void swyft_state::via1_cb2_w(int state)
 {
 	LOGMASKED(LOG_VIA1, "VIA1: CB2 written with %d!\n", state);
 }
 
-WRITE_LINE_MEMBER( swyft_state::write_acia_clock )
+void swyft_state::write_acia_clock(int state)
 {
 	m_acia6850->write_txc(state);
 	m_acia6850->write_rxc(state);

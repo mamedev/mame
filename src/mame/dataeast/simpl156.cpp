@@ -343,7 +343,7 @@ static GFXDECODE_START( gfx_simpl156 )
 	GFXDECODE_ENTRY( "gfx2", 0, tile_16x16_layout, 0x200, 32 )    /* Sprites (16x16) */
 GFXDECODE_END
 
-WRITE_LINE_MEMBER(simpl156_state::vblank_interrupt)
+void simpl156_state::vblank_interrupt(int state)
 {
 	m_maincpu->set_input_line(ARM_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
 }

@@ -150,7 +150,7 @@ public:
 	void scorpion1_viper(machine_config &config);
 
 protected:
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
+	template <unsigned N> void reel_optic_cb(int state) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 	void bankswitch_w(uint8_t data);
 	uint8_t irqlatch_r();
 	void reel12_w(uint8_t data);

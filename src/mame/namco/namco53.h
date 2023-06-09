@@ -17,8 +17,8 @@ public:
 	auto k_port_callback() { return m_k.bind(); }
 	auto p_port_callback() { return m_p.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( reset );
-	DECLARE_WRITE_LINE_MEMBER( chip_select );
+	void reset(int state);
+	void chip_select(int state);
 	uint8_t read();
 
 protected:

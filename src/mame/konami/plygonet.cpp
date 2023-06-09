@@ -205,7 +205,7 @@ private:
 	// Sound handlers
 	void sound_ctrl_w(u8 data);
 	void update_sound_nmi();
-	DECLARE_WRITE_LINE_MEMBER(k054539_nmi_gen);
+	void k054539_nmi_gen(int state);
 
 	template <int PolyPage> void process_polys();
 	template <int PolyPage> void draw_poly(bitmap_rgb32 &bitmap, const u16 raw_color, const u16 span_ptr, const u16 raw_start, const u16 raw_end);
@@ -1027,7 +1027,7 @@ void polygonet_state::update_sound_nmi()
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(polygonet_state::k054539_nmi_gen)
+void polygonet_state::k054539_nmi_gen(int state)
 {
 	m_sound_intck = state;
 	update_sound_nmi();

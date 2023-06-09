@@ -107,29 +107,29 @@ public:
 
 	void set_address(offs_t offset, int state);
 
-	DECLARE_READ_LINE_MEMBER( sprd_out );
-	DECLARE_READ_LINE_MEMBER( spwt_out );
-	DECLARE_READ_LINE_MEMBER( sccs_out );
-	DECLARE_READ_LINE_MEMBER( sromcs_out );
+	int sprd_out();
+	int spwt_out();
+	int sccs_out();
+	int sromcs_out();
 
 	// Collective select line query
 	int gromcs_out();
 
-	DECLARE_READ_LINE_MEMBER( vdprd_out );
-	DECLARE_READ_LINE_MEMBER( vdpwt_out );
-	DECLARE_READ_LINE_MEMBER( lascsq_out );
-	DECLARE_READ_LINE_MEMBER( ggrdy_out );
-	DECLARE_WRITE_LINE_MEMBER( hold_cpu );
+	int vdprd_out();
+	int vdpwt_out();
+	int lascsq_out();
+	int ggrdy_out();
+	void hold_cpu(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( crus_in );
-	DECLARE_WRITE_LINE_MEMBER( crusgl_in );
-	DECLARE_WRITE_LINE_MEMBER( clock_in );
-	DECLARE_WRITE_LINE_MEMBER( memen_in );
+	void crus_in(int state);
+	void crusgl_in(int state);
+	void clock_in(int state);
+	void memen_in(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( sgmry );
-	DECLARE_WRITE_LINE_MEMBER( tsgry );
-	DECLARE_WRITE_LINE_MEMBER( p8gry );
-	DECLARE_WRITE_LINE_MEMBER( p3gry );
+	void sgmry(int state);
+	void tsgry(int state);
+	void p8gry(int state);
+	void p3gry(int state);
 
 private:
 	/*
@@ -258,22 +258,22 @@ public:
 	bool hexbus_access_debug();
 	bool intdsr_access_debug();
 
-	DECLARE_WRITE_LINE_MEMBER( clock_in );
-	DECLARE_WRITE_LINE_MEMBER( msast_in );
-	DECLARE_WRITE_LINE_MEMBER( lascs_in );
-	DECLARE_WRITE_LINE_MEMBER( pmemen_in );
-	DECLARE_WRITE_LINE_MEMBER( skdrcs_in );
+	void clock_in(int state);
+	void msast_in(int state);
+	void lascs_in(int state);
+	void pmemen_in(int state);
+	void skdrcs_in(int state);
 
-	DECLARE_READ_LINE_MEMBER( gromclk_out );
+	int gromclk_out();
 
-	DECLARE_READ_LINE_MEMBER( alccs_out );
-	DECLARE_READ_LINE_MEMBER( prcs_out );
-	DECLARE_READ_LINE_MEMBER( cmas_out );
-	DECLARE_READ_LINE_MEMBER( dbc_out );
+	int alccs_out();
+	int prcs_out();
+	int cmas_out();
+	int dbc_out();
 
-	DECLARE_READ_LINE_MEMBER( rom1cs_out );
-	DECLARE_READ_LINE_MEMBER( rom1am_out );
-	DECLARE_READ_LINE_MEMBER( rom1al_out );
+	int rom1cs_out();
+	int rom1am_out();
+	int rom1al_out();
 
 private:
 	// Memory cycle state
@@ -345,17 +345,17 @@ public:
 	int get_physical_address_debug(offs_t offset);
 	void mapper_access_debug(int data);
 
-	DECLARE_WRITE_LINE_MEMBER( srdy_in );
-	DECLARE_WRITE_LINE_MEMBER( clock_in );
-	DECLARE_WRITE_LINE_MEMBER( crus_in );
-	DECLARE_WRITE_LINE_MEMBER( lascs_in );
-	DECLARE_WRITE_LINE_MEMBER( memen_in );
+	void srdy_in(int state);
+	void clock_in(int state);
+	void crus_in(int state);
+	void lascs_in(int state);
+	void memen_in(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( holda_in );
+	void holda_in(int state);
 
-	DECLARE_READ_LINE_MEMBER( cpury_out );
-	DECLARE_READ_LINE_MEMBER( sramcs_out );
-	DECLARE_READ_LINE_MEMBER( skdrcs_out );
+	int cpury_out();
+	int sramcs_out();
+	int skdrcs_out();
 
 	void connect_sram(uint8_t* sram) { m_sram = sram; }
 	bool mapper_accessed() { return m_mapper_accessed; }
@@ -460,7 +460,7 @@ public:
 	void device_start() override;
 	void hexbus_value_changed(uint8_t data) override;
 
-	WRITE_LINE_MEMBER( clock_in );
+	void clock_in(int state);
 
 	// INT line
 	devcb_write_line m_int;
@@ -556,16 +556,16 @@ public:
 	void cruwrite(offs_t offset, uint8_t data);
 
 	// Control lines
-	DECLARE_WRITE_LINE_MEMBER( clock_in );
-	DECLARE_WRITE_LINE_MEMBER( dbin_in );
-	DECLARE_WRITE_LINE_MEMBER( msast_in );
-	DECLARE_WRITE_LINE_MEMBER( crus_in );
-	DECLARE_WRITE_LINE_MEMBER( ptgen_in );
-	DECLARE_WRITE_LINE_MEMBER( reset_console );
-	DECLARE_WRITE_LINE_MEMBER( hold_cpu );
-	DECLARE_WRITE_LINE_MEMBER( ggrdy_in );
+	void clock_in(int state);
+	void dbin_in(int state);
+	void msast_in(int state);
+	void crus_in(int state);
+	void ptgen_in(int state);
+	void reset_console(int state);
+	void hold_cpu(int state);
+	void ggrdy_in(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( holda_line );
+	void holda_line(int state);
 
 	auto ready_cb() { return m_ready.bind(); }
 	auto reset_cb() { return m_console_reset.bind(); }
@@ -574,13 +574,13 @@ public:
 	void set_paddress(int address);
 
 	// Ready lines from GROMs
-	DECLARE_WRITE_LINE_MEMBER( system_grom_ready );
-	DECLARE_WRITE_LINE_MEMBER( ptts_grom_ready );
-	DECLARE_WRITE_LINE_MEMBER( p8_grom_ready );
-	DECLARE_WRITE_LINE_MEMBER( p3_grom_ready );
-	DECLARE_WRITE_LINE_MEMBER( sound_ready );
-	DECLARE_WRITE_LINE_MEMBER( speech_ready );
-	DECLARE_WRITE_LINE_MEMBER( pbox_ready );
+	void system_grom_ready(int state);
+	void ptts_grom_ready(int state);
+	void p8_grom_ready(int state);
+	void p3_grom_ready(int state);
+	void sound_ready(int state);
+	void speech_ready(int state);
+	void pbox_ready(int state);
 
 protected:
 	void device_start() override;

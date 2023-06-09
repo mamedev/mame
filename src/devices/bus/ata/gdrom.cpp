@@ -867,7 +867,7 @@ void gdrom_device::signature()
 //  return atapi_cdrom_device::set_features();
 //}
 
-WRITE_LINE_MEMBER(gdrom_device::cdda_end_mark_cb)
+void gdrom_device::cdda_end_mark_cb(int state)
 {
 	if (state != ASSERT_LINE)
 		return;

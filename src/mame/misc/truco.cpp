@@ -253,10 +253,10 @@ private:
 	uint8_t m_trigger = 0;
 
 	void porta_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia_ca2_w);
+	void pia_ca2_w(int state);
 	void portb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia_irqa_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_irqb_w);
+	void pia_irqa_w(int state);
+	void pia_irqb_w(int state);
 
 	void palette(palette_device &palette) const;
 
@@ -320,7 +320,7 @@ void truco_state::porta_w(uint8_t data)
 	LOGPIA("Port A writes: %2x\n", data);
 }
 
-WRITE_LINE_MEMBER(truco_state::pia_ca2_w)
+void truco_state::pia_ca2_w(int state)
 {
 /*  PIA CA2 line is connected to IC U19, leg 11.
     The IC was successfully identified as MAX691.
@@ -341,12 +341,12 @@ void truco_state::portb_w(uint8_t data)
 		LOGPIA("Port B writes: %2x\n", data);
 }
 
-WRITE_LINE_MEMBER(truco_state::pia_irqa_w)
+void truco_state::pia_irqa_w(int state)
 {
 	LOGPIA("PIA irq A: %2x\n", state);
 }
 
-WRITE_LINE_MEMBER(truco_state::pia_irqb_w)
+void truco_state::pia_irqb_w(int state)
 {
 	LOGPIA("PIA irq B: %2x\n", state);
 }

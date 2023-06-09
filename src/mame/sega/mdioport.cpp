@@ -316,7 +316,7 @@ megadrive_io_port_device::megadrive_io_port_device(
 }
 
 
-WRITE_LINE_MEMBER(megadrive_io_port_device::th_w)
+void megadrive_io_port_device::th_w(int state)
 {
 	u8 const th = state ? DATA_TH_MASK : 0x00;
 	if (th != m_th_in)
@@ -420,7 +420,7 @@ gamegear_io_port_device::gamegear_io_port_device(
 }
 
 
-WRITE_LINE_MEMBER(gamegear_io_port_device::th_w)
+void gamegear_io_port_device::th_w(int state)
 {
 	u8 const th = state ? DATA_TH_MASK : 0x00;
 	if (th != m_th_in)

@@ -942,7 +942,7 @@ void am9517a_device::write(offs_t offset, uint8_t data)
 //  hack_w - hold acknowledge
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( am9517a_device::hack_w )
+void am9517a_device::hack_w(int state)
 {
 	LOG("AM9517A Hold Acknowledge: %u\n", state);
 
@@ -955,7 +955,7 @@ WRITE_LINE_MEMBER( am9517a_device::hack_w )
 //  ready_w - ready
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( am9517a_device::ready_w )
+void am9517a_device::ready_w(int state)
 {
 	LOG("AM9517A Ready: %u\n", state);
 
@@ -967,7 +967,7 @@ WRITE_LINE_MEMBER( am9517a_device::ready_w )
 //  eop_w - end of process
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( am9517a_device::eop_w )
+void am9517a_device::eop_w(int state)
 {
 	LOG("AM9517A End of Process: %u\n", state);
 }
@@ -977,7 +977,7 @@ WRITE_LINE_MEMBER( am9517a_device::eop_w )
 //  dreq0_w - DMA request for channel 0
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( am9517a_device::dreq0_w )
+void am9517a_device::dreq0_w(int state)
 {
 	dma_request(0, state);
 }
@@ -987,7 +987,7 @@ WRITE_LINE_MEMBER( am9517a_device::dreq0_w )
 //  dreq0_w - DMA request for channel 1
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( am9517a_device::dreq1_w )
+void am9517a_device::dreq1_w(int state)
 {
 	dma_request(1, state);
 }
@@ -997,7 +997,7 @@ WRITE_LINE_MEMBER( am9517a_device::dreq1_w )
 //  dreq1_w - DMA request for channel 2
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( am9517a_device::dreq2_w )
+void am9517a_device::dreq2_w(int state)
 {
 	dma_request(2, state);
 }
@@ -1007,7 +1007,7 @@ WRITE_LINE_MEMBER( am9517a_device::dreq2_w )
 //  dreq3_w - DMA request for channel 3
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( am9517a_device::dreq3_w )
+void am9517a_device::dreq3_w(int state)
 {
 	dma_request(3, state);
 }

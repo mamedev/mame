@@ -277,12 +277,12 @@ protected:
 	void pia0_pa_w(u8 data);
 	void pia0_pb_w(u8 data);
 	u8 pia0_pa_r();
-	DECLARE_WRITE_LINE_MEMBER(pia0_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia0_cb2_w);
+	void pia0_ca2_w(int state);
+	void pia0_cb2_w(int state);
 	void pia1_pa_w(u8 data);
 	void pia1_pb_w(u8 data);
 	u8 pia1_pb_r();
-	DECLARE_WRITE_LINE_MEMBER(pia1_ca2_w);
+	void pia1_ca2_w(int state);
 
 	u8 m_led_data = 0;
 	u8 m_7seg_data = 0;
@@ -438,7 +438,7 @@ void csc_state::pia0_pb_w(u8 data)
 	update_display();
 }
 
-WRITE_LINE_MEMBER(csc_state::pia0_cb2_w)
+void csc_state::pia0_cb2_w(int state)
 {
 	// 7442 A2
 	m_inp_mux = (m_inp_mux & ~4) | (state ? 4 : 0);
@@ -446,7 +446,7 @@ WRITE_LINE_MEMBER(csc_state::pia0_cb2_w)
 	update_sound();
 }
 
-WRITE_LINE_MEMBER(csc_state::pia0_ca2_w)
+void csc_state::pia0_ca2_w(int state)
 {
 	// 7442 A3
 	m_inp_mux = (m_inp_mux & ~8) | (state ? 8 : 0);
@@ -496,7 +496,7 @@ u8 csc_state::pia1_pb_r()
 	return data | (*m_language << 6 & 0xc0);
 }
 
-WRITE_LINE_MEMBER(csc_state::pia1_ca2_w)
+void csc_state::pia1_ca2_w(int state)
 {
 	// printer?
 }

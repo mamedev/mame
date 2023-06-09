@@ -204,7 +204,7 @@ private:
 
 	void main_irq_ack_w(u8 data);
 	void rom_banksel_w(u8 data);
-	template <uint8_t Which> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
+	template <uint8_t Which> void coin_counter_w(int state);
 	u8 novram_data_r(address_space &space, offs_t offset);
 	void novram_data_w(offs_t offset, u8 data);
 	void novram_recall_w(offs_t offset, u8 data);
@@ -212,13 +212,13 @@ private:
 	void vscroll_w(offs_t offset, u8 data);
 	void hscroll_w(offs_t offset, u8 data);
 	void irq_ack_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(audio_reset_w);
+	void audio_reset_w(int state);
 	u8 audio_comm_stat_r();
 	void speech_strobe_w(offs_t offset, u8 data);
 	u8 speech_ready_r();
 	void speech_reset_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(foreground_bank_w);
-	DECLARE_WRITE_LINE_MEMBER(video_off_w);
+	void foreground_bank_w(int state);
+	void video_off_w(int state);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(generate_interrupt);
 	static rgb_t jedi_IRGB_3333(u32 raw);
@@ -252,7 +252,7 @@ void jedi_state::irq_ack_w(u8 data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(jedi_state::audio_reset_w)
+void jedi_state::audio_reset_w(int state)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 	if (!state)
@@ -386,13 +386,13 @@ void jedi_state::video_start()
 }
 
 
-WRITE_LINE_MEMBER(jedi_state::foreground_bank_w)
+void jedi_state::foreground_bank_w(int state)
 {
 	m_foreground_bank = state;
 }
 
 
-WRITE_LINE_MEMBER(jedi_state::video_off_w)
+void jedi_state::video_off_w(int state)
 {
 	m_video_off = state;
 }
@@ -786,7 +786,7 @@ void jedi_state::rom_banksel_w(u8 data)
  *************************************/
 
  template <uint8_t Which> // 0 left, 1 right
-WRITE_LINE_MEMBER(jedi_state::coin_counter_w)
+void jedi_state::coin_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(Which, state);
 }

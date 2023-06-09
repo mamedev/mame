@@ -22,7 +22,7 @@ public:
 
 	// reading and writing
 	virtual uint8_t read() = 0;
-	virtual DECLARE_WRITE_LINE_MEMBER(dir_w) = 0;
+	virtual void dir_w(int state) = 0;
 	virtual void write(uint8_t data) = 0;
 	virtual void set_ready() = 0;
 
@@ -65,7 +65,7 @@ public:
 		return m_cart->read();
 	}
 
-	DECLARE_WRITE_LINE_MEMBER(dir_w)
+	void dir_w(int state)
 	{
 		m_cart->dir_w(state);
 	}

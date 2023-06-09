@@ -72,7 +72,7 @@ protected:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(ninjakd2_get_bg_tile_info);
 	uint32_t screen_update_ninjakd2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_ninjakd2);
+	void screen_vblank_ninjakd2(int state);
 
 	void bg_ctrl(int offset, int data, tilemap_t* tilemap);
 	void gfx_unscramble();

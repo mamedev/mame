@@ -356,7 +356,7 @@ protected:
 	void rtc_latch_w(u8 data);
 	u8 switched_r(offs_t offset);
 	void switched_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(turbo_w);
+	void turbo_w(int state);
 	void msx2_base_io_map(address_map &map);
 	void msx2_io_map(address_map &map);
 	void msx2plus_io_map(address_map &map);

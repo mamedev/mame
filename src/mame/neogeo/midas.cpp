@@ -115,7 +115,7 @@ private:
 	required_shared_ptr<uint16_t> m_zoomram;
 	required_region_ptr<uint8_t> m_zoomtable;
 
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 
 	void hammer_map(address_map &map);
 	void livequiz_map(address_map &map);
@@ -616,7 +616,7 @@ void midas_state::machine_reset()
 {
 }
 
-WRITE_LINE_MEMBER(midas_state::screen_vblank)
+void midas_state::screen_vblank(int state)
 {
 	if (state) m_sprgen->buffer_vram();
 }

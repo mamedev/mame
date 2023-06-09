@@ -403,7 +403,7 @@ void spectrum_disciple_device::device_reset()
 //  IMPLEMENTATION  spectrum_plusd_device
 //**************************************************************************
 
-READ_LINE_MEMBER(spectrum_plusd_device::romcs)
+int spectrum_plusd_device::romcs()
 {
 	return m_romcs;
 }
@@ -530,7 +530,7 @@ INPUT_CHANGED_MEMBER(spectrum_plusd_device::snapshot_button)
 	}
 }
 
-WRITE_LINE_MEMBER(spectrum_plusd_device::busy_w)
+void spectrum_plusd_device::busy_w(int state)
 {
 	m_centronics_busy = state;
 }
@@ -539,7 +539,7 @@ WRITE_LINE_MEMBER(spectrum_plusd_device::busy_w)
 //  IMPLEMENTATION  spectrum_disciple_device
 //**************************************************************************
 
-READ_LINE_MEMBER(spectrum_disciple_device::romcs)
+int spectrum_disciple_device::romcs()
 {
 	return m_romcs | m_exp->romcs();
 }

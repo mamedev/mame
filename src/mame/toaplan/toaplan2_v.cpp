@@ -393,7 +393,7 @@ u32 truxton2_state::screen_update_truxton2(screen_device &screen, bitmap_ind16 &
 }
 
 
-WRITE_LINE_MEMBER(toaplan2_state::screen_vblank)
+void toaplan2_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)

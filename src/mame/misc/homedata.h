@@ -86,9 +86,9 @@ protected:
 	DECLARE_VIDEO_START(mirderby);
 	void mirderby_palette(palette_device &palette) const ATTR_COLD;
 	uint32_t screen_update_mirderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	INTERRUPT_GEN_MEMBER(homedata_irq);
-	void mrokumei_handleblit( int rom_base );
+	void mrokumei_handleblit(int rom_base);
 	void mirderby_info0(tile_data &tileinfo, int tile_index, int page, int gfxbank);
 	void mirderby_info1(tile_data &tileinfo, int tile_index, int page, int gfxbank);
 

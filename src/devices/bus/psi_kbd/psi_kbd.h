@@ -61,12 +61,12 @@ public:
 	auto key_strobe() { return m_key_strobe_handler.bind(); }
 
 	// called from keyboard
-	DECLARE_WRITE_LINE_MEMBER( rx_w ) { m_rx_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( key_strobe_w ) { m_key_strobe_handler(state); }
+	void rx_w(int state) { m_rx_handler(state); }
+	void key_strobe_w(int state) { m_key_strobe_handler(state); }
 	void key_data_w(uint8_t data) { m_key_data = data; }
 
 	// called from host
-	DECLARE_WRITE_LINE_MEMBER( tx_w );
+	void tx_w(int state);
 	uint8_t key_data_r() { return m_key_data; }
 
 protected:

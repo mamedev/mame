@@ -75,12 +75,12 @@ private:
 	void key_x_w(offs_t offset, uint8_t data);
 	void z2_p1_w(uint8_t data);
 	uint8_t z2_p2_r();
-	DECLARE_READ_LINE_MEMBER( z2_t1_r ) { return m_t1_z2; }
+	int z2_t1_r() { return m_t1_z2; }
 
 	void led_w(uint8_t data);
 	uint8_t z5_p1_r();
 	void z5_p2_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( z5_t1_r ) { return m_t1_z5; }
+	int z5_t1_r() { return m_t1_z5; }
 
 	void keyboard_io(address_map &map);
 	void keyboard_mem(address_map &map);

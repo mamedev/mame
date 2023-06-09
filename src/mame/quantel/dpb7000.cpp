@@ -180,7 +180,7 @@ private:
 	void fddcpu_p1_w(uint8_t data);
 	uint8_t fddcpu_p2_r();
 	void fddcpu_p2_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(fddcpu_debug_rx);
+	void fddcpu_debug_rx(int state);
 
 	bool handle_command(uint16_t data);
 	void store_address_w(uint8_t card, uint16_t data);
@@ -369,8 +369,8 @@ private:
 	uint8_t keyboard_p2_r();
 	void keyboard_p1_w(uint8_t data);
 	void keyboard_p2_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER(keyboard_t0_r);
-	DECLARE_READ_LINE_MEMBER(keyboard_t1_r);
+	int keyboard_t0_r();
+	int keyboard_t1_r();
 	uint8_t m_keybc_latched_bit;
 	uint8_t m_keybc_p1_data;
 	uint8_t m_keybc_tx;
@@ -398,7 +398,7 @@ private:
 	void tds_convert_w(uint8_t data);
 	uint8_t tds_adc_r();
 	uint8_t tds_pen_switches_r();
-	DECLARE_WRITE_LINE_MEMBER(duart_b_w);
+	void duart_b_w(int state);
 	TIMER_CALLBACK_MEMBER(tablet_tx_tick);
 	TIMER_CALLBACK_MEMBER(tds_adc_tick);
 	TIMER_CALLBACK_MEMBER(tds_press_tick);
@@ -3044,7 +3044,7 @@ uint8_t dpb7000_state::fdd_cmd_r()
 	return m_diskseq_cmd_to_ctrl;
 }
 
-WRITE_LINE_MEMBER(dpb7000_state::fddcpu_debug_rx)
+void dpb7000_state::fddcpu_debug_rx(int state)
 {
 	if (m_fdd_debug_rx_bit_count < 10)
 	{
@@ -3093,13 +3093,13 @@ void dpb7000_state::keyboard_p2_w(uint8_t data)
 	m_keybc_tx = BIT(~data, 7);
 }
 
-READ_LINE_MEMBER(dpb7000_state::keyboard_t0_r)
+int dpb7000_state::keyboard_t0_r()
 {
 	LOGMASKED(LOG_KEYBC, "%s: T0 read\n", machine().describe_context());
 	return 0;
 }
 
-READ_LINE_MEMBER(dpb7000_state::keyboard_t1_r)
+int dpb7000_state::keyboard_t1_r()
 {
 	uint8_t data = m_keybc_latched_bit;
 	//m_keybc_latched_bit = 0;
@@ -3200,7 +3200,7 @@ TIMER_CALLBACK_MEMBER(dpb7000_state::tablet_tx_tick)
 	}
 }
 
-WRITE_LINE_MEMBER(dpb7000_state::duart_b_w)
+void dpb7000_state::duart_b_w(int state)
 {
 	//printf("B%d ", state);
 }

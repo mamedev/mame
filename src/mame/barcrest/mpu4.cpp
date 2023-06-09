@@ -440,7 +440,7 @@ MACHINE_RESET_MEMBER(mpu4_state, mpu4)
 
 
 /* 6809 IRQ handler */
-WRITE_LINE_MEMBER(mpu4_state::cpu0_irq)
+void mpu4_state::cpu0_irq(int state)
 {
 	/* The PIA and PTM IRQ lines are all connected to a common PCB track, leading directly to the 6809 IRQ line. */
 	uint8_t combined_state = m_pia3->irq_a_state() | m_pia3->irq_b_state() |
@@ -502,7 +502,7 @@ void mpu4_state::bankset_w(uint8_t data)
 
 
 /* IC2 6840 PTM handler */
-WRITE_LINE_MEMBER(mpu4_state::ic2_o1_callback)
+void mpu4_state::ic2_o1_callback(int state)
 {
 	m_6840ptm->set_c2(state);    /* copy output value to IC2 c2
 	this output is the clock for timer2 */
@@ -510,7 +510,7 @@ WRITE_LINE_MEMBER(mpu4_state::ic2_o1_callback)
 }
 
 
-WRITE_LINE_MEMBER(mpu4_state::ic2_o2_callback)
+void mpu4_state::ic2_o2_callback(int state)
 {
 	m_pia3->ca1_w(state);    /* copy output value to IC3 ca1 */
 	/* the output from timer2 is the input clock for timer3 */
@@ -519,7 +519,7 @@ WRITE_LINE_MEMBER(mpu4_state::ic2_o2_callback)
 }
 
 
-WRITE_LINE_MEMBER(mpu4_state::ic2_o3_callback)
+void mpu4_state::ic2_o3_callback(int state)
 {
 	/* the output from timer3 is used as a square wave for the alarm output
 	and as an external clock source for timer 1! */
@@ -577,14 +577,14 @@ void mpu4_state::pia_ic3_portb_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(mpu4_state::pia_ic3_ca2_w)
+void mpu4_state::pia_ic3_ca2_w(int state)
 {
 	LOGMASKED(LOG_IC3, "%s: IC3 PIA Write CA2 (alpha data), %02X\n", machine().describe_context(), state);
 	m_vfd->data(state);
 }
 
 
-WRITE_LINE_MEMBER(mpu4_state::pia_ic3_cb2_w)
+void mpu4_state::pia_ic3_cb2_w(int state)
 {
 	LOGMASKED(LOG_IC3, "%s: IC3 PIA Write CB (alpha reset), %02X\n", machine().describe_context(), state);
 // DM Data pin A
@@ -659,7 +659,7 @@ TIMER_CALLBACK_MEMBER(mpu4_state::update_ic24)
 }
 
 
-WRITE_LINE_MEMBER(mpu4_state::dataport_rxd)
+void mpu4_state::dataport_rxd(int state)
 {
 	m_pia4->cb1_w(state);
 	m_serial_output = state;
@@ -739,7 +739,7 @@ uint8_t mpu4_state::pia_ic4_portb_r()
 }
 
 
-WRITE_LINE_MEMBER(mpu4_state::pia_ic4_ca2_w)
+void mpu4_state::pia_ic4_ca2_w(int state)
 {
 	LOGMASKED(LOG_IC3, "%s: IC4 PIA Write CA (input MUX strobe /LED B), %02X\n", machine().describe_context(), state);
 
@@ -747,7 +747,7 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic4_ca2_w)
 	ic23_update();
 }
 
-WRITE_LINE_MEMBER(mpu4_state::pia_ic4_cb2_w)
+void mpu4_state::pia_ic4_cb2_w(int state)
 {
 	LOGMASKED(LOG_IC3, "%s: IC4 PIA Write CB (Reel optic flag), %02X\n", machine().describe_context(), state);
 	m_reel_flag=state;
@@ -1001,7 +1001,7 @@ void mpu4_state::update_ay()
 }
 
 
-WRITE_LINE_MEMBER(mpu4_state::pia_ic5_cb2_w)
+void mpu4_state::pia_ic5_cb2_w(int state)
 {
 	update_ay();
 }
@@ -1040,7 +1040,7 @@ void mpu4_state::pia_ic6_porta_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(mpu4_state::pia_ic6_ca2_w)
+void mpu4_state::pia_ic6_ca2_w(int state)
 {
 	LOG("%s: IC6 PIA write CA2 %2x (AY8913 BC1)\n", machine().describe_context(), state);
 	if (m_ay8913.found())
@@ -1052,7 +1052,7 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic6_ca2_w)
 }
 
 
-WRITE_LINE_MEMBER(mpu4_state::pia_ic6_cb2_w)
+void mpu4_state::pia_ic6_cb2_w(int state)
 {
 	LOG("%s: IC6 PIA write CB2 %2x (AY8913 BCDIR)\n", machine().describe_context(), state);
 	if (m_ay8913.found())
@@ -1133,7 +1133,7 @@ uint8_t mpu4_state::pia_ic7_portb_r()
 	}
 }
 
-WRITE_LINE_MEMBER(mpu4_state::pia_ic7_ca2_w)
+void mpu4_state::pia_ic7_ca2_w(int state)
 {
 	LOG("%s: IC7 PIA write CA2 %2x (input strobe bit 0 / LED A)\n", machine().describe_context(), state);
 
@@ -1142,7 +1142,7 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic7_ca2_w)
 	ic23_update();
 }
 
-WRITE_LINE_MEMBER(mpu4_state::pia_ic7_cb2_w)
+void mpu4_state::pia_ic7_cb2_w(int state)
 {
 	m_remote_meter = state?0x80:0x00;
 }
@@ -1185,7 +1185,7 @@ void mpu4_state::pia_ic8_portb_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(mpu4_state::pia_ic8_ca2_w)
+void mpu4_state::pia_ic8_ca2_w(int state)
 {
 	LOGMASKED(LOG_IC8, "%s: IC8 PIA write CA2 (input_strobe bit 2 / LED C) %02X\n", machine().describe_context(), state & 0xff);
 
@@ -1194,7 +1194,7 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic8_ca2_w)
 }
 
 
-WRITE_LINE_MEMBER(mpu4_state::pia_ic8_cb2_w)
+void mpu4_state::pia_ic8_cb2_w(int state)
 {
 	LOGMASKED(LOG_IC8, "%s: IC8 PIA write CB2 (alpha clock) %02X\n", machine().describe_context(), state & 0xff);
 
@@ -1203,7 +1203,7 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic8_cb2_w)
 	m_vfd->sclk(!state);
 }
 
-WRITE_LINE_MEMBER(mpu4_state::pia_gb_cb2_w)
+void mpu4_state::pia_gb_cb2_w(int state)
 {
 	// Some BWB games use this to drive the bankswitching
 	// should the regular bankswitch still work in these cases?

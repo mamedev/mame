@@ -122,10 +122,10 @@ private:
 	void pia1b_w(u8 data);
 	void pia0a_g1w(u8 data);
 	void pia1a_g1w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(pia0_ca2_g1w);
-	DECLARE_WRITE_LINE_MEMBER(pia0_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia0_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia1_cb2_w);
+	void pia0_ca2_g1w(int state);
+	void pia0_ca2_w(int state);
+	void pia0_cb2_w(int state);
+	void pia1_cb2_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(pia0_timer);
 
 	void by6803_map(address_map &map);
@@ -265,7 +265,7 @@ void by6803_state::port2_w(u8 data)
 }
 
 // display latch strobes; display blanking
-WRITE_LINE_MEMBER( by6803_state::pia0_ca2_w )
+void by6803_state::pia0_ca2_w(int state)
 {
 	if (state)
 	{
@@ -278,13 +278,13 @@ WRITE_LINE_MEMBER( by6803_state::pia0_ca2_w )
 }
 
 // lamp strobe 1 when high
-WRITE_LINE_MEMBER( by6803_state::pia0_cb2_w )
+void by6803_state::pia0_cb2_w(int state)
 {
 	//printf("CB02=%X,m_pia0_a=%X ",state,m_pia0_a);
 }
 
 // sol bank select (0 to enable sol selection)
-WRITE_LINE_MEMBER( by6803_state::pia1_cb2_w )
+void by6803_state::pia1_cb2_w(int state)
 {
 	//printf("CB12=%X ",state);
 }
@@ -417,7 +417,7 @@ void by6803_state::pia1a_g1w(u8 data)
 		m_segment[4] = BIT(m_pia0_a, 4, 4);
 }
 
-WRITE_LINE_MEMBER( by6803_state::pia0_ca2_g1w )
+void by6803_state::pia0_ca2_g1w(int state)
 {
 	static const u8 patterns[16] = { 0x3f,0x06,0xdb,0xcf,0xe6,0xed,0xfd,0x07,0xff,0xef,0,0,0,0,0,0 }; // MC14543
 	if (state)

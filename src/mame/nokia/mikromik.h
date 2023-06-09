@@ -119,25 +119,25 @@ private:
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( a8_w );
-	DECLARE_WRITE_LINE_MEMBER( recall_w );
-	DECLARE_WRITE_LINE_MEMBER( rx21_w );
-	DECLARE_WRITE_LINE_MEMBER( tx21_w );
-	DECLARE_WRITE_LINE_MEMBER( rcl_w );
-	DECLARE_WRITE_LINE_MEMBER( intc_w );
-	DECLARE_WRITE_LINE_MEMBER( llen_w );
-	DECLARE_WRITE_LINE_MEMBER( motor_on_w );
-	DECLARE_WRITE_LINE_MEMBER( dma_hrq_w );
+	void a8_w(int state);
+	void recall_w(int state);
+	void rx21_w(int state);
+	void tx21_w(int state);
+	void rcl_w(int state);
+	void intc_w(int state);
+	void llen_w(int state);
+	void motor_on_w(int state);
+	void dma_hrq_w(int state);
 	uint8_t mpsc_dack_r();
 	void mpsc_dack_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( dma_eop_w );
-	DECLARE_WRITE_LINE_MEMBER( dack3_w );
-	DECLARE_WRITE_LINE_MEMBER( itxc_w );
-	DECLARE_WRITE_LINE_MEMBER( irxc_w );
-	DECLARE_WRITE_LINE_MEMBER( auxc_w );
-	DECLARE_WRITE_LINE_MEMBER( drq2_w );
-	DECLARE_WRITE_LINE_MEMBER( drq1_w );
-	DECLARE_READ_LINE_MEMBER( dsra_r );
+	void dma_eop_w(int state);
+	void dack3_w(int state);
+	void itxc_w(int state);
+	void irxc_w(int state);
+	void auxc_w(int state);
+	void drq2_w(int state);
+	void drq1_w(int state);
+	int dsra_r();
 
 	void update_tc();
 

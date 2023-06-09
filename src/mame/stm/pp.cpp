@@ -60,21 +60,21 @@ protected:
 private:
 	SCN2672_DRAW_CHARACTER_MEMBER(display_char);
 
-	template<int Line> DECLARE_WRITE_LINE_MEMBER(int_w);
+	template<int Line> void int_w(int state);
 	TIMER_CALLBACK_MEMBER(int_update);
 	IRQ_CALLBACK_MEMBER(intak_cb);
 
 	void kbd_scan_w(u8 data);
 	u8 kbd_cols_r();
-	DECLARE_READ_LINE_MEMBER(cntl_r);
-	DECLARE_READ_LINE_MEMBER(shift_r);
-	DECLARE_WRITE_LINE_MEMBER(printer_busy_w);
+	int cntl_r();
+	int shift_r();
+	void printer_busy_w(int state);
 
 	u8 memory_r(offs_t offset);
 	void memory_w(offs_t offset, u8 data);
 	u8 stat_r();
 	void co_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(hld_w);
+	void hld_w(int state);
 	void mode_w(u8 data);
 
 	void mem_map(address_map &map);
@@ -136,7 +136,7 @@ void pp_state::machine_reset()
 
 
 template <int Line>
-WRITE_LINE_MEMBER(pp_state::int_w)
+void pp_state::int_w(int state)
 {
 	if (BIT(m_int_pending, Line) == state)
 		return;
@@ -210,19 +210,19 @@ u8 pp_state::kbd_cols_r()
 		return m_kbd_rows[m_kbd_scan & 7]->read();
 }
 
-READ_LINE_MEMBER(pp_state::cntl_r)
+int pp_state::cntl_r()
 {
 	// pin 1 of J13 connector
 	return (m_modifiers->read() & 0x5) == 0x5;
 }
 
-READ_LINE_MEMBER(pp_state::shift_r)
+int pp_state::shift_r()
 {
 	// pin 3 of J13 connector
 	return (m_modifiers->read() & 0x6) == 0x6;
 }
 
-WRITE_LINE_MEMBER(pp_state::printer_busy_w)
+void pp_state::printer_busy_w(int state)
 {
 	m_printer_busy = state;
 }
@@ -302,7 +302,7 @@ void pp_state::co_w(u8 data)
 	m_kbd_release = BIT(data, 7);
 }
 
-WRITE_LINE_MEMBER(pp_state::hld_w)
+void pp_state::hld_w(int state)
 {
 	for (int i = 0; i < 2; i++)
 		if (m_floppy[i]->get_device() != nullptr)

@@ -308,7 +308,7 @@ void pce_cd_device::adpcm_play()
   the MSM5205. Currently we can only use static clocks for the
   MSM5205.
  */
-WRITE_LINE_MEMBER( pce_cd_device::msm5205_int )
+void pce_cd_device::msm5205_int(int state)
 {
 	uint8_t msm_data;
 
@@ -877,7 +877,7 @@ void pce_cd_device::handle_data_output()
 	}
 }
 
-WRITE_LINE_MEMBER(pce_cd_device::cdda_end_mark_cb)
+void pce_cd_device::cdda_end_mark_cb(int state)
 {
 	if (state != ASSERT_LINE)
 		return;

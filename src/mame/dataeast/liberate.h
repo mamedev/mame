@@ -97,11 +97,11 @@ private:
 	uint32_t screen_update_prosport(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_boomrang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_prosoccr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(deco16_interrupt);
-	void liberate_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void prosport_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void boomrang_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
-	void prosoccr_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void deco16_interrupt(int state);
+	void liberate_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void prosport_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void boomrang_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
+	void prosoccr_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void deco16_io_map(address_map &map);
 	void decrypted_opcodes_map(address_map &map);
 	void liberatb_map(address_map &map);

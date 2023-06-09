@@ -23,7 +23,7 @@ public:
 	virtual void ExecCommand() override;
 	virtual void WriteData( uint8_t *data, int dataLength ) override;
 	virtual void ReadData( uint8_t *data, int dataLength ) override;
-	DECLARE_WRITE_LINE_MEMBER(cdda_end_mark_cb);
+	void cdda_end_mark_cb(int state);
 
 protected:
 	virtual void process_buffer() override;

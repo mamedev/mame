@@ -151,7 +151,7 @@ void stfight_state::stfight_coin_w(uint8_t data)
  *      Machine hardware for MSM5205 ADPCM sound control
  */
 
-WRITE_LINE_MEMBER(stfight_state::stfight_adpcm_int)
+void stfight_state::stfight_adpcm_int(int state)
 {
 	if (!state)
 		return;

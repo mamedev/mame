@@ -81,7 +81,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE_LINE_MEMBER(int_enable_w);
+	void int_enable_w(int state);
 
 	u8 mw8080bw_shift_result_rev_r();
 
@@ -123,7 +123,7 @@ private:
 	DECLARE_MACHINE_START(maze);
 	DECLARE_MACHINE_START(phantom2);
 	uint32_t screen_update_phantom2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_phantom2);
+	void screen_vblank_phantom2(int state);
 	TIMER_CALLBACK_MEMBER(maze_tone_timing_timer_callback);
 	TIMER_CALLBACK_MEMBER(interrupt_trigger);
 	void tornbase_audio_w(uint8_t data);

@@ -58,7 +58,6 @@ TODO:
 - tithermos temperature sensor comparator (right now just the digital clock works)
 - is alphie(patent) the same as the final version?
 - is starwbcp the same as MP3438? (starwbc is MP3438A)
-- fingbowl internal artwork
 
 ================================================================================
 
@@ -481,7 +480,8 @@ INPUT_CHANGED_MEMBER(hh_tms1k_state::reset_button)
 
 INPUT_CHANGED_MEMBER(hh_tms1k_state::power_button)
 {
-	set_power((bool)param);
+	if (newval != field.defvalue())
+		set_power((bool)param);
 }
 
 void hh_tms1k_state::auto_power_off(int state)
@@ -7221,7 +7221,7 @@ INPUT_PORTS_END
 void elecdet_state::elecdet(machine_config &config)
 {
 	// basic machine hardware
-	TMS0980(config, m_maincpu, 425000); // approximation
+	TMS0980(config, m_maincpu, 450000); // approximation
 	m_maincpu->read_k().set(FUNC(elecdet_state::read_k));
 	m_maincpu->write_r().set(FUNC(elecdet_state::write_r));
 	m_maincpu->write_o().set(FUNC(elecdet_state::write_o));
@@ -11179,7 +11179,7 @@ static const u16 comparc_output_pla[0x20] =
 void comparc_state::comparc(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 400000); // approximation - RC osc. R=39K, C=47pF
+	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=39K, C=47pF
 	m_maincpu->set_output_pla(comparc_output_pla);
 	m_maincpu->read_k().set(FUNC(comparc_state::read_k));
 	m_maincpu->write_r().set(FUNC(comparc_state::write_r));
@@ -15230,8 +15230,9 @@ ROM_END
   * TMS1100 MP1288 (no decap)
   * 3 7seg LEDs, 1-bit sound
 
-  It's a track & field board game, played by sliding or tapping your finger.
-  5 hurdles were included, though they're not essential.
+  It's a track & field electronic board game, played by sliding or tapping
+  your finger. Instructions on how to play the events are written on the
+  device itself. 5 hurdles were included, though they're not essential.
 
 *******************************************************************************/
 
@@ -15513,8 +15514,9 @@ private:
 
 void tmvolleyb_state::update_display()
 {
-	// O7 also selects left digit
-	m_display->matrix((m_o >> 7 & 1) | (m_r >> 3 & 0xe), m_o);
+	// O7 goes to left digit segments B/C
+	m_display->matrix_partial(0, 1, BIT(m_r, 4), BIT(m_o, 7) * 6);
+	m_display->matrix_partial(1, 3, m_r >> 4, m_o);
 }
 
 void tmvolleyb_state::write_r(u32 data)
@@ -15522,7 +15524,8 @@ void tmvolleyb_state::write_r(u32 data)
 	// R0-R3,R7-R9: input mux
 	m_inp_mux = (data & 0xf) | (data >> 3 & 0x70);
 
-	// R4-R6: led select
+	// R4: digit select
+	// R5,R6: led select
 	m_r = data;
 	update_display();
 
@@ -16880,7 +16883,7 @@ SYST( 1980, dxfootb,    0,         0,      dxfootb,   dxfootb,   dxfootb_state, 
 SYST( 1979, copycat,    0,         0,      copycat,   copycat,   copycat_state,   empty_init, "Tiger Electronics", "Copy Cat (model 7-520)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1989, copycata,   copycat,   0,      copycata,  copycata,  copycata_state,  empty_init, "Tiger Electronics", "Copy Cat (model 7-522)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 SYST( 1981, ditto,      0,         0,      ditto,     ditto,     ditto_state,     empty_init, "Tiger Electronics", "Ditto", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1981, fingbowl,   0,         0,      fingbowl,  fingbowl,  fingbowl_state,  empty_init, "Tiger Electronics", "Finger Bowl", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING ) // some of the games: ***
+SYST( 1981, fingbowl,   0,         0,      fingbowl,  fingbowl,  fingbowl_state,  empty_init, "Tiger Electronics", "Finger Bowl", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the games: ***
 SYST( 1982, t7in1ss,    0,         0,      t7in1ss,   t7in1ss,   t7in1ss_state,   empty_init, "Tiger Electronics", "7 in 1 Sports Stadium", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 SYST( 1979, tmvolleyb,  0,         0,      tmvolleyb, tmvolleyb, tmvolleyb_state, empty_init, "Tomy", "Volleyball (Tomy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

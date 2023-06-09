@@ -31,9 +31,9 @@ public:
 	// configuration helpers
 	auto rxd_handler() { return m_rxd_handler.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( write_txd );
+	void write_txd(int state);
 
-	DECLARE_READ_LINE_MEMBER( rxd_r ) { return m_rxd; }
+	int rxd_r() { return m_rxd; }
 
 protected:
 	sun_mouse_port_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock);
@@ -61,9 +61,9 @@ public:
 protected:
 	device_sun_mouse_port_interface(machine_config const &mconfig, device_t &device);
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) { }
+	virtual void input_txd(int state) { }
 
-	DECLARE_WRITE_LINE_MEMBER( output_rxd ) { m_port->m_rxd_handler(m_port->m_rxd = state ? 0 : 1); }
+	void output_rxd(int state) { m_port->m_rxd_handler(m_port->m_rxd = state ? 0 : 1); }
 
 	sun_mouse_port_device *m_port;
 

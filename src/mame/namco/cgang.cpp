@@ -154,11 +154,11 @@ private:
 	void sound_map(address_map &map);
 
 	// I/O handlers
-	DECLARE_WRITE_LINE_MEMBER(main_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(main_firq_w);
+	void main_irq_w(int state);
+	void main_firq_w(int state);
 	void main_irq_clear_w(u8 data);
 	void main_firq_clear_w(u8 data);
-	template<int N> DECLARE_WRITE_LINE_MEMBER(motor_clock_w);
+	template<int N> void motor_clock_w(int state);
 	void cg_motor_tick(int i);
 	TIMER_DEVICE_CALLBACK_MEMBER(door_motor_tick);
 	void refresh_motor_output();
@@ -259,7 +259,7 @@ void cgang_state::machine_reset()
 
 // maincpu (misc)
 
-WRITE_LINE_MEMBER(cgang_state::main_irq_w)
+void cgang_state::main_irq_w(int state)
 {
 	// irq on rising edge
 	if (state && !m_main_irq)
@@ -268,7 +268,7 @@ WRITE_LINE_MEMBER(cgang_state::main_irq_w)
 	m_main_irq = state;
 }
 
-WRITE_LINE_MEMBER(cgang_state::main_firq_w)
+void cgang_state::main_firq_w(int state)
 {
 	// firq on rising edge
 	if (state && !m_main_firq)
@@ -288,7 +288,7 @@ void cgang_state::main_firq_clear_w(u8 data)
 }
 
 template<int N>
-WRITE_LINE_MEMBER(cgang_state::motor_clock_w)
+void cgang_state::motor_clock_w(int state)
 {
 	// clock stepper motors
 	if (state && !m_cg_motor_clk[N] && BIT(m_cg_motor_on, N))

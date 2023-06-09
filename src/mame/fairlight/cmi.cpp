@@ -230,14 +230,14 @@ public:
 	void init_cmi2x();
 
 	// CPU card
-	DECLARE_WRITE_LINE_MEMBER(q133_acia_irq);
+	void q133_acia_irq(int state);
 	void i8214_cpu1_w(u8 data);
 	void i8214_cpu2_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(maincpu2_irq0_w);
-	DECLARE_WRITE_LINE_MEMBER(i8214_1_int_w);
-	DECLARE_WRITE_LINE_MEMBER(i8214_2_int_w);
-	DECLARE_WRITE_LINE_MEMBER(i8214_3_int_w);
-	DECLARE_WRITE_LINE_MEMBER(i8214_3_enlg);
+	void maincpu2_irq0_w(int state);
+	void i8214_1_int_w(int state);
+	void i8214_2_int_w(int state);
+	void i8214_3_int_w(int state);
+	void i8214_3_enlg(int state);
 	u8 shared_ram_r(offs_t offset);
 	void shared_ram_w(offs_t offset, u8 data);
 	template<int CpuNum> u8 perr_r(offs_t offset);
@@ -256,7 +256,7 @@ public:
 	void q133_1_porta_w(u8 data);
 	void q133_1_portb_w(u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER(cmi_iix_vblank);
+	void cmi_iix_vblank(int state);
 	IRQ_CALLBACK_MEMBER(cpu1_interrupt_callback);
 	IRQ_CALLBACK_MEMBER(cpu2_interrupt_callback);
 
@@ -282,9 +282,9 @@ public:
 
 	[[maybe_unused]] u8 tvt_r();
 	[[maybe_unused]] void tvt_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(pia_q219_irqa);
-	DECLARE_WRITE_LINE_MEMBER(pia_q219_irqb);
-	DECLARE_WRITE_LINE_MEMBER(ptm_q219_irq);
+	void pia_q219_irqa(int state);
+	void pia_q219_irqb(int state);
+	void ptm_q219_irq(int state);
 	u32 screen_update_cmi2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// Memory mapping
@@ -307,14 +307,14 @@ public:
 	// MIDI/SMPTE
 	void midi_dma_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 midi_dma_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(midi_ptm0_c3_w);
+	void midi_ptm0_c3_w(int state);
 	void midi_latch_w(u8 data);
 
 	// Floppy
 	void fdc_w(offs_t offset, u8 data);
 	u8 fdc_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(wd1791_irq);
-	DECLARE_WRITE_LINE_MEMBER(wd1791_drq);
+	void wd1791_irq(int state);
+	void wd1791_drq(int state);
 
 	// Master card
 	u8 cmi02_r(offs_t offset);
@@ -323,19 +323,19 @@ public:
 	u8 cmi02_chsel_r();
 	void master_tune_w(u8 data);
 	u8 master_tune_r();
-	DECLARE_WRITE_LINE_MEMBER(cmi02_ptm_irq);
-	DECLARE_WRITE_LINE_MEMBER(cmi02_ptm_o2);
-	DECLARE_WRITE_LINE_MEMBER(cmi02_pia2_irqa_w);
-	DECLARE_WRITE_LINE_MEMBER(cmi02_pia2_cb2_w);
+	void cmi02_ptm_irq(int state);
+	void cmi02_ptm_o2(int state);
+	void cmi02_pia2_irqa_w(int state);
+	void cmi02_pia2_cb2_w(int state);
 
 	u8 cmi07_r();
 	void cmi07_w(u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER(msm5832_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(cmi07_irq);
-	DECLARE_WRITE_LINE_MEMBER(q133_acia_clock);
+	void msm5832_irq_w(int state);
+	void cmi07_irq(int state);
+	void q133_acia_clock(int state);
 
-	template<int Channel> DECLARE_WRITE_LINE_MEMBER(channel_irq);
+	template<int Channel> void channel_irq(int state);
 
 	void cmi2x(machine_config &config);
 	void cmi07cpu_map(address_map &map);
@@ -1040,7 +1040,7 @@ u16 cmi_state::midi_dma_r(offs_t offset)
 	return data;
 }
 
-WRITE_LINE_MEMBER(cmi_state::midi_ptm0_c3_w)
+void cmi_state::midi_ptm0_c3_w(int state)
 {
 	m_midi_ptm[1]->set_clock(0, state);
 	m_midi_ptm[1]->set_clock(1, state);
@@ -1262,7 +1262,7 @@ u8 cmi_state::cmi07_r()
 	return 0xff;
 }
 
-WRITE_LINE_MEMBER( cmi_state::q133_acia_irq )
+void cmi_state::q133_acia_irq(int state)
 {
 	set_interrupt(CPU_1, IRQ_ACINT_LEVEL, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -1434,7 +1434,7 @@ void cmi_state::fdc_dma_transfer()
 	m_fdc_dma_cnt.w.l++;
 }
 
-WRITE_LINE_MEMBER( cmi_state::wd1791_irq )
+void cmi_state::wd1791_irq(int state)
 {
 	if (state)
 	{
@@ -1451,7 +1451,7 @@ WRITE_LINE_MEMBER( cmi_state::wd1791_irq )
 	}
 }
 
-WRITE_LINE_MEMBER( cmi_state::wd1791_drq )
+void cmi_state::wd1791_drq(int state)
 {
 	m_fdc_drq = state;
 	if (state)
@@ -1505,25 +1505,25 @@ u8 cmi_state::cmi02_chsel_r()
 	return m_cmi02_pia_chsel;
 }
 
-WRITE_LINE_MEMBER( cmi_state::cmi02_ptm_irq )
+void cmi_state::cmi02_ptm_irq(int state)
 {
 	m_cmi02_ptm_irq = state;
 	set_interrupt(CPU_1, IRQ_TIMINT_LEVEL, m_cmi02_ptm_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( cmi_state::cmi02_ptm_o2 )
+void cmi_state::cmi02_ptm_o2(int state)
 {
 	m_cmi02_ptm->set_c1(state);
 	m_cmi02_ptm->set_c3(state);
 }
 
-WRITE_LINE_MEMBER( cmi_state::cmi02_pia2_irqa_w )
+void cmi_state::cmi02_pia2_irqa_w(int state)
 {
 	LOG("%s: cmi02_pia2_irqa_w: %d\n", machine().describe_context(), state);
 	set_interrupt(CPU_2, IRQ_ADINT_LEVEL, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( cmi_state::cmi02_pia2_cb2_w )
+void cmi_state::cmi02_pia2_cb2_w(int state)
 {
 	LOG("%s: cmi02_pia2_cb2_w: %d\n", machine().describe_context(), state);
 	m_cmi02_pia[1]->ca1_w(1);
@@ -1625,7 +1625,7 @@ void cmi_state::cmi02_w(offs_t offset, u8 data)
 }
 
 template<int Channel>
-WRITE_LINE_MEMBER(cmi_state::channel_irq)
+void cmi_state::channel_irq(int state)
 {
 	if (Channel == 0)
 	{
@@ -1715,7 +1715,7 @@ void cmi_state::aic_ad565_lsb_w(u8 data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER( cmi_state::ptm_q219_irq )
+void cmi_state::ptm_q219_irq(int state)
 {
 	set_interrupt(CPU_2, IRQ_RINT_LEVEL, state);
 }
@@ -1786,13 +1786,13 @@ void cmi_state::set_interrupt(int cpunum, int level, int state)
 	}
 }
 
-WRITE_LINE_MEMBER( cmi_state::maincpu2_irq0_w )
+void cmi_state::maincpu2_irq0_w(int state)
 {
 	LOG("%s: maincpu2_irq0_w: %d\n", machine().describe_context(), state);
 	set_interrupt(CPU_2, 0 ^ 7, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( cmi_state::i8214_1_int_w )
+void cmi_state::i8214_1_int_w(int state)
 {
 	LOG("%s: i8214_1_int_w %d%s\n", machine().describe_context(), state, state ? ", setting IRQ merger bit 0" : "");
 	if (state)
@@ -1803,14 +1803,14 @@ WRITE_LINE_MEMBER( cmi_state::i8214_1_int_w )
 	}
 }
 
-WRITE_LINE_MEMBER( cmi_state::i8214_2_int_w )
+void cmi_state::i8214_2_int_w(int state)
 {
 	LOG("%s: i8214_2_int_w: %d\n", machine().describe_context(), state);
 	if (state)
 		m_maincpu2->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( cmi_state::i8214_3_int_w )
+void cmi_state::i8214_3_int_w(int state)
 {
 	LOG("%s: i8214_3_int_w %d%s\n", machine().describe_context(), state, state ? ", setting IRQ merger bit 1" : "");
 	if (state)
@@ -1824,18 +1824,18 @@ WRITE_LINE_MEMBER( cmi_state::i8214_3_int_w )
 }
 
 
-WRITE_LINE_MEMBER( cmi_state::i8214_3_enlg )
+void cmi_state::i8214_3_enlg(int state)
 {
 	// Not needed?
 //  m_hp_int = state;
 }
 
-WRITE_LINE_MEMBER( cmi_state::pia_q219_irqa )
+void cmi_state::pia_q219_irqa(int state)
 {
 	set_interrupt(CPU_2, IRQ_TOUCHINT_LEVEL, state);
 }
 
-WRITE_LINE_MEMBER( cmi_state::pia_q219_irqb )
+void cmi_state::pia_q219_irqb(int state)
 {
 	set_interrupt(CPU_2, IRQ_PENINT_LEVEL, state);
 }
@@ -1889,18 +1889,18 @@ void cmi_state::q133_1_portb_w(u8 data)
 //static int kbd_to_cmi;
 //static int cmi_to_kbd;
 
-WRITE_LINE_MEMBER( cmi_state::q133_acia_clock )
+void cmi_state::q133_acia_clock(int state)
 {
 	for (auto &acia : m_q133_acia)
 		acia->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER( cmi_state::msm5832_irq_w )
+void cmi_state::msm5832_irq_w(int state)
 {
 	set_interrupt(CPU_2, IRQ_RTCINT_LEVEL, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( cmi_state::cmi07_irq )
+void cmi_state::cmi07_irq(int state)
 {
 	m_cmi07cpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -2011,7 +2011,7 @@ void cmi_state::machine_start()
 	m_msm5832->cs_w(1);
 }
 
-WRITE_LINE_MEMBER( cmi_state::cmi_iix_vblank )
+void cmi_state::cmi_iix_vblank(int state)
 {
 	if (state)
 	{

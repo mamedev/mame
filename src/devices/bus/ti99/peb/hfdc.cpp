@@ -69,6 +69,7 @@
 #define LOG_MOTOR       (1U << 8)
 #define LOG_INT         (1U << 9)
 #define LOG_CRU         (1U << 10)
+#define LOG_SKCOM       (1U << 11)
 #define LOG_CONFIG      (1U << 15)  // Configuration
 
 #define VERBOSE (LOG_GENERAL | LOG_CONFIG | LOG_WARN)
@@ -546,7 +547,7 @@ void myarc_hfdc_device::harddisk_ready_callback(mfm_harddisk_device *harddisk, i
 */
 void myarc_hfdc_device::harddisk_skcom_callback(mfm_harddisk_device *harddisk, int state)
 {
-	LOGMASKED(LOG_LINES, "HD seek complete = %d\n", state);
+	LOGMASKED(LOG_SKCOM, "HD seek complete = %d\n", state);
 	set_bits(m_status_latch, hdc92x4_device::DS_SKCOM, (state==ASSERT_LINE));
 	signal_drive_status();
 }
@@ -825,7 +826,7 @@ void myarc_hfdc_device::set_floppy_motors_running(bool run)
 /*
     Called whenever the state of the HDC9234 interrupt pin changes.
 */
-WRITE_LINE_MEMBER( myarc_hfdc_device::intrq_w )
+void myarc_hfdc_device::intrq_w(int state)
 {
 	m_irq = (line_state)state;
 	LOGMASKED(LOG_INT, "INT pin from controller = %d, propagating to INTA*\n", state);
@@ -840,7 +841,7 @@ WRITE_LINE_MEMBER( myarc_hfdc_device::intrq_w )
     Called whenever the HDC9234 desires bus access to the buffer RAM. The
     controller expects a call to dmarq in 1 byte time.
 */
-WRITE_LINE_MEMBER( myarc_hfdc_device::dmarq_w )
+void myarc_hfdc_device::dmarq_w(int state)
 {
 	LOGMASKED(LOG_DMA, "DMARQ pin from controller = %d\n", state);
 	if (state == ASSERT_LINE)
@@ -852,7 +853,7 @@ WRITE_LINE_MEMBER( myarc_hfdc_device::dmarq_w )
 /*
     Called whenever the state of the HDC9234 DMA in progress changes.
 */
-WRITE_LINE_MEMBER( myarc_hfdc_device::dip_w )
+void myarc_hfdc_device::dip_w(int state)
 {
 	m_dip = (line_state)state;
 }

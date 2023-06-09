@@ -257,7 +257,6 @@ public:
 	required_device<palette_device> m_palette2;
 
 	void coinmvga(machine_config &config);
-	void coinmvga_io_map(address_map &map);
 	void coinmvga_map(address_map &map);
 	void ramdac2_map(address_map &map);
 	void ramdac_map(address_map &map);
@@ -346,8 +345,6 @@ void coinmvga_state::coinmvga_map(address_map &map)
 	//0x800008 "arrow" w?
 }
 
-void coinmvga_state::coinmvga_io_map(address_map &map)
-{
 /*  Digital I/O ports (ports 4-B are valid on 16-bit H8/3xx) */
 //  map(h8_device::PORT_4, h8_device::PORT_4)
 //  map(h8_device::PORT_5, h8_device::PORT_5)
@@ -363,7 +360,6 @@ void coinmvga_state::coinmvga_io_map(address_map &map)
 //  map(h8_device::ADC_1, h8_device::ADC_1)
 //  map(h8_device::ADC_2, h8_device::ADC_2)
 //  map(h8_device::ADC_3, h8_device::ADC_3)
-}
 
 /*  unknown writes (cmrltv75):
 
@@ -643,7 +639,6 @@ void coinmvga_state::coinmvga(machine_config &config)
 	/* basic machine hardware */
 	H83007(config, m_maincpu, CPU_CLOCK);  /* xtal */
 	m_maincpu->set_addrmap(AS_PROGRAM, &coinmvga_state::coinmvga_map);
-	m_maincpu->set_addrmap(AS_IO, &coinmvga_state::coinmvga_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(coinmvga_state::vblank_irq));   /* wrong, fix me */
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);

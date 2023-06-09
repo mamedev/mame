@@ -328,7 +328,7 @@ void isa8_ibm_speech_device::channel_mux_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(isa8_ibm_speech_device::lpc_interrupt_w)
+void isa8_ibm_speech_device::lpc_interrupt_w(int state)
 {
 	// Active low.
 
@@ -365,7 +365,7 @@ WRITE_LINE_MEMBER(isa8_ibm_speech_device::lpc_interrupt_w)
         - ZM12 serial clock
         - PPI PORTC.3
 ******************************************************************************/
-WRITE_LINE_MEMBER(isa8_ibm_speech_device::cvsd_clock_w)
+void isa8_ibm_speech_device::cvsd_clock_w(int state)
 {
 	m_cvsd_clock = state;
 
@@ -387,7 +387,7 @@ WRITE_LINE_MEMBER(isa8_ibm_speech_device::cvsd_clock_w)
     This signal goes low for one clock every 8 CVSD bit clocks, which specifies
     how often a new byte gets latched into the CVSD shift register.
 ******************************************************************************/
-WRITE_LINE_MEMBER(isa8_ibm_speech_device::cvsd_frame_w)
+void isa8_ibm_speech_device::cvsd_frame_w(int state)
 {
 	// PIT CH1 is the CVSD FRAME signal.
 	LOGMASKED(LOG_CVSD, "*** CVSD frame going %s\n", (state ? "high" : "low"));
@@ -408,7 +408,7 @@ WRITE_LINE_MEMBER(isa8_ibm_speech_device::cvsd_frame_w)
     When INT_ENA is asserted, pulses IRQ7 when the 5220 raises an IRQ.
     When INT_ENA is cleared, the timer acts as a PC speaker-style beeper.
 ******************************************************************************/
-WRITE_LINE_MEMBER(isa8_ibm_speech_device::int_clock_w)
+void isa8_ibm_speech_device::int_clock_w(int state)
 {
 	if(!m_acl_int_ena)
 	{
@@ -421,7 +421,7 @@ WRITE_LINE_MEMBER(isa8_ibm_speech_device::int_clock_w)
 /******************************************************************************
     CVSD Shift Register
 ******************************************************************************/
-WRITE_LINE_MEMBER(isa8_ibm_speech_device::cvsd_shiftreg_clk_w)
+void isa8_ibm_speech_device::cvsd_shiftreg_clk_w(int state)
 {
 	// If rising edge of the inverted signal...
 	if(!m_sr_clk && state)

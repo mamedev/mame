@@ -43,7 +43,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(p1_fdc_irq_drq);
+	void p1_fdc_irq_drq(int state);
 
 	required_device<fd1793_device> m_fdc;
 	required_device<cpu_device> m_cpu;

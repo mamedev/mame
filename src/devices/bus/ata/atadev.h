@@ -30,10 +30,10 @@ public:
 	virtual void write_cs0(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) = 0;
 	virtual void write_cs1(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) = 0;
 
-	virtual DECLARE_WRITE_LINE_MEMBER(write_dmack) = 0;
-	virtual DECLARE_WRITE_LINE_MEMBER(write_csel) = 0;
-	virtual DECLARE_WRITE_LINE_MEMBER(write_dasp) = 0;
-	virtual DECLARE_WRITE_LINE_MEMBER(write_pdiag) = 0;
+	virtual void write_dmack(int state) = 0;
+	virtual void write_csel(int state) = 0;
+	virtual void write_dasp(int state) = 0;
+	virtual void write_pdiag(int state) = 0;
 
 protected:
 	device_ata_interface(const machine_config &mconfig, device_t &device);

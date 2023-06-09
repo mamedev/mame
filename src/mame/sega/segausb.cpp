@@ -299,7 +299,7 @@ void usb_sound_device::p2_w(u8 data)
 }
 
 
-READ_LINE_MEMBER( usb_sound_device::t1_r )
+int usb_sound_device::t1_r()
 {
 	// T1 returns 1 based on the value of the T1 clock; the exact
 	// pattern is determined by one or more jumpers on the board.

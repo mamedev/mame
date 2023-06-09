@@ -359,7 +359,7 @@ void mcpx_isalpc_device::boot_state_w(uint8_t data)
 		m_boot_state_hook((offs_t)0, data);
 }
 
-WRITE_LINE_MEMBER(mcpx_isalpc_device::interrupt_ouptut_changed)
+void mcpx_isalpc_device::interrupt_ouptut_changed(int state)
 {
 	m_interrupt_output(state);
 }
@@ -371,49 +371,49 @@ uint8_t mcpx_isalpc_device::get_slave_ack(offs_t offset)
 	return 0x00;
 }
 
-WRITE_LINE_MEMBER(mcpx_isalpc_device::pit8254_out0_changed)
+void mcpx_isalpc_device::pit8254_out0_changed(int state)
 {
 	pic8259_1->ir0_w(state);
 }
 
-WRITE_LINE_MEMBER(mcpx_isalpc_device::pit8254_out1_changed)
+void mcpx_isalpc_device::pit8254_out1_changed(int state)
 {
 	if (state)
 		m_refresh = !m_refresh;
 }
 
-WRITE_LINE_MEMBER(mcpx_isalpc_device::pit8254_out2_changed)
+void mcpx_isalpc_device::pit8254_out2_changed(int state)
 {
 	m_pit_out2 = state ? 1 : 0;
 	//xbox_speaker_set_input(m_at_spkrdata & m_pit_out2);
 }
 
-WRITE_LINE_MEMBER(mcpx_isalpc_device::irq1)
+void mcpx_isalpc_device::irq1(int state)
 {
 	pic8259_1->ir1_w(state);
 }
 
-WRITE_LINE_MEMBER(mcpx_isalpc_device::irq3)
+void mcpx_isalpc_device::irq3(int state)
 {
 	pic8259_1->ir3_w(state);
 }
 
-WRITE_LINE_MEMBER(mcpx_isalpc_device::irq10)
+void mcpx_isalpc_device::irq10(int state)
 {
 	pic8259_2->ir2_w(state);
 }
 
-WRITE_LINE_MEMBER(mcpx_isalpc_device::irq11)
+void mcpx_isalpc_device::irq11(int state)
 {
 	pic8259_2->ir3_w(state);
 }
 
-WRITE_LINE_MEMBER(mcpx_isalpc_device::irq14)
+void mcpx_isalpc_device::irq14(int state)
 {
 	pic8259_2->ir6_w(state);
 }
 
-WRITE_LINE_MEMBER(mcpx_isalpc_device::irq15)
+void mcpx_isalpc_device::irq15(int state)
 {
 	pic8259_2->ir7_w(state);
 }
@@ -1520,12 +1520,12 @@ void mcpx_ide_device::sec_write_cs1_w(uint8_t data)
 	m_sec->write_cs1(1, data << 16, 0xff0000);
 }
 
-WRITE_LINE_MEMBER(mcpx_ide_device::ide_pri_interrupt)
+void mcpx_ide_device::ide_pri_interrupt(int state)
 {
 	m_pri_interrupt_handler(state);
 }
 
-WRITE_LINE_MEMBER(mcpx_ide_device::ide_sec_interrupt)
+void mcpx_ide_device::ide_sec_interrupt(int state)
 {
 	m_sec_interrupt_handler(state);
 }

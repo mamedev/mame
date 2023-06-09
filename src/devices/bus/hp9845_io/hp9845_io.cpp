@@ -64,37 +64,37 @@ void hp9845_io_slot_device::device_start()
 	}
 }
 
-WRITE_LINE_MEMBER(hp9845_io_slot_device::irq_w)
+void hp9845_io_slot_device::irq_w(int state)
 {
 	m_irq_cb_func(state);
 }
 
-WRITE_LINE_MEMBER(hp9845_io_slot_device::sts_w)
+void hp9845_io_slot_device::sts_w(int state)
 {
 	m_sts_cb_func(state);
 }
 
-WRITE_LINE_MEMBER(hp9845_io_slot_device::flg_w)
+void hp9845_io_slot_device::flg_w(int state)
 {
 	m_flg_cb_func(state);
 }
 
-WRITE_LINE_MEMBER(hp9845_io_slot_device::irq_nextsc_w)
+void hp9845_io_slot_device::irq_nextsc_w(int state)
 {
 	m_irq_nextsc_cb_func(state);
 }
 
-WRITE_LINE_MEMBER(hp9845_io_slot_device::sts_nextsc_w)
+void hp9845_io_slot_device::sts_nextsc_w(int state)
 {
 	m_sts_nextsc_cb_func(state);
 }
 
-WRITE_LINE_MEMBER(hp9845_io_slot_device::flg_nextsc_w)
+void hp9845_io_slot_device::flg_nextsc_w(int state)
 {
 	m_flg_nextsc_cb_func(state);
 }
 
-WRITE_LINE_MEMBER(hp9845_io_slot_device::dmar_w)
+void hp9845_io_slot_device::dmar_w(int state)
 {
 	m_dmar_cb_func(state);
 }
@@ -158,49 +158,49 @@ void device_hp9845_io_interface::interface_pre_start()
 		throw device_missing_dependencies();
 }
 
-WRITE_LINE_MEMBER(device_hp9845_io_interface::irq_w)
+void device_hp9845_io_interface::irq_w(int state)
 {
 	if (m_slot_dev) {
 		m_slot_dev->irq_w(state);
 	}
 }
 
-WRITE_LINE_MEMBER(device_hp9845_io_interface::sts_w)
+void device_hp9845_io_interface::sts_w(int state)
 {
 	if (m_slot_dev) {
 		m_slot_dev->sts_w(state);
 	}
 }
 
-WRITE_LINE_MEMBER(device_hp9845_io_interface::flg_w)
+void device_hp9845_io_interface::flg_w(int state)
 {
 	if (m_slot_dev) {
 		m_slot_dev->flg_w(state);
 	}
 }
 
-WRITE_LINE_MEMBER(device_hp9845_io_interface::irq_nextsc_w)
+void device_hp9845_io_interface::irq_nextsc_w(int state)
 {
 	if (m_slot_dev) {
 		m_slot_dev->irq_nextsc_w(state);
 	}
 }
 
-WRITE_LINE_MEMBER(device_hp9845_io_interface::sts_nextsc_w)
+void device_hp9845_io_interface::sts_nextsc_w(int state)
 {
 	if (m_slot_dev) {
 		m_slot_dev->sts_nextsc_w(state);
 	}
 }
 
-WRITE_LINE_MEMBER(device_hp9845_io_interface::flg_nextsc_w)
+void device_hp9845_io_interface::flg_nextsc_w(int state)
 {
 	if (m_slot_dev) {
 		m_slot_dev->flg_nextsc_w(state);
 	}
 }
 
-WRITE_LINE_MEMBER(device_hp9845_io_interface::dmar_w)
+void device_hp9845_io_interface::dmar_w(int state)
 {
 	if (m_slot_dev) {
 		m_slot_dev->dmar_w(state);

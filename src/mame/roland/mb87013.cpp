@@ -125,7 +125,7 @@ void mb87013_device::write(offs_t offset, u8 data)
 //  MFM modulator
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(mb87013_device::dtr_w)
+void mb87013_device::dtr_w(int state)
 {
 }
 
@@ -135,7 +135,7 @@ WRITE_LINE_MEMBER(mb87013_device::dtr_w)
 //  modulated by QDC
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(mb87013_device::txd_w)
+void mb87013_device::txd_w(int state)
 {
 }
 
@@ -145,6 +145,6 @@ WRITE_LINE_MEMBER(mb87013_device::txd_w)
 //  data through RxC and RxD
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(mb87013_device::rts_w)
+void mb87013_device::rts_w(int state)
 {
 }

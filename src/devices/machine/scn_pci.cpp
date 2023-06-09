@@ -551,7 +551,7 @@ void scn_pci_device::rx_load_sync(u8 data, bool pe)
 //  rxd_w - set serial data input for receiver
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(scn_pci_device::rxd_w)
+void scn_pci_device::rxd_w(int state)
 {
 	m_rxd = state;
 }
@@ -1096,7 +1096,7 @@ void scn_pci_device::set_rts(bool state)
 //  or ring indicator input (active low)
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(scn_pci_device::dsr_w)
+void scn_pci_device::dsr_w(int state)
 {
 	assert(!m_is_aci);
 
@@ -1118,7 +1118,7 @@ WRITE_LINE_MEMBER(scn_pci_device::dsr_w)
 //  enable receiver (active low)
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(scn_pci_device::dcd_w)
+void scn_pci_device::dcd_w(int state)
 {
 	if (BIT(m_status, 6) == !state)
 		return;
@@ -1145,7 +1145,7 @@ WRITE_LINE_MEMBER(scn_pci_device::dcd_w)
 //  transmitter (active low)
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(scn_pci_device::cts_w)
+void scn_pci_device::cts_w(int state)
 {
 	m_cts = !state;
 }
@@ -1477,7 +1477,7 @@ void scn_pci_device::write(offs_t offset, u8 data)
 //  (or jam sync for EPCI receiver)
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(scn_pci_device::txc_w)
+void scn_pci_device::txc_w(int state)
 {
 	if (state == m_txc_input)
 		return;
@@ -1512,7 +1512,7 @@ WRITE_LINE_MEMBER(scn_pci_device::txc_w)
 //  rxc_w - external clock input for receiver
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(scn_pci_device::rxc_w)
+void scn_pci_device::rxc_w(int state)
 {
 	if (state == m_rxc_input)
 		return;

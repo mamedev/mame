@@ -149,7 +149,7 @@ private:
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_w);
+	void vblank_w(int state);
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
 
@@ -255,7 +255,7 @@ void devstors_state::nmienable_w(uint8_t data)
 	m_nmi_enable = data;
 }
 
-WRITE_LINE_MEMBER(devstors_state::vblank_w)
+void devstors_state::vblank_w(int state)
 {
 	if (state && m_nmi_enable)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);

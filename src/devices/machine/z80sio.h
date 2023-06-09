@@ -202,12 +202,12 @@ public:
 	uint8_t data_read();
 	void data_write(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( write_rx ) { m_rxd = state; }
-	DECLARE_WRITE_LINE_MEMBER( cts_w );
-	DECLARE_WRITE_LINE_MEMBER( dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( rxc_w );
-	DECLARE_WRITE_LINE_MEMBER( txc_w );
-	DECLARE_WRITE_LINE_MEMBER( sync_w );
+	void write_rx(int state) { m_rxd = state; }
+	void cts_w(int state);
+	void dcd_w(int state);
+	void rxc_w(int state);
+	void txc_w(int state);
+	void sync_w(int state);
 
 	// Register state
 	// read registers     enum
@@ -511,19 +511,19 @@ public:
 	// interrupt acknowledge
 	virtual int m1_r();
 
-	DECLARE_WRITE_LINE_MEMBER( rxa_w ) { m_chanA->write_rx(state); }
-	DECLARE_WRITE_LINE_MEMBER( rxb_w ) { m_chanB->write_rx(state); }
-	DECLARE_WRITE_LINE_MEMBER( ctsa_w ) { m_chanA->cts_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( ctsb_w ) { m_chanB->cts_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( dcda_w ) { m_chanA->dcd_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( dcdb_w ) { m_chanB->dcd_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( rxca_w ) { m_chanA->rxc_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( rxcb_w ) { m_chanB->rxc_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( txca_w ) { m_chanA->txc_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( txcb_w ) { m_chanB->txc_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( rxtxcb_w ) { m_chanB->rxc_w(state); m_chanB->txc_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( synca_w ) { m_chanA->sync_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( syncb_w ) { m_chanB->sync_w(state); }
+	void rxa_w(int state) { m_chanA->write_rx(state); }
+	void rxb_w(int state) { m_chanB->write_rx(state); }
+	void ctsa_w(int state) { m_chanA->cts_w(state); }
+	void ctsb_w(int state) { m_chanB->cts_w(state); }
+	void dcda_w(int state) { m_chanA->dcd_w(state); }
+	void dcdb_w(int state) { m_chanB->dcd_w(state); }
+	void rxca_w(int state) { m_chanA->rxc_w(state); }
+	void rxcb_w(int state) { m_chanB->rxc_w(state); }
+	void txca_w(int state) { m_chanA->txc_w(state); }
+	void txcb_w(int state) { m_chanB->txc_w(state); }
+	void rxtxcb_w(int state) { m_chanB->rxc_w(state); m_chanB->txc_w(state); }
+	void synca_w(int state) { m_chanA->sync_w(state); }
+	void syncb_w(int state) { m_chanB->sync_w(state); }
 
 protected:
 	z80sio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -581,8 +581,8 @@ class z80dart_device : public z80sio_device
 public:
 	z80dart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER( ria_w ) { m_chanA->sync_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( rib_w ) { m_chanB->sync_w(state); }
+	void ria_w(int state) { m_chanA->sync_w(state); }
+	void rib_w(int state) { m_chanB->sync_w(state); }
 
 protected:
 	// device_t overrides

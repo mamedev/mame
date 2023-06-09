@@ -219,12 +219,12 @@ void mb9061x_device::timer_w(offs_t offset, u8 data)
 	}
 }
 
-WRITE_LINE_MEMBER(mb9061x_device::tin0_w)
+void mb9061x_device::tin0_w(int state)
 {
 	tin_common(0, 0, state);
 }
 
-WRITE_LINE_MEMBER(mb9061x_device::tin1_w)
+void mb9061x_device::tin1_w(int state)
 {
 	tin_common(1, 4, state);
 }

@@ -184,7 +184,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual DECLARE_WRITE_LINE_MEMBER(reset_4002_in) override;
+	virtual void reset_4002_in(int state) override;
 
 private:
 	void ram_out(offs_t offset, u8 data);
@@ -271,7 +271,7 @@ void imm4_22_device::device_reset()
 }
 
 
-WRITE_LINE_MEMBER(imm4_22_device::reset_4002_in)
+void imm4_22_device::reset_4002_in(int state)
 {
 	// FIXME: this takes several cycles to actually erase everything, and prevents writes while asserted
 	if (!state)

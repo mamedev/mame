@@ -61,7 +61,7 @@ private:
 
 	bool m_busy;
 
-	DECLARE_WRITE_LINE_MEMBER( busy_w ) { m_busy = state; }
+	void busy_w(int state) { m_busy = state; }
 };
 
 

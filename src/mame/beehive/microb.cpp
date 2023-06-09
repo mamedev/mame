@@ -53,7 +53,7 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(dmac_hrq_w);
+	void dmac_hrq_w(int state);
 	u8 dmac_mem_r(offs_t offset);
 	void dmac_mem_w(offs_t offset, u8 data);
 	I8275_DRAW_CHARACTER_MEMBER(draw_character);
@@ -75,7 +75,7 @@ private:
 	u8 m_keyline = 0U;
 };
 
-WRITE_LINE_MEMBER(microb_state::dmac_hrq_w)
+void microb_state::dmac_hrq_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 	m_dmac->hlda_w(state);

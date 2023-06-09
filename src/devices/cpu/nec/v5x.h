@@ -19,7 +19,7 @@ public:
 	// TCU
 	void set_tclk(double clk) { m_tclk = clk; }
 	void set_tclk(const XTAL &xtal) { set_tclk(xtal.dvalue()); }
-	DECLARE_WRITE_LINE_MEMBER(tclk_w);
+	void tclk_w(int state);
 
 	// DMAU
 	auto out_hreq_cb() { return device().subdevice<v5x_dmau_device>("dmau")->out_hreq_callback(); }
@@ -106,7 +106,7 @@ protected:
 	u8 OPSEL_r();
 	void OPSEL_w(u8 data);
 	virtual u8 get_pic_ack(offs_t offset) { return 0; }
-	DECLARE_WRITE_LINE_MEMBER(internal_irq_w);
+	void internal_irq_w(int state);
 
 	void tcu_clock_update();
 
@@ -141,9 +141,9 @@ protected:
 class v50_base_device : public nec_common_device, public device_v5x_interface
 {
 public:
-	template <unsigned Channel> DECLARE_WRITE_LINE_MEMBER(dreq_w) { m_dmau->dreq_w<Channel>(state); }
-	DECLARE_WRITE_LINE_MEMBER(hack_w) { m_dmau->hack_w(state); }
-	DECLARE_WRITE_LINE_MEMBER(tctl2_w) { m_tcu->write_gate2(state); }
+	template <unsigned Channel> void dreq_w(int state) { m_dmau->dreq_w<Channel>(state); }
+	void hack_w(int state) { m_dmau->hack_w(state); }
+	void tctl2_w(int state) { m_tcu->write_gate2(state); }
 
 	auto tout1_cb() { return m_tout1_callback.bind(); }
 	auto tout2_cb() { return subdevice<pit8253_device>("tcu")->out_handler<2>(); }
@@ -189,7 +189,7 @@ protected:
 	}
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(tout1_w);
+	void tout1_w(int state);
 
 	devcb_write_line m_tout1_callback;
 	devcb_read8 m_icu_slave_ack;
@@ -223,7 +223,7 @@ class v53_device : public v33_base_device, public device_v5x_interface
 public:
 	v53_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	template <unsigned Channel> DECLARE_WRITE_LINE_MEMBER(dreq_w)
+	template <unsigned Channel> void dreq_w(int state)
 	{
 		// dreq0 could be wrong / nonexistent
 		if (!(m_SCTL & 0x02))
@@ -235,7 +235,7 @@ public:
 			logerror("dreq%d not in 71071mode\n", Channel);
 		}
 	}
-	DECLARE_WRITE_LINE_MEMBER(hack_w);
+	void hack_w(int state);
 
 	template <unsigned Timer> auto tout_handler() { return subdevice<pit8253_device>("tcu")->out_handler<Timer>(); }
 

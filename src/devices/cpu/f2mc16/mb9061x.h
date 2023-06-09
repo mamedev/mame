@@ -33,8 +33,8 @@ public:
 	};
 
 	// timer external counter tick functions
-	DECLARE_WRITE_LINE_MEMBER(tin0_w);
-	DECLARE_WRITE_LINE_MEMBER(tin1_w);
+	void tin0_w(int state);
+	void tin1_w(int state);
 
 protected:
 	// construction/destruction

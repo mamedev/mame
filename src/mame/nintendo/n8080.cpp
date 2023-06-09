@@ -538,7 +538,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::rst2_tick)
 	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state, 0xd7); // I8080
 }
 
-WRITE_LINE_MEMBER(n8080_state::n8080_inte_callback)
+void n8080_state::n8080_inte_callback(int state)
 {
 	m_inte = state;
 }
