@@ -41108,6 +41108,9 @@ goupilg2                        //
 @source:skeleton/grfd2301.cpp
 grfd2301                        //
 
+@source:skeleton/happyvideo.cpp
+hppyvideo                       //
+
 @source:skeleton/hazeltin.cpp
 hazl1500                        // Hazeltine 1500 (c) 1977
 hazl1552                        // Hazeltine 1552 (c) 1979
