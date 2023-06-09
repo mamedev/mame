@@ -411,7 +411,7 @@ void kaypro_10_keyboard_device::p2_w(uint8_t data)
 	m_rxd_cb(BIT(data, 7));
 }
 
-READ_LINE_MEMBER(kaypro_10_keyboard_device::t1_r)
+int kaypro_10_keyboard_device::t1_r()
 {
 	return m_txd ? 1 : 0;
 }

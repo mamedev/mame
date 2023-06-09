@@ -288,7 +288,7 @@ TIMER_CALLBACK_MEMBER(psion_asic9_device::rtc)
 	m_rtc++;
 }
 
-WRITE_LINE_MEMBER(psion_asic9_device::eint0_w)
+void psion_asic9_device::eint0_w(int state)
 {
 	if (state)
 		m_a9_interrupt_status |= 0x08; // A9MExpIntC
@@ -298,7 +298,7 @@ WRITE_LINE_MEMBER(psion_asic9_device::eint0_w)
 	update_interrupts();
 }
 
-WRITE_LINE_MEMBER(psion_asic9_device::eint1_w)
+void psion_asic9_device::eint1_w(int state)
 {
 	if (state)
 		m_a9_interrupt_status |= 0x10; // A9MExpIntA
@@ -308,7 +308,7 @@ WRITE_LINE_MEMBER(psion_asic9_device::eint1_w)
 	update_interrupts();
 }
 
-WRITE_LINE_MEMBER(psion_asic9_device::eint2_w)
+void psion_asic9_device::eint2_w(int state)
 {
 	if (state)
 		m_a9_interrupt_status |= 0x20; // A9MExpIntB
@@ -319,7 +319,7 @@ WRITE_LINE_MEMBER(psion_asic9_device::eint2_w)
 }
 
 
-WRITE_LINE_MEMBER(psion_asic9_device::medchng_w)
+void psion_asic9_device::medchng_w(int state)
 {
 	if (state)
 		m_a9_status |= 0x04; // A9MDoorNMI

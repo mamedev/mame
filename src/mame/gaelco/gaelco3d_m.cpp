@@ -347,7 +347,7 @@ TIMER_CALLBACK_MEMBER( gaelco_serial_device::link_cb )
 
 
 
-WRITE_LINE_MEMBER(gaelco_serial_device::irq_enable)
+void gaelco_serial_device::irq_enable(int state)
 {
 	LOGMSG(("???? irq enable %d\n", state));
 }
@@ -398,14 +398,14 @@ uint8_t gaelco_serial_device::data_r()
 	return ret;
 }
 
-WRITE_LINE_MEMBER(gaelco_serial_device::unknown_w)
+void gaelco_serial_device::unknown_w(int state)
 {
 	std::lock_guard<std::mutex> guard(m_mutex);
 	LOGMSG(("???? unknown serial access %d\n", state));
 
 }
 
-WRITE_LINE_MEMBER(gaelco_serial_device::rts_w)
+void gaelco_serial_device::rts_w(int state)
 {
 	std::lock_guard<std::mutex> guard(m_mutex);
 
@@ -419,7 +419,7 @@ WRITE_LINE_MEMBER(gaelco_serial_device::rts_w)
 	}
 }
 
-WRITE_LINE_MEMBER(gaelco_serial_device::tr_w)
+void gaelco_serial_device::tr_w(int state)
 {
 	LOGMSG(("set transmit %d\n", data));
 	std::lock_guard<std::mutex> guard(m_mutex);

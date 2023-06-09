@@ -14,7 +14,7 @@ public:
 	cherry_g80_1500_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual DECLARE_WRITE_LINE_MEMBER(data_write) override;
+	virtual void data_write(int state) override;
 
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;

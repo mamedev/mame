@@ -340,7 +340,7 @@ void atari_jsa_base_device::ym2151_port_w(uint8_t data)
 //  main's test line, provided by a callback
 //-------------------------------------------------
 
-READ_LINE_MEMBER(atari_jsa_base_device::main_test_read_line)
+int atari_jsa_base_device::main_test_read_line()
 {
 	return !m_test_read_cb();
 }
@@ -351,7 +351,7 @@ READ_LINE_MEMBER(atari_jsa_base_device::main_test_read_line)
 //  from the comm device to the owning callback
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(atari_jsa_base_device::main_int_write_line)
+void atari_jsa_base_device::main_int_write_line(int state)
 {
 	m_main_int_cb(state);
 }
@@ -397,7 +397,7 @@ void atari_jsa_base_device::sound_irq_ack_w(u8 data)
 //  YM2151's IRQ line.
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(atari_jsa_base_device::ym2151_irq_gen)
+void atari_jsa_base_device::ym2151_irq_gen(int state)
 {
 	m_ym2151_int = state;
 	update_sound_irq();

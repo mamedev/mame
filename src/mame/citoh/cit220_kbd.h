@@ -26,7 +26,7 @@ public:
 	auto txd_callback() { return m_txd_callback.bind(); }
 
 	// serial line input
-	DECLARE_WRITE_LINE_MEMBER(write_rxd);
+	void write_rxd(int state);
 
 protected:
 	// device-level overrides

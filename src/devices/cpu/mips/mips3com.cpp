@@ -143,7 +143,7 @@ generate_tlb_index - generate a random tlb index
 uint32_t mips3_device::generate_tlb_index()
 {
 	// Actual hardware uses a free running counter to generate the index.
-	// This impementation uses a linear congruential generator so that DRC and non-DRC code sequences match.
+	// This implementation uses a linear congruential generator so that DRC and non-DRC code sequences match.
 	m_tlb_seed = 214013 * m_tlb_seed + 2531011;
 	return (m_tlb_seed >> 16) & 0x3f;
 }

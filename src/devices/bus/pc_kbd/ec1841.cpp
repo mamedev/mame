@@ -325,7 +325,7 @@ void ec_1841_keyboard_device::device_reset()
 //  clock_write -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( ec_1841_keyboard_device::clock_write )
+void ec_1841_keyboard_device::clock_write(int state)
 {
 	LOG("clock write %d\n", state);
 }
@@ -335,7 +335,7 @@ WRITE_LINE_MEMBER( ec_1841_keyboard_device::clock_write )
 //  data_write -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( ec_1841_keyboard_device::data_write )
+void ec_1841_keyboard_device::data_write(int state)
 {
 	LOG("data write %d\n", state);
 }
@@ -440,7 +440,7 @@ void ec_1841_keyboard_device::p2_w(uint8_t data)
 //  t1_r -
 //-------------------------------------------------
 
-READ_LINE_MEMBER( ec_1841_keyboard_device::t1_r )
+int ec_1841_keyboard_device::t1_r()
 {
 	if (BIT(m_p2,0)) {
 		m_q = 1;

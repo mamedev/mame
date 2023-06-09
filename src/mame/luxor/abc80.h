@@ -122,13 +122,13 @@ protected:
 	virtual u8 read(offs_t offset);
 	virtual void write(offs_t offset, u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER( vco_voltage_w );
+	void vco_voltage_w(int state);
 
 	u8 pio_pa_r();
 	u8 pio_pb_r();
 	void pio_pb_w(u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER( keydown_w );
+	void keydown_w(int state);
 	void kbd_w(u8 data);
 	void csg_w(u8 data);
 

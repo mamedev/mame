@@ -95,7 +95,7 @@ TILE_GET_INFO_MEMBER(nemesis_state::get_fg_tile_info)
 }
 
 
-WRITE_LINE_MEMBER(nemesis_state::gfx_flipx_w)
+void nemesis_state::gfx_flipx_w(int state)
 {
 	m_flipscreen = state;
 
@@ -107,7 +107,7 @@ WRITE_LINE_MEMBER(nemesis_state::gfx_flipx_w)
 	machine().tilemap().set_flip_all(m_tilemap_flip);
 }
 
-WRITE_LINE_MEMBER(nemesis_state::gfx_flipy_w)
+void nemesis_state::gfx_flipy_w(int state)
 {
 	if (state)
 		m_tilemap_flip |= TILEMAP_FLIPY;

@@ -55,8 +55,8 @@ public:
 
 	void thayers(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(laserdisc_enter_r);
-	DECLARE_READ_LINE_MEMBER(laserdisc_ready_r);
+	int laserdisc_enter_r();
+	int laserdisc_ready_r();
 
 private:
 	virtual void machine_start() override;
@@ -105,8 +105,8 @@ private:
 	uint8_t cop_g_r();
 	void control_w(uint8_t data);
 	void cop_g_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER(kbdata_r);
-	DECLARE_WRITE_LINE_MEMBER(kbclk_w);
+	int kbdata_r();
+	void kbclk_w(int state);
 	void control2_w(uint8_t data);
 	uint8_t dsw_b_r();
 	uint8_t laserdsc_data_r();
@@ -316,13 +316,13 @@ void thayers_state::cop_g_w(uint8_t data)
 
 /* Keyboard */
 
-READ_LINE_MEMBER(thayers_state::kbdata_r)
+int thayers_state::kbdata_r()
 {
 	if (LOG) logerror("%s KBDATA %u BIT %u\n",machine().time().as_string(),m_kbdata,m_rx_bit);
 	return m_kbdata;
 }
 
-WRITE_LINE_MEMBER(thayers_state::kbclk_w)
+void thayers_state::kbclk_w(int state)
 {
 	if (m_kbclk != state) {
 		if (LOG) logerror("%s %s KBCLK %u\n", machine().time().as_string(), machine().describe_context(),state);
@@ -649,14 +649,14 @@ void thayers_state::thayers_io_map(address_map &map)
 
 /* Input Ports */
 
-READ_LINE_MEMBER(thayers_state::laserdisc_enter_r)
+int thayers_state::laserdisc_enter_r()
 {
 	if (m_pr7820 != nullptr) return m_pr7820_enter;
 	if (m_ldv1000 != nullptr) return (m_ldv1000->status_strobe_r() == ASSERT_LINE) ? 0 : 1;
 	return 0;
 }
 
-READ_LINE_MEMBER(thayers_state::laserdisc_ready_r)
+int thayers_state::laserdisc_ready_r()
 {
 	if (m_pr7820 != nullptr) return (m_pr7820->ready_r() == ASSERT_LINE) ? 0 : 1;
 	if (m_ldv1000 != nullptr) return (m_ldv1000->command_strobe_r() == ASSERT_LINE) ? 0 : 1;

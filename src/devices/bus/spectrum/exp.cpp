@@ -69,7 +69,7 @@ void spectrum_expansion_slot_device::device_start()
 //  romcs
 //-------------------------------------------------
 
-READ_LINE_MEMBER(spectrum_expansion_slot_device::romcs)
+int spectrum_expansion_slot_device::romcs()
 {
 	if (m_card)
 		return m_card->romcs();

@@ -247,6 +247,7 @@ public:
 	hd6303r_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+
 class hd6301x_cpu_device : public hd6301_cpu_device
 {
 public:

@@ -232,8 +232,8 @@ private:
 	uint32_t screen_update_buggyboy_middle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_buggyboy_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_buggybjr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_tx1);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_buggyboy);
+	void screen_vblank_tx1(int state);
+	void screen_vblank_buggyboy(int state);
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
 
 	void buggybjr_main(address_map &map);

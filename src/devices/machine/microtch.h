@@ -17,7 +17,7 @@ public:
 	microtouch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	auto stx() { return m_out_stx_func.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(rx) { device_serial_interface::rx_w(state); }
+	void rx(int state) { device_serial_interface::rx_w(state); }
 	DECLARE_INPUT_CHANGED_MEMBER(touch);
 
 	template <typename... T> void set_touch_callback(T &&... args) { m_out_touch_cb.set(std::forward<T>(args)...); }

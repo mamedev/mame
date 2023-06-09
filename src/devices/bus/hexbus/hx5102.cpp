@@ -299,7 +299,7 @@ void hx5102_device::write(offs_t offset, uint8_t data)
 /*
     Clock line from the CPU. Used to control wait state generation.
 */
-WRITE_LINE_MEMBER( hx5102_device::clock_out )
+void hx5102_device::clock_out(int state)
 {
 	m_readyff->clock_w(state);
 }
@@ -316,7 +316,7 @@ void hx5102_device::hexbus_value_changed(uint8_t data)
     Propagate READY signals to the CPU. This is used to hold the CPU
     during DMA accesses.
 */
-WRITE_LINE_MEMBER( hx5102_device::board_ready )
+void hx5102_device::board_ready(int state)
 {
 	if (m_ready_old != state)
 	{
@@ -330,7 +330,7 @@ WRITE_LINE_MEMBER( hx5102_device::board_ready )
 /*
     Trigger RESET.
 */
-WRITE_LINE_MEMBER( hx5102_device::board_reset )
+void hx5102_device::board_reset(int state)
 {
 	LOGMASKED(LOG_RESET, "Incoming RESET line = %d\n", state);
 
@@ -345,7 +345,7 @@ WRITE_LINE_MEMBER( hx5102_device::board_reset )
 /*
     Effect from the motor monoflop.
 */
-WRITE_LINE_MEMBER( hx5102_device::motor_w )
+void hx5102_device::motor_w(int state)
 {
 	m_motor_on = (state==ASSERT_LINE);
 	LOGMASKED(LOG_MOTOR, "Motor %s\n", m_motor_on? "start" : "stop");
@@ -359,7 +359,7 @@ WRITE_LINE_MEMBER( hx5102_device::motor_w )
     Effect from the speed monoflop. This is essentially a watchdog to
     check whether the lock on the CPU must be released due to an error.
 */
-WRITE_LINE_MEMBER( hx5102_device::mspeed_w )
+void hx5102_device::mspeed_w(int state)
 {
 	m_mspeed_on = (state==ASSERT_LINE);
 	LOGMASKED(LOG_READY, "Speedcheck %s\n", m_mspeed_on? "on" : "off");
@@ -448,7 +448,7 @@ void hx5102_device::hexbus_out(uint8_t data)
 /*
     Latch the HSK* to low.
 */
-WRITE_LINE_MEMBER(hx5102_device::hsklatch_out)
+void hx5102_device::hsklatch_out(int state)
 {
 	LOGMASKED(LOG_HEXBUS, "Latching HSK*\n");
 	m_myvalue &= ~HEXBUS_LINE_HSK;
@@ -483,27 +483,27 @@ uint8_t hx5102_device::cruread(offs_t offset)
 /*
     CRU write access.
 */
-WRITE_LINE_MEMBER(hx5102_device::nocomp_w)
+void hx5102_device::nocomp_w(int state)
 {
 	// unused right now
 	LOGMASKED(LOG_CRU, "Set precompensation = %d\n", state);
 }
 
-WRITE_LINE_MEMBER(hx5102_device::diren_w)
+void hx5102_device::diren_w(int state)
 {
 	LOGMASKED(LOG_CRU, "Set step direction = %d\n", state);
 	if (m_current_floppy != nullptr)
 		m_current_floppy->dir_w((state==0)? 1 : 0);
 }
 
-WRITE_LINE_MEMBER(hx5102_device::dacken_w)
+void hx5102_device::dacken_w(int state)
 {
 	if (state==1)
 		LOGMASKED(LOG_CRU, "Assert DACK*\n");
 	m_dacken = (state != 0);
 }
 
-WRITE_LINE_MEMBER(hx5102_device::stepen_w)
+void hx5102_device::stepen_w(int state)
 {
 	if (state==1)
 		LOGMASKED(LOG_CRU, "Step pulse\n");
@@ -511,7 +511,7 @@ WRITE_LINE_MEMBER(hx5102_device::stepen_w)
 		m_current_floppy->stp_w((state==0)? 1 : 0);
 }
 
-WRITE_LINE_MEMBER(hx5102_device::ds1_w)
+void hx5102_device::ds1_w(int state)
 {
 	LOGMASKED(LOG_CRU, "Set drive select 0 to %d\n", state);
 	if (state == 1)
@@ -521,7 +521,7 @@ WRITE_LINE_MEMBER(hx5102_device::ds1_w)
 	update_drive_select();
 }
 
-WRITE_LINE_MEMBER(hx5102_device::ds2_w)
+void hx5102_device::ds2_w(int state)
 {
 	LOGMASKED(LOG_CRU, "Set drive select 1 to %d\n", state);
 	if (state == 1)
@@ -531,25 +531,25 @@ WRITE_LINE_MEMBER(hx5102_device::ds2_w)
 	update_drive_select();
 }
 
-WRITE_LINE_MEMBER(hx5102_device::ds3_w)
+void hx5102_device::ds3_w(int state)
 {
 	// External drive; not implemented
 	LOGMASKED(LOG_CRU, "Set drive select 2 to %d\n", state);
 }
 
-WRITE_LINE_MEMBER(hx5102_device::ds4_w)
+void hx5102_device::ds4_w(int state)
 {
 	// External drive; not implemented
 	LOGMASKED(LOG_CRU, "Set drive select 3 to %d\n", state);
 }
 
-WRITE_LINE_MEMBER(hx5102_device::aux_motor_w)
+void hx5102_device::aux_motor_w(int state)
 {
 	// External drive; not implemented
 	LOGMASKED(LOG_CRU, "Set auxiliary motor line to %d\n", state);
 }
 
-WRITE_LINE_MEMBER(hx5102_device::wait_w)
+void hx5102_device::wait_w(int state)
 {
 	m_wait = (state!=0);
 	LOGMASKED(LOG_CRU, "READY circuit %s\n", m_wait? "active" : "inactive" );
@@ -602,7 +602,7 @@ void hx5102_device::device_reset()
     Callbacks from the i8272A chip
     Interrupt
 */
-WRITE_LINE_MEMBER( hx5102_device::fdc_irq_w )
+void hx5102_device::fdc_irq_w(int state)
 {
 	line_state irq = state? ASSERT_LINE : CLEAR_LINE;
 	LOGMASKED(LOG_SIGNALS, "INTRQ callback = %d\n", irq);
@@ -614,7 +614,7 @@ WRITE_LINE_MEMBER( hx5102_device::fdc_irq_w )
     Callbacks from the i8272A chip
     DMA request
 */
-WRITE_LINE_MEMBER( hx5102_device::fdc_drq_w )
+void hx5102_device::fdc_drq_w(int state)
 {
 	line_state drq = state? ASSERT_LINE : CLEAR_LINE;
 	LOGMASKED(LOG_SIGNALS, "DRQ callback = %d\n", drq);

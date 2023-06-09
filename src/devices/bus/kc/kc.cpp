@@ -270,7 +270,7 @@ void kcexp_slot_device::io_write(offs_t offset, uint8_t data)
    MEI line write
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( kcexp_slot_device::mei_w )
+void kcexp_slot_device::mei_w(int state)
 {
 	LOG("KCEXP: %s MEI line\n", state != CLEAR_LINE ? "ASSERT": "CLEAR");
 
@@ -282,7 +282,7 @@ WRITE_LINE_MEMBER( kcexp_slot_device::mei_w )
    MEO line write
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( kcexp_slot_device::meo_w )
+void kcexp_slot_device::meo_w(int state)
 {
 	LOG("KCEXP: %s MEO line\n", state != CLEAR_LINE ? "ASSERT": "CLEAR");
 

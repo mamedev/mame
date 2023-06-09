@@ -107,7 +107,7 @@ public:
 	void shougi(machine_config &config);
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
+	void nmi_enable_w(int state);
 	uint8_t semaphore_r();
 
 	void shougi_palette(palette_device &palette) const;
@@ -233,7 +233,7 @@ uint32_t shougi_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 // maincpu side
 
-WRITE_LINE_MEMBER(shougi_state::nmi_enable_w)
+void shougi_state::nmi_enable_w(int state)
 {
 	m_nmi_enabled = state;
 

@@ -159,7 +159,7 @@ void spectrum_opus_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ_LINE_MEMBER(spectrum_opus_device::romcs)
+int spectrum_opus_device::romcs()
 {
 	return m_romcs | m_exp->romcs();
 }
@@ -280,7 +280,7 @@ void spectrum_opus_device::pia_out_b(uint8_t data)
 	m_centronics->write_data7(BIT(data, 7));
 }
 
-WRITE_LINE_MEMBER(spectrum_opus_device::busy_w)
+void spectrum_opus_device::busy_w(int state)
 {
 	m_pia->set_a_input(state << 6);
 }

@@ -132,7 +132,7 @@ void x68k_neptune_device::x68k_neptune_mem_write(offs_t offset, uint8_t data)
 	m_board_ram[offset - (16*1024)] = data;
 }
 
-WRITE_LINE_MEMBER(x68k_neptune_device::x68k_neptune_irq_w)
+void x68k_neptune_device::x68k_neptune_irq_w(int state)
 {
 	m_slot->irq2_w(state);
 	logerror("Neptune: IRQ2 set to %i\n",state);

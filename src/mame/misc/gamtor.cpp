@@ -33,6 +33,134 @@
 #include "speaker.h"
 
 
+// TODO: Chips & Technologies 65550 with swapped address lines?
+// Needs to be moved to own family file
+// 65550 is used by Apple PowerBook 2400c
+// 65535 is used by IBM PC-110
+
+class gamtor_vga_device :  public svga_device
+{
+public:
+	// construction/destruction
+	gamtor_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+
+	virtual uint8_t port_03b0_r(offs_t offset) override;
+	virtual void port_03b0_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t port_03c0_r(offs_t offset) override;
+	virtual void port_03c0_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t port_03d0_r(offs_t offset) override;
+	virtual void port_03d0_w(offs_t offset, uint8_t data) override;
+//  virtual uint8_t mem_r(offs_t offset) override;
+//  virtual void mem_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t mem_linear_r(offs_t offset) override;
+	virtual void mem_linear_w(offs_t offset,uint8_t data) override;
+
+protected:
+	virtual uint16_t offset() override;
+};
+
+DEFINE_DEVICE_TYPE(GAMTOR_VGA, gamtor_vga_device, "gamtor_vga", "CT-65550 SVGA")
+
+gamtor_vga_device::gamtor_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: svga_device(mconfig, GAMTOR_VGA, tag, owner, clock)
+{
+}
+
+uint8_t gamtor_vga_device::mem_linear_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+		logerror("Reading gamtor SVGA memory %08x\n", offset);
+	return vga.memory[offset];
+}
+
+void gamtor_vga_device::mem_linear_w(offs_t offset, uint8_t data)
+{
+	if (offset & 2)
+		vga.memory[(offset >> 2) + 0x20000] = data;
+	else
+		vga.memory[(offset & 1) | (offset >> 1)] = data;
+}
+
+
+uint8_t gamtor_vga_device::port_03b0_r(offs_t offset)
+{
+	uint8_t res;
+
+	switch(offset)
+	{
+		default:
+			res = vga_device::port_03b0_r(offset ^ 3);
+			break;
+	}
+
+	return res;
+}
+
+void gamtor_vga_device::port_03b0_w(offs_t offset, uint8_t data)
+{
+	switch(offset)
+	{
+		default:
+			vga_device::port_03b0_w(offset ^ 3,data);
+			break;
+	}
+}
+
+uint8_t gamtor_vga_device::port_03c0_r(offs_t offset)
+{
+	uint8_t res;
+
+	switch(offset)
+	{
+		default:
+			res = vga_device::port_03c0_r(offset ^ 3);
+			break;
+	}
+
+	return res;
+}
+
+void gamtor_vga_device::port_03c0_w(offs_t offset, uint8_t data)
+{
+	switch(offset)
+	{
+		default:
+			vga_device::port_03c0_w(offset ^ 3,data);
+			break;
+	}
+}
+
+uint8_t gamtor_vga_device::port_03d0_r(offs_t offset)
+{
+	uint8_t res;
+
+	switch(offset)
+	{
+		default:
+			res = vga_device::port_03d0_r(offset ^ 3);
+			break;
+	}
+
+	return res;
+}
+
+void gamtor_vga_device::port_03d0_w(offs_t offset, uint8_t data)
+{
+	switch(offset)
+	{
+		default:
+			vga_device::port_03d0_w(offset ^ 3,data);
+			break;
+	}
+}
+
+uint16_t gamtor_vga_device::offset()
+{
+	// TODO: pinpoint whatever extra register that wants this shifted by 1
+	return vga_device::offset() << 1;
+}
+
 namespace {
 
 class gaminator_state : public driver_device

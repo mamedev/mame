@@ -68,12 +68,12 @@ void sega_speech_device::device_start()
  *
  *************************************/
 
-READ_LINE_MEMBER( sega_speech_device::t0_r )
+int sega_speech_device::t0_r()
 {
 	return m_t0;
 }
 
-READ_LINE_MEMBER( sega_speech_device::t1_r )
+int sega_speech_device::t1_r()
 {
 //printf("%s: t1_r=%d\n", machine().scheduler().time().as_string(), m_drq);
 	return m_drq;
@@ -108,7 +108,7 @@ void sega_speech_device::p2_w(uint8_t data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(sega_speech_device::drq_w)
+void sega_speech_device::drq_w(int state)
 {
 //printf("%s: DRQ=%d\n", machine().scheduler().time().as_string(), state);
 	m_drq = (state == ASSERT_LINE);

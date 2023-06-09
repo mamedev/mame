@@ -122,7 +122,7 @@ private:
 
 	bool m_boot_press = false;
 	emu_timer *m_boot_timer = nullptr;
-	uint8_t m_mcu_p3 = 0x04;
+	uint8_t m_mcu_p3;
 };
 
 // Quizard 2 language values:

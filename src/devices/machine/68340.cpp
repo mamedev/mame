@@ -247,7 +247,7 @@ void m68340_cpu_device::device_reset()
 
 // Some hardwares pulls this low when resetting peripherals, most just ties this line to GND or VCC
 // TODO: Support Limp mode and external clock with no PLL
-WRITE_LINE_MEMBER( m68340_cpu_device::set_modck )
+void m68340_cpu_device::set_modck(int state)
 {
 	m_modck = state;
 	m_clock_mode &= ~(m68340_sim::CLOCK_MODCK | m68340_sim::CLOCK_PLL);
@@ -273,7 +273,7 @@ void m68340_cpu_device::device_start()
 	m_internal = &space(AS_PROGRAM);
 }
 
-WRITE_LINE_MEMBER(m68340_cpu_device::reset_peripherals)
+void m68340_cpu_device::reset_peripherals(int state)
 {
 	m_m68340SIM->module_reset();
 	m_m68340DMA->module_reset();

@@ -66,7 +66,7 @@ public:
 	TILE_GET_INFO_MEMBER(tile_info);
 
 	void adpcm_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int_w);
+	void adpcm_int_w(int state);
 
 	INTERRUPT_GEN_MEMBER(vblank_int);
 	void ctrl_w(uint8_t data);
@@ -411,7 +411,7 @@ void chinsan_state::adpcm_w(uint8_t data)
 	m_adpcm->reset_w(0);
 }
 
-WRITE_LINE_MEMBER( chinsan_state::adpcm_int_w )
+void chinsan_state::adpcm_int_w(int state)
 {
 	if (m_adpcm_pos >= 0x10000 || m_adpcm_idle)
 	{

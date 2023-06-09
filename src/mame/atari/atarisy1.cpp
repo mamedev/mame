@@ -383,13 +383,13 @@ uint8_t atarisy1_state::via_pb_r()
  *
  *************************************/
 
-WRITE_LINE_MEMBER(atarisy1_state::coin_counter_right_w)
+void atarisy1_state::coin_counter_right_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
 
-WRITE_LINE_MEMBER(atarisy1_state::coin_counter_left_w)
+void atarisy1_state::coin_counter_left_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }

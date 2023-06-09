@@ -405,7 +405,7 @@ void wangpc_keyboard_device::device_reset()
 //  write_rxd -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(wangpc_keyboard_device::write_rxd)
+void wangpc_keyboard_device::write_rxd(int state)
 {
 	m_rxd = state;
 }

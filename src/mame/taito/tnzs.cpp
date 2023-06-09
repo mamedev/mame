@@ -896,7 +896,7 @@ public:
 	void tnzsb(machine_config &config) ATTR_COLD;
 
 protected:
-	DECLARE_WRITE_LINE_MEMBER(ym2203_irqhandler);
+	void ym2203_irqhandler(int state);
 
 	void sound_command_w(uint8_t data);
 
@@ -1409,7 +1409,7 @@ void tnzsb_state::sound_command_w(uint8_t data)
 }
 
 // handler called by the 2203 emulator when the internal timers cause an IRQ
-WRITE_LINE_MEMBER(tnzsb_state::ym2203_irqhandler)
+void tnzsb_state::ym2203_irqhandler(int state)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }

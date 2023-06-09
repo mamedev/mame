@@ -363,17 +363,17 @@ uint16_t hp_taco_device::reg_r(offs_t offset)
 	return res;
 }
 
-READ_LINE_MEMBER(hp_taco_device::flg_r)
+int hp_taco_device::flg_r()
 {
 	return m_flg;
 }
 
-READ_LINE_MEMBER(hp_taco_device::sts_r)
+int hp_taco_device::sts_r()
 {
 	return m_sts;
 }
 
-WRITE_LINE_MEMBER(hp_taco_device::cart_out_w)
+void hp_taco_device::cart_out_w(int state)
 {
 	LOG_DBG("cart_out_w %d\n", state);
 	set_tape_present(!state);
@@ -383,7 +383,7 @@ WRITE_LINE_MEMBER(hp_taco_device::cart_out_w)
 	}
 }
 
-WRITE_LINE_MEMBER(hp_taco_device::hole_w)
+void hp_taco_device::hole_w(int state)
 {
 	if (state) {
 		LOG_DBG("hole_w\n");
@@ -395,7 +395,7 @@ WRITE_LINE_MEMBER(hp_taco_device::hole_w)
 	}
 }
 
-WRITE_LINE_MEMBER(hp_taco_device::tacho_tick_w)
+void hp_taco_device::tacho_tick_w(int state)
 {
 	if (state) {
 		LOG_DBG("tacho_tick_w\n");
@@ -451,14 +451,14 @@ WRITE_LINE_MEMBER(hp_taco_device::tacho_tick_w)
 	}
 }
 
-WRITE_LINE_MEMBER(hp_taco_device::motion_w)
+void hp_taco_device::motion_w(int state)
 {
 	if (state) {
 		cmd_fsm();
 	}
 }
 
-WRITE_LINE_MEMBER(hp_taco_device::rd_bit_w)
+void hp_taco_device::rd_bit_w(int state)
 {
 	LOG_RW("RD bit %d (st=%d,w=%04x,i=%u)\n", state, m_cmd_state, m_working_reg, m_bit_idx);
 	if (m_cmd_state != CMD_IDLE) {
@@ -516,7 +516,7 @@ WRITE_LINE_MEMBER(hp_taco_device::rd_bit_w)
 	}
 }
 
-READ_LINE_MEMBER(hp_taco_device::wr_bit_r)
+int hp_taco_device::wr_bit_r()
 {
 	bool bit = false;
 	if (is_cmd_wr(m_cmd_reg) && m_cmd_state == CMD_PH2) {

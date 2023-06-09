@@ -109,7 +109,7 @@ private:
 
 	uint8_t apu_read_mem(offs_t offset);
 
-	DECLARE_WRITE_LINE_MEMBER(apu_irq);
+	void apu_irq(int state);
 
 	int m_initial_startup_state;
 
@@ -444,7 +444,7 @@ void nes_sh6578_max10in1_state::extio_w(uint8_t data)
 
 
 
-WRITE_LINE_MEMBER(nes_sh6578_state::apu_irq)
+void nes_sh6578_state::apu_irq(int state)
 {
 	// unimplemented
 }

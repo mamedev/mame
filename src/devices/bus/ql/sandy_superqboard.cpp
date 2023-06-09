@@ -86,7 +86,7 @@ void sandy_superqboard_device::floppy_formats(format_registration &fr)
 //  centronics
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( sandy_superqboard_device::busy_w )
+void sandy_superqboard_device::busy_w(int state)
 {
 	if (state)
 	{

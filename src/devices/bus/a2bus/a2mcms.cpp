@@ -123,7 +123,7 @@ mcms_device *a2bus_mcms1_device::get_engine(void)
 	return m_mcms;
 }
 
-WRITE_LINE_MEMBER(a2bus_mcms1_device::irq_w)
+void a2bus_mcms1_device::irq_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{

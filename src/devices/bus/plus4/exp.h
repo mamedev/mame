@@ -79,8 +79,8 @@ public:
 	// cartridge interface
 	uint8_t dma_cd_r(offs_t offset) { return m_read_dma_cd(offset); }
 	void dma_cd_w(offs_t offset, uint8_t data) { m_write_dma_cd(offset, data); }
-	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
-	DECLARE_WRITE_LINE_MEMBER( aec_w ) { m_write_aec(state); }
+	void irq_w(int state) { m_write_irq(state); }
+	void aec_w(int state) { m_write_aec(state); }
 	int phi2() { return clock(); }
 
 protected:

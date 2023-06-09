@@ -50,7 +50,7 @@
 #include "emu.h"
 #include "namco52.h"
 
-WRITE_LINE_MEMBER( namco_52xx_device::reset )
+void namco_52xx_device::reset(int state)
 {
 	// The incoming signal is active low
 	m_cpu->set_input_line(INPUT_LINE_RESET, !state);
@@ -61,7 +61,7 @@ uint8_t namco_52xx_device::K_r()
 	return m_latched_cmd & 0x0f;
 }
 
-READ_LINE_MEMBER( namco_52xx_device::SI_r )
+int namco_52xx_device::SI_r()
 {
 	return m_si(0) ? 1 : 0;
 }
@@ -111,7 +111,7 @@ TIMER_CALLBACK_MEMBER( namco_52xx_device::write_sync )
 	m_latched_cmd = param;
 }
 
-WRITE_LINE_MEMBER( namco_52xx_device::chip_select )
+void namco_52xx_device::chip_select(int state)
 {
 	m_cpu->set_input_line(0, state);
 }

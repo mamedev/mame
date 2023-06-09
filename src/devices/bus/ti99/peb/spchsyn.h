@@ -40,7 +40,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( speech_ready );
+	void speech_ready(int state);
 
 	required_device<cd2501e_device> m_vsp;
 	bool m_reading;

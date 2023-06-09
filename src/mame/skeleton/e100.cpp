@@ -176,8 +176,8 @@ private:
 	void pia1_kbA_w(uint8_t data);
 	uint8_t pia1_kbB_r();
 	void pia1_kbB_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER( pia1_cb2_w);
+	void pia1_ca2_w(int state);
+	void pia1_cb2_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(rtc_w);
 	void e100_map(address_map &map);
 
@@ -393,12 +393,12 @@ uint8_t e100_state::pia1_kbB_r()
 	return m_pia1_B;
 }
 
-WRITE_LINE_MEMBER(e100_state::pia1_ca2_w)
+void e100_state::pia1_ca2_w(int state)
 {
 	// TODO: Make this a slot device to trigger time meassurements
 }
 
-WRITE_LINE_MEMBER(e100_state::pia1_cb2_w)
+void e100_state::pia1_cb2_w(int state)
 {
 	m_rs232->write_txd(!state);
 }

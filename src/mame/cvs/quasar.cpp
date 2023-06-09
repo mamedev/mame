@@ -80,7 +80,7 @@ private:
 	void bullet_w(offs_t offset, uint8_t data);
 	void sh_command_w(uint8_t data);
 	uint8_t sh_command_r();
-	DECLARE_READ_LINE_MEMBER(audio_t1_r);
+	int audio_t1_r();
 	void palette(palette_device &palette) const ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -334,7 +334,7 @@ uint8_t quasar_state::sh_command_r()
 	return m_soundlatch->read() + (m_dsw[2]->read() & 0x30);
 }
 
-READ_LINE_MEMBER(quasar_state::audio_t1_r)
+int quasar_state::audio_t1_r()
 {
 	return (m_soundlatch->read() == 0);
 }

@@ -73,11 +73,11 @@ private:
 	uint32_t gba_io_r(offs_t offset, uint32_t mem_mask = ~0);
 	void gba_io_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t gba_10000000_r(offs_t offset, uint32_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(int_hblank_callback);
-	DECLARE_WRITE_LINE_MEMBER(int_vblank_callback);
-	DECLARE_WRITE_LINE_MEMBER(int_vcount_callback);
-	DECLARE_WRITE_LINE_MEMBER(dma_hblank_callback);
-	DECLARE_WRITE_LINE_MEMBER(dma_vblank_callback);
+	void int_hblank_callback(int state);
+	void int_vblank_callback(int state);
+	void int_vcount_callback(int state);
+	void dma_hblank_callback(int state);
+	void dma_vblank_callback(int state);
 	TIMER_CALLBACK_MEMBER(dma_complete);
 	TIMER_CALLBACK_MEMBER(timer_expire);
 	TIMER_CALLBACK_MEMBER(handle_irq);

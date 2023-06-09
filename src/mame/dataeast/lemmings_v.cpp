@@ -53,7 +53,7 @@ void lemmings_state::video_start()
 	save_pointer(NAME(m_sprite_triple_buffer[1]), 0x800/2, 1);
 }
 
-WRITE_LINE_MEMBER(lemmings_state::screen_vblank_lemmings)
+void lemmings_state::screen_vblank_lemmings(int state)
 {
 	// rising edge
 	if (state)

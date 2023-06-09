@@ -151,10 +151,10 @@ private:
 	int m_centronics_fault;
 	int m_centronics_perror;
 
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_perror );
+	void write_centronics_busy(int state);
+	void write_centronics_select(int state);
+	void write_centronics_fault(int state);
+	void write_centronics_perror(int state);
 
 	void fp_io(address_map &map);
 	void fp_mem(address_map &map);
@@ -502,23 +502,23 @@ INPUT_PORTS_END
 
 */
 
-WRITE_LINE_MEMBER( fp_state::write_centronics_busy )
+void fp_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 	if (!state) m_pic->ir6_w(ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( fp_state::write_centronics_select )
+void fp_state::write_centronics_select(int state)
 {
 	m_centronics_select = state;
 }
 
-WRITE_LINE_MEMBER( fp_state::write_centronics_fault )
+void fp_state::write_centronics_fault(int state)
 {
 	m_centronics_fault = state;
 }
 
-WRITE_LINE_MEMBER( fp_state::write_centronics_perror )
+void fp_state::write_centronics_perror(int state)
 {
 	m_centronics_perror = state;
 }

@@ -88,8 +88,8 @@ protected:
 
 	virtual void io_control_w(offs_t offset, uint8_t data);
 	void audio_command_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(set_use_cart_vectors);
-	DECLARE_WRITE_LINE_MEMBER(set_use_cart_audio);
+	void set_use_cart_vectors(int state);
+	void set_use_cart_audio(int state);
 	uint16_t banked_vectors_r(offs_t offset);
 	void write_banksel(uint16_t data);
 	void write_bankprot(uint16_t data);
@@ -99,8 +99,8 @@ protected:
 	void write_bankprot_kof10th(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t read_lorom_kof10th(offs_t offset);
 
-	DECLARE_WRITE_LINE_MEMBER(set_screen_shadow);
-	DECLARE_WRITE_LINE_MEMBER(set_palette_bank);
+	void set_screen_shadow(int state);
+	void set_palette_bank(int state);
 
 	void neogeo_base(machine_config &config);
 	void neogeo_stereo(machine_config &config);
@@ -231,7 +231,7 @@ protected:
 	virtual void machine_reset() override;
 
 	virtual void io_control_w(offs_t offset, uint8_t data) override;
-	DECLARE_WRITE_LINE_MEMBER(set_save_ram_unlock);
+	void set_save_ram_unlock(int state);
 	void save_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t in0_edge_r();
 	uint16_t in0_edge_joy_r();

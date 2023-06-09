@@ -22,21 +22,21 @@
 
 struct mz_poly_extra_data
 {
-	const void *    palbase;
-	const void *    texbase;
-	uint16_t          solidcolor = 0;
-	uint16_t          voffset = 0;
-	int16_t           zoffset = 0;
-	uint16_t          transcolor = 0;
-	uint16_t          texwidth = 0;
-	uint16_t          color = 0;
-	uint32_t          alpha = 0;
-	uint32_t          ctrl_word = 0;
+	const void      *palbase;
+	const void      *texbase;
+	uint16_t        solidcolor = 0;
+	uint16_t        voffset = 0;
+	int16_t         zoffset = 0;
+	uint16_t        transcolor = 0;
+	uint16_t        texwidth = 0;
+	uint16_t        color = 0;
+	uint32_t        alpha = 0;
+	uint32_t        ctrl_word = 0;
 	bool            blend_enable = false;
 	bool            depth_test_enable = false;
 	bool            depth_write_enable = false;
-	uint32_t          blend = 0;
-	uint8_t           (*get_texel)(const void *, int, int, int);
+	uint32_t        blend = 0;
+	uint8_t         (*get_texel)(const void *, int, int, int);
 };
 
 
@@ -65,8 +65,8 @@ class midzeus_state : public driver_device
 	friend class midzeus_renderer;
 
 public:
-	midzeus_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	midzeus_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_nvram(*this, "nvram"),
 		m_ram_base(*this, "ram_base"),
 		m_tms32031_control(*this, "tms32031_ctl"),

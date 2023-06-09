@@ -50,18 +50,18 @@ protected:
 private:
 	enum { IRQ_VIA_0, IRQ_VIA_1, IRQ_ACIA };
 
-	DECLARE_WRITE_LINE_MEMBER(bus_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(bus_so_w);
+	void bus_irq_w(int state);
+	void bus_so_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(read_cassette);
 	uint8_t via_0_in_a();
 	void via_0_out_a(uint8_t data);
 	void via_0_out_b(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(via_0_out_ca2);
-	DECLARE_WRITE_LINE_MEMBER(via_0_out_cb2);
+	void via_0_out_ca2(int state);
+	void via_0_out_cb2(int state);
 	void via_1_out_a(uint8_t data);
 	void via_1_out_b(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(via_1_out_ca2);
-	DECLARE_WRITE_LINE_MEMBER(via_1_out_cb2);
+	void via_1_out_ca2(int state);
+	void via_1_out_cb2(int state);
 
 	required_memory_region m_rom_tanex;
 	required_memory_region m_rom_h2;

@@ -726,7 +726,7 @@ void msx2_base_state::switched_w(offs_t offset, u8 data)
 }
 
 // Some MSX2+ can switch the z80 clock between 3.5 and 5.3 MHz
-WRITE_LINE_MEMBER(msx2_base_state::turbo_w)
+void msx2_base_state::turbo_w(int state)
 {
 	// 0 - 5.369317 MHz
 	// 1 - 3.579545 MHz

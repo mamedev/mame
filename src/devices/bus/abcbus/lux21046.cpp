@@ -226,7 +226,7 @@ void luxor_55_21046_device::luxor_55_21046_io(address_map &map)
 
 */
 
-WRITE_LINE_MEMBER( luxor_55_21046_device::dma_int_w )
+void luxor_55_21046_device::dma_int_w(int state)
 {
 	m_dma_irq = state;
 
@@ -271,7 +271,7 @@ static void abc_floppies(device_slot_interface &device)
 	device.option_add("8dsdd", FLOPPY_8_DSDD);
 }
 
-WRITE_LINE_MEMBER( luxor_55_21046_device::fdc_intrq_w )
+void luxor_55_21046_device::fdc_intrq_w(int state)
 {
 	m_fdc_irq = state;
 

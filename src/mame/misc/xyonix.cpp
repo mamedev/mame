@@ -87,7 +87,7 @@ private:
 	uint8_t m_prev_coin;
 	bool m_nmi_mask;
 
-	DECLARE_WRITE_LINE_MEMBER(nmiclk_w);
+	void nmiclk_w(int state);
 	void irqack_w(uint8_t data);
 	void nmiack_w(uint8_t data);
 	uint8_t io_r();
@@ -124,7 +124,7 @@ void xyonix_state::irqack_w(uint8_t data)
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(xyonix_state::nmiclk_w)
+void xyonix_state::nmiclk_w(int state)
 {
 	if (state && m_nmi_mask)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);

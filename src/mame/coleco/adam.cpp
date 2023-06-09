@@ -913,7 +913,7 @@ INPUT_PORTS_END
 //  TMS9928A_INTERFACE( vdc_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( adam_state::vdc_int_w )
+void adam_state::vdc_int_w(int state)
 {
 	if (state && !m_vdp_nmi)
 	{
@@ -927,7 +927,7 @@ WRITE_LINE_MEMBER( adam_state::vdc_int_w )
 //  M6801_INTERFACE( m6801_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( adam_state::os3_w )
+void adam_state::os3_w(int state)
 {
 	if (state && !m_dma)
 	{
@@ -950,12 +950,12 @@ WRITE_LINE_MEMBER( adam_state::os3_w )
 }
 
 
-WRITE_LINE_MEMBER( adam_state::joy1_irq_w )
+void adam_state::joy1_irq_w(int state)
 {
 	// TODO
 }
 
-WRITE_LINE_MEMBER( adam_state::joy2_irq_w )
+void adam_state::joy2_irq_w(int state)
 {
 	// TODO
 }

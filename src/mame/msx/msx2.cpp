@@ -44,7 +44,7 @@ using namespace msx_keyboard;
 
 /***************************************************************************
 
-  MSX2 Game drivers
+  MSX2 machine drivers
 
 Undumped and/or not emulated:
 - AVT CPC-300 (prototype)

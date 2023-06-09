@@ -173,7 +173,7 @@ void adc0808_device::address_w(u8 data)
 	m_address = data & 7;
 }
 
-WRITE_LINE_MEMBER( adc0808_device::start_w )
+void adc0808_device::start_w(int state)
 {
 	if (m_start == state)
 		return;
@@ -191,7 +191,7 @@ WRITE_LINE_MEMBER( adc0808_device::start_w )
 	m_start = state;
 }
 
-READ_LINE_MEMBER( adc0808_device::eoc_r )
+int adc0808_device::eoc_r()
 {
 	return m_eoc;
 }

@@ -14,20 +14,25 @@
 
 #pragma once
 
-#include "h8.h"
-#include "h8_intc.h"
+class h8_device;
+class h8_intc_device;
 
 class h8_sci_device : public device_t {
 public:
 	h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intc, int eri, int rxi, int txi, int tei)
+	template<typename T, typename U> h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, int id, T &&cpu, U &&intc, int eri, int rxi, int txi, int tei)
 		: h8_sci_device(mconfig, tag, owner, 0)
 	{
-		set_info(intc, eri, rxi, txi, tei);
+		m_cpu.set_tag(std::forward<T>(cpu));
+		m_intc.set_tag(std::forward<U>(intc));
+		m_id = id;
+		m_eri_int = eri;
+		m_rxi_int = rxi;
+		m_txi_int = txi;
+		m_tei_int = tei;
 	}
 
-	void set_info(const char *intc, int eri, int rxi, int txi, int tei);
-	void set_external_clock_period(const attotime &_period);
+	void do_set_external_clock_period(const attotime &_period);
 
 	void smr_w(uint8_t data);
 	uint8_t smr_r();
@@ -43,11 +48,8 @@ public:
 	void scmr_w(uint8_t data);
 	uint8_t scmr_r();
 
-	DECLARE_WRITE_LINE_MEMBER(rx_w);
-	DECLARE_WRITE_LINE_MEMBER(clk_w);
-
-	auto tx_handler() { return tx_cb.bind(); }
-	auto clk_handler() { return clk_cb.bind(); }
+	void do_rx_w(int state);
+	void do_clk_w(int state);
 
 	uint64_t internal_update(uint64_t current_time);
 
@@ -102,24 +104,22 @@ protected:
 		SSR_MPBT = 0x01
 	};
 
-	required_device<h8_device> cpu;
-	devcb_write_line tx_cb, clk_cb;
-	h8_intc_device *intc;
-	const char *intc_tag;
-	attotime external_clock_period, cur_sync_time;
-	double external_to_internal_ratio, internal_to_external_ratio;
-	emu_timer *sync_timer;
+	required_device<h8_device> m_cpu;
+	required_device<h8_intc_device> m_intc;
+	attotime m_external_clock_period, m_cur_sync_time;
+	double m_external_to_internal_ratio, m_internal_to_external_ratio;
+	emu_timer *m_sync_timer;
 
-	int eri_int, rxi_int, txi_int, tei_int;
+	int m_id, m_eri_int, m_rxi_int, m_txi_int, m_tei_int;
 
-	int tx_state, rx_state, tx_bit, rx_bit, clock_state, tx_parity, rx_parity, ext_clock_counter;
-	clock_mode_t clock_mode;
-	bool clock_value, ext_clock_value, rx_value;
+	int m_tx_state, m_rx_state, m_tx_bit, m_rx_bit, m_clock_state, m_tx_parity, m_rx_parity, m_ext_clock_counter;
+	clock_mode_t m_clock_mode;
+	bool m_clock_value, m_ext_clock_value, m_rx_value;
 
-	uint8_t rdr, tdr, smr, scr, ssr, brr, rsr, tsr;
-	uint64_t clock_base, divider;
+	uint8_t m_rdr, m_tdr, m_smr, m_scr, m_ssr, m_brr, m_rsr, m_tsr;
+	uint64_t m_clock_base, m_divider;
 
-	std::string last_clock_message;
+	std::string m_last_clock_message;
 
 	void device_start() override;
 	void device_reset() override;

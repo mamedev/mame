@@ -53,6 +53,7 @@ public:
 	void sys1ppisx_315_5064(machine_config &config);
 	void sys2_317_0007(machine_config &config);
 	void sys1piox_315_5110(machine_config &config);
+	void sys1piox_315_5111(machine_config &config);
 	void sys1piox_315_5065(machine_config &config);
 	void sys2m(machine_config &config);
 	void sys1ppix_315_5178(machine_config &config);

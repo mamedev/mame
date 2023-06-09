@@ -25,8 +25,8 @@ public:
 
 	void vreadere(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(power_on_w);
-	DECLARE_WRITE_LINE_MEMBER(power_off_w);
+	void power_on_w(int state);
+	void power_off_w(int state);
 
 protected:
 	virtual void machine_start() override;
@@ -89,12 +89,12 @@ EPL43102_UPDATE_CB(vreadere_state::lcd_update)
 	return 0;
 }
 
-WRITE_LINE_MEMBER(vreadere_state::power_on_w)
+void vreadere_state::power_on_w(int state)
 {
 	m_maincpu->set_input_line(riscii_series_device::PA6_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(vreadere_state::power_off_w)
+void vreadere_state::power_off_w(int state)
 {
 	m_maincpu->set_input_line(riscii_series_device::PA7_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }

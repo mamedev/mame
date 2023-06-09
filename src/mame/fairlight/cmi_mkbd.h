@@ -25,10 +25,10 @@ public:
 	auto kbd_txd_handler() { return m_kbd_txd.bind(); }
 	auto kbd_rts_handler() { return m_kbd_rts.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( cmi_rxd_w );
-	DECLARE_WRITE_LINE_MEMBER( cmi_cts_w );
-	DECLARE_WRITE_LINE_MEMBER( kbd_rxd_w );
-	DECLARE_WRITE_LINE_MEMBER( kbd_cts_w );
+	void cmi_rxd_w(int state);
+	void cmi_cts_w(int state);
+	void kbd_rxd_w(int state);
+	void kbd_cts_w(int state);
 
 	DECLARE_INPUT_CHANGED_MEMBER(key_changed);
 
@@ -127,20 +127,20 @@ private:
 
 	void cmi10_u20_a_w(u8 data);
 	void cmi10_u20_b_w(u8 data);
-	DECLARE_READ_LINE_MEMBER( cmi10_u20_cb1_r );
-	DECLARE_WRITE_LINE_MEMBER( cmi10_u20_cb2_w );
-	DECLARE_WRITE_LINE_MEMBER( cmi10_u21_cb2_w );
+	int cmi10_u20_cb1_r();
+	void cmi10_u20_cb2_w(int state);
+	void cmi10_u21_cb2_w(int state);
 	u8 cmi10_u21_a_r();
 
 	u32 get_key_for_indices(int mux, int module, int key);
 
-	DECLARE_WRITE_LINE_MEMBER( kbd_acia_int );
-	DECLARE_WRITE_LINE_MEMBER( cmi_acia_int );
+	void kbd_acia_int(int state);
+	void cmi_acia_int(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( cmi_txd_w );
-	DECLARE_WRITE_LINE_MEMBER( cmi_rts_w );
-	DECLARE_WRITE_LINE_MEMBER( kbd_txd_w );
-	DECLARE_WRITE_LINE_MEMBER( kbd_rts_w );
+	void cmi_txd_w(int state);
+	void cmi_rts_w(int state);
+	void kbd_txd_w(int state);
+	void kbd_rts_w(int state);
 
 	template <unsigned N> void update_dp(offs_t offset, u16 data);
 

@@ -1039,7 +1039,7 @@ uint16_t neogeo_base_state::unmapped_r(address_space &space)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(ngarcade_base_state::set_save_ram_unlock)
+void ngarcade_base_state::set_save_ram_unlock(int state)
 {
 	m_save_ram_unlocked = state;
 }
@@ -1124,13 +1124,13 @@ uint8_t neogeo_base_state::audio_cpu_bank_select_r(offs_t offset)
  *************************************/
 
 
-WRITE_LINE_MEMBER(neogeo_base_state::set_use_cart_vectors)
+void neogeo_base_state::set_use_cart_vectors(int state)
 {
 	m_use_cart_vectors = state;
 }
 
 
-WRITE_LINE_MEMBER(neogeo_base_state::set_use_cart_audio)
+void neogeo_base_state::set_use_cart_audio(int state)
 {
 	m_use_cart_audio = state;
 	m_sprgen->neogeo_set_fixed_layer_source(state);

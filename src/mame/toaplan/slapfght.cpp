@@ -376,13 +376,13 @@ void slapfght_state::slapfighb2_map(address_map &map)
 
 /**************************************************************************/
 
-WRITE_LINE_MEMBER(slapfght_state::vblank_irq)
+void slapfght_state::vblank_irq(int state)
 {
 	if (state && m_main_irq_enabled)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(slapfght_state::irq_enable_w)
+void slapfght_state::irq_enable_w(int state)
 {
 	m_main_irq_enabled = state ? true : false;
 
@@ -390,7 +390,7 @@ WRITE_LINE_MEMBER(slapfght_state::irq_enable_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(slapfght_state::sound_reset_w)
+void slapfght_state::sound_reset_w(int state)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 

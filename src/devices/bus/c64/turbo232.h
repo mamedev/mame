@@ -45,7 +45,7 @@ protected:
 	virtual void c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
+	void acia_irq_w(int state);
 
 	required_device<mos6551_device> m_acia;
 	required_device<rs232_port_device> m_rs232;

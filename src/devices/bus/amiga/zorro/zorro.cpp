@@ -96,9 +96,9 @@ void zorro_bus_device_base::device_start()
 }
 
 // from slot device
-WRITE_LINE_MEMBER( zorro_bus_device_base::ovr_w ) { m_ovr_handler(state); }
-WRITE_LINE_MEMBER( zorro_bus_device_base::int2_w ) { m_int2_handler(state); }
-WRITE_LINE_MEMBER( zorro_bus_device_base::int6_w ) { m_int6_handler(state); }
+void zorro_bus_device_base::ovr_w(int state) { m_ovr_handler(state); }
+void zorro_bus_device_base::int2_w(int state) { m_int2_handler(state); }
+void zorro_bus_device_base::int6_w(int state) { m_int6_handler(state); }
 
 
 //**************************************************************************
@@ -272,12 +272,12 @@ void zorro2_bus_device::add_card(device_zorro_card_interface &card)
 }
 
 // from slot device
-WRITE_LINE_MEMBER( zorro2_bus_device::eint1_w ) { m_eint1_handler(state); }
-WRITE_LINE_MEMBER( zorro2_bus_device::eint4_w ) { m_eint4_handler(state); }
-WRITE_LINE_MEMBER( zorro2_bus_device::eint5_w ) { m_eint5_handler(state); }
-WRITE_LINE_MEMBER( zorro2_bus_device::eint7_w ) { m_eint7_handler(state); }
+void zorro2_bus_device::eint1_w(int state) { m_eint1_handler(state); }
+void zorro2_bus_device::eint4_w(int state) { m_eint4_handler(state); }
+void zorro2_bus_device::eint5_w(int state) { m_eint5_handler(state); }
+void zorro2_bus_device::eint7_w(int state) { m_eint7_handler(state); }
 
-WRITE_LINE_MEMBER( zorro2_bus_device::cfgout_w )
+void zorro2_bus_device::cfgout_w(int state)
 {
 	// if there is still a device in the chain, tell it to configure itself
 	if (m_dev.size() > ++m_autoconfig_device)
@@ -324,7 +324,7 @@ void device_zorro_card_interface::fc_w(int code)
 {
 }
 
-WRITE_LINE_MEMBER( device_zorro_card_interface::cfgin_w )
+void device_zorro_card_interface::cfgin_w(int state)
 {
 }
 

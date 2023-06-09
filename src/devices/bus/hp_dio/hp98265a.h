@@ -40,9 +40,9 @@ protected:
 	void dmack_w_in(int channel, uint8_t data) override;
 	uint8_t dmack_r_in(int channel) override;
 
-	DECLARE_WRITE_LINE_MEMBER(dmar0_w);
+	void dmar0_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void irq_w(int state);
 
 	required_device<nscsi_bus_device> m_scsibus;
 	required_device<mb87030_device> m_spc;

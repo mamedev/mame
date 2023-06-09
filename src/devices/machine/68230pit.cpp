@@ -231,7 +231,7 @@ TIMER_CALLBACK_MEMBER(pit68230_device::tick_clock)
 	}
 }
 
-WRITE_LINE_MEMBER( pit68230_device::h1_w )
+void pit68230_device::h1_w(int state)
 {
 	LOGBIT("%s pit68230_device::h1_w H1 set to %d\n", tag(), state);
 
@@ -245,7 +245,7 @@ WRITE_LINE_MEMBER( pit68230_device::h1_w )
 		m_psr = ((state == 0) ? (m_psr & ~REG_PSR_H1S) : (m_psr | REG_PSR_H1S));
 }
 
-WRITE_LINE_MEMBER( pit68230_device::h2_w )
+void pit68230_device::h2_w(int state)
 {
 	LOGBIT("%s pit68230_device::h2_w H2 set to %d\n", tag(), state);
 
@@ -259,7 +259,7 @@ WRITE_LINE_MEMBER( pit68230_device::h2_w )
 		m_psr = ((state == 0) ? (m_psr & ~REG_PSR_H2S) : (m_psr | REG_PSR_H2S));
 }
 
-WRITE_LINE_MEMBER( pit68230_device::h3_w )
+void pit68230_device::h3_w(int state)
 {
 	LOGBIT("%s pit68230_device::h3_w H3 set to %d\n", tag(), state);
 
@@ -273,7 +273,7 @@ WRITE_LINE_MEMBER( pit68230_device::h3_w )
 		m_psr = ((state == 0) ? (m_psr & ~REG_PSR_H3S) : (m_psr | REG_PSR_H3S));
 }
 
-WRITE_LINE_MEMBER( pit68230_device::h4_w )
+void pit68230_device::h4_w(int state)
 {
 	LOGBIT("%s pit68230_device::h4_w H4 set to %d\n", tag(), state);
 

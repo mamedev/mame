@@ -405,7 +405,7 @@ void bq4847_device::set_wdo(int state)
 	}
 }
 
-WRITE_LINE_MEMBER(bq4847_device::write_wdi)
+void bq4847_device::write_wdi(int state)
 {
 	if (m_wdi_state != state)
 	{

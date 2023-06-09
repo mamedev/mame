@@ -98,7 +98,7 @@ private:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	u8 input_r(offs_t offset);
 	void latch_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(lcd_update_w);
+	void lcd_update_w(int state);
 
 	u8 m_latch[5] = { };
 	u8 m_dac_data = 0;
@@ -166,7 +166,7 @@ void debut_state::latch_w(offs_t offset, u8 data)
 	}
 }
 
-WRITE_LINE_MEMBER(debut_state::lcd_update_w)
+void debut_state::lcd_update_w(int state)
 {
 	// 8086 S5 also goes to the lcd panel
 	if (!state && m_lcd_update)

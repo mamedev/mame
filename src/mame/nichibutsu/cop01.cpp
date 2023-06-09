@@ -150,7 +150,7 @@ public:
 
 	void mightguy(machine_config &config);
 
-	template <int Mask> DECLARE_READ_LINE_MEMBER(area_r);
+	template <int Mask> int area_r();
 
 	void init_mightguy();
 
@@ -389,7 +389,7 @@ uint8_t cop01_state::sound_command_r()
 
 
 template <int Mask>
-READ_LINE_MEMBER(mightguy_state::area_r)
+int mightguy_state::area_r()
 {
 	return (m_fake->read() & Mask) ? 1 : 0;
 }

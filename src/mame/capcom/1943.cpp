@@ -51,11 +51,6 @@
 
 /* Protection Handlers */
 
-INTERRUPT_GEN_MEMBER(_1943_state::mcu_irq)
-{
-	m_mcu->set_input_line(MCS51_INT1_LINE, HOLD_LINE);
-}
-
 void _1943_state::mcu_p3_w(u8 data)
 {
 	// write strobe
@@ -266,10 +261,9 @@ void _1943_state::machine_start()
 
 void _1943_state::machine_reset()
 {
-	m_char_on = 0;
-	m_obj_on = 0;
-	m_bg1_on = 0;
-	m_bg2_on = 0;
+	// these latches are cleared at RESET
+	c804_w(0);
+	d806_w(0);
 }
 
 void _1943_state::_1943(machine_config &config)
@@ -279,9 +273,9 @@ void _1943_state::_1943(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &_1943_state::c1943_map);
 	m_maincpu->set_vblank_int("screen", FUNC(_1943_state::irq0_line_hold));
 
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(24'000'000)/8)); /* verified on pcb */
-	audiocpu.set_addrmap(AS_PROGRAM, &_1943_state::sound_map);
-	audiocpu.set_periodic_int(FUNC(_1943_state::irq0_line_hold), attotime::from_hz(4*60));
+	Z80(config, m_audiocpu, XTAL(24'000'000)/8); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &_1943_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(_1943_state::irq0_line_hold), attotime::from_hz(4*60));
 
 	I8751(config, m_mcu, XTAL(24'000'000)/4); // clock unknown
 	m_mcu->port_in_cb<0>().set([this](){ return m_cpu_to_mcu; });
@@ -290,7 +284,6 @@ void _1943_state::_1943(machine_config &config)
 	m_mcu->port_in_cb<2>().set([this](){ return m_audiocpu_to_mcu; });
 	m_mcu->port_out_cb<2>().set([this](u8 data){ m_mcu_p2 = data; });
 	m_mcu->port_out_cb<3>().set(FUNC(_1943_state::mcu_p3_w));
-	m_mcu->set_vblank_int("screen", FUNC(_1943_state::mcu_irq));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -299,6 +292,7 @@ void _1943_state::_1943(machine_config &config)
 	m_screen->set_raw(XTAL(24'000'000)/4, 384, 128, 0, 262, 22, 246);   // hsync is 50..77, vsync is 257..259
 	m_screen->set_screen_update(FUNC(_1943_state::screen_update));
 	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline(m_mcu, MCS51_INT1_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1943);
 	PALETTE(config, m_palette, FUNC(_1943_state::_1943_palette), 32*4+16*16+16*16+16*16, 256);

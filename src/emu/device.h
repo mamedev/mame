@@ -37,19 +37,6 @@
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-// configure devices
-
-#define DECLARE_READ_LINE_MEMBER(name)      int  name()
-#define READ_LINE_MEMBER(name)              int  name()
-#define DECLARE_WRITE_LINE_MEMBER(name)     void name([[maybe_unused]] int state)
-#define WRITE_LINE_MEMBER(name)             void name([[maybe_unused]] int state)
-
-
-
-//**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 

@@ -11,7 +11,7 @@ ROM source notes when dumped from another title, but confident it's the same:
 - cambrp: Radio Shack EC-4001 Programmable
 
 TODO:
-- qkracerm link cable (already tested locally and it works, so driver notes
+- qkracer link cable (already tested locally and it works, so driver notes
   and MCU serial emulation are good enough)
 
 *******************************************************************************/
@@ -31,7 +31,7 @@ TODO:
 #include "mhockey.lh"
 #include "mhockeya.lh"
 #include "msoccer.lh"
-#include "qkracerm.lh"
+#include "qkracer.lh"
 #include "qkspeller.lh"
 
 //#include "hh_cops1_test.lh" // common test-layout - use external artwork
@@ -346,15 +346,15 @@ ROM_END
 
 *******************************************************************************/
 
-class qkracerm_state : public hh_cops1_state
+class qkracer_state : public hh_cops1_state
 {
 public:
-	qkracerm_state(const machine_config &mconfig, device_type type, const char *tag) :
+	qkracer_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_cops1_state(mconfig, type, tag),
 		m_ds8874(*this, "ds8874")
 	{ }
 
-	void qkracerm(machine_config &config);
+	void qkracer(machine_config &config);
 
 private:
 	required_device<ds8874_device> m_ds8874;
@@ -370,12 +370,12 @@ private:
 
 // handlers
 
-void qkracerm_state::update_display()
+void qkracer_state::update_display()
 {
 	m_display->matrix(m_grid, m_s);
 }
 
-void qkracerm_state::ds8874_output_w(u16 data)
+void qkracer_state::ds8874_output_w(u16 data)
 {
 	// DS8874 outputs: digit select, input mux
 	m_grid = ~data;
@@ -383,7 +383,7 @@ void qkracerm_state::ds8874_output_w(u16 data)
 	update_display();
 }
 
-void qkracerm_state::write_do(u8 data)
+void qkracer_state::write_do(u8 data)
 {
 	// DO1: DS8874 CP
 	// DO4: DS8874 _DATA
@@ -391,7 +391,7 @@ void qkracerm_state::write_do(u8 data)
 	m_ds8874->data_w(BIT(data, 3));
 }
 
-void qkracerm_state::write_s(u8 data)
+void qkracer_state::write_s(u8 data)
 {
 	// Sa-Sg: digit segment data
 	// Sp: link data out
@@ -399,7 +399,7 @@ void qkracerm_state::write_s(u8 data)
 	update_display();
 }
 
-u8 qkracerm_state::read_f()
+u8 qkracer_state::read_f()
 {
 	// F1: N/C
 	// F2: link cable detected
@@ -407,13 +407,13 @@ u8 qkracerm_state::read_f()
 	return m_maincpu->f_output_r() & 1;
 }
 
-u8 qkracerm_state::read_k()
+u8 qkracer_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(5);
 }
 
-int qkracerm_state::read_si()
+int qkracer_state::read_si()
 {
 	// SI: link master(1)/slave(0)
 	return 0;
@@ -421,7 +421,7 @@ int qkracerm_state::read_si()
 
 // inputs
 
-static INPUT_PORTS_START( qkracerm )
+static INPUT_PORTS_START( qkracer )
 	PORT_START("IN.0") // DS8874 OUT 4 port K
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Amateur")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Pro")
@@ -455,37 +455,37 @@ INPUT_PORTS_END
 
 // config
 
-void qkracerm_state::qkracerm(machine_config &config)
+void qkracer_state::qkracer(machine_config &config)
 {
 	// basic machine hardware
 	MM5799(config, m_maincpu, 220000); // approximation
 	m_maincpu->set_option_ram_d12(true);
 	m_maincpu->set_option_lb_10(5);
-	m_maincpu->write_do().set(FUNC(qkracerm_state::write_do));
-	m_maincpu->write_s().set(FUNC(qkracerm_state::write_s));
-	m_maincpu->read_f().set(FUNC(qkracerm_state::read_f));
-	m_maincpu->read_k().set(FUNC(qkracerm_state::read_k));
-	m_maincpu->read_si().set(FUNC(qkracerm_state::read_si));
+	m_maincpu->write_do().set(FUNC(qkracer_state::write_do));
+	m_maincpu->write_s().set(FUNC(qkracer_state::write_s));
+	m_maincpu->read_f().set(FUNC(qkracer_state::read_f));
+	m_maincpu->read_k().set(FUNC(qkracer_state::read_k));
+	m_maincpu->read_si().set(FUNC(qkracer_state::read_si));
 
 	// video hardware
-	DS8874(config, m_ds8874).write_output().set(FUNC(qkracerm_state::ds8874_output_w));
+	DS8874(config, m_ds8874).write_output().set(FUNC(qkracer_state::ds8874_output_w));
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
 	m_display->set_segmask(0xdf, 0x7f);
 	m_display->set_segmask(0x20, 0x41); // equals sign
-	config.set_default_layout(layout_qkracerm);
+	config.set_default_layout(layout_qkracer);
 
 	// no sound!
 }
 
 // roms
 
-ROM_START( qkracerm )
+ROM_START( qkracer )
 	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "mm4799_c_duz", 0x0000, 0x0200, CRC(8b484d2a) SHA1(809e902a11e23bed010ac795ab8dc50e5c1869dc) )
 	ROM_CONTINUE(             0x0400, 0x0400 )
 
 	ROM_REGION( 254, "maincpu:opla", 0 )
-	ROM_LOAD( "mm5799_qkracerm_output.pla", 0, 254, CRC(f095fc51) SHA1(e3321d5cc4ecef363df7ef94f47e860c7a6d8c7e) )
+	ROM_LOAD( "mm5799_qkracer_output.pla", 0, 254, CRC(f095fc51) SHA1(e3321d5cc4ecef363df7ef94f47e860c7a6d8c7e) )
 ROM_END
 
 
@@ -849,7 +849,7 @@ SYST( 1978, msoccer,   0,       0,      msoccer,   mbaskb,    mbaskb_state,    e
 SYST( 1978, mhockey,   0,       0,      mhockey,   mbaskb,    mbaskb_state,    empty_init, "Mattel Electronics", "Hockey (Mattel, US version)", MACHINE_SUPPORTS_SAVE )
 SYST( 1978, mhockeya,  mhockey, 0,      mhockeya,  mhockeya,  mbaskb_state,    empty_init, "Mattel Electronics", "Hockey (Mattel, export version)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1977, qkracerm,  qkracer, 0,      qkracerm,  qkracerm,  qkracerm_state,  empty_init, "National Semiconductor", "QuizKid Racer (MM5799 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NODEVICE_LAN )
+SYST( 1977, qkracer,   0,       0,      qkracer,   qkracer,   qkracer_state,   empty_init, "National Semiconductor", "QuizKid Racer (MM5799 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NODEVICE_LAN )
 SYST( 1978, qkspeller, 0,       0,      qkspeller, qkspeller, qkspeller_state, empty_init, "National Semiconductor", "QuizKid Speller", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // ***
 
 SYST( 1977, cambrp,    0,       0,      cambrp,    cambrp,    cambrp_state,    empty_init, "Sinclair Radionics", "Cambridge Programmable", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

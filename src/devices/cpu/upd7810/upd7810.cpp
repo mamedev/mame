@@ -585,7 +585,7 @@ void upd7810_device::pf_w(uint8_t data, uint8_t mem_mask)
 	COMBINE_DATA(&m_pf_in);
 }
 
-WRITE_LINE_MEMBER(upd7810_device::sck_w)
+void upd7810_device::sck_w(int state)
 {
 	if ((SMH & 0x03) == 0x03 && state != SCK)
 		update_sio(1);

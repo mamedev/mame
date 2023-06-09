@@ -1057,23 +1057,23 @@ u8 mc68901_device::get_vector()
 		return 0x18; // Spurious irq
 }
 
-WRITE_LINE_MEMBER( mc68901_device::i0_w ) { gpio_input(0, state); }
-WRITE_LINE_MEMBER( mc68901_device::i1_w ) { gpio_input(1, state); }
-WRITE_LINE_MEMBER( mc68901_device::i2_w ) { gpio_input(2, state); }
-WRITE_LINE_MEMBER( mc68901_device::i3_w ) { gpio_input(3, state); }
-WRITE_LINE_MEMBER( mc68901_device::i4_w ) { gpio_input(4, state); }
-WRITE_LINE_MEMBER( mc68901_device::i5_w ) { gpio_input(5, state); }
-WRITE_LINE_MEMBER( mc68901_device::i6_w ) { gpio_input(6, state); }
-WRITE_LINE_MEMBER( mc68901_device::i7_w ) { gpio_input(7, state); }
+void mc68901_device::i0_w(int state) { gpio_input(0, state); }
+void mc68901_device::i1_w(int state) { gpio_input(1, state); }
+void mc68901_device::i2_w(int state) { gpio_input(2, state); }
+void mc68901_device::i3_w(int state) { gpio_input(3, state); }
+void mc68901_device::i4_w(int state) { gpio_input(4, state); }
+void mc68901_device::i5_w(int state) { gpio_input(5, state); }
+void mc68901_device::i6_w(int state) { gpio_input(6, state); }
+void mc68901_device::i7_w(int state) { gpio_input(7, state); }
 
 
-WRITE_LINE_MEMBER( mc68901_device::tai_w )
+void mc68901_device::tai_w(int state)
 {
 	timer_input(TIMER_A, state);
 }
 
 
-WRITE_LINE_MEMBER( mc68901_device::tbi_w )
+void mc68901_device::tbi_w(int state)
 {
 	timer_input(TIMER_B, state);
 }
@@ -1086,7 +1086,7 @@ WRITE_LINE_MEMBER( mc68901_device::tbi_w )
 //  si_w - serial data input for receiver
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(mc68901_device::si_w)
+void mc68901_device::si_w(int state)
 {
 	m_si = state;
 }
@@ -1095,7 +1095,7 @@ WRITE_LINE_MEMBER(mc68901_device::si_w)
 //  rc_w - receiver clock input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(mc68901_device::rc_w)
+void mc68901_device::rc_w(int state)
 {
 	if (state != m_rc)
 	{
@@ -1110,7 +1110,7 @@ WRITE_LINE_MEMBER(mc68901_device::rc_w)
 //  tc_w - transmitter clock input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(mc68901_device::tc_w)
+void mc68901_device::tc_w(int state)
 {
 	if (state != m_tc)
 	{

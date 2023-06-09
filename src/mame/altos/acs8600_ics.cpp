@@ -51,7 +51,7 @@ void acs8600_ics_device::hostram_w(offs_t offset, u8 data)
 	m_host_space->write_byte((m_hiaddr << 16) | (BIT(m_ctrl, 0) << 15) | (offset & 0x7fff), data);
 }
 
-WRITE_LINE_MEMBER(acs8600_ics_device::attn_w)
+void acs8600_ics_device::attn_w(int state)
 {
 	m_icscpu->set_input_line(INPUT_LINE_NMI, state);
 }

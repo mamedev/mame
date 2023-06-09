@@ -219,8 +219,8 @@ private:
 	void mac_via2_out_b(u8 data);
 	void field_interrupts();
 	void mac_via_sync();
-	DECLARE_WRITE_LINE_MEMBER(via_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(via2_irq_w);
+	void via_irq_w(int state);
+	void via2_irq_w(int state);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
 	int m_via_interrupt = 0, m_via2_interrupt = 0, m_scc_interrupt = 0, m_asc_interrupt = 0, m_last_taken_interrupt = 0;
 	int m_ca1_data = 0, m_via2_ca1_hack = 0;
@@ -267,7 +267,7 @@ private:
 
 	u32 buserror_r();
 
-	DECLARE_WRITE_LINE_MEMBER(asc_irq_w)
+	void asc_irq_w(int state)
 	{
 		m_asc_interrupt = state;
 		field_interrupts();
@@ -568,13 +568,13 @@ void macpb030_state::mac_via2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_via2->write(offset, (data >> 8) & 0xff);
 }
 
-WRITE_LINE_MEMBER(macpb030_state::via_irq_w)
+void macpb030_state::via_irq_w(int state)
 {
 	m_via_interrupt = state;
 	field_interrupts();
 }
 
-WRITE_LINE_MEMBER(macpb030_state::via2_irq_w)
+void macpb030_state::via2_irq_w(int state)
 {
 	m_via2_interrupt = state;
 	field_interrupts();

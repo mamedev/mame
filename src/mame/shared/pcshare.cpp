@@ -15,17 +15,14 @@
 
 #include "emu.h"
 #include "pcshare.h"
+
 #include "cpu/i86/i286.h"
-#include "bus/isa/trident.h"
-#include "video/pc_vga.h"
-#include "video/clgd542x.h"
-#include "screen.h"
 
 /******************
 DMA8237 Controller
 ******************/
 
-WRITE_LINE_MEMBER( pcat_base_state::pc_dma_hrq_changed )
+void pcat_base_state::pc_dma_hrq_changed(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
@@ -103,10 +100,10 @@ void pcat_base_state::set_dma_channel(int channel, int state)
 	if (!state) m_dma_channel = channel;
 }
 
-WRITE_LINE_MEMBER( pcat_base_state::pc_dack0_w ) { set_dma_channel(0, state); }
-WRITE_LINE_MEMBER( pcat_base_state::pc_dack1_w ) { set_dma_channel(1, state); }
-WRITE_LINE_MEMBER( pcat_base_state::pc_dack2_w ) { set_dma_channel(2, state); }
-WRITE_LINE_MEMBER( pcat_base_state::pc_dack3_w ) { set_dma_channel(3, state); }
+void pcat_base_state::pc_dack0_w(int state) { set_dma_channel(0, state); }
+void pcat_base_state::pc_dack1_w(int state) { set_dma_channel(1, state); }
+void pcat_base_state::pc_dack2_w(int state) { set_dma_channel(2, state); }
+void pcat_base_state::pc_dack3_w(int state) { set_dma_channel(3, state); }
 
 /******************
 8259 IRQ controller
@@ -120,7 +117,7 @@ uint8_t pcat_base_state::get_slave_ack(offs_t offset)
 	return 0x00;
 }
 
-WRITE_LINE_MEMBER( pcat_base_state::at_pit8254_out2_changed )
+void pcat_base_state::at_pit8254_out2_changed(int state)
 {
 	m_pit_out2 = state;
 	//at_speaker_set_input( state ? 1 : 0 );
@@ -138,65 +135,6 @@ void pcat_base_state::pcat32_io_common(address_map &map)
 	map(0x0080, 0x009f).rw(FUNC(pcat_base_state::dma_page_select_r), FUNC(pcat_base_state::dma_page_select_w));//TODO
 	map(0x00a0, 0x00bf).rw(m_pic8259_2, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x00c0, 0x00df).rw(m_dma8237_2, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask32(0x00ff00ff);
-}
-
-
-void pcat_base_state::pcvideo_vga(machine_config &config)
-{
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
-	screen.set_screen_update("vga", FUNC(vga_device::screen_update));
-
-	vga_device &vga(VGA(config, "vga", 0));
-	vga.set_screen("screen");
-	vga.set_vram_size(0x100000);
-}
-
-void pcat_base_state::pcvideo_trident_vga(machine_config &config)
-{
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
-	screen.set_screen_update("vga", FUNC(trident_vga_device::screen_update));
-
-	trident_vga_device &vga(TRIDENT_VGA(config, "vga", 0));
-	vga.set_screen("screen");
-	vga.set_vram_size(0x200000);
-}
-
-void pcat_base_state::pcvideo_s3_vga(machine_config &config)
-{
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
-	screen.set_screen_update("vga", FUNC(s3_vga_device::screen_update));
-
-	s3_vga_device &vga(S3_VGA(config, "vga", 0));
-	vga.set_screen("screen");
-	vga.set_vram_size(0x100000);
-}
-
-
-void pcat_base_state::pcvideo_cirrus_gd5428(machine_config &config)
-{
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
-	screen.set_screen_update("vga", FUNC(cirrus_gd5428_device::screen_update));
-
-	cirrus_gd5428_device &vga(CIRRUS_GD5428(config, "vga", 0));
-	vga.set_screen("screen");
-	vga.set_vram_size(0x200000);
-
-}
-
-void pcat_base_state::pcvideo_cirrus_gd5430(machine_config &config)
-{
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
-	screen.set_screen_update("vga", FUNC(cirrus_gd5430_device::screen_update));
-
-	cirrus_gd5430_device &vga(CIRRUS_GD5430(config, "vga", 0));
-	vga.set_screen("screen");
-	vga.set_vram_size(0x200000);
-
 }
 
 void pcat_base_state::pcat_common(machine_config &config)

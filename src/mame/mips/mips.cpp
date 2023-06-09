@@ -392,7 +392,7 @@ protected:
 	u16 lance_r(offs_t offset, u16 mem_mask = 0xffff);
 	void lance_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);
 
-	template <u8 Source> WRITE_LINE_MEMBER(irq_w);
+	template <u8 Source> void irq_w(int state);
 
 private:
 	// processors and memory
@@ -1151,7 +1151,7 @@ void rx3230_state::rs3230(machine_config &config)
 	}
 }
 
-template <u8 Source> WRITE_LINE_MEMBER(rx3230_state::irq_w)
+template <u8 Source> void rx3230_state::irq_w(int state)
 {
 	if (state)
 		m_int_reg |= Source;

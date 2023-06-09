@@ -36,8 +36,8 @@ protected:
 
 private:
 	// miscellaneous handlers
-	DECLARE_WRITE_LINE_MEMBER(acia_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(external_clock_w);
+	void acia_irq_w(int state);
+	void external_clock_w(int state);
 	u8 baud_select_r(offs_t offset);
 
 	// object finders

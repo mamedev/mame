@@ -26,8 +26,8 @@ public:
 	auto out_eop() { return m_eop.bind(); }
 
 	// input lines
-	DECLARE_WRITE_LINE_MEMBER(eop_w);
-	template <unsigned Channel> DECLARE_WRITE_LINE_MEMBER(dreq_w);
+	void eop_w(int state);
+	template <unsigned Channel> void dreq_w(int state);
 
 	template <unsigned Channel> auto flyby_byte_r() { return m_channel[Channel].flyby_byte_r.bind(); }
 	template <unsigned Channel> auto flyby_byte_w() { return m_channel[Channel].flyby_byte_w.bind(); }

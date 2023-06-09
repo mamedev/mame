@@ -279,23 +279,23 @@ private:
 
 	// Connections with the system interface TMS9901
 	uint8_t psi_input(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(peripheral_bus_reset);
-	DECLARE_WRITE_LINE_MEMBER(VDP_reset);
-	DECLARE_WRITE_LINE_MEMBER(joystick_select);
-	DECLARE_WRITE_LINE_MEMBER(keyboard_reset);
-	DECLARE_WRITE_LINE_MEMBER(video_wait_states);
-	DECLARE_WRITE_LINE_MEMBER(left_mouse_button);
+	void peripheral_bus_reset(int state);
+	void VDP_reset(int state);
+	void joystick_select(int state);
+	void keyboard_reset(int state);
+	void video_wait_states(int state);
+	void left_mouse_button(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(keyboard_clock_line);
-	DECLARE_WRITE_LINE_MEMBER(keyboard_data_line);
+	void keyboard_clock_line(int state);
+	void keyboard_data_line(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(clock_out);
+	void clock_out(int state);
 
 	void external_operation(offs_t offset, uint8_t data);
 
 	void tms9901_interrupt(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( keyboard_interrupt );
+	void keyboard_interrupt(int state);
 
 	required_device<tms9995_device>     m_cpu;
 	required_device<tms9901_device>     m_tms9901;
@@ -322,19 +322,19 @@ private:
 	void read_eprom_or_pfm(offs_t offset, uint8_t& value);
 	void write_pfm(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( pfm_a17 );
-	DECLARE_WRITE_LINE_MEMBER( pfm_a18 );
-	DECLARE_WRITE_LINE_MEMBER( pfm_oe );
+	void pfm_a17(int state);
+	void pfm_a18(int state);
+	void pfm_oe(int state);
 
 	// Interrupts
-	DECLARE_WRITE_LINE_MEMBER( inta );
-	DECLARE_WRITE_LINE_MEMBER( intb );
-	DECLARE_WRITE_LINE_MEMBER( keyboard_int );
-	DECLARE_WRITE_LINE_MEMBER( int2_from_v9938 );
+	void inta(int state);
+	void intb(int state);
+	void keyboard_int(int state);
+	void int2_from_v9938(int state);
 
 	// READY line contributors
-	DECLARE_WRITE_LINE_MEMBER( extready );
-	DECLARE_WRITE_LINE_MEMBER( sndready );
+	void extready(int state);
+	void sndready(int state);
 
 	// Memory bus
 	void setaddress_debug(bool debug, offs_t address, uint8_t busctrl);
@@ -738,19 +738,19 @@ void geneve_state::memwrite(offs_t offset, uint8_t data)
     PFM handling
 *****************************************************************************/
 
-WRITE_LINE_MEMBER( geneve_state::pfm_a17 )
+void geneve_state::pfm_a17(int state)
 {
 	if (state==ASSERT_LINE) m_pfm_prefix |= 0x20000;
 	else m_pfm_prefix &= ~0x20000;
 }
 
-WRITE_LINE_MEMBER( geneve_state::pfm_a18 )
+void geneve_state::pfm_a18(int state)
 {
 	if (state==ASSERT_LINE) m_pfm_prefix |= 0x40000;
 	else m_pfm_prefix &= ~0x40000;
 }
 
-WRITE_LINE_MEMBER( geneve_state::pfm_oe )
+void geneve_state::pfm_oe(int state)
 {
 	// Negative logic
 	LOGMASKED(LOG_PFM, "PFM output %s\n", (state==0)? "enable" : "disable");
@@ -908,7 +908,7 @@ uint8_t geneve_state::psi_input(offs_t offset)
 	}
 }
 
-WRITE_LINE_MEMBER( geneve_state::left_mouse_button )
+void geneve_state::left_mouse_button(int state)
 {
 	m_left_button = state;
 }
@@ -916,7 +916,7 @@ WRITE_LINE_MEMBER( geneve_state::left_mouse_button )
 /*
     Write PE bus reset line
 */
-WRITE_LINE_MEMBER( geneve_state::peripheral_bus_reset )
+void geneve_state::peripheral_bus_reset(int state)
 {
 	m_peribox->reset_in(state);
 }
@@ -924,7 +924,7 @@ WRITE_LINE_MEMBER( geneve_state::peripheral_bus_reset )
 /*
     Write VDP reset line
 */
-WRITE_LINE_MEMBER( geneve_state::VDP_reset )
+void geneve_state::VDP_reset(int state)
 {
 	m_video->reset_line(state);
 }
@@ -932,7 +932,7 @@ WRITE_LINE_MEMBER( geneve_state::VDP_reset )
 /*
     Write joystick select line. 1 selects joystick 1 (pin 7), 0 selects joystick 2 (pin 2)
 */
-WRITE_LINE_MEMBER( geneve_state::joystick_select )
+void geneve_state::joystick_select(int state)
 {
 	m_joyport->write_port((state==ASSERT_LINE)? 1:2);
 }
@@ -941,7 +941,7 @@ WRITE_LINE_MEMBER( geneve_state::joystick_select )
    Keyboard reset (active low). Most keyboards do not use a dedicated reset
    line but trigger a reset when the clock line is held low for some time.
 */
-WRITE_LINE_MEMBER( geneve_state::keyboard_reset )
+void geneve_state::keyboard_reset(int state)
 {
 	if (state==CLEAR_LINE)
 		LOG("Keyboard reset (line not connected)\n");
@@ -966,7 +966,7 @@ void geneve_state::tms9901_interrupt(offs_t offset, uint8_t data)
 /*
     inta is connected to both tms9901 IRQ1 line and to tms9995 INT4/EC line.
 */
-WRITE_LINE_MEMBER( geneve_state::inta )
+void geneve_state::inta(int state)
 {
 	m_inta = (state!=0)? ASSERT_LINE : CLEAR_LINE;
 	m_tms9901->set_int_line(1, state);
@@ -976,7 +976,7 @@ WRITE_LINE_MEMBER( geneve_state::inta )
 /*
     intb is connected to tms9901 IRQ12 line.
 */
-WRITE_LINE_MEMBER( geneve_state::intb )
+void geneve_state::intb(int state)
 {
 	m_intb = (state!=0)? ASSERT_LINE : CLEAR_LINE;
 	m_tms9901->set_int_line(12, state);
@@ -985,7 +985,7 @@ WRITE_LINE_MEMBER( geneve_state::intb )
 /*
     set the state of int2 (called by the v9938 core)
 */
-WRITE_LINE_MEMBER(geneve_state::int2_from_v9938)
+void geneve_state::int2_from_v9938(int state)
 {
 	// This method is frequently called without level change, so we only
 	// react on changes
@@ -999,7 +999,7 @@ WRITE_LINE_MEMBER(geneve_state::int2_from_v9938)
 /*
     Interrupt from the keyboard.
 */
-WRITE_LINE_MEMBER( geneve_state::keyboard_interrupt )
+void geneve_state::keyboard_interrupt(int state)
 {
 	m_keyint = (state!=0)? ASSERT_LINE : CLEAR_LINE;
 	m_tms9901->set_int_line(8, state);
@@ -1008,7 +1008,7 @@ WRITE_LINE_MEMBER( geneve_state::keyboard_interrupt )
 /*
     READY from the box is connected to the Gate Array and the Genmod board.
 */
-WRITE_LINE_MEMBER( geneve_state::extready )
+void geneve_state::extready(int state)
 {
 	m_gatearray->extready_in(state);
 	if (m_genmod)
@@ -1018,7 +1018,7 @@ WRITE_LINE_MEMBER( geneve_state::extready )
 /*
     READY from the sound chip is connected to the Gate Array and the Genmod board.
 */
-WRITE_LINE_MEMBER( geneve_state::sndready )
+void geneve_state::sndready(int state)
 {
 	m_gatearray->sndready_in(state);
 	if (m_genmod)
@@ -1035,7 +1035,7 @@ void geneve_state::external_operation(offs_t offset, uint8_t data)
 /*
     Clock line from the CPU. Used to control wait state generation.
 */
-WRITE_LINE_MEMBER( geneve_state::clock_out )
+void geneve_state::clock_out(int state)
 {
 	m_tms9901->phi_line(state);
 	m_gatearray->clock_in(state);

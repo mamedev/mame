@@ -157,9 +157,9 @@ public:
 	uint8_t syspia_A_r();
 	uint8_t syspia_B_r();
 	void syspia_B_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( syspia_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER( usrpia_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER (write_acia_clock);
+	void syspia_cb2_w(int state);
+	void usrpia_cb2_w(int state);
+	void write_acia_clock(int state);
 	void can09t(machine_config &config);
 	void can09t_map(address_map &map);
 protected:
@@ -444,17 +444,18 @@ void can09t_state::syspia_B_w(uint8_t data)
 	m_cass->output(BIT(data, 6) ? 1.0 : -1.0);
 }
 
-WRITE_LINE_MEMBER(can09t_state::syspia_cb2_w)
+void can09t_state::syspia_cb2_w(int state)
 {
 	LOG("%s(%02x)\n", FUNCNAME, state);
 }
 
-WRITE_LINE_MEMBER(can09t_state::usrpia_cb2_w)
+void can09t_state::usrpia_cb2_w(int state)
 {
 	LOG("%s(%02x)\n", FUNCNAME, state);
 }
 
-WRITE_LINE_MEMBER (can09t_state::write_acia_clock){
+void can09t_state::write_acia_clock(int state)
+{
 		m_acia->write_txc (state);
 		m_acia->write_rxc (state);
 }
@@ -523,7 +524,7 @@ protected:
 	void pia1_A_w(uint8_t data);
 	uint8_t pia1_B_r();
 	void pia1_B_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( pia1_cb2_w);
+	void pia1_cb2_w(int state);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void can09_map(address_map &map);
 	required_device<pia6821_device> m_pia1;
@@ -622,7 +623,7 @@ void can09_state::pia1_B_w(uint8_t data)
 #endif
 }
 
-WRITE_LINE_MEMBER(can09_state::pia1_cb2_w)
+void can09_state::pia1_cb2_w(int state)
 {
 	LOG("%s(%02x)\n", FUNCNAME, state);
 }

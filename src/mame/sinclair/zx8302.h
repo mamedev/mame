@@ -77,14 +77,14 @@ public:
 	uint8_t irq_status_r();
 	void irq_acknowledge_w(uint8_t data);
 	void data_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( vsync_w );
-	DECLARE_WRITE_LINE_MEMBER( comctl_w );
-	DECLARE_WRITE_LINE_MEMBER( comdata_w );
-	DECLARE_WRITE_LINE_MEMBER( extint_w );
+	void vsync_w(int state);
+	void comctl_w(int state);
+	void comdata_w(int state);
+	void extint_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( write_netin );
-	DECLARE_WRITE_LINE_MEMBER( write_dtr1 );
-	DECLARE_WRITE_LINE_MEMBER( write_cts2 );
+	void write_netin(int state);
+	void write_dtr1(int state);
+	void write_cts2(int state);
 
 protected:
 	// device-level overrides

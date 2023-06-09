@@ -187,22 +187,22 @@ void xavix_state::process_ioevent(uint8_t bits)
 	}
 }
 
-WRITE_LINE_MEMBER(xavix_state::ioevent_trg01)
+void xavix_state::ioevent_trg01(int state)
 {
 	process_ioevent(0x01);
 }
 
-WRITE_LINE_MEMBER(xavix_state::ioevent_trg02)
+void xavix_state::ioevent_trg02(int state)
 {
 	process_ioevent(0x02);
 }
 
-WRITE_LINE_MEMBER(xavix_state::ioevent_trg04)
+void xavix_state::ioevent_trg04(int state)
 {
 	process_ioevent(0x04);
 }
 
-WRITE_LINE_MEMBER(xavix_state::ioevent_trg08)
+void xavix_state::ioevent_trg08(int state)
 {
 	process_ioevent(0x08);
 }
@@ -380,7 +380,7 @@ void xavix_state::dispctrl_posirq_y_w(uint8_t data)
 
 
 
-READ_LINE_MEMBER(xavix_ekara_state::ekara_multi0_r)
+int xavix_ekara_state::ekara_multi0_r()
 {
 	switch (m_extraioselect & 0x7f)
 	{
@@ -398,7 +398,7 @@ READ_LINE_MEMBER(xavix_ekara_state::ekara_multi0_r)
 	return 0x00;
 }
 
-READ_LINE_MEMBER(xavix_ekara_state::ekara_multi1_r)
+int xavix_ekara_state::ekara_multi1_r()
 {
 	switch (m_extraioselect & 0x7f)
 	{
@@ -505,7 +505,7 @@ void xavix_ekara_state::write_io1(uint8_t data, uint8_t direction)
 
 // the cart pins Popira 2 uses for IO with cart gc0010 are not controllable by the CPU on other ekara systems
 
-READ_LINE_MEMBER(xavix_popira2_cart_state::i2c_r)
+int xavix_popira2_cart_state::i2c_r()
 {
 	if (m_cartslot->has_cart())
 		return m_cartslot->read_sda();
@@ -522,7 +522,7 @@ void xavix_popira2_cart_state::write_io1(uint8_t data, uint8_t direction)
 	}
 }
 
-READ_LINE_MEMBER(xavix_evio_cart_state::i2c_r)
+int xavix_evio_cart_state::i2c_r()
 {
 	if (m_cartslot->has_cart())
 		return m_cartslot->read_sda();

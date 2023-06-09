@@ -21,9 +21,9 @@ public:
 	auto out_J() { return m_out_J_cb.bind(); }
 
 	// port 2 input lines
-	DECLARE_WRITE_LINE_MEMBER(in_E); // C̅L̅E̅A̅R̅
-	DECLARE_WRITE_LINE_MEMBER(in_F); // Data Direction
-	DECLARE_WRITE_LINE_MEMBER(in_G); // IN0
+	void in_E(int state); // C̅L̅E̅A̅R̅
+	void in_F(int state); // Data Direction
+	void in_G(int state); // IN0
 
 	// indirect register access
 	template <u8 Port> u8 reg_r()           { return reg_r(Port - 1); }

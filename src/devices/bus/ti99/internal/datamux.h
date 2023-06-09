@@ -48,11 +48,11 @@ public:
 	void write(offs_t offset, uint16_t data);
 	void setaddress(offs_t offset, uint16_t busctrl);
 
-	DECLARE_WRITE_LINE_MEMBER( clock_in );
-	DECLARE_WRITE_LINE_MEMBER( dbin_in );
-	DECLARE_WRITE_LINE_MEMBER( ready_line );
+	void clock_in(int state);
+	void dbin_in(int state);
+	void ready_line(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( gromclk_in );
+	void gromclk_in(int state);
 
 	auto ready_cb() { return m_ready.bind(); }
 

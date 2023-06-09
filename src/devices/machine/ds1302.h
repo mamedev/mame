@@ -36,10 +36,10 @@ public:
 	// construction/destruction
 	ds1302_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER( ce_w );
-	DECLARE_WRITE_LINE_MEMBER( sclk_w );
-	DECLARE_WRITE_LINE_MEMBER( io_w );
-	DECLARE_READ_LINE_MEMBER( io_r );
+	void ce_w(int state);
+	void sclk_w(int state);
+	void io_w(int state);
+	int io_r();
 
 protected:
 	ds1302_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t ram_size);

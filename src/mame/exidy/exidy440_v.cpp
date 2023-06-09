@@ -230,7 +230,7 @@ void exidy440_state::exidy440_update_firq()
 }
 
 
-WRITE_LINE_MEMBER(exidy440_state::vblank_interrupt_w)
+void exidy440_state::vblank_interrupt_w(int state)
 {
 	/* set the FIRQ line on a VBLANK */
 	if (state)

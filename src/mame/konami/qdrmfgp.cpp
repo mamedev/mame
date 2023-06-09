@@ -101,9 +101,9 @@ private:
 	INTERRUPT_GEN_MEMBER(qdrmfgp2_interrupt);
 	TIMER_CALLBACK_MEMBER(gp2_timer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(qdrmfgp_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(gp2_ide_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(k054539_irq1_gen);
+	void ide_interrupt(int state);
+	void gp2_ide_interrupt(int state);
+	void k054539_irq1_gen(int state);
 	K056832_CB_MEMBER(qdrmfgp_tile_callback);
 	K056832_CB_MEMBER(qdrmfgp2_tile_callback);
 
@@ -349,7 +349,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(qdrmfgp_state::qdrmfgp_interrupt)
 			m_maincpu->set_input_line(M68K_IRQ_3, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(qdrmfgp_state::ide_interrupt)
+void qdrmfgp_state::ide_interrupt(int state)
 {
 	if (m_control & 0x0008)
 		if (state != CLEAR_LINE)
@@ -371,7 +371,7 @@ INTERRUPT_GEN_MEMBER(qdrmfgp_state::qdrmfgp2_interrupt)
 		device.execute().set_input_line(M68K_IRQ_4, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(qdrmfgp_state::gp2_ide_interrupt)
+void qdrmfgp_state::gp2_ide_interrupt(int state)
 {
 	if (m_control & 0x0010)
 		if (state != CLEAR_LINE)
@@ -614,7 +614,7 @@ INPUT_PORTS_END
 
 int m_sound_intck;
 
-WRITE_LINE_MEMBER(qdrmfgp_state::k054539_irq1_gen)
+void qdrmfgp_state::k054539_irq1_gen(int state)
 {
 	if (m_control & 1)
 	{

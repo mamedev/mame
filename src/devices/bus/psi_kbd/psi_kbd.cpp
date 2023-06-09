@@ -72,7 +72,7 @@ void psi_keyboard_bus_device::device_reset()
 //  host to module interface
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( psi_keyboard_bus_device::tx_w )
+void psi_keyboard_bus_device::tx_w(int state)
 {
 	if (m_kbd)
 		m_kbd->tx_w(state);

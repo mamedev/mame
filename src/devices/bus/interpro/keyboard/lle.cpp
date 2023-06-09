@@ -486,7 +486,7 @@ void lle_device_base::ext_map(address_map &map)
 				}, "write");
 }
 
-READ_LINE_MEMBER(lle_device_base::t0_r)
+int lle_device_base::t0_r()
 {
 	if ((VERBOSE & LOG_RXTX) && (m_mcu->pc() == 0x8e) && m_txd)
 	{
@@ -501,7 +501,7 @@ READ_LINE_MEMBER(lle_device_base::t0_r)
 	return !m_txd;
 }
 
-READ_LINE_MEMBER(lle_device_base::t1_r)
+int lle_device_base::t1_r()
 {
 	return BIT(m_lower[m_count >> 3]->read(), m_count & 0x7) ? ASSERT_LINE : CLEAR_LINE;
 }

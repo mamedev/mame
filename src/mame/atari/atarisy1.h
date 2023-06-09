@@ -124,8 +124,8 @@ protected:
 	void adc_w(offs_t offset, uint8_t data);
 	uint16_t trakball_r(offs_t offset);
 	uint8_t switch_6502_r();
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
+	void coin_counter_right_w(int state);
+	void coin_counter_left_w(int state);
 	void via_pb_w(uint8_t data);
 	uint8_t via_pb_r();
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);

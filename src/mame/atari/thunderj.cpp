@@ -86,7 +86,7 @@ private:
 
 	static const atari_motion_objects_config s_mob_config;
 
-	DECLARE_WRITE_LINE_MEMBER(scanline_int_write_line);
+	void scanline_int_write_line(int state);
 	uint16_t special_port2_r();
 	void latch_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
@@ -336,7 +336,7 @@ uint32_t thunderj_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
  *
  *************************************/
 
-WRITE_LINE_MEMBER(thunderj_state::scanline_int_write_line)
+void thunderj_state::scanline_int_write_line(int state)
 {
 	m_maincpu->set_input_line(M68K_IRQ_4, state ? ASSERT_LINE : CLEAR_LINE);
 	m_extra->set_input_line(M68K_IRQ_4, state ? ASSERT_LINE : CLEAR_LINE);

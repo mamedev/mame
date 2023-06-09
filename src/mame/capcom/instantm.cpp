@@ -46,7 +46,7 @@ public:
 private:
 	u8 port01_r();
 	void port01_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
+	void clock_w(int state);
 
 	void main_map(address_map &map);
 	void sub_io(address_map &map);
@@ -76,7 +76,7 @@ void instantm_state::port01_w(u8 data)
 }
 
 // clock out the speech bytes
-WRITE_LINE_MEMBER( instantm_state::clock_w )
+void instantm_state::clock_w(int state)
 {
 	if (m_clock_en)
 		m_port01 ^= 0x80;

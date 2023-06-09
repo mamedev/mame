@@ -103,7 +103,7 @@ private:
 	void select_cart(uint8_t data);
 	void control_w(uint8_t data);
 	uint8_t cart_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(int_callback);
+	void int_callback(int state);
 
 	void prg_map(address_map &map);
 };
@@ -168,7 +168,7 @@ void shtzone_state::control_w(uint8_t data)
 	m_control = data;
 }
 
-WRITE_LINE_MEMBER(shtzone_state::int_callback)
+void shtzone_state::int_callback(int state)
 {
 	if (BIT(m_control, 0))
 		m_timercpu->set_input_line(0, state);

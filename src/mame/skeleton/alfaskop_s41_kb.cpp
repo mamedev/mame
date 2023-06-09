@@ -223,18 +223,18 @@ alfaskop_s41_keyboard_device::alfaskop_s41_keyboard_device(
 {
 }
 
-WRITE_LINE_MEMBER(alfaskop_s41_keyboard_device::rxd_w)
+void alfaskop_s41_keyboard_device::rxd_w(int state)
 {
 	LOGBITS("KBD bit presented: %d\n", state);
 	//m_rxd_high = CLEAR_LINE != state;
 }
 
-// WRITE_LINE_MEMBER(alfaskop_s41_keyboard_device::hold_w)
+// void alfaskop_s41_keyboard_device::hold_w(int state)
 // {
 //  m_hold = CLEAR_LINE == state;
 // }
 
-WRITE_LINE_MEMBER(alfaskop_s41_keyboard_device::rst_line_w)
+void alfaskop_s41_keyboard_device::rst_line_w(int state)
 {
 	if (state == CLEAR_LINE)
 	{

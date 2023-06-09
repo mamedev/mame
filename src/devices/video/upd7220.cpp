@@ -1653,7 +1653,7 @@ void upd7220_device::stop_dma()
 //  ext_sync_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( upd7220_device::ext_sync_w )
+void upd7220_device::ext_sync_w(int state)
 {
 	//LOG("uPD7220 External Synchronization: %u\n", state);
 
@@ -1672,7 +1672,7 @@ WRITE_LINE_MEMBER( upd7220_device::ext_sync_w )
 //  ext_sync_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( upd7220_device::lpen_w )
+void upd7220_device::lpen_w(int state)
 {
 	/* only if 2 rising edges on the lpen input occur at the same
 	   point during successive video fields are the pulses accepted */

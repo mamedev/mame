@@ -45,9 +45,9 @@ public:
 
 	void init_sidewndr();
 
-	template <int Mask> DECLARE_READ_LINE_MEMBER(sidewndr_payout_r);
-	template <int Mask> DECLARE_READ_LINE_MEMBER(starspnr_coinage_r);
-	template <int Mask> DECLARE_READ_LINE_MEMBER(starspnr_payout_r);
+	template <int Mask> int sidewndr_payout_r();
+	template <int Mask> int starspnr_coinage_r();
+	template <int Mask> int starspnr_payout_r();
 
 protected:
 	virtual void machine_start() override;

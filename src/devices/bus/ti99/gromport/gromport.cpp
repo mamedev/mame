@@ -173,7 +173,7 @@ void gromport_device::cruwrite(offs_t offset, uint8_t data)
 		m_connector->cruwrite(offset, data);
 }
 
-WRITE_LINE_MEMBER(gromport_device::ready_line)
+void gromport_device::ready_line(int state)
 {
 	m_console_ready(state);
 }
@@ -181,14 +181,14 @@ WRITE_LINE_MEMBER(gromport_device::ready_line)
 /*
     Asserted when the console addresses cartridge rom.
 */
-WRITE_LINE_MEMBER(gromport_device::romgq_line)
+void gromport_device::romgq_line(int state)
 {
 	m_romgq = state;
 	if (m_connector != nullptr)
 		m_connector->romgq_line(state);
 }
 
-WRITE_LINE_MEMBER(gromport_device::gclock_in)
+void gromport_device::gclock_in(int state)
 {
 	if (m_connector != nullptr)
 		m_connector->gclock_in(state);
@@ -278,7 +278,7 @@ cartridge_connector_device::cartridge_connector_device(const machine_config &mco
 {
 }
 
-WRITE_LINE_MEMBER( cartridge_connector_device::ready_line )
+void  cartridge_connector_device::ready_line(int state)
 {
 	m_gromport->ready_line(state);
 }

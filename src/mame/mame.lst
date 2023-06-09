@@ -2005,6 +2005,7 @@ sprint2h                        // 005922 romkit
 @source:atari/sprint4.cpp
 sprint4                         // 008716           1977/12 [6502]
 sprint4a                        // 008716           1977/12 [6502]
+sprint4b                        // 008716           1977/12 [6502]
 
 @source:atari/sprint8.cpp
 sprint8                         // ??????           1977/05 [6800]
@@ -18176,6 +18177,7 @@ redrobin                        // (c) 1986 Elettronolo
 amidar                          // GX337 (c) 1982 Konami
 amidar1                         // GX337 (c) 1981 Konami
 amidarb                         // bootleg
+amidarb2                        // bootleg
 amidarc                         // bootleg
 amidaro                         // GX337 (c) 1982 Konami + Olympia license
 amidars                         // GX337 (c) 1982 Konami
@@ -18637,6 +18639,7 @@ gmaster                         // Hartung Gamemaster
 
 @source:handheld/hh_cop400.cpp
 bshipg                          // Milton Bradley
+comparca                        // Tandy Corporation
 copspa                          // National Semiconductor
 ctstein                         // Castle Toy
 einvaderc                       // Entex
@@ -18654,7 +18657,7 @@ mbaskb2                         // Mattel
 mdallas                         // Mattel
 msoccer2                        // Mattel
 plus1                           // Milton Bradley
-qkracer                         // National Semiconductor
+qkracera                        // National Semiconductor
 solution                        // SCAT
 unkeinv                         // Gordon Barlow Design
 vidchal                         // Select Merchandise
@@ -18665,7 +18668,7 @@ mbaskb                          // Mattel
 mhockey                         // Mattel
 mhockeya                        // Mattel
 msoccer                         // Mattel
-qkracerm                        // National Semiconductor
+qkracer                         // National Semiconductor
 qkspeller                       // National Semiconductor
 
 @source:handheld/hh_hmcs40.cpp
@@ -18738,6 +18741,7 @@ us2pfball                       // US Games
 uspbball                        // US Games
 
 @source:handheld/hh_pps41.cpp
+addocalc                        // Addometer Company
 brainbaf                        // Mattel
 dunksunk                        // Kmart
 ftri1                           // Fonas
@@ -18858,75 +18862,75 @@ nummunch                        // VTech
 nupogodi                        // Elektronika
 okhota                          // Elektronika
 rkosmosa                        // Elektronika
-taddams                         // Tiger
-taltbeast                       // Tiger
-tapollo13                       // Tiger
+taddams                         // Tiger Electronics
+taltbeast                       // Tiger Electronics
+tapollo13                       // Tiger Electronics
 taynyoke                        // Elektronika
-tbatfor                         // Tiger
-tbatman                         // Tiger
-tbatmana                        // Tiger
-tbtoads                         // Tiger
-tbttf                           // Tiger
-tddragon                        // Tiger
-tddragon3                       // Tiger
-tdennis                         // Tiger
-tdummies                        // Tiger
-tflash                          // Tiger
-tgaiden                         // Tiger
-tgaiden3                        // Tiger
-tgargnf                         // Tiger
-tgaunt                          // Tiger
-tgoldeye                        // Tiger
-tgoldnaxe                       // Tiger
-thalone                         // Tiger
-thalone2                        // Tiger
-thook                           // Tiger
+tbatfor                         // Tiger Electronics
+tbatman                         // Tiger Electronics
+tbatmana                        // Tiger Electronics
+tbtoads                         // Tiger Electronics
+tbttf                           // Tiger Electronics
+tddragon                        // Tiger Electronics
+tddragon3                       // Tiger Electronics
+tdennis                         // Tiger Electronics
+tdummies                        // Tiger Electronics
+tflash                          // Tiger Electronics
+tgaiden                         // Tiger Electronics
+tgaiden3                        // Tiger Electronics
+tgargnf                         // Tiger Electronics
+tgaunt                          // Tiger Electronics
+tgoldeye                        // Tiger Electronics
+tgoldnaxe                       // Tiger Electronics
+thalone                         // Tiger Electronics
+thalone2                        // Tiger Electronics
+thook                           // Tiger Electronics
 tigarden                        // Tronica
-tinday                          // Tiger
-tjdredd                         // Tiger
-tjpark                          // Tiger
-tkarnov                         // Tiger
-tkazaam                         // Tiger
-tmchammer                       // Tiger
-tmegaman3                       // Tiger
-tmkombat                        // Tiger
-tnmarebc                        // Tiger
-topaliens                       // Tiger
-trobhood                        // Tiger
-trobocop2                       // Tiger
-trobocop3                       // Tiger
-trockteer                       // Tiger
+tinday                          // Tiger Electronics
+tjdredd                         // Tiger Electronics
+tjpark                          // Tiger Electronics
+tkarnov                         // Tiger Electronics
+tkazaam                         // Tiger Electronics
+tmchammer                       // Tiger Electronics
+tmegaman3                       // Tiger Electronics
+tmkombat                        // Tiger Electronics
+tnmarebc                        // Tiger Electronics
+topaliens                       // Tiger Electronics
+trobhood                        // Tiger Electronics
+trobocop2                       // Tiger Electronics
+trobocop3                       // Tiger Electronics
+trockteer                       // Tiger Electronics
 trsgkeep                        // Tronica
 trshutvoy                       // Tronica
 trspacmis                       // Tronica
 trspider                        // Tronica
 trsrescue                       // Tronica
 trthuball                       // Tronica
-tsddragon                       // Tiger
-tsf2010                         // Tiger
-tsfight2                        // Tiger
-tshadow                         // Tiger
-tsharr2                         // Tiger
-tsimquest                       // Tiger
-tsjam                           // Tiger
-tskelwarr                       // Tiger
-tsonic                          // Tiger
-tsonic2                         // Tiger
-tspidman                        // Tiger
-tstrider                        // Tiger
-tsuperman                       // Tiger
-tswampt                         // Tiger
-ttransf2                        // Tiger
-tvindictr                       // Tiger
-twworld                         // Tiger
-txmen                           // Tiger
-txmenpx                         // Tiger
+tsddragon                       // Tiger Electronics
+tsf2010                         // Tiger Electronics
+tsfight2                        // Tiger Electronics
+tshadow                         // Tiger Electronics
+tsharr2                         // Tiger Electronics
+tsimquest                       // Tiger Electronics
+tsjam                           // Tiger Electronics
+tskelwarr                       // Tiger Electronics
+tsonic                          // Tiger Electronics
+tsonic2                         // Tiger Electronics
+tspidman                        // Tiger Electronics
+tstrider                        // Tiger Electronics
+tsuperman                       // Tiger Electronics
+tswampt                         // Tiger Electronics
+ttransf2                        // Tiger Electronics
+tvindictr                       // Tiger Electronics
+twworld                         // Tiger Electronics
+txmen                           // Tiger Electronics
+txmenpx                         // Tiger Electronics
 vespovar                        // Elektronika
 vfutbol                         // Elektronika
 
 @source:handheld/hh_smc1k.cpp
-tkkongq                         // Tiger
-tlluke2                         // Tiger
+tkkongq                         // Tiger Electronics
+tlluke2                         // Tiger Electronics
 
 @source:handheld/hh_tms1k.cpp
 alphie                          // Playskool
@@ -18968,6 +18972,7 @@ esbattle                        // Entex
 esoccer                         // Entex
 f2pbball                        // Fonas
 f3in1                           // Fonas
+fingbowl                        // Tiger Electronics
 fxmcr165                        // Gakken
 ginv                            // Gakken
 ginv1000                        // Gakken
@@ -32544,6 +32549,7 @@ taiko3                          // 2002.03 Taiko no Tatsujin 3 (Japan, TK31 Ver.
 taiko4                          // 2002.12 Taiko no Tatsujin 4 (Japan, TK41 Ver.A)
 taiko5                          // 2003.10 Taiko no Tatsujin 5 (Japan, TK51 Ver.A)
 taiko6                          // 2004.07 Taiko no Tatsujin 6 (Japan, TK61 Ver.A)
+taikort                         // 2004.11 Taiko no Tatsujin RT: Nippon no Kokoro (Japan, TKN1 Ver.A)
 
 @source:namco/namcos11.cpp
 danceyes                        // 1996.09 Dancing Eyes (World, DC2/VER.B)
@@ -35335,7 +35341,9 @@ streetgr3                       // (c) 1993
 
 @source:pc/pcipc.cpp
 pcipc                           //
+pcinv3                          //
 pcipctx                         //
+pciagp                          //
 
 @source:pc/pcxt.cpp
 filetto                         // (c) 1990 Novamatic
@@ -35361,9 +35369,12 @@ quake                           // (c) 19?? Lazer-Tron / iD Software
 queen                           //
 
 @source:pc/sis630.cpp
+asuspolo                        // (c) 2001
+asuscusc                        // (c) 2001
 gamecst2                        // MAME based bootleg, version 2.613
 gamecstl                        // MAME based bootleg
 shutms11                        // (c) 2000
+zidav630e                       // (c) 2000/2001
 
 @source:pc/tandy1t.cpp
 t1000hx                         // 1987 Tandy 1000 HX (similiar to PCJr)
@@ -38943,10 +38954,10 @@ zombrvno                        // 1999.02 Zombie Revenge
 zunou                           // 2006.07 Touch de Zunou
 
 @source:sega/puckpkmn.cpp
+jingling                        // (c) 2000 IBS Co. Ltd
 jzth                            //
-puckpkmn                        // (c) 2000 Genie
-puckpkmna                       // (c) 2000 IBS
-puckpkmnb                       // (c) 2000 IBS
+puckpkmn                        // (c) 2000 Sun Mixing
+puckpkmnb                       //
 
 @source:sega/saturn.cpp
 hisaturn                        // Hitachi HiSaturn
@@ -39813,6 +39824,7 @@ starjacks                       // (c) 1983 Stern (S1)
 swat                            // 834-5388 (c) 1984 Coreland / Sega (S1)
 teddybb                         // 834-5712 (c) 1985 (S1)
 teddybbo                        // 834-5712 (c) 1985 (S1)
+teddybboa                       // 834-5712 (c) 1985 (S1)
 teddybbobl                      // bootleg
 thetogyu                        // 834-5478 (c) 1984 Sega / Coreland (S1)
 tokisens                        // (c) 1987
@@ -40307,6 +40319,19 @@ prpht600                        // 1983 Sequential Circuits
 @source:seta/albazc.cpp
 hanaroku                        // (c) 1988 Alba
 
+@source:seta/downtown.cpp
+arbalest                        // UK   (c) 1989 + Jordan, Romstar or Taito license (DSW)
+calibr50                        // UH   (c) 1989 + Romstar or Taito license (DSW)
+downtown                        // UD-2 (c) 1989 + Romstar or Taito license (DSW)
+downtown2                       // UD-2 (c) 1989 + Romstar or Taito license (DSW)
+downtownj                       // UD-2 (c) 1989 + Romstar or Taito license (DSW)
+downtownp                       // UD-2 (c) 1989 + Romstar or Taito license (DSW)
+metafox                         // UP   (c) 1989 + Jordan, Romstar or Taito license (DSW)
+tndrcade                        // UA-0 (c) 1987 Taito
+tndrcadej                       // UA-0 (c) 1987 Taito
+twineagl                        // UA-2 (c) 1988 + Taito license
+usclssic                        // UE   (c) 1989 + Romstar or Taito license (DSW)
+
 @source:seta/hanaawas.cpp
 hanaawas                        // (c) SetaKikaku
 
@@ -40337,23 +40362,17 @@ yujan                           // (C) 1999 Yubis
 yuka                            // (c) 1999 Yubis
 
 @source:seta/seta.cpp
-arbalest                        // UK   (c) 1989 + Jordan, Romstar or Taito license (DSW)
 atehate                         // (C) 1993 Athena
 blandia                         // (c) 1992 Allumer
 blandiap                        // (c) 1992 Allumer
 blockcar                        // (c) 1992 Visco
 blockcarb                       // bootleg
-calibr50                        // UH   (c) 1989 + Romstar or Taito license (DSW)
 crazyfgt                        // (c) 1998 Subsino
 daioh                           // (C) 1993 Athena
 daioha                          // (C) 1993 Athena
 daiohc                          // (C) 1993 Athena (93111A PCB conversion)
 daiohp                          // (C) 1993 Athena (prototype)
 daiohp2                         // (C) 1993 Athena (prototype, earlier)
-downtown                        // UD-2 (c) 1989 + Romstar or Taito license (DSW)
-downtown2                       // UD-2 (c) 1989 + Romstar or Taito license (DSW)
-downtownj                       // UD-2 (c) 1989 + Romstar or Taito license (DSW)
-downtownp                       // UD-2 (c) 1989 + Romstar or Taito license (DSW)
 drgnunit                        // (c) 1989 Athena / Seta + Romstar or Taito license (DSW)
 eightfrc                        // (c) 1994 Tecmo
 extdwnhl                        // (c) 1995 Sammy Japan
@@ -40373,7 +40392,6 @@ krzybowl                        // (c) 1994 American Sammy
 madshark                        // (c) 1993 Allumer
 madsharkbl                      // bootleg
 magspeed                        // (c) 1994 Allumer
-metafox                         // UP   (c) 1989 + Jordan, Romstar or Taito license (DSW)
 msgundam                        // (c) 1993 Banpresto
 msgundam1                       // (c) 1993 Banpresto
 msgundamb                       // bootleg
@@ -40394,12 +40412,8 @@ thunderl                        // (c) 1990 Seta + Romstar or Visco license (DSW
 thunderla                       // (c) 1990 Seta + Romstar or Visco license (DSW)
 thunderlbl                      // (c) 1991 Hyogo bootleg with Tetris sound
 thunderlbl2                     // (c) 1990 bootleg with Tetris sound
-tndrcade                        // UA-0 (c) 1987 Taito
-tndrcadej                       // UA-0 (c) 1987 Taito
 triplfun                        // bootleg
-twineagl                        // UA-2 (c) 1988 + Taito license
 umanclub                        // (c) 1992 Tsuburaya Prod. / Banpresto
-usclssic                        // UE   (c) 1989 + Romstar or Taito license (DSW)
 utoukond                        // (c) 1993 Banpresto + Tsuburaya Prod.
 wiggie                          // (c) 1994 Promat (not genuine seta hardware, but based on thunderl code)
 wits                            // (c) 1989 Athena (Visco license)
@@ -41094,6 +41108,9 @@ goupilg2                        //
 @source:skeleton/grfd2301.cpp
 grfd2301                        //
 
+@source:skeleton/happyvideo.cpp
+hppyvideo                       //
+
 @source:skeleton/hazeltin.cpp
 hazl1500                        // Hazeltine 1500 (c) 1977
 hazl1552                        // Hazeltine 1552 (c) 1979
@@ -41233,6 +41250,9 @@ mini2440                        //
 
 @source:skeleton/miniframe.cpp
 minifram
+
+@source:skeleton/minihock.cpp
+minihockey                      // (c) 1991 Rumatic
 
 @source:skeleton/miuchiz.cpp
 miuchiz                         // (c) 2006 MGA Entertainment

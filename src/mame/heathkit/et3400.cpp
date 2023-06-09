@@ -51,8 +51,8 @@ public:
 
 	void et3400(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(reset_key_w);
-	DECLARE_WRITE_LINE_MEMBER(segment_test_w);
+	void reset_key_w(int state);
+	void segment_test_w(int state);
 
 private:
 
@@ -149,7 +149,7 @@ void et3400_state::mem_map(address_map &map)
 	map(0xfc00, 0xffff).rom().region("roms", 0x1000);
 }
 
-WRITE_LINE_MEMBER(et3400_state::reset_key_w)
+void et3400_state::reset_key_w(int state)
 {
 	// delivered through MC6875 (or 74LS241 on ET-3400A)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
@@ -159,7 +159,7 @@ WRITE_LINE_MEMBER(et3400_state::reset_key_w)
 		m_pia->reset();
 }
 
-WRITE_LINE_MEMBER(et3400_state::segment_test_w)
+void et3400_state::segment_test_w(int state)
 {
 	for (int d = 0; d < 6; d++)
 		m_displatch[d]->clear_w(state);

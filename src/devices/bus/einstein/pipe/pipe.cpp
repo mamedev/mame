@@ -91,7 +91,7 @@ void tatung_pipe_device::device_start()
 //  host to module interface
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( tatung_pipe_device::host_int_w )
+void tatung_pipe_device::host_int_w(int state)
 {
 	if (m_card)
 		m_card->int_w(state);

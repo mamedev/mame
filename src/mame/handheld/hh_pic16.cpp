@@ -190,7 +190,8 @@ INPUT_CHANGED_MEMBER(hh_pic16_state::reset_button)
 
 INPUT_CHANGED_MEMBER(hh_pic16_state::power_button)
 {
-	set_power((bool)param);
+	if (newval != field.defvalue())
+		set_power((bool)param);
 }
 
 void hh_pic16_state::set_power(bool state)

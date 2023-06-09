@@ -272,7 +272,7 @@ hle_device_base::~hle_device_base()
 {
 }
 
-WRITE_LINE_MEMBER(hle_device_base::input_txd)
+void hle_device_base::input_txd(int state)
 {
 	device_buffered_serial_interface::rx_w(state);
 }

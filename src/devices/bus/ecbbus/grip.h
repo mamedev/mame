@@ -57,12 +57,12 @@ private:
 	uint8_t ppi_pb_r();
 	void ppi_pc_w(uint8_t data);
 	uint8_t sti_gpio_r();
-	DECLARE_WRITE_LINE_MEMBER( speaker_w );
+	void speaker_w(int state);
 
 	void kb_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
+	void write_centronics_busy(int state);
+	void write_centronics_fault(int state);
 
 	MC6845_UPDATE_ROW( crtc_update_row );
 

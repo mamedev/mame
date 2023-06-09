@@ -14,7 +14,7 @@
 #include "emu.h"
 #include "polyplay.h"
 
-WRITE_LINE_MEMBER(polyplay_state::ctc_zc0_w)
+void polyplay_state::ctc_zc0_w(int state)
 {
 	if (state)
 	{
@@ -23,7 +23,7 @@ WRITE_LINE_MEMBER(polyplay_state::ctc_zc0_w)
 	}
 }
 
-WRITE_LINE_MEMBER(polyplay_state::ctc_zc1_w)
+void polyplay_state::ctc_zc1_w(int state)
 {
 	if (state)
 	{

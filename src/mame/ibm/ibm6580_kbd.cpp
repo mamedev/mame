@@ -281,7 +281,7 @@ void dw_keyboard_device::bus_w(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(dw_keyboard_device::reset_w)
+void dw_keyboard_device::reset_w(int state)
 {
 	if (m_reset ^ state)
 	{
@@ -295,7 +295,7 @@ WRITE_LINE_MEMBER(dw_keyboard_device::reset_w)
 	}
 }
 
-WRITE_LINE_MEMBER(dw_keyboard_device::ack_w)
+void dw_keyboard_device::ack_w(int state)
 {
 	m_ack = state;
 }

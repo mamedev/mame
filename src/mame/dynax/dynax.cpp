@@ -107,7 +107,7 @@ TODO:
 
 
 /* It runs in IM 0, thus needs an opcode on the data bus */
-WRITE_LINE_MEMBER(dynax_state::sprtmtch_blitter_irq_w)
+void dynax_state::sprtmtch_blitter_irq_w(int state)
 {
 	if (state && m_blitter_irq_mask)
 		m_mainirq->rst4_w(1);
@@ -118,14 +118,14 @@ void dynax_state::dynax_vblank_ack_w(uint8_t data)
 	m_mainirq->rst2_w(0);
 }
 
-WRITE_LINE_MEMBER(dynax_state::blitter_ack_w)
+void dynax_state::blitter_ack_w(int state)
 {
 	m_blitter_irq_mask = state;
 	if (!m_blitter_irq_mask)
 		m_mainirq->rst4_w(0);
 }
 
-WRITE_LINE_MEMBER(dynax_state::sprtmtch_vblank_w)
+void dynax_state::sprtmtch_vblank_w(int state)
 {
 	if (state)
 		m_mainirq->rst2_w(1);
@@ -142,33 +142,33 @@ void jantouki_state::jantouki_vblank_ack_w(uint8_t data)
 	m_mainirq->rst4_w(0);
 }
 
-WRITE_LINE_MEMBER(jantouki_state::jantouki_blitter_irq_w)
+void jantouki_state::jantouki_blitter_irq_w(int state)
 {
 	if (state && m_blitter_irq_mask)
 		m_mainirq->rst1_w(1);
 }
 
-WRITE_LINE_MEMBER(jantouki_state::jantouki_blitter_ack_w)
+void jantouki_state::jantouki_blitter_ack_w(int state)
 {
 	m_blitter_irq_mask = state;
 	if (!m_blitter_irq_mask)
 		m_mainirq->rst1_w(0);
 }
 
-WRITE_LINE_MEMBER(jantouki_state::jantouki_blitter2_irq_w)
+void jantouki_state::jantouki_blitter2_irq_w(int state)
 {
 	if (state && m_blitter2_irq_mask)
 		m_mainirq->rst2_w(1);
 }
 
-WRITE_LINE_MEMBER(jantouki_state::jantouki_blitter2_ack_w)
+void jantouki_state::jantouki_blitter2_ack_w(int state)
 {
 	m_blitter2_irq_mask = state;
 	if (!m_blitter2_irq_mask)
 		m_mainirq->rst2_w(0);
 }
 
-WRITE_LINE_MEMBER(jantouki_state::jantouki_vblank_w)
+void jantouki_state::jantouki_vblank_w(int state)
 {
 	if (state)
 	{
@@ -200,12 +200,12 @@ void jantouki_state::jantouki_sound_vblank_ack_w(uint8_t data)
                                 Sports Match
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(dynax_state::coincounter_0_w)
+void dynax_state::coincounter_0_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(dynax_state::coincounter_1_w)
+void dynax_state::coincounter_1_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }
@@ -312,7 +312,7 @@ void dynax_adpcm_state::nanajign_palette_update(offs_t offset)
 }
 
 
-WRITE_LINE_MEMBER(dynax_adpcm_state::adpcm_int)
+void dynax_adpcm_state::adpcm_int(int state)
 {
 	m_msm->data_w(m_msm5205next >> 4);
 	m_msm5205next <<= 4;
@@ -326,7 +326,7 @@ WRITE_LINE_MEMBER(dynax_adpcm_state::adpcm_int)
 	}
 }
 
-WRITE_LINE_MEMBER(jantouki_state::adpcm_int_cpu1)
+void jantouki_state::adpcm_int_cpu1(int state)
 {
 	m_msm->data_w(m_msm5205next >> 4);
 	m_msm5205next <<= 4;
@@ -351,7 +351,7 @@ void dynax_adpcm_state::adpcm_reset_w(uint8_t data)
 	m_msm->reset_w(~data & 1);
 }
 
-WRITE_LINE_MEMBER(dynax_adpcm_state::adpcm_reset_kludge_w)
+void dynax_adpcm_state::adpcm_reset_kludge_w(int state)
 {
 	m_resetkludge = state;
 }
@@ -546,12 +546,12 @@ void dynax_adpcm_state::hnoridur_io_map(address_map &map)
                                 Hana Jingi
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(dynax_adpcm_state::hjingi_lockout_w)
+void dynax_adpcm_state::hjingi_lockout_w(int state)
 {
 	machine().bookkeeping().coin_lockout_w(0, !state);
 }
 
-WRITE_LINE_MEMBER(dynax_adpcm_state::hjingi_hopper_w)
+void dynax_adpcm_state::hjingi_hopper_w(int state)
 {
 	m_hopper = state;
 }
@@ -1205,13 +1205,13 @@ void dynax_state::tenkai_show_6c()
 //    popmessage("%02x %02x", m_tenkai_6c, m_tenkai_70);
 }
 
-WRITE_LINE_MEMBER(dynax_state::tenkai_6c_w)
+void dynax_state::tenkai_6c_w(int state)
 {
 	m_tenkai_6c = state;
 	tenkai_show_6c();
 }
 
-WRITE_LINE_MEMBER(dynax_state::tenkai_70_w)
+void dynax_state::tenkai_70_w(int state)
 {
 	m_tenkai_70 = state;
 	tenkai_show_6c();
@@ -4516,7 +4516,7 @@ void dynax_state::sprtmtch(machine_config &config)
                             Mahjong Friday
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(dynax_state::mjfriday_vblank_w)
+void dynax_state::mjfriday_vblank_w(int state)
 {
 	if (state)
 		m_maincpu->set_input_line(0, HOLD_LINE);
@@ -4850,13 +4850,13 @@ void dynax_adpcm_state::neruton(machine_config &config)
                                Mahjong Tenkaigen
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(dynax_state::tenkai_blitter_irq_w)
+void dynax_state::tenkai_blitter_irq_w(int state)
 {
 	if (state && m_blitter_irq_mask)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(dynax_state::tenkai_blitter_ack_w)
+void dynax_state::tenkai_blitter_ack_w(int state)
 {
 	m_blitter_irq_mask = state;
 

@@ -84,8 +84,8 @@ protected:
 	uint8_t ppi_pc_r();
 	void ppi_pc_w(uint8_t data);
 	uint8_t vdg_videoram_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER( atom_8271_interrupt_callback );
-	DECLARE_WRITE_LINE_MEMBER( motor_w );
+	void atom_8271_interrupt_callback(int state);
+	void motor_w(int state);
 
 	/* keyboard state */
 	u8 m_keylatch = 0U;
@@ -98,7 +98,7 @@ protected:
 	/* devices */
 	bool m_previous_i8271_int_state = false;
 	static void floppy_formats(format_registration &fr);
-	DECLARE_WRITE_LINE_MEMBER(cassette_output_tick);
+	void cassette_output_tick(int state);
 
 	std::pair<std::error_condition, std::string> load_cart(device_image_interface &image, generic_slot_device &slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) { return load_cart(image, *m_cart); }

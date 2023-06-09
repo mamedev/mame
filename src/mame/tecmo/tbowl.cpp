@@ -103,7 +103,7 @@ private:
 	uint32_t screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	template <uint8_t Which> DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	template <uint8_t Which> void adpcm_int(int state);
 
 	void _6206A_map(address_map &map);
 	void _6206B_map(address_map &map);
@@ -340,7 +340,7 @@ void tbowl_state::adpcm_vol_w(uint8_t data)
 }
 
 template <uint8_t Which>
-WRITE_LINE_MEMBER(tbowl_state::adpcm_int)
+void tbowl_state::adpcm_int(int state)
 {
 	if (m_adpcm_pos[Which] >= m_adpcm_end[Which] ||
 				m_adpcm_pos[Which] >= m_adpcm_rom.bytes() / 2)

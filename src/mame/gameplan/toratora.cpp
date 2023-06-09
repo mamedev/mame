@@ -85,15 +85,15 @@ private:
 	void clear_tv_w(uint8_t data);
 	uint8_t timer_r();
 	void clear_timer_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(cb2_u2_w);
+	void cb2_u2_w(int state);
 	void port_b_u1_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(main_cpu_irq);
+	void main_cpu_irq(int state);
 	void sn1_port_a_u3_w(uint8_t data);
 	void sn1_port_b_u3_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(sn1_ca2_u3_w);
+	void sn1_ca2_u3_w(int state);
 	void sn2_port_a_u2_w(uint8_t data);
 	void sn2_port_b_u2_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(sn2_ca2_u2_w);
+	void sn2_ca2_u2_w(int state);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_toratora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -109,7 +109,7 @@ private:
  *
  *************************************/
 
-WRITE_LINE_MEMBER(toratora_state::cb2_u2_w)
+void toratora_state::cb2_u2_w(int state)
 {
 	logerror("DIP tristate %sactive\n",(state & 1) ? "in" : "");
 }
@@ -176,7 +176,7 @@ void toratora_state::port_b_u1_w(uint8_t data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(toratora_state::main_cpu_irq)
+void toratora_state::main_cpu_irq(int state)
 {
 	int combined_state = m_pia_u1->irq_a_state() | m_pia_u1->irq_b_state();
 
@@ -262,7 +262,7 @@ void toratora_state::sn1_port_b_u3_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(toratora_state::sn1_ca2_u3_w)
+void toratora_state::sn1_ca2_u3_w(int state)
 {
 	m_sn1->vco_w(state);
 }
@@ -301,7 +301,7 @@ void toratora_state::sn2_port_b_u2_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(toratora_state::sn2_ca2_u2_w)
+void toratora_state::sn2_ca2_u2_w(int state)
 {
 	m_sn2->vco_w(state);
 }

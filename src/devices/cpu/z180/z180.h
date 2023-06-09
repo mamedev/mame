@@ -121,14 +121,14 @@ public:
 	bool get_tend0();
 	bool get_tend1();
 
-	DECLARE_WRITE_LINE_MEMBER( rxa0_w )     { m_asci[0]->rxa_wr(state); }
-	DECLARE_WRITE_LINE_MEMBER( rxa1_w )     { m_asci[1]->rxa_wr(state); }
-	DECLARE_WRITE_LINE_MEMBER( cts0_w )     { m_asci[0]->cts_wr(state); }
-	DECLARE_WRITE_LINE_MEMBER( rxs_cts1_w ) { m_asci[1]->cts_wr(state); m_csio->rxs_wr(state); }
-	DECLARE_WRITE_LINE_MEMBER( dcd0_w )     { m_asci[0]->dcd_wr(state); }
-	DECLARE_WRITE_LINE_MEMBER( cka0_w )     { m_asci[0]->cka_wr(state); }
-	DECLARE_WRITE_LINE_MEMBER( cka1_w )     { m_asci[1]->cka_wr(state); }
-	DECLARE_WRITE_LINE_MEMBER( cks_w )      { m_csio->cks_wr(state); }
+	void rxa0_w(int state)     { m_asci[0]->rxa_wr(state); }
+	void rxa1_w(int state)     { m_asci[1]->rxa_wr(state); }
+	void cts0_w(int state)     { m_asci[0]->cts_wr(state); }
+	void rxs_cts1_w(int state) { m_asci[1]->cts_wr(state); m_csio->rxs_wr(state); }
+	void dcd0_w(int state)     { m_asci[0]->dcd_wr(state); }
+	void cka0_w(int state)     { m_asci[0]->cka_wr(state); }
+	void cka1_w(int state)     { m_asci[1]->cka_wr(state); }
+	void cks_w(int state)      { m_csio->cks_wr(state); }
 
 protected:
 	// construction/destruction

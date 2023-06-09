@@ -314,12 +314,12 @@ void bfm_sc5_state::sc5_10202F0_w(offs_t offset, uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(bfm_sc5_state::bfm_sc5_duart_irq_handler)
+void bfm_sc5_state::bfm_sc5_duart_irq_handler(int state)
 {
 	logerror("bfm_sc5_duart_irq_handler\n");
 }
 
-WRITE_LINE_MEMBER(bfm_sc5_state::bfm_sc5_duart_txa)
+void bfm_sc5_state::bfm_sc5_duart_txa(int state)
 {
 	logerror("bfm_sc5_duart_tx\n");
 }

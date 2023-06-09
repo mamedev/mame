@@ -39,7 +39,7 @@ public:
 	uint8_t ymz1_data_r();
 	uint8_t ymz2_data_r();
 
-	virtual WRITE_LINE_MEMBER(cursor_w) override { m_ctc->trg1(state); }
+	virtual void cursor_w(int state) override { m_ctc->trg1(state); }
 
 protected:
 	// device-level overrides
@@ -50,8 +50,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(ctc_zc1_cb) { if(state) { m_slot->nmi_w(1); m_slot->nmi_w(0); } }
-	DECLARE_WRITE_LINE_MEMBER(ctc_intr_cb) { m_slot->irq_w(state); }
+	void ctc_zc1_cb(int state) { if(state) { m_slot->nmi_w(1); m_slot->nmi_w(0); } }
+	void ctc_intr_cb(int state) { m_slot->irq_w(state); }
 
 	cpc_expansion_slot_device *m_slot;
 

@@ -859,7 +859,7 @@ void segas32_state::tilebank_external_w(uint8_t data)
 }
 
 template<int Which>
-WRITE_LINE_MEMBER(segas32_state::display_enable_w)
+void segas32_state::display_enable_w(int state)
 {
 	m_system32_displayenable[Which] = state;
 }
@@ -967,7 +967,7 @@ void segas32_state::sound_int_control_hi_w(offs_t offset, uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(segas32_state::ym3438_irq_handler)
+void segas32_state::ym3438_irq_handler(int state)
 {
 	if (state)
 		signal_sound_irq(SOUND_IRQ_YM3438);
@@ -2497,13 +2497,13 @@ void segas32_cd_state::lamps2_w(uint8_t data)
 		m_lamps[8 + i] = BIT(data, i);
 }
 
-WRITE_LINE_MEMBER(segas32_cd_state::scsi_irq_w)
+void segas32_cd_state::scsi_irq_w(int state)
 {
 	//printf("%02x IRQ\n",state);
 	// TODO: sent!
 }
 
-WRITE_LINE_MEMBER(segas32_cd_state::scsi_drq_w)
+void segas32_cd_state::scsi_drq_w(int state)
 {
 	//printf("%02x DRQ\n",state);
 }

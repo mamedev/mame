@@ -38,14 +38,14 @@ public:
 	}
 	keyboard_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
 
-	DECLARE_WRITE_LINE_MEMBER(txd_w);
+	void txd_w(int state);
 
 	// callbacks
 	auto txd_handler() { return m_txd_handler.bind(); }
 
 	// called from host
-	DECLARE_WRITE_LINE_MEMBER(rxd_w);
-	DECLARE_WRITE_LINE_MEMBER(clk_w);
+	void rxd_w(int state);
+	void clk_w(int state);
 
 protected:
 	// device-level overrides
@@ -62,8 +62,8 @@ class keyboard_device : public device_t, public device_interface
 {
 
 public:
-	DECLARE_WRITE_LINE_MEMBER(rxd_w);
-	DECLARE_WRITE_LINE_MEMBER(clk_w);
+	void rxd_w(int state);
+	void clk_w(int state);
 
 protected:
 	keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

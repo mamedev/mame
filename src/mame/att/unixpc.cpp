@@ -72,10 +72,10 @@ private:
 	uint16_t line_printer_r();
 	void disk_control_w(uint8_t data);
 	void gcr_w(offs_t offset, uint16_t data);
-	DECLARE_WRITE_LINE_MEMBER(romlmap_w);
-	DECLARE_WRITE_LINE_MEMBER(error_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(parity_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(bpplus_w);
+	void romlmap_w(int state);
+	void error_enable_w(int state);
+	void parity_enable_w(int state);
+	void bpplus_w(int state);
 	uint16_t ram_mmu_r(offs_t offset);
 	void ram_mmu_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t gsr_r();
@@ -87,10 +87,10 @@ private:
 	void diskdma_size_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void diskdma_ptr_w(offs_t offset, uint16_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(wd2797_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(wd2797_drq_w);
+	void wd2797_intrq_w(int state);
+	void wd2797_drq_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(wd1010_intrq_w);
+	void wd1010_intrq_w(int state);
 
 	void unixpc_mem(address_map &map);
 
@@ -127,7 +127,7 @@ void unixpc_state::gcr_w(offs_t offset, uint16_t data)
 	m_gcr->write_bit(offset >> 11, BIT(data, 15));
 }
 
-WRITE_LINE_MEMBER(unixpc_state::romlmap_w)
+void unixpc_state::romlmap_w(int state)
 {
 	m_ramromview.select(state ? 1 : 0);
 }
@@ -162,17 +162,17 @@ void unixpc_state::machine_reset()
 	disk_control_w(0);
 }
 
-WRITE_LINE_MEMBER(unixpc_state::error_enable_w)
+void unixpc_state::error_enable_w(int state)
 {
 	logerror("error_enable_w: %d\n", state);
 }
 
-WRITE_LINE_MEMBER(unixpc_state::parity_enable_w)
+void unixpc_state::parity_enable_w(int state)
 {
 	logerror("parity_enable_w: %d\n", state);
 }
 
-WRITE_LINE_MEMBER(unixpc_state::bpplus_w)
+void unixpc_state::bpplus_w(int state)
 {
 	logerror("bpplus_w: %d\n", state);
 }
@@ -279,14 +279,14 @@ void unixpc_state::disk_control_w(uint8_t data)
 	m_wd2797->mr_w(BIT(data, 7));
 }
 
-WRITE_LINE_MEMBER(unixpc_state::wd2797_intrq_w)
+void unixpc_state::wd2797_intrq_w(int state)
 {
 	logerror("wd2797_intrq_w: %d\n", state);
 	m_fdc_intrq = state;
 	m_int02->in_w<1>(state);
 }
 
-WRITE_LINE_MEMBER(unixpc_state::wd2797_drq_w)
+void unixpc_state::wd2797_drq_w(int state)
 {
 	logerror("wd2797_drq_w: %d\n", state);
 }
@@ -295,7 +295,7 @@ WRITE_LINE_MEMBER(unixpc_state::wd2797_drq_w)
     HARD DISK
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(unixpc_state::wd1010_intrq_w)
+void unixpc_state::wd1010_intrq_w(int state)
 {
 	m_hdc_intrq = state;
 	m_int02->in_w<0>(state);

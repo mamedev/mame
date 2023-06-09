@@ -194,7 +194,7 @@ private:
 	uint8_t ppi_port_b_r();
 	void ppi_port_a_w(uint8_t data);
 	void ppi_port_c_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	void irqhandler(int state);
 	void sfkick_io_map(address_map &map);
 	void sfkick_map(address_map &map);
 	void sfkick_sound_io_map(address_map &map);
@@ -399,7 +399,7 @@ void sfkick_state::machine_reset()
 		m_bank[i]->set_entry(i);
 }
 
-WRITE_LINE_MEMBER(sfkick_state::irqhandler)
+void sfkick_state::irqhandler(int state)
 {
 	m_soundcpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff); // Z80
 }

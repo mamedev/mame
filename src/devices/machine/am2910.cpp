@@ -91,27 +91,27 @@ TIMER_CALLBACK_MEMBER(am2910_device::clock_tick)
 	cp_w(m_cp ? 0 : 1);
 }
 
-WRITE_LINE_MEMBER(am2910_device::cc_w)
+void am2910_device::cc_w(int state)
 {
 	m_cc = state;
 }
 
-WRITE_LINE_MEMBER(am2910_device::ccen_w)
+void am2910_device::ccen_w(int state)
 {
 	m_ccen = state;
 }
 
-WRITE_LINE_MEMBER(am2910_device::ci_w)
+void am2910_device::ci_w(int state)
 {
 	m_ci = state;
 }
 
-WRITE_LINE_MEMBER(am2910_device::rld_w)
+void am2910_device::rld_w(int state)
 {
 	m_rld = state;
 }
 
-WRITE_LINE_MEMBER(am2910_device::cp_w)
+void am2910_device::cp_w(int state)
 {
 	int old_state = m_cp;
 	m_cp = state;

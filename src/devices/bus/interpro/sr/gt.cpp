@@ -1390,7 +1390,7 @@ void gtdb_device::srx_mapping_w(u32 data)
 	m_bus->install_map(*this, srx_base, srx_base | 0xffffff, &gtdb_device::map_dynamic);
 }
 
-WRITE_LINE_MEMBER(gtdb_device::serial_irq)
+void gtdb_device::serial_irq(int state)
 {
 	if (state)
 		m_mouse_int |= SERIAL;

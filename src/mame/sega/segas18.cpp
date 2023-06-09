@@ -1333,15 +1333,15 @@ GFXDECODE_END
 
 
 // are any of the VDP interrupt lines hooked up to anything?
-WRITE_LINE_MEMBER(segas18_state::vdp_sndirqline_callback_s18)
+void segas18_state::vdp_sndirqline_callback_s18(int state)
 {
 }
 
-WRITE_LINE_MEMBER(segas18_state::vdp_lv6irqline_callback_s18)
+void segas18_state::vdp_lv6irqline_callback_s18(int state)
 {
 }
 
-WRITE_LINE_MEMBER(segas18_state::vdp_lv4irqline_callback_s18)
+void segas18_state::vdp_lv4irqline_callback_s18(int state)
 {
 }
 

@@ -134,12 +134,12 @@ void segam1audio_device::m1_snd_mpcm_bnk2_w(uint16_t data)
 	m_mpcmbank2->set_entry(data & 3);
 }
 
-WRITE_LINE_MEMBER(segam1audio_device::write_txd)
+void segam1audio_device::write_txd(int state)
 {
 	m_uart->write_rxd(state);
 }
 
-WRITE_LINE_MEMBER(segam1audio_device::output_txd)
+void segam1audio_device::output_txd(int state)
 {
 	m_rxd_handler(state);
 }

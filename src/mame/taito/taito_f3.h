@@ -302,7 +302,7 @@ protected:
 	TILE_GET_INFO_MEMBER(get_tile_info_text);
 	TILE_GET_INFO_MEMBER(get_tile_info_pixel);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 
 	void bubsympb_map(address_map &map);
 	void f3_map(address_map &map);

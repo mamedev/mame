@@ -32,7 +32,7 @@ public:
 	void m1_snd_mpcm_bnk1_w(uint16_t data);
 	void m1_snd_mpcm_bnk2_w(uint16_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(write_txd);
+	void write_txd(int state);
 
 	void mpcm1_map(address_map &map);
 	void mpcm2_map(address_map &map);
@@ -58,7 +58,7 @@ private:
 
 	devcb_write_line   m_rxd_handler;
 
-	DECLARE_WRITE_LINE_MEMBER(output_txd);
+	void output_txd(int state);
 };
 
 

@@ -137,7 +137,7 @@ void ds1wire_device::device_start()
 //  data_r - read signal on data line
 //-------------------------------------------------
 
-READ_LINE_MEMBER(ds1wire_device::data_r)
+int ds1wire_device::data_r()
 {
 	// Open drain output produces wired-AND signal
 	return m_data_in && m_data_out;
@@ -148,7 +148,7 @@ READ_LINE_MEMBER(ds1wire_device::data_r)
 //  data_w - write bit to data line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(ds1wire_device::data_w)
+void ds1wire_device::data_w(int state)
 {
 	// Look for transitions
 	if (m_data_in && !state)

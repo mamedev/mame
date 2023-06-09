@@ -245,7 +245,7 @@ void er1400_device::erase_data()
 //  data_w - write data input line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(er1400_device::data_w)
+void er1400_device::data_w(int state)
 {
 	m_data_input = bool(state);
 }
@@ -255,7 +255,7 @@ WRITE_LINE_MEMBER(er1400_device::data_w)
 //  c1_w - write to first control line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(er1400_device::c1_w)
+void er1400_device::c1_w(int state)
 {
 	if (bool(state) == BIT(m_code_input, 2))
 		return;
@@ -270,7 +270,7 @@ WRITE_LINE_MEMBER(er1400_device::c1_w)
 //  c2_w - write to second control line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(er1400_device::c2_w)
+void er1400_device::c2_w(int state)
 {
 	if (bool(state) == BIT(m_code_input, 1))
 		return;
@@ -285,7 +285,7 @@ WRITE_LINE_MEMBER(er1400_device::c2_w)
 //  c3_w - write to third control line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(er1400_device::c3_w)
+void er1400_device::c3_w(int state)
 {
 	if (bool(state) == BIT(m_code_input, 0))
 		return;
@@ -316,7 +316,7 @@ TIMER_CALLBACK_MEMBER(er1400_device::propagate_data)
 //  clock_w - write to clock line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(er1400_device::clock_w)
+void er1400_device::clock_w(int state)
 {
 	if (m_clock_input == bool(state))
 		return;
@@ -396,7 +396,7 @@ WRITE_LINE_MEMBER(er1400_device::clock_w)
 //  data_r - read data line
 //-------------------------------------------------
 
-READ_LINE_MEMBER(er1400_device::data_r)
+int er1400_device::data_r()
 {
 	return m_data_input & m_data_output;
 }

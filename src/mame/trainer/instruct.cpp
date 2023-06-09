@@ -85,8 +85,8 @@ private:
 	uint8_t portfc_r();
 	uint8_t portfd_r();
 	uint8_t portfe_r();
-	DECLARE_READ_LINE_MEMBER(sense_r);
-	DECLARE_WRITE_LINE_MEMBER(flag_w);
+	int sense_r();
+	void flag_w(int state);
 	void port_w(uint8_t data);
 	void portf8_w(uint8_t data);
 	void portf9_w(uint8_t data);
@@ -113,7 +113,7 @@ private:
 };
 
 // flag led
-WRITE_LINE_MEMBER( instruct_state::flag_w )
+void instruct_state::flag_w(int state)
 {
 	m_leds[8] = !state;
 }
@@ -182,7 +182,7 @@ uint8_t instruct_state::portfe_r()
 
 
 // Read cassette and SENS key
-READ_LINE_MEMBER( instruct_state::sense_r )
+int instruct_state::sense_r()
 {
 	if (m_cassin)
 		return (m_cass->input() > 0.03) ? 1 : 0;

@@ -75,7 +75,7 @@ void amiga_keyboard_bus_device::device_reset()
 //  host to module interface
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( amiga_keyboard_bus_device::kdat_in_w )
+void amiga_keyboard_bus_device::kdat_in_w(int state)
 {
 	if (m_kbd)
 		m_kbd->kdat_w(state);

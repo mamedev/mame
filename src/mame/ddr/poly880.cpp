@@ -95,8 +95,8 @@ private:
 	void poly880s_mem(address_map &map);
 
 	void cldig_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
+	void ctc_z0_w(int state);
+	void ctc_z1_w(int state);
 	void pio1_pa_w(u8 data);
 	u8 pio1_pb_r();
 	void pio1_pb_w(u8 data);
@@ -195,7 +195,7 @@ INPUT_PORTS_END
 
 // Z80-CTC Interface
 
-WRITE_LINE_MEMBER(poly880_state::ctc_z0_w)
+void poly880_state::ctc_z0_w(int state)
 {
 	// SEND
 	if (!m_nmi && state)
@@ -205,7 +205,7 @@ WRITE_LINE_MEMBER(poly880_state::ctc_z0_w)
 	}
 }
 
-WRITE_LINE_MEMBER(poly880_state::ctc_z1_w)
+void poly880_state::ctc_z1_w(int state)
 {
 }
 

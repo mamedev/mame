@@ -61,7 +61,7 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	void nexus3d_map(address_map &map);
 
 	uint32_t m_intpend = 0, m_intmask = 0, m_intlevel = 0;
@@ -301,7 +301,7 @@ void nexus3d_state::machine_reset()
 	memcpy(m_mainram, memregion("flash")->base(), 4 * 1024);
 }
 
-WRITE_LINE_MEMBER(nexus3d_state::screen_vblank)
+void nexus3d_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)

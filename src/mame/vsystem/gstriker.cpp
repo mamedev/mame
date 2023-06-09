@@ -283,7 +283,7 @@ private:
 	void vbl_toggle_w(uint16_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 
 	void mcu_init();
 	void gstriker_map(address_map &map);
@@ -306,7 +306,7 @@ void gstriker_state::video_start()
 	m_bg->set_transparent_pen(0xf);
 }
 
-WRITE_LINE_MEMBER(gstriker_state::screen_vblank)
+void gstriker_state::screen_vblank(int state)
 {
 	// sprites are two frames ahead
 	// TODO: probably all Video System games are (Aero Fighters definitely desyncs wrt background)
@@ -378,8 +378,6 @@ GFXDECODE_END
 
 
 /*** MEMORY LAYOUTS **********************************************************/
-
-
 
 void gstriker_state::twcup94_map(address_map &map)
 {
@@ -1276,7 +1274,6 @@ void gstriker_state::init_vgoalsoc()
 GAME( 1993, gstriker,  0,        gstriker, gstriker, gstriker_state, empty_init, ROT0, "Human", "Grand Striker (Europe, Oceania)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, gstrikera, gstriker, gstriker, gstriker, gstriker_state, empty_init, ROT0, "Human", "Grand Striker (Americas)",        MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, gstrikerj, gstriker, gstriker, gstriker, gstriker_state, empty_init, ROT0, "Human", "Grand Striker (Japan)",           MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-
 
 // Similar, but not identical hardware, appear to be protected by an MCU
 GAME( 1994, vgoalsoc,  0,        vgoal, vgoalsoc, gstriker_state, init_vgoalsoc, ROT0, "Tecmo", "V Goal Soccer (Europe)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // has ger/hol/arg/bra/ita/eng/spa/fra
