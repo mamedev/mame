@@ -120,17 +120,18 @@ void z37_intr_cntrl::update_intr_line()
 uint8_t z37_intr_cntrl::get_instruction()
 {
 
+	if (m_drq_raised)
+	{
+		// EI
+		return 0xfb;
+	}
+
 	if (m_fd_irq_raised)
 	{
 		// RST 20H (Interrupt 4)
 		return 0xe7;
 	}
 
-	if (m_drq_raised)
-	{
-		// EI
-		return 0xfb;
-	}
 
 	if (!m_interrupts_blocked)
 	{

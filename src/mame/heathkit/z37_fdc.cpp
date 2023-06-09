@@ -222,9 +222,13 @@ void heath_z37_fdc_device::device_add_mconfig(machine_config &config)
 	m_fdc->drq_wr_callback().set(FUNC(heath_z37_fdc_device::set_drq));
 
 	FLOPPY_CONNECTOR(config, m_floppies[0], z37_floppies, "qd", floppy_image_device::default_mfm_floppy_formats);
+	m_floppies[0]->enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppies[1], z37_floppies, "qd", floppy_image_device::default_mfm_floppy_formats);
+	m_floppies[1]->enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppies[2], z37_floppies, "qd", floppy_image_device::default_mfm_floppy_formats);
+	m_floppies[2]->enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppies[3], z37_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
+	m_floppies[3]->enable_sound(true);
 }
 
 void heath_z37_fdc_device::device_resolve_objects()
