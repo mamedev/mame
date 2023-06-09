@@ -3904,6 +3904,13 @@ void namcos23_state::s23(machine_config &config)
 	m_iocpu->read_adc<5>().set_ioport("ADC5");
 	m_iocpu->read_adc<6>().set_ioport("ADC6");
 	m_iocpu->read_adc<7>().set_ioport("ADC7");
+	m_iocpu->read_port4().set(FUNC(namcos23_state::iob_p4_r));
+	m_iocpu->write_port4().set(FUNC(namcos23_state::iob_p4_w));
+	m_iocpu->write_port5().set_nop();   // bit 2 = status LED to indicate transmitting packet to main
+	m_iocpu->read_port6().set(FUNC(namcos23_state::iob_p6_r));
+	m_iocpu->write_port6().set(FUNC(namcos23_state::iob_p6_w));
+	m_iocpu->write_port8().set_nop();   // unknown - used on ASCA-5 only
+	m_iocpu->write_port9().set_nop();   // unknown - used on ASCA-5 only
 
 	m_iocpu->write_sci_tx<0>().set(m_subcpu, FUNC(h8_device::sci_rx_w<0>));
 	m_subcpu->write_sci_tx<0>().set(m_iocpu, FUNC(h8_device::sci_rx_w<0>));
