@@ -335,7 +335,7 @@ void coinmvga_state::coinmvga_map(address_map &map)
 
 	map(0x600000, 0x600000).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x600001, 0x600001).w("ramdac", FUNC(ramdac_device::pal_w));
-	map(0x600002, 0x600002).w("ramdac", FUNC(ramdac_device::mask_w));\
+	map(0x600002, 0x600002).w("ramdac", FUNC(ramdac_device::mask_w));
 	map(0x600004, 0x600004).w("ramdac2", FUNC(ramdac_device::index_w));
 	map(0x600005, 0x600005).w("ramdac2", FUNC(ramdac_device::pal_w));
 	map(0x600006, 0x600006).w("ramdac2", FUNC(ramdac_device::mask_w));
