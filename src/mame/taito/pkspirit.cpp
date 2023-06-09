@@ -40,6 +40,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 namespace {
@@ -49,23 +50,76 @@ class pkspirit_state : public driver_device
 public:
 	pkspirit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_bg_videoram(*this, "bg_videoram"),
+		m_fg_videoram(*this, "fg_videoram")
 	{ }
 
 	void pkspirit(machine_config &config);
 
+protected:
+	virtual void video_start() override;
+
 private:
 	required_device<tmp68301_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+
+	required_shared_ptr<uint16_t> m_bg_videoram;
+	required_shared_ptr<uint16_t> m_fg_videoram;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void fg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
+
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+
 };
 
+void pkspirit_state::bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_bg_videoram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+TILE_GET_INFO_MEMBER(pkspirit_state::get_bg_tile_info)
+{
+	int tileno = m_bg_videoram[tile_index];
+	tileinfo.set(0, tileno, 0, 0);
+}
+
+void pkspirit_state::fg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_fg_videoram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+TILE_GET_INFO_MEMBER(pkspirit_state::get_fg_tile_info)
+{
+	int tileno = m_fg_videoram[tile_index];
+	tileinfo.set(0, tileno, 0, 0);
+}
+
+
+void pkspirit_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pkspirit_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pkspirit_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_fg_tilemap->set_transparent_pen(0);
+}
 
 uint32_t pkspirit_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -79,7 +133,16 @@ void pkspirit_state::main_map(address_map &map) // TODO: verify everything
 	map(0x800001, 0x800001).w("ciu", FUNC(pc060ha_device::master_port_w));
 	map(0x800003, 0x800003).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
 	//map(0x900000, 0x900001).w // ?
-	map(0xb00000, 0xb0ffff).ram(); // GFX chips RAM?
+
+	map(0xa00000, 0xa0003f).ram();
+	map(0xa04000, 0xa057ff).ram();
+	map(0xb00000, 0xb00fff).ram().w(FUNC(pkspirit_state::fg_videoram_w)).share(m_fg_videoram); // GFX chips RAM?
+	map(0xb01000, 0xb01fff).ram(); // GFX chips RAM?
+	map(0xb02000, 0xb02fff).ram().w(FUNC(pkspirit_state::bg_videoram_w)).share(m_bg_videoram); // GFX chips RAM?
+	map(0xb03000, 0xb0ffff).ram(); // GFX chips RAM ?
+	map(0xb04000, 0xb04fff).ram(); // maybe sprite data, arranged as strips of 4 horizontal tiles
+	map(0xb05000, 0xb0ffff).ram(); // GFX chips RAM ?
+
 	map(0xb10800, 0xb1087f).ram(); // control registers for one of the custom GFX chips?
 	map(0xb20000, 0xb2001f).ram(); // control registers for one of the custom GFX chips?
 }
@@ -143,7 +206,7 @@ const gfx_layout gfx_16x16x5_planar =
 	16,16,
 	RGN_FRAC(1,5),
 	5,
-	{ RGN_FRAC(4,5), RGN_FRAC(3,5), RGN_FRAC(2,5), RGN_FRAC(1,5), RGN_FRAC(0,5) },
+	{ RGN_FRAC(0,5), RGN_FRAC(1,5), RGN_FRAC(2,5), RGN_FRAC(3,5), RGN_FRAC(4,5) },
 	{ STEP8(7,-1), STEP8(15,-1) },
 	{ STEP16(0,16) },
 	16*16
@@ -171,8 +234,8 @@ void pkspirit_state::pkspirit(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: wrong
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(0*8, 64*8-1, 0*8, 56*8-1);
 	screen.set_palette("palette");
 	screen.set_screen_update(FUNC(pkspirit_state::screen_update));
 	screen.screen_vblank().set_inputline(m_maincpu, 1);
@@ -206,13 +269,13 @@ ROM_START( pkspirit )
 	ROM_REGION( 0xa0000, "tiles", 0 ) // on video PCB, TODO: correct ROM loading
 	ROM_LOAD16_BYTE( "d41_07.ic1",  0x00000, 0x10000, CRC(c57b18f8) SHA1(e25f2ff8d0bf312d23b8ff09f07f63e61c3094c6) )
 	ROM_LOAD16_BYTE( "d41_08.ic2",  0x00001, 0x10000, CRC(67b941dd) SHA1(cc9abb5d7f3cb90a91921097d23261d80f418287) )
-	ROM_LOAD16_BYTE( "d41_09.ic5",  0x20000, 0x10000, CRC(199820a2) SHA1(ae3af3aa424b535fc03ef6bb99fca146bdcd88b1) )
-	ROM_LOAD16_BYTE( "d41_10.ic6",  0x20001, 0x10000, CRC(0af0488c) SHA1(36a77b980038731b703f935a6a813bc9295b7889) )
-	ROM_LOAD16_BYTE( "d41_11.ic8",  0x40000, 0x10000, CRC(4913401d) SHA1(d7c92405b7c5505a6b4ac738b6d502cf99f995c6) )
-	ROM_LOAD16_BYTE( "d41_12.ic9",  0x40001, 0x10000, CRC(7c521521) SHA1(10ac517921a08ce5387656f33bf3e45879fa614a) )
-	ROM_LOAD16_BYTE( "d41_13.ic11", 0x60000, 0x10000, CRC(78e1fc0b) SHA1(8475a97cc574971ec201840a71dbf823762f2970) )
-	ROM_LOAD16_BYTE( "d41_14.ic12", 0x60001, 0x10000, CRC(3ec2fe4b) SHA1(74877d1623e2336770ff0606d6ca7d7c89a51004) )
-	ROM_LOAD16_BYTE( "d41_15.ic15", 0x80000, 0x10000, CRC(df078e72) SHA1(b781b1ce3b87755513eefc295f00159f495359d8) )
+	ROM_LOAD16_BYTE( "d41_10.ic6",  0x20000, 0x10000, CRC(0af0488c) SHA1(36a77b980038731b703f935a6a813bc9295b7889) )
+	ROM_LOAD16_BYTE( "d41_09.ic5",  0x20001, 0x10000, CRC(199820a2) SHA1(ae3af3aa424b535fc03ef6bb99fca146bdcd88b1) )
+	ROM_LOAD16_BYTE( "d41_12.ic9",  0x40000, 0x10000, CRC(7c521521) SHA1(10ac517921a08ce5387656f33bf3e45879fa614a) )
+	ROM_LOAD16_BYTE( "d41_11.ic8",  0x40001, 0x10000, CRC(4913401d) SHA1(d7c92405b7c5505a6b4ac738b6d502cf99f995c6) )
+	ROM_LOAD16_BYTE( "d41_15.ic15", 0x60000, 0x10000, CRC(df078e72) SHA1(b781b1ce3b87755513eefc295f00159f495359d8) )
+	ROM_LOAD16_BYTE( "d41_13.ic11", 0x60001, 0x10000, CRC(78e1fc0b) SHA1(8475a97cc574971ec201840a71dbf823762f2970) )
+	ROM_LOAD16_BYTE( "d41_14.ic12", 0x80000, 0x10000, CRC(3ec2fe4b) SHA1(74877d1623e2336770ff0606d6ca7d7c89a51004) )
 	ROM_LOAD16_BYTE( "d41_16.ic16", 0x80001, 0x10000, CRC(6c9d169d) SHA1(e6cd2ddd6b6242e2fadbbcb4b3170dd54391b25e) )
 
 	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 ) // on video PCB
