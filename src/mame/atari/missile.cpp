@@ -424,8 +424,9 @@ private:
 	u8 trampoline_r(offs_t offset);
 	void trampoline_w(offs_t offset, uint8_t data);
 
-	void missilea_map(address_map &map);
+	void base_map(address_map &map);
 	void missile_map(address_map &map);
+	void missilea_map(address_map &map);
 	void mcombat_map(address_map &map);
 
 	required_device<m6502_device> m_maincpu;
@@ -810,7 +811,7 @@ void missile_state::trampoline_map(address_map &map)
 	map(0x0000, 0xffff).rw(FUNC(missile_state::trampoline_r), FUNC(missile_state::trampoline_w));
 }
 
-void missile_state::missilea_map(address_map &map)
+void missile_state::base_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0x7fff);
@@ -826,8 +827,14 @@ void missile_state::missilea_map(address_map &map)
 
 void missile_state::missile_map(address_map &map)
 {
-	missilea_map(map);
+	base_map(map);
 	map(0x4000, 0x400f).mirror(0x07f0).rw(m_pokey, FUNC(pokey_device::read), FUNC(pokey_device::write));
+}
+
+void missile_state::missilea_map(address_map &map)
+{
+	base_map(map);
+	map(0x4000, 0x4000).mirror(0x00ff).portr("R8"); // also sound
 }
 
 void missile_state::mcombat_map(address_map &map)
@@ -1104,7 +1111,7 @@ ROM_START( missilem )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) // banked, decrypted rom goes here
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD("mcm001d.512", 0x00000, 0x10000, CRC(0a5845b5) SHA1(4828866018a984e7cd7f55a33613f43ece5d8d63) )
+	ROM_LOAD( "mcm001d.512", 0x00000, 0x10000, CRC(0a5845b5) SHA1(4828866018a984e7cd7f55a33613f43ece5d8d63) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "035826-01.l6", 0x0000, 0x0020, CRC(86a22140) SHA1(2beebf7855e29849ada1823eae031fc98220bc43) )
@@ -1198,7 +1205,7 @@ ROM_START( missilea )
 	ROM_LOAD( "5.1n", 0x7000, 0x0800, CRC(df8c58f4) SHA1(44a0cdb0e5222e14e3e91547c35e73b2cf2df174) )
 	ROM_LOAD( "6.1r", 0x7800, 0x0800, CRC(96a21c1f) SHA1(6e43ce8d53aa6d38cef920e7fa2e0683ce42cdb4) )
 
-	ROM_REGION( 0x800, "unknown", 0 )
+	ROM_REGION( 0x800, "samples", 0 )
 	ROM_LOAD( "2708.10c",  0x0000, 0x0400, CRC(9f6978c4) SHA1(34b356fddd86b8b73ee1415b3ad6b00dc4be60e2) )
 	ROM_LOAD( "2708.10e",  0x0400, 0x0400, CRC(90eb28c8) SHA1(c82bc0a00d9e54004b0210f95343c8d7dc1f2050) )
 

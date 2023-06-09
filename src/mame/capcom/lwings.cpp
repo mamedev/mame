@@ -14,7 +14,7 @@ To Do:
     increment twice per coin.
 -   clean up Avengers protection; it currently checks against hard-coded program
     counter rather than behaving as a memory-mapped black box.
--   Avengers had a protection chip underneath the sound module. Needs dumping.
+-   Avengers had a protection chip underneath the sound module. Needs to be hooked up.
     The protection is extensive: palette data, calculates player movement,
     even a hand in the sound.  The angle/movement stuff isn't 100% accurate either.
 -   accurate music tempo (audiocpu irq freq)
@@ -293,7 +293,7 @@ void lwings_state::msm5205_w(uint8_t data)
 	m_msm->vclk_w(0);
 }
 
-void lwings_state::avengers_map(address_map &map)
+void lwings_state::buraikenb_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
@@ -309,13 +309,22 @@ void lwings_state::avengers_map(address_map &map)
 	map(0xf804, 0xf804).w(FUNC(lwings_state::trojan_bg2_scrollx_w));
 	map(0xf805, 0xf805).w(FUNC(lwings_state::trojan_bg2_image_w));
 
-	map(0xf808, 0xf808).portr("SERVICE").nopw(); /* ? */
-	map(0xf809, 0xf809).portr("P1").w(FUNC(lwings_state::avengers_protection_w));
+	map(0xf808, 0xf808).portr("SERVICE").nopw(); // ?
+	map(0xf809, 0xf809).portr("P1");
 	map(0xf80a, 0xf80a).portr("P2");
 	map(0xf80b, 0xf80b).portr("DSWB");
-	map(0xf80c, 0xf80c).portr("DSWA").w(FUNC(lwings_state::avengers_prot_bank_w));
-	map(0xf80d, 0xf80d).rw(FUNC(lwings_state::avengers_protection_r), FUNC(lwings_state::avengers_adpcm_w));
+	map(0xf80c, 0xf80c).portr("DSWA").w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xf80d, 0xf80d).w(FUNC(lwings_state::avengers_adpcm_w));
 	map(0xf80e, 0xf80e).w(FUNC(lwings_state::lwings_bankswitch_w));
+}
+
+void lwings_state::avengers_map(address_map &map)
+{
+	buraikenb_map(map);
+
+	map(0xf809, 0xf809).w(FUNC(lwings_state::avengers_protection_w));
+	map(0xf80c, 0xf80c).w(FUNC(lwings_state::avengers_prot_bank_w));
+	map(0xf80d, 0xf80d).r(FUNC(lwings_state::avengers_protection_r));
 }
 
 void lwings_state::lwings_map(address_map &map)
@@ -377,7 +386,6 @@ void lwings_state::lwings_sound_map(address_map &map)
 }
 
 
-
 void lwings_state::fball_map(address_map &map)
 {
 	map(0x0000, 0x7fff).bankr("bank2");
@@ -403,8 +411,6 @@ void lwings_state::fball_map(address_map &map)
 }
 
 
-
-
 void lwings_state::fball_oki_bank_w(uint8_t data)
 {
 	//printf("fball_oki_bank_w %02x\n", data);
@@ -421,13 +427,9 @@ void lwings_state::fball_oki_map(address_map &map)
 void lwings_state::fball_sound_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
-
 	map(0x8000, 0x8000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-
-	map(0xA000, 0xA000).w(FUNC(lwings_state::fball_oki_bank_w));
-
+	map(0xa000, 0xa000).w(FUNC(lwings_state::fball_oki_bank_w));
 	map(0xc000, 0xc7ff).ram();
-
 	map(0xe000, 0xe000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
@@ -450,6 +452,7 @@ void lwings_state::trojan_adpcm_io_map(address_map &map)
 	map(0x00, 0x00).r("soundlatch2", FUNC(generic_latch_8_device::read));
 	map(0x01, 0x01).w(FUNC(lwings_state::msm5205_w));
 }
+
 
 /*************************************
  *
@@ -488,6 +491,7 @@ static INPUT_PORTS_START( lwings_generic )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 INPUT_PORTS_END
+
 
 /*************************************
  *
@@ -618,7 +622,6 @@ static INPUT_PORTS_START( fball )
 	PORT_MODIFY("SERVICE")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START4 )
-
 
 	PORT_START("DSWA") // only one set of dipswitches
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SWA:1")
@@ -784,6 +787,7 @@ static INPUT_PORTS_START( avengers )
 	PORT_DIPSETTING(    0x00, "6" )
 INPUT_PORTS_END
 
+
 /*************************************
  *
  *  Graphics definitions
@@ -853,6 +857,7 @@ static GFXDECODE_START( gfx_trojan )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,   640,  8 ) /* colors 640-767 */
 	GFXDECODE_ENTRY( "gfx4", 0, bg2_tilelayout,   0,  8 ) /* colors   0-127 */
 GFXDECODE_END
+
 
 /*************************************
  *
@@ -936,18 +941,18 @@ void lwings_state::machine_reset()
 
 void lwings_state::lwings(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(12'000'000)/2);     /* verified on PCB */
+	// basic machine hardware
+	Z80(config, m_maincpu, 12_MHz_XTAL/2); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::lwings_map);
 
-	Z80(config, m_soundcpu, XTAL(12'000'000)/4);    /* verified on PCB */
+	Z80(config, m_soundcpu, 12_MHz_XTAL/4); // verified on PCB
 	m_soundcpu->set_addrmap(AS_PROGRAM, &lwings_state::lwings_sound_map);
 	m_soundcpu->set_periodic_int(FUNC(lwings_state::irq0_line_hold), attotime::from_hz(222));
 	// above frequency is an approximation from PCB music recording - where is the frequency actually derived from?
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	/* video hardware */
+	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -963,18 +968,18 @@ void lwings_state::lwings(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lwings);
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 1024);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym2203_device &ym2203a(YM2203(config, "2203a", XTAL(12'000'000)/8));    /* verified on PCB */
+	ym2203_device &ym2203a(YM2203(config, "2203a", 12_MHz_XTAL/8)); // verified on PCB
 	ym2203a.add_route(0, "mono", 0.20);
 	ym2203a.add_route(1, "mono", 0.20);
 	ym2203a.add_route(2, "mono", 0.20);
 	ym2203a.add_route(3, "mono", 0.10);
 
-	ym2203_device &ym2203b(YM2203(config, "2203b", XTAL(12'000'000)/8));    /* verified on PCB */
+	ym2203_device &ym2203b(YM2203(config, "2203b", 12_MHz_XTAL/8)); // verified on PCB
 	ym2203b.add_route(0, "mono", 0.20);
 	ym2203b.add_route(1, "mono", 0.20);
 	ym2203b.add_route(2, "mono", 0.20);
@@ -985,24 +990,24 @@ void lwings_state::sectionz(machine_config &config)
 {
 	lwings(config);
 
-	m_maincpu->set_clock(XTAL(12'000'000)/4);     // XTAL and clock verified on an original PCB and on a bootleg with ROMs matching those of sectionza
+	m_maincpu->set_clock(12_MHz_XTAL/4); // XTAL and clock verified on an original PCB and on a bootleg with ROMs matching those of sectionza
 
 	subdevice<screen_device>("screen")->set_refresh_hz(55.37); // verified on an original PCB
 }
 
 void lwings_state::fball(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(12'000'000)/2);
+	// basic machine hardware
+	Z80(config, m_maincpu, 12_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::fball_map);
 
-	Z80(config, m_soundcpu, XTAL(12'000'000)/4); // ?
+	Z80(config, m_soundcpu, 12_MHz_XTAL/4); // ?
 	m_soundcpu->set_addrmap(AS_PROGRAM, &lwings_state::fball_sound_map);
-//  m_soundcpu->set_periodic_int(FUNC(lwings_state::irq0_line_hold), attotime::from_hz(222));
+	//m_soundcpu->set_periodic_int(FUNC(lwings_state::irq0_line_hold), attotime::from_hz(222));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	/* video hardware */
+	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1018,12 +1023,12 @@ void lwings_state::fball(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lwings);
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 1024);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	okim6295_device &oki(OKIM6295(config, "oki", XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	okim6295_device &oki(OKIM6295(config, "oki", 12_MHz_XTAL/12, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
 	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 	oki.set_addrmap(0, &lwings_state::fball_oki_map);
 }
@@ -1032,28 +1037,28 @@ void lwings_state::trojan(machine_config &config)
 {
 	lwings(config);
 
-	/* basic machine hardware */
-	m_maincpu->set_clock(XTAL(12'000'000)/4);   /* verified on PCB */
+	// basic machine hardware
+	m_maincpu->set_clock(12_MHz_XTAL/4); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::trojan_map);
 
-	m_soundcpu->set_clock(XTAL(12'000'000)/4);  /* verified on PCB */
+	m_soundcpu->set_clock(12_MHz_XTAL/4); // verified on PCB
 
-	z80_device &adpcm(Z80(config, "adpcm", XTAL(12'000'000)/4));    /* verified on PCB */
-	adpcm.set_addrmap(AS_PROGRAM, &lwings_state::trojan_adpcm_map);
-	adpcm.set_addrmap(AS_IO, &lwings_state::trojan_adpcm_io_map);
-	adpcm.set_periodic_int(FUNC(lwings_state::irq0_line_hold), attotime::from_hz(4000));
+	Z80(config, m_adpcmcpu, 12_MHz_XTAL/4); // verified on PCB
+	m_adpcmcpu->set_addrmap(AS_PROGRAM, &lwings_state::trojan_adpcm_map);
+	m_adpcmcpu->set_addrmap(AS_IO, &lwings_state::trojan_adpcm_io_map);
+	m_adpcmcpu->set_periodic_int(FUNC(lwings_state::irq0_line_hold), attotime::from_hz(4000));
 
-	/* video hardware */
+	// video hardware
 	m_gfxdecode->set_info(gfx_trojan);
 
 	MCFG_VIDEO_START_OVERRIDE(lwings_state,trojan)
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(lwings_state::screen_update_trojan));
 
-	/* sound hardware */
+	// sound hardware
 	GENERIC_LATCH_8(config, "soundlatch2");
 
-	MSM5205(config, m_msm, XTAL(384'000));                  /* verified on PCB */
-	m_msm->set_prescaler_selector(msm5205_device::SEX_4B);  /* slave mode */
+	MSM5205(config, m_msm, 384_kHz_XTAL); // verified on PCB
+	m_msm->set_prescaler_selector(msm5205_device::SEX_4B); // slave mode
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
@@ -1061,24 +1066,31 @@ void lwings_state::avengers(machine_config &config)
 {
 	trojan(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::avengers_map);
+
+	I8751(config, m_mcu, 12_MHz_XTAL/2);
 
 	screen_device &screen(*subdevice<screen_device>("screen"));
 	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.screen_vblank().append(FUNC(lwings_state::avengers_interrupt)); // RST 38h triggered by software
 
-	subdevice<cpu_device>("adpcm")->set_addrmap(AS_IO, &lwings_state::avengers_adpcm_io_map);
+	m_adpcmcpu->set_addrmap(AS_IO, &lwings_state::avengers_adpcm_io_map);
 
-	/* video hardware */
+	// video hardware
 	MCFG_VIDEO_START_OVERRIDE(lwings_state,avengers)
 }
 
-void lwings_state::avengersb(machine_config &config)
+void lwings_state::buraikenb(machine_config &config)
 {
 	avengers(config);
-	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(lwings_state,avengersb)
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::buraikenb_map);
+	config.device_remove("mcu");
+
+	// video hardware
+	MCFG_VIDEO_START_OVERRIDE(lwings_state,buraikenb)
 }
 
 
@@ -1360,7 +1372,7 @@ ROM_START( trojan )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "tb02.15h", 0x0000, 0x8000, CRC(21154797) SHA1(e1a3006746cc2d692ecd4369cc0a77c596abd60b) )
 
-	ROM_REGION( 0x10000, "adpcm", 0 ) /* 64k for ADPCM CPU */
+	ROM_REGION( 0x10000, "adpcmcpu", 0 ) /* 64k for ADPCM CPU */
 	ROM_LOAD( "tb01.6d", 0x0000, 0x4000, CRC(1c0f91b2) SHA1(163bf6aa1936994659661653eabdc368199b0070) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
@@ -1407,7 +1419,7 @@ ROM_START( trojana )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "tb02.15h", 0x0000, 0x8000, CRC(21154797) SHA1(e1a3006746cc2d692ecd4369cc0a77c596abd60b) )
 
-	ROM_REGION( 0x10000, "adpcm", 0 ) /* 64k for ADPCM CPU  */
+	ROM_REGION( 0x10000, "adpcmcpu", 0 ) /* 64k for ADPCM CPU  */
 	ROM_LOAD( "tb01.6d", 0x0000, 0x4000, CRC(1c0f91b2) SHA1(163bf6aa1936994659661653eabdc368199b0070) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
@@ -1454,7 +1466,7 @@ ROM_START( trojanr )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "tb02.15h", 0x0000, 0x8000, CRC(21154797) SHA1(e1a3006746cc2d692ecd4369cc0a77c596abd60b) )
 
-	ROM_REGION( 0x10000, "adpcm", 0 ) /* 64k for ADPCM CPU */
+	ROM_REGION( 0x10000, "adpcmcpu", 0 ) /* 64k for ADPCM CPU */
 	ROM_LOAD( "tb01.6d", 0x0000, 0x4000, CRC(1c0f91b2) SHA1(163bf6aa1936994659661653eabdc368199b0070) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
@@ -1501,7 +1513,7 @@ ROM_START( trojanj )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "tb02.15h", 0x0000, 0x8000, CRC(21154797) SHA1(e1a3006746cc2d692ecd4369cc0a77c596abd60b) )
 
-	ROM_REGION( 0x10000, "adpcm", 0 ) /* 64k for ADPCM CPU */
+	ROM_REGION( 0x10000, "adpcmcpu", 0 ) /* 64k for ADPCM CPU */
 	ROM_LOAD( "tb01.6d", 0x0000, 0x4000, CRC(1c0f91b2) SHA1(163bf6aa1936994659661653eabdc368199b0070) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
@@ -1548,7 +1560,7 @@ ROM_START( trojanlt ) // titled Trojan but only shows Capcom like the Japanese v
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "tb02.15h", 0x0000, 0x8000, CRC(21154797) SHA1(e1a3006746cc2d692ecd4369cc0a77c596abd60b) )
 
-	ROM_REGION( 0x10000, "adpcm", 0 ) /* 64k for ADPCM CPU */
+	ROM_REGION( 0x10000, "adpcmcpu", 0 ) /* 64k for ADPCM CPU */
 	ROM_LOAD( "tb01.3f", 0x0000, 0x8000, CRC(83c715b2) SHA1(0c69c086657f91828a639ff7c72c703a27ade710) ) // 1xxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
@@ -1595,7 +1607,7 @@ ROM_START( trojanb )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "2.6q", 0x0000, 0x8000, CRC(21154797) SHA1(e1a3006746cc2d692ecd4369cc0a77c596abd60b) )
 
-	ROM_REGION( 0x10000, "adpcm", 0 ) /* 64k for ADPCM CPU */
+	ROM_REGION( 0x10000, "adpcmcpu", 0 ) /* 64k for ADPCM CPU */
 	ROM_LOAD( "1.3f", 0x0000, 0x8000, CRC(83c715b2) SHA1(0c69c086657f91828a639ff7c72c703a27ade710) ) // different
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
@@ -1653,11 +1665,11 @@ ROM_START( avengers )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "av_02.15h",    0x0000, 0x8000, CRC(107a2e17) SHA1(5aae2f4ac9f15ccb4122f3ba9fba588438d62f4f) ) /* ?? */
 
-	ROM_REGION( 0x10000, "adpcm", 0 )     /* ADPCM CPU */
+	ROM_REGION( 0x10000, "adpcmcpu", 0 )     /* ADPCM CPU */
 	ROM_LOAD( "av_01.6d",     0x0000, 0x8000, CRC(c1e5d258) SHA1(88ed978e6df72ce22f9371930360aa9cde73abe9) ) /* adpcm player - "Talker" ROM */
 
 	ROM_REGION( 0x1000, "mcu", 0 ) // Intel C8751H-88
-	ROM_LOAD( "av.13k", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "av.13k", 0x0000, 0x1000, CRC(505a0987) SHA1(ea1d855a9870d79d0e00eaa88a23038355a1203a) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "av_03.8k",     0x00000, 0x8000, CRC(efb5883e) SHA1(08aebf579f2c5ff472db66597cde1c6871d7d757) )  /* characters */
@@ -1703,11 +1715,11 @@ ROM_START( avengersa )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "av_02.15h",    0x0000, 0x8000, CRC(107a2e17) SHA1(5aae2f4ac9f15ccb4122f3ba9fba588438d62f4f) ) /* ?? */
 
-	ROM_REGION( 0x10000, "adpcm", 0 )     /* ADPCM CPU */
+	ROM_REGION( 0x10000, "adpcmcpu", 0 )     /* ADPCM CPU */
 	ROM_LOAD( "av_01.6d",     0x0000, 0x8000, CRC(c1e5d258) SHA1(88ed978e6df72ce22f9371930360aa9cde73abe9) ) /* adpcm player - "Talker" ROM */
 
 	ROM_REGION( 0x1000, "mcu", 0 ) // Intel C8751H-88
-	ROM_LOAD( "av.13k", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "av.13k", 0x0000, 0x1000, CRC(505a0987) SHA1(ea1d855a9870d79d0e00eaa88a23038355a1203a) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "av_03.8k",     0x00000, 0x8000, CRC(efb5883e) SHA1(08aebf579f2c5ff472db66597cde1c6871d7d757) )  /* characters */
@@ -1753,11 +1765,11 @@ ROM_START( avengersb )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "av_02.15h",    0x0000, 0x8000, CRC(107a2e17) SHA1(5aae2f4ac9f15ccb4122f3ba9fba588438d62f4f) ) /* ?? */
 
-	ROM_REGION( 0x10000, "adpcm", 0 )     /* ADPCM CPU */
+	ROM_REGION( 0x10000, "adpcmcpu", 0 )     /* ADPCM CPU */
 	ROM_LOAD( "av_01.6d",     0x0000, 0x8000, CRC(c1e5d258) SHA1(88ed978e6df72ce22f9371930360aa9cde73abe9) ) /* adpcm player - "Talker" ROM */
 
 	ROM_REGION( 0x1000, "mcu", 0 ) // Intel C8751H-88
-	ROM_LOAD( "av.13k", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "av.13k", 0x0000, 0x1000, CRC(505a0987) SHA1(ea1d855a9870d79d0e00eaa88a23038355a1203a) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "av_03.8k",     0x00000, 0x8000, CRC(efb5883e) SHA1(08aebf579f2c5ff472db66597cde1c6871d7d757) )  /* characters */
@@ -1803,11 +1815,11 @@ ROM_START( avengersc )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "av_02.15h",    0x0000, 0x8000, CRC(107a2e17) SHA1(5aae2f4ac9f15ccb4122f3ba9fba588438d62f4f) ) /* ?? */
 
-	ROM_REGION( 0x10000, "adpcm", 0 )     /* ADPCM CPU */
+	ROM_REGION( 0x10000, "adpcmcpu", 0 )     /* ADPCM CPU */
 	ROM_LOAD( "av_01.6d",     0x0000, 0x8000, CRC(c1e5d258) SHA1(88ed978e6df72ce22f9371930360aa9cde73abe9) ) /* adpcm player - "Talker" ROM */
 
 	ROM_REGION( 0x1000, "mcu", 0 ) // Intel C8751H-88
-	ROM_LOAD( "av.13k", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "av.13k", 0x0000, 0x1000, CRC(505a0987) SHA1(ea1d855a9870d79d0e00eaa88a23038355a1203a) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "av_03.8k",     0x00000, 0x8000, CRC(efb5883e) SHA1(08aebf579f2c5ff472db66597cde1c6871d7d757) )  /* characters */
@@ -1853,11 +1865,11 @@ ROM_START( buraiken )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "av_02.15h",    0x0000, 0x8000, CRC(107a2e17) SHA1(5aae2f4ac9f15ccb4122f3ba9fba588438d62f4f) ) /* ?? */
 
-	ROM_REGION( 0x10000, "adpcm", 0 )     /* ADPCM CPU */
+	ROM_REGION( 0x10000, "adpcmcpu", 0 )     /* ADPCM CPU */
 	ROM_LOAD( "av_01.6d",     0x0000, 0x8000, CRC(c1e5d258) SHA1(88ed978e6df72ce22f9371930360aa9cde73abe9) ) /* adpcm player - "Talker" ROM */
 
 	ROM_REGION( 0x1000, "mcu", 0 ) // Intel C8751H-88
-	ROM_LOAD( "av.13k", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "av.13k", 0x0000, 0x1000, CRC(505a0987) SHA1(ea1d855a9870d79d0e00eaa88a23038355a1203a) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "av_03.8k",     0x00000, 0x8000, CRC(efb5883e) SHA1(08aebf579f2c5ff472db66597cde1c6871d7d757) )  /* characters */
@@ -1896,14 +1908,14 @@ ROM_END
 
 ROM_START( buraikenb )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
-	ROM_LOAD( "a4",       0x00000, 0x8000, CRC(b4ac7928) SHA1(4a525532f634dd9e800dc3dbd1230a5c431f869a) )
-	ROM_LOAD( "a6",       0x10000, 0x8000, CRC(b1c6d40d) SHA1(d150adace829130ebf99b8beeedde0e673124984) )
-	ROM_LOAD( "av_05.12n",    0x18000, 0x8000, CRC(9a214b42) SHA1(e13d47dcf9fa055fef467a10751badffcc3b8734) )
+	ROM_LOAD( "a4",        0x00000, 0x8000, CRC(b4ac7928) SHA1(4a525532f634dd9e800dc3dbd1230a5c431f869a) )
+	ROM_LOAD( "a6",        0x10000, 0x8000, CRC(b1c6d40d) SHA1(d150adace829130ebf99b8beeedde0e673124984) )
+	ROM_LOAD( "av_05.12n", 0x18000, 0x8000, CRC(9a214b42) SHA1(e13d47dcf9fa055fef467a10751badffcc3b8734) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "a2",       0x0000, 0x8000, CRC(5e991c96) SHA1(1866f38043f61244b65213544fa5ec5d6d82f96f) )
 
-	ROM_REGION( 0x10000, "adpcm", 0 )     /* ADPCM CPU */
+	ROM_REGION( 0x10000, "adpcmcpu", 0 )     /* ADPCM CPU */
 	ROM_LOAD( "av_01.6d",     0x0000, 0x8000, CRC(c1e5d258) SHA1(88ed978e6df72ce22f9371930360aa9cde73abe9) ) /* adpcm player - "Talker" ROM */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
@@ -1942,41 +1954,34 @@ ROM_START( buraikenb )
 ROM_END
 
 
-void lwings_state::init_avengersb()
-{
-	// set up protection handlers
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf80c, 0xf80c, write8smo_delegate(*m_soundlatch, FUNC(generic_latch_8_device::write)));
-}
-
-
 /*************************************
  *
  *  Game driver(s)
  *
  *************************************/
 
-GAME( 1985, sectionz,  0,        sectionz,  sectionz, lwings_state, empty_init,     ROT0,  "Capcom",           "Section Z (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, sectionza, sectionz, sectionz,  sectionz, lwings_state, empty_init,     ROT0,  "Capcom",           "Section Z (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sectionz,  0,        sectionz,  sectionz, lwings_state, empty_init, ROT0,  "Capcom", "Section Z (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sectionza, sectionz, sectionz,  sectionz, lwings_state, empty_init, ROT0,  "Capcom", "Section Z (set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, lwings,    0,        lwings,    lwings,   lwings_state, empty_init,     ROT90, "Capcom",           "Legendary Wings (US set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lwings2,   lwings,   lwings,    lwings,   lwings_state, empty_init,     ROT90, "Capcom",           "Legendary Wings (US set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lwingsj,   lwings,   lwings,    lwings,   lwings_state, empty_init,     ROT90, "Capcom",           "Ares no Tsubasa (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lwingsja,  lwings,   lwings,    lwings,   lwings_state, empty_init,     ROT90, "Capcom",           "Ares no Tsubasa (Japan, rev. A)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lwingsb,   lwings,   lwings,    lwingsb,  lwings_state, empty_init,     ROT90, "bootleg",          "Legendary Wings (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lwings,    0,        lwings,    lwings,   lwings_state, empty_init, ROT90, "Capcom", "Legendary Wings (US set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lwings2,   lwings,   lwings,    lwings,   lwings_state, empty_init, ROT90, "Capcom", "Legendary Wings (US set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lwingsj,   lwings,   lwings,    lwings,   lwings_state, empty_init, ROT90, "Capcom", "Ares no Tsubasa (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lwingsja,  lwings,   lwings,    lwings,   lwings_state, empty_init, ROT90, "Capcom", "Ares no Tsubasa (Japan, rev. A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lwingsb,   lwings,   lwings,    lwingsb,  lwings_state, empty_init, ROT90, "bootleg", "Legendary Wings (bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, trojan,    0,        trojan,    trojanls, lwings_state, empty_init,     ROT0,  "Capcom",           "Trojan (US set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, trojana,   trojan,   trojan,    trojan,   lwings_state, empty_init,     ROT0,  "Capcom",           "Trojan (US set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, trojanr,   trojan,   trojan,    trojan,   lwings_state, empty_init,     ROT0,  "Capcom (Romstar license)", "Trojan (Romstar)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, trojanj,   trojan,   trojan,    trojan,   lwings_state, empty_init,     ROT0,  "Capcom",           "Tatakai no Banka (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, trojanb,   trojan,   trojan,    trojan,   lwings_state, empty_init,     ROT0,  "bootleg",          "Trojan (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, trojanlt,  trojan,   trojan,    trojan,   lwings_state, empty_init,     ROT0,  "Capcom",           "Trojan (location test)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, trojan,    0,        trojan,    trojanls, lwings_state, empty_init, ROT0,  "Capcom", "Trojan (US set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, trojana,   trojan,   trojan,    trojan,   lwings_state, empty_init, ROT0,  "Capcom", "Trojan (US set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, trojanr,   trojan,   trojan,    trojan,   lwings_state, empty_init, ROT0,  "Capcom (Romstar license)", "Trojan (Romstar)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, trojanj,   trojan,   trojan,    trojan,   lwings_state, empty_init, ROT0,  "Capcom", "Tatakai no Banka (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, trojanb,   trojan,   trojan,    trojan,   lwings_state, empty_init, ROT0,  "bootleg", "Trojan (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, trojanlt,  trojan,   trojan,    trojan,   lwings_state, empty_init, ROT0,  "Capcom", "Trojan (location test)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, avengers,  0,        avengers,  avengers, lwings_state, empty_init,     ROT90, "Capcom",           "Avengers (US, revision C)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, avengersa, avengers, avengers,  avengers, lwings_state, empty_init,     ROT90, "Capcom",           "Avengers (US, revision A)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, avengersb, avengers, avengers,  avengers, lwings_state, empty_init,     ROT90, "Capcom",           "Avengers (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, avengersc, avengers, avengers,  avengers, lwings_state, empty_init,     ROT90, "Capcom",           "Avengers (US, unknown revision)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, buraiken,  avengers, avengers,  avengers, lwings_state, empty_init,     ROT90, "Capcom",           "Hissatsu Buraiken (Japan, revision A)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, buraikenb, avengers, avengersb, avengers, lwings_state, init_avengersb, ROT90, "Capcom",           "Hissatsu Buraiken (Japan, bootleg?)", MACHINE_SUPPORTS_SAVE ) // unprotected at least
+GAME( 1987, avengers,  0,        avengers,  avengers, lwings_state, empty_init, ROT90, "Capcom", "Avengers (US, revision C)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, avengersa, avengers, avengers,  avengers, lwings_state, empty_init, ROT90, "Capcom", "Avengers (US, revision A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, avengersb, avengers, avengers,  avengers, lwings_state, empty_init, ROT90, "Capcom", "Avengers (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, avengersc, avengers, avengers,  avengers, lwings_state, empty_init, ROT90, "Capcom", "Avengers (US, unknown revision)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, buraiken,  avengers, avengers,  avengers, lwings_state, empty_init, ROT90, "Capcom", "Hissatsu Buraiken (Japan, revision A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, buraikenb, avengers, buraikenb, avengers, lwings_state, empty_init, ROT90, "Capcom", "Hissatsu Buraiken (Japan, unprotected)", MACHINE_SUPPORTS_SAVE )
 
 // cloned lwings hardware
-GAME( 1992, fball,     0,        fball,     fball,    lwings_state, empty_init,     ROT0,  "FM Work",          "Fire Ball (FM Work)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fball,     0,        fball,     fball,    lwings_state, empty_init, ROT0,  "FM Work", "Fire Ball (FM Work)", MACHINE_SUPPORTS_SAVE )

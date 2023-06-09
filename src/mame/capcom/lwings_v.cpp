@@ -105,7 +105,7 @@ VIDEO_START_MEMBER(lwings_state,avengers)
 	m_spr_avenger_hw = 1;
 }
 
-VIDEO_START_MEMBER(lwings_state,avengersb)
+VIDEO_START_MEMBER(lwings_state,buraikenb)
 {
 	VIDEO_START_CALL_MEMBER(trojan);
 	m_bg2_avenger_hw = 0;
