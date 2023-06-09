@@ -41248,6 +41248,9 @@ mini2440                        //
 @source:skeleton/miniframe.cpp
 minifram
 
+@source:skeleton/minihock.cpp
+minihockey                      // (c) 1991 Rumatic
+
 @source:skeleton/miuchiz.cpp
 miuchiz                         // (c) 2006 MGA Entertainment
 
