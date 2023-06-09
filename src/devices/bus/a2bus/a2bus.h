@@ -98,6 +98,7 @@ public:
 	void recalc_inh(int slot);
 	uint8_t dma_r(uint16_t offset);
 	void dma_w(uint16_t offset, uint8_t data);
+	void reset_bus();
 
 	void irq_w(int state);
 	void nmi_w(int state);
@@ -151,6 +152,7 @@ public:
 	virtual uint16_t inh_end() { return INH_END_INVALID; }
 	virtual bool inh_check(uint16_t offset, bool bIsWrite) { return false; }
 	virtual int inh_type() { return INH_NONE; }
+	virtual void bus_reset() { }
 
 	device_a2bus_card_interface *next() const { return m_next; }
 

@@ -893,6 +893,9 @@ void apple2gs_state::machine_reset()
 	auxbank_update();
 	update_slotrom_banks();
 
+	// reset the slots
+	m_a2bus->reset_bus();
+
 	// with all the banking reset, now reset the CPU
 	m_maincpu->reset();
 
@@ -3385,8 +3388,26 @@ void apple2gs_state::adbmicro_p2_out(u8 data)
 	if (!BIT(data, 5) && BIT(m_adb_p2_last, 5))
 	{
 		m_adb_reset_freeze = 2;
+		m_a2bus->reset_bus();
 		m_maincpu->reset();
 		m_video->set_newvideo(0x41);
+
+		m_lcram = false;
+		m_lcram2 = true;
+		m_lcprewrite = false;
+		m_lcwriteenable = true;
+		m_intcxrom = false;
+		m_slotc3rom = false;
+		m_video->a80store_w(false);
+		m_altzp = false;
+		m_ramrd = false;
+		m_ramwrt = false;
+		m_altzp = false;
+		m_video->page2_w(false);
+		m_video->res_w(0);
+
+		auxbank_update();
+		update_slotrom_banks();
 	}
 
 	if (!(data & 0x10))

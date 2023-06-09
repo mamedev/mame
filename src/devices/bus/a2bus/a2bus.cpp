@@ -197,6 +197,18 @@ void a2bus_device::add_a2bus_card(int slot, device_a2bus_card_interface *card)
 	m_device_list[slot] = card;
 }
 
+void a2bus_device::reset_bus()
+{
+	for (int slot = 0; slot <= 7; slot++)
+	{
+		auto card = get_a2bus_card(slot);
+		if (card != nullptr)
+		{
+			card->bus_reset();
+		}
+	}
+}
+
 uint8_t a2bus_device::get_a2bus_irq_mask()
 {
 	return m_slot_irq_mask;

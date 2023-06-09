@@ -1346,6 +1346,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 			if (m_reset_latch)
 			{
 				m_reset_latch = false;
+				// allow cards to see reset
+				m_a2bus->reset_bus();
 				m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 			}
 		}
