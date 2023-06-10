@@ -248,9 +248,20 @@ namespace bx
 			? sub(_eye, _at)
 			: sub(_at, _eye)
 			);
-		const Vec3 uxv   = cross(_up, view);
-		const Vec3 right = normalize(uxv);
-		const Vec3 up    = cross(view, right);
+
+		const Vec3 uxv = cross(_up, view);
+		Vec3 right = bx::InitNone;
+
+		if (0.0f == dot(uxv, uxv) )
+		{
+			right = { -1.0f, 0.0f, 0.0f };
+		}
+		else
+		{
+			right = normalize(uxv);
+		}
+
+		const Vec3 up = cross(view, right);
 
 		memSet(_result, 0, sizeof(float)*16);
 		_result[ 0] = right.x;
