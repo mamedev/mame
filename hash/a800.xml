@@ -1719,6 +1719,22 @@ Unemulated [cassette] interface
 		</part>
 	</software>
 
+	<software name="turbohit" supported="no">
+		<!-- "Atari Blizzard Hit" on main menu -->
+		<description>Turbo Hit (Blizzard 32kb)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Unemulated [cassette] interface
+]]></notes>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_blizzard_32kb" />
+			<dataarea name="rom" size="32768">
+				<rom name="turbo_hit.bin" size="32768" crc="cd0d086f" sha1="20e0fcdcdfc2c955b68ac682e9f821aab57996c5"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jturbo2k" supported="no">
 		<description>Cartridge System Turbo 2000 (JK Soft)</description>
 		<year>1991</year>
