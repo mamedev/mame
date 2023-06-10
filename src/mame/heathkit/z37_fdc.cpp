@@ -95,54 +95,22 @@ uint8_t heath_z37_fdc_device::intf_r()
 
 void heath_z37_fdc_device::stat_w(uint8_t val)
 {
-	if (m_access_track_sector)
-	{
-		m_fdc->sector_w(val);
-	}
-	else
-	{
-		m_fdc->cmd_w(val);
-	}
+	m_access_track_sector ? m_fdc->sector_w(val) : m_fdc->cmd_w(val);
 }
 
 uint8_t heath_z37_fdc_device::stat_r()
 {
-	if (m_access_track_sector)
-	{
-		return m_fdc->sector_r();
-	}
-	else
-	{
-		return m_fdc->status_r();
-	}
+	return m_access_track_sector ? m_fdc->sector_r() : m_fdc->status_r();
 }
 
 void heath_z37_fdc_device::data_w(uint8_t val)
 {
-	if (m_access_track_sector)
-	{
-		m_fdc->track_w(val);
-	}
-	else
-	{
-		m_fdc->data_w(val);
-	}
+	m_access_track_sector ? m_fdc->track_w(val) : m_fdc->data_w(val);
 }
 
 uint8_t heath_z37_fdc_device::data_r()
 {
-	if (m_access_track_sector)
-	{
-		uint8_t val = m_fdc->track_r();
-
-		return val;
-	}
-	else
-	{
-		uint8_t val = m_fdc->data_r();
-
-		return val;
-	}
+	return m_access_track_sector ? m_fdc->track_r() : m_fdc->data_r();
 }
 
 void heath_z37_fdc_device::write(offs_t reg, uint8_t val)
@@ -204,14 +172,13 @@ void heath_z37_fdc_device::device_start()
 
 static void z37_floppies(device_slot_interface &device)
 {
-	// H-17-1 - density is a function of the controller, and this one support both ?
-	device.option_add("sssd", FLOPPY_525_SSSD);
+	// H-17-1
 	device.option_add("ssdd", FLOPPY_525_SSDD);
 	// SS 96tpi
 	device.option_add("ssqd", FLOPPY_525_SSQD);
 	// DS 48tpi
 	device.option_add("dd", FLOPPY_525_DD);
-	// DS 96tpi
+	// H-17-4 / H-17-5 -- DS 96tpi
 	device.option_add("qd", FLOPPY_525_QD);
 }
 
