@@ -320,6 +320,7 @@ void _1943_state::_1943b(machine_config &config)
 	_1943(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &_1943_state::c1943b_map);
+	m_screen->screen_vblank().set_nop();
 
 	config.device_remove("mcu");
 }
