@@ -243,42 +243,43 @@ namespace bx
 
 	void mtxLookAt(float* _result, const Vec3& _eye, const Vec3& _at, const Vec3& _up, Handedness::Enum _handedness)
 	{
-		const Vec3 view = normalize(
-			  Handedness::Right == _handedness
-			? sub(_eye, _at)
-			: sub(_at, _eye)
-			);
+		const Vec3 eye  = Handedness::Left == _handedness ? _eye : neg(_eye);
+		const Vec3 view = normalize(sub(_at, eye) );
+
+		Vec3 right = bx::InitNone;
+		Vec3 up    = bx::InitNone;
 
 		const Vec3 uxv = cross(_up, view);
-		Vec3 right = bx::InitNone;
 
 		if (0.0f == dot(uxv, uxv) )
 		{
-			right = { -1.0f, 0.0f, 0.0f };
+			right = { Handedness::Left == _handedness ? -1.0f : 1.0f, 0.0f, 0.0f };
 		}
 		else
 		{
 			right = normalize(uxv);
 		}
 
-		const Vec3 up = cross(view, right);
+		up = cross(right, view);
 
-		memSet(_result, 0, sizeof(float)*16);
 		_result[ 0] = right.x;
 		_result[ 1] = up.x;
 		_result[ 2] = view.x;
+		_result[ 3] = 0.0f;
 
 		_result[ 4] = right.y;
 		_result[ 5] = up.y;
 		_result[ 6] = view.y;
+		_result[ 7] = 0.0f;
 
 		_result[ 8] = right.z;
 		_result[ 9] = up.z;
 		_result[10] = view.z;
+		_result[11] = 0.0f;
 
-		_result[12] = -dot(right, _eye);
-		_result[13] = -dot(up,    _eye);
-		_result[14] = -dot(view,  _eye);
+		_result[12] = -dot(right, eye);
+		_result[13] = -dot(up,    eye);
+		_result[14] = -dot(view,  eye);
 		_result[15] = 1.0f;
 	}
 
