@@ -105,12 +105,12 @@ void altos586_hdc_device::sector_write(uint8_t index)
 
 uint16_t altos586_hdc_device::mem_r(offs_t offset, uint16_t mem_mask)
 {
-	return m_bus->read_word_unaligned(offset << 1, mem_mask);
+	return m_bus->read_word(offset << 1, mem_mask);
 }
 
 void altos586_hdc_device::mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_bus->write_word_unaligned(offset << 1, data, mem_mask);
+	m_bus->write_word(offset << 1, data, mem_mask);
 }
 
 void altos586_hdc_device::altos586_hdc_mem(address_map &map)
@@ -321,7 +321,7 @@ void altos586_hdc_device::altos586_hdc_io(address_map &map)
 	map(0xfff8, 0xfff9).nopw();
 }
 
-std::error_condition altos586_hdc_device::hdd_load(device_image_interface &image, uint8_t index)
+template <uint8_t index> std::error_condition altos586_hdc_device::hdd_load(device_image_interface &image)
 {
 	if (m_hdd[index]->get_info().sectorbytes != 512) {
 		logerror("expected 512 bytes per sector, got %d", m_geom[index]->sectorbytes);
@@ -340,12 +340,12 @@ void altos586_hdc_device::device_add_mconfig(machine_config &config)
 	m_iop->set_data_width(16);
 
 	harddisk_image_device &hdd0(HARDDISK(config, "hdd0", 0));
-	hdd0.set_device_load(FUNC(altos586_hdc_device::hdd0_load));
-	hdd0.set_device_unload(FUNC(altos586_hdc_device::hdd0_unload));
+	hdd0.set_device_load(FUNC(altos586_hdc_device::hdd_load<0U>));
+	hdd0.set_device_unload(FUNC(altos586_hdc_device::hdd_unload<0U>));
 
 	harddisk_image_device &hdd1(HARDDISK(config, "hdd1", 0));
-	hdd1.set_device_load(FUNC(altos586_hdc_device::hdd1_load));
-	hdd1.set_device_unload(FUNC(altos586_hdc_device::hdd1_unload));
+	hdd1.set_device_load(FUNC(altos586_hdc_device::hdd_load<1U>));
+	hdd1.set_device_unload(FUNC(altos586_hdc_device::hdd_unload<1U>));
 }
 
 void altos586_hdc_device::device_reset()
@@ -368,4 +368,13 @@ void altos586_hdc_device::attn_w(uint16_t data)
 
 void altos586_hdc_device::device_start()
 {
+        save_item(NAME(m_status));
+        save_item(NAME(m_seek_status));
+        save_item(NAME(m_cyl_latch));
+        save_item(NAME(m_cyl[0]));
+        save_item(NAME(m_cyl[1]));
+        save_pointer(NAME(m_sector), std::size(m_sector));
+        save_item(NAME(m_secoffset));
+        save_item(NAME(m_drive));
+        save_item(NAME(m_head));
 }

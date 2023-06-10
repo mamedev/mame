@@ -58,11 +58,8 @@ private:
 	void sector_write(uint8_t index);
 
 	// Image mount and unmount.
-	std::error_condition hdd_load(device_image_interface &image, uint8_t index);
-	std::error_condition hdd0_load(device_image_interface &image) { return hdd_load(image, 0); }
-	std::error_condition hdd1_load(device_image_interface &image) { return hdd_load(image, 1); }
-	void hdd0_unload(device_image_interface &image) { m_geom[0] = nullptr; }
-	void hdd1_unload(device_image_interface &image) { m_geom[1] = nullptr; }
+	template <uint8_t index> std::error_condition hdd_load(device_image_interface &image);
+	template <uint8_t index> void hdd_unload(device_image_interface &image) { m_geom[index] = nullptr; }
 
 	required_address_space m_bus;
 	required_device<i8089_device> m_iop;
