@@ -123,22 +123,7 @@ Compiled by K1W1
    - Atari                                    RAM Extension Module Test Rev 1.0
    - Atari Mexico                    U        LOGO Computing Language
 
-   - Atrax                           ER       Atrax (#01)
-   - Atrax                           ER       Atrax (#02)
-   - Atrax                           ER       Atrax (#03)
-   - Atrax                           ER       Atrax (#04)
-   - Atrax                           ER       Atrax (#05)
-   - Atrax                           ER       Atrax (#06)
    - Atrax                           ER       Atrax (#07)
-   - Atrax                           ER       Atrax (#08)
-   - Atrax                           ER       Atrax (#09)
-   - Atrax                           ER       Atrax (#10)
-   - Atrax                           ER       Atrax (#11)
-   - Atrax                           ER       Atrax (#12)
-   - Atrax                           ER       Atrax (#13)
-   - Atrax                           ER       Atrax (#14)
-   - Atrax                           ER       Atrax (#15)
-   - Atrax                           ER       Atrax (#16)
 
    - Beaumont                        ER       PUP (Primary Utility Pack)
 
@@ -975,6 +960,287 @@ https://forums.atariage.com/topic/169199-mess-a800-cartridge-software-list/#comm
 			<feature name="slot" value="a800_8k" />
 			<dataarea name="rom" size="8192">
 				<rom name="atlantis.rom" size="8192" crc="f929f40f" sha1="c795029c69b7b88efad659e107cad415ff3e066e"/> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- All Atrax entry notes presumes to use a PAL machine -->
+	<!-- (They have extra glitches when using NTSC) -->
+	<!-- It's unknown if any of these have been released outside Poland, probably not -->
+	<software name="atrax01" supported="partial">
+		<description>Atrax #01 (Poland)</description>
+		<year>1993?</year>
+		<publisher>Atrax</publisher>
+		<notes><![CDATA[
+Easy Money: boots
+Spy Master: boots
+Hawkmoon: cutoff [GTIA] main sprite
+Trix: inputs are too fast (verify)
+]]></notes>
+		<info name="usage" value="Spy Master: sports manual copy protection when accessing terminals" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_atrax" />
+			<dataarea name="rom" size="131072">
+				<rom name="atrax01.bin" size="131072" crc="d3653f64" sha1="476333a6185a7d70a65a7c992eaee6cc6993790d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atrax02" supported="partial">
+		<description>Atrax #02 (Poland)</description>
+		<year>1993?</year>
+		<publisher>Atrax</publisher>
+		<notes><![CDATA[
+Vicky: boots
+Darkness Hour: boots
+Kampania Wrzesniowa: boots
+Geometria: sports heavy blackened [ANTIC] GFXs sections
+]]></notes>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_atrax" />
+			<dataarea name="rom" size="131072">
+				<rom name="atrax02.bin" size="131072" crc="e34facd9" sha1="dee6b708165be781eb8f7e265e7209a9365f11be"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atrax03">
+		<description>Atrax #03 (Poland)</description>
+		<year>1993?</year>
+		<publisher>Atrax</publisher>
+		<notes><![CDATA[
+Frank and Mark: boots
+Czaszki: boots
+The Jet Action: [ANTIC] playfield flickers a lot with NTSC machine (verify), has odd yellow boxes when starting a stage (verify)
+Gold Hunter: boots
+]]></notes>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_atrax" />
+			<dataarea name="rom" size="131072">
+				<rom name="atrax03.bin" size="131072" crc="55e39b41" sha1="e0cf78cf7b03216396079a3577e8d049d8b5c3f7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atrax04" supported="partial">
+		<description>Atrax #04 (Poland)</description>
+		<year>1993?</year>
+		<publisher>Atrax</publisher>
+		<notes><![CDATA[
+Streets: [ANTIC] playfield flickers on NTSC (verify)
+Kernaw: [GTIA] sprites don't completely mask out on edges, [ANTIC] playfield flickers on NTSC (verify)
+Dagobar: [ANTIC] playfield flickers on NTSC (verify)
+Uczen Czarnoksieznika: [GTIA] main sprite don't mask out on screen edge (verify)
+]]></notes>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_atrax" />
+			<dataarea name="rom" size="131072">
+				<rom name="atrax04.bin" size="131072" crc="dc5a540b" sha1="0f82354df78c4fe9384eb56bc97ac0fe9c6c31e6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atrax05">
+		<description>Atrax #05 (Poland)</description>
+		<year>1993?</year>
+		<publisher>Atrax</publisher>
+		<notes><![CDATA[
+Syn Boga Wiatru: [GTIA] ladder collision detection is off (verify)
+Honky: boots
+U 235: [ANTIC] playfield flickers on NTSC (verify)
+Hydraulik: boots
+]]></notes>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_atrax" />
+			<dataarea name="rom" size="131072">
+				<rom name="atrax05.bin" size="131072" crc="a599c16c" sha1="c7b5ec6c13749a951bd4bec4671aefe5076fdbb9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atrax06">
+		<description>Atrax #06 (Poland)</description>
+		<year>1993?</year>
+		<publisher>Atrax</publisher>
+		<notes><![CDATA[
+Imagine: boots
+Adax: boots
+Aurum: boots
+Electra: boots
+]]></notes>
+		<!-- Cheat: press TAB to skip a level in Electra -->
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_atrax" />
+			<dataarea name="rom" size="131072">
+				<rom name="atrax06.bin" size="131072" crc="74dba211" sha1="023680763209f3b360801e5096d820e62c6e663f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atrax08" supported="partial">
+		<description>Atrax #08 (Poland)</description>
+		<year>1993?</year>
+		<publisher>Atrax</publisher>
+		<notes><![CDATA[
+Smus: doesn't mask [GTIA] sprites on game over screen
+Captain Gather: boots
+Snowball: weird input handling (verify)
+Major Bronx: boots
+]]></notes>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_atrax" />
+			<dataarea name="rom" size="131072">
+				<rom name="atrax08.bin" size="131072" crc="d9d5c193" sha1="b9f7b40c36d130acda0f00ac8f6cd8b20af297a6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atrax09">
+		<description>Atrax #09 (Poland)</description>
+		<year>1993?</year>
+		<publisher>Atrax</publisher>
+		<notes><![CDATA[
+Digi Duck: boots
+Microx: boots
+Piekielko: boots
+Android: boots
+]]></notes>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_atrax" />
+			<dataarea name="rom" size="131072">
+				<rom name="atrax09.bin" size="131072" crc="0e99e18c" sha1="b647e121c1f6c0eb4346168db8f0964104e7c363"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atrax10" supported="partial">
+		<description>Atrax #10 (Poland)</description>
+		<year>1993?</year>
+		<publisher>Atrax</publisher>
+		<notes><![CDATA[
+Wladca: boots
+Alchemia: [GTIA] main sprite don't completely mask out on edges
+Wloczykij: boots
+Saper: boots
+]]></notes>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_atrax" />
+			<dataarea name="rom" size="131072">
+				<rom name="atrax10.bin" size="131072" crc="8ccddb58" sha1="c80136bfdae0fec9d7fd6d7509de69f81e251707"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atrax11" supported="partial">
+		<description>Atrax #11 (Poland)</description>
+		<year>1993?</year>
+		<publisher>Atrax</publisher>
+		<notes><![CDATA[
+Bank Bang!: boots
+Eureka!: boots
+Jaffar: boots
+Robal: boots
+Thinker: incorrect [ANTIC] masking effects
+]]></notes>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_atrax" />
+			<dataarea name="rom" size="131072">
+				<rom name="atrax11.bin" size="131072" crc="8f269d78" sha1="450d2c5d20018e96747df0e4a1c56f745ed09a5d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atrax12" supported="partial">
+		<description>Atrax #12 (Poland)</description>
+		<year>1993?</year>
+		<publisher>Atrax</publisher>
+		<notes><![CDATA[
+Bertyx: boots
+Midnight: boots
+Tank vs Tank: hangs on gameplay
+Sexversi: boots
+]]></notes>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_atrax" />
+			<dataarea name="rom" size="131072">
+				<rom name="atrax12.bin" size="131072" crc="a1c2f2a0" sha1="af29105021ab00d071f47e82c895350f7cd97470"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atrax13" supported="partial">
+		<description>Atrax #13 (Poland)</description>
+		<year>1993?</year>
+		<publisher>Atrax</publisher>
+		<notes><![CDATA[
+Tanks: No [GTIA] bullets, player inputs stops responding from time to time (verify)
+Tron: wrong [ANTIC] raster split for scrolling text (fixes when returning from gameplay), heavy [ANTIC] and [GTIA] artifacts on gameplay, can either not recognize or straight crash when pausing with 'P' key
+Tusker: boots
+Helix: boots
+]]></notes>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_atrax" />
+			<dataarea name="rom" size="131072">
+				<rom name="atrax13.bin" size="131072" crc="800ab6d7" sha1="7debecedafff2ebb0c0c7b30bb632c7f35764753"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atrax14" supported="no">
+		<description>Atrax #14 (Poland)</description>
+		<year>199?</year>
+		<publisher>Atrax</publisher>
+		<!-- TODO: Kolony needs Polish language knowledge -->
+		<notes><![CDATA[
+Axilox: cut off [ANTIC] text during gameplay
+Kolony:
+Reverse: [GTIA] button trigger is too fast
+Ship: black screen
+]]></notes>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_atrax" />
+			<dataarea name="rom" size="131072">
+				<rom name="atrax14.bin" size="131072" crc="21db0d60" sha1="fa67b2a73cdde0dec0647b60290cbe6e1e335bad"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atrax15" supported="partial">
+		<description>Atrax #15 (Poland)</description>
+		<year>199?</year>
+		<publisher>Atrax</publisher>
+		<!-- TODO: Cywilizacja and Mozgprocesor needs Polish language knowledge -->
+		<notes><![CDATA[
+Cywilizacja:
+Mozgprocesor:
+Missile Action: boots
+Zbir: boots
+]]></notes>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_atrax" />
+			<dataarea name="rom" size="131072">
+				<rom name="atrax15.bin" size="131072" crc="9543ef90" sha1="a4da951e20003d15372011fe8b859a5ba3ebf5b6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atrax16" supported="no">
+		<description>Atrax #16 (Poland)</description>
+		<year>199?</year>
+		<publisher>Atrax</publisher>
+		<!-- TODO: Historia entries all needs Polish language knowledge -->
+		<notes><![CDATA[
+Ortografia: black screen
+Historia  966 - 1385:
+Historia 1385 - 1572:
+Historia 1573 - 1795:
+Historia 1795 - 1918:
+Historia 1918 - 1992:
+]]></notes>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_atrax" />
+			<dataarea name="rom" size="131072">
+				<rom name="atrax16.bin" size="131072" crc="156e7460" sha1="881f285fe2dc4be6966036deb1b72c07204f01c4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4619,6 +4885,40 @@ Activision logo glitches out on vertical scrolls
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
 				<rom name="popeye_wip8.rom" size="16384" crc="da07e268" sha1="7719e2c6102ff8b7ff715a6df6c1e6efe3b0b159"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="popmax" supported="partial">
+		<description>Prince of Persia (AtariMAX i/f)</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+Title screen is very off, [ANTIC] timing sensitive
+Missing text during attract mode
+]]></notes>
+		<info name="usage" value="Requires a130xe or xl with 128KB RAM"/>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="maxflash_1mb" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="prince of persia + atarimax.bin" size="0x100000" crc="52df819c" sha1="2871d5d4bc7588b288dea32121c66156301d360b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="popsic" cloneof="popmax" supported="partial">
+		<description>Prince of Persia (SIC! i/f)</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+Title screen is very off, [ANTIC] timing sensitive
+Missing text during attract mode
+]]></notes>
+		<info name="usage" value="Requires a130xe or xl with 128KB RAM"/>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="sic_256kb" />
+			<dataarea name="rom" size="0x040000">
+				<rom name="prince of persia + sic.bin" size="0x040000" crc="d531a9a6" sha1="92dde90f5a586754ae132a2aeedac084bce7c678"/>
 			</dataarea>
 		</part>
 	</software>
