@@ -208,8 +208,8 @@
 
   TODO:
 
-  - Touch screen hook-up;
-  - i2c at I/O port $6;
+  - Microtouch touch screen hook-up;
+  - i2c or EEPROM at I/O port $6;
   - Proper gfxdecode background roms;
   - cmkenosp: corrupts the RAMDAC palette during POST;
   - cmkenosp/cmkenospa: doesn't draw foreground tiles properly;
@@ -580,20 +580,22 @@ static const gfx_layout tiles8x8x4bpp_layout =
 	8, 8,
 	RGN_FRAC(1,1),
 	4,
-	{ 3, 2, 1, 0 },
+	{ STEP4(0, 1) },
 	{ 12, 8, 4, 0, 28, 24, 20, 16  },
 	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8 },
 	32*8
 };
 
-// TODO: wrong decoding, should be an 8bpp
+// TODO: sligthly wrong X/Y decoding, convert to ROM_LOAD32_BYTE
+// cfr. cmkenospa offset $0 charset
 static const gfx_layout tiles8x8x8bpp_layout =
 {
 	8, 8,
-	RGN_FRAC(1, 1),
-	4,
-	{ 3, 2, 1, 0 },
-	{ 12, 8, 4, 0, 28, 24, 20, 16  },
+	RGN_FRAC(1, 2),
+	8,
+	{ STEP8(0, 1) },
+	{ RGN_FRAC(1, 2) + 0, RGN_FRAC(1, 2) + 8, RGN_FRAC(1, 2) + 16, RGN_FRAC(1, 2) + 24,
+      0, 8, 16, 24 },
 	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8 },
 	32*8
 };
@@ -697,10 +699,10 @@ ROM_START( colorama )
 	ROM_LOAD16_BYTE( "p521_fore2.fg2",  0x00000, 0x80000, CRC(3ae78445) SHA1(ef590a6042969718d88732244d2639b7cd8ab507) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "p521_back1.bg1",  0x200001, 0x100000, CRC(0c1a7a2d) SHA1(a7827c6091d0f78e146419261eca427cd229d445) )
-	ROM_LOAD16_BYTE( "p521_back2.bg2",  0x200000, 0x100000, CRC(218912d7) SHA1(64e3dc22ff6ae296e1843b6d6bfb02eb0d202db5) )
-	ROM_LOAD16_BYTE( "p521_back3.bg3",  0x000001, 0x100000, CRC(8ddad7d1) SHA1(0a41ca166c8a9eca2ee27d35a3ae41ddb8759dce) )
-	ROM_LOAD16_BYTE( "p521_back4.bg4",  0x000000, 0x100000, CRC(28d54ce1) SHA1(0dadae2e11f9b86dddb6a0c33abfbdb8b6f2d862) )
+	ROM_LOAD16_BYTE( "p521_back1.bg1",  0x200000, 0x100000, CRC(0c1a7a2d) SHA1(a7827c6091d0f78e146419261eca427cd229d445) )
+	ROM_LOAD16_BYTE( "p521_back2.bg2",  0x200001, 0x100000, CRC(218912d7) SHA1(64e3dc22ff6ae296e1843b6d6bfb02eb0d202db5) )
+	ROM_LOAD16_BYTE( "p521_back3.bg3",  0x000000, 0x100000, CRC(8ddad7d1) SHA1(0a41ca166c8a9eca2ee27d35a3ae41ddb8759dce) )
+	ROM_LOAD16_BYTE( "p521_back4.bg4",  0x000001, 0x100000, CRC(28d54ce1) SHA1(0dadae2e11f9b86dddb6a0c33abfbdb8b6f2d862) )
 
 	ROM_REGION( 0x100000, "ymz", 0 )
 	ROM_LOAD( "p521_snd.sp1",   0x00000, 0x100000, CRC(5c87bb98) SHA1(bc1b8c090fbae166e3a7e1da74bfd2e84c1a03f6) )
@@ -726,10 +728,10 @@ ROM_START( coloramas )
 	ROM_LOAD16_BYTE( "p521_v12_rwof_fore_2_=401=_20-7-99_spanish.bin",  0x00000, 0x80000, CRC(fdf71c26) SHA1(4e2e5cc3f847a173283401969e21ccde941f0f20) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "p521_v12_rwof_back_1_=801=_20-7-99_spanish.bin",  0x200001, 0x100000, CRC(0cbaf152) SHA1(2d6dfc7a4a8ccb6891dd8859594711ddf8a1055e) )
-	ROM_LOAD16_BYTE( "p521_v12_rwof_back_2_=801=_20-7-99_spanish.bin",  0x200000, 0x100000, CRC(7e840b74) SHA1(3825533a824a9a47e4bd44adcebbdc56a01a6f1e) )
-	ROM_LOAD16_BYTE( "p521_v12_rwof_back_3_=801=_20-7-99_spanish.bin",  0x000001, 0x100000, CRC(3163f25d) SHA1(ea2336f2381de1680046c70f217c398d1229f11f) )
-	ROM_LOAD16_BYTE( "p521_v12_rwof_back_4_=801=_20-7-99_spanish.bin",  0x000000, 0x100000, CRC(e741a046) SHA1(8b65205c1d55dfca953e3626d151cb28ba1b2dfc) )
+	ROM_LOAD16_BYTE( "p521_v12_rwof_back_1_=801=_20-7-99_spanish.bin",  0x200000, 0x100000, CRC(0cbaf152) SHA1(2d6dfc7a4a8ccb6891dd8859594711ddf8a1055e) )
+	ROM_LOAD16_BYTE( "p521_v12_rwof_back_2_=801=_20-7-99_spanish.bin",  0x200001, 0x100000, CRC(7e840b74) SHA1(3825533a824a9a47e4bd44adcebbdc56a01a6f1e) )
+	ROM_LOAD16_BYTE( "p521_v12_rwof_back_3_=801=_20-7-99_spanish.bin",  0x000000, 0x100000, CRC(3163f25d) SHA1(ea2336f2381de1680046c70f217c398d1229f11f) )
+	ROM_LOAD16_BYTE( "p521_v12_rwof_back_4_=801=_20-7-99_spanish.bin",  0x000001, 0x100000, CRC(e741a046) SHA1(8b65205c1d55dfca953e3626d151cb28ba1b2dfc) )
 
 	ROM_REGION( 0x100000, "ymz", 0 )
 	ROM_LOAD( "p521_v12_rwof_bet_sound_=801=_20-7-99_spanish.bin",  0x00000, 0x100000, CRC(a9bda811) SHA1(c5a9aa83bba4bed00f4b23f17b82100c94e2889c) )
@@ -755,10 +757,10 @@ ROM_START( cmrltv75 )
 	ROM_LOAD16_BYTE( "p497.fg2",    0x00000, 0x80000, CRC(3846fad0) SHA1(409725ab8c9353a8d5774c5f010ace1077b3fd35) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "p497.bg1",    0x200001, 0x100000, CRC(fadf2a5a) SHA1(ac5413ff213ef5c6210e716a24cd41519b81a54a) )
-	ROM_LOAD16_BYTE( "p497.bg2",    0x200000, 0x100000, CRC(5d648914) SHA1(2a4a2839293529aee500aacfbf1d6b12b328b2eb) )
-	ROM_LOAD16_BYTE( "p497.bg3",    0x000001, 0x100000, CRC(627e236c) SHA1(a4bd8b482cbac2bf2ab1723ee61d32480ede8985) )
-	ROM_LOAD16_BYTE( "p497.bg4",    0x000000, 0x100000, CRC(3698f748) SHA1(856eeed8eff79273ba3aafbbd5d0b1d89e9cff5b) )
+	ROM_LOAD16_BYTE( "p497.bg1",    0x200000, 0x100000, CRC(fadf2a5a) SHA1(ac5413ff213ef5c6210e716a24cd41519b81a54a) )
+	ROM_LOAD16_BYTE( "p497.bg2",    0x200001, 0x100000, CRC(5d648914) SHA1(2a4a2839293529aee500aacfbf1d6b12b328b2eb) )
+	ROM_LOAD16_BYTE( "p497.bg3",    0x000000, 0x100000, CRC(627e236c) SHA1(a4bd8b482cbac2bf2ab1723ee61d32480ede8985) )
+	ROM_LOAD16_BYTE( "p497.bg4",    0x000001, 0x100000, CRC(3698f748) SHA1(856eeed8eff79273ba3aafbbd5d0b1d89e9cff5b) )
 
 	ROM_REGION( 0x100000, "ymz", 0 )
 	ROM_LOAD( "betsound.sp1",   0x00000, 0x100000, CRC(979ecd0e) SHA1(827e8c86b27e5252368960fffe42ace167aa4495) )
@@ -796,10 +798,10 @@ ROM_START( cmkenosp )
 	ROM_LOAD16_BYTE( "fore2.fg2",   0x00000, 0x80000, CRC(8b1afa73) SHA1(efd176dfb55f047b8e01b9460469936c86953417) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "back1.bg1",   0x200001, 0x100000, CRC(8e9d1753) SHA1(4a733bc6b284571b2dae9e80ba8b88724e9dbffb) )
-	ROM_LOAD16_BYTE( "back2.bg2",   0x200000, 0x100000, CRC(aa4fe1ba) SHA1(241cf6ee13664d4cf0c559c26170cb561afca016) )
-	ROM_LOAD16_BYTE( "back3.bg3",   0x000001, 0x100000, CRC(9f26f0e0) SHA1(0c3d78e2befc6fdeb8c3534f5278d2d275106219) )
-	ROM_LOAD16_BYTE( "back4.bg4",   0x000000, 0x100000, CRC(96d33887) SHA1(ca7eb9f2cfeb65c69e837246c8c78ea56c057e66) )
+	ROM_LOAD16_BYTE( "back1.bg1",   0x200000, 0x100000, CRC(8e9d1753) SHA1(4a733bc6b284571b2dae9e80ba8b88724e9dbffb) )
+	ROM_LOAD16_BYTE( "back2.bg2",   0x200001, 0x100000, CRC(aa4fe1ba) SHA1(241cf6ee13664d4cf0c559c26170cb561afca016) )
+	ROM_LOAD16_BYTE( "back3.bg3",   0x000000, 0x100000, CRC(9f26f0e0) SHA1(0c3d78e2befc6fdeb8c3534f5278d2d275106219) )
+	ROM_LOAD16_BYTE( "back4.bg4",   0x000001, 0x100000, CRC(96d33887) SHA1(ca7eb9f2cfeb65c69e837246c8c78ea56c057e66) )
 
 	ROM_REGION( 0x100000, "ymz", 0 )
 	ROM_LOAD( "betsound.sp1",   0x00000, 0x100000, CRC(979ecd0e) SHA1(827e8c86b27e5252368960fffe42ace167aa4495) )
@@ -835,10 +837,10 @@ ROM_START( cmkenospa )
 	ROM_LOAD16_BYTE( "fore2.fg2",   0x00000, 0x80000, CRC(8b1afa73) SHA1(efd176dfb55f047b8e01b9460469936c86953417) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "back1.bg1",   0x200001, 0x100000, CRC(8e9d1753) SHA1(4a733bc6b284571b2dae9e80ba8b88724e9dbffb) )
-	ROM_LOAD16_BYTE( "back2.bg2",   0x200000, 0x100000, CRC(aa4fe1ba) SHA1(241cf6ee13664d4cf0c559c26170cb561afca016) )
-	ROM_LOAD16_BYTE( "back3.bg3",   0x000001, 0x100000, CRC(9f26f0e0) SHA1(0c3d78e2befc6fdeb8c3534f5278d2d275106219) )
-	ROM_LOAD16_BYTE( "back4.bg4",   0x000000, 0x100000, CRC(96d33887) SHA1(ca7eb9f2cfeb65c69e837246c8c78ea56c057e66) )
+	ROM_LOAD16_BYTE( "back1.bg1",   0x200000, 0x100000, CRC(8e9d1753) SHA1(4a733bc6b284571b2dae9e80ba8b88724e9dbffb) )
+	ROM_LOAD16_BYTE( "back2.bg2",   0x200001, 0x100000, CRC(aa4fe1ba) SHA1(241cf6ee13664d4cf0c559c26170cb561afca016) )
+	ROM_LOAD16_BYTE( "back3.bg3",   0x000000, 0x100000, CRC(9f26f0e0) SHA1(0c3d78e2befc6fdeb8c3534f5278d2d275106219) )
+	ROM_LOAD16_BYTE( "back4.bg4",   0x000001, 0x100000, CRC(96d33887) SHA1(ca7eb9f2cfeb65c69e837246c8c78ea56c057e66) )
 
 	ROM_REGION( 0x100000, "ymz", 0 )
 	ROM_LOAD( "betsound.sp1",   0x00000, 0x100000, CRC(979ecd0e) SHA1(827e8c86b27e5252368960fffe42ace167aa4495) )
