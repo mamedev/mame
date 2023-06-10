@@ -1981,7 +1981,7 @@ GAME( 1987, avengersa, avengers, avengers,  avengers, lwings_state, empty_init, 
 GAME( 1987, avengersb, avengers, avengers,  avengers, lwings_state, empty_init, ROT90, "Capcom", "Avengers (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, avengersc, avengers, avengers,  avengers, lwings_state, empty_init, ROT90, "Capcom", "Avengers (US, unknown revision)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, buraiken,  avengers, avengers,  avengers, lwings_state, empty_init, ROT90, "Capcom", "Hissatsu Buraiken (Japan, revision A)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, buraikenb, avengers, buraikenb, avengers, lwings_state, empty_init, ROT90, "Capcom", "Hissatsu Buraiken (Japan, unprotected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, buraikenb, avengers, buraikenb, avengers, lwings_state, empty_init, ROT90, "bootleg", "Hissatsu Buraiken (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
 
 // cloned lwings hardware
 GAME( 1992, fball,     0,        fball,     fball,    lwings_state, empty_init, ROT0,  "FM Work", "Fire Ball (FM Work)", MACHINE_SUPPORTS_SAVE )
