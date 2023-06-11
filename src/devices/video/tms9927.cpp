@@ -351,7 +351,9 @@ void tms9927_device::recompute_parameters(bool postload)
 
 	attotime refresh = clocks_to_attotime(HCOUNT * m_total_vpix);
 
-	osd_printf_debug("TMS9927: Total = %dx%d, Visible = %dx%d, HSync = %d-%d, VSync = %d-%d, Skew=%d, Upscroll=%d, Period=%f Hz\n", m_total_hpix, m_total_vpix, m_visible_hpix, m_visible_vpix, m_hsyn_start, m_hsyn_end, m_vsyn_start, m_vsyn_end, SKEW_BITS, m_start_datarow, refresh.as_hz());
+	osd_printf_debug(
+			"TMS9927(%s): Total = %dx%d, Visible = %dx%d, HSync = %d-%d, VSync = %d-%d, Skew=%d, Upscroll=%d, Period=%f Hz\n",
+			tag(), m_total_hpix, m_total_vpix, m_visible_hpix, m_visible_vpix, m_hsyn_start, m_hsyn_end, m_vsyn_start, m_vsyn_end, SKEW_BITS, m_start_datarow, refresh.as_hz());
 
 	screen().configure(m_total_hpix, m_total_vpix, visarea, refresh.as_attoseconds());
 

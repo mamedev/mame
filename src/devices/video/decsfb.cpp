@@ -35,8 +35,8 @@
 
 DEFINE_DEVICE_TYPE(DECSFB, decsfb_device, "decsfb", "Digital Equipment Corporation Smart Frame Buffer")
 
-decsfb_device::decsfb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DECSFB, tag, owner, clock),
+decsfb_device::decsfb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, DECSFB, tag, owner, clock),
 	m_int_cb(*this)
 {
 }

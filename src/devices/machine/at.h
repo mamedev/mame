@@ -19,8 +19,8 @@ public:
 
 	void map(address_map &map);
 
-	auto kbd_clk() { return subdevice<at_keyboard_controller_device>("keybc")->kbd_clk(); }
-	auto kbd_data() { return subdevice<at_keyboard_controller_device>("keybc")->kbd_data(); }
+	auto kbd_clk() { return m_keybc.lookup()->kbd_clk(); }
+	auto kbd_data() { return m_keybc.lookup()->kbd_data(); }
 
 	uint8_t page8_r(offs_t offset);
 	void page8_w(offs_t offset, uint8_t data);

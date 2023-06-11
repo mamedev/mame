@@ -160,7 +160,6 @@ public:
 	void com_delay_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t com_delay_r(offs_t offset, uint32_t mem_mask = ~0);
 
-	static psxcpu_device *getcpu( device_t &device, const char *cputag ) { return downcast<psxcpu_device *>( device.subdevice( cputag ) ); }
 	void set_disable_rom_berr(bool mode);
 
 	void psxcpu_internal_map(address_map &map);

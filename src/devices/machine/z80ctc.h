@@ -115,7 +115,7 @@ private:
 	// internal helpers
 	void interrupt_check();
 
-	z80ctc_channel_device &channel_config(int ch) { return *subdevice<z80ctc_channel_device>(m_channel[ch].finder_tag()); }
+	z80ctc_channel_device &channel_config(int ch) { return *m_channel[ch].lookup(); }
 
 	// internal state
 	devcb_write_line   m_intr_cb;              // interrupt callback

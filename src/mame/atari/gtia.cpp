@@ -893,7 +893,7 @@ void gtia_device::write(offs_t offset, uint8_t data)
 		recalc_m3();
 		break;
 
-		case 30:    /* clear collisions */
+	case 30:    /* clear collisions */
 		m_r.m0pf = m_r.m1pf = m_r.m2pf = m_r.m3pf =
 		m_r.p0pf = m_r.p1pf = m_r.p2pf = m_r.p3pf =
 		m_r.m0pl = m_r.m1pl = m_r.m2pl = m_r.m3pl =

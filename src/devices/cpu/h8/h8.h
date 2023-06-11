@@ -42,7 +42,7 @@ public:
 	template<int sci> void sci_clk_w(int state) { m_sci[sci]->do_clk_w(state); }
 
 	void sci_set_external_clock_period(int sci, const attotime &period) {
-		m_sci[sci].finder_target().first.subdevice<h8_sci_device>(m_sci[sci].finder_target().second)->do_set_external_clock_period(period);
+		m_sci[sci].lookup()->do_set_external_clock_period(period);
 	}
 
 	void internal_update();

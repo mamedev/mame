@@ -22,26 +22,26 @@ public:
 	void tclk_w(int state);
 
 	// DMAU
-	auto out_hreq_cb() { return device().subdevice<v5x_dmau_device>("dmau")->out_hreq_callback(); }
-	auto out_eop_cb() { return device().subdevice<v5x_dmau_device>("dmau")->out_eop_callback(); }
-	auto in_memr_cb() { return device().subdevice<v5x_dmau_device>("dmau")->in_memr_callback(); }
-	auto in_mem16r_cb() { return device().subdevice<v5x_dmau_device>("dmau")->in_mem16r_callback(); }
-	auto out_memw_cb() { return device().subdevice<v5x_dmau_device>("dmau")->out_memw_callback(); }
-	auto out_mem16w_cb() { return device().subdevice<v5x_dmau_device>("dmau")->out_mem16w_callback(); }
-	template <unsigned Channel> auto in_ior_cb() { return device().subdevice<v5x_dmau_device>("dmau")->in_ior_callback<Channel>(); }
-	template <unsigned Channel> auto in_io16r_cb() { return device().subdevice<v5x_dmau_device>("dmau")->in_io16r_callback<Channel>(); }
-	template <unsigned Channel> auto out_iow_cb() { return device().subdevice<v5x_dmau_device>("dmau")->out_iow_callback<Channel>(); }
-	template <unsigned Channel> auto out_io16w_cb() { return device().subdevice<v5x_dmau_device>("dmau")->out_io16w_callback<Channel>(); }
-	template <unsigned Channel> auto out_dack_cb() { return device().subdevice<v5x_dmau_device>("dmau")->out_dack_callback<Channel>(); }
+	auto out_hreq_cb() { return m_dmau.lookup()->out_hreq_callback(); }
+	auto out_eop_cb() { return m_dmau.lookup()->out_eop_callback(); }
+	auto in_memr_cb() { return m_dmau.lookup()->in_memr_callback(); }
+	auto in_mem16r_cb() { return m_dmau.lookup()->in_mem16r_callback(); }
+	auto out_memw_cb() { return m_dmau.lookup()->out_memw_callback(); }
+	auto out_mem16w_cb() { return m_dmau.lookup()->out_mem16w_callback(); }
+	template <unsigned Channel> auto in_ior_cb() { return m_dmau.lookup()->in_ior_callback<Channel>(); }
+	template <unsigned Channel> auto in_io16r_cb() { return m_dmau.lookup()->in_io16r_callback<Channel>(); }
+	template <unsigned Channel> auto out_iow_cb() { return m_dmau.lookup()->out_iow_callback<Channel>(); }
+	template <unsigned Channel> auto out_io16w_cb() { return m_dmau.lookup()->out_io16w_callback<Channel>(); }
+	template <unsigned Channel> auto out_dack_cb() { return m_dmau.lookup()->out_dack_callback<Channel>(); }
 
 	// SCU
-	auto txd_handler_cb() { return device().subdevice<v5x_scu_device>("scu")->txd_handler(); }
-	auto dtr_handler_cb() { return device().subdevice<v5x_scu_device>("scu")->dtr_handler(); }
-	auto rts_handler_cb() { return device().subdevice<v5x_scu_device>("scu")->rts_handler(); }
-	auto rxrdy_handler_cb() { return device().subdevice<v5x_scu_device>("scu")->rxrdy_handler(); }
-	auto txrdy_handler_cb() { return device().subdevice<v5x_scu_device>("scu")->txrdy_handler(); }
-	auto txempty_handler_cb() { return device().subdevice<v5x_scu_device>("scu")->txempty_handler(); }
-	auto syndet_handler_cb() { return device().subdevice<v5x_scu_device>("scu")->syndet_handler(); }
+	auto txd_handler_cb() { return m_scu.lookup()->txd_handler(); }
+	auto dtr_handler_cb() { return m_scu.lookup()->dtr_handler(); }
+	auto rts_handler_cb() { return m_scu.lookup()->rts_handler(); }
+	auto rxrdy_handler_cb() { return m_scu.lookup()->rxrdy_handler(); }
+	auto txrdy_handler_cb() { return m_scu.lookup()->txrdy_handler(); }
+	auto txempty_handler_cb() { return m_scu.lookup()->txempty_handler(); }
+	auto syndet_handler_cb() { return m_scu.lookup()->syndet_handler(); }
 
 protected:
 	device_v5x_interface(const machine_config &mconfig, nec_common_device &device, bool is_16bit);
@@ -146,7 +146,7 @@ public:
 	void tctl2_w(int state) { m_tcu->write_gate2(state); }
 
 	auto tout1_cb() { return m_tout1_callback.bind(); }
-	auto tout2_cb() { return subdevice<pit8253_device>("tcu")->out_handler<2>(); }
+	auto tout2_cb() { return m_tcu.lookup()->out_handler<2>(); }
 
 	auto icu_slave_ack_cb() { return m_icu_slave_ack.bind(); }
 
@@ -237,7 +237,7 @@ public:
 	}
 	void hack_w(int state);
 
-	template <unsigned Timer> auto tout_handler() { return subdevice<pit8253_device>("tcu")->out_handler<Timer>(); }
+	template <unsigned Timer> auto tout_handler() { return m_tcu.lookup()->out_handler<Timer>(); }
 
 protected:
 	v53_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);

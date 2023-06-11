@@ -110,13 +110,13 @@ class z180_device : public cpu_device, public z80_daisy_chain_interface
 public:
 	auto tend0_wr_callback() { return m_tend0_cb.bind(); }
 	auto tend1_wr_callback() { return m_tend1_cb.bind(); }
-	auto txa0_wr_callback() { return subdevice<z180asci_channel_base>("asci_0")->txa_handler(); }
-	auto txa1_wr_callback() { return subdevice<z180asci_channel_base>("asci_1")->txa_handler(); }
-	auto rts0_wr_callback() { return subdevice<z180asci_channel_base>("asci_0")->rts_handler(); }
-	auto cka0_wr_callback() { return subdevice<z180asci_channel_base>("asci_0")->cka_handler(); }
-	auto cka1_wr_callback() { return subdevice<z180asci_channel_base>("asci_1")->cka_handler(); }
-	auto cks_wr_callback() { return subdevice<z180csio_device>("csio")->cks_handler(); }
-	auto txs_wr_callback() { return subdevice<z180csio_device>("csio")->txs_handler(); }
+	auto txa0_wr_callback() { return m_asci[0].lookup()->txa_handler(); }
+	auto txa1_wr_callback() { return m_asci[1].lookup()->txa_handler(); }
+	auto rts0_wr_callback() { return m_asci[0].lookup()->rts_handler(); }
+	auto cka0_wr_callback() { return m_asci[0].lookup()->cka_handler(); }
+	auto cka1_wr_callback() { return m_asci[1].lookup()->cka_handler(); }
+	auto cks_wr_callback() { return m_csio.lookup()->cks_handler(); }
+	auto txs_wr_callback() { return m_csio.lookup()->txs_handler(); }
 
 	bool get_tend0();
 	bool get_tend1();
