@@ -38,8 +38,8 @@ public:
 	template<int port> auto read_adc() { return m_read_adc[port].bind(); }
 	template<int sci> auto write_sci_tx() { return m_sci_tx[sci].bind(); }
 	template<int sci> auto write_sci_clk() { return m_sci_clk[sci].bind(); }
-	template<int sci> auto sci_rx_w(int state) { m_sci[sci]->do_rx_w(state); }
-	template<int sci> auto sci_clk_w(int state) { m_sci[sci]->do_clk_w(state); }
+	template<int sci> void sci_rx_w(int state) { m_sci[sci]->do_rx_w(state); }
+	template<int sci> void sci_clk_w(int state) { m_sci[sci]->do_clk_w(state); }
 
 	void sci_set_external_clock_period(int sci, const attotime &period) {
 		m_sci[sci].finder_target().first.subdevice<h8_sci_device>(m_sci[sci].finder_target().second)->do_set_external_clock_period(period);
