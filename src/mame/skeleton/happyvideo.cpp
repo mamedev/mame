@@ -2,7 +2,7 @@
 // copyright-holders:
 /***********************************************************************************************
 
- Skeleton driver for "Happy Video" kiddie ride coinop machine (unknown Chinese manufacturer).
+ Skeleton driver for "Happy Video" kiddie ride coinop hardware from Leyaoyao.
 
    ________________________________________________________________________
   |                          _______                                      |
@@ -94,5 +94,5 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME       PARENT  MACHINE    INPUT      CLASS            INIT        ROT   COMPANY    FULLNAME       FLAGS 
-GAME( 20??, hppyvideo, 0,      hppyvideo, hppyvideo, hppyvideo_state, empty_init, ROT0, "unknown", "Happy Video", MACHINE_IS_SKELETON )
+//    YEAR  NAME       PARENT  MACHINE    INPUT      CLASS            INIT        ROT   COMPANY     FULLNAME       FLAGS 
+GAME( 20??, hppyvideo, 0,      hppyvideo, hppyvideo, hppyvideo_state, empty_init, ROT0, "Leyaoyao", "Happy Video", MACHINE_IS_SKELETON )
