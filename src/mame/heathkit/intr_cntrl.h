@@ -36,6 +36,8 @@ protected:
 	virtual void update_intr_line();
 
 	virtual void device_start() override;
+	virtual void device_reset() override;
+
 	virtual void device_resolve_objects() override;
 
 	devcb_write8 m_irq_line;
@@ -62,6 +64,7 @@ protected:
 	virtual void update_intr_line() override;
 
 	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	bool m_interrupts_blocked;

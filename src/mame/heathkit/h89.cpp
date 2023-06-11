@@ -123,6 +123,7 @@ private:
 	uint8_t raise_NMI_r();
 	void raise_NMI_w(uint8_t data);
 	void console_intr(uint8_t data);
+	void reset_line(uint8_t data);
 };
 
 /*
@@ -362,8 +363,14 @@ void h89_state::machine_reset()
 
 	update_gpp(0);
 	update_mem_view();
+	m_h37->reset();
+	m_intr_cntrl->reset();
+	m_console->reset();
+	m_serial1->reset();
+	m_serial2->reset();
+	m_serial3->reset();
+	m_maincpu->reset();
 }
-
 
 uint8_t h89_state::raise_NMI_r()
 {
@@ -386,6 +393,14 @@ void h89_state::console_intr(uint8_t data)
 	else
 	{
 		m_intr_cntrl->raise_irq(3);
+	}
+}
+
+void h89_state::reset_line(uint8_t data)
+{
+	if (data == ASSERT_LINE)
+	{
+		reset();
 	}
 }
 
@@ -447,6 +462,8 @@ void h89_state::h89(machine_config & config)
 	// Connect the console port on CPU board to serial port on TLB
 	m_console->out_tx_callback().set(m_tlb, FUNC(heath_tlb_device::cb1_w));
 	m_tlb->serial_data_callback().set(m_console, FUNC(ins8250_uart_device::rx_w));
+
+	m_tlb->reset_cb().set(FUNC(h89_state::reset_line));
 
 	HEATH_Z37_FDC(config, m_h37);
 	m_h37->drq_cb().set(m_intr_cntrl, FUNC(z37_intr_cntrl::set_drq));
