@@ -1,26 +1,21 @@
 // license:BSD-3-Clause
-// copyright-holders:Ville Linde
-/*  Taito Wolf System
+// copyright-holders:Ville Linde, Angelo Salese
+/*  P5TX-LA / Taito Wolf System
 
-Driver by Ville Linde
+Original legacy PCI driver by Ville Linde,
+rewritten by Angelo Salese to use the new PCI model
 
 Three board system consisting of a P5TX-LA PC motherboard, a Taito main board and a rom board.
 
 TODO:
-- Implement proper Super I/O (crashes on CMOS and keyboard checks);
-- pf2012: Recheck following statement with the new BIOS dump, may be just standard ISA hook;
-\- program ROM is read via parallel port (for offset write, encrypted) and game port.
-   It's the first thing that the BIOS does at boot (cfr. accesses at $20x),
-   if these ports are fed with proper values then it sets up PnP then tries a DMA ch. 3 transfer,
-   otherwise it just boots the normal P5TX-LA bootstrap sequence.
-   cfr. PC=e850b, PC=e4fc8, PC=fd84a (reading I/O $0006).
-- Above needs to be converted to a proper EISA device, program ROM board is connected on MB thru the only
-  available slot option;
-- Hookup Voodoo to PCI root;
-- Convert P5TX-LA to a proper stand-alone driver;
+- The Retro Web MB pic has a Winbond w83877tf Super I/O but neither BIOSes accesses it, is it specific to the (unavailable) ECS P5TX-LA BIOS?
+- pf2012: crashes with "EMM386 not installed - insufficient memory" during boot up;
+- pf2012: Hookup Voodoo to PCI root;
 - According to manual hold A+B+service button for 10 seconds for entering test mode during initial bootup
-  sequence. Board and input test menu doesn't seem to have a dedicated test mode switch. This statement needs
-  verification once we get there;
+  sequence. Board and input test menu doesn't seem to have a dedicated test mode switch.
+  This statement needs verification once we get there;
+
+===================================================================================================
 
 Hardware configuration:
 
