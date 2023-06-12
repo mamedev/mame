@@ -225,6 +225,7 @@ void atirageiidvd_device::device_start()
 	m_regs0[CONFIG_CHIP_ID+1] = 0x47;
 	m_regs0[CONFIG_CHIP_ID+3] = 0x3a;
 
+	// TODO: opt-in Mach64 legacy x86 memory & i/o VGA bridge control
 	command = 0;
 
 	add_rom((u8 *)m_vga_rom->base(), 0x8000);

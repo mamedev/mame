@@ -77,6 +77,162 @@ Taito W Rom Board:
 #include "video/virge_pci.h"
 #include "video/atirage.h"
 
+class isa16_taito_rom_disk : public device_t, public device_isa16_card_interface
+{
+public:
+	// construction/destruction
+	isa16_taito_rom_disk(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template <typename T> void set_program_rom_tag(T &&tag) { m_program_rom.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_data_rom_tag(T &&tag) { m_data_rom.set_tag(std::forward<T>(tag)); }
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	required_memory_region m_program_rom;
+	required_memory_region m_data_rom;
+
+	u8 m_program_bank = 0;
+	u8 read_program(offs_t offset);
+	void write_program(offs_t offset, u8 data);
+	u8 read_data(offs_t offset);
+	void write_data(offs_t offset, u8 data);
+	u8 read_bank(offs_t offset);
+	void write_bank(offs_t offset, u8 data);
+
+	void remap(int space_id, offs_t start, offs_t end) override;
+};
+
+DEFINE_DEVICE_TYPE(ISA16_TAITO_ROM_DISK, isa16_taito_rom_disk, "isa16_taito_rom_disk", "ISA16 Taito Wolf System ROM DISK")
+
+isa16_taito_rom_disk::isa16_taito_rom_disk(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, ISA16_TAITO_ROM_DISK, tag, owner, clock)
+	, device_isa16_card_interface(mconfig, *this)
+	, m_program_rom(*this, finder_base::DUMMY_TAG)
+	, m_data_rom(*this, finder_base::DUMMY_TAG)
+{
+}
+
+void isa16_taito_rom_disk::device_start()
+{
+	set_isa_device();
+}
+
+void isa16_taito_rom_disk::device_reset()
+{
+}
+
+void isa16_taito_rom_disk::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_PROGRAM)
+	{
+		// emm386 /X=CB00-D400
+		m_isa->install_memory(0xcb080, 0xcb081, read8sm_delegate(*this, FUNC(isa16_taito_rom_disk::read_bank)), write8sm_delegate(*this, FUNC(isa16_taito_rom_disk::write_bank)));
+
+		m_isa->install_memory(0xd0000, 0xd3fff, read8sm_delegate(*this, FUNC(isa16_taito_rom_disk::read_program)), write8sm_delegate(*this, FUNC(isa16_taito_rom_disk::write_program)));
+
+		// TODO: unknown location
+		//m_isa->install_memory(0xd8000, 0xdffff, read8sm_delegate(*this, FUNC(isa16_taito_rom_disk::read_data)), write8sm_delegate(*this, FUNC(isa16_taito_rom_disk::write_data)));
+	}
+}
+
+
+u8 isa16_taito_rom_disk::read_program(offs_t offset)
+{
+	return m_program_rom->base()[offset | (m_program_bank * 0x4000)];
+}
+
+void isa16_taito_rom_disk::write_program(offs_t offset, u8 data)
+{
+
+}
+
+u8 isa16_taito_rom_disk::read_data(offs_t offset)
+{
+	return m_data_rom->base()[offset];
+}
+
+void isa16_taito_rom_disk::write_data(offs_t offset, u8 data)
+{
+
+}
+
+u8 isa16_taito_rom_disk::read_bank(offs_t offset)
+{
+	logerror("isa16_taito_rom_disk: unconfirmed read bank\n");
+	return m_program_bank;
+}
+
+void isa16_taito_rom_disk::write_bank(offs_t offset, u8 data)
+{
+	//printf("%02x %02x\n", offset, data);
+
+	if (!offset)
+		m_program_bank = data;
+}
+
+class isa16_p5txla_mb : public device_t, public device_isa16_card_interface
+{
+public:
+	// construction/destruction
+	isa16_p5txla_mb(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	required_device<mc146818_device> m_rtc;
+	required_device<kbdc8042_device> m_kbdc;
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	void remap(int space_id, offs_t start, offs_t end) override;
+};
+
+DEFINE_DEVICE_TYPE(ISA16_P5TXLA_MB, isa16_p5txla_mb, "isa16_p5txla_mb", "ISA16 P5TX-LA Virtual MB resources")
+
+isa16_p5txla_mb::isa16_p5txla_mb(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, ISA16_P5TXLA_MB, tag, owner, clock)
+	, device_isa16_card_interface(mconfig, *this)
+	, m_rtc(*this, "rtc")
+	, m_kbdc(*this, "kbdc")
+{
+}
+
+void isa16_p5txla_mb::device_add_mconfig(machine_config &config)
+{
+	MC146818(config, m_rtc, 32.768_kHz_XTAL);
+	//m_rtc->irq().set(m_pic8259_2, FUNC(pic8259_device::ir0_w));
+	m_rtc->set_century_index(0x32);
+
+	KBDC8042(config, m_kbdc, 0);
+	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
+	m_kbdc->system_reset_callback().set_inputline(":maincpu", INPUT_LINE_RESET);
+	m_kbdc->gate_a20_callback().set_inputline(":maincpu", INPUT_LINE_A20);
+	m_kbdc->input_buffer_full_callback().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq1_w));
+}
+
+
+void isa16_p5txla_mb::device_start()
+{
+	set_isa_device();
+}
+
+void isa16_p5txla_mb::device_reset()
+{
+
+}
+
+void isa16_p5txla_mb::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_IO)
+	{
+		m_isa->install_device(0x60, 0x6f, read8sm_delegate(m_kbdc, FUNC(kbdc8042_device::data_r)), write8sm_delegate(m_kbdc, FUNC(kbdc8042_device::data_w)));
+		m_isa->install_device(0x70, 0x7f, read8sm_delegate(m_rtc, FUNC(mc146818_device::read)), write8sm_delegate(m_rtc, FUNC(mc146818_device::write)));
+	}
+}
 
 namespace {
 
@@ -95,7 +251,9 @@ private:
 	void p5txla_io(address_map &map);
 	void p5txla_map(address_map &map);
 
-	static void winbond_superio_config(device_t *device);
+	static void romdisk_config(device_t *device);
+
+//	static void winbond_superio_config(device_t *device);
 };
 
 void p5txla_state::p5txla_map(address_map &map)
@@ -113,9 +271,13 @@ void p5txla_state::p5txla_io(address_map &map)
 static void isa_internal_devices(device_slot_interface &device)
 {
     // TODO: w83877tf
-	device.option_add("w83977tf", W83977TF);
+	// It actually don't seem to access any kind of Super I/O, wtf
+//	device.option_add("w83977tf", W83977TF);
+	device.option_add_internal("taito_romdisk", ISA16_TAITO_ROM_DISK);
+	device.option_add_internal("p5txla_mb", ISA16_P5TXLA_MB);
 }
 
+#if 0
 void p5txla_state::winbond_superio_config(device_t *device)
 {
 	w83977tf_device &fdc = *downcast<w83977tf_device *>(device);
@@ -131,6 +293,7 @@ void p5txla_state::winbond_superio_config(device_t *device)
 //	fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
 //	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
 }
+#endif
 
 // TODO: PCI address mapping is unconfirmed
 void p5txla_state::p5txla(machine_config &config)
@@ -153,7 +316,8 @@ void p5txla_state::p5txla(machine_config &config)
 	ide.irq_pri().set("pci:07.0", FUNC(i82371sb_isa_device::pc_irq14_w));
 	ide.irq_sec().set("pci:07.0", FUNC(i82371sb_isa_device::pc_mirq0_w));
 
-	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "w83977tf", true).set_option_machine_config("w83977tf", winbond_superio_config);
+//	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "w83977tf", true).set_option_machine_config("w83977tf", winbond_superio_config);
+	ISA16_SLOT(config, "board2", 0, "pci:07.0:isabus", isa_internal_devices, "p5txla_mb", true);
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa3", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
@@ -180,9 +344,18 @@ void p5txla_state::p5txla(machine_config &config)
     ATI_RAGEIIDVD(config, "pci:12.0", 0);
 }
 
+void p5txla_state::romdisk_config(device_t *device)
+{
+	isa16_taito_rom_disk &romdisk = *downcast<isa16_taito_rom_disk *>(device);
+	romdisk.set_program_rom_tag("program_rom");
+	romdisk.set_data_rom_tag("data_rom");
+}
+
 void p5txla_state::taitowlf(machine_config &config)
 {
     p5txla_state::p5txla(config);
+
+	ISA16_SLOT(config, "board1", 0, "pci:07.0:isabus", isa_internal_devices, "taito_romdisk", true).set_option_machine_config("taito_romdisk", romdisk_config);
 
     // TODO: replace ATI Rage above with Voodoo setup
     VIRGE_PCI(config.replace(), "pci:12.0", 0);
@@ -200,11 +373,11 @@ ROM_START(pf2012)
     // TAITO Ver1.0 1998/5/7
 	ROM_LOAD("p5tx-la_861.u16", 0x20000, 0x20000, CRC(a4d4a0fc) SHA1(af3a49a1bee416b58a61af28473f3dac0a4160c8))
 
-	ROM_REGION(0x400000, "user3", 0) // Program ROM (FAT12)
+	ROM_REGION(0x400000, "board1:program_rom", 0) // Program ROM (FAT12)
 	ROM_LOAD("u1.bin", 0x000000, 0x200000, CRC(8f4c09cb) SHA1(0969a92fec819868881683c580f9e01cbedf4ad2))
 	ROM_LOAD("u2.bin", 0x200000, 0x200000, CRC(59881781) SHA1(85ff074ab2a922eac37cf96f0bf153a2dac55aa4))
 
-	ROM_REGION(0x4000000, "user4", 0) // Data ROM (FAT12)
+	ROM_REGION(0x4000000, "board1:data_rom", 0) // Data ROM (FAT12)
 	ROM_LOAD("e59-01.u20", 0x0000000, 0x800000, CRC(701d3a9a) SHA1(34c9f34f4da34bb8eed85a4efd1d9eea47a21d77) )
 	ROM_LOAD("e59-02.u23", 0x0800000, 0x800000, CRC(626df682) SHA1(35bb4f91201734ce7ccdc640a75030aaca3d1151) )
 	ROM_LOAD("e59-03.u26", 0x1000000, 0x800000, CRC(74e4efde) SHA1(630235c2e4a11f615b5f3b8c93e1e645da09eefe) )
