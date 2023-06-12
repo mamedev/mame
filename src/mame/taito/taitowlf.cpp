@@ -75,6 +75,7 @@ Taito W Rom Board:
 #include "machine/pci-ide.h"
 #include "machine/pci.h"
 #include "video/virge_pci.h"
+#include "video/atirage.h"
 
 
 namespace {
@@ -131,7 +132,7 @@ void p5txla_state::winbond_superio_config(device_t *device)
 //	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
 }
 
-
+// TODO: PCI address mapping is unconfirmed
 void p5txla_state::p5txla(machine_config &config)
 {
 	pentium_device &maincpu(PENTIUM(config, "maincpu", 90000000));
@@ -175,15 +176,16 @@ void p5txla_state::p5txla(machine_config &config)
 	serport1.cts_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::ncts2_w));
 #endif
 
-    // TODO: ATI Rage II+DVD
-    VIRGE_PCI(config, "pci:12.0", 0);
+	// on-board
+    ATI_RAGEIIDVD(config, "pci:12.0", 0);
 }
 
 void p5txla_state::taitowlf(machine_config &config)
 {
     p5txla_state::p5txla(config);
 
-    // TODO: replace ATI Rage above with the 2x Voodoo setup
+    // TODO: replace ATI Rage above with Voodoo setup
+    VIRGE_PCI(config.replace(), "pci:12.0", 0);
 }
 
 /*****************************************************************************/
@@ -191,7 +193,6 @@ void p5txla_state::taitowlf(machine_config &config)
 ROM_START(p5txla)
 	ROM_REGION32_LE(0x40000, "pci:07.0", 0)
 	ROM_LOAD("p5tx-la.bin", 0x00000, 0x40000, CRC(072e6d51) SHA1(70414349b37e478fc28ecbaba47ad1033ae583b7))
-
 ROM_END
 
 ROM_START(pf2012)
