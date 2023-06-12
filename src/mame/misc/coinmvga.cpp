@@ -586,7 +586,7 @@ static const gfx_layout tiles8x8x4bpp_layout =
 	32*8
 };
 
-// TODO: sligthly wrong X/Y decoding, convert to ROM_LOAD32_BYTE
+// TODO: convert to ROM_LOAD32_BYTE
 // cfr. cmkenospa offset $0 charset
 static const gfx_layout tiles8x8x8bpp_layout =
 {
@@ -594,8 +594,8 @@ static const gfx_layout tiles8x8x8bpp_layout =
 	RGN_FRAC(1, 2),
 	8,
 	{ STEP8(0, 1) },
-	{ RGN_FRAC(1, 2) + 0, RGN_FRAC(1, 2) + 8, RGN_FRAC(1, 2) + 16, RGN_FRAC(1, 2) + 24,
-      0, 8, 16, 24 },
+	{ RGN_FRAC(1, 2) +  0, RGN_FRAC(1, 2) +  8,  0,  8,
+	  RGN_FRAC(1, 2) + 16, RGN_FRAC(1, 2) + 24, 16, 24 },
 	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8 },
 	32*8
 };
@@ -605,11 +605,11 @@ static const gfx_layout tiles8x8x8bpp_layout =
 ******************************/
 
 static GFXDECODE_START( gfx_coinmvga_4bpp )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x4bpp_layout, 0x000, 1 )  /* Foreground GFX */
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x4bpp_layout, 0x000, 1 )  // Foreground GFX
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_coinmvga_8bpp )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8x8bpp_layout, 0x000, 1 )  /* Background GFX */
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8x8bpp_layout, 0x000, 1 )  // Background GFX
 GFXDECODE_END
 
 
@@ -881,8 +881,8 @@ void coinmvga_state::init_cmrltv75()
 *************************/
 
 //    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT    COMPANY                    FULLNAME                                       FLAGS
-GAME( 2000, colorama,  0,        coinmvga, coinmvga, coinmvga_state, init_colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Colorama (P521, English)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2000, coloramas, colorama, coinmvga, coinmvga, coinmvga_state, init_colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Colorama (P521 V13, Spanish)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2001, cmrltv75,  0,        coinmvga, coinmvga, coinmvga_state, init_cmrltv75, ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Roulette P497 V75 (Y2K, Spanish)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2000, cmkenosp,  0,        coinmvga, coinmvga, coinmvga_state, empty_init,    ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-14)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2000, cmkenospa, cmkenosp, coinmvga, coinmvga, coinmvga_state, empty_init,    ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-02)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2000, colorama,  0,        coinmvga, coinmvga, coinmvga_state, init_colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Colorama (P521, English)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2000, coloramas, colorama, coinmvga, coinmvga, coinmvga_state, init_colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Colorama (P521 V13, Spanish)",                MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2001, cmrltv75,  0,        coinmvga, coinmvga, coinmvga_state, init_cmrltv75, ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Roulette P497 V75 (Y2K, Spanish)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2000, cmkenosp,  0,        coinmvga, coinmvga, coinmvga_state, empty_init,    ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-14)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2000, cmkenospa, cmkenosp, coinmvga, coinmvga, coinmvga_state, empty_init,    ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-02)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
