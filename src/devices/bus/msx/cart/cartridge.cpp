@@ -28,6 +28,7 @@
 #include "msx_audio.h"
 #include "msxdos2.h"
 #include "nomapper.h"
+#include "quickdisk.h"
 #include "ram.h"
 #include "rtype.h"
 #include "slotexpander.h"
@@ -80,6 +81,7 @@ void msx_cart(device_slot_interface &device, bool is_in_subslot)
 	device.option_add_internal(slotoptions::MSXDOS2E,        MSX_CART_MSXDOS2E);
 	device.option_add_internal(slotoptions::MSXWRITE,        MSX_CART_MSXWRITE);
 	device.option_add_internal(slotoptions::NOMAPPER,        MSX_CART_NOMAPPER);
+	device.option_add_internal(slotoptions::QUICKDISK,       MSX_CART_QUICKDISK);
 	device.option_add_internal(slotoptions::RTYPE,           MSX_CART_RTYPE);
 	device.option_add_internal(slotoptions::SOUND_SNATCHER,  MSX_CART_SOUND_SNATCHER);
 	device.option_add_internal(slotoptions::SOUND_SDSNATCH,  MSX_CART_SOUND_SDSNATCHER);

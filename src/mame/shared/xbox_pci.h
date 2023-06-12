@@ -459,13 +459,13 @@ public:
 	mcpx_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	template <typename T> void set_bus_master_space(T &&bmtag, int bmspace)
 	{
-		subdevice<bus_master_ide_controller_device>(m_pri.finder_tag())->set_bus_master_space(bmtag, bmspace);
-		subdevice<bus_master_ide_controller_device>(m_sec.finder_tag())->set_bus_master_space(bmtag, bmspace);
+		m_pri.lookup()->set_bus_master_space(bmtag, bmspace);
+		m_sec.lookup()->set_bus_master_space(bmtag, bmspace);
 	}
 	template <bool R> void set_bus_master_space(const address_space_finder<R> &finder)
 	{
-		subdevice<bus_master_ide_controller_device>(m_pri.finder_tag())->set_bus_master_space(finder);
-		subdevice<bus_master_ide_controller_device>(m_sec.finder_tag())->set_bus_master_space(finder);
+		m_pri.lookup()->set_bus_master_space(finder);
+		m_sec.lookup()->set_bus_master_space(finder);
 	}
 
 	auto pri_interrupt_handler() { return m_pri_interrupt_handler.bind(); }

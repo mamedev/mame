@@ -64,7 +64,8 @@ public:
 		floppy0(*this, "0"),
 		floppy1(*this, "1"),
 		floppy2(*this, "2"),
-		floppy3(*this, "3")
+		floppy3(*this, "3"),
+		m_reset_latch(false)
 	{
 	}
 
@@ -136,6 +137,7 @@ public:
 	void apple3(machine_config &config);
 	void apple3_map(address_map &map);
 private:
+	bool m_reset_latch;
 	uint8_t m_via_0_a = 0;
 	uint8_t m_via_0_b = 0;
 	uint8_t m_via_1_a = 0;

@@ -1460,7 +1460,6 @@ void vic3_device::port_w(offs_t offset, uint8_t data)
 		if (!m_port_changed_cb.isnull())
 		{
 			DBG_LOG(2, "vic write", ("%.2x:%.2x\n", offset, data));
-			m_reg[offset] = data;
 			m_port_changed_cb((offs_t)0,data);
 		}
 		break;

@@ -25,6 +25,7 @@
     The Apple IIe, IIc and IIgs also have an external DE-9 connector
     that carries a subset of the signals, excluding the annunciator
     outputs and utility strobe (which the IIc and IIgs do not have).
+    The Laser 3000 provides only the 9-pin connector.
 
 **********************************************************************
                             ____________
@@ -85,6 +86,12 @@ void apple2_gameio_device::default_options(device_slot_interface &slot)
 	slot.option_add("paddles", APPLE2_PADDLES);
 	slot.option_add("gizmo", APPLE2_GIZMO);
 	slot.option_add("compeyes", APPLE2_COMPUTEREYES);
+}
+
+void apple2_gameio_device::joystick_options(device_slot_interface &slot)
+{
+	slot.option_add("joy", APPLE2_JOYSTICK);
+	slot.option_add("paddles", APPLE2_PADDLES);
 }
 
 void apple2_gameio_device::device_config_complete()

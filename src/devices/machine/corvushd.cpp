@@ -282,7 +282,7 @@ void corvus_hdc_device::dump_buffer(uint8_t *buffer, uint16_t length) {
 	for(uint16_t offset = 0; offset < length; offset += 16) {
 		int buf_offset = 0;
 		for(uint8_t byte_idx = 0; byte_idx < 16 && (offset + byte_idx) < length; byte_idx++) {
-			sprintf(data_buf + buf_offset, "%02x ", *(buffer + offset));
+			snprintf(data_buf + buf_offset, 128 - buf_offset, "%02x ", *(buffer + offset));
 			ascii_buf[byte_idx] = isprint(*(buffer + offset)) ? *(buffer + offset) : '.';
 		}
 		if((length - offset) < 16) {

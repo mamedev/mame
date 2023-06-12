@@ -1127,7 +1127,21 @@ TIMER_CALLBACK_MEMBER(apple3_state::scanend_cb)
 	// check for ctrl-reset
 	if ((m_kbspecial->read() & 0x88) == 0x88)
 	{
-		m_maincpu->reset();
+		if (!m_reset_latch)
+		{
+			m_reset_latch = true;
+			m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+		}
+	}
+	else
+	{
+		if (m_reset_latch)
+		{
+			m_reset_latch = false;
+			// allow cards to see reset
+			m_a2bus->reset_bus();
+			m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		}
 	}
 }
 

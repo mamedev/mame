@@ -2481,6 +2481,14 @@ void system1_state::sys1piox_315_5155(machine_config &config)
 	z80.set_decrypted_tag(":decrypted_opcodes");
 }
 
+void system1_state::sys1piox_315_5111(machine_config &config)
+{
+	sys1pio(config);
+	segacrpt_z80_device &z80(SEGA_315_5111(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1pio_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
+
 void system1_state::sys1piox_315_5110(machine_config &config)
 {
 	sys1pio(config);
@@ -3713,6 +3721,33 @@ ROM_START( teddybbo )
 	ROM_LOAD( "epr-6739.116",   0x0000, 0x4000, CRC(81a37e69) SHA1(ddd0fd7ba5b3646c43ae4261f1e3fedd4184d92c) ) /* encrypted */
 	ROM_LOAD( "epr-6740.109",   0x4000, 0x4000, CRC(715388a9) SHA1(5affc4ecb1e0d58b69093aed732b1e292b8d3118) ) /* encrypted */
 	ROM_LOAD( "epr-6741.96",    0x8000, 0x4000, CRC(e5a74f5f) SHA1(ccf18b424d4aaeec0bae1e6f096b4c176f6ab554) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "epr-6748.120",   0x0000, 0x2000, CRC(9325a1cf) SHA1(555d137b1c974b144ebe6593b4c32c97b3bb5de9) )
+
+	ROM_REGION( 0xc000, "tiles", 0 )
+	ROM_LOAD( "epr-6747.62",    0x0000, 0x2000, CRC(a0e5aca7) SHA1(e7d35ed5e1606a1ea8b29eeca3ca807ed163573b) )
+	ROM_LOAD( "epr-6746.61",    0x2000, 0x2000, CRC(cdb77e51) SHA1(590855f41b62fe9a84db51f90242697abb603c00) )
+	ROM_LOAD( "epr-6745.64",    0x4000, 0x2000, CRC(0cab75c3) SHA1(ef9b74c62fbd81db8942f0b7aa2569a8f4843e9d) )
+	ROM_LOAD( "epr-6744.63",    0x6000, 0x2000, CRC(0ef8d2cd) SHA1(cf9ebf8e3c1d0794b3d3377464f3908d4fcee6f7) )
+	ROM_LOAD( "epr-6743.66",    0x8000, 0x2000, CRC(c33062b5) SHA1(5845da895059ff0271a6ed6fd0fa1392be1ac223) )
+	ROM_LOAD( "epr-6742.65",    0xa000, 0x2000, CRC(c457e8c5) SHA1(3c1008ae8b054c198cfeb0a66534fb51beaee0f6) )
+
+	ROM_REGION( 0x10000, "sprites", 0 )
+	ROM_LOAD( "epr-6735.117",   0x0000, 0x4000, CRC(1be35a97) SHA1(7524cfa1a9c9a2e37753f119e7ac7aa3158621be) )
+	ROM_LOAD( "epr-6737.04",    0x4000, 0x4000, CRC(6b53aa7a) SHA1(b1b3ff9460b2321e72b49befa63b61c9c36fedd9) )
+	ROM_LOAD( "epr-6736.110",   0x8000, 0x4000, CRC(565c25d0) SHA1(5ae524ef01138c5042b223286d65eb9043c0f0d5) )
+	ROM_LOAD( "epr-6738.05",    0xc000, 0x4000, CRC(e116285f) SHA1(b6fb50b02a981b3b23385200045ae537092d26d6) )
+
+	ROM_REGION( 0x0100, "lookup_proms", 0 )
+	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
+ROM_END
+
+ROM_START( teddybboa ) // uses same program numbers of the new version but it's similar to the old one with different encryption module?
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "epr-6768.116",   0x0000, 0x4000, CRC(30437ff1) SHA1(117995ad21ba716152d3f45e3ac10310ea9930a0) ) // encrypted, SLDH
+	ROM_LOAD( "epr-6769.109",   0x4000, 0x4000, CRC(984b47f1) SHA1(fe66aa7189c54be6f94434a19e8fadb4434b3583) ) // encrypted, SLDH
+	ROM_LOAD( "epr-6770.96",    0x8000, 0x4000, CRC(e5a74f5f) SHA1(ccf18b424d4aaeec0bae1e6f096b4c176f6ab554) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-6748.120",   0x0000, 0x2000, CRC(9325a1cf) SHA1(555d137b1c974b144ebe6593b4c32c97b3bb5de9) )
@@ -5727,6 +5762,7 @@ GAME( 1985, imsorry,    0,        sys1piox_315_5110, imsorry,   system1_state, e
 GAME( 1985, imsorryj,   imsorry,  sys1piox_315_5110, imsorry,   system1_state, empty_init,        ROT0,   "Coreland / Sega", "Gonbee no I'm Sorry (315-5110, Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, teddybb,    0,        sys1piox_315_5155, teddybb,   system1_state, empty_init,        ROT0,   "Sega", "TeddyBoy Blues (315-5115, New Ver.)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, teddybbo,   teddybb,  sys1piox_315_5155, teddybb,   system1_state, empty_init,        ROT0,   "Sega", "TeddyBoy Blues (315-5115, Old Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, teddybboa,  teddybb,  sys1piox_315_5111, teddybb,   system1_state, empty_init,        ROT0,   "Sega", "TeddyBoy Blues (315-5111, Old Ver.)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, teddybbobl, teddybb,  sys1piox_315_5155, teddybb,   system1_state, empty_init,        ROT0,   "bootleg", "TeddyBoy Blues (Old Ver. bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, myhero,     0,        sys1pio,           myhero,    system1_state, empty_init,        ROT0,   "Coreland / Sega", "My Hero (US, not encrypted)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, sscandal,   myhero,   sys1piox_315_5132, myhero,    system1_state, empty_init,        ROT0,   "Coreland / Sega", "Seishun Scandal (315-5132, Japan)", MACHINE_SUPPORTS_SAVE )

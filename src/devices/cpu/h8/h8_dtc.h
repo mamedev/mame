@@ -29,13 +29,14 @@ class h8_dtc_device : public device_t {
 public:
 	enum { DTC_CHAINED = 1000 };
 
-	h8_dtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	h8_dtc_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intc, int irq)
-		: h8_dtc_device(mconfig, tag, owner, 0)
+	h8_dtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	template<typename T, typename U> h8_dtc_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu, U &&intc, int irq)
+		: h8_dtc_device(mconfig, tag, owner)
 	{
-		set_info(intc, irq);
+		m_cpu.set_tag(std::forward<T>(cpu));
+		m_intc.set_tag(std::forward<U>(intc));
+		m_irq = irq;
 	}
-	void set_info(const char *intc, int irq);
 
 	uint8_t dtcer_r(offs_t offset);
 	void dtcer_w(offs_t offset, uint8_t data);
@@ -55,7 +56,7 @@ public:
 protected:
 	static const int vector_to_enable[];
 	required_device<h8_device> m_cpu;
-	h8_intc_device *m_intc;
+	required_device<h8_intc_device> m_intc;
 	const char *m_intc_tag;
 	int m_irq;
 	h8_dtc_state m_states[92];

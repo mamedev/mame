@@ -124,16 +124,16 @@ void i80130_device::device_add_mconfig(machine_config &config)
 //  i80130_device - constructor
 //-------------------------------------------------
 
-i80130_device::i80130_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, I80130, tag, owner, clock),
-		m_pic(*this, "pic"),
-		m_pit(*this, "pit"),
-		m_write_irq(*this),
-		m_write_ack(*this),
-		m_write_lir(*this),
-		m_write_systick(*this),
-		m_write_delay(*this),
-		m_write_baud(*this)
+i80130_device::i80130_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, I80130, tag, owner, clock),
+	m_pic(*this, "pic"),
+	m_pit(*this, "pit"),
+	m_write_irq(*this),
+	m_write_ack(*this),
+	m_write_lir(*this),
+	m_write_systick(*this),
+	m_write_delay(*this),
+	m_write_baud(*this)
 {
 }
 

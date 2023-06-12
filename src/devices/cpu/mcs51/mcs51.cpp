@@ -1015,7 +1015,7 @@ void mcs51_cpu_device::do_sub_flags(uint8_t a, uint8_t data, uint8_t c)
 	SET_OV((result1 < -128 || result1 > 127));
 }
 
-void mcs51_cpu_device::transmit(bool state)
+void mcs51_cpu_device::transmit(int state)
 {
 	if (BIT(SFR_A(ADDR_P3), 1) != state)
 	{
@@ -1143,7 +1143,7 @@ void mcs51_cpu_device::transmit_receive(int source)
 		if (GET_REN)
 		{
 			// directly read RXD input
-			bool const data = BIT(m_port_in_cb[3](), 0);
+			int const data = BIT(m_port_in_cb[3](), 0);
 
 			switch (m_uart.rxbit)
 			{
@@ -2464,6 +2464,7 @@ void mcs51_cpu_device::device_reset()
 	m_uart.tx_clk = 0;
 	m_uart.txbit = SIO_IDLE;
 	m_uart.rxbit = SIO_IDLE;
+	m_uart.rxb8 = 0;
 	m_uart.smod_div = 0;
 
 	m_recalc_parity = 0;

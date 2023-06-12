@@ -213,6 +213,7 @@ private:
 
 	uint32_t tile_callback(uint32_t code);
 	void sh_bankswitch_w(uint8_t data);
+	void soundlatch_pending_w(int state);
 	template <uint8_t Which> void videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { COMBINE_DATA(&m_videoram[Which][offset]); m_tilemap[Which]->mark_tile_dirty(offset); }
 	void roz_bank_w(offs_t offset, uint8_t data);
 	void gfxctrl_w(offs_t offset, uint8_t data);
@@ -259,7 +260,6 @@ TILE_GET_INFO_MEMBER(crshrace_state::get_bgtile_info)
 
 ***************************************************************************/
 
-
 uint32_t crshrace_state::tile_callback(uint32_t code)
 {
 	return m_spriteram[1]->buffer()[code&0x7fff];
@@ -282,7 +282,6 @@ void crshrace_state::video_start()
   Memory handlers
 
 ***************************************************************************/
-
 
 void crshrace_state::roz_bank_w(offs_t offset, uint8_t data)
 {
@@ -329,8 +328,6 @@ uint32_t crshrace_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	bitmap.fill(0x1ff, cliprect);
 
-
-
 	switch (m_gfxctrl & 0xfb)
 	{
 		case 0x00:  // high score screen
@@ -357,6 +354,16 @@ uint32_t crshrace_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 void crshrace_state::sh_bankswitch_w(uint8_t data)
 {
 	m_z80bank->set_entry(data & 0x03);
+}
+
+void crshrace_state::soundlatch_pending_w(int state)
+{
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+
+	// sound comms is 2-way (see pending_r in "DSW2"),
+	// NMI routine is very short, so briefly set perfect_quantum to make sure that the timing is right
+	if (state)
+		machine().scheduler().perfect_quantum(attotime::from_usec(100));
 }
 
 
@@ -544,7 +551,7 @@ static INPUT_PORTS_START( crshrace )
     PORT_DIPSETTING(      0x0e00, "5" )
     PORT_DIPSETTING(      0x0f00, "5" )
 */
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r)  // pending sound command
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r) // pending sound command
 INPUT_PORTS_END
 
 // Same as 'crshrace', but additional "unknown" Dip Switch (see notes)
@@ -635,7 +642,7 @@ void crshrace_state::crshrace(machine_config &config) // TODO: PCB sports 32 MHz
 	SPEAKER(config, "rspeaker").front_right();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->data_pending_callback().set(FUNC(crshrace_state::soundlatch_pending_w));
 	m_soundlatch->set_separate_acknowledge(true);
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8'000'000));

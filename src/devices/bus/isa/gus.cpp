@@ -380,9 +380,6 @@ void gf1_device::device_start()
 {
 	acia6850_device::device_start();
 
-	int i;
-	double out = (double)(1 << 13);
-
 	m_txirq_handler.resolve_safe();
 	m_rxirq_handler.resolve_safe();
 	m_wave_irq_handler.resolve_safe();
@@ -416,9 +413,10 @@ void gf1_device::device_start()
 	m_gf1_irq = 0;
 	m_midi_irq = 0;
 
-	for (i=4095;i>=0;i--)
+	double out = double(1 << 13);
+	for (int i = 4095; i >= 0; i--)
 	{
-		m_volume_table[i] = (int16_t)out;
+		m_volume_table[i] = int16_t(out);
 		out /= 1.002709201; /* 0.0235 dB Steps */
 	}
 

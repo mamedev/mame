@@ -18,8 +18,8 @@
 
 DEFINE_DEVICE_TYPE(E05A30, e05a30_device, "e05a30", "Epson E05A30 Gate Array")
 
-e05a30_device::e05a30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, E05A30, tag, owner, clock),
+e05a30_device::e05a30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, E05A30, tag, owner, clock),
 	m_write_printhead(*this),
 	m_write_pf_stepper(*this),
 	m_write_cr_stepper(*this),

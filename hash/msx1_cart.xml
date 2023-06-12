@@ -11510,7 +11510,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="startreka">
+	<software name="startreka" cloneof="startrek">
 		<description>Star Trek (Japan, alt)</description>
 		<year>1986</year>
 		<publisher>SEGA</publisher>
@@ -17968,6 +17968,67 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
+	<!-- Quick Disk interfaces -->
+
+	<!-- Hardware not emulated -->
+	<software name="dpq280" supported="no">
+		<description>DPQ-280 Quick Disk Drive</description>
+		<year>1985</year>
+		<publisher>Daewoo</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="quickdisk" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="qd100.rom" size="0x2000" crc="8281aa1c" sha1="1cb958787cc3e25e96952fc8f271ae24787ff898" />
+			</dataarea>
+			<dataarea name="ram" size="0x800"/>
+		</part>
+	</software>
+
+	<!-- Hardware not emulated -->
+	<software name="dpq280a" cloneof="dpq280" supported="no">
+		<description>DPQ-280 Quick Disk Drive (alt)</description>
+		<year>1985</year>
+		<publisher>Daewoo</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="quickdisk" />
+			<dataarea name="rom" size="0x2000">
+				<!-- The last byte is different from dpq280 -->
+				<rom name="qdd100.rom" size="0x2000" crc="c25ea17a" sha1="fc3ddde930e2b697f7ee45dd155deacd00afb402" />
+			</dataarea>
+			<dataarea name="ram" size="0x800"/>
+		</part>
+	</software>
+
+	<!-- There are mentions of a v1.10 rom linked to Sanyo but there is no photographic evidence of a Sanyo QDM-01 Quick Disk unit. -->
+	<!-- Hardware not emulated -->
+	<software name="qdm01" supported="no">
+		<description>QDM-01 Quick Disk Drive</description>
+		<year>1985</year>
+		<publisher>AVT</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="quickdisk" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="qd110.rom" size="0x2000" crc="4b507ce4" sha1="150e95fe5c33d17b606fb4e17d1c25b42a3a9ab5" />
+			</dataarea>
+			<dataarea name="ram" size="0x800"/>
+		</part>
+	</software>
+
+	<!-- Hardware not emulated -->
+	<software name="vy0002" supported="no">
+		<description>VY-0002 Quick Disk Drive</description>
+		<year>1985</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="quickdisk" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="qd111.rom" size="0x2000" crc="3b3c140f" sha1="70f200121734b46f83e7c9aacbd46bc928383df5" />
+			</dataarea>
+			<dataarea name="ram" size="0x800"/>
+		</part>
+	</software>
+
+
 	<!-- SORT -->
 
 	<software name="dooly">
@@ -18402,7 +18463,7 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
-	<software name="sensha21">
+	<software name="sensha21" cloneof="sensha">
 		<description>Sensha Game (20210318)</description>
 		<year>2021</year>
 		<publisher>&lt;homebrew&gt;</publisher>
@@ -19707,7 +19768,7 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
-	<software name="transbal132a">
+	<software name="transbal132a" cloneof="transbal">
 		<description>Transball (v1.3.2?, English, alt)</description>
 		<year>2016</year>
 		<publisher>&lt;homebrew&gt;</publisher>

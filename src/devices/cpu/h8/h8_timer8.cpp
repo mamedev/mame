@@ -19,27 +19,15 @@ h8_timer8_channel_device::h8_timer8_channel_device(const machine_config &mconfig
 
 h8_timer8_channel_device::h8_timer8_channel_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	m_cpu(*this, "^"), m_chained_timer(nullptr), m_intc(nullptr), m_chain_tag(nullptr), m_intc_tag(nullptr), m_irq_ca(0), m_irq_cb(0), m_irq_v(0), m_chain_type(0), m_tcr(0), m_tcsr(0), m_tcnt(0), m_extra_clock_bit(false),
+	m_cpu(*this, finder_base::DUMMY_TAG),
+	m_intc(*this, finder_base::DUMMY_TAG),
+	m_chained_timer(*this, finder_base::DUMMY_TAG),
+	m_irq_ca(0), m_irq_cb(0), m_irq_v(0), m_chain_type(0), m_tcr(0), m_tcsr(0), m_tcnt(0), m_extra_clock_bit(false),
 	m_has_adte(false), m_has_ice(false), m_clock_type(0), m_clock_divider(0), m_clear_type(0), m_counter_cycle(0), m_last_clock_update(0), m_event_time(0)
 {
-}
-
-void h8_timer8_channel_device::set_info(const char *intc, int irq_ca, int irq_cb, int irq_v, int div1, int div2, int div3, int div4, int div5, int div6)
-{
-	m_intc_tag = intc;
-	m_irq_ca = irq_ca;
-	m_irq_cb = irq_cb;
-	m_irq_v = irq_v;
-	m_chain_tag = nullptr;
 	m_chain_type = STOPPED;
 	m_has_adte = false;
 	m_has_ice = false;
-	m_div_tab[0] = div1;
-	m_div_tab[1] = div2;
-	m_div_tab[2] = div3;
-	m_div_tab[3] = div4;
-	m_div_tab[4] = div5;
-	m_div_tab[5] = div6;
 }
 
 uint8_t h8_timer8_channel_device::tcr_r()
@@ -182,11 +170,6 @@ void h8_timer8_channel_device::tcnt_w(uint8_t data)
 
 void h8_timer8_channel_device::device_start()
 {
-	m_intc = siblingdevice<h8_intc_device>(m_intc_tag);
-	if(m_chain_tag)
-		m_chained_timer = siblingdevice<h8_timer8_channel_device>(m_chain_tag);
-	else
-		m_chained_timer = nullptr;
 }
 
 void h8_timer8_channel_device::device_reset()
@@ -354,22 +337,6 @@ void h8_timer8_channel_device::timer_tick()
 h8h_timer8_channel_device::h8h_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8_timer8_channel_device(mconfig, H8H_TIMER8_CHANNEL, tag, owner, clock)
 {
-}
-
-h8h_timer8_channel_device::~h8h_timer8_channel_device()
-{
-}
-
-void h8h_timer8_channel_device::set_info(const char *intc, int irq_ca, int irq_cb, int irq_v, const char *chain_tag, int chain_type, bool has_adte, bool has_ice)
-{
-	m_intc_tag = intc;
-	m_irq_ca = irq_ca;
-	m_irq_cb = irq_cb;
-	m_irq_v = irq_v;
-	m_chain_tag = chain_tag;
-	m_chain_type = chain_type;
-	m_has_adte = has_adte;
-	m_has_ice = has_ice;
 	// The extra clock bit is not used for h8h+
 	m_div_tab[0] = 8;
 	m_div_tab[1] = 8;

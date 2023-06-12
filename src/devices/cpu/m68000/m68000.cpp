@@ -211,6 +211,7 @@ void m68000_device::device_start()
 	save_item(NAME(m_movems));
 	save_item(NAME(m_isr));
 	save_item(NAME(m_sr));
+	save_item(NAME(m_new_sr));
 	save_item(NAME(m_dbin));
 	save_item(NAME(m_dbout));
 	save_item(NAME(m_edb));
@@ -255,6 +256,7 @@ void m68000_device::device_start()
 	m_movems = 0;
 	m_isr = 0;
 	m_sr = 0;
+	m_new_sr = 0;
 	m_dbin = 0;
 	m_dbout = 0;
 	m_edb = 0;

@@ -8,15 +8,9 @@ const int h8_watchdog_device::div_s [8] = { 1, 5, 6, 7,  8,  9, 11, 12 };
 
 h8_watchdog_device::h8_watchdog_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, H8_WATCHDOG, tag, owner, clock),
-	m_cpu(*this, DEVICE_SELF_OWNER)
+	m_cpu(*this, finder_base::DUMMY_TAG),
+	m_intc(*this, finder_base::DUMMY_TAG)
 {
-}
-
-void h8_watchdog_device::set_info(const char *intc_tag, int irq, int type)
-{
-	m_intc_tag = intc_tag;
-	m_irq = irq;
-	m_type = type;
 }
 
 
@@ -113,7 +107,10 @@ void h8_watchdog_device::rst_w(uint16_t data)
 
 void h8_watchdog_device::device_start()
 {
-	m_intc = siblingdevice<h8_intc_device>(m_intc_tag);
+	save_item(NAME(m_tcnt));
+	save_item(NAME(m_tcnt_cycle_base));
+	save_item(NAME(m_tcsr));
+	save_item(NAME(m_rst));
 }
 
 void h8_watchdog_device::device_reset()

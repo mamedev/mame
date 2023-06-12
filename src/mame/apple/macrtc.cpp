@@ -58,23 +58,23 @@ DEFINE_DEVICE_TYPE(RTC3430042, rtc3430042_device, "rtc3430042", "Apple 343-0042-
 //  rtc4543_device - constructor
 //-------------------------------------------------
 
-rtc3430042_device::rtc3430042_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool hasBigPRAM)
-	: device_t(mconfig, type, tag, owner, clock),
-		device_rtc_interface(mconfig, *this),
-		device_nvram_interface(mconfig, *this),
-		m_is_big_PRAM(hasBigPRAM),
-		m_time_was_set(false),
-		m_cko_cb(*this)
+rtc3430042_device::rtc3430042_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool hasBigPRAM) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_rtc_interface(mconfig, *this),
+	device_nvram_interface(mconfig, *this),
+	m_is_big_PRAM(hasBigPRAM),
+	m_time_was_set(false),
+	m_cko_cb(*this)
 {
 }
 
-rtc3430042_device::rtc3430042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: rtc3430042_device(mconfig, RTC3430042, tag, owner, clock, true)
+rtc3430042_device::rtc3430042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	rtc3430042_device(mconfig, RTC3430042, tag, owner, clock, true)
 {
 }
 
-rtc3430040_device::rtc3430040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: rtc3430042_device(mconfig, RTC3430040, tag, owner, clock, false)
+rtc3430040_device::rtc3430040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	rtc3430042_device(mconfig, RTC3430040, tag, owner, clock, false)
 {
 }
 

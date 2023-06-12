@@ -33,8 +33,8 @@ public:
 	template <typename T> void set_cputag(T &&tag)
 	{
 		m_maincpu.set_tag(std::forward<T>(tag));
-		subdevice<isa8_device>("isa")->set_memspace(std::forward<T>(tag), AS_PROGRAM);
-		subdevice<isa8_device>("isa")->set_iospace(std::forward<T>(tag), AS_IO);
+		m_isabus.lookup()->set_memspace(std::forward<T>(tag), AS_PROGRAM);
+		m_isabus.lookup()->set_iospace(std::forward<T>(tag), AS_IO);
 	}
 
 	auto int_callback() { return m_int_callback.bind(); }

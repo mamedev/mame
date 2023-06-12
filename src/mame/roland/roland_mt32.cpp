@@ -275,15 +275,21 @@ void mt32_state::machine_reset()
 
 void mt32_state::lcd_ctrl_w(uint8_t data)
 {
+	lcd->cs_w(0);
+	lcd->control_w(data >> 4);
 	lcd->control_w(data);
-	for(int i=0; i != lcd_data_buffer_pos; i++)
+	for(int i=0; i != lcd_data_buffer_pos; i++) {
+		lcd->data_w(lcd_data_buffer[i] >> 4);
 		lcd->data_w(lcd_data_buffer[i]);
+	}
+	lcd->cs_w(1);
 	lcd_data_buffer_pos = 0;
 }
 
 uint8_t mt32_state::lcd_ctrl_r()
 {
-	return lcd->control_r();
+	// Note that this does not read from the actual LCD unit (whose /RD line is pulled high)
+	return 0;
 }
 
 void mt32_state::lcd_data_w(uint8_t data)

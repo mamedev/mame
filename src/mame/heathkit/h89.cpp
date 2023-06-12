@@ -44,6 +44,8 @@
 #include "emu.h"
 
 #include "tlb.h"
+#include "z37_fdc.h"
+#include "intr_cntrl.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/ins8250.h"
@@ -64,26 +66,28 @@ public:
 		, m_ram(*this, RAM_TAG)
 		, m_floppy_ram(*this, "floppyram")
 		, m_tlb(*this, "tlb")
+		, m_h37(*this, "h37")
+		, m_intr_cntrl(*this, "intr_cntrl")
 		, m_console(*this, "console")
 		, m_serial1(*this, "serial1")
 		, m_serial2(*this, "serial2")
 		, m_serial3(*this, "serial3")
-		, m_gpp(0)
-		, m_rom_enabled(true)
-		, m_timer_intr_enabled(true)
-		, m_floppy_ram_wp(true)
 	{
 	}
 
 	void h89(machine_config &config);
 
+
 private:
+
 	required_device<cpu_device> m_maincpu;
 	required_memory_region m_maincpu_region;
 	memory_view m_mem_view;
 	required_device<ram_device> m_ram;
 	required_shared_ptr<uint8_t> m_floppy_ram;
 	required_device<heath_tlb_device> m_tlb;
+	required_device<heath_z37_fdc_device> m_h37;
+	required_device<heath_intr_cntrl> m_intr_cntrl;
 	required_device<ins8250_device> m_console;
 	required_device<ins8250_device> m_serial1;
 	required_device<ins8250_device> m_serial2;
@@ -118,6 +122,7 @@ private:
 
 	uint8_t raise_NMI_r();
 	void raise_NMI_w(uint8_t data);
+	void console_intr(uint8_t data);
 };
 
 /*
@@ -206,6 +211,7 @@ void h89_state::h89_io(address_map &map)
 	//     - H47 Dual 8" Drives - Requires MTR-89 or MTR-90 ROM
 	//     - H67 8" Hard disk + 8" Floppy Drives - Requires MTR-90 ROM
 	// map(0x78, 0x7b)
+	map(0x78, 0x7b).rw(m_h37, FUNC(heath_z37_fdc_device::read), FUNC(heath_z37_fdc_device::write));
 
 	// Disk I/O #2 - 0174-0177 (0x7c-0x7f)
 	//   Options
@@ -228,7 +234,7 @@ void h89_state::h89_io(address_map &map)
 	map(0xf0, 0xf1).rw(FUNC(h89_state::raise_NMI_r),FUNC(h89_state::raise_NMI_w));
 
 	// General Purpose Port (GPP)
-	map(0xf2, 0xf2).w(FUNC(h89_state::port_f2_w)).portr("SW501");
+	map(0xf2, 0xf2).w(FUNC(h89_state::port_f2_w)).portr("MTR90_SW501");
 
 	// port defined on the H8. On the H89, access to these addresses causes a NMI
 	map(0xfa, 0xfb).rw(FUNC(h89_state::raise_NMI_r), FUNC(h89_state::raise_NMI_w));
@@ -238,7 +244,7 @@ void h89_state::h89_io(address_map &map)
 static INPUT_PORTS_START( h89 )
 
 	// Settings with the MTR-88 ROM (#444-40)
-//  PORT_START("SW501")
+//  PORT_START("MTR88_SW501")
 //  PORT_DIPNAME( 0x1f, 0x00, "Unused" )  PORT_DIPLOCATION("S1:1,2,3,4,5")
 //  PORT_DIPNAME( 0x20, 0x20, "Perform memory test at start" )  PORT_DIPLOCATION("S1:6")
 //  PORT_DIPSETTING( 0x20, DEF_STR( Off ) )
@@ -250,7 +256,7 @@ static INPUT_PORTS_START( h89 )
 //  PORT_DIPSETTING( 0xc0, "57600" )
 
 	// Settings with the MTR-89 ROM (#444-62)
-//  PORT_START("SW501")
+//  PORT_START("MTR89_SW501")
 //  PORT_DIPNAME( 0x03, 0x00, "Disk I/O #2" )  PORT_DIPLOCATION("S1:1,2")
 //  PORT_DIPSETTING( 0x00, "H-88-1" )
 //  PORT_DIPSETTING( 0x01, "H/Z-47" )
@@ -275,27 +281,27 @@ static INPUT_PORTS_START( h89 )
 //  PORT_DIPSETTING( 0x80, "Auto" )
 
 	// Settings with the MTR-90 ROM (#444-84 or 444-142)
-	PORT_START("SW501")
-	PORT_DIPNAME( 0x03, 0x00, "Disk I/O #2" )  PORT_DIPLOCATION("S1:1,2")
+	PORT_START("MTR90_SW501")
+	PORT_DIPNAME( 0x03, 0x00, "Disk I/O #2" )  PORT_DIPLOCATION("SW501:1,2")
 	PORT_DIPSETTING( 0x00, "H-88-1 (Not yet implemented)" )
 	PORT_DIPSETTING( 0x01, "H/Z-47 (Not yet implemented)" )
 	PORT_DIPSETTING( 0x02, "Z-67 (Not yet implemented)" )
 	PORT_DIPSETTING( 0x03, "Undefined" )
-	PORT_DIPNAME( 0x0c, 0x00, "Disk I/O #1" )  PORT_DIPLOCATION("S1:3,4")
-	PORT_DIPSETTING( 0x00, "H-89-37 (Not yet implemented)" )
+	PORT_DIPNAME( 0x0c, 0x00, "Disk I/O #1" )  PORT_DIPLOCATION("SW501:3,4")
+	PORT_DIPSETTING( 0x00, "H-89-37" )
 	PORT_DIPSETTING( 0x04, "H/Z-47 (Not yet implemented)" )
 	PORT_DIPSETTING( 0x08, "Z-67 (Not yet implemented)" )
 	PORT_DIPSETTING( 0x0c, "Undefined" )
-	PORT_DIPNAME( 0x10, 0x00, "Primary Boot from" )  PORT_DIPLOCATION("S1:5")
+	PORT_DIPNAME( 0x10, 0x00, "Primary Boot from" )  PORT_DIPLOCATION("SW501:5")
 	PORT_DIPSETTING( 0x00, "Disk I/O #2" )
 	PORT_DIPSETTING( 0x10, "Disk I/O #1" )
-	PORT_DIPNAME( 0x20, 0x20, "Perform memory test at start" )  PORT_DIPLOCATION("S1:6")
+	PORT_DIPNAME( 0x20, 0x20, "Perform memory test at start" )  PORT_DIPLOCATION("SW501:6")
 	PORT_DIPSETTING( 0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Console Baud rate" )  PORT_DIPLOCATION("S1:7")
+	PORT_DIPNAME( 0x40, 0x00, "Console Baud rate" )  PORT_DIPLOCATION("SW501:7")
 	PORT_DIPSETTING( 0x00, "9600" )
 	PORT_DIPSETTING( 0x40, "19200" )
-	PORT_DIPNAME( 0x80, 0x00, "Boot mode" )  PORT_DIPLOCATION("S1:8")
+	PORT_DIPNAME( 0x80, 0x00, "Boot mode" )  PORT_DIPLOCATION("SW501:8")
 	PORT_DIPSETTING( 0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING( 0x80, "Auto" )
 INPUT_PORTS_END
@@ -340,13 +346,22 @@ void h89_state::machine_start()
 		m_mem_view[2].install_ram(0x0000, 0x1fff, m_ram_ptr + ram_size - 0x2000);
 	}
 
+	m_rom_enabled = true;
+	m_timer_intr_enabled = true;
+	m_floppy_ram_wp = false;
 	update_gpp(0);
+	update_mem_view();
 }
 
 
 void h89_state::machine_reset()
 {
+	m_rom_enabled = true;
+	m_timer_intr_enabled = true;
+	m_floppy_ram_wp = false;
+
 	update_gpp(0);
+	update_mem_view();
 }
 
 
@@ -362,41 +377,53 @@ void h89_state::raise_NMI_w(uint8_t)
 	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::from_usec(2));
 }
 
+void h89_state::console_intr(uint8_t data)
+{
+	if (data == CLEAR_LINE)
+	{
+		m_intr_cntrl->lower_irq(3);
+	}
+	else
+	{
+		m_intr_cntrl->raise_irq(3);
+	}
+}
+
 TIMER_DEVICE_CALLBACK_MEMBER(h89_state::h89_irq_timer)
 {
 	if (m_timer_intr_enabled)
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);
+		m_intr_cntrl->raise_irq(1);
 	}
 }
 
 void h89_state::update_mem_view()
 {
-	if (m_rom_enabled)
-	{
-		m_mem_view.select(m_floppy_ram_wp ? 0 : 1);
-	}
-	else
-	{
-		m_mem_view.select(2);
-	}
+	m_mem_view.select(m_rom_enabled ? (m_floppy_ram_wp ? 0 : 1) : 2);
 }
 
 void h89_state::update_gpp(uint8_t gpp)
 {
 	m_gpp = gpp;
 
-	m_rom_enabled = BIT(m_gpp, GPP_DISABLE_ROM_BIT) == 0;
+	bool new_rom_enabled = BIT(m_gpp, GPP_DISABLE_ROM_BIT) == 0;
 
-	update_mem_view();
+	if (m_rom_enabled != new_rom_enabled)
+	{
+		m_rom_enabled = new_rom_enabled;
 
-	m_timer_intr_enabled = BIT(m_gpp, GPP_ENABLE_TIMER_INTERRUPT_BIT) == 1;
+		update_mem_view();
+	}
+
+	m_timer_intr_enabled = bool(BIT(m_gpp, GPP_ENABLE_TIMER_INTERRUPT_BIT));
 }
 
 // General Purpose Port
 void h89_state::port_f2_w(uint8_t data)
 {
 	update_gpp(data);
+
+	m_intr_cntrl->lower_irq(1);
 }
 
 void h89_state::h89(machine_config & config)
@@ -405,15 +432,26 @@ void h89_state::h89(machine_config & config)
 	Z80(config, m_maincpu, H89_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &h89_state::h89_mem);
 	m_maincpu->set_addrmap(AS_IO, &h89_state::h89_io);
+	m_maincpu->set_irq_acknowledge_callback("intr_cntrl", FUNC(heath_intr_cntrl::irq_callback));
+
+	HEATH_Z37_INTR_CNTRL(config, m_intr_cntrl);
+	m_intr_cntrl->irq_line_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	RAM(config, m_ram).set_default_size("64K").set_extra_options("16K,32K,48K").set_default_value(0x00);
 
 	INS8250(config, m_console, INS8250_CLOCK);
+	m_console->out_int_callback().set(FUNC(h89_state::console_intr));
+
 	HEATH_TLB(config, m_tlb);
 
 	// Connect the console port on CPU board to serial port on TLB
 	m_console->out_tx_callback().set(m_tlb, FUNC(heath_tlb_device::cb1_w));
 	m_tlb->serial_data_callback().set(m_console, FUNC(ins8250_uart_device::rx_w));
+
+	HEATH_Z37_FDC(config, m_h37);
+	m_h37->drq_cb().set(m_intr_cntrl, FUNC(z37_intr_cntrl::set_drq));
+	m_h37->irq_cb().set(m_intr_cntrl, FUNC(z37_intr_cntrl::set_intrq));
+	m_h37->block_interrupt_cb().set(m_intr_cntrl, FUNC(z37_intr_cntrl::block_interrupts));
 
 	// H-88-3 3-port serial board
 	INS8250(config, m_serial1, INS8250_CLOCK);
@@ -453,4 +491,4 @@ ROM_END
 // Driver
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY          FULLNAME        FLAGS
-COMP( 1979, h89,  0,      0,      h89,     h89,   h89_state, empty_init, "Heath Company", "Heathkit H89", MACHINE_NOT_WORKING)
+COMP( 1979, h89,  0,      0,      h89,     h89,   h89_state, empty_init, "Heath Company", "Heathkit H89", MACHINE_SUPPORTS_SAVE)

@@ -28,8 +28,8 @@ public:
 	tmpz84c015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <int Channel> void set_clk_trg(u32 clock) { subdevice<z80ctc_device>(m_ctc.finder_tag())->set_clk<Channel>(clock); }
-	template <int Channel> void set_clk_trg(const XTAL &xtal) { subdevice<z80ctc_device>(m_ctc.finder_tag())->set_clk<Channel>(xtal); }
+	template <int Channel> void set_clk_trg(u32 clock) { m_ctc.lookup()->set_clk<Channel>(clock); }
+	template <int Channel> void set_clk_trg(const XTAL &xtal) { m_ctc.lookup()->set_clk<Channel>(xtal); }
 
 	// SIO callbacks
 	auto out_txda_callback() { return m_out_txda_cb.bind(); }

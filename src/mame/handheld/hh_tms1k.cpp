@@ -480,7 +480,8 @@ INPUT_CHANGED_MEMBER(hh_tms1k_state::reset_button)
 
 INPUT_CHANGED_MEMBER(hh_tms1k_state::power_button)
 {
-	set_power((bool)param);
+	if (newval != field.defvalue())
+		set_power((bool)param);
 }
 
 void hh_tms1k_state::auto_power_off(int state)
@@ -11178,7 +11179,7 @@ static const u16 comparc_output_pla[0x20] =
 void comparc_state::comparc(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 400000); // approximation - RC osc. R=39K, C=47pF
+	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=39K, C=47pF
 	m_maincpu->set_output_pla(comparc_output_pla);
 	m_maincpu->read_k().set(FUNC(comparc_state::read_k));
 	m_maincpu->write_r().set(FUNC(comparc_state::write_r));

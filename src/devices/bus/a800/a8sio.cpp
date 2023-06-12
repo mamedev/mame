@@ -41,7 +41,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(A8SIO, a8sio_device, "a8sio", "Atari 8 bit SIO Slot")
+DEFINE_DEVICE_TYPE(A8SIO, a8sio_device, "a8sio", "Atari 8-bit SIO Slot")
 
 //**************************************************************************
 //  LIVE DEVICE

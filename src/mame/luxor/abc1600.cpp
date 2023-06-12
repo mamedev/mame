@@ -36,6 +36,7 @@
 
     TODO:
 
+	- abcenix panics while booting after commit 78661e9aa92c7e43c9a96039e7dfb3dabc79a287
     - systest1600 failures
         - CIO timer
         - RTC (seconds advance too slowly)
@@ -1059,6 +1060,7 @@ void abc1600_state::abc1600(machine_config &config)
 
 	// software list
 	SOFTWARE_LIST(config, "flop_list").set_original("abc1600_flop");
+	SOFTWARE_LIST(config, "hdd_list").set_original("abc1600_hdd");
 }
 
 

@@ -27,17 +27,17 @@ DEFINE_DEVICE_TYPE(TTL74123, ttl74123_device, "ttl74123", "74123 TTL")
 //  ttl74123_device - constructor
 //-------------------------------------------------
 
-ttl74123_device::ttl74123_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TTL74123, tag, owner, clock),
-		m_clear_timer(nullptr),
-		m_output_timer(nullptr),
-		m_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE),
-		m_res(1.0),
-		m_cap(1.0),
-		m_a(0),
-		m_b(0),
-		m_clear(0),
-		m_output_changed_cb(*this)
+ttl74123_device::ttl74123_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, TTL74123, tag, owner, clock),
+	m_clear_timer(nullptr),
+	m_output_timer(nullptr),
+	m_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE),
+	m_res(1.0),
+	m_cap(1.0),
+	m_a(0),
+	m_b(0),
+	m_clear(0),
+	m_output_changed_cb(*this)
 {
 }
 

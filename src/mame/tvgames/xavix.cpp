@@ -125,7 +125,7 @@
             6   e-kara /Hasbro/Spain                                                                            -           -               -           -               -                   -                       dumped (has 3 Spanish songs)
             7   Starter set for e-kara H.S," Morning sisters" /TAKARA/Japan                                     -           -               -           -               -                   -                       -
             8   e-kara H.S.(headphones set) /TAKARA/Japan                                                       -           -               -           -               -                   -                       -
-            9   Accessory cartridge for Slot machine TV," Aladdin TV" /TAKARA/Japan                             -           -               -           -               -                   -                       dumped (cart)
+            9   Accessory cartridge for Slot machine TV "Aladdin TV" /TAKARA/Japan                              -           -               -           -               -                   -                       dumped (cart)
             10  Accessory cartridge for Slot machine TV "Businessman Kintaro/TAKARA/Japan                       -           -               -           -               -                   -                       dumped (cart)
             11  Poko-poko Hammers /TAKARA/Japan                                                                 -           -               -           -               -                   -                       -
             12  e-kara N Angel blue special set /TAKARA/Japan                                                   -           -               -           -               -                   -                       -
@@ -187,7 +187,7 @@
             8   PLAY TV Baseball 2 /EPOCH/Japan, HK                                                             -           -               -           -               -                   -                       -
             9   Let's hit a homerun! Exciting baseball /EPOCH/Japan                                             -           -               -           -               -                                           -
                 Play TV Baseball /RADICA/USA,EU                                                                 8017        x8              none                        none                SSD 98 PA7351-107       dumped
-    1999    1   ABC Jungle Fun Hippo /Vteck/HK, USA, France                                                     -           -               -           -               -                   -                       -
+    1999    1   ABC Jungle Fun Hippo /VTech/HK, USA, France                                                     -           -               -           -               -                   -                       -
     Unknown 1   PLAY TV Football /RADICA/USA                                                                    74021       x8              48          4M              none                SSD 98 PL7351-181       dumped
                 XaviXTennis                                                                                     SGM6446     x16             48          8M              24C08               SSD 2002 NEC 85054-611  dumped
                 XaviXBowling                                                                                    SGM644C     x16             48                                                                      dumped
