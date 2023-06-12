@@ -55,7 +55,10 @@
   Bet station (VGA board):
   -----------------------
 
-  1x H8 CPU. (HD6413007F20).   (IC01)
+  PCB-VGA-001 R0
+  COINMASTER MANUFACTURING LIMITED (C)1997.
+
+  1x H8/3002 (HD6413002F16) or H8/3007 (HD6413007F20) CPU (IC1)
   1x AMD MACH 131-15JC CPLD.   (IC29)
   1x AMD MACH 231-7JC CPLD.    (IC12)
   1x ADV471.                   (IC30)
@@ -63,10 +66,10 @@
   1x YMZ280B (sound).          (IC33)
 
   1x PALCE 22V10H25 PC/4.      (IC11)
-  1x MSM62X42B.                (IC06)
-  1x COM20020.                 (IC31)
+  1x MSM62X42B.                (IC6)
+  1x SMC COM20020I-P (ARCNET controller) (IC31)
 
-  2x K6T10082CE-DB70.          (IC04, IC05)
+  2x K6T10082CE-DB70.          (IC4, IC5)
   2x HY62256BLP-70.            (IC13, IC14)
 
   1x 14.7456 MHz.Xtal (H8 CPU direct clock).
@@ -74,11 +77,12 @@
   1x 50.35 Mhz module (MACH 231 direct clock).
   1x 16.9344 MHz.Xtal (YMZ280B direct? clock).
 
-  2x 27c040 --> Program.
-  2x 27c040 --> Foreground GFX.
-  4x 27c801 --> Background GFX.
+  2x 27c040 --> Program.        (IC2, IC3)
+  2x 27c040 --> Foreground GFX. (IC23, IC24)
+  4x 27c801 --> Background GFX. (IC25, IC26, IC27, IC28)
   1x 27c801 --> Sound.
 
+  1x 8 DIP switches bank.
   1x 15-pin VGA connector.
   1x Microtouch connector.
 
@@ -96,68 +100,68 @@
   * Battery backed up RAM
 
 
-  Input N? | Pin N? | Colours | Ground
-  ---------+--------+---------+---------------------------------------------------------------
-  00       | 1A     | Brn-Wht | Universal Hopper Early / AWP hopper switch 1 (?1) / Y2K Hop 1.
-  01       | 2A     | Red-Wht | Universal Hopper Late / AWP hopper switch 2 (20p) / Y2K Hop 2.
-  02       | 3A     | Org-Wht | CC46 Coin / C435 Accept 1.
-  03       | 4A     | Yel-Wht | CC46 Error / C435 Accept 2.
-  04       | 5A     | Grn-Wht | CC46 Sensor / C435 Accept 3.
-  05       | 6A     | Blu-Wht | Lid Switch.
-  06       | 7A     | Vio-Wht | Door Switch.
-  07       | 8A     | Gry-Wht | Key Switch.
-  08       | 17A    | Brn-Pnk | Shooting Button / Start Button.
-  09       | 18A    | Red-Pnk | C435 Accept 4.
-  10       | 19A    | Org-Pnk | Dumbcard Present.
-  11       | 20A    | Yel-Pnk | Small Hopper Return / Y2K Hop 3.
-  12       | 21A    | Grn-Pnk | Dumbcard / Bill.
-  13       | 22A    | Blu-Pnk | C435 Accept 5.
-  14       | 23A    | Vio-Pnk | Cancel Button.
-  15       | 24A    | Gry-Pnk | Payout Button.
-  16       | 27A    | Red-Brn | Gamble Button.
-  17       | 28A    | Org-Brn |
-  18       | 29A    | Yel-Brn |
-  19       | 30A    | Grn-Brn |
-  20       | 31A    | Blu-Brn |
-  21       | 32A    | Vio-Brn |
-  22       | 33A    | Gry-Brn |
-  23       | 34A    | Pnk-Brn |
+  Input | Pin | Colours | Ground
+  ------+-----+---------+---------------------------------------------------------------
+  00    | 1A  | Brn-Wht | Universal Hopper Early / AWP hopper switch 1 (?1) / Y2K Hop 1.
+  01    | 2A  | Red-Wht | Universal Hopper Late / AWP hopper switch 2 (20p) / Y2K Hop 2.
+  02    | 3A  | Org-Wht | CC46 Coin / C435 Accept 1.
+  03    | 4A  | Yel-Wht | CC46 Error / C435 Accept 2.
+  04    | 5A  | Grn-Wht | CC46 Sensor / C435 Accept 3.
+  05    | 6A  | Blu-Wht | Lid Switch.
+  06    | 7A  | Vio-Wht | Door Switch.
+  07    | 8A  | Gry-Wht | Key Switch.
+  08    | 17A | Brn-Pnk | Shooting Button / Start Button.
+  09    | 18A | Red-Pnk | C435 Accept 4.
+  10    | 19A | Org-Pnk | Dumbcard Present.
+  11    | 20A | Yel-Pnk | Small Hopper Return / Y2K Hop 3.
+  12    | 21A | Grn-Pnk | Dumbcard / Bill.
+  13    | 22A | Blu-Pnk | C435 Accept 5.
+  14    | 23A | Vio-Pnk | Cancel Button.
+  15    | 24A | Gry-Pnk | Payout Button.
+  16    | 27A | Red-Brn | Gamble Button.
+  17    | 28A | Org-Brn |
+  18    | 29A | Yel-Brn |
+  19    | 30A | Grn-Brn |
+  20    | 31A | Blu-Brn |
+  21    | 32A | Vio-Brn |
+  22    | 33A | Gry-Brn |
+  23    | 34A | Pnk-Brn |
 
 
-  Output N? | Pin N? | Colours | Description
-  ----------+--------+---------+---------------------------------------------------------------
-  00        | 4B     | Brn-Blu | Universal Hopper Drive / AWP hopper drive 1 (?1) / Y2K Hop 1.
-  01        | 5B     | Red-Blu | Candle 1.
-  02        | 6B     | Org-Blu | Candle 2.
-  03        | 7B     | Yel-Blu | Cancel Button Lamp.
-  04        | 8B     | Grn-Blu | CC46 Deflector / C435 Inhibit 1.
-  05        | 1B     | Vio-Blu | CC46 Inhibit / C435 Inhibit 2.
-  06        | 2B     | Gry-Blu | C435 Inhibit 3.
-  07        | 3B     | Wht-Blu | C435 Inhibit 4.
-  08        | 10B    | Brn-Vio | Small Hopper Drive / AWP hopper drive 2 (20p) / Y2K Hop 2.
-  09        | 11B    | Red-Vio | Shooting Button Lamp / Start Button Lamp.
-  10        | 12B    | Org-Vio | Payout Button Lamp.
-  11        | 13B    | Yel-Vio | Gamble Button Lamp.
-  12        | 14B    | Vio-Red | Y2K Hop 3.
-  13        | 15B    | Blu-Vio | Candle 3.
-  14        | 16B    | Gry-Vio | C435 Overide B.
-  15        | 17B    | Wht-Vio | C435 Overide C.
-  16        | 24B    | Brn-Gry | C435 Inhibit 5.
-  17        | 25B    | Red-Gry | C435 Inhibit 6.
-  18        | 26B    | Org-Gry | C435 Inhibit 7.
-  19        | 27B    | Yel-Gry | C435 Inhibit 8.
-  20        | 28B    | Grn-Gry | C435 Overide D.
-  21        | 29B    | Blu-Gry |
-  22        | 30B    | Vio-Gry | Dumbcard Trigger.
-  23        | 31B    | Wht-Gry | Screen Supply.
-  24        | 38B    | Org-Red | Credit In (Coin In).
-  25        | 39B    | Yel-Red | Credit Out (Coin Out).
-  26        | 40B    | Grn-Red | Cashbox (Cashbox).
-  27        | 37B    | Blu-Red | Remote Out (Canceled Credits).
-  28        | 36B    | Vio-Red | Games.
-  29        | 35B    | Gry-Red | Tot Wins.
-  30        | 34B    | Wht-Red | Total Bet.
-  31        | 33B    | Pnk-Red | Jackpot.
+  Output | Pin | Colours | Description
+  -------+-----+---------+---------------------------------------------------------------
+  00     | 4B  | Brn-Blu | Universal Hopper Drive / AWP hopper drive 1 (?1) / Y2K Hop 1.
+  01     | 5B  | Red-Blu | Candle 1.
+  02     | 6B  | Org-Blu | Candle 2.
+  03     | 7B  | Yel-Blu | Cancel Button Lamp.
+  04     | 8B  | Grn-Blu | CC46 Deflector / C435 Inhibit 1.
+  05     | 1B  | Vio-Blu | CC46 Inhibit / C435 Inhibit 2.
+  06     | 2B  | Gry-Blu | C435 Inhibit 3.
+  07     | 3B  | Wht-Blu | C435 Inhibit 4.
+  08     | 10B | Brn-Vio | Small Hopper Drive / AWP hopper drive 2 (20p) / Y2K Hop 2.
+  09     | 11B | Red-Vio | Shooting Button Lamp / Start Button Lamp.
+  10     | 12B | Org-Vio | Payout Button Lamp.
+  11     | 13B | Yel-Vio | Gamble Button Lamp.
+  12     | 14B | Vio-Red | Y2K Hop 3.
+  13     | 15B | Blu-Vio | Candle 3.
+  14     | 16B | Gry-Vio | C435 Overide B.
+  15     | 17B | Wht-Vio | C435 Overide C.
+  16     | 24B | Brn-Gry | C435 Inhibit 5.
+  17     | 25B | Red-Gry | C435 Inhibit 6.
+  18     | 26B | Org-Gry | C435 Inhibit 7.
+  19     | 27B | Yel-Gry | C435 Inhibit 8.
+  20     | 28B | Grn-Gry | C435 Overide D.
+  21     | 29B | Blu-Gry |
+  22     | 30B | Vio-Gry | Dumbcard Trigger.
+  23     | 31B | Wht-Gry | Screen Supply.
+  24     | 38B | Org-Red | Credit In (Coin In).
+  25     | 39B | Yel-Red | Credit Out (Coin Out).
+  26     | 40B | Grn-Red | Cashbox (Cashbox).
+  27     | 37B | Blu-Red | Remote Out (Canceled Credits).
+  28     | 36B | Vio-Red | Games.
+  29     | 35B | Gry-Red | Tot Wins.
+  30     | 34B | Wht-Red | Total Bet.
+  31     | 33B | Pnk-Red | Jackpot.
 
 
 *******************************************************************************
@@ -210,7 +214,6 @@
 
   - Microtouch touch screen hook-up;
   - i2c or EEPROM at I/O port $6;
-  - Proper gfxdecode background roms;
   - cmkenosp: corrupts the RAMDAC palette during POST;
   - cmkenosp/cmkenospa: doesn't draw foreground tiles properly;
 
@@ -640,16 +643,16 @@ void coinmvga_state::ramdac2_map(address_map &map)
 
 void coinmvga_state::coinmvga(machine_config &config)
 {
-	/* basic machine hardware */
-	// TODO: H83007 doesn't seem right, maybe the note refers to the terminal sections only?
-    //H83007(config, m_maincpu, CPU_CLOCK);
+	// basic machine hardware
+	// could be either H8/3002 or H8/3007
+//	H83007(config, m_maincpu, CPU_CLOCK);
     H83002(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &coinmvga_state::coinmvga_map);
 	m_maincpu->set_vblank_int("screen", FUNC(coinmvga_state::vblank_irq));
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -669,7 +672,7 @@ void coinmvga_state::coinmvga(machine_config &config)
 	ramdac_device &ramdac2(RAMDAC(config, "ramdac2", 0, m_palette[1]));
 	ramdac2.set_addrmap(0, &coinmvga_state::ramdac2_map);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
