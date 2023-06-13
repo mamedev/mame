@@ -26,7 +26,7 @@ P5TX-LA Motherboard:
 
 Chipsets (430TX PCIset):
 -82439TX Northbridge
--82371EB PIIX4 PCI-ISA Southbridge
+-82371AB PIIX4 PCI-ISA Southbridge
 
 Taito W Main Board:
 -AMD M4-128N/64 CPLD stamped 'E58-01'
@@ -71,6 +71,7 @@ Taito W Rom Board:
 #include "machine/pci.h"
 #include "video/virge_pci.h"
 #include "video/atirage.h"
+#include "video/voodoo_pci.h"
 
 class isa16_taito_rom_disk : public device_t, public device_isa16_card_interface
 {
@@ -174,7 +175,7 @@ public:
 	// construction/destruction
 	isa16_p5txla_mb(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	required_device<mc146818_device> m_rtc;
+	required_device<ds12885_device> m_rtc;
 	required_device<kbdc8042_device> m_kbdc;
 
 protected:
@@ -198,7 +199,9 @@ isa16_p5txla_mb::isa16_p5txla_mb(const machine_config &mconfig, const char *tag,
 
 void isa16_p5txla_mb::device_add_mconfig(machine_config &config)
 {
-	MC146818(config, m_rtc, 32.768_kHz_XTAL);
+    // TODO: verify keyboard / rtc types
+    // need at least a DS12885 otherwise EMM386 will complain to not have enough memory
+	DS12885(config, m_rtc, 32.768_kHz_XTAL);
 	//m_rtc->irq().set(m_pic8259_2, FUNC(pic8259_device::ir0_w));
 	m_rtc->set_century_index(0x32);
 
@@ -303,6 +306,7 @@ void p5txla_state::p5txla(machine_config &config)
     // 64MB for Taito Wolf HW, to be checked for base p5txla
 	I82439TX(config, "pci:00.0", 0, "maincpu", 64*1024*1024);
 
+    // TODO: 82371AB
 	i82371sb_isa_device &isa(I82371SB_ISA(config, "pci:07.0", 0, "maincpu"));
 	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
 	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
@@ -352,8 +356,19 @@ void p5txla_state::taitowlf(machine_config &config)
 
 	ISA16_SLOT(config, "board1", 0, "pci:07.0:isabus", isa_internal_devices, "taito_romdisk", true).set_option_machine_config("taito_romdisk", romdisk_config);
 
-    // TODO: replace ATI Rage above with Voodoo setup
+    // TODO: remove this
     VIRGE_PCI(config.replace(), "pci:12.0", 0);
+
+	voodoo_1_pci_device &voodoo(VOODOO_1_PCI(config, "pci:13.0", 0, "maincpu", "screen"));
+	voodoo.set_fbmem(2);
+	voodoo.set_tmumem(4, 0);
+	voodoo.set_status_cycles(1000); // optimization to consume extra cycles when polling status
+
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57);
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640 - 1, 0, 480 - 1);
+    screen.set_screen_update("pci:13.0", FUNC(voodoo_1_pci_device::screen_update));
 }
 
 /*****************************************************************************/
