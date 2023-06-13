@@ -18205,8 +18205,8 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
-	<software name="othelcs">
-		<description>Othello Competicao (Spanish)</description>
+	<software name="othelcp">
+		<description>Othello Competicao (Portuguese)</description>
 		<year>2003</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="A&amp;L Soft"/>
