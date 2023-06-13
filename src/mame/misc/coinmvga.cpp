@@ -213,7 +213,6 @@
   TODO:
 
   - Microtouch touch screen hook-up;
-  - i2c or EEPROM at I/O port $6;
   - cmkenosp: corrupts the RAMDAC palette during POST;
   - cmkenosp/cmkenospa: doesn't draw foreground tiles properly;
 
@@ -223,7 +222,8 @@
 #include "cpu/h8/h83002.h"
 //#include "cpu/h8/h83006.h"
 #include "sound/ymz280b.h"
-#include "machine/nvram.h"
+#include "machine/i2cmem.h"
+#include "machine/msm6242.h"
 #include "video/ramdac.h"
 #include "emupal.h"
 #include "screen.h"
@@ -233,7 +233,7 @@
 namespace {
 
 #define CPU_CLOCK   XTAL(14'745'600)
-#define MACH_CLOCK  XTAL(50'000'000)      // 50.35
+#define MACH_CLOCK  XTAL(50'350'000)
 #define COM_CLOCK   XTAL(20'000'000)
 #define SND_CLOCK   XTAL(16'934'400)
 
@@ -245,25 +245,47 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_vram(*this, "vram")
 		, m_maincpu(*this, "maincpu")
+		, m_eeprom(*this, "eeprom")
 		, m_gfxdecode(*this, "gfxdecode%u", 0U)
 		, m_palette(*this, "palette%u", 0U)
 	{ }
 
-	required_shared_ptr<uint16_t> m_vram;
 	void init_colorama();
 	void init_cmrltv75();
+
+	void coinmvga(machine_config &config);
+
+protected:
 	virtual void video_start() override;
+
+private:
+	uint8_t i2c_r();
+	void i2c_w(uint8_t data);
+
 	uint32_t screen_update_coinmvga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+
+	required_shared_ptr<uint16_t> m_vram;
 	required_device<cpu_device> m_maincpu;
+	required_device<i2cmem_device> m_eeprom;
 	required_device_array<gfxdecode_device, 2> m_gfxdecode;
 	required_device_array<palette_device, 2> m_palette;
 
-	void coinmvga(machine_config &config);
 	void coinmvga_map(address_map &map);
 	void ramdac2_map(address_map &map);
 	void ramdac_map(address_map &map);
 };
+
+
+uint8_t coinmvga_state::i2c_r()
+{
+	return 0x04 | m_eeprom->read_sda() << 1;
+}
+
+void coinmvga_state::i2c_w(uint8_t data)
+{
+	m_eeprom->write_sda(BIT(data, 1));
+	m_eeprom->write_scl(BIT(data, 2));
+}
 
 
 /*************************
@@ -343,7 +365,7 @@ void coinmvga_state::coinmvga_map(address_map &map)
 	map(0x600005, 0x600005).w("ramdac2", FUNC(ramdac_device::pal_w));
 	map(0x600006, 0x600006).w("ramdac2", FUNC(ramdac_device::mask_w));
 	map(0x600008, 0x600009).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
-	map(0x610000, 0x61000f).ram(); //touch screen i/o
+	map(0x610000, 0x61000f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 
 	map(0x700000, 0x7fffff).rom().region("maincpu", 0); // ?
 
@@ -617,16 +639,6 @@ GFXDECODE_END
 
 
 /*************************
-*    Sound Interface     *
-*************************/
-
-INTERRUPT_GEN_MEMBER(coinmvga_state::vblank_irq)
-{
-	device.execute().set_input_line(2, HOLD_LINE);
-}
-
-
-/*************************
 *    Machine Drivers     *
 *************************/
 
@@ -646,18 +658,20 @@ void coinmvga_state::coinmvga(machine_config &config)
 	// basic machine hardware
 	// could be either H8/3002 or H8/3007
 //	H83007(config, m_maincpu, CPU_CLOCK);
-    H83002(config, m_maincpu, CPU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &coinmvga_state::coinmvga_map);
-	m_maincpu->set_vblank_int("screen", FUNC(coinmvga_state::vblank_irq));
+	h83002_device &maincpu(H83002(config, m_maincpu, CPU_CLOCK));
+	maincpu.set_addrmap(AS_PROGRAM, &coinmvga_state::coinmvga_map);
+	maincpu.read_port6().set(FUNC(coinmvga_state::i2c_r));
+	maincpu.write_port6().set(FUNC(coinmvga_state::i2c_w));
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
+	I2C_24C04(config, "eeprom");
+
+	MSM6242(config, "rtc", 32768);
+
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(640,480);
-	screen.set_visarea_full();
+	screen.set_raw(MACH_CLOCK / 2, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(FUNC(coinmvga_state::screen_update_coinmvga));
 	//screen.set_palette(m_palette);
 
@@ -677,6 +691,7 @@ void coinmvga_state::coinmvga(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", SND_CLOCK));
+	ymz.irq_handler().set_inputline("maincpu", 2);
 	ymz.add_route(0, "lspeaker", 1.0);
 	ymz.add_route(1, "rspeaker", 1.0);
 }
