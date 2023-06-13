@@ -139,7 +139,7 @@ void pkspirit_state::main_map(address_map &map) // TODO: verify everything
 	map(0xb00000, 0xb00fff).ram().w(FUNC(pkspirit_state::fg_videoram_w)).share(m_fg_videoram); // GFX chips RAM?
 	map(0xb01000, 0xb01fff).ram(); // GFX chips RAM?
 	map(0xb02000, 0xb02fff).ram().w(FUNC(pkspirit_state::bg_videoram_w)).share(m_bg_videoram); // GFX chips RAM?
-	map(0xb03000, 0xb0ffff).ram(); // GFX chips RAM ?
+	map(0xb03000, 0xb03fff).ram(); // GFX chips RAM ?
 	map(0xb04000, 0xb04fff).ram(); // maybe sprite data, arranged as strips of 4 horizontal tiles
 	map(0xb05000, 0xb0ffff).ram(); // GFX chips RAM ?
 

@@ -94,5 +94,5 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME       PARENT  MACHINE    INPUT      CLASS            INIT        ROT   COMPANY    FULLNAME       FLAGS 
+//    YEAR  NAME       PARENT  MACHINE    INPUT      CLASS            INIT        ROT   COMPANY    FULLNAME       FLAGS
 GAME( 20??, hppyvideo, 0,      hppyvideo, hppyvideo, hppyvideo_state, empty_init, ROT0, "unknown", "Happy Video", MACHINE_IS_SKELETON )
