@@ -224,7 +224,7 @@ void device_t::add_machine_configuration(machine_config &config)
 	assert(&config == &m_machine_config);
 	machine_config::token const tok(config.begin_configuration(*this));
 	device_add_mconfig(config);
-	for (finder_base *autodev = m_auto_finder_list; autodev != nullptr; autodev = autodev->next())
+	for (auto *autodev = m_auto_finder_list; autodev; autodev = autodev->next())
 		autodev->end_configuration();
 }
 
@@ -321,11 +321,7 @@ void device_t::config_complete()
 
 void device_t::validity_check(validity_checker &valid) const
 {
-	// validate callbacks
-	for (devcb_base const *callback : m_callbacks)
-		callback->validity_check(valid);
-
-	// validate via the interfaces
+	// validate mixins
 	for (device_interface &intf : interfaces())
 		intf.interface_validity_check(valid);
 
@@ -478,8 +474,10 @@ void device_t::set_machine(running_machine &machine)
 bool device_t::findit(validity_checker *valid) const
 {
 	bool allfound = true;
-	for (finder_base *autodev = m_auto_finder_list; autodev != nullptr; autodev = autodev->next())
+	for (auto *autodev = m_auto_finder_list; autodev; autodev = autodev->next())
 	{
+#if 0
+		// FIXME: this stuff is specific to finder_base and not relevant to devcb - probably unnecessary anyway
 		if (valid)
 		{
 			// sanity checking
@@ -497,6 +495,7 @@ bool device_t::findit(validity_checker *valid) const
 				continue;
 			}
 		}
+#endif
 		allfound &= autodev->findit(valid);
 	}
 	return allfound;
@@ -1006,18 +1005,9 @@ void device_t::subdevice_list::remove(device_t &device)
 //  list of stuff to find after we go live
 //-------------------------------------------------
 
-finder_base *device_t::register_auto_finder(finder_base &autodev)
+device_resolver_base *device_t::register_auto_finder(device_resolver_base &autodev)
 {
-	// add to this list
-	finder_base *old = m_auto_finder_list;
-	m_auto_finder_list = &autodev;
-	return old;
-}
-
-
-void device_t::register_callback(devcb_base &callback)
-{
-	m_callbacks.emplace_back(&callback);
+	return std::exchange(m_auto_finder_list, &autodev);
 }
 
 
