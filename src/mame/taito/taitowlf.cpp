@@ -91,6 +91,7 @@ private:
 	required_memory_region m_data_rom;
 
 	u8 m_program_bank = 0;
+	u8 m_program_select = 0;
 	u8 read_program(offs_t offset);
 	void write_program(offs_t offset, u8 data);
 	u8 read_data(offs_t offset);
@@ -137,12 +138,15 @@ void isa16_taito_rom_disk::remap(int space_id, offs_t start, offs_t end)
 
 u8 isa16_taito_rom_disk::read_program(offs_t offset)
 {
+	if (m_program_select == 2)
+		return m_data_rom->base()[offset | ((m_program_bank) * 0x4000)];
+
 	return m_program_rom->base()[offset | (m_program_bank * 0x4000)];
 }
 
 void isa16_taito_rom_disk::write_program(offs_t offset, u8 data)
 {
-
+	// TODO: EMM386 and flush interactions only?
 }
 
 u8 isa16_taito_rom_disk::read_data(offs_t offset)
@@ -158,7 +162,10 @@ void isa16_taito_rom_disk::write_data(offs_t offset, u8 data)
 u8 isa16_taito_rom_disk::read_bank(offs_t offset)
 {
 	logerror("isa16_taito_rom_disk: unconfirmed read bank\n");
-	return m_program_bank;
+	if (!offset)
+		return m_program_bank;
+	else
+		return m_program_select;
 }
 
 void isa16_taito_rom_disk::write_bank(offs_t offset, u8 data)
@@ -167,6 +174,12 @@ void isa16_taito_rom_disk::write_bank(offs_t offset, u8 data)
 
 	if (!offset)
 		m_program_bank = data;
+	else
+	{
+		m_program_select = data;
+		if (data != 2 && data != 0)
+			logerror("Upper data bank unknown %02x\n", data);
+	}
 }
 
 class isa16_p5txla_mb : public device_t, public device_isa16_card_interface
@@ -364,10 +377,12 @@ void p5txla_state::taitowlf(machine_config &config)
 	voodoo.set_tmumem(4, 0);
 	voodoo.set_status_cycles(1000); // optimization to consume extra cycles when polling status
 
+	// TODO: displays bootscreen ROM contents (512x240 8bpp) while the board is in POST state
+	// This is provided by one of the CPLDs that is on the Taito PCB stack.
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(57);
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640 - 1, 0, 480 - 1);
+	screen.set_size(800, 262);
+	screen.set_visarea(0, 512 - 1, 0, 240 - 1);
     screen.set_screen_update("pci:13.0", FUNC(voodoo_1_pci_device::screen_update));
 }
 
