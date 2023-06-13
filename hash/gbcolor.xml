@@ -4,30 +4,30 @@
 license:CC0-1.0
 
   To investigate:
-    - Fushigi no Dungeon - Fuurai no Shiren GB2 - Sabaku no Majou (Japan, Alt)  <- What is this version?
-    - Super Mario Bros. Deluxe (USA, Rev 2) <- Was it released?
+    - Fushigi no Dungeon - Fuurai no Shiren GB2 - Sabaku no Majou (Japan, alt)  <- What is this version?
+    - Super Mario Bros. Deluxe (USA, rev 2) <- Was it released?
 
   Undumped:
-    - San Francisco Rush 2049 (Europe, fr/de/nl) [small pic]
+    - San Francisco Rush 2049 (Europe, French / German / Dutch) [small pic]
 
   Known dumps not yet verified against retail cartridge:
     - Alice in Wonderland (Europe)
     - AMF Bowling (USA)
     - Cruis'n Exotica (USA)
     - Donkey Kong Country (USA, Not for resale)
-    - Fushigi no Dungeon - Fuurai no Shiren GB2 - Sabaku no Majou (Japan, Alt)
+    - Fushigi no Dungeon - Fuurai no Shiren GB2 - Sabaku no Majou (Japan, alt)
     - Gakkyuu Ou Yamazaki (Japan)
     - Jissen ni Yakudatsu Tsumego (Japan)
     - Laura (Europe)
-    - Mission Impossible (Europe, Rev 1)
+    - Mission Impossible (Europe, rev 1)
     - Merlin (Europe)
     - Monster Traveler (Japan)
     - Moomin's Tale (Europe)
     - NBA In the Zone (USA)
     - Pro Pool (USA)
     - Sei Hai Densetsu (Japan)
-    - Super Mario Bros. Deluxe (USA, Rev 2)
-    - Tsuri Sensei 2 (Japan, Rev 1)
+    - Super Mario Bros. Deluxe (USA, rev 2)
+    - Tsuri Sensei 2 (Japan, rev 1)
     - Turok - Rage Wars (Australia)
     - VR Sports Powerboat Racing (USA)
     - Yakouchuu GB (Japan)
@@ -28394,6 +28394,27 @@ license:CC0-1.0
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="81920">
 				<rom name="gameshark online bios (usa) (unl).bin" size="81920" crc="c37d21d9" sha1="22f00e604acb827a48d4c9e109ba622f59a9d0a9"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- Aftermarket games -->
+
+	<software name="grimaces">
+		<description>Grimace's Birthday</description>
+		<year>2023</year>
+		<publisher>Krool Toys</publisher>
+		<notes><![CDATA[
+Free game released as part of McDonald's "Grimace's Birthday" 2023 campaign.
+ROM name was taken from the original file used by the site's emulator.
+]]></notes>
+		<info name="release" value="20230612"/>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bX4TvUeiUEfKRw8bkPGaB" size="1048576" crc="7744f551" sha1="035b7417e03c4e264a90212f2a3811012f03c2a2"/>
 			</dataarea>
 		</part>
 	</software>
