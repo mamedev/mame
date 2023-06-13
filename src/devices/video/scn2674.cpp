@@ -106,7 +106,7 @@ device_memory_interface::space_config_vector scn2674_device::memory_space_config
 void scn2674_device::device_start()
 {
 	// resolve callbacks
-	m_display_cb.resolve();
+	m_display_cb.resolve_safe();
 	m_intr_cb.resolve_safe();
 	m_breq_cb.resolve_safe();
 	m_mbc_cb.resolve_safe();
@@ -1149,7 +1149,7 @@ TIMER_CALLBACK_MEMBER(scn2674_device::scanline_timer)
 				attrcode = m_attr_space->read_byte(address);
 		}
 
-		if (m_display_enabled && !m_display_cb.isnull())
+		if (m_display_enabled)
 		{
 			bool cursor_on = ((address & 0x3fff) == m_cursor_address)
 				&& m_cursor_enabled

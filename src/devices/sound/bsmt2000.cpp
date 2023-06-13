@@ -110,7 +110,7 @@ void bsmt2000_device::device_add_mconfig(machine_config &config)
 
 void bsmt2000_device::device_start()
 {
-	m_ready_callback.resolve();
+	m_ready_callback.resolve_safe();
 
 	// create the stream; BSMT typically runs at 24MHz and writes to a DAC, so
 	// in theory we should generate a 24MHz stream, but that's certainly overkill
@@ -261,8 +261,7 @@ uint16_t bsmt2000_device::tms_data_r()
 {
 	// also implicitly clear the write pending flag
 	m_write_pending = false;
-	if (!m_ready_callback.isnull())
-		m_ready_callback();
+	m_ready_callback();
 	return m_write_data;
 }
 
