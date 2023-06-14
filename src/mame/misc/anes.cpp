@@ -7,7 +7,7 @@ Ton Puu Mahjong (Japan) by ANES
 
 TODO:
 - ROM banking;
-- blitter, 8bpp with hardcoded palette & writes to ROM area!?
+- blitter;
 - inputs;
 - DIP sheets are available for sanma.
 
@@ -20,7 +20,7 @@ TODO:
 - 2x ISSI IS61C64AH 8k x8 SRAM
 - 1x HM6265LK-70
 - 1x unknown 160 pin device labeled "ANES ORIGINAL SEAL NO. A199." for tonpuu, "ANES ORIGINAL SEAL NO. A446." for sanma
-- 4x bank of 8 dip-switches
+- 4x banks of 8 DIP switches
 */
 
 #include "emu.h"
@@ -117,8 +117,8 @@ uint32_t anes_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 {
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint16_t const *const &src = m_bitmap[0].pix(y);
-		uint16_t const *const &src2 = m_bitmap[1].pix(y);
+		uint16_t const *const src = &m_bitmap[0].pix(y);
+		uint16_t const *const src2 = &m_bitmap[1].pix(y);
 		uint16_t *const dst = &bitmap.pix(y);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
