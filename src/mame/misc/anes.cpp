@@ -117,8 +117,8 @@ uint32_t anes_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 {
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint16_t const *const src = m_bitmap[0].pix(y);
-		uint16_t const *const src2 = m_bitmap[1].pix(y);
+		uint16_t const *const &src = m_bitmap[0].pix(y);
+		uint16_t const *const &src2 = m_bitmap[1].pix(y);
 		uint16_t *const dst = &bitmap.pix(y);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
