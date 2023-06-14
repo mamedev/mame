@@ -9,7 +9,7 @@ TODO:
 - ROM banking;
 - blitter, 8bpp with hardcoded palette & writes to ROM area!?
 - inputs;
-- dip sheets are available for sanma.
+- DIP sheets are available for sanma.
 
 - 1x Z0840008PSC Z80 CPU
 - 1x 16.000 XTAL near the Z80
@@ -82,7 +82,7 @@ private:
 	uint8_t m_palette_data_lsb[0x2000];
 	uint8_t m_palette_data_msb[0x2000];
 
-	void do_blit_draw(bitmap_ind16& bitmap, int& addr, int sx, int sy, int sw, int sh, int x, int y, bool flipx, bool flipy);
+	void do_blit_draw(bitmap_ind16 &bitmap, int &addr, int sx, int sy, int sw, int sh, int x, int y, bool flipx, bool flipy);
 	void do_blit();
 	void blit_w(offs_t offset, uint8_t data);
 	void blit_rom_w(offs_t offset, uint8_t data);
@@ -115,22 +115,18 @@ private:
 
 uint32_t anes_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap_ind16 *srcbitmap = &m_bitmap[0];
-	bitmap_ind16 *srcbitmap2 = &m_bitmap[1];
-
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
+		uint16_t const *const src = m_bitmap[0].pix(y);
+		uint16_t const *const src2 = m_bitmap[1].pix(y);
+		uint16_t *const dst = &bitmap.pix(y);
+
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			uint16_t* src = &srcbitmap->pix(y, x);
-			uint16_t* src2 = &srcbitmap2->pix(y, x);
-
-			uint16_t* dst = &bitmap.pix(y, x);
-
-			dst[0] = src[0] + (m_palette_active_bank_alt * 0x100);
-
-			if (src2[0])
-				dst[0] = src2[0] + m_palette_active_bank * 0x100;
+			if (src2[x])
+				dst[x] = src2[x] + (m_palette_active_bank * 0x100);
+			else
+				dst[x] = src[x] + (m_palette_active_bank_alt * 0x100);
 		}
 	}
 
@@ -147,7 +143,7 @@ uint32_t anes_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
  writes a mode to port $0b, writes to trigger port $0a
  */
 
-void anes_state::do_blit_draw(bitmap_ind16& bitmap, int& addr, int sx, int sy, int sw, int sh, int x, int y, bool flipx, bool flipy)
+void anes_state::do_blit_draw(bitmap_ind16 &bitmap, int &addr, int sx, int sy, int sw, int sh, int x, int y, bool flipx, bool flipy)
 {
 	int drawx, drawy;
 
@@ -180,17 +176,17 @@ void anes_state::do_blit()
 {
 	int src = (m_blit[0x0c] << 16) + (m_blit[0x0d] << 8) + m_blit[0x0e];
 
-	logerror("%s: src %06x, xpos %04X width %02X, ypos %04X height %02X | %02X %02X %02X %02X %02X %02X %02X | %02X %02X | %02X\n", machine().describe_context(),
-		src, m_blit_addr[0], m_blit_val[0], m_blit_addr[1], m_blit_val[1],
-		m_blit[0x00], m_blit[0x01], m_blit[0x02], m_blit[0x03], m_blit[0x04], m_blit[0x05], m_blit[0x06],
-		m_blit[0x0a], m_blit[0x0b],
-		m_blit[0x0f]
-	);
+	logerror("%s: src %06x, xpos %04X width %02X, ypos %04X height %02X | %02X %02X %02X %02X %02X %02X %02X | %02X %02X | %02X\n",
+			machine().describe_context(),
+			src, m_blit_addr[0], m_blit_val[0], m_blit_addr[1], m_blit_val[1],
+			m_blit[0x00], m_blit[0x01], m_blit[0x02], m_blit[0x03], m_blit[0x04], m_blit[0x05], m_blit[0x06],
+			m_blit[0x0a], m_blit[0x0b],
+			m_blit[0x0f]);
 
 	bool flipx = m_blit[0x04] & 0x01;
 	bool flipy = m_blit[0x04] & 0x02;
 
-	bitmap_ind16& bitmap = m_bitmap[(m_blit[0x0b] & 0x04) ? 1 : 0];
+	bitmap_ind16 &bitmap = m_bitmap[(m_blit[0x0b] & 0x04) ? 1 : 0];
 
 	int sx = m_blit_addr[0];
 	int sy = m_blit_val[0];
