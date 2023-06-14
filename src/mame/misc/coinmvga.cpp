@@ -787,6 +787,38 @@ ROM_START( wof_v11 )
 
 ROM_END
 
+/*
+   Wheel of Fortune.
+   p517 (v16?).
+   Standalone. Physical arm on marquee + bet station.
+
+   Program ROMs stickers have the version illegible.
+   The plus sign means minor revision.
+
+*/
+ROM_START( wof_v16 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "p517vxx+_wof.pr1", 0x00001, 0x80000, CRC(1b3f17d7) SHA1(57f5aabdd065546a9bf6ebea0d74350b8ef3e44e) )
+	ROM_LOAD16_BYTE( "p517vxx+_wof.pr2", 0x00000, 0x80000, CRC(a40467db) SHA1(0e74ef023a8aeb4f5bbd3dbe5cab4d9de19c6f10) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "p517v16_wof.fg1",  0x00001, 0x80000, CRC(61d15d45) SHA1(9ed8abca13b9494151b5b06fe20111d0863ce4b0) )
+	ROM_LOAD16_BYTE( "p517v16_wof.fg2",  0x00000, 0x80000, CRC(9968ac3a) SHA1(b3c78ea795a6350b3abff54ebbbeff6432dd16fc) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "p517v16_wof.bg1",  0x200000, 0x100000, CRC(39f023b5) SHA1(4cd855683226697767eb76a24ef0535950c6d663) )
+	ROM_LOAD16_BYTE( "p517v16_wof.bg2",  0x200001, 0x100000, CRC(40b6f0ad) SHA1(b5e94c91a2ea1d240f3710955f72d5f832b853b6) )
+	ROM_LOAD16_BYTE( "p517v16_wof.bg3",  0x000000, 0x100000, CRC(4ebc7f22) SHA1(4717bd4f88024ae11d87514a8e3a2c489abfb149) )
+	ROM_LOAD16_BYTE( "p517v16_wof.bg4",  0x000001, 0x100000, CRC(1de571c9) SHA1(df7de4e985ff39977f0553d3f8a588e91d003d00) )
+
+	ROM_REGION( 0x100000, "ymz", 0 )
+	ROM_LOAD( "p517v16_wof.snd",   0x00000, 0x100000, CRC(6d90f7ca) SHA1(5360331ce8de74c71149480a345586145bddbca2) )
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "palce22v10h25.u11",  0x0000, 0x0200, NO_DUMP )
+
+ROM_END
+
 
 /*
    Coinmaster Roulette V75 (y2k, spanish)
@@ -929,7 +961,8 @@ void coinmvga_state::init_cmrltv75()
 //    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT    COMPANY                    FULLNAME                                       FLAGS
 GAME( 2000, colorama,  0,        coinmvga, coinmvga, coinmvga_state, init_colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Colorama (P521, English)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2000, coloramas, colorama, coinmvga, coinmvga, coinmvga_state, init_colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Colorama (P521 V13, Spanish)",                MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2000, wof_v11,   0,        coinmvga, coinmvga, coinmvga_state, init_colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Wheel of Fortune (P517 V11, Belgium)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2000, wof_v16,   0,        coinmvga, coinmvga, coinmvga_state, init_colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Wheel of Fortune (P517 V16, English)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2000, wof_v11,   wof_v16,  coinmvga, coinmvga, coinmvga_state, init_colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Wheel of Fortune (P517 V11, English)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2001, cmrltv75,  0,        coinmvga, coinmvga, coinmvga_state, init_cmrltv75, ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Roulette P497 V75 (Y2K, Spanish)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2000, cmkenosp,  0,        coinmvga, coinmvga, coinmvga_state, empty_init,    ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-14)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2000, cmkenospa, cmkenosp, coinmvga, coinmvga, coinmvga_state, empty_init,    ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-02)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
