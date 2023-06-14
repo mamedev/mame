@@ -117,7 +117,7 @@ void phc25_state::port40_w(uint8_t data)
 	m_port40 = data;
 }
 
-WRITE_LINE_MEMBER( phc25_state::write_centronics_busy )
+void phc25_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
@@ -294,7 +294,7 @@ MC6847_GET_CHARROM_MEMBER(phc25_state::pal_char_rom_r)
 }
 
 // irq is inverted in emulation, so we need this trampoline
-WRITE_LINE_MEMBER( phc25_state::irq_w )
+void phc25_state::irq_w(int state)
 {
 	m_maincpu->set_input_line(0, state ? CLEAR_LINE : ASSERT_LINE);
 }

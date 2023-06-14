@@ -130,7 +130,7 @@ void bebox_state::cirrus_config(device_t *device)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(bebox_state::bebox_keyboard_interrupt)
+void bebox_state::bebox_keyboard_interrupt(int state)
 {
 	bebox_set_irq_bit(16, state);
 	m_pic8259[0]->ir1_w(state);

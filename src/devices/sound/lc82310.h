@@ -19,11 +19,11 @@ class lc82310_device : public device_t,
 public:
 	lc82310_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	DECLARE_WRITE_LINE_MEMBER(zcsctl_w);
-	DECLARE_WRITE_LINE_MEMBER(ckctl_w);
-	DECLARE_WRITE_LINE_MEMBER(dictl_w);
-	DECLARE_READ_LINE_MEMBER(doctl_r);
-	DECLARE_READ_LINE_MEMBER(demand_r);
+	void zcsctl_w(int state);
+	void ckctl_w(int state);
+	void dictl_w(int state);
+	int doctl_r();
+	int demand_r();
 
 	void dimpg_w(uint8_t data);
 

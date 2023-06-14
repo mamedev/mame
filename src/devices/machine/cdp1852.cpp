@@ -107,7 +107,7 @@ void cdp1852_device::device_reset()
 //  clock_w - clock write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(cdp1852_device::clock_w)
+void cdp1852_device::clock_w(int state)
 {
 	if (m_clock_active != bool(state))
 		return;

@@ -45,13 +45,13 @@ public:
 
 	void address_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( adj_w );
-	DECLARE_WRITE_LINE_MEMBER( test_w );
-	DECLARE_WRITE_LINE_MEMBER( hold_w );
+	void adj_w(int state);
+	void test_w(int state);
+	void hold_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( read_w );
-	DECLARE_WRITE_LINE_MEMBER( write_w );
-	DECLARE_WRITE_LINE_MEMBER( cs_w );
+	void read_w(int state);
+	void write_w(int state);
+	void cs_w(int state);
 
 protected:
 	// device-level overrides

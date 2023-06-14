@@ -263,14 +263,14 @@ void mc68340_timer_module_device::write(offs_t offset, uint16_t data, uint16_t m
 	LOG("%08x m68340_internal_timer_w %08x, %08x (%08x)\n", m_cpu->pcbase(), offset * 2, data, mem_mask);
 }
 
-WRITE_LINE_MEMBER( mc68340_timer_module_device::tin_w)
+void mc68340_timer_module_device::tin_w(int state)
 {
 	LOGTIMER("%s\n", FUNCNAME);
 
 	m_tin = state;
 }
 
-WRITE_LINE_MEMBER( mc68340_timer_module_device::tgate_w)
+void mc68340_timer_module_device::tgate_w(int state)
 {
 	LOGTIMER("%s\n", FUNCNAME);
 

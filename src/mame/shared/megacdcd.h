@@ -22,7 +22,7 @@ public:
 
 	template <typename... T> void set_cdc_do_dma_callback(T &&... args) { m_segacd_dma_callback.set(std::forward<T>(args)...); }
 
-	template <typename T> void set_cdrom_tag(T &&tag) { m_cdrom.set_tag(std::forward<T>(tag)); subdevice<cdda_device>("cdda")->set_cdrom_tag(std::forward<T>(tag)); }
+	template <typename T> void set_cdrom_tag(T &&tag) { m_cdrom.set_tag(std::forward<T>(tag)); m_cdda.lookup()->set_cdrom_tag(std::forward<T>(tag)); }
 	template <typename T> void set_68k_tag(T &&tag) { m_68k.set_tag(std::forward<T>(tag)); }
 
 

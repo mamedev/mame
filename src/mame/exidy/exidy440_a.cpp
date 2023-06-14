@@ -279,7 +279,7 @@ void exidy440_sound_device::sound_volume_w(offs_t offset, uint8_t data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(exidy440_sound_device::sound_interrupt_w)
+void exidy440_sound_device::sound_interrupt_w(int state)
 {
 	if (state)
 		m_audiocpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
@@ -290,7 +290,7 @@ void exidy440_sound_device::sound_interrupt_clear_w(uint8_t data)
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(exidy440_sound_device::sound_reset_w)
+void exidy440_sound_device::sound_reset_w(int state)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, state);
 }

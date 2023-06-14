@@ -31,12 +31,12 @@ public:
 	void spiders(machine_config &config);
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	void flipscreen_w(int state);
 	void gfx_rom_intf_w(uint8_t data);
 	uint8_t gfx_rom_r();
 	virtual void machine_start() override;
 	INTERRUPT_GEN_MEMBER(update_pia_1);
-	DECLARE_WRITE_LINE_MEMBER(ic60_74123_output_changed);
+	void ic60_74123_output_changed(int state);
 	void spiders_audio_command_w(uint8_t data);
 	void spiders_audio_a_w(uint8_t data);
 	void spiders_audio_b_w(uint8_t data);

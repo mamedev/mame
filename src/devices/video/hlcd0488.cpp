@@ -92,13 +92,13 @@ TIMER_CALLBACK_MEMBER(hlcd0488_device::sync_update)
 	m_data_clk_prev = m_data_clk;
 }
 
-WRITE_LINE_MEMBER(hlcd0488_device::latch_pulse_w)
+void hlcd0488_device::latch_pulse_w(int state)
 {
 	m_latch_pulse = state ? 1 : 0;
 	m_sync_timer->adjust(attotime::zero);
 }
 
-WRITE_LINE_MEMBER(hlcd0488_device::data_clk_w)
+void hlcd0488_device::data_clk_w(int state)
 {
 	m_data_clk = state ? 1 : 0;
 	m_sync_timer->adjust(attotime::zero);

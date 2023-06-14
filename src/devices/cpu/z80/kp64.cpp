@@ -473,7 +473,7 @@ void kp64_device::control_w(u8 data)
 //  xclk_w - set external count input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(kp64_device::xclk_w)
+void kp64_device::xclk_w(int state)
 {
 	// Only falling edges count
 	if (std::exchange(m_xclk, state) && !state)
@@ -506,7 +506,7 @@ WRITE_LINE_MEMBER(kp64_device::xclk_w)
 //  gate_w - set gate input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(kp64_device::gate_w)
+void kp64_device::gate_w(int state)
 {
 	if (m_gate == bool(state))
 		return;

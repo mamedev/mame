@@ -96,16 +96,16 @@ private:
 	u8 porte8_r();
 	void portec_w(u8 data);
 	static void floppy_formats(format_registration &fr);
-	DECLARE_WRITE_LINE_MEMBER(cent_busy_w);
-	DECLARE_WRITE_LINE_MEMBER(busreq_w);
+	void cent_busy_w(int state);
+	void busreq_w(int state);
 	u8 memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, u8 data);
 	u8 io_read_byte(offs_t offset);
 	void io_write_byte(offs_t offset, u8 data);
 	MC6845_UPDATE_ROW(update_row);
-	DECLARE_WRITE_LINE_MEMBER(crtc_hs);
-	DECLARE_WRITE_LINE_MEMBER(crtc_vs);
-	DECLARE_WRITE_LINE_MEMBER(motor_w);
+	void crtc_hs(int state);
+	void crtc_vs(int state);
+	void motor_w(int state);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
@@ -245,7 +245,7 @@ static INPUT_PORTS_START( excali64 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 &") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')
 INPUT_PORTS_END
 
-WRITE_LINE_MEMBER( excali64_state::cent_busy_w )
+void excali64_state::cent_busy_w(int state)
 {
 	m_centronics_busy = state;
 }
@@ -262,7 +262,7 @@ static void excali64_floppies(device_slot_interface &device)
 }
 
 // pulses from port E4 bit 5 restart the 74123. After 3.6 secs without a pulse, the motor gets turned off.
-WRITE_LINE_MEMBER( excali64_state::motor_w )
+void excali64_state::motor_w(int state)
 {
 	m_motor = state;
 	m_floppy1->get_device()->mon_w(!m_motor);
@@ -301,7 +301,7 @@ void excali64_state::portec_w(u8 data)
 	m_fdc->dden_w(BIT(data, 2));
 }
 
-WRITE_LINE_MEMBER( excali64_state::busreq_w )
+void excali64_state::busreq_w(int state)
 {
 // since our Z80 has no support for BUSACK, we assume it is granted immediately
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
@@ -459,12 +459,12 @@ void excali64_state::machine_start()
 
 	m_sys_status = 0;
 }
-WRITE_LINE_MEMBER( excali64_state::crtc_hs )
+void excali64_state::crtc_hs(int state)
 {
 	m_crtc_hs = state;
 }
 
-WRITE_LINE_MEMBER( excali64_state::crtc_vs )
+void excali64_state::crtc_vs(int state)
 {
 	m_crtc_vs = state;
 }

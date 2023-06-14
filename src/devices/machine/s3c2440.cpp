@@ -350,7 +350,7 @@ void s3c2440_device::s3c2440_request_eint(uint32_t number)
 	s3c24xx_request_eint( number);
 }
 
-WRITE_LINE_MEMBER( s3c2440_device::frnb_w )
+void s3c2440_device::frnb_w(int state)
 {
 	s3c24xx_pin_frnb_w(state);
 }

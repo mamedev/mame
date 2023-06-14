@@ -4,8 +4,8 @@
 
     PIIX4E ACPI interface
 
-	TODO:
-	- PIIX4 / PIIX4M dispatches
+    TODO:
+    - PIIX4 / PIIX4M dispatches
 
 **************************************************************************************************/
 
@@ -66,7 +66,7 @@ void i82371eb_acpi_device::io_map(address_map &map)
 void i82371eb_acpi_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
-//	printf("%08llx %08llx %08llx %04llx %04llx %04llx\n", memory_window_start, memory_window_end, memory_offset ,io_window_start, io_window_end, io_offset);
+//  printf("%08llx %08llx %08llx %04llx %04llx %04llx\n", memory_window_start, memory_window_end, memory_offset ,io_window_start, io_window_end, io_offset);
 	if (io_offset != 0)
 		throw emu_fatalerror("I82371EB_ACPI io_offset != 0 (%04llx)", io_offset);
 
@@ -109,7 +109,7 @@ void i82371eb_acpi_device::device_start()
 void i82371eb_acpi_device::device_reset()
 {
 	pci_device::device_reset();
-	
+
 	command = 0x0000;
 	status = 0x0280;
 	m_pmiose = false;
@@ -151,7 +151,7 @@ void i82371eb_acpi_device::devresa_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_devresa);
 	LOGIO("devresa w %08x\n", m_devresa);
-//	remap_cb();
+//  remap_cb();
 }
 
 u32 i82371eb_acpi_device::smbba_r()

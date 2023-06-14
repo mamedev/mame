@@ -367,17 +367,17 @@ void asteroid_state::llander_sound(machine_config &config)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(asteroid_state::coin_counter_left_w)
+void asteroid_state::coin_counter_left_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(asteroid_state::coin_counter_center_w)
+void asteroid_state::coin_counter_center_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-WRITE_LINE_MEMBER(asteroid_state::coin_counter_right_w)
+void asteroid_state::coin_counter_right_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(2, state);
 }
@@ -489,7 +489,7 @@ void asteroid_state::llander_map(address_map &map)
  *
  *************************************/
 
-READ_LINE_MEMBER(asteroid_state::clock_r)
+int asteroid_state::clock_r()
 {
 	return (m_maincpu->total_cycles() & 0x100) ? 1 : 0;
 }

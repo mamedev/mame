@@ -14,7 +14,7 @@ public:
 	uts_400_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual DECLARE_WRITE_LINE_MEMBER(ready_w) override;
+	virtual void ready_w(int state) override;
 
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
@@ -25,8 +25,8 @@ private:
 	u8 bus_r();
 	void p1_w(u8 data);
 	void p2_w(u8 data);
-	DECLARE_READ_LINE_MEMBER(t1_r);
-	DECLARE_WRITE_LINE_MEMBER(prog_w);
+	int t1_r();
+	void prog_w(int state);
 
 	void ext_map(address_map &map);
 

@@ -403,20 +403,20 @@ void acorn_memc_device::do_sound_dma()
 	}
 }
 
-WRITE_LINE_MEMBER(acorn_memc_device::spvmd_w)
+void acorn_memc_device::spvmd_w(int state)
 {
 	m_spvmd = state;
 	m_abort_w(CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(acorn_memc_device::sndrq_w)
+void acorn_memc_device::sndrq_w(int state)
 {
 	if (state && m_sound_dma_on)
 		do_sound_dma();
 }
 
 
-WRITE_LINE_MEMBER(acorn_memc_device::vidrq_w)
+void acorn_memc_device::vidrq_w(int state)
 {
 	if (state && m_video_dma_on)
 		do_video_dma();

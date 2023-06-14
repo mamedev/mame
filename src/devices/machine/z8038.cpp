@@ -482,7 +482,7 @@ void z8038_device::message_out_w(u8 const port, u8 data)
 	m_port[!port].interrupt_status[0] |= ISR0_MIP;
 }
 
-WRITE_LINE_MEMBER(z8038_device::in_E)
+void z8038_device::in_E(int state)
 {
 	// check port 2 in i/o mode and pin 35 configured as input
 	if ((m_port[0].control_0 & CR0_P2M_IO) && (m_control_3 & CR3_P2CLR))
@@ -498,7 +498,7 @@ WRITE_LINE_MEMBER(z8038_device::in_E)
 	}
 }
 
-WRITE_LINE_MEMBER(z8038_device::in_F)
+void z8038_device::in_F(int state)
 {
 	// check port 2 in i/o mode and pin 34 configured as input
 	if ((m_port[0].control_0 & CR0_P2M_IO) && (m_control_3 & CR3_P2DIR))
@@ -520,7 +520,7 @@ WRITE_LINE_MEMBER(z8038_device::in_F)
 	}
 }
 
-WRITE_LINE_MEMBER(z8038_device::in_G)
+void z8038_device::in_G(int state)
 {
 	// check port 2 in i/o mode
 	if (m_port[0].control_0 & CR0_P2M_IO)

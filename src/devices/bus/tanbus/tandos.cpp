@@ -253,17 +253,17 @@ uint8_t tanbus_tandos_device::status_r()
 }
 
 
-WRITE_LINE_MEMBER(tanbus_tandos_device::fdc_drq_w)
+void tanbus_tandos_device::fdc_drq_w(int state)
 {
 	m_tanbus->so_w((m_drq_enable && state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(tanbus_tandos_device::fdc_irq_w)
+void tanbus_tandos_device::fdc_irq_w(int state)
 {
 	m_tanbus->irq_w((m_irq_enable && state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(tanbus_tandos_device::fdc_hld_w)
+void tanbus_tandos_device::fdc_hld_w(int state)
 {
 	if (m_floppy)
 		m_floppy->mon_w(state);

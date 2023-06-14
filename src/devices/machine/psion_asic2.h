@@ -39,10 +39,10 @@ public:
 	uint8_t io_r(offs_t offset);
 	void io_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(on_clr_w);
-	DECLARE_WRITE_LINE_MEMBER(dnmi_w);
-	DECLARE_WRITE_LINE_MEMBER(frcovl_w);
-	DECLARE_WRITE_LINE_MEMBER(reset_w);
+	void on_clr_w(int state);
+	void dnmi_w(int state);
+	void frcovl_w(int state);
+	void reset_w(int state);
 
 protected:
 	virtual void device_resolve_objects() override;

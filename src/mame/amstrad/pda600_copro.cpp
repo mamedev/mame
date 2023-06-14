@@ -285,7 +285,7 @@ TIMER_CALLBACK_MEMBER(pda600_copro_device::update_timer)
 }
 
 
-WRITE_LINE_MEMBER( pda600_copro_device::wakeup_w )
+void pda600_copro_device::wakeup_w(int state)
 {
 	if (m_state != STATE_SLEEP && m_state != STATE_READY)
 		logerror("PDA600: wakeup_w in %d state\n", m_state);

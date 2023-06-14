@@ -3,7 +3,8 @@
 # 6509 opcodes
 
 lda_9_idy
-	TMP2 = read_pc();
+	TMP2 = read(PC);
+	PC++;
 	TMP = read(TMP2);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	if(page_changing(TMP, Y)) {
@@ -14,7 +15,8 @@ lda_9_idy
 	prefetch();
 
 sta_9_idy
-	TMP2 = read_pc();
+	TMP2 = read(PC);
+	PC++;
 	TMP = read(TMP2);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	read_9(set_l(TMP, TMP+Y));

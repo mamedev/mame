@@ -547,7 +547,7 @@ void hpc1_device::decrement_chain()
 	}
 }
 
-WRITE_LINE_MEMBER(hpc1_device::scsi_drq)
+void hpc1_device::scsi_drq(int state)
 {
 	m_scsi_dma.m_drq = state;
 
@@ -592,21 +592,21 @@ void hpc1_device::set_timer_int_clear(uint32_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(hpc1_device::timer0_int)
+void hpc1_device::timer0_int(int state)
 {
 	LOGMASKED(LOG_PIT, "Timer0 Interrupt: %d\n", state);
 	if (state)
 		m_maincpu->set_input_line(MIPS3_IRQ2, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(hpc1_device::timer1_int)
+void hpc1_device::timer1_int(int state)
 {
 	LOGMASKED(LOG_PIT, "Timer2 Interrupt: %d\n", state);
 	if (state)
 		m_maincpu->set_input_line(MIPS3_IRQ3, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(hpc1_device::timer2_int)
+void hpc1_device::timer2_int(int state)
 {
 	LOGMASKED(LOG_PIT, "Timer2 Interrupt (Disabled): %d\n", state);
 }
@@ -615,9 +615,9 @@ WRITE_LINE_MEMBER(hpc1_device::timer2_int)
 //  SERIAL DUARTS
 //**************************************************************************
 
-WRITE_LINE_MEMBER(hpc1_device::duart0_int_w) { duart_int_w(0, state); }
-WRITE_LINE_MEMBER(hpc1_device::duart1_int_w) { duart_int_w(1, state); }
-WRITE_LINE_MEMBER(hpc1_device::duart2_int_w) { duart_int_w(2, state); }
+void hpc1_device::duart0_int_w(int state) { duart_int_w(0, state); }
+void hpc1_device::duart1_int_w(int state) { duart_int_w(1, state); }
+void hpc1_device::duart2_int_w(int state) { duart_int_w(2, state); }
 
 void hpc1_device::duart_int_w(int channel, int state)
 {
@@ -665,7 +665,7 @@ void hpc1_device::update_irq(int channel)
 	}
 }
 
-WRITE_LINE_MEMBER(hpc1_device::scsi_irq)
+void hpc1_device::scsi_irq(int state)
 {
 	if (state)
 	{

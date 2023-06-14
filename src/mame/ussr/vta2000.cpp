@@ -47,7 +47,7 @@ public:
 	void vta2000(machine_config &config);
 private:
 	void output_00(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(speaker_w);
+	void speaker_w(int state);
 	uint8_t m_framecnt = 0;
 
 	uint32_t screen_update_vta2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -68,7 +68,7 @@ void vta2000_state::output_00(uint8_t data)
 	m_mainpit->write_gate0(BIT(data, 4));
 }
 
-WRITE_LINE_MEMBER(vta2000_state::speaker_w)
+void vta2000_state::speaker_w(int state)
 {
 	m_speaker->level_w(state);
 }

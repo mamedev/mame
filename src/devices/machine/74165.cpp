@@ -89,7 +89,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( ttl165_device::qh_output )
 //  INTERFACE
 //**************************************************************************
 
-WRITE_LINE_MEMBER( ttl165_device::serial_w )
+void ttl165_device::serial_w(int state)
 {
 	m_ser = state;
 }
@@ -100,7 +100,7 @@ void ttl165_device::update_qh()
 	m_timer->adjust(attotime::from_nsec(25), BIT(m_data, 7));
 }
 
-WRITE_LINE_MEMBER( ttl165_device::clock_w )
+void ttl165_device::clock_w(int state)
 {
 	if (m_shld && !m_clk && state)
 	{
@@ -114,7 +114,7 @@ WRITE_LINE_MEMBER( ttl165_device::clock_w )
 	m_clk = state;
 }
 
-WRITE_LINE_MEMBER( ttl165_device::shift_load_w )
+void ttl165_device::shift_load_w(int state)
 {
 	if (!m_shld || !state)
 	{

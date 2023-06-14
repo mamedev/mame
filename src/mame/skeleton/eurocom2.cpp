@@ -98,7 +98,7 @@ protected:
 	uint8_t kbd_get();
 	void kbd_put(u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER(pia1_cb2_w);
+	void pia1_cb2_w(int state);
 
 	void eurocom2_map(address_map &map);
 
@@ -136,10 +136,10 @@ public:
 private:
 	uint8_t waveterm_kb_r();
 	void waveterm_kb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(waveterm_kbh_w);
+	void waveterm_kbh_w(int state);
 
 	void pia3_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia3_cb2_w);
+	void pia3_cb2_w(int state);
 
 	uint8_t waveterm_adc();
 	void waveterm_dac(uint8_t data); // declared but not defined, commented in memory map
@@ -220,7 +220,7 @@ void eurocom2_state::vico_w(offs_t offset, uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(eurocom2_state::pia1_cb2_w)
+void eurocom2_state::pia1_cb2_w(int state)
 {
 	LOG("PIA1 CB2 <- %d (SST reset)\n", state);
 	// reset single-step timer
@@ -265,7 +265,7 @@ void waveterm_state::waveterm_kb_w(uint8_t data)
 	m_drive = (~data) >> 4;
 }
 
-WRITE_LINE_MEMBER(waveterm_state::waveterm_kbh_w)
+void waveterm_state::waveterm_kbh_w(int state)
 {
 	m_driveh = !state;
 }

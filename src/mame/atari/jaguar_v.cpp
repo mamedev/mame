@@ -302,12 +302,12 @@ inline void jaguar_state::trigger_host_cpu_irq(int level)
 }
 
 
-WRITE_LINE_MEMBER( jaguar_state::gpu_cpu_int )
+void jaguar_state::gpu_cpu_int(int state)
 {
 	trigger_host_cpu_irq(1);
 }
 
-WRITE_LINE_MEMBER( jaguar_state::dsp_cpu_int )
+void jaguar_state::dsp_cpu_int(int state)
 {
 	trigger_host_cpu_irq(4);
 }

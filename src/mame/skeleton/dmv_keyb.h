@@ -27,8 +27,8 @@ public:
 	// construction/destruction
 	dmv_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER(sd_poll_w);
-	DECLARE_READ_LINE_MEMBER(sd_poll_r);
+	void sd_poll_w(int state);
+	int sd_poll_r();
 
 protected:
 	// device-level overrides

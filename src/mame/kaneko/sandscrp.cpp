@@ -134,7 +134,7 @@ private:
 	virtual void machine_start() override;
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	void update_irq_state();
@@ -198,7 +198,7 @@ INTERRUPT_GEN_MEMBER(sandscrp_state::interrupt)
 }
 
 
-WRITE_LINE_MEMBER(sandscrp_state::screen_vblank)
+void sandscrp_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)

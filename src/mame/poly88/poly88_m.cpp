@@ -129,7 +129,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( poly88_state::kansas_r )
 	}
 }
 
-WRITE_LINE_MEMBER(poly88_state::cassette_clock_w)
+void poly88_state::cassette_clock_w(int state)
 {
 	// incoming @4800Hz (bit), 2400Hz (polyphase)
 	if (BIT(m_linec->read(), 7))
@@ -205,7 +205,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(poly88_state::rtc_tick)
 	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE_LINE_MEMBER(poly88_state::vi2_w)
+void poly88_state::vi2_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -214,7 +214,7 @@ WRITE_LINE_MEMBER(poly88_state::vi2_w)
 	}
 }
 
-WRITE_LINE_MEMBER(poly88_state::vi5_w)
+void poly88_state::vi5_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -223,7 +223,7 @@ WRITE_LINE_MEMBER(poly88_state::vi5_w)
 	}
 }
 
-WRITE_LINE_MEMBER(poly88_state::usart_ready_w)
+void poly88_state::usart_ready_w(int state)
 {
 	if (state)
 	{

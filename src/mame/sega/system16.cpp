@@ -394,7 +394,7 @@ void segas1x_bootleg_state::tturfbl_msm5205_data_w(uint8_t data)
 	m_sample_buffer = data;
 }
 
-WRITE_LINE_MEMBER(segas1x_bootleg_state::tturfbl_msm5205_callback)
+void segas1x_bootleg_state::tturfbl_msm5205_callback(int state)
 {
 	m_msm->data_w((m_sample_buffer >> 4) & 0x0f);
 
@@ -474,7 +474,7 @@ void segas1x_bootleg_state::shinobi_datsu_sound_map(address_map &map)
 	map(0xf800, 0xffff).ram();
 }
 
-WRITE_LINE_MEMBER(segas1x_bootleg_state::datsu_msm5205_callback)
+void segas1x_bootleg_state::datsu_msm5205_callback(int state)
 {
 	if (!state)
 		return;
@@ -1209,7 +1209,7 @@ void segas1x_bootleg_state::shdancbl_msm5205_data_w(uint8_t data)
 	m_sample_buffer = data;
 }
 
-WRITE_LINE_MEMBER(segas1x_bootleg_state::shdancbl_msm5205_callback)
+void segas1x_bootleg_state::shdancbl_msm5205_callback(int state)
 {
 	m_msm->data_w(m_sample_buffer & 0x0f);
 
@@ -2084,7 +2084,7 @@ void segas1x_bootleg_state::z80_ym2151(machine_config &config)
 	YM2151(config, "ymsnd", 4000000).add_route(0, "lspeaker", 0.32).add_route(1, "rspeaker", 0.32);
 }
 
-WRITE_LINE_MEMBER(segas1x_bootleg_state::sound_cause_nmi)
+void segas1x_bootleg_state::sound_cause_nmi(int state)
 {
 	if (state)
 		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);

@@ -109,7 +109,7 @@ void xtide_device::write(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(xtide_device::ide_interrupt)
+void xtide_device::ide_interrupt(int state)
 {
 	switch (m_irq_number)
 	{

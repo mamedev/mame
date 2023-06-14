@@ -153,7 +153,7 @@ void fromance_state::fromance_adpcm_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(fromance_state::fromance_adpcm_int)
+void fromance_state::fromance_adpcm_int(int state)
 {
 	/* skip if we're reset */
 	if (!m_adpcm_reset)

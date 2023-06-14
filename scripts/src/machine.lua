@@ -4363,6 +4363,19 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/w83977tf.h,MACHINES["W83977TF"] = true
+---------------------------------------------------
+
+if (MACHINES["W83977TF"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/w83977tf.cpp",
+		MAME_DIR .. "src/devices/machine/w83977tf.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/machine/pdc.h,MACHINES["PDC"] = true
 ---------------------------------------------------
 
@@ -5212,5 +5225,17 @@ if (MACHINES["PCCARD_SRAM"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/pccard_sram.cpp",
 		MAME_DIR .. "src/devices/machine/pccard_sram.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/tc9223.h,MACHINES["TC9223"] = true
+---------------------------------------------------
+
+if (MACHINES["TC9223"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/tc9223.cpp",
+		MAME_DIR .. "src/devices/machine/tc9223.h",
 	}
 end

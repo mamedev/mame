@@ -41,10 +41,10 @@ public:
 	void write(uint8_t data);
 	void set_lines(line_state mline, line_state moline, line_state gsq);
 
-	DECLARE_WRITE_LINE_MEMBER(m_line);
-	DECLARE_WRITE_LINE_MEMBER(mo_line);
-	DECLARE_WRITE_LINE_MEMBER(gsq_line);
-	DECLARE_WRITE_LINE_MEMBER(gclock_in);
+	void m_line(int state);
+	void mo_line(int state);
+	void gsq_line(int state);
+	void gclock_in(int state);
 
 	void set_region_and_ident(const char *regionname, int offset, int ident)
 	{

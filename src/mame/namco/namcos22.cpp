@@ -24,8 +24,7 @@ TODO:
 - where is the steering wheel motor torque output for dirtdash? Answer: The data comes from the Serial Port on
   the MOTHER PCB at J2 Pin 7 /TXD
 - tokyowar garbage tile at right edge in attract mode. It's part of the cabinet link message, maybe BTANB?
-- ridgera2 title screen scrolls horizontally on some video footage, is it an undumped version? or an effect that only
-  happens on linked cabinets?
+- ridgera2 title screen scrolls horizontally on some video footage, C139 related?
 - texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures
 - improve vertex lighting (is it phong shading?)
 - global offset is wrong in non-super22 testmode video test
@@ -3210,7 +3209,7 @@ INPUT_PORTS_END
 /*********************************************************************************************/
 
 template <int N>
-READ_LINE_MEMBER(alpine_state::alpine_motor_r)
+int alpine_state::alpine_motor_r()
 {
 	return BIT(m_motor_status, N);
 }

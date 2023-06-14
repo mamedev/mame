@@ -150,10 +150,10 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<cpu_device> m_soundcpu;
 
-	DECLARE_WRITE_LINE_MEMBER(soundcpu_timera_irq);
-	DECLARE_WRITE_LINE_MEMBER(soundcpu_timerb_irq);
+	void soundcpu_timera_irq(int state);
+	void soundcpu_timerb_irq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(maincpu_timer_irq);
+	void maincpu_timer_irq(int state);
 
 	required_device<vrt_vt1682_timer_device> m_soundcpu_timer_a_dev;
 	required_device<vrt_vt1682_timer_device> m_soundcpu_timer_b_dev;
@@ -5326,7 +5326,7 @@ void vt_vt1682_state::vt1682_sound_reset_hack_w(offs_t offset, uint8_t data)
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(vt_vt1682_state::soundcpu_timera_irq)
+void vt_vt1682_state::soundcpu_timera_irq(int state)
 {
 	if (state && !m_scpu_is_in_reset)
 		m_soundcpu->set_input_line(0, ASSERT_LINE);
@@ -5334,7 +5334,7 @@ WRITE_LINE_MEMBER(vt_vt1682_state::soundcpu_timera_irq)
 		m_soundcpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(vt_vt1682_state::soundcpu_timerb_irq)
+void vt_vt1682_state::soundcpu_timerb_irq(int state)
 {
 // need to set proper vector (need IRQ priority manager function?)
 /*
@@ -5345,7 +5345,7 @@ WRITE_LINE_MEMBER(vt_vt1682_state::soundcpu_timerb_irq)
 */
 }
 
-WRITE_LINE_MEMBER(vt_vt1682_state::maincpu_timer_irq)
+void vt_vt1682_state::maincpu_timer_irq(int state)
 {
 	// need to set proper vector (need IRQ priority manager function?)
 

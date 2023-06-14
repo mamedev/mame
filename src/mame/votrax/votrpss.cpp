@@ -402,7 +402,7 @@ private:
 	void ppi_pb_w(uint8_t data);
 	void ppi_pc_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
-	DECLARE_WRITE_LINE_MEMBER(write_uart_clock);
+	void write_uart_clock(int state);
 	IRQ_CALLBACK_MEMBER(irq_ack);
 
 	void io_map(address_map &map);

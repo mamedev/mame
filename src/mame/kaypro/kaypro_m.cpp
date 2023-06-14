@@ -16,12 +16,12 @@
 
 ************************************************************/
 
-WRITE_LINE_MEMBER( kaypro_state::write_centronics_busy )
+void kaypro_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-u8 kaypro_state::pio_system_r()
+u8 kayproii_state::pio_system_r()
 {
 	u8 data = 0;
 
@@ -34,7 +34,7 @@ u8 kaypro_state::pio_system_r()
 	return data;
 }
 
-void kaypro_state::kayproii_pio_system_w(u8 data)
+void kayproii_state::kayproii_pio_system_w(u8 data)
 {
 /*  d7 bank select
     d6 disk drive motors - (0=on)
@@ -73,7 +73,7 @@ void kaypro_state::kayproii_pio_system_w(u8 data)
 	m_system_port = data;
 }
 
-void kaypro_state::kayproiv_pio_system_w(u8 data)
+void kayproii_state::kayproiv_pio_system_w(u8 data)
 {
 	kayproii_pio_system_w(data);
 
@@ -90,13 +90,13 @@ void kaypro_state::kayproiv_pio_system_w(u8 data)
 
 ************************************************************/
 
-u8 kaypro_state::kaypro484_system_port_r()
+u8 kaypro84_state::kaypro484_system_port_r()
 {
 	u8 data = m_centronics_busy << 6;
 	return (m_system_port & 0xbf) | data;
 }
 
-void kaypro_state::kaypro484_system_port_w(u8 data)
+void kaypro84_state::kaypro484_system_port_w(u8 data)
 {
 /*  d7 bank select
     d6 alternate character set (write only)
@@ -202,28 +202,28 @@ TIMER_DEVICE_CALLBACK_MEMBER(kaypro_state::floppy_timer)
 }
 
 
-WRITE_LINE_MEMBER( kaypro_state::fdc_intrq_w )
+void kaypro_state::fdc_intrq_w(int state)
 {
 	m_fdc_rq = (m_fdc_rq & 0x82) | state;
 }
 
-WRITE_LINE_MEMBER( kaypro_state::fdc_drq_w )
+void kaypro_state::fdc_drq_w(int state)
 {
 	m_fdc_rq = (m_fdc_rq & 0x81) | (state << 1);
 }
 
 
-void kaypro_state::rtc_address_w(u8 data)
+void kaypro84_state::rtc_address_w(u8 data)
 {
 	m_rtc_address = data & 0x1f;
 }
 
-u8 kaypro_state::rtc_r()
+u8 kaypro84_state::rtc_r()
 {
 	return m_rtc->read(m_rtc_address);
 }
 
-void kaypro_state::rtc_w(u8 data)
+void kaypro84_state::rtc_w(u8 data)
 {
 	m_rtc->write(m_rtc_address, data);
 }
@@ -236,27 +236,37 @@ void kaypro_state::rtc_w(u8 data)
 ************************************************************/
 void kaypro_state::machine_start()
 {
-	if (m_pio_s)
-		m_pio_s->strobe_a(0);
-
 	m_leds.resolve();
 
 	save_pointer(NAME(m_vram), 0x1000);
 	save_pointer(NAME(m_ram),  0x4000);
 
-	save_item(NAME(m_mc6845_reg));
-	save_item(NAME(m_mc6845_ind));
 	save_item(NAME(m_framecnt));
 	save_item(NAME(m_centronics_busy));
 	save_item(NAME(m_is_motor_off));
 	save_item(NAME(m_fdc_rq));
 	save_item(NAME(m_system_port));
+
+	m_framecnt = 0;
+}
+
+void kayproii_state::machine_start()
+{
+	kaypro_state::machine_start();
+
+	m_pio_s->strobe_a(0);
+}
+
+void kaypro84_state::machine_start()
+{
+	kaypro_state::machine_start();
+
+	save_item(NAME(m_mc6845_reg));
+	save_item(NAME(m_mc6845_ind));
 	save_item(NAME(m_mc6845_video_address));
 
 	if (m_rtc.found())
 		save_item(NAME(m_rtc_address));
-
-	m_framecnt = 0;
 }
 
 void kaypro_state::machine_reset()

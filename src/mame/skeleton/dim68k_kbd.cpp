@@ -68,7 +68,7 @@ void dim68k_keyboard_device::p2_w(u8 data)
 	m_numlock_led = !BIT(data, 6);
 }
 
-WRITE_LINE_MEMBER(dim68k_keyboard_device::prog_w)
+void dim68k_keyboard_device::prog_w(int state)
 {
 	if (state)
 	{

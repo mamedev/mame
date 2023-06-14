@@ -379,7 +379,7 @@ static void super6_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_QD);
 }
 
-WRITE_LINE_MEMBER( super6_state::fdc_intrq_w )
+void super6_state::fdc_intrq_w(int state)
 {
 	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 
@@ -387,7 +387,7 @@ WRITE_LINE_MEMBER( super6_state::fdc_intrq_w )
 	// m_maincpu->set_state_int(Z80_AF, 0x7f00);   // hack, see notes
 }
 
-WRITE_LINE_MEMBER( super6_state::fdc_drq_w )
+void super6_state::fdc_drq_w(int state)
 {
 	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 

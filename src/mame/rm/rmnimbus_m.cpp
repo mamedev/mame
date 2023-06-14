@@ -408,7 +408,7 @@ Z80SIO, used for the keyboard interface
 
 /* Z80 SIO/2 */
 
-WRITE_LINE_MEMBER(rmnimbus_state::sio_interrupt)
+void rmnimbus_state::sio_interrupt(int state)
 {
 	LOGMASKED(LOG_SIO, "SIO Interrupt state=%02X\n",state);
 
@@ -423,7 +423,7 @@ void rmnimbus_state::fdc_reset()
 	m_scsi_ctrl_out->write(0);
 }
 
-WRITE_LINE_MEMBER(rmnimbus_state::nimbus_fdc_intrq_w)
+void rmnimbus_state::nimbus_fdc_intrq_w(int state)
 {
 	LOGMASKED(LOG_DISK, "nimbus_drives_intrq = %d\n",state);
 
@@ -433,14 +433,14 @@ WRITE_LINE_MEMBER(rmnimbus_state::nimbus_fdc_intrq_w)
 	}
 }
 
-WRITE_LINE_MEMBER(rmnimbus_state::nimbus_fdc_drq_w)
+void rmnimbus_state::nimbus_fdc_drq_w(int state)
 {
 	LOGMASKED(LOG_DISK, "nimbus_drives_drq_w(%d)\n", state);
 
 	m_maincpu->drq1_w(state && FDC_DRQ_ENABLED());
 }
 
-READ_LINE_MEMBER(rmnimbus_state::nimbus_fdc_enmf_r)
+int rmnimbus_state::nimbus_fdc_enmf_r()
 {
 	return false;
 }
@@ -600,7 +600,7 @@ void rmnimbus_state::check_scsi_irq()
 	nimbus_fdc_intrq_w(m_scsi_io && m_scsi_cd && m_scsi_req && m_scsi_iena);
 }
 
-WRITE_LINE_MEMBER(rmnimbus_state::write_scsi_iena)
+void rmnimbus_state::write_scsi_iena(int state)
 {
 	m_scsi_iena = state;
 	check_scsi_irq();
@@ -634,12 +634,12 @@ void rmnimbus_state::hdc_drq(bool state)
 	m_maincpu->drq1_w(HDC_DRQ_ENABLED() && !m_scsi_cd && state);
 }
 
-WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_bsy )
+void rmnimbus_state::write_scsi_bsy(int state)
 {
 	m_scsi_bsy = state;
 }
 
-WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_cd )
+void rmnimbus_state::write_scsi_cd(int state)
 {
 	m_scsi_cd = state;
 
@@ -649,7 +649,7 @@ WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_cd )
 	check_scsi_irq();
 }
 
-WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_io )
+void rmnimbus_state::write_scsi_io(int state)
 {
 	m_scsi_io = state;
 
@@ -660,12 +660,12 @@ WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_io )
 	check_scsi_irq();
 }
 
-WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_msg )
+void rmnimbus_state::write_scsi_msg(int state)
 {
 	m_scsi_msg = !state;
 }
 
-WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_req )
+void rmnimbus_state::write_scsi_req(int state)
 {
 	// Detect rising edge on req, IC11b, clock
 	int rising = ((m_scsi_req == 0) && (state == 1));
@@ -964,7 +964,7 @@ void rmnimbus_state::nimbus_sound_ay8910_portb_w(uint8_t data)
 	m_ay8910_b=data;
 }
 
-WRITE_LINE_MEMBER(rmnimbus_state::nimbus_msm5205_vck)
+void rmnimbus_state::nimbus_msm5205_vck(int state)
 {
 	if(m_iou_reg092 & MSM5205_INT_ENABLE)
 		external_int(EXTERNAL_INT_MSM5205,state);

@@ -783,7 +783,7 @@ void i82730_device::attention()
 	m_ca_latch = false;
 }
 
-WRITE_LINE_MEMBER( i82730_device::ca_w )
+void i82730_device::ca_w(int state)
 {
 	// falling edge
 	if (m_ca == 1 && state == 0)
@@ -830,7 +830,7 @@ WRITE_LINE_MEMBER( i82730_device::ca_w )
 	}
 }
 
-WRITE_LINE_MEMBER( i82730_device::irst_w )
+void i82730_device::irst_w(int state)
 {
 	m_sint_handler(0);
 }

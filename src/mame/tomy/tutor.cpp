@@ -237,7 +237,7 @@ private:
 	uint8_t tutor_highmem_r(offs_t offset);
 	TIMER_CALLBACK_MEMBER(tape_interrupt_handler);
 
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	void write_centronics_busy(int state);
 	[[maybe_unused]] void test_w(offs_t offset, uint8_t data);
 
 	void pyuutajr_mem(address_map &map);
@@ -469,7 +469,7 @@ void tutor_state::tutor_cassette_w(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER( tutor_state::write_centronics_busy )
+void tutor_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }

@@ -59,7 +59,7 @@ public:
 
 	void quickpick5(machine_config &config);
 	void waijockey(machine_config &config);
-	DECLARE_READ_LINE_MEMBER(serial_io_r);
+	int serial_io_r();
 
 private:
 	u32 screen_update_quickpick5(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -69,8 +69,8 @@ private:
 	void ccu_int_time_w(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
-	WRITE_LINE_MEMBER(vbl_ack_w) { m_maincpu->set_input_line(0, CLEAR_LINE); }
-	WRITE_LINE_MEMBER(nmi_ack_w) { m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); }
+	void vbl_ack_w(int state) { m_maincpu->set_input_line(0, CLEAR_LINE); }
+	void nmi_ack_w(int state) { m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); }
 
 	// A0 is inverted to match the Z80's endianness.  Typical Konami.
 	u8 k244_r(offs_t offset) { return m_k053245->k053244_r(offset^1);  }
@@ -158,7 +158,7 @@ void quickpick5_state::serial_io_w(u8 data)
 	m_sio_prev = data;
 }
 
-READ_LINE_MEMBER(quickpick5_state::serial_io_r)
+int quickpick5_state::serial_io_r()
 {
 	return BIT(m_sio_out, 0);
 }

@@ -19,7 +19,7 @@ public:
 
 	uint8_t serin_r();
 	void serout_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( pia_cb2_w );
+	void pia_cb2_w(int state);
 	void atari_load_proc(device_image_interface &image, bool is_created);
 
 protected:

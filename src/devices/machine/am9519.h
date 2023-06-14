@@ -42,14 +42,14 @@ public:
 	void data_w(u8 data);
 	u32 acknowledge();
 
-	DECLARE_WRITE_LINE_MEMBER( ireq0_w ) { set_irq_line(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( ireq1_w ) { set_irq_line(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( ireq2_w ) { set_irq_line(2, state); }
-	DECLARE_WRITE_LINE_MEMBER( ireq3_w ) { set_irq_line(3, state); }
-	DECLARE_WRITE_LINE_MEMBER( ireq4_w ) { set_irq_line(4, state); }
-	DECLARE_WRITE_LINE_MEMBER( ireq5_w ) { set_irq_line(5, state); }
-	DECLARE_WRITE_LINE_MEMBER( ireq6_w ) { set_irq_line(6, state); }
-	DECLARE_WRITE_LINE_MEMBER( ireq7_w ) { set_irq_line(7, state); }
+	void ireq0_w(int state) { set_irq_line(0, state); }
+	void ireq1_w(int state) { set_irq_line(1, state); }
+	void ireq2_w(int state) { set_irq_line(2, state); }
+	void ireq3_w(int state) { set_irq_line(3, state); }
+	void ireq4_w(int state) { set_irq_line(4, state); }
+	void ireq5_w(int state) { set_irq_line(5, state); }
+	void ireq6_w(int state) { set_irq_line(6, state); }
+	void ireq7_w(int state) { set_irq_line(7, state); }
 
 	IRQ_CALLBACK_MEMBER(iack_cb);
 

@@ -48,8 +48,8 @@ private:
 	void mem_map(address_map &map);
 
 	u8 p2_r();
-	WRITE_LINE_MEMBER(midi_rx_r) { m_rx_data = state; }
-	WRITE_LINE_MEMBER(midiclock_w) { if (state) m_maincpu->m6801_clock_serial(); }
+	void midi_rx_r(int state) { m_rx_data = state; }
+	void midiclock_w(int state) { if (state) m_maincpu->m6801_clock_serial(); }
 
 	required_device<hd6303x_cpu_device> m_maincpu;
 	required_ioport m_port2;

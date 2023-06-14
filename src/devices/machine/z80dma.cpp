@@ -859,7 +859,7 @@ TIMER_CALLBACK_MEMBER(z80dma_device::rdy_write_callback)
 //  rdy_w - ready input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(z80dma_device::rdy_w)
+void z80dma_device::rdy_w(int state)
 {
 	LOG("Z80DMA RDY: %d Active High: %d\n", state, READY_ACTIVE_HIGH);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(z80dma_device::rdy_write_callback),this), state);
@@ -870,7 +870,7 @@ WRITE_LINE_MEMBER(z80dma_device::rdy_w)
 //  wait_w - wait input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(z80dma_device::wait_w)
+void z80dma_device::wait_w(int state)
 {
 }
 
@@ -879,6 +879,6 @@ WRITE_LINE_MEMBER(z80dma_device::wait_w)
 //  bai_w - bus acknowledge input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(z80dma_device::bai_w)
+void z80dma_device::bai_w(int state)
 {
 }

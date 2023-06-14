@@ -258,7 +258,7 @@ void isa8_hpblp_device::update_gpib_irq()
 		m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(isa8_hpblp_device::gpib_irq)
+void isa8_hpblp_device::gpib_irq(int state)
 {
 	if (state) {
 		m_gpib_reg1 |= 0x40;
@@ -276,7 +276,7 @@ void isa8_hpblp_device::m68map(address_map &map)
 	map(0xc00000, 0xffffff).ram();
 }
 
-WRITE_LINE_MEMBER(isa8_hpblp_device::hpblp_interrupt)
+void isa8_hpblp_device::hpblp_interrupt(int state)
 {
 	switch(m_irq) {
 	case 0:

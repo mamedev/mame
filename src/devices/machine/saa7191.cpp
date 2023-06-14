@@ -120,13 +120,13 @@ uint8_t saa7191_device::i2c_data_r()
 	return 0;
 }
 
-WRITE_LINE_MEMBER(saa7191_device::i2c_stop_w)
+void saa7191_device::i2c_stop_w(int state)
 {
 	if (state)
 		m_i2c_state = I2C_STATE_IDLE;
 }
 
-WRITE_LINE_MEMBER(saa7191_device::iicsa_w)
+void saa7191_device::iicsa_w(int state)
 {
 	m_i2c_write_addr = state ? 0x8e : 0x8a;
 	m_i2c_read_addr = m_i2c_write_addr | 1;

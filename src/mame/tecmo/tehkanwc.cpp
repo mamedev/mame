@@ -173,7 +173,7 @@ private:
 	void portA_w(uint8_t data);
 	void portB_w(uint8_t data);
 	void msm_reset_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void adpcm_int(int state);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -408,7 +408,7 @@ void tehkanwc_state::msm_reset_w(uint8_t data)
 	m_msm->reset_w(data ? 0 : 1);
 }
 
-WRITE_LINE_MEMBER(tehkanwc_state::adpcm_int)
+void tehkanwc_state::adpcm_int(int state)
 {
 	uint8_t msm_data = m_adpcm_rom[m_msm_data_offs & 0x7fff];
 

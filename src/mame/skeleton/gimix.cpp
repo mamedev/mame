@@ -92,8 +92,8 @@ public:
 
 private:
 	void system_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	void fdc_irq_w(int state);
+	void fdc_drq_w(int state);
 	uint8_t dma_r(offs_t offset);
 	void dma_w(offs_t offset, uint8_t data);
 	uint8_t fdc_r(offs_t offset);
@@ -384,7 +384,7 @@ void gimix_state::pia_pb_w(uint8_t data)
 }
 
 
-WRITE_LINE_MEMBER(gimix_state::fdc_irq_w)
+void gimix_state::fdc_irq_w(int state)
 {
 	if(state)
 		m_dma_status |= 0x40;
@@ -397,7 +397,7 @@ WRITE_LINE_MEMBER(gimix_state::fdc_irq_w)
 		m_irqs->in_w<6>(0);
 }
 
-WRITE_LINE_MEMBER(gimix_state::fdc_drq_w)
+void gimix_state::fdc_drq_w(int state)
 {
 	if(state && DMA_ENABLED)
 	{

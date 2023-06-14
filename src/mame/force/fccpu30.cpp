@@ -283,7 +283,7 @@ private:
 
 	/* Interrupt  support */
 	void cpu_space_map(address_map &map);
-	DECLARE_WRITE_LINE_MEMBER(fga_irq_callback);
+	void fga_irq_callback(int state);
 	uint8_t fga_irq_state = 0;
 	//  int fga_irq_vector = 0;
 	int fga_irq_level = 0;
@@ -623,7 +623,7 @@ void cpu30_state::vme_a16_w(uint16_t data){
 }
 #endif
 
-WRITE_LINE_MEMBER(cpu30_state::fga_irq_callback)
+void cpu30_state::fga_irq_callback(int state)
 {
 	LOGINT("%s(%02x)\n", FUNCNAME, state);
 

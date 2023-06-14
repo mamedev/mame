@@ -137,18 +137,18 @@ public:
 	void floppy_drive_set_controller(device_t *controller);
 	int floppy_get_drive_type();
 	void floppy_set_type(int ftype);
-	WRITE_LINE_MEMBER( floppy_ds_w );
-	WRITE_LINE_MEMBER( floppy_mon_w );
-	WRITE_LINE_MEMBER( floppy_drtn_w );
-	WRITE_LINE_MEMBER( floppy_wtd_w );
-	WRITE_LINE_MEMBER( floppy_stp_w );
-	WRITE_LINE_MEMBER( floppy_wtg_w );
-	READ_LINE_MEMBER( floppy_wpt_r );
-	READ_LINE_MEMBER( floppy_tk00_r );
-	READ_LINE_MEMBER( floppy_dskchg_r );
-	READ_LINE_MEMBER( floppy_twosid_r );
-	READ_LINE_MEMBER( floppy_index_r );
-	READ_LINE_MEMBER( floppy_ready_r );
+	void floppy_ds_w(int state);
+	void floppy_mon_w(int state);
+	void floppy_drtn_w(int state);
+	void floppy_wtd_w(int state);
+	void floppy_stp_w(int state);
+	void floppy_wtg_w(int state);
+	int floppy_wpt_r();
+	int floppy_tk00_r();
+	int floppy_dskchg_r();
+	int floppy_twosid_r();
+	int floppy_index_r();
+	int floppy_ready_r();
 
 
 private:

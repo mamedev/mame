@@ -1650,7 +1650,7 @@ uint8_t z80scc_channel::do_sccreg_rr14()
 {
 	LOGR("%s\n", FUNCNAME);
 	if (m_uart->m_variant & (z80scc_device::SET_ESCC | z80scc_device::TYPE_SCC85C30))
-		return BIT(m_wr7, 6) ? m_wr7 : m_rr10;
+		return BIT(m_wr7p, 6) ? m_wr7p : m_rr10;
 	else
 		return m_rr10;
 }
@@ -1799,24 +1799,17 @@ void z80scc_channel::do_sccreg_wr0(uint8_t data)
 		   priority conditions to request interrupts. This command allows the use of the internal
 		   daisy chain (even in systems without an external daisy chain) and is the last operation in
 		   an interrupt service routine. */
-		if (m_uart->m_variant & z80scc_device::SET_NMOS)
+		LOGCMD("Reset Highest IUS\n");
+		// loop over all interrupt sources
+		for (auto & elem : m_uart->m_int_state)
 		{
-			logerror("WR0_RESET_HIGHEST_IUS command not supported on NMOS\n");
-		}
-		else
-		{
-			LOGCMD("Reset Highest IUS\n");
-			// loop over all interrupt sources
-			for (auto & elem : m_uart->m_int_state)
+			// find the first interrupt under service
+			if (elem & Z80_DAISY_IEO)
 			{
-				// find the first interrupt under service
-				if (elem & Z80_DAISY_IEO)
-				{
-					LOGCMD("- found IUS bit to clear\n");
-					elem = 0; // Clear IUS bit (called IEO in z80 daisy lingo)
-					m_uart->check_interrupts();
-					break;
-				}
+				LOGCMD("- found IUS bit to clear\n");
+				elem = 0; // Clear IUS bit (called IEO in z80 daisy lingo)
+				m_uart->check_interrupts();
+				break;
 			}
 		}
 		break;
@@ -2014,7 +2007,10 @@ void z80scc_channel::do_sccreg_wr6(uint8_t data)
 void z80scc_channel::do_sccreg_wr7(uint8_t data)
 {
 	LOG("%s(%02x): Receive sync\n", FUNCNAME, data);
-	m_sync_pattern = (data << 8) | (m_sync_pattern & 0xff);
+	if ((m_uart->m_variant & (z80scc_device::SET_ESCC | z80scc_device::TYPE_SCC85C30)) && BIT(m_wr15, 0))
+		m_wr7p = data;
+	else
+		m_sync_pattern = (data << 8) | (m_sync_pattern & 0xff);
 }
 
 /* WR8 is the transmit buffer register */

@@ -33,9 +33,9 @@ protected:
 	void addrmap_mem(address_map &map) { map.unmap_value_high(); }
 	void addrmap_io(address_map &map) { map.unmap_value_high(); }
 
-	DECLARE_WRITE_LINE_MEMBER( clk_w ) { m_bus->clk_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( tx_w ) { m_bus->tx_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( tx2_w ) { m_bus->tx2_w(state); }
+	void clk_w(int state) { m_bus->clk_w(state); }
+	void tx_w(int state) { m_bus->tx_w(state); }
+	void tx2_w(int state) { m_bus->tx2_w(state); }
 
 	// object finders
 	required_device<z180_device> m_maincpu;

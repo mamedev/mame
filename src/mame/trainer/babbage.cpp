@@ -56,9 +56,9 @@ private:
 	uint8_t pio2_a_r();
 	void pio1_b_w(uint8_t data);
 	void pio2_b_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
+	void ctc_z0_w(int state);
+	void ctc_z1_w(int state);
+	void ctc_z2_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 
 	void babbage_io(address_map &map);
@@ -141,15 +141,15 @@ INPUT_PORTS_END
 
 /* Z80-CTC Interface */
 
-WRITE_LINE_MEMBER( babbage_state::ctc_z0_w )
+void babbage_state::ctc_z0_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( babbage_state::ctc_z1_w )
+void babbage_state::ctc_z1_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( babbage_state::ctc_z2_w )
+void babbage_state::ctc_z2_w(int state)
 {
 }
 

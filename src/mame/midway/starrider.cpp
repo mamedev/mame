@@ -310,7 +310,7 @@ private:
 	void cpu_wd_w(u8 data);
 	u8 cpu_nvram_r(address_space &space, offs_t offset);
 	void cpu_nvram_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(cpu_pia2_ca2_w);
+	void cpu_pia2_ca2_w(int state);
 
 	static constexpr u16 vgg_drams_map(u16 v, u16 h, u16 p);
 	u16 vgg_drams_map(u16 a) const;
@@ -340,10 +340,10 @@ private:
 	void sound_er2_w(u8 data);
 
 	void sound_pia2_pa(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(sound_fifo0_ir);
-	DECLARE_WRITE_LINE_MEMBER(sound_fifo1_ir);
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(sound_fifo_or);
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(sound_fifo_flag);
+	void sound_fifo0_ir(int state);
+	void sound_fifo1_ir(int state);
+	template <unsigned N> void sound_fifo_or(int state);
+	template <unsigned N> void sound_fifo_flag(int state);
 
 	void main_memory(address_map &map);
 	void main_banks(address_map &map);
@@ -586,7 +586,7 @@ void sr_state::cpu_nvram_w(offs_t offset, u8 data)
 		m_main_nvram[offset] = data & 0x0f;
 }
 
-WRITE_LINE_MEMBER(sr_state::cpu_pia2_ca2_w)
+void sr_state::cpu_pia2_ca2_w(int state)
 {
 	m_sound_cpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 	for (auto const &fifo : m_sound_fifos)
@@ -762,7 +762,7 @@ void sr_state::sound_pia2_pa(u8 data)
 	}
 }
 
-DECLARE_WRITE_LINE_MEMBER(sr_state::sound_fifo0_ir)
+void sr_state::sound_fifo0_ir(int state)
 {
 	if (state)
 		m_sound_pia2_pb_in |= 0x08U;
@@ -771,7 +771,7 @@ DECLARE_WRITE_LINE_MEMBER(sr_state::sound_fifo0_ir)
 	m_sound_pia2->portb_w(m_sound_pia2_pb_in | (m_sound_pia2_pa_out & 0x77U));
 }
 
-DECLARE_WRITE_LINE_MEMBER(sr_state::sound_fifo1_ir)
+void sr_state::sound_fifo1_ir(int state)
 {
 	if (state)
 		m_sound_pia2_pb_in |= 0x80U;
@@ -780,7 +780,7 @@ DECLARE_WRITE_LINE_MEMBER(sr_state::sound_fifo1_ir)
 	m_sound_pia2->portb_w(m_sound_pia2_pb_in | (m_sound_pia2_pa_out & 0x77U));
 }
 
-template <unsigned N> WRITE_LINE_MEMBER(sr_state::sound_fifo_or)
+template <unsigned N> void sr_state::sound_fifo_or(int state)
 {
 	if (state)
 		m_sound_pia2_pb_in |= u8(1) << (N + 4);
@@ -793,7 +793,7 @@ template <unsigned N> WRITE_LINE_MEMBER(sr_state::sound_fifo_or)
 	}
 }
 
-template <unsigned N> WRITE_LINE_MEMBER(sr_state::sound_fifo_flag)
+template <unsigned N> void sr_state::sound_fifo_flag(int state)
 {
 	if (state)
 		m_sound_pia2_pb_in |= u8(1) << N;

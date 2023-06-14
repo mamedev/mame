@@ -110,25 +110,25 @@ class z180_device : public cpu_device, public z80_daisy_chain_interface
 public:
 	auto tend0_wr_callback() { return m_tend0_cb.bind(); }
 	auto tend1_wr_callback() { return m_tend1_cb.bind(); }
-	auto txa0_wr_callback() { return subdevice<z180asci_channel_base>("asci_0")->txa_handler(); }
-	auto txa1_wr_callback() { return subdevice<z180asci_channel_base>("asci_1")->txa_handler(); }
-	auto rts0_wr_callback() { return subdevice<z180asci_channel_base>("asci_0")->rts_handler(); }
-	auto cka0_wr_callback() { return subdevice<z180asci_channel_base>("asci_0")->cka_handler(); }
-	auto cka1_wr_callback() { return subdevice<z180asci_channel_base>("asci_1")->cka_handler(); }
-	auto cks_wr_callback() { return subdevice<z180csio_device>("csio")->cks_handler(); }
-	auto txs_wr_callback() { return subdevice<z180csio_device>("csio")->txs_handler(); }
+	auto txa0_wr_callback() { return m_asci[0].lookup()->txa_handler(); }
+	auto txa1_wr_callback() { return m_asci[1].lookup()->txa_handler(); }
+	auto rts0_wr_callback() { return m_asci[0].lookup()->rts_handler(); }
+	auto cka0_wr_callback() { return m_asci[0].lookup()->cka_handler(); }
+	auto cka1_wr_callback() { return m_asci[1].lookup()->cka_handler(); }
+	auto cks_wr_callback() { return m_csio.lookup()->cks_handler(); }
+	auto txs_wr_callback() { return m_csio.lookup()->txs_handler(); }
 
 	bool get_tend0();
 	bool get_tend1();
 
-	DECLARE_WRITE_LINE_MEMBER( rxa0_w )     { m_asci[0]->rxa_wr(state); }
-	DECLARE_WRITE_LINE_MEMBER( rxa1_w )     { m_asci[1]->rxa_wr(state); }
-	DECLARE_WRITE_LINE_MEMBER( cts0_w )     { m_asci[0]->cts_wr(state); }
-	DECLARE_WRITE_LINE_MEMBER( rxs_cts1_w ) { m_asci[1]->cts_wr(state); m_csio->rxs_wr(state); }
-	DECLARE_WRITE_LINE_MEMBER( dcd0_w )     { m_asci[0]->dcd_wr(state); }
-	DECLARE_WRITE_LINE_MEMBER( cka0_w )     { m_asci[0]->cka_wr(state); }
-	DECLARE_WRITE_LINE_MEMBER( cka1_w )     { m_asci[1]->cka_wr(state); }
-	DECLARE_WRITE_LINE_MEMBER( cks_w )      { m_csio->cks_wr(state); }
+	void rxa0_w(int state)     { m_asci[0]->rxa_wr(state); }
+	void rxa1_w(int state)     { m_asci[1]->rxa_wr(state); }
+	void cts0_w(int state)     { m_asci[0]->cts_wr(state); }
+	void rxs_cts1_w(int state) { m_asci[1]->cts_wr(state); m_csio->rxs_wr(state); }
+	void dcd0_w(int state)     { m_asci[0]->dcd_wr(state); }
+	void cka0_w(int state)     { m_asci[0]->cka_wr(state); }
+	void cka1_w(int state)     { m_asci[1]->cka_wr(state); }
+	void cks_w(int state)      { m_csio->cks_wr(state); }
 
 protected:
 	// construction/destruction

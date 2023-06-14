@@ -492,7 +492,7 @@ void megasys1_state::megasys1D_oki_map(address_map &map)
 */
 
 /* YM2151 IRQ */
-WRITE_LINE_MEMBER(megasys1_state::sound_irq)
+void megasys1_state::sound_irq(int state)
 {
 	if (state)
 		m_audiocpu->set_input_line(4, HOLD_LINE);

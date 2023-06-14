@@ -63,7 +63,7 @@ void spectrum_plus2test_device::device_start()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ_LINE_MEMBER(spectrum_plus2test_device::romcs)
+int spectrum_plus2test_device::romcs()
 {
 	return 1;
 }

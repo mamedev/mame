@@ -129,16 +129,16 @@ void avalnche_state::acatch_sound(machine_config &config)
   Catch memory audio output handlers
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(avalnche_state::catch_aud0_w)
+void avalnche_state::catch_aud0_w(int state)
 {
 	/* Different from avalnche, it plays a sound (offset 0/1/2) on data bit 0 rising edge.
 	There's no indication that the game silences sound, it's probably done automatically. */
 }
 
-WRITE_LINE_MEMBER(avalnche_state::catch_aud1_w)
+void avalnche_state::catch_aud1_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER(avalnche_state::catch_aud2_w)
+void avalnche_state::catch_aud2_w(int state)
 {
 }

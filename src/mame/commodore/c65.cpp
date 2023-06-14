@@ -88,7 +88,7 @@ public:
 	void cia0_porta_w(uint8_t data);
 	uint8_t cia0_portb_r();
 	void cia0_portb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(cia0_irq);
+	void cia0_irq(int state);
 
 	uint8_t dummy_r();
 
@@ -668,7 +668,7 @@ INTERRUPT_GEN_MEMBER(c65_state::vic3_vblank_irq)
 	//  m_maincpu->set_input_line(M4510_IRQ_LINE,HOLD_LINE);
 }
 
-WRITE_LINE_MEMBER(c65_state::cia0_irq)
+void c65_state::cia0_irq(int state)
 {
 	printf("%d IRQ\n",state);
 

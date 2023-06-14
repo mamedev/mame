@@ -255,7 +255,7 @@ void vme_mvme120_device::rom_shadow_tap(offs_t address, u16 data, u16 mem_mask)
 	}
 }
 
-WRITE_LINE_MEMBER(vme_mvme120_device::watchdog_reset)
+void vme_mvme120_device::watchdog_reset(int state)
 {
 	if(state)
 	{
@@ -264,7 +264,7 @@ WRITE_LINE_MEMBER(vme_mvme120_device::watchdog_reset)
 	}
 }
 
-WRITE_LINE_MEMBER(vme_mvme120_device::mfp_interrupt)
+void vme_mvme120_device::mfp_interrupt(int state)
 {
 	LOG("%s: MFP asserting interrupt\n", FUNCNAME);
 

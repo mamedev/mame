@@ -43,7 +43,7 @@ void znmcu_device::device_start()
 	memset(m_send, 0, sizeof(m_send));
 }
 
-WRITE_LINE_MEMBER(znmcu_device::write_select)
+void znmcu_device::write_select(int state)
 {
 	if (m_select != state)
 	{
@@ -64,7 +64,7 @@ WRITE_LINE_MEMBER(znmcu_device::write_select)
 	}
 }
 
-WRITE_LINE_MEMBER(znmcu_device::write_clock)
+void znmcu_device::write_clock(int state)
 {
 	if (m_clk != state)
 	{

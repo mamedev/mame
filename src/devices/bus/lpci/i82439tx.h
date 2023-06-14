@@ -29,7 +29,7 @@ public:
 	virtual uint32_t pci_read(pci_bus_device *pcibus, int function, int offset, uint32_t mem_mask) override;
 	virtual void pci_write(pci_bus_device *pcibus, int function, int offset, uint32_t data, uint32_t mem_mask) override;
 
-	DECLARE_WRITE_LINE_MEMBER(smi_act_w);
+	void smi_act_w(int state);
 
 protected:
 	// device-level overrides

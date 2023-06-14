@@ -39,10 +39,10 @@ public:
 	// configuration helpers
 	auto write_segs() { return m_write_segs.bind(); } // S pins, COM1/COM2 in offset
 
-	DECLARE_WRITE_LINE_MEMBER(data_w) { m_data = (state) ? 1 : 0; }
-	DECLARE_WRITE_LINE_MEMBER(clk_w);
-	DECLARE_WRITE_LINE_MEMBER(ce_w);
-	DECLARE_WRITE_LINE_MEMBER(inh_w) { m_blank = bool(state); refresh_output(); }
+	void data_w(int state) { m_data = (state) ? 1 : 0; }
+	void clk_w(int state);
+	void ce_w(int state);
+	void inh_w(int state) { m_blank = bool(state); refresh_output(); }
 
 protected:
 	// device-level overrides

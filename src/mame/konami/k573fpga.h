@@ -16,13 +16,13 @@ class k573fpga_device : public device_t
 public:
 	k573fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	template <typename... T> void add_route(T &&... args) { subdevice<mas3507d_device>("mpeg")->add_route(std::forward<T>(args)...); }
+	template <typename... T> void add_route(T &&... args) { mas3507d.lookup()->add_route(std::forward<T>(args)...); }
 	template <typename T> void set_ram(T &&tag) { ram.set_tag(std::forward<T>(tag)); }
 
 	void set_ddrsbm_fpga(bool flag) { is_ddrsbm_fpga = flag; }
 
-	DECLARE_WRITE_LINE_MEMBER(mpeg_frame_sync);
-	DECLARE_WRITE_LINE_MEMBER(mas3507d_demand);
+	void mpeg_frame_sync(int state);
+	void mas3507d_demand(int state);
 
 	void set_crypto_key1(uint16_t v);
 	void set_crypto_key2(uint16_t v);

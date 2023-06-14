@@ -128,12 +128,12 @@ void bbc_scsiaiv_device::write(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(bbc_scsiaiv_device::bsy_w)
+void bbc_scsiaiv_device::bsy_w(int state)
 {
 	m_scsi->sel_w(0);
 }
 
-WRITE_LINE_MEMBER(bbc_scsiaiv_device::req_w)
+void bbc_scsiaiv_device::req_w(int state)
 {
 	m_scsi->ack_w(0);
 

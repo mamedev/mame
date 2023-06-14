@@ -57,10 +57,10 @@ public:
 	void keylatch_w(uint8_t data);
 	uint8_t dispon_r();
 	void dispoff_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( clear_r );
-	DECLARE_READ_LINE_MEMBER( ef2_r );
-	DECLARE_READ_LINE_MEMBER( ef3_r );
-	DECLARE_WRITE_LINE_MEMBER( q_w );
+	int clear_r();
+	int ef2_r();
+	int ef3_r();
+	void q_w(int state);
 
 	void tmc1800(machine_config &config);
 	void tmc1800_video(machine_config &config);
@@ -87,10 +87,10 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void keylatch_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( clear_r );
-	DECLARE_READ_LINE_MEMBER( ef2_r );
-	DECLARE_READ_LINE_MEMBER( ef3_r );
-	DECLARE_WRITE_LINE_MEMBER( q_w );
+	int clear_r();
+	int ef2_r();
+	int ef3_r();
+	void q_w(int state);
 
 	void osc1000b(machine_config &config);
 	void osc1000b_video(machine_config &config);
@@ -118,14 +118,14 @@ public:
 
 	void keylatch_w(uint8_t data);
 	void bankswitch_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( clear_r );
-	DECLARE_READ_LINE_MEMBER( ef2_r );
-	DECLARE_READ_LINE_MEMBER( ef3_r );
-	DECLARE_WRITE_LINE_MEMBER( q_w );
+	int clear_r();
+	int ef2_r();
+	int ef3_r();
+	void q_w(int state);
 	void dma_w(offs_t offset, uint8_t data);
-	DECLARE_READ_LINE_MEMBER( rdata_r );
-	DECLARE_READ_LINE_MEMBER( bdata_r );
-	DECLARE_READ_LINE_MEMBER( gdata_r );
+	int rdata_r();
+	int bdata_r();
+	int gdata_r();
 	DECLARE_INPUT_CHANGED_MEMBER( run_pressed );
 
 	void bankswitch();
@@ -169,10 +169,10 @@ public:
 
 	void keylatch_w(uint8_t data);
 	void bankswitch_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( clear_r );
-	DECLARE_READ_LINE_MEMBER( ef2_r );
-	DECLARE_READ_LINE_MEMBER( ef3_r );
-	DECLARE_WRITE_LINE_MEMBER( q_w );
+	int clear_r();
+	int ef2_r();
+	int ef3_r();
+	void q_w(int state);
 	DECLARE_INPUT_CHANGED_MEMBER( run_pressed );
 	DECLARE_INPUT_CHANGED_MEMBER( monitor_pressed );
 

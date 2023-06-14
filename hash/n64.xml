@@ -3227,7 +3227,7 @@ Requires [16KB EEPROM]
 		<year>200?</year>
 		<publisher>Marigul</publisher>
 		<notes><![CDATA[
-Loops on retry message when failing to read backup data after pressing start. 
+Loops on retry message when failing to read backup data after pressing start.
 Note: to work on N64 flash carts this proto needs save memory set to [Flash RAM].
 ]]></notes>
 		<part name="cart" interface="n64_cart">
@@ -4964,7 +4964,7 @@ Doesn't recognize start button pressed on title screen
 		</part>
 	</software>
 
-	<!-- 
+	<!--
 
 	-->
 	<software name="heypika" supported="no">

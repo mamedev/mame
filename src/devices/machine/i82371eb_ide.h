@@ -8,7 +8,7 @@
 
 #include "machine/i82371sb.h"
 
-class i82371eb_ide_device : public i82371sb_ide_device 
+class i82371eb_ide_device : public i82371sb_ide_device
 {
 public:
 	template <typename T>

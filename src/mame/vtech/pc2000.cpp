@@ -7,8 +7,6 @@
         04/12/2009 Skeleton driver.
 
         TODO:
-        - fix MisterX LCD
-        - MisterX bankswitch
         - dump the chargen
         - change PC2000 to use a SED1278F-0B instead of an HD44780 (different charset)
 
@@ -151,31 +149,6 @@ public:
 protected:
 	virtual void machine_start() override;
 	HD44780_PIXEL_UPDATE(gl4000_pixel_update);
-};
-
-class pc1000_state : public pc2000_state
-{
-public:
-	pc1000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pc2000_state(mconfig, type, tag)
-	{ }
-
-	void misterx(machine_config &config);
-	void pc1000(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	uint8_t kb_r(offs_t offset);
-	uint8_t lcdc_data_r();
-	void lcdc_data_w(uint8_t data);
-	uint8_t lcdc_control_r();
-	void lcdc_control_w(uint8_t data);
-	HD44780_PIXEL_UPDATE(pc1000_pixel_update);
-
-	void pc1000_mem(address_map &map);
-	void pc1000_io(address_map &map);
 };
 
 
@@ -376,77 +349,6 @@ void gl3000s_state::gl3000s_io(address_map &map)
 	map(0x10, 0x11).rw(FUNC(gl3000s_state::key_matrix_r), FUNC(gl3000s_state::key_matrix_w));
 }
 
-uint8_t pc1000_state::kb_r(offs_t offset)
-{
-	static const char *const bitnames[9] =
-	{
-		"IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7", "IN8"
-	};
-
-	uint8_t data = 0xff;
-
-	for (int line=0; line<9; line++)
-		if (!(offset & (1<<line)))
-			data &= ioport(bitnames[line])->read();
-
-	return data;
-}
-
-uint8_t pc1000_state::lcdc_data_r()
-{
-	//logerror("lcdc data r\n");
-	return m_lcdc->data_r() >> 4;
-}
-
-void pc1000_state::lcdc_data_w(uint8_t data)
-{
-	//popmessage("%s", (char*)m_maincpu->space(AS_PROGRAM).get_read_ptr(0x4290));
-
-	//logerror("lcdc data w %x\n", data);
-	m_lcdc->data_w(data << 4);
-}
-
-uint8_t pc1000_state::lcdc_control_r()
-{
-	//logerror("lcdc control r\n");
-	return m_lcdc->control_r() >> 4;
-}
-
-void pc1000_state::lcdc_control_w(uint8_t data)
-{
-	//logerror("lcdc control w %x\n", data);
-	m_lcdc->control_w(data<<4);
-}
-
-HD44780_PIXEL_UPDATE(pc1000_state::pc1000_pixel_update)
-{
-	constexpr static uint8_t layout[] = { 0x00, 0x4f, 0x4e, 0x4d, 0x4c, 0x4b, 0x4a, 0x49, 0x48, 0x47, 0x40, 0x3f, 0x3e, 0x3d, 0x3c, 0x3b, 0x3a, 0x39, 0x38, 0x37 };
-	//constexpr static uint8_t layout[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49 };
-
-	for (int i=0; i<20; i++)
-		if (pos == layout[i])
-		{
-			bitmap.pix((line * 9) + y, (i * 6) + x) = state;
-			break;
-		}
-}
-
-void pc1000_state::pc1000_mem(address_map &map)
-{
-	map.unmap_value_high();
-	map(0x0000, 0x3fff).rom().region("bios", 0x00000);
-	map(0x4000, 0x47ff).ram();
-	map(0x8000, 0xbfff).r(m_cart, FUNC(generic_slot_device::read_rom));    //0x8000 - 0xbfff tests a cartridge, header is 0x55 0xaa 0x33, if it succeeds a jump at 0x8010 occurs
-	map(0xc000, 0xffff).bankr("bank1");
-}
-
-void pc1000_state::pc1000_io(address_map &map)
-{
-	map(0x0000, 0x01ff).r(FUNC(pc1000_state::kb_r));
-	map(0x4000, 0x4000).mirror(0xfe).rw(FUNC(pc1000_state::lcdc_control_r), FUNC(pc1000_state::lcdc_control_w));
-	map(0x4100, 0x4100).mirror(0xfe).rw(FUNC(pc1000_state::lcdc_data_r), FUNC(pc1000_state::lcdc_data_w));
-}
-
 /* Input ports */
 static INPUT_PORTS_START( pc2000 )
 	PORT_START("IN0")
@@ -605,93 +507,6 @@ static INPUT_PORTS_START( pc2000 )
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( pc1000 )
-	PORT_START("IN0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SCHREIBMASCHINENKURS") PORT_CODE(KEYCODE_F1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("COMPUTER-UBUNGEN") PORT_CODE(KEYCODE_F2)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ALLGEMEINWISSEN") PORT_CODE(KEYCODE_F3)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MATHE")      PORT_CODE(KEYCODE_F7)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("GESCHICHTE") PORT_CODE(KEYCODE_F4)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("GEOGRAPHIE") PORT_CODE(KEYCODE_F5)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("NATURWISSENSCHAFTEN") PORT_CODE(KEYCODE_F6)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SPIELE")     PORT_CODE(KEYCODE_F8)
-
-	PORT_START("IN1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KASSETTE")   PORT_CODE(KEYCODE_F9)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("AUS")        PORT_CODE(KEYCODE_F12)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left")       PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right")      PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("?")          PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("?")          PORT_CODE(KEYCODE_2_PAD)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("?")          PORT_CODE(KEYCODE_3_PAD)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ELEKRONIK-RECHNER")   PORT_CODE(KEYCODE_F10)
-
-	PORT_START("IN2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0")  PORT_CODE(KEYCODE_0) PORT_CHAR('0')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("?")  PORT_CODE(KEYCODE_4_PAD)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xc3\xb6")  PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xc3\xa4")  PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xc3\xbc")  PORT_CODE(KEYCODE_QUOTE)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("-")  PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift")  PORT_CODE(KEYCODE_LSHIFT)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P")  PORT_CODE(KEYCODE_P) PORT_CHAR('P')
-
-	PORT_START("IN3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8")  PORT_CODE(KEYCODE_8) PORT_CHAR('8')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9")  PORT_CODE(KEYCODE_9) PORT_CHAR('9')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("O")  PORT_CODE(KEYCODE_O) PORT_CHAR('O')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("K")  PORT_CODE(KEYCODE_K) PORT_CHAR('K')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("L")  PORT_CODE(KEYCODE_L) PORT_CHAR('L')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(",")  PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(".")  PORT_CODE(KEYCODE_STOP) PORT_CHAR('.')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I")  PORT_CODE(KEYCODE_I) PORT_CHAR('I')
-
-	PORT_START("IN4")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6")  PORT_CODE(KEYCODE_6) PORT_CHAR('6')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7")  PORT_CODE(KEYCODE_7) PORT_CHAR('7')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U")  PORT_CODE(KEYCODE_U) PORT_CHAR('U')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H")  PORT_CODE(KEYCODE_H) PORT_CHAR('H')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("J")  PORT_CODE(KEYCODE_J) PORT_CHAR('J')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("N")  PORT_CODE(KEYCODE_N) PORT_CHAR('N')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M")  PORT_CODE(KEYCODE_M) PORT_CHAR('M')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Z")  PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
-
-	PORT_START("IN5")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4")  PORT_CODE(KEYCODE_4) PORT_CHAR('4')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5")  PORT_CODE(KEYCODE_5) PORT_CHAR('5')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("T")  PORT_CODE(KEYCODE_T) PORT_CHAR('T')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F")  PORT_CODE(KEYCODE_F) PORT_CHAR('F')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G")  PORT_CODE(KEYCODE_G) PORT_CHAR('G')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("V")  PORT_CODE(KEYCODE_V) PORT_CHAR('V')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B")  PORT_CODE(KEYCODE_B) PORT_CHAR('B')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R")  PORT_CODE(KEYCODE_R) PORT_CHAR('R')
-
-	PORT_START("IN6")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2")  PORT_CODE(KEYCODE_2) PORT_CHAR('2')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3")  PORT_CODE(KEYCODE_3) PORT_CHAR('3')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E")  PORT_CODE(KEYCODE_E) PORT_CHAR('E')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S")  PORT_CODE(KEYCODE_S) PORT_CHAR('S')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D")  PORT_CODE(KEYCODE_D) PORT_CHAR('D')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("X")  PORT_CODE(KEYCODE_X) PORT_CHAR('X')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C")  PORT_CODE(KEYCODE_C) PORT_CHAR('C')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("W")  PORT_CODE(KEYCODE_W) PORT_CHAR('W')
-
-	PORT_START("IN7")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Caps Lock")  PORT_CODE(KEYCODE_CAPSLOCK)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1")  PORT_CODE(KEYCODE_1) PORT_CHAR('1')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Q")  PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A")  PORT_CODE(KEYCODE_A) PORT_CHAR('A')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Y")  PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DEL") PORT_CODE(KEYCODE_DEL)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5_PAD)
-
-	PORT_START("IN8")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7_PAD)
-	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( gl3000s )
 	PORT_START("IN0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
@@ -834,9 +649,8 @@ INPUT_PORTS_END
 
 void pc2000_state::machine_start()
 {
-	std::string region_tag;
 	uint8_t *bios = memregion("bios")->base();
-	memory_region *cart_region = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	memory_region *cart_region = memregion(std::string(m_cart->tag()) + GENERIC_ROM_REGION_TAG);
 	uint8_t *cart = cart_region ? cart_region->base() : bios;
 
 	m_bank0->configure_entries(0, 0x10, bios, 0x4000);
@@ -847,9 +661,8 @@ void pc2000_state::machine_start()
 
 void gl4004_state::machine_start()
 {
-	std::string region_tag;
 	uint8_t *bios = memregion("bios")->base();
-	memory_region *cart_region = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	memory_region *cart_region = memregion(std::string(m_cart->tag()) + GENERIC_ROM_REGION_TAG);
 	uint8_t *cart = (cart_region != nullptr) ? cart_region->base() : memregion("bios")->base();
 
 	m_bank0->configure_entries(0, 0x20, bios, 0x4000);
@@ -864,17 +677,6 @@ void pc2000_state::machine_reset()
 	m_bank0->set_entry(0);
 	m_bank1->set_entry(0);
 	m_bank2->set_entry(0);
-}
-
-void pc1000_state::machine_start()
-{
-	uint8_t *bios = memregion("bios")->base();
-	m_bank1->configure_entries(0, 0x08, bios, 0x4000);
-}
-
-void pc1000_state::machine_reset()
-{
-	m_bank1->set_entry(0);
 }
 
 void pc2000_state::pc2000_palette(palette_device &palette) const
@@ -1014,36 +816,6 @@ void gl4004_state::gl4000(machine_config &config)
 	SOFTWARE_LIST(config, "misterx_cart").set_compatible("misterx");
 }
 
-void pc1000_state::misterx(machine_config &config)
-{
-	pc2000(config);
-
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc1000_state::pc1000_mem);
-	m_maincpu->set_addrmap(AS_IO, &pc1000_state::pc1000_io);
-	m_maincpu->set_periodic_int(FUNC(pc1000_state::irq0_line_hold), attotime::from_hz(10));
-
-	/* video hardware */
-	m_screen->set_size(120, 9); //1x20 chars
-	m_screen->set_visarea(0, 120-1, 0, 9-1);
-
-	m_lcdc->set_lcd_size(1, 20);
-	m_lcdc->set_pixel_update_cb(FUNC(pc1000_state::pc1000_pixel_update));
-
-	/* Software lists */
-	SOFTWARE_LIST(config, "cart_list").set_original("misterx");
-}
-
-void pc1000_state::pc1000(machine_config &config)
-{
-	misterx(config);
-
-	config.device_remove("cart_list");
-	config.device_remove("pc1000_cart");
-	SOFTWARE_LIST(config, "cart_list").set_original("pc1000");
-	SOFTWARE_LIST(config, "misterx_cart").set_compatible("misterx");
-}
-
 /* ROM definition */
 ROM_START( pc2000 )
 	ROM_REGION( 0x40000, "bios", 0 )
@@ -1110,21 +882,6 @@ ROM_START( gbs5505x )
 	ROM_LOAD( "27-7006-00.u5", 0x000000, 0x200000, CRC(28af3ca7) SHA1(5df7063c7327263c23d5ac2aac3aa66f7e0821c5) )
 ROM_END
 
-ROM_START( pc1000 )
-	ROM_REGION( 0x20000, "bios", 0 )
-	ROM_LOAD( "27-00780-002-002.u4", 0x000000, 0x020000, CRC(705170ae) SHA1(825ce0ff2c7d0a7b1e2577d1465a37f7e8da383b))
-ROM_END
-
-ROM_START( misterx )
-	ROM_REGION( 0x20000, "bios", 0 )
-	ROM_LOAD( "27-00882-001.bin", 0x000000, 0x020000, CRC(30e0dc94) SHA1(2f4675746a41399b3d9e3e8001a9b4a0dcc5b620))
-ROM_END
-
-ROM_START( ordisava )
-	ROM_REGION( 0x20000, "bios", 0 )
-	ROM_LOAD( "27-00874-001.u4", 0x000000, 0x020000, CRC(5e40764e) SHA1(636ea61d3d675e51c20f610aae6824369c01a804))
-ROM_END
-
 ROM_START( lexipcm )
 	ROM_REGION( 0x200000, "bios", 0 )
 	ROM_LOAD( "epoxy.u3", 0x00000, 0x100000, CRC(0a410790) SHA1(be04d5f74208a2f3b200daed75e04e966f64b545) )
@@ -1141,10 +898,7 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME      PARENT  COMPAT MACHINE    INPUT    CLASS         INIT        COMPANY                    FULLNAME                                  FLAGS
-COMP( 1988, pc1000,   0,      0,     pc1000,    pc1000,  pc1000_state, empty_init, "Video Technology",        "PreComputer 1000",                       MACHINE_NOT_WORKING )
-COMP( 1988, misterx,  0,      0,     misterx,   pc1000,  pc1000_state, empty_init, "Video Technology / Yeno", "MisterX",                                MACHINE_NOT_WORKING )
-COMP( 198?, primusex, 0,      0,     misterx,   pc1000,  pc1000_state, empty_init, "Yeno",                    "Primus Expert mit Stimme",               MACHINE_IS_SKELETON )
-COMP( 1988, ordisava, 0,      0,     pc1000,    pc1000,  pc1000_state, empty_init, "Video Technology",        "Ordisavant (France)",                    MACHINE_NOT_WORKING )
+COMP( 198?, primusex, 0,      0,     pc2000,    pc2000,  pc2000_state, empty_init, "Yeno",                    "Primus Expert mit Stimme",               MACHINE_IS_SKELETON )
 COMP( 1993, pc2000,   0,      0,     pc2000,    pc2000,  pc2000_state, empty_init, "Video Technology",        "PreComputer 2000",                       MACHINE_NOT_WORKING )
 COMP( 1993, pc2000s,  pc2000, 0,     pc2000eur, pc2000,  pc2000_state, empty_init, "Video Technology",        "PreComputer 2000 (Spain)",               MACHINE_NOT_WORKING )
 COMP( 1993, gl2000,   0,      0,     gl2000,    pc2000,  pc2000_state, empty_init, "Video Technology",        "Genius Leader 2000",                     MACHINE_NOT_WORKING )

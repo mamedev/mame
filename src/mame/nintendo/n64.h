@@ -43,7 +43,7 @@ public:
 	void n64_machine_stop();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 
 	// Getters
 	n64_rdp* rdp() { return m_rdp.get(); }

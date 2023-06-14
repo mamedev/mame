@@ -94,7 +94,7 @@ void patinho_feio_cpu_device::transfer_byte_from_external_device(uint8_t channel
 void patinho_feio_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_update_panel_cb.resolve();
+	m_update_panel_cb.resolve_safe();
 
 //TODO: implement handling of these special purpose registers
 //      which are also mapped to the first few main memory positions:
@@ -159,8 +159,7 @@ void patinho_feio_cpu_device::device_reset()
 	m_addr = 0;
 	m_opcode = 0;
 	m_mode = ADDRESSING_MODE;
-	if (!m_update_panel_cb.isnull())
-		m_update_panel_cb(ACC, m_opcode, READ_BYTE_PATINHO(m_addr), m_addr, PC, FLAGS, RC, m_mode);
+	m_update_panel_cb(ACC, m_opcode, READ_BYTE_PATINHO(m_addr), m_addr, PC, FLAGS, RC, m_mode);
 }
 
 /* execute instructions on this CPU until icount expires */
@@ -169,8 +168,7 @@ void patinho_feio_cpu_device::execute_run() {
 		read_panel_keys_register();
 		m_ext = READ_ACC_EXTENSION_REG();
 		m_idx = READ_INDEX_REG();
-		if (!m_update_panel_cb.isnull())
-			m_update_panel_cb(ACC, READ_BYTE_PATINHO(PC), READ_BYTE_PATINHO(m_addr), m_addr, PC, FLAGS, RC, m_mode);
+		m_update_panel_cb(ACC, READ_BYTE_PATINHO(PC), READ_BYTE_PATINHO(m_addr), m_addr, PC, FLAGS, RC, m_mode);
 		debugger_instruction_hook(PC);
 
 		if (!m_run){

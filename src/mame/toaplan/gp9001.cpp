@@ -604,7 +604,7 @@ void gp9001vdp_device::pipibibi_bootleg_spriteram16_w(offs_t offset, u16 data, u
     Blanking Signal Polling
 ***************************************************************************/
 
-READ_LINE_MEMBER(gp9001vdp_device::hsync_r)
+int gp9001vdp_device::hsync_r()
 {
 	int hpos = screen().hpos();
 
@@ -612,7 +612,7 @@ READ_LINE_MEMBER(gp9001vdp_device::hsync_r)
 	return (hpos > 325) && (hpos < 380) ? 0 : 1;
 }
 
-READ_LINE_MEMBER(gp9001vdp_device::vsync_r)
+int gp9001vdp_device::vsync_r()
 {
 	int vpos = screen().vpos();
 
@@ -620,7 +620,7 @@ READ_LINE_MEMBER(gp9001vdp_device::vsync_r)
 	return (vpos >= 232) && (vpos <= 245) ? 0 : 1;
 }
 
-READ_LINE_MEMBER(gp9001vdp_device::fblank_r)
+int gp9001vdp_device::fblank_r()
 {
 	// ?? Dogyuun is too slow if this is wrong
 	return (hsync_r() == 0 || vsync_r() == 0) ? 0 : 1;

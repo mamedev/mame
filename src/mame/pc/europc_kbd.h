@@ -25,8 +25,8 @@ public:
 	auto reset_callback() { return m_reset_callback.bind(); }
 
 	// line inputs
-	DECLARE_WRITE_LINE_MEMBER(kbdata_w);
-	DECLARE_WRITE_LINE_MEMBER(kbclk_w);
+	void kbdata_w(int state);
+	void kbclk_w(int state);
 
 protected:
 	// device-level overrides

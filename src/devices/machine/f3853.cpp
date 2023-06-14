@@ -207,7 +207,7 @@ TIMER_CALLBACK_MEMBER(f3853_device::timer_callback)
 }
 
 
-WRITE_LINE_MEMBER(f3853_device::ext_int_w)
+void f3853_device::ext_int_w(int state)
 {
 	if (!m_external_interrupt_line && state && m_external_int_enable)
 	{
@@ -217,7 +217,7 @@ WRITE_LINE_MEMBER(f3853_device::ext_int_w)
 	set_interrupt_request_line();
 }
 
-WRITE_LINE_MEMBER(f3853_device::pri_in_w)
+void f3853_device::pri_in_w(int state)
 {
 	m_priority_line = bool(state);
 	set_interrupt_request_line();

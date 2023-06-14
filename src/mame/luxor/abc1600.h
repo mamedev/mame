@@ -122,15 +122,15 @@ private:
 	void fw0_w(uint8_t data);
 	void fw1_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(cs7_w);
-	DECLARE_WRITE_LINE_MEMBER(btce_w);
-	DECLARE_WRITE_LINE_MEMBER(atce_w);
-	DECLARE_WRITE_LINE_MEMBER(dmadis_w);
-	DECLARE_WRITE_LINE_MEMBER(sysscc_w);
-	DECLARE_WRITE_LINE_MEMBER(sysfs_w);
-	DECLARE_WRITE_LINE_MEMBER(dbrq0_w) { m_dbrq0 = state; update_br(); }
-	DECLARE_WRITE_LINE_MEMBER(dbrq1_w) { m_dbrq1 = state; update_br(); }
-	DECLARE_WRITE_LINE_MEMBER(dbrq2_w) { m_dbrq2 = state; update_br(); }
+	void cs7_w(int state);
+	void btce_w(int state);
+	void atce_w(int state);
+	void dmadis_w(int state);
+	void sysscc_w(int state);
+	void sysfs_w(int state);
+	void dbrq0_w(int state) { m_dbrq0 = state; update_br(); }
+	void dbrq1_w(int state) { m_dbrq1 = state; update_br(); }
+	void dbrq2_w(int state) { m_dbrq2 = state; update_br(); }
 
 	uint8_t cio_pa_r();
 	uint8_t cio_pb_r();

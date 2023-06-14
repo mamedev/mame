@@ -160,7 +160,7 @@ TIMER_CALLBACK_MEMBER(psion_asic1_device::watchdog)
 	}
 }
 
-WRITE_LINE_MEMBER(psion_asic1_device::eint1_w)
+void psion_asic1_device::eint1_w(int state)
 {
 	if (state)
 		m_a1_interrupt_status |= 0x04; // ExpIntRightB
@@ -170,7 +170,7 @@ WRITE_LINE_MEMBER(psion_asic1_device::eint1_w)
 	update_interrupts();
 }
 
-WRITE_LINE_MEMBER(psion_asic1_device::eint2_w)
+void psion_asic1_device::eint2_w(int state)
 {
 	if (state)
 		m_a1_interrupt_status |= 0x08; // ExpIntLeftA
@@ -180,7 +180,7 @@ WRITE_LINE_MEMBER(psion_asic1_device::eint2_w)
 	update_interrupts();
 }
 
-WRITE_LINE_MEMBER(psion_asic1_device::eint3_w)
+void psion_asic1_device::eint3_w(int state)
 {
 	if (state)
 		m_a1_interrupt_status |= 0x10; // Asic2Int
@@ -190,7 +190,7 @@ WRITE_LINE_MEMBER(psion_asic1_device::eint3_w)
 	update_interrupts();
 }
 
-WRITE_LINE_MEMBER(psion_asic1_device::enmi_w)
+void psion_asic1_device::enmi_w(int state)
 {
 	if (state)
 		m_a1_status |= 0x0200; // ExternalNmi

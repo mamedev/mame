@@ -73,7 +73,7 @@ private:
 	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	INTERRUPT_GEN_MEMBER(timer_interrupt);
 	void prg_map(address_map &map);
 };
@@ -305,7 +305,7 @@ uint32_t labyrunr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 // machine
 
-WRITE_LINE_MEMBER(labyrunr_state::vblank_irq)
+void labyrunr_state::vblank_irq(int state)
 {
 	if (state && (m_k007121->ctrlram_r(7) & 0x02))
 		m_maincpu->set_input_line(HD6309_IRQ_LINE, HOLD_LINE);

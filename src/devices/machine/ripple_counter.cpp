@@ -33,16 +33,16 @@ DEFINE_DEVICE_TYPE(RIPPLE_COUNTER, ripple_counter_device, "ripple_counter", "Gen
 //  ripple_counter_device - constructor
 //-------------------------------------------------
 
-ripple_counter_device::ripple_counter_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, RIPPLE_COUNTER, tag, owner, clock),
-		device_rom_interface(mconfig, *this),
-		m_count_out_cb(*this),
-		m_rom_out_cb(*this),
-		m_count_timer(nullptr),
-		m_count_mask(0),
-		m_count(1),
-		m_clk(false),
-		m_reset(false)
+ripple_counter_device::ripple_counter_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, RIPPLE_COUNTER, tag, owner, clock),
+	device_rom_interface(mconfig, *this),
+	m_count_out_cb(*this),
+	m_rom_out_cb(*this),
+	m_count_timer(nullptr),
+	m_count_mask(0),
+	m_count(1),
+	m_clk(false),
+	m_reset(false)
 {
 }
 
@@ -144,7 +144,7 @@ void ripple_counter_device::set_count(u32 count)
 //  clock_w - handle falling-edge clock input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(ripple_counter_device::clock_w)
+void ripple_counter_device::clock_w(int state)
 {
 	if (m_clk != bool(state))
 	{
@@ -159,7 +159,7 @@ WRITE_LINE_MEMBER(ripple_counter_device::clock_w)
 //  reset_w - handle active-high reset input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(ripple_counter_device::reset_w)
+void ripple_counter_device::reset_w(int state)
 {
 	if (m_reset != bool(state))
 	{

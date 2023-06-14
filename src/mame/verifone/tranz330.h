@@ -48,10 +48,10 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE_LINE_MEMBER(syncb_w);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
+	void syncb_w(int state);
+	void clock_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(sound_w);
+	void sound_w(int state);
 
 	void pio_a_w(uint8_t data);
 	uint8_t pio_b_r();

@@ -47,12 +47,12 @@ public:
 	void mjdialq2(machine_config &config);
 	void sprtmtch(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(blitter_ack_w);
-	DECLARE_WRITE_LINE_MEMBER(sprtmtch_blitter_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(sprtmtch_vblank_w);
-	DECLARE_WRITE_LINE_MEMBER(layer_half_w);
-	DECLARE_WRITE_LINE_MEMBER(layer_half2_w);
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	void blitter_ack_w(int state);
+	void sprtmtch_blitter_irq_w(int state);
+	void sprtmtch_vblank_w(int state);
+	void layer_half_w(int state);
+	void layer_half2_w(int state);
+	void flipscreen_w(int state);
 
 	void hnoridur_blit_pixel_w(offs_t offset, uint8_t data);
 	void dynax_blit_scrollx_w(uint8_t data);
@@ -86,15 +86,15 @@ protected:
 
 	// Nothing below here is used by ddenlovr.cpp
 	// TODO: further decouple dynax.cpp and ddenlovr.cpp
-	DECLARE_WRITE_LINE_MEMBER(coincounter_0_w);
-	DECLARE_WRITE_LINE_MEMBER(coincounter_1_w);
+	void coincounter_0_w(int state);
+	void coincounter_1_w(int state);
 	uint8_t ret_ff();
 	uint8_t hanamai_keyboard_0_r();
 	uint8_t hanamai_keyboard_1_r();
 	void hanamai_keyboard_w(uint8_t data);
 	void dynax_rombank_w(uint8_t data);
 	void dynax_blit_palette23_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(blit_palbank_w);
+	void blit_palbank_w(int state);
 	void dynax_blit_backpen_w(uint8_t data);
 	void dynax_blit_palette01_w(uint8_t data);
 	void dynax_layer_enable_w(uint8_t data);
@@ -162,8 +162,8 @@ private:
 	void tenkai_p8_w(uint8_t data);
 	uint8_t tenkai_p8_r();
 	void ougonhai_p7_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(tenkai_6c_w);
-	DECLARE_WRITE_LINE_MEMBER(tenkai_70_w);
+	void tenkai_6c_w(int state);
+	void tenkai_70_w(int state);
 	void tenkai_blit_romregion_w(uint8_t data);
 	uint8_t gekisha_keyboard_0_r();
 	uint8_t gekisha_keyboard_1_r();
@@ -172,10 +172,10 @@ private:
 	void tenkai_blit_dest_w(uint8_t data);
 	void tenkai_blit_palette01_w(uint8_t data);
 	void tenkai_blit_palette23_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(mjdialq2_blit_dest0_w);
-	DECLARE_WRITE_LINE_MEMBER(mjdialq2_blit_dest1_w);
-	DECLARE_WRITE_LINE_MEMBER(mjdialq2_layer0_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(mjdialq2_layer1_enable_w);
+	void mjdialq2_blit_dest0_w(int state);
+	void mjdialq2_blit_dest1_w(int state);
+	void mjdialq2_layer0_enable_w(int state);
+	void mjdialq2_layer1_enable_w(int state);
 	void drgpunch_blit_pixel_w(offs_t offset, uint8_t data);
 	void mjdialq2_blit_pixel_w(offs_t offset, uint8_t data);
 	void tenkai_blit_scrollx_w(uint8_t data);
@@ -185,14 +185,14 @@ private:
 	uint32_t screen_update_sprtmtch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mjdialq2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(mjfriday_vblank_w);
+	void mjfriday_vblank_w(int state);
 
 	void tenkai_update_rombank();
 
 	void tenkai_dswsel_w(uint8_t data);
 	uint8_t tenkai_dsw_r();
-	DECLARE_WRITE_LINE_MEMBER(tenkai_blitter_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(tenkai_blitter_ack_w);
+	void tenkai_blitter_irq_w(int state);
+	void tenkai_blitter_ack_w(int state);
 	DECLARE_MACHINE_START(sprtmtch);
 	DECLARE_VIDEO_START(sprtmtch);
 	DECLARE_VIDEO_START(mjdialq2);
@@ -273,8 +273,8 @@ private:
 	void nanajign_palette_lo_w(offs_t offset, uint8_t data);
 	void nanajign_palette_hi_w(offs_t offset, uint8_t data);
 	void nanajign_palette_update(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(hjingi_lockout_w);
-	DECLARE_WRITE_LINE_MEMBER(hjingi_hopper_w);
+	void hjingi_lockout_w(int state);
+	void hjingi_hopper_w(int state);
 	uint8_t hjingi_hopper_bit();
 	uint8_t hjingi_keyboard_0_r();
 	uint8_t hjingi_keyboard_1_r();
@@ -290,8 +290,8 @@ private:
 	void hanamai_priority_w(uint8_t data);
 	void mjembase_priority_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_reset_kludge_w);
+	void adpcm_int(int state);
+	void adpcm_reset_kludge_w(int state);
 
 	DECLARE_MACHINE_START(hanamai);
 	DECLARE_MACHINE_START(hjingi);
@@ -370,11 +370,11 @@ private:
 	int m_toggle_cpu1 = 0;
 
 	void jantouki_vblank_ack_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(jantouki_blitter_ack_w);
-	DECLARE_WRITE_LINE_MEMBER(jantouki_blitter_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(jantouki_blitter2_ack_w);
-	DECLARE_WRITE_LINE_MEMBER(jantouki_blitter2_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(jantouki_vblank_w);
+	void jantouki_blitter_ack_w(int state);
+	void jantouki_blitter_irq_w(int state);
+	void jantouki_blitter2_ack_w(int state);
+	void jantouki_blitter2_irq_w(int state);
+	void jantouki_vblank_w(int state);
 	void jantouki_sound_vblank_ack_w(uint8_t data);
 	void jantouki_sound_rombank_w(uint8_t data);
 	uint8_t jantouki_soundlatch_ack_r();
@@ -387,7 +387,7 @@ private:
 	void dynax_blit2_dest_w(uint8_t data);
 	void dynax_blit_palette45_w(uint8_t data);
 	void dynax_blit_palette67_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(blit2_palbank_w);
+	void blit2_palbank_w(int state);
 	void jantouki_blit_pixel_w(offs_t offset, uint8_t data);
 	void jantouki_blit2_pixel_w(offs_t offset, uint8_t data);
 	void dynax_blit2_scrollx_w(uint8_t data);
@@ -400,7 +400,7 @@ private:
 
 	void jantouki_copylayer(bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int y);
 
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int_cpu1);
+	void adpcm_int_cpu1(int state);
 
 	DECLARE_VIDEO_START(jantouki);
 

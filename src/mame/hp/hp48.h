@@ -118,7 +118,7 @@ private:
 	void reset_modules();
 
 	/* memory controller */
-	DECLARE_WRITE_LINE_MEMBER(mem_reset);
+	void mem_reset(int state);
 	void mem_config(uint32_t data);
 	void mem_unconfig(uint32_t data);
 	uint32_t mem_id();
@@ -131,7 +131,7 @@ private:
 	void reg_out(uint32_t data);
 
 	/* keyboard interrupt system */
-	DECLARE_WRITE_LINE_MEMBER(rsi);
+	void rsi(int state);
 	void hp48_common(machine_config &config);
 	void hp48(address_map &map);
 

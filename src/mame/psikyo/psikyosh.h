@@ -110,7 +110,7 @@ private:
 	u32 mjgtaste_input_r();
 	void eeprom_w(u8 data);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void screen_vblank(int state);
 	INTERRUPT_GEN_MEMBER(interrupt);
 	void draw_scanline32_alpha(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, const u32 *srcptr, int alpha);
 	void draw_scanline32_argb(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, const u32 *srcptr);

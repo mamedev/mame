@@ -129,7 +129,7 @@ CUSTOM_INPUT_MEMBER( namcoio_gearbox_device::in_r )
 	return 0xf; // return neutral while changing gear
 }
 
-READ_LINE_MEMBER( namcoio_gearbox_device::clutch_r )
+int namcoio_gearbox_device::clutch_r()
 {
 	return ioport("CLUTCH")->read() & 1;
 }

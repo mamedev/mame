@@ -43,8 +43,8 @@ public:
 
 	void teleray10(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(key_interrupt_w);
-	DECLARE_READ_LINE_MEMBER(timer_expired_r);
+	void key_interrupt_w(int state);
+	int timer_expired_r();
 
 protected:
 	virtual void machine_start() override;
@@ -57,9 +57,9 @@ private:
 	TIMER_CALLBACK_MEMBER(bell_toggle);
 	void bell_update();
 
-	DECLARE_WRITE_LINE_MEMBER(wide_mode_w);
-	DECLARE_WRITE_LINE_MEMBER(bell_off_w);
-	DECLARE_WRITE_LINE_MEMBER(reset_timer_w);
+	void wide_mode_w(int state);
+	void bell_off_w(int state);
+	void reset_timer_w(int state);
 
 	void scratchpad_w(offs_t offset, u8 data);
 	u8 serial_io_r(offs_t offset);
@@ -179,16 +179,16 @@ u32 teleray10_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 }
 
 
-WRITE_LINE_MEMBER(teleray10_state::key_interrupt_w)
+void teleray10_state::key_interrupt_w(int state)
 {
 	m_maincpu->set_input_line(m6502_device::NMI_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(teleray10_state::wide_mode_w)
+void teleray10_state::wide_mode_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER(teleray10_state::bell_off_w)
+void teleray10_state::bell_off_w(int state)
 {
 	if (state)
 	{
@@ -199,7 +199,7 @@ WRITE_LINE_MEMBER(teleray10_state::bell_off_w)
 		bell_update();
 }
 
-WRITE_LINE_MEMBER(teleray10_state::reset_timer_w)
+void teleray10_state::reset_timer_w(int state)
 {
 	if (!state)
 	{
@@ -208,7 +208,7 @@ WRITE_LINE_MEMBER(teleray10_state::reset_timer_w)
 	}
 }
 
-READ_LINE_MEMBER(teleray10_state::timer_expired_r)
+int teleray10_state::timer_expired_r()
 {
 	return m_timer_expired;
 }

@@ -60,7 +60,7 @@
 #include "namco53.h"
 
 
-WRITE_LINE_MEMBER( namco_53xx_device::reset )
+void namco_53xx_device::reset(int state)
 {
 	// The incoming signal is active low
 	m_cpu->set_input_line(INPUT_LINE_RESET, !state);
@@ -105,7 +105,7 @@ void namco_53xx_device::P_w(uint8_t data)
 	m_p(0, data);
 }
 
-WRITE_LINE_MEMBER(namco_53xx_device::chip_select)
+void namco_53xx_device::chip_select(int state)
 {
 	m_cpu->set_input_line(0, state);
 }

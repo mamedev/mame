@@ -71,9 +71,9 @@ public:
 private:
 	u8 mem_r(offs_t offset);
 	void mem_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(kansas_w);
-	DECLARE_READ_LINE_MEMBER(serial_r);
-	DECLARE_WRITE_LINE_MEMBER(serial_w);
+	void kansas_w(int state);
+	int serial_r();
+	void serial_w(int state);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 
@@ -90,7 +90,7 @@ private:
 	required_device<s100_bus_device> m_s100;
 };
 
-WRITE_LINE_MEMBER( binbug_state::kansas_w )
+void binbug_state::kansas_w(int state)
 {
 	if ((m_cass->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_RECORD)
 		return;
@@ -135,12 +135,12 @@ TIMER_DEVICE_CALLBACK_MEMBER( binbug_state::kansas_r )
 	}
 }
 
-READ_LINE_MEMBER( binbug_state::serial_r )
+int binbug_state::serial_r()
 {
 	return m_rs232->rxd_r() & m_cassinbit;
 }
 
-WRITE_LINE_MEMBER( binbug_state::serial_w )
+void binbug_state::serial_w(int state)
 {
 	m_cassoutbit = state;
 }

@@ -83,9 +83,19 @@ void aerofgt_sound_cpu_state::karatblzbl_soundlatch_w(uint8_t data)
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-uint8_t aerofgt_sound_cpu_state::pending_command_r()
+uint8_t aerofgt_sound_cpu_state::soundlatch_pending_r()
 {
 	return m_soundlatch->pending_r();
+}
+
+void aerofgt_sound_cpu_state::soundlatch_pending_w(int state)
+{
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+
+	// sound comms is 2-way (see soundlatch_pending_r),
+	// NMI routine is very short, so briefly set perfect_quantum to make sure that the timing is right
+	if (state)
+		machine().scheduler().perfect_quantum(attotime::from_usec(100));
 }
 
 void aerofgt_banked_sound_state::sh_bankswitch_w(uint8_t data)
@@ -159,7 +169,7 @@ void aerofgt_banked_sound_state::pspikes_map(address_map &map)
 	map(0xfff002, 0xfff003).portr("IN1");
 	map(0xfff003, 0xfff003).w(FUNC(aerofgt_banked_sound_state::pspikes_gfxbank_w));
 	map(0xfff004, 0xfff005).portr("DSW").w(FUNC(aerofgt_banked_sound_state::scrolly_w<0>));
-	map(0xfff007, 0xfff007).r(FUNC(aerofgt_banked_sound_state::pending_command_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
+	map(0xfff007, 0xfff007).r(FUNC(aerofgt_banked_sound_state::soundlatch_pending_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
 	map(0xfff400, 0xfff403).w("gga", FUNC(vsystem_gga_device::write)).umask16(0x00ff);
 }
 
@@ -200,7 +210,7 @@ void aerofgt_sound_cpu_state::spikes91_map(address_map &map)
 	map(0xfff002, 0xfff003).portr("IN1");
 	map(0xfff003, 0xfff003).w(FUNC(aerofgt_sound_cpu_state::pspikes_gfxbank_w));
 	map(0xfff004, 0xfff005).portr("DSW").w(FUNC(aerofgt_sound_cpu_state::scrolly_w<0>));
-	map(0xfff007, 0xfff007).r(FUNC(aerofgt_sound_cpu_state::pending_command_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
+	map(0xfff007, 0xfff007).r(FUNC(aerofgt_sound_cpu_state::soundlatch_pending_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
 	map(0xfff008, 0xfff009).w(FUNC(aerofgt_sound_cpu_state::spikes91_lookup_w));
 }
 
@@ -237,7 +247,7 @@ void aerofgt_sound_cpu_state::kickball_map(address_map &map)
 	map(0xfff002, 0xfff003).portr("IN1");
 	map(0xfff003, 0xfff003).w(FUNC(aerofgt_sound_cpu_state::kickball_gfxbank_w));
 	map(0xfff004, 0xfff005).portr("DSW").w(FUNC(aerofgt_sound_cpu_state::scrolly_w<0>));
-	map(0xfff007, 0xfff007).r(FUNC(aerofgt_sound_cpu_state::pending_command_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
+	map(0xfff007, 0xfff007).r(FUNC(aerofgt_sound_cpu_state::soundlatch_pending_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
 	map(0xfff400, 0xfff403).nopw(); // GGA access
 }
 
@@ -261,7 +271,7 @@ void aerofgt_banked_sound_state::karatblz_map(address_map &map)
 	map(0x0ff006, 0x0ff007).portr("IN3");
 	map(0x0ff007, 0x0ff007).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x0ff008, 0x0ff009).portr("DSW").w(FUNC(aerofgt_banked_sound_state::scrollx_w<0>));
-	map(0x0ff00b, 0x0ff00b).r(FUNC(aerofgt_banked_sound_state::pending_command_r));
+	map(0x0ff00b, 0x0ff00b).r(FUNC(aerofgt_banked_sound_state::soundlatch_pending_r));
 	map(0x0ff00a, 0x0ff00b).w(FUNC(aerofgt_banked_sound_state::scrolly_w<0>));
 	map(0x0ff00c, 0x0ff00d).w(FUNC(aerofgt_banked_sound_state::scrollx_w<1>));
 	map(0x0ff00e, 0x0ff00f).w(FUNC(aerofgt_banked_sound_state::scrolly_w<1>));
@@ -288,7 +298,7 @@ void aerofgt_sound_cpu_state::karatblzbl_map(address_map &map)
 	map(0x0ff006, 0x0ff007).portr("IN3");
 	map(0x0ff007, 0x0ff007).w(FUNC(aerofgt_sound_cpu_state::karatblzbl_soundlatch_w));
 	map(0x0ff008, 0x0ff009).portr("DSW").w(FUNC(aerofgt_sound_cpu_state::scrollx_w<0>));
-	map(0x0ff00b, 0x0ff00b).r(FUNC(aerofgt_sound_cpu_state::pending_command_r));
+	map(0x0ff00b, 0x0ff00b).r(FUNC(aerofgt_sound_cpu_state::soundlatch_pending_r));
 	map(0x0ff00a, 0x0ff00b).w(FUNC(aerofgt_sound_cpu_state::scrolly_w<0>));
 	map(0x0ff00c, 0x0ff00d).w(FUNC(aerofgt_sound_cpu_state::scrollx_w<1>));
 	map(0x0ff00e, 0x0ff00f).w(FUNC(aerofgt_sound_cpu_state::scrolly_w<1>));
@@ -332,7 +342,7 @@ void aerofgt_banked_sound_state::turbofrc_map(address_map &map)
 	map(0x0ff001, 0x0ff001).w(FUNC(aerofgt_banked_sound_state::turbofrc_flip_screen_w));
 	map(0x0ff002, 0x0ff003).portr("IN1").w(FUNC(aerofgt_banked_sound_state::scrolly_w<0>));
 	map(0x0ff004, 0x0ff005).portr("DSW").w(FUNC(aerofgt_banked_sound_state::scrollx_w<1>));
-	map(0x0ff007, 0x0ff007).r(FUNC(aerofgt_banked_sound_state::pending_command_r));
+	map(0x0ff007, 0x0ff007).r(FUNC(aerofgt_banked_sound_state::soundlatch_pending_r));
 	map(0x0ff006, 0x0ff007).w(FUNC(aerofgt_banked_sound_state::scrolly_w<1>));
 	map(0x0ff008, 0x0ff009).portr("IN2");
 	map(0x0ff008, 0x0ff00b).w(FUNC(aerofgt_banked_sound_state::turbofrc_gfxbank_w));
@@ -356,7 +366,7 @@ void aerofgt_banked_sound_state::aerofgtb_map(address_map &map)
 	map(0x0fe001, 0x0fe001).w(FUNC(aerofgt_banked_sound_state::turbofrc_flip_screen_w));
 	map(0x0fe002, 0x0fe003).portr("IN1").w(FUNC(aerofgt_banked_sound_state::scrolly_w<0>));
 	map(0x0fe004, 0x0fe005).portr("DSW1").w(FUNC(aerofgt_banked_sound_state::scrollx_w<1>));
-	map(0x0fe007, 0x0fe007).r(FUNC(aerofgt_banked_sound_state::pending_command_r));
+	map(0x0fe007, 0x0fe007).r(FUNC(aerofgt_banked_sound_state::soundlatch_pending_r));
 	map(0x0fe006, 0x0fe007).w(FUNC(aerofgt_banked_sound_state::scrolly_w<1>));
 	map(0x0fe008, 0x0fe009).portr("DSW2");
 	map(0x0fe008, 0x0fe00b).w(FUNC(aerofgt_banked_sound_state::turbofrc_gfxbank_w));
@@ -456,7 +466,7 @@ void aerofgt_sound_cpu_state::wbbc97_map(address_map &map)
 	map(0xfff002, 0xfff003).portr("IN1");
 	map(0xfff003, 0xfff003).w(FUNC(aerofgt_sound_cpu_state::pspikes_gfxbank_w));
 	map(0xfff004, 0xfff005).portr("DSW").w(FUNC(aerofgt_sound_cpu_state::scrolly_w<0>));
-	map(0xfff007, 0xfff007).r(FUNC(aerofgt_sound_cpu_state::pending_command_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
+	map(0xfff007, 0xfff007).r(FUNC(aerofgt_sound_cpu_state::soundlatch_pending_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
 	map(0xfff00e, 0xfff00f).w(FUNC(aerofgt_sound_cpu_state::wbbc97_bitmap_enable_w));
 	map(0xfff400, 0xfff403).nopw(); // GGA access
 }
@@ -1477,7 +1487,7 @@ void aerofgt_banked_sound_state::pspikes(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->data_pending_callback().set(FUNC(aerofgt_banked_sound_state::soundlatch_pending_w));
 	m_soundlatch->set_separate_acknowledge(true);
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
@@ -1598,7 +1608,7 @@ void aerofgt_sound_cpu_state::kickball(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->data_pending_callback().set(FUNC(aerofgt_sound_cpu_state::soundlatch_pending_w));
 	m_soundlatch->set_separate_acknowledge(true);
 
 	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(4'000'000))); // K-666 (YM3812)
@@ -1686,7 +1696,7 @@ void aerofgt_banked_sound_state::karatblz(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->data_pending_callback().set(FUNC(aerofgt_banked_sound_state::soundlatch_pending_w));
 	m_soundlatch->set_separate_acknowledge(true);
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(8'000'000))); /* verified on pcb */
@@ -1792,7 +1802,7 @@ void aerofgt_banked_sound_state::spinlbrk(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->data_pending_callback().set(FUNC(aerofgt_banked_sound_state::soundlatch_pending_w));
 	m_soundlatch->set_separate_acknowledge(true);
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(8'000'000)));  /* verified on pcb */
@@ -1845,7 +1855,7 @@ void aerofgt_banked_sound_state::turbofrc(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->data_pending_callback().set(FUNC(aerofgt_banked_sound_state::soundlatch_pending_w));
 	m_soundlatch->set_separate_acknowledge(true);
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(8'000'000)));  /* verified on pcb */
@@ -1898,7 +1908,7 @@ void aerofgt_banked_sound_state::aerofgtb(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->data_pending_callback().set(FUNC(aerofgt_banked_sound_state::soundlatch_pending_w));
 	m_soundlatch->set_separate_acknowledge(true);
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
@@ -1956,7 +1966,7 @@ void aerofgt_banked_sound_state::aerofgt(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->data_pending_callback().set(FUNC(aerofgt_banked_sound_state::soundlatch_pending_w));
 	m_soundlatch->set_separate_acknowledge(true);
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(8'000'000)));  /* verified on pcb */

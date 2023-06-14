@@ -115,7 +115,7 @@ public:
 		return *this;
 	}
 
-	DECLARE_WRITE_LINE_MEMBER(kbclk_w)
+	void kbclk_w(int state)
 	{
 		if (bool(state) != bool(m_kbclk))
 		{
@@ -275,8 +275,8 @@ public:
 	void init_pal();
 	void init_ntsc();
 
-	DECLARE_WRITE_LINE_MEMBER( zorro2_int2_w );
-	DECLARE_WRITE_LINE_MEMBER( zorro2_int6_w );
+	void zorro2_int2_w(int state);
+	void zorro2_int6_w(int state);
 
 	u16 clock_r(offs_t offset);
 	void clock_w(offs_t offset, u16 data);
@@ -315,8 +315,8 @@ public:
 	void init_pal();
 	void init_ntsc();
 
-	DECLARE_WRITE_LINE_MEMBER( side_int2_w );
-	DECLARE_WRITE_LINE_MEMBER( side_int6_w );
+	void side_int2_w(int state);
+	void side_int6_w(int state);
 
 	void a500n(machine_config &config);
 	void a500(machine_config &config);
@@ -359,10 +359,10 @@ public:
 
 	uint8_t dmac_scsi_data_read(offs_t offset);
 	void dmac_scsi_data_write(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( dmac_int_w );
+	void dmac_int_w(int state);
 
 	void tpi_port_b_write(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( tpi_int_w );
+	void tpi_int_w(int state);
 
 	void cdtv(machine_config &config);
 	void cdtvn(machine_config &config);
@@ -461,8 +461,8 @@ public:
 		, m_gayle_int2(0)
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER( gayle_int2_w );
-	DECLARE_WRITE_LINE_MEMBER( gayle_int6_w );
+	void gayle_int2_w(int state);
+	void gayle_int6_w(int state);
 
 	void init_pal();
 	void init_ntsc();
@@ -496,8 +496,8 @@ public:
 		, m_gayle_int2(0)
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER( gayle_int2_w );
-	DECLARE_WRITE_LINE_MEMBER( gayle_int6_w );
+	void gayle_int2_w(int state);
+	void gayle_int6_w(int state);
 
 	void init_pal();
 	void init_ntsc();
@@ -538,7 +538,7 @@ public:
 	void scsi_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u16 ide_r(offs_t offset, u16 mem_mask = ~0);
 	void ide_w(offs_t offset, u16 data, u16 mem_mask);
-	DECLARE_WRITE_LINE_MEMBER( ide_interrupt_w );
+	void ide_interrupt_w(int state);
 	u32 motherboard_r(offs_t offset, u32 mem_mask = ~0);
 	void motherboard_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
@@ -576,14 +576,14 @@ public:
 		, m_cdda(*this, "akiko:cdda")
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER( akiko_int_w );
+	void akiko_int_w(int state);
 	void akiko_cia_0_port_a_write(uint8_t data);
 
 	void handle_joystick_cia(u8 pra, u8 dra);
 	u16 handle_joystick_potgor(u16 potgor);
 
 	DECLARE_CUSTOM_INPUT_MEMBER( cd32_input );
-	template <int P> DECLARE_READ_LINE_MEMBER( cd32_sel_mirror_input );
+	template <int P> int cd32_sel_mirror_input();
 
 	void init_pal();
 	void init_ntsc();
@@ -660,7 +660,7 @@ void cdtv_state::dmac_scsi_data_write(offs_t offset, uint8_t data)
 		m_tpi->write(offset, data);
 }
 
-WRITE_LINE_MEMBER( cdtv_state::dmac_int_w )
+void cdtv_state::dmac_int_w(int state)
 {
 	m_dmac_irq = state;
 	update_int2();
@@ -672,7 +672,7 @@ void cdtv_state::tpi_port_b_write(uint8_t data)
 	m_cdrom->enable_w(BIT(data, 1));
 }
 
-WRITE_LINE_MEMBER( cdtv_state::tpi_int_w )
+void cdtv_state::tpi_int_w(int state)
 {
 	m_tpi_irq = state;
 	update_int2();
@@ -847,13 +847,13 @@ void a2000_state::machine_reset()
 	m_zorro->reset();
 }
 
-WRITE_LINE_MEMBER( a2000_state::zorro2_int2_w )
+void a2000_state::zorro2_int2_w(int state)
 {
 	m_zorro2_int2 = state;
 	update_int2();
 }
 
-WRITE_LINE_MEMBER( a2000_state::zorro2_int6_w )
+void a2000_state::zorro2_int6_w(int state)
 {
 	m_zorro2_int6 = state;
 	update_int6();
@@ -878,13 +878,13 @@ void a500_state::machine_reset()
 	m_side->reset();
 }
 
-WRITE_LINE_MEMBER( a500_state::side_int2_w )
+void a500_state::side_int2_w(int state)
 {
 	m_side_int2 = state;
 	update_int2();
 }
 
-WRITE_LINE_MEMBER( a500_state::side_int6_w )
+void a500_state::side_int6_w(int state)
 {
 	m_side_int6 = state;
 	update_int6();
@@ -973,13 +973,13 @@ bool a600_state::int6_pending()
 	return m_cia_1_irq || m_gayle_int6;
 }
 
-WRITE_LINE_MEMBER( a600_state::gayle_int2_w )
+void a600_state::gayle_int2_w(int state)
 {
 	m_gayle_int2 = state;
 	update_int2();
 }
 
-WRITE_LINE_MEMBER( a600_state::gayle_int6_w )
+void a600_state::gayle_int6_w(int state)
 {
 	m_gayle_int6 = state;
 	update_int6();
@@ -995,13 +995,13 @@ bool a1200_state::int6_pending()
 	return m_cia_1_irq || m_gayle_int6;
 }
 
-WRITE_LINE_MEMBER( a1200_state::gayle_int2_w )
+void a1200_state::gayle_int2_w(int state)
 {
 	m_gayle_int2 = state;
 	update_int2();
 }
 
-WRITE_LINE_MEMBER( a1200_state::gayle_int6_w )
+void a1200_state::gayle_int6_w(int state)
 {
 	m_gayle_int6 = state;
 	update_int6();
@@ -1045,7 +1045,7 @@ void a4000_state::ide_w(offs_t offset, u16 data, u16 mem_mask)
 		m_ata->cs0_swap_w((offset >> 1) & 0x07, data, mem_mask);
 }
 
-WRITE_LINE_MEMBER( a4000_state::ide_interrupt_w )
+void a4000_state::ide_interrupt_w(int state)
 {
 	m_ide_interrupt = state;
 }
@@ -1090,7 +1090,7 @@ void a4000_state::motherboard_w(offs_t offset, u32 data, u32 mem_mask)
 	logerror("motherboard_w(%06x): %08x & %08x\n", offset, data, mem_mask);
 }
 
-WRITE_LINE_MEMBER(cd32_state::akiko_int_w)
+void cd32_state::akiko_int_w(int state)
 {
 	set_interrupt(INTENA_SETCLR | INTENA_PORTS);
 }
@@ -1177,7 +1177,7 @@ CUSTOM_INPUT_MEMBER( cd32_state::cd32_input )
 }
 
 template <int P>
-READ_LINE_MEMBER( cd32_state::cd32_sel_mirror_input )
+int cd32_state::cd32_sel_mirror_input()
 {
 	u8 bits = m_player_ports[P]->read();
 	return (bits & 0x20)>>5;

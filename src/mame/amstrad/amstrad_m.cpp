@@ -820,7 +820,7 @@ void amstrad_state::amstrad_plus_update_video_sprites()
 }
 
 
-WRITE_LINE_MEMBER(amstrad_state::amstrad_hsync_changed)
+void amstrad_state::amstrad_hsync_changed(int state)
 {
 	amstrad_update_video();
 
@@ -864,7 +864,7 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_hsync_changed)
 }
 
 
-WRITE_LINE_MEMBER(amstrad_state::amstrad_plus_hsync_changed)
+void amstrad_state::amstrad_plus_hsync_changed(int state)
 {
 	amstrad_plus_update_video();
 
@@ -939,7 +939,7 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_plus_hsync_changed)
 }
 
 
-WRITE_LINE_MEMBER(amstrad_state::amstrad_vsync_changed)
+void amstrad_state::amstrad_vsync_changed(int state)
 {
 	amstrad_update_video();
 
@@ -960,7 +960,7 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_vsync_changed)
 }
 
 
-WRITE_LINE_MEMBER(amstrad_state::amstrad_plus_vsync_changed)
+void amstrad_state::amstrad_plus_vsync_changed(int state)
 {
 	amstrad_plus_update_video();
 
@@ -981,7 +981,7 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_plus_vsync_changed)
 }
 
 
-WRITE_LINE_MEMBER(amstrad_state::amstrad_de_changed)
+void amstrad_state::amstrad_de_changed(int state)
 {
 	amstrad_update_video();
 
@@ -1004,7 +1004,7 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_de_changed)
 }
 
 
-WRITE_LINE_MEMBER(amstrad_state::amstrad_plus_de_changed)
+void amstrad_state::amstrad_plus_de_changed(int state)
 {
 	amstrad_plus_update_video();
 
@@ -1097,7 +1097,7 @@ device_t* amstrad_state::get_expansion_device(const char* tag)
 	return nullptr;
 }
 
-WRITE_LINE_MEMBER(amstrad_state::cpc_romdis)
+void amstrad_state::cpc_romdis(int state)
 {
 	m_gate_array.romdis = state;
 	amstrad_rethinkMemory();
@@ -2425,7 +2425,7 @@ void amstrad_state::kccomp_reset_machine()
 }
 
 
-WRITE_LINE_MEMBER(amstrad_state::screen_vblank_amstrad)
+void amstrad_state::screen_vblank_amstrad(int state)
 {
 	// rising edge
 	if (state)
@@ -2553,7 +2553,7 @@ Note:
   On the CPC this can be used by a expansion device to report its presence. "1" = device connected, "0" = device not connected. This is not always used by all expansion devices.
 */
 
-WRITE_LINE_MEMBER(amstrad_state::write_centronics_busy)
+void amstrad_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }

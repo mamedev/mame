@@ -32,7 +32,7 @@ If the output isn't satisfactory, it prints "I/O BOARD FAILURE".
 
 #include "bus/isa/isa.h"
 #include "bus/isa/sblaster.h"
-#include "bus/isa/trident.h"
+#include "video/pc_vga_trident.h"
 #include "bus/rs232/hlemouse.h"
 #include "bus/rs232/rs232.h"
 
@@ -103,7 +103,7 @@ void pcat_dyn_state::bank2_w(uint8_t data)
 void pcat_dyn_state::pcat_map(address_map &map)
 {
 	map(0x00000000, 0x0009ffff).ram();
-	map(0x000a0000, 0x000bffff).rw("vga", FUNC(trident_vga_device::mem_r), FUNC(trident_vga_device::mem_w));
+	map(0x000a0000, 0x000bffff).rw("vga", FUNC(tvga9000_device::mem_r), FUNC(tvga9000_device::mem_w));
 	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
 	map(0x000d0000, 0x000d0fff).rom().region("game_prg", 0x0000).w(FUNC(pcat_dyn_state::bank1_w));
 	map(0x000d1000, 0x000d1fff).rom().region("game_prg", 0x1000).w(FUNC(pcat_dyn_state::bank2_w));
@@ -118,9 +118,9 @@ void pcat_dyn_state::pcat_map(address_map &map)
 void pcat_dyn_state::pcat_io(address_map &map)
 {
 	pcat32_io_common(map);
-	map(0x03b0, 0x03bf).rw("vga", FUNC(trident_vga_device::port_03b0_r), FUNC(trident_vga_device::port_03b0_w));
-	map(0x03c0, 0x03cf).rw("vga", FUNC(trident_vga_device::port_03c0_r), FUNC(trident_vga_device::port_03c0_w));
-	map(0x03d0, 0x03df).rw("vga", FUNC(trident_vga_device::port_03d0_r), FUNC(trident_vga_device::port_03d0_w));
+	map(0x03b0, 0x03bf).rw("vga", FUNC(tvga9000_device::port_03b0_r), FUNC(tvga9000_device::port_03b0_w));
+	map(0x03c0, 0x03cf).rw("vga", FUNC(tvga9000_device::port_03c0_r), FUNC(tvga9000_device::port_03c0_w));
+	map(0x03d0, 0x03df).rw("vga", FUNC(tvga9000_device::port_03d0_r), FUNC(tvga9000_device::port_03d0_w));
 	map(0x03f8, 0x03ff).rw("ns16550", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 	map(0x0530, 0x0533).r(FUNC(pcat_dyn_state::audio_r));
 	map(0x0534, 0x0537).rw("ad1848", FUNC(ad1848_device::read), FUNC(ad1848_device::write));
@@ -172,9 +172,12 @@ void pcat_dyn_state::pcat_dyn(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	/* video hardware */
-	pcvideo_trident_vga(config);
-	subdevice<screen_device>("screen")->set_refresh_hz(60);
-	tvga9000_device &vga(TVGA9000_VGA(config.replace(), "vga", 0));
+	// TODO: map to ISA bus
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
+	screen.set_screen_update("vga", FUNC(tvga9000_device::screen_update));
+
+	tvga9000_device &vga(TVGA9000_VGA(config, "vga", 0));
 	vga.set_screen("screen");
 	vga.set_vram_size(0x200000);
 

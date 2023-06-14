@@ -831,7 +831,7 @@ void segaorun_state::update_main_irqs()
 //  main 68000 is reset
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(segaorun_state::m68k_reset_callback)
+void segaorun_state::m68k_reset_callback(int state)
 {
 	m_subcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }

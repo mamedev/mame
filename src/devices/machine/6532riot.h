@@ -41,22 +41,22 @@ public:
 	void porta_in_set(uint8_t data, uint8_t mask);
 	void portb_in_set(uint8_t data, uint8_t mask);
 
-	DECLARE_WRITE_LINE_MEMBER(pa0_w);
-	DECLARE_WRITE_LINE_MEMBER(pa1_w);
-	DECLARE_WRITE_LINE_MEMBER(pa2_w);
-	DECLARE_WRITE_LINE_MEMBER(pa3_w);
-	DECLARE_WRITE_LINE_MEMBER(pa4_w);
-	DECLARE_WRITE_LINE_MEMBER(pa5_w);
-	DECLARE_WRITE_LINE_MEMBER(pa6_w);
-	DECLARE_WRITE_LINE_MEMBER(pa7_w);
-	DECLARE_WRITE_LINE_MEMBER(pb0_w);
-	DECLARE_WRITE_LINE_MEMBER(pb1_w);
-	DECLARE_WRITE_LINE_MEMBER(pb2_w);
-	DECLARE_WRITE_LINE_MEMBER(pb3_w);
-	DECLARE_WRITE_LINE_MEMBER(pb4_w);
-	DECLARE_WRITE_LINE_MEMBER(pb5_w);
-	DECLARE_WRITE_LINE_MEMBER(pb6_w);
-	DECLARE_WRITE_LINE_MEMBER(pb7_w);
+	void pa0_w(int state);
+	void pa1_w(int state);
+	void pa2_w(int state);
+	void pa3_w(int state);
+	void pa4_w(int state);
+	void pa5_w(int state);
+	void pa6_w(int state);
+	void pa7_w(int state);
+	void pb0_w(int state);
+	void pb1_w(int state);
+	void pb2_w(int state);
+	void pb3_w(int state);
+	void pb4_w(int state);
+	void pb5_w(int state);
+	void pb6_w(int state);
+	void pb7_w(int state);
 
 	uint8_t porta_in_get();
 	uint8_t portb_in_get();

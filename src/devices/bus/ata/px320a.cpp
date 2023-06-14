@@ -51,19 +51,19 @@ void px320a_device::write_cs1(offs_t offset, u16 data, u16 mem_mask)
 {
 }
 
-WRITE_LINE_MEMBER(px320a_device::write_dmack)
+void px320a_device::write_dmack(int state)
 {
 }
 
-WRITE_LINE_MEMBER(px320a_device::write_csel)
+void px320a_device::write_csel(int state)
 {
 }
 
-WRITE_LINE_MEMBER(px320a_device::write_dasp)
+void px320a_device::write_dasp(int state)
 {
 }
 
-WRITE_LINE_MEMBER(px320a_device::write_pdiag)
+void px320a_device::write_pdiag(int state)
 {
 }
 

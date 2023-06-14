@@ -115,7 +115,7 @@ private:
 	void output2_w(uint16_t data);
 	void feversoc_map(address_map &map);
 	uint32_t screen_update_feversoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(feversoc_irq);
+	void feversoc_irq(int state);
 	void feversoc_irq_ack(uint16_t data);
 	virtual void machine_start() override;
 
@@ -278,7 +278,7 @@ static INPUT_PORTS_START( feversoc )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-WRITE_LINE_MEMBER(feversoc_state::feversoc_irq)
+void feversoc_state::feversoc_irq(int state)
 {
 	if (state)
 		m_maincpu->set_input_line(8, ASSERT_LINE);

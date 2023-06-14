@@ -122,23 +122,23 @@ INPUT_CHANGED_MEMBER(oric_jasmin_device::boot_pressed)
 	}
 }
 
-WRITE_LINE_MEMBER(oric_jasmin_device::side_sel_w)
+void oric_jasmin_device::side_sel_w(int state)
 {
 	if(m_cur_floppy)
 		m_cur_floppy->ss_w(state);
 }
 
-WRITE_LINE_MEMBER(oric_jasmin_device::ram_access_w)
+void oric_jasmin_device::ram_access_w(int state)
 {
 	remap();
 }
 
-WRITE_LINE_MEMBER(oric_jasmin_device::rom_access_w)
+void oric_jasmin_device::rom_access_w(int state)
 {
 	remap();
 }
 
-WRITE_LINE_MEMBER(oric_jasmin_device::select_w)
+void oric_jasmin_device::select_w(int state)
 {
 	m_cur_floppy = nullptr;
 	for(int i=0; i != 4; i++)

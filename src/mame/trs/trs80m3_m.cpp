@@ -473,7 +473,7 @@ INTERRUPT_GEN_MEMBER(trs80m3_state::rtc_interrupt)
 }
 
 // The floppy sector has been read. Enable CPU and NMI.
-WRITE_LINE_MEMBER(trs80m3_state::intrq_w)
+void trs80m3_state::intrq_w(int state)
 {
 	m_intrq_off = state ? false : true;
 	if (state)
@@ -490,7 +490,7 @@ WRITE_LINE_MEMBER(trs80m3_state::intrq_w)
 }
 
 // The next byte from floppy is available. Enable CPU so it can get the byte.
-WRITE_LINE_MEMBER(trs80m3_state::drq_w)
+void trs80m3_state::drq_w(int state)
 {
 	m_drq_off = state ? false : true;
 	if (state)

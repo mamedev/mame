@@ -474,7 +474,7 @@ void upd71071_device::write(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(upd71071_device::set_hreq)
+void upd71071_device::set_hreq(int state)
 {
 	if (m_hreq != state)
 	{
@@ -483,7 +483,7 @@ WRITE_LINE_MEMBER(upd71071_device::set_hreq)
 	}
 }
 
-WRITE_LINE_MEMBER(upd71071_device::set_eop)
+void upd71071_device::set_eop(int state)
 {
 	if (m_eop != state)
 	{

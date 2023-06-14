@@ -46,8 +46,8 @@ protected:
 	virtual void write(offs_t offset, uint8_t data) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(motor_w);
-	DECLARE_WRITE_LINE_MEMBER(side_w);
+	void motor_w(int state);
+	void side_w(int state);
 
 	required_device<i8271_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
@@ -73,8 +73,8 @@ protected:
 	virtual void write(offs_t offset, uint8_t data) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
 
 	required_device<wd1770_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;

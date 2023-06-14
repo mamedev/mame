@@ -66,18 +66,18 @@ private:
 
 	// Interrupt vectoring glue
 	void intmask_w(uint8_t data);
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(tx_rx_rdy_w);
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(irq_w);
+	template <unsigned N> void tx_rx_rdy_w(int state);
+	template <unsigned N> void irq_w(int state);
 
 	// DMA controller handlers
-	DECLARE_WRITE_LINE_MEMBER(busreq_w);
+	void busreq_w(int state);
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
 	uint8_t io_read_byte(offs_t offset);
 	void io_write_byte(offs_t offset, uint8_t data);
 
 	// PIT handlers
-	DECLARE_WRITE_LINE_MEMBER(br1_w);
+	void br1_w(int state);
 
 	// PIA handlers
 	void pia0_porta_w(uint8_t data);
@@ -88,8 +88,8 @@ private:
 	I8275_DRAW_CHARACTER_MEMBER(zorba_update_chr);
 
 	// Printer port glue
-	DECLARE_WRITE_LINE_MEMBER(printer_fault_w);
-	DECLARE_WRITE_LINE_MEMBER(printer_select_w);
+	void printer_fault_w(int state);
+	void printer_select_w(int state);
 
 	required_ioport                     m_config_port;
 

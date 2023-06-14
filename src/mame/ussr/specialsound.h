@@ -17,9 +17,9 @@ class specimx_sound_device : public device_t, public device_sound_interface
 public:
 	specimx_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER(set_input_ch0);
-	DECLARE_WRITE_LINE_MEMBER(set_input_ch1);
-	DECLARE_WRITE_LINE_MEMBER(set_input_ch2);
+	void set_input_ch0(int state);
+	void set_input_ch1(int state);
+	void set_input_ch2(int state);
 
 protected:
 	// device-level overrides

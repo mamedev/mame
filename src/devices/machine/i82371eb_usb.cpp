@@ -4,8 +4,8 @@
 
     PIIX4E USB interface
 
-	TODO:
-	- Actual USB ports;
+    TODO:
+    - Actual USB ports;
 
 **************************************************************************************************/
 
@@ -57,7 +57,7 @@ void i82371eb_usb_device::io_map(address_map &map)
 void i82371eb_usb_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
-//	io_space->install_device(0, 0x03ff, *this, &i82371eb_usb_device::io_map);
+//  io_space->install_device(0, 0x03ff, *this, &i82371eb_usb_device::io_map);
 }
 
 void i82371eb_usb_device::device_start()
@@ -75,7 +75,7 @@ void i82371eb_usb_device::device_start()
 void i82371eb_usb_device::device_reset()
 {
 	pci_device::device_reset();
-	
+
 	command = 0x0000;
 	status = 0x0280;
 }

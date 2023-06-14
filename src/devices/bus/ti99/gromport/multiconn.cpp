@@ -137,7 +137,7 @@ void ti99_multi_cart_conn_device::remove(int index)
 	m_cartridge[index] = nullptr;
 }
 
-WRITE_LINE_MEMBER(ti99_multi_cart_conn_device::romgq_line)
+void ti99_multi_cart_conn_device::romgq_line(int state)
 {
 	m_readrom = state;
 
@@ -169,7 +169,7 @@ void ti99_multi_cart_conn_device::set_gromlines(line_state mline, line_state mol
 	}
 }
 
-WRITE_LINE_MEMBER(ti99_multi_cart_conn_device::gclock_in)
+void ti99_multi_cart_conn_device::gclock_in(int state)
 {
 	// Propagate to all slots
 	for (int i=0; i < NUMBER_OF_CARTRIDGE_SLOTS; i++)

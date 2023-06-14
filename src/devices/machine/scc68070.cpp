@@ -450,7 +450,7 @@ void scc68070_device::device_reset()
 	set_timer_callback(0);
 }
 
-WRITE_LINE_MEMBER(scc68070_device::reset_peripherals)
+void scc68070_device::reset_peripherals(int state)
 {
 	m_lir = 0;
 
@@ -516,31 +516,31 @@ void scc68070_device::update_ipl()
 	}
 }
 
-WRITE_LINE_MEMBER(scc68070_device::in2_w)
+void scc68070_device::in2_w(int state)
 {
 	m_in2_line = state;
 	update_ipl();
 }
 
-WRITE_LINE_MEMBER(scc68070_device::in4_w)
+void scc68070_device::in4_w(int state)
 {
 	m_in4_line = state;
 	update_ipl();
 }
 
-WRITE_LINE_MEMBER(scc68070_device::in5_w)
+void scc68070_device::in5_w(int state)
 {
 	m_in5_line = state;
 	update_ipl();
 }
 
-WRITE_LINE_MEMBER(scc68070_device::nmi_w)
+void scc68070_device::nmi_w(int state)
 {
 	m_nmi_line = state;
 	update_ipl();
 }
 
-WRITE_LINE_MEMBER(scc68070_device::int1_w)
+void scc68070_device::int1_w(int state)
 {
 	if (m_int1_line != state)
 	{
@@ -554,7 +554,7 @@ WRITE_LINE_MEMBER(scc68070_device::int1_w)
 	}
 }
 
-WRITE_LINE_MEMBER(scc68070_device::int2_w)
+void scc68070_device::int2_w(int state)
 {
 	if (m_int2_line != state)
 	{
@@ -1236,7 +1236,7 @@ void scc68070_device::i2c_process_rising_scl()
 	}
 }
 
-WRITE_LINE_MEMBER(scc68070_device::write_scl)
+void scc68070_device::write_scl(int state)
 {
 	if (m_i2c.status_register & ISR_MST)
 	{

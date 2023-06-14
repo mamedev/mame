@@ -2,8 +2,7 @@
 // copyright-holders:Uki
 /*****************************************************************************
 
-    Markham (c) 1983 Sun Electronics
-    Strength & Skill (c) 1984 Sun Electronics
+    Sun Electronics Markham / Strength & Skill hardware
 
     Driver by Uki
 
@@ -18,9 +17,9 @@
     Pettan Pyuu is a clone of Banbam although with different levels / play fields.
 
     The MCU controls:
-      - general protection startup
-      - the time between when enemies spawn
-      - graphics selection for playfields
+    - general protection startup
+    - the time between when enemies spawn
+    - graphics selection for playfields
 
 *****************************************************************************/
 

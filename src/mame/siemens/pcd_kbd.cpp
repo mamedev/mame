@@ -254,12 +254,12 @@ void pcd_keyboard_device::p1_w(uint8_t data)
 	m_out_tx_handler(BIT(data, 5));
 }
 
-READ_LINE_MEMBER( pcd_keyboard_device::t0_r )
+int pcd_keyboard_device::t0_r()
 {
 	return m_t0;
 }
 
-WRITE_LINE_MEMBER( pcd_keyboard_device::t0_w )
+void pcd_keyboard_device::t0_w(int state)
 {
 	m_t0 = state;
 }

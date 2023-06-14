@@ -41,6 +41,7 @@ public:
 	rollrace_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
@@ -50,7 +51,7 @@ public:
 	{ }
 
 	void rollace2(machine_config &config);
-	void rollrace(machine_config &config);
+	void rollace(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -58,6 +59,7 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -87,17 +89,17 @@ private:
 
 	uint8_t fake_d900_r();
 	void fake_d900_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
+	void nmi_mask_w(int state);
 	void sound_nmi_mask_w(uint8_t data);
-	template <uint8_t Which> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
-	DECLARE_WRITE_LINE_MEMBER(charbank_0_w);
-	DECLARE_WRITE_LINE_MEMBER(charbank_1_w);
+	template <uint8_t Which> void coin_counter_w(int state);
+	void charbank_0_w(int state);
+	void charbank_1_w(int state);
 	void bkgpen_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(spritebank_w);
+	void spritebank_w(int state);
 	void backgroundpage_w(uint8_t data);
 	void backgroundcolor_w(uint8_t data);
 	void flipy_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(flipx_w);
+	void flipx_w(int state);
 	void vram_w(offs_t offset, uint8_t data);
 	void cram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -107,7 +109,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void vblank_irq(int state);
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
@@ -200,13 +202,13 @@ void rollrace_state::palette(palette_device &palette) const
 	}
 }
 
-WRITE_LINE_MEMBER(rollrace_state::charbank_0_w)
+void rollrace_state::charbank_0_w(int state)
 {
 	m_chrbank = state | (m_chrbank & 2);
 	m_fg_tilemap->mark_all_dirty();
 }
 
-WRITE_LINE_MEMBER(rollrace_state::charbank_1_w)
+void rollrace_state::charbank_1_w(int state)
 {
 	m_chrbank = (m_chrbank & 1) | (state << 1);
 	m_fg_tilemap->mark_all_dirty();
@@ -217,7 +219,7 @@ void rollrace_state::bkgpen_w(uint8_t data)
 	m_bkgpen = data;
 }
 
-WRITE_LINE_MEMBER(rollrace_state::spritebank_w)
+void rollrace_state::spritebank_w(int state)
 {
 	m_spritebank = state;
 }
@@ -241,7 +243,7 @@ void rollrace_state::flipy_w(uint8_t data)
 	// bit 2: cleared at night stage in attract, unknown purpose
 }
 
-WRITE_LINE_MEMBER(rollrace_state::flipx_w)
+void rollrace_state::flipx_w(int state)
 {
 	m_flipx = state;
 	m_fg_tilemap->set_flip(m_flipx ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
@@ -280,7 +282,7 @@ uint32_t rollrace_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	}
 
 	// sprites
-	for (int offs = 0x80-4; offs >=0x0; offs -= 4)
+	for (int offs = 0x80-4; offs >= 0x0; offs -= 4)
 	{
 		int s_flipy = 0;
 
@@ -341,7 +343,7 @@ void rollrace_state::fake_d900_w(uint8_t data)
 	LOGD900("d900: %02X\n", data);
 }
 
-WRITE_LINE_MEMBER(rollrace_state::nmi_mask_w)
+void rollrace_state::nmi_mask_w(int state)
 {
 	m_nmi_mask = state;
 	if (!m_nmi_mask)
@@ -354,7 +356,7 @@ void rollrace_state::sound_nmi_mask_w(uint8_t data)
 }
 
 template <uint8_t Which>
-WRITE_LINE_MEMBER(rollrace_state::coin_counter_w)
+void rollrace_state::coin_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(Which, state);
 }
@@ -362,7 +364,7 @@ WRITE_LINE_MEMBER(rollrace_state::coin_counter_w)
 void rollrace_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x9fff).rom();          // only rollace2
+	map(0x8000, 0x9fff).rom(); // only rollace2
 	map(0xc000, 0xcfff).ram();
 	map(0xd806, 0xd806).nopr(); // looks like a watchdog, bit 4 checked
 	map(0xd900, 0xd900).rw(FUNC(rollrace_state::fake_d900_r), FUNC(rollrace_state::fake_d900_w)); // protection ??
@@ -393,7 +395,7 @@ void rollrace_state::sound_map(address_map &map)
 }
 
 
-static INPUT_PORTS_START( rollrace )
+static INPUT_PORTS_START( rollace )
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -519,7 +521,7 @@ static const gfx_layout spritelayout =
 	32*32    // every sprite takes 128 consecutive bytes
 };
 
-static GFXDECODE_START( gfx_rollrace )
+static GFXDECODE_START( gfx_rollace )
 	GFXDECODE_ENTRY( "chars",     0x0000, charlayout,    0,  32 )
 	GFXDECODE_ENTRY( "chars",     0x0800, charlayout,    0,  32 )
 	GFXDECODE_ENTRY( "chars",     0x1000, charlayout,    0,  32 )
@@ -530,7 +532,7 @@ static GFXDECODE_START( gfx_rollrace )
 	GFXDECODE_ENTRY( "sprites_2", 0x0000, spritelayout,  0,  32 )
 GFXDECODE_END
 
-WRITE_LINE_MEMBER(rollrace_state::vblank_irq)
+void rollrace_state::vblank_irq(int state)
 {
 	if (state && m_nmi_mask)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -542,15 +544,15 @@ INTERRUPT_GEN_MEMBER(rollrace_state::sound_timer_irq)
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-void rollrace_state::rollrace(machine_config &config)
+void rollrace_state::rollace(machine_config &config)
 {
 	// basic machine hardware
 	Z80(config, m_maincpu, XTAL(24'000'000) / 8); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &rollrace_state::main_map);
 
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(24'000'000) / 16)); // verified on PCB
-	audiocpu.set_addrmap(AS_PROGRAM, &rollrace_state::sound_map);
-	audiocpu.set_periodic_int(FUNC(rollrace_state::sound_timer_irq), attotime::from_hz(4 * 60));
+	Z80(config, m_audiocpu, XTAL(24'000'000) / 16); // verified on PCB
+	m_audiocpu->set_addrmap(AS_PROGRAM, &rollrace_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(rollrace_state::sound_timer_irq), attotime::from_hz(4 * 60));
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<0>().set(FUNC(rollrace_state::flipx_w));
@@ -571,7 +573,7 @@ void rollrace_state::rollrace(machine_config &config)
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(rollrace_state::vblank_irq));
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rollrace);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rollace);
 	PALETTE(config, m_palette, FUNC(rollrace_state::palette), 256);
 
 	// sound hardware
@@ -581,15 +583,13 @@ void rollrace_state::rollrace(machine_config &config)
 	GENERIC_LATCH_8(config, "soundlatch");
 
 	AY8910(config, "ay1", XTAL(24'000'000) / 16).add_route(ALL_OUTPUTS, "rspeaker", 0.10); // verified on PCB
-
 	AY8910(config, "ay2", XTAL(24'000'000) / 16).add_route(ALL_OUTPUTS, "rspeaker", 0.10); // verified on PCB
-
 	AY8910(config, "ay3", XTAL(24'000'000) / 16).add_route(ALL_OUTPUTS, "lspeaker", 0.10); // verified on PCB
 }
 
 void rollrace_state::rollace2(machine_config &config)
 {
-	rollrace(config);
+	rollace(config);
 
 	// basic machine hardware
 
@@ -642,9 +642,9 @@ ROM_START( fightrol )
 	ROM_LOAD ( "4.18d", 0x6000, 0x2000, CRC(3d9e16ab) SHA1(e99628ffc54e3ff4818313a287ca111617120910) )
 
 	ROM_REGION( 0x300, "proms", 0 )  // colour
-	ROM_LOAD("tbp24s10.7u", 0x0000, 0x0100, CRC(9d199d33) SHA1(b8982f7da2b85f10d117177e4e73cbb486931cf5) )
-	ROM_LOAD("tbp24s10.7t", 0x0100, 0x0100, CRC(c0426582) SHA1(8e3e4d1e76243cce272aa099d2d6ad4fa6c99f7c) )
-	ROM_LOAD("tbp24s10.6t", 0x0200, 0x0100, CRC(c096e05c) SHA1(cb5b509e6124453f381a683ba446f8f4493d4610) )
+	ROM_LOAD( "tbp24s10.7u", 0x0000, 0x0100, CRC(9d199d33) SHA1(b8982f7da2b85f10d117177e4e73cbb486931cf5) )
+	ROM_LOAD( "tbp24s10.7t", 0x0100, 0x0100, CRC(c0426582) SHA1(8e3e4d1e76243cce272aa099d2d6ad4fa6c99f7c) )
+	ROM_LOAD( "tbp24s10.6t", 0x0200, 0x0100, CRC(c096e05c) SHA1(cb5b509e6124453f381a683ba446f8f4493d4610) )
 
 	ROM_REGION( 0x1000, "audiocpu", 0 )
 	ROM_LOAD( "8.6f", 0x0000, 0x1000, CRC(6ec3c545) SHA1(1a2477b9e1563734195b0743f5dbbb005e06022e) )
@@ -689,9 +689,9 @@ ROM_START( rollace )
 	ROM_LOAD ( "4.18d", 0x6000, 0x2000, CRC(3d9e16ab) SHA1(e99628ffc54e3ff4818313a287ca111617120910) )
 
 	ROM_REGION( 0x300, "proms", 0 )  // colour
-	ROM_LOAD("tbp24s10.7u", 0x0000, 0x0100, CRC(9d199d33) SHA1(b8982f7da2b85f10d117177e4e73cbb486931cf5) )
-	ROM_LOAD("tbp24s10.7t", 0x0100, 0x0100, CRC(c0426582) SHA1(8e3e4d1e76243cce272aa099d2d6ad4fa6c99f7c) )
-	ROM_LOAD("tbp24s10.6t", 0x0200, 0x0100, CRC(c096e05c) SHA1(cb5b509e6124453f381a683ba446f8f4493d4610) )
+	ROM_LOAD( "tbp24s10.7u", 0x0000, 0x0100, CRC(9d199d33) SHA1(b8982f7da2b85f10d117177e4e73cbb486931cf5) )
+	ROM_LOAD( "tbp24s10.7t", 0x0100, 0x0100, CRC(c0426582) SHA1(8e3e4d1e76243cce272aa099d2d6ad4fa6c99f7c) )
+	ROM_LOAD( "tbp24s10.6t", 0x0200, 0x0100, CRC(c096e05c) SHA1(cb5b509e6124453f381a683ba446f8f4493d4610) )
 
 	ROM_REGION( 0x1000, "audiocpu", 0 )
 	ROM_LOAD( "8.6f", 0x0000, 0x1000, CRC(6ec3c545) SHA1(1a2477b9e1563734195b0743f5dbbb005e06022e) )
@@ -737,9 +737,9 @@ ROM_START( rollace2 )
 	ROM_LOAD ( "4.18d",   0x6000, 0x2000, CRC(3d9e16ab) SHA1(e99628ffc54e3ff4818313a287ca111617120910) )
 
 	ROM_REGION( 0x300, "proms", 0 )  // colour
-	ROM_LOAD("tbp24s10.7u", 0x0000, 0x0100, CRC(9d199d33) SHA1(b8982f7da2b85f10d117177e4e73cbb486931cf5) )
-	ROM_LOAD("tbp24s10.7t", 0x0100, 0x0100, CRC(c0426582) SHA1(8e3e4d1e76243cce272aa099d2d6ad4fa6c99f7c) )
-	ROM_LOAD("tbp24s10.6t", 0x0200, 0x0100, CRC(c096e05c) SHA1(cb5b509e6124453f381a683ba446f8f4493d4610) )
+	ROM_LOAD( "tbp24s10.7u", 0x0000, 0x0100, CRC(9d199d33) SHA1(b8982f7da2b85f10d117177e4e73cbb486931cf5) )
+	ROM_LOAD( "tbp24s10.7t", 0x0100, 0x0100, CRC(c0426582) SHA1(8e3e4d1e76243cce272aa099d2d6ad4fa6c99f7c) )
+	ROM_LOAD( "tbp24s10.6t", 0x0200, 0x0100, CRC(c096e05c) SHA1(cb5b509e6124453f381a683ba446f8f4493d4610) )
 
 	ROM_REGION( 0x1000, "audiocpu", 0 )
 	ROM_LOAD( "8.6f", 0x0000, 0x1000, CRC(6ec3c545) SHA1(1a2477b9e1563734195b0743f5dbbb005e06022e) )
@@ -747,7 +747,7 @@ ROM_END
 
 } // anonymous namespace
 
-
-GAME( 1983, fightrol, 0,        rollrace, rollrace, rollrace_state, empty_init, ROT270, "Kaneko (Taito license)",    "Fighting Roller",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, rollace,  fightrol, rollrace, rollrace, rollrace_state, empty_init, ROT270, "Kaneko (Williams license)", "Roller Aces (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, rollace2, fightrol, rollace2, rollrace, rollrace_state, empty_init, ROT90,  "Kaneko (Williams license)", "Roller Aces (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT    MACHINE   INPUT    CLASS          INIT        SCREEN  COMPANY, FULLNAME, FLAGS
+GAME( 1983, fightrol, 0,        rollace,  rollace, rollrace_state, empty_init, ROT270, "Kaneko (Taito license)", "Fighting Roller", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, rollace,  fightrol, rollace,  rollace, rollrace_state, empty_init, ROT270, "Kaneko (Williams license)", "Roller Aces (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, rollace2, fightrol, rollace2, rollace, rollrace_state, empty_init, ROT90,  "Kaneko (Williams license)", "Roller Aces (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

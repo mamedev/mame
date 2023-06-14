@@ -12,7 +12,7 @@
 #define ROM128 (BIT(m_regs[MEM_CONFIG], 0))
 #define OFFS_512(_rl) (((m_regs[_rl + 1] & 1) << 8) | m_regs[_rl])
 
-#define VM static_cast<v_mode>(BIT(m_regs[V_CONFIG], 0, 2))
+#define VM v_mode(BIT(m_regs[V_CONFIG], 0, 2))
 
 static constexpr rectangle screen_area[4] = {
 	rectangle(tsconf_state::with_hblank(52), tsconf_state::with_hblank(256 + 51), tsconf_state::with_vblank(48), tsconf_state::with_vblank(192 + 47)), // 52|256|52 x 48-192-48
@@ -373,7 +373,7 @@ void tsconf_state::ram_page_write(u8 page, offs_t offset, u8 data)
 
 u16 tsconf_state::ram_read16(offs_t offset)
 {
-	return ((m_ram->read(offset & ~offs_t(1))) << 8) | m_ram->read(offset | 1);
+	return (m_ram->read(offset & ~offs_t(1)) << 8) | m_ram->read(offset | 1);
 }
 
 void tsconf_state::ram_write16(offs_t offset, u16 data)
@@ -399,7 +399,7 @@ void tsconf_state::cram_write(u16 offset, u8 data)
 
 void tsconf_state::cram_write16(offs_t offset, u16 data)
 {
-	cram_write(offset & 0xfffe, data >> 8);
+	cram_write(offset & 0x1fe, data >> 8);
 	cram_write(offset | 1, data & 0xff);
 };
 
@@ -494,7 +494,7 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 	case T0_X_OFFSET_H:
 	case T1_X_OFFSET_L:
 	case T1_X_OFFSET_H:
-		m_scanline_delayed_regs_update[static_cast<tsconf_regs>(nreg)] = data;
+		m_scanline_delayed_regs_update[tsconf_regs(nreg)] = data;
 		break;
 
 	default:
@@ -665,7 +665,7 @@ void tsconf_state::tsconf_port_f7_w(offs_t offset, u8 data)
 			if (m_glukrs->address_r() == 0xf0)
 			{
 				u8 m_fx[0xf] = {0xff};
-				m_port_f7_ext = static_cast<gluk_ext>(data);
+				m_port_f7_ext = gluk_ext(data);
 				switch (m_port_f7_ext)
 				{
 				case CONF_VERSION:

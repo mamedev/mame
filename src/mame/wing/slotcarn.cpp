@@ -59,7 +59,7 @@ private:
 	std::unique_ptr<uint8_t[]> m_ram_palette;
 	uint8_t palette_r(offs_t offset);
 	void palette_w(offs_t offset, uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
+	void hsync_changed(int state);
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	virtual void machine_start() override;
@@ -156,7 +156,7 @@ MC6845_UPDATE_ROW( slotcarn_state::crtc_update_row )
 }
 
 
-WRITE_LINE_MEMBER(slotcarn_state::hsync_changed)
+void slotcarn_state::hsync_changed(int state)
 {
 	/* update any video up to the current scanline */
 //  m_screen->update_now();

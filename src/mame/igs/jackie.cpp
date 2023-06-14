@@ -80,7 +80,7 @@ public:
 
 	void init_jackie();
 
-	DECLARE_READ_LINE_MEMBER(hopper_r);
+	int hopper_r();
 
 private:
 	void fg_tile_w(offs_t offset, uint8_t data);
@@ -378,7 +378,7 @@ void jackie_state::io_map(address_map &map)
 	map(0x8000, 0xffff).r(FUNC(jackie_state::expram_r));
 }
 
-READ_LINE_MEMBER(jackie_state::hopper_r)
+int jackie_state::hopper_r()
 {
 	if (m_hopper) return !(m_screen->frame_number()%10);
 	return machine().input().code_pressed(KEYCODE_H);

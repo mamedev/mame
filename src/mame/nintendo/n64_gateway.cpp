@@ -4,46 +4,46 @@
     Nintendo Gateway 64
 
     LodgeNet was a pay-per-view system that allowed television, movie and video
-	game rentals on hotels starting in 1993. They entered an agreement with
-	Nintendo to allow the rental of their games on airplanes and hotels for a
-	moderate fee.
+    game rentals on hotels starting in 1993. They entered an agreement with
+    Nintendo to allow the rental of their games on airplanes and hotels for a
+    moderate fee.
 
-	The LodgeNet 64 system was exclusively used in hotels, and consisted of a
-	set-top box with a customized N64 system inside. You could choose one of
-	several games via a TV-driven menu, which would then be downloaded to your
-	room's system, and you would be charged a fee for one hour of playtime.
+    The LodgeNet 64 system was exclusively used in hotels, and consisted of a
+    set-top box with a customized N64 system inside. You could choose one of
+    several games via a TV-driven menu, which would then be downloaded to your
+    room's system, and you would be charged a fee for one hour of playtime.
 
-	The games were different from their retail counterparts; Games had to have
-	their multiplayer modes, accessories and game save support removed, plus have
-	additional support for the system's "halt" functions, so they would be allowed
-	on the system. The game controllers were custom, with additional buttons for
-	use with their rental system and a reset button, and did not allow the use of
-	Rumble Paks or Memory Paks. While the hardware allowed temporary save files,
-	these would be deleted from the system with a special utility before a new game
-	was loaded. These files were stored in encrypted format in the LodgeNet
-	servers, and were decrypted after being downloaded to the system. An extra file
-	with additional info about the game, its encryption code, and EEPROM settings
-	was also present.
+    The games were different from their retail counterparts; Games had to have
+    their multiplayer modes, accessories and game save support removed, plus have
+    additional support for the system's "halt" functions, so they would be allowed
+    on the system. The game controllers were custom, with additional buttons for
+    use with their rental system and a reset button, and did not allow the use of
+    Rumble Paks or Memory Paks. While the hardware allowed temporary save files,
+    these would be deleted from the system with a special utility before a new game
+    was loaded. These files were stored in encrypted format in the LodgeNet
+    servers, and were decrypted after being downloaded to the system. An extra file
+    with additional info about the game, its encryption code, and EEPROM settings
+    was also present.
 
-	While the development info released mentions a requirement for PAL versions of
-	the games, none are currently known to exist.
+    While the development info released mentions a requirement for PAL versions of
+    the games, none are currently known to exist.
 
-	38 Nintendo 64 titles were made available on the service, and 31 are currently
-	dumped. The following games have not been found:
+    38 Nintendo 64 titles were made available on the service, and 31 are currently
+    dumped. The following games have not been found:
 
-	- Extreme-G
-	- Forsaken 64
-	- Iggy's Reckin' Balls
-	- Milo's Astro Lanes
-	- Namco Museum 64
-	- San Francisco Rush: Extreme Racing
-	- Turok 2: Seeds of Evil
+    - Extreme-G
+    - Forsaken 64
+    - Iggy's Reckin' Balls
+    - Milo's Astro Lanes
+    - Namco Museum 64
+    - San Francisco Rush: Extreme Racing
+    - Turok 2: Seeds of Evil
 
-	These games will function, but the actual LodgeNet system is not emulated,
-	so the extra controller buttons and other system functions are not
-	implemented.
+    These games will function, but the actual LodgeNet system is not emulated,
+    so the extra controller buttons and other system functions are not
+    implemented.
 
-	The existing roms are decrypted, and should be considered bad dumps.
+    The existing roms are decrypted, and should be considered bad dumps.
 
     TODO:
     - Set-top box part;
@@ -73,12 +73,12 @@ public:
 		n64_state(mconfig, type, tag)
 	{ }
 
-    void n64_lodgenet_map(address_map &map);
-    void n64_lodgenet(machine_config &config);
+	void n64_lodgenet_map(address_map &map);
+	void n64_lodgenet(machine_config &config);
 
 private:
 	void n64_map(address_map &map);
-   	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void rsp_imem_map(address_map &map);
 	void rsp_dmem_map(address_map &map);
@@ -104,7 +104,7 @@ void n64_gateway_state::n64_lodgenet_map(address_map &map)
 	map(0x1fc00000, 0x1fc007bf).rom().region("user1", 0);                                   // PIF ROM
 	map(0x1fc007c0, 0x1fc007ff).rw("rcp", FUNC(n64_periphs::pif_ram_r), FUNC(n64_periphs::pif_ram_w));
 
-    // map(0x0ff70000, 0x0ff70003) Host HALT control
+	// map(0x0ff70000, 0x0ff70003) Host HALT control
 }
 
 void n64_gateway_state::rsp_imem_map(address_map &map)
@@ -124,35 +124,35 @@ static INPUT_PORTS_START( n64_lodgenet )
 	PORT_CONFNAME(0x0003, 0x0001, "Controller Port 0 Device")
 	PORT_CONFSETTING(0x00, "None")
 	PORT_CONFSETTING(0x01, "Joypad")
-//	PORT_CONFSETTING(0x02, "Mouse")
-    PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
-//	PORT_CONFNAME(0x000C, 0x0000, "Controller Port 1 Device")
-//	PORT_CONFSETTING(0x00, "None")
-//	PORT_CONFSETTING(0x04, "Joypad")
-//	PORT_CONFSETTING(0x08, "Mouse")
-//	PORT_CONFNAME(0x0030, 0x0000, "Controller Port 2 Device")
-//	PORT_CONFSETTING(0x00, "None")
-//	PORT_CONFSETTING(0x10, "Joypad")
-//	PORT_CONFSETTING(0x20, "Mouse")
-//	PORT_CONFNAME(0x00C0, 0x0000, "Controller Port 3 Device")
-//	PORT_CONFSETTING(0x00, "None")
-//	PORT_CONFSETTING(0x40, "Joypad")
-//	PORT_CONFSETTING(0x80, "Mouse")
+//  PORT_CONFSETTING(0x02, "Mouse")
+	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
+//  PORT_CONFNAME(0x000C, 0x0000, "Controller Port 1 Device")
+//  PORT_CONFSETTING(0x00, "None")
+//  PORT_CONFSETTING(0x04, "Joypad")
+//  PORT_CONFSETTING(0x08, "Mouse")
+//  PORT_CONFNAME(0x0030, 0x0000, "Controller Port 2 Device")
+//  PORT_CONFSETTING(0x00, "None")
+//  PORT_CONFSETTING(0x10, "Joypad")
+//  PORT_CONFSETTING(0x20, "Mouse")
+//  PORT_CONFNAME(0x00C0, 0x0000, "Controller Port 3 Device")
+//  PORT_CONFSETTING(0x00, "None")
+//  PORT_CONFSETTING(0x40, "Joypad")
+//  PORT_CONFSETTING(0x80, "Mouse")
 
-    PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-//	PORT_CONFNAME(0x0100, 0x0000, "Disk Drive")
-//	PORT_CONFSETTING(0x0000, "Retail")
-//	PORT_CONFSETTING(0x0100, "Development")
+//  PORT_CONFNAME(0x0100, 0x0000, "Disk Drive")
+//  PORT_CONFSETTING(0x0000, "Retail")
+//  PORT_CONFSETTING(0x0100, "Development")
 //
 
-    PORT_CONFNAME(0xC000, 0x8000, "EEPROM Size")
-    PORT_CONFSETTING(0x0000, "None")
-    PORT_CONFSETTING(0x8000, "4KB")
-    PORT_CONFSETTING(0xC000, "16KB")
+	PORT_CONFNAME(0xC000, 0x8000, "EEPROM Size")
+	PORT_CONFSETTING(0x0000, "None")
+	PORT_CONFSETTING(0x8000, "4KB")
+	PORT_CONFSETTING(0xC000, "16KB")
 
 	//Player 1
-    // TODO: extra buttons
+	// TODO: extra buttons
 	PORT_START("P1")
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("P1 Button A / Left Click")
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("P1 Button B / Right Click")
@@ -177,63 +177,63 @@ static INPUT_PORTS_START( n64_lodgenet )
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1) PORT_REVERSE
 
 	PORT_START("P1_MOUSE_X")
-    PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P1_MOUSE_Y")
-    PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	//Player 2
 	PORT_START("P2")
-    PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P2_ANALOG_X")
-    PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P2_ANALOG_Y")
-    PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P2_MOUSE_X")
-    PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P2_MOUSE_Y")
-    PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	//Player 3
 	PORT_START("P3")
-    PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P3_ANALOG_X")
-    PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P3_ANALOG_Y")
-    PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P3_MOUSE_X")
-    PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P3_MOUSE_Y")
-    PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	//Player 4
 	PORT_START("P4")
-    PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P4_ANALOG_X")
-    PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P4_ANALOG_Y")
-    PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P4_MOUSE_X")
-    PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P4_MOUSE_Y")
-    PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("RESET")
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
-    // no reset button available
-//	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OTHER )        PORT_NAME("Warm Reset") PORT_CODE(KEYCODE_3)
+	// no reset button available
+//  PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OTHER )        PORT_NAME("Warm Reset") PORT_CODE(KEYCODE_3)
 
 INPUT_PORTS_END
 
@@ -319,8 +319,8 @@ void n64_gateway_state::n64_lodgenet(machine_config &config)
 	//m_vr4300->set_icache_size(16384);
 	//m_vr4300->set_dcache_size(8192);
 	//m_vr4300->set_system_clock(62500000);
-   	m_vr4300->set_addrmap(AS_PROGRAM, &n64_gateway_state::n64_lodgenet_map);
-//	m_vr4300->set_vblank_int("screen", FUNC(n64_console_state::n64_reset_poll));
+	m_vr4300->set_addrmap(AS_PROGRAM, &n64_gateway_state::n64_lodgenet_map);
+//  m_vr4300->set_vblank_int("screen", FUNC(n64_console_state::n64_reset_poll));
 
 	RSP(config, m_rsp, 62500000);
 	m_rsp->set_force_no_drc(false);
@@ -359,9 +359,9 @@ void n64_gateway_state::n64_lodgenet(machine_config &config)
 }
 
 ROM_START( n64_lodgenet )
-    ROM_REGION( 0x20000, "gateway64", ROMREGION_ERASEFF )
-    // unknown CPU/controller, likely multiple ROMs for set-top box & game data receiver.
-    ROM_LOAD( "gateway64.bios", 0, 0x20000, NO_DUMP )
+	ROM_REGION( 0x20000, "gateway64", ROMREGION_ERASEFF )
+	// unknown CPU/controller, likely multiple ROMs for set-top box & game data receiver.
+	ROM_LOAD( "gateway64.bios", 0, 0x20000, NO_DUMP )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for R4300 */
 

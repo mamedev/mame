@@ -38,6 +38,7 @@
 
 DEFINE_DEVICE_TYPE(ATI_RAGEII, atirageii_device, "rageii", "ATI Rage II PCI")
 DEFINE_DEVICE_TYPE(ATI_RAGEIIC, atirageiic_device, "rageiic", "ATI Rage IIC PCI")
+DEFINE_DEVICE_TYPE(ATI_RAGEIIDVD, atirageiidvd_device, "rageiidvd", "ATI Rage II+ DVD PCI")
 DEFINE_DEVICE_TYPE(ATI_RAGEPRO, atiragepro_device, "ragepro", "ATI Rage Pro PCI")
 
 // register offsets
@@ -101,6 +102,12 @@ atirageii_device::atirageii_device(const machine_config &mconfig, const char *ta
 
 atirageiic_device::atirageiic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: atirage_device(mconfig, ATI_RAGEIIC, tag, owner, clock)
+{
+}
+
+atirageiidvd_device::atirageiidvd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: atirage_device(mconfig, ATI_RAGEIIDVD, tag, owner, clock)
+	, m_vga_rom(*this, "vga_rom")
 {
 }
 
@@ -205,6 +212,40 @@ void atirageiic_device::device_start()
 	m_regs0[CONFIG_CHIP_ID] = 0x56;
 	m_regs0[CONFIG_CHIP_ID+1] = 0x47;
 	m_regs0[CONFIG_CHIP_ID+3] = 0x3a;
+}
+
+void atirageiidvd_device::device_start()
+{
+	// Mach64 GT-B [3D Rage II+ DVD]
+	// TODO: verify subvendor ID & revision
+	set_ids(0x10024755, 0x00, 0x030000, 0x10026987);
+	atirage_device::device_start();
+	revision = 0x3a;
+	m_regs0[CONFIG_CHIP_ID] = 0x55;
+	m_regs0[CONFIG_CHIP_ID+1] = 0x47;
+	m_regs0[CONFIG_CHIP_ID+3] = 0x3a;
+
+	// TODO: opt-in Mach64 legacy x86 memory & i/o VGA bridge control
+	command = 0;
+
+	add_rom((u8 *)m_vga_rom->base(), 0x8000);
+	expansion_rom_base = 0xc0000;
+}
+
+ROM_START( atirageiidvd )
+	ROM_REGION32_LE( 0x10000, "vga_rom", ROMREGION_ERASEFF )
+	// Header, P/N then date
+	ROM_SYSTEM_BIOS( 0, "2mbsgr", "ATI Mach64 2mb 113-40109-100 1997/10/03" )
+	ROMX_LOAD( "2mbsgr.vbi", 0x0000, 0x8000, CRC(d800adfd) SHA1(17492b51b5ec158db618f2851ce8beca91d12aa8), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "4mbsgr", "ATI Mach64 4mb 113-37914-103 1997/04/15" )
+	ROMX_LOAD( "4mbsgr.vbi", 0x0000, 0xc000, CRC(e974821f) SHA1(185557cec469f54e15cbe30241bd1af56ed303d2), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "4mbedo", "ATI Mach64 GTB 4mb EDO 113-38801-101 1997/02/12" )
+	ROMX_LOAD( "4mbedo.vbi", 0x0000, 0x8800, CRC(0c344b72) SHA1(a068ef73d56b5fc200076283d32676b818404f1b), ROM_BIOS(2) )
+ROM_END
+
+const tiny_rom_entry *atirageiidvd_device::device_rom_region() const
+{
+	return ROM_NAME(atirageiidvd);
 }
 
 void atiragepro_device::device_start()

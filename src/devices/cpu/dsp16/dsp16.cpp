@@ -113,7 +113,7 @@ ALLOW_SAVE_TYPE(dsp16_device_base::phase);
 ALLOW_SAVE_TYPE(dsp16_device_base::flags);
 ALLOW_SAVE_TYPE(dsp16_device_base::sio_flags);
 
-WRITE_LINE_MEMBER(dsp16_device_base::exm_w)
+void dsp16_device_base::exm_w(int state)
 {
 	if (bool(state) != bool(m_exm_in))
 	{

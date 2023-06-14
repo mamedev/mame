@@ -8,7 +8,7 @@
 
 #include "machine/i82371sb.h"
 
-class i82371eb_isa_device : public i82371sb_isa_device 
+class i82371eb_isa_device : public i82371sb_isa_device
 {
 public:
 	template <typename T>
@@ -17,7 +17,7 @@ public:
 	{
 		set_cpu_tag(std::forward<T>(cpu_tag));
 	}
-	
+
 	i82371eb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 private:

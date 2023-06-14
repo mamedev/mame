@@ -245,7 +245,7 @@ uint8_t dio16_device::dmack_r_out(int index, int channel)
 	return ret;
 }
 
-WRITE_LINE_MEMBER(dio16_device::reset_in)
+void dio16_device::reset_in(int state)
 {
 	for (auto &card : m_cards) {
 		if (card->get_index() != m_bus_index)

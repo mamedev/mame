@@ -40,7 +40,7 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(keyin_w);
+	void keyin_w(int state);
 	u8 p1_r();
 	void p3_w(u8 data);
 	u8 bs_24k_r(offs_t offset);
@@ -69,7 +69,7 @@ void z29_state::machine_start()
 	save_item(NAME(m_keyin));
 }
 
-WRITE_LINE_MEMBER(z29_state::keyin_w)
+void z29_state::keyin_w(int state)
 {
 	m_keyin = state;
 }

@@ -72,7 +72,7 @@ void acorn_bmu_device::device_start()
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-WRITE_LINE_MEMBER(acorn_bmu_device::scl_w)
+void acorn_bmu_device::scl_w(int state)
 {
 	if (m_scl != state)
 	{
@@ -230,7 +230,7 @@ WRITE_LINE_MEMBER(acorn_bmu_device::scl_w)
 	}
 }
 
-WRITE_LINE_MEMBER(acorn_bmu_device::sda_w)
+void acorn_bmu_device::sda_w(int state)
 {
 	state &= 1;
 	if (m_sdaw != state)
@@ -257,7 +257,7 @@ WRITE_LINE_MEMBER(acorn_bmu_device::sda_w)
 	}
 }
 
-READ_LINE_MEMBER(acorn_bmu_device::sda_r)
+int acorn_bmu_device::sda_r()
 {
 	int res = m_sdar & 1;
 

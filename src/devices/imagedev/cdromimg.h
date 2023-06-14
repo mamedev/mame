@@ -82,7 +82,7 @@ protected:
 	// device_image_interface implementation
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	void setup_current_preset_image();	
+	void setup_current_preset_image();
 
 	bool        m_gd_compat;
 	bool        m_dvd_compat;

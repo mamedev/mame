@@ -49,7 +49,7 @@ public:
 
 	void rgum(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(heartbeat_r);
+	int heartbeat_r();
 
 protected:
 	virtual void video_start() override;
@@ -186,7 +186,7 @@ void rgum_state::main_map(address_map &map) // TODO: map MK48Z08B-10
 }
 
 
-READ_LINE_MEMBER(rgum_state::heartbeat_r)
+int rgum_state::heartbeat_r()
 {
 	return m_hbeat;
 }

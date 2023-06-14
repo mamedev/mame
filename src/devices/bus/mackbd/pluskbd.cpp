@@ -149,7 +149,7 @@ protected:
 		save_item(NAME(m_host_data_in));
 	}
 
-	virtual DECLARE_WRITE_LINE_MEMBER(data_w) override
+	virtual void data_w(int state) override
 	{
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(keyboard_base::update_host_data), this), state);
 	}

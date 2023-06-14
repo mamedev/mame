@@ -48,7 +48,7 @@ public:
 		: xavix_i2c_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_READ_LINE_MEMBER(camera_r);
+	int camera_r();
 };
 
 

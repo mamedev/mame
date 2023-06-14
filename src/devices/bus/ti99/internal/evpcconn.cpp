@@ -32,7 +32,7 @@ evpc_clock_connector::evpc_clock_connector(const machine_config &mconfig, const 
 {
 }
 
-WRITE_LINE_MEMBER( evpc_clock_connector::vclock_line )
+void evpc_clock_connector::vclock_line(int state)
 {
 	m_vdpint(state);
 }

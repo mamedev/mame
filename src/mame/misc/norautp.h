@@ -56,7 +56,7 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(ppi2_obf_w);
+	void ppi2_obf_w(int state);
 	TIMER_CALLBACK_MEMBER(ppi2_ack);
 	uint8_t test2_r();
 	void mainlamps_w(uint8_t data);

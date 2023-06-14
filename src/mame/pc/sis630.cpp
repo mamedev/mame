@@ -7,6 +7,10 @@
 
     TODO (main):
     - PS/2 loses IRQs, mouse is unusable, "ibm" BIOS doesn't work at all;
+    - Super I/O handling of ITE 8705F (I/O $2e / $2f)
+    \- We currently (wrongly) handle most stuff in PCI LPC instead;
+    \- Another Super I/O is the HW motherboard monitor,
+       cfr. I/O $294 reads in shutms11 BIOS fan tests;
     - '900 Ethernet (missing ROM dump);
     - USB controllers (OpenHCI complaint);
     - Floppy drive, unsupported SMC37C673 default;
@@ -14,7 +18,6 @@
     - EISA slots;
     - PnP from LPC;
     - SMBus;
-    - Super I/O handling in LPC (HW motherboard monitor, cfr. I/O $294 reads in shutms11 fan tests);
 
     TODO (usability, to be moved in a SW list):
     - windows xp sp3: tests HW then does an ACPI devtrap write ($48), will eventually BSoD with
@@ -176,7 +179,11 @@ public:
 	{ }
 
 	void sis630(machine_config &config);
+
+	void asuspolo(machine_config &config);
+	void asuscusc(machine_config &config);
 	void gamecstl(machine_config &config);
+	void zidav630e(machine_config &config);
 
 private:
 
@@ -255,6 +262,34 @@ void sis630_state::sis630(machine_config &config)
 //  ISA16_SLOT(config, "isa2", 0, "pci:01.0:isabus", pc_isa16_cards, nullptr, false);
 }
 
+void sis630_state::asuspolo(machine_config &config)
+{
+	sis630_state::sis630(config);
+
+	// one expansion PCI only
+	// SiS950 rebadged as ITE chip (unreadable on available photo)
+}
+
+void sis630_state::asuscusc(machine_config &config)
+{
+	sis630_state::sis630(config);
+
+	// 2x expansion PCIs
+	// "ASUS Mozart"
+}
+
+void sis630_state::zidav630e(machine_config &config)
+{
+	sis630_state::sis630(config);
+
+	// SiS630E
+	// 3x expansion PCIs
+	// ITE 8705F (Super I/O)
+	// Winbond chip nearby with unreadable marking
+
+	// Max allowed CPU 333 MHz (according to AIDA16)
+}
+
 // Kontron 786LCD/3.5 based
 void sis630_state::gamecstl(machine_config &config)
 {
@@ -281,6 +316,35 @@ ROM_START(shutms11)
 	ROMX_LOAD( "ms11s134.bin",     0x040000, 0x040000, CRC(d739c4f3) SHA1(2301e57163ac4d9b7eddcabce52fa7d01b22330e), ROM_BIOS(1) )
 ROM_END
 
+ROM_START(asuspolo)
+	ROM_REGION32_LE(0x80000, "flash", ROMREGION_ERASEFF )
+	ROM_SYSTEM_BIOS(0, "polotv", "Polo-TV 1009")
+	ROMX_LOAD( "potv1009.awd",     0x040000, 0x040000, CRC(981e1c75) SHA1(0e1cd42ad62fca63e4919c708348ce18947faaa4), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS(1, "polo",   "Polo 1011.001 (beta)")
+	ROMX_LOAD( "1011efx.001",      0x040000, 0x040000, CRC(00d73848) SHA1(b2b4ed8e9ec10b853dfdabe1af580b01983864fc), ROM_BIOS(1) )
+ROM_END
+
+ROM_START(asuscusc)
+	ROM_REGION32_LE(0x80000, "flash", ROMREGION_ERASEFF )
+	ROM_SYSTEM_BIOS(0, "cusc",        "Cusc 1009")
+	ROMX_LOAD( "cusc1009.awd",     0x040000, 0x040000, CRC(f7d8cab9) SHA1(47e7728d487a8105de1bc0eeb58a603e334304c0), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS(1, "cusc_beta",   "Cusc 1011.001 (beta)")
+	ROMX_LOAD( "cusc1011.001",     0x040000, 0x040000, CRC(c2935b70) SHA1(8dedfc7423ebbee5dbe3af3ad92cd0f9866ca876), ROM_BIOS(1) )
+ROM_END
+
+ROM_START(zidav630e)
+	ROM_REGION32_LE(0x80000, "flash", ROMREGION_ERASEFF )
+	ROM_SYSTEM_BIOS(0, "award_v108",  "Award BIOS v1.08")
+	ROMX_LOAD( "v630108e.bin",     0x040000, 0x040000, CRC(25c91274) SHA1(95ff37ad0cfb39bb4ceff2db1cd47f13849ea53a), ROM_BIOS(0) )
+	// Corrupt file
+//	ROM_SYSTEM_BIOS(1, "award_v104",  "Award BIOS v1.04")
+//	ROMX_LOAD( "V630e104.bin",     0x040000, 0x040000, CRC(?) SHA1(?), ROM_BIOS(1) )
+ROM_END
+
+/*
+ * Arcade based GameCristal
+ */
+
 ROM_START(gamecstl)
 	ROM_REGION32_LE(0x80000, "flash", ROMREGION_ERASEFF )
 	// from gamecstl HDD dump, under "C:\drvs\bios\bios1_9"
@@ -303,8 +367,12 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 2000, shutms11, 0,      0,      sis630,  sis630, sis630_state, empty_init, "Shuttle", "MS11 PC", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 2000, shutms11,  0,      0,      sis630,   sis630, sis630_state, empty_init, "Shuttle", "MS11 PC (SiS630 chipset)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 2001, asuspolo,  0,      0,      asuspolo, sis630, sis630_state, empty_init, "Asus", "Polo \"Genie\" (SiS630 chipset)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // hangs at CMOS check first time, corrupts flash ROM on successive boots
+COMP( 2001, asuscusc,  0,      0,      asuscusc, sis630, sis630_state, empty_init, "Asus", "Terminator P-3 \"Cusc\" (SiS630 chipset)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // fails CMOS test, does crc with I/O accesses at $c00
+COMP( 2001, zidav630e, 0,      0,      zidav630e,sis630, sis630_state, empty_init, "Zida", "V630E Baby AT (SiS630 chipset)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // Flash ROM corrupts often, otherwise same-y as shutms11
+
 
 // Arcade based games
-GAME( 2002, gamecstl, 0,              gamecstl, sis630, sis630_state, empty_init, ROT0, "Cristaltec", "GameCristal",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2002, gamecst2, gamecstl,       gamecstl, sis630, sis630_state, empty_init, ROT0, "Cristaltec", "GameCristal (version 2.613)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2002, gamecstl,  0,        gamecstl, sis630, sis630_state, empty_init, ROT0, "Cristaltec", "GameCristal",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2002, gamecst2,  gamecstl, gamecstl, sis630, sis630_state, empty_init, ROT0, "Cristaltec", "GameCristal (version 2.613)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

@@ -34,12 +34,12 @@ public:
 	void uc_w(offs_t offset, uint8_t data);
 
 	// Signals to CPU
-	DECLARE_READ_LINE_MEMBER(irl_r);
-	DECLARE_READ_LINE_MEMBER(halt_r);
+	int irl_r();
+	int halt_r();
 
 	// Signals to uC
-	DECLARE_READ_LINE_MEMBER(reset_r);
-	DECLARE_READ_LINE_MEMBER(int_r);
+	int reset_r();
+	int int_r();
 
 	// Interrupt enable
 	void inten();

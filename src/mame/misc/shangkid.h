@@ -32,8 +32,8 @@ protected:
 
 	bool m_int_enable[2];
 
-	DECLARE_WRITE_LINE_MEMBER(int_enable_1_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_1_w);
+	void int_enable_1_w(int state);
+	void irq_1_w(int state);
 
 private:
 	void palette(palette_device &palette) const;
@@ -80,13 +80,13 @@ private:
 
 	void ay8910_porta_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(sound_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(int_enable_2_w);
-	DECLARE_WRITE_LINE_MEMBER(nmi_enable_1_w);
-	DECLARE_WRITE_LINE_MEMBER(nmi_enable_2_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_2_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
+	void sound_enable_w(int state);
+	void int_enable_2_w(int state);
+	void nmi_enable_1_w(int state);
+	void nmi_enable_2_w(int state);
+	void irq_2_w(int state);
+	void coin_counter_1_w(int state);
+	void coin_counter_2_w(int state);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 

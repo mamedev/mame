@@ -3,11 +3,11 @@
 
 /*
 
-	Skeleton driver for Yamaha PortaSound PCS-30 keyboard with Playcard support
+    Skeleton driver for Yamaha PortaSound PCS-30 keyboard with Playcard support
 
-	CPU: Toshiba TMPZ84C00P (Z80 clone)
-	Sound: Yamaha YM2142 (GE8)
-	Other: Yamaha YM3514 (64 pins)
+    CPU: Toshiba TMPZ84C00P (Z80 clone)
+    Sound: Yamaha YM2142 (GE8)
+    Other: Yamaha YM3514 (64 pins)
 
 */
 

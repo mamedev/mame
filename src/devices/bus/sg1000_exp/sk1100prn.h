@@ -40,12 +40,12 @@ public:
 	sk1100_printer_port_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 	virtual ~sk1100_printer_port_device();
 
-	DECLARE_READ_LINE_MEMBER(fault_r);
-	DECLARE_READ_LINE_MEMBER(busy_r);
+	int fault_r();
+	int busy_r();
 
-	DECLARE_WRITE_LINE_MEMBER(data_w);
-	DECLARE_WRITE_LINE_MEMBER(reset_w);
-	DECLARE_WRITE_LINE_MEMBER(feed_w);
+	void data_w(int state);
+	void reset_w(int state);
+	void feed_w(int state);
 
 protected:
 	// device-level overrides
@@ -69,12 +69,12 @@ public:
 protected:
 	device_sk1100_printer_port_interface(const machine_config &mconfig, device_t &device);
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data )  { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_reset ) { }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_feed ) { }
+	virtual void input_data(int state)  { }
+	virtual void input_reset(int state) { }
+	virtual void input_feed(int state) { }
 
-	virtual DECLARE_READ_LINE_MEMBER( output_fault ) { return 1; }
-	virtual DECLARE_READ_LINE_MEMBER( output_busy ) { return 1; }
+	virtual int output_fault() { return 1; }
+	virtual int output_busy() { return 1; }
 };
 
 

@@ -328,7 +328,7 @@ void vme_hcpu30_card_device::trap_w(offs_t offset, uint32_t data, uint32_t mem_m
 }
 
 // Active High?
-WRITE_LINE_MEMBER(vme_hcpu30_card_device::dusirq_callback)
+void vme_hcpu30_card_device::dusirq_callback(int state)
 {
 	LOGINT("vme_hcpu30_card_device::dusirq_callback(%02x)\n", state);
 	m_irq_state &= ~(1 << 12);
@@ -336,7 +336,7 @@ WRITE_LINE_MEMBER(vme_hcpu30_card_device::dusirq_callback)
 }
 
 // Active Low?
-WRITE_LINE_MEMBER(vme_hcpu30_card_device::scsiirq_callback)
+void vme_hcpu30_card_device::scsiirq_callback(int state)
 {
 	LOGINT("vme_hcpu30_card_device::scsiirq_callback(%02x)\n", state);
 	m_irq_state &= ~(1 << 8);
@@ -344,7 +344,7 @@ WRITE_LINE_MEMBER(vme_hcpu30_card_device::scsiirq_callback)
 }
 
 // Active Low?
-WRITE_LINE_MEMBER(vme_hcpu30_card_device::scsidrq_callback)
+void vme_hcpu30_card_device::scsidrq_callback(int state)
 {
 	LOGINT("vme_hcpu30_card_device::scsidrq_callback(%02x)\n", state);
 	m_irq_state &= ~(1 << 7);
@@ -352,7 +352,7 @@ WRITE_LINE_MEMBER(vme_hcpu30_card_device::scsidrq_callback)
 }
 
 // Active Low?
-WRITE_LINE_MEMBER(vme_hcpu30_card_device::fdcirq_callback)
+void vme_hcpu30_card_device::fdcirq_callback(int state)
 {
 	LOGINT("vme_hcpu30_card_device::fdcirq_callback(%02x)\n", state);
 	m_irq_state &= ~(1 << (8+2));
@@ -360,7 +360,7 @@ WRITE_LINE_MEMBER(vme_hcpu30_card_device::fdcirq_callback)
 }
 
 // Active Low?
-WRITE_LINE_MEMBER(vme_hcpu30_card_device::fdcdrq_callback)
+void vme_hcpu30_card_device::fdcdrq_callback(int state)
 {
 	LOGINT("vme_hcpu30_card_device::fdcdrq_callback(%02x)\n", state);
 #if 0

@@ -81,7 +81,7 @@ public:
 
 	void r2dtank(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(ttl74123_output_r);
+	int ttl74123_output_r();
 
 protected:
 	virtual void machine_start() override;
@@ -107,14 +107,14 @@ private:
 	void audio_command_w(uint8_t data);
 	uint8_t audio_answer_r();
 	void audio_answer_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(main_cpu_irq);
+	void main_cpu_irq(int state);
 	void AY8910_select_w(uint8_t data);
 	uint8_t AY8910_port_r();
 	void AY8910_port_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	void flipscreen_w(int state);
 	void pia_comp_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(ttl74123_output_changed);
+	void ttl74123_output_changed(int state);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
@@ -129,7 +129,7 @@ private:
  *
  *************************************/
 
-WRITE_LINE_MEMBER(r2dtank_state::main_cpu_irq)
+void r2dtank_state::main_cpu_irq(int state)
 {
 	int combined_state = m_pia_main->irq_a_state() | m_pia_main->irq_b_state() |
 							m_pia_audio->irq_a_state() | m_pia_audio->irq_b_state();
@@ -237,14 +237,14 @@ void r2dtank_state::AY8910_port_w(uint8_t data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(r2dtank_state::ttl74123_output_changed)
+void r2dtank_state::ttl74123_output_changed(int state)
 {
 	m_pia_main->ca1_w(state);
 	m_ttl74123_output = state;
 }
 
 
-READ_LINE_MEMBER(r2dtank_state::ttl74123_output_r)
+int r2dtank_state::ttl74123_output_r()
 {
 	return m_ttl74123_output;
 }
@@ -272,7 +272,7 @@ void r2dtank_state::machine_start()
  *************************************/
 
 
-WRITE_LINE_MEMBER(r2dtank_state::flipscreen_w)
+void r2dtank_state::flipscreen_w(int state)
 {
 	m_flipscreen = !state;
 }

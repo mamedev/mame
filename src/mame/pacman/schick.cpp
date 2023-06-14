@@ -58,14 +58,14 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void coin_counter_1_w(int state);
+	void coin_counter_2_w(int state);
+	void irq_mask_w(int state);
+	void vblank_irq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(schick_palettebank_w);
-	DECLARE_WRITE_LINE_MEMBER(schick_colortablebank_w);
-	DECLARE_WRITE_LINE_MEMBER(schick_gfxbank_w);
+	void schick_palettebank_w(int state);
+	void schick_colortablebank_w(int state);
+	void schick_gfxbank_w(int state);
 
 	TILEMAP_MAPPER_MEMBER(schick_scan_rows);
 	TILE_GET_INFO_MEMBER(schick_get_tile_info);
@@ -199,21 +199,21 @@ void schick_state::schick_colorram_w(offs_t offset, uint8_t data)
 	m_bg_tilemap->mark_tile_dirty(offset );
 }
 
-WRITE_LINE_MEMBER(schick_state::schick_palettebank_w)
+void schick_state::schick_palettebank_w(int state)
 {
 	logerror("%s: schick_palettebank_w %d\n", machine().describe_context(), state);
 	m_palettebank = state;
 	m_bg_tilemap->mark_all_dirty();
 }
 
-WRITE_LINE_MEMBER(schick_state::schick_colortablebank_w)
+void schick_state::schick_colortablebank_w(int state)
 {
 	logerror("%s: schick_colortablebank_w %d\n", machine().describe_context(), state);
 	m_colortablebank = state;
 	m_bg_tilemap->mark_all_dirty();
 }
 
-WRITE_LINE_MEMBER(schick_state::schick_gfxbank_w)
+void schick_state::schick_gfxbank_w(int state)
 {
 	logerror("%s: schick_gfxbank_w %d\n", machine().describe_context(), state);
 	m_spritebank = state;
@@ -221,17 +221,17 @@ WRITE_LINE_MEMBER(schick_state::schick_gfxbank_w)
 	m_bg_tilemap->mark_all_dirty();
 }
 
-WRITE_LINE_MEMBER(schick_state::coin_counter_1_w)
+void schick_state::coin_counter_1_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE_LINE_MEMBER(schick_state::coin_counter_2_w)
+void schick_state::coin_counter_2_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-WRITE_LINE_MEMBER(schick_state::irq_mask_w)
+void schick_state::irq_mask_w(int state)
 {
 	m_irq_mask = state;
 }
@@ -569,7 +569,7 @@ static GFXDECODE_START( gfx_schick )
 	GFXDECODE_ENTRY( "gfx1", 0x7000, spritelayout, 0, 128/4 ) // gameplay, has C, K, ? block tiles (and different scenery items) (for levels 4,5,6?)
 GFXDECODE_END
 
-WRITE_LINE_MEMBER(schick_state::vblank_irq)
+void schick_state::vblank_irq(int state)
 {
 	if (state && m_irq_mask)
 		m_maincpu->set_input_line(0, HOLD_LINE);
