@@ -56,10 +56,10 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<cpu_device> m_soundcpu;
 
-	uint8_t m_vram_bank_mask;
-	int m_robokid_sprites;
+	uint8_t m_vram_bank_mask = 0;
+	int m_robokid_sprites = 0;
 	bool (*m_stencil_compare_function) (uint16_t pal);
-	int m_sprites_updated;
+	int m_sprites_updated = 0;
 	tilemap_t* m_fg_tilemap;
 	tilemap_t* m_bg_tilemap;
 	bitmap_ind16 m_sprites_bitmap;
@@ -96,8 +96,8 @@ private:
 	required_memory_bank m_mainbank;
 
 	std::unique_ptr<int16_t[]> m_sampledata;
-	int m_next_sprite_overdraw_enabled;
-	uint8_t m_rom_bank_mask;
+	int m_next_sprite_overdraw_enabled = 0;
+	uint8_t m_rom_bank_mask = 0;
 
 	void draw_sprites( bitmap_ind16 &bitmap);
 	void erase_sprites( bitmap_ind16 &bitmap);
@@ -145,7 +145,7 @@ protected:
 	template<int Layer> void robokid_bg_videoram_w(offs_t offset, uint8_t data);
 	template<int Layer> void robokid_bg_ctrl_w(offs_t offset, uint8_t data);
 	template<int Layer> void robokid_bg_bank_w(uint8_t data);
-	tilemap_t* m_robokid_tilemap[3]{};
+	tilemap_t* m_robokid_tilemap[3];
 
 	void video_init_banked(uint32_t vram_alloc_size);
 	TILEMAP_MAPPER_MEMBER(robokid_bg_scan);
@@ -160,7 +160,7 @@ private:
 	uint32_t screen_update_robokid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void motion_error_kludge(uint16_t offset);
-	uint8_t m_robokid_bg_bank[3];
+	uint8_t m_robokid_bg_bank[3] = { };
 	std::unique_ptr<uint8_t[]> m_robokid_bg_videoram[3];
 };
 
@@ -196,7 +196,7 @@ private:
 	void io_protection_start();
 	void io_protection_reset();
 
-	uint8_t m_io_protection[3];
+	uint8_t m_io_protection[3] = { };
 	uint8_t m_io_protection_input = 0;
 	int m_io_protection_tick = 0;
 };
