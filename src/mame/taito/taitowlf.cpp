@@ -9,11 +9,16 @@ Three board system consisting of a P5TX-LA PC motherboard, a Taito main board an
 
 TODO:
 - The Retro Web MB pic has a Winbond w83877tf Super I/O but neither BIOSes accesses it, is it specific to the (unavailable) ECS P5TX-LA BIOS?
-- pf2012: crashes with "EMM386 not installed - insufficient memory" during boot up;
-- pf2012: Hookup Voodoo to PCI root;
+- pf2012: enters service mode no matter what (failed EEPROM? bad data bank?),
+          fully resets the machine if exited;
+- pf2012: PC portion returns an EMM386 "WARNING: Unable to set page frame base address"
+          during boot up, safe to ignore?
 - According to manual hold A+B+service button for 10 seconds for entering test mode during initial bootup
   sequence. Board and input test menu doesn't seem to have a dedicated test mode switch.
   This statement needs verification once we get there;
+
+Notes:
+- pf2012: -isa1 svga_et4k if you need PC side logs;
 
 ===================================================================================================
 
@@ -71,9 +76,16 @@ Taito W Rom Board:
 #include "machine/i82439tx.h"
 #include "machine/pci-ide.h"
 #include "machine/pci.h"
-#include "video/virge_pci.h"
 #include "video/atirage.h"
 #include "video/voodoo_pci.h"
+
+#include "taitoio.h"
+
+/***********************
+ *
+ * Taito extra ISA board
+ *
+ **********************/
 
 class isa16_taito_rom_disk : public device_t, public device_isa16_card_interface
 {
@@ -88,11 +100,15 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	required_memory_region m_program_rom;
 	required_memory_region m_data_rom;
 	required_device<address_map_bank_device> m_bankdev;
+	required_device<tc0510nio_device> m_tc0510nio;
+
+	void io_map(address_map &map);
 
 	u8 m_program_bank = 0;
 	u8 m_program_select = 0;
@@ -113,6 +129,7 @@ isa16_taito_rom_disk::isa16_taito_rom_disk(const machine_config &mconfig, const 
 	, m_program_rom(*this, finder_base::DUMMY_TAG)
 	, m_data_rom(*this, finder_base::DUMMY_TAG)
 	, m_bankdev(*this, "bankdev")
+	, m_tc0510nio(*this, "tc0510nio")
 {
 }
 
@@ -120,7 +137,34 @@ void isa16_taito_rom_disk::device_add_mconfig(machine_config &config)
 {
 	ADDRESS_MAP_BANK(config, m_bankdev).set_map(&isa16_taito_rom_disk::bankdev_map).set_options(ENDIANNESS_LITTLE, 8, 16 + 14, 0x4000);
 
+	TC0510NIO(config, m_tc0510nio, 0);
+	m_tc0510nio->read_0_callback().set_ioport("IN0");
+	m_tc0510nio->read_1_callback().set_ioport("IN1");
+	m_tc0510nio->read_2_callback().set_ioport("IN2");
+	m_tc0510nio->read_3_callback().set_ioport("IN3");
+	// TODO: check me
+	//m_tc0510nio->write_3_callback().set
+	//m_tc0510nio->write_4_callback().set
+	m_tc0510nio->read_7_callback().set_ioport("IN7");
+
 	// TODO: sound CPU et al.
+}
+
+void isa16_taito_rom_disk::io_map(address_map &map)
+{
+	map.unmap_value_high();
+
+	map(0x080, 0x081).rw(FUNC(isa16_taito_rom_disk::read_bank), FUNC(isa16_taito_rom_disk::write_bank));
+	// writes watchdog to port 1, in 8-bit fashion
+	map(0x200, 0x207).lrw8(
+		NAME([this] (offs_t offset) { return m_tc0510nio->read(offset ^ 1); }),
+		NAME([this] (offs_t offset, u8 data) { m_tc0510nio->write(offset ^ 1, data); })
+	);
+
+	//map(0x400, 0x4ff) sound CPU shared RAM?
+
+	//map(0x601, 0x601) EEPROM?
+	//map(0x602, 0x603) to sound CPU
 }
 
 void isa16_taito_rom_disk::bankdev_map(address_map &map)
@@ -150,7 +194,8 @@ void isa16_taito_rom_disk::remap(int space_id, offs_t start, offs_t end)
 	if (space_id == AS_PROGRAM)
 	{
 		// emm386 /X=CB00-D400
-		m_isa->install_memory(0xcb080, 0xcb081, read8sm_delegate(*this, FUNC(isa16_taito_rom_disk::read_bank)), write8sm_delegate(*this, FUNC(isa16_taito_rom_disk::write_bank)));
+		m_isa->install_memory(0xcb000, 0xcbfff, *this, &isa16_taito_rom_disk::io_map);
+		//m_isa->install_memory(0xcb080, 0xcb081, read8sm_delegate(*this, FUNC(isa16_taito_rom_disk::read_bank)), write8sm_delegate(*this, FUNC(isa16_taito_rom_disk::write_bank)));
 
 		m_isa->install_memory(0xd0000, 0xd3fff, *m_bankdev, &address_map_bank_device::amap8);
 	}
@@ -176,6 +221,101 @@ void isa16_taito_rom_disk::write_bank(offs_t offset, u8 data)
 
 	m_bankdev->set_bank(m_program_select << 8 | m_program_bank);
 }
+
+static INPUT_PORTS_START(pf2012)
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) // marked as セレクト (Select) in test mode
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 ) // as above
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x0001, 0x0001, "IN2" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	// TODO: Either test or service (game doesn't tell which is which)
+	PORT_DIPNAME( 0x0020, 0x0020, "Service/Test? (0x20)" )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_DIPNAME( 0x0080, 0x0080, "Service/Test? (0x80)" )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("IN3")
+	PORT_DIPNAME( 0x0001, 0x0001, "IN3" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("IN7")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+INPUT_PORTS_END
+
+ioport_constructor isa16_taito_rom_disk::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(pf2012);
+}
+
+
+/***********************
+ *
+ * Motherboard resources
+ *
+ **********************/
 
 class isa16_p5txla_mb : public device_t, public device_isa16_card_interface
 {
@@ -363,11 +503,9 @@ void p5txla_state::taitowlf(machine_config &config)
     p5txla_state::p5txla(config);
 
 	ISA16_SLOT(config, "board1", 0, "pci:07.0:isabus", isa_internal_devices, "taito_romdisk", true).set_option_machine_config("taito_romdisk", romdisk_config);
+	// TODO: remove keyboard slot option
 
-    // TODO: remove this
-    VIRGE_PCI(config.replace(), "pci:12.0", 0);
-
-	voodoo_1_pci_device &voodoo(VOODOO_1_PCI(config, "pci:13.0", 0, "maincpu", "screen"));
+	voodoo_1_pci_device &voodoo(VOODOO_1_PCI(config.replace(), "pci:12.0", 0, "maincpu", "screen"));
 	voodoo.set_fbmem(2);
 	voodoo.set_tmumem(4, 0);
 	voodoo.set_status_cycles(1000); // optimization to consume extra cycles when polling status
@@ -378,7 +516,7 @@ void p5txla_state::taitowlf(machine_config &config)
 	screen.set_refresh_hz(57);
 	screen.set_size(800, 262);
 	screen.set_visarea(0, 512 - 1, 0, 240 - 1);
-    screen.set_screen_update("pci:13.0", FUNC(voodoo_1_pci_device::screen_update));
+    screen.set_screen_update("pci:12.0", FUNC(voodoo_1_pci_device::screen_update));
 }
 
 /*****************************************************************************/
