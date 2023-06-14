@@ -10182,7 +10182,7 @@ kept for now until finding out what those bytes affect...
 	</software>
 
 	<software name="printlab">
-		<description>Print Lab (Japan)</description>
+		<description>Printer Soft Print Lab (Japan)</description>
 		<year>1985</year>
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="プリンターソフトプリントラボ"/>
@@ -18767,7 +18767,7 @@ legacy FM implementations cannot find it.
 	</software>
 
 	<software name="pwnd">
-		<description>PWND - Of je Worst Lust</description>
+		<description>PWND - Of je worst lust</description>
 		<year>2009</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="Metal Soft"/>
@@ -18780,7 +18780,7 @@ legacy FM implementations cannot find it.
 	</software>
 
 	<software name="pwnda" cloneof="pwnd">
-		<description>PWND - Of je Worst Lust (alt)</description>
+		<description>PWND - Of je worst lust (alt)</description>
 		<year>2009</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="Metal Soft"/>
@@ -18793,7 +18793,7 @@ legacy FM implementations cannot find it.
 	</software>
 
 	<software name="pwnd2">
-		<description>PWND Part 2 - Of Je Assembly Lust</description>
+		<description>PWND part 2 - Of je assembly lust</description>
 		<year>2011</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="Metal Soft"/>
@@ -18806,7 +18806,7 @@ legacy FM implementations cannot find it.
 	</software>
 
 	<software name="pwnd2a" cloneof="pwnd2">
-		<description>PWND Part 2 - Of Je Assembly Lust (alt)</description>
+		<description>PWND part 2 - Of je assembly lust (alt)</description>
 		<year>2011</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="Metal Soft"/>
@@ -18819,7 +18819,7 @@ legacy FM implementations cannot find it.
 	</software>
 
 	<software name="pwnd3">
-		<description>PWND Part 3 - Full Metal Snake (v1.1)</description>
+		<description>PWND part 3 - Full Metal Snake (v1.1)</description>
 		<year>2019</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="Metal Soft"/>
@@ -18832,7 +18832,7 @@ legacy FM implementations cannot find it.
 	</software>
 
 	<software name="pwnd310">
-		<description>PWND Part 3 - Full Metal Snake (v1.0)</description>
+		<description>PWND part 3 - Full Metal Snake (v1.0)</description>
 		<year>2019</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="Metal Soft"/>
