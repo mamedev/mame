@@ -28405,6 +28405,7 @@ license:CC0-1.0
 		<description>Grimace's Birthday (rev 2)</description>
 		<year>2023</year>
 		<publisher>Krool Toys</publisher>
+		<info name="release" value="20230614"/>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
@@ -28418,11 +28419,12 @@ license:CC0-1.0
 		<description>Grimace's Birthday (rev 1)</description>
 		<year>2023</year>
 		<publisher>Krool Toys</publisher>
+		<info name="release" value="20230613"/>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="0x100000">
-				<rom name="bX4TvUeiUEfKRw8bkPGaB.gb" size="0x100000" crc="7744f551" sha1="035b7417e03c4e264a90212f2a3811012f03c2a2"/>
+				<rom name="bX4TvUeiUEfKRw8bkPGaB" size="0x100000" crc="7744f551" sha1="035b7417e03c4e264a90212f2a3811012f03c2a2"/>
 			</dataarea>
 		</part>
 	</software>
