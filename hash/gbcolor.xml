@@ -28405,15 +28405,11 @@ license:CC0-1.0
 		<description>Grimace's Birthday (rev 2)</description>
 		<year>2023</year>
 		<publisher>Krool Toys</publisher>
-		<notes><![CDATA[
-Officially licensed free game, released as part of McDonald's "Grimace's Birthday" 2023 campaign.
-ROM name was taken from the original file used by the website's emulator.
-]]></notes>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
-			<dataarea name="rom" size="1048576">
-				<rom name="bX4TvUeiUEfKRw8bkPGaB.gb" size="1048576" crc="9dee42fe" sha1="071fa179df96950c3c92b0abbe32092b1816ec40"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="bX4TvUeiUEfKRw8bkPGaB.gb" size="0x100000" crc="9dee42fe" sha1="071fa179df96950c3c92b0abbe32092b1816ec40"/>
 			</dataarea>
 		</part>
 	</software>
@@ -28422,15 +28418,11 @@ ROM name was taken from the original file used by the website's emulator.
 		<description>Grimace's Birthday (rev 1)</description>
 		<year>2023</year>
 		<publisher>Krool Toys</publisher>
-		<notes><![CDATA[
-Officially licensed free game, released as part of McDonald's "Grimace's Birthday" 2023 campaign.
-ROM name was taken from the original file used by the website's emulator.
-]]></notes>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
-			<dataarea name="rom" size="1048576">
-				<rom name="bX4TvUeiUEfKRw8bkPGaB.gb" size="1048576" crc="7744f551" sha1="035b7417e03c4e264a90212f2a3811012f03c2a2"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="bX4TvUeiUEfKRw8bkPGaB.gb" size="0x100000" crc="7744f551" sha1="035b7417e03c4e264a90212f2a3811012f03c2a2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -28439,16 +28431,12 @@ ROM name was taken from the original file used by the website's emulator.
 		<description>Grimace's Birthday</description>
 		<year>2023</year>
 		<publisher>Krool Toys</publisher>
-		<notes><![CDATA[
-Officially licensed free game, released as part of McDonald's "Grimace's Birthday" 2023 campaign.
-ROM name was taken from the original file used by the website's emulator.
-]]></notes>
 		<info name="release" value="20230612"/>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
-			<dataarea name="rom" size="1048576">
-				<rom name="bX4TvUeiUEfKRw8bkPGaB.gb" size="1048576" crc="7f4386e9" sha1="d6358d100ea65d34d95588f800635b64927baf82"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="bX4TvUeiUEfKRw8bkPGaB.gb" size="0x100000" crc="7f4386e9" sha1="d6358d100ea65d34d95588f800635b64927baf82"/>
 			</dataarea>
 		</part>
 	</software>
