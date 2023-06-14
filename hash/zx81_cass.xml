@@ -3,9 +3,17 @@
 <!--
 license:CC0-1.0
 
-Sinclair ZX81 Cassettes
+    Sinclair ZX81 Cassettes
 
-This list was compiled from the archive at http://www.zx81stuff.org.uk/. Updated to 22/08/2016
+    Notes about the dumps:
+        Due to the way the ZX81 saves data, different recordings of identical code (such as those in both sides of a cassette) might be stored with a few different bytes on them. Additional dumps of the same release should match those differences.
+
+    Loading instructions:
+        At the prompt, press the following sequence to execute the LOAD "" command:
+            J, Shift+P, Shift+P, Enter
+        Enable UI controls (Scroll Lock) and start the tape (F2).
+        If the program doesn't start automatically after loading, execute the RUN command by pressing:
+            R, Enter
 -->
 
 <softwarelist name="zx81_cass" description="Sinclair ZX81 cassettes">
@@ -401,6 +409,27 @@ This list was compiled from the archive at http://www.zx81stuff.org.uk/. Updated
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="11252">
 				<rom name="Alphaprobe.tzx" size="11252" crc="7b7603f0" sha1="a71fdaec9225187ad0724bdaaab65b2860e994fb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ams81">
+		<description>AMSAT AMS-81 Tracking System (Version N5BF 1.4)</description>
+		<year>1983</year>
+		<publisher>The Radio Amateur Satellite Corporation</publisher>
+		<notes><![CDATA[
+Code in both sides is identical.
+]]></notes>
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="A"/>
+			<dataarea name="cass" size="13817">
+				<rom name="ams81a.p" size="13817" crc="c1e1ba56" sha1="da0fefb2db6e2000937301123186abc54db334be"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="B"/>
+			<dataarea name="cass" size="13817">
+				<rom name="ams81b.p" size="13817" crc="c87bbd26" sha1="dc7db398a10655df89897b9d4f5801764cb9008d"/>
 			</dataarea>
 		</part>
 	</software>
