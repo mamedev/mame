@@ -27,10 +27,7 @@ public:
 
 	auto block_interrupt_cb() { return m_block_interrupt_cb.bind(); }
 
-protected:
-
-	virtual void device_start() override;
-	virtual void device_reset() override;
+protected : virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_resolve_objects() override;
 

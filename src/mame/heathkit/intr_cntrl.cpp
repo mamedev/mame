@@ -31,11 +31,6 @@ void heath_intr_cntrl::device_start()
 	m_intr_lines = 0;
 }
 
-void heath_intr_cntrl::device_reset()
-{
-	m_intr_lines = 0;
-}
-
 void heath_intr_cntrl::device_resolve_objects()
 {
 	m_irq_line.resolve_safe();
@@ -170,15 +165,6 @@ void z37_intr_cntrl::device_start()
 	save_item(NAME(m_interrupts_blocked));
 	save_item(NAME(m_drq_raised));
 	save_item(NAME(m_fd_irq_raised));
-
-	m_interrupts_blocked = false;
-	m_drq_raised = false;
-	m_fd_irq_raised = false;
-}
-
-void z37_intr_cntrl::device_reset()
-{
-	heath_intr_cntrl::device_reset();
 
 	m_interrupts_blocked = false;
 	m_drq_raised = false;
