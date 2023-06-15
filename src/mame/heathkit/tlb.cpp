@@ -168,11 +168,15 @@ void heath_tlb_device::device_start()
 	save_item(NAME(m_keyclickactive));
 	save_item(NAME(m_bellactive));
 	save_item(NAME(m_reset_pending));
+	save_item(NAME(m_right_shift));
+	save_item(NAME(m_reset_key));
 
 	m_strobe = false;
 	m_keyclickactive = false;
 	m_bellactive = false;
 	m_reset_pending = false;
+	m_right_shift = false;
+	m_reset_key = false;
 
 	m_key_click_timer = timer_alloc(FUNC(heath_tlb_device::key_click_off), this);
 	m_bell_timer = timer_alloc(FUNC(heath_tlb_device::bell_off), this);
@@ -183,13 +187,6 @@ void heath_tlb_device::device_reset()
 	m_strobe = false;
 	m_keyclickactive = false;
 	m_bellactive = false;
-	m_reset_pending = false;
-
-	m_crtc->reset();
-	m_ace->reset();
-	m_beep->reset();
-	m_mm5740->reset();
-	m_maincpu->reset();
 }
 
 void heath_tlb_device::key_click_w(uint8_t data)
@@ -228,22 +225,6 @@ void heath_tlb_device::bell_w(uint8_t data)
 uint16_t heath_tlb_device::translate_mm5740_b(uint16_t b)
 {
 	return ((b & 0x100) >> 2) | ((b & 0x0c0) << 1) | (b & 0x03f);
-}
-
-void heath_tlb_device::check_for_reset()
-{
-	ioport_value value = m_kbspecial->read();
-
-	if ((value & 0x300) == 0)
-	{
-		m_reset_pending = true;
-	}
-	else if (m_reset_pending)
-	{
-		m_reset_pending = false;
-		m_maincpu->reset();
-		m_reset(ASSERT_LINE);
-	}
 }
 
 uint8_t heath_tlb_device::kbd_key_r()
@@ -287,8 +268,6 @@ int heath_tlb_device::mm5740_control_r()
 
 void heath_tlb_device::mm5740_data_ready_w(int state)
 {
-	check_for_reset();
-
 	if (state == ASSERT_LINE)
 	{
 		uint8_t *decode = m_kbdrom->base();
@@ -297,6 +276,34 @@ void heath_tlb_device::mm5740_data_ready_w(int state)
 		m_strobe = true;
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 	}
+}
+
+void heath_tlb_device::check_for_reset()
+{
+	if (m_reset_key && m_right_shift)
+	{
+		m_reset_pending = true;
+	}
+	else if (m_reset_pending)
+	{
+		m_reset_pending = false;
+		reset();
+		m_reset(ASSERT_LINE);
+	}
+}
+
+void heath_tlb_device::reset_key_w(int state)
+{
+	m_reset_key = (state == CLEAR_LINE);
+
+	check_for_reset();
+}
+
+void heath_tlb_device::right_shift_w(int state)
+{
+	m_right_shift = (state == CLEAR_LINE);
+
+	check_for_reset();
 }
 
 MC6845_UPDATE_ROW(heath_tlb_device::crtc_update_row)
@@ -368,8 +375,8 @@ static INPUT_PORTS_START( tlb )
 	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LeftShift")  PORT_CODE(KEYCODE_LSHIFT)    PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Repeat")     PORT_CODE(KEYCODE_LALT)
 	// bit 7 - 0x080 is low if a key is pressed
-	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RightShift") PORT_CODE(KEYCODE_RSHIFT)    PORT_CHAR(UCHAR_SHIFT_2)
-	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset")      PORT_CODE(KEYCODE_F10)       PORT_CHAR(UCHAR_MAMEKEY(F10))
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RightShift") PORT_CODE(KEYCODE_RSHIFT)    PORT_WRITE_LINE_MEMBER(heath_tlb_device, right_shift_w)
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset")      PORT_CODE(KEYCODE_F10)       PORT_WRITE_LINE_MEMBER(heath_tlb_device, reset_key_w)
 
 	PORT_START("X1")
 	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("/")          PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('/') PORT_CHAR('?')

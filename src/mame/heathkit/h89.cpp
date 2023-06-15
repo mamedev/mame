@@ -123,7 +123,7 @@ private:
 	uint8_t raise_NMI_r();
 	void raise_NMI_w(uint8_t data);
 	void console_intr(uint8_t data);
-	void reset_line(uint8_t data);
+	void reset_line(int data);
 };
 
 /*
@@ -363,13 +363,6 @@ void h89_state::machine_reset()
 
 	update_gpp(0);
 	update_mem_view();
-	m_h37->reset();
-	m_intr_cntrl->reset();
-	m_console->reset();
-	m_serial1->reset();
-	m_serial2->reset();
-	m_serial3->reset();
-	m_maincpu->reset();
 }
 
 uint8_t h89_state::raise_NMI_r()
@@ -396,7 +389,7 @@ void h89_state::console_intr(uint8_t data)
 	}
 }
 
-void h89_state::reset_line(uint8_t data)
+void h89_state::reset_line(int data)
 {
 	if (data == ASSERT_LINE)
 	{

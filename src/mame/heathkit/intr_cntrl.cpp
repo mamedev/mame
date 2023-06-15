@@ -33,7 +33,6 @@ void heath_intr_cntrl::device_start()
 
 void heath_intr_cntrl::device_reset()
 {
-	m_intr_lines = 0;
 }
 
 void heath_intr_cntrl::device_resolve_objects()
@@ -179,10 +178,6 @@ void z37_intr_cntrl::device_start()
 void z37_intr_cntrl::device_reset()
 {
 	heath_intr_cntrl::device_reset();
-
-	m_interrupts_blocked = false;
-	m_drq_raised = false;
-	m_fd_irq_raised = false;
 }
 
 void z37_intr_cntrl::block_interrupts(uint8_t data)

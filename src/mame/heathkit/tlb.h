@@ -31,6 +31,9 @@ public:
 
 	void cb1_w(int state);
 
+	void reset_key_w(int state);
+	void right_shift_w(int state);
+
 protected:
 	heath_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
@@ -88,6 +91,8 @@ private:
 	bool     m_keyclickactive;
 	bool     m_bellactive;
 	bool     m_reset_pending;
+	bool     m_right_shift;
+	bool     m_reset_key;
 };
 
 class heath_super19_tlb_device : public heath_tlb_device

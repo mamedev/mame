@@ -178,8 +178,6 @@ void heath_z37_fdc_device::device_reset()
 	m_intrq_allowed = false;
 	m_drq_allowed = false;
 	m_access_track_sector = false;
-
-	m_fdc->reset();
 }
 
 static void z37_floppies(device_slot_interface &device)
