@@ -221,6 +221,17 @@ static INPUT_PORTS_START( stlforce )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static const gfx_layout stlforce_bg_full_layout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	4,
+	{0,1,2,3},
+	{12,8,4,0,28,24,20,16,16*32+12,16*32+8,16*32+4,16*32+0,16*32+28,16*32+24,16*32+20,16*32+16},
+	{0*32,1*32,2*32,3*32,4*32,5*32,6*32,7*32,8*32,9*32,10*32,11*32,12*32,13*32,14*32,15*32},
+	32*32
+};
+
 static const gfx_layout stlforce_bglayout =
 {
 	16,16,
@@ -231,6 +242,7 @@ static const gfx_layout stlforce_bglayout =
 	{0*32,1*32,2*32,3*32,4*32,5*32,6*32,7*32,8*32,9*32,10*32,11*32,12*32,13*32,14*32,15*32},
 	32*32
 };
+
 
 static const gfx_layout stlforce_txlayout =
 {
@@ -257,7 +269,7 @@ static const gfx_layout stlforce_splayout =
 static GFXDECODE_START( gfx_stlforce )
 	GFXDECODE_ENTRY( "sprites",0x000000, stlforce_splayout, 1024,  16 )
 	GFXDECODE_ENTRY( "tiles2", 0x080000, stlforce_txlayout, 384,   8  )
-	GFXDECODE_ENTRY( "tiles2", 0x000000, stlforce_bglayout, 256,   8  )
+	GFXDECODE_ENTRY( "tiles2", 0x000000, stlforce_bg_full_layout, 256,   8  )
 
 	GFXDECODE_ENTRY( "tiles",  0x080000, stlforce_bglayout, 128,   8  )
 	GFXDECODE_ENTRY( "tiles",  0x000000, stlforce_bglayout, 0,     8  )
@@ -265,8 +277,8 @@ GFXDECODE_END
 
 static GFXDECODE_START( gfx_mortalr )
 	GFXDECODE_ENTRY( "sprites",0x000000, stlforce_splayout, 1024,  16 )
-	GFXDECODE_ENTRY( "tiles2", 0x080000, stlforce_txlayout, 384,   8  )
-	GFXDECODE_ENTRY( "tiles2", 0x000000, stlforce_bglayout, 256,   8  )
+	GFXDECODE_ENTRY( "tiles2", 0x080000, stlforce_txlayout, 384,   8  ) // doesn't actually use this layer?
+	GFXDECODE_ENTRY( "tiles2", 0x000000, stlforce_bg_full_layout, 256,   8  )
 
 	GFXDECODE_ENTRY( "tiles",  0x100000, stlforce_bglayout, 128,   8  )
 	GFXDECODE_ENTRY( "tiles",  0x000000, stlforce_bglayout, 0,     8  )
