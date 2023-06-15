@@ -983,6 +983,41 @@ ROM_START( pitnruna )
 	ROM_LOAD( "clr.3",  0x0040, 0x0020, CRC(25e70e5e) SHA1(fdb9c69e9568a725dd0e3ac25835270fb4f49280) )
 ROM_END
 
+ROM_START( pitnrunb ) // all labels handwritten
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "test.a1", 0x0000, 0x2000, CRC(395b5514) SHA1(af5c8eb4b99a0bdcd3565e121a407febd560a2a5) )
+	ROM_LOAD( "test.a2", 0x2000, 0x2000, CRC(09ffb063) SHA1(cf0aaf938366122a1c4f1b8f38f92c322ae9cb48) )
+	ROM_LOAD( "test.a3", 0x4000, 0x2000, CRC(4f96e346) SHA1(e33c82fce30f769fb4e706f937c6c5344065cba6) )
+	ROM_LOAD( "test.a4", 0x6000, 0x2000, CRC(3d04ef80) SHA1(17c966eb1256813302e1bce86fb6bd860138ef88) )
+
+	ROM_REGION( 0x2000, "audiocpu", 0 )
+	ROM_LOAD( "sound", 0x0000, 0x1000, CRC(fbd63042) SHA1(a473b42b76599a37434772ea1aa113397a842c1f) )
+
+	ROM_REGION( 0x0800, "mcu", 0 ) // not dumped for this set, but seems to work fine. Marked 15-00011-001 DA68233
+	ROM_LOAD( "a11_17.3a", 0x0000, 0x0800, BAD_DUMP CRC(e7d5d6e1) SHA1(c1131d6fcc36926e287be26090a3c89f22feaa35) )
+
+	ROM_REGION( 0x6000, "sprites", 0 )
+	ROM_LOAD( "obj3", 0x0000, 0x2000, CRC(c3b3131e) SHA1(ed0463e7eef452d7fbdcb031f9477825e9780943) )
+	ROM_LOAD( "obj2", 0x2000, 0x2000, CRC(2fa1682a) SHA1(9daefb525fd69f0d9a45ff27e89865545e177a5a) )
+	ROM_LOAD( "obj1", 0x4000, 0x2000, CRC(e678fe39) SHA1(134e36fd30bf3cf5884732f3455ca4d9dab6b665) )
+
+	ROM_REGION( 0x4000, "bgtiles", 0 )
+	ROM_LOAD( "chr1", 0x0000, 0x2000, CRC(fbae3504) SHA1(ce799dfd653462c0814e7530f3f8a686ab0ad7f4) )
+	ROM_LOAD( "chr2", 0x2000, 0x2000, CRC(c9177180) SHA1(98c8f8f586b78b88dba254bd662642ee27f9b131) )
+
+	ROM_REGION( 0x2000, "fgtiles", 0 )
+	ROM_LOAD( "bsc1", 0x0000, 0x1000, CRC(c53cb897) SHA1(81a73e6031b52fa45ec507ff4264b14474ef42a2) )
+	ROM_LOAD( "bsc2", 0x1000, 0x1000, CRC(7cdf9a55) SHA1(404dface7e09186e486945981e39063929599efc) )
+
+	ROM_REGION( 0x2000, "spot", 0 )
+	ROM_LOAD( "lightdata", 0x0000, 0x2000, CRC(8e346d10) SHA1(1362ce4362c2d28c48fbd8a33da0cec5ef8e321f) )
+
+	ROM_REGION( 0x0060, "proms", 0 )
+	ROM_LOAD( "bp1",  0x0000, 0x0020, CRC(643012f4) SHA1(4a0c9766b9da456e39ce379ad62d695bf82413b0) )
+	ROM_LOAD( "bp2",  0x0020, 0x0020, CRC(50705f02) SHA1(a3d348678fd66f37c7a0d29af88f40740918b8d3) )
+	ROM_LOAD( "bp3",  0x0040, 0x0020, CRC(25e70e5e) SHA1(fdb9c69e9568a725dd0e3ac25835270fb4f49280) )
+ROM_END
+
 ROM_START( jumpkun )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "pr1.5d.2764", 0x00000, 0x02000, CRC(b0eabe9f) SHA1(e662f3946efe72b0bbf6c6934201163f765bb7aa) )
@@ -1024,4 +1059,5 @@ ROM_END
 
 GAME( 1984, pitnrun,  0,       pitnrun_mcu, pitnrun, pitnrun_mcu_state, empty_init, ROT90, "Taito Corporation", "Pit & Run - F-1 Race (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, pitnruna, pitnrun, pitnrun_mcu, pitnrun, pitnrun_mcu_state, empty_init, ROT90, "Taito Corporation", "Pit & Run - F-1 Race (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, pitnrunb, pitnrun, pitnrun_mcu, pitnrun, pitnrun_mcu_state, empty_init, ROT90, "Taito Corporation", "Pit & Run - F-1 Race (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, jumpkun,  0,       pitnrun,     jumpkun, pitnrun_state,     empty_init, ROT90, "Kaneko",            "Jump Kun (prototype)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // no copyright message

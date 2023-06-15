@@ -42519,6 +42519,7 @@ othunderuo                      // B67 (c) 1988 Taito America Corporation (US)
 jumpkun                         // prototype
 pitnrun                         // PR  (c) 1984 Taito Corporation
 pitnruna                        // PR  (c) 1984 Taito Corporation
+pitnrunb                        // PR  (c) 1984 Taito Corporation
 
 @source:taito/pkspirit.cpp
 pkspirit                        // D41
