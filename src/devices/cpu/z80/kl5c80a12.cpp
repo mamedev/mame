@@ -40,9 +40,9 @@ kl5c80a12_device::kl5c80a12_device(const machine_config &mconfig, const char *ta
 					address_map_constructor(FUNC(kl5c80a12_device::internal_ram), this),
 					address_map_constructor(FUNC(kl5c80a12_device::internal_io), this))
 	, m_kp69(*this, "kp69")
-	, m_porta_in_callback(*this)
+	, m_porta_in_callback(*this, 0)
 	, m_porta_out_callback(*this)
-	, m_portb_in_callback(*this)
+	, m_portb_in_callback(*this, 0)
 	, m_portb_out_callback(*this)
 	, m_porta_data{0, 0}
 	, m_porta_direction{0, 0}
@@ -96,9 +96,9 @@ void kl5c80a12_device::device_resolve_objects()
 {
 	// Resolve parallel port callbacks
 	for (int i = 0; i < 2; i++)
-		m_porta_in_callback[i].resolve(m_porta_3state[i]);
+		/*m_porta_in_callback[i].resolve(m_porta_3state[i])*/;
 	for (int i = 0; i < 3; i++)
-		m_portb_in_callback[i].resolve(m_portb_3state[i]);
+		/*m_portb_in_callback[i].resolve(m_portb_3state[i])*/;
 }
 
 
