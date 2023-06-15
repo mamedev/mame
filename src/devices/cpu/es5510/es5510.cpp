@@ -37,7 +37,7 @@ static int exec_cc = 0;
 
 #define LOG_EXEC(...) LOGMASKED(LOG_EXECUTION,  __VA_ARGS__)
 
-DEFINE_DEVICE_TYPE(ES5510, es5510_device, "es5510", "ES5510")
+DEFINE_DEVICE_TYPE(ES5510, es5510_device, "es5510", "Ensoniq ES5510")
 
 #define FLAG_N (1 << 7)
 #define FLAG_C (1 << 6)
