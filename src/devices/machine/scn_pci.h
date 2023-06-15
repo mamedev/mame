@@ -102,8 +102,7 @@ protected:
 	// construction/destruction
 	scn_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const u16 *br_div, bool is_enhanced, bool is_aci);
 
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -260,9 +259,8 @@ public:
 	int intr_r() { return (m_status & 0x07) != 0 ? 0 : 1; }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_resolve_objects() override;
 
 	// scn_pci_device overrides
 	virtual void set_rxrdy(bool state) override;

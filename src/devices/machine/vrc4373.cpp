@@ -130,8 +130,6 @@ void vrc4373_device::device_start()
 	io_offset       = 0x00000000;
 	status = 0x0280;
 
-	m_irq_cb.resolve();
-
 	// Reserve 8M for ram
 	m_ram.reserve(0x00800000 / 4);
 	m_ram.resize(m_ram_size);
@@ -416,7 +414,7 @@ TIMER_CALLBACK_MEMBER (vrc4373_device::dma_transfer)
 		m_cpu_regs[NREG_DMACR1 + which * 0xc] &= ~DMA_GO;
 		// Set the interrupt
 		if (m_cpu_regs[NREG_DMACR1 + which * 0xc] & DMA_INT_EN) {
-			if (!m_irq_cb.isnull()) {
+			if (!m_irq_cb.isunset()) {
 				m_irq_cb(ASSERT_LINE);
 			} else {
 				logerror("vrc4373_device::dma_transfer Error: DMA configured to trigger interrupt but no interrupt line configured\n");
@@ -523,7 +521,7 @@ void vrc4373_device::cpu_if_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		case NREG_ICSR:
 			// TODO: Check and clear individual interrupts
 			if (data & 0xff000000) {
-				if (!m_irq_cb.isnull())
+				if (!m_irq_cb.isunset())
 					m_irq_cb(CLEAR_LINE);
 			}
 			break;

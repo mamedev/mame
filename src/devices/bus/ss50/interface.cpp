@@ -120,9 +120,6 @@ ss50_interface_port_device::ss50_interface_port_device(const machine_config &mco
 
 void ss50_interface_port_device::device_resolve_objects()
 {
-	m_irq_cb.resolve_safe();
-	m_firq_cb.resolve_safe();
-
 	m_card = get_card_device();
 	if (m_card != nullptr)
 		m_card->m_slot = this;

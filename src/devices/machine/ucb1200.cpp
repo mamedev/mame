@@ -25,18 +25,12 @@ ucb1200_device::ucb1200_device(const machine_config &mconfig, const char *tag, d
 	, m_audio_out(*this)
 	, m_telecom_out(*this)
 	, m_irq_out(*this)
-	, m_adc_in(*this)
+	, m_adc_in(*this, 0xffff)
 {
 }
 
 void ucb1200_device::device_start()
 {
-	m_gpio_out.resolve_all_safe();
-	m_audio_out.resolve_safe();
-	m_telecom_out.resolve_safe();
-	m_irq_out.resolve_safe();
-	m_adc_in.resolve_all_safe(0xffff);
-
 	save_item(NAME(m_gpio_out_latch));
 	save_item(NAME(m_gpio_in_latch));
 	save_item(NAME(m_gpio_dir));

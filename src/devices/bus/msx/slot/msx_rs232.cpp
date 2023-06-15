@@ -75,8 +75,6 @@ void msx_slot_rs232_base_device::device_start()
 {
 	msx_slot_rom_device::device_start();
 
-	m_irq_handler.resolve_safe();
-
 	save_item(NAME(m_irq_mask));
 	save_item(NAME(m_out2));
 	save_item(NAME(m_cts));

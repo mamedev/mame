@@ -160,10 +160,10 @@ pic16c5x_device::pic16c5x_device(const machine_config &mconfig, device_type type
 	, m_data_width(data_width)
 	, m_program_width(program_width)
 	, m_temp_config(0)
-	, m_read_a(*this)
-	, m_read_b(*this)
-	, m_read_c(*this)
-	, m_read_d(*this)
+	, m_read_a(*this, 0)
+	, m_read_b(*this, 0)
+	, m_read_c(*this, 0)
+	, m_read_d(*this, 0)
 	, m_write_a(*this)
 	, m_write_b(*this)
 	, m_write_c(*this)
@@ -936,15 +936,6 @@ void pic16c5x_device::device_start()
 {
 	space(AS_PROGRAM).cache(m_program);
 	space(AS_DATA).specific(m_data);
-
-	m_read_a.resolve_safe(0);
-	m_read_b.resolve_safe(0);
-	m_read_c.resolve_safe(0);
-	m_read_d.resolve_safe(0);
-	m_write_a.resolve_safe();
-	m_write_b.resolve_safe();
-	m_write_c.resolve_safe();
-	m_write_d.resolve_safe();
 
 	m_program_mask = (1 << m_program_width) - 1;
 	m_data_mask = (1 << m_data_width) - 1;

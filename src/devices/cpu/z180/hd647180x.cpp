@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(HD647180X, hd647180x_device, "hd647180x", "Hitachi HD647180X 
 
 hd647180x_device::hd647180x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z180_device(mconfig, HD647180X, tag, owner, clock, true, address_map_constructor(FUNC(hd647180x_device::internal_map), this))
-	, m_port_input_cb(*this)
+	, m_port_input_cb(*this, 0xff)
 	, m_port_output_cb(*this)
 	, m_ram_view(*this, "ram_view")
 {
@@ -246,14 +246,6 @@ void hd647180x_device::z180_internal_port_write(uint8_t port, uint8_t data)
 		z180_device::z180_internal_port_write(port, data);
 		break;
 	}
-}
-
-void hd647180x_device::device_resolve_objects()
-{
-	z180_device::device_resolve_objects();
-
-	m_port_input_cb.resolve_all_safe(0xff);
-	m_port_output_cb.resolve_all_safe();
 }
 
 void hd647180x_device::device_start()

@@ -634,12 +634,6 @@ void mos6566_device::device_start()
 	// set our instruction counter
 	set_icountptr(m_icount);
 
-	// resolve callbacks
-	m_write_irq.resolve_safe();
-	m_write_ba.resolve_safe();
-	m_write_aec.resolve_safe();
-	m_write_k.resolve_safe();
-
 	screen().register_screen_bitmap(m_bitmap);
 
 	for (int i = 0; i < 256; i++)

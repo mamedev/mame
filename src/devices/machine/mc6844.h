@@ -68,9 +68,7 @@ public:
 	void dgrnt_w(int state) { m_dgrnt = state; trigger(1); }
 
 protected:
-	// device-level overrides
-	//virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void execute_run() override;

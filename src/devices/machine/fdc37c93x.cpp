@@ -982,17 +982,6 @@ void fdc37c93x_device::device_start()
 	m_isa->set_dma_channel(2, this, true);
 	m_isa->set_dma_channel(3, this, true);
 	remap(AS_IO, 0, 0x400);
-	m_gp20_reset_callback.resolve_safe();
-	m_gp25_gatea20_callback.resolve_safe();
-	m_irq1_callback.resolve_safe();
-	m_irq8_callback.resolve_safe();
-	m_irq9_callback.resolve_safe();
-	m_txd1_callback.resolve_safe();
-	m_ndtr1_callback.resolve_safe();
-	m_nrts1_callback.resolve_safe();
-	m_txd2_callback.resolve_safe();
-	m_ndtr2_callback.resolve_safe();
-	m_nrts2_callback.resolve_safe();
 }
 
 void fdc37c93x_device::device_reset()

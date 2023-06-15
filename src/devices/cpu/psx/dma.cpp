@@ -48,8 +48,6 @@ void psxdma_device::device_post_load()
 
 void psxdma_device::device_start()
 {
-	m_irq_handler.resolve_safe();
-
 	for( int index = 0; index < 7; index++ )
 	{
 		psx_dma_channel *dma = &m_channel[ index ];

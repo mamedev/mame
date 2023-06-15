@@ -44,7 +44,6 @@ protected:
 	at_kbc_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
 
 	// device_t implementation
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
 	// host outputs - use 1 = asserted, 0 = deasserted
@@ -126,7 +125,6 @@ protected:
 	// device_t implementation
 	virtual tiny_rom_entry const *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
 private:

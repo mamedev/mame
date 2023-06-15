@@ -59,13 +59,6 @@ template void z8038_device::zbus_map<2>(address_map &map);
 
 void z8038_device::device_start()
 {
-	m_out_int_cb.resolve_all_safe();
-
-	m_out_E_cb.resolve_safe();
-	m_out_F_cb.resolve_safe();
-	m_out_H_cb.resolve_safe();
-	m_out_J_cb.resolve_safe();
-
 	save_item(NAME(m_control_2));
 	save_item(NAME(m_control_3));
 

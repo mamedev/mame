@@ -26,10 +26,10 @@ spg110_device::spg110_device(const machine_config &mconfig, device_type type, co
 	m_porta_out(*this),
 	m_portb_out(*this),
 	m_portc_out(*this),
-	m_porta_in(*this),
-	m_portb_in(*this),
-	m_portc_in(*this),
-	m_adc_in(*this),
+	m_porta_in(*this, 0),
+	m_portb_in(*this, 0),
+	m_portc_in(*this, 0),
+	m_adc_in(*this, 0x0fff),
 	m_chip_sel(*this),
 	m_is_spiderman(false)
 {
@@ -168,22 +168,9 @@ void spg110_device::internal_map(address_map &map)
 }
 
 
-void spg110_device::device_start()
-{
-	unsp_device::device_start();
-
-	m_porta_out.resolve_safe();
-	m_portb_out.resolve_safe();
-	m_portc_out.resolve_safe();
-	m_porta_in.resolve_safe(0);
-	m_portb_in.resolve_safe(0);
-	m_portc_in.resolve_safe(0);
-	m_adc_in.resolve_all_safe(0x0fff);
-	m_chip_sel.resolve_safe();
-}
-
 void spg110_device::device_reset()
 {
 	unsp_device::device_reset();
+
 	m_spg_video->set_video_irq_spidman(m_is_spiderman);
 }

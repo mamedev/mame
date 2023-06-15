@@ -83,10 +83,10 @@ axc51base_cpu_device::axc51base_cpu_device(const machine_config &mconfig, device
 	, m_num_interrupts(5)
 	, m_scratchpad(*this, "scratchpad")
 	, m_mainram(*this, "mainram")
-	, m_port_in_cb(*this)
+	, m_port_in_cb(*this, 0xff)
 	, m_port_out_cb(*this)
 	, m_dac_out_cb(*this)
-	, m_spi_in_cb(*this)
+	, m_spi_in_cb(*this, 0xff)
 	, m_spi_out_cb(*this)
 	, m_spi_out_dir_cb(*this)
 	, m_rtemp(0)
@@ -1220,14 +1220,6 @@ void axc51base_cpu_device::device_start()
 	space(AS_PROGRAM).cache(m_program);
 	space(AS_DATA).specific(m_data);
 	space(AS_IO).specific(m_io);
-
-	m_port_in_cb.resolve_all_safe(0xff);
-	m_port_out_cb.resolve_all_safe();
-	m_dac_out_cb.resolve_all_safe();
-
-	m_spi_in_cb.resolve_safe(0xff);
-	m_spi_out_cb.resolve_safe();
-	m_spi_out_dir_cb.resolve_safe();
 
 	/* Save states */
 	save_item(NAME(m_ppc));

@@ -13,9 +13,9 @@ DEFINE_DEVICE_TYPE(TMP68301, tmp68301_device, "tmp68301", "Toshiba TMP68301")
 
 tmp68301_device::tmp68301_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	m68000_mcu_device(mconfig, TMP68301, tag, owner, clock),
-	m_parallel_r_cb(*this),
+	m_parallel_r_cb(*this, 0xffff),
 	m_parallel_w_cb(*this),
-	m_tx_cb{*this, *this, *this}
+	m_tx_cb(*this)
 {
 	auto m = address_map_constructor(FUNC(tmp68301_device::internal_map), this);
 	m_program_config.m_internal_map = m;
@@ -63,11 +63,6 @@ void tmp68301_device::internal_update(uint64_t current_time)
 void tmp68301_device::device_start()
 {
 	m68000_mcu_device::device_start();
-	m_parallel_r_cb.resolve_safe(0xffff);
-	m_parallel_w_cb.resolve_safe();
-
-	for(auto &tx : m_tx_cb)
-		tx.resolve_safe();
 
 	save_item(NAME(m_external_interrupt_state));
 

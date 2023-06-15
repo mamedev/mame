@@ -91,7 +91,6 @@ public:
 	void out_w(u8 data, u8 mem_mask);
 
 protected:
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
 private:

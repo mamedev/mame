@@ -40,7 +40,7 @@ ef9340_1_device::ef9340_1_device(const machine_config &mconfig, const char *tag,
 	, device_video_interface(mconfig, *this)
 	, m_charset(*this, "ef9340_1")
 	, m_write_exram(*this)
-	, m_read_exram(*this)
+	, m_read_exram(*this, 0xff)
 {
 	m_offset_x = 0;
 	m_offset_y = 0;
@@ -61,9 +61,6 @@ const tiny_rom_entry *ef9340_1_device::device_rom_region() const
 
 void ef9340_1_device::device_start()
 {
-	m_write_exram.resolve_safe();
-	m_read_exram.resolve_safe(0xff);
-
 	// let the screen create our temporary bitmap with the screen's dimensions
 	screen().register_screen_bitmap(m_tmp_bitmap);
 

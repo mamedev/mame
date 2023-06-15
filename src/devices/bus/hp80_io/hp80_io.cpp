@@ -36,8 +36,6 @@ hp80_io_slot_device::~hp80_io_slot_device()
 
 void hp80_io_slot_device::device_start()
 {
-	m_irl_cb_func.resolve_safe();
-	m_halt_cb_func.resolve_safe();
 }
 
 void hp80_io_slot_device::irl_w(int state)

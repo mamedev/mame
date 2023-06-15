@@ -35,7 +35,7 @@ DEFINE_DEVICE_TYPE(SEGA_315_5296, sega_315_5296_device, "315_5296", "Sega 315-52
 
 sega_315_5296_device::sega_315_5296_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, SEGA_315_5296, tag, owner, clock),
-	m_in_port_cb(*this),
+	m_in_port_cb(*this, 0xff),
 	m_out_port_cb(*this),
 	m_out_cnt_cb(*this),
 	m_dir_override(0xff)
@@ -48,11 +48,6 @@ sega_315_5296_device::sega_315_5296_device(const machine_config &mconfig, const 
 
 void sega_315_5296_device::device_start()
 {
-	// resolve callbacks
-	m_in_port_cb.resolve_all_safe(0xff);
-	m_out_port_cb.resolve_all_safe();
-	m_out_cnt_cb.resolve_all_safe();
-
 	// register for savestates
 	save_item(NAME(m_output_latch));
 	save_item(NAME(m_cnt));

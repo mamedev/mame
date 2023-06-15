@@ -217,9 +217,6 @@ void atari_cage_device::device_start()
 {
 	attotime cage_cpu_clock_period;
 
-	// resolve callbacks
-	m_irqhandler.resolve_safe();
-
 	m_bootbank->set_base(m_bootrom->base());
 	m_mainbank->set_base(m_mainrom->base());
 

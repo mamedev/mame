@@ -104,7 +104,8 @@ public:
 
 protected:
 	rc2014_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	// device-level overrides
+
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -159,7 +160,8 @@ public:
 
 protected:
 	rc2014_slot_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
-	// device-level overrides
+
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_resolve_objects() override;
 
@@ -200,8 +202,6 @@ public:
 
 protected:
 	rc2014_ext_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	// device-level overrides
-	virtual void device_start() override;
 
 private:
 	devcb_write_line m_clk2;
@@ -252,7 +252,8 @@ public:
 
 protected:
 	rc2014_ext_slot_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
-	// device-level overrides
+
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_resolve_objects() override;
 };

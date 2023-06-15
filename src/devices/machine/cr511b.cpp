@@ -63,13 +63,6 @@ cr511b_device::cr511b_device(const machine_config &mconfig, const char *tag, dev
 
 void cr511b_device::device_start()
 {
-	// resolve callbacks
-	m_stch_handler.resolve_safe();
-	m_sten_handler.resolve_safe();
-	m_drq_handler.resolve_safe();
-	m_dten_handler.resolve_safe();
-	m_scor_handler.resolve_safe();
-	m_xaen_handler.resolve_safe();
 }
 
 //-------------------------------------------------

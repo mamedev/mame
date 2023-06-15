@@ -55,8 +55,7 @@ public:
 	int rom_dtack_cycle_count();
 
 protected:
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

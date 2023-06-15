@@ -200,8 +200,7 @@ void lc8670_cpu_device::device_start()
 	// set our instruction counter
 	set_icountptr(m_icount);
 
-	// resolve callbacks
-	m_bankswitch_func.resolve();
+	// resolve delegates
 	m_lcd_update_func.resolve_safe(0);
 
 	// setup timers

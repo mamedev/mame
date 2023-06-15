@@ -81,8 +81,7 @@ void scc8530_legacy_device::updateirqs()
 
 		// tell the driver the new IRQ line status if possible
 		LOG("SCC8530 IRQ status => %d\n", irqstat);
-		if(!intrq_cb.isnull())
-			intrq_cb(irqstat);
+		intrq_cb(irqstat);
 	}
 }
 
@@ -167,8 +166,6 @@ TIMER_CALLBACK_MEMBER(scc8530_legacy_device::baud_expire)
 
 void scc8530_legacy_device::device_start()
 {
-	intrq_cb.resolve();
-
 	memset(channel, 0, sizeof(channel));
 
 	mode = 0;
@@ -214,8 +211,7 @@ void scc8530_legacy_device::set_status(int _status)
 
 void scc8530_legacy_device::acknowledge()
 {
-	if(!intrq_cb.isnull())
-		intrq_cb(0);
+	intrq_cb(0);
 }
 
 /*-------------------------------------------------

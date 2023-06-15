@@ -194,7 +194,6 @@ void votrax_sc01_device::device_start()
 	m_timer = timer_alloc(FUNC(votrax_sc01_device::phone_tick), this);
 
 	// reset outputs
-	m_ar_cb.resolve_safe();
 	m_ar_state = ASSERT_LINE;
 
 	// save inputs

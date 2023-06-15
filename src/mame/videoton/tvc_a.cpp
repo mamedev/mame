@@ -28,9 +28,6 @@ tvc_sound_device::tvc_sound_device(const machine_config &mconfig, const char *ta
 //-------------------------------------------------
 void tvc_sound_device::device_start()
 {
-	// resolve callbacks
-	m_write_sndint.resolve_safe();
-
 	m_stream = stream_alloc(0, 1, machine().sample_rate());
 	m_sndint_timer = timer_alloc(FUNC(tvc_sound_device::trigger_int), this);
 }

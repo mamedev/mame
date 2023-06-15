@@ -200,10 +200,6 @@ e22_kbd_hle_device::e22_kbd_hle_device(const machine_config &mconfig, const char
 
 void e22_kbd_hle_device::device_start()
 {
-	// resolve callbacks
-	m_tx_handler.resolve_safe();
-	m_cts_handler.resolve_safe();
-
 	// signal ready
 	m_cts_handler(0);
 }

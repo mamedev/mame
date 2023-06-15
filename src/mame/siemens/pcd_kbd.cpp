@@ -232,7 +232,6 @@ pcd_keyboard_device::pcd_keyboard_device(const machine_config &mconfig, const ch
 
 void pcd_keyboard_device::device_start()
 {
-	m_out_tx_handler.resolve_safe();
 	m_out_tx_handler(1);
 }
 

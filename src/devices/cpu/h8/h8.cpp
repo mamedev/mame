@@ -18,8 +18,8 @@
 h8_device::h8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map_delegate) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_BIG, 16, 16, 0, map_delegate),
-	m_read_adc(*this),
-	m_read_port(*this),
+	m_read_adc(*this, 0),
+	m_read_port(*this, 0),
 	m_write_port(*this),
 	m_sci(*this, "sci%u", 0),
 	m_sci_tx(*this),
@@ -73,12 +73,6 @@ void h8_device::device_start()
 {
 	space(AS_PROGRAM).cache(m_cache);
 	space(AS_PROGRAM).specific(m_program);
-
-	m_read_adc.resolve_all();
-	m_read_port.resolve_all();
-	m_write_port.resolve_all();
-	m_sci_tx.resolve_all_safe();
-	m_sci_clk.resolve_all_safe();
 
 	uint32_t pcmask = m_mode_advanced ? 0xffffff : 0xffff;
 	state_add<uint32_t>(H8_PC, "PC",

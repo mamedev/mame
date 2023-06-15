@@ -36,8 +36,6 @@ gt913_kbd_hle_device::gt913_kbd_hle_device(const machine_config &mconfig, const 
 
 void gt913_kbd_hle_device::device_start()
 {
-	m_irq_cb.resolve_safe();
-
 	save_item(NAME(m_status));
 	save_item(NAME(m_fifo));
 	save_item(NAME(m_fifo_read));

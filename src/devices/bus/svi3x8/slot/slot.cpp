@@ -42,10 +42,6 @@ svi_slot_bus_device::~svi_slot_bus_device()
 
 void svi_slot_bus_device::device_start()
 {
-	// resolve callbacks
-	m_int_handler.resolve_safe();
-	m_romdis_handler.resolve_safe();
-	m_ramdis_handler.resolve_safe();
 }
 
 //-------------------------------------------------

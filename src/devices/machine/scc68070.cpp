@@ -240,15 +240,15 @@ void scc68070_device::cpu_space_map(address_map &map)
 
 scc68070_device::scc68070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: scc68070_base_device(mconfig, tag, owner, clock, SCC68070, address_map_constructor(FUNC(scc68070_device::internal_map), this))
-	, m_iack2_callback(*this)
-	, m_iack4_callback(*this)
-	, m_iack5_callback(*this)
-	, m_iack7_callback(*this)
+	, m_iack2_callback(*this, autovector(2))
+	, m_iack4_callback(*this, autovector(4))
+	, m_iack5_callback(*this, autovector(5))
+	, m_iack7_callback(*this, autovector(7))
 	, m_uart_tx_callback(*this)
 	, m_uart_rtsn_callback(*this)
 	, m_i2c_scl_callback(*this)
 	, m_i2c_sdaw_callback(*this)
-	, m_i2c_sdar_callback(*this)
+	, m_i2c_sdar_callback(*this, 0)
 	, m_ipl(0)
 	, m_in2_line(CLEAR_LINE)
 	, m_in4_line(CLEAR_LINE)
@@ -258,27 +258,6 @@ scc68070_device::scc68070_device(const machine_config &mconfig, const char *tag,
 	, m_int2_line(CLEAR_LINE)
 {
 	m_cpu_space_config.m_internal_map = address_map_constructor(FUNC(scc68070_device::cpu_space_map), this);
-}
-
-//-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void scc68070_device::device_resolve_objects()
-{
-	scc68070_base_device::device_resolve_objects();
-
-	m_iack2_callback.resolve_safe(autovector(2));
-	m_iack4_callback.resolve_safe(autovector(4));
-	m_iack5_callback.resolve_safe(autovector(5));
-	m_iack7_callback.resolve_safe(autovector(7));
-	m_uart_tx_callback.resolve_safe();
-	m_uart_rtsn_callback.resolve_safe();
-	m_i2c_scl_callback.resolve_safe();
-	m_i2c_sdaw_callback.resolve_safe();
-	m_i2c_sdar_callback.resolve_safe(0);
 }
 
 //-------------------------------------------------

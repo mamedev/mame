@@ -53,7 +53,7 @@ void sm590_device::data_56x4(address_map &map)
 sm590_device::sm590_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
 	sm510_base_device(mconfig, type, tag, owner, clock, stack_levels, prgwidth, program, datawidth, data),
 	m_write_rx(*this),
-	m_read_rx(*this)
+	m_read_rx(*this, 0)
 { }
 
 sm590_device::sm590_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
@@ -84,10 +84,6 @@ void sm590_device::device_start()
 {
 	// common init
 	sm510_base_device::device_start();
-
-	// resolve callbacks
-	m_read_rx.resolve_all_safe(0);
-	m_write_rx.resolve_all_safe();
 
 	// init/register for savestates
 	m_pagemask = 0x7f;

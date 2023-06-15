@@ -410,7 +410,6 @@ idegdrom_device::idegdrom_device(const machine_config &mconfig, const char *tag,
 void idegdrom_device::device_start()
 {
 	pci_device::device_start();
-	irq_cb.resolve_safe();
 	add_map(0x00000020, M_IO, FUNC(idegdrom_device::map_command));
 	bank_infos[0].adr = 0x01c0;
 	// pci system does not support base addresses not multiples of size

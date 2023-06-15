@@ -19,7 +19,6 @@ msx_slot_cartridge_base_device::msx_slot_cartridge_base_device(const machine_con
 
 void msx_slot_cartridge_base_device::device_resolve_objects()
 {
-	m_irq_handler.resolve_safe();
 	m_cartridge = dynamic_cast<msx_cart_interface *>(get_card_device());
 	if (m_cartridge)
 	{

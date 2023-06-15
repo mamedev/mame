@@ -51,9 +51,6 @@ void samcoupe_mouse_port_device::device_start()
 {
 	// get inserted module
 	m_module = get_card_device();
-
-	// resolve callbacks
-	m_mseint_handler.resolve_safe();
 }
 
 //-------------------------------------------------

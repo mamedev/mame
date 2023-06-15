@@ -50,7 +50,7 @@ static FILE *adpcm_file[16] = {};
 spg2xx_audio_device::spg2xx_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, m_space_read_cb(*this)
+	, m_space_read_cb(*this, 0)
 	, m_irq_cb(*this)
 	, m_ch_irq_cb(*this)
 {
@@ -110,10 +110,6 @@ void spg2xx_audio_device::device_start()
 		m_channel_irq[i] = timer_alloc(FUNC(spg2xx_audio_device::irq_tick), this);
 		m_channel_irq[i]->adjust(attotime::never);
 	}
-
-	m_space_read_cb.resolve_safe(0);
-	m_irq_cb.resolve();
-	m_ch_irq_cb.resolve();
 }
 
 void spg2xx_audio_device::device_reset()

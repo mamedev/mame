@@ -217,8 +217,8 @@ smpc_hle_device::smpc_hle_device(const machine_config &mconfig, const char *tag,
 	, m_sysres(*this)
 	, m_syshalt(*this)
 	, m_dotsel(*this)
-	, m_pdr1_read(*this)
-	, m_pdr2_read(*this)
+	, m_pdr1_read(*this, 0xff)
+	, m_pdr2_read(*this, 0xff)
 	, m_pdr1_write(*this)
 	, m_pdr2_write(*this)
 	, m_irq_line(*this)
@@ -250,20 +250,6 @@ void smpc_hle_device::device_start()
 //  check if SMEM has valid data via byte 4 in the array, if not then simulate a battery backup fail
 //  (-> call the RTC / Language select menu for Saturn)
 	m_mini_nvram->set_base(&m_smem, 5);
-
-	m_mshres.resolve_safe();
-	m_mshnmi.resolve_safe();
-	m_sshres.resolve_safe();
-	m_sndres.resolve_safe();
-	m_sysres.resolve_safe();
-	m_syshalt.resolve_safe();
-	m_dotsel.resolve_safe();
-	m_irq_line.resolve_safe();
-
-	m_pdr1_read.resolve_safe(0xff);
-	m_pdr2_read.resolve_safe(0xff);
-	m_pdr1_write.resolve_safe();
-	m_pdr2_write.resolve_safe();
 
 	save_item(NAME(m_sf));
 	save_item(NAME(m_sr));

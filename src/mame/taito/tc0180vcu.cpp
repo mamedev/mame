@@ -73,18 +73,6 @@ tc0180vcu_device::tc0180vcu_device(const machine_config &mconfig, const char *ta
 }
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void tc0180vcu_device::device_resolve_objects()
-{
-	m_inth_callback.resolve_safe();
-	m_intl_callback.resolve_safe();
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

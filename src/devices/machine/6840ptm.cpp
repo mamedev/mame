@@ -90,10 +90,6 @@ ptm6840_device::ptm6840_device(const machine_config &mconfig, const char *tag, d
 
 void ptm6840_device::device_start()
 {
-	// resolve callbacks
-	m_out_cb.resolve_all_safe();
-	m_irq_cb.resolve_safe();
-
 	m_timer[0] = timer_alloc(FUNC(ptm6840_device::state_changed), this);
 	m_timer[1] = timer_alloc(FUNC(ptm6840_device::state_changed), this);
 	m_timer[2] = timer_alloc(FUNC(ptm6840_device::state_changed), this);

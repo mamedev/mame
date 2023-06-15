@@ -54,7 +54,7 @@ t11_device::t11_device(const machine_config &mconfig, device_type type, const ch
 	, m_berr_active(false)
 	, m_hlt_active(false)
 	, m_out_reset_func(*this)
-	, m_in_iack_func(*this)
+	, m_in_iack_func(*this, 0) // default vector (T-11 User's Guide, p. A-11)
 {
 	m_program_config.m_is_octal = true;
 	for (auto &reg : m_reg)
@@ -310,8 +310,6 @@ void t11_device::device_start()
 	m_initial_pc = initial_pc[c_initial_mode >> 13];
 	space(AS_PROGRAM).cache(m_cache);
 	space(AS_PROGRAM).specific(m_program);
-	m_out_reset_func.resolve_safe();
-	m_in_iack_func.resolve_safe(0); // default vector (T-11 User's Guide, p. A-11)
 
 	save_item(NAME(m_ppc.w.l));
 	save_item(NAME(m_reg[0].w.l));

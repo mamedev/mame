@@ -416,8 +416,6 @@ void isbc_215g_device::device_start()
 	m_wrgate = false;
 	m_rdgate = false;
 	m_format_bytes = 0;
-	m_out_irq_func.resolve_safe();
-
 }
 
 void isbc_215g_device::write(offs_t offset, uint8_t data)

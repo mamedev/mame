@@ -71,11 +71,6 @@ vic20_expansion_slot_device::vic20_expansion_slot_device(const machine_config &m
 void vic20_expansion_slot_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_write_irq.resolve_safe();
-	m_write_nmi.resolve_safe();
-	m_write_res.resolve_safe();
 }
 
 

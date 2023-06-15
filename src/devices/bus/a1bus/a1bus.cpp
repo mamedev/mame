@@ -87,13 +87,6 @@ a1bus_device::a1bus_device(const machine_config &mconfig, device_type type, cons
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void a1bus_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_out_irq_cb.resolve_safe();
-	m_out_nmi_cb.resolve_safe();
-}
-
 void a1bus_device::device_start()
 {
 	// clear slot

@@ -65,17 +65,6 @@ ttl7474_device::ttl7474_device(const machine_config &mconfig, const char *tag, d
 
 
 //-------------------------------------------------
-//  device_resolve_objects - complete setup
-//-------------------------------------------------
-
-void ttl7474_device::device_resolve_objects()
-{
-	m_output_func.resolve_safe();
-	m_comp_output_func.resolve_safe();
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

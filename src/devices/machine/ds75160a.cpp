@@ -29,7 +29,7 @@ DEFINE_DEVICE_TYPE(DS75160A, ds75160a_device, "ds75160a", "DS75160A GPIB Transce
 
 ds75160a_device::ds75160a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, DS75160A, tag, owner, clock),
-	m_read(*this),
+	m_read(*this, 0),
 	m_write(*this),
 	m_data(0xff),
 	m_te(0),
@@ -44,10 +44,6 @@ ds75160a_device::ds75160a_device(const machine_config &mconfig, const char *tag,
 
 void ds75160a_device::device_start()
 {
-	// resolve callbacks
-	m_read.resolve_safe(0);
-	m_write.resolve_safe();
-
 	// register for state saving
 	save_item(NAME(m_data));
 	save_item(NAME(m_te));

@@ -299,7 +299,7 @@ mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type ty
 	, m_num_interrupts(5)
 	, m_sfr_ram(*this, "sfr_ram")
 	, m_scratchpad(*this, "scratchpad")
-	, m_port_in_cb(*this)
+	, m_port_in_cb(*this, 0xff)
 	, m_port_out_cb(*this)
 	, m_rtemp(0)
 {
@@ -2290,9 +2290,6 @@ void mcs51_cpu_device::device_start()
 	space(AS_PROGRAM).cache(m_program);
 	space(AS_DATA).specific(m_data);
 	space(AS_IO).specific(m_io);
-
-	m_port_in_cb.resolve_all_safe(0xff);
-	m_port_out_cb.resolve_all_safe();
 
 	/* Save states */
 	save_item(NAME(m_ppc));

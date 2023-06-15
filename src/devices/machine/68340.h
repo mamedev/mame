@@ -28,10 +28,8 @@ public:
 	auto pb_out_callback() { return m_pb_out_cb.bind(); }
 
 	auto tout1_out_callback() { return m_timer[0]->m_tout_out_cb.bind(); }
-	auto tin1_in_callback() { return m_timer[0]->m_tin_in_cb.bind(); }
 	auto tgate1_in_callback() { return m_timer[0]->m_tgate_in_cb.bind(); }
 	auto tout2_out_callback() { return m_timer[1]->m_tout_out_cb.bind(); }
-	auto tin2_in_callback() { return m_timer[1]->m_tin_in_cb.bind(); }
 	auto tgate2_in_callback() { return m_timer[1]->m_tgate_in_cb.bind(); }
 
 	uint16_t get_cs(offs_t address);

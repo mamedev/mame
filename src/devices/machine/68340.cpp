@@ -229,9 +229,9 @@ m68340_cpu_device::m68340_cpu_device(const machine_config &mconfig, const char *
 	, m_crystal(0)
 	, m_extal(0)
 	, m_pa_out_cb(*this)
-	, m_pa_in_cb(*this)
+	, m_pa_in_cb(*this, 0)
 	, m_pb_out_cb(*this)
-	, m_pb_in_cb(*this)
+	, m_pb_in_cb(*this, 0)
 {
 	m_m68340SIM = nullptr;
 	m_m68340DMA = nullptr;

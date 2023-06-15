@@ -33,8 +33,7 @@ void ad1848_device::device_add_mconfig(machine_config &config)
 void ad1848_device::device_start()
 {
 	m_timer = timer_alloc(FUNC(ad1848_device::update_tick), this);
-	m_irq_cb.resolve_safe();
-	m_drq_cb.resolve_safe();
+
 	save_item(NAME(m_regs.idx));
 	save_item(NAME(m_addr));
 	save_item(NAME(m_stat));

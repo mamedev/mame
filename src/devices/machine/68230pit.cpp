@@ -51,11 +51,11 @@ DEFINE_DEVICE_TYPE(PIT68230, pit68230_device, "pit68230", "MC68230 PI/T")
 pit68230_device::pit68230_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_pa_out_cb(*this)
-	, m_pa_in_cb(*this)
+	, m_pa_in_cb(*this, 0)
 	, m_pb_out_cb(*this)
-	, m_pb_in_cb(*this)
+	, m_pb_in_cb(*this, 0)
 	, m_pc_out_cb(*this)
-	, m_pc_in_cb(*this)
+	, m_pc_in_cb(*this, 0)
 	, m_h1_out_cb(*this)
 	, m_h2_out_cb(*this)
 	, m_h3_out_cb(*this)
@@ -100,29 +100,9 @@ void pit68230_device::device_start()
 	LOGSETUP("pit68230_device::device_start\n");
 
 	// NOTE:
-	// Not using resolve_safe for the m_px_in_cb's is a temporary way to be able to check
+	// Not using resolve_safe for the m_px_in_cb's was a temporary way to be able to check
 	// if a handler is installed with isnull(). The safe function installs a dummy default
-	// handler which disable the isnull() test. TODO: Need a better fix?
-
-	// resolve callbacks Port A
-	m_pa_out_cb.resolve_safe();
-	m_pa_in_cb.resolve();
-
-	// resolve callbacks Port B
-	m_pb_out_cb.resolve_safe();
-	m_pb_in_cb.resolve();
-
-	// resolve callbacks Port C
-	m_pc_out_cb.resolve_safe();
-	m_pc_in_cb.resolve();
-
-	m_h1_out_cb.resolve_safe();
-	m_h2_out_cb.resolve_safe();
-	m_h3_out_cb.resolve_safe();
-	m_h4_out_cb.resolve_safe();
-
-	m_tirq_out_cb.resolve_safe();
-	m_pirq_out_cb.resolve_safe();
+	// handler which disabled the isnull() test. TODO: Need a better fix?
 
 	// Timers
 	pit_timer = timer_alloc(FUNC(pit68230_device::tick_clock), this);
@@ -809,7 +789,7 @@ uint8_t pit68230_device::rr_pitreg_pbcr()
 uint8_t pit68230_device::rr_pitreg_padr()
 {
 	m_padr &= m_paddr;
-	if (!m_pa_in_cb.isnull())
+	if (!m_pa_in_cb.isunset())
 	{
 		m_padr |= m_pa_in_cb() & ~m_paddr;
 	}
@@ -831,7 +811,7 @@ uint8_t pit68230_device::rr_pitreg_padr()
 uint8_t pit68230_device::rr_pitreg_pbdr()
 {
 	m_pbdr &= m_pbddr;
-	if (!m_pb_in_cb.isnull())
+	if (!m_pb_in_cb.isunset())
 	{
 		m_pbdr |= m_pb_in_cb() & ~m_pbddr;
 	}
@@ -848,7 +828,7 @@ uint8_t pit68230_device::rr_pitreg_pbdr()
 uint8_t pit68230_device::rr_pitreg_pcdr()
 {
 	m_pcdr &= m_pcddr;
-	if (!m_pc_in_cb.isnull()) // Port C has alternate functions that may set bits apart from callback
+	if (!m_pc_in_cb.isunset()) // Port C has alternate functions that may set bits apart from callback
 	{
 		m_pcdr |= m_pc_in_cb() & ~m_pcddr;
 	}
@@ -871,7 +851,7 @@ the instantaneous pin level is read and no input latching is performed except at
 data bus interface. Writes to this address are answered with DTACK, but the data is ignored.*/
 uint8_t pit68230_device::rr_pitreg_paar()
 {
-	uint8_t ret = m_pa_in_cb.isnull() ? 0 : m_pa_in_cb();
+	const uint8_t ret = m_pa_in_cb();
 	LOGR("%s pit68230_device::rr_pitreg_paar <- %02x\n", tag(), ret);
 	return ret;
 }
@@ -882,7 +862,7 @@ the instantaneous pin level is read and no input latching is performed except at
 data bus interface.Writes to this address are answered with DTACK, but the data is ignored.*/
 uint8_t pit68230_device::rr_pitreg_pbar()
 {
-	uint8_t ret = m_pb_in_cb.isnull() ? 0 : m_pb_in_cb();
+	const uint8_t ret = m_pb_in_cb();
 	LOGR("%s pit68230_device::rr_pitreg_pbar <- %02x\n", tag(), ret);
 	return ret;
 }

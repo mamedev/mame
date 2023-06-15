@@ -524,7 +524,6 @@ lk201_device::lk201_device(const machine_config &mconfig, const char *tag, devic
 void lk201_device::device_start()
 {
 	m_count = timer_alloc(FUNC(lk201_device::timer_irq), this);
-	m_tx_handler.resolve_safe();
 
 	m_beeper = timer_alloc(FUNC(lk201_device::beeper_off), this);
 

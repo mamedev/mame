@@ -71,9 +71,6 @@ void i8089_channel_device::device_start()
 	// get parent device
 	m_iop = downcast<i8089_device *>(owner());
 
-	// resolve callbacks
-	m_write_sintr.resolve_safe();
-
 	// register for save states
 	save_item(NAME(m_xfer_pending));
 	save_item(NAME(m_dma_value));

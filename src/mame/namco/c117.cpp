@@ -56,8 +56,6 @@ device_memory_interface::space_config_vector namco_c117_device::memory_space_con
 
 void namco_c117_device::device_start()
 {
-	m_subres_cb.resolve_safe();
-
 	space(AS_PROGRAM).specific(m_program);
 
 	m_cpuexec[0]->space(AS_PROGRAM).cache(m_cpucache[0]);

@@ -41,11 +41,10 @@ public:
 	void reset_counters();
 
 protected:
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 
-	// device_execute_interface overrides
+	// device_execute_interface implementation
 	virtual void execute_run() override;
 
 private:

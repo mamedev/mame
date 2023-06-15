@@ -149,8 +149,6 @@ void ioport_device::reset_in(int state)
 
 void ioport_device::device_start()
 {
-	m_console_extint.resolve();
-	m_console_ready.resolve();
 	if (m_connected != nullptr)
 		m_connected->set_ioport(this);
 }

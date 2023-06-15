@@ -2087,13 +2087,6 @@ void sa1111_device::device_start()
 
 	m_ssp_regs.rx_timer = timer_alloc(FUNC(sa1111_device::ssp_rx_callback), this);
 	m_ssp_regs.tx_timer = timer_alloc(FUNC(sa1111_device::ssp_tx_callback), this);
-
-	m_irq_out.resolve_safe();
-	m_gpio_out.resolve_all_safe();
-	m_ssp_out.resolve_safe();
-	m_l3_addr_out.resolve_safe();
-	m_l3_data_out.resolve_safe();
-	m_i2s_out.resolve_safe();
 }
 
 void sa1111_device::device_reset()

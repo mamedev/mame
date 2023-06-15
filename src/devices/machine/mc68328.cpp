@@ -59,16 +59,16 @@ mc68328_base_device::mc68328_base_device(const machine_config &mconfig, device_t
 	, m_out_port_e_cb(*this)
 	, m_out_port_f_cb(*this)
 	, m_out_port_g_cb(*this)
-	, m_in_port_a_cb(*this)
-	, m_in_port_b_cb(*this)
-	, m_in_port_c_cb(*this)
-	, m_in_port_d_cb(*this)
-	, m_in_port_e_cb(*this)
-	, m_in_port_f_cb(*this)
-	, m_in_port_g_cb(*this)
+	, m_in_port_a_cb(*this, 0)
+	, m_in_port_b_cb(*this, 0)
+	, m_in_port_c_cb(*this, 0)
+	, m_in_port_d_cb(*this, 0)
+	, m_in_port_e_cb(*this, 0)
+	, m_in_port_f_cb(*this, 0)
+	, m_in_port_g_cb(*this, 0)
 	, m_out_pwm_cb(*this)
 	, m_out_spim_cb(*this)
-	, m_in_spim_cb(*this)
+	, m_in_spim_cb(*this, 0)
 	, m_out_flm_cb(*this)
 	, m_out_llp_cb(*this)
 	, m_out_lsclk_cb(*this)
@@ -82,9 +82,9 @@ mc68328_device::mc68328_device(const machine_config &mconfig, const char *tag, d
 	, m_out_port_j_cb(*this)
 	, m_out_port_k_cb(*this)
 	, m_out_port_m_cb(*this)
-	, m_in_port_j_cb(*this)
-	, m_in_port_k_cb(*this)
-	, m_in_port_m_cb(*this)
+	, m_in_port_j_cb(*this, 0)
+	, m_in_port_k_cb(*this, 0)
+	, m_in_port_m_cb(*this, 0)
 {
 	m_cpu_space_config.m_internal_map = address_map_constructor(FUNC(mc68328_device::cpu_space_map), this);
 	auto imap = address_map_constructor(FUNC(mc68328_device::internal_map), this);
@@ -327,51 +327,7 @@ void mc68328_base_device::device_resolve_objects()
 {
 	m68000_device::device_resolve_objects();
 
-	m_out_port_a_cb.resolve_all_safe();
-	m_out_port_b_cb.resolve_all_safe();
-	m_out_port_c_cb.resolve_all_safe();
-	m_out_port_d_cb.resolve_all_safe();
-	m_out_port_e_cb.resolve_all_safe();
-	m_out_port_f_cb.resolve_all_safe();
-	m_out_port_g_cb.resolve_all_safe();
-
-	m_in_port_a_cb.resolve_all();
-	m_in_port_b_cb.resolve_all();
-	m_in_port_c_cb.resolve_all();
-	m_in_port_d_cb.resolve_all();
-	m_in_port_e_cb.resolve_all();
-	m_in_port_f_cb.resolve_all();
-	m_in_port_g_cb.resolve_all();
-
-	m_out_pwm_cb.resolve_safe();
-
-	m_out_spim_cb.resolve_safe();
-	m_in_spim_cb.resolve_safe(0);
-
-	m_out_flm_cb.resolve_safe();
-	m_out_llp_cb.resolve_safe();
-	m_out_lsclk_cb.resolve_safe();
-	m_out_ld_cb.resolve_safe();
-
 	m_lcd_info_changed_cb.resolve_safe();
-}
-
-void mc68328_device::device_resolve_objects()
-{
-	mc68328_base_device::device_resolve_objects();
-
-	m_out_port_j_cb.resolve_all_safe();
-	m_out_port_k_cb.resolve_all_safe();
-	m_out_port_m_cb.resolve_all_safe();
-
-	m_in_port_j_cb.resolve_all();
-	m_in_port_k_cb.resolve_all();
-	m_in_port_m_cb.resolve_all();
-}
-
-void mc68ez328_device::device_resolve_objects()
-{
-	mc68328_base_device::device_resolve_objects();
 }
 
 //-------------------------------------------------
@@ -1556,7 +1512,7 @@ u8 mc68328_base_device::padata_r() // 0x401
 			{
 				data |= m_padata & (1 << i);
 			}
-			else if (!m_in_port_a_cb[i].isnull())
+			else if (!m_in_port_a_cb[i].isunset())
 			{
 				data |= m_in_port_a_cb[i]() << i;
 			}
@@ -1619,7 +1575,7 @@ u8 mc68328_base_device::pbdata_r() // 0x409
 			{
 				data |= m_pbdata & (1 << i);
 			}
-			else if (!m_in_port_b_cb[i].isnull())
+			else if (!m_in_port_b_cb[i].isunset())
 			{
 				data |= m_in_port_b_cb[i]() << i;
 			}
@@ -1686,7 +1642,7 @@ u8 mc68328_base_device::pcdata_r() // 0x411
 			{
 				data |= m_pcdata & (1 << i);
 			}
-			else if (!m_in_port_c_cb[i].isnull())
+			else if (!m_in_port_c_cb[i].isunset())
 			{
 				data |= m_in_port_c_cb[i]() << i;
 			}
@@ -1780,7 +1736,7 @@ u8 mc68328_base_device::pddata_r() // 0x419
 		{
 			data |= m_pddata & (1 << i);
 		}
-		else if (!m_in_port_d_cb[i].isnull())
+		else if (!m_in_port_d_cb[i].isunset())
 		{
 			data |= m_in_port_d_cb[i]() << i;
 		}
@@ -1882,7 +1838,7 @@ u8 mc68328_base_device::pedata_r() // 0x421
 			{
 				data |= m_pedata & (1 << i);
 			}
-			else if (!m_in_port_e_cb[i].isnull())
+			else if (!m_in_port_e_cb[i].isunset())
 			{
 				data |= m_in_port_e_cb[i]() << i;
 			}
@@ -1961,7 +1917,7 @@ u8 mc68328_base_device::pfdata_r() // 0x429
 			{
 				data |= m_pfdata & (1 << i);
 			}
-			else if (!m_in_port_f_cb[i].isnull())
+			else if (!m_in_port_f_cb[i].isunset())
 			{
 				data |= m_in_port_f_cb[i]() << i;
 			}
@@ -2040,7 +1996,7 @@ u8 mc68328_base_device::pgdata_r() // 0x431
 			{
 				data |= m_pgdata & (1 << i);
 			}
-			else if (!m_in_port_g_cb[i].isnull())
+			else if (!m_in_port_g_cb[i].isunset())
 			{
 				data |= m_in_port_g_cb[i]() << i;
 			}
@@ -2119,7 +2075,7 @@ u8 mc68328_device::pjdata_r() // 0x439
 			{
 				data |= m_pjdata & (1 << i);
 			}
-			else if (!m_in_port_j_cb[i].isnull())
+			else if (!m_in_port_j_cb[i].isunset())
 			{
 				data |= m_in_port_j_cb[i]() << i;
 			}
@@ -2182,7 +2138,7 @@ u8 mc68328_device::pkdata_r() // 0x441
 			{
 				data |= m_pkdata & (1 << i);
 			}
-			else if (!m_in_port_k_cb[i].isnull())
+			else if (!m_in_port_k_cb[i].isunset())
 			{
 				data |= m_in_port_k_cb[i]() << i;
 			}
@@ -2261,7 +2217,7 @@ u8 mc68328_device::pmdata_r() // 0x449
 			{
 				data |= m_pmdata & (1 << i);
 			}
-			else if (!m_in_port_m_cb[i].isnull())
+			else if (!m_in_port_m_cb[i].isunset())
 			{
 				data |= m_in_port_m_cb[i]() << i;
 			}

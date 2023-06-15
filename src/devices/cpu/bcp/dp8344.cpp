@@ -150,22 +150,6 @@ device_memory_interface::space_config_vector dp8344_device::memory_space_config(
 
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void dp8344_device::device_resolve_objects()
-{
-	// resolve output callbacks
-	m_birq_out_cb.resolve_safe();
-	m_data_out_cb.resolve_safe();
-	m_data_dly_cb.resolve_safe();
-	m_tx_act_cb.resolve_safe();
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

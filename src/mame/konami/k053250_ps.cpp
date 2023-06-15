@@ -76,7 +76,6 @@ void k053250ps_device::device_start()
 	save_item(NAME(m_page));
 	save_item(NAME(m_dmairq_on));
 
-	m_dmairq_cb.resolve_safe();
 	m_timer_lvcdma = timer_alloc(FUNC(k053250ps_device::handle_od_wait), this);
 }
 

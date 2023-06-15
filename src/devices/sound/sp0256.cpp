@@ -68,8 +68,6 @@ sp0256_device::sp0256_device(const machine_config &mconfig, const char *tag, dev
 
 void sp0256_device::device_start()
 {
-	m_drq_cb.resolve_safe();
-	m_sby_cb.resolve_safe();
 	m_drq_cb(1);
 	m_sby_cb(1);
 

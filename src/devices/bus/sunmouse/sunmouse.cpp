@@ -112,8 +112,6 @@ void sun_mouse_port_device::device_config_complete()
 void sun_mouse_port_device::device_resolve_objects()
 {
 	m_rxd = 1;
-
-	m_rxd_handler.resolve_safe();
 }
 
 

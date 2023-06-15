@@ -1025,12 +1025,6 @@ void mc6845_device::device_start()
 	m_end_update_cb.resolve_safe();
 	m_on_update_addr_changed_cb.resolve();
 
-	/* resolve callbacks */
-	m_out_de_cb.resolve_safe();
-	m_out_cur_cb.resolve_safe();
-	m_out_hsync_cb.resolve_safe();
-	m_out_vsync_cb.resolve_safe();
-
 	/* create the timers */
 	m_line_timer = timer_alloc(FUNC(mc6845_device::handle_line_timer), this);
 	m_de_off_timer = timer_alloc(FUNC(mc6845_device::de_off_tick), this);

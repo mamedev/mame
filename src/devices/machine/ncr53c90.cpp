@@ -239,9 +239,6 @@ void ncr53c90_device::device_start()
 	save_item(NAME(drq));
 	save_item(NAME(test_mode));
 
-	m_irq_handler.resolve_safe();
-	m_drq_handler.resolve_safe();
-
 	config = 0;
 	bus_id = 0;
 	select_timeout = 0;

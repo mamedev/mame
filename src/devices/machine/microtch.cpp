@@ -242,7 +242,6 @@ void microtouch_device::device_start()
 	set_tra_rate(clock());
 	set_rcv_rate(clock());
 	m_out_touch_cb.resolve_safe(1);
-	m_out_stx_func.resolve_safe();
 	m_output_valid = false;
 
 	save_item(NAME(m_output_valid));

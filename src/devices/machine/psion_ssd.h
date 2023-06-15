@@ -34,7 +34,6 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_resolve_objects() override;
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;

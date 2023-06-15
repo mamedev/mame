@@ -45,9 +45,8 @@ public:
 	inline void ready_w(int state);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_config_complete() override;
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
 	// called from keyboard

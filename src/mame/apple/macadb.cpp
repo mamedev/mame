@@ -252,11 +252,6 @@ ioport_constructor macadb_device::device_input_ports() const
 
 void macadb_device::device_start()
 {
-	write_via_clock.resolve_safe();
-	write_via_data.resolve_safe();
-	write_adb_data.resolve_safe();
-	write_adb_irq.resolve_safe();
-
 	this->m_adb_timer = timer_alloc(FUNC(macadb_device::mac_adb_tick), this);
 	this->m_adb_timer->adjust(attotime::never);
 

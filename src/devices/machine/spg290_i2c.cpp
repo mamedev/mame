@@ -16,16 +16,13 @@ DEFINE_DEVICE_TYPE(SPG290_I2C, spg290_i2c_device, "spg290_i2c", "SPG290 I2C")
 spg290_i2c_device::spg290_i2c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SPG290_I2C, tag, owner, clock)
 	, m_irq_cb(*this)
-	, m_i2c_read_cb(*this)
+	, m_i2c_read_cb(*this, 0)
 	, m_i2c_write_cb(*this)
 {
 }
 
 void spg290_i2c_device::device_start()
 {
-	m_irq_cb.resolve_safe();
-	m_i2c_read_cb.resolve_safe(0);
-	m_i2c_write_cb.resolve_safe();
 	m_i2c_timer = timer_alloc(FUNC(spg290_i2c_device::i2c_update), this);
 
 	save_item(NAME(m_config));

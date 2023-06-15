@@ -239,8 +239,6 @@ nabupc_keyboard_device::nabupc_keyboard_device(machine_config const &mconfig, ch
 
 void nabupc_keyboard_device::device_start()
 {
-	m_rxd_cb.resolve_safe();
-
 	save_item(NAME(m_port1));
 	save_item(NAME(m_eoc));
 }

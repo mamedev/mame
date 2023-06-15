@@ -143,7 +143,6 @@ protected:
 
 	// device_t implementation
 	virtual void device_start() override;
-	virtual void device_resolve_objects() override;
 	virtual space_config_vector memory_space_config() const override;
 
 private:

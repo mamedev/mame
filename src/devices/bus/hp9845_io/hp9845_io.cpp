@@ -10,11 +10,13 @@
 
 #include "emu.h"
 #include "hp9845_io.h"
+
 #include "98032.h"
 #include "98035.h"
 #include "98036.h"
 #include "98034.h"
 #include "98046.h"
+
 
 // device type definition
 DEFINE_DEVICE_TYPE(HP9845_IO_SLOT, hp9845_io_slot_device, "hp98x5_io_slot", "HP98x5 I/O Slot")
@@ -49,14 +51,6 @@ hp9845_io_slot_device::~hp9845_io_slot_device()
 
 void hp9845_io_slot_device::device_start()
 {
-	m_irq_cb_func.resolve_safe();
-	m_sts_cb_func.resolve_safe();
-	m_flg_cb_func.resolve_safe();
-	m_irq_nextsc_cb_func.resolve_safe();
-	m_sts_nextsc_cb_func.resolve_safe();
-	m_flg_nextsc_cb_func.resolve_safe();
-	m_dmar_cb_func.resolve_safe();
-
 	device_hp9845_io_interface *card = get_card_device();
 
 	if (card != nullptr) {

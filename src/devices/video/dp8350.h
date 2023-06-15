@@ -81,9 +81,8 @@ protected:
 					  bool cursor_on_all_lines, int lbc_0_width, int hsync_serration,
 					  bool hsync_active, bool vsync_active, bool vblank_active);
 
-	// device-specific overrides
+	// device_t implementation
 	virtual void device_config_complete() override;
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_clock_changed() override;
 	virtual void device_reset() override;

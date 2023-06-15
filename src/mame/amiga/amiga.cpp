@@ -143,11 +143,6 @@ public:
 	}
 
 protected:
-	virtual void device_resolve_objects() override
-	{
-		m_kbrst_cb.resolve_safe();
-	}
-
 	virtual void device_start() override
 	{
 		// allocate resources

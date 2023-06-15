@@ -13,8 +13,10 @@
 
 #include "emu.h"
 #include "98032.h"
+
 #include "hp9871.h"
 #include "hp9885.h"
+
 
 // Debugging
 #define VERBOSE 0
@@ -455,9 +457,6 @@ void hp98032_gpio_slot_device::preset_w(int state)
 
 void hp98032_gpio_slot_device::device_start()
 {
-	m_pflg_handler.resolve_safe();
-	m_psts_handler.resolve_safe();
-	m_eir_handler.resolve_safe();
 }
 
 void hp98032_gpio_slot_device::device_reset()

@@ -32,12 +32,6 @@ tv955kb_device::tv955kb_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-void tv955kb_device::device_resolve_objects()
-{
-	m_txd_cb.resolve_safe();
-	m_reset_cb.resolve_safe();
-}
-
 void tv955kb_device::device_start()
 {
 	m_bell_timer = timer_alloc(FUNC(tv955kb_device::bell_q8), this);

@@ -81,7 +81,7 @@ void wd7600_device::device_add_mconfig(machine_config & config)
 
 wd7600_device::wd7600_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, WD7600, tag, owner, clock),
-	m_read_ior(*this),
+	m_read_ior(*this, 0),
 	m_write_iow(*this),
 	m_write_tc(*this),
 	m_write_hold(*this),
@@ -120,17 +120,6 @@ void wd7600_device::device_start()
 	// make sure the ram device is already running
 	if (!m_ram->started())
 		throw device_missing_dependencies();
-
-	// resolve callbacks
-	m_read_ior.resolve_safe(0);
-	m_write_iow.resolve_safe();
-	m_write_tc.resolve_safe();
-	m_write_hold.resolve_safe();
-	m_write_nmi.resolve_safe();
-	m_write_intr.resolve_safe();
-	m_write_cpureset.resolve_safe();
-	m_write_a20m.resolve_safe();
-	m_write_spkr.resolve_safe();
 
 	m_space = &m_cpu->space(AS_PROGRAM);
 	m_space_io = &m_cpu->space(AS_IO);

@@ -86,7 +86,7 @@ atirage_device::atirage_device(const machine_config &mconfig, device_type type, 
 	: pci_device(mconfig, type, tag, owner, clock),
 	m_mach64(*this, "vga"),
 	m_screen(*this, "screen"),
-	read_gpio(*this),
+	read_gpio(*this, 0),
 	write_gpio(*this)
 {
 	m_hres = m_vres = m_htotal = m_vtotal = m_format = 0;
@@ -141,9 +141,6 @@ void atirage_device::config_map(address_map &map)
 
 void atirage_device::device_start()
 {
-	read_gpio.resolve_safe(0);
-	write_gpio.resolve_safe();
-
 	pci_device::device_start();
 
 	add_map(0x1000000, M_MEM, FUNC(atirage_device::mem_map));   // 16 MB memory map

@@ -165,8 +165,6 @@ void m6809_base_device::device_start()
 	space(AS_PROGRAM).specific(m_mintf->program);
 	space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).cache(m_mintf->csprogram);
 
-	m_lic_func.resolve_safe();
-
 	// register our state for the debugger
 	state_add(STATE_GENPCBASE, "CURPC",     m_ppc.w).callimport().noshow();
 	state_add(STATE_GENFLAGS,  "CURFLAGS",  m_cc).formatstr("%8s").noshow();

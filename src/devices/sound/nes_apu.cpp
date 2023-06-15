@@ -55,7 +55,7 @@ nesapu_device::nesapu_device(const machine_config &mconfig, device_type type, co
 	, m_samps_per_sync(0)
 	, m_stream(nullptr)
 	, m_irq_handler(*this)
-	, m_mem_read_cb(*this)
+	, m_mem_read_cb(*this, 0x00)
 	, m_frame_timer(nullptr)
 {
 }
@@ -114,10 +114,6 @@ void nesapu_device::calculate_rates()
 
 void nesapu_device::device_start()
 {
-	// resolve callbacks
-	m_irq_handler.resolve_safe();
-	m_mem_read_cb.resolve_safe(0x00);
-
 	m_frame_timer = timer_alloc(FUNC(nesapu_device::frame_timer_cb), this);
 	m_frame_clocks = m_is_pal ? 33254 : 29830;
 	m_frame_period = clocks_to_attotime(m_frame_clocks);

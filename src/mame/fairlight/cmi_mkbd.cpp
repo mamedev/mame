@@ -67,10 +67,6 @@ cmi_music_keyboard_device::cmi_music_keyboard_device(const machine_config &mconf
 
 void cmi_music_keyboard_device::device_resolve_objects()
 {
-	m_cmi_txd.resolve_safe();
-	m_cmi_rts.resolve_safe();
-	m_kbd_txd.resolve_safe();
-	m_kbd_rts.resolve_safe();
 	m_digit.resolve();
 }
 

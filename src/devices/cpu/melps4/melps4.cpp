@@ -55,10 +55,10 @@ melps4_cpu_device::melps4_cpu_device(const machine_config &mconfig, device_type 
 	, m_sp_mask(0x7<<4)
 	, m_ba_op(0x01)
 	, m_stack_levels(3)
-	, m_read_k(*this)
-	, m_read_d(*this)
-	, m_read_s(*this)
-	, m_read_f(*this)
+	, m_read_k(*this, 0)
+	, m_read_d(*this, 0)
+	, m_read_s(*this, 0)
+	, m_read_f(*this, 0)
 	, m_write_d(*this)
 	, m_write_s(*this)
 	, m_write_f(*this)
@@ -102,19 +102,6 @@ void melps4_cpu_device::device_start()
 	m_prgmask = (1 << m_prgwidth) - 1;
 	m_datamask = (1 << m_datawidth) - 1;
 	m_d_mask = (1 << m_d_pins) - 1;
-
-	// resolve callbacks
-	m_read_k.resolve_safe(0);
-	m_read_d.resolve_safe(0);
-	m_read_s.resolve_safe(0);
-	m_read_f.resolve_safe(0);
-
-	m_write_d.resolve_safe();
-	m_write_s.resolve_safe();
-	m_write_f.resolve_safe();
-	m_write_g.resolve_safe();
-	m_write_u.resolve_safe();
-	m_write_t.resolve_safe();
 
 	// zerofill
 	m_pc = 0;

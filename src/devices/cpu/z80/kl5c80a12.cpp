@@ -96,11 +96,9 @@ void kl5c80a12_device::device_resolve_objects()
 {
 	// Resolve parallel port callbacks
 	for (int i = 0; i < 2; i++)
-		m_porta_in_callback[i].resolve_safe(m_porta_3state[i]);
-	m_porta_out_callback.resolve_all_safe();
+		m_porta_in_callback[i].resolve(m_porta_3state[i]);
 	for (int i = 0; i < 3; i++)
-		m_portb_in_callback[i].resolve_safe(m_portb_3state[i]);
-	m_portb_out_callback.resolve_all_safe();
+		m_portb_in_callback[i].resolve(m_portb_3state[i]);
 }
 
 

@@ -61,9 +61,6 @@ psion_honda_slot_device::psion_honda_slot_device(const machine_config &mconfig, 
 void psion_honda_slot_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_int_cb.resolve_safe();
 }
 
 

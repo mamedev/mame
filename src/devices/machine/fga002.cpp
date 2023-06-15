@@ -76,10 +76,10 @@ DEFINE_DEVICE_TYPE(FGA002, fga002_device, "fga002", "Force FGA-002")
 fga002_device::fga002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_out_int_cb(*this)
-	, m_liack4_cb(*this)
-	, m_liack5_cb(*this)
-	, m_liack6_cb(*this)
-	, m_liack7_cb(*this)
+	, m_liack4_cb(*this, 0)
+	, m_liack5_cb(*this, 0)
+	, m_liack6_cb(*this, 0)
+	, m_liack7_cb(*this, 0)
 	, m_irq_level(uint8_t(0))
 {
 	for (auto & elem : m_int_state)
@@ -94,13 +94,6 @@ fga002_device::fga002_device(const machine_config &mconfig, const char *tag, dev
 void fga002_device::device_start()
 {
 	LOG("%s\n", FUNCNAME);
-
-	// resolve callbacks
-	m_out_int_cb.resolve_safe();
-	m_liack4_cb.resolve_safe(0);
-	m_liack5_cb.resolve_safe(0);
-	m_liack6_cb.resolve_safe(0);
-	m_liack7_cb.resolve_safe(0);
 
 	// Timers
 	fga_timer = timer_alloc(FUNC(fga002_device::timer_tick), this);

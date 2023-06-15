@@ -58,12 +58,12 @@ static constexpr int    resshifts[8] = { 9, 10, 11, 12, 13, 14, 15, 16 };
 //  es5503_device - constructor
 //-------------------------------------------------
 
-es5503_device::es5503_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ES5503, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		device_rom_interface(mconfig, *this),
-		m_irq_func(*this),
-		m_adc_func(*this)
+es5503_device::es5503_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ES5503, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	device_rom_interface(mconfig, *this),
+	m_irq_func(*this),
+	m_adc_func(*this, 0)
 {
 }
 
@@ -267,9 +267,6 @@ void es5503_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 
 void es5503_device::device_start()
 {
-	m_irq_func.resolve_safe();
-	m_adc_func.resolve_safe(0);
-
 	rege0 = 0xff;
 
 	save_pointer(STRUCT_MEMBER(oscillators, freq), 32);

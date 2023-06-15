@@ -193,11 +193,6 @@ void hp_1mb5_device::clear_service()
 
 void hp_1mb5_device::device_start()
 {
-	m_irl_handler.resolve_safe();
-	m_halt_handler.resolve_safe();
-	m_reset_handler.resolve_safe();
-	m_int_handler.resolve_safe();
-
 	save_item(NAME(m_sr));
 	save_item(NAME(m_cr));
 	save_item(NAME(m_ib));

@@ -22,7 +22,6 @@ ncr5385_device::ncr5385_device(const machine_config &mconfig, const char *tag, d
 
 void ncr5385_device::device_start()
 {
-	m_int.resolve_safe();
 }
 
 void ncr5385_device::device_reset()

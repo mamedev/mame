@@ -78,7 +78,7 @@ hp_dc100_tape_device::hp_dc100_tape_device(const machine_config &mconfig, const 
 	, m_tacho_tick_handler(*this)
 	, m_motion_handler(*this)
 	, m_rd_bit_handler(*this)
-	, m_wr_bit_handler(*this)
+	, m_wr_bit_handler(*this, 0)
 	, m_unit_name()
 	, m_image()
 	, m_image_dirty(false)
@@ -457,13 +457,6 @@ void hp_dc100_tape_device::time_to_next_gap(hti_format_t::tape_pos_t min_gap_siz
 
 void hp_dc100_tape_device::device_start()
 {
-	m_cart_out_handler.resolve_safe();
-	m_hole_handler.resolve_safe();
-	m_tacho_tick_handler.resolve_safe();
-	m_motion_handler.resolve_safe();
-	m_rd_bit_handler.resolve_safe();
-	m_wr_bit_handler.resolve_safe(0);
-
 	save_item(NAME(m_acceleration));
 	save_item(NAME(m_slow_set_point));
 	save_item(NAME(m_fast_set_point));

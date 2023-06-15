@@ -73,9 +73,6 @@ void i82730_device::device_start()
 	// register bitmap
 	screen().register_screen_bitmap(m_bitmap);
 
-	// resolve callbacks
-	m_sint_handler.resolve_safe();
-
 	// bind delegates
 	m_update_row_cb.resolve();
 

@@ -46,8 +46,8 @@ scn2674_device::scn2674_device(const machine_config &mconfig, device_type type, 
 	, m_intr_cb(*this)
 	, m_breq_cb(*this)
 	, m_mbc_cb(*this)
-	, m_mbc_char_cb(*this)
-	, m_mbc_attr_cb(*this)
+	, m_mbc_char_cb(*this, 0)
+	, m_mbc_attr_cb(*this, 0)
 	, m_IR_pointer(0)
 	, m_screen1_address(0), m_screen2_address(0)
 	, m_cursor_address(0)
@@ -105,13 +105,9 @@ device_memory_interface::space_config_vector scn2674_device::memory_space_config
 
 void scn2674_device::device_start()
 {
-	// resolve callbacks
+	// resolve delegates
 	m_display_cb.resolve_safe();
-	m_intr_cb.resolve_safe();
-	m_breq_cb.resolve_safe();
-	m_mbc_cb.resolve_safe();
-	m_mbc_char_cb.resolve();
-	m_mbc_attr_cb.resolve();
+
 	m_scanline_timer = timer_alloc(FUNC(scn2674_device::scanline_timer), this);
 	m_breq_timer = timer_alloc(FUNC(scn2674_device::breq_timer), this);
 	m_vblank_timer = timer_alloc(FUNC(scn2674_device::vblank_timer), this);
@@ -1131,12 +1127,12 @@ TIMER_CALLBACK_MEMBER(scn2674_device::scanline_timer)
 	for (int i = 0; i < m_character_per_row; i++)
 	{
 		u8 charcode, attrcode = 0;
-		if (mbc && !m_mbc_char_cb.isnull())
+		if (mbc && !m_mbc_char_cb.isunset())
 		{
 			// row buffering DMA
 			charcode = m_mbc_char_cb(address);
 			m_char_space->write_byte(address, charcode);
-			if (m_attr_space != nullptr && !m_mbc_attr_cb.isnull())
+			if (m_attr_space != nullptr && !m_mbc_attr_cb.isunset())
 			{
 				attrcode = m_mbc_attr_cb(address);
 				m_attr_space->write_byte(address, attrcode);

@@ -72,13 +72,6 @@ sis950_lpc_device::sis950_lpc_device(const machine_config &mconfig, const char *
 {
 }
 
-void sis950_lpc_device::device_start()
-{
-	pci_device::device_start();
-
-	m_fast_reset_cb.resolve_safe();
-}
-
 void sis950_lpc_device::device_reset()
 {
 	pci_device::device_reset();

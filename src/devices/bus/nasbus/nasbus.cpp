@@ -78,8 +78,6 @@ nasbus_device::~nasbus_device()
 
 void nasbus_device::device_start()
 {
-	// resolve callbacks
-	m_ram_disable_handler.resolve_safe();
 }
 
 //-------------------------------------------------

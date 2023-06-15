@@ -77,10 +77,6 @@ void dc_g2if_device::device_start()
 		m_dma[i].end_timer = timer_alloc(FUNC(dc_g2if_device::dma_end_tick), this);
 	}
 
-	m_int_w.resolve();
-	m_error_ia_w.resolve();
-	m_error_ov_w.resolve();
-
 	save_item(STRUCT_MEMBER(m_dma, g2_addr));
 	save_item(STRUCT_MEMBER(m_dma, root_addr));
 	save_item(STRUCT_MEMBER(m_dma, len));

@@ -35,13 +35,6 @@ void pc8801_exp_slot_device::device_start()
 {
 }
 
-void pc8801_exp_slot_device::device_resolve_objects()
-{
-	m_int3_cb.resolve_safe();
-	m_int4_cb.resolve_safe();
-	m_int5_cb.resolve_safe();
-}
-
 device_pc8801_exp_interface::device_pc8801_exp_interface(const machine_config &mconfig, device_t &device)
    : device_interface(device, "pc8801exp")
 {

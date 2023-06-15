@@ -72,7 +72,6 @@ ALLOW_SAVE_TYPE(spi_sdcard_device::sd_type);
 
 void spi_sdcard_device::device_start()
 {
-	write_miso.resolve_safe();
 	save_item(NAME(m_state));
 	save_item(NAME(m_in_latch));
 	save_item(NAME(m_out_latch));

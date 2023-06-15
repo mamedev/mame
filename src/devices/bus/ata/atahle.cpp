@@ -74,11 +74,6 @@ void ata_hle_device::device_start()
 {
 	MINIMUM_COMMAND_TIME = attotime::from_usec(10);
 
-	m_irq_handler.resolve_safe();
-	m_dmarq_handler.resolve_safe();
-	m_dasp_handler.resolve_safe();
-	m_pdiag_handler.resolve_safe();
-
 	m_buffer.resize(sector_length());
 	save_item(NAME(m_buffer));
 	save_item(NAME(m_buffer_offset));

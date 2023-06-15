@@ -85,24 +85,6 @@ v5x_scu_device::v5x_scu_device(const machine_config &mconfig, const char *tag, d
 
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void i8251_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_txd_handler.resolve_safe();
-	m_rts_handler.resolve_safe();
-	m_dtr_handler.resolve_safe();
-	m_rxrdy_handler.resolve_safe();
-	m_txrdy_handler.resolve_safe();
-	m_txempty_handler.resolve_safe();
-	m_syndet_handler.resolve_safe();
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

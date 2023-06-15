@@ -269,8 +269,6 @@ void upd7759_device::device_start()
 	m_sample_offset_shift = 1;
 
 	m_timer = timer_alloc(FUNC(upd7759_device::drq_update), this);
-
-	m_drqcallback.resolve_safe();
 }
 
 

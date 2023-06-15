@@ -44,10 +44,6 @@ md4332b_device::md4332b_device(const machine_config &mconfig, const char *tag, d
 
 void md4330b_device::device_start()
 {
-	// resolve callbacks
-	m_write_q.resolve_safe();
-	m_write_do.resolve_safe();
-
 	// zerofill
 	m_shift = 0;
 	m_clk = 0;

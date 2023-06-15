@@ -58,10 +58,6 @@ bbc_fdc_slot_device::bbc_fdc_slot_device(const machine_config &mconfig, const ch
 void bbc_fdc_slot_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_intrq_cb.resolve_safe();
-	m_drq_cb.resolve_safe();
 }
 
 //-------------------------------------------------

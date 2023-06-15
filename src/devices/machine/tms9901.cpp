@@ -175,7 +175,7 @@ tms9901_device::tms9901_device(const machine_config &mconfig, const char *tag, d
 	m_poll_lines(false),
 	m_clockdiv(0),
 	m_timer_int_pending(false),
-	m_read_port(*this),
+	m_read_port(*this, 0),
 	m_write_p(*this),
 	m_interrupt(*this)
 {
@@ -265,14 +265,12 @@ void tms9901_device::signal_int()
 	if (m_int_pending)
 	{
 		LOGMASKED(LOG_INT, "Triggering interrupt, level %d\n", m_int_level);
-		if (!m_interrupt.isnull())
-			m_interrupt(ASSERT_LINE);
+		m_interrupt(ASSERT_LINE);
 	}
 	else
 	{
 		LOGMASKED(LOG_INT, "Clear all interrupts\n");
-		if (!m_interrupt.isnull())
-			m_interrupt(CLEAR_LINE);  //Spec: INTREQ*=1 <=> IC0,1,2,3 = 1111
+		m_interrupt(CLEAR_LINE);  //Spec: INTREQ*=1 <=> IC0,1,2,3 = 1111
 	}
 }
 
@@ -338,8 +336,8 @@ bool tms9901_device::read_bit(int bit)
 		else
 		{
 			// Positive logic; should be 0 if there is no connection.
-			if (m_read_port.isnull()) return false;
-			return m_read_port((crubit<=P6)? crubit : P6+P0-crubit)!=0;
+			if (m_read_port.isunset()) return false;
+			return m_read_port((crubit<=P6) ? crubit : P6+P0-crubit)!=0;
 		}
 	}
 
@@ -349,7 +347,7 @@ bool tms9901_device::read_bit(int bit)
 		if (crubit == 15)    // bit 15 in clock mode = /INTREQ
 			return !m_int_pending;
 
-		return BIT(m_clock_read_register, crubit-1)!=0;
+		return BIT(m_clock_read_register, crubit-1) != 0;
 	}
 	else
 	{
@@ -361,7 +359,7 @@ bool tms9901_device::read_bit(int bit)
 		if (crubit>INT6 && is_output(22-crubit))
 			return output_value(22-crubit);
 		else
-			return m_read_port.isnull()? true : (m_read_port(crubit)!=0);
+			return m_read_port.isunset() ? true : (m_read_port(crubit)!=0);
 	}
 }
 
@@ -626,10 +624,6 @@ void tms9901_device::device_start()
 		m_decrementer = timer_alloc(FUNC(tms9901_device::decrement_tick), this);
 		m_decrementer->adjust(attotime::from_hz(clock() / 64.), 0, attotime::from_hz(clock() / 64.));
 	}
-
-	m_read_port.resolve();
-	m_write_p.resolve_all_safe();
-	m_interrupt.resolve();
 
 	m_clock_register = 0;
 

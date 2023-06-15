@@ -78,10 +78,6 @@ am9513a_device::am9513a_device(const machine_config &mconfig, const char *tag, d
 
 void am9513_device::device_start()
 {
-	// Resolve callbacks
-	m_out_cb.resolve_all_safe();
-	m_fout_cb.resolve();
-
 	// Power-on reset
 	m_dpr = 0x1f;
 	m_mmr = 0;
@@ -113,7 +109,7 @@ void am9513_device::device_start()
 	for (int f = 0; f < 5; f++)
 	{
 		m_freq_timer[f] = timer_alloc(FUNC(am9513_device::timer_tick), this);
-		m_freq_timer_selected[f] = (f == 0) ? (m_fout_cb.isnull() ? 0x3e : 0x3f) : 0;
+		m_freq_timer_selected[f] = (f == 0) ? (m_fout_cb.isunset() ? 0x3e : 0x3f) : 0;
 		m_freq_timer_cycle[f] = 0;
 	}
 
@@ -325,7 +321,7 @@ void am9513_device::set_master_mode(u16 data)
 		if (source >= 11 && source <= 15)
 		{
 			LOGMASKED(LOG_MODE, "FOUT = F%d / %d\n", source - 10, divider);
-			select_freq_timer(source - 11, 0, !m_fout_cb.isnull(), BIT(divider, 0));
+			select_freq_timer(source - 11, 0, !m_fout_cb.isunset(), BIT(divider, 0));
 		}
 		else if (source >= 6 && source <= 10)
 			LOGMASKED(LOG_MODE, "FOUT = GATE %d / %d\n", source - 5, divider);
@@ -1460,7 +1456,7 @@ void am9513_device::fout_tick()
 	m_fout = !m_fout;
 
 	// Check whether the FOUT gate is on
-	if (!BIT(m_mmr, 12) && !m_fout_cb.isnull())
+	if (!BIT(m_mmr, 12) && !m_fout_cb.isunset())
 		m_fout_cb(m_fout);
 
 	// Reload the counter

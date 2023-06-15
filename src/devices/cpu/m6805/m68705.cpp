@@ -221,7 +221,7 @@ m6805_hmos_device::m6805_hmos_device(machine_config const &mconfig, char const *
 	, m_port_input{ 0xff, 0xff, 0xff, 0xff }
 	, m_port_latch{ 0xff, 0xff, 0xff, 0xff }
 	, m_port_ddr{ 0x00, 0x00, 0x00, 0x00 }
-	, m_port_cb_r(*this)
+	, m_port_cb_r(*this, 0xff)
 	, m_port_cb_w(*this)
 	, m_ram_size(ram_size)
 {
@@ -282,7 +282,7 @@ template <std::size_t N> void m6805_hmos_device::set_port_mask(u8 mask)
 
 template <std::size_t N> u8 m6805_hmos_device::port_r()
 {
-	if (!m_port_cb_r[N].isnull())
+	if (!m_port_cb_r[N].isunset())
 	{
 		u8 const newval(m_port_cb_r[N](0, ~m_port_ddr[N] & ~m_port_mask[N]) & ~m_port_mask[N]);
 		if (newval != m_port_input[N])
@@ -412,8 +412,6 @@ void m6805_hmos_device::device_start()
 
 	// initialise digital I/O
 	for (u8 &input : m_port_input) input = 0xff;
-	m_port_cb_r.resolve_all();
-	m_port_cb_w.resolve_all_safe();
 
 	add_port_latch_state<0>();
 	add_port_latch_state<1>();

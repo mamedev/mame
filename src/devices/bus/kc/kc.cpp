@@ -193,11 +193,6 @@ void kcexp_slot_device::device_validity_check(validity_checker &valid) const
 void kcexp_slot_device::device_start()
 {
 	m_cart = get_card_device();
-
-	// resolve callbacks
-	m_out_irq_cb.resolve_safe();
-	m_out_nmi_cb.resolve_safe();
-	m_out_halt_cb.resolve_safe();
 }
 
 

@@ -39,7 +39,7 @@ DEFINE_DEVICE_TYPE(SCREAMER, screamer_device, "screamer", "Screamer audio I/O")
 awacs_macrisc_device::awacs_macrisc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, m_output_cb(*this)
+	, m_output_cb(*this, 0)
 	, m_input_cb(*this)
 	, m_stream(nullptr)
 {
@@ -63,9 +63,6 @@ void awacs_macrisc_device::device_start()
 {
 	// create the stream
 	m_stream = stream_alloc(0, 2, clock()/1024, STREAM_SYNCHRONOUS);
-
-	m_output_cb.resolve_safe(0);
-	m_input_cb.resolve_safe();
 
 	save_item(NAME(m_phase));
 	save_item(NAME(m_active));

@@ -383,7 +383,6 @@ wangpc_keyboard_device::wangpc_keyboard_device(const machine_config &mconfig, co
 
 void wangpc_keyboard_device::device_start()
 {
-	m_txd_handler.resolve_safe();
 	m_leds.resolve();
 
 	save_item(NAME(m_keylatch));

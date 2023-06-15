@@ -740,7 +740,6 @@ void funcube_touchscreen_device::device_start()
 	m_button_state = 0x00;
 	emu_timer *tm = timer_alloc(FUNC(funcube_touchscreen_device::read_buttons), this);
 	tm->adjust(attotime::from_ticks(1, clock()), 0, attotime::from_ticks(1, clock()));
-	m_tx_cb.resolve_safe();
 
 	save_item(NAME(m_button_state));
 	save_item(NAME(m_serial_pos));

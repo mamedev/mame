@@ -36,7 +36,6 @@ protected:
 	virtual void update_intr_line();
 
 	virtual void device_start() override;
-	virtual void device_resolve_objects() override;
 
 	devcb_write8 m_irq_line;
 

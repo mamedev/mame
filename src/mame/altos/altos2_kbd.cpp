@@ -45,7 +45,6 @@ void altos2_keyboard_device::device_resolve_objects()
 	m_insline_led.resolve();
 	m_inschar_led.resolve();
 	m_calc_led.resolve();
-	m_txd_callback.resolve_safe();
 }
 
 void altos2_keyboard_device::device_start()

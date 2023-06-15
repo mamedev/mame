@@ -83,8 +83,6 @@ const tiny_rom_entry *ie15_keyboard_device::device_rom_region() const
 
 void ie15_keyboard_device::device_start()
 {
-	m_keyboard_cb.resolve_safe();
-	m_sdv_cb.resolve_safe();
 }
 
 void ie15_keyboard_device::device_reset()

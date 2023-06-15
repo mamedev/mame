@@ -779,11 +779,11 @@ void cio_base_device::external_port_w(int port, int bit, int state)
 cio_base_device::cio_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_write_irq(*this),
-	m_read_pa(*this),
+	m_read_pa(*this, 0),
 	m_write_pa(*this),
-	m_read_pb(*this),
+	m_read_pb(*this, 0),
 	m_write_pb(*this),
-	m_read_pc(*this),
+	m_read_pc(*this, 0),
 	m_write_pc(*this),
 	m_irq(CLEAR_LINE)
 {
@@ -828,15 +828,6 @@ void cio_base_device::device_start()
 	// allocate timer
 	m_timer = timer_alloc(FUNC(cio_base_device::advance_counters), this);
 	m_timer->adjust(attotime::from_hz(clock() / 2), 0, attotime::from_hz(clock() / 2));
-
-	// resolve callbacks
-	m_write_irq.resolve_safe();
-	m_read_pa.resolve_safe(0);
-	m_write_pa.resolve_safe();
-	m_read_pb.resolve_safe(0);
-	m_write_pb.resolve_safe();
-	m_read_pc.resolve_safe(0);
-	m_write_pc.resolve_safe();
 
 	save_item(NAME(m_irq));
 	save_item(NAME(m_register));

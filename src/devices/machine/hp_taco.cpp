@@ -560,10 +560,6 @@ void hp_taco_device::device_add_mconfig(machine_config &config)
 void hp_taco_device::device_start()
 {
 	LOG("device_start\n");
-	m_irq_handler.resolve_safe();
-	m_flg_handler.resolve_safe();
-	m_sts_handler.resolve_safe();
-
 	save_item(NAME(m_data_reg));
 	save_item(NAME(m_cmd_reg));
 	save_item(NAME(m_status_reg));

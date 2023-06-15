@@ -292,11 +292,6 @@ void eispc_keyboard_device::rst_line_w(int state)
 
 void eispc_keyboard_device::device_start()
 {
-	m_txd_cb.resolve_safe();
-	m_led_caps_cb.resolve_safe();
-	m_led_num_cb.resolve_safe();
-	m_led_scroll_cb.resolve_safe();
-
 	save_item(NAME(m_rxd_high));
 	save_item(NAME(m_txd_high));
 	save_item(NAME(m_col_select));

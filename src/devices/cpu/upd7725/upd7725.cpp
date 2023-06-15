@@ -30,12 +30,12 @@ necdsp_device::necdsp_device(const machine_config &mconfig, device_type type, co
 	m_data_config("data", ENDIANNESS_BIG, 16, dbits, -1), m_icount(0),   // -1 for WORD-addressable
 	m_irq(0),
 	m_irq_firing(0),
-	m_in_int_cb(*this),
-	//m_in_si_cb(*this),
-	//m_in_sck_cb(*this),
-	//m_in_sien_cb(*this),
-	//m_in_soen_cb(*this),
-	//m_in_dack_cb(*this),
+	m_in_int_cb(*this, 0),
+	//m_in_si_cb(*this, 0),
+	//m_in_sck_cb(*this, 0),
+	//m_in_sien_cb(*this, 0),
+	//m_in_soen_cb(*this, 0),
+	//m_in_dack_cb(*this, 0),
 	m_out_p0_cb(*this),
 	m_out_p1_cb(*this)
 	//m_out_so_cb(*this),
@@ -85,19 +85,6 @@ void necdsp_device::device_start()
 	state_add(UPD7725_SI, "SI", regs.si);
 	state_add(UPD7725_SO, "SO", regs.so);
 	state_add(UPD7725_IDB, "IDB", regs.idb);
-
-	// resolve callbacks
-	m_in_int_cb.resolve_safe(0);
-	//m_in_si_cb.resolve_safe(0);
-	//m_in_sck_cb.resolve_safe(0);
-	//m_in_sien_cb.resolve_safe(0);
-	//m_in_soen_cb.resolve_safe(0);
-	//m_in_dack_cb.resolve_safe(0);
-	m_out_p0_cb.resolve_safe();
-	m_out_p1_cb.resolve_safe();
-	//m_out_so_cb.resolve_safe();
-	//m_out_sorq_cb.resolve_safe();
-	//m_out_drq_cb.resolve_safe();
 
 	// save state registrations
 	save_item(NAME(regs.pc));

@@ -79,9 +79,6 @@ epson_sio_device::~epson_sio_device()
 void epson_sio_device::device_start()
 {
 	m_cart = get_card_device();
-
-	m_write_rx.resolve_safe();
-	m_write_pin.resolve_safe();
 }
 
 

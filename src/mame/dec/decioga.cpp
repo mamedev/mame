@@ -35,8 +35,6 @@ dec_ioga_device::dec_ioga_device(const machine_config &mconfig, const char *tag,
 
 void dec_ioga_device::device_start()
 {
-	m_irq_out_cb.resolve_safe();
-
 	save_item(NAME(m_csr));
 	save_item(NAME(m_intr));
 	save_item(NAME(m_imsk));

@@ -151,11 +151,6 @@ static constexpr uint8_t KB_STATUS_ONLINE_KEY_MASK = 0x08;
 static constexpr uint8_t KB_STATUS_REPEAT_KEYS_MASK = 0x40;
 static constexpr uint8_t KB_STATUS_KEYBOARD_STROBE_MASK = 0x80;
 
-void heath_tlb_device::device_resolve_objects()
-{
-
-	m_write_sd.resolve_safe();
-}
 
 void heath_tlb_device::device_start()
 {

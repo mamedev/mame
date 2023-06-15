@@ -81,7 +81,7 @@ z80sti_device::z80sti_device(const machine_config &mconfig, const char *tag, dev
 	, device_serial_interface(mconfig, *this)
 	, device_z80daisy_interface(mconfig, *this)
 	, m_out_int_cb(*this)
-	, m_in_gpio_cb(*this)
+	, m_in_gpio_cb(*this, 0)
 	, m_out_gpio_cb(*this)
 	, m_out_so_cb(*this)
 	, m_out_tao_cb(*this)
@@ -110,16 +110,6 @@ z80sti_device::z80sti_device(const machine_config &mconfig, const char *tag, dev
 
 void z80sti_device::device_start()
 {
-	// resolve callbacks
-	m_out_int_cb.resolve_safe();
-	m_in_gpio_cb.resolve_safe(0);
-	m_out_gpio_cb.resolve_safe();
-	m_out_so_cb.resolve_safe();
-	m_out_tao_cb.resolve_safe();
-	m_out_tbo_cb.resolve_safe();
-	m_out_tco_cb.resolve_safe();
-	m_out_tdo_cb.resolve_safe();
-
 	// create the counter timers
 	m_timer[TIMER_A] = timer_alloc(FUNC(z80sti_device::timer_count), this);
 	m_timer[TIMER_B] = timer_alloc(FUNC(z80sti_device::timer_count), this);

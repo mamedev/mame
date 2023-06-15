@@ -30,8 +30,6 @@ void msm5232_device::device_start()
 	int rate = clock()/CLOCK_RATE_DIVIDER;
 	int voicenum;
 
-	m_gate_handler_cb.resolve();
-
 	init(clock(), rate);
 
 	m_stream = stream_alloc(0, 11, rate);
@@ -291,7 +289,7 @@ void msm5232_device::gate_update()
 {
 	int new_state = (m_control2 & 0x20) ? m_voi[7].GF : 0;
 
-	if (m_gate != new_state && !m_gate_handler_cb.isnull())
+	if (m_gate != new_state)
 	{
 		m_gate = new_state;
 		m_gate_handler_cb(new_state);

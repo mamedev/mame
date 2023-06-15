@@ -32,8 +32,7 @@ protected:
 	// device base class constructor
 	rst_buffer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 
 	// synchronization helpers

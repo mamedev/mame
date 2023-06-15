@@ -254,9 +254,6 @@ void alfaskop_s41_keyboard_device::rst_line_w(int state)
 
 void alfaskop_s41_keyboard_device::device_start()
 {
-	m_txd_cb.resolve_safe();
-	m_leds_cb.resolve_safe();
-
 	save_item(NAME(m_rxd_high));
 	save_item(NAME(m_txd_high));
 	save_item(NAME(m_col_select));
