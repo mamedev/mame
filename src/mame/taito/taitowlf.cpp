@@ -9,13 +9,13 @@ Three board system consisting of a P5TX-LA PC motherboard, a Taito main board an
 
 TODO:
 - The Retro Web MB pic has a Winbond w83877tf Super I/O but neither BIOSes accesses it, is it specific to the (unavailable) ECS P5TX-LA BIOS?
-- pf2012: enters service mode no matter what (failed EEPROM? bad data bank?),
-          fully resets the machine if exited;
+- pf2012: cannot be coined in (lockout read? Enters into gameplay if set to free play);
+- pf2012: boots in service mode the first time around, needs default EEPROM set;
 - pf2012: PC portion returns an EMM386 "WARNING: Unable to set page frame base address"
           during boot up, safe to ignore?
-- According to manual hold A+B+service button for 10 seconds for entering test mode during initial bootup
-  sequence. Board and input test menu doesn't seem to have a dedicated test mode switch.
-  This statement needs verification once we get there;
+- pf2012: according to manual hold A+B+service button for 10 seconds for entering
+          test mode during initial bootup sequence.
+          Board and input test menu doesn't seem to have a dedicated test mode switch;
 
 Notes:
 - pf2012: -isa1 svga_et4k if you need PC side logs;
@@ -68,7 +68,6 @@ Taito W Rom Board:
 #include "bus/rs232/sun_kbd.h"
 #include "bus/rs232/terminal.h"
 #include "cpu/i386/i386.h"
-#include "machine/bankdev.h"
 //#include "machine/w83977tf.h"
 #include "machine/8042kbdc.h"
 #include "machine/ds128x.h"
@@ -77,9 +76,13 @@ Taito W Rom Board:
 #include "machine/pci-ide.h"
 #include "machine/pci.h"
 #include "video/atirage.h"
-#include "video/voodoo_pci.h"
 
+// Specific to taitowlf
+#include "machine/bankdev.h"
+#include "machine/eepromser.h"
+#include "video/voodoo_pci.h"
 #include "taitoio.h"
+
 
 /***********************
  *
@@ -107,6 +110,9 @@ private:
 	required_memory_region m_data_rom;
 	required_device<address_map_bank_device> m_bankdev;
 	required_device<tc0510nio_device> m_tc0510nio;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_ioport m_eepromin;
+	required_ioport m_eepromout;
 
 	void io_map(address_map &map);
 
@@ -130,6 +136,9 @@ isa16_taito_rom_disk::isa16_taito_rom_disk(const machine_config &mconfig, const 
 	, m_data_rom(*this, finder_base::DUMMY_TAG)
 	, m_bankdev(*this, "bankdev")
 	, m_tc0510nio(*this, "tc0510nio")
+	, m_eeprom(*this, "eeprom")
+	, m_eepromin(*this, "EEPROMIN")
+	, m_eepromout(*this, "EEPROMOUT")
 {
 }
 
@@ -147,6 +156,12 @@ void isa16_taito_rom_disk::device_add_mconfig(machine_config &config)
 	//m_tc0510nio->write_4_callback().set
 	m_tc0510nio->read_7_callback().set_ioport("IN7");
 
+	// TODO: verify erase/write times
+	EEPROM_93C66_16BIT(config, m_eeprom)
+		.erase_time(attotime::from_usec(250))
+		.write_time(attotime::from_usec(250));
+
+
 	// TODO: sound CPU et al.
 }
 
@@ -163,7 +178,17 @@ void isa16_taito_rom_disk::io_map(address_map &map)
 
 	//map(0x400, 0x4ff) sound CPU shared RAM?
 
-	//map(0x601, 0x601) EEPROM?
+	map(0x600, 0x600).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			// writes 0x30 before showing 3dfx, disable bootscreen?
+			logerror("Write %02x to $600\n", data);
+		})
+	);
+	map(0x601, 0x601).lrw8(
+		NAME([this] (offs_t offset) { return m_eepromin->read(); }),
+		NAME([this] (offs_t offset, u8 data) { m_eepromout->write(data, 0xff); })
+	);
+
 	//map(0x602, 0x603) to sound CPU
 }
 
@@ -259,12 +284,11 @@ static INPUT_PORTS_START(pf2012)
 	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	// TODO: Either test or service (game doesn't tell which is which)
-	PORT_DIPNAME( 0x0020, 0x0020, "Service/Test? (0x20)" )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	// service mode doesn't explicitly tell, but goes service sw error if left on during boot
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_DIPNAME( 0x0080, 0x0080, "Service/Test? (0x80)" )
+	// fully resets the machine if held low
+	PORT_DIPNAME( 0x0080, 0x0080, "Reset? (0x80)" )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
@@ -303,6 +327,17 @@ static INPUT_PORTS_START(pf2012)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+
+	PORT_START("EEPROMIN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 ioport_constructor isa16_taito_rom_disk::device_input_ports() const
