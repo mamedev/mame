@@ -212,13 +212,13 @@ void mu5_state::mu5(machine_config &config)
 	/* basic machine hardware */
 	H83002(config, m_maincpu, 10_MHz_XTAL); // clock verified by schematics
 	m_maincpu->set_addrmap(AS_PROGRAM, &mu5_state::mu5_map);
-	m_maincpu->read_adc<7>().set([]() -> u8 { return 0xff; }); // Battery level
+	m_maincpu->read_adc<7>().set_constant(0x3ff); // battery level
 	m_maincpu->read_port4().set([this]() -> u8 { return m_matrixsel; });
 	m_maincpu->write_port4().set([this](u8 data) { m_matrixsel = data; });
 	m_maincpu->read_port6().set(FUNC(mu5_state::lcd_ctrl_r));
 	m_maincpu->write_port6().set(FUNC(mu5_state::lcd_ctrl_w));
 	m_maincpu->read_port7().set(FUNC(mu5_state::matrix_r));
-	m_maincpu->read_porta().set([]() -> u8 { return 0; });
+	m_maincpu->read_porta().set_constant(0);
 	m_maincpu->read_portb().set(FUNC(mu5_state::lcd_data_r));
 	m_maincpu->write_portb().set(FUNC(mu5_state::lcd_data_w));
 
