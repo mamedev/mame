@@ -368,7 +368,7 @@ void lw840_state::lw840(machine_config &config)
 
 ROM_START( lw840 )
 	ROM_REGION(0x400000, "maincpu", 0)
-	ROM_LOAD("us3122-a", 0x00000, 0x400000, CRC(70A3A4A6) SHA1(11e32c7da58800d69af29089f7e7deeab513b1ae))
+	ROM_LOAD("us3122-a", 0x00000, 0x400000, CRC(70a3a4a6) SHA1(11e32c7da58800d69af29089f7e7deeab513b1ae))
 ROM_END
 
 } // anonymous namespace

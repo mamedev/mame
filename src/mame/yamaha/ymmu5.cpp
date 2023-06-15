@@ -242,7 +242,6 @@ void mu5_state::mu5(machine_config &config)
 	screen.set_size(800, 435);
 	screen.set_visarea_full();
 	screen.screen_vblank().set(FUNC(mu5_state::render_w));
-
 }
 
 ROM_START( mu5 )
