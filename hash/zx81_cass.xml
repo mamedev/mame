@@ -237,8 +237,9 @@ license:CC0-1.0
 		<description>8 Programmes by GM4IHJ</description>
 		<year>198?</year>
 		<publisher>AMSAT-UK Software Service</publisher>
+		<info name="usage" value="Load with LOAD &quot;A&quot;, LOAD &quot;B&quot;, etc" />
 		<notes><![CDATA[
-Loading instructions:
+Programs included:
 	FAI				LOAD "A"
 	Geodrifter		LOAD "B"
 	RA+DEC			LOAD "C"
