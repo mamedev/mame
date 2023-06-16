@@ -203,7 +203,7 @@ void edevices_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, 
 		if (source[0] & 0x0800)
 		{
 			y = 0x1ff - (source[0] & 0x01ff);
-			x = (source[3] & 0x3ff) - 9;
+			x = (source[3] & 0x3ff) - 9; // an offset of -7 gives more correct looking alignment on mortalr car select screen, but is worse for twinbrat, maybe needs to be configurable?
 
 			color = source[1] & 0x000f;
 			flipx = source[1] & 0x0200;
