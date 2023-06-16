@@ -435,7 +435,6 @@ public:
 	{ }
 
 	void p5txla(machine_config &config);
-	void taitowlf(machine_config &config);
 
 protected:
 	required_device<pentium_mmx_device> m_maincpu;
