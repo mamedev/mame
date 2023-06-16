@@ -65,6 +65,7 @@ finder_base::finder_base(device_t &base, char const *tag)
 void finder_base::set_tag(char const *tag)
 {
 	assert(!m_resolved);
+	assert(tag);
 	m_base = m_base.get().mconfig().current_device();
 	m_tag = tag;
 }

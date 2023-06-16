@@ -476,27 +476,8 @@ bool device_t::findit(validity_checker *valid) const
 	bool allfound = true;
 	for (auto *autodev = m_auto_finder_list; autodev; autodev = autodev->next())
 	{
-#if 0
-		// FIXME: this stuff is specific to finder_base and not relevant to devcb - probably unnecessary anyway
-		if (valid)
-		{
-			// sanity checking
-			char const *const tag = autodev->finder_tag();
-			if (!tag)
-			{
-				osd_printf_error("Finder tag is null!\n");
-				allfound = false;
-				continue;
-			}
-			if (tag[0] == '^' && tag[1] == ':')
-			{
-				osd_printf_error("Malformed finder tag: %s\n", tag);
-				allfound = false;
-				continue;
-			}
-		}
-#endif
-		allfound &= autodev->findit(valid);
+		if (!autodev->findit(valid))
+			allfound = false;
 	}
 	return allfound;
 }

@@ -306,6 +306,7 @@ public:
 	void set_tag(device_t &base, char const *tag)
 	{
 		assert(!m_resolved);
+		assert(tag);
 		m_base = base;
 		m_tag = tag;
 	}
