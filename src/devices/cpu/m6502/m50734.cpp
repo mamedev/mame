@@ -53,11 +53,15 @@ device_memory_interface::space_config_vector m50734_device::memory_space_config(
 	return scv;
 }
 
-void m50734_device::device_resolve_objects()
+void m50734_device::device_config_complete()
 {
+	m740_device::device_config_complete();
+
 	for (int n = 0; n < 4; n++)
-		/*m_port_in_cb[n].resolve(m_port_3state[n])*/;
-	/*m_port_in_cb[4].resolve(0)*/;
+	{
+		if (m_port_in_cb[n].isunset())
+			m_port_in_cb[n].bind().set_constant(m_port_3state[n]);
+	}
 }
 
 void m50734_device::step_motor(int which)

@@ -87,22 +87,6 @@ void kl5c80a12_device::internal_io(address_map &map)
 
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void kl5c80a12_device::device_resolve_objects()
-{
-	// Resolve parallel port callbacks
-	for (int i = 0; i < 2; i++)
-		/*m_porta_in_callback[i].resolve(m_porta_3state[i])*/;
-	for (int i = 0; i < 3; i++)
-		/*m_portb_in_callback[i].resolve(m_portb_3state[i])*/;
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -173,7 +157,20 @@ void kl5c80a12_device::device_add_mconfig(machine_config &config)
 
 void kl5c80a12_device::device_config_complete()
 {
+	kc82_device::device_config_complete();
+
 	set_daisy_config(pseudo_daisy_config);
+
+	for (int i = 0; i < 2; i++)
+	{
+		if (m_porta_in_callback[i].isunset())
+			m_porta_in_callback[i].bind().set_constant(m_porta_3state[i]);
+	}
+	for (int i = 0; i < 3; i++)
+	{
+		if (m_portb_in_callback[i].isunset())
+			m_portb_in_callback[i].bind().set_constant(m_portb_3state[i]);
+	}
 }
 
 
