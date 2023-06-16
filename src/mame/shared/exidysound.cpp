@@ -656,14 +656,6 @@ venture_sound_device::venture_sound_device(const machine_config &mconfig, device
 {
 }
 
-void venture_sound_device::device_resolve_objects()
-{
-	m_pa_callback.resolve_safe();
-	m_pb_callback.resolve_safe();
-	m_ca2_callback.resolve_safe();
-	m_cb2_callback.resolve_safe();
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------

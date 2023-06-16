@@ -65,9 +65,6 @@ void ttl7416x_device::device_start()
 	save_item(NAME(m_pclock));
 	save_item(NAME(m_p));
 	save_item(NAME(m_out));
-
-	m_output_func.resolve_safe();
-	m_tc_func.resolve_safe();
 }
 
 void ttl7416x_device::device_reset()

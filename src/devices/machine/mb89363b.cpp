@@ -83,22 +83,22 @@
 DEFINE_DEVICE_TYPE(MB89363B, mb89363b_device, "mb89363b", "Fujitsu MB89363B I/O")
 
 
-mb89363b_device::mb89363b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MB89363B, tag, owner, clock),
-		m_i8255_a(*this, "i8255_a"),
-		m_i8255_b(*this, "i8255_b"),
-		m_in_a_pa_cb(*this),
-		m_in_a_pb_cb(*this),
-		m_in_a_pc_cb(*this),
-		m_out_a_pa_cb(*this),
-		m_out_a_pb_cb(*this),
-		m_out_a_pc_cb(*this),
-		m_in_b_pa_cb(*this),
-		m_in_b_pb_cb(*this),
-		m_in_b_pc_cb(*this),
-		m_out_b_pa_cb(*this),
-		m_out_b_pb_cb(*this),
-		m_out_b_pc_cb(*this)
+mb89363b_device::mb89363b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, MB89363B, tag, owner, clock),
+	m_i8255_a(*this, "i8255_a"),
+	m_i8255_b(*this, "i8255_b"),
+	m_in_a_pa_cb(*this, 0xff),
+	m_in_a_pb_cb(*this, 0xff),
+	m_in_a_pc_cb(*this, 0xff),
+	m_out_a_pa_cb(*this),
+	m_out_a_pb_cb(*this),
+	m_out_a_pc_cb(*this),
+	m_in_b_pa_cb(*this, 0xff),
+	m_in_b_pb_cb(*this, 0xff),
+	m_in_b_pc_cb(*this, 0xff),
+	m_out_b_pa_cb(*this),
+	m_out_b_pb_cb(*this),
+	m_out_b_pc_cb(*this)
 {
 }
 
@@ -156,20 +156,6 @@ void mb89363b_device::device_add_mconfig(machine_config &config)
 
 void mb89363b_device::device_start()
 {
-	m_in_a_pa_cb.resolve_safe(0xff);
-	m_in_a_pb_cb.resolve_safe(0xff);
-	m_in_a_pc_cb.resolve_safe(0xff);
-	m_out_a_pa_cb.resolve_safe();
-	m_out_a_pb_cb.resolve_safe();
-	m_out_a_pc_cb.resolve_safe();
-
-	m_in_b_pa_cb.resolve_safe(0xff);
-	m_in_b_pb_cb.resolve_safe(0xff);
-	m_in_b_pc_cb.resolve_safe(0xff);
-	m_out_b_pa_cb.resolve_safe();
-	m_out_b_pb_cb.resolve_safe();
-	m_out_b_pc_cb.resolve_safe();
-
 }
 
 void mb89363b_device::device_reset()

@@ -153,7 +153,7 @@ wd_fdc_device_base::wd_fdc_device_base(const machine_config &mconfig, device_typ
 	enp_cb(*this),
 	sso_cb(*this),
 	ready_cb(*this), // actually output by the drive, not by the FDC
-	enmf_cb(*this),
+	enmf_cb(*this, 0),
 	mon_cb(*this)
 {
 	force_ready = false;
@@ -175,16 +175,7 @@ void wd_fdc_device_base::set_disable_motor_control(bool _disable_motor_control)
 
 void wd_fdc_device_base::device_start()
 {
-	intrq_cb.resolve();
-	drq_cb.resolve();
-	hld_cb.resolve();
-	enp_cb.resolve();
-	sso_cb.resolve();
-	ready_cb.resolve();
-	enmf_cb.resolve();
-	mon_cb.resolve_safe();
-
-	if (!has_enmf && !enmf_cb.isnull())
+	if (!has_enmf && !enmf_cb.isunset())
 		logerror("Warning, this chip doesn't have an ENMF line.\n");
 
 	t_gen = timer_alloc(FUNC(wd_fdc_device_base::generic_tick), this);
@@ -252,19 +243,16 @@ void wd_fdc_device_base::mr_w(int state)
 		mr = false;
 
 		// gnd == enmf enabled, otherwise disabled (default)
-		if (!enmf_cb.isnull() && has_enmf)
+		if (!enmf_cb.isunset() && has_enmf)
 			enmf = enmf_cb() ? false : true;
 
 		intrq = false;
-		if (!intrq_cb.isnull())
-			intrq_cb(intrq);
+		intrq_cb(intrq);
 		drq = false;
-		if (!drq_cb.isnull())
-			drq_cb(drq);
+		drq_cb(drq);
 		if(head_control) {
 			hld = false;
-			if(!hld_cb.isnull())
-				hld_cb(hld);
+			hld_cb(hld);
 		}
 
 		mon_cb(1); // Clear the MON* line
@@ -370,8 +358,7 @@ void wd_fdc_device_base::command_end()
 			status &= ~S_BUSY;
 		}
 		intrq = true;
-		if(!intrq_cb.isnull())
-			intrq_cb(intrq);
+		intrq_cb(intrq);
 	}
 }
 
@@ -1100,8 +1087,7 @@ void wd_fdc_device_base::interrupt_start()
 
 	if(!intrq && (command & I_IMM)) {
 		intrq = true;
-		if(!intrq_cb.isnull())
-			intrq_cb(intrq);
+		intrq_cb(intrq);
 	}
 
 	if(spinup_on_interrupt) { // see notes in FD1771 and WD1772 constructors, might be true for other FDC types as well.
@@ -1285,8 +1271,7 @@ void wd_fdc_device_base::cmd_w(uint8_t val)
 	// No other logic present in real chips, descriptions of "Forced interrupt" (Dx) command in datasheets are wrong.
 	if (intrq) {
 		intrq = false;
-		if(!intrq_cb.isnull())
-			intrq_cb(intrq);
+		intrq_cb(intrq);
 	}
 
 	// No more than one write in flight, but interrupts take priority
@@ -1313,8 +1298,7 @@ uint8_t wd_fdc_device_base::status_r()
 {
 	if(intrq && !(intrq_cond & I_IMM) && !machine().side_effects_disabled()) {
 		intrq = false;
-		if(!intrq_cb.isnull())
-			intrq_cb(intrq);
+		intrq_cb(intrq);
 	}
 
 	if(status_type_1) {
@@ -1488,8 +1472,7 @@ void wd_fdc_device_base::spinup()
 
 void wd_fdc_device_base::ready_callback(floppy_image_device *floppy, int state)
 {
-	if(!ready_cb.isnull())
-		ready_cb(state);
+	ready_cb(state);
 
 	// why is this even possible?
 	if (!floppy)
@@ -1501,8 +1484,7 @@ void wd_fdc_device_base::ready_callback(floppy_image_device *floppy, int state)
 
 	if(!intrq && (((intrq_cond & I_RDY) && !state) || ((intrq_cond & I_NRDY) && state))) {
 		intrq = true;
-		if(!intrq_cb.isnull())
-			intrq_cb(intrq);
+		intrq_cb(intrq);
 	}
 }
 
@@ -1533,8 +1515,7 @@ void wd_fdc_device_base::index_callback(floppy_image_device *floppy, int state)
 
 		if(!intrq && (intrq_cond & I_IDX)) {
 			intrq = true;
-			if(!intrq_cb.isnull())
-				intrq_cb(intrq);
+			intrq_cb(intrq);
 		}
 		break;
 
@@ -1636,7 +1617,7 @@ void wd_fdc_device_base::live_start(int state)
 	cur_live.data_bit_context = false;
 	cur_live.byte_counter = 0;
 
-	if (!enmf_cb.isnull() && has_enmf)
+	if (!enmf_cb.isunset() && has_enmf)
 		enmf = enmf_cb() ? false : true;
 
 	pll_reset(dden, enmf, cur_live.tm);
@@ -2379,8 +2360,7 @@ void wd_fdc_device_base::set_drq()
 		status |= S_LOST;
 	} else if(!(status & S_LOST)) {
 		drq = true;
-		if(!drq_cb.isnull())
-			drq_cb(true);
+		drq_cb(true);
 	}
 }
 
@@ -2388,13 +2368,11 @@ void wd_fdc_device_base::drop_drq()
 {
 	if(drq) {
 		drq = false;
-		if(!drq_cb.isnull())
-			drq_cb(false);
+		drq_cb(false);
 		if(main_state == IDLE && (status & S_BUSY)) {
 			status &= ~S_BUSY;
 			intrq = true;
-			if(!intrq_cb.isnull())
-				intrq_cb(intrq);
+			intrq_cb(intrq);
 		}
 	}
 }
@@ -2405,8 +2383,7 @@ void wd_fdc_device_base::set_hld()
 		hld = true;
 		int temp = sub_state;
 		sub_state = DUMMY;
-		if(!hld_cb.isnull())
-			hld_cb(hld);
+		hld_cb(hld);
 		sub_state = temp;
 	}
 }
@@ -2417,8 +2394,7 @@ void wd_fdc_device_base::drop_hld()
 		hld = false;
 		int temp = sub_state;
 		sub_state = DUMMY;
-		if(!hld_cb.isnull())
-			hld_cb(hld);
+		hld_cb(hld);
 		sub_state = temp;
 	}
 }
@@ -2435,7 +2411,7 @@ void wd_fdc_device_base::update_sso()
 	// If a SSO callback is defined then it is assumed that this callback
 	// will update the floppy side if that is the connection. There are
 	// some machines that use the SSO output for other purposes.
-	if(!sso_cb.isnull()) {
+	if(!sso_cb.isunset()) {
 		sso_cb(side);
 		return;
 	}

@@ -28,8 +28,7 @@ public:
 	void write_rxd(int state);
 
 protected:
-	// device-specific overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;

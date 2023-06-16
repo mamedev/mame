@@ -220,9 +220,6 @@ digilog_kbd_device::digilog_kbd_device(const machine_config &mconfig, const char
 
 void digilog_kbd_device::device_start()
 {
-	// resolve callbacks
-	m_tx_handler.resolve_safe();
-
 	// register for save states
 	save_item(NAME(m_bus));
 	save_item(NAME(m_key_row));

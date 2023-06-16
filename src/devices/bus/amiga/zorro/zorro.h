@@ -182,7 +182,7 @@ public:
 protected:
 	zorro_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 	// configuration
@@ -223,8 +223,7 @@ protected:
 	// construction/destruction
 	zorro_bus_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_resolve_objects() override ATTR_COLD;
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 private:
@@ -257,8 +256,7 @@ public:
 protected:
 	exp_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_resolve_objects() override ATTR_COLD;
+	// device_t implementation
 	virtual void device_reset() override;
 
 private:
@@ -301,8 +299,7 @@ public:
 protected:
 	zorro2_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_resolve_objects() override ATTR_COLD;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

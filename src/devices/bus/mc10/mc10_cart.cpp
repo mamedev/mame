@@ -71,7 +71,6 @@ mc10cart_slot_device::mc10cart_slot_device(const machine_config &mconfig, const 
 
 void mc10cart_slot_device::device_start()
 {
-	m_nmi_callback.resolve_safe();
 	m_cart = get_card_device();
 }
 

@@ -86,12 +86,6 @@ k053252_device::k053252_device(const machine_config &mconfig, const char *tag, d
 
 void k053252_device::device_start()
 {
-	m_int1_en_cb.resolve_safe();
-	m_int2_en_cb.resolve_safe();
-	m_int1_ack_cb.resolve_safe();
-	m_int2_ack_cb.resolve_safe();
-	m_int_time_cb.resolve_safe();
-
 	save_item(NAME(m_regs));
 	save_item(NAME(m_hc));
 	save_item(NAME(m_hfp));

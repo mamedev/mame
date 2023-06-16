@@ -581,10 +581,9 @@ void datamux_device::gromclk_in(int state)
     DEVICE LIFECYCLE FUNCTIONS
 ***************************************************************************/
 
-void datamux_device::device_start(void)
+void datamux_device::device_start()
 {
 	m_muxready = ASSERT_LINE;
-	m_ready.resolve();
 
 	// Register persistable state variables
 	save_item(NAME(m_addr_buf));
@@ -599,11 +598,11 @@ void datamux_device::device_start(void)
 	save_item(NAME(m_grom_idle));
 }
 
-void datamux_device::device_stop(void)
+void datamux_device::device_stop()
 {
 }
 
-void datamux_device::device_reset(void)
+void datamux_device::device_reset()
 {
 	m_consolerom = (uint16_t*)owner()->memregion(TI99_CONSOLEROM)->base();
 	m_use32k = (ioport("RAM")->read()==1);

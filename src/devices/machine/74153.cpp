@@ -44,10 +44,6 @@ ttl153_device::ttl153_device(const machine_config &mconfig, const char *tag, dev
 
 void ttl153_device::device_start()
 {
-	// resolve callbacks
-	m_za_cb.resolve_safe();
-	m_zb_cb.resolve_safe();
-
 	// register for save states
 	save_pointer(NAME(m_s), 2);
 	save_pointer(NAME(m_ia), 4);

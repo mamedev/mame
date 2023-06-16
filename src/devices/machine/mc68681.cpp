@@ -112,8 +112,8 @@ DEFINE_DEVICE_TYPE(DUART_CHANNEL, duart_channel, "duart_channel", "DUART channel
 //  LIVE DEVICE
 //**************************************************************************
 
-duart_base_device::duart_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
+duart_base_device::duart_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	m_chanA(*this, CHANA_TAG),
 	m_chanB(*this, CHANB_TAG),
 	m_chanC(*this, CHANC_TAG),
@@ -123,7 +123,7 @@ duart_base_device::duart_base_device(const machine_config &mconfig, device_type 
 	write_b_tx(*this),
 	write_c_tx(*this),
 	write_d_tx(*this),
-	read_inport(*this),
+	read_inport(*this, 0),
 	write_outport(*this),
 	ip3clk(0),
 	ip4clk(0),
@@ -200,14 +200,6 @@ void duart_base_device::set_clocks(int clk3, int clk4, int clk5, int clk6)
 
 void duart_base_device::device_start()
 {
-	write_irq.resolve_safe();
-	write_a_tx.resolve_safe();
-	write_b_tx.resolve_safe();
-	write_c_tx.resolve_safe();
-	write_d_tx.resolve_safe();
-	read_inport.resolve();
-	write_outport.resolve_safe();
-
 	duart_timer = timer_alloc(FUNC(duart_base_device::duart_timer_callback), this);
 
 	save_item(NAME(ACR));
@@ -622,7 +614,7 @@ uint8_t duart_base_device::read(offs_t offset)
 		break;
 
 	case 0x0d: /* IP */
-		if (!read_inport.isnull())
+		if (!read_inport.isunset())
 		{
 			r = read_inport();  // TODO: go away
 		}

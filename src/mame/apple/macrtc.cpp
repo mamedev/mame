@@ -78,11 +78,6 @@ rtc3430040_device::rtc3430040_device(const machine_config &mconfig, const char *
 {
 }
 
-void rtc3430042_device::device_resolve_objects()
-{
-	m_cko_cb.resolve_safe();
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------

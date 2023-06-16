@@ -227,7 +227,7 @@ base_sns_cart_slot_device::base_sns_cart_slot_device(const machine_config &mconf
 	m_type(SNES_MODE20),
 	m_cart(nullptr),
 	m_irq_callback(*this),
-	m_open_bus_callback(*this)
+	m_open_bus_callback(*this, 0xff)
 {
 }
 
@@ -263,9 +263,6 @@ void base_sns_cart_slot_device::device_start()
 	m_cart = dynamic_cast<device_sns_cart_interface *>(get_card_device());
 	if (m_cart != nullptr)
 		m_cart->m_slot = this;
-
-	m_irq_callback.resolve_safe();
-	m_open_bus_callback.resolve_safe(0xff);
 }
 
 

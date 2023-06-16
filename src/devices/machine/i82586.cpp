@@ -162,8 +162,6 @@ void i82586_base_device::device_start()
 {
 	m_space = &space(0);
 
-	m_out_irq.resolve_safe();
-
 	m_cu_timer = timer_alloc(FUNC(i82586_base_device::cu_execute), this);
 
 	save_item(NAME(m_cx));

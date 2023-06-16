@@ -31,11 +31,6 @@ void heath_intr_cntrl::device_start()
 	m_intr_lines = 0;
 }
 
-void heath_intr_cntrl::device_resolve_objects()
-{
-	m_irq_line.resolve_safe();
-}
-
 void heath_intr_cntrl::update_intr_line()
 {
 

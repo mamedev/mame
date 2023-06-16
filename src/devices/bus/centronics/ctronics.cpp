@@ -51,25 +51,6 @@ void centronics_device::device_reset()
 
 void centronics_device::device_start()
 {
-	m_strobe_handler.resolve_safe();
-	m_data0_handler.resolve_safe();
-	m_data1_handler.resolve_safe();
-	m_data2_handler.resolve_safe();
-	m_data3_handler.resolve_safe();
-	m_data4_handler.resolve_safe();
-	m_data5_handler.resolve_safe();
-	m_data6_handler.resolve_safe();
-	m_data7_handler.resolve_safe();
-	m_ack_handler.resolve_safe();
-	m_busy_handler.resolve_safe();
-	m_perror_handler.resolve_safe();
-	m_select_handler.resolve_safe();
-	m_autofd_handler.resolve_safe();
-	m_fault_handler.resolve_safe();
-	m_init_handler.resolve_safe();
-	m_sense_handler.resolve_safe();
-	m_select_in_handler.resolve_safe();
-
 	m_sense_handler(0);
 
 	// pull up

@@ -94,7 +94,6 @@ void joyport_device::set_interrupt(int state)
 
 void joyport_device::device_start()
 {
-	m_interrupt.resolve();
 }
 
 void joyport_device::device_config_complete()

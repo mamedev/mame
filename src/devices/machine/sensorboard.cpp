@@ -77,8 +77,8 @@ sensorboard_device::sensorboard_device(const machine_config &mconfig, const char
 	m_inp_ui(*this, "UI"),
 	m_inp_conf(*this, "CONF"),
 	m_custom_init_cb(*this),
-	m_custom_sensor_cb(*this),
-	m_custom_spawn_cb(*this),
+	m_custom_sensor_cb(*this, 0),
+	m_custom_spawn_cb(*this, 0),
 	m_custom_output_cb(*this)
 {
 	m_nvram_auto = false;
@@ -101,13 +101,7 @@ sensorboard_device::sensorboard_device(const machine_config &mconfig, const char
 
 void sensorboard_device::device_start()
 {
-	// resolve handlers
-	m_custom_init_cb.resolve_safe();
-	m_custom_sensor_cb.resolve_safe(0);
-	m_custom_spawn_cb.resolve();
-	m_custom_output_cb.resolve();
-
-	if (m_custom_output_cb.isnull())
+	if (m_custom_output_cb.isunset())
 	{
 		m_out_piece.resolve();
 		m_out_pui.resolve();
@@ -322,7 +316,7 @@ void sensorboard_device::refresh()
 	if (machine().phase() < machine_phase::RESET)
 		return;
 
-	bool custom_out = !m_custom_output_cb.isnull();
+	bool custom_out = !m_custom_output_cb.isunset();
 
 	// output spawn icons
 	for (int i = 0; i < m_maxspawn; i++)
@@ -511,7 +505,7 @@ INPUT_CHANGED_MEMBER(sensorboard_device::ui_spawn)
 	m_handpos = -1;
 
 	// optional callback to change piece id
-	if (!m_custom_spawn_cb.isnull())
+	if (!m_custom_spawn_cb.isunset())
 		m_hand = m_custom_spawn_cb(pos);
 
 	refresh();

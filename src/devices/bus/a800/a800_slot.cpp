@@ -198,12 +198,6 @@ void a800_cart_slot_device::device_start()
 	m_space_mem = &space(AS_PROGRAM);
 }
 
-void a800_cart_slot_device::device_resolve_objects()
-{
-	m_rd4_cb.resolve_safe();
-	m_rd5_cb.resolve_safe();
-}
-
 void a5200_cart_slot_device::device_start()
 {
 	m_cart = get_card_device();

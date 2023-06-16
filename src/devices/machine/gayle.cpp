@@ -54,7 +54,7 @@ gayle_device::gayle_device(const machine_config &mconfig, const char *tag, devic
 	m_int2_w(*this),
 	m_int6_w(*this),
 	m_rst_w(*this),
-	m_ide_cs_r_cb(*this),
+	m_ide_cs_r_cb(*this, 0xffff),
 	m_ide_cs_w_cb(*this),
 	m_gayle_id(0xff),
 	m_gayle_id_count(0)
@@ -67,13 +67,6 @@ gayle_device::gayle_device(const machine_config &mconfig, const char *tag, devic
 
 void gayle_device::device_start()
 {
-	// resolve callbacks
-	m_int2_w.resolve_safe();
-	m_int6_w.resolve_safe();
-	m_rst_w.resolve_safe();
-	m_ide_cs_r_cb.resolve_all_safe(0xffff);
-	m_ide_cs_w_cb.resolve_all_safe();
-
 	save_item(NAME(m_gayle_id_count));
 	save_item(NAME(m_gayle_reg));
 	save_item(NAME(m_line_state));

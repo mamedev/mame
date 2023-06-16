@@ -144,9 +144,9 @@ zx8302_device::zx8302_device(const machine_config &mconfig, const char *tag, dev
 		m_out_mdrdw_cb(*this),
 		m_out_erase_cb(*this),
 		m_out_raw1_cb(*this),
-		m_in_raw1_cb(*this),
+		m_in_raw1_cb(*this, 0),
 		m_out_raw2_cb(*this),
-		m_in_raw2_cb(*this),
+		m_in_raw2_cb(*this, 0),
 		m_dtr1(0),
 		m_cts2(0),
 		m_idr(1),
@@ -171,22 +171,6 @@ zx8302_device::zx8302_device(const machine_config &mconfig, const char *tag, dev
 
 void zx8302_device::device_start()
 {
-	// resolve callbacks
-	m_out_ipl1l_cb.resolve_safe();
-	m_out_baudx4_cb.resolve_safe();
-	m_out_comdata_cb.resolve_safe();
-	m_out_txd1_cb.resolve_safe();
-	m_out_txd2_cb.resolve_safe();
-	m_out_netout_cb.resolve_safe();
-	m_out_mdselck_cb.resolve_safe();
-	m_out_mdseld_cb.resolve_safe();
-	m_out_mdrdw_cb.resolve_safe();
-	m_out_erase_cb.resolve_safe();
-	m_out_raw1_cb.resolve_safe();
-	m_in_raw1_cb.resolve_safe(0);
-	m_out_raw2_cb.resolve_safe();
-	m_in_raw2_cb.resolve_safe(0);
-
 	// allocate timers
 	m_baudx4_timer = timer_alloc(FUNC(zx8302_device::baudx4_tick), this);
 	m_rtc_timer = timer_alloc(FUNC(zx8302_device::rtc_tick), this);

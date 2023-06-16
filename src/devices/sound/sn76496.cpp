@@ -227,24 +227,20 @@ segapsg_device::segapsg_device(const machine_config &mconfig, const char *tag, d
 void sn76496_base_device::device_start()
 {
 	int sample_rate = clock()/2;
-	int i;
-	double out;
 	int gain;
-
-	m_ready_handler.resolve_safe();
 
 	m_sound = stream_alloc(0, (m_stereo? 2:1), sample_rate);
 
-	for (i = 0; i < 4; i++) m_volume[i] = 0;
+	for (int i = 0; i < 4; i++) m_volume[i] = 0;
 
 	m_last_register = m_sega_style_psg?3:0; // Sega VDP PSG defaults to selected period reg for 2nd channel
-	for (i = 0; i < 8; i+=2)
+	for (int i = 0; i < 8; i+=2)
 	{
 		m_register[i] = 0;
 		m_register[i + 1] = 0x0;   // volume = 0x0 (max volume) on reset; this needs testing on chips other than SN76489A and Sega VDP PSG
 	}
 
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		m_output[i] = 0;
 		m_period[i] = 0;
@@ -263,12 +259,12 @@ void sn76496_base_device::device_start()
 	gain &= 0xff;
 
 	// increase max output basing on gain (0.2 dB per step)
-	out = MAX_OUTPUT / 4; // four channels, each gets 1/4 of the total range
+	double out = MAX_OUTPUT / 4; // four channels, each gets 1/4 of the total range
 	while (gain-- > 0)
 		out *= 1.023292992; // = (10 ^ (0.2/20))
 
 	// build volume table (2dB per step)
-	for (i = 0; i < 15; i++)
+	for (int i = 0; i < 15; i++)
 	{
 		// limit volume to avoid clipping
 		if (out > MAX_OUTPUT / 4) m_vol_table[i] = MAX_OUTPUT / 4;

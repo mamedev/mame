@@ -2328,7 +2328,6 @@ hng64_lamps_device::hng64_lamps_device(const machine_config &mconfig, const char
 
 void hng64_lamps_device::device_start()
 {
-	m_lamps_out_cb.resolve_all_safe();
 }
 
 void hng64_state::hng64_drive_lamps7_w(uint8_t data)

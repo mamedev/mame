@@ -95,7 +95,7 @@ public:
 protected:
 	isa8_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 	// configuration
@@ -210,7 +210,7 @@ protected:
 
 	template<typename R, typename W> void install_space(int spacenum, offs_t start, offs_t end, R rhandler, W whandler);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_config_complete() override;
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
@@ -292,7 +292,7 @@ public:
 	isa16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 };
 
@@ -347,10 +347,6 @@ public:
 	void mem16_swap_w(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t io16_swap_r(offs_t offset, uint16_t mem_mask = 0xffff);
 	void io16_swap_w(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 
 private:
 	// internal state

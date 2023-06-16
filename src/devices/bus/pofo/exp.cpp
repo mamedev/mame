@@ -65,11 +65,6 @@ portfolio_expansion_slot_device::portfolio_expansion_slot_device(const machine_c
 void portfolio_expansion_slot_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_write_eint.resolve_safe();
-	m_write_nmio.resolve_safe();
-	m_write_wake.resolve_safe();
 }
 
 

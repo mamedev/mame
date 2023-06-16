@@ -149,12 +149,7 @@ void i8275_device::device_start()
 	// get the screen device
 	screen().register_screen_bitmap(m_bitmap);
 
-	// resolve callbacks
-	m_write_drq.resolve_safe();
-	m_write_irq.resolve_safe();
-	m_write_hrtc.resolve_safe();
-	m_write_vrtc.resolve_safe();
-	m_write_lc.resolve_safe();
+	// resolve delegates
 	m_display_cb.resolve_safe();
 
 	// allocate timers

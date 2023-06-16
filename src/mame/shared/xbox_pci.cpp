@@ -173,9 +173,6 @@ void mcpx_isalpc_device::device_start()
 {
 	pci_device::device_start();
 	set_multifunction_device(true);
-	m_smi_callback.resolve_safe();
-	m_interrupt_output.resolve_safe();
-	m_boot_state_hook.resolve_safe();
 	add_map(0x00000100, M_IO, FUNC(mcpx_isalpc_device::lpc_io));
 	bank_infos[0].adr = 0x8000;
 	status = 0x00b0;
@@ -355,8 +352,7 @@ void mcpx_isalpc_device::acpi_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 void mcpx_isalpc_device::boot_state_w(uint8_t data)
 {
-	if (m_boot_state_hook)
-		m_boot_state_hook((offs_t)0, data);
+	m_boot_state_hook(offs_t(0), data);
 }
 
 void mcpx_isalpc_device::interrupt_ouptut_changed(int state)
@@ -733,7 +729,6 @@ void mcpx_smbus_device::device_start()
 {
 	pci_device::device_start();
 	set_multifunction_device(true);
-	m_interrupt_handler.resolve_safe();
 	add_map(0x00000010, M_IO, FUNC(mcpx_smbus_device::smbus_io0));
 	bank_infos[0].adr = 0x1000;
 	add_map(0x00000010, M_IO, FUNC(mcpx_smbus_device::smbus_io1));
@@ -803,10 +798,7 @@ void mcpx_smbus_device::smbus_write(int bus, offs_t offset, uint32_t data, uint3
 	if ((offset == 0) && (ACCESSING_BITS_0_7 || ACCESSING_BITS_8_15)) // 0 smbus status
 	{
 		if (!((smbusst[bus].status ^ data) & 0x10)) // clearing interrupt
-		{
-			if (m_interrupt_handler)
-				m_interrupt_handler(0);
-		}
+			m_interrupt_handler(0);
 		smbusst[bus].status &= ~data;
 	}
 	if ((offset == 0) && ACCESSING_BITS_16_23) // 2 smbus control
@@ -826,10 +818,7 @@ void mcpx_smbus_device::smbus_write(int bus, offs_t offset, uint32_t data, uint3
 					logerror("SMBUS: access to missing device at bus %d address %d\n", bus, smbusst[bus].address);
 				smbusst[bus].status |= 0x10;
 				if (smbusst[bus].control & 0x10)
-				{
-					if (m_interrupt_handler)
-						m_interrupt_handler(1);
-				}
+					m_interrupt_handler(1);
 			}
 		}
 	}
@@ -910,7 +899,6 @@ void mcpx_ohci_device::plug_usb_device(int port, device_usb_ohci_function_interf
 void mcpx_ohci_device::device_start()
 {
 	pci_device::device_start();
-	m_interrupt_handler.resolve_safe();
 	add_map(0x00001000, M_MEM, FUNC(mcpx_ohci_device::ohci_mmio));
 	bank_infos[0].adr = 0xfed00000;
 	status = 0x00b0;
@@ -1425,8 +1413,6 @@ void mcpx_ide_device::device_start()
 	bank_infos[4].adr = 0xff60;
 	status = 0x00b0;
 	command = 0x0001;
-	m_pri_interrupt_handler.resolve_safe();
-	m_sec_interrupt_handler.resolve_safe();
 }
 
 void mcpx_ide_device::device_reset()
@@ -1604,7 +1590,6 @@ nv2a_gpu_device::nv2a_gpu_device(const machine_config &mconfig, const char *tag,
 void nv2a_gpu_device::device_start()
 {
 	agp_device::device_start();
-	m_interrupt_handler.resolve_safe();
 	add_map(0x01000000, M_MEM, FUNC(nv2a_gpu_device::nv2a_mmio));
 	bank_infos[0].adr = 0xfd000000;
 	add_map(0x08000000, M_MEM, FUNC(nv2a_gpu_device::nv2a_mirror));

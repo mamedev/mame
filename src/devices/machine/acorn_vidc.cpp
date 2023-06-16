@@ -148,9 +148,6 @@ void acorn_vidc10_device::device_config_complete()
 
 void acorn_vidc10_device::device_start()
 {
-	m_vblank_cb.resolve_safe();
-	m_sound_drq_cb.resolve_safe();
-
 	for (int i = 0; i < entries(); i++)
 		set_pen_color(i, rgb_t::black());
 

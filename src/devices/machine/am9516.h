@@ -76,9 +76,9 @@ private:
 	{
 		channel(am9516_device &parent)
 			: udc(parent)
-			, flyby_byte_r(parent)
+			, flyby_byte_r(parent, 0)
 			, flyby_byte_w(parent)
-			, flyby_word_r(parent)
+			, flyby_word_r(parent, 0)
 			, flyby_word_w(parent)
 		{}
 

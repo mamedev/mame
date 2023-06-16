@@ -84,10 +84,6 @@ void tms9927_device::device_start()
 	assert(clock() > 0);
 	if (!(m_hpixels_per_column > 0)) fatalerror("TMS9927: number of pixels per column must be explicitly set using set_char_width()!\n");
 
-	// resolve callbacks
-	m_write_vsyn.resolve_safe();
-	m_write_hsyn.resolve();
-
 	// allocate timers
 	m_vsync_timer = timer_alloc(FUNC(tms9927_device::toggle_vsync), this);
 	m_hsync_timer = timer_alloc(FUNC(tms9927_device::toggle_hsync), this);
@@ -358,7 +354,7 @@ void tms9927_device::recompute_parameters(bool postload)
 	screen().configure(m_total_hpix, m_total_vpix, visarea, refresh.as_attoseconds());
 
 	m_hsyn = false;
-	if (!m_write_hsyn.isnull())
+	if (!m_write_hsyn.isunset())
 	{
 		m_write_hsyn(0);
 		m_hsync_timer->adjust(screen().time_until_pos(m_vsyn_start, m_hsyn_start));

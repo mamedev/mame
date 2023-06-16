@@ -231,8 +231,6 @@ void timekeeper_device::device_start()
 
 	m_watchdog_timer = timer_alloc(FUNC(timekeeper_device::watchdog_callback), this);
 	m_watchdog_timer->adjust(attotime::never);
-	m_reset_cb.resolve_safe();
-	m_irq_cb.resolve_safe();
 }
 
 //-------------------------------------------------

@@ -36,11 +36,6 @@ cit220p_keyboard_device::cit220p_keyboard_device(const machine_config &mconfig, 
 {
 }
 
-void cit220p_keyboard_device::device_resolve_objects()
-{
-	m_txd_callback.resolve_safe();
-}
-
 void cit220p_keyboard_device::device_start()
 {
 }

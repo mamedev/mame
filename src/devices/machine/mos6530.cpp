@@ -41,12 +41,12 @@ enum
 
 DEFINE_DEVICE_TYPE(MOS6530, mos6530_device, "mos6530", "MOS 6530 MIOT")
 
-mos6530_device::mos6530_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MOS6530, tag, owner, clock),
-		m_in_pa_cb(*this),
-		m_out_pa_cb(*this),
-		m_in_pb_cb(*this),
-		m_out_pb_cb(*this)
+mos6530_device::mos6530_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, MOS6530, tag, owner, clock),
+	m_in_pa_cb(*this, 0),
+	m_out_pa_cb(*this),
+	m_in_pb_cb(*this, 0),
+	m_out_pb_cb(*this)
 {
 }
 
@@ -58,12 +58,6 @@ void mos6530_device::device_start()
 {
 	/* set static values */
 	m_clock = clock();
-
-	/* resolve callbacks */
-	m_in_pa_cb.resolve_safe(0);
-	m_out_pa_cb.resolve_safe();
-	m_in_pb_cb.resolve_safe(0);
-	m_out_pb_cb.resolve_safe();
 
 	/* allocate timers */
 	m_timer = timer_alloc(FUNC(mos6530_device::end_state), this);

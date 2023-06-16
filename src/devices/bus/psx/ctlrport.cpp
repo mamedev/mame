@@ -52,9 +52,6 @@ psxcontrollerports_device::psxcontrollerports_device(const machine_config &mconf
 
 void psxcontrollerports_device::device_start()
 {
-	m_dsr_handler.resolve_safe();
-	m_rxd_handler.resolve_safe();
-
 	m_port0->set_ack_cb(*this, FUNC(psxcontrollerports_device::ack));
 	m_port1->set_ack_cb(*this, FUNC(psxcontrollerports_device::ack));
 }

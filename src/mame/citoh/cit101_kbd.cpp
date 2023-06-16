@@ -86,7 +86,6 @@ cit101e_keyboard_device::cit101e_keyboard_device(const machine_config &mconfig, 
 
 void cit101_keyboard_device::device_resolve_objects()
 {
-	m_txd_callback.resolve_safe();
 	m_leds.resolve();
 }
 

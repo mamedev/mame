@@ -49,7 +49,6 @@ public:
 	uint32_t screen_update_dual(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

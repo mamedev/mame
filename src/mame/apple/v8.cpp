@@ -138,7 +138,7 @@ v8_device::v8_device(const machine_config &mconfig, device_type type, const char
 	write_cb2(*this),
 	write_hdsel(*this),
 	write_hmmu_enable(*this),
-	read_pb3(*this),
+	read_pb3(*this, 0),
 	m_montype(*this, "MONTYPE"),
 	m_via1(*this, "via1"),
 	m_rom(*this, finder_base::DUMMY_TAG),
@@ -154,13 +154,6 @@ v8_device::v8_device(const machine_config &mconfig, device_type type, const char
 void v8_device::device_start()
 {
 	m_vram = std::make_unique<u32[]>(0x100000 / sizeof(u32));
-
-	write_pb4.resolve_safe();
-	write_pb5.resolve_safe();
-	write_cb2.resolve_safe();
-	write_hdsel.resolve_safe();
-	write_hmmu_enable.resolve_safe();
-	read_pb3.resolve_safe(0);
 
 	m_6015_timer = timer_alloc(FUNC(v8_device::mac_6015_tick), this);
 	m_6015_timer->adjust(attotime::never);

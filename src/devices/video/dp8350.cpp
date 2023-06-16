@@ -194,24 +194,6 @@ void dp835x_device::device_config_complete()
 
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void dp835x_device::device_resolve_objects()
-{
-	m_lrc_callback.resolve_safe();
-	m_clc_callback.resolve_safe();
-	m_lc_callback.resolve_safe();
-	m_lbre_callback.resolve_safe();
-	m_hsync_callback.resolve_safe();
-	m_vsync_callback.resolve_safe();
-	m_vblank_callback.resolve_safe();
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

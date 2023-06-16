@@ -206,23 +206,6 @@ void duscc_device::device_start()
 {
 	LOG("%s\n", FUNCNAME);
 
-	// resolve callbacks
-	m_out_txda_cb.resolve_safe();
-	m_out_dtra_cb.resolve_safe();
-	m_out_rtsa_cb.resolve_safe();
-	m_out_synca_cb.resolve_safe();
-	m_out_rtxca_cb.resolve_safe();
-	m_out_trxca_cb.resolve_safe();
-
-	m_out_txdb_cb.resolve_safe();
-	m_out_dtrb_cb.resolve_safe();
-	m_out_rtsb_cb.resolve_safe();
-	m_out_syncb_cb.resolve_safe();
-	m_out_rtxcb_cb.resolve_safe();
-	m_out_trxcb_cb.resolve_safe();
-
-	m_out_int_cb.resolve_safe();
-
 	// state saving - stuff with runtime values
 	save_item(NAME(m_int_state));
 	save_item(NAME(m_gsr));

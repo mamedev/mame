@@ -201,13 +201,6 @@ msm58321_device::msm58321_device(const machine_config &mconfig, const char *tag,
 
 void msm58321_device::device_start()
 {
-	// resolve callbacks
-	m_d0_handler.resolve_safe();
-	m_d1_handler.resolve_safe();
-	m_d2_handler.resolve_safe();
-	m_d3_handler.resolve_safe();
-	m_busy_handler.resolve_safe();
-
 	// allocate timers
 	m_clock_timer = timer_alloc(FUNC(msm58321_device::clock_tick), this);
 	m_clock_timer->adjust(clocks_to_attotime(32768/1024), 0, clocks_to_attotime(32768/1024));

@@ -58,9 +58,6 @@ psion_module_slot_device::psion_module_slot_device(const machine_config &mconfig
 void psion_module_slot_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_intr_cb.resolve_safe();
 }
 
 

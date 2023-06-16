@@ -67,7 +67,6 @@ distomeb_slot_device::distomeb_slot_device(const machine_config &mconfig, const 
 void distomeb_slot_device::device_start()
 {
 	m_cart = get_card_device();
-	m_cart_callback.resolve_safe();
 
 	save_item(NAME(m_cart_line));
 }

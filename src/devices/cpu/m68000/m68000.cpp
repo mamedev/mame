@@ -167,7 +167,6 @@ void m68000_device::device_start()
 {
 	init_decode_table();
 
-	m_reset_cb.resolve_safe();
 	m_cmpild_instr_callback.resolve();
 	m_rte_instr_callback.resolve();
 	m_tas_write_callback.resolve();

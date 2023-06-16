@@ -515,12 +515,6 @@ void bq48x2_device::device_start()
 	// Watchdog timer
 	m_watchdog_timer = timer_alloc(FUNC(bq48x2_device::rtc_watchdog_cb), this);
 
-	// Interrupt line
-	m_interrupt_cb.resolve_safe();
-
-	// Reset output
-	m_resetout_cb.resolve_safe();
-
 	m_sram = std::make_unique<u8 []>(m_memsize);
 
 	// Interrupt enables are cleared on powerup

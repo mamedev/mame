@@ -65,7 +65,7 @@ mips1core_device_base::mips1core_device_base(machine_config const &mconfig, devi
 	, m_icount(0)
 	, m_icache_size(icache_size)
 	, m_dcache_size(dcache_size)
-	, m_in_brcond(*this)
+	, m_in_brcond(*this, 0)
 {
 }
 
@@ -147,9 +147,6 @@ void mips1core_device_base::device_start()
 {
 	// set our instruction counter
 	set_icountptr(m_icount);
-
-	// resolve conditional branch input handlers
-	m_in_brcond.resolve_all_safe(0);
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,      "GENPC",     m_pc).noshow();

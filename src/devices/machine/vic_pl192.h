@@ -52,10 +52,9 @@ public:
 protected:
 	vic_pl190_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_resolve_objects() override;
 
 	virtual space_config_vector memory_space_config() const override;
 

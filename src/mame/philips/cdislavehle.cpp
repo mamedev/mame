@@ -386,25 +386,11 @@ void cdislave_hle_device::slave_w(offs_t offset, uint16_t data)
 cdislave_hle_device::cdislave_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CDI_SLAVE_HLE, tag, owner, clock)
 	, m_int_callback(*this)
-	, m_read_mousex(*this)
-	, m_read_mousey(*this)
-	, m_read_mousebtn(*this)
+	, m_read_mousex(*this, 0x0000)
+	, m_read_mousey(*this, 0x0000)
+	, m_read_mousebtn(*this, 0x00)
 	, m_dmadac(*this, ":dac%u", 1U)
 {
-}
-
-//-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void cdislave_hle_device::device_resolve_objects()
-{
-	m_int_callback.resolve_safe();
-	m_read_mousex.resolve_safe(0x0000);
-	m_read_mousey.resolve_safe(0x0000);
-	m_read_mousebtn.resolve_safe(0x00);
 }
 
 //-------------------------------------------------

@@ -39,10 +39,8 @@ void psxirq_device::device_post_load()
 
 void psxirq_device::device_start()
 {
-	m_irq_handler.resolve_safe();
-
-	save_item( NAME( n_irqdata ) );
-	save_item( NAME( n_irqmask ) );
+	save_item(NAME(n_irqdata));
+	save_item(NAME(n_irqmask));
 }
 
 void psxirq_device::set( uint32_t bitmask )

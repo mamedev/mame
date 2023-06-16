@@ -477,8 +477,6 @@ void mb87030_device::device_start()
 {
 	m_timer = timer_alloc(FUNC(mb87030_device::timeout), this);
 	m_delay_timer = timer_alloc(FUNC(mb87030_device::delay_timeout), this);
-	m_irq_handler.resolve_safe();
-	m_dreq_handler.resolve_safe();
 
 	save_item(NAME(m_bdid));
 	save_item(NAME(m_sctl));

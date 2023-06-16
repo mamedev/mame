@@ -42,9 +42,6 @@ void dp8573_device::device_start()
 	m_timer = timer_alloc(FUNC(dp8573_device::msec_tick), this);
 	m_timer->adjust(attotime::never);
 
-	m_intr_cb.resolve_safe();
-	m_mfo_cb.resolve_safe();
-
 	std::fill(std::begin(m_ram), std::end(m_ram), 0);
 
 	m_tscr = 0;

@@ -47,8 +47,6 @@ ttl74123_device::ttl74123_device(const machine_config &mconfig, const char *tag,
 
 void ttl74123_device::device_start()
 {
-	m_output_changed_cb.resolve_safe();
-
 	m_clear_timer = timer_alloc(FUNC(ttl74123_device::clear_callback), this);
 	m_output_timer = timer_alloc(FUNC(ttl74123_device::output_callback), this);
 

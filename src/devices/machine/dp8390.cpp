@@ -25,7 +25,7 @@ dp8390_device::dp8390_device(const machine_config &mconfig, device_type type, co
 	, m_variant(variant)
 	, m_irq_cb(*this)
 	, m_breq_cb(*this)
-	, m_mem_read_cb(*this)
+	, m_mem_read_cb(*this, 0)
 	, m_mem_write_cb(*this)
 	, m_reset(0)
 	, m_rdma_active(0)
@@ -33,10 +33,6 @@ dp8390_device::dp8390_device(const machine_config &mconfig, device_type type, co
 }
 
 void dp8390_device::device_start() {
-	m_irq_cb.resolve_safe();
-	m_breq_cb.resolve_safe();
-	m_mem_read_cb.resolve_safe(0);
-	m_mem_write_cb.resolve_safe();
 }
 
 void dp8390_device::stop() {

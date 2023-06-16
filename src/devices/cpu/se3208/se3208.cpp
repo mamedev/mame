@@ -38,7 +38,7 @@ se3208_device::se3208_device(const machine_config &mconfig, const char *tag, dev
 	: cpu_device(mconfig, SE3208, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
 	, m_machinex_cb(*this)
-	, m_iackx_cb(*this)
+	, m_iackx_cb(*this, 0)
 	, m_PC(0), m_SR(0), m_SP(0), m_ER(0), m_PPC(0), m_IRQ(0), m_NMI(0), m_icount(0)
 {
 }
@@ -48,13 +48,6 @@ device_memory_interface::space_config_vector se3208_device::memory_space_config(
 	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config)
 	};
-}
-
-
-void se3208_device::device_resolve_objects()
-{
-	m_machinex_cb.resolve_safe();
-	m_iackx_cb.resolve_safe(0);
 }
 
 

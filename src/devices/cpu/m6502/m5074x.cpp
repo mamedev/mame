@@ -43,7 +43,7 @@ DEFINE_DEVICE_TYPE(M50753, m50753_device, "m50753", "Mitsubishi M50753")
 m5074x_device::m5074x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addrbits, address_map_constructor internal_map) :
 	m740_device(mconfig, type, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, addrbits, 0, internal_map),
-	m_read_p(*this),
+	m_read_p(*this, 0),
 	m_write_p(*this),
 	m_intctrl(0),
 	m_tmrctrl(0),
@@ -66,9 +66,6 @@ m5074x_device::m5074x_device(const machine_config &mconfig, device_type type, co
 
 void m5074x_device::device_start()
 {
-	m_read_p.resolve_all_safe(0);
-	m_write_p.resolve_all_safe();
-
 	m_timers[TIMER_1] = timer_alloc(FUNC(m5074x_device::timer1_tick), this);
 	m_timers[TIMER_2] = timer_alloc(FUNC(m5074x_device::timer2_tick), this);
 	m_timers[TIMER_X] = timer_alloc(FUNC(m5074x_device::timerx_tick), this);
@@ -513,8 +510,8 @@ m50753_device::m50753_device(const machine_config &mconfig, const char *tag, dev
 
 m50753_device::m50753_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	m5074x_device(mconfig, type, tag, owner, clock, 16, address_map_constructor(FUNC(m50753_device::m50753_map), this)),
-	m_ad_in(*this),
-	m_in_p(*this),
+	m_ad_in(*this, 0),
+	m_in_p(*this, 0),
 	m_ad_control(0),
 	m_pwm_enabled(false)
 {
@@ -523,9 +520,6 @@ m50753_device::m50753_device(const machine_config &mconfig, device_type type, co
 void m50753_device::device_start()
 {
 	m5074x_device::device_start();
-
-	m_ad_in.resolve_all_safe(0);
-	m_in_p.resolve_safe(0);
 
 	save_item(NAME(m_ad_control));
 	save_item(NAME(m_pwm_enabled));

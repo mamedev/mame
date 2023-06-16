@@ -181,11 +181,6 @@ void cmi01a_device::device_reset()
 	m_sample_timer->adjust(attotime::never);
 }
 
-void cmi01a_device::device_resolve_objects()
-{
-	m_irq_cb.resolve_safe();
-}
-
 void cmi01a_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	if (m_run)

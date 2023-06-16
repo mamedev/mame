@@ -92,22 +92,22 @@ void sonora_device::device_add_mconfig(machine_config &config)
 //  sonora_device - constructor
 //-------------------------------------------------
 
-sonora_device::sonora_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SONORA, tag, owner, clock),
-	  write_pb4(*this),
-	  write_pb5(*this),
-	  write_cb2(*this),
-	  read_pb3(*this),
-	  m_maincpu(*this, finder_base::DUMMY_TAG),
-	  m_video(*this, "sonora_video"),
-	  m_via1(*this, "via1"),
-	  m_asc(*this, "asc"),
-	  m_fdc(*this, "fdc"),
-	  m_floppy(*this, "fdc:%d", 0U),
-	  m_rom(*this, finder_base::DUMMY_TAG),
-	  m_cur_floppy(nullptr),
-	  m_hdsel(0),
-	  m_overlay(false)
+sonora_device::sonora_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SONORA, tag, owner, clock),
+	write_pb4(*this),
+	write_pb5(*this),
+	write_cb2(*this),
+	read_pb3(*this, 0),
+	m_maincpu(*this, finder_base::DUMMY_TAG),
+	m_video(*this, "sonora_video"),
+	m_via1(*this, "via1"),
+	m_asc(*this, "asc"),
+	m_fdc(*this, "fdc"),
+	m_floppy(*this, "fdc:%d", 0U),
+	m_rom(*this, finder_base::DUMMY_TAG),
+	m_cur_floppy(nullptr),
+	m_hdsel(0),
+	m_overlay(false)
 {
 }
 
@@ -118,11 +118,6 @@ sonora_device::sonora_device(const machine_config &mconfig, const char *tag, dev
 void sonora_device::device_start()
 {
 	m_vram = std::make_unique<u32[]>(0x100000 / sizeof(u32));
-
-	write_pb4.resolve_safe();
-	write_pb5.resolve_safe();
-	write_cb2.resolve_safe();
-	read_pb3.resolve_safe(0);
 
 	m_6015_timer = timer_alloc(FUNC(sonora_device::mac_6015_tick), this);
 	m_6015_timer->adjust(attotime::never);

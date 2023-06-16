@@ -169,14 +169,6 @@ void mpcc_device::device_start()
 {
 	LOGSETUP("%s\n", FUNCNAME);
 
-	// resolve callbacks
-	m_out_txd_cb.resolve_safe();
-	m_out_dtr_cb.resolve_safe();
-	m_out_rts_cb.resolve_safe();
-	m_out_rtxc_cb.resolve_safe();
-	m_out_trxc_cb.resolve_safe();
-	m_out_int_cb.resolve_safe();
-
 	// state saving
 	save_item(NAME(m_int_state));
 	save_item(NAME(m_rsr));

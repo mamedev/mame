@@ -668,11 +668,6 @@ void upd7220_device::device_start()
 	m_display_cb.resolve_safe();
 	m_draw_text_cb.resolve_safe();
 
-	m_write_drq.resolve_safe();
-	m_write_hsync.resolve_safe();
-	m_write_vsync.resolve_safe();
-	m_write_blank.resolve_safe();
-
 	// allocate timers
 	m_vsync_timer = timer_alloc(FUNC(upd7220_device::vsync_update), this);
 	m_hsync_timer = timer_alloc(FUNC(upd7220_device::hsync_update), this);

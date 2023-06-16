@@ -143,13 +143,6 @@ void mcs40_cpu_device_base::device_start()
 	m_spaces[AS_ROM]->cache(m_cache);
 
 	m_bus_cycle_cb.resolve_safe();
-	m_sync_cb.resolve_safe();
-	m_cm_rom_cb.resolve_all_safe();
-	m_cm_ram_cb.resolve_all_safe();
-	m_cy_cb.resolve_safe();
-	m_stp_ack_cb.resolve_safe();
-	m_4289_pm_cb.resolve_safe();
-	m_4289_f_l_cb.resolve_safe();
 
 	m_stop_latch = m_decoded_halt = m_resume = false;
 

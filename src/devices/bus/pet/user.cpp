@@ -46,26 +46,6 @@ void pet_user_port_device::device_config_complete()
 
 void pet_user_port_device::device_start()
 {
-	m_2_handler.resolve_safe();
-	m_3_handler.resolve_safe();
-	m_4_handler.resolve_safe();
-	m_5_handler.resolve_safe();
-	m_6_handler.resolve_safe();
-	m_7_handler.resolve_safe();
-	m_8_handler.resolve_safe();
-	m_9_handler.resolve_safe();
-	m_10_handler.resolve_safe();
-	m_b_handler.resolve_safe();
-	m_c_handler.resolve_safe();
-	m_d_handler.resolve_safe();
-	m_e_handler.resolve_safe();
-	m_f_handler.resolve_safe();
-	m_h_handler.resolve_safe();
-	m_j_handler.resolve_safe();
-	m_k_handler.resolve_safe();
-	m_l_handler.resolve_safe();
-	m_m_handler.resolve_safe();
-
 	// pull up
 	m_3_handler(1);
 	m_4_handler(1);

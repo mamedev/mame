@@ -111,7 +111,6 @@ void megadrive_io_port_device_base::device_resolve_objects()
 
 	m_in_callback.resolve();
 	m_out_callback.resolve();
-	m_hl_callback.resolve_safe();
 }
 
 

@@ -164,19 +164,19 @@ ROM_END
 //-------------------------------------------------
 //  qs1000_device - constructor
 //-------------------------------------------------
-qs1000_device::qs1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, QS1000, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		device_rom_interface(mconfig, *this),
-		m_external_rom(false),
-		m_in_p1_cb(*this),
-		m_in_p2_cb(*this),
-		m_in_p3_cb(*this),
-		m_out_p1_cb(*this),
-		m_out_p2_cb(*this),
-		m_out_p3_cb(*this),
-		m_stream(nullptr),
-		m_cpu(*this, "cpu")
+qs1000_device::qs1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, QS1000, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	device_rom_interface(mconfig, *this),
+	m_external_rom(false),
+	m_in_p1_cb(*this, 0),
+	m_in_p2_cb(*this, 0),
+	m_in_p3_cb(*this, 0),
+	m_out_p1_cb(*this),
+	m_out_p2_cb(*this),
+	m_out_p3_cb(*this),
+	m_stream(nullptr),
+	m_cpu(*this, "cpu")
 {
 }
 
@@ -229,15 +229,6 @@ void qs1000_device::device_start()
 	// would be overkill so we opt for a fraction of that rate which
 	// gives reasonable results
 	m_stream = stream_alloc(0, 2, clock() / 32);
-
-	// Resolve CPU port callbacks
-	m_in_p1_cb.resolve_safe(0);
-	m_in_p2_cb.resolve_safe(0);
-	m_in_p3_cb.resolve_safe(0);
-
-	m_out_p1_cb.resolve_safe();
-	m_out_p2_cb.resolve_safe();
-	m_out_p3_cb.resolve_safe();
 
 	save_item(NAME(m_wave_regs));
 

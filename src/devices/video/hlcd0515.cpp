@@ -58,10 +58,6 @@ hlcd0601_device::hlcd0601_device(const machine_config &mconfig, const char *tag,
 
 void hlcd0515_device::device_start()
 {
-	// resolve callbacks
-	m_write_cols.resolve_safe();
-	m_write_data.resolve_safe();
-
 	// timer
 	m_lcd_timer = timer_alloc(FUNC(hlcd0515_device::scan_lcd), this);
 	attotime period = attotime::from_hz(clock() / 2);

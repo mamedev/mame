@@ -17,7 +17,6 @@ m24_z8000_device::m24_z8000_device(const machine_config &mconfig, const char *ta
 
 void m24_z8000_device::device_start()
 {
-	m_halt_out.resolve_safe();
 }
 
 void m24_z8000_device::device_reset()

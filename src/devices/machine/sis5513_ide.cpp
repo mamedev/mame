@@ -131,9 +131,6 @@ void sis5513_ide_device::device_start()
 {
 	pci_device::device_start();
 
-	m_irq_pri_callback.resolve();
-	m_irq_sec_callback.resolve();
-
 	add_map(8, M_IO, FUNC(sis5513_ide_device::ide1_command_map));
 	add_map(4, M_IO, FUNC(sis5513_ide_device::ide1_control_map));
 	add_map(8, M_IO, FUNC(sis5513_ide_device::ide2_command_map));

@@ -366,8 +366,6 @@ ms7004_device::ms7004_device(const machine_config &mconfig, const char *tag, dev
 
 void ms7004_device::device_start()
 {
-	m_tx_handler.resolve_safe();
-	m_rts_handler.resolve_safe();
 }
 
 

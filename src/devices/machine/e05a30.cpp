@@ -43,19 +43,6 @@ e05a30_device::e05a30_device(const machine_config &mconfig, const char *tag, dev
 
 void e05a30_device::device_start()
 {
-	/* resolve callbacks */
-	m_write_printhead.resolve_safe();
-	m_write_pf_stepper.resolve_safe();
-	m_write_cr_stepper.resolve_safe();
-	m_write_ready.resolve_safe();
-	m_write_centronics_ack.resolve_safe();
-	m_write_centronics_busy.resolve_safe();
-	m_write_centronics_perror.resolve_safe();
-	m_write_centronics_fault.resolve_safe();
-	m_write_centronics_select.resolve_safe();
-	m_write_cpu_reset.resolve_safe();
-	m_write_ready_led.resolve_safe();
-
 	/* register for state saving */
 	save_item(NAME(m_printhead));
 	save_item(NAME(m_pf_stepper));

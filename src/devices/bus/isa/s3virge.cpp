@@ -113,8 +113,6 @@ void s3virge_vga_device::device_start()
 	save_item(s3virge.s3d.reg[3],"S3D Registers: 3D Line");
 	save_item(s3virge.s3d.reg[4],"S3D Registers: 3D Triangle");
 
-	m_linear_config_changed_cb.resolve_safe();
-
 	// Initialise hardware graphics cursor colours, Windows 95 doesn't touch the registers for some reason
 	for (int x = 0; x < 4; x++)
 	{

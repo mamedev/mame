@@ -33,7 +33,7 @@ constexpr u32 CODEC_PRESENT = (1 << 22);
 burgundy_device::burgundy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, BURGUNDY, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, m_output_cb(*this)
+	, m_output_cb(*this, 0)
 	, m_input_cb(*this)
 	, m_stream(nullptr)
 {
@@ -47,9 +47,6 @@ void burgundy_device::device_start()
 {
 	// create the stream
 	m_stream = stream_alloc(0, 2, clock() / 512, STREAM_SYNCHRONOUS);
-
-	m_output_cb.resolve_safe(0);
-	m_input_cb.resolve_safe();
 
 	save_item(NAME(m_phase));
 	save_item(NAME(m_active));

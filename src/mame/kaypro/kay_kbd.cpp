@@ -370,7 +370,6 @@ ioport_constructor kaypro_10_keyboard_device::device_input_ports() const
 
 void kaypro_10_keyboard_device::device_start()
 {
-	m_rxd_cb.resolve_safe();
 	m_led_caps_lock.resolve();
 
 	save_item(NAME(m_txd));

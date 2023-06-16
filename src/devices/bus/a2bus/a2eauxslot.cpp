@@ -72,19 +72,6 @@ a2eauxslot_device::a2eauxslot_device(const machine_config &mconfig, device_type 
 }
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void a2eauxslot_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_out_irq_cb.resolve_safe();
-	m_out_nmi_cb.resolve_safe();
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

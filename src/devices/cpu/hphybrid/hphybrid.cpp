@@ -236,7 +236,6 @@ void hp_hybrid_cpu_device::device_start()
 
 	set_icountptr(m_icount);
 
-	m_pa_changed_func.resolve_safe();
 	m_opcode_func.resolve();
 	m_stm_func.resolve();
 	m_int_func.resolve();

@@ -25,7 +25,6 @@ void midi_port_device::device_config_complete()
 
 void midi_port_device::device_start()
 {
-	m_rxd_handler.resolve_safe();
 }
 
 void midi_port_device::write_txd(int state)

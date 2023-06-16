@@ -109,11 +109,6 @@ acia6850_device::acia6850_device(const machine_config &mconfig, device_type type
 
 void acia6850_device::device_start()
 {
-	// resolve callbacks
-	m_txd_handler.resolve_safe();
-	m_rts_handler.resolve_safe();
-	m_irq_handler.resolve_safe();
-
 	save_item(NAME(m_status));
 	save_item(NAME(m_tdr));
 	save_item(NAME(m_rdr));

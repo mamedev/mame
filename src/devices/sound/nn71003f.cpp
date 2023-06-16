@@ -20,7 +20,6 @@ nn71003f_device::nn71003f_device(const machine_config &mconfig, const char *tag,
 
 void nn71003f_device::device_start()
 {
-	m_miso.resolve_safe();
 	save_item(NAME(m_ss));
 	save_item(NAME(m_sclk));
 	save_item(NAME(m_mosi));

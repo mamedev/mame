@@ -79,24 +79,6 @@ void scsi_port_device::device_start()
 			m_device_count = i + 1;
 	}
 
-	m_bsy_handler.resolve_safe();
-	m_sel_handler.resolve_safe();
-	m_cd_handler.resolve_safe();
-	m_io_handler.resolve_safe();
-	m_msg_handler.resolve_safe();
-	m_req_handler.resolve_safe();
-	m_ack_handler.resolve_safe();
-	m_atn_handler.resolve_safe();
-	m_rst_handler.resolve_safe();
-	m_data0_handler.resolve_safe();
-	m_data1_handler.resolve_safe();
-	m_data2_handler.resolve_safe();
-	m_data3_handler.resolve_safe();
-	m_data4_handler.resolve_safe();
-	m_data5_handler.resolve_safe();
-	m_data6_handler.resolve_safe();
-	m_data7_handler.resolve_safe();
-
 	m_data0_handler(0);
 	m_data1_handler(0);
 	m_data2_handler(0);

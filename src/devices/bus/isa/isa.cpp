@@ -223,20 +223,6 @@ void isa8_device::device_config_complete()
 
 void isa8_device::device_resolve_objects()
 {
-	// resolve callbacks
-	m_write_iochrdy.resolve_safe();
-	m_write_iochck.resolve_safe();
-
-	m_out_irq2_cb.resolve_safe();
-	m_out_irq3_cb.resolve_safe();
-	m_out_irq4_cb.resolve_safe();
-	m_out_irq5_cb.resolve_safe();
-	m_out_irq6_cb.resolve_safe();
-	m_out_irq7_cb.resolve_safe();
-	m_out_drq1_cb.resolve_safe();
-	m_out_drq2_cb.resolve_safe();
-	m_out_drq3_cb.resolve_safe();
-
 	m_iowidth = m_iospace->data_width();
 	m_memwidth = m_memspace->data_width();
 }
@@ -519,27 +505,6 @@ isa16_device::isa16_device(const machine_config &mconfig, const char *tag, devic
 	m_out_drq6_cb(*this),
 	m_out_drq7_cb(*this)
 {
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void isa16_device::device_start()
-{
-	isa8_device::device_start();
-
-	// resolve callbacks
-	m_out_irq10_cb.resolve_safe();
-	m_out_irq11_cb.resolve_safe();
-	m_out_irq12_cb.resolve_safe();
-	m_out_irq14_cb.resolve_safe();
-	m_out_irq15_cb.resolve_safe();
-
-	m_out_drq0_cb.resolve_safe();
-	m_out_drq5_cb.resolve_safe();
-	m_out_drq6_cb.resolve_safe();
-	m_out_drq7_cb.resolve_safe();
 }
 
 template<typename R, typename W> void isa16_device::install16_device(offs_t start, offs_t end, R rhandler, W whandler)

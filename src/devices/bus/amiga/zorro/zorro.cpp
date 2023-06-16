@@ -74,20 +74,6 @@ zorro_bus_device_base::zorro_bus_device_base(const machine_config &mconfig, devi
 }
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void zorro_bus_device_base::device_resolve_objects()
-{
-	// resolve callbacks
-	m_ovr_handler.resolve_safe();
-	m_int2_handler.resolve_safe();
-	m_int6_handler.resolve_safe();
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -121,21 +107,6 @@ exp_slot_device::exp_slot_device(const machine_config &mconfig, device_type type
 	m_ipl_handler(*this),
 	m_dev(nullptr)
 {
-}
-
-//-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void exp_slot_device::device_resolve_objects()
-{
-	// call base device
-	zorro_bus_device_base::device_resolve_objects();
-
-	// resolve callbacks
-	m_ipl_handler.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -206,24 +177,6 @@ zorro2_bus_device::zorro2_bus_device(const machine_config &mconfig, device_type 
 
 zorro2_bus_device::~zorro2_bus_device()
 {
-}
-
-//-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void zorro2_bus_device::device_resolve_objects()
-{
-	// call base device
-	zorro_bus_device_base::device_resolve_objects();
-
-	// resolve callbacks
-	m_eint1_handler.resolve_safe();
-	m_eint4_handler.resolve_safe();
-	m_eint5_handler.resolve_safe();
-	m_eint7_handler.resolve_safe();
 }
 
 //-------------------------------------------------

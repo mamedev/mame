@@ -77,7 +77,7 @@ DEFINE_DEVICE_TYPE(SEIBU_SOUND, seibu_sound_device, "seibu_sound", "Seibu Sound 
 seibu_sound_device::seibu_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SEIBU_SOUND, tag, owner, clock),
 		m_int_cb(*this),
-		m_ym_read_cb(*this),
+		m_ym_read_cb(*this, 0),
 		m_ym_write_cb(*this),
 		m_sound_rom(*this, finder_base::DUMMY_TAG),
 		m_rom_bank(*this, finder_base::DUMMY_TAG),
@@ -96,10 +96,6 @@ seibu_sound_device::seibu_sound_device(const machine_config &mconfig, const char
 
 void seibu_sound_device::device_start()
 {
-	m_int_cb.resolve_safe();
-	m_ym_read_cb.resolve_safe(0);
-	m_ym_write_cb.resolve_safe();
-
 	if (m_sound_rom.found() && m_rom_bank.found())
 	{
 		if (m_sound_rom.length() > 0x10000)

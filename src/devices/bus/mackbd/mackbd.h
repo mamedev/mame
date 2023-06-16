@@ -49,7 +49,6 @@ public:
 	void data_w(int state);
 
 protected:
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
 private:

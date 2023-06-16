@@ -36,9 +36,6 @@ ds8874_device::ds8874_device(const machine_config &mconfig, const char *tag, dev
 
 void ds8874_device::device_start()
 {
-	// resolve callbacks
-	m_write_output.resolve_safe();
-
 	// zerofill
 	m_data = 0;
 	m_cp = 0;

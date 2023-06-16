@@ -121,6 +121,5 @@ void isbc_208_device::device_reset()
 void isbc_208_device::device_start()
 {
 	m_maincpu_mem = &m_maincpu->space(AS_PROGRAM);
-	m_out_irq_func.resolve_safe();
 }
 

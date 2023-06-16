@@ -64,11 +64,6 @@ cmos_40105_device::cmos_40105_device(const machine_config &mconfig, const char *
 
 void cmos_40105_device::device_start()
 {
-	// resolve callbacks
-	m_write_dir.resolve_safe();
-	m_write_dor.resolve_safe();
-	m_write_q.resolve_safe();
-
 	// state saving
 	save_item(NAME(m_d));
 	save_item(NAME(m_q));

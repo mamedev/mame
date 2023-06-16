@@ -15,9 +15,9 @@ DEFINE_DEVICE_TYPE(KR2376_12,  kr2376_12_device,  "kr2376_12",  "SMC KR2376-12 K
 
 kr2376_device::kr2376_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	m_read_x(*this),
-	m_read_shift(*this),
-	m_read_control(*this),
+	m_read_x(*this, 0x7ff),
+	m_read_shift(*this, 0),
+	m_read_control(*this, 0),
 	m_write_strobe(*this)
 {
 }
@@ -166,12 +166,6 @@ uint8_t kr2376_12_device::key_codes(int mode, int x, int y)
 
 void kr2376_device::device_start()
 {
-	/* resolve callbacks */
-	m_read_x.resolve_all_safe(0x7ff);
-	m_read_shift.resolve_safe(0);
-	m_read_control.resolve_safe(0);
-	m_write_strobe.resolve_safe();
-
 	/* set initial values */
 	m_ring11 = 0;
 	m_ring8 = 0;

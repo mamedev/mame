@@ -62,8 +62,7 @@ public:
 	int eoc_so_r() { return eoc_r() && so_r(); }
 
 protected:
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 
 private:

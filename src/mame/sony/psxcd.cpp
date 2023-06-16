@@ -92,7 +92,6 @@ psxcd_device::psxcd_device(const machine_config &mconfig, const char *tag, devic
 void psxcd_device::device_start()
 {
 	cdrom_image_device::device_start();
-	m_irq_handler.resolve_safe();
 
 	uint32_t sysclk = m_maincpu->clock() / 2;
 	start_read_delay = (sysclk / 60);

@@ -55,15 +55,9 @@ DEFINE_DEVICE_TYPE(SGI_MACE, mace_device, "sgimace", "SGI MACE")
 mace_device::mace_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SGI_MACE, tag, owner, clock)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
-	, m_rtc_read_callback(*this)
+	, m_rtc_read_callback(*this, 0)
 	, m_rtc_write_callback(*this)
 {
-}
-
-void mace_device::device_resolve_objects()
-{
-	m_rtc_read_callback.resolve_safe(0);
-	m_rtc_write_callback.resolve_safe();
 }
 
 void mace_device::device_start()

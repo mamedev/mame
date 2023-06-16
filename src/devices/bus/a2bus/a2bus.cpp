@@ -152,15 +152,6 @@ a2bus_device::a2bus_device(const machine_config &mconfig, device_type type, cons
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void a2bus_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_out_irq_cb.resolve_safe();
-	m_out_nmi_cb.resolve_safe();
-	m_out_inh_cb.resolve_safe();
-	m_out_dma_cb.resolve_safe();
-}
-
 void a2bus_device::device_start()
 {
 	// clear slots

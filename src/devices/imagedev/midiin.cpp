@@ -77,7 +77,6 @@ ioport_constructor midiin_device::device_input_ports() const
 
 void midiin_device::device_start()
 {
-	m_input_cb.resolve_safe();
 	m_timer = timer_alloc(FUNC(midiin_device::midi_update), this);
 	m_midi.reset();
 	m_timer->enable(false);

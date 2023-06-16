@@ -268,11 +268,11 @@ decocpu_type1_device::decocpu_type1_device(const machine_config &mconfig, device
 		, m_pia34(*this, "pia34")
 		, m_rom(*this, finder_base::DUMMY_TAG)
 		, m_diags(*this, "DIAGS")
-		, m_read_display(*this)
+		, m_read_display(*this, 0)
 		, m_write_display(*this)
-		, m_read_dmdstatus(*this)
+		, m_read_dmdstatus(*this, 0)
 		, m_write_soundlatch(*this)
-		, m_read_switch(*this)
+		, m_read_switch(*this, 0)
 		, m_write_switch(*this)
 		, m_write_lamp(*this)
 		, m_write_solenoid(*this)
@@ -282,16 +282,6 @@ decocpu_type1_device::decocpu_type1_device(const machine_config &mconfig, device
 
 void decocpu_type1_device::device_start()
 {
-	// resolve callbacks
-	m_read_display.resolve_safe(0);
-	m_write_display.resolve_safe();
-	m_read_dmdstatus.resolve_safe(0);
-	m_write_soundlatch.resolve_safe();
-	m_read_switch.resolve_safe(0);
-	m_write_switch.resolve_safe();
-	m_write_lamp.resolve_safe();
-	m_write_solenoid.resolve_safe();
-
 	m_irq_timer = timer_alloc(FUNC(decocpu_type1_device::irq_trigger), this);
 	m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES, E_CLOCK), 1);
 	m_irq_active = false;

@@ -72,9 +72,6 @@ void ti8x_link_port_device::ring_w(int state)
 
 void ti8x_link_port_device::device_start()
 {
-	m_tip_handler.resolve_safe();
-	m_ring_handler.resolve_safe();
-
 	save_item(NAME(m_tip_in));
 	save_item(NAME(m_tip_out));
 	save_item(NAME(m_ring_in));

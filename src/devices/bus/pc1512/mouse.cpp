@@ -69,12 +69,6 @@ pc1512_mouse_device::pc1512_mouse_device(const machine_config &mconfig, const ch
 void pc1512_mouse_port_device::device_start()
 {
 	m_device = get_card_device();
-
-	// resolve callbacks
-	m_write_x.resolve_safe();
-	m_write_y.resolve_safe();
-	m_write_m1.resolve_safe();
-	m_write_m2.resolve_safe();
 }
 
 void pc1512_mouse_device::device_start()

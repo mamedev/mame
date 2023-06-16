@@ -191,11 +191,6 @@ void fifo2812_device::write(u8 data)
 
 void fifo2812_device::device_resolve_objects()
 {
-	m_q_cb.resolve_safe();
-	m_ir_cb.resolve_safe();
-	m_or_cb.resolve_safe();
-	m_flag_cb.resolve_safe();
-
 	m_d = 0U;
 	m_mr = 1U;
 	m_pl = 0U;

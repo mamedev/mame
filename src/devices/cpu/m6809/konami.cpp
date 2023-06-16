@@ -104,9 +104,6 @@ void konami_cpu_device::device_start()
 {
 	super::device_start();
 
-	// resolve callbacks
-	m_set_lines.resolve();
-
 	// initialize variables
 	m_temp_im = 0;
 	m_bcount = 0;
@@ -307,8 +304,7 @@ inline void konami_cpu_device::divx()
 
 void konami_cpu_device::set_lines(uint8_t data)
 {
-	if (!m_set_lines.isnull())
-		m_set_lines((offs_t)0, data);
+	m_set_lines(offs_t(0), data);
 }
 
 

@@ -61,11 +61,6 @@ void ttl741745_device::device_start()
 	save_item(NAME(m_q2));
 	save_item(NAME(m_q3));
 	save_item(NAME(m_q4));
-
-	m_q1_func.resolve_safe();
-	m_q2_func.resolve_safe();
-	m_q3_func.resolve_safe();
-	m_q4_func.resolve_safe();
 }
 
 void ttl741745_device::device_reset()
@@ -81,9 +76,6 @@ void ttl74174_device::device_start()
 	save_item(NAME(m_d6));
 	save_item(NAME(m_q5));
 	save_item(NAME(m_q6));
-
-	m_q5_func.resolve_safe();
-	m_q6_func.resolve_safe();
 }
 
 void ttl74175_device::device_start()
@@ -92,11 +84,6 @@ void ttl74175_device::device_start()
 	save_item(NAME(m_not_q2));
 	save_item(NAME(m_not_q3));
 	save_item(NAME(m_not_q4));
-
-	m_not_q1_func.resolve_safe();
-	m_not_q2_func.resolve_safe();
-	m_not_q3_func.resolve_safe();
-	m_not_q4_func.resolve_safe();
 }
 
 void ttl741745_device::init()

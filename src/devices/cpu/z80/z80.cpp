@@ -3591,16 +3591,12 @@ void z80_device::device_start()
 	m_cc_xy = cc_xy;
 	m_cc_xycb = cc_xycb;
 	m_cc_ex = cc_ex;
-
-	m_irqack_cb.resolve_safe();
-	m_refresh_cb.resolve_safe();
-	m_nomreq_cb.resolve_safe();
-	m_halt_cb.resolve_safe();
 }
 
 void nsc800_device::device_start()
 {
 	z80_device::device_start();
+
 	save_item(NAME(m_nsc800_irq_state));
 }
 

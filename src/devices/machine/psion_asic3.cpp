@@ -29,20 +29,8 @@ DEFINE_DEVICE_TYPE(PSION_ASIC3, psion_asic3_device, "psion_asic3", "Psion ASIC3"
 
 psion_asic3_device::psion_asic3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PSION_ASIC3, tag, owner, clock)
-	, m_adin_cb(*this)
+	, m_adin_cb(*this, 0)
 {
-}
-
-
-//-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void psion_asic3_device::device_resolve_objects()
-{
-	m_adin_cb.resolve_safe(0);
 }
 
 

@@ -171,15 +171,6 @@ i82371sb_isa_device::i82371sb_isa_device(const machine_config &mconfig, device_t
 {
 }
 
-void i82371sb_isa_device::device_start()
-{
-	pci_device::device_start();
-	m_smi_callback.resolve();
-	m_nmi_callback.resolve_safe();
-	m_stpclk_callback.resolve_safe();
-	m_boot_state_hook.resolve();
-}
-
 void i82371sb_isa_device::device_reset()
 {
 	pci_device::device_reset();
@@ -1026,8 +1017,6 @@ void i82371sb_ide_device::device_start()
 	status = 0x0280;
 	command = 2;
 	command_mask = 5;
-	m_irq_pri_callback.resolve();
-	m_irq_sec_callback.resolve();
 }
 
 void i82371sb_ide_device::device_reset()

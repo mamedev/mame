@@ -1082,10 +1082,6 @@ int geneve_gate_array_device::get_prefix(int lines)
 
 void geneve_gate_array_device::device_start()
 {
-	m_keyint.resolve_safe();
-	m_keyb_clk.resolve_safe();
-	m_keyb_data.resolve_safe();
-
 	m_geneve_mode = false;
 	m_direct_mode = true;
 
@@ -1382,8 +1378,6 @@ void geneve_pal_device::set_ready()
 
 void geneve_pal_device::device_start()
 {
-	m_ready.resolve_safe();
-
 	save_item(NAME(m_pin3));
 	save_item(NAME(m_pin4));
 	save_item(NAME(m_pin5));

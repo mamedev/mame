@@ -53,10 +53,6 @@ void psi_keyboard_bus_device::device_start()
 {
 	// get connected keyboard
 	m_kbd = get_card_device();
-
-	// resolve callbacks
-	m_rx_handler.resolve_safe();
-	m_key_strobe_handler.resolve_safe();
 }
 
 //-------------------------------------------------

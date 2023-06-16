@@ -208,7 +208,7 @@ uint8_t m68340_cpu_device::m68340_internal_sim_ports_r(offs_t offset)
 			sim.m_porta &= sim.m_ddra;
 			// TODO: call callback
 
-			if (!m_pa_in_cb.isnull())
+			if (!m_pa_in_cb.isunset())
 			{
 				sim.m_porta |= (m_pa_in_cb() & ~sim.m_ddra);
 			}
@@ -245,7 +245,7 @@ uint8_t m68340_cpu_device::m68340_internal_sim_ports_r(offs_t offset)
 			sim.m_portb &= sim.m_ddrb;
 			// TODO: call callback
 
-			if (!m_pb_in_cb.isnull())
+			if (!m_pb_in_cb.isunset())
 			{
 				sim.m_portb |= (m_pb_in_cb() & ~sim.m_ddrb);
 			}
@@ -470,14 +470,6 @@ void m68340_cpu_device::start_68340_sim()
 	LOG("%s\n", FUNCNAME);
 	LOGCLOCK( " - Clock: %d [0x%08x]\n", clock(), clock());
 	m_irq_timer = timer_alloc(FUNC(m68340_cpu_device::periodic_interrupt_timer_callback), this);
-
-	// resolve callbacks Port A
-	m_pa_out_cb.resolve_safe();
-	m_pa_in_cb.resolve();
-
-	// resolve callbacks Port B
-	m_pb_out_cb.resolve_safe();
-	m_pb_in_cb.resolve();
 
 	// Setup correct VCO/clock speed based on reset values and crystal
 	assert(m_m68340SIM);

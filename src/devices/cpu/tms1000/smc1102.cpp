@@ -60,8 +60,6 @@ void smc1102_cpu_device::device_start()
 {
 	tms1100_cpu_device::device_start();
 
-	m_write_segs.resolve_safe();
-
 	// zerofill
 	memset(m_lcd_ram, 0, sizeof(m_lcd_ram));
 	m_lcd_sr = 0;

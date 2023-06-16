@@ -65,18 +65,17 @@ public:
 protected:
 	m6801_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const m6800_cpu_device::op_func *insn, const uint8_t *cycles, address_map_constructor internal = address_map_constructor());
 
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_execute_interface overrides
+	// device_execute_interface implementation
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 4); }
 	virtual uint32_t execute_input_lines() const noexcept override { return 5; }
 	virtual void execute_set_input(int inputnum, int state) override;
 
-	// device_disasm_interface overrides
+	// device_disasm_interface implementation
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	void p1_ddr_w(uint8_t data);
@@ -265,8 +264,7 @@ public:
 protected:
 	hd6301x_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

@@ -35,6 +35,9 @@
 
 #include "imagedev/magtape.h"
 
+#include <algorithm>
+#include <iterator>
+
 enum
 {
 	w0_offline          = 0x8000,
@@ -968,8 +971,7 @@ tap_990_device::tap_990_device(const machine_config &mconfig, const char *tag, d
 
 void tap_990_device::device_start()
 {
-	m_int_line.resolve();
-	memset(m_w, 0, sizeof(m_w));
+	std::fill(std::begin(m_w), std::end(m_w), 0);
 
 	// The PE bit is always set for the MT3200 (but not MT1600)
 	// According to MT3200 manual, w7 bit #4 (reserved) is always set

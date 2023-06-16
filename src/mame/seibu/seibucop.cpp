@@ -286,9 +286,6 @@ void raiden2cop_device::device_start()
 	save_item(NAME(m_LEGACY_r0));
 	save_item(NAME(m_LEGACY_r1));
 
-	m_videoramout_cb.resolve_safe();
-	m_paletteramout_cb.resolve_safe();
-
 	m_host_space = &m_host_cpu->space(AS_PROGRAM);
 	m_host_endian = m_host_space->endianness() == ENDIANNESS_BIG; // m_cpu_is_68k
 

@@ -89,18 +89,6 @@ psion_ssd_device::~psion_ssd_device()
 
 
 //-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void psion_ssd_device::device_resolve_objects()
-{
-	m_door_cb.resolve_safe();
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

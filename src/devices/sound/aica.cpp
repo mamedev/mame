@@ -662,7 +662,7 @@ void aica_device::UpdateReg(int reg)
 
 		case 0x90:
 		case 0x91:
-			if (!m_irq_cb.isnull())
+			if (!m_irq_cb.isunset())
 			{
 				u32 time;
 
@@ -681,7 +681,7 @@ void aica_device::UpdateReg(int reg)
 			break;
 		case 0x94:
 		case 0x95:
-			if (!m_irq_cb.isnull())
+			if (!m_irq_cb.isunset())
 			{
 				u32 time;
 
@@ -700,7 +700,7 @@ void aica_device::UpdateReg(int reg)
 			break;
 		case 0x98:
 		case 0x99:
-			if (!m_irq_cb.isnull())
+			if (!m_irq_cb.isunset())
 			{
 				u32 time;
 
@@ -727,7 +727,7 @@ void aica_device::UpdateReg(int reg)
 		case 0xa4:  //SCIRE
 		case 0xa5:
 
-			if (!m_irq_cb.isnull())
+			if (!m_irq_cb.isunset())
 			{
 				m_udata.data[0xa0 / 2] &= ~m_udata.data[0xa4 / 2];
 				ResetInterrupts();
@@ -754,7 +754,7 @@ void aica_device::UpdateReg(int reg)
 		case 0xad:
 		case 0xb0:
 		case 0xb1:
-			if (!m_irq_cb.isnull())
+			if (!m_irq_cb.isunset())
 			{
 				m_IrqTimA = DecodeSCI(SCITMA);
 				m_IrqTimBC = DecodeSCI(SCITMB);
@@ -1403,10 +1403,6 @@ void aica_device::device_start()
 
 	// init the emulation
 	Init();
-
-	// set up the IRQ callbacks
-	m_irq_cb.resolve_safe();
-	m_main_irq_cb.resolve_safe();
 
 	m_stream = stream_alloc(2, 2, (int)m_rate);
 

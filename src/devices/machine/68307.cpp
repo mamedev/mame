@@ -61,7 +61,7 @@ m68307_cpu_device::m68307_cpu_device(const machine_config &mconfig, const char *
 	m_write_irq(*this),
 	m_write_a_tx(*this),
 	m_write_b_tx(*this),
-	m_read_inport(*this),
+	m_read_inport(*this, 0),
 	m_write_outport(*this),
 	m_porta_r(*this),
 	m_porta_w(*this),
@@ -251,12 +251,6 @@ void m68307_cpu_device::device_start()
 	m_m68307_base = 0xbfff;
 	m_m68307_scrhigh = 0x0007;
 	m_m68307_scrlow = 0xf010;
-
-	m_write_irq.resolve_safe();
-	m_write_a_tx.resolve_safe();
-	m_write_b_tx.resolve_safe();
-	m_read_inport.resolve();
-	m_write_outport.resolve_safe();
 
 	m_porta_r.set(nullptr);
 	m_porta_w.set(nullptr);

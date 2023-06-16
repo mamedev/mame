@@ -198,13 +198,6 @@ void heath_z37_fdc_device::device_add_mconfig(machine_config &config)
 	m_floppies[3]->enable_sound(true);
 }
 
-void heath_z37_fdc_device::device_resolve_objects()
-{
-	m_fd_irq_cb.resolve_safe();
-	m_drq_cb.resolve_safe();
-	m_block_interrupt_cb.resolve_safe();
-}
-
 void heath_z37_fdc_device::set_irq(uint8_t data)
 {
 	m_fd_irq_cb(m_intrq_allowed ? data : CLEAR_LINE);

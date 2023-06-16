@@ -291,15 +291,6 @@ at_kbc_device_base::at_kbc_device_base(machine_config const &mconfig, device_typ
 {
 }
 
-void at_kbc_device_base::device_resolve_objects()
-{
-	m_hot_res_cb.resolve_safe();
-	m_gate_a20_cb.resolve_safe();
-	m_kbd_irq_cb.resolve_safe();
-	m_kbd_clk_cb.resolve_safe();
-	m_kbd_data_cb.resolve_safe();
-}
-
 void at_kbc_device_base::device_start()
 {
 	save_item(NAME(m_hot_res));
@@ -475,15 +466,6 @@ void ps2_keyboard_controller_device::device_add_mconfig(machine_config &config)
 	m_mcu->p2_out_cb().set(FUNC(ps2_keyboard_controller_device::p2_w));
 	m_mcu->t0_in_cb().set([this] () { return kbd_clk_r(); });
 	m_mcu->t1_in_cb().set([this] () { return aux_clk_r(); });
-}
-
-void ps2_keyboard_controller_device::device_resolve_objects()
-{
-	at_kbc_device_base::device_resolve_objects();
-
-	m_aux_irq_cb.resolve_safe();
-	m_aux_clk_cb.resolve_safe();
-	m_aux_data_cb.resolve_safe();
 }
 
 void ps2_keyboard_controller_device::device_start()

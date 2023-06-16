@@ -69,8 +69,6 @@ void pcf8583_device::device_start()
 	save_item(NAME(m_irq));
 	save_item(NAME(m_data));
 	save_item(NAME(m_slave_address));
-
-	m_irq_cb.resolve_safe();
 }
 
 TIMER_CALLBACK_MEMBER(pcf8583_device::clock_tick)

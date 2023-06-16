@@ -473,7 +473,7 @@ hdc92x4_device::hdc92x4_device(const machine_config &mconfig, device_type type, 
 	m_out_dmarq(*this),
 	m_out_dip(*this),
 	m_out_auxbus(*this),
-	m_in_dma(*this),
+	m_in_dma(*this, 0),
 	m_out_dma(*this),
 	m_initialized(false)
 {
@@ -4787,13 +4787,6 @@ void hdc92x4_device::reset(int state)
 
 void hdc92x4_device::device_start()
 {
-	m_out_intrq.resolve_safe();
-	m_out_dip.resolve_safe();
-	m_out_auxbus.resolve_safe();
-	m_out_dmarq.resolve_safe();
-	m_out_dma.resolve_safe();
-	m_in_dma.resolve_safe(0);
-
 	// allocate timers
 	m_timer = timer_alloc(FUNC(hdc92x4_device::gen_timer_expired), this);
 	m_cmd_timer = timer_alloc(FUNC(hdc92x4_device::com_timer_expired), this);

@@ -238,7 +238,7 @@ public:
 	void mouse_status_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

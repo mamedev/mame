@@ -85,18 +85,6 @@ void upc82c711_device::device_start()
 	irq = drq = false;
 	fdc_irq = fdc_drq = false;
 
-	m_fintr_callback.resolve_safe();
-	m_fdrq_callback.resolve_safe();
-	m_pintr_callback.resolve_safe();
-	m_irq3_callback.resolve_safe();
-	m_irq4_callback.resolve_safe();
-	m_txd1_callback.resolve_safe();
-	m_dtr1_callback.resolve_safe();
-	m_rts1_callback.resolve_safe();
-	m_txd2_callback.resolve_safe();
-	m_dtr2_callback.resolve_safe();
-	m_rts2_callback.resolve_safe();
-
 	// default addresses
 	com_address[0] = 0x3f8;
 	com_address[1] = 0x2f8;

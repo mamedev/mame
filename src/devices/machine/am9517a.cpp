@@ -441,42 +441,41 @@ void am9517a_device::end_of_process()
 //-------------------------------------------------
 
 
-am9517a_device::am9517a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
-		device_execute_interface(mconfig, *this),
-		m_icount(0),
-		m_hack(0),
-		m_ready(1),
-		m_command(0),
-		m_status(0),
-		m_out_hreq_cb(*this),
-		m_out_eop_cb(*this),
-		m_in_memr_cb(*this),
-		m_out_memw_cb(*this),
-		m_in_ior_cb(*this),
-		m_out_iow_cb(*this),
-		m_out_dack_cb(*this)
+am9517a_device::am9517a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_execute_interface(mconfig, *this),
+	m_icount(0),
+	m_hack(0),
+	m_ready(1),
+	m_command(0),
+	m_status(0),
+	m_out_hreq_cb(*this),
+	m_out_eop_cb(*this),
+	m_in_memr_cb(*this, 0),
+	m_out_memw_cb(*this),
+	m_in_ior_cb(*this, 0),
+	m_out_iow_cb(*this),
+	m_out_dack_cb(*this)
 {
 }
 
 
-am9517a_device::am9517a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: am9517a_device(mconfig, AM9517A, tag, owner, clock)
+am9517a_device::am9517a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	am9517a_device(mconfig, AM9517A, tag, owner, clock)
 {
 }
 
-v5x_dmau_device::v5x_dmau_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: am9517a_device(mconfig, V5X_DMAU, tag, owner, clock)
-	, m_in_mem16r_cb(*this)
-	, m_out_mem16w_cb(*this)
-	, m_in_io16r_cb(*this)
-	, m_out_io16w_cb(*this)
-
+v5x_dmau_device::v5x_dmau_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	am9517a_device(mconfig, V5X_DMAU, tag, owner, clock),
+	m_in_mem16r_cb(*this, 0),
+	m_out_mem16w_cb(*this),
+	m_in_io16r_cb(*this, 0),
+	m_out_io16w_cb(*this)
 {
 }
 
-pcxport_dmac_device::pcxport_dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: am9517a_device(mconfig, PCXPORT_DMAC, tag, owner, clock)
+pcxport_dmac_device::pcxport_dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	am9517a_device(mconfig, PCXPORT_DMAC, tag, owner, clock)
 {
 }
 
@@ -488,15 +487,6 @@ void am9517a_device::device_start()
 {
 	// set our instruction counter
 	set_icountptr(m_icount);
-
-	// resolve callbacks
-	m_out_hreq_cb.resolve_safe();
-	m_out_eop_cb.resolve_safe();
-	m_in_memr_cb.resolve_safe(0);
-	m_out_memw_cb.resolve_safe();
-	m_in_ior_cb.resolve_all_safe(0);
-	m_out_iow_cb.resolve_all_safe();
-	m_out_dack_cb.resolve_all_safe();
 
 	for(auto &elem : m_channel)
 	{
@@ -1020,11 +1010,6 @@ void v5x_dmau_device::device_start()
 {
 	am9517a_device::device_start();
 	m_address_mask = 0x00ffffff;
-
-	m_in_mem16r_cb.resolve_safe(0);
-	m_out_mem16w_cb.resolve_safe();
-	m_in_io16r_cb.resolve_all_safe(0);
-	m_out_io16w_cb.resolve_all_safe();
 
 	m_selected_channel = 0;
 	m_base = 0;

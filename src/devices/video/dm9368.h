@@ -44,8 +44,7 @@ public:
 	int rbo_r() { return m_rbo; }
 
 protected:
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
 	virtual void device_start() override;
 
 	void update();

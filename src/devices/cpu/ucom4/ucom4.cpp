@@ -72,10 +72,10 @@ ucom4_cpu_device::ucom4_cpu_device(const machine_config &mconfig, device_type ty
 	, m_datawidth(datawidth)
 	, m_family(family)
 	, m_stack_levels(stack_levels)
-	, m_read_a(*this)
-	, m_read_b(*this)
-	, m_read_c(*this)
-	, m_read_d(*this)
+	, m_read_a(*this, 0)
+	, m_read_b(*this, 0)
+	, m_read_c(*this, 0)
+	, m_read_d(*this, 0)
 	, m_write_c(*this)
 	, m_write_d(*this)
 	, m_write_e(*this)
@@ -161,20 +161,6 @@ void ucom4_cpu_device::device_start()
 	m_dph_mask = m_datamask >> 4;
 
 	m_timer = timer_alloc(FUNC(ucom4_cpu_device::simple_timer_cb), this);
-
-	// resolve callbacks
-	m_read_a.resolve_safe(0);
-	m_read_b.resolve_safe(0);
-	m_read_c.resolve_safe(0);
-	m_read_d.resolve_safe(0);
-
-	m_write_c.resolve_safe();
-	m_write_d.resolve_safe();
-	m_write_e.resolve_safe();
-	m_write_f.resolve_safe();
-	m_write_g.resolve_safe();
-	m_write_h.resolve_safe();
-	m_write_i.resolve_safe();
 
 	// zerofill
 	memset(m_stack, 0, sizeof(m_stack));

@@ -68,12 +68,6 @@ x68k_expansion_slot_device::~x68k_expansion_slot_device()
 void x68k_expansion_slot_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_out_irq2_cb.resolve_safe();
-	m_out_irq4_cb.resolve_safe();
-	m_out_nmi_cb.resolve_safe();
-	m_out_reset_cb.resolve_safe();
 }
 
 

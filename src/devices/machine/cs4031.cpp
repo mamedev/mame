@@ -161,7 +161,7 @@ void cs4031_device::device_add_mconfig(machine_config &config)
 
 cs4031_device::cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CS4031, tag, owner, clock),
-	m_read_ior(*this),
+	m_read_ior(*this, 0),
 	m_write_iow(*this),
 	m_write_tc(*this),
 	m_write_hold(*this),
@@ -212,17 +212,6 @@ void cs4031_device::device_start()
 	// make sure the ram device is already running
 	if (!m_ram_dev->started())
 		throw device_missing_dependencies();
-
-	// resolve callbacks
-	m_read_ior.resolve_safe(0);
-	m_write_iow.resolve_safe();
-	m_write_tc.resolve_safe();
-	m_write_hold.resolve_safe();
-	m_write_nmi.resolve_safe();
-	m_write_intr.resolve_safe();
-	m_write_cpureset.resolve_safe();
-	m_write_a20m.resolve_safe();
-	m_write_spkr.resolve_safe();
 
 	// register for state saving
 	save_item(NAME(m_dma_eop));

@@ -72,11 +72,6 @@ void fifo7200_device::device_start()
 	assert(m_ram_size > 1 && ~m_ram_size & 1);
 	m_buffer.resize(m_ram_size);
 
-	// resolve callbacks
-	m_ef_handler.resolve_safe();
-	m_ff_handler.resolve_safe();
-	m_hf_handler.resolve_safe();
-
 	// state save
 	save_item(NAME(m_buffer));
 	save_item(NAME(m_read_ptr));

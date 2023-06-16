@@ -29,7 +29,7 @@ public:
 protected:
 	devcb_read16  m_parallel_r_cb;
 	devcb_write16 m_parallel_w_cb;
-	devcb_write_line m_tx_cb[3];
+	devcb_write_line::array<3> m_tx_cb;
 
 	void device_start() override;
 	void device_reset() override;

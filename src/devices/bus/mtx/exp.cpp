@@ -77,11 +77,6 @@ mtx_exp_slot_device::mtx_exp_slot_device(const machine_config &mconfig, const ch
 void mtx_exp_slot_device::device_start()
 {
 	m_card = get_card_device();
-
-	// resolve callbacks
-	m_busreq_handler.resolve_safe();
-	m_int_handler.resolve_safe();
-	m_nmi_handler.resolve_safe();
 }
 
 

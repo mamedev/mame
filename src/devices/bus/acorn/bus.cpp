@@ -83,9 +83,6 @@ void acorn_bus_device::add_slot(acorn_bus_slot_device &slot)
 
 void acorn_bus_device::device_start()
 {
-	// resolve callbacks
-	m_out_irq_cb.resolve_safe();
-	m_out_nmi_cb.resolve_safe();
 }
 
 //-------------------------------------------------

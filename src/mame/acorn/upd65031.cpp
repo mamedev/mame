@@ -268,7 +268,7 @@ inline void upd65031_device::set_mode(int mode)
 upd65031_device::upd65031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, UPD65031, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
-	m_read_kb(*this),
+	m_read_kb(*this, 0),
 	m_write_int(*this),
 	m_write_nmi(*this),
 	m_write_spkr(*this),
@@ -290,16 +290,6 @@ upd65031_device::upd65031_device(const machine_config &mconfig, const char *tag,
 
 void upd65031_device::device_start()
 {
-	// resolve callbacks
-	m_read_kb.resolve_safe(0);
-	m_write_int.resolve_safe();
-	m_write_nmi.resolve_safe();
-	m_write_spkr.resolve_safe();
-	m_write_txd.resolve_safe();
-	m_write_rts.resolve_safe();
-	m_write_dtr.resolve_safe();
-	m_write_vpp.resolve_safe();
-
 	// bind delegates
 	m_screen_update_cb.resolve();
 	m_out_mem_cb.resolve();

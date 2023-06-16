@@ -280,7 +280,6 @@ void i80286_cpu_device::device_start()
 	state_add( I8086_HALT, "HALT", m_halt ).mask(1);
 
 	m_a20_callback.resolve_safe(0xffffff);
-	m_out_shutdown_func.resolve_safe();
 }
 
 device_memory_interface::space_config_vector i80286_cpu_device::memory_space_config() const

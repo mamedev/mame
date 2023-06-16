@@ -537,7 +537,6 @@ void bally_cheap_squeak_device::device_add_mconfig(machine_config &config)
 
 void bally_cheap_squeak_device::device_start()
 {
-	m_sound_ack_w_handler.resolve();
 	m_leds.resolve();
 
 	save_item(NAME(m_sound_select));
@@ -570,10 +569,7 @@ uint8_t bally_cheap_squeak_device::in_p2_cb()
 void bally_cheap_squeak_device::out_p2_cb(uint8_t data)
 {
 	m_sound_ack = BIT(data, 0);
-	if (!m_sound_ack_w_handler.isnull())
-	{
-		m_sound_ack_w_handler(m_sound_ack);
-	}
+	m_sound_ack_w_handler(m_sound_ack);
 	update_led();
 }
 
