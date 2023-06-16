@@ -120,7 +120,7 @@ private:
 	void audiocpu_irq_ack_w(u8 data);
 	void mcu_irq_ack_w(u8 data);
 	u8 dsw_r(offs_t offset);
-	void coin_w(u8 data);
+	void coin_w(offs_t offset, u8 data, u8 mem_mask);
 	void dac_gain_w(u8 data);
 	void sound_bankswitch_w(u8 data);
 	void mcu_bankswitch_w(u8 data);

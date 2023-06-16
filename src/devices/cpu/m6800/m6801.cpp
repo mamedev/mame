@@ -317,7 +317,6 @@ m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, device_type ty
 	: m6800_cpu_device(mconfig, type, tag, owner, clock, insn, cycles, internal)
 	, m_in_port_func(*this)
 	, m_out_port_func(*this)
-	, m_tri_port_func(*this)
 	, m_out_sc2_func(*this)
 	, m_out_sertx_func(*this)
 	, m_sclk_divider(8)
@@ -358,7 +357,6 @@ hd6301x_cpu_device::hd6301x_cpu_device(const machine_config &mconfig, device_typ
 	: hd6301_cpu_device(mconfig, type, tag, owner, clock, hd63701_insn, cycles_63701)
 	, m_in_portx_func(*this)
 	, m_out_portx_func(*this)
-	, m_tri_portx_func(*this)
 {
 	m_sclk_divider = 16;
 }
@@ -1023,7 +1021,6 @@ void m6801_cpu_device::device_resolve_objects()
 
 	m_in_port_func.resolve_all_safe(0xff);
 	m_out_port_func.resolve_all_safe();
-	m_tri_port_func.resolve_all_safe(0xff);
 	m_out_sc2_func.resolve_safe();
 	m_out_sertx_func.resolve_safe();
 }
@@ -1034,7 +1031,6 @@ void hd6301x_cpu_device::device_resolve_objects()
 
 	m_in_portx_func.resolve_all_safe(0xff);
 	m_out_portx_func.resolve_all_safe();
-	m_tri_portx_func.resolve_all_safe(0xff);
 }
 
 
@@ -1230,7 +1226,7 @@ void m6801_cpu_device::write_port2()
 
 	if ((ddr != 0x1f) && ddr)
 	{
-		data = (m_port_data[1] & ddr) | (~ddr & m_tri_port_func[1]());
+		data = (m_port_data[1] & ddr) | (ddr ^ 0xff);
 	}
 
 	if (m_trcsr & M6801_TRCSR_TE)
@@ -1254,7 +1250,7 @@ void hd6301x_cpu_device::write_port2()
 	if (m_tcsr2 & TCSR2_OE2)
 		ddr |= 0x20;
 
-	uint8_t data = (m_port_data[1] & ddr) | (~ddr & m_tri_port_func[1]());
+	uint8_t data = (m_port_data[1] & ddr) | (ddr ^ 0xff);
 
 	if (m_trcsr & M6801_TRCSR_TE)
 	{
@@ -1293,7 +1289,7 @@ void m6801_cpu_device::p1_ddr_w(uint8_t data)
 	if (m_port_ddr[0] != data)
 	{
 		m_port_ddr[0] = data;
-		m_out_port_func[0](0, (m_port_data[0] & m_port_ddr[0]) | (~m_port_ddr[0] & m_tri_port_func[0]()), m_port_ddr[0]);
+		m_out_port_func[0](0, (m_port_data[0] & m_port_ddr[0]) | (m_port_ddr[0] ^ 0xff), m_port_ddr[0]);
 	}
 }
 
@@ -1310,7 +1306,7 @@ void m6801_cpu_device::p1_data_w(uint8_t data)
 	LOGPORT("Port 1 Data Register: %02x\n", data);
 
 	m_port_data[0] = data;
-	m_out_port_func[0](0, (m_port_data[0] & m_port_ddr[0]) | (~m_port_ddr[0] & m_tri_port_func[0]()), m_port_ddr[0]);
+	m_out_port_func[0](0, (m_port_data[0] & m_port_ddr[0]) | (m_port_ddr[0] ^ 0xff), m_port_ddr[0]);
 }
 
 void m6801_cpu_device::p2_ddr_w(uint8_t data)
@@ -1361,7 +1357,7 @@ void m6801_cpu_device::p3_ddr_w(uint8_t data)
 	if (m_port_ddr[2] != data)
 	{
 		m_port_ddr[2] = data;
-		m_out_port_func[2](0, (m_port_data[2] & m_port_ddr[2]) | (~m_port_ddr[2] & m_tri_port_func[2]()), m_port_ddr[2]);
+		m_out_port_func[2](0, (m_port_data[2] & m_port_ddr[2]) | (m_port_ddr[2] ^ 0xff), m_port_ddr[2]);
 	}
 }
 
@@ -1418,7 +1414,7 @@ void m6801_cpu_device::p3_data_w(uint8_t data)
 	}
 
 	m_port_data[2] = data;
-	m_out_port_func[2](0, (m_port_data[2] & m_port_ddr[2]) | (~m_port_ddr[2] & m_tri_port_func[2]()), m_port_ddr[2]);
+	m_out_port_func[2](0, (m_port_data[2] & m_port_ddr[2]) | (m_port_ddr[2] ^ 0xff), m_port_ddr[2]);
 
 	if (m_p3csr & M6801_P3CSR_OSS)
 	{
@@ -1441,7 +1437,7 @@ void hd6301x_cpu_device::p3_data_w(uint8_t data)
 	LOGPORT("Port 3 Data Register: %02x\n", data);
 
 	m_port_data[2] = data;
-	m_out_port_func[2](0, (m_port_data[2] & m_port_ddr[2]) | (~m_port_ddr[2] & m_tri_port_func[2]()), m_port_ddr[2]);
+	m_out_port_func[2](0, (m_port_data[2] & m_port_ddr[2]) | (m_port_ddr[2] ^ 0xff), m_port_ddr[2]);
 }
 
 uint8_t m6801_cpu_device::p3_csr_r()
@@ -1468,7 +1464,7 @@ void m6801_cpu_device::p4_ddr_w(uint8_t data)
 	if (m_port_ddr[3] != data)
 	{
 		m_port_ddr[3] = data;
-		m_out_port_func[3](0, (m_port_data[3] & m_port_ddr[3]) | (~m_port_ddr[3] & m_tri_port_func[3]()), m_port_ddr[3]);
+		m_out_port_func[3](0, (m_port_data[3] & m_port_ddr[3]) | (m_port_ddr[3] ^ 0xff), m_port_ddr[3]);
 	}
 }
 
@@ -1485,7 +1481,7 @@ void m6801_cpu_device::p4_data_w(uint8_t data)
 	LOGPORT("Port 4 Data Register: %02x\n", data);
 
 	m_port_data[3] = data;
-	m_out_port_func[3](0, (m_port_data[3] & m_port_ddr[3]) | (~m_port_ddr[3] & m_tri_port_func[3]()), m_port_ddr[3]);
+	m_out_port_func[3](0, (m_port_data[3] & m_port_ddr[3]) | (m_port_ddr[3] ^ 0xff), m_port_ddr[3]);
 }
 
 void hd6301y_cpu_device::p5_ddr_w(uint8_t data)
@@ -1495,7 +1491,7 @@ void hd6301y_cpu_device::p5_ddr_w(uint8_t data)
 	if (m_portx_ddr[0] != data)
 	{
 		m_portx_ddr[0] = data;
-		m_out_portx_func[0](0, (m_portx_data[0] & m_portx_ddr[0]) | (~m_portx_ddr[0] & m_tri_portx_func[0]()), m_portx_ddr[0]);
+		m_out_portx_func[0](0, (m_portx_data[0] & m_portx_ddr[0]) | (m_portx_ddr[0] ^ 0xff), m_portx_ddr[0]);
 	}
 }
 
@@ -1518,7 +1514,7 @@ void hd6301y_cpu_device::p5_data_w(uint8_t data)
 	LOGPORT("Port 5 Data Register: %02x\n", data);
 
 	m_portx_data[0] = data;
-	m_out_portx_func[0](0, (m_portx_data[0] & m_portx_ddr[0]) | (~m_portx_ddr[0] & m_tri_portx_func[0]()), m_portx_ddr[0]);
+	m_out_portx_func[0](0, (m_portx_data[0] & m_portx_ddr[0]) | (m_portx_ddr[0] ^ 0xff), m_portx_ddr[0]);
 }
 
 void hd6301x_cpu_device::p6_ddr_w(uint8_t data)
@@ -1528,7 +1524,7 @@ void hd6301x_cpu_device::p6_ddr_w(uint8_t data)
 	if (m_portx_ddr[1] != data)
 	{
 		m_portx_ddr[1] = data;
-		m_out_portx_func[1](0, (m_portx_data[1] & m_portx_ddr[1]) | (~m_portx_ddr[1] & m_tri_portx_func[1]()), m_portx_ddr[1]);
+		m_out_portx_func[1](0, (m_portx_data[1] & m_portx_ddr[1]) | (m_portx_ddr[1] ^ 0xff), m_portx_ddr[1]);
 	}
 }
 
@@ -1545,7 +1541,7 @@ void hd6301x_cpu_device::p6_data_w(uint8_t data)
 	LOGPORT("Port 6 Data Register: %02x\n", data);
 
 	m_portx_data[1] = data;
-	m_out_portx_func[1](0, (m_portx_data[1] & m_portx_ddr[1]) | (~m_portx_ddr[1] & m_tri_portx_func[1]()), m_portx_ddr[1]);
+	m_out_portx_func[1](0, (m_portx_data[1] & m_portx_ddr[1]) | (m_portx_ddr[1] ^ 0xff), m_portx_ddr[1]);
 }
 
 uint8_t hd6301y_cpu_device::p6_data_r()

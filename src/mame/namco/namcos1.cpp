@@ -169,7 +169,6 @@ Address          Dir Data     Name      Description
 
 
 
-
 Preliminary driver by:
 Ernesto Corvi
 ernesto@imagina.com
@@ -372,8 +371,9 @@ u8 namcos1_state::dsw_r(offs_t offset)
 	return 0xf0 | bitswap<4>(m_dsw_sel->output_r(), 0, 1, 2, 3);
 }
 
-void namcos1_state::coin_w(u8 data)
+void namcos1_state::coin_w(offs_t offset, u8 data, u8 mem_mask)
 {
+	data &= mem_mask;
 	machine().bookkeeping().coin_lockout_global_w(BIT(~data, 0));
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 1));
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 2));
@@ -1019,7 +1019,6 @@ void namcos1_state::ns1(machine_config &config)
 	m_mcu->set_addrmap(AS_PROGRAM, &namcos1_state::mcu_map);
 	m_mcu->in_p1_cb().set_ioport("COIN");
 	m_mcu->out_p1_cb().set(FUNC(namcos1_state::coin_w));
-	m_mcu->tri_p1_cb().set_constant(0);
 	m_mcu->out_p2_cb().set(FUNC(namcos1_state::dac_gain_w));
 
 	NAMCO_C117(config, m_c117, 0);
