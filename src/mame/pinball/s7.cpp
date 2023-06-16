@@ -788,6 +788,21 @@ ROM_START(bk_l3)
 	ROM_LOAD("sound12.716",  0x4800, 0x0800, CRC(6d454c0e) SHA1(21640b9ed3bdbae8bf27629891f355304e467c64))
 ROM_END
 
+ROM_START(bk_l2)
+	ROM_REGION(0x3000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("bk_rev2.ic26", 0x0800, 0x0800, CRC(703b61e1) SHA1(32013d72d70ed0bfca5eb10769471966c07dba09) )
+	ROM_LOAD("bk_rev2.ic14", 0x1000, 0x0800, CRC(30d87653) SHA1(2b1b927dfbd7c9ddcea2732e0d4e82c236499338) )
+	ROM_LOAD("ic20.716",     0x1800, 0x0800, CRC(dfb4b75a) SHA1(bcf017b01236f755cee419e398bbd8955ae3576a) )
+	ROM_LOAD("ic17.532",     0x2000, 0x1000, CRC(bb571a17) SHA1(fb0b7f247673dae0744d4188e1a03749a2237165) )
+
+	ROM_REGION(0x5000, "s6sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("speech7.532",  0x0000, 0x1000, CRC(c7e229bf) SHA1(3b2ab41031f507963af828639f1690dc350737af))
+	ROM_LOAD("speech5.532",  0x1000, 0x1000, CRC(411bc92f) SHA1(6c8d26fd13ed5eeba5cc40886d39c65a64beb377))
+	ROM_LOAD("speech6.532",  0x2000, 0x1000, CRC(fc985005) SHA1(9df4ad12cf98a5a92b8f933e6b6788a292c8776b))
+	ROM_LOAD("speech4.532",  0x3000, 0x1000, CRC(f36f12e5) SHA1(24fb192ad029cd35c08f4899b76d527776a4895b))
+	ROM_LOAD("sound12.716",  0x4800, 0x0800, CRC(6d454c0e) SHA1(21640b9ed3bdbae8bf27629891f355304e467c64))
+ROM_END
+
 /*-----------------------------------
 / Cosmic Gunfight (#502)
 /-----------------------------------*/
@@ -1102,6 +1117,7 @@ ROM_END
 GAME( 1980, bk_l4,    0,        s7, bk,    s7_state, empty_init, ROT0, "Williams",  "Black Knight (L-4)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, bk_f4,    bk_l4,    s7, bk,    s7_state, empty_init, ROT0, "Williams",  "Black Knight (L-4, French speech)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, bk_l3,    bk_l4,    s7, bk,    s7_state, empty_init, ROT0, "Williams",  "Black Knight (L-3)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, bk_l2,    bk_l4,    s7, bk,    s7_state, empty_init, ROT0, "Williams",  "Black Knight (L-2)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, csmic_l1, 0,        s7, csmic, s7_state, empty_init, ROT0, "Williams",  "Cosmic Gunfight (L-1)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, jngld_l2, 0,        s7, jngld, s7_state, empty_init, ROT0, "Williams",  "Jungle Lord (L-2)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, jngld_l1, jngld_l2, s7, jngld, s7_state, empty_init, ROT0, "Williams",  "Jungle Lord (L-1)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
