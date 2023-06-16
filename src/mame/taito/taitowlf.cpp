@@ -8,19 +8,25 @@ rewritten by Angelo Salese to use the new PCI model
 Three board system consisting of a P5TX-LA PC motherboard, a Taito main board and a rom board.
 
 TODO:
-- The Retro Web MB pic has a Winbond w83877tf Super I/O but neither BIOSes accesses it, is it specific to the (unavailable) ECS P5TX-LA BIOS?
+- The Retro Web MB pic has a Winbond w83877tf Super I/O but neither BIOSes accesses it,
+  is it specific to the (unavailable) ECS P5TX-LA BIOS?
 - p5txla: Rage VGA chip sets up screen with 8x1, making MAME unresponsive.
           Needs x86 VGA legacy map bridge to fix.
-- pf2012: cannot be coined in (lockout read? Enters into gameplay if set to free play);
+- pf2012: cannot be coined in (lockout read? ISA irq? sound CPU comms?)
+          Enters into gameplay if set to free play;
+- pf2012: Should show bootscreen when Voodoo fbiInit0 bit 0 is off (vga_pass), cfr. GH #11343;
 - pf2012: boots in service mode the first time around, needs default EEPROM set;
+- pf2012: service mode RTC item always initializes to 0 for hour count;
 - pf2012: PC portion returns an EMM386 "WARNING: Unable to set page frame base address"
           during boot up, safe to ignore?
-- pf2012: according to manual hold A+B+service button for 10 seconds for entering
-          test mode during initial bootup sequence.
-          Board and input test menu doesn't seem to have a dedicated test mode switch;
 
 Notes:
 - pf2012: -isa1 svga_et4k if you need PC side logs;
+- pf2012: game responds to CTRL+ALT+DEL, which will reset the machine.
+- pf2012: according to manual hold A+B+service button for 10 seconds for entering
+          test mode during initial bootup sequence.
+          Board and input test menu doesn't seem to have a dedicated test mode switch
+          Update: it just goes "SERVICE SW ERROR"?
 
 ===================================================================================================
 
@@ -182,7 +188,9 @@ void isa16_taito_rom_disk::io_map(address_map &map)
 
 	map(0x600, 0x600).lw8(
 		NAME([this] (offs_t offset, u8 data) {
-			// writes 0x30 before showing 3dfx, disable bootscreen?
+			// 0x30 before showing 3dfx logo
+			// 0x3d in-game
+			// 0xf3 in service mode, 0xff when accessing sound volume/panning settings
 			logerror("Write %02x to $600\n", data);
 		})
 	);
@@ -191,7 +199,7 @@ void isa16_taito_rom_disk::io_map(address_map &map)
 		NAME([this] (offs_t offset, u8 data) { m_eepromout->write(data, 0xff); })
 	);
 
-	//map(0x602, 0x603) to sound CPU
+	//map(0x602, 0x603) to/from sound CPU
 }
 
 void isa16_taito_rom_disk::bankdev_map(address_map &map)
@@ -381,8 +389,8 @@ isa16_p5txla_mb::isa16_p5txla_mb(const machine_config &mconfig, const char *tag,
 
 void isa16_p5txla_mb::device_add_mconfig(machine_config &config)
 {
-    // TODO: verify keyboard / RTC types, latter lies inside PIIX4?
-    // need at least a DS12885 otherwise EMM386 will complain to not have enough memory
+	// TODO: verify keyboard / RTC types, latter lies inside PIIX4?
+	// need at least a DS12885 otherwise EMM386 will complain to not have enough memory
 	DS12885(config, m_rtc, 32.768_kHz_XTAL);
 	//m_rtc->irq().set(m_pic8259_2, FUNC(pic8259_device::ir0_w));
 	m_rtc->set_century_index(0x32);
@@ -416,15 +424,17 @@ void isa16_p5txla_mb::remap(int space_id, offs_t start, offs_t end)
 
 namespace {
 
+#define PCI_VIDEO_ID "pci:12.0"
+
 class p5txla_state : public driver_device
 {
 public:
 	p5txla_state(const machine_config &mconfig, device_type type, const char *tag)
-        : driver_device(mconfig, type, tag)
+		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-    void p5txla(machine_config &config);
+	void p5txla(machine_config &config);
 	void taitowlf(machine_config &config);
 
 protected:
@@ -434,10 +444,69 @@ private:
 	void p5txla_io(address_map &map);
 	void p5txla_map(address_map &map);
 
+//  static void winbond_superio_config(device_t *device);
+};
+
+class taitowlf_state : public p5txla_state
+{
+public:
+	taitowlf_state(const machine_config &mconfig, device_type type, const char *tag)
+		: p5txla_state(mconfig, type, tag)
+		, m_voodoo(*this, PCI_VIDEO_ID)
+		, m_screen(*this, "screen")
+	{ }
+
+	void taitowlf(machine_config &config);
+
+protected:
+	required_device<voodoo_1_pci_device> m_voodoo;
+	required_device<screen_device> m_screen;
+
+private:
 	static void romdisk_config(device_t *device);
 
-//	static void winbond_superio_config(device_t *device);
+	u32 screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
 };
+
+u32 taitowlf_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
+{
+// TODO: debug code for bootscreen, ISA card sub-device
+// Also fixed area, not worth decoding more than once (bitmap_device?)
+#if 0
+	static bool enable_switch = 1;
+	// bits 0-2 TAITOWOLF splash screen, bits 4-6 cross hatch
+	static u8 base_pen = 0;
+	const u8 *bootscreen_rom = memregion("bootscreen")->base();
+
+	if (machine().input().code_pressed_once(KEYCODE_Z))
+		enable_switch ^= 1;
+
+	if (machine().input().code_pressed_once(KEYCODE_X))
+		base_pen ^= 4;
+
+	if (enable_switch)
+	{
+		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		{
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+			{
+				const u8 pen = bootscreen_rom[y * 512 + x];
+				// TODO: palette color routing (game barely uses red and white in both screens)
+				const u32 to_rgb = rgb_t(
+					pal1bit(BIT(pen, 0 + base_pen)),
+					pal1bit(BIT(pen, 1 + base_pen)),
+					pal1bit(BIT(pen, 2 + base_pen))
+				);
+				bitmap.pix(y, x) = to_rgb;
+			}
+		}
+
+		return 0;
+	}
+#endif
+
+	return m_voodoo->screen_update(screen, bitmap, cliprect);
+}
 
 void p5txla_state::p5txla_map(address_map &map)
 {
@@ -453,9 +522,9 @@ void p5txla_state::p5txla_io(address_map &map)
 
 static void isa_internal_devices(device_slot_interface &device)
 {
-    // TODO: w83877tf
+	// TODO: w83877tf
 	// It actually don't seem to access any kind of Super I/O, wtf
-//	device.option_add("w83977tf", W83977TF);
+//  device.option_add("w83977tf", W83977TF);
 	device.option_add_internal("taito_romdisk", ISA16_TAITO_ROM_DISK);
 	device.option_add_internal("p5txla_mb", ISA16_P5TXLA_MB);
 }
@@ -464,36 +533,37 @@ static void isa_internal_devices(device_slot_interface &device)
 void p5txla_state::winbond_superio_config(device_t *device)
 {
 	w83977tf_device &fdc = *downcast<w83977tf_device *>(device);
-//	fdc.set_sysopt_pin(1);
+//  fdc.set_sysopt_pin(1);
 	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
 	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
 	fdc.irq1().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq1_w));
 	fdc.irq8().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq8n_w));
-//	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
-//	fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
-//	fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
-//	fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
-//	fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
-//	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
+//  fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
+//  fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
+//  fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
+//  fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
+//  fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
+//  fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
 }
 #endif
 
 // TODO: PCI address mapping is unconfirmed
 void p5txla_state::p5txla(machine_config &config)
 {
-	// 133, 150, 166, 200, 233, 266, 300 MHz options
+	// P55C 133, 150, 166, 200, 233 MHz desktop options
+	// 266, 300 MHz should be mobile only
 	PENTIUM_MMX(config, m_maincpu, 133'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &p5txla_state::p5txla_map);
 	m_maincpu->set_addrmap(AS_IO, &p5txla_state::p5txla_io);
 	m_maincpu->set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
-//	m_maincpu->smiact().set("pci:00.0", FUNC(i82439tx_host_device::smi_act_w));
+//  m_maincpu->smiact().set("pci:00.0", FUNC(i82439tx_host_device::smi_act_w));
 
 	// FSB 66 MHz
 	PCI_ROOT(config, "pci", 0);
-    // 64MB for Taito Wolf HW, to be checked for base p5txla
+	// 64MB for Taito Wolf HW, to be checked for base p5txla
 	I82439TX(config, "pci:00.0", 0, m_maincpu, 64*1024*1024);
 
-    // TODO: 82371AB
+	// TODO: 82371AB
 	i82371sb_isa_device &isa(I82371SB_ISA(config, "pci:07.0", 0, m_maincpu));
 	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
 	isa.smi().set_inputline(m_maincpu, INPUT_LINE_SMI);
@@ -502,7 +572,7 @@ void p5txla_state::p5txla(machine_config &config)
 	ide.irq_pri().set("pci:07.0", FUNC(i82371sb_isa_device::pc_irq14_w));
 	ide.irq_sec().set("pci:07.0", FUNC(i82371sb_isa_device::pc_mirq0_w));
 
-//	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "w83977tf", true).set_option_machine_config("w83977tf", winbond_superio_config);
+//  ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "w83977tf", true).set_option_machine_config("w83977tf", winbond_superio_config);
 	ISA16_SLOT(config, "board2", 0, "pci:07.0:isabus", isa_internal_devices, "p5txla_mb", true);
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
@@ -527,38 +597,38 @@ void p5txla_state::p5txla(machine_config &config)
 #endif
 
 	// on-board
-    ATI_RAGEIIDVD(config, "pci:12.0", 0);
+	ATI_RAGEIIDVD(config, PCI_VIDEO_ID, 0);
 }
 
-void p5txla_state::romdisk_config(device_t *device)
+void taitowlf_state::romdisk_config(device_t *device)
 {
 	isa16_taito_rom_disk &romdisk = *downcast<isa16_taito_rom_disk *>(device);
 	romdisk.set_program_rom_tag("program_rom");
 	romdisk.set_data_rom_tag("data_rom");
 }
 
-void p5txla_state::taitowlf(machine_config &config)
+void taitowlf_state::taitowlf(machine_config &config)
 {
-    p5txla_state::p5txla(config);
+	p5txla_state::p5txla(config);
 
 	m_maincpu->set_clock(200'000'000);
 
 	ISA16_SLOT(config, "board1", 0, "pci:07.0:isabus", isa_internal_devices, "taito_romdisk", true).set_option_machine_config("taito_romdisk", romdisk_config);
 	// TODO: remove keyboard slot option
 
+	VOODOO_1_PCI(config.replace(), m_voodoo, 0, m_maincpu, m_screen);
 	// TODO: unverified parameters
-	voodoo_1_pci_device &voodoo(VOODOO_1_PCI(config.replace(), "pci:12.0", 0, "maincpu", "screen"));
-	voodoo.set_fbmem(2);
-	voodoo.set_tmumem(4, 0);
-	voodoo.set_status_cycles(1000);
+	m_voodoo->set_fbmem(2);
+	m_voodoo->set_tmumem(4, 0);
+	m_voodoo->set_status_cycles(1000);
 
-	// TODO: displays bootscreen ROM contents (512x240 8bpp) while the board is in POST state
-	// This is provided by one of the CPLDs that is on the Taito PCB stack.
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(57);
-	screen.set_size(800, 262);
-	screen.set_visarea(0, 512 - 1, 0, 240 - 1);
-    screen.set_screen_update("pci:12.0", FUNC(voodoo_1_pci_device::screen_update));
+	// TODO: displays bootscreen ROM contents (512x240 8bpp) while the board is in vga_pass off state
+	// This is provided by one of the CPLDs that is on the Taito PCB stack, CRTC values needs to be verified in this state
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(57);
+	m_screen->set_size(800, 262);
+	m_screen->set_visarea(0, 512 - 1, 0, 240 - 1);
+	m_screen->set_screen_update(FUNC(taitowlf_state::screen_update));
 }
 
 /*****************************************************************************/
@@ -570,7 +640,7 @@ ROM_END
 
 ROM_START(pf2012)
 	ROM_REGION32_LE(0x40000, "pci:07.0", ROMREGION_ERASEFF)
-    // TAITO Ver1.0 1998/5/7
+	// TAITO Ver1.0 1998/5/7
 	ROM_LOAD("p5tx-la_861.u16", 0x20000, 0x20000, CRC(a4d4a0fc) SHA1(af3a49a1bee416b58a61af28473f3dac0a4160c8))
 
 	ROM_REGION16_LE(0x400000, "board1:program_rom", 0) // Program ROM (FAT12)
@@ -607,6 +677,6 @@ ROM_END
 
 /*****************************************************************************/
 
-COMP(1997, p5txla, 0,   0, p5txla, 0,   p5txla_state, empty_init, "ECS",    "P5TX-LA (i430TX)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP(1997, p5txla, 0,   0, p5txla, 0, p5txla_state,   empty_init, "ECS",    "P5TX-LA (i430TX)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 
-GAME(1998, pf2012, 0,   taitowlf, 0, p5txla_state, empty_init, ROT0, "Taito",  "Psychic Force 2012 (Ver 2.04J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND) // 1998/05/07 18:30:00
+GAME(1998, pf2012, 0,   taitowlf, 0,  taitowlf_state, empty_init, ROT0, "Taito",  "Psychic Force 2012 (Ver 2.04J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND) // 1998/05/07 18:30:00
