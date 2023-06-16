@@ -239,14 +239,14 @@ license:CC0-1.0
 		<publisher>AMSAT-UK Software Service</publisher>
 		<notes><![CDATA[
 Loading instructions:
-FAI				LOAD "A"
-Geodrifter		LOAD "B"
-RA+DEC			LOAD "C"
-Moontrack		LOAD "D"
-Yankee Clipper	LOAD "E"
-Tensat			LOAD "F"
-Oscar10			LOAD "G"
-TenPlan			LOAD "H"
+	FAI				LOAD "A"
+	Geodrifter		LOAD "B"
+	RA+DEC			LOAD "C"
+	Moontrack		LOAD "D"
+	Yankee Clipper	LOAD "E"
+	Tensat			LOAD "F"
+	Oscar10			LOAD "G"
+	TenPlan			LOAD "H"
 ]]></notes>
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="56578">
