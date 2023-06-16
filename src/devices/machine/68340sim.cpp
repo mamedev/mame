@@ -113,7 +113,7 @@ void m68340_cpu_device::m68340_internal_sim_w(offs_t offset, uint16_t data, uint
 			LOGSIM("PC: %08x %s %04x, %04x (%04x) (MCR - Module Configuration Register)\n", m_ppc, FUNCNAME, offset * 2, data, mem_mask);
 			LOGPIT("- FRZ1: Watchdog and PIT timer are %s\n", (data & m68340_sim::REG_MCR_FRZ1) == 0 ? "enabled" : "disabled");
 			LOGSIM("- FRZ0: The BUS monitor is %s\n", (data & m68340_sim::REG_MCR_FRZ0) == 0 ? "enabled" : "disabled");
-			LOGSIM("- FIRQ: Full Interrupt Request Mode %s\n", data & m68340_sim::REG_MCR_FIRQ ? "used on port B" : "supressed, adding 4 chip select lines on Port B");
+			LOGSIM("- FIRQ: Full Interrupt Request Mode %s\n", data & m68340_sim::REG_MCR_FIRQ ? "used on port B" : "suppressed, adding 4 chip select lines on Port B");
 			LOGSIM("- SHEN0-SHEN1: Show Cycle Enable %02x - not implemented\n", ((data & m68340_sim::REG_MCR_SHEN) >> 8));
 			LOGSIM("- Supervisor registers %s - not implemented\n", data & m68340_sim::REG_MCR_SVREG ? "requries supervisor privileges" : "can be accessed by user privileged software");
 			LOGSIM("- Interrupt Arbitration level: %02x\n", data & m68340_sim::REG_MCR_ARBLV);

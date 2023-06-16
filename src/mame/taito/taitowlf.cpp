@@ -9,13 +9,15 @@ Three board system consisting of a P5TX-LA PC motherboard, a Taito main board an
 
 TODO:
 - The Retro Web MB pic has a Winbond w83877tf Super I/O but neither BIOSes accesses it, is it specific to the (unavailable) ECS P5TX-LA BIOS?
-- pf2012: enters service mode no matter what (failed EEPROM? bad data bank?),
-          fully resets the machine if exited;
+- p5txla: Rage VGA chip sets up screen with 8x1, making MAME unresponsive.
+          Needs x86 VGA legacy map bridge to fix.
+- pf2012: cannot be coined in (lockout read? Enters into gameplay if set to free play);
+- pf2012: boots in service mode the first time around, needs default EEPROM set;
 - pf2012: PC portion returns an EMM386 "WARNING: Unable to set page frame base address"
           during boot up, safe to ignore?
-- According to manual hold A+B+service button for 10 seconds for entering test mode during initial bootup
-  sequence. Board and input test menu doesn't seem to have a dedicated test mode switch.
-  This statement needs verification once we get there;
+- pf2012: according to manual hold A+B+service button for 10 seconds for entering
+          test mode during initial bootup sequence.
+          Board and input test menu doesn't seem to have a dedicated test mode switch;
 
 Notes:
 - pf2012: -isa1 svga_et4k if you need PC side logs;
@@ -68,7 +70,6 @@ Taito W Rom Board:
 #include "bus/rs232/sun_kbd.h"
 #include "bus/rs232/terminal.h"
 #include "cpu/i386/i386.h"
-#include "machine/bankdev.h"
 //#include "machine/w83977tf.h"
 #include "machine/8042kbdc.h"
 #include "machine/ds128x.h"
@@ -77,9 +78,13 @@ Taito W Rom Board:
 #include "machine/pci-ide.h"
 #include "machine/pci.h"
 #include "video/atirage.h"
-#include "video/voodoo_pci.h"
 
+// Specific to taitowlf
+#include "machine/bankdev.h"
+#include "machine/eepromser.h"
+#include "video/voodoo_pci.h"
 #include "taitoio.h"
+
 
 /***********************
  *
@@ -107,6 +112,9 @@ private:
 	required_memory_region m_data_rom;
 	required_device<address_map_bank_device> m_bankdev;
 	required_device<tc0510nio_device> m_tc0510nio;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_ioport m_eepromin;
+	required_ioport m_eepromout;
 
 	void io_map(address_map &map);
 
@@ -130,6 +138,9 @@ isa16_taito_rom_disk::isa16_taito_rom_disk(const machine_config &mconfig, const 
 	, m_data_rom(*this, finder_base::DUMMY_TAG)
 	, m_bankdev(*this, "bankdev")
 	, m_tc0510nio(*this, "tc0510nio")
+	, m_eeprom(*this, "eeprom")
+	, m_eepromin(*this, "EEPROMIN")
+	, m_eepromout(*this, "EEPROMOUT")
 {
 }
 
@@ -147,6 +158,12 @@ void isa16_taito_rom_disk::device_add_mconfig(machine_config &config)
 	//m_tc0510nio->write_4_callback().set
 	m_tc0510nio->read_7_callback().set_ioport("IN7");
 
+	// TODO: verify erase/write times
+	EEPROM_93C66_16BIT(config, m_eeprom)
+		.erase_time(attotime::from_usec(250))
+		.write_time(attotime::from_usec(250));
+
+
 	// TODO: sound CPU et al.
 }
 
@@ -163,7 +180,17 @@ void isa16_taito_rom_disk::io_map(address_map &map)
 
 	//map(0x400, 0x4ff) sound CPU shared RAM?
 
-	//map(0x601, 0x601) EEPROM?
+	map(0x600, 0x600).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			// writes 0x30 before showing 3dfx, disable bootscreen?
+			logerror("Write %02x to $600\n", data);
+		})
+	);
+	map(0x601, 0x601).lrw8(
+		NAME([this] (offs_t offset) { return m_eepromin->read(); }),
+		NAME([this] (offs_t offset, u8 data) { m_eepromout->write(data, 0xff); })
+	);
+
 	//map(0x602, 0x603) to sound CPU
 }
 
@@ -259,14 +286,10 @@ static INPUT_PORTS_START(pf2012)
 	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	// TODO: Either test or service (game doesn't tell which is which)
-	PORT_DIPNAME( 0x0020, 0x0020, "Service/Test? (0x20)" )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	// service mode doesn't explicitly tell, but goes service sw error if left on during boot
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_DIPNAME( 0x0080, 0x0080, "Service/Test? (0x80)" )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("IN3")
 	PORT_DIPNAME( 0x0001, 0x0001, "IN3" )
@@ -303,6 +326,17 @@ static INPUT_PORTS_START(pf2012)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+
+	PORT_START("EEPROMIN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 ioport_constructor isa16_taito_rom_disk::device_input_ports() const
@@ -387,13 +421,16 @@ class p5txla_state : public driver_device
 public:
 	p5txla_state(const machine_config &mconfig, device_type type, const char *tag)
         : driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
     void p5txla(machine_config &config);
 	void taitowlf(machine_config &config);
 
-private:
+protected:
+	required_device<pentium_mmx_device> m_maincpu;
 
+private:
 	void p5txla_io(address_map &map);
 	void p5txla_map(address_map &map);
 
@@ -444,22 +481,24 @@ void p5txla_state::winbond_superio_config(device_t *device)
 // TODO: PCI address mapping is unconfirmed
 void p5txla_state::p5txla(machine_config &config)
 {
-	pentium_device &maincpu(PENTIUM(config, "maincpu", 90000000));
-	maincpu.set_addrmap(AS_PROGRAM, &p5txla_state::p5txla_map);
-	maincpu.set_addrmap(AS_IO, &p5txla_state::p5txla_io);
-	maincpu.set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
-//	maincpu.smiact().set("pci:00.0", FUNC(i82439tx_host_device::smi_act_w));
+	// 133, 150, 166, 200, 233, 266, 300 MHz options
+	PENTIUM_MMX(config, m_maincpu, 133'000'000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &p5txla_state::p5txla_map);
+	m_maincpu->set_addrmap(AS_IO, &p5txla_state::p5txla_io);
+	m_maincpu->set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
+//	m_maincpu->smiact().set("pci:00.0", FUNC(i82439tx_host_device::smi_act_w));
 
+	// FSB 66 MHz
 	PCI_ROOT(config, "pci", 0);
     // 64MB for Taito Wolf HW, to be checked for base p5txla
-	I82439TX(config, "pci:00.0", 0, "maincpu", 64*1024*1024);
+	I82439TX(config, "pci:00.0", 0, m_maincpu, 64*1024*1024);
 
     // TODO: 82371AB
-	i82371sb_isa_device &isa(I82371SB_ISA(config, "pci:07.0", 0, "maincpu"));
+	i82371sb_isa_device &isa(I82371SB_ISA(config, "pci:07.0", 0, m_maincpu));
 	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
-	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
+	isa.smi().set_inputline(m_maincpu, INPUT_LINE_SMI);
 
-	i82371sb_ide_device &ide(I82371SB_IDE(config, "pci:07.1", 0, "maincpu"));
+	i82371sb_ide_device &ide(I82371SB_IDE(config, "pci:07.1", 0, m_maincpu));
 	ide.irq_pri().set("pci:07.0", FUNC(i82371sb_isa_device::pc_irq14_w));
 	ide.irq_sec().set("pci:07.0", FUNC(i82371sb_isa_device::pc_mirq0_w));
 
@@ -502,13 +541,16 @@ void p5txla_state::taitowlf(machine_config &config)
 {
     p5txla_state::p5txla(config);
 
+	m_maincpu->set_clock(200'000'000);
+
 	ISA16_SLOT(config, "board1", 0, "pci:07.0:isabus", isa_internal_devices, "taito_romdisk", true).set_option_machine_config("taito_romdisk", romdisk_config);
 	// TODO: remove keyboard slot option
 
+	// TODO: unverified parameters
 	voodoo_1_pci_device &voodoo(VOODOO_1_PCI(config.replace(), "pci:12.0", 0, "maincpu", "screen"));
 	voodoo.set_fbmem(2);
 	voodoo.set_tmumem(4, 0);
-	voodoo.set_status_cycles(1000); // optimization to consume extra cycles when polling status
+	voodoo.set_status_cycles(1000);
 
 	// TODO: displays bootscreen ROM contents (512x240 8bpp) while the board is in POST state
 	// This is provided by one of the CPLDs that is on the Taito PCB stack.

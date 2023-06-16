@@ -45,6 +45,7 @@ class m6801_cpu_device : public m6800_cpu_device
 public:
 	m6801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// port 1-4 I/O, DDR is passed through mem_mask
 	auto in_p1_cb() { return m_in_port_func[0].bind(); }
 	auto out_p1_cb() { return m_out_port_func[0].bind(); }
 	auto in_p2_cb() { return m_in_port_func[1].bind(); }
@@ -128,33 +129,33 @@ protected:
 	int m_sclk_divider;
 
 	/* internal registers */
-	uint8_t   m_port_ddr[4];
-	uint8_t   m_port_data[4];
-	uint8_t   m_p3csr;          // Port 3 Control/Status Register
-	uint8_t   m_tcsr;           /* Timer Control and Status Register */
-	uint8_t   m_pending_tcsr;   /* pending IRQ flag for clear IRQflag process */
-	uint8_t   m_irq2;           /* IRQ2 flags */
-	uint8_t   m_ram_ctrl;
-	PAIR    m_counter;        /* free running counter */
-	PAIR    m_output_compare; /* output compare       */
-	uint16_t  m_input_capture;  /* input capture        */
-	bool m_pending_isf_clear;
-	int     m_port3_latched;
+	uint8_t  m_port_ddr[4];
+	uint8_t  m_port_data[4];
+	uint8_t  m_p3csr;          // Port 3 Control/Status Register
+	uint8_t  m_tcsr;           /* Timer Control and Status Register */
+	uint8_t  m_pending_tcsr;   /* pending IRQ flag for clear IRQflag process */
+	uint8_t  m_irq2;           /* IRQ2 flags */
+	uint8_t  m_ram_ctrl;
+	PAIR     m_counter;        /* free running counter */
+	PAIR     m_output_compare; /* output compare       */
+	uint16_t m_input_capture;  /* input capture        */
+	bool     m_pending_isf_clear;
+	int      m_port3_latched;
+	bool     m_port2_written;
 
-	uint8_t   m_trcsr, m_rmcr, m_rdr, m_tdr, m_rsr, m_tsr;
-	int     m_rxbits, m_txbits, m_txstate, m_trcsr_read_tdre, m_trcsr_read_orfe, m_trcsr_read_rdrf, m_tx, m_ext_serclock;
-	bool    m_use_ext_serclock;
-	bool    m_port2_written;
+	uint8_t  m_trcsr, m_rmcr, m_rdr, m_tdr, m_rsr, m_tsr;
+	int      m_rxbits, m_txbits, m_txstate, m_trcsr_read_tdre, m_trcsr_read_orfe, m_trcsr_read_rdrf, m_tx, m_ext_serclock;
+	bool     m_use_ext_serclock;
 
-	int     m_latch09;
+	int      m_latch09;
 
-	PAIR    m_timer_over;
+	PAIR     m_timer_over;
 	emu_timer *m_sci_timer;
 
 	/* point of next timer event */
 	uint32_t m_timer_next;
 
-	int     m_sc1_state;
+	int      m_sc1_state;
 
 	static const uint8_t cycles_6803[256];
 	static const uint8_t cycles_63701[256];
@@ -250,6 +251,7 @@ public:
 class hd6301x_cpu_device : public hd6301_cpu_device
 {
 public:
+	// port 5-7 I/O, DDR is passed through mem_mask
 	auto in_p5_cb() { return m_in_portx_func[0].bind(); }
 	auto out_p5_cb() { return m_out_portx_func[0].bind(); }
 	auto in_p6_cb() { return m_in_portx_func[1].bind(); }
@@ -378,7 +380,6 @@ protected:
 	void clear_pending_isf();
 
 	uint8_t m_p6csr;
-	bool m_pending_isf_clear;
 };
 
 

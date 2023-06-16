@@ -7923,9 +7923,7 @@ static INPUT_PORTS_START( strobe )
 
 	PORT_START("IN.7") // R9
 	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_CONFNAME( 0x08, 0x00, "Factory Test" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE ) // beneath a small hole between "S" and "T" on the faceplate
 
 	PORT_START("IN.8") // Vss
 	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )

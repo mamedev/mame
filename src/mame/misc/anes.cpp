@@ -1,15 +1,15 @@
 // license:BSD-3-Clause
-// copyright-holders:Ivan Vangelista, Luca Elia, David Haywood
+// copyright-holders: Luca Elia, David Haywood
 
 /*
 Sanma - San-nin Uchi Mahjong (Japan) by ANES
 Ton Puu Mahjong (Japan) by ANES
 
 TODO:
-- ROM banking;
-- blitter;
-- inputs;
-- DIP sheets are available for sanma.
+- refine blitter emulation;
+- flip screen;
+- player 2 inputs;
+- verify sanma dips translations;
 
 - 1x Z0840008PSC Z80 CPU
 - 1x 16.000 XTAL near the Z80
@@ -26,6 +26,7 @@ TODO:
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/nvram.h"
 #include "sound/ymopl.h"
 
 #include "emupal.h"
@@ -41,6 +42,7 @@ public:
 	anes_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_rombank(*this, "rombank"),
 		m_blitrom(*this, "blitter"),
@@ -58,6 +60,7 @@ private:
 	void vram_offset_w(offs_t offset, uint8_t data);
 
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
 	required_memory_bank m_rombank;
@@ -86,7 +89,6 @@ private:
 	void do_blit();
 	void blit_w(offs_t offset, uint8_t data);
 	void blit_rom_w(offs_t offset, uint8_t data);
-	uint8_t blit_status_r();
 	void blit_unk_w(uint8_t data);
 
 	void rombank_w(uint8_t data);
@@ -163,7 +165,7 @@ void anes_state::do_blit_draw(bitmap_ind16 &bitmap, int &addr, int sx, int sy, i
 
 	if (pen != 0xff)
 	{
-		//	if (pen != 0x00)
+		//  if (pen != 0x00)
 		bitmap.pix(drawy, drawx) = pen;
 	}
 	else
@@ -251,14 +253,6 @@ void anes_state::blit_rom_w(offs_t offset, uint8_t data)
 		logerror("%s: Unknown blit ROM which %02X\n", machine().describe_context(), which);
 }
 
-
-
-uint8_t anes_state::blit_status_r()
-{
-	// bits 0-3 = ?
-	// bit    4 = busy
-	return 0x00;
-}
 
 void anes_state::matrix_w(uint8_t data)
 {
@@ -406,7 +400,7 @@ void anes_state::prg_map(address_map &map)
 	map(0x2000, 0xefff).bankr(m_rombank);
 	map(0x0000, 0x01ff).w(FUNC(anes_state::blit_rom_w));
 	map(0x1000, 0x11ff).w(FUNC(anes_state::blit_rom_w)); // does writing with 0x1000 set on the address have a different meaning?
-	map(0xf000, 0xffff).ram(); // there might be a hole at 0xf800 - 0xf8ff
+	map(0xf000, 0xffff).ram().share("nvram"); // there might be a hole at 0xf800 - 0xf8ff, battery backed RAM may be less
 }
 
 void anes_state::io_map(address_map &map)
@@ -425,7 +419,7 @@ void anes_state::io_map(address_map &map)
 	map(0x13, 0x13).portr("SW4");
 	map(0x14, 0x14).r(FUNC(anes_state::key_r));
 	map(0x15, 0x15).portr("COIN");
-	map(0x16, 0x16).rw(FUNC(anes_state::blit_status_r), FUNC(anes_state::blit_unk_w));
+	map(0x16, 0x16).portr("SYSTEM").w(FUNC(anes_state::blit_unk_w));
 	map(0x50, 0x50).w(FUNC(anes_state::palette_enable_w));
 	map(0x51, 0x51).w(FUNC(anes_state::palette_offset_w));
 	map(0x52, 0x52).w(FUNC(anes_state::palette_offset_msb_w));
@@ -441,6 +435,16 @@ static INPUT_PORTS_START( anes )
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) // test
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_BOOK ) // analyzer
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MEMORY_RESET ) // reset
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 ) // note
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // the following ones have no effect in test mode
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("KEY1.0")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -543,15 +547,143 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( tonpuu )
 	PORT_INCLUDE( anes )
 
+	// dips and defaults not verified from manual
+	PORT_MODIFY("SW1")
+	PORT_DIPNAME( 0x0f, 0x09, "Main Rate" )      PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPSETTING(    0x0f, "50%" )
+	PORT_DIPSETTING(    0x07, "56%" )
+	PORT_DIPSETTING(    0x0b, "59%" )
+	PORT_DIPSETTING(    0x03, "62%" )
+	PORT_DIPSETTING(    0x0d, "65%" )
+	PORT_DIPSETTING(    0x05, "68%" )
+	PORT_DIPSETTING(    0x09, "70%" )
+	PORT_DIPSETTING(    0x01, "72%" )
+	PORT_DIPSETTING(    0x0e, "74%" )
+	PORT_DIPSETTING(    0x06, "76%" )
+	PORT_DIPSETTING(    0x0a, "78%" )
+	PORT_DIPSETTING(    0x02, "80%" )
+	PORT_DIPSETTING(    0x0c, "85%" )
+	PORT_DIPSETTING(    0x04, "90%" )
+	PORT_DIPSETTING(    0x08, "95%" )
+	PORT_DIPSETTING(    0x00, "99%" )
+	PORT_DIPNAME( 0x30, 0x00, "Bonus Rate" )    PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(    0x30, "5%" )
+	PORT_DIPSETTING(    0x10, "10%" )
+	PORT_DIPSETTING(    0x20, "15%" )
+	PORT_DIPSETTING(    0x00, "20%" )
+	PORT_DIPNAME( 0xc0, 0x00, "Max Bet" )    PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(    0xc0, "2" )
+	PORT_DIPSETTING(    0x80, "7" )
+	PORT_DIPSETTING(    0x40, "5" )
+	PORT_DIPSETTING(    0x00, "10" )
+
 	PORT_MODIFY("SW4") // port 0x13
 	PORT_DIPNAME( 0x04, 0x04, "Background Style" )    PORT_DIPLOCATION("SW4:3")
 	PORT_DIPSETTING(    0x04, "Textured" )
 	PORT_DIPSETTING(    0x00, "Flat")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( sanma )
+	PORT_INCLUDE( anes )
+
+	// dips and defaults from manual version 2.60
+	PORT_MODIFY("SW1")
+	PORT_DIPNAME( 0x07, 0x06, "Main Rate" )      PORT_DIPLOCATION("SW1:1,2,3") // spelt 'Mein Rate' in the manual
+	PORT_DIPSETTING(    0x07, "50%" )
+	PORT_DIPSETTING(    0x03, "55%" )
+	PORT_DIPSETTING(    0x05, "60%" )
+	PORT_DIPSETTING(    0x01, "65%" )
+	PORT_DIPSETTING(    0x06, "70%" )
+	PORT_DIPSETTING(    0x02, "75%" )
+	PORT_DIPSETTING(    0x04, "80%" )
+	PORT_DIPSETTING(    0x00, "90%" )
+	PORT_DIPNAME( 0x08, 0x00, "Bonus Rate" )    PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, "20%" )
+	PORT_DIPSETTING(    0x00, "30%" )
+	PORT_DIPNAME( 0x10, 0x10, "Tile Arrangement" )    PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, "Bad" ) // TODO: check this translation
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Difficulty ) )    PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0xc0, 0xc0, "Customer Service" )    PORT_DIPLOCATION("SW1:7,8") // TODO: check this translation
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x80, "Small" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0xc0, "Big" )
+
+	PORT_MODIFY("SW2")
+	PORT_DIPNAME( 0x03, 0x01, "Odds Rate" )      PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x03, "1,2,3,5,8,12,24,36 / 2,3,5,8,12,18,36,58" )
+	PORT_DIPSETTING(    0x01, "1,2,3,5,8,12,24,60 / 2,3,5,8,12,18,36,100" )
+	PORT_DIPSETTING(    0x02, "1,2,3,5,8,15,30,50" )
+	PORT_DIPSETTING(    0x00, "1,2,3,4,5,6,7,8" )
+	PORT_DIPNAME( 0x04, 0x00, "Max Bet" )    PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, "5" )
+	PORT_DIPSETTING(    0x00, "10")
+	PORT_DIPNAME( 0x08, 0x08, "Minimum Bet" )    PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, "1" )
+	PORT_DIPSETTING(    0x00, "2")
+	PORT_DIPNAME( 0x30, 0x00, "Coin Limit" )     PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(    0x30, "100" )
+	PORT_DIPSETTING(    0x10, "300" )
+	PORT_DIPSETTING(    0x20, "1000" )
+	PORT_DIPSETTING(    0x00, "9999" )
+	PORT_DIPNAME( 0xc0, 0x00, "Credit Limit" )     PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPSETTING(    0xc0, "300" )
+	PORT_DIPSETTING(    0x40, "500" )
+	PORT_DIPSETTING(    0x80, "1000" )
+	PORT_DIPSETTING(    0x00, "9999" )
+
+	PORT_MODIFY("SW3") // port 0x12
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW3:1,2,3")
+	PORT_DIPSETTING(    0x00, "10 Coins/1 Credit" )
+	PORT_DIPSETTING(    0x04, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x01, "1 Coin/10 Credits" )
+	PORT_DIPNAME( 0x38, 0x38, "Notes" )          PORT_DIPLOCATION("SW3:4,5,6")
+	PORT_DIPSETTING(    0x00, "10 Notes/1 Credit" )
+	PORT_DIPSETTING(    0x20, "5 Notes/1 Credit" )
+	PORT_DIPSETTING(    0x10, "3 Notes/1 Credit" )
+	PORT_DIPSETTING(    0x30, "2 Notes/1 Credit" )
+	PORT_DIPSETTING(    0x08, "1 Note/1 Credit" )
+	PORT_DIPSETTING(    0x28, "1 Note/2 Credits" )
+	PORT_DIPSETTING(    0x18, "1 Note/5 Credits" )
+	PORT_DIPSETTING(    0x38, "1 Note/10 Credits" )
+	PORT_DIPNAME( 0x40, 0x40, "Pay Out Type" )             PORT_DIPLOCATION("SW3:7")
+	PORT_DIPSETTING(    0x40, "Coin" )
+	PORT_DIPSETTING(    0x00, "Note" )
+	PORT_DIPNAME( 0x80, 0x80, "Pay Out Speed" )                PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Low ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
+
+	PORT_MODIFY("SW4") // port 0x13
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )                PORT_DIPLOCATION("SW4:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "8 Renso Initial Setting" )                PORT_DIPLOCATION("SW4:2") // TODO: check this translation
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )                PORT_DIPLOCATION("SW4:3") // TODO: needs translation
+	PORT_DIPSETTING(    0x04, "Every 2 Bets" )
+	PORT_DIPSETTING(    0x00, "Every 3 Bets" )
+	PORT_DIPNAME( 0x08, 0x08, "Credit Timer" )       PORT_DIPLOCATION("SW4:4") // TODO: check this translation
+	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW4:5" ) // last 4 dips are unused according to the manual
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW4:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW4:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW4:8" )
+INPUT_PORTS_END
+
+
 void anes_state::machine_start()
 {
-	uint8_t* rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	for (int i = 0; i < (memregion("maincpu")->bytes() - 0x2000) / 0xc000; i++)
 		m_rombank->configure_entry(i, &rom[0x2000 + (0xc000 * i)]);
 
@@ -570,7 +702,11 @@ void anes_state::video_start()
 	{
 		m_bitmap[layer].allocate(512, 512);
 		m_bitmap[layer].fill(0);
+		m_screen->register_screen_bitmap(m_bitmap[layer]);
 	}
+
+	save_item(NAME(m_bitmap[0]));
+	save_item(NAME(m_bitmap[1]));
 
 	std::fill(std::begin(m_blit), std::end(m_blit), 0);
 	std::fill(std::begin(m_blit_addr), std::end(m_blit_addr), 0);
@@ -614,16 +750,17 @@ void anes_state::anes(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &anes_state::io_map);
 	maincpu.set_vblank_int("screen", FUNC(anes_state::interrupt));
 
-	// all wrong
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(0*8, 46*8-1, 0*8, 31*8-1);
-	screen.set_screen_update(FUNC(anes_state::screen_update));
-	screen.set_palette("palette");
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	PALETTE(config, "palette").set_entries(0x2000);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER); // TODO: set_raw
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0*8, 46*8-1, 0*8, 31*8-1);
+	m_screen->set_screen_update(FUNC(anes_state::screen_update));
+	m_screen->set_palette(m_palette);
+
+	PALETTE(config, m_palette).set_entries(0x2000);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -660,5 +797,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2001, sanma,  0, anes, anes,   anes_state, empty_init, ROT0, "ANES", "Sanma - San-nin Uchi Mahjong [BET] (Japan, version 2.60)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // flyer says 2000, manual says 2001 version 2.60
-GAME( 200?, tonpuu, 0, anes, tonpuu, anes_state, empty_init, ROT0, "ANES", "Ton Puu Mahjong [BET] (Japan)",                            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2001, sanma,  0, anes, sanma,  anes_state, empty_init, ROT0, "ANES", "Sanma - San-nin Uchi Mahjong [BET] (Japan, version 2.60)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // flyer says 2000, manual says 2001 version 2.60
+GAME( 200?, tonpuu, 0, anes, tonpuu, anes_state, empty_init, ROT0, "ANES", "Ton Puu Mahjong Version 2.0 RX [BET] (Japan)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE  )

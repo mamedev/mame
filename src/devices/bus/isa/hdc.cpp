@@ -117,7 +117,7 @@ const char *const s_hdc_command_names[] =
 
 ROM_START( hdc )
 	ROM_REGION(0x02000,"hdc", 0)
-	// Bios taken from WD1002A-WX1
+	// BIOS taken from WD1002A-WX1
 	ROM_LOAD("wdbios.rom",  0x00000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 ROM_END
 

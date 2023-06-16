@@ -23699,7 +23699,7 @@ kpontoon                        // (c) 1993 Konami
 
 @source:konami/kpython.cpp
 dogstdx                         // (c) 2002 Konami. dogstation Deluxe
-kpython                         // (c) 2002 Konami. Python Bios
+kpython                         // (c) 2002 Konami. Python BIOS
 pesta                           // (c) 2002 Konami. Pro Evolution Soccer The Arcade
 popn9                           // (c) 2003 Konami. Pop'n Music 9
 wswe                            // (c) 2002 Konami. World Soccer Winning Eleven
@@ -34814,7 +34814,7 @@ asst128                         //
 
 @source:pc/at.cpp
 asi100b0                        // ASI 100B0, identified as "HAM 12 TI 286 Motherboard ZERO WAIT" ab hier 286
-at                              // 1987 AMI Bios and Diagnostics
+at                              // 1987 AMI BIOS and Diagnostics
 ataripc4                        // Atari PC4 (286)
 atariabc286                     // Atari ABC-286/30
 atturbo                         // 19?? AT 12 MHz
@@ -34904,8 +34904,8 @@ v286c                           // Victor V286c
 vlsi5                           // 286 motherboards using the 5-chip VLSI chipset
 wpc250                          // Wang PC-250/16 (286)
 wy220001                        // WYSEpc 286
-xb42639                         // 1989 Apricot XEN-S (Venus I Motherboard 286) (Bios:3.10.17i)
-xb42639a                        // 1990 Apricot XEN-S (Venus II Motherboard 286) (Bios:1.02.17)
+xb42639                         // 1989 Apricot XEN-S (Venus I Motherboard 286) (BIOS:3.10.17i)
+xb42639a                        // 1990 Apricot XEN-S (Venus II Motherboard 286) (BIOS:1.02.17)
 zdz248                          // Zenith Z-248 ab hier 386sx
 386sxvhcom                      // 80386SX-VH-COM
 3siud                           // 3SIUD-1.1 motherboard (386sx)
@@ -35033,8 +35033,8 @@ um82c493f                       // motherboards using the UMC UM82C491F + UM82C4
 uni386w                         // UNICHIP 386W 367C REV 1.0 motherboard (386)
 walk386dx                       // 1992 Triumph-Adler Walkstation 386 DX
 xb42663                         // 1988 Apricot Qi 300 (Rev D,E & F Motherboard)
-xb42664                         // 1989 Apricot XEN-S (Venus I Motherboard 386) (Bios:3.10.17i)
-xb42664a                        // 1990 Apricot XEN-S (Venus II Motherboard 386) (Bios:1.02.17) ab hier 486
+xb42664                         // 1989 Apricot XEN-S (Venus I Motherboard 386) (BIOS:3.10.17i)
+xb42664a                        // 1990 Apricot XEN-S (Venus II Motherboard 386) (BIOS:1.02.17) ab hier 486
 486apio                         // EFA 486 APIO motherboard
 486ccv                          // Diamond Flower, Inc. (DFI) 486-CCV motherboard (486)
 486igb21                        // 486IG-B-2-1 motherboard (486)
@@ -38809,7 +38809,7 @@ mvsc2                           // 2000.03 Marvel Vs. Capcom 2 New Age of Heroes
 mvsc2u                          // 2000.03 Marvel Vs. Capcom 2 New Age of Heroes (USA) (Rev A)
 naomi                           // 1998.?? Naomi BIOS
 naomi2                          // 2001.?? Naomi 2 BIOS
-naomigd                         // 2001.?? Naomi GD-ROM Bios
+naomigd                         // 2001.?? Naomi GD-ROM BIOS
 ndcfboxa                        // 2009.04.01 DIMM Firmware Updater for CF-BOX (Rev A)
 ngdup23a                        // DIMM Firmware Updater (Rev A)
 ngdup23c                        // DIMM Firmware Updater (Rev C)

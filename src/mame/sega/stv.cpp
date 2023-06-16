@@ -1883,7 +1883,7 @@ epr-19730  - Japan   PCD11.13J0970217  97/02/17 v1.13 - Enhanced version for CD 
 epr-20091  - Japan   PCS11.13J0970821  97/08/21 v1.13 - Enhanced version for ???
 
 stv110.bin  - Debug  STVB1.10D0950113  95/01/13 v1.10
-stv1061.bin - ST-V Dev Bios (1.061) - Sega 1994, Noted "ST-V Ver 1.061 94/11/25" on EPROM sticker, Coming from a S-TV SG5001A dev board
+stv1061.bin - ST-V Dev BIOS (1.061) - Sega 1994, Noted "ST-V Ver 1.061 94/11/25" on EPROM sticker, Coming from a S-TV SG5001A dev board
 
 Regions found listed in the BIOS:
     Japan
@@ -1895,8 +1895,8 @@ Regions found listed in the BIOS:
     Europe
     Latin America
 
-ROM_SYSTEM_BIOS( x, "saturn",      "Saturn bios" ) \
-ROM_LOAD16_WORD_SWAP_BIOS( x, "saturn.bin", 0x000000, 0x080000, CRC(653ff2d8) SHA1(20994ae7ee177ddaf3a430b010c7620dca000fb4) ) - Saturn Eu Bios
+ROM_SYSTEM_BIOS( x, "saturn",      "Saturn BIOS" ) \
+ROM_LOAD16_WORD_SWAP_BIOS( x, "saturn.bin", 0x000000, 0x080000, CRC(653ff2d8) SHA1(20994ae7ee177ddaf3a430b010c7620dca000fb4) ) - Saturn EU BIOS
 
 */
 
@@ -3839,7 +3839,7 @@ ROM_START( yattrmnp ) // ROM board stickered 837-13598
 	ROM_LOAD( "315-5930.ic19", 0x000, 0x117, CRC(d1201563) SHA1(a133b07240c0a4eb8bae4b438d98fc6148fb7f4f) )
 ROM_END
 
-GAME( 1996, stvbios,   0,       stv_slot, stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "ST-V Bios", MACHINE_IS_BIOS_ROOT )
+GAME( 1996, stvbios,   0,       stv_slot, stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "ST-V BIOS", MACHINE_IS_BIOS_ROOT )
 
 //GAME YEAR, NAME,     PARENT,  MACH,     INP,      STATE,       INIT,            MONITOR
 /* Playable */

@@ -924,7 +924,7 @@ void rastersp_state::interrupt_ctrl_w(offs_t offset, uint8_t data)
 uint8_t rastersp_state::interrupt_status_r(offs_t offset)
 {
 	// TODO: This returns something to do with interrupts
-	// Is it a bit pattern of the current interupt or a
+	// Is it a bit pattern of the current interrupt or a
 	// bit pattern of all interrupts pending?
 	// Either way, 0 works anyway!
 	return 0;

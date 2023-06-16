@@ -71,8 +71,10 @@ private:
 	int m_ch;
 
 	/* Transmitter */
-	uint8_t tx_data;
+	uint8_t m_tx_data;
+	bool m_tx_data_in_buffer;
 	bool m_tx_break;
+	uint8_t m_bits_transmitted;
 
 	/* Rx/Tx clocking */
 	uint8_t m_rx_prescaler , m_tx_prescaler;
