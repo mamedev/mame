@@ -238,7 +238,7 @@ void cortex_state::cortex(machine_config &config)
 /* ROM definition */
 ROM_START( cortex )
 	ROM_REGION( 0x8000, "maincpu", ROMREGION_ERASEFF )
-	ROM_SYSTEM_BIOS(0, "basic", "Cortex Bios")
+	ROM_SYSTEM_BIOS(0, "basic", "Cortex BIOS")
 	ROMX_LOAD( "cortex.ic47", 0x0000, 0x2000, CRC(bdb8c7bd) SHA1(340829dcb7a65f2e830fd5aff82a312e3ed7918f), ROM_BIOS(0))
 	ROMX_LOAD( "cortex.ic46", 0x2000, 0x2000, CRC(4de459ea) SHA1(00a42fe556d4ffe1f85b2ce369f544b07fbd06d9), ROM_BIOS(0))
 	ROMX_LOAD( "cortex.ic45", 0x4000, 0x2000, CRC(b0c9b6e8) SHA1(4e20c3f0b7546b803da4805cd3b8616f96c3d923), ROM_BIOS(0))

@@ -4,7 +4,7 @@
 
 TODO:
 - Jumps to PC=0xfb000 after the first 2 PCI dword configs, which points to empty 0xff opcodes.
-  $3a000 contains an "= Award Decompression Bios =" header
+  $3a000 contains an "= Award Decompression BIOS =" header
 
 Thanks to Guru for hardware infos and pics for Ez2dancer 2nd Move.
 Later games in the series might run on newer, beefier hardware.

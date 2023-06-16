@@ -1935,7 +1935,7 @@ void chihiro_state::chihirogd(machine_config &config)
 
 #define CHIHIRO_BIOS \
 	ROM_REGION32_LE( 0x80000, "bios", 0) \
-	ROM_SYSTEM_BIOS( 0, "bios0", "Chihiro Bios" ) \
+	ROM_SYSTEM_BIOS( 0, "bios0", "Chihiro BIOS" ) \
 	ROM_LOAD_BIOS( 0,  "chihiro_xbox_bios.bin", 0x000000, 0x80000, CRC(66232714) SHA1(b700b0041af8f84835e45d1d1250247bf7077188) ) \
 	ROM_REGION( 0x200000, "mediaboard", 0) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "fpr-23887_29lv160te.ic4", 0x000000, 0x200000, CRC(13034372) SHA1(77197fba2781ed1d81402c48bd743adb26d3161a) ) \
@@ -2557,7 +2557,7 @@ ROM_START( gundcb83b )
 ROM_END
 
 /* Main board */
-/*Chihiro*/ GAME( 2002, chihiro,  0,        chihiro_base, chihiro, chihiro_state, empty_init, ROT0, "Sega",                     "Chihiro Bios", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT )
+/*Chihiro*/ GAME( 2002, chihiro,  0,        chihiro_base, chihiro, chihiro_state, empty_init, ROT0, "Sega",                     "Chihiro BIOS", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT )
 
 /* GDX-xxxx (Sega GD-ROM games) */
 /* 0001  */ GAME( 2002, hotd3,    chihiro,  chihirogd,    chihiro, chihiro_state, empty_init, ROT0, "Sega / Wow Entertainment", "The House of the Dead III (GDX-0001)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )

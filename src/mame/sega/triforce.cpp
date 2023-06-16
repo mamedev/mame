@@ -4,7 +4,7 @@
  -- split from Naomi.c
 
 Triforce uses:
-- a stock Gamecube motherboard with custom Bios
+- a stock Gamecube motherboard with custom BIOS
 - a 'media board' which acts as a CD/DVD emulator
 - the Naomi 'DIMM' board, which connects to the GD-ROM drive
 
@@ -620,7 +620,7 @@ void triforce_state::triforcegd(machine_config &config)
 
 #define TRIFORCE_BIOS \
 	ROM_REGION( 0x200000, "maincpu", 0) \
-	ROM_SYSTEM_BIOS( 0, "bios0", "Triforce Bios" ) \
+	ROM_SYSTEM_BIOS( 0, "bios0", "Triforce BIOS" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "triforce_bootrom.bin", 0x000000, 0x200000, CRC(d1883221) SHA1(c3cb7227e4dbc2af861e76d00cb59726105a2e4c) )
 ROM_START( triforce )
 	TRIFORCE_BIOS
@@ -1300,7 +1300,7 @@ ROM_END
 
 
 /* Main board */
-/*Triforce*/GAME( 2002, triforce, 0,        triforce_base, triforce, triforce_state, empty_init, ROT0, "Sega",                               "Triforce Bios", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT )
+/*Triforce*/GAME( 2002, triforce, 0,        triforce_base, triforce, triforce_state, empty_init, ROT0, "Sega",                               "Triforce BIOS", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT )
 
 /* GDT-xxxx (Sega GD-ROM games) */
 /* 0001  */ GAME( 2002, vs2002j,  triforce, triforcegd,    triforce, triforce_state, empty_init, ROT0, "Sega / Amusement Vision",            "Virtua Striker 2002 (Japan) (GDT-0001)", MACHINE_IS_SKELETON )

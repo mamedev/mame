@@ -95,7 +95,7 @@ void playcenter_state::playcenter(machine_config &config)
 
 // 'Epox' version.
 ROM_START(plycntrchtr)
-	ROM_REGION32_LE(0x40000, "bios", 0) // Bios date: 03/13/2001
+	ROM_REGION32_LE(0x40000, "bios", 0) // BIOS date: 03/13/2001
 	ROM_LOAD("vp4f1313.bin", 0x00000, 0x40000, CRC(bd4b155f) SHA1(3eafe71e89bf84b72a42e933187676fe08db0492))
 
 	DISK_REGION( "ide:0:hdd" )

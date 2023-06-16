@@ -98,7 +98,7 @@ Grull Osgo - Improvements
 compatible with chipset VIA.
  (this motherboard has VIA Apollo VXPro chipset. It is not compatible with Intel i430).
  With this changes now BIOS Shadow ram works fine, BIOS can relocate and decompress the full code
- necesary to run the Extended Bios, POST and Boot). No more BIOS Checksum error.
+ necesary to run the Extended BIOS, POST and Boot). No more BIOS Checksum error.
 
 - Suppressed all video related items wich will be replaced with VGA driver.
 
@@ -110,7 +110,7 @@ compatible with chipset VIA.
 
 - Minor changes and NOPS into address maps for debugging purposes.
 
-- Now Bios is looking for the disk (BIOS Auto detection). It seems all works fine but must be there
+- Now BIOS is looking for the disk (BIOS Auto detection). It seems all works fine but must be there
 something wrong in the disk geometry reported by calchase.chd (20,255,63) since BIOS does not accept
  255 heads as parameter. Perhaps a bad dump?
 
