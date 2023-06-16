@@ -1019,6 +1019,7 @@ void namcos1_state::ns1(machine_config &config)
 	m_mcu->set_addrmap(AS_PROGRAM, &namcos1_state::mcu_map);
 	m_mcu->in_p1_cb().set_ioport("COIN");
 	m_mcu->out_p1_cb().set(FUNC(namcos1_state::coin_w));
+	m_mcu->tri_p1_cb().set_constant(0);
 	m_mcu->out_p2_cb().set(FUNC(namcos1_state::dac_gain_w));
 
 	NAMCO_C117(config, m_c117, 0);

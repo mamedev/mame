@@ -45,6 +45,7 @@ class m6801_cpu_device : public m6800_cpu_device
 public:
 	m6801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// port 1-4 I/O
 	auto in_p1_cb() { return m_in_port_func[0].bind(); }
 	auto out_p1_cb() { return m_out_port_func[0].bind(); }
 	auto in_p2_cb() { return m_in_port_func[1].bind(); }
@@ -53,6 +54,12 @@ public:
 	auto out_p3_cb() { return m_out_port_func[2].bind(); }
 	auto in_p4_cb() { return m_in_port_func[3].bind(); }
 	auto out_p4_cb() { return m_out_port_func[3].bind(); }
+
+	// port outputs when in tri-state (high-impedance), default 0xff
+	auto tri_p1_cb() { return m_tri_port_func[0].bind(); }
+	auto tri_p2_cb() { return m_tri_port_func[1].bind(); }
+	auto tri_p3_cb() { return m_tri_port_func[2].bind(); }
+	auto tri_p4_cb() { return m_tri_port_func[3].bind(); }
 
 	auto out_sc2_cb() { return m_out_sc2_func.bind(); }
 	auto out_ser_tx_cb() { return m_out_sertx_func.bind(); }
@@ -122,6 +129,7 @@ protected:
 
 	devcb_read8::array<4> m_in_port_func;
 	devcb_write8::array<4> m_out_port_func;
+	devcb_read8::array<4> m_tri_port_func;
 
 	devcb_write_line m_out_sc2_func;
 	devcb_write_line m_out_sertx_func;
@@ -251,11 +259,16 @@ public:
 class hd6301x_cpu_device : public hd6301_cpu_device
 {
 public:
+	// port 5-7 I/O
 	auto in_p5_cb() { return m_in_portx_func[0].bind(); }
 	auto out_p5_cb() { return m_out_portx_func[0].bind(); }
 	auto in_p6_cb() { return m_in_portx_func[1].bind(); }
 	auto out_p6_cb() { return m_out_portx_func[1].bind(); }
 	auto out_p7_cb() { return m_out_portx_func[2].bind(); }
+
+	// port outputs when in tri-state (high-impedance), default 0xff
+	auto tri_p5_cb() { return m_tri_portx_func[0].bind(); }
+	auto tri_p6_cb() { return m_tri_portx_func[1].bind(); }
 
 	// TODO: privatize eventually
 	void hd6301x_io(address_map &map);
@@ -305,6 +318,7 @@ protected:
 
 	devcb_read8::array<2> m_in_portx_func;
 	devcb_write8::array<3> m_out_portx_func;
+	devcb_read8::array<2> m_tri_portx_func;
 
 	uint8_t m_portx_ddr[2];
 	uint8_t m_portx_data[3];

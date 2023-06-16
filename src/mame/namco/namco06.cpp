@@ -201,7 +201,7 @@ TIMER_CALLBACK_MEMBER( namco_06xx_device::ctrl_w_sync )
 	else
 	{
 		// NMI is cleared immediately if this is a read
-		// It will be supressed the next clock cycle.
+		// It will be suppressed the next clock cycle.
 		if (BIT(m_control, 4))
 		{
 			set_nmi(CLEAR_LINE);
