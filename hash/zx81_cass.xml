@@ -5,20 +5,21 @@ license:CC0-1.0
 -->
 
 <softwarelist name="zx81_cass" description="Sinclair ZX81 cassettes">
-<!--
-	Sinclair ZX81 Cassettes
+	<!--
+		Sinclair ZX81 cassettes
 
-	Notes about the dumps:
-		Due to the way the ZX81 saves data, different recordings of identical code (such as those in both sides of a cassette) might be stored with a few different bytes on them. Additional dumps of the same release should match those differences.
-		TZX files for ZX81 are just the .P dumps with an additional header on top, so they may not be the cleanest format for archival.
+		Loading instructions:
+			At the prompt, press the following sequence to execute the LOAD "" command:
+				J, Shift+P, Shift+P, Enter
+			Enable UI controls (Scroll Lock) and start the tape (F2).
+			If the program doesn't start automatically after loading, execute the RUN command by pressing:
+				R, Enter
 
-	Loading instructions:
-		At the prompt, press the following sequence to execute the LOAD "" command:
-			J, Shift+P, Shift+P, Enter
-		Enable UI controls (Scroll Lock) and start the tape (F2).
-		If the program doesn't start automatically after loading, execute the RUN command by pressing:
-			R, Enter
--->
+		Notes about the dumps:
+			Due to the way the ZX81 saves data, different recordings of identical code (such as those in both sides of a cassette) might be stored with a few different bytes in them. Additional dumps of the same releases should match those differences.
+			TZX files for ZX81 are just the .P dumps with an additional header on top, so they may not be the cleanest format for archival.
+
+	-->
 
 	<software name="10games">
 		<description>10 Games for 1K</description>
@@ -233,9 +234,20 @@ license:CC0-1.0
 	</software>
 
 	<software name="8progs">
-		<description>8 Programs by GM4IHJ</description>
+		<description>8 Programmes by GM4IHJ</description>
 		<year>198?</year>
-		<publisher>Amsat-UK Software Service</publisher>
+		<publisher>AMSAT-UK Software Service</publisher>
+		<notes><![CDATA[
+Loading instructions:
+FAI				LOAD "A"
+Geodrifter		LOAD "B"
+RA+DEC			LOAD "C"
+Moontrack		LOAD "D"
+Yankee Clipper	LOAD "E"
+Tensat			LOAD "F"
+Oscar10			LOAD "G"
+TenPlan			LOAD "H"
+]]></notes>
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="56578">
 				<rom name="8Programs.tzx" size="56578" crc="bb788390" sha1="e2185c5962d8c89bb020028a22e25470405bef0f" />
